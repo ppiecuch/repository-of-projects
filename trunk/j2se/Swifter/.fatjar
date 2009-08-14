@@ -1,12 +1,12 @@
 #Fat Jar Configuration File
-#Thu Aug 13 09:03:21 CST 2009
+#Fri Aug 14 09:52:03 CST 2009
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
 onejar.checkbox=false
 jarname=Swifter.jar
 manifest.mergeall=true
-manifest.mainclass=core.Monitor
+manifest.mainclass=extend.ZhuXianSwifter
 manifest.file=<createnew>
 jarname.isextern=false
 onejar.expand=

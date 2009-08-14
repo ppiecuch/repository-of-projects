@@ -35,7 +35,6 @@ public abstract class KeyboardHookEventListener implements HookEventListener{
 //		System.out.println(khd.getScanCode());
 		if (khd.getScanCode()==F_12&&khd.getTransitionState()) { // 按下[F12]結束
 			doExit();
-			System.out.println("------程序退出------");
 			System.exit(0);
 		}
 		if (khd.getScanCode()==F_11&&khd.getTransitionState()) { // 按下[F11]結束
