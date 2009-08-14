@@ -86,6 +86,7 @@ public class Monitor {
 				System.out.println("内容已经复制到系统剪贴板");
 				Transferable text = new StringSelection(mouseListener.getDimensionSeries());
 				systemClipboard.setContents(text,null);
+				System.out.println("------程序退出------");
 			}
 
 			@Override
