@@ -20,7 +20,7 @@ public class ZhuXianSwifter {
 	public static final int F_11=122;
 	public static final int F_12=123;
 	
-	private static final String OFFSET_SERIES_1280_1024="-200,138,-200,172,-200,211,-200,248,0,0,33,0,68,0";
+	private static final String OFFSET_SERIES_1280_1024="-200,138,-200,172,-200,211,-200,248,0,0,43,0,84,0";
 
 	/**
 	 * 使用说明：
