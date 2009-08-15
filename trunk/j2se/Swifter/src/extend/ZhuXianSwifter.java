@@ -20,11 +20,12 @@ public class ZhuXianSwifter {
 	public static final int F_11=122;
 	public static final int F_12=123;
 	
-	private static final String OFFSET_SERIES_1280_1024="-200,138,-200,172,-200,211,-200,248,0,0,43,0,84,0";
+	private static final String OFFSET_SERIES_640_480="-125,84,-125,107,-125,130,-125,152,44,0,20,0,0,0";
+	private static final String OFFSET_SERIES_1024_768="-200,138,-200,172,-200,211,-200,248,84,0,43,0,0,0";
 
 	/**
 	 * 使用说明：
-	 * 1、启动后先选择所使用的分辨率，目前只支持1280*1024；
+	 * 1、启动后先选择所使用的分辨率，目前只支持640*480,1024*768；
 	 * 2、然后使用鼠标右键点击一下试炼答题窗口的第一个幸运星的中心点即可；
 	 * 3、使用小键盘的1234选择答案，使用5点星星(第一个使用完会自动用第二个),
 	 * 4、只支持命令行模式
@@ -77,14 +78,14 @@ public class ZhuXianSwifter {
 						switch(keyNum)
 						{
 						case NUM_1:
+							mode="640*480";
+							mouseListener.setCurrentOffsetSeries(OFFSET_SERIES_640_480);
 							break;
 						case NUM_2:
 							break;
 						case NUM_3:
-							break;
-						case NUM_4:
-							mode="1280*1024";
-							mouseListener.setCurrentOffsetSeries(OFFSET_SERIES_1280_1024);
+							mode="1024*768";
+							mouseListener.setCurrentOffsetSeries(OFFSET_SERIES_1024_768);
 							break;
 						default:
 							System.out.println("请重新选择:");
@@ -153,8 +154,7 @@ public class ZhuXianSwifter {
 		System.out.println("请选择屏幕分辨率：");
 		System.out.println("NUM1:640*480");
 		System.out.println("NUM2:800*600");
-		System.out.println("NUM3:1024*768");
-		System.out.println("NUM4:1280*1024");
+		System.out.println("NUM4:1024*768");
 	}
 	
 	private static void printFetchZeroCoordinate()
