@@ -21,7 +21,8 @@ public class ZhuXianSwifter {
 	public static final int F_12=123;
 	
 	private static final String OFFSET_SERIES_640_480="-125,84,-125,107,-125,130,-125,152,44,0,20,0,0,0";
-	private static final String OFFSET_SERIES_1024_768="-200,138,-200,172,-200,211,-200,248,84,0,43,0,0,0";
+	private static final String OFFSET_SERIES_800_600="-156,105,-156,134,-156,163,-156,190,55,0,25,0,0,0";
+	private static final String OFFSET_SERIES_1024_768="-200,138,-200,172,-200,211,-200,248,70,0,32,0,0,0";
 
 	/**
 	 * 使用说明：
@@ -68,6 +69,7 @@ public class ZhuXianSwifter {
 				else if(keyNum==F_11)
 				{
 					haveChooseMode=false;
+					count=0;
 					System.out.println("启动重置模式");
 					printChooseMode();
 				}
@@ -82,6 +84,8 @@ public class ZhuXianSwifter {
 							mouseListener.setCurrentOffsetSeries(OFFSET_SERIES_640_480);
 							break;
 						case NUM_2:
+							mode="800*600";
+							mouseListener.setCurrentOffsetSeries(OFFSET_SERIES_800_600);
 							break;
 						case NUM_3:
 							mode="1024*768";
@@ -154,7 +158,7 @@ public class ZhuXianSwifter {
 		System.out.println("请选择屏幕分辨率：");
 		System.out.println("NUM1:640*480");
 		System.out.println("NUM2:800*600");
-		System.out.println("NUM4:1024*768");
+		System.out.println("NUM3:1024*768");
 	}
 	
 	private static void printFetchZeroCoordinate()
