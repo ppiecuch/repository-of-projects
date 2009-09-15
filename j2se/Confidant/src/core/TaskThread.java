@@ -45,7 +45,7 @@ public final class TaskThread extends Thread {
 	@Override
 	public void run() {
 		Task task;
-		while (runnable) {
+		Label:while (runnable) {
 			synchronized (taskQueue) { // apply for the task queue's obj lock
 				while (taskQueue.isEmpty()) {
 					taskQueue.notify(); // release the task queue's obj lock
@@ -54,6 +54,7 @@ public final class TaskThread extends Thread {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+					if(runnable==false)break Label;
 				}
 				/* when the task queue is not empty */
 				task = taskQueue.remove(0); // fetch the head task
@@ -61,7 +62,7 @@ public final class TaskThread extends Thread {
 			}
 			task.perform(); // perform the task
 		}
-		System.out.println("TaskThread close");
+//		System.out.println("TaskThread close");
 	}
 
 	/**
@@ -86,6 +87,9 @@ public final class TaskThread extends Thread {
 	 */
 	public void close(){
 		this.runnable=false;
+		synchronized (taskQueue) { 
+			taskQueue.notify();
+		}
 	}
 
 }

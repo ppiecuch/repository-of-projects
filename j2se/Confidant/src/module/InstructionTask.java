@@ -60,22 +60,22 @@ public class InstructionTask implements Task {
 	}
 
 	public void perform() {
-		System.out.println("perform:"+toString());
-//		if(this.instruction!=null)
-//		{
-//			robot.keyPress(instruction);
-//			robot.keyRelease(instruction);
-//		}
-//		else if(this.point!=null)
-//		{
-//			robot.mouseMove(point.x,point.y);
-//			robot.mousePress(InputEvent.BUTTON1_MASK);
-//			robot.mouseRelease(InputEvent.BUTTON1_MASK);
-//		}
-//		else
-//		{
-//			System.out.println("warning:Perform nothing!");
-//		}
+//		System.out.println("perform:"+toString());
+		if(this.instruction!=null)
+		{
+			robot.keyPress(instruction);
+			robot.keyRelease(instruction);
+		}
+		else if(this.point!=null)
+		{
+			robot.mouseMove(point.x,point.y);
+			robot.mousePress(InputEvent.BUTTON1_MASK);
+			robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		}
+		else
+		{
+			System.out.println("!警告:非可执行操作!");
+		}
 		
 	}
 	

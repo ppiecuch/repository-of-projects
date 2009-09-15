@@ -57,7 +57,7 @@ public class Operation implements Externalizable {
 		return encode();
 	}
 
-	private void decode(String info) {
+	public void decode(String info) {
 		if (info != null && info.length() != 0) {
 			String str[] = info.split("@");
 			if (str.length == 2) {
@@ -75,7 +75,7 @@ public class Operation implements Externalizable {
 		}
 	}
 
-	private String encode() {
+	public String encode() {
 		if (instruction == null) {
 			return point.x + "," + point.y + "@" + round((double)delay/1000,1);
 		} else {
