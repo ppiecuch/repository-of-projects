@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="lib/org.sf.feeling.swt.win32.extension_1.0.5.v20081205.jar"/>
 	<classpathentry kind="lib" path="lib/xmlbean.jar"/>
 	<classpathentry kind="lib" path="lib/xbean.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

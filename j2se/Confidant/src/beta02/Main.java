@@ -156,7 +156,7 @@ public class Main {
 //						e.printStackTrace();
 //					}
 					
-					calculagraph=new Calculagraph("Ä£ÄâÆ÷");
+					calculagraph=new Calculagraph("Imitator");
 					calculagraph.setOperations(TempRecorder.getOperations());
 					Config.saveConfig(calculagraph);
 					calculagraph=null;
@@ -208,7 +208,7 @@ public class Main {
 			public void start() {
 				if(calculagraph==null)
 				{
-					calculagraph=new Calculagraph();
+					calculagraph=new Calculagraph("Imitator");
 				}
 //				File file =new File("script.txt");
 //				FileInputStream fis;
