@@ -17,6 +17,10 @@ public class Config {
 
 	private static final String FILE_PATH = "script.xml";
 
+	/**
+	 * 导入脚本
+	 * @param calculagraph
+	 */
 	public static void loadConfig(Calculagraph calculagraph) {
 		File file = new File(FILE_PATH);
 		try {
@@ -37,6 +41,10 @@ public class Config {
 		}
 	}
 
+	/**
+	 * 生成脚本
+	 * @param calculagraph
+	 */
 	public static void saveConfig(Calculagraph calculagraph) {
 		File file = new File(FILE_PATH);
 		try {

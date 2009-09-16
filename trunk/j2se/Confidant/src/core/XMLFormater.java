@@ -13,16 +13,6 @@ import org.dom4j.io.XMLWriter;
 
 public class XMLFormater {
 
-//	public static String format(String source) throws JDOMException,
-//			IOException {
-//		SAXBuilder sb = new SAXBuilder();
-//		Reader reader = new StringReader(source);
-//		Document doc = sb.build(reader);
-//		XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-//		String result = outputter.outputString(doc);
-//		return result;
-//	}
-
 	public static void format(File file) throws DocumentException, IOException {
 		
 		SAXReader reader = new SAXReader();

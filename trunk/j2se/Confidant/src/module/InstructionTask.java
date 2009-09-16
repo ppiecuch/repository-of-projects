@@ -59,6 +59,9 @@ public class InstructionTask implements Task {
 		this.instruction=null;
 	}
 
+	/**
+	 * Ö´ÐÐÈÎÎñ
+	 */
 	public void perform() {
 //		System.out.println("perform:"+toString());
 		if(this.instruction!=null)
