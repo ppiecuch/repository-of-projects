@@ -9,7 +9,7 @@ import module.Operation;
 
 public class TempRecorder {
 	
-	private static Long latestRecordTime;
+	private static Long latestRecordTime;			//上次记录时间
 	private static List<Operation> operations=new LinkedList<Operation>();
 	private static Point pressPoint=new Point(-65525,-65525);
 	private static Point releasePoint=new Point(-65525,-65525);

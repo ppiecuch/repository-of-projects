@@ -57,6 +57,10 @@ public class Operation implements Externalizable {
 		return encode();
 	}
 
+	/**
+	 * 将字符串解码成操作实体
+	 * @param info
+	 */
 	public void decode(String info) {
 		if (info != null && info.length() != 0) {
 			String str[] = info.split("@");
@@ -75,6 +79,10 @@ public class Operation implements Externalizable {
 		}
 	}
 
+	/**
+	 * 对操作类进行编码成字符串，方便保存
+	 * @return
+	 */
 	public String encode() {
 		if (instruction == null) {
 			return point.x + "," + point.y + "@" + round((double)delay/1000,1);

@@ -61,43 +61,6 @@ public class Calculagraph extends Thread implements Externalizable {
 
 	}
 	
-//	@Override
-//	public void start() {
-//		
-////		Recorder.start();
-////		try {
-////			Thread.sleep(10000);
-////		} catch (InterruptedException e) {
-////			e.printStackTrace();
-////		}
-////		Recorder.stop();
-////		this.operations=Recorder.getOperations();
-////
-////		File file =new File("D:/file.txt");
-////		try {
-////			file.createNewFile();
-////			FileOutputStream fos=new FileOutputStream(file);
-////			ObjectOutputStream oos=new ObjectOutputStream(fos);
-////			writeExternal(oos);
-////			oos.close();
-////		} catch (IOException e) {
-////			e.printStackTrace();
-////		}
-//		
-//		File file =new File("D:/file.txt");
-//		try {
-//			FileInputStream fis=new FileInputStream(file);
-//			ObjectInputStream ois=new ObjectInputStream(fis);
-//			readExternal(ois);
-//			ois.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//		super.start();
-//	}
-	
 	@Override
 	public synchronized void start() {
 		super.start();
@@ -150,7 +113,6 @@ public class Calculagraph extends Thread implements Externalizable {
 				System.out.println("执行操作:"+count+++"/"+operations.size()+"-->"+op);
 				if(runnable==false) break Label;
 			}
-//			/***/return;
 		}
 		timer.cancel();
 		executive.close();
@@ -188,14 +150,5 @@ public class Calculagraph extends Thread implements Externalizable {
 		}
 		this.operations.add(operation);
 	}
-	
-	
-
-//	public static void main(String[] args)
-//	{
-//		Calculagraph calculagraph=new Calculagraph("第一次");
-//		calculagraph.start();
-//		executive.start();
-//	}
 
 }
