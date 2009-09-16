@@ -30,6 +30,7 @@ public class XMLFormater {
 		OutputFormat of = OutputFormat.createPrettyPrint();
         of.setIndent(true);
         of.setNewlines(true);
+        of.setLineSeparator("\r\n");
         Writer fileWriter=new FileWriter(file);   
         XMLWriter xmlWriter=new XMLWriter(fileWriter,of);
         xmlWriter.write(doc);   

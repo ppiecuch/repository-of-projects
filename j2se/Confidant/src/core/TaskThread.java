@@ -38,6 +38,11 @@ public final class TaskThread extends Thread {
 		}
 		return instanceMap.get(threadId);
 	}
+	
+	public static TaskThread getInstance()
+	{
+		return new TaskThread();
+	}
 
 	private TaskThread() {
 	}
@@ -62,7 +67,7 @@ public final class TaskThread extends Thread {
 			}
 			task.perform(); // perform the task
 		}
-//		System.out.println("TaskThread close");
+		System.out.println("TaskThread close");
 	}
 
 	/**
