@@ -218,8 +218,12 @@ public class Main {
 		Hook.KEYBOARD.install();
 		
 		currentMode=menuMode;
+		System.out.println("====================================================");
+		System.out.println("                   按键精灵 1.1版                    ");
+		System.out.println("====================================================");
+		System.out.println("本程序版权归夜梦星辰所有，联系方式：babala_234@163.com");
+		System.out.println();
 		menuMode.start();
-			
 	}
 
 }
