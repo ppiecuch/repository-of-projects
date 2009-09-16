@@ -27,8 +27,6 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		
-//		calculagraph=new Calculagraph("模拟器");
-		
 		keyboardListener=new KeyboardHookEventListener(){
 
 			@Override
@@ -144,17 +142,6 @@ public class Main {
 			public void doPress(int keyNum) {
 				if(keyNum==Mode.F_12)
 				{
-//					File file =new File("script.txt");
-//					try {
-//						file.createNewFile();
-//						FileOutputStream fos=new FileOutputStream(file);
-//						ObjectOutputStream oos=new ObjectOutputStream(fos);
-//						calculagraph.setOperations(TempRecorder.getOperations());
-//						calculagraph.writeExternal(oos);
-//						oos.close();
-//					} catch (IOException e) {
-//						e.printStackTrace();
-//					}
 					
 					calculagraph=new Calculagraph("Imitator");
 					calculagraph.setOperations(TempRecorder.getOperations());
@@ -210,22 +197,6 @@ public class Main {
 				{
 					calculagraph=new Calculagraph("Imitator");
 				}
-//				File file =new File("script.txt");
-//				FileInputStream fis;
-//				try {
-//					fis = new FileInputStream(file);
-//					ObjectInputStream ois=new ObjectInputStream(fis);
-//					calculagraph.readExternal(ois);
-//					ois.close();
-//					calculagraph.start();
-//					System.out.println("模拟模式已启动,系统正在模拟您的操作...");
-//				} catch (FileNotFoundException e) {1
-//					e.printStackTrace();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				} catch (ClassNotFoundException e) {
-//					e.printStackTrace();
-//				}
 				
 				Config.loadConfig(calculagraph);
 				calculagraph.start();
