@@ -21,7 +21,7 @@ public class Calculagraph extends Thread implements Externalizable {
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final TaskThread executive=TaskThread.getInstance("Executive");
+	private static TaskThread executive;
 	
 	private String title;
 	private List<Operation> operations;
@@ -101,6 +101,7 @@ public class Calculagraph extends Thread implements Externalizable {
 	@Override
 	public synchronized void start() {
 		super.start();
+		executive=TaskThread.getInstance();
 		executive.start();
 	}
 	
@@ -153,6 +154,7 @@ public class Calculagraph extends Thread implements Externalizable {
 		}
 		timer.cancel();
 		executive.close();
+		executive=null;
 		System.out.println("--计时器已关闭--");
 	}
 	
