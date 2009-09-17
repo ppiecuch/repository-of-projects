@@ -94,15 +94,6 @@ public class Calculagraph extends Thread implements Externalizable {
 				timer.schedule(new TimerTask(){
 					@Override
 					public void run() {
-						
-						if(runnable==false)
-						{
-							synchronized(Calculagraph.this){
-								Calculagraph.this.notify();
-							}
-							return;
-						}
-						
 						executive.addTask(task);
 						synchronized(Calculagraph.this){
 							Calculagraph.this.notify();
@@ -116,8 +107,14 @@ public class Calculagraph extends Thread implements Externalizable {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				System.out.println("执行操作:"+count+++"/"+operations.size()+"-->"+op);
-				if(runnable==false) break Label;
+				if(runnable)
+				{
+					System.out.println("执行操作:"+count+++"/"+operations.size()+"-->"+op);
+				}
+				else
+				{
+					break Label;
+				}
 			}
 		}
 		timer.cancel();
