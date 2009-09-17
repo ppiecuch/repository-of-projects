@@ -95,7 +95,13 @@ public class Calculagraph extends Thread implements Externalizable {
 					@Override
 					public void run() {
 						
-						if(runnable==false)return;
+						if(runnable==false)
+						{
+							synchronized(Calculagraph.this){
+								Calculagraph.this.notify();
+							}
+							return;
+						}
 						
 						executive.addTask(task);
 						synchronized(Calculagraph.this){
