@@ -39,7 +39,9 @@ public class OBJLoader {
 				b1=b2;
 				b2=dis.readByte();
 			}
+			buffer.append((char)10);
 			line=buffer.toString();
+			
 			if (line.length() > 0) {
 				if (line.startsWith("v ")) {
 					float[] vertex = new float[3];
@@ -151,6 +153,55 @@ public class OBJLoader {
 						parseInt(face.substring(ix2+1))-1};
 			}
 		}
+	}
+	
+	public float[] getNormals() {
+		float[] normalArray=new float[normals.size()*3];
+		for(int i=0;i<this.normals.size();i++)
+		{
+			normalArray[i*3]=((float[])this.normals.elementAt(i))[0];
+			normalArray[i*3+1]=((float[])this.normals.elementAt(i))[1];
+			normalArray[i*3+2]=((float[])this.normals.elementAt(i))[2];
+		}
+		return normalArray;
+	}
+	
+	public float[] getVertices(){
+		float[] verticeArray=new float[vertices.size()*3];
+		for(int i=0;i<this.vertices.size();i++)
+		{
+			verticeArray[i*3]=((float[])this.vertices.elementAt(i))[0];
+			verticeArray[i*3+1]=((float[])this.vertices.elementAt(i))[1];
+			verticeArray[i*3+2]=((float[])this.vertices.elementAt(i))[2];
+		}
+		return verticeArray;
+	}
+
+	public Vector getCoordinates() {
+		return coordinates;
+	}
+
+	public int[] getFaceIndices() {
+		int[] verticeIndiceArray=new int[faceIndices.size()*3];
+		for(int i=0;i<this.faceIndices.size();i++)
+		{
+			verticeIndiceArray[i*3]=((int[])this.faceIndices.elementAt(i))[0];
+			verticeIndiceArray[i*3+1]=((int[])this.faceIndices.elementAt(i))[1];
+			verticeIndiceArray[i*3+2]=((int[])this.faceIndices.elementAt(i))[2];
+		}
+		return verticeIndiceArray;
+	}
+
+
+
+	public static void main(String[] args) throws IOException
+	{
+		OBJLoader loader=new OBJLoader();
+		InputStream is = loader.getClass().getResourceAsStream("/Liit.obj");
+		loader.load(is);
+		
+		
+		System.out.println("v:"+loader.getVertices().length/3+",vt:"+loader.getCoordinates().size()+",vn:"+loader.getNormals().length/3+",vi:"+loader.getFaceIndices().length/3);
 	}
 
 }
