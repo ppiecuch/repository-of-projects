@@ -32,10 +32,10 @@ public class OBJLoader {
 		String line=null;
 		while(dis.available()!=0)
 		{
-			buffer.delete(0,buffer.length());
+			buffer.setLength(0);		//Çå¿Õbuffer
 			b2=dis.readByte();
 			while((b1!=13||b2!=10)&&dis.available()!=0){
-				buffer.append((char)b1);
+				buffer.append((char)b2);
 				b1=b2;
 				b2=dis.readByte();
 			}
@@ -182,14 +182,35 @@ public class OBJLoader {
 	}
 
 	public int[] getFaceIndices() {
-		int[] verticeIndiceArray=new int[faceIndices.size()*3];
+		int[] faceIndiceArray=new int[faceIndices.size()*3];
 		for(int i=0;i<this.faceIndices.size();i++)
 		{
-			verticeIndiceArray[i*3]=((int[])this.faceIndices.elementAt(i))[0];
-			verticeIndiceArray[i*3+1]=((int[])this.faceIndices.elementAt(i))[1];
-			verticeIndiceArray[i*3+2]=((int[])this.faceIndices.elementAt(i))[2];
+			faceIndiceArray[i*3]=((int[])this.faceIndices.elementAt(i))[0];
+			faceIndiceArray[i*3+1]=((int[])this.faceIndices.elementAt(i))[1];
+			faceIndiceArray[i*3+2]=((int[])this.faceIndices.elementAt(i))[2];
 		}
-		return verticeIndiceArray;
+		return faceIndiceArray;
+	}
+	
+	public int[] getCoordIndices() {
+		int[] coordIndiceArray=new int[coordIndices.size()*2];
+		for(int i=0;i<this.coordIndices.size();i++)
+		{
+			coordIndiceArray[i*2]=((int[])this.coordIndices.elementAt(i))[0];
+			coordIndiceArray[i*2+1]=((int[])this.coordIndices.elementAt(i))[1];
+		}
+		return coordIndiceArray;
+	}
+	
+	public int[] getNormalIndices() {
+		int[] normalIndiceArray=new int[normalIndices.size()*3];
+		for(int i=0;i<this.normalIndices.size();i++)
+		{
+			normalIndiceArray[i*3]=((int[])this.normalIndices.elementAt(i))[0];
+			normalIndiceArray[i*3+1]=((int[])this.normalIndices.elementAt(i))[1];
+			normalIndiceArray[i*3+2]=((int[])this.normalIndices.elementAt(i))[2];
+		}
+		return normalIndiceArray;
 	}
 
 
@@ -201,7 +222,7 @@ public class OBJLoader {
 		loader.load(is);
 		
 		
-		System.out.println("v:"+loader.getVertices().length/3+",vt:"+loader.getCoordinates().size()+",vn:"+loader.getNormals().length/3+",vi:"+loader.getFaceIndices().length/3);
+		System.out.println("v:"+loader.getVertices().length/3+",vt:"+loader.getCoordinates().size()+",vn:"+loader.getNormals().length/3+",vi:"+loader.getFaceIndices().length/3+",ci:"+loader.getCoordIndices().length/2+",ni:"+loader.getNormalIndices().length/3);
 	}
 
 }
