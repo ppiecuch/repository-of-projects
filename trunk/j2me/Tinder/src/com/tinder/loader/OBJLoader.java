@@ -13,7 +13,7 @@ public class OBJLoader {
 	private Vector vertices;			//顶点组
 	private Vector coordinates;		//纹理坐标组
 	private Vector normals;			//法线向量组
-	private Vector faceIndices;		//顶点索引组
+	private Vector verticeIndices;		//顶点索引组
 	private Vector coordIndices;		//纹理索引组
 	private Vector normalIndices;		//法线索引组
 	
@@ -24,7 +24,7 @@ public class OBJLoader {
 		vertices=new Vector();
 		coordinates=new Vector();
 		normals=new Vector();
-		faceIndices=new Vector();
+		verticeIndices=new Vector();
 		coordIndices=new Vector();
 		normalIndices=new Vector();
 		byte b1=-1;
@@ -92,7 +92,7 @@ public class OBJLoader {
 						face_n_ix[2] = val[2];
 						normalIndices.addElement(face_n_ix);
 					}
-					faceIndices.addElement(face);
+					verticeIndices.addElement(face);
 					if (tok.hasMoreTokens()) {
 						val = parseIntTriple(tok.nextToken());
 						face[1] = face[2];
@@ -107,7 +107,7 @@ public class OBJLoader {
 							face_n_ix[2] = val[2];
 							normalIndices.addElement(face_n_ix);
 						}
-						faceIndices.addElement(face);
+						verticeIndices.addElement(face);
 					}
 
 				}
@@ -177,27 +177,44 @@ public class OBJLoader {
 		return verticeArray;
 	}
 
-	public Vector getCoordinates() {
-		return coordinates;
+	public float[] getCoordinates() {
+		float[] coordinateArray=new float[coordinates.size()*2];
+		for(int i=0;i<this.coordinates.size();i++)
+		{
+			coordinateArray[i*2]=((float[])this.coordinates.elementAt(i))[0];
+			coordinateArray[i*2+1]=((float[])this.coordinates.elementAt(i))[1];
+		}
+		return coordinateArray;
 	}
 
-	public int[] getFaceIndices() {
-		int[] faceIndiceArray=new int[faceIndices.size()*3];
-		for(int i=0;i<this.faceIndices.size();i++)
+//	public int[] getVerticeIndices() {
+//		int[] verticeIndiceArray=new int[verticeIndices.size()*3];
+//		for(int i=0;i<this.verticeIndices.size();i++)
+//		{
+//			verticeIndiceArray[i*3]=((int[])this.verticeIndices.elementAt(i))[0];
+//			verticeIndiceArray[i*3+1]=((int[])this.verticeIndices.elementAt(i))[1];
+//			verticeIndiceArray[i*3+2]=((int[])this.verticeIndices.elementAt(i))[2];
+//		}
+//		return verticeIndiceArray;
+//	}
+	public short[] getVerticeIndices() {
+		short[] verticeIndiceArray=new short[verticeIndices.size()*3];
+		for(int i=0;i<this.verticeIndices.size();i++)
 		{
-			faceIndiceArray[i*3]=((int[])this.faceIndices.elementAt(i))[0];
-			faceIndiceArray[i*3+1]=((int[])this.faceIndices.elementAt(i))[1];
-			faceIndiceArray[i*3+2]=((int[])this.faceIndices.elementAt(i))[2];
+			verticeIndiceArray[i*3]=(short)((int[])this.verticeIndices.elementAt(i))[0];
+			verticeIndiceArray[i*3+1]=(short)((int[])this.verticeIndices.elementAt(i))[1];
+			verticeIndiceArray[i*3+2]=(short)((int[])this.verticeIndices.elementAt(i))[2];
 		}
-		return faceIndiceArray;
+		return verticeIndiceArray;
 	}
 	
 	public int[] getCoordIndices() {
-		int[] coordIndiceArray=new int[coordIndices.size()*2];
+		int[] coordIndiceArray=new int[coordIndices.size()*3];
 		for(int i=0;i<this.coordIndices.size();i++)
 		{
-			coordIndiceArray[i*2]=((int[])this.coordIndices.elementAt(i))[0];
-			coordIndiceArray[i*2+1]=((int[])this.coordIndices.elementAt(i))[1];
+			coordIndiceArray[i*3]=((int[])this.coordIndices.elementAt(i))[0];
+			coordIndiceArray[i*3+1]=((int[])this.coordIndices.elementAt(i))[1];
+			coordIndiceArray[i*3+2]=((int[])this.coordIndices.elementAt(i))[2];
 		}
 		return coordIndiceArray;
 	}
@@ -222,7 +239,7 @@ public class OBJLoader {
 		loader.load(is);
 		
 		
-		System.out.println("v:"+loader.getVertices().length/3+",vt:"+loader.getCoordinates().size()+",vn:"+loader.getNormals().length/3+",vi:"+loader.getFaceIndices().length/3+",ci:"+loader.getCoordIndices().length/2+",ni:"+loader.getNormalIndices().length/3);
+		System.out.println("v:"+loader.getVertices().length/3+",vt:"+loader.getCoordinates().length/2+",vn:"+loader.getNormals().length/3+",vi:"+loader.getVerticeIndices().length/3+",ci:"+loader.getCoordIndices().length/3+",ni:"+loader.getNormalIndices().length/3);
 	}
 
 }
