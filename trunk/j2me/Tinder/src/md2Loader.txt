@@ -1,0 +1,242 @@
+unit MD2Loader;
+
+interface
+
+uses
+  Windows, Dialogs, OpenGL, SysUtils, Classes, Textures;
+
+const
+  MAX_TRIANGLES = 4096;
+  MAX_VERTS = 2048;
+  MAX_FRAMES = 512;
+  MAX_MD2SKINS = 32;
+  MAX_SKINNAME = 64;
+  MD2Magic=844121161;//MD2的标志
+  
+type
+   //MD2开头的就是MD2文件里的块结构
+   //Header比较重要，基本上MD2所有的信息都在这里面了
+   //不过也很简单，对于不关心的块，根据各自的Offset跳过去就行了
+
+  //Header
+  TMD2Header = record
+    MagicNum: GLint;
+    Version: GLint;
+    SkinWidth: GLint;
+    SkinHeight: GLint;
+    FrameSize: GLint;
+    SkinsNum: GLint;
+    VerticesNum: GLint;
+    TexCoordsNum: GLint;
+    TrianglesNum: GLint;
+    GLCommandsNum: GLint;
+    FramesNum: GLint;
+    SkinsOffset: GLint;
+    TexCoordsOffset: GLint;
+    TrianglesOffset: GLint;
+    FramesOffset: GLint;
+    GlCommandsOffset: GLint;
+    FileSize: GLint;
+  end;
+
+  //顶点结构
+  TMD2Ver = record
+    x, y, z, l: Byte;
+  end;
+
+  TVertice = record
+    x, y, z: GLfloat;
+  end;
+
+  TTexCoord = record
+    u, v: GLshort;
+  end;
+
+  TMD2TexCoord = record
+    u, v: GLfloat;
+  end;
+
+
+  //桢
+  TMD2Frame = record
+    Scale: TVertice;
+    Trans: TVertice;
+    Name: array[0..15] of Char;
+    Verts: array[0..MAX_VERTS - 1] of TMD2Ver;
+  end;
+
+  TFrame = record
+    Name: string;
+    Verts: array of TVertice;
+  end;
+
+  //三角形
+  TMD2Tri = record
+    VertIndex: array[0..2] of GLushort; //顶点索引
+    TexIndex: array[0..2] of GLushort; //纹理索引
+  end;
+
+  TMD2 = class(TObject)
+    //private
+    FHeader: TMD2Header;
+    FFrames: array of TFrame; //桢
+    FTriangles: array of TMD2Tri; //三角形
+    FTexCoords: array of TMD2TexCoord;
+    Texture: gluint;
+    ModelZoom: glfloat;
+  public
+    constructor Create; //构造函数
+    destructor Destroy; override; //析构函数
+    function LoadFile(fname: string; texName: string): Boolean;
+    procedure MD2Draw(frameID: integer); virtual;
+    procedure MD2Init; virtual;
+  end;
+
+procedure glBindTexture(Target: GLenum; Texture: GLuint); stdcall; external opengl32;
+
+implementation
+{ TMD2File }
+
+constructor TMD2.Create;
+begin
+  ModelZoom := 2;
+end;
+
+destructor TMD2.Destroy;
+begin
+
+end;
+
+function TMD2.LoadFile(fname: string; texName: string): Boolean;
+var
+  modelfile: THandle;
+  i, j: integer;
+  Tri: TMD2Tri;
+  tex: array[0..MAX_VERTS] of TTexCoord;
+  frame: TMD2Frame;
+begin
+  result := false;
+  glEnable(GL_TEXTURE_2D);
+  LoadTexture(texName, Texture, False);
+  modelfile := FileOpen(fname, fmOpenRead);
+  if modelfile <= 0 then
+  begin
+    showmessage('load file erro');
+    exit;
+  end;
+  //读入Header
+  if FileRead(modelfile, FHeader, sizeof(FHeader)) <= 0 then
+  begin
+    showmessage('Read Header erro');
+    exit;
+  end;
+  if FHeader.MagicNum <> MD2Magic then
+  begin
+    showmessage('Not MD2 File');
+    exit;
+  end;
+  //设置Frame长度
+  setlength(FFrames, FHeader.FramesNum);
+  //设置Tri长度
+  setlength(FTriangles, FHeader.TrianglesNum);
+  //
+  SetLength(FTexCoords, FHeader.TexCoordsNum);
+  for i := 0 to FHeader.FramesNum - 1 do
+    //设置每个 Frame的Verts长度
+    setlength(FFrames[i].Verts, FHeader.VerticesNum);
+
+  //定位到TexCoords
+  if FileSeek(modelfile, FHeader.TexCoordsOffset, 0) <= 0 then
+  begin
+    showmessage('Seek TexCoords erro');
+    exit;
+  end;
+  if FileRead(modelfile, Tex, FHeader.TrianglesOffset - FHeader.SkinsOffset) <= 0 then
+  begin
+    showmessage('tex erro');
+    exit;
+  end;
+
+  for i := 0 to FHeader.TexCoordsNum - 1 do
+  begin
+    FTexCoords[i].u := tex[i].u / FHeader.SkinWidth;
+    FTexCoords[i].v := 1 - tex[i].v / FHeader.SkinHeight;
+  end;
+
+  //定位到Triangles
+  if FileSeek(modelfile, FHeader.TrianglesOffset, 0) <= 0 then
+  begin
+    showmessage('Seek Triangles erro');
+    exit;
+  end;
+  for i := 0 to FHeader.TrianglesNum - 1 do
+  begin
+    if FileRead(modelfile, Tri, sizeof(TMD2Tri)) <= 0 then
+    begin
+      showmessage('Tri erro');
+      exit;
+    end;
+    FTriangles[i].VertIndex[0] := Tri.VertIndex[0];
+    FTriangles[i].VertIndex[1] := Tri.VertIndex[1];
+    FTriangles[i].VertIndex[2] := Tri.VertIndex[2];
+
+    FTriangles[i].TexIndex[0] := Tri.TexIndex[0];
+    FTriangles[i].TexIndex[1] := Tri.TexIndex[1];
+    FTriangles[i].TexIndex[2] := Tri.TexIndex[2];
+  end;
+  //定位到 Frames
+  if FileSeek(modelfile, FHeader.FramesOffset, 0) <= 0 then
+  begin
+    showmessage('Seek frame erro');
+    exit;
+  end;
+  ZeroMemory(@frame, Sizeof(frame));
+  for i := 0 to FHeader.FramesNum - 1 do
+  begin
+    if FileRead(modelfile, frame, FHeader.FrameSize) <= 0 then
+    begin
+      showmessage('frame erro');
+      exit;
+    end;
+    FFrames[i].Name := frame.Name;
+    for j := 0 to FHeader.VerticesNum - 1 do
+    begin
+      FFrames[i].Verts[j].x := (frame.Verts[j].x * frame.Scale.x + frame.Trans.x) / ModelZoom;
+      FFrames[i].Verts[j].y := (frame.Verts[j].y * frame.Scale.y + frame.Trans.y) / ModelZoom;
+      FFrames[i].Verts[j].z := (frame.Verts[j].z * frame.Scale.z + frame.Trans.z) / ModelZoom;
+    end;
+  end;
+  MD2Init;
+end;
+
+procedure TMD2.MD2Draw(frameID: integer);
+var
+  i: integer;
+begin
+  if frameID >= FHeader.FramesNum then
+    frameID := -1;
+  if frameID < 0 then exit;
+  glBindTexture(GL_TEXTURE_2D, texture); // 选择纹理
+  glBegin(GL_TRIANGLES);
+  for i := 0 to FHeader.TrianglesNum - 1 do
+  begin
+    glTexCoord2fv(@FTexCoords[FTriangles[i].TexIndex[0]]);
+    glVertex3fv(@FFrames[frameID].Verts[FTriangles[i].VertIndex[0]]);
+    glTexCoord2fv(@FTexCoords[FTriangles[i].TexIndex[1]]);
+    glVertex3fv(@FFrames[frameID].Verts[FTriangles[i].VertIndex[1]]);
+    glTexCoord2fv(@FTexCoords[FTriangles[i].TexIndex[2]]);
+    glVertex3fv(@FFrames[frameID].Verts[FTriangles[i].VertIndex[2]]);
+  end;
+  glEnd();
+end;
+
+procedure TMD2.MD2Init;
+begin
+end;
+
+end.
+
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/chijingde/archive/2005/03/11/317422.aspx
