@@ -37,23 +37,60 @@ public class LittleEndianInputStream {
 		+ ((b2 << 24) >>> 16) 
 		+ ((b1 << 24) >>> 24);
 	}
+	
+	public long readUnsignedInt()
+	throws IOException
+	{
+		int b1 = is.read();
+		int b2 = is.read();
+		int b3 = is.read();
+		int b4 = is.read();
+		
+		return ((long)b4<<24)+(b3<<16)+(b2<<8)+b1;
+	}
 
 	/**
 	 * Read an unsigned short
 	 * @return The short value that is read in.
 	 * @throws IOException If the underlying InputStream throws an exception
 	 */
-	public short readUnsignedShort() 
+	public char readUnsignedShort() 
 	throws IOException 
 	{
 		int b1 = is.read();
 		int b2 = is.read();
-		if (b1 < 0)
-			b1 += 256;
-		if (b2 < 0)
-			b2 += 256;
 
-		return (short)(b2*256+b1);
+		return (char)(b2<<8|b1);
+	}
+//	public short readUnsignedShort() 
+//	throws IOException 
+//	{
+//		int b1 = is.read();
+//		int b2 = is.read();
+//		if (b1 < 0)
+//			b1 += 256;
+//		if (b2 < 0)
+//			b2 += 256;
+//
+//		return (short)(b2*256+b1);
+//	}
+	
+	public void skip(long n)
+	throws IOException
+	{
+		is.skip(n);
+	}
+	
+	public int available()
+	throws IOException
+	{
+		return is.available();
+	}
+	
+	public int readByte()
+	throws IOException
+	{
+		return is.read();
 	}
 
 	/**
