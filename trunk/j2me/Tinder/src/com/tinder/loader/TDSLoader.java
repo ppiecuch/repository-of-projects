@@ -515,6 +515,12 @@ public class TDSLoader {
 		System.out.println("model:"+loader.getModel());
 	}
 	
+	public int getObjectSize(){
+		if(model!=null&&model.objects!=null)
+			return model.objects.size();
+		return 0;
+	}
+	
 	public float[] getVertices(int objectIndex)
 	{
 		return ((TDObject)model.objects.elementAt(objectIndex)).vertices;
