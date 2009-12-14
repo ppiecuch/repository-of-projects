@@ -140,7 +140,7 @@ public class TDSLoader {
 				// 获得并保存对象的名称，然后增加读入的字节数
 				int length=readString(buffer);
 				chunk.bytesRead+=length;
-				((TDObject)model.objects.lastElement()).name=new String(buffer,"GBK").substring(0,length-2);
+				((TDObject)model.objects.lastElement()).name=new String(buffer,"GBK").substring(0,length-1);
 				// 进入其余的对象信息的读入
 				processNextObjectChunk(model, (TDObject)model.objects.lastElement(), chunk);
 				break;
@@ -177,7 +177,7 @@ public class TDSLoader {
 			switch(chunk.ID)
 			{
 			case MATERIAL_NAME:			// 材质的名称
-				((MaterialInfo)model.materials.lastElement()).name=leis.readString((int)(chunk.length-chunk.bytesRead));
+				((MaterialInfo)model.materials.lastElement()).name=leis.readString((int)(chunk.length-chunk.bytesRead)).trim();
 				chunk.bytesRead=chunk.length;
 				break;
 			case MATERIAL_DIFFUSE:		// 对象的RGB颜色
@@ -304,7 +304,8 @@ public class TDSLoader {
 		// 下面读入赋予当前对象的材质名称
 		int length=readString(buffer);
 		prevChunk.bytesRead+=length;
-		strMaterial=new String(buffer,"GBK").substring(0,length-2);
+		strMaterial=new String(buffer,"GBK").substring(0,length-1);
+		System.out.println(strMaterial);
 		
 		String fileName=null;
 		// 遍历所有的纹理
@@ -406,7 +407,7 @@ public class TDSLoader {
 		do{
 			leis.read(buffer, index, 1);
 		}while(buffer[index++]!=0);
-		return index+1;
+		return index;
 	}
 	
 //	private void printChunk(Chunk chunk){
@@ -579,7 +580,7 @@ class TDObject{
 	}
 	
 	public String toString() {
-		return "name:"+name+",vn:"+numOfVerts+",vf:"+numOfFaces+",vu:"+numTexVertex+",maId:"+materialID;
+		return "name:"+name+",v:"+numOfVerts+",vf:"+numOfFaces+",vu:"+numTexVertex+",maId:"+materialID;
 	}
 }
 /**
