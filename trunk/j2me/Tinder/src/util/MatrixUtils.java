@@ -248,5 +248,25 @@ public class MatrixUtils {
 	for (int i=0;i<a.length;i++)
 	    res[i] = a[i]+b[i];
     }
+    
+    /**
+     * zero all the elements of the vector
+     * @param a the vector
+     */
+    public static void zero(float[] a)
+    {
+    	for(int i=0;i<a.length;i++)
+    		a[i]=0.0f;
+    }
+    
+    /**
+     * zero all the elements of the vector
+     * @param a the vector
+     */
+    public static void zero(int[] a)
+    {
+    	for(int i=0;i<a.length;i++)
+    		a[i]=0;
+    }
 }
 

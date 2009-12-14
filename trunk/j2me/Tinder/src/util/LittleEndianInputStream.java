@@ -143,6 +143,12 @@ public class LittleEndianInputStream {
 	{
 		return is.read(buff);
 	}
+	
+	public int read(byte[] buffer,int pos,int offset)
+	throws IOException
+	{
+		return is.read(buffer,pos,offset);
+	}
 
 	/**
 	 * Read in a String from the InputStream
