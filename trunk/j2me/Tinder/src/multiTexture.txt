@@ -1,0 +1,45 @@
+OpenGL多个纹理的创建
+由于一直使用DevIL库的ilut辅助函数直接从文件创建OpenGL纹理，所以基本上没怎么直接用过OpenGL的纹理操作命令。昨天需要一次从内存创建六个纹理，结果总是不成功，最初代码是这样的：
+        GLuint uiTextures[ 6]；
+        ::glGenTextures( 6, uiTextures);
+        for( int i = 0; i < 6; ++i)
+        {
+                ::glBindTexture( GL_TEXTURE_2D, uiTextures[ i] );
+                ::glTexImage2D( GL_TEXTURE_2D, 0, 3, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, lpTexData);
+        }// for
+        ......
+但是执行后却发现只有uiTextures[ 5]纹理有效，其它都是白的！原因是在绑定每个纹理并指定其数据之后，必须还得调整其属性，否则就会出现上述问题。所以改成下面这样就对了：
+        GLuint uiTextures[ 6]；
+        ::glGenTextures( 6, uiTextures);
+        for( int i = 0; i < 6; ++i)
+        {
+                ::glBindTexture( GL_TEXTURE_2D, uiTextures[ i] );
+                ::glTexImage2D( GL_TEXTURE_2D, 0, 3, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, lpTexData);
+                ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        }// for
+        ......
+        
+AUX_RGBImageRec *TextureImage[3];
+TextureImage[0]= auxDIBImageLoadA("floor.bmp");
+TextureImage[1]= auxDIBImageLoadA("wall.bmp");
+TextureImage[2]= auxDIBImageLoadA("wall3.bmp");
+glGenTextures(3, &texture[0]); // 创建纹理 
+for(int i=0;i<3;i++)
+{
+glBindTexture(GL_TEXTURE_2D, texture[i]); // 使用来自位图数据生成 的典型纹理
+// 生成纹理
+glTexImage2D(GL_TEXTURE_2D, 0, 3, TextureImage[i]->sizeX, TextureImage[i]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureImage[i]->data);
+glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // 线形滤波
+glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // 线形滤波
+}
+
+glEnable(GL_TEXTURE_2D);
+
+然后怎么贴呢？
+大虾赐教
+已经解决，原来NEHE上有的....
+在每一面前加这个
+glBindTexture(GL_TEXTURE_2D, texture[i]);
