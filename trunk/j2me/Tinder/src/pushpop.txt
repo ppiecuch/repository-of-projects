@@ -1,0 +1,67 @@
+glPushMatrix didn't fail to push onto the stack; it's job is to push a copy of the current matrix onto a stack of matrices. Those matrices on the stack don't interact at all. You only manipulate the current, top-most, matrix at any given time.
+
+Example 1:
+
+   command                 result
+
+glLoadMatrixf(A)       stack = [A]
+glPushMatrix()         stack = [A, A]
+glLoadMatrixf(B)       stack = [B, A]
+glPopMatrix()          stack = [A]
+
+Example 2:
+
+   command                 result
+
+glLoadMatrixf(A)       stack = [A]
+glPushMatrix()         stack = [A, A]
+glMultMatrixf(B)       stack = [AB, A]
+glPopMatrix()          stack = [A]
+
+
+Notice that glLoadMatrixf replaced the top-most matrix, whilst glMultMatrixf just manipulated it.
+Likewise, functions such as glTranslate* and glRotate* just manipulate (by multiplication) the top-most matrix.
+
+
+//出于自己测试方便的目的，把原来的球半径0.001改成了0.1了   
+  void   drawChannel(   GLfloat   x1,   GLfloat   y1,   GLfloat   z1,   GLfloat   x2,   GLfloat   y2,   GLfloat   z2   )   
+  {   
+  //   计算方向向量   
+  GLfloat   dx   =   fabs(x2   -   x1);   
+  GLfloat   dy   =   fabs(y2   -   y1);   
+  GLfloat   dz   =   fabs(z2   -   z1);   
+  GLfloat   distance   =   sqrt(   dx*dx   +   dy*dy   +   dz*dz   );   
+  //   单位化方向向量   
+                    GLfloat   d1   =   1.0f   /   distance;   
+  dx   =   dx   *   d1;   
+  dy   =   dy   *   d1;   
+  dz   =   dz   *   d1;   
+  //   做Z和方向向量叉乘后的向量——转轴   
+  GLfloat   dxv   =   -dy;   
+  GLfloat   dyv   =   dx;   
+  GLfloat   dzv   =   0;   
+  //   计算夹角   
+  GLfloat   arg   =   asin(sqrt(dxv*dxv+dyv*dyv))*180.0f   /   3.1415926;   
+    
+  //   绘制第一个球   
+  glPushMatrix();   
+  glTranslatef(x1,   y1,   z1);   
+  glutSolidSphere(0.1,   12,   12);     
+  glPopMatrix();   
+    
+  //   绘制圆柱   
+  glPushMatrix();   
+  GLUquadric   *   mySphere;   
+  mySphere   =   gluNewQuadric();   
+  gluQuadricDrawStyle(mySphere,   GLU_FILL);   
+  gluQuadricNormals(mySphere,   GLU_SMOOTH);   
+  //   旋转到指定的方向   
+  glRotated(arg,   dxv,   dyv,   dzv);   
+  gluCylinder(mySphere,   0.1,   0.1,   distance,   6,   1);   
+  glPopMatrix();   
+  //   绘制第二个球   
+  glPushMatrix();   
+  glTranslatef(x2,   y2,   z2);   
+  glutSolidSphere(0.1,   12,   12);       
+  glPopMatrix();   
+  };
