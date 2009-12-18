@@ -1,0 +1,490 @@
+Frustum Culling in OpenGL
+By Mark Morley
+December 2000 
+
+
+
+
+Introduction:
+Imagine you are writing a program that lets the user wander around in a virtual world that's chock full of trees, buildings, cars, people, and all sorts of other objects. What would your main rendering loop look like? 
+The simplest and most obvious thing to do would be to loop through all of the objects in your world and tell OpenGL to draw each one. After all, OpenGL clips everything for you so you don't have to worry about objects that are off-screen. Everything will look correct when it's done. 
+
+If you only had a few objects, that method would probably suffice. But as you add more and more objects to your world you'll find that things bog down pretty quickly. It won't be long before your frame rate plummets. 
+
+Now, it's likely that only a small fraction of the objects in your world are actually visible at any given moment. If you could somehow determine that an object will not be visible before you draw it, you could just skip it and avoid sending all that extra data down the OpenGL pipeline in the first place. 
+
+One way to do this is known as Frustum Culling. 
+
+
+
+
+Definitions:
+Before we go any further, let's answer a few basic questions: 
+
+What's the view frustum? 
+
+The view frustum is the volume of space that includes everything that is currently visible from a given viewpoint. It is defined by six planes arranged in the shape of a pyramid with the top chopped off. If a point is inside this volume then it's in the frustum and it's visible. If a point is outside of the frustum then it isn't visible. 
+[Note that by "visible" what I really mean is that it's potentially visible. For example, it might be behind another point that obscures it, but it's still in the frustum.] 
+
+
+What's a plane? 
+
+A plane is like an infinitely long, infinitely wide, and infinitely thin sheet of paper. Any given point is in front of the plane, behind the plane, or actually part of the plane. 
+A plane can be defined with four numbers: A, B, and C define the plane's normal, and D defines its distance from the origin. If this is all greek to you, don't sweat it - you don't really need to understand it to use it. 
+
+
+
+
+The Nitty Gritty
+Ok, the first thing we need to know is: what are the numbers that define the six planes of the current view frustum? 
+Figuring this out on your own can be tough. Fortunately, with a little bit of effort you can extract these numbers from OpenGL itself. What we need to do is extract the current PROJECTION and MODELVIEW matrices, combine them, then extract the values from the resulting matrix. 
+
+First of all, let's assume that we're going to store the frustum values in a global variable like this: 
+
+
+float frustum[6][4];
+
+That's six sets of four numbers (six planes, each with an A, B, C, and D value). 
+
+Now here's the function that extracts the numbers and fills in the array. You'll call this function once each frame, after setting up your view but before drawing your objects. 
+
+
+ExtractFrustum()
+{
+   float   proj[16];
+   float   modl[16];
+   float   clip[16];
+   float   t;
+
+   /* Get the current PROJECTION matrix from OpenGL */
+   glGetFloatv( GL_PROJECTION_MATRIX, proj );
+
+   /* Get the current MODELVIEW matrix from OpenGL */
+   glGetFloatv( GL_MODELVIEW_MATRIX, modl );
+
+   /* Combine the two matrices (multiply projection by modelview) */
+   clip[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
+   clip[ 1] = modl[ 0] * proj[ 1] + modl[ 1] * proj[ 5] + modl[ 2] * proj[ 9] + modl[ 3] * proj[13];
+   clip[ 2] = modl[ 0] * proj[ 2] + modl[ 1] * proj[ 6] + modl[ 2] * proj[10] + modl[ 3] * proj[14];
+   clip[ 3] = modl[ 0] * proj[ 3] + modl[ 1] * proj[ 7] + modl[ 2] * proj[11] + modl[ 3] * proj[15];
+
+   clip[ 4] = modl[ 4] * proj[ 0] + modl[ 5] * proj[ 4] + modl[ 6] * proj[ 8] + modl[ 7] * proj[12];
+   clip[ 5] = modl[ 4] * proj[ 1] + modl[ 5] * proj[ 5] + modl[ 6] * proj[ 9] + modl[ 7] * proj[13];
+   clip[ 6] = modl[ 4] * proj[ 2] + modl[ 5] * proj[ 6] + modl[ 6] * proj[10] + modl[ 7] * proj[14];
+   clip[ 7] = modl[ 4] * proj[ 3] + modl[ 5] * proj[ 7] + modl[ 6] * proj[11] + modl[ 7] * proj[15];
+
+   clip[ 8] = modl[ 8] * proj[ 0] + modl[ 9] * proj[ 4] + modl[10] * proj[ 8] + modl[11] * proj[12];
+   clip[ 9] = modl[ 8] * proj[ 1] + modl[ 9] * proj[ 5] + modl[10] * proj[ 9] + modl[11] * proj[13];
+   clip[10] = modl[ 8] * proj[ 2] + modl[ 9] * proj[ 6] + modl[10] * proj[10] + modl[11] * proj[14];
+   clip[11] = modl[ 8] * proj[ 3] + modl[ 9] * proj[ 7] + modl[10] * proj[11] + modl[11] * proj[15];
+
+   clip[12] = modl[12] * proj[ 0] + modl[13] * proj[ 4] + modl[14] * proj[ 8] + modl[15] * proj[12];
+   clip[13] = modl[12] * proj[ 1] + modl[13] * proj[ 5] + modl[14] * proj[ 9] + modl[15] * proj[13];
+   clip[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
+   clip[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
+
+   /* Extract the numbers for the RIGHT plane */
+   frustum[0][0] = clip[ 3] - clip[ 0];
+   frustum[0][1] = clip[ 7] - clip[ 4];
+   frustum[0][2] = clip[11] - clip[ 8];
+   frustum[0][3] = clip[15] - clip[12];
+
+   /* Normalize the result */
+   t = sqrt( frustum[0][0] * frustum[0][0] + frustum[0][1] * frustum[0][1] + frustum[0][2] * frustum[0][2] );
+   frustum[0][0] /= t;
+   frustum[0][1] /= t;
+   frustum[0][2] /= t;
+   frustum[0][3] /= t;
+
+   /* Extract the numbers for the LEFT plane */
+   frustum[1][0] = clip[ 3] + clip[ 0];
+   frustum[1][1] = clip[ 7] + clip[ 4];
+   frustum[1][2] = clip[11] + clip[ 8];
+   frustum[1][3] = clip[15] + clip[12];
+
+   /* Normalize the result */
+   t = sqrt( frustum[1][0] * frustum[1][0] + frustum[1][1] * frustum[1][1] + frustum[1][2] * frustum[1][2] );
+   frustum[1][0] /= t;
+   frustum[1][1] /= t;
+   frustum[1][2] /= t;
+   frustum[1][3] /= t;
+
+   /* Extract the BOTTOM plane */
+   frustum[2][0] = clip[ 3] + clip[ 1];
+   frustum[2][1] = clip[ 7] + clip[ 5];
+   frustum[2][2] = clip[11] + clip[ 9];
+   frustum[2][3] = clip[15] + clip[13];
+
+   /* Normalize the result */
+   t = sqrt( frustum[2][0] * frustum[2][0] + frustum[2][1] * frustum[2][1] + frustum[2][2] * frustum[2][2] );
+   frustum[2][0] /= t;
+   frustum[2][1] /= t;
+   frustum[2][2] /= t;
+   frustum[2][3] /= t;
+
+   /* Extract the TOP plane */
+   frustum[3][0] = clip[ 3] - clip[ 1];
+   frustum[3][1] = clip[ 7] - clip[ 5];
+   frustum[3][2] = clip[11] - clip[ 9];
+   frustum[3][3] = clip[15] - clip[13];
+
+   /* Normalize the result */
+   t = sqrt( frustum[3][0] * frustum[3][0] + frustum[3][1] * frustum[3][1] + frustum[3][2] * frustum[3][2] );
+   frustum[3][0] /= t;
+   frustum[3][1] /= t;
+   frustum[3][2] /= t;
+   frustum[3][3] /= t;
+
+   /* Extract the FAR plane */
+   frustum[4][0] = clip[ 3] - clip[ 2];
+   frustum[4][1] = clip[ 7] - clip[ 6];
+   frustum[4][2] = clip[11] - clip[10];
+   frustum[4][3] = clip[15] - clip[14];
+
+   /* Normalize the result */
+   t = sqrt( frustum[4][0] * frustum[4][0] + frustum[4][1] * frustum[4][1] + frustum[4][2] * frustum[4][2] );
+   frustum[4][0] /= t;
+   frustum[4][1] /= t;
+   frustum[4][2] /= t;
+   frustum[4][3] /= t;
+
+   /* Extract the NEAR plane */
+   frustum[5][0] = clip[ 3] + clip[ 2];
+   frustum[5][1] = clip[ 7] + clip[ 6];
+   frustum[5][2] = clip[11] + clip[10];
+   frustum[5][3] = clip[15] + clip[14];
+
+   /* Normalize the result */
+   t = sqrt( frustum[5][0] * frustum[5][0] + frustum[5][1] * frustum[5][1] + frustum[5][2] * frustum[5][2] );
+   frustum[5][0] /= t;
+   frustum[5][1] /= t;
+   frustum[5][2] /= t;
+   frustum[5][3] /= t;
+}
+
+Whew! That's a big one. Certainly doesn't look like it'll help to speed things up does it? It will, believe me. We only have to call this function once each frame, so don't be alarmed by those expensive sqrt() calls and all the math. 
+
+
+
+
+Is This Point In the Frustum?
+Ok, so we have the plane equations, how do we test an object against the frustum to determine if it might be visible? Let's start small, with a single point. 
+Given what we now know about planes and points, we can make the following observation: 
+
+A point is within the frustum if it is in front of all six planes simultaneously. 
+
+[This is true because our frustum planes all face inwards. If they faced outwards we'd say that a point has to be behind all six planes.] 
+
+Good stuff! That's going to form the basis for all the tests we come up with. The next step is to figure out whether a point is in front of a plane or not. To do that we have to calculate the distance of the point from the plane. If the distance is positive then the point is in front of the plane. If it's negative then it's behind the plane. 
+
+Here's the formula for calculating a point's distance from a plane: 
+
+
+distance = A * X + B * Y + C * Z + D
+
+Where A, B, C, and D are the four numbers that define the plane and X, Y, and Z are the point's coordinates. 
+
+So now we can write a function that checks a point against the frustum: 
+
+
+bool PointInFrustum( float x, float y, float z )
+{
+   int p;
+
+   for( p = 0; p < 6; p++ )
+      if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= 0 )
+         return false;
+   return true;
+}
+
+The function simply loops through all six planes, calculating the distance of the point from each plane. If it's behind any one of them we can exit immediately, so on average we'll only have to perform three distance calculations to reject a point, while points that are in the frustum will require all six tests. 
+
+Simple, huh? 
+
+By the way, this function treats points that are right on the plane as if they were outside the frustum, which seems perfectly acceptable to me. If you want to count those points as being inside, just change the <= operator to <. 
+
+
+
+
+Bounding Volumes
+Before we move on to more elaborate tests, we should talk about bounding volumes. 
+Let's say that one of your objects is a highly detailed model with a huge polygon count. We could perform our PointInFrustum() test on every vertex in the model, but the test itself would probably become slower than simply sending everything to OpenGL in the first place. 
+
+[Actually, testing every point wouldn't always work - what if the model totally encloses the frustum? All points would be outside the frustum but we'd still want to draw it.] 
+
+So what do we do? Imagine a sphere that totally encloses the model. Now instead of testing the model itself, let's just test the sphere. If any part of the sphere is "visible" we draw the model (but not the sphere, normally). 
+
+This allows us to decide whether or not to draw an object with one simple test, rather than testing every vertex in the object itself. Of course, the sphere we test may be in the frustum even though the model itself isn't visible, but in that case we just let OpenGL deal with it. 
+
+The sphere that we're testing is called a bounding sphere, and it's one example of a bounding volume. The other common bounding volume is the bounding box. You could use any other volume shape, but spheres and boxes are usually the most practical.
+
+
+The idea is to calculate a bounding sphere or box for each object as you load it into memory. For a sphere you need to store a point and a radius, only four numbers. For a cube you could do the same, and for an arbitrary box you'll need eight points. In any case, the overhead is small. 
+
+So which is better, a sphere or a box? Well it depends. We'll come back to this question later. 
+
+
+
+
+Is This Sphere In the Frustum?
+Well now we know why we'd want to test a sphere, but how exactly do we do it? As it turns out, it's almost exactly the same test as the PointInFrustum() function. 
+Here you go: 
+
+
+bool SphereInFrustum( float x, float y, float z, float radius )
+{
+   int p;
+
+   for( p = 0; p < 6; p++ )
+      if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= -radius )
+         return false;
+   return true;
+}
+
+We pass it the X, Y, and Z of the sphere's center, and the sphere's radius. The only difference from the point test is that we compare the distance to the radius instead of zero. 
+
+
+
+
+A Cool Variation
+Consider this variation of the SphereInFrustum() function: 
+
+float SphereInFrustum( float x, float y, float z, float radius )
+{
+   int p;
+   float d;
+
+   for( p = 0; p < 6; p++ )
+   {
+      d = frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3];
+      if( d <= -radius )
+         return 0;
+   }
+   return d + radius;
+}
+
+It's almost identical, except we return zero if the sphere is not in the frustum, otherwise we return the distance plus the radius from the last plane tested. 
+
+What does this do for us? Well, the last plane in the frustum array is the near plane, so in addition to telling us if a sphere is visible it now also tells us how far away the object is from the camera. 
+
+This is cool because we can use it to alter the level of detail. If the object is close to the near plane we can render it using more polygons, but if it's far away we can probably get away with a less detailed version. The neat thing is that it's free - we had to do the calculation anyway! 
+
+[Note that simply using the distance to determine a level of detail isn't always the best method. You might also want to take into account the sphere's radius. For example, a very large object that's far away may still need more detail than a tiny object that's closer.] 
+
+
+
+
+Is This Box In the Frustum?
+A point can't be bigger than the frustum, and the sphere test works even when the sphere totally encloses the frustum, but a box is a bit more complicated. 
+We can test to see if any of the eight corners are within the frustum of course, and that would work for most cases, but what happens if the box totally encloses the frustum? All of the corners are outside of the frustum, but it's still visible. 
+
+For this example we'll assume that the bounding box is a cube, but you can easily modify the routine to work for an arbitrary set of eight points (or more if you want to use a more complicated bounding volume). 
+
+Here it is (and this one works, even if the cube encloses the frustum): 
+
+
+bool CubeInFrustum( float x, float y, float z, float size )
+{
+   int p;
+
+   for( p = 0; p < 6; p++ )
+   {
+      if( frustum[p][0] * (x - size) + frustum[p][1] * (y - size) + frustum[p][2] * (z - size) + frustum[p][3] > 0 )
+         continue;
+      if( frustum[p][0] * (x + size) + frustum[p][1] * (y - size) + frustum[p][2] * (z - size) + frustum[p][3] > 0 )
+         continue;
+      if( frustum[p][0] * (x - size) + frustum[p][1] * (y + size) + frustum[p][2] * (z - size) + frustum[p][3] > 0 )
+         continue;
+      if( frustum[p][0] * (x + size) + frustum[p][1] * (y + size) + frustum[p][2] * (z - size) + frustum[p][3] > 0 )
+         continue;
+      if( frustum[p][0] * (x - size) + frustum[p][1] * (y - size) + frustum[p][2] * (z + size) + frustum[p][3] > 0 )
+         continue;
+      if( frustum[p][0] * (x + size) + frustum[p][1] * (y - size) + frustum[p][2] * (z + size) + frustum[p][3] > 0 )
+         continue;
+      if( frustum[p][0] * (x - size) + frustum[p][1] * (y + size) + frustum[p][2] * (z + size) + frustum[p][3] > 0 )
+         continue;
+      if( frustum[p][0] * (x + size) + frustum[p][1] * (y + size) + frustum[p][2] * (z + size) + frustum[p][3] > 0 )
+         continue;
+      return false;
+   }
+   return true;
+}
+
+We pass in the center coordinates of the cube and the size, which is actually half of the cube's length (think of it like a sphere's radius). Then for each plane we test each corner of the cube. As soon as we find a point that is in front of the current plane, we can move on to the next plane, possibly saving several calculations. If we test all eight points against a plane and all of them are behind it, then we can exit immediately because the cube can't be visible. If we make it to the end then every plane has at least one point in front of it, so the cube is visible. 
+
+ NOTE: The function given above will produce the occasional false positive, meaning it will tell you a cube is visible when it's not. This happens in the case where all the corners of the bounding box are not behind any one plane, but it's still outside the frustum. So you might end up rendering objects that won't be visible. Depending on how your world looks and how you're using frustum culling, this is likely to be a rare event, and it shouldn't have a noticeable impact on overall rendering speed unless the false positives contain a very large number of polygons. 
+
+To make this completely accurate you would also have to test the eight corners of the frustum volume against the six planes that make up the sides of the bounding box. If the bounding box is axially aligned, you can dispense with the box's planes and perform some simple greater-than/less-than tests for each corner of the frustum. In any case, this is left as an exercise for those with more patience than I :-) 
+
+
+
+
+
+Intersection Tests
+The routines presented thus far have checked to see if any part of the bounding volume is in the frustum, which is fast and probably what you want in most cases. But sometimes it's useful to know if a bounding volume is entirely within the frustum or only partially inside. 
+Why would you want to know this? Well, let's say that you have a bounding volume that encloses many other bounding volumes, and they in turn enclose other bounding volumes, until you finally get to individual objects (this is pretty much how an octree works). If you test the top-most bounding volume and it's not visible, you can skip all the things it contains. If it's totally inside the frustum then so are all of the things inside it, so you can jump straight to the objects and render them all without further testing. But if it's only partially in the frustum you'll want to test each bounding volume it contains and deal with their contents in a similar, recursive manner. 
+
+Here's a version of the SphereInFrustum() function that returns 0 if the sphere is totally outside, 1 if it's partially inside, and 2 if it's totally inside: 
+
+
+int SphereInFrustum( float x, float y, float z, float radius )
+{
+   int p;
+   int c = 0;
+   float d;
+
+   for( p = 0; p < 6; p++ )
+   {
+      d = frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3];
+      if( d <= -radius )
+         return 0;
+      if( d > radius )
+         c++;
+   }
+   return (c == 6) ? 2 : 1;
+}
+
+We still get to exit early if the sphere is completely behind any of the six planes, but now we also test to see if it's completely in front of the plane as well. If it is we increment a counter. When we reach the end we just check the counter - if it's equal to six then the sphere doesn't intersect any of the planes so it's completely inside the frustum, otherwise it's only partially inside. 
+
+And here's a version of CubeInFrustum() that does the same thing: 
+
+
+int CubeInFrustum( float x, float y, float z, float size )
+{
+   int p;
+   int c;
+   int c2 = 0;
+
+   for( p = 0; p < 6; p++ )
+   {
+      c = 0;
+      if( frustum[p][0] * (x - size) + frustum[p][1] * (y - size) + frustum[p][2] * (z - size) + frustum[p][3] > 0 )
+         c++;
+      if( frustum[p][0] * (x + size) + frustum[p][1] * (y - size) + frustum[p][2] * (z - size) + frustum[p][3] > 0 )
+         c++;
+      if( frustum[p][0] * (x - size) + frustum[p][1] * (y + size) + frustum[p][2] * (z - size) + frustum[p][3] > 0 )
+         c++;
+      if( frustum[p][0] * (x + size) + frustum[p][1] * (y + size) + frustum[p][2] * (z - size) + frustum[p][3] > 0 )
+         c++;
+      if( frustum[p][0] * (x - size) + frustum[p][1] * (y - size) + frustum[p][2] * (z + size) + frustum[p][3] > 0 )
+         c++;
+      if( frustum[p][0] * (x + size) + frustum[p][1] * (y - size) + frustum[p][2] * (z + size) + frustum[p][3] > 0 )
+         c++;
+      if( frustum[p][0] * (x - size) + frustum[p][1] * (y + size) + frustum[p][2] * (z + size) + frustum[p][3] > 0 )
+         c++;
+      if( frustum[p][0] * (x + size) + frustum[p][1] * (y + size) + frustum[p][2] * (z + size) + frustum[p][3] > 0 )
+         c++;
+      if( c == 0 )
+         return 0;
+      if( c == 8 )
+         c2++;
+   }
+   return (c2 == 6) ? 2 : 1;
+}
+
+This routine tests all eight corners against each plane, counting how many corners are in front of the plane. If none of the eight corners are in front, then we can exit immediately because the entire cube is outside the frustum. If all eight are in front of the plane then we increment a second counter. When we reach the end we know that at least some part of the cube is in the frustum, so we check the second counter. If it equals six then the cube is completely within the frustum, otherwise only part of it is. 
+
+Possible variations on these functions might return a byte value where each bit represents a specific frustum plane. Set a bit if the volume is completely in front of the corresponding plane, otherwise leave it unset. In the end if all bits are unset, it isn't in the frustum at all. If all six bits are set, it's completely in the frustum. And if only some of the six bits are set, it's partially in the frustum. The difference now is that you know which planes it intersects. 
+
+
+
+
+Spheres VS Boxes
+The opinions on whether to use bounding spheres or boxes seems to be fairly evenly split. Personally I think you should use spheres whenever possible. Here's why: 
+
+The sphere test is more accurate, it doesn't return false positives like the cube test can. 
+
+The sphere test is the fastest, requiring on average only 3 distance tests to reject a sphere, and at most 6. The cube test, on the other hand, requires at least 6 and possibly as many as 48! 
+
+Consider an object that is spinning around it's center point. The sphere enclosing it doesn't change, but if it's enclosed in a box, parts of the object may stick out as it spins, so you'd have to remember to rotate the box as well (or make the box bigger in the first place). 
+
+Spheres take less memory to store. Only four floating point numbers as opposed to the eight required for a box (well, if it's a cube you can get away with four numbers too). 
+
+Bounding spheres do have one flaw though. Consider an object that is long and thin, like a telephone pole. The sphere that fully encloses it needs to be fairly large, and winds up incorporating a lot of empty space. If you had many objects like this your bounding sphere test would result in rendering a lot of non-visible objects. 
+There are a few ways to deal with this. One way would be to use a long thin bounding box instead of a sphere. This gives you a more accurate bounding volume, but requires a more complicated test. 
+
+Another option is to break the object up into smaller pieces, each with its own bounding sphere. If you have really large or complicated objects you might want to do this anyway. 
+
+Yet another option is to leave the object in one piece, but define multiple bounding spheres for it. If any one of the spheres is in the frustum, draw the whole object. This may require overlapping spheres though, so whether it will speed things up or not depends very much on the shape and size of the object. 
+
+In the end it's up to you. You may find that it's necessary to use a combination of techniques. 
+
+
+
+
+Testing Triangles and Other Polygons
+I am often asked how to test polygons against the frustum. Really it's just like the CubeInFrustum() test, but for an arbitrary number of points. The same rule applies: if all of the points are behind any single frustum plane then the polygon is invisible, otherwise at least some part of it is in the frustum (we assume the polygons are convex of course). 
+[Note: This test is may generate the occasional false positive, just like I've explained in the CubeInFrustum() section above] 
+
+Here's the routine: 
+
+
+bool PolygonInFrustum( int numpoints, POINT* pointlist )
+{
+   int f, p;
+
+   for( f = 0; f < 6; f++ )
+   {
+      for( p = 0; p < numpoints; p++ )
+      {
+         if( frustum[f][0] * pointlist[p].x + frustum[f][1] * pointlist[p].y + frustum[f][2] * pointlist[p].z + frustum[f][3] > 0 )
+            break;
+      }
+      if( p == numpoints )
+         return false;
+   }
+   return true;
+}
+
+We pass in the number of points we're testing, and a pointer to the point array itself (assume that a POINT structure contains an X, Y, and Z value - it's actual structure is irrelevent). For each frustum plane we test all the points, breaking out early if a point is in front of a plane. If all the points are behind the plane we return false immediately. If we make it to the end then every plane has at least one point in front of it so the polygon is potentially visible. 
+[This routine certainly has its uses, but in a real-time game or simulation it's not a great idea to use it for testing every single polygon in your scene. OpenGL itself can clip polygons faster than you can. The idea behind frustum culling is to discard entire sets of polygons and/or objects with a single test.] 
+
+
+
+
+Optimizations
+The following optimizations could be made, but it's hard to say if they will make any significant difference: 
+
+You can eliminate all the code in ExtractFrustum() that has to do with normalizing the plane values. This will result in scaled distances when you compare a point to a plane. The point and box tests will still work, but the sphere test won't. If you aren't using bounding spheres at all this will save a few expensive calculations per frame, but those probably won't be an issue on most systems. 
+
+ExtractFrustum() actually only needs to be called in frames where the camera position has moved. If your PROJECTION and MODELVIEW matrices don't change from frame to frame, don't bother recalculating the frustum planes. 
+
+Try unrolling the loops inside the test routines. 
+
+
+
+Sample Code
+I've written a sample program that demonstrates frustum culling. It lets you wander around in a world that's filled with either points, spheres, or cubes of varying sizes and colors. The source code and executable can be downloaded here: 
+
+LessonX.zip Visual C++ 6.0 Source Code (17K) 
+
+LessonX.exe Windows Executable (78K) 
+
+The keyboard commands are as follows: 
+
+Esc - Exit 
+Up - Moves the camera forward 
+Down - Moves the camera backwards 
+Left - Turns the camera left 
+Right - Turns the camera right 
+U - Tilts the camera up 
+D - Tilts the camera down 
+Keypad + - Adds more objects to the world (1000 max) 
+Keypad - - Subtracts objects from the world (1 min) 
+W - Wide angle (increases FOV) 
+T - Telephoto (decreases FOV) 
+G - Toggles the ground plane grid 
+M - Changes mode (objects change from points to spheres to cubes) 
+C - Toggles frustum culling 
+Things to note: 
+
+
+This source code is based on NeHe Production's OpenGL tutorial framework (nehe.gamedev.net), and I've tried to mimic his programming and commenting style, which is very different than my own. 
+
+You'll likely find that the cube mode is faster than the spheres. This is not due to the frustum test - it's just that the cubes require less geometry to render. The sphere tests are still faster. 
+
+With culling enabled, try different FOV values. The larger your FOV (ie: the wider your viewing angle), the larger your frustum becomes and more objects will be rendered. This is something to keep in mind when you're trying to tweak every last frame out of an application. 
+
+The main rendering loop simply runs through all the known objects. A better way would be to store the objects in an octree or use some other method of space partitioning, but that's beyond the scope of this tutorial. 
+
+http://www.crownandcutlass.com/features/technicaldetails/frustum.html
