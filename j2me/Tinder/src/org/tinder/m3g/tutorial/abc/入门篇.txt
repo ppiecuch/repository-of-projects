@@ -28,6 +28,8 @@ Moto 220/T720µÈ¡£M3GÖ»ÊÇÒ»¸öJava½Ó¿Ú£¬¾ßÌåµÄµ×²ã3DÒýÇæÒ»°ãÓÉC´úÂëÊµÏÖ£¬±ÈÈçÐí¶àÊ
 Mobile 3D Graphics APIÖÐÓÐ¼¸¸ö±È½ÏÖØÒªµÄÀà£º
 
 1¡¢Object3D£º¼¸ºõ°üÖÐËùÓÐÀà¶¼¼Ì³Ð×Ô´ËÀà£¬²¢ÇÒËùÓÐ¿ÉÒÔäÖÈ¾µÄÀà¼°´Óm3gÎÄ¼þÖÐÔØÈëµÄÀà¶¼ÊÇËüµÄ×ÓÀà£» 
-2¡¢World£ºÕû¸ö³¡¾°Í¼ÐÎ½á¹¹µÄ»ù´¡£¬ËùÓÐ3D¶ÔÏó¶¼Ó¦¼ÓÈëµ½World¶ÔÏóÖÐ¡£µ±ÔØÈëÒ»¸öm3gÎÄ¼þÊ±£¬Æä¸ù¶ÔÏóÒ»°ã¾ÍÊÇÒ»¸öWorld¶ÔÏó¡£µ±ÎÒÃÇäÖÈ¾³¡¾°Ê±£¬Ö»Òª½«World¶ÔÏó×÷ÎªÒ»¸öäÖÈ¾¶ÔÏó´«µÝ¸øGraphics3D¶ÔÏó¼´¿É¡£ 
+2¡¢World£ºÕû¸ö³¡¾°Í¼ÐÎ½á¹¹µÄ»ù´¡£¬ËùÓÐ3D¶ÔÏó¶¼Ó¦¼ÓÈëµ½World¶ÔÏóÖÐ¡£µ±ÔØÈëÒ»¸öm3gÎÄ¼þÊ±£¬Æä¸ù¶Ô
+ÏóÒ»°ã¾ÍÊÇÒ»¸öWorld¶ÔÏó¡£µ±ÎÒÃÇäÖÈ¾³¡¾°Ê±£¬Ö»Òª½«World¶ÔÏó×÷ÎªÒ»¸öäÖÈ¾¶ÔÏó´«µÝ¸øGraphics3D¶ÔÏó¼´¿É¡£ 
 3¡¢Graphics3D£º3DÍ¼ÐÎÉÏÏÂÎÄ£¬ÊÇÒ»¸öµ¥ÀýÀà£¬Ìá¹©¶ÔÏó°ó¶¨½Ó¿Ú£¬ËùÓÐäÖÈ¾¶¼ÊÇÍ¨¹ýËüÀ´ÊµÏÖµÄ¡£ 
-4¡¢Loader£ºÕë¶ÔËùÓÐ³¡¾°Í¼ÐÎ¡¢µ¥¶ÀµÄ·ÖÖ§ÒÔ¼°ÊôÐÔ¶ÔÏóµÄÒì²½ÔØÈëÆ÷£¨½âÎöÆ÷£©¡£¿ÉÒÔÓÃÓÚÔØÈëm3gÎÄ¼þ£¬¼´ÆäÖÐËùÒÔ3D¶ÔÏó¡£
+4¡¢Loader£ºÕë¶ÔËùÓÐ³¡¾°Í¼ÐÎ¡¢µ¥¶ÀµÄ·ÖÖ§ÒÔ¼°ÊôÐÔ¶ÔÏóµÄÒì²½ÔØÈëÆ÷£¨½âÎöÆ÷£©¡£¿ÉÒÔÓÃÓÚÔØÈëm3gÎÄ¼þ£¬¼´
+ÆäÖÐËùÒÔ3D¶ÔÏó¡£
