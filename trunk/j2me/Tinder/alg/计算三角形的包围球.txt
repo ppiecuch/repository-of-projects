@@ -1,0 +1,30 @@
+void MinimumBoundingCircle(Circle &circle, Point a, Point b, Point c) {   
+    float dotABAB = Dot(b - a, b - a);   
+    float dotABAC = Dot(b - a, c - a);   
+    float dotACAC = Dot(c - a, c - a);   
+    float d = 2.0f*(dotABAB*dotACAC - dotABAC*dotABAC);   
+    Point referencePt = a;   
+    if (Abs(d) <= EPSILON) {   
+        // a, b, and c lie on a line. Circle center is center of AABB of the   
+        // points, and radius is distance from circle center to AABB corner   
+        AABB bbox = ComputeAABB(a, b, c);   
+        circle.c = 0.5f * (bbox.min + bbox.max);   
+        referencePt = bbox.min;   
+    } else {   
+        float s = (dotABAB*dotACAC - dotACAC*dotABAC) / d;   
+        float t = (dotACAC*dotABAB - dotABAB*dotABAC) / d;   
+        // s controls height over AC, t over AB, (1-s-t) over BC   
+        if (s <= 0.0f) {   
+            circle.c = 0.5f * (a + c);   
+        } else if (t <= 0.0f) {   
+            circle.c = 0.5f * (a + b);   
+        } else if (s + t >= 1.0f) {   
+            circle.c = 0.5f * (b + c);   
+            referencePt = b;   
+        } else circle.c = a + s*(b - a) + t*(c - a);   
+    }   
+    circle.r = Sqrt(Dot(circle.c - referencePt, circle.c - referencePt));   
+}  
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2009/09/15/4556202.aspx
