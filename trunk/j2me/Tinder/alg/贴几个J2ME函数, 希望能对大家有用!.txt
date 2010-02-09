@@ -1,0 +1,307 @@
+swap(int a, int b) ...{
+    a = a ^ b; 
+    b = a ^ b; 
+    a = a ^ b; 
+}
+/** *//**
+     * 求平方根
+     * @param value 定义域
+     * @return 值域
+     */
+    final public static int sqrt(int value) ...{
+        int sqrt = 0;
+        for (int k = 0x100000; k != 0; k >>= 2) ...{
+            int tmp = sqrt + k;
+            sqrt >>= 1;
+            if (tmp <= value) ...{
+                value -= tmp;
+                sqrt += k;
+            }
+        }
+        return sqrt;
+    }原理：先按行缩放，再按列缩放 
+测试结果，在50MS以下 
+
+package com.gts.Util; 
+
+
+import javax.microedition.lcdui.*; 
+
+
+public class GImageUtil ...{ 
+        /** *//** 
+         * 本次缩放操作的所用时间 
+         * 以毫秒的形式 
+         */ 
+        public static long timecost = 0; 
+
+
+        /** *//** 
+         * 快速缩放一个图片 
+         * 得到一个不带透明色的缩放後的图片 
+         * 一般耗时在 50ms 以下 
+         * @param imgSrc - 原始图片 
+         * @param scale100 - 缩放比率，以百分比的形式，比如输入200，表示放大到原始的200%；输入75，表示缩小到原始的 
+75% 
+         * @return 
+         */ 
+        public static final Image fastScale(Image imgSrc, int scale100) ...{ 
+                int width = imgSrc.getWidth(); 
+                int height = imgSrc.getHeight(); 
+
+
+                width *= scale100; 
+                width /= 100; 
+                height *= scale100; 
+                height /= 100; 
+
+
+//              return scale(imgSrc, width, height); 
+                return fastScale(imgSrc, width, height); 
+        } 
+
+
+        /** *//** 
+         * 快速缩放 
+         * @param imgSrc - 原始图片 
+         * @param w_new  - 新宽度 
+         * @param h_new - 新高度 
+         * @return - 缩放后的图片 
+         */ 
+        public static final Image fastScale(Image src, int dstW ,int dstH) ...{ 
+                long time = System.currentTimeMillis(); 
+
+
+                int srcW = src.getWidth(); 
+        int srcH = src.getHeight(); 
+
+
+        Image tmp = Image.createImage(dstW, srcH); 
+        Graphics g = tmp.getGraphics(); 
+
+
+        int delta = (srcW << 16) / dstW; 
+        int pos = delta >> 1; 
+
+
+        for (int x = 0; x < dstW; x++) ...{ 
+                g.setClip(x, 0, 1, srcH); 
+                g.drawImage(src, x - (pos >> 16), 0, Graphics.LEFT | 
+Graphics.TOP); 
+                pos += delta; 
+        } 
+
+
+        Image dst = Image.createImage(dstW, dstH); 
+        g = dst.getGraphics(); 
+
+
+        delta = (srcH << 16) / dstH; 
+        pos = delta >> 1; 
+
+
+        for (int y = 0; y < dstH; y++) ...{ 
+                g.setClip(0, y, dstW, 1); 
+                g.drawImage(tmp, 0, y - (pos >> 16), Graphics.LEFT | 
+Graphics.TOP); 
+                pos += delta; 
+        } 
+
+
+//        return dst; 
+
+
+        tmp = null; 
+                timecost = System.currentTimeMillis() - time; 
+
+
+                return dst; 
+        } 
+
+
+ /** *//**轮询次数计数器*/ 
+        static int sort_counter = 0; 
+        /** *//**交换次数计数器*/ 
+        static int swap_counter = 0; 
+
+        /** *//** 
+         * 冒泡排序法 
+         * 从小到大 
+         * @param data - 原始数据 
+         * @param smallToBig - true if 从小到大; false if 从大到小 
+         */ 
+        public static final void bubbleSort(int[] data, boolean smallToBig) ...{ 
+                int high = data.length; 
+
+
+                int sort_start = sort_counter; 
+                int swap_start = swap_counter; 
+
+
+                for(int i = 0; i < high; i++) ...{ 
+                        for(int j = i; j < high; j++) ...{ 
+                                ++sort_counter; 
+                                if(smallToBig) ...{ 
+                                        if(data[i] > data[j]) ...{ 
+                                                swapData(data, i, j); 
+                                        } 
+                                } else ...{ 
+                                        if(data[i] < data[j]) ...{ 
+                                                swapData(data, i, j); 
+                                        } 
+                                } 
+
+
+                        } 
+                } 
+
+
+                Util.debug("bubbleSort::Sort_Counter::" + (sort_counter - 
+sort_start) + "::swap_counter::" + (swap_counter - swap_start)); 
+        } 
+
+
+        /** *//** 
+         * Quick sort 来排序一个数组 
+         * 从小到大 
+         * @param data - 要排序的数组 
+         * @param smallToBig - true if 从小到大; false if 从大到小 
+         */ 
+        public static final void quickSort(int[] data, boolean smallToBig) ...{ 
+                int low = 0; 
+                int high = data.length - 1; 
+
+
+                int sort_start = sort_counter; 
+                int swap_start = swap_counter; 
+
+
+                quickSort(data, low, high, smallToBig); 
+
+
+                Util.debug("quickSort::Sort_Counter::" + (sort_counter - 
+sort_start)  + "::swap_counter::" + (swap_counter - swap_start)); 
+        } 
+
+
+        /** *//** 
+         * 快速排序 
+         * @param data - 原始数组 
+         * @param low - 
+         * @param high 
+         */ 
+        private static final void quickSort(int[] data, int low, int high, 
+boolean smallToBig) ...{ 
+                if(low < high) ...{ 
+                        int pivot = partition(data, low, high, smallToBig); 
+                        quickSort(data, low, pivot - 1, smallToBig); 
+                        quickSort(data, pivot + 1, high, smallToBig); 
+                } 
+        } 
+
+
+        /** *//** 
+         * 分割点 
+         * @param data 
+         * @param low 
+         * @param high 
+         * @return 
+         */ 
+        private static final int partition(int[] data, int low, int high, 
+boolean smallToBig) ...{ 
+                //当前位置为第一个元素所在位置 
+                int pos = low; 
+                //采用第一个元素位轴 
+                int pivot = data[pos]; 
+
+
+                for(int i = low + 1; i <= high; i++) ...{ 
+                        ++sort_counter; 
+                        if(smallToBig) ...{ 
+                                //从小到大 
+                                if(data[i] < pivot) ...{ 
+                                        ++pos; 
+                                        swapData(data, pos, i); 
+                                } 
+                        } else ...{ 
+                                //从大到小 
+                                if(data[i] > pivot) ...{ 
+                                        ++pos; 
+                                        swapData(data, pos, i); 
+                                } 
+                        } 
+                } 
+
+
+                swapData(data, low, pos); 
+
+
+                return pos; 
+        } 
+
+
+        /** *//** 
+         * 交换数据 
+         * @param data - 原始数组 
+         * @param i 
+         * @param j 
+         */ 
+        private static final void swapData(int[] data, int i, int j) ...{ 
+                int tmp = data[i]; 
+                data[i] = data[j]; 
+                data[j] = tmp; 
+
+
+                ++swap_counter; 
+        } 
+
+
+/** *//** 
+     * Build a 8-byte array from a long.  No check is performed on the 
+     * array length. 
+     * 
+     * @param n The number to convert. 
+     * @param b The array to fill. 
+     * @return A byte[]. 
+     */ 
+    public static byte[] toBytes(long n, byte[] b) ...{ 
+        b[7] = (byte) (n); 
+        n >>>= 8; 
+        b[6] = (byte) (n); 
+        n >>>= 8; 
+        b[5] = (byte) (n); 
+        n >>>= 8; 
+        b[4] = (byte) (n); 
+        n >>>= 8; 
+        b[3] = (byte) (n); 
+        n >>>= 8; 
+        b[2] = (byte) (n); 
+        n >>>= 8; 
+        b[1] = (byte) (n); 
+        n >>>= 8; 
+        b[0] = (byte) (n); 
+
+        return b; 
+    } 
+
+
+    /** *//** 
+     * Build a long from first 8 bytes of the array. 
+     * 
+     * @param b The byte[] to convert. 
+     * @return A long. 
+     */ 
+    public static long toLong(byte[] b) ...{ 
+        return ((((long) b[7]) & 0xFF) 
+                + ((((long) b[6]) & 0xFF) << 8) 
+                + ((((long) b[5]) & 0xFF) << 16) 
+                + ((((long) b[4]) & 0xFF) << 24) 
+                + ((((long) b[3]) & 0xFF) << 32) 
+                + ((((long) b[2]) & 0xFF) << 40) 
+                + ((((long) b[1]) & 0xFF) << 48) 
+                + ((((long) b[0]) & 0xFF) << 56)); 
+    } 
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/09/29/1806410.aspx

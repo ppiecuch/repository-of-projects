@@ -1,0 +1,59 @@
+/**
+     * 计算椭圆和矩形是否相交
+     * (x/rx)^2 + (y/ry)^2 = 1;
+     * left is: (x*ry)^2 + (y*rx)^2
+     * right is: (rx*ry)^2
+     * 
+     * if(left > right) out
+     * else in
+     * @param x0 - 椭圆圆心x
+     * @param y0 - 椭圆圆心y
+     * @param rx - 椭圆x轴半径
+     * @param ry - 椭圆y轴半径
+     * @param xmin - 矩形左上角x
+     * @param ymin - 矩形左上角y
+     * @param xmax - 矩形右下角x
+     * @param ymax - 矩形右下角y
+     * @return
+     */
+    public static final boolean isColliside(int x0, int y0, int rx, int ry, int xmin, int ymin, int xmax, int ymax) {
+        //如果圆心点就在矩形内部, 那么就直接返回true
+        if(isIntersect(x0, y0, x0, y0, xmin, ymin, xmax, ymax)) {
+            return true;
+        }
+        
+        //首先找到矩形距离圆心的最近点
+        int x = x0, y = y0;
+        
+        if(x < xmin) {
+            x = xmin;
+        } else if(x > xmax) {
+            x = xmax;
+        }
+        
+        if(y < ymin) {
+            y = ymin;
+        } else if(y > ymax) {
+            y = ymax;
+        }
+        
+        int dx = x - x0;
+        int dy = y - y0;
+        dx *= dx;
+        dy *= dy;
+        
+        rx *= rx;
+        ry *= ry;
+        
+        dx *= ry;
+        dy *= rx;
+        
+        if( dx + dy <= rx*ry) {
+            return true;
+        }
+        
+        return false;
+    } 
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/09/11/1780323.aspx
