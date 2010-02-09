@@ -12,6 +12,10 @@
 	http://www.52rd.com/Blog/Detail_RD.Blog_juney_3078.html
 3D编程指南第五部分：使用M3G渲染heightmap地形
 	http://www.gz183.com.cn/Info/193/info36030_1.htm
+What's the unit length in m3g
+	http://blog.csdn.net/xueyong1203/archive/2007/03/12/1526760.aspx
+Export model (teapot4_background.max) to m3g file.
+	http://www.mobilefish.com/tutorials/3dsmax/3dsmax_quickguide_export_m3g_4.html
 	
 	
 /*===============网络协议相关===============*/
@@ -82,6 +86,8 @@ Ray casting in a 2D tile-based environment(2D地形)
 	http://www.azure.com.cn/article.asp?id=217
 An OBB-Line Segment Test (Testing a box and a line segment for intersection requires checking only six separating axes
 	http://blog.csdn.net/xueyong1203/archive/2007/03/27/1542542.aspx)
+ 深入探讨透视投影坐标变换
+ 	http://blog.csdn.net/xueyong1203/archive/2007/03/23/1538742.aspx
 
 
 
@@ -110,10 +116,16 @@ Terrain Geomorphing in the Vertex Shader
 	http://www.ogre3d.org/wiki/index.php/3dsmax_Heightmaps
 Terrain generation tools
 	http://blog.csdn.net/xueyong1203/archive/2007/04/10/1559008.aspx
+Terrain Generating
+	http://dev.gameres.com/Program/Visual/3D/terain.htm
+Slope(斜坡) 法线生成算法，在地形渲染中的应用(高度图中没有包含法线信息，无法进行光照)
+	http://www.azure.com.cn/article.asp?id=285
 	
 /*===============灯光相关===============*/
 Light Mapping - Theory and Implementation
 	http://www.flipcode.com/archives/Light_Mapping_Theory_and_Implementation.shtml
+M3G embedded lightmaps
+	http://blog.csdn.net/xueyong1203/archive/2007/03/21/1535996.aspx
 	
 	
 /*===============鼠标拾取相关===============*/
@@ -121,11 +133,13 @@ Mouse Picking Demystified
 	http://trac.bookofhook.com/bookofhook/trac.cgi/wiki/MousePicking
 	
 	
-/*===============骨骼动画相关===============*/
+/*===============角色动画相关===============*/
 近期在研究Skeletal Animation（骨骼动画）
 	http://blog.csdn.net/skyman_2001/archive/2006/05/23/750893.aspx
 [原创] 骨骼运动变换的数学计算过程详解
 	http://www.cnblogs.com/neoragex2002/archive/2007/09/13/Bone_Animation.html
+3D游戏角色动画原理及应
+	http://blog.csdn.net/xueyong1203/archive/2007/03/22/1537798.aspx
 	
 
 /*===============Alpha相关===============*/
@@ -210,6 +224,14 @@ Fast integer square roots in Java(求数值的根的几种方法)
 	http://blog.csdn.net/housisong/archive/2006/11/22/1404896.aspx
 图形图像处理－之－任意角度的高质量的快速的图像旋转 上篇 纯软件的任意角度的快速旋转
 	http://blog.csdn.net/housisong/archive/2007/04/27/1586717.aspx
+KVM的执行引擎（上） — 栈和帧 
+	http://blog.csdn.net/xueyong1203/archive/2007/03/13/1528156.aspx
+KVM的执行引擎（下） — 指令集
+	http://blog.csdn.net/fyzhao/archive/2006/08/31/1150446.aspx
+KVM的常量池
+	http://blog.csdn.net/xueyong1203/archive/2007/03/13/1528168.aspx
+ Can I display a Sprite3D object at 2 places in the world?
+ 	http://blog.csdn.net/xueyong1203/archive/2007/03/12/1527092.aspx
 	
 	
 	
@@ -246,3 +268,8 @@ JDK 1.4   : 0x0030
 JDK 1.3   : 0x002F
 JDK 1.2   : 0x002E
 JDK 1.1   : 0x002D 
+
+preRotate vs postRotate
+简单地讲，就是
+preRotate先做其它的再旋转
+而postRotate是先旋转再做其它的 
