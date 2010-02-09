@@ -1,0 +1,37 @@
+public final void c(int i, int j, int k)
+    ...{
+        boolean flag = false;
+        if(i != 0)
+        ...{
+            a_javax_microedition_m3g_Transform_fld.postRotate(0.08789063F * (float)i, 1.0F, 0.0F, 0.0F);
+            flag = true;
+        }
+        if(j != 0)
+        ...{
+            if(flag)
+            ...{
+                Transform transform;
+                (transform = a_m_static_fld.a_javax_microedition_m3g_Transform_fld).setIdentity();
+                transform.postRotate(0.08789063F * (float)j, 0.0F, 1.0F, 0.0F);
+                a_javax_microedition_m3g_Transform_fld.postMultiply(transform);
+            } else
+            ...{
+                a_javax_microedition_m3g_Transform_fld.postRotate(0.08789063F * (float)j, 0.0F, 1.0F, 0.0F);
+            }
+            flag = true;
+        }
+        if(k != 0)
+        ...{
+            if(flag)
+            ...{
+                Transform transform1;
+                (transform1 = a_m_static_fld.a_javax_microedition_m3g_Transform_fld).setIdentity();
+                transform1.postRotate(0.08789063F * (float)k, 0.0F, 0.0F, 1.0F);
+                a_javax_microedition_m3g_Transform_fld.postMultiply(transform1);
+                return;
+            }
+            a_javax_microedition_m3g_Transform_fld.postRotate(0.08789063F * (float)k, 0.0F, 0.0F, 1.0F);
+        }
+    }
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/06/15/1653678.aspx

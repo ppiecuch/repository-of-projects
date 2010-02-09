@@ -1,0 +1,36 @@
+Camera m_camera;               //current camera
+  Transform m_camTransform;  //current camera transform
+  Transform m_objTransform;   //transform of the render obj
+
+  void Pos3D2Pos2D(float[] pos3D, float[]pos2D)
+  {
+      float pos[] = new float[]{pos3D[0], pos3D[1], pos3D[2], 1}   
+      
+      //get current position
+      m_objTransform.transform(pos);
+      
+      //apply camera transform
+      Transform invTrans = new Transform(m_camTransform);      
+      invTrans.invert();
+      invTrans.transform(pos);
+      
+      //get z
+      float z = -pos[2];
+      float x = 0;
+      float y = 0;
+
+      //projection
+      Transform transProjection = new Transform();
+      camera.getProjection(transProjection);
+      transProjection.transform(pos);      
+      
+      // NDC to View
+      x = pos[0] * getWidth()/ (2 * z);
+      y = pos[1] * getHeight()/ (2 * z);      
+      
+
+      //convert to screen pos.
+      pos2D[0] = (int)(getWidth()/2 + x);
+      pos2D[1] = (int)(getHeight()/2 - y);
+      
+  }
