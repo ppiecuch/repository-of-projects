@@ -63,6 +63,9 @@ Ray casting in a 2D tile-based environment(2D地形)
 	http://www.codeproject.com/KB/GDI-plus/RayCasting2D.aspx
 训练三－卡马克算法（郑鸿）
 	http://blog.csdn.net/ok9034875/archive/2007/04/23/1576589.aspx
+精髓游戏算法收拾(A*算法)
+	http://www.j2mehome.com/j2me/jinjie/12898.html
+	
 	
 
 /*===============3D计算相关===============*/
