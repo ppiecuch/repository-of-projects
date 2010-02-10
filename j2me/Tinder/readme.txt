@@ -20,6 +20,34 @@ Export model (teapot4_background.max) to m3g file.
 	Transform _tPosition;
 	_mesh.getTransformTo(_world, _tPosition);
 	_world是这个.m3g的world，如果返回true，则_mesh的位置就会储存在_tPosition里面了
+M3G内坐标系作用范围的混淆
+	http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474459.aspx
+Rendering world后的内存的释放
+	http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474457.aspx
+getOrientation 得到的数据的意义
+	public void getOrientation(float[] angleAxis)
+	得到
+	angleAxis[0] = 38.0f  angleAxis[1] = 12 angleAxis[2] = 30, angleAxis[2] = 18
+	The getOrientation() method retrieves the current orientation component of the Transformable instance in question. The first item in the returned array is the angle in degrees and the three others define the axis of rotation. 
+	The same from another perspective: The object on which you called the method, is first transformed by the free used transform, then scaled by some amount, then rotated 38 degrees around axis  (12, 30, 18) and then translated with some vector. 
+	本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474454.aspx
+Mesh 的 duplicate()方法
+	http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474437.aspx
+Transform.transform(float[] vectors)的物理意义
+	http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474435.aspx
+Transform.setIdentity()&invert()&transpose()
+	http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474421.aspx
+手动替换/更新模型的纹理
+	  ((Mesh) nodeUnit).getAppearance(0).getTexture(0).setImage(img2dSequences[indexFrame]);
+终于实现Object lookAt Object了。。
+	http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474407.aspx
+翻译的Mesh类
+	http://blog.csdn.net/xueyong1203/archive/2007/01/04/1473514.aspx
+我翻译的Material 
+	http://blog.csdn.net/xueyong1203/archive/2007/01/04/1473510.aspx
+M3G优化技巧 持续更新中。。
+	http://blog.csdn.net/xueyong1203/archive/2007/01/04/1473481.aspx
+	
 
 	
 	
@@ -72,6 +100,8 @@ Ray casting in a 2D tile-based environment(2D地形)
 	http://www.j2mehome.com/j2me/jinjie/12898.html
 An Oriented Bounding Box (OBB) Intersection Test 
 	http://blog.csdn.net/xueyong1203/archive/2007/01/23/1491368.aspx
+ A* 算法的一些文章集合
+ 	http://blog.csdn.net/xueyong1203/archive/2006/05/08/713622.aspx
 	
 	
 
@@ -173,6 +203,8 @@ Alpha transparency tutorial
 	http://www.terathon.com/wiki/index.php?title=Alpha_transparency
 W810 compositing mode alpha bug 
 	http://blog.csdn.net/xueyong1203/archive/2007/08/31/1766515.aspx
+看到一片讨论ALPHA BLENDING的帖子 
+	http://blog.csdn.net/xueyong1203/archive/2006/05/08/712637.aspx
 	
 	
 /*===============移植相关===============*/
@@ -227,6 +259,10 @@ KXML：J2ME中的XML语法分析利器
 /*===============手机参数查询===============*/
 http://www.mobilade.com/ml/home
 http://www.jbenchmark.com/result.jsp?orderby=date&brand=all&submit=OK&benchmark=3d
+ 手机性能参数及BUG总结(持续搜寻添加中....) 
+ 	http://blog.csdn.net/xueyong1203/archive/2006/07/28/991851.aspx
+ 各型号手机Bug总结
+ 	http://blog.csdn.net/xueyong1203/archive/2006/04/26/677924.aspx
 
 /*===============脚本相关===============*/
 再探游戏--天赐脚本
@@ -272,6 +308,21 @@ KVM的常量池
  	http://blog.csdn.net/xueyong1203/archive/2007/01/09/1477750.aspx
  通用数据压缩算法简介
  	http://www.j2megame.org/index.php/content/view/1889/125.html
+ 对高速二次线性插值算法的讨论
+ 	http://blog.csdn.net/xueyong1203/archive/2007/01/04/1473420.aspx
+ 图像几何变换（缩放、旋转）中的插值算法
+ 	http://blog.csdn.net/xueyong1203/archive/2007/01/04/1473405.aspx
+ 基于矢量点积的高效可视剔除算法 
+ 	http://blog.csdn.net/xueyong1203/archive/2006/08/16/1075353.aspx
+ [转帖][风过回廊的小屋]手机中文码制问题的一点理解- -
+ 	http://blog.csdn.net/xueyong1203/archive/2005/12/27/562897.aspx
+J2ME游戏开发之免费地图编辑器(2D and 2.5D) 
+ 	http://blog.csdn.net/xueyong1203/archive/2005/11/19/532838.aspx
+ J2ME游戏开发学习之用setClip分割图片
+ 	http://blog.csdn.net/xueyong1203/archive/2005/09/02/470186.aspx
+ J2ME游戏开发学习之高效&漂亮显示积分
+ 	http://blog.csdn.net/xueyong1203/archive/2005/09/02/470115.aspx
+
 	
 	
 	
@@ -340,3 +391,15 @@ http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Manifest%20Specification
 描述的 Manifest规范，
 mf文件里面每一行只能有72个bytes，去掉最开头的必须的一个冒号和空格
 就剩下70个bytes了。。
+
+  学好3D必备的数学基础 by TK 收藏 
+Thanks TK!
+
+学好3D必备的数学基础 by TK
+坐标变换是把什么变换成什么？为什么要乘矩阵？矩阵的每行/列是什么含义？
+乘矩阵的本质是什么？矩阵的行序/列序是什么意义？为什么DX和GL的矩阵是互相转置的？
+矢量为什么要分1*4和4*1？矩阵的左乘和右乘有什么区别，各有什么含意？。。。
+这些问题自己一定要搞清楚。
+还有，为什么旋转/平移/缩放的顺序要这么排？如果颠倒顺序会如何？
+为什么旋转一般按照ZXY的顺序进行？什么是万向锁。。。
+查查资料吧，这些问题的答案如果是别人告诉你，那就没有意义了。  

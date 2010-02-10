@@ -1,0 +1,38 @@
+测试环境：
+   Nokia 3300真机，老40，与7210同一个系列
+测试代码:
+
+long time1 = System.currentTimeMillis();
+        int a = 45456485, b = 0;
+        for(int i = 100000; --i >= 0;) {
+            b = a >> 10;
+        }
+        tt1 = System.currentTimeMillis() - time1;//307
+        
+        time1 = System.currentTimeMillis();
+        for(int i = 100000; --i >= 0;) {
+            b = a / 1024;
+        }
+        tt2 = System.currentTimeMillis() - time1;//584
+        
+        time1 = System.currentTimeMillis();
+        for(int i = 0; i < 100000; i++) {
+            b = a / 1024;
+        }
+        tt3 = System.currentTimeMillis() - time1;//647
+        
+        time1 = System.currentTimeMillis();
+        for(int i = 0; i < 100000; i++) {
+            b = a >> 10;
+        }
+       tt4 = System.currentTimeMillis() - time1;//354
+      
+       System.out.println(String.valueOf(b));
+
+结论：
+  for循环建议写成这样：
+    for(int i = value; --i >= 0;), 可提高效率15%左右
+  除法时如果是除以2的N次方
+   建议写成 >> N, 可提高效率90%左右, 乘法同理 
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2006/02/16/600158.aspx

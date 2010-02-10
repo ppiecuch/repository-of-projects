@@ -1,0 +1,243 @@
+这个算法比先前的算法效率提高了１０倍
+
+import java.lang.*;
+import javax.microedition.lcdui.*;
+import java.util.*;
+import javax.microedition.rms.*;
+import java.io.*;
+class MainPit extends Canvas implements Runnable
+{
+ 
+Graphics gb;
+Image bufImg;
+
+private int nWidth = getWidth();
+private int nHeight = getHeight();
+int[] x;
+int[] y;
+int[] id;
+int top,bottom;
+public MainPit()
+{
+try{
+bufImg = Image.createImage(nWidth,nHeight);
+}catch(Exception e){System.out.println(e+" createImage");}
+gb = bufImg.getGraphics();
+}
+
+
+public void paint(Graphics g)
+{
+g.drawImage(bufImg,0,0,0);
+}
+
+int nodes[][] = {//8/
+{20,100},//0
+{100,40},//1
+{150,80},//2
+{60,50},
+//{150,110},//3
+{150,150},//4
+//{160,150},//5
+//{110,110},//6
+{50,130},//7
+{160,140},
+{60,139},
+{110,45}
+};
+public void sort(int nodes[][])
+{
+ int i=nodes.length;
+ int temp1=0;
+ int temp2=0;
+ for(int m=0;m<i-1;m++)
+ for(int n=0;n<i-m-1;n++)
+ {
+  if(nodes[n][0]>nodes[n+1][0]||(nodes[n][0]==nodes[n+1][0]&&nodes[n][1]>nodes[n+1][1]))
+  {
+   temp1=nodes[n][0];
+   temp2=nodes[n][1];
+   nodes[n][0]=nodes[n+1][0];
+   nodes[n][1]=nodes[n+1][1];
+   nodes[n+1][0]=temp1;
+   nodes[n+1][1]=temp2;
+  }
+ }
+}
+public void sortTang(int nodes[][])
+{
+ id=new int[nodes.length-1];
+ int[] high=new int[id.length];
+ int[] low=new int[id.length];
+ for(int i=0;i<id.length;i++)
+ {
+  id[i]=-1;//序号数组
+  high[i]=-1;
+  low[i]=-1;
+ }
+ int Htag,Ltag;
+ Htag=0;
+ Ltag=0;
+ for(int i=1;i<nodes.length;i++)
+ {
+  if(nodes[i][1]<=nodes[0][1])
+  high[Htag++]=i;
+  else
+  low[Ltag++]=i;
+ }
+ for(int i=0;i<id.length;i++)
+ {
+  if(high[i]>0)
+  id[i]=high[i];
+  else
+  id[i]=low[Ltag-1-i+Htag];
+ }
+ top=0;
+ bottom=id.length-1;
+}
+/*判断点x2,y2是不是在指定的线段上*/
+public boolean cut(int x0,int y0,int x1,int y1,int x2,int y2)
+{
+ if(((y1-y0)*(x2-x0)<=(y2-y0)*(x1-x0))&&((y1-y0)*(x2-x0)>=(y2-1-y0)*(x1-x0)))
+ return true;
+ else
+ return false;
+}
+public int findNextPoint(int[][] nodes,int a,boolean s)
+{
+ if(a==nodes.length-3)
+ return a+2;
+ else
+ {
+    if(id[top]==a+1)
+    {
+     top++;
+     return id[bottom];
+    }
+    else
+    {
+     bottom--;
+     return id[top];
+    }
+ }
+}
+public void fillPolygon(int nodes[][])
+{
+ gb.setColor(0xff0000);
+ int tempy1=nodes[0][1];
+ int tempy2=0;
+ int nextP=0;
+ int p1=0;
+ int p2=0;
+ int p3=0;
+ int p4=0;
+ int scanp1=-1;
+ int scanp2=-1;
+ for(int i=0;i<nodes.length-1;i++)
+ {
+  nextP=0;
+  if(nodes[i][0]<nodes[i+1][0])
+  {
+   if(tempy1!=nodes[i][1])
+   nextP=findNextPoint(nodes,i,tempy1>=nodes[i][1]?true:false);
+   else
+   if((nodes[i+1][1]-nodes[i][1])*(nodes[i+2][0]-nodes[i][0])<(nodes[i+2][1]-nodes[i][1])*(nodes[i+1][0]-nodes[i][0]))
+   nextP=findNextPoint(nodes,i,true);
+   else
+   nextP=findNextPoint(nodes,i,false);
+   if((nodes[i+1][1]-nodes[nextP][1])*(nodes[i][1]-tempy1)>=0)
+   p3=tempy1;
+   else
+   p3=nodes[i][1];
+   for(int j=0;j<nHeight;j++)
+   {
+    if(cut(nodes[i][0],p3,nodes[nextP][0],nodes[nextP][1],nodes[i+1][0],j))
+    {
+     tempy2=j;
+     break;
+    }
+   }
+   p1=nodes[i][1]>tempy1?tempy1:nodes[i][1];
+   p2=p1!=tempy1?tempy1:nodes[i][1];
+   p3=nodes[i+1][1]>tempy2?tempy2:nodes[i+1][1];
+   p4=p3!=tempy2?tempy2:nodes[i+1][1];
+   scanp1=p1;
+   scanp2=p2;
+   for(int j=nodes[i][0];j<=nodes[i+1][0];j++)
+   {
+    for(int m=scanp1>p3?p3:scanp1;m<=(scanp1>p3?scanp1:p3);m++)
+    {
+     if(cut(nodes[i][0],p1,nodes[i+1][0],p3,j,m))
+     {
+      scanp1=m;
+      break;
+     }
+    }
+    for(int m=scanp2>p4?p4:scanp2;m<=(scanp2>p4?scanp2:p4);m++)
+    {
+     if(cut(nodes[i][0],p2,nodes[i+1][0],p4,j,m))
+     {
+      scanp2=m;
+      break;
+     }
+    }   
+    gb.drawLine(j,scanp1,j,scanp2);
+   }
+   tempy1=tempy2;
+  }
+  else
+  {
+   gb.drawLine(nodes[i][0],nodes[i][1],nodes[i+1][0],nodes[i+1][1]);
+   tempy1=nodes[i][1];
+   bottom--;
+  }
+ }
+}
+private void drawPolygon(int nodes[][])
+{
+gb.setColor(0x0000ff00);
+for(int i = 0; i < nodes.length; i++){
+gb.drawLine(nodes[i][0],nodes[i][1],nodes[i][0],nodes[i][1]);
+gb.drawString(String.valueOf(nodes[i][0])+"."+String.valueOf(nodes[i][1]),nodes[i][0],nodes[i][1],0);
+}
+}
+public void run()
+{
+x=new int[nodes.length];
+y=new int[nodes.length];
+for(int i=0;i<x.length;i++)
+{
+ x[i]=nodes[i][0];
+ y[i]=nodes[i][1];
+} 
+gb.setColor(0x00ffffff);
+gb.fillRect(0,0,nWidth,nHeight);
+gb.setColor(0);
+long time1=0;
+long time2=0;
+sort(nodes);
+sortTang(nodes);
+time1=System.currentTimeMillis();
+//fillPolygon(gb,x,y);
+fillPolygon(nodes);
+time2=System.currentTimeMillis();
+System.out.println(time2-time1);
+drawPolygon(nodes);
+System.out.println("done1");
+repaint();
+}
+
+private void pause(long t)
+{
+try{Thread.sleep(t);}catch(Exception e){}
+}
+public void keyPressed(int keyCode)
+  {
+
+} 
+}
+
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2005/12/27/562898.aspx
