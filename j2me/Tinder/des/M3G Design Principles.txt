@@ -1,0 +1,109 @@
+#1. No Java code along critical paths
+
+Move all graphics processing to native code
+
+l         Not only rasterization and transformations
+
+l         Also morphing, skinning, and keyframe animation
+
+l         Keep all data on native side to avoid Java-native traffic
+
+ 
+
+So with that background in mind, let’s see what our main design principles were.
+
+Well, the most important thing of course is to free the apps from doing rasterization and transformations in Java. That’s simply too slow.
+
+But when we have those in native code, then other things become the bottlenecks. So, we decided to go for a retained mode, scene graph API and keep all scene data on the native code. We also decided to include all functionality that can be generalized well enough. As a result, we have things like morphing, skinning, and keyframe interpolation in the API.
+
+ 
+
+#2. Cater for both software and hardware
+
+Do not add features that are too heavy for software engines.
+
+l         Such-as per-pixel mipmapping or float-point vertices
+
+Do not add features that break the OpenGL 1.x pipeline.
+
+l         Such as hardcoded transparency shaders.
+
+ 
+
+Secondly, we wanted the API to work well on today’s software-based handsets as well as the hardware-accelerated ones in the future.
+
+We had a rule that features that cannot be done efficiently in software will not be included. Per-pixel mipmapping and float-point vertex arrays fell into that category.
+
+On the other hand, we had a rule that no feature would be included that cannot be easily implemented on fixed-point hardware, even if it would be a useful feature and easy to do in software. Various hardcoded effects for e.g. transparency and reflection were proposed, but rejected on that basis.
+
+ 
+
+#3. Maximize developer productivity
+
+Address content creation and tool chain issues.
+
+l         Export art assets into a compressed file (.m3g)
+
+l         Load and manipulate the content at run time
+
+l         Need scene graph and animation support for that
+
+Minimize the amount of  “boilerplate code”
+
+ 
+
+Third, we didn’t want to leave content creation and tool chain issues hanging in the air. We wanted to have a well-defined way of getting stuff out from 3dsmax and other tools, and manipulating that content at run time. That’s of course another reason to have scene management and animation features in the API. We also defined a file format that matches the features one-to-one.
+
+Furthermore, we wanted the API to be at a high enough level that not much boilerplate code needs to be written to get something done.
+
+ 
+
+#4. Minimize engine complexity
+
+#5. Minimize fragmentation
+
+#6. Plan for future expansion
+
+ 
+
+Here are some more design issues that we had to keep in mind.
+
+Number four, minimize engine complexity. This meant that a commercial implementation should be doable in 150k, including the rasterizer.
+
+Number five, minimize fragmentation. This means that we wanted to have a tight spec, so that you don’t have to query the availability of each and every feature. There are no optional parts or extensions in the API, although some quality hints were left optional. For instance, perspective correction.
+
+And finally, we wanted to have a compact API that can be deployed right away, but so that adding more features in the future won’t cause ugly legacy.
+
+ 
+
+Why a New Standard?
+
+OpenGL ES is too low-level
+
+n         Lots-of Java code, function calls needed for simple things.
+
+n         No support for animation and scene management.
+
+n         Fails on Design Principles 1 (performance) and 3 (productivity)
+
+n         …but may become practical with faster Java virtual machines.
+
+Java 3D is too bloated
+
+n         A hundred times larger (!) than M3G
+
+n         Still lacks a file format, skinning, etc.
+
+n         Fails on Design Principles 1, 3 and 4 (code size)
+
+ 
+
+Okay, so why did we have to define yet another API, why not just pick an exist one?
+
+OpenGL ES would be the obvious choice, but it didn’t fit the Java space very well, because you’d need a lot of that slow Java code to get anything on the screen. Also, you’d have to do animation yourself, and keep all your scene data on the Java side. Basically you’d spend more time writing your code, and yet the code would run slower in the end. That might change in the future, when Java VMs become faster, but don’t hole your breathe.
+
+The other choice that we had was Java 3D. At first it seemed to match our requirements, and we gave it a serious try. But then it turned out that the structure of Java 3D was simply too bloated, and we just couldn’t simplify it enough to fit our target devices. Besides, even though Java 3D is something like a hundred times larger than M3G, it still lacks crucial things like a file format and skinning. It’s also too damn difficult to use.
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/02/25/1514146.aspx

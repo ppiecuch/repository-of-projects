@@ -1,0 +1,58 @@
+public static int RGB2HSL(int red,int green, int blue){    int H,S,L,var_Min,var_Max,del_Max,del_R,del_G,del_B;    H=0;     var_Min = Math.min(red, Math.min(blue, green));        var_Max = Math.max(red, Math.max(blue, green));        del_Max = var_Max - var_Min;                  L = ( var_Max + var_Min ) / 2;     if ( del_Max == 0 )                         {       H = 0;                                       S = 0;    }else                                        {        if ( L < 128 )             S = 256*del_Max / ( var_Max + var_Min );        else                       S = 256*del_Max / ( 512 - var_Max - var_Min );         del_R = ( ( 360*( var_Max - red ) / 6) + ( 360*del_Max / 2 ) ) / del_Max;        del_G = ( ( 360*( var_Max - green ) / 6) + ( 360*del_Max / 2 ) ) / del_Max;        del_B = ( ( 360*( var_Max - blue ) / 6) + ( 360*del_Max / 2 ) ) / del_Max;                     if      ( red == var_Max )             H = del_B - del_G;        else if ( green == var_Max )             H = 120 + del_R - del_B;        else if ( blue == var_Max )             H = 240 + del_G - del_R;         if ( H < 0 )             H += 360;        if ( H >= 360 )             H -= 360;         if ( L >= 256 )             L = 255;        if ( S >= 256 )             S = 255;                }    return H+S*256+L*256*256;}
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474478.aspx
+
+public static int HSL2RGB(int H, int S, int L)
+{
+    int R,G,B,var_1,var_2;
+
+    if ( S == 0 )                       
+    {
+       R = L;                      
+       G = L;
+       B = L;
+    }
+    else
+    {
+        if ( L < 128 ) 
+            var_2 = (L * ( 256   S ))/256;
+        else           
+            var_2 = ( L   S ) - ( S * L )/256;
+
+        var_1 = 2 * L - var_2;
+
+        R = RGBFromHue( var_1, var_2, H   120 );
+        G = RGBFromHue( var_1, var_2, H );
+        B = RGBFromHue( var_1, var_2, H - 120 );
+    }
+
+    return R G*256 B*256*256;
+}
+
+public static int RGBFromHue(int a,int b,int h )          
+{
+    if ( h < 0 ) 
+        h  = 360;
+    if ( h >= 360 ) 
+        h -= 360;
+
+    if ( h < 60 )                                      
+        return a   (( b - a ) * h) / 60;                                
+    if (  h  < 180 ) 
+        return b;
+    if (  h  < 240 ) 
+        return a   (( b - a ) * ( 240 - h )) / 60;
+
+    return a;
+}
+Note: Saturation and lightness both range from 0 to 255 while hue ranges from 0 to 360. 
+
+RGB2HSL returns an integer containing all three hue, saturation and lightness values. To extract them separately use the following method: 
+
+int hsl = RGB2HSL(red,green,blue);
+int hue=hsl%6;
+int saturation=(hsl/256)%6;
+int lightness=hsl/(256*256);
+HSL2RGB return red, green and blue channels in the same manner. 
+
+Retrieved from "http://www.j2meforums.com/wiki/index.php/RGB_HSL_Conversion"

@@ -16,6 +16,11 @@ What's the unit length in m3g
 	http://blog.csdn.net/xueyong1203/archive/2007/03/12/1526760.aspx
 Export model (teapot4_background.max) to m3g file.
 	http://www.mobilefish.com/tutorials/3dsmax/3dsmax_quickguide_export_m3g_4.html
+获得.m3g文件里面的物体的位置
+	Transform _tPosition;
+	_mesh.getTransformTo(_world, _tPosition);
+	_world是这个.m3g的world，如果返回true，则_mesh的位置就会储存在_tPosition里面了
+
 	
 	
 /*===============网络协议相关===============*/
@@ -33,7 +38,7 @@ Export model (teapot4_background.max) to m3g file.
 	http://blog.codingnow.com/2006/04/sync.html
 貌似合理的网络包协议
 	http://blog.codingnow.com/2006/01/aeeieaiaeioeacueoe.html#comments
- .net服务器向j2me客户端发送字节流，在穿过cmwap网-关时字节流的内容发生变化，为什么？
+.net服务器向j2me客户端发送字节流，在穿过cmwap网-关时字节流的内容发生变化，为什么？
  	http://blog.csdn.net/xueyong1203/archive/2007/03/28/1543796.aspx
 	
 /*===============声音相关===============*/
@@ -65,6 +70,8 @@ Ray casting in a 2D tile-based environment(2D地形)
 	http://blog.csdn.net/ok9034875/archive/2007/04/23/1576589.aspx
 精髓游戏算法收拾(A*算法)
 	http://www.j2mehome.com/j2me/jinjie/12898.html
+An Oriented Bounding Box (OBB) Intersection Test 
+	http://blog.csdn.net/xueyong1203/archive/2007/01/23/1491368.aspx
 	
 	
 
@@ -91,7 +98,15 @@ An OBB-Line Segment Test (Testing a box and a line segment for intersection requ
 	http://blog.csdn.net/xueyong1203/archive/2007/03/27/1542542.aspx)
  深入探讨透视投影坐标变换
  	http://blog.csdn.net/xueyong1203/archive/2007/03/23/1538742.aspx
-
+ 3D数学与游戏：四元数与旋转 
+ 	http://blog.csdn.net/xueyong1203/archive/2007/02/15/1510470.aspx
+ 四元数(Quaternions) 
+ 	http://blog.csdn.net/xueyong1203/archive/2007/02/15/1510467.aspx
+ 探讨：物体绕任意向量的旋转-四元数法VS.旋转矩阵法的性能比较 
+ 	http://www.cnblogs.com/soroman/archive/2006/09/19/509597.html
+ 使JSR184相机绕世界坐标系中的坐标轴旋转！
+ 	http://blog.csdn.net/xueyong1203/archive/2007/02/08/1505406.aspx
+变换AABB的快速算法
 
 
 /*===============3D换装相关===============*/
@@ -123,6 +138,12 @@ Terrain Generating
 	http://dev.gameres.com/Program/Visual/3D/terain.htm
 Slope(斜坡) 法线生成算法，在地形渲染中的应用(高度图中没有包含法线信息，无法进行光照)
 	http://www.azure.com.cn/article.asp?id=285
+VOXEL 技术在即时渲染地形中的应用 by 樊一鹏
+	http://blog.csdn.net/xueyong1203/archive/2007/01/22/1489687.aspx
+ 3D地表生成及渲染 (VOXEL) by 云风
+ 	http://blog.csdn.net/xueyong1203/archive/2007/01/22/1489682.aspx
+ 四叉树 Quadtrees
+ 	http://blog.csdn.net/xueyong1203/archive/2007/01/22/1489678.aspx
 	
 /*===============灯光相关===============*/
 Light Mapping - Theory and Implementation
@@ -207,6 +228,10 @@ KXML：J2ME中的XML语法分析利器
 http://www.mobilade.com/ml/home
 http://www.jbenchmark.com/result.jsp?orderby=date&brand=all&submit=OK&benchmark=3d
 
+/*===============脚本相关===============*/
+再探游戏--天赐脚本
+	http://blog.csdn.net/zdsdiablo/archive/2006/11/13/1381156.aspx
+
 	
 /*===============其他===============*/
 即时战略游戏中如何协调对象移动
@@ -235,6 +260,18 @@ KVM的常量池
 	http://blog.csdn.net/xueyong1203/archive/2007/03/13/1528168.aspx
  Can I display a Sprite3D object at 2 places in the world?
  	http://blog.csdn.net/xueyong1203/archive/2007/03/12/1527092.aspx
+ Camera In JSR184 by Lyo Wu
+ 	http://blog.csdn.net/xueyong1203/archive/2007/02/01/1499730.aspx
+ 计算几何算法概览
+ 	http://blog.csdn.net/xueyong1203/archive/2007/01/22/1489691.aspx
+ Camera.translate的陷阱！问题解决了
+ 	http://blog.csdn.net/xueyong1203/archive/2007/01/12/1481307.aspx
+ M3G里面的BillBoard(有图)
+ 	http://blog.csdn.net/xueyong1203/archive/2007/01/10/1479299.aspx
+ 关于PNG图像压缩的一点感悟 by cocomo
+ 	http://blog.csdn.net/xueyong1203/archive/2007/01/09/1477750.aspx
+ 通用数据压缩算法简介
+ 	http://www.j2megame.org/index.php/content/view/1889/125.html
 	
 	
 	
@@ -276,3 +313,30 @@ preRotate vs postRotate
 简单地讲，就是
 preRotate先做其它的再旋转
 而postRotate是先旋转再做其它的 
+
+jsr184里面Light代价排序
+none < emissive <=ambient << directional << spotlight 
+
+Micro3D 里面的最大纹理尺寸
+256x256 pixels(256 colors selected from a 16-bit color palette) 
+
+
+  ARGB8888 --> ARGB4444&Other Formats 收藏 
+int argb8888;
+int a=(argb8888 & 0xff000000)>>24;
+int r=(argb8888 & 0x00ff0000)>>16;
+int g=(argb8888 & 0x0000ff00)>>8;
+int b=(argb8888 & 0x000000ff)>>0;
+ 
+short argb4444=((a>>4)<<12)|((r>>4)<<8)|((g>>4)<<4)|((b>>4)<<0);
+short rgb555=((r>>3)<<10)|((g>>3)<<5)|((b>>3)<<0); 
+short rgb565=((r>>3)<<11)|((g>>2)<<5)|(b>>3); 
+
+
+Manifest.mf里面的自动换行问题
+我们经常遇到因为MIDP-Description里面的字数太多而导致的mf文件自动换行，从而安装失败的问题
+原来，根据
+http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Manifest%20Specification
+描述的 Manifest规范，
+mf文件里面每一行只能有72个bytes，去掉最开头的必须的一个冒号和空格
+就剩下70个bytes了。。

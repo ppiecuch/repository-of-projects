@@ -1,0 +1,115 @@
+Retained Mode
+
+Use the retained mode
+
+Do not render objects separately – place them in a world
+
+Minimize the amount of Java code and method calls
+
+Allows the implementation to do view frustum culling, etc
+
+Keep node properties simple
+
+Favor the T R S components over M
+
+Avoid non-uniform scales in S
+
+Avoid using the Alpha factor
+
+ 
+
+Rendering Order
+
+Use layers to impose a rendering order
+
+Appearance contains a layer index (an Integer)
+
+Defines a global ordering for submeshes & sprites
+
+Can simplify shader state for backgrounds, overlays
+
+Also enables multipass rendering in retained mode
+
+Optimize the rendering order
+
+Shader state sorting done by the implementation
+
+Use layers to force back-to-front ordering
+
+ 
+
+Textures
+
+Use multitexturing to save in T&L and triangle setup
+
+Use mipmapping to save in memory bandwidth
+
+Combine small textures into texture atlases
+
+Use the perspective correction hint (where needed )
+
+       Usually much faster than increasing triangle count
+
+       Nokia: 2% fixed overhead, 20% in worst case
+
+ 
+
+Meshes
+
+Minimize the number of objects
+
+Per-mesh overhead is high, per-submesh also fairly high
+
+Lots of small meshes and sprites to render --- bad
+
+Ideally, everything would be in one big triangle strip
+
+But then view frustum culling doesn’t work --- bad
+
+Strike a balance
+
+Merge simple meshes that are close to each other
+
+Criteria for “simple” and “close” will vary by device
+
+ 
+
+Shading State
+
+Software vs. hardware implementations
+
+SW: Minimize per-pixel operations
+
+HW: Minimize shading state changes
+
+HW: Do not mix 2D and 3D rendering
+
+ 
+
+In general, OpenGL ES performances tips apply
+
+ 
+
+Particle Effects                                                                       
+
+Several Problems
+
+Point sprites are not supported
+
+Sprite3D are too much overhead
+
+ 
+
+Put all particles in one Mesh
+
+One particle == two triangles
+
+All glued into one triangle strip
+
+Update vertices to animate
+
+       XYZ, RGB, maybe UV
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/02/25/1513936.aspx

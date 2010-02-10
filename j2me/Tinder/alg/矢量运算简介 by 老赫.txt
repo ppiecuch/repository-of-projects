@@ -1,0 +1,68 @@
+如果不好好学，那么下回我介绍一个3D Engine的时候你就麻烦大了.
+
+质量保证:
+只讨论可以任意平移自由矢量
+以下原理适于你个人开发的3D系统,D3D系统,OpenGL系统
+
+一.两点距离
+2D系统:
+Point1(x1,y1),Point2(x2,y2)
+距离D=sqr( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) )
+3D系统:
+Point 1 (x1, y1, z1) Point 2 at (x2, y2, z2).
+
+xd = x2-x1
+yd = y2-y1
+zd = z2-z1
+距离Distance = SquareRoot(xd*xd + yd*yd + zd*zd)
+
+做游戏和demo永远不要去做开方:
+1.用LUT查表技术(Look up Table )
+2.在做碰撞检测时,误差Distance*Distance<a certain number就可以认为点相撞了
+
+二规格化,单位化(Normalize)
+先要说矢量的长度:
+矢量Vector(x,y,z)
+矢量长度Length(Vector)= |Vector|=sqr(x*x+y*y+z*z)
+Normalize后:
+(x/Length(Vector),y/Length(Vector),z/Length(Vector))
+方向不变,长度为1个单位
+
+
+三.点乘 点积 数量积(Dot Product)
+是一回事儿.首先明确两个矢量的点积是个标量.
+中学物理的力做功就是矢量点积的例子:W=|F|.|S|.cos(theta)
+
+二矢量点积:
+Vector1:(x1,y1,z1) Vector2(x2,y2,z2)
+DotProduct=x1*x2+y1*y2+z1*z2
+
+很重要的应用:
+1.求二矢量余弦:
+由我们最熟悉的力做功:
+cos(theta)=F.S/(|F|.|S|)
+可以判断二矢量的方向情况: cos=1同向,cos=-1相反,cos=0直角
+曲面消隐(Cull face)时判断物体表面是否可见:(法线和视线矢量的方向问题)cos>0不可见,cos<0可见
+OpenGL就是这么做的。
+
+2.Lambert定理求光照强度也用点积:
+Light=K.I.cos(theta)
+K,I为常数,theta是平面法线与入射光线夹角
+老王头的Fast Bump(Add Hyper Link here)也就是依据这个数学模型.但是他用了个很Cheap的Hack来模拟cosine
+
+四.叉乘(Cross product)
+叉乘:Vector1(x1,y1,z1),Vector2(x2,y2,z2):
+其结果是个矢量.
+方向是Vector1,Vector2构成的平面法线.再使用右手定则
+长度是Length(Vector1)*Length(Vector2)*sin(theta)
+theta是Vector1 & Vector2的夹角.
+所以,平行的矢量叉乘结果为0矢量(长为0,方向任意)
+计算结果矢量:(ox,oy,oz)
+ox = (y1 * z2) - (y2 * z1)
+oy = (z1 * x2) - (z2 * x1)
+oz = (x1 * y2) - (x2 * y1)
+用途:计算法向量，这是生成3D图形的很关键一步。
+
+学会了?好样的！你又重新达到了大学一年级的水平~~~~~~~~~~~~
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/01/22/1489677.aspx
