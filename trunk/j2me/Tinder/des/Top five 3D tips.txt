@@ -1,0 +1,17 @@
+
+Top five 3D tips
+So here are Paul Beardow's top five tips for building a great Mobile Java 3D game.
+
+Remember to reward the player
+Game play and fun for the end user are still the priority, no matter how you draw the game. All of the aspects of the game are important, the sounds, the responsiveness of the controls, how it uses the network and most of all does it reward the player for having purchased your game? 
+Start with mass-market phones
+Get the design as right as you can from the start and consider what a mass-market handset can achieve, not the latest and greatest high-end phone. Also, remember that it's a phone and not a console, so don't try to bend a console game to fit, but try to come up with something original that addresses the mobile market. 
+Consider scalability and portability
+Think about scalability and portability from day one. Stick to the obvious things, like not hard-coding screen sizes or key codes, and also consider how to substitute parts of the scene if the frame rate is chugging on a slower handset. 
+Think outside the 2D and 3D box
+Don't be afraid to mix 2D and 3D. It's what the end user sees that counts, not how you achieved it. Also think outside of the box when constructing your 3D scene; accuracy of modelling may not be the right answer if a simple cheat looks just as good. 
+Test and check quality early on
+Don't let the testing and quality slip when you're under pressure. If you do, you'll pay for it in extended porting times and probable failures at carrier testing. Remember, it's cheaper to fix things the earlier you do it! 
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474455.aspx
