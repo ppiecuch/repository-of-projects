@@ -137,7 +137,19 @@ An OBB-Line Segment Test (Testing a box and a line segment for intersection requ
  使JSR184相机绕世界坐标系中的坐标轴旋转！
  	http://blog.csdn.net/xueyong1203/archive/2007/02/08/1505406.aspx
 变换AABB的快速算法
-
+	http://blog.csdn.net/xueyong1203/archive/2007/02/06/1503605.aspx
+高级碰撞检测技术
+	http://blog.csdn.net/lookus/archive/2006/05/06/709957.aspx
+J2ME中的基础碰撞检测算法
+	http://blog.csdn.net/Mailbomb/archive/2005/10/22/513675.aspx
+AABB Trees: Best Axis Algorithm
+	http://www.cyberkreations.com/kreationsedge/?page_id=27
+Fast (!) and correct Frustum - AABB Intersection
+	http://www.gamedev.net/community/forums/topic.asp?topic_id=512123&forum_id=20&gforum_id=0
+View Frustum Culling Tutorial
+	http://zach.in.tu-clausthal.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
+在游戏开发中如何用高级碰撞检测技术 
+	http://game.chinaitlab.com/program/30691.html
 
 /*===============3D换装相关===============*/
 3D换装资料搜集
