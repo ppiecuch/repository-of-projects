@@ -47,6 +47,8 @@ Transform.setIdentity()&invert()&transpose()
 	http://blog.csdn.net/xueyong1203/archive/2007/01/04/1473510.aspx
 M3G优化技巧 持续更新中。。
 	http://blog.csdn.net/xueyong1203/archive/2007/01/04/1473481.aspx
+ClausHoefele.com - M3G(M3G教程)
+	http://www.claushoefele.com/m3g/examples.html
 	
 
 	
@@ -102,6 +104,12 @@ An Oriented Bounding Box (OBB) Intersection Test
 	http://blog.csdn.net/xueyong1203/archive/2007/01/23/1491368.aspx
  A* 算法的一些文章集合
  	http://blog.csdn.net/xueyong1203/archive/2006/05/08/713622.aspx
+ 随机迷宫生成算法浅析
+ 	http://www.j2megame.org/index.php/content/view/2120/125.html
+ 随机生成迷宫算法及其 Java 实现
+ 	http://www.robotsky.com/e/DoPrint/?classid=32&id=3986
+ 一个JAVA编写的迷宫算法。。自动找迷宫出口
+ 	http://blog.sina.com.cn/s/blog_60c11a490100dwak.html
 	
 	
 
@@ -258,6 +266,12 @@ ProGuard GUI
 	http://proguard.sourceforge.net/
 OZCollide(一个很好的高效碰撞引擎)
 	http://www.tsarevitch.org/ozcollide/
+·【教程】教你如何截取3D网游模型
+	http://bbs.gameres.com/showthread.asp?threadid=141970
+xna fbx模型导出插件。Autodesk公司好牛啊！
+	http://usa.autodesk.com/adsk/servlet/pc/item?siteID=123112&id=10775855
+3D Studio Max SMD Import Plug-in - Import SMD mode 
+	http://www.moddb.com/games/half-life/downloads/3d-studio-max-smd-import-plug-in-import-smd-mode
 
 /*===============XML相关===============*/
 在以CLDC為基礎的架構上分析XML 
@@ -334,6 +348,10 @@ J2ME游戏开发之免费地图编辑器(2D and 2.5D)
  	http://blog.csdn.net/xueyong1203/archive/2005/09/02/470186.aspx
  J2ME游戏开发学习之高效&漂亮显示积分
  	http://blog.csdn.net/xueyong1203/archive/2005/09/02/470115.aspx
+ [翻译][难度2]教程：如何进行骨骼绑定（图片已修复）
+ 	http://bbs.mountblade.com.cn/viewthread.php?tid=3530&extra=page%3D1
+
+ 	
 
 	
 	
