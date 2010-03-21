@@ -1,7 +1,5 @@
 package org.tinder.m3g.tutorial.abc05;
 
-
-
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.game.GameCanvas;
 import javax.microedition.m3g.AnimationController;
@@ -92,7 +90,8 @@ public class M3GCanvas extends GameCanvas implements Runnable {
 			// res-folder that I keep all files in. If you normally just put
 			// your
 			// resources in the project root, then load it from the root.
-			Object3D[] buffer = Loader.load("/pogoroo.m3g");
+//			Object3D[] buffer = Loader.load("/pogoroo.m3g");
+			Object3D[] buffer = Loader.load("/axe.m3g");
 	
 			// Find the world node, best to do it the "safe" way
 			for (int i = 0; i < buffer.length; i++) {
@@ -144,8 +143,11 @@ public class M3GCanvas extends GameCanvas implements Runnable {
      */
     public void getObjects() {
         try {
-            acRoo = (Group)world.find(POGOROO_TRANSFORM_ID);
-            animRoo = (AnimationController)world.find(ROO_BOUNCE_ID);
+//            acRoo = (Group)world.find(POGOROO_TRANSFORM_ID);
+//            animRoo = (AnimationController)world.find(ROO_BOUNCE_ID);
+        	//axe.m3g
+        	acRoo = (Group)world.find(26);
+            animRoo = (AnimationController)world.find(3);
 
             // get length of animation
             AnimationTrack track = acRoo.getAnimationTrack(0);
