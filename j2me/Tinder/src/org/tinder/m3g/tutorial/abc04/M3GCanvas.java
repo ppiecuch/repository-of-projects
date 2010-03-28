@@ -103,6 +103,7 @@ public class M3GCanvas extends GameCanvas implements Runnable {
 			// your
 			// resources in the project root, then load it from the root.
 			Object3D[] buffer = Loader.load("/map.m3g");
+//			Object3D[] buffer = Loader.load("/pond_vilkutus.m3g");
 
 			// Find the world node, best to do it the "safe" way
 			for (int i = 0; i < buffer.length; i++) {
