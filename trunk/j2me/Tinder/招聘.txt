@@ -19,3 +19,95 @@ rebecca
 QQ:275804313
 MSN/EMAIL:rebecca6455@sohu.com
 TEL:028-66843288
+
+职位描述： 
+1、负责MTK手机平台软件的设计、开发、测试； 
+2、负责MTK手机平台相关技术应用的研发。 
+职位要求： 
+1、计算机或者电子类相关专业本科毕业； 
+2、精通C/C++，了解JAVA，熟悉MTK手机软件架构，能独立进行MTK手机软件开发和移植； 
+3、有1年以上MTK平台工作经验； 
+4、有GUI开发经验优先；
+5、能吃苦耐劳，善于交流和沟通，有良好的合作精神。 
+工作地点：上海人数：2 有兴趣的请将简历发至alice.zhen@in-fun.com，截止日期2010-4-30
+
+
+二、要求
+        题目描述：用J2ME实现，一开始在手机屏幕上显示图1,按下中间键后显示图2：
+* * * * * * * * * * * * * 
+* * * * * * * * * * * * * 
+* * * * * * * * * * * * * 
+* * * * * * * * * * * * * 
+* * * * * * * * * * * * * 
+* * * * * * * * * * * * * 
+* * * * * * * * * * * * * 
+(图1)
+按下中间键后左下角星号不动，向右顺时针旋转45度，如下
+          *                         
+            *   *                       
+          *   *   *                     
+        *   *   *   *                   
+      *   *   *   *   *                 
+    *   *   *   *   *   *               
+  *   *   *   *   *   *   *             
+    *   *   *   *   *   *   *           
+      *   *   *   *   *   *   *         
+        *   *   *   *   *   *   *       
+          *   *   *   *   *   *   *     
+            *   *   *   *   *   *   *   
+              *   *   *   *   *   *   * 
+                *   *   *   *   *   *   
+                  *   *   *   *   *     
+                    *   *   *   *       
+                      *   *   *         
+                        *   *           
+                          *  
+(图2)
+
+1.        程序第一次运行时，显示7行13列的“*”字符如图1
+2.        按下中间键后左下角星号不动，向右顺时针旋转45度. 如图2
+3.        类的数量必须超过2个
+
+
+int H=7;
+        int S=13;
+        int[][] shuzu;
+        int[][] shuzu45;
+        public void draw(Graphics g) {
+                g.setColor(0xFF0000);
+                for (int i = 0; i < shuzu.length; i++) {
+                        for (int j = 0; j < shuzu[0].length; j++) {
+                                if (shuzu[ i ][j] == 1) {
+                                        g.setColor(0xFFFF00);
+                                        g.fillRect(70 + j * 6, 100 + i * 6, 3, 3);
+                                } 
+//                                else {
+//                                        g.setColor(0xFF00ff);
+//                                        g.fillRect(70 + j * 6, 100 + i * 6, 3, 3);
+//                                }
+                        }
+                }
+        }
+        
+        public void init() {
+                shuzu = new int[H][S];
+                for (int i = 0; i < shuzu.length; i++) {
+                        for (int j = 0; j < shuzu[0].length; j++) {
+                                shuzu[ i ][j] = 1;
+                        }
+                }
+        }
+        
+        
+        
+        public void bian_45() {
+                shuzu45 = new int[H][S];
+                shuzu = new int[H + S - 1][H + S - 1];
+                for (int i = 0; i < shuzu45.length; i++) {
+                        for (int j = 0; j < shuzu45[0].length; j++) {
+                                shuzu[i + j][(H-1) - i + (j) * 1] = 1;
+                        }
+                }
+                shuzu45 = null;
+        } 
+http://www.j2megame.cn/bbs/viewthread.php?tid=21270
