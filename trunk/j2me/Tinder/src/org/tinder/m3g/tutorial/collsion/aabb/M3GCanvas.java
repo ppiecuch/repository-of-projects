@@ -51,10 +51,10 @@ class M3GCanvas  extends GameCanvas implements Runnable
         mesh2.setTranslation(-0.5f, 0.0f,0.0f) ;
         mesh2.setScale(0.5f,0.5f,0.5f);
         box2 = new AABB();
-        box2.setMin(-1.0f,-1.0f,-1.0f);
-        box2.setMax(1.0f,1.0f,1.0f); 
-        mesh2.getCompositeTransform(cubeTransform);  
-        box2.setToTransformedBox(cubeTransform);           
+        box2.setMin(-1.0f,-1.0f,-1.0f);//设置包装盒2的最小顶点
+        box2.setMax(1.0f,1.0f,1.0f); //设置包装盒2的最大顶点
+        mesh2.getCompositeTransform(cubeTransform); //获取立方体2的混合矩阵
+        box2.setToTransformedBox(cubeTransform); //将变换矩阵应用到包装盒2中
         world.addChild(mesh2);
      //   mesh.setOrientation(45,1.0f,1.0f,0.0f);
      
@@ -67,10 +67,11 @@ class M3GCanvas  extends GameCanvas implements Runnable
     }
     public void run() {
         g2d = getGraphics();
+        Transform transform=new Transform();
+    	transform.postTranslate(-0.001f,0,0);
         while(true){
         	mesh1.translate(-0.001f,0,0);
-        	mesh1.getCompositeTransform(cubeTransform);  
-            box1.setToTransformedBox(cubeTransform);    
+            box1.setToTransformedBox(transform);    
         	isCollided = box1.intersectAABBs(box2,null);
 	        try{
 	            g3d.bindTarget(g2d); // Binds the given Graphics or mutable Image2D as the rendering target of this Graphics3D
