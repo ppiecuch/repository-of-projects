@@ -1,4 +1,6 @@
-import javax.microedition.m3g.VertexArray;
+import java.util.Date;
+
+
 
 
 
@@ -9,8 +11,8 @@ public class Demo {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		VertexArray va=new VertexArray(1,1,1);
-		
+		long st=new Date().getTime();
+		QuadtreeNode root=new QuadtreeNode(6);
+		System.out.println(new Date().getTime()-st);
 	}
-
 }
