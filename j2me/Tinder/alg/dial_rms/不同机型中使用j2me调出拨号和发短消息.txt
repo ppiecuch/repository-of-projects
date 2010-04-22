@@ -1,0 +1,143 @@
+1，j2me调出拨号通常情况下只需这样（对于Nokia，SE，三星）： 
+Java代码 
+midlet.platformRequest("tel:1370000000"));   
+midlet.platformRequest("http://www.baidu.com");//这样是访问网站  
+
+midlet.platformRequest("tel:1370000000"));
+midlet.platformRequest("http://www.baidu.com");//这样是访问网站
+
+如果是moto手机可以先使用上面通用的办法试一下，如果不行就要使用moto api了， 
+要先实现DialerListener接口： 
+
+Java代码 
+import com.motorola.phone.Dialer;   
+import com.motorola.phone.DialerListener;   
+public class CallUtil extends Thread implements DialerListener {   
+   String number = "";   
+    public CallUtil(String number) {   
+    this.number = number;   
+    }   
+  
+    public void run() {   
+    Dialer dialer = Dialer.getDefaultDialer();   
+    dialer.setDialerListener(this);   
+    try {   
+        dialer.startCall(this.number);   
+        Screen.infoText = "已挂断电话";   
+    } catch (IOException ex) {   
+        ex.printStackTrace();   
+        Screen.infoText = "未呼出电话";   
+    }    
+    }   
+  
+    public void notifyDialerEvent(Dialer dialer, byte _byte) {   
+  
+    }   
+  
+}  
+
+import com.motorola.phone.Dialer;
+import com.motorola.phone.DialerListener;
+public class CallUtil extends Thread implements DialerListener {
+   String number = "";
+    public CallUtil(String number) {
+	this.number = number;
+    }
+
+    public void run() {
+	Dialer dialer = Dialer.getDefaultDialer();
+	dialer.setDialerListener(this);
+	try {
+	    dialer.startCall(this.number);
+	    Screen.infoText = "已挂断电话";
+	} catch (IOException ex) {
+	    ex.printStackTrace();
+	    Screen.infoText = "未呼出电话";
+	} 
+    }
+
+    public void notifyDialerEvent(Dialer dialer, byte _byte) {
+
+    }
+
+}
+/////////////////////////////////////////////////////////// 
+
+2，j2me发短消息通常情况下只需这样（对于Nokia，SE，moto）： 
+Java代码 
+public void sendSMS(String number, String content) {   
+    MessageConnection smsconn = null;   
+    try {   
+        smsconn = (MessageConnection) Connector.open("sms://"+number);   
+        TextMessage txtmessage = (TextMessage) smsconn.newMessage(MessageConnection.TEXT_MESSAGE);   
+        txtmessage.setPayloadText(content);   
+        smsconn.send(txtmessage);   
+  
+        Screen.infoText = "短信已发送";   
+    } catch (Exception e) {      
+        Screen.infoText = "短信未发出";     
+    } finally {   
+        if (smsconn != null) {   
+        try {   
+            smsconn.close();   
+        } catch (IOException e) {   
+            e.printStackTrace();   
+        }   
+        }   
+    }   
+    }  
+
+public void sendSMS(String number, String content) {
+	MessageConnection smsconn = null;
+	try {
+	    smsconn = (MessageConnection) Connector.open("sms://"+number);
+	    TextMessage txtmessage = (TextMessage) smsconn.newMessage(MessageConnection.TEXT_MESSAGE);
+	    txtmessage.setPayloadText(content);
+	    smsconn.send(txtmessage);
+
+	    Screen.infoText = "短信已发送";
+	} catch (Exception e) {   
+	    Screen.infoText = "短信未发出";  
+	} finally {
+	    if (smsconn != null) {
+		try {
+		    smsconn.close();
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+	    }
+	}
+    }
+
+对于三星手机可以先试一下上面的方法，如果不行，那就下面的吧： 
+Java代码 
+public void sendSMS(String number, String content) {   
+    try {   
+        com.samsung.util.SM sm = new com.samsung.util.SM();//samsung api   
+        sm.setData(content);   
+        sm.setDestAddress(number);   
+        com.samsung.util.SMS.send(sm);   
+  
+        Screen.infoText = "短信已发送";   
+    } catch (Exception e) {   
+        Screen.infoText = "短信未发出";   
+    }   
+    }  
+
+public void sendSMS(String number, String content) {
+	try {
+	    com.samsung.util.SM sm = new com.samsung.util.SM();//samsung api
+	    sm.setData(content);
+	    sm.setDestAddress(number);
+	    com.samsung.util.SMS.send(sm);
+
+	    Screen.infoText = "短信已发送";
+	} catch (Exception e) {
+	    Screen.infoText = "短信未发出";
+	}
+    }
+
+
+提供moto和samsung api 下载（最后的那个jar包括了nokia等许多api，可以打开看一下就知道了）：
+
+http://gundumw100.javaeye.com/blog/580305
