@@ -1,0 +1,171 @@
+实现了J2SE的java.util.Properties类，可以用来读取内容类似下面这样的配置文件： 
+=============================================== 
+# 这是注释 
+screen_width=240 
+screen_height=238 
+myname = rocks 
+mybirth = \u00d7\u00f7\u00d5\u00df\u00c9\u00fa\u00c8\u00d5 
+=============================================== 
+这样使用： 
+Properties prop = new Properties(); 
+InputStream is = this.getClass().getResourceAsStream("conf.prop"); 
+prop.load(is); 
+is.close(); 
+String name = prop.getProperty("myname"); 
+... 
+为了省空间和提高性能我把解析unicode的那部分注释起来了，如果你需要支持中文（就像上面的mybirth那样的），把那些注释起来的代码恢复就可以了。 
+
+代码： 
+-------------------------------------------------------------------------------- 
+Java代码 
+package com.joyamigo.util;   
+import java.io.*;   
+import java.util.Hashtable;   
+import java.util.Enumeration;   
+public class Properties extends java.util.Hashtable {   
+      
+   public Properties() {   
+       super();   
+   }   
+      
+ public String getProperty(String key) {   
+       return (String)this.get(key);   
+   }   
+      
+   public String getProperty(String key, String defaultValue) {   
+       Object ret = this.get(key);   
+       return ret == null ? defaultValue : (String)ret;   
+   }   
+              
+ public Object setProperty(String key, String value) {   
+       return this.put(key, value);   
+   }   
+      
+   public void list(PrintStream out) {   
+       Enumeration e = this.keys();   
+       while (e.hasMoreElements()) {   
+           Object key = e.nextElement();   
+           Object value = this.get(key);   
+           out.println(key+"="+value);   
+       }   
+   }   
+      
+   public void load(InputStream is) throws IOException {   
+       this.load(is, "ISO8859_1");   
+  }   
+      
+   public void load(InputStream is, String enc) throws IOException {   
+       Reader reader = new InputStreamReader(is, enc);   
+      boolean reading = true;   
+       StringBuffer buf = new StringBuffer();   
+       while (reading) {   
+           int c = reader.read();   
+           switch (c) {   
+           case -1:   
+              reading = false;   
+               break;   
+          case (int)'\r':   
+               break;   
+          case (int)'\n':   
+               Object[] pair = parseLine(buf.toString());   
+               if (pair != null) {   
+                   this.put(pair[0], pair[1]);   
+               }   
+              buf.setLength(0);   
+               break;   
+           default:   
+               buf.append((char)c);   
+           }   
+       }   
+       Object[] pair = parseLine(buf.toString());   
+       if (pair != null) {   
+           this.put(pair[0], pair[1]);   
+       }   
+   }   
+          
+   public void store(OutputStream out, String header) throws IOException {   
+       this.store(out, "ISO8859_1", header);   
+   }   
+      
+   public void store(OutputStream out, String enc, String header) throws IOException {   
+       Writer writer = new OutputStreamWriter(out, enc);   
+       if (header != null) {   
+           writer.write("#"+header+"\n");   
+       }   
+       Enumeration e = this.keys();   
+       while (e.hasMoreElements()) {   
+           Object key = e.nextElement();   
+           String value = (String)this.get(key);   
+           //writer.write(key+"="+rconvUnicode(value)+"\n");   
+           writer.write(key+"="+value+"\n");   
+      }   
+   }   
+   private Object[] parseLine(String line) {   
+       if (line == null || line.trim().length() == 0) {   
+           return null;   
+       }   
+       line = line.trim();   
+       if (line.startsWith("#") || line.startsWith("!")) { // is comment line   
+          return null;   
+       }   
+       int idx = line.indexOf("=");   
+       if (idx == -1) {   
+          //return new String[] { convUnicode(line), "" };   
+           return new String[] { line, "" };   
+      } else {   
+           //return new String[] { convUnicode(line.substring(0, idx).trim()),    
+          //                      convUnicode(line.substring(idx+1).trim()) };   
+           return new String[] { line.substring(0, idx).trim(),    
+                                 line.substring(idx+1).trim() };   
+       }   
+   }   
+   /*/  
+   private static final String convUnicode(String s) {  
+       int idx = 0;  
+       int len = s.length();  
+       StringBuffer buf = new StringBuffer();  
+       try {  
+           while (idx < len) {  
+               char c = s.charAt(idx++);  
+               if (c == '\\') {  
+                   c = s.charAt(idx++);  
+                   if (c == 'u') {  
+                       StringBuffer tmp = new StringBuffer(4);  
+                       for (int i = 0; i < 4; i++) {  
+                           tmp.append(s.charAt(idx++));  
+                       }  
+                       buf.append((char)Integer.parseInt(tmp.toString(), 16));  
+                   } else {  
+                       buf.append("\\"+c);  
+                   }  
+               } else {  
+                   buf.append(c);  
+               }  
+           }  
+       } catch (StringIndexOutOfBoundsException ex) {  
+           ;  
+       }  
+       return buf.toString();  
+   }  
+         
+   private static final String rconvUnicode(String s) {  
+      StringBuffer buf = new StringBuffer();  
+       for (int i = 0; i < s.length(); i++) {  
+           char c = s.charAt(i);  
+           if ((int)c > 127) {  
+               buf.append("\\u");  
+               String ss = Integer.toHexString((int)c);  
+              for (int j = 0; j < 4 - ss.length(); j++) {  
+                   buf.append('0');  
+               }  
+               buf.append(ss);  
+           } else {  
+               buf.append(c);  
+           }  
+       }  
+       return buf.toString();  
+   }  
+   //*/  
+}  
+
+http://gundumw100.javaeye.com/blog/488504

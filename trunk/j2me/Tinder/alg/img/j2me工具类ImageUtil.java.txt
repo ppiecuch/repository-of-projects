@@ -1,0 +1,1241 @@
+# import javax.microedition.lcdui.*;     
+# import javax.microedition.lcdui.game.Sprite;     
+#      
+#      
+# public class ImageUtil     
+# {     
+#     public static final int TURN_LEFT = 1;     
+#     public static final int TURN_RIGHT = 2;     
+#      
+#      
+#     /*   
+#     *获取图片RGB数据，并返回大小为width*height大小的一维数组   
+#     */     
+#     public int[] getPixels(Image src)     
+#     {     
+#         int w = src.getWidth();     
+#         int h = src.getHeight();     
+#         int[] pixels = new int[w * h];     
+#         src.getRGB(pixels, 0, w, 0, 0, w, h);     
+#         return pixels;     
+#     }     
+#      
+#       
+#     /*   
+#     *将pixels[]里的数据，生成一张图片，图片宽为w，高为h   
+#     */      
+#     public Image drawPixels(int[] pixels, int w, int h)     
+#     {     
+#         Image image = Image.createRGBImage(pixels, w, h, true);     
+#         pixels = null;     
+#         return image;     
+#     }     
+#      
+#      
+#     /*   
+#     *调整图片大小   
+#     *destW 调整后的宽，destH调整后的高   
+#     */       
+#     public  Image effect_resizeImage(Image src, int destW, int destH)     
+#     {     
+#         int srcW = src.getWidth();     
+#         int srcH = src.getHeight();     
+#      
+#        
+#         int[] destPixels = new int[destW * destH];      
+#              
+#         int[] srcPixels = getPixels(src);      
+#      
+#             for (int destY = 0; destY < destH; ++destY)     
+#             {     
+#                 for (int destX = 0; destX < destW; ++destX)     
+#                 {     
+#                     int srcX = (destX * srcW) / destW;     
+#                     int srcY = (destY * srcH) / destH;     
+#                     destPixels[destX + destY * destW] = srcPixels[srcX + srcY     
+#                             * srcW];     
+#                 }     
+#             }     
+#      
+#        
+#         return drawPixels(destPixels, destW, destH);     
+#     }     
+#      
+#         
+#    /*   
+#    * 调整图片亮度与对比度。  contrast 对比度，light 亮度   
+#    */     
+#    public Image effect_light_contrast(Image src,double contrast,int light)     
+#    {     
+#             int srcW = src.getWidth();     
+#             int srcH = src.getHeight();       
+#             int[] srcPixels = getPixels(src);     
+#             int r = 0;     
+#             int g = 0;     
+#             int b = 0;     
+#             int a = 0;     
+#             int argb;     
+#      //公式y =ax+b   a为对比度，b为亮度      
+#      //int para_b  = light - 127 * (light - 1);     
+#      for (int i = 0; i < srcH; i++)     
+#            {     
+#               for(int ii=0;ii<srcW;ii++)     
+#         {     
+#                       argb = srcPixels[i*srcW+ii];       
+#         a = ((argb & 0xff000000) >> 24); // alpha channel     
+#                       r =((argb & 0x00ff0000) >> 16); // red channel     
+#                       g =((argb & 0x0000ff00) >> 8); // green channel     
+#                       b =(argb & 0x000000ff); // blue channel     
+#                       r =(int)( r*contrast+light);                          
+#         g =(int)( g*contrast+light);     
+#         b =(int)( b*contrast+light);     
+#                           
+#          /*r =(int)((r -127 ) * contrast + 127+para_b);   
+#          g =(int)((g -127 ) * contrast + 127+para_b);   
+#          b =(int)((b -127 ) * contrast + 127+para_b);*/     
+#          if(r>255)     
+#                                r = 255;     
+#                        else if(r<0) r=0;     
+#                        if(g>255)     
+#                                g = 255;     
+#                        else if(g<0) g=0;     
+#                        if(b>255)     
+#                                b = 255;     
+#                        else if(b<0) b=0;     
+#                srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);     
+#      
+#         }     
+#      }     
+#          return drawPixels(srcPixels, srcW, srcH);     
+#    }     
+#       
+#       
+#     /*   
+#    * 图片镜像特效   
+#    */     
+#     public Image effect_mirror(Image src)     
+#     {     
+#           int srcW = src.getWidth();     
+#           int srcH = src.getHeight();       
+#           int[] srcPixels = getPixels(src);     
+#           int len;     
+#           int temp;     
+#           for (int i = 0; i < srcH; i++)     
+#           {     
+#               len = (i+1)*srcW;     
+#               for(int ii=0;ii<srcW/2;ii++)      
+#               {        
+#                  temp=srcPixels[i*srcW+ii];      
+#                  srcPixels[i*srcW+ii]=srcPixels[len-1-ii];      
+#                  srcPixels[len-1-ii]=temp;      
+#               }      
+#            }     
+#            return drawPixels(srcPixels, srcW, srcH);     
+#     }     
+#      
+#       /*   
+#    * 图片剪切，cut_xpos，cut_ypos 切割框的起始位置坐标，cut_width，cut_height 切割框的宽与高   
+#    */     
+#     public Image effect_cut(Image src,int cut_xpos,int cut_ypos,int cut_width,int cut_height)     
+#     {     
+#           int srcW = src.getWidth();     
+#           int srcH = src.getHeight();       
+#           int[] srcPixels = getPixels(src);     
+#           int[] desPixels = new int[cut_width*cut_height];     
+#           int argb;     
+#    int num = 0;     
+#           for (int i = 0; i < srcH; i++)     
+#           {     
+#             if(i >= cut_ypos&&i<cut_height+cut_ypos)     
+#             {     
+#                  for(int ii=0;ii<srcW;ii++)     
+#           {     
+#                     if(ii>=cut_xpos && ii<cut_width+cut_xpos)     
+#       {     
+#                          desPixels[num] = srcPixels[i*srcW+ii];         
+#                          num++;     
+#                               
+#         }     
+#    }     
+#              }     
+#          }     
+#            return drawPixels(desPixels, cut_width, cut_height);     
+#     }     
+#      
+#      
+#     /*   
+#    * 图片叠加，将src和image合成一张图片，x_pos，y_pos一般为0,0,也可以为自定义值   
+#    */     
+#     public Image effect_image_add_image(Image src,Image image,int x_pos,int y_pos)     
+#     {        
+#              Image temp  = Image.createImage(src.getWidth(),src.getHeight());     
+#       Graphics g = temp.getGraphics();     
+#              //g.drawImage(src,x_pos,y_pos,Graphics.LEFT|Graphics.TOP);     
+#       //g.drawImage(image,x_pos,y_pos,Graphics.LEFT|Graphics.TOP);*/      
+#              int alpha = 168;     
+#              int []srcRgbdata   =   new   int[src.getWidth()*src.getHeight()];        
+#              int []desRgbdata   =   new   int[image.getWidth()*image.getHeight()];       
+#              src.getRGB(srcRgbdata,0,src.getWidth(),0,0,src.getWidth(),src.getHeight());        
+#              image.getRGB(desRgbdata,0,image.getWidth(),0,0,image.getWidth(),image.getHeight());         
+#              g.drawRGB(getTransImg(alpha,srcRgbdata,desRgbdata),0,src.getWidth(),0,0,src.getWidth(),src.getHeight(),false);        
+#              src=null;        
+#              image=null;       
+#              return temp;     
+#     }     
+#          
+#      /*   
+#    * 图片上添加字符   
+#    */     
+#     public Image effect_image_add_str(Image src,String str,int x_pos,int y_pos)     
+#     {      
+#              Image temp = Image.createImage(src.getWidth(),src.getHeight());     
+#       Graphics g = temp.getGraphics();     
+#              g.drawImage(src,0,0,Graphics.LEFT|Graphics.TOP);     
+#              g.setColor(0x000000);     
+#    g.drawString(str,x_pos,y_pos,Graphics.LEFT|Graphics.TOP);     
+#              return temp;     
+#     }     
+#       
+#      /*   
+#    * 图片特效负片   
+#    */     
+#     public Image effect_negative(Image src)     
+#     {     
+#          int srcW = src.getWidth();     
+#          int srcH = src.getHeight();       
+#          int[] srcPixels = getPixels(src);     
+#          int r = 0;     
+#          int g = 0;     
+#          int b = 0;     
+#          int a = 0;     
+#          int argb;        
+#          for (int i = 0; i < srcH; i++)     
+#          {     
+#               for(int ii=0;ii<srcW;ii++)     
+#         {     
+#    argb = srcPixels[i*srcW+ii];     
+#                         a = ((argb & 0xff000000) >> 24); // alpha channel     
+#                         r =255-((argb & 0x00ff0000) >> 16); // red channel     
+#                         g =255-((argb & 0x0000ff00) >> 8); // green channel     
+#                         b =255-(argb & 0x000000ff); // blue channel     
+#                         srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);     
+#         }     
+#          }     
+#         return drawPixels(srcPixels, srcW, srcH);     
+#      
+#               
+#     }     
+#      
+#       /*   
+#    * 图片特效黑白   
+#    */     
+#      public Image effect_black_white(Image src)     
+#     {     
+#          int srcW = src.getWidth();     
+#          int srcH = src.getHeight();       
+#          int[] srcPixels = getPixels(src);     
+#          int r = 0;     
+#          int g = 0;     
+#          int b = 0;     
+#          int a = 0;     
+#          int argb;     
+#          int temp;     
+#                
+#          for (int i = 0; i < srcH; i++)     
+#          {     
+#               for(int ii=0;ii<srcW;ii++)     
+#         {     
+#    argb = srcPixels[i*srcW+ii];     
+#                         a = ((argb & 0xff000000) >> 24); // alpha channel     
+#                         r = ((argb & 0x00ff0000) >> 16); // red channel     
+#                         g = ((argb & 0x0000ff00) >> 8); // green channel     
+#                         b = (argb & 0x000000ff); // blue channel     
+#                         temp = (int)(.299*(double)r+.587*(double)g+.114*(double)b);     
+#                         r = temp;     
+#                         g = temp;     
+#                         b = temp;     
+#                         srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);     
+#         }     
+#          }     
+#         return drawPixels(srcPixels, srcW, srcH);     
+#      
+#               
+#     }     
+#           
+#       /*   
+#    * 图片特效粉笔画   
+#    */     
+#      public Image effect_crayon(Image src)     
+#      {      
+#          int srcW = src.getWidth();     
+#          int srcH = src.getHeight();       
+#          int[] srcPixels = getPixels(src);     
+#          int r = 0;     
+#          int g = 0;     
+#          int b = 0;     
+#          int a = 0;     
+#          int argb;        
+#          int r1 = 0;     
+#          int g1 = 0;     
+#          int b1 = 0;     
+#          int a1 = 0;     
+#          int r2 = 0;     
+#          int g2 = 0;     
+#          int b2 = 0;     
+#          int a2 = 0;     
+#               
+#          for (int i = 0; i < srcH; i++)     
+#          {     
+#               for(int ii=0;ii<srcW;ii++)     
+#        {     
+#                   argb = srcPixels[i*srcW+ii];     
+#                   a = ((argb & 0xff000000) >> 24); // alpha channel     
+#                   r = ((argb & 0x00ff0000) >> 16); // red channel     
+#                   g = ((argb & 0x0000ff00) >> 8); // green channel     
+#                   b = (argb & 0x000000ff); // blue channel      
+#                   if(i+1 == srcH)     
+#                   {     
+#                        r1= 0;     
+#                        g1= 0;     
+#                        b1=0;     
+#                   }     
+#                   else     
+#                   {     
+#                      argb = srcPixels[(i+1)*srcW+ii];      
+#                      //a1 = ((argb & 0xff000000) >> 24); // alpha channel     
+#                      r1 = ((argb & 0x00ff0000) >> 16); // red channel     
+#                      g1 = ((argb & 0x0000ff00) >> 8); // green channel     
+#                      b1 = (argb & 0x000000ff); // blue channel      
+#                   }     
+#                   if(ii+1 == srcW){     
+#                        r2= 0;     
+#                        g2= 0;     
+#                        b2=0;     
+#                   }     
+#                   else     
+#                   {     
+#                       argb = srcPixels[i*srcW+ii+1];      
+#                       r2 = ((argb & 0x00ff0000) >> 16); // red channel     
+#                       g2 = ((argb & 0x0000ff00) >> 8); // green channel     
+#                       b2 = (argb & 0x000000ff); // blue channel     
+#                   }     
+#                  // rr1=(r1-r2)^2  rr2=(r1-r3)^2     
+#                   r = (int)Math.sqrt((double)(2*(r-r1)*(r-r1)+(r-r2)*(r-r2)));     
+#                   g = (int)Math.sqrt((double)(2*(g-g1)*(g-g1)+(g-g2)*(g-g2)));     
+#                   b = (int)Math.sqrt((double)(2*(b-b1)*(b-b1)+(b-b2)*(b-b2)));     
+#                   r =255-r; // red channel     
+#                   g =255-g; // green channel     
+#                   b =255-b; // blue channel     
+#                   srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);     
+#               }     
+#          }     
+#          return drawPixels(srcPixels, srcW, srcH);     
+#      }     
+#           
+#          /*   
+#    * 图片特效蒙版   
+#    */     
+#       public Image effect_hoodwink(Image src)     
+#     {     
+#          int srcW = src.getWidth();     
+#          int srcH = src.getHeight();       
+#          int[] srcPixels = getPixels(src);     
+#          int r = 0;     
+#          int g = 0;     
+#          int b = 0;     
+#          int a = 0;     
+#          int argb;     
+#      
+#                
+#          for (int i = 0; i < srcH; i++)     
+#          {     
+#               for(int ii=0;ii<srcW;ii++)     
+#         {     
+#    argb = srcPixels[i*srcW+ii];     
+#                         a = ((argb & 0xff000000) >> 24); // alpha channel     
+#                         r = ((argb & 0x00ff0000) >> 16); // red channel     
+#                         g = ((argb & 0x0000ff00) >> 8); // green channel     
+#                         b = (argb & 0x000000ff); // blue channel     
+#                         r = (int)(.299*(double)r);     
+#                         g = (int)(.587*(double)g);     
+#                         b = (int)(.114*(double)b);     
+#                         srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);     
+#         }     
+#          }     
+#         return drawPixels(srcPixels, srcW, srcH);     
+#      
+#               
+#     }     
+#           
+#     private   int[]   getTransImg(int alpha,int[] srcRgbdata,int[] desRgbdata)        
+#     {         
+#            int []   tempRgbData = new int[desRgbdata.length];        
+#              
+#            int   sr  ;     
+#            int   sg ;     
+#            int   sb ;     
+#            int   dr  ;       
+#            int   dg ;     
+#            int   db ;      
+#            int   tr  ;     
+#            int   tg  ;     
+#            int   tb  ;     
+#            for(int   i=0;i<desRgbdata.length;i++)        
+#            {        
+#               sr   =   (srcRgbdata[i]&0xff0000)>>16;        
+#               sg   =   (srcRgbdata[i]&0xff00)>>8;        
+#               sb   =   srcRgbdata[i]&0xff;        
+#               dr   =   (desRgbdata[i]&0xff0000)>>16;        
+#               dg   =   (desRgbdata[i]&0xff00)>>8;        
+#               db   =   desRgbdata[i]&0xff;        
+#               tr   =   (sr*alpha   +   dr*(255-alpha))/255;        
+#               tg   =   (sg*alpha   +   dg*(255-alpha))/255;        
+#               tb   =   (sb*alpha   +   db*(255-alpha))/255;          
+#               tempRgbData[i]   =   (tr<<16)|(tg<<8)|tb;        
+#            }        
+#          return   tempRgbData;        
+#        }      
+#          
+#          /*   
+#    * 图片特旋转   
+#    */     
+#     public Image effect_rotate(Image src,int direction)      
+#     {      
+#         Sprite sprite = new Sprite(src);     
+#         switch(direction)     
+#         {     
+#                   case 1:     
+#                             sprite.setTransform(sprite.TRANS_ROT270);     
+#                             break;     
+#                   case 2:     
+#                             sprite.setTransform(sprite.TRANS_ROT90);        
+#                             break;     
+#         }     
+#             
+#         Image temp = Image.createImage(src.getHeight(),src.getWidth());     
+#   Graphics g = temp.getGraphics();     
+#         sprite.setPosition(0,0);     
+#         sprite.paint(g);     
+#         return temp;        
+#      }      
+#      
+#          
+#         
+#      
+#        /*   
+#    * 图片特霓虹灯   
+#    */     
+#     public Image effect_neonLight(Image src)     
+#     {     
+#          int srcW = src.getWidth();     
+#          int srcH = src.getHeight();       
+#          int[] srcPixels = getPixels(src);     
+#          int r = 0;     
+#          int g = 0;     
+#          int b = 0;     
+#          int a = 0;     
+#          int argb;        
+#          int r1 = 0;     
+#          int g1 = 0;     
+#          int b1 = 0;     
+#          int a1 = 0;     
+#          int r2 = 0;     
+#          int g2 = 0;     
+#          int b2 = 0;     
+#          int a2 = 0;     
+#               
+#          for (int i = 0; i < srcH; i++)     
+#          {     
+#               for(int ii=0;ii<srcW;ii++)     
+#        {     
+#                   argb = srcPixels[i*srcW+ii];     
+#                   a = ((argb & 0xff000000) >> 24); // alpha channel     
+#                   r = ((argb & 0x00ff0000) >> 16); // red channel     
+#                   g = ((argb & 0x0000ff00) >> 8); // green channel     
+#                   b = (argb & 0x000000ff); // blue channel      
+#                   if(i+1 == srcH)     
+#                   {     
+#                        r1= 0;     
+#                        g1= 0;     
+#                        b1=0;     
+#                   }     
+#                   else     
+#                   {     
+#                      argb = srcPixels[(i+1)*srcW+ii];      
+#                      //a1 = ((argb & 0xff000000) >> 24); // alpha channel     
+#                      r1 = ((argb & 0x00ff0000) >> 16); // red channel     
+#                      g1 = ((argb & 0x0000ff00) >> 8); // green channel     
+#                      b1 = (argb & 0x000000ff); // blue channel      
+#                   }     
+#                   if(ii+1 == srcW){     
+#                        r2= 0;     
+#                        g2= 0;     
+#                        b2=0;     
+#                   }     
+#                   else     
+#                   {     
+#                       argb = srcPixels[i*srcW+ii+1];      
+#                       r2 = ((argb & 0x00ff0000) >> 16); // red channel     
+#                       g2 = ((argb & 0x0000ff00) >> 8); // green channel     
+#                       b2 = (argb & 0x000000ff); // blue channel     
+#                   }     
+#                  // rr1=(r1-r2)^2  rr2=(r1-r3)^2     
+#                   r = (int)Math.sqrt((double)(2*(r-r1)*(r-r1)+(r-r2)*(r-r2)));     
+#                   g = (int)Math.sqrt((double)(2*(g-g1)*(g-g1)+(g-g2)*(g-g2)));     
+#                   b = (int)Math.sqrt((double)(2*(b-b1)*(b-b1)+(b-b2)*(b-b2)));     
+#                   srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);     
+#               }     
+#          }     
+#          return drawPixels(srcPixels, srcW, srcH);     
+#     }     
+#      
+# }    
+
+# import javax.microedition.lcdui.*;  
+# import javax.microedition.lcdui.game.Sprite;  
+#   
+#   
+# public class ImageUtil  
+# {  
+#     public static final int TURN_LEFT = 1;  
+#     public static final int TURN_RIGHT = 2;  
+#   
+#   
+#     /* 
+#     *获取图片RGB数据，并返回大小为width*height大小的一维数组 
+#     */  
+#     public int[] getPixels(Image src)  
+#     {  
+#         int w = src.getWidth();  
+#         int h = src.getHeight();  
+#         int[] pixels = new int[w * h];  
+#         src.getRGB(pixels, 0, w, 0, 0, w, h);  
+#         return pixels;  
+#     }  
+#   
+#    
+#     /* 
+#     *将pixels[]里的数据，生成一张图片，图片宽为w，高为h 
+#     */   
+#     public Image drawPixels(int[] pixels, int w, int h)  
+#     {  
+#         Image image = Image.createRGBImage(pixels, w, h, true);  
+#         pixels = null;  
+#         return image;  
+#     }  
+#   
+#   
+#     /* 
+#     *调整图片大小 
+#     *destW 调整后的宽，destH调整后的高 
+#     */    
+#     public  Image effect_resizeImage(Image src, int destW, int destH)  
+#     {  
+#         int srcW = src.getWidth();  
+#         int srcH = src.getHeight();  
+#   
+#     
+#         int[] destPixels = new int[destW * destH];   
+#           
+#         int[] srcPixels = getPixels(src);   
+#   
+#             for (int destY = 0; destY < destH; ++destY)  
+#             {  
+#                 for (int destX = 0; destX < destW; ++destX)  
+#                 {  
+#                     int srcX = (destX * srcW) / destW;  
+#                     int srcY = (destY * srcH) / destH;  
+#                     destPixels[destX + destY * destW] = srcPixels[srcX + srcY  
+#                             * srcW];  
+#                 }  
+#             }  
+#   
+#     
+#         return drawPixels(destPixels, destW, destH);  
+#     }  
+#   
+#      
+#    /* 
+#    * 调整图片亮度与对比度。  contrast 对比度，light 亮度 
+#    */  
+#    public Image effect_light_contrast(Image src,double contrast,int light)  
+#    {  
+#             int srcW = src.getWidth();  
+#             int srcH = src.getHeight();    
+#             int[] srcPixels = getPixels(src);  
+#             int r = 0;  
+#             int g = 0;  
+#             int b = 0;  
+#             int a = 0;  
+#             int argb;  
+#      //公式y =ax+b   a为对比度，b为亮度   
+#      //int para_b  = light - 127 * (light - 1);  
+#      for (int i = 0; i < srcH; i++)  
+#            {  
+#               for(int ii=0;ii<srcW;ii++)  
+#         {  
+#                       argb = srcPixels[i*srcW+ii];    
+#         a = ((argb & 0xff000000) >> 24); // alpha channel  
+#                       r =((argb & 0x00ff0000) >> 16); // red channel  
+#                       g =((argb & 0x0000ff00) >> 8); // green channel  
+#                       b =(argb & 0x000000ff); // blue channel  
+#                       r =(int)( r*contrast+light);                       
+#         g =(int)( g*contrast+light);  
+#         b =(int)( b*contrast+light);  
+#                        
+#          /*r =(int)((r -127 ) * contrast + 127+para_b); 
+#          g =(int)((g -127 ) * contrast + 127+para_b); 
+#          b =(int)((b -127 ) * contrast + 127+para_b);*/  
+#          if(r>255)  
+#                                r = 255;  
+#                        else if(r<0) r=0;  
+#                        if(g>255)  
+#                                g = 255;  
+#                        else if(g<0) g=0;  
+#                        if(b>255)  
+#                                b = 255;  
+#                        else if(b<0) b=0;  
+#                srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);  
+#   
+#         }  
+#      }  
+#          return drawPixels(srcPixels, srcW, srcH);  
+#    }  
+#    
+#    
+#     /* 
+#    * 图片镜像特效 
+#    */  
+#     public Image effect_mirror(Image src)  
+#     {  
+#           int srcW = src.getWidth();  
+#           int srcH = src.getHeight();    
+#           int[] srcPixels = getPixels(src);  
+#           int len;  
+#           int temp;  
+#           for (int i = 0; i < srcH; i++)  
+#           {  
+#               len = (i+1)*srcW;  
+#               for(int ii=0;ii<srcW/2;ii++)   
+#               {     
+#                  temp=srcPixels[i*srcW+ii];   
+#                  srcPixels[i*srcW+ii]=srcPixels[len-1-ii];   
+#                  srcPixels[len-1-ii]=temp;   
+#               }   
+#            }  
+#            return drawPixels(srcPixels, srcW, srcH);  
+#     }  
+#   
+#       /* 
+#    * 图片剪切，cut_xpos，cut_ypos 切割框的起始位置坐标，cut_width，cut_height 切割框的宽与高 
+#    */  
+#     public Image effect_cut(Image src,int cut_xpos,int cut_ypos,int cut_width,int cut_height)  
+#     {  
+#           int srcW = src.getWidth();  
+#           int srcH = src.getHeight();    
+#           int[] srcPixels = getPixels(src);  
+#           int[] desPixels = new int[cut_width*cut_height];  
+#           int argb;  
+#    int num = 0;  
+#           for (int i = 0; i < srcH; i++)  
+#           {  
+#             if(i >= cut_ypos&&i<cut_height+cut_ypos)  
+#             {  
+#                  for(int ii=0;ii<srcW;ii++)  
+#           {  
+#                     if(ii>=cut_xpos && ii<cut_width+cut_xpos)  
+#       {  
+#                          desPixels[num] = srcPixels[i*srcW+ii];      
+#                          num++;  
+#                            
+#         }  
+#    }  
+#              }  
+#          }  
+#            return drawPixels(desPixels, cut_width, cut_height);  
+#     }  
+#   
+#   
+#     /* 
+#    * 图片叠加，将src和image合成一张图片，x_pos，y_pos一般为0,0,也可以为自定义值 
+#    */  
+#     public Image effect_image_add_image(Image src,Image image,int x_pos,int y_pos)  
+#     {     
+#              Image temp  = Image.createImage(src.getWidth(),src.getHeight());  
+#       Graphics g = temp.getGraphics();  
+#              //g.drawImage(src,x_pos,y_pos,Graphics.LEFT|Graphics.TOP);  
+#       //g.drawImage(image,x_pos,y_pos,Graphics.LEFT|Graphics.TOP);*/   
+#              int alpha = 168;  
+#              int []srcRgbdata   =   new   int[src.getWidth()*src.getHeight()];     
+#              int []desRgbdata   =   new   int[image.getWidth()*image.getHeight()];    
+#              src.getRGB(srcRgbdata,0,src.getWidth(),0,0,src.getWidth(),src.getHeight());     
+#              image.getRGB(desRgbdata,0,image.getWidth(),0,0,image.getWidth(),image.getHeight());      
+#              g.drawRGB(getTransImg(alpha,srcRgbdata,desRgbdata),0,src.getWidth(),0,0,src.getWidth(),src.getHeight(),false);     
+#              src=null;     
+#              image=null;    
+#              return temp;  
+#     }  
+#       
+#      /* 
+#    * 图片上添加字符 
+#    */  
+#     public Image effect_image_add_str(Image src,String str,int x_pos,int y_pos)  
+#     {   
+#              Image temp = Image.createImage(src.getWidth(),src.getHeight());  
+#       Graphics g = temp.getGraphics();  
+#              g.drawImage(src,0,0,Graphics.LEFT|Graphics.TOP);  
+#              g.setColor(0x000000);  
+#    g.drawString(str,x_pos,y_pos,Graphics.LEFT|Graphics.TOP);  
+#              return temp;  
+#     }  
+#    
+#      /* 
+#    * 图片特效负片 
+#    */  
+#     public Image effect_negative(Image src)  
+#     {  
+#          int srcW = src.getWidth();  
+#          int srcH = src.getHeight();    
+#          int[] srcPixels = getPixels(src);  
+#          int r = 0;  
+#          int g = 0;  
+#          int b = 0;  
+#          int a = 0;  
+#          int argb;     
+#          for (int i = 0; i < srcH; i++)  
+#          {  
+#               for(int ii=0;ii<srcW;ii++)  
+#         {  
+#    argb = srcPixels[i*srcW+ii];  
+#                         a = ((argb & 0xff000000) >> 24); // alpha channel  
+#                         r =255-((argb & 0x00ff0000) >> 16); // red channel  
+#                         g =255-((argb & 0x0000ff00) >> 8); // green channel  
+#                         b =255-(argb & 0x000000ff); // blue channel  
+#                         srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);  
+#         }  
+#          }  
+#         return drawPixels(srcPixels, srcW, srcH);  
+#   
+#            
+#     }  
+#   
+#       /* 
+#    * 图片特效黑白 
+#    */  
+#      public Image effect_black_white(Image src)  
+#     {  
+#          int srcW = src.getWidth();  
+#          int srcH = src.getHeight();    
+#          int[] srcPixels = getPixels(src);  
+#          int r = 0;  
+#          int g = 0;  
+#          int b = 0;  
+#          int a = 0;  
+#          int argb;  
+#          int temp;  
+#             
+#          for (int i = 0; i < srcH; i++)  
+#          {  
+#               for(int ii=0;ii<srcW;ii++)  
+#         {  
+#    argb = srcPixels[i*srcW+ii];  
+#                         a = ((argb & 0xff000000) >> 24); // alpha channel  
+#                         r = ((argb & 0x00ff0000) >> 16); // red channel  
+#                         g = ((argb & 0x0000ff00) >> 8); // green channel  
+#                         b = (argb & 0x000000ff); // blue channel  
+#                         temp = (int)(.299*(double)r+.587*(double)g+.114*(double)b);  
+#                         r = temp;  
+#                         g = temp;  
+#                         b = temp;  
+#                         srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);  
+#         }  
+#          }  
+#         return drawPixels(srcPixels, srcW, srcH);  
+#   
+#            
+#     }  
+#        
+#       /* 
+#    * 图片特效粉笔画 
+#    */  
+#      public Image effect_crayon(Image src)  
+#      {   
+#          int srcW = src.getWidth();  
+#          int srcH = src.getHeight();    
+#          int[] srcPixels = getPixels(src);  
+#          int r = 0;  
+#          int g = 0;  
+#          int b = 0;  
+#          int a = 0;  
+#          int argb;     
+#          int r1 = 0;  
+#          int g1 = 0;  
+#          int b1 = 0;  
+#          int a1 = 0;  
+#          int r2 = 0;  
+#          int g2 = 0;  
+#          int b2 = 0;  
+#          int a2 = 0;  
+#            
+#          for (int i = 0; i < srcH; i++)  
+#          {  
+#               for(int ii=0;ii<srcW;ii++)  
+#        {  
+#                   argb = srcPixels[i*srcW+ii];  
+#                   a = ((argb & 0xff000000) >> 24); // alpha channel  
+#                   r = ((argb & 0x00ff0000) >> 16); // red channel  
+#                   g = ((argb & 0x0000ff00) >> 8); // green channel  
+#                   b = (argb & 0x000000ff); // blue channel   
+#                   if(i+1 == srcH)  
+#                   {  
+#                        r1= 0;  
+#                        g1= 0;  
+#                        b1=0;  
+#                   }  
+#                   else  
+#                   {  
+#                      argb = srcPixels[(i+1)*srcW+ii];   
+#                      //a1 = ((argb & 0xff000000) >> 24); // alpha channel  
+#                      r1 = ((argb & 0x00ff0000) >> 16); // red channel  
+#                      g1 = ((argb & 0x0000ff00) >> 8); // green channel  
+#                      b1 = (argb & 0x000000ff); // blue channel   
+#                   }  
+#                   if(ii+1 == srcW){  
+#                        r2= 0;  
+#                        g2= 0;  
+#                        b2=0;  
+#                   }  
+#                   else  
+#                   {  
+#                       argb = srcPixels[i*srcW+ii+1];   
+#                       r2 = ((argb & 0x00ff0000) >> 16); // red channel  
+#                       g2 = ((argb & 0x0000ff00) >> 8); // green channel  
+#                       b2 = (argb & 0x000000ff); // blue channel  
+#                   }  
+#                  // rr1=(r1-r2)^2  rr2=(r1-r3)^2  
+#                   r = (int)Math.sqrt((double)(2*(r-r1)*(r-r1)+(r-r2)*(r-r2)));  
+#                   g = (int)Math.sqrt((double)(2*(g-g1)*(g-g1)+(g-g2)*(g-g2)));  
+#                   b = (int)Math.sqrt((double)(2*(b-b1)*(b-b1)+(b-b2)*(b-b2)));  
+#                   r =255-r; // red channel  
+#                   g =255-g; // green channel  
+#                   b =255-b; // blue channel  
+#                   srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);  
+#               }  
+#          }  
+#          return drawPixels(srcPixels, srcW, srcH);  
+#      }  
+#        
+#          /* 
+#    * 图片特效蒙版 
+#    */  
+#       public Image effect_hoodwink(Image src)  
+#     {  
+#          int srcW = src.getWidth();  
+#          int srcH = src.getHeight();    
+#          int[] srcPixels = getPixels(src);  
+#          int r = 0;  
+#          int g = 0;  
+#          int b = 0;  
+#          int a = 0;  
+#          int argb;  
+#   
+#             
+#          for (int i = 0; i < srcH; i++)  
+#          {  
+#               for(int ii=0;ii<srcW;ii++)  
+#         {  
+#    argb = srcPixels[i*srcW+ii];  
+#                         a = ((argb & 0xff000000) >> 24); // alpha channel  
+#                         r = ((argb & 0x00ff0000) >> 16); // red channel  
+#                         g = ((argb & 0x0000ff00) >> 8); // green channel  
+#                         b = (argb & 0x000000ff); // blue channel  
+#                         r = (int)(.299*(double)r);  
+#                         g = (int)(.587*(double)g);  
+#                         b = (int)(.114*(double)b);  
+#                         srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);  
+#         }  
+#          }  
+#         return drawPixels(srcPixels, srcW, srcH);  
+#   
+#            
+#     }  
+#        
+#     private   int[]   getTransImg(int alpha,int[] srcRgbdata,int[] desRgbdata)     
+#     {      
+#            int []   tempRgbData = new int[desRgbdata.length];     
+#           
+#            int   sr  ;  
+#            int   sg ;  
+#            int   sb ;  
+#            int   dr  ;    
+#            int   dg ;  
+#            int   db ;   
+#            int   tr  ;  
+#            int   tg  ;  
+#            int   tb  ;  
+#            for(int   i=0;i<desRgbdata.length;i++)     
+#            {     
+#               sr   =   (srcRgbdata[i]&0xff0000)>>16;     
+#               sg   =   (srcRgbdata[i]&0xff00)>>8;     
+#               sb   =   srcRgbdata[i]&0xff;     
+#               dr   =   (desRgbdata[i]&0xff0000)>>16;     
+#               dg   =   (desRgbdata[i]&0xff00)>>8;     
+#               db   =   desRgbdata[i]&0xff;     
+#               tr   =   (sr*alpha   +   dr*(255-alpha))/255;     
+#               tg   =   (sg*alpha   +   dg*(255-alpha))/255;     
+#               tb   =   (sb*alpha   +   db*(255-alpha))/255;       
+#               tempRgbData[i]   =   (tr<<16)|(tg<<8)|tb;     
+#            }     
+#          return   tempRgbData;     
+#        }   
+#       
+#          /* 
+#    * 图片特旋转 
+#    */  
+#     public Image effect_rotate(Image src,int direction)   
+#     {   
+#         Sprite sprite = new Sprite(src);  
+#         switch(direction)  
+#         {  
+#                   case 1:  
+#                             sprite.setTransform(sprite.TRANS_ROT270);  
+#                             break;  
+#                   case 2:  
+#                             sprite.setTransform(sprite.TRANS_ROT90);     
+#                             break;  
+#         }  
+#          
+#         Image temp = Image.createImage(src.getHeight(),src.getWidth());  
+#   Graphics g = temp.getGraphics();  
+#         sprite.setPosition(0,0);  
+#         sprite.paint(g);  
+#         return temp;     
+#      }   
+#   
+#       
+#      
+#   
+#        /* 
+#    * 图片特霓虹灯 
+#    */  
+#     public Image effect_neonLight(Image src)  
+#     {  
+#          int srcW = src.getWidth();  
+#          int srcH = src.getHeight();    
+#          int[] srcPixels = getPixels(src);  
+#          int r = 0;  
+#          int g = 0;  
+#          int b = 0;  
+#          int a = 0;  
+#          int argb;     
+#          int r1 = 0;  
+#          int g1 = 0;  
+#          int b1 = 0;  
+#          int a1 = 0;  
+#          int r2 = 0;  
+#          int g2 = 0;  
+#          int b2 = 0;  
+#          int a2 = 0;  
+#            
+#          for (int i = 0; i < srcH; i++)  
+#          {  
+#               for(int ii=0;ii<srcW;ii++)  
+#        {  
+#                   argb = srcPixels[i*srcW+ii];  
+#                   a = ((argb & 0xff000000) >> 24); // alpha channel  
+#                   r = ((argb & 0x00ff0000) >> 16); // red channel  
+#                   g = ((argb & 0x0000ff00) >> 8); // green channel  
+#                   b = (argb & 0x000000ff); // blue channel   
+#                   if(i+1 == srcH)  
+#                   {  
+#                        r1= 0;  
+#                        g1= 0;  
+#                        b1=0;  
+#                   }  
+#                   else  
+#                   {  
+#                      argb = srcPixels[(i+1)*srcW+ii];   
+#                      //a1 = ((argb & 0xff000000) >> 24); // alpha channel  
+#                      r1 = ((argb & 0x00ff0000) >> 16); // red channel  
+#                      g1 = ((argb & 0x0000ff00) >> 8); // green channel  
+#                      b1 = (argb & 0x000000ff); // blue channel   
+#                   }  
+#                   if(ii+1 == srcW){  
+#                        r2= 0;  
+#                        g2= 0;  
+#                        b2=0;  
+#                   }  
+#                   else  
+#                   {  
+#                       argb = srcPixels[i*srcW+ii+1];   
+#                       r2 = ((argb & 0x00ff0000) >> 16); // red channel  
+#                       g2 = ((argb & 0x0000ff00) >> 8); // green channel  
+#                       b2 = (argb & 0x000000ff); // blue channel  
+#                   }  
+#                  // rr1=(r1-r2)^2  rr2=(r1-r3)^2  
+#                   r = (int)Math.sqrt((double)(2*(r-r1)*(r-r1)+(r-r2)*(r-r2)));  
+#                   g = (int)Math.sqrt((double)(2*(g-g1)*(g-g1)+(g-g2)*(g-g2)));  
+#                   b = (int)Math.sqrt((double)(2*(b-b1)*(b-b1)+(b-b2)*(b-b2)));  
+#                   srcPixels[i*srcW+ii] = ((a << 24) | (r << 16) | (g << 8) | b);  
+#               }  
+#          }  
+#          return drawPixels(srcPixels, srcW, srcH);  
+#     }  
+#   
+# }  
+
+
+图片的透明处理 其实和第一个渐变效果差不多 只不多这个函数中多了一个透明度参数 使用起来更加方便 
+Java代码 
+ 1. /**   
+ 2.      *    
+ 3.      * @param img   
+ 4.      *            原始图片   
+ 5.      * @param transparent   
+ 6.      *            透明度 0-255之间   
+ 7.      * @return 处理透明度后的图片   
+ 8.      */     
+ 9.     public static Image effect_transparent(Image img, int transparent) {     
+10.         if (transparent < 0 || transparent > 255)     
+11.             return img;     
+12.      
+13.         int srcW = img.getWidth();     
+14.         int srcH = img.getHeight();     
+15.         int[] srcPixels = getPixels(img); //函数功能 讲图片数据存入指定数组     
+16.      
+17.         for (int i = 0; i < srcPixels.length; i++) {     
+18.             int a = srcPixels[i] >> 24;     
+19.             srcPixels[i] = (transparent << 24) | (srcPixels[i] & 0x00ffffff);     
+20.      
+21.         }     
+22.         return drawPixels(srcPixels, srcW, srcH); //将数组转化为图片     
+23.     }    
+
+   1. /** 
+   2.      *  
+   3.      * @param img 
+   4.      *            原始图片 
+   5.      * @param transparent 
+   6.      *            透明度 0-255之间 
+   7.      * @return 处理透明度后的图片 
+   8.      */  
+   9.     public static Image effect_transparent(Image img, int transparent) {  
+  10.         if (transparent < 0 || transparent > 255)  
+  11.             return img;  
+  12.   
+  13.         int srcW = img.getWidth();  
+  14.         int srcH = img.getHeight();  
+  15.         int[] srcPixels = getPixels(img); //函数功能 讲图片数据存入指定数组  
+  16.   
+  17.         for (int i = 0; i < srcPixels.length; i++) {  
+  18.             int a = srcPixels[i] >> 24;  
+  19.             srcPixels[i] = (transparent << 24) | (srcPixels[i] & 0x00ffffff);  
+  20.   
+  21.         }  
+  22.         return drawPixels(srcPixels, srcW, srcH); //将数组转化为图片  
+  23.     }  
+
+
+任意角度翻转函数 
+Java代码 
+ 1. /**   
+ 2.     *@param imgSource  源图像   
+ 3.     *@param cx   旋转点相对于源图像坐上角横坐标   
+ 4.     *@param cy   旋转点相对于源图像坐上角纵坐标   
+ 5.     *@param theta 图像逆时针旋转的角度   
+ 6.     *@return 旋转后的图像   
+ 7.     */     
+ 8.     public Image rotate(Image imgSource, int cx, int cy, double theta)      
+ 9.     {     
+10.         if (Math.abs(theta % 360) < 1)     
+11.             return imgSource; //角度很小时直接返回     
+12.      
+13.         int w1 = imgSource.getWidth(); //原始图像的高度和宽度     
+14.      
+15.         int h1 = imgSource.getHeight();     
+16.      
+17.         int[] srcMap = new int[w1 * h1];     
+18.      
+19.         imgSource.getRGB(srcMap, 0, w1, 0, 0, w1, h1); //获取原始图像的像素信息     
+20.      
+21.         int dx = cx > w1 / 2 ? cx : w1 - cx; //计算旋转半径     
+22.      
+23.         int dy = cy > h1 / 2 ? cy : h1 - cy;     
+24.      
+25.         double dr = Math.sqrt(dx * dx + dy * dy);     
+26.      
+27.         int wh2 = (int) (2 * dr + 1); //旋转后新图像为正方形，其边长+1是为了防止数组越界     
+28.      
+29.         int[] destMap = new int[wh2 * wh2]; //存放新图像象素的数组     
+30.      
+31.         double destX, destY;     
+32.      
+33.         double radian = theta * Math.PI / 180; //计算角度计算对应的弧度值     
+34.      
+35.         for (int i = 0; i < w1; i++) {     
+36.             for (int j = 0; j < h1; j++) {     
+37.                 if (srcMap[j * w1 + i] >> 24 != 0) { //对非透明点才进行处理     
+38.                     // 得到当前点经旋转后相对于新图像左上角的坐标     
+39.                     destX = dr + (i - cx) * Math.cos(radian) + (j - cy)     
+40.                             * Math.sin(radian);     
+41.                     destY = dr + (j - cy) * Math.cos(radian) - (i - cx)     
+42.                             * Math.sin(radian);     
+43.                     //从源图像中往新图像中填充像素     
+44.                     destMap[(int) destY * wh2 + (int) destX] = srcMap[j * w1     
+45.                             + i];     
+46.                 }     
+47.             }     
+48.         }     
+49.         return Image.createRGBImage(destMap, wh2, wh2, true); //返回旋转后的图像     
+50.     }    
+
+   1. /** 
+   2.     *@param imgSource  源图像 
+   3.     *@param cx   旋转点相对于源图像坐上角横坐标 
+   4.     *@param cy   旋转点相对于源图像坐上角纵坐标 
+   5.     *@param theta 图像逆时针旋转的角度 
+   6.     *@return 旋转后的图像 
+   7.     */  
+   8.     public Image rotate(Image imgSource, int cx, int cy, double theta)   
+   9.     {  
+  10.         if (Math.abs(theta % 360) < 1)  
+  11.             return imgSource; //角度很小时直接返回  
+  12.   
+  13.         int w1 = imgSource.getWidth(); //原始图像的高度和宽度  
+  14.   
+  15.         int h1 = imgSource.getHeight();  
+  16.   
+  17.         int[] srcMap = new int[w1 * h1];  
+  18.   
+  19.         imgSource.getRGB(srcMap, 0, w1, 0, 0, w1, h1); //获取原始图像的像素信息  
+  20.   
+  21.         int dx = cx > w1 / 2 ? cx : w1 - cx; //计算旋转半径  
+  22.   
+  23.         int dy = cy > h1 / 2 ? cy : h1 - cy;  
+  24.   
+  25.         double dr = Math.sqrt(dx * dx + dy * dy);  
+  26.   
+  27.         int wh2 = (int) (2 * dr + 1); //旋转后新图像为正方形，其边长+1是为了防止数组越界  
+  28.   
+  29.         int[] destMap = new int[wh2 * wh2]; //存放新图像象素的数组  
+  30.   
+  31.         double destX, destY;  
+  32.   
+  33.         double radian = theta * Math.PI / 180; //计算角度计算对应的弧度值  
+  34.   
+  35.         for (int i = 0; i < w1; i++) {  
+  36.             for (int j = 0; j < h1; j++) {  
+  37.                 if (srcMap[j * w1 + i] >> 24 != 0) { //对非透明点才进行处理  
+  38.                     // 得到当前点经旋转后相对于新图像左上角的坐标  
+  39.                     destX = dr + (i - cx) * Math.cos(radian) + (j - cy)  
+  40.                             * Math.sin(radian);  
+  41.                     destY = dr + (j - cy) * Math.cos(radian) - (i - cx)  
+  42.                             * Math.sin(radian);  
+  43.                     //从源图像中往新图像中填充像素  
+  44.                     destMap[(int) destY * wh2 + (int) destX] = srcMap[j * w1  
+  45.                             + i];  
+  46.                 }  
+  47.             }  
+  48.         }  
+  49.         return Image.createRGBImage(destMap, wh2, wh2, true); //返回旋转后的图像  
+  50.     }  
+
+
+图片的缩放和透明效果 
+Java代码 
+public static final Image zoomImage(Image src){   
+return zoomImage(src,src.getWidth(),src.getHeight(),true,false);   
+}   
+public static final Image zoomImage(Image src, int desW, int desH, boolean isBackgroundTrans, boolean isTrans) {   
+Image desImg = null;   
+int srcW = src.getWidth(); // source image width   
+int srcH = src.getHeight(); // source image height   
+int[] srcBuf = new int[srcW * srcH]; // source image pixel   
+src.getRGB(srcBuf, 0, srcW, 0, 0, srcW, srcH);   
+// compute interpolation table   
+int[] tabY = new int[desH];   
+int[] tabX = new int[desW];   
+int sb = 0;   
+int db = 0;   
+int tems = 0;   
+int temd = 0;   
+int distance = srcH > desH ? srcH : desH;   
+for ( int i = 0 ; i <= distance ; i++) { /* vertical direction */  
+tabY[db] = sb;   
+tems += srcH;   
+temd += desH;   
+if ( tems > distance) {   
+tems -= distance;   
+sb++;   
+}   
+if ( temd > distance) {   
+temd -= distance;   
+db++;   
+}   
+}   
+sb = 0;   
+db = 0;   
+tems = 0;   
+temd = 0;   
+distance = srcW > desW ? srcW : desW;   
+for ( int i = 0 ; i <= distance ; i++) { /* horizontal direction */  
+tabX[db] = (short) sb;   
+tems += srcW;   
+temd += desW;   
+if ( tems > distance) {   
+tems -= distance;   
+sb++;   
+}   
+if ( temd > distance) {   
+temd -= distance;   
+db++;   
+}   
+}   
+// set transparence   
+// if(isTrans){   
+// int a= 100;//set the transparence of pixel 100   
+// for(int i=0;i<srcBuf.length;i++){   
+// if(srcBuf[i]==0x00FFFFFF)continue;   
+// srcBuf[i]=(a<<24) | (srcBuf[i] & 0x00FFFFFF);// modify the highest 2 value   
+// }   
+// }   
+  
+// formation enlarge and shorten buffer pixel   
+int[] desBuf = new int[desW * desH];   
+int dx = 0;   
+int dy = 0;   
+int sy = 0;   
+int oldy = -1;   
+for ( int i = 0 ; i < desH ; i++) {   
+if ( oldy == tabY[i]) {   
+System.arraycopy(desBuf, dy - desW, desBuf, dy, desW);   
+}   
+else {   
+dx = 0;   
+for ( int j = 0 ; j < desW ; j++) {   
+desBuf[dy + dx] = srcBuf[sy + tabX[j]];   
+dx++;   
+}   
+sy += (tabY[i] - oldy) * srcW;   
+}   
+oldy = tabY[i];   
+dy += desW;   
+}   
+if(isTrans){   
+// int a= 100;//set the transparence of pixel 100   
+for(int i=0;i<desBuf.length;i++){   
+if(desBuf[i]==0x00FFFFFF)continue;   
+int alpha = ((desBuf[i] & 0xff000000) >>> 24)==0?0:100;   
+desBuf[i]=((alpha+1)<<24) | (desBuf[i] & 0x00FFFFFF);// modify the highest 2 value   
+}   
+}   
+if(isBackgroundTrans){   
+desImg = Image.createRGBImage(desBuf, desW, desH, true);   
+}else{   
+desImg = Image.createRGBImage(desBuf, desW, desH, false);   
+}   
+  
+return desImg;   
+}   
+
+http://gundumw100.javaeye.com/blog/502390
