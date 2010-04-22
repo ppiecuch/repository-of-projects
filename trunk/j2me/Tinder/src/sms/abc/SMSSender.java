@@ -1,4 +1,4 @@
-package rms.bcd;
+package sms.abc;
 
 import java.io.IOException;
 
