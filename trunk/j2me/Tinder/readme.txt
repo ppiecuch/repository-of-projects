@@ -350,6 +350,8 @@ J2ME游戏开发之免费地图编辑器(2D and 2.5D)
  	http://blog.csdn.net/xueyong1203/archive/2005/09/02/470115.aspx
  [翻译][难度2]教程：如何进行骨骼绑定（图片已修复）
  	http://bbs.mountblade.com.cn/viewthread.php?tid=3530&extra=page%3D1
+ 关于J2ME的中断事件处理 
+ 	http://www.j2megame.org/index.php/content/view/2275/125.html
 
  	
 
