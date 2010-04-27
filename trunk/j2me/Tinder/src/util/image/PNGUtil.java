@@ -29,5 +29,18 @@ public class PNGUtil {
         raw = null;
         System.gc();
     }
+	
+	public static Image setAlpha(Image image,int color,byte alpha)
+	{
+		int w = image.getWidth();
+		int h = image.getHeight();
+		int[] newData = new int[w * h];
+		image.getRGB(newData, 0, w, 0, 0, w, h);
+        /*µ÷ÓÃÌæ»»*/
+		Image newImage=Image.createRGBImage(newData, w, h, true);
+		newData=null;
+		System.gc();
+		return newImage;
+	}
 
 }
