@@ -1,0 +1,37 @@
+<?xml version ="1.0" encoding="iso-8859-1"?>
+<Scene name="3DS">
+	<Model Filename="car_blue.3DS" ID="0" Type="1000" Scale="0.5, 0.5, 0.5" Radius="5.0">
+		<Location size="0">
+		</Location>
+	</Model>
+	<Model Filename="car_red.3DS" ID="1" Type="1000" Scale="0.5, 0.5, 0.5" Radius="5.0">
+		<Location size="0">
+		</Location>
+	</Model>
+	<Model Filename="road.3DS" ID="2" Type="1001" Scale="0.5, 0.5, 0.5" Radius="10.0">
+		<Location size="4">
+			<point x="200.0"  y="0.0"  z="200.0"  angle="0" />			
+			<point x="200.0"  y="0.0"  z="-11500.0"  angle="90" />	
+			<point x="-11500.0"  y="0.0"  z="200.0"  angle="270" />
+			<point x="-11500.0"  y="0.0"  z="-11500.0"  angle="180" />
+		</Location>
+	</Model>
+	<Model Filename="road_line.3DS" ID="3" Type="1002" Scale="0.5, 0.5, 0.5" Radius="10.0">
+		<Location size="4">
+			<point x="200.0"  y="0.0"  z="200.0"  angle="0" />			
+			<point x="200.0"  y="0.0"  z="-11500.0"  angle="90" />	
+			<point x="-11500.0"  y="0.0"  z="200.0"  angle="270" />
+			<point x="-11500.0"  y="0.0"  z="-11500.0"  angle="180" />
+		</Location>
+	</Model>
+	<Model Filename="garage.3DS" ID="4" Type="1003" Scale="0.5, 0.5, 0.5" Radius="10.0">
+		<Location size="0">		
+		</Location>
+	</Model>	
+</Scene>
+
+<!--
+1000:	TYPE_CAR		
+1001:	TYPE_MAP
+1002:	TYPE_COLLISION 
+-->
