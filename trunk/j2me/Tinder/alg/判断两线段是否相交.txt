@@ -1,0 +1,53 @@
+我们分两步确定两条线段是否相交：
+
+1．快速排斥试验
+
+设以线段 P1P2 为对角线的矩形为R， 设以线段 Q1Q2 为对角线的矩形为T，如果R和T不相交，显然两线段不会相交；
+
+2．跨立试验
+
+如果两线段相交，则两线段必然相互跨立对方，如图1所示（可惜这里无法显示图:(  ）。在图1中，P1P2跨立Q1Q2 ，则矢量 ( P1 – Q1 ) 和( P2 – Q1 )位于矢量( Q2 – Q1 ) 的两侧，即
+
+( P1 – Q1 ) × ( Q2 – Q1 )  *  ( P2 – Q1 ) × ( Q2 – Q1 )  <  0
+
+ 上式可改写成
+
+ ( P1 – Q1 ) × ( Q2 – Q1 )  *  ( Q2 – Q1 ) × ( P2 – Q1 )  >  0
+
+ 当  ( P1 – Q1 ) × ( Q2 – Q1 ) = 0 时，说明  ( P1 – Q1 ) 和 ( Q2 – Q1 )共线，但是因为已经通过快速排斥试验，所以 P1 一定在线段 Q1Q2上；同理，( Q2 – Q1 ) ×( P2 – Q1 )  = 0 说明 P2 一定在线段 Q1Q2上。
+
+ 所以判断P1P2跨立Q1Q2的依据是：
+
+ ( P1 – Q1 ) × ( Q2 – Q1 )  *  ( Q2 – Q1 ) × ( P2 – Q1 )  ≥  0
+
+ 同理判断Q1Q2跨立P1P2的依据是：
+
+( Q1 – P1 ) × ( P2 – P1 )  *  ( P2 – P1 ) × ( Q2 – P1 )  ≥  0
+
+至此已经完全解决判断线段是否相交的问题。
+
+
+
+
+
+//确定两条线段是否相交
+
+int intersect(TLineSeg u,TLineSeg v)
+
+{
+
+    return( (max(u.a.x,u.b.x)>=min(v.a.x,v.b.x))&&
+
+            (max(v.a.x,v.b.x)>=min(u.a.x,u.b.x))&&
+
+            (max(u.a.y,u.b.y)>=min(v.a.y,v.b.y))&&
+
+            (max(v.a.y,v.b.y)>=min(u.a.y,u.b.y))&&
+
+            (multiply(v.a,u.b,u.a)*multiply(u.b,v.b,u.a)>=0)&&
+
+            (multiply(u.a,v.b,v.a)*multiply(v.b,u.b,v.a)>=0));
+
+}
+
+http://www.pginjp.org/modules/newbb/viewtopic.php?viewmode=compact&order=ASC&topic_id=40&forum=15
