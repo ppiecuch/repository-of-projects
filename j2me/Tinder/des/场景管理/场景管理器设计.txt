@@ -1,0 +1,63 @@
+场景对象创建
+场景中的所有对象，包括可移动与不可移动的：lights, cameras, entities,particle system,
+billboards, skyboxes, static geometry , world geometry.都由场景管理器来创建。场景中的
+任何东西都由场景管理器来管理。任何通过场景管理器得到的东西，都必须由场景管理器来销毁。
+用户不能delete通过由场景管理器得到的指针。
+场景结点只有一个父结点，可能有多个子结点。可以随意的attach 和 detach 这些场景中的结点。
+在明确告诉场景管理器销毁这些结点前，它们总是存在。如果不想渲染场景中的某些结点上的内容，
+我们可以很方便地对她们进行detach.场景中总是存在一个Root结点。可以把多个内容对象attach到
+同一个结点上。不能同时把一个实例对象挂到两个场景结点上，一个场景结点也不能有两个父结点。
+总是场景结点在执行空间操作（平移，旋转，缩放）而不是实体对象。
+
+场景查询
+场景管理器的第二个最常用的功能是进行场景查询。包括射线查询，球查询，绑定盒查询，绑定平面
+查询，相交查询。Terrain clamping：在崎岖不平的路上，勇敢地向下发射一束光，不管你告诉我你有
+多高，我永远把你踩在脚下..（是不是不太像笔记？^_^)。所有这些查询都是 maskble的，这表明可
+以在查询时过滤掉不关心的对象类型。如球查询时，只想看看它包含了多少lights,其他的对象即使包含
+在球里也不必返回，实际上根本不用计算。
+
+空间关系与3D变换
+world , parent , local世界空间中的变换是相对于全局坐标系的源点(0,0,0),这也是root scene node的位置。
+因此可以认为世界空间中的变换是相对于Root scene node的。父空间中的变换是相对于场点结点的父结点的，
+本地空间的变换是相对于物体所挂接的结点的。大多数情况下，我们会在父空间中做平移，在本地空间中做旋转，ogre中的这些操作，都是在上述的这种方式下。
+
+object space
+从模型导出的顶点数据与它的源点之间的关系是不变的，当它被挂到场景结点上，这个结点就是认为是
+它的源点。建模时与导出时不假设测量单位，以世界单位导出（也就是无单位）。
+ogre平移与设置位置不同：平移可以有多个参照点（world,local,parent space),而用setPosition()
+时，总是相对于parent-space　坐标系的。
+
+可移动的场景对象
+基于资源的对象：最普通的是mesh(陪伴着skeleton)，这种类型的对象被资源管理系统管理。
+场景管理器不负责实际的装载，它调用Ogreuq资源管理器来完成。
+基于四边形的对象：粒子系统，公告板，ribbon trail,overlay,天空盒。它们通常是面向相机的，
+使用动态材质。它们的主要资源是脚本，这些脚本定义了如何映射材质，以及它们的生命期（对于粒子系统与ribbon trail来说)。天空盒直接用场景管理器来定义。
+skyplane,skydome,skybox
+主要的相似点是它们与相机保持一个常量的距离。它们可以在场景中其它对象
+之前或是之后渲染。它们使用普通的ogre material,因此纹理动画与其他纹理没有什么不同。它们可以
+被场景管理器打开或关闭，与相机的距离也可以设置。
+skyplane 是一个平面。用距离和法线定义它与相机的位置关系。可以弯曲，可以分多个段，可对纹理进行多次平铺。skydome由五个平面组成，底部空。
+使用改变纹理坐标的方式来达到外观上的曲率变化。有一个值用来调节，值越低，曲率越柔和，值越高，越陡峭。skybox 像skydome,但他不能“弯曲”材质坐标。
+它可以使用立方材质。可使用硬件加速功能达到很好渲染效率。
+
+光
+使用光的限制：单个通道通常最大支持8个灯。使用更多的灯，通过多通道。
+光与物体之间的距离，决定光对物体实际的影响。Ogre支持点光源，平等光，聚光灯。
+
+世界几何
+当创建基于mesh的景物或关卡，应该分成较小的部分，以便于裁减。Paging Scene Manager提供了这样的工具。
+
+空间分割方案
+Ogre是基于硬件加速渲染引擎，因此以最大化几何体batching的方式会比基于实际多边形进行空间分割
+效果要好的多。Modern GPUs prefer to render a few large batches　of geometry instead of 
+many small batches.
+The more visible geometry you can render in a single batch, the better your application’s
+performance is likely to be (within reason, of course; other classic issues such as fillrate and
+overdraw can still take over if you just blindly blast polygons at the GPU, batched or not).
+静态几何使用注意：
+静态几何在使用之间必须被建立。
+使用相同材质的几何体将被放到同一渲染操作中(batch):different materials still require a separate batch.
+努力的方向是，最大化一个调用的三角形数，最小化调用的次数。
+不能移动被包含在static geometry中的对象。只有一个世界转换应用到完整的static geometry对象上.
+比同样规模的movable geometry占用更多的内存。
+假如组中的任何东西在视锥之内，那么组中的所有对象都将被渲染。
