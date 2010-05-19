@@ -158,6 +158,8 @@ View Frustum Culling Tutorial
 	http://zach.in.tu-clausthal.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
 在游戏开发中如何用高级碰撞检测技术 
 	http://game.chinaitlab.com/program/30691.html
+基于2D多边形的碰撞检测和响应(一)
+	http://blog.csdn.net/nette/archive/2008/02/27/2124894.aspx
 
 /*===============3D换装相关===============*/
 3D换装资料搜集
