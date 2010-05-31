@@ -71,9 +71,18 @@ public class InstructionTask implements Task {
 		}
 		else if(this.point!=null)
 		{
-			robot.mouseMove(point.x,point.y);
-			robot.mousePress(InputEvent.BUTTON1_MASK);
-			robot.mouseRelease(InputEvent.BUTTON1_MASK);
+			if(this.point.x>0&&this.point.y>0)
+			{
+				robot.mouseMove(point.x,point.y);
+				robot.mousePress(InputEvent.BUTTON1_MASK);
+				robot.mouseRelease(InputEvent.BUTTON1_MASK);
+			}
+			else if(this.point.x<0&&this.point.y<0)
+			{
+				robot.mouseMove(-point.x,-point.y);
+				robot.mousePress(InputEvent.BUTTON3_MASK);
+				robot.mouseRelease(InputEvent.BUTTON3_MASK);
+			}
 		}
 		else
 		{
