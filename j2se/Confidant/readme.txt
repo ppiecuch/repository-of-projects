@@ -36,3 +36,8 @@ beta02:
 beta02-v2:
 1、修正了script.xml不换行的BUG
 2、修正了进入模拟模式后回在菜单模式再进入时报异常的BUG
+3、添加右键定义支持（使用负坐标）
+
+2.0:
+模式：循环/定时<CHUNK mode="loop/time"></CHUNK>
+1、CHUNK下支持像素颜色判断<CHECK-COLOR color="" x="" y="" operator=""></CHECK-COLOR>
