@@ -64,7 +64,7 @@ public class Calculagraph extends Thread implements Externalizable {
 	@Override
 	public synchronized void start() {
 		super.start();
-		executive=TaskThread.getInstance();
+		executive=TaskThread.getInstance("TaskThread");
 		executive.start();
 	}
 	
