@@ -38,6 +38,32 @@ beta02-v2:
 2、修正了进入模拟模式后回在菜单模式再进入时报异常的BUG
 3、添加右键定义支持（使用负坐标）
 
-2.0:
-模式：循环/定时<CHUNK mode="loop/time"></CHUNK>
-1、CHUNK下支持像素颜色判断<CHECK-COLOR color="" x="" y="" operator=""></CHECK-COLOR>
+beta03:
+1、支持像素颜色判断
+2、支持定时(指定一个具体时间执行)与循环（支持定义间隔时间）两种模式
+7、支持局域网消息发送功能
+
+3、支持关机
+4、支持键盘按钮、鼠标左键、鼠标右键模拟
+5、支持执行指令串（针对定时与循环两者的竞争会导致一些指令的错乱）
+6、录制只支持loop模式，并用只支持键盘、左键、右键、颜色的录制，其它命令只能通过手工编制实现
+8、支持Alt,Shift,Ctrl附加键
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+	<commander mode="loop" time="*/30">
+		<command type="key" value="51" delay="1000" ctrl="true" alt="true" shift="true"/>
+		<command type="leftMouse" x="500" y="500" delay="1000" ctrl="true"/>
+		<command type="call" x="500" y="500" ref="id02" alt="true"/>
+		<command type="checkColor" x="500" y="500" value="0xFFFFFF" delay="1000" trueRef="id00" falseRef="id01"/>
+		<command type="rightMouse" x="500" y="500" delay="1000" shift="true"/>
+	</commander>
+	<commander mode="timer" time="20:30">
+		<command type="shutDown" delay="1000"/>
+	</commander>
+	<commander id="id00" mode="bunch">
+		<command type="key" value="51" delay="1000"/>
+		<command type="leftMouse" x="500" y="500" delay="1000"/>
+		<command type="rightMouse" x="500" y="500" delay="1000"/>
+		<command type="sendUDPMsg" value="fgagdafddsaf" delay="1000" ip="127.0.0.1"/>
+	</commander>
+</System>

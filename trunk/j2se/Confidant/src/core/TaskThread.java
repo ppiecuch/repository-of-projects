@@ -1,5 +1,6 @@
 package core;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -22,6 +23,7 @@ public final class TaskThread extends Thread {
 	private Vector<Task> taskQueue = new Vector<Task>();
 
 	private boolean runnable = true;
+	private String threadId;
 
 	/**
 	 * Return a task thread instance corresponding to threadId, if it don't
@@ -34,17 +36,13 @@ public final class TaskThread extends Thread {
 	 */
 	public static TaskThread getInstance(String threadId) {
 		if (instanceMap.containsKey(threadId) == false) {
-			instanceMap.put(threadId, new TaskThread());
+			instanceMap.put(threadId, new TaskThread(threadId));
 		}
 		return instanceMap.get(threadId);
 	}
-	
-	public static TaskThread getInstance()
-	{
-		return new TaskThread();
-	}
 
-	private TaskThread() {
+	private TaskThread(String threadId) {
+		this.threadId=threadId;
 	}
 
 	@Override
@@ -67,7 +65,9 @@ public final class TaskThread extends Thread {
 			}
 			task.perform(); // perform the task
 		}
+		instanceMap.remove(threadId);
 		System.out.println("TaskThread close");
+		threadId=null;
 	}
 
 	/**
@@ -85,6 +85,24 @@ public final class TaskThread extends Thread {
 	}
 	
 	/**
+	 * Add task bunck into task queue synchronously and then wake the task thread.
+	 * <br>
+	 * 向任务队列添加任务串并唤醒线程对队列进行处理
+	 * 
+	 * @param task
+	 */
+	public void addTask(Collection<Task> tasks)
+	{
+		synchronized (taskQueue) { // apply for the task queue's obj lock
+			for(Task task:tasks)
+			{
+				taskQueue.add(task);
+			}
+			taskQueue.notify(); // release the task queue's obj lock
+		}
+	}
+	
+	/**
 	 * Close task thread
 	 * <br>
 	 * 关闭任务处理线程
@@ -95,6 +113,7 @@ public final class TaskThread extends Thread {
 		synchronized (taskQueue) { 
 			taskQueue.notify();
 		}
+		while(threadId!=null);
 	}
 
 }
