@@ -1,0 +1,1 @@
+package org.java3dgamesdk.graphics.MS3D;public class MS3DGroup {	public byte flags;	public String name;	public int numtriangles;	public int triangleIndices[];	public byte materialIndex;	public float coords[];	public float normals[];	public float texcoords[];	public int coordsIndex[];}

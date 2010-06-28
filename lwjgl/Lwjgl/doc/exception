@@ -1,0 +1,5 @@
+【异常】org.lwjgl.LWJGLException: Pixel format not accelerated
+【解决】安装最新驱动解决（使用everestultimate）
+
+【异常】渲染文字倒置问题
+【解决】
