@@ -72,7 +72,7 @@ public class MS3DLoader {
 		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/gsg9.ms3d"));
 		
 		// Load font
-		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 12, width, height);
+		//font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 12, width, height);
 
 		// Init timer
 		timer = new Timer();
@@ -89,12 +89,11 @@ public class MS3DLoader {
 		// Model anzeigen
 		GL11.glTranslatef(0.0f, -40.0f, -150.0f);
 		GL11.glRotatef(angle, 0.0f, 1.0f, 0.0f);
-//		g36c.updateAnimation(new Date().getTime());
 		g36c.updateModel(new Date().getTime());
 //		g36c.render();
 
 		GL11.glColor3f(1.0f, 1.0f, 1.0f);
-		font.print("" + FPS, 2, font.getSize() + 4, 0);
+		//font.print("" + FPS, 2, font.getSize() + 4, 0);
 
 		Display.update(); // Update The Display
 	}

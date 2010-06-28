@@ -140,7 +140,7 @@ public class MS3DModel {
 		    }
 
 			// Load textures
-			this.reloadTextures();
+			//this.reloadTextures();
 			
 			buildModel();
 
@@ -217,13 +217,10 @@ public class MS3DModel {
 			}
 
 			for (int k = 0; k < meshs[i].coordsIndex.length; k++) {
-//				meshs[i].coords[3 * k] = vertex[3 * meshs[i].coordsIndex[k]];
-//				meshs[i].coords[3 * k + 1] = vertex[3 * meshs[i].coordsIndex[k] + 1];
-//				meshs[i].coords[3 * k + 2] = vertex[3 * meshs[i].coordsIndex[k] + 2];
 				
-				meshs[i].coords[3 * k] = vertices[meshs[i].coordsIndex[k]].vertex.x;
-				meshs[i].coords[3 * k + 1] = vertices[meshs[i].coordsIndex[k]].vertex.y;
-				meshs[i].coords[3 * k + 2] = vertices[meshs[i].coordsIndex[k]].vertex.z;
+				meshs[i].coords[3 * k] = vertex[3 * meshs[i].coordsIndex[k]];
+				meshs[i].coords[3 * k + 1] = vertex[3 * meshs[i].coordsIndex[k] + 1];
+				meshs[i].coords[3 * k + 2] = vertex[3 * meshs[i].coordsIndex[k] + 2];
 				
 
 				if (vertices[meshs[i].coordsIndex[k]].boneID != -1) {
@@ -251,7 +248,7 @@ public class MS3DModel {
 					meshs[i].coords[3 * k] = temp.x;
 					meshs[i].coords[3 * k + 1] = temp.y;
 					meshs[i].coords[3 * k + 2] = temp.z;
-					GL11.glNormal3f(meshs[i].normals[3 * k],meshs[i].normals[3 * k+1],meshs[i].normals[3 * k+2]);
+					GL11.glNormal3f(meshs[i].normals[3*k],meshs[i].normals[3*k+1],meshs[i].normals[3*k+2]);
 					GL11.glTexCoord2f(meshs[i].texcoords[2 * k],meshs[i].texcoords[2 * k+1]);
 					GL11.glVertex3f(temp.x,temp.y,temp.z);
 				}
@@ -518,6 +515,7 @@ public class MS3DModel {
 		{
 			this.flag=modelFile.readByte();
 			this.name=modelFile.readString(32);
+			System.out.print(name+":");
 			this.parentName=modelFile.readString(32);
 			this.rotation[0]=modelFile.readFloat();
 			this.rotation[1]=modelFile.readFloat();
@@ -527,6 +525,7 @@ public class MS3DModel {
 			this.translation[2]=modelFile.readFloat();
 			this.numRotationKeyframes=modelFile.readShort();
 			this.numTranslationKeyframes=modelFile.readShort();
+			System.out.println(this.numRotationKeyframes+","+this.numTranslationKeyframes);
 			
 			this.rotationKeyframes=new MS3DKeyframe[numRotationKeyframes];
 			for(int i=0;i<this.numRotationKeyframes;i++)
@@ -907,6 +906,7 @@ public class MS3DModel {
 		return allAnimations.size();
 	}
 	
+	
 	private void buildModel() {
 
 //	    Shape3D shape3d = null;
@@ -916,6 +916,7 @@ public class MS3DModel {
 
 	    MS3DMesh group = null;
 	    MS3DMaterial groupMaterial = null;
+		
 	    int vertex = 0;
 	    int texvertex = 0;
 	    for (int i = 0; i < meshs.length; i++) {
@@ -933,6 +934,7 @@ public class MS3DModel {
 	      group.coordsIndex = new int[group.numTriangles * 3];
 	      group.normals = new float[group.numTriangles * 3 * 3];
 	      group.texcoords = new float[group.numTriangles * 3 * 2];
+	      
 
 	      if (group.numTriangles > 0) {
 //	        triangleArray = new TriangleArray(group.numtriangles * 3, GeometryArray.COORDINATES | GeometryArray.NORMALS | GeometryArray.TEXTURE_COORDINATE_2 | GeometryArray.BY_REFERENCE);
@@ -1025,6 +1027,9 @@ public class MS3DModel {
 	    }
 	  }
 
+	/**
+	 * 初始化骨骼和绑定顶点
+	 */
 	private void makeBones() {
 	    MS3DJoint joint = null;
 	    MS3DVertex vertex = null;
@@ -1053,6 +1058,7 @@ public class MS3DModel {
 	      MS3DModel.setTranslationTranspose(joint.relativeMatrix, joint.translation[0], joint.translation[1], joint.translation[2]);
 
 	      if (!joint.parentName.equals("")) {
+	    	  //如果是子关节，那么将上一个节点的绝对矩阵乘上这个节点的变幻矩 阵就可以得到这个子节点的绝对矩阵了.
 	        father = (MS3DJoint) allJoints.get(joint.parentName);
 
 	        joint.absoluteMatrix = new Matrix4f();
@@ -1060,7 +1066,7 @@ public class MS3DModel {
 	        MS3DModel.mulTransposeBothTanspose(joint.absoluteMatrix, father.absoluteMatrix, joint.relativeMatrix);
 
 	      } else {
-
+	    	 //如果是根关节那么它的绝对矩阵就是它的相对变换矩阵
 	        joint.absoluteMatrix = new Matrix4f(joint.relativeMatrix);
 
 	      }
