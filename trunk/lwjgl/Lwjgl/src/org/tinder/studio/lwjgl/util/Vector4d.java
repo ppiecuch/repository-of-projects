@@ -14,7 +14,7 @@
  makes no representations about the suitability of this software for any
  purpose.  It is provided "AS IS" with NO WARRANTY.
  */
-package de.bloodyblades.ms3dloader;
+package org.tinder.studio.lwjgl.util;
 
 import java.io.Serializable;
 
@@ -63,6 +63,11 @@ public class Vector4d extends Tuple4d implements Serializable {
 	 * Revision 1.1 1997/11/26 03:00:44 hiranabe Initial revision
 	 * 
 	 */
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Constructs and initializes a Vector4d from the specified xyzw

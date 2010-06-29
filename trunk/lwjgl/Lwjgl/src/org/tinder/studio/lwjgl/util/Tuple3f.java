@@ -14,7 +14,7 @@
    makes no representations about the suitability of this software for any
    purpose.  It is provided "AS IS" with NO WARRANTY.
 */
-package de.bloodyblades.ms3dloader;
+package org.tinder.studio.lwjgl.util;
 
 import java.io.Serializable;
 
@@ -27,6 +27,11 @@ import java.io.Serializable;
 public abstract class Tuple3f implements Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
       * The x coordinate.
       */
     public float x;

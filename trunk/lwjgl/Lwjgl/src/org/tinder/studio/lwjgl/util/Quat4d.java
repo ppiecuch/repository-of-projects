@@ -14,23 +14,23 @@
    makes no representations about the suitability of this software for any
    purpose.  It is provided "AS IS" with NO WARRANTY.
 */
-package de.bloodyblades.ms3dloader;
+package org.tinder.studio.lwjgl.util;
 
 import java.io.Serializable;
 
 /**
- * A 4 element quaternion represented by single precision floating 
+ * A 4 element quaternion represented by double precision floating 
  * point x,y,z,w coordinates. 
  * @version specification 1.1, implementation $Revision: 1.9 $, $Date: 2006/07/28 17:01:32 $
  * @author Kenji hiranabe
  */
-public class Quat4f extends Tuple4f implements Serializable {
+public class Quat4d extends Tuple4d implements Serializable {
 /*
- * $Log: Quat4f.java,v $
+ * $Log: Quat4d.java,v $
  * Revision 1.9  2006/07/28 17:01:32  qxie
  * *** empty log message ***
  *
- * Revision 1.6  2006/07/19 19:26:01  qxie
+ * Revision 1.6  2006/07/19 19:26:00  qxie
  * *** empty log message ***
  *
  * Revision 1.3  2006/06/20 14:00:04  qxie
@@ -39,14 +39,11 @@ public class Quat4f extends Tuple4f implements Serializable {
  * Revision 1.1  2006/03/22 02:28:49  qxie
  * *** empty log message ***
  *
- * Revision 1.9  1999/10/05  07:03:50  hiranabe
+ * Revision 1.8  1999/10/05  07:03:50  hiranabe
  * copyright change
  *
- * Revision 1.9  1999/10/05  07:03:50  hiranabe
+ * Revision 1.8  1999/10/05  07:03:50  hiranabe
  * copyright change
- *
- * Revision 1.8  1999/03/11  00:17:50  hiranabe
- * now extends Tuple4f instead of Tuple4d
  *
  * Revision 1.7  1999/03/04  09:16:33  hiranabe
  * small bug fix and copyright change
@@ -72,60 +69,65 @@ public class Quat4f extends Tuple4f implements Serializable {
  */
 
     /**
-     * Constructs and initializes a Quat4f from the specified xyzw coordinates.
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+     * Constructs and initializes a Quat4d from the specified xyzw coordinates.
      * @param x the x coordinate
      * @param y the y coordinate
      * @param z the z coordinate
      * @param w the w scalar component
      */
-    public Quat4f(float x, float y, float z, float w) {
+    public Quat4d(double x, double y, double z, double w) {
 	super(x, y, z, w);
     }
   
     /**
-     * Constructs and initializes a Quat4f from the array of length 4.
+     * Constructs and initializes a Quat4d from the array of length 4.
      * @param v the array of length 4 containing xyzw in order
      */
-    public Quat4f(float q[]) {
+    public Quat4d(double q[]) {
 	super(q);
     }
 
     /**
-     * Constructs and initializes a Quat4f from the specified Quat4f.
-     * @param q1 the Quat4f containing the initialization x y z w data
-     */
-    public Quat4f(Quat4f q1) {
-	super(q1);
-    }
-
-    /**
-     * Constructs and initializes a Quat4f from the specified Quat4d.
+     * Constructs and initializes a Quat4d from the specified Quat4d.
      * @param q1 the Quat4d containing the initialization x y z w data
      */
-    public Quat4f(Quat4d q1) {
+    public Quat4d(Quat4d q1) {
 	super(q1);
     }
 
     /**
-      * Constructs and initializes a Quat4f from the specified Tuple4d.
+     * Constructs and initializes a Quat4d from the specified Quat4f.
+     * @param q1 the Quat4f containing the initialization x y z w data
+     */
+    public Quat4d(Quat4f q1) {
+	super(q1);
+    }
+
+    /**
+      * Constructs and initializes a Quat4d from the specified Tuple4d.
       * @param t1 the Tuple4d containing the initialization x y z w data
       */
-    public Quat4f(Tuple4d t1) {
+    public Quat4d(Tuple4d t1) {
 	super(t1);
     }
 
     /**
-      * Constructs and initializes a Quat4f from the specified Tuple4f.
+      * Constructs and initializes a Quat4d from the specified Tuple4f.
       * @param t1 the Tuple4f containing the initialization x y z w data
       */
-    public Quat4f(Tuple4f t1) {
+    public Quat4d(Tuple4f t1) {
 	super(t1);
     }
 
     /**
-     * Constructs and initializes a Quat4f to (0,0,0,0).
+     * Constructs and initializes a Quat4d to (0,0,0,0).
      */
-    public Quat4f() {
+    public Quat4d() {
 	// super(); called implicitly.
     }
 
@@ -133,7 +135,7 @@ public class Quat4f extends Tuple4f implements Serializable {
      * Sets the value of this quaternion to the conjugate of quaternion q1.
      * @param q1 the source vector
      */
-    public final void conjugate(Quat4f q1) {
+    public final void conjugate(Quat4d q1) {
 	x = -q1.x;
 	y = -q1.y;
 	z = -q1.z;
@@ -157,7 +159,7 @@ public class Quat4f extends Tuple4f implements Serializable {
      * @param q1 the first quaternion
      * @param q2 the second quaternion
      */
-    public final void mul(Quat4f q1, Quat4f q2) {
+    public final void mul(Quat4d q1, Quat4d q2) {
 	// store on stack for aliasing-safty
 	set(
 	    q1.x*q2.w + q1.w*q2.x + q1.y*q2.z - q1.z*q2.y,
@@ -172,7 +174,7 @@ public class Quat4f extends Tuple4f implements Serializable {
      * itself and q1 (this = this * q1).
      * @param q1 the other quaternion
      */
-    public final void mul(Quat4f q1) {
+    public final void mul(Quat4d q1) {
 	// store on stack for aliasing-safty
 	set(
 	    x*q1.w + w*q1.x + y*q1.z - z*q1.y,
@@ -190,16 +192,16 @@ public class Quat4f extends Tuple4f implements Serializable {
      * @param q1 the left quaternion
      * @param q2 the right quaternion
      */
-    public final void mulInverse(Quat4f q1, Quat4f q2) {
+    public final void mulInverse(Quat4d q1, Quat4d q2) {
 	double n = norm();
 	// zero-div may occur.
 	n = (n == 0.0 ? n : 1/n);
 	// store on stack once for aliasing-safty
 	set(
-	    (float)((q1.x*q2.w - q1.w*q2.x - q1.y*q2.z + q1.z*q2.y)*n),
-	    (float)((q1.y*q2.w - q1.w*q2.y - q1.z*q2.x + q1.x*q2.z)*n),
-	    (float)((q1.z*q2.w - q1.w*q2.z - q1.x*q2.y + q1.y*q2.x)*n),
-	    (float)((q1.w*q2.w + q1.x*q2.x + q1.y*q2.y + q1.z*q2.z)*n)
+	    (q1.x*q2.w - q1.w*q2.x - q1.y*q2.z + q1.z*q2.y)*n,
+	    (q1.y*q2.w - q1.w*q2.y - q1.z*q2.x + q1.x*q2.z)*n,
+	    (q1.z*q2.w - q1.w*q2.z - q1.x*q2.y + q1.y*q2.x)*n,
+	    (q1.w*q2.w + q1.x*q2.x + q1.y*q2.y + q1.z*q2.z)*n
 	    );
     }
 
@@ -209,21 +211,21 @@ public class Quat4f extends Tuple4f implements Serializable {
      * is preserved (this = this * q^-1).
      * @param q1 the other quaternion
      */
-    public final void mulInverse(Quat4f q1) {
+    public final void mulInverse(Quat4d q1) {
 	double n = norm();
 	// zero-div may occur.
 	n = (n == 0.0 ? n : 1/n);
 	// store on stack once for aliasing-safty
 	set(
-	    (float)((x*q1.w - w*q1.x - y*q1.z + z*q1.y)*n),
-	    (float)((y*q1.w - w*q1.y - z*q1.x + x*q1.z)*n),
-	    (float)((z*q1.w - w*q1.z - x*q1.y + y*q1.x)*n),
-	    (float)((w*q1.w + x*q1.x + y*q1.y + z*q1.z)*n)
+	    (x*q1.w - w*q1.x - y*q1.z + z*q1.y)*n,
+	    (y*q1.w - w*q1.y - z*q1.x + x*q1.z)*n,
+	    (z*q1.w - w*q1.z - x*q1.y + y*q1.x)*n,
+	    (w*q1.w + x*q1.x + y*q1.y + z*q1.z)*n
 	    );
     }
 
 
-    // helper
+    //
     private final double norm() {
 	return x*x + y*y + z*z + w*w;
     }
@@ -232,13 +234,13 @@ public class Quat4f extends Tuple4f implements Serializable {
      * Sets the value of this quaternion to quaternion inverse of quaternion q1.
      * @param q1 the quaternion to be inverted
      */
-    public final void inverse(Quat4f q1) {
+    public final void inverse(Quat4d q1) {
 	double n = q1.norm();
 	// zero-div may occur.
-	x = (float)(-q1.x/n);
-	y = (float)(-q1.y/n);
-	z = (float)(-q1.z/n);
-	w = (float)(q1.w/n);
+	x = -q1.x/n;
+	y = -q1.y/n;
+	z = -q1.z/n;
+	w = q1.w/n;
     }
 
     /**
@@ -247,10 +249,10 @@ public class Quat4f extends Tuple4f implements Serializable {
     public final void inverse() {
 	double n = norm();
 	// zero-div may occur.
-	x = (float)(-x/n);
-	y = (float)(-y/n);
-	z = (float)(-z/n);
-	w = (float)(w/n);
+	x = -x/n;
+	y = -y/n;
+	z = -z/n;
+	w /= n;
     }
 
     /**
@@ -258,20 +260,20 @@ public class Quat4f extends Tuple4f implements Serializable {
      * of quaternion q1.
      * @param q1 the quaternion to be normalized.
      */
-    public final void normalize(Quat4f q1) {
+    public final void normalize(Quat4d q1) {
 	double n = Math.sqrt(q1.norm());
 	// zero-div may occur.
-	x = (float)(q1.x/n);
-	y = (float)(q1.y/n);
-	z = (float)(q1.z/n);
-	w = (float)(q1.w/n);
+	x = q1.x/n;
+	y = q1.y/n;
+	z = q1.z/n;
+	w = q1.w/n;
     }
 
     /**
      * Normalizes the value of this quaternion in place.
      */
     public final void normalize() {
-	float n = (float)Math.sqrt(norm());
+	double n = Math.sqrt(norm());
 	// zero-div may occur.
 	x /= n;
 	y /= n;
@@ -342,11 +344,11 @@ public class Quat4f extends Tuple4f implements Serializable {
 	z = a1.z;
 	double n = Math.sqrt(x*x + y*y + z*z);
 	// zero-div may occur.
-	float s = (float)(Math.sin(0.5*a1.angle)/n);
+	double s = Math.sin(0.5*a1.angle)/n;
 	x *= s;
 	y *= s;
 	z *= s;
-	w = (float)Math.cos(0.5*a1.angle);
+	w = Math.cos(0.5*a1.angle);
     }
 
     /**
@@ -355,16 +357,16 @@ public class Quat4f extends Tuple4f implements Serializable {
      * @param a1 the axis-angle
      */
     public final void set(AxisAngle4d a1) {
-	x = (float)a1.x;
-	y = (float)a1.y;
-	z = (float)a1.z;
+	x = a1.x;
+	y = a1.y;
+	z = a1.z;
 	double n = Math.sqrt(x*x + y*y + z*z);
 	// zero-div may occur.
-	float s = (float)(Math.sin(0.5*a1.angle)/n);
+	double s = Math.sin(0.5*a1.angle)/n;
 	x *= s;
 	y *= s;
 	z *= s;
-	w = (float)Math.cos(0.5*a1.angle);
+	w = Math.cos(0.5*a1.angle);
     }
 
     /**
@@ -373,7 +375,7 @@ public class Quat4f extends Tuple4f implements Serializable {
       * @param q1 the other quaternion
       * @param alpha the alpha interpolation parameter
       */
-    public final void interpolate(Quat4f q1, double alpha) {
+    public final void interpolate(Quat4d q1, double alpha) {
 	// From Hoggar.
 	normalize();
 	double n1 = Math.sqrt(q1.norm());
@@ -403,10 +405,10 @@ public class Quat4f extends Tuple4f implements Serializable {
 	t = Math.sin(alpha*t)/sin_t;
 
 	// set values
-	x = (float)(s*x + t*x1);
-	y = (float)(s*y + t*y1);
-	z = (float)(s*z + t*z1);
-	w = (float)(s*w + t*w1);
+	x = s*x + t*x1;
+	y = s*y + t*y1;
+	z = s*z + t*z1;
+	w = s*w + t*w1;
     }
 
     /**
@@ -416,7 +418,7 @@ public class Quat4f extends Tuple4f implements Serializable {
       * @param q2 the second quaternion
       * @param alpha the alpha interpolation parameter
       */
-    public final void interpolate(Quat4f q1, Quat4f q2, double alpha) {
+    public final void interpolate(Quat4d q1, Quat4d q2, double alpha) {
 	set(q1);
 	interpolate(q2, alpha);
     }
@@ -432,35 +434,36 @@ public class Quat4f extends Tuple4f implements Serializable {
 	double tr = m00 + m11 + m22;
 	if (tr >= 0.0) {
 	    s = Math.sqrt(tr + 1.0);
-	    w = (float)(s*0.5);
+	    w = s*0.5;
 	    s = 0.5/s;
-	    x = (float)((m21 - m12)*s);
-	    y = (float)((m02 - m20)*s);
-	    z = (float)((m10 - m01)*s);
+	    x = (m21 - m12)*s;
+	    y = (m02 - m20)*s;
+	    z = (m10 - m01)*s;
 	} else {
 	    double max = Math.max(Math.max(m00, m11), m22);
 	    if (max == m00) {
 		s = Math.sqrt(m00 - (m11 + m22) + 1.0);
-		x = (float)(s*0.5);
+		x = s*0.5;
 		s = 0.5/s;
-		y = (float)((m01 + m10)*s);
-		z = (float)((m20 + m02)*s);
-		w = (float)((m21 - m12)*s);
+		y = (m01 + m10)*s;
+		z = (m20 + m02)*s;
+		w = (m21 - m12)*s;
 	    } else if (max == m11) {
 		s = Math.sqrt(m11 - (m22 + m00) + 1.0);
-		y = (float)(s*0.5);
+		y = s*0.5;
 		s = 0.5/s;
-		z = (float)((m12 + m21)*s);
-		x = (float)((m01 + m10)*s);
-		w = (float)((m02 - m20)*s);
+		z = (m12 + m21)*s;
+		x = (m01 + m10)*s;
+		w = (m02 - m20)*s;
 	    } else {
 		s = Math.sqrt(m22 - (m00 + m11) + 1.0);
-		z = (float)(s*0.5);
+		z = s*0.5;
 		s = 0.5/s;
-		x = (float)((m20 + m02)*s);
-		y = (float)((m12 + m21)*s);
-		w = (float)((m10 - m01)*s);
+		x = (m20 + m02)*s;
+		y = (m12 + m21)*s;
+		w = (m10 - m01)*s;
 	    }
 	}
+
     }
 }

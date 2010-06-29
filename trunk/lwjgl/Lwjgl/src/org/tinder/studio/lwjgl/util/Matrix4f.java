@@ -14,7 +14,7 @@
    makes no representations about the suitability of this software for any
    purpose.  It is provided "AS IS" with NO WARRANTY.
 */
-package de.bloodyblades.ms3dloader;
+package org.tinder.studio.lwjgl.util;
 
 import java.io.Serializable;
 
@@ -75,6 +75,11 @@ public class Matrix4f implements Serializable {
  */
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
       * The first element of the first row.
       */
     public float m00;

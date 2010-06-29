@@ -4,7 +4,7 @@
  * Created on 24. Juni 2006, 23:40
  */
 
-package de.bloodyblades.ms3dloader;
+package org.tinder.studio.lwjgl.util;
 
 
 

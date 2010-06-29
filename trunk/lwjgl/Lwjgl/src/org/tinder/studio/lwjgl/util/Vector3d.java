@@ -14,7 +14,7 @@
    makes no representations about the suitability of this software for any
    purpose.  It is provided "AS IS" with NO WARRANTY.
 */
-package de.bloodyblades.ms3dloader;
+package org.tinder.studio.lwjgl.util;
 
 import java.io.Serializable;
 
@@ -71,6 +71,13 @@ public class Vector3d extends Tuple3d implements Serializable {
 
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+
+
+	/**
       * Constructs and initializes a Vector3d from the specified xyz coordinates.
       * @param x the x coordinate
       * @param y the y coordinate

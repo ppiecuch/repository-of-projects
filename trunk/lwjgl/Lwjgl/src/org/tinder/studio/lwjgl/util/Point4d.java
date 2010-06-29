@@ -14,23 +14,23 @@
    makes no representations about the suitability of this software for any
    purpose.  It is provided "AS IS" with NO WARRANTY.
 */
-package de.bloodyblades.ms3dloader;
+package org.tinder.studio.lwjgl.util;
 
 import java.io.Serializable;
 
 /**
-  * A 4 element point that is represented by single precision
+  * A 4 element point that is represented by double precision
   * floating point x,y,z,w coordinates.
   * @version specification 1.1, implementation $Revision: 1.9 $, $Date: 2006/07/28 17:01:32 $
   * @author Kenji hiranabe
   */
-public class Point4f extends Tuple4f implements Serializable {
+public class Point4d extends Tuple4d implements Serializable {
 /*
- * $Log: Point4f.java,v $
+ * $Log: Point4d.java,v $
  * Revision 1.9  2006/07/28 17:01:32  qxie
  * *** empty log message ***
  *
- * Revision 1.6  2006/07/19 19:26:02  qxie
+ * Revision 1.6  2006/07/19 19:26:01  qxie
  * *** empty log message ***
  *
  * Revision 1.3  2006/06/20 14:00:04  qxie
@@ -45,15 +45,15 @@ public class Point4f extends Tuple4f implements Serializable {
  * Revision 1.10  1999/10/05  07:03:50  hiranabe
  * copyright change
  *
- * Revision 1.9  1999/10/05  04:56:12  hiranabe
+ * Revision 1.9  1999/10/05  04:55:37  hiranabe
  * Java3D 1.2 support
- * Point4f(Tuple3f t1) constructor
- * set(Tuple3f t1)
+ * Point4d(Tuple3d t1) constructor
+ * set(Tuple3d t1)
  *
  * Revision 1.8  1999/03/04  09:16:33  hiranabe
  * small bug fix and copyright change
  *
- * Revision 1.7  1999/02/28  01:53:49  hiranabe
+ * Revision 1.7  1999/02/28  01:55:03  hiranabe
  * bug in distanceSquared
  * 	double dw = z - p1.w; fixed
  *
@@ -79,65 +79,70 @@ public class Point4f extends Tuple4f implements Serializable {
 
 
     /**
-      * Constructs and initializes a Point4f from the specified xyzw coordinates.
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+      * Constructs and initializes a Point4d from the specified xyzw coordinates.
       * @param x the x coordinate
       * @param y the y coordinate
       * @param z the z coordinate
       * @param w the w coordinate
       */
-    public Point4f(float x, float y, float z, float w) {
+    public Point4d(double x, double y, double z, double w) {
 	super(x, y, z, w);
     }
 
     /**
-      * Constructs and initializes a Point4f from the specified array.
+      * Constructs and initializes a Point4d from the specified array.
       * @param p the array of length 4 containing xyzw in order
       */
-    public Point4f(float p[]) {
+    public Point4d(double p[]) {
 	super(p);
     }
 
     /**
-      * Constructs and initializes a Point4f from the specified Point4f.
+      * Constructs and initializes a Point4d from the specified Point4f.
       * @param p1 the Point4f containing the initialization x y z w data
       */
-    public Point4f(Point4f p1) {
+    public Point4d(Point4f p1) {
 	super(p1);
     }
 
     /**
-      * Constructs and initializes a Point4f from the specified Point4d.
+      * Constructs and initializes a Point4d from the specified Point4d.
       * @param p1 the Point4d containing the initialization x y z w data
       */
-    public Point4f(Point4d p1) {
+    public Point4d(Point4d p1) {
 	super(p1);
     }
 
     /**
-      * Constructs and initializes a Point4f from the specified Tuple4d.
+      * Constructs and initializes a Point4d from the specified Tuple4d.
       * @param t1 the Tuple4d containing the initialization x y z w data
       */
-    public Point4f(Tuple4d t1) {
+    public Point4d(Tuple4d t1) {
 	super(t1);
     }
 
     /**
-      * Constructs and initializes a Point4f from the specified Tuple4f.
+      * Constructs and initializes a Point4d from the specified Tuple4f.
       * @param t1 the Tuple4f containing the initialization x y z w data
       */
-    public Point4f(Tuple4f t1) {
+    public Point4d(Tuple4f t1) {
 	super(t1);
     }
 
     /**
-      * Constructs and initializes a Point4f to (0,0,0,0).
+      * Constructs and initializes a Point4d to (0,0,0,0).
       */
-    public Point4f() {
+    public Point4d() {
 	// super(); called implicitly.
     }
 
     /**
-     * Constructs and initializes a Point4d from the specified Tuple3f.
+     * Constructs and initializes a Point4d from the specified Tuple3d.
      * The x,y,z  components of this point are set to the corresponding
      * components
      * of tuple t1. The w component of this point is set to 1.
@@ -145,7 +150,7 @@ public class Point4f extends Tuple4f implements Serializable {
      * @param t1 the tuple to be copied
      * @since Java3D 1.2
      */
-    public Point4f(Tuple3f t1) {
+    public Point4d(Tuple3d t1) {
         super(t1.x, t1.y, t1.z, 1);
     }
 
@@ -156,16 +161,16 @@ public class Point4f extends Tuple4f implements Serializable {
      * @param t1 the tuple to be copied
      * @since Java3D 1.2
      */
-    public final void set(Tuple3f t1) {
+    public final void set(Tuple3d t1) {
         set(t1.x, t1.y, t1.z, 1);
     }
 
     /**
       * Computes the square of the distance between this point and point p1.
       * @param  p1 the other point
-      * @return the square of distance between these two points as a float
+      * @return the square of distance between this point and p1
       */
-    public final float distanceSquared(Point4f p1) {
+    public final double distanceSquared(Point4d p1) {
 	double dx = x - p1.x;
 	double dy = y - p1.y;
 	double dz = z - p1.z;
@@ -176,10 +181,10 @@ public class Point4f extends Tuple4f implements Serializable {
     /**
       * Returns the distance between this point and point p1.
       * @param p1 the other point
-      * @return the distance between these two points
+      * @return the distance between this point and point p1.
       */
-    public final float distance(Point4f p1) {
-	return (float)Math.sqrt(distanceSquared(p1));
+    public final double distance(Point4d p1) {
+	return Math.sqrt(distanceSquared(p1));
     }
 
     /**
@@ -189,7 +194,8 @@ public class Point4f extends Tuple4f implements Serializable {
       * @param p1 the other point
       * @return L-1 distance
       */
-    public final float distanceL1(Point4f p1) {
+    public final double distanceL1(Point4d p1) {
+	// return type changed from float to double as of API1.1 Beta02
 	return Math.abs(x-p1.x) + Math.abs(y-p1.y)
 	    + Math.abs(z-p1.z) + Math.abs(w-p1.w);
     }
@@ -200,23 +206,24 @@ public class Point4f extends Tuple4f implements Serializable {
       * @param p1 the other point
       * @return L-infinite distance
       */
-    public final float distanceLinf(Point4f p1) {
+    public final double distanceLinf(Point4d p1) {
+	// return type changed from float to double as of API1.1 Beta02
 	return Math.max(Math.max(Math.abs(x-p1.x), Math.abs(y-p1.y)),
 			Math.max(Math.abs(z-p1.z), Math.abs(w-p1.w)));
     }
 
     /**
-      * Multiplies each of the x,y,z components of the Point4f parameter by 1/w,
+      * Multiplies each of the x,y,z components of the Point4d parameter by 1/w,
       * places the projected values into this point, and places a 1 as the w
       * parameter of this point.
       * @param p1 the source Point4d, which is not modified
       */
-     public final void project(Point4f p1) {
+     public final void project(Point4d p1) {
 	 // zero div may occur.
 	 x = p1.x/p1.w;
 	 y = p1.y/p1.w;
 	 z = p1.z/p1.w;
-	 w = 1.0f;
+	 w = 1.0;
      }
 
 }
