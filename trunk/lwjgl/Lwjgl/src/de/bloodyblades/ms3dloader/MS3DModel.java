@@ -40,9 +40,9 @@ public class MS3DModel {
 	int numMaterials;
 	MS3DMaterial[] materials;
 	
-	float animationFPS;
+//	float animationFPS;
 	float currentTime;
-	int totalFrames;
+//	int totalFrames;
 	
 	int numJoints;
 	MS3DJoint[] joints;
@@ -124,10 +124,10 @@ public class MS3DModel {
 				this.materials[i] = new MS3DMaterial(modelFile);
 			
 			//Keyframe data
-			animationFPS = modelFile.readFloat();
+			fAnimationFPS = modelFile.readFloat();
 		    currentTime = (long) (modelFile.readFloat() * 1000);
-		    totalFrames = modelFile.readInt();
-		    System.out.println(animationFPS+","+currentTime+","+totalFrames);
+		    iTotalFrames = modelFile.readInt();
+		    System.out.println(fAnimationFPS+","+currentTime+","+iTotalFrames);
 		    
 		    //Joints
 		    numJoints = modelFile.readShort();
@@ -249,6 +249,7 @@ public class MS3DModel {
 					meshs[i].coords[3 * k + 1] = temp.y;
 					meshs[i].coords[3 * k + 2] = temp.z;
 					GL11.glNormal3f(meshs[i].normals[3*k],meshs[i].normals[3*k+1],meshs[i].normals[3*k+2]);
+//					GL11.glNormal3f(temp.x,temp.y,temp.z);
 					GL11.glTexCoord2f(meshs[i].texcoords[2 * k],meshs[i].texcoords[2 * k+1]);
 					GL11.glVertex3f(temp.x,temp.y,temp.z);
 				}
@@ -360,6 +361,7 @@ public class MS3DModel {
 			this.vertex = new Vector3f(modelFile.readFloat(), modelFile.readFloat(), modelFile.readFloat());
 			this.boneID = modelFile.readByte();
 			this.refCount = modelFile.readByte();
+			System.out.print(boneID+",");
 		}
 
 
@@ -673,11 +675,17 @@ public class MS3DModel {
 
 		if (currentTime >= (endFrame + 1) * 1000.0 / fAnimationFPS) {
 			if (loop) {
+				System.out.println("reset");
 				reset();
 			} else {
 				currentTime = (long) ((endFrame + 1) * 1000.0 / fAnimationFPS);
+				System.out.println(currentTime);
 				loopDone = true;
 			}
+		}
+		else
+		{
+			System.out.println("currentTime<(endFrame + 1) * 1000.0 / fAnimationFPS:"+currentTime +"<"+ (endFrame + 1) * 1000.0 / fAnimationFPS);
 		}
 
 		for (int i = 0; i < numJoints; i++) {
@@ -695,11 +703,11 @@ public class MS3DModel {
 
 			//
 			frame = joint.currentTranslationKeyframe;
-
-			while (frame < joint.numTranslationKeyframes
-					&& joint.translationKeyframes[frame].time < currentTime) {
+			while (frame < joint.numTranslationKeyframes&& joint.translationKeyframes[frame].time < currentTime) {
+				System.out.println(joint.translationKeyframes[frame].time+"<"+currentTime);
 				frame++;
 			}
+			System.out.println("frame:"+frame);
 			joint.currentTranslationKeyframe = frame;
 
 			if (frame == 0) {
@@ -710,12 +718,14 @@ public class MS3DModel {
 				transVec.x = joint.translationKeyframes[frame - 1].x;
 				transVec.y = joint.translationKeyframes[frame - 1].y;
 				transVec.z = joint.translationKeyframes[frame - 1].z;
+//				System.out.println(joint.name+","+joint.numTranslationKeyframes+","+frame);
 			} else {
 				MS3DKeyframe curFrame = joint.translationKeyframes[frame];
 				MS3DKeyframe prevFrame = joint.translationKeyframes[frame - 1];
 
 				float timeDelta = ((float) (curFrame.time - prevFrame.time));
 				float interpValue = (float) ((currentTime - prevFrame.time) / (float) timeDelta);
+				System.out.println(interpValue);
 
 				transVec.x = prevFrame.x + (curFrame.x - prevFrame.x)
 						* interpValue;
@@ -1035,13 +1045,13 @@ public class MS3DModel {
 	    MS3DVertex vertex = null;
 
 	    // refer vertices to the joints
-	    for (int i = 0; i < numVertices; i++) {
-	      vertex = vertices[i];
-
-	      if (vertex.boneID != -1) {
-	        joint =joints[vertex.boneID];
-	      }
-	    }
+//	    for (int i = 0; i < numVertices; i++) {
+//	      vertex = vertices[i];
+//
+//	      if (vertex.boneID != -1) {
+//	        joint =joints[vertex.boneID];
+//	      }
+//	    }
 
 	    MS3DJoint father = null;
 
@@ -1071,12 +1081,18 @@ public class MS3DModel {
 
 	      }
 	    }
-
+	    
+	    System.out.println(joint.relativeMatrix.m00+","+joint.relativeMatrix.m01+","+joint.relativeMatrix.m02+","+joint.relativeMatrix.m03);
+	    System.out.println(joint.relativeMatrix.m10+","+joint.relativeMatrix.m11+","+joint.relativeMatrix.m12+","+joint.relativeMatrix.m13);
+	    System.out.println(joint.relativeMatrix.m20+","+joint.relativeMatrix.m21+","+joint.relativeMatrix.m22+","+joint.relativeMatrix.m23);
+	    System.out.println(joint.relativeMatrix.m30+","+joint.relativeMatrix.m31+","+joint.relativeMatrix.m32+","+joint.relativeMatrix.m33);
+	    int count=0;
 	    // initialize the vertices
 	    for (int i = 0; i < numVertices; i++) {
 	      vertex = vertices[i];
-
+	      
 	      if (vertex.boneID != -1) {
+	    	  count++;
 	        Matrix4f matrix = joints[vertex.boneID].absoluteMatrix;
 
 	        float x = vertex.vertex.x - matrix.m30;
@@ -1089,6 +1105,8 @@ public class MS3DModel {
 
 	      }
 	    }
+	    
+	    System.out.println(count);
 
 	  }
 }
