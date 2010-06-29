@@ -127,11 +127,11 @@ public class MS3DModel {
 			fAnimationFPS = modelFile.readFloat();
 		    currentTime = (long) (modelFile.readFloat() * 1000);
 		    iTotalFrames = modelFile.readInt();
-		    System.out.println(fAnimationFPS+","+currentTime+","+iTotalFrames);
+//		    System.out.println(fAnimationFPS+","+currentTime+","+iTotalFrames);
 		    
 		    //Joints
 		    numJoints = modelFile.readShort();
-		    System.out.println(numJoints);
+//		    System.out.println(numJoints);
 		    this.joints=new MS3DJoint[numJoints];
 		    for (int i=0; i < this.numJoints; i++)
 		    {
@@ -140,7 +140,7 @@ public class MS3DModel {
 		    }
 
 			// Load textures
-			//this.reloadTextures();
+			this.reloadTextures();
 			
 			buildModel();
 
@@ -195,7 +195,6 @@ public class MS3DModel {
 		updateAnimation(time);
 
 		boolean texturingEnabled = GL11.glIsEnabled(GL11.GL_TEXTURE_2D);
-		GL11.glBegin(GL11.GL_TRIANGLES);
 		
 		// update the points
 		for (int i = 0; i < numMeshs; i++) {
@@ -215,7 +214,7 @@ public class MS3DModel {
 			} else {
 				GL11.glDisable(GL11.GL_TEXTURE_2D);
 			}
-
+			GL11.glBegin(GL11.GL_TRIANGLES);
 			for (int k = 0; k < meshs[i].coordsIndex.length; k++) {
 				
 				meshs[i].coords[3 * k] = vertex[3 * meshs[i].coordsIndex[k]];
@@ -248,15 +247,18 @@ public class MS3DModel {
 					meshs[i].coords[3 * k] = temp.x;
 					meshs[i].coords[3 * k + 1] = temp.y;
 					meshs[i].coords[3 * k + 2] = temp.z;
+					// Render each mesh
+					
 					GL11.glNormal3f(meshs[i].normals[3*k],meshs[i].normals[3*k+1],meshs[i].normals[3*k+2]);
 //					GL11.glNormal3f(temp.x,temp.y,temp.z);
 					GL11.glTexCoord2f(meshs[i].texcoords[2 * k],meshs[i].texcoords[2 * k+1]);
 					GL11.glVertex3f(temp.x,temp.y,temp.z);
+					
 				}
 			}
+			GL11.glEnd();
 
 		}
-		GL11.glEnd();
 		
 		// Reset texture state
 		if (texturingEnabled)
@@ -361,7 +363,7 @@ public class MS3DModel {
 			this.vertex = new Vector3f(modelFile.readFloat(), modelFile.readFloat(), modelFile.readFloat());
 			this.boneID = modelFile.readByte();
 			this.refCount = modelFile.readByte();
-			System.out.print(boneID+",");
+//			System.out.print(boneID+",");
 		}
 
 
@@ -473,18 +475,25 @@ public class MS3DModel {
 			this.texturemap = modelFile.readString(128);
 			this.alphamap = modelFile.readString(128);
 
-			// Fix paths
+			
+//			// Fix paths
 			if (this.texturemap.startsWith("..\\"))
 				this.texturemap = this.texturemap.substring(3);
+			
+			if(this.texturemap.startsWith(".\\"))
+				this.texturemap = this.texturemap.substring(2);
 
 			if (!this.texturemap.startsWith("/"))
 				this.texturemap = "/" + this.texturemap;
+			
 
 			if (this.alphamap.startsWith("..\\"))
 				this.alphamap = this.alphamap.substring(3);
 
 			if (!this.alphamap.startsWith("/"))
 				this.alphamap = "/" + this.alphamap;
+			
+			System.out.println(texturemap+","+alphamap+","+getClass().getResource("/"));
 
 			// Fill buffers
 			this.ambient.put(ambientArray).flip();
@@ -536,74 +545,7 @@ public class MS3DModel {
 			this.translationKeyframes=new MS3DKeyframe[numTranslationKeyframes];
 			for(int i=0;i<this.numTranslationKeyframes;i++)
 				this.translationKeyframes[i]=new MS3DKeyframe(modelFile);
-			
-//			 fread(&_i->arrJoints[i].flags, 1, sizeof(byte), fp);   
-//			  fread(&_i->arrJoints[i].name, 32, sizeof(char), fp);   
-//			  fread(&_i->arrJoints[i].parentName, 32, sizeof(char), fp);   
-//			  fread(&_i->arrJoints[i].rotation, 3, sizeof(float), fp);   
-//			  fread(&_i->arrJoints[i].position, 3, sizeof(float), fp);   
-//			  fread(&_i->arrJoints[i].numKeyFramesRot, 1, sizeof(word), fp);   
-//			  fread(&_i->arrJoints[i].numKeyFramesTrans, 1, sizeof(word), fp);   
-//			  _i->arrJoints[i].keyFramesRot = new ms3d_keyframe_rot_t[_i->arrJoints[i].numKeyFramesRot];   
-//			  _i->arrJoints[i].keyFramesTrans = new ms3d_keyframe_pos_t[_i->arrJoints[i].numKeyFramesTrans];   
-//			  fread(_i->arrJoints[i].keyFramesRot, _i->arrJoints[i].numKeyFramesRot, sizeof(ms3d_keyframe_rot_t), fp);   
-//			  fread(_i->arrJoints[i].keyFramesTrans, _i->arrJoints[i].numKeyFramesTrans, sizeof(ms3d_keyframe_pos_t), fp);   
 
-
-//			      joint.flags = byteBuffer.get();
-//
-//			      byte buffer[] = new byte[32];
-//			      for (int k = 0; k < 32; k++)
-//			        buffer[k] = byteBuffer.get();
-//			      joint.name = makeString(buffer);
-//
-//			      buffer = new byte[32];
-//			      for (int k = 0; k < 32; k++)
-//			        buffer[k] = byteBuffer.get();
-//			      joint.parentName = makeString(buffer);
-//
-//			      joint.rotX = byteBuffer.getFloat();
-//			      joint.rotY = byteBuffer.getFloat();
-//			      joint.rotZ = byteBuffer.getFloat();
-//
-//			      joint.x = byteBuffer.getFloat();
-//			      joint.y = byteBuffer.getFloat();
-//			      joint.z = byteBuffer.getFloat();
-//
-//			      joint.numKeyFramesRot = getUnsignedShortValue(byteBuffer.getShort());
-//			      joint.keyRotations = new MS3DKeyFrameRotation[joint.numKeyFramesRot];
-//			      joint.numKeyFramesTrans = getUnsignedShortValue(byteBuffer.getShort());
-//			      joint.keyTranslations = new MS3DKeyFrameTranslation[joint.numKeyFramesTrans];
-//
-//			      MS3DKeyFrameRotation keyRotation = null;
-//			      for (int k = 0; k < joint.numKeyFramesRot; k++) {
-//			        keyRotation = new MS3DKeyFrameRotation();
-//
-//			        keyRotation.time = (long) (byteBuffer.getFloat() * 1000);
-//
-//			        keyRotation.rotX = byteBuffer.getFloat();
-//			        keyRotation.rotY = byteBuffer.getFloat();
-//			        keyRotation.rotZ = byteBuffer.getFloat();
-//
-//			        joint.keyRotations[k] = keyRotation;
-//			      }
-//
-//			      MS3DKeyFrameTranslation keyTranslation = null;
-//			      for (int k = 0; k < joint.numKeyFramesTrans; k++) {
-//			        keyTranslation = new MS3DKeyFrameTranslation();
-//
-//			        keyTranslation.time = (long) (byteBuffer.getFloat() * 1000);
-//
-//			        keyTranslation.x = byteBuffer.getFloat();
-//			        keyTranslation.y = byteBuffer.getFloat();
-//			        keyTranslation.z = byteBuffer.getFloat();
-//
-//			        joint.keyTranslations[k] = keyTranslation;
-//			      }
-//
-//			      model.joints[i] = joint;
-//			      // add to the animation list
-//			      model.addJoint(joint);
 		}
 		int flag;
 		String name;
@@ -675,18 +617,18 @@ public class MS3DModel {
 
 		if (currentTime >= (endFrame + 1) * 1000.0 / fAnimationFPS) {
 			if (loop) {
-				System.out.println("reset");
+//				System.out.println("reset");
 				reset();
 			} else {
 				currentTime = (long) ((endFrame + 1) * 1000.0 / fAnimationFPS);
-				System.out.println(currentTime);
+//				System.out.println(currentTime);
 				loopDone = true;
 			}
 		}
-		else
-		{
-			System.out.println("currentTime<(endFrame + 1) * 1000.0 / fAnimationFPS:"+currentTime +"<"+ (endFrame + 1) * 1000.0 / fAnimationFPS);
-		}
+//		else
+//		{
+//			System.out.println("currentTime<(endFrame + 1) * 1000.0 / fAnimationFPS:"+currentTime +"<"+ (endFrame + 1) * 1000.0 / fAnimationFPS);
+//		}
 
 		for (int i = 0; i < numJoints; i++) {
 			Vector3f transVec = new Vector3f();
@@ -704,10 +646,10 @@ public class MS3DModel {
 			//
 			frame = joint.currentTranslationKeyframe;
 			while (frame < joint.numTranslationKeyframes&& joint.translationKeyframes[frame].time < currentTime) {
-				System.out.println(joint.translationKeyframes[frame].time+"<"+currentTime);
+//				System.out.println(joint.translationKeyframes[frame].time+"<"+currentTime);
 				frame++;
 			}
-			System.out.println("frame:"+frame);
+//			System.out.println("frame:"+frame);
 			joint.currentTranslationKeyframe = frame;
 
 			if (frame == 0) {
@@ -725,7 +667,7 @@ public class MS3DModel {
 
 				float timeDelta = ((float) (curFrame.time - prevFrame.time));
 				float interpValue = (float) ((currentTime - prevFrame.time) / (float) timeDelta);
-				System.out.println(interpValue);
+//				System.out.println(interpValue);
 
 				transVec.x = prevFrame.x + (curFrame.x - prevFrame.x)
 						* interpValue;
@@ -1082,17 +1024,17 @@ public class MS3DModel {
 	      }
 	    }
 	    
-	    System.out.println(joint.relativeMatrix.m00+","+joint.relativeMatrix.m01+","+joint.relativeMatrix.m02+","+joint.relativeMatrix.m03);
-	    System.out.println(joint.relativeMatrix.m10+","+joint.relativeMatrix.m11+","+joint.relativeMatrix.m12+","+joint.relativeMatrix.m13);
-	    System.out.println(joint.relativeMatrix.m20+","+joint.relativeMatrix.m21+","+joint.relativeMatrix.m22+","+joint.relativeMatrix.m23);
-	    System.out.println(joint.relativeMatrix.m30+","+joint.relativeMatrix.m31+","+joint.relativeMatrix.m32+","+joint.relativeMatrix.m33);
-	    int count=0;
+//	    System.out.println(joint.relativeMatrix.m00+","+joint.relativeMatrix.m01+","+joint.relativeMatrix.m02+","+joint.relativeMatrix.m03);
+//	    System.out.println(joint.relativeMatrix.m10+","+joint.relativeMatrix.m11+","+joint.relativeMatrix.m12+","+joint.relativeMatrix.m13);
+//	    System.out.println(joint.relativeMatrix.m20+","+joint.relativeMatrix.m21+","+joint.relativeMatrix.m22+","+joint.relativeMatrix.m23);
+//	    System.out.println(joint.relativeMatrix.m30+","+joint.relativeMatrix.m31+","+joint.relativeMatrix.m32+","+joint.relativeMatrix.m33);
+//	    int count=0;
 	    // initialize the vertices
 	    for (int i = 0; i < numVertices; i++) {
 	      vertex = vertices[i];
 	      
 	      if (vertex.boneID != -1) {
-	    	  count++;
+//	    	  count++;
 	        Matrix4f matrix = joints[vertex.boneID].absoluteMatrix;
 
 	        float x = vertex.vertex.x - matrix.m30;
@@ -1106,7 +1048,7 @@ public class MS3DModel {
 	      }
 	    }
 	    
-	    System.out.println(count);
+//	    System.out.println(count);
 
 	  }
 }

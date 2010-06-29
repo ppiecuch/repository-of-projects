@@ -141,14 +141,17 @@ public class FontDemo {
 		}
 
 	}
-	
+	static UnicodeFont tfont=null;
 	private static void render() {
 		GL11.glClearColor(COLOR, COLOR, COLOR, 1f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 		
 		try {
 //			UnicodeFont tfont=FontLoader.loadFontByFile("MSYH.TTF",20,Color.MAGENTA);
-			UnicodeFont tfont=FontLoader.loadFontByName("ËÎÌו",20,Color.MAGENTA);
+			if(tfont==null)
+			{
+				tfont=FontLoader.loadFontByName("ËÎÌו",20,Color.MAGENTA);
+			}
 			tfont.drawString(100,100,"ÎÒ1234567890");
 		} catch (SlickException e) {
 			e.printStackTrace();

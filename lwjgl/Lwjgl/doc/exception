@@ -2,4 +2,7 @@
 【解决】安装最新驱动解决（使用everestultimate）
 
 【异常】渲染文字倒置问题
-【解决】
+【解决】GL11.glOrtho(0, 640, 0, 480, 0,25);改为GL11.glOrtho(0, 640, 480, 0, 0,25);
+
+【异常】Exception in thread "main" org.lwjgl.opengl.OpenGLException: Invalid operation (1282)
+【解决】原因:GL11.glBegin(GL11.GL_TRIANGLES);GL11.glEnd();包含了GL11.glBindTexture....

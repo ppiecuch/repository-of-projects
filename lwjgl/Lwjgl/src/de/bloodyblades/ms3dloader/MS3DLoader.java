@@ -37,7 +37,7 @@ public class MS3DLoader {
 	private void init() {
 
 		try {
-			Display.setDisplayMode(new DisplayMode(300, 200));
+			Display.setDisplayMode(new DisplayMode(800, 600));
 			Display.setVSyncEnabled(true);
 			Display.setTitle("MS3D Loader [G36C]");
 			Display.create();
@@ -70,10 +70,10 @@ public class MS3DLoader {
 
 		// Load model
 //		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/gsg9.ms3d"));
-//		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"));
+		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"));
 		
 		// Load font
-//		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 12, width, height);
+		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 12, width, height);
 
 		// Init timer
 		timer = new Timer();
@@ -89,12 +89,12 @@ public class MS3DLoader {
 		// Model anzeigen
 		GL11.glTranslatef(0.0f, -40.0f, -150.0f);
 		GL11.glRotatef(angle, 0.0f, 1.0f, 0.0f);
-		GL11.glScaled(2.0f,2.0f,2.0f);
+		GL11.glScaled(6.0f,6.0f,6.0f);
 		g36c.updateModel(new Date().getTime());
 //		g36c.render();
 
 		GL11.glColor3f(1.0f, 1.0f, 1.0f);
-//		font.print("" + FPS, 2, font.getSize() + 4, 0);
+		font.print("" + FPS, 2, font.getSize() + 4, 0);
 
 		Display.update(); // Update The Display
 	}
@@ -105,9 +105,9 @@ public class MS3DLoader {
 	private void updateLogic() {
 
 		// Update angle
-//		angle += 20.0 / FPS;
-//		if (angle > 360.0f)
-//			angle -= 360.0f;
+		angle += 20.0 / FPS;
+		if (angle > 360.0f)
+			angle -= 360.0f;
 
 		// Update FPS
 		FPS = 1000.0 / timer.getElapsedMillis();
