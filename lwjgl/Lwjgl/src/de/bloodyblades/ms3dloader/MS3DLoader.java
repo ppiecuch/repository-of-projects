@@ -70,7 +70,7 @@ public class MS3DLoader {
 
 		// Load model
 //		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/gsg9.ms3d"));
-		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/test.ms3d"));
+//		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"));
 		
 		// Load font
 //		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 12, width, height);
