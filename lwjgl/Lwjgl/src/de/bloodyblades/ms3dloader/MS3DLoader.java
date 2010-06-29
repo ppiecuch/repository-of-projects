@@ -9,6 +9,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.tinder.studio.lwjgl.ms3d.MS3DModel;
 
 import de.bloodyblades.ms3dloader.data.ResourceLoader;
 
@@ -69,8 +70,8 @@ public class MS3DLoader {
 		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
 
 		// Load model
-//		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/gsg9.ms3d"));
-		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"));
+//		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/gsg9.ms3d"),this.getClass().getResource("./data/textures").getPath());
+		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"),this.getClass().getResource("./data/textures").getPath());
 		
 		// Load font
 		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 12, width, height);
@@ -89,7 +90,7 @@ public class MS3DLoader {
 		// Model anzeigen
 		GL11.glTranslatef(0.0f, -40.0f, -150.0f);
 		GL11.glRotatef(angle, 0.0f, 1.0f, 0.0f);
-		GL11.glScaled(6.0f,6.0f,6.0f);
+		GL11.glScaled(8.0f,8.0f,8.0f);
 		g36c.updateModel(new Date().getTime());
 //		g36c.render();
 

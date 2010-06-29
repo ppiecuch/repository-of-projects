@@ -15,7 +15,7 @@
  purpose.  It is provided "AS IS" with NO WARRANTY.
  */
 
-package de.bloodyblades.ms3dloader;
+package org.tinder.studio.lwjgl.util;
 
 import java.io.Serializable;
 
@@ -74,6 +74,11 @@ public class AxisAngle4d implements Serializable {
 	/*
 	 * I assumed that the length of the axis vector is not significant.
 	 */
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * The x coordinate.

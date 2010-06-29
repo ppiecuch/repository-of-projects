@@ -14,7 +14,7 @@
    makes no representations about the suitability of this software for any
    purpose.  It is provided "AS IS" with NO WARRANTY.
 */
-package de.bloodyblades.ms3dloader;
+package org.tinder.studio.lwjgl.util;
 
 import java.io.Serializable;
 
@@ -75,6 +75,11 @@ public class Vector4f extends Tuple4f implements Serializable {
 
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
       * Constructs and initializes a Vector4f from the specified xyzw coordinates.
       * @param x the x coordinate
       * @param y the y coordinate
