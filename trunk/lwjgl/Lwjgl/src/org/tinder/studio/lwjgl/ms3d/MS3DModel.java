@@ -9,6 +9,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
 import org.tinder.studio.lwjgl.util.BinaryFileReader;
+import org.tinder.studio.lwjgl.util.Bounding;
 import org.tinder.studio.lwjgl.util.GLApp;
 import org.tinder.studio.lwjgl.util.Matrix4f;
 import org.tinder.studio.lwjgl.util.Vector3f;
@@ -27,7 +28,7 @@ public class MS3DModel {
 	MS3DHeader header;
 
 	int numVertices;
-	MS3DVertex[] vertices;
+	public MS3DVertex[] vertices;
 	float vertex[];
 
 	int numTriangles;
@@ -54,6 +55,8 @@ public class MS3DModel {
 	Hashtable<String, MS3DJoint> allJoints;
 	Vector<MS3DJoint> rootJoints;
 	String textureDirectory;
+	
+	Bounding bounding;
 
 	/***************************************************************************************************************************************************************************************************
 	 * MS3DModel () - Constructor
@@ -67,6 +70,7 @@ public class MS3DModel {
 		this.loopDone = false;
 		this.textureDirectory=textureDirectory;
 		this.loadModel(file);
+		this.makeBounding();
 
 	}
 
@@ -593,6 +597,38 @@ public class MS3DModel {
 		}
 
 	}
+	
+	private void makeBounding()
+	{
+		float minX,minY,minZ,maxX,maxY,maxZ;
+		minX=minY=minZ=maxX=maxY=maxZ=0;
+		Vector3f vertex;
+		for(int i=0;i<this.vertices.length;i++)
+		{
+			vertex=this.vertices[i].vertex;
+			if (i == 0) {
+				minX = maxX = vertex.x;
+				minY = maxY = vertex.y;
+				minZ = maxZ = vertex.z;
+			} else {
+				if (vertex.x < minX)
+					minX = vertex.x;
+				else if (vertex.x > maxX)
+					maxX = vertex.x;
+
+				if (vertex.y < minY)
+					minY = vertex.y;
+				else if (vertex.y > maxY)
+					maxY = vertex.y;
+				if (vertex.z < minZ)
+					minZ = vertex.z;
+				else if (vertex.z > maxZ)
+					maxZ = vertex.z;
+
+			}
+		}
+		this.bounding=new Bounding(minX, minY, minZ, maxX, maxY, maxZ);
+	}
 
 	/***************************************************************************************************************************************************************************************************
 	 * Header of a ms3d file
@@ -850,4 +886,9 @@ public class MS3DModel {
 
 	}
 
+	public Bounding getBounding() {
+		return bounding;
+	}
+
+	
 }

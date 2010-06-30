@@ -1,5 +1,6 @@
 package de.bloodyblades.ms3dloader;
 
+import java.io.IOException;
 import java.util.Date;
 
 import org.lwjgl.LWJGLException;
@@ -10,6 +11,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.tinder.studio.lwjgl.ms3d.MS3DModel;
+import org.tinder.studio.lwjgl.tds.TDSLoader;
 
 import de.bloodyblades.ms3dloader.data.ResourceLoader;
 
@@ -31,6 +33,8 @@ public class MS3DLoader {
 
 	MS3DModel g36c;
 	float angle;
+	
+	TDSLoader tdsLoader;
 
 	/***************************************************************************************************************************************************************************************************
 	 * Initialization stuff comes in here...
@@ -73,6 +77,14 @@ public class MS3DLoader {
 //		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/gsg9.ms3d"),this.getClass().getResource("./data/textures").getPath());
 		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"),this.getClass().getResource("./data/textures").getPath());
 		
+		tdsLoader=new TDSLoader();
+		try {
+			tdsLoader.load(resourceLoader.loadResourceAsStream("models/face.3ds"));
+			System.out.println(tdsLoader.getObjectSize());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		// Load font
 		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 12, width, height);
 
@@ -90,9 +102,12 @@ public class MS3DLoader {
 		// Model anzeigen
 		GL11.glTranslatef(0.0f, -40.0f, -150.0f);
 		GL11.glRotatef(angle, 0.0f, 1.0f, 0.0f);
-		GL11.glScaled(8.0f,8.0f,8.0f);
+		GL11.glScaled(6.0f,6.0f,6.0f);
 		g36c.updateModel(new Date().getTime());
 //		g36c.render();
+		g36c.getBounding().renderLine();
+		
+		tdsLoader.render();
 
 		GL11.glColor3f(1.0f, 1.0f, 1.0f);
 		font.print("" + FPS, 2, font.getSize() + 4, 0);

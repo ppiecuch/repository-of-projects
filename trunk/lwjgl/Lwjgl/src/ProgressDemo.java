@@ -83,8 +83,7 @@ public class ProgressDemo {
     	
     	
     	boolean running=true;
-		int count=128;
-		while (running && count-- > 0) {
+		while (running) {
 			render();
 			Display.update();
 			try {
@@ -110,7 +109,7 @@ public class ProgressDemo {
 	}
 	static long lastTime=0;
 	static int progress=0;
-	static int length=500;
+	static int length=499;
 	private static void render() {
 		GL11.glClearColor(COLOR, COLOR, COLOR, 1f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
@@ -122,9 +121,9 @@ public class ProgressDemo {
     	GL11.glTexCoord2f(0,1);
     	GL11.glVertex2f(1,50);
     	GL11.glTexCoord2f((float)progress/100,1);
-    	GL11.glVertex2f(length*progress/100,50);
+    	GL11.glVertex2f(length*progress/100+1,50);
     	GL11.glTexCoord2f((float)progress/100,0);
-    	GL11.glVertex2f(length*progress/100,65);
+    	GL11.glVertex2f(length*progress/100+1,65);
     	GL11.glTexCoord2f(0,0);
     	GL11.glVertex2f(1,65);
     	GL11.glEnd();
@@ -135,7 +134,7 @@ public class ProgressDemo {
     		progress++;
     		lastTime=currentTime;
     	}
-    	if(progress==100)
+    	if(progress==101)
     		progress=0;
 	}
 
