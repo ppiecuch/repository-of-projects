@@ -118,4 +118,24 @@ draw_the_object();
 自动计算矩阵（关于这方面的细节，请参阅附录F）。
 
 
+关于glDrawElements的使用 
+glDrawElements是一个OPENGL的图元绘制函数，从数组中获得数据渲染图元。
+函数原型为：
+void glDrawElements( GLenum mode, GLsizei count,GLenum type, const GLvoid *indices）；      
+其中：
+mode指定绘制图元的类型，它应该是下列值之一，GL_POINTS, GL_LINE_STRIP, GL_LINE_LOOP, GL_LINES,
+         GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_TRIANGLES, GL_QUAD_STRIP, GL_QUADS, and 
+         GL_POLYGON. 
+count为绘制图元的数量。
+type为索引值的类型，只能是下列值之一：GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT。
+indices：指向索引存贮位置的指针。
+glDrawElements函数能够通过较少的函数调用绘制多个几何图元，而不是通过OPENGL函数调用来传递每一个顶点，
+法线，颜色信息。你可以事先准备一系列分离的顶点、法线、颜色数组，并且调用一次glDrawElements把这些数组
+定义成一个图元序列。当调用glDrawElements函数的时候，它将通过索引使用count个成序列的元素来创建一系列
+的几何图元。mode指定待创建的图元类型和数组元素如何如来创建这些图元。但是如果GL_VERTEX_ARRAY 没有被
+激活的话，不能生成任何图元。被glDrawElements修改的顶点属性在glDrawElements调用返回后的值具有不确定性，
+例如，GL_COLOR_ARRAY被激活后，当glDrawElements执行完成时，当前的颜色值是没有指定的。没有被修改的属性
+值保持不变。
+可以在显示列表中包含glDrawElements，当glDrawElements被包含进显示列表时，相应的顶点、法线、颜色数组数据也得进入显示列表的，因为那些数组指针是ClientSideState的变量，在显示列表创建的时候而不是在显示列表执行的时候，这些数组指针的值影响显示列表。glDrawElements只能用在OPENGL1.1或者更高的版本。
+
 
