@@ -42,7 +42,7 @@ public class MS3DLoader {
 	private void init() {
 
 		try {
-			Display.setDisplayMode(new DisplayMode(800, 600));
+			Display.setDisplayMode(new DisplayMode(640, 480));
 			Display.setVSyncEnabled(true);
 			Display.setTitle("MS3D Loader [G36C]");
 			Display.create();
@@ -77,13 +77,13 @@ public class MS3DLoader {
 //		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/gsg9.ms3d"),this.getClass().getResource("./data/textures").getPath());
 		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"),this.getClass().getResource("./data/textures").getPath());
 		
-		tdsLoader=new TDSLoader();
-		try {
-			tdsLoader.load(resourceLoader.loadResourceAsStream("models/face.3ds"));
-			System.out.println(tdsLoader.getObjectSize());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		tdsLoader=new TDSLoader();
+//		try {
+//			tdsLoader.load(resourceLoader.loadResourceAsStream("models/face.3ds"));
+//			System.out.println(tdsLoader.getObjectSize());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 		// Load font
 		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 12, width, height);
@@ -107,7 +107,7 @@ public class MS3DLoader {
 //		g36c.render();
 		g36c.getBounding().renderLine();
 		
-		tdsLoader.render();
+//		tdsLoader.render();
 
 		GL11.glColor3f(1.0f, 1.0f, 1.0f);
 		font.print("" + FPS, 2, font.getSize() + 4, 0);
