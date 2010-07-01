@@ -139,3 +139,20 @@ glDrawElements函数能够通过较少的函数调用绘制多个几何图元，而不是通过OPENGL函数调
 可以在显示列表中包含glDrawElements，当glDrawElements被包含进显示列表时，相应的顶点、法线、颜色数组数据也得进入显示列表的，因为那些数组指针是ClientSideState的变量，在显示列表创建的时候而不是在显示列表执行的时候，这些数组指针的值影响显示列表。glDrawElements只能用在OPENGL1.1或者更高的版本。
 
 
+void glDrawArrays(
+  GLenum mode,     //绘图方式 GL_POINTS、GL_QUADS etc
+  GLint first,      //第一个元素的下标
+  GLsizei count   //绘制元素的数量
+);
+
+void glVertexPointer(
+  GLint size,      //每个顶点占用的数组元素数量
+  GLenum type,   //数组元素的数据类型
+  GLsizei stride,  //元素之间的间隔，一般系统为0
+  const GLvoid *pointer  //指向数组的指针
+）;
+
+
+
+
+
