@@ -9,6 +9,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import org.tinder.studio.lwjgl.util.GLImage;
+import org.tinder.studio.lwjgl.util.Point3f;
 
 /**
  * ∏ﬂ∂»Õº
@@ -22,7 +23,6 @@ public class HeightMap {
 	private int width;
 	private int height;
 	private short[][] heightWeights;
-	int[][][][] vertexs;
 	
 	public HeightMap(int width,int height,File file) throws IOException
 	{
@@ -35,39 +35,63 @@ public class HeightMap {
 		this.height=height;
 		Image image=ImageIO.read(is);
 		loadHeightWeight(image);
-		generaVertex();
+//		generaVertex();
 	}
 	
-	private void generaVertex()
+	public Point3f[][] generateTriangleStrip()
 	{
-		this.vertexs=new int[height-1][][][];
-		for(int i=0;i<this.vertexs.length;i++)
+		Point3f[][] triangleStrip=new Point3f[height-1][];
+		for(int i=0;i<triangleStrip.length;i++)
 		{
-			this.vertexs[i]=new int[width-1][][];
-			for(int j=0;j<this.vertexs[i].length;j++)
+			triangleStrip[i]=new Point3f[width*2];
+			for(int j=0;j<width;j++)
 			{
-				int[][] quad=new int[4][];
-				quad[0]=new int[3];
-				quad[0][0]=j;
-				quad[0][1]=i;
-				quad[0][2]=heightWeights[i][j];
-				quad[1]=new int[3];
-				quad[1][0]=j+1;
-				quad[1][1]=i;
-				quad[1][2]=heightWeights[i][j+1];
-				quad[2]=new int[3];
-				quad[2][0]=j;
-				quad[2][1]=i+1;
-				quad[2][2]=heightWeights[i+1][j];
-				quad[3]=new int[3];
-				quad[3][0]=j+1;
-				quad[3][1]=i+1;
-				quad[3][2]=heightWeights[i+1][j+1];
-				this.vertexs[i][j]=quad;
+				Point3f point=new Point3f();
+				point.x=j;
+				point.y=i;
+				point.z=heightWeights[i][j];
+				triangleStrip[i][j*2]=point;
 				
+				point=new Point3f();
+				point.x=j;
+				point.y=i+1;
+				point.z=heightWeights[i+1][j];
+				triangleStrip[i][j*2+1]=point;
 			}
 		}
+		return triangleStrip;
 	}
+	
+//	private void generaVertex()
+//	{
+//		this.vertexs=new int[height-1][][][];
+//		for(int i=0;i<this.vertexs.length;i++)
+//		{
+//			this.vertexs[i]=new int[width-1][][];
+//			for(int j=0;j<this.vertexs[i].length;j++)
+//			{
+//				int[][] quad=new int[4][];
+//				quad[0]=new int[3];
+//				quad[0][0]=j;
+//				quad[0][1]=i;
+//				quad[0][2]=heightWeights[i][j];
+//				quad[1]=new int[3];
+//				quad[1][0]=j+1;
+//				quad[1][1]=i;
+//				quad[1][2]=heightWeights[i][j+1];
+//				quad[2]=new int[3];
+//				quad[2][0]=j;
+//				quad[2][1]=i+1;
+//				quad[2][2]=heightWeights[i+1][j];
+//				quad[3]=new int[3];
+//				quad[3][0]=j+1;
+//				quad[3][1]=i+1;
+//				quad[3][2]=heightWeights[i+1][j+1];
+//				this.vertexs[i][j]=quad;
+//				
+//			}
+//		}
+//	}
 	
 	private void loadHeightWeight(Image image) throws IOException
 	{
@@ -88,7 +112,7 @@ public class HeightMap {
         	heightWeights[y]=new short[width];
             for(int x = 0; x < width; x++)
             {
-                heightWeights[y][x] = (short)((pixels[x * xOffset + y * yOffset * imageWidth] & 0x000000ff) * 10);
+                heightWeights[y][x] = (short)((pixels[x * xOffset + y * yOffset * imageWidth] & 0x000000ff));
             }
         }
 	}
@@ -105,9 +129,9 @@ public class HeightMap {
 		return heightWeights;
 	}
 
-	public int[][][][] getVertexs() {
-		return vertexs;
-	}
+//	public int[][][][] getVertexs() {
+//		return vertexs;
+//	}
 	
 	
 
