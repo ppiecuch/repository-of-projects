@@ -1,0 +1,56 @@
+三角形线性插值
+CODE
+
+/*
+三角形线性插值：根据A、B、C三点的XYZ坐标，以及P点的XY坐标，计算P的Z坐标，使得四点共面。
+
+pzy, 2007-11-9
+
+参数：
+A,B,C,P - double[3]，其中P[2]用于输出。对三点顺序没有要求。
+
+返回：
+true - 成功。计算结果被保存在P[2]中。
+false - 失败。可能的原因是三点所在平面与XY平面垂直。
+*/
+bool TriInterpolate(const double A[], const double B[], const double C[], double P[])
+{
+  // 检查三角形是否垂直于XY平面。条件是其法向量的Z分量为0。
+  if (abs((B[0] - A[0]) * (C[1] - A[1]) - (B[1] - A[1]) * (C[0] - A[0])) < TOLERANCE)
+    return false;
+
+  // 求解依据是以下两矢量方向相同：(P->A) * (P->B) 和 (P->B) * (P->C)，其中 * 是叉积运算符。
+
+  double t2 = (A[0] - P[0]) * (B[1] - P[1]) - (A[1] - P[1]) * (B[0] - P[0]);
+  double t4 = (B[0] - P[0]) * (C[1] - P[1]) - (B[1] - P[1]) * (C[0] - P[0]);
+
+  if (abs(t2) < TOLERANCE && abs(t4) < TOLERANCE) // P 与 B 重复。
+  {
+    P[2] = B[2];
+    return true;
+  }
+
+  double t12 = (A[1] - P[1]) * B[2] - A[2] * (B[1] - P[1]);
+  double t32 = (B[1] - P[1]) * C[2] - B[2] * (C[1] - P[1]);
+
+  double t = t2 * (C[1] - B[1]) - t4 * (B[1] - A[1]);
+
+  if (abs(t) > TOLERANCE)
+  {
+    P[2] = (t12 * t4 - t2 * t32) / t;
+    return true;
+  }
+  else
+  {
+    // 不应该能到达这里。
+    return false;
+  }  
+}
+
+ 
+
+END CODE 
+
+评论：
+求P.Z的更好的公式是:d·(d1×d2)=0.
+其中d为向量<A,P>,d1为向量<A,B>,d2为向量<A,C>.
