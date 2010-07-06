@@ -1,0 +1,63 @@
+
+......
+
+知道了对应高度，四个周围顶点的高度和点位于哪个三角形中，你就可以计算精确高度了。
+
+如果点在左下方的三角形中，这时pointAboveLowerTriangle为true，下面是使用双线性插值获取三角形任意点高度的代码：
+
+finalHeight = heightLxLz; 
+finalHeight += zRelative * (heightLxHz - heightLxLz); 
+finalHeight += xRelative * (heightHxLz - heightLxLz); 根据前面解释的单插值的方法，从lowestX的Y值开始。因为这是“双”插值，你要从lowestXlowestZ的Y值开始。
+
+在单插值中，你maxY之间添加高度差，并乘以对应的X值。在双插值中，你乘的是 zRelative和xRelative。
+
+换句话说，从左下顶点的高度开始，对这个高度，你添加了这个顶点和有着更高Z坐标的顶点间的高度差，并乘以距离第二个顶点的Z坐标的接近程度。最后一行代码类似：对这个高度，你添加了左下顶点和右下顶点的高度差，乘以距离右下顶点的X坐标的接近程度。
+
+如果该点在右上三角形的内部，这时pointAboveLowerTriangle为false，情况有所不同，你需要以下代码：
+
+finalHeight = heightHxHz; 
+finalHeight += (1.0f - zDifference) *(heightHxLz - heightHxHz); 
+finalHeight += (1.0f - xDifference) * (heightLxHz - heightHxHz); 从高度开始，从右上顶点开始，遵循同样的步骤：添加高度差，乘以对应距离。
+
+代码
+这个方法包含前面解释的所有代码。基于任意(X,Z)坐标，无论是整数还是浮点数，这个方法返回该点的精确高度。首先检查该点是否在地形上。如果不是，返回默认的高度10。
+
+public float GetExactHeightAt(float xCoord, float zCoord) 
+{
+    bool invalid = xCoord < 0; 
+    invalid |= zCoord < 0; 
+    invalid |= xCoord > heightData.GetLength(0) - 1; 
+    invalid |= zCoord > heightData.GetLength(1) - 1; 
+    
+    if (invalid) 
+        return 10; 
+    
+    int xLower = (int)xCoord; 
+    int xHigher = xLower + 1; 
+    float xRelative = (xCoord - xLower) / ((float)xHigher - (float)xLower); 
+    int zLower = (int)zCoord; 
+    int zHigher = zLower + 1; 
+    float zRelative = (zCoord - zLower) / ((float)zHigher - (float)zLower); 
+    float heightLxLz = heightData[xLower, zLower]; 
+    float heightLxHz = heightData[xLower, zHigher]; 
+    float heightHxLz = heightData[xHigher, zLower]; 
+    float heightHxHz = heightData[xHigher, zHigher]; 
+    
+    bool pointAboveLowerTriangle = (xRelative + zRelative < 1); 
+    float finalHeight; 
+    if (pointAboveLowerTriangle ) 
+    { 
+        finalHeight = heightLxLz; 
+        finalHeight += zRelative * (heightLxHz - heightLxLz); 
+        finalHeight += xRelative * (heightHxLz - heightLxLz); 
+    }
+    else 
+    {
+        finalHeight = heightHxHz; 
+        finalHeight += (1.0f - zRelative) * (heightHxLz - heightHxHz); 
+        finalHeight += (1.0f - xRelative) * (heightLxHz - heightHxHz); 
+    }
+    return finalHeight; } 
+    
+    
+    http://shiba.hpe.sh.cn/jiaoyanzu/WULI/ShowArticle.aspx?articleId=473&classId=4
