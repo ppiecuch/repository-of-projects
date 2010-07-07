@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 
 import org.tinder.studio.lwjgl.util.GLImage;
 import org.tinder.studio.lwjgl.util.Point3f;
+import org.tinder.studio.lwjgl.util.Util;
 
 /**
  * 高度图
@@ -22,6 +23,8 @@ public class HeightMap {
 	
 	private int width;
 	private int height;
+	private int imageWidth;
+	private int imageHeight;
 	private short[][] heightWeights;
 	
 	public HeightMap(int width,int height,File file) throws IOException
@@ -47,19 +50,106 @@ public class HeightMap {
 			for(int j=0;j<width;j++)
 			{
 				Point3f point=new Point3f();
-				point.x=j;
-				point.y=i;
+				point.x=j-width/2;
+				point.y=i-height/2;
 				point.z=heightWeights[i][j];
 				triangleStrip[i][j*2]=point;
 				
 				point=new Point3f();
-				point.x=j;
-				point.y=i+1;
+				point.x=j-width/2;
+				point.y=i+1-height/2;
 				point.z=heightWeights[i+1][j];
 				triangleStrip[i][j*2+1]=point;
 			}
 		}
 		return triangleStrip;
+	}
+	
+	public Point3f[][][] generateTriangles()
+	{
+		Point3f[][][] triangles=new Point3f[height-1][][];
+		for(int i=0;i<triangles.length;i++)
+		{
+			triangles[i]=new Point3f[width*2-2][];
+			for(int j=0;j<width-1;j++)
+			{
+				Point3f[] points=new Point3f[3];
+				for(int k=0;k<3;k++)
+					points[k]=new Point3f();
+				points[0].x=j-width/2;
+				points[0].y=i-height/2;
+				points[0].z=heightWeights[i][j];
+				points[1].x=j+1-width/2;
+				points[1].y=i-height/2;
+				points[1].z=heightWeights[i][j+1];
+				points[2].x=j-width/2;
+				points[2].y=i+1-height/2;
+				points[2].z=heightWeights[i+1][j];
+				triangles[i][j*2]=points;
+				points=new Point3f[3];
+				for(int k=0;k<3;k++)
+					points[k]=new Point3f();
+				points[0].x=j+1-width/2;
+				points[0].y=i-height/2;
+				points[0].z=heightWeights[i][j+1];
+				points[1].x=j-width/2;
+				points[1].y=i+1-height/2;
+				points[1].z=heightWeights[i+1][j];
+				points[2].x=j+1-width/2;
+				points[2].y=i+1-height/2;
+				points[2].z=heightWeights[i+1][j+1];
+				triangles[i][j*2+1]=points;
+			}
+		}
+		return triangles;
+	}
+	
+	/**
+	 * 根据x,y求出高度z
+	 * 先根据xy判断在哪个矩形中,再判断在哪一个三角形中,再对其使用三角形插值
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public float getHeight(float x,float y)
+	{
+		int floorX=(int) Math.floor(x*imageWidth/width);
+		int cellX=(int) Math.ceil(x*imageWidth/width);
+		int floorY=(int) Math.floor(y*imageHeight/height);
+		int cellY=(int) Math.ceil(y*imageHeight/height);
+		if(floorX==cellX)cellX=floorX+1;
+		if(floorY==cellY)cellY=floorY+1;
+		
+		Point3f lt=new Point3f(floorX,floorY,0);
+		Point3f rt=new Point3f(cellX,floorY,0);
+		Point3f lb=new Point3f(floorX,cellY,0);
+		Point3f rb=new Point3f(cellX,cellY,0);
+		Point3f p=new Point3f(x,y,0);
+		System.out.println(floorX+","+floorY+","+cellX+","+cellY);
+
+		float Slt=Util.getArea(lt,rt,lb);
+		float Sp1=Util.getArea(lt,rt,p);
+		float Sp2=Util.getArea(lt,p,lb);
+		float Sp3=Util.getArea(p,rt,lb);
+		System.out.println("S:"+Slt+","+Sp1+","+Sp2+","+Sp3);
+		
+		if(Slt-Sp1-Sp2-Sp3<Util.TOLERATION)
+		{
+			lt.z=heightWeights[(int) lt.y+height/2][(int) lt.x+width/2];
+			rt.z=heightWeights[(int) rt.y+height/2][(int) rt.x+width/2];
+			lb.z=heightWeights[(int) lb.y+height/2][(int) lb.x+width/2];
+			rt.z=heightWeights[(int) rb.y+height/2][(int) rb.x+width/2];
+			Util.linearInterpolate(lt,rt,lb,p);
+		}
+		else
+		{
+			lt.z=heightWeights[(int) lt.y+height/2][(int) lt.x+width/2];
+			rt.z=heightWeights[(int) rt.y+height/2][(int) rt.x+width/2];
+			lb.z=heightWeights[(int) lb.y+height/2][(int) lb.x+width/2];
+			rt.z=heightWeights[(int) rb.y+height/2][(int) rb.x+width/2];
+			Util.linearInterpolate(rb,rt,lb,p);
+		}
+		return p.z;
 	}
 	
 //	private void generaVertex()
@@ -96,8 +186,9 @@ public class HeightMap {
 	private void loadHeightWeight(Image image) throws IOException
 	{
 		int[] pixels=GLImage.getImagePixels(image);
-		int imageWidth=image.getWidth(null);
-		int imageHeight=image.getHeight(null);
+		imageWidth=image.getWidth(null);
+		imageHeight=image.getHeight(null);
+		System.out.println("imageWidth:"+imageWidth+",imageHeight:"+imageHeight);
 		heightWeights=new short[height][];
 		/*计算偏量*/
 		int xOffset = imageWidth/width;

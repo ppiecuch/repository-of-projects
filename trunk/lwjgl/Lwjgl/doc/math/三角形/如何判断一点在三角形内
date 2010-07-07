@@ -1,0 +1,166 @@
+假定在右手坐标系中的三角形3点坐标为A，B，C，判断P是否在ABC之内
+
+ 
+
+( 主要来自 3D引擎研发QQ群（38224573 ）的各位朋友的讨论 ，我仅仅算做个总结吧，特别感谢各位朋友的热情支持。 ）
+
+ 
+
+方法1：三个Perplane的方法
+
+           设AB，BC，AC边上的垂直平面为Perplane[3]，垂直朝向内侧的法向为n[3]
+
+          1）先根据任意两边叉出法向N
+
+               N = AB.CrossProduct(AC); 
+
+               N.Normalize();
+
+               D = A.DotProduct( N );
+
+          2）如果P在三角形所在平面之外，可直接判定不在平面之内（ 假定方程为 ax+by+cz+d = 0 )
+
+               if( P.DotProduct( N ) + D > 0 ) return false; 
+
+          3）然后法向和各边叉出垂直平面的法向
+
+               n[0] = N.CrossProduct(AB); //朝向内侧
+
+               n[0].Normalize();
+
+               Perplane[0].dist = A.DotProduct(n[0]); 
+
+               Perplane[0].normal = n[0];
+
+               同样方法求得Perplane[1],Perlane[2];
+
+          3）因为三个Perplane都朝向三角形内侧，P在三角形内的条件是同时在三个Perplane前面；如果给定点P在任意一个垂直平面之后，那么可判定P在三角形外部
+
+               for( int i = 0;i<3;j++ )
+
+               {
+
+                    if( P.DotProduct( Perplane[i].normal ) + Perplane[i].dist < 0 )
+
+                         return false;
+
+               }
+
+               return true;//如果P没有在任意一条边的外面，可判断定在三角形之内，当然包括在边上的情况
+
+ 
+
+方法2：三个部分面积与总面积相等的方法
+
+ 
+
+          S(PAB) + S(PAC) + S( PBC) = S(ABC) 则判定在三角形之内
+
+          用矢量代数方法计算三角形的面积为 
+
+               S = 1/2*|a|*|b|*sin(theta) 
+
+                  = 1/2*|a|*|b|*sqrt(1-cos^2(theta)) 
+
+                  = 1/2*|a|*|b|*sqrt(1- (a.DotProduct(b)/(|a|*|b|))^2);
+
+
+ 
+
+               另一种计算面积的方法是 S = 1/2*|a.CrossProduct(b)|
+
+
+ 
+
+               比较一下，发现后者的精确度和效率都高于前者，因为前者需要开方和求矢量长度，矢量长度相当于一次点乘，三个点乘加一个开方，显然不如
+
+
+               后者一次叉乘加一次矢量长度（注，一次叉乘计算相当于2次点乘，一次矢量长度计算相当于一次点乘），后者又对又快。 
+
+                 
+
+
+               S(ABC)  = AB.CrossProduct(AC)；//*0.5;
+
+               S(PAB)  = PA.CrossProduct(PB)；//*0.5;
+
+               S(PBC)  = PB.CrossProduct(PC)；//*0.5;
+
+               S(PAC)  = PC.CrossProduct(PA)；//*0.5;
+
+ 
+
+               if( S(PAB) + S(PBC) + S(PAC) == S(ABC)  )
+
+                    return true;
+
+               return false;
+
+          
+
+        另一种计算三角形面积的矢量方法是 1/2*a.CrossProdcuct(b) ，CrossProduct = ( y1*z2 - y2*z1 , x1*z2 - x2*z1, x1*y2 - x2*z1 )
+
+               可以看到CrossProduct 的计算要比DotProduct多3个乘法计算，效率没有上面的方法高
+
+
+方法3：三个向量归一化后相加为0
+
+ 
+
+        这个方法很怪异，发现自http://flipcode.spaces.live.com/blog/cns!8e578e7901a88369!903.entry 下面的一个回帖
+
+               
+               
+
+          如上图三角形ABC，P为AB外侧一点，N1，N2，N3 分别为BP，AP，CP的归一化矢量；NM为N1，N2夹角的角平分线
+
+          可以看出角A-P-B是三角形内角，必然小于180度，那么角N1-P-N2等于A-P-B；NM是N1-P-N2的角平分线，那么角B-P-N等于角N-P-A，而CPN必然小于其中一个，
+
+          即小于180/2 = 90度。结论是角N1，N2的合矢量方向与N3的夹角为锐角。所以N1，N2，N3的合向量模大于1.
+
+          这里注意，N3不一定在N1，N2之间，不能假定N2-P-N3 和N3-P-N1这两个角一定是锐角
+
+          同样可以推导出如果P在三角形内，N1+N2+N3必然小于0；若N1+N2+N3 = 0则P在三角形的边上。
+
+          有没有更简单的推导方法？
+
+          
+
+          这个方法看起来很精巧，但是善于优化的朋友会立刻发现，三个矢量归一化，需要三个开方。迭代式开方太慢了，而快速开方有的时候又不满足精度要求。
+
+                  
+
+ 方法4：重心坐标之和为1
+
+ 
+
+         {
+
+               BaryCenter = ( S(PAB)/S(PABC),S(PBC)/S(PABC),S(PAC)/S(PABC)) // 点P在三角形内的重心坐标
+
+          
+
+               if( BaryCenter.x + BaryCenter.y + BaryCenter.z >0.f )
+
+                    return false
+
+               return true;
+
+          }
+
+ 
+
+          其中S(PAB)，S(ABC)，S(PBC)，S(PBC) 用上述的方法二种提到的计算三角形面积方法计算。 
+
+ 
+
+综合比较
+
+     方法1必须求叉乘，虽然可以通过首先排除不在平面内的点，但是后面仍要求三个叉乘和3个点乘（当然还可排除法优化）
+
+     方法2看起来之需要求4个点乘，如果用叉乘方法计算面积，可能会导致效率低下
+
+     方法3是看起来是最精巧的方法，但是效率也不能保证...3个开方
+
+     方法4和方法2的效率差不多
+http://www.cnblogs.com/cgwolver/archive/2008/07/31/1257611.html
