@@ -1,0 +1,69 @@
+判断xoy平面内两线段是否相交
+萝卜 2005-09-21 13:14
+
+
+
+function r=line_cross(x1,y1,x2,y2,x3,y3,x4,y4); 
+% 判断xoy平面内两线段是否相交 
+% Author's email:zjliu2001@163.com 
+% if r==1; 
+%     two line is cross 
+% else 
+%     not 
+% 
+% reference: 
+% 吴文虎,王建德,<<实用算法的分析和程序设计>>，第四章 
+r1=0;r2=0;r3=0; 
+S1='相交'; 
+S2='次; 相离'; 
+S3='次; 端点在线段上'; 
+S4='次'; 
+if nargin==0; 
+   while 1 
+       x1=rand;x2=rand;x3=rand;x4=rand; 
+       y1=rand;y2=rand;y3=rand;y4=rand; 
+       r=estimate(x1,y1,x2,y2,x3,y3,x4,y4); 
+       r1=r1+(r==1); 
+       r2=r2+(r==0); 
+       r3=r3+(r==-1); 
+       title([S1,num2str(r1),S2,num2str(r2),S3,num2str(r3),S4]); 
+       pause(1); 
+   end 
+end 
+function r=estimate(x1,y1,x2,y2,x3,y3,x4,y4); 
+
+% left and down point 
+LD1x=min(x1,x2);LD1y=min(y1,y2); 
+LD2x=min(x3,x4);LD2y=min(y3,y4); 
+RU1x=max(x2,x1);RU1y=max(y2,y1); 
+RU2x=max(x3,x4);RU2y=max(y3,y4); 
+X=(RU1x>LD2x)&(RU2x>LD1x); 
+Y=(RU1y>LD2y)&(RU2y>LD1y); 
+s1='相离'; 
+s2='相交'; 
+s3='端点在线段上'; 
+r=0; 
+if X&Y 
+   M1=[x3-x1,y3-y1;x2-x1,y2-y1]; 
+   M2=[x4-x1,y4-y1;x2-x1,y2-y1]; 
+   P1=det(M1); 
+   P2=det(M2); 
+   if P1*P2>0; 
+       s=s1; 
+   elseif P1*P2==0; 
+       s=s3; 
+       r=-1; 
+   else 
+       s=s2; 
+       r=1; 
+   end 
+else 
+   s=s1; 
+end 
+plot([x1,x2],[y1,y2]); 
+hold on; 
+plot([x3,x4],[y3,y4]); 
+hold off; 
+axis([0,1,0,1]) 
+text(0.47,0.47,s,'fontsize',24,'fontname','楷体','color','g'); 
+http://luobo.ycool.com/post.876803.html
