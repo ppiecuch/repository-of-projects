@@ -53,7 +53,7 @@ public class BaseDemo {
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
     	GL11.glLoadIdentity();
 //    	GL11.glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, 0,25);
-    	GLU.gluPerspective(90.0f,(float)width/(float)height,0.1f,1000.0f);
+    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,1000.0f);
     	
     	GL11.glEnable(GL11.GL_BLEND);
     	GL11.glEnable(GL11.GL_ALPHA_TEST);

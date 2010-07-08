@@ -121,6 +121,7 @@ public class MS3DModel {
 			animationFPS = modelFile.readFloat();
 			currentTime = (long) (modelFile.readFloat() * 1000);
 			totalFrames = modelFile.readInt();
+			System.out.println("animationFPS:"+animationFPS+",totalFrames:"+totalFrames);
 
 			// Joints
 			numJoints = modelFile.readShort();
@@ -862,33 +863,18 @@ public class MS3DModel {
 		float x, y, z;
 	}
 
-	@SuppressWarnings("unused")
-	private class MS3DAnimation {
-
-		short startFrame;
-		short endFrame;
-
-		public MS3DAnimation() {
-			this.startFrame = 0;
-			this.endFrame = 0;
-		}
-
-		/** Creates a new instance of MS3DAnimation */
-		public MS3DAnimation(short startFrame, short endFrame) {
-			this.startFrame = startFrame;
-			this.endFrame = endFrame;
-		}
-
-		public MS3DAnimation(int startFrame, int endFrame) {
-			this.startFrame = (short) startFrame;
-			this.endFrame = (short) endFrame;
-		}
-
-	}
-
 	public Bounding getBounding() {
 		return bounding;
 	}
 
+	public int getCurrentAnimation() {
+		return currentAnimation;
+	}
+
+	public void setCurrentAnimation(int currentAnimation) {
+		this.currentAnimation = currentAnimation;
+	}
+
+	
 	
 }
