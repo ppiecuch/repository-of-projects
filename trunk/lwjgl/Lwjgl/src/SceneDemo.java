@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.SlickException;
 import org.tinder.studio.lwjgl.heightmap.HeightMap;
+import org.tinder.studio.lwjgl.heightmap.HeightMap2;
 import org.tinder.studio.lwjgl.util.FPSRecorder;
 import org.tinder.studio.lwjgl.util.Point3f;
 
@@ -29,8 +30,8 @@ import de.bloodyblades.ms3dloader.Font;
 public class SceneDemo{
 	
 	private static ResourceLoader resourceLoader = new ResourceLoader();
-	public static final int DISPLAY_WIDTH=800;
-	public static final int DISPLAY_HEIGHT=600;
+	public static final int DISPLAY_WIDTH=300;
+	public static final int DISPLAY_HEIGHT=200;
 	
 	private boolean runnable=true;
 	private static final int FPS=40;
@@ -38,7 +39,7 @@ public class SceneDemo{
 	private static Font font=null;
 	private int textureId;
 	
-	private HeightMap heightMap;
+	private HeightMap2 heightMap;
 	private Point3f[][] strips;
 	private Point3f[][][] lines;
 	
@@ -79,7 +80,8 @@ public class SceneDemo{
     	GL11.glAlphaFunc(GL11.GL_GREATER, 0);
     	
 		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 25, width, height);
-		heightMap=new HeightMap(50,50,resourceLoader.loadResourceAsStream("textures/heightmap.png"));
+//		heightMap=new HeightMap(50,50,resourceLoader.loadResourceAsStream("textures/heightmap.png"));
+		heightMap=new HeightMap2(new int[]{40,40,1},new int[]{50,50}, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
 		strips=heightMap.generateTriangleStrip();
 		lines=heightMap.generateTriangles();
 		
@@ -146,9 +148,9 @@ public class SceneDemo{
 		GL11.glLoadIdentity();
 		
 		GL11.glTranslated(position[0],-400, position[2]);
-		System.out.println(position[0]+","+position[1]+","+position[2]+":"+heightMap.getHeight(position[0]/40,position[2]/40));
+		System.out.println(position[0]+","+position[1]+","+position[2]+":"+heightMap.getHeight(position[0],position[2]));
 		GL11.glRotatef(angle++, 0,1,0);
-		GL11.glScaled(40,0.8f,40);
+//		GL11.glScaled(40,0.8f,40);
 //		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
 //		GL11.glEnable(GL11.GL_TEXTURE_2D);
 //		for(int i=0;i<this.strips.length;i++)
@@ -163,22 +165,23 @@ public class SceneDemo{
 //			GL11.glEnd();
 //		}
 //		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		for(int i=0;i<lines.length;i++)
-		{
-			for(int j=0;j<lines[i].length;j++)
-			{
-				for(int k=0;k<lines[i][j].length;k++)
-				{
-					if(k%3==0)
-						GL11.glBegin(GL11.GL_LINE_LOOP);
-					Point3f point=lines[i][j][k];
-					GL11.glColor3f(point.x/(point.x+point.z+point.y),point.z/(point.x+point.z+point.y),point.y/(point.x+point.z+point.y));
-					GL11.glVertex3f(point.x,point.z,point.y);
-					if(k%3==2)
-						GL11.glEnd();
-				}
-			}
-		}
+		
+//		for(int i=0;i<lines.length;i++)
+//		{
+//			for(int j=0;j<lines[i].length;j++)
+//			{
+//				for(int k=0;k<lines[i][j].length;k++)
+//				{
+//					if(k%3==0)
+//						GL11.glBegin(GL11.GL_LINE_LOOP);
+//					Point3f point=lines[i][j][k];
+//					GL11.glColor3f(point.x/(point.x+point.z+point.y),point.z/(point.x+point.z+point.y),point.y/(point.x+point.z+point.y));
+//					GL11.glVertex3f(point.x,point.z,point.y);
+//					if(k%3==2)
+//						GL11.glEnd();
+//				}
+//			}
+//		}
 		
 
 //		GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
