@@ -15,6 +15,7 @@ import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.SlickException;
 import org.tinder.studio.lwjgl.heightmap.HeightMap;
 import org.tinder.studio.lwjgl.heightmap.HeightMap2;
+import org.tinder.studio.lwjgl.ms3d.MS3DModel;
 import org.tinder.studio.lwjgl.util.FPSRecorder;
 import org.tinder.studio.lwjgl.util.Point3f;
 
@@ -30,8 +31,8 @@ import de.bloodyblades.ms3dloader.Font;
 public class SceneDemo{
 	
 	private static ResourceLoader resourceLoader = new ResourceLoader();
-	public static final int DISPLAY_WIDTH=300;
-	public static final int DISPLAY_HEIGHT=200;
+	public static final int DISPLAY_WIDTH=800;
+	public static final int DISPLAY_HEIGHT=600;
 	
 	private boolean runnable=true;
 	private static final int FPS=40;
@@ -39,9 +40,14 @@ public class SceneDemo{
 	private static Font font=null;
 	private int textureId;
 	
+	private MS3DModel g36c;
+	
 	private HeightMap2 heightMap;
 	private Point3f[][] strips;
 	private Point3f[][][] lines;
+	
+	private int width;
+	private int height;
 	
 	private float[] position={0,0,0};
 	
@@ -55,8 +61,8 @@ public class SceneDemo{
 		Display.setDisplayMode(new DisplayMode(DISPLAY_WIDTH, DISPLAY_HEIGHT));
 		
 		/*居中*/
-		int width=Display.getDesktopDisplayMode().getWidth();
-		int height=Display.getDesktopDisplayMode().getHeight();
+		width=Display.getDesktopDisplayMode().getWidth();
+		height=Display.getDesktopDisplayMode().getHeight();
 		int x=(width-DISPLAY_WIDTH)/2;
 		int y=(height-DISPLAY_HEIGHT)/2;
 		Display.setLocation(x,y);
@@ -70,10 +76,12 @@ public class SceneDemo{
 		GL11.glViewport(0,0,DISPLAY_WIDTH,DISPLAY_HEIGHT);
 		
 		//设置正交投影
-		GL11.glMatrixMode(GL11.GL_PROJECTION);
-    	GL11.glLoadIdentity();
-//    	GL11.glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, 0,25);
-    	GLU.gluPerspective(90.0f,(float)width/(float)height,0.1f,2000.0f);
+//		GL11.glMatrixMode(GL11.GL_PROJECTION);
+//    	GL11.glLoadIdentity();
+//    	
+////    	GL11.glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, 0,25);
+//    	GLU.gluPerspective(90.0f,(float)width/(float)height,0.1f,1000.0f);
+//    	GL11.glTranslated(position[0],0, position[2]-500);
     	
     	GL11.glEnable(GL11.GL_BLEND);
     	GL11.glEnable(GL11.GL_ALPHA_TEST);
@@ -85,7 +93,9 @@ public class SceneDemo{
 		strips=heightMap.generateTriangleStrip();
 		lines=heightMap.generateTriangles();
 		
-		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"),this.getClass().getResource("./textures").getPath());
+		
+//		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		textureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sod.jpg");
 		
 	}
@@ -133,10 +143,10 @@ public class SceneDemo{
                    e.printStackTrace();
                 }
             }
-            GL11.glColor3f(0,1,0);
-            FPSRecorder.push(costTime);
-            costTime=FPSRecorder.getAverage();
-            font.print("FPS:"+String.valueOf(costTime==0?FPS:1000/costTime),5,25,0);
+//            GL11.glColor3f(0,1,0);
+//            FPSRecorder.push(costTime);
+//            costTime=FPSRecorder.getAverage();
+//            font.print("FPS:"+String.valueOf(costTime==0?FPS:1000/costTime),5,25,0);
             Display.update();
 		}
 		Keyboard.destroy();
@@ -145,11 +155,19 @@ public class SceneDemo{
 	}
 	int angle=0;
 	private void render() {
+		GL11.glMatrixMode(GL11.GL_PROJECTION);
+    	GL11.glLoadIdentity();
+    	
+//    	GL11.glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, 0,25);
+    	GLU.gluPerspective(90.0f,(float)width/(float)height,0.1f,1000.0f);
+    	GL11.glTranslated(position[0],0, position[2]-500);
+    	GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		GL11.glLoadIdentity();
 		
-		GL11.glTranslated(position[0],-400, position[2]);
-		System.out.println(position[0]+","+position[1]+","+position[2]+":"+heightMap.getHeight(position[0],position[2]));
-		GL11.glRotatef(angle++, 0,1,0);
+//		GL11.glTranslated(position[0],-400, position[2]);
+		GL11.glTranslated(0,-400, 0);
+//		System.out.println(position[0]+","+position[1]+","+position[2]+":"+heightMap.getHeight(position[0],position[2]));
+//		GL11.glRotatef(angle++, 0,1,0);
 //		GL11.glScaled(40,0.8f,40);
 //		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
 //		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -166,23 +184,39 @@ public class SceneDemo{
 //		}
 //		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
-//		for(int i=0;i<lines.length;i++)
-//		{
-//			for(int j=0;j<lines[i].length;j++)
-//			{
-//				for(int k=0;k<lines[i][j].length;k++)
-//				{
-//					if(k%3==0)
-//						GL11.glBegin(GL11.GL_LINE_LOOP);
-//					Point3f point=lines[i][j][k];
-//					GL11.glColor3f(point.x/(point.x+point.z+point.y),point.z/(point.x+point.z+point.y),point.y/(point.x+point.z+point.y));
-//					GL11.glVertex3f(point.x,point.z,point.y);
-//					if(k%3==2)
-//						GL11.glEnd();
-//				}
-//			}
-//		}
+		for(int i=0;i<lines.length;i++)
+		{
+			for(int j=0;j<lines[i].length;j++)
+			{
+				for(int k=0;k<lines[i][j].length;k++)
+				{
+					if(k%3==0)
+						GL11.glBegin(GL11.GL_LINE_LOOP);
+					Point3f point=lines[i][j][k];
+					GL11.glColor3f(point.x/(point.x+point.z+point.y),point.z/(point.x+point.z+point.y),point.y/(point.x+point.z+point.y));
+					GL11.glVertex3f(point.x,point.z,point.y);
+					if(k%3==2)
+						GL11.glEnd();
+				}
+			}
+		}
+		GL11.glPushMatrix();
+		GL11.glLoadIdentity();
+		GL11.glTranslatef(position[0], -40.0f, position[2]+450.0f);
+		GL11.glScaled(6.0f,6.0f,6.0f);
+		g36c.render();
+		GL11.glPopMatrix();
 		
+		
+//		GL11.glColor3f(1,0,0);
+//		GL11.glBegin(GL11.GL_LINES);
+//		GL11.glVertex3f(position[0],position[1],position[2]);
+//		GL11.glVertex3f(position[0],position[1]+100,position[2]);
+//		GL11.glVertex3f(position[0]-50,position[1]+100,position[2]);
+//		GL11.glVertex3f(position[0]+50,position[1]+100,position[2]);
+//		GL11.glVertex3f(position[0],position[1]+100,position[2]-50);
+//		GL11.glVertex3f(position[0],position[1]+100,position[2]+50);
+//		GL11.glEnd();
 
 //		GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
 //		GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);

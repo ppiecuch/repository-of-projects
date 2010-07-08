@@ -141,21 +141,21 @@ public class HeightMap2 {
 		Point3f rt=new Point3f(cellX,floorY,0);
 		Point3f lb=new Point3f(floorX,cellY,0);
 		Point3f rb=new Point3f(cellX,cellY,0);
-		Point3f p=new Point3f(x,y,0);
-		System.out.println(floorX+","+floorY+","+cellX+","+cellY);
+		Point3f p=new Point3f(x/mufactors[0]+steps[0]/2,y/mufactors[1]+steps[1]/2,0);
+//		System.out.println(floorX+","+floorY+","+cellX+","+cellY);
 
 		float Slt=Util.getArea(lt,rt,lb);
 		float Sp1=Util.getArea(lt,rt,p);
 		float Sp2=Util.getArea(lt,p,lb);
 		float Sp3=Util.getArea(p,rt,lb);
-		System.out.println("S:"+Slt+","+Sp1+","+Sp2+","+Sp3);
+//		System.out.println("S:"+Slt+","+Sp1+","+Sp2+","+Sp3);
 		
 		if(Slt-Sp1-Sp2-Sp3<Util.TOLERATION)
 		{
 			lt.z=heightWeights[(int) lt.y+steps[1]/2][(int) lt.x+steps[0]/2];
 			rt.z=heightWeights[(int) rt.y+steps[1]/2][(int) rt.x+steps[0]/2];
 			lb.z=heightWeights[(int) lb.y+steps[1]/2][(int) lb.x+steps[0]/2];
-			rt.z=heightWeights[(int) rb.y+steps[1]/2][(int) rb.x+steps[0]/2];
+			rb.z=heightWeights[(int) rb.y+steps[1]/2][(int) rb.x+steps[0]/2];
 			Util.linearInterpolate(lt,rt,lb,p);
 		}
 		else
@@ -163,7 +163,7 @@ public class HeightMap2 {
 			lt.z=heightWeights[(int) lt.y+steps[1]/2][(int) lt.x+steps[0]/2];
 			rt.z=heightWeights[(int) rt.y+steps[1]/2][(int) rt.x+steps[0]/2];
 			lb.z=heightWeights[(int) lb.y+steps[1]/2][(int) lb.x+steps[0]/2];
-			rt.z=heightWeights[(int) rb.y+steps[1]/2][(int) rb.x+steps[0]/2];
+			rb.z=heightWeights[(int) rb.y+steps[1]/2][(int) rb.x+steps[0]/2];
 			Util.linearInterpolate(rb,rt,lb,p);
 		}
 		return p.z;
