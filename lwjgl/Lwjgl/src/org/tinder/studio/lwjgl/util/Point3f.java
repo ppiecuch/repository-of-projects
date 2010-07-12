@@ -138,5 +138,10 @@ public class Point3f extends Tuple3f implements Serializable {
 	 y = p1.y/p1.w;
 	 z = p1.z/p1.w;
      }
+     
+     @Override
+    public String toString() {
+    	return "{"+x+","+y+","+z+"}";
+    }
 
 }

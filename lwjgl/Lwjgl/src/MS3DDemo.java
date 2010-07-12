@@ -1,14 +1,21 @@
+import glapp.GLApp;
+
+import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.Date;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.tinder.studio.lwjgl.heightmap.HeightMap2;
 import org.tinder.studio.lwjgl.ms3d.MS3DAnimation;
 import org.tinder.studio.lwjgl.ms3d.MS3DModel;
+import org.tinder.studio.lwjgl.util.Point3f;
 
 import de.bloodyblades.ms3dloader.Font;
 
@@ -32,7 +39,19 @@ public class MS3DDemo {
 	MS3DModel g36c;
 	private float[] position={0,0,0};
 	private int state;
-	private static final int INCREMENT=1;
+	private static final float INCREMENT=0.2f;
+	
+	private HeightMap2 heightMap;
+	private Point3f[][][] lines;
+	private Point3f[][] strips;
+	
+	private int width,height;
+	private int textureId;
+	
+	private boolean isPress3=false;
+	private float[] viewAngle=new float[3];
+	private float[] cameraPosition={0,0,0};
+	private float cameraRadius=25;
 	
 	public MS3DDemo() throws LWJGLException{
 		this.init();
@@ -44,8 +63,8 @@ public class MS3DDemo {
 		Display.setDisplayMode(new DisplayMode(DISPLAY_WIDTH, DISPLAY_HEIGHT));
 		
 		/*居中*/
-		int width=Display.getDesktopDisplayMode().getWidth();
-		int height=Display.getDesktopDisplayMode().getHeight();
+		width=Display.getDesktopDisplayMode().getWidth();
+		height=Display.getDesktopDisplayMode().getHeight();
 		int x=(width-DISPLAY_WIDTH)/2;
 		int y=(height-DISPLAY_HEIGHT)/2;
 		Display.setLocation(x,y);
@@ -62,7 +81,7 @@ public class MS3DDemo {
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
     	GL11.glLoadIdentity();
 //    	GL11.glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, 0,25);
-    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,1000.0f);
+    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,3000.0f);
     	
     	GL11.glEnable(GL11.GL_BLEND);
     	GL11.glEnable(GL11.GL_ALPHA_TEST);
@@ -79,13 +98,22 @@ public class MS3DDemo {
 		g36c.addAnimation(walk);
 		g36c.addAnimation(leftMove);
 		
-		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		try {
+			heightMap=new HeightMap2(new int[]{100,100,1},new int[]{10,10}, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
+			textureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sod.jpg");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		lines=heightMap.generateTriangles();
+		strips=heightMap.generateTriangleStrip();
+		
+		
 	}
 	
 	private void run(){
 		while (runnable) {
 			long startTime = System.currentTimeMillis();
-			GL11.glClearColor(0,0,0,1);
+			GL11.glClearColor(0.5f,0.5f,0.5f,1);
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT| GL11.GL_DEPTH_BUFFER_BIT);
 			
 			checkInput();
@@ -105,8 +133,8 @@ public class MS3DDemo {
                    e.printStackTrace();
                 }
             }
-            GL11.glColor3f(0,1,0);
-            font.print("FPS:"+String.valueOf(costTime==0?FPS:1000/costTime),5,22,0);
+//            GL11.glColor3f(0,1,0);
+//            font.print("FPS:"+String.valueOf(costTime==0?FPS:1000/costTime),5,22,0);
             Display.update();
 		}
 		Keyboard.destroy();
@@ -128,18 +156,22 @@ public class MS3DDemo {
 				case Keyboard.KEY_W:
 					state|=1;
 					g36c.setCurrentAnimation(0);
+					g36c.reset();
 					break;
 				case Keyboard.KEY_S:
 					state|=2;
 					g36c.setCurrentAnimation(0);
+					g36c.reset();
 					break;
 				case Keyboard.KEY_A:
 					state|=4;
 					g36c.setCurrentAnimation(1);
+					g36c.reset();
 					break;
 				case Keyboard.KEY_D:
 					state|=8;
 					g36c.setCurrentAnimation(1);
+					g36c.reset();
 					break;
 				}
 			}
@@ -164,6 +196,42 @@ public class MS3DDemo {
 			}
 		}
 		
+		if (Mouse.next()) {
+		    if (Mouse.getEventButton() != -1) {
+		        int btn = Mouse.getEventButton();
+
+		        if (btn == 0)btn = MouseEvent.BUTTON1;
+		        else if (btn == 1)btn = MouseEvent.BUTTON3;
+		        else if (btn == 2)btn = MouseEvent.BUTTON2;
+
+		        if (Mouse.getEventButtonState()) {
+		        	//Press
+		        	switch(btn)
+		        	{
+		        	case MouseEvent.BUTTON1:
+		        		break;
+		        	case MouseEvent.BUTTON2:
+		        		break;
+		        	case MouseEvent.BUTTON3:
+		        		isPress3=true;
+		        		break;
+		        	}
+		        } else {
+		        	//Release
+		        	switch(btn)
+		        	{
+		        	case MouseEvent.BUTTON1:
+		        		break;
+		        	case MouseEvent.BUTTON2:
+		        		break;
+		        	case MouseEvent.BUTTON3:
+		        		isPress3=false;
+		        		break;
+		        	}
+		        }
+		    }
+		}
+
 		if(Display.isCloseRequested())
 		{
 			runnable=false;
@@ -171,33 +239,111 @@ public class MS3DDemo {
 	}
 	
 	private void logic(){
-		if((state&1)>0)
+		if((state&1)>0)			//W
 		{
-			position[2]-=INCREMENT;
+			position[0]+=INCREMENT*Math.sin(-viewAngle[1]* Math.PI/180);
+			position[2]-=INCREMENT*Math.cos(-viewAngle[1]* Math.PI/180);
 		}
-		else if((state&2)>0)
+		else if((state&2)>0)	//S
 		{
-			position[2]+=INCREMENT;
+			position[0]-=INCREMENT*Math.sin(-viewAngle[1]* Math.PI/180);
+			position[2]+=INCREMENT*Math.cos(-viewAngle[1]* Math.PI/180);
 		}
-		else if((state&4)>0)
+		else if((state&4)>0)	//A
 		{
-			position[0]-=INCREMENT;
+			position[0]-=INCREMENT*Math.cos(-viewAngle[1]* Math.PI/180);
+			position[2]-=INCREMENT*Math.sin(-viewAngle[1]* Math.PI/180);
 		}
-		else if((state&8)>0)
+		else if((state&8)>0)	//D
 		{
-			position[0]+=INCREMENT;
+			position[0]+=INCREMENT*Math.cos(-viewAngle[1]* Math.PI/180);
+			position[2]+=INCREMENT*Math.sin(-viewAngle[1]* Math.PI/180);
 		}
+		if(isPress3)
+		{
+			viewAngle[1]-=Mouse.getDX();
+			viewAngle[0]+=Mouse.getDY();
+		}
+		/*第三人称视角,使用极坐标运算公式*/
+		cameraPosition[0] = (float) (cameraRadius * Math.sin(viewAngle[1]*Math.PI/180)+position[0]);
+		cameraPosition[2] = (float) (cameraRadius * Math.cos(viewAngle[1]*Math.PI/180)+position[2]);
+//		System.out.println(position[0]+","+position[2]+","+cameraPosition[0]+","+cameraPosition[2]+"("+((cameraPosition[0]-position[0])*(cameraPosition[0]-position[0])+(cameraPosition[2]-position[2])*(cameraPosition[2]-position[2]))+")");
 	}
 	
 	private void render() {
+		GL11.glMatrixMode(GL11.GL_PROJECTION);
+    	GL11.glLoadIdentity();
+//    	GL11.glTranslated(0.0f+position[0], 0, position[2]*0.1f);
+    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,3000.0f);
+//    	GL11.glTranslated(caremaPosition[0], 0, caremaPosition[2]);
+//    	GL11.glTranslated(0, 0, 10);
+//    	GL11.glRotatef(-viewAngle[1],0,1,0);
+//    	GL11.glTranslated(-caremaPosition[0], 0, caremaPosition[2]);
+//    	GL11.glRotatef(viewAngle[0],1,0,0);
+    	GLU.gluLookAt(cameraPosition[0],10,cameraPosition[2], position[0],5,position[2], 0,1,0);
 		
+		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		GL11.glLoadIdentity();
-		
-		GL11.glTranslatef(0.0f+position[0], -40.0f, -150.0f+position[2]);
-		GL11.glScaled(6.0f,6.0f,6.0f);
+//		GL11.glTranslated(0,-400, -1000);
+		for(int i=0;i<lines.length;i++)
+		{
+			for(int j=0;j<lines[i].length;j++)
+			{
+				for(int k=0;k<lines[i][j].length;k++)
+				{
+					if(k%3==0)
+						GL11.glBegin(GL11.GL_LINE_LOOP);
+					Point3f point=lines[i][j][k];
+//					GL11.glColor3f(point.x/(point.x+point.z+point.y),point.z/(point.x+point.z+point.y),point.y/(point.x+point.z+point.y));
+					GL11.glVertex3f(point.x,point.z,point.y);
+					if(k%3==2)
+						GL11.glEnd();
+				}
+			}
+		}
+		/*画出坐标轴*/
+		GL11.glLoadIdentity();
+		GL11.glTranslated(-20,-20,-20);
+		GL11.glBegin(GL11.GL_LINES);
+		GL11.glColor3f(1,0,0);
+		GL11.glVertex3f(0,0,0);
+		GL11.glVertex3f(500,0,0);
+		GL11.glColor3f(0,0,1);
+		GL11.glVertex3f(0,0,0);
+		GL11.glVertex3f(0,500,0);
+		GL11.glColor3f(0,1,0);
+		GL11.glVertex3f(0,0,0);
+		GL11.glVertex3f(0,0,500);
+		GL11.glEnd();
+		/*绘制地形*/
+		GL11.glLoadIdentity();
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		for(int i=0;i<this.strips.length;i++)
+		{
+			GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+			for(int j=0;j<this.strips[i].length;j++)
+			{
+				Point3f point=this.strips[i][j];
+				GL11.glTexCoord2f(point.x/80,point.y/80);
+				GL11.glVertex3f(point.x,point.z,point.y);
+			}
+			GL11.glEnd();
+		}
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glPushMatrix();
+		GL11.glLoadIdentity();
+//		float y=heightMap.getHeight(position[0], position[2]);
+		GL11.glTranslated(position[0], 0, position[2]);
+		GL11.glRotatef(viewAngle[1],0,1,0);
+//		GL11.glTranslated(0, 0, -50);
+//		GL11.glScaled(6.0f,6.0f,6.0f);
 		GL11.glColor3f(1,1,1);
-		
+//		g36c.render();
 		g36c.updateModel(System.currentTimeMillis()*2/3);
+		GL11.glPopMatrix();
+		
+		
 	}
 	
 	public static void main(String[] args) throws LWJGLException

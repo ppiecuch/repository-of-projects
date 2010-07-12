@@ -26,7 +26,7 @@ public class Util {
 		ac.sub(c,a);
 		Vector3f temp=new Vector3f();
 		temp.cross(ab,ac);
-		p.z=-(temp.x*p.x+temp.y*p.y/temp.z);
+		p.z=a.z-(temp.x*(p.x-a.x)+temp.y*(p.y-a.y)/temp.z);
 	}
 	
 	/**

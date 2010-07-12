@@ -67,17 +67,20 @@ public class HeightMap2 {
 			for(int j=0;j<steps[0];j++)
 			{
 				Point3f point=new Point3f();
-				point.x=(j-steps[0]/2)*mufactors[0];
-				point.y=(i-steps[1]/2)*mufactors[1];
+				point.x=(j)*mufactors[0];
+				point.y=(i)*mufactors[1];
 				point.z=heightWeights[i][j]*mufactors[2];
 				triangleStrip[i][j*2]=point;
+				System.out.print(point);
 				
 				point=new Point3f();
-				point.x=(j-steps[0]/2)*mufactors[0];
-				point.y=(i+1-steps[1]/2)*mufactors[1];
+				point.x=(j)*mufactors[0];
+				point.y=(i+1)*mufactors[1];
 				point.z=heightWeights[i+1][j]*mufactors[2];
 				triangleStrip[i][j*2+1]=point;
+				System.out.print(point);
 			}
+			System.out.println();
 		}
 		return triangleStrip;
 	}
@@ -93,27 +96,27 @@ public class HeightMap2 {
 				Point3f[] points=new Point3f[3];
 				for(int k=0;k<3;k++)
 					points[k]=new Point3f();
-				points[0].x=(j-steps[0]/2)*mufactors[0];
-				points[0].y=(i-steps[1]/2)*mufactors[1];
+				points[0].x=(j)*mufactors[0];
+				points[0].y=(i)*mufactors[1];
 				points[0].z=(heightWeights[i][j])*mufactors[2];
-				points[1].x=(j+1-steps[0]/2)*mufactors[0];
-				points[1].y=(i-steps[1]/2)*mufactors[1];
+				points[1].x=(j+1)*mufactors[0];
+				points[1].y=(i)*mufactors[1];
 				points[1].z=(heightWeights[i][j+1])*mufactors[2];
-				points[2].x=(j-steps[0]/2)*mufactors[0];
-				points[2].y=(i+1-steps[1]/2)*mufactors[1];
+				points[2].x=(j)*mufactors[0];
+				points[2].y=(i+1)*mufactors[1];
 				points[2].z=(heightWeights[i+1][j])*mufactors[2];
 				triangles[i][j*2]=points;
 				points=new Point3f[3];
 				for(int k=0;k<3;k++)
 					points[k]=new Point3f();
-				points[0].x=(j+1-steps[0]/2)*mufactors[0];
-				points[0].y=(i-steps[1]/2)*mufactors[1];
+				points[0].x=(j+1)*mufactors[0];
+				points[0].y=(i)*mufactors[1];
 				points[0].z=(heightWeights[i][j+1])*mufactors[2];
-				points[1].x=(j-steps[0]/2)*mufactors[0];
-				points[1].y=(i+1-steps[1]/2)*mufactors[1];
+				points[1].x=(j)*mufactors[0];
+				points[1].y=(i+1)*mufactors[1];
 				points[1].z=(heightWeights[i+1][j])*mufactors[2];
-				points[2].x=(j+1-steps[0]/2)*mufactors[0];
-				points[2].y=(i+1-steps[1]/2)*mufactors[1];
+				points[2].x=(j+1)*mufactors[0];
+				points[2].y=(i+1)*mufactors[1];
 				points[2].z=(heightWeights[i+1][j+1])*mufactors[2];
 				triangles[i][j*2+1]=points;
 			}
@@ -141,7 +144,7 @@ public class HeightMap2 {
 		Point3f rt=new Point3f(cellX,floorY,0);
 		Point3f lb=new Point3f(floorX,cellY,0);
 		Point3f rb=new Point3f(cellX,cellY,0);
-		Point3f p=new Point3f(x/mufactors[0]+steps[0]/2,y/mufactors[1]+steps[1]/2,0);
+		Point3f p=new Point3f(x/mufactors[0],y/mufactors[1],0);
 //		System.out.println(floorX+","+floorY+","+cellX+","+cellY);
 
 		float Slt=Util.getArea(lt,rt,lb);
@@ -152,18 +155,20 @@ public class HeightMap2 {
 		
 		if(Slt-Sp1-Sp2-Sp3<Util.TOLERATION)
 		{
-			lt.z=heightWeights[(int) lt.y+steps[1]/2][(int) lt.x+steps[0]/2];
-			rt.z=heightWeights[(int) rt.y+steps[1]/2][(int) rt.x+steps[0]/2];
-			lb.z=heightWeights[(int) lb.y+steps[1]/2][(int) lb.x+steps[0]/2];
-			rb.z=heightWeights[(int) rb.y+steps[1]/2][(int) rb.x+steps[0]/2];
+			lt.z=heightWeights[(int) lt.y][(int) lt.x];
+			rt.z=heightWeights[(int) rt.y][(int) rt.x];
+			lb.z=heightWeights[(int) lb.y][(int) lb.x];
+			rb.z=heightWeights[(int) rb.y][(int) rb.x];
+//			System.out.println("lt:"+lt.z+","+rt.z+","+rb.z);
 			Util.linearInterpolate(lt,rt,lb,p);
 		}
 		else
 		{
-			lt.z=heightWeights[(int) lt.y+steps[1]/2][(int) lt.x+steps[0]/2];
-			rt.z=heightWeights[(int) rt.y+steps[1]/2][(int) rt.x+steps[0]/2];
-			lb.z=heightWeights[(int) lb.y+steps[1]/2][(int) lb.x+steps[0]/2];
-			rb.z=heightWeights[(int) rb.y+steps[1]/2][(int) rb.x+steps[0]/2];
+			lt.z=heightWeights[(int) lt.y][(int) lt.x];
+			rt.z=heightWeights[(int) rt.y][(int) rt.x];
+			lb.z=heightWeights[(int) lb.y][(int) lb.x];
+			rb.z=heightWeights[(int) rb.y][(int) rb.x];
+//			System.out.println("rb:"+rb.z+","+rt.z+","+lb.z);
 			Util.linearInterpolate(rb,rt,lb,p);
 		}
 		return p.z;
