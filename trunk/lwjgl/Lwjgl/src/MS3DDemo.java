@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-import org.tinder.studio.lwjgl.heightmap.HeightMap2;
+import org.tinder.studio.lwjgl.camera.ThirdPersonCamera;
+import org.tinder.studio.lwjgl.heightmap.HeightMap;
 import org.tinder.studio.lwjgl.ms3d.MS3DAnimation;
 import org.tinder.studio.lwjgl.ms3d.MS3DModel;
 import org.tinder.studio.lwjgl.util.Point3f;
@@ -28,8 +28,8 @@ import de.bloodyblades.ms3dloader.Font;
  */
 public class MS3DDemo {
 	private static ResourceLoader resourceLoader = new ResourceLoader();
-	public static final int DISPLAY_WIDTH=300;
-	public static final int DISPLAY_HEIGHT=200;
+	public static final int DISPLAY_WIDTH=800;
+	public static final int DISPLAY_HEIGHT=600;
 	
 	private boolean runnable=true;
 	private static final int FPS=50;
@@ -39,21 +39,21 @@ public class MS3DDemo {
 	MS3DModel g36c;
 	private float[] position={0,0,0};
 	private int state;
-	private static final float INCREMENT=0.2f;
 	
-	private HeightMap2 heightMap;
+	private HeightMap heightMap;
 	private Point3f[][][] lines;
 	private Point3f[][] strips;
-	private int[] mufactors={100,100,1};
-	private int[] steps={10,10};
+	private int[] mufactors={20,20,1};
+	private int[] steps={60,60};
 	
 	private int width,height;
 	private int textureId;
 	
 	private boolean isPress3=false;
-	private float[] viewAngle=new float[3];
+	private float yaw=0;
 	private float[] cameraPosition={0,0,0};
-	private float cameraRadius=25;
+	
+	private ThirdPersonCamera thirdCamera;
 	
 	public MS3DDemo() throws LWJGLException{
 		this.init();
@@ -73,6 +73,7 @@ public class MS3DDemo {
 		
 		/*全屏*/
 //		Display.setFullscreen(true);
+		thirdCamera=new ThirdPersonCamera(25, 0.2f);
 		
 		Display.create();
 		Display.setTitle("MS3DDemo");
@@ -101,7 +102,7 @@ public class MS3DDemo {
 		g36c.addAnimation(leftMove);
 		
 		try {
-			heightMap=new HeightMap2(mufactors,steps, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
+			heightMap=new HeightMap(mufactors,steps, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
 			textureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sod.jpg");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -122,7 +123,7 @@ public class MS3DDemo {
 			
 			logic();
 			
-			render2();
+			render();
 			
 			
             long costTime = System.currentTimeMillis() - startTime;
@@ -243,50 +244,37 @@ public class MS3DDemo {
 	private void logic(){
 		if((state&1)>0)			//W
 		{
-			position[0]+=INCREMENT*Math.sin(-viewAngle[1]* Math.PI/180);
-			position[2]-=INCREMENT*Math.cos(-viewAngle[1]* Math.PI/180);
+			thirdCamera.walkForward(position, yaw);
 		}
 		else if((state&2)>0)	//S
 		{
-			position[0]-=INCREMENT*Math.sin(-viewAngle[1]* Math.PI/180);
-			position[2]+=INCREMENT*Math.cos(-viewAngle[1]* Math.PI/180);
+			thirdCamera.walkBackward(position, yaw);
 		}
 		else if((state&4)>0)	//A
 		{
-			position[0]-=INCREMENT*Math.cos(-viewAngle[1]* Math.PI/180);
-			position[2]-=INCREMENT*Math.sin(-viewAngle[1]* Math.PI/180);
+			thirdCamera.walkLeft(position, yaw);
 		}
 		else if((state&8)>0)	//D
 		{
-			position[0]+=INCREMENT*Math.cos(-viewAngle[1]* Math.PI/180);
-			position[2]+=INCREMENT*Math.sin(-viewAngle[1]* Math.PI/180);
+			thirdCamera.walkRight(position, yaw);
 		}
 		if(isPress3)
 		{
-			viewAngle[1]-=Mouse.getDX();
-			viewAngle[0]+=Mouse.getDY();
+			yaw=thirdCamera.horizontalTurn(yaw,-Mouse.getDX());
 		}
 		/*第三人称视角,使用极坐标运算公式*/
-		cameraPosition[0] = (float) (cameraRadius * Math.sin(viewAngle[1]*Math.PI/180)+position[0]);
-		cameraPosition[2] = (float) (cameraRadius * Math.cos(viewAngle[1]*Math.PI/180)+position[2]);
+		thirdCamera.calculateCameraPosition(position, yaw, cameraPosition);
 //		System.out.println(position[0]+","+position[2]+","+cameraPosition[0]+","+cameraPosition[2]+"("+((cameraPosition[0]-position[0])*(cameraPosition[0]-position[0])+(cameraPosition[2]-position[2])*(cameraPosition[2]-position[2]))+")");
 	}
 	
 	private void render() {
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
     	GL11.glLoadIdentity();
-//    	GL11.glTranslated(0.0f+position[0], 0, position[2]*0.1f);
     	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,3000.0f);
-//    	GL11.glTranslated(caremaPosition[0], 0, caremaPosition[2]);
-//    	GL11.glTranslated(0, 0, 10);
-//    	GL11.glRotatef(-viewAngle[1],0,1,0);
-//    	GL11.glTranslated(-caremaPosition[0], 0, caremaPosition[2]);
-//    	GL11.glRotatef(viewAngle[0],1,0,0);
-    	GLU.gluLookAt(cameraPosition[0],10,cameraPosition[2], position[0],5,position[2], 0,1,0);
+    	GLU.gluLookAt(cameraPosition[0],10+position[1],cameraPosition[2], position[0],5+position[1],position[2], 0,1,0);
 		
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		GL11.glLoadIdentity();
-//		GL11.glTranslated(0,-400, -1000);
 		for(int i=0;i<lines.length;i++)
 		{
 			for(int j=0;j<lines[i].length;j++)
@@ -335,23 +323,14 @@ public class MS3DDemo {
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();
-		float y=heightMap.getHeight(position[0], position[2]);
-		GL11.glTranslated(position[0], 0, position[2]);
-		GL11.glRotatef(viewAngle[1],0,1,0);
-//		GL11.glTranslated(0, 0, -50);
-//		GL11.glScaled(6.0f,6.0f,6.0f);
+		position[1]=heightMap.getHeight(position[0], position[2]);
+		GL11.glTranslated(position[0], position[1], position[2]);
+		GL11.glRotatef(yaw,0,1,0);
 		GL11.glColor3f(1,1,1);
-//		g36c.render();
 		g36c.updateModel(System.currentTimeMillis()*2/3);
 		GL11.glPopMatrix();
 		
 		
-	}
-	
-	private void render2()
-	{
-		float y=heightMap.getHeight(position[0], position[2]);
-		System.out.println(y);
 	}
 	
 	public static void main(String[] args) throws LWJGLException
