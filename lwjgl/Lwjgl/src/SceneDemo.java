@@ -14,7 +14,6 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.util.glu.GLU;
 import org.newdawn.slick.SlickException;
 import org.tinder.studio.lwjgl.heightmap.HeightMap;
-import org.tinder.studio.lwjgl.heightmap.HeightMap2;
 import org.tinder.studio.lwjgl.ms3d.MS3DModel;
 import org.tinder.studio.lwjgl.util.FPSRecorder;
 import org.tinder.studio.lwjgl.util.Point3f;
@@ -42,7 +41,7 @@ public class SceneDemo{
 	
 	private MS3DModel g36c;
 	
-	private HeightMap2 heightMap;
+	private HeightMap heightMap;
 	private Point3f[][] strips;
 	private Point3f[][][] lines;
 	
@@ -89,7 +88,7 @@ public class SceneDemo{
     	
 		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 25, width, height);
 //		heightMap=new HeightMap(50,50,resourceLoader.loadResourceAsStream("textures/heightmap.png"));
-		heightMap=new HeightMap2(new int[]{40,40,1},new int[]{50,50}, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
+		heightMap=new HeightMap(new int[]{40,40,1},new int[]{50,50}, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
 		strips=heightMap.generateTriangleStrip();
 		lines=heightMap.generateTriangles();
 		
