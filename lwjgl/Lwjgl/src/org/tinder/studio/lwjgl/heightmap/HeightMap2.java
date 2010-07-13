@@ -137,8 +137,12 @@ public class HeightMap2 {
 		int cellX=(int) Math.ceil(x/mufactors[0]);
 		int floorY=(int) Math.floor(y/mufactors[1]);
 		int cellY=(int) Math.ceil(y/mufactors[1]);
+		if(floorX<0)floorX=0;
+		if(floorY<0)floorY=0;
 		if(floorX==cellX)cellX=floorX+1;
 		if(floorY==cellY)cellY=floorY+1;
+		if(cellX>steps[0]-1)cellX=steps[0]-1;
+		if(cellY>steps[1]-1)cellY=steps[1]-1;
 		
 		Point3f lt=new Point3f(floorX,floorY,0);
 		Point3f rt=new Point3f(cellX,floorY,0);
