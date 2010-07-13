@@ -28,8 +28,8 @@ import de.bloodyblades.ms3dloader.Font;
  */
 public class MS3DDemo {
 	private static ResourceLoader resourceLoader = new ResourceLoader();
-	public static final int DISPLAY_WIDTH=800;
-	public static final int DISPLAY_HEIGHT=600;
+	public static final int DISPLAY_WIDTH=300;
+	public static final int DISPLAY_HEIGHT=200;
 	
 	private boolean runnable=true;
 	private static final int FPS=50;
@@ -44,6 +44,8 @@ public class MS3DDemo {
 	private HeightMap2 heightMap;
 	private Point3f[][][] lines;
 	private Point3f[][] strips;
+	private int[] mufactors={100,100,1};
+	private int[] steps={10,10};
 	
 	private int width,height;
 	private int textureId;
@@ -99,7 +101,7 @@ public class MS3DDemo {
 		g36c.addAnimation(leftMove);
 		
 		try {
-			heightMap=new HeightMap2(new int[]{100,100,1},new int[]{10,10}, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
+			heightMap=new HeightMap2(mufactors,steps, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
 			textureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sod.jpg");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -120,7 +122,7 @@ public class MS3DDemo {
 			
 			logic();
 			
-			render();
+			render2();
 			
 			
             long costTime = System.currentTimeMillis() - startTime;
@@ -333,7 +335,7 @@ public class MS3DDemo {
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();
-//		float y=heightMap.getHeight(position[0], position[2]);
+		float y=heightMap.getHeight(position[0], position[2]);
 		GL11.glTranslated(position[0], 0, position[2]);
 		GL11.glRotatef(viewAngle[1],0,1,0);
 //		GL11.glTranslated(0, 0, -50);
@@ -344,6 +346,12 @@ public class MS3DDemo {
 		GL11.glPopMatrix();
 		
 		
+	}
+	
+	private void render2()
+	{
+		float y=heightMap.getHeight(position[0], position[2]);
+		System.out.println(y);
 	}
 	
 	public static void main(String[] args) throws LWJGLException
