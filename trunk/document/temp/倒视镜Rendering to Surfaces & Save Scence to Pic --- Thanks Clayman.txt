@@ -1,0 +1,153 @@
+Rendering to Surfaces 
+
+         你是否玩过那种可以打开一个倒视镜的赛车游戏？或者可以在屏幕表面显示当前赛道的赛车游戏。这些效果都是通过把同一个场景（通常使用不同的摄像机）渲染为一个纹理来实现的。事实上，这虽然听起来很复杂，却相当容易实现。再从第五章的例子开始。 
+
+         首先自然先声明将用来渲染的纹理，添加代码： 
+
+private Texture renderTexture = null; 
+
+private Surface renderSurface = null; 
+
+private RenderToSurface rts = null; 
+
+private const int RenderSurfaceSize = 128; 
+
+这里声明了用于渲染的纹理，实际所要渲染的表面，以及用于绘制表面的助手对象。我们同时还声明了将要创建的纹理大小。在InitializeGraphics方法中，订阅device reste事件来创建纹理以及表面。添加代码： 
+
+device = new Device(0, DeviceType.Hardware, this, CreateFlags.SoftwareVertexProcessing, presentParams); 
+
+device.DeviceReset +=new EventHandler(OnDeviceReset); 
+
+this.OnDeviceReset(); 
+
+接下来添加事件处理程序： 
+
+private void OnDeviceReset(object sender, EventArgs e) 
+
+{ 
+
+     Device dev = (Device)sender; 
+
+     if(dev.DeviceCaps.VertexProcessingCaps.SupportsDirectionalLights) 
+
+     { 
+
+         uint masLights = (uint)dev.DeviceCaps.MaxActiveLights; 
+
+         if(maxLights > 0) 
+
+         { 
+
+              dev.Lights[0].Type = LightType.Directional; 
+
+              dev.Lights[0].Diffuse = Color.White; 
+
+              dev.Lights[0].Direction = new Vector3(0,-1,-1); 
+
+              dev.Lights[0].Update(); 
+
+              dev.Lights[0].Enabled = true; 
+
+         } 
+
+         if(maxLights > 1) 
+
+         { 
+
+              dev.Lights[1].Type = LightType.Directional; 
+
+              dev.Lights[1].Diffuse = Color.White; 
+
+              dev.Lights[1].Direction = new Vector3(0,-1,1); 
+
+              dev.Lights[1].Update(); 
+
+              dev.Lights[1].Enabled = true; 
+
+         } 
+
+     } 
+
+     rts = new RenderToSurface(dev,RenderSurfaceSize,RenderSurfaceSize,Format.X8B8G8R8,true,DepthFormat.D16); 
+
+     renderTexture = new Texture(dev,RenderSurfaceSize,RenderSurfaceSize,1,Usage.RenderTarget,Format.X8B8G8R8,Pool.Managed); 
+
+     renderSurface = renderTexture.GetSurfaceLevel(0); 
+
+} 
+
+这里对系统作了一些检查。首先看看它是否支持方向光，如果可以，就打开这些灯光，并假设他支持足够的可用灯光。我们使用了2个方法光，分别在模型的前面和后面。 
+
+创建了灯光之后，通过之前定义的常量创建助手对象。你可能注意到了，这个构造函数所需的参数大都能从device的presentaion parameter获得。这里使用了最常用的值，但通过presentParameter结构获得同样的值也是可以的。 
+
+最后，创建纹理。注意把Usage设置为RenderTarger，因为我们很快就要在这张纹理上渲染。所有的渲染目标纹理都必须位于默认托管内存池中。同时，通过纹理获得实际的表面。 
+
+既然这里设置好的灯光，把选来SetupCamera方法中的代码删除。接下来，添加一个方法来绘制表面。代码如下： 
+
+private void RenderIntoSurface() 
+
+{ 
+
+     // Render to this surface 
+
+     Viewport view = new Viewport(); 
+
+     view.Width = RenderSurfaceSize; 
+
+     view.Height = RenderSurfaceSize; 
+
+     view.MaxZ = 1.0f; 
+
+     rts.BeginScene(renderSurface, view); 
+
+     device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.DarkBlue, 1.0f, 0); 
+
+     device.Transform.Projection = Matrix.PerspectiveFovLH((float)Math.PI / 4, this.Width / this.Height, 1.0f, 10000.0f); 
+
+device.Transform.View = Matrix.LookAtLH(new Vector3(0,0, -580.0f), new Vector3(), new Vector3(0, 1,0)); 
+
+     DrawMesh(angle / (float)Math.PI, angle / (float)Math.PI * 2.0f, angle / (float)Math.PI / 4.0f, 0.0f, 0.0f, 0.0f); 
+
+     DrawMesh(angle / (float)Math.PI, angle / (float)Math.PI / 2.0f, angle / (float)Math.PI * 4.0f, 150.0f, -100.0f, 175.0f); 
+
+rts.EndScene(Filter.None); 
+
+} 
+
+这里和一般的渲染方法很类似。调用了BeginScene方法和EndScene方法，设置摄像机变换，绘制mesh。当绘制纹理时，实际上就是把场景中我们需要的对象渲染到纹理上。在这里，你应该注意到我们使用了同一个device，只是把它移动到了模型的另一面而已，这样就可以把模型的背面渲染为纹理。另外我们还在场景中绘制了2个模型。这样可以模拟场景中有两个模型：默认的摄像机之后还有一个模型，只能通过另一个面向相反方向的摄像机才能同时看到2个模型。 
+
+注意，BeginScene方法使用了即将要渲染的表面作为参数。因为我们是通过纹理来获得这个表面的，任何对这个表面的更新都将会映射到纹理上。EndScene方法可以把一个mipmap过滤器应用到纹理上。为了避免检测显卡的能力，暂时不使用任何过滤器。最后要注意的一点是我们改天了纹理场景的clear color。这样做可以清楚的显示出“真实”的场景和“其他的”场景。 
+
+自然，最后还需要稍微修改一下渲染方法。首先，把纹理渲染到主窗口之前对纹理进行渲染。在OnPaint方法的最前面添加如下代码： 
+
+RenderIntoSurface(); 
+
+最后，可以真正把纹理显示到屏幕上了有一个我们将在以后章节讨论的Sprite类可以完成这个任务，他可以方便的使用屏幕坐标绘制纹理。在EndScene方法之前，添加如下代码： 
+
+using (Sprite s = new Sprite(device)) 
+
+{ 
+
+      s.Begin(SpriteFlags.None); 
+
+      s.Draw(renderTexture, new Rectangle(0, 0, RenderSurfaceSize, RenderSurfaceSize),new Vector3(0, 0, 0), new Vector3(0, 0, 1.0f), Color.White); 
+
+      s.End(); 
+
+} 
+
+这段代码把纹理渲染到了屏幕的左上方，现在运行程序来看看吧。
+
+ 
+----------------------------------------------------------------------------------------------------------------------------------------------
+Clayman   10:02:33
+using Microsoft.DirectX.Direct3D;
+
+Surface backbuffer = device.GetBackBuffer(0, 0, BackBufferType.Mono);
+SurfaceLoader.Save("Screenshot.bmp", ImageFileFormat.Bmp, backbuffer);
+backbuffer.Dispose();
+----------------------------------
+u can find all u need in the dx or xna document,
+why don't u check it........ 
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/08/06/1728292.aspx

@@ -1,0 +1,48 @@
+设   ap×ab   代表矢量ap与ab的矢性积，其坐标表达式为   
+        ap×ab   =   (xp-xa)*(yb-ya)-(yp-ya)*(xb-xa)   
+  于是判别过程如下：   
+    
+  若   ap×ab>0   and   bp×bc>0   and   cp×ca>0   或   ap×ab<0   and   bp×bc<0   and   cp×ca<0   
+  则可判定p在△abc内。   
+    
+  若   ap×ab=0   and   (bp×bc>0   and   cp×ca>0   或   bp×bc<0   and   cp×ca<0)   
+  或   bp×bc=0   and   (ap×ab>0   and   cp×ca>0   或   ap×ab<0   and   cp×ca<0)   
+  或   cp×ca=0   and   (ap×ab>0   and   bp×bc>0   或   ap×ab<0   and   bp×bc<0)   
+  则可判定p在△abc轮廓上。   
+    
+  否则，p在△abc在外。   
+int   inside4(const   struct   TPoint   tr[],   struct   TPoint   p)   
+  ...{   
+  struct   TPoint   arr[3];   
+  memcpy(arr,tr,sizeof(arr));   
+  for(int   i=0;i<3;i++)   //   求三个向量   
+  ...{   
+  arr[i].x   =   tr[i].x   -   p.x;   
+  arr[i].y   =   tr[i].y   -   p.y;   
+  }   
+  for(i=0;i<3;i++)     //   判断是否在边界上   
+  ...{   
+  int   j=(i+1)%3;   
+  if(   arr[i].x*arr[j].y-arr[i].y*arr[j].x==0   )     //点在边界上，向量对称   
+  ...{   
+  if(   arr[i].x*arr[j].x>0   ||   arr[i].y*arr[j].y>0   )   return   0;//   同方向   
+  return   1;                                                                   //   方向相反   
+  }   
+  }   
+  for(i=0;i<2;i++)   //   判断在内还是外，在此只需判断两个向量，下有说明【注1】   
+  ...{   
+  int   front   =   (i+2)%3,   next   =   3-i-front;   
+  int   cnt   =   0;   
+  int   t1   =   arr[i].y*arr[front].x   -   arr[front].y*arr[i].x;   
+  int   t2   =   arr[i].y*arr[next].x     -   arr[next].y   *arr[i].x;   
+  if(   (t1>0)+(t2>0)!=1   )   return   0;   //向量分布在同一侧，则在外；否则不能确定   
+  }   
+  return   1;   //   三个向量都在不同两侧，则在内   
+  //   【注1】：如果三个向量分布在同一侧，则必定有两个向量使得另外的两个向量在该向量的同一侧   
+  //                         a   b   c   
+  //                     如   |/   三条线，b,c在a的一边，   a,b在c的一边，所以a,b,c中有两条线都可以判断   
+  //                     a,b,c三个向量对应的三个顶点在三个向量原点的一个方向，所以该点不在此三角形中   
+  }   
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/01/05/1474474.aspx

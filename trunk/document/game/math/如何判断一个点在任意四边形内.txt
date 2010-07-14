@@ -1,0 +1,70 @@
+如何判断一个点在任意四边形内。
+通过面积法，判断点P是否在四边形(A,B,C,D)内。
+
+   如果在四边形内则，  四边形的面积=面积(P,A,B)+面积(P,B,C)+面积(P,C,D)+面积(P,D,A)
+
+   反之不在四边形内。
+
+                      
+
+Java代码 
+public class Quadrangle    
+{   
+       
+    /**  
+     * 点是否在四边形内  
+     * @param a  
+     * @param b  
+     * @param c  
+     * @param d  
+     * @param p  
+     * @return  
+     */  
+    public static boolean pInQuadrangle(Point a, Point b, Point c,Point d,Point p)   
+    {   
+        Log.d("Walk Game","Quadrangle:"+   
+                 "new Point("+a.x+","+a.y+"),"+   
+                 "new Point("+b.x+","+b.y+"),"+   
+                 "new Point("+c.x+","+c.y+"),"+   
+                 "new Point("+d.x+","+d.y+"),"+   
+                 "new Point("+p.x+","+p.y+"),"  
+                );   
+            
+            
+        double dTriangle = triangleArea(a,b,p)+triangleArea(b,c,p)   
+                    +triangleArea(c,d,p)+triangleArea(d,a,p);   
+        double dQuadrangle = triangleArea(a,b,c)+triangleArea(c,d,a);          
+        return dTriangle==dQuadrangle;     
+    }   
+    public static boolean pInQuadrangle(float[] px,float[] py,float x,float y)   
+    {   
+        Point a = new Point((int)px[0],(int)py[0]);    
+        Point b = new Point((int)px[1],(int)py[1]);    
+        Point c = new Point((int)px[2],(int)py[2]);    
+        Point d = new Point((int)px[3],(int)py[3]);    
+        Point p = new Point((int)x,(int)y);    
+        Log.d("Walk Game","Quadrangle:"+   
+                 "new Point("+a.x+","+a.y+"),"+   
+                 "new Point("+b.x+","+b.y+"),"+   
+                 "new Point("+c.x+","+c.y+"),"+   
+                 "new Point("+d.x+","+d.y+"),"+   
+                 "new Point("+p.x+","+p.y+"),"  
+                );          
+            
+        double dTriangle = triangleArea(a,b,p)+triangleArea(b,c,p)   
+                    +triangleArea(c,d,p)+triangleArea(d,a,p);   
+        double dQuadrangle = triangleArea(a,b,c)+triangleArea(c,d,a);          
+        return dTriangle==dQuadrangle;     
+    }   
+       
+    // 返回三个点组成三角形的面积   
+    private static double triangleArea(Point a, Point b, Point c)    
+    {   
+        double result = Math.abs((a.x * b.y + b.x * c.y + c.x * a.y - b.x * a.y   
+                - c.x * b.y - a.x * c.y) / 2.0D);   
+        return result;   
+    }   
+       
+}  
+http://ansili.javaeye.com/blog/583824
+

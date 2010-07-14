@@ -1,0 +1,129 @@
+算法介绍
+矩阵求逆在3D程序中很常见，主要应用于求Billboard矩阵。按照定义的计算方法乘法运算，严重影响了性能。在需要大量Billboard矩阵运算时，矩阵求逆的优化能极大提高性能。这里要介绍的矩阵求逆算法称为全选主元高斯-约旦法。
+
+高斯-约旦法（全选主元）求逆的步骤如下：
+
+首先，对于 k 从 0 到 n - 1 作如下几步：
+
+从第 k 行、第 k 列开始的右下角子阵中选取绝对值最大的元素，并记住次元素所在的行号和列号，在通过行交换和列交换将它交换到主元素位置上。这一步称为全选主元。 
+m(k, k) = 1 / m(k, k) 
+m(k, j) = m(k, j) * m(k, k)，j = 0, 1, ..., n-1；j != k 
+m(i, j) = m(i, j) - m(i, k) * m(k, j)，i, j = 0, 1, ..., n-1；i, j != k 
+m(i, k) = -m(i, k) * m(k, k)，i = 0, 1, ..., n-1；i != k 
+最后，根据在全选主元过程中所记录的行、列交换的信息进行恢复，恢复的原则如下：在全选主元过程中，先交换的行（列）后进行恢复；原来的行（列）交换用列（行）交换来恢复。
+
+实现(4阶矩阵) 
+ 
+ 
+float Inverse(CLAYMATRIX& mOut, const CLAYMATRIX& rhs)
+...{
+    CLAYMATRIX m(rhs);
+    DWORD is[4];
+    DWORD js[4];
+    float fDet = 1.0f;
+    int f = 1;
+
+    for (int k = 0; k < 4; k ++)
+    ...{
+        // 第一步，全选主元
+        float fMax = 0.0f;
+        for (DWORD i = k; i < 4; i ++)
+        ...{
+            for (DWORD j = k; j < 4; j ++)
+            ...{
+                const float f = Abs(m(i, j));
+                if (f > fMax)
+                ...{
+                    fMax    = f;
+                    is[k]    = i;
+                    js[k]    = j;
+                }
+            }
+        }
+        if (Abs(fMax) < 0.0001f)
+            return 0;
+        
+        if (is[k] != k)
+        ...{
+            f = -f;
+            swap(m(k, 0), m(is[k], 0));
+            swap(m(k, 1), m(is[k], 1));
+            swap(m(k, 2), m(is[k], 2));
+            swap(m(k, 3), m(is[k], 3));
+        }
+        if (js[k] != k)
+        ...{
+            f = -f;
+            swap(m(0, k), m(0, js[k]));
+            swap(m(1, k), m(1, js[k]));
+            swap(m(2, k), m(2, js[k]));
+            swap(m(3, k), m(3, js[k]));
+        }
+
+        // 计算行列值
+        fDet *= m(k, k);
+
+        // 计算逆矩阵
+
+        // 第二步
+        m(k, k) = 1.0f / m(k, k);    
+        // 第三步
+        for (DWORD j = 0; j < 4; j ++)
+        ...{
+            if (j != k)
+                m(k, j) *= m(k, k);
+        }
+        // 第四步
+        for (DWORD i = 0; i < 4; i ++)
+        ...{
+            if (i != k)
+            ...{
+                for    (j = 0; j < 4; j ++)
+                ...{
+                    if (j != k)
+                        m(i, j) = m(i, j) - m(i, k) * m(k, j);
+                }
+            }
+        }
+        // 第五步
+        for (i = 0; i < 4; i ++)
+        ...{
+            if (i != k)
+                m(i, k) *= -m(k, k);
+        }
+    }
+
+    for    (k = 3; k >= 0; k --)
+    ...{
+        if (js[k] != k)
+        ...{
+            swap(m(k, 0), m(js[k], 0));
+            swap(m(k, 1), m(js[k], 1));
+            swap(m(k, 2), m(js[k], 2));
+            swap(m(k, 3), m(js[k], 3));
+        }
+        if (is[k] != k)
+        ...{
+            swap(m(0, k), m(0, is[k]));
+            swap(m(1, k), m(1, is[k]));
+            swap(m(2, k), m(2, is[k]));
+            swap(m(3, k), m(3, is[k]));
+        }
+    }
+
+    mOut = m;
+    return fDet * f;
+}
+  
+比较
+　 原算法 原算法(经过高度优化) 新算法 
+加法次数 103 61 39 
+乘法次数 170 116 69 
+需要额外空间 16 * sizeof(float) 34 * sizeof(float) 25 * sizeof(float) 
+
+结果不言而喻吧。
+
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/01/18/1486532.aspx

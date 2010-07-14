@@ -1,0 +1,89 @@
+比较完美，效率不怎么高，不过这种代码也不需要啥效率。
+
+package org.penguinz.util;
+
+import java.io.UnsupportedEncodingException;
+
+public class URLEncoder {
+    public static String encode(String url, String encode)
+        throws UnsupportedEncodingException {
+    StringBuffer StrUrl = new StringBuffer();
+    for (int i = 0; i < url.length(); ++i) {
+        char c = url.charAt(i);
+        switch (c) {
+        case '=':
+        StrUrl.append("%3d");
+        break;
+        case ' ':
+        StrUrl.append("%20");
+        break;
+        case '+':
+        StrUrl.append("%2b");
+        break;
+        case '\'':
+        StrUrl.append("%27");
+        break;
+        case '/':
+        StrUrl.append("%2F");
+        break;
+        case '.':
+        StrUrl.append("%2E");
+        break;
+        case '<':
+        StrUrl.append("%3c");
+        break;
+        case '>':
+        StrUrl.append("%3e");
+        break;
+        case '#':
+        StrUrl.append("%23");
+        break;
+        case '%':
+        StrUrl.append("%25");
+        break;
+        case '&':
+        StrUrl.append("%26");
+        break;
+        case '{':
+        StrUrl.append("%7b");
+        break;
+        case '}':
+        StrUrl.append("%7d");
+        break;
+        case '\\':
+        StrUrl.append("%5c");
+        break;
+        case '^':
+        StrUrl.append("%5e");
+        break;
+        case '~':
+        StrUrl.append("%73");
+        break;
+        case '[':
+        StrUrl.append("%5b");
+        break;
+        case ']':
+        StrUrl.append("%5d");
+        break;
+        default:
+        if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z')
+            || (c >= 'A' && c <= 'Z'))
+            StrUrl.append(c);
+        else {
+            byte codes[] = String.valueOf(c).getBytes(encode);
+            for (int j = 0; j < codes.length; j++) {
+            StrUrl.append('%');
+            StrUrl.append(Integer.toHexString(codes[j]).substring(6));
+            }
+        }
+        break;
+        }
+    }
+    return StrUrl.toString();
+    }
+
+}
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/highkay/archive/2008/11/26/3379952.aspx
