@@ -1,0 +1,367 @@
+//RMS工具类 
+Java代码 
+import java.util.Vector;   
+  
+import javax.microedition.rms.RecordEnumeration;   
+import javax.microedition.rms.RecordStore;   
+import javax.microedition.rms.RecordStoreException;   
+  
+public class Rms {   
+  
+    private RecordStore rs;   
+    private String rmsName;   
+  
+    public Rms(String rmsName) {   
+        this.rmsName = rmsName;   
+    }   
+  
+    public String getRmsName() {   
+        return rmsName;   
+    }   
+  
+    // 打开表   
+    public void openRecordStore() throws RecordStoreException {   
+        rs = RecordStore.openRecordStore(rmsName, true);   
+    }   
+  
+    // 关闭表   
+    public void closeRecordStore() throws RecordStoreException {   
+        rs.closeRecordStore();   
+  
+    }   
+  
+    // 删除表   
+    public static void delRecordStore(String rmsName)   
+            throws RecordStoreException {   
+        RecordStore.deleteRecordStore(rmsName);   
+    }   
+  
+    // 获得记录表名   
+    public String[] getAllRMSNames() {   
+        return RecordStore.listRecordStores();   
+    }   
+  
+    // 返回全部记录   
+    public Vector getAllRecords() throws RecordStoreException {   
+        Vector vec = new Vector();   
+        RecordEnumeration e = rs.enumerateRecords(null, null, false);   
+        while (e.hasNextElement()) {   
+            byte[] data = e.nextRecord();   
+            vec.addElement(data);   
+        }   
+        return vec;   
+    }   
+  
+    // 修改记录   
+    public void setRecord(int id, byte[] data) throws RecordStoreException {   
+        rs.setRecord(id, data, 0, data.length);   
+    }   
+  
+    // 新增记录,返回记录号   
+    public int addRecord(byte[] data) throws RecordStoreException {   
+        return rs.addRecord(data, 0, data.length);   
+    }   
+  
+    // 删除记录   
+    public void delRecord(int id) throws RecordStoreException {   
+        rs.deleteRecord(id);   
+    }   
+  
+    // 返回记录   
+    public byte[] getRecord(int id) throws RecordStoreException {   
+        return rs.getRecord(id);   
+    }   
+  
+    // 返回下个记录ID   
+    public int getNextRecordId() throws RecordStoreException {   
+        return rs.getNextRecordID();   
+    }   
+  
+    // 删除rms   
+    public void deleteRMS(String name) throws RecordStoreException {   
+        rs.closeRecordStore();   
+        RecordStore.deleteRecordStore(name);   
+    }   
+}  
+
+import java.util.Vector;
+
+import javax.microedition.rms.RecordEnumeration;
+import javax.microedition.rms.RecordStore;
+import javax.microedition.rms.RecordStoreException;
+
+public class Rms {
+
+	private RecordStore rs;
+	private String rmsName;
+
+	public Rms(String rmsName) {
+		this.rmsName = rmsName;
+	}
+
+	public String getRmsName() {
+		return rmsName;
+	}
+
+	// 打开表
+	public void openRecordStore() throws RecordStoreException {
+		rs = RecordStore.openRecordStore(rmsName, true);
+	}
+
+	// 关闭表
+	public void closeRecordStore() throws RecordStoreException {
+		rs.closeRecordStore();
+
+	}
+
+	// 删除表
+	public static void delRecordStore(String rmsName)
+			throws RecordStoreException {
+		RecordStore.deleteRecordStore(rmsName);
+	}
+
+	// 获得记录表名
+	public String[] getAllRMSNames() {
+		return RecordStore.listRecordStores();
+	}
+
+	// 返回全部记录
+	public Vector getAllRecords() throws RecordStoreException {
+		Vector vec = new Vector();
+		RecordEnumeration e = rs.enumerateRecords(null, null, false);
+		while (e.hasNextElement()) {
+			byte[] data = e.nextRecord();
+			vec.addElement(data);
+		}
+		return vec;
+	}
+
+	// 修改记录
+	public void setRecord(int id, byte[] data) throws RecordStoreException {
+		rs.setRecord(id, data, 0, data.length);
+	}
+
+	// 新增记录,返回记录号
+	public int addRecord(byte[] data) throws RecordStoreException {
+		return rs.addRecord(data, 0, data.length);
+	}
+
+	// 删除记录
+	public void delRecord(int id) throws RecordStoreException {
+		rs.deleteRecord(id);
+	}
+
+	// 返回记录
+	public byte[] getRecord(int id) throws RecordStoreException {
+		return rs.getRecord(id);
+	}
+
+	// 返回下个记录ID
+	public int getNextRecordId() throws RecordStoreException {
+		return rs.getNextRecordID();
+	}
+
+	// 删除rms
+	public void deleteRMS(String name) throws RecordStoreException {
+		rs.closeRecordStore();
+		RecordStore.deleteRecordStore(name);
+	}
+}
+
+
+Java代码 
+  
+Rms indexRms=new Rms(Consts.INDEX_RMS_NAME);   
+indexRms.openRecordStore();   
+Vector vec = indexRms.getAllRecords();   
+for (int i = 0; i < vec.size(); i++) {   
+    RmsIndex index = RmsIndex.deserialize((byte[]) vec.elementAt(i));   
+}   
+//新增记录   
+indexRms.addRecord(index.serialize());   
+//删除记录   
+if (indexRms != null)   
+    indexRms.closeRecordStore();   
+//删除rms   
+indexRms.deleteRMS(indexRms.getRmsName());   
+//删除记录   
+indexRms.delRecord(index.getID());   
+//新增新记录   
+index.setID(indexRms.getNextRecordId());   
+indexRms.addRecord(index.serialize());   
+//更新   
+indexRms.setRecord(index.getID(), index.serialize());  
+
+
+Rms indexRms=new Rms(Consts.INDEX_RMS_NAME);
+indexRms.openRecordStore();
+Vector vec = indexRms.getAllRecords();
+for (int i = 0; i < vec.size(); i++) {
+	RmsIndex index = RmsIndex.deserialize((byte[]) vec.elementAt(i));
+}
+//新增记录
+indexRms.addRecord(index.serialize());
+//删除记录
+if (indexRms != null)
+	indexRms.closeRecordStore();
+//删除rms
+indexRms.deleteRMS(indexRms.getRmsName());
+//删除记录
+indexRms.delRecord(index.getID());
+//新增新记录
+index.setID(indexRms.getNextRecordId());
+indexRms.addRecord(index.serialize());
+//更新
+indexRms.setRecord(index.getID(), index.serialize());
+
+
+//需要存储的对象 
+Java代码 
+import java.io.ByteArrayInputStream;   
+import java.io.ByteArrayOutputStream;   
+import java.io.DataInputStream;   
+import java.io.DataOutputStream;   
+import java.io.IOException;   
+  
+public class RmsIndex {   
+  
+    private int ID;// 索引ID   
+    private String name = "";// 记录名称   
+    private boolean isVisit = false;// 本地已更新   
+    private boolean isModify = true;// 网络文件是否修改   
+    private boolean isFound = false; // 有无记录   
+    private String version = "";// 记录版本   
+    private String rmsName = ""; // rms名称   
+    private int contID = 0;// rms id   
+    private int type;// 存储类型0: 长期缓存 1: 关闭后删除   
+  
+    public RmsIndex() {   
+  
+    }   
+  
+    public int getID() {   
+        return ID;   
+    }   
+  
+    public void setID(int id) {   
+        ID = id;   
+    }   
+  
+    public String getName() {   
+        return name;   
+    }   
+  
+    public void setName(String name) {   
+        this.name = name;   
+    }   
+  
+    public boolean isVisit() {   
+        return isVisit;   
+    }   
+  
+    public boolean isModify() {   
+        return isModify;   
+    }   
+  
+    public void setModify(boolean isModify) {   
+        this.isModify = isModify;   
+    }   
+  
+    public void setVisit(boolean isVisit) {   
+        this.isVisit = isVisit;   
+    }   
+  
+    public String getVersion() {   
+        return version;   
+    }   
+  
+    public boolean isFound() {   
+        return isFound;   
+    }   
+  
+    public void setFound(boolean isFound) {   
+        this.isFound = isFound;   
+    }   
+  
+    public void setVersion(String version) {   
+        this.version = version;   
+    }   
+  
+    public int getType() {   
+        return type;   
+    }   
+  
+    public void setType(int type) {   
+        this.type = type;   
+    }   
+  
+    public String getRmsName() {   
+        return rmsName;   
+    }   
+  
+    public void setRmsName(String name) {   
+        rmsName = name;   
+    }   
+  
+    public int getContID() {   
+        return contID;   
+    }   
+  
+    public void setContID(int contID) {   
+        this.contID = contID;   
+    }   
+  
+    public byte[] serialize() throws IOException {   
+        ByteArrayOutputStream bos = null;   
+        DataOutputStream dos = null;   
+        try {   
+            bos = new ByteArrayOutputStream();   
+            dos = new DataOutputStream(bos);   
+            dos.writeInt(getID());   
+            dos.writeUTF(getName());   
+            dos.writeBoolean(isFound());   
+            dos.writeUTF(getVersion());   
+            dos.writeUTF(getRmsName());   
+            dos.writeInt(getContID());   
+            dos.flush();   
+            return bos.toByteArray();   
+        } finally {   
+            if (bos != null) {   
+                bos.close();   
+                bos = null;   
+            }   
+            if (dos != null) {   
+                dos.close();   
+                dos = null;   
+            }   
+        }   
+    }   
+  
+    public static RmsIndex deserialize(byte[] data) throws IOException {   
+        ByteArrayInputStream bis = null;   
+        DataInputStream dis = null;   
+        try {   
+            bis = new ByteArrayInputStream(data);   
+            dis = new DataInputStream(bis);   
+            RmsIndex myIndex = new RmsIndex();   
+            myIndex.setID(dis.readInt());   
+            myIndex.setName(dis.readUTF());   
+            myIndex.setFound(dis.readBoolean());   
+            myIndex.setVersion(dis.readUTF());   
+            myIndex.setRmsName(dis.readUTF());   
+            myIndex.setContID(dis.readInt());   
+            return myIndex;   
+        } finally {   
+            if (bis != null) {   
+                bis.close();   
+                bis = null;   
+            }   
+            if (dis != null) {   
+                dis.close();   
+                dis = null;   
+            }   
+        }   
+    }   
+}  
+
+http://gundumw100.javaeye.com/blog/627409

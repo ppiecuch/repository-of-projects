@@ -1,0 +1,64 @@
+判断点是否在线段上：
+
+设点为Q，线段为P1P2 ，判断点Q在该线段上的依据是：( Q - P1 ) × ( P2 - P1 ) = 0 且 Q 在以 P1，P2为对角顶点的矩形内。前者保证Q点在直线P1P2上，后者是保证Q点不在线段P1P2的延长线或反向延长线上，对于这一步骤的判断可以用以下过 程实现：
+
+ON-SEGMENT(pi,pj,pk)
+
+if min(xi,xj)<=xk<=max(xi,xj) and min(yi,yj)<=yk<=max(yi,yj)
+
+then return true;
+
+else return false;
+
+特别要注意的是，由于需要考虑水平线段和垂直线段两种特殊情况，min(xi,xj)<=xk<=max(xi,xj)和min(yi,yj)<=yk<=max(yi,yj)两个条件必须同时满足才能返回真值。
+
+  BOOL CGe::PtInLine(double x,double y,double z,
+        double x1,double y1,double z1,
+        double x2,double y2,double z2)
+{//from http://blog.csdn.net/hoya5121
+    //判断目标点是否是端点
+    if(DoubleComp(x,x1)==0 && DoubleComp(y,y1)==0 && DoubleComp(z,z1)==0)
+    {
+        return TRUE;
+    }
+    if(DoubleComp(x,x2)==0 && DoubleComp(y,y2)==0 && DoubleComp(z,z2)==0)
+    {
+        return TRUE;
+    }
+    //
+    double d = DistPt2Line(x,y,z,x1,y1,z1,x2,y2,z2);
+    
+    if(DoubleComp(d,1e-6) > 0)//(d > 1e-6)
+    {
+        return FALSE;
+    }
+
+    if(DoubleComp(x1,x2) != 0)//(x1 != x2)
+    {
+        if( ((DoubleComp((x-x1),0)<0)&&(DoubleComp((x-x2),0)>0)) ||
+            ((DoubleComp((x-x1),0)>0)&&(DoubleComp((x-x2),0)<0)) )
+        {
+            return TRUE;
+        }
+    }
+    if(DoubleComp(y1,y2) != 0)//(y1 != y2)
+    {
+        if( ((DoubleComp((y-y1),0)<0)&&(DoubleComp((y-y2),0)>0)) ||
+            ((DoubleComp((y-y1),0)>0)&&(DoubleComp((y-y2),0)<0)) )
+        {
+            return TRUE;
+        }
+    }
+    if(DoubleComp(z1,z2) != 0)
+    {
+        if( ((DoubleComp((z-z1),0)<0)&&(DoubleComp((z-z2),0)>0)) ||
+            ((DoubleComp((z-z1),0)>0)&&(DoubleComp((z-z2),0)<0)) )
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/01/22/1489715.aspx

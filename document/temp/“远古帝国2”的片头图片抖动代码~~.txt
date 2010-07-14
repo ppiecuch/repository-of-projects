@@ -1,0 +1,39 @@
+这个是手机游戏“远古帝国2”的片头图片抖动代码~~写的相当不错~~我给大家贴一下~~在这里感谢一下南京朋友~~
+
+    public static final void drawEffect(Graphics g, int current, int sum, int type, Image img, int x, int y, int t)
+    {
+        int width;
+        int height;
+        if(type == 0)
+        {
+            width = img.getWidth();
+            height = img.getHeight();
+        } else
+        {
+            height = img.getHeight();
+            width = img.getWidth();
+        }
+        int halfWidth = width / 2;
+        int wholeHeight = height / 1;
+        int currentWidth = (width * current) / sum;
+        int l3 = (width * (sum - current)) / (sum * 4);//每改变一个记数点x的改变量，举例，在LOGO的变化中为 width*current
+        int currentAngle = (360 * current) / sum;
+        int angle = (360 * t) / wholeHeight;//每增加一行的像素，角度增加量,t 决定了有几个弧形循环
+        for(int i = 0; i < wholeHeight; i++)
+        {
+            int moveX = l3 * cos(currentAngle) >> 10;
+            if(type == 0)
+            {
+                g.setClip(((x + halfWidth) - currentWidth / 2) + moveX, y + i * 1, currentWidth, 1);
+                g.drawImage(img,x+moveX, y ,20);
+            } else
+            {
+                g.setClip(x + i * 1, ((y + halfWidth) - currentWidth / 2) + moveX, 1, currentWidth);
+                g.drawImage(img,x, y + movex,20);
+            }
+            currentAngle += angle;
+        }
+
+    }
+
+更改里面的函数中的current变量就可以了~~

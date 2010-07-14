@@ -1,0 +1,89 @@
+//=====================================
+/**//**
+等速运动用的间补
+
+@param start [in] 起点
+@param end  [in] 终点
+@param all  [in] 起点到终点经过的时间
+@param now  [in] 现在时间
+
+@return 以now为基础的间补值
+*/
+//=====================================
+float FlatSpeed( float start, float end, long all, long now )
+{
+return (start + ((end - start) * now / all));
+}
+
+//=============================================
+/**//**
+加速运动用的间补
+
+@param start [in] 起点
+@param end  [in] 终点
+@param all  [in] 起点到终点经过的时间
+@param now  [in] 现在时间
+
+@return 以now为基础的间补值
+*/
+//===========================================
+float AddSpeed( float start, float end, long all, long now )
+{
+return ( (start)+((end)-(start)) * (((           (now)+1)*(now))>>1) / ((((all)+1)*(all))>>1) );
+}
+
+//=============================================
+/**//**
+减速运动用的间补
+
+@param start [in] 起点
+@param end  [in] 终点
+@param all  [in] 起点到终点经过的时间
+@param now  [in] 现在时间
+
+@return 以now为基础的间补值
+*/
+//============================================
+float SubSpeed( float start, float end, long all, long now )
+{
+return ( (start)+((end)-(start)) * (((((all)< <1)-(now)+1)*(now))>>1) / ((((all)+1)*(all))>>1) );
+}
+
+//==============================================
+/**//**
+Bezier用的间补计算
+
+@param p1 [in] 起点
+@param p2 [in] 中间点
+@param p3 [in] 终点
+@param t [in] 现在的时间(0 1)
+
+@return 在t方面的值
+*/
+//============================================
+float Bezier( float p1, float p2, float p3, float t )
+{
+return ( ((1-t)*(1-t)*p1) + (2*(1-t)*t*p2) + (t*t*p3) );
+}
+
+//===========================================
+/**//**
+Neville用的间补计算
+
+@param p1 [in] 起点
+@param p2 [in] 中间点
+@param p3 [in] 终点
+@param t [in] 现在的时间(0 1)
+
+@return 在t方面的值
+*/
+//=========================================
+float Neville( float p1, float p2, float p3, float t )
+{
+t *= 2;
+p1 = p2 + ( p2 - p1 ) * ( t - 1 );
+p2 = p3 + ( p3 - p2 ) * ( t - 2 );
+return p2 + ( p2 - p1 ) * ( t - 2 ) * 0.5f;
+}
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/08/30/1765571.aspx

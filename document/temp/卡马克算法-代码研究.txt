@@ -1,0 +1,393 @@
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+//@ CIRCULAR DIRTY BUFFER CIRCULAR DIRTY BUFFER CIRCULAR DIRTY BUFFER
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+ 
+
+    static int _oldLevelX;
+
+    static int _oldLevelY;
+
+    static int _lastTileX;
+
+    static int _lastTileY;
+
+ 
+
+    static int _vp_x;
+
+    static int _vp_y;
+
+    static int _vp_w;
+
+    static int _vp_h;
+
+ 
+
+    static Image _imgCDB;
+
+    static Graphics _gCDB;
+
+ 
+
+ 
+
+    static void CDB_Init() ...{
+
+        _imgCDB = Image.createImage(DEF.CDB_W, DEF.CDB_H);
+
+        _gCDB = _imgCDB.getGraphics();
+
+ 
+
+        _lastTileX = -1;
+
+        _lastTileY = -1;
+
+ 
+
+        _oldLevelX = -1;
+
+        _oldLevelY = -1;
+
+ 
+
+        _vp_x = DEF.SV_X;
+
+        _vp_y = DEF.SV_Y;
+
+ 
+
+        _vp_w = DEF.SV_W;
+
+        _vp_h = DEF.SV_H;
+
+    }
+
+ 
+
+    static void CDB_Free() ...{
+
+        _gCDB = null;
+
+        _imgCDB = null;
+
+    }
+
+ 
+
+/**/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ 
+
+ 
+
+    static void CDB_UpdateGameView(int x, int y) ...{
+
+        int lx = x >> 4; // x / GAME.G_TILE_W;
+
+        int ly = y >> 4; // y / GAME.G_TILE_H;
+
+ 
+
+        int olx = _oldLevelX >> 4; // _oldLevelX / GAME.G_TILE_W;
+
+        int oly = _oldLevelY >> 4; // _oldLevelY / GAME.G_TILE_H;
+
+ 
+
+        if ((lx == _lastTileX) && (ly == _lastTileY)) ...{
+
+            _oldLevelX = x;
+
+            _oldLevelY = y;
+
+            return;
+
+        }
+
+ 
+
+        if ((_lastTileX == -1 && _lastTileY == -1) ||
+
+            (Abs(lx - olx) >= DEF.CDB_TW) || (Abs(ly - oly) >= DEF.CDB_TH)) ...{
+
+            CDB_InvalidateTiles(lx, ly, lx + DEF.CDB_TW, ly + DEF.CDB_TH);
+
+        } else ...{
+
+            int minX, maxX, minY, maxY;
+
+            int x1, x2, y1, y2;
+
+ 
+
+            minX = ((x >= _oldLevelX) ? olx : lx);
+
+            minY = ((y >= _oldLevelY) ? oly : ly);
+
+            maxX = lx + olx - minX;
+
+            maxY = ly + oly - minY;
+
+ 
+
+            x1 = (_oldLevelX < x) ? (minX + DEF.CDB_TW) : minX;
+
+            x2 = (x1 - minX + maxX);
+
+ 
+
+            if (x1 == x2) ...{
+
+                if (x > _oldLevelX) ...{
+
+                    x1--;
+
+                } else if (x < _oldLevelX) ...{
+
+                    x2++;
+
+                }
+
+            }
+
+ 
+
+            y1 = (_oldLevelY <= y) ? maxY : minY;
+
+            y2 = y1 + DEF.CDB_TH;
+
+ 
+
+            CDB_InvalidateTiles(x1, y1, x2, y2);
+
+ 
+
+            x1 = maxX;
+
+            x2 = minX + DEF.CDB_TW;
+
+ 
+
+            y1 = (_oldLevelY < y) ? (minY + DEF.CDB_TH) : minY;
+
+            y2 = (_oldLevelY < y) ? (maxY + DEF.CDB_TH) : maxY;
+
+ 
+
+            if (y1 == y2) ...{
+
+                if (y > _oldLevelY) ...{
+
+                    y1--;
+
+                } else if (y < _oldLevelY) ...{
+
+                    y2++;
+
+                }
+
+            }
+
+ 
+
+            CDB_InvalidateTiles(x1, y1, x2, y2);
+
+        }
+
+ 
+
+        // record level coords (for not redrawin every time ...)
+
+        _lastTileX = lx;
+
+        _lastTileY = ly;
+
+ 
+
+        _oldLevelX = x;
+
+        _oldLevelY = y;
+
+ 
+
+    }
+
+ 
+
+/**/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Repaint a portion of game background into the circular dirty buffer
+
+ 
+
+    static void CDB_InvalidateTiles(int minX, int minY, int maxX, int maxY) ...{
+
+        int x, y;
+
+ 
+
+        if (maxX > map_sizeX)
+
+            maxX = map_sizeX;
+
+        if (maxY > map_sizeY)
+
+            maxY = map_sizeY;
+
+ 
+
+        if (minX == maxX || minY == maxY)
+
+            return;
+
+ 
+
+        _gCDB.setClip(0, 0, DEF.CDB_W, DEF.CDB_H);
+
+ 
+
+        for (x = minX; x < maxX; x++) ...{
+
+            for (y = minY; y < maxY; y++) ...{
+
+                int t = x + y * map_sizeX;
+
+                int x1 = (x * DEF.TILE_W) % DEF.CDB_W;
+
+                int y1 = (y * DEF.TILE_H) % DEF.CDB_H;
+
+ 
+
+                DrawTile(_gCDB, t, x1, y1);
+
+ 
+
+            }
+
+        }
+
+ 
+
+    }
+
+ 
+
+ 
+
+/**/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// CDB -> Screen
+
+ 
+
+    static void CDB_DrawGameView() ...{
+
+        int bb_pos_x =  (s_camX % DEF.CDB_W);
+
+        int bb_pos_y =  (s_camY %  DEF.CDB_H);
+
+ 
+
+        int widthR = (DEF.CDB_W - bb_pos_x);
+
+        int widthL = (DEF.CDB_W - widthR);
+
+        int heightB = (DEF.CDB_H - bb_pos_y);
+
+        int heightT = (DEF.CDB_H - heightB);
+
+ 
+
+        // blit backbuffer on screen ...
+
+        // ************* top left *************
+
+        CDB_Copy2Screen(DEF.SV_X, DEF.SV_Y, widthR, heightB,
+
+                        DEF.SV_X - bb_pos_x, DEF.SV_Y - bb_pos_y);
+
+        // ************* top right *************
+
+        CDB_Copy2Screen(DEF.SV_X + widthR, DEF.SV_Y, widthL, heightB,
+
+                        DEF.SV_X + widthR, DEF.SV_Y - bb_pos_y);
+
+        // ************* bottom left *************
+
+        CDB_Copy2Screen(DEF.SV_X, DEF.SV_Y + heightB, widthR, heightT,
+
+                        DEF.SV_X - bb_pos_x, DEF.SV_Y + heightB);
+
+        // ************* bottom right *************
+
+        CDB_Copy2Screen(DEF.SV_X + widthR, DEF.SV_Y + heightB, widthL, heightT,
+
+                        DEF.SV_X + widthR, DEF.SV_Y + heightB);
+
+    }
+
+ 
+
+/**/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ 
+
+    private static void CDB_Copy2Screen(int x, int y, int w, int h, int xx,
+
+                                        int yy) ...{
+
+ 
+
+        //clip viewport
+
+        if (x < _vp_x) ...{
+
+            w = w - _vp_x + x;
+
+            x = _vp_x;
+
+        }
+
+        if (y < _vp_y) ...{
+
+            h = h - _vp_y + y;
+
+            y = _vp_y;
+
+        }
+
+        if (x + w > _vp_x + _vp_w) ...{
+
+            w = _vp_x + _vp_w - x;
+
+        }
+
+        if (y + h > _vp_y + _vp_h) ...{
+
+            h = _vp_y + _vp_h - y;
+
+        }
+
+ 
+
+        if (w <= 0 || h <= 0)
+
+            return;
+
+ 
+
+ 
+
+        s_g.setClip(x, y, w, h);
+
+        s_g.drawImage( _imgCDB, xx, yy, Graphics.LEFT | Graphics.TOP);
+
+    }
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/ok9034875/archive/2007/04/27/1587282.aspx
