@@ -5,6 +5,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
+import org.tinder.studio.lwjgl.util.Dome;
 
 import de.bloodyblades.ms3dloader.Font;
 
@@ -25,6 +26,8 @@ public class BaseDemo {
 	
 	private static Font font=null;
 	
+	private static Dome dome;
+	
 	public BaseDemo() throws LWJGLException{
 		this.init();
 		this.run();
@@ -43,6 +46,7 @@ public class BaseDemo {
 		
 		/*х╚фа*/
 //		Display.setFullscreen(true);
+		dome=new Dome(100, 10,5);
 		
 		Display.create();
 		Display.setTitle("BaseDemo");
@@ -54,6 +58,7 @@ public class BaseDemo {
     	GL11.glLoadIdentity();
 //    	GL11.glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, 0,25);
     	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,1000.0f);
+    	GLU.gluLookAt(0, 50, -300,0,0,100, 0,1,0);
     	
     	GL11.glEnable(GL11.GL_BLEND);
     	GL11.glEnable(GL11.GL_ALPHA_TEST);
@@ -117,6 +122,8 @@ public class BaseDemo {
 //		GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
 //		GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
 //		GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+		GL11.glColor3f(1,0,0);
+		dome.render();
 	}
 	
 	public static void main(String[] args) throws LWJGLException
