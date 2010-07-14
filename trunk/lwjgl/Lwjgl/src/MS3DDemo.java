@@ -15,6 +15,7 @@ import org.tinder.studio.lwjgl.camera.ThirdPersonCamera;
 import org.tinder.studio.lwjgl.heightmap.HeightMap;
 import org.tinder.studio.lwjgl.ms3d.MS3DAnimation;
 import org.tinder.studio.lwjgl.ms3d.MS3DModel;
+import org.tinder.studio.lwjgl.util.Dome;
 import org.tinder.studio.lwjgl.util.Point3f;
 
 import de.bloodyblades.ms3dloader.Font;
@@ -44,16 +45,21 @@ public class MS3DDemo {
 	private Point3f[][][] lines;
 	private Point3f[][] strips;
 	private int[] mufactors={20,20,1};
-	private int[] steps={60,60};
+	private int[] steps={80,80};
 	
 	private int width,height;
 	private int textureId;
 	
 	private boolean isPress3=false;
-	private float yaw=0;
+	private float yaw=0;	 //the rotation around the Y axis of the camera
+	private float pitch=0; //the rotation around the X axis of the camera
 	private float[] cameraPosition={0,0,0};
 	
 	private ThirdPersonCamera thirdCamera;
+	
+	private Dome dome;
+	private int domeTextureId;
+	private float domeRadius=1500;
 	
 	public MS3DDemo() throws LWJGLException{
 		this.init();
@@ -84,16 +90,18 @@ public class MS3DDemo {
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
     	GL11.glLoadIdentity();
 //    	GL11.glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, 0,25);
-    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,3000.0f);
+    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,8000.0f);
     	
     	GL11.glEnable(GL11.GL_BLEND);
     	GL11.glEnable(GL11.GL_ALPHA_TEST);
+    	GL11.glShadeModel(GL11.GL_FLAT);
     	GL11.glAlphaFunc(GL11.GL_GREATER, 0);
     	GL11.glClearDepth(1.0f);
     	GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDepthFunc(GL11.GL_LEQUAL);
 		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
     	
+		dome=new Dome(domeRadius, 24,5);
 		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 25, width, height);
 		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"),this.getClass().getResource("./textures").getPath());
 		MS3DAnimation walk=new MS3DAnimation(0,13);
@@ -101,9 +109,13 @@ public class MS3DDemo {
 		g36c.addAnimation(walk);
 		g36c.addAnimation(leftMove);
 		
+		position[0]=200;
+		position[2]=200;
+		
 		try {
 			heightMap=new HeightMap(mufactors,steps, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
 			textureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sod.jpg");
+			domeTextureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sky01.jpg");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -261,6 +273,7 @@ public class MS3DDemo {
 		if(isPress3)
 		{
 			yaw=thirdCamera.horizontalTurn(yaw,-Mouse.getDX());
+			pitch=thirdCamera.portraitTurn(pitch,Mouse.getDY()*0.3f);
 		}
 		/*第三人称视角,使用极坐标运算公式*/
 		thirdCamera.calculateCameraPosition(position, yaw, cameraPosition);
@@ -271,9 +284,17 @@ public class MS3DDemo {
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
     	GL11.glLoadIdentity();
     	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,3000.0f);
-    	GLU.gluLookAt(cameraPosition[0],10+position[1],cameraPosition[2], position[0],5+position[1],position[2], 0,1,0);
+    	GLU.gluLookAt(cameraPosition[0],10+position[1],cameraPosition[2], position[0],5+position[1]+pitch,position[2], 0,1,0);
 		
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		/*画出天空*/
+		GL11.glLoadIdentity();
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, domeTextureId);
+		GL11.glTranslatef(domeRadius*0.7f,-domeRadius*0.2f,domeRadius*0.7f);
+		dome.render();
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		/*画出线条*/
 		GL11.glLoadIdentity();
 		for(int i=0;i<lines.length;i++)
 		{
@@ -285,7 +306,7 @@ public class MS3DDemo {
 						GL11.glBegin(GL11.GL_LINE_LOOP);
 					Point3f point=lines[i][j][k];
 //					GL11.glColor3f(point.x/(point.x+point.z+point.y),point.z/(point.x+point.z+point.y),point.y/(point.x+point.z+point.y));
-					GL11.glVertex3f(point.x,point.z,point.y);
+					GL11.glVertex3f(point.x,point.z+0.01f,point.y);
 					if(k%3==2)
 						GL11.glEnd();
 				}

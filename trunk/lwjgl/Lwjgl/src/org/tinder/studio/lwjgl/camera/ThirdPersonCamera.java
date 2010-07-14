@@ -54,6 +54,12 @@ public class ThirdPersonCamera {
 		yaw+=angle;
 		return yaw;
 	}
+	
+	public float portraitTurn(float pitch,float angle)
+	{
+		pitch+=angle;
+		return pitch;
+	}
 
 	/**
 	 * Calculate the position of the camera

@@ -806,7 +806,7 @@ public class MS3DModel {
 		public MS3DJoint(BinaryFileReader modelFile) {
 			this.flag = modelFile.readByte();
 			this.name = modelFile.readString(32);
-			System.out.print(name + ":");
+//			System.out.print(name + ":");
 			this.parentName = modelFile.readString(32);
 			this.rotation[0] = modelFile.readFloat();
 			this.rotation[1] = modelFile.readFloat();
@@ -816,8 +816,7 @@ public class MS3DModel {
 			this.translation[2] = modelFile.readFloat();
 			this.numRotationKeyframes = modelFile.readShort();
 			this.numTranslationKeyframes = modelFile.readShort();
-			System.out.println(this.numRotationKeyframes + ","
-					+ this.numTranslationKeyframes);
+//			System.out.println(this.numRotationKeyframes + ","+ this.numTranslationKeyframes);
 
 			this.rotationKeyframes = new MS3DKeyframe[numRotationKeyframes];
 			for (int i = 0; i < this.numRotationKeyframes; i++)
