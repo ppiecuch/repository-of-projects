@@ -1,0 +1,132 @@
+此种模型绘制类似米字形的网格。由于整个过程递归调用绘图函数，所以可以根据误差判断绘制DEM的精细程度，从而绘制出不同精细程度的DEM，为解决漫游中数据量较大而引起的画面不流畅现象提供了模型基础。 本文并没有对LOD作研究，只是给出了四叉树的建立和遍历绘图的方法。
+
+#include "Pt3d.h"  //空间点类(主要记录空间点的x,y,z)
+
+#define EDGE_POINT 0
+#define NODE_POINT 1
+#define UNKNOWN    2
+
+class CDEM  
+...{
+public:
+ CString strFileName;     //文件名
+ CString strPathName;     //文件路径名
+ double  **dDEMGrid;      //原始DEM格网点高程数据
+ int  iCols;       //研究区格网列数
+ int  iRows;       //研究区格网行数
+ double  dXllcorner;      //格网左下角X坐标（起始坐标）
+ double  dYllcorner;      //格网左下角Y坐标（起始坐标）
+ double  dCellsize;         //格网大小
+ double  dNodata;      //无数据区域的标识数字
+ double  dMinZ,dMaxZ;     //最大、最小高程值
+ double  dCenterX,dCenterY;    //DEM中心的坐标
+ float   fScale;       //范围比例
+    float   fZRatio;      //DEM高程夸张系数
+ bool IsShow;       //是否显示
+ CDEM();
+ virtual ~CDEM();
+ void GetDEMScope();     //获得DEM最大、最小高程值
+ void Draw();       //绘制DEM
+ bool GetPt(int i,int j,CPt3d &pt); //获得DEM中的i行j列点
+ 
+ //四叉树算法实现
+ int  iLodRows,iLodCols;        //经过LOD扩展后的行数和列数
+ int** quadtree;          //四叉树边点记录
+ void init_quadtree(int i, int j);     //初始化四叉树
+ void setup_quadtree(int i, int j, int width);  //建立四叉树
+ void Draw(int i, int j, int width);     //绘制四叉树
+ void triangle(CPt3d &pt1, CPt3d &pt2, CPt3d &pt3); //绘制三角形
+};
+
+void CDEM::init_quadtree(int iRow, int iCol)
+...{
+ int i,j;
+ quadtree = new int *[iRow];
+ for(i=0; i<iRow; i++)
+ ...{
+  quadtree[i] = new int[iCol];
+  for(j=0; j<iCol; j++)
+  ...{
+   quadtree[i][j] = UNKNOWN;
+  }
+ }
+}
+
+void CDEM::setup_quadtree(int i, int j, int width)
+...{
+ int width2;
+ width2 = width / 2;
+ if(width > 1)
+ ...{
+  quadtree[i][j] = NODE_POINT;
+  setup_quadtree(i-width2,j-width2,width2);
+  setup_quadtree(i-width2,j+width2,width2);
+  setup_quadtree(i+width2,j-width2,width2);
+  setup_quadtree(i+width2,j+width2,width2);
+ }
+ else
+  quadtree[i][j] = EDGE_POINT;
+}
+
+void CDEM::Draw(int i, int j, int width)
+...{
+ int width2;
+ width2 = width / 2;
+ if((width > 1) && (quadtree[i][j] == NODE_POINT))
+ ...{
+  Draw(i-width2,j-width2,width2);
+  Draw(i-width2,j+width2,width2);
+  Draw(i+width2,j-width2,width2);
+  Draw(i+width2,j+width2,width2);
+ }
+ else if(quadtree[i][j] == EDGE_POINT)
+ ...{
+  //绘制8个三角行
+  CPt3d pt[9];
+  GetPt(i, j, pt[0]);
+
+  GetPt(i-width, j-width, pt[1]);
+  GetPt(i, j-width, pt[2]);
+  GetPt(i+width, j-width, pt[3]);
+  GetPt(i+width, j, pt[4]);
+
+  GetPt(i+width, j+width, pt[5]);
+  GetPt(i, j+width, pt[6]);
+  GetPt(i-width, j+width, pt[7]);
+  GetPt(i-width, j, pt[8]);
+
+  int m;
+  for(m=1; m<8; m++)
+   triangle(pt[0], pt[m], pt[m+1]);
+  triangle(pt[0], pt[8], pt[1]);
+ 
+ }
+ else 
+ ...{
+  return;
+ }
+}
+
+void CDEM::triangle(CPt3d &pt1, CPt3d &pt2, CPt3d &pt3)
+...{ 
+ if (pt1.z != -9999.0f * fZRatio && pt2.z != -9999.0f*fZRatio &&
+  pt3.z != -9999.0f * fZRatio)
+ ...{ 
+  glBegin(GL_LINE_LOOP);
+   glBegin(GL_TRIANGLES); 
+
+    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+    glVertex3f(pt1.x, pt1.y, pt1.z);
+
+    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+    glVertex3f(pt2.x, pt2.y, pt2.z);
+
+    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+    glVertex3f(pt3.x, pt3.y, pt3.z);
+
+   glEnd();
+  glEnd();
+ }
+}
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2007/05/28/1627832.aspx

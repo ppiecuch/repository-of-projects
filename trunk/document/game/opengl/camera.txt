@@ -1,0 +1,74 @@
+gluPerspective(GLdouble fovy,GLdouble aspect,GLdouble zNear,GLdouble zFar)
+fovy,这个最难理解,我的理解是,眼睛睁开的角度,即,视角的大小,如果设置为0,相当你闭上眼睛了,所以什么也看不到,如果为180,那么可以认为你的视界很广阔,
+aspect,这个好理解,就是实际窗口的纵横比,即x/y
+zNear,这个呢,表示你近处的裁面,眼睛距离近处的距离,假设为10米远,请不要设置为负值,OpenGl就傻了,不知道怎么算了
+zFar表示远处的裁面,
+
+glPerspective:也是用于透视投影，功能和glFrustum非常相似，参数不一样。相对于glFrustum来说不常用。
+void glPerspective(GLdouble fov, GLdouble aspect, GLdouble near, GLdouble far)
+fov是依据y方向的视角，aspect是近裁剪面的纵横比，当然远裁剪面也取这个值，near和far的意义和上面的一样。
+ 透视投影的一个问题就是深度精度的损失，在显示设备中该问题很明显。问题出在深度缓存中深度的限制以及由透视投影引起的非线性比例变换。
+ 当近裁剪面非常靠近投影中心的时候，误差就非常大。(不理解)
+
+
+glOrtho(left, right, bottom, top, near, far)
+glOrtho:正交投影，摄像机可以位于裁剪体内，所以near和far可以取两个正值或者一正一负
+glOrtho是创建一个正交平行的视景体。一般用于物体不会因为离屏幕的远近而产生大小的变换的情况。
+比如，常用的工程中的制图等。需要比较精确的显示。 而作为它的对立情况, glFrustum则产生一个透视投影。
+这是一种模拟真是生活中，人们视野观测物体的真实情况。例如：观察两条平行的火车到，在过了很远之后，这两条铁轨是会相交于一处的。
+还有，离眼睛近的物体看起来大一些，远的物体看起来小一些。
+glOrtho(left, right, bottom, top, near, far)， left表示视景体左面的坐标，right表示右面的坐标，bottom表示下面的，top表示上面的。
+这个函数简单理解起来，就是一个物体摆在那里，你怎么去截取他。
+glOrtho函数只是负责使用什么样的视景体来截取图像，并不负责使用某种规则把图像呈现在屏幕上。
+
+void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near, GLdouble far);
+ 透视投影，摄像机不可以位于裁剪体内，所以near和far都必须去正值，它的参数矩阵定义了裁剪体以及投影的类型，但是未定义摄像机的方位。
+ GL 中的摄像机位于原点，并指向了Z轴的负方向。函数glFrustum只是修改了摄像机的 透镜，并非位置，
+ 为了改变位置或者朝向可以借助于模型视图矩阵相对于摄像机移动场景中的对象，或者通过GL变换，或者用函数gluLookAt().
+因为glFrustum对参数far和near非常敏感，修改near和far则远景可能就影响很大，所以常用于观察近景。
+
+在这个函数中，有六下参数，这六个参数，都不是真实的世界坐标（虽然有些书上说它们是坐标），而指的是到眼睛的平面距离，
+left,right分别指的是左右截面到眼睛(在XY平面上)的距离，这两个数不必一定要对称，甚至两个都可以大于或小于0;
+
+
+
+glViewport(GLint x,GLint y,GLsizei width, GLsizei height);
+glViewport主要完成这样的功能。它负责把视景体截取的图像按照怎样的高和宽显示到屏幕上
+视口变换
+在前面几节内容中已相继提到过视口变换，这一节将针对OpenGL来讲述视口变换的原理及其相关函数的用法。
+运用相机模拟方式，我们很容易理解视口变换就是类似于照片的放大与缩小。
+在计算机图形学中，它的定义是将经过几何变换、投影变换和裁剪变换后的物体显示于屏幕窗口内指定的区域内，这个区域通常为矩形，称为视口。OpenGL中相关函数是：
+这个函数定义一个视口。函数参数(x, y)是视口在屏幕窗口坐标系中的左下角点坐标，参数width和height分别是视口的宽度和高度。
+缺省时，参数值即(0, 0, winWidth, winHeight) 指的是屏幕窗口的实际尺寸大小。所有这些值都是以象素为单位，全为整型数。
+注意：在实际应用中，视口的长宽比率总是等于视景体裁剪面的长宽比率。如果两个比率不相等，那么投影后的图像显示于视口内时会发生变形，如图8-14所示。
+另外，屏幕窗口的改变一般不明显影响视口的大小。
+因此，在调用这个函数时，最好实时检测窗口尺寸，及时修正视口的大小，保证视口内的图像能随窗口的变化而变化，且不变形。
+
+
+【问题】
+我的程序中两个函数顺序如下
+gluPerspective(45.0f,(GLfloat)cx/(GLfloat)cy,0.1f,100.0f)；
+glMatrixMode(GL_MODELVIEW);
+运行可以出来结果。但是我将两个函数顺序改为：
+glMatrixMode(GL_MODELVIEW);
+ gluPerspective(45.0f,(GLfloat)cx/(GLfloat)cy,0.1f,100.0f)；
+为什么就没有图像了呢？还请高人指点小弟（初学opengl）
+【回答】
+GL_MODELVIEW 是模型矩阵 GL_PROJECTION 是投影矩阵。
+gluPerspective的意思是设定投影变换，但要先通过glMatrixMode设定成投影矩阵才可以变换。
+如果你glMatrixMode设定成模型矩阵变换，gluPerspective就不会设定在投影矩阵，而是模型矩阵，导致没有图像。 
+同样于glFrustumf
+//设置投影矩阵
+gl.glMatrixMode(GL10.GL_PROJECTION);
+//重置投影矩阵
+gl.glLoadIdentity();
+// 设置视口的大小
+gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
+// 选择模型观察矩阵
+gl.glMatrixMode(GL10.GL_MODELVIEW);
+// 重置模型观察矩阵
+gl.glLoadIdentity();
+.....
+
+
+

@@ -1,0 +1,291 @@
+发布者：日复一日 
+发布时间：2005-11-08 星期二(Tuesday) 21:31:42 
+出自：日复一日*B&Log 
+网址：http://veekchen.gdcvi.com/ 
+ 
+动态LOD地形渲染是3D网络游戏比较流行用既地形，例如希望online等。
+
+用了两个多星期写了个LOD地形网格，晕了...。经多次改良后，速度不是大问题了！是用扇型画的。
+
+我写的这个LOD相对流行既LOD之下比较容易，但原理差不多！
+
+入正题：
+
+class QuadNode//节点类
+{
+public:
+ bool isLeaf;//是否子节点
+ int nX,nZ;  //节点所的X、Z轴位置
+ int Size;   //节点的跨度大小
+
+public:
+ QuadNode():Level(0), isLeaf(false), nX(0), nZ(0),Size(0){};
+ ~QuadNode(){};
+};
+
+class NodeArray
+{
+public:
+ QuadNode *p;       //节点数组指针
+ int i;             //节点数组下标
+ float tempX, tempZ, tempSize;//临时变量X、Z、Size   用作纹理坐标的定义
+
+public:
+ NodeArray()//初始化i，申请内存
+{
+ i = -1;
+ p = new QuadNode[MAPSIZE * 8];
+}
+ ~NodeArray()；//删除内存，略
+
+ void PushNode(int xCenter, int zCenter,int nSize bool bleaf)
+{
+ i++;//下标＋1
+ ...//写入数据到节点数组中
+}
+//压入数据到数组尾
+ int FindNode(int xCenter, int zCenter);//略
+
+
+//查找节点在节点数组中的位置，返回位置下标，返回－1为查找不到
+ void ClearArray();
+
+//清除数组
+ int Lens();
+
+返回数组长度i＋1
+};
+
+class CTerrain//地形类
+{
+public:
+ NodeArray nodes; //节点数组
+ float *heightmap;//高度图指针，内有数据
+ CCamera *pCamera;//摄像头指针，用来获取摄像头位置
+
+int *pArrayIndices;//节点数组索引
+ int count;        //计数器
+
+public:
+ CTerrain(); 
+ ~CTerrain();
+
+ bool Init();    //初始化数据
+ bool Render();    //渲染地形
+ void GetCameraPointer(CCamera *camera); //获取摄像头指针
+private:
+ //生成节点四叉树
+ void GenQuad(int xCenter, int zCenter, int nSize);
+ //获取x，z在高度图中既高度
+ float GetHeight(int x, int z);
+ //计算节点高度误差
+ float CalcError(int xCenter, int zCenter, int nSize);
+ //下面四个函数作用为修补T型裂缝
+ void RemedyTop(int xCenter,int zCenter,int nSize);
+ void RemedyRight(int xCenter,int zCenter,int nSize);
+ void RemedyBottom(int xCenter,int zCenter,int nSize);
+ void RemedyLeft(int xCenter,int zCenter,int nSize);
+ //设定纹理坐标
+ void SetTexCoord(int xOff, int zOff);
+ //纹理类
+ CTexture tex_surface;
+};
+
+//计算节点高度误差，用作节点评级
+float CTerrain::CalcError(int xCenter, int zCenter, int nSize)
+{
+    float nError = 0;
+    //获取节点四周、中心节点高度
+    float nH0 = GetHeight(xCenter, zCenter);
+    float nH1 = GetHeight(xCenter - size, zCenter - size);
+    float nH2 = GetHeight(xCenter + size, zCenter - size);
+    float nH3 = GetHeight(xCenter + size, zCenter + size);
+    float nH4 = GetHeight(xCenter - size, zCenter + size);
+    //计算节点之间的误差
+    nError  += abs(GetHeight(xCenter, zCenter - size) - (nH1 + nH2) / 2);
+    nError  += abs(GetHeight(xCenter + size, zCenter) - (nH2 + nH3) / 2);
+    nError  += abs(GetHeight(xCenter, zCenter + size) - (nH3 + nH4) / 2);
+    nError  += abs(GetHeight(xCenter - size, zCenter) - (nH4 + nH1) / 2);
+    nError  += abs(GetHeight(xCenter - size / 2,zCenter - size / 2) - (nH0 + nH1) / 2);
+    nError  += abs(GetHeight(xCenter + size / 2,zCenter - size / 2) - (nH0 + nH2) / 2);
+    nError  += abs(GetHeight(xCenter + size / 2,zCenter + size / 2) - (nH0 + nH3) / 2);
+    nError  += abs(GetHeight(xCenter - size / 2,zCenter + size / 2) - (nH0 + nH4) / 2);
+
+    return nError;
+}
+
+void CTerrain::GenQuad(int xCenter, int zCenter, int nSize)
+{
+
+ float nLevel = log(static_cast(nSize));
+ //求网格5个点中高度最大和最小值
+ float nMax =GetHeight(xCenter,xCenter);
+ float nMin = nMax;
+
+    float nH1 = GetHeight(xCenter - nSize,zCenter - nSize);
+ float nH2 = GetHeight(xCenter + nSize,zCenter - nSize);
+ float nH3 = GetHeight(xCenter + nSize,zCenter + nSize);
+ float nH4 = GetHeight(xCenter - nSize,zCenter + nSize);
+
+    if(nMax if(nMax    if(nMax    if(nMax    if(nMin>nH1)nMin = nH1;
+    if(nMin>nH2)nMin = nH2;
+    if(nMin>nH3)nMin = nH3;
+    if(nMin>nH4)nMin = nH4;
+
+//如果此网格不在视野内，返回
+ if(!pCamera->frustum.CuboidInFrustum(&vPoint1, &vPoint2))
+   return ;
+
+if(nSize == 1)
+ {
+  nodes.PushNode(xCenter, zCenter, nSize, true);
+  pArrayIndices[xCenter + zCenter * MAPSIZE] = count;
+  count++;
+  return;//此网格不需要细分
+ }
+
+
+    //网格的中心点坐标
+
+    Vector3d vDst(xCenter ,(nMax + nMin) / 2, zCenter);
+
+ Vector3d vPoint1(xCenter + nSize, nMax, zCenter + nSize);
+ Vector3d vPoint2(xCenter - nSize, nMin, zCenter - nSize);
+
+    //视点到网格中心点的距离
+    float nDist = vDst.dist(pCamera->GetPosition());
+ if(nDist>550.0)//距离大于550.0时才将距离和误差(坡度)2个因素考虑
+    {
+        //与距离成正比,与误差(坡度)成反比,还与当前细分等级有关
+        if(18.0*nDist / nSize / CalcError(xCenter, zCenter, nSize) > nLevel)
+  {   
+   nodes.PushNode(xCenter, zCenter, nSize, true);
+   pArrayIndices[xCenter + zCenter * MAPSIZE] = count;
+   count++;
+   return;//此网格不需要细分
+  }
+    }
+    else//近距离(<550)时只考虑误差(坡度)因素(因为动态LOD会造成地表呼吸现象,为减弱此现象不考虑距离因素)
+    {
+        if(CalcError(xCenter, zCenter, nSize) < 8)
+  {
+   nodes.PushNode(xCenter, zCenter, nSize, true);
+   pArrayIndices[xCenter + zCenter * MAPSIZE] = count;
+   count++;
+   return;//此网格不需要细分
+  }
+    }
+
+    if(nSize > 1)
+ { ////此网格需要细分
+  nodes.PushNode(xCenter, zCenter, nSize, false);
+  pArrayIndices[xCenter + zCenter * MAPSIZE] = count;
+  count++;
+ }
+        //递归4个子网格
+    GenQuad(xCenter - nSize / 2,zCenter - nSize / 2,nSize / 2);
+    GenQuad(xCenter + nSize / 2,zCenter - nSize / 2,nSize / 2);
+    GenQuad(xCenter + nSize / 2,zCenter + nSize / 2,nSize / 2);
+    GenQuad(xCenter - nSize / 2,zCenter + nSize / 2,nSize / 2); 
+
+}
+
+bool CTerrain::Render()
+{
+ //生成地形四叉树节点
+ GenQuad((MAPSIZE - 1) / 2,(MAPSIZE - 1) / 2, (MAPSIZE - 1) / 2, 9);
+
+ glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+ 
+ tex_surface.Bind(2);
+ int lenth;
+ lenth = nodes.Lens(); 
+ if(lenth == 0)
+  return false;
+
+ for(int x = 0; x < lenth; x++)
+ {
+  if(nodes.p[x].isLeaf)
+  {
+   nodes.tempSize = static_cast(nodes.p[x].Size);
+   nodes.tempX  = static_cast(nodes.p[x].nX);
+   nodes.tempZ  = static_cast(nodes.p[x].nZ);
+
+   glBegin(GL_TRIANGLE_FAN);
+   SetTexCoord(nodes.p[x].nX, nodes.p[x].nZ);  // center            glVertex3i (nodes.p[x].nX, GetHeight(nodes.p[x].nX, nodes.p[x].nZ), nodes.p[x].nZ);
+
+   SetTexCoord(nodes.p[x].nX - nodes.p[x].Size, nodes.p[x].nZ - nodes.p[x].Size); //left top
+            glVertex3i(nodes.p[x].nX - nodes.p[x].Size, GetHeight(nodes.p[x].nX - nodes.p[x].Size, nodes.p[x].nZ - nodes.p[x].Size) , nodes.p[x].nZ - nodes.p[x].Size);
+   
+   RemedyLeft(nodes.p[x].nX - 2 * nodes.p[x].Size, nodes.p[x].nZ, nodes.p[x].Size);//left
+   
+   SetTexCoord(nodes.p[x].nX - nodes.p[x].Size, nodes.p[x].nZ + nodes.p[x].Size);//left bottom 
+            glVertex3i(nodes.p[x].nX - nodes.p[x].Size, GetHeight(nodes.p[x].nX - nodes.p[x].Size, nodes.p[x].nZ + nodes.p[x].Size), nodes.p[x].nZ + nodes.p[x].Size);
+
+   RemedyBottom(nodes.p[x].nX, nodes.p[x].nZ + 2 * nodes.p[x].Size, nodes.p[x].Size);//bottom
+            
+   SetTexCoord(nodes.p[x].nX + nodes.p[x].Size, nodes.p[x].nZ + nodes.p[x].Size); //right bottom
+            glVertex3i(nodes.p[x].nX + nodes.p[x].Size, GetHeight(nodes.p[x].nX + nodes.p[x].Size, nodes.p[x].nZ + nodes.p[x].Size), nodes.p[x].nZ + nodes.p[x].Size);
+  
+   RemedyRight(nodes.p[x].nX + 2 * nodes.p[x].Size, nodes.p[x].nZ, nodes.p[x].Size); //right
+
+   SetTexCoord(nodes.p[x].nX + nodes.p[x].Size, nodes.p[x].nZ - nodes.p[x].Size); //right top
+            glVertex3i(nodes.p[x].nX + nodes.p[x].Size, GetHeight(nodes.p[x].nX + nodes.p[x].Size, nodes.p[x].nZ - nodes.p[x].Size), nodes.p[x].nZ - nodes.p[x].Size);
+
+
+   RemedyTop(nodes.p[x].nX, nodes.p[x].nZ - 2 * nodes.p[x].Size, nodes.p[x].Size);  //top
+
+   SetTexCoord(nodes.p[x].nX - nodes.p[x].Size, nodes.p[x].nZ - nodes.p[x].Size); //left top
+            glVertex3i(nodes.p[x].nX - nodes.p[x].Size, GetHeight(nodes.p[x].nX - nodes.p[x].Size, nodes.p[x].nZ - nodes.p[x].Size), nodes.p[x].nZ - nodes.p[x].Size);
+
+            glEnd();         
+
+ nodes.ClearArray();//清除节点数组数据
+
+ return true;
+}
+
+//修补T型裂缝，用二叉树中根遍历节点，其他Left、Right、Bottom等函数类推
+void CTerrain::RemedyTop(int xCenter, int zCenter, int nSize)
+{
+if(xCenter < 0 || zCenter < 0) return;
+ if(xCenter > MAPSIZE || zCenter > MAPSIZE) return;
+ int index = pArrayIndices[xCenter + zCenter * MAPSIZE]; //查找此节点在节点数组中的位置
+ if(index == -1 )    //检查此节点是否存在
+  return;
+ if(nodes.p[index].isLeaf)   //检查此节点是否为子节点
+  return;
+
+ //二叉遍历顶部相邻的节点
+ RemedyTop(xCenter + nSize / 2, zCenter + nSize / 2, nSize / 2);
+ SetTexCoord(xCenter, zCenter + nSize);  //设置纹理坐标u，v
+ glVertex3i(xCenter, GetHeight(xCenter, zCenter + nSize), zCenter + nSize);
+ RemedyTop(xCenter - nSize / 2, zCenter + nSize / 2, nSize / 2);
+}
+
+近距离三角形数量多，地形达到最大分辨
+
+
+
+
+
+距离拉远，三角形数量减少，地形顶部分辨率明显减低
+
+
+
+距离较远，三角形数量减少，远处地形变得平坦
+
+
+
+距离很远，整个网格的三角形数量骤减，整体地形更加平坦
+
+
+
+距离最远时，三角形数量最少，为两个
+
+
+
+
+  }
+ }  
+http://veekchen.gdcvi.com/?CH=Print.Preview&ArticleID=15566

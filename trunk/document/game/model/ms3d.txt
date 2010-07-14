@@ -1,0 +1,398 @@
+OPhone 3D开发之解析渲染MS3D模型
+http://www.vvcha.cn/c.aspx?id=8759
+
+【MilkShape 3D之ms3d格式】
+NeHe OpenGL教程第三十一课，DancingWind翻译
+http://www.owlei.com/DancingWind/Course/Tutorial_31.htm
+
+MilkShape 3D Tutorials
+http://chumbalum.swissquake.ch/ms3d/tutorials.html
+
+java3D MS3DLoader
+http://www.koders.com/java/fidDC840EB90C3690DC5770ED5240E449C4C2E1064D.aspx?s=Frame.1
+
+ 近期在研究Skeletal Animation（骨骼动画） 
+http://blog.csdn.net/skyman_2001/archive/2006/05/23/750893.aspx
+
+Project: Milkshape3D Loader
+http://bloody-blades.de/home/Project__Milkshape3D_Loader.html
+
+Milkshape 3D Loader for Java3D
+http://www.duling.us/kevin/Java3D/Milkshape/index.html
+
+ms3d骨骼动画的DirectX实现
+http://bbs.gameres.com/showthread.asp?threadid=45227
+
+因此第一个步骤是将骨骼搭建起来。 步骤一：初始化骨骼和绑定顶点
+void SetupJointMatrices(CMS3DFile *mesh)
+{
+先为每个节点设置三个矩阵，分别是 绝对矩阵_absoluteJointMatrices，这个矩阵里面包含了改节点的变换
+和他的绝对位置 相对变换矩阵_relativeJointMatrices ，这个就是前面例子里的“高两
+个台阶”的概念 最终变换矩_finalJointMatrices ，这个的作用是将前面所有变化累积
+起来。
+
+
+mesh->_absoluteJointMatrices = new mat4[mesh->GetNumJoints()]; mesh->_relativeJointMatrices = new mat4[mesh->GetNumJoints()]; mesh->_finalJointMatrices = new mat4[mesh->GetNumJoints()];
+
+
+接着遍历每一个节点，这里 ms3d 里的第一个节点就是根节点
+for(int i = 0; i <mesh->GetNumJoints(); i++)
+{
+mat4 relativeMatrix; 设置一个暂时的变化矩阵 mat4_identity( relativeMatrix);	单位化！！这步要严谨 ms3d_joint_t *jt;
+mesh->GetJointAt(i, &jt); 下面的函数如前面概念一是将旋转矩阵 R 和平移矩阵 T 合为矩阵 M mat4_rotateX(relativeMatrix, jt->rotation[0]); mat4_rotateY(relativeMatrix, jt->rotation[1]); mat4_rotateZ(relativeMatrix, jt->rotation[2]);
+ 
+mat4_translate(relativeMatrix,jt->position[0], jt->position[1], jt->position[2]);
+if(strcmp(jt->parentName,"") == 0 ) 判断是不是根节点
+{ 如果是根关节那么它的绝对矩阵就是它的相对变换矩阵
+mat4_copy(mesh->_absoluteJointMatrices[i],relativeMatrix);
+}
+else
+{
+否者的如果是子关节，那么将上一个节点的绝对矩阵乘上这个节点的变幻矩 阵就可以得到这个子节点的绝对矩阵了.这就好比上面例子告诉我的得知前一个人的台阶根 据“高 2 个台阶”的规律得到这个认得台阶。
+
+
+int index =	mesh->FindJointByName(jt->parentName);
+mat4 temp;
+
+
+mat4_multiply( mesh->_absoluteJointMatrices[index],relativeMatrix,temp);
+mat4_copy(mesh->_absoluteJointMatrices[i],temp);
+} 将相对相对矩阵保存起来方便运算以后的总变换
+mat4_copy(mesh->_relativeJointMatrices[i],relativeMatrix);
+>_absoluteJointMatrices[i]);
+
+
+}
+
+
+}
+通过这步骨骼被搭建起来了，所有节点绝对矩阵_absoluteJointMatrices 里都可以看 到节点的准确位置。这个骨骼被准确的摆放成了你模型里的标准姿势，而以后的变换都是根 据这个标准变幻的，注意你不需要每次都改变节点的绝对，这样做的后果是模型骨骼变化古 怪，顶点也是一样的，每次顶点都是通过标准姿势变化的带的。
+
+
+下面代码是通过计算标准位置的时候顶点对与其绑定节点的相对坐标。
+void SetupVertices(CMS3DFile *mesh)
+{
+遍历每一个顶点
+for(size_t j=0;j<mesh->GetNumVertices();j++)
+{
+ms3d_triangle_t *mTr;
+ms3d_vertex_t	*mVt;
+mesh->GetVertexAt(j,&mVt);
+vec4 v,v2,v1; mat4 matrix; mat4 matrix2;
+if(mVt[j].boneId >= 0)
+ 
+{
+
+
+mat4_copy(matrix,mesh->_absoluteJointMatrices[mVt->boneId]);
+mat4_inverse(matrix,matrix2);求对以节点的逆矩阵 vec4_fromXYZ(v1,mVt->vertex[0], mVt->vertex[1], mVt->vertex[2]); 根据上面的概念二，我通过步得到了顶点对于节点的位置坐标。 mat4_transform(matrix2,v1,v2);
+mVt->vertex[0]=v2[0]; mVt->vertex[1]=v2[1]; mVt->vertex[2]=v2[2];
+
+
+}
+}
+
+
+}
+
+通过以上两部节点建立，顶点绑定，这个时候准备工作已经完成，接下来需要进行动画， 步骤二、更新节点的绝对变换
+前面说过节点的绝对变换矩阵里面包含节点的位置信息，转动信息，和其父节点的变化，也 就是说只要我们根据动画的关节帧，以正确的顺序遍历所有节点，并且根据前一个节点变换 后的矩阵乘以次节点对以前一个节点的相对变换，那么我们就刷新了所有骨骼的位置。如下 代码：
+
+
+void AdvanceAnimation(CMS3DFile *mesh)
+
+{	遍历所有节点
+
+
+for(int i=0;i< mesh->GetNumJoints();i++)
+
+
+{
+
+
+mesh->GetJointAt(i,&jt);
+
+mat4_identity(keyFrameMatrix);  建立一个缓存用的 keyFrameMatrix（相对变换矩阵）
+
+
+if(jt->numKeyFramesRot == 0 && jt->numKeyFramesTrans == 0)
+
+{	如果这个模型的转动帧和移动帧为0 ，那么直接吧骨骼的绝对矩阵复制到
+_finalJointMatrices 最终变换矩阵里。continue 跳过后面的骨骼刷性。
+
+
+mat4_copy(mesh->_finalJointMatrices[i] ,mesh->_absoluteJointMatrices[i]);
+
+
+continue;
+ 
+}
+
+一下很长的一步识读取关键帧，计算中间差值，这一部是通过计算两个关键帧直接的 时间差和变化差之的关系，求出该时刻的转动和移动程度是多少。如果你对下面有了解可以 略过。
+
+frame=mesh->m_currentTranslationKeyframe[i];  首先或者移动的关键帧数
+
+
+while ( frame < jt->numKeyFramesTrans && jt->keyFramesTrans[frame].time < time )
+
+
+{
+
+frame++;不断循环找到现在所在关键帧的位置。
+
+
+}
+
+
+mesh->m_currentTranslationKeyframe[i] = frame;
+
+
+if(frame==0)
+
+{  、、如果是第一帧那么保持标准姿势不变 p[0]=jt->keyFramesTrans[frame].position[0]; p[1]=jt->keyFramesTrans[frame].position[1]; p[2]=jt->keyFramesTrans[frame].position[2];
+}
+
+
+else if( frame ==jt->numKeyFramesTrans)
+
+
+{
+
+如果是最后一帧，减一，此步骤防止程序指针越界
+
+
+p[0]=jt->keyFramesTrans[frame-1].position[0]; p[1]=jt->keyFramesTrans[frame-1].position[1]; p[2]=jt->keyFramesTrans[frame-1].position[2];
+}else
+
+
+{
+
+如果现在帧在两个关键帧之间开始刷新骨骼。
+ 
+ms3d_keyframe_pos_t &curFrame=jt->keyFramesTrans[frame]; ms3d_keyframe_pos_t &prevFrame=jt->keyFramesTrans[frame-1]; float timeDelta = curFrame.time-prevFrame.time;
+计算差值，原理很简单看下一句代码你就知道了
+
+
+float interpValue = ( float )(( time-prevFrame.time )/timeDelta ); p[0]=prevFrame.position[0]+( curFrame.position[0]-prevFrame.position[0] )*interpValue;; p[1]=prevFrame.position[1]+( curFrame.position[1]-prevFrame.position[1] )*interpValue;;
+p[2]=prevFrame.position[2]+( curFrame.position[2]-prevFrame.position[2] )*interpValue;;
+
+保存三个方向的变化值
+
+
+
+
+
+}
+
+以下步骤同上是求旋转的变换
+
+
+frame =mesh-> m_currentRotationKeyframe[i];
+
+
+while ( frame < jt->numKeyFramesRot&& jt->keyFramesRot[frame].time < time )
+
+
+{
+
+
+frame++;
+
+
+}
+
+
+mesh->m_currentRotationKeyframe[i] = frame;
+
+
+if ( frame == 0 )
+
+
+{		r[0]=jt->keyFramesRot[frame].rotation[0]; r[1]=jt->keyFramesRot[frame].rotation[1]; r[2]=jt->keyFramesRot[frame].rotation[2];
+ 
+}else if(frame == jt->numKeyFramesRot)
+
+
+{		r[0]=jt->keyFramesRot[frame-1].rotation[0]; r[1]=jt->keyFramesRot[frame-1].rotation[1]; r[2]=jt->keyFramesRot[frame-1].rotation[2];
+}else
+
+
+{	ms3d_keyframe_rot_t &curFrame = jt->keyFramesRot[frame];
+
+
+ms3d_keyframe_rot_t &prevFrame = jt->keyFramesRot[frame-1];
+
+
+float timeDelta = curFrame.time-prevFrame.time;
+
+
+float interpValue = ( float )(( time-prevFrame.time )/timeDelta );
+
+
+r[0]=
+prevFrame.rotation[0]+( curFrame.rotation[0]-prevFrame.rotation[0] )*interpValue;
+
+
+r[1]	=
+prevFrame.rotation[1]+( curFrame.rotation[1]-prevFrame.rotation[1] )*interpValue;
+
+
+r[2]	=
+prevFrame.rotation[2]+( curFrame.rotation[2]-prevFrame.rotation[2] )*interpValue;
+
+保存了三个旋转变换
+
+
+}
+
+
+setRotationRadians(keyFrameMatrix,r);
+
+
+setTranslation(keyFrameMatrix,p);
+
+
+上面两个步骤是将旋转变换和平移变换放置到 keyFrameMatrix（用之前别忘了单位 化）中
+
+
+
+
+mat4 finalRelativeMatrix,mt;设置一个缓存用的最终变换矩阵
+
+mat4_multiply2(mesh->_relativeJointMatrices[i],keyFrameMatrix,mt);  通过矩阵乘法将 前面（初始化时候）求的 relativeJointMatrices（相对变换矩阵）和此时动画的变换矩阵累积 起来，成为最终的相对变换矩阵。
+ 
+mat4_copy(finalRelativeMatrix,mt);
+
+
+if(strcmp(jt->parentName,"") == 0)
+
+{这个时候要判断如果是第一个节点那么最终变换矩阵就是他的最终的相对变换矩阵
+
+
+mat4_copy(mesh->_finalJointMatrices[i],finalRelativeMatrix);
+
+
+}
+
+
+else
+
+
+{
+
+如果不是跟节点那么将他的最终的相对变换矩阵乘以父节点的最终变换矩阵就可 以得到次节点的最终变换矩阵，原理和前面设置节点的步骤一样
+
+
+int index =	mesh->FindJointByName(jt->parentName);
+
+
+mat4 tm;
+
+
+mat4_multiply2(mesh->_finalJointMatrices[index],finalRelativeMatrix,tm);
+
+
+mat4_copy(mesh->_finalJointMatrices[i],tm); } }}
+
+
+刷新骨骼后那么节点会根据每次累积的变换从标准姿势摆放到对应位置，记住！不要改 变相对变换矩阵_relativeJointMatrices[i]和最终变换矩阵_absoluteJointMatrices[i]。应为这两 个数据保存了节点的标准状态和节点间的相对变换。
+步骤三、渲染顶点。 这里定点的信息其实在之前的初始化顶点的时候全部改变了，他里面保存的数据并不是
+顶点的绝对坐标，而是相对于骨骼的相对坐标，这是为了方便后面的新的顶点位置的计算，
+我们不需要考虑节点变换了多少，只需要将节点的最终变换矩阵乘以顶点的相对位置就可以 求出新的顶点绝对坐标（世界坐标）了。
+
+代码如下：
+
+
+glBegin(GL_TRIANGLES);
+
+
+for(size_t i=0;i <Gn;i++)
+
+{	遍历所有组
+
+
+ms3d_group_t *mGp;
+ 
+mesh->GetGroupAt(i,&mGp); glBindTexture(GL_TEXTURE_2D, mesh->texture[Gn]); for(size_t j=0;j<mGp->numtriangles;j++)
+{
+
+遍历所有三角形
+
+
+ms3d_triangle_t *mTr;
+
+
+ms3d_vertex_t	*mVt[3];
+
+
+mesh->GetTriangleAt(mGp->triangleIndices[j],&mTr); mesh->GetVertexAt(mTr->vertexIndices[0],&mVt[0]); mesh->GetVertexAt(mTr->vertexIndices[1],&mVt[1]); mesh->GetVertexAt(mTr->vertexIndices[2],&mVt[2]);
+
+
+
+float nv1[3],nv2[3],nv3[3];
+
+
+vec4 v1,v2;
+
+
+mat4 matrix;
+
+或者顶点绑定的骨骼最终变化矩阵
+
+
+mat4_copy(matrix,mesh->_finalJointMatrices[mVt[0]->boneId]);
+
+
+vec4_fromXYZ(v1,mVt[0]->vertex[0], mVt[0]->vertex[1], mVt[0]->vertex[2]);
+
+mat4_transform2(matrix,v1,v2);这部是关键，计算顶点最新的位子
+
+nv1[0]=v2[0];nv1[1]=v2[1];nv1[2]=v2[2];  注意！不要覆盖顶点的原始信息， 应为我们的相对位置没有改变，改变的只是变化矩阵，所以为了不改变顶点，我们需要用一 个新的变量保存
+
+一下是 OpenGL 渲染步骤
+
+
+mat4_copy(matrix,mesh->_finalJointMatrices[mVt[1]->boneId]);
+
+
+vec4_fromXYZ(v1,mVt[1]->vertex[0], mVt[1]->vertex[1], mVt[1]->vertex[2]);
+ 
+mat4_transform2(matrix,v1,v2);
+
+
+nv2[0]=v2[0];nv2[1]=v2[1];nv2[2]=v2[2];
+
+
+
+
+
+mat4_copy(matrix,mesh->_finalJointMatrices[mVt[2]->boneId]); vec4_fromXYZ(v1,mVt[2]->vertex[0], mVt[2]->vertex[1], mVt[2]->vertex[2]); mat4_transform2(matrix,v1,v2);
+
+
+
+nv3[0]=v2[0];nv3[1]=v2[1];nv3[2]=v2[2]; glTexCoord2f(mTr->s[0],1.0f - mTr->t[0]); glVertex3fv(nv1);
+
+
+
+glTexCoord2f(mTr->s[1],1.0f - mTr->t[1]);
+
+
+glVertex3fv(nv2);
+
+
+
+
+
+glTexCoord2f(mTr->s[2],1.0f - mTr->t[2]);
+
+
+glVertex3fv(nv3);
+
+
+}
+
+
+}
+
+
+glEnd();

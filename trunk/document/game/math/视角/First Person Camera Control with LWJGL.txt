@@ -1,0 +1,153 @@
+This tutorial will show you a way of implementing a first person camera control system in Java using the Lightweight Java Game Library (LWJGL).
+
+We will make a class called FPCameraController that has 3 propertys:
+position - A vector that will store the x, y and z co-ords of the camera. 
+yaw - A float that will store the yaw (y axis rotation) of the camera. 
+pitch - A float that will store the pitch (x axis rotation) of the camera. 
+We do not need to store the roll (z rotation) as a First person camera will not roll (tilt) but you could add this if you want your camera to tilt (some games use tilt to peek around corners). import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector3f;
+
+//First Person Camera Controller
+public class FPCameraController
+{
+    //3d vector to store the camera's position in
+    private Vector3f    position    = null;
+    //the rotation around the Y axis of the camera
+    private float       yaw         = 0.0f;
+    //the rotation around the X axis of the camera
+    private float       pitch       = 0.0f;
+Now we will make the constructor that will take 3 float values as params: x, y and z. They will be the starting location of the camera.     //Constructor that takes the starting x, y, z location of the camera
+    public FPCameraController(float x, float y, float z)
+    {
+        //instantiate position Vector3f to the x y z params.
+        position = new Vector3f(x, y, z);
+    }
+Next we will make yaw and pitch methods, these will be used to controll the rotation of the camera. They will both take a float param: amount. This value will be the y movment of the mouse for the pitch method and the x movment of the param for the yaw method.     //increment the camera's current yaw rotation
+    public void yaw(float amount)
+    {
+        //increment the yaw by the amount param
+        yaw += amount;
+    }
+
+    //increment the camera's current yaw rotation
+    public void pitch(float amount)
+    {
+        //increment the pitch by the amount param
+        pitch += amount;
+    }
+Next we will make the walking methods tipicly bound to the WASD keys. The methods will need to calculate to how much on the x and z axsis the camera will need to move as the movement is relitive to the the current yaw (y rotation) of the camera. For example if have turned the camera 45d to the right when you move forward you will half the amount on the z axsis and half on the y axis (diagonal).
+This is calculation is done using basic trigonometry. If we know the distance we want to move and the angle we want to move at (yaw) we can calculate how far to move with in the x and z axis like this:
+x = distance * sin(yaw)
+z = distance * cos(yaw)     //moves the camera forward relitive to its current rotation (yaw)
+    public void walkForward(float distance)
+    {
+        position.x -= distance * (float)Math.sin(Math.toRadians(yaw));
+        position.z += distance * (float)Math.cos(Math.toRadians(yaw));
+    }
+
+    //moves the camera backward relitive to its current rotation (yaw)
+    public void walkBackwards(float distance)
+    {
+        position.x += distance * (float)Math.sin(Math.toRadians(yaw));
+        position.z -= distance * (float)Math.cos(Math.toRadians(yaw));
+    }
+
+    //strafes the camera left relitive to its current rotation (yaw)
+    public void strafeLeft(float distance)
+    {
+        position.x -= distance * (float)Math.sin(Math.toRadians(yaw-90));
+        position.z += distance * (float)Math.cos(Math.toRadians(yaw-90));
+    }
+
+    //strafes the camera right relitive to its current rotation (yaw)
+    public void strafeRight(float distance)
+    {
+        position.x -= distance * (float)Math.sin(Math.toRadians(yaw+90));
+        position.z += distance * (float)Math.cos(Math.toRadians(yaw+90));
+    }
+
+Next we will write a method that will be used to translate and rotate the modelview matrix so that we will look threw the camera.     //translates and rotate the matrix so that it looks through the camera
+    //this dose basic what gluLookAt() does
+    public void lookThrough()
+    {
+        //roatate the pitch around the X axis
+        GL11.glRotatef(pitch, 1.0f, 0.0f, 0.0f);
+        //roatate the yaw around the Y axis
+        GL11.glRotatef(yaw, 0.0f, 1.0f, 0.0f);
+        //translate to the position vector's location
+        GL11.glTranslatef(position.x, position.y, position.z);
+    }
+
+}
+This class would be used in the games main loop runing the lookThrough() method before anything is renderd and with the movement and run from rotation methods run bassed on key presses and mouse movement. This is what a game loop might look like using this class.     public void gameLoop()
+    {
+        FPCameraController camera = new FPCameraController(0, 0, 0);
+
+        float dx        = 0.0f;
+        float dy        = 0.0f;
+        float dt        = 0.0f; //length of frame
+        float lastTime  = 0.0f; // when the last frame was
+        float time      = 0.0f;
+
+        float mouseSensitivity = 0.05f;
+        float movementSpeed = 10.0f; //move 10 units per second
+
+        //hide the mouse
+        Mouse.setGrabbed(true);
+
+        // keep looping till the display window is closed the ESC key is down
+        while (!Display.isCloseRequested() &&
+                !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
+        {
+            time = Sys.getTime();
+            dt = (time - lastTime)/1000.0f;
+            lastTime = time;
+
+
+            //distance in mouse movement from the last getDX() call.
+            dx = Mouse.getDX();
+            //distance in mouse movement from the last getDY() call.
+            dy = Mouse.getDY();
+
+            //controll camera yaw from x movement fromt the mouse
+            camera.yaw(dx * mouseSensitivity);
+            //controll camera pitch from y movement fromt the mouse
+            camera.pitch(dy * mouseSensitivity);
+
+
+            //when passing in the distrance to move
+            //we times the movementSpeed with dt this is a time scale
+            //so if its a slow frame u move more then a fast frame
+            //so on a slow computer you move just as fast as on a fast computer
+            if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
+            {
+                camera.walkForward(movementSpeed*dt);
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards
+            {
+                camera.walkBackwards(movementSpeed*dt);
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left
+            {
+                camera.strafeLeft(movementSpeed*dt);
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right
+            {
+                camera.strafeRight(movementSpeed*dt);
+            }
+
+            //set the modelview matrix back to the identity
+            GL11.glLoadIdentity();
+            //look through the camera before you draw anything
+            camera.lookThrough();
+            //you would draw your scene here.
+
+            //draw the buffer to the screen
+            Display.update();
+        }
+
+    }
+If there are any problems, questions and or sugestions about this tutorial please leave a comment. 
+Comments
+
+http://lloydgoodall.com/lwjgl-fpcamera.shtml
