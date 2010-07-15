@@ -1,0 +1,2 @@
+Please notice that GL_FOG_DENSITY is only used by the modes GL_EXP, GL_EXP2. 
+Similarly, GL_FOG_START and GL_FOG_END are only used with GL_LINEAR.

@@ -1,7 +1,15 @@
 14. OpenGL Fog
 Posted on : 25-03-2010 | By : Swiftless | In : OpenGL
 Tags: fog, OpenGL, programming, tutorial3
-This tutorial will teach you how to create basic opengl fog. Fog is used in most games, to help simulate both the size and reality of an area. For the fog to work well do this: Enable the opengl depth testing, enable the opengl fog, choose the opengl fog mode, choose the opengl fog color, choose the opengl fog density and set how well we want our opengl fog to look. You can also set the starting and ending distances for the fog, but this is enough for now.
+This tutorial will teach you how to create basic opengl fog. 
+Fog is used in most games, to help simulate both the size and reality of an area. 
+For the fog to work well do this: 
+Enable the opengl depth testing, 
+enable the opengl fog, 
+choose the opengl fog mode, 
+choose the opengl fog color, 
+choose the opengl fog density and set how well we want our opengl fog to look. 
+You can also set the starting and ending distances for the fog, but this is enough for now.
 
 To get started we need some variables for the fog colour and
 
