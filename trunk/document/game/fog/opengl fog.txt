@@ -1,0 +1,292 @@
+14. OpenGL Fog
+Posted on : 25-03-2010 | By : Swiftless | In : OpenGL
+Tags: fog, OpenGL, programming, tutorial3
+This tutorial will teach you how to create basic opengl fog. Fog is used in most games, to help simulate both the size and reality of an area. For the fog to work well do this: Enable the opengl depth testing, enable the opengl fog, choose the opengl fog mode, choose the opengl fog color, choose the opengl fog density and set how well we want our opengl fog to look. You can also set the starting and ending distances for the fog, but this is enough for now.
+
+To get started we need some variables for the fog colour and
+
+the density of the fog. I have done it with this:
+
+GLfloat density = 0.3;
+
+GLfloat fogColor[4] = {0.5, 0.5, 0.5, 1.0}; 
+
+The fog colour is written in four parts, they cover the RGB values
+
+Unfortunately I have been unable to find out what the fourth value
+
+does. Next we have the density which sets how thick our fog is.
+
+If you run the application you can acctually see that a density of 0.3 is acctually
+
+quite thick.
+
+After this we enable our fog and set its parameters.
+
+First off we enable the fog.
+
+glEnable (GL_FOG);
+
+Now we set the fog mode, here i have set it to GL_EXP2, which is quite nice looking.
+
+glFogi (GL_FOG_MODE, GL_EXP2);
+
+Here we set the actual colour of our fog.
+
+glFogfv (GL_FOG_COLOR, fogColor);
+
+Now the density.
+
+glFogf (GL_FOG_DENSITY, density);
+
+And here I have set it up to look the nicest. In large projects, this may slow
+
+down you application.
+
+glHint (GL_FOG_HINT, GL_NICEST);
+
+There are a few other options but I will explain them in the next Fog tutorial.
+
+I will just let you get a grasp at this basic concept before I complicate it
+
+just a little more.
+
+If you have any problems, please email me at swiftless@gmail.com
+
+1.
+
+2.
+
+3.
+
+4.
+
+5.
+
+6.
+
+7.
+
+8.
+
+9.
+
+10.
+
+11.
+
+12.
+
+13.
+
+14.
+
+15.
+
+16.
+
+17.
+
+18.
+
+19.
+
+20.
+
+21.
+
+22.
+
+23.
+
+24.
+
+25.
+
+26.
+
+27.
+
+28.
+
+29.
+
+30.
+
+31.
+
+32.
+
+33.
+
+34.
+
+35.
+
+36.
+
+37.
+
+38.
+
+39.
+
+40.
+
+41.
+
+42.
+
+43.
+
+44.
+
+45.
+
+46.
+
+47.
+
+48.
+
+49.
+
+50.
+
+51.
+
+52.
+
+53.
+
+54.
+
+55.
+
+56.
+
+57.
+
+58.
+
+59.
+
+60.
+
+61.
+
+62.
+
+63.
+
+64.
+
+65.
+
+66.
+   #include <GL/gl.h>
+
+#include <GL/glut.h>
+
+GLfloat angle = 0.0;
+
+GLfloat density = 0.3; //set the density to 0.3 which is
+acctually quite thick
+
+GLfloat fogColor[4] = {0.5, 0.5, 0.5, 1.0}; //set the for
+color to grey
+
+void cube (void) {
+
+glRotatef(angle, 1.0, 0.0, 0.0);
+
+glRotatef(angle, 0.0, 1.0, 0.0);
+
+glRotatef(angle, 0.0, 0.0, 1.0);
+
+glColor3f(1.0, 0.0, 0.0);
+
+glutSolidCube(2);
+
+}
+
+void init (void) {
+
+glEnable (GL_DEPTH_TEST); //enable the depth testing
+
+glEnable (GL_FOG); //enable the fog
+
+glFogi (GL_FOG_MODE, GL_EXP2); //set the fog mode to GL_EXP2
+
+
+glFogfv (GL_FOG_COLOR, fogColor); //set the fog color to
+our color chosen above
+
+glFogf (GL_FOG_DENSITY, density); //set the density to the
+value above
+
+glHint (GL_FOG_HINT, GL_NICEST); // set the fog to look the
+nicest, may slow down on older cards
+
+}
+
+void display (void) {
+
+glClearColor (0.0,0.0,0.0,1.0);
+
+glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+glLoadIdentity();
+
+gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+cube();
+
+glutSwapBuffers();
+
+angle ++;
+
+}
+
+void reshape (int w, int h) {
+
+glViewport (0, 0, (GLsizei)w, (GLsizei)h);
+
+glMatrixMode (GL_PROJECTION);
+
+glLoadIdentity ();
+
+gluPerspective (60, (GLfloat)w / (GLfloat)h, 1.0, 100.0);
+
+glMatrixMode (GL_MODELVIEW);
+
+}
+
+int main (int argc, char **argv) {
+
+glutInit (&argc, argv);
+
+glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH
+);
+
+glutInitWindowSize (500, 500);
+
+glutInitWindowPosition (100, 100);
+
+glutCreateWindow (¡°A basic OpenGL Window¡°);
+
+init ();
+
+glutDisplayFunc (display);
+
+glutIdleFunc (display);
+
+glutReshapeFunc (reshape);
+
+glutMainLoop ();
+
+return 0;
+
+}
+ 
+http://www.swiftless.com/tutorials/opengl/fog.html
