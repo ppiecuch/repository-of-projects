@@ -1,0 +1,117 @@
+Home FAQ Contact Search
+ 
+
+Water Rendering and Simulation
+The color of water is influenced by a very large number of factors, especially by sky color and light conditions, so it's radically different on a sunny day vs. an overcast day. 
+Realtime
+Scalable Real-Time Animation of Rivers, Yu, Neyret, Bruneton and Holzschuch, 2009
+Treats the terrain and river as purely 2D, doing fluid flow calculation of sparese particles, then renders those as "wave sprites". 
+Looks nice, and very dynamic, although not particularly realistic. 
+ 
+Realistic and Interactive Simulation of Rivers, Peter Kipfer and R¨¹diger Westermann, 2006
+From the abstract: Describes realtime physics-based simulation and realistic rendering of rivers using Smoothed Particle Hydrodynamics.  Claims their method of generating the surface is far faster than the Marching Cubes. approach, and is well suited for rendering. 
+The demo video shows very tiny shallow streams of water, which look rather unstable and artificial.  The larger area demos (for a valley and flooding) also looks unstable and less realistic than a simple water heightfield. 
+GPU water simulation, Peter Trier and Karsten Noe, 2005
+open-source implementation of the 2D Kass et al. shallow water simulation, with downloadable demo, with accompanying academic paper (pdf) 
+'In the simulation we use Jacobi iteration for solving linear systems. For the visualization we use a method based on the refraction and reflection of light on the water surface.' 
+requires an Nvidia Geforce 6200 or newer (it didn't run on my ATI Radeon 9800) 
+Real-time water rendering - projected grid concept, 2004
+thesis project of Claes Johanson, Sweden, building on previous 'projected grid' work 
+includes binaries and DX9 source for a method of using the GPU to create an animated water surface, using "a grid mesh whose vertices are even-spaced, not in world-space, but in post-perspective camera space." 
+result is very smooth, with great reflection/refraction appearance 
+Real-Time Fluid Dynamics for Games, Jos Stam, GDC 2003
+Jos extends his amazing Siggraph work into fast, stable and simple implementation of 2D fluids 
+C example code is included, both in the paper and linked from his publications page 
+numerous extensions of the code are described, including 3D fluids and more realistic solutions 
+Interactive Animation of Ocean Waves, 2002
+Damien Hinsinger, Fabrice Neyret, Marie-Paule Cani published the concept of a projected grid for realtime water, which restricts computations to the visible part of the ocean surface, adapts the geometric resolution to the viewing distance and only considers the visible waves wavelengths. 
+CHENGINE 
+implementation by Gottfried Chen of several of the known realtime algorithms 
+made the flipCode Image of the Day 3/3/2002 
+"source code for the water algos can be downloaded and used for free" 
+Deep-Water Animation and Rendering
+Gamasutra article on realtime water, Sept. 2001 
+rather heavy on math (perhaps unavoidably so) 
+has example images, but no animations or source code 
+good reference section, especially: 
+Jerry Tessendorf. ¡°Simulating Ocean Water¡± SIGGRAPH 2001/2004
+(pdfs online at FVT: course materials) 
+Water-Fire-Sky at Bonzai Software
+demonstrates the realistic rendering of clean and foggy water, Fire and Sky (OpenGL) 
+A tutorial about the water effect is included 
+uses GL_ARB_vertex_program and GL_ARB_fragment_program 
+Joe Dart's RoamAlaska water demo
+an open-source implementation which follows the Tessendorf paper for the basic approach, uses a take-off on Gottfried Chen's algorithm, and Paul Bourke's FFT function 
+downloadable from here: source (33k), binaries (481k), and data (3 MB) 
+parent site: Roam Alaska 
+demo uses OpenGL, GLUT, and glew; compiles on Windows but is mostly portable 
+NVIDIA's Cg is used for the bottom refraction; it appears to work on both contemporary GeForce and Radeon cards 
+Typhoon is a realtime terrain engine with an emphasis on sophisticated water rendering
+waves, reflections, caustics, diffraction, floating particles 
+written with C++ and DX9 vertex and pixel shaders 
+OpenGL-rendering of Underwater Caustics
+tutorial by Mark Kilgard (of SGI/NVidia) 
+includes source code and sample caustic textures 
+Old/Historical
+OceanBump
+shows how to use SGI Performer to approximate bump mapping on a shiny surface such as the ocean 
+part of the Performer Witches Brew 
+Jeff Lander
+Agua demo in Game Developer, Dec. 1999 
+Research on the Rhine: Reflections on Water Simulation in Game Developer, Jan. 2000 
+his FluidSim page has lots of good academic references, including: 
+Kass, Michael, and Gavin Miller, "Rapid, Stable Fluid Dynamics for Computer Graphics," SIGGRAPH, 1990, pp. 49-55 
+Jeff says "This methods simplifies the full navier-stokes fluid flow equations for shallow water. It uses a height map to represent the water surface. I have implemented both the 2D and 3D versions of this system and it is very suitable for realtime performance on the scale I need." 
+the realtime fish in Artificial Animals for Computer Animation (XiaoYuan Tu, Demetri Terzopolous, Siggraph '96) involve some minimal realtime water contact forces 
+Harmony 2
+snapshots from a (very old) high-end 'image generator' from E&S show that water can look much better by using a bump map 
+God
+an old WorldToolKit program which simulates water as an array of water columns 
+flow direction and speed determined by differences in column height 
+supports arbitrary arrangement of columns
+regular grid, hexagonal grid, spherical planet, etc. 
+the texture map on water surface can be set to scroll (u,v) in the direction of water flow 
+2D Water page from Hugo Elias 
+AnfyFluid 2.0
+a Java app with fake-ish "realtime water simulation" 
+Trespasser claimed wave dynamics and "diffraction-based rendering" in realtime
+the water surface does look nice, but the water itself is far too transparent, a problem seen with other games as well 
+Non-realtime
+paper: Rendering Natural Waters, Simon Premoze, Michael Ashikhmin, 2000 
+GVU has a page on water simulation, primarily small bodies of water 
+there are companies like Scientific Software Group that do non-realtime groundwater and surface-water simulation which they claim are highly accurate 
+RiverTools
+A software toolkit for digital terrain and river network analysis.  Was a free, academic tool, developed by Scott Peckham at University of Colorado, then a commercial product from RSI, then spun off as its own company Rivix LLC.  As of 2008, it is $500/$900 a license. 
+Includes extensive DEM tools, including formats and patching together multiple DEM files. 
+hydrologic operations including extracting drainage network patterns 
+runs on Windows, Solaris, and Mac OS X 
+3D modeler plugins
+Aret¨¦ Image Software does "oceanographic F/X" as a plugin for several modelers 
+Seascape for MAX does nice surfaces for large bodies of water 
+Splash! MAX from Digimation is a plugin that "makes water fluid dynamics easy" 
+RealFlow, "the most sophisticated fluid simulator on the market", uses a particle-based approach which looks fairly good, but is naturally very non-realtime 
+Finelight Visual Technology has several commercial and licensable tools and APIs for water simulation and rendering, SeaMonster, WaveTools V1 and V2. 
+Open source computational packages: OpenFOAM, OpenFlower, Gerris Flow Solver 
+Hydrogeology
+should ultimately be considered when modeling any ecosystem 
+Keith Loague of the Stanford Hydrogeology Program is an expert in the field who has done work in Hawai¡®i 
+IST Visual Systems Lab (VSL) claimed to have implemented a physically based, realtime hydrology model in 1993 
+Campbell, Charles. "Fluid Dynamics Methodologies for Computer Graphics", M.S. Thesis, University of Central Florida, Orlando, Florida, 1991. 
+Jim Chen. "Physically-Based Modeling and Real-Time Simulation of Fluids", Ph.D. Dissertation, University of Central Florida, Orlando, Florida, May 1995. 
+CatchmentSIM
+"A freely available 3D-GIS topographic parameterization and hydrologic analysis model. The model automatically delineates watershed and subcatchment boundaries, generalizes geophysical parameters and provides in-depth analysis tools to examine and compare the hydrologic properties of subcatchments." 
+might be useful for operating on DEMs as well, e.g. using simulated water erosion to provide detail and accuracy beyond the 30m/10m grid data 
+the papers of Bedich Bene
+Interactive Terrain Modeling Using Hydraulic Erosion (zipped pdf)
+Stava, O., Benes, B., Brisbin, M., and Krivanek, O., Siggraph/Eurographics Symposium on Computer Animation 2008 video 
+Interactive, because the three erosion algorithms (force-based and dissolution-based hydraulic erosion, and direct material transportation through sediment slippage) are GPU-based and run at least 20 fps for scenes with grid resolution of 2048¡Á1024. 
+Hydraulic Erosion
+Benes, B., Tesinsky, V., Hornys, J, Bhatia, S. K., Computer Animation and Virtual Worlds, 16, pp 1-10, 2006 
+Visual Simulation of Hydraulic Erosion, 2002
+describes a simplified model of hydraulic erosion with a heightfield grid 
+Load Balancing in Parallel Implementation of Hydraulic Erosion Visual Simulations, 2002
+shows how the task of simulating erosion can be distributed among several computers (or CPUs) with message-passing between for the state of their boundaries 
+see Artificial Terrain Generation for more on this subject 
+Water Textures
+
+http://www.vterrain.org/Water/

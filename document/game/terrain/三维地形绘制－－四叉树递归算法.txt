@@ -31,7 +31,7 @@ public:
  
  //四叉树算法实现
  int  iLodRows,iLodCols;        //经过LOD扩展后的行数和列数
- int** quadtree;          //四叉树边点记录
+ int** quadtree;          		//四叉树边点记录
  void init_quadtree(int i, int j);     //初始化四叉树
  void setup_quadtree(int i, int j, int width);  //建立四叉树
  void Draw(int i, int j, int width);     //绘制四叉树
