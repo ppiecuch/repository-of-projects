@@ -88,7 +88,7 @@ public class SceneDemo{
     	
 		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 25, width, height);
 //		heightMap=new HeightMap(50,50,resourceLoader.loadResourceAsStream("textures/heightmap.png"));
-		heightMap=new HeightMap(new int[]{40,40,1},new int[]{50,50}, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
+		heightMap=new HeightMap(new float[]{40,40,1},new int[]{50,50}, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
 		strips=heightMap.generateTriangleStrip();
 		lines=heightMap.generateTriangles();
 		

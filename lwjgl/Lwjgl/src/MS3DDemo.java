@@ -2,8 +2,13 @@ import glapp.GLApp;
 
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.Date;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -44,7 +49,7 @@ public class MS3DDemo {
 	private HeightMap heightMap;
 	private Point3f[][][] lines;
 	private Point3f[][] strips;
-	private int[] mufactors={20,20,1};
+	private float[] mufactors={20,20,0.5f};
 	private int[] steps={80,80};
 	
 	private int width,height;
@@ -60,6 +65,9 @@ public class MS3DDemo {
 	private Dome dome;
 	private int domeTextureId;
 	private float domeRadius=1500;
+	
+	private float fogDensity=0.0055f;
+	private float[] fogColor={0.9f,0.9f,0.9f,1.0f};
 	
 	public MS3DDemo() throws LWJGLException{
 		this.init();
@@ -86,6 +94,11 @@ public class MS3DDemo {
 		
 		GL11.glViewport(0,0,DISPLAY_WIDTH,DISPLAY_HEIGHT);
 		
+		
+        
+        /*设置纹理参数*/
+        GL11.glTexEnvf(GL11.GL_TEXTURE_ENV,GL11.GL_TEXTURE_ENV_MODE,GL11.GL_REPLACE);
+		
 		//设置正交投影
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
     	GL11.glLoadIdentity();
@@ -94,13 +107,24 @@ public class MS3DDemo {
     	
     	GL11.glEnable(GL11.GL_BLEND);
     	GL11.glEnable(GL11.GL_ALPHA_TEST);
-    	GL11.glShadeModel(GL11.GL_FLAT);
-    	GL11.glAlphaFunc(GL11.GL_GREATER, 0);
+//    	GL11.glShadeModel(GL11.GL_FLAT);
+//    	GL11.glShadeModel(GL11.GL_SMOOTH);
+//    	GL11.glAlphaFunc(GL11.GL_GREATER, 0);
     	GL11.glClearDepth(1.0f);
     	GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDepthFunc(GL11.GL_LEQUAL);
-		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
-    	
+//		GL11.glDepthFunc(GL11.GL_LEQUAL);
+//		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		
+		/*设置雾的参数*/
+		FloatBuffer fogColorBuffer=BufferUtils.createFloatBuffer(fogColor.length);
+		fogColorBuffer.put(fogColor);
+        fogColorBuffer.flip(); 
+        GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_EXP); //set the fog mode to GL_EXP
+		GL11.glFogf (GL11.GL_FOG_DENSITY, fogDensity); //set the density to thevalue above
+		GL11.glHint (GL11.GL_FOG_HINT, GL11.GL_DONT_CARE); // set the fog to look the nicest, may slow down on older cards
+        GL11.glFog(GL11.GL_FOG_COLOR, fogColorBuffer);  //set the fog color to our color chosen above
+		
 		dome=new Dome(domeRadius, 24,5);
 		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 25, width, height);
 		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"),this.getClass().getResource("./textures").getPath());
@@ -112,9 +136,11 @@ public class MS3DDemo {
 		position[0]=200;
 		position[2]=200;
 		
+		
+		
 		try {
-			heightMap=new HeightMap(mufactors,steps, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
-			textureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sod.jpg");
+			heightMap=new HeightMap(mufactors,steps, resourceLoader.loadResourceAsStream("textures/terrain.png"));
+			textureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/terrain.jpg");
 			domeTextureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sky01.jpg");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -287,31 +313,39 @@ public class MS3DDemo {
     	GLU.gluLookAt(cameraPosition[0],10+position[1],cameraPosition[2], position[0],5+position[1]+pitch,position[2], 0,1,0);
 		
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		GL11.glDisable(GL11.GL_FOG);
 		/*画出天空*/
 		GL11.glLoadIdentity();
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, domeTextureId);
 		GL11.glTranslatef(domeRadius*0.7f,-domeRadius*0.2f,domeRadius*0.7f);
+		GL11.glRotatef(180,0,1,0);
 		dome.render();
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		
+		/*启用雾化效果*/
+		GL11.glEnable(GL11.GL_FOG);
+//		GL11.glFogf(GL11.GL_FOG_START, 10+cameraPosition[2]);       // Fog Start Depth
+//		GL11.glFogf(GL11.GL_FOG_END, 50+cameraPosition[2]);        // Fog End Depth
+		
 		/*画出线条*/
-		GL11.glLoadIdentity();
-		for(int i=0;i<lines.length;i++)
-		{
-			for(int j=0;j<lines[i].length;j++)
-			{
-				for(int k=0;k<lines[i][j].length;k++)
-				{
-					if(k%3==0)
-						GL11.glBegin(GL11.GL_LINE_LOOP);
-					Point3f point=lines[i][j][k];
-//					GL11.glColor3f(point.x/(point.x+point.z+point.y),point.z/(point.x+point.z+point.y),point.y/(point.x+point.z+point.y));
-					GL11.glVertex3f(point.x,point.z+0.01f,point.y);
-					if(k%3==2)
-						GL11.glEnd();
-				}
-			}
-		}
+//		GL11.glLoadIdentity();
+//		for(int i=0;i<lines.length;i++)
+//		{
+//			for(int j=0;j<lines[i].length;j++)
+//			{
+//				for(int k=0;k<lines[i][j].length;k++)
+//				{
+//					if(k%3==0)
+//						GL11.glBegin(GL11.GL_LINE_LOOP);
+//					Point3f point=lines[i][j][k];
+////					GL11.glColor3f(point.x/(point.x+point.z+point.y),point.z/(point.x+point.z+point.y),point.y/(point.x+point.z+point.y));
+//					GL11.glVertex3f(point.x,point.z+0.01f,point.y);
+//					if(k%3==2)
+//						GL11.glEnd();
+//				}
+//			}
+//		}
 		/*画出坐标轴*/
 		GL11.glLoadIdentity();
 		GL11.glTranslated(-20,-20,-20);
@@ -328,6 +362,7 @@ public class MS3DDemo {
 		GL11.glEnd();
 		/*绘制地形*/
 		GL11.glLoadIdentity();
+		GL11.glColor3f(1,1,1);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		for(int i=0;i<this.strips.length;i++)
@@ -342,14 +377,12 @@ public class MS3DDemo {
 			GL11.glEnd();
 		}
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glPushMatrix();
 		GL11.glLoadIdentity();
 		position[1]=heightMap.getHeight(position[0], position[2]);
 		GL11.glTranslated(position[0], position[1], position[2]);
 		GL11.glRotatef(yaw,0,1,0);
 		GL11.glColor3f(1,1,1);
 		g36c.updateModel(System.currentTimeMillis()*2/3);
-		GL11.glPopMatrix();
 		
 		
 	}
