@@ -1,0 +1,361 @@
+ Introduction
+In this tutorial, we will see how to add fog in the scene of the Tutorial 7.
+
+Another usefull thing is time based movements. In previous tutorials, the objects was updated for each frame at a fixed step, without taking into account the time for rendering. Due to the performance of computers are highly variable, frames rate (speed of rendering) is also highly variable from computer to computer.
+Time based movement is based on calculating the time passed for rendering a frame. Then, depending on the object speed, we can calculate the object movement between the last and the current frames. With this, the objects will move at the same speed, independently to the frame rate and to the computer used. The difference between a low or high performance computer, is the number of frames rendered to display the same animation. On a performant computer, the animation will be smooth, on an old computer the animation will be jerky.
+Time based movement are necessary for realtime applications.
+ 
+
+
+
+ Tutorial
+ Fog
+In the Lesson 4, you can lear how OpenGl computes fog and understand the effect of the differents properties of the fog.
+
+The following code will show you how to set-up the fog. Please notice that GL_FOG_DENSITY is only used by the modes GL_EXP, GL_EXP2. Similarly, GL_FOG_START and GL_FOG_END are only used with GL_LINEAR.
+
+When using fog, to have a realistic effect, set the clearing (ie background) color to the fog color.
+ 
+
+Initialization of the fog
+ 
+    //Color of the fog : grey fog
+    float[] fogColor = new float[]{0.5f, 0.5f, 0.5f, 1.0f};
+    gl.glFogfv(GL_FOG_COLOR, fogColor);
+    /*
+     * Select the fog mode
+     *     GL_EXP, GL_EXP2 or GL_LINEAR
+     */
+    gl.glFogi(GL_FOG_MODE, GL_EXP);
+    /*
+     * Density of the fog
+     *     ONLY used by the modes : GL_EXP, GL_EXP2
+     * GL_EXP  fog equation : exp(-GL_FOG_DENSITY * z)
+     * GL_EXP2 fog equation : exp(-(GL_FOG_DENSITY * z)2)
+     */
+    gl.glFogf(GL_FOG_DENSITY, 0.3f);
+//    /*
+//     * Start of the fog (object begin to mix with the fog) and end of the fog (objects disappear)
+//     * The value 
+//     *     ONLY used by the mode : GL_LINEAR
+//     * Fog equation : (GL_FOG_END-z)/(GL_FOG_END-GL_FOG_START)
+//     */
+//    gl.glFogf(GL_FOG_START, 4.0f);
+//    gl.glFogf(GL_FOG_END, 10.0f);
+    /*
+     * Precision of the fog calculation (per pixel or per vertex)
+     *     GL_DONT_CARE, GL_NICEST (per pixel calculation) or GL_FASTEST (per vertex calculation)
+     */
+    gl.glHint(GL_FOG_HINT, GL_DONT_CARE);
+    
+    //enable the fog mode
+    gl.glEnable(GL_FOG);
+    
+    //Clearing color equal to the fog color
+    gl.glClearColor(fogColor[0], fogColor[1], fogColor[2], 0.0f)
+ 
+
+ 
+
+ Time based movements
+ Calculating the time to render the frame
+In the display loop, we will add a counter to know how many time was taken to render our frames. This time will be used to update our animation to run at a constant speed.
+
+This counter will keep track of the time. By a subtraction between the current time (currentTimeMillis) with last time keeped (lastTime), we deduce the time passed to render the last frame and we store this value int timePassed.
+ 
+
+Time based movement (TimeFPSCounter)
+ 
+/* Enable the counter */
+private boolean enabled = true;
+
+/* Time passed calculation */
+private long timePassedNanos = 0;
+private long lastTime = -1; //Previous time
+
+private long accumulatedTimeNanos = 0;
+
+/* FPS calculation */
+private float fps = 60;
+private int frames = 0;
+private long firstFrameTime = 0;
+public int fpsRefreshTimeNanos = 500 * 1000 * 1000; //each 500ms
+
+
+/*************************
+ * NEW *   updateTime    *
+ *******************************************************************************
+ * This method calculates the time that OpenGl takes to draw frames.           *
+ * This time should be used to increase the movement of the objects of the     *
+ * scene.                                                                      *
+ *******************************************************************************/
+public void update() {
+    //Counter enabled ?
+    if(!enabled) return;
+
+    if(lastTime == -1) {
+        //Initialization of the counter
+        lastTime = getTimeNanos();
+        timePassedNanos = 0;
+
+        //Initialization for FPS calculation
+        fps = 0;
+        frames = 0;
+        firstFrameTime = lastTime;
+    }
+    else {
+        //Get the current time
+        long currentTime = getTimeNanos();
+        //Time passed
+        timePassedNanos = currentTime-lastTime;
+        //Update last time, it is now the current for next frame calculation
+        lastTime = currentTime;
+        //Accumulate time
+        accumulatedTimeNanos += timePassedNanos;
+
+        //FPS
+        frames++;
+
+        //Calculate fps
+        long dt = currentTime-firstFrameTime;
+        if(dt >= fpsRefreshTimeNanos) {
+            fps = (float)(1000*frames)/(float)(dt / 1000000);
+            frames = 0;
+            firstFrameTime = currentTime;
+        }
+    }
+}
+
+/** @return the time passed, in milliseconds, to render last frame */
+public final long getTimePassedMillis() {
+    return timePassedNanos / 1000000;
+}
+
+/** @return the time passed, in microseconds, to render last frame */
+public final long getTimePassedMicros() {
+    return timePassedNanos / 1000;
+}
+
+/** @return the time passed, in nanoseconds, to render last frame */
+public final long getTimePassedNanos() {
+    return timePassedNanos;
+}
+
+/** @return the number of frames per seconds */
+public final float getFPS() {
+    return fps;
+}
+ 
+
+FPS for 'frame per second' is the speed of rendering.
+This quantity is calculated with :
+    fps = 'number of frames render' / 'time to render the frames'
+
+Previously, we have have calculated timePassed which is the time for rendering a frame (in milliseconds). To calculate the FPS, at each frame, the formula becomes :
+    fps = 1 / (timePassed/1000.0f)
+
+In the TimeFPSCounter counter, the FPS is not updated each frame. It is updated when a certain laps of time is passed, like this we calculate an average FPS.
+ 
+
+ Using the counter
+This method should be called at each rendering :
+
+Using updateTime
+ 
+public void display(GLDrawable glDrawable)
+{
+    //Calculate the time to draw the previous frame
+    updateTime();
+    //Increase object movements using getTimePassed
+    increaseMovements();
+    
+    //Render the current frame
+    ...
+ 
+
+Now, we have access in the display method of the time passed to draw the previous frame.
+ 
+
+ Remarks
+After the animation has been stopped and restart, we need to reset the time counter.
+
+In Jogl/JSR231, after animator.start() we need to call lastTime = -1.
+In Gl4java, to unpause the animation we call setSuspended(false). The method ReInit can be overwritten in the GLAnimCanvas class. This method is called after setSuspended(false) was called.
+So I've modify the calls in the container to put setSuspended(false, true) instead of setSuspended(false).
+ 
+
+Unpause animation
+ 
+In Jogl / JSR-231:
+    //Reset time
+    lastTime = -1;
+    animator.start();
+
+In Gl4java :
+    public void ReInit()
+    {
+        //Reset time
+        lastTime = -1;
+    }
+ 
+
+ 
+
+ Using the frame time (timePassed)
+Now, we know the last frame time and we want our objects moves at a constant speed.
+
+A speed have the dimension of a distance (or a rotation) over a time. To obtain the movement distance/rotation, we simply multiply those two values like this :
+    speed*getTimePassed()
+
+For a translation, the speed is the distance to be covered in a millisecond :
+    translationSpeed = ...;    //In units by milli-seconds
+    translationSpeed * getTimePassed()
+
+For a rotation, the speed is the angle to be covered in a millisecond :
+    rotationSpeed = ...;       //In angles by milli-seconds
+    rotationSpeed * getTimePassed()
+ 
+
+Increase Movements
+ 
+/**
+ * Increase movements of the object depending on the time passed to draw
+ * the last frame
+ */
+private void increaseMovements()
+{
+    /*
+     * How to update movement using getTimePassed() ?
+     * It is really simple, just multiply the speed by getTimePassed() :
+     *   distance += speed*getTimePassed()  //speed is in unit/millisecond
+     * 
+     * Rem:
+     *  unit is generally considered as 1 meter for deplacement.
+     *  unit should be angles in case of a rotation.
+     */
+    
+    //Increase z deplacement
+    if(pause)
+    {
+        zOffset += (fogEnd-fogStart+4)*zDir*getTimePassed()/3000;
+
+        //Just to bound the deplacement
+        if(zOffset < fogStart-2)
+            zDir = 1;
+        else if(zOffset > fogEnd+2)
+            zDir = -1;
+    }
+    
+    //Increase movement
+    cylinderRot += 360.f*getTimePassed()/(2500);          //speed = one turn (360бу) in 2.5 seconds
+    cdRot       += 360.f*getTimePassed()/(2000);          //speed = one turn (360бу) in 2   seconds
+    sphereRot   += 360.f*getTimePassed()/(1000);          //speed = one turn (360бу) in 1   seconds
+    sphereTrans += 4.7f*sphereDir*getTimePassed()/1200;   //speed = 4.7 units in 1.2 seconds
+
+    //Just to bound the deplacement
+    if(sphereTrans > 2.35f)
+        sphereDir = -1;
+    else if(sphereTrans < -2.35f)
+        sphereDir = 1;
+}
+ 
+
+ 
+
+
+
+Advanced Part
+ V-Sync: synchronizing with screen refresh frequency
+The screen refresh frequency tell the number of times per second the screen is refresh. A screen at 75Hz, will render 75 images per seconds.
+
+If your application is running at a fps speed considerably higher, for example 500fps, lot of frame will be computed but not used at all (ie not rendered to the screen). This involve an important usage of the cpu and gpu for nothing.
+In this case, the best way will be the rendered the maximum number of frames handled by the screen. This can be easily done by synchronizing the application with the screen refresh frequency, generally called V-Sync (vertical synchronization) :
+ 
+
+Enable/Disable V-Sync
+ 
+    //JOGL
+    gl.setSwapInterval(enableVSync ? 1 : 0);
+
+    //LWJGL
+    Display.setVSyncEnabled(enableVSync);
+ 
+
+
+In the contrary, if you want to render the maximum frame possible just disable the V-Sync.
+
+ Controlling frame rate (fps speed)
+In some other cases, you may want to run at a different frame rate (different to screen refresh freq.).
+A typical case for that is an application which a huge amount of datas to be computed or displayed. In that case, the fps can goes does lower than screen refresh rate. 
+
+Suppose the case you want to set frame constant to 30fps. The maximum time to prepare a frame will be maxFrameDuration = 1000ms / 30fps = 33.33ms. For each frame rendered, track the duration: frameDuration.
+When a fast frame occures (faster than 33.33ms), you will need to wait before rendering the next one: waitTime = (maxFrameDuration - frameDuration).
+
+Here is a simple example:
+
+Constant frame-rate pseudo code
+ 
+    final float constantFps = 30.0f;
+    final int maxFrameDurationNano = (int)(1000000 / constantFps); //Maximum time in nano seconds
+
+    public void render()
+    {
+        ... //prepare and render the frame
+
+
+        /*
+         * Track the frame durations
+         * Compute the different with current and previous call of System.nanoTime()
+         * (value accessible later with getFrameDurationNanos())
+         */
+        timer.update();
+
+        /*
+         * Wait until
+         */
+        long frameDurationNano = timer.getFrameDurationNanos();
+        long waitNano = maxFrameDurationNano - frameDurationNano;
+        if(waitNano > 0) {
+             long millis = waitNano / 1000;
+             long nanos  = waitNano - millis * 1000;
+
+             Thread.sleep(millis, nanos); //Surround with try/catch to handle excpetions
+        }
+    }
+ 
+
+
+In addition to that, you can take into account too slow frames to wait less time when faster frames will be rendered. I've just wanted to show you here the basic idea.
+ 
+
+
+
+ Keys
+1-3 : select a fog mode
+F : enable/disable fog
+P : pause/unpause z deplacement
++ - : increase/decrease fog density (has an effect for the mode 1 & 2)
+ 
+
+
+
+ Download Section
+Remember to download the GraphicEngineAPI to run this tutorial !
+
+ Tutorial 10 src ( 9 ko)    //Port to Jogl JSR-231 initially done by Magarrett Dias
+
+ Tutorial 10 jar (19 ko)
+
+
+If you've got any remarks on this tutorial, please let me know to improve it.
+Thanks for your feedback.
+ 
+
+
+
+Previous Tutorial
+ Back
+ Next turorial
+ 
+
+http://jerome.jouvie.free.fr/OpenGl/Tutorials/Tutorial10.php
