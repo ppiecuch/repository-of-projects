@@ -22,10 +22,10 @@ public class HeightMap {
 	private int imageWidth;
 	private int imageHeight;
 	private short[][] heightWeights;
-	private int[] mufactors;	//放大系数
+	private float[] mufactors;	//放大系数
 	private int[] steps;		//步数
 	
-	public HeightMap(int[] mufactors,int[] steps,InputStream is) throws IOException
+	public HeightMap(float[] mufactors,int[] steps,InputStream is) throws IOException
 	{
 		this.mufactors=mufactors;
 		this.steps=steps;
@@ -178,6 +178,6 @@ public class HeightMap {
 			Util.linearInterpolate(rb,lb,rt,p);
 //			System.out.println("rb:"+rb.z+","+rt.z+","+lb.z+"-->"+p.z);
 		}
-		return p.z;
+		return p.z*mufactors[2];
 	}
 }
