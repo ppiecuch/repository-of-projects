@@ -64,7 +64,7 @@ public class MS3DDemo {
 	
 	private Dome dome;
 	private int domeTextureId;
-	private float domeRadius=1500;
+	private float domeRadius=2000;
 	
 	private float fogDensity=0.0055f;
 	private float[] fogColor={0.9f,0.9f,0.9f,1.0f};
@@ -117,15 +117,15 @@ public class MS3DDemo {
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		
 		/*设置雾的参数*/
-		FloatBuffer fogColorBuffer=BufferUtils.createFloatBuffer(fogColor.length);
-		fogColorBuffer.put(fogColor);
-        fogColorBuffer.flip(); 
-        GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_EXP); //set the fog mode to GL_EXP
-		GL11.glFogf (GL11.GL_FOG_DENSITY, fogDensity); //set the density to thevalue above
-		GL11.glHint (GL11.GL_FOG_HINT, GL11.GL_DONT_CARE); // set the fog to look the nicest, may slow down on older cards
-        GL11.glFog(GL11.GL_FOG_COLOR, fogColorBuffer);  //set the fog color to our color chosen above
+//		FloatBuffer fogColorBuffer=BufferUtils.createFloatBuffer(fogColor.length);
+//		fogColorBuffer.put(fogColor);
+//        fogColorBuffer.flip(); 
+//        GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_EXP); //set the fog mode to GL_EXP
+//		GL11.glFogf (GL11.GL_FOG_DENSITY, fogDensity); //set the density to thevalue above
+//		GL11.glHint (GL11.GL_FOG_HINT, GL11.GL_DONT_CARE); // set the fog to look the nicest, may slow down on older cards
+//        GL11.glFog(GL11.GL_FOG_COLOR, fogColorBuffer);  //set the fog color to our color chosen above
 		
-		dome=new Dome(domeRadius, 24,5);
+		dome=new Dome(domeRadius, 12,6);
 		font = new Font(resourceLoader.loadResourceAsStream("textures/font.bmp"), 25, width, height);
 		g36c = new MS3DModel(resourceLoader.loadResourceAsStream("models/assassin.ms3d"),this.getClass().getResource("./textures").getPath());
 		MS3DAnimation walk=new MS3DAnimation(0,13);
@@ -141,7 +141,7 @@ public class MS3DDemo {
 		try {
 			heightMap=new HeightMap(mufactors,steps, resourceLoader.loadResourceAsStream("textures/terrain.png"));
 			textureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/terrain.jpg");
-			domeTextureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sky01.jpg");
+			domeTextureId=GLApp.makeTexture(SceneDemo.class.getResource(".").getPath()+"textures/sky02.png");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -309,22 +309,22 @@ public class MS3DDemo {
 	private void render() {
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
     	GL11.glLoadIdentity();
-    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,3000.0f);
+    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,6000.0f);
     	GLU.gluLookAt(cameraPosition[0],10+position[1],cameraPosition[2], position[0],5+position[1]+pitch,position[2], 0,1,0);
 		
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
-		GL11.glDisable(GL11.GL_FOG);
+//		GL11.glDisable(GL11.GL_FOG);
 		/*画出天空*/
 		GL11.glLoadIdentity();
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, domeTextureId);
-		GL11.glTranslatef(domeRadius*0.7f,-domeRadius*0.2f,domeRadius*0.7f);
-		GL11.glRotatef(180,0,1,0);
+		GL11.glTranslatef(domeRadius*0.5f,-domeRadius*0.05f,domeRadius*0.5f);
+//		GL11.glRotatef(180,0,1,0);
 		dome.render();
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		
 		/*启用雾化效果*/
-		GL11.glEnable(GL11.GL_FOG);
+//		GL11.glEnable(GL11.GL_FOG);
 //		GL11.glFogf(GL11.GL_FOG_START, 10+cameraPosition[2]);       // Fog Start Depth
 //		GL11.glFogf(GL11.GL_FOG_END, 50+cameraPosition[2]);        // Fog End Depth
 		
@@ -377,6 +377,7 @@ public class MS3DDemo {
 			GL11.glEnd();
 		}
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		/*绘制人物*/
 		GL11.glLoadIdentity();
 		position[1]=heightMap.getHeight(position[0], position[2]);
 		GL11.glTranslated(position[0], position[1], position[2]);
