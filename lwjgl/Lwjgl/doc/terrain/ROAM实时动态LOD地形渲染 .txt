@@ -1,0 +1,303 @@
+ROAM实时动态LOD地形渲染 
+      REALTIME DYNAMIC LOD TERRIAN RENDER WITH ROAM
+
+　
+
+     作者：Bryan Turner
+
+     翻译：Dreams Woo
+
+译者注：翻译这篇文章的目的是国内关于这方面内容的东西太少了，而ROAM做为现今最流行的地形渲染技术已经在国外的游戏中大行其道，只有不断的学习才能不断的进步，希望通过这篇文章能使大家得到进步，我就已经满足了，这篇文章你可以转载，但必须署上我的名字，并发到我的邮箱告知我，我的EMAIL是：dreams_wu@sina.com,有什么交流或建议也可以给我发信。
+
+本文的DEMO可以在这里下载
+
+如同大多数人一样，每当我看见起伏的山脉和险峻的峡谷的照片时都会令我震撼，但不幸的是对于玩家来说，我们却不能纵情于大自然的美景中去。仅仅只有一小部分当前和将来的游戏可以给我们的眼睛带来震撼的享受（例如Tribes 1 & 2, Tread Marks, Outcast, Myth 1 & 2, and HALO）。这些游戏把3D动作游戏带进了下一个时代。
+
+在本文中我将简要的讲述一下在硬件加速地形引擎中使用的技术和运算法则。每一个法则都将被详细的描述、讨论和最终实现，作为一个起点任何人都应该把地形加入到他的下一个项目中。现在我假设你已经有中级的C++知识和一般的3D渲染知识，如果没有的话建议你马上补习一下。
+
+1 引言
+
+如果没有接触过涉及到细节等级（LOD）的地形生成法则，恐怕你就不能在地形可视化的世界里任意挥舞你的指挥棒了。细节等级是一种使用了一系列启发式的方法来决定地形的哪一部分需要看起来有更多的细节的技术。在这里，对于地形渲染的许多技术挑战之一是如何存储一个地形的特征。高度图是事实上的标准解决方案，简单的说他们就是保存地形每点高度的二维数组。
+
+2 LOD地形法则概论
+
+一个LOD地形法则的优秀概述可以被三篇论文来描述，作者分别为[1微软的Hoppe][2 Lindstrom][3 Duchaineau]。在第一位作者的论文中描绘了一个基于Progressive Meshes的法则，这是一个与增加三角形到任意网格来达到你需要的细节相关的新的和绝妙的技术。这篇论文是一篇精彩的读物但有点复杂，同时这项技术需要大量的内存。第二篇论文的作者是Lindstrom，他描述了一个叫四叉树（Quad Tree）的结构用于描绘地形碎片（PATCH），一个四叉树递归的把一个地形分割成一个一个小块（tessellates）并建立一个近似的高度图。四叉树非常简单但很有效。第三篇论文的作者是Duchaineau，他描述了一个基于二元三角树结构的法则ROAM（实时优化自适应网格）。这里每一个小片（PATCH）都是一个单独的正二等边三角形，从它的顶点到对面斜边的中点分割三角形为两个新的正等边三角形，分割是递归进行的可以被子三角形重复直到达到希望的细节等级。由于ROAM法则的简单和可扩展性吸引了我的目光。不幸的是这片论文非常短，仅仅只有少量的伪代码。但无论如何，他可以在连续的范围实现从最基本的平面到最高级的优化。而且ROAM分割成小方块非常快速，而且可以动态更新高度图。
+
+3 ROAM执行初步
+
+代码用Visual C++ 6.0来写的，使用OPENGL来渲染。
+
+ROAM资源说明
+
+让我使用一个概述来介绍这个法则，然后讨论单独的小块是如何相互影响的：
+
+1高度图文件被载入内存并和一个Landscape类的实例相联系，多个Landscape物体连接起来产生无限的地形。
+
+2一个新的Landscape物体把载入的高度图的一部分包裹到新的Patch类物体中，这一步的目的是：
+
+     （1）使用基于树的结构来控制随着深度而呈指数增长的内存，这样可以保持他们的深度在一个很小的有限的范围。
+
+     （2）动态更新高度图需要在变更场景时有一个完整的变更树从算操作。过大的Patch类物体在实时重新计算时非常慢。
+
+3每一个Patch类物体被调用来建立一个MESH的近似值（分割成小块）。Patch类物体使用了一个叫二元三角树的结构来存储即将显示在屏幕上的三角的坐标。这些三角形顶点坐标被非常合理的存储，ROAM使用36字节以上的内存来存储每一个三角形。高效的坐标计算也是渲染的一部分（见下）。
+
+4在分割完高度图后，引擎已经建立了二元三角树。树的叶节点保存了需要进入图形渲染流水线的三角形。
+
+高度图文件格式
+
+高度图使用一个RAW的数据格式来保存，这个格式包含了8位的高度信息。通常高度图必须从头至尾保存在内存中，在高级标题中我将讨论如何扩展法则来呈现大的数据集。
+
+二元三角树Binary Triangle Trees
+
+ROAM使用了二元三角树来保持三角坐标而不是存储一个巨大的三角形坐标数组来描绘地形。这个结构可以看作是一个测量员把地形切断为一个一个小三角块的结果。这些三角块逻辑上看就象一组相连的邻居一样（左右邻居）。同样的当一个三角块把土地当作遗产时，他需要平等的分给两个儿子。
+
+用这样进行扩展，这个三角块就是二元三角树的根节点，其他三角块也是他们各自树的根节点。Landscape类如同一个局域的土地注册表，保存所有三角块的索引，同时也保存他们之间的层次关系。由于大量子三角块的产生，分割土地也成为一个沉重的负担，但是大量的细节可以被需要更好模拟的区域的种群'population'来简单的处理。看图一：
+
+
+
+图一 二元三角树结构等级0-3
+
+二元三角树被TriTreeNode结构保存，同时他还保存ROAM需要的五个最基本的数据，参考图二。
+
+struct TriTreeNode {
+     TriTreeNode *LeftChild;
+// Our Left child
+     TriTreeNode *RightChild;
+// Our Right child
+     TriTreeNode *BaseNeighbor;
+// Adjacent node, below us     
+     TriTreeNode *LeftNeighbor;
+// Adjacent node, to our left     
+     TriTreeNode *RightNeighbor;
+// Adjacent node, to our right
+};
+
+
+
+图二 基本的二元三角树的子和邻节点
+
+当对高度图建立一个网格模拟值时，我们需要向二元三角树中添加子节点直到达到我们需要的细节。这一步完成后重新遍历整个树，此时把子节点中保存的三角形数据渲染到屏幕上。这就是一个最基本的引擎了但需要重新设置每一帧，这种递归的方法最大的优点是我们不需要保存每一个顶点的数据，可以释放大量的内存给其他物体。实际上，TriTreeNode结构需要多次的建立和销毁，但这种方法是非常高效的，同时我们或许需要建立几万个这样的结构，因此我们需要一个指针指向我们需要的内存，TriTreeNode结构是通过一个静态内存池来分配的，而不是动态分配，他也给了我们一个快速的重新设置状态的方法。
+
+
+
+图三 典型的地形PATCH，从左至右依次是网格模式，光照模式，纹理模式
+
+4 Landscape类的详解
+
+Landscape类对地形的细节渲染进行了高级的封装，通过一些简单的函数调用我们可以在屏幕缓冲中进行从简单的点的显示到复杂的地形渲染工作。这里是Landscape类的定义。
+
+class Landscape {
+public:
+     void Init(unsigned char *hMap);
+         // Initialize the whole process
+     void Reset();
+         // Reset for a new frame
+     void Tessellate();
+         // Create mesh approximation
+     void Render();
+         // Render current mesh static
+     TriTreeNode *AllocateTri();
+         // Allocate a new node for the mesh
+protected:
+     static int m_NextTriNode;
+         // Index to the next free TriTreeNode
+     static TriTreeNode m_TriPool[];
+         // Pool of nodes for tessellation
+     Patch m_aPatches[][];
+         // Array of patches to be rendered
+     unsigned char *m_HeightMap;
+         // Pointer to Height Field data
+};
+
+Landscape类管理了一个大的正三角块，同时可以和其他Landscape物体一起工作。在初始化过程中，高度图被分割成大量的可管理的小块，同时把他和一个新的Patch物体联系起来。Patch类及其它的方法我们将在下面花费更多的时间讲解。注意这些函数的简单性，Landscape物体本身是设计用于一个简单的渲染流水线的，尤其是在可以免费使用Z缓冲的今天。
+
+5 Patch类详解
+
+Patch类是这个引擎的灵魂，他可以分为两部分，一半是递归部分，另一半是基本函数部分，下面就是这个类的数据成员和基本函数描述：
+
+class Patch {
+public:
+     void Init( int heightX, int heightY, int worldX, int worldY, unsigned char *hMap);
+         // Initialize the patch
+     void Reset();
+         // Reset for next frame
+     void Tessellate();
+         // Create mesh
+     void Render();
+         // Render mesh void
+     ComputeVariance();
+         // Update for Height Map changes
+     ...
+
+
+protected:
+     unsigned char *m_HeightMap;
+         // Adjusted pointer into Height Field
+     int m_WorldX, m_WorldY;
+         // World coordinate offset for patch
+
+     unsigned char m_VarianceLeft[];
+         // Left variance tree
+     unsigned char m_VarianceRight[];
+         // Right variance tree
+
+     unsigned char *m_CurrentVariance;
+         // Pointer to current tree in use
+     unsigned char m_VarianceDirty;
+         // Does variance tree need updating?
+
+     TriTreeNode m_BaseLeft;
+         // Root node for left triangle tree
+     TriTreeNode m_BaseRight;
+         // Root node for right triangle tree
+     ...
+
+在上面的代码中，下面要解释的基本函数被每一个PATCH物体所调用，PATCH类的方法名类似于调用他们的Landscape类的方法，这些方法或许太单纯化这里需要详细的解释一下：
+
+Init()函数需要高度图和世界坐标的偏移值，他们用来对地形进行缩放，指向高度图的指针已经经过调整，指向了这个PATCH物体所需要数据的第一个字节。
+
+Reset()函数释放所有无用的TriTreeNodes结构，接着重新连接两个二元三角树成为一个PATCH，现在这些还没有被提及，但是每一个PATCH物体都有两个单独的二元三角树构成一个正方形（ROAM论文中称为'Diamond'）。如果不明白的话再看一下图二，详细的内容下一节再讨论。
+
+Tessellate()函数简单的传递适当的高级三角形参数（每一个PATCH物体的两个根节点）给一个递归版本的函数，函数Render()和ComputeVariance()也是这样。
+
+6 ROAM精华
+
+讲了这么多我们只是讨论了支持ROAM运算法则的结构，现在的时间我们将讨论ROAM的精华部分，在这点上你或许从ROAM的论文中唾手可得，但是我要讲一下我是如何做的。参考一下图二三角形关系。首先我们要为网格的近似值定义一个最小可视距离值，我使用的是Tread Marks引擎中的一个叫'Variance'的方法，我们将需要他来决定当分割一个节点（增加细节）时需要分割到什么程度。在ROAM论文中使用了一个基于嵌套空间范围的方法（nested world- space bounds），他非常精确但很慢。Variance是对二元三角树节点中正三角形斜边中点在高度图中的不同高度进行插值，这个计算非常快。
+
+triVariance = abs( centerZ - ((leftZ + rightZ) / 2) );
+
+但是等等，我们不能仅仅计算每一个PATCH物体的两个二元三角树Variance值，因为这样计算带来的误差太大了。因此还应该计算树的深度，在本DEMO中计算的深度可以在编译时指定。通常，Variance计算每一帧都需要进行，除非高度区域发生变化，他一般不会发生变化。因此我们提出一个和二元三角树一起工作的Variance树，一个Variance树是一个填充高度值的二元树，用一个连续的数组来表示。一些简单的宏可以让我们有效的操纵这个树，我们填充到里面的数据是每个不同节点的单字节值。如果你没有遇到过这个结构可以参考以下图四，两个Variance树被存储在PATCH类中，分为左右两个。
+
+
+
+图四 二元树结构
+
+现在我们可以重新去做建立近似网格的工作了。获得我们的误差值（Variance），如果它的Variance非常大，我们将把二元三角树的节点分割成很小的三角块，这是指，如果当前地形下的三角形非常起伏不平，这样做可以更好的模拟它。分割必须建立两个可以精确填充父三角形区域的子三角形（见图一）。对于子三角形重复进行这样的操作，在一些点上我们或许发现一个单独的三角形可以足够光滑的模拟地形或者我们的操作超过了预定的步数。。所有的这些之后我们可能仅仅建立了一个达到高度区域的网格。
+
+
+
+图五 地形显示 低级，优化和高Variance设置
+
+这还是有一点复杂，当分割在地形上相邻的二元三角树时，在网格里经常出现裂缝，这个裂缝是由于不连续的分割穿过PATCH边界的树造成的。这个问题如图六。
+
+
+
+图六 网格上的裂缝
+
+为了解决这个问题，ROAM使用了网格本身关于邻节点的一个有趣规律：一个细节节点和它的邻节点只存在两种关系：共直角边关系（如左右邻节点）和共斜边关系（如下邻节点）[可参考图一的等级三]，我们可以应用这个原理到建立网格上以保持相邻的树与我们同步。下面看一下如何使用这个规则：对于一个节点，我们只在它与它的下邻节点呈相互下邻关系时才进行分割（如图七），这个关系可以把它当作一个钻石来看，这样形容是因为在钻石上分割一个节点可以很容易的镜象到其他节点，因此在网格上不会出现裂缝。
+
+
+
+图七 在一个钻石上进行分割操作
+
+当分割一个节点时存在三种可能：
+
+1 节点是钻石的一部分---分割它和它的下邻节点。
+
+2 节点是网格的边---只分割这个节点。
+
+3 节点不是钻石的一部分---强制分割下邻节点。
+
+强制分割指的是递归的遍历整个网格直到发现钻石样的节点或网格边。这里是它的工作流程：当分割一个节点时，首先看是不是钻石的一部分，如果不是，然后在下邻节点上调用第二个分割操作建立一个钻石，然后继续最初的分割。第二个分割操作将做同样的工作，重复处理下一个节点，一旦一个节点被发现可以递归的分割，就一直分割下去，看一下图八：
+
+
+
+图八 强制分割操作
+
+现在让我们重新看一下，给出一个PATCH物体建立两个包含高度区域细节的二元三角树，我们将进行下列操作：
+
+1 计算Variance树----为每一个二元三角树建立包含Variance数据的二元树，Variance是一个我们用来决定模拟是否足够逼真的数值，它是直角三角形斜边中点与斜边两端点高度经过插值产生的不同高度取样。
+
+2 对地形分块---如果第一级的Variance不是我们希望的高度就使用Variance树分割我们的二元三角树。
+
+3 强制分割---如果我们分割的节点不是钻石的一部分，就调用强制分割，它将给我们一个能进行基本分割操作的完整钻石。
+
+4 重复---在子节点上重复对分块操作直到在二元三角树的所有的三角形达到当前帧的Variance值或者我们分割的节点溢出我们的静态内存池。
+
+7 重新讨论PATCH
+
+现在我们已经明白ROAM的所有细节了，让我们重新完成我们的PATCH类吧。所有的递归函数（分割函数除外）都需要从即将渲染的三角形中获得坐标数据，这些坐标需要在栈中进行计算并传送到下一级运算，或通过OPENGL进行渲染。在二元三角树的最深级别，在栈内运算的三角形不会超过十三个。下面的函数使用了最基本的递归运算：
+
+int centerX = (leftX + rightX) / 2;
+     // X coord for Hypotenuse center
+int centerY = (leftY + rightY) / 2;
+     // Y coord...
+Recurs( apexX, apexY, leftX, leftY, centerX, centerY);
+     // Recurs Left
+Recurs( rightX, rightY, apexX, apexY, centerX, centerY);
+     // Recurs Right
+
+Recursive Patch Class Functions:
+
+void Patch::Split( TriTreeNode *tri);
+
+unsigned char Patch::RecursComputeVariance(
+               int leftX, int leftY, unsigned char leftZ,
+               int rightX, int rightY, unsigned char rightZ,
+               int apexX, int apexY, unsigned char apexZ,
+               int node);
+
+void Patch::RecursTessellate( TriTreeNode *tri,
+                             int leftX, int leftY,
+                             int rightX, int rightY,
+                             int apexX, int apexY, int node);
+
+void Patch::RecursRender( TriTreeNode *tri,
+                         int leftX, int leftY,
+                         int rightX, int rightY,
+                         int apexX, int apexY );
+
+Split()函数进行了包含强制分割处理的ROAM分割。它的功能包括选择合适的钻石，分配子节点，连接他们到网格和调用我们需要的其他分割操作。
+
+RecurseComputeVariance()函数用于获得当前三角形的所有坐标设置和我们保存在栈内的一部分扩展信息。三角的Variance值是和它的子三角一起合并计算的。我选择通过传送每一个点的X和Y坐标而不是每点的高度值来减少在高度图数据数组的内存采样。
+
+RecurseTessellate()完成LOD功能。在计算完到CAMERA的距离后，它调整当前节点的Variance值，以便于适应距离的变化。它也可以让一个闭合的节点有一个比较大的Variance值。调整后的MESH将在近处使用比较多的三角形而在远处使用较少的三角形。距离的计算使用了一个简单的平方根计算（他比较慢，我将用一个较快的方法来替换它）。
+
+RecurseRender()这个函数非常的简单，但是你必须看一下在下面高级话题中的三角形排列优化技术。简单的说来就是如果当前的三角形不是一个叶节点那么就把它重新并入到子节点中。另外输出一个三角形使用了OPENGL，注意OPENGL渲染并没有被优化，这是为了使代码容易阅读。现在所有的都完成了，你需要做的是去理解代码，接下来将介绍一些高级话题了。
+
+8 引擎的性能
+
+Platform: Win98, AMD K6-2 450 Mhz, 96 Mb RAM, NVIDIA GeForce 256 DDR video.
+Resolution: 640x480, 32 bit color
+
+Roam Engine Qualifiers 
+Desired # of
+TriTree Nodes Textured FPS Solid-Fill FPD 
+5000 57 62 
+10000 30 36 
+15000 20 25 
+20000 16 19 
+
+Variance值的注意事项：Variance值在本引擎中是一个非常重要的变量，它被用在整个框架内。试着更改一下用于Variance树的计算方法，或树的深度。例如设置深度值为非常小的值如3，再试一个比较大的数如13，注意一下渲染性能的差异。
+
+9 高级话题
+
+作为一个承诺，这里有一些关于引擎优化和高级特性的暗示和秘密。他们中的每一个都可以论述成一篇论文，因此在每一个标题中我都尽可能的用最少的段落来描述最重要的内容。
+
+   1三角形排列
+
+    三角形排列是当所有的三角形都共享一个中心点时你才可以使用的一项优化技术（也就是三角形是按扇形排列的）。它允许你对相同数目的三角形指定一些顶点，并进行改进处理。在OPENGL中三角形排列对每个三角形的点进行处理时是按照顺时针进行的，因此你将不得不去转换待处理三角形所面对的方向否则OPENGL将剔除所有的三角形。为了获得正确的三角形输出，三角形排列将帮助用于改变在每一级别（LOD级别）的渲染过程中遍历子节点的顺序。也就是说如果我们在级别1上首先遍历左子节点，那么在级别2中必须首先遍历右子节点，而级别3又首先是遍历左子节点。
+
+在这里顶点的顺序是非常重要的，第一个被指定的顶点必须是围绕其他三角形“扇形扩展”方向的中心点。这样做是通过传送一个参考值给来做为“最佳中心点（BEST CENTER POINT）”一个三角形顶点。在每一个级别上，这个值都被改变为指向一个新的每级“最佳中心点”。当一个叶节点被发现时，它被添加到一个很小的顶点缓冲中，这个缓冲是以一个“最佳中心点”开始，其他顶点以顺时针方向排列。在下一个子节点中，我们只需要把“最佳中心点”和缓冲中的第一个顶点进行比较，如果他们不相等，把扇形输出到OPENGL中并终止。无论如何，如果两个顶点相等的话，那么测试缓冲中最后一个顶点是否等于三角形中按顺时针方向的下一个顶点，如果他们不相等，那么输出扇形到OPENGL并终止。另外要注意添加三角形的最后一个顶点到顶点缓冲的结尾部分。在这个方法中扇形的长度不能超过8个三角形，而平均长度应该为每一个扇形不超过3-4个三角形。
+
+     2 GeoMorphing
+
+使用动态LOD进行渲染的一个不好的边缘效果是当三角形从MESH中插入或移出时会产生突然的看的见的裂缝，这个现象可以被顶点变形体（MORPHING）简化为忽略不计，也叫几何变形体（GEOMORPHING）。它是指一个顶点在几帧的过程中随着从不分割点位置到它的新分割点位置而他的高度随着逐渐升高或降低。
+
+几何变形体并不难，但他也有一些棘手的地方。在分块过程中TriTreeNode结构或许保存有一个等于这个三角形的“MORPH”的值，这个“MORPH”值将被保持在0.0-1.0的范围。在渲染过程中，把插值高度值改变为实际的高度区域值需要使用下面的函数：
+
+MorphedZ = (fMorph * actualZ) + ((1-fMorph) *      interpolatedZ);
+
+     3 帧的一致性
+
+    帧的一致性是ROAM中的高级优化技术，对于这项技术来说，最后一帧建立的网格可以被再次使用。这个特性也可以用来进行动态帧定时，允许你连续的改进当前帧的网格直到这帧结束。在一个高速动作游戏中，这意味着你不必花费时间进行地形分块，相反可以先处理其他最重要的快速动作部件，而在帧时间静止时进行地形分块，而在结束时进行渲染。如果一个玩家在进行交火时，地形将用一个低级细节来动态渲染以保存时间。用本文的空间来解释帧的一致性是远远不够的，但是对于他有一些小的标题步骤：增加一个父节点指针到TriTreeNode中，建立一个不做Split()操作的Merge()函数，使用一个优先队列或其他优先结构来保存整个MESH中的叶节点。在分块过程中，随着分割这一帧中非常粗糙的节点的操作，合并所有本帧中足够DETAIL的节点（或直到时间结束）。
+
+     4 大拓扑结构支持
+
+    本引擎是用来构造一个非常大的世界，在为每一个Landscape类进行高度图载入和渲染每一个地形时，都没有限制它的大小！可是还有其他限制如内存和计算机性能。Landscape类被设计用来保存一个分页的世界块，连同其他Landscape类保存其他块，每一个Landscape必须连接它的patches到附近其他的Landscape中。这是在Patch::Reset()完成，另外设置邻节点指针为NULL。
+
+　
+
+PS：终于翻译完成，希望大家看到好的文章也能翻译过来
+
+http://hi.baidu.com/zuollblog/blog/item/e444a60efbc796266059f331.html
