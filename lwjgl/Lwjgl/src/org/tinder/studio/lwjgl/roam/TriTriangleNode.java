@@ -2,6 +2,8 @@ package org.tinder.studio.lwjgl.roam;
 /**
  *
  * 二元三角形
+ * TriTreeNode Struct
+ * Store the triangle tree data, but no coordinates!
  * @Author Micheal Hong
  * @Email babala_234@163.com
  * @Version 2010-7-21上午12:26:33
