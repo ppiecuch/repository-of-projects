@@ -11,6 +11,16 @@ public class Util {
 	public static float TOLERATION=0.0000005f;
 	
 	/**
+	 * 平方
+	 * @param a
+	 * @return
+	 */
+	public static float square(float a)
+	{
+		return a*a;
+	}
+	
+	/**
 	 * 三角形线性插值,a为共点,b跟c注意顺序,按右手法则
 	 * 原理：求P.Z的更好的公式是:d·(d1×d2)=0.其中d为向量<A,P>,d1为向量<A,B>,d2为向量<A,C>.
 	 * @param a

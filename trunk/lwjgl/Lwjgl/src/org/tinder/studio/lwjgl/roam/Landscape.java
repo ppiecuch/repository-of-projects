@@ -1,6 +1,7 @@
 package org.tinder.studio.lwjgl.roam;
 /**
  *
+ * Landscape管理大的地形块，协调块与块之间的沟通。它相当于地形渲染所有细节的封装体。
  * @Author Micheal Hong
  * @Email babala_234@163.com
  * @Version 2010-7-21上午12:38:00
@@ -9,12 +10,13 @@ package org.tinder.studio.lwjgl.roam;
 public class Landscape {
 	
 	private static final int POOL_SIZE=25000;	// How many TriTreeNodes should be allocated?
-	private static TriTriangleNode[] pool=new TriTriangleNode[POOL_SIZE];	// Pool of TriTree nodes for splitting
+	private static TriTreeNode[] pool=new TriTreeNode[POOL_SIZE];	// Pool of TriTree nodes for splitting
 	public static int nextTriNode;				// Index to next free TriTreeNode
 	
 	private Landscape(){}
 	
 	/**
+	 * 初始化所有地形块
 	 * Initialize all patches
 	 */
 	public static void init()
@@ -46,15 +48,16 @@ public class Landscape {
 	 * Allocate a TriTreeNode from the pool.
 	 * @return
 	 */
-	public static TriTriangleNode allocateTri(){
+	public static TriTreeNode allocateTri(){
 		if(nextTriNode>=POOL_SIZE)
 			return null;
-		TriTriangleNode node=pool[nextTriNode++];
+		TriTreeNode node=pool[nextTriNode++];
 		node.leftChild=node.rightChild=null;
 		return node;
 	}
 	
 	/**
+	 * 在每帧开始时重新设置每个地形块，并在需要的时候重新计算变差值
 	 * Reset all patches, recompute variance if needed
 	 */
 	public static void reset()
@@ -131,6 +134,7 @@ public class Landscape {
 	}
 	
 	/**
+	 * 分割地形块以生成近似网格
 	 * Create an approximate mesh of the landscape.
 	 */
 	public static void tessellate()
@@ -148,6 +152,7 @@ public class Landscape {
 	}
 	
 	/**
+	 * 渲染每个地形块，并调整gFrameVariance的值
 	 * Render each patch of the landscape & adjust the frame variance.
 	 */
 	public static void render()
