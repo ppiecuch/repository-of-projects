@@ -1,6 +1,9 @@
 package org.tinder.studio.lwjgl.roam;
 
+import org.lwjgl.opengl.GL11;
+import org.tinder.studio.lwjgl.util.Point3f;
 import org.tinder.studio.lwjgl.util.Util;
+import org.tinder.studio.lwjgl.util.Vector3f;
 
 /**
  *
@@ -20,19 +23,123 @@ public class Patch {
 	private int[] varianceLeft=new int[1<<(VARIANCE_DEPTH)];// Left variance tree
 	private int[] varianceRight=new int[1<<(VARIANCE_DEPTH)];// Right variance tree
 	
-	private float[] currentVariance;// Which varience we are currently using. [Only valid during the Tessellate and ComputeVariance passes]
-	private int varianceDirty;// Does the Varience Tree need to be recalculated for this Patch?
+	private int[] currentVariance;// Which varience we are currently using. [Only valid during the Tessellate and ComputeVariance passes]
+	private boolean varianceDirty;// Does the Varience Tree need to be recalculated for this Patch?
 	private boolean isVisible;// Is this patch visible in the current frame?
 	
-	private TriTreeNode baseLeft;// Left base triangle tree node
-	private TriTreeNode baseRight;// Right base triangle tree node
+	public TriTreeNode baseLeft;// Left base triangle tree node
+	public TriTreeNode baseRight;// Right base triangle tree node
+	
+	private int[] heightMap;
 	
 	// Beginning frame varience (should be high, it will adjust automatically)
 	private float gFrameVariance = 50;
 	
 	private float[] gViewPosition={ 0.f, 5.f, 0.f };
 	private int mapSize=0;
+	private int patchSize=0;
 	private int gNumTrisRendered=0;
+	
+	/**
+	 * Initialize a patch.
+	 */
+	public void init(int heightX, int heightY, int worldX, int worldY, int[] heightMap)
+	{
+		// Clear all the relationships
+		baseLeft.rightNeighbor=null;
+		baseLeft.leftNeighbor=null;
+		baseLeft.leftChild=null;
+		baseLeft.rightChild=null;
+		baseRight.rightNeighbor=null;
+		baseRight.leftNeighbor=null;
+		baseRight.leftChild=null;
+		baseRight.rightChild=null;
+		
+		// Attach the two m_Base triangles together
+		baseLeft.baseNeighbor=baseRight;
+		baseRight.baseNeighbor=baseLeft;
+		
+		// Store Patch offsets for the world and heightmap.
+		this.worldX=worldX;
+		this.worldY=worldY;
+		
+		// Store pointer to first byte of the height data for this patch.
+		this.heightMap=heightMap;
+		
+		// Initialize flags
+		this.varianceDirty=true;
+		this.isVisible=false;
+		/*
+		 * // ---------------------------------------------------------------------
+		// Initialize a patch.
+		//
+		void Patch::Init( int heightX, int heightY, int worldX, int worldY, unsigned char *hMap )
+		{
+			// Clear all the relationships
+			m_BaseLeft.RightNeighbor = m_BaseLeft.LeftNeighbor = m_BaseRight.RightNeighbor = m_BaseRight.LeftNeighbor =
+			m_BaseLeft.LeftChild = m_BaseLeft.RightChild = m_BaseRight.LeftChild = m_BaseLeft.LeftChild = NULL;
+		
+			// Attach the two m_Base triangles together
+			m_BaseLeft.BaseNeighbor = &m_BaseRight;
+			m_BaseRight.BaseNeighbor = &m_BaseLeft;
+		
+			// Store Patch offsets for the world and heightmap.
+			m_WorldX = worldX;
+			m_WorldY = worldY;
+		
+			// Store pointer to first byte of the height data for this patch.
+			m_HeightMap = &hMap[heightY * MAP_SIZE + heightX];
+		
+			// Initialize flags
+			m_VarianceDirty = 1;
+			m_isVisible = 0;
+		}
+		 */
+	}
+	
+	/**
+	 * Reset the patch.
+	 */
+	public void reset(){
+		// Assume patch is not visible.
+		isVisible=false;
+		
+		// Reset the important relationships
+		baseLeft.leftChild=null;
+		baseLeft.rightChild=null;
+		baseRight.leftChild=null;
+		baseRight.rightChild=null;
+		
+		// Attach the two m_Base triangles together
+		baseLeft.baseNeighbor=baseRight;
+		baseRight.baseNeighbor=baseLeft;
+		
+		// Clear the other relationships.
+		baseLeft.rightNeighbor=null;
+		baseLeft.leftNeighbor=null;
+		baseRight.rightNeighbor=null;
+		baseRight.leftNeighbor=null;
+		/*
+		 *
+		// Reset the patch.
+		//
+		void Patch::Reset()
+		{
+			// Assume patch is not visible.
+			m_isVisible = 0;
+
+			// Reset the important relationships
+			m_BaseLeft.LeftChild = m_BaseLeft.RightChild = m_BaseRight.LeftChild = m_BaseLeft.LeftChild = NULL;
+
+			// Attach the two m_Base triangles together
+			m_BaseLeft.BaseNeighbor = &m_BaseRight;
+			m_BaseRight.BaseNeighbor = &m_BaseLeft;
+
+			// Clear the other relationships.
+			m_BaseLeft.RightNeighbor = m_BaseLeft.LeftNeighbor = m_BaseRight.RightNeighbor = m_BaseRight.LeftNeighbor = NULL;
+		} 
+		 */
+	}
 	
 	/**
 	 * 对当前节点进行递归分解
@@ -251,6 +358,53 @@ public class Patch {
 	}
 	
 	/**
+	 * Render the mesh.
+	 */
+	public void render()
+	{
+		// Store old matrix
+		GL11.glPushMatrix();
+		// Translate the patch to the proper world coordinates
+		GL11.glTranslatef(worldX,0,worldY );
+		GL11.glBegin(GL11.GL_TRIANGLES);
+		recursRender(baseLeft,0,patchSize,patchSize,0,0,0);
+		recursRender(baseRight,patchSize,0,0,patchSize,patchSize,patchSize);
+		GL11.glEnd();
+		// Restore the matrix
+		GL11.glPopMatrix();
+		
+		/*
+		 * // ---------------------------------------------------------------------
+		// Render the mesh.
+		//
+		void Patch::Render()
+		{
+			// Store old matrix
+			glPushMatrix();
+			
+			// Translate the patch to the proper world coordinates
+			glTranslatef( (GLfloat)m_WorldX, 0, (GLfloat)m_WorldY );
+			glBegin(GL_TRIANGLES);
+				
+				RecursRender (	&m_BaseLeft,
+					0,				PATCH_SIZE,
+					PATCH_SIZE,		0,
+					0,				0);
+				
+				RecursRender(	&m_BaseRight,
+					PATCH_SIZE,		0,
+					0,				PATCH_SIZE,
+					PATCH_SIZE,		PATCH_SIZE);
+			
+			glEnd();
+			
+			// Restore the matrix
+			glPopMatrix();
+		}
+		 */
+	}
+	
+	/**
 	 * 	渲染每个叶子节点
 	 *  Render the tree.  Simple no-fan method.
 	 * @param tri
@@ -276,98 +430,109 @@ public class Patch {
 			// Actual number of rendered triangles...
 			gNumTrisRendered++;
 			
-//			GLfloat leftZ  = m_HeightMap[(leftY *MAP_SIZE)+leftX ];
-//			GLfloat rightZ = m_HeightMap[(rightY*MAP_SIZE)+rightX];
-//			GLfloat apexZ  = m_HeightMap[(apexY *MAP_SIZE)+apexX ];
+			int leftZ=heightMap[(leftY*mapSize)+leftX];
+			int rightZ=heightMap[(rightY*mapSize)+rightX];
+			int apexZ=heightMap[(apexY*mapSize)+apexX];
+			// Perform lighting calculations if requested.
 			
 			// Perform lighting calculations if requested.
+			Vector3f normal=new Vector3f();
+			Point3f p1=new Point3f(leftX,leftY,leftZ);
+			Point3f p2=new Point3f(rightX,rightY,rightZ);
+			Point3f p3=new Point3f(apexX,apexY,apexZ);
+			Util.calculateNormal(p1, p2, p3, normal);
+			GL11.glNormal3f(normal.x,normal.z,normal.y);
+			GL11.glVertex3f(leftX, leftZ, leftY);
+			GL11.glVertex3f(rightX, rightZ, rightY);
+			GL11.glVertex3f(apexX, apexZ, apexY);
 		}
+			
 		/*
 		 * // ---------------------------------------------------------------------
-// Render the tree.  Simple no-fan method.
-//
-void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY )
-{
-	if ( tri->LeftChild )					// All non-leaf nodes have both children, so just check for one
-	{
-		int centerX = (leftX + rightX)>>1;	// Compute X coordinate of center of Hypotenuse
-		int centerY = (leftY + rightY)>>1;	// Compute Y coord...
-
-		RecursRender( tri->LeftChild,  apexX,   apexY, leftX, leftY, centerX, centerY );
-		RecursRender( tri->RightChild, rightX, rightY, apexX, apexY, centerX, centerY );
-	}
-	else									// A leaf node!  Output a triangle to be rendered.
-	{
-		// Actual number of rendered triangles...
-		gNumTrisRendered++;
-
-		GLfloat leftZ  = m_HeightMap[(leftY *MAP_SIZE)+leftX ];
-		GLfloat rightZ = m_HeightMap[(rightY*MAP_SIZE)+rightX];
-		GLfloat apexZ  = m_HeightMap[(apexY *MAP_SIZE)+apexX ];
-
-		// Perform lighting calculations if requested.
-		if (gDrawMode == DRAW_USE_LIGHTING)
-		{
-			float v[3][3];
-			float out[3];
+			// Render the tree.  Simple no-fan method.
+			//
+			void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY )
+			{
+				if ( tri->LeftChild )					// All non-leaf nodes have both children, so just check for one
+				{
+					int centerX = (leftX + rightX)>>1;	// Compute X coordinate of center of Hypotenuse
+					int centerY = (leftY + rightY)>>1;	// Compute Y coord...
 			
-			// Create a vertex normal for this triangle.
-			// NOTE: This is an extremely slow operation for illustration purposes only.
-			//       You should use a texture map with the lighting pre-applied to the texture.
-			v[0][0] = (GLfloat) leftX;
-			v[0][1] = (GLfloat) leftZ;
-			v[0][2] = (GLfloat) leftY;
+					RecursRender( tri->LeftChild,  apexX,   apexY, leftX, leftY, centerX, centerY );
+					RecursRender( tri->RightChild, rightX, rightY, apexX, apexY, centerX, centerY );
+				}
+				else									// A leaf node!  Output a triangle to be rendered.
+				{
+					// Actual number of rendered triangles...
+					gNumTrisRendered++;
 			
-			v[1][0] = (GLfloat) rightX;
-			v[1][1] = (GLfloat) rightZ ;
-			v[1][2] = (GLfloat) rightY;
+					GLfloat leftZ  = m_HeightMap[(leftY *MAP_SIZE)+leftX ];
+					GLfloat rightZ = m_HeightMap[(rightY*MAP_SIZE)+rightX];
+					GLfloat apexZ  = m_HeightMap[(apexY *MAP_SIZE)+apexX ];
 			
-			v[2][0] = (GLfloat) apexX;
-			v[2][1] = (GLfloat) apexZ ;
-			v[2][2] = (GLfloat) apexY;
+					// Perform lighting calculations if requested.
+					if (gDrawMode == DRAW_USE_LIGHTING)
+					{
+						float v[3][3];
+						float out[3];
+						
+						// Create a vertex normal for this triangle.
+						// NOTE: This is an extremely slow operation for illustration purposes only.
+						//       You should use a texture map with the lighting pre-applied to the texture.
+						v[0][0] = (GLfloat) leftX;
+						v[0][1] = (GLfloat) leftZ;
+						v[0][2] = (GLfloat) leftY;
+						
+						v[1][0] = (GLfloat) rightX;
+						v[1][1] = (GLfloat) rightZ ;
+						v[1][2] = (GLfloat) rightY;
+						
+						v[2][0] = (GLfloat) apexX;
+						v[2][1] = (GLfloat) apexZ ;
+						v[2][2] = (GLfloat) apexY;
+						
+						calcNormal( v, out );
+						glNormal3fv( out );
+					}
 			
-			calcNormal( v, out );
-			glNormal3fv( out );
-		}
-
-		// Perform polygon coloring based on a height sample
-		float fColor = (60.0f + leftZ) / 256.0f;
-		if ( fColor > 1.0f )  fColor = 1.0f;
-		glColor3f( fColor, fColor, fColor );
-
-		// Output the LEFT VERTEX for the triangle
-		glVertex3f(		(GLfloat) leftX,
-						(GLfloat) leftZ,
-						(GLfloat) leftY );
-
-		if ( gDrawMode == DRAW_USE_TEXTURE ||	// Gaurad shading based on height samples instead of light normal
-			 gDrawMode == DRAW_USE_FILL_ONLY )
-		{
-			float fColor = (60.0f + rightZ) / 256.0f;
-			if ( fColor > 1.0f )  fColor = 1.0f;
-			glColor3f( fColor, fColor, fColor );
-		}
-
-		// Output the RIGHT VERTEX for the triangle
-		glVertex3f(		(GLfloat) rightX,
-						(GLfloat) rightZ,
-						(GLfloat) rightY );
-
-
-		if ( gDrawMode == DRAW_USE_TEXTURE ||	// Gaurad shading based on height samples instead of light normal
-			 gDrawMode == DRAW_USE_FILL_ONLY )
-		{
-			float fColor = (60.0f + apexZ) / 256.0f;
-			if ( fColor > 1.0f )  fColor = 1.0f;
-			glColor3f( fColor, fColor, fColor );
-		}
-
-		// Output the APEX VERTEX for the triangle
-		glVertex3f(		(GLfloat) apexX,
-						(GLfloat) apexZ,
-						(GLfloat) apexY );
-	}
-}
+					// Perform polygon coloring based on a height sample
+					float fColor = (60.0f + leftZ) / 256.0f;
+					if ( fColor > 1.0f )  fColor = 1.0f;
+					glColor3f( fColor, fColor, fColor );
+			
+					// Output the LEFT VERTEX for the triangle
+					glVertex3f(		(GLfloat) leftX,
+									(GLfloat) leftZ,
+									(GLfloat) leftY );
+			
+					if ( gDrawMode == DRAW_USE_TEXTURE ||	// Gaurad shading based on height samples instead of light normal
+						 gDrawMode == DRAW_USE_FILL_ONLY )
+					{
+						float fColor = (60.0f + rightZ) / 256.0f;
+						if ( fColor > 1.0f )  fColor = 1.0f;
+						glColor3f( fColor, fColor, fColor );
+					}
+			
+					// Output the RIGHT VERTEX for the triangle
+					glVertex3f(		(GLfloat) rightX,
+									(GLfloat) rightZ,
+									(GLfloat) rightY );
+			
+			
+					if ( gDrawMode == DRAW_USE_TEXTURE ||	// Gaurad shading based on height samples instead of light normal
+						 gDrawMode == DRAW_USE_FILL_ONLY )
+					{
+						float fColor = (60.0f + apexZ) / 256.0f;
+						if ( fColor > 1.0f )  fColor = 1.0f;
+						glColor3f( fColor, fColor, fColor );
+					}
+			
+					// Output the APEX VERTEX for the triangle
+					glVertex3f(		(GLfloat) apexX,
+									(GLfloat) apexZ,
+									(GLfloat) apexY );
+				}
+			}
 		 */
 	}
 	
@@ -377,29 +542,37 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
 	 */
 	public void computeVariance()
 	{
+		// Compute variance on each of the base triangles...
+		currentVariance=varianceLeft;
+		recursComputeVariance(0,patchSize,heightMap[patchSize*mapSize],patchSize,0,heightMap[patchSize],0,0,heightMap[0],1);
+		currentVariance=varianceRight;
+		recursComputeVariance(patchSize,0,heightMap[patchSize],0,patchSize,heightMap[patchSize*mapSize],
+				patchSize,patchSize,heightMap[(patchSize*mapSize)+patchSize],1);
+		// Clear the dirty flag for this patch
+		varianceDirty = false;
 		/*
 		 * // ---------------------------------------------------------------------
-// Compute the variance tree for each of the Binary Triangles in this patch.
-//
-void Patch::ComputeVariance()
-{
-	// Compute variance on each of the base triangles...
-
-	m_CurrentVariance = m_VarianceLeft;
-	RecursComputeVariance(	0,          PATCH_SIZE, m_HeightMap[PATCH_SIZE * MAP_SIZE],
-							PATCH_SIZE, 0,          m_HeightMap[PATCH_SIZE],
-							0,          0,          m_HeightMap[0],
-							1);
-
-	m_CurrentVariance = m_VarianceRight;
-	RecursComputeVariance(	PATCH_SIZE, 0,          m_HeightMap[ PATCH_SIZE],
-							0,          PATCH_SIZE, m_HeightMap[ PATCH_SIZE * MAP_SIZE],
-							PATCH_SIZE, PATCH_SIZE, m_HeightMap[(PATCH_SIZE * MAP_SIZE) + PATCH_SIZE],
-							1);
-
-	// Clear the dirty flag for this patch
-	m_VarianceDirty = 0;
-}
+		// Compute the variance tree for each of the Binary Triangles in this patch.
+		//
+		void Patch::ComputeVariance()
+		{
+			// Compute variance on each of the base triangles...
+		
+			m_CurrentVariance = m_VarianceLeft;
+			RecursComputeVariance(	0,          PATCH_SIZE, m_HeightMap[PATCH_SIZE * MAP_SIZE],
+									PATCH_SIZE, 0,          m_HeightMap[PATCH_SIZE],
+									0,          0,          m_HeightMap[0],
+									1);
+		
+			m_CurrentVariance = m_VarianceRight;
+			RecursComputeVariance(	PATCH_SIZE, 0,          m_HeightMap[ PATCH_SIZE],
+									0,          PATCH_SIZE, m_HeightMap[ PATCH_SIZE * MAP_SIZE],
+									PATCH_SIZE, PATCH_SIZE, m_HeightMap[(PATCH_SIZE * MAP_SIZE) + PATCH_SIZE],
+									1);
+		
+			// Clear the dirty flag for this patch
+			m_VarianceDirty = 0;
+		}
 		 */
 	}
 	
@@ -417,52 +590,81 @@ void Patch::ComputeVariance()
 	 * @param apexZ
 	 * @param node
 	 */
-	public void recursComputeVariance(int leftX,int leftY,int leftZ,
-				int rightX,int rightY,int rightZ,
-				int apexX,int apexY,int apexZ,int node)
+	public int recursComputeVariance(int leftX,int leftY,int leftZ,int rightX,int rightY,int rightZ,int apexX,int apexY,int apexZ,int node)
 	{
+		//        /|\
+		//      /  |  \
+		//    /    |    \
+		//  /      |      \
+		//  ~~~~~~~*~~~~~~~  <-- Compute the X and Y coordinates of '*'
+		//
+		int centerX = (leftX + rightX) >>1;		// Compute X coordinate of center of Hypotenuse
+		int centerY = (leftY + rightY) >>1;		// Compute Y coord...
+		int myVariance;
+		
+		// Get the height value at the middle of the Hypotenuse
+		int centerZ=heightMap[(centerY*mapSize)+centerX];
+		
+		// Variance of this triangle is the actual height at it's hypotenuse midpoint minus the interpolated height.
+		// Use values passed on the stack instead of re-accessing the Height Field.
+		myVariance = Math.abs((int)centerZ - (((int)leftZ + (int)rightZ)>>1));
+		
+		// Since we're after speed and not perfect representations,
+		// only calculate variance down to an 8x8 block
+		if ((Math.abs(leftX - rightX)>=8)||(Math.abs(leftY - rightY)>=8))
+		{
+			// Final Variance for this node is the max of it's own variance and that of it's children.
+			myVariance = Math.max( myVariance, recursComputeVariance( apexX,   apexY,  apexZ, leftX, leftY, leftZ, centerX, centerY, centerZ,    node<<1 ) );
+			myVariance = Math.max( myVariance, recursComputeVariance( rightX, rightY, rightZ, apexX, apexY, apexZ, centerX, centerY, centerZ, 1+(node<<1)) );
+		}
+		
+		// Store the final variance for this node.  Note Variance is never zero.
+		if (node < (1<<VARIANCE_DEPTH))
+			currentVariance[node] = 1 + myVariance;
+		return myVariance;
+		
 		/*
 		 * // ---------------------------------------------------------------------
-// Computes Variance over the entire tree.  Does not examine node relationships.
-//
-unsigned char Patch::RecursComputeVariance( int leftX,  int leftY,  unsigned char leftZ,
-										    int rightX, int rightY, unsigned char rightZ,
-											int apexX,  int apexY,  unsigned char apexZ,
-											int node)
-{
-	//        /|\
-	//      /  |  \
-	//    /    |    \
-	//  /      |      \
-	//  ~~~~~~~*~~~~~~~  <-- Compute the X and Y coordinates of '*'
-	//
-	int centerX = (leftX + rightX) >>1;		// Compute X coordinate of center of Hypotenuse
-	int centerY = (leftY + rightY) >>1;		// Compute Y coord...
-	unsigned char myVariance;
-
-	// Get the height value at the middle of the Hypotenuse
-	unsigned char centerZ  = m_HeightMap[(centerY * MAP_SIZE) + centerX];
-
-	// Variance of this triangle is the actual height at it's hypotenuse midpoint minus the interpolated height.
-	// Use values passed on the stack instead of re-accessing the Height Field.
-	myVariance = abs((int)centerZ - (((int)leftZ + (int)rightZ)>>1));
-
-	// Since we're after speed and not perfect representations,
-	//    only calculate variance down to an 8x8 block
-	if ( (abs(leftX - rightX) >= 8) ||
-		 (abs(leftY - rightY) >= 8) )
-	{
-		// Final Variance for this node is the max of it's own variance and that of it's children.
-		myVariance = MAX( myVariance, RecursComputeVariance( apexX,   apexY,  apexZ, leftX, leftY, leftZ, centerX, centerY, centerZ,    node<<1 ) );
-		myVariance = MAX( myVariance, RecursComputeVariance( rightX, rightY, rightZ, apexX, apexY, apexZ, centerX, centerY, centerZ, 1+(node<<1)) );
-	}
-
-	// Store the final variance for this node.  Note Variance is never zero.
-	if (node < (1<<VARIANCE_DEPTH))
-		m_CurrentVariance[node] = 1 + myVariance;
-
-	return myVariance;
-}
+			// Computes Variance over the entire tree.  Does not examine node relationships.
+			//
+			unsigned char Patch::RecursComputeVariance( int leftX,  int leftY,  unsigned char leftZ,
+													    int rightX, int rightY, unsigned char rightZ,
+														int apexX,  int apexY,  unsigned char apexZ,
+														int node)
+			{
+				//        /|\
+				//      /  |  \
+				//    /    |    \
+				//  /      |      \
+				//  ~~~~~~~*~~~~~~~  <-- Compute the X and Y coordinates of '*'
+				//
+				int centerX = (leftX + rightX) >>1;		// Compute X coordinate of center of Hypotenuse
+				int centerY = (leftY + rightY) >>1;		// Compute Y coord...
+				unsigned char myVariance;
+			
+				// Get the height value at the middle of the Hypotenuse
+				unsigned char centerZ  = m_HeightMap[(centerY * MAP_SIZE) + centerX];
+			
+				// Variance of this triangle is the actual height at it's hypotenuse midpoint minus the interpolated height.
+				// Use values passed on the stack instead of re-accessing the Height Field.
+				myVariance = abs((int)centerZ - (((int)leftZ + (int)rightZ)>>1));
+			
+				// Since we're after speed and not perfect representations,
+				//    only calculate variance down to an 8x8 block
+				if ( (abs(leftX - rightX) >= 8) ||
+					 (abs(leftY - rightY) >= 8) )
+				{
+					// Final Variance for this node is the max of it's own variance and that of it's children.
+					myVariance = MAX( myVariance, RecursComputeVariance( apexX,   apexY,  apexZ, leftX, leftY, leftZ, centerX, centerY, centerZ,    node<<1 ) );
+					myVariance = MAX( myVariance, RecursComputeVariance( rightX, rightY, rightZ, apexX, apexY, apexZ, centerX, centerY, centerZ, 1+(node<<1)) );
+				}
+			
+				// Store the final variance for this node.  Note Variance is never zero.
+				if (node < (1<<VARIANCE_DEPTH))
+					m_CurrentVariance[node] = 1 + myVariance;
+			
+				return myVariance;
+			}
 		 */
 	}
 	
@@ -478,22 +680,69 @@ unsigned char Patch::RecursComputeVariance( int leftX,  int leftY,  unsigned cha
 	 */
 	public void setVisibility(int eyeX,int eyeY,int leftX,int leftY,int rightX,int rightY )
 	{
+		// Get patch's center point
+		int patchCenterX=worldX+patchSize/2;
+		int patchCenterY=worldY+patchSize/2;
+		
+		// Set visibility flag (orientation of both triangles must be counter clockwise)
+		isVisible=Util.orientation(eyeX,eyeY,rightX,rightY,patchCenterX, patchCenterY)<0&&Util.orientation(leftX,leftY,eyeX,eyeY,patchCenterX,patchCenterY )<0;
 		/*
 		 * // ---------------------------------------------------------------------
-// Set patch's visibility flag.
-//
-void Patch::SetVisibility( int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY )
-{
-	// Get patch's center point
-	int patchCenterX = m_WorldX + PATCH_SIZE / 2;
-	int patchCenterY = m_WorldY + PATCH_SIZE / 2;
-	
-	// Set visibility flag (orientation of both triangles must be counter clockwise)
-	m_isVisible = (orientation( eyeX,  eyeY,  rightX, rightY, patchCenterX, patchCenterY ) < 0) &&
-				  (orientation( leftX, leftY, eyeX,   eyeY,   patchCenterX, patchCenterY ) < 0);
-}
-
+		// Set patch's visibility flag.
+		//
+		void Patch::SetVisibility( int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY )
+		{
+			// Get patch's center point
+			int patchCenterX = m_WorldX + PATCH_SIZE / 2;
+			int patchCenterY = m_WorldY + PATCH_SIZE / 2;
+			
+			// Set visibility flag (orientation of both triangles must be counter clockwise)
+			m_isVisible = (orientation( eyeX,  eyeY,  rightX, rightY, patchCenterX, patchCenterY ) < 0) &&
+						  (orientation( leftX, leftY, eyeX,   eyeY,   patchCenterX, patchCenterY ) < 0);
+		}
 		 */
+	}
+	
+	/**
+	 *  Create an approximate mesh.
+	 */
+	public void tesslate()
+	{
+		// Split each of the base triangles
+		currentVariance=varianceLeft;
+		recursTessellate(baseLeft,worldX,worldY+patchSize,worldX+patchSize,worldY,worldX,worldY,1);
+		currentVariance=varianceRight;
+		recursTessellate(baseRight,worldX+patchSize,worldY,worldX,worldY+patchSize,worldX+patchSize,worldY+patchSize,1);
+		/*
+		 * // ---------------------------------------------------------------------
+		// Create an approximate mesh.
+		//
+		void Patch::Tessellate()
+		{
+			// Split each of the base triangles
+			m_CurrentVariance = m_VarianceLeft;
+			RecursTessellate (	&m_BaseLeft,
+								m_WorldX,				m_WorldY+PATCH_SIZE,
+								m_WorldX+PATCH_SIZE,	m_WorldY,
+								m_WorldX,				m_WorldY,
+								1 );
+							
+			m_CurrentVariance = m_VarianceRight;
+			RecursTessellate(	&m_BaseRight,
+								m_WorldX+PATCH_SIZE,	m_WorldY,
+								m_WorldX,				m_WorldY+PATCH_SIZE,
+								m_WorldX+PATCH_SIZE,	m_WorldY+PATCH_SIZE,
+								1 );
+		}
+		 */
+	}
+	
+	public boolean isVisible() { 
+		return isVisible;
+	}
+	
+	public boolean isDirty(){
+		return varianceDirty;
 	}
 
 }

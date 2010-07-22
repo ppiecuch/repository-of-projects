@@ -11,6 +11,41 @@ public class Util {
 	public static float TOLERATION=0.0000005f;
 	
 	/**
+	 * 计算三角形的方向向量,点按逆时针顺序
+	 * Points p1, p2, & p3 specified in counter clock-wise order
+	 * @param points
+	 * @param normal
+	 */
+	public static void calculateNormal(Point3f p1,Point3f p2,Point3f p3,Vector3f normal)
+	{
+		Vector3f v1=new Vector3f();
+		v1.sub(p1,p2);
+		Vector3f v2=new Vector3f();
+		v2.sub(p2,p3);
+		normal.cross(v1, v2);
+		normal.normalize();
+	}
+	
+	// 计算三角形的面向,即可见性
+	// Discover the orientation of a triangle's points:
+	// Taken from "Programming Principles in Computer Graphics", L. Ammeraal (Wiley)
+	//
+	public static int orientation( int pX, int pY, int qX, int qY, int rX, int rY )
+	{
+		int aX, aY, bX, bY;
+		float d;
+
+		aX = qX - pX;
+		aY = qY - pY;
+
+		bX = rX - pX;
+		bY = rY - pY;
+
+		d = (float)aX * (float)bY - (float)aY * (float)bX;
+		return (d<0)?-1:(d>0)?1:0;
+	}
+	
+	/**
 	 * 平方
 	 * @param a
 	 * @return
