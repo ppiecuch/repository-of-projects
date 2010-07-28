@@ -1,0 +1,377 @@
+你可以在CPU上计算所有波的3D位置，但这样做会消耗大量的资源，每帧向显卡发送大量的数据是不可接受的。
+
+解决方案
+在XNA程序中，你只需创建一个三角形组成的平面网格。这和创建地形类似，在教程5－8中已经解释过了，只不过这次网格是平的，你将需一次性地把这些数据传递到显卡。当绘制网格时，vertex shader会在网格上添加水波，pixel shader添加反射，这一切都在GPU中完成，CPU只处理Draw指令，让CPU可以处理更重要的工作。 
+
+vertex shader接受网格的顶点数据并改变它们的高度，这样平的网格会形成一个波涛起伏的海面。你可以使用一个正弦波产生这个高度。只有一个正弦波会导致海面看起来太理想化，这是因为每个波都是一样的。 
+
+幸运的是，GPU上的所以操作在一次并行处理中能执行四次，所以计算一个正弦波和计算四个正弦波所用的时间是相同的。vertex shader会计算四个正弦波并将它们求和，如图5－32所示。当你对每个波设置不同的波长、波速和振幅，最终会形成比较真实的海面。 
+
+ 
+图5－32 四个正弦波的叠加 
+
+只有海面反射周围环境时它才会看起来足够真实。在pixel shader中，你将从天空盒（见教程2－8）采样反射颜色。但是，这些反射太完美的话会形成像玻璃一样的水洋面，反而不真实。所以在每个像素中，你还要在水面上添加凹凸映射（见教程5－16），在大的海浪上再增加一些小的逐像素的漪涟。
+
+最后使用菲涅耳项调整最后结果，这样pixel shader会根据视角在深蓝色和反射颜色之间进行插值。
+
+工作原理
+在XNA项目中，你需要导入并绘制一个天空盒（见教程2－8）.接着，你需要为平面网格生成顶点和索引，这个只是教程5－8中地形生成的简化版本。使用如下代码生成顶点： 
+
+private VertexPositionTexture[] CreateWaterVertices() 
+{
+    VertexPositionTexture[] waterVertices = new VertexPositionTexture[waterWidth * waterHeight]; 
+    
+    int i = 0; 
+    for (int z = 0;z < waterHeight; z++) 
+    {
+        for (int x = 0; x < waterWidth; x++) 
+        { 
+            Vector3 position = new Vector3(x, 0, -z); 
+            Vector2 texCoord = new Vector2((float)x / 30.0f, (float)z / 30.0f); 
+            waterVertices[i++] = new VertexPositionTexture(position, texCoord); 
+        }
+    }
+    return waterVertices;
+}这个网格是平的，因为所有Y值都是0。在顶点中只存储了3D位置和纹理坐标，生成索引的方法已在教程5－8中介绍过了。定义好顶点和索引后，你就做好了编写HLSL effect文件的准备了。 
+
+XNA-to-HLSL变量
+你想让海面的生成尽可能的灵活，所以期望可以在XNA项目中设置很多变量。因为你处理的3D位置要被转换到2D屏幕坐标，所以需要World，View和Projection矩阵。接着你想完全控制四个正弦波，每个波都有四个可控变量：振幅、波长、波速和方向。 
+
+因为你想让vertex shader在每帧都更新波，所以需要知道当前时间；要添加水面反射，需要知道相机的3D位置。最后，要在水面通过凹凸贴图添加漪涟，你还要一个凹凸贴图，还要两个变量设置凹凸贴图的强度和漪涟的大小：
+
+float4x4 xWorld; float4x4 xView; 
+float4x4 xProjection; 
+float4 xWaveSpeeds; 
+float4 xWaveHeights; 
+float4 xWaveLengths; 
+float2 xWaveDir0; 
+float2 xWaveDir1; 
+float2 xWaveDir2; 
+float2 xWaveDir3; 
+float3 xCameraPos; 
+float xBumpStrength; 
+float xTexStretch; 
+float xTime; 你需要一个天空盒采样反射的颜色，还有一个凹凸贴图： 
+
+Texture xCubeMap; 
+samplerCUBE CubeMapSampler =sampler_state
+{
+    texture = <xCubeMap> ;
+    magfilter = LINEAR; 
+    minfilter = LINEAR; 
+    mipfilter=LINEAR; 
+    AddressU =mirror; 
+    AddressV = mirror; 
+}; 
+
+Texture xBumpMap; sampler BumpMapSampler =sampler_state 
+{
+    texture = <xBumpMap> ; 
+    magfilter = LINEAR; 
+    minfilter = LINEAR; 
+    mipfilter=LINEAR; 
+    AddressU = mirror; 
+    AddressV = mirror; 
+}; Output结构
+要查询反射的颜色，pixel shader需要知道相机位置。需要根据pixel shader 中对凹凸贴图的处理构建出Tangent-to-World矩阵。 
+
+pixel shader只需计算每个像素的颜色：
+
+struct OWVertexToPixel
+{
+    float4 Position : POSITION; 
+    float2 TexCoord : TEXCOORD0; 
+    float3 Pos3D: TEXCOORD1; 
+    float3x3 TTW: TEXCOORD2; 
+};
+
+struct OWPixelToFrame
+{
+    float4 Color : COLOR0; 
+}; Vertex Shader：正弦波
+vertex shader中最重要的任务是调整每个顶点的高度。前面已经解释了，你将四个正弦函数进行叠加生成水波。正弦函数需要一个参数，当这个参数增加时，会形成在–1到1之间的波形。你使用顶点位置作为正弦函数的一个参数，这个参数与波的传播方向相关。你可以将顶点的X，Z位置与传播方向点乘，对于垂直于波的传播方向上一直线上的所有顶点来说，这个点乘值是相同的。如果参数相同，那么正弦函数也相同，所以它们的高度也是相同的。 这让波在正确地方向上波形良好。
+
+OWVertexToPixel OWVertexShader(float4 inPos: POSITION0, float2 inTexCoord: TEXCOORD0)
+{
+    OWVertexToPixel Output = (OWVertexToPixel)0; 
+    
+    float4 dotProducts; 
+    dotProducts.x = dot(xWaveDir0, inPos.xz); 
+    dotProducts.y = dot(xWaveDir1, inPos.xz); 
+    dotProducts.z = dot(xWaveDir2, inPos.xz); 
+    dotProducts.w = dot(xWaveDir3, inPos.xz); 
+} 因为shader允许你将四个正弦函数求和，你需要对顶点的XZ坐标和波的方向进行四次点乘。在使用这些点乘作为正弦函数的参数之前，需要将它们除以xWaveLengths变量，这样可以调整波长。
+
+最后要使水波移动，所以需要在参数中添加当前时间。将xWaveSpeeds 变量乘以当前时间，让你可以定义每列波的波速，让某些波可以比其他波运动得更快或是更慢。下面是代码：
+
+float4 arguments = dotProducts/xWaveLengths+xTime*xWaveSpeeds; 
+float4 heights = xWaveHeights*sin(arguments); 正弦函数的结果乘以xWaveHeights变量，这样你可以独立地缩放四个波形。记住这个代码是并行地执行了四次，让你可以快速地获取当前时间当前顶点的正弦波的高度。
+
+计算完正弦函数后，将它们相加作为顶点的Y坐标： 
+
+float4 final3DPos = inPos; 
+final3DPos.y += heights.x; 
+final3DPos.y += heights.y; 
+final3DPos.y += heights.z; 
+final3DPos.y += heights.w; 
+float4x4 preViewProjection = mul(xView, xProjection); 
+float4x4 preWorldViewProjection = mul(xWorld, preViewProjection); 
+Output.Position = mul(final3DPos, preWorldViewProjection); 
+float4 final3DPosW = mul(final3DPos, xWorld); 
+Output.Pos3D = final3DPosW; 这可以有效地将顶点高度提升。一旦你知道了顶点的最终位置，你就可以将它们转换为2D屏幕位置了。
+
+pixel shader也需要知道3D位置，所以你要将3D位置信息传递到pixel shader (因为Output.Position不是在pixel shader中被处理的)。 
+
+Pixel Shader：最简单的形式
+在vertex shader转换了顶点的3D位置后，这个简单的pixel shader会给每个像素施加同样的颜色并将它们绘制到屏幕： 
+
+OWPixelToFrame OWPixelShader(OWVertexToPixel PSIn) : COLOR0
+{
+    OWPixelToFrame Output = (OWPixelToFrame)0; 
+    float4 waterColor = float4(0,0.1,0.3,1); 
+    Output.Color = waterColor; 
+    return Output; 
+}  
+只能看到一片蓝色混在一起上下起伏
+
+定义Technique 
+添加technique定义使effect可用。如果你每帧更新xTime变量，那么波也会在vertex shader中更新：
+
+technique OceanWater
+{
+    pass Pass0
+    {
+        VertexShader = compile vs_2_0 OWVertexShader(); 
+        PixelShader = compile ps_2_0 OWPixelShader(); 
+    }
+} Vertex Shader：法线计算
+所有光线计算都要用到顶点的法线，在你的XNA项目中你无需添加顶点的法线信息。法线向量必须垂直于表面，因为vertex shader在不停地改变表面，所以在vertex shader中还要计算法线。
+
+对于一个平面，法线的方向是(0,1,0)向上。当水波通过平面时，你需要知道(0,1,0)向量会偏离多少。你可以通过求导算出一个函数（例如正弦函数）上任意点的偏移量。听起来很难，但幸运的是正弦函数的导数是余弦函数。如果太抽象，可以看一下图5-33。实线表示正弦函数，你可以看到虚线非常好（事实上是非常完美）地显示了波形上任意点的法线的偏移程度。 
+
+ 
+图5-33 正弦函数(实线)和余弦函数(虚线) 
+
+例如，在波峰和波谷(这里水面是平的)，余弦值为0，这表示(0,1,0)向量无需改变，而在波的平衡位置余弦函数最大。
+
+这意味着计算完正弦函数后，还要对高度函数求导。因为高度函数要乘以xWaveHeights，所以求导函数也要乘以xWaveHeights。正弦函数的导数是余弦函数，在将dotProducts (图5-33中的水平轴)除以xWaveLengths时也要将它除以xWaveLengths。 
+
+float4 derivatives = xWaveHeights*cos(arguments)/xWaveLengths; 
+
+上面公式的意义是：波越高，则波形越陡，法线的偏移量就越大，而波长越长，法线偏离(0,1,0) 方向就越少。 
+
+注意：正弦和余弦都乘以xWaveHeights这意味这如果你将高度设置为0，那么顶点就没有起伏或法线就没有偏离。 
+
+现在你已经计算出了导数，将它们相加获得当前顶点的法线偏移量。图5-33中的波是2D的，所以余弦值表示法线向前或向后的偏移量。而你的波是在3D空间中的，所以前面的话中你应该用“波的传播方向”代替“向前”：
+
+float2 deviations = 0; 
+deviations += derivatives.x*xWaveDir0; 
+deviations += derivatives.y*xWaveDir1; 
+deviations += derivatives.z*xWaveDir2; 
+deviations += derivatives.w*xWaveDir3; 
+float3 Normal = float3(-deviations.x, 1, -deviations.y); 顶点法线为(0,1,0)表示几乎不偏离，对应为波峰波谷的顶点，如果波长很短那么法线几乎都是指向波的传播方向的。
+
+Vertex Shader: 创建Tangent-to-World矩阵
+当你使用前一节中生成的法线给水面添加光照时，明暗效果已经很好了，但是你还要在水面上添加一些小起伏。要添加这个细节，你需要使用凹凸映射。在pixel shader中进行凹凸映射前，你需要生成正确的Tangent-to-World矩阵。
+
+如教程5-16中解释的那样，这个矩阵中的行对应法线、副法线和切线向量。现在你已经有了法线向量，现在继续定义切线和副法线向量： 
+
+float3 Binormal = float3(1, deviations.x, 0); 
+float3 Tangent = float3(0, deviations.y, 1); 这三个向量必须彼此垂直。因为你要让法线偏离(0,1,0)方向，所以你需要将副法线偏离(1,0,0)方向，切线偏离(0,0,1)方向。
+
+知道了切线空间的三个向量后，就很容易定义Tangent-to-World矩阵，如教程5-16中解释的那样： 
+
+float3x3 tangentToObject; tangentToObject[0] = normalize(Binormal); 
+tangentToObject[1] = normalize(Tangent); 
+tangentToObject[2] = normalize(Normal); 
+float3x3 tangentToWorld = mul(tangentToObject, xWorld); 
+Output.TTW = tangentToWorld; 
+Output.TexCoord = inTexCoord+xTime/50.0f*float2(-1,0); 
+return Output; 你将Tangent-to-World 矩阵和用来从凹凸映射中采样的纹理坐标传递到pixel shader。 
+
+Pixel Shader：凹凸映射
+在每个像素中，你将改变法线方向用来添加水面的小起伏。如果使用凹凸贴图，你可以很容易地在最后结果中看到凹凸贴图上的图案。对每个像素，你都要采样凹凸贴图的三个颜色通道并对结果求平均。记住颜色总是定义在[0,1]区间，所以你将颜色的每个分量减去0.5使它们在[–0.5,0.5]区间。然后在下一步把它们映射到[–1,1]区间(法线的XYZ坐标区间)。 
+
+float3 bumpColor1 = tex2D(BumpMapSampler, xTexStretch*PSIn.TexCoord)-0.5f; 
+float3 bumpColor2 = tex2D(BumpMapSampler, xTexStretch*1.8*PSIn.TexCoord.yx)-0.5f; 
+float3 bumpColor3 = tex2D(BumpMapSampler, xTexStretch*3.1*PSIn.TexCoord)-0.5f; 
+float3 normalT = bumpColor1 + bumpColor2 + bumpColor3; 这三个纹理坐标是不同的，因为它们乘以不同的因子。第二个纹理的XY坐标已经被改变，最后，将三个偏移量相加。
+
+这个方向必须要归一化，但在这之前，你还可以缩放凹凸贴图。在凹凸贴图中，蓝色向量对应默认法线向量，红色和绿色对应副法线和切线的偏移量，所以如果你增加/减少红色或绿色，就可以增加/减少偏移量，并由此改变了凹凸映射！
+
+normalT.rg *= xBumpStrength; 
+normalT = normalize(normalT); 
+float3 normalW = mul(normalT, PSIn.TTW); 上面代码中获取的方向需要归一化并转换到世界空间。你最终得到世界空间中的法线，这样可以和其他世界空间中的向量进行计算。 
+
+Pixel Shader：反射
+有了定义在世界空间中的法线向量，现在可以计算水面的光照了。但是为了使效果更真实，你需要首先添加水面的反射。因为反射颜色是从天空盒采样的，所以需要从天空盒采样的方向(见教程2-8)。你可以将eye向量取关于法线的镜像获取这个反射方向，如图5-34所示。
+
+ 
+图5-34 将eye向量关于法线取镜像获得reflection向量
+
+你可以将目标点减去初始点获取eye向量：
+
+float3 eyeVector = normalize(PSIn.Pos3D - xCameraPos); 因为eye向量盒法线向量都是在定义在间中，你可以对他们进行操作。HLSL提供了reflect 方法可以计算如图5-34的反射向量：
+
+float3 reflection = reflect(eyeVector, normalW); 如果你从这个方向采样天空盒纹理，就可以获得当前像素的反射颜色(可见教程2-8获取更多关于texCUBE的知识)： 
+
+float4 reflectiveColor = texCUBE(CubeMapSampler, reflection); Pixel Shader：菲涅耳项
+如果你只是简单地施加反射颜色，那么水面任何地方反射程度都一样，这会导致水面像一面起伏的镜子。要解决这个问题，你需要根据观察角度调整反射率。如果你平行于水面观察，反射率会很高，如果垂直观察，反射率低，水面会呈现深蓝色。
+
+
+译者注：在《新概念物理－光学教程》第276页，引用了M.C.Escher的名画《三界（Three Worlds）》形象地表明了：同是在水与空气的界面上的光，来自于入射角大的远处，以反射为主，只能看到树的倒影；来自于入射角小的近处，以透射为主，即反射率很小，可以清楚地看到水下的鱼。
+
+这可以使用eye向量盒法线向量的点乘表示。如果你垂直观察水面，那么这两个向量夹角为0，点乘积最大（如果两个向量都是单位向量则为1）。如果你平行于水面观察，这两个向量的夹角为90度，点乘积为0。Eye向量盒法线向量的点乘叫做菲涅耳项（Fresnel term）。
+
+菲涅耳项大（接近1）表示最小的反射，而菲涅耳项小的像素表示它的行为像一面镜子。水面看起来永远不会像一面镜子，所以你要把菲涅耳项从[0,1]区间缩放到[0.5,1]区间来降低反射率： 
+
+float fresnelTerm = dot(-eyeVector, normalW); 
+fresnelTerm = fresnelTerm/2.0f+0.5f; 注意：代码第一行中的负号是必须的，这是因为这两个向量方向相反，法线指向上方而eye向量指向下方，如果没有负号会导致菲涅耳项为负数。
+
+ 
+效果已经不错了，但还没加上对太阳的反射效果
+
+Pixel Shader：镜面反射
+现在你已经知道了反射的颜色，反射与深蓝色混合的程度，下面你可以通过添加一些镜面反射来改进最后的效果。
+
+如教程6-4中解释的那样，镜面反射通常取决于入射光的方向。在本例中，通过找到反射立方贴图中光源的水面上的点的方式获取更好的效果，它们通常对应于天空盒的亮白色部分。
+
+要找到明亮的反射位置，要将反射颜色的三个颜色通道相加求和，明亮的部位和会接近于3，将这个值除以3使之处于[0,1]区间。
+
+float sunlight = reflectiveColor.r; 
+sunlight += reflectiveColor.g; 
+sunlight += reflectiveColor.b; 
+sunlight /= 3.0f; 
+float specular = pow(sunlight,30); 将这个值进行30的幂计算，这样可以只剩下最亮的颜色，只有大于0.975的sunlight值才会得到超过0.5的specular值！ 
+
+Pixel Shader：整合在一起
+最后，你将所有要素组合在一起获得最终的颜色，下面是代码：
+
+float4 waterColor = float4(0,0.2,0.4,1); 
+Output.Color = waterColor*fresnelTerm + reflectiveColor*(1-fresnelTerm) + specular; 深蓝色的水面颜色和反射颜色的联系是由菲涅耳项决定的。对几乎所有像素，这这种颜色的组合构成了最终的颜色。对于一个有很亮反光颜色的像素，specular值会大于1，这会让最终颜色亮得多，有着非常亮的反射的水面位置对应的是天空盒中太阳的位置。
+
+ 
+最终效果
+
+代码
+XNA部分
+在XNA项目中，你可以完全控制波。你可以独立地设置四个波的波速，振幅和波长。如果你想移除一个波，只需将它的振幅设置为0即可。下面的代码设置effect的所有参数并绘制海面的三角形：
+
+Vector4 waveSpeeds = new Vector4(1, 2, 0.5f, 1.5f); 
+Vector4 waveHeights = new Vector4(0.3f, 0.4f, 0.2f, 0.3f); 
+Vector4 waveLengths = new Vector4(10, 5, 15, 7); 
+Vector2[] waveDirs = new Vector2[4]; 
+
+waveDirs[0] = new Vector2(-1, 0); 
+waveDirs[1] = new Vector2(-1, 0.5f); 
+waveDirs[2] = new Vector2(-1, 0.7f); 
+waveDirs[3] = new Vector2(-1, -0.5f); 
+
+for (int i = 0; i < 4; i++) 
+    waveDirs[i].Normalize(); 
+effect.CurrentTechnique = effect.Techniques["OceanWater"]; 
+effect.Parameters["xWorld"].SetValue(Matrix.Identity); 
+effect.Parameters["xView"].SetValue(fpsCam.ViewMatrix); 
+effect.Parameters["xBumpMap"].SetValue(waterBumps); 
+effect.Parameters["xProjection"].SetValue(fpsCam.ProjectionMatrix); 
+effect.Parameters["xBumpStrength"].SetValue(0.5f); 
+effect.Parameters["xCubeMap"].SetValue(skyboxTexture); 
+effect.Parameters["xTexStretch"].SetValue(4.0f); 
+effect.Parameters["xCameraPos"].SetValue(fpsCam.Position); 
+effect.Parameters["xTime"].SetValue(time); 
+effect.Parameters["xWaveSpeeds"].SetValue(waveFreqs); 
+effect.Parameters["xWaveHeights"].SetValue(waveHeights); 
+effect.Parameters["xWaveLengths"].SetValue(waveLengths); 
+effect.Parameters["xWaveDir0"].SetValue(waveDirs[0]); 
+effect.Parameters["xWaveDir1"].SetValue(waveDirs[1]); 
+effect.Parameters["xWaveDir2"].SetValue(waveDirs[2]); 
+effect.Parameters["xWaveDir3"].SetValue(waveDirs[3]); 
+
+effect.Begin(); 
+foreach (EffectPass pass in effect.CurrentTechnique.Passes) 
+{
+    pass.Begin(); 
+    device.Vertices[0].SetSource(waterVertexBuffer, 0, VertexPositionTexture.SizeInBytes); 
+    device.Indices = waterIndexBuffer; 
+    device.VertexDeclaration = myVertexDeclaration; 
+    device.DrawIndexedPrimitives(PrimitiveType.TriangleStrip, 0, 0, waterWidth *waterHeight, 
+    0, waterWidth * 2 * (waterHeight - 1) - 2); 
+    pass.End(); 
+} 
+effect.End(); 注意：波的参数只有在波变化时才需要被设置，而其他参数，如time，view matrix和camera position需要每帧都更新或当相机位置变动时更新。 
+
+HLSL部分
+你可以在本教程开始部分找到XNA-to-HLSL变量，纹理和输出结构。
+
+下面是vertex shader的代码，vertex shader中不停地改变每个顶点的高并计算Tangent-to-World矩阵： 
+
+OWVertexToPixel OWVertexShader(float4 inPos: POSITION0, float2 inTexCoord:TEXCOORD0)
+{
+    OWVertexToPixel Output = (OWVertexToPixel)0; 
+    
+    float4 dotProducts; 
+    dotProducts.x = dot(xWaveDir0, inPos.xz); 
+    dotProducts.y = dot(xWaveDir1, inPos.xz); 
+    dotProducts.z = dot(xWaveDir2, inPos.xz); 
+    dotProducts.w = dot(xWaveDir3, inPos.xz); 
+    float4 arguments = dotProducts/xWaveLengths+xTime*xWaveSpeeds; 
+    float4 heights = xWaveHeights*sin(arguments); 
+    float4 final3DPos = inPos; 
+    final3DPos.y += heights.x; 
+    final3DPos.y += heights.y; 
+    final3DPos.y += heights.z; 
+    final3DPos.y += heights.w; 
+    
+    float4x4 preViewProjection = mul(xView, xProjection); 
+    float4x4 preWorldViewProjection = mul(xWorld, preViewProjection); 
+    Output.Position = mul(final3DPos, preWorldViewProjection); 
+    float4 final3DPosW = mul(final3DPos, xWorld); 
+    Output.Pos3D = final3DPosW; 
+    
+    float4 derivatives = xWaveHeights*cos(arguments)/xWaveLengths; 
+    float2 deviations = 0; 
+    deviations += derivatives.x*xWaveDir0; 
+    deviations += derivatives.y*xWaveDir1; 
+    deviations += derivatives.z*xWaveDir2; 
+    deviations += derivatives.w*xWaveDir3; 
+    
+    float3 Normal = float3(-deviations.x, 1, -deviations.y); 
+    float3 Binormal = float3(1, deviations.x, 0); 
+    float3 Tangent = float3(0, deviations.y, 1); 
+    float3x3 tangentToObject; tangentToObject[0] = normalize(Binormal); 
+    tangentToObject[1] = normalize(Tangent); 
+    tangentToObject[2] = normalize(Normal); 
+    float3x3 tangentToWorld = mul(tangentToObject, xWorld); 
+    Output.TTW = tangentToWorld; 
+    Output.TexCoord = inTexCoord+xTime/50.0f*float2(-1,0); 
+    return Output; 
+} pixel shader将深蓝色的水面颜色与反射颜色混合，混合程度取决于视角，由菲涅耳项表示。镜面反光项会在对应环境中光源的水面上的位置添加高光。
+
+OWPixelToFrame OWPixelShader(OWVertexToPixel PSIn) : COLOR0 
+{
+    OWPixelToFrame Output = (OWPixelToFrame)0; 
+    
+    float3 bumpColor1 = tex2D(BumpMapSampler, xTexStretch*PSIn.TexCoord)-0.5f; 
+    float3 bumpColor2 = tex2D(BumpMapSampler, xTexStretch*1.8*PSIn.TexCoord.yx)-0.5f; 
+    float3 bumpColor3 = tex2D(BumpMapSampler, xTexStretch*3.1*PSIn.TexCoord)-0.5f; 
+    float3 normalT = bumpColor1 + bumpColor2 + bumpColor3; 
+    normalT.rg *= xBumpStrength; 
+    normalT = normalize(normalT); 
+    float3 normalW = mul(normalT, PSIn.TTW); 
+    float3 eyeVector = normalize(PSIn.Pos3D - xCameraPos);
+    float3 reflection = reflect(eyeVector, normalW); 
+    float4 reflectiveColor = texCUBE(CubeMapSampler, reflection); 
+    float fresnelTerm = dot(-eyeVector, normalW); 
+    fresnelTerm = fresnelTerm/2.0f+0.5f; 
+    
+    float sunlight = reflectiveColor.r; 
+    sunlight += reflectiveColor.g; 
+    sunlight += reflectiveColor.b; sunlight /= 3.0f; 
+    float specular = pow(sunlight,30); 
+    float4 waterColor = float4(0,0.2,0.4,1); 
+    Output.Color = waterColor*fresnelTerm + reflectiveColor*(1-fresnelTerm) + specular; 
+    
+    return Output; 
+} 
+
+http://shiba.hpe.sh.cn/jiaoyanzu/WULI/showArticle.aspx?articleId=413&classId=4
