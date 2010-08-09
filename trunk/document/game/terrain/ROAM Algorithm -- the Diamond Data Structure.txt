@@ -1,0 +1,84 @@
+ROAM Algorithm -- the Diamond Data Structure
+[ROAM Algorithm Homepage] [ROAM Algorithm Version 2 work in progress] 
+
+
+
+--------------------------------------------------------------------------------
+
+Diamonds are a better "backbone" than bintree triangles
+The "diamond" point of view is what I use now insead of "triangle bintree" data structures. 
+The concept of a diamond existed in the orignal ROAM paper, but we didn't have a specific data structure for it. 
+In that old point of view, if a triangle was to be split, then it's base neighbor first needed to be split if it was larger, 
+resulting in a base neighbor of the same size. 
+Note that the triangle and its base neighbor then formed a diamond. For merging, 
+the only allowed configuration was two triangles that both were split but had unsplit kids. 
+Note that here as well the two triangles formed a diamond. Indeed, in the split or merge cases, 
+a split or merge would occur only if the two triangles taken together as a diamond would have been split or merged, 
+taking the diamond's priority to be the max of the two triange's priorities. 
+So really the diamond point of view is equivalent in its results to the triangle viewpoint, 
+but takes only half the resources in terms of data structures and processing (more or less). 
+
+
+                     a2
+                    /|\
+                   k2| k1
+                  /  |  \
+                 a3  d...a1
+                / \  |  /.\
+               /   k3| k0. \
+              /     \|/  .  \
+             o       a0..d1   o
+              \     / \     /
+               \   /   \   /
+                \ /     \ /
+                 o       o 
+                  \     /
+                   \   /
+                    \ /
+                     o
+So here is how it works. Consider your original terrain grid at full resolution, an array of heights H(i,j). 
+Let's be concrete and use a terrain of size 4097x4097 (any power of two plus one will work). 
+Every (i,j) tuple will be the center of exactly one diamond. 
+There are four "fake" diamonds at the four corners just for completeness: (0,0), (0,4096), (4096,0) and (4096,4096). 
+The "root" diamond is (2048,2048). The root diamond has four kids: (2048,0), (4096,2048), (2048,4096) and (0,2048). 
+I recommend plotting these points on a piece of graph paper to visualize it, with the horizontal axis being i, and vertical being j. 
+The the root diamond be on level=0, with the kids on level=1. 
+Every diamond at level L has two parents at level L-1 and four kids at level L+1. 
+You may choose to either use NULL pointers to deal with boundaries, or use some kind of periodic arrangement (as I do in the ROAM tutorial code). 
+
+There are four "flavors" of diamonds. 
+Think in terms of the base edge, and these flavors are: horizontal, vertical, diagonal rising to the right, diagonal falling to the right. The even levels (level 0,2,4,...) are of the diagonal flavors, while the odd levels (1,3,5,...) are of the horizontal and vertical flavors. [Update: there is really only one "flavor" -- this is just for people thinking about terrain in particular]. 
+
+In order to completely avoid any indexing (thus making the data structure more universal for many purposes), all parents and children will be referenced by explicit pointers in the diamond data structure. Indeed, we have four corners which as you will see represent two parents (the ones opposite the diagonal), and two older ancestors (the two corners that the diagonal meets). One of the older ancestor corners is in fact a grandparent, specifically the quadtree "parent", while the other ancestor is even older. Let us use the convention that the quadtree ancestor is "a0", and walk counterclockwise around the corners to get parent "a1", older ancestor "a2", and parent "a3". Similarly label the four boundary edges as kids, with the (a0,a1) edge being kid "k0", walking counterclockwise to k1,k2,k3. This makes eight pointers total, four for ancestors and four for kids. The picture is as follows (this is ascii art, view using fixed-width font): 
+
+
+Here the diamond in question is d, with ancestors a0-a3 and kids k0-k3. 
+The first thing to learn is how to navigate around a diamond mesh using only there eight pointers. Obviously you have direct links to the parents, kids, quadtree parent, and that older ancestor. Suppose you want to visit d's sibling across the k0 edge. Note that the common parent of this sibling is a1. Since a1 has four kids, it helps to know which kid d is. Keep an index in d (two bits per index per parent) to indicate which kid d is with respect to each of its parents. Then getting to the sibling is a matter of moving counterclockwise one step from d's entry in a1's kid list. In code, it looks like this: 
+
+  d0 = d->a[1]->k[(ai1+1)%4];
+
+where ai1 is the value for which d->a[1]->k[ai1] == d (keep this information in a bit field in d). You can similarly move across the other three edges of d to get to any sibling neighbor. Any other navigation around the mesh can be decomposed into these little steps. 
+Now the main thing you need to learn is how to hook up the pointers when adding a new kid. This basically comes down to making diagrams for each of the four kids of d in the same configutation as d itself, but now rotated, scaled and translated appropriately for the kid. I just drew it out on some graph paper and twisted my head around a lot. Let's take one case so you get the idea. Kid k0 will have d and d0 as parents (see prev bit on getting to d0). The question is: which parent is a1 and which is a3? This is answered if we can decide which of a0 and a1 is k0's quadtree parent. Well, clearly a0 is d's quadtree parent and so can not be k0's quadtree parent. Therefore a1 must be k0's quadtree parent. From this we can deduce that: 
+
+    k0->a0=a1
+    k0->a1=d
+    k0->a2=a0
+    k0->a3=d1
+
+That gives all the kid-to-ancestor links for k0. The parent-to-kid links to k0 come from d and d1. Well, we obviously know k0 is d->k0. What about d1? Well, clearly d1 has the same quadtree parent as d, namely a0, so k0 is d1->k3. 
+And that is it as far as hooking up the pointers when adding a kid. 
+
+Those are the basics of the data structure. 
+
+Let me know if this makes sense. The tutorial code uses a slightly different notation. I cleaned it up a bit in the description I just gave you. 
+
+Now to actually access your array, just keep the array index ij=j*4096+i for each diamond. You have pointers to each corner, so you can build the actual geometry as needed from just that information. 
+
+-- Mark Duchaineau 
+
+
+
+--------------------------------------------------------------------------------
+
+Updated 2003-02-20 -- duchaine@llnl.gov 
+http://www.cognigraph.com/ROAM_homepage/ROAM2/diamonds.html
