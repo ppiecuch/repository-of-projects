@@ -1,30 +1,72 @@
 package org.tinder.studio.lwjgl.roam;
 
+import org.tinder.studio.lwjgl.util.Util;
+
 
 /**
  * 
  * @author Micheal Hong 
  * @email babala_234@163.com
  * @version 2010-7-23 下午05:47:56
- * 原理：
+ * 【原理】
+ * ROAM(Real-Time Optionally Adapting Meshes)方法，即实时优化自适应地形网格，其基本思想是通过将网格分割为多个等腰直角三角形进行细分，
+ * 从而提高细节等级(Mark Duchaineau等，1997)。在传统的ROAM算法中，当DEM数据量比较小时，采用三角形二叉树构建LOD模型的效率非常高。
+ * 但当DEM数据量比较大时，三角形二叉树就会变得庞大复杂，难以处理规模较大的地形。
+ * 
+ * 分块思想
+ * 采用地形分块的办法，可以有效地处理三角形二叉树过于庞大的问题，
+ * 对规模较大的地形进行分块处理以后，每一个子块分别建立对应的二叉树三角形，
+ * 这样整个地形的高深度二叉树就会分解成多个低深度的二叉树，在低深度的二叉树上建立LOD模型。
+ * 在三维渲染时，首先根据视点判断各个子块是否需要更加细致的表现，如果需要，就建立三角形二叉树；
+ * 否则就只是显示该块，这样就只需建立少数低深度二叉树，而不必对整个地形建立一个高深度二叉树，减少了存储空间，降低了复杂度。
+ * 
+ * 基于分块的ROAM算法的步骤可以分为建立分块结构、块分割、消除裂缝三个部分。
+ * 
  * 注意：
  * 1、地图大小必须是2^n+1
  */
 public class Roam {
-	
-	private short[][] heightWeights;
+	private static final int POOL_SIZE=25000;
+	private short[][] heightMap;
 	private float[] scales;	//放大系数     scale>0
 	private float delicate;	//细致系数
+	private int mapSize=1024;//地图大小
+	private int patchNumPerSide=16;//每边块数
+	private int varianceLimit=50;//变差值界限
+	private int patchSize=mapSize/patchNumPerSide;//块大小
+	private Diamond[][] patchs;
+	private float[] viewPosition;
+	private TriTreeNode[] pool;
+	public int nextTriNode=0;
 	
-	public Roam(short[][] heightWeights,float[] scales,float delicate)
+	public Roam(short[][] heightMap,float[] scales,float delicate)
 	{
-		this.heightWeights=heightWeights;
+		this.heightMap=heightMap;
 		this.scales=scales;
 		this.delicate=delicate;
 	}
 	
+	/**
+	 * 初始化所有地形块
+	 */
 	public void init(){
-		
+		pool=new TriTreeNode[POOL_SIZE];
+		for(int i=0;i<POOL_SIZE;i++)
+		{
+			pool[i]=new TriTreeNode();
+		}
+		patchs=new Diamond[patchNumPerSide][];
+		viewPosition=new float[3];
+		for(int i=0;i<patchNumPerSide;i++)
+		{
+			patchs[i]=new Diamond[patchNumPerSide];
+			for(int j=0;j<patchNumPerSide;j++)
+			{
+				patchs[i][j]=new Diamond();
+				patchs[i][j].init(j*patchSize, i*patchSize);
+				patchs[i][j].computeVariance();
+			}
+		}
 	}
 	
 	public void drawFrame(){
@@ -32,18 +74,46 @@ public class Roam {
 	}
 	
 	public TriTreeNode allocate(){
-		return null;
+		if(nextTriNode>=POOL_SIZE)
+			return null;
+		TriTreeNode node=pool[nextTriNode++];
+		node.leftChild=node.rightChild=null;
+		return node;
+	}
+	
+	/**
+	 * 分割地形块以生成近似网格
+	 * Create an approximate mesh of the landscape.
+	 */
+	public void tessellate()
+	{
+		Diamond patch;
+		for(int i=0;i<patchNumPerSide;i++)
+		{
+			for(int j=0;j<patchNumPerSide;j++)
+			{
+				patch=patchs[i][j];
+				if (patch.isVisible())
+					patch.tessellate();
+			}
+		}
 	}
 	
 	/**
 	 * 
-	 * 钻石由两个对角的等腰三角形构成，每个三角形形成一个独立的二元三角树
+	 * 钻石（块）由两个对角的等腰三角形构成，每个三角形形成一个独立的二元三角树，
+	 * 每个钻石由两个二元三角树组成，当需要更高的细节时，再进一步划分。
 	 *
 	 */
 	class Diamond{
-		public TriTreeNode baseLeft;// 左二元三角树
-		public TriTreeNode baseRight;// 右二元三角树
-		public int x,y;
+		private static final int VARIANCE_DEPTH=9;//变差树的深度，必须是近似 SQRT(PATCH_SIZE) + 1的值
+		private TriTreeNode baseLeft;// 左二元三角树
+		private TriTreeNode baseRight;// 右二元三角树
+		private int[] varianceLeft=new int[1<<(VARIANCE_DEPTH)];// 左变差树
+		private int[] varianceRight=new int[1<<(VARIANCE_DEPTH)];// 右变差树
+		private int[] currentVariance;// 临时索引，用于tessellate和computeVariance方法
+		private int x,y;
+		private boolean visible=false;
 //		public byte height;
 		
 		public void init(int x,int y){
@@ -62,6 +132,131 @@ public class Roam {
 			
 			this.x=x;
 			this.y=y;
+		}
+		
+		public void reset(){
+			visible=false;
+			
+			baseLeft.leftChild=null;
+			baseLeft.rightChild=null;
+			baseRight.leftChild=null;
+			baseRight.rightChild=null;
+			
+			baseLeft.baseNeighbor=baseRight;
+			baseRight.baseNeighbor=baseLeft;
+			
+			baseLeft.rightNeighbor=null;
+			baseLeft.leftNeighbor=null;
+			baseRight.rightNeighbor=null;
+			baseRight.leftNeighbor=null;
+		}
+		
+		/**
+		 * 在实际中，并不需要分割所有的三角形，也不可能无限分割，因此就需要对要分割的三角形进行选择，
+		 * 也就是说需要知道一个结点何时应该继续进行分割。这与三角形与视点的距离、地形本身的粗糙程度有关，
+		 * 简言之，对远处的地形和平坦的地形不需要高细节的渲染，对近处的地形和复杂的地形需要更加清晰的细节才能看清物体。
+		 * 对于分割选择，首要的是得到三角形与视点的距离和地形粗糙程度。
+		 * 在实际运算中，计算视点到三角形的距离并不复杂，但是对于大规模地形而言，无疑会加重CPU负担，
+		 * 所以，采用直角三角形的斜边中点的位置和视点的距离近似视点与三角形的距离，这种方法虽然存在微小误差，
+		 * 但在整体上不会影响地形的LOD显示，有效降低了计算复杂度，提高了渲染帧速度。 
+		 * 规定每个三角形的粗糙度是斜边中点的实际高度与两个定点连线的中点高度差值，把该值记为T。
+		 * 每个节点的粗糙度，就是它所有子结点中最大的T值。
+		 * 
+		 * 调用recursComputeVariance方法完成各个节点的变差计算
+		 */
+		public void computeVariance(){
+			//分别对两个二元三角树进行递归运算
+			currentVariance=varianceLeft;
+			recursComputeVariance(0,patchSize,heightMap[y+patchSize][x],patchSize,0,heightMap[y][x+patchSize],0,0,heightMap[y][x],1);
+			currentVariance=varianceRight;
+			recursComputeVariance(patchSize,0,heightMap[y][x+patchSize],0,patchSize,heightMap[y+patchSize][x],patchSize,patchSize,heightMap[y+patchSize][x+patchSize],1);
+		}
+		
+		/**
+		 * 计算整棵二元三角树所有节点的变差
+		 * @param leftX
+		 * @param leftY
+		 * @param leftZ
+		 * @param rightX
+		 * @param rightY
+		 * @param rightZ
+		 * @param apexX
+		 * @param apexY
+		 * @param apexZ
+		 * @param index
+		 * @return
+		 */
+		private int recursComputeVariance(int leftX,int leftY,int leftZ,int rightX,int rightY,int rightZ,int apexX,int apexY,int apexZ,int index){
+			//计算斜边中点坐标
+			int centerX = (leftX + rightX) >>1;
+			int centerY = (leftY + rightY) >>1;
+			int myVariance;
+			
+			// 获取实际高度值
+			int centerZ=heightMap[centerY][centerX];
+			
+			//计算变差值
+			myVariance = Math.abs((int)centerZ - (((int)leftZ + (int)rightZ)>>1));
+			
+			//基于效率的考虑，我们只以8*8大小的块为单位进行计算
+			if ((Math.abs(leftX - rightX)>=8)||(Math.abs(leftY - rightY)>=8))
+			{
+				// 将自身的变差值与子孙的变差值进行比较，取其最大者
+				myVariance = Math.max( myVariance, recursComputeVariance( apexX,   apexY,  apexZ, leftX, leftY, leftZ, centerX, centerY, centerZ,    index<<1 ) );
+				myVariance = Math.max( myVariance, recursComputeVariance( rightX, rightY, rightZ, apexX, apexY, apexZ, centerX, centerY, centerZ, 1+(index<<1)) );
+			}
+			
+			//保存结果，注意变差值不为0
+			if (index < currentVariance.length)
+				currentVariance[index] = 1 + myVariance;
+			return myVariance;
+		}
+		
+		/**
+		 * 细分网格
+		 * 将每一个网格分割成两个三角小片，每个小片都是一个单独的等腰直角三角形，
+		 * 从每个等腰直角三角形的顶点到对面斜边的中点分割三角形为两个新的等腰直角三角形，如此递归分割，直到达到希望的细节等级。
+		 * 分割以后，ROAM方法采用二叉树的数据结构来存储分割的三角形
+		 */
+		public void tessellate(){
+			// 分割两个二元三角树
+			currentVariance=varianceLeft;
+			recursTessellate(baseLeft,x,y+patchSize,x+patchSize,y,x,y,1);
+			currentVariance=varianceRight;
+			recursTessellate(baseRight,x+patchSize,y,x,y+patchSize,x+patchSize,y+patchSize,1);
+		}
+		
+		/**
+		 * 分割一个小块，直到满足一定细节层次
+		 */
+		private void recursTessellate(TriTreeNode tri,int leftX,int leftY,int rightX,int rightY,int apexX,int apexY,int index)
+		{
+			float triVariance=0;
+			//计算斜边中点
+			int centerX = (leftX + rightX)>>1;
+			int centerY = (leftY + rightY)>>1;
+			
+			if (index<(1<<VARIANCE_DEPTH))
+			{
+				// Extremely slow distance metric (sqrt is used).
+				// Replace this with a faster one!
+				float distance = (float) (1.0f + Math.sqrt(Util.square((float)centerX - viewPosition[0])+Util.square((float)centerY - viewPosition[2]) ));
+				// Egads!  A division too?  What's this world coming to!
+				// This should also be replaced with a faster operation.
+				triVariance = ((float)currentVariance[index]*mapSize*2)/distance;	// Take both distance and variance into consideration
+			}
+			
+			//如果索引溢出，表示之前已经分割过此节点（不明白），因此继续分割操作，又或者变差超限，也要进行分割操作
+			if((index>=(1<<VARIANCE_DEPTH))||(triVariance > varianceLimit))
+			{
+				split(tri);
+				//如果儿子不空，则继续分割儿子
+				if(tri.leftChild!=null&&((Math.abs(leftX - rightX)>=3)||(Math.abs(leftY-rightY)>= 3)))
+				{
+					recursTessellate( tri.leftChild,   apexX,  apexY, leftX, leftY, centerX, centerY,    index<<1);
+					recursTessellate( tri.rightChild, rightX, rightY, apexX, apexY, centerX, centerY, 1+(index<<1));
+				}
+			}
 		}
 		
 		/**
@@ -134,6 +329,29 @@ public class Roam {
 				node.rightChild.leftNeighbor=null;
 			}
 		}
+		
+		/**
+		 * 根据嵌套包围盒算法来判断地形的可见性，从而实现裁剪
+		 * @param eyeX
+		 * @param eyeY
+		 * @param leftX
+		 * @param leftY
+		 * @param rightX
+		 * @param rightY
+		 */
+		public void setVisibility(int eyeX,int eyeY,int leftX,int leftY,int rightX,int rightY )
+		{
+			int patchCenterX=x+patchSize/2;
+			int patchCenterY=y+patchSize/2;
+			
+			// Set visibility flag (orientation of both triangles must be counter clockwise)
+			visible=Util.orientation(eyeX,eyeY,rightX,rightY,patchCenterX, patchCenterY)<0&&Util.orientation(leftX,leftY,eyeX,eyeY,patchCenterX,patchCenterY )<0;
+		}
+
+		public boolean isVisible() {
+			return visible;
+		}
+		
 	}
 
 }
