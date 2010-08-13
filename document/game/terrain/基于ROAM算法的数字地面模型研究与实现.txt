@@ -1,0 +1,201 @@
+张恒国1 王合龙2 吴清香3
+1（中国人民解放军95861部队 兰州735018）
+
+2（莱芜市科技开发中心 山东莱芜 271100）
+
+3（中国人民解放军95948部队 兰州 732750）
+
+【摘要】针对规则格网的数据量过大问题，采用基于分块的ROAM算法进行多分辨率渲染；
+根据地形粗糙程度和视点位置，对地形进行有选择的细化，将庞大的三角形二叉树分为多个小二叉树，提高了地形构建效率，
+在此基础上建立地物要素模型，完成数字地面模型的构建与多分辨率渲染。
+
+【关键词】数字地面模型 数字高程模型 规则格网 实时优化自适应地形网格
+
+1 引言
+
+数字地面模型(Digital Terrain Model，DTM)是地形起伏的数字表达，由对地形表面取样所得到的一组点的三维坐标数据和一套对地面提供连续的描述的算法组成。
+简单地说，数字地面模型是按一定结构组织在一起的数据组，它代表着地形特征的空间分布。
+
+数字地面模型可以描述为在数字高程模型(Digital Elevation Model，DEM)基础上叠加要素模型信息及非地形信息的过程。
+在数字高程模型建立上，规则格网得到了广泛的应用，但是传统的规则格网方法不能准确表示地形的细节，不能描述具有尖锐特征的地形部分；
+而且为了调整精度，必须增大网格数目，造成数据量过大，给数据管理带来了不方便。
+
+文中针对规则格网的问题，采用了ROAM算法，对地形进行多分辨率渲染，根据视点的位置和地形粗糙程度，对地形进行有选择的细化；
+对不在视点范围内或比较平坦的地方不予细化。在ROAM算法中引入分块的思想，将庞大的三角形二叉树分为多个小二叉树，提高了地形检索效率。
+
+2 规则格网的建模流程
+
+规则格网DEM的建立的整体思路在区域空间上对研究区域进行格网划分，形成覆盖整个区域的格网空间结构。
+数学上可以表示为一个矩阵，在计算机实现中则是一个二维数组，然后利用分布在格网点周围的地形采样点内插计算格网点的高程值，形成该地区的格网DEM，如图1所示。
+
+
+1 通过采样内插建立规则格网DEM
+
+
+图
+
+每个网格的数值可以采用两种不同方法计算。
+第一种是格网栅格观点，认为该格网单元的数值是其中所有点的高程值，即格网单元对应的地面面积内高程是均一的高度，这种数字高程模型是一个不连续的函数。
+第二种是点栅格观点，认为该网格单元的数值是网格中心点的高程或该网格单元的平均高程值，这样就需要用一种插值方法来计算每个点的高程。
+计算任何不是网格中心的数据点的高程值，使用周围4个中心点的高程值，采用距离加权平均方法进行计算。
+
+3 基于分块的ROAM算法
+
+3.1 ROAM算法中存在的问题
+
+ROAM(Real-Time Optionally Adapting Meshes)方法，即实时优化自适应地形网格，其基本思想是通过将网格分割为多个等腰直角三角形进行细分，
+从而提高细节等级(Mark Duchaineau等，1997)。在传统的ROAM算法中，当DEM数据量比较小时，采用三角形二叉树构建LOD模型的效率非常高。
+但当DEM数据量比较大时，三角形二叉树就会变得庞大复杂，难以处理规模较大的地形。
+
+3.2 分块思想
+
+采用地形分块的办法，可以有效地处理三角形二叉树过于庞大的问题，
+对规模较大的地形进行分块处理以后，每一个子块分别建立对应的二叉树三角形，
+这样整个地形的高深度二叉树就会分解成多个低深度的二叉树，在低深度的二叉树上建立LOD模型。
+在三维渲染时，首先根据视点判断各个子块是否需要更加细致的表现，如果需要，就建立三角形二叉树；
+否则就只是显示该块，这样就只需建立少数低深度二叉树，而不必对整个地形建立一个高深度二叉树，减少了存储空间，降低了复杂度。
+
+3.3 算法步骤
+
+基于分块的ROAM算法的步骤可以分为建立分块结构、块分割、消除裂缝三个部分。
+
+(1)块结构的建立。一个块由左右两个等腰直角三角形构成，
+也就是从块对角线进行切分出来的两个三角形，每个三角形形成一个独立的三角形二叉树，每个块由两个二叉树组成，
+当需要更高的细节时，再进一步划分。于是可以得到每一个节点的数据结构：
+
+struct TriTreeNode {
+
+　TriTreeNode *LeftChild;                // 左孩子
+
+　TriTreeNode *RightChild;                //右孩子
+
+　TriTreeNode *BaseNeighbor;            //底边相邻三角形
+
+　TriTreeNode *LeftNeighbor;            //左边相邻三角形
+
+　TriTreeNode *RightNeighbor;           //右边相邻三角形
+
+　};
+
+定义块的数据结构如下：
+
+class Patch {
+
+public:
+
+void Init( int heightX, int heightY, int worldX, int worldY, unsigned char *hMap); // 初始化块
+
+void Reset();      //重置
+
+void Tessellate();   //格网建立
+
+void Render();     //格网渲染
+
+ComputeVariance(); //计算高度差T
+
+Split();           //分割，其中包括强制分割
+
+……
+
+protected:
+
+unsigned char *m_HeightMap; //定义一个指向高度的指针
+
+int m_WorldX, m_WorldY;    //块的世界坐标
+
+……
+
+}
+
+(2)格网分割。将每一个网格分割成两个三角小片，每个小片都是一个单独的等腰直角三角形，
+从每个等腰直角三角形的顶点到对面斜边的中点分割三角形为两个新的正等边三角形，如此递归分割，直到达到希望的细节等级。
+分割以后，ROAM方法采用二叉树的数据结构来存储分割的三角形，如图2所示。
+
+
+
+
+图2 采用二叉树结构存储分割出的三角形
+
+(3)三角形分割的选择。按上面两种方法进行分割，可以分割所有的三角形，而且可以按照规则无限分割下去，
+但在实际中，并不需要分割所有的三角形，也不可能无限分割，因此就需要对要分割的三角形进行选择，也就是说需要知道一个结点何时应该继续进行分割。
+这与三角形与视点的距离、地形本身的粗糙程度有关，简言之，对远处的地形和平坦的地形不需要高细节的渲染，对近处的地形和复杂的地形需要更加清晰的细节才能看清物体。
+
+对于分割选择，首要的是得到三角形与视点的距离和地形粗糙程度。
+在实际运算中，计算视点到三角形的距离并不复杂，但是对于大规模地形而言，无疑会加重CPU负担，
+所以，采用直角三角形的斜边中点的位置和视点的距离近似视点与三角形的距离，这种方法虽然存在微小误差，
+但在整体上不会影响地形的LOD显示，有效降低了计算复杂度，提高了渲染帧速度。 
+
+规定每个三角形的粗糙度是斜边中点的实际高度与两个定点连线的中点高度差值，把该值记为T。
+每个节点的粗糙度，就是它所有子结点中最大的T值。如图3所示，第一幅图表示两点直接相连的状态；第二幅图表示如果画出中间点；第三幅图箭头表示T 值。
+
+
+3 节点的粗糙度
+
+
+图
+
+(4)裂缝问题。采用上述的方法对格网进行分割，可以看出每个三角形的分割是和它的底边邻居三角形一同分割，而有时可能会出现不存在底边邻居三角形的情况，这就会造成裂缝，破坏地形的空间连续性。此时必须采用强制分割的办法，如图4所示。图(a)中，三角形T1的底边邻居不存在，因此，强制分割T2得到T1的底边邻居，然后再对T1和它的底边邻居进行分割；T2分割又触发了它的底边邻居分割，但是该邻居不存在，所以强制分割T3，如此进行下去，过程如图(a)(b)(c)(d)(e)所示，得到的最后结果如图(e)所示。
+
+
+4 ROAM算法中的强制分割
+
+
+图
+
+4 要素模型及三维可视化
+
+根据地物要素对象的不同，可以将地物对象分为规则地物模型和不规则地物模型，针对不同的地物模型，文中采用了不同的建模方法。
+
+(1)规则地物模型。这类地物模型，如河流、道路、湖泊等。根据中心线及宽度得到其剖分三角形，然后再对每个三角形进行纹理贴图。
+
+(2)不规则地物模型。主要采用3DS MAX三维模型，将其导出为3DS文件，在OpenGL中根据文件格式用TIN 模型显示。
+
+在使用ROAM算法生成的数字高程模型上求得高程值，按照高程值大小叠加三维地物构成数字地面模型。数字地面模型的构建及三维可视化流程如图5所示。
+
+
+5 要素模型叠加及三维可视化流程
+
+
+图
+
+5 实验结果
+
+采用Visual C++ 6.0、OpenGL为开发平台，使用3DS MAX作为不规则地物构建方式，选取实验环境Pentium M 1.4G CPU，512MDDR内存，Intel(R) 82852/82855 GM/GME Graphics Controller显示卡，Windows Xp操作系统，屏幕分辨率1024*768，32位真彩色，分别选择129*129、257*257、513*513、1025*1025的规则格网DEM，采用ROAM算法进行地形的多分辨率绘制，获得了不同的帧速率：165fps，119fps，99fps，65fps。
+
+6 结论
+
+实验证明，基于分块的ROAM算法根据视点位置和地形粗糙程度裁减了不需要的网格，对于距离视点近的、比较粗糙的地方进行了细化的渲染，有效降低了地形构建复杂度，提高了地形渲染效率，在此基础上建立了三维地物要素模型和空间关系，完成了数字地面模型的构建，在保证效果的前提下提高了渲染速度。
+
+(收稿日期：2007.06.30；Email：liunian0314@163.com)
+
+
+参考文献
+
+[1]P．Lindstrom, V．Pascucci. Terrain simplification: A general framework for view-dependent out-of-core visualization. IEEE Transactions on Visualization and Computer Graphics,2002：239~254
+
+[2]Borges K，Davis J，Laender A，OMT-G：An Object-Oriented Data Model for Geographic Applications，GeoInformatic，2001，5(3)：221～260
+
+[3]Chrisman N R. Concepts of Space as a Guide to Cartographic Data Structures. Proceedings of the First Advanced Study International Symposium on Topological Data Structures for Geographic Information systems，Cambridge MA：Harvard Lab，1978：1～19
+
+[4]王璐锦，唐泽圣，唐龙．基于三角形二叉树的地表模型动态简化算法清华大学学报(自然科学版)，2002，42(1)
+
+[5]石松，朱泉锋，唐丽玉．四叉树高效Delaunay三角网生成算法．计算机工程，2005，31(18)：87~89
+
+[6]李志林，朱庆．数字高程模型．武汉：武汉测绘科技大学出版社．2000，30 
+
+　
+
+
+The Research and Realization of DTM based on ROAM
+ZHANG Heng-Guo1，WANG He-Long2，Wu Qing-Xiang3
+1（People's Liberation Army 95861 Troop, Gansu Lanzhou 735018, China）
+
+        2（Laiwu Science & Technology development center, Shandong Laiwu 271100, China）
+
+        3（People's Liberation Army 95948 Troop, Gansu Lanzhou 732750, China）
+
+Abstract: To solve the problem of massive data in regular grid, an idea of ROAM algorithm based on block is introduced into the design of multi-resolution rendering. The terrain is detailed selectively according to roughness and the position of view port. The method improves the efficiency of the terrain model and then element model is modeled. DTM is established efficiently and multi-resolution is obtained.
+
+Key words: digital terrain model；digital elevation model；regular grid；real-time optionally adapting meshes；
+
+http://hi.baidu.com/ouyang80/blog/item/e3c662c45a2c4bcd38db49c1.html
