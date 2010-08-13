@@ -38,6 +38,10 @@ public class Roam {
 	private float[] viewPosition;
 	private TriTreeNode[] pool;
 	public int nextTriNode=0;
+	private float gFovX = 90.0f;
+	private float gClipAngle;
+	
+	private static final float PI_DIV_180 = (float) (Math.PI / 180.0f);
 	
 	public Roam(short[][] heightMap,float[] scales,float delicate)
 	{
@@ -69,11 +73,65 @@ public class Roam {
 		}
 	}
 	
+	/**
+	 *  在每帧开始时重新设置每个地形块，并在需要的时候重新计算变差值
+	 */
+	public void reset(){
+		//根据摄相机定义一个三角形，以patchSize为单位；如果patch在视截体中则此patch可视
+		float FOV_DIV_2 = gFovX/2;
+		int eyeX = (int)(viewPosition[0] - patchSize * Math.sin( gClipAngle * PI_DIV_180 ));
+		int eyeY = (int)(viewPosition[2] + patchSize * Math.cos( gClipAngle * PI_DIV_180 ));
+
+		int leftX  = (int)(eyeX + 100.0f * Math.sin( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+		int leftY  = (int)(eyeY - 100.0f * Math.cos( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+
+		int rightX = (int)(eyeX + 100.0f * Math.sin( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+		int rightY = (int)(eyeY - 100.0f * Math.cos( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+		
+		nextTriNode=0;
+		Diamond patch;
+		for(int y=0;y<patchNumPerSide;y++)
+		{
+			for(int x=0;x<patchNumPerSide;x++)
+			{
+				patch=patchs[y][x];
+				patch.reset();
+				patch.setVisibility(eyeX, eyeY, leftX, leftY, rightX, rightY);
+				
+				//TODO 不明白
+				//检测patch是否在上一帧中变形过，如果是重新切割
+				if(patch.isDirty())
+					patch.computeVariance();
+				if(patch.isVisible())
+				{
+					//将左右上下的patch进行互联
+					if(x>0)
+						patch.baseLeft.leftNeighbor=patchs[y][x-1].baseRight;
+					else
+						patch.baseLeft.leftNeighbor=null;
+					if(x<patchNumPerSide-1)
+						patch.baseRight.leftNeighbor=patchs[y][x+1].baseLeft;
+					else
+						patch.baseRight.leftNeighbor=null;
+					
+					if(y>0)
+						patch.baseLeft.rightNeighbor=patchs[y-1][x].baseRight;
+					else
+						patch.baseLeft.rightNeighbor=null;
+					if(y<patchNumPerSide-1)
+						patch.baseRight.rightNeighbor=patchs[y+1][x].baseLeft;
+					else
+						patch.baseRight.rightNeighbor=null;
+				}
+			}
+		}
+	}
+	
 	public void drawFrame(){
 		
 	}
 	
-	public TriTreeNode allocate(){
+	private TriTreeNode allocate(){
 		if(nextTriNode>=POOL_SIZE)
 			return null;
 		TriTreeNode node=pool[nextTriNode++];
@@ -105,7 +163,7 @@ public class Roam {
 	 * 每个钻石由两个二元三角树组成，当需要更高的细节时，再进一步划分。
 	 *
 	 */
-	class Diamond{
+	private class Diamond{
 		private static final int VARIANCE_DEPTH=9;//变差树的深度，必须是近似 SQRT(PATCH_SIZE) + 1的值
 		private TriTreeNode baseLeft;// 左二元三角树
 		private TriTreeNode baseRight;// 右二元三角树
@@ -114,6 +172,7 @@ public class Roam {
 		private int[] currentVariance;// 临时索引，用于tessellate和computeVariance方法
 		private int x,y;
 		private boolean visible=false;
+		private boolean dirty=false;
 //		public byte height;
 		
 		public void init(int x,int y){
@@ -132,6 +191,7 @@ public class Roam {
 			
 			this.x=x;
 			this.y=y;
+			dirty=true;
 		}
 		
 		public void reset(){
@@ -170,6 +230,7 @@ public class Roam {
 			recursComputeVariance(0,patchSize,heightMap[y+patchSize][x],patchSize,0,heightMap[y][x+patchSize],0,0,heightMap[y][x],1);
 			currentVariance=varianceRight;
 			recursComputeVariance(patchSize,0,heightMap[y][x+patchSize],0,patchSize,heightMap[y+patchSize][x],patchSize,patchSize,heightMap[y+patchSize][x+patchSize],1);
+			dirty=false;
 		}
 		
 		/**
@@ -350,6 +411,10 @@ public class Roam {
 
 		public boolean isVisible() {
 			return visible;
+		}
+
+		public boolean isDirty() {
+			return dirty;
 		}
 		
 	}
