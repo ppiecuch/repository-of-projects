@@ -1,0 +1,126 @@
+菲涅耳反射（Fresnel Reflection）
+
+当光线射到材质表面时，菲涅耳反射（Fresnel Reflection）解释了有多少光被反射，有多少光被折射。
+
+（1）菲涅耳公式
+
+     一些变量说明：θ1---->入射角
+                   θ2---->折射角
+                   N1----->入射光所在介质的折射率
+                   N2----->折射光所在介质的折射率
+
+     反射光的大小决定于θ1，光的偏振，N2 / N1；
+     折射光的大小决定于光的波长。
+
+     公式1：R(θ1) = 1/2 * (R1(θ1) + R2(θ1))
+
+            R1(θ1)---->垂直于入射平面的偏振光反射系数函数
+            R2(θ1)---->平行于入射平面的偏振光反射系数函数
+
+     公式2：θ2 = arcsin(N1 / N2 * sin(θ1))
+
+     公式3：R1(θ1) = (sin(θ1 - θ2) / sin(θ1 + θ2))^2
+
+     公式4：R2(θ1) = (tan(θ1 - θ2) / tan(θ1 + θ2))^2
+
+     当θ1 = 0 时有：
+     公式5：R1(0) = R2(0) = ((N1 - N2) / (N1 + N2))^2
+
+     设 c = cos(θ1) * N1 / N2
+        g = sqrt(1 + c^2 - (N1 / N2)^2)
+     则：
+     公式6：R(θ1) = 1/2 * (((g - c) / (g + c))^2) * 
+                            (1 + ((c * (g + c) - (N1 / N2)^2) / 
+                            (c * (g - c) + (N1 / N2)^2))^2)
+
+（2）用菲涅耳公式来渲染
+
+     在支持DX8.1的硬件上就可以用菲涅耳公式来渲染。逐顶点和逐像素都可以，相差只是
+
+     法线是逐顶点还是逐像素计算的。
+
+     渲染前的两个假设（加快渲染数度）：
+
+　　　　　假设所有的光都是非偏振的；
+　　　　　假设所有的光波长都是一样的。
+
+     (a) 逐顶点渲染
+
+         近似公式：R(θ1) = R(0) + (1 - R(0)) * (1 - cos(θ1))^5
+
+         HLSL代码：
+
+             float fresnel (float3 light, float3 normal, float R0)
+             {
+                  // R0 用CPU来算，refractionIndexRatio 是 N2 / N1
+                  // light 和 normal 需要已经做过单位化
+                  // float const R0 = pow(1.0 - refractionIndexRatio, 2.0) /
+                  //                        pow(1.0 + refractionIndexRatio, 2.0)
+
+                 return R0 + (1.0 - R0) * pow(1.0 - dot(light, normal), 5.0);
+             }
+
+         ASM代码：
+
+             ; c[0] 常数 [R(0), 1 - R(0), 0, 1]
+             ; r0   单位化的表面法线
+             ; r1   单位化的光线方向
+
+             vs.1.0
+
+             dp3 r0.w, r0, r1
+             add r0.w, c[0].w, -r0.w
+             mul r1.w, r0.w, r0.w
+             mul r1.w, r1.w, r1.w
+             mul r1.w, r1.w, r0.w
+             mad oD0.a, r1.w, c[0].y, c[0].x
+
+     (b) 逐像素渲染
+
+         N dot L = cos(θ1)
+         用计算得到的结果来查一张编码R(arcos(x))的纹理
+
+         HLSL代码：
+
+             float fresnel (float3 light, float3 normal, float R0)
+             {
+                 float const cosAngle = 1 - saturate(dot3(light, normal));
+
+                 float result = cosAngle * cosAngle;
+                         result = result * result;
+                         result = result * cosAngle;
+                         result = saturate(mad(result, 1 - saturate(R0), R0));
+
+                        return result;
+             }
+
+         ASM代码：
+
+             ps.1.1
+
+             def c0, 1.0, 0.0, 0.0, R(0)
+
+             tex t0
+             texm3x3pad t1, t0
+             texm3x3pad t2, t0 
+             texm3x3vspec t3, t0 
+
+             dp3_sat r1.rgba, v0_bx2, t0
+
+             mul r0.a, 1-r1.a, 1-r1.a
+             mul r0.a, r0.a, r0.a
+             mul r0.a, r0.a, 1-r0.a
+             mad r0.a, r0.a, 1-c0.a, c0.a
+             lrp r0, r0.a, t3, v1
+
+（3）一些介质的折射率
+
+     真空：1.0
+     空气：1.000293
+　     冰：1.31
+  　   水：1.333333
+     酒精：1.36
+     钻石：2.417
+
+
+
