@@ -1,5 +1,6 @@
 package org.tinder.studio.lwjgl.roam;
 
+import org.lwjgl.opengl.GL11;
 import org.tinder.studio.lwjgl.util.Util;
 
 
@@ -38,10 +39,18 @@ public class Roam {
 	private float[] viewPosition;
 	private TriTreeNode[] pool;
 	public int nextTriNode=0;
-	private float gFovX = 90.0f;
+	private static float gFovX = 90.0f;
 	private float gClipAngle;
+	private int gNumTrisRendered;
+	// Desired number of Binary Triangle tessellations per frame.
+	// This is not the desired number of triangles rendered!
+	// There are usually twice as many Binary Triangle structures as there are rendered triangles.
+	private int gDesiredTris = 10000;
+	// Beginning frame varience (should be high, it will adjust automatically)
+	private float gFrameVariance = 50;
 	
 	private static final float PI_DIV_180 = (float) (Math.PI / 180.0f);
+	private static final float FOV_DIV_2 = gFovX/2;
 	
 	public Roam(short[][] heightMap,float[] scales,float delicate)
 	{
@@ -89,6 +98,7 @@ public class Roam {
 		int rightY = (int)(eyeY - 100.0f * Math.cos( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
 		
 		nextTriNode=0;
+		gNumTrisRendered=0;
 		Diamond patch;
 		for(int y=0;y<patchNumPerSide;y++)
 		{
@@ -127,8 +137,128 @@ public class Roam {
 		}
 	}
 	
-	public void drawFrame(){
+	/**
+	 * 画出视点跟视角
+	 */
+	public void drawFrustum(){
 		
+		GL11.glDisable(GL11.GL_LIGHTING);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_TEXTURE_GEN_S);
+		GL11.glDisable(GL11.GL_TEXTURE_GEN_T);
+		GL11.glBegin(GL11.GL_LINES);
+
+		// Draw the View Vector starting at the eye (red)
+		GL11.glColor3f(1, 0, 0);
+		GL11.glVertex3f(viewPosition[0],viewPosition[1],viewPosition[2]);
+		GL11.glVertex3f((float)(viewPosition[0]+50.0f* Math.sin( gClipAngle*Math.PI/180.0f)),viewPosition[1],(float)(viewPosition[2]-50.0f*Math.cos(gClipAngle*Math.PI/ 180.0f)));
+		// Draw the view frustum (blue)
+		GL11.glColor3f(0, 0, 1);
+		GL11.glVertex3f(viewPosition[0],viewPosition[1],viewPosition[2] );
+		GL11.glVertex3f((float)(viewPosition[0] + 1000.0f * Math.sin((gClipAngle-45.0f)*Math.PI/180.0f)),viewPosition[1],(float)(viewPosition[2]-1000.0f*Math.cos((gClipAngle-45.0f)*Math.PI/180.0f)));
+		GL11.glVertex3f(viewPosition[0],viewPosition[1],viewPosition[2]);
+		GL11.glVertex3f((float)(viewPosition[0]+1000.0f*Math.sin((gClipAngle+45.0f)*Math.PI/180.0f)),viewPosition[1],(float)(viewPosition[2]-1000.0f*Math.cos((gClipAngle+45.0f)*Math.PI/180.0f)));
+		// Draw the clipping planes behind the eye (yellow)
+		int ptEyeX = (int)(viewPosition[0] - patchSize * Math.sin( gClipAngle * PI_DIV_180 ));
+		int ptEyeY = (int)(viewPosition[2] + patchSize * Math.cos( gClipAngle * PI_DIV_180 ));
+
+		int ptLeftX = (int)(ptEyeX + 100.0f * Math.sin( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+		int ptLeftY = (int)(ptEyeY - 100.0f * Math.cos( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+
+		int ptRightX = (int)(ptEyeX + 100.0f * Math.sin( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+		int ptRightY = (int)(ptEyeY - 100.0f * Math.cos( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+
+		GL11.glColor3f(1, 1, 0);
+		GL11.glVertex3f((float)ptEyeX,viewPosition[1],(float)ptEyeY);
+		GL11.glVertex3f((float)ptLeftX,viewPosition[1],(float)ptLeftY);
+		GL11.glVertex3f((float)ptEyeX,viewPosition[1],(float)ptEyeY);
+		GL11.glVertex3f((float)ptRightX,viewPosition[1],(float)ptRightY);
+		GL11.glEnd();
+		GL11.glLineWidth(1.f);
+		GL11.glColor3f(1, 1, 1);
+		/*
+		 * void drawFrustum()
+{
+	//
+	// Draw the camera eye & frustum
+	//
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+
+	glPointSize(5.f);
+	glLineWidth(3.f);
+
+	glBegin(GL_LINES);
+
+		// Draw the View Vector starting at the eye (red)
+		glColor3f(1, 0, 0);
+		glVertex3f(	gViewPosition[0],
+					gViewPosition[1],
+					gViewPosition[2] );
+
+		glVertex3f(	gViewPosition[0] + 50.0f * sinf( gClipAngle * M_PI / 180.0f ),
+					gViewPosition[1],
+					gViewPosition[2] - 50.0f * cosf( gClipAngle * M_PI / 180.0f ));
+
+
+		// Draw the view frustum (blue)
+		glColor3f(0, 0, 1);
+		glVertex3f(	gViewPosition[0],
+					gViewPosition[1],
+					gViewPosition[2] );
+
+		glVertex3f(	gViewPosition[0] + 1000.0f * sinf( (gClipAngle-45.0f) * M_PI / 180.0f ),
+					gViewPosition[1],
+					gViewPosition[2] - 1000.0f * cosf( (gClipAngle-45.0f) * M_PI / 180.0f ));
+
+		glVertex3f(	gViewPosition[0],
+					gViewPosition[1],
+					gViewPosition[2] );
+
+		glVertex3f(	gViewPosition[0] + 1000.0f * sinf( (gClipAngle+45.0f) * M_PI / 180.0f ),
+					gViewPosition[1],
+					gViewPosition[2] - 1000.0f * cosf( (gClipAngle+45.0f) * M_PI / 180.0f ));
+
+		// Draw the clipping planes behind the eye (yellow)
+		const float PI_DIV_180 = M_PI / 180.0f;
+		const float FOV_DIV_2 = gFovX/2;
+
+		int ptEyeX = (int)(gViewPosition[0] - PATCH_SIZE * sinf( gClipAngle * PI_DIV_180 ));
+		int ptEyeY = (int)(gViewPosition[2] + PATCH_SIZE * cosf( gClipAngle * PI_DIV_180 ));
+
+		int ptLeftX = (int)(ptEyeX + 100.0f * sinf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+		int ptLeftY = (int)(ptEyeY - 100.0f * cosf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+
+		int ptRightX = (int)(ptEyeX + 100.0f * sinf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+		int ptRightY = (int)(ptEyeY - 100.0f * cosf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+
+		glColor3f(1, 1, 0);
+		glVertex3f(	(float)ptEyeX,
+					gViewPosition[1],
+					(float)ptEyeY );
+
+		glVertex3f(	(float)ptLeftX,
+					gViewPosition[1],
+					(float)ptLeftY);
+
+		glVertex3f(	(float)ptEyeX,
+					gViewPosition[1],
+					(float)ptEyeY );
+
+		glVertex3f(	(float)ptRightX,
+					gViewPosition[1],
+					(float)ptRightY);
+
+	glEnd();
+
+	glLineWidth(1.f);
+	glColor3f(1, 1, 1);
+
+	SetDrawModeContext();
+}
+		 */
 	}
 	
 	private TriTreeNode allocate(){
@@ -155,6 +285,26 @@ public class Roam {
 					patch.tessellate();
 			}
 		}
+	}
+	
+	public void render(){
+		Diamond patch = patchs[0][0];
+//		glScalef( 1.0f, MULT_SCALE, 1.0f );
+		for(int y=0;y<patchNumPerSide;y++)
+		{
+			for(int x=0;x<patchNumPerSide;x++)
+			{
+				patch=patchs[y][x];
+				if(patch.isVisible())
+					patch.render();
+			}
+		}
+		//TODO  不明
+		if(nextTriNode!=gDesiredTris)
+			gFrameVariance += ((float)nextTriNode - (float)gDesiredTris) / (float)gDesiredTris;
+		// Bounds checking.
+		if ( gFrameVariance < 0 )
+			gFrameVariance = 0;
 	}
 	
 	/**
@@ -314,8 +464,8 @@ public class Roam {
 				//如果儿子不空，则继续分割儿子
 				if(tri.leftChild!=null&&((Math.abs(leftX - rightX)>=3)||(Math.abs(leftY-rightY)>= 3)))
 				{
-					recursTessellate( tri.leftChild,   apexX,  apexY, leftX, leftY, centerX, centerY,    index<<1);
-					recursTessellate( tri.rightChild, rightX, rightY, apexX, apexY, centerX, centerY, 1+(index<<1));
+					recursTessellate(tri.leftChild,   apexX,  apexY, leftX, leftY, centerX, centerY,    index<<1);
+					recursTessellate(tri.rightChild, rightX, rightY, apexX, apexY, centerX, centerY, 1+(index<<1));
 				}
 			}
 		}
@@ -415,6 +565,49 @@ public class Roam {
 
 		public boolean isDirty() {
 			return dirty;
+		}
+		
+		private void recursRender(TriTreeNode tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY ){
+			
+			if(tri.leftChild!=null)
+			{
+				int centerX = (leftX + rightX)>>1;
+				int centerY = (leftY + rightY)>>1;
+				recursRender( tri.leftChild,  apexX,   apexY, leftX, leftY, centerX, centerY );
+				recursRender( tri.rightChild, rightX, rightY, apexX, apexY, centerX, centerY );
+			}
+			else
+			{
+				gNumTrisRendered++;
+				float leftZ=heightMap[leftY][leftX];
+				float rightZ=heightMap[rightY][rightX];
+				float apexZ=heightMap[apexY][apexX];
+				
+				float fColor = (60.0f + leftZ) / 256.0f;
+				if ( fColor > 1.0f )  fColor = 1.0f;
+				GL11.glColor3f( fColor, fColor, fColor );
+				GL11.glVertex3f(leftX,leftZ,leftY );
+				
+				fColor = (60.0f + rightZ) / 256.0f;
+				if ( fColor > 1.0f )  fColor = 1.0f;
+				GL11.glColor3f( fColor, fColor, fColor );
+				GL11.glVertex3f(rightX,rightZ,rightY );
+				
+				fColor = (60.0f + apexZ) / 256.0f;
+				if ( fColor > 1.0f )  fColor = 1.0f;
+				GL11.glColor3f( fColor, fColor, fColor );
+				GL11.glVertex3f(apexX,apexZ,apexY );
+			}
+		}
+		
+		public void render(){
+			GL11.glPushMatrix();
+			GL11.glTranslatef( x, 0, y );
+			GL11.glBegin(GL11.GL_TRIANGLES);
+			recursRender(baseLeft,0,patchSize,patchSize,0,0,0);
+			recursRender(baseRight,patchSize,0,0,patchSize,patchSize,patchSize);
+			GL11.glEnd();
+			GL11.glPopMatrix();
 		}
 		
 	}
