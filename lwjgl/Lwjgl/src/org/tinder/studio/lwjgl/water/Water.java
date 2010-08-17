@@ -5,6 +5,7 @@ import java.nio.DoubleBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBFragmentProgram;
 import org.lwjgl.opengl.ARBMultitexture;
+import org.lwjgl.opengl.ARBProgram;
 import org.lwjgl.opengl.ARBVertexProgram;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -32,6 +33,11 @@ public class Water {
 	private int myVertexProgram;
 	private int myFragmentProgram;
 	private int texmove;
+	private float[] viewpos;
+	private float[] lightpos;
+	private float[] waterColor;
+	private int normalmap;
+	private int dudvmap;
 	
 	/**
 	 * 渲染倒影,通过glScale颠倒下场景来实现
@@ -96,21 +102,21 @@ public class Water {
 	void RenderWater()
 	{
 
-	    //bind & enable shader programs
+	    //激活并切换到位可编程顶点/片段渲染管线
 		GL11.glEnable(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB);
 		GL11.glEnable(ARBFragmentProgram.GL_FRAGMENT_PROGRAM_ARB);
-		GL11.glBindProgramARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, myVertexProgram);
-		GL11.glBindProgramARB(ARBFragmentProgram.GL_FRAGMENT_PROGRAM_ARB, myFragmentProgram);
+		ARBProgram.glBindProgramARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, myVertexProgram);
+		ARBProgram.glBindProgramARB(ARBFragmentProgram.GL_FRAGMENT_PROGRAM_ARB, myFragmentProgram);
 
 	    //move texture across water surface
-		GL11.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, 0, texmove,texmove,texmove, 1.0f);
-		GL11.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, 1, -texmove,-texmove,-texmove, 1.0f);
+		ARBProgram.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, 0, texmove,texmove,texmove, 1.0f);
+		ARBProgram.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, 1, -texmove,-texmove,-texmove, 1.0f);
 	    //Set viewposition and lightposition
-		GL11.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, 2, viewpos.x,viewpos.y,viewpos.z, 1.0f);
-		GL11.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, 3, lightpos.x,lightpos.y,lightpos.z, 1.0f);
+		ARBProgram.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, 2, viewpos[0],viewpos[1],viewpos[2], 1.0f);
+		ARBProgram.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, 3, lightpos[0],lightpos[1],lightpos[2], 1.0f);
 
 	    //Set watercolor
-		GL11.glProgramLocalParameter4fARB(ARBFragmentProgram.GL_FRAGMENT_PROGRAM_ARB, 0, water.red,water.green,water.blue, 1.0f);
+		ARBProgram.glProgramLocalParameter4fARB(ARBFragmentProgram.GL_FRAGMENT_PROGRAM_ARB, 0, waterColor[0],waterColor[1],waterColor[2], 1.0f);
 
 	    //bind all textures
 		ARBMultitexture.glActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB);
@@ -162,9 +168,6 @@ public class Water {
 	    GL11.glEnd();
 
 	    //Disable texture units and shader programs
-	    .
-	    .
-	    .
 	}
 
 }
