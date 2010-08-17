@@ -1,0 +1,150 @@
+OpenGL中的GPU编程（1）- -
+                                       
+
+介绍如何使用ARB_vertex_program扩展来对GPU进行编程，使用vp1.0的汇编语言，需要OpenGL1.4以上的版本，当然要支持ARB_vertex_program扩展。
+兴奋死了，研究了N天，总算给我找到门路了，希望本文能够给初学者带来一点帮助。
+OpenGL1.4开始就以ARB扩展的形式支持vertex program(DX里叫作vertex shader，其实都是一回事），可编程图形管线是什么概念我就懒得说了，
+不知道得去google一下就有很多很多很多很多（下面省略）的东东，还不明白就给我发mail吧！
+
+要使用ARB_vertex_program扩展，首先得检查当前OpenGL实现是否支持该扩展，
+在glGetString (GL_EXTENSIONS)取回的字符串里找找有没有GL_VERTEX_PROGRAM_ARB就知道了。
+Cut!忘了说，要使用 ARB_vertex_program扩展，首先得做点苦力活，也就是声明和获取一些扩展的函数。
+因为原来的OpenGL函数基本上没办法完全支持 vertex program（知道哪个标准的OpenGL命令能够加载vertex program么？不知道啊？我也不知道^^），
+因此在引入ARB_vertex_program扩展的同时，也引入了一批相关的扩展函数（这些函数同时能够给ARB_fragment_program使用）。
+首先去下载glext.h这个文件，它声明了ARB扩展的常量和函数类型，然后要自己声明和绑定函数。懒得说概念了，给个例子：
+PFNGLPROGRAMSTRINGARBPROC        glProgramStringARB        = NULL;
+glProgramStringARB    =    (PFNGLPROGRAMSTRINGARBPROC) wglGetProcAddress("glProgramStringARB"); 
+ 
+大写的东东glext.h里面都定义好了，相信聪明的人已经看出来了，这些扩展函数的类型都长成PFNGL***PROC，中间就是具体函数名称的大写了。
+苦力活自然不需要重复劳动了，我写好了multi texture和vertex program扩展的相关声明，下载了放到工程里就可以用了。
+附件 Renderer.rar：http://blog.blogchina.com/upload/2005-03-15/2005031516113243510.rar
+
+vertex program的创建和使用方法和创建、使用纹理极其相似：
+1、用 glGenProgramsARB( sziei n , uint *ids )函数产生一个ProgramId，类似Texture Name；
+2、用glBindProgramARB( enum target,uint id )切换当前vertex program。这里target必须是GL_VERTEX_PROGRAM_ARB，id就是刚才产生的id；
+3、用glProgramStringARB(enum target,enum format , sizei len , const ubyte *program)将vertex program加载、编译。
+target同上，format可以使用GL_PROGRAM_FORMAT_ASCII_ARB表示program数组为 ASCII编码的程序，len为program字符串长度，
+program字符串是一个以null结尾的字符串——也就是vertex program源程序了。
+下面给一个具体的例子（其实是抄来的）
+
+GLuint progid;
+glGenProgramsARB( 1 , &progid );
+glBindProgramARB( GL_VERTEX_PROGRAM_ARB , progid );
+glProgramStringARB( GL_VERTEX_PROGRAM_ARB , GL_PROGRAM_FORMAT_ACSII_ARB , strlen(myString) , mySring ); 
+ 
+
+这样就完成了程序的加载和编译——别高兴得太早，程序写错了怎么办？OpenGL才不会傻乎乎得去执行呢。我们还得自己判断程序有没有错误：
+
+if( GL_INVALID_OPERATION == glGetError() )
+{
+ GLint errPos; // 发生错误的位置（在字符串中的索引）
+ glGetIntegerv( GL_PROGRAM_ERROR_POSITION_ARB , &errPos );
+ 
+ // 获取程序出错的具体信息，跟一般编译器返回的一样：**行发生**错误
+ const GLubyte *errString = glGetString( GL_PROGRAM_ERROR_STRING_ARB );
+ fprintf( stderr , "error at position:%d\n%s\n" , errPos , errString );
+}
+ 
+
+最后要做的是删除vertex program。
+glDeleteProgramsARB( sizei n , GLuint *ids );
+
+要使用vertex program，首先用glEnable( GL_VERTEX_PROGRAM_ARB )来激活可编程顶点渲染管线，
+然后使用glBindProgramARB( GL_VERTEX_PROGRAM_ARB , progid )切换当前vertex program。
+前面完成了基本的框架，接下来介绍一下编写vertex program（这么长我受不了啦，下面全用vp代替——源代码除外）需要的一些知识。
+ARB顶点处理器共有6组寄存器组（所有的寄存器都是x,y,z,w4元组），分别是：
+1、顶点属性（Vertex Attributes）寄存器（vertex和result)。vp中使用vertex.*访问当前顶点的所有属性，
+在OpenGL程序中可以使用 glVertexAttrib*fARB等函数指定。
+其实我们平时用的glVertex*f、glColor、glNormal等函数都能够改变顶点属性的值，注意：非浮点类型数据会被自动映射到[-1,1]或[0,1]。顶点属性寄存器组如下：
+ 属性寄存器 组件  内容  
+ vertex.position  {x,y,z,w}  顶点位置信息 
+ vertex.weight  {w,w,w,w}  顶点权值信息（骨骼动画）
+ 
+ vertex.weight[n]  {w,w,w,w}  顶点第n个权值信息 
+ vertex.normal {x,y,z,1} 
+ 顶点法线 
+ 
+vertex.color 
+ {r,g,b,a}
+ 顶点主颜色 
+ 
+vertex.color.primary 
+ {r,g,b,a} 
+ 顶点主颜色 
+ 
+vertex.color.secondary 
+ {r,g,b,a} 
+ 顶点次颜色 
+ 
+vertex.fogcoord 
+ {f,0,0,1} 
+ 顶点雾纹理坐标 
+ 
+vertex.texcoord 
+ { s,t,r,q}
+ 顶点纹理坐标 
+ 
+ vertex.texcoord[n]  {s,t,r,q}  顶点第n个纹理的纹理坐标
+ 
+ vertex.matrixindex {i,i,i,i} 
+ 顶点矩阵索引 （骨骼动画）
+ 
+vertex.matrixindex[n] 
+ {i,i,i,i} 
+ 顶点第n个矩阵索引 
+ 
+ vertex.attrib[n] {x,y,z,w} 
+ 顶点第n个属性 
+ 
+用于输出的result寄存器组也有相同的组成，就不重复贴了。
+2、地址寄存器（Address Register）。地址存器只有x元素可用来寻址，vp中在使用前必须声明，如下：
+ADDRESS Areg;
+ADDRESS a0;
+ADDRESS A1,Areg； 
+ 
+
+3、程序环境参数（Program Environment Parameters)。一共有至少96个寄存器，vp中使用program.env[n]来访问，
+这组寄存器是唯一能够被不同顶点共享的寄存器组（不知道能不能被fragment program共享），一共有n组。
+在OpenGL程序中可以使用glProgramEnvParameter4fARB( GL_VERTEX_PROGRAM_ARB , index , x , y , z , w )等函数设置其值。
+
+4、程序本地参数（Program Local Parameters）。一共有至少96个寄存器，用于存储程序需要的参数。
+OpenGL程序中使用 glProgramLocalParameter4fARB( GL_VERTEX_PROGRAM_ARB , index , x,y,z,w)等函数设置值。
+vp中使用program.local[i]访问。
+
+5、临时寄存器（Temporary Variables）。在vp中使用"TEMP 变量名;"声明，是vp中唯一的可读写的寄存器组。
+
+VP语法。
+标识符和变量：任何序列都有一个或多个字母（A-Z,a-z）、数字（0-9）、下划线、$组成。第一个字符不能为数字。
+常量：由整数、小数点和小数部分构成。还可以用指数方式描述。例如：1，4.3，4e3等。
+PARAM参数：只读常量，使用PARAM关键字声明，声明时必须指定值。例如：
+PARAM a =  {0,0,0,0};
+PARAM b[2] = { {1,1,1,1} , {2,2,2,2} }
+ 
+还有一些省略的写法，懒得说了。
+TEMP变量：是程序中唯一的可读写的变量，使用TEMP关键字声明，声明的时候不能够指定初值。例如：
+TEMP a;  
+OUTPUT变量：只写的输出变量类型。使用OUTPUT关键字声明，声明时必须指定要绑定的变量名称。OUTPUT变量事实上并不占用任何寄存器，它只是引用声明时所指定的变量地址。如：
+OUTPUT oPos = result.position;  
+vp中还有一个非常重要的状态寄存器state，它包含了OpenGL中指定的一些状态参数。如材质、灯光、矩阵等参数。有兴趣的可以自己去找资料看看。
+我下班啦！收工！
+(在家里补充)最后再给一个vertex program的例子，很简单的，只是做MVP变换，没有光照。
+!!ARBvp1.0
+ATTRIB iPos         = vertex.position;
+ATTRIB iTexcoord    = vertex.texcoord;
+PARAM  mvp[4]       = { state.matrix.mvp };
+PARAM  diffuseCol   = { 0.6, 0.6, 0.6, 1 };
+OUTPUT oPos         = result.position;
+OUTPUT oColor       = result.color;
+OUTPUT oTexcoord    = result.texcoord;
+
+MOV   oColor.xyz, diffuseCol;
+MOV   oTexcoord , iTexcoord;
+DP4   oPos.x, mvp[0], iPos;
+DP4   oPos.y, mvp[1], iPos;
+DP4   oPos.z, mvp[2], iPos;
+DP4   oPos.w, mvp[3], iPos;
+END 
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/duduliao/archive/2008/08/06/2777157.aspx
