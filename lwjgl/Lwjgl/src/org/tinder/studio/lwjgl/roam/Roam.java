@@ -31,16 +31,16 @@ public class Roam {
 	private short[][] heightMap;
 	private float[] scales;	//放大系数     scale>0
 	private float delicate;	//细致系数
-	private int mapSize=1024;//地图大小
-	private int patchNumPerSide=16;//每边块数
-	private int varianceLimit=50;//变差值界限
+	private int mapSize=5;//地图大小
+	private int patchNumPerSide=4;//每边块数
+	private int varianceLimit=30;//变差值界限
 	private int patchSize=mapSize/patchNumPerSide;//块大小
 	private Diamond[][] patchs;
-	private float[] viewPosition;
+	private float[] viewPosition={0,0,0};
 	private TriTreeNode[] pool;
 	public int nextTriNode=0;
 	private static float gFovX = 90.0f;
-	private float gClipAngle;
+	private float gClipAngle=120;
 	private int gNumTrisRendered;
 	// Desired number of Binary Triangle tessellations per frame.
 	// This is not the desired number of triangles rendered!
@@ -176,89 +176,7 @@ public class Roam {
 		GL11.glEnd();
 		GL11.glLineWidth(1.f);
 		GL11.glColor3f(1, 1, 1);
-		/*
-		 * void drawFrustum()
-{
-	//
-	// Draw the camera eye & frustum
-	//
-	glDisable(GL_LIGHTING);
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_TEXTURE_GEN_S);
-	glDisable(GL_TEXTURE_GEN_T);
-
-	glPointSize(5.f);
-	glLineWidth(3.f);
-
-	glBegin(GL_LINES);
-
-		// Draw the View Vector starting at the eye (red)
-		glColor3f(1, 0, 0);
-		glVertex3f(	gViewPosition[0],
-					gViewPosition[1],
-					gViewPosition[2] );
-
-		glVertex3f(	gViewPosition[0] + 50.0f * sinf( gClipAngle * M_PI / 180.0f ),
-					gViewPosition[1],
-					gViewPosition[2] - 50.0f * cosf( gClipAngle * M_PI / 180.0f ));
-
-
-		// Draw the view frustum (blue)
-		glColor3f(0, 0, 1);
-		glVertex3f(	gViewPosition[0],
-					gViewPosition[1],
-					gViewPosition[2] );
-
-		glVertex3f(	gViewPosition[0] + 1000.0f * sinf( (gClipAngle-45.0f) * M_PI / 180.0f ),
-					gViewPosition[1],
-					gViewPosition[2] - 1000.0f * cosf( (gClipAngle-45.0f) * M_PI / 180.0f ));
-
-		glVertex3f(	gViewPosition[0],
-					gViewPosition[1],
-					gViewPosition[2] );
-
-		glVertex3f(	gViewPosition[0] + 1000.0f * sinf( (gClipAngle+45.0f) * M_PI / 180.0f ),
-					gViewPosition[1],
-					gViewPosition[2] - 1000.0f * cosf( (gClipAngle+45.0f) * M_PI / 180.0f ));
-
-		// Draw the clipping planes behind the eye (yellow)
-		const float PI_DIV_180 = M_PI / 180.0f;
-		const float FOV_DIV_2 = gFovX/2;
-
-		int ptEyeX = (int)(gViewPosition[0] - PATCH_SIZE * sinf( gClipAngle * PI_DIV_180 ));
-		int ptEyeY = (int)(gViewPosition[2] + PATCH_SIZE * cosf( gClipAngle * PI_DIV_180 ));
-
-		int ptLeftX = (int)(ptEyeX + 100.0f * sinf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
-		int ptLeftY = (int)(ptEyeY - 100.0f * cosf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
-
-		int ptRightX = (int)(ptEyeX + 100.0f * sinf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
-		int ptRightY = (int)(ptEyeY - 100.0f * cosf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
-
-		glColor3f(1, 1, 0);
-		glVertex3f(	(float)ptEyeX,
-					gViewPosition[1],
-					(float)ptEyeY );
-
-		glVertex3f(	(float)ptLeftX,
-					gViewPosition[1],
-					(float)ptLeftY);
-
-		glVertex3f(	(float)ptEyeX,
-					gViewPosition[1],
-					(float)ptEyeY );
-
-		glVertex3f(	(float)ptRightX,
-					gViewPosition[1],
-					(float)ptRightY);
-
-	glEnd();
-
-	glLineWidth(1.f);
-	glColor3f(1, 1, 1);
-
-	SetDrawModeContext();
-}
-		 */
+		
 	}
 	
 	private TriTreeNode allocate(){
@@ -324,6 +242,11 @@ public class Roam {
 		private boolean visible=false;
 		private boolean dirty=false;
 //		public byte height;
+		
+		public Diamond() {
+			this.baseLeft=new TriTreeNode();
+			this.baseRight=new TriTreeNode();
+		}
 		
 		public void init(int x,int y){
 			//清空记录
@@ -455,12 +378,14 @@ public class Roam {
 				// Egads!  A division too?  What's this world coming to!
 				// This should also be replaced with a faster operation.
 				triVariance = ((float)currentVariance[index]*mapSize*2)/distance;	// Take both distance and variance into consideration
+				System.out.println("distance:"+distance+",triVariance:"+triVariance);
 			}
 			
 			//如果索引溢出，表示之前已经分割过此节点（不明白），因此继续分割操作，又或者变差超限，也要进行分割操作
 			if((index>=(1<<VARIANCE_DEPTH))||(triVariance > varianceLimit))
 			{
 				split(tri);
+				System.out.println("tri:"+tri);
 				//如果儿子不空，则继续分割儿子
 				if(tri.leftChild!=null&&((Math.abs(leftX - rightX)>=3)||(Math.abs(leftY-rightY)>= 3)))
 				{
@@ -539,6 +464,7 @@ public class Roam {
 				node.leftChild.rightNeighbor=null;
 				node.rightChild.leftNeighbor=null;
 			}
+			System.out.println("split "+node);
 		}
 		
 		/**
@@ -557,6 +483,8 @@ public class Roam {
 			
 			// Set visibility flag (orientation of both triangles must be counter clockwise)
 			visible=Util.orientation(eyeX,eyeY,rightX,rightY,patchCenterX, patchCenterY)<0&&Util.orientation(leftX,leftY,eyeX,eyeY,patchCenterX,patchCenterY )<0;
+			
+			System.out.println("visible:"+visible);
 		}
 
 		public boolean isVisible() {
@@ -610,6 +538,15 @@ public class Roam {
 			GL11.glPopMatrix();
 		}
 		
+	}
+	
+	public static void main(String[] args){
+		short[][] heightMap={{0,1,24,3,5},{5,2,6,35,84,1},{4,15,26,37,8},{10,20,50,60,80},{56,23,19,38,200}};
+		Roam roam=new Roam(heightMap, null, 0);
+		roam.init();
+		roam.reset();
+		roam.tessellate();
+		roam.render();
 	}
 
 }
