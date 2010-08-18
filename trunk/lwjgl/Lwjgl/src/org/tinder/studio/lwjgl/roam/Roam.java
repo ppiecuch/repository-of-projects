@@ -31,8 +31,8 @@ public class Roam {
 	private short[][] heightMap;
 	private float[] scales;	//放大系数     scale>0
 	private float delicate;	//细致系数
-	private int mapSize=5;//地图大小
-	private int patchNumPerSide=4;//每边块数
+	private int mapSize=7;//地图大小
+	private int patchNumPerSide=6;//每边块数
 	private int varianceLimit=30;//变差值界限
 	private int patchSize=mapSize/patchNumPerSide;//块大小
 	private Diamond[][] patchs;
@@ -541,12 +541,12 @@ public class Roam {
 	}
 	
 	public static void main(String[] args){
-		short[][] heightMap={{0,1,24,3,5},{5,2,6,35,84,1},{4,15,26,37,8},{10,20,50,60,80},{56,23,19,38,200}};
+		short[][] heightMap={{0,1,24,3,5,2,8},{5,2,6,35,84,1,7,9},{4,15,26,37,8,11,36},{10,20,50,60,80,62,83},{56,23,19,38,200,0,3},{5,9,1,20,57,8,33},{98,65,3,2,95,0,2}};
 		Roam roam=new Roam(heightMap, null, 0);
 		roam.init();
 		roam.reset();
 		roam.tessellate();
-		roam.render();
+//		roam.render();
 	}
 
 }
