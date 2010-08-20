@@ -1,0 +1,174 @@
+水波 收藏 
+/* h = A*sin(2*pi*W*t)*/
+  int dx, dy; /* Disturbance Point */
+  float s, v, W, t;
+  int i, j;
+
+  dx = WSIZE >> 1;
+  dy = WSIZE >> 1;
+  W = 0.3; 
+  v = -4; /* Wave speed */
+
+  for (i=0; i<WSIZE; i++)
+    for (j=0; j<WSIZE; j++)
+    {
+      s = sqrt((j-dx)*(j-dx) + (i-dy)*(i-dy));//距离中心点越远s越大
+      wt[i][j] += 0.1; 
+      t = s/v;
+      water[i][j] = A*sin(2*PI*W*(wt[i][j]+t));//距离中心点相同的点具有相同的t值，也就具有了相同的振幅。也就是整个面呈现正形波状态。
+            //针对同一个点，由于t值一直相同，故增加一个值，这样同一个点的波形在变化，所有的点增加
+            //相同的值。
+    }
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/yjw041/archive/2010/03/12/5369184.aspx
+
+
+
+水波二 收藏 
+void Wave(void)
+{
+ int i,j;
+ float d;
+
+ for(i=0; i<size; i++)
+ for(j=0; j<size; j++)
+  force[i][j] = 0.0f;
+
+ for(i=1; i<size-1; i++)
+ for(j=1; j<size-1; j++)
+ {
+  d=surf[i][j][1]-surf[i][j-1][1];
+  force[i][j] -= d;
+  force[i][j-1] += d;
+
+  d=surf[i][j][1]-surf[i-1][j][1];
+  force[i][j] -= d;
+  force[i-1][j] += d;
+
+  d=surf[i][j][1]-surf[i][j+1][1];
+  force[i][j] -= d;
+  force[i][j+1] += d;
+
+  d=surf[i][j][1]-surf[i+1][j][1];
+  force[i][j] -= d;
+  force[i+1][j] += d;
+
+  d=(surf[i][j][1]-surf[i+1][j+1][1])*SQRTOFTWOINV;
+  force[i][j] -= d;
+  force[i+1][j+1] += d;
+
+  d=(surf[i][j][1]-surf[i-1][j-1][1])*SQRTOFTWOINV;
+  force[i][j] -= d;
+  force[i-1][j-1] += d;
+
+  d=(surf[i][j][1]-surf[i+1][j-1][1])*SQRTOFTWOINV;
+  force[i][j] -= d;
+  force[i+1][j-1] += d;
+
+  d=(surf[i][j][1]-surf[i+1][j-1][1])*SQRTOFTWOINV;
+  force[i][j] -= d;
+  force[i+1][j-1] += d;
+ }
+
+ for(i=0; i<size; i++)
+ for(j=0; j<size; j++)
+  veloc[i][j] += force[i][j] * dt;
+ 
+ for(i=0; i<size; i++)
+ for(j=0; j<size; j++)
+ {
+  surf[i][j][1] += veloc[i][j];
+  
+  if (surf[i][j][1]>0) surf[i][j][1] -= surf[i][j][1]/size;
+  else surf[i][j][1] -= surf[i][j][1]/size;
+ }
+}
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/yjw041/archive/2010/03/11/5369970.aspx
+
+
+水波三 收藏 
+case WM_LBUTTONDOWN:
+  {
+   int x,z;
+   float dx,dz;
+   xpos = LOWORD(lParam);  // horizontal position of cursor 
+   ypos = HIWORD(lParam);  // vertical position of cursor 
+   dx=(float)fx/DIMX;
+   dz=(float)fy/DIMZ;
+   x=xpos/dx;
+   z=ypos/dz;
+   xmouse=x;
+   zmouse=z;
+   if( (x>=0) && (x<(DIMX-1)) && (z>=0) && (z<(DIMZ-1)) )
+   {
+    buf[x][z].y=8;
+   }
+   return 0;
+  }
+
+
+void ProcessWave()
+{
+ float temp;
+
+ for (int i=1; i<MAPY-1; i++)
+  for (int j=1; j<MAPX-1; j++)
+  {
+   temp = ((wavemap[cmap][i-1][j] + 
+     wavemap[cmap][i+1][j] + 
+        wavemap[cmap][i][j-1] + 
+        wavemap[cmap][i][j+1] +
+        
+     wavemap[cmap][i-1][j+1] + 
+     wavemap[cmap][i+1][j+1] + 
+
+     wavemap[cmap][i-1][j-1] + 
+     wavemap[cmap][i+1][j-1]) / 4) -
+        wavemap[nmap][i][j];   
+   temp = temp - (temp / damp);
+   //if ((temp < 0.01) && (temp > -0.01)) temp = 0;
+   if (temp < 0.01) temp = 0;
+   wavemap[nmap][i][j] = temp;
+  }
+}
+
+void InvertWaveMap()
+{
+ int temp = cmap;
+ cmap = nmap;
+ nmap = temp;
+}
+
+void DrawWave()
+{
+ int i, j;
+
+ glDisable(GL_TEXTURE_2D); 
+ glColor4f(1, 1, 1, 0.1);
+ glBegin(GL_TRIANGLES);
+ for (i=0; i<MAPY-1; i++)
+ {
+  for (j=0; j<MAPX-1; j++)
+  {
+   glVertex3f(j*2, wavemap[cmap][i][j], i*2);
+   glVertex3f((j+1)*2, wavemap[cmap][i+1][j+1], (i+1)*2);
+   glVertex3f(j*2, wavemap[cmap][i+1][j], (i+1)*2);
+
+   glVertex3f(j*2, wavemap[cmap][i][j], i*2);
+   glVertex3f((j+1)*2, wavemap[cmap][i][j+1], i*2);
+   glVertex3f((j+1)*2, wavemap[cmap][i+1][j+1], (i+1)*2);
+  }
+ }
+ glEnd();
+ glEnable(GL_TEXTURE_2D); 
+}
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/yjw041/archive/2010/03/11/5370050.aspx
+
+
