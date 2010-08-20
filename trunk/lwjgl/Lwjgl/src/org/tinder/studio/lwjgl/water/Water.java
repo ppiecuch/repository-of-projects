@@ -56,6 +56,7 @@ public class Water {
 	    DoubleBuffer buffer=BufferUtils.createDoubleBuffer(plane.length);
 	    buffer.put(plane);
 	    GL11.glEnable(GL11.GL_CLIP_PLANE0);
+	    //定义一个裁剪平面。equation参数指向平面方程Ax + By + Cz + D = 0的4个系数。满足（A B C D）...
 	    GL11.glClipPlane(GL11.GL_CLIP_PLANE0, buffer);
 //	    RenderScene();
 	    GL11.glDisable(GL11.GL_CLIP_PLANE0);
