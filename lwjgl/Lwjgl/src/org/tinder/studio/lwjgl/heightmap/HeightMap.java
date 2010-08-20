@@ -180,4 +180,20 @@ public class HeightMap {
 		}
 		return p.z*mufactors[2];
 	}
+
+	public short[][] getHeightWeights() {
+		return heightWeights;
+	}
+
+	public int getImageWidth() {
+		return imageWidth;
+	}
+
+	public int getImageHeight() {
+		return imageHeight;
+	}
+	
+	
+	
+	
 }

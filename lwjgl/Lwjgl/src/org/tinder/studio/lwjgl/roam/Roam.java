@@ -31,9 +31,9 @@ public class Roam {
 	private short[][] heightMap;
 	private float[] scales;	//放大系数     scale>0
 	private float delicate;	//细致系数
-	private int mapSize=7;//地图大小
-	private int patchNumPerSide=6;//每边块数
-	private int varianceLimit=30;//变差值界限
+	private int mapSize=65;//地图大小
+	private int patchNumPerSide=16;//每边块数
+	private int varianceLimit=50;//变差值界限
 	private int patchSize=mapSize/patchNumPerSide;//块大小
 	private Diamond[][] patchs;
 	private float[] viewPosition={0,0,0};
@@ -378,14 +378,14 @@ public class Roam {
 				// Egads!  A division too?  What's this world coming to!
 				// This should also be replaced with a faster operation.
 				triVariance = ((float)currentVariance[index]*mapSize*2)/distance;	// Take both distance and variance into consideration
-				System.out.println("distance:"+distance+",triVariance:"+triVariance);
+//				System.out.println("distance:"+distance+",triVariance:"+triVariance);
 			}
 			
 			//如果索引溢出，表示之前已经分割过此节点（不明白），因此继续分割操作，又或者变差超限，也要进行分割操作
 			if((index>=(1<<VARIANCE_DEPTH))||(triVariance > varianceLimit))
 			{
 				split(tri);
-				System.out.println("tri:"+tri);
+//				System.out.println("tri:"+tri);
 				//如果儿子不空，则继续分割儿子
 				if(tri.leftChild!=null&&((Math.abs(leftX - rightX)>=3)||(Math.abs(leftY-rightY)>= 3)))
 				{
@@ -464,7 +464,7 @@ public class Roam {
 				node.leftChild.rightNeighbor=null;
 				node.rightChild.leftNeighbor=null;
 			}
-			System.out.println("split "+node);
+//			System.out.println("split "+node);
 		}
 		
 		/**
@@ -484,7 +484,7 @@ public class Roam {
 			// Set visibility flag (orientation of both triangles must be counter clockwise)
 			visible=Util.orientation(eyeX,eyeY,rightX,rightY,patchCenterX, patchCenterY)<0&&Util.orientation(leftX,leftY,eyeX,eyeY,patchCenterX,patchCenterY )<0;
 			
-			System.out.println("visible:"+visible);
+//			System.out.println("visible:"+visible);
 		}
 
 		public boolean isVisible() {
@@ -496,7 +496,7 @@ public class Roam {
 		}
 		
 		private void recursRender(TriTreeNode tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY ){
-			
+//			System.out.println("recursRender");
 			if(tri.leftChild!=null)
 			{
 				int centerX = (leftX + rightX)>>1;
@@ -515,6 +515,7 @@ public class Roam {
 				if ( fColor > 1.0f )  fColor = 1.0f;
 				GL11.glColor3f( fColor, fColor, fColor );
 				GL11.glVertex3f(leftX,leftZ,leftY );
+//				System.out.println(leftX+","+leftZ+","+leftY);
 				
 				fColor = (60.0f + rightZ) / 256.0f;
 				if ( fColor > 1.0f )  fColor = 1.0f;
@@ -528,10 +529,10 @@ public class Roam {
 			}
 		}
 		
-		public void render(){
+		private void render(){
 			GL11.glPushMatrix();
 			GL11.glTranslatef( x, 0, y );
-			GL11.glBegin(GL11.GL_TRIANGLES);
+			GL11.glBegin(GL11.GL_LINE_LOOP);
 			recursRender(baseLeft,0,patchSize,patchSize,0,0,0);
 			recursRender(baseRight,patchSize,0,0,patchSize,patchSize,patchSize);
 			GL11.glEnd();
@@ -539,14 +540,11 @@ public class Roam {
 		}
 		
 	}
-	
-	public static void main(String[] args){
-		short[][] heightMap={{0,1,24,3,5,2,8},{5,2,6,35,84,1,7,9},{4,15,26,37,8,11,36},{10,20,50,60,80,62,83},{56,23,19,38,200,0,3},{5,9,1,20,57,8,33},{98,65,3,2,95,0,2}};
-		Roam roam=new Roam(heightMap, null, 0);
-		roam.init();
-		roam.reset();
-		roam.tessellate();
-//		roam.render();
+
+	public void setgClipAngle(float gClipAngle) {
+		this.gClipAngle = gClipAngle;
 	}
+	
+	
 
 }
