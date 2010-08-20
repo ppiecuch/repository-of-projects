@@ -1,0 +1,88 @@
+水波算法实例
+
+//******************************************************* 
+//根据波能数据缓冲区对离屏页面进行渲染 
+//******************************************************* 
+void RenderRipple() 
+{ 
+//锁定两个离屏页面 
+DDSURFACEDESC ddsd1, ddsd2; 
+ddsd1.dwSize = sizeof (DDSURFACEDESC); 
+ddsd2.dwSize = sizeof(DDSURFACEDESC); 
+lpDDSPic1->Lock(NULL, &ddsd1, DDLOCK_WAIT, NULL); 
+lpDDSPic2->Lock(NULL, &ddsd2, DDLOCK_WAIT, NULL); 
+
+//取得页面象素位深度，和页面内存指针 
+int depth=ddsd1.ddpfPixelFormat.dwRGBBitCount/8; 
+BYTE *Bitmap1 = (BYTE*)ddsd1.lpSurface; 
+BYTE *Bitmap2 = (BYTE*)ddsd2.lpSurface; 
+
+//下面进行页面渲染 
+int xoff, yoff; 
+int k = BACKWIDTH; 
+for (int i=1; i<BACKHEIGHT-1; i++) 
+{ 
+for (int j=0; j<BACKWIDTH; j++) 
+{ 
+//计算偏移量 
+xoff = buf1[k-1]-buf1[k+1]; 
+yoff = buf1[k-BACKWIDTH]-buf1[k+BACKWIDTH]; 
+
+//判断坐标是否在窗口范围内 
+if ((i+yoff )< 0 ) {k++; continue;} 
+if ((i+yoff )> BACKHEIGHT) {k++; continue;} 
+if ((j+xoff )< 0 ) {k++; continue;} 
+if ((j+xoff )> BACKWIDTH ) {k++; continue;} 
+
+//计算出偏移象素和原始象素的内存地址偏移量 
+int pos1, pos2; 
+pos1=ddsd1.lPitch*(i+yoff)+ depth*(j+xoff); 
+pos2=ddsd2.lPitch*i+ depth*j; 
+
+//复制象素 
+for (int d=0; d<depth; d++) 
+Bitmap2[pos2++]=Bitmap1[pos1++]; 
+k++; 
+} 
+} 
+//解锁页面 
+lpDDSPic1->Unlock(&ddsd1); 
+lpDDSPic2->Unlock(&ddsd2); 
+} 
+
+增加波源 
+俗话说：无风不起浪，为了形成水波，我们必须在水池中加入波源，你可以想象成向水中投入石头，形成的波源的大小和能量与石头的半径和你扔石头的力量都有关系。知道了这些，那么好，我们只要修改波能数据缓冲区buf，让它在石头入水的地点来一个负的“尖脉冲”，即让buf[x,y]=-n。经过实验，n的范围在（32~128）之间比较合适。 
+
+控制波源半径也好办，你只要以石头入水中心点为圆心，画一个以石头半径为半径的圆，让这个圆中所有的点都来这么一个负的“尖脉冲”就可以了（这里也做了近似处理）。 
+
+增加波源的代码如下： 
+
+//***************************************************** 
+//增加波源 
+//***************************************************** 
+void DropStone(int x,//x坐标 
+int y,//y坐标 
+int stonesize,//波源半径 
+int stoneweight)//波源能量 
+{ 
+//判断坐标是否在屏幕范围内 
+if ((x+stonesize)>BACKWIDTH || 
+(y+stonesize)>BACKHEIGHT|| 
+(x-stonesize)<0|| 
+(y-stonesize)<0) 
+return; 
+
+for (int posx=x-stonesize; posx<x+stonesize; posx++) 
+for (int posy=y-stonesize; posy<y+stonesize; posy++) 
+if ((posx-x)*(posx-x) + (posy-y)*(posy-y) < stonesize*stonesize) 
+buf1[BACKWIDTH*posy+posx] = -stoneweight; 
+} 
+
+好了，至此，水波特效的制作原理就此就全部揭示了。在上面的推导中，每一步都进行了很多看似非常过分的近似处理，但是，你完全不必担心，事实证明，用这种方法，在速度和图象上都可以获得非常好的效果。源程序中有非常详尽的注释，仔细推敲一下，看懂它们应该不成问题。 
+这个程序是Win32下的DirectX编程，没有使用任何包装库。在我的电脑上（AMDK6-200、2MVRam、64MSRam），320x240的画面大小，每秒可以达到25帧。与前几个程序不一样，这个程序使用了窗口模式，所以调试起来很方便。如果你对窗口模式编程不熟悉，这个程序也是一个很好的例子。 
+
+这种用数据缓冲区对图象进行水波处理的方法，有个最大的好处就是，程序运算和其示的速度与水波的复杂程度是没有关系的，无论水面是风平浪静还是波涛汹涌，程序的fps始终保持不变，这一点你研究一下程序就应该可以看出来。实际上，如果你掌握了这种方法，将这种方法推广一下，完全可以做出另外一些特殊的效果，如烟雾、大气、阳光等，我现在也正在研究这些特效的制作，相信不久以后就会有新的收获。
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/w9521423/archive/2005/10/07/496732.aspx
