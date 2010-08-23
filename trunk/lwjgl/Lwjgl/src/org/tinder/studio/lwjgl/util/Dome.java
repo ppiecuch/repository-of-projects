@@ -13,20 +13,24 @@ public class Dome {
 	
 	private static final double DTOR=Math.PI/180;
 	private int horizonalSteps,portraitSteps;
-	private float radius;
-	private Point3f[][][] vertex;
-	private Point2f[][][] texCoords;
+	private float radius;					//半径
+	private Point3f[][][] vertex;			//顶点坐标
+	private Point2f[][][] texCoords;		//纹理坐标
 	
+	/**
+	 * 以原点为球心，绘制半球形天空
+	 * @param radius 球的半径
+	 * @param horizonalSteps 水平方向分割步数
+	 * @param portraitSteps 垂直方向分割步数
+	 */
 	public Dome(float radius, int horizonalSteps, int portraitSteps) {
 		this.horizonalSteps=horizonalSteps;
 		this.portraitSteps=portraitSteps;
 		this.radius=radius;
-		float dtheta=(float)360/horizonalSteps;
-		float dphi=(float)90/portraitSteps;
+		float dtheta=(float)360/horizonalSteps;	//水平方向步增
+		float dphi=(float)90/portraitSteps;		//垂直方向步增
 		vertex=new Point3f[portraitSteps][][];
 		texCoords=new Point2f[portraitSteps][][];
-//		Point2f[] temp=new Point2f[3];
-//		int index=0;
 		for(int i=0,phi=0;i<portraitSteps;i++,phi+=dphi)
 		{
 			vertex[i]=new Point3f[horizonalSteps][];
@@ -43,22 +47,9 @@ public class Dome {
 				vertex[i][j][0]=point;
 				Vector3f vector=new Vector3f(point.x, point.y, point.z);
 				vector.normalize();
-				//tu = asin(Nx)/PI + 0.5 
-				//tv = asin(Ny)/PI + 0.5 
-//				uv.x=(float)(Math.atan2(vector.x, vector.z)/(Math.PI*2)) + 0.5f;
-//				uv.y=(float)(Math.asin(vector.y) / Math.PI) + 0.5f;
-//				uv.x=(float) (Math.asin(vector.x)/Math.PI+0.5f);
 				uv.x=(float)j/horizonalSteps;
 				uv.y=(float) (Math.asin(vector.z)/Math.PI*2);
-//				uv.x=(float) Math.sin((theta/4)*DTOR);
-//				uv.y=(float) Math.sin((90-phi)*DTOR);
 				texCoords[i][j][0]=uv;
-//				System.out.print("point:"+point);
-//				System.out.print(",uv:"+uv);
-//				temp[0]=temp[1];
-//				temp[1]=temp[2];
-//				temp[2]=uv;
-//				if(index++>=2)revise(temp[0], temp[1], temp[2]);
 				
 				point=new Point3f();
 				uv=new Point2f();
@@ -68,20 +59,9 @@ public class Dome {
 				vertex[i][j][1]=point;
 				vector=new Vector3f(point.x, point.y, point.z);
 				vector.normalize();
-//				uv.x=(float)(Math.atan2(vector.x, vector.z)/(Math.PI*2)) + 0.5f;
-//				uv.y=(float)(Math.asin(vector.y) / Math.PI) + 0.5f;
-//				uv.x=(float) (Math.asin(vector.x)/Math.PI+0.5f);
 				uv.x=(float)(j+1)/horizonalSteps;
 				uv.y=(float) (Math.asin(vector.z)/Math.PI*2);
-//				uv.x=(float) Math.sin(((theta+dtheta)/4)*DTOR);
-//				uv.y=(float) Math.sin((90-phi)*DTOR);
 				texCoords[i][j][1]=uv;
-//				System.out.print("point:"+point);
-//				System.out.print(",uv:"+uv);
-//				temp[0]=temp[1];
-//				temp[1]=temp[2];
-//				temp[2]=uv;
-//				if(index++>=2)revise(temp[0], temp[1], temp[2]);
 				
 				point=new Point3f();
 				uv=new Point2f();
@@ -91,20 +71,9 @@ public class Dome {
 				vertex[i][j][2]=point;
 				vector=new Vector3f(point.x, point.y, point.z);
 				vector.normalize();
-//				uv.x=(float)(Math.atan2(vector.x, vector.z)/(Math.PI*2)) + 0.5f;
-//				uv.y=(float)(Math.asin(vector.y) / Math.PI) + 0.5f;
-//				uv.x=(float) (Math.asin(vector.x)/Math.PI+0.5f);
 				uv.x=(float)(j+1)/horizonalSteps;
 				uv.y=(float) (Math.asin(vector.z)/Math.PI*2);
-//				uv.x=(float) Math.sin(((theta+dtheta)/4)*DTOR);
-//				uv.y=(float) Math.sin((90-phi-dphi)*DTOR);
 				texCoords[i][j][2]=uv;
-//				System.out.print("point:"+point);
-//				System.out.print(",uv:"+uv);
-//				temp[0]=temp[1];
-//				temp[1]=temp[2];
-//				temp[2]=uv;
-//				if(index++>=2)revise(temp[0], temp[1], temp[2]);
 				
 				point=new Point3f();
 				uv=new Point2f();
@@ -114,63 +83,12 @@ public class Dome {
 				vertex[i][j][3]=point;
 				vector=new Vector3f(point.x, point.y, point.z);
 				vector.normalize();
-//				uv.x=(float)(Math.atan2(vector.x, vector.z)/(Math.PI*2)) + 0.5f;
-//				uv.y=(float)(Math.asin(vector.y) / Math.PI) + 0.5f;
-//				uv.x=(float) (Math.asin(vector.x)/Math.PI+0.5f);
 				uv.x=(float)j/horizonalSteps;
 				uv.y=(float) (Math.asin(vector.z)/Math.PI*2);
-//				uv.x=(float) Math.sin((theta/4)*DTOR);
-//				uv.y=(float) Math.sin((90-phi-dphi)*DTOR);
 				texCoords[i][j][3]=uv;
-//				System.out.print("point:"+point);
-//				System.out.print(",uv:"+uv);
-//				temp[0]=temp[1];
-//				temp[1]=temp[2];
-//				temp[2]=uv;
-//				if(index++>=2)revise(temp[0], temp[1], temp[2]);
 			}
-			System.out.println();
 		}
 	}
-	
-//	private void revise(Point2f p0,Point2f p1,Point2f p2)
-//	{
-//		if (p0.x - p1.x > 0.9f)
-//			p1.x += 1.0f;
-//
-//		if (p1.x - p0.x > 0.9f)
-//			p0.x += 1.0f;
-//
-//		if (p0.x - p2.x > 0.9f)
-//			p2.x += 1.0f;
-//
-//		if (p2.x - p0.x > 0.9f)
-//			p0.x += 1.0f;
-//
-//		if (p1.x - p2.x > 0.9f)
-//			p2.x += 1.0f;
-//
-//		if (p2.x - p1.x > 0.9f)
-//			p1.x += 1.0f;
-//
-//		if (p0.y - p1.y > 0.8f)
-//			p1.y += 1.0f;
-//
-//		if (p1.y - p0.y > 0.8f)
-//			p0.y += 1.0f;
-//
-//		if (p0.y - p2.y > 0.8f)
-//			p2.y += 1.0f;
-//
-//		if (p2.y - p0.y > 0.8f)
-//			p0.y += 1.0f;
-//
-//		if (p1.y - p2.y > 0.8f)
-//			p2.y += 1.0f;
-//
-//		if (p2.y - p1.y > 0.8f)
-//			p1.y += 1.0f;
-//	}
 
 	public int getHorizonalSteps() {
 		return horizonalSteps;

@@ -52,6 +52,7 @@ public class RoamDemo {
 			HeightMap heightMap = new HeightMap(new float[]{40,40,1},new int[]{80,80}, resourceLoader.loadResourceAsStream("textures/heightmap.png"));
 			roam=new Roam(heightMap.getHeightWeights(), null, 0);
 			roam.init();
+			roam.setViewPosition(new float[]{35,0,35});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -104,7 +105,7 @@ public class RoamDemo {
                 }
             }
             GL11.glColor3f(0,1,0);
-            font.print("FPS:"+String.valueOf(costTime==0?FPS:1000/costTime),5,22,0);
+//            font.print("FPS:"+String.valueOf(costTime==0?FPS:1000/costTime),5,22,0);
             Display.update();
 		}
 		Keyboard.destroy();
@@ -141,6 +142,7 @@ public class RoamDemo {
 		GL11.glLoadIdentity();
 		GL11.glScaled(10,50,10);
 		roam.render();
+		roam.drawFrustum();
 	}
 	
 	public static void main(String[] args) throws LWJGLException

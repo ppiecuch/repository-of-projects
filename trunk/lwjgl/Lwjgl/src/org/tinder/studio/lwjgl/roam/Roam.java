@@ -33,7 +33,7 @@ public class Roam {
 	private float delicate;	//细致系数
 	private int mapSize=65;//地图大小
 	private int patchNumPerSide=16;//每边块数
-	private int varianceLimit=50;//变差值界限
+	private int varianceLimit=5000;//变差值界限
 	private int patchSize=mapSize/patchNumPerSide;//块大小
 	private Diamond[][] patchs;
 	private float[] viewPosition={0,0,0};
@@ -232,7 +232,7 @@ public class Roam {
 	 *
 	 */
 	private class Diamond{
-		private static final int VARIANCE_DEPTH=9;//变差树的深度，必须是近似 SQRT(PATCH_SIZE) + 1的值
+		private static final int VARIANCE_DEPTH=4;//变差树的深度，必须是近似 SQRT(PATCH_SIZE) + 1的值
 		private TriTreeNode baseLeft;// 左二元三角树
 		private TriTreeNode baseRight;// 右二元三角树
 		private int[] varianceLeft=new int[1<<(VARIANCE_DEPTH)];// 左变差树
@@ -511,20 +511,25 @@ public class Roam {
 				float rightZ=heightMap[rightY][rightX];
 				float apexZ=heightMap[apexY][apexX];
 				
-				float fColor = (60.0f + leftZ) / 256.0f;
-				if ( fColor > 1.0f )  fColor = 1.0f;
-				GL11.glColor3f( fColor, fColor, fColor );
+//				float fColor = (60.0f + leftZ) / 256.0f;
+//				if ( fColor > 1.0f )  fColor = 1.0f;
+//				GL11.glColor3f( fColor, fColor, fColor );
+//				GL11.glVertex3f(leftX,leftZ,leftY );
+//				
+//				fColor = (60.0f + rightZ) / 256.0f;
+//				if ( fColor > 1.0f )  fColor = 1.0f;
+//				GL11.glColor3f( fColor, fColor, fColor );
+//				GL11.glVertex3f(rightX,rightZ,rightY );
+//				
+//				fColor = (60.0f + apexZ) / 256.0f;
+//				if ( fColor > 1.0f )  fColor = 1.0f;
+//				GL11.glColor3f( fColor, fColor, fColor );
+//				GL11.glVertex3f(apexX,apexZ,apexY );
+				
+				GL11.glColor3f(1,1,1);
+				
 				GL11.glVertex3f(leftX,leftZ,leftY );
-//				System.out.println(leftX+","+leftZ+","+leftY);
-				
-				fColor = (60.0f + rightZ) / 256.0f;
-				if ( fColor > 1.0f )  fColor = 1.0f;
-				GL11.glColor3f( fColor, fColor, fColor );
 				GL11.glVertex3f(rightX,rightZ,rightY );
-				
-				fColor = (60.0f + apexZ) / 256.0f;
-				if ( fColor > 1.0f )  fColor = 1.0f;
-				GL11.glColor3f( fColor, fColor, fColor );
 				GL11.glVertex3f(apexX,apexZ,apexY );
 			}
 		}
@@ -532,6 +537,7 @@ public class Roam {
 		private void render(){
 			GL11.glPushMatrix();
 			GL11.glTranslatef( x, 0, y );
+//			GL11.glBegin(GL11.GL_TRIANGLES);
 			GL11.glBegin(GL11.GL_LINE_LOOP);
 			recursRender(baseLeft,0,patchSize,patchSize,0,0,0);
 			recursRender(baseRight,patchSize,0,0,patchSize,patchSize,patchSize);
@@ -543,6 +549,10 @@ public class Roam {
 
 	public void setgClipAngle(float gClipAngle) {
 		this.gClipAngle = gClipAngle;
+	}
+
+	public void setViewPosition(float[] viewPosition) {
+		this.viewPosition = viewPosition;
 	}
 	
 	
