@@ -26,7 +26,8 @@ public class Util {
 		normal.normalize();
 	}
 	
-	// 计算三角形的面向,即可见性
+	// 计算三角形的面向,即可见性（不明白数学根据）
+	// 顺时针为-1，逆时针为1
 	// Discover the orientation of a triangle's points:
 	// Taken from "Programming Principles in Computer Graphics", L. Ammeraal (Wiley)
 	//
