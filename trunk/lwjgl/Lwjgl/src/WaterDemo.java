@@ -1,15 +1,11 @@
 
-import java.io.IOException;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-import org.tinder.studio.lwjgl.heightmap.HeightMap;
-import org.tinder.studio.lwjgl.roam.Roam;
-import org.tinder.studio.lwjgl.util.Util;
+import org.tinder.studio.lwjgl.util.Dome;
 
 import de.bloodyblades.ms3dloader.Font;
 
@@ -20,18 +16,17 @@ import de.bloodyblades.ms3dloader.Font;
  * @version 2010-7-2 ÏÂÎç02:30:14
  *
  */
-public class RoamDemo {
+public class WaterDemo {
 	private static ResourceLoader resourceLoader = new ResourceLoader();
 	public static final int DISPLAY_WIDTH=300;
 	public static final int DISPLAY_HEIGHT=200;
 	
 	private boolean runnable=true;
-	private static final int FPS=40;
+	private static final int FPS=50;
 	
 	private static Font font=null;
-	private static Roam roam=null;
 	
-	public RoamDemo() throws LWJGLException{
+	public WaterDemo() throws LWJGLException{
 		this.init();
 		this.run();
 	}
@@ -49,17 +44,6 @@ public class RoamDemo {
 		
 		/*È«ÆÁ*/
 //		Display.setFullscreen(true);
-		try {
-			HeightMap heightMap = new HeightMap(new float[]{1,1,1},new int[]{1024,1024}, resourceLoader.loadResourceAsStream("textures/Terrain.png"));
-			roam=new Roam(heightMap.getHeightWeights(), null, 0);
-			roam.init();
-			roam.setViewPosition(new float[]{270,0,270});
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
 		
 		Display.create();
 		Display.setTitle("BaseDemo");
@@ -70,8 +54,8 @@ public class RoamDemo {
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
     	GL11.glLoadIdentity();
 //    	GL11.glOrtho(0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0, 0,25);
-    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,4000.0f);
-    	GLU.gluLookAt(500, 1050, 3000,500,0,-100, 0,1,0);
+    	GLU.gluPerspective(60.0f,(float)width/(float)height,0.1f,1000.0f);
+    	GLU.gluLookAt(0, 50, -300,0,0,100, 0,1,0);
     	
     	GL11.glEnable(GL11.GL_BLEND);
     	GL11.glEnable(GL11.GL_ALPHA_TEST);
@@ -106,15 +90,14 @@ public class RoamDemo {
                 }
             }
             GL11.glColor3f(0,1,0);
-//            font.print("FPS:"+String.valueOf(costTime==0?FPS:1000/costTime),5,22,0);
-//            System.out.println("FPS:"+String.valueOf(costTime==0?FPS:1000/costTime));
+            font.print("FPS:"+String.valueOf(costTime==0?FPS:1000/costTime),5,22,0);
             Display.update();
 		}
 		Keyboard.destroy();
 		Display.destroy();
 		System.out.println("Program stopped");
 	}
-	private float angle=0;
+	
 	private void render() {
 		GL11.glClearColor(0.5f,0.5f,0.5f, 1f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT|GL11.GL_DEPTH_BUFFER_BIT);
@@ -136,20 +119,11 @@ public class RoamDemo {
 //		GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
 //		GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
 //		GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-		angle+=2;
-		if(angle==360)angle=0;
-		roam.setgClipAngle(angle);
-		roam.reset();
-		roam.tessellate();
-		GL11.glLoadIdentity();
-		GL11.glScaled(6,1,6);
-		roam.render();
-//		System.out.println(roam.getgNumTrisRendered());
-//		roam.drawFrustum();
+		GL11.glColor3f(1,0,0);
 	}
 	
 	public static void main(String[] args) throws LWJGLException
 	{
-		new RoamDemo();
+		new WaterDemo();
 	}
 }

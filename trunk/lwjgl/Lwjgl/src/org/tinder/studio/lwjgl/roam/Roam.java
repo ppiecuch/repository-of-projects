@@ -31,9 +31,9 @@ public class Roam {
 	private short[][] heightMap;
 	private float[] scales;	//放大系数     scale>0
 	private float delicate;	//细致系数
-	private int mapSize=65;//地图大小
-	private int patchNumPerSide=16;//每边块数
-	private int varianceLimit=5000;//变差值界限
+	private int mapSize=1023;//地图大小
+	private int patchNumPerSide=64;//每边块数
+	private int varianceLimit=500;//变差值界限
 	private int patchSize=mapSize/patchNumPerSide;//块大小
 	private Diamond[][] patchs;
 	private float[] viewPosition={0,0,0};
@@ -232,7 +232,7 @@ public class Roam {
 	 *
 	 */
 	private class Diamond{
-		private static final int VARIANCE_DEPTH=4;//变差树的深度，必须是近似 SQRT(PATCH_SIZE) + 1的值
+		private static final int VARIANCE_DEPTH=9;//变差树的深度，必须是近似 SQRT(PATCH_SIZE) + 1的值
 		private TriTreeNode baseLeft;// 左二元三角树
 		private TriTreeNode baseRight;// 右二元三角树
 		private int[] varianceLeft=new int[1<<(VARIANCE_DEPTH)];// 左变差树
@@ -531,6 +531,8 @@ public class Roam {
 				GL11.glVertex3f(leftX,leftZ,leftY );
 				GL11.glVertex3f(rightX,rightZ,rightY );
 				GL11.glVertex3f(apexX,apexZ,apexY );
+				
+//				System.out.println(leftX+","+leftZ+","+leftY+",|"+rightX+","+rightZ+","+rightY+",|"+apexX+","+apexZ+","+apexY);
 			}
 		}
 		
@@ -553,6 +555,10 @@ public class Roam {
 
 	public void setViewPosition(float[] viewPosition) {
 		this.viewPosition = viewPosition;
+	}
+
+	public int getgNumTrisRendered() {
+		return gNumTrisRendered;
 	}
 	
 	
