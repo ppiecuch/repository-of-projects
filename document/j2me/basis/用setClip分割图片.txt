@@ -1,0 +1,70 @@
+J2ME游戏开发学习之用setClip分割图片
+
+分类 : Perl    发布时间 : 2007-09-04    来源 : bbbh.org
+
+游戏开发中我们往往需要把一些列零碎的小图片合成一幅比较大的图片，需要用到这些图片时可以通过setClip画这张大图的一小部分，
+也可以预先通过setClip把大图分割成小图然后直接调用小图。
+
+下面通过例子来说明如何分割图片。
+
+ 
+
+建立一个Image数组：Image[ ] imgNumbers = new Image[10];
+
+ 
+
+private void initImgNumbers() throws Exception {
+
+       Image imgTotal = Image.createImage(…);
+
+       Graphics g;
+
+       for ( int i = 0; i < 10; i++) {
+
+              imgNumbers[i] = Image.createImage(10, 15);//这里初始化图片数组，大小为10X15
+
+              g = imgNumbers[i].getGraphics();
+
+              g.drawImage(imgTotal, -i * 10, 0, 20);
+
+       }
+
+}
+
+ 
+
+需要说明的一点是，MIDP 1.0里面采用上述做法会丢失图片中的透明像素，补救措施有二：
+
+一是直接setClip画大图；
+
+二是如果是诺基亚的机子，采用如下代码：
+
+imgNumbers[i] = DirectUtils.createImage(10, 15, 0);
+
+即可 
+
+
+
+javax.microedition.lcdui.Graphics.drawImage(Image img, int x, int y, int anchor)的anchor
+
+┏━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┓
+┃ int  ┃                                常量                                ┃     相当（x,y）      ┃
+┣━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━┫
+┃0或20 ┃             Graphics.SOLID或Graphics.LEFT|Graphics.TOP             ┃ 图片左上角为（x,y）  ┃
+┣━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━┫
+┃  3   ┃Graphics.DOTTED|Graphics.VCENTER或Graphics.HCENTER|Graphics.VCENTER ┃  图片中心为（x,y）   ┃
+┣━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━┫
+┃  6   ┃                   Graphics.LEFT|Graphics.VCENTER                   ┃图片左边中点为（x,y） ┃
+┣━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━┫
+┃  10  ┃                  Graphics.RIGHT|Graphics.VCENTER                   ┃图片右边中点为（x,y） ┃
+┣━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━┫
+┃  17  ┃    Graphics.DOTTED|Graphics.TOP或Graphics.HCENTER|Graphics.TOP     ┃图片上边中点为（x,y） ┃
+┣━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━┫
+┃  24  ┃                    Graphics.RIGHT|Graphics.TOP                     ┃ 图片右上角为（x,y）  ┃
+┣━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━┫
+┃  33  ┃ Graphics.BOTTOM|Graphics. DOTTED或Graphics.BOTTOM|Graphics.HCENTER ┃图片下边中点为（x,y） ┃
+┣━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━┫
+┃  36  ┃                   Graphics.BOTTOM|Graphics.LEFT                    ┃ 图片左下角为（x,y）  ┃
+┣━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━┫
+┃  40  ┃                   Graphics.BOTTOM|Graphics.RIGHT                   ┃ 图片右下角为（x,y）  ┃
+┗━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━┛

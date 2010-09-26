@@ -1,0 +1,86 @@
+[原创技术] JSR-256学习（二） - 给游戏添加重力感应操作
+手头上有一个飞机射击游戏，现在尝试给它加上重力感应操作，
+基本原理就是获得重力感应器，然后获取X方向的重力加速度，
+当这个值大于0的时候手机这时候处于向左的状态（比较准别的描述应该是手机底部向下时，顶部相对底部向左）这时候飞机向左移动（相当于按下4键），
+小于0的时候手机处于向右的状态飞机这时候向右移动（相当于按下6键）。
+下面是实现这个操作的代码：
+首先给Canvas类里添加DataListener接口。
+然后增加以下变量和方法：
+  //各方向上的重力加速度
+  public static int x_int, y_int, z_int;    
+  //传感器
+  private static SensorConnection sensor = null;
+  private static SensorInfo infos[];   
+  //是否获得正确的传感器
+  private static boolean sensor_found = false;
+  //传感器的缓冲区大小
+  private static final int BUFFER_SIZE = 3;   
+public void dataReceived(SensorConnection sensor, Data[] data, boolean isDataLost) {
+   int[] directions = getIntegerDirections(data);
+         x_int = directions[0];
+         y_int = directions[1];
+         z_int = directions[2];
+         
+    }
+  /**
+   * 获得个方向上的重力加速度
+   * @param data
+   * @return
+   */
+  private static int[] getIntegerDirections(Data[] data) {
+   int [][] intValues = new int[3][BUFFER_SIZE];
+         int[] directions = new int[3];
+   for (int i=0; i<3; i++){
+    intValues = data.getIntValues();
+             int temp = 0;
+             for (int j = 0; j<BUFFER_SIZE; j++) {
+                 temp = temp + intValues[j];
+             }
+             directions = temp/BUFFER_SIZE;
+   }
+   return directions;
+  }
+     /**
+      * 传感器的初始化
+      */
+     private synchronized void initSensor() {
+         sensor = openSensor();
+   if (sensor == null) {
+    sensor_found = true;
+   }
+   sensor.setDataListener(this, BUFFER_SIZE);
+     }
+     /**
+      * 打开传感器，获得需要的传感器
+      * @return INT 数据类型的传感器
+      */
+     private SensorConnection openSensor() {
+   infos = SensorManager.findSensors("acceleration", null);
+   if (infos.length==0) return null;
+         int datatypes[] = new int[infos.length];
+         int i = 0;
+         String sensor_url = "";
+            while (!sensor_found) {
+                datatypes = infos.getChannelInfos()[0].getDataType();
+                if (datatypes ==  ChannelInfo.TYPE_INT) { 
+                    sensor_url = infos.getUrl();
+                    sensor_found = true;
+                }
+                else i++;
+            }
+   try {
+    return (SensorConnection)Connector.open(sensor_url);
+   }catch (IOException ioe) {
+             ioe.printStackTrace();
+    return null;
+   }
+     }
+然后我们在Canvas类的构造函数里添加initSensor() ;
+最后在负责游戏操作部分的地方，
+在判断是否按4键的地方同时加上：if(x_int > 8  && sensor_found)
+在判断是否按4键的地方同时加上：if(x_int < -8  && sensor_found)
+这里用8和-8是让操作的判断更模糊一些，不然不向左向右的时候只有把手机竖得笔直才行。
+最后上真机试一下，感觉还是比较爽的。
+（本人原创文章，部分代码参考自NOKIA论坛上的JSR-256的例子） 
+
+http://dev.10086.cn/cmdn/bbs/thread-13322-1-1.html

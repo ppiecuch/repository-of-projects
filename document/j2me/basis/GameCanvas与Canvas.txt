@@ -1,0 +1,53 @@
+J2me低级UI界面中Canvas类与GameCanvas类
+关于MIDlet类中destroyApp（参数）问题：
+
+    在destroyApp()方法中的参数为Boolean类型，destroyApp是一个callback，它是一个接口或者说一个协议。
+
+    当参数为false时，被调用MIDlet可以选择是否被关闭。如果选择被关闭，那么MIDlet就应该在destroyApp返回之前做好被关闭的准备，
+    否则就抛出MIDletStateChangeException，然后再调用notifyDestroyed();来通知应用程序管理器来销毁程序。
+
+     当参数为true时，MIDlet会清空和回收所有资源。
+
+
+GameCanvas类是继承Canvas类的一个抽象类，它提供了游戏的借口，它的主要功能为，提供屏幕缓冲绘制机制，并能直接得到设备键盘的物理状态。
+它在Canvas类的基础上增加了双缓冲和随时查询按键状态的功能。
+
+  
+
+GameCanvas的构造方法，protected GameCanvas(boolean suppressKeyEvents)，参数表示是否需要处理游戏按键之外的其他按键事件。例如数字键，
+如果此参数为false时，那么按键事件处理方法keyPressed()、keyRepeated()、keyReleased()在程序运行过程中不会被调用，这样可以提高程序的运行速度和性能。
+
+    GameCanvas为这个类的每个实例提供了惟一的图形缓冲区，所有的图形创建和修改都在缓冲区上进行，缓 冲区的大小和GameCanvas全屏幕时的大小一样，
+    但是存在的Ticker或者Command等控件都会影响到GameCanvas的大小。 缓冲区的颜色初始化为白色。
+
+    GameCanvas绘制的图形存在于后备缓冲区中，不会立即被显示出来，直接调用flushGraphics()方法,才能将缓冲区中的内容一起绘制到屏幕上。
+
+    绘制实际屏幕的操作不会改变后备屏幕的内容，这个方法会一直等到绘制操作完成后才返回，因此，当这个方法返回 时，应用程序可以立刻对缓冲区进行下一帧后备屏幕的绘制。
+
+    如果GameCanvas当前没有显示，或者系统忙而不能执行绘制请求，该方法不进行任何操作就立刻返回。
+
+
+    
+GameCanvas中的对getGraphics()和flushGraphics()方 法的调用换成Canvas中repaint()以及serviceRepaints()方法的调用，两者没有什么明显的区别，
+但是如果程序包含了很多复杂 的图形。
+
+   
+
+    GameCanvas和Canvas的按键状态的响应是不一样的。使用Canvas类，如果想 知道按键状态，必须实现keyPressed()/keyReleased()/keyRepeated()，
+    每当有按键被按下时，这个方法就被调用，而使用GameCanvas类，如果要检查特定的按键是否被按下，只需要将getKeyStates()返回的值与这些键值进行按位与（&），
+    并根 据计算结果来判断即可。
+
+    如果希望当游戏运行时，禁止调用KeyPressed()/keyReleased() /KeyRepeated()方法，那么就可以在构造GameCanvas时，在super()中传入true值。
+    如果传入false值，那么一旦按键按 下，就会调用传统的键盘事件处理方法。
+
+    
+注意： 键盘的抑制只对当前的GameCanvas有效，并且只能抑制Canvas预定义的键盘事件（例如无法抑制手机上的'*'号键，'#'号键，以及接听、挂断键等功能键）
+
+
+  
+repaint和serviceRepaints 区别:
+
+     repaint提出paint请求，但是这是repaint不会立即执行重画，它的执行是不可以控制的，如果在repaint的后面添加serviceRepaints,
+     那么所有已经排队的paint请求会被立即处理，在中间调用serviceRepaints时其他的线程会被阻塞。
+ 
+ http://dev.10086.cn/cmdn/bbs/thread-13292-1-1.html
