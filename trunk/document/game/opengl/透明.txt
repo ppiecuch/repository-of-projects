@@ -1,0 +1,16 @@
+  OpenGL ES 操作透明纹理 收藏 
+1.对于有透明色的纹理对象，启用混合时代码如下：
+
+
+glEnable(GL_BLEND);
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+
+2.对于背景色为黑色，也就是把黑色当作透明色的纹理，要想渲染时自动将黑色当成透明色，混合代码如下：
+
+
+glEnable(GL_BLEND);   
+glBlendFunc(GL_ONE, GL_ONE);  
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xueyong1203/archive/2010/08/31/5854281.aspx

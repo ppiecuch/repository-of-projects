@@ -1,0 +1,11 @@
+drawRect
+public void drawRect(int x,
+                     int y,
+                     int width,
+                     int height)绘制指定矩形的边框。矩形的左边和右边位于 x 和 x + width。顶边和底边位于 y 和 y + height。使用图形上下文的当前颜色绘制该矩形。 
+
+参数：
+x - 要绘制矩形的 x 坐标。
+y - 要绘制矩形的 y 坐标。
+width - 要绘制矩形的宽度。
+height - 要绘制矩形的高度。 
