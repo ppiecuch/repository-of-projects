@@ -3,7 +3,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 
+ * A星算法
  * @author Micheal Hong 
  * @email babala_234@163.com
  * @version 2010-9-26 下午03:14:42
@@ -14,27 +14,38 @@ public class AStar {
 	private List<Node> open;
 	private List<Node> close;
 	
-	private Node start;
-	private Node end;
+	private Node start;//起点
+	private Node end;//终点
 	
-	private boolean[][] grid;
-	private int gridWidth,gridHeight;
+	private boolean[][] grid;//地图数据
+	private int gridWidth,gridHeight;//地图宽高
 	
 	public AStar(){
 		open=new LinkedList<Node>();
 		close=new LinkedList<Node>();
 	}
 	
+	/**
+	 * 初始化
+	 * @param grid
+	 */
 	public void init(boolean[][] grid){
 		this.grid=grid;
 		this.gridWidth=grid[0].length;
 		this.gridHeight=grid.length;
-		
-		open.clear();
-		close.clear();
 	}
 	
+	/**
+	 * 寻找路径，如果找到则返回路径，否则返回null
+	 * @param startX
+	 * @param startY
+	 * @param endX
+	 * @param endY
+	 * @return
+	 */
 	public int[][] search(int startX,int startY,int endX,int endY){
+		open.clear();
+		close.clear();
 		start=new Node(startX,startY,null);
 		end=new Node(endX,endY,null);
 		
