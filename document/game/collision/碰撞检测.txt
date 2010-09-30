@@ -1,4 +1,31 @@
 
+float D0;
+  float D1;
+
+  D0 = g_vSpherePos.DotProduct(g_sQuads[i].vNormal) - g_sQuads[i].D;   // before movement
+  D1 = g_vSphereAfter.DotProduct(g_sQuads[i].vNormal) - g_sQuads[i].D; // after movement
+
+  // distance check
+  if (bDistanceCheck)
+  {
+   if (abs(D1) < g_fSphere_radius)
+   {
+    // sphere is too close to plane
+    printf("The sphere is too close to the plane!\n");
+
+    collision=true;
+   }
+  }  
+
+当法向量是单位向量时，任何向量与法向量的点乘表示向量在法向量上的投影。
+这时向量一与法向量的乘积的绝对值减去向量二与法向量的乘积的绝对值表示两个向量在法向量方向上之间的距离。
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/yjw041/archive/2010/03/11/5368418.aspx
+
+
+
 ziee
  
 (奔流到海) 
