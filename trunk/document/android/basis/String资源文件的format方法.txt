@@ -1,0 +1,48 @@
+ 很多时候我们感性Google在设计Android时遵守了大量MVC架构方式，可以让写公共代码、美工和具体逻辑开发人员独立出来。
+ 有关Android的资源文件values/strings.xml中如何实现格式化字符串呢? 这里Android123举个简单的例子，以及最终可能会用到哪些地方。
+
+ <?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+    <string name="app_name">cwj_Demo</string>  
+    <string name="hello">android开发网</string>  
+</resources>  
+
+ 上面是一段简单的字符串资源文件，没有用到格式化，因为比较简单直接描述了意思，当我们设计一个类似 Delete xxx File ? 的时候，
+ 我们可能需要在Java中动态获取 xxx 的名称，所以定义资源时使用格式化可以轻松解决，不需要一堆String去拼接或StringBuffer一个一个append这样的愚蠢方法，看例子
+
+    <string name="alert">Delete %1$s File</string>   这里%1$s代表这是一个字符串型的，如果是整数型可以写为%1$d，
+    类似printf这样的格式化字符串函数，当然如果包含了多个需要格式化的内容，则第二个可以写为%2$s或%2$d了，那么最终在Java中如何调用呢? 看下面的例子:
+
+   例一: 整数型的
+
+  <string name="alert">I am %1$d years old</string>  定义的是这样的
+
+   当然，我们杜绝意外情况，比如冒出个secret这样的string类型的，注意上面是%1$d不是%1$s，所以默认标准的合并成为
+
+   int nAge=23;
+
+   String sAgeFormat = getResources().getString(R.string.alert);  
+
+   String sFinalAge = String.format(sAgeFormat, nAge);  
+
+    这样执行完后，就组成了 I am 23 years old，是不是很方便啊.  当然了，下面看下String字符串时的情况.
+
+  例二: 字符串型的
+
+  String sName="cwj"
+
+  String sCity="Shanghai"
+
+   资源定义为   <string name="alert2">My name is %1$s , I am form %2$s</string> 
+
+   则Java中只需要
+
+  String sInfoFormat = getResources().getString(R.string.alert2);  
+
+  String sFinalInfo=String.format(sInfoFormat, sName, sCity);  
+
+  我们看到了整个，整个定义类似MFC的CString::Format或Mac OS中的NSLog，
+  但是需要显示类似C#中那样显示的标出参数的数字，比如%1或%n，这里数字代表参数的第n个。本行最终sFinalInfo显示的内容为
+
+  My name is cwj , I am form Shanghai 。当然了你有什么不懂的地方可以来函至 android123@163.com 
+

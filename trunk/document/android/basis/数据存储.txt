@@ -1,0 +1,54 @@
+Android SQLite解析、Android 应用程序之间数据共享中分别详细说明了，如何使用数据库存储信息，
+以及如何通过ContentProvider获取其他应用程序共享的数据，现将Android数据存储做下总结，在以后的开发过程中根据需求选择合适的数据存储方式。
+
+Android提供了5种方式存储数据：
+
+使用SharedPreferences存储数据； 
+文件存储数据； 
+SQLite数据库存储数据； 
+使用ContentProvider存储数据； 
+网络存储数据； 
+其中3，4已经在Android SQLite解析、Android 应用程序之间数据共享篇幅中详细说明，不在此重复说明，现将其他3种方式详细介绍。
+
+使用SharedPreferences存储数据
+首先说明SharedPreferences存储方式，它是Android提供的用来存储一些简单配置信息的一种机制，例如：登录用户的用户名与密码。其采用了Map数据结构来存储数据，以键值的方式存储，可以简单的读取与写入，具体实例如下：
+
+void  ReadSharedPreferences()
+{
+String  strName,strPassword;
+SharedPreferences   user = getSharedPreferences(“user_info”,0);
+strName = user.getString(“NAME”,””);
+strPassword = user getString(“PASSWORD”,””);
+}
+
+void  WriteSharedPreferences(String  strName,String strPassword)
+{
+SharedPreferences   user = getSharedPreferences(“user_info”,0);
+uer.edit();
+user.putString(“NAME”, strName);
+user.putString(“PASSWORD” ,strPassword);
+user.commit();
+}
+
+数据读取与写入的方法都非常简单，只是在写入的时候有些区别：先调用edit()使其处于编辑状态，然后才能修改数据，最后使用commit()提交修改的数据。实际上SharedPreferences是采用了XML格式将数据存储到设备中，在DDMS中的File Explorer中的/data/data/<package name>/shares_prefs下。以上面的数据存储结果为例，打开后可以看到一个user_info.xml的文件，打开后可以看到：
+<?xml version=”1.0″ encoding=”UTF-8″?>
+<map>
+<string name=”NAME”>moandroid</string>
+<string name=” PASSWORD”>SharedPreferences</string>
+</map>
+使用SharedPreferences是有些限制的：只能在同一个包内使用，不能在不同的包之间使用。
+
+文件存储数据
+文件存储方式是一种较常用的方法，在Android中读取/写入文件的方法，与Java中实现I/O的程序是完全一样的，提供了openFileInput()和openFileOutput()方法来读取设备上的文件。FilterInputStream， FilterOutputStream等可以到Java  io  package说明中去详细学习，不再此详细说明，具体实例如下:
+String fn = “moandroid.log”;
+FileInputStream fis = openFileInput(fn);
+FileOutputStream fos = openFileOutput(fn,Context.MODE_PRIVATE);
+除此之外，Android还提供了其他函数来操作文件，详细说明请阅读Android SDK。
+
+网络存储数据
+网络存储方式，需要与Android 网络数据包打交道，关于Android 网络数据包的详细说明，请阅读Android SDK引用了Java SDK的哪些package？。
+
+总结说明
+以上5中存储方式，在以后的开发过程中，根据设计目标、性能需求、空间需求等找到合适的数据存储方式。Android 中的数据存储都是私有的，其他应用程序都是无法访问的，除非通过ContentResolver获取其他程序共享的数据。
+
+http://www.eoeandroid.com/thread-19572-1-3.html

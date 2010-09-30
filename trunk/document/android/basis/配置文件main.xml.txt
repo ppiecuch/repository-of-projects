@@ -1,0 +1,71 @@
+关于android main.xml中id的问题
+android:id="@+id/textview"这句中的“+”有什么用，为什么要加个“+” 
+首先main.xml为布局用的xml，保存在res/layout/下，android运行时按此布局显示。
+根据楼主的textview,代码补充完整为<TextView android:id="@+id/textview"/>。
+“+”会在R.java文件中自动加入如下代码：
+public static final class id{
+    public static final int textview=0x7f050002;
+}
+解释："+"后的id就是上面代码class后的id ,textview就是代码中的textview。"="后的16进制数可能不一样
+=========================================
+同理：
+若main.xml中有<Button android:id="@+bt/Button01"/>
+则R.java中自动加入
+public static final class bt{
+    public static final int Button01=0x7f050002;
+} 
+
+如果没有这个+，则需要你实现在id.xml中预先定义好一个叫‘textview’的string。
+
+有了这个+，系统就会自动生成了。 
+
+
+，<?xml version="1.0" encoding="utf-8"?>  xml标记描述语言，必须的
+
+ 
+
+2，<LinearLayout> 线性版面配置，在这个标签中，所有元件都是按由上到下的排队排成的
+
+ 
+
+3，xmlns:android=http://schemas.android.com/apk/res/android
+
+描述xml描述档案的名称空间。必须属性
+
+ 
+
+ 
+
+4，android:orientation="vertical"
+
+表示这个介质的版面配置方式是从上到下的垂直得排列其内部的视图
+
+android:orientation="horizontal" 水平排列
+
+ 
+
+5，android:layout_width="fill_parent"
+
+定义当前视图在屏幕上可以消费的宽度，fill_parent即填充整个屏幕。
+
+android:layout_height="fill_parent"
+
+ 
+
+"wrap_content":随着文字栏位的不同而改变这个视图的宽度或者高度。
+
+有点自动设置框度或者高度的意思
+
+6，android:layout_weight="1.0"
+
+Layout_weight属性是为了要EditText能延伸到最右侧【将剩余的空间全部给他】
+
+layout_weight 用于给一个线性布局中的诸多视图的重要度赋值。所有的视图都有一个layout_weight值，默认为零，意思是需要显示多大的视图就占据多大的屏幕空 间。若赋一个高于零的值，则将父视图中的可用空间分割，分割大小具体取决于每一个视图的layout_weight值以及该值在当前屏幕布局的整体 layout_weight值和在其它视图屏幕布局的layout_weight值中所占的比率而定。
+
+举个例子：比如说我们在 水平方向上有一个文本标签和两个文本编辑元素。该文本标签并无指定layout_weight值，所以它将占据需要提供的最少空间。如果两个文本编辑元素每一个的layout_weight值都设置为1，则两者平分在父视图布局剩余的宽度(因为我们声明这两者的重要度相等)。如果两个 文本编辑元素其中第一个的layout_weight值设置为1，而第二个的设置为2，则剩余空间的三分之一分给第一个，三分之二分给第二个(因为我们声 明第二个有较之第一个更高的重要度)。
+
+这个布局也演示了如何在其它布局中嵌套多个布局以实现更复杂更漂亮的布局。在本例中，一个水平方向上的线性布局嵌套在另一垂直方向上的布局中，以使标题标签和文本字段在水平方向上挨个对齐
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/vicky_yaoxj/archive/2009/05/22/4208763.aspx

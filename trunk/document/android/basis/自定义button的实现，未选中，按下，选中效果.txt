@@ -1,0 +1,46 @@
+package com.test.TestButton;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
+public class TestButton extends Activity {
+
+   @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        Integer[] mButtonState = { R.drawable.defaultbutton,
+                R.drawable.focusedpressed, R.drawable.pressed };
+        Button mButton = (Button) findViewById(R.id.button);
+        MyButton myButton = new MyButton(this);
+        mButton.setBackgroundDrawable(myButton.setbg(mButtonState));
+    }
+
+    class MyButton extends View {
+
+        public MyButton(Context context) {
+            super(context);
+        }
+        //以下这个方法也可以把你的图片数组传过来，以StateListDrawable来设置图片状态，来表现button的各中状态。未选中，按下，选中效果。
+        public StateListDrawable setbg(Integer[] mImageIds) {
+            StateListDrawable bg = new StateListDrawable();
+            Drawable normal = this.getResources().getDrawable(mImageIds[0]);
+            Drawable selected = this.getResources().getDrawable(mImageIds[1]);
+            Drawable pressed = this.getResources().getDrawable(mImageIds[2]);
+            bg.addState(View.PRESSED_ENABLED_STATE_SET, pressed);
+            bg.addState(View.ENABLED_FOCUSED_STATE_SET, selected);
+            bg.addState(View.ENABLED_STATE_SET, normal);
+            bg.addState(View.FOCUSED_STATE_SET, selected);
+            bg.addState(View.EMPTY_STATE_SET, normal);
+            return bg;
+        }
+    }
+
+}
+
+Android MediaPlayer的生命周期 | 所有 Android Dialog 
