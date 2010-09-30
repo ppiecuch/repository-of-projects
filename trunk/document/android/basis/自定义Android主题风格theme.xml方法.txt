@@ -1,0 +1,34 @@
+在Android中可以通过自定义主题风格方式来实现个性化以及复用，首先我们创建theme.xml主题文件，保存位置为工程的res/values/theme.xml ，
+这里我们可以可以为主题起一个名称，比如CWJ，这里去除了xml的文件头<?xml version="1.0" encoding="utf-8"?>这行，
+我们在工程中只需在androidmanifest.xml文件的Activity节点中加入android:theme="@style/Theme.CWJ" 属性，
+则这个Activity就使用了这种主题风格，整个xml的关键代码如下:
+
+<resources>
+    <style name="Theme.CWJ" parent="android:Theme">
+        <item name="android:windowBackground">@drawable/android123</item>
+    </style>
+</resources>
+
+  其中上面的代码中，我们定义设置全局android:windowBackground即背景值为/res/drawable中的android123图片为背景，
+  更多的属性定义可以参考view的layout xml属性设置，比如我们设置所有字体颜色、大体大小和样式，可以在style节点中加入 
+
+  <item name="android:textColor">#fff</item> 
+  <item name="android:textSize">14sp</item> 
+  <item name="android:textStyle">bold</item> 
+
+ 当然我们可以将上面的android123的图片改进下，使用一个xml文件替代，比如使用bitmap对象，则/res/drawable/android123.xml的完整代码变为
+
+  <?xml version="1.0" encoding="utf-8"?> 
+
+ <bitmap xmlns:android="http://schemas.android.com/apk/res/android" 
+     android:src="@drawable/cwj_image" 
+     android:tileMode="repeat" />  
+
+  这里我们使用了一个bitmap对象来解析cwj_image图片，当然这里可以识别各种类型的图片，其中android:tileMode是bitmap的内部属性，
+  其中tileMode设置为repeat代表重复，这样可以节省bitmap资源，比如我们的背景是一层楼，那么全屏可以显示同样的为5层效果，而图片仅是一层大小，对于资源利用相对更高。
+
+  当然bitmap的属性tileMode的值为repeat外还有其他的值比如clamp、mirror，这些值并没有在SDK中并没有找到定义，
+  通过上次Android开发网的 Android自定义View以及layout属性全攻略 一文，我们可以联想到bitmap属于android.graphics.Bitmap 包，
+  由于是android框架，所以下载git的base包，找到该类，类的实例化时android123已经在 Android自定义View以及layout属性全攻略 说的很清楚，
+  所以我们定位到res\\values中找到attr.xml有关bitmap的定义即可，有关bitmap的更多属性如  antialias、filter和dither都可以找到使用。 
+

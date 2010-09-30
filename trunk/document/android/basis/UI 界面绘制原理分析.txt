@@ -1,0 +1,28 @@
+本帖最后由 zhangyangjing 于 2010-7-29 10:05 编辑 
+
+View类包含Surface（变量名mSurface）。Surface中包含CompatibleCanvas（变量名mCanvas）。
+CompatibleCanvas继承至Canval（java.awt.Canval），其中包含一个矩阵对象Matrix（变量名mOrigMatrix）。
+矩阵Matrix就是一块内存区域，针对View的各种绘画操作都保存在此内存中。
+
+每个Surface通常对应两个buffer，一个front buffer, 一个back buffer。
+其中，back buffer就是canvas绘图时对应的bitmap (研究android_view_Surface.cpp::lockCanvas)。
+因此，绘画总是在back buffer上，需要更新时，则将back buffer和front buffer互换。 
+每个surface又对应一个layer, SurfaceFlinger负责将各个layer的front buffer合成（composite）绘制到屏幕上。
+
+用户接口方面，主要表现任务由View的各种继承类来实现。View类的继承关系如图所示。
+
+当用户请求绘制调用invalidate()，此函数会找到当前View或Viewgroup的ParentView,并调用父视图的invalidateChild(this, r)。
+invalidateChild会循环调用父视图的invalidateChildInParent()因此层层向上层视图调用，直到调用到根视图ViewRoot。
+ViewRoot的invalidateChildInParent调用invalidateChild，然后发送消息让ViewRoot进行绘制。
+绘制代码在handleMessage()中的case DO_TRAVERSAL中调用了performTraversals()。
+然后调用下一级视图的draw()函数。draw函数会依次调用以下几个函数：
+background.draw(canvas)
+onDraw(canvas)
+dispatchDraw(canvas)
+onDrawScrollBars(canvas)
+在ViewGroup的dispatchDraw中会调用drawChild函数。drawChild根据子View的私有标志位mPrivateFlags来调用子类的draw()或者dispatchDraw(canvas)。由此实现了层层向下绘制，直到最基本的View。View的dispatchDraw是一个抽象函数，绘制过程到此结束。最后ViewRoot会调用nativeShowFPS(canvas, now - sDrawTime)函数将绘制结果canvas传递给本地层进行显示。
+
+参考别人的分析，自己大概的看了一遍。框架层看得差不多了，本地层还没有看。等有时间看了再更新吧。
+
+参考资料：http://blog.sina.com.cn/s/blog_5e71b14f0100c75g.html
+ 
