@@ -1,0 +1,4 @@
+发现的，够简单。可应用至任何控件。
+View v = findViewById(R.id.content);//找到你要设透明背景的layout 的id
+v.getBackground().setAlpha(100);//0~255透明度值
+复制代码

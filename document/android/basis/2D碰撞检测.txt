@@ -1,0 +1,15 @@
+获取两张图片显示区域的Bounds，然后看Bounds是否相交，类似如下：
+BitmapDrawable bitmap1;
+
+        BitmapDrawable bitmap2;
+
+        
+
+        bitmap1.setBounds(0,0,bitmap1.getIntrinsicWidth(),bitmap1.getIntrinsicHeight());
+
+        bitmap2.setBounds(0,0,bitmap2.getIntrinsicWidth(),bitmap2.getIntrinsicHeight());
+
+        
+
+        boolean ins= bitmap1.getBounds().intersect(bitmap2.getBounds());
+复制代码 

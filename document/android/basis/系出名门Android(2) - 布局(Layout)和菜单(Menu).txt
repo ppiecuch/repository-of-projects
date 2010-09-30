@@ -1,0 +1,272 @@
+介绍
+
+在 Android 中各种布局的应用，以及菜单效果的实现
+
+各种布局方式的应用，FrameLayout, LinearLayout, TableLayout, AbsoluteLayout, RelativeLayout
+
+为指定元素配置上下文菜单，为应用程序配置选项菜单，以及多级菜单的实现
+
+1、各种布局方式的演示
+
+res/layout/main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+layout_width - 宽。fill_parent: 宽度跟着父元素走；wrap_content: 宽度跟着本身的内容走；直接指定一个 px 值来设置宽
+layout_height - 高。fill_parent: 高度跟着父元素走；wrap_content: 高度跟着本身的内容走；直接指定一个 px 值来设置高
+-->
+
+<!--
+LinearLayout - 线形布局。
+    orientation - 容器内元素的排列方式。vertical: 子元素们垂直排列；horizontal: 子元素们水平排列
+    gravity - 内容的排列形式。常用的有 top, bottom, left, right, center 等，详见文档
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:gravity="right"
+    android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+    <!--
+    FrameLayout - 层叠式布局。以左上角为起点，将  FrameLayout 内的元素一层覆盖一层地显示
+    -->
+    <FrameLayout android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="FrameLayout">
+        </TextView>
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="Frame Layout">
+        </TextView>
+    </FrameLayout>
+
+    <TextView android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="@string/hello" />
+
+    <!--
+    TableLayout - 表格式布局。
+        TableRow - 表格内的行，行内每一个元素算作一列
+        collapseColumns - 设置 TableLayout 内的 TableRow 中需要隐藏的列的列索引，多个用“,”隔开
+        stretchColumns - 设置 TableLayout 内的 TableRow 中需要拉伸（该列会拉伸到所有可用空间）的列的列索引，多个用“,”隔开
+        shrinkColumns - 设置 TableLayout 内的 TableRow 中需要收缩（为了使其他列不会被挤到屏幕外，此列会自动收缩）的列的列索引，多个用“,”隔开
+    -->
+    <TableLayout android:id="@+id/TableLayout01"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        android:collapseColumns="1">
+        <TableRow android:id="@+id/TableRow01" android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView android:layout_width="wrap_content"
+                android:layout_weight="1" android:layout_height="wrap_content"
+                android:text="行1列1" />
+            <TextView android:layout_width="wrap_content"
+                android:layout_weight="1" android:layout_height="wrap_content"
+                android:text="行1列2" />
+            <TextView android:layout_width="wrap_content"
+                android:layout_weight="1" android:layout_height="wrap_content"
+                android:text="行1列3" />
+        </TableRow>
+        <TableRow android:id="@+id/TableRow01" android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="行2列1" />
+        </TableRow>
+    </TableLayout>
+
+    <!--
+    AbsoluteLayout - 绝对定位布局。
+        layout_x - x 坐标。以左上角为顶点
+        layout_y - y 坐标。以左上角为顶点
+    -->
+    <AbsoluteLayout android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="AbsoluteLayout"
+            android:layout_x="100px"
+            android:layout_y="100px" />
+    </AbsoluteLayout>
+
+    <!--
+    RelativeLayout - 相对定位布局。
+        layout_centerInParent - 将当前元素放置到其容器内的水平方向和垂直方向的中央位置（类似的属性有 ：layout_centerHorizontal, layout_alignParentLeft 等）
+        layout_marginLeft - 设置当前元素相对于其容器的左侧边缘的距离
+        layout_below - 放置当前元素到指定的元素的下面
+        layout_alignRight - 当前元素与指定的元素右对齐
+    -->
+    <RelativeLayout android:id="@+id/RelativeLayout01"
+        android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <TextView android:layout_width="wrap_content" android:id="@+id/abc"
+            android:layout_height="wrap_content" android:text="centerInParent=true"
+            android:layout_centerInParent="true" />
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="marginLeft=20px"
+            android:layout_marginLeft="20px" />
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="xxx"
+            android:layout_below="@id/abc" android:layout_alignRight="@id/abc" />
+    </RelativeLayout>
+
+</LinearLayout>
+res/values/strings.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello Layout</string>
+    <string name="app_name">webabcd_layout</string>
+</resources>
+
+Main.java
+
+package com.webabcd.layout;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+public class Main extends Activity {
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+    }
+}
+
+2、上下文菜单，选项菜单，子菜单
+
+res/layout/main.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+    <TextView android:id="@+id/txt1" android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:text="@string/hello_contextMenu" />
+
+    <TextView android:id="@+id/txt2" android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:text="@string/hello_subMenu" />
+
+</LinearLayout>
+
+res/values/strings.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_contextMenu">Hello Context Menu</string>
+    <string name="hello_subMenu">Hello Context Sub Menu</string>
+    <string name="app_name">webabcd_menu</string>
+</resources>
+
+Main.java
+
+package com.webabcd.menu;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.TextView;
+import android.widget.Toast;
+
+// 演示两种菜单的实现方式：上下文菜单（通过在某元素上长按，来呼出菜单）和选项菜单（通过按手机上的菜单按钮，来呼出菜单）
+public class Main extends Activity {
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+
+        // 为 R.id.txt1 注册一个上下文菜单（在此 TextView 上长按，则会呼出上下文菜单）
+        // 具体呼出的菜单内容需要重写 onCreateContextMenu 来创建
+        TextView txt1 = (TextView) this.findViewById(R.id.txt1);
+        this.registerForContextMenu(txt1);
+
+        // 为 R.id.txt2 注册一个上下文菜单
+        TextView txt2 = (TextView) this.findViewById(R.id.txt2);
+        this.registerForContextMenu(txt2);
+    }
+
+    // 重写 onCreateContextMenu 用以创建上下文菜单
+    // 重写 onContextItemSelected 用以响应上下文菜单
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        // 创建 R.id.txt1 的上下文菜单
+        if (v == (TextView) this.findViewById(R.id.txt1)) {
+
+            // ContextMenu.setIcon() - 设置菜单的图标
+            // ContextMenu.setHeaderTitle() - 设置菜单的标题
+            menu.setHeaderIcon(R.drawable.icon01);
+            menu.setHeaderTitle("我是菜单");
+
+            // 用 ContextMenu.add() 来增加菜单项，返回值为 MenuItem
+            // 第一个参数：组ID
+            // 第二个参数：菜单项ID
+            // 第三个参数：顺序号
+            // 第四个参数：菜单项上显示的内容
+            menu.add(1, 0, 0, "菜单1");
+
+            // MenuItem - 新增菜单项后的返回类型，针对菜单项的其他设置在此对象上操作 
+            menu.add(1, 1, 1, "菜单2").setCheckable(true);
+
+        }
+        // 创建 R.id.txt2 的上下文菜单（多级上下文菜单）
+        else if (v == (TextView) this.findViewById(R.id.txt2)) {
+
+            // ContextMenu.addSubMenu("菜单名称") - 用来添加子菜单。子菜单其实就是一个特殊的菜单
+            SubMenu sub = menu.addSubMenu("父菜单1");
+            sub.setIcon(R.drawable.icon01);
+            sub.add(0, 0, 0, "菜单1");
+            sub.add(0, 1, 1, "菜单2");
+            sub.setGroupCheckable(1, true, true);
+
+            SubMenu sub2 = menu.addSubMenu("父菜单2");
+            sub2.setIcon(R.drawable.icon01);
+            sub2.add(1, 0, 0, "菜单3");
+            sub2.add(1, 1, 1, "菜单4");
+            sub2.setGroupCheckable(1, true, false);
+
+        }
+    }
+    
+    
+    // 重写 onCreateOptionsMenu 用以创建选项菜单
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuItem menuItem = menu.add(0, 0, 0, "菜单111111111111111111111");
+
+        // MenuItem.setIcon() - 设置菜单项的图标
+        // MenuItem.setTitleCondensed() - 菜单的简标题，如果指定了简标题的话，菜单项上的标题将会以此简标题为准
+        // MenuItem.setAlphabeticShortcut() - 设置选中此菜单项的快捷键
+        // 注：菜单项超过 6 个的话，第 6 个菜单将会变为  More 菜单，多余的菜单会在单击 More 菜单之后显示出来
+        menuItem.setIcon(R.drawable.icon01);
+        menuItem.setTitleCondensed("菜单1");
+        menuItem.setAlphabeticShortcut('a');
+
+        menu.add(0, 1, 1, "菜单2").setIcon(R.drawable.icon02);
+        menu.add(0, 2, 2, "菜单3").setIcon(R.drawable.icon03);
+        menu.add(0, 3, 3, "菜单4");
+        menu.add(0, 4, 4, "菜单5");
+        menu.add(0, 5, 5, "菜单6");
+        menu.add(0, 6, 6, "菜单7").setIcon(R.drawable.icon04);
+        menu.add(0, 7, 7, "菜单8").setIcon(R.drawable.icon05);
+
+        return true;
+    }
+
+    // 重写 onOptionsItemSelected 用以响应选项菜单
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        Toast.makeText(Main.this, "被单击的菜单项为：" + String.valueOf(item.getItemId()), Toast.LENGTH_SHORT).show();
+
+        return false;
+    }
+}
+
+本文来自编程入门网：http://www.bianceng.cn/OS/extra/201004/16652.htm

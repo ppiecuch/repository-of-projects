@@ -1,0 +1,17 @@
+Android软件一般处理大的资源通过sdcard比如在线下载资源到sdcard，而apk中内嵌资源或二进制文件时一般使用下面的两种方法: 
+
+  方法一
+
+  res/raw目录下存放，比如cwj.dat一个二进制文件，我们可以读取可以直接  InputStream is=context.getResources().openRawResource(R.raw.cwj); 
+
+  方法二
+
+  工程根目录下的assets文件夹中存放，比如assets/cwj.dat 这样我们使用下面的代码
+
+  AssetManager am = context.getAssets();   
+  InputStream is = am.open(cwj.dat);   
+
+  这里Android123提示大家Google的Android系统处理Assert有个bug，
+  在AssertManager中不能处理单个超过1MB的文件，
+  不然会报异常具体数值大家可以测试下传个稍大的文件，我们在两年前的文章中有提到，而第一种raw没这个限制可以放个4MB的Mp3文件没问题。
+

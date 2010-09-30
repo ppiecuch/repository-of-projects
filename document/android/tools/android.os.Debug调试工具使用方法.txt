@@ -1,0 +1,9 @@
+在Android软件开发中最终的性能测试和调试显得至观重要，今天Android123和大家一起讨论下Google送给我们的android.os.Debug类，
+使用起来比较简单，我们先导入 import android.os.Debug这个包。
+
+   在需要开始跟踪的地方加入 Debug.startMethodTracing(“/sdcard/cwj”);  
+
+   最终在停止调试的地方加入 Debug.stopMethodTracing();
+
+    最终在sdcard上生成的cwj文件我们可以用sdk\\tools中的traceview来查看运行的结果。
+
