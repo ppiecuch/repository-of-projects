@@ -1,0 +1,20 @@
+[ERROR]
+Performing org.example.sudoku.Sudoku activity launch
+[2010-09-28 22:46:40 - Sudoku] Automatic Target Mode: Preferred AVD 'G1' is not available. Launching new emulator.
+[2010-09-28 22:46:40 - Sudoku] Launching a new emulator with Virtual Device 'G1'
+[2010-09-28 22:46:40 - Emulator] emulator: ERROR: the user data image is used by another emulator. aborting
+[解决]
+初学者需要多加注意，新的android SDK1.5提供了avd，可以更好的模拟真实环境。但是需要设置ANDROID_SDK_HOME环境变量，
+否则avd manger和android命令默认都会把新建的avd放到用户目录下，但emulator默认却不会到用户目录搜索。
+设置ANDROID_SDK_HOME后，大家都会到该目录下搜索。初学者需要多加注意
+Android_SDK_HOME路径是你解压下载的SDK路径， 在path环境变量里配置%Android_SDK_HOME%\tools,
+
+
+android create avd -n my_android1.5 -t 2
+emulator -avd my_android1.5 -sdcard F:\mysdcard.img 
+adb shell
+/data/app
+adb logcat
+
+[Exception]
+改变代码后无法安装APKApplication already deployed. No need to reinstall. 
