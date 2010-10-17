@@ -1,0 +1,88 @@
+Android Debug Bridage
+
+ 
+
+adb，Android重要工具之一，以提供强大的特性，例如复制文件到设备或从设备复制文件。可以使用 shell 命令行参数连接到手机本身，并发送基本的 shell 命令。
+
+ 
+
+进入命令行，使用
+
+Java代码 
+adb shell  
+
+adb shell 
+
+进入到Andvoid中shell模式，注意，这时候模拟器或者手机要启用并且正确接通。
+
+ 
+
+在这个 shell 环境中，可以：
+
+显示网络配置，网络配置可显示多个网络连接。注意这多个网络连接： 
+lo 是本地或 loopback 连接。 
+tiwlan0 是 WiFi 连接，该连接由本地 DHCP 服务器提供一个地址。 
+显示 PATH 环境变量的内容。 
+执行 su 命令，以成为超级用户。 
+将目录改为 /data/app，其中存放用户应用程序。 
+列出包含某个应用程序的目录。Android 应用程序文件实际上是归档文件，可通过 WinZip 之类的软件查看。扩展名为 apk。 
+发出 ping 命令，查看 Google.com 是否可用。 
+从相同的命令提示符环境中，还可以与 SQLite 数据库交互，启动程序以及执行许多其他系统级任务。想像一下您正在连接到电话，因此这是非常了不起的功能。
+
+ 
+
+一、adb命令
+
+Java代码 
+adb get-product        // 获取设备的ID   
+adb get-serialno       // 获取设备的序列号   
+adb devices            // 得当前运行的模拟器/设备的实例的列表及每个实例的状态   
+adb bugreport          // 查看bug报告  
+
+adb get-product        // 获取设备的ID
+adb get-serialno       // 获取设备的序列号
+adb devices            // 得当前运行的模拟器/设备的实例的列表及每个实例的状态
+adb bugreport          // 查看bug报告  
+
+二、shell命令
+
+ 
+
+通过adb shell命令进入shell后，执行下列命令。
+
+ 
+
+1、访问数据库：
+
+Java代码 
+sqlite3  
+
+sqlite3 2、记录无线通讯日志：
+
+  一般来说，无线通讯的日志非常多，在运行时没必要去记录，但我们还是可以通过命令，设置记录：
+
+Java代码 
+logcat -b radio  
+
+logcat -b radio 3、删除应用：
+
+Android没有提供一个卸载应用的命令，需要自己手动删除：
+
+Java代码 
+cd /data/app   
+rm appName.apk  
+
+cd /data/app
+rm appName.apk 注：[appName]为应用的名称；
+
+ 
+
+三、可以在Android shell下使用的一些linux命令
+
+命令：
+
+Java代码 
+ls                               // 查看目录   
+date                          // 打印或设置当前系统时间   
+cat /proc/meminfo     // 查看内存信息   
+cat /proc/cpuinfo       // 查看CPU信息 
