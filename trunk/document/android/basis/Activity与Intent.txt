@@ -13,7 +13,40 @@ void onPause()
 void onStop()
 void onDestroy()
 注意的是，Activity的使用需要在Manifest文件中添加相应 的<Activity>，并设置其属性和intent-filter。
+从一个Activity调用另一个Activity时,我们只要填好Intent的内容和动作,使用"startActivity"调用即可唤起Activity。
 
+【生命周期】
+
+	启动
+	a↓
+	运行
+  b↗  ↘c↖d
+ 停止 ←e暂停
+ f↘    ↙g
+    销毁
+    
+a:onCreate、onStart、onRestoreInstanceState、onResume
+b:onResume、onStart、onRestart
+c:onSaveInstanceState、onPause
+d:onResume
+e:onSaveInstanceState、onStop
+f:onDestory、<Process killed>
+g:<Process killed>
+
+onCreate(Bundle):首次启动活动时会调用该方法。可使用该方法执行一次性的初始化工作，
+如创建用户界面。onCreate()接受一个参数，可以是null或由onSaveInstancefState()方法以前保存的某些状态信息。
+onStart()：该方法说明了将要显示给用户的活动
+onResume()：用户可以开始与活动进行交互时会调用该方法。这个方法非常适合开始播放动画和音乐。
+onPause()：活动将要进入后台时会运行该方法，活动进入后台原因通常是在前台启动了另一个活动。
+还应该在该方法中保存程序的持久性状态，如正在编辑的数据库记录。
+onStop()：用户无需看到某个活动，或者在一段时间内不需要某个活动时，可以调用该方法。如果内存不足，可能永远不会调用onStop()（系统可能只是终止进程）
+onRestart()：如果调用该方法，则表明要将已处于停止状态的活动重新显示给用户。
+onDestroy()：销毁活动前会调用该方法。如果内存不足，可能永远都不会调用onDestroy()（系统可能只是终止进程）
+onSaveInstancezState(Bundle)：Android调用该方法的作用是让活动可以保存每个实例的状态，如光标在文本字段中的位置。
+通常你无需重写该方法，因为该方法的实现会自动保存所有用户界面控件的状态。
+onRestoreInstanceState(Bundle)：使用onSaveInstanceState()方法以前保存的状态重新初始化某个活动时会调用该方法。默认实现会还原用户界面的状态。
+
+finish()：将结束当前活动，并将控制权交给Android应用程序栈中的下一个活动。（通常是Home屏幕）
 
 Intent
 Android中提供了 Intent机制来协助应用间的交互与通讯，Intent负责对应用中一次操作的动作、动作涉及数据、附加数据进行描述，
