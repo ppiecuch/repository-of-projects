@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">战机</string>
+    <string name="main_title">战机</string>
+    <string name="game_title">战机</string>
+    <string name="start_button_label">开始游戏</string>
+    <string name="exit_button_label">退出</string>
+</resources>
