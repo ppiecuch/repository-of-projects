@@ -13,6 +13,7 @@ public class Commander extends Thread{
 	
 	private Map<String,Plane> map;
 	private List<Command> commands;
+	private boolean runnable=true;
 	
 	
 	/*×¢²á»úÐÍ*/
@@ -35,17 +36,26 @@ public class Commander extends Thread{
 	@Override
 	public void run() {
 		for(Command c:commands){
-			try {
-				Thread.sleep(c.delay);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			Plane plane=map.get(c.type).clone();
-			Log.d("Commander","execute command:"+c+",add:"+plane);
-			synchronized (Plane.LOCK_ENEMY) {
-				Plane.getEnemies().add(plane);
+			if(runnable)
+			{
+				try {
+					Thread.sleep(c.delay);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				Plane plane=map.get(c.type).clone();
+				Log.d("Commander","execute command:"+c+",add:"+plane);
+				synchronized (Plane.LOCK_ENEMY) {
+					Plane.getEnemies().add(plane);
+				}
 			}
 		}
+		Log.d("Commander","Stop");
+	}
+	
+	public void destroy(){
+		this.runnable=false;
+		this.interrupt();
 	}
 
 }

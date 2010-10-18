@@ -50,6 +50,7 @@ public class GameView extends View implements Runnable{
 	private int[][] explode2={{0,256,65,60},{65,256,65,60},{130,256,65,60},{195,256,65,60},
 		{260,256,65,60},{325,256,65,60},{390,256,65,60},{455,256,65,60}};
 	private int[] p2Icon={0,166,26,20};
+	private int[] bossCoor={347,132,167,116};
 	
 //	private Bitmap[] players;
 //	private Bitmap bullet;
@@ -122,6 +123,7 @@ public class GameView extends View implements Runnable{
 		Gun gun=new Level1Gun(Feature.FEATURE_1,5,10);
 		Gun gunE1=new Level1Gun(Feature.FEATURE_E1,15,5);
 		Gun gunE2=new LevelAGun(Feature.FEATURE_E1,50,5);
+		Gun gunE3=new LevelBGun(Feature.FEATURE_E1,50,5);
 		
 		
 		/*初始化Enemy*/
@@ -163,6 +165,11 @@ public class GameView extends View implements Runnable{
 		enemy8.addGun(gunE2);
 		beelinePath8.reset(enemy8.getPosition());
 		
+		/*初始化BOSS*/
+		Bitmap bossImage=Bitmap.createBitmap(bmp,bossCoor[0],bossCoor[1],bossCoor[2],bossCoor[3]);
+		Enemy1 boss=new Enemy1(0,0,100,Feature.CAMP_BLACK,1,beelinePath5);
+		boss.addFrame(bossImage);
+		boss.addGun(gunE3);
 		
 //		Plane.getEnemies().add(enemy1);
 		
@@ -193,6 +200,7 @@ public class GameView extends View implements Runnable{
 		commander.register("e6",enemy6);
 		commander.register("e7",enemy7);
 		commander.register("e8",enemy8);
+		commander.register("b1",boss);
 		
 		
 		
@@ -213,6 +221,7 @@ public class GameView extends View implements Runnable{
 		commander.addCommand("e2",0);
 		commander.addCommand("e1",20000);
 		commander.addCommand("e2",0);
+		commander.addCommand("b1",20000);
 		
 		
 		commander.start();
@@ -310,6 +319,7 @@ public class GameView extends View implements Runnable{
 	public void stop()
 	{
 		this.runnable=false;
+		this.commander.destroy();
 		try {
 			thread.join();
 		} catch (InterruptedException e) {

@@ -26,6 +26,7 @@ public class Game extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		view.stop();
 		Log.d("Game","Destroy");
 	}
 }
