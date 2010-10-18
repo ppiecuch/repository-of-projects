@@ -1,0 +1,3 @@
+搞了好久，也查了好多资料，什么utf8 to gb2312的转换啊什么的，结果都不好使，后来琢磨发现解决方法非常简单，代码如下：
+               byte bytes[]=cur.getBlob(2);                
+        String sn=new String(bytes,"gb2312");

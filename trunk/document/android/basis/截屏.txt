@@ -1,0 +1,4 @@
+View        view   = LifeCycle_Test.this.getWindow().getDecorView();//得到当前应用的整个view
+view.setDrawingCacheEnabled(true);
+Bitmap  bm           = view.getDrawingCache();
+就可以得到当前屏幕的位图

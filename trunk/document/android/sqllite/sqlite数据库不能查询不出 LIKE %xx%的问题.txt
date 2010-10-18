@@ -1,0 +1,34 @@
+
+我看了一下网上的问题解答：
+
+先搞清楚几件事情：
+（1） SQLite只能按照几种标准的字符编码保存数据，及时你按照GB2312保存了汉字，SQLite还是按照数据库的字符集解析字符编码。这是问题的关键。数据库的字符编码：
+PRAGMA encoding; （查看当前数据库的字符编码）
+PRAGMA encoding = "UTF-8"; 
+PRAGMA encoding = "UTF-16"; 
+PRAGMA encoding = "UTF-16le"; 
+PRAGMA encoding = "UTF-16be";
+（2）如果SQLite将汉字按照GB2312编码保存到数据库中（通过UltraEdit二进制查看，如果能够看到中文，说明是按照GB2312保存的），查询肯定会出问题（不考虑BLOB字段）。使用sqlite3.exe执行插入操作，保存的汉字都是按照GB2312编码保存的，因此使用like匹配时，肯定会出问题。
+（3）我现在成功处理的方法：
+1. 使用sqlite3_prepare执行的SQL语句，必须编码成UTF8格式；Delphi: AnsiToUTF8转换
+2. 如果使用sqlite3_bind_text绑定文本，也必须编码成UTF8格式
+3. 字符读出来后，也必须转换成GB2312编码，UTF8ToAnsi(Result)
+这样就不存在，查询不出内容的问题。
+
+SQLite3数据库，默认使用UTF8编码保存数据。？？？
+
+Android平台上有出现类似的问题。
+大家来讨论一下。
+
+
+这个问题解决了。
+
+确实是 编码的问题。
+
+我insert的时候:
+
+String param1 = new String(data1.getBytes(),"UTF-8");
+
+String sql="insert into  table（colum1）......values("+param1+")";
+
+这样 select 时，才能 select * from table where colum1 like '%xxx%'
