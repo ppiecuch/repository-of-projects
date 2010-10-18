@@ -1,0 +1,178 @@
+一个生成迷宫的算法 收藏 
+      在《Data Structure and Algorithm Analysis in C++》一书中看到一个生成迷宫的简单方法(书中第八章)：将迷宫看成是有一个个单元组成的矩形，这些单元与相连的单元被墙壁分离开来。此时，不断的随即选择一面墙壁，如果被该墙分割的单元彼此不连通，那么就把这么墙拆掉，否则什么也不做。重复这个过程直到开始单元和终止单元彼此连通，那么就得到一个迷宫。实际上不断拆掉墙壁知道每一个单元都可以从其它单元到达会更好(使得迷宫会产生更多误导路径)。
+
+     上述算法是不相交类集(求并/查找数据结构)的一个典型例子，这种数据结构是解决等价问题的一种有效数据结构。涉及到的理论知识:等价关系。
+
+     若对于每一对元素(a,b), a,b属于S， a R b为true或false，则称在集合S上定义关系R。如果a R b为true，则a与b有关系。 
+
+     等价关系是满足三个性质的关系R：
+
+     自反性: 对于所有a属于S，有a R a。
+
+     对称性: a R b当且仅当 b R a。
+
+     传递性: 若a R b且b R c，则a R c。
+
+     基本数据结构可以用一个数组表示，整个数组实际上是树的集合(即森林)。假设迷宫游戏用M*N的矩形来描述，那么就需要以大小为M*N的数组maze[M*N]来表示该迷宫中的所有单元。起初每个单元都不连通，每个单元是一棵单独的树的树根，高度为1，记为maze[i] = -1(表示高度为1的root)。那么随即选中一面墙，比如maze[0]和maze[1]之间的墙，判断它们的树根是否相同，如果树根不同，那么它们没有连通,那么拆掉墙，将这两棵树合并起来，将高度小的那棵树并到高度大的树的树上(限制树的高度),如果它们的树根分别为maze[i],maze[j], 将j树并到i树上，则maze[j] = i, 即maze[j]不再是树根，而是以i为根的树的一部分。
+
+      例如是2*3， 最开始有6个集合: {0},{1},{2},{3},{4},{5},对应的maze[0-6] = -1; 如果随即选中0和3之间的墙壁，它们没有连通，于是将它们并起来，现在是{0,3},{1},{2},{4},{5}; 如果入口为左上角，出口为右下角，则当0，5在一个集合的时候便有了一条从入口到出口的通路。如果需要每一个单元都能从其它单元达到，那么最后应该只有一棵树，即一个集合{0，1，2，3，4，5}。
+
+      用C语言按照上述算法生成迷宫:
+
+/*
+* Maze_Create.h
+*/
+#ifndef MAZE_CREATE_H
+#define Maze_Create_H
+#define ROWS 40    
+#define COLS 60
+#define DIRECTION_NUM 4
+#define DIRECTION_EAST 0
+#define DIRECTION_SOUTH 1
+#define DIRECTION_WEST 2
+#define DIRECTION_NORTH 3
+/* basic information of one cell: four walls with/without door */
+typedef struct cell
+{
+    bool door[DIRECTION_NUM];       // 0: east; 1: south; 2: west; 3 north; have door: true
+}cell;
+void create_Maze(int *cells, cell (*maze)[COLS]); // create maze
+static void init_Maze(int *cells, cell (*maze)[COLS]);   // initialization of the maze
+static bool is_Connect(const int * const cells, int c1, int c2);   // judge whether the two adjacent rooms are connected
+static bool all_Connect(const int * const cells);      // judge if all the rooms are connected
+static void union_Cells(int *cells, int c1, int c2);     // if the two adjacent rooms are not connect, remove the wall between them(or fix a door)
+#endif
+
+/*
+* 迷宫实现类:Maze_Create.cpp
+*/
+#include "Maze_Create.h"
+#include <time.h>
+
+int cells[ROWS*COLS];
+cell maze[ROWS][COLS];
+/* create maze*/
+void create_Maze(int *cells, cell (*maze)[COLS]) 
+{
+    int direction, c1, c2;
+    int CELL_NUM = ROWS*COLS;
+    init_Maze(cells, maze);
+    srand((unsigned)time(NULL));
+    // choose a wall by random
+    while(1)
+    {
+        c1 = rand()%CELL_NUM;
+        direction = rand()%DIRECTION_NUM;
+        switch(direction)
+        {
+        case DIRECTION_EAST:
+            if(c1%COLS == COLS-1) c2 = -1;
+            else c2 = c1 + 1;
+            break;
+        case DIRECTION_SOUTH:
+            if((ROWS-1) == (c1 - c1%COLS)/COLS) c2 = -1;
+            else c2 = c1 + COLS;
+            break;
+        case DIRECTION_WEST:
+            if(c1%COLS == 0) c2 = -1;
+            else c2 = c1 - 1;
+            break;
+        case DIRECTION_NORTH:
+            if(0 == (c1 - c1%COLS)/COLS) c2 = -1;
+            else c2 = c1 - COLS;
+            break;
+        default:
+            //printf("error on random numbers\n");
+            exit(0);
+            break;
+        }
+        if(c2 < 0) continue;
+        // judge whether the two adjacent rooms choose by random are connected
+        if(is_Connect(cells, c1, c2)) continue;
+        else
+        {
+            // remove the wall between them
+            union_Cells(cells, c1, c2);
+            // change state of the maze
+            maze[(c1-c1%COLS)/COLS][c1%COLS].door[direction] = true;
+            maze[(c2-c2%COLS)/COLS][c2%COLS].door[(direction+2)%DIRECTION_NUM] = true;
+        }
+        // if start and end point connects, the maze is created successfully
+        if(is_Connect(cells, 0, CELL_NUM - 1)) break;
+    //     if(all_Connect(cells)) break;      
+    }
+}
+/*initialize maze*/
+void init_Maze(int *cells, cell (*maze)[COLS])
+{
+    int i, j, k;
+    for(i = 0; i < ROWS; i++)
+    {
+        for(j = 0; j < COLS; j++)
+        {
+            for(k = 0; k < DIRECTION_NUM; k++)
+            maze[i][j].door[k] = false;
+        }
+    }
+    maze[0][0].door[DIRECTION_WEST] = true;
+    maze[ROWS-1][COLS-1].door[DIRECTION_EAST] = true;
+
+    for(i = 0; i < ROWS*COLS; i++)
+    {
+        cells[i] = -1;
+    }
+}
+/*judge whether the two adjacent rooms are connected*/
+bool is_Connect(const int * const cells, int c1, int c2)
+{
+    while(cells[c1] >= 0) c1 = cells[c1];
+    while(cells[c2] >= 0) c2 = cells[c2];
+    if(c1 == c2) 
+        return true;
+    else 
+        return false;
+}
+/*
+* if the two adjacent rooms are not connect, remove the wall between them(or fix a door)
+*/
+void union_Cells(int *cells, int c1, int c2)
+{
+    while(cells[c1] >= 0) c1 = cells[c1];
+    while(cells[c2] >= 0) c2 = cells[c2];
+    
+    // the depth of the tree with c2 is deepper than Tc1, Tc1 attach to Tc2
+    if(cells[c1] > cells[c2])
+    {
+        cells[c1] = c2;        
+    }
+    else
+    {
+        if(cells[c1] == cells[c2]) cells[c1]--;
+        cells[c2] = c1;
+    }
+}
+/*judge whether all the rooms are connected*/
+bool all_Connect(const int * const cells)
+{
+    int i, count_root = 0;
+    for(i = 0; i < ROWS*COLS; i++)
+    {
+        if(cells[i] < 0) count_root++;
+    }
+    if(1 == count_root) 
+        return true;
+    else 
+        return false;
+}
+
+    调用create_Maze函数后利用maze[ROWS][COLS]中的信息便能绘出迷宫。上面所示代码都是最简单的情况，实际应用中unit会很多，有很多可以优化的地方以提高速度。下面是在win32下所绘出的迷宫图：
+
+
+
+每两个单元都相互连通的迷宫：
+
+
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/homer1984/archive/2009/02/15/3891780.aspx
