@@ -196,16 +196,16 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 
 	public static void drawAllEnemies(Canvas canvas,Paint paint,int minX,int minY,int maxX,int maxY){
 		temp.clear();
-		for(Plane p:enemies){
-			if(p.destroy)
-			{
-				temp.add(p);
-				Log.d("Plane","remove:"+p);
-				continue;
-			}
-			p.draw(canvas, paint, minX, minY, maxX, maxY);
-		}
 		synchronized (Plane.LOCK_ENEMY) {
+			for(Plane p:enemies){
+				if(p.destroy)
+				{
+					temp.add(p);
+					Log.d("Plane","remove:"+p);
+					continue;
+				}
+				p.draw(canvas, paint, minX, minY, maxX, maxY);
+			}
 			enemies.removeAll(temp);
 		}
 	}

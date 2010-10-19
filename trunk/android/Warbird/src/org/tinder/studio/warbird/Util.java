@@ -2,10 +2,15 @@ package org.tinder.studio.warbird;
 
 
 
+import java.util.Date;
+import java.util.Random;
+
 import android.graphics.Bitmap;
 import android.graphics.Point;
 
 public class Util {
+	
+	private static Random random=new Random(new Date().getTime());
 	
 	public static Bitmap alphaColor(Bitmap image,int color,byte alpha)
 	{
@@ -58,6 +63,10 @@ public class Util {
 	{
 		return x1*x2+y1*y2;
 	}
+	public static double dot(double x1,double y1,double x2,double y2)
+	{
+		return x1*x2+y1*y2;
+	}
 	
 	/**
 	 * 外积，回传纯量（除去方向）   
@@ -69,6 +78,9 @@ public class Util {
 	 * @return
 	 */
 	public static int cross(int x1,int y1,int x2,int y2){
+		return x1*y2-y1*x2;
+	}
+	public static double cross(double x1,double y1,double x2,double y2){
 		return x1*y2-y1*x2;
 	}
 	
@@ -89,12 +101,23 @@ public class Util {
 	 * @param angle
 	 * @param result
 	 */
-	public static void rotate(int x,int y,double angle,Point result)
+	public static void rotate(int x,int y,double angle,Point2D result)
 	{
 		double sin=Math.sin(angle);
 		double cos=Math.cos(angle);
-		result.x = (int) (x*cos - y*sin);
-		result.y = (int) (x*sin + y*cos);
+		result.x = x*cos - y*sin;
+		result.y = x*sin + y*cos;
+	}
+	public static void rotate(double x,double y,double angle,Point2D result)
+	{
+		double sin=Math.sin(angle);
+		double cos=Math.cos(angle);
+		result.x = x*cos - y*sin;
+		result.y = x*sin + y*cos;
+	}
+	
+	public static int random(int start,int end){
+		return random.nextInt(end-start)+start;
 	}
 
 }

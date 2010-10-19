@@ -14,7 +14,7 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 	
 	private static List<Bullet> bullets=new LinkedList<Bullet>();
 	
-	protected int dx,dy;
+	protected double dx,dy;
 	protected Point position;
 	protected Feature feature;
 	protected boolean destroy;
@@ -24,8 +24,8 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 	private static List<Bullet> temp=new LinkedList<Bullet>();
 	
 	public Bullet(int x,int y,int velocity,double direction,Feature feature){
-		this.dx=(int) (Math.cos(direction)*velocity);
-		this.dy=-(int) (Math.sin(direction)*velocity);
+		this.dx=Math.cos(direction)*velocity;
+		this.dy=-Math.sin(direction)*velocity;
 		this.position=new Point(x,y);
 		this.feature=feature;
 		this.frameIndex=0;
@@ -63,7 +63,7 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 	public static void addBullet(Bullet bullet){
 		if(Bullet.bullets==null)
 			Bullet.bullets=new LinkedList<Bullet>();
-		Log.d("Bullet","add:"+bullet);
+//		Log.d("Bullet","add:"+bullet);
 		Bullet.bullets.add(bullet);
 	}
 
@@ -95,7 +95,7 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 				if(b.destroy)
 				{
 					temp.add(b);
-					Log.d("Bullet","remove:"+b);
+//					Log.d("Bullet","remove:"+b);
 					continue;
 				}
 				b.draw(canvas, paint,minX,minY,maxX,maxY);
