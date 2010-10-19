@@ -48,7 +48,7 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 	}
 
 
-	private void update(int minX,int minY,int maxX,int maxY) {
+	protected void update(int minX,int minY,int maxX,int maxY) {
 		if(this.position!=null)
 		{
 			this.position.x+=dx;
@@ -129,5 +129,12 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 	public int getHitY() {
 		return position.y+feature.getFrames().get(frameIndex).getHeight()/2;
 	}
+
+
+	public Feature getFeature() {
+		return feature;
+	}
+	
+	
 	
 }

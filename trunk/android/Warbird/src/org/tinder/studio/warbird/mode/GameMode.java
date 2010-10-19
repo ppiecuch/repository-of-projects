@@ -2,6 +2,7 @@ package org.tinder.studio.warbird.mode;
 
 import org.tinder.studio.warbird.Bullet;
 import org.tinder.studio.warbird.Effect;
+import org.tinder.studio.warbird.Feature;
 import org.tinder.studio.warbird.GameView;
 import org.tinder.studio.warbird.KeyCache;
 import org.tinder.studio.warbird.Plane;
@@ -12,6 +13,10 @@ import android.graphics.Paint;
 public class GameMode implements Mode {
 	
 	private GameView view;
+	int minX=0;
+	int minY=0;
+	int maxX=view.getWidth();
+	int maxY=view.getHeight();
 	
 	public GameMode(GameView view){
 		this.view=view;
@@ -19,10 +24,6 @@ public class GameMode implements Mode {
 
 	@Override
 	public void draw(Canvas canvas,Paint paint) {
-		int minX=0;
-		int minY=0;
-		int maxX=view.getWidth();
-		int maxY=view.getHeight();
 		view.getBg().draw(canvas, paint, minX, minY, maxX, maxY);
 		checkCollision();
 		Bullet.drawAll(canvas, paint,minX,minY,maxX,maxY);
@@ -86,29 +87,40 @@ public class GameMode implements Mode {
 		{
 			if(b.getPosition()!=null)
 			{
-				if(b.intersect(view.getPlayer()))
+				switch(b.getFeature().getCamp())
 				{
-					view.getPlayer().hitted(b);
-					b.destroy();
-				}
-				else{
-					synchronized (Plane.LOCK_ENEMY) {
-						for(Plane p:Plane.getEnemies())
+				case Feature.CAMP_BLACK:
+					if(view.getPlayer().isDestroy())
+						continue;
+					if(b.intersect(view.getPlayer()))
+					{
+						view.getPlayer().hitted(b);
+						b.destroy();
+					}
+					break;
+				case Feature.CAMP_WHITE:
+					for(Plane p:Plane.getEnemies())
+					{
+						if(p.isDestroy())
+							continue;
+						if(b.intersect(p))
 						{
-							if(b.intersect(p))
-							{
-								p.hitted(b);
-								b.destroy();
-							}
+							p.hitted(b);
+							b.destroy();
 						}
 					}
 				}
+				
 			}
 		}
 		/*检测飞机之间的碰撞*/
 		synchronized (Plane.LOCK_ENEMY) {
 			for(Plane p:Plane.getEnemies())
 			{
+				if(view.getPlayer().isDestroy())
+					break;
+				if(p.isDestroy())
+					continue;
 				if(p.intersect(view.getPlayer()))
 				{
 					view.getPlayer().hitted(p);
