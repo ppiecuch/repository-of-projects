@@ -15,8 +15,8 @@ public class GameMode implements Mode {
 	private GameView view;
 	int minX=0;
 	int minY=0;
-	int maxX=view.getWidth();
-	int maxY=view.getHeight();
+	int maxX=0;
+	int maxY=0;
 	
 	public GameMode(GameView view){
 		this.view=view;
@@ -24,6 +24,11 @@ public class GameMode implements Mode {
 
 	@Override
 	public void draw(Canvas canvas,Paint paint) {
+		if(maxX==0)
+		{
+			this.maxX=view.getWidth();
+			this.maxY=view.getHeight();
+		}
 		view.getBg().draw(canvas, paint, minX, minY, maxX, maxY);
 		checkCollision();
 		Bullet.drawAll(canvas, paint,minX,minY,maxX,maxY);
@@ -99,14 +104,16 @@ public class GameMode implements Mode {
 					}
 					break;
 				case Feature.CAMP_WHITE:
-					for(Plane p:Plane.getEnemies())
-					{
-						if(p.isDestroy())
-							continue;
-						if(b.intersect(p))
+					synchronized (Plane.LOCK_ENEMY) {
+						for(Plane p:Plane.getEnemies())
 						{
-							p.hitted(b);
-							b.destroy();
+							if(p.isDestroy())
+								continue;
+							if(b.intersect(p))
+							{
+								p.hitted(b);
+								b.destroy();
+							}
 						}
 					}
 				}

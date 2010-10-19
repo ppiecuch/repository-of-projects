@@ -51,6 +51,7 @@ public class GameView extends View implements Runnable{
 		{260,256,65,60},{325,256,65,60},{390,256,65,60},{455,256,65,60}};
 	private int[] p2Icon={0,166,26,20};
 	private int[] bossCoor={347,132,167,116};
+	private int[][] tb={{287,50,12,29},{313,56,19,19},{337,59,30,12},{372,56,19,19},{407,50,11,29},{432,54,20,20},{458,59,30,12},{493,56,19,18}};
 	
 //	private Bitmap[] players;
 //	private Bitmap bullet;
@@ -124,6 +125,7 @@ public class GameView extends View implements Runnable{
 		Gun gunE1=new Level1Gun(Feature.FEATURE_E1,15,5);
 		Gun gunE2=new LevelAGun(Feature.FEATURE_E1,50,5);
 		Gun gunE3=new LevelBGun(Feature.FEATURE_E1,50,5);
+		Gun trackingGun=new TrackingGun(Feature.FEATURE_2,20,5);
 		
 		
 		/*初始化Enemy*/
@@ -179,6 +181,12 @@ public class GameView extends View implements Runnable{
 		Feature.FEATURE_1.addFrame(bullet1);
 		Feature.FEATURE_E1.addFrame(bullet1);
 		
+		for(int i=0;i<tb.length;i++)
+		{
+			Feature.FEATURE_2.addFrame(Bitmap.createBitmap(bmp,tb[i][0],tb[i][1],tb[i][2],tb[i][3]));
+		}
+		
+		
 		/*初始化Effect*/
 		for(int i=0;i<explode1.length;i++)
 			Effect.FRAMES_1.add(Bitmap.createBitmap(bmp,explode1[i][0],explode1[i][1],explode1[i][2],explode1[i][3]));
@@ -186,6 +194,7 @@ public class GameView extends View implements Runnable{
 			Effect.FRAMES_2.add(Bitmap.createBitmap(bmp,explode2[i][0],explode2[i][1],explode2[i][2],explode2[i][3]));
 		
 		player.addGun(gun);
+		player.addGun(trackingGun);
 		
 		
 		
@@ -206,12 +215,12 @@ public class GameView extends View implements Runnable{
 		
 		commander.addCommand("e3",1000);
 		commander.addCommand("e4",0);
-		commander.addCommand("e5",4000);
-		commander.addCommand("e6",0);
-		commander.addCommand("e7",4000);
-		commander.addCommand("e8",0);
-		commander.addCommand("e7",4000);
-		commander.addCommand("e8",0);
+//		commander.addCommand("e5",4000);
+//		commander.addCommand("e6",0);
+//		commander.addCommand("e7",4000);
+//		commander.addCommand("e8",0);
+//		commander.addCommand("e7",4000);
+//		commander.addCommand("e8",0);
 		commander.addCommand("e5",4000);
 		commander.addCommand("e6",0);
 		commander.addCommand("e3",4000);
@@ -219,9 +228,9 @@ public class GameView extends View implements Runnable{
 		
 		commander.addCommand("e1",10000);
 		commander.addCommand("e2",0);
-		commander.addCommand("e1",20000);
-		commander.addCommand("e2",0);
-		commander.addCommand("b1",20000);
+//		commander.addCommand("e1",20000);
+//		commander.addCommand("e2",0);
+//		commander.addCommand("b1",20000);
 		
 		
 		commander.start();

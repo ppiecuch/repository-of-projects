@@ -1,6 +1,7 @@
 package org.tinder.studio.warbird;
 
 import android.graphics.Point;
+import android.util.Log;
 
 public class TrackingBullet extends Bullet {
 
@@ -21,72 +22,84 @@ public class TrackingBullet extends Bullet {
 	protected void update(int minX, int minY, int maxX, int maxY) {
 		/*更新位置*/
 		super.update(minX, minY, maxX, maxY);
-		/*调整角度*/
-		int vx=target.getPosition().x-this.position.x;
-		int vy=target.getPosition().y-this.position.y;
-		/*使用内积判断向量的夹角[0,180]*/
-		int dot=Util.dot(dx,dy,vx,vy);
-		float cos=dot/velocity*Util.modulus(vx,vy);
-		double angle=Math.acos(cos);
-		/*使用外积判断向量的夹角是顺时针还是逆时针*/
-		int cross=Util.cross(dx,dy,vx,vy);
-		if(angle==0||cross==0)
-			return;
-		/*参考偏转角界限进行调整*/
-		Point result=new Point();
-		if(angle<deflectionAngleLimit)
+		Log.d("TrackingBullet","------start-----");
+		if(target!=null&&target.isDestroy()==false)
 		{
-			if(cross>0)
+			/*调整角度*/
+			int vx=target.getPosition().x-this.position.x;
+			int vy=target.getPosition().y-this.position.y;
+			/*使用内积判断向量的夹角[0,180]*/
+			double dot=Util.dot(dx,dy,vx,vy);
+			double cos=dot/velocity*Util.modulus(vx,vy);
+			double angle=Math.acos(cos);
+			/*使用外积判断向量的夹角是顺时针还是逆时针*/
+			double cross=Util.cross(dx,dy,vx,vy);
+			if(angle!=0&&Math.abs(cross)>0.00001)
 			{
-				//逆时针旋转
-				direction+=angle;
-				Util.rotate(dx,dy, angle, result);
+				/*参考偏转角界限进行调整*/
+				Point2D result=new Point2D();
+				if(angle<deflectionAngleLimit)
+				{
+					if(cross>0)
+					{
+						//逆时针旋转
+						direction+=angle;
+						Util.rotate(dx,dy, angle, result);
+						Log.d("TrackingBullet","ccw angle:"+angle+",direction:"+direction);
+					}
+					else if(cross<0)
+					{
+						//顺时针旋转
+						direction-=angle;
+						Util.rotate(dx,dy, -angle, result);
+						Log.d("TrackingBullet","cw angle:"+angle+",direction:"+direction);
+					}
+				}
+				else
+				{
+					if(cross>0)
+					{
+						//逆时针旋转
+						direction+=deflectionAngleLimit;
+						Util.rotate(dx,dy, deflectionAngleLimit, result);
+						Log.d("TrackingBullet","ccw limit:"+deflectionAngleLimit+",direction:"+direction);
+					}
+					else if(cross<0)
+					{
+						//顺时针旋转
+						direction-=deflectionAngleLimit;
+						Util.rotate(dx,dy, -deflectionAngleLimit, result);
+						Log.d("TrackingBullet","cw limit:"+deflectionAngleLimit+",direction:"+direction);
+					}
+				}
+				Log.d("TrackingBullet","dx:"+dx+",dy:"+dy+"--result:"+result.x+","+result.y);
+				this.dx=result.x;
+				this.dy=result.y;
 			}
-			else if(cross<0)
-			{
-				//顺时针旋转
-				direction-=angle;
-				Util.rotate(dx,dy, -angle, result);
-			}
+			/*根据direction设置frameIndex*/
+			while(direction<0)
+				direction+=Gun.PI2;
+			while(direction>Gun.PI2)
+				direction-=Gun.PI2;
+			if(direction<=Gun.PI_1_8||direction>Gun.PI_15_8)
+				frameIndex=6;
+			else if(direction>Gun.PI_1_8&&direction<=Gun.PI_3_8)
+				frameIndex=7;
+			else if(direction>Gun.PI_3_8&&direction<=Gun.PI_5_8)
+				frameIndex=0;
+			else if(direction>Gun.PI_5_8&&direction<=Gun.PI_7_8)
+				frameIndex=1;
+			else if(direction>Gun.PI_7_8&&direction<=Gun.PI_9_8)
+				frameIndex=2;
+			else if(direction>Gun.PI_9_8&&direction<=Gun.PI_11_8)
+				frameIndex=3;
+			else if(direction>Gun.PI_11_8&&direction<=Gun.PI_13_8)
+				frameIndex=4;
+			else if(direction>Gun.PI_13_8&&direction<=Gun.PI_15_8)
+				frameIndex=5;
+			Log.d("TrackingBullet","frameIndex:"+frameIndex);
 		}
-		else
-		{
-			if(cross>0)
-			{
-				//逆时针旋转
-				direction+=deflectionAngleLimit;
-				Util.rotate(dx,dy, deflectionAngleLimit, result);
-			}
-			else if(cross<0)
-			{
-				//顺时针旋转
-				direction-=deflectionAngleLimit;
-				Util.rotate(dx,dy, -deflectionAngleLimit, result);
-			}
-		}
-		this.dx=result.x;
-		this.dy=result.y;
-		/*根据direction设置frameIndex*/
-		while(direction<0)
-			direction+=Gun.PI2;
-		while(direction>Gun.PI2)
-			direction-=Gun.PI2;
-		if(direction<=Gun.PI_1_16||direction>Gun.PI_15_16)
-			frameIndex=0;
-		else if(direction>Gun.PI_1_16&&direction<=Gun.PI_3_16)
-			frameIndex=1;
-		else if(direction>Gun.PI_3_16&&direction<=Gun.PI_5_16)
-			frameIndex=2;
-		else if(direction>Gun.PI_5_16&&direction<=Gun.PI_7_16)
-			frameIndex=3;
-		else if(direction>Gun.PI_7_16&&direction<=Gun.PI_9_16)
-			frameIndex=4;
-		else if(direction>Gun.PI_9_16&&direction<=Gun.PI_11_16)
-			frameIndex=5;
-		else if(direction>Gun.PI_11_16&&direction<=Gun.PI_13_16)
-			frameIndex=6;
-		else if(direction>Gun.PI_13_16&&direction<=Gun.PI_15_16)
-			frameIndex=7;
+		Log.d("TrackingBullet","------end-----");
 	}
 
 }

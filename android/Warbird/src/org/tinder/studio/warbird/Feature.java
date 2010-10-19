@@ -10,7 +10,9 @@ public class Feature {
 	public static final int CAMP_BLACK=2;
 	
 	public static final Feature FEATURE_1=new Feature(CAMP_WHITE, 10);
+	public static final Feature FEATURE_2=new Feature(CAMP_WHITE, 20);
 	public static final Feature FEATURE_E1=new Feature(CAMP_BLACK, 10);
+	
 	
 	private int camp;					//’Û”™
 	private int execution;				//…±…À¡¶
