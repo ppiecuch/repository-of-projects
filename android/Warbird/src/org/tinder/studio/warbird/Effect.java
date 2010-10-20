@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.util.Log;
 
 public class Effect implements Drawable {
 	
@@ -27,11 +28,20 @@ public class Effect implements Drawable {
 		this.position=new Point(x, y);
 		this.frameIndex=0;
 	}
+	
+	public Effect(int x,int y,List<Bitmap> frames,int frameIndex)
+	{
+		this.frames=frames;
+		this.position=new Point(x, y);
+		this.frameIndex=frameIndex;
+	}
 
 	@Override
 	public void draw(Canvas canvas, Paint paint, int minX, int minY, int maxX,
 			int maxY) {
-		canvas.drawBitmap(frames.get(frameIndex++),position.x,position.y,paint);
+		if(frameIndex>=0)
+			canvas.drawBitmap(frames.get(frameIndex),position.x,position.y,paint);
+		frameIndex++;
 
 	}
 	

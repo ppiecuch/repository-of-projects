@@ -17,8 +17,8 @@ public class LevelCGun extends Gun {
 			int y=host.getPosition().y;
 			if(direction==Gun.PI_3_2)
 				y+=+host.getFrame().getHeight();
-			for(float i=0.0f;i<Gun.PI2;i+=Gun.PI_1_16)
-				Bullet.addBullet(new Bullet(x,y+feature.getFrames().get(0).getHeight()*2,velocity,i,feature));
+			for(float i=0.0f;i<Gun.PI2;i+=Gun.PI_1_8)
+				Bullet.addBullet(new Bullet(x,y+feature.getFrames().get(0).getHeight(),velocity,i,feature));
 		}
 			
 	}

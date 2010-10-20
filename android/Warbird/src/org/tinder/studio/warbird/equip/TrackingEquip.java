@@ -6,7 +6,13 @@ import org.tinder.studio.warbird.GameView;
 import org.tinder.studio.warbird.Player;
 import org.tinder.studio.warbird.gun.Gun;
 
-public class TrackingEquip implements Equip {
+public class TrackingEquip extends Equip {
+
+	public TrackingEquip(int x, int y, int velocity, double direction,
+			long validity) {
+		super(x, y, velocity, direction, validity);
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public void equip(Player player) {
