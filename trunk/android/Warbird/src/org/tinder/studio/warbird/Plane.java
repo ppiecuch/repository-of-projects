@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 
 public abstract class Plane implements Hittable,Drawable,Cloneable {
@@ -221,7 +222,15 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 	
 	@Override
 	public boolean intersect(Plane plane) {
-		return false;
+		if(plane.getCamp()==this.camp)
+			return false;
+		Bitmap bitmap=plane.getFrame();
+		BitmapDrawable b1=new BitmapDrawable(getFrame());
+		BitmapDrawable b2=new BitmapDrawable(bitmap);
+		b1.setBounds(this.position.x,this.position.y,this.position.x+b1.getIntrinsicWidth(),this.position.y+b1.getIntrinsicHeight());
+		b2.setBounds(plane.getPosition().x,plane.getPosition().y,plane.getPosition().x+b2.getIntrinsicWidth(),plane.getPosition().y+b2.getIntrinsicHeight());
+//		Log.d("Enemy1",b1.getBounds().toShortString()+",b2:"+b2.getBounds().toShortString()+"="+b1.getBounds().intersect(b2.getBounds()));
+		return b1.getBounds().intersect(b2.getBounds());
 	}
 	
 	

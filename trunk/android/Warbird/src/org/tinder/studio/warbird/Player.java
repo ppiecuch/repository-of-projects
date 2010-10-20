@@ -37,7 +37,7 @@ public class Player extends Plane {
 	@Override
 	public void die() {
 		super.die();
-		if(life>=0)
+		if(life>0)
 			new Thread(){
 			public void run() {
 				try {

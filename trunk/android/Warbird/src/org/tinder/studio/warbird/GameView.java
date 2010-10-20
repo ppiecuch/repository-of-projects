@@ -3,10 +3,13 @@ package org.tinder.studio.warbird;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.tinder.studio.warbird.enemy.Boss;
 import org.tinder.studio.warbird.enemy.Command;
 import org.tinder.studio.warbird.enemy.Commander;
 import org.tinder.studio.warbird.enemy.Enemy1;
 import org.tinder.studio.warbird.gun.Gun;
+import org.tinder.studio.warbird.gun.LevelCGun;
+import org.tinder.studio.warbird.gun.LevelDGun;
 import org.tinder.studio.warbird.gun.LevelGun;
 import org.tinder.studio.warbird.gun.LevelAGun;
 import org.tinder.studio.warbird.gun.LevelBGun;
@@ -15,6 +18,7 @@ import org.tinder.studio.warbird.layer.ScrollBgLayer;
 import org.tinder.studio.warbird.mode.GameMode;
 import org.tinder.studio.warbird.mode.Mode;
 import org.tinder.studio.warbird.path.BeelinePath;
+import org.tinder.studio.warbird.path.LoopXPath;
 import org.tinder.studio.warbird.path.Path;
 
 import android.content.Context;
@@ -126,13 +130,16 @@ public class GameView extends View implements Runnable{
 		Path beelinePath6=new BeelinePath(width-100, 0,width-100, height);
 		Path beelinePath7=new BeelinePath(100, 0,100, height);
 		Path beelinePath8=new BeelinePath(width-150, 0,width-150, height);
+		Path loopXPath=new LoopXPath(0, width-180,2);
 		
 		/*初始化Gun*/
-		Gun gun=new LevelGun(Feature.FEATURE_1,5,10,1);
+		Gun gun=new LevelGun(Feature.FEATURE_1,5,15,1);
 		Gun gunE1=new LevelGun(Feature.FEATURE_E1,15,5,1);
 		Gun gunE2=new LevelAGun(Feature.FEATURE_E1,50,5,1);
-		Gun gunE3=new LevelBGun(Feature.FEATURE_E1,50,5,1);
-		trackingGun=new TrackingGun(Feature.FEATURE_2,20,5,1);
+		Gun gunE3=new LevelBGun(Feature.FEATURE_E1,20,5,1);
+		trackingGun=new TrackingGun(Feature.FEATURE_2,20,10,1);
+		Gun gunE4=new LevelCGun(Feature.FEATURE_E1,80,8,1);
+		Gun gunE5=new LevelDGun(Feature.FEATURE_E1,80,8,1);
 		
 		
 		/*初始化Enemy*/
@@ -176,11 +183,11 @@ public class GameView extends View implements Runnable{
 		
 		/*初始化BOSS*/
 		Bitmap bossImage=Bitmap.createBitmap(bmp,bossCoor[0],bossCoor[1],bossCoor[2],bossCoor[3]);
-		Enemy1 boss=new Enemy1(0,0,100,Feature.CAMP_BLACK,1,beelinePath5);
+		Boss boss=new Boss(0,0,1000,Feature.CAMP_BLACK,1,loopXPath);
 		boss.addFrame(bossImage);
 		boss.addGun(gunE3);
-		
-//		Plane.getEnemies().add(enemy1);
+		boss.addGun(gunE4);
+		boss.addGun(gunE5);
 		
 		
 		/*初始化Feature*/
@@ -201,7 +208,7 @@ public class GameView extends View implements Runnable{
 			Effect.FRAMES_2.add(Bitmap.createBitmap(bmp,explode2[i][0],explode2[i][1],explode2[i][2],explode2[i][3]));
 		
 		player.addGun(gun);
-//		player.addGun(trackingGun);
+		player.addGun(trackingGun);
 		
 		
 		
@@ -222,12 +229,12 @@ public class GameView extends View implements Runnable{
 		
 		commander.addCommand("e3",1000);
 		commander.addCommand("e4",0);
-//		commander.addCommand("e5",4000);
-//		commander.addCommand("e6",0);
-//		commander.addCommand("e7",4000);
-//		commander.addCommand("e8",0);
-//		commander.addCommand("e7",4000);
-//		commander.addCommand("e8",0);
+		commander.addCommand("e5",4000);
+		commander.addCommand("e6",0);
+		commander.addCommand("e7",4000);
+		commander.addCommand("e8",0);
+		commander.addCommand("e7",4000);
+		commander.addCommand("e8",0);
 		commander.addCommand("e5",4000);
 		commander.addCommand("e6",0);
 		commander.addCommand("e3",4000);
@@ -235,9 +242,9 @@ public class GameView extends View implements Runnable{
 		
 		commander.addCommand("e1",10000);
 		commander.addCommand("e2",0);
-//		commander.addCommand("e1",20000);
-//		commander.addCommand("e2",0);
-//		commander.addCommand("b1",20000);
+		commander.addCommand("e1",20000);
+		commander.addCommand("e2",0);
+		commander.addCommand("b1",10000);
 		
 		
 		commander.start();
