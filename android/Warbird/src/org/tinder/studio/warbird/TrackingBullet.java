@@ -1,6 +1,7 @@
 package org.tinder.studio.warbird;
 
-import android.graphics.Point;
+import org.tinder.studio.warbird.gun.Gun;
+
 import android.util.Log;
 
 public class TrackingBullet extends Bullet {
@@ -25,7 +26,7 @@ public class TrackingBullet extends Bullet {
 		Log.d("TrackingBullet","------start-----");
 		if(target!=null&&target.isDestroy()==false)
 		{
-			/*调整角度*/
+			/*子弹到目标的向量分量*/
 			int vx=target.getPosition().x-this.position.x;
 			int vy=target.getPosition().y-this.position.y;
 			/*使用内积判断向量的夹角[0,180]*/

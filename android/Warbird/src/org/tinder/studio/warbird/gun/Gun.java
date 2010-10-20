@@ -1,4 +1,7 @@
-package org.tinder.studio.warbird;
+package org.tinder.studio.warbird.gun;
+
+import org.tinder.studio.warbird.Feature;
+import org.tinder.studio.warbird.Plane;
 
 public abstract class Gun implements Cloneable {
 	
@@ -26,11 +29,13 @@ public abstract class Gun implements Cloneable {
 	protected int frequence;//子弹发射频率
 	protected int velocity;//子弹速度
 	protected int counter=0;
+	protected int level;//火力等级
 	
-	public Gun(Feature feature,int frequence,int velocity){
+	public Gun(Feature feature,int frequence,int velocity,int level){
 		this.feature=feature;
 		this.frequence=frequence;
 		this.velocity=velocity;
+		this.level=level;
 	}
 	
 	public void setHost(Plane host) {
@@ -40,8 +45,14 @@ public abstract class Gun implements Cloneable {
 	public Gun clone() {
 		return null;
 	}
-
+	
+	@Override
+	public boolean equals(Object o) {
+		return o.getClass()==this.getClass();
+	}
 
 	public abstract void fire(double direction);
+	public abstract void increaseLevel();
+	public abstract void maxLevel();
 
 }

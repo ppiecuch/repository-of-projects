@@ -1,5 +1,7 @@
 package org.tinder.studio.warbird;
 
+import org.tinder.studio.warbird.gun.Gun;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -66,10 +68,14 @@ public class Player extends Plane {
 
 	@Override
 	public int getImpact() {
-		
 		return 100;
 	}
 	
+	public void increateLife() {
+		if(this.life<5)
+			this.life++;
+	}
+
 	@Override
 	public String toString() {
 		return "life:"+life+",position:["+position.x+","+position.y+"]";
