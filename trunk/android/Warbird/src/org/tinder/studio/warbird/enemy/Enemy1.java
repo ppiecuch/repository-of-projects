@@ -1,7 +1,7 @@
 package org.tinder.studio.warbird.enemy;
 
-import org.tinder.studio.warbird.Gun;
 import org.tinder.studio.warbird.Plane;
+import org.tinder.studio.warbird.gun.Gun;
 import org.tinder.studio.warbird.path.Path;
 
 import android.graphics.Bitmap;

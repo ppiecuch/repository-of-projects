@@ -3,6 +3,8 @@ package org.tinder.studio.warbird;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.tinder.studio.warbird.gun.Gun;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -137,7 +139,6 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 	{
 		if(this.guns==null)
 			this.guns=new LinkedList<Gun>();
-		
 		Gun newGun = gun.clone();
 		newGun.setHost(this);
 		this.guns.add(newGun);
@@ -178,6 +179,10 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 		return camp;
 	}
 	
+	public List<Gun> getGuns() {
+		return guns;
+	}
+
 	@Override
 	public int getHitX() {
 		return position.x;

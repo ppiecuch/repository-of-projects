@@ -6,6 +6,11 @@ import java.util.List;
 import org.tinder.studio.warbird.enemy.Command;
 import org.tinder.studio.warbird.enemy.Commander;
 import org.tinder.studio.warbird.enemy.Enemy1;
+import org.tinder.studio.warbird.gun.Gun;
+import org.tinder.studio.warbird.gun.LevelGun;
+import org.tinder.studio.warbird.gun.LevelAGun;
+import org.tinder.studio.warbird.gun.LevelBGun;
+import org.tinder.studio.warbird.gun.TrackingGun;
 import org.tinder.studio.warbird.layer.ScrollBgLayer;
 import org.tinder.studio.warbird.mode.GameMode;
 import org.tinder.studio.warbird.mode.Mode;
@@ -26,6 +31,8 @@ import android.view.View;
 public class GameView extends View implements Runnable{
 	
 	public static final int FPS = 30;	//每秒绘制的帧数
+	public static Gun trackingGun;
+	public static Gun energyGun;
 	private static final int increment=3; //移动速度
 	private Thread thread;
 	private Integer width,height;
@@ -121,11 +128,11 @@ public class GameView extends View implements Runnable{
 		Path beelinePath8=new BeelinePath(width-150, 0,width-150, height);
 		
 		/*初始化Gun*/
-		Gun gun=new Level1Gun(Feature.FEATURE_1,5,10);
-		Gun gunE1=new Level1Gun(Feature.FEATURE_E1,15,5);
-		Gun gunE2=new LevelAGun(Feature.FEATURE_E1,50,5);
-		Gun gunE3=new LevelBGun(Feature.FEATURE_E1,50,5);
-		Gun trackingGun=new TrackingGun(Feature.FEATURE_2,20,5);
+		Gun gun=new LevelGun(Feature.FEATURE_1,5,10,1);
+		Gun gunE1=new LevelGun(Feature.FEATURE_E1,15,5,1);
+		Gun gunE2=new LevelAGun(Feature.FEATURE_E1,50,5,1);
+		Gun gunE3=new LevelBGun(Feature.FEATURE_E1,50,5,1);
+		trackingGun=new TrackingGun(Feature.FEATURE_2,20,5,1);
 		
 		
 		/*初始化Enemy*/
@@ -194,7 +201,7 @@ public class GameView extends View implements Runnable{
 			Effect.FRAMES_2.add(Bitmap.createBitmap(bmp,explode2[i][0],explode2[i][1],explode2[i][2],explode2[i][3]));
 		
 		player.addGun(gun);
-		player.addGun(trackingGun);
+//		player.addGun(trackingGun);
 		
 		
 		
