@@ -1,0 +1,19 @@
+我们在使用List,Set的时候，为了实现对其数据的遍历，我们经常使用到了Iterator(跌代器)。
+使用跌代器，你不必干涉其遍历的过程，只需要每次取出一个你想要的数据进行处理就能了。 
+不过在使用的时候也是有不同的。List和Set都有iterator()来取得其迭代器。
+对List来说，你也能通过listIterator()取得其迭代器，两种迭代器在有些时候是不能通用的，Iterator和ListIterator主要差别在以下方面： 
+
+1. ListIterator有add()方法，能向List中添加对象，而Iterator不能 
+2. ListIterator和Iterator都有hasNext()和next()方法，能实现顺序向后遍历，不过ListIterator有hasPrevious()和previous()方法，
+能实现逆向（顺序向前）遍历。Iterator就不能。 
+3. ListIterator能定位当前的索引位置，nextIndex()和previousIndex()能实现。Iterator没有此功能。 
+4. 都可实现删除对象，不过ListIterator能实现对象的修改，set()方法能实现。Iierator仅能遍历，不能修改。 
+因为ListIterator的这些功能，能实现对LinkedList等List数据结构的操作。其实，数组对象也能用迭代器来实现。 
+
+org.apache.commons.collections.iterators.ArrayIterator就能实现此功能。一般情况下，我们使用Iterator就能了，
+如果你需要进行记录的前后反复检索的话，你就能使用ListIterator来扩展你的功能，（有点象JDBC中的滚动结果集）。 
+
+java.util.ListIterator声明了三个功能强大的方法，允许在迭代的进行过程当中安全地修改列的内容。
+add(),remove(),set()
+注意：只能在调用一次next()或previous()后调用一次remove()。如果需要再次调用remove()就需要再调用一次next()或previous()然后再调用remove()
+如果刚刚调用了add(),那么只有在调用next()或previous()一次后，才可以调用remove(),set()也是这样
