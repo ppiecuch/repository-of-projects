@@ -1,0 +1,121 @@
+程序员日志：Android NDK配置
+Android NDK是什么,  NDK：Native Develpment Kit.
+
+众所周知，Android是基于Linux的支持，自然对C、C++提供原生的支持，Android的开发也是基于Java的语言。应用程序的运行环境主要是Dalvik虚拟机。
+虽然开发语言是Java但是我们总可以通过各种方式用C等语言开发。
+
+至于用NDK开发的流程，请阅读NDK附带的文档。
+
+关于具体的信息了解，请访问Android开发网阅读文档了解基本的信息。
+
+点这里了解基本信息(需要设置代理访问或者翻墙)
+
+建议通读上面链接的全文(英文版)，很多东西按照上面介绍的步骤就可以完全的成功。一些基本的命令和操作也在里面可以看到，相信看过以后会对你有启发。
+
+在其中有这么一句话：
+
+Please note that the NDK does not enable you to develop native-only applications. Android’s primary runtime remains the Dalvik virtual machine
+
+在NDK文档中也有这样的描述：
+
+The NDK is *not* a good way to write generic native code that runs on Android devices. In particular, your applications should still be written in the Java programming language, handle Android system events appropriately to avoid the "Application Not Responding" dialog or deal with the Android application 
+life-cycle.
+
+也就是说，Android的Application不能完全用C或者C++开发，其运行环境主要是Dalvik的JVM，而且NDK没有关于组件声明周期和事件处理的东西。
+
+其实据我的了解和理解，NDK的原理大体就是Java中声明接口然后通过JNI(Java Native Interface )调用NDK开发的C和C++代码，文档中也提到，A good understanding of JNI is highly recommended。native code被静态编译为.so的模块，然后加载到.apk中，然后安装到Android中运行。这些信息都可以通过google关键字Android NDK和阅读NDK的文档获取，形成你自己的理解。
+
+当然按照本文的介绍的步骤也可以配置，但还是建议读一下。
+
+第一步，下载Android 的SDK，注意，SDK要1.5以后的版本(链接中有提到,原因在NDK的文档里有介绍)。
+
+当然，配置好的Eclipse+ADT也是需要的。
+
+第二步，下载Android NDK。
+
+下载完成后即解压到适当的目录。设置Android SDK的环境变量。NDK目前只需要解压到适当目录即可。
+
+解压后可大致浏览下目录的结构。当然，在上面的链接中，有关于其目录结构的介绍。
+
+第三步，安装Cygwin(www.cygwin.com)。最新版本1.7，我用的1.6的版本，也会我建议的版本。Cygwin是什么，有关于一些交叉编译的知识请自己通过搜索引擎了解。
+
+下载后运行Setup，点击next，选择Install from Internet：
+
+然后下一步，选择适当的目录，
+
+下一步，再选择相应的包的下载存放位置，默认，
+
+下一步，网络配置，默认，
+
+下一步，会搜索站点，下载站点选择台湾的，速度比较快，
+
+等待其更新软件的列表后，就是比较关键的一步。
+
+上面链接的文档和NDK附带文档中的INSTALL.TXT中也提到了，我们需要以下的工具：
+
+1. GNU make
+
+2. bash shell
+
+3. Nawk或者GNU awk
+
+所以在这里我们安装上面所需要的组件，找到Devel，并点击后面的循环箭头，将其改为Install
+
+Devel中就包含了make及gcc等组件，可以点开前面的+号浏览。
+
+然后找到Shell 选项，改为install
+
+然后在上面的搜索框中搜索awk，找到两条，其默认已经包含了，这里确认一下，改为install。
+
+next，开始安装。
+
+安装完成后，找到Cygwin的安装目录下<cygwin>/home/<你的用户名>/.bash_profile文件，UltraEdit打开，据说用记事本等的打开也会出问题。不要转换格式，否则出问题。最后一行，添加上
+
+ANDROID_NDK_ROOT=/cygdrive/c/android-ndk-r3 
+export ANDROID_NDK_ROOT
+
+其中的c/android-ndk-r3是我的安装的目录。改为你的。
+
+保存退出。
+
+桌面或者开始菜单打开Cygwin的bash shell，
+
+到这步之前，请确保你了解什么是Cygwin以及Cygwin是干什么的。
+
+进入NDK的目录，
+
+cd $ANDROID_NDK_ROOT
+
+下面就是配置Android的NDK了
+
+运行一下命令：
+
+build/host-setup.sh
+
+注意无空格。运行后会提示安装完毕。
+
+到此，NDK的配置就完毕了。
+
+提示中有着么一句话：如果你不知道接下来干什么，请阅读docs目录下的OVERVIEW.txt。这个文档是非常有用，建议细读。
+
+接下来是如何运行NDK中自带的samples。
+
+首先还是在Cygwin的bash shell中：
+
+cd $ANDROID_NDK_ROOT
+
+make APP=hello-jni
+
+此命令会在<ndk-dir>\apps\apps\hello-jni\project\libs\armeabi下生成.so文件，其实这个.so文件就相当于Windows下的dll。
+
+然后，打开你配置好的Eclipse+ADT的环境。
+
+新建Android Project。
+
+新建选项中，选择create Project from existing source, 目录选择NDK下的hello-jni目录下的Project文件夹
+
+然后编译运行，看到从.c文件返回的hello from JNI字符串：
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/goldroc/archive/2010/04/02/5444005.aspx

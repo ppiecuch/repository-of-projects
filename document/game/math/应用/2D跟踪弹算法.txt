@@ -1,0 +1,51 @@
+/*子弹到目标的向量分量*/  
+int vx=target.getPosition().x-this.position.x;   
+int vy=target.getPosition().y-this.position.y;   
+/*使用内积判断向量的夹角[0,180]*/  
+double dot=Util.dot(dx,dy,vx,vy);//dx,dy为速度向量分量   
+double cos=dot/velocity*Util.modulus(vx,vy);//velocity为速度标量   
+double angle=Math.acos(cos);//两向量的夹角   
+/*使用外积判断向量的夹角是顺时针还是逆时针*/  
+double cross=Util.cross(dx,dy,vx,vy);   
+if(angle!=0&&Math.abs(cross)>0.00001)   
+{   
+    /*参考偏转角界限进行调整*/  
+    Point2D result=new Point2D();   
+    if(angle<deflectionAngleLimit)//deflectionAngleLimit为子弹最大偏转角，即从一帧跳到下一帧最大的旋转角度   
+    {   
+        if(cross>0)   
+        {   
+            //逆时针旋转   
+            direction+=angle;   
+            Util.rotate(dx,dy, angle, result);   
+            Log.d("TrackingBullet","ccw angle:"+angle+",direction:"+direction);   
+        }   
+        else if(cross<0)   
+        {   
+            //顺时针旋转   
+            direction-=angle;   
+            Util.rotate(dx,dy, -angle, result);   
+            Log.d("TrackingBullet","cw angle:"+angle+",direction:"+direction);   
+        }   
+    }   
+    else  
+    {   
+        if(cross>0)   
+        {   
+            //逆时针旋转   
+            direction+=deflectionAngleLimit;   
+            Util.rotate(dx,dy, deflectionAngleLimit, result);   
+            Log.d("TrackingBullet","ccw limit:"+deflectionAngleLimit+",direction:"+direction);   
+        }   
+        else if(cross<0)   
+        {   
+            //顺时针旋转   
+            direction-=deflectionAngleLimit;   
+            Util.rotate(dx,dy, -deflectionAngleLimit, result);   
+            Log.d("TrackingBullet","cw limit:"+deflectionAngleLimit+",direction:"+direction);   
+        }   
+    }   
+    Log.d("TrackingBullet","dx:"+dx+",dy:"+dy+"--result:"+result.x+","+result.y);   
+    this.dx=result.x;//新的速度分量   
+    this.dy=result.y;   
+}  

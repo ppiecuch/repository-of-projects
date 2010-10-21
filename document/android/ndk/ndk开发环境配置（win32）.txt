@@ -1,0 +1,58 @@
+Android学习笔记之NDK开发环境配置（WIN32）二
+ 1 Android由于我使用的是NDK1.6，所以该文中的NDK环境指的是1.6。
+之前Google还发布了一个1.5版本的NDK，配置步骤应该与之类似。
+
+下载并解压android-ndk-1.6_r1； 
+安装1.6或高于1.6版本的android-sdk； 
+下载Cygwin, 执行setup.exe开始安装（在select package 页面要选上Devel，安装编译器等（附图），否则后面编译不过）； 
+运行Cygwin.bat，出现linux shell提示符（便于以后直接进入到NDK的根目录，可以在/home/username/.bash_profile文件中添加如下内容： 
+NDK_ROOT=/cygdrive/<ndk install path>/android-ndk-1.6_r1
+export NDK_ROOT）
+
+在linux shell提示符下进入到NDK的根目录(cd $NDK进入对应目录)输入如下命令以配置NDK环境：build/host-setup.sh； 成功表示环境搭建OK； 
+编译.so文件（linux下.so相当于win 的dll）以NDK下的hello-jni为例，在 shell提示符下进入到NDK的根目录，输入：make APP=hello-jni。
+如果编译成功会在<NDK install roo>/apps/hello-jni/project/libs/armeabi目录下生成hello-jni.so文件。 
+到此一个用C/C++实现的dll就生成了，可以在Android java程序中调用hello-jni.so了。
+
+ 
+
+转载请注明： 转载自iT人 – theiter
+
+http://www.theiter.com/2010/02/android学习笔记之ndk开发环境配置（win32）.html
+
+
+
+Android NDK 开发环境安装和配置
+
+Android NDK 开发环境安装和配置 
+
+by admin on 七.23, 2009, under 开发, 环境 
+支持我们 
+
+【Android 开发者】Emck 
+
+标 题: HWOTO install and setup Android NDK for Windows 
+发布日期: 2009-06-27 18:00 
+作 者: Androidin Emck 
+说 明: 此文档严格遵循GPL协议,转贴请保持此文档的完整性! 
+
+1. 下载Android 1.5 NDK, Release 1 For Windows 并解压到D:\android-ndk-1.5_r1 
+2.下载Cygwin, 执行setup.exe并开始安装(根据网络速度快慢而定, 预计安装需要20分钟左右) 
+注意:1. 选择台湾的http站点,速度会快很多; 2.开发选项里必须勾选gcc和make,否则后期无法编译 
+3.执行桌面图标Cygwin,出现linux shell提示符后, 修改当前目录(/home/username)下.bash_profile文件, 加入如下内容在文件尾部 
+ANDROID_NDK_ROOT=/cygdrive/d/android-ndk-1.5_r1 
+export ANDROID_NDK_ROOT 
+4.退出Cygwin,重新进入,执行以下命令 
+cd $ANDROID_NDK_ROOT 
+build/host-setup.sh 
+一切顺利的话会提示设置成功, 如果出错, 则检查错误并修复 
+5.编译sample hello-jni 
+进入Cygwin 
+cd $ANDROID_NDK_ROOT 
+make APP=hello-jni 
+一切顺利则会生成libhello-jni.so文件在 $ANDROID_NDK_ROOT/apps/hello-jni/project/libs/armeabi目录下 
+6.启动预先配置好的Eclipse + ADT环境,创建一个Android Project,选择Create project form existring source 
+Location = D:\android-ndk-1.5_r1\apps\hello-jni\project, 直接确认即可开始编译并生成apk文件 
+7.运行这个Project,及可看到效果. 
+8.祝大家好运 
+http://jimychen.javaeye.com/blog/441625

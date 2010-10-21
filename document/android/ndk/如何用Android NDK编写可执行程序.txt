@@ -1,0 +1,112 @@
+大家都知道NDK可以用C/C++为Android编写动态库，这个网络上和NDK里面文档和例子都讲的很清楚。可能有时候需要用C/C++为Android实现一个可执行程序。今天学习了下，其实很简单，基本和编写.so差不多，就是配置有点改变。至于如何搭建NDK开发环境，就不再说了，之前有写过相关的文章（Android学习笔记之NDK开发环境配置（WIN32））。
+
+在写详细步骤之前，强烈建议大家仔细阅读NDK下面的几篇文档“HOWTO.TXT”，“ANDROID-MK.TXT”，“APPLICATION-MK.TXT”。他们分别讲了如何使用NDK，编译脚本语法等等。
+
+言归正传，详细说说我是如何实现helloworld的：
+
+
+在NDK的apps目录下创建helloworld目录，并且创建相关文件，目录结构如下： 
+helloworld
+
+–Application.mk
+
+–project
+
+   –jni
+
+      –Android.mk
+
+      –helloworld.c
+
+Application.mk:
+
+APP_PROJECT_PATH := $(call my-dir)/project   
+  
+APP_MODULES      := helloworld  
+APP_PROJECT_PATH := $(call my-dir)/project
+
+APP_MODULES      := helloworldAndroid.mk: 
+
+view plaincopy to clipboardprint?
+LOCAL_PATH := $(call my-dir)   
+  
+include $(CLEAR_VARS)   
+  
+LOCAL_MODULE    := helloworld   
+LOCAL_SRC_FILES := helloworld.c   
+  
+#include $(BUILD_SHARED_LIBRARY)//编译动态库   
+include $(BUILD_EXECUTABLE)//编译可执行程序  
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := helloworld
+LOCAL_SRC_FILES := helloworld.c
+
+#include $(BUILD_SHARED_LIBRARY)//编译动态库
+include $(BUILD_EXECUTABLE)//编译可执行程序helloworld.c
+
+view plaincopy to clipboardprint?
+#include<STDIO.H>   
+  
+int main(int argc, char *argv[])   
+{   
+  printf("Hello world!\n");   
+  return 0;   
+}  
+#include
+
+int main(int argc, char *argv[])
+{
+  printf("Hello world!\n");
+  return 0;
+} 
+
+编译生成可执行程序（我是在win32下使用cygwin）。启动cygwin，在shell下进入到代码所在的目录（NDK_ROOT），输入：“make APP=helloworld”。 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+在NDK_ROOT/apps/helloworld/project/libs/armeabi/目录有生成了“helloworld”可执行程序。到这里编译已经完成了。
+
+ 
+
+接下来就是把可执行程序复制到目标机器上，我的操作如下： 
+cd NDK_ROOT/apps/helloworld/project/libs/armeabi
+
+adb push /data/helloworld
+
+adb shell
+
+chmod 777 /data/helloworld/helloworld
+
+/data/helloworld/helloworld
+
+如下图，在adb上显示效果
+
+ 
+
+在模拟器上显示效果
+
+ 
+
+OK，全都搞定！
+
+http://www.theiter.com/2010/03/%E7%94%A8android-ndk%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E5%8F%AF%E6%89%A7%E8%A1%8C%E7%A8%8B%E5%BA%8F.html
