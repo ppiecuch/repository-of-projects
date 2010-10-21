@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 
 /**
  * 装备
@@ -25,11 +26,11 @@ import android.graphics.drawable.BitmapDrawable;
 public abstract class Equip implements Drawable,Hittable,Cloneable {
 	
 	private static List<Equip> equips;
-	private static List<Equip> temp;
-	public static final LifeEquip LIFE_EQUIP=new LifeEquip(0,0,10,Gun.PI_1_4,15000);
-	public static final EnergyEquip ENERGY_EQUIP=new EnergyEquip(0,0,10,Gun.PI_1_4,15000);
-	public static final TrackingEquip TRACKING_EQUIP=new TrackingEquip(0,0,10,Gun.PI_1_4,15000);
-	public static final BombEquip BOMB_EQUIP=new BombEquip(0,0,10,Gun.PI_1_4,15000);
+	private static List<Equip> temp=new LinkedList<Equip>();
+	public static final LifeEquip LIFE_EQUIP=new LifeEquip(0,0,5,Gun.PI_1_4,15000);
+	public static final EnergyEquip ENERGY_EQUIP=new EnergyEquip(0,0,5,Gun.PI_1_4,15000);
+	public static final TrackingEquip TRACKING_EQUIP=new TrackingEquip(0,0,5,Gun.PI_1_4,15000);
+	public static final BombEquip BOMB_EQUIP=new BombEquip(0,0,5,Gun.PI_1_4,15000);
 
 	protected List<Bitmap> frames;
 	protected int frameIndex;
@@ -52,20 +53,6 @@ public abstract class Equip implements Drawable,Hittable,Cloneable {
 		this.direction=direction;
 	}
 	
-	public void update(int minX, int minY, int maxX, int maxY){
-		/*判断是否在有效范围*/
-		if(position.x<minX+frames.get(frameIndex).getWidth()||position.x>maxX)
-		{
-			destroy=true;
-			return;
-		}
-		if(position.y<minY+frames.get(frameIndex).getHeight()||position.y>maxY)
-		{
-			destroy=true;
-			return;
-		}
-	}
-	
 	@Override
 	public void draw(Canvas canvas, Paint paint, int minX, int minY, int maxX, int maxY) {
 		/*判断是否在有效期内*/
@@ -80,6 +67,20 @@ public abstract class Equip implements Drawable,Hittable,Cloneable {
 				this.dy=-dy;
 			}
 		}
+		else
+		{
+			/*判断是否在有效范围*/
+			if(position.x<minX+frames.get(frameIndex).getWidth()||position.x>maxX)
+			{
+				destroy=true;
+				return;
+			}
+			if(position.y<minY+frames.get(frameIndex).getHeight()||position.y>maxY)
+			{
+				destroy=true;
+				return;
+			}
+		}
 		position.x+=dx;
 		position.y+=dy;
 		canvas.drawBitmap(frames.get(frameIndex),(float)position.x,(float)position.y,paint);
@@ -91,10 +92,10 @@ public abstract class Equip implements Drawable,Hittable,Cloneable {
 	public static void drawAll(Canvas canvas, Paint paint,int minX,int minY,int maxX,int maxY){
 		if(equips!=null)
 		{
+			Log.d("Equip","temp:"+temp);
 			temp.clear();
 			for(Equip e:equips)
 			{
-				e.update(minX,minY,maxX,maxY);
 				if(e.destroy)
 				{
 					temp.add(e);
@@ -182,7 +183,7 @@ public abstract class Equip implements Drawable,Hittable,Cloneable {
 		case 2:
 			return TRACKING_EQUIP.clone();
 		case 3:
-			return BOMB_EQUIP.clone();
+			return LIFE_EQUIP.clone();
 		}
 		return null;
 	}

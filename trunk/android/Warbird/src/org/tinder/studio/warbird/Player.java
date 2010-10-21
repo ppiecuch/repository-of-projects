@@ -20,6 +20,7 @@ public class Player extends Plane {
 	
 	private int rebirthHealth;
 	private int rebirthX,rebirthY;
+	private int invisiblecounter=0;
 
 	public Player(int x,int y, int health, int camp,int velocity,int life,Bitmap liftIcon) {
 		super(x, y, health, camp, velocity);
@@ -28,6 +29,7 @@ public class Player extends Plane {
 		this.rebirthX=x;
 		this.rebirthY=y;
 		this.lifeIcon=liftIcon;
+		invisiblecounter=30;
 	}
 	
 	public void rebirth(){
@@ -36,7 +38,11 @@ public class Player extends Plane {
 		this.health=rebirthHealth;
 		this.position.x=rebirthX;
 		this.position.y=rebirthY;
+		for(Gun g:guns){
+			g.reset();
+		}
 		this.life--;
+		this.invisiblecounter=30;
 		Log.d("Player","rebirth!!!!!life:"+life);
 	}
 	
@@ -60,7 +66,10 @@ public class Player extends Plane {
 	public void draw(Canvas canvas, Paint paint,int minX,int minY,int maxX,int maxY) {
 		if(destroy)
 			return;
-		super.draw(canvas, paint,minX,minY,maxX,maxY);
+		if(invisiblecounter%2==0)
+			super.draw(canvas, paint,minX,minY,maxX,maxY);
+		if(invisiblecounter>0)
+			invisiblecounter--;
 		for(Gun g:guns)
 			g.fire(Gun.PI_1_2);
 	}
@@ -90,6 +99,10 @@ public class Player extends Plane {
 			this.bombs.set(3,equip);
 		else
 			this.bombs.add(equip);
+	}
+	
+	public boolean isVisible(){
+		return invisiblecounter==0;
 	}
 
 	@Override

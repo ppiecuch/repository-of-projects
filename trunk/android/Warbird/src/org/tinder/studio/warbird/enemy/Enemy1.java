@@ -29,14 +29,14 @@ public class Enemy1 extends Plane {
 	@Override
 	public void die() {
 		super.die();
-		int random=Util.random(1,20);
-		if(random==8)
+		int random=Util.random(1,10);
+		if(random==1)
 		{
 			Equip equip=Equip.generateRandomEquip();
 			equip.setPosition(position.x,position.y);
+			random=Util.random(0, 3);
 			equip.setDirection(Gun.PI_4S_ARRAY[random]);
 			Equip.addEquip(equip);
-			random=Util.random(0, 3);
 		}
 	}
 	

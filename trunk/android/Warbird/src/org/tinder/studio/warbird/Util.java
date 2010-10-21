@@ -117,7 +117,7 @@ public class Util {
 	}
 	
 	public static int random(int start,int end){
-		return random.nextInt(end-start)+start;
+		return random.nextInt(end-start+1)+start;
 	}
 
 }
