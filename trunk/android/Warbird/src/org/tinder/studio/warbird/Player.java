@@ -1,5 +1,9 @@
 package org.tinder.studio.warbird;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.tinder.studio.warbird.equip.BombEquip;
 import org.tinder.studio.warbird.gun.Gun;
 
 import android.graphics.Bitmap;
@@ -11,6 +15,8 @@ public class Player extends Plane {
 	
 	private int life;
 	private Bitmap lifeIcon;
+	private List<BombEquip> bombs;
+	
 	
 	private int rebirthHealth;
 	private int rebirthX,rebirthY;
@@ -74,6 +80,16 @@ public class Player extends Plane {
 	public void increateLife() {
 		if(this.life<5)
 			this.life++;
+	}
+	
+	public void addBomb(BombEquip equip)
+	{
+		if(this.bombs==null)
+			this.bombs=new LinkedList<BombEquip>();
+		if(this.bombs.size()>=4)
+			this.bombs.set(3,equip);
+		else
+			this.bombs.add(equip);
 	}
 
 	@Override

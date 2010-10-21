@@ -6,6 +6,7 @@ import org.tinder.studio.warbird.Feature;
 import org.tinder.studio.warbird.GameView;
 import org.tinder.studio.warbird.KeyCache;
 import org.tinder.studio.warbird.Plane;
+import org.tinder.studio.warbird.equip.Equip;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -31,6 +32,7 @@ public class GameMode implements Mode {
 		}
 		view.getBg().draw(canvas, paint, minX, minY, maxX, maxY);
 		checkCollision();
+		Equip.drawAll(canvas, paint, minX, minY, maxX, maxY);
 		Bullet.drawAll(canvas, paint,minX,minY,maxX,maxY);
 		Plane.drawAllEnemies(canvas, paint, minX, minY, maxX, maxY);
 		view.getPlayer().draw(canvas, paint,minX,minY,maxX,maxY);
@@ -87,6 +89,16 @@ public class GameMode implements Mode {
 	}
 	
 	private void checkCollision(){
+		/*检测物品与飞机的碰撞*/
+		for(Equip e:Equip.getEquips())
+		{
+			if(e.isDestroy())
+				continue;
+			if(e.intersect(view.getPlayer()))
+			{
+				e.equip(view.getPlayer());
+			}
+		}
 		/*检测子弹与飞机的碰撞*/
 		for(Bullet b:Bullet.getBullets())
 		{

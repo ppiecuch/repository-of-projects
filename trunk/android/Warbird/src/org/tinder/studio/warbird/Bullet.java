@@ -110,6 +110,11 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 			return false;
 //		return false;
 		Bitmap bitmap=plane.getFrame();
+		int max=Math.max(bitmap.getWidth()+feature.getFrames().get(frameIndex).getWidth(),bitmap.getHeight()+feature.getFrames().get(frameIndex).getHeight());
+		int distanceX=plane.getPosition().x-this.position.x;
+		int distanceY=plane.getPosition().y-this.position.y;
+		if(distanceX*distanceX+distanceY*distanceY>max*max)
+			return false;
 		BitmapDrawable b1=new BitmapDrawable(this.feature.getFrames().get(frameIndex));
 		BitmapDrawable b2=new BitmapDrawable(bitmap);
 		b1.setBounds(this.position.x,this.position.y,this.position.x+b1.getIntrinsicWidth(),this.position.y+b1.getIntrinsicHeight());

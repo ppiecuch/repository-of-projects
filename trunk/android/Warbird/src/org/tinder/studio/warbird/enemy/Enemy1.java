@@ -1,6 +1,8 @@
 package org.tinder.studio.warbird.enemy;
 
 import org.tinder.studio.warbird.Plane;
+import org.tinder.studio.warbird.Util;
+import org.tinder.studio.warbird.equip.Equip;
 import org.tinder.studio.warbird.gun.Gun;
 import org.tinder.studio.warbird.path.Path;
 
@@ -25,6 +27,20 @@ public class Enemy1 extends Plane {
 	}
 	
 	@Override
+	public void die() {
+		super.die();
+		int random=Util.random(1,20);
+		if(random==8)
+		{
+			Equip equip=Equip.generateRandomEquip();
+			equip.setPosition(position.x,position.y);
+			equip.setDirection(Gun.PI_4S_ARRAY[random]);
+			Equip.addEquip(equip);
+			random=Util.random(0, 3);
+		}
+	}
+	
+	@Override
 	public void draw(Canvas canvas, Paint paint,int minX,int minY,int maxX,int maxY) {
 		update();
 		super.draw(canvas, paint,minX,minY,maxX,maxY);
@@ -34,7 +50,6 @@ public class Enemy1 extends Plane {
 
 	@Override
 	public int getImpact() {
-		// TODO Auto-generated method stub
 		return 100;
 	}
 	

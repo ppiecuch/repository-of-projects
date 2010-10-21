@@ -8,14 +8,20 @@ import org.tinder.studio.warbird.gun.Gun;
 
 public class EnergyEquip extends Equip {
 
-	public EnergyEquip(int x, int y, int velocity, double direction,
-			long validity) {
+	public EnergyEquip(double x, double y, int velocity, double direction,long validity) {
 		super(x, y, velocity, direction, validity);
-		// TODO Auto-generated constructor stub
+	}
+	
+	@Override
+	protected EnergyEquip clone(){
+		EnergyEquip equip=new EnergyEquip(position.x,position.y, velocity, direction, validity);
+		equip.frames=frames;
+		return equip;
 	}
 
 	@Override
 	public void equip(Player player) {
+		destroy=true;
 		List<Gun> guns=player.getGuns();
 		for(Gun g:guns)
 		{
