@@ -37,6 +37,15 @@ public class Boss extends Plane {
 		Effect.addEffect(new Effect(x-20,y,Effect.FRAMES_2,-17));
 		Effect.addEffect(new Effect(x-20,y+20,Effect.FRAMES_2,-2));
 		Effect.addEffect(new Effect(x-20,y-20,Effect.FRAMES_2,-7));
+		Effect.addEffect(new Effect(x,y,Effect.FRAMES_2,-6));
+		Effect.addEffect(new Effect(x,y+30,Effect.FRAMES_2,-15));
+		Effect.addEffect(new Effect(x,y-30,Effect.FRAMES_2,-22));
+		Effect.addEffect(new Effect(x+25,y,Effect.FRAMES_2,-17));
+		Effect.addEffect(new Effect(x+25,y+25,Effect.FRAMES_2,-16));
+		Effect.addEffect(new Effect(x+15,y-25,Effect.FRAMES_2,-23));
+		Effect.addEffect(new Effect(x-15,y,Effect.FRAMES_2,-19));
+		Effect.addEffect(new Effect(x-20,y+15,Effect.FRAMES_2,-12));
+		Effect.addEffect(new Effect(x-20,y-15,Effect.FRAMES_2,-12));
 		destroy=true;
 		Log.d("Boss","die:"+this);
 	}

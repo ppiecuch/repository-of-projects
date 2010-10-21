@@ -22,20 +22,20 @@ public class LevelGun extends Gun {
 			switch(level)
 			{
 			case 5:
-				Bullet.addBullet(new Bullet(x-20,y,velocity,direction,feature));
-				Bullet.addBullet(new Bullet(x+20,y,velocity,direction,feature));
+				Bullet.addBullet(new Bullet(x-30,y,velocity+level,direction,feature));
+				Bullet.addBullet(new Bullet(x+30,y,velocity+level,direction,feature));
 			case 3:
-				Bullet.addBullet(new Bullet(x-10,y,velocity,direction,feature));
-				Bullet.addBullet(new Bullet(x+10,y,velocity,direction,feature));
+				Bullet.addBullet(new Bullet(x-20,y,velocity+level,direction,feature));
+				Bullet.addBullet(new Bullet(x+20,y,velocity+level,direction,feature));
 			case 1:
-				Bullet.addBullet(new Bullet(x,y,velocity,direction,feature));
+				Bullet.addBullet(new Bullet(x,y,velocity+level,direction,feature));
 				break;
 			case 4:
-				Bullet.addBullet(new Bullet(x-15,y,velocity,direction,feature));
-				Bullet.addBullet(new Bullet(x+15,y,velocity,direction,feature));
+				Bullet.addBullet(new Bullet(x-20,y,velocity+level,direction,feature));
+				Bullet.addBullet(new Bullet(x+20,y,velocity+level,direction,feature));
 			case 2:
-				Bullet.addBullet(new Bullet(x-5,y,velocity,direction,feature));
-				Bullet.addBullet(new Bullet(x+5,y,velocity,direction,feature));
+				Bullet.addBullet(new Bullet(x-10,y,velocity+level,direction,feature));
+				Bullet.addBullet(new Bullet(x+10,y,velocity+level,direction,feature));
 			}
 		}
 			

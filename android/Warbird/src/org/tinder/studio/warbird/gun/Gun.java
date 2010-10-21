@@ -43,6 +43,11 @@ public abstract class Gun implements Cloneable {
 		this.host = host;
 	}
 	
+	public void reset(){
+		this.counter=0;
+		this.level=1;
+	}
+	
 	public Gun clone() {
 		return null;
 	}

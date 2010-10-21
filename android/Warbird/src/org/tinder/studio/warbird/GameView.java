@@ -7,6 +7,7 @@ import org.tinder.studio.warbird.enemy.Boss;
 import org.tinder.studio.warbird.enemy.Command;
 import org.tinder.studio.warbird.enemy.Commander;
 import org.tinder.studio.warbird.enemy.Enemy1;
+import org.tinder.studio.warbird.equip.Equip;
 import org.tinder.studio.warbird.gun.Gun;
 import org.tinder.studio.warbird.gun.LevelCGun;
 import org.tinder.studio.warbird.gun.LevelDGun;
@@ -63,6 +64,10 @@ public class GameView extends View implements Runnable{
 	private int[] p2Icon={0,166,26,20};
 	private int[] bossCoor={347,132,167,116};
 	private int[][] tb={{287,50,12,29},{313,56,19,19},{337,59,30,12},{372,56,19,19},{407,50,11,29},{432,54,20,20},{458,59,30,12},{493,56,19,18}};
+	private int[] lifeEquip={184,108,25,26};
+	private int[] energyEquip={185,79,24,24};
+	private int[] trackingEquip={213,108,28,26};
+	private int[] bombEquip={213,81,25,24};
 	
 //	private Bitmap[] players;
 //	private Bitmap bullet;
@@ -133,7 +138,7 @@ public class GameView extends View implements Runnable{
 		Path loopXPath=new LoopXPath(0, width-180,2);
 		
 		/*初始化Gun*/
-		Gun gun=new LevelGun(Feature.FEATURE_1,5,15,1);
+		energyGun=new LevelGun(Feature.FEATURE_1,5,15,1);
 		Gun gunE1=new LevelGun(Feature.FEATURE_E1,15,5,1);
 		Gun gunE2=new LevelAGun(Feature.FEATURE_E1,50,5,1);
 		Gun gunE3=new LevelBGun(Feature.FEATURE_E1,20,5,1);
@@ -200,6 +205,16 @@ public class GameView extends View implements Runnable{
 			Feature.FEATURE_2.addFrame(Bitmap.createBitmap(bmp,tb[i][0],tb[i][1],tb[i][2],tb[i][3]));
 		}
 		
+		/*初始化Equip*/
+		Bitmap life=Bitmap.createBitmap(bmp,lifeEquip[0],lifeEquip[1],lifeEquip[2],lifeEquip[3]);
+		Equip.LIFE_EQUIP.addFrame(life);
+		Bitmap energy=Bitmap.createBitmap(bmp,energyEquip[0],energyEquip[1],energyEquip[2],energyEquip[3]);
+		Equip.ENERGY_EQUIP.addFrame(energy);
+		Bitmap tracking=Bitmap.createBitmap(bmp,trackingEquip[0],trackingEquip[1],trackingEquip[2],trackingEquip[3]);
+		Equip.TRACKING_EQUIP.addFrame(tracking);
+		Bitmap bomb=Bitmap.createBitmap(bmp,bombEquip[0],bombEquip[1],bombEquip[2],bombEquip[3]);
+		Equip.BOMB_EQUIP.addFrame(bomb);
+		
 		
 		/*初始化Effect*/
 		for(int i=0;i<explode1.length;i++)
@@ -207,7 +222,7 @@ public class GameView extends View implements Runnable{
 		for(int i=0;i<explode2.length;i++)
 			Effect.FRAMES_2.add(Bitmap.createBitmap(bmp,explode2[i][0],explode2[i][1],explode2[i][2],explode2[i][3]));
 		
-		player.addGun(gun);
+		player.addGun(energyGun);
 		player.addGun(trackingGun);
 		
 		
@@ -242,9 +257,9 @@ public class GameView extends View implements Runnable{
 		
 		commander.addCommand("e1",10000);
 		commander.addCommand("e2",0);
-		commander.addCommand("e1",20000);
+		commander.addCommand("e1",10000);
 		commander.addCommand("e2",0);
-		commander.addCommand("b1",10000);
+		commander.addCommand("b1",20000);
 		
 		
 		commander.start();

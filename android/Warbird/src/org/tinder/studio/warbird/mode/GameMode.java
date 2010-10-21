@@ -90,13 +90,16 @@ public class GameMode implements Mode {
 	
 	private void checkCollision(){
 		/*检测物品与飞机的碰撞*/
-		for(Equip e:Equip.getEquips())
+		if(Equip.getEquips()!=null)
 		{
-			if(e.isDestroy())
-				continue;
-			if(e.intersect(view.getPlayer()))
+			for(Equip e:Equip.getEquips())
 			{
-				e.equip(view.getPlayer());
+				if(e.isDestroy()||view.getPlayer().isDestroy())
+					continue;
+				if(e.intersect(view.getPlayer()))
+				{
+					e.equip(view.getPlayer());
+				}
 			}
 		}
 		/*检测子弹与飞机的碰撞*/
@@ -107,7 +110,7 @@ public class GameMode implements Mode {
 				switch(b.getFeature().getCamp())
 				{
 				case Feature.CAMP_BLACK:
-					if(view.getPlayer().isDestroy())
+					if(view.getPlayer().isDestroy()||view.getPlayer().isVisible()==false)
 						continue;
 					if(b.intersect(view.getPlayer()))
 					{
@@ -136,7 +139,7 @@ public class GameMode implements Mode {
 		synchronized (Plane.LOCK_ENEMY) {
 			for(Plane p:Plane.getEnemies())
 			{
-				if(view.getPlayer().isDestroy())
+				if(view.getPlayer().isDestroy()||view.getPlayer().isVisible()==false)
 					break;
 				if(p.isDestroy())
 					continue;

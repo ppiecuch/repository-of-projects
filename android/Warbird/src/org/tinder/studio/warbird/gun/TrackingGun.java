@@ -33,7 +33,7 @@ public class TrackingGun extends Gun {
 			case 1:
 				if(Plane.getEnemies().size()>0)
 				{
-					int index=Util.random(0,Plane.getEnemies().size());
+					int index=Util.random(0,Plane.getEnemies().size()-1);
 					Log.d("TrackingGun","target enemy:"+index);
 					target1=Plane.getEnemies().get(index);
 				}
@@ -42,8 +42,8 @@ public class TrackingGun extends Gun {
 			case 2:
 				if(Plane.getEnemies().size()>0)
 				{
-					int index1=Util.random(0,Plane.getEnemies().size());
-					int index2=Util.random(0,Plane.getEnemies().size());
+					int index1=Util.random(0,Plane.getEnemies().size()-1);
+					int index2=Util.random(0,Plane.getEnemies().size()-1);
 					Log.d("TrackingGun","target enemy:"+index1+","+index2);
 					target1=Plane.getEnemies().get(index1);
 					target2=Plane.getEnemies().get(index2);
@@ -54,13 +54,13 @@ public class TrackingGun extends Gun {
 			case 3:
 				if(Plane.getEnemies().size()>0)
 				{
-					int index1=Util.random(0,Plane.getEnemies().size());
-					int index2=Util.random(0,Plane.getEnemies().size());
-					int index3=Util.random(0,Plane.getEnemies().size());
+					int index1=Util.random(0,Plane.getEnemies().size()-1);
+					int index2=Util.random(0,Plane.getEnemies().size()-1);
+					int index3=Util.random(0,Plane.getEnemies().size()-1);
 					Log.d("TrackingGun","target enemy:"+index1+","+index2+","+index3);
 					target1=Plane.getEnemies().get(index1);
 					target2=Plane.getEnemies().get(index2);
-					target2=Plane.getEnemies().get(index3);
+					target3=Plane.getEnemies().get(index3);
 				}
 				Bullet.addBullet(new TrackingBullet(x-15,y,velocity,direction,feature,Gun.PI_1_32,target1));
 				Bullet.addBullet(new TrackingBullet(x,y,velocity,direction,feature,Gun.PI_1_32,target2));
