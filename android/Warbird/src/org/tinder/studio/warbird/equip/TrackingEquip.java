@@ -8,14 +8,20 @@ import org.tinder.studio.warbird.gun.Gun;
 
 public class TrackingEquip extends Equip {
 
-	public TrackingEquip(int x, int y, int velocity, double direction,
-			long validity) {
+	public TrackingEquip(double x, double y, int velocity, double direction,long validity) {
 		super(x, y, velocity, direction, validity);
-		// TODO Auto-generated constructor stub
+	}
+	
+	@Override
+	protected TrackingEquip clone() {
+		TrackingEquip equip=new TrackingEquip(position.x, position.y, velocity, direction, validity);
+		equip.frames=frames;
+		return equip;
 	}
 
 	@Override
 	public void equip(Player player) {
+		destroy=true;
 		List<Gun> guns=player.getGuns();
 		for(Gun g:guns)
 		{

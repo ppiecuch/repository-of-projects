@@ -23,6 +23,7 @@ public abstract class Gun implements Cloneable {
 	public static final double PI_15_8=15*Math.PI/8;
 	public static final double PI_1_64=Math.PI/64;
 	public static final double PI_1_32=Math.PI/32;
+	public static final double[] PI_4S_ARRAY=new double[]{PI_1_4,PI_3_4,PI_5_4,PI_7_4};
 	
 	protected Feature feature;//×Óµ¯ÌØÐÔ
 	protected Plane host;
