@@ -10,5 +10,10 @@ public class Point2D {
 	}
 	
 	public double x,y;
+	
+	@Override
+	public String toString() {
+		return "[x:"+x+",y:"+y+"]";
+	}
 
 }

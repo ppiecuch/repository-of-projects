@@ -3,6 +3,7 @@ package org.tinder.studio.warbird;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.tinder.studio.warbird.equip.Equip;
 import org.tinder.studio.warbird.gun.Gun;
 
 import android.graphics.Bitmap;
@@ -17,6 +18,7 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 	private static List<Plane> enemies=new LinkedList<Plane>();
 	public static final byte[] LOCK_ENEMY=new byte[0];
 	private static List<Plane> temp=new LinkedList<Plane>();
+	private List<Equip> awards;
 	
 	protected Point position;
 	protected int health;
@@ -25,6 +27,7 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 	protected List<Bitmap> frames;
 	protected int velocity;
 	protected boolean destroy;
+	protected boolean attackable;
 	
 	protected int frameIndex;
 	protected int dv,sdv;
@@ -38,6 +41,7 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 		this.dv=velocity;
 		this.velocity=velocity;
 		this.sdv=(int) (velocity/1.414f);
+		this.attackable=true;
 	}
 	
 	public void resetFrameIndex(){
@@ -167,6 +171,16 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 		int x=position.x+(frames.get(frameIndex).getWidth()-Effect.FRAMES_2.get(0).getWidth())/2;
 		int y=position.y+(frames.get(frameIndex).getHeight()-Effect.FRAMES_2.get(0).getHeight())/2;
 		Effect.addEffect(new Effect(x,y,Effect.FRAMES_2));
+		if(awards!=null)
+		{
+			for(Equip equip:awards)
+			{
+				equip.setPosition(position.x,position.y);
+				int random=Util.random(0, 3);
+				equip.setDirection(Gun.PI_4S_ARRAY[random]);
+				Equip.addEquip(equip);
+			}
+		}
 		destroy=true;
 		Log.d("Plane","die:"+this);
 	}
@@ -238,7 +252,17 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 		return b1.getBounds().intersect(b2.getBounds());
 	}
 	
-	
+	public boolean isAttackable() {
+		return attackable;
+	}
+
+	public void setAttackable(boolean attackable) {
+		this.attackable = attackable;
+	}
+
+	public void setAwards(List<Equip> awards) {
+		this.awards = awards;
+	}
 
 	public void setFrames(List<Bitmap> frames) {
 		this.frames = frames;

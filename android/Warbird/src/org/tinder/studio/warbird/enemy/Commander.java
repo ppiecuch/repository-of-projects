@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.tinder.studio.warbird.Plane;
+import org.tinder.studio.warbird.equip.Equip;
 
 import android.util.Log;
 
@@ -29,8 +30,10 @@ public class Commander extends Thread{
 			commands=new LinkedList<Command>();
 		commands.add(command);
 	}
-	public void addCommand(String type,int delay){
-		addCommand(new Command(type,delay));
+	public Command addCommand(String type,int delay,boolean luck){
+		Command command=new Command(type,delay,luck);
+		addCommand(command);
+		return command;
 	}
 	
 	@Override
@@ -44,6 +47,7 @@ public class Commander extends Thread{
 					e.printStackTrace();
 				}
 				Plane plane=map.get(c.type).clone();
+				plane.setAwards(c.getAwards());
 				Log.d("Commander","execute command:"+c+",add:"+plane);
 				synchronized (Plane.LOCK_ENEMY) {
 					Plane.getEnemies().add(plane);
