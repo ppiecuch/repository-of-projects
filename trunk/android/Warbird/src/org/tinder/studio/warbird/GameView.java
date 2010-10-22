@@ -242,24 +242,24 @@ public class GameView extends View implements Runnable{
 		
 		
 		
-		commander.addCommand("e3",1000);
-		commander.addCommand("e4",0);
-		commander.addCommand("e5",4000);
-		commander.addCommand("e6",0);
-		commander.addCommand("e7",4000);
-		commander.addCommand("e8",0);
-		commander.addCommand("e7",4000);
-		commander.addCommand("e8",0);
-		commander.addCommand("e5",4000);
-		commander.addCommand("e6",0);
-		commander.addCommand("e3",4000);
-		commander.addCommand("e4",0);
+		commander.addCommand("e3",1000,true);
+		commander.addCommand("e4",0,false);
+		commander.addCommand("e5",4000,false);
+		commander.addCommand("e6",0,true);
+		commander.addCommand("e7",4000,true);
+		commander.addCommand("e8",0,false);
+		commander.addCommand("e7",4000,false);
+		commander.addCommand("e8",0,true);
+		commander.addCommand("e5",4000,true);
+		commander.addCommand("e6",0,false);
+		commander.addCommand("e3",4000,false);
+		commander.addCommand("e4",0,true);
 		
-		commander.addCommand("e1",10000);
-		commander.addCommand("e2",0);
-		commander.addCommand("e1",10000);
-		commander.addCommand("e2",0);
-		commander.addCommand("b1",20000);
+		commander.addCommand("e1",10000,true);
+		commander.addCommand("e2",0,true);
+		commander.addCommand("e1",10000,true);
+		commander.addCommand("e2",0,true);
+		commander.addCommand("b1",20000,false).addAward(Equip.generateRandomEquip()).addAward(Equip.generateRandomEquip());
 		
 		
 		commander.start();

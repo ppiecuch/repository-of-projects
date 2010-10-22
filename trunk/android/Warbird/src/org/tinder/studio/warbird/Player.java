@@ -70,8 +70,11 @@ public class Player extends Plane {
 			super.draw(canvas, paint,minX,minY,maxX,maxY);
 		if(invisiblecounter>0)
 			invisiblecounter--;
-		for(Gun g:guns)
-			g.fire(Gun.PI_1_2);
+		if(attackable)
+		{
+			for(Gun g:guns)
+				g.fire(Gun.PI_1_2);
+		}
 	}
 	
 	public void drawLifeIcon(Canvas canvas, Paint paint,int minX,int minY,int maxX,int maxY) {
