@@ -19,7 +19,7 @@ public class Command {
 		if(luck)
 		{
 			if(Util.random(1,10)==1){
-				awards.add(Equip.generateRandomEquip());
+				addAward(Equip.generateRandomEquip());
 			}
 		}
 	}

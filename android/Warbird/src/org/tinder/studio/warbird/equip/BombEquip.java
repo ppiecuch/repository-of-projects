@@ -9,7 +9,7 @@ public class BombEquip extends Equip {
 	}
 	
 	@Override
-	protected BombEquip clone() {
+	public BombEquip clone() {
 		BombEquip equip=new BombEquip(position.x, position.y, velocity, direction, validity);
 		equip.frames=frames;
 		return equip;

@@ -3,6 +3,7 @@ package org.tinder.studio.warbird;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.tinder.studio.warbird.enemy.Command;
 import org.tinder.studio.warbird.equip.Equip;
 import org.tinder.studio.warbird.gun.Gun;
 
@@ -18,9 +19,9 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 	private static List<Plane> enemies=new LinkedList<Plane>();
 	public static final byte[] LOCK_ENEMY=new byte[0];
 	private static List<Plane> temp=new LinkedList<Plane>();
-	private List<Equip> awards;
+	protected List<Equip> awards;
 	
-	protected Point position;
+	protected Point2D position;
 	protected int health;
 	protected List<Gun> guns;
 	protected int camp;
@@ -32,8 +33,8 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 	protected int frameIndex;
 	protected int dv,sdv;
 	
-	public Plane(int x,int y,int health,int camp,int velocity){
-		this.position=new Point(x,y);
+	public Plane(double x,double y,int health,int camp,int velocity){
+		this.position=new Point2D(x,y);
 		this.health=health;
 		this.camp=camp;
 		this.destroy=false;
@@ -158,18 +159,18 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 	
 	@Override
 	public void draw(Canvas canvas,Paint paint,int minX,int minY,int maxX,int maxY) {
-		canvas.drawBitmap(frames.get(frameIndex),position.x,position.y,paint);
+		canvas.drawBitmap(frames.get(frameIndex),(int)position.x,(int)position.y,paint);
 	}
 	
 	
 	
-	public Point getPosition() {
+	public Point2D getPosition() {
 		return position;
 	}
 
 	public void die(){
-		int x=position.x+(frames.get(frameIndex).getWidth()-Effect.FRAMES_2.get(0).getWidth())/2;
-		int y=position.y+(frames.get(frameIndex).getHeight()-Effect.FRAMES_2.get(0).getHeight())/2;
+		int x=(int) (position.x+(frames.get(frameIndex).getWidth()-Effect.FRAMES_2.get(0).getWidth())/2);
+		int y=(int) (position.y+(frames.get(frameIndex).getHeight()-Effect.FRAMES_2.get(0).getHeight())/2);
 		Effect.addEffect(new Effect(x,y,Effect.FRAMES_2));
 		if(awards!=null)
 		{
@@ -200,12 +201,12 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 
 	@Override
 	public int getHitX() {
-		return position.x;
+		return (int) position.x;
 	}
 	
 	@Override
 	public int getHitY() {
-		return position.y;
+		return (int) position.y;
 	}
 
 	
@@ -240,14 +241,14 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 			return false;
 		Bitmap bitmap=plane.getFrame();
 		int max=Math.max(bitmap.getWidth()+frames.get(frameIndex).getWidth(),bitmap.getHeight()+frames.get(frameIndex).getHeight());
-		int distanceX=plane.getPosition().x-this.position.x;
-		int distanceY=plane.getPosition().y-this.position.y;
+		double distanceX=plane.getPosition().x-this.position.x;
+		double distanceY=plane.getPosition().y-this.position.y;
 		if(distanceX*distanceX+distanceY*distanceY>max*max)
 			return false;
 		BitmapDrawable b1=new BitmapDrawable(getFrame());
 		BitmapDrawable b2=new BitmapDrawable(bitmap);
-		b1.setBounds(this.position.x,this.position.y,this.position.x+b1.getIntrinsicWidth(),this.position.y+b1.getIntrinsicHeight());
-		b2.setBounds(plane.getPosition().x,plane.getPosition().y,plane.getPosition().x+b2.getIntrinsicWidth(),plane.getPosition().y+b2.getIntrinsicHeight());
+		b1.setBounds((int)this.position.x,(int)this.position.y,(int)this.position.x+b1.getIntrinsicWidth(),(int)this.position.y+b1.getIntrinsicHeight());
+		b2.setBounds((int)plane.getPosition().x,(int)plane.getPosition().y,(int)plane.getPosition().x+b2.getIntrinsicWidth(),(int)plane.getPosition().y+b2.getIntrinsicHeight());
 //		Log.d("Enemy1",b1.getBounds().toShortString()+",b2:"+b2.getBounds().toShortString()+"="+b1.getBounds().intersect(b2.getBounds()));
 		return b1.getBounds().intersect(b2.getBounds());
 	}
@@ -266,6 +267,12 @@ public abstract class Plane implements Hittable,Drawable,Cloneable {
 
 	public void setFrames(List<Bitmap> frames) {
 		this.frames = frames;
+	}
+	
+	public void addAward(Equip equip){
+		if(this.awards==null)
+			this.awards=new LinkedList<Equip>();
+		this.awards.add(equip);
 	}
 
 	@Override

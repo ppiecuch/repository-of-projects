@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 
 public class Enemy1 extends Plane {
 	
@@ -17,13 +18,14 @@ public class Enemy1 extends Plane {
 	private Path path;
 	
 
-	public Enemy1(int x, int y, int health, int camp, int velocity,Path path) {
+	public Enemy1(double x, double y, int health, int camp, int velocity,Path path) {
 		super(x, y, health, camp, velocity);
 		this.path=path;
 	}
 	
 	private void update(){
-		path.getNextPosition(position, velocity);
+		if(path.getNextPosition(position, velocity)==false)
+			destroy=true;
 	}
 	
 	@Override

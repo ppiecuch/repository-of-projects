@@ -90,8 +90,8 @@ public class Util {
 	 * @param y
 	 * @return
 	 */
-	public static float modulus(int x,int y){
-		return (float) Math.sqrt(x*x+y*y);
+	public static double modulus(double x,double y){
+		return Math.sqrt(x*x+y*y);
 	}
 	
 	/**

@@ -48,7 +48,6 @@ public abstract class Equip implements Drawable,Hittable,Cloneable {
 		this.velocity=velocity;
 		this.validity=validity;
 		this.frameIndex=0;
-		this.startTime=new Date().getTime();
 		this.destroy=false;
 		this.direction=direction;
 	}
@@ -116,11 +115,12 @@ public abstract class Equip implements Drawable,Hittable,Cloneable {
 	public static void addEquip(Equip equip){
 		if(equips==null)
 			equips=new LinkedList<Equip>();
+		equip.startTime=new Date().getTime();
 		equips.add(equip);
 	}
 	
 	@Override
-	protected Equip clone() {
+	public Equip clone() {
 		return null;
 	}
 	
@@ -135,7 +135,7 @@ public abstract class Equip implements Drawable,Hittable,Cloneable {
 		BitmapDrawable b1=new BitmapDrawable(frames.get(frameIndex));
 		BitmapDrawable b2=new BitmapDrawable(bitmap);
 		b1.setBounds((int)this.position.x,(int)this.position.y,(int)this.position.x+b1.getIntrinsicWidth(),(int)this.position.y+b1.getIntrinsicHeight());
-		b2.setBounds(plane.getPosition().x,plane.getPosition().y,plane.getPosition().x+b2.getIntrinsicWidth(),plane.getPosition().y+b2.getIntrinsicHeight());
+		b2.setBounds((int)plane.getPosition().x,(int)plane.getPosition().y,(int)plane.getPosition().x+b2.getIntrinsicWidth(),(int)plane.getPosition().y+b2.getIntrinsicHeight());
 //		Log.d("Equip",b1.getBounds().toShortString()+",b2:"+b2.getBounds().toShortString()+"="+b1.getBounds().intersect(b2.getBounds()));
 		return b1.getBounds().intersect(b2.getBounds());
 	}

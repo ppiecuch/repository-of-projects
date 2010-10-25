@@ -5,6 +5,7 @@ import java.util.List;
 import org.tinder.studio.warbird.GameView;
 import org.tinder.studio.warbird.Player;
 import org.tinder.studio.warbird.gun.Gun;
+import org.tinder.studio.warbird.mode.GameMode;
 
 public class EnergyEquip extends Equip {
 
@@ -13,7 +14,7 @@ public class EnergyEquip extends Equip {
 	}
 	
 	@Override
-	protected EnergyEquip clone(){
+	public EnergyEquip clone(){
 		EnergyEquip equip=new EnergyEquip(position.x,position.y, velocity, direction, validity);
 		equip.frames=frames;
 		return equip;
@@ -25,7 +26,7 @@ public class EnergyEquip extends Equip {
 		List<Gun> guns=player.getGuns();
 		for(Gun g:guns)
 		{
-			if(g.equals(GameView.energyGun))
+			if(g.equals(GameMode.energyGun))
 			{
 				g.increaseLevel();
 				return;

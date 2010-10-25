@@ -8,6 +8,7 @@ public abstract class Gun implements Cloneable {
 	public static final double PI_1_2=Math.PI/2;
 	public static final double PI_3_2=3*Math.PI/2;
 	public static final double PI2=Math.PI*2;
+	public static final double PI4=Math.PI*4;
 	public static final double PI_1_16=Math.PI/16;
 	public static final double PI_1_8=Math.PI/8;
 	public static final double PI_3_8=3*Math.PI/8;
@@ -57,7 +58,12 @@ public abstract class Gun implements Cloneable {
 		return o.getClass()==this.getClass();
 	}
 
-	public abstract void fire(double direction);
+	/**
+	 * 开火,如果当前火力发完返回true,否则返回false
+	 * @param direction 向什么方向开火
+	 * @return
+	 */
+	public abstract boolean fire(double direction);
 	public abstract void increaseLevel();
 	public abstract void maxLevel();
 

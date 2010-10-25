@@ -5,22 +5,27 @@ import org.tinder.studio.warbird.Feature;
 
 public class LevelDGun extends Gun {
 
-	private float offset=0.0f;
+	private double offset=Gun.PI4;
 	public LevelDGun(Feature feature, int frequence, int velocity, int level) {
 		super(feature, frequence, velocity, level);
 	}
 
 	@Override
-	public void fire(double direction) {
-		if(counter++%frequence==0)
+	public boolean fire(double direction) {
+		if(offset>0)
 		{
-			int x=host.getPosition().x+host.getFrame().getWidth()/2-feature.getFrames().get(0).getWidth()/2;
-			int y=host.getPosition().y;
+			double x=host.getPosition().x+host.getFrame().getWidth()/2-feature.getFrames().get(0).getWidth()/2;
+			double y=host.getPosition().y;
 			if(direction==Gun.PI_3_2)
 				y+=+host.getFrame().getHeight();
-			for(float i=0.0f;i<Gun.PI2;i+=Gun.PI_1_8)
-				Bullet.addBullet(new Bullet(x,y+feature.getFrames().get(0).getHeight(),velocity,i+offset,feature));
-			offset+=Gun.PI_1_16;
+			Bullet.addBullet(new Bullet(x,y+feature.getFrames().get(0).getHeight()-15,velocity,offset-Gun.PI_1_4,feature));
+			offset-=Gun.PI_1_8;
+			return false;
+		}
+		else
+		{
+			offset=Gun.PI4;
+			return true;
 		}
 			
 	}
