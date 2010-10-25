@@ -9,7 +9,7 @@ public class LifeEquip extends Equip {
 	}
 	
 	@Override
-	protected LifeEquip clone(){
+	public LifeEquip clone(){
 		LifeEquip equip=new LifeEquip(position.x, position.y, velocity, direction, validity);
 		equip.frames=frames;
 		return equip;

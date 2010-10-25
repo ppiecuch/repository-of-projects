@@ -15,7 +15,7 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 	private static List<Bullet> bullets=new LinkedList<Bullet>();
 	
 	protected double dx,dy;
-	protected Point position;
+	protected Point2D position;
 	protected Feature feature;
 	protected boolean destroy;
 	
@@ -23,10 +23,10 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 	
 	private static List<Bullet> temp=new LinkedList<Bullet>();
 	
-	public Bullet(int x,int y,int velocity,double direction,Feature feature){
+	public Bullet(double x,double y,int velocity,double direction,Feature feature){
 		this.dx=Math.cos(direction)*velocity;
 		this.dy=-Math.sin(direction)*velocity;
-		this.position=new Point(x,y);
+		this.position=new Point2D(x,y);
 		this.feature=feature;
 		this.frameIndex=0;
 	}
@@ -39,7 +39,7 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 
 	@Override
 	public void draw(Canvas canvas, Paint paint,int minX,int minY,int maxX,int maxY) {
-		canvas.drawBitmap(feature.getFrames().get(frameIndex),position.x,position.y,paint);
+		canvas.drawBitmap(feature.getFrames().get(frameIndex),(int)position.x,(int)position.y,paint);
 		
 	}
 	
@@ -72,17 +72,17 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 		return bullets;
 	}
 	
-	public Point getPosition(){
+	public Point2D getPosition(){
 		return position;
 	}
 	
 	public int getX(){
-		return position.x;
+		return (int) position.x;
 	}
 	
 	public int getY()
 	{
-		return position.y;
+		return (int) position.y;
 	}
 	
 	public static void drawAll(Canvas canvas, Paint paint,int minX,int minY,int maxX,int maxY){
@@ -111,14 +111,14 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 //		return false;
 		Bitmap bitmap=plane.getFrame();
 		int max=Math.max(bitmap.getWidth()+feature.getFrames().get(frameIndex).getWidth(),bitmap.getHeight()+feature.getFrames().get(frameIndex).getHeight());
-		int distanceX=plane.getPosition().x-this.position.x;
-		int distanceY=plane.getPosition().y-this.position.y;
+		double distanceX=plane.getPosition().x-this.position.x;
+		double distanceY=plane.getPosition().y-this.position.y;
 		if(distanceX*distanceX+distanceY*distanceY>max*max)
 			return false;
 		BitmapDrawable b1=new BitmapDrawable(this.feature.getFrames().get(frameIndex));
 		BitmapDrawable b2=new BitmapDrawable(bitmap);
-		b1.setBounds(this.position.x,this.position.y,this.position.x+b1.getIntrinsicWidth(),this.position.y+b1.getIntrinsicHeight());
-		b2.setBounds(plane.getPosition().x,plane.getPosition().y,plane.getPosition().x+b2.getIntrinsicWidth(),plane.getPosition().y+b2.getIntrinsicHeight());
+		b1.setBounds((int)this.position.x,(int)this.position.y,(int)this.position.x+b1.getIntrinsicWidth(),(int)this.position.y+b1.getIntrinsicHeight());
+		b2.setBounds((int)plane.getPosition().x,(int)plane.getPosition().y,(int)plane.getPosition().x+b2.getIntrinsicWidth(),(int)plane.getPosition().y+b2.getIntrinsicHeight());
 //		Log.d("Bullet",b1.getBounds().toShortString()+",b2:"+b2.getBounds().toShortString()+"="+b1.getBounds().intersect(b2.getBounds()));
 		return b1.getBounds().intersect(b2.getBounds());
 	}
@@ -126,13 +126,13 @@ public class Bullet implements Hittable,Drawable,Cloneable {
 
 	@Override
 	public int getHitX() {
-		return position.x+feature.getFrames().get(frameIndex).getWidth()/2;
+		return (int) (position.x+feature.getFrames().get(frameIndex).getWidth()/2);
 	}
 
 
 	@Override
 	public int getHitY() {
-		return position.y+feature.getFrames().get(frameIndex).getHeight()/2;
+		return (int) (position.y+feature.getFrames().get(frameIndex).getHeight()/2);
 	}
 
 

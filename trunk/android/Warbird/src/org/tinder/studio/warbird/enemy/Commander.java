@@ -41,13 +41,20 @@ public class Commander extends Thread{
 		for(Command c:commands){
 			if(runnable)
 			{
-				try {
-					Thread.sleep(c.delay);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				if(c.delay>0)
+				{
+					try {
+						Thread.sleep(c.delay);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 				Plane plane=map.get(c.type).clone();
-				plane.setAwards(c.getAwards());
+				if(c.getAwards()!=null)
+				{
+					for(Equip e:c.getAwards())
+						plane.addAward(e.clone());
+				}
 				Log.d("Commander","execute command:"+c+",add:"+plane);
 				synchronized (Plane.LOCK_ENEMY) {
 					Plane.getEnemies().add(plane);

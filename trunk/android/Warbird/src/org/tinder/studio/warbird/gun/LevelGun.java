@@ -12,11 +12,11 @@ public class LevelGun extends Gun {
 	}
 
 	@Override
-	public void fire(double direction) {
+	public boolean fire(double direction) {
 		if(counter++%frequence==0)
 		{
-			int x=host.getPosition().x+host.getFrame().getWidth()/2-feature.getFrames().get(0).getWidth()/2;
-			int y=host.getPosition().y;
+			double x=host.getPosition().x+host.getFrame().getWidth()/2-feature.getFrames().get(0).getWidth()/2;
+			double y=host.getPosition().y;
 			if(direction==Gun.PI_3_2)
 				y+=+host.getFrame().getHeight();
 			switch(level)
@@ -38,6 +38,7 @@ public class LevelGun extends Gun {
 				Bullet.addBullet(new Bullet(x+10,y,velocity+level,direction,feature));
 			}
 		}
+		return true;
 			
 	}
 	

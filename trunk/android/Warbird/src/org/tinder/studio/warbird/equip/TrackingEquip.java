@@ -5,6 +5,7 @@ import java.util.List;
 import org.tinder.studio.warbird.GameView;
 import org.tinder.studio.warbird.Player;
 import org.tinder.studio.warbird.gun.Gun;
+import org.tinder.studio.warbird.mode.GameMode;
 
 public class TrackingEquip extends Equip {
 
@@ -13,7 +14,7 @@ public class TrackingEquip extends Equip {
 	}
 	
 	@Override
-	protected TrackingEquip clone() {
+	public  TrackingEquip clone() {
 		TrackingEquip equip=new TrackingEquip(position.x, position.y, velocity, direction, validity);
 		equip.frames=frames;
 		return equip;
@@ -25,13 +26,13 @@ public class TrackingEquip extends Equip {
 		List<Gun> guns=player.getGuns();
 		for(Gun g:guns)
 		{
-			if(g.equals(GameView.trackingGun))
+			if(g.equals(GameMode.trackingGun))
 			{
 				g.increaseLevel();
 				return;
 			}
 		}
-		player.addGun(GameView.trackingGun);
+		player.addGun(GameMode.trackingGun);
 	}
 
 }

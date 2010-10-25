@@ -11,7 +11,7 @@ public class TrackingBullet extends Bullet {
 	protected int velocity;//速度
 	protected double direction;//方向
 	
-	public TrackingBullet(int x, int y, int velocity, double direction,Feature feature,double deflectionAngleLimit,Plane target) {
+	public TrackingBullet(double x, double y, int velocity, double direction,Feature feature,double deflectionAngleLimit,Plane target) {
 		super(x, y, velocity, direction, feature);
 		this.deflectionAngleLimit=deflectionAngleLimit;
 		this.target=target;
@@ -23,12 +23,12 @@ public class TrackingBullet extends Bullet {
 	protected void update(int minX, int minY, int maxX, int maxY) {
 		/*更新位置*/
 		super.update(minX, minY, maxX, maxY);
-		Log.d("TrackingBullet","------start-----");
+//		Log.d("TrackingBullet","------start-----");
 		if(target!=null&&target.isDestroy()==false)
 		{
 			/*子弹到目标的向量分量*/
-			int vx=target.getPosition().x-this.position.x;
-			int vy=target.getPosition().y-this.position.y;
+			double vx=target.getPosition().x+target.getFrame().getWidth()/2-this.position.x;
+			double vy=target.getPosition().y+target.getFrame().getHeight()/2-this.position.y;
 			/*使用内积判断向量的夹角[0,180]*/
 			double dot=Util.dot(dx,dy,vx,vy);
 			double cos=dot/velocity*Util.modulus(vx,vy);
@@ -46,14 +46,14 @@ public class TrackingBullet extends Bullet {
 						//逆时针旋转
 						direction+=angle;
 						Util.rotate(dx,dy, angle, result);
-						Log.d("TrackingBullet","ccw angle:"+angle+",direction:"+direction);
+//						Log.d("TrackingBullet","ccw angle:"+angle+",direction:"+direction);
 					}
 					else if(cross<0)
 					{
 						//顺时针旋转
 						direction-=angle;
 						Util.rotate(dx,dy, -angle, result);
-						Log.d("TrackingBullet","cw angle:"+angle+",direction:"+direction);
+//						Log.d("TrackingBullet","cw angle:"+angle+",direction:"+direction);
 					}
 				}
 				else
@@ -63,17 +63,17 @@ public class TrackingBullet extends Bullet {
 						//逆时针旋转
 						direction+=deflectionAngleLimit;
 						Util.rotate(dx,dy, deflectionAngleLimit, result);
-						Log.d("TrackingBullet","ccw limit:"+deflectionAngleLimit+",direction:"+direction);
+//						Log.d("TrackingBullet","ccw limit:"+deflectionAngleLimit+",direction:"+direction);
 					}
 					else if(cross<0)
 					{
 						//顺时针旋转
 						direction-=deflectionAngleLimit;
 						Util.rotate(dx,dy, -deflectionAngleLimit, result);
-						Log.d("TrackingBullet","cw limit:"+deflectionAngleLimit+",direction:"+direction);
+//						Log.d("TrackingBullet","cw limit:"+deflectionAngleLimit+",direction:"+direction);
 					}
 				}
-				Log.d("TrackingBullet","dx:"+dx+",dy:"+dy+"--result:"+result.x+","+result.y);
+//				Log.d("TrackingBullet","dx:"+dx+",dy:"+dy+"--result:"+result.x+","+result.y);
 				this.dx=result.x;
 				this.dy=result.y;
 			}
@@ -100,7 +100,7 @@ public class TrackingBullet extends Bullet {
 				frameIndex=5;
 			Log.d("TrackingBullet","frameIndex:"+frameIndex);
 		}
-		Log.d("TrackingBullet","------end-----");
+//		Log.d("TrackingBullet","------end-----");
 	}
 
 }

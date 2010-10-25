@@ -3,6 +3,7 @@ package org.tinder.studio.warbird.enemy;
 import org.tinder.studio.warbird.Effect;
 import org.tinder.studio.warbird.Plane;
 import org.tinder.studio.warbird.Util;
+import org.tinder.studio.warbird.equip.Equip;
 import org.tinder.studio.warbird.gun.Gun;
 import org.tinder.studio.warbird.gun.LevelCGun;
 import org.tinder.studio.warbird.gun.LevelDGun;
@@ -19,15 +20,15 @@ public class Boss extends Plane {
 	private int gunCounter=30;
 	
 
-	public Boss(int x, int y, int health, int camp, int velocity,Path path) {
+	public Boss(double x, double y, int health, int camp, int velocity,Path path) {
 		super(x, y, health, camp, velocity);
 		this.path=path;
 	}
 	
 	@Override
 	public void die() {
-		int x=position.x+(frames.get(frameIndex).getWidth()-Effect.FRAMES_2.get(0).getWidth())/2;
-		int y=position.y+(frames.get(frameIndex).getHeight()-Effect.FRAMES_2.get(0).getHeight())/2;
+		int x=(int) (position.x+(frames.get(frameIndex).getWidth()-Effect.FRAMES_2.get(0).getWidth())/2);
+		int y=(int) (position.y+(frames.get(frameIndex).getHeight()-Effect.FRAMES_2.get(0).getHeight())/2);
 		Effect.addEffect(new Effect(x,y,Effect.FRAMES_2));
 		Effect.addEffect(new Effect(x,y+20,Effect.FRAMES_2,-5));
 		Effect.addEffect(new Effect(x,y-20,Effect.FRAMES_2,-11));
@@ -46,6 +47,16 @@ public class Boss extends Plane {
 		Effect.addEffect(new Effect(x-15,y,Effect.FRAMES_2,-19));
 		Effect.addEffect(new Effect(x-20,y+15,Effect.FRAMES_2,-12));
 		Effect.addEffect(new Effect(x-20,y-15,Effect.FRAMES_2,-12));
+		if(awards!=null)
+		{
+			for(Equip equip:awards)
+			{
+				equip.setPosition(position.x,position.y);
+				int random=Util.random(0, 3);
+				equip.setDirection(Gun.PI_4S_ARRAY[random]);
+				Equip.addEquip(equip);
+			}
+		}
 		destroy=true;
 		Log.d("Boss","die:"+this);
 	}
@@ -58,14 +69,12 @@ public class Boss extends Plane {
 	public void draw(Canvas canvas, Paint paint,int minX,int minY,int maxX,int maxY) {
 		update();
 		super.draw(canvas, paint,minX,minY,maxX,maxY);
-		if(--gunCounter==0)
+		if(guns.get(gunIndex).fire(Gun.PI_3_2))
 		{
 			gunIndex++;
 			if(gunIndex>=guns.size())
 				gunIndex=0;
-			gunCounter=100;
 		}
-		guns.get(gunIndex).fire(Gun.PI_3_2);
 	}
 
 	@Override
@@ -83,6 +92,7 @@ public class Boss extends Plane {
 			boss.addGun(gun);
 		}
 		boss.setFrames(frames);
+		boss.setAwards(this.awards);
 		resetFrameIndex();
 		return boss;
 	}
