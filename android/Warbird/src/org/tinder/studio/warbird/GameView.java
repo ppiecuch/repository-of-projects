@@ -17,6 +17,7 @@ import org.tinder.studio.warbird.gun.LevelBGun;
 import org.tinder.studio.warbird.gun.TrackingGun;
 import org.tinder.studio.warbird.layer.ScrollBgLayer;
 import org.tinder.studio.warbird.mode.GameMode;
+import org.tinder.studio.warbird.mode.LoadingMode;
 import org.tinder.studio.warbird.mode.Mode;
 import org.tinder.studio.warbird.path.BeelinePath;
 import org.tinder.studio.warbird.path.LoopXPath;
@@ -56,7 +57,8 @@ public class GameView extends View implements Runnable{
 		setFocusable(true);
 		setFocusableInTouchMode(true);
 		foreground=new Paint(Paint.ANTI_ALIAS_FLAG);
-		mode=new GameMode(this);
+		LoadingMode.getInstance().reset(this,new GameMode(this));
+		mode=LoadingMode.getInstance();
 		
 		this.keyCache=new KeyCache();
 //		bmp=((BitmapDrawable)getResources().getDrawable(R.drawable.pic)).getBitmap();
@@ -165,6 +167,10 @@ public class GameView extends View implements Runnable{
 		} catch (InterruptedException e) {
 			 Log.e("GameView",e.getMessage());
 		}
+	}
+
+	public void setMode(Mode mode) {
+		this.mode = mode;
 	}
 
 	

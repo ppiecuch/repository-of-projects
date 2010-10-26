@@ -91,7 +91,7 @@ public abstract class Equip implements Drawable,Hittable,Cloneable {
 	public static void drawAll(Canvas canvas, Paint paint,int minX,int minY,int maxX,int maxY){
 		if(equips!=null)
 		{
-			Log.d("Equip","temp:"+temp);
+//			Log.d("Equip","temp:"+temp);
 			temp.clear();
 			for(Equip e:equips)
 			{
