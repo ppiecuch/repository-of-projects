@@ -211,9 +211,11 @@ public class GameMode implements LoadableMode {
 		
 		bmp=((BitmapDrawable)view.getResources().getDrawable(R.drawable.pic)).getBitmap();
 		bmp=Util.alphaColor(bmp, 0xFF040404, (byte)0);
+		progress=5;
 		
 		/*初始化背景*/
 		bg=new ScrollBgLayer(0, -1, ((BitmapDrawable)view.getResources().getDrawable(R.drawable.bg)).getBitmap());
+		progress=10;
 		
 		/*初始化Player*/
 		Bitmap[] players=new Bitmap[3];
@@ -229,6 +231,7 @@ public class GameMode implements LoadableMode {
 		{
 			player.addFrame(players[i]);
 		}
+		progress=30;
 		
 		/*初始化Path*/
 		Path beelinePath1=new BeelinePath(20, 0,20, height);
@@ -242,6 +245,7 @@ public class GameMode implements LoadableMode {
 		Path loopXPath=new LoopXPath(0, width-180,2);
 		Path ovalPath1=new OvalYPath(width/4,height/4, width/4+5, 6,Math.PI,0,false);
 		Path ovalPath2=new OvalYPath(width/4,height/4, width*3/4-30, 6,0,Math.PI,true);
+		progress=40;
 		
 		/*初始化Gun*/
 		energyGun=new LevelGun(Feature.FEATURE_1,5,15,1);
@@ -253,6 +257,7 @@ public class GameMode implements LoadableMode {
 		trackingGun=new TrackingGun(Feature.FEATURE_2,20,10,1);
 		Gun gunE4=new LevelCGun(Feature.FEATURE_E1,15,8,1);
 		Gun gunE5=new LevelDGun(Feature.FEATURE_E1,80,8,1);
+		progress=50;
 		
 		
 		/*初始化Enemy*/
@@ -309,6 +314,7 @@ public class GameMode implements LoadableMode {
 		boss.addGun(gunE4);
 		boss.addGun(gunE3);
 		boss.addGun(gunE5);
+		progress=60;
 		
 		
 		/*初始化Feature*/
@@ -320,6 +326,7 @@ public class GameMode implements LoadableMode {
 		{
 			Feature.FEATURE_2.addFrame(Bitmap.createBitmap(bmp,tb[i][0],tb[i][1],tb[i][2],tb[i][3]));
 		}
+		progress=70;
 		
 		/*初始化Equip*/
 		Bitmap life=Bitmap.createBitmap(bmp,lifeEquip[0],lifeEquip[1],lifeEquip[2],lifeEquip[3]);
@@ -330,6 +337,7 @@ public class GameMode implements LoadableMode {
 		Equip.TRACKING_EQUIP.addFrame(tracking);
 		Bitmap bomb=Bitmap.createBitmap(bmp,bombEquip[0],bombEquip[1],bombEquip[2],bombEquip[3]);
 		Equip.BOMB_EQUIP.addFrame(bomb);
+		progress=80;
 		
 		
 		/*初始化Effect*/
@@ -340,6 +348,7 @@ public class GameMode implements LoadableMode {
 		
 		player.addGun(energyGun);
 		player.addGun(trackingGun);
+		progress=90;
 		
 		
 		
@@ -384,9 +393,11 @@ public class GameMode implements LoadableMode {
 		commander.addCommand("e9",1000,true);
 		commander.addCommand("e10",0,true);
 		commander.addCommand("b1",20000,false).addAward(Equip.generateRandomEquip());
+		progress=99;
 		
 		
 		commander.start();
+		progress=100;
 		Log.i("GameMode", "Initialize finished1!!!");
 	}
 	
