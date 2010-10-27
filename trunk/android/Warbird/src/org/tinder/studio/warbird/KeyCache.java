@@ -44,6 +44,9 @@ public class KeyCache {
 	public static final int KEY_NINE=1<<11;
 
 	private int keyState = 0;
+	private static KeyCache instance;
+	
+	private KeyCache(){}
 
 	/**
 	 * 将物理键值转换为自定义键值
@@ -61,6 +64,8 @@ public class KeyCache {
 			return KEY_LEFT;
 		case KeyEvent.KEYCODE_DPAD_RIGHT:
 			return KEY_RIGHT;
+		case KeyEvent.KEYCODE_DPAD_CENTER:
+			return KEY_FIRE;
 		}
 		return 0;
 	}
@@ -82,6 +87,14 @@ public class KeyCache {
 	public int getKeyState() {
 		return keyState;
 	}
+
+	public static KeyCache getInstance() {
+		if(instance==null)
+			instance=new KeyCache();
+		return instance;
+	}
+	
+	
 	
 	
 

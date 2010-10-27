@@ -98,7 +98,7 @@ public class TrackingBullet extends Bullet {
 				frameIndex=4;
 			else if(direction>Gun.PI_13_8&&direction<=Gun.PI_15_8)
 				frameIndex=5;
-			Log.d("TrackingBullet","frameIndex:"+frameIndex);
+//			Log.d("TrackingBullet","frameIndex:"+frameIndex);
 		}
 //		Log.d("TrackingBullet","------end-----");
 	}

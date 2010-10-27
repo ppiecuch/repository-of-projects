@@ -15,6 +15,8 @@ public class Commander extends Thread{
 	private Map<String,Plane> map;
 	private List<Command> commands;
 	private boolean runnable=true;
+	private static Commander instance;
+	private Commander(){}
 	
 	
 	/*×¢²á»úÐÍ*/
@@ -64,6 +66,15 @@ public class Commander extends Thread{
 		Log.d("Commander","Stop");
 	}
 	
+	
+	
+	public static Commander getInstance() {
+		if(instance==null)
+			instance=new Commander();
+		return instance;
+	}
+
+
 	public void destroy(){
 		this.runnable=false;
 		this.interrupt();
