@@ -9,5 +9,5 @@
 -->
 <resources>
    <color name="background">#000000ff</color>
-   <color name="game_background">#3566ffff</color>
+   <color name="game_background">#ffffffff</color>
 </resources>
