@@ -18,6 +18,7 @@ import org.tinder.studio.warbird.gun.TrackingGun;
 import org.tinder.studio.warbird.layer.ScrollBgLayer;
 import org.tinder.studio.warbird.mode.GameMode;
 import org.tinder.studio.warbird.mode.LoadingMode;
+import org.tinder.studio.warbird.mode.LogoMode;
 import org.tinder.studio.warbird.mode.Mode;
 import org.tinder.studio.warbird.path.BeelinePath;
 import org.tinder.studio.warbird.path.LoopXPath;
@@ -57,10 +58,12 @@ public class GameView extends View implements Runnable{
 		setFocusable(true);
 		setFocusableInTouchMode(true);
 		foreground=new Paint(Paint.ANTI_ALIAS_FLAG);
-		LoadingMode.getInstance().reset(this,new GameMode(this));
-		mode=LoadingMode.getInstance();
+		foreground.setColor(Color.WHITE);
+//		LoadingMode.getInstance().reset(this,new GameMode(this));
+//		mode=LoadingMode.getInstance();
+		mode=new LogoMode(this,5000);
 		
-		this.keyCache=new KeyCache();
+		this.keyCache=KeyCache.getInstance();
 //		bmp=((BitmapDrawable)getResources().getDrawable(R.drawable.pic)).getBitmap();
 //		bmp=Util.alphaColor(bmp, 0xFF040404, (byte)0);
 		
@@ -101,6 +104,7 @@ public class GameView extends View implements Runnable{
 		case KeyEvent.KEYCODE_DPAD_LEFT:
 		case KeyEvent.KEYCODE_DPAD_RIGHT:
 		case KeyEvent.KEYCODE_DPAD_UP:
+		case KeyEvent.KEYCODE_DPAD_CENTER:
 			keyCache.keyPressed(keyCode);
 			break;
 		default:
@@ -117,6 +121,7 @@ public class GameView extends View implements Runnable{
 		case KeyEvent.KEYCODE_DPAD_LEFT:
 		case KeyEvent.KEYCODE_DPAD_RIGHT:
 		case KeyEvent.KEYCODE_DPAD_UP:
+		case KeyEvent.KEYCODE_DPAD_CENTER:
 			keyCache.keyReleased(keyCode);
 			break;
 		default:
@@ -161,7 +166,7 @@ public class GameView extends View implements Runnable{
 	public void stop()
 	{
 		this.runnable=false;
-		//TODO commander.destroy();
+		Commander.getInstance().destroy();
 		try {
 			thread.join();
 		} catch (InterruptedException e) {

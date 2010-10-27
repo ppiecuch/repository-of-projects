@@ -353,7 +353,7 @@ public class GameMode implements LoadableMode {
 		
 		
 		/*≥ı ºªØCommander*/
-		commander=new Commander();
+		commander=Commander.getInstance();
 		
 		commander.register("e1",enemy1);
 		commander.register("e2",enemy2);
