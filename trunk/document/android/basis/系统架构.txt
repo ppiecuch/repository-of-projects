@@ -1,0 +1,109 @@
+是Google于2007年11月5日宣布的基于Linux平台的开源手机操作系统的名称，
+该平台由操作系统、中间件、用户界面和应用软件组成，号称是首个为移动终端打造的真正开放和完整的移动软件。
+
+从架构图看，android分为四个层，从高层到低层分别是应用程序层、应用程序框架层、系统运行库层和linux核心层。
+	
+	应用程序框架
+
+　　开发人员也可以完全访问核心应用程序所使用的API框架。
+该应用程序的架构设计简化了组件的重用;任何一个应用程序都可以发布它的功能块并且任何其它的应用程序都可以使用其所发布的功能块(不过得遵循框架的安全性限制)。
+同样，该应用程序重用机制也使用户可以方便的替换程序组件。
+
+　　隐藏在每个应用后面的是一系列的服务和系统, 其中包括;
+
+　　*丰富而又可扩展的视图(Views)，可以用来构建应用程序，它包括列表(lists)，网格(grids)，文本框(textboxes)，按钮(buttons)，甚至可嵌入的web浏览器。
+　　*内容提供器(ContentProviders)使得应用程序可以访问另一个应用程序的数据(如联系人数据库)，或者共享它们自己的数据
+　　* 资源管理器(Resource Manager)提供非代码资源的访问，如本地字符串，图形，和布局文件(layoutfiles)。
+　　* 通知管理器 (Notification Manager) 使得应用程序可以在状态栏中显示自定义的提示信息。
+　　* 活动管理器( Activity Manager) 用来管理应用程序生命周期并提供常用的导航回退功能。
+　　有关更多的细节和怎样从头写一个应用程序，请参考 如何编写一个 Android 应用程序.
+
+
+　　3.系统运行库
+　　1)程序库
+　　Android包含一些C/C++库，这些库能被Android系统中不同的组件使用。它们通过Android应用程序框架为开发者提供服务。以下是一些核心库：
+　　* 系统 C 库 - 一个从 BSD 继承来的标准 C 系统函数库( libc )，它是专门为基于embeddedlinux的设备定制的。
+　　* 媒体库-基于PacketVideoOpenCORE;该库支持多种常用的音频、视频格式回放和录制，同时支持静态图像文件。编码格式包括MPEG4,H.264,MP3,AAC,AMR, JPG, PNG 。
+　　* Surface Manager - 对显示子系统的管理，并且为多个应用程序提 供了2D和3D图层的无缝融合。
+　　* LibWebCore - 一个最新的web浏览器引擎用，支持Android浏览器和一个可嵌入的web视图。
+　　* SGL - 底层的2D图形引擎
+　　* 3D libraries - 基于OpenGLES1.0APIs实现;该库可以使用硬件3D加速(如果可用)或者使用高度优化的3D软加速。
+　　* FreeType -位图(bitmap)和矢量(vector)字体显示。
+　　* SQLite - 一个对于所有应用程序可用，功能强劲的轻型关系型数据库引擎。
+
+
+
+　　2)Android 运行库
+　　Android 包括了一个核心库，该核心库提供了JAVA编程语言核心库的大多数功能。
+　　每一个Android应用程序都在它自己的进程中运行，都拥有一个独立的Dalvik虚拟机实例。
+Dalvik被设计成一个设备可以同时高效地运行多个虚拟系统。Dalvik虚拟机执行(.dex)的Dalvik可执行文件，该格式文件针对小内存使用做了优化。
+同时虚拟机是基于寄存器的，所有的类都经由JAVA编译器编译，然后通过SDK中的dx工具转化成.dex格式由虚拟机执行。
+　　Dalvik虚拟机依赖于linux内核的一些功能，比如线程机制和底层内存管理机制。
+
+
+　　4.Linux 内核
+
+　　Android 的核心系统服务依赖于 Linux 2.6内核，如安全性，内存管理，进程管理，网络协议栈和驱动模型。Linux内核也同时作为硬件和软件栈之间的抽象层。
+
+
+
+Android应用由四类构件组成： 
+    1. Activity
+    2. Intent Receiver
+    3. Service
+    4. Content Provider
+
+但并不是每个应用必须包含全部的构件，通常可以由其中的几个构件组成。
+
+
+一旦决定了所使用的构件，则需要在AndroidManifest.xml的文件中列出这些构件。文件AndroidManifest.xml用来声明应用所使用的构件、这些构件的功能以及要求。
+
+Activity是四类构件中最常用的。一个Activity通常对应了应用中的一个屏幕。
+一个Activity同样也由一个类来实现，并且这个必须继承android.app.Activity基类。
+这个类会显示一个用户界面，并对一些事件作出响应。用户界面通常由几个View组成。
+
+大多数android应用由多个屏幕组成。例如，一个文本消息的应用就包含了多个屏幕，第一个屏幕可以显示发送消息的联系人列表，
+第二个屏幕用来向指定联系人写一些消息，第三个屏幕可以是重新显阅读旧消息，其他还有更改设置等屏幕… …
+上述的每个屏幕上，都将实现一项Activity。启动一项新的Activity就可以切换屏幕。
+有时Activity会向原来的Activity返回一个值。例如有这么一项Activity，它让用户选择一个图片，并把所选图片返回给本Activity的调用者Activity。
+
+当新屏幕打开时，旧屏幕就暂停，并放入历史栈。先前已经打开的所有屏幕都保留在历史栈中，用户可以浏览这些屏幕，当其中一些屏幕不需要继续保留时，也可以删除。
+
+Intent and Intent Filters
+    在Android应用中，切换屏幕可以用Intent类来实现。
+    Intent用来描述Android应用想做的事情。intent数据结构中最重要的两部分是action、action对应的数据。
+    action的常用数值有：MAIN(activity的入口)、VIEW、PICK和EDIT等。
+    action对应的数据是一个URI。例如，为了显示某个人的联系信息，需要创建一个intent。这个intent中包含了一个VIEW action以及可以描述这个人的URI数据。
+    Intent类还有一个相关类，类名叫IntentFilter。Intent负责发出一个请求，而intent filter负责描述一个Activity(或者intent receiver)所能够处理的所有Intent。
+    例如有这么一个Activity，它可以显示某人的联系信息，那么它就会发布一个IntentFilter。在这个IntentFilter里内含了如何利用一个包含联系人的数据，来处理action(其数值是VIEW)。
+    通过AndroidManifest.xml文件，Activity可以发布其IntentFilter。
+    利用Intent，可以实现从一个屏幕导航到另一个屏幕。
+    导航功能的实现方法如下：
+      第1步 调用activity的函数startActivity(myIntent)。
+      第2步 系统搜索所有已安装应用的Intent Filters，找出最匹配myIntent的Intent Filters，并据此得到所对应的activity。
+      第3步 用myIntent生成新的activity，并执行这个activity。
+    在运行时，在调用startActivity情况才处理Intent有以下两大好处：
+      第1 通过简单地发出一个形如Intent的请求，Activity就可以重用其它组件的功能。
+      第2 利用一个同等IntentFilter，就可以在任何时候用新的Activity取代旧的Activity。
+
+Intent Receiver
+    在Android应用中，如果需要针对外部事件（例如：电话铃响、数据网络激活、或者午夜12点的时候等等）编写一些响应代码，那么就要使用Intent Receiver。
+    当相应事件发生时，尽管Intent Receiver可以使用NotificationManager来提醒用户，但其无法显示用户界面。
+    在AndroidManifest.xml文件中可以注册Intent Receiver，当然也可以通过编写代码Context.registerReceiver()来注册。
+    Android应用并不是一定要使用Intent Receiver的。系统本身可以启动Android应用，当然如果有必要，也可以通过触发Intent Receiver来启动Android应用。
+    使用Context.broadcastIntent()，Android应用也可以向其它的Android应用发送intent广播。
+
+Service
+    一个Service将一直运行，而且运行时没有用户界面。一个很好的离例子是媒体播放器，它可以依次播放列表中的歌曲。
+    在媒体播放器的应用中，可能有一个或者多个Activity，用来让用户选择并开始播放歌曲。由于用户在导航到新的屏幕之后仍然希望音乐能继续播放，
+    所以音乐的背景播放本身并不需要处理Activity。
+    在这种情况下媒体播放器的Activity可以用Context.startService()来启动一个Service，这个Service会在后台运行并保持音乐的播放。
+    接下来，系统会继续播放音乐直到结束。（通过阅读Life Cycle of an Android Application可以进一步了解在系统中Service的优先级）
+    注意，使用Context.bindService()可以联接一个Service（如果还没有运行的话也可以启动它）。
+    联接到Service之后，可以通过这个Service开放的接口与Service进行通信。对于音乐Service，允许进行暂停、重放操作等。
+
+Content Provide
+    Android应用可以把数据保存到文件、SQLite数据库或者其它可以使用的存储方式。
+    而Content Provider可以让Android应用之间共享数据。
+    Content Provider是一个类，它实现了一套标准的方法，可以让Android应用之间保存、获取由Content Provider处理的数据。
+
