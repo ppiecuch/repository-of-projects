@@ -1,0 +1,559 @@
+
+【附录】
+
+
+
+
+
+
+
+
+【附录】
+一，listview你是怎么优化的。$ R; k, L- }9 m2 h( |/ s/ E/ ]
+二，view的刷新，之前说过0 ~8 t6 W, O. g( ^+ A3 {' V
+三，IPC及原理
+  T, l1 N1 }4 i' D* }四，Android多线程0 Z# h4 Q: s9 E# j6 F. ?  ^' X( }/ u
+五，Android为什么要设计4大组件，他们之间的联系，不设计行不行（主要是为了实现MVC模式，然而java中最难的模式也是这个，很少有产品能将这个模式做得很好【Technicolor的面试官问的这个】）& o6 D4 L* I5 c0 _( ?5 ~  O% f8 d7 `& g; n
+六，service的周期，activity的周期，谈下你对Android内部应用的了解，比如他做电话，以及联系人等等应用。框架层有很多东西还是多看看，熟悉Android怎么做的，不管你做应用程开发还是应用框架层开发很有好处的。
+6 w1 p' e6 }% {  K! v在就是你项目经验，突出你遇到什么难点，然后是怎么解决的！尽量将每个技术点凸显出来，当然面试官有时候会为了体现你是否真正做过，他会问你，你在这个应用中做那个模块，用了多少个类之类的问题。. |, B8 @+ ]: ?, o8 x
+偶尔有的面试官会问你，你用过Android自带的单元测试了没，怎么用的？. R$ }1 `3 o3 o
+当然我面试过很多家单位，有的是做平板，手机，数字电视，有的是做出个erp之类的客户端等等，出于前面的三个，基本上都是将Android的全部改掉，如果真正要做Android的话，大家要学的还很多。
+2 _1 W& V& L9 E! S, K% S
+1 |1 M4 f$ B$ o总之，一句话，什么样的面试官都有，去面试的时候要做好一切心理准备，不管是技术还是基础都得扎实。一个人的交谈能力也很重要，总之不是非常标准的普通话，最起码你说的得让别人听得懂，而且得把面试官讲得非常彻底，这样你获得offer的机会更大，谈工资也有优势~~当然曾经一家公司的面试官跟我说过，技术是不惜钱的，只要你有能力，多少钱他都请。! ?- Z2 q% b+ `
+
+2 Y6 l3 d6 x& Q. y  w* j+ k6 {确实，来北京求职期间，牛人真的很多，而且有的面试官也非常好，给了很多忠肯的意见。并不是每个面试官都特想为难你的~最主要的还是想知道你的技术，因为他们也是吃公司饭，得为这个负责。
+
+
+1.View如何刷新？
+答： invalidate();View的刷新可以放在一个线程中，然后通过Handler类去实时更新View。
+
+2.DDMS与TraceView的区别？
+答：traceview是一个可以方便查看应用程序启动时间都耗费在哪的工具，可以用来帮助我们定位系统启动时间主要消耗在什么地方，使我们方便地据此进行有针对性的优化。
+DDMS为我们提供例如:为测试设备截屏，针对特定的进程查看正在运行的线程以及堆信息、Logc……
+Traceview是android平台配备一个很好的性能分析的工具；可以通过DDMS看到目标机器上运行的进程/线程状态。
+DDMS为我们提供例如:为测试设备截屏，针对特定的进程查看正在运行的线程以及堆信息、Logcat、广播状态信息、模拟电话呼叫、接收SMS、虚拟地理坐标等等。
+
+3.activity被回收了怎么办？
+答：重新创建，调用onCreate
+
+4.在Java中如何引入C语言？
+答：JNI 
+
+
+
+
+问题1
+在eclipse的工程中，res目录有默认几项resource，如 drawable， layout，menu，values
+
+其余还有
+
+res/anim/   用来放置动画
+
+res/xml/     用来放置style theme等xml定义。
+
+res/raw/    用来放置data数据
+
+ 
+
+问题2
+单选框(RadioButton与RadioGroup)：
+
+         RadioGroup用于对单选框进行分组，相同组内的单选框只有一个单选框被选中。         
+
+         事件：setOnCheckedChangeListener()，处理单选框被选择事件。把RadioGroup.OnCheckedChangeListener实例作为参数传入。
+
+多选框(CheckBox):
+
+         每个多选框都是独立的，可以通过迭代所有的多选框，然后根据其状态是否被选中在获取其值。
+
+         事件：setOnCheckChangeListener()处理多选框被选择事件。把CompoundButton.OnCheckedChangeListener实例作为参数传入
+
+下拉列表框(Spring)：
+
+         Spinner.getItemAtPosition(Spinner.getSelectedItemPosition());获取下拉列表框的值。
+
+         事件：setOnItemSelectedListener(),处理下拉列表框被选择事件把AdapterView.OnItemSelectedListener实例作为参数传入；
+
+拖动条(SeekBar)：
+
+         SeekBar.getProgress()获取拖动条当前值
+
+         事件:setOnSeekBarChangeListener()，处理拖动条值变化事件，把SeekBar.OnSeekBarChangeListener实例作为参数传入。
+
+菜单(Menu):
+
+         重写Activity的onCreatOptionMenu(Menu menu)方法，该方法用于创建选项菜单，咋用户按下手机的"Menu"按钮时就会显示创建好的菜单，在onCreatOptionMenu(Menu Menu)方法内部可以调用Menu.add()方法实现菜单的添加。
+
+         重写Activity的onMenuItemSelected()方法，该方法用于处理菜单被选择事件。
+
+进度对话框(ProgressDialog)：
+
+         创建并显示一个进度对话框：ProgressDialog.show(ProgressDialogActivity.this,"请稍等"，"数据正在加载中...."，true)；
+
+         设置对话框的风格：setProgressStyle()
+
+                   ProgressDialog.STYLE_SPINNER  旋转进度条风格(为默认风格)
+
+                   ProgressDialog.STYLE_HORIZONTAL 横向进度条风格
+
+ 
+
+问题3
+Android系统的架构！
+
+android的系统架构和其操作系统一样，采用了分层的架构。从架构图看，android分为四个层，从高层到低层分别是应用程序层、应用程序框架层、系统运行库层和linux核心层。
+
+　　1.应用程序
+
+　　Android会同一系列核心应用程序包一起发布，该应用程序包包括email客户端，SMS短消息程序，日历，地图，浏览器，联系人管理程序等。所有的应用程序都是使用JAVA语言编写的。
+
+　　2.应用程序框架
+
+　　开发人员也可以完全访问核心应用程序所使用的API框架。该应用程序的架构设计简化了组件的重用;任何一个应用程序都可以发布它的功能块并且任何其它的应用程序都可以使用其所发布的功能块(不过得遵循框架的安全性限制)。同样，该应用程序重用机制也使用户可以方便的替换程序组件。
+
+　　隐藏在每个应用后面的是一系列的服务和系统, 其中包括;
+
+　　* 丰富而又可扩展的视图(Views)，可以用来构建应用程序， 它包括列表(lists)，网格(grids)，文本框(text boxes)，按钮(buttons)， 甚至可嵌入的web浏览器。
+
+　　* 内容提供器(Content Providers)使得应用程序可以访问另一个应用程序的数据(如联系人数据库)， 或者共享它们自己的数据
+
+　　* 资源管理器(Resource Manager)提供 非代码资源的访问，如本地字符串，图形，和布局文件( layout files )。
+
+　　* 通知管理器 (Notification Manager) 使得应用程序可以在状态栏中显示自定义的提示信息。
+
+　　* 活动管理器( Activity Manager) 用来管理应用程序生命周期并提供常用的导航回退功能。
+
+　　有关更多的细节和怎样从头写一个应用程序，请参考 如何编写一个 Android 应用程序.
+
+　　3.系统运行库
+
+　　1)程序库
+
+　　Android 包含一些C/C++库，这些库能被Android系统中不同的组件使用。它们通过 Android 应用程序框架为开发者提供服务。以下是一些核心库：
+
+　　* 系统 C 库 - 一个从 BSD 继承来的标准 C 系统函数库( libc )， 它是专门为基于 embedded linux 的设备定制的。
+
+　　* 媒体库 - 基于 PacketVideo OpenCORE;该库支持多种常用的音频、视频格式回放和录制，同时支持静态图像文件。编码格式包括MPEG4, H.264, MP3, AAC, AMR, JPG, PNG 。
+
+　　* Surface Manager - 对显示子系统的管理，并且为多个应用程序提 供了2D和3D图层的无缝融合。
+
+　　* LibWebCore - 一个最新的web浏览器引擎用，支持Android浏览器和一个可嵌入的web视图。
+
+　　* SGL - 底层的2D图形引擎
+
+　　* 3D libraries - 基于OpenGL ES 1.0 APIs实现;该库可以使用硬件 3D加速(如果可用)或者使用高度优化的3D软加速。
+
+　　* FreeType -位图(bitmap)和矢量(vector)字体显示。
+
+ 
+
+　　* SQLite - 一个对于所有应用程序可用，功能强劲的轻型关系型数据库引擎。
+
+　　2)Android 运行库
+
+　　Android 包括了一个核心库，该核心库提供了JAVA编程语言核心库的大多数功能。
+
+　　每一个Android应用程序都在它自己的进程中运行，都拥有一个独立的Dalvik虚拟机实例。Dalvik被设计成一个设备可以同时高效地运行多个虚拟系统。 Dalvik虚拟机执行(.dex)的Dalvik可执行文件，该格式文件针对小内存使用做了优化。同时虚拟机是基于寄存器的，所有的类都经由JAVA编译器编译，然后通过SDK中 的 “dx” 工具转化成.dex格式由虚拟机执行。
+
+　　Dalvik虚拟机依赖于linux内核的一些功能，比如线程机制和底层内存管理机制。
+
+　　4.Linux 内核
+
+Android 的核心系统服务依赖于 Linux 2.6 内核，如安全性，内存管理，进程管理， 网络协议栈和驱动模型。 Linux 内核也同时作为硬件和软件栈之间的抽象层。
+
+开机自动运行程序！
+
+Android实现开机自动运行程序2009-12-31 15:01:17.0        开机     自动     运行     程序   有些时候，应用需要在开机时就自动运行，例如某个自动从网上更新内容的后台service。怎样实现开机自动运行的应用？在撰写本文时，联想到高焕堂先生以“Don''t call me, I''ll call you back!”总结Android框架，真是说到点子上了。理解这句话的含义，许多有关Android平台上实现某种功能的问题，都能迎刃而解。
+
+使用场景：手机开机后，自动运行程序，在屏幕上显示"Hello. I started!"字样。
+
+背景知识：当Android启动时，会发出一个系统广播，内容为ACTION_BOOT_COMPLETED，它的字符串常量表示为android.intent.action.BOOT_COMPLETED。只要在程序中“捕捉”到这个消息，再启动之即可。记住，Android框架说：Don''t call me, I''ll call you back。我们要做的是做好接收这个消息的准备，而实现的手段就是实现一个BroadcastReceiver。
+
+ 
+
+问题4
+一 Activity的生命周期
+二 让Activity变成一个窗口：Activity属性设定
+三 你后台的Activity被系统 回收怎么办：onSaveInstanceState
+四 调用与被调用：我们的通信使者 - Intent
+
+一 Activity的生命周期
+
+
+   和其他手机 平台 的应用 程序 一样，Android的应用程序 的生命周期是被统一掌控 的，也
+   就是说我们写的应用程序命运掌握在别人（系统）的手里，我们不能改变它，只能学习 并
+   适应它。
+
+简单地说一下为什么是这样：我们手机在运行 一个应用程序的时候，有可能打进来电话
+   发进来短信 ，或者没有电了，这时候程序都会被中断，优先去服务电话的基本功能 ，另
+   外系统也不允许你占用太多资源 ，至少要保证电话功能吧,所以资源不足的时候也就有可  
+   能被干掉。
+
+   言归正传，Activity的基本生命周期如下代码 所示：
+
+Java 代码
+
+
+public
+class MyActivity extends Activity {   
+    protected
+void onCreate(Bundle savedInstanceState);  
+
+    protected
+void onStart();  
+
+    protected
+void onResume();  
+
+    protected
+void onPause();  
+
+    protected
+void onStop();  
+
+    protected
+void onDestroy();   
+  }   
+
+public class MyActivity extends Activity {     protected void onCreate(Bundle savedInstanceState);     protected void onStart();     protected void onResume();     protected void onPause();     protected void onStop();     protected void onDestroy();   }
+
+   你自己写的Activity会按需要 重载这些方法，onCreate是免不了的，在一个Activity正常启动的过程中，他们被调用的顺序是 onCreate -> onStart -> onResume, 在Activity被干掉的时候顺序是onPause -> onStop -> onDestroy ，这样就是一个完整的生命周期，但是有人问了 ，程序正运行着呢来电话了，这个程序咋办？中止了呗，如果中止的时候新出的一个Activity是全屏的那么：onPause->onStop ，恢复的时候onStart->onResume ，如果打断  这个应用程序的是一个Theme为Translucent 或者Dialog 的Activity那么只是onPause ,恢复 的时候onResume 。
+
+   详细介绍一下这几个方法中系统在做什么以及我们应该做什么：
+
+   onCreate:   在这里创建界面 ，做一些数据 的初始化工作
+
+   onStart:    到这一步变成用户可见不可交互 的
+
+   onResume:   变成和用户可交互 的，（在activity 栈系统通过栈的方式管理这些个       
+                      Activity的最上面，运行完弹出栈，则回到上一个Activity)
+
+   onPause:     到这一步是可见但不可交互 的，系统会停止动画 等消耗CPU 的事情
+                    从上文的描述已经知道，应该在这里保存你的一些数据,因为这个时候
+                    你的程序的优先级降低，有可能被系统收回。在这里保存的数据，应该在
+
+                    onResume里读出来，注意：这个方法里做的事情时间要短，因为下一
+                    个activity不会等到这个方法完成才启动
+
+   onstop:     变得不可见 ，被下一个activity覆盖了
+
+   onDestroy: 这是activity被干掉前最后一个被调用方法了，可能是外面类调用finish方
+                     法或者是系统为了节省空间将它暂时性的干掉，可以用isFinishing()来判
+                     断它，如果你有一个Progress Dialog在线程中转动，请在onDestroy里 
+                     把他cancel掉，不然等线程结束的时候，调用Dialog的cancel方法会抛
+                     异常的。
+
+              
+onPause，onstop， onDestroy，三种状态 下 activity都有可能被系统干掉 
+为了保证程序的正确性，你要在onPause()里写上持久层操作的代码，将用户编辑的内容都保存到存储介质上（一般都是数据库 ）。实际工作中因为生命周期的变化而带来的问题也很多，比如你的应用程序起了新的线程在跑，这时候中断了，你还要去维护那个线程，是暂停还是杀掉还是数据回滚，是吧？因为Activity可能被杀掉，所以线程中使用的变量和一些界面元素就千万要注意了，一般我都是采用Android的消息机制 [Handler,Message]来处理多线程和界面交互的问题。这个我后面会讲一些，最近因为这些东西头已经很大了，等我理清思绪再跟大家分享。
+
+二 让Activity变成一个窗口：Activity属性设定 
+    
+   讲点轻松的吧,可能有人希望做出来的应用程序是一个漂浮在手机主界面的东西，那么很
+简单你只需要设置 一下Activity的主题就可以了在AndroidManifest.xml 中定义 Activity的
+地方一句话：
+
+
+Xml代码
+
+
+android :theme="@android:style/Theme.Dialog"
+
+android:theme="@android:style/Theme.Dialog"
+
+
+这就使你的应用程序变成对话框的形式弹出来了，或者
+
+
+Xml代码
+
+
+android:theme="@android:style/Theme.Translucent"
+
+android:theme="@android:style/Theme.Translucent"
+
+就变成半透明的，[友情提示-.-]类似的这种activity的属性可以在android.R.styleable 类的AndroidManifestActivity 方法中看到，AndroidManifest.xml中所有元素的属性的介绍都可以参考这个类android.R.styleable
+
+上面说的是属性名称，具体有什么值是在android.R.style中 可以看到，比如这个"@android:style/Theme.Dialog" 就对应于android.R.style.Theme_Dialog ,（'_'换成'.' <--注意：这个是文章内容不是笑脸）就可以用在描述文件 中了,找找类定义和描述文件中的对应关系就都明白了。
+
+
+三 你后台的Activity被系统回收怎么办：onSaveInstanceState 
+   
+   当你的程序中某一个Activity A 在运行时中，主动或被动地运行另一个新的Activity B 
+这个时候A会执行
+
+Java代码
+
+
+public
+void onSaveInstanceState(Bundle outState) {   
+    super.onSaveInstanceState(outState);   
+    outState.putLong("id", 1234567890);   
+}  
+
+public void onSaveInstanceState(Bundle outState) {    super.onSaveInstanceState(outState);    outState.putLong("id", 1234567890);}
+
+
+B 完成以后又会来找A, 这个时候就有两种情况，一种是A被回收，一种是没有被回收，被回
+收的A就要重新调用onCreate()方法，不同于直接启动的是这回onCreate()里是带上参数
+savedInstanceState，没被收回的就还是onResume就好了。
+
+savedInstanceState是一个Bundle对象，你基本上可以把他理解为系统帮你维护的一个Map对象。在onCreate()里你可能会用到它，如果正常启动onCreate就不会有它，所以用的时候要判断一下是否为空。
+
+Java代码
+
+
+if(savedInstanceState != null){   
+     long id = savedInstanceState.getLong("id");   
+}  
+
+if(savedInstanceState != null){     long id = savedInstanceState.getLong("id");}
+
+
+就像官方的Notepad教程 里的情况，你正在编辑某一个note，突然被中断，那么就把这个note的id记住，再起来的时候就可以根据这个id去把那个note取出来，程序就完整一些。这也是看你的应用需不需要保存什么，比如你的界面就是读取一个列表，那就不需要特殊记住什么，哦， 没准你需要记住滚动条的位置...
+
+四 调用与被调用：我们的通信使者Intent
+
+要说Intent了，Intent就是这个这个意图 ，应用程序间Intent进行交流，打个电话啦，来个
+电话啦都会发Intent, 这个是Android架构的松耦合的精髓部分，大大提高了组件的复用性，比如你要在你的应用程序中点击按钮，给某人打电话，很简单啊，看下代码先：
+
+Java代码
+
+
+Intent intent = new Intent();   
+intent.setAction(Intent.ACTION_CALL);   
+intent.setData(Uri.parse("tel:" + number));   
+startActivity(intent);  
+
+Intent intent = new Intent(); intent.setAction(Intent.ACTION_CALL); intent.setData(Uri.parse("tel:" + number)); startActivity(intent);
+
+扔出这样一个意图，系统看到了你的意图就唤醒了电话拨号程序，打出来电话。什么读联系人，发短信啊，邮件啊，统统只需要扔出intent就好了，这个部分设计 地确实很好啊。
+
+那Intent通过什么来告诉系统需要谁来接受他呢？
+通常使用Intent有两种方法，第一种是直接说明需要哪一个类来接收代码如下:
+
+Java代码
+
+
+Intent intent = new Intent(this, MyActivity.class);   
+intent.getExtras().putString("id", "1");   
+tartActivity(intent);  
+
+Intent intent = new Intent(this, MyActivity.class);intent.getExtras().putString("id", "1");tartActivity(intent);
+
+
+第一种方式很明显，直接指定了MyActivity为接受者,并且传了一些数据给MyActivity，在MyActivity里可以用getIntent()来的到这个intent和数据。
+
+第二种就需要先看一下AndroidMenifest中的intentfilter的配置了
+
+Xml代码
+
+
+<intent-filter> 
+    <action
+android:name="android.intent.action.VIEW"
+/> 
+    <action
+android:value="android.intent.action.EDIT"
+/> 
+    <action
+android:value="android.intent.action.PICK"
+/> 
+    <category
+android:name="android.intent.category.DEFAULT"
+/> 
+    <data
+android:mimeType="vnd.android.cursor.dir/vnd.google.note"
+/> 
+</intent-filter>
+
+<intent-filter>    <action android:name="android.intent.action.VIEW" />    <action android:value="android.intent.action.EDIT" />    <action android:value="android.intent.action.PICK" />    <category android:name="android.intent.category.DEFAULT" />    <data android:mimeType="vnd.android.cursor.dir/vnd.google.note" /></intent-filter> 这里面配置用到了action, data, category这些东西，那么聪明的你一定想到intent里也会有这些东西，然后一匹配不就找到接收者了吗？
+
+action其实就是一个意图的字符串名称。
+上面这段intent-filter的配置文件说明了这个Activity可以接受不同的Action，当然相应的程序逻辑也不一样咯,提一下那个 mimeType,他是在ContentProvider里定义的，你要是自己实现一个ContentProvider就知道了，必须指定 mimeType才能让数据被别人使用。
+
+不知道原理说明白没，总结一句，就是你调用别的界面不是直接new那个界面，而是通过扔出一个intent，让系统帮你去调用那个界面，这样就多么松藕合啊，而且符合了生命周期被系统管理的原则。
+
+想知道category都有啥，Android为你预先定制好的action都有啥等等，请亲自访问官方链接Intent
+
+ps:想知道怎么调用系统应用程序的同学，可以仔细看一下你的logcat，每次运行一个程序的时候是不是有一些信息比如:
+Starting activity: Intent { action=android.intent.action.MAINcategories={android.intent.category.LAUNCHER} flags=0x10200000comp={com.android.camera/com.android.camera.GalleryPicker} }
+再对照一下Intent的一些set方法，就知道怎么调用咯，希望你喜欢：
+
+
+
+
+
+Basic:
+
+1. 基本的UI控件和布局文件
+
+2. UI配套的Adapter的使用
+
+3. Activity, Intent,Service,broadCast Receiver他们的生命周期管理熟悉一下
+
+4. 操作手机上的数据库SQLite应用
+
+ 
+
+Advanced_1(这是某位成功通过Android面试的兄弟的面经):
+
+1. 为什么看好 Android
+2. 现在在公司做哪些工作（关于 Android)
+3. Android 的框架以及一些基础知识
+4. Android 一些方面的领悟（如Android框架的 IoC特性，View System  的状态机机制等)
+
+ 
+
+Advanced_2(这是某位成功通过Android面试的兄弟的面经):
+
+1.对多线程的运用和理解，及多线程之间handle的传值。 
+
+2.对android 虚拟机的理解，包括内存管理机制垃圾回收机制。
+
+3.framework工作方式及原理，Activity是如何生成一个view的，机制是什么。
+
+4. android本身的一些限制，不如apk包大小限制，读取大文件 时的时间限制。 
+
+5. Linux中跨进程通信的集中方式
+
+
+Android_4: 
+
+1. dvm的进程和Linux的进程, 应用程序的进程是否为同一个概念 
+
+2. sim卡的EF 文件有何作用 
+
+3. AT命令的User case的概念 
+
+4.嵌入式操作系统内存管理有哪几种， 各有何特性 
+
+5. 什么是嵌入式实时操作系统, Android 操作系统属于实时操作系统吗? 
+
+6. 一条最长的短信息约占多少byte?
+
+ 
+
+联想android面试题 
+
+1.activity的生命周期。 
+
+2.横竖屏切换时候activity的生命周期 
+
+3.android中的动画有哪几类，它们的特点和区别是什么 
+
+4.handler机制的原理 
+
+5.说说activity，intent，service是什么关系 
+
+6.android中线程与线程，进程与进程之间如何通信 
+
+7.widget相对位置的完成在antivity的哪个生命周期阶段实现 
+
+8.说说mvc模式的原理，它在android中的运用 
+
+9.说说在android中有哪几种数据存储方式 
+
+10.android中有哪几种解析xml的类，官方推荐哪种？以及它们的原理和区别
+
+
+
+NDK
+1、前言 
+	6月 26 日， Google Android 发布了 NDK ，引起了很多发人员的兴趣。 NDK 全称： Native Development Kit 。下载地址为： http://developer.android.com/sdk/ndk/1.5_r1/index.html 。
+
+2、误解 
+	新出生的事物，除了惊喜外，也会给我们带来一定的迷惑、误解。
+
+2.1、误解一： NDK 发布之前， Android 不支持进行 C 开发 
+	在Google 中搜索 “NDK” ，很多 “Android 终于可以使用 C++ 开发 ” 之类的标题，这是一种对 Android 平台编程方式的误解。其实， Android 平台从诞生起，就已经支持 C 、 C++ 开发。众所周知， Android 的 SDK 基于 Java 实现，这意味着基于 Android SDK 进行开发的第三方应用都必须使用 Java 语言。但这并不等同于 “ 第三方应用只能使用 Java” 。在 Android SDK 首次发布时， Google 就宣称其虚拟机 Dalvik 支持 JNI 编程方式，也就是第三方应用完全可以通过 JNI 调用自己的 C 动态库，即在 Android 平台上， “Java+C” 的编程方式是一直都可以实现的。 
+
+	当然这种误解的产生是有根源的：在Android SDK 文档里，找不到任何 JNI 方面的帮助。即使第三方应用开发者使用 JNI 完成了自己的 C 动态链接库（ so ）开发，但是 so 如何和应用程序一起打包成 apk 并发布？这里面也存在技术障碍。我曾经花了不少时间，安装交叉编译器创建 so ，并通过 asset （资源）方式，实现捆绑 so 发布。但这种方式只能属于取巧的方式，并非官方支持。所以，在 NDK 出来之前，我们将 “Java+C” 的开发模式称之为灰色模式，即官方既不声明 “ 支持这种方式 ” ，也不声明 “ 不支持这种方式 ” 。 
+
+2.2、误解二：有了 NDK ，我们可以使用纯 C 开发 Android 应用 
+	Android SDK采用 Java 语言发布，把众多的 C 开发人员排除在第三方应用开发外（ 注意：我们所有讨论都是基于“ 第三方应用开发 ” ， Android 系统基于 Linux ，系统级别的开发肯定是支持 C 语言的。 ）。NDK 的发布，许多人会误以为，类似于 Symbian 、 WM ，在 Android 平台上终于可以使用纯 C 、 C++ 开发第三方应用了！其实不然， NDK 文档明确说明： it is not a good way 。因为 NDK 并没有提供各种系统事件处理支持，也没有提供应用程序生命周期维护。此外，在本次发布的 NDK 中，应用程序 UI 方面的 API 也没有提供。至少目前来说，使用纯 C 、 C++ 开发一个完整应用的条件还不完备。 
+
+
+
+
+3、NDK 是什么 
+对NDK 进行了粗略的研究后，我对 “NDK 是什么 ” 的理解如下： 
+
+1、NDK 是一系列工具的集合。 
+
+NDK提供了一系列的工具，帮助开发者快速开发 C （或 C++ ）的动态库，并能自动将 so 和 java 应用一起打包成 apk 。这些工具对开发者的帮助是巨大的。 
+NDK集成了交叉编译器，并提供了相应的 mk 文件隔离 CPU 、平台、 ABI 等差异，开发人员只需要简单修改 mk 文件（指出 “ 哪些文件需要编译 ” 、 “ 编译特性要求 ” 等），就可以创建出 so 。 
+NDK可以自动地将 so 和 Java 应用一起打包，极大地减轻了开发人员的打包工作。 
+2、NDK 提供了一份稳定、功能有限的 API 头文件声明。 
+
+	Google明确声明该 API 是稳定的，在后续所有版本中都稳定支持当前发布的 API 。从该版本的 NDK 中看出，这些 API 支持的功能非常有限，包含有： C 标准库（ libc ）、标准数学库（ libm ）、压缩库（ libz ）、 Log 库（ liblog ）。 
+
+
+4、NDK 带来什么 
+1、NDK 的发布，使 “Java+C” 的开发方式终于转正，成为官方支持的开发方式。 
+
+使用NDK ，我们可以将要求高性能的应用逻辑使用 C 开发，从而提高应用程序的执行效率。 
+使用NDK ，我们可以将需要保密的应用逻辑使用 C 开发。毕竟， Java 包都是可以反编译的。 
+NDK促使专业 so 组件商的出现。（乐观猜想，要视乎 Android 用户的数量） 
+2、NDK 将是 Android 平台支持 C 开发的开端。 
+
+	NDK提供了的开发工具集合，使开发人员可以便捷地开发、发布 C 组件。同时， Google承诺在 NDK 后续版本中提高 “ 可调式 ” 能力，即提供远程的 gdb 工具，使我们可以便捷地调试 C 源码。在支持 Android 平台 C 开发，我们能感觉到 Google 花费了很大精力，我们有理由憧憬 “C 组件支持 ” 只是 Google Android 平台上C 开发的开端。毕竟， C 程序员仍然是码农阵营中的绝对主力，将这部分人排除在 Android 应用开发之外，显然是不利于 Android 平台繁荣昌盛的。 
+
+
+
+
+1> 说一下你眼中的Android的优点和不足之处(面试华为的人有被问过)
+随着Android的越来越红火，不少应聘Android开发的人，难免会被问到这样的问题，就是这个平台的优点，当然有优点也会有缺点的，
+
+下面是我从网上总结出来的，希望对大家应聘Android开发有所帮助:
+
+Android平台手机 5大优势： 
+
+　　一、开放性 
+
+　　在优势方面，Android平台首先就是其开发性，开发的平台允许任何移动终端厂商加入到Android联盟中来。显著的开放性可以使其拥有更多的开发者，随着用户和应用的日益丰富，一个崭新的平台也将很快走向成熟
+
+     开发性对于Android的发展而言，有利于积累人气，这里的人气包括消费者和厂商，而对于消费者来讲，随大的受益正是丰富的软件资源。开放的平台也会带来更大竞争，如此一来，消费者将可以用更低的价位购得心仪的手机。
+
+　二、挣脱运营商的束缚 
+
+　　在过去很长的一段时间，特别是在欧美地区，手机应用往往受到运营商制约，使用什么功能接入什么网络，几乎都受到运营商的控制。从去年iPhone 上市 ，用户可以更加方便地连接网络，运营商的制约减少。随着EDGE、HSDPA这些2G至3G移动网络的逐步过渡和提升，手机随意接入网络已不是运营商口中的笑谈，当你可以通过手机IM软件方便地进行即时聊天时，再回想不久前天价的彩信和图铃下载业务，是不是像噩梦一样？
+
+互联网巨头Google推动的Android终端天生就有网络特色，将让用户离互联网更近。
+
+　三、丰富的硬件选择 
+
+　　这一点还是与Android平台的开放性相关，由于Android的开放性，众多的厂商会推出千奇百怪，功能特色各具的多种产品。功能上的差异和特色，却不会影响到数据同步、甚至软件的兼容，好比你从诺基亚 Symbian风格手机 一下改用苹果 iPhone ，同时还可将Symbian中优秀的软件带到iPhone上使用、联系人等资料更是可以方便地转移，是不是非常方便呢？
+
+四、不受任何限制的开发商 
+
+　　Android平台提供给第三方开发商一个十分宽泛、自由的环境，不会受到各种条条框框的阻扰，可想而知，会有多少新颖别致的软件会诞生。但也有其两面性，血腥、暴力、情色方面的程序和游戏如可控制正是留给Android难题之一。
+
+　五、无缝结合的Google应用 
+
+　　如今叱诧互联网的Google已经走过10年度历史，从搜索巨人到全面的互联网渗透，Google服务如地图、邮件、搜索等已经成为连接用户和互联网的重要纽带，而Android平台手机将无缝结合这些优秀的Google服务。
+
+　再说Android的5大不足： 
+
+　　一、安全和隐私 
+
+　　由于手机 与互联网的紧密联系，个人隐私很难得到保守。除了上网过程中经意或不经意留下的个人足迹，Google这个巨人也时时站在你的身后，洞穿一切，因此，互联网的深入将会带来新一轮的隐私危机。
+
+　　二、首先开卖Android手机的不是最大运营商 
+
+　　众所周知，T-Mobile在23日，于美国纽约发布 了Android首款手机G1。但是在北美市场，最大的两家运营商乃AT&T和Verizon，而目前所知取得Android手机销售权的仅有T-Mobile和Sprint，其中T-Mobile的3G网络相对于其他三家也要逊色不少，因此，用户可以买账购买G1，能否体验到最佳的3G网络服务则要另当别论了！
+
+　　三、运营商仍然能够影响到Android手机 
+
+　　在国内市场，不少用户对购得移动定制机不满，感觉所购的手机被人涂画了广告一般。这样的情况在国外市场同样出现。Android手机的另一发售运营商Sprint就将在其机型中内置其手机商店程序。
+
+　　四、同类机型用户减少 
+
+　　在不少手机论坛 都会有针对某一型号的子论坛，对一款手机的使用心得交流，并分享软件资源。而对于Android平台手机，由于厂商丰富，产品类型多样，这样使用同一款机型的用户越来越少，缺少统一机型的程序强化。举个稍显不当的例子，现在山寨机泛滥，品种各异，就很少有专门针对某个型号山寨机的讨论和群组，除了哪些功能异常抢眼、颇受追捧的机型以外。
+
+　五、过分依赖开发商缺少标准配置 
+
+　　在使用PC端的Windows Xp系统的时候，都会内置微软Windows Media Player这样一个浏览器程序，用户可以选择更多样的播放器，如Realplay或暴风影音等。但入手开始使用默认的程序同样可以应付多样的需要。在 Android平台中，由于其开放性，软件更多依赖第三方厂商，比如Android系统的SDK中就没有内置音乐 播放器，全部依赖第三方开发，缺少了产品的统一性。
+
+
+
