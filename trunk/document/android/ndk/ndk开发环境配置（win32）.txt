@@ -39,7 +39,8 @@ by admin on 七.23, 2009, under 开发, 环境
 1. 下载Android 1.5 NDK, Release 1 For Windows 并解压到D:\android-ndk-1.5_r1 
 2.下载Cygwin, 执行setup.exe并开始安装(根据网络速度快慢而定, 预计安装需要20分钟左右) 
 注意:1. 选择台湾的http站点,速度会快很多; 2.开发选项里必须勾选gcc和make,否则后期无法编译 
-3.执行桌面图标Cygwin,出现linux shell提示符后, 修改当前目录(/home/username)下.bash_profile文件, 加入如下内容在文件尾部 
+3.执行桌面图标Cygwin,出现linux shell提示符后, 修改当前目录(/home/username)下.bash_profile文件, 加入如下内容在文件尾部
+UltraEdit打开，据说用记事本等的打开也会出问题。不要转换格式，否则出问题。 
 ANDROID_NDK_ROOT=/cygdrive/d/android-ndk-1.5_r1 
 export ANDROID_NDK_ROOT 
 4.退出Cygwin,重新进入,执行以下命令 
