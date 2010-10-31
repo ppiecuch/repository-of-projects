@@ -1,0 +1,45 @@
+1、Java JDK的安装
+Eclipse是一款跨平台的工具，只需要基本的java虚拟机就可以运行。
+安装Java SDK很简单。到http://java.sun.com上找到适合你的操作系统的Java JDK安装程序，下载之并运行，Java SDK就会安装到你的系统中。
+注意，更高版本的Eclipse需要更高版本的Java JDK。
+
+2、Eclipse及CDT的安装
+到Eclipse的官方网站http://www.eclipse.org上下载Eclipse。
+安装CDT。CDT的全称是C/C++ Development Tools，是使Eclipse能够支持C/C++开发的插件。进入CDT的官方网站，http://www/eclipse.org/cdt，然后选择一个镜像站点分别下载CDT。下载完成后，将这两个压缩包解压到Eclipse的目录中。
+（也可以在安装完Eclipse后，通过Eclipse的软件更新功能安装CDT，具体步骤可以参考Eclipse的在线文档。）
+
+3、安装MinGW
+现在这个C/C++ IDE还不能开动，因为缺少了重要的部件。这个部件就是C/C++的编译器。
+在Windows OS下我们可以选择MinGW。到MinGW的网站http://mingw.sourceforge.net上，下载MinGW，安装。
+为了以后方便使用，创建一个批处理文件：
+安装后，要配置系统环境变量
+右键我的电脑->属性->高级->环境变量->系统变量中添加
+
+
+MINGW_HOME=D:\IDE_Tools\MinGW
+LIBRARY_PATH = %MINGW_HOME%\lib
+C_INCLUDE_PATH = %MINGW_HOME%\include
+CPLUS_INCLUDE_PATH = %C_INCLUDE_PATH%\c++\3.4.5;%C_INCLUDE_PATH%\c++\3.4.5\mingw32;%C_INCLUDE_PATH%\c++\3.4.5\backward;%C_INCLUDE_PATH%
+在PATH变量的最后增加 ;%MINGW_HOME%\bin
+
+ 
+
+这里有一个需要注意的地方！！
+因为Eclipse预设用来编译的文件为 make.exe 但是 MinGw 安装后 make 的文件名是 mingw32-make.exe
+因此需要把 mingw32-make 改名为 make!
+
+为了让CDT能够采用MinGW进行编译，需要在 Eclipse 中进行设定
+Window->Preferences->C/C++->Make->New Make Project->New Builder
+->Binary Parser 取消 Elf Parser 改选 PE Windows Parser
+
+ 
+还有一个问题需要注意,cdt的一个问题,在对c++文件建立indexer时会在75%的时候卡住,而且cpu占用率通常都是100% ,知道的唯一的解决办法是将indexer功能关闭 Window->Perferences->C/C++-->Indexer 选择No Indexer
+
+现在我们测试一下。点击cdt.bat打开Eclipse，点击New->Managed Make C++ Project。给progect取个名字按finish就可以了，之后给project添加New->Source File,文件名的扩展名为.c(c程序)或者.cpp(c++程序)。输入你的代码就可以了，之后的事情就是进行编译成功啦.
+4、安装wxWidgets
+wxWidgets是什么？我想你一定听说过wxWindows。今年，在MS的压力下，wxWindows开发团队不得不将其更名为wxWidgets，不过它还是像原来一样出色。
+在Windows下开发不可避免的要涉及GUI设计的内容。如果仅使用MinGW的Win32API接口就太落伍了。wxWidgets无疑是一个很好的选择。
+到wxWidgets的网站http://wxWindows.sourceforge.net上，下载2.4.2或2.5.3版的wxWidgets，然后解压缩，注意，解压缩的路径不能包含空格字符。然后参照docs\msw\install.txt编译生成需要的程序库。
+（注意：你可能需要安装更多的MinGW工具以完成wxWidgets的编译，这些工具在wxWidgets的网站上也有下载。）
+现在，打开Eclipse，新建一个标准Make C++项目，添加一个wxWidgets中的例子。然后在项目选项中，设置构建器命令为：make -f makefile.g95，然后保存。构建项目，运行。你期望的窗体出现了。
+

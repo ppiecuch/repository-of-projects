@@ -1,0 +1,99 @@
+
+通过Software Update安装CDT：
+http://www.eclipse.org/cdt/downloads.php(可手动下载)
+http://download.eclipse.org/tools/cdt/releases/galileo
+
+安装时只需要勾选
+Eclipse C/C++ Development Tools
+CDT GNU Toolchain Build Support
+CDT GNU Toolchain Debug Support
+CDT Utilities
+Eclipse C/C++ Development Platform
+
+
+安装CDT语言包：
+http://www.eclipse.org/babel/
+http://www.eclipse.org/babel/downloads.php
+
+通过Software Update安装语言包：
+http://download.eclipse.org/technology/babel/update-site/europa 
+or
+http://download.eclipse.org/technology/babel/update-site/ganymede
+or
+http://download.eclipse.org/technology/babel/update-site/galileo
+
+
+Eclipse下配置cygwin路径
+Windows->preferences->c/c++->Make->Makefile->settings
+
+
+eclipse的cdt关于cygwin 1.7支持的问题2010-05-14 08:28首先检查cygwin的etc\setup\installed.db有没有
+gcc-g++
+gcc-core
+binutils 
+make 
+如果没有要在cygwin里面安装添加项目
+
+如果仍然Eclipse 中没有检测到Cygwin的GCC toolcain。
+尝试手动设置项目属性工具链中导致错误的选择 正下方显示：“不支持的配置在系统”安装。
+这是因为Eclipse从注册表中获取 Cygwin的路径，和Cygwin 1.7停止储存在注册表里。
+手动添加a.reg文件，写入：
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Cygnus Solutions\Cygwin\mounts v2]
+"cygdrive prefix"="/cygdrive"
+"cygdrive flags"=dword:00000022
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Cygnus Solutions\Cygwin\mounts v2\/]
+"native"="c:\\cygwin"
+"flags"=dword:0000000a
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Cygnus Solutions\Cygwin\mounts v2\/usr/bin]
+"native"="c:\\cygwin\\bin"
+"flags"=dword:0000000a
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Cygnus Solutions\Cygwin\mounts v2\/usr/lib]
+"native"="c:\\cygwin\\lib"
+"flags"=dword:0000000a
+
+以上内容加入注册表
+eclipse中cdt的toolchain显示出来cygwin.
+
+
+sample:
+#include <iostream>
+using namespace std;
+
+int main(void) {
+    cout << "hello world!" ;
+
+    return 0;
+}
+
+#include <stdio.h>
+int main() {
+    int i;
+    printf("please input a number：");
+    scanf("%d", &i);
+    printf("your number is %d 。", i);
+    return 0;
+}
+makefile:
+all: 
+	g++ HelloC.cpp -g -o HelloC
+run:
+	./HelloC.exe
+
+
+报错:No rule to make target `all'
+
+
+设置环境变量， Path=%Path%；%Cygwin_Path%/bin，LIBRARY_PATH=%Cygwin_Path%/lib, C_INCLUDE_PATH=%Cygwin_Path%/usr/include 然后重启机器 .
+
+
+报错:Lanuch faild,binary not found
+
+要先build自己的project,在run就不会有那样的问题了
+Build Configuration->build->...
+
+
