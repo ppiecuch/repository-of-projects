@@ -1,0 +1,50 @@
+ mtrl 为材质变量， 
+
+mtrl.Diffuse.r =0.0f; mtrl.Ambient.r = 1.0f; 
+
+   mtrl.Diffuse.g = 1.0f;mtrl.Ambient.g = 1.0f; 
+
+   mtrl.Diffuse.b = 0.5f;mtrl.Ambient.b = 0.0f; 
+
+mtrl.Diffuse.a = mtrl.Ambient.a = 1;
+
+（1）当灯光属性的漫反射如下设置时，
+
+light.Diffuse.r=1.0f;
+
+light.Diffuse.g=0;
+
+light.Diffuse.b=1.0;
+
+物体的颜色？
+
+（2）当灯光属性的漫反射值和环境光如下设置时，
+
+light.Diffuse.r=1.0f;
+
+light.Diffuse.g=1.0;
+
+light.Diffuse.b=0.0;
+
+light.Ambient.r=1.0f;
+
+light.Ambient.g=0;
+
+light.Ambient.b=1.0;
+
+    物体的颜色?
+
+
+
+我们可以使用层动画的技术来处理复杂的运动关系；以下是在处理 太阳，地球，月球 运动时的一些设置；
+
+太阳TM  为matSL,单位矩阵
+
+      地球的 TM 为 matWL 单位矩阵 ,地球的平移矩阵为 matWT,旋转矩阵为matWR,
+
+      月亮的TM 为 matML 单位矩阵,月球的平移矩阵为 matMT,旋转矩阵为matMR,
+
+      请写出当三者的运动关系为月球以地球为中心旋转，而地球
+
+      又以太阳为中心旋转时的，月球的世界变换矩阵和地球的世界变换矩阵？
+

@@ -1,0 +1,190 @@
+sexhook
+原问题.
+我想知道的是：
+1,在用glTexImage装入纹理时，用什么东东来控制它装入第几层？
+2,用glTexImage时如何与glGenTextures,glBindTexture配合使用，是否和平常一样用
+3,在使用纹理时，是否只要像平常用一下glBindTexture就OK？
+
+问题回答: By Xheartblue
+1: glActiveTexture(GL_TEXTUREn);可以控制当前的纹理操作是作用到哪个Tex_Unit上的。
+GL_TEXTUREn中的n从0到31.具体看glext.h定义.
+
+2:glActiveTExture为一个扩展.但是已经在OpenGL 1.3的核心里。所以DOC到GLSpec1.3 中去找.
+
+3:glMultTexCoord(GL_TEXTUREn,....);用来指定某个Tex_Unit的纹理坐标.
+
+4:glClientActiveTexture(GL_TEXTUREn);用来控制以下的函数影响的是第n个Tex_Unit
+glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+glTexCoordPointer
+
+5: eg .使用第二个纹理代码如下
+glActiveTexture(GL_TEXTURE1);
+glEnable(GL_TEXTURE_2D);
+glBindTexture(...):
+glTexEnv(......):
+关闭第二个纹理的代码如下
+glActiveTexture(GL_TEXTURE1);
+glDisable(GL_TEXTURE_2D);
+glActiveTexture(GL_TEXTURE0);//改变回第一个.否则以后的操作都是对GL_TEXTURE1的。
+
+使用两个纹理通道的 Vertex Array
+//使用两个纹理通道．全要激活他们．
+glClientActiveTexture(GL_TEXTURE0);
+glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+glClientActiveTexture(GL_TEXTURE1);
+glEnableClientState(GL_TEXTURE_COORD_ARRAY)
+
+glClientActiveTexture(GL_TEXTURE0);
+glTexCoordPointer();
+glClientActiveTexture(GL_TEXTURE1);
+glTexCoordPointer();
+
+........................
+
+glDrawArrays(....
+
+//用完两个通道．全都关闭．
+glClientActiveTexture(GL_TEXTURE0);
+glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+glClientActiveTexture(GL_TEXTURE1);
+glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+//关闭第二个纹理通道
+glActiveTexture(GL_TEXTURE1);
+glDisable(GL_TEXTURE_2D);
+glActiveTexture(GL_TEXTURE0);
+glEnable(GL_TEXTURE_2D);
+
+6 : 最后补充: 带不带ARB都一样的。看定义就知道了。ARB后来变成了核心了。
+
+--------------------------------------------------------------------------------
+
+LangFox
+多重纹理需要用到ARB扩展，大概是ARB_MULTITEXTURE。详细使用说明在opengl.org上找。好像NeHe的某一个教程里也有。
+
+--------------------------------------------------------------------------------
+
+akingbr
+有个扩展，glActiveTextureARB 去BIND纹理，用glMultiTexCoord2fARB指定坐标。
+
+--------------------------------------------------------------------------------
+
+lidingfeng
+本人英语水平有限,Opengl.org上的东西实在看不懂,有没有耐心一点的把多重纹理使用细节写下来让大伙参考参考?
+
+--------------------------------------------------------------------------------
+
+wwwdfq1977
+本人英语水平有限,Opengl.org上的东西实在看不懂,有没有耐心一点的把多重纹理使用细节写下来让大伙参考参考?
+看看上面的neheogl电子书
+
+--------------------------------------------------------------------------------
+
+lidingfeng
+neheogl电子书和其它参考书一样,没有提到扩展编程的事
+
+--------------------------------------------------------------------------------
+
+gongminmin
+多重纹理已经在OpenGL 1.3中加入内核
+所以在Windows只要载入那些函数就可以了
+在Linux下可以直接使用
+
+--------------------------------------------------------------------------------
+
+lidingfeng
+老大,请问你有OpenGL1.3的库文件么,在Windows下使用的,能否贴出来
+
+--------------------------------------------------------------------------------
+
+gongminmin
+extglgen、GLEW都是很好的扩展载入程序
+下一个就可以了
+
+--------------------------------------------------------------------------------
+
+zxwyeah
+//1.声明函数指针
+PFNGLMULTITEXCOORD1FARBPROC glMultiTexCoord(i)fARB = NULL;//i 为1到最多纹理数
+//2.获取指针地址
+glMultiTexCoord(i)fARB = (PFNGLMULTITEXCOORD(i)FARBPROC) wglGetProcAddress("glMultiTexCoord(i)fARB");
+//3.初始化纹理,tex_id是用来存放纹理id的
+unsigned int tex_id;
+glGenTextures(1, &tex_id);
+glBindTexture(GL_TEXTURE_2D, tex_id);
+glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+//4.将纹理数据存入显存,tga_tex是纹理数据
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, tga_tex->width, tga_tex->height, 0, GL_RGB, GL_UNSIGNED_BYTE, tga_tex->imageData);
+//5.激活多重纹理
+glActiveTextureARB(GL_TEXTURE0_ARB);
+glEnable(GL_TEXTURE_2D);
+glBindTexture(GL_TEXTURE_2D, dec_id);
+//6.用吧
+glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, &(scene->triangle_data[aux].texcoord[aux1]));//texcoord
+
+大致如此
+前提是
+1.包含glext.h
+2.扩展都已声明了
+
+注
+不要试图运行上面的代码 那只是一个抽象
+
+--------------------------------------------------------------------------------
+
+xheartblue
+glActiveTexture(GL_TEXTURE0_ARB);
+getTexMgr()->useTexture(hBaseTex);
+glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+glEnable(GL_TEXTURE_2D);
+
+//打开第二个纹理通道．
+glActiveTexture(GL_TEXTURE1_ARB);
+glEnable(GL_TEXTURE_2D)
+
+sFurVertex* pVertex = (sFurVertex*)pFrame->Lock();
+
+getTexMgr()->useTexture(furMesh.m_hShellTex[l]);
+
+glEnableClientState(GL_VERTEX_ARRAY);
+
+//使用两个纹理通道．全要激活他们．
+glClientActiveTexture(GL_TEXTURE0);
+glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+glClientActiveTexture(GL_TEXTURE1);
+glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+glEnableClientState(GL_COLOR_ARRAY)
+
+glVertexPointer(3,GL_FLOAT,sizeof(sFurVertex),(GLvoid*)pVertex);
+
+glClientActiveTexture(GL_TEXTURE0_ARB);
+glTexCoordPointer(2,GL_FLOAT,sizeof(sFurVertex),(GLvoid*)&pVertex->u);
+glClientActiveTexture(GL_TEXTURE1_ARB);
+glTexCoordPointer(2,GL_FLOAT,sizeof(sFurVertex),(GLvoid*)&pVertex->u2);
+
+glColorPointer(4,GL_UNSIGNED_BYTE,sizeof(sFurVertex),(GLvoid*)&pVertex->r);
+
+glDrawArrays(GL_TRIANGLES,0,pFaceInfo->m_nFace * 3);
+
+glClientActiveTexture(GL_TEXTURE0);
+
+pFrame->Unlock()
+
+glDisableClientState(GL_VERTEX_ARRAY);
+
+//用完两个通道．全都关闭．
+glClientActiveTexture(GL_TEXTURE0);
+glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+glClientActiveTexture(GL_TEXTURE1);
+glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+gllDisableClientState(GL_COLOR_ARRAY);
+
+//使用第一个纹理数组
+glClientActiveTexture(GL_TEXTURE0);
+//关闭第二个纹理通道
+glActiveTexture(GL_TEXTURE1_ARB);
+glDisable(GL_TEXTURE_2D)
+
+http://school.ogdev.net/ArticleShow.asp?id=210&categoryid=8
