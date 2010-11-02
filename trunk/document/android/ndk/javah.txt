@@ -1,0 +1,4 @@
+D:\Development\Workspace\Android\HelloGL-C\bin>
+javah -o hellogl.h org.tinder.studio.gl.HelloGL
+
+http://www.inonit.com/cygwin/jni/helloWorld/header.html
