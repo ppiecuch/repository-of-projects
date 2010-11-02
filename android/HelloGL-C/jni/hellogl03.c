@@ -4,7 +4,7 @@
 #include <android/log.h>
 
 /***************************************/
-/*               正方体                 */
+/*           正方体(索引数组)           */
 /***************************************/
 
 #define PI 3.1415926535897932f
@@ -17,68 +17,32 @@ static int  sWindowHeight = 480;
 static float angle=0;
 
 static GLfloat vertexArray[] = {
-// Front face
--1.0, -1.0,  1.0,
- 1.0, -1.0,  1.0,
- 1.0,  1.0,  1.0,
--1.0,  1.0,  1.0,
+-1.0, -1.0,  1.0,//前左下0
+ 1.0, -1.0,  1.0,//前右下1
+ 1.0,  1.0,  1.0,//前右上2
+-1.0,  1.0,  1.0,//前左上3
+-1.0, -1.0, -1.0,//后左下4
+-1.0,  1.0, -1.0,//后左上5
+ 1.0,  1.0, -1.0,//后右上6
+ 1.0, -1.0, -1.0 //后右下7
+};
 
-// Back face
--1.0, -1.0, -1.0,
--1.0,  1.0, -1.0,
- 1.0,  1.0, -1.0,
- 1.0, -1.0, -1.0,
-
-// Top face
--1.0,  1.0, -1.0,
--1.0,  1.0,  1.0,
- 1.0,  1.0,  1.0,
- 1.0,  1.0, -1.0,
-
-// Bottom face
--1.0, -1.0, -1.0,
- 1.0, -1.0, -1.0,
- 1.0, -1.0,  1.0,
--1.0, -1.0,  1.0,
-
-// Right face
- 1.0, -1.0, -1.0,
- 1.0,  1.0, -1.0,
- 1.0,  1.0,  1.0,
- 1.0, -1.0,  1.0,
-
-// Left face
--1.0, -1.0, -1.0,
--1.0, -1.0,  1.0,
--1.0,  1.0,  1.0,
--1.0,  1.0, -1.0
+static GLubyte indiceArray[][VERTEX_COUNT_PER_FACE]={
+{0,1,3,2},//Front
+{4,5,7,6},//Back
+{3,2,5,6},//Top
+{1,0,7,4},//Bottom
+{2,1,6,7},//Right
+{0,3,4,5} //Left
 };
 
 static GLubyte colorArray[] = {
   255, 0, 0, 255,     // Front face
-  255, 0, 0, 255,
-  255, 0, 0, 255,
-  255, 0, 0, 255,
   255, 255, 0, 255,     // Back face
-  255, 255, 0, 255,
-  255, 255, 0, 255,
-  255, 255, 0, 255,
   0, 255, 0, 255,     // Top face
-  0, 255, 0, 255,
-  0, 255, 0, 255,
-  0, 255, 0, 255,
   255, 128, 128, 255,     // Bottom face
-  255, 128, 128, 255,
-  255, 128, 128, 255,
-  255, 128, 128, 255,
   255, 0, 255, 255,     // Right face
-  255, 0, 255, 255,
-  255, 0, 255, 255,
-  255, 0, 255, 255,
-  0, 0, 255, 255,     // Left face
-  0, 0, 255, 255,
-  0, 0, 255, 255,
-  0, 0, 255, 255
+  0, 0, 255, 255     // Left face
 };
 
 static void gluPerspective(GLfloat fovy, GLfloat aspect,
@@ -227,7 +191,7 @@ void appRender(long tick, int width, int height)
 	glColorPointer(4,GL_UNSIGNED_BYTE,0,colorArray);
 	int i;
 	for(i=0;i<FACE_COUNT;i++)
-		glDrawArrays(GL_TRIANGLE_FAN,i*VERTEX_COUNT_PER_FACE,VERTEX_COUNT_PER_FACE);
+		glDrawElements(GL_TRIANGLE_STRIP,VERTEX_COUNT_PER_FACE,GL_UNSIGNED_BYTE,indiceArray[i]);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 }
