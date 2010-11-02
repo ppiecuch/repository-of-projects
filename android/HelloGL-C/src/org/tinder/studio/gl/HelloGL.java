@@ -16,16 +16,17 @@ public class HelloGL extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(new HelloGLView(this));
     }
-    
-    static {
-    	System.loadLibrary("hellogl");
-    }
 
 
 }
 class HelloGLView extends GLSurfaceView{
 	
 	HelloGLRender renderer;
+	
+	private native void nativeInit();
+	private native void nativeResize(int width, int height);
+	private native void nativeRender();
+	private native void nativeDone();
 
 	public HelloGLView(Context context) {
 		super(context);
@@ -43,21 +44,15 @@ class HelloGLView extends GLSurfaceView{
 	 *  The onSurfaceCreated(GL10, EGLConfig) method is a convenient place to do this.
 	 */
 	class HelloGLRender implements GLSurfaceView.Renderer{
-		
-		private native void nativeInit();
-	    private native void nativeResize(int width, int height);
-	    private native void nativeRender();
-	    private native void nativeDone();
 
 		/*
 		 * 当任何时候调用一个画图方法的时候。即所有的绘图操作都在onDrawFrame方法中进行，
 		 * 在绘图之前，需要将屏幕清除成前面所指定的颜色，   
 		 * 清除深度缓存，并且重置场景，然后就可以进行绘图了！ 
 		 */
-		@Override
 		public void onDrawFrame(GL10 gl) {
 			nativeRender();
-			Log.d("HelloGLRender","drawFrame");
+//			Log.d("HelloGLRender","drawFrame");
 		}
 
 		/*
@@ -65,7 +60,6 @@ class HelloGLView extends GLSurfaceView{
 		 * 当然，不管窗口的大小是否已经改变。   
 		 * 它在程序开始时至少运行一次，所以我们在该方法中设置OpenGL场景的大小  
 		 */
-		@Override
 		public void onSurfaceChanged(GL10 gl, int width, int height) {
 			nativeResize(width,height);
 		}
@@ -73,11 +67,14 @@ class HelloGLView extends GLSurfaceView{
 		/*
 		 * 当窗口创建的时候需要调用onSurfaceCreated，所以我们可以在里面对OpenGL做一些初始化的工作 
 		 */
-		@Override
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 			nativeInit();
 		}
 		
 	}
+	
+	static {
+    	System.loadLibrary("hellogl");
+    }
 	
 }
