@@ -1,0 +1,90 @@
+目前Android NDK只能编译出动态库.so文件，并不是能生成.apk文件，这里我们简单介绍下NDK中的Hello JNI列子。
+整个例子分Java和Native C两个部分。首先是我们常用的Java端调用部分。
+
+  package com.example.hellojni;
+
+import android.app.Activity;
+import android.widget.TextView;
+import android.os.Bundle;
+
+public class HelloJni extends Activity
+{
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        TextView  tv = new TextView(this);
+        tv.setText( stringFromJNI() ); //如果调用失败将会抛出 java.lang.UnsatisfiedLinkError异常
+        setContentView(tv);
+    } //注意下面的native关键字
+
+    public native String  stringFromJNI(); 
+    public native String  unimplementedStringFromJNI();
+
+     static {
+        System.loadLibrary("hello-jni"); //载入hello-jni库
+    }  
+}
+
+需要注意的是这里必须设置SDK版本为1.5或以上版本即在androidmanifest.xml文件中指明<uses-sdk android:minSdkVersion="3" /> 这里我们看到JNI调用无需特殊的权限。
+
+ 而在Native C/C++中我们可以直接使用C++库，不过这里包含了jni这个头文件。
+
+ #include <string.h>
+#include <jni.h>
+
+其中下面的返回类型jstring是VM String，在jni.h头文件中有定义
+
+jstring Java_com_example_hellojni_HelloJni_stringFromJNI( JNIEnv* env, jobject thiz )
+{
+    return (*env)->NewStringUTF(env, "Hello from JNI, Android123 Test!");
+}
+
+其实很好理解的，仅仅是换个了别名而以，定义如下
+
+typedef uint8_t         jboolean;       /* unsigned 8 bits */
+typedef int8_t          jbyte;          /* signed 8 bits */
+typedef uint16_t        jchar;          /* unsigned 16 bits */
+typedef int16_t         jshort;         /* signed 16 bits */
+typedef int32_t         jint;           /* signed 32 bits */
+typedef int64_t         jlong;          /* signed 64 bits */
+typedef float           jfloat;         /* 32-bit IEEE 754 */
+typedef double          jdouble;        /* 64-bit IEEE 754 */
+#else
+typedef unsigned char   jboolean;       /* unsigned 8 bits */
+typedef signed char     jbyte;          /* signed 8 bits */
+typedef unsigned short  jchar;          /* unsigned 16 bits */
+typedef short           jshort;         /* signed 16 bits */
+typedef int             jint;           /* signed 32 bits */
+typedef long long       jlong;          /* signed 64 bits */
+typedef float           jfloat;         /* 32-bit IEEE 754 */
+typedef double          jdouble;        /* 64-bit IEEE 754 */
+#endif
+
+
+typedef jint            jsize;
+
+还有一些调用平时注意的声明
+
+#define JNI_FALSE   0
+#define JNI_TRUE    1
+
+#define JNI_VERSION_1_1 0x00010001
+#define JNI_VERSION_1_2 0x00010002
+#define JNI_VERSION_1_4 0x00010004
+#define JNI_VERSION_1_6 0x00010006
+
+#define JNI_OK          (0)         /* no error */
+#define JNI_ERR         (-1)        /* generic error */
+#define JNI_EDETACHED   (-2)        /* thread detached from the VM */
+#define JNI_EVERSION    (-3)        /* JNI version error */
+
+#define JNI_COMMIT      1           /* copy content, do not free buffer */
+#define JNI_ABORT       2           /* free buffer w/o copying back */
+
+#define JNIIMPORT
+#define JNIEXPORT
+#define JNICALL
+
+http://www.android123.com.cn/androidkaifa/316.html
