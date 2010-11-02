@@ -8,7 +8,7 @@ LOCAL_CFLAGS := -DANDROID_NDK \
                 -DDISABLE_IMPORTGL
 
 LOCAL_SRC_FILES := \
-    hellogl02.c \
+    hellogl03.c \
 
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog
 
