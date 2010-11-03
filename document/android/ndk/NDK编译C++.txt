@@ -1,0 +1,479 @@
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+[C \C++ 开发] NDK编译C++
+编译, NDK
+各位好, NDK可以成功编译.C文件,生成SO库实现lib调用,但是如何编译C++的CPP文件呢,我按照编译.c的方法如法炮制了一回,可以成功生成SO,模拟器也可以运行起来,但总是会报错,log提示没找到原生方法的定义,郁闷啊,哪位帮忙看看是什么原因?12万分的感谢! 
+
+eoeAndroidsdk重新编译问题{@hide}
+收藏 分享 00 0 好评 差评  
+ 
+ 
+ 
+  
+
+boxpei 发短消息 
+加为好友 
+boxpei 当前离线 
+
+阅读权限70 在线时间530 小时 注册时间2009-6-25 最后登录2010-10-5   
+资深工程师
+
+
+
+UID4301 帖子445 精华0 积分1523 e望33 点 e币433 元 e脉6 条 在线时间530 小时  2#  发表于 2009-7-21 08:19 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+贴关键代码，make文件，还有log信息。 
+ 
+工作是生活的一部分。 
+ TOP 
+ 
+  
+
+susan_zhang 发短消息 
+加为好友 
+susan_zhang 当前离线 
+
+阅读权限20 性别女 在线时间6 小时 注册时间2009-7-13 最后登录2009-7-29   
+初级工程师
+
+
+
+UID4956 帖子32 精华0 积分94 e望0 点 e币56 元 e脉0 条 在线时间6 小时  3#  发表于 2009-7-21 11:17 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+
+
+to boxpei:
+您就是我的救星,我已经上图了,请帮忙看看吧,还需要什么信息,您尽管说!再次感谢! 
+附件: 您需要登录才可以下载或查看附件。没有帐号？免费加入 
+ 
+ TOP 
+ 
+  
+
+boxpei 发短消息 
+加为好友 
+boxpei 当前离线 
+
+阅读权限70 在线时间530 小时 注册时间2009-6-25 最后登录2010-10-5   
+资深工程师
+
+
+
+UID4301 帖子445 精华0 积分1523 e望33 点 e币433 元 e脉6 条 在线时间530 小时  4#  发表于 2009-7-21 17:05 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+从错误信息来看，应该是你的头文件中的函数原型与c++文件中的不一致，你的make文件中也没有包含.h头文件，你把完整的.h和.cpp，make文件贴上来。 
+ 
+工作是生活的一部分。 
+ TOP 
+ 
+  
+
+boxpei 发短消息 
+加为好友 
+boxpei 当前离线 
+
+阅读权限70 在线时间530 小时 注册时间2009-6-25 最后登录2010-10-5   
+资深工程师
+
+
+
+UID4301 帖子445 精华0 积分1523 e望33 点 e币433 元 e脉6 条 在线时间530 小时  5#  发表于 2009-7-21 17:48 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+只有cpp文件的话在里面要实现jni_onLoad函数。 
+ 
+工作是生活的一部分。 
+ TOP 
+ 
+  
+
+boxpei 发短消息 
+加为好友 
+boxpei 当前离线 
+
+阅读权限70 在线时间530 小时 注册时间2009-6-25 最后登录2010-10-5   
+资深工程师
+
+
+
+UID4301 帖子445 精华0 积分1523 e望33 点 e币433 元 e脉6 条 在线时间530 小时  6#  发表于 2009-7-21 17:52 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+JNI_OnLoad函数里面要发布你的native函数，不然java那里找不到，发布用registerNativeMethods这个方法。 
+ 
+工作是生活的一部分。 
+ TOP 
+ 
+  
+
+susan_zhang 发短消息 
+加为好友 
+susan_zhang 当前离线 
+
+阅读权限20 性别女 在线时间6 小时 注册时间2009-7-13 最后登录2009-7-29   
+初级工程师
+
+
+
+UID4956 帖子32 精华0 积分94 e望0 点 e币56 元 e脉0 条 在线时间6 小时  7#  发表于 2009-7-21 17:56 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+我没有.h文件,cpp已经是完整的了,我只有这么一个函数,全局的函数应该不要.h了吧?还是android 中必须有?make文件也是完整的.是不是我还得加一个.h声明下? 
+ 
+ 
+ TOP 
+ 
+  
+
+boxpei 发短消息 
+加为好友 
+boxpei 当前离线 
+
+阅读权限70 在线时间530 小时 注册时间2009-6-25 最后登录2010-10-5   
+资深工程师
+
+
+
+UID4301 帖子445 精华0 积分1523 e望33 点 e币433 元 e脉6 条 在线时间530 小时  8#  发表于 2009-7-21 18:13 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+#include <jni.h> 
+
+
+
+#define LOG_TAG "JNITest"
+
+
+
+#undef LOG
+
+
+
+#include <utils/Log.h>
+
+
+
+
+
+
+
+
+
+
+
+JNIEXPORT jstring JNICALL Java_com_ura_test_JNITest_GetTest
+
+  (JNIEnv * env, jobject obj)
+
+{
+
+    return env->NewStringUTF( (char *)"JNITest Native String");
+
+    LOGD("Hello LIB!\n");
+
+
+
+}
+
+
+
+static JNINativeMethod methods[] = {
+
+  {"GetTest", "()Ljava/lang/String;", (void*)Java_com_ura_test_JNITest_GetTest },
+
+};
+
+
+
+static const char *classPathName = "com/ura/test/JNITest";
+
+
+
+/*
+
+* Register several native methods for one class.
+
+*/
+
+static int registerNativeMethods(JNIEnv* env, const char* className,
+
+    JNINativeMethod* gMethods, int numMethods)
+
+{
+
+    jclass clazz;
+
+    fprintf(stderr, "RegisterNatives start for '%s'", className);
+
+    clazz = env->FindClass(className);
+
+    if (clazz == NULL) {
+
+        fprintf(stderr, "Native registration unable to find class '%s'", className);
+
+        return JNI_FALSE;
+
+    }
+
+    if (env->RegisterNatives(clazz, gMethods, numMethods) < 0) {
+
+        fprintf(stderr, "RegisterNatives failed for '%s'", className);
+
+        return JNI_FALSE;
+
+    }
+
+
+
+    return JNI_TRUE;
+
+}
+
+
+
+/*
+
+* Register native methods for all classes we know about.
+
+*
+
+* returns JNI_TRUE on success.
+
+*/
+
+static int registerNatives(JNIEnv* env)
+
+{
+
+  if (!registerNativeMethods(env, classPathName,
+
+                 methods, sizeof(methods) / sizeof(methods[0]))) {
+
+    return JNI_FALSE;
+
+  }
+
+
+
+  return JNI_TRUE;
+
+}
+
+
+
+
+
+// ----------------------------------------------------------------------------
+
+
+
+/*
+
+* This is called by the VM when the shared library is first loaded.
+
+*/
+
+
+
+typedef union {
+
+    JNIEnv* env;
+
+    void* venv;
+
+} UnionJNIEnvToVoid;
+
+
+
+jint JNI_OnLoad(JavaVM* vm, void* reserved)
+
+{
+
+    UnionJNIEnvToVoid uenv;
+
+    uenv.venv = NULL;
+
+    jint result = -1;
+
+    JNIEnv* env = NULL;
+
+    
+
+    printf("JNI_OnLoad");
+
+
+
+    if (vm->GetEnv(&uenv.venv, JNI_VERSION_1_4) != JNI_OK) {
+
+        fprintf(stderr, "GetEnv failed");
+
+        goto bail;
+
+    }
+
+    env = uenv.env;
+
+
+
+    if (registerNatives(env) != JNI_TRUE) {
+
+        fprintf(stderr, "GetEnv failed");
+
+        goto bail;
+
+    }
+
+    
+
+    result = JNI_VERSION_1_4;
+
+    
+
+bail:
+
+    return result;
+
+}
+复制代码 
+ 
+工作是生活的一部分。 
+ TOP 
+ 
+  
+
+susan_zhang 发短消息 
+加为好友 
+susan_zhang 当前离线 
+
+阅读权限20 性别女 在线时间6 小时 注册时间2009-7-13 最后登录2009-7-29   
+初级工程师
+
+
+
+UID4956 帖子32 精华0 积分94 e望0 点 e币56 元 e脉0 条 在线时间6 小时  9#  发表于 2009-7-22 09:26 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+太感谢你了,boxpei,我决心要更加努力学习android,要不然都对不起你这么耐心细心的教我了. 
+ 
+ 
+ TOP 
+ 
+  
+
+susan_zhang 发短消息 
+加为好友 
+susan_zhang 当前离线 
+
+阅读权限20 性别女 在线时间6 小时 注册时间2009-7-13 最后登录2009-7-29   
+初级工程师
+
+
+
+UID4956 帖子32 精华0 积分94 e望0 点 e币56 元 e脉0 条 在线时间6 小时  10#  发表于 2009-7-22 09:31 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+还有,如果我有.h的话,是不是就不用实现jni_onLoad?
+thank you! 
+ 
+ 
+ TOP 
+ 
+  
+
+boxpei 发短消息 
+加为好友 
+boxpei 当前离线 
+
+阅读权限70 在线时间530 小时 注册时间2009-6-25 最后登录2010-10-5   
+资深工程师
+
+
+
+UID4301 帖子445 精华0 积分1523 e望33 点 e币433 元 e脉6 条 在线时间530 小时  11#  发表于 2009-7-22 10:38 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+使用.h文件的话不需要自己registerNativeMethods，jni_OnLoad函数是在系统load库文件的时候首先查找的入口函数，如果没有这个函数系统就以旧的jni版本的方式来处理。 
+ 
+工作是生活的一部分。 
+ TOP 
+ 
+  
+
+boxpei 发短消息 
+加为好友 
+boxpei 当前离线 
+
+阅读权限70 在线时间530 小时 注册时间2009-6-25 最后登录2010-10-5   
+资深工程师
+
+
+
+UID4301 帖子445 精华0 积分1523 e望33 点 e币433 元 e脉6 条 在线时间530 小时  12#  发表于 2009-7-22 11:16 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+大家互相学习。 
+ 
+工作是生活的一部分。 
+ TOP 
+ 
+  
+
+ophone78 发短消息 
+加为好友 
+ophone78 当前离线 
+
+阅读权限50 在线时间424 小时 注册时间2009-7-23 最后登录2010-6-7   
+高级工程师
+
+
+
+UID5452 帖子134 精华0 积分780 e望0 点 e币222 元 e脉0 条 在线时间424 小时  13#  发表于 2009-8-6 16:09 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+12# boxpei boxpei，你好，我想问一下，android中 调用C++的方法，要是C++的返回结果是指针类型的话，要怎么处理呢，java中并没有指针的类型啊？ 
+ 
+ 
+ TOP 
+ 
+  
+
+boxpei 发短消息 
+加为好友 
+boxpei 当前离线 
+
+阅读权限70 在线时间530 小时 注册时间2009-6-25 最后登录2010-10-5   
+资深工程师
+
+
+
+UID4301 帖子445 精华0 积分1523 e望33 点 e币433 元 e脉6 条 在线时间530 小时  14#  发表于 2009-8-6 18:02 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+jni只支持基础类型的自动转换，其他类型的需要自己处理，c++中如果返回的是指针，那只有自己处理这些指针，把内容重新整理成基础类型再传给java。 
+ 
+工作是生活的一部分。 
+ TOP 
+ 
+  
+
+ophone78 发短消息 
+加为好友 
+ophone78 当前离线 
+
+阅读权限50 在线时间424 小时 注册时间2009-7-23 最后登录2010-6-7   
+高级工程师
+
+
+
+UID5452 帖子134 精华0 积分780 e望0 点 e币222 元 e脉0 条 在线时间424 小时  15#  发表于 2009-8-17 11:10 | 只看该作者 
+浏览器再掀狂潮 独家火热首发等您来尝《天天浏览器》
+本帖最后由 ophone78 于 2009-8-17 11:27 编辑 
+
+谢谢，处理完了的指针也是一个LONG型的数值吧，指向的是一个地址。java会把指针的long型当做一个long类型的值吧？那在java中，有什么办法可以让java把取出这个地址里的内容呢？
+如果不是这样，能说一下怎么在c++中处理成基础类型，然后在Java中怎么调用指针指向的内存呢？ 
+
+
+boxpei 
+发短消息 
+加为好友 
+boxpei 当前离线 
+
+阅读权限70 在线时间530 小时 注册时间2009-6-25 最后登录2010-10-5   
+资深工程师
+
+
+
+
+不要用指针，这种情况下要么把指针指向的内容包装成object，或者分成多个有基础类型构成的变量返回给java。jni不能处理指针类型，因此java中无法通过这个指针来取得指针指向的内容。 
+ 
+ 
+http://www.eoeandroid.com/thread-1576-1-1.html
