@@ -1,0 +1,242 @@
+c语言typedef的用法-解惑阿！很多天书般的东西解释的不错（转）
+一.基本概念剖析 
+
+int* (*a[5])(int, char*);       //＃1 
+void (*b[10]) (void (*)()); //＃2 
+double(*)() (*pa)[9];          //＃3 
+
+
+1．C语言中函数声明和数组声明。函数声明一般是这样：
+int fun(int, double);
+对应函数指针（pointer to function）的声明是这样：
+int (*pf)(int, double)；
+可以这样使用：
+pf = &fun;       //赋值（assignment）操作 
+(*pf)(5, 8.9);//函数调用操作 
+也请注意，C语言本身提供了一种简写方式如下：
+pf = fun;        // 赋值（assignment）操作 
+pf(5, 8.9);      // 函数调用操作
+不过我本人不是很喜欢这种简写，它对初学者带来了比较多的迷惑。 
+数组声明一般是这样：
+int a[5]；
+对于数组指针（pointer to array）的声明是这样：
+int (*pa)[5];
+可以这样使用：
+pa = &a；             // 赋值（assignment）操作 
+int i = (*pa)[2]； // 将a[2]赋值给i； 
+
+2.有了上面的基础，我们就可以对付开头的三只纸老虎了!：） 这个时候你需要复习一下各种运算符的优先顺序和结合顺序了，顺便找本书看看就够了。 
+＃1：int* (*a[5])(int, char*);
+首先看到标识符名a，“[]”优先级大于“*”，a与“[5]”先结合。所以a是一个数组，这个数组有5个元素，每一个元素都是一个指针，
+指针指向“(int, char*)”，对，指向一个函数，函数参数是“int, char*”，返回值是“int*”。完毕，我们干掉了第一个纸老虎。：）
+
+
+＃2：void (*b[10]) (void (*)());
+b是一个数组，这个数组有10个元素，每一个元素都是一个指针，指针指向一个函数，函数参数是“void (*)()”【注1】，返回值是“void”。完毕！
+注1：这个参数又是一个指针，指向一个函数，函数参数为空，返回值是“void”。 
+
+
+＃3：double(*)()(*pa)[9];
+pa是一个指针，指针指向一个数组，这个数组有9个元素，每一个元素都是“double(*)()”【也即一个指针，指向一个函数，函数参数为空，返回值是“double
+
+---------------------------------------------------------------
+＃1：int* (*a[5])(int, char*);
+typedef int* (*PF)(int, char*);//PF是一个类型别名【注2】。 
+PF a[5];//跟int* (*a[5])(int, char*);的效果一样！ 
+注2：很多初学者只知道typedef char* pchar；但是对于typedef的其它用法不太了解。Stephen Blaha对typedef用法做过一个总结：“建立一个类型别名的方法很简单，在传统的变量声明表达式里用类型名替代变量名，然后把关键字typedef加在该语句的开头”。 
+
+
+＃2：void (*b[10])(void (*)());
+typedef void (*pfv)(); 
+typedef void (*pf_taking_pfv)(pfv);
+pf_taking_pfv b[10]; //跟void (*b[10]) (void (*)());的效果一样！ 
+
+
+＃3. double(*)()(*pa)[9]; 
+typedef double(*PF)();
+typedef PF (*PA)[9]; 
+PA pa; //跟doube(*)()(*pa)[9];的效果一样！ 
+
+3.const和volatile在类型声明中的位置。
+在这里我只说const，volatile是一样的!【注3】
+注3：顾名思义，volatile修饰的量就是很容易变化，不稳定的量，它可能被其它线程，操作系统，硬件等等在未知的时间改变，
+所以它被存储在内存中，每次取用它的时候都只能在内存中去读取，它不能被编译器优化放在内部寄存器中。
+类型声明中const用来修饰一个常量，我们一般这样使用：const在前面：
+const int； //int是const
+const char*;//char是const 
+char* const;//*（指针）是const 
+const char* const;//char和*都是const 
+对初学者，const char*和 char* const是容易混淆的。这需要时间的历练让你习惯它。 上面的声明有一个对等的写法：const在后面：
+int const； //int是const 
+char const*;//char是const 
+char* const;//*（指针）是const 
+char const* const;//char和*都是const 
+
+
+第一次你可能不会习惯，但新事物如果是好的，我们为什么要拒绝它呢？：）const在后面有两个好处：
+A．const所修饰的类型正好是在它前面的那一个。如果这个好处还不能让你动心的话，那请看下一个！
+B．我们很多时候会用到typedef的类型别名定义。比如typedef char* pchar，如果用const来修饰的话，
+
+
+当const在前面的时候，就是const pchar，你会以为它就是const char* ，但是你错了，它的真实含义是char* const。
+是不是让你大吃一惊！但如果你采用const在后面的写法，意义就怎么也不会变，不信你试试！
+不过，在真实项目中的命名一致性更重要。你应该在两种情况下都能适应，并能自如的转换，公司习惯，
+商业利润不论在什么时候都应该优先考虑！不过在开始一个新项目的时候，你可以考虑优先使用const在后面的习惯用法。 
+
+
+二.Typedef声明有助于创建平台无关类型，甚至能隐藏复杂和难以理解的语法。
+   不管怎样，使用 typedef 能为代码带来意想不到的好处，通过本文你可以学习用typedef避免缺欠，从而使代码更健壮。
+typedef声明，简称typedef，为现有类型创建一个新的名字。比如人们常常使用 typedef 来编写更美观和可读的代码。
+所谓美观，意指typedef 能隐藏笨拙的语法构造以及平台相关的数据类型，从而增强可移植性和以及未来的可维护性。
+本文下面将竭尽全力来揭示 typedef 强大功能以及如何避免一些常见的陷阱,如何创建平台无关的数据类型，隐藏笨拙且难以理解的语法.
+typedef使用最多的地方是创建易于记忆的类型名，用它来归档程序员的意图。类型出现在所声明的变量名字中，位于typedef关键字右边。
+例如：typedef int size;
+此声明定义了一个 int 的同义字，名字为 size。注意typedef并不创建新的类型。它仅仅为现有类型添加一个同义字。
+你可以在任何需要 int 的上下文中使用 size：
+void measure(size * psz); 
+size array[4]; 
+size len = file.getlength(); 
+typedef 还可以掩饰复合类型，如指针和数组。例如，你不用象下面这样重复定义有81个字符元素的数组：
+char line[81]; char text[81];
+定义一个typedef，每当要用到相同类型和大小的数组时，可以这样： 
+typedef char Line[81];
+Line text, secondline; 
+getline(text); 
+同样，可以象下面这样隐藏指针语法：
+typedef char * pstr; 
+int mystrcmp(pstr, pstr); 　　
+这里将带我们到达第一个 typedef 陷阱。标准函数 strcmp()有两个const char *类型的参数。因此，它可能会误导人们象下面这样声明：
+int mystrcmp(const pstr, const pstr);
+这是错误的，事实上，const pstr被编译器解释为char * const（一个指向 char 的常量指针），而不是const char *（指向常量 char 的指针）。
+这个问题很容易解决： 
+typedef const char * cpstr; 
+int mystrcmp(cpstr, cpstr);
+上面讨论的 typedef 行为有点像 #define 宏，用其实际类型替代同义字。不同点是typedef在编译时被解释
+，因此让编译器来应付超越预处理器能力的文本替换。例如：
+typedef int (*PF) (const char *, const char *);
+这个声明引入了 PF 类型作为函数指针的同义字，该函数有两个 const char * 类型的参数以及一个 int 类型的返回值。如果要使用下列形式的函数声明，那么上述这个 typedef 是不可或缺的：
+PF Register(PF pf);
+Register()的参数是一个PF类型的回调函数，返回某个函数的地址，其署名与先前注册的名字相同。做一次深呼吸。下面我展示一下如果不用 typedef，我们是如何实现这个声明的： 
+int (*Register (int (*pf)(const char *, const char *))) (const char *, const char *);
+很少有程序员理解它是什么意思，更不用说这种费解的代码所带来的出错风险了。显然，这里使用 typedef 不是一种特权，
+而是一种必需。typedef 就像 auto，extern，mutable，static，和 register 一样，是一个存储类关键字。
+这并不是说typedef会真正影响对象的存储特性；它只是说在语句构成上，typedef 声明看起来象 static，extern 等类型的变量声明。
+下面将带到第二个陷阱：
+typedef register int FAST_COUNTER; // 错误编译通不过
+问题出在你不能在声明中有多个存储类关键字。因为符号 typedef 已经占据了存储类关键字的位置，
+在 typedef 声明中不能用 register（或任何其它存储类关键字）。typedef 有另外一个重要的用途，那就是定义机器无关的类型，
+例如，你可以定义一个叫 REAL 的浮点类型，在目标机器上它可以获得最高的精度： 
+
+typedef long double REAL; 
+在不支持 long double 的机器上，该 typedef 看起来会是下面这样：
+typedef double REAL;
+并且，在连 double 都不支持的机器上，该 typedef 看起来会是这样：
+typedef float REAL;
+你不用对源代码做任何修改，便可以在每一种平台上编译这个使用 REAL 类型的应用程序。唯一要改的是 typedef 本身。
+在大多数情况下，甚至这个微小的变动完全都可以通过奇妙的条件编译来自动实现。不是吗?
+标准库广泛地使用 typedef 来创建这样的平台无关类型：size_t，ptrdiff 和 fpos_t 就是其中的例子。
+此外，象 std::string 和 std::ofstream 这样的 typedef 还隐藏了长长的，难以理解的模板特化语法，
+例如：basic_string，allocator> 和 basic_ofstream>。
+
+用途一：
+定义一种类型的别名，而不只是简单的宏替换。可以用作同时声明指针型的多个对象。比如：
+char* pa, pb; // 这多数不符合我们的意图，它只声明了一个指向字符变量的指针， 
+// 和一个字符变量；
+以下则可行：
+typedef char* PCHAR; // 一般用大写
+PCHAR pa, pb; // 可行，同时声明了两个指向字符变量的指针
+虽然：
+char *pa, *pb;
+也可行，但相对来说没有用typedef的形式直观，尤其在需要大量指针的地方，typedef的方式更省事。
+
+用途二：
+用在旧的C代码中（具体多旧没有查），帮助struct。以前的代码中，声明struct新对象时，必须要带上struct，即形式为： struct 结构名 对象名，如：
+struct tagPOINT1
+{
+int x;
+int y;
+};
+struct tagPOINT1 p1; 
+
+而在C++中，则可以直接写：结构名 对象名，即：
+tagPOINT1 p1;
+
+估计某人觉得经常多写一个struct太麻烦了，于是就发明了：
+typedef struct tagPOINT
+{
+int x;
+int y;
+}POINT;
+
+POINT p1; // 这样就比原来的方式少写了一个struct，比较省事，尤其在大量使用的时候
+
+或许，在C++中，typedef的这种用途二不是很大，但是理解了它，对掌握以前的旧代码还是有帮助的，毕竟我们在项目中有可能会遇到较早些年代遗留下来的代码。
+
+用途三：
+用typedef来定义与平台无关的类型。
+比如定义一个叫 REAL 的浮点类型，在目标平台一上，让它表示最高精度的类型为：
+typedef long double REAL; 
+在不支持 long double 的平台二上，改为：
+typedef double REAL; 
+在连 double 都不支持的平台三上，改为：
+typedef float REAL; 
+也就是说，当跨平台时，只要改下 typedef 本身就行，不用对其他源码做任何修改。
+标准库就广泛使用了这个技巧，比如size_t。
+另外，因为typedef是定义了一种类型的新别名，不是简单的字符串替换，所以它比宏来得稳健（虽然用宏有时也可以完成以上的用途）。
+
+用途四：
+为复杂的声明定义一个新的简单的别名。方法是：在原来的声明里逐步用别名替换一部分复杂声明，如此循环，把带变量名的部分留到最后替换，得到的就是原声明的最简化版。举例：
+
+1. 原声明：int *(*a[5])(int, char*);
+变量名为a，直接用一个新别名pFun替换a就可以了：
+typedef int *(*pFun)(int, char*); 
+原声明的最简化版：
+pFun a[5]; 
+
+2. 原声明：void (*b[10]) (void (*)());
+变量名为b，先替换右边部分括号里的，pFunParam为别名一：
+typedef void (*pFunParam)();
+再替换左边的变量b，pFunx为别名二：
+typedef void (*pFunx)(pFunParam);
+原声明的最简化版：
+pFunx b[10];
+
+3. 原声明：doube(*)() (*e)[9]; 
+变量名为e，先替换左边部分，pFuny为别名一：
+typedef double(*pFuny)();
+再替换右边的变量e，pFunParamy为别名二
+typedef pFuny (*pFunParamy)[9];
+原声明的最简化版：
+pFunParamy e; 
+
+理解复杂声明可用的“右左法则”：从变量名看起，先往右，再往左，碰到一个圆括号就调转阅读的方向；括号内分析完就跳出括号，还是按先右后左的顺序，如此循环，直到整个声明分析完。举例：
+int (*func)(int *p);
+首先找到变量名func，外面有一对圆括号，而且左边是一个*号，这说明func是一个指针；然后跳出这个圆括号，先看右边，又遇到圆括号，这说明(*func)是一个函数，所以func是一个指向这类函数的指针，即函数指针，这类函数具有int*类型的形参，返回值类型是int。
+int (*func[5])(int *);
+func右边是一个[]运算符，说明func是具有5个元素的数组；func的左边有一个*，说明func的元素是指针（注意这里的*不是修饰func，而是修饰func[5]的，原因是[]运算符优先级比*高，func先跟[]结合）。跳出这个括号，看右边，又遇到圆括号，说明func数组的元素是函数类型的指针，它指向的函数具有int*类型的形参，返回值类型为int。
+
+也可以记住2个模式：
+type (*)(....)函数指针 
+type (*)[]数组指针 
+－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+
+陷阱一：
+记住，typedef是定义了一种类型的新别名，不同于宏，它不是简单的字符串替换。比如：
+先定义：
+typedef char* PSTR;
+然后：
+int mystrcmp(const PSTR, const PSTR);
+
+const PSTR实际上相当于const char*吗？不是的，它实际上相当于char* const。
+原因在于const给予了整个指针本身以常量性，也就是形成了常量指针char* const。
+简单来说，记住当const和typedef一起出现时，typedef不会是简单的字符串替换就行。
+
+陷阱二：
+typedef在语法上是一个存储类的关键字（如auto、extern、mutable、static、register等一样），虽然它并不真正影响对象的存储特性，如：
+typedef static int INT2; //不可行
+编译将失败，会提示“指定了一个以上的存储类”。
+
+”】。(注意typedef int* p[9]与typedef int(*p)[9]的区别，前者定义一个数组，此数组包含9个int*类型成员，而后者定义一个指向数组的指针，被指向的数组包含9个int类型成员)。
+现在是不是觉得要认识它们是易如反掌，工欲善其事，必先利其器！我们对这种表达方式熟悉之后，就可以用“typedef”来简化这种类型声明。 
+
+http://www.cnblogs.com/wchhuangya/archive/2009/12/25/1632160.html
