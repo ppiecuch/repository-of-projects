@@ -51,3 +51,12 @@ static {
     	System.loadLibrary("hellogl");
     }
 所以可能是装载错类了，将static块移到HelloGLRender下，编译报不能在内部类中放静态块，只能将native代码放到HelloGLView中，重新编译，通过
+
+
+[Exception]
+JNI调用CPP生成的so库时出现
+JNI_OnLoad.....
+.......
+UnsatisfiedLinkError: Library <out native shared library> not found 
+解决:
+将JNI_OnLoad函数删掉,解决
