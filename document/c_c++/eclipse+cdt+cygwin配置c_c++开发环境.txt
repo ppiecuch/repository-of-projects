@@ -87,7 +87,7 @@ run:
 
 报错:No rule to make target `all'
 
-
+未找到cygwin1.dll问题：
 设置环境变量， Path=%Path%；%Cygwin_Path%/bin，LIBRARY_PATH=%Cygwin_Path%/lib, C_INCLUDE_PATH=%Cygwin_Path%/usr/include 然后重启机器 .
 
 
@@ -95,5 +95,7 @@ run:
 
 要先build自己的project,在run就不会有那样的问题了
 Build Configuration->build->...
+
+
 
 
