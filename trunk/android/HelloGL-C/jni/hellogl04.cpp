@@ -1,12 +1,15 @@
 #include <string.h>
 #include <jni.h>
+#include <jni_md.h>
 #include <stdio.h>
 #include <GLES/gl.h>
 #include <android/log.h>
 #include <math.h>
+#include <stl_pair.h>
 #include "hellogl.h"
 #include "point3f.h"
-#include "math/sphere.h"
+
+using namespace std;
 
 /***************************************/
 /*             球体(索引数组)           */
@@ -19,14 +22,13 @@
 
 static int  sWindowWidth  = 320;
 static int  sWindowHeight = 480;
-static Sphere* sphere;
 
 
 void appInit()
 {
 	glClearColorx((GLfixed)(0.1f * 65536),(GLfixed)(0.2f * 65536),(GLfixed)(0.3f * 65536), 0x10000);
 	Point3f *point=new Point3f();
-	sphere=new Sphere(RADIUS,HORIZONAL_STEPS,PORTRAIT_STEPS);
+	cout<<*point<<endl;
 }
 
 void appResize(int width,int height)
