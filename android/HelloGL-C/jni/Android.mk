@@ -11,6 +11,6 @@ LOCAL_SRC_FILES := \
 	point3f.cpp \
     hellogl04.cpp \
 
-LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog
+LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lstdc++
 
 include $(BUILD_SHARED_LIBRARY)
