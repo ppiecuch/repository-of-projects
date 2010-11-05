@@ -1,0 +1,74 @@
+http://www.codexperiments.com/android/2010/05/android-introduction-part-2-setting-up-your-environment/
+
+I've been able to run the STLport (and the unit tests) as a dynamic
+library, on Android 1.6 and 2, using the Ndk compilation makefiles
+(Android.mk) instead of the STLport makefiles (there must be lacking
+compilation options).
+
+** Here is the Android.mk for the library (in the source directory):
+
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+
+ifdef STLG
+LOCAL_MODULE := stlport_stlg
+else
+LOCAL_MODULE := stlport
+endif
+
+LOCAL_SRC_FILES := \
+strstream.cpp messages.cpp iostream.cpp ctype.cpp dll_main.cpp
+complex_trig.cpp locale_catalog.cpp complex_io.cpp allocators.cpp
+string.cpp ostream.cpp locale_impl.cpp libstlport.so locale.cpp
+istream.cpp time_facets.cpp fstream.cpp bitset.cpp codecvt.cpp
+stdio_streambuf.cpp complex.cpp ios.cpp sstream.cpp num_put.cpp
+num_put_float.cpp cxa.c facets_byname.cpp numpunct.cpp monetary.cpp
+num_get_float.cpp num_get.cpp c_locale.c collate.cpp
+#locale_impl.cpp ios.cpp monetary.cpp num_put_float.cpp numpunct.cpp
+cxa.c time_facets.cpp wince_env.cpp warning_disable.h dll_main.cpp
+collate.cpp num_get_float.cpp Application.mk istream.cpp _stdio_file.h
+stdio_streambuf.h wince_multibyte.cpp num_get.cpp acquire_release.h
+fstream.cpp stlport.rc wince_file.cpp c_locale.c strstream.cpp
+complex.cpp message_facets.h wince_string.cpp sstream.cpp ostream.cpp
+aligned_buffer.h ctype.cpp c_locale.h locale_impl.h iostream.cpp
+codecvt.cpp messages.cpp Android.mk string.cpp facets_byname.cpp
+bitset.cpp wince_time.cpp locale.cpp lock_free_slist.h
+stdio_streambuf.cpp complex_io.cpp sparc_atomic.s allocators.cpp
+details/fstream_stdio.cpp details/fstream_unistd.cpp details/
+fstream_win32io.cpp locale_catalog.cpp complex_trig.cpp num_put.cpp
+stlport_prefix.h
+
+
+LOCAL_CFLAGS = -Iapps/$(LOCAL_MODULE)/include \
+-mandroid \
+-DTARGET_OS=android \
+--sysroot=build/platforms/android-5/arch-arm
+
+ifeq ($(LOCAL_MODULE),stlport_stlg)
+LOCAL_CFLAGS += -D_STLP_DEBUG
+endif
+
+include $(BUILD_SHARED_LIBRARY)
+
+
+
+** and the Application.mk:
+APP_PROJECT_PATH := $(call my-dir)
+APP_MODULES := stlport
+#STLG := 1
+APP_BUILD_SCRIPT := $(APP_PROJECT_PATH)/Android.mk
+
+#APP_OPTIM:=debug
+APP_OPTIM:=release
+
+-- 
+You received this message because you are subscribed to the Google Groups 
+"android-ndk" group.
+To post to this group, send email to android-ndk@xxxxxxxxxxxxxxxxx
+To unsubscribe from this group, send email to 
+android-ndk+unsubscribe@xxxxxxxxxxxxxxxxx
+For more options, visit this group at 
+http://groups.google.com/group/android-ndk?hl=en.
+
+
+http://osdir.com/ml/android-ndk/2010-03/msg00383.html

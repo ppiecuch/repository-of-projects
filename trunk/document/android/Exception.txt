@@ -60,3 +60,8 @@ JNI_OnLoad.....
 UnsatisfiedLinkError: Library <out native shared library> not found 
 解决:
 将JNI_OnLoad函数删掉,解决
+
+
+
+[Exception]
+使用iostream出现iostream:No such file or directory
