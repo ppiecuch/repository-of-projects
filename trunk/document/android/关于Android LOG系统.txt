@@ -1,0 +1,225 @@
+共两篇文章，第一篇讲述了如何在程序中输出Log信息，第二篇详细的分析了Log信息的输出机制。
+
+下面是第一篇（转自：http://blog.163.com/binghaitao@126/blog/static/3383532520099309366435/）
+
+1：在编译so文件的c或cpp文件之前中加入以下代码，就可以在android中的log显示日志内容
+       #include <android/log.h>
+
+       #define LOG_TAG "show infomation"
+
+       #define LOGW(a ) __android_log_write(ANDROID_LOG_WARN,LOG_TAG,a)
+
+2:就可以在c或cpp中加入LOWG（str） 就可以在android中的log中显示打印的内容
+
+3.这样写完以后，如果直接编译，就会报 __android_log_write 方法undefined.
+
+怎么回事呢？关键是在设置编译选项上面。
+
+在Android.mk文件里，可以指定一个LOCAL_LDLIBS的参数。如果不指定，那么编译的时候，只会引入默认的几个重要的lib，比如libc之类的。
+
+如果要用log，那就要把 liblog给引进来。
+
+网上很多的写法是 LOCAL_LDLIBS := -llog ,这在build static lib的时候没什么问题。如果是build shared lib,就会报个 cannot find -llog的错误。意思是找不到liblog.so这个库文件。
+
+因此需要改成 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog 才可以正常编译。
+
+其中-L参数是指定了搜索lib的路径。
+
+下面是一个android.mk的内容的例子：
+
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := TestNdkNetwork
+
+LOCAL_SRC_FILES := HttpConnection.cpp
+
+LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog
+
+include $(BUILD_SHARED_LIBRARY)
+
+
+
+下面是第二篇（转自http://blog.csdn.net/knock/archive/2010/04/21/5511255.aspx）
+
+
+
+
+为了调试，必须要将log怎么打印的搞清楚，于是有了以下的分析。
+
+我们通常在程序中插入LOGD(..),LOGE(..)之类的语句，但什么情况下可以查看这些打印消息呢？
+首先，来到定义处:system/core/include/cutils/log.h，在开头就可以看到
+#ifndef LOG_TAG
+#define LOG_TAG NULL
+#endif
+所以程序中#include "log.h"之前要定义LOG_TAG,不然就为空.
+再看LOGD的定义
+#ifndef LOGD
+#define LOGD(...) ((void)LOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__))
+#endif
+跟进
+#ifndef LOG
+#define LOG(priority, tag, ...) \
+    LOG_PRI(ANDROID_##priority, tag, __VA_ARGS__)
+#endif
+继续
+#ifndef LOG_PRI
+#define LOG_PRI(priority, tag, ...) \
+    android_printLog(priority, tag, __VA_ARGS__)
+#endif
+再跟进
+#define android_printLog(prio, tag, fmt...) \
+    __android_log_print(prio, tag, fmt)
+
+__android_log_print()是位于system/core/liblog/logd_write.c内
+int __android_log_print(int prio, const char *tag, const char *fmt, ...)
+{
+    va_list ap;
+    char buf[LOG_BUF_SIZE];   
+
+    va_start(ap, fmt);
+    vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
+    va_end(ap);
+
+    return __android_log_write(prio, tag, buf);
+}
+看__android_log_write()
+int __android_log_write(int prio, const char *tag, const char *msg)
+{
+    ......
+
+    return write_to_log(log_id, vec, 3);
+}
+write_to_log定义如下
+static int (*write_to_log)(log_id_t, struct iovec *vec, size_t nr) =
+    __write_to_log_init;
+查看一下
+static int __write_to_log_init(log_id_t log_id, struct iovec *vec, size_t nr)
+{
+#ifdef HAVE_PTHREADS
+    pthread_mutex_lock(&log_init_lock);
+#endif
+
+    if (write_to_log == __write_to_log_init) {
+        log_fds[LOG_ID_MAIN] = log_open("/dev/"LOGGER_LOG_MAIN, O_WRONLY);
+        log_fds[LOG_ID_RADIO] = log_open("/dev/"LOGGER_LOG_RADIO, O_WRONLY);
+        log_fds[LOG_ID_EVENTS] = log_open("/dev/"LOGGER_LOG_EVENTS, O_WRONLY);
+
+        write_to_log = __write_to_log_kernel;
+
+        if (log_fds[LOG_ID_MAIN] < 0 || log_fds[LOG_ID_RADIO] < 0 ||
+                log_fds[LOG_ID_EVENTS] < 0) {
+            log_close(log_fds[LOG_ID_MAIN]);
+            log_close(log_fds[LOG_ID_RADIO]);
+            log_close(log_fds[LOG_ID_EVENTS]);
+            log_fds[LOG_ID_MAIN] = -1;
+            log_fds[LOG_ID_RADIO] = -1;
+            log_fds[LOG_ID_EVENTS] = -1;
+            write_to_log = __write_to_log_null;
+        }
+    }
+
+#ifdef HAVE_PTHREADS
+    pthread_mutex_unlock(&log_init_lock);
+#endif
+
+    return write_to_log(log_id, vec, nr);
+}
+这段的主要意思是打开/dev/log/main,/dev/log/radio,/dev/log/events三个设备都成功则将
+
+write_to_log指向__write_to_log_kernel，否则指向__write_to_log_null。
+下面就分别看看这两个
+static int __write_to_log_null(log_id_t log_fd, struct iovec *vec, size_t nr)
+{
+    return -1;
+}
+
+static int __write_to_log_kernel(log_id_t log_id, struct iovec *vec, size_t nr)
+{
+    ssize_t ret;
+    int log_fd;
+
+    if (/*(int)log_id >= 0 &&*/ (int)log_id < (int)LOG_ID_MAX) {
+        log_fd = log_fds[(int)log_id];
+    } else {
+        return EBADF;
+    }
+
+    do {
+        ret = log_writev(log_fd, vec, nr);
+    } while (ret < 0 && errno == EINTR);
+
+    return ret;
+}
+__write_to_log_null()什么也不做，表示丢弃log信息。__write_to_log_kernel会调用log_writev()
+
+将log写进对应的设备(/dev/log/*).
+
+为什么写进init.rc里由init来执行的程序不能输出log呢？下面再来探究一番。。
+system/core/init/init.c中，
+void service_start(struct service *svc)函数启动服务，有这么一句
+        if (needs_console) {
+            setsid();
+            open_console();
+        } else {
+            zap_stdio();
+        }
+而这两个函数为：
+static void zap_stdio(void)
+{
+    int fd;
+    fd = open("/dev/null", O_RDWR);
+    dup2(fd, 0);
+    dup2(fd, 1);
+    dup2(fd, 2);
+    close(fd);
+}
+
+static void open_console()
+{
+    int fd;
+    if ((fd = open(console_name, O_RDWR)) < 0) {
+        fd = open("/dev/null", O_RDWR);
+    }
+    dup2(fd, 0);
+    dup2(fd, 1);
+    dup2(fd, 2);
+    close(fd);
+}
+zap_stdio()比较狠，直接将STDIN,STDOUT,STDERR都干掉了，而open_console()则只是在/dev/console
+
+不存在的情况下才干掉STDIN,STDOUT,STDERR，如果/dev/console存在，则将所有输入输出重定向到它
+
+。
+调用哪个取决于needs_console，
+needs_console = (svc->flags & SVC_CONSOLE) ? 1 : 0;
+而svc->flags关于SVC_CONSOLE的部分来自于system/core/init/parser.c
+static void parse_line_service(struct parse_state *state, int nargs, char **args)
+{
+       case K_console:
+        svc->flags |= SVC_CONSOLE;
+        break;
+
+}
+这也就是说如果init.rc中service部分有请求console，则可以打印到console。
+
+但怎么样才能打印到系统的log中，可以使用logcat来查看呢？这就需要用到logwrapper。
+system/core/logwrapper/logwrapper.c中，logwrapper先打开/dev/ptmx，查询到设备名后
+fork()一个子进程并将STDOUT,STDERR定向到查询到的设备。
+        // redirect stdout and stderr
+        close(parent_ptty);
+        dup2(child_ptty, 1);
+        dup2(child_ptty, 2);
+        close(child_ptty);
+然后开始执行要运行的程序
+child(argc - 1, &argv[1]);
+
+
+总结：
+系统中的程序中输出log一般是到/dev/log/下的三个设备中，可以用logcat查看。
+对于init运行的程序则有两种方法查看到log信息：
+1.添加/system/bin/logwrapper,可以用logcat查看，例如
+service /system/bin/logwrapper /system/bin/rild
+2.添加console,像sh一样直接输出到console
+service console /system/bin/sh

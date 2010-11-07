@@ -1,0 +1,227 @@
+Camera image->NDK->OpenGL texture
+Since we are currently working on some augmented reality stuff for Android I need to show the camera image using OpenGL ES. It works great with pure Java if one uses only the grayscale image. However, I needed the color image. The G1¡äs camera delivers the image in a YUV format while OpenGL only understand RGB images. Unfortunately it is out of question to convert the YUV image to RGB in pure Java for images with 480¡Á320 pixels. Thus, I used the NDK to implement the conversion. The code below does the job. It is based on code provided by Tom Gibara.
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+ void toRGB565(unsigned short *yuvs, int widthIn, int heightIn, unsigned int *rgbs, int widthOut, int heightOut) {
+  int half_widthIn = widthIn >> 1;
+ 
+  //the end of the luminance data
+  int lumEnd = (widthIn * heightIn) >> 1;
+  //points to the next luminance value pair
+  int lumPtr = 0;
+  //points to the next chromiance value pair
+  int chrPtr = lumEnd;
+  //the end of the current luminance scanline
+  int lineEnd = half_widthIn;
+ 
+  int x,y;
+  for (y=0;y<heightIn;y++) {
+    int yPosOut=(y*widthOut) >> 1;
+    for (x=0;x<half_widthIn;x++) {
+      //read the luminance and chromiance values
+      int Y1 = yuvs[lumPtr++];
+      int Y2 = (Y1 >> 8) & 0xff;
+      Y1 = Y1 & 0xff;
+      int Cr = yuvs[chrPtr++];
+      int Cb = ((Cr >> 8) & 0xff) - 128;
+      Cr = (Cr & 0xff) - 128;
+ 
+      int R, G, B;
+      //generate first RGB components
+      B = Y1 + ((454 * Cb) >> 8);
+      if (B < 0) B = 0; if (B > 255) B = 255;
+      G = Y1 - ((88 * Cb + 183 * Cr) >> 8);
+      if (G < 0) G = 0; if (G > 255) G = 255;
+      R = Y1 + ((359 * Cr) >> 8);
+      if (R < 0) R = 0; if (R > 255) R = 255;
+      int val = ((R & 0xf8) << 8) | ((G & 0xfc) << 3) | (B >> 3);
+ 
+      //generate second RGB components
+      B = Y1 + ((454 * Cb) >> 8);
+      if (B < 0) B = 0; if (B > 255) B = 255;
+      G = Y1 - ((88 * Cb + 183 * Cr) >> 8);
+      if (G < 0) G = 0; if (G > 255) G = 255;
+      R = Y1 + ((359 * Cr) >> 8);
+      if (R < 0) R = 0; if (R > 255) R = 255;
+      rgbs[yPosOut+x] = val | ((((R & 0xf8) << 8) | ((G & 0xfc) << 3) | (B >> 3)) << 16);
+    }
+    //skip back to the start of the chromiance values when necessary
+    chrPtr = lumEnd + ((lumPtr  >> 1) / half_widthIn) * half_widthIn;
+    lineEnd += half_widthIn;
+  }
+} 
+
+The code is not that optimized at the moment but can process a 480¡Á320 image in ~25ms on my G1 (which is somewhat slow according to my student¡¯s comments). In order to call this function from Java I needed a wrapper with a JNI signature:
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+ /**
+ * Converts the input image from YUV to a RGB 5_6_5 image.
+ * The size of the output buffer must be at least the size of the input image.
+ */
+JNIEXPORT void JNICALL Java_de_offis_magic_core_NativeWrapper_image2TextureColor
+  (JNIEnv *env, jclass clazz,
+  jbyteArray imageIn, jint widthIn, jint heightIn,
+  jobject imageOut, jint widthOut, jint heightOut,
+  jint filter) {
+ 
+	jbyte *cImageIn = (*env)->GetByteArrayElements(env, imageIn, NULL);
+	jbyte *cImageOut = (jbyte*)(*env)->GetDirectBufferAddress(env, imageOut);
+ 
+ 
+	toRGB565((unsigned short*)cImageIn, widthIn, heightIn, (unsigned int*)cImageOut, widthOut, heightOut);
+ 
+	(*env)->ReleaseByteArrayElements(env, imageIn, cImageIn, JNI_ABORT);
+} 
+
+To make it more interesting I added some filter to the camera image. There is a demo app in the market (direct link to the market). I tried to make the whole thing portable but would love to know if it works on other devices like the Motorola Milestone.
+
+
+
+
+Tags: Android, augmented reality, C, camera, Fisheye, image processing, Java, NDK, OpenGL
+
+
+This entry was posted on November 27, 2009, 1:28 am and is filed under Android, NDK, programming. You can follow any responses to this entry through RSS 2.0. You can leave a response, or trackback from your own site.
+
+11 Comments
+#1 by Ron on December 5, 2009 - 2:12 pm
+
+Quote
+I have the Moto Droid (android 2.0) and am in search of a reliable app that will allow me to use the Driod as a regular video camera and auto save the recordings to the SD card if possible with the ability to turn the led light on and off with in the app while recording.
+#2 by ivomania on January 29, 2010 - 9:21 am
+
+Quote
+Works on the Google nexus OS 2.1. Very basic but really funny.
+#3 by Casper van Wezel on March 19, 2010 - 6:47 pm
+
+Quote
+Hello,
+
+I have a question: is it possible for me to receive the code that belongs to this project/program. I have implemented it on the G1, but for some reason your application runs about (this is a guess) 2-3 fps faster. My goal is to do some image processing tasks on the android platform. There is no commercial interest, since this is part of my master thesis at the University of Utrecht.
+
+Thanks in advance,
+Greetings,
+Casper
+#4 by lee on April 20, 2010 - 4:55 am
+
+Quote
+Moto droid verizon does not work, black, no trace. G1/adp fine. Send email, will forward you code for similar tests to play with and clean for demos.
+#5 by sheiff on April 22, 2010 - 10:45 am
+
+Quote
+Hi!
+
+Great post!
+
+Could you please mail me the sources?
+
+Thank you!
+#6 by td on May 23, 2010 - 12:50 pm
+
+Quote
+also have a look at the AndAR open source project: http://code.google.com/p/andar/
+it brings augmented reality to the android platform.
+#7 by Miguel on September 10, 2010 - 1:07 pm
+
+Quote
+Hi!!
+I would like to know how toconnect the camera with NDK.
+Can anybody help me?
+
+Thanks!!!!
+#8 by Jerry on September 16, 2010 - 4:32 pm
+
+Quote
+Hi
+
+I am a phd student at UK. I work on a project titled ¡°image processing on mobile¡±. It would be greatly appreciated if you send me your source code.
+
+Best,
+#9 by kelvin on October 3, 2010 - 7:41 am
+
+Quote
+Hi,
+You are work is great! I am also a research student in field of computer vision, would you kindly share the code for me as reference. I really appreciate the performance of you app.
+
+Thanks,
+#10 by Stefan Lederer on October 12, 2010 - 11:39 pm
+
+Quote
+Hi,
+
+great work. Is it also possible to extract the frames of a playing video and forward them to the post processing you use? This would be really important for me, maybe we can get in touch via email?
+
+Greetings
+Stefan Lederer
+University of Klagenfurt
+#11 by Amila on November 3, 2010 - 10:14 am
+
+Quote
+Hello,
+
+Where can I download this. it seems this application has been removed from android market
+http://nhenze.net/?p=253

@@ -1,0 +1,154 @@
+运行模拟器 　　emulator -console
+　　* 将文件写入到模拟器的userdata.img文件中
+　　adb push 
+　　*将一个目录拷贝到模拟器中，包括子目录
+　　adb push 
+　　* 将一个目录从模拟器中拷出来
+　　adb pull 
+　　* 使得模拟器可以运行arm代码.
+　　使用GNU/ARM Linux编译器编译你的应用程序就可以了
+　　* 在模拟器里面运行shell，需要先运行模拟器
+　　adb shell
+　　*运行模拟器中的一个控制台程序
+　　adb shell 
+　　*连接模拟器的控制台
+　　telnet localhost 5554/6/8
+　　运行C程序
+　　参考文献
+　　Native C "Hello World" working in emulator
+　　http://groups.google.com/group/a ... wse_thread/threa...
+　　Native C Applications for Android
+　　http://benno.id.au/blog/2007/11/13/android-native-apps
+　　步骤
+　　* 下载GNU/ARM编译工具
+　　http://www.codesourcery.com/gnu_toolchains/arm/download.html
+　　* 编写c/c++代码.
+　　* 使用GNU/ARM Linux 工具创建一个应用程序，不使用动态链接库
+ex. arm-none-linux-gnueabi-g++.exe -static -o hello HelloAndroid.cpp
+　　* 启动模拟器
+$SDK_ROOT/tools/emulator.exe
+　　* 在命令行窗口运行 abd将编译好的hello程序放入模拟器的磁盘
+　adb push hello /system/sbin/hello
+　　* 让hello文件变成可执行程序,不要使用 chmod ugo+x
+　adb shell chmod 777 /system/sbin/hello
+　　* 运行hello程序
+　　adb shell
+　　cd /system/sbin/
+　　hello
+　　EXAMPLE HELLO WORLD CODE
+　　//
+　　// HelloAndroid.cpp
+　　//
+　　//
+　　#include
+　　using std::cin;
+　　using std::cout;
+　　using std::endl;
+　　class MyName
+　　{
+　　public:
+　　void getname( void );
+　　void sayhello( void );
+　　private:
+　　char name[ 255 ];
+　　};
+　　void MyName::getname( void )
+　　{
+　　cout << "What is your name? ";
+　　cin >> name;
+　　}
+　　void MyName::sayhello( void )
+　　{
+　　cout << "Welcome " << name << " to the world of Android" << endl;
+　　}
+　　MyName name;
+　　int main( int argc, char *argv[] )
+　　{
+　　name.getname();
+　　name.sayhello();
+　　return 0;
+　　}
+Android编译本地C++程序方法在Android平台上程序以Java形式运行在Dalvik模拟器上，但Android作为一个Linux内核系统完全可以执行Navtive C++程序，主要的步骤如下： 　　1.下载ARM C++交叉编译器http://www.codesourcery.com/gnu_ ... al/subscription3057
+　　2.编写本地C++代码，如Hello Wolrd，可以使用标准库STL。编译的命令行如下
+　arm-none-linux-gnueabi-g++.exe -static -oandroid123 android123.cpp
+　　首先运行arm-none-linux-gnueabi-g++.exe程序-static 参数代表静态库，-o为输出名称android123，最后的android123.cpp为源代码。
+　　3.运行模拟器，用cmd在sdkTools目录夏之星 adb pushandroid123 /system/sbin/android123 
+　　4.设置访问权限，通过Linux的Shell，在cmd下设置所有用户完全控制权限adb shell chmod 777 /system/sbin/android123
+　　5.执行这个android123程序，输入adb shell cd /system/sbin/android123即可
+在android平台上测试C/C++程序及库int main( int argc, char *argv[] )
+　　{
+　　name.getname();
+　　name.sayhello();
+　　return 0; 　　android平台上带有标准C库，我们可以写个C程序来试试看能不能在上面运行。。。
+　　首先下载并安装交叉编译工具GNU/ARM Linux gcc：
+　　http://www.codesourcery.com/gnu_toolchains/arm/download.html
+　　安装时 直接解压就行了，要设置好PATH环境变量。
+　　简单的C代码：
+　　test.c
+　　#include <stdio.h>
+　　int main()
+　　{
+　　int i,j;
+　　for(i=0;i<=10;i++)
+　　{
+　　for(j=0;j<=i;j++)
+　　printf(”*”);
+　　printf(”n”);
+　　}
+　　 return 0;
+　　}
+　　用刚下载的交叉编译工具编译源代码：
+　　# arm-none-linux-gnueabi-gcc test.c -o test -static
+　　-static选项在这里是必须的，不然android平台就不运行此程序。
+　　这也说明了此平台上的C／C＋＋库是不能被C／C＋＋程序动态连接的 。
+　　进入tools目录，用adb工具下载到android平台，放到/data/data目录。
+　　# ./adb push test /data/data
+　　进入/data/data目录运行程序。
+　　# cd /data/data
+　　# ./test
+　　*
+　　**
+　　***
+　　****
+　　*****
+　　******
+　　*******
+　　********
+　　*********
+　　**********
+　　***********
+　　ok,It’s done !
+　　C++程序一样的方法，只不过编译器换成：arm-none-linux-gnueabi-g++
+　　附C＋＋示例代码：
+　　//
+　　// HelloAndroid.cpp
+　　//
+　　//
+　　#include <iostream>
+　　using std::cin;
+　　using std::cout;
+　　using std::endl;
+　　class MyName
+　　{
+　　public:
+　　void getname( void );
+　　void sayhello( void );
+　　private:
+　　char name[ 255 ];
+　　};
+　　void MyName::getname( void )
+　　{
+　　cout << “What is your name? “;
+　　cin >> name;
+　　}
+　　void MyName::sayhello( void )
+　　{
+　　cout << “Welcome “ << name << ” to the world of Android” << endl;
+　　}
+　　MyName name;
+　　}
+　　上面的应用程序在编译时必须加上-static选项，也就是在编译时将函数都静态编译到程序中了，运行时不用再动态连接。如果不加此选项，在android平台上就不让运行。
+　　经过测试，将自己写的库放到/system/lib目录下，然后写个主程序来动态连接，也是无法运行。
+　　看来此平台做了限制，不让C/C++的程序运行时动态连接到这些C/C++库。
+
+转自http://blog.chinaunix.net/u3/90973/showart_1958940.html
