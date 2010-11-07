@@ -312,6 +312,56 @@ Value Description \par
 \ldblquote fontScale\ldblquote  The font scaling factor has changed \emdash  that is, the user has selected a new global font size.\'c8\'ab\'be\'d6\'d7\'d6\'cc\'e5\'b4\'f3\'d0\'a1\'cb\'f5\'b7\'c5\'b7\'a2\'c9\'fa\'b8\'c4\'b1\'e4 \par
 \'d4\'daActivity\'d6\'d0\'cc\'ed\'bc\'d3\'c1\'cb android:configChanges\'ca\'f4\'d0\'d4\'a3\'ac\'c4\'bf\'b5\'c4\'ca\'c7\'b5\'b1\'cb\'f9\'d6\'b8\'b6\'a8\'ca\'f4\'d0\'d4(Configuration Changes)\'b7\'a2\'c9\'fa\'b8\'c4\'b1\'e4\'ca\'b1\'a3\'ac\'cd\'a8\'d6\'aa\'b3\'cc\'d0\'f2\'b5\'f7\'d3\'c3 \cf4\b onConfigurationChanged()\cf0\b0\'ba\'af\'ca\'fd\'a1\'a3\par
 \par
+\pard\b\fs32\'a1\'beAndroid NDK\'a1\'bf\b0\fs20\par
+\pard\fi426 Android NDK \'ca\'c7\'b1\'e0\'d2\'eb\'c7\'b6\'c8\'eb\'d4\'daAndroid \'d3\'a6\'d3\'c3\'d6\'d0\'b5\'c4\'d4\'ad\'c9\'fa\'b4\'fa\'c2\'eb\'b5\'c4\'b9\'a4\'be\'df\'a1\'a3\par
+Android \'d3\'a6\'d3\'c3\'d4\'cb\'d0\'d0\'d4\'daDalvik \'d0\'e9\'c4\'e2\'bb\'fa\'c9\'cf\'a1\'a3NDK \'d4\'ca\'d0\'ed\'bf\'aa\'b7\'a2\'d5\'df\'d3\'c3\'d4\'ad\'c9\'fa\'b4\'fa\'c2\'eb\'a3\'a8C \'bb\'f2C++\'a3\'a9\'ca\'b5\'cf\'d6\'d3\'a6\'d3\'c3\'b5\'c4\'d2\'bb\'b2\'bf\'b7\'d6\'a1\'a3\'d5\'e2\'bd\'ab\'b8\'f8\'c4\'b3\'d0\'a9\'d3\'a6\'d3\'c3\'b4\'f8\'c0\'b4\'ba\'c3\'b4\'a6\'a3\'ac\'d5\'e2\'d6\'d6\'b7\'bd\'ca\'bd\'bf\'c9\'d6\'d8\'d3\'c3\'b4\'fa\'c2\'eb\'a3\'ac\'b6\'f8\'c7\'d2\'d4\'da\'c4\'b3\'d0\'a9\'c7\'e9\'bf\'f6\'cf\'c2\'bf\'c9\'bc\'d3\'bf\'ec\'d4\'cb\'d0\'d0\'cb\'d9\'b6\'c8\'a1\'a3\par
+NDK \'b2\'a2\'b2\'bb\'ca\'ca\'d3\'c3\'d3\'da\'b4\'f3\'b2\'bf\'b7\'d6\'d3\'a6\'d3\'c3\'a1\'a3\'d7\'f7\'ce\'aa\'bf\'aa\'b7\'a2\'d5\'df\'a3\'ac\'c4\'e3\'d3\'a6\'b8\'c3\'ba\'e2\'c1\'bf\'cb\'fc\'b5\'c4\'d3\'c5\'c8\'b1\'b5\'e3\'a3\'bb\'ba\'dc\'c3\'f7\'cf\'d4\'a3\'ac\'d3\'c3\'d4\'ad\'c9\'fa\'b4\'fa\'c2\'eb\'b2\'a2\'b2\'bb\'c4\'dc\'d7\'d4\'b6\'af\'cc\'e1\'c9\'fd\'d0\'d4\'c4\'dc\'a3\'ac\'c8\'b4\'d4\'f6\'bc\'d3\'c1\'cb\'d3\'a6\'d3\'c3\'b5\'c4\'b8\'b4\'d4\'d3\'b6\'c8\'a1\'a3NDK \'ca\'ca\'ba\'cf\'d3\'c3\'d3\'da\'b6\'c0\'c1\'a2\'b5\'c4\'a1\'a2\'d5\'bc\'d3\'c3\'c4\'da\'b4\'e6\'c9\'d9\'a1\'a2\'d5\'bc\'d3\'c3\'bd\'cf\'b6\'e0CPU\'d7\'ca\'d4\'b4\'b5\'c4\'b4\'a6\'c0\'ed\'a3\'ac\'c0\'fd\'c8\'e7\'a3\'ac\'d0\'c5\'ba\'c5\'b4\'a6\'c0\'ed\'a1\'a2\'ce\'ef\'c0\'ed\'b7\'c2\'d5\'e6\'b5\'c8\'b5\'c8\'a1\'a3\'bc\'f2\'b5\'a5\'b5\'c4\'d3\'c3C \'d6\'d8\'d0\'b4\'b4\'fa\'c2\'eb\'d2\'bb\'b0\'e3\'b2\'bb\'bb\'e1\'b4\'f8\'c0\'b4\'d0\'d4\'c4\'dc\'b5\'c4\'b4\'f3\'b7\'f9\'cc\'e1\'c9\'fd\'a1\'a3\'b2\'bb\'b9\'fd\'a3\'acNDK \'cc\'e1\'b9\'a9\'c1\'cb\'d6\'d8\'d3\'c3\'cf\'d6\'d3\'d0C/C++\'b5\'c4\'d3\'d0\'d0\'a7\'cd\'be\'be\'b6\'a1\'a3\par
+NDK \'b0\'fc\'ba\'ac\'c1\'cb\'d2\'bb\'cc\'d7\'bd\'bb\'b2\'e6\'b1\'e0\'d2\'eb\'b9\'a4\'be\'df\'a3\'a8\'b1\'e0\'d2\'eb\'a3\'aclinkers \'b5\'c8\'a3\'a9\'a3\'ac\'cb\'fc\'bf\'c9\'c9\'fa\'b3\'c9Linux\'a3\'acOS X \'ba\'cdwindows\'a3\'a8\'d3\'c3Cygwin\'a3\'a9\'c9\'cf\'b5\'c4\'d4\'ad\'c9\'faARM \'b5\'c4\'b6\'fe\'bd\'f8\'d6\'c6\'c2\'eb\'a1\'a3\par
+\'cb\'fb\'cc\'e1\'b9\'a9\'c1\'cb\'d2\'bb\'cc\'d7\'d4\'ad\'c9\'faAPI \'b5\'c4\'cf\'b5\'cd\'b3\'cd\'b7\'ce\'c4\'bc\'fe\'a3\'a8\'bc\'e6\'c8\'dd\'bd\'f1\'ba\'f3\'b0\'e6\'b1\'be\'a3\'a9\'a3\'ba\par
+libc (C library) headers\par
+libm (math library) headers\par
+JNI interface headers\par
+libz (Zlib compression) headers\par
+liblog (Android logging) header\par
+A Minimal set of headers for C++ support\par
+\par
+LOCAL_PATH := $(call my-dir)\par
+\'d2\'bb\'b8\'f6Android.mk \'ce\'c4\'bc\'fe\'b4\'d3\'b6\'a8\'d2\'e5LOCAL_PATH \'b1\'e4\'c1\'bf\'bf\'aa\'ca\'bc\'a3\'ac\'cb\'fb\'ce\'bb\'d3\'da\'bf\'aa\'b7\'a2\'ca\'f7\'d4\'b4\'ce\'c4\'bc\'fe\'d6\'d0\'a1\'a3\'d4\'da\'d5\'e2\'b8\'f6\'c0\'fd\'d7\'d3\'c0\'ef\'a3\'ac'my-dir'\'ba\'ea\'b5\'c4\'b9\'a6\'c4\'dc\'d3\'c9\'b1\'e0\'d2\'eb\'c6\'f7\'cc\'e1\'b9\'a9\'a3\'ac\'b1\'bb\'d3\'c3\'c0\'b4\'b7\'b5\'bb\'d8\'b5\'b1\'c7\'b0\'c4\'bf\'c2\'bc\'b5\'c4\'b5\'d8\'d6\'b7(\'d5\'e2\'c0\'ef\'b5\'c4\'b5\'b1\'c7\'b0\'c4\'bf\'c2\'bc\'c0\'ef\'b0\'fc\'c0\'a8Android.mk \'d5\'e2\'b8\'f6\'ce\'c4\'bc\'fe\'b1\'be\'c9\'ed)\par
+include $(CLEAR_VARS)\par
+CLEAR_VARS \'d5\'e2\'b8\'f6\'b1\'e4\'c1\'bf\'d3\'c9\'b1\'e0\'d2\'eb\'cf\'b5\'cd\'b3\'cc\'e1\'b9\'a9\'a3\'ac\'b2\'a2\'c7\'d2\'d6\'b8\'c3\'f7\'c1\'cb\'d2\'bb\'b8\'f6GNU makefile \'ce\'c4\'bc\'fe\'a3\'ac\'d5\'e2\'b8\'f6\'b9\'a6\'c4\'dc\'bb\'e1\'c7\'e5\'c0\'ed\'b5\'f4\'cb\'f9\'d3\'d0\'b5\'c4LOCAL_XXX.(\'c0\'fd\'c8\'e7LOCAL_MODULE, LOCAL_SRC_FILES,LOCAL_STATIC_LIBRARIES, \'b5\'c8)\'a3\'ac\'b3\'fd\'c1\'cbLOCAL_PATH\'a1\'a3\'d5\'e2\'be\'e4\'bb\'b0\'ca\'c7\'b1\'d8\'d0\'eb\'b5\'c4\'a3\'ac\'d2\'f2\'ce\'aa\'c8\'e7\'b9\'fb\'cb\'f9\'d3\'d0\'b5\'c4\'b1\'e4\'c1\'bf\'b6\'bc\'ca\'c7\'c8\'ab\'be\'d6\'b5\'c4\'a3\'ac\'cb\'f9\'d3\'d0\'b5\'c4\'bf\'c9\'bf\'d8\'b5\'c4\'b1\'e0\'d2\'eb\'ce\'c4\'bc\'fe\'b6\'bc\'d0\'e8\'d2\'aa\'d4\'da\'d2\'bb\'b8\'f6\'b5\'a5\'b6\'c0\'b5\'c4GNU \'d6\'d0\'b1\'bb\'bd\'e2\'ce\'f6\'b2\'a2\'d6\'b4\'d0\'d0\'a1\'a3\par
+LOCAL_MODULE := helloworld\par
+LOCAL_MODULE \'b1\'e4\'c1\'bf\'b1\'d8\'d0\'eb\'b1\'bb\'b6\'a8\'d2\'e5\'a3\'ac\'d3\'c3\'c0\'b4\'c7\'f8\'b7\'d6\'c4\'e3\'b5\'c4Android.mk \'d6\'d0\'b5\'c4\'c3\'bf\'d2\'bb\'b8\'f6\'c4\'a3\'bf\'e9\'a1\'a3\'ce\'c4\'bc\'fe\'c3\'fb\'b1\'d8\'d0\'eb\'ca\'c7\'ce\'a8\'d2\'bb\'b5\'c4\'a3\'ac\'b2\'bb\'c4\'dc\'d3\'d0\'bf\'d5\'b8\'f1\'a1\'a3\'d7\'a2\'d2\'e2\'d5\'e2\'c0\'ef\'b1\'e0\'d2\'eb\'c6\'f7\'bb\'e1\'ce\'aa\'c4\'e3\'d7\'d4\'b6\'af\'bc\'d3\'c9\'cf\'d2\'bb\'d0\'a9\'c7\'b0\'d7\'ba\'ba\'cd\'ba\'f3\'d7\'ba\'a3\'ac\'c0\'b4\'b1\'a3\'d6\'a4\'ce\'c4\'bc\'fe\'ca\'c7\'d2\'bb\'d6\'c2\'b5\'c4\'a1\'a3\'d4\'da\'d5\'e2\'d0\'a9\'d3\'ef\'be\'e4\'d6\'d0\'a3\'ac\'d2\'bb\'b8\'f6\'b6\'af\'cc\'ac\'bc\'fc\'bd\'d3\'bf\'e2\'c4\'a3\'bf\'e9\'b1\'bb\'c3\'fc\'c3\'fb\'b3\'c9'foo' \'a3\'ac\'d7\'ee\'ba\'f3\'bb\'e1\'c9\'fa\'b3\'c9\'ca\'c7'libfoo.so'.\par
+LOCAL_SRC_FILES := helloworld.c\par
+LOCAL_SRC_FILES \'b1\'e4\'c1\'bf\'b1\'d8\'d0\'eb\'b0\'fc\'ba\'ac\'d2\'bb\'b8\'f6C \'ba\'cdC++\'d4\'b4\'ce\'c4\'bc\'fe\'b5\'c4\'c1\'d0\'b1\'ed\'a3\'ac\'d5\'e2\'d0\'a9\'bb\'e1\'b1\'bb\'b1\'e0\'d2\'eb\'b2\'a2\'be\'db\'ba\'cf\'b5\'bd\'d2\'bb\'b8\'f6\'c4\'a3\'bf\'e9\'d6\'d0\'a1\'a3\'d7\'a2\'d2\'e2\'d2\'bb\'cf\'c2\'d5\'e2\'c0\'ef\'b2\'a2\'b2\'bb\'d0\'e8\'d2\'aa\'c1\'d0\'b3\'f6\'cd\'b7\'ce\'c4\'bc\'fe\'ba\'cd\'b1\'bb\'b0\'fc\'ba\'ac\'b5\'c4\'ce\'c4\'bc\'fe\'a3\'ac\'d2\'f2\'ce\'aa\'b1\'e0\'d2\'eb\'cf\'b5\'cd\'b3\'bb\'e1\'d7\'d4\'b6\'af\'ce\'aa\'c4\'e3\'bc\'c6\'cb\'e3\'cf\'e0\'b9\'d8\'b5\'c4\'ca\'f4\'d0\'d4\'a3\'bb\'d4\'b4\'b4\'fa\'c2\'eb\'d6\'d0\'b5\'c4\'c1\'d0\'b1\'ed\'a3\'ac\'bb\'e1\'d6\'b1\'bd\'d3\'b1\'bb\'b4\'ab\'b5\'dd\'b8\'f8\'b1\'e0\'d2\'eb\'c6\'f7\'a3\'ac\'d5\'e2\'d1\'f9\'d7\'f6\'b6\'d4\'c4\'e3\'c0\'b4\'cb\'b5\'b1\'c8\'bd\'cf\'ba\'c3\'a1\'a3\par
+\'d7\'a2\'d2\'e2\'d2\'bb\'cf\'c2C++\'c4\'ac\'c8\'cf\'ce\'c4\'bc\'fe\'b5\'c4\'c0\'a9\'d5\'b9\'c3\'fb\'ca\'c7'.cpp'. \'d5\'e2\'c0\'ef\'bf\'c9\'d2\'d4\'cd\'a8\'b9\'fd\'b6\'a8\'d2\'e5\'d2\'bb\'b8\'f6\par
+LOCAL_DEFAULT_CPP_EXTENSION \'b1\'e4\'c1\'bf\'a3\'ac\'c0\'b4\'b6\'a8\'d2\'e5\'d2\'bb\'b8\'f6\'b2\'bb\'cd\'ac\'b5\'c4C \'ce\'c4\'bc\'fe\'a1\'a3\'b2\'bb\'d2\'aa\'cd\'fc\'bc\'c7\'b3\'f5\'ca\'bc\'bb\'af\'c7\'b0\'c3\'e6\'b5\'c4. "\'b5\'e3"\'c5\'b6(\'d2\'b2\'be\'cd\'ca\'c7\'cb\'b5".cxx"\'bf\'c9\'d2\'d4\'d5\'fd\'b3\'a3\'b9\'a4\'d7\'f7\'a3\'ac\'b5\'ab\'ca\'c7'cxx'\'b2\'bb\'d0\'d0)\'a1\'a3\par
+include $(BUILD_SHARED_LIBRARY)\par
+BUILD_SHARED_LIBRARY \'d5\'e2\'b8\'f6\'b1\'e4\'c1\'bf\'ca\'b1\'d3\'c9\'cf\'b5\'cd\'b3\'cc\'e1\'b9\'a9\'b5\'c4\'a3\'ac\'b2\'a2\'c7\'d2\'d6\'b8\'b6\'a8\'b8\'f8GNU Makefile \'b5\'c4\'bd\'c5\'b1\'be\'a3\'ac\'cb\'fb\'bf\'c9\'d2\'d4\'ca\'d5\'bc\'af\'cb\'f9\'d3\'d0\'c4\'e3\'b6\'a8\'d2\'e5\'b5\'c4\'b4\'d3'include $(CLEAR_VARS)'\'b5\'c4LOCAL_XXX \'b1\'e4\'c1\'bf\'a3\'ac\'b2\'a2\'c7\'d2\'be\'f6\'b6\'a8\'c4\'c4\'d0\'a9\'d2\'aa\'b1\'bb\'b1\'e0\'d2\'eb\'a3\'ac\'c4\'c4\'d0\'a9\'d3\'a6\'b8\'c3\'d7\'f6\'b5\'c3\'b8\'fc\'bc\'d3\'d7\'bc\'c8\'b7\'a1\'a3\'d5\'e2\'c0\'ef\'cd\'ac\'d1\'f9\'d2\'b2\'d3\'d0\'d2\'bb\'b8\'f6BUILD_STATIC_LIBRARY \'c0\'b4\'c9\'fa\'b3\'c9\'d2\'bb\'b8\'f6\'be\'b2\'cc\'ac\'b5\'c4\'bf\'e2\'a1\'a3\par
+\'d4\'dasources/samples \'c4\'bf\'c2\'bc\'cf\'c2\'a3\'ac\'bb\'b9\'d3\'d0\'b8\'fc\'b6\'e0\'b8\'b4\'d4\'d3\'b5\'c4\'c0\'fd\'d7\'d3\'a3\'ac\'b2\'a2\'c7\'d2\'b6\'bc\'ca\'c7\'c4\'e3\'bf\'c9\'d2\'d4\'d5\'d2\'b5\'bd\'b5\'c4\'b4\'f8\'d3\'d0\'d7\'a2\'ca\'cd\'b5\'c4Android.mk \'ce\'c4\'bc\'fe\'a1\'a3\par
+LOCAL_LDLIBS\par
+\'b5\'b1\'b1\'e0\'d2\'eb\'c4\'e3\'b5\'c4\'c4\'a3\'bf\'e9\'ca\'b1\'a3\'ac\'d5\'e2\'c0\'ef\'bf\'c9\'c4\'dc\'bb\'e1\'d3\'d0\'d2\'bb\'d0\'a9\'b6\'ee\'cd\'e2\'b5\'c4\'c1\'b4\'bd\'d3\'bb\'e1\'b1\'bb\'d3\'c3\'b5\'bd\'a1\'a3\'d5\'e2\'d0\'a9\'d3\'c3"-1"\'b5\'c4\'c7\'b0\'d7\'ba\'a3\'ac\'c0\'b4\'b4\'ab\'b5\'dd\'be\'df\'cc\'e5\'b5\'c4\'cf\'b5\'cd\'b3\'bf\'e2\'b5\'c4\'c3\'fb\'d7\'d6\'b7\'c7\'b3\'a3\'d3\'d0\'d3\'c3\'a1\'a3\'b1\'c8\'c8\'e7\'cb\'b5\'a3\'ac\'cf\'c2\'c3\'e6\'b5\'c4\'c0\'fd\'d7\'d3\'c4\'e3\'bf\'c9\'d2\'d4\'cf\'c8\'b8\'e6\'cb\'df\'c1\'b4\'bd\'d3\'c0\'b4\'c9\'fa\'b3\'c9\'d2\'bb\'b8\'f6\'c4\'a3\'bf\'e9\'a3\'ac\'c1\'b4\'bd\'d3\'b5\'bd/system/lib/libz.so at load time\par
+LOCAL_LDLIBS := -lz\par
+\'bf\'b4\'d2\'bb\'cf\'c2docs \'d6\'d0\'b5\'c4STABLE-APIS.TXT\'a3\'ac\'d5\'e2\'c0\'ef\'b6\'d4\'cf\'b5\'c4\'e3\'c4\'dc\'d5\'d2\'b5\'bd\'b5\'c4\'cf\'b5\'cd\'b3\'bf\'e2\'d3\'d0\'b8\'f6\'cf\'ea\'cf\'b8\'b5\'c4\'cb\'b5\'c3\'f7\'a1\'a3\par
+LOCAL_ALLOW_UNDEFINED_SYMBOLS\par
+\'c4\'ac\'c8\'cf\'c7\'e9\'bf\'f6\'cf\'c2\'a3\'ac\'ce\'b4\'b6\'a8\'d2\'e5\'b5\'c4\'b2\'ce\'bf\'bc\'bb\'e1\'d3\'f6\'b5\'bd"undefined symbol"\'d5\'e2\'d1\'f9\'b5\'c4\'b4\'ed\'ce\'f3\'a3\'ac\'d5\'e2\'c0\'ef\'bf\'c9\'d2\'d4\'b0\'ef\'d6\'fa\'c4\'e3\'cb\'d1\'bc\'af\'d2\'bb\'cf\'c2\'b4\'fa\'c2\'eb\'d6\'d0\'b5\'c4bug\'a1\'a3\par
+\par
+\b\'b6\'c1\'c8\'a1\'ce\'c4\'bc\'fe\b0\par
+char data[10];\par
+int res = 0;\par
+FILE* fp=fopen("/sdcard/testfile.txt", "r+");\par
+if(fp != 0)\par
+\{\par
+if((res = fread(data, 1, 10, fp)) <= 0)\par
+\{\par
+fclose(fp);\par
+return 0;\par
+\}\par
+fclose(fp);\par
+androidManifest.xml\par
+\'d6\'d0\'bc\'d3\'c8\'a8\'cf\'de \par
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />\par
+</manifest>\par
+\par
 \pard\b\fs32\'a1\'beOpenGL\'a1\'bf\b0\fs20\par
 \pard\fi426\b 1\'a1\'a2GLSurfaceView\b0\par
 SDK\'d6\'d0\'b5\'c4android.opengl.GLSurfaceView\'c0\'e0\'cc\'e1\'b9\'a9\'c8\'e7\'cf\'c2\'b9\'a6\'c4\'dc\'a3\'ba \par
@@ -334,6 +384,9 @@ Java\'b4\'fa\'c2\'eb \par
 \cf5\tab     mRenderer = \cf6\b new\cf5\b0  ClearRenderer();    \cf0\par
 \cf5\tab     setRenderer(mRenderer);    \cf0\par
 \pard\fi426\cf5\tab\}\par
+\b 2\'a1\'a2\'b6\'c1\'c8\'a1\'ce\'c6\'c0\'ed\b0\par
+\par
+\par
 \par
 \pard\'a1\'be\'cc\'e2\'c4\'bf\'a1\'bf\par
 \'a1\'f4View\'c8\'e7\'ba\'ce\'cb\'a2\'d0\'c2\'a3\'bf\par

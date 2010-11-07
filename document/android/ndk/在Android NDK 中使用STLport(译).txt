@@ -1,0 +1,120 @@
+Android NDK是Native C/C++开发，不过下载来看了一下缺少常见的STL库，使用起来诸多不便，于是网上google了一把，发现有人做了这样的事情，特别转过来
+——————————–
+原文: Android NDK - getting STLPort up and running
+作者: Pete Cole
+——————————-
+如果你想在Android NDK使用STLPort, 你必须要做点处理，即便你是在windows上使用cygwin.
+
+首先, 从http://umbel.mooo.com/ 获取一份修改版的 STLPort(by John Ripley (great job, John!)). 如果你是一个 cygwin 用户, 你首先要安装一个git包(译注:可以直接下载snapshot，这样就不要安装git了).
+
+然后将文件拷贝到你的工作目录下. 在我的机器上, 我将文件拷贝到了c:\android-ndk-1.5_r1 目录下, 并将 两个hello-stl 文件夹移动到其他和NDK有关的目录下:
+
+C:\android-ndk-1.5_r1\apps\hello-stl
+C:\android-ndk-1.5_r1\sources\samples\hello-stl
+然后在Build STLPort前必须修改一些文件…
+
+setup.sh
+将最前面的一些行修改正如下样子:
+
+#!/bin/bash
+if uname | grep -qi linux; then
+export NDK_HOST=linux-x86
+elif uname | grep -qi CYGWIN; then
+export NDK_HOST=windows
+else
+export NDK_HOST=darwin-x86
+fi
+将倒数第三行修改成如下样子:
+
+ln -sf "$NDK_DIR/build/prebuilt/${NDK_HOST}/arm-eabi-4.2.1/bin/arm-eabi-$tool" arm-linux-$tool
+stlport/build/lib/android.mak
+
+将TOOLCHAIN_PREFIX这一行修改成
+
+TOOLCHAIN_PREFIX := $(NDK_DIR)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/bin/arm-eabi-
+译注: 我下载来的Wrapper包已经是这个样子了，不用修改
+
+sources/samples/hello-stl/Android.mk
+将STLPORT_BASE这一行修改成如下样子:
+
+STLPORT_BASE := /cygdrive/c/android-ndk-1.5_r1/stlport
+译注:我没有修改这边，执行了一个export NDK_WRAPPERS_BASE=basepath的操作
+
+将:
+
+LOCAL_LDLIBS += -L$(STLPORT_BASE)/build/lib/obj/gcc/so \
+-lstlport
+修改成 
+
+LOCAL_STATIC_LIBRARIES := libstlport.5.1
+Building STLPort
+现在文件已经被合并了，你可以立即build STLPort了!
+
+执行如下cygwin shell脚本… 它将build STLPort的静态链接库! 对此你只需要做一次.
+
+export NDK_DIR=/cygdrive/c/android-ndk-1.5-r1
+cd $NDK_DIR
+./env.sh
+./setup.sh
+现在,像下面这样讲文件拷贝到你的工程中:
+
+cp -p \
+/cygdrive/c/android-ndk-1.5_r1\stlport\build\lib\obj\gcc\ar\libstlport.5.1.a \
+/cygdrive/c/android-ndk-1.5_r1\out\apps\hello-stl\android-1.5-arm
+Building your project’s shared library.
+现在你可以返回cygwin的shell窗口，然后执行如下命令:
+
+cd /cygdrive/c/android-ndk-1.5_r1
+make APP=hello-stl
+将编译你的共享库文件:
+C:\android-ndk-1.5_r1\apps\hello-stl\project\libs\armeabi\libhello-stl.so
+
+注: 这会将STLPort静态链接到你的库中.
+
+Building the hello-stl project
+
+在Eclipse中，使用New Project Wizard为每一个例子创建一新的Android project, 使用”Import from Existing Source” 选项从c:\android-ndk-1.5_r1\apps\hello-stl\project 导入源文件
+
+现在你可以编译和运行你的项目了. 将显示从共享库中返回来的std::string字符串 …!
+
+Popularity: 27% [?]
+
+Related
+February 26, 2009 -- stl中vector,list,deque的使用准则 (1)
+Tags：android, stl.
+December 1, 2009 | Filed Under Android  
+Comments
+4 Responses to “在Android NDK 中使用STLport(译)”
+
+seo on December 22nd, 2009 1:36 pm 多了解下这方面的知识！
+
+[Reply]
+
+Hendy on March 9th, 2010 9:42 am Hi，sunny
+能否给我一份这个ndk-wrapper？http://umbel.mooo.com/已经不提供支持了:(
+现在可能也无法直接使用ndk-wrapper了，但应该会有很大的参考作用。
+如果能给我一份，我将非常感谢：）
+
+[Reply]
+
+
+terry Reply:
+March 25th, 2010 at 5:59 pm
+
+你好，Hendy。我是ndk初学者，目前也需要ndk-wrapper 。如果你能找到的话，希望可以发给我一份。你可以加我的msn，如果我找到什么有价值的资源，也可以方便共享。
+
+[Reply]
+
+
+sunny Reply:
+April 8th, 2010 at 6:25 pm
+
+您好，现在可以使用 http://www.crystax.net/android/ndk.php 这个方案支持stl,比这个要好
+
+[Reply]
+
+青菜吃虫 on May 31st, 2010 5:55 pm hi, sunny :
+您推荐的crystax方案也很不错, 只是我使用的交叉编译器(MIPS)是别人提供的,此方案行不通。能否提供一份ndk-wrapper的拷贝给我?先谢谢您了。
+
+[Reply]
+http://www.sunnyu.com/?p=205

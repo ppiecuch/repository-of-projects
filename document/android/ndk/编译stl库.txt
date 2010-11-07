@@ -72,3 +72,13 @@ http://groups.google.com/group/android-ndk?hl=en.
 
 
 http://osdir.com/ml/android-ndk/2010-03/msg00383.html
+
+
+
+You need to add a line of the form:
+
+LOCAL_SHARED_LIBRARIES=libstlport.so
+
+AND you should add libstlport.so to your Application.mk APP_MODULES list, if you want it to be built as part of the same build process.
+
+OR you can do it the easy way and use the Crystax build of the NDK, which makes STL work correctly. See: http://www.crystax.net/android/ndk.php
