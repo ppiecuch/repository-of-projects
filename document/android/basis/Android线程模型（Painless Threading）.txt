@@ -1,0 +1,128 @@
+当第一次启动一个Android程序时，Android会自动创建一个称为“main”主线程的线程。这个主线程（也称为UI线程）很重要，因为它负责把事件分派到相应的控件，其中就包括屏幕绘图事件，它同样是用户与Andriod控件交互的线程。比如，当你在屏幕上按下一个按钮后，UI线程会把这个事件分发给刚按得那个按钮，紧接着按钮设置它自身为被按下状态并向事件队列发送一个无效（invalidate）请求。UI线程会把这个请求移出事件队列并通知按钮在屏幕上重新绘制自身。
+
+ 
+
+单线程模型会在没有考虑到它的影响的情况下引起Android应用程序性能低下，因为所有的任务都在同一个线程中执行，如果执行一些耗时的操作，如访问网络或查询数据库，会阻塞整个用户界面。当在执行一些耗时的操作的时候，不能及时地分发事件，包括用户界面重绘事件。从用户的角度来看，应用程序看上去像挂掉了。更糟糕的是，如果阻塞应用程序的时间过长（现在大概是5秒钟）Android会向用户提示一些信息，即打开一个“应用程序没有相应（application not responding）”的对话框。
+
+ 
+
+如果你想知道这有多糟糕，写一个简单的含有一个按钮的程序，并为按钮注册一个单击事件，并在事件处理器中调用这样的代码Thread.sleep(2000)。在按下这个按钮这后恢复按钮的正常状态之前，它会保持按下状态大概2秒钟。如果这样的情况在你编写的应用程序中发生，用户的第一反应就是你的程序运行很慢。
+
+ 
+
+现在你知道你应该避免在UI线程中执行耗时的操作，你很有可能会在后台线程或工作者线程中执行这些耗时的任务，这样做是否正确呢？让我们来看一个例子，在这个例子中按钮的单击事件从网络上下载一副图片并使用ImageView来展现这幅图片。代码如下：
+
+ 
+
+Java代码 
+public void onClick( View v ) {   
+        new Thread( new Runnable() {   
+            public void run() {   
+                Bitmap b = loadImageFromNetwork();   
+                mImageView.setImageBitmap( b );   
+            }          
+         }).start();   
+}  
+
+public void onClick( View v ) {
+        new Thread( new Runnable() {
+            public void run() {
+                Bitmap b = loadImageFromNetwork();
+                mImageView.setImageBitmap( b );
+            }       
+         }).start();
+} 
+
+ 这段代码好像很好地解决了你遇到的问题，因为它不会阻塞UI线程。很不幸，它违背了单线程模型：Android UI操作并不是线程安全的并且这些操作必须在UI线程中执行。在这段代码片段中，在一个工作者线程中使用ImageView的方法，这回引起一些很古怪的问题。查处这个问题并修复这个bug会很困难而且也很耗时。
+
+ 
+
+Andriod提供了几种在其他线程中访问UI线程的方法。或许你已经对其中的一些方式很熟悉，但下面是一个更全面的列表：
+
+Activity.runOnUiThread( Runnable ) 
+View.post( Runnable ) 
+View.postDelayed( Runnable, long ) 
+Hanlder 
+上面的任何一个类或方法都可以修复我们前面代码中出现的问题。
+
+ 
+
+Java代码 
+public void onClick( View v ) {   
+        new Thread( new Runnable() {   
+                public void run() {   
+                         final Bitmap b = loadImageFromNetwork();   
+                         mImageView.post( new Runnable() {   
+                                  mImageView.setImageBitmap( b );   
+                          });   
+                 }   
+        }).start();   
+}  
+
+public void onClick( View v ) {
+        new Thread( new Runnable() {
+                public void run() {
+                         final Bitmap b = loadImageFromNetwork();
+                         mImageView.post( new Runnable() {
+                                  mImageView.setImageBitmap( b );
+                          });
+                 }
+        }).start();
+} 
+
+很不幸的是这些类或方法同样会使你的代码很复杂很难理解。然而当你需要实现一些很复杂的操作并需要频繁地更新UI时这会变得更糟糕。为了解决这个问题，Android 1.5提供了一个工具类：AsyncTask，它使创建需要与用户界面交互的长时间运行的任务变得更简单。
+
+ 
+
+在Android 1.0和1.1中具有与AsyncTask相同功能的类UserTask。它提供了完全一样的API，你需要做的只是把它的代码拷贝的你的程序中。
+
+ 
+
+AsyncTask的目标是替你管理你的线程。前面的代码可以很容易地使用AsyncTask重写。
+
+ 
+
+Java代码 
+public void onClick( View v ) {   
+     new DownloadImageTask().execute( "http://example.com/image.png" );   
+}   
+  
+private class DownloadImageTask extends AsyncTask {   
+     protected Bitmap doInBackground( String... urls ) {   
+          return loadImageFormNetwork( urls[0] );   
+     }   
+  
+     protected void onPostExecute( Bitmap result ) {   
+         mImageView.setImageBitmap( result );   
+     }   
+}  
+
+public void onClick( View v ) {
+     new DownloadImageTask().execute( "http://example.com/image.png" );
+}
+
+private class DownloadImageTask extends AsyncTask {
+     protected Bitmap doInBackground( String... urls ) {
+          return loadImageFormNetwork( urls[0] );
+     }
+
+     protected void onPostExecute( Bitmap result ) {
+         mImageView.setImageBitmap( result );
+     }
+} 
+
+正如你看到的，使用AsyncTask必须要继承它。使用AsyncTask非常重要的是：AsyncTask的实例必须在UI线程中创建而且只能被使用一次。你可以使用预读AsyncTask的文档来来了解如何使用这个类，下面大概地了解一下它是如何工作的：
+
+你可以使用泛型参数制定任务的参数、中间值（progress values）和任何的最终执行结果 
+doInBackground()方法会自动地在工作者线程中执行 
+onPreExecute()、onPostExecute()和onProgressUpdate()方法会在UI线程中被调用 
+doInBackground()方法的返回值会被传递给onPostExecute()方法 
+在doInBackground()方法中你可以调用publishProgress()方法，每一次调用都会使UI线程执行一次onProgressUpdate()方法 
+你可以在任何时候任何线程中取消这个任务 
+除了官方的文档，你可以阅读Shelves和Photostream源代码中的几个复杂的示例。我强烈地推荐阅读Shelves的源代码，它会使你知道如何在配置更改之间持久化任务以及在activity被销毁时正确的取消任务。
+
+ 
+
+不管是否使用AsyncTask，始终记住以下两个关于单线程模型的准则：不要阻塞UI线程以及一切Android UI操作都在UI线程中执行。AsyncTask仅仅是使你能够更容易地遵守这两条准则。
+
+http://android.group.javaeye.com/group/blog/382683

@@ -1,0 +1,151 @@
+第一次接触android，第一次接触freetype。
+
+freetype在android该把那些文件编译进去，对于初学者有点摸不着头脑，还好，现在unix下编译通过，然后直接找"*。o"文件来写make文件，
+
+还好，我使用freetype的功能比较初级，所以这些文件已经能够满足我的要求。
+
+共享一下，希望能够让和我一样比较不聪明的初学者有个借鉴。
+
+1) 建议看看源代码中docs/CUSTOMIZE 这个文件，来指导你如何定制编译freetype功能。
+
+特别注意的是，你可以通过更改include/freetype/config/ftoption.h 这个文件里的宏定义来简单的打开和关闭一些功能模块。
+
+2) 如果你使用"*.ttf"等truetype字体的话，请特别注意docs/TRUETYPE这个文件。
+
+    由于版权等问题，在freetype源代码中，默认是关闭“TrueType glyphs hinting”的。
+
+    这样可能画出来的字不美观。
+
+    你可以通过在ftoption.h中打开下面宏定义来打开该功能，
+
+ #define TT_CONFIG_OPTION_BYTECODE_INTERPRETER 
+
+3）由于在android下要自己写makefile文件，所以知道那些文件要编译是必须的。这个可以通过读文件docs/INSTALL.ANY 来解决。读完这个文件应该找到那些文件需要加入编译源文件中。
+
+4）下面是我使用的makefile，仅供参考
+
+# Copyright (C) 2009 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.cpprg/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := ENGINE_FREETYPE_LIB
+
+LOCAL_SRC_FILES := src/base/ftsystem.c \
+      src/base/ftinit.c \
+      src/base/ftdebug.c \
+      src/base/ftbase.c \
+      src/base/ftbbox.c \
+      src/base/ftglyph.c \
+      src/base/ftbdf.c \
+      src/base/ftbitmap.c \
+      src/base/ftcid.c \
+      src/base/ftfstype.c \
+      src/base/ftgasp.c \
+      src/base/ftgxval.c \
+      src/base/ftlcdfil.c \
+      src/base/ftmm.c \
+      src/base/ftotval.c \
+      src/base/ftpatent.c \
+      src/base/ftpfr.c \
+      src/base/ftstroke.c \
+      src/base/ftsynth.c \
+      src/base/fttype1.c \
+      src/base/ftwinfnt.c \
+      src/base/ftxf86.c
+#      src/base/ftmac.c
+
+LOCAL_SRC_FILES += src/bdf/bdf.c \
+      src/cff/cff.c \
+      src/cid/type1cid.c \
+      src/pcf/pcf.c \
+      src/pfr/pfr.c \
+      src/sfnt/sfnt.c \
+      src/truetype/truetype.c \
+      src/type1/type1.c \
+      src/type42/type42.c \
+      src/winfonts/winfnt.c \
+
+#    -- rasterizers (optional; at least one is needed for vector formats)
+
+LOCAL_SRC_FILES += src/raster/raster.c \
+      src/smooth/smooth.c
+
+#    -- auxiliary modules (optional)
+
+LOCAL_SRC_FILES += src/autofit/autofit.c \
+      src/cache/ftcache.c \
+      src/gzip/ftgzip.c \
+      src/lzw/ftlzw.c \
+      src/gxvalid/gxvalid.c \
+      src/otvalid/otvalid.c \
+      src/psaux/psaux.c \
+      src/pshinter/pshinter.c \
+      src/psnames/psnames.c
+
+
+LOCAL_CFLAGS    :=  \
+ -Isources/freetype/src/autofit/ \
+ -Isources/freetype/src/base/ \
+ -Isources/freetype/src/bdf/ \
+ -Isources/freetype/src/cff/ \
+ -Isources/freetype/src/cid/ \
+ -Isources/freetype/src/gxvalid/ \
+ -Isources/freetype/src/gzip/ \
+ -Isources/freetype/src/lzw/ \
+ -Isources/freetype/src/otvalid/ \
+ -Isources/freetype/src/pcf/ \
+ -Isources/freetype/src/pfr/ \
+ -Isources/freetype/src/psaux/ \
+ -Isources/freetype/src/pshinter/ \
+ -Isources/freetype/src/psnames/ \
+ -Isources/freetype/src/raster/ \
+ -Isources/freetype/src/sfnt/ \
+ -Isources/freetype/src/smooth/ \
+ -Isources/freetype/src/tools/ \
+ -Isources/freetype/src/tools/docmaker/ \
+ -Isources/freetype/src/tools/ftrandom/ \
+ -Isources/freetype/src/truetype/ \
+ -Isources/freetype/src/type1/ \
+ -Isources/freetype/src/type42/ \
+ -Isources/freetype/src/winfonts/ \
+ -Isources/freetype/include \
+ -Isources/freetype/include/freetype/ \
+ -Isources/freetype/include/freetype/config/ \
+ -Isources/freetype/include/freetype/internal/ \
+ -Isources/freetype/include/freetype/internal/services/ 
+ 
+ 
+LOCAL_CFLAGS  += -D__LINUX_CPL__ \
+     -DUNICODE \
+     -DFT2_BUILD_LIBRARY \
+#     -D__NEW__ \
+#     -D__SGI_STL_INTERNAL_PAIR_H \
+#     -D_MBSTATE_T \
+#     -DANDROID \
+#     -DOS_ANDROID \
+#     -DTN_PLATFORM_ANDROID \
+#     -DSERVICEPROXY_DEBUG 
+#     -DFT_OPTION_AUTOFIT2 \
+#     -DFT_CONFIG_OPTION_SYSTEM_ZLIB \
+#     -DFT_CONFIG_CONFIG_H="<ftconfig.h>" \
+
+include $(BUILD_STATIC_LIBRARY)
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/junglefly/archive/2010/02/22/5317779.aspx
