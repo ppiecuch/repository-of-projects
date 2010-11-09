@@ -1,0 +1,58 @@
+android 中的touch处理的分成好，使用起来非常方便，收集一些资料，分享如下：
+
+Android里有两个类 
+android.view.GestureDetector 
+android.view.GestureDetector.SimpleOnGestureListener 
+
+1） 新建一个类继承SimpleOnGestureListener，HahaGestureDetectorListener ，可以实现以下event事件。 
+
+boolean  onDoubleTap(MotionEvent e) 
+解释：双击的第二下Touch down时触发 
+
+boolean  onDoubleTapEvent(MotionEvent e) 
+解释：双击的第二下Touch down和up都会触发，可用e.getAction()区分。 
+
+boolean  onDown(MotionEvent e) 
+解释：Touch down时触发 
+
+boolean  onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) 
+解释：Touch了滑动一点距离后，up时触发。 
+
+void  onLongPress(MotionEvent e) 
+解释：Touch了不移动一直Touch down时触发 
+
+boolean  onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) 
+解释：Touch了滑动时触发。 
+
+void  onShowPress(MotionEvent e) 
+解释：Touch了还没有滑动时触发 
+【
+与onDown，onLongPress比较 :onDown只要Touch down一定立刻触发。 
+而Touchdown后过一会没有滑动先触发onShowPress再是onLongPress。 
+所以Touchdown后一直不滑动，onDown->onShowPress->onLongPress这个顺序触发。 
+） 
+
+boolean  onSingleTapConfirmed(MotionEvent e) 
+boolean  onSingleTapUp(MotionEvent e) 
+解释：上面这两个函数都是在touch down后又没有滑动（onScroll），又没有长按（onLongPress），然后Touchup时触发。 
+
+点击一下非常快的（不滑动）Touchup： 
+onDown->onSingleTapUp->onSingleTapConfirmed 
+
+点击一下稍微慢点的（不滑动）Touchup： 
+onDown->onShowPress->onSingleTapUp->onSingleTapConfirmed 
+
+
+2）在view的新建一个GestureDetector的对象。 
+构造函数里 
+gestureDetector = new GestureDetector(new HahaGestureDetectorListener()); 
+
+然后在View的onTouchEvent里以下这样用，就可以在刚才1）弄的事件里写自己的代码 了。 
+@Override 
+public boolean onTouchEvent(MotionEvent event) { 
+    gestureDetector.onTouchEvent(event); 
+}
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/jinlking/archive/2009/07/13/4343869.aspx
