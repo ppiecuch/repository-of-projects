@@ -101,7 +101,7 @@ void appInit(JNIEnv*  env, jobject thiz, jstring apkPath)
 	int width,height,colorType;
 	png_byte* data;
 	LOGI("AndroidGL","apply %d texture name",sizeof(textures)/sizeof(textures[0]));
-	glGenTextures(sizeof(textures), textures);
+	glGenTextures(sizeof(textures)/sizeof(textures[0]), textures);
 	/*¥¥Ω®Œ∆¿Ì1*/
 	data=readPngData("assets/androidgl/earth.png",width,height,colorType,APKArchive);
 	glBindTexture(GL_TEXTURE_2D, textures[0]);
