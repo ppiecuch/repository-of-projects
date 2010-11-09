@@ -1,3 +1,7 @@
+总结：
+1、ftmodule.h设置要编译的模块
+2、Android.mk设置要编译的c文件参考INSTALL.ANY
+
 第一次接触android，第一次接触freetype。
 
 freetype在android该把那些文件编译进去，对于初学者有点摸不着头脑，还好，现在unix下编译通过，然后直接找"*。o"文件来写make文件，
