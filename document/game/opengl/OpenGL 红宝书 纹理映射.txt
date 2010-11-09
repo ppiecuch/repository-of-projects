@@ -1,0 +1,838 @@
+相关文章:
+
+
+      OpenGL 红宝书 纹理映射 
+GLSL学习 -- gl_NormalMatrix 
+卡通阴影的构造原理--OpenGL笔记 
+OpenGL 红宝书 帧缓冲区 
+OpenGL 红宝书 纹理映射 
+OpenGL 红宝书 反走样 雾 点参数 多边形偏移 
+OpenGL 红宝书 混合 
+9.1.1 纹理映射的步骤
+1) 创建纹理对象并为其指定纹理.
+2) 指出如何将纹理应用于每个像素
+3) 启用纹理映射
+4) 使用纹理坐标和几何坐标来绘制场景.
+只能RGBA模式下使用纹理映射
+
+步骤:
+1, 创建纹理对象并为其指定纹理
+纹理不但是二维的,也可以是一维或三维的.
+2. 指定如何将纹理应用于每个像素
+根据片元的颜色和纹理图像数据计算最终的RGBA值的方法:
+1) 将纹理颜色作为最终的颜色, 就像贴花(替换模式), 将纹理绘制到片元
+2) 使用纹理来调整(缩放)片元的颜色
+3) 根据纹理数据, 将一种常量颜色和片元混合起来.
+3. 启用纹理映射
+使用符号常量 GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP作为参数调用函数glEnable()或glDisable();
+分别对应于一维, 二维, 三维和立方图纹理映射模式
+4. 使用纹理坐标和几何坐标绘制场景 
+
+9.2 指定纹理
+void glTexImage2D(GLenum target,GLint level,GLint internalformat,GLsizei width,GLsizei height,
+        GLint border,GLenum format,GLenum type,const GLvoid *pixels);
+target: GL_TEXTURE_2D, GL_PROXY_TEXTURE_2D, GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 
+GL_TEXTURE_CUBE_MAP_POSITIVE_Y, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,GL_PROXY_TEXTURE_CUBE_MAP
+level: 如果提供的纹理映射图有多种分辨率, 应相应地设置参数level, 如只有一种分辨率, level为0.
+internalformat: 指出了纹理中存储了哪些分量(RGBA, 深度, 辉度或强度), 1,2,3,4等效于GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_RGB, GL_RGB4
+width和height定义纹理的大小.
+boder定义边框大小, 为0或1. 宽高和边框必须为2m+2b的形式,m为非负整数,b为边框大小.
+纹理的最大大小至少为64x64,或者66 x 66(带边框)
+format和type与glDrawPixels()函数的参数相同.所以glPixelStore*()和glPixelTransfer*()也可以应用于glTexImage2D函数.
+glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+format: GL_COLOR_INDEX, GL_RGB, GL_RGBA, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, GL_LUMINANCE, GL_LUMINANCE_ALPHA
+type: GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_BITMAP
+pixels: 纹理图像数据.
+
+int gluScaleImage(GLenum format, GLint widthin, GLint heightin, GLenum typein, const void *datain, GLint widthout,
+        GLint heightout, GLenum typeout, void* dataout);
+用合适的像素存储模式从datain参数中解压数据
+
+void glCopyTexImage2D(GLenum target, GLint level, GLint internalFormat,
+            GLint x, GLint y, GLsizei width, GLsizei height,
+            GLint border);
+复制帧缓存为纹理数据
+target: 必须为常量GL_TEXTURE_2D
+level, internalFormat, border: 同函数glTexImage2D()
+x,y: 屏幕坐标的左下点
+width, height: 矩形的宽和高.
+
+9.2.1 纹理代理
+纹理代理的目标是估算是否有足够的资源可以运用
+glGetIntegerv(GL_MAX_TEXTURE_SIZE,...)  得知纹理图像的最大尺寸(没有考虑纹理的内部存储格式)
+glTexImage2D()带参数GL_PROXY_TEXTURE_2D以及给定的level, internalFormat, width, height, border, format和type. 
+使用代理用于查询OpenGL是否能容纳指定内部模式的纹理.pixels指针则传递NULL指针.
+
+之后为了得知是否有足够的资源可以运用于纹理, 可以用glGetTexLevelParameter*()查询状态
+void glGetTexLevelParameter{if}v(GLenum target, GLint level,GLenum pname, TYPE *params);
+target:  GL_TEXTURE_1D, GL_TEXTURE_2D, GL_PROXY_TEXTURE_1D,GL_PROXY_TEXTURE_2D. 
+pname: GL_TEXTURE_WIDTH, GL_TEXTURE_HEIGHT,GL_TEXTURE_BORDER, GL_TEXTURE_INTERNAL_FORMAT, GL_TEXTURE_RED_SIZE,
+    GL_TEXTURE_GREEN_SIZE, GL_TEXTURE_BLUE_SIZE, GL_TEXTURE_ALPHA_SIZE,GL_TEXTURE_LUMINANCE_SIZE, or GL_TEXTURE_INTENSITY_SIZE.
+
+下面的代码演示如何使用纹理代理查询是否有足够的资源, 来创建一个内部格式为GL_RGBA8的 64 x 64纹理.
+如有足够的资源,函数glGetTexLevelParameteriv将内部格式存储到变量format中.
+
+GLint format;
+glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA8, 64, 64, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
+
+
+
+9.2.2 替换纹理图像的部分或全部纹素
+void glTexSubImage2D(GLenum target,GLint level,
+  GLint xoffset,GLint yoffset,GLsizei width,GLsizei height,
+  GLenum format,GLenum type,const GLvoid *pixels);
+功能: 用一个二维纹理图像替换当前二维纹理图像中的一个(矩形)区域.
+target:取值与函数glCopyTexImage2D()中相同.
+level, format, type: level是mipmap明细等级. format和type描述了纹理图像数据的格式和数据类型.
+子图像受函数glPixelStore*()和glPixelTransfer*()设置的模式以及其他像素转移操作的影响.
+xoffset, yoffset: 要替换的子区域左下角相对于当前纹理左下角的位置.
+width, height: 要替换的子区域的宽度和高度.
+texels: 子图像的纹理数据. 
+
+void glCopyTexSubImage2D(GLenum target, GLint level,GLint xoffset, GLint yoffset, GLint x, GLint y,GLsizei width, GLsizei height);
+功能: 使用帧缓存中的图像数据替换当前二维纹理图像的一个子区域. 该函数将应用函数glPixelTransfer*()的设置, 并执行其他像素转移操作.
+
+
+9.2.3 一维纹理
+void glTexImage1D(GLenum target, GLint level, GLint internalFormat,
+    GLsizei width, GLint border, GLenum format,
+    GLenum type, const GLvoid *pixels);
+功能: 定义一维纹理. 除参数pixels为一维数组外, 其他参数的含义都与函数glTexImage2D()中一样.
+参数width的值为2的m次方(有边框时为2的m次方+2)
+指定代理时, 将target设置为GL_PROXY_TEXTURE_1D.
+
+OpenGL实现支持图像处理子集, 启用一维卷积滤波器(GL_CONVOLUTION_1D), 将对纹理图像执行卷积操作(卷积可能改变纹理图像的宽度)
+
+void glTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLint width, Glenum format, GLenum type, const GLvoid *texels);
+功能: 用一个一维纹理数组替换当前一维纹理图像的一个子区域. 
+target: 必须为GL_TEXTURE_1D.
+
+void glCopyTexImage1D(GLenum target, GLint level, GLint internalFormat, GLint x, GLint y, GLsizei width, GLint border);
+功能: 使用帧缓存中的数据来定义纹素以创建一个一维纹理. 应用函数glPixelStore*()和glPixelTransfer*()的设置.
+target: 必须为常量GL_TEXTURE_1D.
+width: 必须是2的m次方(有边框为2的m次方+2),m为非负整数.
+
+void glCopyTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width);
+功能: 使用帧缓存中的图像数据替换当前一维纹理图像的一个子区域.应用函数glPixelTransfer*()的设置和其他像素转移操作.
+target: 必须为常量GL_TEXTURE_1D
+
+
+9.2.4 三维纹理
+三维纹理最常用于医学和地质学应用程序渲染物体. 三维纹理映射是一种被统称为体渲染的应用程序的组成部分.
+
+void glTexImage3D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, 
+    GLint border, GLenum format, GLenum type, const GLvoid* texels);
+功能: 定义一个三维纹理. 参数texels为三维数组并新增参数depth. depth的值必须为2的m次方(有边框为2的m次方+2),m为非负整数.
+target: 代理则是为GL_PROXY_TEXTURE_3D. 
+
+void glTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, 
+    GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* texels);
+功能: 定义一个三维纹理数组, 用于替换当前三维纹理图像的一个子区域. 子图像受函数glPoxelStor*()和glPixelTransfer*()设置的模式以及其他像素转移操作的影响.
+
+void glCopyTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
+功能: 使用帧缓存中的图像数据来替换当前三维纹理图像的一个子区域. 应用函数glPixelTransfer*()的设置和其他像素转移操作.
+      只替换三维纹理中一层(zoffset指定的那一层)
+target: 必须为GL_TEXTURE_3D
+level: mipmap明细等级
+
+
+针对三维纹理的像素存储模式
+像素存储模式决定了各层(二维矩形像素阵列)的行间距.
+用glPixelStore*()设置像素存储模式
+参数*ROW_LENGTH, *ALIGNMENT, *SKIP_PIXELS, *SKIP_ROWS.其中*为GL_UNPACK_或者GL_PACK_(二维纹理中可用的模式)
+参数*IMAGE_HEIGHT,*SKIP_IMAGES让函数glTexImage3D(), glTexSubImage3D()和glGetTexImage()能够界定和存储子体.
+如内存中三维纹理比子体大,则使用*IMAGE_HEIGHT来指定子图像的高度; 如果子体不是从第一层开始, 还需设定参数*SKIP_IMAGES.
+
+*IMAGE_HEIGHT的使用:
+功能: 定义了三维纹理图像中各层的高度(行数).
+如果其值为0(不能为负数), 则每个二维矩形的行数为height(height是传递给函数glTexImage3D()和glTexSubImage3D()的参数); 否则各层高度为*IMAGE_HEIGHT的值. 
+
+*SKIP_IMAGES的使用:
+定义了存取子体的第一个数据之前需要跳过多少层. 如为n, 则子体始于第n曾, 深度为depth层(其中depth是传递给函数glTexImage3D()和glTexSubImage3D()的参数).
+默认值为0 
+
+
+
+9.2.5 压缩的纹理图像
+原理: 在纹理内存中, 可以以压缩格式存储纹理图像, 以减少其占用的纹理内存空间.
+方法: 加载纹理图像时对其进行压缩, 也可以直接加载压缩过的纹理图像.
+
+
+1. 在加载纹理图像时对其进行压缩
+方法: 将internalformat参数设置为枚举GL_COMPRESSED_*.
+代码: 加载图像后, 判断图像是否被压缩以及压缩格式.
+
+GLboolean    compressed;
+GLenum        textureFormat;
+GLsizei        imageSize;
+
+glGetTexLevelParameteriv(GL_TEXTURE_2D, GL_TEXTURE_COMPRESSED, &compressed);
+if(compressed == GL_TRUE){
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, GL_TEXTURE_INTERNAL_FORMAT, &textureFormat);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, GL_TEXTURE_COMPRESSED_IMAGE_SIZE, &imageSize);
+}
+
+
+
+2. 加载压缩过的纹理图像
+void glCompressedTexImage1D(GLenum target, GLint level, GLenum internalformat, 
+    GLsizei width, GLint border, GLsizei imageSize, const GLvoid* texels);
+
+void glCompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, 
+    GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* texels);
+
+void glCompressedTexImage3D(GLenum target, GLint level, GLenum internalformat, 
+    GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* texels);
+
+功能: 使用压缩过的纹理图像定义一个一维, 二维或三维纹理.
+level: 提供多种分辨率的纹理. 如纹理只有一种分辨率, level则设置为0.
+internalformat: 纹理图像的压缩格式, 必须是当前OpenGL实现支持的压缩格式, 否则导致GL_INVALID_ENUM错误.
+width, height, depth: 指定一维, 二维, 三维纹理图像的大小. 参数值的必须为 2的m次方 + 2b.
+border: b的值, 必须是0或1.
+
+
+void glCompressedTexSubImage1D(GLenum target, GLint level, GLint xoffset, 
+    GLsizei width, GLenum format, GLsizei imageSize, const GLvoid* texels);
+
+void glCompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, 
+    GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid* texels);
+
+void glCompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, 
+    GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* texels);
+
+功能: 使用压缩过的纹理图像来替换当前纹理图像的部分或全部纹素.
+xoffset, yoffset, zoffset: 指定从当前纹理图像的什么地方开始替换.
+width, height, depth: 指定用于替换的一维, 二维或三维图像的大小.
+imageSize: 指出数组texels中包含多少个字节的数据.
+
+
+9.2.6 使用纹理边框
+如要应用比OpenGL实现支持的最大尺寸更大的纹理图, 可以将多个纹理拼贴起来.
+由于纹理的边框问题, 可根据相邻纹理图像中的纹素值计算平均值, 然后将其用于纹理边界对应的像素.
+每个纹理都有8个相邻的纹理,4个通过边框,4个通过顶点
+简单可行的方法: 使用函数glTexSubImage2D()复制相邻纹素的值.
+
+
+9.2.7 mipmap: 多个明细等级
+mipmap: 一系列预先通过滤波生成的, 分辨率递减的纹理图.
+功能: 使用mipmap技术时, OpenGL根据物体的大小(以像素为单位)自动确定应使用哪个纹理图像.
+方法: 必须提供从最大尺寸到1 x 1的, 大小为2的幂的各种纹理图.例如最大分辨率为64 X 16, 就必须提供32X8, 16X4, 8X2, 4X1, 2X1, 1X1的纹理
+原理: 小的纹理图通常是通过对最大的纹理图进行滤波处理得到的, 每个纹素的值是前一个纹理图中4个相应纹素的平均值.
+使用: 用函数glTexImage2D()指定使用哪些纹理. 将参数level, width, height和image设置成不同的值.
+level的示例: 例如最大分辨率为64 X 16, level为0表示64X16,level为1表示32X8, 以此类推. 
+
+1. 确定应使用哪一级mipmap
+根据多边形和纹理图像之间的缩放因子来确定使用哪一级mipmap, 缩放因子称为ρ, 并定义另一个参数λ=, ρ为所有方向上最大的缩放因子
+lod(bias)是细节等级偏移, 它是函数glTexEnv*()设置的一个常量, 用于调整λ. 默认情况下为0, 对λ无影响.
+λ <= 0.0 表明纹理比多边形小, 使用放大滤波器.
+λ > 0.0 将使用缩小滤波器, 为mipmap技术, λ指的是mipmap等级.
+例如: 纹理图大小 64 X 64, 多边形 32 X 32, ρ= 2.0, λ = 1.0
+      纹理图大小 64 X 32, 多边形 8 X 16, ρ= 8.0,(x方向缩放因子为8,y方向为2,取最大值),因此λ = 3.0
+
+
+2. 控制mipmap等级数
+
+调用函数glTexParameter*(), 使用参数GL_TEXTURE_BASE_LEVEL, GL_TEXTURE_MAX_LEVEL, GL_TEXTURE_MIN_LOD, GL_TEXTURE_MAX_LOD.
+GL_TEXTURE_BASE_LEVEL: 要使用的分辨率最高的纹理等级(编号最小的mipmap等级), 默认为0
+GL_TEXTURE_MAX_LEVEL: 要使用的分辨率最低的纹理等级(编号最大的mipmap等级), 默认为1000
+示例代码: 设置最小和最大mipmap等级
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 2);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 5);
+glTexImage2D(GL_TEXTURE_2D, 2, GL_RGBA, 64, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, image1);
+glTexImage2D(GL_TEXTURE_2D, 3, GL_RGBA, 32, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, image2);
+glTexImage2D(GL_TEXTURE_2D, 4, GL_RGBA, 16, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, image3);
+glTexImage2D(GL_TEXTURE_2D, 5, GL_RGBA, 8, 4, 0, GL_RGBA, GL_UNSIGNED_BYTE, image4);
+
+注意: 要mipmap技术正确运行, 必须加载等级位于[BASE_LEVEL, MAX_LEVEL]的所有mipmap, 否则纹理映射将被禁用.
+
+GL_TEXTURE_MIN_LOD: λ的最小值(纹理图像和多边形的大小比例)
+GL_TEXTURE_MAX_LOD: λ的最大值
+功能: 间接地指定了使用那些mipmap等级.
+
+仅当MIN_LOD小余MAX_LEVEL时, MIN_LOD才能发挥作用.
+例如: 0级mipmap的大小为64 X 64, MAX_LOD为4.0, 将不会使用小余4 X 4的mipmap
+
+注意: 为避免突变, MIN_LOD设置比BASE_LEVEL大,但差不超过1, MAX_LOD设置比MAX_LEVEL小,但差不超过1
+
+
+3. 自动生成mipmap
+如果已经创建0级(分辨率最高的)mipmap, 可以使用函数gluBuild1DMipmaps(), gluBuild2DMipmaps() 和 gluBuild3DMipmaps()来定义和创建mipmap金字塔.
+塔顶为1X1(对于一维纹理为1; 三维纹理为1X1X1)的mipmap. 如初始图像的大小不是2的幂, 可以使用函数gluBuild*DMipmaps()将图像大小缩放到最接近2的幂,
+如纹理太大, 可以使用函数gluBuild*DMipmaps()将图像缩小到足够的资源来存储它(使用GL_PROXY_TEXTURE机制确定).
+
+int gluBuild1DMipmaps(GLenum target, GLint internalFormat, GLint width, GLenum format, GLenum type, const void *texels);
+
+int gluBuild2DMipmaps(GLenum target, GLint internalFormat, GLint width, GLint height, GLenum format, GLenum type, const void *texels);
+
+int gluBuild3DMipmaps(GLenum target, GLint internalFormat, GLint width, GLint height, GLint depth, GLenum format, GLenum type, const void *texels);
+功能: 创建一系列的mipmap, 并调用函数glTexImage*D()来加载它们.
+返回值: 如成功创建了所有mipmap等级, 则返回0. 否则, 返回GLU错误代码.
+
+int gluBuild1DMipmapLevels(GLenum target, GLint internalFormat, GLint width, 
+    GLenum format, GLenum type, GLint level, GLint base, GLint max, void *texels);
+
+int gluBuild2DMipmapLevels(GLenum target, GLint internalFormat, GLint width, GLint height,
+    GLenum format, GLenum type, GLint level, GLint base, GLint max, void *texels);
+
+int gluBuild3DMipmapLevels(GLenum target, GLint internalFormat, GLint width, GLint height, GLint depth,
+    GLenum format, GLenum type, GLint level, GLint base, GLint max, void *texels);
+功能: 创建一系列的mipmap, 并调用函数glTexImage*D()来加载它们.
+level: 图像texels的mipmap等级.
+base, max: 指出要根据图像texels创建哪些mipmap等级.
+返回值: 如成功创建了所有指定的mipmap等级, 则返回0. 否则, 返回GLU错误代码.
+
+如创建mipmap的纹理图像发生变化. 必须相应地更新整套mipmap.
+使用函数glTexParameter*()将GL_GENERATE_MIPMAP设置为GL_TRUE后. 如BASE_LEVEL对应的mipmap发生变化, 将自动计算和加载BASE_LEVEL + 1 到MAX_LEVEL的mipmap等级.
+
+
+9.3 滤波
+示例代码: 指定放大和缩小的滤波方法
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+用于放大和缩小的滤波方法
+GL_TEXTURE_MAG_FILTER: GL_NEAREST, GL_LINEAR
+GL_TEXTURE_MIN_FILTER: GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR.
+
+GL_NEAREST的计算量比GL_LINEAR少, 但GL_LINEAR的质量更高.
+
+如提供了mipmap, 对放大和缩小映射的影响:
+1) 对于放大映射, 只使用最小等级的纹理图像.
+2) 对于缩小映射, 使用最合适的一种或两种的mipmap的滤波方法. 如滤波方法为GL_NEAREST或GL_LINEAR, 则只使用最小等级的mipmap.
+3) 只同时使用一个mipmap, 选择滤波方法GL_NEAREST_MIPMAP_NEAREST或GL_LINEAR_MIPMAP_NEAREST(使用线性插值).
+   使用那种mipmap取决于缩小量.缺点为存在一个到使用下一个mipmap的切换点.
+4) 使用滤波方法GL_NEAREST_MIPMAP_LINEAR或GL_LINEAR_MIPMAP_LINEAR, 根据两个最合适的mipmap中的纹素值进行线性插值.
+
+警告: 如指定一种mipmap纹理滤波方法,但未提供一组完整的mipmap, 则OpenGL隐式禁用纹理映射.
+
+GL_NEAREST称为点菜样. GL_LINEAR称为双线性采样. GL_LINEAR_MIPMAP_LINEAR称为三线性采样
+
+注意: 缩放到放大的切换点通常为λ = 0.0. 如放大过滤方法为GL_LINEAR, 缩小过滤方法为GL_NEAREST_MIPMAP_NEAREST 或 GL_NEAREST_MIPMAP_LINEAR, 则λ=0.5.
+
+
+9.4 纹理对象
+使用纹理对象来存储纹理数据的步骤:
+1) 生成纹理对象名称
+2) 将纹理对象绑定到纹理数据(包括图像数据数组和纹理属性), 即创建纹理对象.
+3) 如果OpenGL实现高性能纹理工作集, 应检查是否有足够的空间来存储所有的纹理对象. 如没有足够空间, 应设置每个纹理对象的优先级, 以确保最常用的纹理留在工作集中
+4) 绑定和重新绑定纹理对象, 以便可以将其中的纹理映射到物体上.
+
+
+9.4.1 生成纹理对象名称
+void glGenTextures(GLsizei n, GLint* textureNames);
+功能: 通过数组textureNames返回n个未用的纹理对象名, 返回的名称不必是相邻的整数.
+
+GLboolean glIsTexture(GLint textureName);
+功能: 如textureName是已被绑定的纹理对象名, 且没有被删除, 则返回GL_TRUE, 如textureName为0, 或非0, 但不是已有纹理对象的名称, 返回GL_FALSE.
+注意: 如一倍glGenTextures()返回, 但未使用glBindTextures()绑定, 仍返回GL_FALSE.
+
+
+9.4.2 创建和使用纹理对象
+void glBindTexture(GLenum target, GLuint textureName);
+功能: 完成下面几项工作. 
+1) 如textureName为非零无符号整数, 首次被使用, 则创建一新的纹理对象, 并将其名称设置为参数textureName的值.
+2) 绑定一个已创建的纹理对象时, 该纹理对象将进入活动状态.
+3) 如textureName为0, OpenGL将停止使用纹理对象, 返回到未命名的默认纹理.
+4) 首次被创建时, target指定了维数, 其取值为GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D 或 GL_TEXTURE_CUBE_MAP.
+5) 首次被创建时, 诸如缩小滤波方法, 放大滤波方法, 环绕模式, 边框颜色, 纹理优先级等纹理属性被设置为默认值.
+
+例 9.7 绑定纹理对象: tebind.c 
+
+纹理驻留策略
+如果有多个使用周期较短且大小相同的纹理, 可以调用函数glTexSubImage*()将不同的图像加载到已有的纹理对象中.与删除并重新创建纹理对象相比, 这样做的效率可能更高
+void glPrioritiesTextures(GLsizei n, const GLuint *textureNames, const GLclampf *priorities);
+功能: 将n个纹理对象的优先级设置为指定的值, 数组textureNames指定了这些纹理对象的名称, 数组priorities指定了优先级.
+priorities: 指定了优先级, 将其值截取到[0.0, 1.0], 0对应的优先级最低, 1对应的优先级最高
+函数glPrioritiesTextures()步要求textureNames中指定的纹理对象被绑定过.
+
+函数glTexParameter*()也可用于设置单个纹理对象的优先级. 但仅限于当前绑定的纹理对象.
+
+
+9.4.5 纹理函数
+void glTexEnv(if)(GLenum target, GLenum pname, TYPE param);
+void glTexEnv(if)v(GLenum target, GLenum pname, TYPE* param);
+功能: 设置当前的纹理映射方式. 
+target: 必须为GL_TEXTURE_FILTER_CONTROL或GL_TEXTURE_ENV
+pname: 如target为GL_TEXTURE_FILTER_CONTROL, pname必须为GL_TEXTURE_LOD_BIAS.
+       如target为GL_TEXTURE_ENV, pname可为GL_TEXTURE_ENV_MODE, GL_TEXTURE_ENV_COLOR
+param: 如pname为GL_TEXTURE_LOD_BIAS, param是一个浮点数, 用于指定GL_TEXTURE_LOD_BIAS的值.
+       如pname为GL_TEXTURE_ENV_MODE,param的取值为GL_DECAL,GL_REPLACE,GL_MODULATE,GL_BLEND, GL_ADD或GL_COMBINE. 指定了如何将纹理值和片元的颜色值合并起来.
+       如pname为GL_TEXTURE_ENV_COLOR, 则参数pname是一个包含4个浮点数的数组, 这4个元素分别是R, G, B, A分量, 指定了一种用于GL_BLEND操作的颜色.
+
+纹理映射方式和基本内部结构一起决定了如何应用纹素数据的各个分量.
+纹理映射方式作用于被选择的纹素数据分量和片元的颜色值.
+函数glTexImage*D()指定纹理图像时, 第三个参数指定了纹理的内部格式. 有6种基本内部格式:
+GL_ALPHA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_INTENSITY, GL_RGB, GL_RGBA. 
+其他内部结构如GL_LUMINANCE6_ALPHA2和GL_R3_G3_B2, 对应于6种基本内部格式之一. 它们指定纹素数据分量的精度.
+
+纹理映射计算是以RGBA方式进行的, 但有些内部格式不是RGB.
+
+将各种纹理格式转换为颜色值:
+基本内部结构            转换得到的RGBA颜色值
+GL_ALPHA            (0, 0, 0, A)
+GL_LUMINANCE            (1, 1, 1, 1)
+GL_LUMINANCE_ALPHA        (1, 1, 1, A)
+GL_INTENSITY            (1, 1, 1, 1)
+GL_RGB                (R, G, B, 1)
+GL_RGBA                (R, G, B, A)
+
+纹理映射方式替换, 调整和贴花
+
+基本内部格式
+ GL_REPLACE
+ GL_MODULATE
+ GL_DECAL
+ 
+GL_ALPHA
+ C = Cf
+A = As
+ C = Cf
+A = AfAs
+ 未定义
+ 
+GL_LUMINANCE
+ C = Cf(1 - Cs) + CcCs
+A = Af C = Cf + Cs
+A = Af 未定义 
+GL_LUMINANCE_ALPHA
+ C = Cf(1 - Cs) + CcCs
+A = AfAs C = Cf + Cs
+A = AfAs 未定义 
+GL_INTENSITY
+ C = Cf(1 - Cs) + CcCs
+A = Af(1 - As) + AcAs C = Cf + Cs
+A = Af + As 未定义 
+GL_RGB
+ C = Cf(1 - Cs) + CcCs
+A = Af C = Cf + Cs
+A = Af C = Cs
+A = Af 
+GL_RGBA
+ C = Cf(1 - Cs) + CcCs
+A = AfAs C = Cf + Cs
+A = AfAs C = Cf(1-As) + CsAs
+A = Af 
+
+
+
+纹理映射方式混合和相加
+基本内部格式
+ GL_BLEND
+ GL_ADD
+ 
+GL_ALPHA
+ C = Cf
+A = AfAs
+ C = Cf
+A = AfAs
+ 
+GL_LUMINANCE
+ C = Cf(1 - Cs) + CcCs
+A = Af C = Cf + Cs
+A = Af 
+GL_LUMINANCE_ALPHA
+ C = Cf(1 - Cs) + CcCs
+A = AfAs C = Cf + Cs
+A = AfAs 
+GL_INTENSITY
+ C = Cf(1 - Cs) + CcCs
+A = Af(1 - As) + AcAs C = Cf + Cs
+A = Af + As 
+GL_RGB
+ C = Cf(1 - Cs) + CcCs
+A = Af C = Cf + Cs
+A = Af 
+GL_RGBA
+ C = Cf(1 - Cs) + CcCs
+A = AfAs C = Cf + Cs
+A = AfAs 
+
+各个下标的含义如下:
+s表示计算得到的纹理颜色
+f表示片元值
+c表示GL_TEXTURE_ENV_COLOR的值
+没有下标的值表示通过计算得到的最终结果
+
+纹理映射方式替换用纹理颜色替换片元的颜色,
+
+纹理映射方式贴花类似于替换, 但它只适用于RGB和RGBA, 同时处理alpha的方式也不同.
+内部格式为RGBA时, 纹理映射方式贴花将片元的颜色和纹理颜色混合起来, 混合比率由纹理的alpha决定, 片元的alpha不变.
+
+纹理映射方式调整根据纹理图像的内容对片元的颜色进行调整.
+内部格式为GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_INTENSITY时, 各颜色分量乘以相同的值, 调整后的颜色位于片元颜色和黑色之间.
+内部格式为GL_RGB和GL_RGBA时, 片元颜色的各个分量与纹理中相应的分量相乘, alpha值也同片元alpha相乘. 光照适合使用纹理映射方式调整.
+
+纹理映射方式相加将纹理颜色和片元颜色相加, 如有alpha值, 其乘以片元的alpha值, 但内部格式为GL_INTENSITY时除外.这种情况纹理alpha值与片元alpha值相加.
+
+纹理映射方式混合是唯一一种使用GL_TEXTURE_ENV_COLOR指定的颜色的映射方式.
+它像使用alpha值那样使用辉度,强度或颜色值将片元颜色和GL_TEXTURE_ENV_COLOR指定的颜色混合.
+
+
+9.5 指定纹理坐标
+纹理坐标可包含1-4个分量, 这些分量通常被称为s, t, r和q坐标.
+一维纹理, 使用s坐标. 二维纹理, 使用s和t坐标, 三维纹理, 使用s, t和r坐标. q坐标通常被设置为1, 用于创建齐次坐标.
+void glTexCoord[1234][sifd](TYPE coords);
+void glTexCoord[1234][sifd]v(TYPE* coords);
+功能: 设置当前的纹理坐标(s,t,r,q),
+
+
+9.5.1 计算合适的纹理坐标
+由于映射的格式与纹理格式不符,容易造成扭曲的情况,这次要选择恰当的纹理坐标来映射.
+
+
+9.5.2 纹理的重复和截取
+纹理坐标被指定为范围[0, 1]之外的值时, 将截取纹理坐标或重复纹理图像.
+
+也可以使用环绕模式"镜像(mirrored)"重复, 重复时翻转纹理图像.
+例如: 在纹理坐标范围[0,1]内,俺原来顺序使用纹理数据, [1, 2]则相反顺序使用纹理数据, [2, 3]又按原来的顺序使用, 依次类推
+
+另一种环绕模式是截取纹理坐标: 将大于1.0的坐标设置为1.0, 将小于0.0的坐标设置为0.0.
+
+如何使用纹理边框颜色:
+1) 如果环绕模式为GL_REPEAT, 总是忽略边框. 从对侧选择一个2X2纹素阵列来计算加权平均.
+2) 如果环绕模式为GL_CLAMP, 将边框纹素(或GL_TEXTURE_BORDER_COLOR的值)用于计算2X2加权平均. 
+3) 如果环绕模式为GL_CLAMP_TO_EDGE, 总是忽略边框. 使用纹理边缘或靠近纹理边缘的纹素被用于纹理计算, 但不使用边框上的纹素.
+4) 如果环绕模式为GL_CLAMP_TO_BORDER, 纹理坐标超出了范围[0, 1], 则只使用边框纹素(如果没有边框, 使用边框常量颜色)来计算纹理映射.
+   在纹理坐标的上限和下限附近, 可能将边框纹素和内部纹素作为样本加入到2X2纹素阵列中.
+
+环绕模式截取时, 为避免曲面其他部分受纹理的影响, 纹理边缘的纹素的alpha值设置为0,
+
+示例: 环绕模式为GL_REPEAT, 纹理坐标为 4.0上限
+
+
+指定S和T方向重复环绕.
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+如果GL_REPEAT改为GL_CLAMP, 则效果如下
+
+
+
+如S方向为GL_CLAMP, T方向为GL_REPTEAT, 效果如下
+
+
+
+void glTexParameter[if](GLenum target, GLenum pname, TYPE param);
+void glTexParameter[if]v(GLenum target, GLenum pname, TYPE* param);
+功能: 设定纹理如何处理片段或者如何存储纹理对象
+
+pname的取值 param的取值 
+GL_TEXTURE_WRAP_S
+ GL_CLAMP,GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE, GL_MIRRORED_REPEAT, GL_REPEAT
+ 
+GL_TEXTURE_WRAP_T
+ GL_CLAMP,GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE, GL_MIRRORED_REPEAT, GL_REPEAT 
+GL_TEXTURE_WRAP_R GL_CLAMP,GL_CLAMP_TO_BORDER, GL_CLAMP_TO_EDGE, GL_MIRRORED_REPEAT, GL_REPEAT 
+GL_TEXTURE_MAG_FILTER GL_NEAREST, GL_LINEAR
+ 
+GL_TEXTURE_MIN_FILTER GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST,
+GL_NEAREST_MIPMAP_LINEAR,
+GL_LINEAR_MIPMAP_NEAREST,
+GL_LINEAR_MIPMAP_LINEAR
+ 
+GL_TEXTURE_BORDER_COLOR 4个[0.0, 1.0]内的任何值
+ 
+GL_TEXTURE_PRIORITY [0.0, 1.0]内的任何值, 设置当前纹理对象的优先级
+ 
+GL_TEXTURE_MIN_LOD 任何浮点数
+ 
+GL_TEXTURE_MAX_LOD
+ 任何浮点数
+ 
+GL_TEXTURE_BASE_LEVEL 任何非负整数 
+GL_TEXTURE_MAX_LEVEL 任何非负整数 
+GL_DEPTH_TEXTURE_MODE GL_LUMINANCE, GL_INTENSITY, GL_ALPHA
+ 
+GL_TEXTURE_COMPARE_MODE GL_NONE, GL_COMPARE_R_TO_TEXTURE 
+GL_TEXTURE_COMPARE_FUNC GL_LEQUAL, GL_GEQUAL 
+GL_GENERATE_MIPMAP GL_TRUE, GL_FALSE
+ 
+
+
+GL_TEXTURE_BORDER_COLOR: 纹理映射计算使用的边框信息.滤波方法为GL_NEAREST,环绕模式为GL_CLAMP_TO_BORDER时, 边框颜色影响贴上纹理的物体.
+                         当滤波方法为GL_LINEAR, 环绕模式为GL_CLAMP时, 边框也会影响纹理映射.
+                         环绕模式为GL_CLAMP_TO_EDGE或GL_REPEAT, 边框颜色将被忽略.
+
+
+
+9.6 自动生成纹理坐标
+
+void glTexGen[ifd](GLenum coord, GLenum pname, TYPE param);
+void glTexGen[ifd]v(GLenum coord, GLenum pname, TYPE *param);
+功能: 指定用于自动生成纹理坐标的函数(function). 
+coord: 必须是GL_S, GL_T, GL_R, GL_Q. 指出生成s, t, r还是q纹理坐标.
+pname: 为GL_TEXTURE_GEN_MODE, GL_OBJECT_PLANE, GL_EYE_PLANE
+param: 如pname为GL_TEXTURE_GEN_MODE, param为一个整数, 取值为GL_OBJECT_LINEAR, GL_EYE_LINEAR, GL_SPHERE_MAP, GL_REFLECTION_MAP, GL_NORMAL_MAP
+pname为其他值, param是一个指向数组的指针(向量版本), 数组中包含提供给纹理生成函数的参数值.
+
+
+纹理图像映射到固体物体上, 使用物体坐标指定参考较合适. GL_OBJECT_LINEAR. 
+移动的物体上生成动态的等高线时, 使用眼坐标GL_EYE_LINEAR较合适.
+球形环境映射用GL_SPHERE_MAP较合适.
+立方图用GL_NORMAL_MAP.
+
+
+9.6.1 创建等高线
+
+使用GL_TEXTURE_GEN_MODE 和 GL_OBJECT_LINEAR时, 纹理生成函数是顶点的物体坐标(x0, y0, z0, w0)的线性组合:
+生成的坐标 = p1x0 + p2y0 + p3z0 + p4w0
+其中p1,p2,p3,p4是参数pname为GL_OBJECT_PLANE时, 参数param的值.如果p1, p2, p3和p4被归一化, 计算的结果将是顶点到一个平面的距离.
+例如: p2 = p3 = p4 = 0; p1 = 1, 计算结果为顶点到平面x = 0的距离.
+
+
+例9.8 texgen.c
+
+函数glEnable()使用参数GL_TEXTURE_GEN_S来启用自动生成纹理坐标x.
+函数glTexGen*()使用参数GL_OBJECT_LINEAR表示在模型的坐标系下计算纹理坐标. GL_EYE_LINEAR表示在眼坐标系下计算纹理坐标.
+
+
+环境映射指的是渲染物体时, 将其视为全反射的, 使其表面的颜色为周围环境反射到人眼中的颜色.
+
+实现环境映射需要做的只是创建一个合适的纹理图, 并让OpenGL生成纹理坐标.
+
+
+创建了用于环境映射的纹理后, 需要启用OpenGL的环境映射算法
+自动生成纹理坐标以支持环境映射的代码:
+glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+glEnable(GL_TEXTURE_GEN_S);
+glEnable(GL_TEXTURE_GEN_T);
+
+
+纹理映射方法GL_SPHERE_MAP生成合适的环境映射纹理坐标.
+
+
+9.6.3 立方图纹理(cube map texture)
+
+使用6个二维纹理图来构成一个以原点为中心的纹理立方体.对于每个片元, 其纹理坐标(s, r, t)被视为方向向量, 而纹素表示从原点看到的纹理立方体上的东西.
+要创建立方图纹理, 可调用glTexImage2D()6次, 每次调用该函数时使用参数target指定立方体的面
+GL_TEXTURE_CLUB_MAP_POSITIVE_X, GL_TEXTURE_CLUB_MAP_NEGATIVE_X, GL_TEXTURE_CLUB_MAP_POSITIVE_Y, GL_TEXTURE_CLUB_MAP_NEGATIVE_Y,
+GL_TEXTURE_CLUB_MAP_POSITIVE_Z, GL_TEXTURE_CLUB_MAP_NEGATIVE_Z
+
+
+立方图有专用的纹理代理 GL_PROXY_TEXTURE_CUB_MAP
+应将立方图视为一个整体, 为其指定纹理参数和创建纹理对象, 而不是分别对6个礼方面指定纹理参数和创建纹理对象.
+下述设置立方图的环绕模式和滤波方法的代码将参数target的值设置为GL_TEXTURE_CUBE_MAP
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_REPEAT);
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+
+对于给定的片元, 根据纹理坐标(s, t, r)中哪个坐标值最大以及这个值的正负来决定使用哪个纹理, 
+前者决定主轴, 后者决定方向, 然后将其他两个坐标值除以最大坐标值,得到新的坐标(s',t'),并据此来决定使用前面选中的纹理中的哪些纹素.
+
+
+通常是调用函数glTexGen*()来自动生成立方图纹理坐标, 并指定下述两种纹理坐标生成模式之一: GL_REFLECTION_MAP和GL_NORMAL_MAP.
+GL_REFLECTION_MAP适用于环境映射.
+GL_NORMAL_MAP适用于渲染有定位光源和漫反射的场景.使用模型视点矩阵将顶点的发现向量变换为眼坐标(nx,ny,nz),并将其用作纹理坐标(s, t, r)
+
+
+生成立方图纹理坐标的代码:
+glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_NORMAL_MAP);
+glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_NORMAL_MAP);
+glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_NORMAL_MAP);
+glEnable(GL_TEXTURE_GEN_S);
+glEnable(GL_TEXTURE_GEN_T);
+glEnable(GL_TEXTURE_GEN_R);
+
+glEnable(GL_TEXTURE_CUBE_MAP);
+
+
+
+9.7 多重纹理
+多重纹理让你在纹理操作流水线中依次将多个纹理应用于同一个多边形.
+1. 使用多重纹理的步骤
+注意:在返回模式下使用多重纹理时, 只有第一个纹理单元的操作结果是确定的.
+1) 对于每个纹理单元, 指定其纹理映射参数, 包括纹理图像, 滤波方法, 映射方式, 纹理坐标生成方式和纹理矩阵.
+   函数glGetIntegerv()使用参数GL_MAX_TEXTURE_UNITS 来了解OpenGL实现最多支持多少个纹理单元.
+2) 指定顶点时, 使用函数glMultiTexCoord*()为每个顶点指定多组纹理坐标.每个纹理单元都需要一组坐标.每个纹理单元使用的坐标可能各不相同.
+
+2. 建立纹理单元
+使用多重纹理时, 需要有多个纹理单元. 每个纹理单元的功能都相同, 并存储了各自的纹理处理参数.包括:
+1)纹理图像  2)滤波参数  3)纹理映射方式  4)纹理矩阵堆栈  5)纹理坐标生成模式  6)顶点数组(如果需要的话)
+
+要设置纹理映射参数, 使用函数glActiveTexture()来指定要对其进行设置的纹理单元, 
+然后调用函数glTexImage*(), glTexParameter*(), glTexEnv*(), glTexGen*()和glBindTexture()来设置其纹理映射参数.
+void glActiveTexture(GLenum texUnit);
+功能: 选择一个纹理单元, 接下来的纹理函数将修改该纹理单元.
+texUnit: 为符号常量GL_TEXTUREi,其中i的取值范围为0到k-1, k是OpenGL实现支持的最大纹理单元数. 
+
+3. 指定顶点及其纹理坐标
+void glMultiTexCoord(1234)(sifd)(GLenum texUnit, TYPE coords);
+void glMultiTexCoord(1234)v(sifd)(GLenum texUnit, TYPE* coords);
+功能: 将参数coords中的纹理坐标(s, i, r, q)用于纹理单元texUnit, 参数texUnit的取值与函数glActiveTexture()中相同.
+
+对位图或图像使用多重纹理时, 需要为每个光栅位置指定多组纹理坐标.
+因此,每次调用函数glRasterPos*()或glWindowPos*()时, 为每个纹理单元调用函数glMultiTexCoord*().
+
+4. 其他指定纹理坐标的方法
+1) 自动生成纹理坐标(函数glTexGen*())
+   使用函数glActiveTexture()来指定下面纹理坐标生成函数影响哪个纹理单元 glTexGen*(), glEnable(GL_TEXTURE_GEN_*), glDisable(GL_TEXTURE_GEN_*)
+2) 使用顶点数组glTexCoordPointer()
+   函数glClientActiveTexture()用于指出函数glTexCoordPointer()将为哪个纹理单元指定纹理坐标
+   void glClientActiveTexture(GLenum texUnit);
+   功能: 指定要用顶点数组为哪个纹理单元指定纹理坐标.
+   texUnit: 取值与glActiveTexture相同.
+
+5. 恢复到使用单个纹理单元
+对处纹理单元0之外的所有纹理单元禁用纹理映射功能.
+
+
+9.8 纹理组合函数
+void glTexEnv[if](GLenum target, GLenum pname, TYPE param);
+void glTexEnv[if]v(GLenum target, GLenum pname, TYPE* param);
+功能: 设置当前纹理映射方式
+target: 必须为GL_TEXTURE_FILTER_CONTROL 或 GL_TEXTURE_ENV.
+pname: 如target为GL_TEXTURE_FILTER_CONTROL, pname必须为GL_TEXTURE_LOD_BIAS
+param: pname为GL_TEXTURE_LOD_BIAS, param为浮点数, 用于指定GL_TEXTURE_LOD_BIAS的值.
+如果纹理映射方式为GL_BLEND, 将使用GL_TEXTURE_ENV_COLOR的值来与片元混合, 因此必须设置它.
+如果纹理映射方式为GL_COMBINE, 还可能需要设置GL_COMBINE_RGB, GL_COMBINE_ALPHA, GL_RGB_SCALE 或 GL_ALPHA_SCALE.
+如果设置了GL_COMBINE_RGB, 可能还需要设置参数GL_SOURCEi_RGB 和 GL_OPERANDi_RGB(其中i为0, 1, 2)的值.
+如果设置了GL_COMBINE_ALPHA, 可能还需要设置参数GL_SOURCEi_ALPHA 和 GL_OPERANDi_ALPHA(其中i为0, 1, 2)的值.
+
+参数target为GL_TEXTURE_ENV时参数pname和param的取值
+pname                param
+GL_TEXTURE_ENV_MODE        GL_DECAL, GL_REPLACE, GL_MODULATE, GL_BLEND, GL_ADD, GL_COMBINE
+GL_TEXTURE_ENV_COLOR        包括4个浮点数的数组, 表示分量R, G, B, A的值
+GL_COMBINE_RGB            GL_REPLACE, GL_MODULATE, GL_ADD, GL_ADD_SIGNED, GL_INTERPOLATE, GL_SUBTRACT, GL_DONT3_RGB, GL_DOT3_RGBA
+GL_COMBINE_ALPHA        GL_REPLACE, GL_MODULATE, GL_ADD, GL_ADD_SIGNED, GL_INTERPOLATE, GL_SUBTRACT
+
+GL_SOURCEi_RGB, 
+GL_SOURCEi_ALPHA        GL_TEXTURE, GL_TEXTUREEx, GL_CONSTANT, GL_PRIMARTY_COLOR, GL_PREVIOUS
+
+GL_OPERANDi_RGB            GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
+GL_OPERANDi_ALPHA        GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
+GL_RGB_SCALE            表示颜色分量缩放因子的浮点数
+GL_ALPHA_SCALE            表示alpha分量缩放因子的浮点数
+
+多重纹理, 不同的纹理单元中使用不同的组合函数, 执行步骤:
+1) 使用合并函数, 首先必须调用函数glTexEnvf()
+   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+
+2) 指定如何组合RGB, alpha值
+参数param的值            组合函数
+GL_REPLACE            Arg0
+GL_MODULATE(默认)        Arg0 * Arg1
+GL_ADD                Arg0 + Arg1
+GL_ADD_SIGNED            Arg0 + Arg1 - 0.5
+GL_INTERPOLATE            Arg0 * Arg2 + Arg1 * (1 - Arg2)
+GL_SUBTRACT            Arg0 - Arg1
+
+GL_DOT3_RGB    
+GL_DOT3_RGBA            4*((Arg0r - 0.5)*(Arg1r - 0.5) + (Arg0g - 0.5)*(Arg1g - 0.5) + (Arg0b - 0.5)*(Arg1b - 0.5))
+注意: 只能将参数GL_COMBINE_RGB的值设置为GL_DOT3_RGB和GL_DOT3_RGBA, 而不能将GL_COMBINE_ALPHA设置为这样的值.
+
+组合函数GL_DOT3_RGB和GL_DOT3_RGBA之间的差别很小, 前者将R, G, B的值都设置为计算结果, 后者将R, G, B, A的值都设置为计算结果.
+
+3)GL_SOURCEi_RGB来指定组合函数的第i个参数的来源, 例如: 组合函数GL_SUBTRACT需要两个参数.
+指定组合函数的参数来源代码:
+glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_TEXTURE);
+glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_PREVIOUS);
+参数pname为GL_SOURCEi_RGB时, 参数param指定组合函数第i个参数的来源, 其可能取值如下:
+GL_TEXTURE: 第i个参数来自当前纹理单元中的纹理
+GL_TEXTUREn: 第i个参数来自第n个纹理单元中的纹理
+GL_CONSTANT: 使用GL_TEXTURE_ENV_COLOR设置的常量颜色
+GL_PRIMARY_COLOR: 片元进入纹理单元0时的颜色, 即片元最初的颜色.
+GL_PREVIOUS: 前一个纹理单元输出的片元颜色(对纹理单元0来说, 含义与GL_PRIMARY_COLOR相同)
+
+4) 指定来源中的哪些值(RGB还是alpha), 以及如何使用它们.
+GL_OPERAND/_RGB 指定如何使用来源GL_SOURCE/_RGB中的颜色值
+GL_OPERAND/_ALPHA指定如何使用来源GL_SOURCEi_ALPHA中的ALPHA值
+在RGB组合函数中使用alpha值的代码
+static GLfloat constColor[4] = { 0.1, 0.2, 0.3, 0.4 };
+glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, constColor);
+glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_CONSTANT);
+glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_ALPHA);
+上例另Arg2的R,G,B分量都为0.4
+
+5) (可选)设置RGB或alpha缩放因子. 默认设置如下:
+glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 1.0);
+glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0);
+
+6) 绘制几何体, 确定其顶点有合适的纹理坐标
+
+
+插值组合函数
+插值组合函数适合用于演示纹理组合函数的用法, 因为它有三个参数, 且支持多种指定来源和操作数的方式
+插值组合函数: combiner.c
+
+/* 用作常量纹理颜色 */
+static GLfloat constColor[4] = {0.0, 0.0, 0.0, 0.0};
+
+constColor[3] = 0.2;
+glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, constColor);
+glBindTexture(GL_TEXTURE_ENV, texName[0]);
+glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
+glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_TEXTURE);
+glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_PREVIOUS);
+glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+glTexEnvf(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_CONSTANT);
+/* 接下来渲染几何体 */
+
+
+一个活动的纹理单元. 由于组合函数为GL_INTERPOLATE. 因此有三个参数: 使用下述公式将这些参数组合起来:  Arg0 * Arg2 + Arg1 * (1 - Arg2)
+Arg0: 来自GL_TEXTURE---与当前绑定的纹理对象(texName[0])相关联的纹理图像.
+Arg1: GL_PREVIOUS---前一个纹理单元的输出. 由于当前纹理单元0, 因此是片元最初的颜色值.
+Arg2: GL_CONSTANT---常量颜色, 当前为(0.0, 0.0, 0.0, 0.2);
+
+插值结果为纹理图像和片元的加权混合. 由于GL_OPERAND2_RGB被设置为GL_SRC_ALPHA, 因此常量颜色的alpha值被用于计算权重(Arg2)
+
+上例, 程序将20%的纹理颜色和经过平滑着色的多边形颜色的80%混合起来.
+
+
+9.9 执行纹理映射后应用辅助颜色
+执行纹理映射后, 在计算雾效之前, 有时候可能将辅助颜色用于片元, 使得镜面反射区域(highlight)显得更真实
+
+9.9.1 光照被禁用时的辅助颜色
+光照被禁用,且颜色累积模式被启用---使用glEnable()调用参数GL_COLOR_SUM. 把当前的辅助颜色(由函数glSecondaryColor*()设置)与经过纹理映射处理后的片元颜色相加.
+void glSecondaryColor3(b s i f d ub us ui)(TYPE r, TYPE g, TYPE b);
+void glSecondaryColor3(b s i f d ub us ui)v(const TYPE *values);
+功能: 设置当前辅助颜色的红, 绿, 黄分量的值。
+
+
+9.9.2 光照被启用时的辅助镜面反射颜色
+注意： 如果光照被启用， 则不管GL_COLOR_SUM模式是否被启用， 都将应用镜面反射颜色， 并忽略函数glSecondaryColor*()设置的辅助颜色.
+
+
+9.10 纹理矩阵堆栈
+
+要修改当前的纹理矩阵, 需要将矩阵模式设置为GL_TEXTURE, 如下所示
+
+glMatrixMode(GL_TEXTURE);    /* 进入纹理矩阵模式 */
+glRotated(...);
+/* 其他矩阵操作 */
+glMatrixMode(GL_MODELVIEW);    /* 返回模型视图模式 */
+
+
+1. q坐标
+将纹理坐标(s, t, r, q)乘以纹理矩阵后, 得到的向量(s', t', r', q')被视为齐次纹理坐标. 换句话说, 根据s'/q', t'/q', r'/q'在纹理图像中查找纹素.
+
+需要多种投影变换时, 可以使用q坐标.
+
+
+9.11 深度纹理
+(1) 从光源的角度渲染场景. 不管场景如何, 你只需要深度值, 复制深度缓存中的值, 将其存储到一个纹理图中, 以创建一个阴影图
+(2) 生成纹理坐标, 其中(s, t)坐标表示阴影图中的位置, 第三个纹理坐标r是距离光源的距离. 
+    再次绘制场景, 绘制时将r值同深度纹理值进行比较, 以判断片元被光源照射还是位于阴影中.
+
+
+9.11.1 创建阴影图
+第一步是创建一个由深度值组成的纹理图. 为此, 将视点放在光源处, 并渲染场景.
+
+范例中: 调用函数glGetLightfv()来获得当前的光源位置, 然后计算向上向量, 并使用它来进行视点变换.
+        视口的大小设置成与纹理图相同, 然后, 设置合适的透视矩阵和视点矩阵, 渲染场景中的物体, 并将深度图像复制到纹理内存中,用作阴影图.
+        最后, 将视口的位置和大小恢复到原来的设置.
+1) 投影矩阵决定了灯罩的形状. 函数gluPerspective()的参数lightFovy和lightAspect决定了灯罩的大小.lightFovy越小, 越接近于聚光灯. 其值越大, 越接近于泛光灯.
+2) 光源的近裁剪面和远裁剪面用于控制深度值的准确度. 近裁剪面和远裁剪面之间的距离越小, 深度值的准确度越高.
+3) 在深度缓存中建立深度值后, 需要复制它们, 并以内部格式GL_DEPTH_COMPONENT将它们存储到纹理图中.
+   范例使用函数glCopyTexImage2D()根据深度缓存的内容创建了一个纹理图像. 和其他纹理一样, 纹理图像的宽度和高度必须是2的幂
+
+
+
+
+ 原文地址 http://www.cppblog.com/summericeyl/archive/2009/03/21/77368.html
