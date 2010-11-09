@@ -195,6 +195,40 @@ void appInit(JNIEnv*  env, jobject thiz, jstring apkPath)
 		}
 	}
 
+	switch (bitmap.pixel_mode)
+	     {
+	      case FT_PIXEL_MODE_GRAY:
+	       {
+	        for(int k = 0; k < bitmap.width; k++ )
+	        {
+	         pixelclr = buffer[j * face->glyph->bitmap.pitch + k];
+	          // 可以使用pixelclr作为alpha值
+
+	         // pDest是显示用的image内存指针
+	         *pDest++= pixelclr;
+	       }
+	       break;
+
+	      case FT_PIXEL_MODE_MONO:
+
+	      //很多人不知道这个对应的就是fix size时的图片格式，每个bit对应一个点，非黑即白
+
+	       for(int k = 0; k <bitmap.width; k++ )
+	       {
+	        pixelclr = (src [k / 8] & (0x80 >> (k & 7))) ? 0xFFFFFFFF : 0x00000000;
+	        // pDest是显示用的image内存指针
+	         *pDest++= pixelclr;
+	       }
+	       break;
+
+	      default:
+	       //throw InvalidRequestException("Error - unsupported pixel mode");
+	       break;
+	     }
+
+
+	//本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/vrix/archive/2009/09/28/4601832.aspx
+
 	// 设置字体纹理的纹理过滤器
 	//glGenTextures(sizeof(textures)/sizeof(textures[0]), textures);
 	glBindTexture(GL_TEXTURE_2D, textures[0]);
