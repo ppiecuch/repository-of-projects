@@ -10,12 +10,12 @@ LOCAL_CFLAGS := -DANDROID_NDK \
                 
 LOCAL_DEFAULT_CPP_EXTENSION := cpp 
                 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../libzip/ $(LOCAL_PATH)/../libpng/
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../libzip/ $(LOCAL_PATH)/../libpng/ $(LOCAL_PATH)/../freetype/
 
-LOCAL_STATIC_LIBRARIES := libzip libpng
+LOCAL_STATIC_LIBRARIES := libzip libpng freetype
 
 LOCAL_SRC_FILES := \
-	math/point3c.cpp \
+#	math/point3c.cpp \
 	math/point3s.cpp \
 	math/point3f.cpp \
 	math/point2f.cpp \
@@ -23,8 +23,14 @@ LOCAL_SRC_FILES := \
 	math/vector3f.cpp \
 	math/sphere.cpp \
 	math/cuboid.cpp \
+
+LOCAL_SRC_FILES += \
+	math/point3f.cpp \
+	math/point2f.cpp \
+	math/cuboid.cpp \
+	math/rectangle.cpp \
 	util.cpp \
-    androidgl05.cpp \
+    androidgl06.cpp \
 
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lz -lstdc++
 
