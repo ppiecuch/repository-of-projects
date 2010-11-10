@@ -26,7 +26,7 @@ LOCAL_SRC_FILES := src/base/ftsystem.c \
       src/base/ftbbox.c \
       src/base/ftglyph.c \
       src/base/ftbitmap.c \
-      src/base/ftbdf.c \
+#      src/base/ftbdf.c \
       src/base/ftcid.c \
       src/base/ftfstype.c \
       src/base/ftgasp.c \
@@ -40,15 +40,15 @@ LOCAL_SRC_FILES := src/base/ftsystem.c \
       src/base/ftsynth.c \
       src/base/fttype1.c \
       src/base/ftwinfnt.c \
-      src/base/ftxf86.c
-#      src/base/ftmac.c
+      src/base/ftxf86.c \
+      src/base/ftmac.c
 
 LOCAL_SRC_FILES += src/truetype/truetype.c \
-      src/cff/cff.c \
+      src/sfnt/sfnt.c \
+#      src/cff/cff.c \
       src/cid/type1cid.c \
       src/pcf/pcf.c \
       src/pfr/pfr.c \
-      src/sfnt/sfnt.c \
       src/bdf/bdf.c \
       src/type1/type1.c \
       src/type42/type42.c \
@@ -62,14 +62,14 @@ LOCAL_SRC_FILES += src/raster/raster.c \
 #    -- auxiliary modules (optional)
 
 LOCAL_SRC_FILES += src/autofit/autofit.c \
-      src/cache/ftcache.c \
-      src/gzip/ftgzip.c \
-      src/lzw/ftlzw.c \
       src/gxvalid/gxvalid.c \
       src/otvalid/otvalid.c \
       src/psaux/psaux.c \
       src/pshinter/pshinter.c \
-      src/psnames/psnames.c
+      src/psnames/psnames.c \
+#      src/cache/ftcache.c \
+      src/gzip/ftgzip.c \
+      src/lzw/ftlzw.c \
 
 
 LOCAL_CFLAGS    :=  \
