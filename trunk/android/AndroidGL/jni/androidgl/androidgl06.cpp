@@ -146,17 +146,20 @@ void appInit(JNIEnv*  env, jobject thiz, jstring apkPath)
 
 	// 在FreeType中使用1/64作为一个像素的高度所以我们需要缩放h来满足这个要求
 	FT_Set_Char_Size( face, h << 6, h << 6, 96, 96);
+	//FT_Set_Pixel_Sizes(face,w,h);
 
 
-	if(FT_Load_Char( face, FT_Get_Char_Index( face, ch ), FT_LOAD_RENDER ))
+	//if(FT_Load_Char( face, FT_Get_Char_Index( face, ch ), FT_LOAD_RENDER ))
+	if(FT_Load_Char(m_FT_Face, ch,FT_LOAD_RENDER|FT_LOAD_FORCE_AUTOHINT|
+			(true ? FT_LOAD_TARGET_NORMAL : FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO)))
 			LOGI("AndroidGL","FT_Load_Char ERROR",NULL);
 
-	FT_GlyphSlot  slot = face->glyph;
-	FT_Bitmap bitmap=slot->bitmap;
+	//FT_GlyphSlot  slot = face->glyph;
+	//FT_Bitmap bitmap=slot->bitmap;
 
 	/*// 载入给定字符的轮廓
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT ))
-		LOGI("AndroidGL","FT_Load_Glyph ERROR",NULL);
+		LOGI("AndroidGL","FT_Load_Glyph ERROR",NULL);*/
 
 	// 保存轮廓对象
 	FT_Glyph glyph;
@@ -164,12 +167,13 @@ void appInit(JNIEnv*  env, jobject thiz, jstring apkPath)
 		LOGI("AndroidGL","FT_Get_Glyph ERROR",NULL);
 
 	// 把轮廓转化为位图
+	FT_Render_Glyph( face->glyph,   FT_RENDER_MODE_LCD );//FT_RENDER_MODE_NORMAL  );
 	FT_Glyph_To_Bitmap( &glyph, ft_render_mode_normal, 0, 1 );
 	FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
 	LOGI("AndroidGL","FT_Glyph_To_Bitmap",NULL);
 
 	// 保存位图
-	FT_Bitmap& bitmap=bitmap_glyph->bitmap;*/
+	FT_Bitmap& bitmap=bitmap_glyph->bitmap;
 
 	// 转化为OpenGl可以使用的大小
 	width = next_p2( bitmap.width );
@@ -187,15 +191,28 @@ void appInit(JNIEnv*  env, jobject thiz, jstring apkPath)
 //		}
 //	}
 
-	GLubyte* data = new GLubyte[width * height];
+	/*GLubyte* data = new GLubyte[width * height];
 	for(int j=0; j <height;j++) {
 		for(int i=0; i < width; i++){
 			data[i+j*width]=bitmap.buffer[i + bitmap.width*j];
 			//LOGI("AndroidGL","%d,%d",data[2*(i+j*width)],bitmap.buffer[i + bitmap.width*j]);
 		}
+	}*/
+
+	char* data = new char[width*height*4];
+	for(int j=0; j  < height ; j++)
+	{
+		for(int i=0; i < width; i++)
+		{
+			unsigned char _vl =  (i>=bitmap.width || j>=bitmap.rows) ? 0 : bitmap.buffer[i + bitmap.width*j];
+			data[(4*i + (height - j - 1) * width * 4)  ] = 0xff;
+			data[(4*i + (height - j - 1) * width * 4)+1] = 0xff;
+			data[(4*i + (height - j - 1) * width * 4)+2] = 0xff;
+			data[(4*i + (height - j - 1) * width * 4)+3] = _vl;
+		}
 	}
 
-	switch (bitmap.pixel_mode)
+	/*switch (bitmap.pixel_mode)
 	     {
 	      case FT_PIXEL_MODE_GRAY:
 	       {
@@ -224,7 +241,7 @@ void appInit(JNIEnv*  env, jobject thiz, jstring apkPath)
 	      default:
 	       //throw InvalidRequestException("Error - unsupported pixel mode");
 	       break;
-	     }
+	     }*/
 
 
 	//本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/vrix/archive/2009/09/28/4601832.aspx
@@ -236,7 +253,8 @@ void appInit(JNIEnv*  env, jobject thiz, jstring apkPath)
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
 	// 邦定纹理
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,GL_RGB, GL_UNSIGNED_BYTE, data);
+	//glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D( GL_TEXTURE_2D,0,GL_RGBA,width, height,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
 
 	// 释放分配的内存
 	delete[] data;
