@@ -336,4 +336,57 @@ int registerNativeMethods(JNIEnv* env, const char* className,
     return JNI_TRUE;
 }
 
+/**
+ *
+ * 返回比num大的，并且是最接近num的2的次方的数
+ */
+int ceilPower(const int& num)
+{
+	int rval=1;
+	rval*=2;
+	while(rval<num)
+		rval<<=1;
+	return rval;
+}
 
+//本机大端返回1，小端返回0
+int checkCPUendian()
+{
+   union{
+		  unsigned long int i;
+		  unsigned char s[4];
+   }c;
+   c.i = 0x12345678;
+   return (0x12 == c.s[0]);
+}
+// 模拟htons函数，本机字节序转网络字节序
+unsigned short htons(unsigned short h)
+{
+   // 若本机为大端，与网络字节序同，直接返回
+   // 若本机为小端，转换成大端再返回
+   return checkCPUendian() ? h : BigLittleSwap16(h);
+}
+
+// 模拟ntohs函数，网络字节序转本机字节序
+unsigned short ntohs(unsigned short n)
+{
+   // 若本机为大端，与网络字节序同，直接返回
+   // 若本机为小端，网络数据转换成小端再返回
+   return checkCPUendian() ? n : BigLittleSwap16(n);
+}
+
+//统计包含中文字符串的长度
+int count(const char* s)
+{
+	int len=0;
+	int size=strlen(s);
+	for(int i=0;i<size;)
+	{
+		if((unsigned char)s[i]<=0x80)
+			i++;
+		else
+			i+=2;
+		len++;
+	}
+	return len;
+}
