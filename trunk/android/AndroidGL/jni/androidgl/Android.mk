@@ -23,15 +23,23 @@ LOCAL_SRC_FILES := \
 	math/vector3f.cpp \
 	math/sphere.cpp \
 	math/cuboid.cpp \
+	math/cuboid.cpp \
+	font/AsciiFont.cpp \
+	math/rectangle.cpp \
 
 LOCAL_SRC_FILES += \
 	math/point3f.cpp \
 	math/point2f.cpp \
-	math/cuboid.cpp \
-	math/rectangle.cpp \
+	math/point2d.cpp \
+	math/point2s.cpp \
 	util.cpp \
-    androidgl06.cpp \
+	encode/GBnUnicode.cpp \
+	font/Font.cpp \
+	font/UnicodePainter.cpp \
+    androidgl07.cpp \
 
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lz -lstdc++
+
+#LOCAL_LDLIBS+=  -finput-charset=GB2312
 
 include $(BUILD_SHARED_LIBRARY)
