@@ -1,0 +1,21 @@
+....
+if(FT_Load_Char( face,FT_Get_Char_Index( face, ch), FT_LOAD_RENDER ))
+	printf...
+FT_GlyphSlot  slot = face->glyph;
+FT_Bitmap& bitmap=slot->bitmap;
+
+这种写法会出现偏移30个字符的情况,如ch='A'(65),渲染出来的就是#(35)
+
+
+以下这种才是对应的写法:
+if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT ))
+	printf...
+FT_Glyph glyph;
+if(FT_Get_Glyph(face->glyph, &glyph ))
+	printf...
+// 把轮廓转化为位图
+FT_Render_Glyph( face->glyph,   FT_RENDER_MODE_NORMAL );
+FT_Glyph_To_Bitmap( &glyph, ft_render_mode_normal, 0, 1 );
+FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
+FT_Bitmap& bitmap=bitmap_glyph->bitmap;
+......

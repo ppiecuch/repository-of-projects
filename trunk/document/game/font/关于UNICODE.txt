@@ -1,0 +1,63 @@
+MSDN中搜索L constant，可以看到关于字符的说明。这里我结合自己的研究，说一下
+
+字符有三种格式
+
+1，Normal character constants
+
+2，Multicharacter constants
+
+3，Wide-character constants
+
+通常的英文数字不说了，中文的情况
+
+int i1 = L'人';        // Wide-character constants
+
+int i2 = '人';         // Multicharacter constants
+
+int i3 = *(int*)L"人"; // Wide-character constants
+
+int i4 = *(int*)"人";  // Normal character constants
+
+其中i1和i3相等，i2是0xc8cb，i4是0xcbc8
+
+ 
+
+1，Normal character constants和Multicharacter constants有什么区别？
+
+下面
+
+char norc[] = "ab";
+
+char mulc[] = 'ab';
+
+norc是0x6261，mulc是0x6162，由此可见Normal character constants是按照字符顺序存放在内存中的，而Multicharacter constants则是反序的。
+
+ 
+
+2，Normal character constants和Wide-character constants的区别？
+
+Normal character constants和Wide-character constants对中文都是存放两个字节，但是Wide-character constants使用UNICODE编码，这是和Normal character constants不同的编码方式。
+
+ 
+
+3，无论程序被编译成多字节还是UNICODE，字符常量的格式不变的
+
+ 
+
+4，要做的在多字节和UNICODE下都能编译通过的话，我觉得字符常量加TEXT，字符变量用TCHAR，指针用PTCHAR，与字符相关的操作都用TCHAR版，比如strlen用_tcslen代替，查查msdn都有说明相应的TCHAR版本。 
+
+ 
+
+转换函数
+
+Normal character constants转Wide-character constants
+
+MultiByteToWideChar
+
+Wide-character constants转Normal character constants
+
+WideCharToMultiByte
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/rikpan/archive/2009/02/07/3868005.aspx

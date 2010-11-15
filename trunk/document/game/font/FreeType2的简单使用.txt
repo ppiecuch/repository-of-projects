@@ -1,0 +1,98 @@
+FreeType2的简单使用:
+　　FreeType2是一个简单的跨平台的字体绘制引擎.目前支持TrueType Type1 Type2等字体格式.不过目前好象还不支持OpenType.
+　　使用FreeType的应用很多.著名的FTGL就是使用FreeType的.能在OpenGL高效率的绘制矢量字体.
+　　FTGL我没用过.因为不想在没了解该怎么用FreeType的情况下就去用FTGL.
+　　经过一个晚上的阅读代码(我的代码阅读能力是很差的).终于知道了如何使用FreeType2了。不过是简单的使用，还不知道如何设置Bold Itainly等属性.主要是简单的演示.以后准备做成一个完善的字体引擎.
+　　下面简单的介绍一下.
+　　首先当然是包含头文件了。头文件要这样包含:
+　　#include [ft2build.h]
+　　#include FT_FREETYPE_H 
+　　不知道为什么.反正就是要这么包含.
+　　以下为FT2的初始化代码.和绘制以及释放的代码>
+　　注意这里绘制代码接受的字符是Unicode.表示你这样旧可以绘制了
+　　FT2_Obj font;
+　　font.Init("SimSun.ttf",32);
+　　wchat_t pText[]=L"潘李亮是一头野猪";
+　　for(int n = 0 ; n< wcslen(pText);n++)
+　　{
+　　 font.DrawAUnicode(pText[n]; 
+　　}
+　　font.Free();
+　　//以下为FT2_Obj的代码.
+　　//主要参考了Nehe的Lesson 43
+　　class FT2_Obj
+　　{ 
+　　 FT_Library library;
+　　 int h ;
+　　 FT_Face face;
+　　public:
+　　 void Init(const char * fname, unsigned int h);
+　　 void Free();
+　　 void DrawAUnicode(wchar_t ch) 
+　　};
+　　void FT2_Obj::Init(const char * fname, unsigned int h) 
+　　{
+　　 this->h=h;
+　　 //初始化FreeType库..
+　　 if (FT_Init_FreeType( &library )) 
+　　 throw std::runtime_error("FT_Init_FreeType failed");
+　　 //加载一个字体,取默认的Face,一般为Regualer
+　　 if (FT_New_Face( library, fname, 0, &face )) 
+　　 throw std::runtime_error("FT_New_Face failed (there is probably a problem with your font file)");
+　　 //大小要乘64.这是规定。照做就可以了。
+　　 FT_Set_Char_Size( face,h<< 6, h << 6, 96, 96);
+　　 FT_Matrix matrix; /* transformation matrix */
+　　 FT_UInt glyph_index;
+　　 FT_Vector pen;
+　　 //给它设置个旋转矩阵
+　　 float angle = -20/180.* 3.14;
+　　 matrix.xx = (FT_Fixed)( cos( angle ) * 0x10000L );
+　　 matrix.xy = (FT_Fixed)(-sin( angle ) * 0x10000L );
+　　 matrix.yx = (FT_Fixed)( sin( angle ) * 0x10000L );
+　　 matrix.yy = (FT_Fixed)( cos( angle ) * 0x10000L );
+　　 FT_Set_Transform( face, &matrix, &pen );
+　　}.
+　　 /*
+　　 绘制操作.
+　　 */
+　　void FT2_Obj::DrawAUnicode(wchar_t ch)
+　　{
+　　 if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT ))
+　　 throw std::runtime_error("FT_Load_Glyph failed");
+　　 //得到字模
+　　 FT_Glyph glyph;
+　　 if(FT_Get_Glyph( face->glyph, &glyph ))
+　　 throw std::runtime_error("FT_Get_Glyph failed");
+　　 //转化成位图
+　　 FT_Render_Glyph( face->glyph, FT_RENDER_MODE_NORMAL ); 
+　　 FT_Glyph_To_Bitmap( &glyph, ft_render_mode_normal, 0, 1 );
+　　 FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
+　　 //取道位图数据
+　　 FT_Bitmap& bitmap=bitmap_glyph->bitmap;
+　　 //把位图数据拷贝自己定义的数据区里.这样旧可以画到需要的东西上面了。
+　　 int width = bitmap.width;
+　　 int height = bitmap.rows;
+　　 usigned char* expanded_data = new usigned char[ 3 * width * height];
+　　 for(int j=0; j 
+　　< height ; j++)
+　　 {
+　　 for(int i=0; i < width; i++)
+　　 {
+　　 expanded_data[3*(i+(height-j-1)*width)]= 
+　　 expanded_data[3*(i+(height-j-1)*width)+1] = 
+　　 expanded_data[3*(i+(height-j-1)*width)+2] =
+　　 (i>=bitmap.width || j>=bitmap.rows) ?
+　　 0 : bitmap.buffer[i + bitmap.width*j];
+　　 }
+　　 }
+　　}
+　　}
+　　void FT2_Obj::Free()
+　　{
+　　 FT_Done_Face(face);
+　　 FT_Done_FreeType(library);
+　　}(王朝网络 wangchao.net.cn)
+http://www.wangchao.net.cn/bbsdetail_58348.html
+
+
+复杂的可参考:http://springrts.com/doxygen/de/d81/glFont_8cpp_source.html
