@@ -6,7 +6,6 @@ UnicodePainter::UnicodePainter(FT_Byte* &dataBase,const unsigned long dataSize,c
 
 	this->size=size;
 	this->dataBase=dataBase;
-//	this->dataSize=dataSize;
 	int error;
 	// 创建FreeType库
 	if (error=FT_Init_FreeType( &library ))
@@ -31,9 +30,9 @@ UnicodePainter::UnicodePainter(FT_Byte* &dataBase,const unsigned long dataSize,c
 		FT_Done_FreeType(library);
 		return;
 	}
-	//在FreeType中使用1/64作为一个像素的高度所以我们需要缩放charWidth,charHeight来满足这个要求，
-	//横向分辨率和垂直分辨率都使用96
-	if(error=FT_Set_Char_Size( face, size << 6, size << 6, 96,96))
+//	//在FreeType中使用1/64作为一个像素的高度所以我们需要缩放charWidth,charHeight来满足这个要求，
+//	//横向分辨率和垂直分辨率都使用96
+	if(error=FT_Set_Char_Size( face, size << 6, size << 6, size*6,size*6))
 	{
 		LOGE("UnicodePainter","FT_Set_Char_Size ERROR:%d",error);
 		// 释放face类
@@ -42,11 +41,22 @@ UnicodePainter::UnicodePainter(FT_Byte* &dataBase,const unsigned long dataSize,c
 		FT_Done_FreeType(library);
 		return;
 	}
+//	if(error = FT_Set_Pixel_Sizes(face,size,size))
+//	{
+//		LOGE("UnicodePainter","FT_Set_Pixel_Sizes ERROR:%d",error);
+//		// 释放face类
+//		FT_Done_Face(face);
+//		// 释放FreeType库
+//		FT_Done_FreeType(library);
+//		return;
+//	}
 //	int index;
 //	FT_Glyph glyph;
-	//设置行间距为ascender，即基线到字符轮廓最高点的距离, 由于是26.6的定点数，因此获取整数部分需要除以64
-	this->lineSpacing = face->size->metrics.ascender>>6;
-	LOGI("UnicodePainter","lineSpacing:%d",this->lineSpacing);
+	//基线到字符轮廓最高点的距离, 由于是26.6的定点数，因此获取整数部分需要除以64
+	int ascender = face->size->metrics.ascender>>6;
+	LOGI("AsciiFont","ascender:%d",ascender);
+	//设置行间距
+	this->lineSpacing=ascender+2;
 	//设置空格宽度为最大宽度/2
 	this->spaceWidth=face->size->metrics.max_advance>>7;
 	LOGI("UnicodePainter","spaceWidth:%d",this->spaceWidth);
@@ -54,6 +64,8 @@ UnicodePainter::UnicodePainter(FT_Byte* &dataBase,const unsigned long dataSize,c
 
 UnicodePainter::~UnicodePainter()
 {
+	delete[] dataBase;
+
 	//释放FreeType库
 	if(library!=NULL)
 	{
@@ -66,22 +78,32 @@ UnicodePainter::~UnicodePainter()
 		LOGI("UnicodePainter","FT_Done_Face",NULL);
 		FT_Done_Face(face);
 	}
-	delete[] dataBase;
 }
 
 void UnicodePainter::draw(unsigned short* (&str),int len,float x,float y)
 {
+	//记录x，用于换行用
+	float orighnalX=x;
 	unsigned short unicode;
 	for(int i=0;i<len;i++)
 	{
 		unicode=str[i];
-		LOGI("UnicodePainter","unicode:%lx",unicode);
+		//LOGI("UnicodePainter","unicode:%lx",unicode);
+
+		if(unicode==CODE_SPACE){
+			x+=this->charSpacing+this->spaceWidth+this->charSpacing;
+			continue;
+		}else if(unicode==CODE_NEW_LINE){
+			y-=this->lineSpacing;
+			x=orighnalX;
+			continue;
+		}
 		//迭代器
 		HASH::iterator iterator=fonts.find(unicode);
 		//如果不存在此字符，创建之
 		if(iterator==fonts.end())
 		{
-			LOGI("UnicodePainter","unicode[%lx] not found,creating",unicode);
+			LOGI("UnicodePainter","unicode[%lx] not found,will create one instance",unicode);
 			//获取编码unicode在face的字符映射表中的glyph索引
 			int index=FT_Get_Char_Index(face,unicode);
 			int error;
@@ -111,6 +133,10 @@ void UnicodePainter::draw(unsigned short* (&str),int len,float x,float y)
 			//FT_RENDER_MODE_NORMAL：1像素使用8位灰度级的抗锯齿位图
 			//FT_RENDER_MODE_MONO：1像素使用1位灰度级的位图
 			if(error=FT_Render_Glyph( face->glyph, FT_RENDER_MODE_NORMAL))
+			//FT_RENDER_MODE_LIGHT
+			//Changes the hinting algorithm to make the glyph image closer
+			//	to it's real shape, but probably more fuzzy.
+			//if(error=FT_Render_Glyph( face->glyph,FT_RENDER_MODE_LIGHT))
 			{
 				LOGW("UnicodePainter","FT_Render_Glyph ERROR:%d",error);
 				continue;
@@ -154,17 +180,20 @@ void UnicodePainter::draw(unsigned short* (&str),int len,float x,float y)
 			font->texCoords[3].x=dx;
 			font->texCoords[3].y=1.0f;
 
-			//fonts[unicode]=font;
 			fonts.insert(HASH::value_type(unicode,*font));
 
-			font->draw(x,y);
+			font->draw((int)x,(int)y);
+			x+=font->base.x;
 
 			delete glyph;
 		}
 		else
 		{
-			(*iterator).second.draw(x,y);
+			(*iterator).second.draw((int)x,(int)y);
+			x+=(*iterator).second.base.x;
 		}
+
+		x+=this->charSpacing;
 	}
 }
 

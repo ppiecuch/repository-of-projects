@@ -18,7 +18,17 @@ using namespace std;
 using namespace __gnu_cxx;
 
 #define HASH hash_map<unsigned short,Font>
+#define CODE_SPACE 0x0020
+#define CODE_NEW_LINE 0x000A
 
+/**
+ * Unicode码绘制器
+ * 支持：
+ * 1、设置字体颜色（暂不支持同编码多颜色，并且字符创建后颜色再改变无效）
+ * 2、设置行高，字距
+ * 待优化：
+ * 1、字体模糊问题
+ */
 class UnicodePainter{
 private:
 	FT_Byte* dataBase;		 //字体文件数据
