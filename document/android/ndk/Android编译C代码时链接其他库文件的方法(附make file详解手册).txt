@@ -1,0 +1,12 @@
+Android的内核基本就是Linux。在Android-x86的代码基础上，可以编译自己的Android系统。
+
+常常需要在自己的C代码里链接第三方提供的库文件，例如以.a文件提供。此时需要修改Android.mk文件来加进需要连接的库。LOCAL_LDLIBS不是做这个的，一个可行的方法是使用LOCAL_LDFLAGS通知编译器。例如
+
+LOCAL_LDFLAGS -L$(LOCAL_PATH) -lxxxx
+其中xxxx是被链接模块的名字，不含后缀和前缀lib
+
+注意-L后面使用相对路径似乎不行。
+
+后面附上来自http://android.git.kernel.org/?p=platform/build.git;a=blob_plain;f=core/build-system.html
+
+的Android系统makefile的文档，因为很难准确google到，转载记录一下。Android的资料水都太大了。
