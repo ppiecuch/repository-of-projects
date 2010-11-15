@@ -1,0 +1,49 @@
+问题：
+
+在使用freetype过程中发现，从window下拷贝来的simsun.ttc, simkai.ttf两个字体，
+
+在调用
+
+FT_Set_Pixel_Sizes(face, 12, 0)；
+
+将字体大小设置为12×12pixels，或者16×16pixels等时，中文无法正常画出，英文可以正常画出。
+
+而设置为10×10pixepixels, 17×17pixels时，却能正常画出中文。
+
+其实解决方法是比较简单的，不过还是贴出来供新手有个参考。
+
+分析：
+
+后来经过跟踪发现在设置为12×12pixels时，
+
+FT_Load_Glyph(face, FT_Get_Char_Index(face, szText), FT_LOAD_DEFAULT);
+
+函数在load时，从字体文件中load的时bitmapped image，而不是outline，而可能是字体中的bitmapped image有问题，从而造成无法正常画出中文。
+
+联想到freetype帮助文档中有如下的描述
+
+
+Loading a glyph image into the slot is performed by calling FT_Load_Glyph as in
+
+error = FT_Load_Glyph( face, /* handle to face object */ glyph_index, /* glyph index */ load_flags ); /* load flags, see below */ 
+
+The load_flags value is a set of bit flags used to indicate some special operations. The default value FT_LOAD_DEFAULT is 0.
+
+This function will try to load the corresponding glyph image from the face:
+
+If a bitmap is found for the corresponding glyph and pixel size, it will be loaded into the slot. Embedded bitmaps are always favored over native image formats, because we assume that they are higher-quality versions of the same glyph. This can be changed by using the FT_LOAD_NO_BITMAP flag.
+
+Otherwise, a native image for the glyph will be loaded. It will also be scaled to the current pixel size, as well as hinted for certain formats like TrueType and Type 1.
+
+
+解决办法：
+
+error = FT_Load_Glyph(face, FT_Get_Char_Index(face, szText), FT_LOAD_DEFAULT|FT_LOAD_NO_BITMAP);
+
+这样强制在load时，loadoutline，然后再根据outline得到bitmapped image。
+
+通过这样修改后，上面提到的问题得到解决。
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/junglefly/archive/2010/03/02/5340192.aspx
