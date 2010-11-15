@@ -26,9 +26,9 @@ float cameraPosition[]={0,10,40};
 zip* APKArchive;
 //UnicodeFont* font;
 UnicodePainter* painter;
-const static char* fontPath="assets/font/SIMKAI.TTF";
+const static char* fontPath="assets/font/jdst.TTF";
 //const static char* text="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const static char* text="经";
+const static char* text="abc中华人民共和国\n我爱你！！中 国";
 //const static char* text="a";
 unsigned short* unicode;
 int len;
@@ -66,6 +66,7 @@ void appInit(JNIEnv*  env, jobject thiz, jstring apkPath)
 	LOGI("AndroidGL","len:%d:unicode:%lx",len,unicode[0]);
 
 	painter=new UnicodePainter(fileBase,fileSize,12);
+	painter->setColor(0xFFFFFFFF);
 
 	/*创建Unicode纹理*/
 //	font=new UnicodeFont(fileBase,fileSize,12,12);
@@ -110,8 +111,8 @@ void appRender(long tick, int width, int height)
 	glEnable(GL_TEXTURE_2D);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-//	glEnable(GL_BLEND);
-//	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 //	font->draw(text,10-sWindowWidth/2,sWindowHeight/2-40);
 	painter->draw(unicode,len,10-sWindowWidth/2,sWindowHeight/2-40);
 
