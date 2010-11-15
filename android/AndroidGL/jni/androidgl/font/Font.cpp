@@ -11,11 +11,6 @@ Font::Font(GLubyte* (&buffer),const int size,const long color,const int width,co
 	this->base.y=height;
 	this->offset.x=left;
 	this->offset.y=top;
-//	for(int i=0;i<4;i++)
-//	{
-//		texCoords[i]=new Point2f(0,0);
-//		vertexs[i]=new Point2f(0,0);
-//	}
 	generateTexture();
 }
 
@@ -61,20 +56,37 @@ void Font::generateTexture()
 		return;
 	}
 	//获取颜色分量
-//	int red=0xFF&color[0];
-//	int green=0xFF&color[1];
-//	int blue=0xFF&color[2];
-//	int alpha=0xFF&color[3];
-//	unsigned char red=(unsigned char)((t&RED_IN_LONG)>>24);
-//	unsigned char green=(unsigned char)((t&GREEN_IN_LONG)>>16);
-//	unsigned char blue=(unsigned char)((t&BLUE_IN_LONG)>>8);
-//	unsigned char alpha=(unsigned char)(t&ALPHA_IN_LONG);
+	unsigned char red=(unsigned char)((this->color&RED_IN_LONG)>>24);
+	unsigned char green=(unsigned char)((this->color&GREEN_IN_LONG)>>16);
+	unsigned char blue=(unsigned char)((this->color&BLUE_IN_LONG)>>8);
+	unsigned char alpha=(unsigned char)(this->color&ALPHA_IN_LONG);
+
+//	int width=this->base.x;
+//	int height=this->base.y;
+//	int newWidth=ceilPower(width);
+//	int newHeight=ceilPower(height);
+//	GLubyte* data=new GLubyte[newWidth*newHeight];
+//	int bufferIndex=0;
+//	int value;
+//	int row;
+//	int column;
+//	for(int i=0; i<newHeight;i++) {
+//		row=(newHeight-i-1)*newWidth;
+//		for(int j=0; j<newWidth; j++){
+//			column=row+j;
+//			//因为width跟height是经过对bitmap.width,bitmap.rows进行ceilPower扩大后得到的，
+//			//所以对于扩出的部分应该用0表示
+//			value=(i>=height||j>=width)?0:buffer[bufferIndex++];
+//			data[column]=value;
+////			LOGI("UnicodePainter","%d-%d:%d",i,j,value);
+//		}
+//	}
 
 	int width=this->base.x;
 	int height=this->base.y;
 	int newWidth=ceilPower(width);
 	int newHeight=ceilPower(height);
-	GLubyte* data=new GLubyte[newWidth*newHeight];
+	GLubyte* data=new GLubyte[newWidth*newHeight*4];
 	int bufferIndex=0;
 	int value;
 	int row;
@@ -82,12 +94,14 @@ void Font::generateTexture()
 	for(int i=0; i<newHeight;i++) {
 		row=(newHeight-i-1)*newWidth;
 		for(int j=0; j<newWidth; j++){
-			column=row+j;
+			column=row+j<<2;
 			//因为width跟height是经过对bitmap.width,bitmap.rows进行ceilPower扩大后得到的，
 			//所以对于扩出的部分应该用0表示
 			value=(i>=height||j>=width)?0:buffer[bufferIndex++];
-			data[column]=value;
-//			LOGI("UnicodePainter","%d-%d:%d",i,j,value);
+			data[column]=value*red>>8;
+			data[column+1]=value*green>>8;
+			data[column+2]=value*blue>>8;
+			data[column+3]=value*alpha>>8;
 		}
 	}
 
@@ -100,7 +114,8 @@ void Font::generateTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D( GL_TEXTURE_2D,0,GL_LUMINANCE,newWidth,newHeight,0,GL_LUMINANCE,GL_UNSIGNED_BYTE,data);
+//	glTexImage2D( GL_TEXTURE_2D,0,GL_LUMINANCE,newWidth,newHeight,0,GL_LUMINANCE,GL_UNSIGNED_BYTE,data);
+	glTexImage2D( GL_TEXTURE_2D,0,GL_RGBA,newWidth,newHeight,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
 
 	delete[] data;
 }
