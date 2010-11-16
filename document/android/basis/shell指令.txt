@@ -86,3 +86,18 @@ ls                               // 查看目录
 date                          // 打印或设置当前系统时间   
 cat /proc/meminfo     // 查看内存信息   
 cat /proc/cpuinfo       // 查看CPU信息 
+
+
+adb push
+adb push Superuser.apk /sdcard/Superuser.apk5
+
+adb install AnDroidDraw.apk 
+1.不支持中文
+2.应该remote的路径中不应含目标文件名
+
+adb push <path>/背景01.pcm /sdcard/Zhaocha
+就可以了
+
+<path>为 D:/res 等
+
+成功后，在/sdcard/Zhaocha下只找得到01.pcm，中文已无效
