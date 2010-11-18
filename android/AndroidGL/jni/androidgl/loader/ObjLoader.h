@@ -1,36 +1,24 @@
 #ifndef _OBJ_LOADER_H_
 #define _OBJ_LOADER_H_
+#include "../math/point3f.h"
+#include "../math/point2f.h"
 
-struct ObjVertex
-{
-   float x, y, z;
-};
-
-typedef ObjVertex ObjNormal;
-
-struct ObjTexCoord
-{
-   float u, v;
-};
-
-struct ObjTriangle
-{
-   int Vertex[3];
-   int Normal[3];
-   int TexCoord[3];
-};
-
+/**
+ * OBJÄ£ÐÍ¼ÓÔØÆ÷
+ */
 struct ObjModel
 {
-   int nVertex, nNormal, nTexCoord, nTriangle;
+   int vertexCount, normalCount, texCoordCount, triangleCount;
 
-   ObjVertex* VertexArray;
-   ObjNormal* NormalArray;
-   ObjTexCoord* TexCoordArray;
-   ObjTriangle* TriangleArray;
+   Point3f* vertexs;
+   Point3f* normals;
+   Point2f* texCoords;
+   unsigned short* vertexIndice;
+   unsigned short* normalIndice;
+   unsigned short* texCoordIndice;
 };
 
-ObjModel* ObjLoadModel(char*, size_t);
+ObjModel* loadModel(char*, size_t);
 size_t    ObjLoadFile(char*, char**);
 
 #endif

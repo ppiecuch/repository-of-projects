@@ -3,74 +3,73 @@
 #include <memory.h>
 #include "ObjLoader.h"
 
-ObjModel* ObjLoadModel(char* memory, size_t size)
+ObjModel* loadModel(char* memory, size_t size)
 {
    char *p = NULL, *e = NULL;
-   ObjModel* ret = (ObjModel*) calloc(1, sizeof(ObjModel));
-   memset(ret, 0, sizeof(ObjModel));
+   ObjModel* model=new ObjModel();
 
 	p = memory;
 	e = memory + size;
 
 	while (p != e)
 	{
-           if (memcmp(p, "vn", 2) == 0) ret->nNormal++;
-      else if (memcmp(p, "vt", 2) == 0) ret->nTexCoord++;
-      else if (memcmp(p, "v",  1) == 0) ret->nVertex++;
-      else if (memcmp(p, "f",  1) == 0) ret->nTriangle++;
+           if (memcmp(p, "vn", 2) == 0) model->normalCount++;
+      else if (memcmp(p, "vt", 2) == 0) model->texCoordCount++;
+      else if (memcmp(p, "v",  1) == 0) model->vertexCount++;
+      else if (memcmp(p, "f",  1) == 0) model->triangleCount++;
 
       while (*p++ != (char) 0x0A);
    }
 
-   ret->VertexArray   = (ObjVertex*)   malloc(sizeof(ObjVertex) * ret->nVertex);
-   ret->NormalArray   = (ObjNormal*)   malloc(sizeof(ObjNormal) * ret->nNormal);
-   ret->TexCoordArray = (ObjTexCoord*) malloc(sizeof(ObjTexCoord) * ret->nTexCoord);
-   ret->TriangleArray = (ObjTriangle*) malloc(sizeof(ObjTriangle) * ret->nTriangle);
-
+	model->vertexs=new Point3f[model->vertexCount];
+	model->normals=new Point3f[model->normalCount];
+	model->texCoords=new Point2f[model->texCoordCount];
+	model->vertexIndice=new unsigned short[model->triangleCount*3];
+	model->normalIndice=new unsigned short[model->triangleCount*3];
+	model->texCoordIndice=new unsigned short[model->triangleCount*3];
 	p = memory;
 
-   int nV = 0, nN = 0, nT = 0, nF = 0;
+   int v = 0, n=0, t=0,  ni = 0, ti = 0, vi = 0;
 
 	while (p != e)
 	{
       if (memcmp(p, "vn", 2) == 0)
       {
-         sscanf(p, "vn %f %f %f", &ret->NormalArray[nN].x,
-                                  &ret->NormalArray[nN].y,
-                                  &ret->NormalArray[nN].z);
-         nN++;
+         sscanf(p, "vn %f %f %f", &model->normals[n].x,
+                                  &model->normals[n].y,
+                                  &model->normals[n].z);
+         n++;
       }
       else if (memcmp(p, "vt", 2) == 0)
       {
-         sscanf(p, "vt %f %f", &ret->TexCoordArray[nT].u,
-                               &ret->TexCoordArray[nT].v);
-         nT++;
+         sscanf(p, "vt %f %f", &model->texCoords[t].x,
+                               &model->texCoords[t].y);
+         t++;
       }
       else if (memcmp(p, "v", 1) == 0) /* or *p == 'v' */
       {
-         sscanf(p, "v %f %f %f", &ret->VertexArray[nV].x,
-                                 &ret->VertexArray[nV].y,
-                                 &ret->VertexArray[nV].z);
-         nV++;
+         sscanf(p, "v %f %f %f", &model->vertexs[v].x,
+                                 &model->vertexs[v].y,
+                                 &model->vertexs[v].z);
+         v++;
       }
       else if (memcmp(p, "f", 1) == 0) /* or *p == 'f' */
       {
-         sscanf(p, "f %d/%d/%d %d/%d/%d %d/%d/%d", &ret->TriangleArray[nF].Vertex[0],
-                                                   &ret->TriangleArray[nF].TexCoord[0],
-                                                   &ret->TriangleArray[nF].Normal[0],
-                                                   &ret->TriangleArray[nF].Vertex[1],
-                                                   &ret->TriangleArray[nF].TexCoord[1],
-                                                   &ret->TriangleArray[nF].Normal[1],
-                                                   &ret->TriangleArray[nF].Vertex[2],
-                                                   &ret->TriangleArray[nF].TexCoord[2],
-                                                   &ret->TriangleArray[nF].Normal[2]);
-         nF++;
+         sscanf(p, "f %d/%d/%d %d/%d/%d %d/%d/%d", &model->vertexIndice[vi++],
+                                                   &model->texCoordIndice[ti++],
+                                                   &model->normalIndice[ni++],
+                                                   &model->vertexIndice[vi++],
+                                                   &model->texCoordIndice[ti++],
+                                                   &model->normalIndice[ni++],
+                                                   &model->vertexIndice[vi++],
+                                                   &model->texCoordIndice[ti++],
+                                                   &model->normalIndice[ni++]);
       }
 
       while (*p++ != (char) 0x0A);
    }
 
-   return ret;
+   return model;
 }
 
 size_t ObjLoadFile(char* szFileName, char** memory)
