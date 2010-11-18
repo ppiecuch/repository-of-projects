@@ -33,40 +33,45 @@ ObjModel* loadModel(char* memory, size_t size)
 
 	while (p != e)
 	{
-      if (memcmp(p, "vn", 2) == 0)
-      {
-         sscanf(p, "vn %f %f %f", &model->normals[n].x,
-                                  &model->normals[n].y,
-                                  &model->normals[n].z);
-         n++;
-      }
-      else if (memcmp(p, "vt", 2) == 0)
-      {
-         sscanf(p, "vt %f %f", &model->texCoords[t].x,
-                               &model->texCoords[t].y);
-         t++;
-      }
-      else if (memcmp(p, "v", 1) == 0) /* or *p == 'v' */
-      {
-         sscanf(p, "v %f %f %f", &model->vertexs[v].x,
-                                 &model->vertexs[v].y,
-                                 &model->vertexs[v].z);
-         v++;
-      }
-      else if (memcmp(p, "f", 1) == 0) /* or *p == 'f' */
-      {
-         sscanf(p, "f %d/%d/%d %d/%d/%d %d/%d/%d", &model->vertexIndice[vi++],
-                                                   &model->texCoordIndice[ti++],
-                                                   &model->normalIndice[ni++],
-                                                   &model->vertexIndice[vi++],
-                                                   &model->texCoordIndice[ti++],
-                                                   &model->normalIndice[ni++],
-                                                   &model->vertexIndice[vi++],
-                                                   &model->texCoordIndice[ti++],
-                                                   &model->normalIndice[ni++]);
-      }
+		if(memcmp(p,"mtllib",6)==0)
+		{
+			model->mtlFilePath=new char[256];
+			sscanf(p, "mtllib %s", model->mtlFilePath);
+		}
+		else if (memcmp(p, "vn", 2) == 0)
+		{
+		 sscanf(p, "vn %f %f %f", &model->normals[n].x,
+								  &model->normals[n].y,
+								  &model->normals[n].z);
+		 n++;
+		}
+		else if (memcmp(p, "vt", 2) == 0)
+		{
+		 sscanf(p, "vt %f %f", &model->texCoords[t].x,
+							   &model->texCoords[t].y);
+		 t++;
+		}
+		else if (memcmp(p, "v", 1) == 0) /* or *p == 'v' */
+		{
+		 sscanf(p, "v %f %f %f", &model->vertexs[v].x,
+								 &model->vertexs[v].y,
+								 &model->vertexs[v].z);
+		 v++;
+		}
+		else if (memcmp(p, "f", 1) == 0) /* or *p == 'f' */
+		{
+		 sscanf(p, "f %d/%d/%d %d/%d/%d %d/%d/%d", &model->vertexIndice[vi++],
+												   &model->texCoordIndice[ti++],
+												   &model->normalIndice[ni++],
+												   &model->vertexIndice[vi++],
+												   &model->texCoordIndice[ti++],
+												   &model->normalIndice[ni++],
+												   &model->vertexIndice[vi++],
+												   &model->texCoordIndice[ti++],
+												   &model->normalIndice[ni++]);
+		}
 
-      while (*p++ != (char) 0x0A);
+		while (*p++ != (char) 0x0A);
    }
 
    return model;
