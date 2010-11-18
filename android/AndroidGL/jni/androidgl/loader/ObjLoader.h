@@ -10,6 +10,7 @@ struct ObjModel
 {
    int vertexCount, normalCount, texCoordCount, triangleCount;
 
+   char* mtlFilePath;
    Point3f* vertexs;
    Point3f* normals;
    Point2f* texCoords;
