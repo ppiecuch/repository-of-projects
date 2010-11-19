@@ -60,15 +60,18 @@ ObjModel* loadModel(char* memory, size_t size)
 		}
 		else if (memcmp(p, "f", 1) == 0) /* or *p == 'f' */
 		{
-		 sscanf(p, "f %d/%d/%d %d/%d/%d %d/%d/%d", &model->vertexIndice[vi++],
-												   &model->texCoordIndice[ti++],
-												   &model->normalIndice[ni++],
-												   &model->vertexIndice[vi++],
-												   &model->texCoordIndice[ti++],
-												   &model->normalIndice[ni++],
-												   &model->vertexIndice[vi++],
-												   &model->texCoordIndice[ti++],
-												   &model->normalIndice[ni++]);
+		 sscanf(p, "f %d/%d/%d %d/%d/%d %d/%d/%d", &model->vertexIndice[vi],
+												   &model->texCoordIndice[ti],
+												   &model->normalIndice[ni],
+												   &model->vertexIndice[vi+1],
+												   &model->texCoordIndice[ti+1],
+												   &model->normalIndice[ni+1],
+												   &model->vertexIndice[vi+2],
+												   &model->texCoordIndice[ti+2],
+												   &model->normalIndice[ni+2]);
+		 vi+=3;
+		 ti+=3;
+		 ni+=3;
 		}
 
 		while (*p++ != (char) 0x0A);
