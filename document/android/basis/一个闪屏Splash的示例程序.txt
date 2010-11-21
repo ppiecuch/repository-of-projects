@@ -1,0 +1,54 @@
+1）变量解释： 
+1 m_dwSplashTime：long 类型，为闪屏界面停留的时间，这儿设置为3000也就是3秒
+
+2 m_Paused: bool 类型，设置该变量可以使得程序暂停在闪屏界面
+
+3 m_bSplashActive：bool类型，设置该变量可以跳过闪屏，从而快速竟如主程序界面
+
+
+2）程序结构解释：
+
+1 SplashyDemo继承自Activity,且是程序启动的第一个界面（查看），所以要实现闪屏，我们需要开启一个线程，以便在3秒钟之后进入主界面。这些主要有一个while循环来实现
+
+2 在3秒钟结束或者用户选择跳过闪屏后，程序会调用startActivity函数来跳到主界面，传入该函数的参数是一个"com.google.app.splashy.CLEARSPLASH"的intent对象。至于什么是Intent对象，这儿简单的介绍下。Intent对象主要是多个Activity对象之间传递信息、交流的一个对象。并且，当startActivity函数被
+
+调用的时候，Android会搜索所有的描述性文件(manifests文件)直到找到intent Action是"com.google.app.splashy.CLEARSPLASH"的节点。如工程中AndroidManifest.xml文件中部分内容如下：
+
+      <activity android:name=".MainMenu"   android:label="@string/main_name">
+
+   <intent-filter>
+
+   <action android:name="com.google.app.splashy.CLEARSPLASH"></action>
+
+   <category android:name="android.intent.category.DEFAULT"></category>
+
+   </intent-filter>
+
+   </activity>
+
+     
+
+   5、 重写下SplashyDmeo中OnPaused和OnResume函数
+
+   当程序Pause或者Resume的时候，再稍微做下处理：
+
+1） 当程序Pause时候，设置m_paused=true，从而使得程序暂停
+
+2） 当程序Resume的时候，要设置m_paused=false,从而使得程序恢复正常运行
+
+
+   6、 键盘事件处理
+
+   处理键盘事件只需重写下继承自Activity类的onKeyDown函数即可，从示例程序中可以看出，当我们按下Menu键的话，直接跳过闪屏进入主界面;若按 下Back键的话，则直接关闭主程序。 
+
+     
+
+   7、运行效果    
+
+
+
+闪屏界面
+
+3秒过后进入主界面
+
+http://hi.baidu.com/marioooooooooo/blog/item/af0d9c095518c53ce9248835.html
