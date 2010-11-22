@@ -1,0 +1,59 @@
+在本文中，我们将通过编写一个触摸屏幕拾取3D空间图元的小程序，来向大家展示如何在OPhone中处理2D屏幕空间与3D世界的交互，并附带介绍包围体、几何相交检测等其他相关知识。程序最终的效果如图1所示，选中的三角形呈现红色半透明，深红色点表示当前屏幕触摸位置： 
+ 
+
+图1 三角形拾取程序效果图
+什么是拾取
+    在PC 3D游戏中，我们通常需要用鼠标来点击选中屏幕上某个模型。鼠标所在的屏幕是2D平面空间，而游戏世界则是标准的三维立体空间。这个根据2D屏幕坐标来选取3D空间中图元的操作，就是拾取。在手机平台中，触摸屏幕来代替了鼠标点击，三角形则是最基本的渲染图元。因此，如何通过触摸屏幕，来精确选中模型的某个三角形，正是本文所讨论的课题。
+ 
+拾取射线
+    在拾取操作中，首要的一步，就是根据屏幕触摸坐标，来得到3D空间中的拾取射线。有关计算拾取射线的数学推导，这里不做过多叙述，读者可以自行查阅相关资料，下面将直接介绍如何获得拾取射线。
+ 
+
+ 
+图2 拾取原理图
+ 
+    如图2所示，z = 0处为视锥体近剪裁面，z = 1处为远剪裁面。我们的拾取射线，就是由触摸位置在近剪裁面上的位置P0，以及在远剪裁面上的位置P1所组成的，其中，P0为射线原点，射线由P0发射指向P1。我们将从P0出发，沿着这条拾取射线，寻找到离P0最近的一个相交三角形，并将其渲染在屏幕上。因此，我们的问题就变成如何求P0以及P1的三维坐标。
+ 
+    在求P0以及P1之前，我们首先要获得屏幕触摸事件的坐标。前面两篇文章中已经介绍过，在重载了GLSurfaceView的onTouchEvent()方法后，我们可以监听触屏事件，并得到事件发生的屏幕坐标（ScreenX，ScreenY）。这里需要注意的是，由于屏幕空间的原点位于左上角，而OpenGL中的视口坐标系中，原点处于左下角，因此，我们需要额外的一个操作，将屏幕坐标转化为OpenGL视口坐标：
+OpenGLX = ScreenX;
+OpenGLY = ViewportHeight – ScreenY;
+ 
+    其中，ViewportHeight是指视口高度。
+ 
+    在获得了OpenGL中的视口坐标之后，OPhone平台中提供了一个辅助函数GLU.gluUnproject()，用于将2D视口坐标，转换为3D空间坐标。该函数详细参数如下：
+ 
+public static int gluUnProject (float winX, float winY, float winZ, float[] model, int modelOffset, float[] project, int projectOffset, int[] view, int viewOffset, float[] obj, int objOffset)
+ 
+    可以看到，只需要传入视口坐标（winX，winY，winZ）、以及当前的模型视图矩阵model、投影矩阵project，便可得到3D空间中的坐标，并将计算结果存储到obj数组中返回。
+ 
+    其中，winX就是ScreenX，winY就是OpenGLY，而winZ，我们在求P0时，winZ传入0，求P1时，winZ设置为1，计算得到的P0和P1的三维坐标，将存储在obj数组中。
+ 
+    在得到P0和P1后，需要将这两个点转换为拾取射线。P0作为射线的原点，根据向量P1-P0来得到射线的方向，相关代码如下：
+/**   
+     * 更新拾取射线   
+     * @param screenX - 屏幕坐标X   
+     * @param screenY - 屏幕坐标Y   
+     */   
+    public static void update(float screenX, float screenY) {       AppConfig.gMatView.fillFloatArray(AppConfig.gpMatrixViewArray);    
+           
+       //由于OpenGL坐标系原点为左下角，而窗口坐标系原点为左上角    
+       //因此，在OpenGl中的Y应该需要用当前视口高度，减去窗口坐标Y    
+       float openglY = AppConfig.gpViewport[3] - screenY;    
+       //z = 0 , 得到P0    
+       gProjector.gluUnProject(screenX, openglY, 0.0f, AppConfig.gpMatrixViewArray, 0,     
+              AppConfig.gpMatrixProjectArray, 0, AppConfig.gpViewport, 0, gpObjPosArray, 0);    
+       //填充射线原点P0    
+       gPickRay.mvOrigin.set(gpObjPosArray[0], gpObjPosArray[1], gpObjPosArray[2]);    
+           
+       //z = 1 ，得到P1    
+       gProjector.gluUnProject(screenX, openglY, 1.0f, AppConfig.gpMatrixViewArray, 0,     
+              AppConfig.gpMatrixProjectArray, 0, AppConfig.gpViewport, 0, gpObjPosArray, 0);    
+       //计算射线的方向，P1 - P0    
+       gPickRay.mvDirection.set(gpObjPosArray[0], gpObjPosArray[1], gpObjPosArray[2]);    
+       gPickRay.mvDirection.sub(gPickRay.mvOrigin);    
+       //向量归一化    
+       gPickRay.mvDirection.normalize();    
+    }  
+    这样，只需要在触屏事件触发时，我们从外部调用这个update(int，int)方法，将最新触屏的屏幕坐标传入，就可以更新拾取射线。
+    
+http://edu.gamfe.com/tutor/d/22207.html
