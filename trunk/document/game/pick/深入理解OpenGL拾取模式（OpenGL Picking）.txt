@@ -1,0 +1,327 @@
+深入理解OpenGL拾取模式（OpenGL Picking）
+
+
+
+
+
+    在用OpenGL进行图形编程的时候，通常要用鼠标进行交互操作，比如用鼠标点选择画面中的物体，我们称之为拾取(Picking)，在网上看了很多OpenGL拾取的文章，但大多是只是介绍在OpenGL中如何拾取，如何利用OpenGL提供的一系列函数来完成拾取，最多再简单介绍下OpenGL的名字栈(Name stack)，拾取矩阵(Picking Matrix)等等，但是拾取真正的原理确没有提到。所以，我在这里为大家详细介绍下OpenGL中拾取是怎样实现的，以及其背后的真正原理。
+
+    OpenGL中的拾取是对OpenGL图形管线的一个应用。所以OpenGL中的拾取并不是像D3D一样采用射线交叉测试来判断是否选中一个目标，而是在图形管线的投影变换(Projection Transformation)阶段利用拾取矩阵来实现的。为了理解这个过程，先来复习一下OpenGL的图形管线。
+
+ 
+
+ 
+
+ 
+
+    总的来说，OpenGL图形管线大体分为上面的五个阶段。在编程的时候使用glMatrixMode(GL_MODELVIEW)，或者 glMatrixMode(GL_PROJECTION)就是告诉OpenGL我们是要在那个阶段进行操作。先来看看投影变换，因为理解投影变换是理解OpenGL拾取的前提条件。为了简单起见，这里以正交投影(Orthogonal Projection)为例。在OpenGL中，使用正交投影可以调用glOrtho (left, right, bottom, top, zNear, zFar)，其中的六个参数分别对应正交投影视体的六个平面到观察坐标系原点的距离。一旦在程序中调用了这个函数，OpenGL会马上创建根据给定的六个参数创建一个视体，并且把视体的大小归一化到-1到1之间，也就是说，OpenGL会自动把你给的参数所对应的x，y，z值转换为-1到1之间的值，并且这个视体的中心就是观察坐标系的原点。要注意的是，当视体归一化后，z轴的方向要反向，也就是说，这里OpenGL的右手坐标系要换成左手坐标系。原因很简单，z轴朝向显示器里的方向更符合我们的常识，越向里就离我们越远，z的值也就越大。
+
+
+
+ 
+
+    当我们调用了glOrtho()这个函数后，OpenGL会建立一个矩阵，也就是投影矩阵。这个矩阵可以分解为三个步骤，首先将我们设置的视体移动到观察坐标是的原点，然后在缩放为边长为2的单位视体。因为转化后的视体坐标都在-1和1之间，所以视体的边长就是2。然后再对z进行反方向。最后的投影矩阵我们用来表示的话，那么有
+
+ 
+
+
+
+ 
+
+    上面的矩阵虽然看起来很复杂，其实很简单。它就是进行移动，缩放，反号三个操作而已。现在我们在OpenGL中检查一下是不是进行了这样的操作。添加下面的代码。
+
+view plaincopy to clipboardprint?
+glMatrixMode(GL_PROJECTION);   
+glLoadIdentity();   
+glOrtho(-10, 10, -10, 10, -10, 10);   
+       
+GLfloat m[16];   
+glGetFloatv(GL_PROJECTION_MATRIX, m);  
+glMatrixMode(GL_PROJECTION);
+glLoadIdentity();
+glOrtho(-10, 10, -10, 10, -10, 10);
+	
+GLfloat m[16];
+glGetFloatv(GL_PROJECTION_MATRIX, m); 
+
+首先进入投影变换阶段，然后我们使用glLoadIdentity()在矩阵栈中存入单位矩阵。设置视体为边长为20的正方体。这里我们把glortho中的6个参数带入上面公式计算，得到的结果为
+
+
+
+代码中我们使用了glGetFloatv来获得当前操作矩阵，然后设定断点来检查一下。
+
+
+
+可以看到，得到的数据和我们计算的一样。说明OpenGL的确是创建了这样的矩阵来进行计算。
+
+ 
+
+    弄清楚了OpenGL中的投影变换，现在就开看看大家关心的拾取操作。OpenGL的拾取就是利用投影变换中归一化视体这个操作来实现的。拾取的时候，我们可以想象想用一个方框来选择我们要选择的物体。比如一个边长为2的正方形，我们用鼠标在窗口上点击的时候，一旦点到一个位置，那么就在这个位置生成一个边长为2的正方形，那么正方形内包围的物体就是我们要选择的物体，如果这个正方形内没有包围任何东西，那么就说明什么都没有选择到。这个过程就和我们归一化投影，然后再剪裁的过程是一样的。OpenGL会自动剪裁掉在归一化视体之外的物体，那么如果我们把选择物体用的方框转换为用投影时的视体，那么在这个方框外的东西，也就是我们没有选择的东西，OpenGL会自动的为我们扔掉。所以OpenGL提供了选择模式glRenderMode(GL_SELECT)，当我们进行拾取前进入这个模式，然后设定好我们的选择框的大小，再为我们要选择的物体设定好名字，也就是我们说的名字栈。接下来的操作和投影变换就一样了，先把这个选择框移归一化为边长为-1到1的正方体，然后移动到原点，最后放大为我们窗口的大小。（这时OpenGL已经把在选择框外的东西剪裁掉了，如果这个时候我们显示投影矩阵中的内容的话，就会只看到我们选择到的东西，并且放大和窗口一样大。）然后OpenGL会把选中的物体信息记录在一个叫做SelectBuffer的缓冲中，这个缓冲就是个一维数组，里面保存了名字栈中名字的个数，选择到的物体的最小最大深度值，也就是z的值，这个值是个0到1之间的值，也就是里我们最近的为0，最远的为1。selectBuffer是个整型的数组，所以这里保存的深度值是乘以0xFFFFFFFF后的值。当然最重要的，其中还保存了我们选择到的物体的名字，这样只要在程序中判断选择到物体的名字，我们就可以判断是不是选择到了要选择的物体了。整个拾取的过程可如下。
+
+ 
+
+
+
+ 
+
+    上图中左边的正方体是我们归一化的视体，拾取的时候就是在这个空间中拾取的。红色的小框是我们的选择框。里面的红色就是我们选择到的物体的一部分。现在要做的就是把这个小框转变为视体，这样OpenGL才能为我们把不要的东西扔掉。所以，首先还是把这个小框移动到观察坐标系的原点，然后再放大为我们归一化视体的大小，这样整个视体中就只有我们选中的东西了，上图中间显示了这个过程。视体外的东西已经被OpenGL剪裁掉，选中的记录会保存到selectbuffer中。因为这些操作是在选择模式下完成的，所以看不到我们选择的过程，但是如果我们把选择的过程显示出来的话，就会看到上图右边的样子。整个窗口就铺满了我们选择的部分。在OpenGL中，提供了这个设置拾取框的函数。
+
+gluPickMatrix (x, y, width, height, viewport[4]);
+
+其中x，y是鼠标点击到窗口上的坐标，width和height就是这个拾取框的长宽，viewport是为了得到我们窗口的大小。一但调用了该函数，OpenGL就会创建一个拾取矩阵，分解这个矩阵的话，可以看到，这个矩阵就是上面的移动拾取框到原点，然后再放大为视体大小这两个步骤。所以即使我们不使用这个函数，也可以自己计算出这个拾取矩阵
+
+
+
+同样，我们还是在OpenGL中检查一下，是不是做了这样的操作。在OpenGL中添加下面的代码。
+
+ view plaincopy to clipboardprint?
+void SelectObject(GLint x, GLint y)   
+{   
+    GLuint selectBuff[32]={0};//创建一个保存选择结果的数组   
+    GLint hits, viewport[4];     
+  
+    glGetIntegerv(GL_VIEWPORT, viewport); //获得viewport   
+    glSelectBuffer(64, selectBuff); //告诉OpenGL初始化selectbuffer   
+    glRenderMode(GL_SELECT);    //进入选择模式   
+       
+    glInitNames();  //初始化名字栈   
+    glPushName(0);  //在名字栈中放入一个初始化名字，这里为‘0’   
+  
+  
+    glMatrixMode(GL_PROJECTION);    //进入投影阶段准备拾取   
+    glPushMatrix();     //保存以前的投影矩阵   
+    glLoadIdentity();   //载入单位矩阵   
+  
+    float m[16];   
+    glGetFloatv(GL_PROJECTION_MATRIX, m);   
+  
+    gluPickMatrix( x,           // 设定我们选择框的大小，建立拾取矩阵，就是上面的公式   
+                  viewport[3]-y,    // viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标   
+                  2,2,              // 选择框的大小为2，2   
+                  viewport          // 视口信息，包括视口的起始位置和大小   
+                  );       
+                                                       
+    glGetFloatv(GL_PROJECTION_MATRIX, m);   
+    glOrtho(-10, 10, -10, 10, -10, 10);     //拾取矩阵乘以投影矩阵，这样就可以让选择框放大为和视体一样大   
+    glGetFloatv(GL_PROJECTION_MATRIX, m);   
+       
+    draw(GL_SELECT);    // 该函数中渲染物体，并且给物体设定名字   
+       
+    glMatrixMode(GL_PROJECTION);   
+    glPopMatrix();  // 返回正常的投影变换   
+    glGetFloatv(GL_PROJECTION_MATRIX, m);   
+    hits = glRenderMode(GL_RENDER); // 从选择模式返回正常模式,该函数返回选择到对象的个数   
+    if(hits > 0)   
+        processSelect(selectBuff);  //  选择结果处理   
+}  
+void SelectObject(GLint x, GLint y)
+{
+	GLuint selectBuff[32]={0};//创建一个保存选择结果的数组
+	GLint hits, viewport[4];  
+
+	glGetIntegerv(GL_VIEWPORT, viewport); //获得viewport
+	glSelectBuffer(64, selectBuff);	//告诉OpenGL初始化selectbuffer
+	glRenderMode(GL_SELECT);	//进入选择模式
+	
+	glInitNames();	//初始化名字栈
+	glPushName(0);	//在名字栈中放入一个初始化名字，这里为‘0’
+
+
+	glMatrixMode(GL_PROJECTION);	//进入投影阶段准备拾取
+	glPushMatrix();		//保存以前的投影矩阵
+	glLoadIdentity();	//载入单位矩阵
+
+	float m[16];
+	glGetFloatv(GL_PROJECTION_MATRIX, m);
+
+	gluPickMatrix( x,			// 设定我们选择框的大小，建立拾取矩阵，就是上面的公式
+				  viewport[3]-y,	// viewport[3]保存的是窗口的高度，窗口坐标转换为OpenGL坐标
+				  2,2,				// 选择框的大小为2，2
+				  viewport			// 视口信息，包括视口的起始位置和大小
+				  );	
+													
+	glGetFloatv(GL_PROJECTION_MATRIX, m);
+	glOrtho(-10, 10, -10, 10, -10, 10);		//拾取矩阵乘以投影矩阵，这样就可以让选择框放大为和视体一样大
+	glGetFloatv(GL_PROJECTION_MATRIX, m);
+	
+	draw(GL_SELECT);	// 该函数中渲染物体，并且给物体设定名字
+	
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();	// 返回正常的投影变换
+	glGetFloatv(GL_PROJECTION_MATRIX, m);
+	hits = glRenderMode(GL_RENDER);	// 从选择模式返回正常模式,该函数返回选择到对象的个数
+	if(hits > 0)
+		processSelect(selectBuff);	//	选择结果处理
+} 
+
+ 
+
+view plaincopy to clipboardprint?
+void draw(GLenum model=GL_RENDER)   
+{   
+    if(model==GL_SELECT)   
+    {   
+        glColor3f(1.0,0.0,0.0);   
+        glLoadName(100);   
+        glPushMatrix();   
+        glTranslatef(-5, 0.0, 10.0);   
+        glBegin(GL_QUADS);   
+            glVertex3f(-1, -1, 0);   
+            glVertex3f( 1, -1, 0);   
+            glVertex3f( 1, 1, 0);   
+            glVertex3f(-1, 1, 0);   
+        glEnd();   
+        glPopMatrix();   
+  
+        glColor3f(0.0,0.0,1.0);   
+        glLoadName(101);   
+        glPushMatrix();   
+        glTranslatef(5, 0.0, -10.0);   
+        glBegin(GL_QUADS);   
+            glVertex3f(-1, -1, 0);   
+            glVertex3f( 1, -1, 0);   
+            glVertex3f( 1, 1, 0);   
+            glVertex3f(-1, 1, 0);   
+        glEnd();   
+        glPopMatrix();   
+    }   
+    else  
+    {   
+        glColor3f(1.0,0.0,0.0);   
+        glPushMatrix();   
+        glTranslatef(-5, 0.0, -5.0);   
+        glBegin(GL_QUADS);   
+            glVertex3f(-1, -1, 0);   
+            glVertex3f( 1, -1, 0);   
+            glVertex3f( 1, 1, 0);   
+            glVertex3f(-1, 1, 0);   
+        glEnd();   
+        glPopMatrix();   
+  
+        glColor3f(0.0,0.0,1.0);   
+        glPushMatrix();   
+        glTranslatef(5, 0.0, -10.0);   
+        glBegin(GL_QUADS);   
+            glVertex3f(-1, -1, 0);   
+            glVertex3f( 1, -1, 0);   
+            glVertex3f( 1, 1, 0);   
+            glVertex3f(-1, 1, 0);   
+        glEnd();   
+        glPopMatrix();   
+    }   
+  
+}  
+void draw(GLenum model=GL_RENDER)
+{
+	if(model==GL_SELECT)
+	{
+		glColor3f(1.0,0.0,0.0);
+		glLoadName(100);
+		glPushMatrix();
+		glTranslatef(-5, 0.0, 10.0);
+		glBegin(GL_QUADS);
+			glVertex3f(-1, -1, 0);
+			glVertex3f( 1, -1, 0);
+			glVertex3f( 1, 1, 0);
+			glVertex3f(-1, 1, 0);
+		glEnd();
+		glPopMatrix();
+
+		glColor3f(0.0,0.0,1.0);
+		glLoadName(101);
+		glPushMatrix();
+		glTranslatef(5, 0.0, -10.0);
+		glBegin(GL_QUADS);
+			glVertex3f(-1, -1, 0);
+			glVertex3f( 1, -1, 0);
+			glVertex3f( 1, 1, 0);
+			glVertex3f(-1, 1, 0);
+		glEnd();
+		glPopMatrix();
+	}
+	else
+	{
+		glColor3f(1.0,0.0,0.0);
+		glPushMatrix();
+		glTranslatef(-5, 0.0, -5.0);
+		glBegin(GL_QUADS);
+			glVertex3f(-1, -1, 0);
+			glVertex3f( 1, -1, 0);
+			glVertex3f( 1, 1, 0);
+			glVertex3f(-1, 1, 0);
+		glEnd();
+		glPopMatrix();
+
+		glColor3f(0.0,0.0,1.0);
+		glPushMatrix();
+		glTranslatef(5, 0.0, -10.0);
+		glBegin(GL_QUADS);
+			glVertex3f(-1, -1, 0);
+			glVertex3f( 1, -1, 0);
+			glVertex3f( 1, 1, 0);
+			glVertex3f(-1, 1, 0);
+		glEnd();
+		glPopMatrix();
+	}
+
+} 
+
+然后设点断点来检查一下。
+
+ 
+
+
+
+ 
+
+上面看到我们的视口的起始位置就是窗口的原点，大小和窗口的大小一样，500×500。然后在gluPickMatrix( x,  viewport[3]-y,    2,2,  viewport )函数调用后，会马上建立一个拾取矩阵，根据提供的参数，在屏幕上点击的坐标为 x=136，y=261，这是屏幕坐标，转换成openGL坐标为x=136，y=500-261=239。拾取框的另一个坐标就是138，242，因为这个给的长，宽都是2。现在就得到了拾取框的2个坐标了，，然后把这2个坐标再转换为-1到1之间的坐标得到
+
+
+
+把这个坐标带入拾取矩阵中计算，可以得到
+
+
+
+然后，在程序中设置断点，获取当前操作矩阵检查一下。
+
+
+
+从上面可以看到，和我们计算的结果是一样的。在设置了拾取矩阵后，又调用了语句glOrtho(-10, 10, -10, 10, -10, 10)，这表示让这个拾取框的大小铺满我们整个窗口，OpenGL会把刚才得到的拾取矩阵再乘以这个投影矩阵，我们可以得到
+
+
+
+再在程序中设置断点来检查一下。
+
+
+
+的确和我们计算的结果一样。然后代码中使用了glPopMatrix()，由于我们的拾取操作已经完成，到里位置，拾取的结果信息已经被OpenGL保存到了selectbuffer中了，所以这时我们就要不在需要这个拾取矩阵，由于之前使用了glPushMatrix()保存了原来的投影矩阵，现在只要glPopMatrix()就可以了。glPopMatrix()后，我们可以再设置断点看一下是不是真的返回到原来的投影矩阵。
+
+
+
+同样我们可以从上图中看到，的确在PopMatrix后，返回了原来的投影变换，所以现在从选择模式返回到正常模式的时候我们就可以看到正常的画面。
+
+ 
+
+
+
+上图中可以看到红色正方形中有个白色的小方框，这个就是在设置拾取矩阵时的拾取框，拾取框在红色正方形内部，说明我们已经选中了红色的正方形了。如果这个时候把选择框中的东西显示出来的话，就可以看到我们选择到的部分铺满整个屏幕。
+
+
+
+在前面的代码中，我们已经为红色正方形命名为100，蓝色的为101，现在我们来看看selectbuffer里被选中的物体。
+
+ 
+
+可以看到数组的前4个部分有值，第一个表示被选中物体的个数，当然现在是1。第二个表示和第三个表示物体的最小深度值和最大深度值，由于物体是个平面，所以这两个值是一样的。这里的深度值是整数，除以0xffffffff以后就得到了0到1之间的深度值了。第四个值，也就是我们选择到的物体的名字。这里就是红色的正方形。
+
+ 
+
+OpenGL的整个拾取过程就是这样的。它是利用了图形管线中投影变换阶段来实现拾取操作的。对于OpenGL图形管线不了解的朋友可能对这种方法会感到困难。但是一旦理解了图形管线后，再来理解拾取就很容易了。
+
+ 
+
+*原创内容，转载请注明出处*
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/zhangci226/archive/2009/10/30/4749526.aspx
