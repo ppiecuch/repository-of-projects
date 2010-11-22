@@ -367,6 +367,27 @@ mHandler.postAtTime(this,start + (((minutes * 60) + seconds + 1) * 1000));\par
 \pard\fi426\b0\'a3\'a81\'a3\'a9\'bb\'f9\'b1\'be\'d4\'ad\'d4\'f2\'a3\'ba\'c4\'ac\'c8\'cf\'c7\'e9\'bf\'f6\'cf\'c2\'a3\'ac\'b0\'b4back\'bc\'fc\'a3\'ac\'bb\'e1\'cf\'fa\'bb\'d9\'b5\'b1\'c7\'b0\'b5\'c4\'bb\'ee\'b6\'af\'a3\'ac\'cf\'d4\'ca\'be\'d3\'c3\'bb\'a7\'d6\'ae\'c7\'b0\'ca\'b9\'d3\'c3\'b5\'c4\'bb\'ee\'b6\'af\'a1\'a3\par
 By default, pressing the BACK key finishes (destroys) the current activity and displays the previous activity to the user.\par
 \'a3\'a82\'a3\'a9\'b6\'d4\'d3\'da\'b8\'b4\'d4\'d3\'b5\'c4\'d3\'a6\'d3\'c3\'a3\'ac\'b0\'b4back\'bc\'fc\'a3\'ac\'d3\'a6\'d3\'c3\'b3\'cc\'d0\'f2\'bf\'c9\'d2\'d4\'bd\'d3\'b9\'dc\'a3\'ac\'d7\'d4\'d0\'d0\'d1\'a1\'d4\'f1\'cc\'f8\'d7\'aa\'b5\'c4\'bb\'ee\'b6\'af\'a1\'a3\'e4\'af\'c0\'c0\'c6\'f7\'a3\'ac\'d3\'c3\'bb\'a7\'e4\'af\'c0\'c0\'b6\'e0\'b8\'f6\'cd\'f8\'d2\'b3\'a3\'ac\'b4\'cb\'ca\'b1\'a3\'ac\'b5\'e3\'bb\'f7back\'a3\'ac\'c7\'d0\'bb\'bb\'b5\'bd\'d6\'ae\'c7\'b0\'b5\'c4\'e4\'af\'c0\'c0\'d2\'b3\'c3\'e6\'a3\'ac\'d2\'bb\'d6\'b1\'b5\'e3\'bb\'f7back\'a3\'ac\'d6\'b1\'b5\'bd\'c7\'d0\'bb\'bb\'b5\'bd\'b8\'d5\'b4\'f2\'bf\'aa\'e4\'af\'c0\'c0\'c6\'f7\'ca\'b1\'b5\'c4\'d2\'b3\'c3\'e6\'a3\'bb\'d3\'d6\'c8\'e7\'a3\'ac\'d2\'f4\'c0\'d6\'b2\'a5\'b7\'c5\'c6\'f7\'a3\'ac\'b5\'e3\'bb\'f7back\'a3\'ac\'b2\'a2\'b2\'bb\'b9\'d8\'b1\'d5\'d2\'f4\'c0\'d6\'a3\'ac\'b6\'f8\'ca\'c7\'c8\'c3\'cb\'fc\'d4\'da\'ba\'f3\'cc\'a8\'b2\'a5\'b7\'c5\'a3\'ac\'ca\'b5\'bc\'ca\'c9\'cf\'ca\'c7\'d3\'a6\'d3\'c3\'b3\'cc\'d0\'f2\'b8\'b2\'b8\'c7\'c1\'cb\'d5\'fd\'b3\'a3\'b5\'c4back\'b0\'b4\'c5\'a5\'cf\'ec\'d3\'a6\'b5\'c4\'b2\'d9\'d7\'f7\'a1\'a3\par
+ \'ba\'dc\'b6\'e0\'cd\'f8\'d3\'d1\'b2\'bb\'c3\'f7\'b0\'d7\'c8\'e7\'ba\'ce\'d4\'daAndroid\'c6\'bd\'cc\'a8\'c9\'cf\'b2\'b6\'bb\'f1Back\'bc\'fc\'b5\'c4\'ca\'c2\'bc\'fe\'a3\'acBack\'bc\'fc\'ca\'c7\'ca\'d6\'bb\'fa\'c9\'cf\'b5\'c4\'ba\'f3\'cd\'cb\'bc\'fc\'a3\'ac\'d2\'bb\'b0\'e3\'b5\'c4\'c8\'ed\'bc\'fe\'b2\'bb\'b2\'b6\'bb\'f1\'cf\'e0\'b9\'d8\'d0\'c5\'cf\'a2\'bf\'c9\'c4\'dc\'b5\'bc\'d6\'c2\'c4\'e3\'b5\'c4\'b3\'cc\'d0\'f2\'b1\'bb\'c7\'d0\'bb\'bb\'b5\'bd\'ba\'f3\'cc\'a8\'a3\'ac \'b6\'f8\'bb\'d8\'b5\'bd\'d7\'c0\'c3\'e6\'b5\'c4\'de\'cf\'de\'ce\'c7\'e9\'bf\'f6\'a3\'ac\'d4\'daAndroid\'c9\'cf\'d3\'d0\'c1\'bd\'d6\'d6\'b7\'bd\'b7\'a8\'c0\'b4\'bb\'f1\'c8\'a1\'b8\'c3\'b0\'b4\'c5\'a5\'b5\'c4\'ca\'c2\'bc\'fe\'a1\'a3\par
+\par
+  1.\'d6\'b1\'bd\'d3\'bb\'f1\'c8\'a1\'b0\'b4\'c5\'a5\'b0\'b4\'cf\'c2\'ca\'c2\'bc\'fe\'a3\'ac\'b4\'cb\'b7\'bd\'b7\'a8\'bc\'e6\'c8\'ddAndroid 1.0\'b5\'bdAndroid 2.1 \'d2\'b2\'ca\'c7\'b3\'a3\'b9\'e6\'b7\'bd\'b7\'a8\'a3\'ac\'d6\'b1\'bd\'d3\'d6\'d8\'d0\'b4Activity\'b5\'c4onKeyDown\'b7\'bd\'b7\'a8\'bc\'b4\'bf\'c9\'a3\'ac\'b4\'fa\'c2\'eb\'c8\'e7\'cf\'c2:\par
+\par
+@Override\par
+public boolean onKeyDown(int keyCode, KeyEvent event)  \{\par
+    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) \{ //\'b0\'b4\'cf\'c2\'b5\'c4\'c8\'e7\'b9\'fb\'ca\'c7BACK\'a3\'ac\'cd\'ac\'ca\'b1\'c3\'bb\'d3\'d0\'d6\'d8\'b8\'b4\par
+       Toast.makeText(android123.this,"Android \'bf\'aa\'b7\'a2\'cd\'f8Back\'bc\'fc\'b2\'e2\'ca\'d4",1).show();\par
+        return true;\par
+    \}\par
+\par
+    return super.onKeyDown(keyCode, event);\par
+\}\par
+\par
+ \'b6\'f8\'b6\'d4\'d3\'daAndroid 2.0\'bf\'aa\'ca\'bc\'d3\'d6\'b6\'e0\'b3\'f6\'c1\'cb\'d2\'bb\'d6\'d6\'d0\'c2\'b5\'c4\'b7\'bd\'b7\'a8\'a3\'ac\'b6\'d4\'d3\'daActivity \'bf\'c9\'d2\'d4\'b5\'a5\'b6\'c0\'bb\'f1\'c8\'a1Back\'bc\'fc\'b5\'c4\'b0\'b4\'cf\'c2\'ca\'c2\'bc\'fe\'a3\'ac\'d6\'b1\'bd\'d3\'d6\'d8\'d0\'b4onBackPressed\'b7\'bd\'b7\'a8\'bc\'b4\'bf\'c9\'a3\'ac\'b4\'fa\'c2\'eb\'c8\'e7\'cf\'c2\par
+\par
+@Override\par
+public void onBackPressed() \{\par
+// \'d5\'e2\'c0\'ef\'b4\'a6\'c0\'ed\'c2\'df\'bc\'ad\'b4\'fa\'c2\'eb\'a3\'accwj\'cc\'e1\'ca\'be\'b4\'f3\'bc\'d2\'d7\'a2\'d2\'e2\'b8\'c3\'b7\'bd\'b7\'a8\'bd\'f6\'ca\'ca\'d3\'c3\'d3\'da2.0\'bb\'f2\'b8\'fc\'d0\'c2\'b0\'e6\'b5\'c4sdk\par
+return;\par
+\}\par
 \par
 \pard\b\'a1\'beForm\'a1\'bf\b0\par
 \pard\fi426 1\'a1\'a2\b checkbox\b0\par
