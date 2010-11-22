@@ -1,0 +1,261 @@
+Android包含了常用于嵌入式系统的SQLite，免去了开发者自己移植安装的功夫。SQLite 支持多数 SQL92 标准，很多常用的SQL命令都能在SQLite上面使用，除此之外Android还提供了一系列自定义的方法去简化对SQLite数据库的操作。不过有跨平台需求的程序就建议使用标准的SQL语句，毕竟这样容易在多个平台之间移植。
+
+先贴出本文程序运行的结果：
+
+
+
+本文主要讲解了SQLite的基本用法，如：创建数据库，使用SQL命令查询数据表、插入数据，关闭数据库，以及使用GridView实现了一个分页栏(关于GridView的用法)，用于把数据分页显示。
+
+分页栏的pagebuttons.xml的源码如下：
+
+view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:layout_height="wrap_content" android:paddingBottom="4dip"  
+    android:layout_width="fill_parent">  
+    <TextView android:layout_width="wrap_content"  
+        android:layout_below="@+id/ItemImage" android:layout_height="wrap_content"  
+        android:text="TextView01" android:layout_centerHorizontal="true"  
+        android:id="@+id/ItemText">  
+    </TextView>  
+</RelativeLayout>    
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content" android:paddingBottom="4dip"
+	android:layout_width="fill_parent">
+	<TextView android:layout_width="wrap_content"
+		android:layout_below="@+id/ItemImage" android:layout_height="wrap_content"
+		android:text="TextView01" android:layout_centerHorizontal="true"
+		android:id="@+id/ItemText">
+	</TextView>
+</RelativeLayout>   
+
+main.xml的源码如下：
+
+ 
+
+view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical" android:layout_width="fill_parent"  
+    android:layout_height="fill_parent">  
+    <Button android:layout_height="wrap_content"  
+        android:layout_width="fill_parent" android:id="@+id/btnCreateDB"  
+        android:text="创建数据库"></Button>  
+    <Button android:layout_height="wrap_content"  
+        android:layout_width="fill_parent" android:text="插入一串实验数据" android:id="@+id/btnInsertRec"></Button>  
+    <Button android:layout_height="wrap_content" android:id="@+id/btnClose"  
+        android:text="关闭数据库" android:layout_width="fill_parent"></Button>  
+    <EditText android:text="@+id/EditText01" android:id="@+id/EditText01"  
+        android:layout_width="fill_parent" android:layout_height="256dip"></EditText>  
+    <GridView android:id="@+id/gridview" android:layout_width="fill_parent"  
+        android:layout_height="32dip" android:numColumns="auto_fit"  
+        android:columnWidth="40dip"></GridView>  
+</LinearLayout>  
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<Button android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:id="@+id/btnCreateDB"
+		android:text="创建数据库"></Button>
+	<Button android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:text="插入一串实验数据" android:id="@+id/btnInsertRec"></Button>
+	<Button android:layout_height="wrap_content" android:id="@+id/btnClose"
+		android:text="关闭数据库" android:layout_width="fill_parent"></Button>
+	<EditText android:text="@+id/EditText01" android:id="@+id/EditText01"
+		android:layout_width="fill_parent" android:layout_height="256dip"></EditText>
+	<GridView android:id="@+id/gridview" android:layout_width="fill_parent"
+		android:layout_height="32dip" android:numColumns="auto_fit"
+		android:columnWidth="40dip"></GridView>
+</LinearLayout>
+ 
+
+本文程序源码如下：
+
+view plaincopy to clipboardprint?
+package com.testSQLite;     
+     
+import java.util.ArrayList;     
+import java.util.HashMap;     
+import android.app.Activity;     
+import android.database.Cursor;     
+import android.database.SQLException;     
+import android.database.sqlite.SQLiteDatabase;     
+import android.os.Bundle;     
+import android.util.Log;     
+import android.view.View;     
+import android.widget.AdapterView;     
+import android.widget.AdapterView.OnItemClickListener;     
+import android.widget.Button;     
+import android.widget.EditText;     
+import android.widget.GridView;     
+import android.widget.SimpleAdapter;     
+     
+public class testSQLite extends Activity {     
+    /** Called when the activity is first created. */     
+    Button btnCreateDB, btnInsert, btnClose;     
+    EditText edtSQL;//显示分页数据     
+    SQLiteDatabase db;     
+    int id;//添加记录时的id累加标记，必须全局     
+    static final int PageSize=10;//分页时，每页的数据总数     
+    private static final String TABLE_NAME = "stu";     
+    private static final String ID = "id";     
+    private static final String NAME = "name";     
+         
+    SimpleAdapter saPageID;// 分页栏适配器     
+    ArrayList<HashMap<String, String>> lstPageID;// 分页栏的数据源，与PageSize和数据总数相关     
+     
+    @Override     
+    public void onCreate(Bundle savedInstanceState) {     
+        super.onCreate(savedInstanceState);     
+        setContentView(R.layout.main);     
+        btnCreateDB = (Button) this.findViewById(R.id.btnCreateDB);     
+        btnCreateDB.setOnClickListener(new ClickEvent());     
+     
+        btnInsert = (Button) this.findViewById(R.id.btnInsertRec);     
+        btnInsert.setOnClickListener(new ClickEvent());     
+     
+        btnClose = (Button) this.findViewById(R.id.btnClose);     
+        btnClose.setOnClickListener(new ClickEvent());     
+             
+        edtSQL=(EditText)this.findViewById(R.id.EditText01);     
+             
+        GridView gridview = (GridView) findViewById(R.id.gridview);//分页栏控件     
+        // 生成动态数组，并且转入数据     
+        lstPageID = new ArrayList<HashMap<String, String>>();     
+     
+        // 生成适配器的ImageItem <====> 动态数组的元素，两者一一对应     
+        saPageID = new SimpleAdapter(testSQLite.this, // 没什么解释     
+                lstPageID,// 数据来源     
+                R.layout.pagebuttons,//XML实现     
+                new String[] { "ItemText" },     
+                new int[] { R.id.ItemText });     
+     
+        // 添加并且显示     
+        gridview.setAdapter(saPageID);     
+        // 添加消息处理     
+        gridview.setOnItemClickListener(new OnItemClickListener(){     
+     
+            @Override     
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,     
+                    long arg3) {     
+                LoadPage(arg2);//根据所选分页读取对应的数据     
+            }     
+        });     
+     
+    }     
+     
+         
+    class ClickEvent implements View.OnClickListener {     
+     
+        @Override     
+        public void onClick(View v) {     
+            if (v == btnCreateDB) {     
+                CreateDB();     
+            } else if (v == btnInsert) {     
+                InsertRecord(16);//插入16条记录     
+                RefreshPage();     
+            }else if (v == btnClose) {     
+                db.close();     
+            }     
+        }     
+     
+    }     
+         
+     
+    /*   
+     * 读取指定ID的分页数据   
+     * SQL:Select * From TABLE_NAME Limit 9 Offset 10;   
+     * 表示从TABLE_NAME表获取数据，跳过10行，取9行   
+     */     
+    void LoadPage(int pageID)     
+    {     
+        String sql= "select * from " + TABLE_NAME +      
+        " Limit "+String.valueOf(PageSize)+ " Offset " +String.valueOf(pageID*PageSize);     
+        Cursor rec = db.rawQuery(sql, null);     
+     
+        setTitle("当前分页的数据总数:"+String.valueOf(rec.getCount()));     
+             
+        // 取得字段名称     
+        String title = "";     
+        int colCount = rec.getColumnCount();     
+        for (int i = 0; i < colCount; i++)     
+            title = title + rec.getColumnName(i) + "     ";     
+     
+             
+        // 列举出所有数据     
+        String content="";     
+        int recCount=rec.getCount();     
+        for (int i = 0; i < recCount; i++) {//定位到一条数据     
+            rec.moveToPosition(i);     
+            for(int ii=0;ii<colCount;ii++)//定位到一条数据中的每个字段     
+            {     
+                content=content+rec.getString(ii)+"     ";     
+            }     
+            content=content+"\r\n";     
+        }     
+             
+        edtSQL.setText(title+"\r\n"+content);//显示出来     
+        rec.close();     
+    }     
+         
+    /*   
+     * 在内存创建数据库和数据表   
+     */     
+    void CreateDB() {     
+        // 在内存创建数据库     
+        db = SQLiteDatabase.create(null);     
+        Log.e("DB Path", db.getPath());     
+        String amount = String.valueOf(databaseList().length);     
+        Log.e("DB amount", amount);     
+        // 创建数据表     
+        String sql = "CREATE TABLE " + TABLE_NAME + " (" + ID     
+                + " text not null, " + NAME + " text not null " + ");";     
+        try {     
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);     
+            db.execSQL(sql);     
+        } catch (SQLException e) {}     
+    }     
+     
+    /*   
+     * 插入N条数据   
+     */     
+    void InsertRecord(int n) {     
+        int total = id + n;     
+        for (; id < total; id++) {     
+            String sql = "insert into " + TABLE_NAME + " (" + ID + ", " + NAME     
+                    + ") values('" + String.valueOf(id) + "', 'test');";     
+            try {     
+                db.execSQL(sql);     
+            } catch (SQLException e) {     
+            }     
+        }     
+    }     
+     
+    /*   
+     * 插入之后刷新分页   
+     */     
+    void RefreshPage()     
+    {     
+        String sql = "select count(*) from " + TABLE_NAME;     
+        Cursor rec = db.rawQuery(sql, null);     
+        rec.moveToLast();     
+        long recSize=rec.getLong(0);//取得总数     
+        rec.close();     
+        int pageNum=(int)(recSize/PageSize) + 1;//取得分页数     
+             
+        lstPageID.clear();     
+        for (int i = 0; i < pageNum; i++) {     
+            HashMap<String, String> map = new HashMap<String, String>();     
+            map.put("ItemText", "No." + String.valueOf(i));   
+     
+            lstPageID.add(map);     
+        }     
+        saPageID.notifyDataSetChanged();     
+    }     
+}    
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/hellogv/archive/2010/11/16/6011934.aspx
