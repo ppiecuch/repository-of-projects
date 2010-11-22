@@ -1,0 +1,237 @@
+.mtl文件（Material Library File）是材质库文件，描述的是物体的材质信息，ASCII存储，任何文本编辑器可以将其打开和编辑。一个.mtl文件可以包含一个或多个材质定义，对于每个材质都有其颜色，纹理和反射贴图的描述，应用于物体的表面和顶点。 
+以下是一个材质库文件的基本结构：
+newmtl mymtl_1
+材质颜色光照定义
+纹理贴图定义
+反射贴图定义
+newmtl mymtl_2
+材质颜色光照定义
+纹理贴图定义
+反射贴图定义
+newmtl mymtl_3
+材质颜色光照定义
+纹理贴图定义
+反射贴图定义
+……
+
+注释：每个材质库可含多个材质定义，每个材质都有一个材质名。用newmtl mtlName来定义一个材质。对于每个材质，可定义它的颜色光照纹理反射等描述特征。主要的定义格式如下文所示：
+
+////////////////////////////////////////////////
+材质颜色光照
+1。环境反射有以下三种描述格式，三者是互斥的，不能同时使用。
+Ka r g b ——用RGB颜色值来表示，g和b两参数是可选的，如果只指定了r的值，则g和b的值都等于r的值。三个参数一般取值范围为0.0~1.0，在此范围外的值则相应的增加或减少反射率;
+Ka spectral file.rfl factor ——用一个rfl文件来表示。factor是一个可选参数，表示.rfl文件中值的乘数，默认为1.0;
+Ka xyz x y z ——用CIEXYZ值来表示，x，y，z是CIEXYZ颜色空间的各分量值。y和z两参数是可选的，如果只指定了x的值，则y和z的值都等于r的值。三个参数一般取值范围为0~1。
+
+2。漫反射描述的三种格式：
+Kd r g b
+Kd spectral file.rfl factor
+Kd xyz x y z
+
+3。镜反射描述的三种格式:
+Ks r g b
+Ks spectral file.rfl factor
+Ks xyz x y z
+
+4。滤光透射率描述的三种格式：
+Tf r g b
+Tf spectral file.rfl factor
+Tf xyz x y z
+
+5。光照模型描述格式：
+
+illum illum_#
+指定材质的光照模型。illum后面可接0~10范围内的数字参数。各个参数代表的光照模型如下所示：
+--------------------------------------------------------------
+
+光照模型 属性
+0 Color on and Ambient off
+1 Color on and Ambient on
+2 Highlight on
+3 Reflection on and Ray trace on
+4 Transparency: Glass on
+Reflection: Ray trace on
+5 Reflection: Fresnel on and Ray trace on
+6 Transparency: Refraction on
+Reflection: Fresnel off and Ray trace on
+7 Transparency: Refraction on
+Reflection: Fresnel on and Ray trace on
+8 Reflection on and Ray trace off
+9 Transparency: Glass on
+Reflection: Ray trace off
+10 Casts shadows onto invisible surfaces
+
+--------------------------------------------------------------
+
+
+6。渐隐指数描述
+
+d factor
+参数factor表示物体融入背景的数量，取值范围为0.0~1.0，取值为1.0表示完全不透明，取值为0.0时表示完全透明。当新创建一个物体时，该值默认为1.0，即无渐隐效果。
+与真正的透明物体材质不一样，这个渐隐效果是不依赖于物体的厚度或是否具有光谱特性。该渐隐效果对所有光照模型都有效。
+
+d -halo factor
+指定一种受观察者影响的渐隐效果。例如，对于一个定义为 d -halo 0.0的球体，在它的中心是完全消隐的，而在表面边界处将逐渐变得不透明。
+其中factor表示应用在材质上的渐隐率的最小值。而材质上具体的渐隐率将在这个最小值到1.0之间取值。其计算公式为：
+dissolve = 1.0 - (N*v)(1.0-factor)
+
+7。反射指数描述
+
+Ns exponent
+指定材质的反射指数，定义了反射高光度。
+exponent是反射指数值，该值越高则高光越密集，一般取值范围在0~1000。
+
+8。清晰度描述
+
+Sharpness value
+指定本地反射贴图的清晰度。如果材质中没有本地反射贴图定义，则将此值应用到预览中的全局反射贴图上。
+value可在0~1000中取值，默认60。值越高则越清晰。
+
+来源：(http://blog.sina.com.cn/s/blog_6335b5130100hr95.html) - 看了.mtl文件格式解析，简要总结下吧_牛魔公主_新浪博客 
+9。折射值描述
+
+Ni ptical density
+指定材质表面的光密度，即折射值。
+ptical density是光密度值，可在0.001到10之间进行取值。若取值为1.0，光在通过物体的时候不发生弯曲。玻璃的折射率为1.5。取值小于1.0的时候可能会产生奇怪的结果，不推荐。
+
+
+////////////////////////////////////////////////
+纹理映射
+纹理映射可以对映射的相应材质参数进行修改，这个修改只是对原有存在的参数进行叠加修改，而不是替换原有参数，从而纹理映射在物体表面的表现上有很好的灵活性。
+纹理映射只可以改变以下材质参数：
+- Ka (color)
+- Kd (color)
+- Ks (color)
+- Ns (scalar)
+- d (scalar)
+除了以上参数，表面法线也可以更改。
+纹理文件类型可以是以下几种：
+1.纹理映射文件
+.mpc：颜色纹理文件color texture files ——可改变Ka，Kd，Ks的值
+.mps：标量纹理文件scalar texture files——可改变Ns，d，decal的值
+.mpb：凹凸纹理文件bump texture files——可改变面法线
+2.程序纹理文件：
+程序纹理文件是用数学公式来计算纹理的样本值。有以下几种格式：
+.cxc
+.cxs
+.cxb
+
+
+以下是mtl文件中对于纹理映射的描述格式：
+1.map_Ka -options args filename
+为环境反射指定颜色纹理文件(.mpc)或程序纹理文件(.cxc)，或是一个位图文件。在渲染的时候，Ka的值将再乘上map_Ka的值。
+而map_Ka的可选项参数有以下几个：
+-blendu on | off
+-blendv on | off
+-cc on | off
+-clamp on | off
+-mm base gain
+-o u v w
+-s u v w
+-t u v w
+-texres value
+
+2.map_Kd -options args filename
+为漫反射指定颜色纹理文件(.mpc)或程序纹理文件(.cxc)，或是一个位图文件。作用原理与可选参数与map_Ka同。
+
+3.map_Ks -options args filename
+为镜反射指定颜色纹理文件(.mpc)或程序纹理文件(.cxc)，或是一个位图文件。作用原理与可选参数与map_Ka同。
+
+4.map_Ns -options args filename
+为镜面反射指定标量纹理文件（.mps或.cxs）。可选参数如下所示：
+-blendu on | off
+-blendv on | off
+-clamp on | off
+-imfchan r | g | b | m | l | z
+-mm base gain
+-o u v w
+-s u v w
+-t u v w
+-texres value
+
+5.map_d -options args filename
+为消隐指数指定标量纹理文件（.mps或.cxs）。作用原理和可选参数与map_Ns同。
+
+6.map_aat on
+打开纹理反走样功能。
+
+7.decal -options args filename
+指定一个标量纹理文件或程序纹理文件用于选择性地将材质的颜色替换为纹理的颜色。可选参数同map_Ns。
+在渲染期间， Ka, Kd, and Ks和map_Ka, map_Kd, map_Ks的值通过下面这个公式来进行使用：
+result_color=tex_color(tv)*decal(tv)+mtl_color*(1.0-decal(tv))
+其中tv表示纹理顶点，result_color是Ka,Kd和Ks的综合作用值。
+
+8.disp -options args filename
+指定一个标量纹理文件或程序纹理文件实现物体变形或产生表面粗糙。可选参数同map_Ns。
+
+9.bump -options args filename
+为材质指定凹凸纹理文件（.mpb或.cxb）,或是一个位图文件。
+可选参数可为：
+-bm mult
+-clamp on | off
+-blendu on | off
+-blendv on | off
+-imfchan r | g | b | m | l | z
+-mm base gain
+-o u v w
+-s u v w
+-t u v w
+-texres value
+
+以上各参数含义可见原文。
+
+////////////////////////////////////////////////////////
+反射贴图
+在.mtl文件中的定义格式为：
+1.refl -type sphere -options -args filename
+指定一个球体区域将指定的纹理反射映射至物体。filename为一个颜色纹理文件，或可以映射的位图。
+
+2.refl -type cube_side -options -args filenames
+指定一个立方体区域将指定的纹理反射映射至物体。可以通过以下方式来指定纹理位置：
+refl -type cube_top
+refl -type cube_bottom
+refl -type cube_front
+refl -type cube_back
+refl -type cube_left
+refl -type cube_right
+
+“refl”可以单独使用，或配合以下参数使用。使用时将参数置于“refl”和“filename”之间。
+-blendu on | off
+-blendv on | off
+-cc on | off
+-clamp on | off
+-mm base gain
+-o u v w
+-s u v w
+-t u v w
+-texres value
+
+////////////////////////////////////////////////////////
+
+实例：
+
+newmtl my_mtl
+Ka 0.0435 0.0435 0.0435
+Kd 0.1086 0.1086 0.1086
+Ks 0.0000 0.0000 0.0000
+Tf 0.9885 0.9885 0.9885
+illum 6
+d -halo 0.6600
+Ns 10.0000
+sharpness 60
+Ni 19713
+map_Ka -s 1 1 1 -o 0 0 0 -mm 0 1 chrome.mpc
+map_Kd -s 1 1 1 -o 0 0 0 -mm 0 1 chrome.mpc
+map_Ks -s 1 1 1 -o 0 0 0 -mm 0 1 chrome.mpc
+map_Ns -s 1 1 1 -o 0 0 0 -mm 0 1 wisp.mps
+map_d -s 1 1 1 -o 0 0 0 -mm 0 1 wisp.mps
+disp -s 1 1 .5 wisp.mps
+decal -s 1 1 1 -o 0 0 0 -mm 0 1 sand.mps
+bump -s 1 1 1 -o 0 0 0 -bm 1 sand.mpb
+refl -type sphere -mm 0 1 clouds.mpc
+
+////////////////////////////////////////////////////////
+
+以上只是简要说明，更具体的见http://local.wasp.uwa.edu.au/~pbourke/dataformats/mtl/
+
+http://hi.baidu.com/ab_xyz/blog/item/efff4fc518a11ba48326acbe.html

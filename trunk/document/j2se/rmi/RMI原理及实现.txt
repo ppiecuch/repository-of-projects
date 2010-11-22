@@ -1,0 +1,162 @@
+简介
+
+　　RMI是远程方法调用的简称，象其名称暗示的那样，它能够帮助我们查找并执行远程对象的方法。通俗地说，远程调用就象将一个class放在A机器上，然后在B机器中调用这个class的方法。
+
+　　我个人认为，尽管RMI不是唯一的企业级远程对象访问方案，但它却是最容易实现的。与能够使不同编程语言开发的CORBA不同的是，RMI是一种纯Java解决方案。在RMI中，程序的所有部分都由Java编写。
+
+　　在看本篇文章时，我假定读者都已经具备了较扎实的Java基础知识，在这方面有欠缺的读者请自行阅读有关资料。
+
+　　概念
+
+　　我在前面已经提到，RMI是一种远程方法调用机制，其过程对于最终用户是透明的：在进行现场演示时，如果我不说它使用了RNI，其他人不可能知道调用的方法存储在其他机器上。当然了，二台机器上必须都安装有Java虚拟机（JVM）。
+
+　　其他机器需要调用的对象必须被导出到远程注册服务器，这样才能被其他机器调用。因此，如果机器A要调用机器B上的方法，则机器B必须将该对象导出到其远程注册服务器。注册服务器是服务器上运行的一种服务，它帮助客户端远程地查找和访问服务器上的对象。一个对象只有导出来后，然后才能实现RMI包中的远程接口。例如，如果想使机器A中的Xyz对象能够被远程调用，它就必须实现远程接口。
+
+　　RMI需要使用占位程序和框架，占位程序在客户端，框架在服务器端。在调用远程方法时，我们无需直接面对存储有该方法的机器。
+
+　　在进行数据通讯前，还必须做一些准备工作。占位程序就象客户端机器上的一个本机对象，它就象服务器上的对象的代理，向客户端提供能够被服务器调用的方法。然后，Stub就会向服务器端的Skeleton发送方法调用，Skeleton就会在服务器端执行接收到的方法。
+
+　　Stub和Skeleton之间通过远程调用层进行相互通讯，远程调用层遵循TCP/IP协议收发数据。下面我们来大致了解一种称为为“绑定”的技术。
+
+　　客户端无论何时要调用服务器端的对象，你可曾想过他是如何告诉服务器他想创建什么样的对象吗？这正是“绑定”的的用武之地。在服务器端，我们将一个字符串变量与一个对象联系在一起（可以通过方法来实现），客户端通过将那个字符串传递给服务器来告诉服务器它要创建的对象，这样服务器就可以准确地知道客户端需要使用哪一个对象了。所有这些字符串和对象都存储在的远程注册服务器中。 
+
+　　在编程中需要解决的问题
+
+　　在研究代码之前，我们来看看必须编写哪些代码：
+
+　　·远程对象：这个接口只定义了一个方法。我们应当明白的是，这个接口并非总是不包括方法的代码而只包括方法的定义。远程对象包含要导出的每个方法的定义，它还实现Java.rmi中的远程接口。
+
+　　·远程对象实现：这是一个实现远程对象的类。如果实现了远程对象，就能够覆盖该对象中的所有方法，因此，远程对象的实现类将真正包含我们希望导出的方法的代码。
+
+　　·远程服务器：这是一个作为服务器使用的类，它是相对于要访问远程方法的客户端而言的。它存储着绑定的字符串和对象。
+
+　　·远程客户端：这是一个帮助我们访问远程方法提供帮助的类，它也是最终用户。我们将使用查找和调用远程方法的方法在该类中调用远程方法。
+
+编程
+
+　　我们将首先编写远程对象，并将代码保存为名字为AddServer.Java的文件：
+
+
+import Java.rmi.*; 
+
+public interface AddServer extends Remote { 
+
+public int AddNumbers(int firstnumber,int secondnumber) throws RemoteException; 
+
+} 
+ 
+
+　　我们来看看上面的代码。首先，为了使用其内容，我们导入rmi包。然后，我们创建一个扩展了Java.rmi中远程接口的接口。所有的远程对象必须扩展该远程接口，我们将该远程接口称为AddServer。在该远程对象中，有一个名字为AddNumbers的方法，客户端可以调用这一方法。我们必须记住的是，所有的远程方法都需要启动RemoteException方法，有错误发生时就会调用该方法。
+
+　　下面我们开始编写远程对象的实现。这是一个实现远程对象并包含有所有方法代码的类，将下面的代码保存为名字为AddServerImpl.Java的文件：
+
+
+import Java.rmi.*; 
+
+public class AddServerImpl extends UnicastRemoteObject implements AddServer { 
+public AddServerImpl() { 
+super(); 
+} 
+public int AddNumbers(int firstnumber,int secondnumber) throws RemoteException { 
+return firstnumber + secondnumber; 
+} 
+}  
+
+　　首先，我们导入rmi包，然后创建一个扩展UnicastRemoteObject和实现创建的远程对象的类；其次，我们可以为类创建一个缺省的构建器。我们还了解了AddNumbers方法的代码，它启动RemoteException。这样我们就覆盖了创建的远程对象中的方法。AddNumbers方法的代码非常好理解，它接受2个整型参数，然后相加并返回它们的和。
+
+　　至此，我们已经有了二个Java文件：远程对象和远程对象的实现。下面我们将使用Javac命令编译这二个文件：
+
+　　编译远程对象：
+
+
+C:\jdk\bin\Javac workingdir\AddServer.Java  
+
+　　编译远程对象实现：
+
+
+C:\jdk\bin\Javac workingdir\AddServerImpl.Java  
+
+　　这样，就会达到二个Java文件和二个类文件，下面我们将创建stub和skeleton。为了创建stub和skeleton文件，我们必须使用rmic编译器编译远程对象实现文件。
+
+　　用Rmic编译远程对象实现文件：
+
+
+C:\jdk\bin\rmic workingdir\AddServerImpl.Java  
+
+　　然后，我们就会发现多了2个新建的类文件，它们分别是AddServerImpl_Stub.class 和AddServerImpl_Skel.class 。
+
+　　The Coding (Contd.) 
+
+　　我们已经编译了所有的源代码，下面我们来创建客户端和服务器端，将下面的代码保存为名字为RmiServer.Java的文件：
+
+
+import Java.rmi.*; 
+import Java.net.*; 
+
+public class RmiServer { 
+public static void main (String args[]) throws RemoteException, MalformedURLException { 
+AddServerImpl add = new AddServerImpl(); 
+Naming.rebind("addnumbers",add); 
+} 
+} 
+ 
+
+　　首先，我们导入Java.rmi包和Java.net包。另外，我们还使用throws从句捕获任何异常。我们从对象中得出远程对象实现，使用rebind方法将字符串addnumbers与该对象绑定。下面的例子显示了绑定的含义：
+从现在开始，无论何时客户端要调用远程对象，使用字符串addnumbers就可以实现。rebind方法有二个参数：第一个参数是字符串变量，第二个参数是远程对象实现类的对象。
+
+　　下面我们来创建客户端，将下面的代码保存为名字为RmiClient.Java的文件：
+
+
+import Java.rmi.*; 
+import Java.net.*; 
+
+public class RmiClient { 
+public static void main(String args[]) throws RemoteException, MalformedURLException { 
+String url="rmi://127.0.0.1/addnumbers"; 
+AddServer add; 
+add = (AddServer)Naming.lookup(url); 
+int result = add.AddNumbers(10,5); 
+System.out.println(result); 
+} 
+} 
+ 
+
+　　首先，我们导入Java.rmi包和Java.net包，并使用throws从句捕获所有必要的异常。然后通过利用Naming类中的静态lookup方法从远程对象中得到一个对象。（这也是我们无需从Naming类中得到一个对象并调用它。而只使用类名字的原因。）
+
+　　lookup方法接受远程对象的完整的URL名字，该URL由完整的机器IP地址以及与对象绑定的字符串（也誻对象的绑定名）组成。在调用远程对象时，我们使用了RMI协议。lookup方法向我们返回一个对象，在能够使用它前，我们必须将它的数据类型转换为与远程对象的数据类型一致。
+
+
+Since we have both our server and client source ready, let's compile them both:  
+
+　　至此，我们已经有了服务器端和客户端的源代码，下面我们来编译这二个源文件：
+
+　　编译远程服务器：
+
+
+C:\jdk\bin\Javac workingdir\RmiServer.Java  
+
+　　编译远程客户端：
+
+
+C:\jdk\bin\Javac workingdir\RmiClient.Java  
+
+　　在对我们的代码进行测试前，还必须首先启动RMI Registry。RMI Registry存储有所有绑定的数据，没有它，RMI就不能正常地运行！
+
+　　启动Rmi Registry服务器：
+
+
+C:\jdk\bin\start rmiregistry  
+
+　　我们会注意到，这时会出现一个空白的DOS提示符窗口，这表明Rmi Registry服务器在运行，注意不要关闭该窗口。然后，我们首先在一个DOS提示符窗口中运行Rmi服务器，然后在另一个DOS提示符窗口中运行Rmi客户端。
+
+　　启动RMI服务器： 
+
+C:\jdk\bin\Java workingdir\RmiServer  
+
+　　启动RMI客户端：
+
+
+C:\jdk\bin\Java workingdir\RmiClient  
+
+　　如果一切正常，我们应该能够得到15这个输出。我们向AddNumbers方法输入10和5二个数字，该方法将这二者加起来，并将其和15返回给我们。如果得到了15这个输出，说明我们已经成功地执行了一个远程方法。当然，在这里，我们并没有执行真正意义上的远程方法，因为我们的计算机既是服务器，又是客户机。如果有计算机网络，我们就可以方便地进行执行远程方法的试验了。
+http://www.yesky.com/274/1625274_1.shtml
