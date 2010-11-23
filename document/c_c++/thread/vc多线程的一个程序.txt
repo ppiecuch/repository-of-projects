@@ -1,0 +1,50 @@
+#include<windows.h> 
+#include<iostream.h> 
+
+DWORD WINAPI Fun1Proc(LPVOID lpParameter); //声明线程函数1 
+
+int tickets=100; //初始化车票的数量 
+HANDLE hMutex; //定义线程互斥对象 
+void main() 
+{ 
+HANDLE hThread1; //定义线程hThread1 
+hThread1=CreateThread(NULL,0,Fun1Proc,NULL,0,NULL); //创建线程hThread1 
+CloseHandle(hThread1); //关闭线程句柄， 
+cout<<"main thread is running!"<<endl; 
+hMutex=CreateMutex(NULL,FALSE,NULL); //初始化线程互斥对象 
+while(1) 
+{ 
+WaitForSingleObject(hMutex,INFINITE); //等待互斥对象 
+if(tickets>0)//如果车票数量大于0则卖票，车票数量减一 
+{ 
+cout<<"main thread sell tickets:"<<tickets<<endl; 
+tickets--; 
+} 
+
+else 
+break; //若车票卖光了，则跳出while循环 
+
+ReleaseMutex(hMutex); //主线程卖出一张票后，释放线程互斥对象 
+} 
+} 
+DWORD WINAPI Fun1Proc(LPVOID lpParameter) //定义线程1的处理函数 
+{ 
+cout<<" thread1 is running!"<<endl; 
+while(1) 
+{ 
+WaitForSingleObject(hMutex,INFINITE); //等待线程互斥对象 
+if(tickets>0) //若车票没卖完，则卖票，车票数减一 
+{ 
+
+cout<<"thread1 sell tickets:"<<tickets<<endl; 
+tickets--; 
+} 
+
+else 
+break; //否则跳出while循环 
+ReleaseMutex(hMutex); //卖票成功，释放线程互斥对象 
+} 
+return 0; 
+} 
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/dolphin98629/archive/2008/12/23/3587780.aspx
