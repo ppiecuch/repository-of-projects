@@ -6,3 +6,8 @@
 
 【异常】Exception in thread "main" org.lwjgl.opengl.OpenGLException: Invalid operation (1282)
 【解决】原因:GL11.glBegin(GL11.GL_TRIANGLES);GL11.glEnd();包含了GL11.glBindTexture....
+
+【异常】call to OpenGL ES API with no current context 
+【解决】You're not calling it from the OpenGL thread. 
+If a different thread is trying to do something with OpenGL, 
+queue that up and call it during your OpenGL thread instead.
