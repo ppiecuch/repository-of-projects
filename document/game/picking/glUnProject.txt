@@ -1,0 +1,38 @@
+GLint GLAPIENTRY
+gluUnProject(GLdouble winx, GLdouble winy, GLdouble winz,
+        const GLdouble modelMatrix[16], 
+        const GLdouble projMatrix[16],
+                const GLint viewport[4],
+            GLdouble *objx, GLdouble *objy, GLdouble *objz)
+{
+    double finalMatrix[16]; //最终矩阵
+    double in[4];
+    double out[4];
+
+    __gluMultMatricesd(modelMatrix, projMatrix, finalMatrix);  //finalMatrix = 世界变换*相机变换*投影变换
+    if (!__gluInvertMatrixd(finalMatrix, finalMatrix)) return(GL_FALSE); 逆矩阵（从投影坐标到世界坐标）
+
+    in[0]=winx;//客户区窗口坐标x
+    in[1]=winy;//客户区窗口坐标y
+    in[2]=winz;//坐标z(深度)
+    in[3]=1.0; //w分量
+    //viewport[0] = 窗口左端坐标（在以ScreenCoordinate作坐标系的时候有用）viewport[2] = width viewport[3] = height
+    /* Map x and y from window coordinates */
+    in[0] = (in[0] - viewport[0]) / viewport[2]; // x([-1,+1]) = 2 *(screenPosX - screenLeft) / screenWidth - 1
+    in[1] = (in[1] - viewport[1]) / viewport[3]; // x([-1,+1]) = 2 *(screenPosY - screenTop) / screenHeight - 1
+    /* Map to range -1 to 1 */
+    in[0] = in[0] * 2 - 1; 
+    in[1] = in[1] * 2 - 1;
+    in[2] = in[2] * 2 - 1;
+
+    __gluMultMatrixVecd(finalMatrix, in, out); //将已经转化到标准设备空间的坐标*逆矩阵 = 世界空间坐标
+    if (out[3] == 0.0) return(GL_FALSE);
+    out[0] /= out[3];  out[3]为w分量，除w分量投影到三维空间
+    out[1] /= out[3];
+    out[2] /= out[3];
+    *objx = out[0]; //[objx,objy,objz]  =[x,y,z]
+    *objy = out[1];
+    *objz = out[2];
+    return(GL_TRUE);
+}
+http://topic.csdn.net/u/20090321/20/b488373f-6f3a-4ff0-b80e-38a1192487bb.html
