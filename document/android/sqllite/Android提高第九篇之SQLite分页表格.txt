@@ -1,0 +1,559 @@
+本文来自http://blog.csdn.net/hellogv/ ，引用必须注明出处！
+
+       上次讲的Android上的SQLite分页读取，只用文本框显示数据而已，这次就讲得更加深入些，实现并封装一个SQL分页表格控件，不仅支持分页还是以表格的形式展示数据。先来看看本文程序运行的动画：
+
+
+
+       这个SQL分页表格控件主要分为“表格区”和“分页栏”这两部分，这两部分都是基于GridView实现的。网上介绍Android上实现表格的DEMO一般都用ListView。ListView与GridView对比，ListView最大的优势是格单元的大小可以自定义，可以某单元长某单元短，但是不能自适应数据表的结构；而GridView最大的优势就是自适应数据表的结构，但是格单元统一大小。。。对于数据表结构多变的情况，建议使用GridView实现表格。
+
+本文实现的SQL分页表格控件有以下特点：
+
+1.自适应数据表结构，但是格单元统一大小；
+
+2.支持分页；
+
+3.“表格区”有按键事件回调处理，“分页栏”有分页切换事件回调处理。
+
+本文程序代码较多，可以到这里下载整个工程的源码：http://www.rayfile.com/files/72e78b68-f2e5-11df-8469-0015c55db73d/
+
+items.xml的代码如下，它是“表格区”和“分页栏”的格单元实现：
+
+view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout android:id="@+id/LinearLayout01"  
+    xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:layout_width="fill_parent" android:background="#555555"  
+    android:layout_height="wrap_content">  
+    <TextView android:layout_below="@+id/ItemImage" android:text="TextView01"  
+        android:id="@+id/ItemText" android:bufferType="normal"  
+        android:singleLine="true" android:background="#000000"  
+        android:layout_width="fill_parent" android:gravity="center"  
+        android:layout_margin="1dip" android:layout_gravity="center"  
+        android:layout_height="wrap_content">  
+    </TextView>  
+</LinearLayout>  
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/LinearLayout01"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:background="#555555"
+	android:layout_height="wrap_content">
+	<TextView android:layout_below="@+id/ItemImage" android:text="TextView01"
+		android:id="@+id/ItemText" android:bufferType="normal"
+		android:singleLine="true" android:background="#000000"
+		android:layout_width="fill_parent" android:gravity="center"
+		android:layout_margin="1dip" android:layout_gravity="center"
+		android:layout_height="wrap_content">
+	</TextView>
+</LinearLayout>
+ 
+
+main.xml的代码如下：
+
+view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical" android:layout_width="fill_parent"  
+    android:layout_height="fill_parent" android:id="@+id/MainLinearLayout">  
+  
+    <Button android:layout_height="wrap_content"  
+        android:layout_width="fill_parent" android:id="@+id/btnCreateDB"  
+        android:text="创建数据库"></Button>  
+    <Button android:layout_height="wrap_content"  
+        android:layout_width="fill_parent" android:text="插入一串实验数据" android:id="@+id/btnInsertRec"></Button>  
+    <Button android:layout_height="wrap_content" android:id="@+id/btnClose"  
+        android:text="关闭数据库" android:layout_width="fill_parent"></Button>  
+</LinearLayout>  
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:id="@+id/MainLinearLayout">
+
+	<Button android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:id="@+id/btnCreateDB"
+		android:text="创建数据库"></Button>
+	<Button android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:text="插入一串实验数据" android:id="@+id/btnInsertRec"></Button>
+	<Button android:layout_height="wrap_content" android:id="@+id/btnClose"
+		android:text="关闭数据库" android:layout_width="fill_parent"></Button>
+</LinearLayout>
+ 
+
+演示程序testSQLite.java的源码：
+
+view plaincopy to clipboardprint?
+package com.testSQLite;   
+  
+import android.app.Activity;   
+import android.database.Cursor;   
+import android.database.SQLException;   
+import android.database.sqlite.SQLiteDatabase;   
+import android.os.Bundle;   
+import android.util.Log;   
+import android.view.View;   
+import android.widget.Button;   
+import android.widget.LinearLayout;   
+import android.widget.Toast;   
+  
+public class testSQLite extends Activity {   
+    GVTable table;   
+    Button btnCreateDB, btnInsert, btnClose;   
+    SQLiteDatabase db;   
+    int id;//添加记录时的id累加标记，必须全局   
+  
+    private static final String TABLE_NAME = "stu";   
+    private static final String ID = "id";   
+    private static final String NAME = "name";   
+    private static final String PHONE = "phone";   
+    private static final String ADDRESS = "address";   
+    private static final String AGE = "age";   
+       
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {   
+        super.onCreate(savedInstanceState);   
+        setContentView(R.layout.main);   
+        btnCreateDB = (Button) this.findViewById(R.id.btnCreateDB);   
+        btnCreateDB.setOnClickListener(new ClickEvent());   
+  
+        btnInsert = (Button) this.findViewById(R.id.btnInsertRec);   
+        btnInsert.setOnClickListener(new ClickEvent());   
+  
+        btnClose = (Button) this.findViewById(R.id.btnClose);   
+        btnClose.setOnClickListener(new ClickEvent());   
+  
+        table=new GVTable(this);   
+        table.gvSetTableRowCount(8);//设置每个分页的ROW总数   
+        LinearLayout ly = (LinearLayout) findViewById(R.id.MainLinearLayout);   
+  
+        table.setTableOnClickListener(new GVTable.OnTableClickListener() {   
+            @Override  
+            public void onTableClickListener(int x,int y,Cursor c) {   
+                c.moveToPosition(y);   
+                String str=c.getString(x)+" 位置:("+String.valueOf(x)+","+String.valueOf(y)+")";   
+                Toast.makeText(testSQLite.this, str, 1000).show();   
+            }   
+  
+        });   
+        table.setOnPageSwitchListener(new GVTable.OnPageSwitchListener() {   
+               
+            @Override  
+            public void onPageSwitchListener(int pageID,int pageCount) {   
+                String str="共有"+String.valueOf(pageCount)+   
+                " 当前第"+String.valueOf(pageID)+"页";   
+                Toast.makeText(testSQLite.this, str, 1000).show();   
+            }   
+        });   
+           
+        ly.addView(table);   
+    }   
+  
+    class ClickEvent implements View.OnClickListener {   
+  
+        @Override  
+        public void onClick(View v) {   
+            if (v == btnCreateDB) {   
+                CreateDB();   
+            } else if (v == btnInsert) {   
+                InsertRecord(16);//插入16条记录   
+  
+                table.gvUpdatePageBar("select count(*) from " + TABLE_NAME,db);   
+                table.gvReadyTable("select * from " + TABLE_NAME,db);   
+            }else if (v == btnClose) {   
+                table.gvRemoveAll();   
+                db.close();   
+                   
+            }   
+        }   
+    }   
+       
+    /**  
+     * 在内存创建数据库和数据表  
+     */  
+    void CreateDB() {   
+        // 在内存创建数据库   
+        db = SQLiteDatabase.create(null);   
+        Log.e("DB Path", db.getPath());   
+        String amount = String.valueOf(databaseList().length);   
+        Log.e("DB amount", amount);   
+        // 创建数据表   
+        String sql = "CREATE TABLE " + TABLE_NAME + " (" +    
+                ID  + " text not null, " + NAME + " text not null," +   
+                ADDRESS + " text not null, " + PHONE + " text not null," +   
+                AGE + " text not null "+");";   
+        try {   
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);   
+            db.execSQL(sql);   
+        } catch (SQLException e) {}   
+    }   
+  
+    /**  
+     * 插入N条数据  
+     */  
+    void InsertRecord(int n) {   
+        int total = id + n;   
+        for (; id < total; id++) {   
+            String sql = "insert into " + TABLE_NAME + " (" +    
+            ID + ", " + NAME+", " + ADDRESS+", " + PHONE+", "+AGE   
+                    + ") values('" + String.valueOf(id) + "', 'man','address','123456789','18');";   
+            try {   
+                db.execSQL(sql);   
+            } catch (SQLException e) {   
+            }   
+        }   
+    }   
+       
+       
+  
+}  
+package com.testSQLite;
+
+import android.app.Activity;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
+public class testSQLite extends Activity {
+	GVTable table;
+	Button btnCreateDB, btnInsert, btnClose;
+	SQLiteDatabase db;
+	int id;//添加记录时的id累加标记，必须全局
+
+	private static final String TABLE_NAME = "stu";
+	private static final String ID = "id";
+	private static final String NAME = "name";
+	private static final String PHONE = "phone";
+	private static final String ADDRESS = "address";
+	private static final String AGE = "age";
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		btnCreateDB = (Button) this.findViewById(R.id.btnCreateDB);
+		btnCreateDB.setOnClickListener(new ClickEvent());
+
+		btnInsert = (Button) this.findViewById(R.id.btnInsertRec);
+		btnInsert.setOnClickListener(new ClickEvent());
+
+		btnClose = (Button) this.findViewById(R.id.btnClose);
+		btnClose.setOnClickListener(new ClickEvent());
+
+		table=new GVTable(this);
+		table.gvSetTableRowCount(8);//设置每个分页的ROW总数
+		LinearLayout ly = (LinearLayout) findViewById(R.id.MainLinearLayout);
+
+		table.setTableOnClickListener(new GVTable.OnTableClickListener() {
+			@Override
+			public void onTableClickListener(int x,int y,Cursor c) {
+				c.moveToPosition(y);
+				String str=c.getString(x)+" 位置:("+String.valueOf(x)+","+String.valueOf(y)+")";
+				Toast.makeText(testSQLite.this, str, 1000).show();
+			}
+
+		});
+		table.setOnPageSwitchListener(new GVTable.OnPageSwitchListener() {
+			
+			@Override
+			public void onPageSwitchListener(int pageID,int pageCount) {
+				String str="共有"+String.valueOf(pageCount)+
+				" 当前第"+String.valueOf(pageID)+"页";
+				Toast.makeText(testSQLite.this, str, 1000).show();
+			}
+		});
+		
+		ly.addView(table);
+	}
+
+	class ClickEvent implements View.OnClickListener {
+
+		@Override
+		public void onClick(View v) {
+			if (v == btnCreateDB) {
+				CreateDB();
+			} else if (v == btnInsert) {
+				InsertRecord(16);//插入16条记录
+
+				table.gvUpdatePageBar("select count(*) from " + TABLE_NAME,db);
+				table.gvReadyTable("select * from " + TABLE_NAME,db);
+			}else if (v == btnClose) {
+				table.gvRemoveAll();
+				db.close();
+				
+			}
+		}
+	}
+	
+	/**
+	 * 在内存创建数据库和数据表
+	 */
+	void CreateDB() {
+		// 在内存创建数据库
+		db = SQLiteDatabase.create(null);
+		Log.e("DB Path", db.getPath());
+		String amount = String.valueOf(databaseList().length);
+		Log.e("DB amount", amount);
+		// 创建数据表
+		String sql = "CREATE TABLE " + TABLE_NAME + " (" + 
+		        ID	+ " text not null, " + NAME + " text not null," +
+		        ADDRESS	+ " text not null, " + PHONE + " text not null," +
+		        AGE	+ " text not null "+");";
+		try {
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+			db.execSQL(sql);
+		} catch (SQLException e) {}
+	}
+
+	/**
+	 * 插入N条数据
+	 */
+	void InsertRecord(int n) {
+		int total = id + n;
+		for (; id < total; id++) {
+			String sql = "insert into " + TABLE_NAME + " (" + 
+			ID + ", " + NAME+", " + ADDRESS+", " + PHONE+", "+AGE
+					+ ") values('" + String.valueOf(id) + "', 'man','address','123456789','18');";
+			try {
+				db.execSQL(sql);
+			} catch (SQLException e) {
+			}
+		}
+	}
+	
+	
+
+} 
+
+分页表格控件GVTable.java的源码：
+
+view plaincopy to clipboardprint?
+package com.testSQLite;   
+  
+import java.util.ArrayList;   
+import java.util.HashMap;   
+import android.content.Context;   
+import android.database.Cursor;   
+import android.database.sqlite.SQLiteDatabase;   
+import android.view.View;   
+import android.widget.AdapterView;   
+import android.widget.GridView;   
+import android.widget.LinearLayout;   
+import android.widget.SimpleAdapter;   
+import android.widget.AdapterView.OnItemClickListener;   
+  
+public class GVTable extends LinearLayout {   
+    protected GridView gvTable,gvPage;     
+    protected SimpleAdapter saPageID,saTable;// 适配器   
+    protected ArrayList<HashMap<String, String>> srcPageID,srcTable;// 数据源   
+       
+    protected int TableRowCount=10;//分页时，每页的Row总数   
+    protected int TableColCount=0;//每页col的数量   
+  
+    protected SQLiteDatabase db;   
+    protected String rawSQL="";   
+    protected Cursor curTable;//分页时使用的Cursor   
+    protected OnTableClickListener clickListener;//整个分页控件被点击时的回调函数   
+    protected OnPageSwitchListener switchListener;//分页切换时的回调函数   
+       
+    public GVTable(Context context) {   
+        super(context);   
+        this.setOrientation(VERTICAL);//垂直   
+        //----------------------------------------   
+        gvTable=new GridView(context);   
+        addView(gvTable, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,   
+                LayoutParams.WRAP_CONTENT));//宽长式样   
+           
+        srcTable = new ArrayList<HashMap<String, String>>();   
+        saTable = new SimpleAdapter(context,   
+                srcTable,// 数据来源   
+                R.layout.items,//XML实现   
+                new String[] { "ItemText" },// 动态数组与ImageItem对应的子项   
+                new int[] { R.id.ItemText });   
+        // 添加并且显示   
+        gvTable.setAdapter(saTable);   
+        gvTable.setOnItemClickListener(new OnItemClickListener(){   
+            @Override  
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,   
+                    long arg3) {   
+                int y=arg2/curTable.getColumnCount()-1;//标题栏的不算   
+                int x=arg2 % curTable.getColumnCount();   
+                if (clickListener != null//分页数据被点击   
+                        && y!=-1) {//点中的不是标题栏时   
+                    clickListener.onTableClickListener(x,y,curTable);   
+                }   
+            }   
+        });   
+           
+        //----------------------------------------   
+        gvPage=new GridView(context);   
+        gvPage.setColumnWidth(40);//设置每个分页按钮的宽度   
+        gvPage.setNumColumns(GridView.AUTO_FIT);//分页按钮数量自动设置   
+        addView(gvPage, new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,   
+                LayoutParams.WRAP_CONTENT));//宽长式样   
+        srcPageID = new ArrayList<HashMap<String, String>>();   
+        saPageID = new SimpleAdapter(context,   
+                srcPageID,// 数据来源   
+                R.layout.items,//XML实现   
+                new String[] { "ItemText" },// 动态数组与ImageItem对应的子项   
+                new int[] { R.id.ItemText });   
+  
+        // 添加并且显示   
+        gvPage.setAdapter(saPageID);   
+        // 添加消息处理   
+        gvPage.setOnItemClickListener(new OnItemClickListener(){   
+            @Override  
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,   
+                    long arg3) {   
+                LoadTable(arg2);//根据所选分页读取对应的数据   
+                if(switchListener!=null){//分页切换时   
+                    switchListener.onPageSwitchListener(arg2,srcPageID.size());   
+                }   
+            }   
+        });   
+    }   
+  
+    /**  
+     * 清除所有数据  
+     */  
+    public void gvRemoveAll()   
+    {   
+        if(this.curTable!=null)   
+            curTable.close();   
+        srcTable.clear();   
+        saTable.notifyDataSetChanged();   
+       
+        srcPageID.clear();   
+        saPageID.notifyDataSetChanged();   
+           
+    }   
+    /**  
+     * 读取指定ID的分页数据,返回当前页的总数据  
+     * SQL:Select * From TABLE_NAME Limit 9 Offset 10;  
+     * 表示从TABLE_NAME表获取数据，跳过10行，取9行  
+     * @param pageID 指定的分页ID  
+     */  
+    protected void LoadTable(int pageID)   
+    {   
+        if(curTable!=null)//释放上次的数据   
+            curTable.close();   
+           
+        String sql= rawSQL+" Limit "+String.valueOf(TableRowCount)+ " Offset " +String.valueOf(pageID*TableRowCount);   
+        curTable = db.rawQuery(sql, null);   
+           
+        gvTable.setNumColumns(curTable.getColumnCount());//表现为表格的关键点！   
+        TableColCount=curTable.getColumnCount();   
+        srcTable.clear();   
+        // 取得字段名称   
+        int colCount = curTable.getColumnCount();   
+        for (int i = 0; i < colCount; i++) {   
+            HashMap<String, String> map = new HashMap<String, String>();   
+            map.put("ItemText", curTable.getColumnName(i));   
+            srcTable.add(map);   
+        }   
+           
+        // 列举出所有数据   
+        int recCount=curTable.getCount();   
+        for (int i = 0; i < recCount; i++) {//定位到一条数据   
+            curTable.moveToPosition(i);   
+            for(int ii=0;ii<colCount;ii++)//定位到一条数据中的每个字段   
+            {   
+                HashMap<String, String> map = new HashMap<String, String>();   
+                map.put("ItemText", curTable.getString(ii));   
+                srcTable.add(map);   
+            }   
+        }   
+           
+        saTable.notifyDataSetChanged();   
+    }   
+  
+    /**  
+     * 设置表格的最多显示的行数  
+     * @param row 表格的行数  
+     */  
+    public void gvSetTableRowCount(int row)   
+    {   
+        TableRowCount=row;   
+    }   
+       
+    /**  
+     * 取得表格的最大行数      
+     * @return 行数  
+     */  
+    public int gvGetTableRowCount()   
+    {   
+        return TableRowCount;   
+    }   
+       
+    /**  
+     * 取得当前分页的Cursor  
+     * @return 当前分页的Cursor  
+     */  
+    public Cursor gvGetCurrentTable()   
+    {   
+        return curTable;   
+    }   
+           
+    /**  
+     * 准备分页显示数据  
+     * @param rawSQL sql语句  
+     * @param db 数据库  
+     */  
+    public void gvReadyTable(String rawSQL,SQLiteDatabase db)   
+    {   
+        this.rawSQL=rawSQL;   
+        this.db=db;   
+    }   
+       
+    /**  
+     * 刷新分页栏，更新按钮数量  
+     * @param sql SQL语句  
+     * @param db 数据库  
+     */  
+    public void gvUpdatePageBar(String sql,SQLiteDatabase db)   
+    {   
+        Cursor rec = db.rawQuery(sql, null);   
+        rec.moveToLast();   
+        long recSize=rec.getLong(0);//取得总数   
+        rec.close();   
+        int pageNum=(int)(recSize/TableRowCount) + 1;//取得分页数   
+           
+        srcPageID.clear();   
+        for (int i = 0; i < pageNum; i++) {   
+            HashMap<String, String> map = new HashMap<String, String>();   
+            map.put("ItemText", "No." + String.valueOf(i));// 添加图像资源的ID   
+  
+            srcPageID.add(map);   
+        }   
+        saPageID.notifyDataSetChanged();   
+    }   
+  
+    //---------------------------------------------------------   
+    /**  
+     * 表格被点击时的回调函数  
+     */  
+    public void setTableOnClickListener(OnTableClickListener click) {   
+        this.clickListener = click;   
+    }   
+       
+    public interface OnTableClickListener {   
+        public void onTableClickListener(int x,int y,Cursor c);   
+    }   
+    //---------------------------------------------------------   
+    /**  
+     * 分页栏被点击时的回调函数  
+     */  
+    public void setOnPageSwitchListener(OnPageSwitchListener pageSwitch) {   
+        this.switchListener = pageSwitch;   
+    }   
+    public interface OnPageSwitchListener {   
+        public void onPageSwitchListener(int pageID,int pageCount);   
+    }   
+}  
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/hellogv/archive/2010/11/18/6019301.aspx
