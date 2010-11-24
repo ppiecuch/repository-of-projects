@@ -1,0 +1,108 @@
+April 5, 2005 
+
+Introduction 
+There comes a time in every 3D game where the user needs to click on something in the scene. Maybe he needs to select a unit in an RTS, or open a door in an RPG, or delete some geometry in a level editing tool. This conceptually simple task is easy to screw up since there are so many little steps that can go wrong. 
+
+The problem is this: given the mouse's position in window coordinates, how can I determine what object in the scene the user has selected with a mouse click? 
+
+One method is to generate a ray using the mouse's location and then intersect it with the world geometry, finding the object nearest to the viewer. Alternatively we can determine the actual 3-D location that the user has clicked on by sampling the depth buffer (giving us (x,y,z) in viewport space) and performing an inverse transformation. Technically there is a third approach, using a selection or object ID buffer, but this has numerous limitations that makes it impractical for widespread use. 
+
+This article describes using the inverse transformation to derive world space coordinates from the mouse's position on screen. 
+
+Before we worry about the inverse transformation, we need to establish how the standard forward transformation works in a typical graphics pipeline. 
+
+The View Transformation 
+The standard view transformation pipeline takes a point in model space and transforms it all the way to viewport space (sometimes known as window coordinates) or, for systems without a window system, screen coordinates. It does this by transforming the original point through a series of coordinate systems: 
+
+ 
+Not each step is discrete. OpenGL has the GL_MODELVIEW matrix, M, that transforms a point from model space to view space, using a right-handed coordinate system with +Y up, +X to the right, and -Z into the screen. 
+
+ 
+Another matrix, GL_PROJECTION, then transforms the point from view space to homogeneous clipping space. Clip space is a right-handed coordinate system (+Z into the screen) contained within a canonical clipping volume extending from (-1,-1,-1) to (+1,+1,+1): 
+
+ 
+After clipping is performed the perspective divide transforms the homogeneous coordinate to a Cartesian point in normalized device space. Normalized device coordinates are left-handed, with w = 1, and are contained within the canonical view frustum from (-1,-1,-1) to (+1,+1,+1): 
+
+ 
+Finally there is the viewport scale and translation, which transforms the normalized device coordinate into viewport (window) coordinates. Another axis inversion occurs here; this time +Y goes down instead of up (some window systems may place the origin at another location, such as the bottom left of the window, so this isn't always true). Viewport depth values are calculated by rescaling normalized device coordinate Z values from the range (-1,1) to (0,1), with 0 at the near clip plane and 1 at the far clip plane. Note: any user specified depth bias may impact our calculations later. 
+
+ 
+This pipeline allows us to take a model space point, apply a series of transformation, and get a window space point at the end. 
+
+Our ultimate goal is to transform the mouse position (in window space) all the way back to world space. Since we're not rendering a model, model space and and world space are the same thing. 
+
+The Inverse View Transformation 
+To go from mouse coordinate to world coordinates we have to do the exact opposite of the view transformation: 
+
+ 
+That's a lot of steps, and it's easy to screw up, and if you screw up just a little that's enough to blow everything apart. 
+
+Viewport to NDC to Clip 
+The first step is to transform the viewport coordinates into clip coordinates. The viewport transformation takes a normalized device coordinate and transforms it into a viewport coordinate: 
+
+ 
+So we need to do the inverse of this process by rearranging to solve for n: 
+
+ 
+Okay, not so bad. The only real question is the z component of v. We can either calculate that value by reading it back from the framebuffer, or ignore it by substituting 0, in which case we'll be computing a ray passing through v that we'll then have to intersect with world geometry to find the corresponding point in 3-space. 
+
+From here we need to go to clip coordinates, which, if you recall, are the homogeneous versions of the NDC coordinates (i.e. w != 1.0). Since w is already 1.0 and the transformation back to clip coordinates is a scale by w, this step can be skipped and we can assume that our NDC coordinates are the same as our clip coordinates. 
+
+Clipping Space to View Space 
+A point in view space is transformed to clipping space with the GL_PROJECTION matrix: 
+
+ 
+Given this we can do the opposite by multiplying the clipping space coordinate by the inverse of the GL_PROJECTION matrix. This isn't as bad as it sounds since we can avoid computing a true 4x4 matrix inverse if we just construct the inverse projection matrix at the same time we build the projection matrix. 
+
+A typical OpenGL projection matrix takes the form: 
+
+ 
+The specific coefficient values depend on the nature of the perspective projection matrix (for more information I recommend you look at the documentation for gluPerspective. These co-efficients should scale and bias the x, y, and z components of a point while assigning -z to w. 
+
+To transform from view coordinates to clip coordinates: 
+
+ 
+So solving for v we get: 
+
+ 
+Encoding the viewspace to clipspace transformation in a matrix yields the inverse projection matrix: 
+
+ 
+Computing the view coordinate from a clip coordinate is now: 
+
+ 
+There's no guarantee that w will be 1, so we'll want to rescale appropriately: 
+
+ 
+Viewspace to Modelspace 
+Finally we just need to go from view coordinates to world coordinates by multiplying the view coordinates against the inverse of the modelview matrix. Again we can avoid doing a true inverse if we just logically break down what the modelview transform accomplishes when working with the camera: it is a translation (centering the universe around the camera) and then a rotation (to reflect the camera's orientation). The inverse of this is reversed rotation (accomplished with a transpose) followed by a translation with the negation of the modelview matrix's translation component after it has been rotated by the inverse rotation. 
+
+If given our initial modelview matrix M, consisting of a 3x3 rotation submatrix R and a 3-element translation vector t: 
+
+ 
+Then we can construct the inverse modelview using the transpose of the rotation submatrix and the camera's translation vector: 
+
+ 
+If you're specifying the modelview matrix directly, for example by calling glLoadMatrix, then you already have it lying around and you can build the inverse as described earlier. If, on the other hand, the modelview matrix is built dynamically using something like gluLookAt or a sequence of glTranslate, glRotate, and glScale calls, you can use glGetFloatv to retrieve the current modelview matrix. 
+
+Now that we have the inverse modelview matrix we can use it to transform our view coordinate into world space: 
+
+ 
+If the depth value under the mouse was used to construct the original viewport coordinate, then w should correspond to the point in 3-space where the user clicked. If the depth value was not read then we have an arbitrary point in space with which we can construct a ray from the viewer's position: 
+
+ 
+However, there's a trick we can use to skip the above altogether. Setting v_w to 0 in the view to world transformation right before the inverse modelview transformation ensures any translation components are removed. This means we'll be taking a ray in view coordinates and getting a ray back in world coordinates. Of course this is only relevant if we're trying to compute a pick ray instead of back projecting an actual point in space. 
+
+Picking 
+We should now have one of two things: either an actual point in world space corresponding to the location of the mouse click, or a world space ray representing the direction of the mouse click. 
+
+If we have an actual point we can search against all geometry in the world and see which piece it's closest to. If we have the ray, then we'll need to perform an intersection test between the ray and the world geometry and find the geometry closest to the near Z clip plane. Either method should be reasonably simple to implement. 
+
+Conclusion 
+Picking objects in a 3D scene using a mouse is a common task, but there are very few papers that describe pragmatic approaches to accomplishing this. Hopefully this paper helps someone trying to muddle through this on their own, God knows I could have used it a few weeks ago. 
+
+Greets 
+A shout out and greets to my boys Casey Muratori and Nicholas Vining for helping me sort through this shit and hopefully not sounding like a dumbass. Yo. 
+
+
+http://trac.bookofhook.com/bookofhook/trac.cgi/wiki/MousePicking
