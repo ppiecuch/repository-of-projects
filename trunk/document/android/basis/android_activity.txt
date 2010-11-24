@@ -1,0 +1,131 @@
+　Activities是由Activity stack管理的。当一个新的Activity被启动，它就会处于stack的top位置，成为当前运行的Activity。而前一个Activity依然保留在stack里面，当需要调用这个Activity时就会回到stack的top位置成为当前运行的Activity。
+
+　　一个Activity有4个基本状态：
+
+　　1. active / running 状态，当Activity处于当前屏幕时;
+
+　　2. paused 状态，当Activity失去焦点但对用户依然可见时;即是，一个非全屏或者透明的Activity在该Activity的屏幕上面，并成为了当前的焦点。而paused的Activity依然是alive状态的，它保留着所有的状态和成员信息并连接至窗口管理器，但当系统处于极低内存的情况下，仍然可以杀死这个Activity。
+
+　　3. stopped 状态，当Activity完全被另一个Activity覆盖时;它仍然保留所有的状态和成员信息。但它不再被用户可见，所以它的窗口将被隐藏，当其它地方需要内存，则系统经常会杀死这个Activity。
+
+　　4. 当Activity是paused或者stopped状态时，系统可以通过要求它结束(调用它的finish()方法)或直接杀死它的进程来将它驱出内存。当它再次为用户可见的时候，它只能完全重新启动并恢复至以前的状态。
+
+　　怎么来理解Activity的状态及其生命周期呢?引用网友的解释：
+
+　　“由于手机应用的一些特殊性，所以我们需要更多的去关注各个Android Component的运行时生命周期模型。(所谓手机应用的特殊性主要是指这样2点： 1. 手机应用的大多数情况下我们只能在手机上看到一个程序的一个界面，用户除了通过程序界面上的功能按钮来在不同的窗体间切换，还可以通过Back键和Home键来返回上一个窗口，而用户使用Back或者Home的时机是非常不确定的，任何时候用户都可以使用Home或Back来强行切换当前的界面。 2. 往往手机上一些特殊的事件发生也会强制的改变当前用户所处的操作状态，例如无论任何情况，在手机来电时，系统都会优先显示电话接听界面。)了解这些 Component的生命周期模型一方面是让我们对软件在手机中的运行情况做到心中有数，更重要的，对于程序开发来说，生命周期中的每一个关键事件都会有我们可以覆写于各种Component对应基类型的事件处理方法，了解各Component的生命周期就是让我们在开发程序时明白我们该怎样去编写各种事件的处理代码。”
+
+　　“由于前面已经说到的手机应用的特殊性，一个Activity很可能被强制交换到后台(交换到后台就是指该窗体不再对用户可见，但实际上又还是存在于某个Task中的，比如一个新的Activity压入了当前的Task从而“遮盖”住了当前的Activity，或者用户按了 Home键回到桌面，又或者其他重要事件发生导致新的Activity出现在当前Activity之上，比如来电界面)，而如果此后用户在一段时间内没有重新查看该窗体(Android 通过长按Home键可以选择最近运行的6个程序，或者用户直接再次点击程序的运行图标，如果窗体所在的Task和进程没有被系统销毁，则不用重新加载 Process, Task和Task中的Activity， 直接重新显示Task顶部的Activity，这就称之为重新查看某个程序的窗体)，该窗体连同其所在的Task和Process则可能已经被系统自动销毁了，此时如果再次查看该窗体，则要重新执行 onCreate事件初始化窗体。而这个时候我们可能希望用户继续上次打开该窗体时的操作状态进行操作，而不是一切从头开始。例如用户在编辑短信时突然来电，接完电话后用户又去做了一些其他的事情，比如保存来电号码到联系人，而没有立即回到短信编辑界面，导致了短信编辑界面被销毁，当用户重新进入短信程序时他可能希望继续上次的编辑。这种情况我们就可以覆写Activity的void onSaveInstanceState(Bundle outState)事件，通过向outState中写入一些我们需要在窗体销毁前保存的状态或信息，这样在窗体重新执行onCreate的时候，则会通过 savedInstanceState将之前保存的信息传递进来，此时我们就可以有选择的利用这些信息来初始化窗体，而不是一切从头开始。”
+
+　　下面官方提供的这幅图，描述了Activity生命周期的整个过程：
+
+
+　　可以看到，以上有3个关键的生命周期循环：
+
+　　1. 一个activity 完整的生命周期 自第一次调用 onCreate(Bundle)开始，直至调用onDestroy()为止。activity在onCreate()中设置所有"全局"状态以完成初始化，而在onDestroy()中释放所有系统资源。比如说，如果activity有一个线程在后台运行以从网络上下载数据，它会以 onCreate()创建那个线程，而以 onDestroy()销毁那个线程。
+
+　　2. 一个activity的 可视生命周期 自 onStart() 调用开始直到相应的 onStop()调用。在此期间，用户可以在屏幕上看到此activity，尽管它也许并不是位于前台或者正在与用户做交互。在这两个方法中，你可以管控用来向用户显示这个activity的资源。比如说，你可以在onStart() 中注册一个BroadcastReceiver 来监控会影响到你UI的改变，而在onStop() 中来取消注册，这时用户是无法看到你的程序显示的内容的。onStart() 和 onStop() 方法可以随着应用程序是否为用户可见而被多次调用。
+
+　　3. 一个activity的 前台生命周期 自 onResume() 调用起，至相应的 onPause()调用为止。在此期间，activity位于前台最上面并与用户进行交互。activity会经常在暂停和恢复之间进行状态转换──比如说当设备转入休眠状态或有新的activity启动时，将调用onPause() 方法。当activity获得结果或者接收到新的intent的时候会调用onResume() 方法。因此，在这两个方法中的代码应当是轻量级的。
+
+　　当一个activity从这个状态转变到另一个状态时，它被以下列protected方法所通知：
+
+　　public class Activity extends ApplicationContext { protected void onCreate(Bundle savedInstanceState); protected void onStart(); protected void onRestart(); protected void onResume(); protected void onPause(); protected void onStop(); protected void onDestroy(); }
+
+　　我们可以重载所有这些方法以在状态改变时进行合适的工作。所有的activity都必须实现 onCreate() 用以当对象第一次实例化时进行初始化设置。很多activity会实现 onPause()以提交数据变化或准备停止与用户的交互。
+
+　　要注意的是，onPause()，onStop()，onDestory()这3个方法是可以被系统直接kill的，当系统内存不足的时候。而平常从一个activity转向/回到另一个activity时，当新activity是full screen(弹出窗口，例如AlertDialog是不算的)的时候就会call 前一个activity的onPause()，然后call onStop()，而无论onPause或者onStop，都有可能被kill，所以一般在onPause就会执行savedata操作将所有持久性数据(比如用户的编辑结果)写入存储之中。
+
+　　现在我们来看看两个activity在同一个进程内的调用情况：
+
+　　1. 调用当前activity的 onPause() 方法。
+
+　　2. 接着调用新启动activity的onCreate()、 onStart()和onResume()方法。
+
+　　3. 然后，如果启动的activity不再于屏幕上可见，则调用它的onStop()方法。
+
+　　以下我使用Logcat记录下来的Activity调用过程中的方法调用顺序：
+
+　　1. 点击按钮去启动 Activity1，就会看到
+
+　　05-08 09:39:48.389: DEBUG/Activity1(313): onCreate Activity 1 05-08 09:39:48.399: DEBUG/Activity1(313): onStart Activity 1 05-08 09:39:48.399: DEBUG/Activity1(313): onResume Activity 1
+
+　　这说明一般Activity的启动顺序是onCreate -> onStart -> onResume
+
+　　2. 点击back返回键后
+
+　　05-08 09:40:04.129: DEBUG/Activity1(313): onPause Activity 1 05-08 09:40:04.628: DEBUG/Activity1(313): onStop Activity 1 05-08 09:40:04.659: DEBUG/Activity1(313): onDestory Activity 1
+
+　　退出当前Activity时，onPause -> onStop -> onDestory
+
+　　3. 再次启动Activity
+
+　　05-08 09:40:18.249: DEBUG/Activity1(313): onCreate Activity 1 05-08 09:40:18.249: DEBUG/Activity1(313): onStart Activity 1 05-08 09:40:18.259: DEBUG/Activity1(313): onResume Activity 1
+
+　　和一般启动的顺序是一样的
+
+　　4. 从Activity1启动Acitivity2
+
+　　05-08 09:40:25.477: DEBUG/Activity1(313): onPause Activity 1 05-08 09:40:25.687: DEBUG/Activity2(313): onCreate Activity 2 05-08 09:40:25.687: DEBUG/Activity2(313): onStart Activity 2 05-08 09:40:25.719: DEBUG/Activity2(313): onResume Activity 2 05-08 09:40:26.277: DEBUG/Activity1(313): onStop Activity 1
+
+　　Activity1.onPause -> Activity2.onCreate -> Activity2.onStart -> Activity2.onResume ->Activity1.onStop
+
+　　5. 点击Home键回到桌面
+
+　　05-08 09:40:31.777: DEBUG/Activity2(313): onPause Activity 2 05-08 09:40:32.658: DEBUG/Activity2(313): onStop Activity 2
+
+　　Activity2.onPause - > Activity2.onStop
+
+　　6. 回到原来的程序
+
+　　05-08 09:40:50.429: INFO/ActivityManager(58): Starting activity: Intent ... 05-08 09:40:50.649: DEBUG/Activity2(313): onRestart Activity 2 05-08 09:40:50.649: DEBUG/Activity2(313): onStart Activity 2 05-08 09:40:50.769: DEBUG/Activity2(313): onResume Activity 2
+
+　　Activity2.onRestart -> Activity2.onStart -> Activity2.onResume
+
+　　7. 点击comfirm, setResult(RESULT_OK)，Activity2.finish()，返回到Activity1
+
+　　05-08 09:41:04.928: DEBUG/Activity2(313): onPause Activity 2 05-08 09:41:04.988: DEBUG/Activity1(313): onRestart Activity 1 05-08 09:41:04.998: DEBUG/Activity1(313): onStart Activity 1 05-08 09:41:04.998: DEBUG/Activity1(313): onResume Activity 1 05-08 09:41:05.419: DEBUG/Activity2(313): onStop Activity 2 05-08 09:41:05.469: DEBUG/Activity2(313): onDestory Activity 2
+
+　　Activity2.onPause - > Activity1.onRestart - > Activity1.onStart - > Activity1.onResume - > Activity2.onStop
+
+　　8. 点击back返回键后
+
+　　05-08 09:41:51.868: DEBUG/Activity1(313): onPause Activity 1 05-08 09:41:52.428: DEBUG/Activity1(313): onStop Activity 1 05-08 09:41:52.468: DEBUG/Activity1(313): onDestory Activity 1
+
+　　Activity1 退出：onPause -> onStop -> onDestory
+
+　　保存activity状态
+
+　　保存activity状态，是为了方便用户重新打开程序时，能够回到上次离开时的状态。这里面涉及到的方法有：
+
+　　protected void onSaveInstanceState (Bundle outState)
+
+　　protected void onRestoreInstanceState (Bundle savedInstanceState)
+
+　　当一个Activity被kill之前，它可以调用onSaveInstanceState()来保存当前activity的状态信息，它会将一个以名称-值对方式记录了activity动态状态的Bundle对象传递给该方法。当activity再次启动时，这个Bundle会传递给onCreate()方法和随着onStart()方法调用的 onRestoreInstanceState()。这两个方法的内容一般是把要临时保存的数据放到Bundle里面，或者从里面拿出来。
+
+　　要注意的是，onSaveInstanceState() 和 onRestoreInstanceState() 并不是生命周期方法。它们并不是总会被调用。比如说，Android会在activity易于被系统销毁之前调用 onSaveInstanceState()，但用户动作(比如按下了BACK键)造成的销毁则不调用。在这种情况下，用户没打算再次回到这个 activity，所以没有保存状态的必要。因为onSaveInstanceState()不是总被调用，所以你应该只用它来为activity保存一些临时的状态，而不能用来保存持久性数据。而是应该用onPause()来达到这个目的：?在onPause()里面调用自定义命名的函数saveState()，在saveState里面保存数据到数据库。
+
+　　Logcat的使用
+
+　　1. import android.util.Log;
+
+　　2. private static final String TAG = "Activity1"; 设置TAG
+
+　　3. Log.d(TAG, message); log记录信息
+　其中Log.v() : VERBOSE
+
+　　Log.d() : DEBUG
+
+　　Log.i() : INFO
+
+　　Log.w() : WARN
+
+　　Log.e() : ERROR
+
+　　以上log的级别依次升高，Debug信息应当只存在于开发中，INFO、 WARN、ERROR这3种log将出现在发布版本中。
+
+　　4. 在Eclipse查看Log:
+
+　　在菜单Window-> Show View选择other，在弹出的窗口中选择Android里面的LogCat，ok，就会看到LogCat窗口，在Filter那里可以输入过滤的词语，一般是输入TAG的内容，这样子可以直接看到有关这个TAG的Log。
+
+
