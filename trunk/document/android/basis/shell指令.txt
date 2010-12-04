@@ -101,3 +101,15 @@ adb push <path>/背景01.pcm /sdcard/Zhaocha
 <path>为 D:/res 等
 
 成功后，在/sdcard/Zhaocha下只找得到01.pcm，中文已无效
+
+
+在Android模拟器上使用sd card 
+
+生成sdcard镜像文件:
+
+mksdcard: create a blank FAT32 image to be used with the Android emulator
+   usage: mksdcard [-l label] < size> < file>   
+   if < size> is a simple integer, it specifies a size in bytes   
+   if < size> is an integer followed by 'K', it specifies a size in KiB   
+   if < size> is an integer followed by 'M', it specifies a size in MiB   
+   D:\android-sdk\tools>mksdcard.exe -l sdcard 2048M sdcard.img  
