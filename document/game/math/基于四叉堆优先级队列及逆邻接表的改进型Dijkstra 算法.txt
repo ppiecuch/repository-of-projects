@@ -1,0 +1,472 @@
+摘　　要:
+在深入分析传统Ｄｉｊｋｓｔｒａ算法的基础上，提出了利用基于ｋ叉堆的优先级队列对算法进行改进的思想，并对３种可合并替进行了比较，从理论上证明了四叉堆在ｋ叉堆中的最优性，设计了基于四叉堆优先级队列及逆领接表，顾及路段方向阻抗的改进型Ｄｉｊｋｓｔｒａ最短径算法，将Ｄｉｊｓｔｒａ算法复杂度降为Ｏ（ｎｌｏｇｎ）。
+堆与优先级队列
+文章分类:综合技术 
+优先级队列是一种数据结构，其中能被访问和删除的是仅具有最高优先级的元素。所谓优先级是通过一些方法对元素进行比较得出的。基本的思路是队列中存在等待服务的元素。对元素的选取不再严格基于先来先服务原则。 
+
+
+定义如下：优先级队列是这样的一种数据结构，对它的访问或者删除操作只能对集合中通过指定优先级方法得出的最高优先级元素进行。 
+
+
+优先级队列是公平的，对于任何两个具有相同优先级的元素，首先被删除的是那个在队列中存在时间最长的元素。如果元素是Integer类型且按照其排列的顺序进行比较，那么具有最高优先级的元素就是优先级队列中相应的int值最小的那个元素。如果元素是Integer类型，但是比较方法与原排列顺序相反，那么具有最高优先级的元素就是优先级队列中相应的int值最大的元素。到底是最小的还是最大的元素优先，具体的优先比较算法由实现PriorityQueue接口的程序员来决定。 
+
+
+那么堆与优先级队列又有什么关系呢，实质上堆可用来实现优先级队列，或者说堆就是一种优先级队列。由于堆的添加元素与删除元素时都会破坏堆结构，所以添加与删除进都要进行结构调整。一般普通的队列添加是在最后加入，但优先级队列却不一定添加到最后，他会按照优先级算法把它插入到队列当中去，出队时还是从第一个（也即最小元素，优先级最高）开始，即取根元素，这样保证了队列中优先级高的先服务，而不是先来先服务了。 
+
+Heap类是对PriorityQueue接口的一种高效实现。堆是一种完全二叉树。由于使用基于数组的完全二叉树的表示，可以根据子节点的索引快速计算出你父节点的索引，反之亦然，所以，使用数组来表示堆，它是利用了数组可以根据给定索引随机访问元素的特性。
+
+Java代码 
+package priorityqueue;    
+   
+/**   
+ * 优先级队列接口   
+ *    
+ * @author jzj   
+ * @data 2010-1-5   
+ * @param <E>   
+ */   
+public interface PriorityQueue<E extends Comparable<E>> {    
+    int size();    
+   
+    boolean isEmpty();    
+   
+    //向队列加入元素，添加时会按照优先级别排序    
+    void add(E elem);    
+   
+    //取优先高的元素    
+    E getMin();    
+   
+    //从优先级队列中删除优先级最高的元素    
+    E removeMin();    
+}   
+package priorityqueue;
+
+/**
+ * 优先级队列接口
+ * 
+ * @author jzj
+ * @data 2010-1-5
+ * @param <E>
+ */
+public interface PriorityQueue<E extends Comparable<E>> {
+	int size();
+
+	boolean isEmpty();
+
+	//向队列加入元素，添加时会按照优先级别排序
+	void add(E elem);
+
+	//取优先高的元素
+	E getMin();
+
+	//从优先级队列中删除优先级最高的元素
+	E removeMin();
+}
+  
+
+Java代码 
+package priorityqueue;    
+   
+import java.util.Comparator;    
+import java.util.LinkedList;    
+import java.util.ListIterator;    
+   
+/**   
+ * 基于 LinkedList 优先级队列的实现   
+ *    
+ * @author jzj   
+ * @data 2010-1-5   
+ * @param <E>   
+ */   
+public class LinkedListPriorityQueue<E extends Comparable<E>> implements PriorityQueue<E> {    
+    //LinkedList只用来存储，并不排序，排序操作由外界实现    
+    private LinkedList<E> list;    
+    private Comparator<E> comp;    
+   
+    public LinkedListPriorityQueue() {    
+        list = new LinkedList<E>();    
+    }    
+   
+    public LinkedListPriorityQueue(Comparator<E> c) {    
+        this();    
+        comp = c;    
+    }    
+   
+    private int compare(E elem1, E elem2) {    
+        return comp == null ? elem1.compareTo(elem2) : comp.compare(elem1, elem2);    
+    }    
+   
+    /**   
+     * 插队优先级实现   
+     * @param elem   
+     */   
+    public void add(E elem) {    
+        /*   
+         * 如果list本身为空，或者元素的值大于等于list中最后一个元素的值，add方法就把元素对象   
+         * 追加到list的末尾。否则，从头部逐个访问直到找到某个元素，该元素的值大于新增元素的值，   
+         * 然后将给定的元素插入到该元素的前面。   
+         */   
+        if (list.isEmpty() || compare(elem, list.get(list.size() - 1)) >= 0) {    
+            list.addLast(elem);    
+            //或 list.add(elem)，add方法其实就是在循环链最后即header头节点前添加元素    
+        } else {    
+            ListIterator<E> itr = list.listIterator();    
+            //找到第一个比它大的元素    
+            while (itr.hasNext() && compare(elem, itr.next()) >= 0)    
+                ;    
+            itr.previous();//因为迭代器的next方法取之后会下移，所以要后移一位    
+            itr.add(elem);//在比新元素大的节点前插入元素    
+        }    
+   
+    }    
+   
+    public E getMin() {    
+        return list.getFirst();    
+    }    
+   
+    public boolean isEmpty() {    
+   
+        return list.isEmpty();    
+    }    
+   
+    public E removeMin() {    
+        return list.removeFirst();    
+    }    
+   
+    public int size() {    
+        return list.size();    
+    }    
+}   
+package priorityqueue;
+
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.ListIterator;
+
+/**
+ * 基于 LinkedList 优先级队列的实现
+ * 
+ * @author jzj
+ * @data 2010-1-5
+ * @param <E>
+ */
+public class LinkedListPriorityQueue<E extends Comparable<E>> implements PriorityQueue<E> {
+	//LinkedList只用来存储，并不排序，排序操作由外界实现
+	private LinkedList<E> list;
+	private Comparator<E> comp;
+
+	public LinkedListPriorityQueue() {
+		list = new LinkedList<E>();
+	}
+
+	public LinkedListPriorityQueue(Comparator<E> c) {
+		this();
+		comp = c;
+	}
+
+	private int compare(E elem1, E elem2) {
+		return comp == null ? elem1.compareTo(elem2) : comp.compare(elem1, elem2);
+	}
+
+	/**
+	 * 插队优先级实现
+	 * @param elem
+	 */
+	public void add(E elem) {
+		/*
+		 * 如果list本身为空，或者元素的值大于等于list中最后一个元素的值，add方法就把元素对象
+		 * 追加到list的末尾。否则，从头部逐个访问直到找到某个元素，该元素的值大于新增元素的值，
+		 * 然后将给定的元素插入到该元素的前面。
+		 */
+		if (list.isEmpty() || compare(elem, list.get(list.size() - 1)) >= 0) {
+			list.addLast(elem);
+			//或 list.add(elem)，add方法其实就是在循环链最后即header头节点前添加元素
+		} else {
+			ListIterator<E> itr = list.listIterator();
+			//找到第一个比它大的元素
+			while (itr.hasNext() && compare(elem, itr.next()) >= 0)
+				;
+			itr.previous();//因为迭代器的next方法取之后会下移，所以要后移一位
+			itr.add(elem);//在比新元素大的节点前插入元素
+		}
+
+	}
+
+	public E getMin() {
+		return list.getFirst();
+	}
+
+	public boolean isEmpty() {
+
+		return list.isEmpty();
+	}
+
+	public E removeMin() {
+		return list.removeFirst();
+	}
+
+	public int size() {
+		return list.size();
+	}
+}  
+Java代码 
+package priorityqueue.heap;    
+   
+import java.util.Arrays;    
+import java.util.Comparator;    
+import java.util.LinkedList;    
+import java.util.NoSuchElementException;    
+import java.util.Random;    
+   
+import priorityqueue.PriorityQueue;    
+   
+/**   
+ * 基于堆的优先级队列实现   
+ *    
+ * 堆（heap）是一个完使用二叉树，它是一棵空树或   
+ * 1、根元素大于左右子节点（这时叫大顶堆）   
+ * 2、左右子节点又是堆   
+ *    
+ * 堆是一种完全二叉树，所以这里先要熟悉要用的二叉树几个性质：   
+ * N（N>1）个节点的的完全二叉树从层次从左自右编号，最后一个分枝节点（非叶子节点）的编号为 N/2 取   
+ * 整。且对于编号 i（1<=i<=N 编号从1开始）有：父节点为 i/2 向下取整；若2i>N，则节点i没有左孩子   
+ * ，否则其左孩子为2i；若2i+1>N，则没有右孩子，否则其右孩子为2i+1。   
+ * 注，这里使用完全二叉树只是为了好描述算法，它只是一种逻辑结构，真真在实现时我们还是使用数组来存   
+ * 储这棵二叉树的，因为完全二叉树与数组可以连续的一一对应赶快来   
+ *    
+ * 数组具有的随机访问特性对于堆的处理很方便：给定元素的索引值，很快就能得到该元素的子节点元素。例   
+ * 如，节点编号为i的元素的子节点分别为 2i 或 2i+1，那么对应到数组的索引号就分别为 2i-1 或 2i，   
+ * 节点编号为j的元素的父节点为 j/2 向下取整，对应的数组元素索引在父节点编号基础上减一即可得到。   
+ * 所以，堆可以快速交换父节点和小于它的子节点的值，这使得堆成为实现PriorityQueue接口的一种高效   
+ * 数据结构。   
+ *    
+ * @author jzj   
+ * @data 2010-1-5   
+ * @param <E>   
+ */   
+public class Heap<E extends Comparable<E>> implements PriorityQueue<E> {    
+    private E[] heap;//使用数组来实现堆存储    
+    private Comparator<E> comp;    
+    private int size;    
+   
+    public Heap() {    
+        heap = (E[]) new Comparable[5];    
+    }    
+   
+    public Heap(Comparator<E> c) {    
+        this();    
+        comp = c;    
+    }    
+   
+    //类似于TreeMap中的私有方法 compare(Object k1, Object k2)     
+    private int compare(E elem1, E elem2) {    
+        return comp == null ? elem1.compareTo(elem2) : comp.compare(elem1, elem2);    
+    }    
+   
+    //添加元素，    
+    public void add(E elem) {    
+        if (++size == heap.length) {//预判断放入后是否满，如果满则先扩容后再加    
+            E[] newHeap = (E[]) new Comparable[2 * heap.length];    
+            System.arraycopy(heap, 0, newHeap, 0, size);    
+            heap = newHeap;    
+        }    
+        heap[size - 1] = elem;    
+        adjustUp();//添加后堆规则可能打破，所以需重新调整堆结构    
+    }    
+   
+    //添加元素后向上调整堆结构，构造小顶堆，即添加的小的元素向上(根)浮    
+    private void adjustUp() {    
+        /* 添加28               28小于50，交换   
+         *   →        26            →                 26   
+         *           /  \                            /  \   
+         *         32    30                        32    30   
+         *        /  \   / \                      /  \   / \   
+         *       48  50 85 36                    48  28 85 36   
+         *      / \  / \                        / \  / \   
+         *    90 80 55 28                     90 80 55 50   
+         *       
+         * 现28小于父，还需交换           现28大于父26，所以调整完成   
+         *   →        26              
+         *           /  \                            
+         *         28    30                         
+         *        /  \   / \                         
+         *       48  32 85 36                      
+         *      / \  / \                          
+         *    90 80 55 50         
+         *                      
+         */   
+        int child = size;//新加入的叶节点编号，即最后一个节点    
+        int parent;//父节点编号    
+        while (child > 1) {//如果调整到了根节点则直接退出    
+            parent = child / 2;//新增叶子节点的父节点编号    
+            //如果父节点小于等于子节点（新增节点），则退出    
+            if (compare(heap[parent - 1], heap[child - 1]) <= 0) {    
+                break;    
+            }    
+            //如果新增节点小于它的父节点时，则交换    
+            E tmp = heap[parent - 1];    
+            heap[parent - 1] = heap[child - 1];    
+            heap[child - 1] = tmp;    
+            child = parent;//新增节点移到父节点位置，以便下次循环    
+        }    
+    }    
+   
+    public E getMin() {    
+        if (size == 0) {    
+            throw new NoSuchElementException();    
+        }    
+        return heap[0];    
+    }    
+   
+    public boolean isEmpty() {    
+        return size == 0;    
+    }    
+   
+    //删除堆顶元素，使用最后一个元素替换根元素，然后再进结构调整    
+    public E removeMin() {    
+        if (size == 0) {    
+            throw new NoSuchElementException();    
+        }    
+        /*    
+         * 删除根元素，根元素是最小元素，删除后使用树的最后叶节点替换他，此时堆结构会破坏，   
+         * 需从根节点向下重新调整堆结构   
+         *    
+         * 删除26             交换根26与最后叶节点55          55比最小子节点30大，需交换        
+         *   →      26              →            55                →   
+         *         /  \                         /  \   
+         *       32    30                     32    30   
+         *      / \    / \                   / \    / \   
+         *     48  50 85 36                 48 50  85 36    
+         *    / \  /                        /\    
+         *  90 80 55                       90 80   
+         *    
+         *                   55比最小子节点36大，需交换                
+         *          30               →                  30     堆结构恢复，调整结束    
+         *         /  \                                /  \   
+         *       32    55                            32    36   
+         *      / \    / \                          / \    / \   
+         *     48  50 85 36                       48  50  85 55   
+         *    / \  /                             / \   /   
+         *  90 80 55                            90 80 55   
+         */   
+        //交换最后与根元素位置    
+        E minElem = heap[0];//堆顶元素    
+        heap[0] = heap[size - 1];    
+        //不能把heap[--size]置为null，因为后面的堆排序方法heapSort要用    
+        heap[--size] = minElem;    
+        adjustDown(1);//删除后从根开始向下调整    
+        return minElem;    
+    }    
+   
+    //堆结构调整，从指定的节点向下开始调整    
+    private void adjustDown(int nodeNum) {    
+   
+        int parent = nodeNum;//从指定节点开始往下调整    
+        int child = 2 * parent;//指定节点左子节点编号    
+        //如果左孩子存在    
+        while (child <= size) {    
+            int minNum = parent;//假设父就是最小的    
+            //与左孩子比，如果比左孩子大，则最小设置为左孩子    
+            if (compare(heap[parent - 1], heap[child - 1]) > 0) {    
+                minNum = child;    
+            }    
+   
+            //如果右孩子存在，则更小时    
+            if ((child + 1) <= size && compare(heap[minNum - 1], heap[child]) > 0) {    
+                minNum = child + 1;    
+            }    
+   
+            //如果发现最小元素为子节点时需交换    
+            if (minNum != parent) {    
+                E tmp = heap[minNum - 1];    
+                heap[minNum - 1] = heap[parent - 1];    
+                heap[parent - 1] = tmp;    
+                parent = minNum;    
+                child = 2 * minNum;    
+            } else {//否则退出    
+                break;    
+            }    
+        }    
+    }    
+   
+    /**   
+     * 堆排序   
+     * 使用堆结构对某个数组进行排序   
+     * @param elems   
+     */   
+    public E[] heapSort(E[] elems) {    
+   
+        int length = elems.length;    
+   
+        heap = elems;    
+        size = length;    
+        /*   
+        * 创建初始堆，从最后一个非叶子节点开始调整所有的非叶子节点，直到根节点，   
+        * 所有的节点调整都采用向下调整的方法   
+        */   
+        for (int i = length / 2; i >= 1; i--) {    
+            adjustDown(i);    
+        }    
+        //再对初始堆进行排序    
+        while (size > 0) {    
+            //删除的过程实质上就是排序过程    
+            removeMin();    
+        }    
+        return elems;    
+    }    
+   
+    //树的层次遍历    
+    private void levelOrder() {    
+        if (size == 0) {    
+            return;    
+        }    
+        LinkedList queue = new LinkedList();    
+        queue.add(1);    
+        System.out.print("层次遍历 - ");    
+        while (!queue.isEmpty()) {    
+            int num = (Integer) queue.removeFirst();    
+            System.out.print(heap[num - 1] + " ");    
+   
+            if (num * 2 <= size) {    
+                queue.add(num * 2);    
+                if (num * 2 + 1 <= size) {    
+                    queue.add(num * 2 + 1);    
+                }    
+            }    
+        }    
+        System.out.println();    
+    }    
+   
+    public int size() {    
+   
+        return size;    
+    }    
+   
+    /**   
+     * @param args   
+     */   
+    public static void main(String[] args) {    
+        Heap<Integer> h = new Heap<Integer>();    
+   
+        Random rr = new Random(System.currentTimeMillis());    
+        Integer[] itg = new Integer[rr.nextInt(20)];    
+        for (int i = 0; i < itg.length; i++) {    
+            Integer tmp = new Integer(rr.nextInt(100));    
+            h.add(tmp);    
+            itg[i] = tmp;    
+        }    
+        h.levelOrder();    
+        System.out.print("优先队列 - ");    
+        while (h.isEmpty() == false) {    
+            System.out.print(h.removeMin() + " ");    
+        }    
+   
+        System.out.println();    
+        itg = h.heapSort(itg);    
+        System.out.print("堆排序 - ");    
+        System.out.println(Arrays.toString(itg));    
+    }    
+} 
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/zhanghefu/archive/2010/11/30/6046418.aspx

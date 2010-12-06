@@ -1,0 +1,172 @@
+class QuadTreeCode
+{
+public:
+    vector<int> m_Numbers;
+
+    /*判断两个四叉树码是否相等*/
+    bool operator ==( QuadTreeCode& tempTree )
+    {
+        if ( m_Numbers.size()!=tempTree.m_Numbers.size() )
+        {
+            return false;
+        }
+        else
+        {
+            for ( int i=0; i<m_Numbers.size(); i++ )
+            {
+                if ( m_Numbers[i]!=tempTree.m_Numbers[i])
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /*返回四叉树码的长度*/
+    int GetLength()
+    {
+        return m_Numbers.size();
+    }
+
+    int operator[](int Index)
+    {
+        return m_Numbers[Index];
+    }
+
+};
+
+enum ChildType
+{
+    UL = 0,
+    UR = 3,
+    LL = 1,
+    LR = 2
+};
+template<class T>
+class QuadTreeNode
+{
+public:
+    T *m_pData;
+    QuadTreeNode *m_pUpperLeft,*m_pUpperRight,*m_pLowerLeft,*m_pLowerRight;
+    QuadTreeCode m_Code; //节点在树中位置的编码
+    QuadTreeNode ()
+    {
+        m_pData = NULL;
+        m_pUpperLeft = m_pUpperRight = m_pLowerLeft = m_pLowerRight = NULL;
+    }
+    
+    ~QuadTreeNode ()
+    {
+        delete m_pData;
+    }
+
+    /*返回子成员的地址*/
+    QuadTreeNode ** GetChild( ChildType ctype )
+    {
+        switch( ctype )
+        {
+            case ChildType::UL:
+            return &m_pUpperLeft;
+            break;
+
+            case ChildType::UR:
+            return &m_pUpperRight;
+            break;
+
+            case ChildType::LL:
+            return &m_pLowerLeft;
+            break;
+
+            case ChildType::LR:
+            return &m_pLowerRight;
+            break;
+        }
+    }
+};
+
+template<class T>
+class QuadTree
+{
+public:
+    int m_nTreeDepth; //树的深度
+    QuadTreeNode<T> *m_pHeadNode; //树的头部
+    QuadTree()
+    {
+        m_nTreeDepth = 0;
+        m_pHeadNode = NULL;
+    }
+
+    ~QuadTree()
+    {
+        void (QuadTree::*func)(QuadTreeNode<T> *) ;
+        func = &QuadTree::DestroyNode;
+        PostOrderOperation( m_pHeadNode, func );
+    }
+
+    /*
+    后序遍历方式操作四叉树
+    */
+    void PostOrderOperation( QuadTreeNode<T> * ptempNode, void (QuadTree<T>::*NodeOp)( QuadTreeNode<T> * ) )
+    {
+        if( ptempNode!=NULL )
+        {
+            PostOrderOperation( ptempNode->m_pLowerLeft, NodeOp );
+            PostOrderOperation( ptempNode->m_pLowerRight, NodeOp );
+            PostOrderOperation( ptempNode->m_pUpperLeft, NodeOp  );
+            PostOrderOperation( ptempNode->m_pUpperRight, NodeOp );
+            (this->*NodeOp) ( ptempNode );
+        }
+    }
+
+    void DestroyNode( QuadTreeNode<T> * ptempNode )
+    {
+        delete ptempNode;
+    }
+
+    /*创建树枝*/
+    void CreateBranch( QuadTreeNode<T>**ppNode , int TreeDepth, int CurrentDepth )
+    {
+        if( CurrentDepth>TreeDepth )
+        {
+            return;
+        }
+        else
+        {
+            QuadTreeNode<T> *pNewNode = new QuadTreeNode<T>;
+            *ppNode = pNewNode;
+            QuadTreeNode<T> **pTempNode;
+            CreateBranch( pNewNode->GetChild(ChildType::UL), TreeDepth, CurrentDepth+1 );
+            CreateBranch( pNewNode->GetChild(ChildType::UR), TreeDepth, CurrentDepth+1 );
+            CreateBranch( pNewNode->GetChild(ChildType::LL), TreeDepth, CurrentDepth+1 );
+            CreateBranch( pNewNode->GetChild(ChildType::LR), TreeDepth, CurrentDepth+1 );
+        }
+
+    }
+
+    /*按照四叉树码进行操作*/
+    bool OperateNodeByCode( QuadTreeCode code, void (*Op)( QuadTreeNode<T> *) )
+    {
+        QuadTreeNode* ptempNode = m_pHeadNode;
+        for( int i=0; i<code.GetLength(); i++ )
+        {
+            ptempNode = ptempNode->GetChild( code[i] );
+            if( ptempNode==NULL )
+                return false;
+        }
+        Op( ptempNode );
+        return true;
+    }
+
+    /*近创建内存结构，数据内容并未赋值*/
+    void CreateTree( int TreeDepth )
+    {
+        m_nTreeDepth = TreeDepth;
+        CreateBranch( &m_pHeadNode, TreeDepth, 0);
+    }
+    //virtual void CreateNode( QuadTreeNode<T> * ptempNode ) const = 0;
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/zhanghefu/archive/2010/12/02/6051546.aspx

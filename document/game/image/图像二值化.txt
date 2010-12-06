@@ -1,0 +1,86 @@
+最近要写一个条形码识别的程序，在CodeProject上得到一些代码能够识别基本的Code39码，但是它需要二值化的黑白图像，而由于其他原因，我们的原图只能是彩色或者是灰度图，所以需要一个转换。
+
+二值化有很多算法，我没有去研究。步骤如下：
+
+1. 首先灰度化，简单把三色相加除以3
+
+2. 二值化，将一个点周围8个点全部相加，除以9 ，然后根据一个阀值决定是黑还是白，我用160
+
+3. 一定要用LockBit，直接处理图像数据，速度才能快
+
+代码如下：
+
+int n = 3;
+
+        /// <summary>
+        /// 转化普通图像到2值图像
+        /// </summary>
+        /// <param name="bmp"></param>
+        /// <returns></returns>
+        Bitmap ConvertImageTo2Value(Bitmap bmp)
+        {
+            int w = bmp.Width;
+            int h = bmp.Height;
+            BitmapData data = bmp.LockBits(new Rectangle(0, 0, w, h), 
+                ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            unsafe
+            {
+                // 将原始图片变成灰度二位数组
+                byte* p = (byte*)data.Scan0;
+                byte[,] vSource = new byte[w, h];
+                int offset = data.Stride - w * n;
+
+                for (int y = 0; y < h; y++)
+                {
+                    for (int x = 0; x < w; x++)
+                    {
+                        vSource[x, y] = (byte)(((int)p[0] + (int)p[1] + (int)p[2]) / 3);
+                        p += n;
+                    }
+                    p += offset;
+                }
+
+                bmp.UnlockBits(data);
+
+                // 将灰度二位数组变成二值图像
+                Bitmap bmpDest = new Bitmap(w, h, PixelFormat.Format24bppRgb);
+                BitmapData dataDest = bmpDest.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly,
+                    PixelFormat.Format24bppRgb);
+
+                p = (byte*)dataDest.Scan0;
+                offset = dataDest.Stride - w * n;
+                for (int y = 0; y < h; y++)
+                {
+                    for (int x = 0; x < w; x++)
+                    {
+                        //p[0] = p[1] = p[2] = (int)vSource[x, y] > 160 ? (byte)255 : (byte)0;
+                        p[0] = p[1] = p[2] = (int)GetAverageColor(vSource, x, y, w, h) > 120 ? (byte)255 : (byte)0;
+                        p += n;
+                    }
+                    p += offset;
+                }
+                
+                bmpDest.UnlockBits(dataDest);
+
+                // return
+                return bmpDest;
+            }
+        }
+
+        byte GetAverageColor(byte[,] vSource, int x, int y, int w, int h)
+        {
+            int rs = vSource[x, y]
+                + (x == 0 ? 255 : (int)vSource[x - 1, y])
+                + (x == 0 || y == 0 ? 255 : (int)vSource[x - 1, y - 1])
+                + (x == 0 || y == h - 1 ? 255 : (int)vSource[x - 1, y + 1])
+                + (y == 0 ? 255 : (int)vSource[x, y - 1])
+                + (y == h - 1 ? 255 : (int)vSource[x, y + 1])
+                + (x == w - 1 ? 255 : (int)vSource[x + 1, y])
+                + (x == w - 1 || y == 0 ? 255 : (int)vSource[x + 1, y - 1])
+                + (x == w - 1 || y == h - 1 ? 255 : (int)vSource[x + 1, y + 1]);
+            return (byte)(rs / 9);
+        }
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/zhanghefu/archive/2010/12/02/6049070.aspx
