@@ -1,0 +1,50 @@
+直线方程 ，  平面方程。的通式为: 
+直线: 
+ (x - x0)/a = (y - y0)/b = (z - z0)      (a,b,c)为直线的方向向量， 方向向量为单位向量
+
+平面: 
+ a*(x - x0) + b * (y - y0) + c(z - z0)      (a,b,c)为垂直于平面的法线向量， 为单位向量。 通过平面内两顶点的叉积可以得到法线。
+
+通过直线和平面两方程联立， 可以求得直线与平面的交点， 通过运动改变直线的始点，可以确定直线在指定时间内与平面
+相交。 这个是按书上写的公式写的，很不专业，谢谢。
+
+// 线面相交 , 先计算平面方程，再计算直线方程
+  bool lineCutPlane(GLVector p0, GLVector p, GLVector Decp, GLVector& lineP1, GLVector& lineP2)
+  {
+   // 求解平面方程
+   GLVector t1 = p0;
+   GLVector t2 = p;
+   
+   GLVector equ = t1.glVecCross(t2);                 // 和法线向量保持相同
+         equ.vecRound();
+   
+
+         GLVector planeEqua = equ * Decp;         // n * p-p1 平面方程 = y = 0
+   
+         
+         // 计算直线方程
+   GLVector tlinp1 = lineP1;
+   GLVector tlinp2 = lineP2;
+         
+   GLVector lineVec = tlinp2 - tlinp1;      // 直线向量
+         lineVec.normalize();                     // 法线向量
+         lineVec.vecRound();
+
+   GLVector tzero(0.0f, 0.0f, 0.0f, 1.0f);
+  
+   GLVector rel(0.0f);
+   rel.vec[0] = ((planeEqua.vec[1] - tlinp1.vec[1]) / lineVec.vec[1]) * lineVec.vec[0] + tlinp1.vec[0];
+         rel.vec[2] =  ((planeEqua.vec[1] - tlinp1.vec[1]) / lineVec.vec[1]) * lineVec.vec[2] + tlinp1.vec[1];
+         
+   // 看当前的 n向量确实是等于0的吗？
+   GLVector nVec = equ * (tlinp1 - Decp);   // Decp为平面上的任意点
+         
+   if(nVec == Decp)
+   {
+    return true;
+   }
+
+   return false;
+  }
+
+http://www.cnblogs.com/microsoftxiao/archive/2007/03/03/662837.html

@@ -1,0 +1,27 @@
+1、http://www.opengl.org/resources/libraries/glut/下载glutdlls37beta.zip包
+解压得到5个文件，将glut.h放到\VC\PlatformSDK\Include\gl目录下
+2、将glut.lib和glut32.lib放到\VC\lib
+3、将glut.dll和glut32.dll放system32下 
+4、建立一个OpenGL工程
+写入以下代码：
+#include <GL/glut.h>
+
+void myDisplay(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0.0f,1.0f,0.0f);
+	glRectf(-0.5f,-0.5f,0.5f,0.5f);
+	glFlush();
+}
+
+int main(int argc,char *argv[])
+{
+	glutInit(&argc,argv);
+	glutInitDisplayMode(GLUT_RGB|GLUT_SINGLE);
+	glutInitWindowPosition(100,100);
+	glutInitWindowSize(400,400);
+	glutCreateWindow("第一个OpenGL程序");
+	glutDisplayFunc(&myDisplay);
+	glutMainLoop();
+	return 0;
+}
