@@ -1,0 +1,103 @@
+OpenGL递归分割三角形[原创]2008-09-08 22:26关于多边形的网格化是很有用的，尤其是在讲一个多边形进行扭曲的时候。
+
+所以递归分割变成了一种十分重要的技术，所以本人做了一次将一个三角形递归分割n次的小程序。参考
+
+了一本书的程序，但是他的算法没看明白，只是取了其思想。而且我用了显示列表的方法，不然让程序递归分割10次的话，就是一种灾难，程序会非常慢
+
+
+程序如下：(发现原来那个有很多错误和不足之处，于是重新写了一下, 08-11-4更改，visual studio 2008 下编译通过)
+
+如果把递归次数改大一点，比如10，你会看到小三角形一个一个生成，所以下一步考虑用显示列表
+
+#include <gl/glut.h>
+
+//消除控制台窗口
+//#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) // 设置连接器选项
+
+void divide( GLfloat * a, GLfloat * b, GLfloat * c, GLsizei n )
+{
+    if ( n > 0 )
+    {
+   GLfloat a2[2]={0.0f}, b2[2]={0.0f}, c2[2]={0.0f};
+   //计算出第一个定点
+        a2[0] = (a[0]+c[0]) / 2;
+   printf( "\na2[0]=%f ", a2[0] );
+   a2[1] = (a[1]+c[1]) / 2;
+   printf( "a2[1]=%f\n", a2[1] );
+
+   //计算出第二个点
+   b2[0] = (b[0]+a[0]) / 2;
+   printf( "b2[0]=%f ", b2[0] );
+   b2[1] = (b[1]+a[1]) / 2;
+   printf( "b2[1]=%f\n", b2[1] );
+
+   //计算出第三个点
+   c2[0] = (b[0]+c[0]) / 2;
+   printf( "c2[0]=%f ", c2[0] );
+   c2[1] = (b[1]+c[1]) / 2;
+   printf( "c2[1]=%f\n", c2[1] );
+
+   //先将三个点计算出来
+   glBegin( GL_LINE_LOOP );
+    glColor3f(a2[0]+0.2, a2[1], 0.3); glVertex2fv( a2 ); 
+    glColor3f(b2[0]+0.2, b2[1], 0.3); glVertex2fv( b2 );
+    glColor3f(c2[0]+0.2, c2[1], 0.3); glVertex2fv( c2 );
+   glEnd();
+   glFlush();
+
+   divide( a, a2, b2, n-1 );
+   divide( b2, b, c2, n-1 );
+   divide( a2, c2, c, n-1 );
+   divide( a2, b2, c2, n-1 );
+  
+    }
+
+}
+
+GLfloat triangle[3][2] = { 
+                        {-0.8, -0.8}, 
+                           {0.8, -0.8}, 
+                           {0, 0.8} 
+                         };
+
+void display()
+{ 
+glBegin( GL_LINE_LOOP );
+glVertex2f( triangle[0][0], triangle[0][1] );
+glVertex2f( triangle[1][0], triangle[1][1] );
+glVertex2f( triangle[2][0], triangle[2][1] );
+    glEnd();
+
+//递归分割5次
+divide( triangle[0], triangle[1], triangle[2], 5 ); 
+
+glFlush();
+}
+
+void init()
+{
+    glMatrixMode( GL_PROJECTION );
+glLoadIdentity();
+gluOrtho2D( -1.0, 1.0, -1.0, 1.0 );
+glClear( GL_COLOR_BUFFER_BIT );
+}
+
+int main( int argc, char ** argv )
+{
+glutInit( &argc, argv );
+glutInitDisplayMode(GLUT_RGBA | GLUT_SINGLE);
+glutInitWindowPosition( 100, 100 );
+glutInitWindowSize( 400, 400 );
+init();
+glutCreateWindow( "triangle" );
+glutDisplayFunc( display );
+glutMainLoop();
+}
+
+截图：
+
+
+ 
+
+类别：opengl成长 |  | 添加到搜藏 | 分享到i贴吧 | 浏览(194) | 评论 (0)  上一篇：这个季节    下一篇：OpenGL入门学习[七]--光照
+http://hi.baidu.com/fairzy/blog/item/bd0f68ecbcddc33b269791cb.html

@@ -1,0 +1,13 @@
+已知矢量a在b上的投影长度为 proj_len,并且知道a和b的方向为an,bn
+
+因为an,bn为单位矢量，所以 an.DotProduct(bn) = |a|*|b|*cos(theta)，其中|a| = |b| = 1
+
+解得cos(theta) = an.DotProduct(bn) 
+
+矢量a的原长度为 a_len = proj_len/cos(theta) 
+
+需要首先判断proj_len是否为0；如果投影长度为0，那么夹角cos(theta)必然为90度，需直接返回无穷大就可以了。
+
+上面的方法绕过了用acos函数求夹角的迭代开销和误差。又对又快
+
+http://www.cnblogs.com/cgwolver/archive/2008/07/31/1257630.html

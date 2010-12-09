@@ -163,4 +163,176 @@
      方法3是看起来是最精巧的方法，但是效率也不能保证...3个开方
 
      方法4和方法2的效率差不多
+
+ 
+          
+ 
+
+cgwolver
+关注 - 1
+粉丝 - 3
+关注博主0 0 0 
+(请您对文章做出评价)下一篇：根据矢量的投影长度求原矢量长度
+
+posted on 2008-07-31 20:57 cgwolver 阅读(2896) 评论(11) 编辑 收藏 
+
+ 
+评论
+1933876 
+#1楼[楼主] 　回复　引用　查看　   
+特此更正一下: 
+2d 三角型面积等于两边叉向量长度的一半,但3d情况下就不是这样了: 
+关于3d三角形快速就面积方法若避免求三角函数的话,利用正弦定理 
+S(ABC) = |AB|*|AC|*sin(theta)*0.5 
+
+|AB|*sin(theta) 可以看作AC边上的高线矢量的长度 
+设B在AC上的投影为D 
+DB = AB - AD 
+设AB归一化矢量为ABn 
+AD = ABn*DotProduct(AC,ABn) 
+
+这样由正弦定理求面积的公式在三维直角坐标系中演化为 
+S(ABC) = |AC| * | AB - ABn*DotProduct(AC,ABn) | * 0.5 
+
+计算开销：三个开方，没有三角函数 
+
+关于三维直角坐标系中三角形求面积的更好更快的方法，我还在寻找中... 
+
+2008-09-20 10:10 | 狼图       
+#2楼 　回复　引用　   
+我觉得如果点在三角形内 第二种方法至少不必第一种慢，第一种方法求法向量也消耗了一个叉乘。第一种方法的优点在于可以提早排除（每求一个PLANE就排除一次） 
+2008-11-10 20:29 | KXL[未注册用户] 
+#3楼 　回复　引用　   
+我觉得如果点在三角形内 第二种方法至少不必第一种慢，第一种方法求法向量也消耗了一个叉乘。第一种方法的优点在于可以提早排除（每求一个PLANE就排除一次） 
+有一个的方法（我还不知道对不对，自己想的）三个点A,B，C。判断点P，假如P在三角形外（例如AB,BC的同侧，或称对B点判断），则 dot(NB,BA)与dot（NB，BC）异号（等于零的如在三角形外会以后被排除）。不需要求发向量，最差六次点乘。 
+希望多交流，kxlsc1985@163.com QQ 404399768 
+2008-11-10 20:49 | KXL[未注册用户] 
+#4楼 　回复　引用　   
+写错了 
+。。则 dot(NB,BA)与dot（NB，BC）同号 
+2008-11-10 20:53 | KXL[未注册用户] 
+#5楼 　回复　引用　   
+想了一下，写错了，判断在不在同一侧要用 Cross，。。 
+2008-11-10 21:02 | KXL[未注册用户] 
+#6楼 　回复　引用　   
+又想了一下，可以这样做，如果点在三角形外，则会出现三角形点的反转（本来是逆时针的），此时所围成的三角形面积是负的。以上面为例 逆时针方向A,B,C。则Cross（AB，BP）为负。总体上在不知道逆时针方向时 ，先求Cross（AB，BC）的符号 T。然后判断Cross（AB，BP），Cross（BC，CP），Cross（CA，AP）符号，与T不同则停止。 
+2008-11-10 21:19 | KXL[未注册用户] 
+#7楼 　回复　引用　   
+写了一下，发现计算还挺多的 。 
+Vec3f P; 
+Sub(mEdge1,mV2,mV1);//mEdge1 = mV2 - mV1 
+Sub(mEdge2,mV3,mV2); 
+Sub(mEdge3,mV1,mV3); 
+
+Vec3f::Cross3(mNormal,mEdge1,mEdge2); /*mNormal = Cross(mEdge1,mEdge2)*/ 
+mNormal.Normalize(); 
+
+Vec3f::Cross3(mEdge1Normal,mEdge1,P - mV2); 
+if( mEdge1Normal.Dot3(mNormal) < 0) return false; 
+Vec3f::Cross3(mEdge2Normal,mEdge2,P - mV3); 
+if( mEdge2Normal.Dot3(mNormal) < 0) return false; 
+Vec3f::Cross3(mEdge3Normal,mEdge2,P - mV1); 
+if( mEdge3Normal.Dot3(mNormal) < 0) return false; 
+
+2008-11-10 21:43 | KXL[未注册用户] 
+#8楼 　回复　引用　   
+Vec3f::Cross3(mEdge3Normal,mEdge3,P - mV1); 
+
+2008-11-10 21:44 | KXL[未注册用户] 
+#9楼 　回复　引用　   
+//算法解析 
+////////////////////////////////////////////////////////////////////////// 
+//三角形内点可以表达为 
+//v0 + (v1 - v0)*u + (v2 - v0)*v 
+//射线上的点可以描述为 
+//origin + dir*t 
+//交点既在平面上，又在射线上 
+//满足方程 
+//v0 + (v1 - v0)*u + (v2 - v0)*v = origin + dir*t 
+//变形 
+//(-dir)*t+ (v1-v0)*u + (v2 - v0)*v = origin - v0 
+//转化为三元一次方程组 
+////////////////////////////////////////////////////////////////////////// 
+//三角形两边 
+vertex3d edg1 = v1 - v0; 
+vertex3d edg2 = v2 - v0; 
+//射线方向与边二的叉积 
+vertex3d pvec; 
+cross3d(&pvec,&dir,&edg2); 
+double det = dot3d(&edg1,&pvec); 
+
+vertex3d tmpvec; 
+
+if(det>0) 
+{ 
+tmpvec = origin - v0;// 从正面穿越三角形，三角形和视点相对的面为正面 
+}else 
+{ 
+tmpvec = v0 - origin;//反面穿越三角形穿越三角形 
+det = -det; 
+} 
+
+if(det<MATHPRESISION) //射线在平面上 
+return false; 
+
+// 求u的值，求线性方程组的解展开后等同于求点积展开 
+*u = dot3d( &tmpvec, &pvec); 
+if( *u < 0.0f || *u > det ) 
+return false; 
+
+//测试V值 
+vertex3d qvec; 
+cross3d( &qvec, &tmpvec, &edg1); 
+
+*v = dot3d( &dir, &qvec); 
+if( *v < 0.0f || *u + *v > det ) 
+return false; 
+
+//求len 
+*len = dot3d(&edg2, &qvec ); 
+double fInvDet = 1.0 / det; 
+*len *= fInvDet; 
+*u *= fInvDet; 
+*v *= fInvDet; 
+
+return true; 
+2009-03-26 22:58 | lililililililili[未注册用户] 
+#10楼 　回复　引用　查看　   
+我傻得拿这文章去写程序, 一写发觉非常无语.
+面积 归一 和平面 3种算法均有错. 
+而且本来平面法是最高效率的.
+
+)1 引用" if( P.DotProduct( N ) + D > 0 ) return false; 
+
+这个应该是 Dot(P,N) - D == 0 吧 
+
+
+
+)2 引用" n[0] = N.CrossProduct(AB); //朝向内侧 
+
+ABC 顺序符合右手定则的情况下 程序计算后这个得出来是外侧! 
+
+
+)3 引用" S(ABC) = AB.CrossProduct(AC)；//*0.5; 
+
+这样算是错的 
+
+应该是 S_ABC = |Coss(AB,AC)| 绝对值不能少 
+也就是 S_ABC = Coss(AB,AC).Length(); //C# 
+
+这样算程序才得出正确结果. 
+
+
+我修改该文的逻辑并编写了代码 通过Matrix 变换 和不同的输入点测试了各种情况 结果正确
+
+
+经过 循环测试 使用平面的方法效率是最高的 平面方法中不需要归一处理
+因为只需要判断是否大于0 归一计算是可以省略或避免的。
+
+
+
+2010-07-06 01:51 | neko       
+#11楼[楼主] 　回复　引用　查看　   
+呵呵，多谢大家关注和指正，本文是群友讨论记录，有疏漏指出，请多指正！欢迎大家加入 63708310 讨论3d引擎技术。 
+
 http://www.cnblogs.com/cgwolver/archive/2008/07/31/1257611.html
