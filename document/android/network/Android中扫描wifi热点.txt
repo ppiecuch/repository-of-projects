@@ -1,0 +1,72 @@
+（摘自：http://www.eoeandroid.com/viewthread.php?tid=386）
+
+package com.eoeandroid.demo.testcode;
+
+主要Activity代码：
+
+public class WifiTester extends Activity {
+        TextView mainText;
+        WifiManager mainWifi;
+        WifiReceiver receiverWifi;
+        List<ScanResult> wifiList;
+        StringBuilder sb = new StringBuilder();
+
+        public void onCreate(Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.vifi);
+                setTitle("eoe教程: Wifi Test. -by:IceskYsl");
+                mainText = (TextView) findViewById(R.id.wifi);
+                mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+                receiverWifi = new WifiReceiver();
+                registerReceiver(receiverWifi, new IntentFilter(
+                                WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+                mainWifi.startScan();
+                mainText.setText("\nStarting Scan...\n");
+        }
+
+        public boolean onCreateOptionsMenu(Menu menu) {
+                menu.add(0, 0, 0, "Refresh");
+                return super.onCreateOptionsMenu(menu);
+        }
+
+        public boolean onMenuItemSelected(int featureId, MenuItem item) {
+                mainWifi.startScan();
+                mainText.setText("Starting Scan");
+                return super.onMenuItemSelected(featureId, item);
+        }
+
+        protected void onPause() {
+                unregisterReceiver(receiverWifi);
+                super.onPause();
+        }
+
+        protected void onResume() {
+                registerReceiver(receiverWifi, new IntentFilter(
+                                WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+                super.onResume();
+        }
+
+        class WifiReceiver extends BroadcastReceiver {
+
+                public void onReceive(Context c, Intent intent) {
+                        sb = new StringBuilder();
+                        wifiList = mainWifi.getScanResults();
+                        for (int i = 0; i < wifiList.size(); i++) {
+                                sb.append(new Integer(i + 1).toString() + ".");
+                                sb.append((wifiList.get(i)).toString());
+                                sb.append("\n\n");
+                        }
+                        mainText.setText(sb);
+                }
+        }
+}
+
+在manifest.xml里加权限：
+
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission> 
+<uses-permission android:name="android.permission.ACCESS_CHECKIN_PROPERTIES"></uses-permission> 
+<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission> 
+<uses-permission android:name="android.permission.INTERNET"></uses-permission> 
+<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission> 
+<uses-permission android:name="android.permission.MODIFY_PHONE_STATE"></uses-permission>

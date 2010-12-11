@@ -1,0 +1,27 @@
+编写GPS代码的时候总是要做这个判断，干脆封装成一个函数，随用随取。
+
+public boolean isGpsEnabled(Context context)
+{
+LocationManager locationManager =
+((LocationManager)context.getSystemService(Context.LOCATION_SERVICE));
+List<String> accessibleProviders = locationManager.getProviders(true);
+return accessibleProviders != null && accessibleProviders.size() > 0;
+}
+
+类似的wifi是否打开
+public boolean isWifiEnabled(Context context)
+{
+ConnectivityManager mgrConn = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE); 
+TelephonyManager mgrTel = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE); 
+return ((mgrConn.getActiveNetworkInfo()!=null && mgrConn.getActiveNetworkInfo().getState()==NetworkInfo.State.CONNECTED) 
+|| mgrTel.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS) 
+}
+网络连接是否好用
+public static boolean isNetworkConnected(Context context){   
+ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);   
+NetworkInfo network = cm.getActiveNetworkInfo();   
+if(network != null){   
+return network.isAvailable();   
+}   
+return false;  
+}  

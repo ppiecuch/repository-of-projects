@@ -1,0 +1,188 @@
+最终编辑 hanqigcxy     1、wifi网卡有以下几种状态：  
+
+ 
+
+
+ 
+
+
+
+ 2、 要对wifi进行操作，首先要在AndroidMenifest.xml中取得权限的，如下：
+
+<!-- 以下是使用wifi访问网络所需要的权限-->
+
+<uses-permissionandroid:name="android.permission.CHANGE_NETWORK_STATE">
+
+</uses-permission>  //修改网络状态的权限
+
+<uses-permissionandroid:name="android.permission.CHANGE_WIFI_STATE">
+
+</uses-permission>  //修改wifi状态的权限
+
+<uses-permissionandroid:name="android.permission.ACCESS_NETWORK_STATE">
+
+</uses-permission>  //访问网络权限
+
+<uses-permissionandroid:name="android.permission.ACCESS_WIFI_STATE">
+
+</uses-permission>   //访问wifi权限
+
+ 
+
+3、  对wifi网卡进行操作需要通过WifiManger对象来进行，获取该对象的方法如下：
+
+WifiManger wifiManger = 
+
+（WifiManger）Context.getSystemService(Service.WIFI_SERVICE);
+
+
+  打开wifi网卡
+
+        Wifimanger.setWifiEnabled(true);
+
+ 关闭wifi网卡
+
+        wifiManger.setWifiEnablee(false);
+
+ 获取网卡的当前的状态
+
+       wifiManger.getWifiState();
+
+ 
+
+========================================主要代码如下=============================================
+
+JAVA CODE   :No Title Code 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+ package mars.wifi;
+
+import android.app.Activity;
+import android.content.Context;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.Toast;
+
+public class WifiActivity extends Activity {
+    /** Called when the activity is first created. */
+ private Button startButton = null;
+ private Button stopButton = null;
+ private Button checkButton = null;
+ private WifiManager wifiManager = null;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        startButton = (Button)findViewById(R.id.startWifi);
+        stopButton = (Button)findViewById(R.id.stopWifi);
+        checkButton = (Button)findViewById(R.id.checkWifi);
+        startButton.setOnClickListener(new StartWifiListener());
+        stopButton.setOnClickListener(new StopWifiListener());
+        checkButton.setOnClickListener(new CheckWifiListener());
+    }
+    class StartWifiListener implements OnClickListener{
+
+  @Override
+  public void onClick(View v) {
+   wifiManager = (WifiManager)WifiActivity.this.getSystemService(Context.WIFI_SERVICE);
+   wifiManager.setWifiEnabled(true);
+   System.out.println("wifi state --->" + wifiManager.getWifiState());
+   Toast.makeText(WifiActivity.this, "当前Wifi网卡状态为" + 
+wifiManager.getWifiState(), Toast.LENGTH_SHORT).show();
+  }
+    }
+    class StopWifiListener implements OnClickListener{
+
+  @Override
+  public void onClick(View arg0) {
+   // TODO Auto-generated method stub
+   wifiManager = (WifiManager)WifiActivity.this.getSystemService(Context.WIFI_SERVICE);
+   wifiManager.setWifiEnabled(false);
+   System.out.println("wifi state --->" + wifiManager.getWifiState());
+   Toast.makeText(WifiActivity.this, "当前Wifi网卡状态为" + 
+wifiManager.getWifiState(), Toast.LENGTH_SHORT).show();
+  }
+    
+    }
+    
+    class CheckWifiListener implements OnClickListener{
+
+  @Override
+  public void onClick(View v) {
+   wifiManager = (WifiManager)WifiActivity.this.getSystemService(Context.WIFI_SERVICE);
+   System.out.println("wifi state --->" + wifiManager.getWifiState());
+   Toast.makeText(WifiActivity.this, "当前Wifi网卡状态为" + 
+wifiManager.getWifiState(), Toast.LENGTH_SHORT).show();
+  }
+     
+    }
+}
+
+ 
+ 
+http://hi.baidu.com/leo_han/blog/item/bbe470f764f8d47fdcc47425.html
