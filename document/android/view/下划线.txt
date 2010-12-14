@@ -1,0 +1,3 @@
+textView.setText(Html.fromHtml("<u>"+textContent+"</u>"));
+或者资源文件里写
+<string name="text"><u>textContent</u></string>

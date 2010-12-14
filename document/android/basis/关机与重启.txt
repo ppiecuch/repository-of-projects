@@ -1,0 +1,20 @@
+关机：
+In frameworks/base/services/java/com/android/server/BatteryService.java
+
+Intent intent = new Intent(Intent.ACTION_REQUEST_SHUTDOWN);
+
+  intent.putExtra(Intent.EXTRA_KEY_CONFIRM, false);
+
+  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+  mContext.startActivity(intent);
+
+重启：
+Intent i = new Intent(Intent.ACTION_REBOOT);
+i.putExtra("nowait", 1);
+i.putExtra("interval", 1);
+i.putExtra("window", 0);
+sendBroadcast(i);
+
+注意添加权限。
+
