@@ -1,0 +1,67 @@
+On Nov 24, 6:38 pm, jkj2...@xxxxxxxxx wrote:
+
+Hi everyone,
+
+I need to run an intersection test between a triangle and a plane, and
+I'm having a hard time finding anything online to do this (plenty out
+there for ray-triangle intersections). My ideal would be a C++
+function that takes a triangle and a plane, and yields the
+intersection points (if any).
+
+If you know of any resources I can use I'd be grateful. As it stands
+now I'm calculating the three rays that form the triangle's sides and
+individually testing them against the plane. Don't know that this is
+particularly efficient however. Thanks very much for any and all help.
+
+
+
+Comparing de 'signed' distances from each point to plane is simple.
+
+//==============================================================
+//
+// N : Normal to plane , |N| = 1
+// Q : Point into the plane
+//
+// P1,P2,P3 : Triangle vertices
+//
+// return : 0 if no intersection
+// U1,U2 : Intersection points
+//
+//==============================================================
+typedef struct {double x,y;} XY ;
+
+int Intersection(XY *Q,XY *N,XY *P1,XY *P2,XY *P3,XY *U1,XY *U2){
+
+double d1 = (P1->x-Q->x)*N->x+(P1->y-Q->y)*N->y ;// (P1-Q) dot N
+double d2 = (P2->x-Q->x)*N->x+(P2->y-Q->y)*N->y ;// (P2-Q) dot N
+double d3 = (P3->x-Q->x)*N->x+(P3->y-Q->y)*N->y ;// (P3-Q) dot N
+
+bool s1 = d1<0 ;
+bool s2 = d2<0 ;
+bool s3 = d3<0 ;
+
+// if signs are differents then U = (a*Pb-b*Pa)/(a-b)
+// unstable if a,b are near to zero
+
+if(s2!=s1){
+U1->x = (d2*P1->x - d1*P2->x)/(d2-d1) ;
+U1->y = (d2*P1->y - d1*P2->y)/(d2-d1) ;
+if(s1!=s3){
+U2->x = (d1*P3->x - d3*P1->x)/(d1-d3) ;
+U2->y = (d1*P3->y - d3*P1->y)/(d1-d3) ;
+} else {
+U2->x = (d2*P3->x - d3*P2->x)/(d2-d3) ;
+U2->y = (d2*P3->y - d3*P2->y)/(d2-d3) ;
+}
+} else if(s3!=s1){
+U1->x = (d3*P1->x - d1*P3->x)/(d3-d1) ;
+U1->y = (d3*P1->y - d1*P3->y)/(d3-d1) ;
+
+U2->x = (d2*P3->x - d3*P2->x)/(d2-d3) ;
+U2->y = (d2*P3->y - d3*P2->y)/(d2-d3) ;
+} else
+return 0 ;
+
+return 1;
+}
+//==============================================================
