@@ -1,0 +1,22 @@
+An easier way than what Richie mentioned is to the following: 
+
+if a point P is inside triangle ABC, then 
+
+Area PAB+Area PBC +Area PAC=Area ABC 
+
+notice that if P is on the edge of AB, BC, or CA, the above hold. But effectively, one of the area PAB, PBC, PAC is 0 (so just make sure you check that). 
+
+if P is outside, the above equality does NOT hold... 
+
+How to determine area? you have two options: 
+1) Heron's theorem, involves sqrt, slower 
+2) the more perferred way is the cross products (or effectively, the half of absolute value of (sum of the down products minus the sum of up products)) 
+
+for example, if A=(x1,y1) B=(x2,y2), C=(x3,y3) 
+Area= abs(x1*y2+x2*y3+x3*y1-x1*y3-x3*y2-x2*y1)/2 
+
+also you might want to be careful about floating point errors... instead of checking for strict inequality, 
+check for abs(b-a)<eps, where eps can be a small value, such as 1e-12 (0.000000000001)
+
+
+面积就是0.5*向量|AB|叉|AC|，再求绝对值
