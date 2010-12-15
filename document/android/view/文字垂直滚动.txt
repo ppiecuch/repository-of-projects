@@ -1,0 +1,363 @@
+文字垂直滚动
+
+ 
+
+[功能]
+
+在以前的文章曾经写过 如何水平滚动 现在说一下垂直滚动
+
+ 
+
+ 
+
+[原理]
+
+1. 设置 ScrollView的控件高度 为定值
+
+2. 如何滚动显示：ScrollView.smoothScrollBy()
+
+3. 如何循环滚动显示 即 当滚到最下面后 会回到最上面继续滚动： 得到最下面的垂直位移 然后通过 ScrollView.scrollTo() 来返回最上面
+
+4. 如何判断是否到达底部：通过 ScrollView.getScrollY() 得到本次的垂直位移 然后与上次该值做比较 如果相等 则已经到达底部 否则 继续往下滚动
+
+ 
+
+ 
+
+[代码 步骤]
+
+1. 现以陆游的诗歌为例 定义布局文件 main.xml 如下：
+
+Xml代码 
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent"  
+    >  
+<TextView     
+    android:layout_width="fill_parent"    
+    android:layout_height="wrap_content"    
+    android:text="Text head! - 钗头凤 之 陆游 唐婉"  
+    />  
+<ScrollView    
+    android:id="@+id/sv"  
+    android:layout_width="fill_parent"    
+    android:layout_height="50dip" >  
+<LinearLayout  
+    android:id="@+id/layout"  
+    android:orientation="vertical"  
+    android:layout_width="wrap_content"    
+    android:layout_height="wrap_content" >  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="钗头凤 陆游"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="红酥手 黄藤酒 满城春色宫墙柳"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="东风恶 欢情薄 一杯愁绪，几年离索"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="错！错！错！"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="春如旧 人空瘦 泪痕红悒鲛绡透"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="桃花落 闲池阁 山盟虽在 锦书难托"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="莫! 莫! 莫!"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="---------"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="钗头凤 唐婉"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="世情薄 人情恶 雨送黄昏花易落"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="晓风干 泪痕残 欲笺心事 独语斜阑"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="难！难！难!"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="人成各 今非昨 病魂常似秋千索"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="角声寒 夜阑珊 怕人寻问 咽泪装欢"/>  
+<TextView  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:text="瞒! 瞒! 瞒!"/>  
+</LinearLayout>  
+</ScrollView>  
+<TextView     
+    android:layout_width="fill_parent"    
+    android:layout_height="wrap_content"    
+    android:text="Text tail!"  
+    />  
+</LinearLayout>  
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="Text head! - 钗头凤 之 陆游 唐婉"
+    />
+<ScrollView 
+	android:id="@+id/sv"
+	android:layout_width="fill_parent" 
+    android:layout_height="50dip" >
+<LinearLayout
+	android:id="@+id/layout"
+	android:orientation="vertical"
+	android:layout_width="wrap_content" 
+    android:layout_height="wrap_content" >
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="钗头凤 陆游"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="红酥手 黄藤酒 满城春色宫墙柳"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="东风恶 欢情薄 一杯愁绪，几年离索"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="错！错！错！"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="春如旧 人空瘦 泪痕红悒鲛绡透"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="桃花落 闲池阁 山盟虽在 锦书难托"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="莫! 莫! 莫!"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="---------"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="钗头凤 唐婉"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="世情薄 人情恶 雨送黄昏花易落"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="晓风干 泪痕残 欲笺心事 独语斜阑"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="难！难！难!"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="人成各 今非昨 病魂常似秋千索"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="角声寒 夜阑珊 怕人寻问 咽泪装欢"/>
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="瞒! 瞒! 瞒!"/>
+</LinearLayout>
+</ScrollView>
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="Text tail!"
+    />
+</LinearLayout>
+ 
+
+ 
+
+2. 得到ScrollView 变量 scroll
+
+ 
+
+Java代码 
+scroll = (ScrollView)findViewById(R.id.sv);  
+
+scroll = (ScrollView)findViewById(R.id.sv); 
+
+ 
+
+3. 开辟Thread TimerLoop 用来定时 并通知 Activity 的 ScrollView 滚动一定的位移
+
+Java代码 
+private Handler message = new Handler(){   
+        public void handleMessage(Message msg) {   
+            doScrow();   
+                   
+            }   
+    };   
+           
+    public class TimerLoop implements Runnable {   
+        @Override  
+        public void run() {   
+            // TODO Auto-generated method stub   
+               
+            while(true){   
+                loop(500);   
+                   
+                message.sendEmptyMessage(0);   
+            }   
+        }   
+           
+    }   
+       
+//因为sleep()似乎不好用 所以采用这种方法计时   
+    public void loop(long i){   
+        long j = i;   
+        while(j>0){   
+               
+            j = j-1;   
+        }   
+  
+    }  
+
+private Handler message = new Handler(){
+    	public void handleMessage(Message msg) {
+    		doScrow();
+				
+			}
+	};
+		
+    public class TimerLoop implements Runnable {
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			
+			while(true){
+				loop(500);
+				
+				message.sendEmptyMessage(0);
+			}
+		}
+    	
+    }
+    
+//因为sleep()似乎不好用 所以采用这种方法计时
+    public void loop(long i){
+    	long j = i;
+    	while(j>0){
+    		
+    		j = j-1;
+		}
+
+    } 
+
+启动之
+
+Java代码 
+public boolean onKeyDown(int keyCode, KeyEvent msg){   
+        Thread loop = new Thread(new TimerLoop());   
+        loop.start();   
+           
+        return super.onKeyDown(keyCode, msg);   
+    }  
+
+public boolean onKeyDown(int keyCode, KeyEvent msg){
+    	Thread loop = new Thread(new TimerLoop());
+    	loop.start();
+    	
+    	return super.onKeyDown(keyCode, msg);
+	}  
+
+4. 根据值比较结果 来决定是 滚动 还是 返回最上面
+
+Java代码 
+public void doScrow(){   
+        int now = scroll.getScrollY();   
+           
+        if(ori == now){   
+            scroll.scrollTo(now, 0);   
+            ori = -1;   
+               
+        }   
+        else {   
+            scroll.smoothScrollBy(10, 10);   
+               
+            ori = now;   
+               
+        }   
+    }  
+
+public void doScrow(){
+    	int now = scroll.getScrollY();
+    	
+    	if(ori == now){
+    		scroll.scrollTo(now, 0);
+    		ori = -1;
+    		
+    	}
+    	else {
+    		scroll.smoothScrollBy(10, 10);
+    		
+    		ori = now;
+    		
+    	}
+    } 
+
+ 
+
+ 
+
+emulator 运行截图 (注意2次的字符内容的差异)
+
+1. 
+
+
+
+ 
+
+2.
+
+
+
+ 
+
+ 
+
+done!
+
+http://griffinshi.javaeye.com/blog/599015

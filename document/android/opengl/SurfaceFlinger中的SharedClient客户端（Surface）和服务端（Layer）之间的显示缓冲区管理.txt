@@ -1,0 +1,266 @@
+ SurfaceFlinger在系统启动阶段作为系统服务被加载。应用程序中的每个窗口，对应本地代码中的Surface，而Surface又对应于SurfaceFlinger中的各个Layer，SurfaceFlinger的主要作用是为这些Layer申请内存，根据应用程序的请求管理这些Layer显示、隐藏、重画等操作，最终由SurfaceFlinger把所有的Layer组合到一起，显示到显示器上。当一个应用程序需要在一个Surface上进行画图操作时，首先要拿到这个Surface在内存中的起始地址，而这块内存是在SurfaceFlinger中分配的，因为SurfaceFlinger和应用程序并不是运行在同一个进程中，如何在应用客户端（Surface）和服务端（SurfaceFlinger - Layer）之间传递和同步显示缓冲区？这正是本文要讨论的内容。
+
+Surface的创建过程
+我们先看看Android如何创建一个Surface，下面的序列图展示了整个创建过程。
+
+
+
+                                                              图一   Surface的创建过程
+
+创建Surface的过程基本上分为两步：
+
+1. 建立SurfaceSession
+
+第一步通常只执行一次，目的是创建一个SurfaceComposerClient的实例，JAVA层通过JNI调用本地代码，本地代码创建一个SurfaceComposerClient的实例，SurfaceComposerClient通过ISurfaceComposer接口调用SurfaceFlinger的createConnection，SurfaceFlinger返回一个ISurfaceFlingerClient接口给SurfaceComposerClient，在createConnection的过程中，SurfaceFlinger创建了用于管理缓冲区切换的SharedClient，关于SharedClient我们下面再介绍，最后，本地层把SurfaceComposerClient的实例返回给JAVA层，完成SurfaceSession的建立。
+
+2. 利用SurfaceSession创建Surface
+
+JAVA层通过JNI调用本地代码Surface_Init()，本地代码首先取得第一步创建的SurfaceComposerClient实例，通过SurfaceComposerClient，调用ISurfaceFlingerClient接口的createSurface方法，进入SurfaceFlinger，SurfaceFlinger根据参数，创建不同类型的Layer，然后调用Layer的setBuffers()方法，为该Layer创建了两个缓冲区，然后返回该Layer的ISurface接口，SurfaceComposerClient使用这个ISurface接口创建一个SurfaceControl实例，并把这个SurfaceControl返回给JAVA层。
+
+由此得到以下结果：
+
+JAVA层的Surface实际上对应于本地层的SurfaceControl对象，以后本地代码可以使用JAVA传入的SurfaceControl对象，通过SurfaceControl的getSurface方法，获得本地Surface对象； 
+Android为每个Surface分配了两个图形缓冲区，以便实现Page-Flip的动作； 
+建立SurfaceSession时，SurfaceFlinger创建了用于管理两个图形缓冲区切换的SharedClient对象，SurfaceComposerClient可以通过ISurfaceFlingerClient接口的getControlBlock()方法获得这个SharedClient对象，查看SurfaceComposerClient的成员函数_init: 
+ view plaincopy to clipboardprint?
+void SurfaceComposerClient::_init(   
+        const sp<ISurfaceComposer>& sm, const sp<ISurfaceFlingerClient>& conn)   
+{   
+    ......   
+    mClient = conn;   
+    if (mClient == 0) {   
+        mStatus = NO_INIT;   
+        return;   
+    }   
+  
+    mControlMemory = mClient->getControlBlock();   
+    mSignalServer = sm;   
+    mControl = static_cast<SharedClient *>(mControlMemory->getBase());   
+}  
+void SurfaceComposerClient::_init(
+        const sp<ISurfaceComposer>& sm, const sp<ISurfaceFlingerClient>& conn)
+{
+    ......
+    mClient = conn;
+    if (mClient == 0) {
+        mStatus = NO_INIT;
+        return;
+    }
+
+    mControlMemory = mClient->getControlBlock();
+    mSignalServer = sm;
+    mControl = static_cast<SharedClient *>(mControlMemory->getBase());
+}
+ 
+
+获得Surface对应的显示缓冲区
+虽然在SurfaceFlinger在创建Layer时已经为每个Layer申请了两个缓冲区，但是此时在JAVA层并看不到这两个缓冲区，JAVA层要想在Surface上进行画图操作，必须要先把其中的一个缓冲区绑定到Canvas中，然后所有对该Canvas的画图操作最后都会画到该缓冲区内。下图展现了绑定缓冲区的过程：
+
+
+
+                                                                            图二  绑定缓冲区的过程
+
+    开始在Surface画图前，Surface.java会先调用lockCanvas()来得到要进行画图操作的Canvas，lockCanvas会进一步调用本地层的Surface_lockCanvas，本地代码利用JAVA层传入的SurfaceControl对象，通过getSurface()取得本地层的Surface对象，接着调用该Surface对象的lock()方法，lock()返回了改Surface的信息，其中包括了可用缓冲区的首地址vaddr，该vaddr在Android的2D图形库Skia中，创建了一个bitmap，然后通过Skia库中Canvas的API：Canvas.setBitmapDevice(bitmap)，把该bitmap绑定到Canvas中，最后把这个Canvas返回给JAVA层，这样JAVA层就可以在该Canvas上进行画图操作，而这些画图操作最终都会画在以vaddr为首地址的缓冲区中。
+
+    再看看在Surface的lock()方法中做了什么：
+
+dequeueBuffer(&backBuffer)获取backBuffer 
+SharedBufferClient->dequeue()获得当前空闲缓冲区的编号 
+通过缓冲区编号获得真正的GraphicBuffer:backBuffer 
+如果还没有对Layer中的buffer进行映射（Mapper），getBufferLocked通过ISurface接口重新重新映射
+获取frontBuffer 
+根据两个Buffer的更新区域，把frontBuffer的内容拷贝到backBuffer中，这样保证了两个Buffer中显示内容的同步 
+backBuffer->lock() 获得backBuffer缓冲区的首地址vaddr 
+通过info参数返回vaddr 
+释放Surface对应的显示缓冲区
+画图完成后，要想把Surface的内容显示到屏幕上，需要把Canvas中绑定的缓冲区释放，并且把该缓冲区从变成可投递（因为默认只有两个buffer，所以实际上就是变成了frontBuffer），SurfaceFlinger的工作线程会在适当的刷新时刻，把系统中所有的frontBuffer混合在一起，然后通过OpenGL刷新到屏幕上。下图展现了解除绑定缓冲区的过程：
+
+
+
+                                                                 图三  解除绑定缓冲区的过程
+
+JAVA层调用unlockCanvasAndPost 
+进入本地代码：Surface_unlockCanvasAndPost 
+本地代码利用JAVA层传入的SurfaceControl对象，通过getSurface()取得本地层的Surface对象 
+绑定一个空的bitmap到Canvas中 
+调用Surface的unlockAndPost方法 
+调用GraphicBuffer的unlock()，解锁缓冲区 
+在queueBuffer()调用了SharedBufferClient的queue()，把该缓冲区更新为可投递状态 
+SharedClient 和 SharedBufferStack
+从前面的讨论可以看到，Canvas绑定缓冲区时，要通过SharedBufferClient的dequeue方法取得空闲的缓冲区，而解除绑定并提交缓冲区投递时，最后也要调用SharedBufferClient的queue方法通知SurfaceFlinger的工作线程。实际上，在SurfaceFlinger里，每个Layer也会关联一个SharedBufferServer，SurfaceFlinger的工作线程通过SharedBufferServer管理着Layer的缓冲区，在SurfaceComposerClient建立连接的阶段，SurfaceFlinger就已经为该连接创建了一个SharedClient 对象，SharedClient 对象中包含了一个SharedBufferStack数组，数组的大小是31，每当创建一个Surface，就会占用数组中的一个SharedBufferStack，然后SurfaceComposerClient端的Surface会创建一个SharedBufferClient和该SharedBufferStack关联，而SurfaceFlinger端的Layer也会创建SharedBufferServer和SharedBufferStack关联，实际上每对SharedBufferClient/SharedBufferServer是控制着同一个SharedBufferStack对象，通过SharedBufferStack，保证了负责对Surface的画图操作的应用端和负责刷新屏幕的服务端（SurfaceFlinger）可以使用不同的缓冲区，并且让他们之间知道对方何时锁定/释放缓冲区。
+
+SharedClient和SharedBufferStack的代码和头文件分别位于：
+
+\frameworks\base\libs\surfaceflinger_client\SharedBufferStack.cpp
+
+\frameworks\base\include\private\surfaceflinger\SharedBufferStack.h
+
+
+
+                                                                       图四    客户端和服务端缓冲区管理
+
+     继续研究SharedClient、SharedBufferStack、SharedBufferClient、SharedBufferServer的诞生过程。
+
+    1. SharedClient
+    在createConnection阶段，SurfaceFlinger创建Client对象： 
+view plaincopy to clipboardprint?
+sp<ISurfaceFlingerClient> SurfaceFlinger::createConnection()   
+{   
+    Mutex::Autolock _l(mStateLock);   
+    uint32_t token = mTokens.acquire();   
+  
+    sp<Client> client = new Client(token, this);   
+    if (client->ctrlblk == 0) {   
+        mTokens.release(token);   
+        return 0;   
+    }   
+    status_t err = mClientsMap.add(token, client);   
+    if (err < 0) {   
+        mTokens.release(token);   
+        return 0;   
+    }   
+    sp<BClient> bclient =   
+        new BClient(this, token, client->getControlBlockMemory());   
+    return bclient;   
+}  
+sp<ISurfaceFlingerClient> SurfaceFlinger::createConnection()
+{
+    Mutex::Autolock _l(mStateLock);
+    uint32_t token = mTokens.acquire();
+
+    sp<Client> client = new Client(token, this);
+    if (client->ctrlblk == 0) {
+        mTokens.release(token);
+        return 0;
+    }
+    status_t err = mClientsMap.add(token, client);
+    if (err < 0) {
+        mTokens.release(token);
+        return 0;
+    }
+    sp<BClient> bclient =
+        new BClient(this, token, client->getControlBlockMemory());
+    return bclient;
+} 
+
+再进入Client的构造函数中，它分配了4K大小的共享内存，并在这块内存上构建了SharedClient对象： 
+view plaincopy to clipboardprint?
+Client::Client(ClientID clientID, const sp<SurfaceFlinger>& flinger)   
+    : ctrlblk(0), cid(clientID), mPid(0), mBitmap(0), mFlinger(flinger)   
+{   
+    const int pgsize = getpagesize();   
+    const int cblksize = ((sizeof(SharedClient)+(pgsize-1))&~(pgsize-1));   
+  
+    mCblkHeap = new MemoryHeapBase(cblksize, 0,   
+            "SurfaceFlinger Client control-block");   
+  
+    ctrlblk = static_cast<SharedClient *>(mCblkHeap->getBase());   
+    if (ctrlblk) { // construct the shared structure in-place.   
+        new(ctrlblk) SharedClient;   
+    }   
+}  
+Client::Client(ClientID clientID, const sp<SurfaceFlinger>& flinger)
+    : ctrlblk(0), cid(clientID), mPid(0), mBitmap(0), mFlinger(flinger)
+{
+    const int pgsize = getpagesize();
+    const int cblksize = ((sizeof(SharedClient)+(pgsize-1))&~(pgsize-1));
+
+    mCblkHeap = new MemoryHeapBase(cblksize, 0,
+            "SurfaceFlinger Client control-block");
+
+    ctrlblk = static_cast<SharedClient *>(mCblkHeap->getBase());
+    if (ctrlblk) { // construct the shared structure in-place.
+        new(ctrlblk) SharedClient;
+    }
+} 
+
+回到createConnection中，通过Client的getControlBlockMemory()方法获得共享内存块的IMemoryHeap接口，接着创建ISurfaceFlingerClient的子类BClient，BClient的成员变量mCblk保存了IMemoryHeap接口指针； 
+把BClient返回给SurfaceComposerClient，SurfaceComposerClient通过ISurfaceFlingerClient接口的getControlBlock()方法获得IMemoryHeap接口指针，同时保存在SurfaceComposerClient的成员变量mControlMemory中； 
+继续通过IMemoryHeap接口的getBase ()方法获取共享内存的首地址，转换为SharedClient指针后保存在SurfaceComposerClient的成员变量mControl中； 
+至此，SurfaceComposerClient的成员变量mControl和SurfaceFlinger::Client.ctrlblk指向了同一个内存块，该内存块上就是SharedClient对象。  
+    2. SharedBufferStack、SharedBufferServer、SharedBufferClient
+    SharedClient对象中有一个SharedBufferStack数组：
+
+    SharedBufferStack surfaces[ NUM_LAYERS_MAX ];
+
+    NUM_LAYERS_MAX 被定义为31，这样保证了SharedClient对象的大小正好满足4KB的要求。创建一个新的Surface时，进入SurfaceFlinger的createSurface函数后，先取在createConnection阶段创建的Client对象，通过Client在0--NUM_LAYERS_MAX 之间取得一个尚未被使用的编号，这个编号实际上就是SharedBufferStack数组的索引：
+
+view plaincopy to clipboardprint?
+int32_t id = client->generateId(pid);  
+int32_t id = client->generateId(pid);  
+
+ 然后以Client对象和索引值以及其他参数，创建不同类型的Layer对象，一普通的Layer对象为例：
+
+view plaincopy to clipboardprint?
+layer = createNormalSurfaceLocked(client, d, id,   
+                        w, h, flags, format);  
+layer = createNormalSurfaceLocked(client, d, id,
+                        w, h, flags, format); 
+
+在createNormalSurfaceLocked中创建Layer对象：
+
+view plaincopy to clipboardprint?
+sp<Layer> layer = new Layer(this, display, client, id);  
+sp<Layer> layer = new Layer(this, display, client, id); 
+
+构造Layer时会先构造的父类LayerBaseClient，LayerBaseClient中创建了SharedBufferServer对象，SharedBufferStack 数组的索引值和SharedClient被传入SharedBufferServer对象中。
+
+view plaincopy to clipboardprint?
+LayerBaseClient::LayerBaseClient(SurfaceFlinger* flinger, DisplayID display,   
+        const sp<Client>& client, int32_t i)   
+    : LayerBase(flinger, display), lcblk(NULL), client(client), mIndex(i),   
+      mIdentity(uint32_t(android_atomic_inc(&sIdentity)))   
+{   
+    lcblk = new SharedBufferServer(   
+            client->ctrlblk, i, NUM_BUFFERS,   
+            mIdentity);   
+}  
+LayerBaseClient::LayerBaseClient(SurfaceFlinger* flinger, DisplayID display,
+        const sp<Client>& client, int32_t i)
+    : LayerBase(flinger, display), lcblk(NULL), client(client), mIndex(i),
+      mIdentity(uint32_t(android_atomic_inc(&sIdentity)))
+{
+    lcblk = new SharedBufferServer(
+            client->ctrlblk, i, NUM_BUFFERS,
+            mIdentity);
+} 
+
+    自此，Layer通过lcblk成员变量(SharedBufferServer)和SharedClient共享内存区建立了关联，并且每个Layer对应于SharedBufferStack 数组中的一项。 
+
+    回到SurfaceFlinger的客户端Surface.cpp中，Surface的构造函数如下：
+
+view plaincopy to clipboardprint?
+Surface::Surface(const sp<SurfaceControl>& surface)   
+    : mClient(surface->mClient), mSurface(surface->mSurface),   
+      mToken(surface->mToken), mIdentity(surface->mIdentity),   
+      mFormat(surface->mFormat), mFlags(surface->mFlags),   
+      mBufferMapper(GraphicBufferMapper::get()), mSharedBufferClient(NULL),   
+      mWidth(surface->mWidth), mHeight(surface->mHeight)   
+{   
+    mSharedBufferClient = new SharedBufferClient(   
+            mClient->mControl, mToken, 2, mIdentity);   
+  
+    init();   
+}  
+Surface::Surface(const sp<SurfaceControl>& surface)
+    : mClient(surface->mClient), mSurface(surface->mSurface),
+      mToken(surface->mToken), mIdentity(surface->mIdentity),
+      mFormat(surface->mFormat), mFlags(surface->mFlags),
+      mBufferMapper(GraphicBufferMapper::get()), mSharedBufferClient(NULL),
+      mWidth(surface->mWidth), mHeight(surface->mHeight)
+{
+    mSharedBufferClient = new SharedBufferClient(
+            mClient->mControl, mToken, 2, mIdentity);
+
+    init();
+}
+ 
+
+SharedBufferClient构造参数mClient->mControl就是共享内存块中的SharedClient对象，mToken就是SharedBufferStack 数组索引值。
+
+到这里我们终于知道，Surface中的mSharedBufferClient成员和Layer中的lcblk成员(SharedBufferServer)，通过SharedClient中的同一个SharedBufferStack，共同管理着Surface（Layer）中的两个缓冲区。
+
+发表于 @ 2010年10月28日
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/DroidPhone/archive/2010/10/28/5972568.aspx
