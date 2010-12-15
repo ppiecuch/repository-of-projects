@@ -1,0 +1,121 @@
+字体滚动
+
+ 
+
+[功能]
+
+当字太多的话 让字体滚动 会是一个好办法 
+
+ 
+
+ 
+
+[代码 步骤]
+
+1. 设定 TextView 的属性
+
+Java代码 
+<?xml version="1.0" encoding="utf-8"?>   
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+        xmlns:app="http://schemas.android.com/apk/res/com.android.View.CustomView"  
+        android:orientation="vertical"  
+        android:layout_width="fill_parent"  
+        android:layout_height="wrap_content">   
+<TextView   
+    android:id="@+id/text"  
+    android:layout_width="100px"  
+    android:layout_height="wrap_content"  
+       
+                //居中显示   
+    android:layout_centerInParent="true"  
+       
+                //使得字不分行显示 否则当字太多会分行   
+    android:singleLine="true"  
+       
+    android:layout_x="61px"  
+    android:layout_y="69px"  
+  
+                //设置为"滚动"   
+    android:ellipsize="marquee"  
+                   
+                //设置滚动时间为永远 也可以为具体的int 来设置滚动次数   
+    android:marqueeRepeatLimit="marquee_forever"  
+/>   
+</RelativeLayout>  
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res/com.android.View.CustomView"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+<TextView
+	android:id="@+id/text"
+	android:layout_width="100px"
+	android:layout_height="wrap_content"
+	
+                //居中显示
+	android:layout_centerInParent="true"
+	
+                //使得字不分行显示 否则当字太多会分行
+	android:singleLine="true"
+	
+	android:layout_x="61px"
+	android:layout_y="69px"
+
+                //设置为"滚动"
+	android:ellipsize="marquee"
+                
+                //设置滚动时间为永远 也可以为具体的int 来设置滚动次数
+	android:marqueeRepeatLimit="marquee_forever"
+/>
+</RelativeLayout> 
+
+2. 给 TextView 指定显示内容
+
+Java代码 
+public class TextGoUsage extends Activity {   
+    /** Called when the activity is first created. */  
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {   
+        super.onCreate(savedInstanceState);   
+        setContentView(R.layout.main);   
+           
+        TextView text = (TextView) findViewById(R.id.text);   
+        text.setText("梅花绝句 闻道梅花坼晓风 雪堆遍满四山中 何方可化身千亿 一树梅花一放翁");   
+        text.setTextSize(30);   
+        text.setFocusable(true);   
+    }   
+}  
+
+public class TextGoUsage extends Activity {
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        TextView text = (TextView) findViewById(R.id.text);
+        text.setText("梅花绝句 闻道梅花坼晓风 雪堆遍满四山中 何方可化身千亿 一树梅花一放翁");
+        text.setTextSize(30);
+        text.setFocusable(true);
+    }
+} 
+
+ 
+
+3. emulator 运行效果  2次时间的截图：
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+done!
+
+http://griffinshi.javaeye.com/blog/585791

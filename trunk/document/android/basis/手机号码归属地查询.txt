@@ -1,0 +1,361 @@
+package com.eden.phonesearch.demo;
+
+
+
+import java.io.BufferedReader;
+
+import java.io.IOException;
+
+import java.io.InputStream;
+
+import java.io.InputStreamReader;
+
+import java.net.MalformedURLException;
+
+import java.net.URL;
+
+
+
+import android.app.Activity;
+
+import android.os.Bundle;
+
+import android.view.KeyEvent;
+
+import android.view.View;
+
+import android.view.View.OnClickListener;
+
+import android.view.View.OnLongClickListener;
+
+import android.widget.Button;
+
+import android.widget.EditText;
+
+import android.widget.TextView;
+
+import android.widget.Toast;
+
+
+
+/**
+
+* @author Eden
+
+* 
+
+*/
+
+public class SearchActivity extends Activity {
+
+    private EditText input;
+
+    private Button search;
+
+    private TextView info;
+
+    
+
+    
+
+    public void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.main);
+
+        
+
+        input = (EditText)findViewById(R.id.input_et);
+
+        search = (Button)findViewById(R.id.ok_btn);
+
+        info = (TextView)findViewById(R.id.result_et);
+
+        
+
+        search.setOnClickListener(searchListener);
+
+        search.setOnLongClickListener(searchLongClickListener);
+
+    }
+
+    
+
+    //查询按钮的监听事件
+
+    private OnClickListener searchListener = new OnClickListener() {
+
+                public void onClick(View v) {
+
+                        info.setText("");
+
+                        if(entryisEmpty() == false)
+
+                        {
+
+                                String number = input.getText().toString();
+
+                                String phonedata = getPhoneData(number);
+
+                                String mobile = "_ _ _";
+
+                                String Corp = "_ _ _";
+
+                                String Card = "_ _ _";
+
+                                String Province = "_ _ _";
+
+                                String City = "_ _ _";
+
+                                String AreaCode = "_ _ _";
+
+                                String PostCode = "_ _ _";
+
+                                if(phonedata.contains("True"))
+
+                                {
+
+                                        mobile = getDate(phonedata, "<Mobile>", "</Mobile>");
+
+                                        Corp = getDate(phonedata, "<Corp>", "</Corp>");
+
+                                        Card = getDate(phonedata, "<Card>", "</Card>");
+
+                                        Province = getDate(phonedata, "<Province>", "</Province>");
+
+                                        City = getDate(phonedata, "<City>", "</City>");
+
+                                        AreaCode = getDate(phonedata, "<AreaCode>", "</AreaCode>");
+
+                                        PostCode = getDate(phonedata, "<PostCode>", "</PostCode>");
+
+                                        /*if(phonedata.contains("<Province />"))
+
+                                        {
+
+                                                Province = "未知";
+
+                                                City = "未知";
+
+                                                AreaCode = "未知";
+
+                                                PostCode = "未知";
+
+                                        }
+
+                                        else
+
+                                        {
+
+                                                Province = getDate(phonedata, "<Province>", "</Province>");
+
+                                                City = getDate(phonedata, "<City>", "</City>");
+
+                                                AreaCode = getDate(phonedata, "<AreaCode>", "</AreaCode>");
+
+                                                PostCode = getDate(phonedata, "<PostCode>", "</PostCode>");
+
+                                        }*/
+
+                                }
+
+                                else if(phonedata.contains("False"))
+
+                                {
+
+                                        mobile = getDate(phonedata, "<Mobile>", "</Mobile>");
+
+                                }
+
+                                
+
+                                info.setText("\t手    机：" + mobile +"\n\t省    份：" + Province 
+
+                                                        + "\n\t城    市：" + City + "\n\t区    号：" + AreaCode 
+
+                                                        + "\n\t邮    编：" + PostCode + "\n\t运营商："+ Corp
+
+                                                        + "\n\t类    型：" + Card);
+
+                        }
+
+                        else
+
+                        {
+
+                                Toast.makeText(SearchActivity.this, "请输入您要查询的11位手机号码!", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                }
+
+        };
+
+        
+
+         private OnLongClickListener searchLongClickListener = new View.OnLongClickListener() {
+
+                public boolean onLongClick(View v) {
+
+                        input.setText("");
+
+                        return true;
+
+                }
+
+        };
+
+    
+
+    //通过API获得包含手机号码信息的xml
+
+    public static String getPhoneData(String inputnumber)
+
+    {
+
+            String  phonedata = null;
+
+            try {
+
+                        URL url = new URL("http://api.showji.com/locating/?m="+inputnumber+"&outfmt=xml");
+
+                        try {
+
+                                InputStream in = url.openStream();
+
+                                BufferedReader br = new BufferedReader(new InputStreamReader(in,"UTF-8"));
+
+                                phonedata  = br.readLine();
+
+                        } catch (IOException e) {
+
+                                e.printStackTrace();
+
+                        }
+
+                } catch (MalformedURLException e) {
+
+                        e.printStackTrace();
+
+                }
+
+                return phonedata;
+
+    }
+
+
+
+    
+
+    //根据起始位置截取文件中的目标字符串
+
+    public boolean entryisEmpty() {
+
+                String entryContent = "";
+
+                entryContent = input.getText().toString().trim();
+
+                if (entryContent.equals("")) {
+
+                        return true;
+
+                } else {
+
+                        return false;
+
+                }
+
+        }
+
+
+
+    //根据起始位置截取文件中的目标字符串
+
+    public String getDate(final String in, String Datastart, String Dataend) {
+
+                int Startid = in.indexOf(Datastart) + Datastart.length();
+
+                int Endid = in.indexOf(Dataend, Startid);
+
+                return in.substring(Startid, Endid);
+
+        }
+
+
+
+}
+复制代码xml： <?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+
+        android:layout_width="fill_parent" 
+
+        android:layout_height="fill_parent"
+
+        android:orientation="vertical" 
+
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <LinearLayout
+
+                android:layout_width="fill_parent" 
+
+                android:layout_height="50px"
+
+                android:orientation="horizontal">
+
+                <EditText android:id="@+id/input_et" 
+
+                        android:layout_width="fill_parent"
+
+                        android:layout_height="fill_parent" 
+
+                        android:hint="Please input the phone number"
+
+                        android:textSize="18sp" 
+
+                        android:ellipsize="middle"
+
+                        android:phoneNumber="true"
+
+                        android:layout_weight="1">
+
+                </EditText>
+
+                <Button android:id="@+id/ok_btn"
+
+                        android:layout_weight="11" 
+
+                        android:layout_width="fill_parent"
+
+                        android:layout_height="fill_parent" 
+
+                        android:text="OK">
+
+                </Button>
+
+        </LinearLayout>
+
+        <TextView android:id="@+id/result_et" 
+
+                android:layout_width="fill_parent"
+
+                android:layout_height="wrap_content" 
+
+                android:padding="5px"
+
+                android:textSize="24sp" 
+
+                android:textStyle="bold"
+
+                android:gravity="left">
+
+        </TextView>
+
+</LinearLayout>
+复制代码记得加上权限： <supports-screens android:largeScreens="true" />
+
+          <uses-permission android:name="android.permission.INTERNET" />
+复制代码
+http://www.eoeandroid.com/thread-50824-1-1.html
