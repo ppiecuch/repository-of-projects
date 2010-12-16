@@ -1,0 +1,60 @@
+Intersection of a plane and a line
+Written by Paul Bourke
+August 1991 
+
+
+--------------------------------------------------------------------------------
+
+This note will illustrate the algorithm for finding the intersection of a line and a plane using two possible formulations for a plane.
+
+
+
+
+Solution 1
+The equation of a plane (points P are on the plane with normal N and point P3 on the plane) can be written as
+
+N dot (P - P3) = 0
+The equation of the line (points P on the line passing through points P1 and P2) can be written as
+
+
+P = P1 + u (P2 - P1)
+The intersection of these two occurs when
+
+
+N dot (P1 + u (P2 - P1)) = N dot P3
+Solving for u gives
+
+
+
+Note
+
+
+If the denominator is 0 then the normal to the plane is perpendicular to the line. Thus the line is either parallel to the plane and there are no solutions or the line is on the plane in which case there are an infinite number of solutions
+
+If it is necessary to determine the intersection of the line segment between P1 and P2 then just check that u is between 0 and 1.
+
+Solution 2
+A plane can also be represented by the equation
+
+A x + B y + C z + D = 0
+where all points (x,y,z) lie on the plane.
+
+Substituting in the equation of the line through points P1 (x1,y1,z1) and P2 (x2,y2,z2) 
+
+P = P1 + u (P2 - P1)
+gives
+
+
+A (x1 + u (x2 - x1)) + B (y1 + u (y2 - y1)) + C (z1 + u (z2 - z1)) + D = 0
+Solving for u
+
+
+
+Note
+
+
+the denominator is 0 then the normal to the plane is perpendicular to the line. Thus the line is either parallel to the plane and there are no solutions or the line is on the plane in which case are infinite solutions
+
+if it is necessary to determine the intersection of the line segment between P1 and P2 then just check that u is between 0 and 1.
+
+http://local.wasp.uwa.edu.au/~pbourke/geometry/planeline/
