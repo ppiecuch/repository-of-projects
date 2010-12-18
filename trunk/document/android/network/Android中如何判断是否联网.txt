@@ -1,0 +1,27 @@
+首先在AndroidManifest.xml中添加与连接网络相关的权限：
+
+view plaincopy to clipboardprint?
+<uses-permission android:name="android.permission.INTERNET"></uses-permission>  
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>  
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>  
+	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission> 
+
+判断联网的代码如下：
+
+view plaincopy to clipboardprint?
+ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);   
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();   
+        if(networkInfo == null || !networkInfo.isAvailable())   
+        {   
+            //当前有可用网络   
+        }   
+        else    
+        {   
+            //当前无可用网络   
+        }  
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/Sevan7/archive/2010/10/14/5940585.aspx

@@ -1,0 +1,231 @@
+ExpandableListView是android中可以实现下拉list的一个控件，具体的实现方法如下：
+
+首先：在layout的xml文件中定义一个ExpandableListView
+
+view plaincopy to clipboardprint?
+<LinearLayout    
+    android:id="@+id/linearLayout"  
+    android:layout_width="fill_parent"    
+    android:layout_height="fill_parent"  
+    androidrientation="vertical"  
+    >  
+       
+    <ExpandableListView  
+    android:id="@+id/expandableListView"  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+        />  
+</LinearLayout>  
+    <LinearLayout 
+    	android:id="@+id/linearLayout"
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent"
+        androidrientation="vertical"
+        >
+        
+        <ExpandableListView
+  			android:id="@+id/expandableListView"
+  			android:layout_width="fill_parent"
+  			android:layout_height="wrap_content"
+  		        />
+    </LinearLayout> 
+
+定义两个List，用来存放控件中Group/Child中的String
+
+view plaincopy to clipboardprint?
+private List<String> groupArray;   
+private List<List<String>> childArray;  
+	private List<String> groupArray;
+	private List<List<String>> childArray; 
+
+对这两个List进行初始化，并插入一些数据
+
+view plaincopy to clipboardprint?
+groupArray = new ArrayList<String>();   
+childArray = new ArrayList<List<String>>();   
+  
+groupArray.add("第一行");   
+groupArray.add("第二行");   
+  
+List<String> tempArray = new ArrayList<String>();   
+tempArray.add("第一条");   
+tempArray.add("第二条");   
+tempArray.add("第三条");   
+  
+for(int index = 0; index <groupArray.size(); ++index)   
+{   
+    childArray.add(tempArray);   
+}  
+		groupArray = new ArrayList<String>();
+		childArray = new ArrayList<List<String>>();
+		
+		groupArray.add("第一行");
+		groupArray.add("第二行");
+		
+		List<String> tempArray = new ArrayList<String>();
+		tempArray.add("第一条");
+		tempArray.add("第二条");
+		tempArray.add("第三条");
+		
+		for(int index = 0; index <groupArray.size(); ++index)
+		{
+			childArray.add(tempArray);
+		} 
+
+定义ExpandableListView的Adapter
+
+view plaincopy to clipboardprint?
+//ExpandableListView的Adapter   
+public class ExpandableAdapter extends BaseExpandableListAdapter   
+{   
+    Activity activity;   
+       
+    public ExpandableAdapter(Activity a)   
+    {   
+        activity = a;   
+    }   
+    public Object getChild(int groupPosition, int childPosition)   
+    {   
+        return childArray.get(groupPosition).get(childPosition);   
+    }   
+    public long getChildId(int groupPosition, int childPosition)   
+    {   
+        return childPosition;   
+    }   
+    public int getChildrenCount(int groupPosition)   
+    {   
+        return childArray.get(groupPosition).size();   
+    }   
+    public View getChildView(int groupPosition, int childPosition,   
+            boolean isLastChild, View convertView, ViewGroup parent)   
+    {   
+        String string = childArray.get(groupPosition).get(childPosition);   
+        return getGenericView(string);   
+    }   
+    // group method stub   
+    public Object getGroup(int groupPosition)   
+    {   
+        return groupArray.get(groupPosition);   
+    }   
+    public int getGroupCount()   
+    {   
+        return groupArray.size();   
+    }   
+    public long getGroupId(int groupPosition)   
+    {   
+        return groupPosition;   
+    }   
+    public View getGroupView(int groupPosition, boolean isExpanded,   
+            View convertView, ViewGroup parent)   
+    {   
+        String string = groupArray.get(groupPosition);   
+        return getGenericView(string);   
+    }   
+    // View stub to create Group/Children 's View   
+    public TextView getGenericView(String string)   
+    {   
+        // Layout parameters for the ExpandableListView   
+        AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(   
+                ViewGroup.LayoutParams.FILL_PARENT, 64);   
+        TextView text = new TextView(activity);   
+        text.setLayoutParams(layoutParams);   
+        // Center the text vertically   
+        text.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);   
+        // Set the text starting position   
+        text.setPadding(36, 0, 0, 0);   
+        text.setText(string);   
+        return text;   
+    }   
+    public boolean hasStableIds()   
+    {   
+        return false;   
+    }   
+    public boolean isChildSelectable(int groupPosition, int childPosition)   
+    {   
+        return true;   
+    }   
+}  
+	//ExpandableListView的Adapter
+	public class ExpandableAdapter extends BaseExpandableListAdapter
+	{
+		Activity activity;
+		
+		public ExpandableAdapter(Activity a)
+		{
+			activity = a;
+		}
+		public Object getChild(int groupPosition, int childPosition)
+		{
+			return childArray.get(groupPosition).get(childPosition);
+		}
+		public long getChildId(int groupPosition, int childPosition)
+		{
+			return childPosition;
+		}
+		public int getChildrenCount(int groupPosition)
+		{
+			return childArray.get(groupPosition).size();
+		}
+		public View getChildView(int groupPosition, int childPosition,
+				boolean isLastChild, View convertView, ViewGroup parent)
+		{
+			String string = childArray.get(groupPosition).get(childPosition);
+			return getGenericView(string);
+		}
+		// group method stub
+		public Object getGroup(int groupPosition)
+		{
+			return groupArray.get(groupPosition);
+		}
+		public int getGroupCount()
+		{
+			return groupArray.size();
+		}
+		public long getGroupId(int groupPosition)
+		{
+			return groupPosition;
+		}
+		public View getGroupView(int groupPosition, boolean isExpanded,
+				View convertView, ViewGroup parent)
+		{
+			String string = groupArray.get(groupPosition);
+			return getGenericView(string);
+		}
+		// View stub to create Group/Children 's View
+		public TextView getGenericView(String string)
+		{
+			// Layout parameters for the ExpandableListView
+			AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(
+					ViewGroup.LayoutParams.FILL_PARENT, 64);
+			TextView text = new TextView(activity);
+			text.setLayoutParams(layoutParams);
+			// Center the text vertically
+			text.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT);
+			// Set the text starting position
+			text.setPadding(36, 0, 0, 0);
+			text.setText(string);
+			return text;
+		}
+		public boolean hasStableIds()
+		{
+			return false;
+		}
+		public boolean isChildSelectable(int groupPosition, int childPosition)
+		{
+			return true;
+		}
+	} 
+
+最后，给定义好的ExpandableListView添加上Adapter
+
+view plaincopy to clipboardprint?
+ExpandableListView expandableListView = (ExpandableListView)findViewById(R.id.expandableListView);   
+expandableListView.setAdapter(new ExpandableAdapter(Main.this));  
+		ExpandableListView expandableListView = (ExpandableListView)findViewById(R.id.expandableListView);
+		expandableListView.setAdapter(new ExpandableAdapter(Main.this)); 
+
+运行即可见效果~~~
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/Sevan7/archive/2010/10/13/5937472.aspx
