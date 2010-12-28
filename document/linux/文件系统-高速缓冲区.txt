@@ -1,0 +1,132 @@
+Linux通过在内存中开辟一块缓冲区来保存最近从磁盘中读取的数据块，达到共享数据、减小对磁盘的读取频率、增大系统吞吐量的目的，这个缓冲区称为高速缓冲区（Cache Buffer）。高速缓冲区位于文件子系统与块设备驱动程序之间，所以Linux中除了设备驱动程序以外的所有程序对块设备的读写操作都必须通过高速缓冲区实现（很重要，一旦出现错误系统就完蛋）。
+
+ 按照Linux对内存的分配情况来看，高速缓冲区从内核模块的末端位置开始到主内存区的开始位置。其中640K到1M被显存和显示BIOS占据，所以实际的高速缓冲区的大小应该减去384K。
+
+    以1K为单元高速缓冲区被分为若干个缓冲块。并通过标识缓冲块的缓冲头部实现对缓冲块的管理，在高速缓冲区初始化时实现缓冲块的划分和缓冲头部的建立。详细的过程在void buffer_init(long buffer_end)中实现，此函数在main函数进入保护模式后调用，用以初始化高速缓冲区。
+      
+    初始化高速缓冲区的过程实际上是在高速缓冲区的高端开始划分1K大小的缓冲块，同时在低端开始建立与之相应的缓冲头部，直到缓冲区被划分完毕。建立缓冲头部的过程中，需要将这些缓冲头部建立成双向链表（此时都为空闲缓冲块，因此在建立连接的时候只需要简单地将当前缓冲头部的Next指针指向下一个建立的缓冲头就可以了）
+
+void buffer_init(long buffer_end)
+{
+       struct buffer_head * h = start_buffer;//内核模块的末尾
+        void * b;
+        int i;
+
+ 
+
+        if (buffer_end == 1<<20)//如果等于1M，划分的位置为640K
+            b = (void *) (640*1024);
+       else
+            b = (void *) buffer_end;
+
+
+       while ( (b -= BLOCK_SIZE) >= ((void *) (h+1)) ) 
+
+       {//当划分的位置到达缓冲头部时，停止。
+           h->b_dev = 0;
+           h->b_dirt = 0;
+           h->b_count = 0;
+           h->b_lock = 0;
+           h->b_uptodate = 0;
+           h->b_wait = NULL;//因为没有块在高速缓冲区，所以hash链表为空。
+           h->b_next = NULL;
+           h->b_prev = NULL;
+           h->b_data = (char *) b;//与缓冲块建立对应关系。
+           h->b_prev_free = h-1;//建立双向链表，指向前一个缓冲头部
+           h->b_next_free = h+1;//建立双向链表，指向后一个缓冲头部
+           h++;
+           NR_BUFFERS++;
+           if (b == (void *) 0x100000)//如果到达1M处，应该跳过384K
+                b = (void *) 0xA0000;
+      }
+     h--;
+     free_list = start_buffer;//空闲块双向链表头
+     free_list->b_prev_free = h;//建立双向链表
+     h->b_next_free = free_list;//建立双向链表
+     for (i=0;i<NR_HASH;i++)
+          hash_table[i]=NULL;//hash表初始化为空
+
+} 
+
+     在这里有必要介绍以下缓冲头部的结构：
+     struct buffer_head{
+        char* b_data;   //指向缓冲块;
+        unsigned long b_blocknr; //块号
+        unsigned short b_dev;  //设备号
+        unsigned char b_uptodate; //更新标志，只有标志为1时才表示可用
+        unsigned char b_dirty;  //是否被修改了，写延迟时使用这个标志
+        unsigned char b_count;  //块被引用的次数，当为0时为空闲缓冲块
+        char b_lock;  //是否被锁，用于互斥，在进行磁盘读写时会被锁。
+        unsigned task_struct *b_wait //等待缓冲区解锁的队列
+        unsigned buffer_head *b_prev //hash队列的前一块
+        unsigned buffer_head *b_next //hash队列的后一块
+        unsigned buffer_head *b_prev_free; //空闲表前一块
+        unsigned buffer_head *b_next_free; //空闲表后一块
+   }
+
+    指针b_prev和b_next建立起块的hash双向链表，当上层程序需要使用某个块时，通过hash函数将块散列到对应的hash链表上，然后查找hash链表。如果hash链表中没有块，说明块不在高速缓冲区，这就需要在空闲块链表中申请一个空闲块。将数据从磁盘中读出后放入空闲块，修改b_blocknr和b_dev后插入到hash链表中，并且将这个缓冲块放入空闲缓冲链表的末尾，因此位于空闲缓冲链表头部的永远时最近最少使用的块。
+
+    当上层程序调用bread函数读取块设备上指定的块时，bread函数首先会调用getblk函数，getblk函数首先查找高速缓冲区，如果高速缓冲区中已经有指定的块，就直接返回地址；如果没有就申请一个空闲块。bread函数根据返回块的b_uptodate标志判断getblk函数返回的块是否有效，如果有效就返回，如果无效就调用设备驱动程序去读取指定的块。
+
+
+
+ 这里对getblk函数详细分析一下： 
+
+ getblk函数
+
+ 输入：int dev设备号
+ int block数据块号
+ 输出：缓冲头部地址
+ {
+ start: 查找hash链表。
+       if(查找的结果表明在缓冲区){
+          返回缓冲区地址。
+      }
+      else{
+          查找空闲块双向链表。
+               if(存在空闲块){
+                    if(上锁了){
+                        进入睡眠状态。
+                            if(又被别人占用) {//通过b_count判断
+                            重新开始查询(goto start)
+                        }
+                        else{
+                             if(修改过) {//通过b_dirty判断
+                                 写入块设备。
+                                 进入睡眠状态。
+                                 if(又被别人占用) {//通过b_count判断
+                                 重新开始查询(goto start)
+                                 }
+                             }
+                        }
+             }
+              修改空闲块属性:b_dirty=0,b_count=1,b_uptodate=0
+             从原hash链表和空闲块链表中删除
+             修改b_dev,b_blocknr
+             插入到新的hash链表，并插入到空闲块链表末尾。
+             返回空闲块地址。
+
+          }
+         else{
+                   进入睡眠状态
+                   重新开始查询(goto start)
+         }
+     }
+
+}
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+理解了上面两个函数,理解Linux高速缓冲区的处理应该就没有问题了。
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/LinuxStroller/archive/2009/04/13/4069921.aspx
