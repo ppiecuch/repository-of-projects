@@ -1,0 +1,193 @@
+内存管理是C++程序员的痛。我的《内存管理变革系列》就是试图讨论更为有效的内存管理方式，以杜绝（或减少）内存泄漏，减轻C++程序员的负担。
+
+这篇短文我想换个方式，讨论一下如何以最快的速度找到内存泄漏。
+
+确认是否存在内存泄漏
+
+我们知道，MFC程序如果检测到存在内存泄漏，退出程序的时候会在调试窗口提醒内存泄漏。例如：
+
+class CMyApp : public CWinApp
+
+{
+
+public:
+
+   BOOL InitApplication()
+
+   {
+
+       int* leak = new int[10];
+
+       return TRUE;
+
+   }
+
+};
+
+产生的内存泄漏报告大体如下：
+
+Detected memory leaks!
+
+Dumping objects ->
+
+c:\work\test.cpp(186) : {52} normal block at 0×003C4410, 40 bytes long.
+
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+
+Object dump complete.
+
+这挺好。问题是，如果我们不喜欢MFC，那么难道就没有办法？或者自己做？
+
+呵呵，这不需要。其实，MFC也没有自己做。内存泄漏检测的工作是VC++的C运行库做的。也就是说，只要你是VC++程序员，都可以很方便地检测内存泄漏。我们还是给个样例：
+
+#include <crtdbg.h>
+
+ 
+
+inline void EnableMemLeakCheck()
+
+{
+
+   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+
+}
+
+ 
+
+void main()
+
+{
+
+   EnableMemLeakCheck();
+
+   int* leak = new int[10];
+
+}
+
+运行（提醒：不要按Ctrl+F5，按F5），你将发现，产生的内存泄漏报告与MFC类似，但有细节不同，如下：
+
+Detected memory leaks!
+
+Dumping objects ->
+
+{52} normal block at 0×003C4410, 40 bytes long.
+
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+
+Object dump complete.
+
+为什么呢？看下面。
+
+定位内存泄漏由于哪一句话引起的
+
+你已经发现程序存在内存泄漏。现在的问题是，我们要找泄漏的根源。
+
+一般我们首先确定内存泄漏是由于哪一句引起。在MFC中，这一点很容易。你双击内存泄漏报告的文字，或者在Debug窗口中按F4，IDE就帮你定位到申请该内存块的地方。对于上例，也就是这一句：
+
+int* leak = new int[10];
+
+这多多少少对你分析内存泄漏有点帮助。特别地，如果这个new仅对应一条delete（或者你把delete漏写），这将很快可以确认问题的症结。
+
+我们前面已经看到，不使用MFC的时候，生成的内存泄漏报告与MFC不同，而且你立刻发现按F4不灵。那么难道MFC做了什么手脚？
+
+其实不是，我们来模拟下MFC做的事情。看下例：
+
+inline void EnableMemLeakCheck()
+
+{
+
+   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+
+}
+
+ 
+
+#ifdef _DEBUG
+
+#define new   new(_NORMAL_BLOCK, __FILE__, __LINE__)
+
+#endif
+
+ 
+
+void main()
+
+{
+
+   EnableMemLeakCheck();
+
+   int* leak = new int[10];
+
+}
+
+再运行这个样例，你惊喜地发现，现在内存泄漏报告和MFC没有任何分别了。
+
+快速找到内存泄漏
+
+单确定了内存泄漏发生在哪一行，有时候并不足够。特别是同一个new对应有多处释放的情形。在实际的工程中，以下两种情况很典型：
+
+· 创建对象的地方是一个类工厂（ClassFactory）模式。很多甚至全部类实例由同一个new创建。对于此，定位到了new出对象的所在行基本没有多大帮助。 
+
+· COM对象。我们知道COM对象采用Reference Count维护生命周期。也就是说，对象new的地方只有一个，但是Release的地方很多，你要一个个排除。 
+
+那么，有什么好办法，可以迅速定位内存泄漏？
+
+答：有。
+
+在内存泄漏情况复杂的时候，你可以用以下方法定位内存泄漏。这是我个人认为通用的内存泄漏追踪方法中最有效的手段。
+
+我们再回头看看crtdbg生成的内存泄漏报告：
+
+Detected memory leaks!
+
+Dumping objects ->
+
+c:\work\test.cpp(186) : {52} normal block at 0×003C4410, 40 bytes long.
+
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+
+Object dump complete.
+
+除了产生该内存泄漏的内存分配语句所在的文件名、行号为，我们注意到有一个比较陌生的信息：{52}。这个整数值代表了什么意思呢？
+
+其实，它代表了第几次内存分配操作。象这个例子，{52}代表了第52次内存分配操作发生了泄漏。你可能要说，我只new过一次，怎么会是第52次？这很容易理解，其他的内存申请操作在C的初始化过程调用的呗。:)
+
+有没有可能，我们让程序运行到第52次内存分配操作的时候，自动停下来，进入调试状态？所幸，crtdbg确实提供了这样的函数：即 long _CrtSetBreakAlloc(long nAllocID)。我们加上它：
+
+inline void EnableMemLeakCheck()
+
+{
+
+   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+
+}
+
+ 
+
+#ifdef _DEBUG
+
+#define new   new(_NORMAL_BLOCK, __FILE__, __LINE__)
+
+#endif
+
+ 
+
+void main()
+
+{
+
+   EnableMemLeakCheck();
+
+   _CrtSetBreakAlloc(52);
+
+   int* leak = new int[10];
+
+}
+
+你发现，程序运行到 int* leak = new int[10]; 一句时，自动停下来进入调试状态。细细体会一下，你可以发现，这种方式你获得的信息远比在程序退出时获得文件名及行号有价值得多。因为报告泄漏文件名及行号，你获得的只是静态的信息，然而_CrtSetBreakAlloc则是把整个现场恢复，你可以通过对函数调用栈分析（我发现很多人不习惯看函数调用栈，如果你属于这种情况，我强烈推荐你去补上这一课，因为它太重要了）以及其他在线调试技巧，来分析产生内存泄漏的原因。通常情况下，这种分析方法可以在 5分钟内找到肇事者。
+
+当然，_CrtSetBreakAlloc要求你的程序执行过程是可还原的（多次执行过程的内存分配顺序不会发生变化）。这个假设在多数情况下成立。不过，在多线程的情况下，这一点有时难以保证。
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/Eric_Jo/archive/2009/06/12/4264442.aspx
