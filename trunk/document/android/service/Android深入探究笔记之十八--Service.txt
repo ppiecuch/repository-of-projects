@@ -1,0 +1,1529 @@
+1. Service 没有用户界面，且可以一直运行于系统后台，生命周期很长。
+
+   例如，要实现一个可以后台播放的音乐播放器，就可以采用 Service 的方式。
+
+   Android 中的 Service 还可以实现进程通信。即，一个应用可以调用另一个应用的在 Service 上公开的方法。
+
+   更详细的说明请参看文档：docs/reference/android/app/Service.html 说得非常详细。
+
+ 
+
+2. 为了相对独立且透彻的演示 Service 的用法。这里演示一个例子：电话窃听器。其实这个例子仅仅是名字不好听而已，在很所场合我们都要用到这个例子中所演示的知识点。
+
+   例如，如何监听到用户的通话状态 -- 意义在于很多时候，很多应用我们都需要知道这个状态。例如音乐播放器，电脑上它可以不管，但是放到手机应用上，却不得不关注用户是否来电了，一旦处于来电状态，立马停止播放。用户可不希望一遍煲电话，一边听音乐。
+
+   例如，如何刻录音频 -- 也许你想做一个交友客户端，你想用户记录一下身边美好的声音或者说几句话传到网上。你需要使用到这个技术。
+
+   等等。
+
+ 
+
+3. 新建 Android 项目
+
+ 
+
+4. 新建 Service -- PhoneService 继承 Service
+
+       public class PhoneService extends Service { }
+
+       
+
+5. Service 的 OnCreate 方法在服务启动时候调用，在服务的生命周期只会被调用一次,并且是由 Android 来管理和调用的。比较适合做数据的初始化工作。
+
+       
+
+6. 监听电话呼叫状态
+
+ view plaincopy to clipboardprint?
+/* 取得电话服务 */  
+ TelephonyManager telManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);   
+  
+ PhoneStateListener listener = new PhoneStateListener(){      
+               /* @param state 呼叫状态 @param incomingNumber :来电号码，只会在来电时有值 */  
+        @Override  public void onCallStateChanged(int state, String incomingNumber) {   
+              switch (state){   
+                 /* 无任何状态时,  
+                  * 注意：虽然是“无状态”，但是要知道，它是在 onCallStateChanged 内部的，这个方法就是在呼叫状态发生改变时调用的。  
+                  * 因此结合起来看，本状态就是：当由其它状态切换到 “无状态” 时的状态。  
+                  * 而对于呼叫状态来说，只有当 “挂断电话” 这一行为才符合这种状态描述。  
+                  * 刚接触这一块的时候，我拼命的找 “电话挂断” 事件。原来是它。  
+                  * 这个事件很重要。很多时候我们都要关注这个事件（不一定是通过监听这种方式）。  
+                  * 这是在 J2EE 里面或其它非移动电话领域开发之外的。  
+                  * 3G 手机再智能，也是电话，我们不能在实现我们的功能的时候，牺牲掉它的最基本功能 -- “打接电话”。这是底线。  
+                  * 3G 开发与其它应用开发的最大区别就是，我们不得不经常去考虑，这时候电话来了怎么办？短信来了怎么办？  
+                  * 用户突然想暂停一会应用去发个短信、打个电话怎么办？应用要提供怎样的机制去面对？*/  
+                case TelephonyManager.CALL_STATE_IDLE:   
+                       break;   
+                 /* 接起电话时 */  
+                case TelephonyManager.CALL_STATE_OFFHOOK:   
+                       // recordAndio(); --  录音   
+                       break;       
+                /* 电话进来时 */  
+                case TelephonyManager.CALL_STATE_RINGING:   
+                       // 记录来电号码   
+                       break;   
+                default:   
+               break;   
+              }   
+        super.onCallStateChanged(state, incomingNumber);   
+        }               
+ };   
+  
+ /* 监听电话的状态 */  
+ telManager.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);  
+      /* 取得电话服务 */
+       TelephonyManager telManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+      
+       PhoneStateListener listener = new PhoneStateListener(){   
+                     /* @param state 呼叫状态 @param incomingNumber :来电号码，只会在来电时有值 */
+              @Override  public void onCallStateChanged(int state, String incomingNumber) {
+                    switch (state){
+                       /* 无任何状态时,
+                        * 注意：虽然是“无状态”，但是要知道，它是在 onCallStateChanged 内部的，这个方法就是在呼叫状态发生改变时调用的。
+                        * 因此结合起来看，本状态就是：当由其它状态切换到 “无状态” 时的状态。
+                        * 而对于呼叫状态来说，只有当 “挂断电话” 这一行为才符合这种状态描述。
+                        * 刚接触这一块的时候，我拼命的找 “电话挂断” 事件。原来是它。
+                        * 这个事件很重要。很多时候我们都要关注这个事件（不一定是通过监听这种方式）。
+                        * 这是在 J2EE 里面或其它非移动电话领域开发之外的。
+                        * 3G 手机再智能，也是电话，我们不能在实现我们的功能的时候，牺牲掉它的最基本功能 -- “打接电话”。这是底线。
+                        * 3G 开发与其它应用开发的最大区别就是，我们不得不经常去考虑，这时候电话来了怎么办？短信来了怎么办？
+                        * 用户突然想暂停一会应用去发个短信、打个电话怎么办？应用要提供怎样的机制去面对？*/
+                      case TelephonyManager.CALL_STATE_IDLE:
+                             break;
+                       /* 接起电话时 */
+                      case TelephonyManager.CALL_STATE_OFFHOOK:
+                             // recordAndio(); --  录音
+                             break;    
+                      /* 电话进来时 */
+                      case TelephonyManager.CALL_STATE_RINGING:
+                             // 记录来电号码
+                             break;
+                      default:
+                     break;
+                    }
+              super.onCallStateChanged(state, incomingNumber);
+              }            
+       };
+      
+       /* 监听电话的状态 */
+       telManager.listen(listener, PhoneStateListener.LISTEN_CALL_STATE); 
+
+        
+
+       在清单文件AndroidManifest.xml中添加读取来单状态的权限：
+
+       <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+ 
+
+       
+
+7. 音频采集
+
+       第一步：在功能清单文件AndroidManifest.xml中添加音频刻录权限：
+
+       <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
+ 
+
+       第二步：编写音频刻录代码:
+
+       MediaRecorder recorder = new MediaRecorder();
+
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);//从麦克风采集声音
+
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);//内容输出格式，THREE_GPP -- 3GP
+
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);//音频编码方式,AudioEncoder.AMR_NB -- amr
+
+        recorder.setOutputFile("/mnt/sdcard/itcast.amr"); // 存储路径
+
+        recorder.prepare();//预期准备
+
+        recorder.start();   //开始刻录
+
+        ...
+
+        recorder.stop();//停止刻录
+
+        recorder.reset();   //重设
+
+        recorder.release(); //刻录完成一定要释放资源
+
+        
+
+8. 挂断电话之后，开一条子线程，上传录制的文件。
+
+       new Thread(new UploadThread()).start();
+
+       
+
+9. 注册服务  <service android:name=".PhoneService" /> 
+
+ 
+
+10. 服务不能自己运行。
+
+   需要通过调用Context.startService()或Context.bindService()方法启动服务。
+
+   这两个方法都可以启动Service，但是它们的使用场合有所不同。
+
+   
+
+   ** 使用startService()方法启用服务，
+
+     访问者与服务之间没有关连，即使访问者退出了，服务仍然运行。这种情况下的 Service 在功能和业务上应该具有一定的独立性。一般不需要和其它组件有频繁的通信。
+
+     采用Context.startService()方法启动服务，只能调用Context.stopService()方法结束服务，服务结束时会调用onDestroy()方法。
+
+     
+
+   ** 使用bindService()方法启用服务，
+
+     访问者与服务绑定在了一起，访问者一旦退出，服务也就终止。
+
+   
+
+ 
+
+11. 那么本例 “电话窃听器” 这个 Service。要怎么启动呢？
+
+    当然最好就是开机自动启动。你别指望用户去给自己启动一个麻烦。
+
+    最好的办法就是写一个 BroadcastReceiver -- 广播接收者。
+
+    去接收 “开机” 广播，在接收到系统发出的 “开机广播” 时，马上启动 “监听器” 服务。
+
+    <intent-filter>
+
+        <action android:name="android.intent.action.BOOT_COMPLETED"/>
+
+    </intent-filter>
+
+   
+
+ 
+
+12. 代码
+
+       ** PhoneService    
+
+ view plaincopy to clipboardprint?
+package wjh.android.phonelistener;   
+  
+     import java.io.File;   
+     import java.io.IOException;   
+     import java.io.OutputStream;   
+     import java.io.PushbackInputStream;   
+     import java.io.RandomAccessFile;   
+     import java.net.Socket;   
+       
+     import android.app.Service;   
+     import android.content.Context;   
+     import android.content.Intent;   
+     import android.media.MediaRecorder;   
+     import android.os.Environment;   
+     import android.os.IBinder;   
+     import android.telephony.PhoneStateListener;   
+     import android.telephony.TelephonyManager;   
+     import android.util.Log;   
+       
+     public class PhoneService extends Service {   
+       
+            @Override  
+            public IBinder onBind(Intent intent) {   
+                   return null;   
+            }   
+              
+            /* 此方法是 Service的生命周期方法，是由  Android   */  
+            @Override  
+            public void onCreate() {   
+                   super.onCreate();   
+                   /* Context.TELEPHONY_SERVICE = "phone",因此此处也可以直接写成 "phone" */  
+                   TelephonyManager telManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);   
+                   /* 注册对电话状态的监听。  
+                    * LISTEN_CALL_STATE 表示是对电话呼叫状态的监听，其值为 0x00000020 ，因此这里可以直接使用32 */  
+                   telManager.listen(new PhoneListener(), PhoneStateListener.LISTEN_CALL_STATE);   
+            }   
+              
+            private final class PhoneListener extends PhoneStateListener {   
+                   private final static String TAG = "PhoneListener";   
+                   private String phone;   
+                   private MediaRecorder recorder;   
+                   private File audioFile;   
+                   private boolean record;   
+                     
+                   /* 由方法名即可看出，这是电话呼叫状态发生改变的事件 */  
+                   @Override  
+                   public void onCallStateChanged(int state, String incomingNumber) {   
+                          switch (state) {   
+                          /* 来电时 */  
+                          case TelephonyManager.CALL_STATE_RINGING:   
+                                 phone = incomingNumber;   
+                                 break;   
+                          /* 接起电话时 */  
+                          case TelephonyManager.CALL_STATE_OFFHOOK:   
+                                 recordAudio();   
+                                 record = true;   
+                                 break;   
+                          /* 空闲状态：挂断 */  
+                          case TelephonyManager.CALL_STATE_IDLE:   
+                                 stopAudio();   
+                                 break;       
+                          }   
+                   }   
+                     
+                   private void recordAudio() {   
+                          try {   
+                                 audioFile = new File(Environment.getExternalStorageDirectory(), phone+"_"+ System.currentTimeMillis()+".3gp");   
+                                 recorder = new MediaRecorder();   
+                                 recorder.setAudioSource(MediaRecorder.AudioSource.MIC);   
+                                 recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);   
+                                 recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);   
+                                 recorder.setOutputFile(audioFile.getAbsolutePath());   
+                                 recorder.prepare();   
+                                 recorder.start();   
+                          } catch (Exception e) {   
+                                 Log.i(TAG, e.toString());   
+                          }   
+                   }   
+                     
+                   private void stopAudio() {   
+                          if(recorder!=null){   
+                                 if(record) recorder.stop();   
+                                 recorder.release();   
+                                 recorder = null;   
+                                 record = false;   
+                                 uploadAudio();   
+                          }   
+                   }   
+                     
+                   /**  
+                    * 上传电话录音  
+                    */  
+                   private void uploadAudio() {   
+                          new Thread(new UploadTask()).start();   
+                   }   
+                     
+                   /**  
+                    * UI 线程里不能处理耗时的工作（超过5秒），  
+                    * 因此，上传文件的工作应该是新开一条线程来完成  
+                    */  
+                   private final class UploadTask implements Runnable{   
+                          public void run() {   
+                                  ...(建议采用 Socket 与服务器通信。服务器要有一个监听程序来接收本客户端的上传文件。)   
+                           }     
+                   }   
+            }   
+       
+     }  
+  package wjh.android.phonelistener;
+ 
+       import java.io.File;
+       import java.io.IOException;
+       import java.io.OutputStream;
+       import java.io.PushbackInputStream;
+       import java.io.RandomAccessFile;
+       import java.net.Socket;
+      
+       import android.app.Service;
+       import android.content.Context;
+       import android.content.Intent;
+       import android.media.MediaRecorder;
+       import android.os.Environment;
+       import android.os.IBinder;
+       import android.telephony.PhoneStateListener;
+       import android.telephony.TelephonyManager;
+       import android.util.Log;
+      
+       public class PhoneService extends Service {
+      
+              @Override
+              public IBinder onBind(Intent intent) {
+                     return null;
+              }
+             
+              /* 此方法是 Service的生命周期方法，是由  Android   */
+              @Override
+              public void onCreate() {
+                     super.onCreate();
+                     /* Context.TELEPHONY_SERVICE = "phone",因此此处也可以直接写成 "phone" */
+                     TelephonyManager telManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                     /* 注册对电话状态的监听。
+                      * LISTEN_CALL_STATE 表示是对电话呼叫状态的监听，其值为 0x00000020 ，因此这里可以直接使用32 */
+                     telManager.listen(new PhoneListener(), PhoneStateListener.LISTEN_CALL_STATE);
+              }
+             
+              private final class PhoneListener extends PhoneStateListener {
+                     private final static String TAG = "PhoneListener";
+                     private String phone;
+                     private MediaRecorder recorder;
+                     private File audioFile;
+                     private boolean record;
+                    
+                     /* 由方法名即可看出，这是电话呼叫状态发生改变的事件 */
+                     @Override
+                     public void onCallStateChanged(int state, String incomingNumber) {
+                            switch (state) {
+                            /* 来电时 */
+                            case TelephonyManager.CALL_STATE_RINGING:
+                                   phone = incomingNumber;
+                                   break;
+                            /* 接起电话时 */
+                            case TelephonyManager.CALL_STATE_OFFHOOK:
+                                   recordAudio();
+                                   record = true;
+                                   break;
+                            /* 空闲状态：挂断 */
+                            case TelephonyManager.CALL_STATE_IDLE:
+                                   stopAudio();
+                                   break;    
+                            }
+                     }
+                    
+                     private void recordAudio() {
+                            try {
+                                   audioFile = new File(Environment.getExternalStorageDirectory(), phone+"_"+ System.currentTimeMillis()+".3gp");
+                                   recorder = new MediaRecorder();
+                                   recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                                   recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                                   recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                                   recorder.setOutputFile(audioFile.getAbsolutePath());
+                                   recorder.prepare();
+                                   recorder.start();
+                            } catch (Exception e) {
+                                   Log.i(TAG, e.toString());
+                            }
+                     }
+                    
+                     private void stopAudio() {
+                            if(recorder!=null){
+                                   if(record) recorder.stop();
+                                   recorder.release();
+                                   recorder = null;
+                                   record = false;
+                                   uploadAudio();
+                            }
+                     }
+                    
+                     /**
+                      * 上传电话录音
+                      */
+                     private void uploadAudio() {
+                            new Thread(new UploadTask()).start();
+                     }
+                    
+                     /**
+                      * UI 线程里不能处理耗时的工作（超过5秒），
+                      * 因此，上传文件的工作应该是新开一条线程来完成
+                      */
+                     private final class UploadTask implements Runnable{
+                            public void run() {
+                                    ...(建议采用 Socket 与服务器通信。服务器要有一个监听程序来接收本客户端的上传文件。)
+                             }  
+                     }
+              }
+      
+       }     
+
+       
+
+13. 建立能与访问者进行相互通信的本地服务
+
+       当服务和访问者在同一个进程内部，就叫本地服务。因为是在同一个内存块，所以访问者可以直接通过“服务”的内存引用就可以与服务交互。
+
+       
+
+       通过startService()和stopService()启动关闭服务。
+
+       适用于服务和访问者之间没有交互的情况。
+
+       如果服务和访问者之间需要方法调用或者传递参数，则需要使用bindService()和unbindService()方法启动关闭服务。
+
+ 
+
+       采用Context.bindService()方法启动服务，
+
+       在服务未被创建时，系统会先调用服务的onCreate()方法，接着调用onBind()方法，这个时候访问者和服务绑定在一起。
+
+       如果访问者要与服务进行通信，那么，onBind()方法必须返回Ibinder对象。
+
+       如果访问者退出了，系统就会先调用服务的onUnbind()方法，接着调用onDestroy()方法。
+
+       如果调用bindService()方法前服务已经被绑定，多次调用bindService()方法并不会导致多次创建服务及绑定(也就是说onCreate()和onBind()方法并不会被多次调用)。
+
+       如果访问者希望与正在绑定的服务解除绑定，可以调用unbindService()方法，调用该方法也会导致系统调用服务的onUnbind()-->onDestroy()方法。
+
+ 
+
+       案例：根据学号查询学生
+
+         view plaincopy to clipboardprint?
+public class MainActicity extends Activity {   
+    private EditText noText;   
+    private TextView resultView;   
+    private IStudentService binder;   
+    private StudentServiceConnection conn = new StudentServiceConnection();   
+       
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {   
+        super.onCreate(savedInstanceState);   
+        setContentView(R.layout.main);   
+           
+        noText = (EditText) this.findViewById(R.id.no);   
+        resultView = (TextView) this.findViewById(R.id.resultView);   
+        Button button = (Button) this.findViewById(R.id.button);   
+           
+        Intent service = new Intent(this, StudentService.class);   
+        /* BIND_AUTO_CREATE 值为1，表示绑定此服务之后，自动创建此服务   
+         * ServiceConnection conn :  */  
+        this.bindService(service, conn, BIND_AUTO_CREATE);   
+           
+        button.setOnClickListener(new View.OnClickListener() {   
+            @Override  
+            public void onClick(View v) {   
+                Integer id = Integer.valueOf(noText.getText().toString());   
+                String name = binder.getStudentById(id);   
+                resultView.setText(name);   
+            }   
+        });   
+    }   
+       
+    private final class StudentServiceConnection implements ServiceConnection {   
+        @Override  
+        public void onServiceConnected(ComponentName name, IBinder service) {   
+            binder = (IStudentService) service;   
+        }   
+        @Override  
+        public void onServiceDisconnected(ComponentName name) {   
+            unbindService(conn);   
+        }   
+           
+    }   
+}   
+/**  
+ * 服务  
+ */  
+public class StudentService extends Service {   
+    private String[] names = {"wjh", "java", "j2ee", "android"};   
+    private IBinder binder = new StudentBinder();   
+       
+    @Override  
+    public IBinder onBind(Intent intent) {   
+        return binder;   
+    }   
+    private final class StudentBinder extends Binder implements IStudentService{   
+        @Override  
+        public String getStudentById(int id) {   
+            return getName(id);   
+        }   
+    }   
+       
+    /**  
+     * 模拟在数据库根据学号查询学生  
+     * @param id 学生 id  
+     */  
+    public String getName(int id) {   
+        if(id >= 1 && id < 5) {   
+            return names[id-1];   
+        }   
+        return getText(R.string.sutnotexist) + "";   
+    }   
+}   
+/**  
+ * 业务接口  
+ */  
+public interface IStudentService {   
+    String getStudentById(int id);   
+}  
+public class MainActicity extends Activity {
+	private EditText noText;
+	private TextView resultView;
+	private IStudentService binder;
+	private StudentServiceConnection conn = new StudentServiceConnection();
+	
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        noText = (EditText) this.findViewById(R.id.no);
+        resultView = (TextView) this.findViewById(R.id.resultView);
+        Button button = (Button) this.findViewById(R.id.button);
+        
+        Intent service = new Intent(this, StudentService.class);
+        /* BIND_AUTO_CREATE 值为1，表示绑定此服务之后，自动创建此服务 
+         * ServiceConnection conn :  */
+        this.bindService(service, conn, BIND_AUTO_CREATE);
+        
+        button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Integer id = Integer.valueOf(noText.getText().toString());
+				String name = binder.getStudentById(id);
+				resultView.setText(name);
+			}
+        });
+    }
+	
+	private final class StudentServiceConnection implements ServiceConnection {
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			binder = (IStudentService) service;
+		}
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			unbindService(conn);
+		}
+		
+	}
+}
+/**
+ * 服务
+ */
+public class StudentService extends Service {
+	private String[] names = {"wjh", "java", "j2ee", "android"};
+	private IBinder binder = new StudentBinder();
+	
+	@Override
+	public IBinder onBind(Intent intent) {
+		return binder;
+	}
+	private final class StudentBinder extends Binder implements IStudentService{
+		@Override
+		public String getStudentById(int id) {
+			return getName(id);
+		}
+	}
+	
+	/**
+	 * 模拟在数据库根据学号查询学生
+	 * @param id 学生 id
+	 */
+	public String getName(int id) {
+		if(id >= 1 && id < 5) {
+			return names[id-1];
+		}
+		return getText(R.string.sutnotexist) + "";
+	}
+}
+/**
+ * 业务接口
+ */
+public interface IStudentService {
+	String getStudentById(int id);
+}   
+
+              
+
+              总结：
+
+                     1. 目标，Service 提供出一个方法，让访问者可以直接调用。
+
+                     
+
+                     2. 激活服务。
+
+                            ** 因为在同一应用中，所以采用显式意图就可以激活。
+
+                                   Intent service = new Intent(this, StudentService.class);
+
+                                   StudentService 为服务类.
+
+                            ** 绑定服务并激活
+
+                                    this.bindService(service, conn, BIND_AUTO_CREATE);
+
+                                    第一个参数，就是上面的用于与服务通讯的 Intent。已经构建好了
+
+                                    第三个参数，BIND_AUTO_CREATE，表示表示绑定此服务之后，自动创建此服务。也就是说服务就可以被激活了。
+
+                                    只剩下第二个参数，我们只需要关注如何构建这个参数使目标服务可以为我们服务。
+
+                                    
+
+                     3. 使目标服务为本应用服务。
+
+                            ** 参数 conn 要求的是一个 ServiceConnection 类型的对象。ServiceConnection是一个接口。因此我们要实现它。
+
+                                   class StudentServiceConnection implements ServiceConnection;
+
+                            
+
+                            ** ServiceConnection 有两个方法需要我们去实现：
+
+                                   onServiceConnected(ComponentName name, IBinder service)
+
+                                          -- 与服务发生连接事件
+
+                                   onServiceDisconnected(ComponentName name)
+
+                                          -- 与服务断开连接事件
+
+                            ** 关注 onServiceConnected 方法
+
+                                   这个方法是与服务类直接发生关系的关键。因为类与类之间通信，无非是通过参数传递。一个指向同一块内存地址的引用被传来传去。
+
+                                   onServiceConnected 方法的第二个参数 “IBinder service” 就是 Service 中，onBind 方法的返回值！！
+
+                                   (第一个参数 ComponentName name 描述了当前连接的 Service 的一些信息，如类名，包名等等 )
+
+                            
+
+                            ** 既然是这样，焦点终于转回了 Service 了，我们只需要关注如何在 Service 中构建一个访问者可用的 IBinder 对象就行了。
+
+                     
+
+                     4. 关注 Service 
+
+                            class StudentService extends Service
+
+                            
+
+                            ** 这个方法 public IBinder onBind(Intent intent) 的返回值就是 ServiceConnection 的第二个参数 “IBinder service”
+
+                            
+
+                            ** 第1条提到目标是 "Service 提供出一个方法，让访问者可以直接调用"
+
+                               而现在我们知道，访问者是通过 IBinder 的实例对象来与 Sercice 交互的。
+
+                               因此，目标再继续细化就是：让访问者可以直接调用 IBinder 实例的某个方法来达到目的是最佳的。
+
+                               那么，只能是定义一个 IBinder 的子类了，让他自定义一个业务方法供调用者使用。
+
+                            
+
+                            ** 抽取出一个业务接口，让调用者面向接口。
+
+                               public interface IStudentService {
+
+                                   String getStudentNameById(int id);
+
+                               }
+
+                            
+
+                             ** 定义一个 IBinder 的子类，并实现 IStudentService 接口
+
+                                    private final class StudentBinder extends Binder implements IStudentService {
+
+                                          @Override
+
+                                          public String getStudentNameById(int id) {
+
+                                                 return /*根据学生 id 返回学生姓名*/;
+
+                                          }
+
+                                   }
+
+                            
+
+                            ** 回到与访问者发生交互最近的 onBind 方法，让其返回 StudentBinder 对象
+
+                                   public IBinder onBind(Intent intent) {
+
+                                          return new StudentBinder();
+
+                                   }
+
+                            
+
+                     5. 访问者大大方方的访问吧.
+
+                            ** 上面说到 ServiceConnection 的 onServiceConnected 方法的第二个参数，其实就是 Service 的 onBind 方法返回值。
+
+                               因此，我们只需要将其返回值由 IBinder 强转为 IStudentService 接口，就可以使用 getStudentNameById 方法了。
+
+                                 public void onServiceConnected(ComponentName name, IBinder service) {
+
+                                        /* 其实说穿了，前面那么多工作，就是为了实现这里的强转而已 */
+
+                                          this.binder = (IStudentService) service;
+
+                                   }
+
+                               /* 使用 this.binder 是因为，ServiceConnection 一般被定义为内部类，
+
+                                * 然后给外部类定义一个成员变量 binder，
+
+                                * 将 onServiceConnected 方法的参数值赋给这个外部类成员变量，就可以很方便的在外面使用了。*/
+
+                             
+
+                             ** 与 Service 交互，实现最终需求。
+
+                                  String name = binder.getStudentById(id);
+
+                                  
+
+                                  
+
+                                  
+
+ 
+
+14. 使用AIDL和远程服务实现进程通信 （服务不在本地客户端）
+
+       还有一种需求是，一个应用要访问另一个应用启动的服务。
+
+       在Android中, 每个应用程序都有自己的进程。
+
+       不同的进程之间通信，也就是说要把一个对象，传递到到另一个应用，并且能供目标应用使用。
+
+       这需要把对象解析成操作系统能够理解的数据格式, 才能达到跨界对象访问的目的。
+
+       Android中, 采用AIDL(Android Interface Definition Language：接口定义语言)方式来实现。
+
+       
+
+       AIDL是一种接口定义语言，用于约束两个进程间的通讯规则，供编译器生成代码，实现Android设备上的两个进程间通信(IPC)。
+
+       进程与进程之间的通信信息，首先会被转换成AIDL协议消息，然后发送给对方，对方收到AIDL协议消息后再转换成相应的对象。整个过程有点类似于 WebService 的远程调用机制。
+
+       由于进程之间的通信信息需要双向转换，所以android采用代理类（注意：也就是说，当我们获取到某个进程传过来的对象时，这个对象只是一个代理）在背后实现了信息的双向转换。
+
+       
+
+       这些都是些原理上的东西，实践起来远远没有这么麻烦，因为代理类由android编译器生成，对开发人员来说是透明的。
+
+       我们只需紧紧记住几个步骤就行了。
+
+ 
+
+       ** AIDL
+
+              编写Aidl文件时，需要注意下面几点: 
+
+                1.接口名和aidl文件名相同。例如，interface IStudentService 对应的文件名就应该为 IStudentService.aidl
+
+                2.接口和方法前不用加访问权限修饰符public,private,protected等,也不能用final,static。
+
+                3.Aidl默认支持的类型包话java基本类型（int、long、boolean等）和（String、List、Map、CharSequence），使用这些类型时不需要import声明。对于List和Map中的元素类型必须是Aidl支持的类型。如果使用自定义类型作为参数或返回值，自定义类型必须实现Parcelable接口。
+
+                4.自定义类型和AIDL生成的其它接口类型在aidl描述文件中，应该显式import，即便在该类和定义的包在同一个包中。
+
+                5.在aidl文件中所有非Java基本类型参数必须加上in、out、inout标记，以指明参数是输入参数、输出参数还是输入输出参数。
+
+                6.Java原始类型默认的标记为in,不能为其它标记。
+
+ 
+
+ 
+
+       例：调用其它应用的服务，根据id，查询学生名字。
+
+              1. 新建 Android 项目，作为服务的载体：StudentQueryService
+
+                 新建 Android 项目，应用作为访问 Service 访问者: StudentManager
+
+              
+
+              2. 编写 StudentQueryService 代码
+
+                     ** 新建 Service
+
+                        view plaincopy to clipboardprint?
+public class StudentRemoteService extends Service {   
+    private String[] names = {"wjh", "java", "j2ee", "android"};   
+    private RemoteStudentBinder binder = new RemoteStudentBinder();   
+    @Override  
+    public IBinder onBind(Intent intent) {   
+        return binder;   
+    }   
+    private final class RemoteStudentBinder extends Stub {   
+        @Override  
+        public String getStudentNameById(int id) throws RemoteException {   
+            return getName(id);   
+        }   
+    }   
+       
+    /**  
+     * 模拟在数据库根据学号查询学生  
+     * @param id   
+     *  学生 id  
+     */  
+    public String getName(int id) {   
+        if(id >= 1 && id < 5) {   
+            return names[id-1];   
+        }   
+        return getText(R.string.sutnotexist) + "";   
+    }   
+}  
+public class StudentRemoteService extends Service {
+	private String[] names = {"wjh", "java", "j2ee", "android"};
+	private RemoteStudentBinder binder = new RemoteStudentBinder();
+	@Override
+	public IBinder onBind(Intent intent) {
+		return binder;
+	}
+	private final class RemoteStudentBinder extends Stub {
+		@Override
+		public String getStudentNameById(int id) throws RemoteException {
+			return getName(id);
+		}
+	}
+	
+	/**
+	 * 模拟在数据库根据学号查询学生
+	 * @param id 
+	 * 	学生 id
+	 */
+	public String getName(int id) {
+		if(id >= 1 && id < 5) {
+			return names[id-1];
+		}
+		return getText(R.string.sutnotexist) + "";
+	}
+} 
+
+                     ** 新建 AIDL 文件，注意后缀名：IStudentService.aidl
+
+                           view plaincopy to clipboardprint?
+interface IStudentService {   
+    String getStudentNameById(int id);   
+}  
+ interface IStudentService {
+     String getStudentNameById(int id);
+ } 
+
+                        当这个文件建立好后，刷新项目，可以看到，在gen目录下多了一个 IStudentService.java 文件
+
+                        这个类是整个进程通信的实现的核心类。
+
+                        它一个接口类
+
+                          public interface IStudentService extends android.os.IInterface
+
+                        同时结构很奇怪。因为就在这个接口内部，以内部类的形式给出了此接口的实现：
+
+                          public static abstract class Stub extends android.os.Binder implements wjh.android.service.IStudentService 
+
+                        值得注意的是，它继承了 Binder 接口，这与上例中“访问本应用的服务”时的机制类似
+
+                          
+
+                     ** AndroidManifest.xml
+
+                        view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  
+      package="wjh.android.service"  
+      android:versionCode="1"  
+      android:versionName="1.0">  
+    <application android:icon="@drawable/icon" android:label="@string/app_name">  
+            <!-- 注册 Service,同时提供了一个 Intent，给其它应用访问它提供了可能 -->  
+        <service android:name=".StudentRemoteService">  
+            <intent-filter>  
+                <action android:name="wjh.android.student.query.remote" />  
+            </intent-filter>  
+        </service>  
+    </application>  
+    <uses-sdk android:minSdkVersion="8" />  
+</manifest>   
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="wjh.android.service"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+    		<!-- 注册 Service,同时提供了一个 Intent，给其它应用访问它提供了可能 -->
+		<service android:name=".StudentRemoteService">
+			<intent-filter>
+				<action android:name="wjh.android.student.query.remote" />
+			</intent-filter>
+		</service>
+    </application>
+    <uses-sdk android:minSdkVersion="8" />
+</manifest>  
+
+                            
+
+                     ** string values
+
+                     
+
+                            <resources>
+
+                                <string name="hello">Hello World!</string>
+
+                                <string name="app_name">远程服务</string>
+
+                                <string name="sutnotexist">此学生不存在！</string>
+
+                            </resources>
+
+ 
+
+              3. 编写 StudentManager 代码
+
+                     
+
+                     ** 布局设计
+
+                            main.xml
+
+                            view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent"  
+    >  
+<TextView     
+    android:layout_width="fill_parent"    
+    android:layout_height="wrap_content"    
+    android:text="@string/no"  
+    />  
+       
+  <EditText android:id="@+id/no"  
+    android:layout_width="fill_parent"    
+    android:layout_height="wrap_content"    
+    />     
+       
+    <Button android:id="@+id/button"  
+    android:layout_width="wrap_content"    
+    android:layout_height="wrap_content"    
+    android:text="@string/button"  
+    />     
+       
+    <TextView android:id="@+id/resultView"  
+    android:layout_width="fill_parent"    
+    android:layout_height="wrap_content"    
+    />     
+</LinearLayout>  
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="@string/no"
+    />
+    
+  <EditText android:id="@+id/no"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    />  
+    
+    <Button android:id="@+id/button"
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content" 
+    android:text="@string/button"
+    />  
+    
+    <TextView android:id="@+id/resultView"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    />  
+</LinearLayout> 
+
+                     ** string values
+
+                            strings.xml
+
+                            
+
+                            <?xml version="1.0" encoding="utf-8"?>
+
+                            <resources>
+
+                                <string name="hello">Hello World, MainActivity!</string>
+
+                                <string name="app_name">调用远程服务实现学生查询</string>
+
+                                <string name="no">学号</string>
+
+                                <string name="button">查询</string>
+
+                            </resources>
+
+                     
+
+                     
+
+                     ** 将 StudentQueryService 项目中的 IStudentService.aidl 文件 copy 一份到本项目中来
+
+                        注意：应该要将两个项目中的这个 aidl 文件放置在同一个包下面。
+
+                              例如，本例中，我在 StudentQueryService 中，我将 IStudentService.aidl 放置在了 wjh.android.service 包下。
+
+                              因此，查看 gen 下，自动生成的 IStudentService.java 类也是在 wjh.android.service 包下的。
+
+                              要复制这个文件到 “访问者” -- StudentManager 项目中，首先要建一个相同的包 wjh.android.service，然后再将 IStudentService.aidl 文件复制到包下。
+
+                     
+
+                     ** 刷新项目，同样可以看到在 gen 包下，生成了一个与 IStudentService.aidl 包名相同的包，其下面生成了一个 IStudentService 接口。
+
+                     
+
+                     ** 编写 MainActivity 代码
+
+                           view plaincopy to clipboardprint?
+public class MainActivity extends Activity {   
+    private EditText noText;   
+    private TextView resultView;   
+    private IStudentService binder;   
+    private StudentServiceConnection conn = new StudentServiceConnection();   
+       
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {   
+        super.onCreate(savedInstanceState);   
+        setContentView(R.layout.main);   
+           
+        noText = (EditText) this.findViewById(R.id.no);   
+        resultView = (TextView) this.findViewById(R.id.resultView);   
+        Button button = (Button) this.findViewById(R.id.button);   
+           
+        /* 激活远程服务 */  
+        Intent service = new Intent("wjh.android.student.query.remote");   
+        this.bindService(service, conn, BIND_AUTO_CREATE);   
+           
+        button.setOnClickListener(new View.OnClickListener() {   
+            @Override  
+            public void onClick(View v) {   
+                Integer id = Integer.valueOf(noText.getText().toString());   
+                String name = "";   
+                try {   
+                    /* 根据 id 获取学生姓名 */  
+                    name = binder.getStudentNameById(id);   
+                } catch (RemoteException e) {   
+                    e.printStackTrace();   
+                }   
+                resultView.setText(name);   
+            }   
+        });   
+    }   
+    private final class StudentServiceConnection implements ServiceConnection {   
+        @Override  
+        public void onServiceConnected(ComponentName name, IBinder service) {   
+            /* 因为此处的 service 其实是远程服务返回过来的，  
+             * 因为经过了进程与进程之间的通信，这个对象，仅仅是一个代理对象，因此不能直接强制转换  */  
+            binder = IStudentService.Stub.asInterface(service);   
+        }   
+        @Override  
+        public void onServiceDisconnected(ComponentName name) {   
+            unbindService(conn);   
+        }   
+           
+    }   
+}  
+public class MainActivity extends Activity {
+	private EditText noText;
+	private TextView resultView;
+	private IStudentService binder;
+	private StudentServiceConnection conn = new StudentServiceConnection();
+	
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        noText = (EditText) this.findViewById(R.id.no);
+        resultView = (TextView) this.findViewById(R.id.resultView);
+        Button button = (Button) this.findViewById(R.id.button);
+        
+        /* 激活远程服务 */
+        Intent service = new Intent("wjh.android.student.query.remote");
+        this.bindService(service, conn, BIND_AUTO_CREATE);
+        
+        button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Integer id = Integer.valueOf(noText.getText().toString());
+				String name = "";
+				try {
+					/* 根据 id 获取学生姓名 */
+					name = binder.getStudentNameById(id);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+				resultView.setText(name);
+			}
+        });
+    }
+	private final class StudentServiceConnection implements ServiceConnection {
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			/* 因为此处的 service 其实是远程服务返回过来的，
+			 * 因为经过了进程与进程之间的通信，这个对象，仅仅是一个代理对象，因此不能直接强制转换  */
+			binder = IStudentService.Stub.asInterface(service);
+		}
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			unbindService(conn);
+		}
+		
+	}
+}
+ 
+
+              4. 总结
+
+                     1. 和 “与本地服务通信” 方式一样，目标是希望 Service 提供出一个方法，让访问者可以直接调用。
+
+                        只不过此处是进程之外的 Service ，但是我们还是希望能够像 “与本地服务通信”一样方便的实现。
+
+                     
+
+                     2. 激活服务。
+
+                          ** 因为不再同一应用中，所以采用隐式意图来激活服务
+
+                                 Intent service = new Intent("wjh.android.student.query.remote");
+
+                                "wjh.android.student.query.remote" 是远程 Service 定义的 Intent 的 action 名字
+
+                             ** 绑定服务并激活
+
+                                    this.bindService(service, conn, BIND_AUTO_CREATE);
+
+                            ** 理由与前面一样，我们只需要关注如何构建 conn 这个参数使目标服务可以为我们服务就可以了
+
+                     
+
+                     3. 使目标服务为本应用服务。
+
+                            ** 理由还是同上，最后得出结论：
+
+                                   我们只需要关注如何在 Service 中构建一个访问者可用的 IBinder 对象就行了，并在 onBind 返回出来。
+
+                     
+
+                     4. 关注 Service ：StudentRemoteService
+
+                            ** 回想以前的做法，是定义了一个同时实现了 IBinder 和业务接口的的类。
+
+                               因为实现了业务接口，所以类中相对于 IBinder 新增了业务方法，
+
+                               然后将这个类的实例通过 onBind 方法返回了出去，因此才得以给本应用的访问者直接调用业务方法 ：
+
+                                 private final class StudentBinder extends Binder implements IStudentService {
+
+                                          @Override
+
+                                          public String getStudentById(int id) {
+
+                                                 return getName(id);
+
+                                          }
+
+                                   }
+
+                               本例显然只做这样简单的工作是不行的，应该要在这基础之上更多的关注如何将 IBinder 发送出去，并能可靠点的供访问者使用。
+
+                               与 WebService 相似，Android 提供了 AIDL 来描述你要公开的服务，
+
+                               所谓公开的服务，就是说，我吧我的哪扇门打开，让别人可以通过这扇门访问到我愿意提供的服务。 
+
+                            
+
+                            ** 于是建立一个 AIDL 文件：
+
+                                   IStudentService.aidl
+
+                                   
+
+                                   interface IStudentService {
+
+                                          String getStudentNameById(int id);
+
+                                   }
+
+                                这个文件描述了：公开 getStudentNameById 这个服务，可供访问者调用。
+
+                            
+
+                            ** 由这个文件生成了一个接口，接口的内部类提供了实现，其实还是 “定义了一个同时实现了 IBinder 和业务接口的的类”。
+
+                                 public static abstract class Stub extends android.os.Binder implements wjh.android.service.IStudentService
+
+                               只不过，在这个类中，为 “远程调用” 的实现做了一些准备工作而已。
+
+                               这个类的修饰符是 abstract，是明显的在勾引我们去继承他，不然他会毫无意义。于是观察他的哪个方法是抽象的呢，重要得要勾引我们去实现它？
+
+                               结果发现是它：public java.lang.String getStudentNameById(int id);
+
+                               这不是我们自己的业务方法么，正愁怎么把我们的业务插入进去，他倒是勾引我们了。
+
+                            
+
+                            ** 于是与前面的 “与本地服务通信” 一样，在 StudentRemoteService 写一个内部类，继承 IStudentService 接口的实现类 -- Stub
+
+                                   private final class RemoteStudentBinder extends Stub {
+
+                                          @Override
+
+                                          public String getStudentNameById(int id) throws RemoteException {
+
+                                                 return getName(id);
+
+                                          }
+
+                                   }
+
+                            
+
+                            ** 暂时我们不管具体 Android 操作系统内部是怎么实现这个 “和远程服务实现进程通信” 的，
+
+                               只要知道 AIDL 文件生成的 Stub 类负责了这方面的一些工作，我们不需要操心，同时基于 AIDL 的描述，它将我们需要公开的服务定义成了抽象方法，供我们自定义实现。
+
+                               这有点像一个钩子，钩子那边我们也不知道怎么回事，反正我们只要将东西挂在这钩子上，那边勾过去后，自会完成我们想做的工作。
+
+                               这是种很干净的设计模式，对使用者而言。
+
+                            
+
+                     5. 访问者大大方方的访问吧.
+
+                            ** 访问者通过隐式意图激活了服务：
+
+                                   Intent service = new Intent("wjh.android.student.query.remote");
+
+                                    this.bindService(service, conn, BIND_AUTO_CREATE);
+
+                                然后，他的 conn 参数使我们自定义的一个实现了 ServiceConnection 接口的类。
+
+                                这个接口的 onServiceConnected 方法的 第二个参数 “IBinder service” 就是所激活的服务的 onBind 方法的返回值。
+
+                                因此，我们这里貌似这样就可以了：
+
+                                    this.binder = (IStudentService) service;
+
+                                然后就可以使用 binder.stub.getStudentNameById(id); 实现获取学生姓名的业务需求。
+
+                             
+
+                             ** 但是这时候，访问者这一段还没有 IStudentService 这个接口，更别提 binder.stub.getStudentNameById(id) 这样的代码了
+
+                             
+
+                             ** 因此才需要将服务所在的应用的 AIDL 文件 cpoy 一份在本应用中，包名必须一致。
+
+                                这样，本应用中就生成了和服务所在的应用那一段一样的 IStudentService 接口了。
+
+                             
+
+                             ** 再来说上面分析的 this.binder = (IStudentService) service; 的问题
+
+                                虽然 “与本地服务通信” 这样可以，那是因为 参数 service 对象本来就和 onBind 方法的返回值是一个对象。
+
+                                而，现在的情况时，由于现在是两个不同的应用在不同的进程之间通信，因此，他们经历了 AIDL 协议消息的双向转换这一过程。
+
+                                这时候，service 对象只是服务的 onBind 方法所返回的对象的一个代理而已。
+
+                             
+
+                             ** AIDL 所生成的实现类 Stub 提供了一个静态方法 asInterface 可以根据这个代理对象，返回出一个转换后的 IStudentService 实例
+
+                                     this.binder = IStudentService.Stub.asInterface(service);
+
+                             ** 然后就可以在“访问者”的应用里使用 binder 对象了：
+
+                                    name = binder.getStudentNameById(id);
+
+                            
+
+                            
+
+                            
+
+                            
+
+                            
+
+                     1. 目标，Service 提供出一个方法，让访问者可以直接调用。
+
+                     
+
+                     2. 激活服务。
+
+                            ** 因为在同一应用中，所以采用显式意图就可以激活。
+
+                                   Intent service = new Intent(this, StudentService.class);
+
+                                   StudentService 为服务类.
+
+                            ** 绑定服务并激活
+
+                                    this.bindService(service, conn, BIND_AUTO_CREATE);
+
+                                    第一个参数，就是上面的用于与服务通讯的 Intent。已经构建好了
+
+                                    第三个参数，BIND_AUTO_CREATE，表示表示绑定此服务之后，自动创建此服务。也就是说服务就可以被激活了。
+
+                                    只剩下第二个参数，我们只需要关注如何构建这个参数使目标服务可以为我们服务。
+
+                                    
+
+                     3. 使目标服务为应用服务。
+
+                            ** 参数 conn 要求的是一个 ServiceConnection 类型的对象。ServiceConnection是一个接口。因此我们要实现它。
+
+                                   class StudentServiceConnection implements ServiceConnection;
+
+                            
+
+                            ** ServiceConnection 有两个方法需要我们去实现：
+
+                                   onServiceConnected(ComponentName name, IBinder service)
+
+                                          -- 与服务发生连接事件
+
+                                   onServiceDisconnected(ComponentName name)
+
+                                          -- 与服务断开连接事件
+
+                            ** 关注 onServiceConnected 方法
+
+                                   这个方法是与服务类直接发生关系的关键。因为类与类之间通信，无非是通过参数传递。一个指向同一块内存地址的引用被传来传去。
+
+                                   onServiceConnected 方法的第二个参数 “IBinder service” 就是 Service 中，onBind 方法的返回值！！
+
+                            
+
+                            ** 既然是这样，焦点终于转回了 Service 了，我们只需要关注如何在 Service 中构建一个访问者可用的 IBinder 对象就行了。
+
+                                   
+
+                            
+
+                     4. 关注 Service 
+
+                            class StudentService extends Service
+
+                            
+
+                            ** 这个方法 public IBinder onBind(Intent intent) 的返回值就是 ServiceConnection 的第二个参数 “IBinder service”
+
+                            
+
+                            ** 第1条提到目标是 "Service 提供出一个方法，让访问者可以直接调用"
+
+                               而现在我们知道，访问者是通过 IBinder 的实例对象来与 Sercice 交互的。
+
+                               因此，目标再继续细化就是：让访问者可以直接调用 IBinder 实例的某个方法来达到目的是最佳的。
+
+                               那么，只能是定义一个 IBinder 的子类了，让他自定义一个业务方法供调用者使用。
+
+                            
+
+                            ** 抽取出一个业务接口，让调用者面向接口。
+
+                               public interface IStudentService {
+
+                                   String getStudentNameById(int id);
+
+                               }
+
+                            
+
+                             ** 定义一个 IBinder 的子类，并实现 IStudentService 接口
+
+                                    private final class StudentBinder extends Binder implements IStudentService {
+
+                                          @Override
+
+                                          public String getStudentNameById(int id) {
+
+                                                 return /*根据学生 id 返回学生姓名*/;
+
+                                          }
+
+                                   }
+
+                            
+
+                            ** 回到与访问者发生交互最近的 onBind 方法，让其返回 StudentBinder 对象
+
+                                   public IBinder onBind(Intent intent) {
+
+                                          return new StudentBinder();
+
+                                   }
+
+                            
+
+                     5. 访问者大大方方的访问吧.
+
+                            ** 上面说到 ServiceConnection 的 onServiceConnected 方法的第二个参数，其实就是 Service 的 onBind 方法返回值。
+
+                               因此，我们只需要将其返回值由 IBinder 强转为 IStudentService 接口，就可以使用 getStudentNameById 方法了。
+
+                                 public void onServiceConnected(ComponentName name, IBinder service) {
+
+                                        /* 其实说穿了，前面那么多工作，就是为了实现这里的强转而已 */
+
+                                          this.binder = (IStudentService) service;
+
+                                   }
+
+                               /* 使用 this.binder 是因为，ServiceConnection 一般被定义为内部类，
+
+                                * 然后给外部类定义一个成员变量 binder，
+
+                                * 将 onServiceConnected 方法的参数值赋给这个外部类成员变量，就可以很方便的在外面使用了。*/
+
+                             
+
+                             ** 与 Service 交互，实现最终需求。
+
+                                  String name = binder.getStudentById(id);
+
+                                  
+
+15. 服务的生命周期
+
+       Service 的生命周期和服务的启动方式是相关的。
+
+       
+
+       ** 当采用Context.startService()方法启动服务，与之有关的生命周期方法:
+
+              onCreate() → onStart()  → onDestroy()
+
+          onCreate()
+
+            该方法在服务被创建时调用，该方法只会被调用一次，无论调用多少次startService()或bindService()方法，服务也只被创建一次。
+
+          onStart() 
+
+            只有采用Context.startService()方法启动服务时才会回调该方法。该方法在服务开始运行时被调用。多次调用startService()方法尽管不会多次创建服务，但onStart() 方法会被多次调用。
+
+          onDestroy()
+
+            在服务被终止时调用。
+
+ 
+
+       ** 当采用Context.bindService()方法启动服务，与之有关的生命周期方法:
+
+              onCreate() → onBind() → onUnbind() → onDestroy()
+
+          onBind()
+
+            只有采用Context.bindService()方法启动服务时才会回调该方法。
+
+            该方法在调用者与服务绑定时被调用，当调用者与服务已经绑定，多次调用Context.bindService()方法并不会导致该方法被多次调用。   
+
+          onUnbind()
+
+            只有采用Context.bindService()方法启动服务时才会回调该方法。该方法在调用者与服务解除绑定时被调用。
+
+ 
+
+ 
+
+ 
+
+              
+
+发表于 @ 2010年12月14日
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/wenlin56/archive/2010/12/14/6076235.aspx
