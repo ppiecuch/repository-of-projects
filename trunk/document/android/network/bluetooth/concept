@@ -1,0 +1,235 @@
+发明蓝牙技术的是瑞典电信巨人爱立信公司。由于这种技术具有十分可喜的应用前景，1998 年5月，五家世界顶级通信/计算机公司：爱立信、诺基亚、东芝、IBM和英特尔经过磋商，联合成立了蓝牙共同利益集团（Bluetooth SIG）, 目的是加速其开发、推广和应用。此项无线通信技术公布后，便迅速得到了包括摩托罗拉、3Com、朗讯、康柏、西门子等一大批公司的一致拥护，至今加盟蓝牙SIG的公司已达到2400多个，其中包括许多世界最著名的计算机、通信以及消费电子产品领域的企业，甚至还有汽车与照相机的制造商和生产厂家。一项公开的技术规范能够得到工业界如此广泛的关注和支持，这说明基于此项蓝牙技术的产品将具有广阔的应用前景和巨大的潜在市场。蓝牙共同利益集团现已改称蓝牙推广集团。 
+
+
+蓝牙(Bluetooth)技术是一种短距离无线电技术，利用"蓝牙"技术，能够有效地简化掌上电脑、笔记本电脑和移动电话手机等移动通信终端设备之间的通信，也能够成功地简化以上这些设备与因特网Internet之间的通信，从而使这些现代通信设备与因特网之间的数据传输变得更加迅速高效，为无线通信拓宽道路。
+　　蓝牙技术采用跳频扩展技术（FHSS），跳频速率为每秒1600次。其设备采用的是GFSK调制技术，其最高传输速率为1Mb/s，实际数据有效速率为721kb/s，话音采用连续可变斜率调制CVSD （ContinuousVariableSlopeDeltaModulation连续可变斜率调制）编码方式，CVSD方式抗干扰能力很强，即使在误码率达到4％时，仍然有可以接受的话音质量。通信协议则采用TDMA（时分多址），在2.4GHz的ISM频带上设立79个带宽为1MHz的信道，用每秒钟切换1600次的频率的跳频 (Hobbing)扩展技术来实现信息的收发。蓝牙技术支持一个异步数据通道，或3个并发的同步话音通道，或一个同时传送异步数据和同步话音的通道。每一个话音通道支持64kbps的同步话音；异步通道支持最大速率721kb/s、反向应答速率为57.6kb/s的非对称连接，或者是432.6kb/s的对称连接。 
+蓝牙技术概述 (Bluetooth Technic Summarize) 
+
+蓝牙支持电路交换和分组交换两种技术，分别定义了两种链路类型，即面向连接的同步链路(SCO)和面向无连接的异步链路(ACL)。
+
+　　为了在很低的功率状态下也能使蓝牙设备处于连接状态，蓝牙规定了三种节能状态，即停等(Park)状态、保持(Hold)状态和呼吸(Sniff)状态。这几种工作模式按照节能效率以升序排依次是：Sniff模式、Hold模式、Park模式。
+
+　　蓝牙采用三种纠错方案：1/3前向纠错(FEC)、2/3前向纠错和自动重发(ARQ)。前向纠错的目的是减少重发的可能性，但同时也增加了额外开销。然而在一个合理的无错误率环境中，多余的投标会减少输出，故分组定义的本身也保持灵活的方式，因此，在软件中可定义是否采用FEC。一般而言，在信道的噪声干扰比较大时蓝牙系统会使用前向纠错方案，以保证通信质量：对于SCO链路，使用1/3前向纠错;对于ACL链路，使用2/3前向纠错。在无编号的自动请求重发方案中，一个时隙传送的数据必须在下一个时隙得到收到的确认。只有数据在收端通过了报头错误检测和循环冗余校验(CRC)后认为无错时，才向发端发回确认消息，否则返回一个错误消息。
+
+
+
+系统概述 
+蓝牙技术是一种无线数据与语音通信的开放性全球规范，它以低成本的近距离无线连接为基础，为固定与移动设备通信环境建立一个特别连接。其程序写在一个9 x 9 mm的微芯片中。 
+例如，如果把蓝牙技术引入到移动电话和膝上型电脑中，就可以去掉移动电话与膝上型电脑之间的令人讨厌的连接电缆而而通过无线使其建立通信。打印机、PDA、桌上型电脑、传真机、键盘、游戏操纵杆以及所有其它的数字设备都可以成为蓝牙系统的一部分。除此之外，蓝牙无线技术还为已存在的数字网络和外设提供通用接口以组建一个远离固定网络的个人特别连接设备群。 
+蓝牙工作在全球通用的2.4GHz ISM(即工业、科学、医学）频段。蓝牙的数据速率为1Mb/s。时分双工传输方案被用来实现全双工传输。 
+
+ISM频带是对所有无线电系统都开放的频带，因此使用其中的某个频段都会遇到不可预测的干扰源。例如某些家电、无绳电话、汽车房开门器、微波炉等等，都可能是干扰。为此，蓝牙特别设计了快速确认和跳频方案以确保链路稳定。跳频技术是把频带分成若干个跳频信道（hop channel），在一次连接中，无线电收发器按一定的码序列（即一定的规律，技术上叫伪随机码，就是假的随机码）不断地从一个信道跳到到另一个信道，只有收发双方是按这个规律进行通信的，而其他的干扰不可能按同样的规律进行干扰；跳频的瞬时带宽是很窄的，但通过扩展频谱技术使这个窄带宽成百倍地扩展成宽频带，使干扰可能的影响变成很小。 
+与其它工作在相同频段的系统相比，蓝牙跳频更快，数据包更短，这使蓝牙比其它系统都更稳定。FEC（Forward Error Correction，前向纠错）的使用抑制了长距离链路的随机噪音。应用了二进制调频（FM）技术的跳频收发器被用来抑制干扰和防止衰落
+
+蓝牙基带协议是电路交换与分组交换的结合。在被保留的时隙中可以传输同步数据包，每个数据包以不同的频率发送。一个数据包名义上占用一个时隙，但实际上可以被扩展到占用5个时隙。蓝牙可以支持异步数据信道、多达3个的同时进行的同步话音信道，还可以用一个信道同时传送异步数据和同步话音。每个话音信道支持64kb/s同步话音链路。异步信道可以支持一端最大速率为721kb/s而另一端速率为57.6kb/s的不对称连接，也可以支持43.2kb/s的对称连接。 
+
+
+蓝牙系统由以下功能单元组成： 
+． 无线单元 
+． 链路控制单元 
+． 链路管理 
+． 软件功能 Definitions
+名词解释： 
+． Piconet：通过蓝牙技术连接在一起的所有设备被认为是一个piconet，一个piconet可以只是两台相连的设备，比如一台便携式电脑和一部移动电话，也可以是八台连在一起的设备。在一个piconet中，所有设备都是级别相同的单元，具有相同的权限。但是在piconet网络初建时，其中一个单元被定义为master ，其它单元被定义为slave。 
+． Scatternet：几个独立且不同步的piconet组成一个scatternet。 
+． Master unit：主单元,即在一个piconet中，其时钟和跳频顺序被用来同步其它单元的设备。 
+． Slave units：从单元,即piconet中不是master的所有设备。 
+． Mac address：用来区分piconet中各单元的长度为3比特的地址。 
+． Parked units：暂停单元,即piconet中与网络保持同步但没有Mac address的设备。 
+． Sniff and hold mode：呼吸与保持模式,与网络同步但进入睡眠状态以节省能源的一种工作模式。 
+网络技术 
+蓝牙技术支持点对点和点对多点连接。几个piconet可以被连接在一起，靠跳频顺序识别每个piconet。同一piconet所有用户都与这个跳频顺序同步。其拓扑结构可以被描述为"多piconet"结构。 
+在一个"多piconet"结构中，在带有10个全负载的独立的piconet的情况下，全双工数据速率超过6Mb/s。
+
+话音 
+话音信道采用连续可变斜率增量调制（CVSD）话音编码方案，并且从不重发话音数据包。CVSD编码擅长处理丢失和被损坏的语音采样，即使比特错误率达到4%，CVSD编码的语音还是可听的。
+
+无线 
+蓝牙空中接口是建立在天线电平为0dBm的基础上的。空中接口遵循FCC(美国联邦通信委员会）有关电平为0dBm的ISM频段的标准。如果全球电平达到100mW以上，可以使用扩展频谱功能来增加一些补充业务。频谱扩展功能是通过起始频率为2.402，终止频率为2.480，间隔为1MHz的79个跳频频点来实现的。出于某些本地规定的考虑，日本、法国和西班牙都缩减了带宽。最大的跳频速率为1660跳/秒。理想的连接范围为10厘米--10米，但是通过增大发送电平可以将距离延长至100米。 
+
+三、蓝牙的技术内容
+　　蓝牙技术产品是采用低能耗无线电通信技术来实现语音、数据和视频传输的，其传输速率最高为每秒1Mb/s，以时分方式进行全双工通信，通信距离为10米左右，配置功率放大器可以使通信距离进一步增加。
+　　蓝牙产品采用的是跳频技术，能够抗信号衰落；采用快跳频和短分组技术，能够有效地减少同频干扰，提高通信的安全性；采用前向纠错编码技术，以便在远距离通信时减少随机噪声的干扰；采用2.4GHz的ISM (即工业、科学、医学)频段，以省去申请专用许可证的麻烦；采用FM调制方式，使设备变得更为简单可靠；"蓝牙"技术产品一个跳频频率发送一个同步分组，每组一个分组占用一个时隙，也可以增至5个时隙；"蓝牙"技术支持一个异步数据通道，或者3个并发的同步语音通道，或者一个同时传送异步数据和同步语音的通道。"蓝牙"的每一个话音通道支持 64kb/s的同步话音，异步通道支持的最大速率为721Kbps、反向应答速率为57.6Kbps的非对称连接，或者432.6kb/s的对称连接。 
+　　蓝牙技术产品与因特网Internet之间的通信，使得家庭和办公室的设备不需要电缆也能够实现互通互联，大大提高办公和通信效率。因此， "蓝牙"将成为无线通信领域的新宠，将为广大用户提供极大的方便而受到青睐。 
+四、蓝牙技术指标和系统参数 
+　　目前所公布的蓝牙技术参数如下表所示。
+蓝牙技术参数
+工作频段 ISM频段，2.402~2.480GHz 
+双工方式 全双工，TDD时分双工 
+业务类型 支持电路交换和分组交换业务 
+数据速率 1Mb/s 
+非同步信道速率 非对称连接721/57.6kb/s，对称连接432.6kb/s 
+同步信道速率 64kb/s 
+功率 美国FCC要求＜0dbm(1mW)，其他国家可扩展为100mW 
+跳频频率数 79个频点/MHz 
+跳频速率 1600次/s 
+工作模式 PARK/HOLD/SNIFF 
+数据连接方式 面向连接业务SCO，无连接业务ACL 
+纠错方式 1/3FEC，2/3FEC，ARQ 
+鉴权 采用反应逻辑算术 
+信道加密 采用0位、40位、60位密钥 
+语音编码方式 连续可变斜率调制CVSD 
+发射距离 一般可达10~10cm，增加功率情况下可达100m 
+
+
+各系统对蓝牙的支持
+Bluez is the canonical Bluetooth stack for Linux. Its goal is to make an implementation of the Bluetooth wireless standards specifications for Linux. As of 2006, the BlueZ stack supports all core Bluetooth protocols and layers.[6] It was initially developed by Qualcomm, and is available for Linux kernel versions 2.4.6 and up.
+Since version 10.2, Apple Inc.'s Mac OS X has contained an integrated Bluetooth stack
+Windows XP includes a built-in Bluetooth stack starting with the Service Pack 2 update, released on 2004-08-06. Windows XP SP2 and SP3 support Bluetooth 1.1 (but not 1.0), Bluetooth 2.0 and Bluetooth 2.0+EDR.[4] 
+
+
+在MAC版本10.3.3之后的版本，MAC系统 可以自動偵測到蓝牙驱动程序并安装, 而不需要用户自行安装。
+在此前的版本, 用户则可到MAC website网站下载驱动程序。
+网站地址如下： 
+http://www.apple.com/support/bluetooth/index.html
+
+
+注释： 
+CVSD：Continuous Variable Slope Delta Modulation，连续可变斜率增量调制。一种自适应增量调制技术，能够获得高质量传输的音频编码。 
+FCC：Federal Communications Comission，美国联邦通信委员会 
+SCO：Synchronous Connection Oriented ，同步定向连接 
+ACL：Asynchronous Connectionless ，异步无连接 
+TDD：Time Division Duplex ，时分双工传输
+
+
+当前已经实现的Bluetooth栈有以下各种：
+
+1. Widcomm:  第一个windows上的协议栈，由Widcomm公司开发，也就是现在的Broadcom.
+
+ 
+2. Microsoft Windows stack: Windows XP SP2中包括了这个内建的协议栈，开发者也可以调用其API开发
+
+第三方软件。
+
+ 
+3. Toshiba stack: 它也是基于Windows的，不支持第三方开发，但它把协议栈授权给一些laptop商(sony, 
+
+asus等，我的本本上就是Toshiba的）。它支持的Profile有： SPP, DUN, FAX, LAP, OPP, FTP, HID, 
+
+HCRP, PAN, BIP, HSP, HFP , A2DP, AVRCP, GAVDP）
+
+ 
+4. BlueSoleil: 著名的IVT公司的产品．该产品可以用于桌面和嵌入式，他也支持第三方开发，DUN, FAX, 
+
+HFP, HSP, LAP, OBEX, OPP, PAN SPP, AV, BIP, FTP, GAP, HID, SDAP, and SYNC。
+
+5. Bluez: Linux官方协议栈，该协议栈的上层用Socket封装，便于开发者使用，通过DBUS与其它应用程序
+
+通信。
+
+6. Affix: NOKIA公司的协议栈，在Symbian系统上运行.
+
+7. BlueDragon：东软公司产品，好像2002年6月就通过了蓝牙的认证，支持的Profile：SDP、Serial-DevB
+
+、AVCTP、AVRCP-Controller、AVRCP-Target、Headset-AG、Headset-HS、OPP-Client、OPP-Server、CT-GW
+
+、CT-Term、Intercom、FT-Server、FT-Client、GAP、SDAP、Serial-DevA、AVDTP、GAVDP、A2DP-Source、
+
+A2DP-Sink.
+
+8. BlueMagic：美国Open Interface 公司for portable embedded divce的协议栈，iphone(apple)，nav-
+
+u(sony)等很多电子产品都用该商业的协议栈，BlueMagic 3.0是第一个通过bluetooth 协议栈1.1认证的协
+
+议栈，那么我现在就在用它，那么该栈用起来简单，API清晰明了。实现了的profile
+
+有:HCI,L2CAP,RFCOMM,A/V,Remote,Control,A/V,Streaming,BIP,BPP,DUN,FAX,FTP,GAP,Hands-
+
+Free,and,Headset,HCRP,HID,OBEX,OPP,PAN,BNEP,PBAP,SAP,SPP,Synchronization,SyncML,Telephony,XML.
+9. BCHS-Bluecore Host Software: 蓝牙芯片CSR的协议栈，同时他也提供了一些上层应用的Profile的库，
+
+当然了它也是为嵌入式产品了，支持的Profile有：A2DP,AVRCP,PBAP,BIP,BPP,CTP,DUN,FAX,FM API,FTP 
+
+GAP,GAVDP,GOEP,HCRP,Headset,HF1.5,HID,ICP,JSR82,LAP Message Access 
+
+Profile,OPP,PAN,SAP,SDAP,SPP,SYNC,SYNC ML。
+
+10. Windows CE：微软给Windows CE开发的协议栈，但是windows ce本身也支持其它的协议栈
+
+11. BlueLet：IVT公司for embedded product的清量级协议栈。
+http://blog.chinaunix.net/u3/104073/showart_2081838.html
+
+
+Android蓝牙协议栈使用的是BlueZ，支持GAP, SDP, and RFCOMM规范，是一个SIG认证的蓝牙协议栈。
+Bluez 是GPL许可的，因此Android的框架内与用户空间的bluez代码通过D-BUS进程通讯进行交互，以避免专有代码。
+移植
+
+BlueZ是兼容蓝牙2.1的，可以工作在任何2.1芯片以及向后兼容的旧的蓝牙版本。有要有两个方面：
+
+串口驱动 UART driver 
+蓝牙电源开/关 Bluetooth Power On/Off 
+串口驱动
+
+BlueZ核心子系统使用hciattach守护进程添加你的指定硬件串口驱动。
+
+例如，MSM7201A，这个文件是在drivers/serial/msm_serial.c。你还需要通过修改init.rc为hciattach来编辑命令行选项。
+
+蓝牙电源开/关
+
+蓝牙芯片的电源开关方法1.0和Post 1.0是不同的，具体如下：
+
+1.0：Android框架写0或1到/sys/modules/board_[PLATFORM]/parameters/bluetooth_power_on 
+Post 1.0：Android框架使用linux rfkill API，参考 arch/arm/mach-msm/board-trout-rfkill.c例子。 
+编译
+
+编译Android打开蓝牙支持，添加下面这行内容到BoardConfig.mk。
+
+    BOARD_HAVE_BLUETOOTH :=true
+
+ 
+
+解决问题
+
+调试
+
+调试你的蓝牙实现，可以通过读跟蓝牙相关的logs(adb logcat)和查找ERROR和警告消息。Android使用Bluez，同时会带来一些有用的调式工具。下面的片段为了提供一个建议的例子： 
+
+view sourceprint?1 hciconfig -a            # print BT chipset address and features. Useful to check if you can communicate with your BT chipset.  
+
+2 hcidump -XVt            # print live HCI UART traffic.  
+
+3 hcitool scan            # scan for local devices. Useful to check if RX/TX works.  
+
+4 l2ping ADDRESS          # ping another BT device. Useful to check if RX/TX works.  
+
+5 sdptool records ADDRESS # request the SDP records of another BT device. 
+
+ 
+
+守护进程日志
+
+hcid(STDOUT)和hciattach(STDERR)的守护进程日志缺省是被写到/dev/null。编辑init.rc和init.PLATFORM.rc在logwrapper下运行这些守护进程，把它们输出到logcat。
+
+ 
+
+hciconfig -a 和 hcitool
+
+如果你编译你自己的system.img，除了hcitool扫描不行，hciconfig -a是可以工作的，尝试安装固件到蓝牙芯片。XXX TBD
+
+ 
+
+工具
+
+BlueZ为调试和与蓝牙子系统通信提供很多设置命令行工具，包含下面这些：
+
+hciconfig
+
+hcitool
+
+hcidump
+
+sdptool
+
+dbus-send
+
+dbus-monitor
+
+ 
+
+特性支持
+
+这一部分提供在每个android版本中的蓝牙的一些变化，主要是一些性能参数上的东西，就不翻译了。
+http://www.cnblogs.com/cnhome/archive/2010/08/31/1813255.html
+
+
+官方介绍:http://source.android.com/porting/bluetooth.html#androidBluetoothPorting
