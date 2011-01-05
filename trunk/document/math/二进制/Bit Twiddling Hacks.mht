@@ -1,0 +1,2911 @@
+From: =?utf-8?Q?=E7=94=B1_Windows_Internet_Explorer_8_=E4=BF=9D=E5=AD=98?=
+Subject: Bit Twiddling Hacks
+Date: Wed, 5 Jan 2011 09:48:49 +0800
+MIME-Version: 1.0
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://graphics.stanford.edu/~seander/bithacks.html
+X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7600.16543
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>Bit Twiddling Hacks</TITLE>
+<META content=3D"text/html; charset=3Dutf-8" http-equiv=3DContent-Type>
+<META name=3DGENERATOR content=3D"MSHTML 8.00.7600.16700"></HEAD>
+<BODY>
+<H2>Bit Twiddling Hacks </H2>
+<H3>By Sean Eron Anderson<BR>seander@cs.<!-- NO SPAM! -->stanford.edu=20
+</H3><SMALL>Individually, the <STRONG>code snippets here are in the =
+public=20
+domain</STRONG> (unless otherwise noted) =E2=80=94 feel free to use them =
+however you=20
+please. The aggregate collection and descriptions are =
+=C2=A9&nbsp;1997-2005 Sean Eron=20
+Anderson. The code and descriptions are distributed in the hope that =
+they will=20
+be useful, but <STRONG>WITHOUT ANY WARRANTY</STRONG> and without even =
+the=20
+implied warranty of merchantability or fitness for a particular purpose. =
+As of=20
+May 5, 2005, all the code has been tested thoroughly. Thousands of =
+people have=20
+read it. Moreover, <A =
+href=3D"http://www-2.cs.cmu.edu/~bryant/">Professor Randal=20
+Bryant</A>, the Dean of Computer Science at Carnegie Mellon University, =
+has=20
+personally tested almost everything with his <A=20
+href=3D"http://www-2.cs.cmu.edu/~uclid/">Uclid code verification =
+system</A>. What=20
+he hasn't tested, I have checked against all possible inputs on a 32-bit =
+
+machine. <STRONG>To the first person to inform me of a legitimate bug in =
+the=20
+code, I'll pay a bounty of US$10 (by check or Paypal)</STRONG>. If =
+directed to a=20
+charity, I'll pay US$20. </SMALL>
+<P>
+<P>
+<H3>Contents </H3>
+<UL>
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#OperationCoun=
+ting">About=20
+  the operation counting methodology</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#CopyIntegerSi=
+gn">Compute=20
+  the sign of an integer</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#DetectOpposit=
+eSigns">Detect=20
+  if two integers have opposite signs=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerAbs">C=
+ompute=20
+  the integer absolute value (abs) without branching</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerMinOrM=
+ax">Compute=20
+  the minimum (min) or maximum (max) of two integers without =
+branching</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPo=
+werOf2">Determining=20
+  if an integer is a power of 2</A>=20
+  <LI>Sign extending=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#FixedSignExte=
+nd">Sign=20
+    extending from a constant bit-width</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#VariableSignE=
+xtend">Sign=20
+    extending from a variable bit-width</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#VariableSignE=
+xtendRisky">Sign=20
+    extending from a variable bit-width in 3 operations</A> </LI></UL>
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ConditionalSe=
+tOrClearBitsWithoutBranching">Conditionally=20
+  set or clear bits without branching</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ConditionalNe=
+gate">Conditionally=20
+  negate a value without branching</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge">=
+Merge=20
+  bits from two values according to a mask</A>=20
+  <LI>Counting bits set=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetN=
+aive">Counting=20
+    bits set, naive way</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetT=
+able">Counting=20
+    bits set by lookup table</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetK=
+ernighan">Counting=20
+    bits set, Brian Kernighan's way</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSet6=
+4">Counting=20
+    bits set in 12, 24, or 32-bit words using 64-bit instructions</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetP=
+arallel">Counting=20
+    bits set, in parallel</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#CountBitsFrom=
+MSBToPos">Count=20
+    bits set (rank) from the most-significant bit upto a given =
+position</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#SelectPosFrom=
+MSBRank">Select=20
+    the bit position (from the most-significant bit) with the given =
+count=20
+    (rank)</A> </LI></UL>
+  <LI>Computing parity (1 if an odd number of bits set, 0 otherwise)=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ParityNaive">=
+Compute=20
+    parity of a word the naive way</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ParityLookupT=
+able">Compute=20
+    parity by lookup table</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ParityWith64B=
+its">Compute=20
+    parity of a byte using 64-bit multiply and modulus division</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ParityMultipl=
+y">Compute=20
+    parity of word with a multiply</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ParityParalle=
+l">Compute=20
+    parity in parallel</A> </LI></UL>
+  <LI>Swapping Values=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#SwappingValue=
+sSubAdd">Swapping=20
+    values with subtraction and addition</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#SwappingValue=
+sXOR">Swapping=20
+    values with XOR</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#SwappingBitsX=
+OR">Swapping=20
+    individual bits with XOR</A> </LI></UL>
+  <LI>Reversing bit sequences=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#BitReverseObv=
+ious">Reverse=20
+    bits the obvious way</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#BitReverseTab=
+le">Reverse=20
+    bits in word by lookup table</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWi=
+th64BitsDiv">Reverse=20
+    the bits in a byte with 3 operations (64-bit multiply and modulus=20
+    division)</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWi=
+th64Bits">Reverse=20
+    the bits in a byte with 4 operations (64-bit multiply, no =
+division)</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWi=
+th32Bits">Reverse=20
+    the bits in a byte with 7 operations (no 64-bit, only 32)</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ReverseParall=
+el">Reverse=20
+    an N-bit quantity in parallel with 5 * lg(N) operations</A> =
+</LI></UL>
+  <LI>Modulus division (aka computing <EM>remainders</EM>)=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ModulusDivisi=
+onEasy">Computing=20
+    modulus division by 1 &lt;&lt; s without a division operation =
+(obvious)</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ModulusDivisi=
+on">Computing=20
+    modulus division by (1 &lt;&lt; s) - 1 without a division =
+operation</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ModulusDivisi=
+onParallel">Computing=20
+    modulus division by (1 &lt;&lt; s) - 1 in parallel without a =
+division=20
+    operation</A> </LI></UL>
+  <LI>Finding integer log base 2 of an integer (aka the position of the =
+highest=20
+  bit set)=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObv=
+ious">Find=20
+    the log base 2 of an integer with the MSB N set in O(N) operations =
+(the=20
+    obvious way)</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogIEE=
+E64Float">Find=20
+    the integer log base 2 of an integer with an 64-bit IEEE float</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogLoo=
+kup">Find=20
+    the log base 2 of an integer with a lookup table</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog">F=
+ind=20
+    the log base 2 of an N-bit integer in O(lg(N)) operations</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogDeB=
+ruijn">Find=20
+    the log base 2 of an N-bit integer in O(lg(N)) operations with =
+multiply and=20
+    lookup</A> </LI></UL>
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog10"=
+>Find=20
+  integer log base 10 of an integer</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLog10O=
+bvious">Find=20
+  integer log base 10 of an integer the obvious way</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogFlo=
+at">Find=20
+  integer log base 2 of a 32-bit IEEE float</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogRoo=
+tFloat">Find=20
+  integer log base 2 of the pow(2, r)-root of a 32-bit IEEE float (for =
+unsigned=20
+  integer r)</A>=20
+  <LI>Counting consecutive trailing zero bits (or finding bit indices)=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightL=
+inear">Count=20
+    the consecutive zero bits (trailing) on the right linearly</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightP=
+arallel">Count=20
+    the consecutive zero bits (trailing) on the right in parallel</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightB=
+inSearch">Count=20
+    the consecutive zero bits (trailing) on the right by binary =
+search</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightF=
+loatCast">Count=20
+    the consecutive zero bits (trailing) on the right by casting to a =
+float</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightM=
+odLookup">Count=20
+    the consecutive zero bits (trailing) on the right with modulus =
+division and=20
+    lookup</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightM=
+ultLookup">Count=20
+    the consecutive zero bits (trailing) on the right with multiply and=20
+    lookup</A> </LI></UL>
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerO=
+f2Float">Round=20
+  up to the next highest power of 2 by float casting</A>=20
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerO=
+f2">Round=20
+  up to the next highest power of 2</A>=20
+  <LI>Interleaving bits (aka computing <EM>Morton Numbers</EM>)=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#InterleaveTab=
+leObvious">Interleave=20
+    bits the obvious way</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#InterleaveTab=
+leLookup">Interleave=20
+    bits by table lookup</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#Interleave64b=
+itOps">Interleave=20
+    bits with 64-bit multiply</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#InterleaveBMN=
+">Interleave=20
+    bits by Binary Magic Numbers</A> </LI></UL>
+  <LI>Testing for ranges of bytes in a word (and counting occurances =
+found)=20
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord">D=
+etermine=20
+    if a word has a zero byte</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ValueInWord">=
+Determine=20
+    if a word has a byte equal to n</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#HasLessInWord=
+">Determine=20
+    if a word has byte less than n</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#HasMoreInWord=
+">Determine=20
+    if a word has a byte greater than n</A>=20
+    <LI><A=20
+    =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#HasBetweenInW=
+ord">Determine=20
+    if a word has a byte between m and n</A> </LI></UL>
+  <LI><A=20
+  =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#NextBitPermut=
+ation">Compute=20
+  the lexicographically next bit permutation</A> </LI></UL>
+<HR>
+
+<H3><A name=3DOperationCounting>About the operation counting methodology =
+
+</A></H3>When totaling the number of operations for algorithms here, any =
+C=20
+operator is counted as one operation. Intermediate assignments, which =
+need not=20
+be written to RAM, are not counted. Of course, this operation counting =
+approach=20
+only serves as an approximation of the actual number of machine =
+instructions and=20
+CPU time. All operations are assumed to take the same amount of time, =
+which is=20
+not true in reality, but CPUs have been heading increasingly in this =
+direction=20
+over time. There are many nuances that determine how fast a system will =
+run a=20
+given sample of code, such as cache sizes, memory bandwidths, =
+instruction sets,=20
+etc. In the end, benchmarking is the best way to determine whether one =
+method is=20
+really faster than another, so consider the techniques below as =
+possibilities to=20
+test on your target architecture.=20
+<P>
+<HR>
+
+<H3><A name=3DCopyIntegerSign>Compute the sign of an integer =
+</A></H3><PRE>int v;      // we want to find the sign of v
+int sign;   // the result goes here=20
+
+// CHAR_BIT is the number of bits per byte (normally 8).
+sign =3D -(v &lt; 0);  // if v &lt; 0 then -1, else 0.=20
+// or, to avoid branching on CPUs with flag registers (IA32):
+sign =3D -(int)((unsigned int)((int)v) &gt;&gt; (sizeof(int) * CHAR_BIT =
+- 1));
+// or, for one less instruction (but not portable):
+sign =3D v &gt;&gt; (sizeof(int) * CHAR_BIT - 1);=20
+</PRE>The last expression above evaluates to sign =3D v &gt;&gt; 31 for =
+32-bit=20
+integers. This is one operation faster than the obvious way, sign =3D =
+-(v &lt; 0).=20
+This trick works because when signed integers are shifted right, the =
+value of=20
+the far left bit is copied to the other bits. The far left bit is 1 when =
+the=20
+value is negative and 0 otherwise; all 1 bits gives -1. Unfortunately, =
+this=20
+behavior is architecture-specific.=20
+<P>Alternatively, if you prefer the result be either -1 or +1, then use: =
+<PRE>sign =3D +1 | (v &gt;&gt; (sizeof(int) * CHAR_BIT - 1));  // if v =
+&lt; 0 then -1, else +1
+</PRE>
+<P>On the other hand, if you prefer the result be either -1, 0, or +1, =
+then use:=20
+<PRE>sign =3D (v !=3D 0) | -(int)((unsigned int)((int)v) &gt;&gt; =
+(sizeof(int) * CHAR_BIT - 1));
+// Or, for more speed but less portability:
+sign =3D (v !=3D 0) | (v &gt;&gt; (sizeof(int) * CHAR_BIT - 1));  // -1, =
+0, or +1
+// Or, for portability, brevity, and (perhaps) speed:
+sign =3D (v &gt; 0) - (v &lt; 0); // -1, 0, or +1
+</PRE>If instead you want to know if something is non-negative, =
+resulting in +1=20
+or else 0, then use: <PRE>sign =3D 1 ^ ((unsigned int)v &gt;&gt; =
+(sizeof(int) * CHAR_BIT - 1)); // if v &lt; 0 then 0, else 1
+</PRE>Caveat: On March 7, 2003, Angus Duggan pointed out that the 1989 =
+ANSI C=20
+specification leaves the result of signed right-shift =
+implementation-defined, so=20
+on some systems this hack might not work. For greater portability, Toby =
+Speight=20
+suggested on September 28, 2005 that CHAR_BIT be used here and =
+throughout rather=20
+than assuming bytes were 8 bits long. Angus recommended the more =
+portable=20
+versions above, involving casting on March 4, 2006. <A=20
+href=3D"http://rpg-314.blogspot.com/">Rohit Garg</A> suggested the =
+version for=20
+non-negative integers on September 12, 2009.=20
+<P>
+<HR>
+
+<H3><A name=3DDetectOppositeSigns>Detect if two integers have opposite =
+signs=20
+</A></H3><PRE>int x, y;               // input values to compare signs
+
+bool f =3D ((x ^ y) &lt; 0); // true iff x and y have opposite signs
+</PRE>Manfred Weis suggested I add this entry on November 26, 2009.=20
+<P>
+<HR>
+
+<H3><A name=3DIntegerAbs>Compute the integer absolute value (abs) =
+without=20
+branching </A></H3><PRE>int v;           // we want to find the absolute =
+value of v
+unsigned int r;  // the result goes here=20
+int const mask =3D v &gt;&gt; sizeof(int) * CHAR_BIT - 1;
+
+r =3D (v + mask) ^ mask;
+</PRE>Patented variation: <PRE>r =3D (v ^ mask) - mask;
+</PRE>Some CPUs don't have an integer absolute value instruction (or the =
+
+compiler fails to use them). On machines where branching is expensive, =
+the above=20
+expression can be faster than the obvious approach, r =3D (v &lt; 0) ?=20
+-(unsigned)v : v, even though the number of operations is the same.=20
+<P>On March 7, 2003, Angus Duggan pointed out that the 1989 ANSI C =
+specification=20
+leaves the result of signed right-shift implementation-defined, so on =
+some=20
+systems this hack might not work. I've read that ANSI C does not require =
+values=20
+to be represented as two's complement, so it may not work for that =
+reason as=20
+well (on a diminishingly small number of old machines that still use =
+one's=20
+complement). On March 14, 2004, Keith H. Duggar sent me the patented =
+variation=20
+above; it is superior to the one I initially came up with,=20
+<CODE>r=3D(+1|(v&gt;&gt;(sizeof(int)*CHAR_BIT-1)))*v</CODE>, because a =
+multiply is=20
+not used. Unfortunately, this method has been <A=20
+href=3D"http://patft.uspto.gov/netacgi/nph-Parser?Sect1=3DPTO2&amp;Sect2=3D=
+HITOFF&amp;p=3D1&amp;u=3D/netahtml/search-adv.htm&amp;r=3D1&amp;f=3DG&amp=
+;l=3D50&amp;d=3Dptxt&amp;S1=3D6073150&amp;OS=3D6073150&amp;RS=3D6073150">=
+patented</A>=20
+in the USA on June 6, 2000 by Vladimir Yu Volkonsky and assigned to <A=20
+href=3D"http://www.sun.com/">Sun Microsystems</A>. On August 13, 2006, =
+Yuriy=20
+Kaminskiy told me that the patent is likely invalid because the method =
+was=20
+published well before the patent was even filed, such as in <A=20
+href=3D"http://www.goof.com/pcg/doc/pentopt.txt">How to Optimize for the =
+Pentium=20
+Processor</A> by Agner Fog, dated November, 9, 1996. Yuriy also =
+mentioned that=20
+this document was translated to Russian in 1997, which Vladimir could =
+have read.=20
+Moreover, the Internet Archive also has an old <A=20
+href=3D"http://web.archive.org/web/19961201174141/www.x86.org/ftp/article=
+s/pentopt/PENTOPT.TXT">link</A>=20
+to it. On January 30, 2007, Peter Kankowski shared with me an <A=20
+href=3D"http://smallcode.weblogs.us/2007/01/31/microsoft-probably-uses-th=
+e-abs-function-patented-by-sun/">abs=20
+version</A> he discovered that was inspired by Microsoft's Visual C++ =
+compiler=20
+output. It is featured here as the primary solution. On December 6, =
+2007, Hai=20
+Jin complained that the result was signed, so when computing the abs of =
+the most=20
+negative value, it was still negative. On April 15, 2008 Andrew Shapira =
+pointed=20
+out that the obvious approach could overflow, as it lacked an (unsigned) =
+cast=20
+then; for maximum portability he suggested <CODE>(v &lt; 0) ? (1 +=20
+((unsigned)(-1-v))) : (unsigned)v</CODE>. But citing the ISO C99 spec on =
+July 9,=20
+2008, Vincent Lef=C3=A8vre convinced me to remove it becasue even on=20
+non-2s-complement machines -(unsigned)v will do the right thing. The =
+evaluation=20
+of -(unsigned)v first converts the negative value of v to an unsigned by =
+adding=20
+2**N, yielding a 2s complement representation of v's value that I'll =
+call U.=20
+Then, U is negated, giving the desired result, -U =3D 0 - U =3D 2**N - U =
+=3D 2**N -=20
+(v+2**N) =3D -v =3D abs(v).=20
+<P>
+<HR>
+
+<H3><A name=3DIntegerMinOrMax>Compute the minimum (min) or maximum (max) =
+of two=20
+integers without branching </A></H3><PRE>int x;  // we want to find the =
+minimum of x and y
+int y;  =20
+int r;  // the result goes here=20
+
+r =3D y ^ ((x ^ y) &amp; -(x &lt; y)); // min(x, y)
+</PRE>On some rare machines where branching is very expensive and no =
+condition=20
+move instructions exist, the above expression might be faster than the =
+obvious=20
+approach, r =3D (x &lt; y) ? x : y, even though it involves two more =
+instructions.=20
+(Typically, the obvious approach is best, though.) It works because if=20
+x&nbsp;&lt;&nbsp;y, then -(x&nbsp;&lt;&nbsp;y) will be all ones, so =
+r&nbsp;=3D y ^=20
+(x ^ y) &amp; ~0 =3D y ^ x ^ y =3D x. Otherwise, if =
+x&nbsp;&gt;=3D&nbsp;y, then=20
+-(x&nbsp;&lt;&nbsp;y) will be all zeros, so r&nbsp;=3D y ^ ((x ^ y) =
+&amp; 0) =3D y.=20
+On some machines, evaluating (x &lt; y) as 0 or 1 requires a branch =
+instruction,=20
+so there may be no advantage.=20
+<P>To find the maximum, use: <PRE>r =3D x ^ ((x ^ y) &amp; -(x &lt; y)); =
+// max(x, y)
+</PRE>
+<H4>Quick and dirty versions:</H4>If you know that INT_MIN &lt;=3D x - y =
+&lt;=3D=20
+INT_MAX, then you can use the following, which are faster because (x - =
+y) only=20
+needs to be evaluated once. <PRE>r =3D y + ((x - y) &amp; ((x - y) =
+&gt;&gt; (sizeof(int) * CHAR_BIT - 1))); // min(x, y)
+r =3D x - ((x - y) &amp; ((x - y) &gt;&gt; (sizeof(int) * CHAR_BIT - =
+1))); // max(x, y)
+</PRE>Note that the 1989 ANSI C specification doesn't specify the result =
+of=20
+signed right-shift, so these aren't portable. If exceptions are thrown =
+on=20
+overflows, then the values of x and y should be unsigned or cast to =
+unsigned for=20
+the subtractions to avoid unnecessarily throwing an exception, however =
+the=20
+right-shift needs a signed operand to produce all one bits when =
+negative, so=20
+cast to signed there.=20
+<P>On March 7, 2003, Angus Duggan pointed out the right-shift =
+portability issue.=20
+On May 3, 2005, Randal E. Bryant alerted me to the need for the =
+precondition,=20
+INT_MIN &lt;=3D x&nbsp;-&nbsp;y &lt;=3D INT_MAX, and suggested the =
+non-quick and=20
+dirty version as a fix. Both of these issues concern only the quick and =
+dirty=20
+version. Nigel Horspoon observed on July 6, 2005 that gcc produced the =
+same code=20
+on a Pentium as the obvious solution because of how it evaluates (x &lt; =
+y). On=20
+July 9, 2008 Vincent Lef=C3=A8vre pointed out the potential for overflow =
+exceptions=20
+with subtractions in r =3D y + ((x - y) &amp; -(x &lt; y)), which was =
+the previous=20
+version. Timothy B. Terriberry suggested using xor rather than add and =
+subract=20
+to avoid casting and the risk of overflows on June 2, 2009.=20
+<P>
+<HR>
+
+<H3><A name=3DDetermineIfPowerOf2>Determining if an integer is a power =
+of 2=20
+</A></H3><PRE>unsigned int v; // we want to see if v is a power of 2
+bool f;         // the result goes here=20
+
+f =3D (v &amp; (v - 1)) =3D=3D 0;
+</PRE>Note that 0 is incorrectly considered a power of 2 here. To remedy =
+this,=20
+use: <PRE>f =3D v &amp;&amp; !(v &amp; (v - 1));
+</PRE>
+<HR>
+
+<H3><A name=3DFixedSignExtend>Sign extending from a constant bit-width=20
+</A></H3>Sign extension is automatic for built-in types, such as chars =
+and ints.=20
+But suppose you have a signed two's complement number, x, that is stored =
+using=20
+only b bits. Moreover, suppose you want to convert x to an int, which =
+has more=20
+than b bits. A simple copy will work if x is positive, but if negative, =
+the sign=20
+must be extended. For example, if we have only 4 bits to store a number, =
+then -3=20
+is represented as 1101 in binary. If we have 8 bits, then -3 is =
+11111101. The=20
+most-significant bit of the 4-bit representation is replicated =
+sinistrally to=20
+fill in the destination when we convert to a representation with more =
+bits; this=20
+is sign extending. In C, sign extension from a constant bit-width is =
+trivial,=20
+since bit fields may be specified in structs or unions. For example, to =
+convert=20
+from 5 bits to an full integer: <PRE>int x; // convert this from using 5 =
+bits to a full int
+int r; // resulting sign extended number goes here
+struct {signed int x:5;} s;
+r =3D s.x =3D x;
+</PRE>The following is a C++ template function that uses the same =
+language=20
+feature to convert from B bits in one operation (though the compiler is=20
+generating more, of course). <PRE>template &lt;typename T, unsigned =
+B&gt;
+inline T signextend(const T x)
+{
+  struct {T x:B;} s;
+  return s.x =3D x;
+}
+
+int r =3D signextend&lt;signed int,5&gt;(x);  // sign extend 5 bit =
+number x to r
+</PRE>
+<P>John Byrd caught a typo in the code (attributed to html formatting) =
+on May 2,=20
+2005. On March 4, 2006, Pat Wood pointed out that the ANSI C standard =
+requires=20
+that the bitfield have the keyword "signed" to be signed; otherwise, the =
+sign is=20
+undefined.=20
+<HR>
+
+<H3><A name=3DVariableSignExtend>Sign extending from a variable =
+bit-width=20
+</A></H3>Sometimes we need to extend the sign of a number but we don't =
+know a=20
+priori the number of bits, b, in which it is represented. (Or we could =
+be=20
+programming in a language like Java, which lacks bitfields.) =
+<PRE>unsigned b; // number of bits representing the number in x
+int x;      // sign extend this b-bit number to r
+int r;      // resulting sign-extended number
+int const m =3D 1U &lt;&lt; (b - 1); // mask can be pre-computed if b is =
+fixed
+
+x =3D x &amp; ((1U &lt;&lt; b) - 1);  // (Skip this if bits in x above =
+position b are already zero.)
+r =3D (x ^ m) - m;
+</PRE>The code above requires four operations, but when the bitwidth is =
+a=20
+constant rather than variable, it requires only two fast operations, =
+assuming=20
+the upper bits are already zeroes.=20
+<P>A slightly faster but less portable method that doesn't depend on the =
+bits in=20
+x above position b being zero is: <PRE>int const m =3D CHAR_BIT * =
+sizeof(x) - b;
+r =3D (x &lt;&lt; m) &gt;&gt; m;
+</PRE>
+<P>Sean A. Irvine suggested that I add sign extension methods to this =
+page on=20
+June 13, 2004, and he provided <CODE>m =3D (1 &lt;&lt; (b - 1)) - 1; r =
+=3D -(x &amp;=20
+~m) | x;</CODE> as a starting point from which I optimized to get m =3D =
+1U=20
+&lt;&lt; (b - 1); r =3D -(x &amp; m) | x. But then on May 11, 2007, Shay =
+Green=20
+suggested the version above, which requires one less operation than =
+mine. Vipin=20
+Sharma suggested I add a step to deal with situations where x had =
+possible ones=20
+in bits other than the b bits we wanted to sign-extend on Oct. 15, 2008. =
+On=20
+December 31, 2009 Chris Pirazzi suggested I add the faster version, =
+which=20
+requires two operations for constant bit-widths and three for variable =
+widths.=20
+<P>
+<HR>
+
+<H3><A name=3DVariableSignExtendRisky>Sign extending from a variable =
+bit-width in=20
+3 operations </A></H3>The following may be slow on some machines, due to =
+the=20
+effort required for multiplication and division. This version is 4 =
+operations.=20
+If you know that your initial bit-width, b, is greater than 1, you might =
+do this=20
+type of sign extension in 3 operations by using r&nbsp;=3D (x * =
+multipliers[b]) /=20
+multipliers[b], which requires only one array lookup. <PRE>unsigned b; =
+// number of bits representing the number in x
+int x;      // sign extend this b-bit number to r
+int r;      // resulting sign-extended number
+#define M(B) (1U &lt;&lt; ((sizeof(x) * CHAR_BIT) - B)) // =
+CHAR_BIT=3Dbits/byte
+static int const multipliers[] =3D=20
+{
+  0,     M(1),  M(2),  M(3),  M(4),  M(5),  M(6),  M(7),
+  M(8),  M(9),  M(10), M(11), M(12), M(13), M(14), M(15),
+  M(16), M(17), M(18), M(19), M(20), M(21), M(22), M(23),
+  M(24), M(25), M(26), M(27), M(28), M(29), M(30), M(31),
+  M(32)
+}; // (add more if using more than 64 bits)
+static int const divisors[] =3D=20
+{
+  1,    ~M(1),  M(2),  M(3),  M(4),  M(5),  M(6),  M(7),
+  M(8),  M(9),  M(10), M(11), M(12), M(13), M(14), M(15),
+  M(16), M(17), M(18), M(19), M(20), M(21), M(22), M(23),
+  M(24), M(25), M(26), M(27), M(28), M(29), M(30), M(31),
+  M(32)
+}; // (add more for 64 bits)
+#undef M
+r =3D (x * multipliers[b]) / divisors[b];
+</PRE>The following variation is not portable, but on architectures that =
+employ=20
+an arithmetic right-shift, maintaining the sign, it should be fast. =
+<PRE>const int s =3D -b; // OR:  sizeof(x) * CHAR_BIT - b;
+r =3D (x &lt;&lt; s) &gt;&gt; s;
+</PRE>Randal E. Bryant pointed out a bug on May 3, 2005 in an earlier =
+version=20
+(that used multipliers[] for divisors[]), where it failed on the case of =
+x=3D1 and=20
+b=3D1.=20
+<P>
+<HR>
+
+<H3><A name=3DConditionalSetOrClearBitsWithoutBranching>Conditionally =
+set or clear=20
+bits without branching </A></H3><PRE>bool f;         // conditional flag
+unsigned int m; // the bit mask
+unsigned int w; // the word to modify:  if (f) w |=3D m; else w &amp;=3D =
+~m;=20
+
+w ^=3D (-f ^ w) &amp; m;
+
+// OR, for superscalar CPUs:
+w =3D (w &amp; ~m) | (-f &amp; m);
+</PRE>On some architectures, the lack of branching can more than make up =
+for=20
+what appears to be twice as many operations. For instance, informal =
+speed tests=20
+on an AMD Athlon=E2=84=A2 XP 2100+ indicated it was 5-10% faster. An =
+Intel Core 2 Duo=20
+ran the superscalar version about 16% faster than the first. Glenn =
+Slayden=20
+informed me of the first expression on December 11, 2003. Marco Yu =
+shared the=20
+superscalar version with me on April 3, 2007 and alerted me to a typo 2 =
+days=20
+later.=20
+<P>
+<HR>
+
+<H3><A name=3DConditionalNegate>Conditionally negate a value without =
+branching</A>=20
+</H3>If you need to negate only when a flag is false, then use the =
+following to=20
+avoid branching: <PRE>bool fDontNegate;  // Flag indicating we should =
+not negate v.
+int v;             // Input value to negate if fDontNegate is false.
+int r;             // result =3D fDontNegate ? v : -v;
+
+r =3D (fDontNegate ^ (fDontNegate - 1)) * v;
+</PRE>If you need to negate only when a flag is true, then use this: =
+<PRE>bool fNegate;  // Flag indicating if we should negate v.
+int v;         // Input value to negate if fNegate is true.
+int r;         // result =3D fNegate ? -v : v;
+
+r =3D (v ^ -fNegate) + fNegate;
+</PRE>Avraham Plotnitzky suggested I add the first version on June 2, =
+2009.=20
+Motivated to avoid the multiply, I came up with the second version on =
+June 8,=20
+2009. Alfonso De Gregorio pointed out that some parens were missing on =
+November=20
+26, 2009, and received a bug bounty.=20
+<P>
+<HR>
+
+<H3><A name=3DMaskedMerge>Merge bits from two values according to a mask =
+</A></H3><PRE>unsigned int a;    // value to merge in non-masked bits
+unsigned int b;    // value to merge in masked bits
+unsigned int mask; // 1 where bits from b should be selected; 0 where =
+from a.
+unsigned int r;    // result of (a &amp; ~mask) | (b &amp; mask) goes =
+here
+
+r =3D a ^ ((a ^ b) &amp; mask);=20
+</PRE>This shaves one operation from the obvious way of combining two =
+sets of=20
+bits according to a bit mask. If the mask is a constant, then there may =
+be no=20
+advantage.=20
+<P>Ron Jeffery sent this to me on February 9, 2006.=20
+<P>
+<HR>
+
+<H3><A name=3DCountBitsSetNaive>Counting bits set (naive way) =
+</A></H3><PRE>unsigned int v; // count the number of bits set in v
+unsigned int c; // c accumulates the total bits set in v
+
+for (c =3D 0; v; v &gt;&gt;=3D 1)
+{
+  c +=3D v &amp; 1;
+}
+</PRE>The naive approach requires one iteration per bit, until no more =
+bits are=20
+set. So on a 32-bit word with only the high set, it will go through 32=20
+iterations.=20
+<P>
+<HR>
+
+<H3><A name=3DCountBitsSetTable>Counting bits set by lookup table =
+</A></H3><PRE>static const unsigned char BitsSetTable256[256] =3D=20
+{
+#   define B2(n) n,     n+1,     n+1,     n+2
+#   define B4(n) B2(n), B2(n+1), B2(n+1), B2(n+2)
+#   define B6(n) B4(n), B4(n+1), B4(n+1), B4(n+2)
+    B6(0), B6(1), B6(1), B6(2)
+};
+
+unsigned int v; // count the number of bits set in 32-bit value v
+unsigned int c; // c is the total bits set in v
+
+// Option 1:
+c =3D BitsSetTable256[v &amp; 0xff] +=20
+    BitsSetTable256[(v &gt;&gt; 8) &amp; 0xff] +=20
+    BitsSetTable256[(v &gt;&gt; 16) &amp; 0xff] +=20
+    BitsSetTable256[v &gt;&gt; 24];=20
+
+// Option 2:
+unsigned char * p =3D (unsigned char *) &amp;v;
+c =3D BitsSetTable256[p[0]] +=20
+    BitsSetTable256[p[1]] +=20
+    BitsSetTable256[p[2]] +=09
+    BitsSetTable256[p[3]];
+
+
+// To initially generate the table algorithmically:
+BitsSetTable256[0] =3D 0;
+for (int i =3D 0; i &lt; 256; i++)
+{
+  BitsSetTable256[i] =3D (i &amp; 1) + BitsSetTable256[i / 2];
+}
+</PRE>
+<P>On July 14, 2009 Hallvard Furuseth suggested the macro compacted =
+table.=20
+<P>
+<HR>
+
+<H3><A name=3DCountBitsSetKernighan>Counting bits set, Brian Kernighan's =
+way=20
+</A></H3><PRE>unsigned int v; // count the number of bits set in v
+unsigned int c; // c accumulates the total bits set in v
+for (c =3D 0; v; c++)
+{
+  v &amp;=3D v - 1; // clear the least significant bit set
+}
+</PRE>Brian Kernighan's method goes through as many iterations as there =
+are set=20
+bits. So if we have a 32-bit word with only the high bit set, then it =
+will only=20
+go once through the loop.=20
+<P>Published in 1988, the C Programming Language 2nd Ed. (by Brian W. =
+Kernighan=20
+and Dennis M. Ritchie) mentions this in exercise 2-9. On April 19, 2006 =
+Don=20
+Knuth pointed out to me that this method "was first published by Peter =
+Wegner in=20
+CACM 3 (1960), 322. (Also discovered independently by Derrick Lehmer and =
+
+published in 1964 in a book edited by Beckenbach.)"=20
+<P>
+<HR>
+
+<H3><A name=3DCountBitsSet64>Counting bits set in 14, 24, or 32-bit =
+words using=20
+64-bit instructions </A></H3><PRE>unsigned int v; // count the number of =
+bits set in v
+unsigned int c; // c accumulates the total bits set in v
+
+// option 1, for at most 14-bit values in v:
+c =3D (v * 0x200040008001ULL &amp; 0x111111111111111ULL) % 0xf;
+
+// option 2, for at most 24-bit values in v:
+c =3D  ((v &amp; 0xfff) * 0x1001001001001ULL &amp; 0x84210842108421ULL) =
+% 0x1f;
+c +=3D (((v &amp; 0xfff000) &gt;&gt; 12) * 0x1001001001001ULL &amp; =
+0x84210842108421ULL)=20
+     % 0x1f;
+
+// option 3, for at most 32-bit values in v:
+c =3D  ((v &amp; 0xfff) * 0x1001001001001ULL &amp; 0x84210842108421ULL) =
+% 0x1f;
+c +=3D (((v &amp; 0xfff000) &gt;&gt; 12) * 0x1001001001001ULL &amp; =
+0x84210842108421ULL) %=20
+     0x1f;
+c +=3D ((v &gt;&gt; 24) * 0x1001001001001ULL &amp; 0x84210842108421ULL) =
+% 0x1f;
+</PRE>This method requires a 64-bit CPU with fast modulus division to be =
+
+efficient. The first option takes only 3 operations; the second option =
+takes 10;=20
+and the third option takes 15.=20
+<P>Rich Schroeppel originally created a 9-bit version, similiar to =
+option 1; see=20
+the Programming Hacks section of <A=20
+href=3D"http://www.inwap.com/pdp10/hbaker/hakmem/hakmem.html">Beeler, =
+M., Gosper,=20
+R. W., and Schroeppel, R. HAKMEM. MIT AI Memo 239, Feb. 29, 1972.</A> =
+His method=20
+was the inspiration for the variants above, devised by Sean Anderson. =
+Randal E.=20
+Bryant offered a couple bug fixes on May 3, 2005. Bruce Dawson tweaked =
+what had=20
+been a 12-bit version and made it suitable for 14 bits using the same =
+number of=20
+operations on Feburary 1, 2007.=20
+<P><!-- After reading this and pondering it, Roshan James wrote a web =
+page=0A=
+<a href=3D=0A=
+"http://pensieve.thinkingms.com/sparksite/articles/tech/bitcounter64/bitc=
+ounter_64bit.htm">explaining how it works</a> and =0A=
+<a =
+href=3D"http://pensieve.thinkingms.com/sparksite/articles/tech/bitcounter=
+64/bitcounter_64bit_2.htm">extending it to=0A=
+16 bits</a> on March 8, 2004. -->
+<P>
+<HR>
+
+<H3><A name=3DCountBitsSetParallel>Counting bits set, in parallel =
+</A></H3><PRE>unsigned int v; // count bits set in this (32-bit value)
+unsigned int c; // store the total here
+static const int S[] =3D {1, 2, 4, 8, 16}; // Magic Binary Numbers
+static const int B[] =3D {0x55555555, 0x33333333, 0x0F0F0F0F, =
+0x00FF00FF, 0x0000FFFF};
+
+c =3D v - ((v &gt;&gt; 1) &amp; B[0]);
+c =3D ((c &gt;&gt; S[1]) &amp; B[1]) + (c &amp; B[1]);
+c =3D ((c &gt;&gt; S[2]) + c) &amp; B[2];
+c =3D ((c &gt;&gt; S[3]) + c) &amp; B[3];
+c =3D ((c &gt;&gt; S[4]) + c) &amp; B[4];
+</PRE>The B array, expressed as binary, is: <PRE>B[0] =3D 0x55555555 =3D =
+01010101 01010101 01010101 01010101
+B[1] =3D 0x33333333 =3D 00110011 00110011 00110011 00110011
+B[2] =3D 0x0F0F0F0F =3D 00001111 00001111 00001111 00001111
+B[3] =3D 0x00FF00FF =3D 00000000 11111111 00000000 11111111
+B[4] =3D 0x0000FFFF =3D 00000000 00000000 11111111 11111111
+</PRE>We can adjust the method for larger integer sizes by continuing =
+with the=20
+patterns for the <EM>Binary Magic Numbers,</EM> B and S. If there are k =
+bits,=20
+then we need the arrays S and B to be ceil(lg(k)) elements long, and we =
+must=20
+compute the same number of expressions for c as S or B are long. For a =
+32-bit v,=20
+16 operations are used.=20
+<P>The best method for counting bits in a 32-bit integer v is the =
+following: <PRE>v =3D v - ((v &gt;&gt; 1) &amp; 0x55555555);             =
+       // reuse input as temporary
+v =3D (v &amp; 0x33333333) + ((v &gt;&gt; 2) &amp; 0x33333333);     // =
+temp
+c =3D ((v + (v &gt;&gt; 4) &amp; 0xF0F0F0F) * 0x1010101) &gt;&gt; 24; // =
+count
+</PRE>
+<P>The best bit counting method takes only 12 operations, which is the =
+same as=20
+the lookup-table method, but avoids the memory and potential cache =
+misses of a=20
+table. It is a hybrid between the purely parallel method above and the =
+earlier=20
+methods using multiplies (in the section on counting bits with 64-bit=20
+instructions), though it doesn't use 64-bit instructions. The counts of =
+bits set=20
+in the bytes is done in parallel, and the sum total of the bits set in =
+the bytes=20
+is computed by multiplying by 0x1010101 and shifting right 24 bits.=20
+<P>A generalization of the best bit counting method to integers of =
+bit-widths=20
+upto 128 (parameterized by type T) is this: <PRE>v =3D v - ((v &gt;&gt; =
+1) &amp; (T)~(T)0/3);                           // temp
+v =3D (v &amp; (T)~(T)0/15*3) + ((v &gt;&gt; 2) &amp; (T)~(T)0/15*3);    =
+  // temp
+v =3D (v + (v &gt;&gt; 4)) &amp; (T)~(T)0/255*15;                      =
+// temp
+c =3D (T)(v * ((T)~(T)0/255)) &gt;&gt; (sizeof(T) - 1) * CHAR_BIT; // =
+count
+</PRE>
+<P>See <A=20
+href=3D"http://groups.google.com/groups?q=3Dreverse+bits&amp;num=3D100&am=
+p;hl=3Den&amp;group=3Dcomp.graphics.algorithms&amp;imgsafe=3Doff&amp;safe=
+=3Doff&amp;rnum=3D2&amp;ic=3D1&amp;selm=3D4fulhm%248dn%40atlas.uniserve.c=
+om">Ian=20
+Ashdown's nice newsgroup post</A> for more information on counting the =
+number of=20
+bits set (also known as <EM>sideways addition</EM>). The best bit =
+counting=20
+method was brought to my attention on October 5, 2005 by <A=20
+href=3D"http://onezero.org/">Andrew Shapira</A>; he found it in pages =
+187-188 of=20
+<A=20
+href=3D"http://www.amd.com/us-en/assets/content_type/white_papers_and_tec=
+h_docs/25112.PDF">Software=20
+Optimization Guide for AMD Athlon=E2=84=A2 64 and Opteron=E2=84=A2 =
+Processors</A>. Charlie=20
+Gordon suggested a way to shave off one operation from the purely =
+parallel=20
+version on December 14, 2005, and Don Clugston trimmed three more from =
+it on=20
+December 30, 2005. I made a typo with Don's suggestion that Eric Cole =
+spotted on=20
+January 8, 2006. Eric later suggested the arbitrary bit-width =
+generalization to=20
+the best method on November 17, 2006. On April 5, 2007, Al Williams =
+observed=20
+that I had a line of dead code at the top of the first method.=20
+<P>
+<HR>
+
+<H3><A name=3D#CountBitsFromMSBToPos>Count bits set (rank) from the=20
+most-significant bit upto a given position </A></H3>The following finds =
+the the=20
+rank of a bit, meaning it returns the sum of bits that are set to 1 from =
+the=20
+most-signficant bit downto the bit at the given position. <PRE>  =
+uint64_t v;       // Compute the rank (bits set) in v from the MSB to =
+pos.
+  unsigned int pos; // Bit position to count bits upto.
+  uint64_t r;       // Resulting rank of bit at pos goes here.
+
+  // Shift out bits after given position.
+  r =3D v &gt;&gt; (sizeof(v) * CHAR_BIT - pos);
+  // Count set bits in parallel.
+  // r =3D (r &amp; 0x5555...) + ((r &gt;&gt; 1) &amp; 0x5555...);
+  r =3D r - ((r &gt;&gt; 1) &amp; ~0UL/3);
+  // r =3D (r &amp; 0x3333...) + ((r &gt;&gt; 2) &amp; 0x3333...);
+  r =3D (r &amp; ~0UL/5) + ((r &gt;&gt; 2) &amp; ~0UL/5);
+  // r =3D (r &amp; 0x0f0f...) + ((r &gt;&gt; 4) &amp; 0x0f0f...);
+  r =3D (r + (r &gt;&gt; 4)) &amp; ~0UL/17;
+  // r =3D r % 255;
+  r =3D (r * (~0UL/255)) &gt;&gt; ((sizeof(v) - 1) * CHAR_BIT);
+</PRE>Juha J=C3=A4rvi sent this to me on November 21, 2009 as an inverse =
+operation to=20
+the computing the bit position with the given rank, which follows.=20
+<P>
+<HR>
+
+<H3><A name=3D#SelectPosFromMSBRank>Select the bit position (from the=20
+most-significant bit) with the given count (rank) </A></H3>The following =
+64-bit=20
+code selects the position of the r<SUP>th</SUP> 1 bit when counting from =
+the=20
+left. In other words if we start at the most significant bit and proceed =
+to the=20
+right, counting the number of bits set to 1 until we reach the desired =
+rank, r,=20
+then the position where we stop is returned. If the rank requested =
+exceeds the=20
+count of bits set, then 64 is returned. The code may be modified for =
+32-bit or=20
+counting from the right. <PRE>  uint64_t v;          // Input value to =
+find position with rank r.
+  unsigned int r;      // Input: bit's desired rank [1-64].
+  unsigned int s;      // Output: Resulting position of bit with rank r =
+[1-64]
+  uint64_t a, b, c, d; // Intermediate temporaries for bit count.
+  unsigned int t;      // Bit count temporary.
+
+  // Do a normal parallel bit count for a 64-bit integer,                =
+    =20
+  // but store all intermediate steps.                                   =
+    =20
+  // a =3D (v &amp; 0x5555...) + ((v &gt;&gt; 1) &amp; 0x5555...);
+  a =3D  v - ((v &gt;&gt; 1) &amp; ~0UL/3);
+  // b =3D (a &amp; 0x3333...) + ((a &gt;&gt; 2) &amp; 0x3333...);
+  b =3D (a &amp; ~0UL/5) + ((a &gt;&gt; 2) &amp; ~0UL/5);
+  // c =3D (b &amp; 0x0f0f...) + ((b &gt;&gt; 4) &amp; 0x0f0f...);
+  c =3D (b + (b &gt;&gt; 4)) &amp; ~0UL/0x11;
+  // d =3D (c &amp; 0x00ff...) + ((c &gt;&gt; 8) &amp; 0x00ff...);
+  d =3D (c + (c &gt;&gt; 8)) &amp; ~0UL/0x101;
+  t =3D (d &gt;&gt; 32) + (d &gt;&gt; 48);
+  // Now do branchless select!                                           =
+    =20
+  s  =3D 64;
+  // if (r &gt; t) {s -=3D 32; r -=3D t;}
+  s -=3D ((t - r) &amp; 256) &gt;&gt; 3; r -=3D (t &amp; ((t - r) =
+&gt;&gt; 8));
+  t  =3D (d &gt;&gt; (s - 16)) &amp; 0xff;
+  // if (r &gt; t) {s -=3D 16; r -=3D t;}
+  s -=3D ((t - r) &amp; 256) &gt;&gt; 4; r -=3D (t &amp; ((t - r) =
+&gt;&gt; 8));
+  t  =3D (c &gt;&gt; (s - 8)) &amp; 0xf;
+  // if (r &gt; t) {s -=3D 8; r -=3D t;}
+  s -=3D ((t - r) &amp; 256) &gt;&gt; 5; r -=3D (t &amp; ((t - r) =
+&gt;&gt; 8));
+  t  =3D (b &gt;&gt; (s - 4)) &amp; 0x7;
+  // if (r &gt; t) {s -=3D 4; r -=3D t;}
+  s -=3D ((t - r) &amp; 256) &gt;&gt; 6; r -=3D (t &amp; ((t - r) =
+&gt;&gt; 8));
+  t  =3D (a &gt;&gt; (s - 2)) &amp; 0x3;
+  // if (r &gt; t) {s -=3D 2; r -=3D t;}
+  s -=3D ((t - r) &amp; 256) &gt;&gt; 7; r -=3D (t &amp; ((t - r) =
+&gt;&gt; 8));
+  t  =3D (v &gt;&gt; (s - 1)) &amp; 0x1;
+  // if (r &gt; t) s--;
+  s -=3D ((t - r) &amp; 256) &gt;&gt; 8;
+  s =3D 65 - s;
+</PRE>If branching is fast on your target CPU, consider uncommenting the =
+
+if-statements and commenting the lines that follow them.=20
+<P>Juha J=C3=A4rvi sent this to me on November 21, 2009.=20
+<P>
+<HR>
+
+<H3><A name=3DParityNaive>Computing parity the naive way =
+</A></H3><PRE>unsigned int v;       // word value to compute the parity =
+of
+bool parity =3D false;  // parity will be the parity of v
+
+while (v)
+{
+  parity =3D !parity;
+  v =3D v &amp; (v - 1);
+}
+
+</PRE>The above code uses an approach like Brian Kernigan's bit =
+counting, above.=20
+The time it takes is proportional to the number of bits set.=20
+<P>
+<HR>
+
+<H3><A name=3DParityLookupTable>Compute parity by lookup table =
+</A></H3><PRE>static const bool ParityTable256[256] =3D=20
+{
+#   define P2(n) n, n^1, n^1, n
+#   define P4(n) P2(n), P2(n^1), P2(n^1), P2(n)
+#   define P6(n) P4(n), P4(n^1), P4(n^1), P4(n)
+    P6(0), P6(1), P6(1), P6(0)
+};
+
+unsigned char b;  // byte value to compute the parity of
+bool parity =3D ParityTable256[b];
+
+// OR, for 32-bit words:
+unsigned int v;
+v ^=3D v &gt;&gt; 16;
+v ^=3D v &gt;&gt; 8;
+bool parity =3D ParityTable256[v &amp; 0xff];
+
+// Variation:
+unsigned char * p =3D (unsigned char *) &amp;v;
+parity =3D ParityTable256[p[0] ^ p[1] ^ p[2] ^ p[3]];
+
+</PRE>Randal E. Bryant encouraged the addition of the (admittedly) =
+obvious last=20
+variation with variable p on May 3, 2005. Bruce Rawles found a typo in =
+an=20
+instance of the table variable's name on September 27, 2005, and he =
+received a=20
+$10 bug bounty. On October 9, 2006, Fabrice Bellard suggested the 32-bit =
+
+variations above, which require only one table lookup; the previous =
+version had=20
+four lookups (one per byte) and were slower. On July 14, 2009 Hallvard =
+Furuseth=20
+suggested the macro compacted table.=20
+<P>
+<HR>
+
+<H3><A name=3DParityWith64Bits>Compute parity of a byte using 64-bit =
+multiply and=20
+modulus division </A></H3><PRE>unsigned char b;  // byte value to =
+compute the parity of
+bool parity =3D=20
+  (((b * 0x0101010101010101ULL) &amp; 0x8040201008040201ULL) % 0x1FF) =
+&amp; 1;
+</PRE>The method above takes around 4 operations, but only works on =
+bytes.=20
+<P>
+<HR>
+
+<H3><A name=3D#ParityMultiply>Compute parity of word with a multiply =
+</A></H3>The=20
+following method computes the parity of the 32-bit value in only 8 =
+operations=20
+using a multiply. <PRE>    unsigned int v; // 32-bit word
+    v ^=3D v &gt;&gt; 1;
+    v ^=3D v &gt;&gt; 2;
+    v =3D (v &amp; 0x11111111U) * 0x11111111U;
+    return (v &gt;&gt; 28) &amp; 1;
+</PRE>Also for 64-bits, 8 operations are still enough. <PRE>    unsigned =
+long long v; // 64-bit word
+    v ^=3D v &gt;&gt; 1;
+    v ^=3D v &gt;&gt; 2;
+    v =3D (v &amp; 0x1111111111111111UL) * 0x1111111111111111UL;
+    return (v &gt;&gt; 60) &amp; 1;
+</PRE>
+<P>Andrew Shapira came up with this and sent it to me on Sept. 2, 2007.=20
+<HR>
+
+<H3><A name=3DParityParallel>Compute parity in parallel =
+</A></H3><PRE>unsigned int v;  // word value to compute the parity of
+v ^=3D v &gt;&gt; 16;
+v ^=3D v &gt;&gt; 8;
+v ^=3D v &gt;&gt; 4;
+v &amp;=3D 0xf;
+return (0x6996 &gt;&gt; v) &amp; 1;
+</PRE>The method above takes around 9 operations, and works for 32-bit =
+words. It=20
+may be optimized to work just on bytes in 5 operations by removing the =
+two lines=20
+immediately following "unsigned int v;". The method first shifts and =
+XORs the=20
+eight nibbles of the 32-bit value together, leaving the result in the =
+lowest=20
+nibble of v. Next, the binary number 0110 1001 1001 0110 (0x6996 in hex) =
+is=20
+shifted to the right by the value represented in the lowest nibble of v. =
+This=20
+number is like a miniature 16-bit parity-table indexed by the low four =
+bits in=20
+v. The result has the parity of v in bit 1, which is masked and =
+returned.=20
+<P>Thanks to Mathew Hendry for pointing out the shift-lookup idea at the =
+end on=20
+Dec. 15, 2002. That optimization shaves two operations off using only =
+shifting=20
+and XORing to find the parity.=20
+<P>
+<HR>
+
+<H3><A name=3DSwappingValuesSubAdd>Swapping values with subtraction and =
+addition=20
+</A></H3><PRE>#define SWAP(a, b) ((&amp;(a) =3D=3D &amp;(b)) || \
+                    (((a) -=3D (b)), ((b) +=3D (a)), ((a) =3D (b) - =
+(a))))
+</PRE>This swaps the values of a and b <EM>without using a temporary=20
+variable.</EM> The initial check for a and b being the same location in =
+memory=20
+may be omitted when you know this can't happen. (The compiler may omit =
+it anyway=20
+as an optimization.) If you enable overflows exceptions, then pass =
+unsigned=20
+values so an exception isn't thrown. The XOR method that follows may be =
+slightly=20
+faster on some machines. Don't use this with floating-point numbers =
+(unless you=20
+operate on their raw integer representations).=20
+<P>Sanjeev Sivasankaran suggested I add this on June 12, 2007. Vincent =
+Lef=C3=A8vre=20
+pointed out the potential for overflow exceptions on July 9, 2008=20
+<HR>
+
+<H3><A name=3DSwappingValuesXOR>Swapping values with XOR =
+</A></H3><PRE>#define SWAP(a, b) (((a) ^=3D (b)), ((b) ^=3D (a)), ((a) =
+^=3D (b)))
+</PRE>This is an old trick to exchange the values of the variables a and =
+b=20
+<EM>without using extra space for a temporary variable</EM>.=20
+<P>On January 20, 2005, Iain A. Fleming pointed out that the macro above =
+doesn't=20
+work when you swap with the same memory location, such as SWAP(a[i], =
+a[j]) with=20
+i =3D=3D j. So if that may occur, consider defining the macro as (((a) =
+=3D=3D (b)) ||=20
+(((a) ^=3D (b)), ((b) ^=3D (a)), ((a) ^=3D (b)))). On July 14, 2009, =
+Hallvard Furuseth=20
+suggested that on some machines, (((a) ^ (b)) &amp;&amp; ((b) ^=3D (a) =
+^=3D (b), (a)=20
+^=3D (b))) might be faster, since the (a) ^ (b) expression is reused.=20
+<P>
+<HR>
+
+<H3><A name=3DSwappingBitsXOR>Swapping individual bits with XOR =
+</A></H3><PRE>unsigned int i, j; // positions of bit sequences to swap
+unsigned int n;    // number of consecutive bits in each sequence
+unsigned int b;    // bits to swap reside in b
+unsigned int r;    // bit-swapped result goes here
+
+unsigned int x =3D ((b &gt;&gt; i) ^ (b &gt;&gt; j)) &amp; ((1U &lt;&lt; =
+n) - 1); // XOR temporary
+r =3D b ^ ((x &lt;&lt; i) | (x &lt;&lt; j));
+</PRE>As an example of swapping ranges of bits suppose we have have b =
+=3D=20
+<B>001</B>0<B>111</B>1 (expressed in binary) and we want to swap the n =
+=3D 3=20
+consecutive bits starting at i =3D 1 (the second bit from the right) =
+with the 3=20
+consecutive bits starting at j =3D 5; the result would be r =3D=20
+<B>111</B>0<B>001</B>1 (binary).=20
+<P>This method of swapping is similar to the general purpose XOR swap =
+trick, but=20
+intended for operating on individual bits.&nbsp; The variable x stores =
+the=20
+result of XORing the pairs of bit values we want to swap, and then the =
+bits are=20
+set to the result of themselves XORed with x.&nbsp; Of course, the =
+result is=20
+undefined if the sequences overlap.=20
+<P>On July 14, 2009 Hallvard Furuseth suggested that I change the 1 =
+&lt;&lt; n=20
+to 1U &lt;&lt; n because the value was being assigned to an unsigned and =
+to=20
+avoid shifting into a sign bit.=20
+<P>
+<HR>
+
+<H3><A name=3DBitReverseObvious>Reverse bits the obvious way =
+</A></H3><PRE>unsigned int v;     // input bits to be reversed
+unsigned int r =3D v; // r will be reversed bits of v; first get LSB of =
+v
+int s =3D sizeof(v) * CHAR_BIT - 1; // extra shift needed at end
+
+for (v &gt;&gt;=3D 1; v; v &gt;&gt;=3D 1)
+{  =20
+  r &lt;&lt;=3D 1;
+  r |=3D v &amp; 1;
+  s--;
+}
+r &lt;&lt;=3D s; // shift when v's highest bits are zero
+</PRE>
+<P>On October 15, 2004, Michael Hoisie pointed out a bug in the original =
+
+version. Randal E. Bryant suggested removing an extra operation on May =
+3, 2005.=20
+Behdad Esfabod suggested a slight change that eliminated one iteration =
+of the=20
+loop on May 18, 2005. Then, on February 6, 2007, Liyong Zhou suggested a =
+better=20
+version that loops while v is not 0, so rather than iterating over all =
+bits it=20
+stops early.=20
+<P>
+<HR>
+
+<H3><A name=3DBitReverseTable>Reverse bits in word by lookup table =
+</A></H3><PRE>static const unsigned char BitReverseTable256[256] =3D=20
+{
+#   define R2(n)     n,     n + 2*64,     n + 1*64,     n + 3*64
+#   define R4(n) R2(n), R2(n + 2*16), R2(n + 1*16), R2(n + 3*16)
+#   define R6(n) R4(n), R4(n + 2*4 ), R4(n + 1*4 ), R4(n + 3*4 )
+    R6(0), R6(2), R6(1), R6(3)
+};
+
+unsigned int v; // reverse 32-bit value, 8 bits at time
+unsigned int c; // c will get v reversed
+
+// Option 1:
+c =3D (BitReverseTable256[v &amp; 0xff] &lt;&lt; 24) |=20
+    (BitReverseTable256[(v &gt;&gt; 8) &amp; 0xff] &lt;&lt; 16) |=20
+    (BitReverseTable256[(v &gt;&gt; 16) &amp; 0xff] &lt;&lt; 8) |
+    (BitReverseTable256[(v &gt;&gt; 24) &amp; 0xff]);
+
+// Option 2:
+unsigned char * p =3D (unsigned char *) &amp;v;
+unsigned char * q =3D (unsigned char *) &amp;c;
+q[3] =3D BitReverseTable256[p[0]];=20
+q[2] =3D BitReverseTable256[p[1]];=20
+q[1] =3D BitReverseTable256[p[2]];=20
+q[0] =3D BitReverseTable256[p[3]];
+</PRE>The first method takes about 17 operations, and the second takes =
+about 12,=20
+assuming your CPU can load and store bytes easily.=20
+<P>On July 14, 2009 Hallvard Furuseth suggested the macro compacted =
+table.=20
+<P>
+<HR>
+
+<H3><A name=3DReverseByteWith64BitsDiv>Reverse the bits in a byte with 3 =
+
+operations (64-bit multiply and modulus division): =
+</A></H3><PRE>unsigned char b; // reverse this (8-bit) byte
+=20
+b =3D (b * 0x0202020202ULL &amp; 0x010884422010ULL) % 1023;
+</PRE>The multiply operation creates five separate copies of the 8-bit =
+byte=20
+pattern to fan-out into a 64-bit value. The AND operation selects the =
+bits that=20
+are in the correct (reversed) positions, relative to each 10-bit groups =
+of bits.=20
+The multiply and the AND operations copy the bits from the original byte =
+so they=20
+each appear in only one of the 10-bit sets. The reversed positions of =
+the bits=20
+from the original byte coincide with their relative positions within any =
+10-bit=20
+set. The last step, which involves modulus division by 2^10 - 1, has the =
+effect=20
+of merging together each set of 10 bits (from positions 0-9, 10-19, =
+20-29, ...)=20
+in the 64-bit value. They do not overlap, so the addition steps =
+underlying the=20
+modulus division behave like or operations.=20
+<P>This method was attributed to Rich Schroeppel in the Programming =
+Hacks=20
+section of <A=20
+href=3D"http://www.inwap.com/pdp10/hbaker/hakmem/hakmem.html">Beeler, =
+M., Gosper,=20
+R. W., and Schroeppel, R. HAKMEM. MIT AI Memo 239, Feb. 29, 1972.</A>=20
+<P>
+<HR>
+
+<H3><A name=3DReverseByteWith64Bits>Reverse the bits in a byte with 4 =
+operations=20
+(64-bit multiply, no division): </A></H3><PRE>unsigned char b; // =
+reverse this byte
+=20
+b =3D ((b * 0x80200802ULL) &amp; 0x0884422110ULL) * 0x0101010101ULL =
+&gt;&gt; 32;
+</PRE>The following shows the flow of the bit values with the boolean =
+variables=20
+<CODE>a, b, c, d, e, f, g,</CODE> and <CODE>h</CODE>, which comprise an =
+8-bit=20
+byte. Notice how the first multiply fans out the bit pattern to multiple =
+copies,=20
+while the last multiply combines them in the fifth byte from the right. =
+<FONT=20
+size=3D-1><PRE>                                                          =
+                              abcd efgh (-&gt; hgfe dcba)
+*                                                      1000 0000  0010 =
+0000  0000 1000  0000 0010 (0x80200802)
+-------------------------------------------------------------------------=
+------------------------
+                                            0abc defg  h00a bcde  fgh0 =
+0abc  defg h00a  bcde fgh0
+&amp;                                           0000 1000  1000 0100  =
+0100 0010  0010 0001  0001 0000 (0x0884422110)
+-------------------------------------------------------------------------=
+------------------------
+                                            0000 d000  h000 0c00  0g00 =
+00b0  00f0 000a  000e 0000
+*                                           0000 0001  0000 0001  0000 =
+0001  0000 0001  0000 0001 (0x0101010101)
+-------------------------------------------------------------------------=
+------------------------
+                                            0000 d000  h000 0c00  0g00 =
+00b0  00f0 000a  000e 0000
+                                 0000 d000  h000 0c00  0g00 00b0  00f0 =
+000a  000e 0000
+                      0000 d000  h000 0c00  0g00 00b0  00f0 000a  000e =
+0000
+           0000 d000  h000 0c00  0g00 00b0  00f0 000a  000e 0000
+0000 d000  h000 0c00  0g00 00b0  00f0 000a  000e 0000
+-------------------------------------------------------------------------=
+------------------------
+0000 d000  h000 dc00  hg00 dcb0  hgf0 dcba  hgfe dcba  hgfe 0cba  0gfe =
+00ba  00fe 000a  000e 0000
+&gt;&gt; 32
+-------------------------------------------------------------------------=
+------------------------
+                                            0000 d000  h000 dc00  hg00 =
+dcb0  hgf0 dcba  hgfe dcba =20
+&amp;                                                                    =
+                   1111 1111
+-------------------------------------------------------------------------=
+------------------------
+                                                                         =
+               hgfe dcba
+</PRE></FONT>Note that the last two steps can be combined on some =
+processors=20
+because the registers can be accessed as bytes; just multiply so that a =
+register=20
+stores the upper 32 bits of the result and the take the low byte. Thus, =
+it may=20
+take only 6 operations.=20
+<P>Devised by Sean Anderson, July 13, 2001.=20
+<P>
+<HR>
+
+<H3><A name=3DReverseByteWith32Bits>Reverse the bits in a byte with 7 =
+operations=20
+(no 64-bit): </A></H3><PRE>b =3D ((b * 0x0802LU &amp; 0x22110LU) | (b * =
+0x8020LU &amp; 0x88440LU)) * 0x10101LU &gt;&gt; 16;=20
+</PRE>Make sure you assign or cast the result to an unsigned char to =
+remove=20
+garbage in the higher bits. Devised by Sean Anderson, July 13, 2001. =
+Typo=20
+spotted and correction supplied by Mike Keith, January 3, 2002.=20
+<P>
+<HR>
+
+<H3><A name=3DReverseParallel>Reverse an N-bit quantity in parallel in 5 =
+* lg(N)=20
+operations: </A></H3><PRE>unsigned int v; // 32-bit word to reverse bit =
+order
+
+// swap odd and even bits
+v =3D ((v &gt;&gt; 1) &amp; 0x55555555) | ((v &amp; 0x55555555) &lt;&lt; =
+1);
+// swap consecutive pairs
+v =3D ((v &gt;&gt; 2) &amp; 0x33333333) | ((v &amp; 0x33333333) &lt;&lt; =
+2);
+// swap nibbles ...=20
+v =3D ((v &gt;&gt; 4) &amp; 0x0F0F0F0F) | ((v &amp; 0x0F0F0F0F) &lt;&lt; =
+4);
+// swap bytes
+v =3D ((v &gt;&gt; 8) &amp; 0x00FF00FF) | ((v &amp; 0x00FF00FF) &lt;&lt; =
+8);
+// swap 2-byte long pairs
+v =3D ( v &gt;&gt; 16             ) | ( v               &lt;&lt; 16);
+</PRE>The following variation is also O(lg(N)), however it requires more =
+
+operations to reverse v. Its virtue is in taking less slightly memory by =
+
+computing the constants on the fly. <PRE>unsigned int s =3D sizeof(v) * =
+CHAR_BIT; // bit size; must be power of 2=20
+unsigned int mask =3D ~0;        =20
+while ((s &gt;&gt;=3D 1) &gt; 0)=20
+{
+  mask ^=3D (mask &lt;&lt; s);
+  v =3D ((v &gt;&gt; s) &amp; mask) | ((v &lt;&lt; s) &amp; ~mask);
+}
+</PRE>These methods above are best suited to situations where N is =
+large. If you=20
+use the above with 64-bit ints (or larger), then you need to add more =
+lines=20
+(following the pattern); otherwise only the lower 32 bits will be =
+reversed and=20
+the result will be in the lower 32 bits.=20
+<P>See Dr. Dobb's Journal 1983, Edwin Freed's article on Binary Magic =
+Numbers=20
+for more information. The second variation was suggested by Ken Raeburn =
+on=20
+September 13, 2005. Veldmeijer mentioned that the first version could do =
+without=20
+ANDS in the last line on March 19, 2006.=20
+<P>
+<HR>
+
+<H3><A name=3DModulusDivisionEasy>Compute modulus division by 1 &lt;&lt; =
+s without=20
+a division operator </A></H3><PRE>const unsigned int n;          // =
+numerator
+const unsigned int s;
+const unsigned int d =3D 1U &lt;&lt; s; // So d will be one of: 1, 2, 4, =
+8, 16, 32, ...
+unsigned int m;                // m will be n % d
+m =3D n &amp; (d - 1);=20
+</PRE>Most programmers learn this trick early, but it was included for =
+the sake=20
+of completeness.=20
+<P>
+<HR>
+
+<P>
+<H3><A name=3DModulusDivision>Compute modulus division by (1 &lt;&lt; s) =
+- 1=20
+without a division operator </A></H3><PRE>unsigned int n;                =
+      // numerator
+const unsigned int s;                // s &gt; 0
+const unsigned int d =3D (1 &lt;&lt; s) - 1; // so d is either 1, 3, 7, =
+15, 31, ...).
+unsigned int m;                      // n % d goes here.
+
+for (m =3D n; n &gt; d; n =3D m)
+{
+  for (m =3D 0; n; n &gt;&gt;=3D s)
+  {
+    m +=3D n &amp; d;
+  }
+}
+// Now m is a value from 0 to d, but since with modulus division
+// we want m to be 0 when it is d.
+m =3D m =3D=3D d ? 0 : m;
+</PRE>This method of modulus division by an integer that is one less =
+than a=20
+power of 2 takes at most 5 + (4 + 5 * ceil(N / s)) * ceil(lg(N / s)) =
+operations,=20
+where N is the number of bits in the numerator. In other words, it takes =
+at most=20
+O(N * lg(N)) time.=20
+<P>Devised by Sean Anderson, August 15, 2001. Before Sean A. Irvine =
+corrected me=20
+on June 17, 2004, I mistakenly commented that we could alternatively =
+assign=20
+<CODE>m =3D ((m + 1) &amp; d) - 1;</CODE> at the end. Michael Miller =
+spotted a=20
+typo in the code April 25, 2005.=20
+<P>
+<HR>
+
+<H3><A name=3DModulusDivisionParallel>Compute modulus division by (1 =
+&lt;&lt; s) -=20
+1 in parallel without a division operator </A></H3><PRE>
+// The following is for a word size of 32 bits!
+
+static const unsigned int M[] =3D=20
+{
+  0x00000000, 0x55555555, 0x33333333, 0xc71c71c7, =20
+  0x0f0f0f0f, 0xc1f07c1f, 0x3f03f03f, 0xf01fc07f,=20
+  0x00ff00ff, 0x07fc01ff, 0x3ff003ff, 0xffc007ff,
+  0xff000fff, 0xfc001fff, 0xf0003fff, 0xc0007fff,
+  0x0000ffff, 0x0001ffff, 0x0003ffff, 0x0007ffff,=20
+  0x000fffff, 0x001fffff, 0x003fffff, 0x007fffff,
+  0x00ffffff, 0x01ffffff, 0x03ffffff, 0x07ffffff,
+  0x0fffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff
+};
+
+static const unsigned int Q[][6] =3D=20
+{
+  { 0,  0,  0,  0,  0,  0}, {16,  8,  4,  2,  1,  1}, {16,  8,  4,  2,  =
+2,  2},
+  {15,  6,  3,  3,  3,  3}, {16,  8,  4,  4,  4,  4}, {15,  5,  5,  5,  =
+5,  5},
+  {12,  6,  6,  6 , 6,  6}, {14,  7,  7,  7,  7,  7}, {16,  8,  8,  8,  =
+8,  8},
+  { 9,  9,  9,  9,  9,  9}, {10, 10, 10, 10, 10, 10}, {11, 11, 11, 11, =
+11, 11},
+  {12, 12, 12, 12, 12, 12}, {13, 13, 13, 13, 13, 13}, {14, 14, 14, 14, =
+14, 14},
+  {15, 15, 15, 15, 15, 15}, {16, 16, 16, 16, 16, 16}, {17, 17, 17, 17, =
+17, 17},
+  {18, 18, 18, 18, 18, 18}, {19, 19, 19, 19, 19, 19}, {20, 20, 20, 20, =
+20, 20},
+  {21, 21, 21, 21, 21, 21}, {22, 22, 22, 22, 22, 22}, {23, 23, 23, 23, =
+23, 23},
+  {24, 24, 24, 24, 24, 24}, {25, 25, 25, 25, 25, 25}, {26, 26, 26, 26, =
+26, 26},
+  {27, 27, 27, 27, 27, 27}, {28, 28, 28, 28, 28, 28}, {29, 29, 29, 29, =
+29, 29},
+  {30, 30, 30, 30, 30, 30}, {31, 31, 31, 31, 31, 31}
+};
+
+static const unsigned int R[][6] =3D=20
+{
+  {0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, =
+0x00000000},
+  {0x0000ffff, 0x000000ff, 0x0000000f, 0x00000003, 0x00000001, =
+0x00000001},
+  {0x0000ffff, 0x000000ff, 0x0000000f, 0x00000003, 0x00000003, =
+0x00000003},
+  {0x00007fff, 0x0000003f, 0x00000007, 0x00000007, 0x00000007, =
+0x00000007},
+  {0x0000ffff, 0x000000ff, 0x0000000f, 0x0000000f, 0x0000000f, =
+0x0000000f},
+  {0x00007fff, 0x0000001f, 0x0000001f, 0x0000001f, 0x0000001f, =
+0x0000001f},
+  {0x00000fff, 0x0000003f, 0x0000003f, 0x0000003f, 0x0000003f, =
+0x0000003f},
+  {0x00003fff, 0x0000007f, 0x0000007f, 0x0000007f, 0x0000007f, =
+0x0000007f},
+  {0x0000ffff, 0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff, =
+0x000000ff},
+  {0x000001ff, 0x000001ff, 0x000001ff, 0x000001ff, 0x000001ff, =
+0x000001ff},=20
+  {0x000003ff, 0x000003ff, 0x000003ff, 0x000003ff, 0x000003ff, =
+0x000003ff},=20
+  {0x000007ff, 0x000007ff, 0x000007ff, 0x000007ff, 0x000007ff, =
+0x000007ff},=20
+  {0x00000fff, 0x00000fff, 0x00000fff, 0x00000fff, 0x00000fff, =
+0x00000fff},=20
+  {0x00001fff, 0x00001fff, 0x00001fff, 0x00001fff, 0x00001fff, =
+0x00001fff},=20
+  {0x00003fff, 0x00003fff, 0x00003fff, 0x00003fff, 0x00003fff, =
+0x00003fff},=20
+  {0x00007fff, 0x00007fff, 0x00007fff, 0x00007fff, 0x00007fff, =
+0x00007fff},=20
+  {0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff, =
+0x0000ffff},=20
+  {0x0001ffff, 0x0001ffff, 0x0001ffff, 0x0001ffff, 0x0001ffff, =
+0x0001ffff},=20
+  {0x0003ffff, 0x0003ffff, 0x0003ffff, 0x0003ffff, 0x0003ffff, =
+0x0003ffff},=20
+  {0x0007ffff, 0x0007ffff, 0x0007ffff, 0x0007ffff, 0x0007ffff, =
+0x0007ffff},
+  {0x000fffff, 0x000fffff, 0x000fffff, 0x000fffff, 0x000fffff, =
+0x000fffff},=20
+  {0x001fffff, 0x001fffff, 0x001fffff, 0x001fffff, 0x001fffff, =
+0x001fffff},=20
+  {0x003fffff, 0x003fffff, 0x003fffff, 0x003fffff, 0x003fffff, =
+0x003fffff},=20
+  {0x007fffff, 0x007fffff, 0x007fffff, 0x007fffff, 0x007fffff, =
+0x007fffff},=20
+  {0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, 0x00ffffff, =
+0x00ffffff},
+  {0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, 0x01ffffff, =
+0x01ffffff},=20
+  {0x03ffffff, 0x03ffffff, 0x03ffffff, 0x03ffffff, 0x03ffffff, =
+0x03ffffff},=20
+  {0x07ffffff, 0x07ffffff, 0x07ffffff, 0x07ffffff, 0x07ffffff, =
+0x07ffffff},
+  {0x0fffffff, 0x0fffffff, 0x0fffffff, 0x0fffffff, 0x0fffffff, =
+0x0fffffff},
+  {0x1fffffff, 0x1fffffff, 0x1fffffff, 0x1fffffff, 0x1fffffff, =
+0x1fffffff},=20
+  {0x3fffffff, 0x3fffffff, 0x3fffffff, 0x3fffffff, 0x3fffffff, =
+0x3fffffff},=20
+  {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, =
+0x7fffffff}
+};
+
+unsigned int n;       // numerator
+const unsigned int s; // s &gt; 0
+const unsigned int d =3D (1 &lt;&lt; s) - 1; // so d is either 1, 3, 7, =
+15, 31, ...).
+unsigned int m;       // n % d goes here.
+
+m =3D (n &amp; M[s]) + ((n &gt;&gt; s) &amp; M[s]);
+
+for (const unsigned int * q =3D &amp;Q[s][0], * r =3D &amp;R[s][0]; m =
+&gt; d; q++, r++)
+{
+  m =3D (m &gt;&gt; *q) + (m &amp; *r);
+}
+m =3D m =3D=3D d ? 0 : m; // OR, less portably: m =3D m &amp; =
+-((signed)(m - d) &gt;&gt; s);
+</PRE>This method of finding modulus division by an integer that is one =
+less=20
+than a power of 2 takes at most O(lg(N)) time, where N is the number of =
+bits in=20
+the numerator (32 bits, for the code above). The number of operations is =
+at most=20
+12 + 9 * ceil(lg(N)). The tables may be removed if you know the =
+denominator at=20
+compile time; just extract the few relevent entries and unroll the loop. =
+It may=20
+be easily extended to more bits.=20
+<P>It finds the result by summing the values in base (1 &lt;&lt; s) in =
+parallel.=20
+First every other base (1 &lt;&lt; s) value is added to the previous =
+one.=20
+Imagine that the result is written on a piece of paper. Cut the paper in =
+half,=20
+so that half the values are on each cut piece. Align the values and sum =
+them=20
+onto a new piece of paper. Repeat by cutting this paper in half (which =
+will be a=20
+quarter of the size of the previous one) and summing, until you cannot =
+cut=20
+further. After performing lg(N/s/2) cuts, we cut no more; just continue =
+to add=20
+the values and put the result onto a new piece of paper as before, while =
+there=20
+are at least two s-bit values.=20
+<P>Devised by Sean Anderson, August 20, 2001. A typo was spotted by =
+Randy E.=20
+Bryant on May 3, 2005 (after pasting the code, I had later added =
+"unsinged" to a=20
+variable declaration). As in the previous hack, I mistakenly commented =
+that we=20
+could alternatively assign <CODE>m =3D ((m + 1) &amp; d) - 1;</CODE> at =
+the end,=20
+and Don Knuth corrected me on April 19, 2006 and suggested <CODE>m =3D m =
+&amp;=20
+-((signed)(m - d) &gt;&gt; s)</CODE>. On June 18, 2009 Sean Irvine =
+proposed a=20
+change that used <CODE>((n &gt;&gt; s) &amp; M[s])</CODE> instead of =
+<CODE>((n=20
+&amp; ~M[s]) &gt;&gt; s)</CODE>, which typically requires fewer =
+operations=20
+because the M[s] constant is already loaded.=20
+<P>
+<HR>
+
+<H3><A name=3DIntegerLogObvious>Find the log base 2 of an integer with =
+the MSB N=20
+set in O(N) operations (the obvious way) </A></H3><PRE>unsigned int v; =
+// 32-bit word to find the log base 2 of
+unsigned r =3D 0; // r will be lg(v)
+
+while (v &gt;&gt;=3D 1) // unroll for more speed...
+{
+  r++;
+}
+</PRE>The log base 2 of an integer is the same as the position of the =
+highest=20
+bit set (or most significant bit set, MSB). The following log base 2 =
+methods are=20
+faster than this one.=20
+<P>
+<HR>
+
+<H3><A name=3DIntegerLogIEEE64Float>Find the integer log base 2 of an =
+integer with=20
+an 64-bit IEEE float </A></H3><PRE>int v; // 32-bit integer to find the =
+log base 2 of
+int r; // result of log_2(v) goes here
+union { unsigned int u[2]; double d; } t; // temp
+
+t.u[__FLOAT_WORD_ORDER=3D=3DLITTLE_ENDIAN] =3D 0x43300000;
+t.u[__FLOAT_WORD_ORDER!=3DLITTLE_ENDIAN] =3D v;
+t.d -=3D 4503599627370496.0;
+r =3D (t.u[__FLOAT_WORD_ORDER=3D=3DLITTLE_ENDIAN] &gt;&gt; 20) - 0x3FF;
+</PRE>The code above loads a 64-bit (IEEE-754 floating-point) double =
+with a=20
+32-bit integer (with no paddding bits) by storing the integer in the =
+mantissa=20
+while the exponent is set to 2<SUP>52</SUP>. From this newly minted =
+double,=20
+2<SUP>52</SUP> (expressed as a double) is subtracted, which sets the =
+resulting=20
+exponent to the log base 2 of the input value, v. All that is left is =
+shifting=20
+the exponent bits into position (20 bits right) and subtracting the =
+bias, 0x3FF=20
+(which is 1023 decimal). This technique only takes 5 operations, but =
+many CPUs=20
+are slow at manipulating doubles, and the endianess of the architecture =
+must be=20
+accommodated.=20
+<P>Eric Cole sent me this on January 15, 2006. Evan Felix pointed out a =
+typo on=20
+April 4, 2006. Vincent Lef=C3=A8vre told me on July 9, 2008 to change =
+the endian=20
+check to use the float's endian, which could differ from the integer's =
+endian.=20
+<P>
+<HR>
+
+<H3><A name=3DIntegerLogLookup>Find the log base 2 of an integer with a =
+lookup=20
+table </A></H3><PRE>static const char LogTable256[256] =3D=20
+{
+#define LT(n) n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n
+    -1, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
+    LT(4), LT(5), LT(5), LT(6), LT(6), LT(6), LT(6),
+    LT(7), LT(7), LT(7), LT(7), LT(7), LT(7), LT(7), LT(7)
+};
+
+unsigned int v; // 32-bit word to find the log of
+unsigned r;     // r will be lg(v)
+register unsigned int t, tt; // temporaries
+
+if (tt =3D v &gt;&gt; 16)
+{
+  r =3D (t =3D tt &gt;&gt; 8) ? 24 + LogTable256[t] : 16 + =
+LogTable256[tt];
+}
+else=20
+{
+  r =3D (t =3D v &gt;&gt; 8) ? 8 + LogTable256[t] : LogTable256[v];
+}
+</PRE>The lookup table method takes only about 7 operations to find the =
+log of a=20
+32-bit value. If extended for 64-bit quantities, it would take roughly 9 =
+
+operations. Another operation can be trimmed off by using four tables, =
+with the=20
+possible additions incorporated into each. Using int table elements may =
+be=20
+faster, depending on your architecture.=20
+<P>The code above is tuned to uniformly distributed <EM>output</EM> =
+values. If=20
+your <EM>inputs</EM> are evenly distributed across all 32-bit values, =
+then=20
+consider using the following: <PRE>if (tt =3D v &gt;&gt; 24)=20
+{
+  r =3D 24 + LogTable256[tt];
+}=20
+else if (tt =3D v &gt;&gt; 16)=20
+{
+  r =3D 16 + LogTable256[tt];
+}=20
+else if (tt =3D v &gt;&gt; 8)=20
+{
+  r =3D 8 + LogTable256[tt];
+}=20
+else=20
+{
+  r =3D LogTable256[v];
+}
+</PRE>To initially generate the log table algorithmically: =
+<PRE>LogTable256[0] =3D LogTable256[1] =3D 0;
+for (int i =3D 2; i &lt; 256; i++)=20
+{
+  LogTable256[i] =3D 1 + LogTable256[i / 2];
+}
+LogTable256[0] =3D -1; // if you want log(0) to return -1
+</PRE>Behdad Esfahbod and I shaved off a fraction of an operation (on =
+average)=20
+on May 18, 2005. Yet another fraction of an operation was removed on =
+November=20
+14, 2006 by Emanuel Hoogeveen. The variation that is tuned to evenly =
+distributed=20
+input values was suggested by David A. Butterfield on September 19, =
+2008. Venkat=20
+Reddy told me on January 5, 2009 that log(0) should return -1 to =
+indicate an=20
+error, so I changed the first entry in the table to that.=20
+<HR>
+
+<H3><A name=3DIntegerLog>Find the log base 2 of an N-bit integer in =
+O(lg(N))=20
+operations </A></H3><PRE>unsigned int v;  // 32-bit value to find the =
+log2 of=20
+const unsigned int b[] =3D {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
+const unsigned int S[] =3D {1, 2, 4, 8, 16};
+int i;
+
+register unsigned int r =3D 0; // result of log2(v) will go here
+for (i =3D 4; i &gt;=3D 0; i--) // unroll for speed...
+{
+  if (v &amp; b[i])
+  {
+    v &gt;&gt;=3D S[i];
+    r |=3D S[i];
+  }=20
+}
+
+
+// OR (IF YOUR CPU BRANCHES SLOWLY):
+
+unsigned int v;	         // 32-bit value to find the log2 of=20
+register unsigned int r; // result of log2(v) will go here
+register unsigned int shift;
+
+r =3D     (v &gt; 0xFFFF) &lt;&lt; 4; v &gt;&gt;=3D r;
+shift =3D (v &gt; 0xFF  ) &lt;&lt; 3; v &gt;&gt;=3D shift; r |=3D shift;
+shift =3D (v &gt; 0xF   ) &lt;&lt; 2; v &gt;&gt;=3D shift; r |=3D shift;
+shift =3D (v &gt; 0x3   ) &lt;&lt; 1; v &gt;&gt;=3D shift; r |=3D shift;
+                                        r |=3D (v &gt;&gt; 1);
+
+
+// OR (IF YOU KNOW v IS A POWER OF 2):
+
+unsigned int v;  // 32-bit value to find the log2 of=20
+static const unsigned int b[] =3D {0xAAAAAAAA, 0xCCCCCCCC, 0xF0F0F0F0,=20
+                                 0xFF00FF00, 0xFFFF0000};
+register unsigned int r =3D (v &amp; b[0]) !=3D 0;
+for (i =3D 4; i &gt; 0; i--) // unroll for speed...
+{
+  r |=3D ((v &amp; b[i]) !=3D 0) &lt;&lt; i;
+}
+</PRE>Of course, to extend the code to find the log of a 33- to 64-bit =
+number,=20
+we would append another element, 0xFFFFFFFF00000000, to b, append 32 to =
+S, and=20
+loop from 5 to 0. This method is much slower than the earlier =
+table-lookup=20
+version, but if you don't want big table or your architecture is slow to =
+access=20
+memory, it's a good choice. The second variation involves slightly more=20
+operations, but it may be faster on machines with high branch costs =
+(e.g.=20
+PowerPC).=20
+<P>The second version was sent to me by <A=20
+href=3D"http://www.balance-software.com/ec/">Eric Cole</A> on January 7, =
+2006.=20
+Andrew Shapira subsequently trimmed a few operations off of it and sent =
+me his=20
+variation (above) on Sept. 1, 2007. The third variation was suggested to =
+me by=20
+<A href=3D"http://www.ece.ucdavis.edu/~jowens/">John Owens</A> on April =
+24, 2002;=20
+it's faster, but <EM>it is only suitable when the input is known to be a =
+power=20
+of 2</EM>. On May 25, 2003, Ken Raeburn suggested improving the general =
+case by=20
+using smaller numbers for b[], which load faster on some architectures =
+(for=20
+instance if the word size is 16 bits, then only one load instruction may =
+be=20
+needed). These values work for the general version, but not for the =
+special-case=20
+version below it, where v is a power of 2; Glenn Slayden brought this =
+oversight=20
+to my attention on December 12, 2003.=20
+<P>
+<HR>
+
+<H3><A name=3DIntegerLogDeBruijn>Find the log base 2 of an N-bit integer =
+in=20
+O(lg(N)) operations with multiply and lookup </A></H3><PRE>uint32_t v; =
+// find the log base 2 of 32-bit v
+int r;      // result goes here
+
+static const int MultiplyDeBruijnBitPosition[32] =3D=20
+{
+  0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30,
+  8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31
+};
+
+v |=3D v &gt;&gt; 1; // first round down to one less than a power of 2=20
+v |=3D v &gt;&gt; 2;
+v |=3D v &gt;&gt; 4;
+v |=3D v &gt;&gt; 8;
+v |=3D v &gt;&gt; 16;
+
+r =3D MultiplyDeBruijnBitPosition[(uint32_t)(v * 0x07C4ACDDU) &gt;&gt; =
+27];
+</PRE>The code above computes the log base 2 of a 32-bit integer with a =
+small=20
+table lookup and multiply. It requires only 13 operations, compared to =
+(up to)=20
+20 for the previous method. The purely table-based method requires the =
+fewest=20
+operations, but this offers a reasonable compromise between table size =
+and=20
+speed.=20
+<P>If you know that v is a power of 2, then you only need the following: =
+<PRE>static const int MultiplyDeBruijnBitPosition2[32] =3D=20
+{
+  0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,=20
+  31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+};
+r =3D MultiplyDeBruijnBitPosition2[(uint32_t)(v * 0x077CB531U) &gt;&gt; =
+27];
+</PRE>
+<P>Eric Cole devised this January 8, 2006 after reading about the entry =
+below to=20
+<A=20
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerO=
+f2">round=20
+up to a power of 2</A> and the method below for <A=20
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightM=
+ultLookup">computing=20
+the number of trailing bits with a multiply and lookup</A> using a =
+DeBruijn=20
+sequence. On December 10, 2009, Mark Dickinson shaved off a couple =
+operations by=20
+requiring v be rounded up to one less than the next power of 2 rather =
+than the=20
+power of 2.=20
+<P>
+<HR>
+
+<H3><A name=3DIntegerLog10>Find integer log base 10 of an integer =
+</A></H3><PRE>unsigned int v; // non-zero 32-bit integer value to =
+compute the log base 10 of=20
+int r;          // result goes here
+int t;          // temporary
+
+static unsigned int const PowersOf10[] =3D=20
+    {1, 10, 100, 1000, 10000, 100000,
+     1000000, 10000000, 100000000, 1000000000};
+
+t =3D (IntegerLogBase2(v) + 1) * 1233 &gt;&gt; 12; // (use a lg2 method =
+from above)
+r =3D t - (v &lt; PowersOf10[t]);
+</PRE>The integer log base 10 is computed by first using one of the =
+techniques=20
+above for finding the log base 2. By the relationship =
+log<SUB>10</SUB>(v) =3D=20
+log<SUB>2</SUB>(v) / log<SUB>2</SUB>(10), we need to multiply it by=20
+1/log<SUB>2</SUB>(10), which is approximately 1233/4096, or 1233 =
+followed by a=20
+right shift of 12. Adding one is needed because the IntegerLogBase2 =
+rounds down.=20
+Finally, since the value t is only an approximation that may be off by =
+one, the=20
+exact value is found by subtracting the result of v &lt; PowersOf10[t].=20
+<P>This method takes 6 more operations than IntegerLogBase2. It may be =
+sped up=20
+(on machines with fast memory access) by modifying the log base 2 =
+table-lookup=20
+method above so that the entries hold what is computed for t (that is, =
+pre-add,=20
+-mulitply, and -shift). Doing so would require a total of only 9 =
+operations to=20
+find the log base 10, assuming 4 tables were used (one for each byte of =
+v).=20
+<P>Eric Cole suggested I add a version of this on January 7, 2006.=20
+<P>
+<HR>
+
+<H3><A name=3DIntegerLog10Obvious>Find integer log base 10 of an integer =
+the=20
+obvious way </A></H3><PRE>unsigned int v; // non-zero 32-bit integer =
+value to compute the log base 10 of=20
+int r;          // result goes here
+
+r =3D (v &gt;=3D 1000000000) ? 9 : (v &gt;=3D 100000000) ? 8 : (v =
+&gt;=3D 10000000) ? 7 :=20
+    (v &gt;=3D 1000000) ? 6 : (v &gt;=3D 100000) ? 5 : (v &gt;=3D 10000) =
+? 4 :=20
+    (v &gt;=3D 1000) ? 3 : (v &gt;=3D 100) ? 2 : (v &gt;=3D 10) ? 1 : 0;
+</PRE>This method works well when the input is uniformly distributed =
+over 32-bit=20
+values because 76% of the inputs are caught by the first compare, 21% =
+are caught=20
+by the second compare, 2% are caught by the third, and so on (chopping =
+the=20
+remaining down by 90% with each comparision). As a result, less than 2.6 =
+
+operations are needed on average.=20
+<P>On April 18, 2007, Emanuel Hoogeveen suggested a variation on this =
+where the=20
+conditions used divisions, which were not as fast as simple comparisons. =
+
+<HR>
+
+<H3><A name=3DIntegerLogFloat>Find integer log base 2 of a 32-bit IEEE =
+float=20
+</A></H3><PRE>const float v; // find int(log2(v)), where v &gt; 0.0 =
+&amp;&amp; finite(v) &amp;&amp; isnormal(v)
+int c;         // 32-bit int c gets the result;
+
+c =3D *(const int *) &amp;v;  // OR, for portability:  memcpy(&amp;c, =
+&amp;v, sizeof c);
+c =3D (c &gt;&gt; 23) - 127;
+</PRE>The above is fast, but IEEE 754-compliant architectures utilize=20
+<EM>subnormal</EM> (also called <EM>denormal</EM>) floating point =
+numbers. These=20
+have the exponent bits set to zero (signifying pow(2,-127)), and the =
+mantissa is=20
+not normalized, so it contains leading zeros and thus the log2 must be =
+computed=20
+from the mantissa. To accomodate for subnormal numbers, use the =
+following: <PRE>const float v;              // find int(log2(v)), where =
+v &gt; 0.0 &amp;&amp; finite(v)
+int c;                      // 32-bit int c gets the result;
+int x =3D *(const int *) &amp;v;  // OR, for portability:  =
+memcpy(&amp;x, &amp;v, sizeof x);
+
+c =3D x &gt;&gt; 23;         =20
+
+if (c)
+{
+  c -=3D 127;
+}
+else
+{ // subnormal, so recompute using mantissa: c =3D intlog2(x) - 149;
+  register unsigned int t; // temporary
+  // Note that LogTable256 was defined <A =
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogLoo=
+kup">earlier</A>
+  if (t =3D x &gt;&gt; 16)
+  {
+    c =3D LogTable256[t] - 133;
+  }
+  else
+  {
+    c =3D (t =3D x &gt;&gt; 8) ? LogTable256[t] - 141 : LogTable256[x] - =
+149;
+  }
+}
+</PRE>On June 20, 2004, Sean A. Irvine suggested that I include code to =
+handle=20
+subnormal numbers. On June 11, 2005, Falk H=C3=BCffner pointed out that =
+ISO C99 6.5/7=20
+specified undefined behavior for the common type punning idiom *(int =
+*)&amp;,=20
+though it has worked on 99.9% of C compilers. He proposed using memcpy =
+for=20
+maximum portability or a union with a float and an int for better code=20
+generation than memcpy on some compilers.=20
+<P>
+<HR>
+
+<H3><A name=3DIntegerLogRootFloat>Find integer log base 2 of the pow(2, =
+r)-root of=20
+a 32-bit IEEE float (for unsigned integer r) </A></H3><PRE>const int r;
+const float v; // find int(log2(pow((double) v, 1. / pow(2, r)))),=20
+               // where isnormal(v) and v &gt; 0
+int c;         // 32-bit int c gets the result;
+
+c =3D *(const int *) &amp;v;  // OR, for portability:  memcpy(&amp;c, =
+&amp;v, sizeof c);
+c =3D ((((c - 0x3f800000) &gt;&gt; r) + 0x3f800000) &gt;&gt; 23) - 127;
+</PRE>So, if r is 0, for example, we have c =3D int(log2((double) v)). =
+If r is 1,=20
+then we have c =3D int(log2(sqrt((double) v))). If r is 2, then we have =
+c =3D=20
+int(log2(pow((double) v, 1./4))).=20
+<P>On June 11, 2005, Falk H=C3=BCffner pointed out that ISO C99 6.5/7 =
+left the type=20
+punning idiom *(int *)&amp; undefined, and he suggested using memcpy.=20
+<P>
+<HR>
+
+<H3><A name=3DZerosOnRightLinear>Count the consecutive zero bits =
+(trailing) on the=20
+right linearly </A></H3><PRE>unsigned int v;  // input to count trailing =
+zero bits
+int c;  // output: c will count v's trailing zero bits,
+        // so if v is 1101000 (base 2), then c will be 3
+if (v)
+{
+  v =3D (v ^ (v - 1)) &gt;&gt; 1;  // Set v's trailing 0s to 1s and zero =
+rest
+  for (c =3D 0; v; c++)
+  {
+    v &gt;&gt;=3D 1;
+  }
+}
+else
+{
+  c =3D CHAR_BIT * sizeof(v);
+}
+</PRE>The average number of trailing zero bits in a (uniformly =
+distributed)=20
+random binary number is one, so this O(trailing zeros) solution isn't =
+that bad=20
+compared to the faster methods below.=20
+<P>Jim Cole suggested I add a linear-time method for counting the =
+trailing zeros=20
+on August 15, 2007. On October 22, 2007, Jason Cunningham pointed out =
+that I had=20
+neglected to paste the unsigned modifier for v.=20
+<HR>
+
+<H3><A name=3DZerosOnRightParallel>Count the consecutive zero bits =
+(trailing) on=20
+the right in parallel </A></H3><PRE>unsigned int v;      // 32-bit word =
+input to count zero bits on right
+unsigned int c =3D 32; // c will be the number of zero bits on the right
+
+static const unsigned int B[] =3D {0x55555555, 0x33333333, 0x0F0F0F0F, =
+0x00FF00FF, 0x0000FFFF};
+static const unsigned int S[] =3D {1, 2, 4, 8, 16}; // Our Magic Binary =
+Numbers
+
+for (int i =3D 4; i &gt;=3D 0; --i) // unroll for more speed
+{
+  if (v &amp; B[i])
+  {
+    v &lt;&lt;=3D S[i];
+    c -=3D S[i];
+  }
+}
+
+if (v)
+{
+  c--;
+}
+</PRE>Here, we are basically doing the same operations as finding the =
+log base 2=20
+in parallel, but the values of b are inverted (in order to count from =
+the right=20
+rather than the left), we shift v up rather than down, and c starts at =
+the=20
+maximum and is decreased. We also have the additional step at the end,=20
+decrementing c if there is anything left in v. The number of operations =
+is at=20
+most 4 * lg(N) + 2, roughly, for N bit words.=20
+<P>
+<HR>
+
+<H3><A name=3DZerosOnRightBinSearch>Count the consecutive zero bits =
+(trailing) on=20
+the right by binary search </A></H3><PRE>unsigned int v;     // 32-bit =
+word input to count zero bits on right
+unsigned int c;     // c will be the number of zero bits on the right,
+                    // so if v is 1101000 (base 2), then c will be 3
+// NOTE: if 0 =3D=3D v, then c =3D 31.
+if (v &amp; 0x1)=20
+{
+  // special case for odd v (assumed to happen half of the time)
+  c =3D 0;
+}
+else
+{
+  c =3D 1;
+  if ((v &amp; 0xffff) =3D=3D 0)=20
+  { =20
+    v &gt;&gt;=3D 16; =20
+    c +=3D 16;
+  }
+  if ((v &amp; 0xff) =3D=3D 0)=20
+  { =20
+    v &gt;&gt;=3D 8; =20
+    c +=3D 8;
+  }
+  if ((v &amp; 0xf) =3D=3D 0)=20
+  { =20
+    v &gt;&gt;=3D 4;
+    c +=3D 4;
+  }
+  if ((v &amp; 0x3) =3D=3D 0)=20
+  { =20
+    v &gt;&gt;=3D 2;
+    c +=3D 2;
+  }
+  c -=3D v &amp; 0x1;
+}=09
+</PRE>The code above is similar to the previous method, but it computes =
+the=20
+number of trailing zeros by accumulating c in a manner akin to binary =
+search. In=20
+the first step, it checks if the bottom 16 bits of v are zeros, and if =
+so,=20
+shifts v right 16 bits and adds 16 to c, which reduces the number of =
+bits in v=20
+to consider by half. Each of the subsequent conditional steps likewise =
+halves=20
+the number of bits until there is only 1. This method is faster than the =
+last=20
+one (by about 33%) because the bodies of the if statements are executed =
+less=20
+often.=20
+<P>Matt Whitlock suggested this on January 25, 2006. Andrew Shapira =
+shaved a=20
+couple operations off on Sept. 5, 2007 (by setting c=3D1 and =
+unconditionally=20
+subtracting at the end).=20
+<P>
+<HR>
+
+<H3><A name=3DZerosOnRightFloatCast>Count the consecutive zero bits =
+(trailing) on=20
+the right by casting to a float </A></H3><PRE>unsigned int v;            =
+// find the number of trailing zeros in v
+int r;                     // the result goes here
+float f =3D (float)(v &amp; -v); // cast the least significant bit in v =
+to a float
+r =3D (*(uint32_t *)&amp;f &gt;&gt; 23) - 0x7f;
+</PRE>Although this only takes about 6 operations, the time to convert =
+an=20
+integer to a float can be high on some machines. The exponent of the =
+32-bit IEEE=20
+floating point representation is shifted down, and the bias is =
+subtracted to=20
+give the position of the least significant 1 bit set in v. If v is zero, =
+then=20
+the result is -127.=20
+<P>
+<HR>
+
+<H3><A name=3DZerosOnRightModLookup>Count the consecutive zero bits =
+(trailing) on=20
+the right with modulus division and lookup </A></H3><PRE>unsigned int v; =
+ // find the number of trailing zeros in v
+int r;           // put the result in r
+static const int Mod37BitPosition[] =3D // map a bit value mod 37 to its =
+position
+{
+  32, 0, 1, 26, 2, 23, 27, 0, 3, 16, 24, 30, 28, 11, 0, 13, 4,
+  7, 17, 0, 25, 22, 31, 15, 29, 10, 12, 6, 0, 21, 14, 9, 5,
+  20, 8, 19, 18
+};
+r =3D Mod37BitPosition[(-v &amp; v) % 37];
+</PRE>The code above finds the number of zeros that are trailing on the =
+right,=20
+so binary 0100 would produce 2. It makes use of the fact that the first =
+32 bit=20
+position values are relatively prime with 37, so performing a modulus =
+division=20
+with 37 gives a unique number from 0 to 36 for each. These numbers may =
+then be=20
+mapped to the number of zeros using a small lookup table. It uses only 4 =
+
+operations, however indexing into a table and performing modulus =
+division may=20
+make it unsuitable for some situations. I came up with this =
+independently and=20
+then searched for a subsequence of the table values, and found it was =
+invented=20
+earlier by Reiser, according to <A=20
+href=3D"http://www.hackersdelight.org/HDcode/ntz.c">Hacker's =
+Delight</A>.=20
+<P>
+<HR>
+
+<H3><A name=3DZerosOnRightMultLookup>Count the consecutive zero bits =
+(trailing) on=20
+the right with multiply and lookup </A></H3><PRE>unsigned int v;  // =
+find the number of trailing zeros in 32-bit v=20
+int r;           // result goes here
+static const int MultiplyDeBruijnBitPosition[32] =3D=20
+{
+  0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,=20
+  31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+};
+r =3D MultiplyDeBruijnBitPosition[((uint32_t)((v &amp; -v) * =
+0x077CB531U)) &gt;&gt; 27];
+</PRE>Converting bit vectors to indices of set bits is an example use =
+for this.=20
+It requires one more operation than the earlier one involving modulus =
+division,=20
+but the multiply may be faster. The expression (v &amp; -v) extracts the =
+least=20
+significant 1 bit from v. The constant 0x077CB531UL is a de Bruijn =
+sequence,=20
+which produces a unique pattern of bits into the high 5 bits for each =
+possible=20
+bit position that it is multiplied against. When there are no bits set, =
+it=20
+returns 0. More information can be found by reading the paper <A=20
+href=3D"http://citeseer.ist.psu.edu/leiserson98using.html">Using de =
+Bruijn=20
+Sequences to Index 1 in a Computer Word</A> by Charles E. Leiserson, =
+Harald=20
+Prokof, and Keith H. Randall.=20
+<P>On October 8, 2005 <A href=3D"http://onezero.org/">Andrew Shapira</A> =
+suggested=20
+I add this. Dustin Spicuzza asked me on April 14, 2009 to cast the =
+result of the=20
+multiply to a 32-bit type so it would work when compiled with 64-bit =
+ints.=20
+<P>
+<HR>
+
+<H3><A name=3DRoundUpPowerOf2Float>Round up to the next highest power of =
+2 by=20
+float casting </A></H3><PRE>unsigned int const v; // Round this 32-bit =
+value to the next highest power of 2
+unsigned int r;       // Put the result here. (So v=3D3 -&gt; r=3D4; =
+v=3D8 -&gt; r=3D8)
+
+if (v &gt; 1)=20
+{
+  float f =3D (float)v;
+  unsigned int const t =3D 1U &lt;&lt; ((*(unsigned int *)&amp;f =
+&gt;&gt; 23) - 0x7f);
+  r =3D t &lt;&lt; (t &lt; v);
+}
+else=20
+{
+  r =3D 1;
+}
+</PRE>The code above uses 8 operations, but works on all v &lt;=3D =
+(1&lt;&lt;31).=20
+<P>Quick and dirty version, for domain of 1 &lt; v &lt; (1&lt;&lt;25): =
+<PRE>float f =3D (float)(v - 1); =20
+r =3D 1U &lt;&lt; ((*(unsigned int*)(&amp;f) &gt;&gt; 23) - 126);
+</PRE>Although the quick and dirty version only uses around 6 =
+operations, it is=20
+roughly three times slower than the <A=20
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerO=
+f2">technique=20
+below</A> (which involves 12 operations) when benchmarked on an =
+Athlon=E2=84=A2 XP 2100+=20
+CPU. Some CPUs will fare better with it, though.=20
+<P>On September 27, 2005 Andi Smithers suggested I include a technique =
+for=20
+casting to floats to find the lg of a number for rounding up to a power =
+of 2.=20
+Similar to the quick and dirty version here, his version worked with =
+values less=20
+than (1&lt;&lt;25), due to mantissa rounding, but it used one more =
+operation.=20
+<P>
+<HR>
+
+<H3><A name=3DRoundUpPowerOf2>Round up to the next highest power of 2 =
+</A></H3><PRE>unsigned int v; // compute the next highest power of 2 of =
+32-bit v
+
+v--;
+v |=3D v &gt;&gt; 1;
+v |=3D v &gt;&gt; 2;
+v |=3D v &gt;&gt; 4;
+v |=3D v &gt;&gt; 8;
+v |=3D v &gt;&gt; 16;
+v++;
+</PRE>In 12 operations, this code computes the next highest power of 2 =
+for a=20
+32-bit integer. The result may be expressed by the formula 1U &lt;&lt; =
+(lg(v -=20
+1) + 1). Note that in the edge case where v is 0, it returns 0, which =
+isn't a=20
+power of 2; you might append the expression v +=3D (v =3D=3D 0) to =
+remedy this if it=20
+matters. It would be faster by 2 operations to use the formula and the =
+log base=20
+2 methed that uses a lookup table, but in some situations, lookup tables =
+are not=20
+suitable, so the above code may be best. (On a Athlon=E2=84=A2 XP 2100+ =
+I've found the=20
+above shift-left and then OR code is as fast as using a single BSR =
+assembly=20
+language instruction, which scans in reverse to find the highest set =
+bit.) It=20
+works by copying the highest set bit to all of the lower bits, and then =
+adding=20
+one, which results in carries that set all of the lower bits to 0 and =
+one bit=20
+beyond the highest set bit to 1. If the original number was a power of =
+2, then=20
+the decrement will reduce it to one less, so that we round up to the =
+same=20
+original value.=20
+<P>You might alternatively compute the next higher power of 2 in only 8 =
+or 9=20
+operations using a lookup table for floor(lg(v)) and then evaluating=20
+1&lt;&lt;(1+floor(lg(v))); Atul Divekar suggested I mention this on =
+September 5,=20
+2010.=20
+<P>Devised by Sean Anderson, Sepember 14, 2001. Pete Hart pointed me to =
+<A=20
+href=3D"http://groups.google.com/group/comp.lang.python/browse_thread/thr=
+ead/c4d3aae0df917df5/6fdae3872f9de79d?lnk=3Dst&amp;q=3Dcomp.lang.python+z=
+eddy&amp;rnum=3D6#6fdae3872f9de79d">a=20
+couple newsgroup posts</A> by him and William Lewis in February of 1997, =
+where=20
+they arrive at the same algorithm.=20
+<P>
+<HR>
+
+<H3><A name=3DInterleaveTableObvious>Interleave bits the obvious way =
+</A></H3><PRE>unsigned short x;   // Interleave bits of x and y, so that =
+all of the
+unsigned short y;   // bits of x are in the even positions and y in the =
+odd;
+unsigned int z =3D 0; // z gets the resulting Morton Number.
+
+for (int i =3D 0; i &lt; sizeof(x) * CHAR_BIT; i++) // unroll for more =
+speed...
+{
+  z |=3D (x &amp; 1U &lt;&lt; i) &lt;&lt; i | (y &amp; 1U &lt;&lt; i) =
+&lt;&lt; (i + 1);
+}
+</PRE>Interleaved bits (aka Morton numbers) are useful for linearizing =
+2D=20
+integer coordinates, so x and y are combined into a single number that =
+can be=20
+compared easily and has the property that a number is usually close to =
+another=20
+if their x and y values are close.=20
+<P>
+<HR>
+
+<H3><A name=3DInterleaveTableLookup>Interleave bits by table lookup =
+</A></H3><PRE>static const unsigned short MortonTable256[256] =3D=20
+{
+  0x0000, 0x0001, 0x0004, 0x0005, 0x0010, 0x0011, 0x0014, 0x0015,=20
+  0x0040, 0x0041, 0x0044, 0x0045, 0x0050, 0x0051, 0x0054, 0x0055,=20
+  0x0100, 0x0101, 0x0104, 0x0105, 0x0110, 0x0111, 0x0114, 0x0115,=20
+  0x0140, 0x0141, 0x0144, 0x0145, 0x0150, 0x0151, 0x0154, 0x0155,=20
+  0x0400, 0x0401, 0x0404, 0x0405, 0x0410, 0x0411, 0x0414, 0x0415,=20
+  0x0440, 0x0441, 0x0444, 0x0445, 0x0450, 0x0451, 0x0454, 0x0455,=20
+  0x0500, 0x0501, 0x0504, 0x0505, 0x0510, 0x0511, 0x0514, 0x0515,=20
+  0x0540, 0x0541, 0x0544, 0x0545, 0x0550, 0x0551, 0x0554, 0x0555,=20
+  0x1000, 0x1001, 0x1004, 0x1005, 0x1010, 0x1011, 0x1014, 0x1015,=20
+  0x1040, 0x1041, 0x1044, 0x1045, 0x1050, 0x1051, 0x1054, 0x1055,=20
+  0x1100, 0x1101, 0x1104, 0x1105, 0x1110, 0x1111, 0x1114, 0x1115,=20
+  0x1140, 0x1141, 0x1144, 0x1145, 0x1150, 0x1151, 0x1154, 0x1155,=20
+  0x1400, 0x1401, 0x1404, 0x1405, 0x1410, 0x1411, 0x1414, 0x1415,=20
+  0x1440, 0x1441, 0x1444, 0x1445, 0x1450, 0x1451, 0x1454, 0x1455,=20
+  0x1500, 0x1501, 0x1504, 0x1505, 0x1510, 0x1511, 0x1514, 0x1515,=20
+  0x1540, 0x1541, 0x1544, 0x1545, 0x1550, 0x1551, 0x1554, 0x1555,=20
+  0x4000, 0x4001, 0x4004, 0x4005, 0x4010, 0x4011, 0x4014, 0x4015,=20
+  0x4040, 0x4041, 0x4044, 0x4045, 0x4050, 0x4051, 0x4054, 0x4055,=20
+  0x4100, 0x4101, 0x4104, 0x4105, 0x4110, 0x4111, 0x4114, 0x4115,=20
+  0x4140, 0x4141, 0x4144, 0x4145, 0x4150, 0x4151, 0x4154, 0x4155,=20
+  0x4400, 0x4401, 0x4404, 0x4405, 0x4410, 0x4411, 0x4414, 0x4415,=20
+  0x4440, 0x4441, 0x4444, 0x4445, 0x4450, 0x4451, 0x4454, 0x4455,=20
+  0x4500, 0x4501, 0x4504, 0x4505, 0x4510, 0x4511, 0x4514, 0x4515,=20
+  0x4540, 0x4541, 0x4544, 0x4545, 0x4550, 0x4551, 0x4554, 0x4555,=20
+  0x5000, 0x5001, 0x5004, 0x5005, 0x5010, 0x5011, 0x5014, 0x5015,=20
+  0x5040, 0x5041, 0x5044, 0x5045, 0x5050, 0x5051, 0x5054, 0x5055,=20
+  0x5100, 0x5101, 0x5104, 0x5105, 0x5110, 0x5111, 0x5114, 0x5115,=20
+  0x5140, 0x5141, 0x5144, 0x5145, 0x5150, 0x5151, 0x5154, 0x5155,=20
+  0x5400, 0x5401, 0x5404, 0x5405, 0x5410, 0x5411, 0x5414, 0x5415,=20
+  0x5440, 0x5441, 0x5444, 0x5445, 0x5450, 0x5451, 0x5454, 0x5455,=20
+  0x5500, 0x5501, 0x5504, 0x5505, 0x5510, 0x5511, 0x5514, 0x5515,=20
+  0x5540, 0x5541, 0x5544, 0x5545, 0x5550, 0x5551, 0x5554, 0x5555
+};
+
+unsigned short x; // Interleave bits of x and y, so that all of the
+unsigned short y; // bits of x are in the even positions and y in the =
+odd;
+unsigned int z;   // z gets the resulting 32-bit Morton Number.
+
+z =3D MortonTable256[y &gt;&gt; 8]   &lt;&lt; 17 |=20
+    MortonTable256[x &gt;&gt; 8]   &lt;&lt; 16 |
+    MortonTable256[y &amp; 0xFF] &lt;&lt;  1 |=20
+    MortonTable256[x &amp; 0xFF];
+
+</PRE>For more speed, use an additional table with values that are=20
+MortonTable256 pre-shifted one bit to the left. This second table could =
+then be=20
+used for the y lookups, thus reducing the operations by two, but almost =
+doubling=20
+the memory required. Extending this same idea, four tables could be =
+used, with=20
+two of them pre-shifted by 16 to the left of the previous two, so that =
+we would=20
+only need 11 operations total.=20
+<HR>
+
+<H3><A name=3DInterleave64bitOps>Interleave bits with 64-bit =
+multiply</A> </H3>In=20
+11 operations, this version interleaves bits of two bytes (rather than =
+shorts,=20
+as in the other versions), but many of the operations are 64-bit =
+multiplies so=20
+it isn't appropriate for all machines. The input parameters, x and y, =
+should be=20
+less than 256. <PRE>unsigned char x;  // Interleave bits of (8-bit) x =
+and y, so that all of the
+unsigned char y;  // bits of x are in the even positions and y in the =
+odd;
+unsigned short z; // z gets the resulting 16-bit Morton Number.
+
+z =3D ((x * 0x0101010101010101ULL &amp; 0x8040201008040201ULL) *=20
+     0x0102040810204081ULL &gt;&gt; 49) &amp; 0x5555 |
+    ((y * 0x0101010101010101ULL &amp; 0x8040201008040201ULL) *=20
+     0x0102040810204081ULL &gt;&gt; 48) &amp; 0xAAAA;
+</PRE>Holger Bettag was inspired to suggest this technique on October =
+10, 2004=20
+after reading the multiply-based bit reversals here.=20
+<P>
+<HR>
+
+<H3><A name=3DInterleaveBMN>Interleave bits by Binary Magic Numbers =
+</A></H3><PRE>static const unsigned int B[] =3D {0x55555555, 0x33333333, =
+0x0F0F0F0F, 0x00FF00FF};
+static const unsigned int S[] =3D {1, 2, 4, 8};
+
+unsigned int x; // Interleave lower 16 bits of x and y, so the bits of x
+unsigned int y; // are in the even positions and bits from y in the odd;
+unsigned int z; // z gets the resulting 32-bit Morton Number. =20
+                // x and y must initially be less than 65536.
+
+x =3D (x | (x &lt;&lt; S[3])) &amp; B[3];
+x =3D (x | (x &lt;&lt; S[2])) &amp; B[2];
+x =3D (x | (x &lt;&lt; S[1])) &amp; B[1];
+x =3D (x | (x &lt;&lt; S[0])) &amp; B[0];
+
+y =3D (y | (y &lt;&lt; S[3])) &amp; B[3];
+y =3D (y | (y &lt;&lt; S[2])) &amp; B[2];
+y =3D (y | (y &lt;&lt; S[1])) &amp; B[1];
+y =3D (y | (y &lt;&lt; S[0])) &amp; B[0];
+
+z =3D x | (y &lt;&lt; 1);
+</PRE>
+<HR>
+
+<H3><A name=3DZeroInWord>Determine if a word has a zero byte =
+</A></H3><PRE>// Fewer operations:
+unsigned int v; // 32-bit word to check if any 8-bit byte in it is 0
+bool hasZeroByte =3D ~((((v &amp; 0x7F7F7F7F) + 0x7F7F7F7F) | v) | =
+0x7F7F7F7F);
+</PRE>The code above may be useful when doing a fast string copy in =
+which a word=20
+is copied at a time; it uses 5 operations. On the other hand, testing =
+for a null=20
+byte in the obvious ways (which follow) have at least 7 operations (when =
+counted=20
+in the most sparing way), and at most 12. <PRE>// More operations:
+bool hasNoZeroByte =3D ((v &amp; 0xff) &amp;&amp; (v &amp; 0xff00) =
+&amp;&amp; (v &amp; 0xff0000) &amp;&amp; (v &amp; 0xff000000))
+// OR:
+unsigned char * p =3D (unsigned char *) &amp;v; =20
+bool hasNoZeroByte =3D *p &amp;&amp; *(p + 1) &amp;&amp; *(p + 2) =
+&amp;&amp; *(p + 3);
+</PRE>The code at the beginning of this section (labeled "Fewer =
+operations")=20
+works by first zeroing the high bits of the 4 bytes in the word. =
+Subsequently,=20
+it adds a number that will result in an overflow to the high bit of a =
+byte if=20
+any of the low bits were initialy set. Next the high bits of the =
+original word=20
+are ORed with these values; thus, the high bit of a byte is set iff any =
+bit in=20
+the byte was set. Finally, we determine if any of these high bits are =
+zero by=20
+ORing with ones everywhere except the high bits and inverting the =
+result.=20
+Extending to 64 bits is trivial; simply increase the constants to be=20
+0x7F7F7F7F7F7F7F7F.=20
+<P>For an additional improvement, a fast pretest that requires only 4 =
+operations=20
+may be performed to determine if the word <EM>may</EM> have a zero byte. =
+The=20
+test also returns true if the high byte is 0x80, so there are occasional =
+false=20
+positives, but the slower and more reliable version above may then be =
+used on=20
+candidates for an overall increase in speed with correct output.=20
+<P><PRE>bool hasZeroByte =3D ((v + 0x7efefeff) ^ ~v) &amp; 0x81010100;
+if (hasZeroByte) // or may just have 0x80 in the high byte
+{
+  hasZeroByte =3D ~((((v &amp; 0x7F7F7F7F) + 0x7F7F7F7F) | v) | =
+0x7F7F7F7F);
+}
+</PRE>
+<P>There is yet a faster method =E2=80=94 use <A=20
+href=3D"http://graphics.stanford.edu/~seander/bithacks.html#HasLessInWord=
+"><CODE>hasless</CODE></A>(v,=20
+1), which is defined below; it works in 4 operations and requires no =
+subsquent=20
+verification. It simplifies to <PRE>bool hasZeroByte =3D (v - =
+0x01010101UL) &amp; ~v &amp; 0x80808080UL;</PRE>The=20
+subexpression (v - 0x01010101UL), evaluates to a high bit set in any =
+byte=20
+whenever the corresponding byte in v is zero or greater than 0x80. The=20
+sub-expression ~v &amp; 0x80808080UL evaluates to high bits set in bytes =
+where=20
+the byte of v doesn't have its high bit set (so the byte was less than =
+0x80).=20
+Finally, by ANDing these two sub-expressions the result is the high bits =
+set=20
+where the bytes in v were zero, since the high bits set due to a value =
+greater=20
+than 0x80 in the first sub-expression are masked off by the second.=20
+<P>Paul Messmer suggested the fast pretest improvement on October 2, =
+2004. Juha=20
+J=C3=A4rvi later suggested hasless(v, 1) on April 6, 2005, which he =
+found on <A=20
+href=3D"http://www.azillionmonkeys.com/qed/asmexample.html">Paul Hsieh's =
+Assembly=20
+Lab</A>; previously it was written in a newsgroup post on April 27, 1987 =
+by Alan=20
+Mycroft.=20
+<P>
+<HR>
+
+<H3><A name=3D#ValueInWord>Determine if a word has a byte equal to n =
+</A></H3>We=20
+may want to know if any byte in a word has a specific value. To do so, =
+we can=20
+XOR the value to test with a word that has been filled with the byte =
+values in=20
+which we're interested. Because XORing a value with itself results in a =
+zero=20
+byte and nonzero otherwise, we can pass the result to haszero. =
+<PRE>#define hasvalue(x,n) \
+(haszero((x) ^ (~0UL/255 * (n))))
+</PRE>
+<P>Stephen M Bennet suggested this on December 13, 2009 after reading =
+the entry=20
+for haszero.=20
+<P>
+<HR>
+
+<H3><A name=3DHasLessInWord>Determine if a word has a byte less than n=20
+</A></H3>Test if a word x contains an unsigned byte with value &lt; n.=20
+Specifically for n=3D1, it can be used to find a 0-byte by examining one =
+long at a=20
+time, or any byte by XORing x with a mask first. Uses 4 =
+arithmetic/logical=20
+operations when n is constant.=20
+<P>Requirements: x&gt;=3D0; 0&lt;=3Dn&lt;=3D128 <PRE>#define =
+hasless(x,n) (((x)-~0UL/255*(n))&amp;~(x)&amp;~0UL/255*128)
+</PRE>To count the number of bytes in x that are less than n in 7 =
+operations,=20
+use <PRE>#define countless(x,n) \
+(((~0UL/255*(127+(n))-((x)&amp;~0UL/255*127))&amp;~(x)&amp;~0UL/255*128)/=
+128%255)
+</PRE>
+<P>Juha J=C3=A4rvi sent this clever technique to me on April 6, 2005. =
+The=20
+<CODE>countless</CODE> macro was added by Sean Anderson on April 10, =
+2005,=20
+inspired by Juha's <CODE>countmore</CODE>, below.=20
+<P>
+<HR>
+
+<H3><A name=3DHasMoreInWord>Determine if a word has a byte greater than =
+n=20
+</A></H3>Test if a word x contains an unsigned byte with value &gt; n. =
+Uses 3=20
+arithmetic/logical operations when n is constant.=20
+<P>Requirements: x&gt;=3D0; 0&lt;=3Dn&lt;=3D127 <PRE>#define =
+hasmore(x,n) (((x)+~0UL/255*(127-(n))|(x))&amp;~0UL/255*128)
+</PRE>To count the number of bytes in x that are more than n in 6 =
+operations,=20
+use: <PRE>#define countmore(x,n) \
+(((((x)&amp;~0UL/255*127)+~0UL/255*(127-(n))|(x))&amp;~0UL/255*128)/128%2=
+55)
+</PRE>
+<P>The macro <CODE>hasmore</CODE> was suggested by Juha J=C3=A4rvi on =
+April 6, 2005,=20
+and he added <CODE>countmore</CODE> on April 8, 2005.=20
+<P>
+<HR>
+
+<H3><A name=3DHasBetweenInWord>Determine if a word has a byte between m =
+and n=20
+</A></H3>When m&nbsp;&lt;&nbsp;n, this technique tests if a word x =
+contains an=20
+unsigned byte value, such that m &lt; value &lt; n. <!--When =
+m&nbsp;&gt;&nbsp;n, it tests for byte values=0A=
+outside the range; that is value &lt; n and m &lt;=3D value.-->It=20
+uses 7 arithmetic/logical operations when n and m are constant.=20
+<P>Note: Bytes that equal n can be reported by =
+<CODE>likelyhasbetween</CODE> as=20
+false positives, so this should be checked by character if a certain =
+result is=20
+needed.=20
+<P>Requirements: x&gt;=3D0; 0&lt;=3Dm&lt;=3D127; 0&lt;=3Dn&lt;=3D128=20
+<P><PRE>#define likelyhasbetween(x,m,n) \
+((((x)-~0UL/255*(n))&amp;~(x)&amp;((x)&amp;~0UL/255*127)+~0UL/255*(127-(m=
+)))&amp;~0UL/255*128)
+</PRE>This technique would be suitable for a fast pretest. A variation =
+that=20
+takes one more operation (8 total for constant m and n) but provides the =
+exact=20
+answer is: <PRE>#define hasbetween(x,m,n) \
+((~0UL/255*(127+(n))-((x)&amp;~0UL/255*127)&amp;~(x)&amp;((x)&amp;~0UL/25=
+5*127)+~0UL/255*(127-(m)))&amp;~0UL/255*128)
+</PRE>To count the number of bytes in x that are between m and n =
+(exclusive) in=20
+10 operations, use: <PRE>#define countbetween(x,m,n) =
+(hasbetween(x,m,n)/128%255)
+</PRE>
+<P>Juha J=C3=A4rvi suggested <CODE>likelyhasbetween</CODE> on April 6, =
+2005. From=20
+there, Sean Anderson created <CODE>hasbetween</CODE> and=20
+<CODE>countbetween</CODE> on April 10, 2005.=20
+<P>
+<HR>
+
+<H3><A name=3DNextBitPermutation>Compute the lexicographically next bit=20
+permutation </A></H3>Suppose we have a pattern of N bits set to 1 in an =
+integer=20
+and we want the next permutation of N 1 bits in a lexicographical sense. =
+For=20
+example, if N is 3 and the bit pattern is 00010011, the next patterns =
+would be=20
+00010101, 00010110, 00011001,00011010, 00011100, 00100011, and so forth. =
+The=20
+following is a fast way to compute the next permutation. <PRE>unsigned =
+int v; // current permutation of bits=20
+unsigned int w; // next permutation of bits
+
+unsigned int t =3D v | (v - 1); // t gets v's least significant 0 bits =
+set to 1
+// Next set to 1 the most significant bit to change,=20
+// set to 0 the least significant ones, and add the necessary 1 bits.
+w =3D (t + 1) | (((~t &amp; -~t) - 1) &gt;&gt; (__builtin_ctz(v) + 1));  =
+
+</PRE>The __builtin_ctz(v) GNU C compiler intrinsic for x86 CPUs returns =
+the=20
+number of trailing zeros. If you are using Microsoft compilers for x86, =
+the=20
+intrinsic is _BitScanForward. These both emit a bsf instruction, but =
+equivalents=20
+may be available for other architectures. If not, then consider using =
+one of the=20
+methods for counting the consecutive zero bits mentioned earlier.=20
+<P>Here is another version that tends to be slower because of its =
+division=20
+operator, but it does not require counting the trailing zeros. =
+<PRE>unsigned int t =3D (v | (v - 1)) + 1; =20
+w =3D t | ((((t &amp; -t) / (v &amp; -v)) &gt;&gt; 1) - 1); =20
+</PRE>
+<P>Thanks to Dario Sneidermanis of Argentina, who provided this on =
+November 28,=20
+2009. <!--=0A=
+<hr>=0A=
+<table>=0A=
+<tr>=0A=
+<td><b>Hits:</b></td>=0A=
+<td><img src=3D"http://www.anderoid.com/cgi-bin/countess.gif?seander2"=0A=
+ width=3D56 height=3D16></td>=0A=
+</tr>=0A=
+</table>=0A=
+--></P></BODY></HTML>
