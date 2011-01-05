@@ -1,0 +1,437 @@
+1. HTML 开发软件界面
+
+   因为android软件开发分工目前还没有细化，程序员往往需要负责软件界面的开发，
+
+   虽然软件的界面图片已经由美工设计好了，但如果使用layout技术把软件做成如图片所示的界面确实很困难，而且也比较耗时。
+
+   Android通过WebView实现了JS代码与Java代码互相通信的功能，使的android软件的界面开发也可以采用HTML网页技术，
+
+   这样，广大网页美工可以参与进android软件的界面开发工作，从而让程序员从中解脱出来。
+
+ 
+
+2. WebView
+
+   WebView 控件可以显示一张网页。
+
+   <WebView  
+
+           android:layout_width="fill_parent" 
+
+           android:layout_height="fill_parent" 
+
+           android:id="@+id/webView"
+
+           />
+
+   
+
+   首先要将一张由美工MM设计的精美的网页复制到项目中来，建议放在 assets 目录下，assets 目录下的资源将不会被添加到 R 文件中。
+
+   然后在 Activity 里首先找到 WebView 控件，然后调用它的 loadUrl 方法，就可以载入一张网页，显示在界面上。
+
+     WebView webView = (WebView) findViewById(R.id.webView);
+
+        webView.loadUrl("file:///android_asset/index.html");
+
+        注意这里用到的是文件访问协议：file:///，而我们项目中的 assets 文件夹部署到手机后，就变成了 android_asset。
+
+        有两点注意：file:/// 是三个斜杠
+
+                   是 asset 不是 assets
+
+       loadUrl 提供了一个很重要的重装后的方法，将在第4点说到。
+
+ 
+
+3. 当然，这样一种机制太死板了，一个数据纯静态的网页，意义不大。
+
+   Android 提供了一种与网页 JS 代码通信的机制。
+
+   这种机制使 HTML 网页中，可以通过 JS 来访问 JAVA 对象的方法。
+
+   这里又要用到 WebView 的另一个方法：addJavascriptInterface(Object obj, String interfaceName)
+
+   WebView 的作用就相当于 HTML 页面和 JAVA 对象的中间人，它们的所有活动都需要这个中间人来处理一下。
+
+   例如，addJavascriptInterface 就可以将一个 JAVA 对象提供给 HTML 页面的 JS 代码来访问。
+
+   仔细想一下，这技术也没什么稀奇的，无非就是反射的一种应用而已。被 WebView 来管理的 HTML 本身已不是传统意义的 HTML 静态网页了。
+
+   因为，处理它的再也不是浏览器了，既然如此。HTML 的意义就仅剩下 ”一个普通文档“ 的意义了。既然如此，WebView 要怎么来解释这个文档，还不是它设计者一句话的事情。
+
+   因此，其设计人员规定，当解释到类似 "contact.getContacts()" 的 JS 代码时，以 "contact" 作为键，找到它所对应的 JAVA 对象，再通过反射技术，调用这个对象的 getContacts() 方法。若方法有返回值，则将返回值返回到 JS 调用的地方。感觉过程甚至和 JSP 有点类似了。
+
+   这是一种非常巧妙的思路。个人觉得，Android 可以照着这个思路，干得更彻底一点 —— 当然强烈鄙视最后变成了 "JSP"。
+
+   contact.getContacts()：中的 contact 最终之所以能作为键找到对应的 JAVA 对象，是因为在加载这张网页前。我们在程序中调用了 WebView 的 addJavascriptInterface 方法
+
+   方法的第一个参数，就是要交给 WebView 这个中间人管理的POJO。第二个参数就是这个 JAVA 对象对外公开的名字，就是我上面说的 ”键“ 的概念。
+
+   webView.addJavascriptInterface(new ContactsPlugin(), "contact");
+
+   于是，通过在 JS 里面使用 contact.getContacts() 就相当于执行了 ： new ContactsPlugin().getContacts()
+
+ 
+
+4. 在 JAVA 代码里访问 JS
+
+   方式是使用 WebView 的 loadUrl()，只不过这时候不再是 load 一张网页了，而是告诉 WebView，请帮我在你管辖下的 HTML 里找一段 JS 代码来执行。
+
+   第一步：打开 webView 对 JavaScript 的支持(默认不支持)：webView.getSettings().setJavaScriptEnabled(true);
+
+   第二步：让 webView 执行一段 JavaScript 代码 ：webView.loadUrl("javascript:show('JAVA to JS')");
+
+   这句代码，将告诉 WebView，在它管辖下的 HTML 中执行这样一段 JS :show('JAVA to JS')
+
+   单把它看成一段 JS 代码，很明显，它是在调用一个方法。于是，这句代码的最终结果就是，HTML 中，我们定义的这样一个 JS 代码执行了：
+
+     <script type="text/javascript">
+
+            function show(data) {
+
+                   
+
+                   alert(data); /* 开个玩笑~~ 这是不行的。别忘了我们是在手机环境，不是浏览器。 很遗憾。
+
+                                  因此，若我们想在 HTML 中给用户弹出一个对话框，必须通过调用 JAVA 代码的方法来完成。
+
+                                  但是我至今并没有找到一个比较舒服的办法，因为在这种界面设计下，AlertDialog 是失效的。*/
+
+            }
+
+     </script>
+
+   
+
+   这个就更神奇了。
+
+   但是只要我们转换一下思路，别把 HTML 当成以前传统的 HTML 、别把 JS 当成传统的 JS 就好。
+
+   我个人觉得可以这样来理解，WebView 大概上讲有些类似于 WEB 服务器的概念了。只要我们将 JAVA 对象 和 所谓的HTML 交给了它管理，它会以特殊的方式来处理这两者被我们打上特殊标记的地方。最后拼凑出最终界面，显示给用户。
+
+   
+
+   
+
+5. 例：
+
+       ** 实现联系人列表显示。要求用户在启动程序之后，动态从数据库获取联系人信息，显示在界面上。
+
+          点击联系人的电话号码，实现电话拨号。
+
+          使用 HTML 语言来描述界面。
+
+       ** 拷贝 index.html 到项目 assets 文件夹下
+
+              * index.html
+
+               view plaincopy to clipboardprint?
+ <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">  
+                <html>  
+                <head>  
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+                <title>Insert title here</title>  
+                <mce:script type="text/javascript"><!--   
+                     /* 接收 JSON 格式的联系人数据，添加到表格中显示 */   
+                     function show(jsondata){   
+                                     
+                             var jsonobjs = eval(jsondata);   
+                             var table = document.getElementById("personTable");   
+                             for(var y=0; y<jsonobjs.length; y++){   
+                                    // 添加行   
+                                    var tr = table.insertRow(table.rows.length);   
+                                    // 编号列   
+                                    var td1 = tr.insertCell(0);   
+                                    td1.innerHTML = jsonobjs[y].id;   
+                                          // 性名列   
+                                    var td2 = tr.insertCell(1);   
+                                    td2.align = "center";   
+                                    td2.innerHTML = jsonobjs[y].name;   
+                                          // 电话列,电话号码为超链接   
+                                    var td3 = tr.insertCell(2);   
+                                    td3.align = "center";   
+                                    // <a href='javascript:contactsAction.call("139999999999")>139999999999</a>  
+                                    td3.innerHTML = "<a href="javascript:contactsAction.call(\""+ jsonobjs[y].mobile+ "\")" mce_href="javascript:contactsAction.call(\""+ jsonobjs[y].mobile+ "\")">"+ jsonobjs[y].mobile+ "</a>";   
+                                   }   
+                     }   
+                   
+// --></mce:script>  
+                
+                </head>  
+                <!-- 页面加载的时候将执行下面的 JS 代码，将调用 ContactsPlugin 的  getContacts() 方法-->  
+                <body onload="javascript:contactsAction.getContacts();">  
+                   <table border="0" width="100%" id="personTable" cellspacing="0">  
+                            <tr>  
+                                   <td width="20%">编号</td><td width="40%" align="center">姓名</td><td align="center">电话</td>  
+                            </tr>  
+                   </table>  
+                   <a href="javascript:window.location.reload()" mce_href="javascript:window.location.reload()">刷新</a>  
+                </body>  
+</html>  
+ <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+                <html>
+                <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                <title>Insert title here</title>
+                <mce:script type="text/javascript"><!--
+                     /* 接收 JSON 格式的联系人数据，添加到表格中显示 */
+                     function show(jsondata){
+                                  
+                             var jsonobjs = eval(jsondata);
+                             var table = document.getElementById("personTable");
+                             for(var y=0; y<jsonobjs.length; y++){
+                                    // 添加行
+                                    var tr = table.insertRow(table.rows.length);
+                                    // 编号列
+                                    var td1 = tr.insertCell(0);
+                                    td1.innerHTML = jsonobjs[y].id;
+                                          // 性名列
+                                    var td2 = tr.insertCell(1);
+                                    td2.align = "center";
+                                    td2.innerHTML = jsonobjs[y].name;
+                                          // 电话列,电话号码为超链接
+                                    var td3 = tr.insertCell(2);
+                                    td3.align = "center";
+                                    // <a href='javascript:contactsAction.call("139999999999")>139999999999</a>
+                                    td3.innerHTML = "<a href="javascript:contactsAction.call(\""+ jsonobjs[y].mobile+ "\")" mce_href="javascript:contactsAction.call(\""+ jsonobjs[y].mobile+ "\")">"+ jsonobjs[y].mobile+ "</a>";
+                                   }
+                     }
+                
+// --></mce:script>
+             
+                </head>
+                <!-- 页面加载的时候将执行下面的 JS 代码，将调用 ContactsPlugin 的  getContacts() 方法-->
+                <body onload="javascript:contactsAction.getContacts();">
+                   <table border="0" width="100%" id="personTable" cellspacing="0">
+                            <tr>
+                                   <td width="20%">编号</td><td width="40%" align="center">姓名</td><td align="center">电话</td>
+                            </tr>
+                   </table>
+                   <a href="javascript:window.location.reload()" mce_href="javascript:window.location.reload()">刷新</a>
+                </body>
+</html> 
+
+                
+
+       ** Activity 里初始化联系人数据，并调用 HTML 中的 show 方法想表格增加行，添加联系人数据到表格显示
+
+              * MainActivity
+
+                 view plaincopy to clipboardprint?
+public class MainActivity extends Activity {   
+                    private final static String TAG = "HtmlUIMainActivity";   
+                    private WebView webView;   
+                    private ContactService contactService;   
+                      
+                     @Override  
+                     public void onCreate(Bundle savedInstanceState) {   
+                          super.onCreate(savedInstanceState);   
+                          setContentView(R.layout.main);   
+                          contactService = new ContactService();   
+                          webView = (WebView) findViewById(R.id.webView);   
+                          webView.getSettings().setJavaScriptEnabled(true);   
+                          webView.addJavascriptInterface(new ContactsPlugin(), "contactsAction");   
+                          webView.loadUrl("file:///android_asset/index.html");   
+                      }   
+                   
+                      /**  
+                       * 这个类提供出了一个视图和业务层通信的接口。HTML 中，通过这个类的实例，间接与业务 Bean 通信。  
+                       * 为什么不直接将业务类提供给  webView, 让  HTML 中直接访问到这个类。而多出这样 "插件"~~  
+                       * 我想：目前的这样一种架构，Activity 甚至有些类似于控制器的概念了。有点像 struts 中的 Action。  
+                       * 在使用了 struts 框架的项目架构中，Action 也是被划分到视图层的。它和JSP页面共同完成准备数据和页面跳转的工作。  
+                       * 因此，这里我们也不应该让 HTML 中的 JS 直接与业务层耦合。实现表现层和业务层的解耦  
+                       */  
+                      private class ContactsPlugin {   
+                             /**  
+                              * 此方法将执行 JS 代码，调用 JS 函数：show()  
+                              * 实现，将联系人信息展示到 HTML 页面上  
+                              */  
+                             @SuppressWarnings("unused")   
+                         public void getContacts() {   
+                                    List<Contact> contacts =contactService.getContacts();   
+                                    try {   
+                                       JSONArray array  = new JSONArray();   
+                                       for(Contact contact : contacts) {   
+                                              JSONObject jsonObject = new JSONObject();   
+                                              jsonObject.put("id", contact.getId());   
+                                              jsonObject.put("mobile", contact.getMobile());   
+                                              jsonObject.put("name", contact.getName());   
+                                              array.put(jsonObject);   
+                                       }   
+                                       String json = array.toString();   
+                                       webView.loadUrl("javascript:show('"+ json +"')");   
+                                 } catch (JSONException e) {   
+                                       Log.i(TAG, e.toString());   
+                                 }   
+                              }   
+                              /**  
+                               * 拨号  
+                               */  
+                              @SuppressWarnings("unused")   
+                          public void call(String phoneCode) {   
+                                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneCode));   
+                                    startActivity(intent);   
+                              }   
+                      }   
+ public class MainActivity extends Activity {
+                     private final static String TAG = "HtmlUIMainActivity";
+                     private WebView webView;
+                     private ContactService contactService;
+                    
+                      @Override
+                      public void onCreate(Bundle savedInstanceState) {
+                           super.onCreate(savedInstanceState);
+                           setContentView(R.layout.main);
+                           contactService = new ContactService();
+                           webView = (WebView) findViewById(R.id.webView);
+                           webView.getSettings().setJavaScriptEnabled(true);
+                           webView.addJavascriptInterface(new ContactsPlugin(), "contactsAction");
+                           webView.loadUrl("file:///android_asset/index.html");
+                       }
+                 
+                       /**
+                        * 这个类提供出了一个视图和业务层通信的接口。HTML 中，通过这个类的实例，间接与业务 Bean 通信。
+                        * 为什么不直接将业务类提供给  webView, 让  HTML 中直接访问到这个类。而多出这样 "插件"~~
+                        * 我想：目前的这样一种架构，Activity 甚至有些类似于控制器的概念了。有点像 struts 中的 Action。
+                        * 在使用了 struts 框架的项目架构中，Action 也是被划分到视图层的。它和JSP页面共同完成准备数据和页面跳转的工作。
+                        * 因此，这里我们也不应该让 HTML 中的 JS 直接与业务层耦合。实现表现层和业务层的解耦
+                        */
+                       private class ContactsPlugin {
+                              /**
+                               * 此方法将执行 JS 代码，调用 JS 函数：show()
+                               * 实现，将联系人信息展示到 HTML 页面上
+                               */
+                              @SuppressWarnings("unused")
+                          public void getContacts() {
+                                     List<Contact> contacts =contactService.getContacts();
+                                     try {
+                                        JSONArray array  = new JSONArray();
+                                        for(Contact contact : contacts) {
+                                               JSONObject jsonObject = new JSONObject();
+                                               jsonObject.put("id", contact.getId());
+                                               jsonObject.put("mobile", contact.getMobile());
+                                               jsonObject.put("name", contact.getName());
+                                               array.put(jsonObject);
+                                        }
+                                        String json = array.toString();
+                                        webView.loadUrl("javascript:show('"+ json +"')");
+                                  } catch (JSONException e) {
+                                        Log.i(TAG, e.toString());
+                                  }
+                               }
+                               /**
+                                * 拨号
+                                */
+                               @SuppressWarnings("unused")
+                           public void call(String phoneCode) {
+                                     Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneCode));
+                                     startActivity(intent);
+                               }
+                       }
+} 
+
+       ** 布局文件，只需要定义一个 WebView 就可以了
+
+              * main.xml
+
+                view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+       android:orientation="vertical"  
+       android:layout_width="fill_parent"  
+       android:layout_height="fill_parent"  
+       >  
+       <WebView    
+         android:layout_width="fill_parent"  
+         android:layout_height="fill_parent"  
+         android:id="@+id/webView"  
+        />  
+</LinearLayout>  
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+       android:orientation="vertical"
+       android:layout_width="fill_parent"
+       android:layout_height="fill_parent"
+       >
+       <WebView 
+         android:layout_width="fill_parent"
+         android:layout_height="fill_parent"
+         android:id="@+id/webView"
+        />
+</LinearLayout> 
+
+       ** 功能清单，需要声明拨号权限
+
+              * AndroidManifest.xml
+
+                view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  
+        package="wjh.android.htmlui"  
+        android:versionCode="1"  
+        android:versionName="1.0">  
+<application android:icon="@drawable/icon" android:label="@string/app_name">  
+            <activity android:name=".MainActivity"  
+                 android:label="@string/app_name">  
+            <intent-filter>  
+                <action android:name="android.intent.action.MAIN" />  
+                <category android:name="android.intent.category.LAUNCHER" />  
+            </intent-filter>  
+            </activity>  
+                
+</application>  
+<uses-sdk android:minSdkVersion="8" />  
+<uses-permission android:name="android.permission.CALL_PHONE"/>  
+</manifest>  
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="wjh.android.htmlui"
+        android:versionCode="1"
+        android:versionName="1.0">
+<application android:icon="@drawable/icon" android:label="@string/app_name">
+            <activity android:name=".MainActivity"
+                 android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            </activity>
+             
+</application>
+<uses-sdk android:minSdkVersion="8" />
+<uses-permission android:name="android.permission.CALL_PHONE"/>
+</manifest> 
+
+                
+
+6. 流程
+
+   1. 使用 HTML 来描述软件界面。   
+
+   2. 当用户在界面中触发一个业务感兴趣的事件的时候，触发并执行一段特殊的 JS 代码。
+
+   3. 这段特殊的 JS 代码可以被 WebView 解析，并最终调用 JAVA Bean 的某个方法，完成业务操作。
+
+   4. 在 JAVA 代码中，通过 WebView 在页面执行一段 JS 代码，实现对用户操作的响应或对页面展示的数据做动态改变。
+
+   
+
+   写着写着，才发现，成 AJAX 了。不禁有点兴奋。这至少比我们自己写 XML 半标记、半代码的来实现界面要好多了。无论从软件开发分工、各层之间的解耦、以及程序员的舒适度来看。
+
+   
+
+7. 缺点，界面效果貌似不如用 layout 界面 XML 文件开发的软件界面华丽。
+
+   就目前来说，对 HTML、JS、CSS 等 web 技术支持到何种程度，还有待进一步发现和总结。
+
+   但是我目前做的测试表明，基本上一些 W3C 标准，和一些公认的规范，WebView 都是支持的。
+
+   至于到底两种方式谁好。一方面来说，似乎就成了桌面应用和WEB应用的争执范畴了。
+
+   
+
+发表于 @ 2010年12月16日
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/wenlin56/archive/2010/12/16/6080931.aspx
