@@ -1,0 +1,181 @@
+今天晚上我按照android开发网，做一个Tab Layout的实例，却总是无法成功！
+
+没道理官方网站的教程都是错的啊！！
+
+结果经过我的不段的测试，总算成功了！也把心里体会拿出来与大家分享！
+
+原教程：http://developer.android.com/intl/zh-CN/resources/tutorials/views/hello-tabwidget.html
+
+
+--------------------------------------------------------------------------------
+
+运行环境：
+
+eclipse 3.4
+
+android 1.6
+
+如果按照上面所做，不会成功的！其中还缺少重要文件和代码，我将重要步骤贴出：
+
+1.Start a new project named HelloTabWidget . （不变） 
+
+2.分别建立三个java：ArtistsActivity , AlbumsActivity , and SongsActivity 
+
+view plaincopy to clipboardprint?
+public class ArtistsActivity extends Activity {    
+    public void onCreate(Bundle savedInstanceState) {    
+        super.onCreate(savedInstanceState);    
+    
+        TextView textview = new TextView(this);    
+        textview.setText("This is the Artists tab");    
+        setContentView(textview);    
+    }    
+}  
+public class ArtistsActivity extends Activity { 
+    public void onCreate(Bundle savedInstanceState) { 
+        super.onCreate(savedInstanceState); 
+ 
+        TextView textview = new TextView(this); 
+        textview.setText("This is the Artists tab"); 
+        setContentView(textview); 
+    } 
+} 
+
+我们只需将其中的"This is the Artists tab" 中的Artists替换成Albums，Songs
+
+3.在res/drawable/(有的是drawable-mdpi),下面新建：三个图片（png格式，且是透明的)分别为ic_tab_artists.png，ic_tab_albums.png，ic_tab_songs.png。如果没有手边没有png格式图片的话，可以到（android安装目录\platforms\android-1.6\data\res\drawable\）下面找，很多！ 
+
+重要的一点，其实并不需要想教程所说建立ic_tab_artists.xml，完全没有必要的！我自认为！ 
+
+请让我给你分析：建立Tab Layout时，选中的图标背景会成白色。如果没有选中的图标，背景会成灰色。而我们找的icon图标本身是浅灰色。
+
+ 
+
+4.Open the res/layout/main.xml file and insert the following:（不变） 
+
+5Now open HelloTabWidget.java and make it extend TabActivity :.view plaincopy to clipboardprint?
+package com.hello.tabview;   
+import android.app.TabActivity;   
+import android.content.Intent;   
+import android.content.res.Resources;   
+import android.os.Bundle;   
+import android.widget.TabHost;   
+public class HelloTabWidget extends TabActivity {   
+    public void onCreate(Bundle savedInstanceState) {   
+        super.onCreate(savedInstanceState);   
+        setContentView(R.layout.main);   
+        Resources res = getResources(); // Resource object to get Drawables   
+        TabHost tabHost = getTabHost();  // The activity TabHost   
+        TabHost.TabSpec spec;  // Reusable TabSpec for each tab   
+        Intent intent;  // Reusable Intent for each tab   
+        // Create an Intent to launch an Activity for the tab (to be reused)   
+        intent = new Intent().setClass(this, ArtistsActivity.class);   
+        // Initialize a TabSpec for each tab and add it to the TabHost   
+        spec = tabHost.newTabSpec("A").setIndicator("文章",   
+                          res.getDrawable(R.drawable.ic_tab_artists))   
+                      .setContent(intent);   
+        //TabSpec android.widget.TabHost.TabSpec.setContent(Intent intent)   
+        //newTabSpec("mytag")就是为后面的setCurrentTabByTag("mytag")   
+        //setIndicator(label,icon);label就是上面显示的文字   
+        tabHost.addTab(spec);   
+        // Do the same for the other tabs   
+        intent = new Intent().setClass(this, AlbumsActivity.class);   
+        spec = tabHost.newTabSpec("B").setIndicator("相片",   
+                          res.getDrawable(R.drawable.ic_tab_albums))   
+                      .setContent(intent);   
+        tabHost.addTab(spec);   
+        intent = new Intent().setClass(this, SongsActivity.class);   
+        spec = tabHost.newTabSpec("C").setIndicator("歌曲",   
+                          res.getDrawable(R.drawable.ic_tab_songs))   
+                      .setContent(intent);   
+        tabHost.addTab(spec);   
+        //tabHost.setCurrentTab(0);//默认tab是从0开始，设置当前的tab标签   
+        tabHost.setCurrentTabByTag("B");   
+    }   
+}   
+package com.hello.tabview;
+import android.app.TabActivity;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.os.Bundle;
+import android.widget.TabHost;
+public class HelloTabWidget extends TabActivity {
+	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+	    setContentView(R.layout.main);
+	    Resources res = getResources(); // Resource object to get Drawables
+	    TabHost tabHost = getTabHost();  // The activity TabHost
+	    TabHost.TabSpec spec;  // Reusable TabSpec for each tab
+	    Intent intent;  // Reusable Intent for each tab
+	    // Create an Intent to launch an Activity for the tab (to be reused)
+	    intent = new Intent().setClass(this, ArtistsActivity.class);
+	    // Initialize a TabSpec for each tab and add it to the TabHost
+	    spec = tabHost.newTabSpec("A").setIndicator("文章",
+	                      res.getDrawable(R.drawable.ic_tab_artists))
+	                  .setContent(intent);
+	    //TabSpec android.widget.TabHost.TabSpec.setContent(Intent intent)
+	    //newTabSpec("mytag")就是为后面的setCurrentTabByTag("mytag")
+	    //setIndicator(label,icon);label就是上面显示的文字
+	    tabHost.addTab(spec);
+	    // Do the same for the other tabs
+	    intent = new Intent().setClass(this, AlbumsActivity.class);
+	    spec = tabHost.newTabSpec("B").setIndicator("相片",
+	                      res.getDrawable(R.drawable.ic_tab_albums))
+	                  .setContent(intent);
+	    tabHost.addTab(spec);
+	    intent = new Intent().setClass(this, SongsActivity.class);
+	    spec = tabHost.newTabSpec("C").setIndicator("歌曲",
+	                      res.getDrawable(R.drawable.ic_tab_songs))
+	                  .setContent(intent);
+	    tabHost.addTab(spec);
+	    //tabHost.setCurrentTab(0);//默认tab是从0开始，设置当前的tab标签
+	    tabHost.setCurrentTabByTag("B");
+	}
+}  
+
+6.还有一个关键的地方：就是修改AndroidManifest.xml文件，挨着<activity android:name=".HelloTabWidget " .....>....</acitivity>后面添加代码： 
+
+view plaincopy to clipboardprint?
+  <activity android:name=".AlbumsActivity"  
+          android:label="@string/app_name"  
+          android:theme="@android:style/Theme.NoTitleBar">   
+</activity>   
+<activity android:name=".ArtistsActivity"  
+          android:label="@string/app_name"  
+          android:theme="@android:style/Theme.NoTitleBar">   
+</activity>   
+  <activity android:name=".SongsActivity"  
+          android:label="@string/app_name"  
+          android:theme="@android:style/Theme.NoTitleBar">   
+</activity>  
+          <activity android:name=".AlbumsActivity"
+                  android:label="@string/app_name"
+                  android:theme="@android:style/Theme.NoTitleBar">
+        </activity>
+        <activity android:name=".ArtistsActivity"
+                  android:label="@string/app_name"
+                  android:theme="@android:style/Theme.NoTitleBar">
+        </activity>
+          <activity android:name=".SongsActivity"
+                  android:label="@string/app_name"
+                  android:theme="@android:style/Theme.NoTitleBar">
+        </activity> 
+
+7.然后运行项目，得到如下图片。（可能你们的有点区别） 
+
+ 
+
+呵呵，总算成功了。
+
+不过我还发现一个问题，但是没有解决。
+
+问题：如果你按下主页图标 ，然后再进入此应用，tab标签仍留在推出的状态
+
+         但是如果你按下后退键 ，再进入，tab标签还原成默认状态。
+
+现在没找到答案，有哪位兄弟能够给我解答！！
+
+发表于 @ 2010年03月14日
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/lonpo/archive/2010/03/14/5380021.aspx

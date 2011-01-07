@@ -1,0 +1,23 @@
+new AlertDialog.Builder(this).setTitle("Test").setItems(R.array.difficulty,new DialogInterface.OnClickListener(){
+	public void onClick(DialogInterface dialog, int which) {
+		Log.d("Dialog",""+which);
+	}
+}).show();
+
+输入文本框
+final AlertDialog.Builder dialog=new AlertDialog.Builder(this).setTitle("本手机名称");
+final EditText edit = new EditText(BluetoothSummaryTab.this);
+edit.setGravity(Gravity.CENTER);
+final LinearLayout ll=new LinearLayout(null);
+ll.setGravity(Gravity.CENTER);
+ll.setOrientation(LinearLayout.VERTICAL);
+ll.addView(edit,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,  ViewGroup.LayoutParams.WRAP_CONTENT)); //给某屏幕添加组件
+edit.setText("Preset Text"); 
+dialog.setPositiveButton("确认",
+	new DialogInterface.OnClickListener(){
+		public void onClick(DialogInterface dialog, int which) {
+			Editable text=edit.getText();
+			((Button) findViewById(R.id.btn_bsName)).setText(text);
+		}
+});
+dialog.setView(ll).show();

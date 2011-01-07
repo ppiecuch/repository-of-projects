@@ -1,0 +1,164 @@
+原创作品，允许转载，转载时请务必以超链接形式标明文章 原始出处 、作者信息和本声明。否则将追究法律责任。http://weizhulin.blog.51cto.com/1556324/323922 
+大家好我们这一节讲的是Android Handler的使用,在讲Handler之前，我们先提个小问题，就是如何让程序5秒钟更新一下Title.
+首先我们看一下习惯了Java编程的人，在不知道Handler的用法之前是怎么样写的程序,代码如下所示:
+view plaincopy to clipboardprint?
+package com.android.tutor;  
+import java.util.Timer;  
+import java.util.TimerTask;  
+import android.app.Activity;  
+import android.os.Bundle;  
+public class HandlerDemo extends Activity {  
+      
+    //title为setTitle方法提供变量,这里为了方便我设置成了int型  
+    private int title = 0;  
+      
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        setContentView(R.layout.main);  
+          
+        Timer timer = new Timer();  
+        timer.scheduleAtFixedRate(new MyTask(), 1, 5000);  
+    }  
+          
+    private class MyTask extends TimerTask{  
+        @Override  
+        public void run() {  
+              
+            setTitle("Welcome to Mr Wei's blog " + title);  
+            title ++;  
+        }     
+    }  
+}  
+package
+ com.android.tutor;
+import java.util.Timer;
+import java.util.TimerTask;
+import android.app.Activity;
+import android.os.Bundle;
+public class HandlerDemo extends Activity {
+    
+	//title为setTitle方法提供变量,这里为了方便我设置成了int型
+	private int title = 0;
+	
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new MyTask(), 1, 5000);
+    }
+        
+    private class MyTask extends TimerTask{
+		@Override
+		public void run() {
+			
+			setTitle("Welcome to Mr Wei's blog " + title);
+			title ++;
+		}  	
+    }
+} 
+然而当我们执行程序，并不能达到我们预期的效果，所以Android 引进了Handler 这个特殊的类，可以说它是Runnable和Activity交互的桥梁
+，所以我们只要在run方法中发送Message,而在Handler里，通过不同的Message执行不同的任务。
+所以我们修改后的代码如下:
+view plaincopy to clipboardprint?
+package com.android.tutor;  
+import java.util.Timer;  
+import java.util.TimerTask;  
+import android.app.Activity;  
+import android.os.Bundle;  
+import android.os.Handler;  
+import android.os.Message;  
+public class HandlerDemo extends Activity {  
+      
+    //title为setTitle方法提供变量,这里为了方便我设置成了int型  
+    private int title = 0;  
+      
+    private Handler mHandler = new Handler(){  
+          
+        public void handleMessage(Message msg) {  
+            switch (msg.what) {  
+            case 1:  
+                updateTitle();  
+                break;  
+            }  
+        };  
+    };  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        setContentView(R.layout.main);  
+          
+        Timer timer = new Timer();  
+        timer.scheduleAtFixedRate(new MyTask(), 1, 5000);  
+    }  
+          
+    private class MyTask extends TimerTask{  
+        @Override  
+        public void run() {  
+              
+            Message message = new Message();  
+            message.what = 1;  
+            mHandler.sendMessage(message);  
+              
+        }     
+    }  
+      
+      
+    public void updateTitle(){  
+          
+        setTitle("Welcome to Mr Wei's blog " + title);  
+        title ++;  
+    }  
+}  
+package 
+com.android.tutor;
+import java.util.Timer;
+import java.util.TimerTask;
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+public class HandlerDemo extends Activity {
+    
+	//title为setTitle方法提供变量,这里为了方便我设置成了int型
+	private int title = 0;
+	
+	private Handler mHandler = new Handler(){
+		
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 1:
+				updateTitle();
+				break;
+			}
+		};
+	};
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new MyTask(), 1, 5000);
+    }
+        
+    private class MyTask extends TimerTask{
+		@Override
+		public void run() {
+			
+			Message message = new Message();
+			message.what = 1;
+			mHandler.sendMessage(message);
+			
+		}  	
+    }
+    
+    
+    public void updateTitle(){
+    	
+    	setTitle("Welcome to Mr Wei's blog " + title);
+		title ++;
+    }
+} 
+下面我们看一下效果图:
+ 
+本文出自 “Android_Tutor” 博客，请务必保留此出处http://weizhulin.blog.51cto.com/1556324/323922
+

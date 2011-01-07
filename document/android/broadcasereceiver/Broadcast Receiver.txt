@@ -1,0 +1,206 @@
+Broadcast Receiver用于接收并处理广播通知（broadcast announcements）。多数的广播是系统发起的，如地域变换、电量不足、来电来信等。程序也可以播放一个广播。程序可以有任意数量的 broadcast receivers来响应它觉得重要的通知。broadcast receiver可以通过多种方式通知用户：启动activity、使用NotificationManager、开启背景灯、振动设备、播放声音等，最典型的是在状态栏显示一个图标，这样用户就可以点它打开看通知内容。
+
+通常我们的某个应用或系统本身在某些事件（电池电量不足、来电来短信）来临时会广播一个Intent出去，我们可以利用注册一个Broadcast Receiver来监听到这些Intent并获取Intent中的数据。
+
+ 
+
+1. 我们自己的程序主动广播Intent 
+
+Java代码 
+final String BROADCAST = "com.forrest.action.mybroadcast";   
+Intent intent = new Intent(BROADCAST); // 对应setAction()   
+intent.putExtra("data_title", "来短信啦");   
+intent.putExtra("data_text", "美女你好，晚上可有空");   
+sendBroadcast(intent);  
+
+final String BROADCAST = "com.forrest.action.mybroadcast";
+Intent intent = new Intent(BROADCAST); // 对应setAction()
+intent.putExtra("data_title", "来短信啦");
+intent.putExtra("data_text", "美女你好，晚上可有空");
+sendBroadcast(intent); 
+
+2.接收广播 
+
+接收broadcast需要注册一个Broadcast Receiver，并且要注册一个Intent Filter来制定Broadcase Receiver是对哪些Intent进行监听。 
+
+（1）注册Broadcast Receiver 
+
+一个Broadcast receiver只有一个简单的回调函数：onReceive(Context curContext, Intent broadcastMsg)，当一个广播消息被Receiver监听到时，Android会调用它的onReceive()方法，并将包含消息的Intent对象传给它。onReceive中代码的执行时间不要超过5s，否则android会弹出超时dialog。 此时是否另开一个线程来处理耗时的操作呢？ 
+
+Receiver只在onReceive方法执行时是激活状态，只要onReceive一返回，Receiver就不再是激活状态了。Receiver进程是被一个激活状态的broadcast receiver所保护而不被系统终止的，一旦onReceive返回，Receiver进程broadcast receiver所保护而变为一个空进程，空进程是可以在任意时刻被终止的。这就带来了一个问题：当响应一个广播信息的处理十分耗时的时候，那么就应该把这个处理放在一个单独的线程里去执行，来保证主线程里的其他用户交互组件能够继续运行，而一旦这么做，当onReceive()唤起一个线程后就会马上返回，这时就会把Receiver进程放到被终止的境地。解决这个问题的方案是在onReceive()里开始一个Service，让这个Service去做这件事情，那么系统就会认为这个进程里还有活动正在进行。 
+
+（2）注册/注销Broadcast Receiver 
+
+1）在AndroidManifest.xml中注册
+
+Xml代码 
+<receiver android:name="Receiver1">  
+    <intent-filter>  
+               <!-- 和Intent中的action对应 -->  
+        <action android:name="com.forrest.action.mybroadcast"/>  
+    </intent-filter>  
+</receiver>  
+
+<receiver android:name="Receiver1">
+	<intent-filter>
+               <!-- 和Intent中的action对应 -->
+		<action android:name="com.forrest.action.mybroadcast"/>
+	</intent-filter>
+</receiver> 2）在代码中注册
+
+Java代码 
+IntentFilter filter = new IntentFilter("com.forrest.action.mybroadcast"); // 和广播中Intent的action对应   
+MyBroadcastReceiver br = new MyBroadcastReceiver();   
+registerReceiver(new MyBroadcastReceiver(), filter);  
+
+IntentFilter filter = new IntentFilter("com.forrest.action.mybroadcast"); // 和广播中Intent的action对应
+MyBroadcastReceiver br = new MyBroadcastReceiver();
+registerReceiver(new MyBroadcastReceiver(), filter); 3）注销
+
+Java代码 
+unregisterReceiver(br);  
+
+unregisterReceiver(br); 
+
+3. 示例代码
+
+Java代码 
+public class Receiver1 extends BroadcastReceiver {   
+    private Context context;   
+    public static final int NOTIFICATION_ID = 10001;   
+       
+    public void onReceive(Context context, Intent intent) {   
+        this.context = context;   
+        showNotification();   
+    }   
+       
+    private void showNotification() {   
+        Notification notification = new Notification(R.drawable.icon, "来电话啦...", System.currentTimeMillis());   
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);   
+        notification.setLatestEventInfo(context, "来电话啦...嘿嘿", "赶紧接电话，否则误大事了", contentIntent);   
+           
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(   
+                android.content.Context.NOTIFICATION_SERVICE);   
+        notificationManager.notify(NOTIFICATION_ID, notification);   
+    }   
+}  
+
+public class Receiver1 extends BroadcastReceiver {
+	private Context context;
+	public static final int NOTIFICATION_ID = 10001;
+	
+	public void onReceive(Context context, Intent intent) {
+		this.context = context;
+		showNotification();
+	}
+	
+	private void showNotification() {
+		Notification notification = new Notification(R.drawable.icon, "来电话啦...", System.currentTimeMillis());
+		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
+		notification.setLatestEventInfo(context, "来电话啦...嘿嘿", "赶紧接电话，否则误大事了", contentIntent);
+		
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(
+				android.content.Context.NOTIFICATION_SERVICE);
+		notificationManager.notify(NOTIFICATION_ID, notification);
+	}
+}  Java代码 
+public class Receiver2 extends BroadcastReceiver {   
+    private Context context;   
+       
+    @Override  
+    public void onReceive(Context context, Intent intent) {   
+        this.context = context;   
+        deleteNotification();   
+    }   
+       
+    private void deleteNotification() {   
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);   
+        notificationManager.cancel(Receiver1.NOTIFICATION_ID);   
+    }   
+}  
+
+public class Receiver2 extends BroadcastReceiver {
+	private Context context;
+	
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		this.context = context;
+		deleteNotification();
+	}
+	
+	private void deleteNotification() {
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+		notificationManager.cancel(Receiver1.NOTIFICATION_ID);
+	}
+}  Java代码 
+public class MainActivity extends Activity {   
+    private final String ACTION_SEND = "com.forrest.action.SENDMESSAGE",   
+                         ACTION_CLEAR = "com.forrest.action.CLEARNOTIFICATION";   
+       
+    public void onCreate(Bundle savedInstanceState) {   
+        super.onCreate(savedInstanceState);   
+        setContentView(R.layout.main);   
+        ( (Button) findViewById(R.id.btn1) ).setOnClickListener(new OnClickListener() {   
+            public void onClick(View v) {   
+                clickMenuItem(ACTION_SEND);   
+            }   
+        });   
+        ( (Button) findViewById(R.id.btn2) ).setOnClickListener(new OnClickListener() {   
+            public void onClick(View v) {   
+                clickMenuItem(ACTION_CLEAR);   
+            }   
+        });   
+    }   
+       
+    private void clickMenuItem(final String action) {   
+        Intent intent = new Intent(action);   
+        sendBroadcast(intent);   
+    }   
+}  
+
+public class MainActivity extends Activity {
+	private final String ACTION_SEND = "com.forrest.action.SENDMESSAGE",
+						 ACTION_CLEAR = "com.forrest.action.CLEARNOTIFICATION";
+	
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        ( (Button) findViewById(R.id.btn1) ).setOnClickListener(new OnClickListener() {
+        	public void onClick(View v) {
+        		clickMenuItem(ACTION_SEND);
+        	}
+        });
+        ( (Button) findViewById(R.id.btn2) ).setOnClickListener(new OnClickListener() {
+        	public void onClick(View v) {
+        		clickMenuItem(ACTION_CLEAR);
+        	}
+        });
+    }
+    
+    private void clickMenuItem(final String action) {
+    	Intent intent = new Intent(action);
+    	sendBroadcast(intent);
+    }
+} 注册Broadcast Reciver
+
+Xml代码 
+<application android:icon="@drawable/icon" android:label="@string/app_name">  
+    <activity android:name=".MainActivity"  
+              android:label="@string/app_name">  
+        <intent-filter>  
+            <action android:name="android.intent.action.MAIN" />  
+            <category android:name="android.intent.category.LAUNCHER" />  
+        </intent-filter>  
+    </activity>  
+    <receiver android:name="Receiver1">  
+        <intent-filter>  
+            <action android:name="com.forrest.action.SENDMESSAGE"/>  
+        </intent-filter>  
+    </receiver>  
+    <receiver android:name="Receiver2">  
+        <intent-filter>  
+            <action android:name="com.forrest.action.CLEARNOTIFICATION"/>  
+        </intent-filter>  
+    </receiver>  
+</application>  
+http://wayfarer.javaeye.com/blog/586157
