@@ -1,0 +1,9 @@
+<SeekBar android:id="@android:id/progress"  
+style="?android:attr/progressBarStyleHorizontal"  
+android:progressDrawable="@drawable/seekbar_style"    
+android:thumb="@drawable/thumb"  
+android:layout_width="fill_parent"  
+android:layout_height="23dip"  
+android:paddingLeft="25dip"  
+android:paddingRight="25dip"  
+android:paddingBottom="4dip />

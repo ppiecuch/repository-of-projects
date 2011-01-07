@@ -1,0 +1,16 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/"
+		android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+	    android:layout_gravity="center"
+	    android:stretchColumns="*">
+	    <TableRow>
+		    <TextView 
+		    android:text=""
+		    />
+		    <Button
+		    	android:id="@+id/"
+		    	android:text=""
+		    />
+	    </TableRow>
+</TableLayout>
