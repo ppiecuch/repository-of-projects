@@ -1,0 +1,8 @@
+OPhone平台开发, 2009-12-07 12:03:24 
+标签 : 列表界面 ListActivity ListView控件 API OPhone 
+
+概述：
+        在我们设计的软件中，很多时候需要以列表的形式显示一些信息，要实现这样的功能，OPhone API给我们提供了非常方便的ListView控件和ListActivity用来显示列表信息，但有的时候这些控件并不能满足于我们程序开发的需要，因此，就需要我们定义自己的列表界面。实际上在OPhone中，设计自己的列表界面和内容十分简单和方便，下面将一步步地进行介绍如何来创建和使用自定义列表项，在这个例子中，我们将实现如下图所示的效果：
+....
+
+http://www.ophonesdn.com/userArticle/show/112;jsessionid=02E53AB4FDFB771F298D461CC4226254

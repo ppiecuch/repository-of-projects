@@ -1,0 +1,24 @@
+static public void printAllInform(Class clsShow) {   
+    try {   
+        // 取得所有方法   
+        Method[] hideMethod = clsShow.getMethods();   
+        int i = 0;   
+        for (; i < hideMethod.length; i++) {   
+            Log.e("method name", hideMethod[i].getName());   
+        }   
+        // 取得所有常量   
+        Field[] allFields = clsShow.getFields();   
+        for (i = 0; i < allFields.length; i++) {   
+            Log.e("Field name", allFields[i].getName());   
+        }   
+    } catch (SecurityException e) {   
+        // throw new RuntimeException(e.getMessage());   
+        e.printStackTrace();   
+    } catch (IllegalArgumentException e) {   
+        // throw new RuntimeException(e.getMessage());   
+        e.printStackTrace();   
+    } catch (Exception e) {   
+        // TODO Auto-generated catch block   
+        e.printStackTrace();   
+    }   
+}  

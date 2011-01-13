@@ -1,3 +1,18 @@
+官网
+http://developer.android.com/intl/de/guide/topics/wireless/bluetooth.html
+
+
+public BluetoothServerSocket listenUsingRfcommWithServiceRecord (String name, UUID uuid)
+　　创建一个正在监听的安全的带有服务记录的无线射频通信（RFCOMM）蓝牙端口。
+　　一个对该端口进行连接的远程设备将被认证，对该端口的通讯将被加密。
+　　使用accpet（）方法可以获取从监听BluetoothServerSocket处新来的连接
+　　该系统分配一个未被使用的无线射频通信通道来进行监听。
+　　该系统也将注册一个服务探索协议（SDP）记录，该记录带有一个包含了特定 的通用唯一识别码
+（Universally Unique Identifier，UUID），服务器名称和自动分配通道的本地SDP服务。远程蓝牙设备
+可以用相同的UUID来查询自己的SDP服务器，并搜寻连接 到了哪个通道上。如果该端口已经关闭，或者如果
+该应用程序异常退出，则这个SDP记录会被移除。
+
+
 Android蓝牙协议栈使用的是BlueZ，支持GAP, SDP, and RFCOMM规范，是一个SIG认证的蓝牙协议栈。
 Bluez 是GPL许可的，因此Android的框架内与用户空间的bluez代码通过D-BUS进程通讯进行交互，以避免专有代码。
 移植

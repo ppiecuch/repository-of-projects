@@ -1,0 +1,127 @@
+最近在使用TabHost的时候遇到一个问题：
+TabHost添加了4个Activity作为tab页面，我们从左至右的顺序称呼它们为tab1，tab2，tab3，tab4。可是每次进入TabHost页面的时候，不管我进来的时候点击的是指向哪个Activity的跳转，tab1的Activity总会首先被执行。可是我希望的效果是，我点击tab2的跳转，我就只希望执行tab2的Activity。
+分析：我看了一下TabHost 2.1的源码，找到addTab方法，如下所示。
+    /**
+     * Add a tab.
+     * @param tabSpec Specifies how to create the indicator and content.
+     */
+    public void addTab(TabSpec tabSpec) {
+
+        if (tabSpec.mIndicatorStrategy == null) {
+            throw new IllegalArgumentException("you must specify a way to create the tab indicator.");
+        }
+
+        if (tabSpec.mContentStrategy == null) {
+            throw new IllegalArgumentException("you must specify a way to create the tab content");
+        }
+        View tabIndicator = tabSpec.mIndicatorStrategy.createIndicatorView();
+        tabIndicator.setOnKeyListener(mTabKeyListener);
+
+        // If this is a custom view, then do not draw the bottom strips for
+        // the tab indicators.
+        if (tabSpec.mIndicatorStrategy instanceof ViewIndicatorStrategy) {
+            mTabWidget.setDrawBottomStrips(false);
+        }
+        mTabWidget.addView(tabIndicator);
+        mTabSpecs.add(tabSpec);
+
+        if (mCurrentTab == -1) {      
+            setCurrentTab(0);            
+        }
+    }
+重点看最后两句代码，当变量mCurrentTab 等于-1的时候，就setCurrentTab(0);然后再找到mCurrentTab 变量，发现它的声明如下：
+protected int mCurrentTab = -1;
+通过上面的情况，我推测是因为变量mCurrentTab 的赋值的情况，导致执行addTab的方法的时候，会执行setCurrentTab(0);方法，这样第一个Activity就会被首先执行。并且第一次调用addTab添加的Activity总会被执行。
+解决方法：
+根据上面的情况，利用反射机制对TabHost 的变量mCurrentTab 的赋值进行控制，就可以实现对于Activity的独立访问。分为2步。
+第一步：将mCurrentTab 的值改为非-1，这些代码要在addTab方法调用之前写，这样防止addTab方法的最后两句代码执行。如下：
+                try
+                {
+                        Field idcurrent = tabHost.getClass()
+                                        .getDeclaredField("mCurrentTab");
+                        idcurrent.setAccessible(true);
+                        idcurrent.setInt(tabHost, -2);
+                }
+                catch (Exception e)
+                {
+                        e.printStackTrace();
+                }
+第二步：在addTab方法执行之后修改mCurrentTab 的值，这样是为了调用setCurrentTab方法时正常执行，如下：
+                try
+                {
+                        Field idcurrent = tabHost.getClass()
+                                        .getDeclaredField("mCurrentTab");
+                        idcurrent.setAccessible(true);
+                        if (tadid == 0)
+                        {
+                                idcurrent.setInt(tabHost, 1);
+                        }
+                        else
+                        {
+                                idcurrent.setInt(tabHost, 0);
+                        }
+                }
+                catch (Exception e)
+                {
+                        e.printStackTrace();
+                }
+最后，把上述的整体的一个功能代码写一下：
+                //取得想跳转到的的tab的Id
+                Bundle extras = getIntent().getExtras();
+                Resources resources = getResources();
+                String defaultTab = extras.getString(STARTING_TAB);
+                int tadid = defaultTab == null ? 2 : Integer.valueOf(defaultTab);
+                //设置mCurrentTab为非-1,addtab时候不会进入setCurrentTab()
+                try
+                {
+                        Field idcurrent = tabHost.getClass()
+                                        .getDeclaredField("mCurrentTab");
+                        idcurrent.setAccessible(true);
+                        idcurrent.setInt(tabHost, -2);
+                }
+                catch (Exception e)
+                {
+                        e.printStackTrace();
+                }
+
+                Intent Intent1= new Intent(this,Activity1.class);
+                Intent1.putExtras(extras);
+                tabHost.addTab(tabHost.newTabSpec(Intent1_TAB).setIndicator(
+                                resources.getString(R.string.Intent1)).setContent(
+                                Intent1));
+
+                Intent Intent12= new Intent(this, Activity2.class);
+                Intent12.putExtras(extras);
+                tabHost.addTab(tabHost.newTabSpec(Intent12_TAB).setIndicator(
+                                resources.getString(R.string.Intent12)).setContent(
+                                Intent12));
+
+                Intent Intent13= new Intent(this, Activity3.class);
+                Intent13.putExtras(extras);
+                tabHost.addTab(tabHost.newTabSpec(Intent13_TAB).setIndicator(
+                                resources.getString(R.string.Intent13)).setContent(
+                                Intent13));
+                //设置mCurrentTab与tadid不同，并且不能数组越界(0-2)，保证第一次进入tab的setCurrentTab()方法正常运行
+                try
+                {
+                        Field idcurrent = tabHost.getClass()
+                                        .getDeclaredField("mCurrentTab");
+                        idcurrent.setAccessible(true);
+                        if (tadid == 0)
+                        {
+                                idcurrent.setInt(tabHost, 1);
+                        }
+                        else
+                        {
+                                idcurrent.setInt(tabHost, 0);
+                        }
+        }
+                catch (Exception e)
+                {
+                        e.printStackTrace();
+                }
+                //进入传来的选项卡
+                tabHost.setCurrentTab(tadid);
+                
+                
+http://www.eoeandroid.com/thread-39870-1-1.html
