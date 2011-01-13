@@ -1,0 +1,55 @@
+我们在平时的开发中，有时候可能会需要一些全局数据，来让应用中的所有Activity和View都能访问到，大家在遇到这种情况时，可能首先会想到自己定义一个类，然后创建很多静态成员，不过android已经为我们提供了这种情况的解决方案，下面就来介绍一下：
+
+     在Android中，有一个名为Application的类，我们可以在Activity中使用getApplication(),方法来获得，它是代表我们的应用程序的类，使用它可以获得当前应用的主题，资源文件中的内容等，这个类更灵活的一个特性就是可以被我们继承，来添加我们自己的全局属性。例如我们在开发一个游戏应用，需要保存分数，那么我们就可以继承Application，代码如下：
+
+
+public class GameApplication extends Application {
+
+    private int score;
+
+    
+
+    public int getScore() {
+
+        return score;
+
+    }
+
+    public void setScore(int score) {
+
+        this.score = score;
+
+    }
+
+}
+复制代码
+
+这样我们就扩展了自己的属性，不过还没有结束，另外一个比较关键的一部，是需要在androidManifest.xml文件中将我们扩展后的Application类指定上去，例如下面的代码：
+
+
+    <application
+
+    android:name=".GameApplication" 
+
+    android:icon="@drawable/icon" 
+
+    android:label="@string/app_name">
+复制代码
+
+这样指定好之后，我们的自定义Application就算完成了，然后我们可以很方便的在任何Activity和View中来获取我们的分数属性，代码如下：
+
+在Activity中：
+//设置分数
+
+((GameApplication)getApplication()).setScore(100)
+复制代码
+//获取分数
+
+((GameApplication)getApplication()).getScore();
+复制代码
+
+在View中:
+((GameApplication)getContext().getApplicationContext()).getScore()
+复制代码
+
+http://www.eoeandroid.com/thread-30257-1-1.html

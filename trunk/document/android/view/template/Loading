@@ -1,0 +1,22 @@
+ showDialog(DIALOG2_KEY);
+ 
+ protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DIALOG1_KEY: {
+                ProgressDialog dialog = new ProgressDialog(this);
+                dialog.setTitle("Indeterminate");
+                dialog.setMessage("Please wait while loading...");
+                dialog.setIndeterminate(true);
+                dialog.setCancelable(true);
+                return dialog;
+            }
+            case DIALOG2_KEY: {
+                ProgressDialog dialog = new ProgressDialog(this);
+                dialog.setMessage("Please wait while loading...");
+                dialog.setIndeterminate(true);
+                dialog.setCancelable(true);
+                return dialog;
+            }
+        }
+        return null;
+    }

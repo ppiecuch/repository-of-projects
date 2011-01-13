@@ -5,6 +5,8 @@ android:layout_height="wrap_content"
 android:text=""
 />
 
+final TextView time=new TextView(BluetoothSummaryTab.this);
+
 
 加上滚动效果
 

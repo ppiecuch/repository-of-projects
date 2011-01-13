@@ -1,0 +1,13 @@
+public void showPopupWindow(Context context,View parent){   
+    LayoutInflater inflater = (LayoutInflater)      
+       context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);      
+    final View popupWindow=inflater.inflate(R.layout.bluetooth_directory_popup, null, false);   
+    pw= new PopupWindow(popupWindow,120,200,true); 
+    Button button=(Button) popupWindow.findViewById(R.id.btn_bdpConnect);
+    button.setOnClickListener(this);
+    button=(Button) popupWindow.findViewById(R.id.btn_bdpDelete);
+    button.setOnClickListener(this);
+    
+    Log.d(TAG,"baseline:"+parent.getBaseline()+",right:"+parent.getRight()+",bottom:"+parent.getBottom()+",left:"+parent.getLeft()+",top:"+parent.getTop());
+    pw.showAtLocation(parent, Gravity.LEFT|Gravity.TOP, (int)(touchX),(int)(touchY+80));   
+}

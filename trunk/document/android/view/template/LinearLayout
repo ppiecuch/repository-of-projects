@@ -1,7 +1,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_gravity="center"
     >
 </LinearLayout>
+
+final LinearLayout ll=new LinearLayout(BluetoothSummaryTab.this);
+ll.setGravity(Gravity.CENTER);
+ll.setOrientation(LinearLayout.VERTICAL);
+ll.addView(bar,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,  ViewGroup.LayoutParams.WRAP_CONTENT));
+ll.addView(time,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,  ViewGroup.LayoutParams.WRAP_CONTENT));

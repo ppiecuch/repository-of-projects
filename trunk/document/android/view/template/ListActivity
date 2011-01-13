@@ -1,0 +1,92 @@
+public class BluetoothDirectoryTab extends ListActivity{
+	public void onCreate(Bundle savedInstanceState) {    
+        super.onCreate(savedInstanceState);      
+
+    }
+	
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		Log.d(TAG,"click:"+position+",right:"+l.getRight()+",bottom:"+l.getBottom()+",left:"+l.getLeft()+",top:"+l.getTop());
+	}
+}
+
+===================================================================
+
+public class BluetoothDirectoryTab extends ListActivity,OnTouchListener{
+	public void onCreate(Bundle savedInstanceState) {    
+        super.onCreate(savedInstanceState);      
+
+    }
+	
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		Log.d(TAG,"click:"+position+",right:"+l.getRight()+",bottom:"+l.getBottom()+",left:"+l.getLeft()+",top:"+l.getTop());
+	}
+	
+	public boolean onTouch(View v, MotionEvent event) {
+//		Log.d(TAG,"touch:"+event.getX()+","+event.getY());
+		touchX=event.getX();
+		touchY=event.getY();
+		return false;
+	}
+}
+
+===============================================================================
+public class BluetoothDirectoryTab extends ListActivity{
+	public void onCreate(Bundle savedInstanceState) {    
+        super.onCreate(savedInstanceState);      
+		setListAdapter(new MyAdapter(this));
+    }
+	
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		Log.d(TAG,"click:"+position+",right:"+l.getRight()+",bottom:"+l.getBottom()+",left:"+l.getLeft()+",top:"+l.getTop());
+	}
+	
+	static class ViewHolder {
+        TextView name;
+        TextView state;
+    }
+	
+	class MyAdapter extends BaseAdapter{
+
+		private Context context;
+		private LayoutInflater mInflater;
+		
+		public MyAdapter(Context context) {
+			this.context=context;
+			mInflater = LayoutInflater.from(context);
+		}
+		
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder;
+			// When convertView is not null, we can reuse it directly, there is no need
+            // to reinflate it. We only inflate a new View when the convertView supplied
+            // by ListView is null.
+			if (convertView == null) {
+				convertView = mInflater.inflate(R.layout.bluetooth_directory_item, null);
+				holder = new ViewHolder();
+                holder.name = (TextView) convertView.findViewById(R.id.tv_bdiName);
+                holder.state = (TextView) convertView.findViewById(R.id.tv_bdiState);
+                convertView.setTag(holder);
+			}else{
+				holder=(ViewHolder) convertView.getTag();
+			}
+			holder.name.setText(deviceNames.get(position));
+			holder.state.setText(deviceStates.get(position));
+			return convertView;
+		}
+
+		public int getCount() {
+			return deviceNames.size();
+		}
+
+		public Object getItem(int position) {
+			return position;
+		}
+
+		public long getItemId(int position) {
+			return position;
+		}
+	}
+}
