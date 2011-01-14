@@ -1,0 +1,113 @@
+
+调用private static 方法
+public class Singleton {    
+    private static Singleton instance = null;   
+    private static synchronized Singleton getInstance() {   
+      System.out.println("调用 私有的单例!");   
+           if (instance==null)   
+                    instance=new Singleton();   
+                 
+                    return instance;   
+      }   
+     }  
+
+     
+import java.lang.reflect.Method;   
+  
+public class test {   
+  
+    public static void main(String[] args) {   
+  
+         Class cl = null;   
+                      try{   
+                             cl=Singleton.class;   
+                             Method m1 =cl.getDeclaredMethod("getInstance");   
+  
+                              m1.setAccessible(true);// 调用private方法的关键一句话   
+                              m1.invoke(cl);   
+                        }catch(Exception e){   
+                              e.printStackTrace();   
+                        }  
+                        
+                        
+                        
+调用private成员方法
+public class R {   
+       
+    private void test(){   
+        System.out.println("test is execute");   
+    }   
+  
+}  
+public class Test {   
+  
+        public static void main(String[] args) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException  {   
+           
+        Class classObj = R.class;   
+           
+           
+        Method mehtod = classObj.getDeclaredMethod("test");   
+           
+        mehtod.setAccessible(true);   
+           
+        Object obj = classObj.newInstance();   
+           
+        mehtod.invoke(obj, null);   
+           
+           
+    }   
+  
+}  
+
+
+调用非public 类
+
+
+try {
+        Class<?> hideClass = Class.forName("android.os.FileUtils"); 
+        //Method hideSubprocess = hidecClass.getMethod("createSubprocess",
+        //        String.class, String.class, String.class, int[].class);
+        Method[] hideMethod = hideClass.getMethods();
+        int i = 0;
+        for (;i < hideMethod.length;i++)
+        {
+            Log.i(LOG_TAG,hideMethod[i].getName());
+        } 
+        Method copyFile = hideClass.getMethod("copyFile", File.class,File.class);
+        File tmpPackageFile  = getFileStreamPath(TMP_FILE_NAME);
+        if (tmpPackageFile == null) {
+                         Log.w(LOG_TAG, "Failed to create temp file");
+                         return ;
+                     }
+                     if (tmpPackageFile.exists()) {
+                         tmpPackageFile.delete();
+                     }
+        //this.openFileOutput("", mode);
+        try {
+            copyFile.invoke(hideClass.newInstance(), new File("/sdcard/MainActivity.apk"),tmpPackageFile);
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        }catch (ClassNotFoundException e) {
+            //throw new RuntimeException(e.getMessage());
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            //throw new RuntimeException(e.getMessage());
+               e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            //throw new RuntimeException(e.getMessage());
+               e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/spy19881201/archive/2010/08/19/5824053.aspx
