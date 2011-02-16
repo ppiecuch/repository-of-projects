@@ -1,0 +1,17 @@
+异常:VS2008LINK : fatal error LNK1000: Internal error during IncrBuildImage
+解决:
+VS2008 LNK1000链接错误    
+
+
+最近在VS2008上做项目，不是很习惯，就编译速度上VS2008就要慢很多，这是公认的，而且还在链接的时候老出现
+LINK : fatal error LNK1000: Internal error during IncrBuildImage这个错误，但是在编译链接一次就没有
+问题了，据说这是链接器的问题。上网查了下资料，出现这个问题的人倒是挺多的，有两种方法可以解决：
+
+第一种：下载补丁，链接地址为
+https://connect.microsoft.com/VisualStudio/Downloads/DownloadDetails.aspx?DownloadID=11399，
+我下载下来了装不上，说我没装VS2008（我想可能是版本不对或者其他问题，我的系统是win7旗舰版，VS2008是中文版的）。
+
+第二种：修改链接选项，方法：项目->属性->链接器->常规   下面的“启用增量链接”，将
+“是(/INCREMENTAL)”改为“否(/INCREMENTAL:NO)”，然后确定就可以了。
+ 
+http://hi.baidu.com/jialifuniya/blog/item/12a49dcf9d73c330f9dc6138.html
