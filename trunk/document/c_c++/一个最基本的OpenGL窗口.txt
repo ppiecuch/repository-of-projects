@@ -1,0 +1,353 @@
+虽然用GLUT库直接就能写OpenGL程序,不用学windows编程了,不过我还是要学用windows编程的方式写OpenGL程序,因为我最终的目的是写OpenGL程序的外挂,所以得学会用windows程序控制OpenGL程序.
+
+从网上收集OpenGL教程,我学会了三种建立OpenGL窗口的方法,
+
+一种是win32 sdk加OpenGL函数,这种方法写起来极其麻烦,很是繁琐,
+
+第二种把建立OpenGL环境所用到的OpenGL函数写成一个小类,然后用win32 sdk加OpenGL类的方式建立OpenGL窗口,这种方法比前一个方法简洁清晰了点,不过还是感觉繁琐.
+
+第三种方法用MFC编程建立OpenGL窗口,这种方法我最推崇.因为首先用MFC建立windows窗口方便简洁.其次可以考虑把要用到的OpenGL函数编成一个类,这样用起OpenGL来更是简洁方便了.
+
+我现在手头有这三种代码,但我以后主要用MFC来写OpenGL程序,下边把如何用MFC建立一个最基本的OpenGL窗口贴出来.
+
+首先是头文件:
+
+// smotri.h
+// smotri - Simple MFC, C++, OpenGL Tutorial Program
+// by:   Joel Parris
+// date: 10/9/2000 
+
+#include <afxwin.h>   // MFC Windows include file
+#include <GL/gl.h>   // OpenGL include file
+#include <GL/glu.h>   // OpenGL Utilities include file
+#include <math.h> 
+
+class CSmotri: public CWinApp
+{
+public:
+virtual BOOL InitInstance();
+
+};
+
+class COpenGLWindow: public CFrameWnd
+{
+public:
+
+COpenGLWindow();   // COpenGLWindow Class Constructor
+
+~COpenGLWindow();   // COpenGLWindow Class Constructor
+
+    HDC   m_hgldc;   // GDI Device Context
+    HGLRC m_hglRC;   // Rendering Context
+
+    BOOL SetPixelformat(HDC hdc); 
+void GetGLInfo();
+int DrawGLScene(void);
+int InitGL(void);
+void ReSizeGLScene(int width, int height);
+
+    //virtual BOOL PreCreateWindow( CREATESTRUCT& cs );
+
+protected:
+
+    afx_msg void OnPaint();
+    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+    afx_msg void OnSize(UINT nType, int cx, int cy );
+    afx_msg BOOL OnEraseBkgnd( CDC* pDC );
+afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+
+DECLARE_MESSAGE_MAP()
+
+};
+
+然后是CPP文件:
+
+// smotri - Simple MFC, C++, OpenGL Tutorial Program
+// by:   Joel Parris
+// date: 1/21/2001 
+
+#include "smotri.h"
+//#include "timer.h"
+
+
+CSmotri Smotri; // Instantiate the Smotri application
+
+////////////////////////////////////////////////////////////////////
+// CMyApp Member Function
+BOOL CSmotri::InitInstance() // Initialize Smotri
+{
+m_pMainWnd = new COpenGLWindow;
+// m_nCmdShow = SW_SHOWMAXIMIZED; // Comment to UnMaximize the Window
+m_pMainWnd -> ShowWindow(m_nCmdShow);
+m_pMainWnd -> UpdateWindow();
+
+return true;
+}
+
+
+////////////////////////////////////////////////////////////////////
+// COpenGLWindow message map and Member functions
+
+BEGIN_MESSAGE_MAP(COpenGLWindow, CFrameWnd)
+ON_WM_PAINT()
+    ON_WM_CREATE()
+    ON_WM_SIZE()
+    ON_WM_ERASEBKGND()
+ON_WM_KEYDOWN()
+END_MESSAGE_MAP()
+
+COpenGLWindow::COpenGLWindow()
+{
+Create( NULL, _T("Smotri - a Simple MFC OpenGL Application"), 
+    WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | CS_OWNDC);
+//ModifyStyle(WS_CAPTION,   0,   SWP_FRAMECHANGED);
+}
+
+COpenGLWindow::~COpenGLWindow()
+{
+    wglMakeCurrent(NULL,NULL);
+    wglDeleteContext(m_hglRC);
+}
+
+/*BOOL COpenGLWindow::PreCreateWindow( CREATESTRUCT& cs )
+{
+    if(!CFrameWnd::PreCreateWindow(cs))
+return FALSE;
+
+// Set the initial size of the window
+cs.cx = 550;
+cs.cy = 400;
+
+    return TRUE;
+}*/
+
+BOOL COpenGLWindow::OnEraseBkgnd( CDC* pDC )
+{
+/* This overrides the MFC Message Loop's OnEraseBkgnd(), which
+keeps the OpenGL window from flashing. I shouldn't tell you
+this but contrary to popular opinion it doesn't matter what this
+override returns TRUE or FALSE. If you don't believe me, try it
+    for yourself. 
+*/   
+
+    return TRUE;
+}
+
+
+void COpenGLWindow::OnSize(UINT nType, int cx, int cy )
+{
+
+ReSizeGLScene( cx, cy );
+
+}
+
+
+void COpenGLWindow::OnPaint()
+{
+    CPaintDC dc(this); // Needed 
+
+//QueryPerformanceFrequency(&timerFrequency); // Initialize timer
+//QueryPerformanceCounter(&startCount);   // Start timer
+
+// process block
+int imax = 100;
+for (int i = 1; i <= imax; i++) // Draw the scene 100 times
+{
+   DrawGLScene(); // Render the OpenGL scene
+}
+// end, process block
+
+//QueryPerformanceCounter(&endCount); // Stop timer
+//double time = interval_time( startCount, endCount );
+//output_time( time );
+
+    SwapBuffers(m_hgldc);
+
+}
+
+
+BOOL COpenGLWindow::SetPixelformat(HDC hdc)
+{
+
+    PIXELFORMATDESCRIPTOR *ppfd; 
+    int pixelformat; 
+
+    PIXELFORMATDESCRIPTOR pfd = { 
+    sizeof(PIXELFORMATDESCRIPTOR), // size of this pfd 
+    1,                     // version number 
+    PFD_DRAW_TO_WINDOW |   // support window 
+    PFD_SUPPORT_OPENGL |   // support OpenGL 
+    PFD_GENERIC_FORMAT |
+    PFD_DOUBLEBUFFER,      // double buffered 
+    PFD_TYPE_RGBA,         // RGBA type 
+    32,                    // 32-bit color depth 
+    0, 0, 0, 0, 0, 0,      // color bits ignored 
+    8,                     // no alpha buffer 
+    0,                     // shift bit ignored 
+    8,                     // no accumulation buffer 
+    0, 0, 0, 0,            // accum bits ignored 
+    64,                    // 64-bit z-buffer 
+    8,                     // stencil buffer 
+    8,                     // auxiliary buffer 
+    PFD_MAIN_PLANE,        // main layer 
+    0,                     // reserved 
+    0, 0, 0                // layer masks ignored 
+    }; 
+
+   
+    ppfd = &pfd;
+
+
+    if ( (pixelformat = ChoosePixelFormat(hdc, ppfd)) == 0 ) 
+    { 
+        ::MessageBox(NULL, "ChoosePixelFormat failed", "Error", MB_OK); 
+        return FALSE; 
+    } 
+
+    if (SetPixelFormat(hdc, pixelformat, ppfd) == FALSE) 
+    { 
+        ::MessageBox(NULL, "SetPixelFormat failed", "Error", MB_OK); 
+        return FALSE; 
+    } 
+
+    return TRUE; 
+
+}
+
+
+int COpenGLWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+
+    m_hgldc = ::GetDC(m_hWnd);   // Get a device context for OpenGL
+
+    if(!SetPixelformat(m_hgldc)) // set pixel format
+    {
+::MessageBox(::GetFocus(),"SetPixelformat Failed!","Error",MB_OK);
+return -1;
+    }
+
+    m_hglRC = wglCreateContext(m_hgldc); // Create an OpenGL rendering context 
+    int i= wglMakeCurrent(m_hgldc,m_hglRC); // Make rendering context current
+
+GetGLInfo(); // Get OpenGL information
+
+InitGL();   // Initialize OpenGL
+
+    return 0;
+}
+
+
+void COpenGLWindow::GetGLInfo() // Get OpenGL Information
+{
+
+CString oglinfo;
+
+oglinfo = "OpenGL Information\n\nWho: ";
+oglinfo += ::glGetString( GL_VENDOR );
+oglinfo += "\nWhich: ";
+oglinfo += ::glGetString( GL_RENDERER );
+oglinfo += "\nVersion: ";
+oglinfo += ::glGetString( GL_VERSION );
+oglinfo += "\nExtensions: ";
+oglinfo += ::glGetString( GL_EXTENSIONS );
+
+AfxMessageBox(oglinfo,MB_ICONINFORMATION); // Display OpenGL Information
+
+}
+
+
+void COpenGLWindow::ReSizeGLScene( int width, int height) // Resize And Initialize The GL Window
+{
+// from NeHe's Tutorial 3
+if (height==0)           // Prevent A Divide By Zero By
+{
+   height=1;           // Making Height Equal One
+}
+
+glViewport(0,0,width,height);       // Reset The Current Viewport
+
+glMatrixMode(GL_PROJECTION);       // Select The Projection Matrix
+glLoadIdentity();          // Reset The Projection Matrix
+
+// Calculate The Aspect Ratio Of The Window
+gluPerspective(45.0,(float)width/(float)height,0.1,100.0);
+
+glMatrixMode(GL_MODELVIEW);        // Select The Modelview Matrix
+glLoadIdentity();          // Reset The Modelview Matrix
+
+}
+
+
+int COpenGLWindow::InitGL(void)        // Intitialize OpenGl     // All Setup For OpenGL Goes Here
+{
+// from NeHe's Tutorial 3
+glShadeModel(GL_SMOOTH);        // Enable Smooth Shading
+glClearColor(0.0, 0.0, 0.0, 0.5);      // Black Background
+glClearDepth(1.0);          // Depth Buffer Setup
+glEnable(GL_DEPTH_TEST);        // Enables Depth Testing
+glDepthFunc(GL_LEQUAL);         // The Type Of Depth Testing To Do
+glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Really Nice Perspective Calculations
+return TRUE;           // Initialization Went OK
+}
+
+
+int COpenGLWindow::DrawGLScene(void)      // Here's Where We Do All The Drawing
+{
+// from NeHe's Tutorial 3
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
+glLoadIdentity();          // Reset The Current Modelview Matrix
+glTranslated(-1.5,0.0,-6.0);       // Move Left 1.5 Units And Into The Screen 6.0
+glBegin(GL_TRIANGLES);         // Drawing Using Triangles
+   glColor3d(1.0,0.0,0.0);        // Set The Color To Red
+   glVertex3d( 0.0, 1.0, 0.0);       // Top
+   glColor3d(0.0,1.0,0.0);        // Set The Color To Green
+   glVertex3d(-1.0,-1.0, 0.0);       // Bottom Left
+   glColor3d(0.0,0.0,1.0);        // Set The Color To Blue
+   glVertex3d( 1.0,-1.0, 0.0);       // Bottom Right
+glEnd();            // Finished Drawing The Triangle
+glTranslated(3.0,0.0,0.0);        // Move Right 3 Units
+glColor3d(0.5,0.5,1.0);         // Set The Color To Blue One Time Only
+glBegin(GL_QUADS);          // Draw A Quad
+   glVertex3d(-1.0, 1.0, 0.0);       // Top Left 
+   glVertex3d( 1.0, 1.0, 0.0);       // Top Right
+   glVertex3d( 1.0,-1.0, 0.0);       // Bottom Right
+   glVertex3d(-1.0,-1.0, 0.0);       // Bottom Left
+glEnd();            // Done Drawing The Quad
+               // Keep Going
+return TRUE;
+
+}
+
+void COpenGLWindow::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+
+switch (nChar)
+{
+case VK_ESCAPE:
+   exit(0);
+   break;
+default:
+   break;
+}
+
+}
+
+由于这是MFC程序,所以要在工程设置里选择使用MFC动态或静态连接,在工程设置的LINK选项卡里加上opengl32.lib glu32.lib 
+
+基本步骤就是:
+
+1创建一个windows窗口.
+
+2在OnCreate函数中创建和设置OpenGL环境.
+
+3在OnSize函数中设置OpenGL窗口跟着windows窗口自动调整大小
+
+4在OnPaint函数中使用OpenGL的作图命令,用swappbuffers把图形显示出来
+
+5设置空的onerasebkgnd函数返回TRUE,目的是防止窗口闪烁.
+
+6在窗口类的析构函数中释放环境描述表DC和着色描述表RC,删除RC
+
+基本上用其它方法编OpenGL程序也得是这样的步骤,
+
+http://hi.baidu.com/lmhopen/blog/item/0282dccbdbbbf21bbf09e62f.html
