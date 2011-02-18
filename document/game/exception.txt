@@ -1,3 +1,35 @@
+【异常】OpenGL MFC下屏幕显示的闪烁问题
+【解决】
+The flicker occurs because Windows paints the background first and then OpenGL next. 
+Since we have OpenGL doing the job of clearing the background, we'll turn off Windows 
+from clearing the background. This can be done by editing OnEraseBkgnd() member function 
+appropriately. We do this by returning true from the function.
+
+BOOL COpenGLView::OnEraseBkgnd(CDC* pDC) 
+{
+    // TODO: Add your message handler code here and/or call default
+    //comment out the original call
+    //return CView::OnEraseBkgnd(pDC);
+    //Tell Windows not to erase the background
+    return TRUE;
+}
+我们知道，在窗口中拖动一个图形的时候，由于边画边显示，会出现闪烁的现象。在GDI中解决这个问题较为复杂，通过在内存中生成一个内存DC，绘画时让画笔在内存DC中画，画完后一次用Bitblt将内存DC“贴”到显示器上，就可解决闪烁的问题。在OpenGL中，我们是通过双缓存来解决这个问题的。一般来说，双缓存在图形工作软件中是很普遍的。双缓存是两个缓存，一个前台缓存、一个后台缓存。绘图先在后台缓存中画，画完后，交换到前台缓存，这样就不会有闪烁现象了。
+A：将像素格式定义成支持双缓存的    pixelDesc.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_STEREO_DONTCARE;
+B：在物体绘制完成后加入这样一行代码SwapBuffers(hDC),到此OpenGL绘图已经没有闪烁了，但MFC还会反复的重绘背景产生闪烁
+C:处理消息循环OnEraseBkgnd，使其不要重绘背景
+BOOL CoglView::OnEraseBkgnd(CDC* pDC)
+{
+// TODO: 在此添加消息处理程序代码和/或调用默认值
+return TRUE;
+//return CView::OnEraseBkgnd(pDC);
+}
+这样就彻底解决了闪烁问题！
+http://anony3721.blog.163.com/blog/static/511974201031910299606/
+
+以上只能解决WinXP下的闪烁问题,但Win Vista跟Win7依然会闪烁
+Win7下更新显卡驱动解决
+
+
 【异常】org.lwjgl.LWJGLException: Pixel format not accelerated
 【解决】安装最新驱动解决（使用everestultimate）
 

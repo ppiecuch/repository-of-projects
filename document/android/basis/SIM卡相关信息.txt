@@ -1,0 +1,80 @@
+TelephonyManager tm = (TelephonyManager)this.getSystemService(TELEPHONY_SERVICE);//取得相关系统服务
+
+        items = new ArrayList();
+
+        values = new ArrayList();
+
+        items.add("SIM 卡状态");
+
+        switch(tm.getSimState()){ //getSimState()取得sim的状态  有下面6中状态
+
+        case TelephonyManager.SIM_STATE_ABSENT :values.add("无卡");break;
+
+        case TelephonyManager.SIM_STATE_UNKNOWN :values.add("未知状态");break;
+
+        case TelephonyManager.SIM_STATE_NETWORK_LOCKED :values.add("需要NetworkPIN解锁");break;
+
+        case TelephonyManager.SIM_STATE_PIN_REQUIRED :values.add("需要PIN解锁");break;
+
+        case TelephonyManager.SIM_STATE_PUK_REQUIRED :values.add("需要PUK解锁");break;
+
+        case TelephonyManager.SIM_STATE_READY :values.add("良好");break;
+
+        }
+
+       
+
+        items.add("卡号");
+
+        if(tm.getSimSerialNumber()!=null){
+
+         values.add(tm.getSimSerialNumber().toString());
+
+        }else{
+
+         values.add("无法取得SIM卡号");
+
+        }
+
+       
+
+        items.add("供货商代码");
+
+        if(tm.getSimOperator().equals("")){
+
+         values.add("无法取得供货商代码");
+
+        }else{
+
+         values.add(tm.getSimOperator().toString());
+
+        }
+
+       
+
+        items.add("供货商");
+
+        if(tm.getSimOperatorName().equals("")){
+
+         values.add("无法取得供货商");
+
+        }else{
+
+         values.add(tm.getSimOperatorName().toString());
+
+        }
+
+       
+
+        items.add("国籍");
+
+        if(tm.getSimCountryIso().equals("")){
+
+         values.add("无法取得国籍");
+
+        }else{
+
+         values.add(tm.getSimCountryIso().toString());
+
+        } 
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=58316
