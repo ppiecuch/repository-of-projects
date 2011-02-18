@@ -1,0 +1,74 @@
+Android的Assets类有单个文件1MB体积的限制，将字体文件test.ttf放到工程的assets文件夹的fonts目录中。
+
+　　Java代码:
+
+package org.yftx.font;
+
+
+
+　　import android.app.Activity;
+
+
+
+　　import android.graphics.Color;
+
+
+
+　　import android.graphics.Typeface;
+
+
+
+　　import android.os.Bundle;
+
+
+
+　　import android.widget.TextView;
+
+
+
+　　public class MainAcitity extends Activity {
+
+
+
+　　@Override
+
+
+
+　　public void onCreate(Bundle savedInstanceState) {
+
+
+
+　　super.onCreate(savedInstanceState);
+
+
+
+　　setContentView(R.layout.main);
+
+
+
+　　Typeface textFont = Typeface.createFromAsset(getAssets(), "fonts/test.ttf");
+
+
+
+　　TextView testView = (TextView) findViewById(R.id.textView2);
+
+
+
+　　testView.setTypeface(textFont); // 设置TextView的风格
+
+
+
+　　testView.setTextSize(12);
+
+
+
+　　testView.setTextColor(Color.RED);
+
+
+
+　　}
+
+
+
+　　}
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=58494

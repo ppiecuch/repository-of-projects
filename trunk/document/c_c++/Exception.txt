@@ -1,3 +1,9 @@
+异常:CString 没有找到接受 const GLubyte * 类型的右操作数的运算符
+解决:
+将oglinfo += ::glGetString( GL_VENDOR );
+改为
+oglinfo +=  (char *)glGetString( GL_VENDOR );
+
 异常:VS2008LINK : fatal error LNK1000: Internal error during IncrBuildImage
 解决:
 VS2008 LNK1000链接错误    
