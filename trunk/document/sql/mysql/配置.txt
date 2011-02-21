@@ -1,0 +1,38 @@
+1、定义MYSQL_HOME环境变量，将%MYSQL_HOME%\bin加到PATH下
+2、修改my.ini
+[WinMySQLAdmin] 
+# 指定mysql服务启动启动的文件
+Server=E:\\myserver\\mysql-5.0.37-win32\\bin\\mysqld-nt.exe
+ 
+[mysqld] 
+# 设置mysql的安装目录 
+basedir=D:\\Development\\Software\\mysql-5.5.8-win32
+# 设置mysql数据库的数据的存放目录，必须是data，或者是\\xxx\data 
+datadir=D:\\Development\\Software\\mysql-5.5.8-win32\\data
+# 设置mysql服务器的字符集
+default-character-set=utf8
+ 
+[client]
+# 设置mysql客户端的字符集
+default-character-set=utf8
+
+show variables;
+
+
+3、mysqld --install mysql5 --defaults-file=D:\Development\Software\mysql-5.5.8-win32\my.ini
+4、net start mysql5
+
+mysqld -remove mysql5
+
+
+mysql -uroot -proot;登录
+
+
+
+更改密码:
+1、
+mysqladmin -uroot -p password newpassword 
+Enter password: 
+2、
+mysql> UPDATE user SET Password=PASSWORD(’newpassword’) where USER=’root’; 
+mysql> FLUSH PRIVILEGES; 

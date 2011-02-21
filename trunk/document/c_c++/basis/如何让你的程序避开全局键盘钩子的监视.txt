@@ -1,0 +1,35 @@
+  一直以来有个疑问,就是如果别人在你的电脑上安装了键盘钩子来监视你的键盘按键动作,我的程序怎么才能避开这些全局键盘钩子(system-wide hook)的监视.正好最近一段时间因为工作关系在研究钩子,顺便研究了一下这个问题,今天算是找到了一个解决办法.
+解决办法:
+在我的程序中安装一个局部键盘钩子(thread-specified hook),键盘钩子函数中不调用CallNextHookEx;
+原理:
+1.钩子链可以被破坏.同一类型的钩子会形成一个链,假如先被调用的钩子没有调用CallNextHookEx的话,后面的钩子将得不到调用.
+2.对于某个特定的线程,如果既安装了线程钩子又安装了系统钩子，则线程钩子先于系统钩子被调用.
+实验:
+键盘钩子(WH_KEYBOARD)
+我写了个简单的对话框程序,部分代码如下:
+1.先声明钩子HHOOK gHook = NULL;
+2.键盘钩子函数:
+LRESULT  CALLBACK KeyboardProc(int nCode,WPARAM wParam,LPARAM lParam)
+{
+ MessageBox(AfxGetMainWnd()->GetSafeHwnd(), "Thread hook", "keyboard", MB_OK);
+ return 0;
+ //return CallNextHookEx(gHook, nCode, wParam, lParam);
+}
+3.安装钩子:
+ DWORD nThreadid = GetCurrentThreadId();
+ gHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, AfxGetApp()->m_hInstance, nThreadid);
+ if(gHook == NULL)
+ {
+      AfxMessageBox("Install Keyboard Hook Failed", MB_OK);
+ }
+4.卸载钩子
+BOOL ret = UnhookWindowsHookEx(gHook);
+实验方法及结果如下:
+1.先启动另一个程序,安装系统键盘钩子,再启动我的程序,安装局部键盘钩子,实验结果表明系统钩子对我的程序无效.
+2.先启动我的程序,安装局部键盘钩子,再启动另一个程序,安装系统键盘钩子.在我的程序中系统键盘钩子无效.
+
+
+
+posted on 2005-12-09 10:33 碧水蓝天 阅读(12927) 评论(24)  编辑 收藏 
+
+http://blog.vckbase.com/bluesky/archive/2005/12/09/15787.html

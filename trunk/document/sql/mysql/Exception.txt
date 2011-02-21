@@ -1,0 +1,9 @@
+1、net start mysql时遇到1067错误
+解决：
+官方人员的某个回答很具有参考价值：请贴出data目录下的错误文档。（原文不是这样的，翻译了下）
+
+2、unknown variable 'default-character-set=utf8'
+解决：
+loose-default-character-set=utf8
+ 
+
