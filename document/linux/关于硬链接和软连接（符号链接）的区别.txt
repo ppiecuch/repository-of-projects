@@ -1,0 +1,89 @@
+linux系统下提供ln指令来进行文件链接。文件链接主要分为硬链接和软链接。
+
+   硬链接：由于linux下的文件是通过索引节点（Inode）来识别文件，硬链接可以认为是一个指针，指向文件索引节点的指针，系统并不为它重新分配inode。每添加一个一个硬链接，文件的链接数就加1。
+
+    可以用:ln命令来建立硬链接。语法: 
+
+  + expand sourceview plaincopy to clipboardprint?
+ln [options] existingfile newfile   
+ln[options] existingfile-list directory   
+ln [options] existingfile newfile
+ln[options] existingfile-list directory 
+ 
+
+  用法: 第一种:为”existingfile”创建硬链接,文件名为”newfile”。第二种:在”directory”目录中,为 ”existingfile-list”中包含的所有文件创建一个同名的硬链接。常用可选[options] –f 无论”newfile”存在与否,都创建链接。-n 如果”newfile”已存在,就不创建链接。
+
+  例子：
+
+ + expand sourceview plaincopy to clipboardprint?
+$ ls –il   
+13058 -rwx - - - - - - 1 longcheng longcheng 48 8月 5 16:38 file1   
+13059 -rwx - - - - - - 1 longcheng longcheng 57 8月 5 16:40 file2   
+$ ln file2 file2hard   
+$ ls –il   
+13058 -rwx - - - - - - 1 longcheng longcheng 48 8月 5 16:38 file1   
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2   
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2hard  
+$ ls –il
+13058 -rwx - - - - - - 1 longcheng longcheng 48 8月 5 16:38 file1
+13059 -rwx - - - - - - 1 longcheng longcheng 57 8月 5 16:40 file2
+$ ln file2 file2hard
+$ ls –il
+13058 -rwx - - - - - - 1 longcheng longcheng 48 8月 5 16:38 file1
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2hard 
+
+注意在创建链接前,file1 显示的链接数目为1,创建链接后(1)file1和file1hard的链接数目都变为2;(2) file1和file1hard在inode号是一样的(3) file1和file1hard显示的文件大小也是一样。可见进行了ln命令的操作结果：file1和file1hard是同一个文件的两个名字，它们具有同样的索引节点号和文件属性，建立文件file1的硬链接，就是为file1的文件索引节点在当前目录上建立一个新指针。如下图,你可以删除其中任何一个,如rm file2 ,每次只会删除一个指针，链接数同时减一,只有将所有指向文件内容的指针,也即链接数减为0时，内核才会把文件内容从磁盘上删除。
+
+ 不足：
+
+尽管硬链接节省空间，也是Linux系统整合文件系统的传统方式，但是存在一下不足之处：（1）不可以在不同文件系统的文件间建立链接（2）只有超级用户才可以为目录创建硬链接。
+
+ 
+
+ 
+
+软链接（符号链接）：
+
+软链接克服了硬链接的不足，没有任何文件系统的限制，任何用户可以创建指向目录的符号链接。因而现在更为广泛使用，它具有更大的灵活性，甚至可以跨越不同机器、不同网络对文件进行链接。 
+
+      　如果给ln命令加上- s选项，则建立软链接。如果[链接名]已经存在但不是目录，将不做链接。[链接名]可以是任何一个文件名（可包含路径），也可以是一个目录，并且允许它与“目标”不在同一个文件系统中。如果[链接名]是一个已经存在的目录，系统将在该目录下建立一个或多个与“目标”同名的文件，此新建的文件实际上是指向原“目标”的符号链接文件。 
+
+   例子：
+
+   
+
+  view plaincopy to clipboardprint?
+$ ls -il   
+13058 -rwx - - - - - - 1 longcheng longcheng 48 8月 5 16:38 file1   
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2   
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2hard   
+$ln –s file1 file1soft   
+$ls -il   
+13058 -rwx - - - - - - 1 longcheng longcheng 48 8月 5 16:38 file1   
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2   
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2hard   
+13061 lrwxrwxrwx 1 longcheng longcheng 5 8月 5 16:58 file1soft->file1   
+$ ls -il
+13058 -rwx - - - - - - 1 longcheng longcheng 48 8月 5 16:38 file1
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2hard
+$ln –s file1 file1soft
+$ls -il
+13058 -rwx - - - - - - 1 longcheng longcheng 48 8月 5 16:38 file1
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2
+13059 -rwx - - - - - - 2 longcheng longcheng 57 8月 5 16:40 file2hard
+13061 lrwxrwxrwx 1 longcheng longcheng 5 8月 5 16:58 file1soft->file1 
+ 
+
+软链接与硬链接，区别不仅仅是在概念上，在实现上也是不同的。区别：硬链接原文件＆链接文件公用一个inode号，说明他们是同一个文件，而软链接原文件＆链接文件拥有不同的inode号，表明他们是两个不同的文件；在文件属性上软链接明确写出了是链接文件，而硬链接没有写出来，因为在本质上硬链接文件和原文件是完全平等关系；链接数目是不一样的，软链接的链接数目不会增加；文件大小是不一样的，硬链接文件显示的大小是跟原文件是一样的，这用强调，因为是等同的嘛，而这里软链接显示的大小与原文件就不同了，file1大小是48B，而file1soft是5B，这里面的5实际上就是“file1”的大小。 
+
+总之，建立软链接就是建立了一个新文件。当访问链接文件时，系统就会发现他是个链接文件，它读取链接文件找到真正要访问的文件。
+
+缺点：
+
+因为链接文件包含有原文件的路径信息，所以当原文件从一个目录下移到其他目录中，再访问链接文件，系统就找不到了，而硬链接就没有这个缺陷，你想怎么移就怎么移；还有它要系统分配额外的空间用于建立新的索引节点和保存原文件的路径。
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/hairetz/archive/2009/05/11/4168296.aspx
