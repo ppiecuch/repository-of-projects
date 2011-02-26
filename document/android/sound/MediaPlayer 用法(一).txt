@@ -1,0 +1,268 @@
+使用SurfaceView播放视频,其实很简单,但是经常会碰见有声音没图像的问题.
+
+
+其实使用SurfaceView播放视频只需要主要下面几个地方就可以了
+
+ 
+
+1. surfaceChanged也就是Suface是否创建成功
+
+2. onPrepared 也就是MideoPlayer是否加载并准备完成
+
+3. surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);	
+
+	类型必须是SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS
+
+
+
+
+Java代码 
+package VideoTest.Test;   
+  
+import java.io.FileDescriptor;   
+  
+import android.app.Activity;   
+import android.content.res.AssetFileDescriptor;   
+import android.media.AudioManager;   
+import android.media.MediaPlayer;   
+import android.media.MediaPlayer.OnBufferingUpdateListener;   
+import android.media.MediaPlayer.OnCompletionListener;   
+import android.media.MediaPlayer.OnPreparedListener;   
+import android.os.Bundle;   
+import android.view.SurfaceHolder;   
+import android.view.SurfaceView;   
+  
+  
+public class VideoTest extends Activity implements SurfaceHolder.Callback,    
+    OnBufferingUpdateListener, OnCompletionListener, OnPreparedListener{   
+       
+    private SurfaceView surfaceView;   
+    private SurfaceHolder surfaceHolder;   
+    private MediaPlayer mediaPlayer;   
+       
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {   
+        super.onCreate(savedInstanceState);   
+           
+        this.surfaceView = new SurfaceView(this);   
+        this.surfaceHolder = this.surfaceView.getHolder();   
+        this.surfaceHolder.addCallback(this);   
+           
+        //类型必须设置成SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS   
+        this.surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);       
+        setContentView(this.surfaceView);   
+    }   
+       
+    @Override  
+    public void onDestroy() {   
+        super.onDestroy();   
+        if (this.mediaPlayer != null) {   
+            this.mediaPlayer.release();   
+            this.mediaPlayer = null;   
+        }   
+    }   
+       
+    public void PlayVideo(){   
+           
+        try {   
+            //视频文件放在 assert中   
+            AssetFileDescriptor aFD = this.getAssets().openFd("welcome.3gp");   
+            FileDescriptor fileDescriptor = aFD.getFileDescriptor();   
+            this.mediaPlayer = new MediaPlayer();   
+            this.mediaPlayer.setDataSource(fileDescriptor, aFD.getStartOffset(), aFD.getLength());   
+            aFD.close();       
+               
+            //视频放在SDCard中   
+            //File sdFile = Environment.getExternalStorageDirectory();   
+            //this.mediaPlayer = new MediaPlayer();   
+            //this.mediaPlayer.setDataSource(sdFile.getAbsoluteFile() + File.separator + "welcome.3gp");   
+               
+            //视频放在res中   
+            //this.mediaPlayer = MediaPlayer.create(this, R.raw.welcome);   
+               
+            //网上的视频,没有测试   
+            //this.mediaPlayer   
+            //  .setDataSource("http://xy2.163.com/download/down/wukong.mp3");   
+               
+            this.mediaPlayer.setDisplay(this.surfaceHolder);   
+            this.mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);   
+            //准备完成后才可以播放,另外如果文件特别大或者从网上获得的资源   
+            //会在这里等待时间过长,造成堵塞,这样的话就得用   
+            //this.mediaPlayer.prepareAsync(),然后监听是否准备完毕在开始   
+               
+            this.mediaPlayer.prepare();            
+            this.mediaPlayer.start();                  
+                   
+        } catch (Exception e) {   
+            // TODO: handle exception   
+        }   
+    }   
+       
+    @Override  
+    public void surfaceChanged(SurfaceHolder holder, int format, int width,   
+            int height) {   
+           
+    }   
+  
+    @Override  
+    public void surfaceCreated(SurfaceHolder holder) {   
+        //SurfaceCreated 创建成功才可以播放视频   
+        PlayVideo();   
+    }   
+  
+    @Override  
+    public void surfaceDestroyed(SurfaceHolder holder) {   
+           
+    }   
+       
+    //@Override   
+    public void onBufferingUpdate(MediaPlayer mp, int percent) {   
+        // TODO Auto-generated method stub   
+  
+    }   
+  
+    //@Override   
+    public void onCompletion(MediaPlayer mp) {   
+        // TODO Auto-generated method stub   
+  
+    }   
+  
+    //@Override   
+    public void onPrepared(MediaPlayer mp) {   
+        //MediaPlayer加载准备完毕才能开始播放   
+        //mp.start();   
+    }   
+       
+}  
+
+package VideoTest.Test;
+
+import java.io.FileDescriptor;
+
+import android.app.Activity;
+import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.os.Bundle;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+
+public class VideoTest extends Activity implements SurfaceHolder.Callback, 
+	OnBufferingUpdateListener, OnCompletionListener, OnPreparedListener{
+	
+	private SurfaceView surfaceView;
+	private SurfaceHolder surfaceHolder;
+	private MediaPlayer mediaPlayer;
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		this.surfaceView = new SurfaceView(this);
+		this.surfaceHolder = this.surfaceView.getHolder();
+		this.surfaceHolder.addCallback(this);
+		
+		//类型必须设置成SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS
+		this.surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);	
+		setContentView(this.surfaceView);
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (this.mediaPlayer != null) {
+			this.mediaPlayer.release();
+			this.mediaPlayer = null;
+		}
+	}
+	
+	public void PlayVideo(){
+		
+		try {
+			//视频文件放在 assert中
+			AssetFileDescriptor aFD = this.getAssets().openFd("welcome.3gp");
+			FileDescriptor fileDescriptor = aFD.getFileDescriptor();
+			this.mediaPlayer = new MediaPlayer();
+			this.mediaPlayer.setDataSource(fileDescriptor, aFD.getStartOffset(), aFD.getLength());
+			aFD.close();	
+			
+			//视频放在SDCard中
+			//File sdFile = Environment.getExternalStorageDirectory();
+			//this.mediaPlayer = new MediaPlayer();
+			//this.mediaPlayer.setDataSource(sdFile.getAbsoluteFile() + File.separator + "welcome.3gp");
+			
+			//视频放在res中
+			//this.mediaPlayer = MediaPlayer.create(this, R.raw.welcome);
+			
+			//网上的视频,没有测试
+			//this.mediaPlayer
+			//	.setDataSource("http://xy2.163.com/download/down/wukong.mp3");
+			
+			this.mediaPlayer.setDisplay(this.surfaceHolder);
+			this.mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			//准备完成后才可以播放,另外如果文件特别大或者从网上获得的资源
+			//会在这里等待时间过长,造成堵塞,这样的话就得用
+			//this.mediaPlayer.prepareAsync(),然后监听是否准备完毕在开始
+			
+			this.mediaPlayer.prepare();			
+			this.mediaPlayer.start();				
+				
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+		
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		//SurfaceCreated 创建成功才可以播放视频
+		PlayVideo();
+	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		
+	}
+	
+	//@Override
+	public void onBufferingUpdate(MediaPlayer mp, int percent) {
+		// TODO Auto-generated method stub
+
+	}
+
+	//@Override
+	public void onCompletion(MediaPlayer mp) {
+		// TODO Auto-generated method stub
+
+	}
+
+	//@Override
+	public void onPrepared(MediaPlayer mp) {
+		//MediaPlayer加载准备完毕才能开始播放
+		//mp.start();
+	}
+	
+}
+  
+ 
+
+但是,对于一些人可能会产生另一个问题就是
+
+surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+在设置成SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS类型后,无法画图了
+
+SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS的意思是创建一个"PUSH"surface,这个surface没有自己的缓冲区,没有自己的缓冲Buffer.
+
+ 
+
+http://crackren.javaeye.com/blog/789810

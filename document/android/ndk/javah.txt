@@ -2,3 +2,9 @@ D:\Development\Workspace\Android\HelloGL-C\bin>
 javah -o hellogl.h org.tinder.studio.gl.HelloGL
 
 http://www.inonit.com/cygwin/jni/helloWorld/header.html
+
+如果不是在bin目录下，如在bin目录的前一个目录helloNdk,则你这样写 
+javah -classpath heloNdk/bin com.android.ndk.jni.Jni
+
+如果是当前目录则:
+javah -classpath . com.android.ndk.jni.Jni

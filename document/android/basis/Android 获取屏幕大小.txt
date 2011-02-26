@@ -1,0 +1,13 @@
+Android 获取屏幕大小有两种方式 
+
+通过窗口管理器 WindowManager对象 
+WindowManager manage = this.getWindowManager(); 
+Display display = manage.getDefaultDisplay(); 
+int screenWidth = display.getWidth(); 
+int screenHeigth = display.getHeight(); 
+
+先得到DisplayMetrics对象，在将屏幕信息存储在DisplayMetrics对象中 
+DisplayMetrics dm = new DisplayMetrics(); 
+getWindowManager().getDefaultDisplay().getMetrics(dm); 
+int screenWidth = dm.widthPixels; 
+int screenHeigth = dm.heightPixels; 

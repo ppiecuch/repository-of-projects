@@ -1,0 +1,52 @@
+重写一个listView 然后在里面改一下触摸屏事件
+
+Java代码 
+public class CustomListView extends ListView {    
+    Context mContext;    
+    
+    public CustomListView (Context context, AttributeSet attrs){    
+        super(context, attrs);    
+        mContext = context;    
+    }    
+    
+    public boolean onTouchEvent(MotionEvent event){    
+        if (event.getRawY() < 100){    
+            Log.d("Your tag", "Allowing the touch to go to the list.");    
+            super.onTouchEvent(event);    
+            return true;    
+        } else {    
+            Log.d("Your tag", "Not allowing the touch to go to the list.");    
+            return true;    
+        }    
+    }    
+}   
+
+public class CustomListView extends ListView { 
+    Context mContext; 
+ 
+    public CustomListView (Context context, AttributeSet attrs){ 
+        super(context, attrs); 
+        mContext = context; 
+    } 
+ 
+    public boolean onTouchEvent(MotionEvent event){ 
+        if (event.getRawY() < 100){ 
+            Log.d("Your tag", "Allowing the touch to go to the list."); 
+            super.onTouchEvent(event); 
+            return true; 
+        } else { 
+            Log.d("Your tag", "Not allowing the touch to go to the list."); 
+            return true; 
+        } 
+    } 
+} 
+ 
+
+Java代码 
+<com.CustomListView xmlns:android="http://schemas.android.com/apk/res/android"    
+    android:layout_width="fill_parent"    
+    android:layout_height="fill_parent"    
+    android:background="@drawable/start_menu_background"    
+    android:cacheColorHint="#00000000"    
+    android:id="@android:id/list">    
+</com.CustomListView>   

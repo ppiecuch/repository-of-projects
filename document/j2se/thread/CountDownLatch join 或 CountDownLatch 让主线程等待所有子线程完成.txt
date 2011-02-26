@@ -1,0 +1,367 @@
+CountDownLatch join 或 CountDownLatch 让主线程等待所有子线程完成
+关键字: countdownlatch 
+用给定的计数 初始化 CountDownLatch。由于调用了 countDown() 方法，所以在当前计数到达零之前，await 方法会一直受阻塞。之后，会释放所有等待的线程，await 的所有后续调用都将立即返回。这种现象只出现一次——计数无法被重置。如果需要重置计数，请考虑使用 CyclicBarrier。 
+
+CountDownLatch 是一个通用同步工具，它有很多用途。将计数 1 初始化的 CountDownLatch 用作一个简单的开/关锁存器，或入口：在通过调用 countDown() 的线程打开入口前，所有调用 await 的线程都一直在入口处等待。用 N 初始化的 CountDownLatch 可以使一个线程在 N 个线程完成某项操作之前一直等待，或者使其在某项操作完成 N 次之前一直等待。 
+
+CountDownLatch 的一个有用特性是，它不要求调用 countDown 方法的线程等到计数到达零时才继续，而在所有线程都能通过之前，它只是阻止任何线程继续通过一个 await。 
+
+示例用法： 下面给出了两个类，其中一组 worker 线程使用了两个倒计数锁存器： 
+
+第一个类是一个启动信号，在 driver 为继续执行 worker 做好准备之前，它会阻止所有的 worker 继续执行。 
+第二个类是一个完成信号，它允许 driver 在完成所有 worker 之前一直等待。 
+Java代码 
+class Driver { // ...   
+   void main() throws InterruptedException {   
+     CountDownLatch startSignal = new CountDownLatch(1);   
+     CountDownLatch doneSignal = new CountDownLatch(N);   
+  
+     for (int i = 0; i < N; ++i) // create and start threads   
+       new Thread(new Worker(startSignal, doneSignal)).start();   
+  
+     doSomethingElse();            // don't let run yet   
+     startSignal.countDown();      // let all threads proceed   
+     doSomethingElse();   
+     doneSignal.await();           // wait for all to finish   
+   }   
+ }   
+  
+ class Worker implements Runnable {   
+   private final CountDownLatch startSignal;   
+   private final CountDownLatch doneSignal;   
+   Worker(CountDownLatch startSignal, CountDownLatch doneSignal) {   
+      this.startSignal = startSignal;   
+      this.doneSignal = doneSignal;   
+   }   
+   public void run() {   
+      try {   
+        startSignal.await();   
+        doWork();   
+        doneSignal.countDown();   
+} catch (InterruptedException ex) {} // return;   
+   }   
+  
+   void doWork() { ... }   
+ }  
+
+class Driver { // ...
+   void main() throws InterruptedException {
+     CountDownLatch startSignal = new CountDownLatch(1);
+     CountDownLatch doneSignal = new CountDownLatch(N);
+
+     for (int i = 0; i < N; ++i) // create and start threads
+       new Thread(new Worker(startSignal, doneSignal)).start();
+
+     doSomethingElse();            // don't let run yet
+     startSignal.countDown();      // let all threads proceed
+     doSomethingElse();
+     doneSignal.await();           // wait for all to finish
+   }
+ }
+
+ class Worker implements Runnable {
+   private final CountDownLatch startSignal;
+   private final CountDownLatch doneSignal;
+   Worker(CountDownLatch startSignal, CountDownLatch doneSignal) {
+      this.startSignal = startSignal;
+      this.doneSignal = doneSignal;
+   }
+   public void run() {
+      try {
+        startSignal.await();
+        doWork();
+        doneSignal.countDown();
+} catch (InterruptedException ex) {} // return;
+   }
+
+   void doWork() { ... }
+ }
+
+另一种典型用法是，将一个问题分成 N 个部分，用执行每个部分并让锁存器倒计数的 Runnable 来描述每个部分，然后将所有 Runnable 加入到 Executor 队列。当所有的子部分完成后，协调线程就能够通过 await。（当线程必须用这种方法反复倒计数时，可改为使用 CyclicBarrier。） 
+Java代码 
+class Driver2 { // ...   
+  void main() throws InterruptedException {   
+    CountDownLatch doneSignal = new CountDownLatch(N);   
+    Executor e = ...   
+  
+    for (int i = 0; i < N; ++i) // create and start threads   
+      e.execute(new WorkerRunnable(doneSignal, i));   
+  
+    doneSignal.await();           // wait for all to finish   
+  }   
+}   
+  
+class WorkerRunnable implements Runnable {   
+  private final CountDownLatch doneSignal;   
+  private final int i;   
+  WorkerRunnable(CountDownLatch doneSignal, int i) {   
+     this.doneSignal = doneSignal;   
+     this.i = i;   
+  }   
+  public void run() {   
+     try {   
+       doWork(i);   
+       doneSignal.countDown();   
+     } catch (InterruptedException ex) {} // return;   
+  }   
+  
+  void doWork() { ... }   
+}  
+
+ class Driver2 { // ...
+   void main() throws InterruptedException {
+     CountDownLatch doneSignal = new CountDownLatch(N);
+     Executor e = ...
+
+     for (int i = 0; i < N; ++i) // create and start threads
+       e.execute(new WorkerRunnable(doneSignal, i));
+
+     doneSignal.await();           // wait for all to finish
+   }
+ }
+
+ class WorkerRunnable implements Runnable {
+   private final CountDownLatch doneSignal;
+   private final int i;
+   WorkerRunnable(CountDownLatch doneSignal, int i) {
+      this.doneSignal = doneSignal;
+      this.i = i;
+   }
+   public void run() {
+      try {
+        doWork(i);
+        doneSignal.countDown();
+      } catch (InterruptedException ex) {} // return;
+   }
+
+   void doWork() { ... }
+ }
+
+Java代码 
+  
+public class WaitAllSubThread {      
+     
+    /*int liveThreadNum;//记录运行的子线程数    
+    */     
+    int n;  //工作线程数      
+     
+    public WaitAllSubThread(int n) {      
+        this.n = n;      
+    }      
+     
+    class Worker implements Runnable {      
+     
+        String name;      
+        int sleep;      
+     
+        public Worker(String name, int sleep) {      
+            this.name = name;      
+            this.sleep = sleep;      
+        }      
+     
+        public void run() {      
+            /*upLive(); //计算此线程已经工作.    
+            */     
+            System.out.println(name+", start to work.");      
+            try {      
+                Thread.sleep(sleep);    //虚拟工作. 10s 随机时间      
+            } catch (InterruptedException e) {      
+                System.out.println(name+" interrupted.");      
+            }      
+            System.out.println(name+", end to work ["+sleep+"] sleep.");      
+            /*downLive();   //此线程工作完成    
+            */     
+        }      
+    }      
+/*  //记录线程数的同步方法.    
+    private synchronized void downLive() {    
+        liveThreadNum--;    
+    }    
+   
+    private synchronized void upLive() {    
+        liveThreadNum++;    
+    }    
+   
+    private synchronized boolean isLive() {    
+        return liveThreadNum > 0;    
+    }*/     
+     
+    public void run() {      
+        System.out.println("-------------main run start-------------");      
+        int sleepSaid = 10 * 1000;  //每个工作线程虚拟工作最大时间      
+        Random rm = new Random();      
+        for(int i=0; i<ths.length; i++) {      
+            ths[i] = new Thread(new MyTask(rm.nextInt(sleep)+1));      
+     
+            ths[i].start();      
+        }      
+     
+        for(Thread th : ths) {      
+            try {      
+                th.join();//join方式      
+            } catch (InterruptedException e) {      
+                // TODO Auto-generated catch block      
+                e.printStackTrace();      
+            }      
+        }      
+        /*//等待所有工作线程完成.    
+        while(isLive()) {    
+            try {    
+                Thread.sleep(1000); //每隔1s查看下是否所有线程完成.    
+            } catch (InterruptedException e) {    
+                System.out.println("main thread sleep interrupted.");    
+            }    
+        }*/     
+        System.out.println("---------------main run end--------------");      
+    }      
+     
+    public static void main(String[] args) {      
+        WaitAllSubThread wast = new WaitAllSubThread(10);      
+        wast.run();      
+    }      
+}    
+
+
+public class WaitAllSubThread {   
+  
+    /*int liveThreadNum;//记录运行的子线程数  
+    */  
+    int n;  //工作线程数   
+  
+    public WaitAllSubThread(int n) {   
+        this.n = n;   
+    }   
+  
+    class Worker implements Runnable {   
+  
+        String name;   
+        int sleep;   
+  
+        public Worker(String name, int sleep) {   
+            this.name = name;   
+            this.sleep = sleep;   
+        }   
+  
+        public void run() {   
+            /*upLive(); //计算此线程已经工作.  
+            */  
+            System.out.println(name+", start to work.");   
+            try {   
+                Thread.sleep(sleep);    //虚拟工作. 10s 随机时间   
+            } catch (InterruptedException e) {   
+                System.out.println(name+" interrupted.");   
+            }   
+            System.out.println(name+", end to work ["+sleep+"] sleep.");   
+            /*downLive();   //此线程工作完成  
+            */  
+        }   
+    }   
+/*  //记录线程数的同步方法.  
+    private synchronized void downLive() {  
+        liveThreadNum--;  
+    }  
+ 
+    private synchronized void upLive() {  
+        liveThreadNum++;  
+    }  
+ 
+    private synchronized boolean isLive() {  
+        return liveThreadNum > 0;  
+    }*/  
+  
+    public void run() {   
+        System.out.println("-------------main run start-------------");   
+        int sleepSaid = 10 * 1000;  //每个工作线程虚拟工作最大时间   
+        Random rm = new Random();   
+        for(int i=0; i<ths.length; i++) {   
+            ths[i] = new Thread(new MyTask(rm.nextInt(sleep)+1));   
+  
+            ths[i].start();   
+        }   
+  
+        for(Thread th : ths) {   
+            try {   
+                th.join();//join方式   
+            } catch (InterruptedException e) {   
+                // TODO Auto-generated catch block   
+                e.printStackTrace();   
+            }   
+        }   
+        /*//等待所有工作线程完成.  
+        while(isLive()) {  
+            try {  
+                Thread.sleep(1000); //每隔1s查看下是否所有线程完成.  
+            } catch (InterruptedException e) {  
+                System.out.println("main thread sleep interrupted.");  
+            }  
+        }*/  
+        System.out.println("---------------main run end--------------");   
+    }   
+  
+    public static void main(String[] args) {   
+        WaitAllSubThread wast = new WaitAllSubThread(10);   
+        wast.run();   
+    }   
+}  
+
+
+Java代码 
+  
+public class CountDownLatchUse {      
+     
+    final CountDownLatch downLatch;      
+    int n;  //工作线程数      
+     
+    public CountDownLatchUse(int n) {      
+        this.downLatch = new CountDownLatch(n);      
+        this.n = n;      
+    }      
+     
+    class Worker implements Runnable {      
+     
+        String name;      
+        int sleep;      
+     
+        public Worker(String name, int sleep) {      
+            this.name = name;      
+            this.sleep = sleep;      
+        }      
+     
+        public void run() {      
+            System.out.println(name+", start to work.");      
+            try {      
+                Thread.sleep(sleep);    //虚拟工作. 10s 随机时间      
+            } catch (InterruptedException e) {      
+                System.out.println(name+" interrupted.");      
+            }      
+            System.out.println(name+", end to work ["+sleep+"] sleep.");      
+            meDone();   //某个工作线程完成      
+        }      
+    }      
+     
+    private void meDone() {      
+        downLatch.countDown();      
+    }      
+     
+    public void run() {      
+        System.out.println("-------------main run start-------------");      
+        int sleepSaid = 10 * 1000;  //每个工作线程虚拟工作最大时间      
+        Random rm = new Random();      
+        for(int i=0; i<n; i++) {      
+            new Thread(new Worker("worker-"+i, rm.nextInt(sleepSaid)+1)).start();      
+        }      
+     
+        try {      
+            downLatch.await();  //等待所有工作线程完成.      
+        } catch (InterruptedException e) {      
+            System.out.println("main interrupted.");      
+        }      
+        System.out.println("---------------main run end--------------");      
+    }      
+     
+    public static void main(String[] args) {      
+        CountDownLatchUse mtu = new CountDownLatchUse(10);      
+        mtu.run();      
+    }      
+}  
+http://vvggsky.javaeye.com/blog/306066
