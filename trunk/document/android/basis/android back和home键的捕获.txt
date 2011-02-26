@@ -1,0 +1,135 @@
+在校准界面显示出来后，按back键或home键退出后会导致主界面点击不准。
+
+原因：校准界面create时，有如下设置：
+
+SystemProperties.set("ts.config.calibrate", "start");
+
+校准结束时，有：
+
+SystemProperties.set("ts.config.calibrate", "done");
+
+在InputDevice.java中处理触屏数据时：
+
+if (prop.equalsIgnoreCase("start")){
+
+                device.tInfo = null;
+
+            }else if (prop.equalsIgnoreCase("done")){
+
+                readCalibrate();
+
+                SystemProperties.set("ts.config.calibrate", "end");
+
+         }else{
+
+                readCalibrate();
+
+           }
+
+…
+
+}
+
+…
+
+if (device.tInfo != null) {
+
+    //上报校准后数据  
+
+} else {
+
+    //上报原始数据
+
+}
+
+可见导致主界面不准的原因是，back退出时，ts.config.calibrate仍为start，导致上报的一直是原始数据。
+
+解决办法：1、对于back键截获按键
+
+在Activity中重写onKeyDown，检测到KEYCODE_BACK时置ts.config.calibrate为break，并在InputDevice中做相应处理。
+
+ @Override
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+               Log.v(LOG_TAG, "onKeyDown: " + event.getKeyCode());
+
+           if (keyCode == KeyEvent.KEYCODE_BACK){                     
+
+                   SystemProperties.set("ts.config.calibrate", "break");
+
+                   AndroidCalibrate.this.finish();
+
+                   return true;
+
+           }
+
+           return super.onKeyDown(keyCode, event);
+
+    }
+
+ 
+
+Home键系统保留，无法通过onKeyDown监听，但可在onDestroy或onStop中处理，因为按back会进入onDestroy，按home会进入onStop，因此，对于home键客按以下方式处理：
+
+    @Override
+
+    protected void onPause() {
+
+        Log.v(LOG_TAG, "onPause: ");
+
+        SystemProperties.set("ts.config.calibrate", "break");
+
+         AndroidCalibrate.this.finish();
+
+        super.onPause();
+
+    }
+
+    
+
+对于按键截获，在网络上查阅后还有一下几种方式：
+
+1、在onCreate中对View监听（测试无法监听到，不知何故）
+
+     myview.setOnKeyListener(new OnKeyListener() {
+
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+              Log.v(LOG_TAG, "onKey: " + keyCode);
+
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+
+                    switch (keyCode) {
+
+                        case KeyEvent.KEYCODE_BACK:
+
+                            AndroidCalibrate.this.finish();
+
+                            return true;
+
+                    }
+
+                }
+
+                return false;
+
+            }
+
+        });
+
+2、适用与监听back键（未作验证）
+
+    @Override
+
+public void onBackPressed() {
+
+    …
+
+        super.onBackPressed();
+
+    }
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/tjd0227/archive/2010/05/17/5601941.aspx

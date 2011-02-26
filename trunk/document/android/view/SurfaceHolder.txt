@@ -1,0 +1,7 @@
+在通常情况下，OPhone程序中的View都是在同一个GUI线程中绘制的，该线程也是接收用户交互事件的线程（例如：按钮点击事件）。从另外的 线程修改GUI元素是不可以的，如果要迅速的更新UI显示该如何办？显然在主线程中还需要处理其他事件，不适合做这件事情，所以OPhone提供了 SurfaceView 来满足这种需求。一个SurfaceView 包装一个Surface对象(通过SurfaceHolder操作该对象)而不是Canvas对象，这就是关键所在，Surface可以在其他线程中绘 制，这对于周期性更新和要求高帧率的场景来说是很有用的，特别是在游戏开发中。Surface中包含了当前UI的原生数据(raw data)，在不同的软件和硬件条件下对这些数据的处理是不一样的，这就可以通过一些设置来加速图形的绘制，可以通过SurfaceHolder的 setType函数来设置，目前接收如下的参数：
+
+SURFACE_TYPE_NORMAL ：用RAM缓存原生数据的普通Surface
+SURFACE_TYPE_HARDWARE ：适用于DMA(Direct memory access )引擎和硬件加速的Surface
+SURFACE_TYPE_GPU ：适用于GPU加速的Surface
+SURFACE_TYPE_PUSH_BUFFERS ：表明该Surface不包含原生数 据，Surface用到的数据由其他对象提供，在Camera图像预览中就使用该类型的Surface，由Camera负责提供给预览Surface数 据，这样图像预览会比较流畅。如果在这里设置了上面三种类型则可以发现不会出现预览图像，这和Camera底层的预览机制实现有关，如果对预览有特殊要求 的可以现实PreviewCallback 接口来自己处理 。
+http://apps.hi.baidu.com/share/detail/24523790

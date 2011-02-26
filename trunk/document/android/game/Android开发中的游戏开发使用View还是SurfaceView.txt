@@ -1,0 +1,202 @@
+在Android中开发游戏，一般来说，或想写一个复杂一点的游戏，是必须用到SurfaceView来开发的。
+经过这一阵子对android的研究，我找到了在android中游戏开发的误区，不要老想着用Layout和view去实现，不要将某个游戏
+中的对象做成一个组件来处理。应该尽量想着在Canvas(画布)中画出游戏戏中的背景、人物、动画等...
+
+
+SurfaceView提供直接访问一个可画图的界面，可以控制在界面顶部的子视图层。SurfaceView是提供给需要直接画像素而不是使用
+窗体部件的应用使用的。Android图形系统中一个重要的概念和线索是surface。View及其子类（如TextView, Button）
+要画在surface上。每个surface创建一个Canvas对象（但属性时常改变），用来管理view在surface上的绘图操作，如画点画线。
+还要注意的是，使用它的时候，一般都是出现在最顶层的：The view hierarchy will take care of correctly compositing
+with the Surface any siblings of the SurfaceView that would normally appear on top of it.
+
+使用的SurfaceView的时候，一般情况下还要对其进行创建，销毁，改变时的情况进行监视，这就要用到SurfaceHolder.Callback.
+class BBatt extends SurfaceView implements SurfaceHolder.Callback {
+public void surfaceChanged(SurfaceHolder holder,int format,int width,int height){}
+//看其名知其义，在surface的大小发生改变时激发
+public void surfaceCreated(SurfaceHolder holder){}
+//同上，在创建时激发，一般在这里调用画图的线程。
+public void surfaceDestroyed(SurfaceHolder holder) {}
+//同上，销毁时激发，一般在这里将画图的线程停止、释放。
+}
+
+例子：
+
+public class BBatt extends SurfaceView implements
+SurfaceHolder.Callback, OnKeyListener {
+private BFairy bFairy;
+private DrawThread drawThread;
+public BBatt(Context context) {
+super(context);
+this.setLayoutParams(
+new ViewGroup.LayoutParams(
+Global.battlefieldWidth, Global.battlefieldHeight));
+this.getHolder().addCallback( this );
+this.setFocusable( true );
+this.setOnKeyListener( this );
+bFairy = new BFairy(this.getContext());
+}
+public void surfaceChanged(SurfaceHolder holder,
+int format,int width,int height) {
+drawThread = new DrawThread(holder);
+drawThread.start();
+}
+public void surfaceDestroyed(SurfaceHolder holder) {
+if( drawThread != null ) {
+drawThread.doStop();
+while (true) try {
+drawThread.join();
+break ;
+} catch(Exception ex) {}
+}
+}
+public boolean onKey(View view, int keyCode, KeyEvent event) {}
+}
+
+实例2:用线程画一个蓝色的长方形。
+
+package com.g3.test;
+/*
+* SurfaceView的示例程序
+* 演示其流程
+*/
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.os.Bundle;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+public class Test extends Activity {
+public void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(new MyView(this));
+}
+
+//内部类
+class MyView extends SurfaceView implements SurfaceHolder.Callback{
+
+     SurfaceHolder holder;
+public MyView(Context context) {
+super(context);
+holder = this.getHolder();//获取holder
+holder.addCallback(this);
+//setFocusable(true);
+
+}
+
+@Override
+public void surfaceChanged(SurfaceHolder holder, int format, int width,
+int height) {
+
+}
+
+@Override
+public void surfaceCreated(SurfaceHolder holder) {
+new Thread(new MyThread()).start();
+}
+
+@Override
+public void surfaceDestroyed(SurfaceHolder holder) {
+
+}
+
+//内部类的内部类
+class MyThread implements Runnable{
+
+   @Override
+public void run() {
+Canvas canvas = holder.lockCanvas(null);//获取画布
+Paint mPaint = new Paint();
+mPaint.setColor(Color.BLUE);
+
+canvas.drawRect(new RectF(40,60,80,80), mPaint);
+holder.unlockCanvasAndPost(canvas);//解锁画布，提交画好的图像
+
+}
+
+}
+
+}
+}
+
+访 问SurfaceView的底层图形是通过SurfaceHolder接口来实现的，通过getHolder()方法可以得到这个 SurfaceHolder对象。你应该实现surfaceCreated(SurfaceHolder)和 surfaceDestroyed(SurfaceHolder)方法来知道在这个Surface在窗口的显示和隐藏过程中是什么时候创建和销毁的。
+SurfaceView可以在多线程中被访问。
+注 意：一个SurfaceView只在SurfaceHolder.Callback.surfaceCreated() 和 SurfaceHolder.Callback.surfaceDestroyed()调用之间是可用的，其他时间是得不到它的Canvas对象的 （null）。
+
+我的访问过程：
+创建一个SurfaceView的子类，实现SurfaceHolder.Callback接口。
+得到这个SurfaceView的SurfaceHolder对象holder。
+holder.addCallback(callback)，也就是实现SurfaceHolder.Callback接口的类对象。
+在SurfaceHolder.Callback.surfaceCreated()调用过后holder.lockCanvas()对象就可以得到SurfaceView对象对应的Canvas对象canvas了。
+用canvas对象画图。
+画图结束后调用holder.unlockCanvasAndPost()就把图画在窗口中了。
+SurfaceView可以多线程访问，在多线程中画图。
+
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+public class MySurfaceView extends SurfaceView implements
+SurfaceHolder.Callback {
+
+
+private Context mContext;
+private SurfaceHolder mHolder;
+
+public TouchScreenAdjusterSurfaceView(Context context,) {
+super(context);
+
+mContext = context;
+
+mHolder = TouchScreenAdjusterSurfaceView.this.getHolder();
+mHolder.addCallback(TouchScreenAdjusterSurfaceView.this);
+
+this.setFocusableInTouchMode(true); // to make sure that we can get
+// touch events and key events,and
+// "setFocusable()" to make sure we
+// can get key events
+}
+
+@Override
+public void surfaceChanged(SurfaceHolder holder, int format, int width,
+int height) {
+// TODO Auto-generated method stub
+
+}
+
+@Override
+public void surfaceCreated(SurfaceHolder holder) {
+//now you can get the Canvas and draw something here
+}
+
+@Override
+public void surfaceDestroyed(SurfaceHolder holder) {
+// TODO Auto-generated method stub
+
+}
+
+
+public void drawMyShape(PointPostion ps) {
+
+mCanvas = mHolder.lockCanvas();
+
+// draw anything you like
+
+mHolder.unlockCanvasAndPost(mCanvas);
+}
+
+}
+
+
+PS:http://blog.csdn.net/sdhjob/archive/2009/12/17/5025993.aspx
+
+
+

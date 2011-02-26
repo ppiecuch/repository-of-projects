@@ -1,0 +1,180 @@
+ShelvesActivity的launchMode设为singleTask，有什么作用？
+通过设为singleTask，ShelvesActivity将永远位于栈底，并且仅仅有一个实例，此外还有一个作用就是当从ShelvesActivity启动了AddBookActivity之后，Home键返回桌面，然后点击桌面上的图标重新进入程序，不会重新回到AddBookActivity，而是回到ShelvesActivity，不会重新创建ShelvesActivity实例，而是重新开启他，调用了onRestart方法，同时会触发AddBookActivity的onDestory方法，因为ShelvesActivity要位于栈顶，那么AddBookActivity必须出栈，出栈就会触发onDestory方法。 
+
+引申： 
+
+standered模式：在这种情况下，activity接收到意图后会不断地去创建新的实例，举个例子，Activity A 自己启动自己，那么调用几次startActivity，就会产生几个Activity A的实例化对象 
+
+SingleTop模式：这种模式主要是用来避免产生多个activity的实例的，如果A 启动B，B启动B，无论启动多少次，都不会创建新的实例。 
+
+假设一个任务的堆栈由根activityA和activity B、C和位于堆栈顶部的D组成，即堆栈A-B-C-D。一个针对D类型的activity的intent抵达的时候，如果D是默认的“standard”加载模式，则创建并加载一个新的类实例，于是堆栈变为A-B-C-D-D。 然而，如果D的载入模式为“singleTop”，则现有的实例会对新intent进行处理（因为它位于堆栈顶部）而堆栈保持A-B-C-D的顺序。 
+换言之，如果新抵达的intent是针对B类型的activity，则无论B的模式是“standard”还是“singleTop” ，都会加载一个新的B的实例（因为B不位于堆栈的顶部），而堆栈的顺序变为A-B-C-D-B。 
+
+SingleInstance模式：这个还是不熟 
+
+activity的四种模式和Intent的几种Flag的作用类似
+
+AddBookActivity是如何处理Activity的声明周期控制，横竖屏和状态保存的？
+主要是靠三个方法： 
+
+onSaveInstanceState，onRetainNonConfigurationInstance，onRestoreInstanceState。 
+
+首先看看这三个方法的Api说明 
+
+  
+
+void onRestoreInstanceState(Bundle savedInstanceState) 
+
+@Override 
+
+This method is called after onStart when the activity is being re-initialized from a previously saved state, given here in state. Most implementations will simply use onCreate to restore their state, but it is sometimes convenient to do it here after all of the initialization has been done or to allow subclasses to decide whether to use your default implementation. The default implementation of this method performs a restore of any view state that had previously been frozen by onSaveInstanceState. This method is called between onStart and onPostCreate. 
+
+当当前activity从先前保存的状态重新实例化，这个方法在onStart方法调用之后调用。大部分的人在onCreate方法中恢复他们的状态，但是有时候在所有的实例化都做完或者是为了允许你的实现者去决定是否使用你自己的实现的时候，使用这个方法更方便。这个方法的默认实现是回复所有在onSaveInstanceState.方法中保存的view的状态。这个方法在onStart和onPostCreate方法之间调用。 
+
+自己的理解： 
+
+对于这个方法的调用有个前提，一个是onSaveInstanceState方法要调用，因为他要保存数据给onRestoreInstanceState方法调用，还有一个前提是onCreate方法必须要调用，这两个前提缺一不可，如果一个activity从onStop------》onRestart-------》onStart，这样是不会调用这个方法的，举个例子： 
+
+从FirstActivity跳转到SecondActivity，Home键回到桌面，重新点击程序快捷方式，进入程序，又回到了SecondActivity 
+
+FirstActivity: task: 27 activity: com.test.launchmode.ui.FirstActivity@43b8fe50 
+
+SecondActivity: task: 27 activity: com.test.launchmode.ui.SecondActivity@43b792e0 
+
+SecondActivity: onStart is working 
+
+SecondActivity: onResume is working 
+
+//***********home键 
+
+SecondActivity: onSaveInstanceState is working 
+
+SecondActivity: onPause is working 
+
+SecondActivity: onStop is working 
+
+//*************重新回来 
+
+SecondActivity: onRestart is working 
+
+SecondActivity: onStart is working 
+
+SecondActivity: onResume is working 
+
+再举个例子： 
+
+从FirstActivity跳转到SecondActivity，然后接到一个电话，电话结束，又回到SecondActivity 
+
+SecondActivity: task: 26activity: com.test.launchmode.ui.SecondActivity@43b8f4f8 
+
+SecondActivity: onStart is working 
+
+SecondActivity: onResume is working 
+
+//**********incoming a call 
+
+SecondActivity: onSaveInstanceState is working 
+
+SecondActivity: onPause is working 
+
+SecondActivity: onStop is working 
+
+//*********incoming end 
+
+SecondActivity: onRestart is working 
+
+SecondActivity: onStart is working 
+
+SecondActivity: onResume is working 
+
+这也没有触发 
+
+估计：在上述两个条件下，再加一个条件，onDestory方法也触发了的时候，才会触发onRestoreInstanceState方法。 
+
+Void onSaveInstanceState(Bundle outState) 
+
+@Override 
+
+Called to retrieve per-instance state from an activity before being killed so that the state can be restored in onCreate or onRestoreInstanceState (the Bundle populated(组装) by this method will be passed to both). 
+
+在activity被杀死前这个方法被调用来获得所有的的状态信息保存起来，以便于以后在onCreate和onRestoreInstanceState方法中恢复 
+
+This method is called before an activity may be killed so that when it comes back some time in the future it can restore its state. For example, if activity B is launched in front of activity A(当activity B启动后，在 栈中位于栈顶), and at some point activity A is killed to reclaim(回收) resources, activity A will have a chance to save the current state of its user interface via this method so that when the user returns to activity A, the state of the user interface can be restored via onCreate or onRestoreInstanceState. 
+
+Do not confuse(混乱，迷惑) this method with activity lifecycle callbacks such as onPause, which is always called when an activity is being placed in the background or on its way to destruction(销毁), or onStop which is called before destruction. One example of when onPause and onStop is called and not this method is when a user navigates back from activity B to activity A: there is no need to call onSaveInstanceState on B because that particular instance will never be restored, so the system avoids calling it. An example when onPause is called and not onSaveInstanceState is when activity B is launched in front of activity A: the system may avoid calling onSaveInstanceState on activity A if it isn't killed during the lifetime of B since the state of the user interface of A will stay intact(完整的). 
+
+The default implementation takes care of most of the UI per-instance state for you by calling android.view.View.onSaveInstanceState() on each view in the hierarchy that has an id, and by saving the id of the currently focused view (all of which is restored by the default implementation of onRestoreInstanceState). If you override this method to save additional information not captured by each individual view, you will likely want to call through to the default implementation, otherwise be prepared to save all of the state of each view yourself. 
+
+If called, this method will occur before onStop. There are no guarantees(保证) about whether it will occur before or after onPause. 
+
+onRetainNonConfigurationInstance() 
+
+@Override 
+
+Called by the system, as part of destroying an activity due to a configuration change, when it is known that a new instance will immediately be created for the new configuration. You can return any object you like here, including the activity instance itself, which can later be retrieved by calling getLastNonConfigurationInstance() in the new activity instance. 
+
+This function is called purely(只不过) as an optimization(最佳化), and you must not rely on it being called. When it is called, a number of guarantees will be made to help optimize configuration switching: 
+
+The function will be called between onStop and onDestroy. 
+A new instance of the activity will always be immediately created after this one's onDestroy() is called. 
+The object you return here will always be available from the getLastNonConfigurationInstance() method of the following activity instance as described there. 
+These guarantees are designed so that an activity can use this API to propagate(传送) extensive (大量的)state from the old to new activity instance, from loaded bitmaps, to network connections, to evenly actively running threads. Note that you should not propagate any data that may change based on the configuration, including any data loaded from resources such as strings, layouts, or drawables. 
+
+Overrides: onRetainNonConfigurationInstance() in Activity 
+
+Returns: 
+
+Return any Object holding the desired state to propagate to the next activity instance. 
+
+个人理解： 
+
+当一个activity进行横竖屏切换的时候，这个方法会触发，并且在onSaveinstance方法之后触发  
+
+如何捕获手机上的Home键？
+通过实验，在activity里无法捕获Home事件，为什么？让我们来看看为什么不能捕获，看看onKeydown方法的文档说明：Called when a key was pressed down and not handled by any of the views inside of the activity.也就是说肯定是Activity中的某个View消费了这个Home事件，是谁消费了Home事件呢，原来是PhoneWindow，在PhoneWindowManager里我们可以看到对HOME 
+
+事件的处理： 
+
+void launchHomeFromHotKey() { 
+
+if (mKeyguardMediator.isShowing()) { 
+
+// don't launch home if keyguard showing 
+
+} else if (mKeyguardMediator.isInputRestricted()) { 
+
+// when in keyguard restricted mode, must first verify unlock 
+
+// before launching home 
+
+mKeyguardMediator.verifyUnlock(new OnKeyguardExitResult() { 
+
+public void onKeyguardExitResult(boolean success) { 
+
+if (success) { 
+
+mContext.startActivity(mHomeIntent); 
+
+sendCloseSystemWindows(); 
+
+} 
+
+} 
+
+}); 
+
+} else { 
+
+// no keyguard stuff to worry about, just launch home! 
+
+mContext.startActivity(mHomeIntent); 
+
+sendCloseSystemWindows(); 
+
+} 
+
+} 
+
+红色标记的两行代码最重要，有很多种Home事件，这里只列举了一种。
+
+http://www.cnblogs.com/transmuse/archive/2010/12/15/1907192.html

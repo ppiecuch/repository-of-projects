@@ -1,0 +1,183 @@
+用几天的时间我研究了一下android的框架，android是这么样开发2D游戏的。
+             我们先来讲GameCanvas(游戏画布) 。这是一个类，你可以这样理解它-----我们游戏的画布。开发游戏的时候大部分的工作都会在这里面完成的 。那么在android 里面 怎样构成我们的GameCanvas。这里我用了
+SurfaceView 类，使用这个类的原因是它比较适合游戏画布。然后我们再继承SurfaceHolder.Callback 这个接口
+              这样我们的GameCanvas类要实现其几个方法：
+             1 public void surfaceCreated(SurfaceHolder holder) {}
+             2 public void surfaceDestroyed(SurfaceHolder holder) {}
+             3 public void surfaceChanged(SurfaceHolder holder, int format,int width,int height) {}
+
+             我们在surfaceCreated 方法里面初始化游戏，在surfaceChanged 处理一下当手机碰到外界情况的事件，
+surfaceDestroyed 方法里面我们写释放资源等。
+这样每个方法里面都会有个参数 SurfaceHolder 这个是什么呢？？暂且先不讨论它，后面你会明白他有什么用了，
+声明一个SurfaceHolder  handle对象，然后在surfaceCreated（）方法里面初始化它 如下：handle = this.getHolder(); 
+handle.addCallback(this);
+              那在哪里绘制我们的游戏画布呢？讲到关键的地方了，这里我们重载view 的 public void draw(Canvas canvas){}方法，
+              我们就在这个方法里面绘制我们的游戏。
+
+java代码：
+public class GameCanvas extends SurfaceView implements SurfaceHolder.Callback
+
+{
+
+private SurfaceHolder handle = null;
+
+
+
+private int width = 0;
+
+
+
+private int height = 0;
+
+
+
+public GameCanvas(){
+
+
+
+handle = this.getHolder(); 
+
+handle.addCallback(this);
+
+
+
+}
+
+
+
+public void initGame(){
+
+
+
+width = this.getWidth();
+
+height = this.getHeight();
+
+{
+
+
+
+public void gameLogic(){
+
+
+
+
+
+}
+
+
+
+public void gameInput(){
+
+
+
+}
+
+
+
+@Override
+
+public void draw(Canvas canvas){
+
+
+
+Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+paint.setColor(Colcor.Black);
+
+
+
+canvas.drawRect(new Rect(int startX,int StartY,int endX,int endY));//此处的Rect跟java里面的有点区别
+
+//,不过差不多 自己写坐标就行 0，0，320，440
+
+
+
+//上面的语句是将屏幕绘制成黑色
+
+
+
+paint.setColor(Cloor.red)；
+
+canvas.drawText("Andoid GameCanvas",100,100,paint)；
+
+
+
+//
+
+}
+
+
+
+//
+
+@Override
+
+public void surfaceCreated(SurfaceHolder holder) {
+
+
+
+this. initGame();
+
+new Thread(this){
+
+public void run(){
+
+
+
+while(true)
+
+{
+
+long start=System.currentTimeMillis();
+
+Canvas canvas = GameCanvas.this.handle.lockCanvas(null);
+
+//logic
+
+this.draw(canvas);
+
+canvas.save();
+
+//input()
+
+GameCanvas.this.handle.unlockCanvasAndPost(canvas);
+
+long end=System.currentTimeMillis();
+
+if(100>end-start){
+
+try{Thread.sleep(100-(end-start));}catch(Exception e){}
+
+}
+
+}
+
+}
+
+}.start();
+
+
+
+}
+
+@Override
+
+public void surfaceDestroyed(SurfaceHolder holder) {
+
+
+
+}
+
+@Override
+
+public void surfaceChanged(SurfaceHolder holder, int format, int width,int height){
+
+
+
+}
+
+
+
+}
+http://www.eoeandroid.com/thread-58894-1-1.html

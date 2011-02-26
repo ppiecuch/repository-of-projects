@@ -1,3 +1,10 @@
+异常:error C2039: “ReadHuge”: 不是“CFile”的成员 
+解决:这是CFile的函数，不过ReadHuge（）函数已被Read（）函数代替。
+还有就是WriteHuge（）函数已被Write（）函数代替。
+
+
+
+
 异常:CString 没有找到接受 const GLubyte * 类型的右操作数的运算符
 解决:
 将oglinfo += ::glGetString( GL_VENDOR );

@@ -1,0 +1,24 @@
+我有一个第三方的jar，自己写了5个纯粹java的程序A,B,C,D,E，都是算法和操作存储卡相关的，A调用B,B调用C,C调用D,D调用E，E调用第三方的jar,都是在eclipse里面通过 configure build path/add external jar的方式加入了需要调用的jar包，编译通过。生成了A,B,C,D,E 共5个jar.然后我写了一个测试程序，测试这5个jar的功能，我做了一个android app,然后通过 configure build path/add external jar加入了A,B,C,D,E等5个jar,以及那个第3方的jar.编译通过生成了APK,安装这个APK,执行对A的功能测试的时候，提示：
+12-29 14:42:50.337 E/dalvikvm( 1431): Could not find class 'com.SD.SCObj.
+SCObj', referenced from method com.test.test.
+感觉是第三方的jar没有打到apk里面，所以A调用第三方jar里面的东西会出错。
+ google了一下,有人说，按照这个办法试了下还是不行，安装之后刚运行就出错，而不是先前那样执行A的功能才出错，而且按照先前做法生成的apk是70多K,按照下面方法生成的apk只有30多K。像这种多个jar相互调用，android应该怎么做？
+右键工程，
+
+  Build path,
+
+  java build path,选择libraries
+
+  在右边的按钮中点击“Add Library”
+
+  选择“User library”,点击“下一步”
+
+  点击“User librarys”按钮
+
+  在出现的界面中点击“New..”按钮
+
+  在弹出的界面中随便起一个名字，点击“确定”
+
+  点击“Add jars”按钮选择第三方jar包，点击“确定”完成操作。
+
+  这样的话该jar包会被一起打包到apk中，问题也就解决了!

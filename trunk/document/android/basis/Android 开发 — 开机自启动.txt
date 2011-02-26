@@ -1,0 +1,494 @@
+  Android 开发 — 开机自启动 收藏 
+Android 的开机自启动是通过捕捉开机结束的广播来实现的，手机的启动完后会给出一个BroadcastReceiver，在自己的程序中捕捉即可。
+
+　　AutoBootReceiver.Java 文件：
+
+　　Java代码
+
+　　1. package com.ldq.auto.boot;
+
+　　2.
+
+　　3. import android.content.BroadcastReceiver;
+
+　　4. import android.content.Context;
+
+　　5. import android.content.Intent;
+
+　　6. import android.util.Log;
+
+　　7.
+
+　　8. public class AutoBootReceiver extends BroadcastReceiver {
+
+　　9.
+
+　　10. @Override
+
+　　11. public void onReceive(Context context, Intent intent) {
+
+　　12. // TODO Auto-generated method stub
+
+　　13. if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+
+　　14. Log.i("------", "AutoBootReceiver auto boot");
+
+　　15. Intent in = new Intent(context, ExAutoBoot.class);
+
+　　16. in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//添加Flags必不可少，否则报错
+
+　　17. context.startActivity(in);
+
+　　18. }
+
+　　19. }
+
+　　20. }
+
+　　package com.ldq.auto.boot;
+
+　　import android.content.BroadcastReceiver;
+
+　　import android.content.Context;
+
+　　import android.content.Intent;
+
+　　import android.util.Log;
+
+　　public class AutoBootReceiver extends BroadcastReceiver {
+
+　　@Override
+
+　　public void onReceive(Context context, Intent intent) {
+
+　　// TODO Auto-generated method stub
+
+　　if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+
+　　Log.i("------", "AutoBootReceiver auto boot");
+
+　　Intent in = new Intent(context, ExAutoBoot.class);
+
+　　in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//添加Flags必不可少，否则报错
+
+　　context.startActivity(in);
+
+　　}
+
+　　}
+
+　　}
+
+　　ExAutoBoot.java 文件：
+
+　　Java代码
+
+　　1. package com.ldq.auto.boot;
+
+　　2.
+
+　　3. import android.app.Activity;　4. import android.os.Bundle;
+
+　　5. import android.util.Log;
+
+　　6.
+
+　　7. public class ExAutoBoot extends Activity {
+
+　　8. /** Called when the activity is first created. */
+
+　　9. @Override
+
+　　10. public void onCreate(Bundle savedInstanceState) {
+
+　　11. super.onCreate(savedInstanceState);
+
+　　12. setContentView(R.layout.main);
+
+　　13. Log.i("------","ExAutoBoot auto boot");
+
+　　14. }
+
+　　15. }
+
+　　package com.ldq.auto.boot;
+
+　　import android.app.Activity;
+
+　　import android.os.Bundle;
+
+　　import android.util.Log;
+
+　　public class ExAutoBoot extends Activity {
+
+　　/** Called when the activity is first created. */
+
+　　@Override
+
+　　public void onCreate(Bundle savedInstanceState) {
+
+　　super.onCreate(savedInstanceState);
+
+　　setContentView(R.layout.main);
+
+　　Log.i("------","ExAutoBoot auto boot");
+
+　　}
+
+　　}
+
+　　AndroidManifest.xml 文件：
+
+　　Java代码
+
+　　1. < ?xml version="1.0" encoding="utf-8"?>
+
+　　2. < manifest xmlns:android="http://schemas.android.com/apk/res/android"
+
+　　3. package="com.ldq.auto.boot" android:versionCode="1"
+
+　　4. android:versionName="1.0">
+
+　　5. < application android:icon="@drawable/icon" android:label="@string/app_name">
+
+　　6. < activity android:name=".ExAutoBoot" android:label="@string/app_name">
+
+　　7. < intent-filter>
+
+　　8. < action android:name="android.intent.action.MAIN" />
+
+　　9. < category android:name="android.intent.category.LAUNCHER" />
+
+　　10. < /intent-filter>
+
+　　11. < /activity>
+
+　　12. < receiver android:name="AutoBootReceiver">
+
+　　13. < intent-filter>
+
+　　14. < action android:name="android.intent.action.BOOT_COMPLETED">< /action>
+
+　　15. < /intent-filter>
+
+　　16. < /receiver>
+
+　　17. < /application>
+
+　　18. < uses-SDK android:minSdkVersion="4" />
+
+　　19. < uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED">< /uses-permission>
+
+　　20. < /manifest>
+
+　　< ?xml version="1.0" encoding="utf-8"?>
+
+　　< manifest xmlns:android="http://schemas.android.com/apk/res/android"
+
+　　package="com.ldq.auto.boot" android:versionCode="1"
+
+　　android:versionName="1.0">
+
+　　< application android:icon="@drawable/icon" android:label="@string/app_name">
+
+　　< activity android:name=".ExAutoBoot" android:label="@string/app_name">
+
+　　< intent-filter>
+
+　　< action android:name="android.intent.action.MAIN" />
+
+　　< category android:name="android.intent.category.LAUNCHER" />
+
+　　< /intent-filter>
+
+　　< /activity>
+
+　　< receiver android:name="AutoBootReceiver">
+
+　　< intent-filter>
+
+　　< action android:name="android.intent.action.BOOT_COMPLETED">< /action>
+
+　　< /intent-filter>
+
+　　< /receiver>
+
+　　< /application>
+
+　　< uses-sdk android:minSdkVersion="4" />
+
+　　< uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED">< /uses-permission>
+
+　　< /manifest>
+
+　　教你开启自启动程序! 在电脑的操作系统中都能在电脑开机后自启动一些程序，在Android平台也是可以的，那么我们如何才能做到这样的效果呢。
+
+　　1、需要BroadcastReceiver
+
+　　2、使用interfilter中的action：android.intent.action.BOOT_COMPLETED //当启动手机系统启动完成后就启动此Receiver
+
+　　功能：当手机系统启动完成后，直接启动某个程序或者Activity，这里直接启动某个程序
+
+　　一下是代码分析：
+
+　　AndroidManifest.xml文件内容：　Xml代码
+
+　　1. # < ?xml version="1.0" encoding="utf-8"?>
+
+　　2. # < manifest xmlns:android="http://schemas.android.com/apk/res/android"
+
+　　3. # package="cc.androidos.sms"
+
+　　4. # android:versionCode="1"
+
+　　5. # android:versionName="1.0.0">
+
+　　6. # < application android:icon="@drawable/icon" android:label="@string/app_name">
+
+　　7. # < activity android:name=".StartUp"
+
+　　8. # android:label="@string/app_name">
+
+　　9. # < intent-filter>
+
+　　10. # < action android:name="android.intent.action.MAIN" />
+
+　　11. # < category android:name="android.intent.category.LAUNCHER" />
+
+　　12. # < /intent-filter>
+
+　　13. # < /activity>
+
+　　14. #
+
+　　15. # < receiver android:name=".BootReceiver">
+
+　　16. # < intent-filter>
+
+　　17. # < action android:name="android.intent.action.BOOT_COMPLETED" />
+
+　　18. # < /intent-filter>
+
+　　19. # < /receiver>
+
+　　20. # < service android:name=".StartService"/>
+
+　　21. # < /application>
+
+　　22. # < /manifest>
+
+　　# < ?xml version="1.0" encoding="utf-8"?>
+
+　　# < manifest xmlns:android="http://schemas.android.com/apk/res/android"
+
+　　# package="cc.androidos.sms"
+
+　　# android:versionCode="1"
+
+　　# android:versionName="1.0.0">
+
+　　# < application android:icon="@drawable/icon" android:label="@string/app_name">
+
+　　# < activity android:name=".StartUp"
+
+　　# android:label="@string/app_name">
+
+　　# < intent-filter>
+
+　　# < action android:name="android.intent.action.MAIN" />
+
+　　# < category android:name="android.intent.category.LAUNCHER" />
+
+　　# < /intent-filter>
+
+　　# < /activity>
+
+　　#
+
+　　# < receiver android:name=".BootReceiver"># < intent-filter>
+
+　　# < action android:name="android.intent.action.BOOT_COMPLETED" />
+
+　　# < /intent-filter>
+
+　　# < /receiver>
+
+　　# < service android:name=".StartService"/>
+
+　　# < /application>
+
+　　# < /manifest>
+
+　　要启动的Activity类：
+
+　　Java代码
+
+　　1. # package cc.androidos.sms;
+
+　　2. # import android.app.Activity;
+
+　　3. # import android.os.Bundle;
+
+　　4. # public class StartUp extends Activity {
+
+　　5. # /** Called when the activity is first created. */
+
+　　6. # @Override
+
+　　7. # public void onCreate(Bundle savedInstanceState) {
+
+　　8. # super.onCreate(savedInstanceState);
+
+　　9. # setContentView(R.layout.main);
+
+　　10. # }
+
+　　11. # }
+
+　　# package cc.androidos.sms;
+
+　　# import android.app.Activity;
+
+　　# import android.os.Bundle;
+
+　　# public class StartUp extends Activity {
+
+　　# /** Called when the activity is first created. */
+
+　　# @Override
+
+　　# public void onCreate(Bundle savedInstanceState) {
+
+　　# super.onCreate(savedInstanceState);
+
+　　# setContentView(R.layout.main);
+
+　　# }
+
+　　# }
+
+　　Receiver类：系统启动后接受信息的类
+
+　　Java代码
+
+　　1. # package cc.androidos.sms;
+
+　　2. # import android.app.Activity;
+
+　　3. # import android.app.PendingIntent;
+
+　　4. # import android.content.BroadcastReceiver;
+
+　　5. # import android.content.Context;
+
+　　6. # import android.content.Intent;
+
+　　7. # import android.NET.Uri;
+
+　　8. # import android.util.Log;
+
+　　9. # public class BootReceiver extends BroadcastReceiver
+
+　　10. # {
+
+　　11. # @Override
+
+　　12. # public void onReceive( Context context, Intent intent )
+
+　　13. # {
+
+　　14. # if(intent.getAction().equals( Intent.ACTION_BOOT_COMPLETED )){　15. # Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　16. # Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　17. # Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　18. # Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　19. # Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　20. # Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　21. # Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　22. # Intent i = new Intent(context,StartUp.class);
+
+　　23. # i.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+
+　　24. # //使用Receiver直接启动Activity时候需要加入此flag，否则系统会出现异常
+
+　　25. # context.startActivity( i );
+
+　　26. #
+
+　　27. # }
+
+　　28. # }
+
+　　29. # }
+
+　　# package cc.androidos.sms;
+
+　　# import android.app.Activity;
+
+　　# import android.app.PendingIntent;
+
+　　# import android.content.BroadcastReceiver;
+
+　　# import android.content.Context;
+
+　　# import android.content.Intent;
+
+　　# import android.net.Uri;
+
+　　# import android.util.Log;
+
+　　# public class BootReceiver extends BroadcastReceiver
+
+# {
+
+　　# @Override
+
+　　# public void onReceive( Context context, Intent intent )
+
+　　# {
+
+　　# if(intent.getAction().equals( Intent.ACTION_BOOT_COMPLETED )){
+
+　　# Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　# Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　# Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　# Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　# Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　# Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　# Log.d( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", "boot start................" );
+
+　　# Intent i = new Intent(context,StartUp.class);
+
+　　# i.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+
+　　# //使用Receiver直接启动Activity时候需要加入此flag，否则系统会出现异常
+
+　　# context.startActivity( i );
+
+　　#
+
+　　# }
+
+　　# }
+
+　　# }
+
+　　第一个运行完成后，关闭手机模拟器或者手机，然后启动手机操作系统，启动完成后StartUp Activity会自动运行。
+
+　　流程： 系统启动完成-------》通过AndroidManifest.xml了解到系统启动完成后要启动BootReceiver -------》BootReceiver 启动StartUp Activity。
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/linshutao/archive/2011/01/27/6165835.aspx

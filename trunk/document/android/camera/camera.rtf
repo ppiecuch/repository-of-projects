@@ -1,0 +1,59 @@
+{\rtf1\ansi\ansicpg936\deff0\deflang1033\deflangfe2052{\fonttbl{\f0\fmodern\fprq6\fcharset134 \'cb\'ce\'cc\'e5;}{\f1\fnil\fprq2\fcharset134 \'cb\'ce\'cc\'e5;}}
+{\colortbl ;\red0\green255\blue0;\red0\green0\blue255;\red255\green0\blue255;\red128\green0\blue0;}
+{\*\generator Msftedit 5.41.21.2509;}\viewkind4\uc1\pard\lang2052\f0\fs21\'a1\'be\'b1\'ea\'bc\'c7\'ba\'ac\'d2\'e5\'a1\'bf\'a3\'ba\par
+\cf1\kerning2\f1\'a8\'80\'a3\'ba\'d2\'c9\'ce\'ca\par
+\cf2\'a8\'80\'a3\'ba\'b0\'e6\'b1\'be\'c7\'f8\'b1\'f0\cf3\par
+\cf4\b\'a8\'80\'a3\'ba\'ba\'af\'ca\'fd\cf0\kerning0\b0\f0\par
+\b\par
+publicclassCameraextendsObject\b0\par
+\par
+\pard\fi426\'b1\'be\'c0\'e0\'d6\'f7\'d2\'aa\'d3\'c3\'d3\'da\'ba\'cdcameraservice\'bd\'a8\'c1\'a2\'bc\'b0\'b6\'cf\'bf\'aa\'c1\'ac\'bd\'d3\'a1\'a2\'c9\'e8\'d6\'c3\'c5\'c4\'d5\'d5\'b9\'a6\'c4\'dc\'a1\'a2\'bf\'aa\'c6\'f4\'bc\'b0\'b9\'d8\'b1\'d5\'d4\'a4\'c0\'c0\'a1\'a2\'c5\'c4\'d5\'d5\'a1\'a2\'bc\'ec\'cb\'f7frames\'b1\'e0\'c2\'eb\'b3\'c9video\'a1\'a3\'b1\'be\'c0\'e0\'c3\'bb\'d3\'d0\'c4\'ac\'c8\'cf\'b5\'c4\'b9\'b9\'d4\'ec\'ba\'af\'ca\'fd\'a3\'ac\'c4\'e3\'bf\'c9\'d2\'d4\'cd\'a8\'b9\'fdopen()\'ba\'af\'ca\'fd\'bb\'f1\'b5\'c3\'d2\'bb\'b8\'f6Camera\'b6\'d4\'cf\'f3\'a1\'a3\par
+\'ca\'d7\'cf\'c8\'d2\'aa\'ca\'b9\'d3\'c3\'d3\'b2\'bc\'fecamera\'a3\'ac\'b1\'d8\'d0\'eb\'d2\'aa\'d4\'damanifest\'ce\'c4\'bc\'fe\'d6\'d0\'c9\'f9\'c3\'f7\'ca\'b9\'d3\'c3\'c8\'a8\'cf\'de\'a3\'ac\'c0\'fd\'c8\'e7\'d3\'a6\'d3\'c3\'d6\'d0\'d2\'aa\'ca\'b9\'d3\'c3camera\'bc\'b0\'d7\'d4\'b6\'af\'b6\'d4\'bd\'b9\'b9\'a6\'c4\'dc\'a3\'ac\'c4\'c7\'c3\'b4manifest\'ce\'c4\'bc\'fe\'d6\'d0\'b0\'fc\'ba\'ac\'cf\'c2\'c1\'d0\'bc\'b8\'d0\'d0\'c9\'f9\'c3\'f7\'a3\'ba\par
+\pard\par
+<uses-permissionandroid:name="android.permission.CAMERA"/>\par
+<uses-featureandroid:name="android.hardware.camera"/>\par
+<uses-featureandroid:name="android.hardware.camera.autofocus"/>\par
+\par
+\pard\fi426\'cd\'a8\'b9\'fd\'b8\'c3\'c0\'e0\'ca\'b5\'cf\'d6\'d5\'d5\'cf\'e0\'b9\'a6\'c4\'dc\'a3\'ac\'d2\'bb\'b0\'e3\'d0\'e8\'d2\'aa\'cf\'c2\'c1\'d0\'bc\'b8\'b8\'f6\'b2\'bd\'d6\'e8:\par
+1\'a1\'a2\'cd\'a8\'b9\'fd\'ba\'af\'ca\'fdopen(int)\'bb\'f1\'b5\'c3\'d2\'bb\'b8\'f6camera\'b6\'d4\'cf\'f3\par
+2\'a1\'a2\'cd\'a8\'b9\'fd\'ba\'af\'ca\'fdgetParameters()\'b5\'c3\'b5\'bd\'d2\'bb\'b8\'f6\'d2\'d1\'d3\'d0\'b5\'c4(\'c4\'ac\'c8\'cf\'b5\'c4)\'c9\'e8\'d6\'c3\par
+3\'a1\'a2\'c8\'e7\'b9\'fb\'d3\'d0\'d0\'e8\'d2\'aa\'a3\'ac\'bf\'c9\'d2\'d4\'cd\'a8\'b9\'fd\'ba\'af\'ca\'fdsetParameters(Camera.Parameters)\'a3\'ac\'d0\'de\'b8\'c4\'b5\'da\'b6\'fe\'b2\'bd\'b7\'b5\'bb\'d8\'b5\'c4Camera.Parameters\'b6\'d4\'cf\'f3.\par
+4\'a1\'a2\'cd\'a8\'b9\'fd\'ba\'af\'ca\'fdsetDisplayOrientation(int)\'c0\'b4\'c9\'e8\'d6\'c3\'c6\'c1\'c4\'bb\'b5\'c4\'cb\'ae\'c6\'bd\'bb\'f2\'b4\'b9\'d6\'b1\par
+5\'a1\'a2\'d6\'d8\'d2\'aa\'a3\'ba\'b4\'ab\'b5\'dd\'d2\'bb\'b8\'f6\'d2\'d1\'be\'ad\'b3\'f5\'ca\'bc\'bb\'af\'ba\'c3\'c1\'cb\'b5\'c4SurfaceHolder\'b6\'d4\'cf\'f3\'b8\'f8\'ba\'af\'ca\'fdsetPreviewDisplay(SurfaceHolder)\'a3\'ac\'c8\'e7\'b9\'fb\'c3\'bb\'d3\'d0surface\'a3\'accarema\'ca\'c7\'ce\'de\'b7\'a8\'b4\'f2\'bf\'aa\'d4\'a4\'c0\'c0\'b9\'a6\'c4\'dc\'a1\'a3\par
+6\'a1\'a2\'d6\'d8\'d2\'aa:\'b5\'f7\'d3\'c3\'ba\'af\'ca\'fdstartPreview()\'b8\'fc\'d0\'c2\'d4\'a4\'c0\'c0\'b5\'c4surface\'a3\'ac\'bf\'aa\'ca\'bc\'d5\'d5\'cf\'e0\'d6\'ae\'c7\'b0\'b1\'d8\'d0\'eb\'bf\'aa\'c6\'f4\'d4\'a4\'c0\'c0\'b9\'a6\'c4\'dc\par
+7\'a1\'a2\'cd\'a8\'b9\'fd\'ba\'af\'ca\'fdltakePicture(Camera.ShutterCallback,Camera.PictureCallback,Camera.PictureCallback,Camera.PictureCallback)\'ca\'b5\'cf\'d6\'d5\'d5\'cf\'e0\'b9\'a6\'c4\'dc.\'d4\'da\'bb\'d8\'b5\'f7\'ba\'af\'ca\'fd\'d6\'d0\'bf\'c9\'d2\'d4\'b5\'c3\'b5\'bd\'ca\'b5\'bc\'ca\'b5\'c4\'cf\'e0\'c6\'ac\'ca\'fd\'be\'dd.\par
+8\'a1\'a2\'c3\'bf\'cd\'ea\'b3\'c9\'d2\'bb\'b4\'ce\'d5\'d5\'cf\'e0\'a3\'ac\'d4\'a4\'c0\'c0\'b9\'a6\'c4\'dc\'bb\'e1\'cd\'a3\'d6\'b9\'a1\'a3\'c8\'e7\'b9\'fb\'d2\'aa\'d5\'d5\'b8\'fc\'b6\'e0\'cf\'f1\'a3\'ac\'d0\'e8\'d2\'aa\'d4\'d9\'b4\'ce\'b5\'f7\'d3\'c3startPreview().\par
+9\'a1\'a2\'b5\'f7\'d3\'c3stopPreview()\'cd\'a3\'d6\'b9\'d4\'a4\'c0\'c0\'a1\'a3\par
+10\'a1\'a2\'d6\'d8\'d2\'aa:\'b5\'f7\'d3\'c3release()\'d2\'d4\'b1\'e3\'c6\'e4\'cb\'fb\'d3\'a6\'d3\'c3\'bf\'c9\'d2\'d4\'b7\'bd\'b1\'e3\'ca\'b9\'d3\'c3camera.\'ca\'b9\'d3\'c3camera\'b5\'c4\'d3\'a6\'d3\'c3\'b3\'cc\'d0\'f2\'d3\'a6\'b8\'c3\'d4\'daonPause()(\'b2\'a2\'c7\'d2\'d4\'daonResume()\'d6\'d0\'d6\'d8\'d0\'c2re-open()),\'c1\'a2\'bc\'b4\'ca\'cd\'b7\'c5camera.\par
+\par
+android.hardware.Camera.ErrorCallback:\'c9\'e3\'cf\'f1\'cd\'b7\'b3\'f6\'b4\'ed\'b5\'c4\'ca\'b1\'ba\'f2\'b5\'f7\'d3\'c3\'a3\'ac\'d5\'e2\'b8\'f6\'bd\'d3\'bf\'da\'be\'df\'d3\'d0\'d2\'bb\'b8\'f6void onError(int error,Camera camera)\'ba\'af\'ca\'fd;\'c6\'e4\'d6\'d0\'a3\'ac\'c7\'b0\'d5\'df\'b1\'ed\'ca\'be\'ca\'fd\'be\'dd\'c0\'e0\'d0\'cd\'a3\'ac\'c8\'a1\'d6\'b5\'ca\'c7Camera\'c0\'e0\'d6\'d0\'b5\'c4\'b3\'a3\'c1\'bfCAMERA_ERROR_UNKNOWN\'bb\'f2\'d5\'df\'ca\'c7 CAMERA_ERROR_SERVICE_DIED\'a3\'bb\par
+\'c7\'b0\'d5\'df\'ca\'c7\'b2\'bb\'c3\'f7\'b4\'ed\'ce\'f3\'a3\'ac\'ba\'f3\'d5\'df\'ca\'c7\'b1\'ed\'ca\'be\'b7\'fe\'ce\'f1\'d2\'d1\'be\'ad\'b9\'d8\'b1\'d5\'a3\'ac\'d4\'da\'d5\'e2\'d6\'d6\'c7\'e9\'bf\'f6\'cf\'c2\'d0\'e8\'d2\'aa\'ca\'cd\'b7\'c5\'b5\'b1\'c7\'b0\'b5\'c4Camera\'b6\'d4\'cf\'f3\'a3\'ac\'c8\'bb\'ba\'f3\'d4\'d9\'b3\'f5\'ca\'bc\'bb\'af\'d2\'bb\'b8\'f6\'a1\'a3\par
+\par
+\par
+android.hardware.camera.PreviewCallback:\'d4\'da\'cd\'bc\'cf\'f1\'d4\'a4\'c0\'c0\'ca\'b1\'b5\'f7\'d3\'c3\'a3\'ac\'d5\'e2\'b8\'f6\'bd\'d3\'bf\'da\'d3\'d0\'d2\'bb\'b8\'f6void onPreviewFrame(byte[] data,Camera camera);\'b2\'ce\'ca\'fddata\'ce\'aa\'c3\'bf\'d6\'a1\'cd\'bc\'cf\'f1\'b5\'c4\'ca\'fd\'be\'dd\'c1\'f7\'a1\'a3\'ce\'d2\'c3\'c7\'bf\'c9\'d2\'d4\'b8\'f9\'be\'dd\'ca\'b5\'bc\'ca\'d0\'e8\'d2\'aa\'c0\'b4\'ca\'b5\'cf\'d6\'d5\'e2\'b8\'f6\'bd\'d3\'bf\'da\'a1\'a3\par
+\par
+\par
+android.hardware.Camera.ShutterCallback:\'d4\'da\'cd\'bc\'cf\'f1\'d4\'a4\'c0\'c0\'b5\'c4\'ca\'b1\'ba\'f2\'b5\'f7\'d3\'c3\'a3\'ac\'d5\'e2\'b8\'f6\'bd\'d3\'bf\'da\'be\'df\'d3\'d0\'d2\'bb\'b8\'f6void onShutter();\'bf\'c9\'d2\'d4\'d4\'da\'b8\'c4\'ba\'af\'ca\'fd\'d6\'d0\'cd\'a8\'d6\'aa\'d3\'c3\'bb\'a7\'bf\'ec\'c3\'c5\'d2\'d1\'be\'ad\'b9\'d8\'b1\'d5\'a3\'ac\'c0\'fd\'c8\'e7\'b2\'a5\'b7\'c5\'d2\'bb\'b8\'f6\'c9\'f9\'d2\'f4\'a1\'a3\par
+\par
+\par
+android.hardware.Camera.PictureCallback:\'b5\'b1\'c5\'c4\'c9\'e3\'cf\'e0\'c6\'ac\'b5\'c4\'ca\'b1\'ba\'f2\'b5\'f7\'d3\'c3\'a3\'ac\'b8\'c3\'bd\'d3\'bf\'da\'be\'df\'d3\'d0\'d2\'bb\'b8\'f6void onPictureTaken(byte[] data,Camera camera)\'ba\'af\'ca\'fd;\'b2\'ce\'ca\'fd\'ba\'cd\'d4\'a4\'c0\'c0\'b5\'c4\'d2\'bb\'d1\'f9\'a1\'a3\'d4\'daandroid\'d6\'d0\'d6\'f7\'d2\'aa\'d3\'d0\'c8\'fd\'b8\'f6\'c0\'e0\'ca\'b5\'cf\'d6\'c1\'cb\'d5\'e2\'b8\'f6\'bd\'d3\'bf\'da\'a3\'ac\'b7\'d6\'b1\'f0\'ca\'c7PostViewPictureCallback\'a1\'a2 RawPictureCallback\'a1\'a2JepgPictureCallback\'a1\'a3\'ce\'d2\'c3\'c7\'bf\'c9\'d2\'d4\'b8\'f9\'be\'dd\'d0\'e8\'d2\'aa\'b6\'a8\'d2\'e5\'d7\'d4\'bc\'ba\'d0\'e8\'d2\'aa\'b5\'c4\'c0\'e0\'a1\'a3 \par
+\par
+\par
+android.hardware.Camera.AutoFocusCallback:\'b5\'b1\'d7\'d4\'b6\'af\'b6\'d4\'bd\'b9\'ca\'b1\'ba\'f2\'b5\'f7\'d3\'c3\'a3\'ac\'b8\'c3\'bd\'d3\'bf\'da\'be\'df\'d3\'d0\'d2\'bb\'b8\'f6void onAutoFocus(boolean focused,Camera camera)\'ba\'af\'ca\'fd;\par
+\par
+\par
+\'bb\'b9\'cc\'e1\'b9\'a9\'c1\'cb\'b7\'c5\'b4\'f3\'cb\'f5\'d0\'a1\'b5\'c4\'bc\'e0\'cc\'fd\'c6\'f7android.hardware.Camera.OnZoomChangeListener\par
+\par
+\par
+\'b5\'b1\'c8\'a1\'b5\'c3\'d5\'d5\'c6\'ac\'b5\'c4\'ca\'fd\'be\'dd\'c1\'f7\'ba\'f3\'bf\'c9\'d2\'d4\'cd\'a8\'b9\'fdBitmapFactory\'b5\'c4decodeByteArray()\'ba\'af\'ca\'fd\'c0\'b4\'bd\'e2\'ce\'f6\'cd\'bc\'c6\'ac\'a1\'a3 \par
+\par
+\'c1\'ed\'cd\'e2\'bb\'b9\'bf\'c9\'d2\'d4\'cd\'a8\'b9\'fdCamera\'b6\'d4\'cf\'f3\'b5\'c4getParameters()\'ba\'af\'ca\'fd\'c0\'b4\'b5\'c3\'b5\'bd\'d2\'bb\'b8\'f6android.hardware.Camera.Parameters \'b6\'d4\'cf\'f3\'a3\'acParameters\'cc\'e1\'b9\'a9\'c1\'cb\'d2\'bb\'d0\'a9\'bd\'d3\'bf\'da\'c0\'b4\'c9\'e8\'d6\'c3Camera\'b5\'c4\'ca\'f4\'d0\'d4\'a3\'ba\par
+1.setPictureFormat(int pixel_format):\'c9\'e8\'d6\'c3\'cd\'bc\'c6\'ac\'b5\'c4\'b8\'f1\'ca\'bd\'a3\'ac\'c6\'e4\'c8\'a1\'d6\'b5\'ce\'aaPixelFormat YCbCr_420_SP\'a1\'a2PixelFormatRGB_565\'bb\'f2\'d5\'dfPixelFormatJPEG\'a1\'a3 \par
+2.setPreviewFormat(int pixel_format):\'c9\'e8\'d6\'c3\'cd\'bc\'c6\'ac\'b5\'c4\'d4\'a4\'c0\'c0\'b8\'f1\'ca\'bd\'a3\'ac\'c8\'a1\'d6\'b5\'c8\'e7\'c9\'cf\'a1\'a3\par
+3.setPictureSize(int width,int height):\'c9\'e8\'d6\'c3\'cd\'bc\'c6\'ac\'b5\'c4\'b8\'df\'b6\'c8\'ba\'cd\'bf\'ed\'b6\'c8\'a3\'ac\'b5\'a5\'ce\'bb\'ce\'aa\'cf\'f1\'cb\'d8\'a1\'a3\par
+4.setPreviewSize(int width,int height):\'c9\'e8\'d6\'c3\'d4\'a4\'c0\'c0\'b5\'c4\'b8\'df\'b6\'c8\'ba\'cd\'bf\'ed\'b6\'c8\'a3\'ac\'c8\'a1\'d6\'b5\'c8\'e7\'c9\'cf\'a1\'a3\par
+5.setPreviewFrameRate(int fps):\'c9\'e8\'d6\'c3\'cd\'bc\'c6\'ac\'d4\'a4\'c0\'c0\'b5\'c4\'d6\'a1\'cb\'d9\'a1\'a3 \'d4\'da\'c9\'e8\'d6\'c3\'ba\'c3Camera\'b5\'c4\'b2\'ce\'ca\'fd\'ba\'f3\'a3\'ac\'bf\'c9\'d2\'d4\'cd\'a8\'b9\'fd\'ba\'af\'ca\'fdvoid startPreview()\'bf\'aa\'ca\'bc\'d4\'a4\'c0\'c0\'cd\'bc\'cf\'f1\'a1\'a2void stopPreview()\'bd\'e1\'ca\'f8\'d4\'a4\'c0\'c0\'a3\'ac\'cd\'a8\'b9\'fdautoFocus(AutoFocusCallback cb)\'c0\'b4\'d7\'d4\'b6\'af\'b6\'d4\'bd\'b9\'a3\'ac\'d7\'ee\'ba\'f3\'bf\'c9\'d2\'d4\'cd\'a8\'b9\'fdtakePicture(ShutterCallback shutter, PictureCallback raw, PictureCallback jpeg)\'ba\'af\'ca\'fd\'c0\'b4\'c5\'c4\'d5\'d5\'a1\'a3\par
+\'b8\'c3\'ba\'af\'ca\'fd\'d3\'d0\'c8\'fd\'b8\'f6\'b2\'ce\'ca\'fd\'a3\'ac\'b7\'d6\'b1\'f0\'ce\'aa\'bf\'ec\'c3\'c5\'bb\'d8\'b5\'f7\'bd\'d3\'bf\'da\'a1\'a2\'d4\'ad\'c9\'fa\'cd\'bc\'cf\'f1\'ca\'fd\'be\'dd\'bd\'d3\'bf\'da\'ba\'cd\'d1\'b9\'cb\'f5\'b8\'f1\'ca\'bd\'cd\'bc\'c6\'ac\'ca\'fd\'be\'dd\'bd\'d3\'bf\'da\'a1\'a3\par
+\'c8\'e7\'b9\'fb\'ca\'fd\'be\'dd\'b8\'f1\'ca\'bd\'b2\'bb\'b4\'e6\'d4\'da\'b5\'c4\'bb\'b0\'ca\'fd\'be\'dd\'c1\'f7\'ce\'aa\'bf\'d5\'a3\'ac\'c8\'e7\'b9\'fb\'b2\'bb\'d0\'e8\'d2\'aa\'ca\'b5\'cf\'d6\'d5\'e2\'d0\'a9\'bd\'d3\'bf\'da\'d4\'f2\'d5\'e2\'d0\'a9\'b2\'ce\'ca\'fd\'c8\'a1\'d6\'b5\'bf\'c9\'d2\'d4\'ce\'aanull\'a1\'a3 \par
+}
+ 

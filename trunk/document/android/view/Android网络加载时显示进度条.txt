@@ -1,0 +1,105 @@
+最近在做一个网络应用软件，为了提高用户体验，必须在联网获取数据时，用一个进度条提示用户正在加载数据，以下讲一下我是如何实现这种效果的。
+
+由于Android的界面更新只能通过自己的UI线程进行操作，所以我们需要用到Handler在进行更新界面的操作。
+
+1、声明变量    private Handler handler = new Handler();
+
+    private ProgressDialog progressDialog = null;
+复制代码2、在开始进行网络连接时显示进度条对话框progressDialog = ProgressDialog.show(MyActivity.this, "请稍等...", "获取数据中...", true);
+复制代码3、在handler.post中进行界面更新  public void setListAdapter(){
+
+  handler.post(new Runnable() {
+
+  public void run() {
+
+   //将获取到的数据更新到列表中
+
+   MyListView.setAdapter(saImageItems);
+
+    }
+
+   }
+
+   });
+复制代码4、开个新的线程进行网络连接获取数据    new Thread(new Runnable(){
+
+   
+
+
+
+    @Override
+
+    public void run() {
+
+    // TODO Auto-generated method stub
+
+    //向服务器请求数据
+
+    mapList=MyAPI.getAllDatas();
+
+    setListAdapter(mapList);
+
+    //更新完列表数据，则关闭对话框
+
+    progressDialog.dismiss();
+
+    }}).start();
+复制代码整个过程就这样完成了，下面贴一下我项目中的效果图：
+
+
+ 
+
+前天 15:22 上传下载附件 (17.17 KB) 
+
+
+
+
+
+ 
+
+前天 15:22 上传下载附件 (26.9 KB) 
+
+
+
+
+还有另外一种进度条的提示，是在对话框的标题上有圆形进度条进行提示。
+
+1、不能将Activity布局设计为无标题；
+并在setContentView（）之前设置一下标题布局形式：requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+复制代码2、在连接网络前，设置进度条为可视状态   
+
+
+
+
+
+   setProgressBarIndeterminateVisibility(true);
+复制代码3、开一个新的线程向服务器请求数据，获取数据后，将进度条设为不可视状态         new Thread(new Runnable(){
+
+         @Override
+
+        public void run() {
+
+          // TODO Auto-generated method stub
+
+          try {
+
+           todosomething();
+
+          setProgressBarIndeterminateVisibility(false);
+
+          } catch (Exception e) {
+
+          // TODO Auto-generated catch block
+
+          e.printStackTrace();
+
+         }
+
+        }}).start();
+复制代码OK了，在看看我项目中的效果图吧:
+
+ 前天 15:22 上传下载附件 (119.36 KB) 
+
+
+ 前天 15:22 上传下载附件 (42.29 KB) 
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=59884

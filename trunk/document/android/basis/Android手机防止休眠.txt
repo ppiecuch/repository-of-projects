@@ -1,0 +1,11 @@
+实现这一功能的方法有两种，一种是在Manifest.xml文件里面声明，一种是在代码里面修改LayoutParams的标志位。具体如下：
+
+1、在Manifest.xml文件里面用user-permission声明。代码如下：
+< uses-permission android:name=”android.permission.WAKE_LOCK” >< /uses-permission > 
+　　这种方法，在安装apk时，系统会提示安装人是否允许使用禁止休眠功能。
+
+2、在程序中用代码实现。代码如下：
+getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+　　把这段代码加在setContentView(R.layout.main)之前即可
+　　这种方法，安装时，不会提示安装人是否允许使用禁止休眠功能
+http://hi.baidu.com/wangjuns8/blog/item/f66db3cfc42c6e0000e928de.html
