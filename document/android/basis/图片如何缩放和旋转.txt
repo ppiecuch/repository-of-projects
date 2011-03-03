@@ -1,0 +1,48 @@
+图片处理在程序开发中也是经常用到的，手机上面经常就有图片浏览器，能将图片放大显示也能将图片显示为缩略图，同时也可以将图片竖着看或者横着看。这些都需要对图片进行处理，让其能够缩放和旋转。因此如题所示，现在跟着我来看看在Android中图片如何缩放和旋转。
+
+ 
+
+Matrix是在Android中用于操作图像的类，以下我们通过例子来看看Matrix中用于实现图片缩放和旋转的两个方法使用。
+
+1、首先加载要操作的图片
+
+Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.fengfly);
+
+2、得到以上加载图片的高度跟宽度
+
+int height = bitmap.getHeight(); 
+int width = bitmap.getWidth();
+
+3、定义要缩放成最终的图片高度跟宽度
+
+int nHeight = 150; 
+int nWidth = 180;
+
+4、计算缩放比例
+
+float scaleWidth = ((float) nWidth)/width; 
+float scaleHeight = ((float) nHeight)/height;
+
+5、创建Matrix对象
+
+Matrix matrix = new Matrix();
+
+6、使用Matrix对象跟缩放比例实现缩放图片
+
+matrix.postScale(scaleWidth, scaleHeight);
+
+7、生成缩放后的图片
+
+Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0,width, height, matrix, true);
+
+同样的，图片旋转只需要通过Matrix改变图片角度即可，生成图片跟7相同。
+
+matrix.postRotate(60);
+
+通过以上生成新的图片后即可将新生成的图片显示到对应的控件中。
+
+
+
+原文来自：雨枫技术教程网 http://www.fengfly.com
+原文网址：http://www.fengfly.com/plus/view-190775-1.html
+

@@ -1,0 +1,15 @@
+public class Setting extends PreferenceActivity
+£û
+    public void onCreate(Bundle savedInstanceState) { 
+        super.onCreate(savedInstanceState); 
+        addPreferencesFromResource(R.xml.settings)£» 
+    }
+£ý
+Setting.xml:
+            Android:key=¡±seting2¡å 
+            android:title=¡±@string/seting2¡å 
+            android:summary=¡±@string/seting2¡å/>
+            android:key=¡±seting1¡å 
+            android:title=¡±@string/seting1¡å 
+            android:summaryOff=¡±@string/seting1summaryOff¡± 
+            android:summaryOn=¡±@stringseting1summaryOff¡±/>

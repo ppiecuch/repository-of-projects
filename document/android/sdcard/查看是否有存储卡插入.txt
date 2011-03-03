@@ -1,0 +1,5 @@
+String status=Environment.getExternalStorageState(); 
+if(status.equals(Enviroment.MEDIA_MOUNTED)) 
+{ 
+   说明有SD卡插入 
+}

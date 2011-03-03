@@ -1,0 +1,3 @@
+OnCreate中不设Layout
+this.setTheme(R.style.Theme_Transparent);
+以下是Theme_Transparent的定义（注意transparent_bg是一副透明的图片）

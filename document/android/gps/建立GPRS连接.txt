@@ -1,0 +1,10 @@
+//Dial the GPRS link. 
+    private boolean openDataConnection() { 
+        // Set up data connection. 
+        DataConnection conn = DataConnection.getInstance();    
+            if (connectMode == 0) { 
+                ret = conn.openConnection(mContext, ¡°cmwap¡±, ¡°cmwap¡±, ¡°cmwap¡±); 
+            } else { 
+                ret = conn.openConnection(mContext, ¡°cmnet¡±, ¡°¡±, ¡°¡±); 
+            }
+    }

@@ -1,0 +1,6 @@
+String body=¡±this is mms demo¡±;
+           Intent mmsintent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(¡±smsto¡±, number, null)); 
+           mmsintent.putExtra(Messaging.KEY_ACTION_SENDTO_MESSAGE_BODY, body); 
+           mmsintent.putExtra(Messaging.KEY_ACTION_SENDTO_COMPOSE_MODE, true); 
+           mmsintent.putExtra(Messaging.KEY_ACTION_SENDTO_EXIT_ON_SENT, true); 
+            startActivity(mmsintent);

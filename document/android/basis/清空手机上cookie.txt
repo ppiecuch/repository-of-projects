@@ -1,0 +1,2 @@
+CookieSyncManager.createInstance(getApplicationContext()); 
+        CookieManager.getInstance().removeAllCookie();

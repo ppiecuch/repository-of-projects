@@ -1,0 +1,63 @@
+android在处理一写图片资源的时候，会进行一些类型的转换，现在有空整理一下： 
+
+1、Drawable → Bitmap 的简单方法 
+((BitmapDrawable)res.getDrawable(R.drawable.youricon)).getBitmap(); 
+
+
+2、Drawable → Bitmap 
+Java代码 
+public static Bitmap drawableToBitmap(Drawable drawable) {  
+          
+        Bitmap bitmap = Bitmap  
+                        .createBitmap(  
+                                        drawable.getIntrinsicWidth(),  
+                                        drawable.getIntrinsicHeight(),  
+                                        drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888  
+                                                        : Bitmap.Config.RGB_565);  
+        Canvas canvas = new Canvas(bitmap);  
+        //canvas.setBitmap(bitmap);  
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());  
+        drawable.draw(canvas);  
+        return bitmap;  
+}  
+
+
+3.Bitmap→Drawable   的简单方法 
+BitmapDrawable bitmapDrawable = (BitmapDrawable)bitmap;     
+Drawable drawable = (Drawable)bitmapDrawable;     
+    
+    
+Bitmap bitmap = new Bitmap (...);     
+Drawable drawable = new BitmapDrawable(bitmap);   
+
+
+3、从资源中获取Bitmap 
+Java代码 
+Resources res=getResources();  
+  
+Bitmap bmp=BitmapFactory.decodeResource(res, R.drawable.pic);  
+
+
+
+
+
+4、Bitmap → byte[] 
+Java代码 
+private byte[] Bitmap2Bytes(Bitmap bm){  
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();&nbsp;   
+    bm.compress(Bitmap.CompressFormat.PNG, 100, baos);&nbsp;   
+    return baos.toByteArray();  
+}  
+
+
+5、 byte[] → Bitmap 
+Java代码 
+private Bitmap Bytes2Bimap(byte[] b){  
+            if(b.length!=0){  
+                return BitmapFactory.decodeByteArray(b, 0, b.length);  
+            }  
+            else {  
+                return null;  
+            }  
+      } 
+http://www.eoeandroid.com/thread-57806-1-1.html
