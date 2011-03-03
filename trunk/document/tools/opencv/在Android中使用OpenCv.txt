@@ -1,0 +1,292 @@
+编译环境:ubuntu 10.10
+opencv版本:2.2
+
+1.首先需要下载以下文件:
+
+
+
+
+
+OpenCV-2.2.0.tar.bz2
+android-ndk-r4-linux-x86-crystax-4.tar.bz2
+
+2.ubuntu需要以下包
+
+sudo apt-get install build-essential
+sudo apt-get install cmake
+sudo apt-get install libgtk2.0-dev
+sudo apt-get install swig
+sudo apt-get install libpython2.6 python-dev python2.6-dev
+
+3.解压缩opencv后,在其目录进行以下操作
+cd release
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PYTHON_SUPPORT=ON
+-D BUILD_EXAMPLES=ON ..
+make
+
+编译完成后安装进系统库中
+sudo make install
+sudo ldconfig
+
+如果想测试效果可以进入samples/c目录中执行
+. build_all.sh
+来编译示例程序,然后运行find_obj来看看opencv中surf的效果
+
+4.接下来是编译android的版本
+在编译之前需要解压缩android-ndk-r4-linux-x86-crystax-4.tar.bz2到用户目录下,因为opencv默认在用户目录下寻找,当然大家也可以更改配置文件
+
+进入android目录中,执行以下操作:
+mkdir build
+cd build
+cmake ..
+make
+
+这就编译好android的库文件了,下面来新建一个android程序来测试一下
+
+5.创建一个android工程,工程名为opencvtest,包名为com.opencvtest
+在工程的根目录下创建一个jni文件夹,然后分别创建Android.mk和hello-jni.cpp两个文件
+Android.mk的内容如下:
+LOCAL_PATH := $(call my-dir)
+
+
+
+include $(CLEAR_VARS)
+
+
+
+include /home/ms/opencv/OpenCV-2.2.0/android/build/android-opencv.mk
+
+LOCAL_LDLIBS += $(OPENCV_LIBS)
+
+LOCAL_C_INCLUDES += $(OPENCV_INCLUDES)
+
+
+
+LOCAL_MODULE := hello-jni
+
+LOCAL_SRC_FILES := hello-jni.cpp
+
+
+
+include $(BUILD_SHARED_LIBRARY)
+复制代码
+其中需要注意的是要更改include /home/ms/opencv/OpenCV-2.2.0到自己的opencv目录下
+hello-jni.cpp的内容如下:
+#include <jni.h>
+
+#include <cstdlib>
+
+#include <stdexcept>
+
+#include <string>
+
+
+
+#include <opencv2/core/core.hpp>
+
+#include <opencv2/features2d/features2d.hpp>
+
+#include <opencv2/highgui/highgui.hpp>
+
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include <opencv2/calib3d/calib3d.hpp>
+
+#include <opencv2/imgproc/imgproc_c.h>
+
+
+
+static CvScalar colors[] =
+
+{
+
+{{0,0,255}},
+
+{{0,128,255}},
+
+{{0,255,255}},
+
+{{0,255,0}},
+
+{{255,128,0}},
+
+{{255,255,0}},
+
+{{255,0,0}},
+
+{{255,0,255}},
+
+{{255,255,255}}
+
+};
+
+
+
+extern "C"
+
+jint Java_com_opencvtest_opencvtest_getKeypointNum(JNIEnv* env,jobject thiz)
+
+{
+
+IplImage* object = cvLoadImage( "/sdcard/src.jpg", CV_LOAD_IMAGE_GRAYSCALE );
+
+
+
+if(object != NULL){
+
+CvSURFParams params = cvSURFParams(500, 1);
+
+CvMemStorage* storage = cvCreateMemStorage(0);
+
+IplImage* object_color = cvCreateImage(cvGetSize(object), 8, 3);
+
+CvSeq *objectKeypoints = 0;
+
+CvSeq *objectDescriptors = 0;
+
+
+
+cvCvtColor( object, object_color, CV_GRAY2BGR );
+
+cvExtractSURF( object, 0, &objectKeypoints, &objectDescriptors, storage, params);
+
+
+
+for( int i = 0; i < objectKeypoints->total; i++ )
+
+{
+
+CvSURFPoint* r = (CvSURFPoint*)cvGetSeqElem( objectKeypoints, i );
+
+CvPoint center;
+
+int radius;
+
+center.x = cvRound(r->pt.x);
+
+center.y = cvRound(r->pt.y);
+
+radius = cvRound(r->size*1.2/9.*2);
+
+cvCircle( object_color, center, radius, colors[0], 1, 8, 0 );
+
+}
+
+
+
+cvSaveImage( "/sdcard/src_surf.jpg" , object_color);
+
+
+
+return objectKeypoints->total;
+
+}
+
+
+
+return 0;
+
+}
+复制代码
+需要注意的是,如果创建的工程名和我不一样的话,需要更改JNI函数的函数名
+
+更改好之后在工程的根目录下运行
+~/android-ndk-r4-crystax/ndk-build
+即可进行编译,~/android-ndk-r4-crystax指向了我自己的目录,大家可以根据自己的情况修改
+
+编译完成后会创建libs和obj两个目录出来,同时需要注意的是要刷新android的工程来同步这两个目录下的内容
+
+最后更改opencvtest.java文件来调用JNI,我的代码如下:
+package com.opencvtest;
+
+
+
+import android.app.Activity;
+
+import android.os.Bundle;
+
+import android.widget.TextView;
+
+
+
+public class opencvtest extends Activity {
+
+
+
+private TextView mTextView;
+
+
+
+/** Called when the activity is first created. */
+
+@Override
+
+public void onCreate(Bundle savedInstanceState) {
+
+super.onCreate(savedInstanceState);
+
+setContentView(R.layout.main);
+
+
+
+mTextView = (TextView) this.findViewById(R.id.textview);
+
+
+
+mTextView.setText(Integer.toString(getKeypointNum()));
+
+}
+
+
+
+public native int getKeypointNum();
+
+
+
+static {
+
+System.loadLibrary("hello-jni");
+
+}
+
+}
+复制代码
+6.这时候编译出来的程序还不能在虚拟机中运行,一运行就会闪一下跳出来,这是因为opencv的android库中有V5和V7两种ARM架构的库,我发现一般都会优先运行V7架构的ARM库,但是虚拟机应该是个V5架构的,所以会马上退出,我的G2手机也一样,所以这时候还要对OpenCV-2.2.0/android/build/android-opencv.mk文件进行修改来让程序在V5架构的ARM上运行,修改内容如下:
+
+--- android-opencv.mk_backup 2011-02-27 05:31:41.813090978 -0800
+
++++ android-opencv.mk 2011-02-27 06:30:09.605091003 -0800
+
+@@ -19,14 +19,10 @@
+
+ANDROID_OPENCV_INCLUDES := $(OPENCV_ROOT)/android/android-jni/jni
+
+
+
+ARMOBJS := local/armeabi
+
+-ARMOBJS_V7A := local/armeabi-v7a
+
+
+
+-OPENCV_LIB_DIRS := -L$(OPENCV_BUILD_ROOT)/obj/$(ARMOBJS_V7A) \
+
+- -L$(OPENCV_BUILD_ROOT)/obj/$(ARMOBJS) -L$(OPENCV_BUILD_ROOT)/bin/ndk/$(ARMOBJS) \
+
+- -L$(OPENCV_BUILD_ROOT)/bin/ndk/$(ARMOBJS_V7A)
+
++OPENCV_LIB_DIRS := -L$(OPENCV_BUILD_ROOT)/obj/$(ARMOBJS) -L$(OPENCV_BUILD_ROOT)/bin/ndk/$(ARMOBJS)
+
+
+
+-ANDROID_OPENCV_LIB_DIRS := -L$(OPENCV_ROOT)/android/android-jni/libs/armeabi-v7a \
+
+- -L$(OPENCV_ROOT)/android/android-jni/libs/armeabi
+
++ANDROID_OPENCV_LIB_DIRS := -L$(OPENCV_ROOT)/android/android-jni/libs/armeabi
+复制代码主要就是去掉V7部分的内容
+然后现在试用adb从电脑上push一张名字为src.jpg的文件到虚拟机的/sdcard/中,再运行程序即可看到效果,运行完毕后会生成SURF特征点检索后的图片
+
+有写漏的地方望大家指出
+thx~
+http://www.eoeandroid.com/thread-61553-1-1.html

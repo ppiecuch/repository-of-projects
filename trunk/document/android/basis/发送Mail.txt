@@ -1,0 +1,5 @@
+mime = ¡°img/jpg¡±; 
+            shareIntent.setDataAndType(Uri.fromFile(fd), mime); 
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(fd)); 
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, body);

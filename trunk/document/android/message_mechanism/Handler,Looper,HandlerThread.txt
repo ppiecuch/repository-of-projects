@@ -1,0 +1,35 @@
+Handler提供了一种消息机制用于线程间的通信。 
+默认情况下，Handler是运行在和创建它的线程同一个线程里的。Looper的机制可以改变这一点，通过在构造函数出传递一个looper，可以指定handler在和looper相同线程中执行。 
+
+1.可以在线程中调用 Looper.prepare(); Looper.myLooper() 得到一个当前线程的 looper。 
+
+2.Looper.getMainLooper(); 可以得到主线程的looper 
+
+3.handler.post(new Runnable(){..}) runnable里的代码和handler是在同一个线程中执行的，当然handler的 handleMessage() 方法也是在handler的同一线程 
+
+HandlerThread 可用于方便的创建一个新线程，然后获得一个looper，以便指定后续的handler在新的线程里执行。 而不用自己再去写一个线程类，然后创建looper等操作。 
+示例： 
+// Start up the thread running the service.  Note that we create a 
+        // separate thread because the service normally runs in the process's 
+        // main thread, which we don't want to block.  We also make it 
+        // background priority so CPU-intensive work will not disrupt our UI. 
+HandlerThread thread = new HandlerThread("ServiceStartArguments",                Process.THREAD_PRIORITY_BACKGROUND); 
+        thread.start();        
+        mServiceLooper = thread.getLooper(); 
+        mServiceHandler = new ServiceHandler(mServiceLooper); 
+
+
+handler常用于新线程中发送一个消息，然后再handleMessage中更新主线程的UI界面(此时handler必须是运行在主线程中的）。 
+
+
+参考： 
+http://www.android123.com.cn/androidkaifa/422.html 
+http://hi.baidu.com/%F0%D0%F0%C4%D6%ED/blog/item/d0c41217b590cd05c93d6d9a.html 
+http://panxq0809.javaeye.com/blog/666255 Android中Message机制的灵活应用1，2 
+
+
+http://www.yuanma.org/data/2009/0706/article_3698.htm 
+http://rayleung.javaeye.com/blog/411860 
+
+
+摘自:http://ytfei.javaeye.com/blog/717227

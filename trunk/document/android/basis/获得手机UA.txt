@@ -1,0 +1,5 @@
+public String getUserAgent() 
+    { 
+           String user_agent = ProductProperties.get(ProductProperties.USER_AGENT_KEY, null); 
+            return user_agent; 
+    }

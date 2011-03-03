@@ -1,0 +1,8 @@
+private ContentObserver mDownloadsObserver = new DownloadsChangeObserver(Downloads.CONTENT_URI);
+private class DownloadsChangeObserver extends ContentObserver { 
+        public DownloadsChangeObserver(Uri uri) { 
+            super(new Handler());
+        }
+        @Override 
+        public void onChange(boolean selfChange) {£ý  
+        } 

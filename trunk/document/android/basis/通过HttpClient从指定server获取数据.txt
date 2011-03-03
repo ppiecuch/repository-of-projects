@@ -1,0 +1,21 @@
+setIntParameter(AllClientPNames.CONNECTION_TIMEOUT, 10000); 
+                httpClient.setParams(params); 
+                resp = httpClient.execute(method); 
+                int status = resp.getStatusLine().getStatusCode();
+                if (status != HttpStatus.SC_OK) return false;
+                // HttpStatus.SC_OK; 
+                return true; 
+            } catch (ClientProtocolException e) { 
+                // TODO Auto-generated catch block 
+                e.printStackTrace(); 
+            } catch (IOException e) { 
+                // TODO Auto-generated catch block 
+                e.printStackTrace(); 
+            } finally { 
+                if (reader != null) try { 
+                    reader.close(); 
+                } catch (IOException e) { 
+                    // TODO Auto-generated catch block 
+                    e.printStackTrace(); 
+                } 
+            } 

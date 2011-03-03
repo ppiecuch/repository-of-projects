@@ -1,0 +1,148 @@
+活用Android线程间通信的Message机制 
+
+1.1.Message 
+
+代码在frameworks\base\core\java\android\Os\Message.java中。 
+
+Message.obtain函数：有多个obtain函数，主要功能一样，只是参数不一样。作用是从Message Pool中取出一个Message，如果Message Pool中已经没有Message可取则新建一个Message返回，同时用对应的参数给得到的Message对象赋值。 
+
+Message Pool：大小为10个；通过Message.mPool->（Message并且Message.next）-> （Message并且Message.next）-> （Message并且Message.next）...构造一个Message Pool。Message Pool的第一个元素直接new出来，然后把Message.mPool（static类的static变量）指向它。其他的元素都是使用完的Message通过Message的recycle函数清理后放到Message Pool（通过Message Pool最后一个Message的next指向需要回收的Message的方式实现）。下图为Message Pool的结构： 
+  
+
+1.2.MessageQueue 
+
+MessageQueue里面有一个收到的Message的对列： 
+
+MessageQueue.mMessages(static变量)->( Message并且Message.next)-> ( Message并且Message.next)->...，下图为接收消息的消息队列： 
+ 
+
+上层代码通过Handler的sendMessage等函数放入一个message到MessageQueue里面时最终会调用MessageQueue的enqueueMessage函数。enqueueMessage根据上面的接收的Message的队列的构造把接收到的Message放入队列中。 
+
+MessageQueue的removeMessages函数根据上面的接收的Message的队列的构造把接收到的Message从队列中删除，并且调用对应Message对象的recycle函数把不用的Message放入Message Pool中。 
+
+1.3.Looper 
+
+Looper对象的创建是通过prepare函数，而且每一个Looper对象会和一个线程关联 
+
+public static final void prepare() { 
+if (sThreadLocal.get() != null) { 
+throw new RuntimeException("Only one Looper may be created per thread"); 
+} 
+sThreadLocal.set(new Looper()); 
+} 
+
+Looper对象创建时会创建一个MessageQueue，主线程默认会创建一个Looper从而有MessageQueue，其他线程默认是没有MessageQueue的不能接收Message，如果需要接收Message则需要通过prepare函数创建一个MessageQueue。具体操作请见示例代码。 
+
+private Looper() { 
+mQueue = new MessageQueue(); 
+mRun = true; 
+mThread = Thread.currentThread(); 
+} 
+
+prepareMainLooper函数只给主线程调用（系统处理，程序员不用处理），它会调用prepare建立Looper对象和MessageQueue。 
+
+public static final void prepareMainLooper() { 
+prepare(); 
+setMainLooper(myLooper()); 
+if (Process.supportsProcesses()) { 
+myLooper().mQueue.mQuitAllowed = false; 
+} 
+} 
+
+Loop函数从MessageQueue中从前往后取出Message，然后通过Handler的dispatchMessage函数进行消息的处理（可见消息的处理是Handler负责的），消息处理完了以后通过Message对象的recycle函数放到Message Pool中，以便下次使用，通过Pool的处理提供了一定的内存管理从而加速消息对象的获取。至于需要定时处理的消息如何做到定时处理，请见MessageQueue的next函数，它在取Message来进行处理时通过判断MessageQueue里面的Message是否符合时间要求来决定是否需要把Message取出来做处理，通过这种方式做到消息的定时处理。 
+
+public static final void loop() { 
+Looper me = myLooper(); 
+MessageQueue queue = me.mQueue; 
+while (true) { 
+Message msg = queue.next(); // might block 
+//if (!me.mRun) { 
+// 
+break; 
+//} 
+if (msg != null) { 
+if (msg.target == null) { 
+// No target is a magic identifier for the quit message. 
+return; 
+} 
+if (me.mLogging!= null) me.mLogging.println( 
+">>>>> Dispatching to " + msg.target + " " 
++ msg.callback + ": " + msg.what 
+
+); 
+msg.target.dispatchMessage(msg); 
+if (me.mLogging!= null) me.mLogging.println( 
+"<<<<< Finished to 
+" + msg.target + " " 
++ msg.callback); 
+msg.recycle(); 
+} 
+} 
+} 
+
+1.4.Handler 
+
+Handler的构造函数表示Handler会有成员变量指向Looper和MessageQueue，后面我们会看到没什么需要这些引用；至于callback是实现了Callback接口的对象，后面会看到这个对象的作用。 
+
+public Handler(Looper looper, Callback callback) { 
+mLooper = looper; 
+mQueue = looper.mQueue; 
+mCallback = callback; 
+} 
+
+public interface Callback { 
+public boolean handleMessage(Message msg); 
+} 
+
+获取消息：直接通过Message的obtain方法获取一个Message对象。 
+
+public final Message obtainMessage(int what, int arg1, int arg2, Object obj) 
+{ 
+return Message.obtain(this, what, arg1, arg2, obj); 
+} 
+
+发送消息：通过MessageQueue的enqueueMessage把Message对象放到MessageQueue的接收消息队列中 
+
+public boolean sendMessageAtTime(Message msg, long uptimeMillis) 
+{ 
+boolean sent = false; 
+MessageQueue queue = mQueue; 
+if (queue != null) { 
+msg.target = this; 
+sent = queue.enqueueMessage(msg, uptimeMillis); 
+} 
+else { 
+RuntimeException e = new RuntimeException( 
+this + " sendMessageAtTime() called with no mQueue"); 
+Log.w("Looper", e.getMessage(), e); 
+} 
+return sent; 
+} 
+
+线程如何处理MessageQueue中接收的消息：在Looper的loop函数中循环取出MessageQueue的接收消息队列中的消息，然后调用Hander的dispatchMessage函数对消息进行处理，至于如何处理（相应消息）则由用户指定（三个方法，优先级从高到低：Message里面的Callback，一个实现了Runnable接口的对象，其中run函数做处理工作；Handler里面的mCallback指向的一个实现了Callback接口的对象，里面的handleMessage进行处理；处理消息Handler对象对应的类继承并实现了其中handleMessage函数，通过这个实现的handleMessage函数处理消息）。 
+
+public void dispatchMessage(Message msg) { 
+if (msg.callback != null) { 
+handleCallback(msg); 
+} else { 
+if (mCallback != null) { 
+if (mCallback.handleMessage(msg)) { 
+return; 
+} 
+} 
+handleMessage(msg); 
+} 
+} 
+
+Runnable说明：Runnable只是一个接口，实现了这个接口的类对应的对象也只是个普通的对象，并不是一个Java中的Thread。Thread类经常使用Runnable，很多人有误解，所以这里澄清一下。 
+
+从上可知以下关系图：  
+
+
+其中清理Message是Looper里面的loop函数指把处理过的Message放到Message的Pool里面去，如果里面已经超过最大值10个，则丢弃这个Message对象。 
+
+调用Handler是指Looper里面的loop函数从MessageQueue的接收消息队列里面取出消息，然后根据消息指向的Handler对象调用其对应的处理方法。 
+
+来自easyandroid论坛
+
+http://panxq0809.javaeye.com/blog/666255
