@@ -1,0 +1,7 @@
+很多时候我们会遇到工程中的R.java文件丢失，必要急，修复很简单。
+
+方法 1：右击你的工程(项目)——>Android Tools——>Fix Project Properties 即可。
+
+方法 2:  右击你的工程(项目)——>Properties——>Android ——> 选择相应的target 然后 点击 apply 即可。
+
+ 注意：也不要自己创建R.java 类文件，上面两个方法总有一个可以用的，呵呵。
