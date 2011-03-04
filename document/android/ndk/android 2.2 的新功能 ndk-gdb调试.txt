@@ -1,0 +1,39 @@
+android2.2 的这个功能可能是很多做移植工作和底层开发者的福音.
+
+下载最新的Android NDK, r4b 
+
+ndk 每个版本都有些变化,有好有坏.对于新人来说,使用更方便,对于我这种好多工程的人来说,又要改配置.
+
+ndk-gdb使用的一些基本步骤.
+
+1.jni 的工程.
+
+   在mk编译选项中LOCAL_LDLIBS := 加入-g  不过我看hello-jni似乎没有.可能不是必须的.
+
+2.java 工程的AndroidManifest.xml 文件中增加android:debuggable="true"
+
+3.apk 需要debug编译然后安装到手机或模拟器.在eclipse中可以使用debug 运行.
+
+4.在工程目录下运行 ndk-gdb
+
+5.一切正常的话见到gdb 提示符.
+
+   并且手机或模拟器中程序运行中.
+
+6.加入工程的源代码目录 directory 你的工程目录.
+
+可以使用 show directory 来检查,你的源代码目录是否正确
+
+7. list filename:linenumber
+
+8 添加断点
+
+    b linenumber
+
+9 continue 即可.
+
+其他操作可以见gdb操作手册.
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/untosil/archive/2010/08/04/5788683.aspx
