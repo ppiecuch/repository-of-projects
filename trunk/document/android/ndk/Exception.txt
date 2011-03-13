@@ -1,0 +1,6 @@
+[异常]
+ERROR/AndroidRuntime(5059): java.lang.UnsatisfiedLinkError: nativeInit
+ERROR/AndroidRuntime(5059):     at org.tinder.studio.AndroidGLView.nativeInit(Native Method)
+ERROR/AndroidRuntime(5059):     at org.tinder.studio.AndroidGLView.access$2(AndroidGLView.java:22)
+[解决]
+编译有问题,请检查你的编译过程,或者重新编译

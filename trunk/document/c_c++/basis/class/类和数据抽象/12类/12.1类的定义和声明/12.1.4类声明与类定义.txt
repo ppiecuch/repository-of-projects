@@ -1,0 +1,110 @@
+一旦遇到右花括号，类的定义就结束了。并且一旦定义了类，那以我们就知道了所有的类成员，以及存
+储该类的对象所需的存储空间。在一个给定的源文件中，一个类只能被定义一次。如果在多个文件中定
+义一个类，那么每个文件中的定义必须是完全相同的。
+【★】一个类只能被定义一次，即使有多个文件定义一个类，那么每个文件中的定义必须是完全相同的。
+
+将类定义在头文件中，可以保证在每个使用类的文件中以同样的方式定义类。使用头文件保护符
+（header guard）（第 2.9.2 节），来保证即使头文件在同一文件中被包含多次，类定义也只出现一次。
+
+可以声明一个类而不定义它：
+     class Screen; // declaration of the Screen class
+这个声明，有时称为前向声明（forward declaraton），在程序中引入了类类型的 Screen。在声明之后、
+定义之前，类 Screen 是一个不完全类型（incompete type），即已知 Screen 是一个类型，但不知道包
+含哪些成员。
+
+
+不完全类型（incomplete type）只能以有限方式使用。不能定义该类型的对象。不完全类型只能用于定
+义指向该类型的指针及引用，或者用于声明（而不是定义）使用该类型作为形参类型或返回类型的函数。
+【★】不完全类型只能用于定义指针、引用、形参类型或返回类型
+
+
+在创建类的对象之前，必须完整地定义该类。必须定义类，而不只是声明类，这样，编译器就会给类的对
+象预定相应的存储空间。同样地，在使用引用或指针访问类的成员之前，必须已经定义类。
+【★】定义类后才能创建类对象、访问类成员
+
+【为类的成员使用类声明】
+只有当类定义已经在前面出现过，数据成员才能被指定为该类类型。如果该类型是不完全类型，那么数据
+成员只能是指向该类类型的指针或引用。
+因为只有当类定义体完成后才能定义类，因此类不能具有自身类型的数据成员。然而，只要类名一出现就
+可以认为该类已声明。因此，类的数据成员可以是指向自身类型的指针或引用：
+     class LinkScreen {
+         Screen window;
+         LinkScreen *next;
+         LinkScreen *prev;
+     };
+【引申：单例类】
+第一种
+class CSingleton
+{
+public:
+	static CSingleton& GetInstance()
+	{
+		static CSingleton theSingleton;
+		return theSingleton;
+	}
+
+/* more (non-static) functions here */
+
+private:
+	CSingleton() // 必须定义, 且为private.
+	{
+	}
+
+	CSingleton(const CSingleton&);            // 不实现.
+
+	CSingleton& operator=(const CSingleton&); // 不实现.
+
+	~CSingleton() // 可声明为public, 但这里声明为private没有错, 可被调用.
+	{
+	}
+};
+
+第二种
+class CSingleton:
+{
+public:
+	static CSingleton* GetInstance()
+	{
+		if (!m_pInstance)
+		{
+			m_pInstance = new CSingleton;
+		}
+		return m_pInstance;
+	}
+
+/* more (non-static) functions here */
+
+private:
+	CSingleton() // 必须定义, 且为private.
+	{
+	}
+
+	static CSingleton* m_pInstance;
+
+	class CGarbo // 它的唯一工作就是在析构函数中删除CSingleton的实例.
+	{
+	public:
+		~CGarbo()
+		{
+			if (CSingleton::m_pInstance)
+			{
+				delete CSingleton::m_pInstance;
+			}
+		}
+	};
+
+	static CGarbo m_garbo; // 定义一个静态成员, 在程序结束时, 系统会调用它的析构函数.
+};
+
+CSingleton* CSingleton::m_pInstance = NULL; // 这句必须有.
+
+
+类的前身声明一般用来编写相互依赖的类。在第 13.4 节中，我们将看到用法的一个例子。
+
+
+
+
+
+
+
+

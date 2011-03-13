@@ -1,0 +1,37 @@
+定义一个类时，也就是定义了一个类型。一旦定义了类，就可以定义该类型的对象。定义对象时，将为其
+分配存储空间，但（一般而言）定义类型时不进行存储分配：
+     class Sales_item {
+     public:
+         // operations on Sales_item objects
+     private:
+         std::string isbn;
+         unsigned units_sold;
+         double revenue;
+     };
+
+定义了一个新的类型，但没有进行存储分配。当我们定义一个对象
+     Sales_item item;
+时，编译器分配了足以容纳一个 Sales_item 对象的存储空间。item 指的就是那个存储空间。每个对象具
+有自己的类数据成员的副本。修改 item 的数据成员不会改变任何其他 Sales_item 对象的数据成员。
+
+
+【定义类类型的对象】
+定义了一个类类型之后，可以按以下两种方式使用。
+1、将类的名字直接用作类型名。
+2、指定关键字 class 或 struct，后面跟着类的名字：
+     Sales_item item1;       // default initialized object of type Sales_item
+     class Sales_item item1; // equivalent definition of item1
+两种引用类类型方法是等价的。第二种方法是从 C 继承而来的，在 C++ 中仍然有效。第一种更为简练，
+由 C++ 语言引入，使得类类型更容易使用。
+
+【为什么类的定义以分号结束】
+我们在第 2.8 节中指出，类的定义分号结束。分号是必需的，因为在类定义之后可以接一个对象定义列
+表。定义必须以分号结束：
+class Sales_item { /* ... */ };
+class Sales_item { /* ... */ } accum, trans;
+通常，将对象定义成类定义的一部分是个坏主意。这样做，会使所发生的操作难以理解。对读者而言，将
+两个不同的实体（类和变量）组合在一个语句中，也会令人迷惑不解。
+【★】因为在类定义之后可以接一个对象定义列表，所以定义必须以分号结束。
+
+
+

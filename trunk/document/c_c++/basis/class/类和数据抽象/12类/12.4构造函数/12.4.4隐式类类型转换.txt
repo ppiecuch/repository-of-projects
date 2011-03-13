@@ -1,0 +1,99 @@
+在第 5.12 节介绍过，C++ 语言定义了内置类型之间的几个自动转换。也可以定义如何将其他类型的对象
+隐式转换为我们的类类型，或将我们的类类型的对象隐式转换为其他类型。在第 14.9 节将会看到如何定
+义从类类型到其他类型的转换。为了定义到类类型的隐式转换，需要定义合适的构造函数。
+
+可以用单个实参来调用的构造函数定义了从形参类型到该类类型的一个隐式转换。
+让我们再看看定义了两个构造函数的 Sales_item 版本：
+
+     class Sales_item {
+     public:
+         // default argument for book is the empty string
+         Sales_item(const std::string &book = ""):
+                   isbn(book), units_sold(0), revenue(0.0) { }
+         Sales_item(std::istream &is);
+         // as before
+      };
+
+
+这里的每个构造函数都定义了一个隐式转换。因此，在期待一个 Sales_item 类型对象的地方，可以使
+用一个 string 或一个 istream：
+
+     string null_book = "9-999-99999-9";
+     // ok: builds a Sales_itemwith 0 units_soldand revenue from
+     // and isbn equal to null_book
+     item.same_isbn(null_book);
+
+这段程序使用一个 string 类型对象作为实参传给 Sales_item 的 same_isbn 函数。该函数期待一个
+ Sales_item 对象作为实参。编译器使用接受一个 string 的 Sales_item 构造函数从 null_book 生
+ 成一个新的 Sales_item 对象。新生成的（临时的）Sales_item 被传递给 same_isbn。
+
+这个行为是否我们想要的，依赖于我们认为用户将如何使用这个转换。在这种情况下，它可能是一个好
+主意。book 中的 string 可能代表一个不存在的 ISBN，对 same_isbn 的调用可以检测 item 中的 
+Sales_item 是否表示一个空的 Sales_item。另一方面，用户也许在 null_book 上错误地调用了 
+same_isbn。
+
+更成问题的是从 istream 到 Sales_item 的转换：
+
+     // ok: uses the Sales_item istream constructor to build an object
+      // to pass to same_isbn
+     item.same_isbn(cin);
+
+这段代码将 cin 隐式转换为 Sales_item。这个转换执行接受一个 istream 的 Sales_item 构造函数。
+该构造函数通过读标准输入来创建一个（临时的）Sales_item 对象。然后该对象被传递给 same_isbn。
+这个 Sales_item 对象是一个临时对象（第 7.3.2 节）。一旦 same_isbn 结束，就不能再访问它。
+实际上，我们构造了一个在测试完成后被丢弃的对象。这个行为几乎肯定是一个错误。
+【?】same_isbn()函数呢?
+
+【抑制由构造函数定义的隐式转换】
+【★】可以通过将构造函数声明为 explicit，来防止在需要隐式转换的上下文中使用构造函数：
+
+     class Sales_item {
+     public:
+         // default argument for book is the empty string
+         explicit Sales_item(const std::string &book = ""):
+                   isbn(book), units_sold(0), revenue(0.0) { }
+         explicit Sales_item(std::istream &is);
+         // as before
+     };
+【★】explicit 关键字只能用于类内部的构造函数声明上。在类的定义体外部所做的定义上不再重复它：
+
+     // error: explicit allowed only on constructor declaration in class header
+     explicit Sales_item::Sales_item(istream& is)
+     {
+         is >> *this; // uses Sales_iteminput operator to read the members
+     }
+
+现在，两个构造函数都不能用于隐式地创建对象。前两个使用都不能编译：
+
+     item.same_isbn(null_book); // error: string constructor is explicit
+     item.same_isbn(cin);       // error: istream constructor is explicit
+
+【★】当构造函数被声明 explicit 时，编译器将不使用它作为转换操作符。
+
+
+
+【为转换而显式地使用构造函数】
+只要显式地按下面这样做，就可以用显式的构造函数来生成转换：
+
+     string null_book = "9-999-99999-9";
+     // ok: builds a Sales_itemwith 0 units_soldand revenue from
+     // and isbn equal to null_book
+     item.same_isbn(Sales_item(null_book));
+
+
+在这段代码中，从 null_book 创建一个 Sales_item。尽管构造函数为显式的，但这个用法是允许的。
+显式使用构造函数只是中止了隐式地使用构造函数。任何构造函数都可以用来显式地创建临时对象。
+
+
+【★】通常，除非有明显的理由想要定义隐式转换，否则，单形参构造函数应该为 explicit。将构造
+函数设置为 explicit 可以避免错误，并且当转换有用时，用户可以显式地构造对象。
+【★】单形参才有可能被隐式转换
+
+
+
+
+
+
+
+
+

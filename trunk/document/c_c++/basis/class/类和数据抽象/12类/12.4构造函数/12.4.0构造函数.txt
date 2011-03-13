@@ -1,0 +1,53 @@
+【★】构造函数是特殊的成员函数，只要创建类类型的新对象，都要执行构造函数。构造函数的工作是
+保证每个对象的数据成员具有合适的初始值。
+
+这个构造函数使用构造函数初始化列表来初始化 units_sold 和 revenue 成员。isbn 成员由 string 
+的默认构造函数隐式初始化为空串。
+
+构造函数的名字与类的名字相同，并且不能指定返回类型。像其他任何函数一样，它们可以没有形参，
+也可以定义多个形参。
+
+【构造函数可以被重载】
+可以为一个类声明的构造函数的数量没有限制，只要每个构造函数的形参表是唯一的。我们如何才能知道
+应该定义哪个或多少个构造函数？一般而言，不同的构造函数允许用户指定不同的方式来初始化数据成员。
+
+【实参决定使用哪个构造函数】
+我们的类现在定义了三个构造函数。在定义新对象时，可以使用这些构造函数中的任意一个：
+
+     // uses the default constructor:
+     // isbn is the empty string; units_soldand revenue are 0
+     Sales_item empty;
+     // specifies an explicit isbn; units_soldand revenue are 0
+     Sales_item Primer_3rd_Ed("0-201-82470-1");
+     // reads values from the standard input into isbn, units_sold, and revenue
+     Sales_item Primer_4th_ed(cin);
+     
+用于初始化一个对象的实参类型决定使用哪个构造函数。在 empty 的定义中，没有初始化式，所以运行
+默认构造函数。接受一个 string 实参的构造函数用于初始化 Primer_3rd_ed；接受一个 istream 引用
+的构造函数初始化 Primer_4th_ed。
+
+【构造函数自动执行】
+只要创建该类型的一个对象，编译器就运行一个构造函数：
+
+     // constructor that takes a string used to create and initialize variable
+     Sales_item Primer_2nd_ed("0-201-54848-8");
+     // default constructor used to initialize unnamed object on the heap
+     Sales_item *p = new Sales_item();
+
+第一种情况下，运行接受一个 string 实参的构造函数，来初始化变量 Primer_2nd_ed。第二种情况下，
+动态分配一个新的 Sales_item 对象。假定分配成功，则通过运行默认构造函数初始化该对象。
+
+
+【用于 const 对象的构造函数】
+构造函数不能声明为 const 第 7.7.1 节：
+     class Sales_item {
+     public:
+         Sales_item() const;    // error
+     };
+const 构造函数是不必要的。创建类类型的 const 对象时，运行一个普通构造函数来初始化该 const 
+对象。构造函数的工作是初始化对象。不管对象是否为 const，都用一个构造函数来初始化化该对象。
+【★】构造函数不能声明为 const
+
+
+
+

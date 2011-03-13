@@ -1,0 +1,15 @@
+char *itoa(int value, char *string, int radix); 
+　　头文件: <stdlib.h> 
+    
+itoa操作使用
+程序例: 
+　　#include <stdlib.h> 
+　　#include <stdio.h> 
+　　int main() 
+　　{ 
+　　int number = 123456; 
+　　char string[25]; 
+　　itoa(number, string, 10); 
+　　printf("integer = %d string = %s\n", number, string); 
+　　return 0; 
+　　}

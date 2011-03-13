@@ -1,0 +1,108 @@
+迄今为止，所定义的类都是简单的，然而通过这些类我们已经了解到 C++ 语言为类所提供的相当多的支
+持。本节的其余部分将阐述编写类的更多基础知识。
+
+【同一类型的多个数据成员】
+正如我们所见，类的数据成员的声明类似于普通变量的声明。如果一个类具有多个同一类型的数据成员，
+则这些成员可以在一个成员声明中指定，这种情况下，成员声明和普通变量声明是相同的。
+
+例如，可以定义一个名为 Screen 的类型表示计算机上的窗口。每个 Screen 可以有一个保存窗口内容的 
+string 成员，以及三个 string::size_type 成员：一个指定光标当前停留的字符，另外两个指定窗口
+的高度和宽度。可以用如下方式这个类的成员：
+     class Screen {
+     public:
+         // interface member functions
+     private:
+         std::string contents;
+         std::string::size_type cursor;
+         std::string::size_type height, width;
+     };
+
+【使用类型别名来简化类】
+除了定义数据和函数成员之外，类还可以定义自己的局部类型名字。如果为 std::string::size_type 
+提供一个类型别名，那么 Screen 类将是一个更好的抽象：
+     class Screen {
+     public:
+         // interface member functions
+         typedef std::string::size_type index;
+     private:
+         std::string contents;
+         index cursor;
+         index height, width;
+     };
+类所定义的类型名遵循任何其他成员的标准访问控制。将 index 的定义放在类的 public 部分，是因为
+希望用户使用这个名字。Screen 类的使用者不必了解用 string 实现的底层细节。定义 index 来隐藏
+ Screen 的实现细节。将这个类型设为 public，就允许用户使用这个名字。
+
+【成员函数可被重载】
+重载操作符（第 14.9.5 节）有特殊规则，是个例外，成员函数只能重载本类的其他成员函数。类的成
+员函数与普通的非成员函数以及在其他类中声明的函数不相关，也不能重载它们。重载的成员函数和普
+通函数应用相同的规则：两个重载成员的形参数量和类型不能完全相同。调用非成员重载函数所用到的
+函数匹配（第 7.8.2 节）过程也应用于重载成员函数的调用。
+
+【定义重载成员函数】
+为了举例说明重载，可以给出 Screen 类的两个重载成员，用于从窗口返回一个特定字符。两个重载成
+员中，一个版本返回由当前光标指示的字符，另一个返回指定行列处的字符：
+
+class Screen {
+public:
+    typedef std::string::size_type index;
+    // return character at the cursor or at a given position
+    char get() const { return contents[cursor]; }
+    char get(index ht, index wd) const;
+    // remaining members
+private:
+    std::string contents;
+    index cursor;
+    index height, width;
+};
+与任意的重载函数一样，给指定的函数调用提供适当数目和／或类型的实参来选择运行哪个版本：
+
+     Screen myscreen;
+     char ch = myscreen.get();// calls Screen::get()
+     ch = myscreen.get(0,0);  // calls Screen::get(index, index)
+
+
+【显式指定 inline 成员函数】
+在类内部定义的成员函数，例如不接受实参的 get 成员，将自动作为 inline 处理。也就是说，当
+它们被调用时，编译器将试图在同一行内扩展该函数（第 7.6 节）。也可以显式地将成员函数声明
+为 inline：
+
+     class Screen {
+     public:
+         typedef std::string::size_type index;
+         // implicitly inline when defined inside the class declaration
+         char get() const { return contents[cursor]; }
+         // explicitly declared as inline; will be defined outside the class declaration
+         inline char get(index ht, index wd) const;
+         // inline not specified in class declaration, but can be defined inline later
+         index get_cursor() const;
+         // ...
+      };
+     // inline declared in the class declaration; no need to repeat on the definition
+     char Screen::get(index r, index c) const
+     {
+         index row = r * width;    // compute the row location
+         return contents[row + c]; // offset by c to fetch specified character
+     }
+     // not declared as inline in the class declaration, but ok to make inline in definition
+     inline Screen::index Screen::get_cursor() const
+     {
+         return cursor;
+     }
+可以在类定义体内部指定一个成员为inline，作为其声明的一部分。或者，也可以在类定义外部的函数
+定义上指定 inline。在声明和定义处指定 inline 都是合法的。在类的外部定义 inline 的一个好处是
+可以使得类比较容易阅读。
+
+像其他 inline 一样，inline 成员函数的定义必须在调用该函数的每个源文件中是可见的。不在类定义
+体内定义的 inline 成员函数，其定义通常应放在有类定义的同一头文件中。
+
+
+
+
+
+
+
+
+
+
+
