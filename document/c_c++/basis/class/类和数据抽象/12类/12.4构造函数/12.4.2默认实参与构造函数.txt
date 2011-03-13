@@ -1,0 +1,40 @@
+再来看看默认构造函数和接受一个 string 的构造函数的定义：
+
+     Sales_item(const std::string &book):
+               isbn(book), units_sold(0), revenue(0.0) { }
+     Sales_item(): units_sold(0), revenue(0.0) { }
+
+【★】这两个构造函数几乎是相同的：唯一的区别在于，接受一个 string 形参的构造函数使用该形参来初
+始化isbn。默认构造函数（隐式地）使用 string 的默认构造函数来初始化 isbn。
+
+
+可以通过为 string 初始化式提供一个默认实参将这些构造函数组合起来：
+
+     class Sales_item {
+     public:
+         // default argument for book is the empty string
+         Sales_item(const std::string &book = ""):
+                   isbn(book), units_sold(0), revenue(0.0) { }
+         Sales_item(std::istream &is);
+         // as before
+     };
+在这里，我们只定义了两个构造函数，其中一个为其形参提供一个默认实参。对于下面的任一定义，将执行
+为其 string 形参接受默认实参的那个构造函数：
+
+     Sales_item empty;
+     Sales_item Primer_3rd_Ed("0-201-82470-1");
+在 empty 的情况下，使用默认实参，而 Primer_3rd_ed 提供了一个显式实参。
+类的两个版本提供同一接口：给定一个 string 或不给定初始化式，它们都将一个 Sales_item 初始化为
+相同的值。
+【?】相同的值,什么意思?
+我们更喜欢使用默认实参，因为它减少代码重复。
+ 
+
+
+
+
+
+
+
+
+

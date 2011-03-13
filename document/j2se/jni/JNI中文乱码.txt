@@ -1,0 +1,35 @@
+需要用一下2个函数做编码格式转换
+
+char* jstringToNative( JNIEnv  *env, jstring jstr )
+{
+  int length = env->GetStringLength(jstr );
+  const jchar* jcstr = env->GetStringChars(jstr, 0 );
+  char* rtn = (char*)malloc( length*2+1 );
+  int size = 0;
+   size = WideCharToMultiByte( CP_ACP, 0, (LPCWSTR)jcstr, length, rtn,(length*2+1), NULL, NULL );
+  if( size <= 0 )return NULL;
+   env->ReleaseStringChars(jstr, jcstr );
+   rtn[size] = 0;
+  return rtn;
+}
+
+jstring nativeTojstring( JNIEnv* env, char* str )
+{
+   jstring rtn = 0;
+  int slen = strlen(str);
+   unsigned short * buffer = 0;
+  if( slen == 0 )
+     rtn = env->NewStringUTF( str ); 
+  else
+   {
+    int length = MultiByteToWideChar( CP_ACP, 0, (LPCSTR)str, slen, NULL, 0 );
+     buffer = (unsigned short *)malloc( length*2 + 1 );
+    if( MultiByteToWideChar( CP_ACP, 0, (LPCSTR)str, slen, (LPWSTR)buffer, length ) >0 )
+       rtn = env->NewString(   (jchar*)buffer, length );
+   }
+  if( buffer )
+   free( buffer );
+  return rtn;
+}
+http://kanhua.blogbus.com/logs/77135193.html
+http://www.vckbase.com/document/viewdoc/?id=1611

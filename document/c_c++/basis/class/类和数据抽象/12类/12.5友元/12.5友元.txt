@@ -1,0 +1,104 @@
+在某些情况下，允许特定的非成员函数访问一个类的私有成员，同时仍然阻止一般的访问，这是很方便做
+到的。例如，被重载的操作符，如输入或输出操作符，经常需要访问类的私有数据成员。这些操作符不可
+能为类的成员，具体原因参见第十四章。然而，尽管不是类的成员，它们仍是类的“接口的组成部分”。
+
+【★】友元机制允许一个类将对其非公有成员的访问权授予指定的函数或类。友元的声明以关键字
+ friend 开始。它只能出现在类定义的内部。友元声明可以出现在类中的任何地方：友元不是授予友元
+ 关系的那个类的成员，所以它们不受声明出现部分的访问控制影响。
+
+通常，将友元声明成组地放在类定义的开始或结尾是个好主意。
+
+【友元关系：一个例子】
+想像一下，除了 Screen 类之外，还有一个窗口管理器，管理给定显示器上的一组 Screen。窗口管理
+类在逻辑上可能需要访问由其管理的 Screen 对象的内部数据。假定 Window_Mgr 是该窗口管理类的
+名字，Screen 应该允许 Window_Mgr 像下面这样访问其成员：
+
+     class Screen {
+         // Window_Mgr members can access private parts of class Screen
+         friend class Window_Mgr;
+         // ...restofthe Screen class
+     };
+
+Window_Mgr 的成员可以直接引用 Screen 的私有成员。例如，Window_Mgr 可以有一个函数来重定位
+一个 Screen：
+
+     Window_Mgr&
+     Window_Mgr::relocate(Screen::index r, Screen::index c,
+                          Screen& s)
+     {
+          // ok to refer to height and width
+          s.height += r;
+          s.width += c;
+
+          return *this;
+     }
+缺少友元声明时，这段代码将会出错：将不允许使用形参 s 的 height 和 width 成员。因为 Screen 
+将友元关系授予 Window_Mgr，所以，Window_Mgr 中的函数都可以访问 Screen 的所有成员。
+
+
+【★】友元可以是普通的非成员函数，或前面定义的其他类的成员函数，或整个类。将一个类设为友元，
+友元类的所有成员函数都可以访问授予友元关系的那个类的非公有成员。
+
+【使其他类的成员函数成为友元】
+如果不是将整个 Window_Mgr 类设为友元，Screen 就可以指定只允许 relocate 成员访问：
+
+     class Screen {
+         // Window_Mgrmust be defined before class Screen
+         friend Window_Mgr&
+             Window_Mgr::relocate(Window_Mgr::index,
+                                  Window_Mgr::index,
+                                  Screen&);
+         // ...restofthe Screen class
+     };
+
+【★】当我们将其他类的成员函数声明为友元时，函数名必须用该函数所属的类名字加以限定。
+
+【友元声明与作用域】
+【★】为了正确地构造类，需要注意友元声明与友元定义之间的互相依赖。
+在前面的例子中，类 Window_Mgr 必须先定义。否则，Screen 类就不能将一个 Window_Mgr 函数指定
+为友元。然而，只有在定义类Screen 之后，才能定义 relocate 函数——毕竟，它被设为友元是为了访
+问类 Screen 的成员。
+
+更一般地讲，必须先定义包含成员函数的类，才能将成员函数设为友元。另一方面，不必预先声明类和
+非成员函数来将它们设为友元。
+友元声明将已命名的类或非成员函数引入到外围作用域中。此外，友元函数可以在类的内部定义，该函
+数的作用域扩展到包围该类定义的作用域。
+【★】声明其他类的成员函数为友元时,必须先定义包含此成员函数的类;另一方面,声明类和非成员函数
+为友元时则不需要这么做
+
+用友元引入的类名和函数（定义或声明），可以像预先声明的一样使用：
+
+     class X {
+         friend class Y;
+         friend void f() { /* ok to define friend function in the class body */ }
+     };
+     class Z {
+         Y *ymem; // ok: declaration for class Y introduced by friend in X
+         void g() { return ::f(); } // ok: declaration of f introduced by X
+     };
+
+
+【重载函数与友元关系】
+类必须将重载函数中每一个希望设为友元的函数都声明为友元：
+
+     // overloaded storeOn functions
+     extern std::ostream& storeOn(std::ostream &, Screen &);
+     extern BitMap& storeOn(BitMap &, Screen &);
+     class Screen {
+         // ostream version of storeOn may access private parts of Screen objects
+         friend std::ostream& storeOn(std::ostream &, Screen &);
+         // ...
+     };
+类 Screen 将接受一个 ostream& 的 storeOn 版本设为自己的友元。接受一个 BitMap& 的版本对
+ Screen 没有特殊访问权。
+【★】对于重载函数,类必须逐个将希望设为友元的函数都声明为友元
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,104 @@
+【指针数组】
+	int  *p[3];
+读法为：
+	p 是一个指针数组，这个指针的类型为 int.
+
+【数组指针】
+    int (*p)[3]; 
+读法为：
+	p是一个指针。指向了int [3]数组。
+
+【数组引用】
+	int (&p)[3];
+读法为：
+    p是一个引用，指向了int[3];
+
+【引用数组】
+      int & p[3];
+      
+ 【指针引用】
+ 	int	*&p;
+ 参数传递指针时将直接对指针指向的地址进行操作   
+ 传递指针的引用时，通过间接寻址，来实现对〔指针指向的地址〕进行操作。
+ 
+ 
+ 
+ 【引用和指针的区别】
+（1）引用必须在声明时初始化，而指针不用。用对象的地址初始化引用是错误的，应该用对象本身初始化引用，但可以定义一个指针引用（即该引用变量是指针类型，并引用一个同类型指针）。
+int *p = a;
+int *&ref = p;    //ok，该引用变量引用int型指针，即使p指向NULL也对
+使用的语言如C++已经尽可能地限制引用变量的有效性，但不能完全保证。存在一些无法保证的情况，例如用于初始化引用变量的变量未被构造，主要是因为使用指针初始化引用变量导致（此时指针指向NULL，无变量）：
+int *p = NULL;
+int &tmp = *p;   //语句是有效的，但是引用变量是无效的，因为引用变量不能引用NULL
+例如引用对象被无意析构，常表现为对函数返回的临时变量的引用（返回值在函数返回时被析构，结果引用错误）：
+int result;
+result = Function();  //warning，但是result已经被赋值为a的值
+int &Function()
+{
+ int a = 5;
+
+ return a;
+}
+一般在使用返回值引用时，常返回全局变量等无法析构的变量，例如：
+int a = 5;    //a是全局变量
+int result;
+result = Function();  //不会出现warning
+int &Function()
+{
+ return a;
+}
+注意int &Function()的返回值可以充当左值，但是如果x是函数的临时变量，对其进行引用是危险的；所以要保证返回值不会因函数返回而被析构。如下：
+int x = 0;    //x是全局变量
+int &Function()
+{
+ return x;
+}
+void main()
+{
+ Function() = 100;   //此时x等于100
+}
+（2）指针可以指向NULL，而引用不能引用NULL。
+（3）引用一旦声明，引用的对象不能改变（不能引用其他对象了），但是引用对象的值可以改变；指针可以随时改变指向的对象，因此说指针更危险，引用比指针安全。可以说，引用是在不牺牲性能的情况下，更安全的利用指针特性所使用的技术。
+（4）理论上存在两种必须用指针的情况，其他情况下建议用引用而不是指针：
+A.可能存在不指向任何对象(NULL)时，使用指针。
+B.需要指向不同对象时，使用指针。
+（5）在函数Function(int* &p)中，使用&目的是为了可以改变p指针本身，使其能指向其他对象，这种用法和Function(int** p)是一样的，即指向指针的指针。
+
+
+ 【const与指针】
+（1）const int a = 10与int const a = 10等价；同理const int*与int const*是等价的。(与下面一句互相矛盾???)
+（2）const int *a是指向const对象的指针，不可通过指针改变对象值，而int * const a是const指针，指针只能指向该对象。
+（3）指针指向const对象的情况
+const int a = 40;
+int *p;
+p = &a;         //错，编译错误，
+p = (int*)&a;   //编译通过，但是p无法改变a的值
+const int *p;
+p = &a;         //ok
+
+   
+ 【const与引用】
+非Const引用只能绑定到与该引用同类型的对象；
+Const引用则可绑定到不同但相关类型的对象或绑定到右值。
+（1）const对象（包括常量、常量+变量生成的无名临时变量）必须用const引用来引用，而反过来const引用可以引用const和非const变量。
+int a = 5;
+const int b = 10;
+int &ref = a;         //ok 
+int &ref = b;         //error
+const int &ref = b;   //ok，必须为const引用
+const int &ref = a;   //ok
+const int &ref = 5;      //ok，必须为const引用
+const int &ref = a + 3;  //ok，必须为const引用
+（2）const引用可以用不同类型的对象初始化，
+对于不同类型间的引用：
+double a = 3.5;
+const int &ref = a;
+实际上其工作流程是先定义int tmp = (int)a，然后const int &ref = tmp，所以必须用const引用，否则会导致错误。常量+变量生成的无名临时变量同理。
+（3）const引用可以指向需要临时对象的对象或值
+const int ival = 1024;
+const int* &b = &ival;        //error
+const int* const &b = &ival;  //ok
+解释是：
+typedef const int * P;
+P &b = &ival;        //error，因为&ival的值不可改变，而b是非常量指针
+P const &b = &ival;  //等价于const P &b = &ival;

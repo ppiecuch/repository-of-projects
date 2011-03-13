@@ -1,0 +1,79 @@
+【★】仅当形参是引用或指针时，形参是否为const才有影响。可基于函数的引用形参是指向const对象还
+是指向非const对象，实现函数重载。
+
+将引用形参定义为const来重载函数是合法的，因为编译器可以根据实参是否为const确定调用哪一个函数:
+Record lookup(Account&);
+Record lookup(const Account&);
+const Account a(0);
+Account b;
+lookup(a); //calls lookup(const Account&);
+lookup(b); //calls lookup(Account&);
+如果形参是普通的引用，则不能将const对象传递给这个形参。如果传递了const对象，则只有带const引
+用形参的版本才是该调用的可行函数。如果传递的是非const对象，则上述任意一种函数皆可行。非const
+对象既可用于初始化const引用，也可用于初始化非const引用。但是，将const引用初始化为非const对
+象，需通过转换来实现，而非const形参的初始化则是精确匹配。
+
+对指针形参的相关处理如出一辙。可将const对象的地址值只传递给带有指向const对象的指针形参的函数。
+也可将指向非const对象的指针传递给函数的const或非const类型的指针形参。如果两个函数仅在指针一
+形参是否指向const对象上不同，则指向非const对象的指针形参对于指向非const对象的指针(实参)来说
+是更佳的匹配。
+【★】重复强调，编译器可以判断:如果实参是const对象，则调用带有const*类型形参的函数;否则，如
+果实参不是const对象，将调用带有普通指针形参的函数。
+
+
+【★】注意不能基于指针本身是否为const来实现函数的重载:
+   f(int *);
+   f(int * const); //redeclaration
+此时指针const用于修饰指针本身，而不是修饰指针所指向的类型。在上述两种情况中，都复制了指针本
+ 身是否为const并没有带来区别。当形参以副本传递时，不能基于形参是否为const来实现重载。
+
+如上，我想起了一个东西。每个类的成员函数具有一个附加的隐含形参，既指向该对象的一个指针，这个
+隐含形参命名为this。下面就说说这个隐含形参this和const的关系，你还别说，还挺那个地。
+在普通的非const成员函数中，this的类型是一个*const，可以改变所指向的值但不能改变this的地址。
+在const成员函数中，this的类型是const * const,地址和值都不能改变。（在返回*this的const函数
+中，必须得是const引用。）
+有如下类：
+class Screen
+{ 
+.......
+public:
+         const Screen& display() const
+         {
+         ....
+         return *this;
+         }
+         void set(char );
+        ........
+};
+
+Screen s;
+s.display().set('*');//errn.why?
+        为了解决这个问题，我们必须定义两个display操作:一
+
+个是const，另一个不是const。基于成员函数是否为const，可以重载一个成员函数（由上可知道）;同样
+地，基于一个指针形参是否指向const可以重载一个函数。const对象只能使用const成员；非const对象
+可以使用任一成员，但非const版本是一个更好的匹配。
+class Screen
+{
+public:
+Screen& display() 
+         {
+         ....
+         return *this;
+         }
+                
+const Screen& display() const
+         {
+         ....
+         return *this;
+         }
+         void set(char );
+        ........
+}
+
+Screen s1(5,3);
+const Screen s2(5,3);
+s1.set('*').display(); //calls nonconst version
+s2.display();   //calls const version
+
+http://hi.baidu.com/%BC%F2%B5%A5%BE%CD%BA%C3_88/blog/item/74cc8bc71c696cd8d1006038.html

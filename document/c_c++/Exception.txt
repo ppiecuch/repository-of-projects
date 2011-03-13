@@ -1,3 +1,52 @@
+[Exception]不能将“this”指针从“const Cuboid”转换为“Cuboid &”
+[解决]将getWidth()定义为const类型
+
+[ERROR]没有找到MSVCR90D.dll
+[解决]中文版:项目-->项目属性-->配置属性-->清单工具-->使用FAT32解决方法-->是
+然后clean下,然后Rebuild即可正常运行
+
+[Exception]error C4430: 缺少类型说明符 - 假定为 int。注意: C++ 不支持默认 int
+[解决]
+可能一些调用用了一些类,这些类没有声明(在Copy时常见)
+
+[Warning]warning: no newline at the end of file
+[解决]
+修复这个警告，在文件结尾回车一下就行了。可以很少会有人去仔细探究，为什么gcc会给出这么一个警告？
+原因其实也很简单，因为标准规定如此。C99第5.1.1.2节这样写道：
+
+Each instance of a backslash character (\) immediately followed by a new-line character is deleted, splicing physical source lines to form logical source lines.Only the last backslash on any physical source lineshall be eligible for being part of such a splice. A source file that is not empty shall end in a new-line character, which shall not be immediately preceded by a backslash character before any such splicing takes place.
+
+C99 Rationale中进一步指出：
+
+A backslash immediately before a newline has long been used to continue string literals, as well as preprocessing command lines. In the interest of easing machine generation of C, and of transporting code to machines with restrictive physical line lengths, the C89 Committee generalized this mechanism to permit any token to be continued by interposing a backslash/newline sequence.
+
+这么规定的初衷有两个：
+为了每一行都要以换行结束。 
+因为行尾的\表示连接下一行，如果一个文件最后一行(main函数的右边大括号)行尾有\，那么，紧跟它也被包含进来的下一个源文件的第一行就会被连接！而如果一个文件以一个空行结束就会避免这种情况的发生。
+例子：
+view plaincopy to clipboardprint?
+#include <stdio.h>   
+int main()   
+{   
+    printf("%d", \   
+    sizeof(int));   
+    return 0;   
+}  
+#include <stdio.h>
+int main()
+{
+	printf("%d", \
+	sizeof(int));
+	return 0;
+} 
+上例中的第四个物理行和第五个物理行被反斜杠(\)连接成一个逻辑行（等价于printf("%d", sizeof(int))）;
+如果在第七行main函数的右大括号后面加上反斜杠的话，那么它就会和下一个文件的第一行连接，所以这里}之后要输入一个换行符，故要求每一行都要用换行结束。
+注：有些编译器会自动在文件结束位置插入换行符。（譬如vi编辑器）
+
+
+异常:fatal error RC1015: cannot open include file 'resource.h'.
+解决:
+
 异常:error C2039: “ReadHuge”: 不是“CFile”的成员 
 解决:这是CFile的函数，不过ReadHuge（）函数已被Read（）函数代替。
 还有就是WriteHuge（）函数已被Write（）函数代替。

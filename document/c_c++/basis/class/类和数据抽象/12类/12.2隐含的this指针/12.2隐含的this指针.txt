@@ -1,0 +1,171 @@
+在第 7.7.1 节中已经提到，成员函数具有一个附加的隐含形参，即指向该类对象的一个指针。这个隐含
+形参命名为 this，与调用成员函数的对象绑定在一起。成员函数不能定义 this 形参，而是由编译器隐
+含地定义。成员函数的函数体可以显式使用 this 指针，但不是必须这么做。如果对类成员的引用没有
+限定，编译器会将这种引用处理成通过 this 指针的引用。
+
+【何时使用 this 指针】
+尽管在成员函数内部显式引用 this 通常是不必要的，但有一种情况下必须这样做：当我们需要将一个
+对象作为整体引用而不是引用对象的一个成员时。最常见的情况是在这样的函数中使用 this：该函数返
+回对调用该函数的对象的引用。
+
+某种类可能具有某些操作，这些操作应该返回引用，Screen 类就是这样的一个类。迄今为止，我们的类
+只有一对 get 操作。逻辑上，我们可以添加下面的操作。
+1、一对 set 操作，将特定字符或光标指向的字符设置为给定值。
+2、一个 move 操作，给定两个 index 值，将光标移至新位置。
+理想情况下，希望用户能够将这些操作的序列连接成一个单独的表达式：
+     // move cursor to given position, and set that character
+     myScreen.move(4,0).set('#');
+这个语句等价于：
+     myScreen.move(4,0);
+     myScreen.set('#');
+
+【返回 *this】
+在单个表达式中调用 move 和 set 操作时，每个操作必须返回一个引用，该引用指向执行操作的那个对象：
+     class Screen {
+     public:
+          // interface member functions
+          Screen& move(index r, index c);
+          Screen& set(char);
+          Screen& set(index, index, char);
+          // other members as before
+     };
+注意，这些函数的返回类型是 Screen&，指明该成员函数返回对其自身类类型的对象的引用。每个函数都
+返回调用自己的那个对象。使用 this 指针来访问该对象。下面是对两个新成员的实现：
+     Screen& Screen::set(char c)
+     {
+         contents[cursor] = c;
+         return *this;
+     }
+     Screen& Screen::move(index r, index c)
+     {
+         index row = r * width; // row location
+         cursor = row + c;
+         return *this;
+     }
+函数中唯一需要关注的部分是 return 语句。在这两个操作中，每个函数都返回 *this。在这些函数中，
+this 是一个指向非常量 Screen 的指针。如同任意的指针一样，可以通过对 this 指针解引用来访问
+ this 指向的对象。
+ 
+ 【从 const 成员函数返回 *this】
+ 在普通的非 const 成员函数中，this 的类型是一个指向类类型的 const 指针（第 4.2.5 节）。可以
+ 改变 this 所指向对象的值，但不能改变 this 所保存的地址。在 const 成员函数中，this 的类型是
+ 一个指向 const 类类型对象的 const 指针。既不能改变 this 所指向的对象，也不能改变 this 所保
+ 存的地址。
+ 不能从 const 成员函数返回指向类对象的普通引用。const 成员函数只能返回 *this 作为一个 const 
+引用。
+
+例如，我们可以给 Screen 类增加一个 display 操作。这个函数应该在给定的 ostream 上打印 contents。
+逻辑上，这个操作应该是一个 const 成员。打印 contents 不会改变对象。如果将 display 作为 Screen
+的 const 成员，则 display 内部的 this 指针将是一个 const Screen* 型的 const。
+
+然而，与 move 和 set 操作一样，我们希望能够在一个操作序列中使用 display：
+     // move cursor to given position, set that character and display the screen
+     myScreen.move(4,0).set('#').display(cout);
+这个用法暗示了 display 应该返回一个 Screen 引用，并接受一个 ostream 引用。如果 display 是一个
+ const 成员，则它的返回类型必须是 const Screen&。
+不幸的是，这个设计存在一个问题。如果将 display 定义为 const 成员，就可以在非 const 对象上调用 
+display，但不能将对 display 的调用嵌入到一个长表达式中。下面的代码将是非法的：
+     Screen myScreen;
+     // this code fails if display is a const member function
+     // display return a const reference; we cannot call set on a const
+     myScreen.display().set('*');
+问题在于这个表达式是在由 display 返回的对象上运行 set。该对象是 const，因为 display 将其对象
+作为 const 返回。我们不能在 const 对象上调用 set。
+【★】在普通的非 const 成员函数中，this是一个指向类类型的 const 指针
+【★】在 const 成员函数中，this是一个指向 const 类类型对象的 const 指针
+【★】const成员与非const成员组成长表达式时,只能是非const在前,const在后，即由非const执行const
+ 
+【基于 const 的重载】
+为了解决这个问题，我们必须定义两个 display 操作：一个是 const，另一个不是 const。基于成员函数
+是否为 const，可以重载一个成员函数；同样地，基于一个指针形参是否指向 const（第 7.8.4 节），可
+以重载一个函数。const 对象只能使用 const 成员。非 const 对象可以使用任一成员，但非 const 版本
+是一个更好的匹配。
+在此，我们将定义一个名为 do_display 的 private 成员来打印 Screen。每个 display 操作都将调用此
+函数，然后返回调用自己的那个对象：
+     class Screen {
+     public:
+         // interface member functions
+         // display overloaded on whether the object is const or not
+         Screen& display(std::ostream &os)
+                       { do_display(os); return *this; }
+         const Screen& display(std::ostream &os) const
+                       { do_display(os); return *this; }
+     private:
+          // single function to do the work of displaying a Screen,
+          // will be called by the display operations
+          void do_display(std::ostream &os) const
+                            { os << contents; }
+          // as before
+      };
+现在，当我们将 display 嵌入到一个长表达式中时，将调用非 const 版本。当我们 display 一个 const
+对象时，就调用 const 版本：
+     Screen myScreen(5,3);
+     const Screen blank(5, 3);
+     myScreen.set('#').display(cout); // calls nonconst version
+     blank.display(cout);             // calls const version
+
+【?】 const Screen& display(std::ostream &os) const两个const的意义是否不同?
+【?】myScreen.set('#').display(cout);应该是对非const成员调用const成员方法吧,这本来就没有
+问题，而且这里的重载方法似乎是通过参数是否为const类型来区分，存在局限性
+
+【可变数据成员】
+有时（但不是很经常），我们希望类的数据成员（甚至在 const 成员函数内）可以修改。这可以通过将
+它们声明为 mutable 来实现。
+可变数据成员（mutable data member）永远都不能为 const，甚至当它是 const 对象的成员时也如此。
+因此，const 成员函数可以改变 mutable 成员。要将数据成员声明为可变的，必须将关键字 mutable 
+放在成员声明之前：
+     class Screen {
+     public:
+     // interface member functions
+     private:
+         mutable size_t access_ctr; // may change in a const members
+         // other data members as before
+      };
+我们给 Screen 添加了一个新的可变数据成员 access_ctr。使用 access_ctr 来跟踪调用 Screen 成员
+函数的频繁程度：
+     void Screen::do_display(std::ostream& os) const
+     {
+         ++access_ctr; // keep count of calls to any member function
+         os << contents;
+     }
+尽管 do_display 是 const，它也可以增加 access_ctr。该成员是可变成员，所以，任意成员函数，包
+括 const 函数，都可以改变 access_ctr 的值。
+【★】要将数据成员声明为可变的，必须将关键字 mutable放在成员声明之前,可变成员可以被const函数
+和非const改变
+
+【建议：用于公共代码的私有实用函数】
+有些读者可能会奇怪为什么要费力地单独定义一个 do_display 内部所做的操作更简单。为什么还要如此
+麻烦？我们这样做有下面几个原因。
+1、一般愿望是避免在多个地方编写同样的代码。
+2、display 操作预期会随着类的演变而变得更复杂。当所涉及的动作变得更复杂时，只在一处而不是两处
+编写这些动作有更显著的意义。
+3、很可能我们会希望在开发时给 do_display 增加调试信息，这些调试信息将会在代码的最终成品版本中
+去掉。如果只需要改变一个 do_display 的定义来增加或删除调试代码，这样做将更容易。
+4、这个额外的函数调用不需要涉及任何开销。我们使 do_display 成为内联的，所以调用 do_display与
+将代码直接放入 display 操作的运行时性能应该是相同的。
+实际上，设计良好的 C++ 程序经常具有许多像 do_display 这样的小函数，它们被调用来完成一些其他函
+数的“实际”工作。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

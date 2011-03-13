@@ -1,0 +1,71 @@
+每个类都定义了自己的新作用域和唯一的类型。在类的定义体内声明类成员，将成员名引入类的作用域。
+两个不同的类具有两个的类作用域。
+
+即使两个类具有完全相同的成员列表，它们也是不同的类型。每个类的成员不同于任何其他类（或任何其
+他作用域）的成员。
+
+【使用类的成员】
+在类作用域之外，成员只能通过对象或指针分别使用成员访问操作符 . 或 -> 来访问。这些操作符左边的
+操作数分别是一个类对象或指向类对象的指针。跟在操作符后面的成员名字必须在相关联的类的作用域中
+声明：
+
+一些成员使用成员访问操作符来访问，另一些直接通过类使用作用域操作符（::）来访问。一般的数据或
+函数成员必须通过对象来访问。定义类型的成员，如 Screen::index，使用作用域操作符来访问。
+【?】何谓类型的成员?
+【▲】应该是指静态成员吧
+
+【作用域与成员定义】
+尽管成员是在类的定义体之外定义的，但成员定义就好像它们是在类的作用域中一样。回忆一下，出现在
+类的定义体之外的成员定义必须指明成员出现在哪个类中：
+     double Sales_item::avg_price() const
+     {
+         if (units_sold)
+             return revenue/units_sold;
+         else
+             return 0;
+     }
+在这里，我们用完全限定名 Sales_item::avg_price 来指出这是类 Sales_item 作用域中的 avg_price 
+成员的定义。一旦看到成员的完全限定名，就知道该定义是在类作用域中。因为该定义是在类作用域中，
+所以我们可以引用 revenue 或 units_sold，而不必写 this->revenue 或 this->units_sold。
+
+
+【形参表和函数体处于类作用域中】
+在定义于类外部的成员函数中，形参表和成员函数体都出现在成员名之后。这些都是在类作用域中定义，
+所以可以不用限定而引用其他成员。例如，类 Screen 中 get 的二形参版本的定义：
+     char Screen::get(index r, index c) const
+     {
+         index row = r * width;      // compute the row location
+
+         return contents[row + c];   // offset by c to fetch specified character
+     }
+
+该函数用 Screen 内定义的 index 类型来指定其形参类型。因为形参表是在 Screen 类的作用域内，所以
+不必指明我们想要的是 Screen::index。我们想要的是定义在当前类作用域中的，这是隐含的。同样，使
+用 index、width 和 contents 时指的都是 Screen 类中声明的名字。
+
+【函数返回类型不一定在类作用域中】
+与形参类型相比，返回类型出现在成员名字前面。如果函数在类定义体之外定义，则用于返回类型的名字
+在类作用域之外。如果返回类型使用由类定义的类型，则必须使用完全限定名。例如，考虑 get_cursor 
+函数：
+
+     class Screen {
+     public:
+         typedef std::string::size_type index;
+         index get_cursor() const;
+     };
+     inline Screen::index Screen::get_cursor() const
+     {
+         return cursor;
+     }
+该函数的返回类型是 index，这是在 Screen 类内部定义的一个类型名。如果在类定义体之外定义
+ get_cursor，则在函数名被处理之前，代码在不在类作用域内。当看到返回类型时，其名字是在类作用
+ 域之外使用。必须用完全限定的类型名 Screen::index 来指定所需要的 index 是在类 Screen 中定义的
+ 名字。
+
+
+
+
+
+
+
+

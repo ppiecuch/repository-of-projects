@@ -1,0 +1,183 @@
+静态数据成员： 
+下面看一个例子： 
+#include <iostream.h> 
+class Point 
+{ 
+public: 
+void output() 
+{ 
+} 
+static void init() 
+{  
+} 
+}; 
+void main( void ) 
+{ 
+Point pt; 
+pt.init(); 
+pt.output(); 
+} 
+这样编译是不会有任何错误的。 
+下面这样看 
+#include <iostream.h> 
+class Point 
+{ 
+public: 
+void output() 
+{  
+} 
+static void init() 
+{  
+} 
+}; 
+void main( void ) 
+{ 
+Point::output(); 
+} 
+这样编译会处错，错误信息：illegal call of non-static member function，为什么？ 
+因为在没有实例化一个类的具体对象时，类是没有被分配内存空间的。 
+好的再看看下面的例子: 
+#include <iostream.h> 
+class Point 
+{ 
+public: 
+void output() 
+{  
+} 
+static void init() 
+{  
+} 
+}; 
+void main( void ) 
+{ 
+Point::init(); 
+} 
+这时编译就不会有错误，因为在类的定义时，它静态数据和成员函数就有了它的内存区，它不属于类的任何一个具体对象。 
+好的再看看下面的例子: 
+#include <iostream.h> 
+class Point 
+{ 
+public: 
+void output() 
+{  
+} 
+static void init() 
+{ 
+   x = 0; 
+   y = 0; 
+} 
+private: 
+int x; 
+int y; 
+}; 
+void main( void ) 
+{ 
+Point::init(); 
+} 
+编译出错： 
+illegal reference to data member 'Point::x' in a static member function 
+illegal reference to data member 'Point::y' in a static member function 
+在一个静态成员函数里错误的引用了数据成员， 
+还是那个问题，静态成员（函数），不属于任何一个具体的对象，那么在类的具体对象声明之前就已经有了内存区， 
+而现在非静态数据成员还没有分配内存空间，那么这里调用就错误了，就好像没有声明一个变量却提前使用它一样。 
+也就是说在静态成员函数中不能引用非静态的成员变量。 
+好的再看看下面的例子: 
+#include <iostream.h> 
+class Point 
+{ 
+public: 
+void output() 
+{ 
+   x = 0; 
+   y = 0; 
+   init();  
+} 
+static void init() 
+{ 
+
+} 
+private: 
+int x; 
+int y; 
+}; 
+void main( void ) 
+{ 
+Point::init(); 
+} 
+好的，这样就不会有任何错误。这最终还是一个内存模型的问题， 
+任何变量在内存中有了自己的空间后，在其他地方才能被调用，否则就会出错。 
+好的再看看下面的例子: 
+#include <iostream.h> 
+class Point 
+{ 
+public: 
+void output() 
+{ 
+} 
+static void init() 
+{ 
+   x = 0; 
+   y = 0; 
+} 
+private: 
+static int x; 
+static int y; 
+}; 
+void main( void ) 
+{ 
+Point::init(); 
+} 
+编译： 
+Linking... 
+test.obj : error LNK2001: unresolved external symbol "private: static int Point::y" (?y@Point@@0HA) 
+test.obj : error LNK2001: unresolved external symbol "private: static int Point::x" (?x@Point@@0HA) 
+Debug/Test.exe : fatal error LNK1120: 2 unresolved externals 
+执行 link.exe 时出错. 
+可以看到编译没有错误，连接错误，这又是为什么呢？ 
+这是因为静态的成员变量要进行初始化，可以这样： 
+#include <iostream.h> 
+class Point 
+{ 
+public: 
+void output() 
+{ 
+} 
+static void init() 
+{ 
+   x = 0; 
+   y = 0; 
+} 
+private: 
+static int x; 
+static int y; 
+}; 
+int Point::x = 0; 
+int Point::y = 0; 
+void main( void ) 
+{ 
+Point::init(); 
+} 
+在静态成员数据变量初始化之后就不会出现编译错误了。 
+再看看下面的代码： 
+#include <iostream.h> 
+class Point 
+{ 
+public: 
+void output() 
+{ 
+} 
+static void init() 
+{ 
+   x = 0; 
+   y = 0; 
+} 
+private: 
+static int x; 
+static int y; 
+}; 
+void main( void ) 
+{ 
+} 
+编译没有错误，为什么？ 
+即使他们没有初始化，因为我们没有访问x，y，所以编译不会出错。 
+http://tjmzgn.javaeye.com/blog/446150

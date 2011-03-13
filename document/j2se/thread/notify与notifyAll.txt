@@ -1,0 +1,9 @@
+使用wait方法和使用synchornized来分配cpu时间是有本质区别的。wait会释放锁，synchornized不释放锁。
+还有：（wait/notify/notifyAll）只能在取得对象锁的时候才能调用。
+
+
+notify和notifyAll都是把某个对象上休息区内的线程唤醒,notify只能唤醒一个,但究竟是哪一个不能确定,而notifyAll则唤醒这个对象上的休息室中所有的线程.
+
+调用notifyAll通知所有线程继续执行，只能有一个线程在执行其余的线程在等待(因为在所有线程被唤醒的时候在synchornized块中)。这时的等待和调用notifyAll前的等待是不一样的。
+notifyAll前：在对象上休息区内休息
+notifyAll后：在排队等待获得对象锁。

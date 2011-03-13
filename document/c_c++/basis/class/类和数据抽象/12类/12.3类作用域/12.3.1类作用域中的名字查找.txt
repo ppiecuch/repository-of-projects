@@ -1,0 +1,151 @@
+迄今为止，在我们所编写的程序中，名字查找（寻找与给定的名字使用相匹配的声明的过程）是相对直接的。
+
+1、首先，在使用该名字的块中查找名字的声明。只考虑在该项使用之前声明的名字。
+2、如果找不到该名字，则在包围的作用域中查找。
+如果找不到任何声明，则程序出错。在 C++ 程序中，所有名字必须在使用之前声明。
+【★】在 C++ 程序中，所有名字必须在使用之前声明。
+
+
+类作用域也许表现得有点不同，但实际上遵循同一规则。可能引起混淆的是函数中名字确定的方式，而该
+函数是在类定义体内定义的。
+类定义实际上是在两个阶段中处理：
+1、首先，编译成员声明；
+2、只有在所有成员出现之后，才编译它们的定义本身。
+当然，类作用域中使用的名字并非必须是类成员名。类作用域中的名字同样会查找发生在其他作用域中的
+声明。在名字查找期间，如果类作用域中使用的名字不能确定为类成员名，则在包含该类或成员定义的
+作用域中查找，以便找到该名字的声明。
+
+【类成员声明的名字查找】
+按以下方式确定在类成员的声明中用到的名字。
+1、检查出现在名字使用之前的类成员的声明。
+2、如果第 1 步查找不成功，则检查包含类定义的作用域中出现的声明以及出现在类定义之前的声明。
+例如：
+     typedef double Money;
+     class Account {
+     public:
+         Money balance() { return bal; }
+     private:
+         Money bal;
+         // ...
+     };
+在处理 balance 函数的声明时，编译器首先在类 Account 的作用域中查找 Money 的声明。编译器只考
+虑出现在 Money 使用之前的声明。因为找不到任何成员声明，编译器随后在全局作用域中查找 Money 的
+声明。只考虑出现在类 Account 的定义之前的声明。找到全局的类型别名 Money 的声明，并将它用作函
+数 balance 的返回类型和数据成员 bal 的类型。
+
+
+编译器按照成员声明在类中出现的次序来处理它们。通常，名字必须在使用之前进行定义。而且，一旦一
+个名字被用作类型名，该名字就不能被重复定义：
+     typedef double Money;
+     class Account {
+     public:
+         Money balance() { return bal; } // uses global definition of Money
+     private:
+         // error: cannot change meaning of Money
+         typedef long double Money;
+         Money bal;
+         // ...
+     };
+
+【★】必须在类中先定义类型名字，才能将它们用作数据成员的类型，或者成员函数的返回类型或形参类型。
+【★】函数局部作用域中的声明->类成员的声明->类定义的作用域中的声明->出现在类定义之前的声明
+
+【类成员定义中的名字查找】
+按以下方式确定在成员函数的函数体中用到的名字。
+1、首先检查成员函数局部作用域中的声明。
+2、如果在成员函数中找不到该名字的声明，则检查对所有类成员的声明。
+3、如果在类中找不到该名字的声明，则检查在此成员函数定义之前的作用域中出现的声明。
+
+
+
+【类成员遵循常规的块作用域名字查找】
+例示名字查找的程序经常不得不依赖一些坏习惯。下面的几个程序故意包含了坏的风格。
+下面的函数使用了相同的名字来表示形参和成员，这是通常应该避免的。这样做的目的是展示如何确定名字：
+     // Note: This code is for illustration purposes only and reflects bad practice
+     // It is a bad idea to use the same name for a parameter and a member
+     int height;
+     class Screen {
+     public:
+         void dummy_fcn(index height) {
+             cursor = width * height; // which height? The parameter
+         }
+     private:
+         index cursor;
+         index height, width;
+     };
+查找 dummy_fcn 的定义中使用的名字 height 的声明时，编译器首先在该函数的局部作用域中查找。函
+数的局部作用域中声明了一个函数形参。dummy_fcn 的函数体中使用的名字 height 指的就是这个形参
+声明。
+在本例中，height 形参屏蔽名为 height 的成员。
+尽管类的成员被屏蔽了，但仍然可以通过用类名来限定成员名或显式使用 this 指针来使用它。
+如果我们想覆盖常规的查找规则，应该这样做：
+     // bad practice: Names local to member functions shouldn't hide member names
+     void dummy_fcn(index height) {
+         cursor = width * this->height;   // member height
+         // alternative way to indicate the member
+         cursor = width * Screen::height; // member height
+     }
+
+【函数作用域之后，在类作用域中查找】
+如果想要使用 height 成员，更好的方式也许是为形参取一个不同的名字：
+
+     // good practice: Don't use member name for a parameter or other local variable
+     void dummy_fcn(index ht) {
+         cursor = width * height; // member height
+     }
+现在当编译器查找名字 height 时，它将不会在函数内查找该名字。编译器接着会在 Screen 类中查找。
+因为 height 是在成员函数内部使用，所以编译器在所有成员声明中查找。尽管 height 是先在 
+dummy_fcn 中使用，然后再声明，编译器还是确定这里用的是名为 height 的数据成员。
+
+
+【类作用域之后，在外围作用域中查找】
+如果编译器不能在函数或类作用域中找到，就在外围作用域中查找。在本例子中，出现在 Screen 定义
+之前的全局作用域中声明了一个名为 height 的全局声明。然而，该对象被屏蔽了。
+尽管全局对象被屏蔽了，但通过用全局作用域确定操作符来限定名字，仍然可以使用它。
+	// bad practice: Don't hide names that are needed from surrounding scopes
+     void dummy_fcn(index height) {
+         cursor = width * ::height;// which height? The global one
+     }
+【★】全局作用域使用::操作符
+
+
+
+【在文件中名字的出现处确定名字】
+当成员定义在类定义的外部时，名字查找的第 3 步不仅要考虑在 Screen 类定义之前的全局作用域中的
+声明，而且要考虑在成员函数定义之前出现的全局作用域声明。例如：
+
+     class Screen {
+     public:
+         // ...
+         void setHeight(index);
+     private:
+         index height;
+     };
+
+     Screen::index verify(Screen::index);
+
+     void Screen::setHeight(index var) {
+         // var: refers to the parameter
+         // height: refers to the class member
+         // verify: refers to the global function
+         height = verify(var);
+     }
+注意，全局函数 verify 的声明在 Screen 类定义之前是不可见的。然而，名字查找的第 3 步要考虑那
+些出现在成员定义之前的外围作用域声明，并找到全局函数 verify 的声明。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

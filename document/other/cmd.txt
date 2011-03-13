@@ -1,0 +1,2 @@
+强制终止进程:
+taskkill /im Demo.exe /f

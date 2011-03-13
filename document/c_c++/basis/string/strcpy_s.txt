@@ -1,0 +1,8 @@
+今天了解了下strcpy_s，原来strcpy_s是系统的安全函数，微软在2005后建议用一系统所谓安全的函数，这中间就有strcpy_s取代了strcpy，原来strcpy函数，就象gets函数一样，它没有方法来保证有效的缓冲区尺寸，所以它只能假定缓冲足够大来容纳要拷贝的字符串。所以用strcpy_s代替，下面有一个使用strcpy_s的例子：
+char source[]="hello";
+char destination[20]={0};
+strcpy_s(destination,sizeof(destination)/sizeof(destination[0]),source);
+
+strcpy_s是以字节为单位的参数，它用来确认缓冲区大小。这允许strcpy_s函数可以进行运行时检查，以确定写入的字符没有超过目标缓冲区的边界。所以它比strcpy好用，我还知道其他系统安全函数是在本来函数的后面加上“_s”，还有个遗憾就是用visual c++6.0没法编译strcpy_s函数，可能是因为他太新吧
+ 
+

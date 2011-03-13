@@ -1,0 +1,37 @@
+Android重力感应接口在很多动作类游戏中被使用,今天我尝试下接口,给大家分享下经验:
+
+public void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+// 取消标题
+requestWindowFeature(Window.FEATURE_NO_TITLE);
+// 禁止屏幕休眠
+getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+// 全屏幕
+getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+WindowManager.LayoutParams.FLAG_FULLSCREEN);
+setContentView(R.layout.main);
+mAgileBuddyView = (AgileBuddyView) findViewById(R.id.agile_buddy);
+//下面是重力感应的相关服务和调用
+mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+mSensorEventListener = new SensorEventListener() {
+public void onSensorChanged(SensorEvent e) {
+mAgileBuddyView.handleMoving(e.values[SensorManager.DATA_X]);
+}
+
+public void onAccuracyChanged(Sensor s, int accuracy) {
+}
+};
+// 注册重力感应监听
+mSensorManager.registerListener(mSensorEventListener, mSensor,
+SensorManager.SENSOR_DELAY_GAME);
+}
+
+@Override
+public void finish() {
+// 注销重力感应监听
+mSensorManager.unregisterListener(mSensorEventListener, mSensor);
+super.finish();
+}
+http://www.eoeandroid.com/thread-62975-1-1.html

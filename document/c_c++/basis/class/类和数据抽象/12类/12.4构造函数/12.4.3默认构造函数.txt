@@ -1,0 +1,96 @@
+只要定义一个对象时没有提供初始化式，就使用默认构造函数。为所有形参提供默认值的构造函数也定
+义了默认构造函数。
+【?】为所有形参提供默认值的构造函数也定义了默认构造函数。什么意思?
+
+【合成的默认构造函数】
+【★】一个类哪怕只定义了一个构造函数，编译器也不会再生成默认构造函数。这条规则的根据是，
+如果一个类在某种情况下需要控制对象初始化，则该类很可能在所有情况下都需要控制。
+只有当一个类没有定义构造函数时，编译器才会自动生成一个默认构造函数。
+
+合成的默认构造函数（synthesized default constructor）使用与变量初始化相同的规则来初始化成
+员。具有类类型的成员通过运行各自的默认构造函数来进行初始化。内置和复合类型的成员，如指针和数
+组，只对定义在全局作用域中的对象才初始化。当对象定义在局部作用域中时，内置或复合类型的成员不
+进行初始化。
+
+如果类包含内置或复合类型的成员，则该类不应该依赖于合成的默认构造函数。它应该定义自己的构造函
+数来初始化这些成员。
+
+【类通常应定义一个默认构造函数】
+在某些情况下，默认构造函数是由编译器隐式应用的。如果类没有默认构造函数，则该类就不能用在这些
+环境中。为了例示需要默认构造函数的情况，假定有一个 NoDefault 类，它没有定义自己的默认构造函
+数，却有一个接受一个 string 实参的构造函数。因为该类定义了一个构造函数，因此编译器将不合成默
+认构造函数。NoDefault 没有默认构造函数，意味着：
+
+1、具有 NoDefault 成员的每个类的每个构造函数，必须通过传递一个初始的 string 值给 NoDefault 
+构造函数来显式地初始化 NoDefault 成员。
+2、编译器将不会为具有 NoDefault 类型成员的类合成默认构造函数。如果这样的类希望提供默认构造
+函数，就必须显式地定义，并且默认构造函数必须显式地初始化其 NoDefault 成员。
+【★】3、NoDefault 类型不能用作动态分配数组的元素类型。
+【★】4、NoDefault 类型的静态分配数组必须为每个元素提供一个显式的初始化式。
+【★】5、如果有一个保存 NoDefault 对象的容器，例如 vector，就不能使用接受容器大小而没有同时
+提供一个元素初始化式的构造函数。
+【★】实际上，如果定义了其他构造函数，则提供一个默认构造函数几乎总是对的。通常，在默认构造函
+数中给成员提供的初始值应该指出该对象是“空”的。
+
+
+【使用默认构造函数】
+初级 C++ 程序员常犯的一个错误是，采用以下方式声明一个用默认构造函数初始化的对象：
+     // oops! declares a function, not an object
+     Sales_item myobj();
+
+编译 myobj 的声明没有问题。然而，当我们试图使用 myobj 时
+
+     Sales_item myobj();   // ok: but defines a function, not an object
+     if (myobj.same_isbn(Primer_3rd_ed))   // error: myobj is a function
+     
+编译器会指出不能将成员访问符号用于一个函数！问题在于 myobj 的定义被编译器解释为一个函数的声
+明，该函数不接受参数并返回一个 Sales_item 类型的对象——与我们的意图大相径庭！使用默认构造函
+数定义一个对象的正确方式是去掉最后的空括号：
+
+     // ok: defines a class object ...
+     Sales_item myobj;
+
+另一方面，下面这段代码也是正确的：
+
+     // ok: create an unnamed, empty Sales_itemand use to initialize myobj
+     Sales_item myobj = Sales_item();
+
+在这里，我们创建并初始化一个 Sales_item 对象，然后用它来按值初始化 myobj。编译器通过运行 
+Sales_item 的默认构造函数来按值初始化一个 Sales_item。
+
+
+
+
+
+
+
+
+
+
+
+
+【引用】合成的默认构造函数
+C++编译器必须为未声明构造函数之class合成一个默认构造函数
+第一，class 有member object（该member object有default constructor), class需要
+default constructor调用member object default constructor
+
+第二，如果一个没有任何constructor的class 派生自一个"带有default constructor"的
+base class.那么它的default constructor会被合成出来。
+
+第三，如果一个class申明了virtual function,，如果该类没有任何constructor，
+编译器也会为它加default constructor.
+(如果用户有constructor，编译器会在他的constructor中添加一些code，用来初始化vptr)
+
+第四，一个class(没有申明任何constructor)派生自一个继承串链，其中有一个或多个
+virtual base classes,编译器也会合成出一个default constructor,在其中放入每一个
+virtual base class的执行期存取操作的的码，(如果用户申明了constructors,编译器会在
+constructor中安插virtual base class执行期存取操作的的码)
+
+上面四种分析合成出的default constructor都是nontrivial default constructors,
+不在此情况之内的都trivial default constructors,它们实际上并不会被编译器合成出来
+
+在合成的default constructors，只有base class subobjects和member class object会
+被初始化，所有其它的nonstatic data member，如整数、整数指针、整数数组等等都不会被
+编译器初始化。
+
+http://zhidao.baidu.com/question/113881644.html
