@@ -1,0 +1,177 @@
+有些类为了做一些工作需要对复制进行控制。为了给出这样的例子，我们将概略定义两个类，这两个类可用于邮件处
+理应用程序。Message 类和 Folder 类分别表示电子邮件（或其他）消息和消息所出现的目录，一个给定消息可以出
+现在多个目录中。Message 上有 save 和 remove 操作，用于在指定 Folder 中保存或删除该消息。
+
+对每个 Message，我们并不是在每个 Folder 中都存放一个副本，而是使每个 Message 保存一个指针集（set），
+set 中的指针指向该 Message 所在的 Folder。每个 Folder 也保存着一些指针，指向它所包含的 Message。将要实
+现的数据结构如图 13.1 所示。
+
+创建新的 Message 时，将指定消息的内容但不指定 Folder。调用 save 将 Message 放入一个 Folder。
+
+复制一个 Message 对象时，将复制原始消息的内容和 Folder 指针集，还必须给指向源 Message 的每个 Folder 
+增加一个指向该 Message 的指针。
+
+将一个 Message 对象赋值给另一个，类似于复制一个 Message：赋值之后，内容和 Folder 集将是相同的。首先从
+左边 Message 在赋值之前所处的 Folder 中删除该 Message。原来的 Message 去掉之后，再将右边操作数的内容
+和 Folders 集复制到左边，还必须在这个 Folder 集中的每个 Folders 中增加一个指向左边 Message 的指针。
+
+撤销一个 Message 对象时，必须更新指向该 Message 的每个 Folder。一旦去掉了 Message，指向该 Message 的
+指针将失效，所以必须从该 Message 的 Folder 指针集的每个 Folder 中删除这个指针。 
+
+查看这个操作列表，可以看到，析构函数和赋值操作符分担了从保存给定 Message 的 Folder 列表中删除消息的工
+作。类似地，复制构造函数和赋值操作符分担将一个 Message 加到给定 Folder 列表的工作。我们将定义一对 
+private 实用函数完成这些任务。
+
+【Message 类】
+对于以上的设计，可以如下编写 Message 类的部分代码：
+
+     class Message {
+     public:
+         // folders is initialized to the empty set automatically
+         Message(const std::string &str = ""):
+                       contents (str) { }
+         // copy control: we must manage pointers to this Message
+         // from the Folders pointed to by folders
+         Message(const Message&);
+         Message& operator=(const Message&);
+         ~Message();
+         // add/remove this Message from specified Folder's set of messages
+         void save (Folder&);
+         void remove(Folder&);
+     private:
+         std::string contents;      // actual message text
+         std::set<Folder*> folders; // Folders that have this Message
+         // Utility functions used by copy constructor, assignment, and destructor:
+         // Add this Message to the Folders that point to the parameter
+         void put_Msg_in_Folders(const std::set<Folder*>&);
+         // remove this Message from every Folder in folders
+         void remove_Msg_from_Folders();
+     };
+
+Message 类定义了两个数据成员：contents 是一个保存实际消息的 string，folders 是一个 set，包含指向该
+ Message 所在的 Folder 的指针。
+
+构造函数接受单个 string 形参，表示消息的内容。构造函数将消息的副本保存在 contents 中，并（隐式）将 
+Folder 的 set 初始化为空集。这个构造函数提供一个默认实参（为空串），所以它也可以作为默认构造函数。
+
+实用函数提供由复制控制成员共享的行为。put_Msg_in_Folders 函数将自身 Message 的一个副本添加到指向给
+定 Message 的各 Folder 中，这个函数执行完后，形参指向的每个 Folder 也将指向这个 Message。复制构造函数
+和赋值操作符都将使用这个函数。
+
+remove_Msg_from_Folders 函数用于赋值操作符和析构函数，它从 folders 成员的每个 Folder 中删除指向这个
+ Message 的指针。
+
+【Message 类的复制控制】
+复制 Message 时，必须将新创建的 Message 添加到保存原 Message 的每个 Folder 中。这个工作超出了合成构造
+函数的能力范围，所以我们必须定义自己的复制构造函数：
+
+     Message::Message(const Message &m):
+         contents(m.contents), folders(m.folders)
+     {
+         // add this Message to each Folder that points to m
+         put_Msg_in_Folders(folders);
+     }
+
+复制构造函数将用旧对象成员的副本初始化新对象的数据成员。除了这些初始化之外（合成复制构造函数可以完成
+这些初始化），还必须用 folders 进行迭代，将这个新的 Message 加到那个集的每个 Folder 中。复制构造函数
+使用 put_Msg_in_Folder 函数完成这个工作。
+
+【★】编写自己的复制构造函数时，必须显式复制需要复制的任意成员。显式定义的复制构造函数不会进行任何
+自动复制。
+
+像其他任何构造函数一样，如果没有初始化某个类成员，则那个成员用该成员的默认构造函数初始化。复制构造函
+数中的默认初始化不会使用成员的复制构造函数。
+
+【put_Msg_in_Folders 成员】
+put_Msg_in_Folders 通过形参 rhs 的成员 folders 中的指针进行迭代。这些指针表示指向 rhs 的每个 Folder，
+需要将指向这个 Message 的指针加到每个 Folder。
+
+函数通过 rhs.folders 进行循环，调用命名为 addMsg 的 Folder 成员来完成这个工作，addMsg 函数将指向该 
+Message 的指针加到 Folder 中。
+
+     // add this Message to Folders that point to rhs
+     void Message::put_Msg_in_Folders(const set<Folder*> &rhs)
+     {
+         for(std::set<Folder*>::const_iterator beg = rhs.begin();
+                                          beg != rhs.end(); ++beg)
+             (*beg)->addMsg(this);     // *beg points to a Folder
+     }
+
+这个函数中唯一复杂的部分是对 addMsg 的调用：
+
+     (*beg)->addMsg(this); // *beg points to a Folder
+
+
+那个调用以 (*beg) 开关，它解除迭代器引用。解除迭代器引用将获得一个指向 Folder 的指针。然后表达式对 
+Folder 指针应用箭头操作符以执行 addMsg 操作，将 this 传给 addMsg，该指针指向我们想要添加到 Folder 
+中的 Message。
+
+【Message 赋值操作符】
+赋值比复制构造函数更复杂。像复制构造函数一样，赋值必须对 contents 赋值并更新 folders 使之与右操作数
+的 folders 相匹配。它还必须将该 Message 加到指向 rhs 的每个 Folder 中，可以使用 put_Msg_in_Folders 
+函数完成赋值的这一部分工作。
+
+在从 rhs 复制之前，必须首先从当前指向该 Message 的每个 Folder 中删除它。我们需要通过 folders 进行迭
+代，从 folders 的每个 Folder 中删除指向该 Message 的指针。命名为 remove_Msg_from_Folders 的函数将
+完成这项工作。
+
+对于完成实际工作的 remove_Msg_from_Folders 和 put_Msg_in_Folders，赋值操作符本身相当简单：
+
+     Message& Message::operator=(const Message &rhs)
+     {
+         if (&rhs != this) {
+             remove_Msg_from_Folders(); // update existing Folders
+             contents = rhs.contents;   // copy contents from rhs
+             folders = rhs.folders;     // copy Folder pointers from rhs
+             // add this Message to each Folder in rhs
+             put_Msg_in_Folders(rhs.folders);
+         }
+         return *this;
+     }
+
+赋值操作符首先检查左右操作数是否相同。查看函数的后续部分可以清楚地看到进行这一检查的原因。假定操作数
+是不同对象，调用 remove_Msg_from_Folders 从 folders 成员的每个 Folder 中删除该 Message。一旦这项工
+作完成，必须将右操作数的 contents 和 folders 成员赋值给这个对象。最后，调用 put_Msg_in_Folders 将指
+向这个 Message 的指针添加至指向 rhs 的每个 Folder 中。
+
+了解了 remove_Msg_from_Folders 的工作之后，我们来看看为什么赋值操作符首先要检查对象是否不同。赋值时
+需删除左操作数，并在撤销左操作数的成员之后，将右操作数的成员赋值给左操作数的相应成员。如果对象是相同
+的，则撤销左操作数的成员也将撤销右操作数的成员！
+
+即使对象赋值给自己，赋值操作符的正确工作也非常重要。保证这个行为的通用方法是显式检查对自身的赋值。
+
+【remove_Msg_from_Folders 成员】
+除了调用 remMsg 从 folders 指向的每个 Folder 中删除这个 Message 之外，remove_Msg_from_Folders 函数
+的实现与 put_Msg_in_Folders 类似：
+
+     // remove this Message from corresponding Folders
+     void Message::remove_Msg_from_Folders()
+     {
+         // remove this message from corresponding folders
+         for(std::set<Folder*>::const_iterator beg =
+               folders.begin (); beg != folders.end (); ++beg)
+            (*beg)->remMsg(this); // *beg points to a Folder
+     }
+
+【Message 析构函数】
+剩下必须实现的复制控制函数是析构函数：
+
+     Message::~Message()
+     {
+         remove_Msg_from_Folders();
+     }
+
+
+有了 remove_Msg_from_Folders 函数，编写析构函数将非常简单。我们调用 remove_Msg_from_Folders 函数
+清除 folders，系统自动调用 string 析构函数释放 contents，自动调用 set 析构函数清除用于保存 folders 
+成员的内存，因此，Message 析构函数唯一要做的是调用 remove_Msg_from_Folders。
+
+【★】赋值操作符通常要做复制构造函数和析构函数也要完成的工作。在这种情况下，通用工作应在 private 
+实用函数中。
+
+
+
+
+
+
+
