@@ -1,0 +1,182 @@
+上节中我们定义了一个简单类，保存一个指针和一个 int 值。其中指针成员的行为与其他任意指针完全相同。对该
+指针指向的对象所做的任意改变都将作用于共享对象。如果用户删除该对象，则类就有一个悬垂指针，指向一个不
+复存在的对象。
+
+除了使指针成员与指针完全相同之外，另一种方法是定义所谓的智能指针类。智能指针除了增加功能外，其行为像
+普通指针一样。本例中让智能指针负责删除共享对象。用户将动态分配一个对象并将该对象的地址传给新的 
+HasPtr 类。用户仍然可以通过普通指针访问对象，但绝不能删除指针。HasPtr 类将保证在撤销指向对象的最后一
+个 HasPtr 对象时删除对象。
+
+HasPtr 在其他方面的行为与普通指针一样。具体而言，复制对象时，副本和原对象将指向同一基础对象，如果通过
+一个副本改变基础对象，则通过另一对象访问的值也会改变。
+
+新的 HasPtr 类需要一个析构函数来删除指针，但是，析构函数不能无条件地删除指针。如果两个 HasPtr 对象指
+向同一基础对象，那么，在两个对象都撤销之前，我们并不希望删除基础对象。为了编写析构函数，需要知道这个
+ HasPtr 对象是否为指向给定对象的最后一个。
+
+【引入使用计数】
+定义智能指针的通用技术是采用一个使用计数。智能指针类将一个计数器与类指向的对象相关联。使用计数跟踪该
+类有多少个对象共享同一指针。使用计数为 0 时，删除对象。使用计数有时也称为引用计数。
+
+每次创建类的新对象时，初始化指针并将使用计数置为 1。当对象作为另一对象的副本而创建时，复制构造函数复
+制指针并增加与之相应的使用计数的值。对一个对象进行赋值时，赋值操作符减少左操作数所指对象的使用计数的
+值（如果使用计数减至 0，则删除对象），并增加右操作数所指对象的使用计数的值。最后，调用析构函数时，析
+构函数减少使用计数的值，如果计数减至 0，则删除基础对象。
+
+唯一的创新在于决定将使用计数放在哪里。计数器不能直接放在 HasPtr 对象中，为什么呢？考虑下面的情况：
+
+     int obj;
+     HasPtr p1(&obj, 42);
+     HasPtr p2(p1);  // p1 and p2 both point to same int object
+     HasPtr p3(p1);  // p1, p2, and p3 all point to same int object
+
+如果使用计数保存在 HasPtr 对象中，创建 p3 时怎样更新它？可以在 p1 中将计数增量并复制到 p3，但怎样更新
+ p2 中的计数？
+
+【使用计数类】
+实现使用计数有两种经典策略，在这里将使用其中一种，另一种方法在第 15.8.1 节中讲述。这里所用的方法中，
+需要定义一个单独的具体类用以封闭使用计数和相关指针：
+
+     // private class for use by HasPtr only
+     class U_Ptr {
+         friend class HasPtr;
+         int *ip;
+         size_t use;
+         U_Ptr(int *p): ip(p), use(1) { }
+         ~U_Ptr() { delete ip; }
+     };
+这个类的所有成员均为 private。我们不希望用户使用 U_Ptr 类，所以它没有任何 public 成员。将 HasPtr 类设
+置为友元，使其成员可以访问 U_Ptr 的成员。
+
+尽管该类的工作原理比较难，但这个类相当简单。U_Ptr 类保存指针和使用计数，每个 HasPtr 对象将指向一个 
+U_Ptr 对象，使用计数将跟踪指向每个 U_Ptr 对象的 HasPtr 对象的数目。U_Ptr 定义的仅有函数是构造函数和
+析构函数，构造函数复制指针，而析构函数删除它。构造函数还将使用计数置为 1，表示一个 HasPtr 对象指向这
+个 U_Ptr 对象。
+
+假定刚从指向 int 值 42 的指针创建一个 HasPtr 对象，可以画出这些对象，如下图：
+
+如果复制这个对象，则对象如下图所示。
+
+【使用计数类的使用】
+新的 HasPtr 类保存一个指向 U_Ptr 对象的指针，U_Ptr 对象指向实际的 int 基础对象。必须改变每个成员以说
+明的 HasPtr 类指向一个 U_Ptr 对象而不是一个 int
+
+先看看构造函数和复制控制成员：
+
+     /* smart pointer class: takes ownership of the dynamically allocated
+      *          object to which it is bound
+      * User code must dynamically allocate an object to initialize a HasPtr
+      * and must not delete that object; the HasPtr class will delete it
+      */
+     class HasPtr {
+     public:
+         // HasPtr owns the pointer; pmust have been dynamically allocated
+         HasPtr(int *p, int i): ptr(new U_Ptr(p)), val(i) { }
+
+         // copy members and increment the use count
+         HasPtr(const HasPtr &orig):
+            ptr(orig.ptr), val(orig.val) { ++ptr->use; }
+         HasPtr& operator=(const HasPtr&);
+
+         // if use count goes to zero, delete the U_Ptr object
+         ~HasPtr() { if (--ptr->use == 0) delete ptr; }
+     private:
+         U_Ptr *ptr;        // points to use-counted U_Ptr class
+         int val;
+     };
+
+接受一个指针和一个 int 值的 HasPtr 构造函数使用其指针形参创建一个新的 U_Ptr 对象。HasPtr 构造函数执行
+完毕后，HasPtr 对象指向一个新分配的 U_Ptr 对象，该 U_Ptr 对象存储给定指针。新 U_Ptr 中的使用计数为 1，
+表示只有一个 HasPtr 对象指向它。
+
+复制构造函数从形参复制成员并增加使用计数的值。复制构造函数执行完毕后，新创建对象与原有对象指向同一
+ U_Ptr 对象，该 U_Ptr 对象的使用计数加 1。
+
+析构函数将检查 U_Ptr 基础对象的使用计数。如果使用计数为 0，则这是最后一个指向该 U_Ptr 对象的 HasPtr 
+对象，在这种情况下，HasPtr 析构函数删除其 U_Ptr 指针。删除该指针将引起对 U_Ptr 析构函数的调用，
+U_Ptr 析构函数删除 int 基础对象。
+
+【赋值与使用计数】
+
+赋值操作符比复制构造函数复杂一点：
+
+     HasPtr& HasPtr::operator=(const HasPtr &rhs)
+     {
+         ++rhs.ptr->use;     // increment use count on rhs first
+         if (--ptr->use == 0)
+              delete ptr;    // if use count goes to 0 on this object, delete it
+         ptr = rhs.ptr;      // copy the U_Ptr object
+         val = rhs.val;      // copy the int member
+         return *this;
+     }
+
+在这里，首先将右操作数中的使用计数加 1，然后将左操作数对象的使用计数减 1 并检查这个使用计数。像析构
+函数中那样，如果这是指向 U_Ptr 对象的最后一个对象，就删除该对象，这会依次撤销 int 基础对象。将左操
+作数中的当前值减 1（可能撤销该对象）之后，再将指针从 rhs 复制到这个对象。赋值照常返回对这个对象的引
+用。
+
+这个赋值操作符在减少左操作数的使用计数之前使 rhs 的使用计数加 1，从而防止自身赋值。
+
+如果左右操作数相同，赋值操作符的效果将是 U_Ptr 基础对象的使用计数加 1 之后立即减 1。
+
+【改变其他成员】
+现在需要改变访问 int* 的其他成员，以便通过 U_Ptr 指针间接获取 int：
+
+     class HasPtr {
+     public:
+         // copy control and constructors as before
+         // accessors must change to fetch value from U_Ptr object
+         int *get_ptr() const { return ptr->ip; }
+         int get_int() const { return val; }
+
+         // change the appropriate data member
+         void set_ptr(int *p) { ptr->ip = p; }
+         void set_int(int i) { val = i; }
+
+         // return or change the value pointed to, so ok for const objects
+         // Note: *ptr->ip is equivalent to *(ptr->ip)
+         int get_ptr_val() const { return *ptr->ip; }
+         void set_ptr_val(int i) { *ptr->ip = i; }
+     private:
+         U_Ptr *ptr;        // points to use-counted U_Ptr class
+         int val;
+     };
+
+获取和设置 int 成员的函数不变。那些使用指针操作的函数必须对 U_Ptr 解引用，以便获取 int* 基础对象。
+
+复制 HasPtr 对象时，int 成员的行为与第一个类中一样。所复制的是 int 成员的值，各成员是独立的，副本和
+原对象中的指针仍指向同一基础对象，对基础对象的改变将影响通过任一 HasPtr 对象所看到的值。然而，
+HasPtr 的用户无须担心悬垂指针。只要他们让 HasPtr 类负责释放对象，HasPtr 类将保证只要有指向基础对象
+的 HasPtr 对象存在，基础对象就存在。
+
+【建议：管理指针成员】
+
+【★】具有指针成员的对象一般需要定义复制控制成员。如果依赖合成版本，会给类的用户增加负担。用户必须
+保证成员所指向的对象存在，只要还有对象指向该对象。
+
+为了管理具有指针成员的类，必须定义三个复制控制成员：复制构造函数、赋值操作符和析构函数。这些成员可以
+定义指针成员的指针型行为或值型行为。
+
+值型类将指针成员所指基础值的副本给每个对象。复制构造函数分配新元素并从被复制对象处复制值，赋值操作
+符撤销所保存的原对象并从右操作数向左操作数复制值，析构函数撤销对象。
+
+作为定义值型行为或指针型行为的另一选择，是使用称为“智能指针”的一些类。这些类在对象间共享同一基础值，
+从而提供了指针型行为。但它们使用复制控制技术以避免常规指针的一些缺陷。为了实现智能指针行为，类需要
+保证基础对象一直存在，直到最后一个副本消失。使用计数（第 13.5.1 节）是管理智能指针类的通用技术。
+同一基础值的每个副本都有一个使用计数。复制构造函数将指针从旧对象复制到新对象时，会将使用计数加 1。
+赋值操作符将左操作数的使用计数减 1 并将右操作数的使用计数加 1，如果左操作数的使用计数减至 0，赋值操
+作符必须删除它所指向的对象，最后，赋值操作符将指针从右操作数复制到左操作数。析构函数将使用计数减 1，
+并且，如果使用计数减至 0，就删除基础对象。
+
+管理指针的这些方法用得非常频繁，因此使用带指针成员类的程序员必须充分熟悉这些编程技术。
+
+
+
+
+
+
+
+
+
+
+

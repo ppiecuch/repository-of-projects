@@ -1,0 +1,64 @@
+处理指针成员的另一个完全不同的方法，是给指针成员提供值语义。具有值语义的类所定义的对象，其行为很像算
+术类型的对象：复制值型对象时，会得到一个不同的新副本。对副本所做的改变不会反映在原有对象上，反之亦然。
+string 类是值型类的一个例子。
+
+要使指针成员表现得像一个值，复制 HasPtr 对象时必须复制指针所指向的对象：
+
+     /*
+      * Valuelike behavior even though HasPtr has a pointer member:
+      * Each time we copy a HasPtr object, we make a new copy of the
+      * underlying int object to which ptr points.
+      */
+     class HasPtr {
+     public:
+         // no point to passing a pointer if we're going to copy it anyway
+         // store pointer to a copy of the object we're given
+         HasPtr(const int &p, int i): ptr(new int(p)), val(i) {}
+
+         // copy members and increment the use count
+         HasPtr(const HasPtr &orig):
+            ptr(new int (*orig.ptr)), val(orig.val) { }
+
+         HasPtr& operator=(const HasPtr&);
+         ~HasPtr() { delete ptr; }
+         // accessors must change to fetch value from Ptr object
+         int get_ptr_val() const { return *ptr; }
+         int get_int() const { return val; }
+
+         // change the appropriate data member
+         void set_ptr(int *p) { ptr = p; }
+         void set_int(int i) { val = i; }
+
+         // return or change the value pointed to, so ok for const objects
+         int *get_ptr() const { return ptr; }
+         void set_ptr_val(int p) const { *ptr = p; }
+     private:
+         int *ptr;        // points to an int
+         int val;
+     };
+
+复制构造函数不再复制指针，它将分配一个新的 int 对象，并初始化该对象以保存与被复制对象相同的值。每个
+对象都保存属于自己的 int 值的不同副本。因为每个对象保存自己的副本，所以析构函数将无条件删除指针。
+
+赋值操作符不需要分配新对象，它只是必须记得给其指针所指向的对象赋新值，而不是给指针本身赋值：
+
+     HasPtr& HasPtr::operator=(const HasPtr &rhs)
+     {
+         // Note: Every HasPtr is guaranteed to point at an actual int;
+         //    We know that ptr cannot be a zero pointer
+         *ptr = *rhs.ptr;       // copy the value pointed to
+         val = rhs.val;         // copy the int
+         return *this;
+     }
+
+换句话说，改变的是指针所指向的值，而不是指针。
+
+【★】即使要将一个对象赋值给它本身，赋值操作符也必须保证正确。本例中，即使左右操作数相同，操作
+本质上也是安全的，因此，不需要显式检查自身赋值。
+ 
+
+
+
+
+
+

@@ -1,0 +1,93 @@
+本书始终提倡使用标准库。这样做的一个原因是，使用标准库能够大大减少现代 C++ 程序中对指针的需要。然而，
+许多应用程序仍需要使用指针，特别是在类的实现中。包含指针的类需要特别注意复制控制，原因是复制指针时只
+复制指针中的地址，而不会复制指针指向的对象。
+
+设计具有指针成员的类时，类设计者必须首先需要决定的是该指针应提供什么行为。将一个指针复制到另一个指针
+时，两个指针指向同一对象。当两个指针指向同一对象时，可能使用任一指针改变基础对象。类似地，很可能一个
+指针删除了一对象时，另一指针的用户还认为基础对象仍然存在。
+
+指针成员默认具有与指针对象同样的行为。然而，通过不同的复制控制策略，可以为指针成员实现不同的行为。大
+多数 C++ 类采用以下三种方法之一管理指针成员：
+
+1、指针成员采取常规指针型行为。这样的类具有指针的所有缺陷但无需特殊的复制控制。
+2、类可以实现所谓的“智能指针”行为。指针所指向的对象是共享的，但类能够防止悬垂指针。
+3、类采取值型行为。指针所指向的对象是唯一的，由每个类对象独立管理。
+本节中介绍三个类，分别实现管理指针成员的三种不同方法。
+
+【一个带指针成员的简单类】
+为了阐明所涉及的问题，我们将实现一个简单类，该类包含一个 int 值和一个指针：
+
+     // class that has a pointer member that behaves like a plain pointer
+     class HasPtr {
+     public:
+         // copy of the values we're given
+         HasPtr(int *p, int i): ptr(p), val(i) { }
+
+         // const members to return the value of the indicated data member
+         int *get_ptr() const { return ptr; }
+         int get_int() const { return val; }
+
+         // non const members to change the indicated data member
+         void set_ptr(int *p) { ptr = p; }
+         void set_int(int i) { val = i; }
+
+         // return or change the value pointed to, so ok for const objects
+         int get_ptr_val() const { return *ptr; }
+         void set_ptr_val(int val) const { *ptr = val; }
+
+     private:
+         int *ptr;
+         int val;
+     };
+HasPtr 构造函数接受两个形参，将它们复制到 HasPtr 的数据成员。HasPtr 类提供简单的访问函数：函数 
+get_int 和 get_ptr 分别返回 int 成员和指针成员的值：set_int 和 set_ptr 成员则使我们能够改变这些成员，
+给 int 成员一个新值或使指针成员指向不同的对象。还定义了 get_ptr_val 和 set_ptr_val 成员，它们能够获
+取和设置指针所指向的基础值。
+
+【默认复制／赋值与指针成员】
+因为 HasPtr 类没有定义复制构造函数，所以复制一个 HasPtr 对象将复制两个成员：
+
+     int obj = 0;
+     HasPtr ptr1(&obj, 42); // int* member points to obj, val is 42
+     HasPtr ptr2(ptr1);     // int* member points to obj, val is 42
+
+复制之后，ptr1 和 ptr2 中的指针指向同一对象且两个对象中的 int 值相同。但是，因为指针的值不同于它所指
+对象的值，这两个成员的行为看来非常不同。复制之后，int 值是清楚和独立的，而指针则纠缠在一起。
+
+【★】具有指针成员且使用默认合成复制构造函数的类具有普通指针的所有缺陷。尤其是，类本身无法避免悬垂指
+针。
+
+【指针共享同一对象】
+复制一个算术值时，副本独立于原版，可以改变一个副本而不改变另一个：
+
+     ptr1.set_int(0); // changes val member only in ptr1
+     ptr2.get_int();  // returns 42
+     ptr1.get_int();  // returns 0
+
+
+复制指针时，地址值是可区分的，但指针指向同一基础对象。如果在任一对象上调用 set_ptr_val，则二者的基础
+对象都会改变：
+
+     ptr1.set_ptr_val(42); // sets object to which both ptr1 and ptr2 point
+     ptr2.get_ptr_val();   // returns 42
+
+两个指针指向同一对象时，其中任意一个都可以改变共享对象的值。
+
+【可能出现悬垂指针】
+因为类直接复制指针，会使用户面临潜在的问题：HasPtr 保存着给定指针。用户必须保证只要 HasPtr 对象存在，
+该指针指向的对象就存在：
+
+     int *ip = new int(42); // dynamically allocated int initialized to 42
+     HasPtr ptr(ip, 10);    // Has Ptr points to same object as ip does
+     delete ip;             // object pointed to by ip is freed
+     ptr.set_ptr_val(0); // disaster: The object to which Has Ptr points was freed!
+
+这里的问题是 ip 和 ptr 中的指针指向同一对象。删除了该对象时，ptr 中的指针不再指向有效对象。然而，没有
+办法得知对象已经不存在了。
+
+
+
+
+
+
+
