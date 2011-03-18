@@ -1,0 +1,37 @@
+通常，C++ 中的类使用相等操作符表示对象是等价的。即，它们通常比较每个数据成员，如果所有对应成员都相
+同，则认为两个对象相等。与这一设计原则一致，Sales_item 的相等操作符应比较 isbn 以及销售数据：
+
+     inline bool
+     operator==(const Sales_item &lhs, const Sales_item &rhs)
+     {
+         // must be made a friend of Sales_item
+         return lhs.units_sold == rhs.units_sold &&
+                lhs.revenue == rhs.revenue &&
+            lhs.same_isbn(rhs);
+     }
+     inline bool
+     operator!=(const Sales_item &lhs, const Sales_item &rhs)
+     {
+         return !(lhs == rhs); // != defined in terms of operator==
+     }
+
+
+这些函数的定义并不重要，重要的是这些函数所包含的设计原则：
+1、如果类定义了 == 操作符，该操作符的含义是两个对象包含同样的数据。
+2、如果类具有一个操作，能确定该类型的两个对象是否相等，通常将该函数定义为 operator== 而不是创造命名
+函数。用户将习惯于用 == 来比较对象，而且这样做比记住新名字更容易。
+3、如果类定义了 operator==，它也应该定义 operator!=。用户会期待如果可以用某个操作符，则另一个也存在。
+【★】4、相等和不等操作符一般应该相互联系起来定义，让一个操作符完成比较对象的实际工作，而另一个操作
+符只是调用前者。
+定义了 operator== 的类更容易与标准库一起使用。有些算法，如 find，默认使用 == 操作符，如果类定义了 ==，
+则这些算法可以无须任何特殊处理而用于该类类型。
+ 
+
+
+
+
+
+
+
+
+

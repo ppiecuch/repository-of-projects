@@ -1,0 +1,46 @@
+第 13.2 节讨论了类类型对象对同类型其他对象的赋值。类赋值操作符接受类类型形参，通常，该形参是对类类型
+的 const 引用，但也可以是类类型或对类类型的非 const 引用。如果没有定义这个操作符，则编译器将合成它。
+类赋值操作符必须是类的成员，以便编译器可以知道是否需要合成一个。
+【★】类赋值操作符必须是类的成员，以便编译器可以知道是否需要合成一个(如果没有,编译器会合成它)。
+
+可以为一个类定义许多附加的赋值操作符，这些赋值操作符会因右操作符类型不同而不同。例如，标准库的类 
+string 定义了 3 个赋值操作符：除了接受 const string& 作为右操作数的类赋值操作符之外，类还定义了接
+受 C 风格字符串或 char 作为右操作数的赋值操作符，这些操作符可以这样使用：
+
+     string car ("Volks");
+     car = "Studebaker"; // string = const char*
+     string model;
+     model = 'T'; // string = char
+
+
+为了支持这些操作符，string 类包含如下成员：
+
+     // illustration of assignment operators for class string
+     class string {
+     public:
+         string& operator=(const string &);      // s1 = s2;
+         string& operator=(const char *);        // s1 = "str";
+         string& operator=(char);                // s1 = 'c';
+         // ....
+      };
+
+赋值操作符可以重载。无论形参为何种类型，赋值操作符必须定义为成员函数，这一点与复合赋值操作符有所不同。
+
+【赋值必须返回对 *this 的引用】
+string 赋值操作符返回 string 引用，这与内置类型的赋值一致。而且，因为赋值返回一个引用，就不需要创建
+和撤销结果的临时副本。返回值通常是左操作数的引用，例如，这是 Sales_item 复合赋值操作符的定义：
+
+     // assumes that both objects refer to the same isbn
+     Sales_item& Sales_item::operator+=(const Sales_item& rhs)
+     {
+        units_sold += rhs.units_sold;
+        revenue += rhs.revenue;
+        return *this;
+     }
+【★】一般而言，赋值操作符与复合赋值操作符应返回操作符的引用。
+ 
+
+
+
+
+

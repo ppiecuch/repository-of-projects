@@ -1,0 +1,27 @@
+一般而言，将算术和关系操作符定义为非成员函数，像下面给出的 Sales_item 加法操作符一样：
+
+     // assumes that both objects refer to the same isbn
+     Sales_item
+     operator+(const Sales_item& lhs, const Sales_item& rhs)
+     {
+         Sales_item ret(lhs);  // copy lhs into a local object that we'll return
+         ret += rhs;           // add in the contents of rhs
+         return ret; // return ret by value
+     }
+
+【★】一般而言，将算术和关系操作符定义为非成员函数
+
+加法操作符并不改变操作符的状态，操作符是对 const 对象的引用；相反，它产生并返回一个新的 Sales_item 
+对象，该对象初始化为 lhs 的副本。我们使用 Sales_item 的复合赋值操作符来加入 rhs 的值。
+
+【★】注意，为了与内置操作符保持一致，加法返回一个右值，而不是一个引用。
+
+算术操作符通常产生一个新值，该值是两个操作数的计算结果，它不同于任一操作数且在一个局部变量中计算，返
+回对那个变量的引用是一个运行时错误。
+【?】返回新值引用后，因为局部变量被释放，会出现错误？
+
+既定义了算术操作符又定义了相关复合赋值操作符的类，一般应使用复合赋值实现算术操作符。
+
+根据复合赋值操作符（如 +=）来实现算术操作符（如 +），比其他方式更简单且更有效。例如，我们的
+ Sales_item 操作符。如果我们调用 += 来实现 +，则可以不必创建和撤销一个临时量来保存 + 的结果。
+

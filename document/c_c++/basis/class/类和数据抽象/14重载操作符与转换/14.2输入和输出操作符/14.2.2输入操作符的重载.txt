@@ -1,0 +1,80 @@
+与输出操作符类似，输入操作符的第一个形参是一个引用，指向它要读的流，并且返回的也是对同一个流的引用。
+它的第二个形参是对要读入的对象的非 const 引用，该形参必须为非 const，因为输入操作符的目的是将数据读
+到这个对象中。
+
+更重要但通常重视不够的是，输入和输出操作符有如下区别：输入操作符必须处理错误和文件结束的可能性。
+【★】输入和输出操作符有如下区别：输入操作符必须处理错误和文件结束的可能性。
+
+Sales_item 的输入操作符
+The Sales_item input operator looks like:
+
+Sales_item 的输入操作符如下：
+
+     istream&
+     operator>>(istream& in, Sales_item& s)
+     {
+         double price;
+         in >> s.isbn >> s.units_sold >> price;
+         // check that the inputs succeeded
+         if (in)
+            s.revenue = s.units_sold * price;
+         else
+            s = Sales_item(); // input failed: reset object to default state
+         return in;
+     }
+
+这个操作符从 istream 形参中读取三个值：一个 string 值，存储到 isbn 成员中；一个 unsigned 值，存储到 
+Sales_item 形参的 units_sold 成员中；一个 double 值，存储到 Sales_item 形参的 price 成员中。假定读
+取成功，操作符用 price 和 units_sold 来设置 Sales_item 对象的 revenue 成员。
+
+【输入期间的错误】
+Sales_item 的输入操作符将读入所期望的值并检查是否发生错误。可能发生的错误包括如下种类：
+1、任何读操作都可能因为提供的值不正确而失败。例如，读入 isbn 之后，输入操作符将期望下两项是数值型
+数据。如果输入非数值型数据，这次的读入以及流的后续使用都将失败。
+2、任何读入都可能碰到输入流中的文件结束或其他一些错误。
+
+我们无需检查每次读入，只在使用读入数据之前检查一次即可：
+
+     // check that the inputs succeeded
+     if (in)
+         s.revenue = s.units_sold * price;
+     else
+         s = Sales_item(); // input failed: reset object to default state
+
+如果这些读入有一个失败了，则 price 可能没有初始化。因此，在使用 price 之前，我们需要检查输入流是否仍
+有效。如果有效，就进行计算并将结果存储到 revenue 中；如果出现了错误，我们不用关心是哪个输入失败了，
+相反，我们将整个对象复位，就好像它是一个空 Sales_item 对象，具体做法是创建一个新的、未命名的、用默认
+构造的 Sales_item 对象并将它赋值给 s。赋值之后，s 的 isbn 成员是一个空 string，它的 revenue 和 
+units_sold 成员为 0。
+
+【处理输入错误】
+如果输入操作符检测到输入失败了，则确保对象处于可用和一致的状态是个好做法。如果对象在错误发生之前已
+经写入了部分信息，这样做就特别重要。
+
+例如，在 Sales_item 的输入操作符中，可能成功地读入了一个新的 isbn，然后遇到流错误。在读入 isbn 之后
+发生错误意味着旧对象的 units_sold 和 revenue 成员没变，结果会将另一个 isbn 与那个数据关联。
+
+在这个操作符中，如果发生了错误，就将形参恢复为空 Sales_item 对象，以避免给它一个无效状态。用户如果需
+要输入是否成功，可以测试流。即使用户忽略了输入可能错误，对象仍处于可用状态——它的成员都已经定义。类似
+地，对象将不会产生令人误解的结果——它的数据是内在一致的。
+
+【★】设计输入操作符时，如果可能，要确定错误恢复措施，这很重要。
+
+【指出错误】
+除了处理可能发生的任何错误之外，输入操作符还可能需要设置输入形参的条件状态（第 8.2 节）。我们的输入
+操作符相当简单——我们只关心读入期间可能发生的错误。如果读入成功，则输入操作符就是正确的而且不需要进
+行附加检查。
+
+有些输入操作符的确需要进行附加检查。例如，我们的输入操作符可以检查读到的 isbn 格式是否恰当。也许我们
+已成功读取了数据，但这些数据不能恰当解释为 ISBN，在这种情况下，尽管从技术上说实际的 IO 是成功的，但
+输入操作符仍可能需要设置条件状态以指出失败。通常输入操作符仅需设置 failbit。设置 eofbit 意思是文件耗
+尽，设置 badbit 可以指出流被破坏，这些错误最好留给 IO 标准库自己来指出。
+
+
+
+
+
+
+
+
+

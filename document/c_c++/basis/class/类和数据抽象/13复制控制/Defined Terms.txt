@@ -1,0 +1,75 @@
+     
+
+Defined Terms
+术语
+assignment operator（赋值操作符） 
+The assignment operator can be overloaded to define what it means to assign one object of a class type to another of the same type. The assignment operator must be a member of its class and should return a reference to its object. The compiler synthesizes the assignment operator if the class does not explicitly define one.
+
+赋值操作符可以重载，对将某个类类型对象赋值给另一同类型对象的含义进行定义。赋值操作符必须是类的成员并且必须返回对所属类对象的引用。如果类没有定义赋值操作符，则编译器将会合成一个。
+
+copy constructor（复制构造函数） 
+Constructor that initializes a new object as a copy of another object of the same type. The copy constructor is applied implicitly to pass objects to or from a function by value. If we do not define the copy constructor, the compiler synthesizes one for us.
+
+将新对象初始化为另一同类型对象的副本的构造函数。显式应用复制构造函数进行对象的按值传递，向函数传递对象或从函数返回对象。如果没有定义复制构造函数，编译器就为我们合成一个。
+
+copy control（复制控制） 
+Special members that control what happens when object of class type are copied, assigned, and destroyed. The compiler synthesizes appropriate definitions for these operations if the class does not otherwise define them.
+
+控制类类型对象的复制、赋值和撤销的特殊成员。如果类没有另外定义它们，则编译器将为这些操作合成适当定义。
+
+destructor（析构函数） 
+Special member function that cleans up an object when the object goes out of scope or is deleted. The compiler automatically destroys each member. Members of class type are destroyed by invoking their destructor; no explicit work is done to destroy members of built-in or compound type. In particular, the object pointed to by a pointer member is not deleted by the automatic work done by the destructor.
+
+当对象超出作用域或删除对象时，清除对象的特殊成员函数。编译器将自动撤销每个成员。类类型的成员通过调用它们的析构函数而撤销，撤销内置或复合类型的成员无须做显式工作。特别地，析构函数的自动工作不会删除指针成员所指向的对象。
+
+memberwise assignment（逐个成员复制） 
+Term used to describe how the synthesized assignment operator works. The assignment operator assigns, member by member, from the old object to the new. Members of built-in or compound type are assigned directly. Those that are of class type are assigned by using the member's assignment operator.
+
+用于描述合成赋值操作符如何工作的术语。赋值操作符将成员依次从旧对象赋值给新对象。内置或复合类型成员直接赋值，类类型成员使用成员的赋值操作符进行赋值。
+
+memberwise initialization（逐个成员初始化） 
+Term used to described how the synthesized copy constructor works. The constructor copies, member by member, from the old object to the new. Members of built-in or compound type are copied directly. Those that are of class type are copied by using the member's copy constructor.
+
+用于描述合成复制构造函数如何工作的术语。构造函数将成员依次从旧对象复制到新对象。内置或复合类型成员直接复制，类类型成员使用成员的复制构造函数进行复制。
+
+overloaded operator（重载操作符） 
+Function that redefines one of the C++ operators to operate on object(s) of class type. This chapter showed how to define the assignment operator; Chapter 14 covers overloaded operators in more detail.
+
+将一个 C++ 操作符重定义以操作类类型对象的函数。本章介绍了如何定义赋值操作符，第十四章将更详细地介绍重载操作符。
+
+reference count（引用计数） 
+Synonym for use count.
+
+使用计数的同义词。
+
+Rule of Three（三法则） 
+Shorthand for the rule of thumb that if a class needs a nontrivial destructor then it almost surely also needs to define its own copy constructor and an assignment operator.
+
+一个经验原则的简写形式，即，如果一个类需要析构函数，则该类几乎也必然需要定义自己的复制构造函数和赋值操作符。
+
+smart pointer（智能指针） 
+A class that behaves like a pointer but provides other functionality as well. One common form of smart pointer takes a pointer to a dynamically allocated object and assumes responsibility for deleting that object. The user allocates the object, but the smart pointer class deletes it. Smart pointer classes require that the class implement the copy-control members to manage a pointer to the shared object. That object is deleted only when the last smart pointer pointing to it is destroyed. Use counting is the most popular way to implement smart pointer classes.
+
+一个行为类似指针但也提供其他功能的类。智能指针的一个通用形式接受指向动态分配对象的指针并负责删除该对象。用户分配对象，但由智能指针类删除它。智能指针类需要实现复制控制成员来管理指向共享对象的指针。只有在撤销了指向共享对象的最后一个智能指针后，才能删除该共享对象。使用计数是实现智能指针类最常用的方式。
+
+synthesized assignment operator（合成赋值操作符） 
+A version of the assignment operator created (synthesized) by the compiler for classes that do not explicitly define one. The synthesized assignment operator memberwise assigns the right-hand operand to the left.
+
+由编译器为没有显式定义赋值操作符的类创建（合成）的赋值操作符版本。合成赋值操作符将右操作数逐个成员地赋值给左操作数。
+
+synthesized copy constructor（合成复制构造函数） 
+The copy constructor created (synthesized) by the compiler for classes that do not explicitly define the copy constructor. The synthesized copy constructor memberwise initializes the new object from the existing one.
+
+由编译器为没有显式定义复制构造函数的类创建（合成）的复制构造函数。合成复制构造函数将原对象逐个成员地初始化新对象。
+
+use count（使用计数） 
+Programming technique used in copy-control members. A use count is stored along with a shared object. A separate class is created that points to the shared object and manages the use count. The constructors, other than the copy constructor, set the state of the shared object and set the use count to one. Each time a new copy is madeeither in the copy constructor or the assignment operatorthe use count is incremented. When an object is destroyed either in the destructor or as the left-hand side of the assignment operatorthe use count is decremented. The assignment operator and the destructor check whether the decremented use count has gone to zero and, if so, they destroy the object.
+
+复制控制成员中使用的编程技术。使用计数与共享对象一起存储。需要创建一个单独类指向共享对象并管理使用计数。由构造函数，而不是复制构造函数，设置共享对象的状态并将使用计数置为 1。每当由复制构造函数或赋值操作符生成一个新副本时，使用计数加 1。由析构函数撤销对象或作为赋值操作符的左操作数撤销对象时，使用计数减 1。赋值操作符和析构函数检查使用计数是否已减至 0。如果是，则撤销对象。
+
+value semantics（值语义） 
+Description of the copy-control behavior of classes that mimic the way arithmetic types are copied. Copies of valuelike objects are independent: Changes made to a copy have no effect on the original object. A valuelike class that has a pointer member must define its own copy-control members. The copy-control operations copy the object to which the pointer points. Valuelike classes that contain only other valuelike classes or built-in types often can rely on the synthesized copy-control members.
+
+对类模拟算术类型复制方式的复制控制控制行为的描述。值型副本是独立的：对副本的改变不会影响原有对象。具有指针成员的值型类必须定义自己的复制控制成员。复制控制操作复制指针所指向的对象。只包含其他值型类或内置类型的值型类，通常可以依赖合成的复制控制成员。
+ 
+     
