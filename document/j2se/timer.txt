@@ -1,0 +1,25 @@
+ 		timer = new Timer();  
+133         timer.schedule(new TimerTask() {  
+134    
+135             @Override 
+136             public void run() {  
+137    
+138                 updateLabelText();  
+139    
+140             }  
+141         }, 0, 1000);  
+
+
+timer.schedule(new MyTask(),long time1,long timer2);
+
+今天算是彻底的搞懂了这个曾经让我为之头疼的方法。下面我就重点介绍一下：
+
+第一个参数，是 TimerTask 类，在包：import java.util.TimerTask .使用者要继承该类，并实现 public void run() 方法，因为 TimerTask 类 实现了 Runnable 接口。
+
+第二个参数的意思是，当你调用该方法后，该方法必然会调用 TimerTask 类 TimerTask 类 中的 run() 方法，这个参数就是这两者之间的差值，转换成汉语的意思就是说，用户调用 schedule() 方法后，要等待这么长的时间才可以第一次执行 run() 方法。
+
+第三个参数的意思就是，第一次调用之后，从第二次开始每隔多长的时间调用一次 run() 方法。
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/lcj8/archive/2008/05/30/2496258.aspx

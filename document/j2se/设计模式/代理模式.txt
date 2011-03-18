@@ -1,0 +1,149 @@
+Proxy代理模式是一种结构型设计模式，主要解决的问题是：在直接访问对象时带来的问题，比如说：要访问的对象在远程的机器上。在面向对象系统中，有些对象由于某些原因（比如对象创建开销很大，或者某些操作需要安全控制，或者需要进程外的访问），直接访问会给使用者或者系统结构带来很多麻烦，我们可以在访问此对象时加上一个对此对象的访问层。如下图：
+   
+
+
+
+       比如说C和A不在一个服务器上，A要频繁的调用C，我们可以在A上做一个代理类Proxy，把访问C的工作交给Proxy，这样对于A来说，就好像在直接访问C的对象。在对A的开发中我们可以把注意力完全放在业务的实现上。
+
+       GoF《设计模式》中说道：为其他对象提供一种代理以控制这个对象的访问。
+
+       Proxy模式的结构：
+   
+
+
+
+       下面通过一个场景来看看Proxy的实现，我们要使用代理类型ProxyClass的对象调用远程机器上的一个类型LongDistanceClass的对象。
+
+    首先我们先模拟一个远程的类型：为了保持对被代理对象使用的透明性，我们使代理类型和被代理类型同时继承同一个接口IProxy
+
+    接口实现：
+
+    interface IProxy
+
+    {
+
+        string Function1();
+
+        string Function2();
+
+    }
+
+    远程对象实现：
+
+    /// <summary>
+
+    /// 模拟的远程对象
+
+    /// </summary>
+
+    public class LongDistanceClass:IProxy
+
+    {
+
+        #region IProxy 成员
+
+        public string Function1()
+
+        {
+
+            //do someting
+
+            return "LongDistanceClass.Function1";
+
+        }
+
+        public string Function2()
+
+        {
+
+            //do someting
+
+            return "LongDistanceClass.Function2";
+
+        }
+
+        #endregion
+
+    }
+
+    接下来就要实现代理类型，使用代理对象访问模拟的远程对象，代理类型实现如下：
+
+    public class ProxyClass:IProxy
+
+    {
+
+        #region IProxy 成员
+
+        public string Function1()
+
+        {
+
+            //to access LongDistanceClass.Function1
+
+            LongDistanceClass obj = new LongDistanceClass();
+
+            return obj.Function1();
+
+        }
+
+        public string Function2()
+
+        {
+
+            //to access LongDistanceClass.Function2
+
+            LongDistanceClass obj = new LongDistanceClass();
+
+            return obj.Function2();
+
+        }
+
+        #endregion
+
+    }
+
+ 
+
+    最后实现客户端代码：
+
+    class Class1
+
+    {
+
+        [STAThread]
+
+        static void Main(string[] args)
+
+        {
+
+            IProxy pro = new ProxyClass();
+
+            Console.WriteLine(pro.Function1());
+
+            Console.WriteLine(pro.Function2());
+
+            Console.Read();
+
+        }
+
+    }
+
+    运行结果如下：
+
+    LongDistanceClass.Function1
+
+LongDistanceClass.Function2
+
+       Proxy模式的要点：
+
+       1、“增加一层间接层”是软件系统中对许多负责问题的一种常见解决方法。在面向对象系统中，直接使用某些对象会带来很多问题，作为间接层的proxy对象便是解决这一问题的常用手段。
+
+       在我们日常的工作中也常常用到代理模式，比如对于三层结构或者N- tiers结构中DAL数据访问层，它把对数据库的访问进行封装。BLL业务层的开发者只是调用DAL中的方法来获得数据。
+
+       在比如前一段时间看了看AOP和Remoting方面的资料，对于跨越应用程序域的访问，要为客户应用程序提供一个TransparentProxy（透明代理），客户程序实际上是通过访问这个代理来访问实际的类型对象。
+
+2、具体proxy设计模式的实现方法、实现粒度都相差很大，有些可能对单个对象作细粒度的控制，有些可能对组件模块提供抽象代理层，在架构层次对对象作proxy。
+
+3、proxy并不一定要求保持接口的一致性，只要能够实现间接控制，有时候损及一些透明性是可以接受的。例如上面的那个例子，代理类型ProxyClass和被代理类型LongDistanceClass可以不用继承自同一个接口，正像GoF《设计模式》中说的：为其他对象提供一种代理以控制这个对象的访问。代理类型从某种角度上讲也可以起到控制被代理类型的访问的作用。
+
+http://www.cnblogs.com/kid-li/archive/2006/10/18/532192.html
