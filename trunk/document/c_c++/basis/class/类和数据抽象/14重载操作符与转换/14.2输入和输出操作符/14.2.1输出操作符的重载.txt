@@ -1,0 +1,68 @@
+为了与 IO 标准库一致，操作符应接受 ostream& 作为第一个形参，对类类型 const 对象的引用作为第二个形参，
+并返回对 ostream 形参的引用。
+
+重载输出操作符一般的简单定义如下：
+
+     // general skeleton of the overloaded output operator
+     ostream&
+     operator <<(ostream& os, const ClassType &object)
+     {
+         // any special logic to prepare object
+
+         // actual output of members
+         os << // ...
+
+         // return ostream object
+         return os;
+     }
+
+第一个形参是对 ostream 对象的引用，在该对象上将产生输出。ostream 为非 const，因为写入到流会改变流的状
+态。该形参是一个引用，因为不能复制 ostream 对象。
+
+第二个形参一般应是对要输出的类类型的引用。该形参是一个引用以避免复制实参。它可以是 const，因为（一般
+而言）输出一个对象不应该改变对象。使形参成为 const 引用，就可以使用同一个定义来输出 const 和非 const 
+对象。
+
+返回类型是一个 ostream 引用，它的值通常是输出操作符所操作的 ostream 对象。
+
+【Sales_item 输出操作符】
+现在可以编写 Sales_item 的输出操作符了：
+
+     ostream&
+     operator<<(ostream& out, const Sales_item& s)
+     {
+         out << s.isbn << "\t" << s.units_sold << "\t"
+             << s.revenue << "\t" << s.avg_price();
+         return out;
+     }
+
+
+【输出操作符通常所做格式化尽量少】
+关于输出，类设计者面临一个重要决定：是否格式化以及进行多少格式化。
+一般而言，输出操作符应输出对象的内容，进行最小限度的格式化，它们不应该输出换行符。
+ 
+用于内置类型的输出操作符所做格式化很少，并且不输出换行符。由于内置类型的这种既定处理，用户预期类输出
+操作符也有类似行为。通过限制输出操作符只输出对象的内容，如果需要执行任意额外的格式化，我们让用户决定
+该如何处理。尤其是，输出操作符不应该输出换行符，如果该操作符输出换行符，则用户就不能将说明文字与对象
+输出在同一行上。尽量减少操作符所做格式化，让用户自己控制输出细节。
+
+【IO 操作符必须为非成员函数】
+当定义符合标准库 iostream 规范的输入或输出操作符的时候，必须使它成为非成员操作符，为什么需要这样做呢？
+我们不能将该操作符定义为类的成员，否则，左操作数将只能是该类类型的对象：
+
+     // if operator<< is a member of Sales_item
+     Sales_item item;
+     item << cout;
+这个用法与为其他类型定义的输出操作符的正常使用方式相反。
+如果想要支持正常用法，则左操作数必须为 ostream 类型。这意味着，如果该操作符是类的成员，则它必须是 
+ostream 类的成员，然而，ostream 类是标准库的组成部分，我们（以及任何想要定义 IO 操作符的人）是不
+能为标准库中的类增加成员的。
+相反，如果想要使用重载操作符为该类型提供 IO 操作，就必须将它们定义为非成员函数。IO 操作符通常对非公
+用数据成员进行读写，因此，类通常将 IO 操作符设为友元。
+【★】当定义符合标准库 iostream 规范的输入或输出操作符的时候，必须使它成为非成员操作符
+【★】类通常将 IO 操作符设为友元
+
+
+
+
+

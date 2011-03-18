@@ -1,0 +1,9 @@
+内置类型是编程语言自己定义的一些类型
+在C++中内置类型有：
+整型：
+①整数 int、short和long
+②字符型 char和wchar_t
+③布尔型 bool
+整型可用修饰：unsigned
+浮点：
+float、double和long double
