@@ -1,0 +1,63 @@
+像任意其他类一样，基类也有定义其接口和实现的数据和函数成员。在（非常简化的）书店定价应用
+程序的例子中，Item_base 类定义了 book 和 net_price 函数并且需要存储每本书的 ISBN 和标准
+价格：
+
+     // Item sold at an undiscounted price
+     // derived classes will define various discount strategies
+     class Item_base {
+     public:
+         Item_base(const std::string &book = "",
+                   double sales_price = 0.0):
+                          isbn(book), price(sales_price) { }
+         std::string book() const { return isbn; }
+         // returns total sales price for a specified number of items
+         // derived classes will override and apply different discount algorithms
+         virtual double net_price(std::size_t n) const
+                    { return n * price; }
+         virtual ~Item_base() { }
+     private:
+         std::string isbn;     // identifier for the item
+     protected:
+         double price;         // normal, undiscounted price
+     };
+
+这个类的大部分看起来像我们已见过的其他类一样。它定义了一个构造函数以及我们已描述过的函数，
+该构造函数使用默认实参（第 7.4.1 节），允许用 0 个、1 个或两个实参进行调用，它用这些实参
+初始化数据成员。
+
+新的部分是 protected 访问标号以及对析构函数和 net_price 函数所使用的保留字 virtual。我们
+将第 15.4.4 节解释虚析构函数，现在只需注意到继承层次的根类一般都要定义虚析构函数即可。
+
+【基类成员函数】
+Item_base 类定义了两个函数，其中一个前面带有保留字 virtual。保留字 virtual 的目的是启用动
+态绑定。成员默认为非虚函数，对非虚函数的调用在编译时确定。为了指明函数为虚函数，在其返回类
+型前面加上保留字 virtual。除了构造函数之外，任意非 static 成员函数都可以是虚函数。保留字只
+在类内部的成员函数声明中出现，不能用在类定义体外部出现的函数定义上。
+【★】保留字 virtual 的目的是启用动态绑定。
+【★】成员默认为非虚函数，对非虚函数的调用在编译时确定。
+【★】为了指明函数为虚函数，在其返回类型前面加上保留字 virtual。
+【★】除了构造函数、static 成员函数之外，任意函数都可以是虚函数。
+【★】保留字只在类内部的成员函数声明中出现，不能用在类定义体外部出现的函数定义上。
+(virtual可以出现在类定义中，但不是必须的<=15.2.3)
+
+第 15.2.4 节将进一步介绍虚函数。
+【★】基类通常应将派生类需要重定义的任意函数定义为虚函数。
+
+【访问控制和继承】
+在基类中，public 和 private 标号具有普通含义：用户代码可以访问类的 public 成员而不能访问 
+private 成员，private 成员只能由基类的成员和友元访问。派生类对基类的 public 和 private 
+成员的访问权限与程序中任意其他部分一样：它可以访问 public 成员而不能访问 private 成员。
+【★】派生类对可以访问基类的 public 成员而不能访问 基类的private 成员
+
+有时作为基类的类具有一些成员，它希望允许派生类访问但仍禁止其他用户访问这些成员。对于这样
+的成员应使用受保护的访问标号。protected 成员可以被派生类对象访问但不能被该类型的普通用
+户访问。
+【★】protected 成员可以被派生类对象访问但不能被该类型的普通用户访问。
+
+我们的 Item_base 类希望它的派生类重定义 net_price 函数，为了重定义 net_price 函数，这些类
+将需要访问 price 成员。希望派生类用与普通用户一样通过 book 访问函数访问 isbn，因此，isbn 
+成员为 private，不能被 Item_base 的继承类所访问。
+
+
+
+

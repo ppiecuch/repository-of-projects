@@ -1,0 +1,22 @@
+如果基类定义 static 成员（第 12.6 节），则整个继承层次中只有一个这样的成员。无论从基类派
+生出多少个派生类，每个 static 成员只有一个实例。static 成员遵循常规访问控制：如果成员在
+基类中为 private，则派生类不能访问它。假定可以访问成员，则既可以通过基类访问 static 成员，
+也可以通过派生类访问 static 成员。一般而言，既可以使用作用域操作符也可以使用点或箭头成员
+访问操作符。
+
+     struct Base {
+         static void statmem(); // public by default
+     };
+     struct Derived : Base {
+         void f(const Derived&);
+     };
+     void Derived::f(const Derived &derived_obj)
+     {
+        Base::statmem();      // ok: Base defines statmem
+        Derived::statmem();   // ok: Derived in herits statmem
+        // ok: derived objects can be used to access static from base
+        derived_obj.statmem();     // accessed through Derived object
+        statmem();                 // accessed through this class
+【★】如果基类定义 static 成员，则整个继承层次中只有一个这样的成员。
+【★】假定可以访问成员，则既可以通过基类访问 static 成员，也可以通过派生类访问 static 成员。
+【★】一般而言，既可以使用作用域操作符也可以使用点或箭头成员访问static成员。

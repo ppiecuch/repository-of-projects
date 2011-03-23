@@ -1,0 +1,160 @@
+【★】派生类中定义的成员访问控制的处理与任意其他类中完全一样（第 12.1.2 节）。派生类可以定
+义零个或多个访问标号，指定跟随其后的成员的访问级别。对类所继承的成员的访问由基类中的成员访
+问级别和派生类派生列表中使用的访问标号共同控制。
+
+每个类控制它所定义的成员的访问。派生类可以进一步限制但不能放松对所继承的成员的访问。
+【★】派生类可以进一步限制但不能放松对所继承的成员的访问。
+
+基类本身指定对自身成员的最小访问控制。如果成员在基类中为 private，则只有基类和基类的友元
+可以访问该成员。派生类不能访问基类的 private 成员，也不能使自己的用户能够访问那些成员。
+如果基类成员为 public 或 protected，则派生列表中使用的访问标号决定该成员在派生类中的访问
+级别：
+【★】1.如果是公用继承，基类成员保持自己的访问级别：基类的 public 成员为派生类的 public 
+成员，基类的 protected 成员为派生类的 protected 成员。
+【★】2.如果是受保护继承，基类的 public 和 protected 成员在派生类中为 protected 成员。
+【★】3.如果是私有继承，基类的的所有成员在派生类中为 private 成员。
+
+例如，考虑下面的继承层次：
+
+     class Base {
+     public:
+         void basemem();   // public member
+     protected:
+         int i;            // protected member
+         // ...
+     };
+     struct Public_derived : public Base {
+         int use_base() { return i; } // ok: derived classes can access i
+         // ...
+     };
+     struct Private_derived : private Base {
+         int use_base() { return i; } // ok: derived classes can access i
+     };
+
+无论派生列表中是什么访问标号，所有继承 Base 的类对 Base 中的成员具有相同的访问。派生访问
+标号将控制派生类的用户对从 Base 继承而来的成员的访问：
+
+     Base b;
+     Public_derived d1;
+     Private_derived d2;
+     b.basemem();   // ok: basemem is public
+     d1.basemem();  // ok: basemem is public in the derived class
+     d2.basemem();  // error: basemem is private in the derived class
+
+Public_derived 和 Private_derived 都继承了 basemem 函数。当进行 public 继承时，该成员保
+持其访问标号，所以，d1 可以调用 basemem。在 Private_derived 中，Base 的成员为 private，
+Private_derived 的用户不能调用 basemem。
+
+派生访问标号还控制来自非直接派生类的访问：
+
+     struct Derived_from Private : public Private_derived {
+         // error: Base::i is private in Private_derived
+         int use_base() { return i; }
+     };
+     struct Derived_from_Public : public Public_derived {
+         // ok: Base::i remains protected in Public_derived
+         int use_base() { return i; }
+     };
+
+从 Public_derived 派生的类可以访问来自 Base 类的 i，是因为该成员在 Public_derived 中仍
+为 protected 成员。从 Private_derived 派生的类没有这样的访问，对它们而言，
+Private_derived 从 Base 继承的所有成员均为 private。
+
+【接口继承与实现继承】
+public 派生类继承基类的接口，它具有与基类相同的接口。设计良好的类层次中，public 派生类
+的对象可以用在任何需要基类对象的地方。
+【★】public 派生类继承基类的接口，它具有与基类相同的接口。
+【★】设计良好的类层次中，public 派生类的对象可以用在任何需要基类对象的地方。
+
+
+【★】使用 private 或 protected 派生的类不继承基类的接口，相反，这些派生通常被称为实现
+继承。派生类在实现中使用被继承但继承基类的部分并未成为其接口的一部分。
+
+如第 15.3 节所介绍的，类是使用接口继承还是实现继承对派生类的用户具有重要含义。
+迄今为止，最常见的继承形式是 public。
+
+【关键概念：继承与组合】
+继承层次的设计本身是个复杂的主题，已超出本书的范围。但是，有一个重要的设计指南非常基础，
+每个程序员都应该熟悉它。
+
+定义一个类作为另一个类的公用派生类时，派生类应反映与基类的“是一种（Is A）”关系。在书店例
+子中，基类表示按规定价格销售的书的概念，Bulk_item 是一种书，但具有不同的定价策略。
+
+类型之间另一种常见的关系是称为“有一个（Has A）”的关系。书店例子中的类具有价格和 ISBN。通
+过“有一个”关系而相关的类型暗含有成员关系，因此，书店例子中的类由表示价格和 ISBN 的成员组
+成。
+
+【去除个别成员】
+如果进行 private 或 protected 继承，则基类成员的访问级别在派生类中比在基类中更受限：
+
+     class Base {
+     public:
+         std::size_t size() const { return n; }
+     protected:
+         std::size_t n;
+     };
+     class Derived : private Base { . . . };
+
+【?】派生类可以恢复继承成员的访问级别，但不能使访问级别比基类中原来指定的更严格或更宽松。
+【▲】比如B:A,C:B,B将成员private了,C可以放宽/限制这些成员,但必须以A的访问级别为限
+
+【★】在这一继承层次中，size 在 Base 中为 public，但在 Derived 中为 private。为了使 size 
+在Derived 中成为 public，可以在 Derived 的 public 部分增加一个 using 声明。如下这样改变
+  Derived 的定义，可以使 size 成员能够被用户访问，并使 n 能够被从 Derived 派生的类访问：
+
+     class Derived : private Base {
+     public:
+        // maintain access levels for members related to the size of the object
+        using Base::size;
+     protected:
+         using Base::n;
+         // ...
+      };
+
+正如可以使用 using 声明（第 3.1 节）从命名空间使用名字，也可以使用 using 声明访问基类中的
+名字，除了在作用域操作符左边用类名字代替命名空间名字之外，使用形式是相同的。
+
+【默认继承保护级别】
+在第 2.8 节介绍过用 struct 和 class 保留字定义的类具有不同的默认访问级别，同样，默认继承
+访问级别根据使用哪个保留字定义派生类也不相同。使用 class 保留字定义的派生默认具有 private
+ 继承，而用 struct 保留字定义的类默认具有 public 继承：
+
+     class Base { /* ... */ };
+ 【★】    struct D1 : Base { /* ... */ };   // public inheritance by default
+ 【★】    class D2 : Base { /* ... */ };    // private       inheritance by default
+
+有一种常见的误解认为用 struct 保留字定义的类与用 class 定义的类有更大的区别。唯一的不同
+只是默认的成员保护级别和默认的派生保护级别，没有其他区别：
+【★】 struct 定义和class 定义的类唯一的不同只是默认的成员保护级别和默认的派生保护级别
+     class D3 : public Base {
+     public:
+         /* ... */
+     };
+     // equivalent definition of D3
+     struct D3 : Base {      // inheritance public by default
+         /* ... */           // initial member access public by default
+     };
+     struct D4 : private Base {
+     private:
+         /* ... */
+     };
+     // equivalent definition of D4
+     class D4 : Base {   // inheritance private by default
+     /* ... */           // initial member access private by default
+     };
+
+尽管私有继承在使用 class 保留字时是默认情况，但这在实践中相对罕见。因为私有继承是如此罕
+见，通常显式指定 private 是比依赖于默认更好的办法。显式指定可清楚指出想要私有继承而不是
+一时疏忽。
+
+
+
+
+
+
+
+
+
+
+
+

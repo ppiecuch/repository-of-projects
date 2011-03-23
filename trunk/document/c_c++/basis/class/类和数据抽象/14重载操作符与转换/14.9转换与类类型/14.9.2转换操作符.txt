@@ -1,0 +1,143 @@
+【★】转换操作符是一种特殊的类成员函数。它定义将类类型值转变为其他类型值的转换。转换操作
+符在类定义体内声明，在保留字 operator 之后跟着转换的目标类型：
+
+     class SmallInt {
+     public:
+         SmallInt(int i = 0): val(i)
+         { if (i < 0 || i > 255)
+            throw std::out_of_range("Bad SmallInt initializer");
+         }
+         operator int() const { return val; }
+     private:
+     
+         std::size_t val;
+     };
+
+转换函数采用如下通用形式：
+     operator type();
+
+这里，type 表示内置类型名、类类型名或由类型别名定义的名字。对任何可作为函数返回类型的类
+型（除了 void 之外）都可以定义转换函数。一般而言，不允许转换为数组或函数类型，转换为指针
+类型（数据和函数指针）以及引用类型是可以的。
+【★】对任何可作为函数返回类型的类型（除了 void 之外）都可以定义转换函数。
+【★】一般而言，不允许转换为数组或函数类型，转换为指针类型（数据和函数指针）以及引用类型
+是可以的。
+
+
+【★】转换函数必须是成员函数，不能指定返回类型，并且形参表必须为空。
+
+下述所有声明都是错误的：
+
+     operator int(SmallInt &);            // error: nonmember
+
+     class SmallInt {
+     public:
+         int operator int();              // error: return type
+         operator int(int = 0);           // error: parameter list
+         // ...
+     };
+
+虽然转换函数不能指定返回类型，但是每个转换函数必须显式返回一个指定类型的值。例如，
+operator int 返回一个 int 值；如果定义 operator Sales_item，它将返回一个 Sales_item 
+对象，诸如此类。
+
+
+【★】转换函数一般不应该改变被转换的对象。因此，转换操作符通常应定义为 const 成员。
+ 
+
+【使用类类型转换】
+只要存在转换，编译器将在可以使用内置转换的地方自动调用它（第 5.12.1 节）：
+在表达式中：
+     SmallInt si;
+     double dval;
+     si >= dval          // si converted to int and then convert to double
+在条件中：
+     if (si)                // si converted to int and then convert to bool
+将实参传给函数或从函数返回值：
+     int calc(int);
+     SmallInt si;
+     int i = calc(si);      // convert si to int and call calc
+作为重载操作符的操作数：
+     // convert si to int then call opeator<< on the int value
+     cout << si << endl;
+在显式类型转换中：
+     int ival;
+     SmallInt si = 3.541; //
+     instruct compiler to cast si to int
+     ival = static_cast<int>(si) + 3;
+
+【类类型转换和标准转换】
+使用转换函数时，被转换的类型不必与所需要的类型完全匹配。必要时可在类类型转换之后跟上标准
+转换以获得想要的类型。例如，在一个 SmallInt 对象与一个 double 值的比较中：
+【★】使用转换函数时，被转换的类型不必与所需要的类型完全匹配。必要时可在类类型转换之后跟
+上标准转换以获得想要的类型。
+
+     SmallInt si;
+     double dval;
+     si >= dval // si converted to int and then convert to double
+首先将 si 从 SmallInt 对象转换为 int 值，然后将该 int 值转换为 double 值。
+
+【只能应用一个类类型转换】
+【★】类类型转换之后不能再跟另一个类类型转换。如果需要多个类类型转换，则代码将出错。
+例如，假定有另一个类 Integral，它可以转换为 SmallInt 但不能转换为 int：
+
+     // class to hold unsigned integral values
+     class Integral {
+     public:
+         Integral(int i = 0): val(i) { }
+         operator SmallInt() const { return val % 256; }
+     private:
+         std::size_t val;
+     };
+
+可以在需要 SmallInt 的地方使用 Integral，但不能在需要 int 的地方使用 Integeral：
+
+     int calc(int);
+     Integral intVal;
+     SmallInt si(intVal);  // ok: convert intVal to SmallInt and copy to si
+     int i = calc(si);     // ok: convert si to int and call calc
+     int j = calc(intVal); // error: no conversion to int from Integral
+
+创建 si 时使用 SmallInt 复制构造函数。首先调用 Integral 转换操作符产生一个 SmallInt 类
+型的临时值，将 int_val 对象转换为 SmallInt。然后（合成的）复制构造函数使用该对象值初始
+化 si。
+
+
+第一个 calc 调用也是正确的：将实参 si 自动转换为 int，然后将 int 值传给函数。
+
+第二个 calc 调用是错误的：没有从 Integral 到 int 的直接转换。从 int 需要两次类类型转换：
+首先从 Integral 到 SmallInt，然后从 SmallInt 到 int。但是，语言只允许一次类类型转换，所
+以该调用出错。
+【★】语言只允许一次类类型转换
+
+
+【标准转换可放在类类型转换之前】
+使用构造函数执行隐式转换（第 12.4.4 节）的时候，构造函数的形参类型不必与所提供的类型完全
+匹配。例如，下面的代码调用 SmallInt(int) 类中定义的构造函数（SmallInt(int)）将 sobj 转
+换为 SmallInt 类型：
+
+     void calc(SmallInt);
+     short sobj;
+     // sobj promoted from short to int
+     // that int converted to SmallInt through the SmallInt(int) constructor
+     calc(sobj);
+
+如果需要，在调用构造函数执行类类型转换之前，可将一个标准转换序列应用于实参。为了调用函
+数 calc()，应用标准转换将 dobj 从 double 类型转换为 int 类型，然后调用构造函数 
+SmallInt(int) 将转换结果转换为 SmallInt 类型。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

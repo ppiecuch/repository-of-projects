@@ -1,0 +1,70 @@
+函数对象经常用作通用算法的实参。在第 11.2.3 节解决的问题就是这样一个例子。那个程序分析一
+组故事中的单词，计算有多少个单词长度在 6 字符以上。该解决方案的一个部分包括定义一个函数以
+确定给定 string 的长度是否大于 6 字符：
+
+     // determine whether a length of a given word is 6 or more
+     bool GT6(const string &s)
+     {
+         return s.size() >= 6;
+     }
+【★】函数对象经常用作通用算法的实参。
+
+使用 GT6 作为传给 count_if 算法的实参，以计算使 GT6 返回 true 的单词的数目：
+
+     vector<string>::size_type wc =
+                     count_if(words.begin(), words.end(), GT6);
+
+
+【函数对象可以比函数更灵活】
+我们的实现有个严重问题：它将 6 这个数字固化在 GT6 函数的定义中。count_if 算法运行只用一个
+形参且返回 bool 的函数。理想情况下，应传递 string 和我们想要的长度进行测试。通过该方式，
+可以使用同一代码对不同长度的字符串进行计数。
+
+通过将 GT6 定义为带函数调用成员类，可以获得所需的灵活性。将这个类命名为 GT_cls 以区别于函
+数：
+
+     // determine whether a length of a given word is longer than a stored bound
+     class GT_cls {
+     public:
+         GT_cls(size_t val = 0): bound(val) { }
+         bool operator()(const string &s)
+                            { return s.size() >= bound; }
+     private:
+         std::string::size_type bound;
+     };
+
+这个类有一个构造函数，该构造函数接受一个整型值并用名为 bound 的成员记住那个值。如果没有提
+供值，构造函数将 bound 置 0。该类也定义了调用操作符，接受一个 string 参数并返回一个 bool。
+调用操作符将 string 实参的长度与数据成员 bound 中存储的值相比较。
+
+【使用 GT_cls 函数对象】
+可以像前面一样进行计数，但这一次使用 GT_cls 类型的对象而不是 GT6 函数：
+
+     cout << count_if(words.begin(), words.end(), GT_cls(6))
+          << " words 6 characters or longer" << endl;
+
+这个 count_if 调用传递一个 GT_cls 类型的临时对象而不再是名为 GT6 的函数。用整型值 6 来初始
+化那个临时对象，构造函数将这个值存储在 bound 成员中。现在，count_if 每次调用它的函数形参
+时，它都使用 GT_cls 的调用操作符，该调用操作符根据 bound 的值测试其 string 实参的长度。
+
+
+使用函数对象，容易修改程序以根据其他值进行测试，只需为传给 count_if 的对象改变构造函数实
+参即可。例如，这样修改程序，就可以计算长度在 5 个字符以上的单词数：
+
+     cout << count_if(words.begin(), words.end(), GT_cls(5))
+          << " words 5 characters or longer" << endl;
+
+更为有用的是，还可以计算长度在 1 到 10 个字符的单词数：
+
+     for (size_t i = 0; i != 11; ++i)
+         cout << count_if(words.begin(), words.end(), GT(i))
+              << " words " << i
+              << " characters or longer" << endl;
+
+
+如果使用函数代替函数对象来编写这个程序，可能需要编写 10 个不同的函数，每个函数测试一个不同
+的值。
+
+
+
+
