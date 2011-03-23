@@ -1,0 +1,146 @@
+C++ 中的函数调用默认不使用动态绑定。要触发动态绑定，满足两个条件：第一，只有指定为虚函数
+的成员函数才能进行动态绑定，成员函数默认为非虚函数，非虚函数不进行动态绑定；第二，必须通
+过基类类型的引用或指针进行函数调用。要理解这一要求，需要理解在使用继承层次中某一类型的对
+象的引用或指针时会发生什么。
+
+【★】C++ 中的函数调用默认不使用动态绑定。
+【★】要触发动态绑定，满足两个条件：
+第一，只有指定为虚函数的成员函数才能进行动态绑定,非虚函数不进行动态绑定
+第二，必须通过基类类型的引用或指针进行函数调用。
+
+【从派生类型到基类的转换】
+【★】因为每个派生类对象都包含基类部分，所以可将基类类型的引用绑定到派生类对象的基类部分，
+也可以用指向基类的指针指向派生类对象：
+     // function with an Item_base reference parameter
+     double print_total(const Item_base&, size_t);
+     Item_base item;           // object of base type
+     // ok: use pointer or reference to Item_base to refer to an Item_base object
+     print_total(item, 10);    // passes reference to an Item_base object
+     Item_base *p = &item;     // p points to an Item_base object
+
+     Bulk_item bulk;           // object of derived type
+     // ok: can bind a pointer or reference to Item_base to a Bulk_item object
+     print_total(bulk, 10);    // passes reference to the Item_base part of bulk
+     p = &bulk;                // p points to the Item_base part of bulk
+
+这段代码使用同一基类类型指针指向基类类型的对象和派生类型的对象，该代码还传递基类类型和派
+生类型的对象来调用需要基类类型引用的函数，两种使用都是正确的，因为每个派生类对象都拥有基
+类部分。
+
+因为可以使用基类类型的指针或引用来引用派生类型对象，所以，使用基类类型的引用或指针时，不
+知道指针或引用所绑定的对象的类型：基类类型的引用或指针可以引用基类类型对象，也可以引用派
+生类型对象。无论实际对象具有哪种类型，编译器都将它当作基类类型对象。将派生类对象当作基类
+对象是安全的，因为每个派生类对象都拥有基类子对象。而且，派生类继承基类的操作，即，任何可
+以在基类对象上执行的操作也可以通过派生类对象使用。
+
+基类类型引用和指针的关键点在于静态类型（在编译时可知的引用类型或指针类型）和动态类型（指
+针或引用所绑定的对象的类型这是仅在运行时可知的）可能不同。
+
+【可以在运行时确定 virtual 函数的调用】
+将基类类型的引用或指针绑定到派生类对象对基类对象没有影响，对象本身不会改变，仍为派生类对
+象。对象的实际类型可能不同于该对象引用或指针的静态类型，这是 C++ 中动态绑定的关键。
+
+通过引用或指针调用虚函数时，编译器将生成代码，在运行时确定调用哪个函数，被调用的是与动态
+类型相对应的函数。例如，我们再来看 print_total 函数：
+
+     // calculate and print price for given number of copies, applying any discounts
+     void print_total(ostream &os,
+                      const Item_base &item, size_t n)
+     {
+         os << "ISBN: " << item.book() // calls Item_base::book
+            << "\tnumber sold: " << n << "\ttotal price: "
+            // virtual call: which version of net_price to call is resolved at run time
+            << item.net_price(n) << endl;
+     }
+
+因为 item 形参是一个引用且 net_price 是虚函数，item.net_price(n) 所调用的 net_price 版本
+取决于在运行时绑定到 item 形参的实参类型：
+
+     Item_base base;
+     Bulk_item derived;
+     // print_total makes a virtual call to net_price
+     print_total(cout, base, 10);     // calls Item_base::net_price
+     print_total(cout, derived, 10);  // calls Bulk_item::net_price
+
+在第一个调用中，item 形参在运行时绑定到 Item_base 类型的对象，因此，print_total 内部调
+用 Item_base 中定义的 net_price 版本。在第二个调用中，item 形参绑定到 Bulk_item 类型的
+对象，从 print_total 调用的是 Bulk_item 类定义的 net_price 版本。
+【★】调用virtual 函数对对象的类型决定，与对象引用的静态类型（可能是其基类型）无关
+
+【关键概念：C++ 中的多态性】
+引用和指针的静态类型与动态类型可以不同，这是 C++ 用以支持多态性的基石。
+
+通过基类引用或指针调用基类中定义的函数时，我们并不知道执行函数的对象的确切类型，执行函数
+的对象可能是基类类型的，也可能是派生类型的。
+
+如果调用非虚函数，则无论实际对象是什么类型，都执行基类类型所定义的函数。如果调用虚函数，
+则直到运行时才能确定调用哪个函数，运行的虚函数是引用所绑定的或指针所指向的对象所属类型定
+义的版本。
+【★】如果调用非虚函数，则无论实际对象是什么类型，都执行基类类型所定义的函数。
+【★】如果调用虚函数,运行的虚函数是引用所绑定的或指针所指向的对象所属类型定义的版本。
+
+从编写代码的角度看我们无需担心。只要正确地设计和实现了类，不管实际对象是基类类型或派生类
+型，操作都将完成正确的工作。
+
+另一方面，对象是非多态的——对象类型已知且不变。对象的动态类型总是与静态类型相同，这一点与
+引用或指针相反。运行的函数（虚函数或非虚函数）是由对象的类型定义的。
+
+只有通过引用或指针调用，虚函数才  运行时确定。只有在这些情况下，直到运行时才知道对象的动
+态类型。
+【★】只有通过引用或指针调用，虚函数才在运行时确定。
+
+【在编译时确定非 virtual 调用】
+不管传给 print_total 的实参的实际类型是什么，对 book 的调用在编译时确定为调用 
+Item_base::book。
+即使 Bulk_item 定义了自己的 book 函数版本，这个调用也会调用基类中的版本。
+
+非虚函数总是在编译时根据调用该函数的对象、引用或指针的类型而确定。item 的类型是 
+const Item_base 的引用，所以，无论在运行时 item 引用的实际对象是什么类型，调用该对象的非
+虚函数都将会调用 Item_base 中定义的版本。
+
+【覆盖虚函数机制】
+【★】在某些情况下，希望覆盖虚函数机制并强制函数调用使用虚函数的特定版本，这里可以使用作
+用域操作符：
+     Item_base *baseP = &derived;
+     // calls version from the base class regardless of the dynamic type of baseP
+     double d = baseP->Item_base::net_price(42);
+
+这段代码强制将 net_price 调用确定为 Item_base 中定义的版本，该调用将在编译时确定。
+只有成员函数中的代码才应该使用作用域操作符覆盖虚函数机制。
+
+为什么会希望覆盖虚函数机制？最常见的理由是为了派生类虚函数调用基类中的版本。在这种情况
+下，基类版本可以完成继承层次中所有类型的公共任务，而每个派生类型只添加自己的特殊工作。
+
+例如，可以定义一个具有虚操作的 Camera 类层次。Camera 类中的 display 函数可以显示所有的
+公共信息，派生类（如 PerspectiveCamera）可能既需要显示公共信息又需要显示自己的独特信息。
+可以显式调用 Camera 版本以显示公共信息，而不是在 PerspectiveCamera 的 display 实现中复
+制 Camera 的操作。在这种情况下，已经确切知道调用哪个实例，因此，不需要通过虚函数机制。
+
+派生类虚函数调用基类版本时，必须显式使用作用域操作符。如果派生类函数忽略了这样做，则函数
+调用会在运行时确定并且将是一个自身调用，从而导致无穷递归。
+ 
+
+【虚函数与默认实参】
+像其他任何函数一样，虚函数也可以有默认实参。通常，如果有用在给定调用中的默认实参值，该
+值将在编译时确定。如果一个调用省略了具有默认值的实参，则所用的值由调用该函数的类型定义，
+与对象的动态类型无关。通过基类的引用或指针调用虚函数时，默认实参为在基类虚函数声明中指
+定的值，如果通过派生类的指针或引用调用虚函数，则默认实参是在派生类的版本中声明的值。
+【★】通过基类的引用或指针调用虚函数时，默认实参为在基类虚函数声明中指定的值，如果通过
+派生类的指针或引用调用虚函数，则默认实参是在派生类的版本中声明的值。
+
+在同一虚函数的基类版本和派生类版本中使用不同的默认实参几乎一定会引起麻烦。如果通过基类
+的引用或指针调用虚函数，但实际执行的是派生类中定义的版本，这时就可能会出现问题。在这种
+情况下，为虚函数的基类版本定义的默认实参将传给派生类定义的版本，而派生类版本是用不同的
+默认实参定义的。
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,129 @@
+为了定义派生类，使用类派生列表指定基类。类派生列表指定了一个或多个基类，具有如下形式：
+     class classname: access-label base-class
+【★】为了定义派生类，使用类派生列表指定基类。
+【★】类派生列表指定了一个或多个基类
+
+这里 access-label 是 public、protected 或 private，base-class 是已定义的类的名字。类派
+生列表可以指定多个基类。继承单个基类是为常见，也是本章的主题。第 17.3 节讨论多个基类的
+使用。
+
+第 15.2.5 节将进一步介绍派生列表中使用的访问标号，现在，只需要了解访问标号决定了对继承成
+员的访问权限。如果想要继承基类的接口，则应该进行 public 派生。
+
+派生类继承基类的成员并且可以定义自己的附加成员。每个派生类对象包含两个部分：从基类继承的
+成员和自己定义的成员。一般而言，派生类只（重）定义那些与基类不同或扩展基类行为的方面。
+
+【定义派生类】
+在书店应用程序中，将从 Item_base 类派生 Bulk_item 类，因此 Bulk_item 类将继承 book、
+isbn 和 price 成员。Bulk_item 类必须重定义 net_price 函数定义该操作所需要的数据成员：
+
+     // discount kicks in when a specified number of copies of same book are sold
+     // the discount is expressed as a fraction used to reduce the normal price
+     class Bulk_item : public Item_base {
+     public:
+         // redefines base version so as to implement bulk purchase discount policy
+         double net_price(std::size_t) const;
+     private:
+         std::size_t min_qty; // minimum purchase for discount to apply
+         double discount;     // fractional discount to apply
+      };
+
+每个 Bulk_item 对象包含四个数据成员：从 Item_base 继承的 isbn 和 price，自己定义的
+ min_qty 和 discount，后两个成员指定最小数量以及购买超过该数量时给的折扣。Bulk_item 
+ 类还需要定义一个构造函数，我们将在第 15.4 节定义它。
+ 
+ 【派生类和虚函数】
+ 尽管不是必须这样做，派生类一般会重定义所继承的虚函数。派生类没有重定义某个虚函数，则
+ 使用基类中定义的版本。
+【★】派生类没有重定义某个虚函数，则使用基类中定义的版本。
+ 
+派生类型必须对想要重定义的每个继承成员进行声明。Bulk_item 类指出，它将重定义 net_price 
+函数但将使用 book 的继承版本。
+【★】派生类型必须对想要重定义的每个继承成员进行声明。
+
+【★】派生类中虚函数的声明（第 7.4 节）必须与基类中的定义方式完全匹配，但有一个例外：返回
+对基类型的引用（或指针）的虚函数。派生类中的虚函数可以返回基类函数所返回类型的派生类的引
+用（或指针）。
+
+例如，Item_base 类可以定义返回 Item_base* 的虚函数，如果这样，Bulk_item 类中定义的实例
+可以定义为返回 Item_base* 或 Bulk_item*。第 15.9 节将介绍这种虚函数的一个例子。
+
+一旦函数在基类中声明为虚函数，它就一直为虚函数，派生类无法改变该函数为虚函数这一事实。派
+生类重定义虚函数时，可以使用 virtual 保留字，但不是必须这样做。
+【★】一旦函数在基类中声明为虚函数，它就一直为虚函数
+【★】派生类重定义虚函数时，可以使用 virtual 保留字，但不是必须这样做。
+
+【派生类对象包含基类对象作为子对象】
+派生类对象由多个部分组成：派生类本身定义的（非 static）成员加上由基类（非 static）成员组
+成的子对象。可以认为 Bulk_item 对象由图 15.1 表示的两个部分组成。
+
+C++ 语言不要求编译器将对象的基类部分和派生部分和派生部分连续排列，因此，图 15.1 是关于类
+如何工作的概念表示而不是物理表示。
+
+【派生类中的函数可以使用基类的成员】
+像任意成员函数一样，派生类函数可以在类的内部或外部定义，正如这里的 net_price 函数一样：
+
+     // if specified number of items are purchased, use discounted price
+     double Bulk_item::net_price(size_t cnt) const
+     {
+         if (cnt >= min_qty)
+             return cnt * (1 - discount) * price;
+         else
+             return cnt * price;
+     }
+
+该函数产生折扣价格：如果给定数量多于 min_qty，就对 price 应用 discount（discount 存储为
+分数）。 
+因为每个派生类对象都有基类部分，类可以访问共基类的 public 和 protected 成员，就好像那些
+成员是派生类自己的成员一样。
+【★】像任意成员函数一样，派生类函数可以在类的内部或外部定义
+
+【用作基类的类必须是已定义的】
+【★】已定义的类才可以用作基类。如果已经声明了 Item_base 类，但没有定义它，则不能用
+ Item_base 作基类：
+
+     class Item_base; // declared but not defined
+     // error: Item_base must be defined
+     class Bulk_item : public Item_base { ... };
+
+这一限制的原因应该很容易明白：每个派生类包含并且可以访问其基类的成员，为了使用这些成员，
+派生类必须知道它们是什么。这一规则暗示着不可能从类自身派生出一个类。
+
+【用派生类作基类】
+基类本身可以是一个派生类：
+
+     class Base { /* ... */ };
+     class D1: public Base { /* ... */ };
+     class D2: public D1 { /* ... */ };
+
+每个类继承其基类的所有成员。最底层的派生类继承其基类的成员，基类又继承自己的基类的成员，
+如此沿着继承链依次向上。从效果来说，最底层的派生类对象包含其每个直接基类和间接基类的子
+对象。
+
+【派生类的声明】
+如果需要声明（但并不实现）一个派生类，则声明包含类名但不包含派生列表。例如，下面的前向
+声明会导致编译时错误：
+
+     // error: a forward declaration must not include the derivation list
+     class Bulk_item : public Item_base;
+
+【★】如果需要声明（但并不实现）一个派生类，则声明包含类名但不包含派生列表。
+正确的前向声明为：
+     // forward declarations of both derived and nonderived class
+     class Bulk_item;
+     class Item_base;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

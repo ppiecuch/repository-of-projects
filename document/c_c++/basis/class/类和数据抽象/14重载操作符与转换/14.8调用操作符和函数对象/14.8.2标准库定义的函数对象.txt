@@ -1,0 +1,111 @@
+标准库定义了一组算术、关系与逻辑函数对象类，表 14.3 列出了这些类。标准库还定义了一组函数
+适配器，使我们能够特化或者扩展标准库所定义的以及自定义的函数对象类。这些标准库函数对象类
+型是在 functional 头文件中定义的。
+
+表 14.3. 标准库函数对象
+
+算术函数对象         类型
+   
+plus<Type>    applies +
+
+minus<Type>   applies -
+
+multiplies<Type>   applies *
+
+divides<Type>    applies /
+
+modulus<Type>   applies %
+
+negate<Type>    applies -
+
+
+
+关系函数对象类型
+   
+equal_to<Type>   applies ==
+
+not_equal_to<Type>   applies !=
+
+greater<Type>    applies >
+
+greater_equal<Type>   applies >=
+
+less<Type>     applies <
+
+less_equal<Type>    applies <=
+
+逻辑函数对象类型
+   
+logical_and<Type>    applies &&
+
+logical_or<Type>    applies |
+
+logical_not<Type>   applies !
+
+
+
+
+【每个类表示一个给定操作符】
+每个标准库函数对象类表示一个操作符，即，每个类都定义了应用命名操作的调用操作符。例如，
+plus 是表示加法操作符的模板类型。plus 模板中的调用操作符对一对操作数应用 + 运算。
+
+
+不同的函数对象定义了执行不同操作的调用操作符。正如 plus 定义了执行 + 操作符的调用操作符，
+modulus 类定义了应用二元操作符 % 的调用操作符，equal_to 类应用 ==，等等。
+
+
+有两个一元函数对象类：一元减（negate<Type>)）和逻辑非（logical_not<Type>)）。其余的标准
+库函数对象都是表示二元操作符的二元函数对象类。为二元操作符定义的调用操作符需要两个给定类
+型的形参，而一元函数对象类型定义了接受一个实参的调用操作符。
+
+
+【表示操作数类型的模板类型】
+每个函数对象类都是一个类模板，我们需要为该模板提供一个类型。正如从诸如 vector 的顺序容器所
+了解的，类模板是可以用于不同类型的类。函数对象类的模板类型指定调用操作符的形参类型。
+
+例如，plus<string> 将 string 加法操作符应用于 string 对象，对于 plus<int>，操作数是 int 
+值，plus<Sales_item> 将 + 应用于 Sales_items; 对象，依次类推：
+
+     plus<int> intAdd;         // function object that can add two int values
+     negate<int> intNegate;   //  function object that can negate an int value
+     // uses intAdd::operator(int, int) to add 10 and 20
+     int sum = intAdd(10, 20);          // sum = 30
+     // uses intNegate::operator(int) to generate -10 as second parameter
+     // to intAdd::operator(int, int)
+     sum = intAdd(10, intNegate(10));    // sum = 0
+
+【在算法中使用标准库函数】
+函数对象常用于覆盖算法使用的默认操作符。例如，sort 默认使用 operator< 按升序对容器进行排
+序。为了按降序对容器进行排序，可以传递函数对象 greater。该类将产生一个调用操作符，调用基
+础对象的大于操作符。如果 svec 是一个 vector<string> 对象，以下代码
+     // passes temporary function object that applies > operator to two strings
+     sort(svec.begin(), svec.end(), greater<string>());
+【★】函数对象常用于覆盖算法使用的默认操作符。
+
+将按降序对 vector 进行排序。像通常那样，传递一对迭代器以指明被排序序列。第三个实参用于传
+递比较元素的谓词（第 11.2.3 节）函数。该实参 greater<string> 类型的临时对象，是一个将 > 
+操作符应用于两个 string 操作符的函数对象。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 

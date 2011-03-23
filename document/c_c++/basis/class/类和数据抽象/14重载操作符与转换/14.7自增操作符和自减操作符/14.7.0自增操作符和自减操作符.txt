@@ -1,0 +1,156 @@
+自增（++）和自减（--）操作符经常由诸如迭代器这样的类实现，这样的类提供类似于指针的行为来
+访问序列中的元素。例如，可以定义一个类，该类指向一个数组并为该数组中的元素提供访问检查。
+理想情况下，带访问检查的指针类可用于任意类型的数组，这一点的实现我们将在第十六章介绍类模
+板时学习。现在，我们的类将处理 int 数组：
+     /*
+      * smart pointer: Checks access to elements throws an out_of_range
+      *                exception if attempt to access a nonexistent element
+      * users allocate and free the array
+      */
+     class CheckedPtr {
+     public:
+         // no default constructor; CheckedPtrs must be bound to an object
+         CheckedPtr(int *b, int *e): beg(b), end(e), curr(b) { }
+         // dereference and increment operations
+     private:
+         int* beg;   // pointer to beginning of the array
+         int* end;   // one past the end of the array
+         int* curr;  // current position within the array
+     };
+
+像 ScreenPtr 一样，这个类没有默认构造函数。创建一个 CheckedPtr 对象时，必须提供指向数组的
+指针。一个 CheckedPtr 对象有三个数据成员：beg，指向数组的第一个元素；end，指向数组的末端；
+curr，指向 CheckedPtr 对象当前引用的数组元素。
+
+构造函数的参数是两个指针：一个指向数组的开始，另一个指向数组的末端。构造函数用这两个指针
+初始化 beg 和 end，并将 curr 初始化为指向第一个元素。
+
+【定义自增／自减操作符】
+C++ 语言不要求自增操作符或自减操作符一定作为类的成员，但是，因为这些操作符改变操作对象的
+状态，所以更倾向于将它们作为成员。
+
+在为类定义重载的自增操作符和自减操作符之前，还必须考虑另一件事情。对内置类型而言，自增操
+作符和自减操作符有前缀和后缀两种形式。毫不奇怪，也可以为我们自己的类定义自增操作符和自减
+操作符的前缀和后缀实例。我们首先介绍前缀形式，然后实现后缀形式。
+
+【定义前自增／前自减操作符】
+前缀式操作符的声明看起来像这样：
+
+     class CheckedPtr {
+     public:
+         CheckedPtr& operator++();        // prefix operators
+         CheckedPtr& operator--();
+         // other members as before
+      };
+
+为了与内置类型一致，前缀式操作符应返回被增量或减量对象的引用。
+
+这个自增操作符根据 end 检查 curr，从而确保用户不能将 curr 增量到超过数组的末端。如果 curr 
+增量到超过 end，就抛出一个 out_of_range 异常；否则，将 curr 加 1 并返回对象引用：
+
+     // prefix: return reference to incremented/decremented object
+     CheckedPtr& CheckedPtr::operator++()
+     {
+         if (curr == end)
+             throw out_of_range
+                   ("increment past the end of CheckedPtr");
+         ++curr;                // advance current state
+         return *this;
+     }
+
+除了将 curr 减 1 并检查是否会减到 beg，自减操作符的行为与自增操作符类似：
+
+     CheckedPtr& CheckedPtr::operator--()
+     {
+         if (curr == beg)
+             throw out_of_range
+               ("decrement past the beginning of CheckedPtr");
+         --curr;              // move current state back one element
+         return *this;
+     }
+
+【区别操作符的前缀和后缀形式】
+同时定义前缀式操作符和后缀式操作符存在一个问题：它们的形参数目和类型相同，普通重载不能区别
+所定义的前缀式操作符还是后缀式操作符。
+
+【★】为了解决这一问题，后缀式操作符函数接受一个额外的（即，无用的）int 型形参。使用后缀式
+操作符进，编译器提供 0 作为这个形参的实参。尽管我们的前缀式操作符函数可以使用这个额外的形参
+，但通常不应该这样做。那个形参不是后缀式操作符的正常工作所需要的，它的唯一目的是使后缀函数
+与前缀函数区别开来。
+
+【定义后缀式操作符】
+现在将后缀式操作符加到 CheckedPtr：
+
+     class CheckedPtr {
+     public:
+         // increment and decrement
+         CheckedPtr operator++(int);       // postfix operators
+         CheckedPtr operator--(int);
+         // other members as before
+     };
+为了与内置操作符一致，后缀式操作符应返回旧值（即，尚未自增或自减的值），并且，应作为值返
+回，而不是返回引用。
+ 
+
+后缀式操作符可以这样实现：
+
+     // postfix: increment/decrement object but return unchanged value
+     CheckedPtr CheckedPtr::operator++(int)
+     {
+
+         // no check needed here, the call to prefix increment will do the check
+         CheckedPtr ret(*this);        // save current value
+         ++*this;                      // advance one element, checking the increment
+         return ret;                   // return saved state
+     }
+     CheckedPtr CheckedPtr::operator--(int)
+     {
+         // no check needed here, the call to prefix decrement will do the check
+         CheckedPtr ret(*this);  // save current value
+         --*this;                // move backward one element and check
+         return ret;             // return saved state
+      }
+
+操作符的后缀式比前缀式复杂一点，必须记住对象在加 1／减 1 之前的当前状态。这些操作符定义了
+一个局部 CheckedPtr 对象，将它初始化为 *this 的副本，即 ret 是这个对象当前状态的副本。
+【?】操作对象副本可能违背了业务需要
+
+保存了当前状态的副本后，操作符调用自己的前缀式操作符分别进行加 1 或减 1：
+     ++*this
+
+调用这个对象的 CheckedPtr 前缀自增操作符，该操作符检查自增是否安全并将 curr 加 1 或抛出一
+个异常。假定不抛出异常，前自增操作符函数以返回存储在 ret 的副本而结束。因此，返回之后，对
+象本身加了 1，但返回的是尚未自增的原值。
+
+因为通过调用前缀式版本实现这些操作符，不需要检查 curr 是否在范围之内，那个检查以及必要的
+ throw，在相应的前缀式操作符中完成。
+
+因为不使用 int 形参，所以没有对其命名。
+
+
+【显式调用前缀式操作符】
+正如在第 14.1 节所见，可以显式调用重载操作符而不是将它作为操作符用在表达式中。如果想要使
+用函数调用来调用后缀式操作符，必须给出一个整型实参值：
+
+     CheckedPtr parr(ia, ia + size);        // iapoints to an array of ints
+     parr.operator++(0);                    // call postfix operator++
+     parr.operator++();                     // call prefix operator++
+
+
+所传递的值通常被忽略，但该值是必要的，用于通知编译器需要的是后缀式版本。
+
+【★】一般而言，最好前缀式和后缀式都定义。只定义前缀式或只定义后缀式的类，将会让习惯于使
+用两种形式的用户感到奇怪。
+
+
+
+
+
+
+
+
+
+
+
+
+

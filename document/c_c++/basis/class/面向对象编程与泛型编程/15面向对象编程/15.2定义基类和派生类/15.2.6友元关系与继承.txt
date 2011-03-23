@@ -1,0 +1,35 @@
+【★】像其他类一样，基类或派生类可以使其他类或函数成为友元（第 12.5 节）。友元可以访问类的 
+private 和 protected 数据。
+
+【★】友元关系不能继承。基类的友元对派生类的成员没有特殊访问权限。如果基类被授予友元关系，
+则只有基类具有特殊访问权限，该基类的派生类不能访问授予友元关系的类。
+
+每个类控制对自己的成员的友元关系：
+
+     class Base {
+         friend class Frnd;
+     protected:
+         int i;
+     };
+     // Frnd has no access to members in D1
+     class D1 : public Base {
+     protected:
+         int j;
+     };
+     class Frnd {
+     public:
+        int mem(Base b) { return b.i; }  // ok: Frnd is friend to Base
+        int mem(D1 d) { return d.i; }    // error: friendship doesn't inherit
+     };
+     // D2 has no access to members in Base
+     class D2 : public Frnd {
+     public:
+        int mem(Base b) { return b.i; } // error: friendship doesn't inherit
+
+如果派生类想要将自己成员的访问权授予其基类的友元，派生类必须显式地这样做：基类的友元对从
+该基类派生的类型没有特殊访问权限。同样，如果基类和派生类都需要访问另一个类，那个类必须特
+地将访问权限授予基类的和每一个派生类。
+【?】如果派生类想要将自己成员的访问权授予其基类的友元，派生类必须显式地这样做：基类的友
+元对从该基类派生的类型没有特殊访问权限。
+【★】如果基类和派生类都需要访问另一个类，那个类必须特地将访问权限授予基类的和每一个派生类。
+

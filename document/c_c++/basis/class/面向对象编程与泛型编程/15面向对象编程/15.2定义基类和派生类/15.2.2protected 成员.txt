@@ -1,0 +1,50 @@
+可以认为 protected 访问标号是 private 和 public 的混合：
+1、像 private 成员一样，protected 成员不能被类的用户访问。
+2、像 public 成员一样，protected 成员可被该类的派生类访问。
+此外，protected 还有另一重要性质：
+【★】派生类只能通过派生类对象访问其基类的 protected 成员，派生类对其基类类型对象的 
+protected 成员没有特殊访问权限。
+
+例如，假定 Bulk_item 定义了一个成员函数，接受一个 Bulk_item 对象的引用和一个 Item_base
+ 对象的引用，该函数可以访问自己对象的 protected 成员以及 Bulk_item 形参的 protected 成
+ 员，但是，它不能访问 Item_base 形参的 protected 成员。
+
+     void Bulk_item::memfcn(const Bulk_item &d, const Item_base &b)
+     {
+         // attempt to use protected member
+         double ret = price;   // ok: uses this->price
+         ret = d.price; // ok: uses price from a Bulk_item object
+         ret = b.price; // error: no access to price from an Item_base
+     }
+d.price 的使用正确，因为是通过 Bulk_item 类型对象引用 price；b.price 的使用非法，因为对
+ Base_item 类型的对象没有特殊访问访问权限。
+ 
+ 【关键概念：类设计与受保护成员】
+ 如果没有继承，类只有两种用户：类本身的成员和该类的用户。将类划分为 private 和 public 访
+ 问级别反映了用户种类的这一分隔：用户只能访问 public 接口，类成员和友元既可以访问 public
+  成员也可以访问 private 成员。
+  
+  有了继承，就有了类的第三种用户：从类派生定义新类的程序员。派生类的提供者通常（但并不总
+  是）需要访问（一般为 private 的）基类实现，为了允许这种访问而仍然禁止对实现的一般访问，
+  提供了附加的 protected 访问标号。类的 protected 部分仍然不能被一般程序访问，但可以被派
+  生类访问。只有类本身和友元可以访问基类的 private 部分，派生类不能访问基类的 private 成
+  员。
+  
+  定义类充当基类时，将成员设计为 public 的标准并没有改变：仍然是接口函数应该为 public 而数
+  据一般不应为 public。被继承的类必须决定实现的哪些部分声明为 protected 而哪些部分声明为 
+  private。希望禁止派生类访问的成员应该设为 private，提供派生类实现所需操作或数据的成员
+  应设为 protected。换句话说，提供给派生类型的接口是 protected 成员和 public 成员的组合。
+ 
+
+  
+
+  
+
+ 
+
+
+
+
+
+
+

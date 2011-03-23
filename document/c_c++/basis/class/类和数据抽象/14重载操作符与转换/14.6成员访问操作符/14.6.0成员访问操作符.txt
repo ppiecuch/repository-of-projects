@@ -1,0 +1,134 @@
+为了支持指针型类，例如迭代器，C++ 语言允许重载解引用操作符（*）和箭头操作符（->)）。
+
+箭头操作符必须定义为类成员函数。解引用操作不要求定义为成员，但将它作为成员一般也是正确的。
+
+【构建更安全的指针】
+解引用操作符和箭头操作符常用在实现智能指针（第 13.5.1 节）的类中。作为例子，假定想要定义
+一个类类型表示指向第十二章 Screen 类型对象的指针，将该类命名为 ScreenPtr。
+
+ScreenPtr 类将类似于我们的第二个 HasPtr 类。ScreenPtr 的用户将会传递一个指针，该指针指向
+动态分配的 Screen，ScreenPtr 类将拥有该指针，并安排在指向基础对象的最后一个 ScreenPtr 消
+失时删除基础对象。另外，不用为 ScreenPtr 类定义默认构造函数。因此，我们知道一个 ScreenPtr
+ 对象将总是指向一个 Screen 对象，不会有未绑定的 ScreenPtr，这一点与内置指针不同。应用程序
+ 可以使用 ScreenPtr 对象而无须首先测试它是否指向一个 Screen 对象。
+
+像 HasPtr 类一样，ScreenPtr 类将对其指针进行使用计数。我们将定义一个伙伴类保存指针及其相
+关使用计数：
+
+     // private class for use by ScreenPtr only
+     class ScrPtr {
+         friend class ScreenPtr;
+         Screen *sp;
+         size_t use;
+         ScrPtr(Screen *p): sp(p), use(1) { }
+         ~ScrPtr() { delete sp; }
+     };
+
+这个类看来很像 U_Ptr 类并且作用同样。ScrPtr 保存指针及其相关使用计数。将 ScreenPtr 设为友
+元，以便 ScreenPtr 可以访问使用计数。ScreenPtr 类将管理使用计数：
+
+     /*
+      * smart pointer: Users pass to a pointer to a dynamically allocated Screen, which
+      *                   is automatically destroyed when the last ScreenPtr goes away
+      */
+     class ScreenPtr {
+     public:
+         //  no default constructor: ScreenPtrs must be bound to an object
+         ScreenPtr(Screen *p): ptr(new ScrPtr(p)) { }
+         //  copy members and increment the use count
+         ScreenPtr(const ScreenPtr &orig):
+            ptr(orig.ptr) { ++ptr->use; }
+         ScreenPtr& operator=(const ScreenPtr&);
+         //  if use count goes to zero, delete the ScrPtr object
+         ~ScreenPtr() { if (--ptr->use == 0) delete ptr; }
+     private:
+         ScrPtr *ptr;    // points to use-counted ScrPtr class
+     };
+
+因为没有默认构造函数，所以 ScreenPtr 类型的每个对象必须提供一个初始化函数，初始化函数必须
+是另一个 ScreenPtr 对象或指向动态分配的 Screen 的指针。构造函数分配一个新的 ScrPtr 对象以
+保存那个那个指针及相关的使用计数。
+
+
+试图定义一个不带初始化式的 ScreenPtr 对象是错误的：
+
+     ScreenPtr p1; // error: ScreenPtr has no default constructor
+     ScreenPtr ps(new Screen(4,4));     // ok: ps points to a copy of myScreen
+
+【支持指针操作】
+指针支持的基本操作有解引用操作和箭头操作。我们的类可以这样定义这些操作：
+
+     class ScreenPtr {
+     public:
+         // constructor and copy control members as before
+         Screen &operator*() { return *ptr->sp; }
+         Screen *operator->() { return ptr->sp; }
+         const Screen &operator*() const { return *ptr->sp; }
+         const Screen *operator->() const { return ptr->sp; }
+     private:
+         ScrPtr *ptr; // points to use-counted ScrPtr class
+     };
+【★】指针支持的基本操作有解引用操作和箭头操作。
+
+【重载解引用操作符】
+解引用操作符是个一元操作符。在这个类中，解引用操作符定义为成员，因此没有显式形参，该操作
+符返回对 ScreenPtr 所指向的 Screen 的引用。
+
+像下标操作符一样，我们需要解引用操作符的 const 和非 const 版本。它们的区别在于返回类型：
+const 成员返回 const 引用以防止用户改变基础对象。
+
+【重载箭头操作符】
+箭头操作符与众不同。它可能表现得像二元操作符一样：接受一个对象和一个成员名。对对象解引用
+以获取成员。不管外表如何，箭头操作符不接受显式形参。
+
+这里没有第二个形参，因为 -> 的右操作数不是表达式，相反，是对应着类成员的一个标识符。没有
+明显可行的途径将一个标识符作为形参传递给函数，相反，由编译器处理获取成员的工作。
+
+当这样编写时：
+     point->action();
+
+由于优先级规则，它实际等价于编写：
+     (point->action)();
+
+换句话说，我们想要调用的是对 point->action 求值的结果。编译器这样对该代码进行求值：
+1、如果 point 是一个指针，指向具有名为 action 的成员的类对象，则编译器将代码编译为调用该
+对象的 action 成员。
+
+2、否则，如果 action 是定义了 operator-> 操作符的类的一个对象，则 point->action 与 
+point.operator->()->action 相同。即，执行 point 的 operator->()，然后使用该结果重复这
+三步。
+
+3、否则，代码出错。
+
+【使用重载箭头】
+可以这样使用 ScreenPtr 对象访问 Screen 对象的成员：
+
+ScreenPtr p(&myScreen);     // copies the underlying Screen
+p->display(cout);
+
+因为 p是一个 ScreenPtr 对象，p->display 的含义与对 (p.operator->())->display 求值相同。
+对 p.operator->() 求值将调用 ScreenPtr 类的 operator->，它返回指向 Screen 对象的指针，该
+指针用于获取并运行 ScreenPtr所指对象的 display 成员。
+
+【对重载箭头的返回值的约束】
+【★】重载箭头操作符必须返回指向类类型的指针，或者返回定义了自己的箭头操作符的类类型对象。
+
+如果返回类型是指针，则内置箭头操作符可用于该指针，编译器对该指针解引用并从结果对象获取指
+定成员。如果被指向的类型没有定义那个成员，则编译器产生一个错误。
+
+如果返回类型是类类型的其他对象（或是这种对象的引用），则将递归应用该操作符。编译器检查返
+回对象所属类型是否具有成员箭头，如果有，就应用那个操作符；否则，编译器产生一个错误。这个
+过程继续下去，直到返回一个指向带有指定成员的的对象的指针，或者返回某些其他值，在后一种情
+况下，代码出错。
+
+
+
+
+
+
+
+
+
+
+
+

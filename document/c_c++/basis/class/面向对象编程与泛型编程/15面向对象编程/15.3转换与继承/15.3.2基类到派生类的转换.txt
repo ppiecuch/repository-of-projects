@@ -1,0 +1,32 @@
+从基类到派生类的自动转换是不存在的。需要派生类对象时不能使用基类对象：
+     Item_base base;
+     Bulk_item* bulkP = &base;  // error: can't convert base to derived
+     Bulk_item& bulkRef = base; // error: can't convert base to derived
+     Bulk_item bulk = base;     // error: can't convert base to derived
+
+【★】从基类到派生类的自动转换是不存在的。
+
+没有从基类类型到派生类型的（自动）转换，原因在于基类对象只能是基类对象，它不能包含派生类
+型成员。如果允许用基类对象给派生类型对象赋值，那么就可以试图使用该派生类对象访问不存在的
+成员。
+
+有时更令人惊讶的是，甚至当基类指针或引用实际绑定到绑定到派生类对象时，从基类到派生类的转
+换也存在限制：
+
+     Bulk_item bulk;
+     Item_base *itemP = &bulk;  // ok: dynamic type is Bulk_item
+     Bulk_item *bulkP = itemP;  // error: can't convert base to derived
+
+编译器在编译时无法知道特定转换在运行时实际上是安全的。编译器确定转换是否合法，只看指针或
+引用的静态类型。
+
+在这些情况下，如果知道从基类到派生类的转换是安全的，就可以使用 static_cast（第 5.12.4 节）
+强制编译器进行转换。或者，可以用 dynamic_cast 申请在运行时进行检查，第 18.2.1 节将介绍 
+dynamic_cast。
+
+【★】如果知道从基类到派生类的转换是安全的，就可以使用 static_cast强制编译器进行转换。
+也可以用 dynamic_cast 申请在运行时进行检查
+
+
+
+

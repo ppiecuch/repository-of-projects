@@ -1,0 +1,45 @@
+可以从容器中检索单个元素的容器类一般会定义下标操作符，即 operator[]。标准库的类 string 和
+ vector 均是定义了下标操作符的类的例子。
+
+【★】下标操作符必须定义为类成员函数。
+
+【提供读写访问】
+定义下标操作符比较复杂的地方在于，它在用作赋值的左右操作符数时都应该能表现正常。下标操作符
+出现在左边，必须生成左值，可以指定引用作为返回类型而得到左值。只要下标操作符返回引用，就可
+用作赋值的任意一方。
+
+可以对 const 和非 const 对象使用下标也是个好主意。应用于 const 对象时，返回值应为 const 引
+用，因此不能用作赋值的目标
+
+【★】类定义下标操作符时，一般需要定义两个版本：一个为非 const 成员并返回引用，另一个为
+ const 成员并返回 const 引用。
+
+ 【原型下标操作符】
+ 
+ 下面的类定义了下标操作符。为简单起见，假定 Foo 所保存的数据存储在一个 vector<int>: 中：
+
+     class Foo {
+     public:
+         int &operator[] (const size_t);
+         const int &operator[] (const size_t) const;
+         // other interface members
+     private:
+         vector<int> data;
+         // other member data and private utility functions
+      };
+
+下标操作符本身可能看起来像这样：
+
+     int& Foo::operator[] (const size_t index)
+     {
+         return data[index];  // no range checking on index
+     }
+     const int& Foo::operator[] (const size_t index) const
+     {
+         return data[index];  // no range checking on index
+     }
+
+
+
+ 
+ 
