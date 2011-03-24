@@ -1,0 +1,81 @@
+像任意其他类一样，派生类也可以使用第十三章所介绍的合成复制控制成员。合成操作对对象的基类部分
+连同派生部分的成员一起进行复制、赋值或撤销，使用基类的复制构造函数、赋值操作符或析构函数对基
+类部分进行复制、赋值或撤销。
+
+类是否需要定义复制控制成员完全取决于类自身的直接成员。基类可以定义自己的复制控制而派生类使用
+合成版本，反之亦然。
+【★】类是否需要定义复制控制成员完全取决于类自身的直接成员。
+
+只包含类类型或内置类型数据成员、不含指针的类一般可以使用合成操作，复制、赋值或撤销这样的成员
+不需要特殊控制。具有指针成员的类一般需要定义自己的复制控制来管理这些成员。
+
+Item_base 类及其派生类可以使用复制控制操作的合成版本。复制 Bulk_item 对象时，调用（合成的）
+Item_base 复制构造函数复制 isbn 和 price 成员。使用 string 复制构造函数复制 isbn，直接复制 
+price 成员。一旦复制了基类部分，就复制派生部分。Bulk_item 的两个成员都是 double 型，直接复
+制这些成员。赋值操作符和析构函数类似处理。
+
+【定义派生类复制构造函数】
+如果派生类显式定义自己的复制构造函数或赋值操作符，则该定义将完全覆盖默认定义。被继承类的复制
+构造函数和赋值操作符负责对基类成分以及类自己的成员进行复制或赋值。
+【★】如果派生类显式定义自己的复制构造函数或赋值操作符，则该定义将完全覆盖默认定义。
+
+【★】如果派生类定义了自己的复制构造函数，该复制构造函数一般应显式使用基类复制构造函数初始化
+对象的基类部分：
+     class Base { /* ... */ };
+     class Derived: public Base {
+     public:
+         // Base::Base(const Base&) not invoked automatically
+         Derived(const Derived& d):
+              Base(d) /* other member initialization */ { /*... */ }
+     };
+     
+初始化函数 Base(d) 将派生类对象 d 转换（第 15.3 节）为它的基类部分的引用，并调用基类复制构造
+函数。如果省略基类初始化函数，如下代码：
+
+     // probably incorrect definition of the Derived copy constructor
+     Derived(const Derived& d) /* derived member initizations */
+                                   {/* ... */ }
+效果是运行 Base 的默认构造函数初始化对象的基类部分。假定 Derived 成员的初始化从 d 复制对应成
+员，则新构造的对象将具有奇怪的配置：它的 Base 部分将保存默认值，而它的 Derived 成员是另一对
+象的副本。
+
+
+【派生类赋值操作符】
+赋值操作符通常与复制构造函数类似：如果派生类定义了自己的赋值操作符，则该操作符必须对基类部分
+进行显式赋值。
+     // Base::operator=(const Base&) not invoked automatically
+     Derived &Derived::operator=(const Derived &rhs)
+     {
+        if (this != &rhs) {
+            Base::operator=(rhs); // assigns the base part
+            // do whatever needed to clean up the old value in the derived part
+            // assign the members from the derived
+        }
+        return *this;
+     }
+【★】如果派生类定义了自己的赋值操作符，则该操作符必须对基类部分进行显式赋值。
+
+赋值操作符必须防止自身赋值。假定左右操作数不同，则调用 Base 类的赋值操作符给基类部分赋值。
+该操作符可以由类定义，也可以是合成赋值操作符，这没什么关系——我们可以直接调用它。基类操作符将
+释放左操作数中基类部分的值，并赋以来自 rhs 的新值。该操作符执行完毕后，接着要做的是为派生类中
+的成员赋值。
+【★】赋值操作符必须防止自身赋值。
+
+【派生类析构函数】
+析构函数的工作与复制构造函数和赋值操作符不同：派生类析构函数不负责撤销基类对象的成员。编译器
+总是显式调用派生类对象基类部分的析构函数。每个析构函数只负责清除自己的成员：
+
+     class Derived: public Base {
+     public:
+         // Base::~Base invoked automatically
+         ~Derived()    { /* do what it takes to clean up derived members */ }
+      };
+【★】派生类析构函数不负责撤销基类对象的成员。
+【★】每个析构函数只负责清除自己的成员
+
+【★】对象的撤销顺序与构造顺序相反：首先运行派生析构函数，然后按继承层次依次向上调用各基类析
+构函数。
+
+
+
+

@@ -50,8 +50,8 @@
      // ok: calls Item_base::operator=(const Item_base&)
      item = bulk;           // bulk is "sliced down" to its Item_base portion
 
-【★】基类一般定义自己的复制构造函数和赋值操作符,这些成员接受一个形参，该形参是基类类型
-的（const）引用。
+【★】从派生类对象对基类对象进行初始化或赋值,基类一般定义自己的复制构造函数和赋值操作符,这些
+成员接受一个形参，该形参是基类类型的（const）引用。
 
 用 Bulk_item 类型的对象调用 Item_base 类的复制构造函数或赋值操作符时，将发生下列步骤：
 1.将 Bulk_item 对象转换为 Item_base 引用，这仅仅意味着将一个 Item_base 引用绑定到 

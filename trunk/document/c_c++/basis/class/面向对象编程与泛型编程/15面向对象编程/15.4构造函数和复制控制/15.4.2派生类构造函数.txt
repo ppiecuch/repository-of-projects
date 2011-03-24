@@ -1,0 +1,171 @@
+派生类的构造函数受继承关系的影响，每个派生类构造函数除了初始化自己的数据成员之外，还要初始化
+基类。
+
+【★】每个派生类构造函数除了初始化自己的数据成员之外，还要初始化基类。
+
+【合成的派生类默认构造函数】
+派生类的合成默认构造函数（第 12.4.3 节与非派生的构造函数只有一点不同：除了初始化派生类的数据成
+员之外，它还初始化派生类对象的基类部分。基类部分由基类的默认构造函数初始化。
+【★】派生类的合成默认构造函数与非派生的构造函数只有一点不同：除了初始化派生类的数据成员之外，
+它还初始化派生类对象的基类部分。
+【★】基类部分由基类的默认构造函数初始化。
+
+对于 Bulk_item 类，合成的默认构造函数会这样执行：
+1.调用 Item_base 的默认构造函数，将 isbn 成员初始化空串，将 price 成员初始化为 0。
+2.用常规变量初始化规则初始化 Bulk_item 的成员，也就是说，qty 和 discount 成员会是未初始化的。
+
+【定义默认构造函数】
+因为 Bulk_item 具有内置类型成员，所以应定义自己的默认构造函数：
+
+     class Bulk_item : public Item_base {
+     public:
+         Bulk_item(): min_qty(0), discount(0.0) { }
+         // as before
+     };
+
+这个构造函数使用构造函数初始化列表（第 7.7.3 节）初始化 min_qty 和 discount 成员，该构造函数还
+隐式调用 Item_base 的默认构造函数初始化对象的基类部分。
+
+运行这个构造函数的效果是，首先使用 Item_base 的默认构造函数初始化 Item_base 部分，那个构造函
+数将 isbn 置为空串并将 price 置为 0。Item_base 的构造函数执行完毕后，再初始化 Bulk_item 部分
+的成员并执行构造函数的函数体（函数体为空）。 
+【★】构造函数:先调用父类的构造函数初始化父类部分,再调用子类的构造函数
+
+【向基类构造函数传递实参】
+除了默认构造函数之外，Item_base 类还使用户能够初始化 isbn 和 price 成员，我们希望支持同样
+ Bulk_item 对象的初始化，事实上，我们希望用户能够指定整个 Bulk_item 的值，包括折扣率和数量。
+
+派生类构造函数的初始化列表只能初始化派生类的成员，不能直接初始化继承成员。相反派生类构造函数通
+过将基类包含在构造函数初始化列表中来间接初始化继承成员。
+
+     class Bulk_item : public Item_base {
+     public:
+         Bulk_item(const std::string& book, double sales_price,
+                   std::size_t qty = 0, double disc_rate = 0.0):
+                      Item_base(book, sales_price),
+                      min_qty(qty), discount(disc_rate) { }
+         // as before
+      };
+
+【★】派生类构造函数的初始化列表只能初始化派生类的成员，不能直接初始化继承成员。
+【★】派生类构造函数通过将基类包含在构造函数初始化列表中来间接初始化继承成员。
+
+这个构造函数使用有两个形参 Item_base 构造函数初始化基类子对象，它将自己的 book 和 
+sales_price 实参传递给该构造函数。这个构造函数可以这样使用：
+
+     // arguments are the isbn, price, minimum quantity, and discount
+     Bulk_item bulk("0-201-82470-1", 50, 5, .19);
+
+要建立 bulk，首先运行 Item_base 构造函数，该构造函数使用从 Bulk_item 构造函数初始化列表传来的
+实参初始化 isbn 和 price。Item_base 构造函数执行完毕之后，再初始化 Bulk_item 的成员。最后，运
+行 Bulk_item 构造函数的（空）函数体。
+【?】构造函数初始化列表的初始化顺序是按顺序执行?
+【▲】见下
+构造函数初始化列表为类的基类和成员提供初始值，它并不指定初始化的执行次序。首先初始化基类，然后
+根据声明次序初始化派生类的成员。
+
+【在派生类构造函数中使用默认实参】
+当然，也可以将这两个 Bulk_item 构造函数编写为一个接受默认实参的构造函数：
+
+     class Bulk_item : public Item_base {
+     public:
+         Bulk_item(const std::string& book, double sales_price,
+                   std::size_t qty = 0, double disc_rate = 0.0):
+                      Item_base(book, sales_price),
+                      min_qty(qty), discount(disc_rate) { }
+         // as before
+      };
+
+这里为每个形参提供了默认值，因此，可以用 0 至 4 个实参使用该构造函数。
+
+【只能初始化直接基类】
+一个类只能初始化自己的直接基类。直接就是在派生列表中指定的类。如果类 C 从类 B 派生，类 B 从类 A 
+派生，则 B 是 C 的直接基类。虽然每个 C 类对象包含一个 A 类部分，但 C 的构造函数不能直接初始化 A 
+部分。相反，需要类 C 初始化类 B，而类 B 的构造函数再初始化类 A。这一限制的原因是，类 B 的作者已
+经指定了怎样构造和初始化 B 类型的对象。像类 B 的任何用户一样，类 C 的作者无权改变这个规约。
+【★】一个类只能初始化自己的直接基类。
+
+作为更具体的例子，书店可以有几种折扣策略。除了批量折扣外，还可以为购买某个数量打折，此后按全
+价销售，或者，购买量超过一定限度的可以打折，在该限度之内不打折。
+
+这些折扣策略都需要一个数量和一个折扣量，可以定义名为 Disc_item 的新类存储数量和折扣量，以支持
+这些不同的折扣策略。Disc_item 类可以不定义 net_price 函数，但可以作为定义不同折扣策略的其他类
+（如 Bulk_item 类）的基类。
+
+【关键概念：重构】
+将 Disc_item 加到 Item_base 层次是重构（refactoring）的一个例子。重构包括重新定义类层次，将操
+作和／或数据从一个类移到另一个类。为了适应应用程序的需要而重新设计类以便增加新函数或处理其他改
+变时，最有可能需要进行重构。
+
+重构常见在面向对象应用程序中非常常见。值得注意的是，虽然改变了继承层次，使用 Bulk_item 类或
+ Item_base 类的代码不需要改变。然而，对类进行重构，或以任意其他方式改变类，使用这些类的任意
+ 代码都必须重新编译。
+ 
+要实现这个设计，首先需要定义 Disc_item 类：
+
+     // class to hold discount rate and quantity
+     // derived classes will implement pricing strategies using these data
+     class Disc_item : public Item_base {
+     public:
+         Disc_item(const std::string& book = "",
+                   double sales_price = 0.0,
+                   std::size_t qty = 0, double disc_rate = 0.0):
+                      Item_base(book, sales_price),
+                      quantity(qty), discount(disc_rate) { }
+         protected:
+             std::size_t quantity; // purchase size for discount to apply
+             double discount;      // fractional discount to apply
+      };
+
+这个类继承 Item_base 类并定义了自己的 discount 和 quantity 成员。它唯一的成员函数是构造函数，
+用以初始化基类和 Disc_item 定义的成员。
+
+其次，可以重新实现 Bulk_item 以继承 Disc_item，而不再直接继承 Item_base：
+     // discount kicks in when a specified number of copies of same book are sold
+     // the discount is expressed as a fraction to use to reduce the normal price
+     class Bulk_item : public Disc_item {
+     public:
+         Bulk_item(const std::string& book = "",
+                   double sales_price = 0.0,
+                   std::size_t qty = 0, double disc_rate = 0.0):
+              Disc_item(book, sales_price, qty, disc_rate) { }
+         // redefines base version so as to implement bulk purchase discount policy
+         double net_price(std::size_t) const;
+     };
+
+Bulk_item 类现在有一个直接基类 Disc_item，还有一个间接基类 Item_base。每个 Bulk_item 对象有
+三个子对象：一个（空的）Bulk_item 部分和一个 Disc_item 子对象，Disc_item 子对象又有一个
+ Item_base 基类子对象。 
+ 
+ 虽然 Bulk_item 没有自己的数据成员，但为获取值用来初始化其继承成员，它定义了一个构造函数。
+
+ 派生类构造函数只能初始化自己的直接基类，在 Bulk_item 类的构造函数初始化列表中指定 Item_base 
+ 是一个错误。
+ 
+ 【关键概念：尊重基类接口】
+ 构造函数只能初始化其直接基类的原因是每个类都定义了自己的接口。定义 Disc_item 时，通过定义它
+ 的构造函数指定了怎样初始化 Disc_item 对象。一旦类定义了自己的接口，与该类对象的所有交互都应
+ 该通过该接口，即使对象是派生类对象的一部分也不例外。
+ 【★】构造函数只能初始化其直接基类的原因是每个类都定义了自己的接口。
+ 
+同样，派生类构造函数不能初始化基类的成员且不应该对基类成员赋值。如果那些成员为 public 或
+ protected，派生构造函数可以在构造函数函数体中给基类成员赋值，但是，这样做会违反基类的接口。
+ 派生类应通过使用基类构造函数尊重基类的初始化意图，而不是在派生类构造函数函数体中对这些成员赋
+ 值。
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
