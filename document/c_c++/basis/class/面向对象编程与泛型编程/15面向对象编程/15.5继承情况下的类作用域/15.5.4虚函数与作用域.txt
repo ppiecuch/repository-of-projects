@@ -1,0 +1,63 @@
+还记得吗，要获得动态绑定，必须通过基类的引用或指针调用虚成员。当我们这样做时，编译器器将
+在基类中查找函数。假定找到了名字，编译器就检查实参是否与形参匹配。
+
+现在可以理解虚函数为什么必须在基类和派生类中拥有同一原型了。如果基类成员与派生类成员接受
+的实参不同，就没有办法通过基类类型的引用或指针调用派生类函数。考虑如下（人为的）为集合：
+
+     class Base {
+     public:
+         virtual int fcn();
+     };
+     class D1 : public Base {
+     public:
+          // hides fcn in the base; this fcn is not virtual
+          int fcn(int); // parameter list differs from fcn in Base
+          // D1 inherits definition of Base::fcn()
+     };
+     class D2 : public D1 {
+     public:
+         int fcn(int); // nonvirtual function hides D1::fcn(int)
+         int fcn();    // redefines virtual fcn from Base
+     };
+
+D1 中的 fcn 版本没有重定义 Base 的虚函数 fcn，相反，它屏蔽了基类的 fcn。结果 D1 有两个名为 
+fcn 的函数：类从 Base 继承了一个名为 fcn 的虚函数，类又定义了自己的名为 fcn 的非虚成员函
+数，该函数接受一个 int 形参。但是，从 Base 继承的虚函数不能通过 D1 对象（或 D1 的引用或指
+针）调用，因为该函数被 fcn(int) 的定义屏蔽了。
+
+类 D2 重定义了它继承的两个函数，它重定义了 Base 中定义的 fcn 的原始版本并重定义了 D1 中定
+义的非虚版本。
+
+【通过基类调用被屏蔽的虚函数】
+通过基类类型的引用或指针调用函数时，编译器将在基类中查找该函数而忽略派生类：
+
+     Base bobj;  D1 d1obj;  D2 d2obj;
+     Base *bp1 = &bobj, *bp2 = &d1obj, *bp3 = &d2obj;
+     bp1->fcn();   // ok: virtual call, will call Base::fcnat run time
+     bp2->fcn();   // ok: virtual call, will call Base::fcnat run time
+     bp3->fcn();   // ok: virtual call, will call D2::fcnat run time
+
+三个指针都是基类类型的指针，因此通过在 Base 中查找 fcn 来确定这三个调用，所以这些调用是合
+法的。另外，因为 fcn 是虚函数，所以编译器会生成代码，在运行时基于引用指针所绑定的对象的实
+际类型进行调用。在 bp2 的情况，基本对象是 D1 类的，D1 类没有重定义不接受实参的虚函数版本，
+通过 bp2 的函数调用（在运行时）调用 Base 中定义的版本。
+
+【关键概念：名字查找与继承】
+理解 C++ 中继承层次的关键在于理解如何确定函数调用。确定函数调用遵循以下四个步骤：
+1.首先确定进行函数调用的对象、引用或指针的静态类型。
+2.在该类中查找函数，如果找不到，就在直接基类中查找，如此循着类的继承链往上找，直到找到该
+函数或者查找完最后一个类。如果不能在类或其相关基类中找到该名字，则调用是错误的。
+3.一旦找到了该名字，就进行常规类型检查（第 7.1.2 节），查看如果给定找到的定义，该函数调用
+是否合法。
+4.假定函数调用合法，编译器就生成代码。如果函数是虚函数且通过引用或指针调用，则编译器生成
+代码以确定根据对象的动态类型运行哪个函数版本，否则，编译器生成代码直接调用函数。
+ 
+ 
+
+
+
+
+
+
+
+

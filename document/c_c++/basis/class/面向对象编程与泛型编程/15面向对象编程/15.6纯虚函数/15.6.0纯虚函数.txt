@@ -1,0 +1,34 @@
+在第 15.4.2 节所编写的 Disc_item 类提出了一个有趣的问题：该类从 Item_base 继承了 net_price
+ 函数但没有重定义该函数。因为对 Disc_item 类而言没有可以给予该函数的意义，所以没有重定义该
+ 函数。在我们的应用程序中，Disc_item 不对应任何折扣策略，这个类的存在只是为了让其他类继承。
+
+我们不想让用户定义 Disc_item 对象，相反，Disc_item 对象只应该作为 Disc_item 派生类型的对
+象的一部分而存在。但是，正如已定义的，没有办法防止用户定义一个普通的 Disc_item 对象。这带
+来一个问题：如果用户创建一个 Disc_item 对象并调用该对象的 net_price 函数，会发生什么呢？
+从前面章节的讨论中了解到，结果将是调用从 Item_base 继承而来的 net_price 函数，该函数产生
+的是不打折的价格。
+
+很难说用户可能期望调用 Disc_item 的 net_price 会有什么样的行为。真正的问题在于，我们宁愿
+用户根本不能创建这样的对象。可以使 net_price 成为纯虚函数，强制实现这一设计意图并正确指
+出 Disc_item 的 net_price 版本没有意义的。在函数形参表后面写上 = 0 以指定纯虚函数：
+【★】在函数形参表后面写上 = 0 以指定纯虚函数
+     class Disc_item : public Item_base {
+     public:
+         double net_price(std::size_t) const = 0;
+     };
+
+
+将函数定义为纯虚能够说明，该函数为后代类型提供了可以覆盖的接口，但是这个类中的版本决不会
+调用。重要的是，用户将不能创建 Disc_item 类型的对象。
+
+试图创建抽象基类的对象将发生编译时错误：
+
+     // Disc_item declares pure virtual functions
+     Disc_item discounted; // error: can't define a Disc_item object
+     Bulk_item bulk;       // ok: Disc_item subobject within Bulk_item
+
+
+含有（或继承）一个或多个纯虚函数的类是抽象基类。除了作为抽象基类的派生类的对象的组成部分，
+不能创建抽象类型的对象。
+【★】含有（或继承）一个或多个纯虚函数的类是抽象基类。
+【★】除了作为抽象基类的派生类的对象的组成部分，不能创建抽象类型的对象。

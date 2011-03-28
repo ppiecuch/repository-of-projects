@@ -1,0 +1,41 @@
+要实现接受 Item_base 对象的构造函数，必须首先解决一个问题：我们不知道给予构造函数的对象
+的实际类型。我们知道它是一个 Item_base 对象或者是一个 Item_base 派生类型的对象。句柄类经
+常需要在不知道对象的确切类型时分配书籍对象的新副本。Sales_item 构造函数是个好例子。
+
+解决这个问题的通用方法是定义虚操作进行复制，我们称将该操作命名为 clone。
+
+为了句柄类，需要从基类开始，在继承层次的每个类型中增加 clone，基类必须将该函数定义为虚函
+数：
+
+     class Item_base {
+     public:
+         virtual Item_base* clone() const
+                            { return new Item_base(*this); }
+     };
+
+
+每个类必须重定义该虚函数。因为函数的存在是为了生成类对象的新副本，所以定义返回类型为类
+本身：
+
+     class Bulk_item : public Item_base {
+     public:
+         Bulk_item* clone() const
+             { return new Bulk_item(*this); }
+     };
+
+第 15.2.3 节介绍过，对于派生类的返回类型必须与基类实例的返回类型完全匹配的要求，但有一个
+例外。这个例外支持像这个类这样的情况。如果虚函数的基类实例返回类类型的引用或指针，则该虚
+函数的派生类实例可以返回基类实例返回的类型的派生类（或者是类类型的指针或引用）。
+
+
+【定义句柄构造函数】
+一旦有了 clone 函数，就可以这样编写 Sales_item 构造函数：
+
+     Sales_item::Sales_item(const Item_base &item):
+                 p(item.clone()), use(new std::size_t(1)) { }
+
+
+像默认构造函数一样，这个构造函数分配并初始化使用计数，它调用形参的 clone 产生那个对象的
+（虚）副本。如果实参是 Item_base 对象，则运行 Item_base 的 clone 函数；如果实参是 
+Bulk_item 对象，则执行 Bulk_item 的 clone 函数。
+

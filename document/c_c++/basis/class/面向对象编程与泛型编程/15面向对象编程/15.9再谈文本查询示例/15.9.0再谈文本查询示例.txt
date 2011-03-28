@@ -1,0 +1,69 @@
+作为继承的最后一个例子，我们来扩展第 10.6 节的文本查询应用程序。使用在第 10.6 节开发的类，
+已经能够在文本文件中查找给定单词的出现，但我们想扩展系统以支持更复杂的查询。
+
+为了说明问题，将用下面的简单小说来运行查询：
+
+     Alice Emma has long flowing red hair.
+     Her Daddy says when the wind blows
+     through her hair, it looks almost alive,
+     like a fiery bird in flight.
+     A beautiful fiery bird, he tells her,
+     magical but untamed.
+     "Daddy, shush, there is no such thing,"
+     she tells him, at the same time wanting
+     him to tell her more.
+     Shyly, she asks, "I mean, Daddy, is there?"
+
+
+系统应该支持：
+
+1.查找单个单词的查询。按升序显示所有包含该单词的行：
+
+     Executed Query for:
+     Daddy match occurs 3 times:
+     (line 2) Her Daddy says when the wind blows
+     (line 7) "Daddy, shush, there is no such thing,"
+     (line 10) Shyly, she asks, "I mean, Daddy, is there?"
+     
+2.“非”查询，使用 ~ 操作符。显示所有不匹配的行：
+
+     Executed Query for: ~(Alice)
+     match occurs 9 times:
+     (line 2) Her Daddy says when the wind blows
+     (line 3) through her hair, it looks almost alive,
+     (line 4) like a fiery bird in flight. ...
+
+
+3.“或”查询，使用 | 操作符。显示与两个查询条件中任意一个匹配的所有行：
+
+     Executing Query for: (hair | Alice)
+     match occurs 2 times:
+     (line 1) Alice Emma has long flowing red hair.
+     (line 3) through her hair, it looks almost alive,
+
+4.“与”查询，使用 & 操作符。显示与两个查询条件都匹配的所有行：
+
+     Executed query: (hair & Alice)
+     match occurs 1 time:
+     (line 1) Alice Emma has long flowing red hair.
+
+
+而且，可以组合这些元素，如
+
+     fiery & bird | wind
+
+
+我们的系统没有复杂到能够读这些表达式。我们将在 C++ 程序中创建它们，因此，将用常规 C++ 优
+先级规则对诸如此类的复合表达式求值。这个查询的求值结果将与出现的 fiery 和 bird 的行或者
+出现 wind 的行相匹配，而不会与 fiery 或 bird 单独出现的行相匹配：
+
+     Executing Query for: ((fiery & bird) | wind)
+     match occurs 3 times:
+     (line 2) Her Daddy says when the wind blows
+     (line 4) like a fiery bird in flight.
+     (line 5) A beautiful fiery bird, he tells her,
+     
+输出将打印查询，并使用圆括号指出解释该查询的方法。像原来的实现一样，系统必须足够聪明，不
+会重复显示相同行。
+
+
