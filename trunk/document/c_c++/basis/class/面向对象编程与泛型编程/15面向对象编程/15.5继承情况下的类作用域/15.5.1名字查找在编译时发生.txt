@@ -1,0 +1,27 @@
+【★】名字查找在编译时发生
+
+对象、引用或指针的静态类型决定了对象能够完成的行为。甚至当静态类型和动态类型可能不同的时
+候，就像使用基类类型的引用或指针时可能会发生的，静态类型仍然决定着可以使用什么成员。例如，
+可以给 Disc_item 类增加一个成员，该成员返回一个保存最小（或最大）数量和折扣价格的 pair 
+对象：
+
+     class Disc_item : public Item_base {
+     public:
+         std::pair<size_t, double> discount_policy() const
+             { return std::make_pair(quantity, discount); }
+         // other members as before
+     };
+
+只能通过 Disc_item 类型或 Disc_item 派生类型的对象、指针或引用访问 discount_policy：
+
+     Bulk_item bulk;
+     Bulk_item *bulkP = &bulk;  // ok: static and dynamic types are the same
+     Item_base *itemP = &bulk;  // ok: static and dynamic types differ
+     bulkP->discount_policy();  // ok: bulkP has type Bulk_item*
+     itemP->discount_policy();  // error: itemP has type Item_base*
+
+重新定义 itemP 的访问是错误的，因为基类类型的指针（引用或对象）只能访问对象的基类部分，
+而在基类中没有定义 discount_policy 成员。
+
+
+

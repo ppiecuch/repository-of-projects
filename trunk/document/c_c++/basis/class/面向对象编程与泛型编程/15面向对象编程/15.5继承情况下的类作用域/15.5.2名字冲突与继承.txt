@@ -1,0 +1,30 @@
+虽然可以直接访问基类成员，就像它是派生类成员一样，但是成员保留了它的基类成员资格。一般
+我们并不关心是哪个实际类包含成员，通常只在基类和派生类共享同一名字时才需要注意。
+
+【★】与基类成员同名的派生类成员将屏蔽对基类成员的直接访问。
+
+struct Base {
+         Base(): mem(0) { }
+     protected:
+         int mem;
+     };
+     struct Derived : Base {
+         Derived(int i): mem(i) { }    // initializes Derived::mem
+         int get_mem() { return mem; } // returns Derived::mem
+     protected:
+         int mem;   // hides mem in the base
+      };
+【?】struct与class的区别是什么?
+
+get_mem 中对 mem 的引用被确定为使用 Derived 中的名字。如果编写如下代码：
+
+     Derived d(42);
+     cout << d.get_mem() << endl;   // prints 42
+则输出将是 42。
+
+作用域操作符指示编译器在 Base 中查找 mem。
+设计派生类时，只要可能，最好避免与基类成员的名字冲突。
+
+
+
+

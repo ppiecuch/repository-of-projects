@@ -1,0 +1,38 @@
+可以考虑使用第 10.6.2 节的 TextQuery 表示单词查询，然后从 TextQuery 类派生其他类。
+
+但是，这个设计可能缺陷。概念上，“非”查询不是一种单词查询，相反，非查询“有一个”查询（单词
+或其他任意种类的查询），非查询对该查询的值求反。
+
+注意到这一点，我们将不同种类的查询建模为独立的类，它们共享一个公共基类：
+
+     WordQuery // Shakespeare
+     NotQuery  // ~Shakespeare
+     OrQuery   // Shakespeare | Marlowe
+     AndQuery  // William & Shakespeare
+
+
+我们不继承 TextQuery，而是使用 TextQuery 类保存文件并建立相关的 word_map，使用查询类建立
+表达式，这些表达式最终对 TextQuery 对象中的文件运行查询。
+
+【抽象接口类】
+已经识别出四各查询类，这些类在概念上是兄弟类。它们共享相同的抽象接口，这暗示我们定义一个
+抽象基类（第 15.6 节）以表示由查询执行的操作。将该抽象基类命名为 Query_base，以指出它的
+作用是作为查询继承层次的根。
+
+直接从抽象基类派生 WordQuery 和 NotQuery 类，WordQuery 和 NotQuery 类具有系统中其他类所没
+有的一个性质：它们都有两个操作数。要为此建立模型，将在继承层次中增加另一个名为 
+BinaryQuery 的抽象类，表示带两个操作数的查询。WordQuery 和 NotQuery 类将继承 BinaryQuery
+ 类，BinaryQuery 类继承 Query_base 类。这些决定得出了图 15.3 所示的类设计。
+
+【操作】
+Query_base 类的存在主要是为了表示查询类型，不做实际工作。我们将重用 TextQuery 类以存储文
+件、建立查询以及查找每个单词。查询类型只需要两个操作：
+1.eval 操作，返回匹配行号编号的集合。该操作接受 TextQuery 对象，在 TextQuery 对象上执行查
+询。
+2.display 操作，接受 ostream 引用并打印给定对象在该 ostream 上执行的查询。
+
+我们将这些操作定义为 Query_base 中的纯虚函数（第 15.6 节），每个派生类都必须对这些函数定
+义自己的版本。
+
+
+

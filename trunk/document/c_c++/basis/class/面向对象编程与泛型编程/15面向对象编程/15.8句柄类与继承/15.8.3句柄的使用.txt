@@ -1,0 +1,171 @@
+使用 Sales_item 对象可以更容易地编写书店应用程序。代码将不必管理 Item_base 对象的指针，
+但仍然可以获得通过 Sales_item 对象进行的调用的虚行为。
+
+例如，可以使用 Item_base 对象解决第 15.7 节提出的问题。可以使用 Sales_item 对象跟踪顾客
+所做购买，在 multiset 中保存一个对象表示一次购买，当顾客完成购买时，可以计算销售总数。
+
+【比较两个 Sales_item 对象】
+在编写函数计算销售总数之前，需要定义比较 Sales_item 对象的方法。要用 Sales_item 作为关联
+容器的关键字，必须能够比较它们（第 10.3.1 节）。关联容器默认使用关键字类型的小于操作符，
+但是，基于第 14.3.2 节讨论过的有关原始 Sales_item 类型的同样理由，为 Sales_item 句柄类定
+义 operator> 可能是个坏主意：当使用 Sales_item 作关键字时，只想考虑 ISBN，但确定相等时又
+想要考虑所有数据成员。
+
+幸好，关联容器使我们能够指定一个函数或函数对象（第 14.8 节）用作比较函数，这样做类似于第 
+11.2.3 节中将单独函数传给 stable_sort 算法的方式。在那种情况下，只需要将附加的实参传给 
+stable_sort 以提供比较函数，代替 < 操作符的。覆盖关联容器的比较函数有点复杂，因为，正如
+我们将看到的，在定义容器对象时必须提供比较函数。
+
+让我们比较容易的部分开始，定义一个函数用于比较 Sales_item 对象：
+
+     // compare defines item ordering for the multiset in Basket
+     inline bool
+     compare(const Sales_item &lhs, const Sales_item &rhs)
+     {
+         return lhs->book() < rhs->book();
+     }
+
+
+我们的 compare 函数与小于操作符有两样的接口，它接受两个 Sales_item 对象的 const 引用，通
+过比较 ISBN 而比较形参，返回一个 book 值。该函数使用 Sales_item 的 -> 操作符，该操作符返
+回 Item_base 对象的指针，那个指针用于获取并运行成员 book，该成员返回 ISBN。
+
+【使用带关联容器的比较器】
+如果考虑一下如何使用比较函数，就会认识到，它必须作为容器的部分而存储。任何在容器中增加或
+查找元素的操作都要使用比较函数。原则上，每个这样的操作可以接受一个可选的附加实参，表示比
+较函数。但是，这种策略容易导致出错：如果两个操作使用不同的比较函数，顺序可能会不一致。不
+可能预测实际上会发生什么。
+
+要有效地工作，关联容器需要对每个操作使用同一比较函数。然而，期望用户每次记住比较函数是不
+合理的，尤其是，没有办法检查每个调用使用同一比较函数。因此，容器记住比较函数是有意义的。
+通过将比较器存储在容器对象中，可以保证比较元素的每个操作将一致地进行。
+
+【★】通过将比较器存储在容器对象中，可以保证比较元素的每个操作将一致地进行。
+
+基于同样的理由，容器需要知道元素类型，为了存储比较器，它需要知道比较器类型。原则上，通过
+假定比较器是一个函数指针，该函数接受两个容器的 key_type 类型的对象并返回 bool 值，容器可
+以推断出这个类型。不幸的是，这个推断出的类型可能限制太大。首先，应该允许比较器是函数对象
+或是普通函数。即使我们愿意要求比较器为函数，这个推断出的类型也可能仍然太受限制了，毕竟，
+比较函数可以返回 int 或者其他任意可用在条件中的类型。同样，形参类型也不需要与 key_type 完
+全匹配，应该允许可以转换为 key_type 的任意形参类型。
+
+所以，要使用 Sales_item 的比较函数，在定义 multiset 时必须指定比较器类型。在我们的例子中，
+比较器类型是接受两个 const Sales_item 引用并返回 bool 值的函数。
+
+首先定义一个类型别名，作为该类型的同义词（第 7.9 节）：
+
+     // type of the comparison function used to order the multiset
+     typedef bool (*Comp)(const Sales_item&, const Sales_item&);
+
+
+这个语句将 Comp 定义为函数类型指针的同义词，该函数类型与我们希望用来比较 Sales_item 对象
+的比较函数相匹配。
+
+接着需要定义 multiset，保存 Sales_item 类型的对象并在它的比较函数中使用这个 Comp 类型。关
+联容器的每个构造函数使我们能够提供比较函数的名字。可以这样定义使用 compare 函数的空
+ multiset：
+
+     std::multiset<Sales_item, Comp> items(compare);
+
+
+这个定义是说，items 是一个 multiset，它保存 Sales_item 对象并使用 Comp 类型的对象比较它
+们。multiset 是空的——我们没有提供任何元素，但我们的确提供了一个名为 compare 的比较函数。
+当在 items 中增加或查找元素时，将用 compare 函数对 multiset 进行排序。
+
+
+【容器与句柄类】
+
+既然知道了怎样提供比较函数，我们将定义名为 Basker 的类，以跟踪销售并计算购买价格：
+
+     class Basket {
+         // type of the comparison function used to order the multiset
+         typedef bool (*Comp)(const Sales_item&, const Sales_item&);
+     public:
+         // make it easier to type the type of our set
+         typedef std::multiset<Sales_item, Comp> set_type;
+         // typedefs modeled after corresponding container types
+         typedef set_type::size_type size_type;
+         typedef set_type::const_iterator const_iter;
+         Basket(): items(compare) { } // initialze the comparator
+         void add_item(const Sales_item &item)
+                             { items.insert(item); }
+         size_type size(const Sales_item &i) const
+                              { return items.count(i); }
+         double total() const; // sum of net prices for all items in the basket
+     private:
+         std::multiset<Sales_item, Comp> items;
+     };
+
+这个类在 Sales_item 对象的 multiple 中保存顾客购买的商品，用 multiple 使顾客能够购买同
+一本书的多个副本。
+
+该类定义了一个构造函数，即 Basket 默认构造函数。该类需要自己的默认构造函数，以便将 
+compare 传给建立 items 成员的 multiset 构造函数。
+
+Basket 类定义的操作非常简单：add_item 操作接受 Sales_item 对象引用并将该项目的副本放入
+ multiset；对于给定 ISBN，size 操作返回购物篮中该 ISBN 的记录数。除了操作，Basket 还定
+ 义了三个类型别名，这样使用它的 multiset 成员就比较容易了。
+
+Using the Handle to Execute a Virtual Function
+
+
+【使用句柄执行虚函数】
+Basket 类唯一的复杂成员是 total 函数，该函数返回购物篮中所有物品的价格：
+
+     double Basket::total() const
+     {
+         double sum = 0.0; // holds the running total
+
+         /* find each set of items with the same isbn and calculate
+          * the net price for that quantity of items
+          * iter refers to first copy of each book in the set
+          * upper_bound refers to next element with a different isbn
+          */
+          for (const_iter iter = items.begin();
+                                 iter != items.end(); iter =
+                                 items.upper_bound(*iter))
+     {
+              // we know there's at least one element with this key in the Basket
+              // virtual call to net_price applies appropriate discounts, if any
+              sum += (*iter)->net_price(items.count(*iter));
+          }
+          return sum;
+     }
+
+total 函数有两个有趣的部分：对 net_price 函数的调用，以及 for 循环结构。我们逐一进行分
+析。
+
+调用 net_price 函数时，需要告诉它某本书已经购买了多少本，net_price 函数使用这个实参确定
+是否打折。这个要求暗示着我们希望成批处理 multiset——处理给定标题的所有记录，然后处理下一
+个标题的所有记录，以此类推。幸好，multiset 非常适合处理这个问题。
+
+for 循环开始于定义 iter 并将 iter 初始化为指向 multiset 中的第一个元素。我们使用 multiset
+ 的 count 成员（第 10.3.6 节）确定 multiset 中的多少成员具有相同的键（即，相同的 isbn），
+ 并且使用该数目作为实参调用 net_price 函数。
+
+for 循环中的“增量”表达式很有意思。与读每个元素的一般循环不同，我们推进 iter 指向下一个
+键。调用 upper_bound 函数以跳过与当前键匹配的所有元素，upper_bound 函数的调用返回一个
+迭代器，该迭代器指向与 iter 键相同的最后一个元素的下一元素，即，该迭代器指向集合的末尾
+或下一本书。测试 iter 的新值，如果与 items.end() 相等，则跳出 for 循环，否则，就处理下
+一本书。
+
+for 循环的循环体调用 net_price 函数，阅读这个调用需要一点技巧：
+
+     sum += (*iter)->net_price(items.count(*iter));
+
+对 iter 解引用获得基础 Sales_item 对象，对该对象应用 Sales_item 类重载的箭头操作符，该
+操作符返回句柄所关联的基础 Item_base 对象，用该 Item_base 对象调用 net_price 函数，传递
+具有相同 isbn 的图书的 count 作为实参。net_price 是虚函数，所以调用的定价函数的版本取决
+于基础 Item_base 对象的类型。 
+
+
+
+
+
+
+
+
+
+
+
+

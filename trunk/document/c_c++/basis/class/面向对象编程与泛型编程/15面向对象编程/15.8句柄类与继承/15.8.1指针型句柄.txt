@@ -1,0 +1,102 @@
+像第一个例子一样，我们将定义一个名为 Sales_item 的指针型句柄类，表示 Item_base 层次。
+Sales_item 的用户将像使用指针一样使用它：用户将 Sales_item 绑定到 Item_base 类型的对象
+并使用 * 和 -> 操作符执行 Item_base 的操作：
+
+     // bind a handle to a Bulk_item object
+     Sales_item item(Bulk_item("0-201-82470-1", 35, 3, .20));
+
+     item->net_price();   // virtual call to net_price function
+
+
+但是，用户不必管理句柄指向的对象，Sales_item 类将完成这部分工作。当用户通过 Sales_item 
+类对象调用函数时，将获得多态行为。
+
+【定义句柄】
+Sales_item 类有三个构造函数：默认构造函数、复制构造函数和接受 Item_base 对象的构造函数。
+第三个构造函数将复制 Item_base 对象，并保证：只要 Sales_item 对象存在副本就存在。当复制 
+Sales_item 对象或给 Sales_item 对象赋值时，将复制指针而不是复制对象。像对其他指针型句柄
+类一样，将用使用计数来管理副本。
+
+迄今为止，我们已经使用过的使用计数式类，都使用一个伙伴类来存储指针和相关的使用计数。
+这个例子将使用不同的设计，如图 15.2 所示。Sales_item 类将有两个数据成员，都是指针：
+一个指针将指向 Item_base 对象，而另一个将指向使用计数。Item_base 指针可以指向 Item_base 
+对象也可以指向 Item_base 派生类型的对象。通过指向使用计数，多个 Sales_item 对象可以共享
+同一计数器。
+
+
+除了管理使用计数之外，Sales_item 类还将定义解引用操作符和箭头操作符：
+
+     // use counted handle class for the Item_base hierarchy
+     class Sales_item {
+     public:
+         // default constructor: unbound handle
+         Sales_item(): p(0), use(new std::size_t(1)) { }
+         // attaches a handle to a copy of the Item_base object
+         Sales_item(const Item_base&);
+         // copy control members to manage the use count and pointers
+         Sales_item(const Sales_item &i):
+                           p(i.p), use(i.use) { ++*use; }
+         ~Sales_item() { decr_use(); }
+         Sales_item& operator=(const Sales_item&);
+         // member access operators
+         const Item_base *operator->() const { if (p) return p;
+             else throw std::logic_error("unbound Sales_item"); }
+         const Item_base &operator*() const { if (p) return *p;
+             else throw std::logic_error("unbound Sales_item"); }
+     private:
+         Item_base *p;        // pointer to shared item
+         std::size_t *use;    // pointer to shared use count
+         // called by both destructor and assignment operator to free pointers
+         void decr_use()
+              { if (--*use == 0) { delete p; delete use; } }
+     };
+
+
+【使用计数式复制控制】
+复制控制成员适当地操纵使用计数和 Item_base 指针。复制 Sales_item 对象包括复制两个指针和将
+使用计数加 1.析构函数将使用计数减 1，如果计数减至 0 就撤销指针。因为赋值操作符需要完成同样
+的工作，所以在一个名为 decr_use 的私有实用函数中实现析构函数的行为。
+
+赋值操作符比复制构造函数复杂一点：
+
+     // use-counted assignment operator; use is a pointer to a shared use count
+     Sales_item&
+     Sales_item::operator=(const Sales_item &rhs)
+     {
+         ++*rhs.use;
+         decr_use();
+         p = rhs.p;
+         use = rhs.use;
+         return *this;
+     }
+
+赋值操作符像复制构造函数一样，将右操作数的使用计数加 1 并复制指针；它也像析构函数一样，
+首先必须将左操作数的使用计数减 1，如果使用计数减至 0 就删除指针。
+
+像通常对赋值操作符一样，必须防止自身赋值。这个操作符通过首先将右操作数的使用计数减 1 来处
+理自身赋值。如果左右操作数相同，则调用 decr_use 时使用计数将至少为 2。该函数将左操作数的
+使用计数减 1 并进行检查，如果使用计数减至 0，则 decr_use 将释放该对象中的 Item_base 对象
+和 use 对象。剩下的是从右操作数向左操作数复制指针，像平常一样，我们的赋值操作符返回左操作
+数的引用。
+
+除了复制控制成员以外，Sales_item 定义的其他函数是是操作函数 operator* 和 operator->，用
+户将通过这些操作符访问 Item_base 成员。因为这两个操作符分别返回指针和引用，所以通过这些
+操作符调用的函数将进行动态绑定。
+
+我们只定义了这些操作符的 const 版本，因为基础 Item_base 层次中的成员都是 const 成员。
+
+【构造句柄】
+我们句柄有两个构造函数：默认构造函数创建未绑定的 Sales_item 对象，第二个构造函数接受一个
+对象，将句柄与其关联。
+
+第一个构造函数容易定义：将 Item_base 指针置 0 以指出该句柄没有关联任何对象上。构造函数分
+配一个新的计数器并将它初始化为 1。
+
+第二个构造函数难一点，我们希望句柄的用户创建自己的对象，在这些对象上关联句柄。构造函数
+将分配适当类型的新对象并将形参复制到新分配的对象中，这样，Sales_item 类将拥有对象并能
+够保证在关联到该对象的最后一个 Sales_item 对象消失之前不会删除对象。
+
+
+
+
+
