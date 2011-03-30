@@ -1,0 +1,24 @@
+假设想要编写一个函数比较两个值并指出第一个值是小于、等于还是大于第二个值。实践中，我们可能希望
+定义几个这样的函数，每一个可以比较一种给定类型的值，第一次尝试可能是定义几个重载函数：
+
+     // returns 0 if the values are equal, -1 if v1 is smaller, 1 if v2 is smaller
+     int compare(const string &v1, const string &v2)
+     {
+         if (v1 < v2) return -1;
+         if (v2 < v1) return 1;
+         return 0;
+     }
+     int compare(const double &v1, const double &v2)
+     {
+         if (v1 < v2) return -1;
+         if (v2 < v1) return 1;
+         return 0;
+     }
+
+这些函数几乎相同，它们之间唯一的区别是形参的类型，每个函数的函数体是相同的。
+
+每个要比较的类型都需要重复函数的函数体，不仅麻烦而且容易出错。更重要的是，需要事先知道空间可能
+会比较哪些类型。如果希望将函数用于未知类型，这种策略就不起作用了。
+
+
+ 

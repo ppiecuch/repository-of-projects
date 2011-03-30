@@ -1,0 +1,52 @@
+就像可以定义函数模板一样，也可以定义类模板。
+
+为了举例说明类模板，我们将为标准库 queue 类（第 9.7 节）实现一个自己的版本。用户程序应使用标准
+的 queue 类，而不是我们这里定义的这个 Queue 类。
+
+我们自定义的 Queue 类必须能够支持不同类型的对象，所以将它定义为类模板。Queue 类将支持的操作是
+标准 queue 类接口的子集：
+
+push 操作，在队尾增加一项
+pop 操作，从队头删除一项
+front 操作，返回队头元素的引用
+empty 操作，指出队列中是否有元素
+
+第 16.4 节将介绍怎样实现 Queue 类，这里先定义它的接口：
+
+     template <class Type> class Queue {
+     public:
+         Queue ();                // default constructor
+         Type &front ();          // return element from head of Queue
+         const Type &front () const;
+         void push (const Type &); // add element to back of Queue
+         void pop();              // remove element from head of Queue
+         bool empty() const;      // true if no elements in the Queue
+     private:
+         // ...
+     };
+
+【★】类模板也是模板，因此必须以关键字 template 开头，后接模板形参表。Queue 模板接受一个名为 
+Type 的模板类型形参。
+
+除了模板形参表外，类模板的定义看起来与任意其他类问相似。类模板可以定义数据成员、函数成员和类型
+成员，也可以使用访问标号控制对成员的访问，还可以定义构造函数和析构函数等等。在类和类成员的定义
+中，可以使用模板形参作为类型或值的占位符，在使用类时再提供那些类型或值。
+
+例如，Queue 模板有一个模板类型形参，可以在任何可以使用类型名字的地方使用该形参。在这个模板定义
+中，用 Type 指定重载 front 操作的返回类型以及作为 push 操作的形参类型。
+
+【使用类模板】
+与调用函数模板形成对比，使用类模板时，必须为模板形参显式指定实参：
+
+     Queue<int> qi;                 // Queue that holds ints
+     Queue< vector<double> > qc;    // Queue that holds vectors of doubles
+     Queue<string> qs;              // Queue that holds strings
+
+编译器使用实参来实例化这个类的特定类型版本。实质上，编译器用用户提供的实际特定类型代替 Type，重
+新编写 Queue 类。在这个例子中，编译器将实例化三个 Queue 类：第一个用 int 代替 Type，第二个用 
+vector<double> 代替 Type，第三个用 string 代替 Type。
+
+
+
+
+

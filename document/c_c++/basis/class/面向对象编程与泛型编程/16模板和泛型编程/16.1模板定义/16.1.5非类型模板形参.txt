@@ -1,0 +1,41 @@
+模板形参不必都是类型。本节将介绍函数模板使用的非类型形参。在介绍了类模板实现的更多内容之后，第
+16.4.2 节将介绍类模板的非类型形参。
+
+在调用函数时非类型形参将用值代替，值的类型在模板形参表中指定。例如，下面的函数模板声明了 array_init
+ 是一个含有一个类型模板形参和一个非类型模板形参的函数模板。函数本身接受一个形参，该形参是数组的引用
+ （第 7.2.4 节）：
+
+     // initialize elements of an array to zero
+【★】    template <class T, size_t N> void array_init(T (&parm)[N])
+     {
+         for (size_t i = 0; i != N; ++i) {
+             parm[i] = 0;
+         }
+     }
+
+
+模板非类型形参是模板定义内部的常量值，在需要常量表达式的时候，可使用非类型形参（例如，像这里所做的
+一样）指定数组的长度。
+
+当调用 array_init 时，编译器从数组实参计算非类型形参的值：
+
+     int x[42];
+     double y[10];
+     array_init(x);  // instantiates array_init(int(&)[42]
+     array_init(y);  // instantiates array_init(double(&)[10]
+
+编译器将为 array_init 调用中用到的每种数组实例化一个 array_init 版本。对于上面的程序，编译器将实例
+化 array_init 的两个版本：第一个实例的形参绑定到 int[42]，另一个实例中的形参绑定到 double[10]。
+
+【类型等价性与非类型形参】
+对模板的非类型形参而言，求值结果相同的表达式将认为是等价的。下面的两个 array_init 调用引用的是相同的
+实例—— array_init<int, 42>：
+
+     int x[42];
+     const int sz = 40;
+     int y[sz + 2];
+     array_init(x);  // instantiates array_init(int(&)[42])
+     array_init(y);  // equivalent instantiation
+
+
+

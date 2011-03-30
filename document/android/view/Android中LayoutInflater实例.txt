@@ -1,0 +1,15 @@
+  Android中LayoutInflater实例 收藏 
+LayoutInflater与findViewById的用法有很多可比较之处。
+
+如：他们都可以通过id返回View。
+
+LayoutInflater inflater = getLayoutInflater();
+
+View layout = inflater.inflate(R.layout.custom_dialog,null);
+
+Button button = (Button) findViewById(R.id.button);
+
+不同之处是：LayoutInflater是用来实例化整个布局文件，而findViewById()是实例化布局文中中的View。 
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/zhangqijie001/archive/2010/08/24/5835838.aspx

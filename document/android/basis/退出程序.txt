@@ -1,0 +1,79 @@
+1. Dalvik VM的本地方法 
+  android.os.Process.killProcess(android.os.Process.myPid())    //获取PID 
+  System.exit(0);   //常规java、c#的标准退出法，返回值为0代表正常退出 
+  注意:假说有两个Activity, Activity1和Activity2, 1跳转到2，如果要在2退出程序.1跳转到2时，
+  如果Activity1你finish掉了，那么是可以退出程序的，但有时1跳转到2时，我们不能将Activity1
+finish掉,那么在Activity2就不能退出程序。
+  
+2. 任务管理器方法 
+   首先要说明该方法运行在Android 1.5 API Level为3以上才可以，同时需要权限 
+  ActivityManager am = (ActivityManager)getSystemService (Context.ACTIVITY_SERVICE); 
+  am.restartPackage(getPackageName()); 
+  系统会将，该包下的 ，所有进程，服务，全部杀掉，就可以杀干净了，要注意加上 
+  <uses-permission android:name=\"android.permission.RESTART_PACKAGES\"></uses-permission> 
+  
+3.  我们知道Android的窗口类提供了历史栈，我们可以通过stack的原理来巧妙的实现，这里我们在A窗口打开B窗口时在Intent中直接加入标志     
+Intent.FLAG_ACTIVITY_CLEAR_TOP，这样开启B时将会清除该进程空间的所有Activity。 
+在A窗口中使用下面的代码调用B窗口 
+Java代码  
+Intent intent = new Intent();    
+intent.setClass(Android123.this, CWJ.class);    
+intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  //注意 FLAG设置TOP    
+startActivity(intent);  
+
+Intent intent = new Intent(); 
+intent.setClass(Android123.this, CWJ.class); 
+intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  //注意 FLAG设置TOP 
+startActivity(intent);
+
+接下来在B窗口中需要退出时直接使用finish方法即可全部退出 
+
+4.写一个堆栈来管理activity 
+Java代码  
+ public class ScreenManager {   
+ private static Stack<Activity> activityStack;   
+ private static ScreenManager instance;   
+ private  ScreenManager(){   
+ }   
+ public static ScreenManager getScreenManager(){   
+  if(instance==null){   
+   instance=new ScreenManager();   
+  }   
+  return instance;   
+ }   
+//退出栈顶Activity   
+ public void popActivity(Activity activity){   
+  if(activity!=null){   
+   activity.finish();   
+   activityStack.remove(activity);   
+   activity=null;   
+  }   
+ }   
+  
+//获得当前栈顶Activity   
+ public Activity currentActivity(){   
+  Activity activity=activityStack.lastElement();   
+  return activity;   
+ }   
+  
+//将当前Activity推入栈中   
+ public void pushActivity(Activity activity){   
+  if(activityStack==null){   
+   activityStack=new Stack<Activity>();   
+  }   
+  activityStack.add(activity);   
+ }   
+ //退出栈中所有Activity   
+ public void popAllActivityExceptOne(Class cls){   
+  while(true){   
+   Activity activity=currentActivity();   
+   if(activity==null){   
+    break;   
+   }   
+   if(activity.getClass().equals(cls) ){   
+    break;   
+   }   
+   popActivity(activity);   
+  }   
+ }   
+}  

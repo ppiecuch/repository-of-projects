@@ -1,0 +1,89 @@
+像函数形参一样，程序员为模板形参选择的名字没有本质含义。在我们的例子中，将 compare 的模板类型形
+参命名为 T，但也可以将它命名为任意名字：
+
+     // equivalent template definition
+     template <class Glorp>
+     int compare(const Glorp &v1, const Glorp &v2)
+     {
+         if (v1 < v2) return -1;
+         if (v2 < v1) return 1;
+         return 0;
+     }
+
+该代码定义的 compare 模板与前面一样。
+
+可以给模板形参赋予的唯一含义是区别形参是类型形参还是非类型形参。如果是类型形参，我们就知道该形
+参表示未知类型，如果是非类型形参，我们就知道它是一个未知值。
+
+如果希望使用模板形参所表示的类型或值，可以使用与对应模板形参相同的名字。例如，compare 函数中所
+有的 Glorp 引用将在该函数被实例化时确定为同一类型。
+
+【模板形参作用域】
+【★】模板形参的名字可以在声明为模板形参之后直到模板声明或定义的末尾处使用。
+
+【★】模板形参遵循常规名字屏蔽规则。与全局作用域中声明的对象、函数或类型同名的模板形参会屏蔽全
+局名字：
+typedef double T;
+     template <class T> T calc(const T &a, const T &b)
+     {
+          // tmp has the type of the template parameter T
+          // not that of the global typedef
+          T tmp = a;
+          // ...
+          return tmp;
+     }
+
+将 T 定义为 double 的全局类型型别名将被名为 T 的类型形参所屏蔽，因此，tmp 不是 double 型，相反，
+tmp 的类型是绑定到模板形参的任意类型。
+
+【使用模板形参名字的限制】
+【★】用作模板形参的名字不能在模板内部重用。
+
+     template <class T> T calc(const T &a, const T &b)
+     {
+         typedef double T; // error: redeclares template parameter T
+         T tmp = a;
+         // ...
+         return tmp;
+     }
+
+这一限制还意味着模板形参的名字只能在同一模板形参表中使用一次：
+
+     // error: illegal reuse of template parameter name V
+     template <class V, class V> V calc(const V&, const V&) ;
+
+
+当然，正如可以重用函数形参名字一样，模板形参的名字也能在不同模板中重用：
+
+     // ok: reuses parameter type name across different templates
+     template <class T> T calc (const T&, const T&) ;
+     template <class T> int compare(const T&, const T&) ;
+
+
+【模板声明】
+【★】像其他任意函数或类一样，对于模板可以只声明而不定义。声明必须指出函数或类是一个模板：
+// declares compare but does not define it
+     template <class T> int compare(const T&, const T&) ;
+
+【★】同一模板的声明和定义中，模板形参的名字不必相同。
+     // all three uses of calc refer to the same function template
+     // forward declarations of the template
+     template <class T> T calc(const T&, const T&) ;
+     template <class U> U calc(const U&, const U&) ;
+     // actual definition of the template
+     template <class Type>
+     Type calc(const Type& a, const Type& b) { /* ... */ }
+
+【★】每个模板类型形参前面必须带上关键字 class 或 typename，每个非类型形参前面必须带上类型名
+字，省略关键字或类型说明符是错误的：
+
+     // error: must precede U by either typename or class
+     template <typename T, U> T calc (const T&, const U&) ;
+
+
+
+
+
+
+
+
