@@ -1,0 +1,74 @@
+我们可以不用为每个类型定义一个新函数，而是只定义一个函数模板（function template）。函数模板是
+一个独立于类型的函数，可作为一种方式，产生函数的特定类型版本。例如，可以编写名为 compare 的函数
+模板，它告诉编译器如何为我们想要比较的类型产生特定的 compare 版本。
+
+下面是 compare 的模板版本：
+
+     // implement strcmp-like generic compare function
+     // returns 0 if the values are equal, 1 if v1 is larger, -1 if v1 is smaller
+     template <typename T>
+     int compare(const T &v1, const T &v2)
+     {
+         if (v1 < v2) return -1;
+         if (v2 < v1) return 1;
+         return 0;
+     }
+
+【★】模板定义以关键字 template 开始，后接模板形参表，模板形参表是用尖括号括住的一个或多个模板
+形参的列表，形参之间以逗号分隔。 
+
+模板形参表不能为空。 
+
+
+ 【模板形参表】
+ 模板形参表很像函数形参表，函数形参表定义了特定类型的局部变量但并不初始化那些变量，在运行时再提
+ 供实参来初始化形参。 
+
+同样，模板形参表示可以在类或函数的定义中使用的类型或值。例如，compare 函数声明一个名为 T 的类型
+形参。在 compare 内部，可以使用名字 T 引用一个类型，T 表示哪个实际类型由编译器根据所用的函数而
+确定。 
+
+模板形参可以是表示类型的类型形参，也可以是表示常量表达式的非类型形参。非类型形参跟在类型说明符
+之后声明，第 16.1.5 节将进一步介绍非类型形参。类型形参跟在关键字 class 或 typename 之后定义，
+例如，class T 是名为 T 的类型形参，在这里 class 和 typename 没有区别。 
+【★】模板形参可以是表示类型的类型形参，也可以是表示常量表达式的非类型形参。
+
+【使用函数模板】
+使用函数模板时，编译器会推断哪个（或哪些）模板实参绑定到模板形参。一旦编译器确定了实际的模板实
+参，就称它实例化了函数模板的一个实例。实质上，编译器将确定用什么类型代替每个类型形参，以及用什
+么值代替每个非类型形参。推导出实际模板实参后，编译器使用实参代替相应的模板形参产生编译该版本的
+函数。编译器承担了为我们使用的每种类型而编写函数的单调工作。 
+【★】推导出实际模板实参后，编译器使用实参代替相应的模板形参产生编译该版本的函数。编译器承担了
+为我们使用的每种类型而编写函数的单调工作。 
+
+
+ 对于以下调用 
+
+     int main ()
+     {
+         // T is int;
+         // compiler instantiates int compare(const int&, const int&)
+         cout << compare(1, 0) << endl;
+         // T is string;
+         // compiler instantiates int compare(const string&, const string&)
+         string s1 = "hi", s2 = "world";
+         cout << compare(s1, s2) << endl;
+         return 0;
+     }
+
+编译器将实例化 compare 的两个不同版本，编译器将用 int 代替 T 创建第一个版本，并用 string 代替 T
+ 创建第二个版本。 
+
+【inline 函数模板】
+【★】函数模板可以用与非模板函数一样的方式声明为 inline。说明符放在模板形参表之后、返回类型之前，
+不能放在关键字 template 之前。
+
+     // ok: inline specifier follows template parameter list
+     template <typename T> inline T min(const T&, const T&);
+     // error: incorrect placement of inline specifier
+     inline template <typename T> T min(const T&, const T&);
+
+
+
+
+ 

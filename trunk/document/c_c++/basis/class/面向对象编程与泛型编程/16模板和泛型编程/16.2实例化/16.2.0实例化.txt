@@ -1,0 +1,80 @@
+模板是一个蓝图，它本身不是类或函数。编译器用模板产生指定的类或函数的特定类型版本。产生模板的特定类型
+实例的过程称为实例化，这个术语反映了创建模板类型或模板函数的新“实例”的概念。
+
+【★】模板在使用时将进行实例化，类模板在引用实际模板类类型时实例化，函数模板在调用它或用它对函数指针
+进行初始化或赋值时实例化。
+
+【类的实例化】
+当编写
+
+     Queue<int> qi;
+
+
+编译器自动创建名为 Queue 的类。实际上，编译器通过重新编写 Queue 模板，用类型 int 代替模板形参的每次出
+现而创建 Queue 类。实例化的类就像已经编写的一样：
+
+     // simulated version of Queue instantiated for type int
+     template <class Type> class Queue<int> {
+     public:
+         Queue();                  // this bound to Queue<int>*
+         int &front();             // return type bound to int
+         const int &front() const; // return type bound to int
+         void push(const int &);   // parameter type bound to int
+         void pop();               // type invariant code
+         bool empty() const;       // type invariant code
+     private:
+         // ...
+     };
+
+要为 string 类型的对象创建 Queue 类，可以编写
+
+     Queue<string> qs;
+
+
+在这个例子中，用 string 代替 Type 的每次出现。
+
+类模板的每次实例化都会产生一个独立的类类型。为 int 类型实例化的 Queue 与任意其他 Queue 类型没有关系，
+对其他 Queue 类型成员也没有特殊的访问权。
+
+【类模板形参是必需的】
+【★】想要使用类模板，就必须显式指定模板实参：
+
+     Queue qs; // error: which template instantiation?
+
+
+类模板不定义类型，只有特定的实例才定义了类型。特定的实例化是通过提供模板实参与每个模板形参匹配而定义
+的。模板实参在用逗号分隔并用尖括号括住的列表中指定：
+
+     Queue<int> qi;         // ok: defines Queue that holds ints
+     Queue<string> qs;      // ok: defines Queue that holds strings
+
+用模板类定义的类型总是模板实参。例如，Queue 不是类型，而 Queue<int> 或 Queue<string> 是类型。
+
+【函数模板实例化】
+使用函数模板时，编译器通常会为我们推断模板实参：
+
+     int main()
+     {
+        compare(1, 0);             // ok: binds template parameter to int
+        compare(3.14, 2.7);        // ok: binds template parameter to double
+        return 0;
+     }
+
+
+这个程序实例化了 compare 的两个版本：一个用 int 代替 T，另一个用 double 代替 T，实质上是编译器为我们
+编写了 compare 的这两个实例：
+
+     int compare(const int &v1, const int &v2)
+     {
+         if (v1 < v2) return -1;
+         if (v2 < v1) return 1;
+         return 0;
+     }
+     int compare(const double &v1, const double &v2)
+     {
+         if (v1 < v2) return -1;
+         if (v2 < v1) return 1;
+         return 0;
+     }
+
+

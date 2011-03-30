@@ -1,0 +1,60 @@
+【★】类型形参由关键字 class 或 typename 后接说明符构成。在模板形参表中，这两个关键字具有相同的含义，
+都指出后面所接的名字表示一个类型。
+
+模板类型形参可作为类型说明符在模板中的任何地方，与内置类型说明符或类类型说明符的使用方式完全相
+同。具体而言，它可以用于指定返回类型或函数形参类型，以及在函数体中用于变量声明或强制类型转换。
+
+     // ok: same type used for the return type and both parameters
+     template <class T> T calc (const T& a, const T& b)
+     {
+          // ok: tmp will have same type as the parameters & return type
+          T tmp = a;
+          // ...
+          return tmp;
+     }
+
+【typename 与 class 的区别】
+在函数模板形参表中，关键字 typename 和 class 具有相同含义，可以互换使用，两个关键字都可以在同一
+模板形参表中使用：
+
+     // ok: no distinction between typename and class in template parameter list
+     template <typename T, class U> calc (const T&, const U&);
+
+使用关键字 typename 代替关键字 class 指定模板类型形参也许更为直观，毕竟，可以使用内置类型（非类
+类型）作为实际的类型形参，而且，typename 更清楚地指明后面的名字是一个类型名。但是，关键字 
+typename 是作为标准 C++ 的组成部分加入到 C++ 中的，因此旧的程序更有可能只用关键字 class。
+
+【??】【在模板定义内部指定类型】
+除了定义数据成员或函数成员之外，类还可以定义类型成员。例如，标准库的容器类定义了不同的类型，如 
+size_type，使我们能够以独立于机器的方式使用容器。如果要在函数模板内部使用这样的类型，必须告诉编译
+器我们正在使用的名字指的是一个类型。必须显式地这样做，因为编译器（以及程序的读者）不能通过检查得知，
+由类型形参定义的名字何时是一个类型何时是一个值。例如，考虑下面的函数：
+
+     template <class Parm, class U>
+     Parm fcn(Parm* array, U value)
+     {
+         Parm::size_type * p; // If Parm::size_type is a type, then a declaration
+                              // If Parm::size_type is an object, then multiplication
+     }
+
+
+我们知道 size_type 必定是绑定到 Parm 的那个类型的成员，但我们不知道 size_type 是一个类型成员的名字还
+是一个数据成员的名字，默认情况下，编译器假定这样的名字指定数据成员，而不是类型。
+
+如果希望编译器将 size_type 当作类型，则必须显式告诉编译器这样做：
+
+     template <class Parm, class U>
+     Parm fcn(Parm* array, U value)
+     {
+         typename Parm::size_type * p; // ok: declares p to be a pointer
+     }
+
+
+通过在成员名前加上关键字 typename 作为前缀，可以告诉编译器将成员当作类型。通过编写 
+typename parm::size_type，指出绑定到 Parm 的类型的 size_type 成员是类型的名字。当然，这一声明给用实
+例化 fcn 的类型增加了一个职责：那些类型必须具有名为 size_type 的成员，而且该成员是一个类型。
+
+
+如果拿不准是否需要以 typename 指明一个名字是一个类型，那么指定它是个好主意。在类型之前指定 typename 
+没有害处，因此，即使 typename 是不必要的，也没有关系。
+

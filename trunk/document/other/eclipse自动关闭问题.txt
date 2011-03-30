@@ -1,0 +1,13 @@
+eclipse.ini:
+-showsplashorg.eclipse.platform
+-launcher.XXMaxPermSize256m
+-vmargs
+-Xms128m
+-Xmx256m
+-XX:PermSize=64M
+-XX:MaxPermSize=256M
+-Djava.net.preferIPv4Stack=true
+-Djava.net.preferIPv4Stack=true
+-Djava.net.preferIPv4Stack=true
+
+二.将.meta...从Workspace从剪切出去
