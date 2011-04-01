@@ -1,0 +1,15 @@
+class Test{
+	public static void t(Object obj){
+		System.out.println("obj");
+	}
+	
+	public static  void t(Test test){
+		System.out.println("tes");
+	}
+	
+}
+Object obj=new Test();
+Test.t(obj);//obj
+
+Test test=new Test();
+Test.t(test);//tes

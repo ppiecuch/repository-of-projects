@@ -1,0 +1,183 @@
+要确定应该实例化哪个函数，编译器会查看每个实参。如果相应形参声明为类型形参的类型，则编译
+器从实参的类型推断形参的类型。在 compare 的例子中，两个实参有同样的模板类型，都是用类型形
+参 T 声明的。
+
+第一个调用 compare(1, 0) 中，实参为 int 类型；第二个调用 compare(3.14, 2.7) 中，实参为 
+double 类型。从函数实参确定模板实参的类型和值的过程叫做模板实参推断。
+【★】从函数实参确定模板实参的类型和值的过程叫做模板实参推断。
+
+【多个类型形参的实参必须完全匹配】
+【★】模板类型形参可以用作一个以上函数形参的类型。在这种情况下，模板类型推断必须为每个对
+应的函数实参产生相同的模板实参类型。如果推断的类型不匹配，则调用将会出错：
+
+     template <typename T>
+     int compare(const T& v1, const T& v2)
+     {
+         if (v1 < v2) return -1;
+         if (v2 < v1) return 1;
+         return 0;
+     }
+     int main()
+     {
+         short si;
+         // error: cannot instantiate compare(short, int)
+         // must be: compare(short, short) or
+         // compare(int, int)
+         compare(si, 1024);
+         return 0;
+     }
+
+这个调用是错误的，因为调用 compare 时的实参类型不相同，从第一个实参推断出的模板类型是 
+short，从第二个实参推断出 int 类型，两个类型不匹配，所以模板实参推断失败。
+
+【★】如果 compare 的设计者想要允许实参的常规转换，则函数必须用两个类型形参来定义：
+     // argument types can differ, but must be compatible
+     template <typename A, typename B>
+     int compare(const A& v1, const B& v2)
+     {
+         if (v1 < v2) return -1;
+         if (v2 < v1) return 1;
+         return 0;
+     }
+
+现在用户可以提供不同类型的实参了：
+
+     short si;
+     compare(si, 1024); // ok: instantiates compare(short, int)
+
+
+但是，比较那些类型的值的 < 操作符必须存在。
+
+【类型形参的实参的受限转换】
+考虑下面的 compare 调用：
+
+     short s1, s2;
+     int i1, i2;
+     compare(i1, i2);           // ok: instantiate compare(int, int)
+     compare(s1, s2);           // ok: instantiate compare(short, short)
+
+第一个调用产生将 T 绑定到 int 的实例，为第二个调用创建新实例，将 T 绑定到 short。
+
+如果 compare(int, int) 是普通的非模板函数，则第二个调用会匹配那个函数，short 实参将提升
+（第 5.12.2 节）为 int。因为 compare 是一个模板，所以将实例化一个新函数，将类型形参绑定
+到 short。
+
+【★】一般而论，不会转换实参以匹配已有的实例化，相反，会产生新的实例。除了产生新的实例化
+之外，编译器只会执行两种转换：
+
+const 转换：接受 const 引用或 const 指针的函数可以分别用非 const 对象的引用或指针来调用，
+无须产生新的实例化。如果函数接受非引用类型，形参类型实参都忽略 const，即，无论传递 const 
+或非 const 对象给接受非引用类型的函数，都使用相同的实例化。
+
+数组或函数到指针的转换：如果模板形参不是引用类型，则对数组或函数类型的实参应用常规指针转
+换。数组实参将当作指向其第一个元素的指针，函数实参当作指向函数类型的指针。
+
+例如，考虑对函数 fobj 和 fref 的调用。fobj 函数复制它的形参，而 fref 的形参是引用：
+
+     template <typename T> T fobj(T, T); // arguments are copied
+     template <typename T>
+     T fref(const T&, const T&);       // reference arguments
+     string s1("a value");
+     const string s2("another value");
+     fobj(s1, s2);     // ok: calls f(string, string), const is ignored
+     fref(s1, s2);     // ok: non const object s1 converted to const reference
+     int a[10], b[42];
+     fobj(a, b); // ok: calls f(int*, int*)
+     fref(a, b); // error: array types don't match; arguments aren't converted to pointers
+
+第一种情况下，传递 string 对象和 const string 对象作为实参，即使这些类型不完全匹配，两个
+调用也都是合法的。在 fobj 的调用中，实参被复制，因此原来的对象是否为 const 无关紧要。在
+ fref 的调用中，形参类型是 const 引用，对引用形参而言，转换为 const 是可以接受的转换，
+ 所以这个调用也正确。
+ 
+ 在第二种情况中，将传递不同长度的数组实参。fobj 的调用中，数组不同无关紧要，两个数组都转
+ 换为指针，fobj 的模板形参类型是 int*。但是，fref 的调用是非法的，当形参为引用时（第 
+ 7.2.4 节），数组不能转换为指针，a 和 b 的类型不匹配，所以调用将出错。
+
+ 【应用于非模板实参的常规转换】
+ 【★】类型转换的限制只适用于类型为模板形参的那些实参。
+ 【★】用普通类型定义的形参可以使用常规转换（第 7.1.2 节），下面的函数模板 sum 有两个形参：
+
+     template <class Type> Type sum(const Type &op1, int op2)
+     {
+         return op1 + op2;
+     }
+第一个形参 op1 具有模板形参类型，它的实际类型到函数使用时才知道。第二个形参 op2 的类型已
+知，为 int。
+因为 op2 的类型是固定的，在调用 sum 的时候，可以对传递给 op2 的实参应用常规转换：
+
+     double d = 3.14;
+     string s1("hiya"), s2(" world");
+     sum(1024, d); // ok: instantiates sum(int, int), converts d to int
+     sum(1.4, d); // ok: instantiates sum(double, int), converts d to int
+     sum(s1, s2); // error: s2 cannot be converted to int
+
+在前两个调用中，第二个实参 dd 的类型与对应函数形参的类型不同，但是，这些调用是正确的：有
+从 double 到 int 的转换。因为第二个形参的类型独立模板形参，编译器将隐式转换 dd。第一个调
+用导致实例化函数 sum(int, int)，第二个调用实例化 sum(double, int)。
+
+第三个调用是错误的。没有从 string 到 int 的转换，使用 string 实参来匹配 int 形参与一般情
+况一样，是非法的。
+
+
+ 【模板实参推断与函数指针】
+ 【★】可以使用函数模板对函数指针进行初始化或赋值（第 7.9 节），这样做的时候，编译器使用
+ 指针的类型实例化具有适当模板实参的模板版本。
+
+例如，假定有一个函数指针指向返回 int 值的函数，该函数接受两个形参，都是 const int 引用，
+可以用该指针指向 compare 的实例化
+
+     template <typename T> int compare(const T&, const T&);
+     // pf1 points to the instantiation int compare (const int&, const int&)
+     int (*pf1) (const int&, const int&) = compare;
+
+pf1 的类型是一个指针，指向“接受两个 const int& 类型形参并返回 int 值的函数”，形参的类型
+决定了 T 的模板实参的类型，T 的模板实参为 int 型，指针 pf1 引用的是将 T 绑定到 int 的实例
+化。
+
+获取函数模板实例化的地址的时候，上下文必须是这样的：它允许为每个模板形参确定唯一的类型或
+值。
+
+如果不能从函数指针类型确定模板实参，就会出错。例如，假定有两个名为 func 的函数，每个函数
+接受一个指向函数实参的指针。func 的第一个版本接受有两个 const string 引用形参并返回
+ string 对象的函数的指针，func 的第二个版本接受带两个 const int 引用形参并返回 int 值的
+ 函数的指针，不能使用 compare 作为传给 func 的实参：
+
+     // overloaded versions of func; each take a different function pointer type
+     void func(int(*) (const string&, const string&));
+     void func(int(*) (const int&, const int&));
+     func(compare); // error: which instantiation of compare?
+
+问题在于，通过查看 func 的形参类型不可能确定模板实参的唯一类型，对 func 的调用可以实例化
+下列函数中的任意一个：
+
+     compare(const string&, const string&)
+     compare(const int&, const int&)
+
+因为不能为传给 func 的实参确定唯一的实例化，该调用会产生一个编译时（或链接时）错误。
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+

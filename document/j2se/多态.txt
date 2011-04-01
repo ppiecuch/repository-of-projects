@@ -1,0 +1,48 @@
+class MyPerson {
+ 
+ public void mydisplay(int abc)
+ {
+  System.out.println("MyPerson");
+ }
+}
+
+class subMyPerson extends MyPerson{
+ 
+ public void mydisplay(char abc)
+ {
+  System.out.println("SubMyPerson");
+ } 
+}
+
+public class MyTestProject {
+ 
+ public static void main(String[] args) {
+  
+ char i1=100;
+ MyPerson mytemp = new subMyPerson();
+
+
+ mytemp.mydisplay(i1);
+ 
+ }
+}
+执行结果为"MyPerson"
+
+
+改为class subMyPerson extends MyPerson{
+ 
+ public void mydisplay(int abc)
+ {
+  System.out.println("SubMyPerson");
+ } 
+}
+
+......
+执行结果为:
+
+SubMyPerson
+
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/lzu_vc/archive/2010/06/17/5675158.aspx
