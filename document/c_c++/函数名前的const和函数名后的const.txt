@@ -1,0 +1,25 @@
+首先要知道函数名后面加const只能用于成员函数。
+
+int const func(); //合法，相当于const int func();
+int func2() const; //非法，对函数的const限定词只能用于成员函数
+
+在成员函数中，const加在函数名前和后也是有区别的。
+例如：
+class A {
+    int const func();
+    int func() const;
+};
+
+int const A::func() { return 0; }
+int A::func() const { return 0; }
+
+上面的代码是合法的，其中A::func成员函数是一个重载成员函数，两个函数都返回int类型数据（注意：对于C/C++，返回类型或参数类型中，const int和int被认为是一种类型。但是const int *和int *不是一种类型），这两个重载函数正是基于函数名后的const来重载的。
+int const func();表示该成员函数的隐藏this指针参数是A * const类型的；而int func() const;表示该重载成员函数的隐藏this指针参数是A const * const类型的.
+
+A * const类型和A const * const类型是不同类型，因此可以重载。
+由此可见const放在函数名后和名前是不同的
+
+
+
+const int *a;  指向const对象的int指针,指向的变量不可修改 指针可修改
+int *const a；  指向int对象的const指针,指向的变量值可变   指针不可改变
