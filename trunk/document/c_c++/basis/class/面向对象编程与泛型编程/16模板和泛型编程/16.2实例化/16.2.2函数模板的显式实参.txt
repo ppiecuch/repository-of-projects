@@ -1,0 +1,80 @@
+在某些情况下，不可能推断模板实参的类型。当函数的返回类型必须与形参表中所用的所有类型都不
+同时，最常出现这一问题。在这种情况下，有必要覆盖模板实参推断机制，并显式指定为模板形参所
+用的类型或值。
+
+【?不是很理解】【指定显式模板实参】
+考虑下面的问题。我们希望定义名为 sum、接受两个不同类型实参的函数模板，希望返回类型足够大，
+可以包含按任意次序传递的任意两个类型的两个值的和，怎样才能做到？应如何指定 sum 的返回类型？
+
+     // T or U as the returntype?
+     template <class T, class U> ??? sum(T, U);
+
+在这个例子中，答案是没有一个形参在任何时候都可行，使用任一形参都一定会在某些时候失败：
+
+     // neither T nor U works as return type
+     sum(3, 4L); // second type is larger; want U sum(T, U)
+     sum(3L, 4); // first type is larger; want T sum(T, U)
+
+
+解决这一问题的一个办法，可能是强制 sum 的调用者将较小的类型强制转换（第 5.12.4 节）为希望
+作为结果使用的类型：
+
+     // ok: now either T or U works as return type
+     int i; short s;
+     sum(static_cast<int>(s), i); // ok: instantiates int sum(int, int)
+
+【在返回类型中使用类型形参】
+指定返回类型的一种方式是引入第三个模板形参，它必须由调用者显式指定：
+
+     // T1 cannot be deduced: it doesn't appear in the function parameter list
+     template <class T1, class T2, class T3>
+     T1 sum(T2, T3);
+
+
+这个版本增加了一个模板形参以指定返回类型。只有一个问题： 无法根据实参的类型推断 T1 的类
+型，相反，调用者必须在每次调用 sum 时为该形参显式提供实参。
+
+为调用提供显式模板实参与定义类模板的实例很类似，在以逗号分隔、用尖括号括住的列表中指定显式
+模板实参。显式模板类型的列表出现在函数名之后、实参表之前：
+
+     // ok T1 explicitly specified; T2 and T3 inferred from argument types
+     long val3 = sum<long>(i, lng); // ok: calls long sum(int, long)
+
+这一调用显式指定 T1 的类型，编译器从调用中传递的实参推断 T2 和 T3 的类型。
+
+显式模板实参从左至右对应模板形参相匹配，第一个模板实参与第一个模板形参匹配，第二个实参与
+第二个形参匹配，以此类推。假如可以从函数形参推断，则结尾（最右边）形参的显式模板实参可以
+省略。如果这样编写 sum 函数：
+
+     // poor design: Users must explicitly specify all three template parameters
+     template <class T1, class T2, class T3>
+     T3 alternative_sum(T2, T1);
+     
+则总是必须为所有三个形参指定实参：
+
+     // error: can't infer initial template parameters
+     long val3 = alternative_sum<long>(i, lng);
+     // ok: All three parameters explicitly specified
+     long val2 = alternative_sum<long, int, long>(i, lng);
+
+【显式实参与函数模板的指针】
+可以使用显式模板实参的另一个例子是第 16.2.1 节中有二义性程序，通过使用显式模板实参能够消
+除二义性：
+
+     template <typename T> int compare(const T&, const T&);
+     // overloaded versions of func; each take a different function pointer type
+     void func(int(*) (const string&, const string&));
+     void func(int(*) (const int&, const int&));
+     func(compare<int>); // ok: explicitly specify which version of compare
+
+像前面一样，需要在调用中传递 compare 实例给名为 func 的重载函数。只查看不同版本 func 的形
+参表来选择传递 compare 的哪个实例是不可能的，两个不同的实例都可能满足该调用。显式模板形参
+需要指出应使用哪个 compare 实例以及调用哪个 func 函数。
+
+
+
+
+
+
+
+

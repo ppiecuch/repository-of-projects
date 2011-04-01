@@ -1,0 +1,48 @@
+到目前为止，我们只介绍了怎样声明 Queue 类模板的接口成员，本节将介绍怎样实现该类。
+
+标准库将 queue 实现为其他容器之上的适配器（第 9.7 节）。为了强调在使用低级数据结构中涉及的
+编程要点，我们将 Queue 实现为链表。实际上，在我们的实现中使用标准库容器可能是一个更好的决
+定。
+
+【Queue 的实现策略】
+如图 16.1 所示，我们的实现使用两个类：
+1、QueueItem 类表示 Queue 的链表中的节点，该类有两个数据成员 item 和 next：
+item 保存 Queue 中元素的值，它的类型随 Queue 的每个实例而变化。
+next 是队列中指向下一 QueueItem 对象的指针。
+2、Queue 类将提供第 16.1.2 节描述的接口函数，Queue 类也有两个数据成员：head 和 tail，这些
+成员是 QueueItem 指针。
+像标准容器一样，Queue 类将复制指定给它的值。
+
+【QueueItem 类】
+首先编写 QueueItem 类：
+
+     template <class Type> class QueueItem {
+     // private class: no public section
+         QueueItem(const Type &t): item(t), next(0) { }
+         Type item;           // value stored in this element
+         QueueItem *next;     // pointer to next element in the Queue
+     };
+这个类似乎已经差不多完整了：它保存由其构造函数初始化的两个数据成员。像 Queue 类一样，
+QueueItem 是一个类模板，该类使用模板形参指定 item 成员的类型，Queue 中每个元素的值将保存
+在 item 中。
+
+每当实例化一个 Queue 类的时候，也将实例化 QueueItem 的相同版本。例如，如果创建 Queue<int>，
+则将实例化一个伙伴类 QueueItem<int>。
+
+QueueItem 类为私有类——它没有公用接口。我们这个类只是为实现 Queue，并不想用于一般目的，因
+此，它没有公用成员。需要将 Queue 类设为 QueueItem 类的友元，以便 Queue 类成员能够访问
+ QueueItem 的成员。第 16.4.4 节将介绍怎样做。
+ 
+ 在类模板的作用域内部，可以用它的非限定名字引用该类。
+ 
+
+
+
+
+
+
+
+
+
+
+

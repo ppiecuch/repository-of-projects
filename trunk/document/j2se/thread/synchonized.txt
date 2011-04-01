@@ -1,0 +1,1 @@
+synchronized被当做方法修饰符的时候，他所取得的lock将被交给方法调用者（某对象）。如果synchronized作用于某对象的引用，则取得的lock将交给该引用所指的对象。
