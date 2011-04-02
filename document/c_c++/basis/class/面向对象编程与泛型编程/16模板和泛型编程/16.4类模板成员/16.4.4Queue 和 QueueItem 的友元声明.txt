@@ -1,0 +1,82 @@
+QueueItem 类不打算为一般程序所用：它的所有成员都是私有的。为了让 Queue 类使用 QueueItem 
+灰，QueueItem 类必须将 Queue 类设为友元。
+
+【将类模板设为友元】
+像我们已经看到的，将类模板设为友元的进修，类设计者必须决定友元关系应设置多广。在 QueueItem
+ 类的例子中，需要决定 QueueItem 类应该将友元关系授予所有的 Queue 类实例，还是只授予特定实例。
+
+将每个 Queue 类设为每个 QueueItem 类的友元太宽泛了，允许用 string 类型实例化的 Queue 类去访
+问用 double 类型实例化的 QueueItem 类的成员是没有意义的。Queue<string> 实例只应该是用 
+string 实例化的 QueueItem 类的友元，即，对于实例化的 Queue 类的每种类型，我们想要 Queue 类
+和 QueueItem 类之间的一对一映射：
+
+     // declaration that Queue is a template needed for friend declaration in QueueItem
+     template <class Type> class Queue;
+     template <class Type> class QueueItem {
+         friend class Queue<Type>;
+         // ...
+      };
+
+这个声明建立了想要一对一映射，只将与 QueueItem 类用同样类型实例化的 Queue 类设为友元。
+
+【Queue 输出操作符】
+Queue 类接口中可能增加的一个有用操作，是输出 Queue 对象的内容的能力。提供输出操作符的重载
+实例，可以做到这一点。这个操作符将遍历 Queue 中的元素链表并输出每个元素的值，将在一对尖括
+号内输出元素。
+
+因为希望能够输出任意类型 Queue 的内容，所以需要将输出操作符也设为模板：
+
+     template <class Type>
+     ostream& operator<<(ostream &os, const Queue<Type> &q)
+     {
+         os << "< ";
+         QueueItem<Type> *p;
+         for (p = q.head; p; p = p->next)
+                 os << p->item << " ";
+         os <<">";
+         return os;
+     }
+
+如果 int 类型的 Queue 包含值 3、5、8 和 13，这个 Queue 的输出显示如下：
+
+     <3 5 8 13 >
+
+
+如果 Queue 为空，for 循环不执行。结果是输出一对空的尖括号。
+
+【将函数模板设为友元】
+输出操作符需要成为 Queue 类和 QueueItem 类的友元。它使用 Queue 类的 head 成员和 QueueItem 
+类的 next 和 item 成员。我们的类将友元关系授予用同样类型实例化的输出操作符的特定实例：
+
+     // function template declaration must precede friend declaration in QueueItem
+     template <class T>
+     std::ostream& operator<<(std::ostream&, const Queue<T>&);
+     template <class Type> class QueueItem {
+         friend class Queue<Type>;
+         // needs access to item and next
+         friend std::ostream&
+         operator<< <Type> (std::ostream&, const Queue<Type>&);
+         // ...
+     };
+     template <class Type> class Queue {
+         // needs access to head
+         friend std::ostream&
+         operator<< <Type> (std::ostream&, const Queue<Type>&);
+     };
+
+每个友元声明授予对对应 operator<< 实例的访问权，即输出 Queue<int> 的输出操作符是
+ Queue<int> 类（以及 QueueItem<int>) 类）的友元，它不是任意其他 Queue 类型的友元。
+
+【类型依赖性与输出操作符】
+Queue 类的输出 operator<< 依赖于 item 对象的 operator<< 实际输出每个元素：
+
+     os << p->item << " ";
+
+
+当使用 p->item 作为 << 操作符的操作数的时候，使用的是为 item 所属的任意类型而定义的 <<。
+
+此代码是 Queue 和 Queue 保存的元素之间的类型依赖性的例子。实际上，绑定到 Queue 且使用 Queue 
+输出操作符的每种类型本身必须有输出操作符。没有语言机制指定或强制 Queue 自身定义中的依赖性。
+为没有定义输出操作符的类创建 Queue 对象是合法的，但输出保存这种类型的 Queue 对象会发生编译
+时（或链接时）错误。
+

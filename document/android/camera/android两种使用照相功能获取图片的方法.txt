@@ -1,0 +1,316 @@
+两种方法，一种是直接调用系统的照相Intent，使用onActivityResult获取图片资源；一种是用SurfaceView自己控制界 面。两种各有优缺点，前一种直接使用系统照相程序，会自带了很多系统功能，比如焦距调节，闪光灯调节之类的。后一种可以自定义界面，添加些自己需要增加的 功能。但竖屏拍照的预览照片角度不对。
+
+代码如下：
+
+第一种：
+package com.photo;
+
+import java.io.File;
+
+import android.app.Activity;
+
+import android.content.Intent;
+
+import android.net.Uri;
+
+import android.os.Bundle;
+
+import android.os.Environment;
+
+import android.provider.MediaStore;
+
+import android.util.Log;
+
+public class PhotographActivity extends Activity {
+
+/** Called when the activity is first created. */
+
+private String logTag = “Exception”;
+
+
+@Override
+
+public void onCreate(Bundle savedInstanceState) {
+
+super.onCreate(savedInstanceState);
+
+//        setContentView(R.layout.main);
+
+try {
+
+Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+File out = new File(Environment.getExternalStorageDirectory(), “camera.jpg”);
+
+Uri uri = Uri.fromFile(out);
+
+intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+
+startActivityForResult(intent, 0);
+
+} catch (Exception e) {
+
+e.printStackTrace();
+
+}
+
+}
+
+protected void onActivityResult(int requestCode, int resultCode, Intent data)
+
+{
+
+try {
+
+
+Log.v(“”, “requestCode = “+requestCode+” resultCode =  ”+resultCode);
+
+if (requestCode != 0) {
+
+return;
+
+}
+
+if (resultCode==0) {
+
+
+finish();
+
+return;
+
+}
+
+//     Bundle extras = data.getExtras();
+
+//     Bitmap b = (Bitmap) extras.get(“data”);
+
+Intent intent = new Intent();
+
+intent.setClass(this, ShowImageActivity.class);
+
+//     intent.putExtra(“image”,b);
+
+this.startActivity(intent);
+
+} catch (Exception e) {
+
+// TODO: handle exception
+
+Log.v(logTag, e.getMessage());
+
+}
+
+}
+
+}
+
+另一个activity：
+package com.photo;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.widget.ImageView;
+public class ShowImageActivity extends Activity {
+private String logTag = “exception”;
+private AlertDialog  alertDialog;
+private ImageView view;
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.show);
+try {
+view = (ImageView) findViewById(R.id.view);
+// Bundle bundle = this.getIntent().getExtras();
+// Bitmap b = bundle.getParcelable(“image”);
+String pathString = Environment.getExternalStorageDirectory().toString() + “/camera.jpg”;
+Log.v(“”, “pathString = “+pathString);
+Bitmap b = BitmapFactory.decodeFile(pathString);
+view.setImageBitmap(b);
+//setContentView(view);
+alertDialog = new AlertDialog.Builder(ShowImageActivity.this)
+.setMessage(“Feels Like IS感觉就像IS尽量晃动手机，体验IS的无限动感。”)
+.setPositiveButton(“ok”, new DialogInterface.OnClickListener() {
+public void onClick(DialogInterface dialog, int whichButton) {
+/* User clicked OK so do some stuff */
+}
+})
+.setNegativeButton(“cancle”, new DialogInterface.OnClickListener() {
+public void onClick(DialogInterface dialog, int whichButton) {
+/* User clicked Cancel so do some stuff */
+}
+})
+.create();
+alertDialog.show();
+} catch (Exception e) {
+Log.v(logTag, e.getMessage());
+throw new RuntimeException(e);
+}
+}
+@Override
+public boolean onTouchEvent(MotionEvent event) {
+// TODO Auto-generated method stub
+Log.v(“”, “event = “+event.getX());
+return super.onTouchEvent(event);
+}
+}
+ 
+第二种：
+ 
+package com.zxhwolfe.feelslike;
+import java.io.IOException;
+import android.app.Activity;
+import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
+import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
+import android.hardware.Camera.Parameters;
+import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.ShutterCallback;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.SurfaceHolder.Callback;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+public class FeelsLike extends Activity implements Callback, OnClickListener {
+/** Called when the activity is first created. */
+private SurfaceView mSurfaceView;
+private SurfaceHolder mSurfaceHolder;
+private Camera mCamera;
+private boolean mPreviewRunning;
+private ImageView mImageView;
+@Override
+public void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+getWindow().setFormat(PixelFormat.TRANSLUCENT);
+getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+WindowManager.LayoutParams.FLAG_FULLSCREEN);
+setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+setContentView(R.layout.main);
+mSurfaceView = (SurfaceView) findViewById(R.id.camera);
+mImageView = (ImageView) findViewById(R.id.image);
+mImageView.setVisibility(View.GONE);
+mSurfaceView.setOnClickListener(this);
+mSurfaceHolder = mSurfaceView.getHolder();
+mSurfaceHolder.addCallback(this);
+mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+}
+@Override
+public void surfaceChanged(SurfaceHolder holder, int format, int width,
+int height) {
+if (mPreviewRunning) {
+mCamera.stopPreview();
+}
+Parameters params = mCamera.getParameters();
+params.setPictureFormat(PixelFormat.JPEG);// 设置图片格式
+// params.setPreviewSize(width, height);
+params.set(“rotation”,90);
+mCamera.setParameters(params);
+try {
+mCamera.setPreviewDisplay(holder);
+} catch (IOException e) {
+e.printStackTrace();
+}
+mCamera.startPreview();
+mPreviewRunning = true;
+}
+private AutoFocusCallback mAutoFocusCallBack = new AutoFocusCallback() {
+@Override
+public void onAutoFocus(boolean success, Camera camera) {
+Log.v(“AutoFocusCallback”, “AutoFocusCallback”+success);
+Camera.Parameters Parameters = mCamera.getParameters();
+Parameters.setPictureFormat(PixelFormat.JPEG);// 设置图片格式
+mCamera.setParameters(Parameters);
+mCamera.takePicture(mShutterCallback, null, mPictureCallback);
+}
+};
+@Override
+public void surfaceCreated(SurfaceHolder holder) {
+// TODO Auto-generated method stub
+mCamera = Camera.open();
+}
+@Override
+public void surfaceDestroyed(SurfaceHolder holder) {
+// TODO Auto-generated method stub
+mCamera.stopPreview();
+mPreviewRunning = false;
+mCamera.release();
+mCamera = null;
+}
+/**
+* 拍照的回调接口
+*/
+PictureCallback mPictureCallback = new PictureCallback() {
+@Override
+public void onPictureTaken(byte[] data, Camera camera) {
+Log.v(“PictureCallback”, “…onPictureTaken…”);
+if (data != null) {
+Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0,
+data.length);
+mImageView.setImageBitmap(bitmap);
+mImageView.setVisibility(View.VISIBLE);
+mSurfaceView.setVisibility(View.GONE);
+if (mPreviewRunning) {
+mCamera.stopPreview();
+mPreviewRunning = false;
+}
+}
+}
+};
+/**
+* 在相机快门关闭时候的回调接口，通过这个接口来通知用户快门关闭的事件，
+* 普通相机在快门关闭的时候都会发出响声，根据需要可以在该回调接口中定义各种动作， 例如：使设备震动
+*/
+ShutterCallback mShutterCallback = new ShutterCallback() {
+public void onShutter() {
+//just log ,do nothing
+Log.v(“ShutterCallback”, “…onShutter…”);
+}
+};
+public boolean onKeyDown(int keyCode, KeyEvent event) {
+if(keyCode==KeyEvent.KEYCODE_DPAD_CENTER){
+if(mCamera !=null){
+// mCamera.takePicture(null, null,mPictureCallback);
+mCamera.autoFocus(mAutoFocusCallBack);
+setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+}
+}
+return super.onKeyDown(keyCode, event);
+}
+@Override
+public void onClick(View arg0) {
+// TODO Auto-generated method stub
+Log.v(“onClick”, “…onClick…”);
+mCamera.autoFocus(mAutoFocusCallBack);
+}
+}
+<?xml version=”1.0″ encoding=”utf-8″?>
+<LinearLayout xmlns:android=”http://schemas.android.com/apk/res/android”
+android:orientation=”vertical”
+android:layout_width=”fill_parent”
+android:layout_height=”fill_parent”
+>
+<SurfaceView android:id=”@+id/camera”
+android:layout_width=”fill_parent”
+android:layout_height=”fill_parent”/>
+<ImageView android:id=”@+id/image”
+android:layout_width=”fill_parent” 
+android:layout_height=”fill_parent”/>
+</LinearLayout>
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/xiongyingzhuantu/archive/2010/12/11/6069454.aspx

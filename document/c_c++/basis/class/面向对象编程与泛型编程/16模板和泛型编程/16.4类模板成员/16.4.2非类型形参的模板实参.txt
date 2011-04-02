@@ -1,0 +1,31 @@
+我们已经了解了如何实现类模板，现在来看看类模板的非类型形参。我们将为第十二章引入的 Screen 
+类定义一个新版本，借引介绍类模板的非类型形参。在这个例子中，将 Screen 类重新定义为模板，以
+高度和宽度为形参。
+
+     template <int hi, int wid>
+     class Screen {
+     public:
+         // template nontype parameters used to initialize data members
+         Screen(): screen(hi * wid, '#'), cursor (0),
+                   height(hi), width(wid) { }
+         // ...
+     private:
+         std::string            screen;
+         std::string::size_type cursor;
+         std::string::size_type height, width;
+     };
+
+【★】这个模板有两个形参，均为非类型形参。当用户定义 Screen 对象时，必须为每个形参提供常量
+表达式以供使用。类在默认构造函数中使用这些形参设置默认 Screen 的尺寸。
+
+像任意类模板一样，使用 Screen 类型时必须显式声明形参值：
+
+     Screen<24,80> hp2621; // screen 24 lines by 80 characters
+
+
+对象 hp2621 使用模板实例化 Screen<24, 80>。hi 的模板实参是 24，而 wid 的模板实参是 80，两种
+情况下，模板实参都是常量表达式。
+
+【★】非类型模板实参必须是编译时常量表达式。
+
+
