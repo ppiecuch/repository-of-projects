@@ -1,0 +1,27 @@
+在Andriod中关于线程一部分中经常会遇到计算时间的操作，这里面应用较多的是SystemClock类，这个
+类有两个主要的静态方法uptimeMillis()和 elapsedRealtime().
+
+我们来看一下这两个函数的实际含义，以下是源码中的注释
+
+　　Returns milliseconds since boot, not counting time spent in deep sleep.      
+
+　　This value may get reset occasionally         
+
+native public static long uptimeMillis();
+
+Returns milliseconds since boot, including time spent in sleep.         
+
+native public static long elapsedRealtime();
+
+
+
+
+由此可见，uptimeMillis()返回的是系统从启动到当前处于非休眠期的时间。
+
+elapsedRealTime()返回的是系统从启动到现在的时间。
+
+ 
+
+值得一提的是，这个类还提供了另外一个方法，  public static void sleep(long ms)，这个方法
+就是封装了Thread.sleep方法，但是不会抛出InterruptedException
+

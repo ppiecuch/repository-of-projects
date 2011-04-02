@@ -7,3 +7,15 @@
 
     最终在sdcard上生成的cwj文件我们可以用sdk\\tools中的traceview来查看运行的结果。
 
+1) 取毫微秒级的时间，用于计算时间 
+Debug.threadCpuTimeNanos()
+
+2) 统计两点间的内存分配情况
+Debug.startAllocCounting()
+Debug.stopAllocCounting()
+Debug.getGlobalAllocCount()
+get…..
+3) 打印当前已load的class 
+Debug.getLoadedClassCount() 
+printLoadedClasses() 它需要打开NDEBUG功能才能打开system/core/中Log功能
+

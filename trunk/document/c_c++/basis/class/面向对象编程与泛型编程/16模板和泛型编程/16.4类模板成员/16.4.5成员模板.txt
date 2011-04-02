@@ -1,0 +1,124 @@
+【★】任意类（模板或非模板）可以拥有本身为类模板或函数模板的成员，这种成员称为成员模板，
+成员模板不能为虚。
+
+成员模板的一个例子是标准容器的 assign 成员（第 9.3.8 节），接受两个迭代器的 assign 版本使
+用模板形参表示其迭代器形参的类型。另一个成员模板例子是接受两个迭代器的容器构造函数（第
+ 9.1.1 节）。该构造函数和 assign 成员使我们能够从不同但兼容的元素类型序列和／或不同容器
+ 类型建立容器。实现了自己的 Queue 类之后，我们现在能够更好地理解这些标准容器成员的设计了。
+
+考虑 Queue 类的复制构造函数：它接受一个形参，是 Queue<Type> 的引用。想要通过从 vector 对象
+中复制元素而创建 Queue 对象，是办不到的，因为没有从 vector 到 Queue 的转换。类似地，想要
+从 Queue<short> 复制元素到 Queue<int>，也办不到。同样的逻辑应用于赋值操作符，它也接受一
+个 Queue<Type>& 类型的形参。
+
+问题在于，复制构造函数和赋值操作符固定了容器和元素的类型。我们希望定义一个构造函数和一
+个 assign 成员，使容器类型和元素类型都能变化。需要形参类型变化的时候，就需要定义函数模板。
+在这个例子中，我们将定义构造函数和 assign 成员接受一对在其他序列指明范围的迭代器，这些函
+数将有一个表示迭代器类型的模板类型形参。
+
+标准 queue 类没有定义这些成员：不支持从其他容器建立 queue 对象或给 queue 对象赋值。我们在
+这里定义这些成员只是为了举例说明。
+ 
+
+【定义成员模板】
+模板成员声明看起来像任意模板的声明一样：
+
+     template <class Type> class Queue {
+     public:
+         // construct a Queue from a pair of iterators on some sequence
+         template <class It>
+         Queue(It beg, It end):
+               head(0), tail(0) { copy_elems(beg, end); }
+         // replace current Queue by contents delimited by a pair of iterators
+         template <class Iter> void assign(Iter, Iter);
+         // rest of Queue class as before
+     private:
+         // version of copy to be used by assign to copy elements from iterator range
+         template <class Iter> void copy_elems(Iter, Iter);
+     };
+
+成员声明的开关是自己的模板形参表。构造函数和 assign 成员各有一个模板类型形参，这些函数使用
+该类型形参作为其函数形参的类型，它们的函数形参是指明要复制元素范围的迭代器。
+
+【在类外部定义成员模板】
+像非模板成员一样，成员模板可以定义在包含它的类或类模板定义的内部或外部。我们已经在类定义
+体内部定义了构造函数，它的工作是从迭代器实参形成的迭代器范围复制元素，实际复制工作是通过
+调用 copy_elems 的迭代器版本完成的。
+【★】成员模板可以定义在包含它的类或类模板定义的内部或外部。
+template <class T> template <class Iter>
+     void Queue<T>::assign(Iter beg, Iter end)
+     {
+         destroy();            // remove existing elements in this Queue
+         copy_elems(beg, end); // copy elements from the input range
+     }
+
+
+当成员模板是类模板的成员时，它的定义必须包含类模板形参以及自己的模板形参。首先是类模板
+形参表，后面接着成员自己的模板形参表。assign 函数定义的开头为
+
+     template <class T> template <class Iter>
+
+
+第一个模板形参表 template<class T> 是类模板的，第二个模板形参表 template<class Iter> 
+是成员模板的。
+
+assign 函数的行为非常简单：它首先调用 destroy 函数，destroy 函数释放这个 Queue 的现在成
+员，然后 assign 成员调用名为 copy_elems 的新实用函数，完成从输入范围复制元素的工作。
+copy_elems 函数也是一个成员模板：
+
+     template <class Type> template <class It>
+     void Queue<Type>::copy_elems(It beg, It end)
+     {
+         while (beg != end) {
+            push(*beg);
+            ++beg;
+         }
+     }
+
+
+copy_elems 的迭代器版本遍历由一对迭代器指定的输入范围，它对范围内的每个元素调用 push 函
+数，实际上由 push 函数将元素加入 Queue。
+
+因为 assign 函数删除现在容器中的成员，所以传给 assign 函数的迭代器有必要引用不同容器中的
+元素。标准容器的 assign 成员和迭代器构造函数有相同的限制。
+
+【成员模板遵循常规访问控制】
+成员模板遵循与任意其他类成员一样的访问规则。如果成员模板为私有的，则只有该类的成员函数和
+友元可以使用该成员模板。因为函数成员模板 assign 是公有的，所以整个程序都可以使用它：
+copy_elems 是私有的，所以只有 Queue 的友元和成员可以访问它。
+【★】成员模板遵循与任意其他类成员一样的访问规则。
+【成员模板和实例化】
+与其他成员一样，成员模板只有在程序中使用时才实例化。类模板的成员模板的实例化比类模板的普
+通成员函数的实例化要复杂一点。成员模板有两种模板形参：由类定义的和由成员模板本身定义的。
+类模板形参由调用函数的对象的类型确定，成员定义的模板形参的行为与普通函数模板一样。这些形
+参都通过常规模板实参推断（第 16.2.1 节）而确定。
+【★】与其他成员一样，成员模板只有在程序中使用时才实例化。
+要理解实例化的原理，我们来看看使用这些成员从 short 数组或 vector<int>: 复制和赋值元素：
+
+     short a[4] = { 0, 3, 6, 9 };
+     // instantiates Queue<int>::Queue(short *, short *)
+     Queue<int> qi(a, a + 4); // copies elements from a into qi
+     vector<int> vi(a, a + 4);
+     // instantiates Queue<int>::assign(vector<int>::iterator,
+     //                                 vector<int>::iterator)
+     qi.assign(vi.begin(), vi.end());
+
+
+因为所构造的是 Queue<int> 类型的对象，我们知道编译器将为 Queue<int> 实例化基于迭代器的构
+造函数。该构造函数本身模板形参的类型由编译器根据 a 和 a+4 的类型推断，而该类型为 short 指
+针。因此，qi 的定义将实例化
+
+     void Queue<int>::Queue(short *, short *);
+
+
+这个构造函数的效果是，从名为 a 的数组中复制 short 类型的元素到 qi。
+
+对 assign 的调用将实例化 qi 的成员。qi 具有 Queue<int> 类型，因此，这个调用将实例化名为
+ assign 的 Queue<int> 成员。该函数本身是函数模板，像对任意其他函数模板一样，编译器从传
+ 给调用的实参推断 assign 的模板实参，推断得到的类型是 vector<int>::iterator，即，这个调
+ 用将实例化
+
+     void Queue<int>::assign(vector<int>::iterator,
+                             vector<int>::iterator);
+
+

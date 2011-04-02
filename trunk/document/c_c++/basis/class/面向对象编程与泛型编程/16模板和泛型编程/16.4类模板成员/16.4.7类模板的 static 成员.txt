@@ -1,0 +1,53 @@
+【★】类模板可以像任意其他类一样声明 static 成员（第 12.6 节）。以下代码：
+
+     template <class T> class Foo {
+     public:
+        static std::size_t count() { return ctr; }
+        // other interface members
+     private:
+        static std::size_t ctr;
+        // other implementation members
+     };
+
+
+定义了名为 Foo 的类模板，它有一个名为 count 的 public static 成员函数和一个名为 ctr 的 
+private static 数据成员。
+
+Foo 类的每个实例化有自己的 static 成员：
+
+     // Each object shares the same Foo<int>::ctrand Foo<int>::count members
+     Foo<int> fi, fi2, fi3;
+     // has static members Foo<string>::ctrand Foo<string>::count
+     Foo<string> fs;
+
+
+每个实例化表示截然不同的类型，所以给定实例外星人所有对象都共享一个 static 成员。因此，
+Foo<int> 类型的任意对象共享同一 static 成员 ctr，Foo<string> 类型的对象共享另一个不同的
+ ctr 成员。
+
+【使用类模板的 static 成员】
+通常，可以通过类类型的对象访问类模板的 static 成员，或者通过使用作用域操作符直接访问成员。
+当然，当试图通过类使用 static 成员的时候，必须引用实际的实例化：
+
+     Foo<int> fi, fi2;              // instantiates Foo<int> class
+     size_t ct = Foo<int>::count(); // instantiates Foo<int>::count
+     ct = fi.count();               // ok: uses Foo<int>::count
+     ct = fi2.count();              // ok: uses Foo<int>::count
+     ct = Foo::count();             // error: which template instantiation?
+
+与任意其他成员函数一样，static 成员函数只有在程序中使用时才进行实例化。
+
+【定义 static 成员】
+【★】像使用任意其他 static 数据成员一样，必须在类外部出现数据成员的定义。在类模板含有
+ static 成员的情况下，成员定义必须指出它是类模板的成员：
+
+     template <class T>
+     size_t Foo<T>::ctr = 0; // define and initialize ctr
+
+static数据成员像定义在类外部的任意其他类成员一样定义，它用关键字 template 开头，后面接着
+类模板形参表和类名。在这个例子中，static 数据成员的名字以 Foo<T>:: 为前缀，表示成员属于类
+模板 Foo。
+
+
+
+

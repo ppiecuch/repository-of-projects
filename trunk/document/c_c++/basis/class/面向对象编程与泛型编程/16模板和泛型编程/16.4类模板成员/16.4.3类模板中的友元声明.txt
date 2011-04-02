@@ -1,0 +1,96 @@
+【★】在类模板中可以出现三种友元声明，每一种都声明了与一个或多个实体友元关系：
+1.普通非模板类或函数的友元声明，将友元关系授予明确指定的类或函数。
+2.类模板或函数模板的友元声明，授予对友元所有实例的访问权。
+3.只授予对类模板或函数模板的特定实例的访问权的友元声明。
+
+【普通友元】
+非模板类或非模板函数可以是类模板的友元：
+     template <class Type> class Bar {
+         // grants access to ordinary, nontemplate class and function
+         friend class FooBar;
+         friend void fcn();
+         // ...
+     };
+这个声明是说，FooBar 的成员和 fcn 函数可以访问 Bar 类的任意实例的 private 成员和 protected 
+成员。 
+
+【一般模板友元关系】
+友元可以是类模板或函数模板：
+     template <class Type> class Bar {
+         // grants access to Foo1 or templ_fcn1 parameterized by any type
+         template <class T> friend class Foo1;
+         template <class T> friend void templ_fcn1(const T&);
+         // ...
+     };
+这些友元声明使用与类本身不同的类型形参，该类型形参指的是 Foo1 和 temp1_fcn1 的类型形参。在
+这两种情况下，都将没有数目限制的类和函数设为 Bar 的友元。Foo1 的友元声明是说，Foo1 的友元
+声明是说，Foo1 的任意实例都可以访问 Bar 的任意实例的私有元素，类似地，temp_fcn1 的任意实
+例可以访问 Bar 的任意实例。
+
+这个友元声明在 Bar 与其友元 Foo1 和 temp1_fcn1 的每个实例之间建立了一对多的映射。对 Bar 的
+每个实例而言，Foo1 或 temp1_fcn1 的所有实例都是友元。
+
+【特定的模板友元关系】
+除了将一个模板的所有实例设为友元，类也可以只授予对特定实例的访问权：
+     template <class T> class Foo2;
+     template <class T> void templ_fcn2(const T&);
+     template <class Type> class Bar {
+          // grants access to a single specific instance parameterized by char*
+          friend class Foo2<char*>;
+          friend void templ_fcn2<char*>(char* const &);
+          // ...
+     };
+
+即使 Foo2 本身是类模板，友元关系也只扩展到 Foo2 的形参类型为 char* 的特定实例。类似地，
+temp1_fcn2 的友元声明是说，只有形参类型为 char* 的函数实例是 Bar 类的友元。形参类型为 
+char* 的 Foo2 和 temp1_fcn2 的特定实例可以访问 Bar 的每个实例。
+
+下面形式的友元声明更为常见：
+     template <class T> class Foo3;
+     template <class T> void templ_fcn3(const T&);
+     template <class Type> class Bar {
+         // each instantiation of Bar grants access to the
+         // version of Foo3 or templ_fcn3 instantiated with the same type
+         friend class Foo3<Type>;
+         friend void templ_fcn3<Type>(const Type&);
+         // ...
+     };
+
+这些友元定义了 Bar 的特定实例与使用同一模板实参的 Foo3 或 temp1_fcn3 的实例之间的友元关系。
+每个 Bar 实例有一个相关的 Foo3 和 temp1_fcn3 友元：
+
+     Bar<int> bi;    // Foo3<int> and templ_fcn3<int> are friends
+     Bar<string> bs; // Foo3<string>, templ_fcn3<string> are friends
+
+只有与给定 Bar 实例有相同模板实参的那些 Foo3 或 temp1_fcn3 版本是友元。因此，Foo3<int> 可
+以访问 Bar<int> 的私有部分，但不能访问 Bar<string> 或者任意其他 Bar 实例的私有部分。
+
+【声明依赖性】
+【★】当授予对给定模板的实例的访问权时候，在作用域中不需要存在该类模板或函数模板的声明。
+实质上，编译器将友元声明也当作类或函数的声明对待。
+
+想要限制对特定实例化的友元关系时，必须在可以用于友元声明之前声明类或函数：
+
+     template <class T> class A;
+     template <class T> class B {
+     public:
+         friend class A<T>;      // ok: A is known to be a template
+         friend class C;         // ok: C must be an ordinary, nontemplate class
+         template <class S> friend class D; // ok: D is a template
+         friend class E<T>;      // error: E wasn't declared as a template
+         friend class F<int>;    // error: F wasn't declared as a template
+      };
+
+【★】如果没有事先告诉编译器该友元是一个模板，则编译器将认为该友元是一个普通非模板类或非模
+板函数。
+
+
+
+
+
+
+
+
+
+
+

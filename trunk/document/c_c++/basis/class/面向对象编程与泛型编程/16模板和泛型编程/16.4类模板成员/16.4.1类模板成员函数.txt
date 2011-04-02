@@ -1,0 +1,163 @@
+【★】类模板成员函数的定义具有如下形式：
+1.必须以关键字 template 开关，后接类的模板形参表。
+2.必须指出它是哪个类的成员。
+3.类名必须包含其模板形参。
+
+从这些规则可以看到，在类外定义的 Queue 类的成员函数的开关应该是：
+
+     template <class T> ret-type Queue<T>::member-name
+
+
+【destroy 函数】
+为了举例说明在类外定义的类模板成员函数，我们来看 destroy 函数：
+
+     template <class Type> void Queue<Type>::destroy()
+     {
+         while (!empty())
+             pop();
+     }
+这个定义可以从左至右读作：
+1.用名为 Type 的类型形参定义一个函数模板；
+2.它返回 void；
+3.它是在类模板 Queue<Type> 的作用域中。
+
+在作用域操作符（::）之前使用的 Queue<Type> 指定成员函数所属的类。
+
+跟在成员函数名之后的是函数定义。在 destroy 的例子中，函数体看来很普通的非模板函数定义，它
+的工作是遍历这个 Queue 的每个分支，调用 pop 除去每一项。
+
+【pop 函数】
+pop 成员的作用是除去 Queue 的队头值：
+
+     template <class Type> void Queue<Type>::pop()
+     {
+         // pop is unchecked: Popping off an empty Queue is undefined
+         QueueItem<Type>* p = head; // keep pointer to head so we can delete it
+         head = head->next;         // head now points to next element
+         delete p;                  // delete old head element
+      }
+
+
+pop 函数假设用户不会在空 Queue 上调用 pop。pop 的工作是除去 Queue 的头元素。必须重置 head 
+指针以指向 Queue 中的下一元素，然后删除 head 位置的元素。唯一有技巧的部分是记得保持指向该
+元素的一个单独指针，以便在重置 head 指针之后可以删除元素。
+
+【push 函数】
+push 成员将新项放在队列末尾：
+
+     template <class Type> void Queue<Type>::push(const Type &val)
+     {
+         // allocate a new QueueItem object
+         QueueItem<Type> *pt = new QueueItem<Type>(val);
+         // put item onto existing queue
+         if (empty())
+             head = tail = pt; // the queue now has only one element
+         else {
+             tail->next = pt; // add new element to end of the queue
+             tail = pt;
+         }
+     }
+
+这个函数首先分配新的 QueueItem 对象，用传递的值初始化它。这里实际上有些令人惊讶的工作，陈
+述如下：
+1.QueueItem 构造函数将实参复制到 QueueItem 对象的 item 成员。像标准容器所做的一样，Queue 
+类存储所给元素的副本。
+2.如果 item 为类类型，item 的初始化使用 item 所具有任意类型的复制构造函数。
+3.QueueItem 构造函数还将 next 指针初始化为 0，以指出该元素没有指向其他 QueueItem 对象。
+
+
+因为将在 Queue 的末尾增加元素，将 next 置 0 正是我们所希望的。
+
+创建和初始化新元素之后，必须将它链入 Queue。如果 Queue 为空，则 head 和 tail 都应该指向这个
+新元素。如果 Queue 中已经有元素了，则使当前 tail 元素指向这个新元素。旧的 tail 不再是最后一
+个元素了，这也是通过使 tail 指向新构造的元素指明的。
+
+【copy_elems 函数】
+我们将赋值操作符的实现留作习题，剩下要编写的函数只有 copy_elems 了。设计该函数的目的是供赋
+值操作符和复制构造函数使用，它的工作是从形参中复制元素到这个 Queue：
+
+     template <class Type>
+     void Queue<Type>::copy_elems(const Queue &orig)
+     {
+         // copy elements from orig into this Queue
+         // loop stops when pt == 0, which happens when we reach orig.tail
+         for (QueueItem<Type> *pt = orig.head; pt; pt = pt->next)
+             push(pt->item); // copy the element
+      }
+
+在 for 循环中复制元素，for 循环始于将 pt 设为等于形参的 head 指针。循环进行直至获得 orig 中
+最后一个元素之后，pt 为 0。对于 orig 中的每个元素，将该元素值的副本 push 到这个 Queue，并推
+进 pt 以指向 orig 中的下一元素。
+
+【类模板成员函数的实例化】
+【★】类模板的成员函数本身也是函数模板。像任何其他函数模板一样，需要使用类模板的成员函数产
+生该成员的实例化。与其他函数模板不同的是，在实例化类模板成员函数的进修，编译器不执行模板实
+参推断，相反，类模板成员函数的模板形参由调用该函数的对象的类型确定。例如，当调用 
+Queue<int>　类型对象的 push 成员时，实例化的 push 函数为
+
+     void Queue<int>::push(const int &val)
+
+对象的模板实参能够确定成员函数模板形参，这一事实意味着，调用类模板成员函数比调用类似函数
+模板更灵活。用模板形参定义的函数形参的实参允许进行常规转换：
+
+     Queue<int> qi; // instantiates class Queue<int>
+     short s = 42;
+     int i = 42;
+     // ok: s converted to int and passed to push
+     qi.push(s); // instantiates Queue<int>::push(const int&)
+     qi.push(i); // uses Queue<int>::push(const int&)
+     f(s);       // instantiates f(const short&)
+     f(i);       // instantiates f(const int&)
+
+【何时实例化类和成员】
+【★】类模板的成员函数只有为程序所用才进行实例化。如果某函数从未使用，则不会实例化该成员函数。
+这一行为意味着，用于实例化模板的类型只需满足实际使用的操作的要求。第 9.1.1 节中只接受一个
+容量形参的顺序容器构造函数就是这样的例子，该构造函数使用元素类型的默认构造函数。如果有一个
+没有定义默认构造函数的类型，仍然可以定义容器来保存该类型，但是，不能使用只接受一个容量的
+构造函数。
+
+定义模板类型的对象时，该定义导致实例化类模板。定义对象也会实例化用于初始化该对象的任一构
+造函数，以及该构造函数调用的任意成员：
+
+     // instantiates Queue<int> class and Queue<int>::Queue()
+     Queue<string> qs;
+     qs.push("hello"); // instantiates Queue<int>::push
+
+第一个语句实例化 Queue 类及其默认构造函数，第二个语句实例化 push 成员函数。
+
+push 成员的实例化：
+
+     template <class Type> void Queue<Type>::push(const Type &val)
+     {
+          // allocate a new QueueItem object
+          QueueItem<Type> *pt = new QueueItem<Type>(val);
+          // put item onto existing queue
+          if (empty())
+              head = tail = pt;    // the queue now has only one element
+          else {
+              tail->next = pt;     // add new element to end of the queue
+              tail = pt;
+          }
+     }
+
+将依次实例化伙伴类 QueueItem<string> 及其构造函数。
+
+Queue 类中的 QueueItem 成员是指针。类模板的指针定义不会对类进行实例化，只有用到这样的指针
+时才会对类进行实例化。因此，在创建 Queue 对象进不会实例化 QueueItem 类，相反，在使用诸如 
+front、push 或 pop 这样的 Queue 成员时才实例化 QueueItem 类。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

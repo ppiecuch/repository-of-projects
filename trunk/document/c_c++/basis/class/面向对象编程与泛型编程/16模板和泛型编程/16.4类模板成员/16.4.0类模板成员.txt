@@ -34,7 +34,80 @@ QueueItem 类为私有类——它没有公用接口。我们这个类只是为实现 Queue，并不想用于一
  QueueItem 的成员。第 16.4.4 节将介绍怎样做。
  
  在类模板的作用域内部，可以用它的非限定名字引用该类。
- 
+ 【?】非限定名字是指?
+
+ 【Queue 类】
+现在充实 Queue 类：
+
+     template <class Type> class Queue {
+     public:
+         // empty Queue
+         Queue(): head(0), tail(0) { }
+         // copy control to manage pointers to QueueItems in the Queue
+         Queue(const Queue &Q): head(0), tail(0)
+                                       { copy_elems(Q); }
+         Queue& operator=(const Queue&);
+         ~Queue() { destroy(); }
+              // return element from head of Queue
+         // unchecked operation: front on an empty Queue is undefined
+         Type& front()             { return head->item; }
+         const Type &front() const { return head->item; }
+         void push(const Type &);       // add element to back of Queue
+         void pop ();                    // remove element from head of Queue
+         bool empty () const {           // true if no elements in the Queue
+             return head == 0;
+         }
+     private:
+         QueueItem<Type> *head;         // pointer to first element in Queue
+         QueueItem<Type> *tail;         // pointer to last element in Queue
+         // utility functions used by copy constructor, assignment, and destructor
+         void destroy();                // delete all the elements
+         void copy_elems(const Queue&); // copy elements from parameter
+     };
+
+除了接口成员之外，还增加了三个复制控制成员（第十三章）以及那些成员所用的相关实用函数。
+private 实用函数 destroy 和 copy_elems 将完成释放 Queue 中的元素以及从另一 Queue 复制元素
+到这个 Queue 的任务。复制控制成员用于管理数据成员 head 和 tail，head 和 tail 是指向 Queue 
+中首尾元素的指针，这些成员是 QueueItem<Type> 类型的值。
+
+Queue 类实现了几个成员函数：
+1.默认构造函数，将 head 和 tail 指针置 0,指明当前 Queue 为空。
+2.复制构造函数，初始化 head 和 tail，并调用 copy_elems 从它的初始器复制元素。
+3.几个 front 函数，返回头元素的值。这些函数不进行检查：像标准 queue 中的类似操作一样，用户不
+能在空 Queue 上运行 front 函数。
+empty 函数，返回 head 与 0 的比较结果。如果 head 为 0，Queue 为空；否则，Queue 是非空的。
+
+ 【模板作用域中模板类型的引用】
+这个类的主要部分应该是我们熟悉的。它只与我们已经定义过的类有少许区别。新的内容是 Queue 类
+型和 QueueItem 类型的引用中对模板类型形参的使用（或缺少）。
+
+通常，当使用类模板的名字的时候，必须指定模板形参。这一规则有个例外：在类本身的作用域内部，
+可以使用类模板的非限定名。例如，在默认构造函数和复制构造函数的声明中，名字 Queue 是
+ Queue<Type> 缩写表示。实质上，编译器推断，当我们引用类的名字时，引用的是同一版本。因此，
+ 复制构造函数定义其实等价于：
+
+     Queue<Type>(const Queue<Type> &Q): head(0), tail(0)
+                 { copy_elems(Q); }
+
+
+编译器不会为类中使用的其他模板的模板形参进行这样的推断，因此，在声明伙伴类 QueueItem 的指
+针时，必须指定类型形参：
+
+     QueueItem<Type> *head;    // pointer to first element in Queue
+     QueueItem<Type> *tail;    // pointer to last element in Queue
+
+这些声明指出，对于 Queue 类的给定实例化，head 和 tail 指向为同一模板形参实例化的 QueueItem 
+类型的对象，即，在 Queue<int> 实例化的内部，head 和 tail 的类型是 QueueItem<int>*。在 head 
+和 tail 成员的定义中省略模板形参将是错误的：
+
+     QueueItem *head;        // error: which version of QueueItem?
+     QueueItem *tail;        // error: which version of QueueItem?
+
+
+
+
+
+
 
 
 
