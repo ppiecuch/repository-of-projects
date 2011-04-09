@@ -1,0 +1,95 @@
+【★】函数模板可以重载：可以定义有相同名字但形参数目或类型不同的多个函数模板，也可以定义
+与函数模板有相同名字的普通非模板函数。
+
+当然，声明一组重载函数模板不保证可以成功调用它们，重载的函数模板可能会导致二义性。
+
+【函数匹配与函数模板】
+如果重载函数中既有普通函数又有函数模板，确定函数调用的步骤如下：
+
+1.为这个函数名建立候选函数集合，包括：
+a.与被调用函数名字相同的任意普通函数。
+b.任意函数模板实例化，在其中，模板实参推断发现了与调用中所用函数实参相匹配的模板实参。
+2.确定哪些普通函数是可行的（第 7.8.2 节）（如果有可行函数的话）。候选集合中的每个模板实例都　可行的，因为模板实参推断保证函数可以被调用。
+3.如果需要转换来进行调用，根据转换的种类排列可靠函数，记住，调用模板函数实例所允许的转换是有限的。
+a.如果只有一个函数可选，就调用这个函数。
+b.如果调用有二义性，从可行函数集合中去掉所有函数模板实例。
+4.重新排列去掉函数模板实例的可行函数。
+a.如果只有一个函数可选，就调用这个函数。
+b.否则，调用有二义性。
+【函数模板匹配的例子】
+考虑下面普通函数和函数模板的重载集合：
+
+     // compares two objects
+     template <typename T> int compare(const T&, const T&);
+     // compares elements in two sequences
+     template <class U, class V> int compare(U, U, V);
+     // plain functions to handle C-style character strings
+     int compare(const char*, const char*);
+重载集合包含三个函数：第一个模板处理简单值，第二个模板比较两个序列的元素，第三个是处理 C 风格字符串的普通函数。
+
+【确定重载函数模板的调用】
+可以在不同类型上调用这些函数：
+
+     // calls compare(const T&, const T&) with T bound to int
+     compare(1, 0);
+     // calls compare(U, U, V), with U and V bound to vector<int>::iterator
+     vector<int> ivec1(10), ivec2(20);
+     compare(ivec1.begin(), ivec1.end(), ivec2.begin());
+     int ia1[] = {0,1,2,3,4,5,6,7,8,9};
+     // calls compare(U, U, V) with U bound to int*
+     // and V bound to vector<int>::iterator
+     compare(ia1, ia1 + 10, ivec1.begin());
+     // calls the ordinary function taking const char* parameters
+     const char const_arr1[] = "world", const_arr2[] = "hi";
+     compare(const_arr1, const_arr2);
+     // calls the ordinary function taking const char* parameters
+     char ch_arr1[] = "world", ch_arr2[] = "hi";
+     compare(ch_arr1, ch_arr2);
+
+下面依次介绍每个调用。
+两个形参都是 int 类型。候选函数是第一个模板将 T 绑定到 int 的实例化，以及名为 compare 的普通函数。但该普通函数不可行——不能将 int 对象传给期待 char* 对象的形参。用 int 实例化的函数与该调用完全匹配，所以选择它。
+
+     compare(ivec1.begin(), ivec1.end(), ivec2.begin())
+
+
+这两个调用中，唯一可行的函数是有三个形参的模板的实例化。带两个参数的模板和普通非模板函数都不能匹配这两个调用。
+
+这个调用正如我们所期待的，调用普通函数。该函数和将 T 绑定到 const char* 的第一个模板都是可行的，也都完全匹配。根据规则 3b，会选择普通函数。从候选集合中去掉模板实例，只剩下普通函数可行。
+
+这个调用也绑定到普通函数。候选者是将 T 绑定到 char* 的函数模板的版本，以及接受 const char* 实参的普通函数，两个函数都需要稍加转换将数组 ch_arr1 和 ch_arr2 转换为指针。因为两个函数一样匹配，所以普通函数优先于模板版本。
+
+【转换与重载的函数模板】
+设计一组重载函数，其中一些是模板而另一些是普通函数，这可能是困难的。这样做需要深入理解类型之间的关系，具体而言，就是当涉及模板时可以发生和不能发生的隐式转换。
+
+来看两个例子，看看为什么当重载集合中既有模板又有非模板版本的时候，设计正确工作的重载函数是困难的。首先，考虑用指针代替数组本身的 compare 调用：
+
+     char *p1 = ch_arr1, *p2 = ch_arr2;
+     compare(p1, p2);
+
+
+这个调用与模板版本匹配！通常，我们希望无论是传递数组，还是传递指向该数组元素的指针，都获得同一函数。但是，在这个例子中，将 char* 绑定到 T 的函数模板与该调用完全匹配。普通版本仍然需要从 char* 到 const char* 的转换，所以优先选择函数模板。
+
+另一个具有惊人结果的改变是，如果 compare 的模板版本有一个 T 类型的形参代替 T 的 const 引用，会发生的情况：
+
+     template <typename T> int compare2(T, T);
+
+
+这个例子中，如果有一个普通类型的数组，则无论传递数组本身，还是传递指针，都将调用模板版本。调用非模板版本的唯一途径是在实参是 const char 或者 const char* 指针数组的时候：
+
+     // calls compare(T, T) with T bound to char*
+     compare(ch_arr1, ch_arr2);
+     // calls compare(T, T) with T bound to char*
+     compare(p1, p2);
+     // calls the ordinary function taking const char*
+     parameters compare(const_arr1, const_arr2);
+     const char *cp1 = const_arr1, *cp2 = const_arr2;
+     // calls the ordinary function taking const char* parameters
+     compare(cp1, cp2);
+
+
+在这些情况下，普通函数和函数模板都完全匹配。像通常一样，当匹配同样好时，非模板版本优先。
+
+设计既包含函数模板又包含非模板函数的重载函数集合是困难的，因为可能会使函数的用户感到奇怪，定义函数模板特化（第 16.6 节）几乎总是比使用非模板版本更好。
+
+
+

@@ -1,0 +1,325 @@
+如何用Android平台开发FPS游戏，其实现过程有哪些方法，这些方法又有哪些不同的地方呢？首先eoe先解释一下什么是FPS。
+
+英文名：FPS （First Personal Shooting）
+
+第一人称视角射击游戏顾名思义就是以玩家的主观视角来进行射击游戏。玩家们不再像别的游戏一样操纵屏幕中的虚拟人物来进行游戏，而是身临其境的体验游戏带来的视觉冲击，这就大大增强了游戏的主动性和真实感。早期第一人称类游戏所带给玩家的一般都是的屏幕光线的刺激，简单快捷的游戏节奏。随着游戏硬件的逐步完善，以及各种类游戏的不断结合。第一人称射击类游戏提供了更加丰富的剧情以及精美的画面和生动的音效。例如我们玩的CS、Quake系列、 UT系列、荣誉勋章、使命召唤、DOOM、彩虹6号、杀手47系列、穿越火线、反恐精英Online等等游戏。
+
+接下来给大家带来两种方式的代码：
+
+第一种方式：
+private boolean drawall=false;
+
+
+
+private RefreshHandler mRedrawHandler = new RefreshHandler();
+
+
+
+    class RefreshHandler extends Handler {
+
+
+
+
+
+
+
+        @Override
+
+
+
+        public void handleMessage(Message msg) {
+
+
+
+        KetrisCanvas.this.update();
+
+
+
+        KetrisCanvas.this.invalidate();
+
+
+
+        }
+
+
+
+
+
+
+
+        public void sleep(long delayMillis) {
+
+
+
+        this.removeMessages(0);
+
+
+
+            sendMessageDelayed(obtainMessage(0), delayMillis);
+
+
+
+        }
+
+
+
+    };
+
+
+
+    long mLastMove=0;
+
+
+
+    long mMoveDelay=30;
+
+
+
+    public void update() {
+
+
+
+            long now = System.currentTimeMillis();
+
+
+
+
+
+
+
+            if (now - mLastMove > mMoveDelay) {
+
+
+
+                //gameLogic(); 这里是游戏逻辑
+
+
+
+            
+
+
+
+                mLastMove = now;
+
+
+
+            }
+
+
+
+            mRedrawHandler.sleep(mMoveDelay);
+
+
+
+      
+
+
+
+    }
+
+
+
+public void onDraw(Canvas canvas)
+
+
+
+{super.onDraw(canvas);
+
+
+
+this.paint(); //这里是绘制到缓冲屏幕
+
+
+
+canvas.drawBitmap(g.offs, 0, 0, g.p);
+
+
+
+}
+
+
+
+//在适当位置执行update();
+复制代码第二种方式:
+
+public class KetrisCanvas extends SurfaceView implements SurfaceHolder.Callback
+
+
+
+{  
+
+
+
+//在构造方法完成  下面2句
+
+
+
+    holder = this.getHolder();//获取holder
+
+
+
+    holder.addCallback(this);
+
+
+
+
+
+@Override
+
+
+
+public void surfaceChanged(SurfaceHolder holder, int format, int width,
+
+
+
+  int height) {
+
+
+
+// TODO Auto-generated method stub
+
+
+
+}
+
+
+
+Thread t;
+
+
+
+boolean isrun=true;
+
+
+
+final SurfaceHolder holder;
+
+
+
+@Override
+
+
+
+public void surfaceCreated(SurfaceHolder holder) {
+
+
+
+// TODO Auto-generated method stub
+
+
+
+
+
+  t=new Thread(){
+
+
+
+  public void run()
+
+
+
+  { while(isrun)
+
+
+
+  {
+
+
+
+  long start=System.currentTimeMillis();
+
+
+
+      Canvas canvas=KetrisCanvas.this.holder.lockCanvas(null);
+
+
+
+    //这里完成游戏逻辑  
+
+
+
+
+
+
+
+     paint();//这里是屏幕绘制
+
+
+
+      canvas.drawBitmap(g.offs, 0, 0,null );
+
+
+
+      
+
+     KetrisCanvas.this.holder.unlockCanvasAndPost(canvas);
+
+
+
+      long end=System.currentTimeMillis();
+
+
+
+      if(200>end-start)
+
+
+
+      {
+
+
+
+      try{Thread.sleep(200-(end-start));}catch(Exception e){}
+
+
+
+      }
+
+
+
+  }
+
+
+
+  }
+
+
+
+};
+
+
+
+t.start();
+
+
+
+}
+
+
+
+@Override
+
+
+
+public void surfaceDestroyed(SurfaceHolder holder) {
+
+
+
+// TODO Auto-generated method stub
+
+
+
+if(t!=null)
+
+
+
+{ isrun=false;
+
+
+
+}
+
+
+
+}
+复制代码
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=68182

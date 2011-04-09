@@ -1,0 +1,66 @@
+当用于 C 风格字符串时，Queue 类具有与 compare 函数相似的问题。在这种情况下，问题出在 push 
+函数中，该函数复制给定值以创建 Queue 中的新元素。默认情况下，复制 C 风格字符串只会复制指
+针，不会复制字符。这种情况下复制指针将出现共享指针在其他环境中会出现的所有问题，最严重的
+是，如果指针指向动态内存，用户就有可能删除指针所指的数组。
+
+【定义类特化】
+为 C 风格字符串的 Queue 提供正确行为的一种途径，是为 const char* 定义整个类的特化版本：
+
+     /* definition of specialization for const char*
+      * this class forwards its work to Queue<string>;
+      * the push function translates the const char* parameter to a string
+      * the front functions return a string rather than a const char*
+      */
+     template<> class Queue<const char*> {
+     public:
+         // no copy control: Synthesized versions work for this class
+         // similarly, no need for explicit default constructor either
+         void push(const char*);
+         void pop()                  {real_queue.pop();}
+         bool empty() const          {return real_queue.empty();}
+         // Note: return type does not match template parameter type
+         std::string front()         {return real_queue.front();}
+         const std::string &front() const
+                                     {return real_queue.front();}
+     private:
+         Queue<std::string> real_queue; // forward calls to real_queue
+     };
+
+这个实现给了 Queue 一个数据元素：string 对象的 Queue。各个成员将它们的工作委派给这个成员。
+例如，通过调用 real_queue 的 pop 实现 pop 成员。
+
+Queue 类的这个版本没有定义复制控制成员，它唯一的数据成员为类类型，该类类型在被复制、被赋
+值或被撤销时完成正确的工作。可以使用合成的复制控制成员。
+
+这个 Queue 类实现了与 Queue 的模板版本大部分相同但不完全相同的接口，区别在于 front 成员返回
+的是 string 而不是 char*，这样做是为了避免必须管理字符数组——如果想要返回指针，就需要字符数
+组。
+
+值得注意的是，特化可以定义与模板本身完全不同的成员。如果一个特化无法从模板定义某个成员，该
+特化类型的对象就不能使用该成员。类模板成员的定义不会用于创建显式特化成员的定义。
+
+
+【★】类模板特化应该与它所特化的模板定义相同的接口，否则当用户试图使用未定义的成员时会感
+到奇怪。
+
+
+【类特化定义】
+【★】在类特化外部定义成员时，成员之前不能加 template<> 标记。
+我们的类只在类的外部定义了一个成员：
+
+     void Queue<const char*>::push(const char* val)
+     {
+         return real_queue.push(val);
+     }
+
+虽然这个函数几乎没有做什么工作，但它隐式复制了 val 指向的字符数组。复制是在对 
+real_queue.push 的调用中进行的，该调用从 const char* 实参创建了一个新的 string 对象。
+const char* 实参使用了以 const char* 为参数的 string 构造函数，string 构造函数将 val 
+所指的数组中的字符复制到未命名的 string 对象，该对象将被存储在 push 到 real_queue 的元素中。
+
+
+
+
+
+
+

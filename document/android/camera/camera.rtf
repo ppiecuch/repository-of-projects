@@ -1,5 +1,5 @@
-{\rtf1\ansi\ansicpg936\deff0\deflang1033\deflangfe2052{\fonttbl{\f0\fmodern\fprq6\fcharset134 \'cb\'ce\'cc\'e5;}{\f1\fnil\fprq2\fcharset134 \'cb\'ce\'cc\'e5;}}
-{\colortbl ;\red0\green255\blue0;\red0\green0\blue255;\red255\green0\blue255;\red128\green0\blue0;}
+{\rtf1\ansi\ansicpg936\deff0\deflang1033\deflangfe2052{\fonttbl{\f0\fmodern\fprq6\fcharset134 \'cb\'ce\'cc\'e5;}{\f1\fnil\fprq2\fcharset134 \'cb\'ce\'cc\'e5;}{\f2\froman\fprq2\fcharset0 Times New Roman;}}
+{\colortbl ;\red0\green255\blue0;\red0\green0\blue255;\red255\green0\blue255;\red128\green0\blue0;\red0\green0\blue0;\red0\green255\blue255;\red219\green229\blue241;}
 {\*\generator Msftedit 5.41.21.2509;}\viewkind4\uc1\pard\lang2052\f0\fs21\'a1\'be\'b1\'ea\'bc\'c7\'ba\'ac\'d2\'e5\'a1\'bf\'a3\'ba\par
 \cf1\kerning2\f1\'a8\'80\'a3\'ba\'d2\'c9\'ce\'ca\par
 \cf2\'a8\'80\'a3\'ba\'b0\'e6\'b1\'be\'c7\'f8\'b1\'f0\cf3\par
@@ -55,5 +55,74 @@ android.hardware.Camera.AutoFocusCallback:\'b5\'b1\'d7\'d4\'b6\'af\'b6\'d4\'bd\'
 5.setPreviewFrameRate(int fps):\'c9\'e8\'d6\'c3\'cd\'bc\'c6\'ac\'d4\'a4\'c0\'c0\'b5\'c4\'d6\'a1\'cb\'d9\'a1\'a3 \'d4\'da\'c9\'e8\'d6\'c3\'ba\'c3Camera\'b5\'c4\'b2\'ce\'ca\'fd\'ba\'f3\'a3\'ac\'bf\'c9\'d2\'d4\'cd\'a8\'b9\'fd\'ba\'af\'ca\'fdvoid startPreview()\'bf\'aa\'ca\'bc\'d4\'a4\'c0\'c0\'cd\'bc\'cf\'f1\'a1\'a2void stopPreview()\'bd\'e1\'ca\'f8\'d4\'a4\'c0\'c0\'a3\'ac\'cd\'a8\'b9\'fdautoFocus(AutoFocusCallback cb)\'c0\'b4\'d7\'d4\'b6\'af\'b6\'d4\'bd\'b9\'a3\'ac\'d7\'ee\'ba\'f3\'bf\'c9\'d2\'d4\'cd\'a8\'b9\'fdtakePicture(ShutterCallback shutter, PictureCallback raw, PictureCallback jpeg)\'ba\'af\'ca\'fd\'c0\'b4\'c5\'c4\'d5\'d5\'a1\'a3\par
 \'b8\'c3\'ba\'af\'ca\'fd\'d3\'d0\'c8\'fd\'b8\'f6\'b2\'ce\'ca\'fd\'a3\'ac\'b7\'d6\'b1\'f0\'ce\'aa\'bf\'ec\'c3\'c5\'bb\'d8\'b5\'f7\'bd\'d3\'bf\'da\'a1\'a2\'d4\'ad\'c9\'fa\'cd\'bc\'cf\'f1\'ca\'fd\'be\'dd\'bd\'d3\'bf\'da\'ba\'cd\'d1\'b9\'cb\'f5\'b8\'f1\'ca\'bd\'cd\'bc\'c6\'ac\'ca\'fd\'be\'dd\'bd\'d3\'bf\'da\'a1\'a3\par
 \'c8\'e7\'b9\'fb\'ca\'fd\'be\'dd\'b8\'f1\'ca\'bd\'b2\'bb\'b4\'e6\'d4\'da\'b5\'c4\'bb\'b0\'ca\'fd\'be\'dd\'c1\'f7\'ce\'aa\'bf\'d5\'a3\'ac\'c8\'e7\'b9\'fb\'b2\'bb\'d0\'e8\'d2\'aa\'ca\'b5\'cf\'d6\'d5\'e2\'d0\'a9\'bd\'d3\'bf\'da\'d4\'f2\'d5\'e2\'d0\'a9\'b2\'ce\'ca\'fd\'c8\'a1\'d6\'b5\'bf\'c9\'d2\'d4\'ce\'aanull\'a1\'a3 \par
+\par
+\par
+public final void setDisplayOrientation (int degrees) \par
+Since: API Level 8 \par
+\'c9\'e8\'d6\'c3 preview \'b5\'c4\'cb\'b3\'ca\'b1\'d5\'eb\'d0\'fd\'d7\'aa\'bd\'c7\'b6\'c8\'a1\'a3\'d5\'e2\'bd\'ab\'d3\'b0\'cf\'ec preview frames \'ba\'cd\'c5\'c4\'d5\'d5\'d6\'ae\'ba\'f3\'b5\'c4\'cf\'e0\'c6\'ac\'cf\'d4\'ca\'be\'a1\'a3\'b8\'c3\'b7\'bd\'b7\'a8\'d6\'f7\'d2\'aa\'d3\'c3\'d3\'da\'b4\'b9\'d6\'b1\'c4\'a3\'ca\'bd\'b5\'c4\'d3\'a6\'d3\'c3\'a1\'a3\'d7\'a2\'d2\'e2\'d4\'da\'d0\'fd\'d7\'aa\'d6\'ae\'c7\'b0\'a3\'ac front-facing cameras \'b5\'c4 preview \'cf\'d4\'ca\'be\'ca\'c7\'cb\'ae\'c6\'bd flip \'b5\'c4\'a3\'ac\'d5\'e2\'be\'cd\'ca\'c7\'cb\'b5\'a3\'ac image \'ca\'c7\'d1\'d8\'d7\'c5 camera sensor \'b5\'c4\'b4\'b9\'d6\'b1\'d6\'d0\'d0\'c4\'d6\'e1\'c0\'b4\'b7\'b4\'c9\'e4\'b5\'c4 \'a3\'a8\'ce\'de\'b7\'a8\'c0\'ed\'bd\'e2\'c6\'e4\'d2\'e2\'cb\'bc\'a3\'a9\'a1\'a3\'cb\'f9\'d2\'d4\'d3\'c3\'bb\'a7\'bf\'c9\'d2\'d4\'cf\'f1\'d5\'d5\'be\'b5\'d7\'d3\'d2\'bb\'d1\'f9\'bf\'b4\'b5\'bd\'cb\'fb\'c3\'c7\'d7\'d4\'bc\'ba\'a1\'a3\'d5\'e2\'b2\'bb\'bb\'e1\'d3\'b0\'cf\'ec\'b4\'ab\'c8\'eb\'ba\'af\'ca\'fd onPreviewFrame(byte[], Camera) \'b5\'c4\'a1\'a2 JPEG \'cf\'e0\'c6\'ac\'b5\'c4\'a1\'a2\'bb\'f2\'bc\'c7\'c2\'bc\'b5\'c4 video \'b5\'c4 byte array \'b5\'c4\'cb\'b3\'d0\'f2\'a1\'a3\'d4\'da preview \'c6\'da\'bc\'e4\'ca\'c7\'b2\'bb\'d4\'ca\'d0\'ed\'b5\'f7\'d3\'c3\'b8\'c3\'b7\'bd\'b7\'a8\'b5\'c4\'a1\'a3\'c8\'e7\'b9\'fb\'c4\'e3\'cf\'eb\'d2\'aa\'ca\'c7\'c4\'e3\'b5\'c4\'d5\'d5\'c6\'ac\'ba\'cd\'cf\'d4\'ca\'be\'b3\'f6\'c0\'b4\'b5\'c4\'bd\'c7\'b6\'c8\'d2\'bb\'d6\'c2\'a3\'ac\'c4\'e3\'bf\'c9\'d2\'d4\'b2\'ce\'bf\'bc\'cf\'c2\'c1\'d0\'b4\'fa\'c2\'eb\'a3\'ba \par
+\par
+\trowd\trgaph108\trleft-108\trbrdrl\brdrs\brdrw10\brdrcf5 \trbrdrt\brdrs\brdrw10\brdrcf5 \trbrdrr\brdrs\brdrw10\brdrcf5 \trbrdrb\brdrs\brdrw10\brdrcf5 \trpaddl108\trpaddr108\trpaddfl3\trpaddfr3
+\clcbpat7\clbrdrl\brdrw10\brdrs\brdrcf5\clbrdrt\brdrw10\brdrs\brdrcf5\clbrdrr\brdrw10\brdrs\brdrcf5\clbrdrb\brdrw10\brdrs\brdrcf5 \cellx8414\pard\intbl\fi426 public static void setCameraDisplayOrientation ( Activity activity , \par
+          int cameraId , android.hardware.Camera camera ) \{ \par
+     android.hardware.Camera.CameraInfo info = \par
+              new android.hardware.Camera.CameraInfo (); \par
+     android.hardware.Camera.getCameraInfo ( cameraId , info ); \par
+      int rotation = activity.getWindowManager (). getDefaultDisplay () \par
+             .getRotation (); \par
+      int degrees = 0 ; \par
+      switch ( rotation ) \{ \par
+          case Surface.ROTATION_0 : degrees = 0 ; break ; \par
+          case Surface.ROTATION_90 : degrees = 90 ; break ; \par
+          case Surface.ROTATION_180 : degrees = 180 ; break ; \par
+          case Surface.ROTATION_270 : degrees = 270 ; break ; \par
+      \} \par
+\par
+      int result ; \par
+      if ( info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT ) \{ \par
+         result = ( info.orientation + degrees ) % 360 ; \par
+         result = ( 360 - result ) % 360 ;   // compensate the mirror \par
+      \} else \{   // back-facing \par
+         result = ( info.orientation - degrees + 360 ) % 360 ; \par
+      \} \par
+     camera.setDisplayOrientation ( result ); \par
+  \} \par
+\pard\intbl\nowidctlpar\fi420\qj   \lang1033\kerning2\f2\cell\row\pard\fi426\lang2052\kerning0\f0\par
+\par
+Parameters \par
+\par
+degrees \par
+ the angle that the picture will be rotated clockwise. Valid values are 0, 90, 180, and 270. The starting position is 0 (landscape). \par
+ \par
+\par
+See Also \par
+\tab  setPreviewDisplay(SurfaceHolder) \par
+\par
+\par
+\par
+\par
+public final void takePicture (Camera.ShutterCallback shutter, Camera.PictureCallback raw, Camera.PictureCallback postview, Camera.PictureCallback jpeg) \par
+Since: API Level 5 \par
+\par
+\'b4\'a5\'b7\'a2\'d2\'bb\'b4\'ce\'b7\'c7\'cd\'ac\'b2\'bd\'c5\'c4\'d5\'d5\'a3\'ac camera service \'bd\'ab\'b0\'b4\'d5\'d5\'c5\'c4\'d5\'d5\'b5\'c4\'c1\'f7\'b3\'cc\'ce\'aa\'d3\'a6\'d3\'c3\'cd\'ea\'b3\'c9\'d2\'bb\'cf\'b5\'c1\'d0\'b5\'c4\'bb\'d8\'b5\'f7\'b3\'f5\'ca\'bc\'bb\'af\'a1\'a3 shutter callback \'a3\'ac\'c5\'c4\'d5\'d5\'d6\'ae\'ba\'f3\'bb\'e1\'b5\'f7\'d3\'c3\'b8\'c3\'bb\'d8\'b5\'f7 . \'b8\'c3\'ba\'af\'ca\'fd\'d6\'d0\'bf\'c9\'d2\'d4\'b4\'a5\'b7\'a2\'d2\'bb\'b8\'f6\'c9\'f9\'d2\'f4\'a3\'ac\'cc\'e1\'ca\'be\'d3\'c3\'bb\'a7\'c5\'c4\'d5\'d5\'cd\'ea\'b3\'c9\'a1\'a3 The raw callback occurs \'a3\'ac\'b5\'b1 raw image data \'d3\'d0\'d0\'a7\'b5\'c4\'ca\'b1\'ba\'f2\'a3\'ac\'bb\'e1\'b4\'a5\'b7\'a2\'b8\'c3\'bb\'d8\'b5\'f7 ( \'d7\'a2\'d2\'e2 : \'c8\'e7\'b9\'fb\'c3\'bb\'d3\'d0\'d7\'e3\'b9\'bb\'b5\'c4 memory \'d3\'c3\'c0\'b4\'b7\'c5\'d6\'c3\'bf\'bd\'b1\'b4\'a3\'ac\'b8\'c3\'d6\'b5\'bf\'c9\'c4\'dc\'ce\'aa ). The postview callback , \'b5\'b1\'c9\'fa\'b3\'c9\'c1\'cb\'be\'ad\'b9\'fd\'cb\'f5\'b7\'c5\'a1\'a2\'bc\'f2\'b5\'a5\'b4\'a6\'c0\'ed\'b5\'c4\'cd\'bc\'c6\'ac\'b5\'c4\'ca\'b1\'ba\'f2\'a3\'ac\'b5\'f7\'d3\'c3 postview callback \'bb\'d8\'b5\'f7 ( \'d7\'a2\'d2\'e2\'a3\'ba\'b2\'a2\'b2\'bb\'ca\'c7\'cb\'f9\'d3\'d0\'b5\'c4\'d3\'b2\'bc\'fe\'b6\'bc\'d6\'a7\'b3\'d6\'b8\'c3\'b9\'a6\'c4\'dc ) \'a1\'a3 The jpeg callback \'a3\'ac\'b5\'b1\'d1\'b9\'cb\'f5\'b5\'c4\'cd\'bc\'c6\'ac\'ca\'fd\'be\'dd\'d3\'d0\'d0\'a7\'b5\'c4\'ca\'b1\'ba\'f2\'a3\'ac\'bb\'e1\'b5\'f7\'d3\'c3\'b8\'c3\'bb\'d8\'b5\'f7\'bd\'d3\'bf\'da\'a1\'a3\'b6\'d4\'d3\'da\'d5\'e2\'d0\'a9\'b2\'ce\'ca\'fd\'a3\'ac\'c8\'e7\'b9\'fb\'c3\'bb\'d3\'d0\'d0\'e8\'d2\'aa\'a3\'ac\'bf\'c9\'d2\'d4\'d6\'b1\'bd\'d3\'b4\'ab\'b5\'dd null \'bc\'b4\'bf\'c9 . \par
+\par
+\'b5\'b1\'c8\'bb\'d5\'e2\'d0\'a9\'bb\'d8\'b5\'f7\'b7\'bd\'b7\'a8\'a3\'ac\'b6\'bc\'b1\'d8\'d0\'eb\'d4\'da preview \'ca\'c7\'bc\'a4\'bb\'ee\'b5\'c4 ( \'bc\'b4\'d4\'da\'ba\'af\'ca\'fd startPreview() \'b5\'f7\'d3\'c3\'d6\'ae\'ba\'f3 ). \'cd\'ea\'b3\'c9\'c5\'c4\'d5\'d5\'d6\'ae\'ba\'f3\'a3\'ac preview \'bb\'e1\'cd\'a3\'d6\'b9\'a3\'ac\'d5\'e2\'b8\'f6\'ca\'b1\'ba\'f2\'c8\'e7\'b9\'fb\'c4\'e3\'cf\'eb\'d2\'aa\'d4\'d9\'b4\'ce\'bf\'aa\'c6\'f4 preview \'a3\'ac\'c5\'c4\'c9\'e3\'b8\'fc\'b6\'e0\'b5\'c4\'d5\'d5\'c6\'ac\'a3\'ac\'c4\'e3\'d0\'e8\'d2\'aa\'d6\'d8\'d0\'c2\'b5\'f7\'d3\'c3 startPreview() . \par
+\par
+. \par
+\par
+Parameters \par
+\par
+shutter \par
+ the callback for image capture moment, or null \par
+raw \par
+ the callback for raw (uncompressed) image data, or null \par
+postview \par
+ callback with postview image data, may be null \par
+jpeg \par
+ the callback for JPEG image data, or null \par
+ \par
+\par
+\par
+\'b1\'be\'ce\'c4\'c0\'b4\'d7\'d4CSDN\'b2\'a9\'bf\'cd\'a3\'ac\'d7\'aa\'d4\'d8\'c7\'eb\'b1\'ea\'c3\'f7\'b3\'f6\'b4\'a6\'a3\'ba{\field{\*\fldinst{HYPERLINK "http://blog.csdn.net/raindrophust/archive/2011/02/24/6205038.aspx"}}{\fldrslt{\ul\cf2 http://blog.csdn.net/raindrophust/archive/2011/02/24/6205038.aspx}}}\f0\fs21\par
+\par
 }
  

@@ -1,0 +1,48 @@
+如果更深入一点分析我们的类，就能够看到代码可以简化：除了特化整个模板之外，还可以只特化
+ push 和 pop 成员。我们将特化 push 成员以复制字符数组，并且特化 pop 成员以释放该副本使用的
+ 内存：
+
+     template <>
+     void Queue<const char*>::push(const char *const &val)
+     {
+          // allocate a new character array and copy characters from val
+          char* new_item = new char[strlen(val) + 1];
+          strncpy(new_item, val, strlen(val) + 1);
+          // store pointer to newly allocated and initialized element
+          QueueItem<const char*> *pt =
+              new QueueItem<const char*>(new_item);
+          // put item onto existing queue
+          if (empty())
+              head = tail = pt; // queue has only one element
+          else {
+              tail->next = pt;  // add new element to end of queue
+              tail = pt;
+          }
+     }
+     template <>
+     void Queue<const char*>::pop()
+     {
+          // remember head so we can delete it
+          QueueItem<const char*> *p = head;
+          delete head->item; // delete the array allocated in push
+          head = head->next; // head now points to next element
+          delete p;          // delete old head element
+     }
+
+现在，类类型 Queue<const char*> 将从通用类模板定义实例化而来，而 push 和 pop 函数例外。调
+用 Queue<const char*> 对象的 push 或 pop 函数时，将调用特化版本；调用任意其他成员时，将从
+类模板为 const char* 实例化一个通用版本。
+
+【特化声明】
+【★】成员特化的声明与任何其他函数模板特化一样，必须以空的模板形参表开头：
+
+     // push and pop specialized for const char*
+     template <>
+     void Queue<const char*>::push(const char* const &);
+     template <> void Queue<const char*>::pop();
+
+
+
+
+这些声明应放在 Queue 类的头文件中。
+

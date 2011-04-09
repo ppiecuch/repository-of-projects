@@ -1,0 +1,9 @@
+测试支持：
+return (((ActivityManager)getSystemService(this.ACTIVITY_SERVICE)). getDeviceConfigurationInfo().reqGlEsVersion > 0x20000);
+
+
+view.setEGLContextClientVersion(2);
+
+xml 肯定要设置，openGLES2.0 与ES1.0有蛮大的区别哦（我也没调试好） xml 是这样的：<uses-feature android:glEsVersion="0x00020000" /> 
+
+OpenGL ES2.0不能使用固定流水管线，你得对着色器（Shader，在OpenGL里指GLSL）有一定的了解。 

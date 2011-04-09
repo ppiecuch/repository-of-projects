@@ -1,0 +1,312 @@
+在上一篇文章中实现了一个带选择框的listview。但是那个例子有个.很严重的问题：必须点击选择框才能选择该列，这在模拟器上没有什么大问题，可是在手机上时问题就来了。手机的屏幕一般很小，那个选择框也会变得很小，如果有些人的指头又粗的话，点击选择框是件很不爽的问题。一般的listview都要支持对整个列的点击响应，在本例中就实现来这个功能。 
+
+    这个例子是基于上个例子来实现的，只是做了一些修改，下面只对修改的地方做出说明。修改主要体现在showlist1.java上。这里用到了ListView.CHOICE_MODE_MULTIPLE，在androidAPIDEMO中实现带选择框的listview时就使用来该参数，设置来该参数后，每次点击listview都会n(n是要显示的条目数）次调用重写的getview方法来更新各个条目的选择状态。在对Listitem的点击事件中，更新记录条目选择状态的ArrayList<Boolean> CheckItemm，这也是getview方法用来更新显示状态的依据。另外本例中去掉来上次中所用到的checkbox，而使用了CheckedTextView来代替，使实现起来能够更加容易。值得一提的是，通过重写getview方法，我们可以得到任何想要的view，也就是说，在listview每一行都是一个view，该view即为getview方法的返回值。
+
+
+
+
+
+package com.test;
+
+
+
+import android.app.Activity;
+
+import android.content.Context;
+
+import android.graphics.Bitmap;
+
+import android.graphics.BitmapFactory;
+
+import android.os.Bundle;
+
+import android.util.Log;
+
+import android.view.LayoutInflater;
+
+import android.view.View;
+
+import android.view.View.OnClickListener;
+
+import android.view.ViewGroup;
+
+import android.widget.AdapterView;
+
+import android.widget.AdapterView.OnItemClickListener;
+
+import android.widget.BaseAdapter;
+
+import android.widget.Button;
+
+import android.widget.CheckedTextView;
+
+import android.widget.ImageView;
+
+import android.widget.ListView; 
+import android.widget.Toast;
+
+
+
+import java.util.ArrayList;
+
+
+
+
+
+public class ShowList1 extends Activity implements OnClickListener {
+
+    private String TAG="showlist1";
+
+    ListView list;
+
+    Button button;
+
+    ArrayList<String> array;
+
+    ArrayList<Boolean> checkedItem=new ArrayList<Boolean>();
+
+    private Bitmap mIcon1;
+
+    CheckAdapter chadapter;
+
+
+
+    public void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+
+        mIcon1 = BitmapFactory.decodeResource(this.getResources(), R.drawable.icon48x48_1);
+
+        setContentView(R.layout.list1);
+
+        list=(ListView)findViewById(R.id.listView);
+
+        button=(Button)findViewById(R.id.result);
+
+        button.setOnClickListener(this);
+
+        //get music names from other activity
+
+        array=getIntent().getStringArrayListExtra("list");
+
+        //init the check box status to unchecked
+
+        for(int i=0;i<array.size();i++){
+
+            checkedItem.add(i,false);
+
+        }
+
+        Log.d(TAG,array.toString());
+
+       chadapter=new CheckAdapter(this);
+
+       list.setAdapter(chadapter);
+
+       list.setItemsCanFocus(false);
+
+       list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+
+
+       list.setOnItemClickListener(new OnItemClickListener(){
+
+            public void onItemClick(AdapterView<?> parent, Viewview, int position, long id) {
+
+                //update the value of checked items
+
+                if(checkedItem.get(position)==true){
+
+                    checkedItem.set(position,false);
+
+                    Log.d(TAG,"true");
+
+                }
+
+                else{
+
+                    checkedItem.set(position,true);
+
+                    Log.d(TAG,"false");
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+
+    /*
+
+     * (non-Javadoc)
+
+     * @see android.view.View.OnClickListener#onClick(android.view.View)
+
+     * see which has been choosed
+
+     */
+
+    @Override
+
+    public void onClick(View v) {
+
+        String s="You have choosed ";
+
+        for(int i=0;i<array.size();i++){
+
+            if(checkedItem.get(i)){
+
+                s=s+","+array.get(i);
+
+            }
+
+        }
+
+        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+
+    }
+
+
+
+    class CheckAdapter extends BaseAdapter {
+
+        private LayoutInflater mInflater;
+
+        public CheckAdapter(Context context){
+
+            this.mInflater=LayoutInflater.from(context);
+
+        }
+
+
+
+        public int getCount() {
+
+            return array.size();
+
+        }
+
+        public Object getItem(int position) {
+
+            return position;
+
+        }
+
+        public long getItemId(int position) {
+
+            return position;
+
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            Log.d(TAG,"getview");
+
+            ImageView img;
+
+            CheckedTextView name;
+
+            View view;
+
+            final int p=position;
+
+            if(convertView==null){
+
+                view=mInflater.inflate(R.layout.api,parent,false);
+
+            }
+
+            else{
+
+                view=convertView;
+
+            }
+
+            img=(ImageView)view.findViewById(R.id.img);
+
+            name=(CheckedTextView)view.findViewById(R.id.text);
+
+            img.setImageBitmap(mIcon1);
+
+            final String s=(String)array.get(position);
+
+            name.setText(s);
+
+            //display which item has been checked
+
+            if(checkedItem.get(p)==true)
+
+                name.setChecked(true);
+
+            else
+
+                name.setChecked(false);
+
+            return view;
+
+        }
+
+    }
+
+}
+
+
+
+     最后修改的地方是布局文件，该文件命名为api.xml。在其中主有有两部分，分别是ImageView和CheckedTextView，实现的界面同上例中的界面是相同的，图片就不再贴出了。
+
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+
+  xmlns:android="http://schemas.android.com/apk/res/android"
+
+  android:orientation="horizontal"
+
+  android:layout_width="wrap_content"
+
+  android:layout_height="wrap_content">
+
+ <ImageView
+
+    android:id="@+id/img"
+
+    android:layout_width="48dip"
+
+    android:layout_height="48dip" 
+
+    android:layout_marginTop="7.0dip"
+
+    android:layout_marginLeft="5.0dip"
+
+    android:layout_marginRight="5.0dip" 
+
+  />
+
+<CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:id="@+id/text"
+
+    android:layout_width="fill_parent"
+
+    android:layout_height="?android:attr/listPreferredItemHeight"
+
+    android:textAppearance="?android:attr/textAppearanceLarge"
+
+    android:gravity="center_vertical"
+
+    android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+
+    android:paddingLeft="6dip"
+
+    android:paddingRight="6dip"
+
+    android:layout_toRightOf="@id/img"
+
+/>
+
+</RelativeLayout>
+http://blog.chinaunix.net/space.php?uid=20771867&do=blog&id=195830

@@ -1,0 +1,14 @@
+如果你在使用Android Market下载应用可能会发现StatusBar拉下后区域除了显示常规的图标、文字和描述外还有一个进度条指示。
+
+在Android的 Notification中如何加入ProgressBar呢?我们发现NotificationManager类只涉及一个提示的显示和取消，相关的细节还是在构造Notification中实现，该类的contentView属性可以帮助我们制定一个RemoteViews的布局，通过 setProgressBar来实现对RemoteViews的进度指示做刷新工作，如果你做过Android上的Widget，则不会对 RemoteViews陌生吧，实现图片和文字的修改可以通过setImageViewResource或setTextViewText方法实现。 eoe需要说明的是：
+
+RemoteViews在构造时第二个参数需要制定一个xml的布局文件。类似:
+
+RemoteViews(getPackageName(),R.layout.android123);
+复制代码
+而对于它的设置进度，4个参数中，第一个为RemoteViews中的ProcessBar ID，第二个参数为进度条的最大范围，第三个是当前的进度指示一般我们在单独的线程中处理逻辑，可以通过Handler实时回调显示状态比如:
+
+setProgressBar(R.id.myProcessBar,maxProcess, currentPos, false);
+复制代码
+
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=68407

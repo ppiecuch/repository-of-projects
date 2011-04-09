@@ -1,0 +1,87 @@
+我们希望 Handle 类能够用于其他类的内部实现中。但是，为了帮助理解 Handle 类怎样工作，交首先
+介绍一个较简单的例子。这个例子通过分配一个 int 对象，并将一个 Handle 对象绑定到新分配的 
+int 对象而说明 Handle 的行为：
+
+     { // new scope
+       // user allocates but must not delete the object to which the Handle is attached
+       Handle<int> hp(new int(42));
+       { // new scope
+           Handle<int> hp2 = hp; // copies pointer; use count incremented
+           cout << *hp << " " << *hp2 << endl; // prints 42 42
+           *hp2 = 10;           // changes value of shared underlying int
+       }   // hp2 goes out of scope; use count is decremented
+       cout << *hp << endl; // prints 10
+     } // hp goes out of scope; its destructor deletes the int
+
+
+即使是 Handle 的用户分配了 int 对象，Handle 析构函数也将删除它。在外层代码块末尾最后一个
+ Handle 对象超出作用域时，删除该 int 对象。为了访问基础对象，应用了 Handle 的 * 操作符，该
+ 操作符返回对基础 int 对象的引用。
+
+【使用 Handle 对象对指针进行使用计数】
+作为在类实现中使用 Handle 的例子，可以重新实现 Sales_item 类（第 15.8.1 节），该类的这个版
+本定义相同的接口，但可以通过用 Handle<Item_base>: 对象代替 Item_base 指针而删去复制控制成
+员：
+
+     class Sales_item {
+     public:
+         // default constructor: unbound handle
+         Sales_item(): h() { }
+         // copy item and attach handle to the copy
+         Sales_item(const Item_base &item): h(item.clone()) { }
+         // no copy control members: synthesized versions work
+         // member access operators: forward their work to the Handle class
+         const Item_base& operator*() const { return *h; }
+         const Item_base* operator->() const
+                                { return h.operator->(); }
+     private:
+         Handle<Item_base> h; // use-counted handle
+     };
+虽然 Sales_item 类的接口没变，它的实现与原来的相当不同：
+1.两个类都定义了默认构造函数和以 Item_base 对象为参数和 const 引用的构造函数。
+2.两个类都将重载的 * 和 -> 操作符定义为 const 成员。
+
+基于 Handle 的 Sales_item 版本有一个数据成员，该数据成员是关联传给构造函数的 Item_base 对
+象的副本上的 Handle 对象。因为 Sales_item 的这个版本没有指针成员，所以不需要复制控制成员，
+Sales_item 的这个版本可以安全地使用合成的复制控制成员。管理使用计数和相关 Item_base 对象
+的工作在 Handle 内部完成。
+
+因为接口没变，所以不需要改变使用 Sales_item 类的代码。例如，第 15.8.3 节中编写的程序可以
+无须改变而使用：
+
+     double Basket::total() const
+     {
+         double sum = 0.0; // holds the running total
+         /* find each set of items with the same isbn and calculate
+          * the net price for that quantity of items
+          * iter refers to first copy of each book in the set
+          * upper_boundrefers to next element with a different isbn
+          */
+         for (const_iter iter = items.begin();
+                         iter != items.end();
+                         iter = items.upper_bound(*iter))
+         {
+             // we know there's at least one element with this key in the Basket
+             // virtual call to net_priceapplies appropriate discounts, if any
+             sum += (*iter)->net_price(items.count(*iter));
+         }
+         return sum;
+     }
+
+
+调用 net_price 函数的语句值得仔细分析一下：
+
+     sum += (*iter)->net_price(items.count(*iter));
+
+
+这个语句使用 -> 操作符获取并运行 net_price 函数，重要的是理解这个操作符怎样工作：
+(*iter) 返回 h，h 是使用计数式句柄的成员。
+因此，(*iter)-> 使用句柄类的重载箭头操作符。 
+编译器计算 h.operator->()，获得该 Handle 对象保存的 Item_base 指针。
+
+编译器对该 Item_base 指针解引用，并调用指针所指对象的 net_price 成员。 
+
+
+
+
+
