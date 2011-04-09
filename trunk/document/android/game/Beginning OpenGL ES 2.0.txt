@@ -1,0 +1,228 @@
+Beginning OpenGL ES 2.0
+Posted on September 8, 2010 by admin 
+With the release of android 2.x came support for OpenGL ES 2.0. Based on OpenGL 2.0, one of the benefits is that it allows you to write your own shaders. There are some differences going from 1.1 to 2.0 and I¡¯m going to explain some of them with a small example. My code is primarily based on the GLES20TriangleRenderer, which is the only example on how to use OpenGL ES 2.0, I have found in the reference. Please bear in mind that I only recently started using this myself, so I can¡¯t guarantee that everything, in this and following tutorials, is correct. Also I might not always remember where i found certain things, so if I have borrowed code from you and forgot a reference, please don¡¯t hesitate to e-mail me. 
+
+Setting up the view
+
+If you are familiar with OpenGL ES 1.1, then this next part should not cause any problems. As with any program in Android, you start with a basic Activity:
+
+public class TestGL extends Activity {
+
+   private GLSurfaceView view;
+
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+     	view = new GLSurfaceView(this);
+     	view.setEGLContextClientVersion(2);
+     	view.setRenderer(new GLRenderer(this));
+       	setContentView(view);
+    }
+
+The first few lines, creates a fullscreen window. Afterwards we use the GLSurfaceview which creates a dedicated view to display OpenGL rendering. The GLSurfaceview provides the following:
+
+Manages a surface, which is a special piece of memory that can be composited into the Android view system. 
+Manages an EGL display, which enables OpenGL to render into a surface. 
+Accepts a user-provided Renderer object that does the actual rendering. 
+Renders on a dedicated thread to decouple rendering performance from the UI thread. 
+Supports both on-demand and continuous rendering. 
+Optionally wraps, traces, and/or error-checks the renderer¡¯s OpenGL calls. 
+With the command "setEGLContextClientVersion(2)¡± we tell, that we want to use OpenGL ES 2.0. Of course this will fail if your device doesn¡¯t support version 2.0. If you want to test if you device supports version 2.0 you can use the following:
+
+return (((ActivityManager)getSystemService(this.ACTIVITY_SERVICE)). getDeviceConfigurationInfo().reqGlEsVersion > 0x20000);
+
+Next up is creating a renderer and adding this to your view. This is done with the setRenderer function. The GLSurfaceView has a standard Renderer with three methods you should override in order to use OpenGL ES 2.0:
+
+onSurfaceCreated(GL10 gl, EGLConfig config) 
+onSurfaceChanged(GL10 gl, int width, int height) 
+onDrawFrame(GL10 gl) 
+As the names imply onSurfaceCreated is called when you first init your renderer and is only called once. onSurfaceChanged is called when you init your renderer and every time your configuration changes (eg. your device changes from landscape to portrait, or the device changes resolution). onDrawFrame is you main loop. This is where you draw everything in each frame.
+You might have noticed that these methods take a parameter GL10 gl. This is the parameter you would normally use when coding with version 1.1 of OpenGL ES. When it comes to version 2.0 this parameter is not used at all, but is just needed to overwrite the methods in the Renderer class. Insted we make use of the class GLES20. Now this class contains a lot of the same methods as GL10. If for instance you wanted to enable backface-culling for everything you draw, a good place to do that would be in the onSurfaceCreated:
+
+@Override
+public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+	GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+	GLES20.glFrontFace(GLES20.GL_CCW);
+	GLES20.glEnable(GLES20.GL_CULL_FACE);
+	GLES20.glCullFace(GLES20.GL_BACK);
+}
+
+I use GLES20 directly, but you could of course also create an instance of it. I won¡¯t go into detail with the above functions, they are basic OpenGL and there are lots of tutorials on backface-culling and how to enable it.
+
+Now i started this post by mentioning that there are benefits to using OpenGL ES 2.0 (like creating your own shaders). Unfortunately some of the more handy things to have, are removed, meaning there is a bit more work to do, in order to do some basic rendering. These are some of the the things that are no longer available:
+
+The matrix stack and coordinate transforms 
+Fixed funtion pipeline 
+All per-primitive attributes (like glColor) 
+If you want to know more about what is in and what is out, i refer you to this document, which gives a pretty good overview.
+
+Now what does all this mean to you. Well ¨C for starters you can no longer use glMatrix operations, which normally keep track of how you translate/rotate/scale your meshes. Fortunately the good people at google made a helper class called Matrix, which has all the functions needed in order to make rotations, translations and so on. It also has methods for defining a projection matrix (frustrumM), an orthographic projection matrix (orthoM) and a viewing transformation, which defines from which point you will be looking at what you eventually render (setLookAtM).
+
+We will look more at this Matrix class later on when we are going to render meshes. First up we need to setup the basic view which is done in onSurfaceChanged:
+
+@Override
+public void onSurfaceChanged(GL10 gl, int width, int height) {
+	GLES20.glViewport(0, 0, width, height);
+	Matrix.orthoM(projMatrix, 0, 0, width, 0, height, 0.01f, 100.0f);
+	Matrix.setLookAtM(mvMatrix, 0, 0, 0, 10,
+	0, 0, 0, 0, 1, 0);
+}
+
+The above sets the viewport to fill the screen, makes an ortographic projection matrix the same size as the viewport (you can substitute with a perspective matrix if you need it), and sets the viewpoint i z=10, looking directly at {0,0,0}, having the y-axis pointing up. You will need these matrixes later on.
+
+Creating and loading shaders
+At this point we would normally be ready to begin rendering by specifying vertices in the onDrawFrame method. The only problem is that since we no longer have the fixed function pipeline, we need to create a shader for the vertices and a shader for fragments. A basic vertex shader could be specified as follows:
+
+
+	uniform mat4 u_mvpMatrix;
+	attribute vec4 a_position;
+	attribute vec4 a_color;
+	varying vec4 v_color;
+	void main() {
+		gl_Position = u_mvpMatrix * a_position;
+		v_color = a_color;
+	}
+
+What this shader does is to take a modelview-projection matrix and multiply it with the vertex position giving us the clipping coordinates for the vertex and passing the color on to the fragment shader. There are three types of input to this shader. Uniforms are read-only values, that are passed only once to the shader for a range of vertices. Attributes are per-vertex values that are available to the vertex shader. Varying variables are used to store output from vertex shaders, and also as input variables to fragment shaders. Later on you will see how to pass values from the OpenGL program to the shader. gl_Position is a built-in variable used to store the clip coordinates used in later stages of the pipeline.
+
+Next we need to define a basic fragment shader:
+
+
+	precision mediump float;
+        varying vec4 v_color;
+	void main()\n {
+		gl_FragColor = v_color;
+	}
+
+You will notice that declaring the same varying variable in both the vertex and the fragment program makes sure that the value is passed on and interpolated in the fragment shader. The only thing this shader does is to take the color as input and pass it on to the built-in variable gl_FragColor, which then in turn is passed on to the per-fragment operations later in the pipeline.
+
+This is as mentioned pretty much the most basic shaders to implement. In later tutorials i might go into more detail regarding shaders (passing texture-coordinates, light and so on), but for now we just need to be able to render something. If you want more info on shaders I would recommend looking at this specification.
+
+There are two ways to load shaders. You can either do an ¡°online¡± compile using glCompileShader or an ¡°offline¡± compile using glShaderBinary. I just use the ¡°online¡± version as it is easy to have your shader in a string and compile it when needed. The following code loads and returns a vertex/fragment-program ready for use. The source for this is taken directly from the GLES20TriangleRenderer:
+
+public int createProgram(String vertexSource, String fragmentSource) {
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
+        if (vertexShader == 0) {
+            return 0;
+        }
+
+        int pixelShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSource);
+        if (pixelShader == 0) {
+            return 0;
+        }
+
+        int program = GLES20.glCreateProgram();
+        if (program != 0) {
+            GLES20.glAttachShader(program, vertexShader);
+            checkGlError("glAttachShader");
+            GLES20.glAttachShader(program, pixelShader);
+            checkGlError("glAttachShader");
+            GLES20.glLinkProgram(program);
+            int[] linkStatus = new int[1];
+            GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
+            if (linkStatus[0] != GLES20.GL_TRUE) {
+                Log.e(TAG, "Could not link program: ");
+                Log.e(TAG, GLES20.glGetProgramInfoLog(program));
+                GLES20.glDeleteProgram(program);
+                program = 0;
+            }
+        }
+        return program;
+}
+
+private int loadShader(int shaderType, String source) {
+	int shader = GLES20.glCreateShader(shaderType);
+        if (shader != 0) {
+            GLES20.glShaderSource(shader, source);
+            GLES20.glCompileShader(shader);
+            int[] compiled = new int[1];
+            GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);
+            if (compiled[0] == 0) {
+                Log.e(TAG, "Could not compile shader " + shaderType + ":");
+                Log.e(TAG, GLES20.glGetShaderInfoLog(shader));
+                GLES20.glDeleteShader(shader);
+                shader = 0;
+            }
+        }
+        return shader;
+}
+
+Knowing how to compile a shader, we are now ready to actually load a shader, and create handles for the parameters.
+
+Preparing to use the shader
+Since you only need to load the shader once, a good place to do it would be in the onSurfaceCreated method. The following example shows how to load and get handles for the parameters used in the shaders specified above, given you have the shader code specified in strings called vertexShader/fragmentShader
+
+shaderProgram = createProgram(vertexShader, fragmentShader);
+poshandle = GLES20.glGetAttribLocation(program, "a_position");
+colorhandle = GLES20.glGetAttribLocation(program, "a_color");
+mvphandle = GLES20.glGetUniformLocation(program, "u_mvpMatrix");
+
+At this point we have a shader and handles which will be used to set the vertex-array and the color-array
+
+A basic triangle
+Since this is a simple example, I¡¯m going to show you how to render a triangle using the shaderprogram we just created. We create a simple triangle from the class below:
+
+public class Triangle
+	public FloatBuffer v = null;
+	public FloatBuffer c = null;
+	public ShortBuffer i = null;
+	public int indices = 3;
+
+	Public Triangle() {
+		float[] vertices = {-1,-1,0, 1,-1,0,0.5f,1,0};
+        	v = ByteBuffer.allocateDirect(vertices.length *4)
+		.order(ByteOrder.nativeOrder()).asFloatBuffer();
+        	v.put(vertices).position(0);
+
+		float[] color = {1,0,0,0,1,0,0,0,1};
+	        c = ByteBuffer.allocateDirect(color.length *4)
+		.order(ByteOrder.nativeOrder()).asFloatBuffer();
+	        c.put(color).position(0);
+
+		short[] ind = {0,1,2};
+		i= ByteBuffer.allocateDirect(ind.length *2)
+	        .order(ByteOrder.nativeOrder()).asShortBuffer();
+        	i.put(ind).position(0);
+	}
+}
+
+The code above creates three simple arrays which contain the position of the vertices, the color for each vertex and the order in which to draw these. They are then put into FloatBuffers (for efficiency).
+
+Drawing to the screen
+We are now finally ready to draw the triangle to the screen. As mentioned earlier this should be done in the onDrawFrame method:
+
+private Triangle t = new Triangle();
+
+public void onDrawFrame(GL10 gl) {
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClear( GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glUseProgram(shaderProgram);
+
+        GLES20.glVertexAttribPointer(poshandle, 3, GLES20.GL_FLOAT, false,0, t.v);
+        GLES20.glEnableVertexAttribArray(poshandle);
+
+    	GLES20.glVertexAttribPointer(colorhandle, 4, GLES20.GL_FLOAT, false, 0, t.c);
+    	GLES20.glEnableVertexAttribArray(colorhandle);
+
+	float[] mvpMatrix = new float[16];
+	float[] iMatrix = new float[16];
+	Matrix.setIdentityM(iMatrix, 0);
+        Matrix.multiplyMM(mvpMatrix, 0, mvMatrix, 0, iMatrix, 0);
+        Matrix.multiplyMM(mvpMatrix, 0, projMatrix, 0, mvpMatrix, 0);
+        GLES20.glUniformMatrix4fv(mvpHandle, 1, false, mvpMatrix, 0);
+
+	GLES20.glDrawElements(GLES20.GL_TRIANGLES, t.numindices,
+	GLES20.GL_UNSIGNED_SHORT, t.i);
+}
+
+We start by setting the background to black and clearing any buffers. Afterwards we tell the renderer to use the shaderProgram we loaded earlier. Using the command glVertexAttribPointer we point, first the poshandle to the array which contains our positions (vertices), and then the colorhandle to the array which contains the color for each vertex. Once we have pointed to the arrays, we need to enable them in the shader using the glEnableVertexAttribArray. At this point we just need to setup our modelview-projection matrix. This is done by loading the identity matrix into iMatrix, and then multiplying it by first the modelview matrix and then the projection matrix. The mvpMatrix is then passed on to the shaderprogram.
+Finally glDrawElements is used to draw the number of indices, in the order specified.
+
+You should now be able to render a simple triangle to the screen using OpenGL ES 2.0. Some parts of this tutorial might be a bit simple if you already know OpenGL or OpenGL ES 1.1, and then again if you have never touched OpenGL before, a lot of this might not make any sense. I just hope that some of this information was useful to you.
+
+This entry was posted in Tutorials. Bookmark the permalink. 
+http://androidgames.dk/wordpress/?p=34

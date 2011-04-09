@@ -1,0 +1,110 @@
+Writing text to screen
+Posted on December 22, 2010 by admin 
+Back from a long vacation and time to move on with another small tutorial.
+
+While trying to make a game for Android, one of the many problems I encountered was that there is no simple command for writing text to the screen in OpenGL ES 2.0. Luckily the android sdk provides an example class for OpenGL ES 1.0 which can be found here.
+
+Essentially the way to write text to screen is to do the following:
+
+Create a Bitmap. 
+Create a Canvas from the Bitmap. 
+Create a texture to later store the Bitmap 
+Draw each character you need to the canvas and store the coordinates + size of the bounding box for the character. 
+Copy the content of the Bitmap to the texture. 
+To draw a string, you draw a textured quad giving it the coordinates for each character in the texture, that you stored when drawing to the canvas. 
+As i said, this is not the worlds most simple procedure, but most of the work is already done by the labelMaker class. If you are using OpenGL ES 1.1 you should have a look at this example, which shows how to use the class. If, like me, you are using 2.0, there are a few things you need to change in order to use it.
+
+First of all, the labelMaker uses GL10. In order to use 2.0 you just need to use GLES20 functions instead. If you look at the initialize function in the class, it looks like this:
+
+
+public void initialize(GL10 gl) {
+  mState = STATE_INITIALIZED;
+  int[] textures = new int[1];
+  gl.glGenTextures(1, textures, 0);
+  mTextureID = textures[0];
+  gl.glBindTexture(GL10.GL_TEXTURE_2D, mTextureID);
+
+  // Use Nearest for performance.
+  gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
+  gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,  GL10.GL_NEAREST);
+  gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE);
+  gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
+  gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE,  GL10.GL_REPLACE);
+}
+
+To use GLES20 you just replace gl with GLES20:
+
+
+public void initialize() {
+  mState = STATE_INITIALIZED;
+  int[] textures = new int[1];
+  GLES20.glGenTextures(1, textures, 0);
+  mTextureID = textures[0];
+  GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
+
+  // Use Nearest for performance.
+  GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
+                                   GLES20.GL_NEAREST);
+  GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
+                                   GLES20.GL_NEAREST);
+  GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
+                                   GLES20.GL_CLAMP_TO_EDGE);
+  GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
+                                   GLES20.GL_CLAMP_TO_EDGE);
+}
+Do this all the places where gl functions are needed.
+
+With this simple modification we have pretty much covered step 1-5. There may be different approaches to step 6, but I¡¯ll describe what I have done. In the original code, they save the position and width/height to a Label. In the draw method they then use a function in GL11EXT called glDrawTexiOES to draw a textured Quad. Unfortunately this method does not exist in GLES20 and something else has to be done.
+
+What i do is to have a primitive called Quad (This is a class similar to the Triangle class described in an earlier post). A quad consists of width/height and in this case texture coordinates, which basically is just the position and size of the character we need to draw. I then modify the last few lines of the add function of Labelmaker:
+
+
+...
+  int u2 = u + width;
+  int vBase = v + ascent;
+  int v2 = v + height;
+
+  if (drawBackground) {
+    background.setBounds(u, v, u + width, v + height);
+    background.draw(mCanvas);
+  }
+
+  if (drawText) {
+    mCanvas.drawText(text, u + padding.left + centerOffsetWidth,
+                              vBase + padding.top + centerOffsetHeight, textPaint);
+  }
+
+  float texU = u * mTexelWidth;
+  float texU2 = u2 * mTexelWidth;
+  float texV = v * mTexelHeight;
+  float texV2 = v2 * mTexelHeight;
+  float[] uv = {texU, texU2, texV, texV2};
+  Quad q = new Quad(width, height);
+
+  q.setTexCoords(uv, mTextureID);
+
+  // We know there's enough space, so update the member variables
+  mU = u + width;
+  mV = v;
+  mLineHeight = lineHeight;
+  mLabels.add(new Label(q, width, height, ascent));
+  return mLabels.size() - 1;
+}
+As you can see I have also modifed the private class Label¡¯s constructor to receive a reference of the Quad. We then need to modify the draw function of labelMaker:
+
+
+public void draw(int labelID, MHelper m) {
+    //checkState(STATE_DRAWING, STATE_DRAWING);
+    Label label = mLabels.get(labelID);
+    label.quad.draw(m, sh);
+}
+As in the original code, each character has an ID and this ID is used to get the corresponding label. In my case i have stored a Quad in the label, which contains the coordinates in the texture where the character is stored. An example of how to actually draw it to the screen can be found in my post ¡°Beginning OpenGL ES 2.0¡å
+
+The labelMaker class i use can be found here. If you wan¡¯t to use it, you need to implement your own Quad class to store the characters texture-coordinates and has a function to draw to the screen using shaders.
+
+As my labelMaker is part of a bigger project i do not currently have a simple example, but I will try to make one as soon as possible
+
+This entry was posted in Tutorials. Bookmark the permalink. 
+
+
+http://androidgames.dk/wordpress/?p=148

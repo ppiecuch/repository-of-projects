@@ -1,0 +1,71 @@
+Handle 类行为类似于指针：复制 Handle 对象将不会复制基础对象，复制之后，两个 Handle 对象将
+引用同一基础对象。要创建 Handle 对象，用户需要传递属于由 Handle 管理的类型（或从该类型派生
+的类型）的动态分配对象的地址，从此刻起，Handle 将“拥有”这个对象。而且，一旦不再有任意 
+Handle 对象与该对象关联，Handle 类将负责删除该对象。
+
+对于这一设计，我们的泛型 Handle 类的实现如下：
+
+     /* generic handle class: Provides pointerlike behavior. Although access through
+      * an unbound Handle is checked and throws a runtime_error exception.
+      * The object to which the Handle points is deleted when the last Handle goes away.
+      * Users should allocate new objects of type T and bind them to a Handle.
+      * Once an object is bound to a Handle,, the user must not delete that object.
+      */
+     template <class T> class Handle {
+     public:
+         // unbound handle
+         Handle(T *p = 0): ptr(p), use(new size_t(1)) { }
+         // overloaded operators to support pointer behavior
+         T& operator*();
+         T* operator->();
+         const T& operator*() const;
+         const T* operator->() const;
+         // copy control: normal pointer behavior, but last Handle deletes the object
+         Handle(const Handle& h): ptr(h.ptr), use(h.use)
+                                             { ++*use; }
+         Handle& operator=(const Handle&);
+         ~Handle() { rem_ref(); }
+     private:
+         T* ptr;          // shared object
+         size_t *use;     // count of how many Handle spointto *ptr
+         void rem_ref()
+             { if (--*use == 0) { delete ptr; delete use; } }
+     };
+
+这个类看来与其他句柄类似，赋值操作符也类似。
+
+     template <class T>
+     inline Handle<T>& Handle<T>::operator=(const Handle &rhs)
+     {
+         ++*rhs.use;      // protect against self-assignment
+         rem_ref();       // decrement use count and delete pointers if needed
+         ptr = rhs.ptr;
+         use = rhs.use;
+         return *this;
+     }
+
+
+Handle 类将定义的其他成员是解引用操作符和成员访问操作符，这些操作符将用于访问基础对象。
+让这些操作检查 Handle 是否确实绑定到对象，可以提供一种安全措施。如果 Handle 没有绑定到对
+象，则试图访问对象将抛出一个异常。
+
+这些操作的非 const 版本看来如下所示：
+
+     template <class T> inline T& Handle<T>::operator*()
+     {
+         if (ptr) return *ptr;
+         throw std::runtime_error
+                        ("dereference of unbound Handle");
+     }
+     template <class T> inline T* Handle<T>::operator->()
+     {
+         if (ptr) return ptr;
+         throw std::runtime_error
+                        ("access through unbound Handle");
+     }
+实现一个 Handle 类的自己的版本。
+
+
+
+
+

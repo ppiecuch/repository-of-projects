@@ -1,0 +1,114 @@
+【★】模板特化（template specialization）是这样的一个定义，该定义中一个或多个模板形参的
+实际类型或实际值是指定的。特化的形式如下：
+关键字 template 后面接一对空的尖括号（<>）；
+再接模板名和一对尖括号，尖括号中指定这个特化定义的模板形参；
+函数形参表；
+函数体。
+
+面的程序定义了当模板形参类型绑定到 const char* 时，compare 函数的特化：
+
+     // special version of compare to handle C-style character strings
+     template <>
+     int compare<const char*>(const char* const &v1,
+                              const char* const &v2)
+     {
+         return strcmp(v1, v2);
+     }
+
+【★】特化的声明必须与对应的模板相匹配。在这个例子中，模板有一个类型形参和两个函数形参，
+函数形参是类型形参的 const 引用，在这里，将类型形参固定为 const char*，因此，函数形参是 
+const char* 的 const 引用。
+
+现在，当调用 compare 函数的时候，传给它两个字符指针，编译器将调用特化版本。编译器将为任意
+其他实参类型（包括普通 char*）调用泛型版本：
+
+     const char *cp1 = "world", *cp2 = "hi";
+     int i1, i2;
+     compare(cp1, cp2); // calls the specialization
+     compare(i1, i2);   // calls the generic version instantiated with int
+     
+     
+【声明模板特化】
+与任意函数一样，函数模板特化可以声明而无须定义。模板特化声明看起来与定义很像，但省略了函数
+体：
+
+     // declaration of function template explicit specialization
+     template<>
+     int compare<const char*>(const char* const&,
+                              const char* const&);
+
+这个声明由一个后接返回类型的空模板形参表（template<>），后接一对尖括号中指定的显式模板实
+参的函数名（可选），以及函数形参表构成。模板特化必须总是包含空模板形参说明符，即 template<>，
+而且，还必须包含函数形参表。如果可以从函数形参表推断模板实参，则不必显式指定模板实参：
+
+     // error: invalid specialization declarations
+     // missing template<>
+     int compare<const char*>(const char* const&,
+                              const char* const&);
+
+     // error: function parameter list missing
+     template<> int compare<const char*>;
+
+     // ok: explicit template argument const char* deduced from parameter types
+     template<> int compare(const char* const&,
+                            const char* const&);
+
+
+【函数重载与模板特化】
+在特化中省略空的模板形参表 template<> 会有令人惊讶的结果。如果缺少该特化语法，则结果是声
+明该函数的重载非模板版本：
+
+     // generic template definition
+     template <class T>
+     int compare(const T& t1, const T& t2) { /* ... */ }
+
+     // OK: ordinary function declaration
+     int compare(const char* const&, const char* const&);
+
+compare 的定义没有定义模板特化，相反，它声明了一个普通函数，该函数含有返回类型和可与模板
+实例化相匹配的形参表。
+
+下一节将更详细地介绍重载和模板的交互作用。现在，重要的是知道，当定义非模板函数的时候，对
+实参应用常规转换；当特化模板的时候，对实参类型不应用转换。在模板特化版本的调用中，实参类
+型必须与特化版本函数的形参类型完全匹配，如果不完全匹配，编译器将为实参从模板定义实例化一
+个实例。
+
+【不是总能检测到重复定义】
+如果程序由多个文件构成，模板特化的声明必须在使用该特化的每个文件中出现。不能在一些文件中从
+泛型模板定义实例化一个函数模板，而在其他文件中为同一模板实参集合特化该函数模板。
+
+与其他函数声明一样，应在一个头文件中包含模板特化的声明，然后使用该特化的每个源文件包含该
+头文件。
+
+【普通作用域规则适用于特化】
+【★】在能够声明或定义特化之前，它所特化的模板的声明必须在作用域中。类似地，在调用模板的
+这个版本之前，特化的声明必须在作用域中：
+
+     // define the general compare template
+     template <class T>
+     int compare(const T& t1, const T& t2) { /* ... */ }
+
+     int main() {
+         // uses the generic template definition
+         int i = compare("hello", "world");
+         // ...
+     }
+     // invalid program: explicit specialization after call
+     template<>
+     int compare<const char*>(const char* const& s1,
+                              const char* const& s2)
+     { /* ... */ }
+
+这个程序有错误，因为在声明特化之前，进行了可以与特化相匹配的一个调用。当编译器看到一个函
+数调用时，它必须知道这个版本需要特化，否则，编译器将可能从模板定义实例化该函数。
+
+【★】对具有同一模板实参集的同一模板，程序不能既有显式特化又有实例化。
+【★】特化出现在对该模板实例的调用之后是错误的。
+
+
+
+
+
+
+
+
