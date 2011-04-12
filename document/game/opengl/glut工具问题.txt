@@ -1,0 +1,74 @@
+请教各位：
+#include <GL/glut.h>
+static double i=0;
+void init()
+{
+	glClearColor(0,0,0,0);
+}
+void display()
+{
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glColor3f(0,1,1);
+	glPushMatrix();	
+	glRotatef(i,0,1,0);
+	glutWireSphere(0.3,30,30);
+	glPopMatrix();
+	i+=0.05;
+ 	glutPostRedisplay();
+	glutSwapBuffers();
+}
+int main(int argc,char **argv)
+{
+	glutInit(&argc,argv);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+	glutInitWindowPosition(200,200);
+	glutInitWindowSize(500,500);
+	glutCreateWindow("1");
+	init();
+	glutDisplayFunc(display);
+	glutMainLoop();
+	return 0;
+}
+
+opengl 中观察点位于（0,0,0），向（0,0，-1）看，球旋转的时候为什么能够看到整个球，应该只看到球的一半才对呀，这是为什么？
+
+
+使用如下代码:
+
+#include "stdafx.h"
+#include <glut.h>
+
+static double i=0;
+void init()
+{
+	glClearColor(0,0,0,0);
+}
+void display()
+{
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glColor3f(0,1,1);
+	glLoadIdentity();
+	glTranslatef(0,0,-1);//注意这里
+	glRotatef(i,0,1,0);
+	glutWireSphere(0.5,30,30);
+	i+=0.05;
+ 	glutPostRedisplay();
+	glutSwapBuffers();
+}
+
+
+int _tmain(int argc, char ** argv)
+{
+	glutInit(&argc,argv);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+	glutInitWindowPosition(200,200);
+	glutInitWindowSize(500,500);
+	glutCreateWindow("1");
+	init();
+	glutDisplayFunc(display);
+	glutMainLoop();
+	return 0;
+
+}
+
+结果发现画的是半球,推断,glutWireSphere所画的原点在(0,0,-1)
