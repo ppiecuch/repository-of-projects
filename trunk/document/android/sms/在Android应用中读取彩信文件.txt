@@ -1,0 +1,154 @@
+在Android应用中读取彩信文件涉及到Android的一个数据库/data/data /com.android.providers.telephony/databases/mmssms.db和一个文件夹/data/data /com.android.providers.telephony/app_parts。要备份彩信，可以将这个数据库和文件夹拷贝到硬盘，但是在应用中却不能通过openDatabase系列方法来读这个数据库，也不能通过直接打开文件来读取附件文件，因为你的应用不是它们的所有者，不能直接读取，而要使用ContentProvider来读取，接下来eoe进行具体讲解。
+
+　　1、读取mmssms.db数据库
+
+　　彩信的标题、发送者号码、日期等数据存储在 mmssms.db的pdu表中，要读取这个表可以使用系统提供的一个ContentProvider，URI 是“content://mms”。操作这个ContentProvider和操作数据库一样，这个ContentProvider的结构也和pdu表的结构一样，Android文档对这些字段没有说明，但是可以通过将mmssms.db数据库备份到硬盘上，然后再通过Sqlite Database Browser软件来查看分析。
+
+　　content://mms主要的几个字段如下：
+
+　　◆ _id：该条彩信的主键，对应着part表(ContentProvider的URI是content://mms/part，详见后)中的mid字段。
+　　◆sub：该条彩信的标题
+　　◆date：该条彩信的接收日期
+
+　　下面的代码可以查询该CotnetProvider，得到一个cursor，并列出所有的列名。
+　　Cursor cur = getContentResolver().query(Uri.parse("content://mms"),null, null, null, null);
+
+
+
+　　String [] temp=cur.getColumnNames();
+
+
+
+　　for (int i=0;i 
+
+
+
+　　System.out.println(i+":"+temp);
+复制代码　　通过上面的方法得到cursor后，就可以对这个cursor操作，并通过get方法得到_id，然后根据这个_id读取彩信附件文件。
+
+　　2、读取彩信附件文件
+
+　　彩信附件文件的地址存储在mmssms.db的part表的_data字段，形如“/data/data /com.android.providers.telephony/app_parts/PART_1262693697763”，但在应用中读取彩信附件时，这个字段基本没什么用，因为不能直接读取这个文件。读取同样要通过ContentProvider，URI为“content://mms /part”，该URI就是对应着part表。可以使用下列代码段来读取文件：
+　　String selection = new String("mid='" + key + "'");//这个key就是pdu里面的_id。
+
+
+
+　　Cursor cur = getContentResolver().query(Uri.parse("content://mms/part"), null, selection, null, null);
+
+
+
+　　if (cur.moveToFirst())
+
+
+
+　　do {
+
+
+
+　　int _partID = cur.getInt(cur.getColumnIndex("_id"));
+
+
+
+　　String partID = String.valueOf(_partID);
+
+
+
+　　Uri partURI = Uri.parse("content://mms/part/" + partID);
+
+
+
+　　ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+
+
+　　InputStream is = null;
+
+
+
+　　try {
+
+
+
+　　is = getContentResolver().openInputStream(partURI);
+
+
+
+　　byte[] buffer = new byte[256];
+
+
+
+　　int len = is.read(buffer);
+
+
+
+　　while (len >= 0)
+
+
+
+　　{
+
+
+
+　　baos.write(buffer, 0, len);
+
+
+
+　　len = is.read(buffer);
+
+
+
+　　}
+
+
+
+　　} catch (IOException e) {
+
+
+
+　　} finally {
+
+
+
+　　if (is != null) {
+
+
+
+　　try {
+
+
+
+　　is.close();
+
+
+
+　　} catch (IOException e) {
+
+
+
+　　}
+
+
+
+　　}
+
+
+
+　　}
+
+
+
+　　}
+复制代码　　这里得到的baos，就是附件文件。
+
+　　3、声明permission
+
+　　要在代码中使用content://mms，content://mms/part，content://sms等，还要在 AndroidManifest.xml中注册premission，代码如下：
+  </application>
+
+
+
+  <uses-permission android:name="android.permission.READ_SMS" />
+复制代码
+
+
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=68379

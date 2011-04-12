@@ -1,0 +1,107 @@
+在今天的文章中我们将展示如何创建，管理和使用Android中的音效。在第一部分我们将展示基本的封装与管理声音有关代码的方法。这个方法可以正常工作当你有一个典型的应用程序或者单线程的简单游戏。在你阅读完这些之后，可以阅读第二部分，它将告诉你一个更高级的方式来管理声音通过其他的类。
+
+        我们用来播放声音的方法利用Sound Pool类而不是Android开发向导推荐的Media Player类。当然利用Media Player类实现简单应用也是可以的，但是这个类不能提供我们所需要的灵活性。
+
+        下面是代码。我们首先需要创建一个Sound Manager类来封装所有的与声音有关的代码。
+
+Java代码：
+public class SoundManager {
+
+
+
+private SoundPool mSoundPool;
+
+private HashMap mSoundPoolMap;
+
+private AudioManager mAudioManager;
+
+private Context mContext;
+
+}
+复制代码
+         代码的第一部分是建立所需要的成员变量：
+
+         mSoundPool: 我们利用Android提供的这个对象来创建和播放声音；
+         mSoundPoolMap: 一旦声音加载了，就用散列表来存储；
+         mAudioManager: 播放我们想要音乐的服务的句柄.
+         mContext: 一个程序上下文的句柄.
+
+Java代码：public void initSounds(Context theContext) {
+
+mContext = theContext;
+
+mSoundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
+
+mSoundPoolMap = new HashMap();
+
+mAudioManager = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
+
+}
+复制代码
+        第一个函数创建了Sound Manager。在一开始我们传递程序上下文给它并且得到一个它的句柄。下一行创建sound pool对象。我们要注意第一个参量，这个传递的整型值代表我们希望同时存在多少个音频流。换句话说，多少声音可以同时播放。如果你尝试播放比这个整型值多的音频，它会自动终止最早的音频流。
+
+       下面两行创建散列表并且将它交给audio-manager。
+
+Java代码：
+public void addSound(int index, int SoundID)
+
+{
+
+mSoundPoolMap.put(index, mSoundPool.load(mContext, SoundID, 1));
+
+}
+复制代码
+       我们在这个函数添加音频。每一个音频文件得到一个用于回放的索引，要确保每个音频有不同的索引。SoundID参数来自于原始音频文件。你可以传递这个参数通过调用R.raw.mysound来得到名为mysound的音频的id。后面会介绍如何运用这个函数。
+
+Java代码：
+public void playSound(int index)
+
+{
+
+float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+mSoundPool.play(mSoundPoolMap.get(index), streamVolume, streamVolume, 1, 0, 1f);
+
+}
+
+
+
+public void playLoopedSound(int index)
+
+{
+
+float streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+streamVolume = streamVolume / mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+mSoundPool.play(mSoundPoolMap.get(index), streamVolume, streamVolume, 1, -1, 1f);
+
+}
+复制代码
+       这两个函数控制声音的回放。你只需要传递你在addSound()中创建的音频的索引数字。streamVolume变量用来获取当前设备上所设置媒体文件播放的音量。因为我们不希望音频回放时音量比用户在手机上设置的音量有所不同。
+
+        你需要将获得的音量除以最大的流媒体音量值，以便于得到一个0到1之间的浮点数。这是要实现播放所必需的，这里要感谢Gyuri为我指出这个问题。
+
+        mSoundPool.play函数相当简单。首先要传递你希望播放的音频的索引数字，之后两个参数分别是播放时的音量下限和上限。我强烈建议设置该两个值都等于音频的音量。
+
+       下一个变量是音频的优先级。这个目前还没有实现，所以设置为1是比较好的。再下一个参数是设置音频是否循环播放。-1设置为循环而1设置为单次播放。这也是这两个函数的唯一不同之处。我个人就比较喜欢能够允许我设置循环播放的设备。
+
+       最后一个参数影响播放的采样率。1是正常速率而可以设置范围从0.5到2.0对应于半速和二倍速播放。
+
+       使用这个类是非常简单的。你需要做的就是当你需要音频的时候创建一个成员变量。之后你可以初始化sound manager而且用下面的方式添加音频。
+
+Java代码：
+mSoundManager = new SoundManager();
+
+mSoundManager.initSounds(getBaseContext());
+
+mSoundManager.addSound(1, R.raw.sound); 
+复制代码
+        之后根据索引播放音频。
+
+Java代码：
+mSoundManager.playSound(1);
+复制代码
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=68272

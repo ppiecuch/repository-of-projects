@@ -1,0 +1,202 @@
+有的时候我们调试Android应用可能涉及中文内容，但是在DDMS的Logcat下显示中文时为乱码，这里大家可以通过自己编译SDK来解决 在Android源码DDMS中我们找到 MultiLineReceiver 这个类，对应GIT开源在development/tools/ddms/libs/ddmuilib/src/com/android /ddmuilib/，最主要的就是有关String实例化时最后一个参数，看到ISO-8859-1了吧，我们将这个换成gb2312就可以很好的显示简体中文了，繁体嘛可以考虑big5这种编码等等了，当然了eoe推荐大家使用UTF-8这种兼容性最好的。
+
+Java代码：
+public abstract class MultiLineReceiver implements IShellOutputReceiver {
+
+
+
+public final void addOutput(byte[] data, int offset, int length) {
+
+
+
+if (isCancelled() == false) {
+
+
+
+String s = null;
+
+
+
+try {
+
+
+
+s = new String(data, offset, length, "ISO-8859-1"); //问题在这里，ISO-8859-1就是Latin-1我们俗称西欧语言
+
+
+
+} catch (UnsupportedEncodingException e) {
+
+
+
+// normal encoding didn't work, try the default one
+
+
+
+s = new String(data, offset,length);
+
+
+
+}
+
+
+
+// 我们有字符串
+
+
+
+if (s != null) {
+
+
+
+//如果我们有一个未完成的线,我们添加。
+
+
+
+if (mUnfinishedLine != null) {
+
+
+
+s = mUnfinishedLine + s;
+
+
+
+mUnfinishedLine = null;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+mArray.clear();
+
+
+
+int start = 0;
+
+
+
+do {
+
+
+
+int index = s.indexOf("\r\n", start);
+
+
+
+
+
+// 我们把它储存到被处理为下一个封包
+
+
+
+if (index == -1) {
+
+
+
+mUnfinishedLine = s.substring(start);
+
+
+
+break;
+
+
+
+}
+
+
+
+
+
+
+
+String line = s.substring(start, index);
+
+
+
+if (mTrimLines) {
+
+
+
+line = line.trim();
+
+
+
+}
+
+
+
+mArray.add(line);
+
+
+
+
+
+// 移动开始后我们发现n支取
+
+
+
+start = index + 2;
+
+
+
+} while (true);
+
+
+
+
+
+
+
+if (mArray.size() > 0) {
+
+
+
+
+
+
+
+String[] lines = mArray.toArray(new String[mArray.size()]);
+
+
+
+
+
+
+
+// 送去最后的加工
+
+processNewLines(lines);
+
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+}
+复制代码
+       我们上面这个例子就是说，怎么能正确的显示你想要的文字，这个是很主要，当我们没有设置好文字的话，就会出现乱码，这是在发开应用当中很正常的一件事，今天的例子就是告诉我们不要在开发的时候来犯这样的错误，我们要一步一步的改正。这个希望对大家有帮助。
+       
+       http://www.eoeandroid.com/forum.php?mod=viewthread&tid=68687
