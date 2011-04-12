@@ -1,0 +1,61 @@
+eoe告诉大家，在Android的开发中，我们知道布局文件可以让我们很方便的对各个UI控件进行位置安排跟属性设置，而在程序中可以直接取得控件并赋予对应操作功能。但是，如果是一个复杂的界面设计，我们把所有布局都放在一个文件中来描述，那这个文件会显得比较臃肿而结构则变得无法清晰了。为此，Android为我们提供了一个武功高强的高手，这个高手的特异功能就是能够将几个不同的布局文件整合在一起，它的名字叫include，听名字就知道是包含的意思，当然是包括多个布局。
+
+       说了那么多，其实使用并不难，而且还很简单，那接下来我们来举例来看看，看了包懂，由于是讲布局的安排跟组合，那我们这里就只拿布局文件来解析下，其他程序代码跟其他程序没区别。这里我们以最简单的控件TextView来举例，总共假设3个布局文件，其中一个布局包含了其他两个子布局。
+
+父布局layoutP：
+
+Java代码：<?xml version="1.0" encoding="utf-8"?> 
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+
+android:orientation="vertical" 
+
+android:layout_width="fill_parent" 
+
+android:layout_height="fill_parent"> 
+
+<include android:id="@+id/cell1" layout="@layout/includeA" /> 
+
+<include android:id="@+id/cell2" 
+
+android:layout_width="fill_parent" 
+
+layout="@layout/includeB" /> 
+
+</LinearLayout>
+复制代码
+子布局layoutA：
+
+Java代码：
+<?xml version="1.0" encoding="utf-8"?> 
+
+<TextView xmlns:android="http://schemas.android.com/apk/res/android" 
+
+android:text="随时随地，即兴时代！" 
+
+android:layout_width="wrap_content" 
+
+android:layout_height="wrap_content"> 
+
+</TextView>
+复制代码
+子布局二layoutB：
+
+Java代码：
+<?xml version="1.0" encoding="utf-8"?> 
+
+<TextView xmlns:android="http://schemas.android.com/apk/res/android" 
+
+android:text="ATAAW.COM" 
+
+android:layout_width="wrap_content" 
+
+android:layout_height="wrap_content"> 
+
+</TextView>
+复制代码
+       通过以上layoutP中的整合，layoutA与layoutB就成为layoutP中的子元素，不仅使得整个布局代码结构清晰，提高了可读性，而且可以将界面排版中的功能模块清楚的划分。
+
+       大家看完是不是感觉很简单呀，其实真的很简单，我们只要明白思路就应该没有事么大问题了，这个例子的思路就是一个父类，下面分支了两个子类，这个应该就是很简单的了只不过是我们不怎么经常用这个include控件，所以上来说这个控件有的人，就不明白了。通过看这个代码，我们就会做的怎么利用include控件了。
+
+       http://www.eoeandroid.com/forum.php?mod=viewthread&tid=68695

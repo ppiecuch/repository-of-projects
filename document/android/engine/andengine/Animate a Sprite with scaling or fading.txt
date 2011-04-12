@@ -1,0 +1,63 @@
+amatig 
+  
+Posts: 15
+Joined: Fri Mar 18, 2011 4:36 pm Top
+--------------------------------------------------------------------------------
+
+Re: Animate a Sprite with scaling or fading?
+by Ctrl+Alt+Del  Mon Apr 04, 2011 8:13 pm 
+
+yup, you will need to use an Entity Modifier on your sprite.Aloha, -Makoto
+------------------------
+My first app
+------------------------Ctrl+Alt+Del 
+  
+Posts: 21
+Joined: Wed Mar 09, 2011 4:35 am
+Location: Kona, Hawaii 
+Website Top
+--------------------------------------------------------------------------------
+
+Re: Animate a Sprite with scaling or fading?
+by amatig  Tue Apr 05, 2011 11:41 am 
+
+do you have an example?amatig 
+  
+Posts: 15
+Joined: Fri Mar 18, 2011 4:36 pm Top
+--------------------------------------------------------------------------------
+
+Re: Animate a Sprite with scaling or fading?
+by Ctrl+Alt+Del  Tue Apr 05, 2011 8:25 pm 
+
+http://code.google.com/p/andengineexamples/source/browse/src/org/anddev/andengine/examples/EntityModifierExample.javaAloha, -Makoto
+------------------------
+My first app
+------------------------Ctrl+Alt+Del 
+  
+Posts: 21
+Joined: Wed Mar 09, 2011 4:35 am
+Location: Kona, Hawaii 
+Website Top
+--------------------------------------------------------------------------------
+
+Re: Animate a Sprite with scaling or fading?
+by amatig  Thu Apr 07, 2011 10:32 am 
+
+Thx, in this example is used Loop Modifier. If i want use non loop but a single animation want i need use?amatig 
+  
+Posts: 15
+Joined: Fri Mar 18, 2011 4:36 pm Top
+--------------------------------------------------------------------------------
+
+Re: Animate a Sprite with scaling or fading?
+by Totta  Sat Apr 09, 2011 8:43 pm 
+
+Be aware though that Modifiers only affects the visible face of the Sprite. If you also use it as a Physical Object (Box2D) the physical boundaries will stay the same even though the sprite is visibly larger.
+
+Rule of thumb: If you do something with the ObjectFace, it's only visual changes. If you do something with the ObjectBody, then there are both visible and physical changes.
+
+This, of course, if you are even using a physical world. If you are not, then ignore this post 
+
+
+http://www.andengine.org/forums/development/animate-a-sprite-with-scaling-or-fading-t2857.html

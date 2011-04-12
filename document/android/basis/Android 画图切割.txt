@@ -1,0 +1,157 @@
+我们先来说说android切割画布的历程不算很难，可是理解起来也比较麻烦，canvas.clipRect(30, 30, 70, 70, Region.Op.XOR);最后一个参数有多个选择分别是：DIFFERENCE是第一次不同于第二次的部分显示出来REPLACE是显示第二次的，REVERSE_DIFFERENCE 是第二次不同于第一次的部分显示，INTERSECT交集显示，UNION全部显示。
+       首先还是继承一个view，在 构造函数里面初始化一个画笔 笔宽为6 文本大小16 文本对齐方式 居右。
+
+Java代码：
+package eoe.print;
+
+
+
+mPaint = new Paint(); 
+
+mPaint.setAntiAlias(true); 
+
+mPaint.setStrokeWidth(6); 
+
+mPaint.setTextSize(16); 
+
+mPaint.setTextAlign(Paint.Align.RIGHT); 
+
+
+
+mPath = new Path();
+复制代码      在所有的之前我们都要实例化一下paint，也就是new以下，这样我们才能开始我们下面开发的工作。上面的代码是给paint设置了一个属性，这样做就是为了让大家知道，paint可以自定义的，也就是说你可以做出你想要的效果出来。
+
+
+        而在接口onDraw中 画了好几个图，每个图都进行了裁剪
+
+Java代码：
+package eoe.print;
+
+
+
+@Override protected void onDraw(Canvas canvas) { 
+
+canvas.drawColor(Color.GRAY); 
+
+// 用来在一个独有的栈中保存数据 
+
+canvas.save(); 
+
+canvas.translate(10, 10); 
+
+drawScene(canvas); 
+
+// 用来清空栈中所有的数据 
+
+canvas.restore(); 
+
+
+
+canvas.save(); 
+
+canvas.translate(160, 10); 
+
+canvas.clipRect(10, 10, 90, 90); 
+
+canvas.clipRect(30, 30, 70, 70, Region.Op.XOR); 
+
+drawScene(canvas); 
+
+canvas.restore(); 
+
+
+
+canvas.save(); 
+
+canvas.translate(10, 160); 
+
+mPath.reset(); 
+
+canvas.clipPath(mPath); // 使剪辑的空
+
+mPath.addCircle(50, 50, 50, Path.Direction.CCW); 
+
+canvas.clipPath(mPath, Region.Op.REPLACE); 
+
+drawScene(canvas); 
+
+canvas.restore(); 
+
+
+
+canvas.save(); 
+
+canvas.translate(160, 160); 
+
+canvas.clipRect(0, 0, 60, 60); 
+
+canvas.clipRect(40, 40, 100, 100, Region.Op.UNION); 
+
+drawScene(canvas); 
+
+canvas.restore(); 
+
+
+
+canvas.save(); 
+
+canvas.translate(10, 310); 
+
+canvas.clipRect(0, 0, 60, 60); 
+
+canvas.clipRect(40, 40, 100, 100, Region.Op.XOR); 
+
+drawScene(canvas); 
+
+canvas.restore(); 
+
+
+
+canvas.save(); 
+
+
+
+canvas.translate(160, 310); 
+
+canvas.clipRect(0, 0, 60, 60); 
+
+canvas.clipRect(40, 40, 100, 100, Region.Op.REVERSE_DIFFERENCE); 
+
+drawScene(canvas); 
+
+canvas.restore(); 
+
+} 
+
+// 建立了一个方法，用于显示所画出的效果 
+
+private void drawScene(Canvas canvas) { 
+
+canvas.clipRect(0, 0, 100, 100); 
+
+
+
+canvas.drawColor(Color.WHITE); 
+
+
+
+mPaint.setColor(Color.RED); 
+
+canvas.drawLine(0, 0, 100, 100, mPaint); 
+
+
+
+mPaint.setColor(Color.GREEN); 
+
+canvas.drawCircle(30, 70, 30, mPaint); 
+
+
+
+mPaint.setColor(Color.BLUE); 
+
+canvas.drawText("Clipping", 100, 30, mPaint); 
+
+}
+复制代码
+       上面的代码我们能看出来，我们每一张图片就是在不停的用canvas来实现，其中主要是就的图片的坐标还有就是图片的颜色，好有就是canvas.clipRect(40, 40, 100, 100, Region.Op.XOR);最后一个属性一定要是不一样的，这样我们才能完成我们想要的效果。不知道我理解的对不对，要理解的还是不够全面的话，希望大家多多在eoe社区里发帖。这样我们才能共同的进步。
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=68342

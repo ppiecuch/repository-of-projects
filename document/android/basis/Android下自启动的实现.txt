@@ -1,0 +1,51 @@
+如何在Android下自启动的实现呢？接下来eoe给大家进行讲解。
+
+
+首先，在程序代码中创建BroadcastReceiver的子类，用来接受手机开机时的消息，然后执行需要的工作，比如启动服务。
+
+Java代码：
+   view plaincopy to clipboardprint?  
+
+   public class yourReceiver extends BroadcastReceiver {        
+
+        @Override       
+
+        public void onReceive(Context context, Intent intent) {       
+
+            Intent i = new Intent(yourService.ACTION_START);       
+
+            i.setClass(context, yourService.class);       
+
+            context.startService(i);       
+
+        }       
+
+    } 
+复制代码然后在项目的AndroidManifest.xml中把接受消息意图的类和消息意图关联。
+
+Java代码：
+   view plaincopy to clipboardprint?  
+
+   <receiver android:name=".yourReceiver" >      
+
+        <intent-filter>      
+
+        <action android:name="android.intent.action.BOOT_COMPLETED" />      
+
+       </intent-filter>      
+
+      </receiver>       
+
+       
+复制代码最后要在 AndroidManifest.xml中申请权限，加入以下代码：
+
+Java代码：
+view plaincopy to clipboardprint?  
+
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>    
+
+    
+复制代码
+
+
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=68744

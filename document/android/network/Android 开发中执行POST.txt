@@ -1,0 +1,184 @@
+大家要知道，我们要在android开发中实行post的请求，就得先看看Get请求和Post请求的区别这样我们才能很好的理解，eoe告诉大家在android中很容易就把GET和POST给混淆了，这样就是看了我这篇文章也不会有什么效果的，那么我们先来看看它俩的区别。
+
+       表单提交中get和post方式的区别有5点
+
+       1.get是从服务器上获取数据，post是向服务器传送数据。
+
+       2.get是把参数数据队列加到提交表单的ACTION属性所指的URL中，值和表单内各个字段一一对应，在URL中可以看到。post是通过HTTPpost机制，将表单内各个字段与其内容放置在HTML HEADER内一起传送到ACTION属性所指的URL地址。用户看不到这个过程。
+
+       3.对于get方式，服务器端用Request.QueryString获取变量的值，对于post方式，服务器端用Request.Form获取提交的数据。
+
+       4.get 传送的数据量较小，不能大于2KB。post传送的数据量较大，一般被默认为不受限制。但理论上，IIS4中最大量为80KB，IIS5中为100KB。
+
+       5.get安全性非常低，post安全性较高。
+
+       那么接下来让我们看看在Android平台开发中如何执行一个Post请求：
+
+Java代码：String uriAPI = "http://192.168.1.100:8080/test/test.jsp"; //这是我测试的本地,大家可以随意改
+
+
+
+/*建立HTTPost对象*/
+
+
+
+HttpPost httpRequest = new HttpPost(uriAPI);
+
+
+
+/*
+
+
+
+* NameValuePair实现请求参数的封装
+
+
+
+*/
+
+
+
+List <NameValuePair> params = new ArrayList <NameValuePair>();
+
+
+
+params.add(new BasicNameValuePair("u", "沈大海"));
+
+
+
+params.add(new BasicNameValuePair("p", "123"));
+
+
+
+try
+
+
+
+{
+
+
+
+/* 添加请求参数到请求对象*/
+
+
+
+httpRequest.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+
+
+
+/*发送请求并等待响应*/
+
+
+
+HttpResponse httpResponse = new DefaultHttpClient().execute(httpRequest);
+
+
+
+/*若状态码为200 ok*/
+
+
+
+if(httpResponse.getStatusLine().getStatusCode() == 200) 
+
+
+
+{
+
+
+
+/*读返回数据*/
+
+
+
+String strResult = EntityUtils.toString(httpResponse.getEntity());
+
+
+
+mTextView1.setText(strResult);
+
+
+
+}
+
+
+
+else
+
+
+
+{
+
+
+
+mTextView1.setText("Error Response: "+httpResponse.getStatusLine().toString());
+
+
+
+}
+
+
+
+}
+
+
+
+catch (ClientProtocolException e)
+
+
+
+{ 
+
+
+
+mTextView1.setText(e.getMessage().toString());
+
+
+
+e.printStackTrace();
+
+
+
+}
+
+
+
+catch (IOException e)
+
+
+
+{ 
+
+
+
+mTextView1.setText(e.getMessage().toString());
+
+
+
+e.printStackTrace();
+
+
+
+}
+
+
+
+catch (Exception e)
+
+
+
+{ 
+
+
+
+mTextView1.setText(e.getMessage().toString());
+
+
+
+e.printStackTrace(); 
+
+
+
+} 
+复制代码
+
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=68690
