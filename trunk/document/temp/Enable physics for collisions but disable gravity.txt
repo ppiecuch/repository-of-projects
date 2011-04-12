@@ -1,0 +1,124 @@
+Hello guys!
+I'm trying to do a pong using this engine, but I do not want to manually check for collisions if it's possible to use box2d for this. The problem is that when I enable physics, the ball respects the gravity, I want it to have a constant velocity, always, even after collision with a wall or the bumpers. Is this possible?
+
+Thank you very much!
+Bernardo
+
+
+--------------------------
+
+Re: Enable physics for collisions but disable gravity?
+by bhecox65 Sun Aug 29, 2010 4:58 am 
+
+Well, it depends on what you are doing with your code right now. If you are using the physics example code, then your ball is moving around with your accelerometer right? Well you would have to take out the line that sets the gravity from the accelerometer in the onAccelerometerChanged method. Something you could probably do to still have physics but 0 gravity is make some temp vector like:
+
+mTempVector.set(0,0);
+this.mPhysicsWorld.setGravity(mTempVector);
+
+So your gravity is 0,0. Your problem would be that there may be friction in the physics world, but I think you can make your object have no friction using the Fixture Definition you use to create your physics object. So once your game starts do something like:
+
+mBall.setLinearVelocity(8,0);
+
+Then the ball should move with physics and such like you are talking about. I'm new to this so I could be wrong, but you could give it a shot till someone else answers, just let us know if it worked or whatever. Good luck.------------------------------------------------------------
+Check out my site: http://www.debragames.com
+I have one Android game out: Tap It!
+It's free so download it now! 
+
+---------------------------
+
+
+Re: Enable physics for collisions but disable gravity?
+by bernardo Sun Aug 29, 2010 2:06 pm 
+
+Thank you very much for your reply! I tried what you said.
+I disabled gravity, but even after setting acceleration and velocity, nothing happens. The ball stands still.
+
+Syntax: [ Download ] [ Hide ]
+Syntax: [ Download ] [ Show ]
+Using java Syntax Highlighting
+                
+                face = new AnimatedSprite(pX, pY, this.mBoxFaceTextureRegion);
+                body = PhysicsFactory.createBoxBody(this.mPhysicsWorld, face, BodyType.DynamicBody, objectFixtureDef);          
+                face.setVelocity(8, 0);
+                face.setAcceleration(8, 8);
+                face.setUpdatePhysics(false);
+ 
+                scene.getTopLayer().addEntity(face);
+                this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(face, body, true, true, false, false));
+Parsed in 0.031 seconds, using GeSHi 1.0.8.4
+
+I can only get the ball to move setting the first boolean of registerPhysicsConnector to false, but then it won't respect the walls.
+
+----------------------------
+
+Re: Enable physics for collisions but disable gravity?
+by bhecox65 Sun Aug 29, 2010 8:58 pm 
+
+If you want to use box2D physics don't use your face object to set velocity and such, you have to use the body object. So, instead of doing this:
+
+face.setVelocity(8, 0);
+face.setAcceleration(8, 8);
+
+change it to:
+
+body.setLinearVelocity(8, 0);
+
+Everything else in your code seems to look just fine. You just need to move around the body, not the face. Good luck!------------------------------------------------------------
+Check out my site: http://www.debragames.com
+I have one Android game out: Tap It!
+
+It's free so download it now! 
+
+
+
+----------------------------
+
+
+
+Re: Enable physics for collisions but disable gravity?
+by nicolas Mon Aug 30, 2010 3:53 am 
+
+Exactly (^^): 
+You can look into : this.mPhysicsWorld = new FixedStepPhysicsWorld(30, new Vector2(0, 0), false, 8, 1);fan Nicolas --- admin this forum (^^)
+
+-----------------------
+
+Re: Enable physics for collisions but disable gravity?
+by bernardo Mon Aug 30, 2010 4:10 am 
+
+I feel silly! Awesome guys, it worked perfectly!
+Now, there is a little problem, because everytime it collides, it loses some of it's speed. Is there a way to disable this or should I after each collision reset the velocity again?
+
+THANKS A LOT!!
+
+-----------------
+
+Re: Enable physics for collisions but disable gravity?
+by nicolas Mon Aug 30, 2010 4:22 am 
+
+This is simple :  
+final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(0f, 0f, 0f);
+No Density , no Elasticity , no Frictionfan Nicolas --- admin this forum (^^)
+
+----------------
+
+
+Re: Enable physics for collisions but disable gravity?
+by bernardo Tue Aug 31, 2010 10:05 pm 
+
+Hi! With elasticity 0f, it was like the wall contained some sort of glue, I set it to 1f and everything was perfect! Thanks guys!
+
+
+------------------
+
+e: Enable physics for collisions but disable gravity?
+by dhavaln Sat Jan 15, 2011 6:08 pm 
+
+Hello All,
+
+The above solution works gr8 for me also. But after a while the ball moves too faster and seems the velocity is increasing.
+
+Is there any way I can make the velocity constant by overriding some method and reduce it from time to time.
+
+
+http://www.andengine.org/forums/development/enable-physics-for-collisions-but-disable-gravity-t469.html

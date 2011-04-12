@@ -1,0 +1,52 @@
+翻译至android.opengl.GLSurfaceView.Renderer Class Overview，水平有限，敬请谅解
+hankersyan@163.com
+
+
+        这是渲染器(Render)的公共接口，它的任务就是调用OpenGL的API来作帧的渲染。GLSurfaceView的实现类通常会创建一个Render的实现类，然后用setRenderer(GLSurfaceView.Renderer)方法把渲染器注册到GLSurfaceView。
+        
+线程
+        把渲染代码分开，让它运行在单独的线程里，这样的设计是为了让渲染性能不受UI线程的影响。UI线程里的各种实例通常需要跟渲染器通讯，例如键盘、鼠标等输入事件，这时候应当进行跨线程通讯，或使用queueEvent(Runnable)方法。
+        
+EGL context丢失
+        很多情况下EGL的context会丢失，例如设备的休眠和唤醒。context丢失后，与之相关的各种OpenGL资源(如：纹理)都将自动删除。为了确保设备再次唤醒后能正常渲染，渲染器应该重建各种资源。一般来说，重建资源的代码会放在surface被创建的函数onSurfaceCreated(GL10, EGLConfig)里。
+        
+        参见
+        setRenderer(Renderer)
+        
+公共方法一览        
+        abstract void 	onDrawFrame(GL10 gl)    				当要求绘制一帧时.
+        abstract void 	onSurfaceChanged(GL10 gl, int width, int height)    	当surface大小变换时.
+        abstract void 	onSurfaceCreated(GL10 gl, EGLConfig config)   		当surface创建或重建时.
+        
+公共方法
+        public abstract void onDrawFrame. (GL10 gl)
+        当要求绘制一帧时被调用。
+        这里通常放置帧绘制的代码，通常会这样写。
+         void onDrawFrame(GL10 gl) {
+             gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+             //... 其它代码 ...
+         }
+        参数
+        	gl GL接口，可以使用instanceof方法判断是否支持GL11或更高版本。
+        
+        public abstract void onSurfaceChanged (GL10 gl, int width, int height)
+        surface创建后，当surface大小变换时被调用。
+        一般来说，要在这里设定视口(viewport)，如果你的摄像机是固定的，也可以在这里设定投影矩阵(projection matrix)。
+         void onSurfaceChanged(GL10 gl, int width, int height) {
+             gl.glViewport(0, 0, width, height);
+             // 对于固定摄像机，就在这里设定投影矩阵
+             float ratio = (float) width / height;
+             gl.glMatrixMode(GL10.GL_PROJECTION);
+             gl.glLoadIdentity();
+             gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
+         }
+        参数
+                gl 同上
+        
+        public abstract void onSurfaceCreated (GL10 gl, EGLConfig config)
+        当surface创建或重建时被调用。
+        Android设备休眠后EGL context会丢失，唤醒后context会重建，该方法会被调用，然后再开始渲染。一般来说，要在这里重建资源。
+        注意，EGL context丢失后，OpenGL的资源会自动删除，你不需要使用glDeleteTextures之类的方法来手动删除资源。
+        参数
+                gl 同上
+                config 创建或重建后的EGL配置，用来创建各种相关缓存。
