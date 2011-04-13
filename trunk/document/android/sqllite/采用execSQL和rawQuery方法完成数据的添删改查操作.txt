@@ -1,0 +1,820 @@
+使用 SQLiteDatabase 操作 SQLite 数据库view plaincopy to clipboardprint?
+/*  
+Android提供了一个名为SQLiteDatabase的类，该类封装了一些操作数据库的API，使用该类可以完成对数据进行添加(Create)、查询(Retrieve)、更新(Update)和删除(Delete)操作（这些操作简称为CRUD）。对SQLiteDatabase的学习，我们应该重点掌握execSQL()和rawQuery()方法。 execSQL()方法可以执行insert、delete、update和CREATE TABLE之类有更改行为的SQL语句； rawQuery()方法用于执行select语句。  
+execSQL()方法的使用例子：  
+SQLiteDatabase db = ....;  
+db.execSQL("insert into person(name, age) values('测试数据', 4)");  
+db.close();  
+执行上面SQL语句会往person表中添加进一条记录，在实际应用中， 语句中的“测试数据”这些参数值会由用户输入界面提供，如果把用户输入的内容原样组拼到上面的insert语句， 当用户输入的内容含有单引号时，组拼出来的SQL语句就会存在语法错误。要解决这个问题需要对单引号进行转义，也就是把单引号转换成两个单引号。有些时候用户往往还会输入像“ & ”这些特殊SQL符号，为保证组拼好的SQL语句语法正确，必须对SQL语句中的这些特殊SQL符号都进行转义，显然，对每条SQL语句都做这样的处理工作是比较烦琐的。 SQLiteDatabase类提供了一个重载后的execSQL(String sql, Object[] bindArgs)方法，使用这个方法可以解决前面提到的问题，因为这个方法支持使用占位符参数(?)。使用例子如下：  
+SQLiteDatabase db = ....;  
+db.execSQL("insert into person(name, age) values(?,?)", new Object[]{"测试数据", 4});   
+db.close();  
+execSQL(String sql, Object[] bindArgs)方法的第一个参数为SQL语句，第二个参数为SQL语句中占位符参数的值，参数值在数组中的顺序要和占位符的位置对应。  
+*/  
+/*
+Android提供了一个名为SQLiteDatabase的类，该类封装了一些操作数据库的API，使用该类可以完成对数据进行添加(Create)、查询(Retrieve)、更新(Update)和删除(Delete)操作（这些操作简称为CRUD）。对SQLiteDatabase的学习，我们应该重点掌握execSQL()和rawQuery()方法。 execSQL()方法可以执行insert、delete、update和CREATE TABLE之类有更改行为的SQL语句； rawQuery()方法用于执行select语句。
+execSQL()方法的使用例子：
+SQLiteDatabase db = ....;
+db.execSQL("insert into person(name, age) values('测试数据', 4)");
+db.close();
+执行上面SQL语句会往person表中添加进一条记录，在实际应用中， 语句中的“测试数据”这些参数值会由用户输入界面提供，如果把用户输入的内容原样组拼到上面的insert语句， 当用户输入的内容含有单引号时，组拼出来的SQL语句就会存在语法错误。要解决这个问题需要对单引号进行转义，也就是把单引号转换成两个单引号。有些时候用户往往还会输入像“ & ”这些特殊SQL符号，为保证组拼好的SQL语句语法正确，必须对SQL语句中的这些特殊SQL符号都进行转义，显然，对每条SQL语句都做这样的处理工作是比较烦琐的。 SQLiteDatabase类提供了一个重载后的execSQL(String sql, Object[] bindArgs)方法，使用这个方法可以解决前面提到的问题，因为这个方法支持使用占位符参数(?)。使用例子如下：
+SQLiteDatabase db = ....;
+db.execSQL("insert into person(name, age) values(?,?)", new Object[]{"测试数据", 4}); 
+db.close();
+execSQL(String sql, Object[] bindArgs)方法的第一个参数为SQL语句，第二个参数为SQL语句中占位符参数的值，参数值在数组中的顺序要和占位符的位置对应。
+*/   
+
+
+view plaincopy to clipboardprint?
+public class DatabaseHelper extends SQLiteOpenHelper {   
+    //类没有实例化,是不能用作父类构造器的参数,必须声明为静态   
+         private static final String name = "itcast"; //数据库名称   
+         private static final int version = 1; //数据库版本   
+         public DatabaseHelper(Context context) {   
+//第三个参数CursorFactory指定在执行查询时获得一个游标实例的工厂类,设置为null,代表使用系统默认的工厂类   
+                super(context, name, null, version);   
+         }   
+        @Override public void onCreate(SQLiteDatabase db) {   
+              db.execSQL("CREATE TABLE IF NOT EXISTS person (personid integer primary key autoincrement, name varchar(20), age INTEGER)");      
+         }   
+        @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {   
+               db.execSQL(" ALTER TABLE person ADD phone VARCHAR(12) NULL "); //往表中增加一列   
+    // DROP TABLE IF EXISTS person 删除表   
+       }   
+}   
+//在实际项目开发中，当数据库表结构发生更新时，应该避免用户存放于数//据库中的数据丢失。  
+public class DatabaseHelper extends SQLiteOpenHelper {
+    //类没有实例化,是不能用作父类构造器的参数,必须声明为静态
+         private static final String name = "itcast"; //数据库名称
+         private static final int version = 1; //数据库版本
+         public DatabaseHelper(Context context) {
+//第三个参数CursorFactory指定在执行查询时获得一个游标实例的工厂类,设置为null,代表使用系统默认的工厂类
+                super(context, name, null, version);
+         }
+        @Override public void onCreate(SQLiteDatabase db) {
+              db.execSQL("CREATE TABLE IF NOT EXISTS person (personid integer primary key autoincrement, name varchar(20), age INTEGER)");   
+         }
+        @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+               db.execSQL(" ALTER TABLE person ADD phone VARCHAR(12) NULL "); //往表中增加一列
+	// DROP TABLE IF EXISTS person 删除表
+       }
+}
+//在实际项目开发中，当数据库表结构发生更新时，应该避免用户存放于数//据库中的数据丢失。 
+
+
+view plaincopy to clipboardprint?
+/*  
+Android提供了一个名为SQLiteDatabase的类，该类封装了一些操作数据库的API，使用该类可以完成对数据进行添加(Create)、查询(Retrieve)、更新(Update)和删除(Delete)操作（这些操作简称为CRUD）。对SQLiteDatabase的学习，我们应该重点掌握execSQL()和rawQuery()方法。 execSQL()方法可以执行insert、delete、update和CREATE TABLE之类有更改行为的SQL语句； rawQuery()方法用于执行select语句。  
+execSQL()方法的使用例子：  
+SQLiteDatabase db = ....;  
+db.execSQL("insert into person(name, age) values('测试数据', 4)");  
+db.close();  
+执行上面SQL语句会往person表中添加进一条记录，在实际应用中， 语句中的“测试数据”这些参数值会由用户输入界面提供，如果把用户输入的内容原样组拼到上面的insert语句， 当用户输入的内容含有单引号时，组拼出来的SQL语句就会存在语法错误。要解决这个问题需要对单引号进行转义，也就是把单引号转换成两个单引号。有些时候用户往往还会输入像“ & ”这些特殊SQL符号，为保证组拼好的SQL语句语法正确，必须对SQL语句中的这些特殊SQL符号都进行转义，显然，对每条SQL语句都做这样的处理工作是比较烦琐的。 SQLiteDatabase类提供了一个重载后的execSQL(String sql, Object[] bindArgs)方法，使用这个方法可以解决前面提到的问题，因为这个方法支持使用占位符参数(?)。使用例子如下：  
+SQLiteDatabase db = ....;  
+db.execSQL("insert into person(name, age) values(?,?)", new Object[]{"测试数据", 4});   
+db.close();  
+execSQL(String sql, Object[] bindArgs)方法的第一个参数为SQL语句，第二个参数为SQL语句中占位符参数的值，参数值在数组中的顺序要和占位符的位置对应。  
+*/  
+/*
+Android提供了一个名为SQLiteDatabase的类，该类封装了一些操作数据库的API，使用该类可以完成对数据进行添加(Create)、查询(Retrieve)、更新(Update)和删除(Delete)操作（这些操作简称为CRUD）。对SQLiteDatabase的学习，我们应该重点掌握execSQL()和rawQuery()方法。 execSQL()方法可以执行insert、delete、update和CREATE TABLE之类有更改行为的SQL语句； rawQuery()方法用于执行select语句。
+execSQL()方法的使用例子：
+SQLiteDatabase db = ....;
+db.execSQL("insert into person(name, age) values('测试数据', 4)");
+db.close();
+执行上面SQL语句会往person表中添加进一条记录，在实际应用中， 语句中的“测试数据”这些参数值会由用户输入界面提供，如果把用户输入的内容原样组拼到上面的insert语句， 当用户输入的内容含有单引号时，组拼出来的SQL语句就会存在语法错误。要解决这个问题需要对单引号进行转义，也就是把单引号转换成两个单引号。有些时候用户往往还会输入像“ & ”这些特殊SQL符号，为保证组拼好的SQL语句语法正确，必须对SQL语句中的这些特殊SQL符号都进行转义，显然，对每条SQL语句都做这样的处理工作是比较烦琐的。 SQLiteDatabase类提供了一个重载后的execSQL(String sql, Object[] bindArgs)方法，使用这个方法可以解决前面提到的问题，因为这个方法支持使用占位符参数(?)。使用例子如下：
+SQLiteDatabase db = ....;
+db.execSQL("insert into person(name, age) values(?,?)", new Object[]{"测试数据", 4}); 
+db.close();
+execSQL(String sql, Object[] bindArgs)方法的第一个参数为SQL语句，第二个参数为SQL语句中占位符参数的值，参数值在数组中的顺序要和占位符的位置对应。
+*/ 
+
+
+view plaincopy to clipboardprint?
+/*  
+SQLiteDatabase的rawQuery() 用于执行select语句，使用例子如下：  SQLiteDatabase db = ....;  
+Cursor cursor = db.rawQuery(“select * from person”, null);  
+while (cursor.moveToNext()) {  
+    int personid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始  
+    String name = cursor.getString(1);//获取第二列的值  
+    int age = cursor.getInt(2);//获取第三列的值  
+}  
+cursor.close();  
+db.close();   
+rawQuery()方法的第一个参数为select语句；第二个参数为select语句中占位符参数的值，如果select语句没有使用占位符，该参数可以设置为null。带占位符参数的select语句使用例子如下：  
+Cursor cursor = db.rawQuery("select * from person where name like ? and age=?", new String[]{"%传智%", "4"});  
+Cursor是结果集游标，用于对结果集进行随机访问，如果大家熟悉jdbc， 其实Cursor与JDBC中的ResultSet作用很相似。使用moveToNext()方法可以将游标从当前行移动到下一行，如果已经移过了结果集的最后一行，返回结果为false，否则为true。另外Cursor 还有常用的moveToPrevious()方法（用于将游标从当前行移动到上一行，如果已经移过了结果集的第一行，返回值为false，否则为true ）、moveToFirst()方法（用于将游标移动到结果集的第一行，如果结果集为空，返回值为false，否则为true ）和moveToLast()方法（用于将游标移动到结果集的最后一行，如果结果集为空，返回值为false，否则为true ） 。  
+ 
+*/  
+/*
+SQLiteDatabase的rawQuery() 用于执行select语句，使用例子如下： SQLiteDatabase db = ....;
+Cursor cursor = db.rawQuery(“select * from person”, null);
+while (cursor.moveToNext()) {
+	int personid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+	String name = cursor.getString(1);//获取第二列的值
+	int age = cursor.getInt(2);//获取第三列的值
+}
+cursor.close();
+db.close(); 
+rawQuery()方法的第一个参数为select语句；第二个参数为select语句中占位符参数的值，如果select语句没有使用占位符，该参数可以设置为null。带占位符参数的select语句使用例子如下：
+Cursor cursor = db.rawQuery("select * from person where name like ? and age=?", new String[]{"%传智%", "4"});
+Cursor是结果集游标，用于对结果集进行随机访问，如果大家熟悉jdbc， 其实Cursor与JDBC中的ResultSet作用很相似。使用moveToNext()方法可以将游标从当前行移动到下一行，如果已经移过了结果集的最后一行，返回结果为false，否则为true。另外Cursor 还有常用的moveToPrevious()方法（用于将游标从当前行移动到上一行，如果已经移过了结果集的第一行，返回值为false，否则为true ）、moveToFirst()方法（用于将游标移动到结果集的第一行，如果结果集为空，返回值为false，否则为true ）和moveToLast()方法（用于将游标移动到结果集的最后一行，如果结果集为空，返回值为false，否则为true ） 。
+
+*/ 
+
+
+view plaincopy to clipboardprint?
+/*  
+除了前面给大家介绍的execSQL()和rawQuery()方法， SQLiteDatabase还专门提供了对应于添加、删除、更新、查询的操作方法： insert()、delete()、update()和query() 。这些方法实际上是给那些不太了解SQL语法的菜鸟使用的，对于熟悉SQL语法的程序员而言，直接使用execSQL()和rawQuery()方法执行SQL语句就能完成数据的添加、删除、更新、查询操作。  
+Insert()方法用于添加数据，各个字段的数据使用ContentValues进行存放。 ContentValues类似于MAP，相对于MAP，它提供了存取数据对应的put(String key, Xxx value)和getAsXxx(String key)方法，  key为字段名称，value为字段值，Xxx指的是各种常用的数据类型，如：String、Integer等。  
+SQLiteDatabase db = databaseHelper.getWritableDatabase();  
+ContentValues values = new ContentValues();  
+values.put("name", "测试数据");  
+values.put("age", 4);  
+long rowid = db.insert(“person”, null, values);//返回新添记录的行号，与主键id无关  
+不管第三个参数是否包含数据，执行Insert()方法必然会添加一条记录，如果第三个参数为空，会添加一条除主键之外其他字段值为Null的记录。Insert()方法内部实际上通过构造insert SQL语句完成数据的添加，Insert()方法的第二个参数用于指定空值字段的名称，相信大家对该参数会感到疑惑，该参数的作用是什么？是这样的：如果第三个参数values 为Null或者元素个数为0， 由于Insert()方法要求必须添加一条除了主键之外其它字段为Null值的记录，为了满足SQL语法的需要， insert语句必须给定一个字段名，如：insert into person(name) values(NULL)，倘若不给定字段名 ， insert语句就成了这样： insert into person() values()，显然这不满足标准SQL的语法。对于字段名，建议使用主键之外的字段，如果使用了INTEGER类型的主键字段，执行类似insert into person(personid) values(NULL)的insert语句后，该主键字段值也不会为NULL。如果第三个参数values 不为Null并且元素的个数大于0 ，可以把第二个参数设置为null。  
+*/  
+/*
+除了前面给大家介绍的execSQL()和rawQuery()方法， SQLiteDatabase还专门提供了对应于添加、删除、更新、查询的操作方法： insert()、delete()、update()和query() 。这些方法实际上是给那些不太了解SQL语法的菜鸟使用的，对于熟悉SQL语法的程序员而言，直接使用execSQL()和rawQuery()方法执行SQL语句就能完成数据的添加、删除、更新、查询操作。
+Insert()方法用于添加数据，各个字段的数据使用ContentValues进行存放。 ContentValues类似于MAP，相对于MAP，它提供了存取数据对应的put(String key, Xxx value)和getAsXxx(String key)方法，  key为字段名称，value为字段值，Xxx指的是各种常用的数据类型，如：String、Integer等。
+SQLiteDatabase db = databaseHelper.getWritableDatabase();
+ContentValues values = new ContentValues();
+values.put("name", "测试数据");
+values.put("age", 4);
+long rowid = db.insert(“person”, null, values);//返回新添记录的行号，与主键id无关
+不管第三个参数是否包含数据，执行Insert()方法必然会添加一条记录，如果第三个参数为空，会添加一条除主键之外其他字段值为Null的记录。Insert()方法内部实际上通过构造insert SQL语句完成数据的添加，Insert()方法的第二个参数用于指定空值字段的名称，相信大家对该参数会感到疑惑，该参数的作用是什么？是这样的：如果第三个参数values 为Null或者元素个数为0， 由于Insert()方法要求必须添加一条除了主键之外其它字段为Null值的记录，为了满足SQL语法的需要， insert语句必须给定一个字段名，如：insert into person(name) values(NULL)，倘若不给定字段名 ， insert语句就成了这样： insert into person() values()，显然这不满足标准SQL的语法。对于字段名，建议使用主键之外的字段，如果使用了INTEGER类型的主键字段，执行类似insert into person(personid) values(NULL)的insert语句后，该主键字段值也不会为NULL。如果第三个参数values 不为Null并且元素的个数大于0 ，可以把第二个参数设置为null。
+*/ 
+
+
+view plaincopy to clipboardprint?
+/*  
+delete()方法的使用：  
+SQLiteDatabase db = databaseHelper.getWritableDatabase();  
+db.delete("person", "personid<?", new String[]{"2"});  
+db.close();  
+上面代码用于从person表中删除personid小于2的记录。  
+update()方法的使用：  
+SQLiteDatabase db = databaseHelper.getWritableDatabase();  
+ContentValues values = new ContentValues();  
+values.put(“name”, “测试数据”);//key为字段名，value为值  
+db.update("person", values, "personid=?", new String[]{"1"});   
+db.close();  
+上面代码用于把person表中personid等于1的记录的name字段的值改为“测试数据”。  
+ 
+*/  
+/*
+delete()方法的使用：
+SQLiteDatabase db = databaseHelper.getWritableDatabase();
+db.delete("person", "personid<?", new String[]{"2"});
+db.close();
+上面代码用于从person表中删除personid小于2的记录。
+update()方法的使用：
+SQLiteDatabase db = databaseHelper.getWritableDatabase();
+ContentValues values = new ContentValues();
+values.put(“name”, “测试数据”);//key为字段名，value为值
+db.update("person", values, "personid=?", new String[]{"1"}); 
+db.close();
+上面代码用于把person表中personid等于1的记录的name字段的值改为“测试数据”。
+
+*/ 
+
+
+view plaincopy to clipboardprint?
+/*  
+query()方法实际上是把select语句拆分成了若干个组成部分，然后作为方法的输入参数：  
+SQLiteDatabase db = databaseHelper.getWritableDatabase();  
+Cursor cursor = db.query("person", new String[]{"personid,name,age"}, "name like ?", new String[]{"%传智%"}, null, null, "personid desc", "1,2");  
+while (cursor.moveToNext()) {  
+         int personid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始  
+        String name = cursor.getString(1);//获取第二列的值  
+        int age = cursor.getInt(2);//获取第三列的值  
+}  
+cursor.close();  
+db.close();   
+上面代码用于从person表中查找name字段含有“传智”的记录，匹配的记录按personid降序排序，对排序后的结果略过第一条记录，只获取2条记录。  
+query(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit)方法各参数的含义：  
+table：表名。相当于select语句from关键字后面的部分。如果是多表联合查询，可以用逗号将两个表名分开。  
+columns：要查询出来的列名。相当于select语句select关键字后面的部分。  
+selection：查询条件子句，相当于select语句where关键字后面的部分，在条件子句允许使用占位符“?”  
+selectionArgs：对应于selection语句中占位符的值，值在数组中的位置与占位符在语句中的位置必须一致，否则就会有异常。  
+groupBy：相当于select语句group by关键字后面的部分  
+having：相当于select语句having关键字后面的部分  
+orderBy：相当于select语句order by关键字后面的部分，如：personid desc, age asc;  
+limit：指定偏移量和获取的记录数，相当于select语句limit关键字后面的部分。  
+*/  
+/*
+query()方法实际上是把select语句拆分成了若干个组成部分，然后作为方法的输入参数：
+SQLiteDatabase db = databaseHelper.getWritableDatabase();
+Cursor cursor = db.query("person", new String[]{"personid,name,age"}, "name like ?", new String[]{"%传智%"}, null, null, "personid desc", "1,2");
+while (cursor.moveToNext()) {
+         int personid = cursor.getInt(0); //获取第一列的值,第一列的索引从0开始
+        String name = cursor.getString(1);//获取第二列的值
+        int age = cursor.getInt(2);//获取第三列的值
+}
+cursor.close();
+db.close(); 
+上面代码用于从person表中查找name字段含有“传智”的记录，匹配的记录按personid降序排序，对排序后的结果略过第一条记录，只获取2条记录。
+query(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit)方法各参数的含义：
+table：表名。相当于select语句from关键字后面的部分。如果是多表联合查询，可以用逗号将两个表名分开。
+columns：要查询出来的列名。相当于select语句select关键字后面的部分。
+selection：查询条件子句，相当于select语句where关键字后面的部分，在条件子句允许使用占位符“?”
+selectionArgs：对应于selection语句中占位符的值，值在数组中的位置与占位符在语句中的位置必须一致，否则就会有异常。
+groupBy：相当于select语句group by关键字后面的部分
+having：相当于select语句having关键字后面的部分
+orderBy：相当于select语句order by关键字后面的部分，如：personid desc, age asc;
+limit：指定偏移量和获取的记录数，相当于select语句limit关键字后面的部分。
+*/ 
+
+
+view plaincopy to clipboardprint?
+package com.zyq.db;   
+import android.app.Activity;   
+import android.os.Bundle;   
+public class MainActivity extends Activity    
+{   
+    @Override  
+    public void onCreate(Bundle savedInstanceState)    
+    {   
+        super.onCreate(savedInstanceState);   
+        setContentView(R.layout.main);   
+    }   
+}  
+package com.zyq.db;
+import android.app.Activity;
+import android.os.Bundle;
+public class MainActivity extends Activity 
+{
+    @Override
+    public void onCreate(Bundle savedInstanceState) 
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+    }
+} 
+
+
+view plaincopy to clipboardprint?
+package com.zyq.db;   
+import java.util.List;   
+import android.test.AndroidTestCase;   
+import android.util.Log;   
+import com.zyq.service.DBOpenHelper;   
+import com.zyq.service.PersonService;   
+import com.zyq.voo.Person;   
+  
+/**  
+ * 测试方法 通过Junit 单元测试  
+ * 1.>实例化测试类  
+ * 2.>把与应用有关的上下文信息传入到测试类实例  
+ * 3.>运行测试方法   
+ * @author Administrator  
+ *  
+ */  
+public class PersonServiceTest extends AndroidTestCase   
+{   
+    private final static String TAG="PersonServiceTest";   
+       
+    /**  
+     * 测试创建数据库  
+     * @throws Throwable  
+     */  
+    public void testCreateDB() throws Throwable   
+    {   
+        DBOpenHelper dbOpenHelper=new DBOpenHelper(this.getContext());   
+        dbOpenHelper.getReadableDatabase(); //Create and/or open a database.   
+    }   
+    /**  
+     * 测试新增一条记录  
+     * @throws Throwable  
+     */  
+    public void testSave() throws Throwable   
+    {   
+        PersonService personService=new PersonService(this.getContext());   
+        personService.save(new Person("zhangsan","1360215320"));   
+        personService.save(new Person("lisi","1123"));   
+        personService.save(new Person("lili","232"));   
+        personService.save(new Person("wangda","123123"));   
+        personService.save(new Person("laozhu","234532"));   
+    }   
+    /**  
+     * 查找一条记录  
+     * @throws Throwable  
+     */  
+    public void testFind() throws Throwable   
+    {   
+        PersonService personService=new PersonService(this.getContext());   
+        Person person=personService.find(1);   
+        Log.i(TAG,person.toString());   
+    }   
+    /**  
+     * 测试更新一条记录  
+     * @throws Throwable  
+     */  
+    public void testUpdate() throws Throwable   
+    {   
+        PersonService personService=new PersonService(this.getContext());   
+        Person person=personService.find(1);   
+        person.setName("lisi");   
+        personService.update(person);   
+    }   
+    /**  
+     * 测试得到所有记录数  
+     * @throws Throwable  
+     */  
+    public void testGetCount() throws Throwable   
+    {   
+        PersonService personService=new PersonService(this.getContext());   
+        Log.i(TAG, personService.getCount()+"********");   
+    }   
+    /**  
+     * 测试分页  
+     * @throws Throwable  
+     */  
+    public void testScroll() throws Throwable   
+    {   
+        PersonService personService=new PersonService(this.getContext());   
+        List<Person> persons=personService.getScrollData(3, 3);   
+        for(Person person:persons)   
+        {   
+            Log.i(TAG, person.toString());   
+        }   
+    }   
+    /**  
+     * 测试删除一条记录  
+     * @throws Throwable  
+     */  
+    public void testDelete() throws Throwable   
+    {   
+        PersonService personService=new PersonService(this.getContext());   
+        personService.delete(5);   
+    }   
+}  
+package com.zyq.db;
+import java.util.List;
+import android.test.AndroidTestCase;
+import android.util.Log;
+import com.zyq.service.DBOpenHelper;
+import com.zyq.service.PersonService;
+import com.zyq.voo.Person;
+
+/**
+ * 测试方法 通过Junit 单元测试
+ * 1.>实例化测试类
+ * 2.>把与应用有关的上下文信息传入到测试类实例
+ * 3.>运行测试方法 
+ * @author Administrator
+ *
+ */
+public class PersonServiceTest extends AndroidTestCase
+{
+	private final static String TAG="PersonServiceTest";
+	
+	/**
+	 * 测试创建数据库
+	 * @throws Throwable
+	 */
+	public void testCreateDB() throws Throwable
+	{
+		DBOpenHelper dbOpenHelper=new DBOpenHelper(this.getContext());
+		dbOpenHelper.getReadableDatabase(); //Create and/or open a database.
+	}
+	/**
+	 * 测试新增一条记录
+	 * @throws Throwable
+	 */
+	public void testSave() throws Throwable
+	{
+		PersonService personService=new PersonService(this.getContext());
+		personService.save(new Person("zhangsan","1360215320"));
+		personService.save(new Person("lisi","1123"));
+		personService.save(new Person("lili","232"));
+		personService.save(new Person("wangda","123123"));
+		personService.save(new Person("laozhu","234532"));
+	}
+	/**
+	 * 查找一条记录
+	 * @throws Throwable
+	 */
+	public void testFind() throws Throwable
+	{
+		PersonService personService=new PersonService(this.getContext());
+		Person person=personService.find(1);
+		Log.i(TAG,person.toString());
+	}
+	/**
+	 * 测试更新一条记录
+	 * @throws Throwable
+	 */
+	public void testUpdate() throws Throwable
+	{
+		PersonService personService=new PersonService(this.getContext());
+		Person person=personService.find(1);
+		person.setName("lisi");
+		personService.update(person);
+	}
+	/**
+	 * 测试得到所有记录数
+	 * @throws Throwable
+	 */
+	public void testGetCount() throws Throwable
+	{
+		PersonService personService=new PersonService(this.getContext());
+		Log.i(TAG, personService.getCount()+"********");
+	}
+	/**
+	 * 测试分页
+	 * @throws Throwable
+	 */
+	public void testScroll() throws Throwable
+	{
+		PersonService personService=new PersonService(this.getContext());
+		List<Person> persons=personService.getScrollData(3, 3);
+		for(Person person:persons)
+		{
+			Log.i(TAG, person.toString());
+		}
+	}
+	/**
+	 * 测试删除一条记录
+	 * @throws Throwable
+	 */
+	public void testDelete() throws Throwable
+	{
+		PersonService personService=new PersonService(this.getContext());
+		personService.delete(5);
+	}
+}
+ 
+
+
+view plaincopy to clipboardprint?
+package com.zyq.service;   
+import android.content.Context;   
+import android.database.sqlite.SQLiteDatabase;   
+import android.database.sqlite.SQLiteOpenHelper;   
+public class DBOpenHelper extends SQLiteOpenHelper   
+{   
+    /**  
+     * 如果想额外的增加一个字段（需求）  
+     * 可以把版本号更改掉 但必须 >=1  
+     * 更改版本号之后 会根据版本号判断是不是上次创建的时候 （目前的版本号和传入的版本号是否一致 ）  
+     * 如果不是会执行 onUpgrade（） 方法  
+     * @param context  
+     */  
+    public DBOpenHelper(Context context)   
+    {   
+        super(context, "zyq.db", null, 2);   
+    }   
+    /**  
+     * 在数据库创建的时候第一个调用的方法  
+     * 适合创建表结构  
+     */  
+    @Override  
+    public void onCreate(SQLiteDatabase db)   
+    {   
+        db.execSQL("CREATE TABLE person (personid integer primary key autoincrement, name varchar(20))");//创建表   
+    }   
+    /**  
+     * 更新表结构 在数据库版本号发生改变的时候调用  
+     * 应用升级   
+     */  
+    @Override  
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)   
+    {   
+        db.execSQL("ALTER TABLE person ADD phone VARCHAR(12) NULL "); //往表中增加一列   
+    }   
+}  
+package com.zyq.service;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+public class DBOpenHelper extends SQLiteOpenHelper
+{
+	/**
+	 * 如果想额外的增加一个字段（需求）
+	 * 可以把版本号更改掉 但必须 >=1
+	 * 更改版本号之后 会根据版本号判断是不是上次创建的时候 （目前的版本号和传入的版本号是否一致 ）
+	 * 如果不是会执行 onUpgrade（） 方法
+	 * @param context
+	 */
+	public DBOpenHelper(Context context)
+	{
+		super(context, "zyq.db", null, 2);
+	}
+	/**
+	 * 在数据库创建的时候第一个调用的方法
+	 * 适合创建表结构
+	 */
+	@Override
+	public void onCreate(SQLiteDatabase db)
+	{
+		db.execSQL("CREATE TABLE person (personid integer primary key autoincrement, name varchar(20))");//创建表
+	}
+	/**
+	 * 更新表结构 在数据库版本号发生改变的时候调用
+	 * 应用升级 
+	 */
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+	{
+		db.execSQL("ALTER TABLE person ADD phone VARCHAR(12) NULL "); //往表中增加一列
+	}
+}
+ 
+
+
+view plaincopy to clipboardprint?
+<?xml version="1.0" encoding="utf-8"?>   
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  
+      package="com.zyq.db"  
+      android:versionCode="1"  
+      android:versionName="1.0">   
+    <application android:icon="@drawable/icon" android:label="@string/app_name">   
+    <uses-library android:name="android.test.runner" />   
+        <activity android:name=".MainActivity"  
+                  android:label="@string/app_name">   
+            <intent-filter>   
+                <action android:name="android.intent.action.MAIN" />   
+                <category android:name="android.intent.category.LAUNCHER" />   
+            </intent-filter>   
+        </activity>   
+    </application>   
+    <uses-sdk android:minSdkVersion="8" />   
+    <instrumentation android:name="android.test.InstrumentationTestRunner"  
+        android:targetPackage="com.zyq.db" android:label="Tests for My App" />   
+</manifest>   
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.zyq.db"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+    <uses-library android:name="android.test.runner" />
+        <activity android:name=".MainActivity"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+    <uses-sdk android:minSdkVersion="8" />
+	<instrumentation android:name="android.test.InstrumentationTestRunner"
+  		android:targetPackage="com.zyq.db" android:label="Tests for My App" />
+</manifest>  
+
+
+view plaincopy to clipboardprint?
+package com.zyq.service;   
+import java.util.ArrayList;   
+import java.util.List;   
+import android.content.Context;   
+import android.database.Cursor;   
+import android.database.sqlite.SQLiteDatabase;   
+import com.zyq.voo.Person;   
+public class PersonService   
+{   
+    private DBOpenHelper helper;   
+    public PersonService(Context context)   
+    {   
+        helper=new DBOpenHelper(context);   
+    }   
+    /**  
+     * 新增一条记录  
+     * @param person  
+     */  
+    public void save(Person person)   
+    {   
+        SQLiteDatabase db=helper.getWritableDatabase();//Create and/or open a database that will be used for reading and writing   
+        db.execSQL("INSERT INTO person(name,phone) values(?,?)",new Object[]{person.getName().trim(),person.getPhone().trim()});//使用占位符进行转译   
+//      db.close();  不关数据库连接 。可以提高性能 因为创建数据库的时候的操作模式是私有的。   
+//                                        代表此数据库，只能被本应用所访问 单用户的，可以维持长久的链接   
+    }    
+    /**  
+     * 更新某一条记录  
+     * @param person  
+     */  
+    public void update(Person person)   
+    {   
+        SQLiteDatabase db=helper.getWritableDatabase();   
+        db.execSQL("update person set phone=?,name=? where personid=?",   
+                    new Object[]{person.getPhone().trim(),person.getName().trim(),person.getId()});   
+    }   
+    /**  
+     * 根据ID查询某条记录  
+     * @param id  
+     * @return  
+     */  
+    public Person find(Integer id)   
+    {   
+        SQLiteDatabase db=helper.getReadableDatabase();   
+        Cursor cursor=db.rawQuery("select * from person where personid=?", new String[]{id.toString()});//Cursor 游标和 ResultSet 很像   
+        if(cursor.moveToFirst())//Move the cursor to the first row. This method will return false if the cursor is empty.   
+        {   
+            int personid=cursor.getInt(cursor.getColumnIndex("personid"));   
+            String name=cursor.getString(cursor.getColumnIndex("name"));   
+            String phone=cursor.getString(cursor.getColumnIndex("phone"));   
+               
+            return new Person(personid,name,phone);   
+        }   
+        return null;   
+    }   
+    /**  
+     * 删除某一条记录  
+     * @param id  
+     */  
+    public void delete(Integer id)   
+    {   
+        SQLiteDatabase db=helper.getWritableDatabase();   
+        db.execSQL("delete from person where personid=?",   
+                    new Object[]{id});   
+    }   
+       
+    /**  
+     * 得到记录数  
+     * @return  
+     */  
+    public long getCount()   
+    {   
+        SQLiteDatabase db=helper.getReadableDatabase();   
+        Cursor cursor=db.rawQuery("select count(*) from person", null);   
+        cursor.moveToFirst();   
+        return cursor.getLong(0);   
+    }   
+    /**  
+     * 分页查询方法 SQL语句跟MySQL的语法一样  
+     * @return  
+     */  
+    public List<Person> getScrollData(int offset,int maxResult)   
+    {   
+        List<Person> persons=new ArrayList<Person>();   
+        SQLiteDatabase db=helper.getReadableDatabase();   
+        Cursor cursor=db.rawQuery("select * from person limit ?,?",    
+                                    new String[]{String.valueOf(offset),String.valueOf(maxResult)});   
+        while (cursor.moveToNext())   
+        {   
+            int personid=cursor.getInt(cursor.getColumnIndex("personid"));   
+            String name=cursor.getString(cursor.getColumnIndex("name"));   
+            String phone=cursor.getString(cursor.getColumnIndex("phone"));   
+               
+            persons.add(new Person(personid,name,phone));   
+        }   
+           
+        return persons;   
+    }   
+}  
+package com.zyq.service;
+import java.util.ArrayList;
+import java.util.List;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import com.zyq.voo.Person;
+public class PersonService
+{
+	private DBOpenHelper helper;
+	public PersonService(Context context)
+	{
+		helper=new DBOpenHelper(context);
+	}
+	/**
+	 * 新增一条记录
+	 * @param person
+	 */
+	public void save(Person person)
+	{
+		SQLiteDatabase db=helper.getWritableDatabase();//Create and/or open a database that will be used for reading and writing
+		db.execSQL("INSERT INTO person(name,phone) values(?,?)",new Object[]{person.getName().trim(),person.getPhone().trim()});//使用占位符进行转译
+//		db.close();  不关数据库连接 。可以提高性能 因为创建数据库的时候的操作模式是私有的。
+//		                                  代表此数据库，只能被本应用所访问 单用户的，可以维持长久的链接
+	} 
+	/**
+	 * 更新某一条记录
+	 * @param person
+	 */
+	public void update(Person person)
+	{
+		SQLiteDatabase db=helper.getWritableDatabase();
+		db.execSQL("update person set phone=?,name=? where personid=?",
+					new Object[]{person.getPhone().trim(),person.getName().trim(),person.getId()});
+	}
+	/**
+	 * 根据ID查询某条记录
+	 * @param id
+	 * @return
+	 */
+	public Person find(Integer id)
+	{
+		SQLiteDatabase db=helper.getReadableDatabase();
+		Cursor cursor=db.rawQuery("select * from person where personid=?", new String[]{id.toString()});//Cursor 游标和 ResultSet 很像
+		if(cursor.moveToFirst())//Move the cursor to the first row. This method will return false if the cursor is empty.
+		{
+			int personid=cursor.getInt(cursor.getColumnIndex("personid"));
+			String name=cursor.getString(cursor.getColumnIndex("name"));
+			String phone=cursor.getString(cursor.getColumnIndex("phone"));
+			
+			return new Person(personid,name,phone);
+		}
+		return null;
+	}
+	/**
+	 * 删除某一条记录
+	 * @param id
+	 */
+	public void delete(Integer id)
+	{
+		SQLiteDatabase db=helper.getWritableDatabase();
+		db.execSQL("delete from person where personid=?",
+					new Object[]{id});
+	}
+	
+	/**
+	 * 得到记录数
+	 * @return
+	 */
+	public long getCount()
+	{
+		SQLiteDatabase db=helper.getReadableDatabase();
+		Cursor cursor=db.rawQuery("select count(*) from person", null);
+		cursor.moveToFirst();
+		return cursor.getLong(0);
+	}
+	/**
+	 * 分页查询方法 SQL语句跟MySQL的语法一样
+	 * @return
+	 */
+	public List<Person> getScrollData(int offset,int maxResult)
+	{
+		List<Person> persons=new ArrayList<Person>();
+		SQLiteDatabase db=helper.getReadableDatabase();
+		Cursor cursor=db.rawQuery("select * from person limit ?,?", 
+									new String[]{String.valueOf(offset),String.valueOf(maxResult)});
+		while (cursor.moveToNext())
+		{
+			int personid=cursor.getInt(cursor.getColumnIndex("personid"));
+			String name=cursor.getString(cursor.getColumnIndex("name"));
+			String phone=cursor.getString(cursor.getColumnIndex("phone"));
+			
+			persons.add(new Person(personid,name,phone));
+		}
+		
+		return persons;
+	}
+}
+ 
+
+
+view plaincopy to clipboardprint?
+package com.zyq.voo;   
+public class Person   
+{   
+    private Integer id;   
+    private String name;   
+    private String phone;   
+       
+    public Person(int personid, String name, String phone)   
+    {   
+        this.id=personid;   
+        this.name=name;   
+        this.phone=phone;   
+    }   
+       
+    public Person(String name, String phone)   
+    {   
+        this.name = name;   
+        this.phone = phone;   
+    }   
+    public String toString()   
+    {   
+        return "Person [id=" + id + ", name=" + name + ", phone=" + phone + "]";   
+    }   
+    public Integer getId()   
+    {   
+        return id;   
+    }   
+    public void setId(Integer id)   
+    {   
+        this.id = id;   
+    }   
+    public String getName()   
+    {   
+        return name;   
+    }   
+    public void setName(String name)   
+    {   
+        this.name = name;   
+    }   
+    public String getPhone()   
+    {   
+        return phone;   
+    }   
+    public void setPhone(String phone)   
+    {   
+        this.phone = phone;   
+    }   
+       
+       
+       
+}  
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/hosterZhu/archive/2011/01/13/6133927.aspx
