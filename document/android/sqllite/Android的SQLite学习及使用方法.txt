@@ -1,0 +1,43 @@
+我们曾经介绍过《Android SQLite数据库应用技巧分享》，今天我们将介绍一下Android的SQLite学习及使用方法。
+
+SQLite介绍
+
+SQLite是轻量级的、嵌入式的、关系型数据库，目前已经在iPhone、Android等手机系统中使用,SQLite可移植性好，很容易使用，很小，高效而且可靠。SQLite嵌入到使用它的应用程序中，它们共用相同的进程空间，而不是单独的一个进程。从外部看，它并不像一个RDBMS，但在进程内部，它却是完整的，自包含的数据库引擎。
+
+在android中当需要操作SQLite数据库的时候需要得到一个SQLiteOpenHelper对象，而SQLiteOpenHelper是一个抽象类，用户需要继承这个类，并实现该类中的一些方法。
+
+1、继承SQLiteOpenHelper之后就拥有了以下两个方法：
+
+◆getReadableDatabase() 创建或者打开一个查询数据库
+
+◆getWritableDatabase()创建或者打开一个可写数据库
+
+◆他们都会返回SQLiteDatabase对象，用户通过得到的SQLiteDatabase对象进行后续操作
+
+2、同时用户还可以覆盖以下回调函数，再对数据库进行操作的时候回调以下方法：
+
+◆onCreate(SQLiteDatabase)：在数据库第一次创建的时候会调用这个方法，一般我们在这个方法里边创建数据库表。
+
+◆onUpgrade(SQLiteDatabase,int,int)：当数据库需要修改的时候，Android系统会主动的调用这个方法。一般我们在这个方法里边删除数据库表，并建立新的数据库表，当然是否还需要做其他的操作，完全取决于应用程序的需求。
+
+◆onOpen(SQLiteDatabase)：这是当打开数据库时的回调函数，一般也不会用到。
+
+需要注意
+
+1、在SQLiteOepnHelper的子类当中，必须有以下该构造函数
+
+public DatabaseHelper(Context context, String name, CursorFactory factory,     int version) {    //必须通过super调用父类当中的构造函数    super(context, name, factory, version);  }   为了方便，也可以创建其它的构造函数，含二个参数或者三个参数的。
+
+2、函数public void onCreate(SQLiteDatabase db)是在调用getReadableDatabase()或者是getWritableDatabase()第一次创建数据库的时候执行,实际上是在第一次得到SQLiteDatabse对象的时候，才会调用这个方法.
+
+public void onCreate(SQLiteDatabase db) {    System.out.println("create a Database");    //execSQL函数用于执行SQL语句    db.execSQL("create table user(id int,name varchar(20))");  }   在向数据库的表中插入记录时，需要先将数据包含在一个ContentValues中，向该对象当中插入键值对，其中键是列名，值是希望插入到这一列的值，值必须和数据库当中的数据类型一致。接着调用Databasehelper的getWritableDatabase方法来获得可以写入的Databasehelper对象，再向其中insert记录。注意调用DatabaseHelper对象的insert,update或者query方法的参数的传递。
+
+另外执行query方法后，返回的是一个Cursor游标，游标最开始指向的是记录集合中第一行的上一行，因此首先需要先调用cursor.next()将游标移动到记录集合的第一行，接着再获取数据即可。
+
+Java代码
+
+    public class SQLiteActivity extends Activity {        /** Called when the activity is first created. */         private Button createButton;          private Button insertButton;          private Button updateButton;          private Button updateRecordButton;            private Button queryButton;           @Override         public void onCreate(Bundle savedInstanceState) {             super.onCreate(savedInstanceState);               setContentView(R.layout.main);                createButton = (Button)findViewById(R.id.createDatabase);             updateButton = (Button)findViewById(R.id.updateDatabase);             insertButton = (Button)findViewById(R.id.insert);             updateRecordButton = (Button)findViewById(R.id.update);               queryButton = (Button)findViewById(R.id.query);               createButton.setOnClickListener(new CreateListener());                updateButton.setOnClickListener(new UpdateListener());                insertButton.setOnClickListener(new InsertListener());                updateRecordButton.setOnClickListener(new UpdateRecordListener());                queryButton.setOnClickListener(new QueryListener());          }         class CreateListener implements OnClickListener{              @Override             public void onClick(View v) {                 //创建一个DatabaseHelper对象                    DatabaseHelper dbHelper = new DatabaseHelper(SQLiteActivity.this,"test_mars_db");                 //只有调用了DatabaseHelper对象的getReadableDatabase()方法，或者是getWritableDatabase()方法之后，才会创建，或打开一个数据库                    SQLiteDatabase db = dbHelper.getReadableDatabase();               }         }         class UpdateListener implements OnClickListener{                    @Override             public void onClick(View v) {                 DatabaseHelper dbHelper = new DatabaseHelper(SQLiteActivity.this,"test_mars_db",2);                   SQLiteDatabase db = dbHelper.getReadableDatabase();               }                       }         class InsertListener implements OnClickListener{                    @Override             public void onClick(View v) {                 //生成ContentValues对象                   ContentValues values = new ContentValues();                   //想该对象当中插入键值对，其中键是列名，值是希望插入到这一列的值，值必须和数据库当中的数据类型一致                    values.put("id", 1);                  values.put("name","zhangsan");                    DatabaseHelper dbHelper = new DatabaseHelper(SQLiteActivity.this,"test_mars_db",2);                   SQLiteDatabase db = dbHelper.getWritableDatabase();                   //调用insert方法，就可以将数据插入到数据库当中                   db.insert("user", null, values);              }         }         //更新操作就相当于执行SQL语句当中的update语句          //UPDATE table_name SET XXCOL=XXX WHERE XXXXCOL=XX...           class UpdateRecordListener implements OnClickListener{                      @Override             public void onClick(View arg0) {                  // TODO Auto-generated method stub                    //得到一个可写的SQLiteDatabase对象                 DatabaseHelper dbHelper = new DatabaseHelper(SQLiteActivity.this,"test_mars_db");                 SQLiteDatabase db = dbHelper.getWritableDatabase();                   ContentValues values = new ContentValues();                   values.put("name", "zhangsanfeng");                   //第一个参数是要更新的表名                    //第二个参数是一个ContentValeus对象                 //第三个参数是where子句                   db.update("user", values, "id=?", new String[]{"1"});             }         }         class QueryListener implements OnClickListener{                     @Override             public void onClick(View v) {                 System.out.println("aaa------------------");                  Log.d("myDebug", "myFirstDebugMsg");                                    DatabaseHelper dbHelper = new DatabaseHelper(SQLiteActivity.this,"test_mars_db");                 SQLiteDatabase db = dbHelper.getReadableDatabase();                   Cursor cursor = db.query("user", new String[]{"id","name"}, "id=?", new String[]{"1"}, null, null, null);                 while(cursor.moveToNext()){                       String name = cursor.getString(cursor.getColumnIndex("name"));                        System.out.println("query--->" + name);                   }             }         }               }     
+    
+    
+    
+    http://mobile.51cto.com/hot-234016.htm

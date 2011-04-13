@@ -1,0 +1,3 @@
+AndroidManifest.xml,打开Application，然后找到Debuggable将其设置成true就ok了
+我都是在真机上设置就可以了……
+设置=》应用程序=》开发=》USB调试，选中即可。

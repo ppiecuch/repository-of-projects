@@ -1,0 +1,18 @@
+Runtime r = Runtime.getRuntime();
+ Process p;
+try {
+ p = r.exec(path + "adb -s " + serialNumber + " uninstall "+ apkPath);
+ BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+ String inline;
+ while ((inline = br.readLine()) != null) {
+    System.out.println(inline);
+}
+} catch (IOException e) {
+           e.printStackTrace();
+}
+
+adb -s emulator-5554 uninstall com.包名
+
+serialNumber是你的设备名
+apkPath是包名
+path是你的adb tools的路径名~指的在windows或linux下如果没有设置adb tools到环境变量中去就要加上这个~
