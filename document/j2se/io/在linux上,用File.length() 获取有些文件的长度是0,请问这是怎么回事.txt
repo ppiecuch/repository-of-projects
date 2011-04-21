@@ -1,0 +1,24 @@
+我在linux上,用File.length() 获取有些文件的长度是0, 请问这是怎么回事？
+TIA
+
+//test.java
+import java.io.*;
+public class test
+{
+public static void main(String args[])
+{
+File file = new File("/proc/mdstat");
+System.out.println("file.length(): " + file.length());
+}
+} 
+
+
+
+Here is the answer from TeamB:
+
+The /proc filesystem is a special file system that maintains process
+state. The contents don't exist on disk but rather in memory, and the
+contents are highly dynamic. Because you're not opening a real file
+per se, there's no easy way to determine the length, so Java returns 0.
+
+http://www.cjsdn.net/post/print?bid=1&id=138072
