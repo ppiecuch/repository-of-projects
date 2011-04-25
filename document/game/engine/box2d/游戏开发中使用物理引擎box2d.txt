@@ -1,0 +1,284 @@
+本文基于JBox2d+canvas，后续提供NDK+openglEs版本；本文的主要目的是给大家介绍如何使用创建一个物理世界。
+
+
+一、主函数：
+
+主函数包括了Box2D的基本流程
+简单来说，一个Box2D程序的基本流程是由以下三个基本步骤构成的：
+
+
+
+
+代码如下：
+function box2dMain() {
+
+setupWorld();               //1. 创建一个世界
+
+addBodys();                 //2. 为世界创建物体
+
+setInterval(step, 1000/60); //3. 让世界动起来，反复计算和绘制世界
+
+}
+复制代码二、创建世界：
+
+设定世界有效区域的大小：超过有效区域的物体将不参与计算。
+定义重力：重力是一个二维矢量，矢量在Box2D中用b2Vec2来定义。
+设定是否允许物体休眠：当物体静止下来，它就会被判定为休眠，如果打开这个开关，对于休眠的物体将停止模拟。直到它被其它物体解除，它才会醒来。
+
+代码：
+function setupWorld(){
+
+//1. 设置有效区域大小 - b2AABB 类 （左上角向量,右下角向量）
+
+worldAABB = new b2AABB();
+
+worldAABB.minVertex.Set(-1000, -1000);  //左上角
+
+worldAABB.maxVertex.Set(1000, 1000);    //右下角
+
+//2. 定义重力 - 2D向量 - b2Vec2 类 （x,y）
+
+gravity = new b2Vec2(0, 300);
+
+//3. 忽略休眠的物体
+
+var doSleep = true;
+
+//4. 创建世界 - b2World
+
+var world = new b2World(worldAABB, gravity, doSleep);
+
+}
+复制代码三、创建物体：
+
+形状定义：Box2D中有三种基本形状，圆形（Circle）、矩形（Box）、多边形（Poly）。每个形状可以单独定义摩擦力、弹性、密度、相对位置等参数。形状是组成物体的基本材料。（当物体的密度设定为0时，物体变为墙类物体，不可移动）
+物体定义：物体可由多个形状组成。形状由其定义相对位置（localPosition）决定其在物体中的位置，形状添加到物体后，其相对位置始终保持不变。
+物体：物体只有使用世界的CreateBody()来生成，物体是物体定义的实例。只有使用这个函数生成的物体，才会在世界中被模拟。
+
+
+
+
+
+
+代码：
+function addBodys(){
+
+
+
+//1. 定义形状   b2CircleDef,b2BoxDef,b2PolyDef 类
+
+var Shape1 = new b2CircleDef(); //Shape1:圆形
+
+Shape1.radius = 20;                 //半径
+
+Shape1.localPosition.Set(0, 0);     //偏移量
+
+Shape1.density = 1.0;               //密度
+
+Shape1.restitution = .3;            //弹性
+
+Shape1.friction = 1;                //摩擦力
+
+
+
+var Shape2 = new b2PolyDef();   //Shape2:多边形
+
+Shape2.vertexCount = 3;                     //顶点数为5
+
+Shape2.vertices[0] = new b2Vec2(0,-20);     //顶点1
+
+Shape2.vertices[1] = new b2Vec2(23.10,20);  //顶点2
+
+Shape2.vertices[2] = new b2Vec2(-23.10,20); //顶点3
+
+Shape2.localPosition.Set(0, 30);    //偏移量
+
+Shape2.density = 1.0;               //密度
+
+Shape2.restitution = .3;            //弹性
+
+Shape2.friction = 1;                //摩擦力
+
+
+
+//2. 定义物体   b2BodyDef 类
+
+var BodyDef1 = new b2BodyDef();
+
+BodyDef1.position.Set(100, 100);    //设置物体的初始位置
+
+BodyDef1.AddShape(Shape1);          //物体中加入Shape1
+
+BodyDef1.AddShape(Shape2);          //物体中加入Shape2
+
+
+
+//3. 将物体添加至world
+
+Body = World.CreateBody(BodyDef1);  //在世界中创建物体
+
+
+
+//...可用同样流程继续添加物体，再定义一块地板
+
+var Shape3 = new b2BoxDef();    //Shape3:矩形
+
+
+
+Shape3.extents.Set(200, 5);         //定义矩形高、宽
+
+Shape2.density = 0;                 //墙体密度为0
+
+Shape2.restitution = .3;            //弹性
+
+Shape2.friction = 1;                //摩擦力
+
+var BodyDef2 = new b2BodyDef();
+
+BodyDef2.position.Set(220, 500);    //设置物体的初始位置
+
+BodyDef2.AddShape(Shape3);          //物体中加入Shape3
+
+Body2 = World.CreateBody(BodyDef2); //在世界中创建物体
+
+}
+复制代码四、让世界运动起来：
+
+
+step()函数的作用是计算某段时间后，世界中物体的位置和角度，并将其绘制到浏览器中。
+计算机中的动画，是一帧一帧构成的，每一帧表现了动画中某一时刻的一个场景。所以我们使用定时器函数setInterval(step, 1000/60)，来每1/60秒执行一次计算和重绘工作，也就是上述的step()函数。
+step()中的dt参数，告诉了计算机要计算当前时间多少秒以后的世界，Box2D官方推荐为1/60秒，当然，如果你的计算机足够快，缩小这个时间间隔。另外dt应该与setInterval()函数中的第二个参数对应起来，这样才不会导致物体看起来运动的比你想像的要快或者慢。还有一点，dt不宜过大，否则模拟会不太精确，可能出现物体穿过另一个物体之类的bug。
+step()中的iterations参数，是多个物体同时发生碰撞时的模拟精度，越高的值会使模拟越精确，但同时也会让运算速度大幅下降，推荐值为10。
+step()中的World.step()函数是用来计算世界中物体的位置，执行后，物体的位置、角度、速度等信息更新。;
+step()中的drawWorld()函数会将物体绘制在浏览器中。
+
+
+
+
+
+
+代码：
+
+
+function step(){
+
+//计算多少秒之后的世界
+
+var dt = 1/60;
+
+//迭代次数，影响物体碰撞的计算精度，太高会导致速度过慢
+
+var iterations = 10;
+
+//计算dt秒之后世界中物体的位置
+
+World.step(dt,iterations);
+
+//绘制世界
+
+drawWorld();
+
+}
+复制代码五、绘制世界：
+
+一般情况下我们只利用box2d提供物理模拟，具体世界的绘制工作自己实现。具体绘制方式opengl，canvas，etc。
+代码：
+/绘制世界
+
+function drawWorld(){
+
+
+
+//绘制之前将上一帧的内容清除
+
+context.clearRect(0, 0, canvasWidth, canvasHeight);
+
+//遍历世界中的物体
+
+for (var b = World.m_bodyList; b; b = b.m_next) {
+
+//遍历物体中的形状
+
+for (var s = b.GetShapeList(); s != null; s = s.GetNext())
+
+{
+
+this.drawShape(s);  //绘制一个形状
+
+}
+
+}
+
+
+
+}
+
+
+
+//绘制一个形状
+
+function drawShape(shape){
+
+
+
+context.strokeStyle = '#000';       //线形
+
+context.beginPath();
+
+switch (shape.m_type) {
+
+case b2Shape.e_circleShape:{    //如果是圆形，画圆
+
+var circle = shape;
+
+var r = circle.m_radius;
+
+var pos = circle.m_position;
+
+var pos2 = circle.m_R.col1.clone().scale(r).add(pos);
+
+context.arc(pos.x, pos.y, r, 0, Math.PI * 2, false);
+
+context.moveTo(pos.x, pos.y);
+
+context.lineTo(pos2.x, pos2.y);
+
+break;
+
+}
+
+case b2Shape.e_polyShape:{      //如果是多边形，画多边形
+
+var poly = shape;
+
+var tV = b2Math.AddVV(poly.m_position,
+
+b2Math.b2MulMV(poly.m_R, poly.m_vertices[0]));
+
+context.moveTo(tV.x, tV.y);
+
+for (var i = 0; i < poly.m_vertexCount; i++) {
+
+var v = b2Math.AddVV(poly.m_position,
+
+b2Math.b2MulMV(poly.m_R, poly.m_vertices[i]));
+
+context.lineTo(v.x, v.y);
+
+}
+
+context.lineTo(tV.x, tV.y);
+
+break;
+
+}
+
+}
+
+context.stroke();   //绘制
+
+
+
+}
+复制代码
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=70494
