@@ -1,0 +1,16 @@
+android:theme="@android:style/Theme.Dialog"将一个Activity显示为对话框的模式
+android:theme="@android:style/Theme.NoTitleBar" 不显示应用程序的标题栏
+android:theme="@android:style/Theme.NoTitleBar.Fullscreen" 不显示应用程序的标题栏,并全屏
+android:theme="@android:style/Theme.Light"将一个Activity的背景设置为白色
+android:theme="@android:style/Theme.Light.NoTitleBar"将一个Activity的背景设置为白色并无标题栏
+
+android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen"将一个Activity的背景设置为白色并无标题栏并全屏
+android:theme="@android:style/Theme.Black" 将一个Activity的背景设置为黑色
+android:theme="@android:style/Theme.Black.NoTitleBar" 将一个Activity的背景设置为黑色
+android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" 将一个Activity的背景设置为黑色并无标题栏并全屏
+android:theme="@android:style/Theme.Wallpaper" 用系统桌面为应用程序背景
+
+android:theme="@android:style/Theme.Wallpaper.NoTitleBar" 用系统桌面为应用程序背景,并无标题栏
+android:theme="@android:style/Theme.Wallpaper.NoTitleBar.Fullscreen" 用系统桌面为应用程序背景,并无标题栏并全屏android:theme="Translucent"android:theme="Theme.Translucent.NoTitleBar"android:theme="Theme.Translucent.NoTitleBar.Fullscreen"android:theme="Theme.Panel"
+
+android:theme="Theme.Light.Panel"

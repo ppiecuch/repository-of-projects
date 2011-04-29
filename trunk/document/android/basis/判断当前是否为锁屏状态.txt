@@ -1,0 +1,7 @@
+boolean isLocked = false;
+KeyguardManager km = (KeyguardManager) getSystemService(
+                        Context.KEYGUARD_SERVICE);
+if (km.inKeyguardRestrictedInputMode()) {
+                 isLocked = true;
+   }
+

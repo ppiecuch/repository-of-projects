@@ -1,0 +1,7 @@
+MotionEvent的getX(),getY()与getRawx(),getRawY()的区别
+如果是Activity实现OnTouchListener接口，需要重写onTouch(View view，MotionEvent event)这个方法，getRawX()和getRawY()获得的是相对屏幕的位置（整个屏幕），getX()和getY()获得的永远是view的触摸位置坐标（这两个值不会超过view的长度和宽度）。也就是getX()永远是你触摸的view的x位置,这个x就是鼠标相对于这个view的位置;getY()也是同样的处理。
+getRawX()是你触摸的view的x位置,这个位置是相对于屏幕的位置，getRawY也是同样的处理。
+还能获取触摸标题栏时的坐标位置，但是触摸状态栏时的坐标位置不能获得。
+
+如果重写Activity的onTouchEvent(MotionEvent event),这个时候获得的是屏幕点击位置的坐标。getRawX()和getRawY()获得的是相对屏幕的位置（整个屏幕），getX()和getY()获得的永远是view的触摸位置坐标（这两个值不会超过view的长度和宽度）。也就是getX()永远是你触摸的view的x位置,这个x就是鼠标相对于这个view的位置;getY()也是同样的处理。而且标题栏和状态栏时的坐标位置都是不能获得。
+（注：Activity上有两段宽度：一个是状态栏，一个是标题栏，每一个宽度都占了25像素）
