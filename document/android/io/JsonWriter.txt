@@ -1,0 +1,176 @@
+在Android 3.0中新增了一个JSON写入类android.util.JsonWriter，使用JsonWriter可以轻松的生成JSON格式的数据，比如下面的JSON数据为
+
+Java代码：
+[{
+
+"id": 912345678901,
+
+"text": "How do I write JSON on Android?",
+
+"geo": null,
+
+"user": {
+
+"name": "android_newb",
+
+"followers_count": 41
+
+},{
+
+"id": 912345678902,
+
+"text": "@android_newb just use android.util.JsonWriter!",
+
+"geo": [50.454722, -104.606667],
+
+"user": {
+
+"name": "jesse",
+
+"followers_count": 2
+
+}
+
+}
+
+
+
+]}
+复制代码
+       上面的JSON数据在Android 3.0 honeycomb上的写入代码为
+
+Java代码：public void writeJsonStream(OutputStream out, List messages) throws IOException {
+
+JsonWriter writer = new JsonWriter(new OutputStreamWriter(out, "UTF-8")); 
+
+//android开发网提示这是UTF-8编码
+
+writer.setIndent(" ");
+
+writeMessagesArray(writer, messages);
+
+writer.close();
+
+
+
+public void writeMessagesArray(JsonWriter writer, List messages) throws IOException {
+
+writer.beginArray();
+
+for (Message message : messages) {
+
+writeMessage(writer, message);
+
+}
+
+writer.endArray();
+
+}
+
+
+
+public void writeMessage(JsonWriter writer, Message message) throws IOException {
+
+writer.beginObject();
+
+writer.name("id").value(message.getId());
+
+writer.name("text").value(message.getText());
+
+if (message.getGeo() != null) {
+
+writer.name("geo");
+
+writeDoublesArray(writer, message.getGeo());
+
+} else {
+
+writer.name("geo").nullValue();
+
+}
+
+writer.name("user");
+
+writeUser(writer, message.getUser());
+
+writer.endObject();
+
+}
+
+
+
+public void writeUser(JsonWriter writer, User user) throws IOException {
+
+writer.beginObject();
+
+writer.name("name").value(user.getName());
+
+writer.name("followers_count").value(user.getFollowersCount());
+
+writer.endObject();
+
+}
+
+
+
+public void writeDoublesArray(JsonWriter writer, List doubles) throws IOException {
+
+writer.beginArray();
+
+for (Double value : doubles) {
+
+writer.value(value);
+
+}
+
+writer.endArray();
+
+
+
+}}
+复制代码
+        这里我们可以看到Android 3.0开始的JsonWriter类可以很轻松的写入json格式的数据流，整个类的成员有
+
+Java代码：
+
+Public Constructors
+
+JsonWriter(Writer out) //公共构造方法，参数为Writer类这是一个I/O类的对象
+
+
+
+JsonWriter beginArray()
+
+JsonWriter beginObject()
+
+void close()
+
+JsonWriter endArray()
+
+JsonWriter endObject()
+
+void flush()
+
+boolean isLenient()
+
+JsonWriter name(String name)
+
+JsonWriter nullValue()
+
+void setIndent(String indent)
+
+void setLenient(boolean lenient)
+
+JsonWriter value(double value)
+
+JsonWriter value(long value)
+
+JsonWriter value(Number value)
+
+JsonWriter value(boolean value)
+
+JsonWriter value(String value)
+复制代码
+       我们平时需要注意的就是API Level为honycomb才能调用，同时上面代码为utf-8编码，写入时保证流清空记住调用flush方法将缓存写入到流中。
+       
+       http://www.eoeandroid.com/forum.php?mod=viewthread&tid=71426

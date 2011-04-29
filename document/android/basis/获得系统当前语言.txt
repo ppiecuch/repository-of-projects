@@ -1,0 +1,5 @@
+1)String currentLanguage = getResources().getConfiguration().local.getCountry();
+
+2)IActivityManager am = ActivityManagerNative.getDefault();
+             Configuration config = am.getConfiguration();
+             String currentLanguage = config.locale.toString();

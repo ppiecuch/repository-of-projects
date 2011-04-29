@@ -1,0 +1,105 @@
+WebView的使用很方便。在学习WebView之前，我们现看看如何通过程序中调浏览器。
+
+1、在程序中调起浏览器 
+
+Uri uri = Uri.parse("http://commonsware.com");
+Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+startActivity(intent);
+
+2、通过WebView嵌入浏览器 
+
+1）允许internet连接的访问
+
+在上面的例子中，我们可能发现无法相关的网页，这是因为程序不具备internet连接的权限，我们需要在Androidmanifest.xml中为App设置相关的权限。
+
+<manifest... > 
+    ... ... 
+<uses-permission android:name="android.permission.INTERNET" /> 
+    <application .....> 
+         ... ... 
+    </application> 
+</manifest> 
+
+2）在Android XML中设置WebView控件
+
+<?xml version="1.0" encoding="utf-8"?> 
+<LinearLayout .... > 
+   <WebView android:id="@+id/c131_webkit"
+     android:layout_width="fill_parent"
+     android:layout_height="fill_parent" />
+</LinearLayout> 
+
+3）通过WebView对象，加载某个URL
+
+WebView browser=(WebView)findViewById(R.id.c131_webkit);
+browser.loadUrl("http://commonsware.com");
+
+我们注意到嵌入的 browser没有工具栏的，因此需要通过程序来某些操作和处理，例如reload(), goBack(), canGoBack(), goForward(), canGoForward(), goBackOrForward(),负数表示回跳N次，正数表示前行N次，canGoBackOrForward(), clearCache(), clearHistory()。
+
+4）通过WebView对象，加载自己的内容
+
+我们可以将WebView作为自己的布局框，在里面使用HTML来表述自己的内容。
+
+browser.loadData("<html><body><h2>Hello , world!</h2></body></html>", "text/html", "UTF-8");
+
+ 
+
+3、获得触发的事件响应 
+
+我们可以通过WebViewClient在WebView中加钩子来获取触发事件和相应。下面是一个简单的例子，浏览器中显示目前的时间，并作为一个链接，当我们点击这个链接时，更新为当前最新时间。
+
+private WebView browser= null;
+
+protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState); 
+        setContentView(R.layout.chapter_13_test1); 
+        browser = (WebView)findViewById(R.id.c131_webkit); 
+        browser.setWebViewClient (new WebViewClient() {
+               /* 这个事件，将在用户点击链接时触发。通过判断url，可确定如何操作，如果返回true，表示我们已经处理了这个request，如果返回false，表示没有处理，那么浏览器将会根据url获取网页*/ 
+                public boolean shouldOverrideUrlLoading (WebView view, String url) {
+                      loadTime(); 
+                      return true ; //表示已经处理了这次URL的请求 
+                }
+        });
+       loadTime(); 
+}
+
+private void loadTime(){
+        String page="<html><body><a href=\"clock\">" + new Date().toString()  + "</a></body></html>";
+        /* 这里我们使用了loadDataWithBaseUrl的方式。浏览器可以通过"file:///android_asset/"来获得映用中asset /的资源。但是如果我们没有设置baseUrl，或者为空，这无法获取，想获取这些资源，baseUrl不能设置为http(s)/ftp(s) /about/javascript这些已有专属的定义。在例子中，我们baseUrl设置为"wei://base". 对于上面的那个链接地址为wei://base/clock */ 
+        browser.loadDataWithBaseURL ("wei://base", page, "text/html","UTF-8", null);
+}
+
+ 
+
+4、丰富浏览器的设置 
+
+我们可以通过webview.getSettings()获得WebSettings对象，对浏览器进行设置。如果我们需要支持JavaScript，我们需要如下设置：
+
+browser.getSettings().setJavaScriptEnabled(true);
+
+有几个比较常用的，setDefaultFontSize(), setTextSize(), etJavaScriptEnabled(), setJavaScriptCanOpenWindowsAutomatically(), setUserAgent()－“1”表示使用PC浏览器，0表示使用手机浏览器，可以通知website给出相应的排版方式。
+
+下面是一个例子，在这个例子中，我使用acivity的进度条来显示加载网页的进度条，当进度条满的时候，进度条会消失。
+
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState); 
+        final Activity activity = this;    //因为方法是以final的方式，所以设置final。 
+        //设置activity的进度条，下面一句必须在setContentView之前，否则会报错。 下面的语句也可以用activity.requestWindowFeature(Window.FEATURE_PROGRESS);来替代 
+        getWindow().requestFeature(Window.FEATURE_PROGRESS); 
+               
+        setContentView(R.layout.chapter_13_test1);
+        browser=(WebView)findViewById(R.id.c131_webkit); 
+        browser.getSettings().setJavaScriptEnabled (true); //设置支持javascript的例子 
+        //通过WebChromeClient可以处理JS对话框，titles, 进度，等 ，这个例子，我们处理 ，我们将websit下载的进度同步到acitity的进度条上。 
+        browser.setWebChromeClient (new WebChromeClient(){
+              public void onProgressChanged(WebView view, int newProgress) {
+                //activity的进度是0 to 10000 (both inclusive),所以要*100 
+                activity.setProgress(newProgress * 100);
+            }            
+        }); 
+        browser.loadUrl("http://slashdot.org/"); 
+    } 
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/flowingflying/archive/2011/04/21/6339328.aspx

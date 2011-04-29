@@ -1,0 +1,23 @@
+【锁定横竖屏】
+在Manifest.xml中的相应的activity中加入如下属性：
+android:screenOrientation = "portrait"
+//设置activity只显示竖屏
+android:screenOrientation= "landscape"
+//设置activity只显示横屏
+
+【横竖屏切换不销毁当前activity】
+在Manifest.xml中的相应的activity中加入如下属性：
+android:configChanges="orientation|keyboardHidden"
+在activity中重写public void onConfigurationChanged(Configuration newConfig)方法。
+
+
+
+【在activity中判断当前横竖屏状态】
+Configuration newConfig = this.getResources().getConfiguration();
+if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+当前为竖屏状态
+}
+if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+当前为横屏状态
+}
+

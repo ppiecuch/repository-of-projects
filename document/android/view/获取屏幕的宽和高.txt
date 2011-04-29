@@ -1,0 +1,6 @@
+1£©getWindowManager().getDefaultDisplay().getWidth();
+     getWindowManager().getDefaultDisplay().getHeight();
+
+2£©((WindowManager) getSystemService(WINDOW_SERVICE) .getDefaultDisplay().getWidth();
+     ((WindowManager) getSystemService(WINDOW_SERVICE) .getDefaultDisplay().getHeight();
+

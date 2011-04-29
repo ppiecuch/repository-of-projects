@@ -1,0 +1,16 @@
+PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//获得cpuWakeLock
+PowerManager.WakeLock cpuWakeLock =  powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+                | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, Log.LOGTAG);
+cpuWakeLock.acquire();
+
+//获得screenWakeLock
+PowerManager.WakeLock screenWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK
+                | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, Log.LOGTAG);
+screenWakeLock.acquire();
+
+//释放cpuWakeLock
+cpuWakeLock.release();
+
+//释放screenWakeLock
+screenWakeLock.release();

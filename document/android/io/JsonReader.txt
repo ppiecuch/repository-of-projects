@@ -1,0 +1,163 @@
+在Android 3.0 honeycomb开始提供了新的JSON解析类 - android.util.JsonReader，下面eoeAndroid以下面的JSON为例子
+
+Java代码：
+[{
+
+"id": 912345678901,
+
+"text": "How do I read JSON on Android?",
+
+"geo": null,
+
+"user": {
+
+"name": "android_newb",
+
+"followers_count": 41
+
+},{
+
+"id": 912345678902,
+
+"text": "@android_newb just use android.util.JsonReader!",
+
+"geo": [50.454722, -104.606667],
+
+"user": {
+
+"name": "jesse",
+
+"followers_count": 2
+
+}
+
+
+
+}
+
+
+
+]}
+复制代码
+       则解析上面的JSON，使用下面代码即可，整个处理方法和解析XML差不多，最终使用List数组保存，不过eoeAndroid提示大家，下面的编码为UTF-8如果遇到中文，服务器默认按GBK编码，下面的UTF-8改为GB2312可以解决乱码问题。
+
+Java代码：
+public List readJsonStream(InputStream in) throws IOException {
+
+JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+
+return readMessagesArray(reader);
+
+public List readMessagesArray(JsonReader reader) throws IOException {
+
+List messages = new ArrayList();
+
+reader.beginArray();
+
+while (reader.hasNext()) {
+
+messages.add(readMessage(reader));
+
+}
+
+
+
+
+
+reader.endArray();
+
+return messages;
+
+}
+
+public Message readMessage(JsonReader reader) throws IOException {
+
+long id = -1;
+
+String text = null;
+
+User user = null;
+
+List geo = null;
+
+reader.beginObject();
+
+while (reader.hasNext()) {
+
+String name = reader.nextName();
+
+if (name.equals("id")) {
+
+id = reader.nextLong();
+
+} else if (name.equals("text")) {
+
+text = reader.nextString();
+
+} else if (name.equals("geo") && reader.peek() != JsonToken.NULL) {
+
+geo = readDoublesArray(reader);
+
+} else if (name.equals("user")) {
+
+user = readUser(reader);
+
+} else {
+
+reader.skipValue();
+
+}
+
+}
+
+reader.endObject();
+
+return new Message(id, text, user, geo);
+
+
+
+}
+复制代码
+        最终eoeAndroid再次提醒大家，JsonReader是Android 3.0引入的新解析类，必须在API Level为honeycomb中的SDK以及固件在3.0上才能使用，完整的成员如下
+
+Java代码：Public Constructors
+
+JsonReader(Reader in) //公共构造方法
+
+void beginArray()
+
+void beginObject()
+
+void close()
+
+void endArray()
+
+void endObject()
+
+boolean hasNext()
+
+boolean isLenient()
+
+boolean nextBoolean()
+
+double nextDouble()
+
+int nextInt()
+
+long nextLong()
+
+String nextName()
+
+void nextNull()
+
+String nextString()
+
+JsonToken peek()
+
+void setLenient(boolean lenient)
+
+void skipValue()
+
+String toString()
+复制代码
+http://www.eoeandroid.com/thread-71423-1-1.html

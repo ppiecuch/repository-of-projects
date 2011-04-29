@@ -1,0 +1,26 @@
+1.到http://www.gnustep.org/experience/Windows.html下载第一,第二,第三下载项,即GNUstep MSYS System
+和GNUstep Core,GNUstep Devel
+2.一个是GNUstep System，其实就是MinGW和MSYS，一个是GNUstep Core，这才是我们需要
+GNUstep相关的东西。安装很简单，就是windows下面的标准安装程序。
+3.装完后，在开始菜单里面，有一个GNUstep 的菜单，点击shell就可以进入MSYS交互环境了。
+
+4.
+> vim main.m
+#import <stdio.h>      
+    int main(int argc,const char *argv[]){      
+    printf(”hello world\n”);      
+    return 0;      
+}
+>:wq
+会在C:\GNUstep\msys\1.0\home\你的用户名 生成main.m 
+
+>gcc -o hello.exe main.m
+-I/GNUstep/System/Library/Headers
+-fconstant-string-class=NSConstantString
+-L/GNUstep/System/Library/Libraries
+-lobjc -lgnustep-base
+>hello.exe //打印hello world
+
+
+参数-I 表示头文件查找的路径，-L 表示库文件查找路径，-l 表示需要链接的库文件，
+-fconstant-string-class=NSConstantString 主要是指定常量字符串所使用的class。
