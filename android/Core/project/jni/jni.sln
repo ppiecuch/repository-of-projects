@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jni", "jni.vcproj", "{38D196BD-A9A5-4CB5-82C3-51FFD00A9267}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38D196BD-A9A5-4CB5-82C3-51FFD00A9267}.Debug|Win32.ActiveCfg = Debug|Win32
+		{38D196BD-A9A5-4CB5-82C3-51FFD00A9267}.Debug|Win32.Build.0 = Debug|Win32
+		{38D196BD-A9A5-4CB5-82C3-51FFD00A9267}.Release|Win32.ActiveCfg = Release|Win32
+		{38D196BD-A9A5-4CB5-82C3-51FFD00A9267}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
