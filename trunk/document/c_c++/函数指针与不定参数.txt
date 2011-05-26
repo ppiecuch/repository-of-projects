@@ -1,0 +1,23 @@
+#include<stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+
+typedef void (*FUN)(int,...);
+
+void tVarArg(int num,...)
+{
+    va_list argp;  
+    va_start(argp,num); 
+    while(--num>=0)
+      printf("%s",(va_arg(argp,char*)));
+    va_end(argp);
+    return ;
+}
+
+int main(){
+    FUN fp = tVarArg;
+    fp(2,"hello  ","world\n");
+    system("pause");
+    return 0;
+}
+http://topic.csdn.net/u/20100913/23/67151072-feef-482c-9594-389eb28846fd.html

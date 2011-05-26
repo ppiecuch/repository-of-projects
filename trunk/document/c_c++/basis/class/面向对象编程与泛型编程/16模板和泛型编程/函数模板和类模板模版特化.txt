@@ -1,0 +1,396 @@
+关于类模板偏特化,可参考:http://topic.csdn.net/t/20060811/17/4943688.html
+
+
+函数模板和类模板 模版特化
+
+关键字: template <class t>, template <typename t> 
+
+模板
+
+       模板(template)是一个将数据类型参化的工具,它提供了一种将代码与数据类相脱离的机制,即代码不受具体的数据类型的影响。模板分为函数模板和类模板两种。
+
+ (1)函数模板
+
+      函数模板是一种不说明某些参数的数据类型的函数。例如，下面定义了一个可对任何类型变量进行操作（求绝对值）的函数模板：
+
+ template <class T>   //或写成: template <typename T>    函数参数的类型T 
+ T abs(T val)    
+{    
+       return val<0 ? -val : val;    
+ }   
+ 
+
+   在template语句与函数模板定义语句之间不允许有别的语句。如下面的声明是错误的：
+
+template<class T>
+
+int I;          // 不该出现在此位置
+
+T min(T x,T y)
+
+{
+
+      //函数体
+
+}
+
+
+在函数模板被调用时，编译器根据实际参数的类型确定模板参数T的类型，并自动生成一个对应的函数，即模板函数。模板参数的类型不同，生成的模板函数也不同。
+
+
+模板函数类似于重载函数，但两者有很大区别：函数重载时，每个函数体内可以执行不同的动作，但同一个函数模板实例化后的模板函数都必须执行相同的动作
+
+ 
+
+例 1 函数模板的定义和使用
+
+#include <iostream.h>    
+template <class T>            //定义模板    
+T abs(T val)                //定义函数模板    
+{    
+    return val<0 ? -val : val;    
+}    
+   
+void main()    
+{    
+    int i=100;    
+    cout <<abs(i)<<endl;    //类型参数T替换为int    
+    long l=-12345L;    
+    cout <<abs(l)<<endl;    //类型参数T替换为long    
+    float f=-125.78F;    
+    cout <<abs(f)<<endl;    //类型参数T替换为float    
+}   
+     定义函数模板时也可以使用多个类型参数，这时每个类型参数前面都要加上关键字class或typename，其间用逗分隔，其形式如下所示。
+
+      template <class T1,class T2,class T3>
+
+ 例 2 使用多个类型参数的函数模板
+
+#include <iostream.h>    
+template <class T1,class T2>    
+T1 Max(T1 x,T2 y)    
+{    
+    return x>y ? x: (T1)y;    
+}    
+   
+void main()    
+{    
+    int i=100;    
+    float f=-125.78F;    
+    cout <<Max(i,f)<<endl;          //类型参数T1替换为int,T2替换为float    
+}   
+  (2)类模板
+
+  使用多个类型参数的类模板
+
+#include <iostream.h>   
+template <class T1,class T2>          //使用2个类型参数   类的数据变量参数类型T 
+class MyTemClass                        //定义类模板    
+{    
+private:    
+    T1 x;    
+    T2 y;    
+public:    
+    MyTemClass(T1 a,T2 b) { x=a;y=b; }  //构造函数    
+    void ShowMax()                      //输出最大的数据成员    
+    {    
+        cout <<"MaxMember="<<(x>y?x:y)<<endl;    
+    }    
+};    
+   
+void main()    
+{    
+    int a=100;    
+    float b=123.45F;    
+    MyTemClass<int,float> mt(a,b);    //声明类模板的对象    
+    mt.ShowMax();    
+}   
+（3）模版特化
+
+模板的“特化”（实例化），它发生在编译期，
+
+无论一个模板被实例化多少次，都不会影响最终结果，但是这会浪费编译的时间．
+
+不知道隐式特化是啥东西．但是显式特化的意思是：当一类东西中出了一渣滓的时候，为了对外接口的统一，或者说是为了家丑不可外扬，有必要把它单独拿出来写一下，然后使他可以和这个类中的所有东西步伐一致。
+
+
+为了需要,针对特定的类型,需要对模板进行特化,也就是特殊处理, 是为模板的特化.
+template <class T>
+class A {};
+template < > class A<bool> { //…// };
+上述定义中template < >告诉编译器这是一个特化的类模板。
+
+ 
+
+函数模板的特化
+
+template <class T>
+
+T mymax(const T t1, const T t2)
+
+{
+
+    return t1 < t2 ? t2 : t1;
+
+}
+
+
+看下面的例子
+
+main()
+
+{
+
+   int highest = mymax(5,10);
+
+   char c = mymax(‘a’, ’z’);
+
+   const char* p1 = “hello”;
+
+   const char* p2 = “world”;
+
+   const char* p = mymax(p1,p2);
+
+}
+
+ 
+
+前面两个mymax都能返回正确的结果.而第三个却不能,因为,此时mymax直接比较两个指针p1 和 p2 而不是其指向的内容.
+
+针对这种情况,当mymax函数的参数类型为const char* 时,需要特化。
+
+
+template <>
+
+const char* mymax(const char* t1,const char* t2)
+
+{
+
+    return (strcmp(t1,t2) < 0) ? t2 : t1;
+
+}
+
+现在mymax(p1,p2)能够返回正确的结果了。
+
+
+（4）模板的偏特化
+
+模板的偏特化是指需要根据模板的某些但不是全部的参数进行特化
+
+(1) 类模板的偏特化
+
+例如c++标准库中的类vector的定义
+
+template <class T, class Allocator>
+
+class vector { // … // };
+
+template <class Allocator>
+
+class vector<bool, Allocator> { //…//};
+
+这个偏特化的例子中，一个参数被绑定到bool类型，而另一个参数仍未绑定需要由用户指定。
+
+(2) 函数模板的偏特化
+
+     严格的来说，函数模板并不支持偏特化，但由于可以对函数进行重载，所以可以达到类似于类模板偏特化的效果。
+
+ 
+
+   template <class T> void f(T);   (a)
+
+   根据重载规则，对（a）进行重载
+
+   template < class T> void f(T*);   (b)
+
+   如果将（a）称为基模板，那么（b）称为对基模板（a）的重载，而非对（a）的偏特化。C++的标准委员会仍在对下一个版本中是否允许函数模板的偏特化进行讨论。
+
+
+/* 此处内容有待考证*/
+
+模板函数可以有进行如下的偏特化定义：
+
+template<> functionname<int>(int &t1 , int &t2){...} 或者
+
+template functionname<int>(int &t1 , int &t2){...}   或者
+
+template functionname(int &t1 , int &t2){...} 
+
+这三种定义是等同的.
+
+ 
+
+这些声明的意思是：不要使用functionname函数模板来生成一个函数定义，而应该使用独立的、专门的函数定义显示的为数据类型int生成函数定义.
+
+当编译器找到与函数调用匹配的偏特化定义的时候，编译器会优先使用该定义，而不再寻找模板定义。
+
+ 
+
+
+（5）模板特化时的匹配规则
+
+(1) 类模板的匹配规则
+
+最优化的优于次特化的，即模板参数最精确匹配的具有最高的优先权
+
+例子：
+
+template <class T> class vector{//…//}; // (a)   普通型
+
+template <class T> class vector<T*>{//…//};   // (b) 对指针类型特化
+
+template <>    class vector <void*>{//…//};   // (c) 对void*进行特化
+
+每个类型都可以用作普通型（a）的参数，但只有指针类型才能用作（b）的参数，而只有void*才能作为(c)的参数
+
+(2) 函数模板的匹配规则
+
+非模板函数具有最高的优先权。如果不存在匹配的非模板函数的话，那么最匹配的和最特化的函数具有高优先权
+
+例子：
+
+template <class T> void f(T);   // (d)
+
+template <class T> void f(int, T, double); // (e)
+
+template <class T> void f(T*);   // (f)
+
+template <> void f<int> (int) ; // (g)
+
+void f(double);   // (h)
+
+bool b;
+
+int i;
+
+double d;
+
+f(b); // 以 T = bool 调用 （d）
+
+f(i,42,d) // 以 T = int 调用（e）
+
+f(&i) ; // 以 T = int* 调用（f）
+
+f(d);   //   调用（h）
+
+ 
+
+C++中，函数模板与同名的非模板函数重载时，应遵循下列调用原则：
+
+寻找一个参数完全匹配的函数，若找到就调用它。若参数完全匹配的函数多于一个，则这个调用是一个错误的调用。
+
+寻找一个函数模板，若找到就将其实例化生成一个匹配的模板函数并调用它。
+
+若上面两条都失败，则使用函数重载的方法，通过类型转换产生参数匹配，若找到就调用它。
+
+若上面三条都失败，还没有找都匹配的函数，则这个调用是一个错误的调用。
+
+ 
+
+至于函数的选择原则, 可以看看C++ Primer中的说明.
+
+    I、 创建候选函数列表，其中包含与被调用函数名字相同的函数和模板函数。
+
+    II、使用候选函数列表创建可行的函数列表。这些都是参数数目正确的函数，并且有一个隐式的转换序列（参数类型转化），其中包括实参类型与相应的形参类型完全匹配情况。
+
+    III、确定是否有最佳的可行函数，有则调用它，没有则报错。
+
+    可行函数的最佳性，主要是判断使用函数的参数与可行性函数的参数的转换规则进行判断，从最佳到最差的顺序如下所示：
+
+    i、完全匹配，但常规函数优先于显示定义模板函数，而显示定义模板函数优先于模板函数。
+
+    ii、提升转换，即从小精度数据转换为高精度数据类型，如char/short 转换为int ， int转化为long，float转换为double。
+
+    iii、标准转换，如int转化为char，long转化为double等
+
+    iiii、用户自定义转换。
+
+ 
+
+
+（6）排序函数模板的实现
+
+该函数模板使用冒泡法对集合元素进行排序，参数说明：
+  collection  集合对象，集合对象必须提供 [] 操作。
+  element    集合元素，该参数的作用仅仅是确定集合元素类型，参数的值没有用，建议取集合的第一个元素。集合元素必须提供复制、赋值和比较操作。
+  count    集合元素的数目
+  ascend   表明排序时使用升序(true)还是降序(false)
+该函数模板支持C++数组以及MFC集合CStringArray、CArray。
+
+
+代码如下：
+
+template  <typename COLLECTION_TYPE,typename ELEMENT_TYPE>  
+  void   BubbleSort(COLLECTION_TYPE collection[],ELEMENT_TYPE element,int count,bool ascend=true)  
+  {int j,element_flag;
+   int k=count-1;
+   while(k>0)
+   {
+        element_flag=0;
+        for(j=element;j<k;j++)
+          {
+            if(ascend)
+             {
+               if(collection  [j]   >   collection [j+1])
+               {
+                    COLLECTION_TYPE temp=collection  [j];  
+                    collection [j]   =  collection  [j+1];  
+                    collection  [j+1]   =   temp; 
+                    element_flag=j;
+               }
+             }
+           else
+           {
+               if(collection  [j]   <  collection [j+1])
+                {
+                     COLLECTION_TYPE temp=collection  [j];  
+                     collection [j]   =  collection  [j+1];  
+                     collection  [j+1]   =   temp; 
+                     element_flag=j;
+                 }
+            }
+         }
+    k=element_flag;
+
+    }
+
+}  
+
+利用它对整型数组进行排序，
+
+int ArrayInt[]={29,12,4,34,56,0,8,6,18,32};
+
+BubbleSort(ArrayInt,0,10,false);//如果省去false讲按默认的true排列
+
+对整数集合按升序排序： 
+
+CArray <int, int> collectionInt;
+      collectionInt.Add(34);
+      collectionInt.Add(90);
+      collectionInt.Add(6);
+      collectionInt.Add(91);
+      collectionInt.Add(37);
+      collectionInt.Add(21);
+      collectionInt.Add(187);
+      BubbleSort(collectionInt, collectionInt[0],collectionInt.GetSize());
+
+
+对字符串数组的排列：
+
+string arrayString[4] = {"jackjones", "lee", "levi's","boss"};
+
+BubbleSort(arrayString,0,4,false);
+
+
+对一个字符串集合按降序排序： 
+      CStringArray collectionString;
+      collectionString.Add("jackjones");
+      collectionString.Add("lee");
+      collectionString.Add("levi's");
+
+      collectionString.Add("boss");
+      BubbleSort(collectionString, collectionString[0],collectionString.GetSize(), false); 
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/zhangboyj/archive/2011/03/01/6215318.aspx

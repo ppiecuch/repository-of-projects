@@ -1,1 +1,45 @@
-TRACE("\r\n%s","fdsafdsfsda");
+MFC中，TRACE("\r\n%s","fdsafdsfsda");
+
+
+
+
+Win32代码中可以直接用OutputDebugString来达到相同效果
+
+#include <stdio.h>  
+#include <wtypes.h>  
+#include <stdarg.h>  
+#include <tchar.h>   
+  
+  
+void LogTrace(LPCTSTR pszFormat, ...)   
+{   
+    va_list pArgs;   
+  
+    char szMessageBuffer[16380]={0};   
+    va_start( pArgs, pszFormat );   
+    _vsntprintf( szMessageBuffer, 16380, pszFormat, pArgs );   
+    va_end( pArgs );   
+  
+    OutputDebugString(szMessageBuffer);   
+}  
+
+
+Win32代码中窗口弹出函数
+
+ view plaincopy to clipboardprint?
+void printDebugMsg(LPCTSTR pszFormat, ...)   
+{   
+    va_list pArgs;   
+  
+    char szMessageBuffer[512] ;   
+    va_start( pArgs, pszFormat );   
+    sprintf_s( szMessageBuffer,   pszFormat, pArgs );   
+    MessageBox(NULL,szMessageBuffer,"",NULL);   
+}  
+
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/whisperLin/archive/2009/10/20/4703346.aspx
+
+

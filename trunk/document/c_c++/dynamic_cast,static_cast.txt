@@ -1,0 +1,119 @@
+dynamic_cast、static_cast、const_cast   和   reinterpret_cast   
+    
+  一、dynamic_cast:   
+  用法：   
+  dynamic_cast<type-id>   (expression).将expression转化为具有type-id型的指针。type-id必须是一个   
+  指针、引用(一个已经定义的类)或者void指针。如果是个指针，expression也必须是个指针或者引用。   
+    
+    a.   如果type-id是expression的直接或间接基类指针，结果将是指向该expression实体的type-id类型指   
+    
+  针。这称作"upcast"。比如：   
+        class   B   {...};   
+        class   C   :   public   B   {...};   
+        class   D   :   public   C   {...};   
+    
+  void   f   (D   *pD)   
+  {   
+  C*   pc   =   dynamic_cast<C*>(pD);       //   ok   
+  B*   pb   =   dynamic_cast<B*>(pD);       //   ok   
+  }   
+    b.如果type-id   是void   *，那么运行时将   检查expression的实际类型。其结果是指向expression完整实   
+    
+  体的一个指针。   
+  如：   
+  class   A   {   ...   };   
+    
+  class   B   {   ...   };   
+    
+  void   f()   
+  {   
+        A*   pa   =   new   A;   
+        B*   pb   =   new   B;   
+        void*   pv   =   dynamic_cast<void*>(pa);   
+        //   pv指向A一个对象   
+        ...   
+        pv   =   dynamic_cast<void*>(pb);   
+        //   pv   指向   B的一个对象   
+  }   
+    
+    c.如果type-id不是void   *，将在运行时检查expression对象是否可以被转型为type-id.   
+        c-1.如果   expression是type-id的一个基类，那么将在运行时检查   expression是否指向type-id一个   
+    
+  完整对象。如果是，结果就是该对象的指针。否则出错   
+      如：   
+  class   B   {...};   
+  class   D   :   public   B   {...};   
+  void   f()   
+  {   
+  B   *pB   =   new   D;   
+  B   *pB2   =   new   B;   
+    
+  D   *pD   =   dynamic_cast<D*>   (pB); //   ok.   
+  D   *pD2   =   dynamic_cast<D*>   (pB2)   //   error.   
+  }   
+  上面称作"downcast"   
+      c-2.如果是多重继承.比如：   
+    
+  class   A   {...};   
+  class   B   :   public   A   {...}; //   B继承自A   
+  class   C   :   public   A   {...}; //   C继承自A   
+  class   D   :   public   B,   public   C   {...}; //   D继承自B,   C   
+  此时指向D的指针可以   安全   的cast为B或者C(见上).不过如果将其cast到A该怎么办呢？   
+  这样吗？   
+  D   *pD   =   new   D;   
+  A   *pA   =   dynamic_cast   <A*>   (pD); //error.不知道指向哪个A.   
+  这时我们可以先转型为B(或C)，然后间接批向A。如下   
+  B   *pB   =   dynamic_cast   <B*>   (pD);   
+  A   *pA   =   dynamic_cast   <A*>   (pB);   //   ok   
+    
+      c-3.虚拟继承的情况.   
+  class   A   {...}   //   以后就直接简写作class   name了   
+  class   B   :   vitual   public   A;   
+  class   C   :   public   B;   
+  class   D   :   public   B;   
+  class   E   :   publc   C,   public   D;   
+  如果E的实体或者A的子对象想要转型为   B将会是失败的(原因见上).这时你需要先转型为一个完整的E对象   
+    
+  ，然后逐层进行明确的转型操作。   
+    
+      c-4.   
+  class   A;   
+  class   B   :   public   A;   
+  class   C   :   public   A;   
+  class   D;   
+  class   E   :   public   B,   public   C,   publc   D;   
+    
+  假如E的一个对象和D子对象的一个指针，想要从D的子对象中得到A的子对象，需要三个转换。   
+  先将D类型的指针转型为E型的一个指针，然后再逐层转型到A。   
+  如   
+  void   f   (D   *pD)   
+  {   
+  E   *pE   =   dynamic_cast   <E*>   (pD);   
+  B   *pB   =   dynamic_cast   <B*>   (pE);   
+  //   或者   B   *pB   =   pe;   
+  A   *pA   =   dynamic_cast   <A*>   (pB);   
+  //   or   A   *pA   =   pB;   
+  }   
+      c-5.   (十字)交叉转换(cross   cast)。   
+          如上例中从   B   (或子类)   与   D   (或子类)的互相转型。   
+    
+  二、static_cast  
+
+     static_cast通常可用于类层次的静态导航，无映射变换，窄化变换（会丢失信息）等等，static_cast的应用要广一些，但如前所提到的，在类层次导航变换中我们应该使用前者，因为后者static_cast可能意味着冒险(比如变换时类似于强制转换一样丢失信息)。但是在一个类层次中没有虚函数或者我们确定有其他允许我们安全向下映射的信息则后者static_cast更快一些。 
+  它将expression类型转型为type-id类型。可以是类(包括继承)的转型，也可以是普通类型的转型(如int   ->   float).   请注意，它运行时   不做类型检查，因而可能是不安全的 。比如将基类转型为派生类指针。   
+    
+  三、const_cast   
+        简单的说，其作用就是将一个类的   const、volatile以及__unaligned属性去掉。   
+  四、reinterpret_cast   
+      C++中的reinterpret_cast主要是将数据从一种类型的转换为另一种类型。所谓“通常为操作数的位模式提供较低层的重新解释”也就是说将数据以二进制存在形式的重新解释。比如：
+
+　　int i;
+
+　　char *p = "This is a example.";
+
+　　i = reinterpret_cast<int>(p);
+
+　　此时结果，i与p的值是完全相同的。reinterpret_cast的作用是说将指针p的值以二进制（位模式）的方式被解释为整型，并赋给i，一个明显的现象是在转换前后没有数位损失。
+
+本文转自：http://blog.csdn.net/jue222/archive/2009/11/03/4761590.aspx
+
