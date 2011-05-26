@@ -1,0 +1,25 @@
+  嵌入式上的FLASH容量是有限的，而对某个库的使用功能上要求也是比较弱（即该库所有不必全部支持），故而有了裁减的概念。
+
+        最近我选用了freetype（version 2.3.9）进行字体处理和绘制，发现编译以后有1.8M之大，而网上搜索别人的库只有130K，于是开始用configure脚本进行一次有一次的尝试，在基本上尝试完了所有的编译选项后，发现1.8M的容量确实基本上没有减少，于是开始查看像ChangeLog,Readme,INSTALL等等文件，在docs/INSTALL.ANY里面查到可以用modules.cfg来进行库的配置因为我上层有pango库依赖于freetype最后经过一次有一次的尝试我只打开了一下编译选项
+
+        FONT_MODULES += pcf
+
+        RASTER_MODULES += smooth
+
+        AUX_MODULES += gzip
+
+        AUX_MODULES += lzw
+
+        BASE_EXTENSIONS += ftbitmap.c
+
+        BASE_EXTENSIONS += ftfstype.c
+
+        BASE_EXTENSIONS += ftglyph.c 
+
+        BASE_EXTENSIONS += fttype1.c
+
+然后再重新configure; make; make install  strip之后文件大小就如网上所说的130K相差无几了，到此大功告成。
+
+
+
+本文来自CSDN博客，转载请标明出处 ：http://blog.csdn.net/green369258/archive/2010/07/03/5711185.aspx

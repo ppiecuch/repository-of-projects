@@ -1,0 +1,84 @@
+ 自学android时间不长，之前一段时间做opengl 3d方面的东西，所以碰到这个平台，感觉挺好，很想弄几个小游戏试试手。
+     平时爱玩魔方，所以第一个游戏就想写个魔方，先用c++实现了一个MFC版本的魔方，然后移植到android的opengl es 平台上，但是移植的过程中碰到问题了，就是拾取问题。搜索各种资料的时候发现了eoe论坛里面的一个myCubic魔方，实现了自己的想法，但是楼主说明了这个魔方是源自android例程，他只是修改了射线拾取的部分，很可惜，作者只是给了程序，没有提供源码，自己留言询问，也一直没有回答。
+后来只好自己一点一点搜集资料，但是无奈不知道为什么网上这个内容有价值的特别特别少，但是好在这个过程中熟悉了android调试过程，又找到了其他一些有用的东西，就写了第一个帖子：
+http://www.eoeandroid.com/thread-66559-1-1.html     在第一个帖子发完之后，很多开发者留了言，给了意见，我发现有些问题是大家都碰到的，讨论之后，问题的结果以及具体的方案渐渐浮出水面。下面就对opengl es实现射线拾取方法做一下总结。
+      opengl2.0的拾取使用的不是射线拾取，但是现在opengles貌似只能使用射线拾取。
+      做这个的时候碰到两个问题：1、无法得到模型视图和投影矩阵，因为opengles本身不提供opengl2.0里面获得矩阵的接口；2、gluUnproject方法出错。
+      当时考虑第一个问题有三个解决方法：1、自己设置自己的矩阵，自己重写glRotate等方法，这样随时可以获得矩阵信息；2、glGetIntegerv()得到后再转换成float；3、使用apiDemo中封装的MatrixTrapper相关类（网上看到的，没有验证）
+      事实上自己使用第二个和第三个方法的时候都遇到更头疼的问题，比如第二个方法得到的参数跟自己想想的差距比较大，没有完全弄明白意思；第三个方法总是报错，应该是自己调试经验不足造成的；于是最终使用了第一个方法，即自己设置自己的矩阵，重写各种矩阵操作，这个方法虽然麻烦，但是对于不是特别熟练的opengl开发者有一个好处，就是你能对你使用的矩阵了解非常透彻，不至于自己把自己弄糊涂了。
+       //3D模型视图矩阵，投影矩阵，视口等
+       final float[] projM = new float[16];
+       final float[] rotM = new float[16];
+       final float[] modelM = new float[16];
+       int[] view;
+        其中的矩阵操作可以使用gl.glMultMatrixf()方法，例如旋转操作可以重写为：
+public void RotateMatrix(float rot, float x, float y, float z, GL10 gl)
+{
+     Matrix.rotateM(modelM, 0, rot, x, y, z);     gl.glMatrixMode(GL10.GL_MODELVIEW);
+     gl.glLoadIdentity();
+     gl.glMultMatrixf(modelM, 0);
+}
+
+        使用自己的矩阵还得注意设置投影矩阵跟显示的一样：
+public void onSurfaceChanged(GL10 gl, int width, int height) {
+   if(height == 0) { 
+          height = 1; 
+   }
+   float size = 0.05f;
+   view = new int[]{0, 0, width, height};
+   float ratio = (float) width / (float) height;
+   gl.glViewport(0, 0, width, height);
+   gl.glMatrixMode(GL10.GL_PROJECTION);
+   gl.glLoadIdentity();
+   gl.glFrustumf(-size, size, -size / ratio, size / ratio, 0.1f, 100f);
+   gl.glEnable(GL10.GL_DEPTH_TEST);
+   //设置投影矩阵和视图中的投影矩阵一样
+   Matrix.setIdentityM(projM, 0); 
+   Matrix.frustumM(projM, 0, -size, size, -size / ratio, size / ratio, 0.1f, 100f);
+}
+
+        这样在绘制的时候就可以使用自己的模型矩阵了：
+       gl.glMatrixMode(GL10.GL_MODELVIEW);
+       gl.glLoadIdentity();
+       Matrix.setIdentityM(modelM, 0);
+       gl.glMultMatrixf(modelM, 0);
+        好，通过上面的方法，我们就不用使用opengl es给出的方法获得模型视图以及投影矩阵了，只要用自己的变量就行。第二个问题来了，如何使用GLU.gluUnProject方法。
+        这个问题一度纠结了自己很长时间，主要是google没有给出方法中各个参数的意义，看方法很容易理解，GLU.gluUnProject(touchX, (viewPort[3] - touchY - 1.0f), 0.0f, mv, 0,  prj, 0, viewPort, 0,  ret1, 0);前两个参数是转换成opengl坐标的触摸点，第三个是触摸点的z平面的值，注意，并不是得到结果的z坐标的值，这个值是你平截头体的far的相对于视点的位置，只有模型视图矩阵和投影矩阵恰好重合的时候才是z坐标的值，mv是模型视图矩阵，下一个是其偏移量，prj是投影矩阵，同样后面跟着一个偏移量，viewPort是视口，后面的0也是偏移量，问题是倒数第二个参数，ret1！按照opengl es里面的定义，这个ret1应该是一个3元素向量，即反投影的(x, y, z)的值（c#中即是这样），然而事实却并非如此。ret1竟然是一个4元素的数组，而不是3元素！而且其中的结果也不能直接拿来用，那么反投影的值在哪呢？自己测试了各种数据，终于找到了问题。
+         ret1[3]这个数是个比例，所以最终反投影的结果应该是(ret1[0]/ret1[3], ret1[1]/ret1[3], ret1[2]/ret1[3])，这样，想获得射线的代码就可以写成如下的样子：
+        public void UnprojectAndGetRay(float x, float y)
+{
+y = view[3] - 1 - y;
+float[] r1 = new float[4];
+float[] r2 = new float[4];
+GLU.gluUnProject(x, y, 0f, modelM, 0, projM, 0, view, 0, r1, 0);
+GLU.gluUnProject(x, y, 1f, modelM, 0, projM, 0, view, 0, r2, 0);
+for(int i=0; i<3; i++)
+{
+r1 /= r1[3];
+r2 /= r2[3];
+}
+                rayStart = new Vec3(r1[0], r1[1], r1[2]);
+                rayEnd = new Vec3(r2[0], r2[1], r2[2]);
+     }
+其中rayStart是射线的起点，rayEnd是射线的终点，都是3维向量。
+后面的射线算法应该大家在网上就很容易找到了，如何判断三角形跟射线相交等等，牵扯到数学上面的算法，这里就不做累述了。最后贴两张实现魔方的图，源码不上传，一是程序还有点bug，二来自己改的乱七八糟，风格很不好，最后一点，也是这次学习的经验，有源码虽然好，但是很让自己的学习打很大折扣，亲自写出来会有更大的收获。当然，大家有什么疑问可以随时提问，我会尽快回答。
+
+ 昨天 22:10 上传下载附件 (20.54 KB) 
+
+
+
+
+
+
+ 
+temp.jpg (14.15 KB, 下载次数: 0) 
+
+昨天 22:11 上传
+下载次数: 0
+
+  
+
+
+
+ 
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=74612

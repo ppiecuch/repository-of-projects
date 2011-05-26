@@ -1,0 +1,16 @@
+linux下为自己的程序加入Freetype的静态链接时，我们会发现程序会突然变得很大，大约增大了1.3m左右，strip了还是有增加了300k+。为什么这么大？其实原因很简单freetype2支持的字体格式非常丰富，包括ttf ttc t1 CFF/OpenType 等等，并且还有很多渲染支持，这样即使你用不到这些东西，它也会把这些二进制加进去。但如果我们只要部分功能时，我们应该如何定制（裁减）呢？
+    Freetype为我们裁减功能时提供了方便。一开始时我还以为编译安装以后也可以实现裁减，于是就在freetype/config/ftmodule.h里面加点注析，但使用#include时，编译通过不了。后来发现要在编译安装freetype时就要裁减了，并且不在ftmodule.h里面搞，后来从docs/INSTALL.ANY里面发现了一下原话：  Read the file `CUSTOMIZE' in case  you want to compile only a subset
+  of  the  drivers,  renderers,   and  optional  modules;  a  detailed
+  description of the various base  extension is given in the top-level
+  file `modules.cfg'.
+也就是在modules.cfg里面选择了，转到modules.cfg，我发现为编译添加模块很简单，它就用**_MODULES += ***  ，这样我们就可以用“#”放到这些语句前面，以去掉不用的功能了（如：#**_MODULES += ***）。修改了modules.cfg后再运行 ./configure ; make clean ; make ; make install 。
+    例如：我只要用到ttf的渲染功能，我们可以只保留：
+FONT_MODULES += truetype   #用于对ttf的支持
+FONT_MODULES += sfnt   #ttf支持的要求
+RASTER_MODULES += smooth   #字体的渲染
+BASE_EXTENSIONS += ftbitmap.c   #将字模转为位图所必须的
+BASE_EXTENSIONS += ftglyph.c   #将字模转为位图所必须的
+    按照以上的裁减，程序添加了freetype支持后（使用静态链接）体积只会增加500k左右，strip后也就只增加130k左右，并且动态链接库strip后也就是130k+
+
+注：modules.cfg 在FreeType的工程目录下，和configure文件是在同一个文件夹的
+http://blog.sina.com.cn/s/blog_4da850d601008bc7.html
