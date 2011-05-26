@@ -1,4 +1,14 @@
 [异常]
+GLES/gl.h: No such file or directory 
+[解决]
+Android.mk中加上
+LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog
+如果还是不行
+Application.mk中加上
+APP_ABI := armeabi armeabi-v7a 
+APP_PLATFORM := android-4
+
+[异常]
 ERROR/AndroidRuntime(5059): java.lang.UnsatisfiedLinkError: nativeInit
 ERROR/AndroidRuntime(5059):     at org.tinder.studio.AndroidGLView.nativeInit(Native Method)
 ERROR/AndroidRuntime(5059):     at org.tinder.studio.AndroidGLView.access$2(AndroidGLView.java:22)

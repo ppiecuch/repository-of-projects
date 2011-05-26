@@ -1,0 +1,3 @@
+添加日志支持:
+LOCAL_LDLIBS += -ldl -llog
+#libtest.so需要引用的库libdl.so:加载动态函数需要，liblog.so 日志打印需要，默认是system/lib目录下
