@@ -1,0 +1,56 @@
+1 unsigned char i;
+2 i=-20;
+3 上面一段很简单的代码，如果输出会是什么 呢？
+今天群里的新学c++同学问我，unsighed char 和char 有啥区别，上面的输出会有什么 不同
+在这里，我先鄙视一下自己，我直观的理解为通常的 首位符号位，然后丢下的就是输入无符号的。好吧，估计各位看官说我太菜，但确实是输出的结果和我想的不大一样，如果各位没明白我说的是什么问题，可以试一下。然后回来看下面的内容。
+。
+
+In an unsigned type, all the bits represent the value. If a type is defined for a particular machine to use 8 bits, then the unsigned version of this type could hold the values 0 through 255.
+
+无符号型中，所有的位都表示数值。如果在某种机器中，定义一种类型使用 8 位表示，那么这种类型的 unsigned 型可以取值 0 到 255。
+
+The C++ standard does not define how signed types are represented at the bit level. Instead, each compiler is free to decide how it will represent signed types. These representations can affect the range of values that a signed type can hold. We are guaranteed that an 8-bit signed type will hold at least the values from 127 through 127; many implementations allow values from 128 through 127.
+
+C++ 标准并未定义 signed 类型如何用位来表示，而是由每个编译器自由决定如何表示 signed 类型。这些表示方式会影响 signed 类型的取值范围。8 位 signed 类型的取值肯定至少是从 -127 到 127，但也有许多实现允许取值从 -128 到 127。
+
+Under the most common strategy for representing signed integral types, we can view one of the bits as a sign bit. Whenever the sign bit is 1, the value is negative; when it is 0, the value is either 0 or a positive number. An 8-bit integral signed type represented using a sign-bit can hold values from 128 through 127.
+
+表示 signed 整型类型最常见的策略是用其中一个位作为符号位。符号位为 1，值就为负数；符号位为 0，值就为 0 或正数。一个 signed 整型取值是从 -128 到 127。
+
+Assignment to Integral Types
+整型的赋值
+The type of an object determines the values that the object can hold. This fact raises the question of what happens when one tries to assign a value outside the allowable range to an object of a given type. The answer depends on whether the type is signed or unsigned.
+
+对象的类型决定对象的取值。这会引起一个疑问：当我们试着把一个超出其取值范围的值赋给一个指定类型的对象时，结果会怎样呢？答案取决于这种类型是 signed 还是 unsigned 的。
+
+For unsigned types, the compiler must adjust the out-of-range value so that it will fit. The compiler does so by taking the remainder of the value modulo the number of distinct values the unsigned target type can hold. An object that is an 8-bit unsigned char, for example, can hold values from 0 through 255 inclusive. If we assign a value outside this range, the compiler actually assigns the remainder of the value modulo 256. For example, we might attempt to assign the value 336 to an 8-bit signed char. If we try to store 336 in our 8-bit unsigned char, the actual value assigned will be 80, because 80 is equal to 336 modulo 256.
+
+对于 unsigned 类型来说，编译器必须调整越界值使其满足要求。编译器会将该值对 unsigned 类型的可能取值数目求模，然后取所得值。比如 8 位的 unsigned char，其取值范围从 0 到 255（包括 255）。如果赋给超出这个范围的值，那么编译器将会取该值对 256 求模后的值。例如，如果试图将 336 存储到 8 位的 unsigned char 中，则实际赋值为 80，因为 80 是 336 对 256 求模后的值。
+
+For the unsigned types, a negative value is always out of range. An object of unsigned type may never hold a negative value. Some languages make it illegal to assign a negative value to an unsigned type, but C++ does not.
+
+对于 unsigned 类型来说，负数总是超出其取值范围。unsigned 类型的对象可能永远不会保存负数。有些语言中将负数赋给 unsigned 类型是非法的，但在 C++ 中这是合法的。
+
+
+ In C++ it is perfectly legal to assign a negative number to an object with unsigned type. The result is the negative value modulo the size of the type. So, if we assign 1 to an 8-bit unsigned char, the resulting value will be 255, which is 1 modulo 256.
+
+C++ 中，把负值赋给 unsigned 对象是完全合法的，其结果是该负数对该类型的取值个数求模后的值。所以，如果把 -1 赋给8位的 unsigned char，那么结果是 255，因为 255 是 -1 对 256 求模后的值。
+ 
+
+
+
+
+When assigning an out-of-range value to a signed type, it is up to the compiler to decide what value to assign. In practice, many compilers treat signed types similarly to how they are required to treat unsigned types. That is, they do the assignment as the remainder modulo the size of the type. However, we are not guaranteed that the compiler will do so for the signed types.
+
+当将超过取值范围的值赋给 signed 类型时，由编译器决定实际赋的值。在实际操作中，很多的编译器处理 signed 类型的方式和 unsigned 类型类似。也就是说，赋值时是取该值对该类型取值数目求模后的值。然而我们不能保证编译器都会这样处理 signed 类型。
+
+
+
+
+
+
+
+以上摘自 c++ primer,惭愧，还是再细细的从头品一次这书吧。
+
+
+http://www.cppblog.com/maosher/archive/2011/02/13/139977.html

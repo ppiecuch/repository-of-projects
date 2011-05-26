@@ -81,7 +81,7 @@ empty º¯Êý£¬·µ»Ø head Óë 0 µÄ±È½Ï½á¹û¡£Èç¹û head Îª 0£¬Queue Îª¿Õ£»·ñÔò£¬Queue Ê
 Õâ¸öÀàµÄÖ÷Òª²¿·ÖÓ¦¸ÃÊÇÎÒÃÇÊìÏ¤µÄ¡£ËüÖ»ÓëÎÒÃÇÒÑ¾­¶¨Òå¹ýµÄÀàÓÐÉÙÐíÇø±ð¡£ÐÂµÄÄÚÈÝÊÇ Queue Àà
 ÐÍºÍ QueueItem ÀàÐÍµÄÒýÓÃÖÐ¶ÔÄ£°åÀàÐÍÐÎ²ÎµÄÊ¹ÓÃ£¨»òÈ±ÉÙ£©¡£
 
-Í¨³££¬µ±Ê¹ÓÃÀàÄ£°åµÄÃû×ÖµÄÊ±ºò£¬±ØÐëÖ¸¶¨Ä£°åÐÎ²Î¡£ÕâÒ»¹æÔòÓÐ¸öÀýÍâ£ºÔÚÀà±¾ÉíµÄ×÷ÓÃÓòÄÚ²¿£¬
+¡¾¡ï¡¿Í¨³££¬µ±Ê¹ÓÃÀàÄ£°åµÄÃû×ÖµÄÊ±ºò£¬±ØÐëÖ¸¶¨Ä£°åÐÎ²Î¡£ÕâÒ»¹æÔòÓÐ¸öÀýÍâ£ºÔÚÀà±¾ÉíµÄ×÷ÓÃÓòÄÚ²¿£¬
 ¿ÉÒÔÊ¹ÓÃÀàÄ£°åµÄ·ÇÏÞ¶¨Ãû¡£ÀýÈç£¬ÔÚÄ¬ÈÏ¹¹Ôìº¯ÊýºÍ¸´ÖÆ¹¹Ôìº¯ÊýµÄÉùÃ÷ÖÐ£¬Ãû×Ö Queue ÊÇ
  Queue<Type> ËõÐ´±íÊ¾¡£ÊµÖÊÉÏ£¬±àÒëÆ÷ÍÆ¶Ï£¬µ±ÎÒÃÇÒýÓÃÀàµÄÃû×ÖÊ±£¬ÒýÓÃµÄÊÇÍ¬Ò»°æ±¾¡£Òò´Ë£¬
  ¸´ÖÆ¹¹Ôìº¯Êý¶¨ÒåÆäÊµµÈ¼ÛÓÚ£º

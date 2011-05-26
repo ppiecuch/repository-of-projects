@@ -21,5 +21,5 @@ A * const类型和A const * const类型是不同类型，因此可以重载。
 
 
 
-const int *a;  指向const对象的int指针,指向的变量不可修改 指针可修改
+const int *a;  指向const对象的int指针,指向的变量不可修改 指针可修改(与int const *a;等价)
 int *const a；  指向int对象的const指针,指向的变量值可变   指针不可改变

@@ -1,0 +1,185 @@
+非类型模板参数的限制
+我们还应该知道：非类型模板参数是有限制的。通常而言，它们可以是常整数（包括枚举值）或者指向外部链接对象的指针。
+
+浮点数和类对象（class-type） 是不允许作为非类型模板参数的：
+
+template<double VAT>  //ERROR:浮点数不能作为非类型模板参数
+double process (double v) 
+{
+return v * VAT;
+}
+
+template<std::string name> //ERROR:类对象不能作为非类型模板参数
+class MyClass {
+...
+};
+
+之所以不能使用浮点数（包括简单的常量浮点表达式）作为模板实参是有历史原因的。然而，该特性的实现并不存在很大的技术障碍；因此，将来的C++版本可能会支持这个特性。
+
+由于字符串文字是内部链接对象（因为两个具有相同名称但处于不同模块的字符串，是两个完全不同的对象），所以你不能使用它们来作为模板实参：
+
+template<char const* name>
+class MyClass {
+...
+};
+
+MyClass<”hello”> x;  //ERROR:不允许使用字符串文字”hello” 
+
+另外，你也不能使用全局指针作为模板参数：
+
+template <char const* name>
+class MyClass {
+...
+};
+
+char const* s = ”hello”;
+
+MyClass<s> x;   //s是一个指向内部链接对象的指针
+
+然而，你可以这样使用：
+
+template <char const* name>
+class MyClass {
+...
+};
+
+extern char const s[] = ”hello”;
+
+MyClass<s> x;  //OK
+
+全局字符数组s由“hello”初始化，是一个外部链接对象。
+
+详细的讨论，请见8.3.3小节；而13.4节给出了将来在这方面可能出现的改变。
+
+对于函数模板和类模板，模板参数并不局限于类型，普通值也可以作为模板参数。在基于类型参数的模板中，你定义了一些具体细节未加确定的代码，直到代 码被调用时这些细节才被真正确定。然而，在这里，我们面对的这些细节是值（value），而不是类型。当要使用基于值的模板时，你必须显式地指定这些值， 才能够对模板进行实例化，并获得最终代码。在这一章里，我们将使用一个新版本的stack类模板来叙述这个特性。另外，我们还给出了一个非类型函数模板参 数的例子，并且讨论了这一技术的某些限制。
+
+4.1  非类型的类模板参数
+
+较之前一章stack例子的实现，你也可以使用元素数目固定的数组来实现stack。这个方法（用固定大小的数组）的优点是：无论是由你来亲自管理 内存，还是由标准容器来管理内存，都可以避免内存管理开销。然而，决定一个栈（stack）的最佳容量是很困难的。如果你指定的容量太小，那么栈可能会溢 出；如果指定的容量太大，那么可能会不必要地浪费内存。一个好的解决方法就是：让栈的用户亲自指定数组的大小，并把它作为所需要的栈元素的最大个数。
+
+为了做到这一点，你需要把数组大小定义为一个模板参数：
+
+//basics/stack4.hpp
+#include <stdexcept>
+
+//template<typename T = int, int MAXSIZE = 100>   //可以为模板参数指定缺省值
+
+template <typename T, int MAXSIZE>             //由用户自己设定
+class Stack {
+private:
+T elems[MAXSIZE];        // 包含元素的数组
+int numElems;            // 元素的当前总个数
+
+  public:
+Stack();                  // 构造函数
+void push(T const&);    // 压入元素
+void pop();               // 弹出元素
+T top() const;           // 返回栈顶元素
+bool empty() const {    // 返回栈是否为空
+return numElems == 0;
+}
+bool full() const {     // 返回栈是否已满
+return numElems == MAXSIZE;
+}
+};
+
+// 构造函数
+template <typename T, int MAXSIZE>
+Stack<T,MAXSIZE>::Stack ()
+: numElems(0)               // 初始时栈不含元素
+{
+// 不做任何事情
+}
+
+template <typename T, int MAXSIZE>
+void Stack<T,MAXSIZE>::push (T const& elem)
+{
+if (numElems == MAXSIZE) {
+throw std::out_of_range("Stack<>::push(): stack is full");
+}
+elems[numElems] = elem;   // 附加元素
+++numElems;               // 增加元素的个数
+}
+
+template<typename T, int MAXSIZE>
+void Stack<T,MAXSIZE>::pop ()
+{
+if (numElems <= 0) {
+throw std::out_of_range("Stack<>::pop(): empty stack");
+}
+--numElems;               // 减少元素的个数
+}
+
+template <typename T, int MAXSIZE>
+T Stack<T,MAXSIZE>::top () const
+{
+if (numElems <= 0) {
+throw std::out_of_range("Stack<>::top(): empty stack");
+}
+return elems[numElems-1];  // 返回最后一个元素
+}
+
+MAXSIZE是新加入的第2个模板参数，类型为int；它指定了数组最多可包含的栈元素的个数：
+ template<typename T, int MAXSIZE>
+class Stack {
+private:
+T elems[MAXSIZE]; //包含元素的数组
+...
+};
+
+另外，我们使用push()来检查该栈是否已经满了：
+template <typename T, int MAXSIZE>
+void Stack<T, MAXSIZE>::push (T const& elem)
+{
+if (numElems = = MAXSIZE ){
+throw std::out_of_range ("Stack<>::push():stack is full")
+}
+elems [numElems] = elem;  //附加元素
+++numElems;    //增加元素的个数
+}
+
+为了使用这个类模板，你需要同时指定元素的类型和个数（即栈的最大容量）：
+//basics/stack4test.cpp
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include "stack4.hpp"
+
+int main()
+{
+try {
+Stack<int,20>  int20Stack;  // 可以存储20个int元素的栈
+Stack<int,40>  int40Stack;  // 可以存储40个int元素的栈
+Stack<std::string,40> stringStack; // 可存储40个string元素的栈
+
+        // 使用可存储20个int元素的栈
+int20Stack.push(7);
+std::cout << int20Stack.top() << std::endl;
+int20Stack.pop();
+
+        // 使用可存储40个string的栈
+stringStack.push("hello");
+std::cout << stringStack.top() << std::endl; 
+stringStack.pop();
+stringStack.pop();
+}
+catch (std::exception const& ex) {
+std::cerr << "Exception: " << ex.what() << std::endl;
+return EXIT_FAILURE;  // 退出程序且有ERROR标记
+}
+}
+
+可以看出，每个模板实例都具有自己的类型，因此int20Stack和int40Stack属于不同的类型，而且这两种类型之间也不存在显式或者隐式的类型转换；所以它们之间不能互相替换，更不能互相赋值。
+
+同样，我们可以为模板参数指定缺省值：
+
+template<typename T = int, int MAXSIZE = 100>
+class Stack {
+...
+};
+
+然而，如果从优化设计的观点来看，这个例子并不适合使用缺省值。缺省值应该是直观上正确的值。但是对于栈的类型和大小而言，int类型和最大容量 100从直观上看起来都不是正确的。因此，在这里最好还是让程序员显式地指定这两个值。因此我们可以在设计文档中用一条声明来说明这两个属性（即类型和最 大容量）。
+
+转自:http://book.51cto.com/art/200803/68250.htm
+ 
+

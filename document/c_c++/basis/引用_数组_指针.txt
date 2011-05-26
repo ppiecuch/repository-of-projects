@@ -63,12 +63,16 @@ void main()
 A.可能存在不指向任何对象(NULL)时，使用指针。
 B.需要指向不同对象时，使用指针。
 （5）在函数Function(int* &p)中，使用&目的是为了可以改变p指针本身，使其能指向其他对象，这种用法和Function(int** p)是一样的，即指向指针的指针。
-
+ 
 
  【const与指针】
 （1）const int a = 10与int const a = 10等价；同理const int*与int const*是等价的。(与下面一句互相矛盾???)
 （2）const int *a是指向const对象的指针，不可通过指针改变对象值，而int * const a是const指针，指针只能指向该对象。
 （3）指针指向const对象的情况
+（4）const int * _var 和 int const * _var是一样的，只是写法不同，后者更被C++组织所推荐，表示指针所指的“对象”是常量，不准更改该指针所指的对象，但是指针本身可以指向其他的同类型对象。
+（5）int* const _var则不同，可以看到const关键字离变量更近，表示该指针是常量，即指针
+当初始化后，就不可以再指向其他的同类型对象了，但是所指的对象可以更改。
+（6）const int* const _var 或 int const* const _var则兼具1,2的特点，表示指针本身是常量，且所指的对象也不准更改)
 const int a = 40;
 int *p;
 p = &a;         //错，编译错误，
@@ -94,7 +98,7 @@ const int &ref = a + 3;  //ok，必须为const引用
 double a = 3.5;
 const int &ref = a;
 实际上其工作流程是先定义int tmp = (int)a，然后const int &ref = tmp，所以必须用const引用，否则会导致错误。常量+变量生成的无名临时变量同理。
-（3）const引用可以指向需要临时对象的对象或值
+（3）const引用可以指向需要临时对象的对象或值 
 const int ival = 1024;
 const int* &b = &ival;        //error
 const int* const &b = &ival;  //ok
