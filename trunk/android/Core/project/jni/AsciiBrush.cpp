@@ -1,8 +1,7 @@
-/*
 #include "AsciiBrush.h"
 
 //返回比num大的，并且是最接近num的2的次方的数
-int ceilPower(const int& num)
+int ceilPower(int num)
 {
 	int rval=1;
 	rval*=2;
@@ -35,9 +34,9 @@ AsciiBrush::~AsciiBrush()
 	FT_Done_FreeType(this->library);
 	FT_Done_Face(this->face);
 }
-AsciiFont& AsciiBrush::generateFont(const HashMapFontKey& key)
+AsciiFont& AsciiBrush::generateFont(const AsciiFont& key)
 {
-	int color=key.color;
+	/*int color=key.color;
 	unsigned char c=key.c;
 	int size=key.size;
 	int error;
@@ -85,9 +84,10 @@ AsciiFont& AsciiBrush::generateFont(const HashMapFontKey& key)
 	int width=bitmap.width;
 	int height=bitmap.rows;
 	int newWidth=ceilPower(width);
-	int newHeight=ceilPower(height);
+	int newHeight=ceilPower(height);*/
 
 	AsciiFont font;
+	/*
 	//保存颜色
 	font.color=color;
 	//保存长宽信息
@@ -161,13 +161,13 @@ AsciiFont& AsciiBrush::generateFont(const HashMapFontKey& key)
 	//glTexEnvi(GL_TEXTURE_2D,GL_TEXTURE_ENV_MODE,GL_REPLACE);
 	glTexImage2D( GL_TEXTURE_2D,0,GL_RGBA,newWidth,newHeight,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
 
-	delete[] data;
+	delete[] data;*/
 
 	return font;
 }
 void AsciiBrush::drawChar(const AsciiFont &font,int x,int y)
 {
-	vertex[0].x=x+font.offset.x;
+	/*vertex[0].x=x+font.offset.x;
 	vertex[0].y=y+font.offset.y-font.delta.y;
 	vertex[1].x=x+font.offset.x+font.delta.x;
 	vertex[1].y=y+font.offset.y-font.delta.y;
@@ -178,26 +178,24 @@ void AsciiBrush::drawChar(const AsciiFont &font,int x,int y)
 	glVertexPointer(2,GL_FLOAT,0,vertex);
 	glTexCoordPointer(2, GL_FLOAT, 0, font.texCoord);
 	glBindTexture(GL_TEXTURE_2D,font.texture);
-	glDrawElements(GL_TRIANGLE_STRIP,4,GL_UNSIGNED_BYTE,vertexIndices);
+	glDrawElements(GL_TRIANGLE_STRIP,4,GL_UNSIGNED_BYTE,vertexIndices);*/
 }
 void AsciiBrush::drawInLine(const unsigned char* const& str,int color,int size,int x,int y)
 {
-	this->tempKey.color=color;
+	/*this->tempKey.color=color;
 	this->tempKey.size=size;
 	int nextX=x;
 	for(int i=0;i<strlen(str);i++)
 	{
 		this->tempKey.c=str[i];
-		if(this->map.containKey(this->tempKey)==false)
+		if(this->map.find(this->tempKey)== map.end())
 		{
 			AsciiFont &font=generateFont(this->tempKey);
-			HashMapFontKey& key=this->tempKey;
-			this->map.put(key,font);
+			this->map[this->tempKey]=font;
 		}
-		AsciiFont &font=this->map.get(this->tempKey);
+		AsciiFont &font=this->map[this->tempKey];
 		drawChar(font,nextX,y);
 		//步进
 		nextX+=font.advance.x;
-	}
+	}*/
 }
-*/

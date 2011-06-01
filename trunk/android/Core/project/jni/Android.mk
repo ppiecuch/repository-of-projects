@@ -10,8 +10,7 @@ LOCAL_C_INCLUDES :=  $(LOCAL_PATH)/freetype/
 LOCAL_MODULE    := core
 
 LOCAL_SRC_FILES :=   \
-		object3d.cpp \
-#		AsciiBrush.cpp \
+		AsciiBrush.cpp \
 		
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lz -lstdc++
 

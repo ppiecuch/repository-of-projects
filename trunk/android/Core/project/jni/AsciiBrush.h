@@ -1,44 +1,29 @@
 #ifndef _ASCII_BRUSH_H_
 #define _ASCII_BRUSH_H_
 
-/*#include <gl\gl.h>
+/*
+#include <gl\gl.h>
 #include <gl\glu.h>
 #include "freetype.h"
-#include <stdio.h>*/
-#include <GLES/gl.h>
-#include <freetype/ft2build.h>
-#include <freetype/freetype.h>
+#include <stdio.h>
+#include <hash_map>
+using namespace std;
+using namespace stdext;*/
 
 
 #include "point2.h"
-#include "hashmap.h"
 
-class HashMapFontKey:HashMapKeyInterface{
-protected:
-	int color;
-	int size;
-	unsigned char c;
-public:
-	HashMapFontKey(){}
-	int hashCode()
-	{
-		return this->c;
-	}
-	bool equal(const HashMapKeyInterface* const &i)
-	{
-		try
-		{
-			HashMapFontKey* p = dynamic_cast<HashMapFontKey*>(const_cast<HashMapKeyInterface*>(i));
-			return this->color==p->hashCode()&&this->size==p->size&&this->c==p->c;
-		}
-		catch(...)
-		{
-			return false;
-		}
-		
-	}
-	friend class AsciiBrush;
-};
+/**/
+#include <GLES/gl.h>
+#include <freetype/ft2build.h>
+#include <freetype/freetype.h>
+#include <ext/hash_map>
+using namespace std;
+using namespace  __gnu_cxx;//需要引入
+
+
+class AsciiBrush;
+struct HashAsciiFont;
 
 class AsciiFont{
 private:
@@ -51,7 +36,7 @@ private:
 	unsigned char c;			//字符代码
 	GLuint texture;				//纹理ID
 	AsciiFont():texture(-1),color(0x000000FF){
-		glGenTextures(1, &this->texture);
+		
 	}
 	~AsciiFont(){
 		if(this->texture!=-1)
@@ -59,25 +44,69 @@ private:
 	}
 public:
 	friend class AsciiBrush;
+	//friend size_t hashAsciiFont(const AsciiFont &f);
+	//friend class HashCompareAsciiFont;
+	//friend  struct hash<const AsciiFont>;
+	friend struct HashAsciiFont;
 
 };
+/*
+inline size_t hashAsciiFont(const AsciiFont &f) {
+	return f.c;
+}
+
+class HashCompareAsciiFont: public hash_compare<AsciiFont>
+{
+public:
+	size_t operator()(const AsciiFont &f) const
+	{
+		return ((size_t)hashAsciiFont(f));
+	}
+
+	bool operator()(const AsciiFont &f1, const AsciiFont &f2) const
+	{
+		return f1.color==f2.color&&f1.size==f2.size&&f1.c==f2.c;
+	}
+};
+namespace  __gnu_cxx { 
+	template<> struct hash<const AsciiFont> {
+		size_t operator()(const AsciiFont& f) const {
+			return f.c;   
+		} 
+	};
+	bool operator()(const AsciiFont& f1,const AsciiFont& f2) const{
+        return f1.color==f2.color&&f1.size==f2.size&&f1.c==f2.c;
+    }
+
+} */
+struct HashAsciiFont{
+	size_t operator()(const AsciiFont& f) const {
+			return f.c;   
+	}
+	bool operator()(const AsciiFont& f1,const AsciiFont& f2) const{
+        return f1.color==f2.color&&f1.size==f2.size&&f1.c==f2.c;
+    }
+};
+
+
+
 
 class AsciiBrush{
 protected:
 	static const unsigned char vertexIndices[];
 	FT_Library library;
 	FT_Face face;
-	HashMapFontKey tempKey;
+	AsciiFont tempKey; 
 	Point2<int> vertex[4];
-	HashMap<HashMapFontKey,AsciiFont> map;
-	AsciiFont& generateFont(const HashMapFontKey& key);
-	void drawChar(const AsciiFont &font,int x,int y);
+	hash_map<AsciiFont,int,HashAsciiFont> map;
+	//AsciiFont& generateFont(const AsciiFont& key);
+	//void drawChar(const AsciiFont &font,int x,int y);
 public:
 	AsciiBrush(const char* const &fontPath);
-	AsciiBrush(FT_Byte* &dataBase,unsigned long dataSize);
-	~AsciiBrush();
+	//AsciiBrush(FT_Byte* &dataBase,unsigned long dataSize);
+	//~AsciiBrush();
 	//在屏幕上绘制文字,color表示字符颜色,R8G8B8A8,size表示字体大小,xy表示字母基线的开始坐标，若字符纹理不存在以空格计，不换行
-	void drawInLine(const unsigned char* const& str,int color,int size,int x,int y);
+	//void drawInLine(const unsigned char* const& str,int color,int size,int x,int y);
 
 };
 
