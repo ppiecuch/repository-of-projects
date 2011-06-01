@@ -148,8 +148,8 @@ int _tmain(int argc, _TCHAR* argv[])
 #include <gl\glu.h>			// Header File For The GLu32 Library
 
 #include "point2.h"
-//#include "AsciiBrush.h"
-#include "hashmap.h"
+#include "AsciiBrush.h"
+//#include "hashmap.h"
 
 #include "freetype.h"
 
@@ -541,6 +541,7 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 
 	LogTrace("\r\nresize:%d,%d",width,height);
 }
+/*
 class HashMapFontKey:public HashMapKeyInterface{
 protected:
 	int color;
@@ -570,7 +571,7 @@ public:
 		}
 		
 	}
-};
+};*/
 int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 {
 	glShadeModel(GL_SMOOTH|GL_FLAT);					// Enable Smooth Shading
@@ -630,7 +631,7 @@ int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 	//const HashMapKeyInterface* p = kp;
 	//LogTrace("\r\nvalue:%d",p->hashCode());
 	//delete k1;
-	HashMap<unsigned int,int> map;
+	/*HashMap<unsigned int,int> map;
 	map.put(1,1);
 	map.put(1,2);
 	map.put(1025,1025);
@@ -642,7 +643,7 @@ int InitGL(GLvoid)										// All Setup For OpenGL Goes Here
 	LogTrace("\r\nvalue:%d",map.get(1025));
 	map.remove(1025);
 	LogTrace("\r\nvalue:%d",map.get(1));
-	LogTrace("\r\nvalue:%d",map.get(1025));
+	LogTrace("\r\nvalue:%d",map.get(1025));*/
 
 	return TRUE;										// Initialization Went OK
 }
