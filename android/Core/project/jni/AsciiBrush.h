@@ -17,8 +17,9 @@ using namespace stdext;*/
 #include <GLES/gl.h>
 #include <freetype/ft2build.h>
 #include <freetype/freetype.h>
-#include <ext/hash_map>
-using namespace std;
+#include <ext/hash_set>
+#include <stdexcept>
+using namespace  std;
 using namespace  __gnu_cxx;//需要引入
 
 
@@ -44,45 +45,16 @@ private:
 	}
 public:
 	friend class AsciiBrush;
-	//friend size_t hashAsciiFont(const AsciiFont &f);
-	//friend class HashCompareAsciiFont;
-	//friend  struct hash<const AsciiFont>;
 	friend struct HashAsciiFont;
+	friend struct EqualAsciiFont;
 
 };
-/*
-inline size_t hashAsciiFont(const AsciiFont &f) {
-	return f.c;
-}
-
-class HashCompareAsciiFont: public hash_compare<AsciiFont>
-{
-public:
-	size_t operator()(const AsciiFont &f) const
-	{
-		return ((size_t)hashAsciiFont(f));
-	}
-
-	bool operator()(const AsciiFont &f1, const AsciiFont &f2) const
-	{
-		return f1.color==f2.color&&f1.size==f2.size&&f1.c==f2.c;
-	}
-};
-namespace  __gnu_cxx { 
-	template<> struct hash<const AsciiFont> {
-		size_t operator()(const AsciiFont& f) const {
-			return f.c;   
-		} 
-	};
-	bool operator()(const AsciiFont& f1,const AsciiFont& f2) const{
-        return f1.color==f2.color&&f1.size==f2.size&&f1.c==f2.c;
-    }
-
-} */
 struct HashAsciiFont{
 	size_t operator()(const AsciiFont& f) const {
 			return f.c;   
 	}
+};
+struct EqualAsciiFont{
 	bool operator()(const AsciiFont& f1,const AsciiFont& f2) const{
         return f1.color==f2.color&&f1.size==f2.size&&f1.c==f2.c;
     }
@@ -98,15 +70,15 @@ protected:
 	FT_Face face;
 	AsciiFont tempKey; 
 	Point2<int> vertex[4];
-	hash_map<AsciiFont,int,HashAsciiFont> map;
-	//AsciiFont& generateFont(const AsciiFont& key);
-	//void drawChar(const AsciiFont &font,int x,int y);
+	hash_set<AsciiFont,HashAsciiFont,EqualAsciiFont> set;
+	AsciiFont& generateFont(const AsciiFont& key);
+	void drawChar(const AsciiFont &font,int x,int y);
 public:
 	AsciiBrush(const char* const &fontPath);
-	//AsciiBrush(FT_Byte* &dataBase,unsigned long dataSize);
-	//~AsciiBrush();
+	AsciiBrush(FT_Byte* &dataBase,unsigned long dataSize);
+	~AsciiBrush();
 	//在屏幕上绘制文字,color表示字符颜色,R8G8B8A8,size表示字体大小,xy表示字母基线的开始坐标，若字符纹理不存在以空格计，不换行
-	//void drawInLine(const unsigned char* const& str,int color,int size,int x,int y);
+	void drawInLine(const unsigned char* const& str,int color,int size,int x,int y);
 
 };
 

@@ -11,6 +11,8 @@ LOCAL_MODULE    := core
 
 LOCAL_SRC_FILES :=   \
 		AsciiBrush.cpp \
+#		object3d.cpp \
+		
 		
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lz -lstdc++
 
