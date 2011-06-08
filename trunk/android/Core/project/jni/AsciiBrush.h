@@ -6,7 +6,7 @@
 #include <gl\glu.h>
 #include "freetype.h"
 #include <stdio.h>
-#include <hash_map>
+#include <hash_set>
 using namespace std;
 using namespace stdext;*/
 
@@ -15,12 +15,13 @@ using namespace stdext;*/
 
 /**/
 #include <GLES/gl.h>
-#include <freetype/ft2build.h>
+#include <freetype/ftglyph.h>
 #include <freetype/freetype.h>
 #include <ext/hash_set>
 #include <stdexcept>
-using namespace  std;
 using namespace  __gnu_cxx;//需要引入
+using namespace  std;
+
 
 
 class AsciiBrush;
@@ -39,11 +40,28 @@ private:
 	AsciiFont():texture(-1),color(0x000000FF){
 		
 	}
+public:
+	AsciiFont(const AsciiFont& font):texture(-1),color(0x000000FF){
+		this->delta.x=font.delta.x;
+		this->delta.y=font.delta.y;
+		for(int i=0;i<4;i++)
+		{
+			this->texCoord[i].x=font.texCoord[i].x;
+			this->texCoord[i].y=font.texCoord[i].y;
+		}
+		this->offset.x=font.offset.x;
+		this->offset.y=font.offset.y;
+		this->advance.x=font.advance.x;
+		this->advance.y=font.advance.y;
+		this->color=font.color;
+		this->size=font.size;
+		this->c=font.c;
+		this->texture=font.texture;
+	}
 	~AsciiFont(){
 		if(this->texture!=-1)
 			glDeleteTextures(1,&this->texture);
 	}
-public:
 	friend class AsciiBrush;
 	friend struct HashAsciiFont;
 	friend struct EqualAsciiFont;
@@ -62,7 +80,7 @@ struct EqualAsciiFont{
 
 
 
-
+typedef hash_set<AsciiFont,HashAsciiFont,EqualAsciiFont> AsciiFontSet;
 class AsciiBrush{
 protected:
 	static const unsigned char vertexIndices[];
@@ -70,15 +88,16 @@ protected:
 	FT_Face face;
 	AsciiFont tempKey; 
 	Point2<int> vertex[4];
-	hash_set<AsciiFont,HashAsciiFont,EqualAsciiFont> set;
-	AsciiFont& generateFont(const AsciiFont& key);
-	void drawChar(const AsciiFont &font,int x,int y);
+	AsciiFontSet set;
+	//生成一个指定的AsciiFont并将它保存进AsciiFontSet中
+	void generateFont(const AsciiFont& key);
+	void drawChar(const AsciiFontSet::iterator &iterator,int x,int y);
 public:
 	AsciiBrush(const char* const &fontPath);
 	AsciiBrush(FT_Byte* &dataBase,unsigned long dataSize);
 	~AsciiBrush();
 	//在屏幕上绘制文字,color表示字符颜色,R8G8B8A8,size表示字体大小,xy表示字母基线的开始坐标，若字符纹理不存在以空格计，不换行
-	void drawInLine(const unsigned char* const& str,int color,int size,int x,int y);
+	void drawInLine(const char* const& str,int color,int size,int x,int y);
 
 };
 

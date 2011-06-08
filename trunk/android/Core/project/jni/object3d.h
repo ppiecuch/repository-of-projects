@@ -1,5 +1,6 @@
 #ifndef _OBJECT_3D_H_
 #define _OBJECT_3D_H_
+/*
 #include <ext/hash_set>
 #include <iostream>
 using namespace std;
@@ -18,22 +19,6 @@ public:
 		return this->no==s.no; 
 	}
 }; 
-/*
-namespace __gnu_cxx{
-	template<> struct hash<Site> { 
-		size_t operator()(const Site &s)const { 
-			return(size_t)s.no; 
-		} 
-	};
-}
-
-namespace std{
-	template<> struct equal_to<Site> { 
-		bool operator()( const Site& s1, const Site& s2 )const { 
-			return s1 == s2; 
-		} 
-	};
-}*/
 struct my_hash {
     size_t operator()(const Site& s) const {
        return(size_t)s.no;
@@ -45,11 +30,11 @@ struct my_equal_to {
     }
 };
 
-
+*/
 class Object3D{
 public:
 	//hash_set<Site,hash<Site>,equal_to<Site>> set;
-	hash_set<Site,my_hash,my_equal_to> set;
+	//hash_set<Site,my_hash,my_equal_to> set;
 	Object3D();
 };
 

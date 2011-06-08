@@ -34,9 +34,9 @@ AsciiBrush::~AsciiBrush()
 	FT_Done_FreeType(this->library);
 	FT_Done_Face(this->face);
 }
-AsciiFont& AsciiBrush::generateFont(const AsciiFont& key)
+void AsciiBrush::generateFont(const AsciiFont& key)
 {
-	/*int color=key.color;
+	int color=key.color;
 	unsigned char c=key.c;
 	int size=key.size;
 	int error;
@@ -84,39 +84,39 @@ AsciiFont& AsciiBrush::generateFont(const AsciiFont& key)
 	int width=bitmap.width;
 	int height=bitmap.rows;
 	int newWidth=ceilPower(width);
-	int newHeight=ceilPower(height);*/
+	int newHeight=ceilPower(height);
 
-	AsciiFont font;
-	/*
+	AsciiFont *font=new AsciiFont();
+	
 	//保存颜色
-	font.color=color;
+	font->color=color;
 	//保存长宽信息
-	font.delta.x=width;
-	font.delta.y=height;
+	font->delta.x=width;
+	font->delta.y=height;
 	//保存大小
-	font.size=size;
+	font->size=size;
 	//复制位图数据到灰度缓冲区
 	//GLubyte *buffers = new GLubyte[bitmap.width * bitmap.rows];
 	//memcpy(buffers,bitmap.buffer,bitmap.width * bitmap.rows);
 
 	//保存偏移
-	font.offset.x=bitmapGlyph->left;// 字符距离左边界的距离
-	font.offset.y=bitmapGlyph->top;// 字符最高点距离基线的距离
-	font.advance.x=slot->advance.x>>6;
-	font.advance.y=slot->advance.y>>6;
+	font->offset.x=bitmapGlyph->left;// 字符距离左边界的距离
+	font->offset.y=bitmapGlyph->top;// 字符最高点距离基线的距离
+	font->advance.x=slot->advance.x>>6;
+	font->advance.y=slot->advance.y>>6;
 
 	//保存纹理坐标，由于newWidth、newHeight与字符的真实轮廓大小不一定相等，所以要调整纹理坐标
 	float dx=(float)width/newWidth;
 	float dy=(float)height/newHeight;
 	dy=1-dy;//因为y被我们反转了，即着色是从上往下的，所以空白是在data块上方
-	font.texCoord[0].x=0.0f;
-	font.texCoord[0].y=dy;
-	font.texCoord[1].x=dx;
-	font.texCoord[1].y=dy;
-	font.texCoord[2].x=0.0f;
-	font.texCoord[2].y=1.0f;
-	font.texCoord[3].x=dx;
-	font.texCoord[3].y=1.0f;
+	font->texCoord[0].x=0.0f;
+	font->texCoord[0].y=dy;
+	font->texCoord[1].x=dx;
+	font->texCoord[1].y=dy;
+	font->texCoord[2].x=0.0f;
+	font->texCoord[2].y=1.0f;
+	font->texCoord[3].x=dx;
+	font->texCoord[3].y=1.0f;
 
 	//获取颜色分量
 	int red=0xFF&(color>>24);
@@ -145,57 +145,57 @@ AsciiFont& AsciiBrush::generateFont(const AsciiFont& key)
 	}
 
 	//生成1个纹理的名称
-	glGenTextures(1, &font.texture);
+	glGenTextures(1, &font->texture);
 	//设置字体纹理的纹理过滤器
-	glBindTexture(GL_TEXTURE_2D, font.texture);
+	glBindTexture(GL_TEXTURE_2D, font->texture);
 	
 	//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	//glTexEnvi(GL_TEXTURE_2D,GL_TEXTURE_ENV_MODE,GL_REPLACE);
 	glTexImage2D( GL_TEXTURE_2D,0,GL_RGBA,newWidth,newHeight,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
 
-	delete[] data;*/
+	delete[] data;
 
-	return font;
+	//将font对象保存进set里
+	this->set.insert(*font);
 }
-void AsciiBrush::drawChar(const AsciiFont &font,int x,int y)
+void AsciiBrush::drawChar(const AsciiFontSet::iterator &iterator,int x,int y)
 {
-	/*vertex[0].x=x+font.offset.x;
-	vertex[0].y=y+font.offset.y-font.delta.y;
-	vertex[1].x=x+font.offset.x+font.delta.x;
-	vertex[1].y=y+font.offset.y-font.delta.y;
-	vertex[2].x=x+font.offset.x;
-	vertex[2].y=y+font.offset.y;
-	vertex[3].x=x+font.offset.x+font.delta.x;
-	vertex[3].y=y+font.offset.y;
+	vertex[0].x=x+iterator->offset.x;
+	vertex[0].y=y+iterator->offset.y-iterator->delta.y;
+	vertex[1].x=x+iterator->offset.x+iterator->delta.x;
+	vertex[1].y=y+iterator->offset.y-iterator->delta.y;
+	vertex[2].x=x+iterator->offset.x;
+	vertex[2].y=y+iterator->offset.y;
+	vertex[3].x=x+iterator->offset.x+iterator->delta.x;
+	vertex[3].y=y+iterator->offset.y;
 	glVertexPointer(2,GL_FLOAT,0,vertex);
-	glTexCoordPointer(2, GL_FLOAT, 0, font.texCoord);
-	glBindTexture(GL_TEXTURE_2D,font.texture);
-	glDrawElements(GL_TRIANGLE_STRIP,4,GL_UNSIGNED_BYTE,vertexIndices);*/
+	glTexCoordPointer(2, GL_FLOAT, 0, iterator->texCoord);
+	glBindTexture(GL_TEXTURE_2D,iterator->texture);
+	glDrawElements(GL_TRIANGLE_STRIP,4,GL_UNSIGNED_BYTE,vertexIndices);
 }
-void AsciiBrush::drawInLine(const unsigned char* const& str,int color,int size,int x,int y)
+void AsciiBrush::drawInLine(const char* const& str,int color,int size,int x,int y)
 {
-	/*this->tempKey.color=color;
+	this->tempKey.color=color;
 	this->tempKey.size=size;
 	int nextX=x;
 	for(int i=0;i<strlen(str);i++)
 	{
 		this->tempKey.c=str[i];
-		if(this->map.find(this->tempKey)== map.end())
+		if(this->set.find(this->tempKey)== set.end())
 		{
-			AsciiFont &font=generateFont(this->tempKey);
-			this->map[this->tempKey]=font;
+			generateFont(this->tempKey);
 		}
-		AsciiFont &font=this->map[this->tempKey];
-		drawChar(font,nextX,y);
+		const AsciiFontSet::iterator iterator=this->set.find(this->tempKey);
+		drawChar(iterator,nextX,y);
 		//步进
-		nextX+=font.advance.x;
-	}*/
+		nextX+=iterator->advance.x;
+	}
 }

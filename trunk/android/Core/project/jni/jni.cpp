@@ -148,9 +148,9 @@ int _tmain(int argc, _TCHAR* argv[])
 #include <gl\glu.h>			// Header File For The GLu32 Library
 
 #include "point2.h"
-//#include "AsciiBrush.h"
+#include "AsciiBrush.h"
 //#include "hashmap.h"
-#include "object3d.h"
+//#include "object3d.h"
 
 #include "freetype.h"
 
