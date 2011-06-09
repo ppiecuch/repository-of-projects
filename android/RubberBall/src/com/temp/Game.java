@@ -62,10 +62,12 @@ public class Game extends BaseGameActivity implements IAccelerometerListener,IOn
 
 	private Texture mTexture1;
 	private Texture mTexture2;
-//	private TiledTextureRegion mFaceTextureRegion;
+	private Texture hightLightTexture;
+	private TiledTextureRegion mFactTiledTextureRegion;
 //	private TiledTextureRegion mFaceTextureRegion2;
 	private TextureRegion mFaceTextureRegion;
-	private TextureRegion mFaceTextureRegion2;
+//	private TextureRegion mFaceTextureRegion2;
+	private TextureRegion highLightTextureRegion;
 	
 	private Texture mTexture;
 	private TextureRegion mParticleTextureRegion;
@@ -104,12 +106,15 @@ public class Game extends BaseGameActivity implements IAccelerometerListener,IOn
 	public void onLoadResources() {
 		this.mTexture1 = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mTexture2 = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-//		this.mFaceTextureRegion = TextureRegionFactory.createTiledFromAsset(this.mTexture, this, "gfx/face_circle_tiled.png", 0, 0, 1, 1);
+		this.hightLightTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mFactTiledTextureRegion = TextureRegionFactory.createTiledFromAsset(this.mTexture2, this, "gfx/face_circle_tiled2.png", 0, 0, 1, 1);
 //		this.mFaceTextureRegion2 = TextureRegionFactory.createTiledFromAsset(this.mTexture, this, "gfx/face_circle_tiled2.png", 0, 0, 1, 1);
 		this.mFaceTextureRegion = TextureRegionFactory.createFromAsset(this.mTexture1, this, "gfx/face_circle_tiled.png",0,0);
-		this.mFaceTextureRegion2 = TextureRegionFactory.createFromAsset(this.mTexture2, this, "gfx/face_circle_tiled2.png",0,0);
+//		this.mFaceTextureRegion2 = TextureRegionFactory.createFromAsset(this.mTexture2, this, "gfx/face_circle_tiled2.png",0,0);
+		this.highLightTextureRegion = TextureRegionFactory.createFromAsset(this.hightLightTexture, this, "gfx/highlight.png",0,0);
 		this.mEngine.getTextureManager().loadTexture(this.mTexture1);
 		this.mEngine.getTextureManager().loadTexture(this.mTexture2);
+		this.mEngine.getTextureManager().loadTexture(this.hightLightTexture);
 		
 		this.mTexture = new Texture(32, 32, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		this.mParticleTextureRegion = TextureRegionFactory.createFromAsset(this.mTexture, this, "gfx/particle_point.png", 0, 0);
@@ -207,23 +212,31 @@ public class Game extends BaseGameActivity implements IAccelerometerListener,IOn
 
 		//定义子弹球
 		BulletBall face1;
-		face1=new BulletBall(MainMenu.CAMERA_WIDTH/2, MainMenu.CAMERA_HEIGHT/2, this.mFaceTextureRegion2, this.mParticleTextureRegion,this.mPhysicsWorld2);
+//		face1=new BulletBall(MainMenu.CAMERA_WIDTH/2, MainMenu.CAMERA_HEIGHT/2, this.mFaceTextureRegion2,this.highLightTextureRegion, this.mParticleTextureRegion,this.mPhysicsWorld2);
+		face1=new BulletBall(MainMenu.CAMERA_WIDTH/2, MainMenu.CAMERA_HEIGHT/2, this.mFactTiledTextureRegion,this.highLightTextureRegion, this.mParticleTextureRegion,this.mPhysicsWorld2);
+//		final PhysicsHandler physicsHandler1 = new PhysicsHandler(face1);
+//		face1.registerUpdateHandler(physicsHandler1);
 		scene.getLastChild().attachChild(face1.getParticleSystem());
 //		face1.setLinearVelocity(1000, 100);
 //		face1.applyForce(-2000,1000);
 		scene.getLastChild().attachChild(face1);
-		this.mPhysicsWorld2.registerPhysicsConnector(new PhysicsConnector(face1, face1.getBody(), true, false));
+		scene.getLastChild().attachChild(face1.getHighLight());
+		this.mPhysicsWorld2.registerPhysicsConnector(new PhysicsConnector(face1, face1.getBody(), true, true));
 		
-		face1=new BulletBall(MainMenu.CAMERA_WIDTH/2-20, MainMenu.CAMERA_HEIGHT/2, this.mFaceTextureRegion2, this.mParticleTextureRegion,this.mPhysicsWorld2);
+//		face1=new BulletBall(MainMenu.CAMERA_WIDTH/2-20, MainMenu.CAMERA_HEIGHT/2, this.mFaceTextureRegion2,this.highLightTextureRegion, this.mParticleTextureRegion,this.mPhysicsWorld2);
+		face1=new BulletBall(MainMenu.CAMERA_WIDTH/2, MainMenu.CAMERA_HEIGHT/2, this.mFactTiledTextureRegion,this.highLightTextureRegion, this.mParticleTextureRegion,this.mPhysicsWorld2);
 		scene.getLastChild().attachChild(face1.getParticleSystem());
 //		face1.setLinearVelocity(-100, 100);
 //		face1.applyForce(200,100);
 		scene.getLastChild().attachChild(face1);
-		this.mPhysicsWorld2.registerPhysicsConnector(new PhysicsConnector(face1, face1.getBody(), true, false));
+		scene.getLastChild().attachChild(face1.getHighLight());
+		this.mPhysicsWorld2.registerPhysicsConnector(new PhysicsConnector(face1, face1.getBody(), true, true));
 		
 		
 		return scene;
 	}
+	
+	
 	
 	/**
 	 * 创建橡皮球
@@ -321,6 +334,7 @@ public class Game extends BaseGameActivity implements IAccelerometerListener,IOn
 		Meta metaB=(Meta) b.getBody().getUserData();
 //		Meta meta=null;
 		RubberBall rubberBall=null;
+		BulletBall bulletBall;
 //		Vector2 vector=contact.GetWorldManifold().getPoints()[0];
 		if(metaA.getType()==Meta.TYPE_BALL&&metaB.getType()==Meta.TYPE_BULLET)
 		{
@@ -358,6 +372,16 @@ public class Game extends BaseGameActivity implements IAccelerometerListener,IOn
 //			}
 			doBallHitBall((RubberBall)metaA.getShape(),(RubberBall)metaB.getShape());
 		}
+		else if(metaA.getType()==Meta.TYPE_WALL&&metaB.getType()==Meta.TYPE_BULLET)
+		{
+			bulletBall=(BulletBall)metaB.getShape();
+			bulletBall.setStatus(1);
+		}
+		else if(metaA.getType()==Meta.TYPE_BULLET&&metaB.getType()==Meta.TYPE_WALL)
+		{
+			bulletBall=(BulletBall)metaA.getShape();
+			bulletBall.setStatus(1);
+		}
 
 //		if(meta!=null)
 //		{
@@ -387,19 +411,34 @@ public class Game extends BaseGameActivity implements IAccelerometerListener,IOn
 	 */
 	@Override
 	public void endContact(Contact contact) {
-		
-//		else if(metaA.getType()==Meta.TYPE_WALL&&metaB.getType()==Meta.TYPE_BALL)
-//		{
-//			rubberBall=(RubberBall)metaB.getShape();
-//			rubberBall.getBody().applyForce(frictionVector,new Vector2(rubberBall.getX(),rubberBall.getY()));
-//		}
-//		else if(metaB.getType()==Meta.TYPE_WALL&&metaA.getType()==Meta.TYPE_BALL)
-//		{
-//			rubberBall=(RubberBall)metaA.getShape();
-//			rubberBall.getBody().applyForce(frictionVector,new Vector2(rubberBall.getX(),rubberBall.getY()));
-//		}
-		
-		
+		Fixture a=contact.getFixtureA();
+		Fixture b=contact.getFixtureB();
+		Meta metaA=(Meta) a.getBody().getUserData();
+		Meta metaB=(Meta) b.getBody().getUserData();
+		BulletBall bulletBall;
+		if(metaA.getType()==Meta.TYPE_WALL&&metaB.getType()==Meta.TYPE_BULLET)
+		{
+			bulletBall=(BulletBall)metaB.getShape();
+			bulletBall.setStatus(2);
+		}
+		else if(metaA.getType()==Meta.TYPE_BULLET&&metaB.getType()==Meta.TYPE_WALL)
+		{
+			bulletBall=(BulletBall)metaA.getShape();
+			bulletBall.setStatus(2);
+		}
+		else
+		{
+			if(metaA.getType()==Meta.TYPE_BULLET)
+			{
+				bulletBall=(BulletBall)metaA.getShape();
+				bulletBall.setStatus(3);
+			}
+			if(metaB.getType()==Meta.TYPE_BULLET)
+			{
+				bulletBall=(BulletBall)metaB.getShape();
+				bulletBall.setStatus(3);
+			}
+		}
 	}
 
 }
