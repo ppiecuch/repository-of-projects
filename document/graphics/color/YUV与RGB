@@ -139,3 +139,7 @@ static public void decodeYUV420SP(byte[] rgbBuf, byte[] yuv420sp, int width, int
 	         }   
 	     }   
 	   }  
+
+	   
+还可以参考:Converting between Y'UV and RGB
+http://en.wikipedia.org/wiki/YUV#Y.27UV444

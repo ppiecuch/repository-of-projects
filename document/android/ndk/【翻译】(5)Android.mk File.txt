@@ -1,0 +1,1588 @@
+英文文档见android-ndk-r5b的documentation.html
+
+属于Android Native Development Kit (NDK)的一部分
+
+见http://developer.android.com/sdk/ndk/（需要代理）
+
+翻译仅个人见解
+
+-----------------
+
+ 
+
+Android.mk file syntax specification
+
+ 
+
+Android.mk文件语法规范
+
+ 
+
+Introduction:
+
+ 
+
+介绍：
+
+-------------
+
+ 
+
+This document describes the syntax of Android.mk build file written to describe your C and C++ source files to the Android NDK. To understand what follows, it is assumed that you have read the docs/OVERVIEW.html file that explains their role and usage.
+
+ 
+
+这篇文档描述Android.mk构建文件的语法，书写这个文件是为了向Android NDK描述你的C和C++源文件。为了明白下面介绍的东西，假设你已经阅读过docs/OVERVIEW.html文件，它解释了那些文件的角色和用法。
+
+ 
+
+Overview:
+
+ 
+
+概述
+
+---------
+
+ 
+
+An Android.mk file is written to describe your sources to the build system. More specifically:
+
+ 
+
+书写Android.mk是为了描述向构建系统描述你的源代码。更特别地：
+
+ 
+
+- The file is really a tiny GNU Makefile fragment that will be parsed one or more times by the build system. As such, you should try to minimize the variables you declare there and do not assume that anything is not defined during parsing.
+
+ 
+
+- 文件是一段很小的GNU Makefile片段，它将被构建系统解析一或多次。因此，在那里你应该尽量减少声明的变量，并且不要假设任何东西在解析期间没有定义。
+
+ 
+
+- The file syntax is designed to allow you to group your sources into 'modules'. A module is one of the following:
+
+ 
+
+- 文件语法是设计为允许你把源代码组织成模块。一个模块是以下其中一种：
+
+ 
+
+    - a static library
+
+ 
+
+    - 静态库
+
+ 
+
+    - a shared library
+
+ 
+
+    - 动态库
+
+ 
+
+  Only shared libraries will be installed/copied to your application package. Static libraries can be used to generate shared libraries though.
+
+ 
+
+  只有动态库将被安装或复制到你的应用程序包。然而静态库可以用于生成动态库。
+
+ 
+
+  You can define one or more modules in each Android.mk file, and you can use the same source file in several modules.
+
+ 
+
+  你可以在每个Android.mk文件中定义一个或多个模块，而且你可以在几个模块中使用相同的源代码。
+
+ 
+
+- The build system handles many details for you. For example, you don't need to list header files or explicit dependencies between generated files in your Android.mk. The NDK build system will compute these automatically for you.
+
+ 
+
+- 构建系统为你处理许多细节。例如，你不需要在你的Android.mk中列出头文件或所生成文件之间的显式依赖。NDK构建系统将自动为你计算这些东西。
+
+ 
+
+  This also means that, when updating to newer releases of the NDK, you should be able to benefit from new toolchain/platform support without having to touch your Android.mk files.
+
+ 
+
+  这也意味着，当更新到更新的NDK发布版，你应该可以从新的工具链或平台支持中获益而不必修改你的Android.mk文件。
+
+ 
+
+Note that the syntax is *very* close to the one used in Android.mk files distributed with the full open-source Android platform sources. While the build system implementation that uses them is different, this is an intentional design decision made to allow reuse of 'external' libraries' source code easier for application developers.
+
+ 
+
+注意，它非常接近于跟随完全开源的Android平台源代码发布的Android.mk文件中所使用的语法。但用于它们的构建系统实现是不相同的，这是内部设计所作出的决定以允许外部库源代码的重用对于应用程序开发者来说更加容易。（注：意思是，Android开源代码的构建系统与NDK的构建系统相似，但实现不同，所以不能混用）
+
+ 
+
+Simple example:
+
+ 
+
+简单的示例：
+
+---------------
+
+ 
+
+Before describing the syntax in details, let's consider the simple "hello JNI" example, i.e. the files under:
+
+ 
+
+在详细描述语法之前，让我们考虑简单的hello JNI示例，即以下目录下的文件：
+
+ 
+
+    apps/hello-jni/project
+
+ 
+
+（注：新版NDK放在samples/hello-jni下）
+
+ 
+
+Here, we can see:
+
+ 
+
+这里，我们可以看到：
+
+ 
+
+  - The 'src' directory containing the Java sources for the sample Android project.
+
+ 
+
+  - src目录包含用于示例Android工程的Java源代码
+
+ 
+
+  - The 'jni' directory containing the native source for the sample, i.e. 'jni/hello-jni.c'
+
+ 
+
+  - jni目录包含用于示例的原生代码，即jni/hello-jni.c（注：原生的意思是与机器代码有关，这里只是相对Java而言，即实现JNI接口的C代码。或许汇编也可以称为原生代码）
+
+ 
+
+    This source file implements a simple shared library that implements a native method that returns a string to the VM application.
+
+ 
+
+    这个源文件实现一个简单动态库，它实现了一个native方法，返回一个字符串到VM应用程序。
+
+ 
+
+  - The 'jni/Android.mk' file that describes the shared library to the NDK build system. Its content is:
+
+ 
+
+  - jni/Android.mk文件向NDK构建系统描述动态库。它的内容是：
+
+ 
+
+   ---------- cut here ------------------
+
+   LOCAL_PATH := $(call my-dir)
+
+ 
+
+   include $(CLEAR_VARS)
+
+ 
+
+   LOCAL_MODULE    := hello-jni
+
+   LOCAL_SRC_FILES := hello-jni.c
+
+ 
+
+   include $(BUILD_SHARED_LIBRARY)
+
+   ---------- cut here ------------------
+
+ 
+
+Now, let's explain these lines:
+
+ 
+
+现在，让我们解释这些代码行：
+
+ 
+
+  LOCAL_PATH := $(call my-dir)
+
+ 
+
+An Android.mk file must begin with the definition of the LOCAL_PATH variable. It is used to locate source files in the development tree. In this example, the macro function 'my-dir', provided by the build system, is used to return the path of the current directory (i.e. the directory containing the Android.mk file itself).
+
+ 
+
+一个Android.mk文件必须以LOCAL_PATH变量定义开头。它用于在开发树中定位源文件。在这个例子中，宏函数my-dir，由构建系统提供，用于返回当前目录的路径（即，包含Android.mk文件自身的目录）。
+
+ 
+
+  include $(CLEAR_VARS)
+
+ 
+
+The CLEAR_VARS variable is provided by the build system and points to a special GNU Makefile that will clear many LOCAL_XXX variables for you (e.g. LOCAL_MODULE, LOCAL_SRC_FILES, LOCAL_STATIC_LIBRARIES, etc...), with the exception of LOCAL_PATH. This is needed because all build control files are parsed in a single GNU Make execution context where all variables are global.
+
+ 
+
+CLEAR_VARS由构建系统提供，并且指向一个特殊GNU Makefile，这个Makefile将为你清除许多LOCAL_XXX变量（例如LOCAL_MODULE，LOCAL_SRC_FILES，LOCAL_STATIC_LIBRARIES，等等），但LOCAL_PATH例外。这是必须的，因为所有构建控制文件在单一GNU Make的执行上下文中执行，所有变量都是全局的。
+
+ 
+
+  LOCAL_MODULE := hello-jni
+
+ 
+
+The LOCAL_MODULE variable must be defined to identify each module you describe in your Android.mk. The name must be *unique* and not contain any spaces. Note that the build system will automatically add proper prefix and suffix to the corresponding generated file. In other words, a shared library module named 'foo' will generate 'libfoo.so'.
+
+ 
+
+必须定义LOCAL_MODULE变量以标识你在你的Android.mk中描述的每个模块。名称必须是唯一的并且不要包含任何空白符。注意构建系统将自动添加合适的前缀和后缀到相应的生成文件。换言之，一个名为foo的动态库模块将生成libfoo.so。
+
+ 
+
+IMPORTANT NOTE:
+
+If you name your module 'libfoo', the build system will not add another 'lib' prefix and will generate libfoo.so as well. This is to support Android.mk files that originate from the Android platform sources, would you need to use these.
+
+ 
+
+重要注意事项：
+
+如果你把你的模块命名为libfoo，构建系统将不会添加另一个lib前缀而且仍将生成libfoo.so。这是为了支持最初在Android平台的源代码中的Android.mk文件，而你可能需要使用它们。
+
+ 
+
+  LOCAL_SRC_FILES := hello-jni.c
+
+ 
+
+The LOCAL_SRC_FILES variables must contain a list of C and/or C++ source files that will be built and assembled into a module. Note that you should not list header and included files here, because the build system will compute dependencies automatically for you; just list the source files that will be passed directly to a compiler, and you should be good.
+
+ 
+
+LOCAL_SRC_FILES变量必须包含一个C和/或C++源代码文件列表，它们将被构建并且汇编成一个模块。注意你不应该在这里列出头文件和被包含的文件，因为构建系统将为你自动计算依赖；只要列举将被直接传递给编译器的源文件，然后你就做好了。（注：头文件只是预编译期被处理的文件，真正编译成.o文件的是被预处理后被展开的.c源代码）
+
+ 
+
+Note that the default extension for C++ source files is '.cpp'. It is however possible to specify a different one by defining the variable LOCAL_CPP_EXTENSION. Don't forget the initial dot (i.e. '.cxx' will work, but not 'cxx').
+
+ 
+
+注意C++源文件的默认扩展名是.cpp。然而可以通过定义LOCAL_CPP_EXTENSION变量定义不同的扩展名。不要忘记开头的点（即.cxx可以，但cxx不可以）
+
+ 
+
+  include $(BUILD_SHARED_LIBRARY)
+
+ 
+
+The BUILD_SHARED_LIBRARY is a variable provided by the build system that points to a GNU Makefile script that is in charge of collecting all the information you defined in LOCAL_XXX variables since the latest 'include $(CLEAR_VARS)' and determine what to build, and how to do it exactly. There is also BUILD_STATIC_LIBRARY to generate a static library.
+
+ 
+
+BUILD_SHARED_LIBRARY是构建系统提供的变量，指向一个GNU Makefile脚本，它负责收集最后的include $(CLEAR_VARS)之后你所定义的所有信息，然后决定要构建什么，并且如何准确地做到。还有一个BUILD_STATIC_LIBRARY变量用于生成静态库。
+
+ 
+
+There are more complex examples in the samples directories, with commented Android.mk files that you can look at.
+
+ 
+
+在例子目录中有更多复杂的示例，你可以看里面带注释的Android.mk文件。
+
+ 
+
+Reference:
+
+ 
+
+参考：
+
+----------
+
+ 
+
+This is the list of variables you should either rely on or define in an Android.mk. You can define other variables for your own usage, but the NDK build system reserves the following variable names:
+
+ 
+
+这是在Android.mk中你应该依赖或定义的变量列表。你可以定义其它变量供你自己使用，但NDK构建系统保留以下变量名称：
+
+ 
+
+- names that begin with LOCAL_  (e.g. LOCAL_MODULE)
+
+ 
+
+- 以LOCAL_开头的名称（例如LOCAL_MODULE）
+
+ 
+
+- names that begin with PRIVATE_, NDK_ or APP_  (used internally)
+
+ 
+
+- 以PRIVATE_，NDK_或APP_开头的名称（内部使用）
+
+ 
+
+- lower-case names (used internally, e.g. 'my-dir')
+
+ 
+
+- 小写名称（用于内部，例如my-dir）
+
+ 
+
+If you need to define your own convenience variables in an Android.mk file, we recommend using the MY_ prefix, for a trivial example:
+
+ 
+
+如果你需要在Android.mk文件中定义你自己的便利变量，对于一个小示例，我们建议使用MY_前缀：
+
+ 
+
+   ---------- cut here ------------------
+
+    MY_SOURCES := foo.c
+
+    ifneq ($(MY_CONFIG_BAR),)
+
+      MY_SOURCES += bar.c
+
+    endif
+
+ 
+
+    LOCAL_SRC_FILES += $(MY_SOURCES)
+
+   ---------- cut here ------------------
+
+ 
+
+So, here we go:
+
+ 
+
+接下来，我们继续：
+
+ 
+
+NDK-provided variables:
+
+ 
+
+NDK提供的变量
+
+- - - - - - - - - - - -
+
+ 
+
+These GNU Make variables are defined by the build system before your Android.mk file is parsed. Note that under certain circumstances the NDK might parse your Android.mk several times, each with different definition for some of these variables.
+
+ 
+
+在你的Android.mk文件被解析前这些GNU Make变量被构建系统定义。注意在某些情况下NDK可能多次解析你的Android.mk，每次用不同的值定义这些变量。
+
+ 
+
+CLEAR_VARS
+
+    Points to a build script that undefines nearly all LOCAL_XXX variables listed in the "Module-description" section below. You must include the script before starting a new module, e.g.:
+
+ 
+
+CLEAR_VARS
+
+    指向一个构建脚本，它取消定义在下面的“模块描述”部分列举的几乎所有LOCAL_XXX变量。你必须在一个新模块开始之前包含这个脚本，例如：
+
+ 
+
+      include $(CLEAR_VARS)
+
+ 
+
+BUILD_SHARED_LIBRARY
+
+    Points to a build script that collects all the information about the module you provided in LOCAL_XXX variables and determines how to build a target shared library from the sources you listed. Note that you must have LOCAL_MODULE and LOCAL_SRC_FILES defined, at a minimum before including this file. Example usage:
+
+ 
+
+BUILD_SHARED_LIBRARY
+
+    指向一个构建脚本，它收集你用LOCAL_XXX变量提供的所有模块相关信息，并且决定如何从你列举的源代码中构建目标动态库。注意你必须已经定义了LOCAL_MODULE和LOCAL_SRC_FILES，至少在包含这个文件之前。示例用法：
+
+ 
+
+      include $(BUILD_SHARED_LIBRARY)
+
+ 
+
+    note that this will generate a file named lib$(LOCAL_MODULE).so
+
+ 
+
+    注意它将生成一个名为lib$(LOCAL_MODULE).so的文件。
+
+ 
+
+BUILD_STATIC_LIBRARY
+
+    A variant of BUILD_SHARED_LIBRARY that is used to build a target static library instead. Static libraries are not copied into your project/packages but can be used to build shared libraries (see LOCAL_STATIC_LIBRARIES and LOCAL_STATIC_WHOLE_LIBRARIES described below).
+
+    Example usage:
+
+ 
+
+BUILD_STATIC_LIBRARY
+
+    一个BUILD_SHARED_LIBRARY的变种，不同的是用于构建一个目标静态库。静态库不会被复制进你的project/packages，但可以它用于构建动态库（见后面描述的LOCAL_STATIC_LIBRARIES和LOCAL_STATIC_WHOLE_LIBRARIES）。
+
+    示例用法：
+
+ 
+
+      include $(BUILD_STATIC_LIBRARY)
+
+ 
+
+    Note that this will generate a file named lib$(LOCAL_MODULE).a
+
+ 
+
+    注意这将生成一个名为lib$(LOCAL_MODULE).a的文件。
+
+ 
+
+PREBUILT_SHARED_LIBRARY
+
+    Points to a build script used to specify a prebuilt shared library. Unlike BUILD_SHARED_LIBRARY and BUILD_STATIC_LIBRARY, the value of LOCAL_SRC_FILES must be a single path to a prebuilt shared library (e.g. foo/libfoo.so), instead of a source file.
+
+ 
+
+PREBUILT_SHARED_LIBRARY
+
+    指向一个构建脚本，用于指定一个预构建的动态库。不同于BUILD_SHARED_LIBRARY和BUILD_STATIC_LIBRARY，LOCAL_SRC_FILES的值（注：原文可能有误，应该是PREBUILT_SHARED_LIBRARY的值）必须是一个指向预构建动态库的单一路径（例如foo/libfoo.so），而非一个源文件。
+
+ 
+
+    You can reference the prebuilt library in another module using the LOCAL_PREBUILTS variable (see docs/PREBUILTS.html for more information).
+
+ 
+
+    你可以在另一个模块中引用预构建库，使用LOCAL_PREBUILTS变量（见docs/PREBUILTS.html获得更多信息）。
+
+ 
+
+PREBUILT_STATIC_LIBRARY
+
+    This is the same as PREBUILT_SHARED_LIBRARY, but for a static library file instead. See docs/PREBUILTS.html for more.
+
+ 
+
+PREBUILT_STATIC_LIBRARY
+
+    和PREBUILT_SHARED_LIBRARY相同，不同的是使用静态库文件。见docs/PREBUILTS.html获得更多信息。
+
+ 
+
+TARGET_ARCH
+
+    Name of the target CPU architecture as it is specified by the full Android open-source build. This is 'arm' for any ARM-compatible build, independent of the CPU architecture revision.
+
+ 
+
+TARGET_ARCH
+
+    目标CPU架构的名称，它由完全Android开源构建指定。对于任意与ARM兼容的构建来说它的值是arm，与CPU架构的修订号无关。
+
+ 
+
+TARGET_PLATFORM
+
+    Name of the target Android platform when this Android.mk is parsed. For example, 'android-3' correspond to Android 1.5 system images. For a complete list of platform names and corresponding Android system images, read docs/STABLE-APIS.html.
+
+ 
+
+TARGET_PLATFORM
+
+    在这个Android.mk解析时目标Android平台的名称。例如android-3对应Android 1.5系统镜像。要想获得平台名称和对应Android系统镜像的完整列表，请阅读docs/STABLE-APIS.html。
+
+ 
+
+TARGET_ARCH_ABI
+
+    Name of the target CPU+ABI when this Android.mk is parsed. Two values are supported at the moment:
+
+ 
+
+TARGET_ARCH_ABI
+
+    当这个Android.mk被解析时目标CPU+ABI的名称。现在支持两种值：
+
+ 
+
+       armeabi
+
+            For Armv5TE
+
+ 
+
+       armeabi-v7a
+
+ 
+
+    NOTE: Up to Android NDK 1.6_r1, this variable was simply defined as 'arm'. However, the value has been redefined to better match what is used internally by the Android platform.
+
+ 
+
+    注意：Android NDK 1.6_r1以上，这个变量被简单地定义为arm。然而，这个值已经被重新定义以更好地匹配Android平台内部所使用的值。
+
+ 
+
+    For more details about architecture ABIs and corresponding compatibility issues, please read docs/CPU-ARCH-ABIS.html
+
+ 
+
+    想获得更多关于架构ABI和相应兼容性问题的细节，请阅读docs/CPU-ARCH-ABIS.html。
+
+ 
+
+    Other target ABIs will be introduced in future releases of the NDK and will have a different name. Note that all ARM-based ABIs will have 'TARGET_ARCH' defined to 'arm', but may have different 'TARGET_ARCH_ABI'
+
+ 
+
+    其它目标ABI将在未来的NDK发布版中引入，并且将拥有不同的名称。注意对于所有基于ARM的ABI，TARGET_ARCH都会被定义为arm，但TARGET_ARCH_ABI的值可能不同。
+
+ 
+
+TARGET_ABI
+
+    The concatenation of target platform and abi, it really is defined as $(TARGET_PLATFORM)-$(TARGET_ARCH_ABI) and is useful when you want to test against a specific target system image for a real device.
+
+ 
+
+TARGET_ABI
+
+    目标平台和abi（注：ABI是Application binary interface的缩写，意思是应用程序和操作系统之间的底层接口）的并称，它实际上被定义为$(TARGET_PLATFORM)-$(TARGET_ARCH_ABI)，当你想测试一个特定供真实设备使用的特定目标系统镜像时它会很有用。
+
+ 
+
+    By default, this will be 'android-3-armeabi'
+
+ 
+
+	默认，它的值将是android-3-armeabi。
+
+ 
+
+    (Up to Android NDK 1.6_r1, this used to be 'android-3-arm' by default)
+
+ 
+
+    （在NDK 1.6_r1之前，它的值曾经默认为android-3-arm）
+
+ 
+
+NDK-provided function macros:
+
+ 
+
+NDK提供的函数宏：
+
+- - - - - - - - - - - - - - -
+
+ 
+
+The following are GNU Make 'function' macros, and must be evaluated by using '$(call <function>)'. They return textual information.
+
+ 
+
+以下是GNU Make的function宏，必须通过使用$(call <function>)来计算。它们返回文本信息。
+
+ 
+
+my-dir
+
+    Returns the path of the last included Makefile, which typically is the current Android.mk's directory. This is useful to define LOCAL_PATH at the start of your Android.mk as with:
+
+ 
+
+my-dir
+
+    返回最近包含的Makefile的路径，它通常是当前Android.mk的目录。对在你的Android.mk开头定义LOCAL_PATH的值有用，正如这样：
+
+ 
+
+        LOCAL_PATH := $(call my-dir)
+
+ 
+
+    IMPORTANT NOTE: Due to the way GNU Make works, this really returns the path of the *last* *included* *Makefile* during the parsing of build scripts. Do not call my-dir after including another file.
+
+ 
+
+    重点注意：由于GNU Make的工作方式，实际上返回的路径是在解析构建脚本时最近包含的Makefile的路径。请不要再包含另一个文件之后调用my-dir。
+
+ 
+
+    For example, consider the following example:
+
+ 
+
+	例如，考虑以下示例
+
+ 
+
+        LOCAL_PATH := $(call my-dir)
+
+ 
+
+        ... declare one module
+
+ 
+
+        ... 声明一个模块
+
+ 
+
+        include $(LOCAL_PATH)/foo/Android.mk
+
+ 
+
+        LOCAL_PATH := $(call my-dir)
+
+ 
+
+        ... declare another module
+
+ 
+
+        ... 声明另一个模块
+
+ 
+
+    The problem here is that the second call to 'my-dir' will define LOCAL_PATH to $PATH/foo instead of $PATH, due to the include that was performed before that.
+
+ 
+
+	这里的问题是第二次调用my-dir将定义LOCAL_PATH为$PATH/foo而非$PATH，因为在此之前执行了include。
+
+ 
+
+    For this reason, it's better to put additional includes after everything else in an Android.mk, as in:
+
+ 
+
+    因为这个原因，最好把额外的include放在Android.mk的其它东西后面，正如这样：
+
+ 
+
+        LOCAL_PATH := $(call my-dir)
+
+ 
+
+        ... declare one module
+
+ 
+
+        ... 声明一个模块
+
+ 
+
+        LOCAL_PATH := $(call my-dir)
+
+ 
+
+        ... declare another module
+
+ 
+
+        ... 声明另一个模块
+
+ 
+
+        # extra includes at the end of the Android.mk
+
+        # Android.mk结束处的额外include
+
+        include $(LOCAL_PATH)/foo/Android.mk
+
+ 
+
+    If this is not convenient, save the value of the first my-dir call into another variable, for example:
+
+ 
+
+    如果这不够方便，保存第一个my-dir调用的值到另一个变量，例如：
+
+ 
+
+        MY_LOCAL_PATH := $(call my-dir)
+
+ 
+
+        LOCAL_PATH := $(MY_LOCAL_PATH)
+
+ 
+
+        ... declare one module
+
+ 
+
+        ... 声明一个模块
+
+ 
+
+        include $(LOCAL_PATH)/foo/Android.mk
+
+ 
+
+        LOCAL_PATH := $(MY_LOCAL_PATH)
+
+ 
+
+        ... declare another module
+
+ 
+
+        ... 声明另一个模块
+
+ 
+
+ 
+
+all-subdir-makefiles
+
+    Returns a list of Android.mk located in all sub-directories of the current 'my-dir' path. For example, consider the following hierarchy:
+
+ 
+
+all-subdir-makefiles
+
+    返回当前my-dir路径的所有子目录下的Android.mk列表。例如，考虑以下目录层次
+
+ 
+
+        sources/foo/Android.mk
+
+        sources/foo/lib1/Android.mk
+
+        sources/foo/lib2/Android.mk
+
+ 
+
+    If sources/foo/Android.mk contains the single line:
+
+ 
+
+    如果sources/foo/Android.mk包含以下单一行：
+
+ 
+
+        include $(call all-subdir-makefiles)
+
+ 
+
+    Then it will include automatically sources/foo/lib1/Android.mk and sources/foo/lib2/Android.mk
+
+ 
+
+    那么它将自动地包含sources/foo/lib1/Android.mk和sources/foo/lib2/Android.mk
+
+ 
+
+    This function can be used to provide deep-nested source directory hierarchies to the build system. Note that by default, the NDK will only look for files in sources/*/Android.mk
+
+ 
+
+    这个函数可以用于把深嵌套源代码目录层次提供给构建系统。注意默认，NDK将只查找sources/*/Android.mk的文件。
+
+ 
+
+this-makefile
+
+    Returns the path of the current Makefile (i.e. where the function is called).
+
+ 
+
+this-makefile
+
+    返回当前Makefile的路径（即函数被调用的地方）
+
+ 
+
+parent-makefile
+
+    Returns the path of the parent Makefile in the inclusion tree, i.e. the path of the Makefile that included the current one.
+
+ 
+
+parent-makefile
+
+    返回包含树中父级Makefile的路径，即包含当前Makefile的Makefile路径。
+
+ 
+
+grand-parent-makefile
+
+    Guess what...
+
+ 
+
+grand-parent-makefile
+
+    猜猜这是什么...（注：应该是祖父母级Makefile的路径）
+
+ 
+
+import-module
+
+    A function that allows you to find and include the Android.mk of another module by name. A typical example is:
+
+ 
+
+import-module
+
+    这个函数允许你通过名称寻找和包含另一个模块的Android.mk。典型例子是：
+
+ 
+
+      $(call import-module,<name>)
+
+ 
+
+    And this will look for the module tagged <name> in the list of directories referenced by your NDK_MODULE_PATH environment variable, and include its Android.mk automatically for you.
+
+ 
+
+    这将在通过你的NDK_MODULE_PATH环境变量引用的目录中寻找标记为<name>的模块，并且自动为你包含它的Android.mk。
+
+ 
+
+    Read docs/IMPORT-MODULE.html for more details.
+
+ 
+
+    阅读docs/IMPORT-MODULE.html以获得更详细的信息。
+
+ 
+
+Module-description variables:
+
+ 
+
+模块描述变量：
+
+- - - - - - - - - - - - - - -
+
+ 
+
+The following variables are used to describe your module to the build system. You should define some of them between an 'include $(CLEAR_VARS)' and an 'include $(BUILD_XXXXX)'. As written previously, $(CLEAR_VARS) is a script that will undefine/clear all of these variables, unless explicitly noted in their description.
+
+ 
+
+以下变量用于向构建系统描述你的模块。你应该在include $(CLEAR_VARS)和include $(BUILD_XXXXX)之间定义它们中的一些。正如前面所写的，$(CLEAR_VARS)是一个脚本，它将取消定义或清除所有这些变量，除非在它们的描述中显式地标明。
+
+ 
+
+LOCAL_PATH
+
+    This variable is used to give the path of the current file. You MUST define it at the start of your Android.mk, which can be done with:
+
+ 
+
+LOCAL_PATH
+
+    这个变量用于给定当前文件的路径。你必须在你的Android.mk开头定义它，它可以这样写：
+
+ 
+
+      LOCAL_PATH := $(call my-dir)
+
+ 
+
+    This variable is *not* cleared by $(CLEAR_VARS) so only one definition per Android.mk is needed (in case you define several modules in a single file).
+
+ 
+
+    这个变量不会被$(CLEAR_VARS)清除，所以每个Android.mk只需要定义一次（如果你在一个文件中定义几个模块）。
+
+ 
+
+LOCAL_MODULE
+
+    This is the name of your module. It must be unique among all module names, and shall not contain any space. You MUST define it before including any $(BUILD_XXXX) script.
+
+ 
+
+LOCAL_MODULE
+
+    这是你的模块的名称。在所有模块名称中它必须是唯一的，并且不应该包含任何空格。你必须在包含任意$(BUILD_XXXX)脚本之前定义它。
+
+ 
+
+    By default, the module name determines the name of generated files, e.g. lib<foo>.so for a shared library module named <foo>. However you should only refer to other modules with their 'normal' name (e.g. <foo>) in your NDK build files (either Android.mk or Application.mk)
+
+ 
+
+    默认，模块名称决定生成文件的名称，例如lib<foo>.so对应一个名为<foo>的动态库模块。然而你只应该在你的NDK构建文件中引用它们正常的名称（例如<foo>）（Android.mk或者Application.mk）
+
+ 
+
+    You can override this default with LOCAL_MODULE_FILENAME (see below)
+
+ 
+
+    你可以用LOCAL_MODULE_FILENAME重载这个默认名称（见下）。
+
+ 
+
+LOCAL_MODULE_FILENAME
+
+    This variable is optional, and allows you to redefine the name of generated files. By default, module <foo> will always generate a static library named lib<foo>.a or a shared library named lib<foo>.so, which are standard Unix conventions.
+
+ 
+
+LOCAL_MODULE_FILENAME
+
+    这个变量是可选的，允许你重新定义生成文件的名称。默认，模块<foo>将总是生成名为lib<foo>.a的静态库或者名为lib<foo>.so的动态库，它是标准Unix约定。
+
+ 
+
+    You can override this by defining LOCAL_MODULE_FILENAME, For example:
+
+ 
+
+    你可以通过定义LOCAL_MODULE_FILENAME重载这个名称，例如：
+
+	
+
+        LOCAL_MODULE := foo-version-1
+
+        LOCAL_MODULE_FILENAME := libfoo
+
+ 
+
+    NOTE: You should not put a path or file extension in your LOCAL_MODULE_FILENAME, these will be handled automatically by the build system.
+
+ 
+
+    注意：你不应该在你的LOCAL_MODULE_FILENAME中放置路径或文件扩展名，这些将由构建系统自动处理。
+
+ 
+
+LOCAL_SRC_FILES
+
+    This is a list of source files that will be built for your module. Only list the files that will be passed to a compiler, since the build system automatically computes dependencies for you.
+
+ 
+
+LOCAL_SRC_FILES
+
+    这是将被构建成你的模块的源文件列表。只需要列出将被传递仅编译器的文件，因为构建系统会自动为你计算依赖（注：C编译器在编译时是分布式的，所以它的输入文件一般是.c文件。.h头文件由预处理程序自动寻找，故不需要在命令行中给出。make在构建期间根据依赖信息忽略不需要重新编译的步骤，提高编译速度。.c文件和.o文件，.o文件和.a/.so文件，.h和.c文件之间存在依赖）
+
+ 
+
+    Note that source files names are all relative to LOCAL_PATH and you can use path components, e.g.:
+
+ 
+
+	注意源文件的名称全部都相对于LOCAL_PATH，你可以使用路径元素，例如：
+
+ 
+
+      LOCAL_SRC_FILES := foo.c \
+
+                         toto/bar.c
+
+ 
+
+    NOTE: Always use Unix-style forward slashes (/) in build files. Windows-style back-slashes will not be handled properly.
+
+ 
+
+    注意：总是在构建文件中使用Unix风格的正斜杠（/）。Windows风格的反斜杠将不能正确地处理。（注：Cygwin风格的/cygdrive/<盘符>/<路径>不知如何？）
+
+ 
+
+LOCAL_CPP_EXTENSION
+
+    This is an optional variable that can be defined to indicate the file extension of C++ source files. The default is '.cpp' but you can change it. For example:
+
+ 
+
+LOCAL_CPP_EXTENSION
+
+    可选变量，可以定义它来指定C++源文件的扩展名。默认是.cpp，但你可以改变它。例如：
+
+ 
+
+        LOCAL_CPP_EXTENSION := .cxx
+
+ 
+
+LOCAL_C_INCLUDES
+
+    An optional list of paths, relative to the NDK *root* directory, which will be appended to the include search path when compiling all sources (C, C++ and Assembly). For example:
+
+ 
+
+LOCAL_C_INCLUDES
+
+    路径的可选的列表，相对于NDK根目录，在编译全部源文件（C、C++和汇编）时它将被接在include搜索路径的后面。例如：
+
+ 
+
+        LOCAL_C_INCLUDES := sources/foo
+
+ 
+
+    Or even:
+
+ 
+
+    或者甚至是：
+
+ 
+
+        LOCAL_C_INCLUDES := $(LOCAL_PATH)/../foo
+
+ 
+
+    These are placed before any corresponding inclusion flag in LOCAL_CFLAGS / LOCAL_CPPFLAGS
+
+ 
+
+    它们放置在LOCAL_CFLAGS或LOCAL_CPPFLAGS中任意对应的包含标记之前。
+
+ 
+
+    The LOCAL_C_INCLUDES path are also used automatically when launching native debugging with ndk-gdb.
+
+ 
+
+	LOCAL_C_INCLUDES路径还在使用ndk-gdb启动原生调试时自动被使用。
+
+ 
+
+LOCAL_CFLAGS
+
+    An optional set of compiler flags that will be passed when building C *and* C++ source files.
+
+ 
+
+LOCAL_CFLAGS
+
+    编译器参数的可选集合，将在构建C和C++源代码时传递给编译器。
+
+ 
+
+    This can be useful to specify additional macro definitions or compile options.
+
+ 
+
+    这可能对指定额外宏定义或编译器选项有用。
+
+ 
+
+    IMPORTANT: Try not to change the optimization/debugging level in your Android.mk, this can be handled automatically for you by specifying the appropriate information in your Application.mk, and will let the NDK generate useful data files used during debugging.
+
+ 
+
+    重要事项：不要尝试在你的Android.mk中改变优化或调试级别，它会自动地为你指定你的Application.mk的合适信息，并且让NDK生成用于调试阶段的有用数据文件。
+
+ 
+
+    NOTE: In android-ndk-1.5_r1, the corresponding flags only applied to C source files, not C++ ones. This has been corrected to match the full Android build system behaviour. (You can use LOCAL_CPPFLAGS to specify flags for C++ sources only now).
+
+ 
+
+	注意：在android-ndk-1.5_r1中，对应的标记值应用于C源文件，而非C++源文件。它已经被更正为符合完全Android构建系统的行为。（现在你可以使用LOCAL_CPPFLAGS指定C++源文件的标记）
+
+ 
+
+    It is possible to specify additional include paths with LOCAL_CFLAGS += -I<path>, however, it is better to use LOCAL_C_INCLUDES for this, since the paths will then also be used during native debugging with ndk-gdb.
+
+ 
+
+	可以用LOCAL_CFLAGS += -I<路径>指定额外的包含路径，最好使用LOCAL_C_INCLUDES做这种事情，因为这些路径也将会在使用ndk-gdb进行原生调试期间使用。
+
+ 
+
+LOCAL_CXXFLAGS
+
+    An alias for LOCAL_CPPFLAGS. Note that use of this flag is obsolete as it may disappear in future releases of the NDK.
+
+ 
+
+LOCAL_CXXFLAGS
+
+    LOCAL_CPPFLAGS的别名。注意使用这个标记是过时的，因为它可能在NDK的未来发布版中消失。
+
+ 
+
+LOCAL_CPPFLAGS
+
+    An optional set of compiler flags that will be passed when building C++ source files *only*. They will appear after the LOCAL_CFLAGS on the compiler's command-line.
+
+ 
+
+LOCAL_CPPFLAGS
+
+    编译器参数的可选集合，它将只在构建C++源代码时传递给编译器。它们将在LOCAL_CFLAGS之后出现在编译器的命令行中。
+
+ 
+
+    NOTE: In android-ndk-1.5_r1, the corresponding flags applied to both C and C++ sources. This has been corrected to match the full Android build system. (You can use LOCAL_CFLAGS to specify flags for both C and C++ sources now).
+
+ 
+
+	注意：在android-ndk-1.5_r1中，对应的参数应用于C和C++源文件。这已经被更正为符合完全Android构建系统。（现在你可以使用LOCAL_CFLAGS指定给C和C++源文件的参数）
+
+	
+
+LOCAL_STATIC_LIBRARIES
+
+    The list of static libraries modules (built with BUILD_STATIC_LIBRARY) that should be linked to this module. This only makes sense in shared library modules.
+
+ 
+
+LOCAL_STATIC_LIBRARIES
+
+    静态库模块的列表（用BUILD_STATIC_LIBRARY构建），这些模块应该被链接进这个模块。这只对动态库模块有意义。
+
+ 
+
+LOCAL_SHARED_LIBRARIES
+
+    The list of shared libraries *modules* this module depends on at runtime. This is necessary at link time and to embed the corresponding information in the generated file.
+
+ 
+
+LOCAL_SHARED_LIBRARIES
+
+    这个模块在运行时依赖的动态库模块的列表。在链接期需要这个列表，在生成文件中嵌入相应的信息。
+
+ 
+
+LOCAL_LDLIBS
+
+    The list of additional linker flags to be used when building your module. This is useful to pass the name of specific system libraries with the "-l" prefix. For example, the following will tell the linker to generate a module that links to /system/lib/libz.so at load time:
+
+ 
+
+LOCAL_LDLIBS
+
+    额外链接器参数列表，在构建你的模块时使用。在用-l前缀传递指定的系统库名称时有用。例如，以下内容将告诉链接器生成一个模块，它在加载期链接到/system/lib/libz.so：
+
+ 
+
+      LOCAL_LDLIBS := -lz
+
+ 
+
+    See docs/STABLE-APIS.html for the list of exposed system libraries you can linked against with this NDK release.
+
+ 
+
+	参考docs/STABLE-APIS.html以获得你可以用NDK发布版链接的公开系统库的列表。
+
+ 
+
+LOCAL_ALLOW_UNDEFINED_SYMBOLS
+
+    By default, any undefined reference encountered when trying to build a shared library will result in an "undefined symbol" error. This is a great help to catch bugs in your source code.
+
+ 
+
+LOCAL_ALLOW_UNDEFINED_SYMBOLS
+
+    当你尝试构建一个共享库时将导致一个未定义符号错误，用这个变量列出默认下所有遇到的未定义引用。对捕捉你的源代码缺陷有很大的帮助。（注：可能是交叉编译导致？）
+
+ 
+
+    However, if for some reason you need to disable this check, set this variable to 'true'. Note that the corresponding shared library may fail to load at runtime.
+
+ 
+
+    然而，如果因为某些原因，你需要关闭这个检查，把这个变量设为true。注意对应的动态库可能在运行期失败。
+
+ 
+
+LOCAL_ARM_MODE
+
+    By default, ARM target binaries will be generated in 'thumb' mode, where each instruction are 16-bit wide. You can define this variable to 'arm' if you want to force the generation of the module's object files in 'arm' (32-bit instructions) mode. E.g.:
+
+ 
+
+LOCAL_ARM_MODE
+
+    默认ARM目标的二进制文件将以thumb模式生成，每个指令是16位宽。如果你想强制以arm（32位指令）模式生成模块目标文件，你可以定义这个变量为arm。例如：
+
+ 
+
+      LOCAL_ARM_MODE := arm
+
+ 
+
+    Note that you can also instruct the build system to only build specific sources in arm mode by appending an '.arm' suffix to its source file name. For example, with:
+
+ 
+
+    注意你还可以通过源文件名的.arm后缀，指示构建系统以arm模式仅构建指定的源文件。例如，用以下内容：
+
+ 
+
+       LOCAL_SRC_FILES := foo.c bar.c.arm
+
+ 
+
+    Tells the build system to always compile 'bar.c' in arm mode, and to build foo.c according to the value of LOCAL_ARM_MODE.
+
+ 
+
+    告诉构建系统总是以arm模式编译bar.c，并且根据LOCAL_ARM_MODE的值构建foo.c。
+
+ 
+
+    NOTE: Setting APP_OPTIM to 'debug' in your Application.mk will also force the generation of ARM binaries as well. This is due to bugs in the toolchain debugger that don't deal too well with thumb code.
+
+ 
+
+    注意：在Application.mk中设置APP_OPTIM为debug也会强制生成ARM二进制文件。因为工具链调试器的缺陷，它处理thumb代码不是太好。
+
+ 
+
+LOCAL_ARM_NEON
+
+    Defining this variable to 'true' allows the use of ARM Advanced SIMD (a.k.a. NEON) GCC intrinsics in your C and C++ sources, as well as NEON instructions in Assembly files.
+
+ 
+
+LOCAL_ARM_NEON
+
+    定义这个变量为true，可以允许在你的C和C++源代码中使用ARM进阶SIMD（即NEON）的GCC内建（注：NEON是用于多媒体运算的硬件加速技术），以及在汇编文件中使用NEON指令。
+
+ 
+
+    You should only define it when targetting the 'armeabi-v7a' ABI that corresponds to the ARMv7 instruction set. Note that not all ARMv7 based CPUs support the NEON instruction set extensions and that you should perform runtime detection to be able to use this code at runtime safely. To lean more about this, please read the documentation at docs/CPU-ARM-NEON.html and docs/CPU-FEATURES.html.
+
+ 
+
+    你应该只在目标为对应ARMv7指令集的armeabi-v7a的ABI时定义它。注意不是所有基于ARMv7的CPU支持NEON指令集扩展，所以你应该执行运行期检测以在运行期安全地使用这个代码。想知道更多关于这方面的信息，请阅读docs/CPU-ARM-NEON.html和docs/CPU-FEATURES.html的文档。
+
+ 
+
+    Alternatively, you can also specify that only specific source files may be compiled with NEON support by using the '.neon' suffix, as in:
+
+ 
+
+    另外，你还可以通过使用.neon后缀，指定特定的源文件使用NEON支持来编译，正如这样：
+
+ 
+
+        LOCAL_SRC_FILES = foo.c.neon bar.c zoo.c.arm.neon
+
+ 
+
+    In this example, 'foo.c' will be compiled in thumb+neon mode, 'bar.c' will be compiled in 'thumb' mode, and 'zoo.c' will be compiled in 'arm+neon' mode.
+
+ 
+
+    在这个例子中，foo.c将用thumb+neon模式编译，bar.c将用thumb模式编译，而zoo.c将以arm+neon模式编译。
+
+ 
+
+    Note that the '.neon' suffix must appear after the '.arm' suffix if you use both (i.e. foo.c.arm.neon works, but not foo.c.neon.arm !)
+
+ 
+
+    注意.neon后缀必须出现在.arm后缀后面，如果你都使用（即foo.c.arm.neon可行，但foo.c.neon.arm不可以！）
+
+ 
+
+LOCAL_DISABLE_NO_EXECUTE
+
+    Android NDK r4 added support for the "NX bit" security feature. It is enabled by default, but you can disable it if you *really* need to by setting this variable to 'true'.
+
+ 
+
+LOCAL_DISABLE_NO_EXECUTE
+
+    Android NDK r4添加对NX bit（注：NX是No eXecute的缩写，一种CPU技术，用于防止缓冲溢出攻击）安全特性的支持。默认是打开NX位，如果你真的需要关闭NX位，可以通过设置这个变量为true来做到。
+
+ 
+
+    NOTE: This feature does not modify the ABI and is only enabled on kernels targetting ARMv6+ CPU devices. Machine code generated with this feature enabled will run unmodified on devices running earlier CPU architectures.
+
+ 
+
+	注意：这个特性不会修改ABI，而且只对目标为ARMv6+ CPU设备的内核有效。这个特性生效所生成的机器代码将不需要修改就能在运行早期CPU架构的设备上运行。
+
+	
+
+    For more information, see:
+
+	
+
+	更多信息请参考：
+
+ 
+
+        http://en.wikipedia.org/wiki/NX_bit
+
+        http://www.gentoo.org/proj/en/hardened/gnu-stack.xml
+
+ 
+
+LOCAL_EXPORT_CFLAGS
+
+    Define this variable to record a set of C/C++ compiler flags that will be added to the LOCAL_CFLAGS definition of any other module that uses this one with LOCAL_STATIC_LIBRARIES or LOCAL_SHARED_LIBRARIES.
+
+ 
+
+LOCAL_EXPORT_CFLAGS
+
+    定义这个变量以记录C/C++编译器参数集合，它将添加到那些通过LOCAL_STATIC_LIBRARIES或LOCAL_SHARED_LIBRARIES使用它的其它任何一个模块的LOCAL_CFLAGS定义，
+
+ 
+
+    For example, consider the module 'foo' with the following definition:
+
+ 
+
+	例如，考虑使用以下定义的foo模块：
+
+ 
+
+        include $(CLEAR_VARS)
+
+        LOCAL_MODULE := foo
+
+        LOCAL_SRC_FILES := foo/foo.c
+
+        LOCAL_EXPORT_CFLAGS := -DFOO=1
+
+        include $(BUILD_STATIC_LIBRARY)
+
+ 
+
+    And another module, named 'bar' that depends on it as:
+
+ 
+
+	而另一个名为bar模块，像这样依赖于它：
+
+ 
+
+        include $(CLEAR_VARS)
+
+        LOCAL_MODULE := bar
+
+        LOCAL_SRC_FILES := bar.c
+
+        LOCAL_CFLAGS := -DBAR=2
+
+        LOCAL_STATIC_LIBRARIES := foo
+
+        include $(BUILD_SHARED_LIBRARY)
+
+ 
+
+    Then, the flags '-DFOO=1 -DBAR=2' will be passed to the compiler when building bar.c
+
+ 
+
+	那么，参数-DFOO=1 -DBAR=2将在构建bar.c时传递给编译器。
+
+ 
+
+    Exported flags are prepended to your module's LOCAL_CFLAGS so you can easily override them. They are also transitive: if 'zoo' depends on 'bar' which depends on 'foo', then 'zoo' will also inherit all flags exported by 'foo'.
+
+ 
+
+	导出的参数被前置到你的模块的LOCAL_CFLAGS，所以你可以简单地重载它们。它们还是及物的：如果zoo依赖于bar，而bar依赖于foo，那么zoo将继承foo导出的所有参数。
+
+ 
+
+    Finally, exported flags are *not* used when building the module that exports them. In the above example, -DFOO=1 would not be passed to the compiler when building foo/foo.c.
+
+ 
+
+	最后，导出参数在构建导出它们的模块时不会被使用。上面的例子中，在构建foo/foo.c时-DFOO=1将不会被传递给编译器。
+
+ 
+
+LOCAL_EXPORT_CPPFLAGS
+
+    Same as LOCAL_EXPORT_CFLAGS, but for C++ flags only.
+
+ 
+
+LOCAL_EXPORT_CPPFLAGS
+
+    和LOCAL_EXPORT_CFLAGS相同，但只用于C++编译器参数
+
+ 
+
+LOCAL_EXPORT_C_INCLUDES
+
+    Same as LOCAL_EXPORT_CFLAGS, but for C include paths. This can be useful if 'bar.c' wants to include headers that are provided by module 'foo'.
+
+ 
+
+LOCAL_EXPORT_C_INCLUDES
+
+    和LOCAL_EXPORT_CFLAGS相同，但只用于C包含路径。如果bar.c想包含foo模块提供的头文件，这将有用。
+
+ 
+
+LOCAL_EXPORT_LDLIBS
+
+    Same as LOCAL_EXPORT_CFLAGS, but for linker flags. Note that the imported linker flags will be appended to your module's LOCAL_LDLIBS though, due to the way Unix linkers work.
+
+ 
+
+LOCAL_EXPORT_LDLIBS
+
+    和LOCAL_EXPORT_CFLAGS相同，但用于链接器参数。不过注意由于Unix链接器的工作方式，导入的链接器参数将接在你的模块的LOCAL_LDLIBS后面。
+
+ 
+
+    This is typically useful when module 'foo' is a static library and has code that depends on a system library. LOCAL_EXPORT_LDLIBS can then be used to export the dependency. For example:
+
+ 
+
+	这通常在foo模块时静态库，并且代码依赖于系统库时有用。而且LOCAL_EXPORT_LDLIBS可以用于导出依赖，例如：
+
+ 
+
+        include $(CLEAR_VARS)
+
+        LOCAL_MODULE := foo
+
+        LOCAL_SRC_FILES := foo/foo.c
+
+        LOCAL_EXPORT_LDLIBS := -llog
+
+        include $(BUILD_STATIC_LIBRARY)
+
+ 
+
+        include $(CLEAR_VARS)
+
+        LOCAL_MODULE := bar
+
+        LOCAL_SRC_FILES := bar.c
+
+        LOCAL_STATIC_LIBRARIES := foo
+
+        include $(BUILD_SHARED_LIBRARY)
+
+ 
+
+    There, libbar.so will be built with a -llog at the end of the linker command to indicate that it depends on the system logging library, because it depends on 'foo'.
+
+ 
+
+    那里，libbar.so构建时，在连接器命令中使用-llog以表示它依赖系统的日志库，因为它依赖于foo。
+
+ 
+
+LOCAL_FILTER_ASM
+
+    Define this variable to a shell command that will be used to filter the assembly files from, or generated from, your LOCAL_SRC_FILES.
+
+ 
+
+LOCAL_FILTER_ASM
+
+    定义这个变量为一个shell命令，它将用于从LOCAL_SRC_FILES中过滤汇编文件或所生成的汇编文件。
+
+ 
+
+    When it is defined, the following happens:
+
+ 
+
+	当它被定义时，以下事情会发生：
+
+ 
+
+      - Any C or C++ source file is generated into a temporary assembly file (instead of being compiled into an object file).
+
+ 
+
+      - 任一C或C++源文件被转成一个临时的汇编文件（而非编译成对象文件）。
+
+ 
+
+      - Any temporary assembly file, and any assembly file listed in LOCAL_SRC_FILES is sent through the LOCAL_FILTER_ASM command to generate _another_ temporary assembly file.
+
+ 
+
+      - LOCAL_SRC_FILES列出的任一临时汇编文件，以及任一汇编文件，通过LOCAL_FILTER_ASM命令发送给LOCAL_FILTER_ASM命令以生成另一个临时汇编文件。
+
+ 
+
+      - These filtered assembly files are compiled into object file.
+
+ 
+
+      - 这些过滤的汇编文件被编译成对象文件。
+
+ 
+
+    In other words, If you have:
+
+ 
+
+	也就是说，如果你这样：
+
+ 
+
+      LOCAL_SRC_FILES  := foo.c bar.S
+
+      LOCAL_FILTER_ASM := myasmfilter
+
+ 
+
+    foo.c --1--> $OBJS_DIR/foo.S.original --2--> $OBJS_DIR/foo.S --3--> $OBJS_DIR/foo.o
+
+    bar.S                                 --2--> $OBJS_DIR/bar.S --3--> $OBJS_DIR/bar.o
+
+ 
+
+    Were "1" corresponds to the compiler, "2" to the filter, and "3" to the assembler. The filter must be a standalone shell command that takes the name of the input file as its first argument, and the name of the output file as the second one, as in:
+
+ 
+
+    1对应编译器，2对应过滤器，3对应汇编器。过滤器必须是一个独立的shell命令，以输入文件名作为第一参数，以输出文件名作为第二参数，正如这样：
+
+ 
+
+        myasmfilter $OBJS_DIR/foo.S.original $OBJS_DIR/foo.S
+
+        myasmfilter bar.S $OBJS_DIR/bar.S
+
+ 
+

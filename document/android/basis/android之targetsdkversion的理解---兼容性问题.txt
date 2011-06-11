@@ -1,0 +1,27 @@
+"Specifying this  target version allows the platform to disable  compatibility settings that are not required for the target version (which may otherwise be turned on in order to maintain forward-compatibility)".                             ----开发文档
+
+"This does not mean that you can program different features for different versions of the platform—it simply informs the platform that you have tested against the target version and the platform should not perform any extra work to maintain forward-compatibility with the target version." [对向前兼容作用]                                                                                     ----开发文档
+
+（Really, people should be writing their apps to target stuff > Cupcake so when they are running on newer platform they aren't getting forced into this and many other compatibility features.  (android:targetSdkVersion does not make you incompatible with older platform versions, just says you are aware of the newer ones.)                         ----Dianne Hackborn
+
+“code your app using the latest Android platform, make features optional where they are not required for your app (in your manifest file), support small screen devices if possible, and add code to check the runtime API level when you need to use newer features.”
+
+从以上的文章来讲，得出结论：
+
+（1）targetsdkversion即其以上的版本将使用新的功能（os new api），但对低版本的需要进行code支持，即文章【1】写到的使用反射（reflection）的技术对老版本使用的一些api功能进行支持，否则会出现老版本上崩溃的现象；
+
+（2）使用最新的开发平台开发，并设置其对应的targetsdkversion；发布的时候，需要从min到target上均需要进行测试；
+
+（3）文章【2】提到了最大兼容性的问题，体现到两个方面：device feature support（新的属性）, 和OS version support（新的api）。当进入新的开发平台时，为了使应用程序最大兼容性，可以对用不到新平台支持的一些特性进行选择设置，使得老版本（不被Market过滤掉）可以安装使用.
+
+（4）minSDKVersion是向后（老版本）兼容，targetSDKVersion是向前兼容。
+
+参考：
+
+[1]   http://android-developers.blogspot.com/2010/07/how-to-have-your-cupcake-and-eat-it-too.html
+
+[2]   http://www.androidza.co.za/coding-for-maximum-compatibility/
+
+[3]   http://comments.gmane.org/gmane.comp.handhelds.android.devel/92560
+
+http://hi.baidu.com/jenus_hi/blog/item/6d83f7096505b9c560d98664.html

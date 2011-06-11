@@ -1,0 +1,51 @@
+1、嵌入式Linux软件结构与分布 
+
+        在一般情况下嵌入式Linux系统中的软件主要分为以下及部分：
+
+       （1）引导加载程序： 其中包括内部ROM中的固化启动代码和Boot Loader两部分。而这个内部固化ROM是厂家在芯片生产时候固化的，作用基本上是引导Boot Loader。有的芯片比较复杂，比如Omap3，他在flash中没有代码的时候有许多启动方式：USB、UART或以太网等等。而S3C24x0则很简单，只有Norboot和Nandboot。
+       （2）Linux kernel 和drivers。
+       （3）文件系统。 包括根文件系统和建立于Flash内存设备之上的文件系统（EXT4、UBI、CRAMFS等等）。它是提供管理系统的各种配置文件以及系统执行用户应用程序的良好运行环境的载体。
+       （4）应用程序。 用户自定义的应用程序，存放于文件系统之中。
+
+       在Flash 存储器中，他们的 一般分布如下：
+
+ 
+
+前天 09:45 上传下载附件 (16.89 KB) 
+
+
+
+但是以上只是大部分情况下的分布，也有一些可能根文件系统是initramfs，被一起压缩到了内核映像里，或者没有Bootloader参数区，等等。
+
+
+       2、在嵌入式Linux中为什么要有BootLoader
+在linux内核的启动运行除了内核映像必须在主存的适当位置，CPU还必须具备一定的条件：
+
+
+       (1)． CPU 寄存器的设置： R0＝0；
+       R1＝Machine ID(即Machine Type Number，定义在linux/arch/arm/tools/mach-types)；
+       R2＝内核启动参数在 RAM 中起始基地址；
+
+
+       (2)． CPU 模式： 必须禁止中断（IRQs和FIQs）；
+       CPU 必须 SVC 模式；
+
+
+       (3)． Cache 和 MMU 的设置： MMU 必须关闭；
+       指令 Cache 可以打开也可以关闭；
+       数据 Cache 必须关闭； 
+
+
+
+        但是在CPU刚上电启动的时候，一般连内存控制器都没有配置过，根本无法在内存中运行程序，更不可能处在Linux内核的启动环境中。为了初始化CPU及其他外设，使得Linux内核可以在系统主存中跑起来，并让系统符合Linux内核启动的必备条件，必须要有一个先于内核运行的程序，他就是所谓的引导加载程序（Boot Loader）。
+而Boot Loader并不是Linux才需要，是几乎所有的运行操作系统的设备都具备的。我们的PC的BOIS就是Boot Loader的一部分（只是前期引导，后面一般还有外存中的各种Boot Loader），对于Linux PC来说，Boot Loader = BIOS + GRUB/LILO。
+
+
+       3、Boot Loader的功能和选择
+
+
+       通过上面的讲述，我们可以知道：Boot Loader是在操作系统内核运行之前运行的一段小程序。通过这段小程序，我们可以初始化硬件设备，从而将系统的软硬件环境带到一个合适的状态，以便为最终调用操作系统内核准备好正确的环境，最后从别处（Flash、以太网、UART）载入内核映像并跳到入口地址。
+
+
+       由于BootLoader直接操作硬件，所以她严重依赖于硬件，而且依据所引导的操作系统的不同，也有不同的选择对于嵌入式世界中更是如此。就S3C24x0而言，如果是引导 Linux，一般选用韩国的mizi公司设计的vivi或者DENX软件工程中心的U-boot，如果是引导Win CE，就选用Eboot。如果是开发StrongARM 构架下的LART，就可选用由Jan-Derk Bakker 和 Erik Mouw发布的Blob(Boot Loader Object)。如果是要引导eCos系统，就可以选用同是Redhat公司开发的Redboot。
+http://www.eoeandroid.com/thread-77386-1-1.html

@@ -1,0 +1,255 @@
+更多请访问我的CSDN博客：我的博客文章索引
+
+Android中的数据库存储是直接使用了SQLite。在Android应用中创建数据库后数据库文件是存储在/data/ data/应用包名/databases/下。
+
+在Android中使用到SQLite会涉及到以下三个类或接口：
+1.SQLiteOpenHelper
+*SQLiteOpenHelper 构造方法，一般传递一个要创建的数据库名称name参数
+*onCreate 创建数据库时调用
+*onUpgrade 版本更新时调用
+*getReadableDatabase 创建或打开一个只读数据库
+*getWritableDatabase 创建或打开一个读写数据库
+
+2.SQLiteDatabase
+*openOrCreateDatabase 打开或者创建数据库
+*insert 添加一条记录
+*delete 删除一条记录
+*query 查询记录
+*update 更新记录
+*execSQL 执行一条SQL语句
+*close 关闭数据库
+
+3.Cursor
+*getCount 总记录条数
+*isFirst 判断是否第一条记录
+*isLast 判断是否最后一条记录
+*moveToFirst 移动到第一条记录
+*moveToLast 移动到最后一条记录
+*move 移动到指定记录
+*moveToNext 移动到下一条记录
+*moveToPrevious 移动到上一条记录
+*getColumnIndexOrThrow根据列名称获得列索引
+*getInt 获得指定列索引的int类型值
+*getString 获得指定列索引的String类型值
+注：某些方法是有重载的，可以结合docs熟悉下。
+
+
+
+
+下面贴上数据库操作的代码，完整代码下载地址：android_sqlite.rar
+
+1.创建数据库只要自定义一个类继承SQLiteOpenHelper即可。在SQLiteOpenHelper的子类中至少需要实现三个方法：
+*构造方法，调用父类SQLiteOpenHelper的构造函数。需要四个参数：上下文环境（例如一个Activity）；数据库名称；一个可选的游标工厂（通常是null）；一个正在使用的数据库版本。
+*onCreate方法，需要一个SQLiteDatabase对象作为参数，根据需要对这个对象填充表和初始化数据。
+*onUpgrade方法，需要三个参数：一个SQLiteDatabase对象，一个旧的版本号和一个新的版本号。
+
+
+
+
+view plaincopy to clipboardprint?
+
+
+/** 
+* 数据库操作助手类 
+* 
+* @author zuolongsnail 
+*/
+
+public
+class AndroidSQLiteOpenHelper extends SQLiteOpenHelper {  
+
+
+    // 数据库名称
+
+    public
+static
+final String DBNAME = "android.db";  
+    // 数据库版本
+
+    public
+static
+final
+int VERSION = 2;  
+    // 建表语句，大小写不敏感
+
+    private
+static
+final String CREATETABLE = "create table "
+
+            + Person.TABLENAME  
+            + "(id string, name string, gender int, age int)";  
+
+
+    public AndroidSQLiteOpenHelper(Context context) {  
+        super(context, DBNAME, null, VERSION);  
+    }  
+
+
+    // 创建表
+
+    @Override
+
+    public
+void onCreate(SQLiteDatabase db) {  
+        db.execSQL(CREATETABLE);  
+    }  
+
+
+    // 更新表
+
+    @Override
+
+    public
+void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {  
+        this.deleteDB(db);  
+        this.onCreate(db);  
+    }  
+
+
+    // 删除表
+
+    private
+void deleteDB(SQLiteDatabase db) {  
+        db.execSQL("drop table if exists " + Person.TABLENAME);  
+    }  
+}  
+
+
+
+
+2.对数据库表进行操作，包括添加、删除、修改和查询。（下面的代码使用的是第一种方法）
+有两种方法可以对数据库表进行操作：使用execSQL方法执行SQL语句；使用insert、delete、update和query方法，把SQL语句的一部分作为参数。
+注：查询数据库时执行SQL语句是使用SQLiteDatabase的rawQuery方法而不是execSQL。 
+
+
+
+
+view plaincopy to clipboardprint?
+
+
+/** 
+* 数据库管理类 
+* 
+* @author zuolongsnail 
+* 
+*/
+
+public
+class DatabaseManager {  
+
+
+    private AndroidSQLiteOpenHelper dbHelper;  
+
+
+    public DatabaseManager(Context context) {  
+        dbHelper = new AndroidSQLiteOpenHelper(context);  
+    }  
+
+
+    // 插入记录
+
+    public
+int insert(Person person) {  
+        Log.e("SQLite", "----insert----");  
+        SQLiteDatabase db = dbHelper.getWritableDatabase();  
+        db.beginTransaction();  
+        try {  
+            db.execSQL("insert into " + Person.TABLENAME  
+                    + " values(?, ?, ?, ?)", new Object[] { person.id,  
+                    person.name, person.gender, person.age });  
+            db.setTransactionSuccessful();  
+        } catch (Exception e) {  
+            return
+0;  
+        } finally {  
+            db.endTransaction();  
+        }  
+        db.close();  
+        return
+1;  
+    }  
+
+
+    // 删除记录
+
+    public
+int delete(Person person) {  
+        Log.e("SQLite", "----delete----");  
+        SQLiteDatabase db = dbHelper.getWritableDatabase();  
+        db.beginTransaction();  
+        try {  
+            db.execSQL("delete from " + Person.TABLENAME + " where id = ?",  
+                    new Object[] { person.id });  
+            db.setTransactionSuccessful();  
+        } catch (Exception e) {  
+            return
+0;  
+        } finally {  
+            db.endTransaction();  
+        }  
+        db.close();  
+        return
+1;  
+    }  
+
+
+    // 更新记录
+
+    public
+int update(Person person) {  
+        Log.e("SQLite", "----update----");  
+        SQLiteDatabase db = dbHelper.getWritableDatabase();  
+        db.beginTransaction();  
+        try {  
+            db.execSQL("update " + Person.TABLENAME  
+                    + " set name=?, gender=?, age=? where id=?", new Object[] {  
+                    person.name, person.gender, person.age, person.id });  
+            db.setTransactionSuccessful();  
+        } catch (Exception e) {  
+            return
+0;  
+        } finally {  
+            db.endTransaction();  
+        }  
+        db.close();  
+        return
+1;  
+    }  
+
+
+    // 查询记录
+
+    public ArrayList<Person> query(String id) {  
+        Log.e("SQLite", "----query----");  
+        SQLiteDatabase db = dbHelper.getReadableDatabase();  
+        Cursor cursor;  
+        Person person;  
+        ArrayList<Person> list = new ArrayList<Person>();  
+        // 若fileId为null或""则查询所有记录
+
+        if (id == null || id.equals("")) {  
+            cursor = db.rawQuery("select * from " + Person.TABLENAME, null);  
+        } else {  
+            cursor = db.rawQuery("select * from " + Person.TABLENAME  
+                    + " where id=?", new String[] { id });  
+        }  
+        while (cursor.moveToNext()) {  
+            person = new Person();  
+            person.id = cursor.getString(cursor.getColumnIndex("id"));  
+            person.name = cursor.getString(cursor.getColumnIndex("name"));  
+            person.gender = cursor.getString(cursor.getColumnIndex("gender"));  
+            person.age = cursor.getInt(cursor.getColumnIndex("age"));  
+            Log.e("SQLite", person.toString());  
+            list.add(person);  
+        }  
+        cursor.close();  
+        db.close();  
+        if (list.size() == 0) {  
+            Log.e("SQLite", "****表中无数据****");  
+        }  
+        return list;  
+    }  
+}  
+
+
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=78929
