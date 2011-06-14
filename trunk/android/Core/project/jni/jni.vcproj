@@ -174,11 +174,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\AsciiBrush.cpp"
+				RelativePath=".\AndroidGLView.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\cuboid.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FontBrush.cpp"
 				>
 			</File>
 			<File
@@ -220,7 +224,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\AsciiBrush.h"
+				RelativePath=".\AndroidGLView.h"
 				>
 			</File>
 			<File
@@ -229,6 +233,10 @@
 			</File>
 			<File
 				RelativePath=".\cuboid_renderer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FontBrush.h"
 				>
 			</File>
 			<File
@@ -271,6 +279,38 @@
 				RelativePath=".\targetver.h"
 				>
 			</File>
+			<Filter
+				Name="common"
+				>
+				<File
+					RelativePath=".\DataUtil.h"
+					>
+				</File>
+				<File
+					RelativePath=".\GBnUnicode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\common\GLUtil.h"
+					>
+				</File>
+				<File
+					RelativePath=".\common\Log.h"
+					>
+				</File>
+				<File
+					RelativePath=".\common\MathUtil.h"
+					>
+				</File>
+				<File
+					RelativePath=".\common\PngUtil.h"
+					>
+				</File>
+				<File
+					RelativePath=".\common\ZipUtil.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="资源文件"
