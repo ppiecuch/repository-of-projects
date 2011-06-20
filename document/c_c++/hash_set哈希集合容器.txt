@@ -1,0 +1,160 @@
+/*
+ *
+ ************************************************************************************
+ *      hash_set哈希集合容器的基础说明：
+ ************************************************************************************
+ *
+ * hash_set哈希集合容器:使用hashtable数据结构的具有高效数据检索的关联容器
+ * 
+ * 不提供反向迭代器，只有前向迭代器iterator和const_iterator
+ * 不允许插入重复的元素键值
+ * Hashed Associative Container  Simple Associative Container   Unique Associative Container
+ *
+ * 目前还不是C++的标准容器，只是SGI C++ STL的一个扩展容器
+ * 使用hash_set必须使用宏语句#include <hash_set>          
+ * 
+ **************************************************************************************
+ *
+ * 创建hash_set对象:
+ * 1.hash_set<int> hs;        //键值比较使用默认的函数对象equal_to<Value>
+ * 2.hash_set(size_type n);      //在质数列表中找出第一个大于等于n的质数作为表长:hash_set<int> hs(100);
+ *  3.hash_set(size_type n,const hasher& h);  //hash函数对象为h
+ * 4.hash_set(size_type n,const hasher& h,const key_equal& k);//键值比较函数对象k         
+ * 5.hash_set(const hash_set& h);     //用一个hash集合容器拷贝生成另一个hash集合容器:hash_set<int> hs2(hs); 
+ *
+ **************************************************************************************
+ *
+ * 元素的插入
+ * //typedef pair<const key,T> value_type;
+ * pair<iterator,bool> insert(const value_type& v);//second:返回true/false插入成功标志   
+ * void insert(iterator pos,const value_type& v);
+ *
+ **************************************************************************************
+ *
+ * 元素的删除
+ * void erase(iterator pos);
+ * size_type erase(const key_type& k);     //删除等于键值k的元素
+ * void erase(first,last);        //删除[first,last)区间的元素
+ * void clear();
+ *
+ **************************************************************************************
+ *
+ * 访问与搜索
+ *
+ * iterator begin();iterator end();     //不会将元素排序遍历出来
+ *
+ * iterator find(const key_type& k) const;    //对于非默认类型如char*,在搜素时应定义相关的函数对象
+ *
+ * 其它常用函数
+ * bool empty() const;
+ * size_type size() const;
+ * size_type bucket_count(const key_type& k) const; //获得hash表的表长
+ * void swap();
+ * resize();
+ * iterator lower_bound();iterator upper_bound();pair<iterator,iterator> equal_range();//上界、下届、确定区间
+ *
+ * 在SGI STL中，提供了以下hash函数： 
+ * struct hash<char*> 
+ * struct hash<const char*> 
+ * struct hash<char> 
+ * struct hash<unsigned char> 
+ * struct hash<signed char> 
+ * struct hash<short> 
+ * struct hash<unsigned short> 
+ * struct hash<int> 
+ * struct hash<unsigned int> 
+ * struct hash<long> 
+ * struct hash<unsigned long> 
+ *
+ * hash函数决定了如何划分散列表
+ *
+ *
+ *
+ ********************************************
+ **   cumirror ** tongjinooo@163.com **    **
+ ********************************************
+ *
+ */
+
+#include <hash_set>
+#include <iostream>
+
+
+struct student{
+ char* name;
+ int age;
+ char* city;
+ char* phone;
+};
+//自定义数据的比较函数
+class stuequal{
+public:
+ bool operator() (const student& a,const student& b){
+  return strcmp(a.city,b.city)==0;      //不允许同名，name为键值
+ }               //将name换为city测试下
+};
+//自定义数据的hash函数
+//typedef unsigned int size_t;
+struct stu_hash{
+ size_t operator()(const student& stu) const
+ { 
+  unsigned long res = 0;
+  char* s=stu.city;
+  for( ; *s; ++s ){
+   res=5*res+*s;
+  }
+  return size_t(res);
+ } 
+};
+
+//针对字符串的比较函数对象
+class strequal{
+public:
+ bool operator () (const char* a,const char* b)const{
+  return strcmp(a,b)==0;         
+ }
+};
+
+int main(){
+ using namespace std;
+
+ hash_set<const char*,hash<const char*>,strequal> a;
+ a.insert("tongjin");
+ a.insert("cumirror");
+ a.insert("makelaugh");
+ a.insert("feiguodeyun");
+
+// hash<const char*>默认提供的hash函数对象
+ hash_set<const char*,hash<const char*>,strequal>::const_iterator b=a.find("tongjin");
+ cout<<*b<<" is "<<(b!=a.end()?"present":"not present")<<endl;
+
+// 对于自定义类型数据,使用hash相关容器时应构造hash函数对象、比较函数对象
+// 注意区别hash函数对象与比较函数对象各自的作用
+ student s[]={
+  {"童进",23,"长沙","XXX"},
+  {"老大",23,"武汉","XXX"},
+  {"饺子",23,"福州","XXX"},
+  {"王老虎",23,"地球","XXX"},
+  {"周润发",23,"香港","XXX"},
+  {"周星星",23,"香港","XXX"},   //city重复
+  {"童进",23,"香港","XXX"}   //name重复、city也有重复
+ };         
+
+ hash_set<student,stu_hash,stuequal> c;
+ c.insert(s[0]);
+ c.insert(s[1]);
+ c.insert(s[2]);
+ c.insert(s[3]);
+ c.insert(s[4]);
+ c.insert(s[5]);
+ c.insert(s[6]);
+// 注意hash容器并不能实现排序
+ for(hash_set<student,stu_hash,stuequal>::iterator i=c.begin();i!=c.end();i++){
+  cout<<i->name<<" "<<i->age<<" "<<i->city<<endl;
+ }
+ return 0;
+}
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/cumirror/archive/2010/05/16/5596908.aspx

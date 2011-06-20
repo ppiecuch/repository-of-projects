@@ -1,90 +1,80 @@
-2010-1-30 created
+熟悉STL或熟悉ACM/ICPC的话，其中的set, map, multiset, multimap一定用过无数次了，它们都是用平衡二叉树（红黑树）实现的，复杂度为O(lgn)。我们也知道set, map可以通过哈希来实现，复杂度只有O(1)，可惜直到现在，unsorted_set或hash_map都没能成为C++标准的一部分（C++0x，- -b）。不过无论在GNU GCC中还是Microsoft Visual Studio中都有对hash_set, hash_map, hash_multiset, hash_multimap的支持。 
 
-1.hash_map属于非标准STL
-2.g++使用的是HP/SGI的hash_map
-3.存在目录<ext/hashmap>下面，放在了namespace __gnu_cxx下面
-4.typedef hash_map<Key,Value> HashMap，对于Key需要提供hash函数和equal_to函数.
-5.对于初始化的时候会指定一个n表示桶的大小..并且随着元素增多桶会自动扩容
-6.对于一些基本类型已经提供了hash和equal_to函数，尤其是const char*特别有用.
-7.个人感觉hash_map很多东西都不好handle住..
-但是使用起来就像是map一样...没有太大的差别:-)
-1  #include <ext/hash_map>
-2  #include <string>
-3  #include <iostream>
-4  using namespace std;
-5  using namespace __gnu_cxx;
-6  int main()
-7  {
-8      typedef hash_map<const char *,string>HashMap;
-9      HashMap mp(100);
-10      mp["hello"]="fuckyou";
-11      mp["hello2"]="fuckyou2";
-12      mp.erase("hello");
-13      for(HashMap::iterator it=mp.begin();it!=mp.end();++it){
-14          cout<<it->first<<" "<<it->second<<endl;
-15      }
-16      return 0;
-17  }
-那些基本类型的hash函数[函数对象]是hash<int>,...hash<const char*>等..比如:
-1  #include <ext/hash_map>
-2  #include <string>
-3  #include <iostream>
-4  using namespace std;
-5  using namespace __gnu_cxx;
-6  int main()
-7  {
-8      hash<const char*> Hash;
-9      cout<<Hash("hello,world")<<endl;
-10      return 0;
-11  }
-如果Key使用自定义类型的话，需要提供hash以及equal_to函数
-1  #include <ext/hash_map>
-2  #include <string>
-3  #include <iostream>
-4  using namespace std;
-5  using namespace __gnu_cxx;
-6  struct A
-7  {
-8      string _txt;
-9      A(const string &txt):_txt(txt){}
-10      string txt() const
-11      {
-12          return _txt;
-13      }
-14      friend ostream & operator<<(ostream &os,const A &a);
-15  };
+GCC中的hash_map定义在<ext/hash_map>文件，namespace __gnu_cxx中。要定义一个hash_map<int, int>非常简单：
 
-16  ostream & operator<<(ostream &os,const A &a)
-17  {
-18      os<<a.txt();
-19      return os;
-20  }
+#include <ext/hash_map>  
 
-21  struct HashA
-22  {
-23      size_t operator()(const A &p) const
-24      {
-25          hash<const char*> tmp;
-26          return tmp(p.txt().c_str());
-27      }
-28  };
-29  struct EqualA
-30  {
-31      bool operator()(const A &a,const A&b)const
-32      {
-33          return a.txt()==b.txt();
-34      }
-35  };
+using namespace __gnu_cxx;  
 
-36  int main()
-37  {
-38      typedef hash_map<A,string,HashA,EqualA>HashMap;
-39      HashMap mp;
-40      mp[A("hello")]="fuck";
-41      mp[A("hello2")]="fuck2";
-42      for(HashMap::iterator it=mp.begin();it!=mp.end();++it){
-43          cout<<it->first<<" "<<it->second<<endl;
-44      }
-45      return 0;
-46  }
-http://hi.baidu.com/dirlt/blog/item/4e6734a98f0843f71e17a239.html
+hash_map<int, int> hm; 
+
+在使用map时，如果我们想要改变元素顺序，或以自定义的struct/class作为key的时候，可以设定map第三个模板参数（默认是less<Key>，即operator<）。对于hash_map，我们需要设定其第三个(hash<Key>)和第四个模板参数(equal_to<Key>, operator==)。
+
+typedef long long my_type;  
+
+typedef int any_type;  
+
+struct my_hash {  
+
+    size_t operator()(const my_type& key) const {  
+
+        return (key >> 32) ^ key;  
+
+    }  
+
+};  
+
+struct my_equal_to {  
+
+    bool operator()(const my_type& lhs, const my_type& rhs) const {  
+
+        return lhs == rhs;  
+
+    }  
+
+};  
+
+hash_map<my_type, any_type, my_hash, my_equal_to> my_hash_map; 
+
+对与int等基本类型，系统提供有hash<int>等版本的模板特化，所以只需要指定前两个模板参数就足够了。实现了模板特化的有以下类型
+
+[const] char*, crope, wrope, [signed|unsigned] char, [unsigned] short, [unsigned] int, [unsigned] long 
+
+如果需要的话，我们也可以为其他类型实现模板特化
+
+view sourceprint?1 // hash_map<Key, Tp, HashFn=hash<Key>, EqualKey=equal_to<Key>, Alloc=allocator<Tp> >  
+
+2 #include <cstdio>  
+
+3 #include <utility>  
+
+4 #include <hash_map>  
+
+5 using namespace std;  
+
+6 using namespace __gnu_cxx;  
+
+7    
+
+8 namespace __gnu_cxx {  
+
+9     template<>  
+
+10     struct hash<pair<int, int> > {  
+
+11         size_t operator()(const pair<int, int>& key) const {  
+
+12             return key.first * key.second;  
+
+13         }  
+
+14     };  
+
+15 }  
+
+16 hash_map<pair<int, int>, int> hm; 
+
+
+Visual C++的hash_map定义在<hash_map>文件，namespace stdext中，早先在namespace std中。其实现与GCC的不同，模板参数也不一样，比如上面的例子在VC++版本如下
+
+http://watashi.ws/blog/tag/macro/

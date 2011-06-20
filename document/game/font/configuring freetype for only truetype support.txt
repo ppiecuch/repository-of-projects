@@ -1,0 +1,40 @@
+Hmm, docs/CUSTOMIZE recommends to edit ftmodule.h directly,
+but the description of each line is not so easy in comparison
+with module.cfg.
+
+On Thu, 25 Feb 2010 15:40:24 +0100
+audioboy 77 <audiobo...@googlemail.com> wrote:
+>im trying to compile a compact version of freetype 2.3.9 with only truetype
+>support.
+
+I recommend to use 2.3.11 :-)
+
+>to do this i configured ftmodule.h with only the following entry...
+>
+>FT_USE_MODULE( FT_Driver_ClassRec, tt_driver_class )
+>
+>However, calling  FT_Set_Char_Size results in a crash, in ftobjs.c, as shown
+>in the attached picture, because "driver" is nil.
+>
+>How can i find out which modules I need to include to only support truetype?
+
+The coverage of "to only support truetype" is dependent
+with what you want to do. Please start from
+
+FT_USE_MODULE( FT_Module_Class, autofit_module_class ) /* hinting */
+FT_USE_MODULE( FT_Driver_ClassRec, tt_driver_class )
+FT_USE_MODULE( FT_Module_Class, psnames_module_class )
+FT_USE_MODULE( FT_Renderer_Class, ft_raster1_renderer_class )
+FT_USE_MODULE( FT_Module_Class, sfnt_module_class )
+FT_USE_MODULE( FT_Renderer_Class, ft_smooth_renderer_class )
+FT_USE_MODULE( FT_Renderer_Class, ft_smooth_lcd_renderer_class )
+FT_USE_MODULE( FT_Renderer_Class, ft_smooth_lcdv_renderer_class )
+
+and find the minimum group fitting your purpose.
+
+Keep it in your mind that current Windows bundles some
+PostScript or CFF OpenType, so "only support truetype"
+softwares cannot load all Windows fonts.
+
+Regards,
+mpsuzuki

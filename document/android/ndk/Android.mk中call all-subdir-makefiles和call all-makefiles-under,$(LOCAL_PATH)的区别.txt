@@ -1,0 +1,9 @@
+在写Android.mk文件时，call all-subdir-makefiles和call all-makefiles-under,$(LOCAL_PATH)是有区别的。
+
+    前者表示“当前目录下没有需要编译的文件，请向子目录深入”，是告诉编译器继续向目录深处递归的一种规定写法。后者从字面上理解也应该是同一个意思。但是，请考虑这样一种情况：
+
+    如果当前目录下有文件需要编译，而且在当前目录下还有子目录，子目录中也有文件需要编译，那么当前目录下的Android.mk除了要包含编译当前目录下文件的语句，同样也要包含告诉编译器在编译完当前目录下的文件后，继续向子目录深入的语句。这里就有一个问题，后面这个语句该如何写呢？是call all-subdir-makefiles，还是call all-makefiles-under,$(LOCAL_PATH)呢？这里经过我的实验，写前者是不行的，编译器会在编译完当前目录下的文件后不再进入子目录编译。而写成后者则可以达到我们的期望。
+include $(call all-makefiles-under,$(LOCAL_PATH)) 
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/jackyu613/archive/2010/10/18/5949324.aspx
