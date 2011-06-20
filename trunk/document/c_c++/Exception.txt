@@ -1,4 +1,11 @@
 [异常]
+invalid use of incomplete type ‘struct 
+[解决]
+加入
+#include <zipint.h>
+#include <zip.h>
+
+[异常]
 不能将“this”指针从“const HashMapKeyInterface”转换为“HashMapKeyInterface &
 [解决]
 将compareKey()定义为const类型

@@ -1,4 +1,18 @@
 [异常]
+java.lang.UnsatisfiedLinkError: nativeInit
+[解决]
+
+[异常]
+make: *** No rule to make target  “XXXXXX”, needed by “ndk-app-XXXXX”. Stop.
+[解决]
+对于同目录也需要编译的Android.mk
+使用
+include $(call all-makefiles-under,$(LOCAL_PATH)) 
+替代
+include $(call all-subdir-makefiles) 
+
+
+[异常]
 GLES/gl.h: No such file or directory 
 [解决]
 Android.mk中加上
