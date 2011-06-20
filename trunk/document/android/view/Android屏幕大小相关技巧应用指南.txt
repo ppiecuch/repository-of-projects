@@ -1,0 +1,47 @@
+Android屏幕大小相关技巧应用指南
+　Android应用程序中屏幕大小的设置大家应该都比较清楚，不过如何才能让屏幕自己适应环境而改变大小呢?在这里我们就可以为大家详细介绍一下有关Android屏幕大小的自适应方式，帮助大家理解。
+　　不同的Android target会有不同的大小，应用程序的界面需要针对不同的大小调整界面元素的尺寸。而且Android屏幕大小也可以在横屏和竖屏之间切换，界面也需要调整。
+　　如何取得屏幕的方向：
+　　默认情况下，当屏幕方面切换时，activity的onCreate()方法会被重新调用，所以可以在其中通过以下代码来读取屏的方向：
+　　1.view plaincopy to clipboardprint?
+　　public void onCreate() {
+　　if(this.getResources().getConfiguration()
+　　.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+　　Log.i("info", "landscape");
+　　} else if (this.getResources().getConfiguration()
+　　.orientation == Configuration.ORIENTATION_PORTRAIT) {
+　　Log.i("info", "portrait");
+　　}
+　　}
+　　public void onCreate() {
+　　if(this.getResources().getConfiguration()
+　　.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+　　Log.i("info", "landscape");
+　　} else if (this.getResources().getConfiguration()
+　　.orientation == Configuration.ORIENTATION_PORTRAIT) {
+　　        Log.i("info", "portrait");
+　　        }
+　　}
+　　如果在androidmanifest.xml中加入配置
+　　android:configChanges="orientation|keyboardHidden|navigation
+　　当屏幕翻转时，Activity就不会重复的调用onCreate()、onPause()和onResume().
+　　而是调用onConfigurationChanged(Configuration newConfig)
+　　如何取得Android屏幕大小：
+　　1.view plaincopy to clipboardprint?
+　　2.int screenWidth,screenHeight;
+　　3.WindowManager windowManager = getWindowManager();
+　　4.Display display = windowManager.getDefaultDisplay();
+　　5.screenWidth = display.getWidth();
+　　6.screenHeight = display.getHeight();
+　　7.int screenWidth,screenHeight;
+　　8.WindowManager windowManager = getWindowManager();
+　　9.Display display = windowManager.getDefaultDisplay();
+　　10.screenWidth = display.getWidth();
+　　11.screenHeight = display.getHeight();
+　　也有人提到另一种Android屏幕大小的更改方法：
+　　1.view plaincopy to clipboardprint?
+　　2.DisplayMetrics dm = new DisplayMetrics();
+　　3.getWindowManager().getDefaultDisplay().getMetrics(dm);
+　　4.int screenWidth = dm.widthPixels;
+　　5.int screenHeight = dm.heightPixels;
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=75989

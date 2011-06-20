@@ -1,0 +1,459 @@
+所谓APK指的是Android操作系统的应用程序安装文件。所谓Crack，简单地理解为“破解”。我具体指的是反编译APK文件进行汇编级的代码分析，并修改或插入自己的代码，重新签名打包为APK文件，以达到改变程序原有行为的目的。
+
+由以上的说明可知，我们要Crack一个APK文件，主要流程有三步：反编译、代码分析、重新打包签名。
+
+基本准备
+
+我们需要一些基本的工具进行一些主要的工作。如果你是一个会做Android APK汉化的朋友，那么你应该对这些工具非常熟悉：
+
+第一个工具是android-apktool，A tool for reengineering Android apk files 。这个工具是我们完成APK Crack的核心，利用它实现APK文件的反编译和重新打包。它是Google Code上一个非常著名的开源项目，大家可以在Google Code的网页上获取它和它的Wiki、源码及其他相关信息。网址是：http://code.google.com/p/android-apktool/ 。
+
+第二个工具是Auto-sign。这个工具实现的是APK打包后的签名工作，属于一个小工具。
+
+除了这些基本工具外，为了更好的分析代码，你可能还需要用到一些其他工具，例如：dex2jar和jd-gui等，这里不做详述。
+
+反编译
+
+如果你是一个经常汉化APK程序的朋友，那么反编译这一步你肯定不会陌生。不过，既然这篇文章侧重于基本流程讲解，那么这一步想来是不能省掉的。所以，觉得罗嗦的朋友，请跳过。首先我们需要有一个待反编译的APK。这里我自己写了一个HelloWorld的APK，代码如下：package com.zh_weir.helloworld;
+
+
+
+import android.app.Activity;
+
+
+
+import android.os.Bundle;
+
+
+
+public class MainActivity extends Activity {
+
+
+
+     /** Called when the activity is first created. */
+
+
+
+     @Override
+
+
+
+     public void onCreate(Bundle savedInstanceState) {
+
+
+
+         super.onCreate(savedInstanceState);
+
+
+
+         setContentView(R.layout.main);
+
+
+
+     }
+
+
+
+}
+复制代码我们通过android-apktool对这个APK进行反编译。对于android-apktool的使用，我就不做太多翻译的工作，直接给出说明文档吧。简单一句话，就是命令行执行。Apktool v1.3.2 - a tool for reengineering Android apk files
+
+
+
+Copyright 2010 Ryszard Wi?niewski <brut.alll@gmail.com>
+
+
+
+Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+
+
+
+Usage: apktool [-v|--verbose] COMMAND [...]
+
+
+
+COMMANDs are:
+
+
+
+    d[ecode] [OPTS] <file.apk> [<dir>]
+
+
+
+        Decode <file.apk> to <dir>.
+
+
+
+        OPTS:
+
+
+
+        -s, --no-src
+
+
+
+            Do not decode sources.
+
+
+
+        -r, --no-res
+
+
+
+            Do not decode resources.
+
+
+
+        -d, --debug
+
+
+
+            Decode in debug mode. Check project page for more info.
+
+
+
+        -f, --force
+
+
+
+            Force delete destination directory.
+
+
+
+        -t <tag>, --frame-tag <tag>
+
+
+
+            Try to use framework files tagged by <tag>.
+
+
+
+        --keep-broken-res
+
+
+
+            Use if there was an error and some resources were dropped, e.g.:
+
+
+
+            "Invalid config flags detected. Dropping resources", but you
+
+
+
+            want to decode them anyway, even with errors. You will have to
+
+
+
+            fix them manually before building.
+
+
+
+    b[uild] [OPTS] [<app_path>] [<out_file>]
+
+
+
+        Build an apk from already decoded application located in <app_path>.
+
+
+
+        It will automatically detect, whether files was changed and perform
+
+
+
+        needed steps only.
+
+
+
+        If you omit <app_path> then current directory will be used.
+
+
+
+        If you omit <out_file> then <app_path>/dist/<name_of_original.apk>
+
+
+
+        will be used.
+
+
+
+        OPTS:
+
+
+
+        -f, --force-all
+
+
+
+            Skip changes detection and build all files.
+
+
+
+        -d, --debug
+
+
+
+            Build in debug mode. Check project page for more info.
+
+
+
+    if|install-framework <framework.apk> [<tag>]
+
+
+
+        Install framework file to your system.
+
+
+
+For additional info, see: http://code.google.com/p/android-apktool/
+复制代码通过apktool d HelloWorld.apk的命令，我们就完成了一个简单的APK的反编译工作。得到了一个叫做“HelloWorld”的文件夹。你可以看见文件夹下有Manifest文件，有反编译出的res资源文件。这些东西都是平时汉化特别关心的，而不是我们要注意的重点。我们需要注意的是一个叫做“smali”的文件夹。
+
+仔细观察，你会发现这个文件夹下的文件组织结构和我们的Android工程中java源码的组织结构几乎一致。只不过Java文件被.smali的文件取而代之了。我们用文本编辑器打开这些.smali文件，你会发现它们都是可识别的、并且非常“整齐”的文本文件，大致如下：.class public Lcom/zh_weir/helloworld/MainActivity;
+
+
+
+.super Landroid/app/Activity;
+
+
+
+.source "MainActivity.java"
+
+
+
+# direct methods
+
+
+
+.method public constructor <init>()V
+
+
+
+    .locals 0
+
+
+
+    .prologue
+
+
+
+    .line 6
+
+
+
+    invoke-direct {p0}, Landroid/app/Activity;-><init>()V
+
+
+
+    return-void
+
+
+
+.end method
+
+
+
+# virtual methods
+
+
+
+.method public onCreate(Landroid/os/Bundle;)V
+
+
+
+    .locals 1
+
+
+
+    .parameter "savedInstanceState"
+
+
+
+    .prologue
+
+
+
+    .line 10
+
+
+
+    invoke-super {p0, p1}, Landroid/app/Activity;->onCreate(Landroid/os/Bundle;)V
+
+
+
+    .line 11
+
+
+
+    const/high16 v0, 0x7f03
+
+
+
+    invoke-virtual {p0, v0}, Lcom/zh_weir/helloworld/MainActivity;->setContentView(I)V
+
+
+
+    .line 12
+
+
+
+    return-void
+
+
+
+.end method
+复制代码Smali文件其实就是dalvik虚拟机运行的dex字节码文件对应的汇编文件了。如果你了解Java虚拟机的汇编语言Jasmin的话，你会发现两者的语法非常相似。关于smali的语法等问题就不深入下去了，如果你想了解更多，可以访问Google Code上Smali项目主页：http://code.google.com/p/smali/ 。
+
+代码分析与修改
+
+即使你不会Jasmin语法，你也能很容易看明白上面的汇编代码。需要指出的是，apktool反编译出来的汇编代码同样也是面向对象的，而不是面向过程的。这点和C++的反汇编可能有所不同。
+
+根据上面的代码，我们可以看出，这个MainActivity的类有两个成员方法。一个是默认的构造函数；另一个就是我们重载的OnCreate方法了。
+
+在java汇编中，每个成员方法需要首先申明自己所使用的局部变量的个数，以便实现分配存储空间。例如OnCreate使用了一个局部变量，就声明：.locals 1 。后面则使用v0表示。
+
+在一个非静态的成员方法中，p0代表的是这个类本身的引用，相当于this，p1开始才是函数的参数；而对于静态方法，由于没有this指针，所以p0就是函数的第一个参数。（其实本身this指针就是作为一个隐含的参数传递给非静态成员函数的）。
+
+通过分析上面Oncreate的汇编代码，我们可以知道，它首先是调用super类的onCreate方法，然后再setContentView设置显示。其中I、V等表示的是函数的参数和返回变量的类型，这是通用做法，这里就不多做说明了。
+
+分析到这一步，你是否发现一个问题？那就是如果我们按照同样的语法修改或者增删一个语句，是否就可以实现对程序的修改了呢？答案是肯定的。
+
+例如，我们希望这个APK程序在运行时会弹出一个Toast，提示它被破解了。用Java的话，应该这样表述：
+
+Toast.makeText(this, "I'm Cracked!", Toast.LENGTH_LONG).show();
+
+而用Java汇编的话，则应该表述为这样：const-string v0, "I\'m Cracked!"
+
+
+
+const/4 v1, 0x1
+
+
+
+invoke-static {p0, v0, v1}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
+
+
+
+move-result-object v0
+
+
+
+invoke-virtual {v0}, Landroid/widget/Toast;->show()V
+复制代码OK，只要我们将这段代码插入到原来程序的OnCreate中，再重新打包程序，我们就能实现在这个程序运行时弹出Toast了。
+
+改之后的代码，大致如下：# virtual methods
+
+
+
+.method public onCreate(Landroid/os/Bundle;)V
+
+
+
+    .locals 2
+
+
+
+    .parameter "savedInstanceState"
+
+
+
+    .prologue
+
+
+
+    .line 11
+
+
+
+    invoke-super {p0, p1}, Landroid/app/Activity;->onCreate(Landroid/os/Bundle;)V
+
+
+
+    .line 12
+
+
+
+    const/high16 v0, 0x7f03
+
+
+
+    invoke-virtual {p0, v0}, Lcom/zh_weir/helloworld/MainActivity;->setContentView(I)V
+
+
+
+    .line 14
+
+
+
+    const-string v0, "I\'m Cracked!"
+
+
+
+    const/4 v1, 0x1
+
+
+
+    invoke-static {p0, v0, v1}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
+
+
+
+    move-result-object v0
+
+
+
+    invoke-virtual {v0}, Landroid/widget/Toast;->show()V
+
+
+
+    .line 15
+
+
+
+    return-void
+
+
+
+.end method
+复制代码 
+ 
+分享到: QQ空间 腾讯微博 腾讯朋友 收藏0  
+ 举报 
+ 
+  
+
+安卓中国 安卓中国 当前离线 
+注册时间2010-2-1最后登录2011-6-17在线时间361 小时阅读权限200积分366帖子244精华0UID1 
+管理员
+
+
+
+威望-30 金钱347 最后登录2011-6-17注册时间2010-2-1主题89积分366帖子244串个门 加好友 打招呼 发消息  2楼 
+ 发表于 2 分钟前 |只看该作者 
+重新编译打包签名
+
+修改完成后，我们就可以对这个文件夹进行编译打包了。同样，我们使用的工具是apktool。通过命令apktool b HelloWorld，就可以实现程序编译打包了。这时会在这个文件夹下生成两个文件夹：存放中间文件的文件夹build和存放最后的apk文件的文件夹dist。
+
+如果一切顺利的话，你就可以在dist文件夹中看到我们修改后的HelloWorld.apk了。不过需要注意的是，这个APK文件是还没有签名的，所以无法安装运行。我们还需要进行最后一步，那就是对这个APK进行签名。
+
+签名我们需要用到的工具是Auto-sign。它主要是利用批处理命令，使用signapk.jar对APK文件进行签名的。你可以用记事本打开Sign.bat，看看它的具体调用关系。关键如下：
+
+java -jar signapk.jar testkey.x509.pem testkey.pk8 update.apk update_signed.apk
+
+OK！到此，我们对这个APK的Crack就结束了。现在在模拟器或者Android机器上安装上签好名的APK程序，运行试试。一切与我们的预期相同~
+
+如何反破解
+
+这篇文章本来到此就结束了。不过，对于软件安全来说，有攻就要有防才对。不然，Android整个产业链就会被这样的Crack给毁掉。由于篇幅有限，反破解方面就不做详细描述了，仅仅做一个思路上的说明，希望大家谅解。
+
+第一种办法：将核心代码用JNI写进so库中。由于so库的反编译和破解的难度加大，所以这种方式防止反编译效果不错。缺点是，对于Java层的代码没有保护作用，同样可以被篡改。
+
+第二种办法：在线签名比较。在程序初始化时，联网将运行的程序的签名与服务器上的官方标准签名进行比较，从而达到让反编译后的程序无法正常运行的效果。缺点是，如果此部分联网检验的代码被篡改跳过，则整套机制失效。
+
+第三种办法：代码混淆。为了加大反编译后代码分析的难度，对代码进行混淆。缺点是，治标不治本，同样可以修改（甚至据说还有反混淆工具，没用过，不多做评论）。
+
+这三种办法都有各自的缺点，所以单单靠某一项要实现完美的软件保护都是不可能的。不过，我们可以采用联合几种办法的方式，来增强软件保护的力度。曾经反编译过Android版的卡巴斯基，它的保护思路似乎是这样的：
+
+代码混淆，那是必须的，不过不指望它能有很好的效果。在程序初始化时，就直接通过JNI的so库初始化程序。程序激活部分也是通过JNI联网下载文件，然后在JNI层读文件并做相应激活与否的判断的。
+
+卡巴斯基是将大部分功能模块都放在JNI层来实现的，如果我们的程序都这样处理，耗费的精力必然很大。所以，我们只是借鉴它的思路而已。具体操作思路如下：
+
+代码混淆。初始化时JNI层联网验证签名。验证失败则直接在JNI层退出程 
+ 
+http://bbs.androidcn.com/thread-11445-1-1.html
