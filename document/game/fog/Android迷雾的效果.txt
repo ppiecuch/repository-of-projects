@@ -1,0 +1,485 @@
+雾效果其实很容易实现，我先总结一下:
+
+        (1)首先肯定是将背景色设为我们雾的颜色
+        (2)打开雾效果
+        (3)设置雾的背景色
+        (4)设置雾方程式
+
+        雾方程式有三种表现形式 EXP(最老)，EXP2(EXP加强版)，LINEAR(雾的最好方程式，当然用这个)，如果要用LINEAR这种，则要多雾start,end的设置，表示雾从多远开始，从多远停止 。
+
+        (5)最后，设置雾质量优先还是效率优先。
+
+        那么说这么多了，我们还是来看看代码是最重要的：
+
+java代码：
+package eoe.demo;
+
+
+
+import android.app.Activity;
+
+import android.content.res.Resources;
+
+import android.graphics.Bitmap;
+
+import android.graphics.BitmapFactory;
+
+import android.opengl.GLSurfaceView;
+
+import android.opengl.GLSurfaceView.Renderer;
+
+import android.os.Bundle;
+
+
+
+public class Fog extends Activity {
+
+/** Called when the activity is first created. */
+
+private GLSurfaceView surfaceView;
+
+private Renderer renderer;
+
+
+
+@Override
+
+public void onCreate(Bundle savedInstanceState) {
+
+super.onCreate(savedInstanceState);
+
+// 载入图片
+
+BitGL.init(this.getResources());
+
+surfaceView = new GLSurfaceView(this);
+
+renderer = new MyRenderer(this);
+
+surfaceView.setRenderer(renderer);
+
+setContentView(surfaceView);
+
+}
+
+}
+
+
+
+class BitGL {
+
+public static Bitmap bitmap;
+
+
+
+public static void init(Resources resources) {
+
+bitmap = BitmapFactory.decodeResource(resources, R.drawable.img);
+
+}
+
+}
+复制代码
+       接着我们来看看Renderer类
+
+java代码：
+package eoe.demo;
+
+
+
+import java.nio.ByteBuffer;
+
+import java.nio.ByteOrder;
+
+import java.nio.IntBuffer;
+
+
+
+import javax.microedition.khronos.egl.EGLConfig;
+
+import javax.microedition.khronos.opengles.GL10;
+
+
+
+import android.content.Context;
+
+import android.graphics.Bitmap;
+
+import android.opengl.GLSurfaceView.Renderer;
+
+import android.opengl.GLUtils;
+
+
+
+public class MyRenderer implements Renderer {
+
+// Context
+
+public Context context;
+
+// 顶点纹理相关
+
+private int one = 0x10000;
+
+// Bitmap
+
+private Bitmap bitmap;
+
+// 纹理相关
+
+private int[] textureids;
+
+// vertexBuffer
+
+private IntBuffer vertexBuffer;
+
+// texBuffer
+
+private IntBuffer texBuffer; 
+
+// 旋转方向
+
+private float xrot, yrot, zrot;
+
+// 正方体顶点
+
+private int[] vertices = { 
+
+-one,-one,one,
+
+one,-one,one,
+
+-one,one,one,
+
+one,one,one,
+
+
+
+
+
+one,-one,one,
+
+one,-one,-one,
+
+one,one,one,
+
+one,one,-one,
+
+
+
+
+
+one,-one,-one,
+
+-one,-one,-one,
+
+one,one,-one,
+
+-one,one,-one,
+
+
+
+
+
+-one,-one,-one,
+
+-one,-one,one,
+
+-one,one,-one,
+
+-one,one,one,
+
+
+
+
+
+-one,one,-one,
+
+one,one,-one,
+
+-one,one,one,
+
+one,one,one,
+
+
+
+
+
+-one,-one,-one,
+
+-one,-one,one,
+
+one,-one,-one,
+
+one,-one,one
+
+};
+
+
+
+//纹理点
+
+private int[] texCoords = { 
+
+0, 0, 
+
+one,0,
+
+0,one, 
+
+one, one 
+
+};
+
+
+
+// 雾模式 
+
+private int fogMode[]={
+
+GL10.GL_EXP,
+
+GL10.GL_EXP2,
+
+GL10.GL_LINEAR
+
+};
+
+// 雾颜色为灰白色
+
+private float fogColor[]={
+
+0.5f,0.5f,0.5f,1.0f
+
+}; 
+
+public MyRenderer(Context context) {
+
+this.context = context;
+
+// 初始化
+
+textureids = new int[1];
+
+// 实例化bitmap
+
+bitmap = BitGL.bitmap;
+
+
+
+ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length * 4);
+
+vbb.order(ByteOrder.nativeOrder());
+
+vertexBuffer = vbb.asIntBuffer(); 
+
+vertexBuffer.put(vertices); 
+
+vertexBuffer.position(0); 
+
+
+
+ByteBuffer tbb = ByteBuffer.allocateDirect(texCoords.length * 4 * 6);
+
+tbb.order(ByteOrder.nativeOrder());
+
+texBuffer = tbb.asIntBuffer();
+
+//为每一个面贴上纹理
+
+for (int i = 0; i < 6; i++) {
+
+texBuffer.put(texCoords);
+
+}
+
+texBuffer.position(0);
+
+}
+
+
+
+@Override
+
+public void onDrawFrame(GL10 gl) {
+
+// 清除深度和颜色缓存
+
+gl.glClear(GL10.GL_DEPTH_BUFFER_BIT | GL10.GL_COLOR_BUFFER_BIT);
+
+gl.glLoadIdentity();
+
+
+
+gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+
+gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+
+
+
+gl.glVertexPointer(3, GL10.GL_FIXED, 0, vertexBuffer);
+
+gl.glTexCoordPointer(2, GL10.GL_FIXED, 0, texBuffer); // Define
+
+
+
+//向z轴里移入6.0f
+
+gl.glTranslatef(0.0f, 0.0f, -5.0f);
+
+// 设置3个方向的旋转
+
+gl.glRotatef(xrot, one, 0.0f, 0.0f);
+
+gl.glRotatef(yrot, 0.0f, one, 0.0f);
+
+gl.glRotatef(zrot, 0.0f, 0.0f, one);
+
+
+
+// 绘制正方体
+
+for (int i = 0; i < 6; i++) {
+
+gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, i * 4, 4);
+
+}
+
+
+
+gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+
+gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+
+
+
+// 设置旋转角度
+
+xrot += 0.5f;
+
+yrot += 0.6f;
+
+zrot += 0.3f;
+
+}
+
+
+
+@Override
+
+public void onSurfaceChanged(GL10 gl, int width, int height) {
+
+// 视角
+
+gl.glViewport(0, 0, width, height);
+
+float ratio = (float) width / height;
+
+// 观察模式
+
+gl.glMatrixMode(GL10.GL_PROJECTION);
+
+// 重置观察布局
+
+gl.glLoadIdentity();
+
+gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
+
+gl.glMatrixMode(GL10.GL_MODELVIEW);
+
+gl.glLoadIdentity();
+
+}
+
+
+
+@Override
+
+public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
+// We'll Clear To The Color Of The Fog ( Modified )
+
+gl.glClearColor(0.5f,0.5f,0.5f,1.0f); 
+
+//设置雾模式
+
+gl.glFogx(GL10.GL_FOG_MODE, fogMode[2]); 
+
+//雾颜色
+
+gl.glFogfv(GL10.GL_FOG_COLOR, fogColor,0); 
+
+//更好的外观，需求大的雾(反之为gl.glHint(GL10.GL_FOG_HINT, GL10.GL_FASTEST);)
+
+gl.glHint(GL10.GL_FOG_HINT, GL10.GL_NICEST); 
+
+//雾密度在模式为LINEAR下无效
+
+//gl.glFogf(GL10.GL_FOG_DENSITY, 0.1f); 
+
+//开始位置
+
+gl.glFogf(GL10.GL_FOG_START, 1.0f);
+
+//结束位置
+
+gl.glFogf(GL10.GL_FOG_END, 5.0f);
+
+//启用雾
+
+gl.glEnable(GL10.GL_FOG);
+
+
+
+// 告诉系统对透视进行修正
+
+gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
+
+// 启用阴影平滑
+
+gl.glShadeModel(GL10.GL_SMOOTH);
+
+
+
+// 清除深度缓存
+
+gl.glClearDepthf(one);
+
+// 启用深度测试
+
+gl.glEnable(GL10.GL_DEPTH_TEST);
+
+// 所做深度测试的类型
+
+gl.glDepthFunc(GL10.GL_LEQUAL);
+
+
+
+gl.glEnable(GL10.GL_TEXTURE_2D);
+
+// 创建纹理
+
+gl.glGenTextures(1, textureids, 0);
+
+// 绑定要使用的纹理
+
+gl.glBindTexture(GL10.GL_TEXTURE_2D, textureids[0]);
+
+// 生成纹理
+
+GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+
+// 线性滤波
+
+gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
+
+GL10.GL_LINEAR);
+
+gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
+
+GL10.GL_LINEAR);
+
+}
+
+}
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=79889

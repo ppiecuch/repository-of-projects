@@ -1,0 +1,38 @@
+本来快写好了的，突然论坛就打不开了，原来的东西也丢失了。。。万恶的中移动啊，什么破网，还光纤，死贵死贵的undefined，好了，不说废话了，开始正题。最近一直在研究android游戏编程方面的知识，故决定在此发些心得，一来可以巩固知识，二来也可以给新手们一些启示。首先我们先学习下游戏编程时常用的一些manifest下的标签，众所周知，manifest是android程序的描述文件，你在程序中用到的四大组件(activity,services,content providers,broadcast receivers)都需要在manifest中定义，还有你所使用的android版本号，所需硬件特性，用户授权等等。下面看下manifest标签<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+package="com.helloworld"
+android:versionCode="1"
+android:versionName="1.0"
+android:installLocation="preferExternal">
+...
+</manifest>
+package属性是你程序的根包，versionCode是android market跟踪你程序版本要用的一个整数值，versionName是用户看到的版本号，installLocation = "preferExternal"表示你程序安装时优先安装到外部存储设备即SD CARD上，这个属性只有在android2.2以后才有效，以前的版本程序默认安装在internal storage上。
+<application android:icon="@drawable/icon" android:label="@string/app_name"
+android:debuggable="true">
+...
+</application>
+
+application标签定义在manifest标签里面，定义了程序的一些信息，icon为图标，"@drawable/icon"里面的@是一个特殊字符，编译器看到这个字符就会解析后面的文字，它会去R.java里面寻找一个叫drawabel的内部类，里面有个变量叫icon,而这个变量是当你把资源放入res文件下自动生成的。
+label属性表示你的程序在启动项里的名字，也是默认的activity标题
+<activity android:name=".MrNomActivity"
+android:label="Mr. Nom"
+android:screenOrientation="portrait">
+android:configChanges="keyboard|keyboardHidden|orientation">
+<intent-filter>
+<action android:name="android.intent.action.MAIN" />
+<category android:name="android.intent.category.LAUNCHER" />
+</intent-filter>
+</activity>
+
+name表示你的activity对应的类名，label显示在activity的标题栏上，如果这个activity是主activity,则此label就是你程序图标下面的文字，
+screenOrientation表示屏幕排列方式，portrait表示竖向，landscape表示横向。一旦指定了排列方式，屏幕就不会根据重力感应自动调整，为什么要指定呢？因为每次屏幕调整方向时，都会destroy和restart activity，这是我们不愿意看到的，所以一般都指定屏幕的方向configChanges,当键盘滑动或者屏幕改变方向时，系统会认为配置改变而重建activity,我们指定这个属性表示当keyboardHidden或orientation发生时由我们自己处理这些事件
+intent-filter表示过滤启动时的intent,android程序没有入口函数，所以你可以通过intent启动它任何一个组件，一般intent启动一个组件有两种方式，显示和隐式，显示是指定你要启动的组件的class,隐式则是赋值给intent一个action和data,系统根据activity的intent-filter来决定是否要启动。接下来讨论的是用户授权，android对系统资源的访问有严格的规定，所以当你访问一些资源，比如SD CARD,INTERNET之前，你都要在manifest中声明，有了用户授权才能访问。声明方式如下
+<uses-permission android:name="android.permission.INTERNET"/>
+当你表现你的程序时，可能需要一些硬件特性，比如多点触控，并不是每个设备都支持，所以需要声明你的硬件需求，方式如下：
+<uses-feature android:name="android.hardware.touchscreen.multitouch"
+android:required="true"/>
+接下来是你所支持的SDK版本号
+<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="9"/>
+这表明你最低支持的版本号是level3
+又重写了一遍，不想写的太详细了，呵呵，如果有看不懂的请留言吧，不过都是些很简单的东西，应该没啥不懂的，下篇给大家讲解下游戏所需要使用的一些android特性，比如如何播放音乐，如何获得用户交互等等undefined
+
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=79171

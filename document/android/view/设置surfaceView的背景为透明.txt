@@ -1,0 +1,6 @@
+做天也遇到了这个问题，找了好久才找到，给大家分享一下。下面三句话加上就好了。
+surfaceView.setZOrderOnTop(true);
+  surfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+  surfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+ 
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=75335
