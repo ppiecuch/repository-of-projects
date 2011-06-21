@@ -1,0 +1,156 @@
+摘要：本文介绍了OpenGL在三维物体建模中的应用，并在VC++下通过该技术实现了对自由型曲线曲面的模型搭建。
+
+　　关键词：OpenGL；自由型曲线曲面；NURBS；Visual C++ 
+
+　　引言
+
+　　随着计算机技术的飞速发展，计算机的性价比越来越高，为计算机图形学的发展奠定了坚实的基础。科学计算可视化、计算机动画和虚拟现实等技术在工程应用中得到了广泛的使用，这些技术的实现离不开对真实物体的三维建模。在实体建模时为减少运算量和存储空间多采用少量的控制点和各种光滑的样条和样条曲面如B样条、Nurbs曲面和贝塞尔(Bez   
+ 
+ 
+   
+ 
+ 
+ier)曲面等来对其作精确的描述。自由型曲线曲面是一种非常重要的工业产品几何定义，在计算机辅助设计类软件中应用较为普遍。自1991年ISO(International Standardization Organization,国际标准化组织)颁布了STEP标准后由于在标准中明确规定了自由型曲线曲面在工程中唯一地用NURBS（Non_Uniform Rational B-Spline,非均匀有理B样条）表示而且在OpenGL（Open Graphics Library，开放式图形库）中对NURBS提供有建立在求值器基础之上的高层编程接口，因此在三维实体建模中多通过使用OpenGL求值器来完成对各种复杂自由型曲线曲面的构造。本文将在VC下对OpenGL提供的这个编程接口的使用进行介绍，并通过对该接口的编程实现对自由型曲线曲面的绘制。
+
+　　OpenGL基本程序框架
+
+　　OpenGL三维图形标准是由AT＆T、IBM、DEC、SUN、HP、Microsoft和SGI等多家公司在GL图形库标准的基础上联合推出的开放式标准，它的出现彻底改变过去只能依赖于价格昂贵的图形工作站及复杂的三维图形软件从事三维图形计算机应用的历史，使广大程序员能够在PC机上用C语言开发出复杂的三维图形。由于OpenGL具有跨平台性、简便、高效、功能完善，目前已经成为三维图形制作中事实上的工业标准。它不仅提供了绘制点、线、多边形等基本形体的函数，还提供了绘制复杂三维曲线曲面和三维形体的函数。由于OpenGL在进行几何建模时是以顶点为图元，由点构成线，再由线及其拓扑结构组成多边形曲面，因此应用OpenGL提供的建模函数可构造出几乎所有的三维模型。
+
+　　OpenGL的作用机制是客户（Client）服务器（Server）机制，客户（用OpenGL绘制图形的应用程序）向服务器（OpenGL内核）发送OpenGL指令，由服务器负责解释执行这些命令。OpenGL图形库被封装在动态连接库opengl32.dll内，在使用时从客户应用程序发出的对OpenGL接口函数的调用首先被opengl32.dll处理，然后传送给服务器并由Winsrv.dll做进一步处理后传给Win32 DDI（Device Drivers Interface,设备驱动接口），最后把处理过的图形命令送给视频显示驱动程序完成最终的显示。
+
+　　由于OpenGL的辅助库函数对于自由型曲线曲面的绘制提供有NURBS编程接口，因此使用起来比较简单。使用OpenGL之前，必须通过初始化代码对其进行初始化并定义像素的存储格式等信息：
+
+PIXELFORMATDESCRIPTOR pixelDesc;
+pixelDesc.nSize = sizeof(PIXELFORMATDESCRIPTOR);//pfd的大小
+pixelDesc.nVersion = 1; //版本号
+pixelDesc.dwFlags = PFD_DRAW_TO_WINDOW | //支持窗口
+PFD_SUPPORT_OPENGL| //支持OpenGL
+PFD_DOUBLEBUFFER; //支持双缓存
+pixelDesc.iPixelType = PFD_TYPE_RGBA; //RGBA类型
+pixelDesc.cColorBits = 32; //32位色深度
+pixelDesc.cRedBits = 8; //各颜色位
+pixelDesc.cRedShift = 16;
+pixelDesc.cGreenBits = 8;
+pixelDesc.cGreenShift = 8;
+pixelDesc.cBlueBits = 8;
+pixelDesc.cBlueShift = 0;
+pixelDesc.cAlphaBits = 0; //无alpha缓存
+pixelDesc.cAlphaShift = 0; //忽略转换位
+pixelDesc.cAccumBits = 64; //各累计位
+pixelDesc.cAccumRedBits = 16;
+pixelDesc.cAccumGreenBits = 16;
+pixelDesc.cAccumBlueBits = 16;
+pixelDesc.cAccumAlphaBits = 0;
+pixelDesc.cDepthBits = 32; //32位深度缓存
+pixelDesc.cStencilBits = 0; //无模版缓存
+pixelDesc.cAuxBuffers = 0; //无辅助缓存
+pixelDesc.iLayerType = PFD_MAIN_PLANE; //主层
+pixelDesc.bReserved = 0; //保留
+pixelDesc.dwLayerMask = 0;
+pixelDesc.dwVisibleMask = 0;
+pixelDesc.dwDamageMask = 0; 
+
+　　这是初始化工作的主要内容，对描述像素存储格式的PIXELFORMATDESCRIPTOR结构变量进行了填充，剩下的工作主要是通过调用ChoosePixelFormat()和SetPixelFormat()函数以返回并设置最佳匹配的像素格式。最后在绘制自由型曲线曲面之前用wglCreateContext()创建一个渲染上下文RC并将其作为参数通过wglMakeCurrent（）来建立一个当前的绘图描述表，并在绘制完毕后将其释放：
+
+//设置一个线程的当前绘图描述表
+wglMakeCurrent(hDC,m_hGLContext);
+//对自由型曲线曲面的绘制
+DoNURBS();
+//释放绘图描述表
+wglMakeCurrent(hDC,NULL);
+//释放RC(一般在WM_DESTORY消息响应函数OnDestory()中进行)
+wglDeleteContext(m_hGLContext); 
+
+
+　　至此，一个基于OpenGL的基本程序框架构造完毕，具体对自由型曲线曲面的构造工作在DoNURBS()中完成。
+
+
+
+对自由型曲线曲面的绘制
+
+　　OpenGL的一个很大的优点就是在绘制构造三维实体的光滑曲线和曲面时只需少量控制点就完成了对其的精确描述，而不必靠大量的基本图元去拟合。NURBS就是我们熟悉的B样条的扩展，只不过引入了权因子并以有理分式表示其曲线。因此用OpenGL的NURBS编程接口绘制自由型曲线曲面只需预先对节点序列和控制点进行定义即可完成对NURBS样条的精确描述：
+
+//节点序列
+GLfloat Notes[8]={0.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f}; 
+//定义控制点
+for(int i=0;i<4;i++)
+{
+　for(int j=0;j<4;j++)
+　{
+　　LinchpinPt[i][j][0]=(GLfloat)(3.0f*(i-0.5f));
+　　LinchpinPt[i][j][1]=(GLfloat)(3.0f*(j-0.5f));
+　　if(0　　　LinchpinPt[i][j][2]=4.0f;
+　　else
+　　　LinchpinPt[i][j][2]=-4.0f;
+　}
+} 
+
+　　使用OpenGL提供的NURBS编程接口进行编程比较简洁：首先创建一个NURBS曲面对象并根据需要对其属性进行设置，在调用了gluBeginSurface()或是gluBeginCurve()后就可以根据前面定义的控制点对其曲线曲面进行绘制了，绘制完毕后以gluEndSurface()或gluEndCurve()结束：
+
+//创建NURBS曲面对象
+Nurb=gluNewNurbsRenderer();
+//设置NURBS曲面对象属性
+gluNurbsProperty(Nurb,GLU_SAMPLING_TOLERANCE,30.0f);
+gluNurbsProperty(Nurb,GLU_DISPLAY_MODE,GLU_FILL);
+//开始NURB区间绘制
+gluBeginSurface(Nurb); 
+//定义NURBS曲面的形状
+gluNurbsSurface(Nurb,8,Notes,8,
+Notes,4*3,3,
+&LinchpinPt[0][0][0],
+4,4,GL_MAP2_VERTEX_3);
+//结束曲面绘制
+gluEndSurface(Nurb);
+glPopMatrix();
+//强制绘图，不驻留缓存
+glFlush(); 
+
+　　其中gluNurbsSurface（）是定义NURBS曲线曲面的关键函数，其函数原型定义如下：
+
+void gluNurbsSurface(
+　GLUnurbsObj * nobj, 　　 //NURBS曲面对象
+　GLint sknot_count, //u方向节点数目
+　GLfloat * sknot, //u方向节点数组指针
+　GLint tknot_count, //v方向节点数目
+　GLfloat * tknot, //v方向节点数组指针
+　GLint s_stride, //u方向控制点数据跨度
+　GLint t_stride, //v方向控制点数据跨度
+　GLfloat * ctlarray, //控制点数组指针
+　GLint sorder, //u方向上多项式阶数
+　GLint torder, //v方向上多项式阶数
+　GLenum type //确定求值器类型
+); 
+
+　　另有一gluNurbsCurve()函数也可用于对NURBS曲线曲面的定义，具体使用方法与之类似。
+
+　　光照和材质的渲染
+
+　　为更真实地对实体进行三维建模，需要对已构造成型的自由型曲线曲面进行光照和材质上的渲染。OpenGL对此提供有一系列的用于建立光照模型的库函数，使用户可以很方便地在三维场景中建立所需的光照模型。OpenGL中的光照模型由环境光(Ambient Light)、漫射光(Diffuse Light)、镜面反射光(Specular Light)等组成，同时还可设置光线衰减因子来模拟真实的光源效果。下面这段代码定义了一个黄色光源：
+
+GLfloat Light_position[]={1.0f,1.0f,1.0f,0.0f,};
+GLfloat Light_diffuse[]={1.0f,1.0f,0.0f,1.0f,};
+glLightfv(GL_LIGHT0,GL_POSITION,Light_position); //定义光源位置
+glLightfv(GL_LIGHT0,GL_DIFFUSE,Light_diffuse); //定义光源漫射光
+glEnable(GL_AUTO_NORMAL); //自动生成曲面法向量
+glEnable(GL_LIGHTING); //启动光照模型；
+glEnable(GL_LIGHT0); //使光源GL_LIGHT0有效 
+
+　　其中glEnable(GL_AUTO_NORMAL)函数可以自动生成曲面法向量来对光照进行处理。OpenGL里提供了GL_LIGHT0～GL_LIGHT7八个光源，在这里glEnable()使用的是GL_LIGHT0光源。虽然通过定义光源可以提高一定的真实度，但对三维实体的材质定义更可大幅提高程 序所绘制曲面的逼真程度。OpenGL中所指的材质均指构成三维实体的材料在光照模型中对于R、G、B三原色的反射率。与光源的定义类似，材质的定义分环境、漫射、 镜面反射等成分，另外还有镜面高光指数、辐射成分等等：
+
+//设置材质的反射成分
+GLfloat mat_ambient[]={0.8f,0.8f,0.8f,1.0f};
+GLfloat mat_diffuse[]={0.8f,0.0f,0.0f,1.0f}; //紫色
+GLfloat mat_specular[]={1.0f,0.0f,1.0f,1.0f}; //镜面高光亮紫色 
+GLfloat mat_shininess[]={100.0f}; //高光指数
+glMaterialfv(GL_FRONT,GL_AMBIENT,mat_ambient); //定义环境光反射率
+glMaterialfv(GL_FRONT,GL_DIFFUSE,mat_diffuse); //定义漫射光反射率
+glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular); //定义镜面光反射率
+glMaterialfv(GL_FRONT,GL_SHININESS,mat_shininess); //定义高光指数 
+
+　　OpenGL中材质的颜色与光照模型中光源的颜色含义是不同的。对于在光源中的定义，R、G、B分别表示三原色在光源中所占的比率；而对于材质的定义，R、G、B则表示具有这种材质属性的物体对于三原色的反射率，场景中物体所呈现的颜色是光照模型、材质定义共同作用的结果。
+
+　　结论
+
+　　本文通过OpenGL辅助库提供的NURBS编程接口，在VC++下对自由型曲线曲面进行了绘制，并介绍了对其曲面的光照和材质的渲染方法。通过对本文的理解可以通过OpenGL绘制自由型曲线曲面来更好的对三维实体进行建模，并可进一步感受到OpenGL在三维图形计算机应用中的微妙之处。
+
+http://tech.sina.com.cn/s/s/2005-02-18/0929529145.shtml
