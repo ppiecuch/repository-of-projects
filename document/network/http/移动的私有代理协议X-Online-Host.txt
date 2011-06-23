@@ -1,0 +1,30 @@
+众所周知，在国内的GPRS网络环境下，用户以cmwap接入点上网的情况居多。cmwap是中国移动的GPRS代理上网，因此在创建连接的时候，必须采用代理的方式进行连接。
+假设我连接的URL为：http://wap.uc.cn/；
+在标准代理中，是这样子的：
+Conection to 10.0.0.172:80
+GET http://wap.uc.cn/ HTTP/1.1
+Host: wap.uc.cn
+
+但是在J2ME中，程序并不能控制到TCP层，因此中国移动定义了一个私有协议字段：X-Online-Host。从移动要求的规范来看，我们只需要这样即可正常进行联网：
+Conection to 10.0.0.172:80
+GET / HTTP/1.1
+Host: 10.0.0.172
+X-Online-Host: wap.uc.cn
+实际上对于程序来说，我们只需要将原来连接的url及http header中的host替换成10.0.0.172，并添加一个http header字段：X-Online-Host，值为原来的host。然后继续采用直连的方式即可正常进行联网。 
+
+这样问题就来了，很明显这是一个不标准的代理协议，不标准的地方在于：
+GET / HTTP/1.1
+因为在标准的代理协议规范中，定义了请求的必须是完整的URI。
+这个问题在平常并不会出现，但是当请求的URL比较特殊时，问题就很明显了。
+假设我连接的URL为：http://wap.baidu.com/logo.gif?img=http://wap.uc.cn/uc.png
+使用X-Online-Host协议的联网：
+Conection to 10.0.0.172:80
+GET /logo.gif?img=http://wap.uc.cn/uc.png HTTP/1.1
+Host: 10.0.0.172
+X-Online-Host: wap.baidu.com
+这样的请求到达移动网关之后，会被误发至http://wap.uc.cn/uc.png。但是实际上我们想要请求的是http://wap.baidu.com/logo.gif （?之后的表示变量）。
+因为，移动网关实际上就是一个HTTP的代理服务器，它对于X-Online-Host协议是这样处理的：
+截取请求头中的URL字段：
+如果没有http://字段的话，则将该字段作为相对URI，同X-Online-Host字段进行补全；
+如果有http://字段的话，则将该字段作为绝对URI，将host替换为X-Online-Host的值。
+http://blog.sina.com.cn/s/blog_6c0e670e0100my6z.html
