@@ -1,0 +1,76 @@
+得到联网方式的方法 
+
+public String NetType(Context context) {    
+try {    
+ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);    
+NetworkInfo info = cm.getActiveNetworkInfo();    
+String typeName = info.getTypeName().toLowerCase; // WIFI/MOBILE    
+if(typeName.equals.("wifi")){    
+}else{   
+typeName = mActiveNetworkInfo.getExtraInfo().toLowerCase();   
+//3gnet/3gwap/uninet/uniwap/cmnet/cmwap/ctnet/ctwap    
+}   
+return typeName;   
+} catch (Exception e) {    
+return null;    
+}    
+}   
+
+public String NetType(Context context) { 
+try { 
+ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE); 
+NetworkInfo info = cm.getActiveNetworkInfo(); 
+String typeName = info.getTypeName().toLowerCase; // WIFI/MOBILE 
+if(typeName.equals.("wifi")){ 
+}else{
+typeName = mActiveNetworkInfo.getExtraInfo().toLowerCase();
+//3gnet/3gwap/uninet/uniwap/cmnet/cmwap/ctnet/ctwap 
+}
+return typeName;
+} catch (Exception e) { 
+return null; 
+} 
+} 
+
+
+没有网络时会出现异常，位置为ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE); 
+NetworkInfo info = cm.getActiveNetworkInfo(); 
+
+
+使用代理联网时得到连接对象的方法 
+
+private HttpURLConnection getURLConnection(String url) throws Exception {    
+String proxyHost = android.net.Proxy.getDefaultHost();    
+if (proxyHost != null) {    
+java.net.Proxy p = new java.net.Proxy(java.net.Proxy.Type.HTTP,    
+new InetSocketAddress(android.net.Proxy.getDefaultHost(),    
+android.net.Proxy.getDefaultPort()));    
+  
+return (HttpURLConnection) new URL(url).openConnection(p);    
+  
+} else {    
+return (HttpURLConnection) new URL(url).openConnection();    
+}    
+}   
+
+private HttpURLConnection getURLConnection(String url) throws Exception { 
+String proxyHost = android.net.Proxy.getDefaultHost(); 
+if (proxyHost != null) { 
+java.net.Proxy p = new java.net.Proxy(java.net.Proxy.Type.HTTP, 
+new InetSocketAddress(android.net.Proxy.getDefaultHost(), 
+android.net.Proxy.getDefaultPort())); 
+
+return (HttpURLConnection) new URL(url).openConnection(p); 
+
+} else { 
+return (HttpURLConnection) new URL(url).openConnection(); 
+} 
+} 
+
+
+返回HttpURLConnection对象android.net.Proxy.getDefaultHost()得到手机设置的代理ip，得到android.net.Proxy.getDefaultPort()得到手机设置的端口； 
+也可以自己设置为 10.0.0.172 端口 80 
+
+ 
+
+http://hi.baidu.com/xcb521/blog/item/c84fe0890adcec85a5c27264.html
