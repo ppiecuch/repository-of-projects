@@ -1,0 +1,281 @@
+一直以来产品都有收到用户反馈说，在wap方式下无法更新天气和登录账号及同步等操作，这两天稍微有点时间就赶紧来解决这个问题。
+
+经过测试发现，这个问题的产生是由于运营商（不管是移动、联通还是电信都一个德行。。）提供的wap方式访问网络需要通过代理网关，而我们在程序中使用的网络连接是http直连的方式，因此无法访问网络。解决这个问题的主要思路包括：
+
+1. 检测当前网络环境，判断网络状态
+2. 在联网状态下，判断联网方式是Wifi或者GPRS
+3. 在GPRS连接方式下，判断上网方式是net或是wap
+4. 对于wap连接方式，在程序进行连接时，设置上相应的代理即可。
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+ package com.leau.app.demo.network;
+ 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+ 
+public class NetworkControl {
+ 
+	/**
+	 * 判断当前网络状态是否可用
+	 * @param context
+	 * @return
+	 */
+	public static boolean getNetworkState(Context context){
+		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo info = connectivityManager.getActiveNetworkInfo(); 
+ 
+		if(info != null)
+		{
+			return true;
+		}
+ 
+		return false;
+	}
+ 
+	/**
+	 * 判断网络类型
+	 * @param context
+	 * @return
+	 */
+	public static NetType getNetType(Context context){
+		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(connectivityManager == null) return null; 
+ 
+		NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+		if(info == null) return null;
+ 
+		String type = info.getTypeName();
+ 
+		if (type.equalsIgnoreCase("WIFI")) {
+			// WIFI方式
+			return null;
+		} else if(type.equalsIgnoreCase("MOBILE")) {
+			// GPRS方式
+			String proxyHost = android.net.Proxy.getDefaultHost();
+	        if (proxyHost != null && !proxyHost.equals("")) {
+	        	// WAP方式
+	        	NetType netType = new NetType();
+	            netType.setProxy(proxyHost);
+	        	netType.setPort(android.net.Proxy.getDefaultPort());
+	        	netType.setWap(true);
+	        	return netType;
+	        }
+		}
+		return null;
+	}
+ 
+	public static class NetType {
+		private String apn = "";
+		private String proxy = "";
+		private String typeName = "";
+		private int port = 0;
+		private boolean isWap = false;
+ 
+		public String getApn() {
+			return apn;
+		}
+		public void setApn(String apn) {
+			this.apn = apn;
+		}
+		public int getPort() {
+			return port;
+		}
+		public void setPort(int port) {
+			this.port = port;
+		}
+		public String getProxy() {
+			return proxy;
+		}
+		public void setProxy(String proxy) {
+			this.proxy = proxy;
+		}
+		public boolean isWap() {
+			return isWap;
+		}
+		public void setWap(boolean isWap) {
+			this.isWap = isWap;
+		}
+		public String getTypeName() {
+			return typeName;
+		}
+		public void setTypeName(String typeName) {
+			this.typeName = typeName;
+		}
+	}
+ 
+} 
+
+使用方式如下：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+ ////////////////////////////////////////////////////////////////////////////////
+// 采用URLConnection的方式
+////////////////////////////////////////////////////////////////////////////////
+Proxy proxy;
+boolean getSuccess = false;
+URL url;
+URLConnection urlConnection = null;
+NetType netType = NetworkControl.getNetType(context);
+InputStreamReader isr;
+ 
+url = new URL(httpUrl);
+// 判断Wap网络并设置代理
+if (netType != null && netType.isWap()) {
+	proxy = new Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(netType.getProxy(), netType.getPort()));
+	urlConnection = url.openConnection(proxy);
+	urlConnection.connect();
+	isr = new InputStreamReader(urlConnection.getInputStream(), "UTF-8");
+} else {
+	isr = new InputStreamReader(url.openStream(), "GBK");
+}
+BufferedReader br = new BufferedReader(isr);
+...
+ 
+////////////////////////////////////////////////////////////////////////////////
+// 采用HttpClient的方式
+////////////////////////////////////////////////////////////////////////////////
+HttpClient client = new DefaultHttpClient();
+ 
+// 判断Wap网络并设置代理
+NetType netType = NetworkControl.getNetType(context);
+if (netType != null && netType.isWap()) {
+	HttpHost proxy = new HttpHost(netType.getProxy(), netType.getPort());
+	client.getParams().setParameter(ConnRouteParams.DEFAULT_PROXY, proxy);
+}
+... 
+
+这个方法基本可以解决移动、联通和电信三大运营商下的wap连接问题，包括双卡双待手机（在XT800上试验可行）。不过还存在一点问题就是，wap连接方式不够稳定，偶尔还是会出现连接不上的情况，需要重新操作才能连上。目前没有比较好的解决方法，以后有时间继续研究。有想法或者问题的朋友可以可以发邮件或联系我qq。
+原文链接：http://blog.liaoxiaoqi.com/?p=563
+
+>>> 进入[Android2D游戏开发]主题文章列表 

@@ -1,59 +1,409 @@
-在本文中，我们将通过编写一个触摸屏幕拾取3D空间图元的小程序，来向大家展示如何在OPhone中处理2D屏幕空间与3D世界的交互，并附带介绍包围体、几何相交检测等其他相关知识。程序最终的效果如图1所示，选中的三角形呈现红色半透明，深红色点表示当前屏幕触摸位置： 
+在前两篇介绍OPhone 3D开发的文章中，我们着重介绍了OPhone平台中强大的3D渲染API。在本文中，我们将通过编写一个触摸屏幕拾取3D空间图元的小程序，来向大家展示如何在OPhone中处理2D屏幕空间与3D世界的交互，并附带介绍包围体、几何相交检测等其他相关知识。程序最终的效果如图1所示，选中的三角形呈现红色半透明，深红色点表示当前屏幕触摸位置：
+
  
 
 图1 三角形拾取程序效果图
 什么是拾取
-    在PC 3D游戏中，我们通常需要用鼠标来点击选中屏幕上某个模型。鼠标所在的屏幕是2D平面空间，而游戏世界则是标准的三维立体空间。这个根据2D屏幕坐标来选取3D空间中图元的操作，就是拾取。在手机平台中，触摸屏幕来代替了鼠标点击，三角形则是最基本的渲染图元。因此，如何通过触摸屏幕，来精确选中模型的某个三角形，正是本文所讨论的课题。
+       在PC 3D游戏中，我们通常需要用鼠标来点击选中屏幕上某个模型。鼠标所在的屏幕是2D平面空间，而游戏世界则是标准的三维立体空间。这个根据2D屏幕坐标来选取3D空间中图元的操作，就是拾取。在手机平台中，触摸屏幕来代替了鼠标点击，三角形则是最基本的渲染图元。因此，如何通过触摸屏幕，来精确选中模型的某个三角形，正是本文所讨论的课题。
  
 拾取射线
-    在拾取操作中，首要的一步，就是根据屏幕触摸坐标，来得到3D空间中的拾取射线。有关计算拾取射线的数学推导，这里不做过多叙述，读者可以自行查阅相关资料，下面将直接介绍如何获得拾取射线。
+         在拾取操作中，首要的一步，就是根据屏幕触摸坐标，来得到3D空间中的拾取射线。有关计算拾取射线的数学推导，这里不做过多叙述，读者可以自行查阅相关资料，下面将直接介绍如何获得拾取射线。
  
 
  
 图2 拾取原理图
  
-    如图2所示，z = 0处为视锥体近剪裁面，z = 1处为远剪裁面。我们的拾取射线，就是由触摸位置在近剪裁面上的位置P0，以及在远剪裁面上的位置P1所组成的，其中，P0为射线原点，射线由P0发射指向P1。我们将从P0出发，沿着这条拾取射线，寻找到离P0最近的一个相交三角形，并将其渲染在屏幕上。因此，我们的问题就变成如何求P0以及P1的三维坐标。
+       如图2所示，z = 0处为视锥体近剪裁面，z = 1处为远剪裁面。我们的拾取射线，就是由触摸位置在近剪裁面上的位置P0，以及在远剪裁面上的位置P1所组成的，其中，P0为射线原点，射线由P0发射指向P1。我们将从P0出发，沿着这条拾取射线，寻找到离P0最近的一个相交三角形，并将其渲染在屏幕上。因此，我们的问题就变成如何求P0以及P1的三维坐标。
  
-    在求P0以及P1之前，我们首先要获得屏幕触摸事件的坐标。前面两篇文章中已经介绍过，在重载了GLSurfaceView的onTouchEvent()方法后，我们可以监听触屏事件，并得到事件发生的屏幕坐标（ScreenX，ScreenY）。这里需要注意的是，由于屏幕空间的原点位于左上角，而OpenGL中的视口坐标系中，原点处于左下角，因此，我们需要额外的一个操作，将屏幕坐标转化为OpenGL视口坐标：
+      在求P0以及P1之前，我们首先要获得屏幕触摸事件的坐标。前面两篇文章中已经介绍过，在重载了GLSurfaceView的onTouchEvent()方法后，我们可以监听触屏事件，并得到事件发生的屏幕坐标（ScreenX，ScreenY）。这里需要注意的是，由于屏幕空间的原点位于左上角，而OpenGL中的视口坐标系中，原点处于左下角，因此，我们需要额外的一个操作，将屏幕坐标转化为OpenGL视口坐标：
 OpenGLX = ScreenX;
 OpenGLY = ViewportHeight – ScreenY;
  
-    其中，ViewportHeight是指视口高度。
+        其中，ViewportHeight是指视口高度。
  
-    在获得了OpenGL中的视口坐标之后，OPhone平台中提供了一个辅助函数GLU.gluUnproject()，用于将2D视口坐标，转换为3D空间坐标。该函数详细参数如下：
+       在获得了OpenGL中的视口坐标之后，OPhone平台中提供了一个辅助函数GLU.gluUnproject()，用于将2D视口坐标，转换为3D空间坐标。该函数详细参数如下：
  
 public static int gluUnProject (float winX, float winY, float winZ, float[] model, int modelOffset, float[] project, int projectOffset, int[] view, int viewOffset, float[] obj, int objOffset)
  
-    可以看到，只需要传入视口坐标（winX，winY，winZ）、以及当前的模型视图矩阵model、投影矩阵project，便可得到3D空间中的坐标，并将计算结果存储到obj数组中返回。
+       可以看到，只需要传入视口坐标（winX，winY，winZ）、以及当前的模型视图矩阵model、投影矩阵project，便可得到3D空间中的坐标，并将计算结果存储到obj数组中返回。
  
-    其中，winX就是ScreenX，winY就是OpenGLY，而winZ，我们在求P0时，winZ传入0，求P1时，winZ设置为1，计算得到的P0和P1的三维坐标，将存储在obj数组中。
+       其中，winX就是ScreenX，winY就是OpenGLY，而winZ，我们在求P0时，winZ传入0，求P1时，winZ设置为1，计算得到的P0和P1的三维坐标，将存储在obj数组中。
  
-    在得到P0和P1后，需要将这两个点转换为拾取射线。P0作为射线的原点，根据向量P1-P0来得到射线的方向，相关代码如下：
-/**   
-     * 更新拾取射线   
-     * @param screenX - 屏幕坐标X   
-     * @param screenY - 屏幕坐标Y   
-     */   
-    public static void update(float screenX, float screenY) {       AppConfig.gMatView.fillFloatArray(AppConfig.gpMatrixViewArray);    
-           
-       //由于OpenGL坐标系原点为左下角，而窗口坐标系原点为左上角    
-       //因此，在OpenGl中的Y应该需要用当前视口高度，减去窗口坐标Y    
-       float openglY = AppConfig.gpViewport[3] - screenY;    
-       //z = 0 , 得到P0    
-       gProjector.gluUnProject(screenX, openglY, 0.0f, AppConfig.gpMatrixViewArray, 0,     
-              AppConfig.gpMatrixProjectArray, 0, AppConfig.gpViewport, 0, gpObjPosArray, 0);    
-       //填充射线原点P0    
-       gPickRay.mvOrigin.set(gpObjPosArray[0], gpObjPosArray[1], gpObjPosArray[2]);    
-           
-       //z = 1 ，得到P1    
-       gProjector.gluUnProject(screenX, openglY, 1.0f, AppConfig.gpMatrixViewArray, 0,     
-              AppConfig.gpMatrixProjectArray, 0, AppConfig.gpViewport, 0, gpObjPosArray, 0);    
-       //计算射线的方向，P1 - P0    
-       gPickRay.mvDirection.set(gpObjPosArray[0], gpObjPosArray[1], gpObjPosArray[2]);    
-       gPickRay.mvDirection.sub(gPickRay.mvOrigin);    
-       //向量归一化    
-       gPickRay.mvDirection.normalize();    
+       在得到P0和P1后，需要将这两个点转换为拾取射线。P0作为射线的原点，根据向量P1-P0来得到射线的方向，相关代码如下：
+view plaincopy to clipboardprint?
+/**  
+     * 更新拾取射线  
+     * @param screenX - 屏幕坐标X  
+     * @param screenY - 屏幕坐标Y  
+     */  
+    public static void update(float screenX, float screenY) {       AppConfig.gMatView.fillFloatArray(AppConfig.gpMatrixViewArray);   
+          
+       //由于OpenGL坐标系原点为左下角，而窗口坐标系原点为左上角   
+       //因此，在OpenGl中的Y应该需要用当前视口高度，减去窗口坐标Y   
+       float openglY = AppConfig.gpViewport[3] - screenY;   
+       //z = 0 , 得到P0   
+       gProjector.gluUnProject(screenX, openglY, 0.0f, AppConfig.gpMatrixViewArray, 0,    
+              AppConfig.gpMatrixProjectArray, 0, AppConfig.gpViewport, 0, gpObjPosArray, 0);   
+       //填充射线原点P0   
+       gPickRay.mvOrigin.set(gpObjPosArray[0], gpObjPosArray[1], gpObjPosArray[2]);   
+          
+       //z = 1 ，得到P1   
+       gProjector.gluUnProject(screenX, openglY, 1.0f, AppConfig.gpMatrixViewArray, 0,    
+              AppConfig.gpMatrixProjectArray, 0, AppConfig.gpViewport, 0, gpObjPosArray, 0);   
+       //计算射线的方向，P1 - P0   
+       gPickRay.mvDirection.set(gpObjPosArray[0], gpObjPosArray[1], gpObjPosArray[2]);   
+       gPickRay.mvDirection.sub(gPickRay.mvOrigin);   
+       //向量归一化   
+       gPickRay.mvDirection.normalize();   
     }  
-    这样，只需要在触屏事件触发时，我们从外部调用这个update(int，int)方法，将最新触屏的屏幕坐标传入，就可以更新拾取射线。
+
+/** * 更新拾取射线 * @param screenX - 屏幕坐标X * @param screenY - 屏幕坐标Y */ public static void update(float screenX, float screenY) { AppConfig.gMatView.fillFloatArray(AppConfig.gpMatrixViewArray); //由于OpenGL坐标系原点为左下角，而窗口坐标系原点为左上角 //因此，在OpenGl中的Y应该需要用当前视口高度，减去窗口坐标Y float openglY = AppConfig.gpViewport[3] - screenY; //z = 0 , 得到P0 gProjector.gluUnProject(screenX, openglY, 0.0f, AppConfig.gpMatrixViewArray, 0, AppConfig.gpMatrixProjectArray, 0, AppConfig.gpViewport, 0, gpObjPosArray, 0); //填充射线原点P0 gPickRay.mvOrigin.set(gpObjPosArray[0], gpObjPosArray[1], gpObjPosArray[2]); //z = 1 ，得到P1 gProjector.gluUnProject(screenX, openglY, 1.0f, AppConfig.gpMatrixViewArray, 0, AppConfig.gpMatrixProjectArray, 0, AppConfig.gpViewport, 0, gpObjPosArray, 0); //计算射线的方向，P1 - P0 gPickRay.mvDirection.set(gpObjPosArray[0], gpObjPosArray[1], gpObjPosArray[2]); gPickRay.mvDirection.sub(gPickRay.mvOrigin); //向量归一化 gPickRay.mvDirection.normalize(); }
+ 
+      这样，只需要在触屏事件触发时，我们从外部调用这个update(int，int)方法，将最新触屏的屏幕坐标传入，就可以更新拾取射线。
+ 
+矩阵托管
+现在还有另一个问题需要解决，就是如何得到投影矩阵，以及当前的模型视图矩阵呢？在桌面版的OpenGL中，我们可以通过查询函数glGetFloatv(matrixMode, mat)来得到当前的模型视图矩阵或者投影矩阵，但在OpenGL ES平台中，该函数被精简了，我们无法直接查询得到底层管线的这些矩阵信息，因此只有通过在外部自行维护相应的矩阵拷贝来实现随时的矩阵访问。在这里，我们不得不避开了OPhone平台中提供给我们的简单易用的GLU. gluPersective()函数以及GLU.gluLookAt()函数，而自己去实现相同功能的函数，传入同样的参数，但将计算结果存储在矩阵中保存并返回。相关代码如下：
+view plaincopy to clipboardprint?
+/**  
+     * 模拟实现GLU.gluLookAt()函数，参数相同，将计算结果矩阵返回  
+     * @param eye  
+     * @param center  
+     * @param up  
+     * @param out - 返回的计算结果矩阵  
+     */  
+    public static void gluLookAt(Vector3f eye, Vector3f center, Vector3f up, Matrix4f out) {   
+    tmpF.x = center.x - eye.x;   
+    tmpF.y = center.y - eye.y;   
+    tmpF.z = center.z - eye.z;   
+       
+    tmpF.normalize();   
+    tmpUp.set(up);   
+    tmpUp.normalize();   
+       
+    tmpS.cross(tmpF, tmpUp);   
+    tmpT.cross(tmpS, tmpF);   
+       
+    out.m00 = tmpS.x;   
+    out.m10 = tmpT.x;   
+    out.m20 = -tmpF.x;   
+    out.m30 = 0;   
+       
+    out.m01 = tmpS.y;   
+    out.m11 = tmpT.y;   
+    out.m21 = -tmpF.y;   
+    out.m31 = 0;   
+       
+    out.m02 = tmpS.z;   
+    out.m12 = tmpT.z;   
+    out.m22 = -tmpF.z;   
+    out.m32 = 0;   
+       
+    out.m03 = 0;   
+    out.m13 = 0;   
+    out.m23 = 0;   
+    out.m33 = 1;   
+       
+    tmpMat.setIdentity();   
+    tmpMat.setTranslation(-eye.x, -eye.y, -eye.z);   
+       
+    out.mul(tmpMat);   
+    }   
+    /**  
+     * 模拟实现GLU.gluPersective()函数，参数相同，将计算结果填入返回矩阵中  
+     * @param fovy  
+     * @param aspect  
+     * @param zNear  
+     * @param zFar  
+     * @param out - 计算结果返回  
+     */  
+    public static void gluPersective(float fovy, float aspect, float zNear, float zFar, Matrix4f out) {   
+    float sine, cotangent, deltaZ;   
+    float radians = (float)(fovy / 2 * Math.PI / 180);   
     
-http://edu.gamfe.com/tutor/d/22207.html
+        deltaZ = zFar - zNear;   
+        sine = (float)Math.sin(radians);   
+    
+        if ((deltaZ == 0) || (sine == 0) || (aspect == 0)) {   
+          return;   
+        }   
+    
+        cotangent = (float)Math.cos(radians) / sine;   
+    
+        out.setIdentity();   
+    
+        out.m00 = cotangent / aspect;   
+        out.m11 = cotangent;   
+        out.m22 = - (zFar + zNear) / deltaZ;   
+        out.m32 = -1;   
+        out.m23 = -2 * zNear * zFar / deltaZ;   
+        out.m33 = 0;   
+    }  
+
+/** * 模拟实现GLU.gluLookAt()函数，参数相同，将计算结果矩阵返回 * @param eye * @param center * @param up * @param out - 返回的计算结果矩阵 */ public static void gluLookAt(Vector3f eye, Vector3f center, Vector3f up, Matrix4f out) { tmpF.x = center.x - eye.x; tmpF.y = center.y - eye.y; tmpF.z = center.z - eye.z; tmpF.normalize(); tmpUp.set(up); tmpUp.normalize(); tmpS.cross(tmpF, tmpUp); tmpT.cross(tmpS, tmpF); out.m00 = tmpS.x; out.m10 = tmpT.x; out.m20 = -tmpF.x; out.m30 = 0; out.m01 = tmpS.y; out.m11 = tmpT.y; out.m21 = -tmpF.y; out.m31 = 0; out.m02 = tmpS.z; out.m12 = tmpT.z; out.m22 = -tmpF.z; out.m32 = 0; out.m03 = 0; out.m13 = 0; out.m23 = 0; out.m33 = 1; tmpMat.setIdentity(); tmpMat.setTranslation(-eye.x, -eye.y, -eye.z); out.mul(tmpMat); } /** * 模拟实现GLU.gluPersective()函数，参数相同，将计算结果填入返回矩阵中 * @param fovy * @param aspect * @param zNear * @param zFar * @param out - 计算结果返回 */ public static void gluPersective(float fovy, float aspect, float zNear, float zFar, Matrix4f out) { float sine, cotangent, deltaZ; float radians = (float)(fovy / 2 * Math.PI / 180); deltaZ = zFar - zNear; sine = (float)Math.sin(radians); if ((deltaZ == 0) || (sine == 0) || (aspect == 0)) { return; } cotangent = (float)Math.cos(radians) / sine; out.setIdentity(); out.m00 = cotangent / aspect; out.m11 = cotangent; out.m22 = - (zFar + zNear) / deltaZ; out.m32 = -1; out.m23 = -2 * zNear * zFar / deltaZ; out.m33 = 0; }
+ 
+     这样，我们在设置投影矩阵时，将变成为下面的方式：
+ 
+view plaincopy to clipboardprint?
+//设置投影矩阵   
+       float ratio = (float) width / height;//屏幕宽高比   
+       gl.glMatrixMode(GL10.GL_PROJECTION);   
+       gl.glLoadIdentity();   
+       //GLU.gluPerspective(gl, 45.0f, ratio, 1, 5000);系统方式   
+       Matrix4f.gluPersective(45.0f, ratio, 1, 5000, AppConfig.gMatProject);   
+    gl.glLoadMatrixf(AppConfig.gMatProject.asFloatBuffer());  
+
+//设置投影矩阵 float ratio = (float) width / height;//屏幕宽高比 gl.glMatrixMode(GL10.GL_PROJECTION); gl.glLoadIdentity(); //GLU.gluPerspective(gl, 45.0f, ratio, 1, 5000);系统方式 Matrix4f.gluPersective(45.0f, ratio, 1, 5000, AppConfig.gMatProject); gl.glLoadMatrixf(AppConfig.gMatProject.asFloatBuffer());
+ 
+     设置视图矩阵时就变成：
+view plaincopy to clipboardprint?
+//设置视图矩阵   
+       gl.glMatrixMode(GL10.GL_MODELVIEW);   
+       gl.glLoadIdentity();   
+       //GLU.gluLookAt(gl, mfEyeX, mfEyeY, mfEyeZ, mfCenterX, mfCenterY, mfCenterZ, 0, 1, 0);//系统方式   
+       Matrix4f.gluLookAt(mvEye, mvCenter, mvUp, AppConfig.gMatView);   
+    gl.glLoadMatrixf(AppConfig.gMatView.asFloatBuffer());  
+
+//设置视图矩阵 gl.glMatrixMode(GL10.GL_MODELVIEW); gl.glLoadIdentity(); //GLU.gluLookAt(gl, mfEyeX, mfEyeY, mfEyeZ, mfCenterX, mfCenterY, mfCenterZ, 0, 1, 0);//系统方式 Matrix4f.gluLookAt(mvEye, mvCenter, mvUp, AppConfig.gMatView); gl.glLoadMatrixf(AppConfig.gMatView.asFloatBuffer());
+ 
+      这样，gMatProject以及gMatView，就是我们实时的投影矩阵和视图矩阵。在调用GLU.gluUnProject()函数时，将这两个矩阵对象以列优先的顺序写入到一个float[16]的矩阵数组中使用即可。
+ 
+射线相交检测
+       现在我们得到了3D空间中的拾取射线，就可以通过射线与模型的相交检测，来判定所要拾取的模型了。在本例中，我们使用的模型格式依然是前面所介绍的MS3D格式。在MS3D模型中，每个模型有若干个分组（Group），每个分组是由若干个三角形构成的。因此，我们需要把射线与每一个三角形进行相交检测。由于我们这里的需求，是仅仅得到射线从原点发射之后的前进路径上，第一个与之相交的三角形。因此，可以通过比较射线原点与相交点的线性距离，得到那个距离最近的，这个三角形就是我们所需要的。相关代码如下：
+view plaincopy to clipboardprint?
+/**  
+     * 射线与模型的精确碰撞检测  
+     * @param ray - 转换到模型空间中的射线  
+     * @param trianglePosOut - 返回的拾取后的三角形顶点位置  
+     * @return 如果相交，返回true  
+     */  
+    public boolean intersect(Ray ray, Vector3f[] trianglePosOut) {   
+       boolean bFound = false;   
+       //存储着射线原点与三角形相交点的距离   
+       //我们最后仅仅保留距离最近的那一个   
+       float closeDis = 0.0f;   
+          
+       for(int i = 0; i < mpGroups.length; i++) {   
+           //遍历每个Group   
+           mpBufVertices[i].position(0);   
+           int vertexCount = mpBufVertices[i].limit() / 3;   
+           int triangleCount = vertexCount / 3;   
+           //由于我们提交渲染的顶点数据是以三角形列表的形式填充的，不牵扯到索引值   
+           //因此，每3个顶点就组成一个三角形   
+           for(int idxTriangle = 0; idxTriangle < triangleCount; idxTriangle++) {   
+              //遍历每个三角形   
+              //填充三角形数据，顶点v0, v1, v2   
+              IBufferFactory.read(mpBufVertices[i], v0);   
+              IBufferFactory.read(mpBufVertices[i], v1);   
+              IBufferFactory.read(mpBufVertices[i], v2);   
+              //进行射线和三角行的碰撞检测   
+               if(ray.intersectTriangle(v0, v1, v2, location)) {   
+                  //如果发生了相交   
+                  if(!bFound) {   
+                     //如果是初次检测到，需要存储射线原点与三角形交点的距离值   
+                     bFound = true;   
+                     closeDis = location.w;   
+                     trianglePosOut[0].set(v0);   
+                     trianglePosOut[1].set(v1);   
+                     trianglePosOut[2].set(v2);   
+                  } else {   
+                     //如果之前已经检测到相交事件，则需要把新相交点与之前的相交数据相比较   
+                     //最终保留离射线原点更近的   
+                     if(closeDis > location.w) {   
+                         closeDis = location.w;   
+                         trianglePosOut[0].set(v0);   
+                         trianglePosOut[1].set(v1);   
+                         trianglePosOut[2].set(v2);   
+                     }   
+                  }   
+              }   
+           }   
+           //重置Buffer   
+           mpBufVertices[i].position(0);   
+       }   
+          
+       return bFound;   
+    }  
+
+/** * 射线与模型的精确碰撞检测 * @param ray - 转换到模型空间中的射线 * @param trianglePosOut - 返回的拾取后的三角形顶点位置 * @return 如果相交，返回true */ public boolean intersect(Ray ray, Vector3f[] trianglePosOut) { boolean bFound = false; //存储着射线原点与三角形相交点的距离 //我们最后仅仅保留距离最近的那一个 float closeDis = 0.0f; for(int i = 0; i < mpGroups.length; i++) { //遍历每个Group mpBufVertices[i].position(0); int vertexCount = mpBufVertices[i].limit() / 3; int triangleCount = vertexCount / 3; //由于我们提交渲染的顶点数据是以三角形列表的形式填充的，不牵扯到索引值 //因此，每3个顶点就组成一个三角形 for(int idxTriangle = 0; idxTriangle < triangleCount; idxTriangle++) { //遍历每个三角形 //填充三角形数据，顶点v0, v1, v2 IBufferFactory.read(mpBufVertices[i], v0); IBufferFactory.read(mpBufVertices[i], v1); IBufferFactory.read(mpBufVertices[i], v2); //进行射线和三角行的碰撞检测 if(ray.intersectTriangle(v0, v1, v2, location)) { //如果发生了相交 if(!bFound) { //如果是初次检测到，需要存储射线原点与三角形交点的距离值 bFound = true; closeDis = location.w; trianglePosOut[0].set(v0); trianglePosOut[1].set(v1); trianglePosOut[2].set(v2); } else { //如果之前已经检测到相交事件，则需要把新相交点与之前的相交数据相比较 //最终保留离射线原点更近的 if(closeDis > location.w) { closeDis = location.w; trianglePosOut[0].set(v0); trianglePosOut[1].set(v1); trianglePosOut[2].set(v2); } } } } //重置Buffer mpBufVertices[i].position(0); } return bFound; }
+ 
+        MS3D的渲染提交数据是以三角形列表的形式填充的，不牵扯到外部索引。因此我们以每3个顶点为单位构建一个三角形，来与射线进行相交检测。这就面临一个问题，我们所使用的顶点数据，是处于模型坐标系中的模型内部顶点，也就是把模型坐标系的原点放置与世界坐标系中的原点，并且对模型不加以任何的平移旋转缩放操作，这时模型坐标系中的顶点位置就是世界坐标系中的顶点位置。而一旦模型进行了平移、旋转或者缩放操作之后，模型坐标系和世界坐标系就不再相同，对于模型的内部顶点，需要经过模型矩阵的变换，才能得到世界坐标系中的位置。而前面我们得到的拾取射线，是在世界坐标系中的表示。因此，我们需要将模型顶点与射线统一到一个坐标系中。这里有两种方式，一种是把全部顶点都转换到世界坐标系中，与拾取射线相检测；另一种就是把拾取射线变换到模型坐标系中。从计算量上来看，模型可能有数百个顶点需要变换，而射线变换仅仅需要2次顶点变换。无疑，我们会选择后一种方法。
+ 
+          在之前的例子中，我们对于模型矩阵的操作，也是调用的系统变换函数，glTranslate()、glRotate()、glScale()等。但这也面临同样的一个问题，就是无法得到管线底层的当前模型矩阵。因此，我们必须要托管模型矩阵变换信息，这样，操作模型的代码就改变成为：
+view plaincopy to clipboardprint?
+//-------使用系统函数进行变换   
+    //gl.glRotatef(mfAngleX, 1, 0, 0);//绕X轴旋转   
+    //gl.glRotatef(mfAngleY, 0, 1, 0);//绕Y轴旋转   
+    //-------托管方式进行变换   
+Matrix4f matRotX = new Matrix4f();   
+    Matrix4f matRotY = new Matrix4f();   
+    matRotX.setIdentity();   
+    matRotY.setIdentity();   
+    matRotX.rotX((float)(mfAngleX * Math.PI / 180));   
+    matRotY.rotY((float)(mfAngleY * Math.PI / 180));   
+          
+    AppConfig.gMatModel.set(matRotX);         AppConfig.gMatModel.mul(matRotY);   
+              
+gl.glMultMatrixf(AppConfig.gMatModel.asFloatBuffer());  
+
+//-------使用系统函数进行变换 //gl.glRotatef(mfAngleX, 1, 0, 0);//绕X轴旋转 //gl.glRotatef(mfAngleY, 0, 1, 0);//绕Y轴旋转 //-------托管方式进行变换 Matrix4f matRotX = new Matrix4f(); Matrix4f matRotY = new Matrix4f(); matRotX.setIdentity(); matRotY.setIdentity(); matRotX.rotX((float)(mfAngleX * Math.PI / 180)); matRotY.rotY((float)(mfAngleY * Math.PI / 180)); AppConfig.gMatModel.set(matRotX); AppConfig.gMatModel.mul(matRotY); gl.glMultMatrixf(AppConfig.gMatModel.asFloatBuffer());
+ 
+     经过上面的操作，我们的模型矩阵就存储在gMatModel中，并可以随时访问。
+       
+      模型矩阵的作用，是将模型坐标系中的顶点，变换到世界坐标系中。而我们的需求是把射线从世界坐标系变换到模型坐标系中。因此，我们需要首先得到模型矩阵的逆矩阵，然后用这个逆矩阵去变换射线，变换后的结果就是射线在模型坐标系中的表示。从而可以用来与模型坐标系中的三角形进行相交检测。变换射线的相关代码如下：
+view plaincopy to clipboardprint?
+/**  
+     * 变换射线，将结果存储到out中  
+     * @param matrix - 变换矩阵  
+     * @param out - 变换后的射线  
+     */  
+    public void transform(Matrix4f matrix, Ray out) {   
+       Vector3f v0 = Vector3f.TEMP;   
+       Vector3f v1 = Vector3f.TEMP1;   
+       v0.set(mvOrigin);   
+       v1.set(mvOrigin);   
+       v1.add(mvDirection);   
+    
+       matrix.transform(v0, v0);   
+       matrix.transform(v1, v1);   
+    
+       out.mvOrigin.set(v0);   
+       v1.sub(v0);   
+       v1.normalize();   
+       out.mvDirection.set(v1);   
+    }  
+
+/** * 变换射线，将结果存储到out中 * @param matrix - 变换矩阵 * @param out - 变换后的射线 */ public void transform(Matrix4f matrix, Ray out) { Vector3f v0 = Vector3f.TEMP; Vector3f v1 = Vector3f.TEMP1; v0.set(mvOrigin); v1.set(mvOrigin); v1.add(mvDirection); matrix.transform(v0, v0); matrix.transform(v1, v1); out.mvOrigin.set(v0); v1.sub(v0); v1.normalize(); out.mvDirection.set(v1); }
+ 
+包围体快速排除
+       在模型与射线相交检测的方法中，大家可以看 到，我们需要把模型的每一个三角形与射线进行精确的相交检测。一个模型往往有数百个面，这样一来，精确检测对于CPU来说就成了一项繁重的工作。因此，我们需要尽可能的少调用这个方法。假设模型位于屏幕的中央，在点击屏幕边角时，很明显是无法拾取模型的，这时候，就需要我们使用一种快速排除策略，来将大部分无效的拾取操作过滤掉，因此我们引入了包围体的概念。所谓包围体，就是将一组物体完全包容起来的封闭空间。将复杂模型用简单的包围体封装起来，可以大大提高几何运算的效率。
+
+   
+图3 常用包围体 a）包围球 b）轴对称包围盒 c）定向包围盒
+ 
+        如图3所示，常用的包围体有包围球（Sphere），轴对称包围盒（AABB），定向包围盒（OBB）等。此外，还有椭圆、圆柱、胶囊、凸包等其他包围体。从上图可以看到，对于不同形状的模型，不同包围体的空间冗余度会有很大差异。在实际应用中，根据具体情况来选择一个最合适的包围体，往往可以达到事半功倍的效果。本例中，我们采用的是最简单的包围球。包围球与射线相交检测的代码非常简单，速度也非常快：
+view plaincopy to clipboardprint?
+/**  
+     * 检测射线是否与包围球相交  
+     *   
+     * @param center  
+     *            圆心  
+     * @param radius  
+     *            半径  
+     * @return 如果相交返回true  
+     */  
+    public boolean intersectSphere(Vector3f center, float radius) {   
+       Vector3f diff = tmp0;   
+       diff.sub(mvOrigin, center);   
+       float r2 = radius * radius;   
+       float a = diff.dot(diff) - r2;   
+       if (a <= 0.0f) {   
+           //在包围球内   
+           return true;   
+       }   
+          
+       float b = mvDirection.dot(diff);   
+       if (b >= 0.0f) {   
+           return false;   
+       }   
+       return b * b >= a;   
+    }  
+
+/** * 检测射线是否与包围球相交 * * @param center * 圆心 * @param radius * 半径 * @return 如果相交返回true */ public boolean intersectSphere(Vector3f center, float radius) { Vector3f diff = tmp0; diff.sub(mvOrigin, center); float r2 = radius * radius; float a = diff.dot(diff) - r2; if (a <= 0.0f) { //在包围球内 return true; } float b = mvDirection.dot(diff); if (b >= 0.0f) { return false; } return b * b >= a; }
+ 
+      载入模型时，我们会根据模型所有的顶点，构建出模型的包围球。注意这个初始的包围球也是基于模型坐标系中的表示，因此在与射线进行相交检测时，也要注意两者应处于同一个坐标系中。
+       
+        有了包围球之后，我们的拾取判定流程，就增加了一步。先将拾取射线与模型的包围球做快速的相交检测，如果两者不相交，那么就无须进行下一步的最为耗时的射线与模型的精确三角形相交检测。完整代码如下：
+view plaincopy to clipboardprint?
+/**  
+     * 更新拾取事件  
+     */  
+    private void updatePick() {   
+       if(!AppConfig.gbNeedPick) {   
+           return;   
+       }   
+       AppConfig.gbNeedPick = false;   
+       //更新最新的拾取射线   
+       PickFactory.update(AppConfig.gScreenX, AppConfig.gScreenY);   
+       //获得最新的拾取射线   
+       Ray ray = PickFactory.getPickRay();   
+          
+       //首先把模型的绑定球通过模型矩阵，由模型局部空间变换到世界空间   
+       AppConfig.gMatModel.transform(mModel.getSphereCenter(), transformedSphereCenter);   
+       //首先检测拾取射线是否与模型绑定球发生相交   
+       //这个检测很快，可以快速排除不必要的精确相交检测   
+       if(ray.intersectSphere(transformedSphereCenter, mModel.getSphereRadius())) {   
+           //如果射线与绑定球发生相交，那么就需要进行精确的三角面级别的相交检测   
+           //由于我们的模型渲染数据，均是在模型局部坐标系中   
+           //而拾取射线是在世界坐标系中   
+           //因此需要把射线转换到模型坐标系中   
+           //这里首先计算模型矩阵的逆矩阵   
+           matInvertModel.set(AppConfig.gMatModel);   
+           matInvertModel.invert();   
+           //把射线变换到模型坐标系中，把结果存储到transformedRay中   
+           ray.transform(matInvertModel, transformedRay);   
+           //将变换后的射线与模型做精确相交检测   
+           if(mModel.intersect(transformedRay, mpTriangle)) {   
+              //如果找到了相交的最近的三角形   
+              AppConfig.gbTrianglePicked = true;   
+              //填充数据到被选取三角形的渲染缓存中   
+              mBufPickedTriangle.position(0);   
+              for(int i = 0; i < 3; i++) {   
+                  IBufferFactory.fillBuffer(mBufPickedTriangle, mpTriangle[i]);   
+              }   
+              mBufPickedTriangle.position(0);   
+           }   
+       } else {   
+           AppConfig.gbTrianglePicked = false;   
+       }   
+    }  
+
+/** * 更新拾取事件 */ private void updatePick() { if(!AppConfig.gbNeedPick) { return; } AppConfig.gbNeedPick = false; //更新最新的拾取射线 PickFactory.update(AppConfig.gScreenX, AppConfig.gScreenY); //获得最新的拾取射线 Ray ray = PickFactory.getPickRay(); //首先把模型的绑定球通过模型矩阵，由模型局部空间变换到世界空间 AppConfig.gMatModel.transform(mModel.getSphereCenter(), transformedSphereCenter); //首先检测拾取射线是否与模型绑定球发生相交 //这个检测很快，可以快速排除不必要的精确相交检测 if(ray.intersectSphere(transformedSphereCenter, mModel.getSphereRadius())) { //如果射线与绑定球发生相交，那么就需要进行精确的三角面级别的相交检测 //由于我们的模型渲染数据，均是在模型局部坐标系中 //而拾取射线是在世界坐标系中 //因此需要把射线转换到模型坐标系中 //这里首先计算模型矩阵的逆矩阵 matInvertModel.set(AppConfig.gMatModel); matInvertModel.invert(); //把射线变换到模型坐标系中，把结果存储到transformedRay中 ray.transform(matInvertModel, transformedRay); //将变换后的射线与模型做精确相交检测 if(mModel.intersect(transformedRay, mpTriangle)) { //如果找到了相交的最近的三角形 AppConfig.gbTrianglePicked = true; //填充数据到被选取三角形的渲染缓存中 mBufPickedTriangle.position(0); for(int i = 0; i < 3; i++) { IBufferFactory.fillBuffer(mBufPickedTriangle, mpTriangle[i]); } mBufPickedTriangle.position(0); } } else { AppConfig.gbTrianglePicked = false; } }
+ 
+渲染拾取的三角形
+        在经历了上面一系列的操作之后，如果我们得到了拾取判定相交的三角形，则需要将其渲染出来。在本例中，我们将返回的三角形，以红色半透明纯色填充的方式渲染在模型之上。需要注意的是，我们得到的三角形数据也是模型坐标系中的位置，需要经过与该模型同样的模型变换后，将它们变换到世界坐标系中，才能使三角形与模型位置表现相一致。相关代码如下：
+view plaincopy to clipboardprint?
+/**  
+     * 渲染选中的三角形  
+     * @param gl  
+     */  
+    private void drawPickedTriangle(GL10 gl) {   
+       if(!AppConfig.gbTrianglePicked) {   
+           return;   
+       }   
+       //由于返回的拾取三角形数据是出于模型坐标系中   
+       //因此需要经过模型变换，将它们变换到世界坐标系中进行渲染   
+       //设置模型变换矩阵   
+       gl.glMultMatrixf(AppConfig.gMatModel.asFloatBuffer());   
+       //设置三角形颜色，alpha为0.7   
+       gl.glColor4f(1.0f, 0.0f, 0.0f, 0.7f);   
+       //开启Blend混合模式   
+       gl.glEnable(GL10.GL_BLEND);   
+       gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);   
+       //禁用无关属性，仅仅使用纯色填充   
+       gl.glDisable(GL10.GL_DEPTH_TEST);   
+       gl.glDisable(GL10.GL_TEXTURE_2D);   
+       //开始绑定渲染顶点数据   
+       gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);   
+       gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mBufPickedTriangle);   
+       //提交渲染   
+       gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 3);   
+       //重置相关属性   
+       gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);   
+       gl.glEnable(GL10.GL_DEPTH_TEST);   
+       gl.glDisable(GL10.GL_BLEND);   
+    }  
+
+/** * 渲染选中的三角形 * @param gl */ private void drawPickedTriangle(GL10 gl) { if(!AppConfig.gbTrianglePicked) { return; } //由于返回的拾取三角形数据是出于模型坐标系中 //因此需要经过模型变换，将它们变换到世界坐标系中进行渲染 //设置模型变换矩阵 gl.glMultMatrixf(AppConfig.gMatModel.asFloatBuffer()); //设置三角形颜色，alpha为0.7 gl.glColor4f(1.0f, 0.0f, 0.0f, 0.7f); //开启Blend混合模式 gl.glEnable(GL10.GL_BLEND); gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA); //禁用无关属性，仅仅使用纯色填充 gl.glDisable(GL10.GL_DEPTH_TEST); gl.glDisable(GL10.GL_TEXTURE_2D); //开始绑定渲染顶点数据 gl.glEnableClientState(GL10.GL_VERTEX_ARRAY); gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mBufPickedTriangle); //提交渲染 gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 3); //重置相关属性 gl.glDisableClientState(GL10.GL_VERTEX_ARRAY); gl.glEnable(GL10.GL_DEPTH_TEST); gl.glDisable(GL10.GL_BLEND); }
+ 
+高级话题
+         在上面的讨论中，最为耗时的操作无疑是射线与模型所有三角形的相交检测。本例中的模型面数均较少，因此代价尚可接受。但如果模型有成千上万面，遍历检测将会极大占用CPU资源，尤其是在实时操作中会导致应用程序响应极为缓慢，这显然是让人无法接受的。解决此问题的方法，目前常用的是建立树形层次包围体，比如Sphere-tree、AABB-tree、OBB-tree、kD-tree等。由于层次包围体树的构建及使用比较复杂，限于篇幅关系，这里不做过多讨论，读者可自行查阅相关资料，或者可以通过EMail(xueyong@live.com)来与我一起讨论。
+ 
+总结
+      在开发过程中，应用程序与用户的交互是非常重要的一部分，而在3D中，这种交互处理起来相对复杂一点。本文通过分析和解决手机触摸屏幕拾取3D空间图元的问题，向读者介绍了OPhone平台中如何处理2D与3D的交互，以及包围体、射线和几何相交检测等相关知识。
+ 
+作者介绍
+        薛永，专注于移动平台3D应用程序的开发，熟悉M3G，JSR 239，OpenGL ES(OPhone&iphone)等多种移动3D开发平台。目前正在自主开发全套3D引擎，包括PC端场景/模型/动画/UI编辑器，3ds max导出插件，面向Java、C++的客户端。同时在制作一款3D射击游戏，到时会面向OPhone、iphone等多个平台发布。
+ 
+（声明：本网的新闻及文章版权均属OPhone SDN网站所有，如需转载请与我们编辑团队联系。任何媒体、网站或个人未经本网书面协议授权，不得进行任何形式的转载。已经取得本网协议授权的媒体、网站，在转载使用时请注明稿件来源。）
+
+http://www.ophonesdn.com/article/show/164

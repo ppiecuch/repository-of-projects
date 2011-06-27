@@ -1,0 +1,11 @@
+private HttpURLConnection getURLConnection(String url) throws Exception {
+String proxyHost = android.net.Proxy.getDefaultHost();
+if (proxyHost != null) {
+java.net.Proxy p = new java.net.Proxy(java.net.Proxy.Type.HTTP,
+new InetSocketAddress(android.net.Proxy.getDefaultHost(),
+android.net.Proxy.getDefaultPort())); 
+return (HttpURLConnection) new URL(url).openConnection(p);
+} else {
+return (HttpURLConnection) new URL(url).openConnection();
+}
+}
