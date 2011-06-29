@@ -1,0 +1,19 @@
+介绍一个开源的图片库DevIL 
+DevIL是致力于开发应用程序中图片显示加载函数库，他有非常强大的功能，同时非常容易学习和掌握。开发人员可以使用它轻易的加载各种格式的图片。
+目前DevIL可以加载的图片格式有:
+.bmp, .cut, .dds, .doom, .gif, .ico, .jpg, .lbm, .mdl, .mng, .pal, .pbm, .pcd, .pcx, .pgm, .pic, .png, .ppm, .psd, .psp, .raw, .sgi, .tga and .tif .hdr files.
+Formats supported for saving include .bmp, .dds, .h, .jpg, .pal, .pbm, .pcx, .hdr, .pgm,.png, .ppm, .raw, .sgi, .tga and .tif.
+
+DevIL目前支持OpenGL,Windows GDI,SDL,DirectX等等，而且看上去好像还是全平台的.
+
+DevIL的站点在
+http://openil.sourceforge.net/
+
+Developer's Image Library (DevIL) is a programmer's library to develop applications with very powerful image loading capabilities, yet is easy for a developer to learn and use. Ultimate control of images is left to the developer, so unnecessary conversions, etc. are not performed. DevIL utilizes a simple, yet powerful, syntax. DevIL can load, save, convert, manipulate, filter and display a wide variety of image formats.
+
+Currently, DevIL can load .bmp, .cut, .dds, .doom, .gif, .ico, .jpg, .lbm, .mdl, .mng, .pal, .pbm, .pcd, .pcx, .pgm, .pic, .png, .ppm, .psd, .psp, .raw, .sgi, .tga and .tif .hdr files.
+Formats supported for saving include .bmp, .dds, .h, .jpg, .pal, .pbm, .pcx, .hdr, .pgm,.png, .ppm, .raw, .sgi, .tga and .tif. 
+
+DevIL currently supports the following APIs for display: OpenGL, Windows GDI, SDL, DirectX and Allegro. Compilers that can compile DevIL or use it include Djgpp, MSVC++, Linux gcc, Delphi, Visual Basic, Power Basic and Dev-C++.
+
+
