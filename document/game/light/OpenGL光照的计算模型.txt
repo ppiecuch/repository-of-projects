@@ -1,0 +1,78 @@
+前言
+
+	OpenGL中的关照分为Ambient, Diffuse, Specular, Emiiter(模型的)部分，这里将介绍几种计算的模型。最终给出OpenGL的光照计算公式.
+
+=======
+
+Diffuse分量
+
+	Lambertian Reflection模型是针对diffuse分量的, diffuse假定接收到得光的密度跟观察者的位置无关, 它正比于lights diffuse intensity 和material's diffuse reflection 系数, 同时还正比于光线与表面法线的夹角.
+
+                 Diffuse        计算公式为：          
+
+下面的一段是Lambert的历史：
+
+          This is known as Lambertian Reflection. 'Lambert's cosine law' states that the brightness of a diffusely radiating plane surface is proportional to the cosine of the angle formed by the line of sight and the normal to the surface. This was more than 200 years ago (Johann Heinrich Lambert, 1728-1777)!
+
+========
+
+Specular分量
+
+	1. Phong model
+
+		phong model表明specular分量正比于反射光与观察点向量的夹角的余弦值(cosine).
+
+                
+
+               L向量: 光源--->顶点.     N: 法向量      Eye向量: 顶点--->Eye.   R: 反射光
+
+       当Eye与R的夹角越大，specular越衰减， 衰减系数由shininess控制。shininess越大,衰减越快。
+
+       
+
+	2. Blinn-Phong model (Or Blinn)
+
+		该模型是Phong的简化版, 它是基于Half-Vector的，Half-Vector是入射光与Eye的中间向量。如下图：
+
+                             	
+
+           Specular的计算如下：
+
+
+
+
+
+
+==============
+
+完整的OpenGL光照计算
+
+==============
+
+	在光的传播过程中会出现衰减，在OpenGL中有两种情况：1.点光源；2.椎体光.  最终落到顶点时光的各个分量为：
+
+               LAmbient  = 衰减系数 * 椎体光影响 * 初始的ambient；
+
+               LDiffuse    = 衰减系数 * 椎体光影响 * 初始的diffuse；
+
+	       LSpecular = 衰减系数 * 椎体光影响 * 初始的specular；
+
+然后和材质进行计算公式为:
+
+        顶点Color =  全局环境光*全局环境光材质  + 各个光源的作用{ Ma * LAmbient) + DFactor * Md * LDiffuse) + SFactor * Ms * LSpecular)}
+
+将上面的等式代入得:
+
+        顶点Color = 全局环境光*全局环境光材质 + 
+
+        各个光源的作用{衰减系数 * 椎体光影响 * (Ma * 初始的ambient + DFactor * Md * 初始的diffuse + SFactor * Ms * 初始的specular)}
+
+下面逐个介绍一些变量的计算(全部在下图中)
+
+	
+
+结束！！
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/huangzhipeng/archive/2010/09/24/5903698.aspx

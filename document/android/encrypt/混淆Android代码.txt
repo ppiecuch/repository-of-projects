@@ -1,0 +1,107 @@
+这两天公司组织旅游了，刚升级的SDK2.3只是装上了还没细看。今天一看，呵呵，有收获了。
+
+2.3SDK的两个新特点：
+
+1.刚安装上2.3时，查看sdk目录，发现在<SDK_PATH>\tools下新增了一文件夹“proguard”,如下图,我就在想是不是Google终于官方对proguard考虑进去了。理论上，对java的混淆都是可以的，但关键在于如何编写proguard的混淆脚本。
+
+ 
+
+2.使用SDK2.3后，新建的工程下和之前相比，都会多了一个文件“proguard.cfg”。一打开，相当惊喜，这就是混淆所需的proguard脚本啊。
+
+如下图：
+
+ 
+
+其代码如下：
+
+view plaincopy to clipboardprint?
+-optimizationpasses 5  
+-dontusemixedcaseclassnames   
+-dontskipnonpubliclibraryclasses   
+-dontpreverify   
+-verbose   
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*   
+-keep public class * extends android.app.Activity   
+-keep public class * extends android.app.Application   
+-keep public class * extends android.app.Service   
+-keep public class * extends android.content.BroadcastReceiver   
+-keep public class * extends android.content.ContentProvider   
+-keep public class com.android.vending.licensing.ILicensingService   
+-keepclasseswithmembernames class * {   
+    native <methods>;   
+}   
+-keepclasseswithmembernames class * {   
+    public <init>(android.content.Context, android.util.AttributeSet);   
+}   
+-keepclasseswithmembernames class * {   
+    public <init>(android.content.Context, android.util.AttributeSet, int);   
+}   
+-keepclassmembers enum * {   
+    public static **[] values();   
+    public static ** valueOf(java.lang.String);   
+}   
+-keep class * implements android.os.Parcelable {   
+  public static final android.os.Parcelable$Creator *;   
+}  
+-optimizationpasses 5
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-dontpreverify
+-verbose
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class com.android.vending.licensing.ILicensingService
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+-keepclasseswithmembernames class * {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+-keepclasseswithmembernames class * {
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+} 
+
+从脚本中可以看到，混淆中保留了继承自Activity、Service、Application、BroadcastReceiver、ContentProvider等基本组件。
+
+并保留了所有的Native变量名及类名，所有类中部分以设定了固定参数格式的构造函数，枚举等等。(详细信息请参考<proguard_path>\examples中的例子及注释。)
+
+好了，进行得差不多了，下面就来看看如何真正的生成混淆APK吧。这儿又得提醒一下，SDK新的特性在文档里都是有的，所以文档很重要。
+
+查看SDK2.3的文档，在路径“<androidSDK_path>/docs/guide/developing/tools/proguard.html”的“Enabling ProGuard ”中是这样描述的：
+
+To enable ProGuard so that it runs as part of an Ant or Eclipse build, set the proguard.config property in the <project_root>/default.properties file. The path can be an absolute path or a path relative to the project's root.
+
+好的，那就这样做吧。
+
+在工程的"default.properties"中添加这样一句话“proguard.config=proguard.cfg”，如下图：
+
+ 
+
+这样就已经设置好ADT的混淆操作了。接下来就是正常的打包和签名了。。
+
+下图是我混淆SDK Demo中自带的Notepad效果图：
+
+ 
+
+哈哈，你也去试下吧。
+
+
+
+
+本文内容归CSDN博客博主Sodino 所有
+转载请注明出处:http://blog.csdn.net/sodino/archive/2010/12/13/6072914.aspx 
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/sodino/archive/2010/12/13/6072914.aspx
