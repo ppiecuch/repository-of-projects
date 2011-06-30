@@ -1,0 +1,55 @@
+多维数组和对象数组一样处理，例如二维数组里的每个元素还是一个数组 用jArray表示，直到数组变为一维的，且里面元素为基本类型，去获得一维数组指针。给大家提供个例子。已经测试通过。
+
+Java_cn_wzl_FiveChessView_checkWin( JNIEnv* env,jobject thiz,jobjectArray qizidata)
+
+{
+
+
+jint i,j;
+
+
+int size = (*env)->GetArrayLength(env, qizidata);//获得行数
+
+
+jarray myarray = ((*env)->GetObjectArrayElement(env, qizidata, 0));
+
+
+int col =
+(*env)->GetArrayLength(env, myarray); //获得列数
+
+
+jint qizi[size][col];
+
+       
+
+
+for (i = 0; i < size; i++)
+
+
+{
+
+
+myarray = ((*env)->GetObjectArrayElement(env, qizidata, i));
+
+
+jint *coldata = (*env)->GetIntArrayElements(env, (jintArray)myarray, 0 );
+
+
+for (j=0; j<col; j++) 
+
+
+{
+
+
+   qizi[i][j] = coldata[j];
+
+
+}
+
+
+}
+
+
+}
+
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=82165

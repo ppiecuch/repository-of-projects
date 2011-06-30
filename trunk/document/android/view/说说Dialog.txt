@@ -1,0 +1,86 @@
+在Android中,Dialog是一个非常重要的UI, 它可以方便的给用户提示,用最简洁的方式向用户展示信息, 以下的图片是Dialog的一个整体架构，通过它，可以总体对Dialog有一个很清晰的认识. 
+
+(图)
+ 
+
+前天 16:56 上传下载附件 (19.47 KB) 
+
+
+
+       从这张图中可以看到，Dialog为父类, 其下有最重要的， 我们最常用的AlertDilog, 而AlertDialog的子类，则是由DatPicker, ProgressDialog,TimePick来组成. 
+
+
+        这几个子类都是我们在程序开发中最常用的,因此要重点理解, 我们可以试着想像一下，如下几个问题的答案 
+        <1> 怎么产生一个Dialog? 
+        <2> Dialog与Activity是什么关系? 为什么显示Dialog的时候，Activity就失去了焦点,不能被点击,在系统内部到底是怎么管理他们的关系的? 
+
+        我们以ProgressDialog为例, 通过分析其源码，让我们彻底理解它的内部运行机制 
+
+        <1> 怎么产生一个ProgressDialog? 
+        通过打开ProgressDialog的源码， 可以看到它有2个构造方法, 
+        ProgressDialog(Context context) 
+        ProgressDialog(Context context,int theme) 
+        参数解释: context:说明它是依靠Context,必须通过一个Context来创建它, 第二个参数theme: 此dialog的主题. 
+         另外我们还可以发现  有四个静态的show方法，他们只是参数不同, 
+         show(Context context,CharSequence title,CharSequence message); 
+         show(Context context,CharSequence title,CharSequence message,boolean indeterminate); 
+         其时，我们只看最后一个静态方法就行了，因为三个静态方法，最终会调用最后一个参数最多的show静态方法来完成功能. 
+
+        它所实现的功能是: 
+        ProgressDialog dialog=new ProgressDiaog(context); 
+        dialog.show(); 
+        这其实跟，我们调用构造方法是一样的. 
+        到这一步，仅仅是知道了，怎么调用产生的ProgressDialog的，但具体内部的细节呢。还要看onCreate()方法, 此方法才是真正能产生progressDialogr 地方, 它跟Activity中的onCreate()方法是一样的，就是初始化的时候调用, 我们看其源码如下: 
+
+        首先看到的是一个名叫 mViewUpdatehandler的 Handler, 这个Handler主要用来更新progress的值, (百分比),接着往下看... 
+        有这么一句: View view=inflater.inflate(R.layout.alert_dialog_press,null); 
+        很明显，这就是我们看到的,显示在dialog中转圈的那个东东. 然而，这个alert_dialog_pross文件是在com.android.internal.R 包中,属于系统定义的ui配置文件. 
+
+         最后调用 setView(view)方法来, 来把view显示在Dialog上。 
+         因此，我们同样也可以实现自定义一个dialog.xml文件，来调用setView()方法显示上来. 
+         这个setView()方法是AlertDialog类中定义的，等会再解释! 
+         这就是我们平时所见到的 ProgressDialog。分析完毕。 
+
+
+       AlertDialog 
+        接下来，我们开始分析ProgressDialog的父类  AlertDialog. 
+
+        打开源码，首先映入眼帘的是 三个构造方法，但这三个构造方法都是protected类型的，可见，不允许我们直接实例化AlertDialog. 因此，我们再看别的有没有方法.可以实例化 再仔细一看，发现一个变量 , 
+        AlertController mAlert; 这个才是我们今天的主角,重点研究它. 
+        mAlert的定义是在 ,以上我们提到的AlertDialog的构造函数, 
+
+        此外，我们还发现，AlertDialog中几乎所有的方法都是通过这个mAlert变量来操作的, 
+
+        也就是说，AlertDialog是一个空壳，并没有实际的作用, 它的实质是AlertController类. 就是我刚才说的  "主角" 。 而Alertcontroller的源码，是Android系统自带的，我们需要花费一番力气去查找. 
+
+        在往下看，AlertDialog 类中,发现一个静态类 Builder,  通过这个类，我们也可以直接创建一个Dialog, 
+Builder静态类中也同样有一个AlertController.Alertparams的类的对象 P,我们再看Builder的源码,它里面可以设置所有Dialog的的方法,包括 
+
+
+        setTitle(CharSequence title) 
+        setMessage(int messageId); 
+        setIcon(int iconId); 
+        setPositiveButton() 
+
+
+        等，我们看这些方法的的内部实现，全部是针对它的内置对象P 来实现的, 也就是我们所调用的这些方法，最终结果实际上是用在了AlertController.AlertParams 类的对象P 身上,而别外还有一个有趣的现象，这些方法的返回值都是Builder对象, 也就是说，我们可以连级调用此方法, 而显示一个Dialog，仅仅调用这些set 方法，还不够，最后还差一步, 就是调用create()方法，这个方法是最后调用的，也就是创建对话框, 我们看，create方法中都做了那些动作 
+
+java代码：
+
+
+public AlertDialog create() { 
+
+final AlertDialog dialog =new AlertDialog(p.mContext); 
+
+p.apply(dialog.mAlert) 
+
+dialog.setCancelable(P.mCancelable); 
+
+
+
+return dialog; 
+
+} 
+复制代码
+
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=82129

@@ -1,0 +1,98 @@
+Android 2.0 之后有了 overridePendingTransition（） ，其中里面两个参数，一个是前一个 activity 的退出两一个 activity 的进入。
+
+java代码：
+@Override
+
+public void onCreate(Bundle savedInstanceState) { 
+
+
+
+super.onCreate(savedInstanceState); 
+
+setContentView(R.layout.SplashScreen); 
+
+new Handler().postDelayed(new Runnable() { 
+
+
+
+@Override
+
+public void run() { 
+
+Intent mainIntent = new Intent(SplashScreen.this,AndroidNews.class); 
+
+SplashScreen.this.startActivity(mainIntent); 
+
+SplashScreen.this.finish(); 
+
+overridePendingTransition(R.anim.mainfadein,R.anim.splashfadeout); 
+
+} 
+
+}, 3000); 
+
+
+
+} 
+复制代码
+         上面的代码只是闪屏的一部分。 
+
+         1. getWindow  ().  setWindowAnimations  (  int  );         
+         这可没有上个好但是也可以。 
+         实现淡入淡出的效果
+
+         overridePendingTransition(Android.R.anim.fade_in,android.R.anim.fade_out);         
+
+         由左向右滑入的效果  
+         overridePendingTransition(Android.R.anim.slide_in_left,android.R.anim.slide_out_right);         
+
+         实现 zoomin 和 zoomout,即类似 iphone 的进入和退出时的效果  
+         overridePendingTransition(R.anim.zoomin,  R.anim.zoomout);   
+
+我们来看看xml代码：
+
+java代码：<?xml version="1.0" encoding="utf-8"?>
+
+<set
+
+xmlns:Android="http://schemas.android.com/apk/res/android"
+
+Android:interpolator="@android:anim/decelerate_interpolator">
+
+<scale Android:fromXScale="2.0" android:toXScale="1.0"
+
+Android:fromYScale="2.0" android:toYScale="1.0"
+
+Android:pivotX="50%p" android:pivotY="50%p"
+
+Android:duration="@android:integer/config_mediumAnimTime" />
+
+</set>
+复制代码
+java代码：
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<set xmlns:Android="http://schemas.android.com/apk/res/android"
+
+Android:interpolator="@android:anim/decelerate_interpolator"
+
+Android:zAdjustment="top">
+
+<scale Android:fromXScale="1.0" android:toXScale=".5"
+
+Android:fromYScale="1.0" android:toYScale=".5"
+
+Android:pivotX="50%p" android:pivotY="50%p"
+
+Android:duration="@android:integer/config_mediumAnimTime" />
+
+<alpha Android:fromAlpha="1.0" android:toAlpha="0"
+
+Android:duration="@android:integer/config_mediumAnimTime"/>
+
+</set>
+复制代码
+
+
+http://www.eoeandroid.com/forum.php?mod=viewthread&tid=82200
