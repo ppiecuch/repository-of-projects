@@ -1,0 +1,24 @@
+OpenGL ES是 OpenGL三维图形API 的子集，针对手机、PDA和游戏主机等嵌入式设备而设计。 OPhone目前支持OpenGL ES 1.0 ，OpenGL ES 1.0 是以 OpenGL 1.3 规范为基础的，OpenGL ES 1.1 是以 OpenGL 1.5 规范为基础的。本文主要介绍利用OpenGL ES绘制图形方面的基本步骤。
+     本文内容由三部分构成。首先通过EGL获得OpenGL ES的编程接口；其次介绍构建3D程序的基本概念；最后是一个应用程序示例。
+ 
+EGL
+       OpenGL ES 本质上是一个图形渲染管线的状态机，而 EGL 则是用于监控这些状态以及维护帧缓冲和其他渲染面的外部层。图1 是一个典型的 EGL 系统布局图。EGL 视窗设计是基于人们熟悉的用于 Microsoft Windows （ WGL ）和 unix （ GLX ）上的 OpenGL 的 Native 接口，与后者比较接近。 OpenGL ES 图形管线的状态被存储于 EGL 管理的一个上下文中。帧缓冲和其他绘制渲染面通过 EGL API 创建、管理和销毁。 EGL 同时也控制和提供了对设备显示和可能的设备渲染配置的访问。
+ 
+   OpenGL ES 需要一个渲染上下文和渲染面。渲染上下文中存储OpenGL ES的状态信息，渲染面用于图元的绘制。编写OpenGL ES之前需要EGL的操作有：
+ 查询设备可以支持的显示句柄，并初始化。 
+ 创建渲染面，绘制OpenGL ES图形。 
+ 创建渲染上下文。EGL需要创建OpenGL ES渲染上下文用于关联到某个渲染面。 
+      Ophone中EGL包括4个类，分别是EGLDisplay：显示句柄、EGLConfig：配置类；EGLContext：渲染上下文；的类和EGLSurface：可渲染的视图类。
+ 
+      EGL可以认为成OpenGL ES和本地窗口系统之间的中间层。 本地窗口系统指GNU/linux上X窗口系统，或者Mac OX X's Quartz等。在EGL确定渲染面的类型前，EGL需要和底层的窗口系统进行通讯。因为在不同的操作系统上的窗口系统的不同，EGL提供一个透明窗口类型，即EGLDisplay。它抽象了各种窗口系统。所以首先要创建、初始化一个EGLDisplay对象。
+ 
+
+// EGLContext的静态方法getEGL获得EGL实例 EGL10 egl = (EGL10)EGLContext.getEGL(); //创建EGLDisplay， EGL_DEFAULT_DISPLAY获得缺省的本地窗口系统类型 EGLDisplay dpy = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY); //初始化EGLDispla的同时获得版本号 int[] version = new int[2]; egl.eglInitialize(dpy, version);  
+
+   每个 EGLDisplay 在使用前都需要初始化。初始化 EGLDisplay 的同时能够得到系统中 EGL 的实现版本号。通过版本号，合理运用相应OpenGL ES API，可以编写兼容性良好的程序，以适应更多的设备以及提供最大限度的移植性。初始化函数原型：
+
+boolean eglInitialize(EGLDisplay display, int[] major_minor)  
+    其中的display是一个有效的 EGLDisplay实例。函数调用完成时， major_minor将被赋予当前 EGL 版本号。比如 EGL1.0 ， major_minor[0]为1，major_minor[1]为0。EGLSurface包含了EGL渲染面相关的所有信息。查询EGLSurface配置信息有两种方法，一是查询所有的配置信息，从中选择一个最为适合的；二是指定好配置信息，由系统给出最佳匹配结果。一般采用第二种方法。用户通过configSpec指定出希望获得的配置，函数eglChooseConfig通过参数Configs返回最佳的配置列表。之后利用已获得的Configs,调用eglCreateContext创建一个渲染上下文，该函数返回EGLContext结构。渲染面EGLSurface的创建通过函数eglCreateWindowSurface完成。一个应用程序可以创建多个EGLContext。 eglMakeCurrent就是将某个渲染上下文绑定到渲染面。查询函数 eglGetCurrentContext, eglGetCurrentDisplay和eglGetCurrentSurface 分别用于获得当前系统的渲染上下文、显示句柄和渲染面。最后EGLContext的静态方法getGL获得OpenGL ES的编程接口。下面的程序片段总结了上述内容。
+       
+EGL10 egl = (EGL10)EGLContext.getEGL(); EGLDisplay dpy = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY); int[] version = new int[2]; egl.eglInitialize(dpy, version); int[] configSpec = { EGL10.EGL_RED_SIZE, 5, EGL10.EGL_GREEN_SIZE, 6, EGL10.EGL_BLUE_SIZE, 5, EGL10.EGL_DEPTH_SIZE, 16, EGL10.EGL_NONE }; EGLConfig[] configs = new EGLConfig[1]; int[] num_config = new int[1]; egl.eglChooseConfig(dpy, configSpec, configs, 1, num_config); EGLConfig config = configs[0]; EGLContext context = egl.eglCreateContext(dpy, config, EGL10.EGL_NO_CONTEXT, null); EGLSurface surface = egl.eglCreateWindowSurface(dpy, config, sHolder, null); egl.eglMakeCurrent(dpy, surface, surface, context); GL10 gl = (GL10)context.getGL();  
+http://dev.10086.cn/cmdn/wiki/index.php?doc-view-1838.html
