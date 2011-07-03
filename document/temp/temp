@@ -5,3 +5,878 @@ http://challenge.huawei.allyes.com/
 
 
 http://www.andengine.org/forums/tutorials/introduction-moving-ball-example-and-some-other-things-t2514.html
+
+// GLDemoView.cpp : CGLDemoView 类的实现
+//
+#include "stdafx.h"
+#include "GLDemo.h"
+
+#include "GLDemoDoc.h"
+#include "GLDemoView.h"
+#include <math.h>
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+bool press=false;
+GLdouble projMatrix[16];
+GLdouble modelMatrix[16];
+GLint viewport[4];
+GLdouble ray[6];
+float fRay[6];
+GLfloat winx,winy,winz;
+GLsizei width,height;
+
+void GetSelectionRay(int mouse_x,int mouse_y);
+void printMatrix(double m[16]){
+	for(int i=0;i<4;i++)
+	{
+		for(int j=0;j<4;j++)
+		{
+			if(j>0)
+				TRACE(",");
+			TRACE("%.2f",m[i*4+j]);
+		}
+		TRACE("\r\n");
+
+
+	}
+}
+
+/**
+ * 将矩阵单位化
+ */
+inline void identityMatrix4(double m[16]){
+	m[0] = 1; m[1] = 0; m[2] = 0; m[3] = 0;
+    m[4] = 0; m[5] = 1; m[6] = 0; m[7] = 0;
+    m[8] = 0; m[9] = 0; m[10] = 1; m[11] = 0;
+    m[12] = 0; m[13] = 0; m[14] = 0; m[15] = 1;
+}
+/**
+ * 计算矩阵src的逆矩阵保存到dest
+ * 原理：首先将结果矩阵单位化，然后将源矩阵单位化，
+ * 同时将运算规则应用于结果矩阵，最后结果矩阵便是源矩阵的逆矩阵
+ */
+bool inverseMatrix4(const double src[16],double result[16])
+{
+	int i, j, k;
+    double temp;
+    double tempMatrix[4][4];                //临时矩阵
+	//复制src矩阵存到临时矩阵中
+    for (i=0; i<4; i++)
+		for (j=0; j<4; j++)
+			tempMatrix[i][j] = src[(i<<2)+j];
+	//单位化result矩阵
+	identityMatrix4(result);
+	for (i = 0; i<4; i++)
+    {
+        //寻找主元
+        k = i;
+        for (j=i+1; j<4; j++)
+		{
+            if (fabs(tempMatrix[j][i]) > fabs(tempMatrix[i][i]))
+                k = j;
+        }
+        //如果主元所在行不是第i行，进行行交换
+        if (k != i)
+        {
+            for (j=0; j<4; j++)
+            {
+                temp = tempMatrix[i][j];
+                tempMatrix[i][j] = tempMatrix[k][j];
+                tempMatrix[k][j] = temp;
+                //result伴随交换
+                temp = result[(i<<2)+j];
+                result[(i<<2)+j] = result[(k<<2)+j];
+                result[(k<<2)+j] = temp;
+            }
+        }
+        //判断主元是否为0, 若是, 则矩阵A不是满秩矩阵,不存在逆矩阵
+		//TRACE("tempMatrix[%d][%d]=%.2f\r\n",i,i,tempMatrix[i][i] );
+        if (tempMatrix[i][i] == 0)
+            return false;
+        //消去src的第i列除去i行以外的各行元素
+        temp = tempMatrix[i][i];
+        for (j=0; j<4; j++)
+        {
+            tempMatrix[i][j] /=temp;        //主对角线上的元素变为1
+            result[(i<<2)+j] /= temp;       //伴随计算
+        }
+        for (j=0; j<4; j++)	
+        {
+            if (j != i)						//不是第i行
+            {
+                temp = tempMatrix[j][i];
+                for (k=0; k<4; k++)        //第j行元素 - i行元素*j列i行元素
+                {
+                    tempMatrix[j][k] -= tempMatrix[i][k]*temp;
+                    result[(j<<2)+k] -= result[(i<<2)+k]*temp;
+                }
+            }
+        }
+    }
+	return true;
+}
+
+void multiMatrix4(const GLdouble a[16], const GLdouble b[16],GLdouble r[16])
+{
+    int i, j;
+
+    for (i = 0; i < 4; i++) {
+		for (j = 0; j < 4; j++) {
+			r[i*4+j] = 
+			a[i*4+0]*b[0*4+j] +
+			a[i*4+1]*b[1*4+j] +
+			a[i*4+2]*b[2*4+j] +
+			a[i*4+3]*b[3*4+j];
+		}
+    }
+}
+
+void multiMatrix42(const GLdouble matrix[16], const GLdouble in[4],GLdouble out[4])
+{
+    int i;
+
+    for (i=0; i<4; i++) {
+	out[i] = 
+	    in[0] * matrix[0*4+i] +
+	    in[1] * matrix[1*4+i] +
+	    in[2] * matrix[2*4+i] +
+	    in[3] * matrix[3*4+i];
+    }
+}
+
+
+GLint gluUnProject2(GLdouble winx, GLdouble winy, GLdouble winz,
+		const GLdouble modelMatrix[16], const GLdouble projMatrix[16],
+        const GLint viewport[4],
+	     GLdouble *objx, GLdouble *objy, GLdouble *objz)
+{
+    double finalMatrix[16];
+    double in[4];
+    double out[4];
+
+    multiMatrix4(modelMatrix, projMatrix, finalMatrix);
+	//TRACE("--------------finalMatrix----------------\r\n");
+	//printMatrix(finalMatrix);
+    if (!inverseMatrix4(finalMatrix, finalMatrix)) return(GL_FALSE);
+
+    in[0]=winx;
+    in[1]=winy;
+    in[2]=winz;
+    in[3]=1.0;
+
+    /* Map x and y from window coordinates */
+    in[0] = (in[0] - viewport[0]) / viewport[2];
+    in[1] = (in[1] - viewport[1]) / viewport[3];
+
+    /* Map to range -1 to 1 */
+    in[0] = in[0] * 2 - 1;
+    in[1] = in[1] * 2 - 1;
+    in[2] = in[2] * 2 - 1;
+
+    multiMatrix42(finalMatrix, in, out);
+    if (out[3] == 0.0) return(GL_FALSE);
+    out[0] /= out[3];
+    out[1] /= out[3];
+    out[2] /= out[3];
+    *objx = out[0];
+    *objy = out[1];
+    *objz = out[2];
+    return(GL_TRUE);
+}
+
+
+// CGLDemoView
+
+IMPLEMENT_DYNCREATE(CGLDemoView, CView)
+
+BEGIN_MESSAGE_MAP(CGLDemoView, CView)
+	ON_WM_CREATE()
+	ON_WM_DESTROY()
+	ON_WM_SIZE()
+	ON_WM_PAINT()
+	ON_WM_TIMER()
+//	ON_WM_ERASEBKGND()
+ON_WM_ERASEBKGND()
+//ON_WM_MOUSEMOVE()
+ON_WM_LBUTTONDOWN()
+END_MESSAGE_MAP()
+
+// CGLDemoView 构造/析构
+
+CGLDemoView::CGLDemoView()
+: m_GLPixelIndex(0)
+{
+	// TODO: 在此处添加构造代码
+
+}
+
+CGLDemoView::~CGLDemoView()
+{
+	this->m_GLPixelIndex = 0;
+    this->m_hGLContext = NULL;
+
+}
+
+BOOL CGLDemoView::PreCreateWindow(CREATESTRUCT& cs)
+{
+	// TODO: 在此处通过修改
+	//  CREATESTRUCT cs 来修改窗口类或样式
+	cs.style |=WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
+
+	return CView::PreCreateWindow(cs);
+}
+
+// CGLDemoView 绘制
+
+void CGLDemoView::OnDraw(CDC* /*pDC*/)
+{
+	CGLDemoDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	// TODO: 在此处为本机数据添加绘制代码
+}
+
+
+// CGLDemoView 诊断
+
+#ifdef _DEBUG
+void CGLDemoView::AssertValid() const
+{
+	CView::AssertValid();
+}
+
+void CGLDemoView::Dump(CDumpContext& dc) const
+{
+	CView::Dump(dc);
+}
+
+CGLDemoDoc* CGLDemoView::GetDocument() const // 非调试版本是内联的
+{
+	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CGLDemoDoc)));
+	return (CGLDemoDoc*)m_pDocument;
+}
+#endif //_DEBUG
+
+
+// CGLDemoView 消息处理程序
+
+int CGLDemoView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	//double A[16]={5,2,0,0,2,1,0,0,0,0,8,3,0,0,5,2};
+	double A[16]={1,0,0,0,1,2,0,0,2,1,3,0,1,2,1,4};
+	double B[16]={0};
+	if(inverseMatrix4(A,B))
+	{
+		for(int i=0;i<4;i++)
+		{
+			for(int j=0;j<4;j++)
+				TRACE(",%.2f",B[i*4+j]);
+			TRACE("\r\n");
+
+
+		}
+	}
+	/*if (CView::OnCreate(lpCreateStruct) == -1)
+  return -1;
+//=================================== 
+ PIXELFORMATDESCRIPTOR pfd=
+ {
+  sizeof(PIXELFORMATDESCRIPTOR),
+  1,
+  PFD_DRAW_TO_WINDOW|PFD_SUPPORT_OPENGL|
+  PFD_DOUBLEBUFFER|PFD_SUPPORT_GDI,
+  PFD_TYPE_RGBA,
+  24,
+  0,0,0,0,0,0,
+  0,
+  0,
+  0,
+  0,0,0,0,
+  32,
+  0,
+  0,
+  PFD_MAIN_PLANE,
+  0,
+  0,0,0
+ };
+
+ CClientDC clientdc(this);
+ int pf =ChoosePixelFormat(clientdc.m_hDC,&pfd);
+ BOOL rt=SetPixelFormat(clientdc.m_hDC,pf,&pfd);
+ hglrc=wglCreateContext(clientdc.m_hDC);
+ //======================================================= 
+ return 0;*/
+	 if (CView::OnCreate(lpCreateStruct) == -1)
+        return -1;
+    
+    // TODO: Add your specialized creation code here
+    HWND hWnd = this->GetSafeHwnd();    
+    hDC = ::GetDC(hWnd);
+	
+    if(this->SetWindowPixelFormat(hDC)==FALSE)
+    {
+        return 0;
+    }
+    if(this->CreateViewGLContext(hDC)==FALSE)
+    {
+        return 0;
+    }
+	//获取OpenGL的基本信息
+	//GetGLInfo();
+	InitGL();   // Initialize OpenGL
+	SetTimer(1,50,NULL);// n 替换为你需要定时的周期，单位毫秒。
+    return 0;
+
+}
+
+
+
+void CGLDemoView::OnDestroy()
+{
+	/*CView::OnDestroy();
+ 
+	 // TODO: Add your message handler code here
+	 if(wglGetCurrentContext()!=NULL)
+	  wglMakeCurrent(NULL,NULL);
+	 if(hglrc!=NULL)
+	 {
+	  wglDeleteContext(hglrc);
+	  hglrc=NULL;
+	 }*/
+	CView::OnDestroy();
+    //把绘制环境删除掉。但在删除RC之前，必须确定它不是当前句柄。
+	//我们是通过wglGetCurrentContext来了解是否存在一个当前绘制环境的。
+	//假如存在，那么用wglMakeCurrent(NULL, NULL)来把它去掉。然后就可以通过wglDelete-Context来删除RC了。
+	//这时允许视类删除DC才是安全的。注：一般来说，使用的都是单线 程的程序，产生的RC就是线程当前的RC，
+	//不需要关注上述这一点。但如果使用的是多线程的程序，那我们就特别需要注意这一点了，否则会出现意想不到的后 果。
+    // TODO: Add your message handler code here
+    if(wglGetCurrentContext()!=NULL)
+    {
+        wglMakeCurrent(NULL,NULL);
+    }
+    if(this->m_hGLContext!=NULL)
+    {
+        wglDeleteContext(this->m_hGLContext);
+        this->m_hGLContext = NULL;
+    }
+
+
+}
+
+
+
+
+void CGLDemoView::OnSize(UINT nType, int cx, int cy)
+{
+	CView::OnSize(nType, cx, cy);
+	/*GLsizei w=cx;
+	GLsizei h=cy;
+	if(!h)
+		return ;
+	CClientDC clientDC(this);
+	wglMakeCurrent(clientDC.m_hDC,hglrc);
+	glViewport(0,0,w,h);
+	wglMakeCurrent(NULL,NULL);*/
+	
+    GLdouble aspect;
+    width = cx;
+    height = cy;
+	TRACE("width:%d,height:%d\r\n",cx,cy);
+    if(cy==0)
+    {
+        aspect = (GLdouble)width;
+    }
+    else
+    {
+        aspect = (GLdouble)width/(GLdouble)height;
+    }
+    glViewport(0,0,width,height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    //gluOrtho2D(0.0,500.0*aspect,0.0,500.0);
+	gluPerspective(50.0f,aspect,1.0f,100.0f);
+	
+    glMatrixMode(GL_MODELVIEW);
+	//启用剔除功能
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+    //glLoadIdentity();
+	
+	//在后台缓存中画图
+	glDrawBuffer (GL_BACK);
+}
+
+static GLfloat vertexArray[] = {
+// Front face
+-1.0, -1.0,  1.0,
+ 1.0, -1.0,  1.0,
+ 1.0,  1.0,  1.0,
+-1.0,  1.0,  1.0,
+
+// Back face
+-1.0, -1.0, -1.0,
+-1.0,  1.0, -1.0,
+ 1.0,  1.0, -1.0,
+ 1.0, -1.0, -1.0,
+
+// Top face
+-1.0,  1.0, -1.0,
+-1.0,  1.0,  1.0,
+ 1.0,  1.0,  1.0,
+ 1.0,  1.0, -1.0,
+
+// Bottom face
+-1.0, -1.0, -1.0,
+ 1.0, -1.0, -1.0,
+ 1.0, -1.0,  1.0,
+-1.0, -1.0,  1.0,
+
+// Right face
+ 1.0, -1.0, -1.0,
+ 1.0,  1.0, -1.0,
+ 1.0,  1.0,  1.0,
+ 1.0, -1.0,  1.0,
+
+// Left face
+-1.0, -1.0, -1.0,
+-1.0, -1.0,  1.0,
+-1.0,  1.0,  1.0,
+-1.0,  1.0, -1.0
+};
+
+static GLubyte colorArray[] = {
+  255, 0, 0, 255,     // Front face
+  255, 0, 0, 255,
+  255, 0, 0, 255,
+  255, 0, 0, 255,
+  255, 255, 0, 255,     // Back face
+  255, 255, 0, 255,
+  255, 255, 0, 255,
+  255, 255, 0, 255,
+  0, 255, 0, 255,     // Top face
+  0, 255, 0, 255,
+  0, 255, 0, 255,
+  0, 255, 0, 255,
+  255, 128, 128, 255,     // Bottom face
+  255, 128, 128, 255,
+  255, 128, 128, 255,
+  255, 128, 128, 255,
+  255, 0, 255, 255,     // Right face
+  255, 0, 255, 255,
+  255, 0, 255, 255,
+  255, 0, 255, 255,
+  0, 0, 255, 255,     // Left face
+  0, 0, 255, 255,
+  0, 0, 255, 255,
+  0, 0, 255, 255
+};
+static float angle=0;
+
+#define VERTEX_COUNT_PER_FACE 4
+#define FACE_COUNT 6
+
+void CGLDemoView::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// TODO: 在此处添加消息处理程序代码
+	// 不为绘图消息调用 CView::OnPaint()
+	
+	DrawGLScene(); // Render the OpenGL scene
+	SwapBuffers(hDC);
+
+    
+	
+
+}
+
+bool CGLDemoView::SetWindowPixelFormat(HDC hDC)
+{
+	//定义窗口的像素格式
+    PIXELFORMATDESCRIPTOR pixelDesc=
+    {
+        sizeof(PIXELFORMATDESCRIPTOR),
+        1,
+		PFD_DRAW_TO_WINDOW|PFD_SUPPORT_OPENGL|
+        PFD_DOUBLEBUFFER|PFD_STEREO_DONTCARE,
+        PFD_TYPE_RGBA,
+        24,
+        0,0,0,0,0,0,
+        0,
+        0,
+        0,
+        0,0,0,0,
+        32,
+        0,
+        0,
+        PFD_MAIN_PLANE,
+        0,
+        0,0,0
+    };
+
+
+
+    this->m_GLPixelIndex = ChoosePixelFormat(hDC,&pixelDesc);
+    if(this->m_GLPixelIndex==0)
+    {
+        this->m_GLPixelIndex = 1;
+        if(DescribePixelFormat(hDC,this->m_GLPixelIndex,sizeof(PIXELFORMATDESCRIPTOR),&pixelDesc)==0)
+        {
+            return FALSE;
+        }
+    }
+
+    if(SetPixelFormat(hDC,this->m_GLPixelIndex,&pixelDesc)==FALSE)
+    {
+        return FALSE;
+    }
+    return TRUE;
+	/*PIXELFORMATDESCRIPTOR pixelDesc;
+   pixelDesc.nSize     = sizeof(PIXELFORMATDESCRIPTOR);
+   pixelDesc.nVersion  = 1;
+   pixelDesc.dwFlags   =  PFD_DRAW_TO_WINDOW | 
+             //   PFD_DRAW_TO_BITMAP | 
+			//    PFD_SUPPORT_GDI  |  
+                          PFD_DOUBLEBUFFER | 
+                          PFD_SUPPORT_OPENGL |  
+                          PFD_STEREO_DONTCARE;
+   pixelDesc.iPixelType            = PFD_TYPE_RGBA;
+   pixelDesc.cColorBits            = 32;
+   pixelDesc.cRedBits              = 8;
+   pixelDesc.cRedShift             = 16;
+   pixelDesc.cGreenBits            = 8;
+   pixelDesc.cGreenShift           = 8;
+   pixelDesc.cBlueBits             = 8;
+   pixelDesc.cBlueShift            = 0;
+   pixelDesc.cAlphaBits            = 0;
+   pixelDesc.cAlphaShift           = 0;
+   pixelDesc.cAccumBits            = 64;   
+   pixelDesc.cAccumRedBits         = 16;
+   pixelDesc.cAccumGreenBits       = 16;
+   pixelDesc.cAccumBlueBits        = 16;
+   pixelDesc.cAccumAlphaBits       = 0;
+   pixelDesc.cDepthBits            = 32;
+   pixelDesc.cStencilBits          = 8;
+   pixelDesc.cAuxBuffers           = 0;
+   pixelDesc.iLayerType            = PFD_MAIN_PLANE;
+   pixelDesc.bReserved             = 0;
+   pixelDesc.dwLayerMask           = 0;
+   pixelDesc.dwVisibleMask         = 0;
+   pixelDesc.dwDamageMask          = 0;
+
+   // find system pixel format
+   m_GLPixelIndex = ChoosePixelFormat( hDC, &pixelDesc);
+   if (m_GLPixelIndex==0) // Let's choose a default index.
+   {
+       m_GLPixelIndex = 1;     
+       if (DescribePixelFormat(hDC, m_GLPixelIndex, sizeof(PIXELFORMATDESCRIPTOR), &pixelDesc)==0)
+		{
+			return FALSE; 
+	   } 
+   }
+   if (SetPixelFormat( hDC, m_GLPixelIndex, &pixelDesc)==FALSE)
+   {   
+	   return FALSE;  
+   }
+   return TRUE;*/
+
+
+}
+
+bool CGLDemoView::CreateViewGLContext(HDC hDC)
+{
+	//产生绘制环境(RC)并使之成为当前绘制环境
+	this->m_hGLContext = wglCreateContext(hDC);
+    if(this->m_hGLContext==NULL)
+    {//创建失败
+        return FALSE;
+    }
+
+    if(wglMakeCurrent(hDC,this->m_hGLContext)==FALSE)
+    {//选为当前RC失败
+        return FALSE;
+    }
+
+    return TRUE;
+
+
+
+
+}
+
+void CGLDemoView::GetGLInfo(void)
+{
+	CString oglinfo;
+
+	oglinfo = "OpenGL Information\n\nWho: ";
+	oglinfo +=  (char *)glGetString( GL_VENDOR );
+	oglinfo += "\nWhich: ";
+	oglinfo +=  (char *)glGetString( GL_RENDERER );
+	oglinfo += "\nVersion: ";
+	oglinfo +=  (char *)glGetString( GL_VERSION );
+	oglinfo += "\nExtensions: ";
+	oglinfo +=  (char *)glGetString( GL_EXTENSIONS );
+
+
+	AfxMessageBox(oglinfo,MB_ICONINFORMATION); // Display OpenGL Information
+
+}
+
+void CGLDemoView::DrawGLScene(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	glLoadIdentity();
+	
+	gluLookAt(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	
+	if(press){
+		glPushMatrix(); 
+		glGetIntegerv(GL_VIEWPORT, viewport); 
+		glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix); 
+		glGetDoublev(GL_PROJECTION_MATRIX, projMatrix); 
+		glPopMatrix(); 
+		winy = viewport[3] - (float)winy;
+		winz=0;
+		for(int j=0;j<4;j++)
+				TRACE(",%d",viewport[j]);
+		TRACE("\r\n");
+		TRACE("-------------modelMatrix--------------\r\n");
+		printMatrix(modelMatrix);
+		TRACE("-------------projMatrix--------------\r\n");
+		printMatrix(projMatrix);
+		if(gluUnProject2(winx,winy,winz,modelMatrix,projMatrix,viewport,&ray[0],&ray[1],&ray[2]))
+			TRACE("near:{%.2f,%.2f,%.2f}-->{%.2f,%.2f,%.2f}\r\n",winx,winy,winz,ray[0],ray[1],ray[2]);
+		else
+			TRACE("error\r\n");
+		winz=1;
+		if(gluUnProject2(winx,winy,winz,modelMatrix,projMatrix,viewport,&ray[3],&ray[4],&ray[5]))
+			TRACE("far:{%.2f,%.2f,%.2f}-->{%.2f,%.2f,%.2f}\r\n",winx,winy,winz,ray[3],ray[4],ray[5]);
+		else
+			TRACE("error\r\n");
+		press=false;
+	}
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glPushMatrix(); 
+	
+	glVertexPointer(3,GL_FLOAT,0,vertexArray);
+	glColorPointer(4,GL_UNSIGNED_BYTE,0,colorArray);
+	glRotatef(angle,1,1,0);
+	angle+=0.5f;
+	int i;
+	//边会反走样,先绘边
+	glEnable (GL_LINE_SMOOTH);
+	glHint (GL_LINE_SMOOTH, GL_NICEST);
+	for(i=0;i<FACE_COUNT;i++)
+		glDrawArrays(GL_LINE_LOOP,i*VERTEX_COUNT_PER_FACE,VERTEX_COUNT_PER_FACE);
+	//填充不会反走样,关闭之
+	glDisable (GL_LINE_SMOOTH);
+	glHint (GL_LINE_SMOOTH, GL_FASTEST);
+	for(i=0;i<FACE_COUNT;i++)
+		glDrawArrays(GL_TRIANGLE_FAN,i*VERTEX_COUNT_PER_FACE,VERTEX_COUNT_PER_FACE);
+	glPopMatrix(); 
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);*/
+	
+
+	for(int i=0;i<3;i++)
+		fRay[i]=(float)ray[i];
+	glPushMatrix(); 
+		glColor4f(1.0f,0.0f,0.0f,1.0f);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		//glVertexPointer(3,GL_DOUBLE,0,ray);
+		for(int i=3;i<6;i++)
+			fRay[i]=(float)ray[i]+1;
+		glVertexPointer(3,GL_FLOAT,0,fRay);
+		glDrawArrays(GL_LINES,0,2);
+		for(int i=3;i<6;i++)
+			fRay[i]=(float)ray[i]-1;
+		glVertexPointer(3,GL_FLOAT,0,fRay);
+		glDrawArrays(GL_LINES,0,2);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		//glBegin (GL_LINES);
+		//glVertex3f ((float)ray[0],(float)ray[1],(float)ray[2]);
+		//glVertex3f ((float)ray[3],(float)ray[4],(float)ray[5]);
+		//glEnd ();
+	glPopMatrix();
+
+	
+
+	//绘制正方形
+	/*glBegin(GL_QUADS);							
+		glColor4f(1.0f,0.0f,0.0f,1.0f);
+		glVertex3f(-1.0f, 1.0f, -5.0f);
+		glColor4f(0.0f,1.0f,0.0f,1.0f);
+		glVertex3f( 1.0f, 1.0f, -5.0f);
+		glColor4f(0.0f,0.0f,1.0f,1.0f);
+		glVertex3f( 1.0f,-1.0f, -5.0f);
+		glColor4f(1.0f,1.0f,0.0f,1.0f);
+		glVertex3f(-1.0f,-1.0f, -5.0f);
+	glEnd();*/
+    /*glBegin(GL_POLYGON);
+        glColor4f(1.0f,0.0f,0.0f,1.0f);
+        glVertex2f(100.0f,50.0f);
+        glColor4f(0.0f,1.0f,0.0f,1.0f);
+        glVertex2f(450.0f,400.0f);
+        glColor4f(0.0f,0.0f,1.0f,1.0f);
+        glVertex2f(450.0f,50.0f);
+    glEnd();*/
+   
+	glFlush();
+}
+
+bool CGLDemoView::InitGL(void)
+{
+	// from NeHe's Tutorial 3
+	/*glShadeModel(GL_SMOOTH);        // Enable Smooth Shading
+	glClearColor(0.0, 0.0, 0.0, 0.5);      // Black Background
+	glClearDepth(1.0);          // Depth Buffer Setup
+	glEnable(GL_DEPTH_TEST);        // Enables Depth Testing
+	glDepthFunc(GL_LEQUAL);         // The Type Of Depth Testing To Do
+	*/
+	
+
+	//抗锯齿
+	
+	//glPointSize(8);   
+	//glLineWidth(5); 
+	glPolygonMode(GL_FRONT,GL_FILL);//多边形被绘成填充模式
+	glEnable (GL_POINT_SMOOTH);
+	glEnable (GL_LINE_SMOOTH);
+	
+	glHint (GL_POINT_SMOOTH, GL_NICEST);//支持
+	glHint (GL_LINE_SMOOTH, GL_NICEST);//支持
+	glHint (GL_POLYGON_SMOOTH, GL_NICEST);//MS不支持
+	glHint (GL_FOG_HINT, GL_NICEST);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Really Nice Perspective Calculations
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);   
+	glEnable(GL_BLEND);   
+	glShadeModel (GL_SMOOTH);
+
+	//启用雾化处理 
+	GLfloat fogColor[4]={0.9,0.9,0.9,0.2}; 
+    glEnable(GL_FOG); 
+    { 
+            //采用线性变化的雾化效果 
+            glFogi(GL_FOG_MODE,GL_LINEAR); 
+            //指定雾化颜色（黄色） 
+            glFogfv(GL_FOG_COLOR,fogColor); 
+            //指定按线性变化时计算公式的参量 
+            glFogf(GL_FOG_START,2.0); 
+            glFogf(GL_FOG_END,15.0); 
+            //规定雾化效果的质量 
+            glHint(GL_FOG_HINT,GL_DONT_CARE); 
+    } 
+
+	return TRUE;           // Initialization Went OK
+
+}
+
+void CGLDemoView::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	if(nIDEvent==1)
+	{
+	  InvalidateRect(NULL,FALSE);
+	}
+
+	CView::OnTimer(nIDEvent);
+}
+
+
+BOOL CGLDemoView::OnEraseBkgnd(CDC* pDC)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	//return CView::OnEraseBkgnd(pDC);
+	return TRUE;
+}
+
+//void CGLDemoView::OnMouseMove(UINT nFlags, CPoint point)
+//{
+//	// TODO: 在此添加消息处理程序代码和/或调用默认值
+//
+//	TRACE("%d,%d",point.x,point.y);
+//	CView::OnMouseMove(nFlags, point);
+//}
+
+//RIP(get selection ray)
+/*
+void GetSelectionRay(int mouse_x,int mouse_y)
+{
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	GLint    viewport[4];
+	glGetDoublev(GL_MODELVIEW_MATRIX,modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX,projection);
+	glGetIntegerv(GL_VIEWPORT,viewport);
+
+	GLdouble world_x, world_y, world_z;
+    // get the near plane's point of intersection(z=0.0)
+	if(gluUnProject( (GLdouble) mouse_x, (GLdouble) mouse_y, 0.0, 
+                    modelview, projection, viewport, 
+                    &world_x, &world_y, &world_z))
+		TRACE("world:%.2f,%.2f,%.2f\r\n",world_x, world_y, world_z);
+	// get the far plane's point of intersection(z=1.0)
+	if(gluUnProject( (GLdouble) mouse_x, (GLdouble) mouse_y, 1.0, 
+                    modelview, projection, viewport, 
+                    &world_x, &world_y, &world_z))
+		TRACE("world:%.2f,%.2f,%.2f\r\n",world_x, world_y, world_z);
+}
+*/
+
+void CGLDemoView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	TRACE("%d,%d-->",point.x,point.y);
+	winx=point.x;
+	winy=point.y;
+	press=true;
+	//GetSelectionRay(winx,height-winy);
+	/*
+	glPushMatrix(); 
+		glGetIntegerv(GL_VIEWPORT, viewport); 
+		glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix); 
+		glGetDoublev(GL_PROJECTION_MATRIX, projMatrix); 
+		glPopMatrix(); 
+		winy = viewport[3] - (float)winy;
+		winz=0;
+		for(int j=0;j<4;j++)
+				TRACE(",%d",viewport[j]);
+		TRACE("\r\n");
+		TRACE("-------------modelMatrix--------------\r\n");
+		printMatrix(modelMatrix);
+		TRACE("-------------projMatrix--------------\r\n");
+		printMatrix(projMatrix);
+		if(gluUnProject2(winx,winy,winz,modelMatrix,projMatrix,viewport,&objx,&objy,&objz))
+			TRACE("near:{%.2f,%.2f,%.2f}-->{%.2f,%.2f,%.2f}\r\n",winx,winy,winz,objx,objy,objz);
+		else
+			TRACE("error\r\n");
+		winz=1;
+		if(gluUnProject2(winx,winy,winz,modelMatrix,projMatrix,viewport,&objx,&objy,&objz))
+			TRACE("far:{%.2f,%.2f,%.2f}-->{%.2f,%.2f,%.2f}\r\n",winx,winy,winz,objx,objy,objz);
+		else
+			TRACE("error\r\n");
+		press=false;*/
+		
+	CView::OnLButtonDown(nFlags, point);
+}
