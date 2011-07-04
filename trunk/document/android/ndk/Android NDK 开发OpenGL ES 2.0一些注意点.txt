@@ -1,0 +1,28 @@
+Android是个好系统哇，特别是Android NDK r3出来以后，可以用OpenGL ES 2.0了。
+自己也试了试用NDK编一个 OpenGL ES 2.0的程序，可是，编译的时候出现了一大堆错。
+
+如图，满屏幕都是 undefined reference to 那些OpenGL ES函数。
+看来是库文件 没有链接进来。
+
+这是NDK例子里的Android.mk的写法：
+LOCAL_PATH:= $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := libgl2jni
+LOCAL_CFLAGS    := -Werror
+LOCAL_SRC_FILES := gl_code.cpp
+LOCAL_LDLIBS    := -llog -lGLESv2
+
+include $(BUILD_SHARED_LIBRARY)
+问题就出在用红色标出的那行。
+
+把那句修改为：
+LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog
+LOCAL_LDLIBS+=-L$(SYSROOT)/usr/lib -lGLESv2
+就可以正常编译了。
+
+还有一些注意点是：
+编译程序前要clean，否则编译会出错；
+每次更新了自己的.so文件 后，在eclipse的那个java项目里要记着refresh一下。 
+http://apps.hi.baidu.com/share/detail/34963570
