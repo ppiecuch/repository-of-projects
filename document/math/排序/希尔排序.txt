@@ -1,0 +1,41 @@
+函数：
+
+
+static void prshl(int[] p,int n)
+	{
+		int k,j,i;
+		int t;
+		k=n/2;
+		while(k>0)
+		{
+			for(j=k;j<=n-1;j++)
+			{
+				t=p[j];i=j-k;
+				while((i>=0)&&(p[i]>t))
+				{
+					p[i+k]=p[i];i=i-k;
+				}
+				p[i+k]=t;
+			}
+			k=k/2;
+		}
+
+这里调用：
+
+import javax.swing.JOptionPane;
+
+public static void main(String args[])
+	{
+		int n=Integer.parseInt(JOptionPane.showInputDialog("Please enter the number of elements to sort:"));
+		int[] p=new int[n];
+		for(int i=0;i<n;i++)
+			p[i]=(int)(Math.random()*100+1);
+		for(int i=0;i<n;i++)
+			System.out.print(p[i]+" ");
+		prshl(p,n);
+		System.out.println();
+		for(int i=0;i<n;i++)
+			System.out.print(p[i]+" ");
+		System.out.println();
+	}
+
