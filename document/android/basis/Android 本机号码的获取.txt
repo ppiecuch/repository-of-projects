@@ -1,0 +1,56 @@
+首先我们来明确几个概念：
+
+ 
+
+SIM卡存储的数据可分为四类：
+
+第一类是固定存放的数据。这类数据在移动电话机被出售之前由SIM卡中心写入，包括国际移动用户识别号（IMSI）、鉴权密钥（KI）、鉴权和加密算法等等。
+
+第二类是暂时存放的有关网络的数据。如位置区域识别码（LAI）、移动用户暂时识别码（TMSI）、禁止接入的公共电话网代码等。
+
+第三类是相关的业务代码，如个人识别码（PIN）、解锁码（PUK）、计费费率等。
+
+第四类是电话号码簿，是手机用户随时输入的电话号码。用户全部资料几乎都存储在SIM卡内，因此SIM卡又称为用户资料识别卡。
+
+ 
+
+IMSI是一个唯一的数字， 标识了GSM和UMTS 网络里的唯一一个用户. 它存储 在手机的SIM卡里，它会通过手机发送到网络上. IMSI 与 SIM唯一对应
+
+IMEI也是一串唯一的数字， 标识了 GSM 和 UMTS网络里的唯一一个手机.它通常被打印在手机里电池下面的那一面，拨 *#06# 也能看到它. IMEI 与 设备唯一对应.
+
+1。IMEI不存在于SIM卡中，它是手机本身的串号。 
+2。通常我们所说的手机号也不存在于SIM卡中，虽然SIM卡中有一个专门存储SIM卡本身号码的地方，但是此号码是通过手工设定的，而且是可以更改的。   SIM卡的识别通常使用IMSI号，这个对于SIM卡是唯一的。 
+3。使用SimGetRecordInfo之类的函数获得SIM卡的IMSI号码能否成功依赖于设备制造商是否实现了此函数，据我所知在DOPOD的机器上是可以获得，但是在联想的机器上却不行，其他机器没有。 
+4。获得IMEI以及IMSI可以通过RIL或者TAPI中的LINE操作的函数获得。
+
+ 
+
+ 
+
+下面给出获取手机本机号码的代码：
+
+        TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+
+        
+
+        String deviceid = tm.getDeviceId();
+
+        String tel = tm.getLine1Number();
+
+        String imei = tm.getSimSerialNumber();
+
+        String imsi = tm.getSubscriberId();
+
+ 
+
+添加权限：
+
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+ 
+
+注意，手机号码不是所有的都能获取。只是有一部分可以拿到。这个是由于移动运营商没有把手机号码的数据写入到sim卡中。这个就像是一个变量，当移动运营商为它赋值了，它自然就会有值。不赋值自然为空。这就是为什么很多人得不到本机号码的原因。
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/lifanupc/archive/2010/07/08/5721484.aspx

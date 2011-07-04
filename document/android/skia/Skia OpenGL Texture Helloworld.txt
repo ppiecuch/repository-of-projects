@@ -1,0 +1,321 @@
+这年头神马都要炫，这不，我就开始研究Skia了。先上一个Skia画在opengl texture上面的圆角矩形。
+
+以下代码：
+
+view plaincopy to clipboardprint?#include <SkDevice.h>   
+#include <SkDraw.h>   
+#include <SkRect.h>   
+#include <memory>   
+#include <GL/gl.h>   
+#include <GL/glut.h>   
+#include <stdio.h>   
+#include <stdlib.h>   
+static void idle(void );  
+static void resize(int x , int y);  
+static void mouseKey(int button, int state, int x , int y);  
+static void keyFunc(unsigned char c,int x,int y);  
+static void mouseMove(int x , int y);  
+static void draw(void);  
+static SkBitmap createBitmap(int x,int y)  
+{  
+    SkBitmap bitmap;  
+    bitmap.setConfig(SkBitmap::kARGB_8888_Config, x, y);  
+    bitmap.setIsOpaque(true);  
+    bitmap.allocPixels();  
+    std::auto_ptr<SkCanvas>  psCanvas(new SkCanvas(bitmap));  
+    SkPaint p;  
+    p.setAntiAlias(true);  
+    p.setStyle(SkPaint::kStroke_Style);  
+    p.setStrokeWidth(4);  
+    p.setColor(SkColorSetARGBInline(255,244,203,244));  
+    psCanvas->clear(SkColorSetARGBInline(255,0,0,0));   
+    psCanvas->drawRoundRect(SkRect::MakeXYWH(100,100,200,200),10,15,p);  
+    return bitmap;  
+}  
+static void generateR8G8B8FromSkBitmap(SkBitmap & aBitmap,void *& aOutBuf,size_t & aOutBufSize)  
+{  
+    aOutBufSize = aBitmap.width() * aBitmap.height() * 3;  
+    aOutBuf = malloc(aOutBufSize);  
+    SkAutoLockPixels sAutoLock(aBitmap);  
+    uint32_t * sAddress = aBitmap.getAddr32(0,0);  
+    char * sWriter  = (char * )aOutBuf;  
+    const uint32_t * sReader = sAddress;  
+    for(int y = 0 ; y < aBitmap.height() ; ++y)  
+    {  
+        for(int x = 0 ; x < aBitmap.width() ; ++ x,++sReader)  
+        {  
+            uint32_t sPixel = *sReader;  
+            const char * sPixelReader = (const char * )&sPixel;  
+            // R   
+            *sWriter = *sPixelReader;  
+            ++sWriter;  
+            ++sPixelReader;  
+            // G   
+            *sWriter = *sPixelReader;  
+            ++sWriter;  
+            ++sPixelReader;  
+            // B   
+            *sWriter = *sPixelReader;  
+            ++sWriter;  
+            ++sPixelReader;  
+        }  
+    }  
+}  
+  
+GLuint getTextureFromBitmap(SkBitmap & aBitmap)  
+{  
+    GLuint sTexture;  
+    GLenum  sError;  
+    glGenTextures(1,&sTexture);  
+    glBindTexture(GL_TEXTURE_2D,sTexture);  
+    void * sBitmapContent;  
+    size_t sBitmapSize;  
+    generateR8G8B8FromSkBitmap(aBitmap,sBitmapContent,sBitmapSize);  
+      
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // Linear Filtering   
+    sError = glGetError();  
+    printf("GL_TEXTURE_MIN_FILTER error code is %d/n",sError);  
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // Linear Filtering   
+    sError = glGetError();  
+    printf("GL_TEXTURE_MAG_FILTER error code is %d/n",sError);  
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP);  
+    sError = glGetError();  
+    printf("GL_TEXTURE_WRAP_S error code is %d/n",sError);  
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP);  
+    sError = glGetError();  
+    printf("GL_TEXTURE_WRAP_T error code is %d/n",sError);  
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,aBitmap.width(),aBitmap.height(),0,GL_RGB,GL_UNSIGNED_BYTE,sBitmapContent);  
+    sError = glGetError();  
+    printf("glTexImage2D error code is %d/n",sError);  
+    free(sBitmapContent);  
+    return sTexture;  
+}  
+int main(int argc,char ** argv)  
+{  
+    glutInit(&argc, argv);  
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);  
+    glutInitWindowSize(800,600);  
+    //glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);   
+    glutCreateWindow("test wglUseFontOutlines");  
+    glutDisplayFunc(draw);  
+    glutIdleFunc(idle);  
+    glutReshapeFunc(resize);  
+    glutMouseFunc(mouseKey);  
+    glutMotionFunc(mouseMove);  
+    glutKeyboardFunc(keyFunc);  
+    glViewport(0,0,800,600);  
+    glClearColor(0.0f, 0.0f, 0.0f, 0.5f);  
+    glutMainLoop();  
+    return 0;  
+}  
+  
+void idle()  
+{  
+}  
+void resize(int x , int y)  
+{  
+    glViewport(0,0,x,y);  
+}  
+void mouseKey(int button, int state, int x , int y)  
+{  
+}  
+void keyFunc(unsigned char c,int x,int y)  
+{  
+}  
+void mouseMove(int x , int y)  
+{  
+}  
+void draw()  
+{  
+    glClear(GL_COLOR_BUFFER_BIT);  
+    // Set up transformation to draw the string     
+    glMatrixMode(GL_PROJECTION);  
+    glLoadIdentity();  
+    glOrtho(1,1,1,1,1,1);  
+    glMatrixMode(GL_MODELVIEW);  
+    glLoadIdentity();  
+    glTranslatef(0.0f, 0.0f, 0.0f) ;  
+    //  glPolygonMode(GL_FRONT,GL_LINE);   
+    glCullFace(GL_BACK);  
+    glEnable(GL_CULL_FACE);  
+    glEnable(GL_TEXTURE_2D);  
+    GLint sViewportParam[4];  
+    glGetIntegerv(GL_VIEWPORT,sViewportParam);  
+    SkBitmap sBitmap = createBitmap(sViewportParam[2],sViewportParam[3]);  
+    GLuint sTexture = getTextureFromBitmap(sBitmap);  
+    glBindTexture(GL_TEXTURE_2D,sTexture);  
+    glBegin(GL_TRIANGLE_STRIP);  
+    //    glColor3f(1.0f,0.0,0.0);   
+    glTexCoord2f(0.0f,1.0f);  
+    glVertex2f(-1.0f,1.0f);  
+    //    glColor3f(0.0,1.0f,0.0f);   
+    glTexCoord2f(0.0f,0.0f);  
+    glVertex2f(-1.0f,-1.0f);  
+    //    glColor3f(0.0,1.0f,1.0f);   
+    glTexCoord2f(1.0f,1.0f);  
+    glVertex2f(1.0f,1.0f);  
+    //    glColor3f(0.0,0.0,1.0f);   
+    glTexCoord2f(1.0f,0.0f);  
+#include <SkDevice.h>
+#include <SkDraw.h>
+#include <SkRect.h>
+#include <memory>
+#include <GL/gl.h>
+#include <GL/glut.h>
+#include <stdio.h>
+#include <stdlib.h>
+static void idle(void );
+static void resize(int x , int y);
+static void mouseKey(int button, int state, int x , int y);
+static void keyFunc(unsigned char c,int x,int y);
+static void mouseMove(int x , int y);
+static void draw(void);
+static SkBitmap createBitmap(int x,int y)
+{
+    SkBitmap bitmap;
+    bitmap.setConfig(SkBitmap::kARGB_8888_Config, x, y);
+    bitmap.setIsOpaque(true);
+    bitmap.allocPixels();
+    std::auto_ptr<SkCanvas>  psCanvas(new SkCanvas(bitmap));
+    SkPaint p;
+    p.setAntiAlias(true);
+    p.setStyle(SkPaint::kStroke_Style);
+    p.setStrokeWidth(4);
+    p.setColor(SkColorSetARGBInline(255,244,203,244));
+    psCanvas->clear(SkColorSetARGBInline(255,0,0,0)); 
+    psCanvas->drawRoundRect(SkRect::MakeXYWH(100,100,200,200),10,15,p);
+    return bitmap;
+}
+static void generateR8G8B8FromSkBitmap(SkBitmap & aBitmap,void *& aOutBuf,size_t & aOutBufSize)
+{
+    aOutBufSize = aBitmap.width() * aBitmap.height() * 3;
+    aOutBuf = malloc(aOutBufSize);
+    SkAutoLockPixels sAutoLock(aBitmap);
+    uint32_t * sAddress = aBitmap.getAddr32(0,0);
+    char * sWriter  = (char * )aOutBuf;
+    const uint32_t * sReader = sAddress;
+    for(int y = 0 ; y < aBitmap.height() ; ++y)
+    {
+        for(int x = 0 ; x < aBitmap.width() ; ++ x,++sReader)
+        {
+            uint32_t sPixel = *sReader;
+            const char * sPixelReader = (const char * )&sPixel;
+            // R
+            *sWriter = *sPixelReader;
+            ++sWriter;
+            ++sPixelReader;
+            // G
+            *sWriter = *sPixelReader;
+            ++sWriter;
+            ++sPixelReader;
+            // B
+            *sWriter = *sPixelReader;
+            ++sWriter;
+            ++sPixelReader;
+        }
+    }
+}
+
+GLuint getTextureFromBitmap(SkBitmap & aBitmap)
+{
+    GLuint sTexture;
+    GLenum  sError;
+    glGenTextures(1,&sTexture);
+    glBindTexture(GL_TEXTURE_2D,sTexture);
+    void * sBitmapContent;
+    size_t sBitmapSize;
+    generateR8G8B8FromSkBitmap(aBitmap,sBitmapContent,sBitmapSize);
+    
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	// Linear Filtering
+    sError = glGetError();
+    printf("GL_TEXTURE_MIN_FILTER error code is %d/n",sError);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	// Linear Filtering
+    sError = glGetError();
+    printf("GL_TEXTURE_MAG_FILTER error code is %d/n",sError);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP);
+    sError = glGetError();
+    printf("GL_TEXTURE_WRAP_S error code is %d/n",sError);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP);
+    sError = glGetError();
+    printf("GL_TEXTURE_WRAP_T error code is %d/n",sError);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,aBitmap.width(),aBitmap.height(),0,GL_RGB,GL_UNSIGNED_BYTE,sBitmapContent);
+    sError = glGetError();
+    printf("glTexImage2D error code is %d/n",sError);
+    free(sBitmapContent);
+    return sTexture;
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitWindowSize(800,600);
+    //glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
+    glutCreateWindow("test wglUseFontOutlines");
+    glutDisplayFunc(draw);
+    glutIdleFunc(idle);
+    glutReshapeFunc(resize);
+    glutMouseFunc(mouseKey);
+    glutMotionFunc(mouseMove);
+    glutKeyboardFunc(keyFunc);
+    glViewport(0,0,800,600);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+    glutMainLoop();
+    return 0;
+}
+
+void idle()
+{
+}
+void resize(int x , int y)
+{
+    glViewport(0,0,x,y);
+}
+void mouseKey(int button, int state, int x , int y)
+{
+}
+void keyFunc(unsigned char c,int x,int y)
+{
+}
+void mouseMove(int x , int y)
+{
+}
+void draw()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    // Set up transformation to draw the string  
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(1,1,1,1,1,1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(0.0f, 0.0f, 0.0f) ;
+    //  glPolygonMode(GL_FRONT,GL_LINE);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+	glEnable(GL_TEXTURE_2D);
+    GLint sViewportParam[4];
+    glGetIntegerv(GL_VIEWPORT,sViewportParam);
+	SkBitmap sBitmap = createBitmap(sViewportParam[2],sViewportParam[3]);
+	GLuint sTexture = getTextureFromBitmap(sBitmap);
+	glBindTexture(GL_TEXTURE_2D,sTexture);
+    glBegin(GL_TRIANGLE_STRIP);
+    //    glColor3f(1.0f,0.0,0.0);
+    glTexCoord2f(0.0f,1.0f);
+    glVertex2f(-1.0f,1.0f);
+    //    glColor3f(0.0,1.0f,0.0f);
+    glTexCoord2f(0.0f,0.0f);
+    glVertex2f(-1.0f,-1.0f);
+    //    glColor3f(0.0,1.0f,1.0f);
+    glTexCoord2f(1.0f,1.0f);
+    glVertex2f(1.0f,1.0f);
+    //    glColor3f(0.0,0.0,1.0f);
+    glTexCoord2f(1.0f,0.0f);
+ 
+
+ 
+
+接着上图：
+
+
+
+http://blog.csdn.net/manjian/article/details/6376928
