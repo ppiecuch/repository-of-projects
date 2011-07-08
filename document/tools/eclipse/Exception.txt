@@ -1,0 +1,4 @@
+[异常]
+java.lang.IncompatibleClassChangeError
+[解决]
+重启Eclipse(可能需要安装JDK5)
