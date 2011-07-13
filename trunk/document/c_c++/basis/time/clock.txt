@@ -1,0 +1,2 @@
+clock_t finish=clock();
+TRACE( "use %ld milliseconds\n", (finish - start)*1000/CLOCKS_PER_SEC); 
