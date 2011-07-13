@@ -1,0 +1,31 @@
+1:请介绍下ContentProvider是如何实现数据共享的。
+答:一个程序可以通过实现一个ContentProvider的抽象接口将自己的数据完全暴露出去，而且ContentProvider是以类似数据库中表的方式将数据暴露。ContentProvider存储和检索数据，通过它可以让所有的应用程序访问，这也是应用程序之间唯一共享数据的方法，要想使应用程序的数据公开化，可通过创建一个属于你自己的ContentProvider或者将你的数据添加到一个已经存在的ContentProvider中，前提是有相同数据类型并且有写入ContentProvider的权限。
+
+2: 如何启用Service，如何停用Service。
+答:第一种是通过调用Context.startService()启动,调用Context.stopService()结束,startService()可以传递参数给Service。第二种是通过调用Context.bindService()启动，调用Context.unbindService()结束,还可以通过ServiceConnection访问Service。在Service每一次的开启关闭过程中，只有onStart可被多次调用(通过多次startService调用),其他onCreate,onBind,onUnbind,onDestroy在一个生命周期中只能被调用一次。
+
+3: 请解释下在单线程模型中Message,Handle,Message Queue,Looper之间的关系
+答:简单的说，Handle获取当前线程中的Looper对象,Looper用来从存放Message的MessageQueue中取出Message,再有Handle进行Message的分发和处理。
+
+4: 系统上安装了多种游览器，能否制定某游览器访问指定页面？
+答:通过直接发送Uri把参数带过去，或者通过manifest里intentfilter里的data属性
+
+5: 简要解释下activity,intent,intent filter,service,Broadcast,BroadcastReceiver
+答:一个activity呈现了一个用户可以操作的可视图化用户界面。一个intent是一个Intent对象,它保存了消息的内容。对于activity和service来说,它指定了请求的操作名称和待操作数据的URI。Intent对象可以显式的指定一个目标component。如果这样的话,android会找到这个component(基于manifest文件中的声明)并激活它。但如果一个目标不是显式指定的,android必须找到响应intent的最佳component。它是通过将Intent对象和目标的intent filter相比较来完成这一工作的。一个component的intent filter告诉android该component能处理的intent。intent filter也是在manifest文件中声明。intent:ContentProvider在接收到ContentResolver的请求时被激活。一个service不包含可见的用户界面,而是在后台无限地运行可以连接到一个正在运行的服务中,连接后,可以通过服务中暴露出来的接口与其进行通信。一个broadcast receiver是一个接受广播并作出回应的component,broadcast receiver没有界面。]
+
+6: IntentService有何优点?
+答:好处…(a)Activity的进程，当处理Intent的时候，会产生一个对象的Service。(b)Android的进程处理器现在会尽可能的不kill掉你。(c)非常容易使用。
+
+7: Android引入广播机制的用意？
+答:…(a)从MVC的角度考虑(应用程序内)android为什么要有那4大组建，现在的移动开发模型基本上也是照搬的web那一套MVC架构，只不过改了点假装而已。android的四大组建本质上就是为了实现移动或者说嵌入式设备上的MVC架构，他们之间有时候是一种相互依存的关系，有时候又是一种补充关系，引入广播机制可以方便极大组建的信息和数据交互。(b)程序间互通消息(列入在组建的应用程序内监听系统来电)。(c)效率上(参考UDP的广播协议在局域网的方便性)。(d)设计模式上(反转控制的一种应用，类似监听者模式)。
+
+8: 谈谈Android的IPC机制
+答:IPC是内部进程通信的简称，是共享"命名管道"的资源。Android中的IPC机制是为了让Activity和Service之间可以随时的进行交互,故在Android中该机制只适用于Activity和Service之间的通信,类似于远程方法调用，类似于C/S模式的访问。通过定义AIDL接口文件来定义IPC接口。Servicer端实现IPC接口,Client端调用IPC接口本地代理。
+
+9: 是否可以继承string类
+答:string类是final类故不可以继承。(final声明的话表示该类不能被继承，是顶级类)
+
+10:俩个对象值相同(x.equals(y)==true)，但却可有不同的hash code,这句话对不对？
+答:不对，有相同的hash code。
+
+http://www.arm4u.com/read.php?tid=63

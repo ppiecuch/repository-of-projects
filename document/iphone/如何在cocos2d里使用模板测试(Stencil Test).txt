@@ -1,0 +1,25 @@
+了一晚上终于把模板测试实现了。心情激动上来分享一下心得，写完睡觉。明天还上班
+
+首先需要说明的是cocos2d本身在初始化opengl的时候没有创建stencil buffer，甚至在实现过程中没有使用depth buffer test。
+因此思路就是在初始化的时候创建模板缓存，但是看一下cocos2d源代码可以发现cocos2d是使用EAGLView来初始化的，而EAGLView本身初始化也没有提供创建模板缓存相应的接口，因此必须自己创建。
+
+代码如下：
+       //cocos2d 在attachInView中初始化opengl，在初始化结束之后加入模板缓存
+       [[Director sharedDirector] attachInView:window];
+    CGSize    newSize;
+    newSize = [window bounds].size;
+    newSize.width = roundf(newSize.width);
+    newSize.height = roundf(newSize.height);
+    GLuint _depthBuffer;
+    glGenRenderbuffersOES(1, &_depthBuffer);
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, _depthBuffer);
+    glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_STENCIL_INDEX8_OES, newSize.width, newSize.height);
+    glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES, GL_RENDERBUFFER_OES, _depthBuffer);
+    
+    glEnable(GL_STENCIL_TEST);
+
+然后继承Sprite或者其他你要用到的类，重载draw函数，实现模板测试把。
+
+另外一点需要注意，在iPhone OS 2.2 下opengl es的头文件没有模板缓存格式的定义，需要把环境设置成iPhone OS 3.0。
+而设置iPhone OS 3.0的时候有一个BUG，UILocalizedIndexedCollation.h会编译报错，需要设置文件权限之后修改一下头文件。我今天第一次在3.0下编译，被这个BUG搞死了。
+http://www.cocoachina.com/bbs/simple/?t7812.html
