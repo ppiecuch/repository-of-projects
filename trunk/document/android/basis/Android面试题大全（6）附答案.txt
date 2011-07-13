@@ -1,0 +1,20 @@
+1. 如何将SQLite数据库(dictionary.db文件)与apk文件一起发布? 
+
+　　解答：可以将dictionary.db文件复制到Eclipse Android工程中的res aw目录中。所有在res aw目录中的文件不会被压缩，这样可以直接提取该目录中的文件。可以将dictionary.db文件复制到res aw目录中 
+
+　　2. 如何将打开res aw目录中的数据库文件? 
+
+　　解答：在Android中不能直接打开res aw目录中的数据库文件，而需要在程序第一次启动时将该文件复制到手机内存或SD卡的某个目录中，然后再打开该数据库文件。复制的基本方法是使用getResources().openRawResource方法获得res aw目录中资源的 InputStream对象，然后将该InputStream对象中的数据写入其他的目录中相应文件中。在Android SDK中可以使用SQLiteDatabase.openOrCreateDatabase方法来打开任意目录中的SQLite数据库文件。 
+
+　　3. Android引入广播机制的用意? 
+
+　　答：a:从MVC的角度考虑(应用程序内) 
+
+　其实回答这个问题的时候还可以这样问，android为什么要有那4大组件，现在的移动开发模型基本上也是照搬的web那一套MVC架构，只不过是改了点嫁妆而已。android的四大组件本质上就是为了实现移动或者说嵌入式设备上的MVC架构，它们之间有时候是一种相互依存的关系，有时候又是一种补充关系，引入广播机制可以方便几大组件的信息和数据交互。 
+
+　　b：程序间互通消息(例如在自己的应用程序内监听系统来电) 
+
+　　c：效率上(参考UDP的广播协议在局域网的方便性) 
+
+　　d：设计模式上(反转控制的一种应用，类似监听者模式)
+http://www.arm4u.com/read.php?tid=66

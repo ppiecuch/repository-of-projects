@@ -1,0 +1,213 @@
+1.    请描述下Activity的生命周期。
+
+      必调用的三个方法：onCreate() --> onStart() --> onResume()，用AAA表示
+
+
+（1）父Activity启动子Activity，子Actvity退出，父Activity调用顺序如下
+AAA --> onFreeze() --> onPause() --> onStop() --> onRestart() --> onStart(),onResume() …
+（2）用户点击Home，Actvity调用顺序如下
+AAA --> onFreeze() --> onPause() --> onStop() -- Maybe --> onDestroy() – Maybe
+（3）调用finish()， Activity调用顺序如下
+AAA --> onPause() --> onStop() --> onDestroy()
+（4）在Activity上显示dialog， Activity调用顺序如下
+AAA
+（5）在父Activity上显示透明的或非全屏的activity，Activity调用顺序如下
+AAA --> onFreeze() --> onPause()
+（6）设备进入睡眠状态，Activity调用顺序如下
+AAA --> onFreeze() --> onPause()
+
+
+2.    如果后台的Activity由于某原因被系统回收了，如何在被系统回收之前保存当前状态？
+
+      onSaveInstanceState()
+
+
+
+当你的程序中某一个Activity A在运行时，主动或被动地运行另一个新的Activity B，这个时候A会执行onSaveInstanceState()。B完成以后又会来找A，这个时候就有两种情况：一是A被回收，二是A没有被回收，被回收的A就要重新调用onCreate()方法，不同于直接启动的是这回onCreate()里是带上了参数savedInstanceState；而没被收回的就直接执行onResume()，跳过onCreate()了。 
+
+
+3.    如何将一个Activity设置成窗口的样式。
+
+
+在AndroidManifest.xml 中定义Activity的地方一句话android:theme="@android:style/Theme.Dialog"或android:theme="@android:style/Theme.Translucent"就变成半透明的
+
+
+4.    如何退出Activity？如何安全退出已调用多个Activity的Application？
+
+
+对于单一Activity的应用来说，退出很简单，直接finish()即可。
+
+当然，也可以用killProcess()和System.exit()这样的方法。
+
+
+
+1、抛异常强制退出：
+
+该方法通过抛异常，使程序Force Close。
+
+验证可以，但是，需要解决的问题是，如何使程序结束掉，而不弹出Force Close的窗口。
+
+2、记录打开的Activity：
+
+每打开一个Activity，就记录下来。在需要退出时，关闭每一个Activity即可。
+
+3、发送特定广播：
+
+在需要结束应用时，发送一个特定的广播，每个Activity收到广播后，关闭即可。
+
+4、递归退出
+
+在打开新的Activity时使用startActivityForResult，然后自己加标志，在onActivityResult中处理，递归关闭。
+
+除了第一个，都是想办法把每一个Activity都结束掉，间接达到目的。
+
+但是这样做同样不完美。
+
+你会发现，如果自己的应用程序对每一个Activity都设置了nosensor，在两个Activity结束的间隙，sensor可能有效了。
+
+但至少，我们的目的达到了，而且没有影响用户使用。
+
+为了编程方便，最好定义一个Activity基类，处理这些共通问题。
+
+
+5.    请介绍下Android中常用的五种布局。
+
+
+FrameLayout（框架布局），LinearLayout （线性布局），AbsoluteLayout（绝对布局），RelativeLayout（相对布局），TableLayout（表格布局）
+
+
+6.    请介绍下Android的数据存储方式。
+
+Android提供了4种方式存储数据：
+
+--使用SharedPreferences存储数据；------------------解析的XML文件用来存储。
+
+--文件存储数据；----------------------输入输出流
+
+--SQLite数据库存储数据；
+
+--使用ContentProvider存储数据；--------------可以存储在SQLite里面，也可以存储在内容解析器（Android自带的一个解析类）里面。
+
+7.    请介绍下ContentProvider是如何实现数据共享的。
+
+创建一个属于你自己的Content provider或者将你的数据添加到一个已经存在的Content provider中，前提是有相同数据类型并且有写入Content provider的权限。
+
+8.    如何启用Service，如何停用Service。
+
+服务类继承自service，清单文件中注册 enabled属性设为true
+
+开始一个服务使用startservice方法，停止一个服务使用stopservice方法
+
+9.    注册广播有几种方式，这些方式有何优缺点？请谈谈Android引入广播机制的用意。
+
+引入广播机制可以方便几大组件的信息和数据交互。
+
+b：程序间互通消息(例如在自己的应用程序内监听系统来电)
+
+c：效率上(参考UDP的广播协议在局域网的方便性)
+
+d：设计模式上(反转控制的一种应用，类似监听者模式)
+
+
+
+10.    请解释下在单线程模型中Message、Handler、Message Queue、Looper之间的关系。
+
+android提供了 Handler 和 Looper 来满足线程间的通信。Handler 先进先出原则。Looper类用来管理特定线程内对象之间的消息交换(Message Exchange)。
+
+1)Looper: 一个线程可以产生一个Looper对象，由它来管理此线程里的Message Queue(消息队列)。
+
+2)Handler: 你可以构造Handler对象来与Looper沟通，以便push新消息到Message Queue里;或者接收Looper从Message Queue取出)所送来的消息
+
+3) Message Queue(消息队列):用来存放线程放入的消息。
+
+4)线程：UI thread 通常就是main thread，而Android启动程序时会替它建立一个Message Queue。
+
+
+
+11.    AIDL的全称是什么？如何工作？能处理哪些类型的数据？
+
+Android Interface Define Language见aidl的笔记
+
+12.    请解释下Android程序运行时权限与文件系统权限的区别。
+
+
+
+
+
+13.    系统上安装了多种浏览器，能否指定某浏览器访问指定页面？请说明原由。
+
+14.    有一个一维整型数组int[]data保存的是一张宽为width，高为height的图片像素值信息。请写一个算法，将该图片所有的白色不透明(0xffffffff)像素点的透明度调整为50%。
+
+15.    你如何评价Android系统？优缺点。
+
+15-1、一条最长的短信息约占多少byte?
+
+中文70(包括标点)，英文160，160个字节。
+
+
+
+ANR：Application Not Responding，五秒。把耗时量大的任务放到新建的子线程中。使用这种方法涉及你的应用程序，能够保证你的程序对输入保持良好的响应，从而避免因为输入事件超过5秒钟不被处理而产生的ANR。
+
+16.Intentservice的好处 Activity的进程，当处理intent的时候，会产生一个对应的Service
+
+Android的进程处理器现在回尽可能的不kill掉你
+
+17.android中线程的处理方法
+
+每当一个程序第一次启动时候都会启动一个main thread 该线程主要处理与UI相关的事件，比如按键事件。
+
+子线程和ui的更新通过 handler处理msg消息队列使用sendmessage方法或者post方法post方法发送的是一个runnable对象。
+
+Looper是每条线程里的message queue的管家。因为子线程里没有mq所以调用looper里的getMainlooper方法这样得到的主线程的looper不为null。
+
+Looper。Loop方法运行开始后，循环的按照接受顺序取出非空的mq
+
+当sendmessage方法执行时 该函数设置了那个msg对象的target属性是当前的hander对象
+
+随后looper取出了那个msg则调用该msg的target只想的handler的dispatchMessage方法
+
+在该方法里用户指定三个判断优先级由高到低
+
+1）  meg里面的callback方法实现了一个runnable接口run函数做处理工作
+
+2）  handler里面的mcallback指向的一个实现了callback接口的对象由handlemessage处理
+
+3）  处理消息handler对象对应的类继承并且实现了其中handlemessage函数通过这个实现的handleMessage函数处理消息
+
+最后handler处理完message对象之后looper设置该msg对象为null以便回收
+
+主线程和子线程如何交互最终谁来处理信息？
+
+判断handler对象里面的looper对象属于哪条线程的则由该线程执行
+
+1）  当handler对象的构造函数为空时，说明looper是主线程的
+
+18.GBK  GB2312  UTF8之间的区别
+
+UTF8它对英文使用8位（即一个字节），中文使用24为（三个字节）来编码
+
+GBK的文字编码是用双字节来表示的，即不论中、英文字符均使用双字节来表示
+
+GB2312和GBK是一样的
+
+19. 如何将SQLite数据库(dictionary.db文件)与apk文件一起发布?
+
+解答：可以将dictionary.db文件复制到Eclipse Android工程中的res aw目录中。所有在res aw目录中的文件不会被压缩，这样可以直接提取该目录中的文件。
+
+20.在Android中不能直接打开res aw目录中的数据库文件，而需要在程序第一次启动时将该文件复制到手机内存或SD卡的某个目录中，然后再打开该数据库文件。复制的基本方法是使用getResources().openRawResource方法获得res aw目录中资源的 InputStream对象，然后将该InputStream对象中的数据写入其他的目录中相应文件中。在Android SDK中可以使用SQLiteDatabase.openOrCreateDatabase方法来打开任意目录中的SQLite数据库文件
+
+21、简要解释一下activity、 intent 、intent filter、service、Broadcase、BroadcaseReceiver
+
+答：一个activity呈现了一个用户可以操作的可视化界面
+
+一个service不包含可见的用户界面，可以在后台无限运行。可以连接到一个正在运行的服务中，连接后可以通过服务中的接口对其通信
+
+一个broadcast receiver 是一个接收广播消息并做出回应的组件。广播接收者没有界面
+
+一个intent是一个intent对象，他保存了消息的内容。对于activity和service来说，它指定了请求的操作名称和待操作数据的URI。Intent对象可以显式的指定一个目标组件。如果这样的话，android会找到这个component(基于manifest文件中的声明)并激活它。但如果一个目标不是显式指定的，android必须找到响应intent的最佳component。是通过将Intent对象和目标的intent filter相比较来完成这一工作的。一个component的intent filter告诉android该component能处理的intent。intent filter也是在manifest文件中声明的.
+
+onPause，onstop， onDestroy，三种状态 下 activity都有可能被系统干掉
+
+为了保证程序的正确性，你要在onPause()里写上持久层操作的代码，将用户编辑的内容都保存到存储介质上（一般都是数据库）。实际工作中因为生命周期的变化而带来的问题也很多，比如你的应用程序起了新的线程在跑，这时候中断了，你还要去维护那个线程，是暂停还是杀掉还是数据回滚，是吧？因为Activity可能被杀掉，所以线程中使用的变量和一些界面元素就千万要注意了，一般我都是采用Android的消息机制 [Handler,Message]来处理多线程和界面交互的问题。
+
+http://www.arm4u.com/read.php?tid=19
