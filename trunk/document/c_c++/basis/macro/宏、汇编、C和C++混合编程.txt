@@ -1,0 +1,299 @@
+宏、汇编、C和C++混合编程 
+*************************************
+* 第十三讲 宏、汇编、C和C++混合编程 *
+*************************************
+    2007/03/14  asdjf@163.com  www.armecos.com
+    
+    在嵌入式开发时，有时需要优化代码，提高执行效率，此时要用到内嵌汇编技术；有时程序比较复杂，采用面向对象技术可以提高代码复用率和可靠性；有时一些宏的使用技巧可以简化代码。通常，在一个项目中，这些需求是同时存在的，因此，编译器需要更多信息了解程序员的意图。混合编程可以充分发挥各种语言的优势，综合利用能取得显著效果。
+    
+    -------------------
+    | 汇编和C混合编程 |
+    -------------------
+    
+    在C中嵌入汇编的格式为：
+    asm(“汇编语句”
+        :输出寄存器
+        :输入寄存器
+        :会被修改的寄存器);
+    其中，“汇编语句”是程序员写汇编指令的地方；“输出寄存器”表示当这段嵌入汇编执行之后，哪些寄存器用于存放输出数据。这些寄存器会分别对应一个C语言表达式或一个内存地址；“输入寄存器”表示在开始执行汇编代码时，这里指定的一些寄存器中应存放的输入值，它们也分别对应着一个C变量或常数值。“会被修改的寄存器”似乎很古怪，不过在gcc知道程序员拿这些寄存器做什么后，确实能够对优化操作带来帮助。下面举例说明：
+    
+    01    #define get_seg_byte(seg, addr) \
+    02    ({ \
+    03    register char __res;
+    04    __asm__("push %%fs; \
+    05             mov %%ax, %%fs; \
+    06             movb %%fs:%2, %%al; \
+    07             pop %%fs" \
+    08             :"=a"(__res) \
+    09             :""(seg), "m"(*(addr))); \
+    10    __res;})
+    
+    这段10行代码定义了一个嵌入汇编语言宏函数。用圆括号括住的组合语句(花括号中的语句)可以作为表达式使用，第10行变量__res是该表达式的输出值。
+    宏语句要在一行上定义，因此使用“\”将这些语句连成一行。宏的名字是get_seg_byte(seg, addr)。第3行定义寄存器变量__res。第4行的__asm__表示嵌入汇编语句的开始。4-7行是AT&T格式的汇编语句。
+    第8行是输出寄存器，其含义是此段代码结束后将eax所代表的寄存器的值放入__res变量中，作为本函数的输出值，"=a"中的"a"称为加载代码，"="表示这是输出寄存器。
+    第9行表示此段代码开始运行时将seg放到eax寄存器中，""表示使用与上面同个位置的输出相同的寄存器。"m"表示使用一个内存偏移地址值。
+    为了在上面的汇编语句中使用该地址值，嵌入汇编程序规定把输出和输入寄存器统一按顺序编号，顺序是从输出寄存器序列从左到右从上到下以"%0"开始，分别记为%0、%1...%9。因此，输出寄存器的编号是%0(这里只有一个输出寄存器)，输入寄存器前一部分(""(seg))的编号是%1，而后部的编号是%2。上面第6行上的%2即代表(*(addr))这个内存偏移量。
+    第4行代码的作用是将fs段寄存器的内容入栈；第5行将eax中的段值赋给fs段寄存器；第6行是把fs:(*(addr))所指定的字节放入al寄存器中。当执行完汇编语句后，输出寄存器eax的值将被放入__res，作为该宏函数的返回值。
+    这段程序中，seg代表一指定的内存段值，而addr表示一内存偏移地址量。该宏函数的功能是从指定段和偏移值的内存地址处取一个字节。
+    表1是一些可能会用到的寄存器加载代码及其具体的含义。
+    
+    表1 常用寄存器加载代码说明
+    ----------------------------------------------------------------------------------
+    | 代码 |              说明              || 代码 |              说明              |
+    ----------------------------------------------------------------------------------
+    |  a   | 使用寄存器eax                  ||  m   | 使用内存地址                   |
+    ----------------------------------------------------------------------------------
+    |  b   | 使用寄存器ebx                  ||  o   | 使用内存地址并可以加偏移量     |
+    ----------------------------------------------------------------------------------
+    |  c   | 使用寄存器ecx                  ||  I   | 使用常数0~31                   |
+    ----------------------------------------------------------------------------------
+    |  d   | 使用寄存器edx                  ||  J   | 使用常数0~63                   |
+    ----------------------------------------------------------------------------------
+    |  S   | 使用esi                        ||  K   | 使用常数0~255                  |
+    ----------------------------------------------------------------------------------
+    |  D   | 使用edi                        ||  L   | 使用常数0~65535                |
+    ----------------------------------------------------------------------------------
+    |  q   | 使用动态字节可寻址寄存器(eax、 ||  M   | 使用常数0~3                    |
+    |      | ebx、ecx或edx)                 ||      |                                |
+    ----------------------------------------------------------------------------------
+    |  r   | 使用任意动态分配的寄存器       ||  N   | 使用1字节常数(0~255)           |
+    ----------------------------------------------------------------------------------
+    |  g   | 使用通用有效的地址即可(eax、   ||  O   | 使用常数0~31                   |
+    |      | ebx、ecx、edx或内存变量)       ||      |                                |
+    ----------------------------------------------------------------------------------
+    |  A   | 使用eax与edx联合(64位)         ||      |                                |
+    ----------------------------------------------------------------------------------
+    
+    再看下一个例子：
+    
+    01    asm("cld\n\t"
+    02        "rep\n\t"
+    03        "stol"
+    04        :/*没有输出寄存器*/
+    05        :"c"(count - 1), "a"(fill_value), "D"(dest)
+    06        :"%ecx", "%edi");
+    
+    1-3行是通常的汇编语句，用以清方向位，重复保存值。
+    第4行说明此段嵌入汇编没有用到输出寄存器。
+    第5行的含义是：将count-1的值加载到ecx寄存器中(加载代码是"c")，fill_value加载到eax中，dest放到edi中。为什么要让gcc编译器去做这样的寄存器值的加载，而不让我们自己做呢？因为这样有利于gcc进行某些优化工作。例如：fill_value值可能已经在eax中了，如果是在一个循环语句中的话，gcc就可能在整个循环中保留eax，这样就可以在每次循环中少用一个movl语句。
+    第6行告诉gcc这些寄存器中的值已经改变了。这些信息有利于gcc优化操作。
+    
+    下面的例子不是让程序员自己指定哪个变量使用哪个寄存器，而是让gcc为程序员选择。
+    
+    01    asm("lea;(%1, %1, 4), %0"
+    02        :"=r"(y)
+    03        :"o"(x));
+    
+    这个例子可以非常快地将x乘5。其中"%0"，"%1"是指gcc自动分配的寄存器。这里"%1"代表输入值x要存入的寄存器，"%0"表示输出值寄存器。输出寄存器代码前一定要加等于号。如果输入寄存器的代码是0或为空时，则说明使用与相应输出一样的寄存器。所以，如果gcc将r指定为eax的话，那么上面汇编语句的含义即为:"leal (eax, eax, 4), eax"。
+    注意：在执行代码时，如果不希望汇编语句被gcc优化而改变位置，就需要在asm符号后添加volatile关键词：asm volatile(...);
+          或者更详细地说明为：__asm__ __volatile__(...)。
+    
+    ------------------
+    | C和C++混合编程 |
+    ------------------
+
+    作为一种面向对象的语言，C++支持函数重载，而过程式语言C则不支持。函数被C++编译后在符号库中的名字与C语言的不同。例如，假设某个函数的原型为： 
+    
+    void foo( int x, int y );
+
+　　该函数被C编译器编译后在符号库中的名字为_foo，而C++编译器则会产生像_foo_int_int之类的名字（不同的编译器可能生成的名字不同，但是都采用了相同的机制，生成的新名字称为“mangled name”）。
+
+　　_foo_int_int这样的名字包含了函数名、函数参数数量及类型信息，C++就是靠这种机制来实现函数重载的。例如，在C++中，函数void foo( int x, int y )与void foo( int x, float y )编译生成的符号是不相同的，后者为_foo_int_float。
+
+按以下方式写C++头文件即可。
+
+#ifndef __INC_ecos
+#define __INC_ecos
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*在下面位置添加需要的头文件内容...*/
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __INC_ecos */
+
+
+(1)C中引用C++语言中的函数和变量时，C++的头文件需添加extern "C"但是在C语言中不能直接引用声明了extern "C"的该头文件，应该仅将C文件中将C++中定义的extern "C"函数声明为extern类型。
+
+/* c语言头文件：cExample.h */
+#ifndef C_EXAMPLE_H
+#define C_EXAMPLE_H
+extern int add(int x,int y);
+#endif
+/* c语言实现文件：cExample.c */
+#include "cExample.h"
+int add( int x, int y )
+{
+return x + y;
+}
+// c++实现文件，调用add：cppFile.cpp
+extern "C" 
+{
+#include "cExample.h"
+}
+int main(int argc, char* argv[])
+{
+add(2,3); 
+return 0;
+}
+
+(2)如果C++调用一个C语言编写的.DLL时，当包括.DLL的头文件或声明接口函数时，应加extern "C" {　}。
+
+//C++头文件 cppExample.h
+#ifndef CPP_EXAMPLE_H
+#define CPP_EXAMPLE_H
+extern "C" int add( int x, int y );
+#endif
+//C++实现文件 cppExample.cpp
+#include "cppExample.h"
+int add( int x, int y )
+{
+return x + y;
+}
+/* C实现文件 cFile.c
+/* 这样会编译出错：#include "cExample.h" */
+extern int add( int x, int y );
+int main( int argc, char* argv[] )
+{
+add( 2, 3 ); 
+return 0;
+}
+
+    -----------------------
+    | 宏中"#"和"##"的用法 |
+    -----------------------
+
+一、一般用法
+我们使用#把宏参数变为一个字符串,用##把两个宏参数贴合在一起.
+用法:
+＃i nclude
+＃i nclude
+using namespace std;
+
+#define STR(s)     #s
+#define CONS(a,b)  int(a##e##b)
+
+int main()
+{
+    printf(STR(vck));           // 输出字符串"vck"
+    printf("%d\n", CONS(2,3));  // 2e3 输出:2000
+    return 0;
+}
+
+二、当宏参数是另一个宏的时候
+需要注意的是凡宏定义里有用'#'或'##'的地方宏参数是不会再展开.
+
+1, 非'#'和'##'的情况
+#define TOW      (2)
+#define MUL(a,b) (a*b)
+
+printf("%d*%d=%d\n", TOW, TOW, MUL(TOW,TOW));
+这行的宏会被展开为：
+printf("%d*%d=%d\n", (2), (2), ((2)*(2)));
+MUL里的参数TOW会被展开为(2).
+
+2, 当有'#'或'##'的时候
+#define A          (2)
+#define STR(s)     #s
+#define CONS(a,b)  int(a##e##b)
+
+printf("int max: %s\n",  STR(INT_MAX));    // INT_MAX ＃i nclude
+这行会被展开为：
+printf("int max: %s\n", "INT_MAX");
+
+printf("%s\n", CONS(A, A));               // compile error 
+这一行则是：
+printf("%s\n", int(AeA));
+
+INT_MAX和A都不会再被展开, 然而解决这个问题的方法很简单. 加多一层中间转换宏.
+加这层宏的用意是把所有宏的参数在这层里全部展开, 那么在转换宏里的那一个宏(_STR)就能得到正确的宏参数.
+
+#define A           (2)
+#define _STR(s)     #s
+#define STR(s)      _STR(s)          // 转换宏
+#define _CONS(a,b)  int(a##e##b)
+#define CONS(a,b)   _CONS(a,b)       // 转换宏
+
+printf("int max: %s\n", STR(INT_MAX));          // INT_MAX,int型的最大值，为一个变量 ＃i nclude
+输出为: int max: 0x7fffffff
+STR(INT_MAX) -->  _STR(0x7fffffff) 然后再转换成字符串；
+
+printf("%d\n", CONS(A, A));
+输出为：200
+CONS(A, A)  -->  _CONS((2), (2))  --> int((2)e(2))
+
+三、'#'和'##'的一些应用特例
+1、合并匿名变量名
+#define  ___ANONYMOUS1(type, var, line)  type  var##line
+#define  __ANONYMOUS0(type, line)  ___ANONYMOUS1(type, _anonymous, line)
+#define  ANONYMOUS(type)  __ANONYMOUS0(type, __LINE__)
+例：ANONYMOUS(static int);  即: static int _anonymous70;  70表示该行行号；
+第一层：ANONYMOUS(static int);  -->  __ANONYMOUS0(static int, __LINE__);
+第二层：                        -->  ___ANONYMOUS1(static int, _anonymous, 70);
+第三层：                        -->  static int  _anonymous70;
+即每次只能解开当前层的宏，所以__LINE__在第二层才能被解开；
+
+2、填充结构
+#define  FILL(a)   {a, #a}
+
+enum IDD{OPEN, CLOSE};
+typedef struct MSG{
+  IDD id;
+  const char * msg;
+}MSG;
+
+MSG _msg[] = {FILL(OPEN), FILL(CLOSE)};
+相当于：
+MSG _msg[] = {{OPEN, "OPEN"},
+              {CLOSE, "CLOSE"}};
+
+3、记录文件名
+#define  _GET_FILE_NAME(f)   #f
+#define  GET_FILE_NAME(f)    _GET_FILE_NAME(f)
+static char  FILE_NAME[] = GET_FILE_NAME(__FILE__);
+
+4、得到一个数值类型所对应的字符串缓冲大小
+#define  _TYPE_BUF_SIZE(type)  sizeof #type
+#define  TYPE_BUF_SIZE(type)   _TYPE_BUF_SIZE(type)
+char  buf[TYPE_BUF_SIZE(INT_MAX)];
+     -->  char  buf[_TYPE_BUF_SIZE(0x7fffffff)];
+     -->  char  buf[sizeof "0x7fffffff"];
+这里相当于：
+char  buf[11];
+
+ 
+
+#pragma hdrstop
+#include 
+#include 
+using namespace std; 
+using std::cin;
+using std::cout;
+//---------------------------------------------------------------------------
+
+#pragma argsused
+int main(int argc, char* argv[])
+{
+    vector ivec(5,20);
+ int i;
+
+ for (i=0; i!=5; i++)
+ {
+  ivec.push_back(i);
+ }
+
+    vector::iterator j= ivec.begin();
+
+ while ( j !=ivec.end() )
+ {
+  cout<<*j++< }
+    cout<<"End"<    cin>>i;
+ return 0;
+} 
+
+http://blog.ednchina.com/SystemARM/46911/message.aspx
