@@ -1,4 +1,19 @@
 [异常]
+MSVCRT.lib(MSVCR100.dll) : error LNK2005: _strchr 已经在 libcmt.lib(strchr.obj) 中定义
+[解决]
+//1>MSVCRT.lib(MSVCR100.dll) : error LNK2005: _strchr 已经在 libcmt.lib(strchr.obj) 中定义
+//1>MSVCRT.lib(MSVCR100.dll) : error LNK2005: _fread 已经在 libcmt.lib(fread.obj) 中定义
+//1>MSVCRT.lib(MSVCR100.dll) : error LNK2005: _feof 已经在 libcmt.lib(feoferr.obj) 中定义 
+       我试了一下，确实如此。经分析，估计这是库冲突的问题，开始我采用忽略特定库办法，把MSVCRTD.lib忽略了，结果出现了另外错误：
+1> uafxcwd.lib(appcore.obj) : error LNK2001: 无法解析的外部符号 ___wargv
+1>uafxcwd.lib(appcore.obj) : error LNK2001: 无法解析的外部符号 ___argc 
+我发现这种解决办法有陷入恶性循环的势头。我分析了一下，估计是LUA工程和调用lua库的工程采用不同的运行时库的不同造成的，也就是解决这种问题的最好办法是：保证底层库和上层调用程序所用的运行时库的一致，就是两个工程的下图的选项设置必须一致，如下图：
+项目->属性->C/C++/运行时库不一样
+http://blog.csdn.net/clever101/article/details/5741869 
+
+
+
+[异常]
 error LNK2019: 无法解析的外部符号 ___glutInitWithExit@12，该符号在函数 _glutInit_ATEXIT_HACK@8 中被引用
 [分析]
 glut.h的注释竟然就写着如下内容：   
