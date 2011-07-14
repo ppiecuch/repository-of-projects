@@ -9,7 +9,22 @@ MSVCRT.lib(MSVCR100.dll) : error LNK2005: _strchr 已经在 libcmt.lib(strchr.obj) 
 1>uafxcwd.lib(appcore.obj) : error LNK2001: 无法解析的外部符号 ___argc 
 我发现这种解决办法有陷入恶性循环的势头。我分析了一下，估计是LUA工程和调用lua库的工程采用不同的运行时库的不同造成的，也就是解决这种问题的最好办法是：保证底层库和上层调用程序所用的运行时库的一致，就是两个工程的下图的选项设置必须一致，如下图：
 项目->属性->C/C++/运行时库不一样
+
+
+MSVCRT.lib(MSVCR100.dll) : error LNK2005: _strchr 已经在 libcmt.lib(strchr.obj) 中定义
+MSVCRT.lib(MSVCR100.dll) : error LNK2005: _fread 已经在 libcmt.lib(fread.obj) 中定义
+
+这样的错误可以尝试先忽略后包含，来强制调整link顺序
+忽略 MSVCRT.lib,libcmt.lib
+包含 libcmt.lib,MSVCRT.lib
+根据提示，MSVCRT.lib在libcmt.lib之前已经连接，调节顺序
+因为这两个都是VC自带库，这样更改不会出现问题
+如果是很第三方库冲突，就的考虑Re: clever101 2010-07-19 21:57发表 [回复] [引用] [举报]的确是这样！如果调用程序和第三方库发生冲突，又没有办法重新编译第三方库，就得考虑忽略特定库的办法。
 http://blog.csdn.net/clever101/article/details/5741869 
+
+经调整发现还是不行,最终解决方案是:
+在相同的窗格中，确保将“MFC 的使用”设置为“在共享 DLL 中使用 MFC”。  
+在“配置属性”下，选择“C/C++”，然后选择“代码生成”。请确保将“运行时库”设置为“多线程调试 DLL (/MDd)”
 
 
 
