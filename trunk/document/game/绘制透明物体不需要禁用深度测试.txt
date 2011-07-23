@@ -1,0 +1,15 @@
+只需要将深度缓冲设为只读。
+
+在实际应用中用禁用深度缓冲的方式绘制透明物体，简直一定是会出错的。
+
+
+glEnable(GL_BLEND);
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+glDepthMask(GL_FALSE); // 将深度缓存设为只读
+
+// 画要透明的图形
+
+glDisable(GL_BLEND);
+glDepthMask(GL_TRUE); // 恢复深度缓存可写
+
+http://www.cnblogs.com/mumuliang/archive/2011/07/12/2104345.html

@@ -1,0 +1,426 @@
+雨松MOMO带你走进游戏开发的世界之摄像头的原理以及更新
+
+
+
+
+
+
+
+
+
+游戏中摄像头的原理介绍
+
+       在游戏开发中更新摄像头的位置可以决定屏幕显示的内容，尤其是RPG类游戏摄像头有着非常重要的作用，我举一个例子 有时候我们在玩RPG游戏的时候进入一个新的场景 触发一段脚本后 发现镜头开始向上移动 根据镜头移动玩家可以大概浏览一下这个场景有什么东西 ，触发什么样的剧情。这个实现的方式就是游戏摄像头原理。
+
+
+如图所示：首先摄像头显示的区域也是手机屏幕显示的区域 如果需要更改摄像头的位置  其实是更改背景地图的位置 利用程序拖动背景地图  给玩家一种假象让玩家感觉像是摄像头在移动而不是背景地图在移动。
+
+
+
+
+
+
+
+游戏中地图的绘制原理介绍
+
+       根据地图编辑器生成的出来的数组的每一个tile 的 ID 找到每一个tile的地图资源原始文件的XY坐标 算出来图片的显示位置利用程序的切割的方法把每一个tile切割出来显示在手机屏幕中。
+
+切割图片的代码所示：
+view plaincopy to clipboardprint?/** 
+ * 绘制图片中的一部分图片 
+ *  
+ * @param canvas 
+ * @param paint 
+ * @param bitmap 
+ * @param x 
+ * @param y 
+ * @param src_x 
+ * @param src_y 
+ * @param src_width 
+ * @param src_Height 
+ */  
+private void DrawClipImage(Canvas canvas, Paint paint, Bitmap bitmap,  
+    int x, int y, int src_x, int src_y, int src_xp, int src_yp) {  
+    canvas.save();  
+    canvas.clipRect(x, y, x + src_xp, y + src_yp);  
+    canvas.drawBitmap(bitmap, x - src_x, y - src_y, paint);  
+    canvas.restore();  
+}  
+	/**
+	 * 绘制图片中的一部分图片
+	 * 
+	 * @param canvas
+	 * @param paint
+	 * @param bitmap
+	 * @param x
+	 * @param y
+	 * @param src_x
+	 * @param src_y
+	 * @param src_width
+	 * @param src_Height
+	 */
+	private void DrawClipImage(Canvas canvas, Paint paint, Bitmap bitmap,
+		int x, int y, int src_x, int src_y, int src_xp, int src_yp) {
+	    canvas.save();
+	    canvas.clipRect(x, y, x + src_xp, y + src_yp);
+	    canvas.drawBitmap(bitmap, x - src_x, y - src_y, paint);
+	    canvas.restore();
+	}
+canvas.save();
+切割图片之前先把Canvas保存起来 然后在切割  绘制结束后
+canvas.restore();
+在把Canvas的在状态重置回来 如果不这么做的话 第一张图片切割后就会挡住以后所有的图片，所以大家一定要记住这一点喔。
+
+
+
+
+
+       如图所示：每一张tile的绘制原理就是这样，说到这里有些朋友可能就要问 如果我的地图无限大那根据这个方法岂不是要循环无限次？其实屏幕须要绘制的tile数量只需要绘制屏幕显示区域以内的， 屏幕现实区域以外的我们不用考虑绘制 只需要更新地图的坐标数据就可以，比如我的模拟器屏幕的大小是320X480 那么我实际绘制的tile数量只是 10 X15 (块)。其实游戏开发绘制中还有一个更重要的绘制技术就是双缓冲技术它可以用来解决屏幕闪烁问题，下一章中我会详细介绍。
+
+        
+       昨天有朋友跟我提出这种用数组的方式来绘制地图不科学我很同意他的观点，为什么不科学？ 原因是现在我们只有一个场景我们用一个数组来绘制地图 万一我们的游戏有100个场景 我们岂不是要在程序中写100个数组了？其实在实际开发中我们是把这些地图的信息转成xml文件 打到游戏的包中 玩家在切换游戏场景的时候便会读取当前游戏场景中的地图xml文件。其实这些xml文件中也是保存这地图的二位数组信息 但是这样做的好处就是数据驱动  程序员不用定义N个数组 做N种判断 只须要根据当前切换的场景的ID就可以得到地图的信息 十分方便 也可以避免代码中由于笔误造成的的错误 何乐而不为。
+
+       但是不管用任何方法处理数据 它的绘制原理都是一样的。
+
+如何更新游戏中摄像头
+
+效果图：程序取随机数更新游戏摄像头 
+
+
+
+
+
+
+
+        目前以每10000毫秒更新一下摄像头的位置 (随机数) 我们有了摄像头的位置以后 就可以在算出背景图片的相对显示位置 移动背景图片的位置后就可以给玩家制造出一种摄像头在移动的假象了。
+
+             地图块是我新拼的 长宽的tile块数是20X20。
+
+
+
+
+
+
+package cn.m15.xys;
+
+import java.io.InputStream;
+import java.util.Random;
+
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Bundle;
+import android.view.Display;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+
+public class CameraAcitvity extends Activity {
+
+    MapView mMapView = null;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+	super.onCreate(savedInstanceState);
+	// 全屏显示窗口
+	requestWindowFeature(Window.FEATURE_NO_TITLE);
+	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+		WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	// 获取屏幕宽高
+	Display display = getWindowManager().getDefaultDisplay();
+	// 显示自定义的游戏View
+	mMapView = new MapView(this,display.getWidth(), display.getHeight());
+	setContentView(mMapView);
+    }
+
+    public class MapView extends View {
+
+	// tile块的宽高
+	public final static int TILE_WIDTH = 32;
+	public final static int TILE_HEIGHT = 32;
+
+	// tile块的宽高的数量
+	public final static int TILE_WIDTH_COUNT = 20;
+	public final static int TILE_HEIGHT_COUNT = 20;
+
+	// 地图的宽高的
+	public final static int MAP_WIDTH = 640;
+	public final static int MAP_HEIGHT = 640;
+	
+	//镜头移动范围
+	public final static int CAMERA_MOVE = 10;
+	
+	// 屏幕的宽高
+	public int mScreenWidth = 0;
+	public int mScreenHeight = 0;
+	
+	// 数组元素为0则什么都不画
+	public final static int TILE_NULL = 0;
+	// 第一层游戏View地图数组
+	public int[][] mMapView = {
+		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 1, 1, 1,
+			1, 1, 1 },
+		{ 1, 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 137, 1, 1, 1,
+			1, 1, 1, 1 },
+		{ 1, 1, 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 1, 1, 1, 1,
+			1, 1, 1 },
+		{ 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 137, 137, 137, 1, 1,
+			1, 1, 1, 1, 1 },
+		{ 137, 137, 137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+			137, 137, 137, 137, 137, 1, 1, 1 },
+		{ 137, 137, 137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+			137, 137, 137, 137, 137, 1, 1, 1 },
+		{ 137, 137, 137, 1, 1, 137, 137, 137, 137, 137, 137, 137, 137,
+			137, 137, 137, 1, 1, 1, 1 },
+		{ 1, 137, 137, 1, 1, 1, 137, 137, 137, 137, 137, 137, 137, 137,
+			137, 137, 137, 1, 137, 1 },
+		{ 1, 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 137, 137, 137,
+			137, 137, 137, 137, 1 },
+		{ 1, 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 1, 1, 1, 137, 137,
+			137, 137, 137, 137 },
+		{ 1, 1, 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 1, 1, 1, 137,
+			137, 137, 137, 1 },
+		{ 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 137, 137, 1, 1, 1,
+			1, 137, 137, 137 },
+		{ 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 1, 1, 1, 1, 1, 1,
+			1, 137, 137 },
+		{ 1, 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 1, 1, 1, 1, 1, 1,
+			137, 137, 137 },
+		{ 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 137, 137, 1, 1, 1, 1,
+			1, 137, 137, 137 },
+		{ 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 137, 1, 1, 1, 1,
+			1, 1, 1, 1 },
+		{ 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 1, 1, 1, 1, 1, 1,
+			1, 1, 1 },
+		{ 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 1, 1, 1, 1, 1, 1,
+			1, 1, 1 },
+		{ 1, 1, 1, 1, 1, 1, 137, 137, 137, 137, 137, 1, 1, 1, 1, 1, 1,
+			1, 1, 1 },
+		{ 1, 1, 1, 1, 1, 1, 1, 137, 137, 137, 1, 1, 1, 1, 1, 1, 1, 1,
+			1, 1 } };
+
+	// 第二层游戏实体actor数组
+	public int[][] mMapAcotor = {
+		{ 143, 144, 0, 102, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    185, 186, 187, 188 },
+		    { 151, 152, 0, 110, 112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    193, 194, 195, 196 },
+		    { 159, 160, 0, 110, 112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    201, 202, 203, 204 },
+		    { 0, 0, 0, 126, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    209, 210, 211, 212 },
+		    { 0, 0, 0, 134, 136, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    0, 218, 219, 220 },
+		    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    0, 0, 227, 228 },
+		    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    0, 0, 0, 0 },
+		    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    0, 0, 0, 0 },
+		    { 102, 103, 103, 103, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    0, 0, 0, 0 },
+		    { 110, 111, 111, 111, 112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    0, 0, 0, 0 },
+		    { 110, 111, 111, 111, 112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    0, 0, 0, 0 },
+		    { 126, 127, 127, 127, 128, 0, 0, 0, 0, 0, 0, 0, 165, 166, 0, 0, 
+		    0, 0, 0, 0 },
+		    { 123, 124, 124, 124, 125, 0, 0, 0, 0, 0, 0, 0, 173, 174, 175, 176, 
+		    0, 0, 0, 0 },
+		    { 229, 230, 231, 232, 0, 0, 0, 0, 0, 0, 0, 0, 181, 182, 183, 184, 
+		    0, 0, 0, 0 },
+		    { 237, 238, 239, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    0, 0, 0, 0 },
+		    { 245, 246, 247, 248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+		    0, 0, 0, 0 },
+		    { 0, 254, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 233, 234, 235, 
+		    236, 0, 0, 0 },
+		    { 0, 262, 263, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 241, 242, 243, 
+		    244, 0, 0, 0 },
+		    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250, 251, 
+		    0, 0, 0, 0 },
+		    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 258, 259, 
+		    0, 0, 143, 144 }
+		    };
+
+	// 第三层游戏碰撞物理层数组
+	// 下一章介绍
+	// ....................
+
+	// 游戏地图资源
+	Bitmap mBitmap = null;
+
+	// 资源文件
+	Resources mResources = null;
+
+	// 游戏画笔
+	Paint mPaint = null;
+
+	// 横向纵向tile块的数量
+	int mWidthTileCount = 0;
+	int mHeightTileCount = 0;
+
+	// 横向纵向tile块的数量
+	int mBitMapWidth = 0;
+	int mBitMapHeight = 0;
+
+	//摄像头的焦点  0.0点为焦点在中心。
+	int mCameraPosX = 0; 
+	int mCameraPosY = 0; 
+	
+	//地图左上角锚点坐标
+	int mMapPosX =0;
+	int mMapPosY =0;
+	
+	//记录上次时间
+	
+	private long statrTime = 0;
+	
+	/**
+	 * 构造方法
+	 * 
+	 * @param context
+	 */
+	public MapView(Context context,int screenWidth, int screenHeight) {
+	    super(context);
+	    mScreenHeight = screenHeight;
+	    mScreenWidth = screenWidth;
+	    mPaint = new Paint();
+	    mBitmap = ReadBitMap(context, R.drawable.map);
+	    mBitMapWidth = mBitmap.getWidth();
+	    mBitMapHeight = mBitmap.getHeight();
+	    mWidthTileCount = mBitMapWidth / TILE_WIDTH;
+	    mHeightTileCount = mBitMapHeight / TILE_HEIGHT;
+	    statrTime = System.currentTimeMillis();
+	}
+
+	@Override
+	protected void onDraw(Canvas canvas) {
+	    UpdateCamera();
+	    DrawMap(canvas, mBitmap);
+	    DrawRectText(canvas);
+	    super.onDraw(canvas);
+	    invalidate();
+	}
+
+	private void DrawMap(Canvas canvas, Bitmap bitmap) {
+	    int i, j;
+	    for (i = 0; i < TILE_HEIGHT_COUNT; i++) {
+		for (j = 0; j < TILE_WIDTH_COUNT; j++) {
+		    int ViewID = mMapView[i][j];
+		    int ActorID = mMapAcotor[i][j];
+		    int x = (j* TILE_WIDTH) + mMapPosX;
+		    int y = (i* TILE_HEIGHT) + mMapPosY;
+		    // 绘制地图第一层
+		    if (ViewID > TILE_NULL) {
+			DrawMapTile(ViewID, canvas, mPaint, bitmap, x, y);
+		    }
+
+		    // 绘制地图第二层
+		    if (ActorID > TILE_NULL) {
+			DrawMapTile(ActorID, canvas, mPaint, bitmap, x, y);
+		    }
+		}
+	    }
+	}
+	private void DrawRectText(Canvas canvas) {
+	    canvas.clipRect(0, 0,mScreenWidth, 30);
+	    mPaint.setColor(Color.WHITE);
+	    canvas.drawRect(0, 0,mScreenWidth, 30, mPaint);
+	    mPaint.setColor(Color.RED);
+	    canvas.drawText("当前摄像头X坐标：" + mCameraPosX + "当前摄像头Y坐标 ：" + mCameraPosY, 0, 20, mPaint);
+	}
+	private void UpdateCamera() {
+	    long nowTime = System.currentTimeMillis();
+	    //每100毫秒更新一下摄像头的位置
+	    if(nowTime - statrTime > 1000) {
+		//随机获得摄像头的坐标
+		mCameraPosX = UtilRandom(0,MAP_WIDTH - mScreenWidth);
+		mCameraPosY = UtilRandom(0,MAP_HEIGHT - mScreenHeight);
+		//根据摄像头的坐标更新地图坐标
+		mMapPosX = -mCameraPosX;
+		mMapPosY = -mCameraPosY;
+		statrTime = nowTime;
+	    }
+	}
+	
+	/**
+	* 返回一个随机数
+	* @param botton
+	* @param top
+	* @return
+	*/
+	private int UtilRandom(int botton, int top) {
+	    return ((Math.abs(new Random().nextInt()) % (top - botton)) + botton);
+	}
+	/**
+	 * 根据ID绘制一个tile块
+	 * 
+	 * @param id
+	 * @param canvas
+	 * @param paint
+	 * @param bitmap
+	 */
+	private void DrawMapTile(int id, Canvas canvas, Paint paint,
+		Bitmap bitmap, int x, int y) {
+	    // 根据数组中的ID算出在地图资源中的XY 坐标
+	    // 因为编辑器默认0 所以第一张tile的ID不是0而是1 所以这里 -1
+	    id--;
+	    int count = id / mWidthTileCount;
+	    int bitmapX = (id - (count * mWidthTileCount)) * TILE_WIDTH;
+	    int bitmapY = count * TILE_HEIGHT;
+	    DrawClipImage(canvas, paint, bitmap, x, y, bitmapX, bitmapY,
+		    TILE_WIDTH, TILE_HEIGHT);
+	}
+
+	/**
+	 * 读取本地资源的图片
+	 * 
+	 * @param context
+	 * @param resId
+	 * @return
+	 */
+	public Bitmap ReadBitMap(Context context, int resId) {
+	    BitmapFactory.Options opt = new BitmapFactory.Options();
+	    opt.inPreferredConfig = Bitmap.Config.RGB_565;
+	    opt.inPurgeable = true;
+	    opt.inInputShareable = true;
+	    // 获取资源图片
+	    InputStream is = context.getResources().openRawResource(resId);
+	    return BitmapFactory.decodeStream(is, null, opt);
+	}
+
+	/**
+	 * 绘制图片中的一部分图片
+	 * 
+	 * @param canvas
+	 * @param paint
+	 * @param bitmap
+	 * @param x
+	 * @param y
+	 * @param src_x
+	 * @param src_y
+	 * @param src_width
+	 * @param src_Height
+	 */
+	private void DrawClipImage(Canvas canvas, Paint paint, Bitmap bitmap,
+		int x, int y, int src_x, int src_y, int src_xp, int src_yp) {
+	    canvas.save();
+	    canvas.clipRect(x, y, x + src_xp, y + src_yp);
+	    canvas.drawBitmap(bitmap, x - src_x, y - src_y, paint);
+	    canvas.restore();
+	}
+	
+    }
+}
+
+最后如果你还是觉得我写的不够详细 看的不够爽 不要紧我把源代码的下载地址贴出来 欢迎大家一起讨论学习 
+雨松MOMO希望可以和大家一起进步。
+
+下载地址：http://download.csdn.net/source/3460437
+http://blog.csdn.net/xys289187120/article/details/6624479
