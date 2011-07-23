@@ -1,0 +1,88 @@
+ 网上一搜一大把为自己的应用创建快捷方式，但是本文的侧重点在为“指定的应用”创建桌面快捷方式。
+    常见的桌面快捷方式有两要素：1.应用名 2.应用图标。
+
+    指定应用图标的信息是：
+
+
+view plaincopy to clipboardprint?// pkgContext为指定应用的上下文环境，iconIdentifier为一个整数，指定应用的图标标识符   
+ShortcutIconResource iconRes = Intent.ShortcutIconResource.fromContext(pkgContext,  
+                iconIdentifier);  
+shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconRes);  
+	// pkgContext为指定应用的上下文环境，iconIdentifier为一个整数，指定应用的图标标识符
+	ShortcutIconResource iconRes = Intent.ShortcutIconResource.fromContext(pkgContext,
+					iconIdentifier);
+	shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconRes);
+    创建第三方应用的快捷方式关键在于如何获取第三方应用的上下文环境，关键代码为：
+
+
+view plaincopy to clipboardprint?Context pkgContext = context.createPackageContext(pkg, Context.CONTEXT_IGNORE_SECURITY  
+                    | Context.CONTEXT_INCLUDE_CODE);  
+	Context pkgContext = context.createPackageContext(pkg, Context.CONTEXT_IGNORE_SECURITY
+						| Context.CONTEXT_INCLUDE_CODE);
+    OK，基础知识讲完了，下面直接给代码以飨读者。view plaincopy to clipboardprint?    /** 
+ * @param context 
+ *            执行者。 
+ * @params pkg 待添加快捷方式的应用包名，其值不可为null。 
+ * @return 返回true为正常执行完毕，<br/> 
+ *         返回false为pkg值为null或者找不到该应用或者该应用无用于Launch的MainActivity 。 
+ * @author sodino 
+ * */  
+public boolean addShortcut(Context context, String pkg) {  
+    // 快捷方式名   
+    String title = "unknown";  
+    // MainActivity完整名   
+    String mainAct = null;  
+    // 应用图标标识   
+    int iconIdentifier = 0;  
+    // 根据包名寻找MainActivity   
+    PackageManager pkgMag = context.getPackageManager();  
+    Intent queryIntent = new Intent(Intent.ACTION_MAIN, null);  
+    queryIntent.addCategory(Intent.CATEGORY_LAUNCHER);  
+    List<ResolveInfo> list = pkgMag.queryIntentActivities(queryIntent,  
+            PackageManager.GET_ACTIVITIES);  
+    for (int i = 0; i < list.size(); i++) {  
+        ResolveInfo info = list.get(i);  
+        if (info.activityInfo.packageName.equals(pkg)) {  
+            title = info.loadLabel(pkgMag).toString();  
+            mainAct = info.activityInfo.name;  
+            iconIdentifier = info.activityInfo.applicationInfo.icon;  
+            break;  
+        }  
+    }  
+    if (mainAct == null) {  
+        // 没有启动类   
+        return false;  
+    }  
+    Intent shortcut = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");  
+    // 快捷方式的名称   
+    shortcut.putExtra(Intent.EXTRA_SHORTCUT_NAME, title);  
+    //不允许重复创建   
+    // shortcut.putExtra("duplicate", false);    
+    ComponentName comp = new ComponentName(pkg, mainAct);  
+    shortcut.putExtra(Intent.EXTRA_SHORTCUT_INTENT,  
+            new Intent(Intent.ACTION_MAIN).setComponent(comp));  
+    // 快捷方式的图标   
+    Context pkgContext = null;  
+    if (context.getPackageName().equals(pkg)) {  
+        pkgContext = context;  
+    } else {  
+        // 创建第三方应用的上下文环境，为的是能够根据该应用的图标标识符寻找到图标文件。   
+        try {  
+            pkgContext = context.createPackageContext(pkg, Context.CONTEXT_IGNORE_SECURITY  
+                    | Context.CONTEXT_INCLUDE_CODE);  
+        } catch (NameNotFoundException e) {  
+            e.printStackTrace();  
+        }  
+    }  
+    if (pkgContext != null) {  
+        ShortcutIconResource iconRes = Intent.ShortcutIconResource.fromContext(pkgContext,  
+                iconIdentifier);  
+        shortcut.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconRes);  
+    }  
+    // 发送广播，让接收者创建快捷方式   
+    // 需权限<uses-permission   
+    // android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />   
+    context.sendBroadcast(shortcut);  
+    return true;  
+}  
+http://blog.csdn.net/sodino/article/details/6624521

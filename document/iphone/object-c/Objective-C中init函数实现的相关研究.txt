@@ -1,0 +1,144 @@
+今天在学习Objective－C时见到某初始化函数中有如下代码：
+
+    self = [super init];
+ 
+    if(self){
+ 
+// Initialize members
+ 
+    }
+ 
+    return self;
+
+    当时只是觉得Objective-C与才C++应该一样，每个子类对象都包含父类对象，所以super与self都是指向同一对象的头部的，[super init]返回的地址应该与self所代表的地址一样（即self == [super init]）。那么，对self赋[super init]的值岂不是没有什么意义？
+ 
+    找朱去讨论，他也不知道是因为什么。但是他想起了在《From C++ to Objective-C》中好像提到过这个情况，于是在一通查找之后终于在7.1.3（P25）找到了说明。那一节的例子中的对应代码是这样的：
+
+    if(![super init])
+ 
+return nil;
+ 
+   // Initialize members
+ 
+return self;
+
+    同时下面又相应的说明：
+ 
+    Polemic: Most people use the instruction self = [super init]; if (self) {...} in the initializer. This is justified by the fact that in some cases, [super init] could return a different object. However, in a very interesting document [6], Will Shipley shows that is a bad practice. It is far more logical to use the above form, where it is only checked whether [super init] returns nil or not.
+ 
+    意思是很多人采用了self = [super init]; if (self) {...}的方法，这是由于有一些实践已经证明了[super init]有可能返回一个（与self所指对象）完全不同的对象。但作者推荐了一篇文章，说这篇文章证实了这个为大多数人所使用的初始化方式是一种不好的手法。
+ 
+    这里所说的 a very interesting document[6] 指的是：
+ 
+    [6] Will Shipley. self = [supid init]. http://wilshipley.com/blog/2005/07/ self-stupid-init.html.  
+ 
+    是一篇博文。在这篇博文里，作者对比了两种形式的初始化方法，它们是：
+
+    1.Traditional -init
+
+    - (id)init;
+ 
+    {
+ 
+if ((self = [super init]) == nil)
+ 
+   return nil;
+
+[...initialize my stuff...]
+ 
+return self;
+ 
+    }
+
+    2.Wil's -init
+
+    - (id)init;
+ 
+    {
+ 
+if (![super init])
+ 
+   return nil;
+
+[...initialize my stuff...]
+ 
+return self;
+ 
+    }
+
+    作者认为不可能存在不用self = [super init]就不对的情况，所以他认为第二种方法才是正确的。他曾在以前的一篇博文上说谁能找到这样的情况就给那人20美元。
+ 
+    但现在作者坦言这样的情况确实存在——一个名叫Ken Ferry的人编写了一个程序，该程序会自动为Cocoa库的每一个类派生出子类并产生程序将其实例化，并在初始化时判断[super init]是否返回的就是self。最终该程序Ken Ferry终于找到了一些这样的类——它们都是 single intance（单实例）的类。
+ 
+    说到这里大家想必也都知道是怎么回事了，单实例的类初始化函数在第一次被调用时会返回新的实例，以后再被调用则只会返回第一次生成的实例。在这种情况下，作者提出的方式2也就有了问题 ——若遇到父类采用单例模式，则在子类中[super init]返回的确实非nil，但却也不再是子类对象所包含的那个父类对象了。如此一来子类对象所包含的那个父类对象并未被初始化，没有达到初始化函数的目的。
+ 
+    但是我们也应该注意到第一种方式也是不对的——self被重新定向为指向父类那个单实例，如此一来则发生了内存泄露，因为self原先所指向的对象变成了“没有链子栓着的狗”（没有指针指向它）。
+ 
+    原来两种方式都存在不足，那么该如何是好呢？作者提出了第三种方式：
+
+    id superInitReturn = [super init];
+ 
+    if(!superInitReturn || self != superInitReturn)
+ 
+    {
+ 
+return nil;
+ 
+    }
+ 
+    // Initialize memebers
+ 
+    return self;
+
+   我个人对此方法的理解是：若[super init]返回的与self不同，则说明父类是单实例类，而单实例类的init函数应该是被重写过的，一般会返回nil，遇到这种情况我们就该收手了—— 让你的类去继承一个单实例类并非好的设计（如果想达到类似效果，请让这个单实例成为你的类的成员）——故而返回nil。
+
+    值得一提的是该博文为作者2005年所作，作者于2009年在末尾追加了更新，指出苹果公司有些说明表明了他们很有可能要重写[NSObject init]方法，主要是因为要采用新的内存管理手段以提高内存重用率，所以作者最终推荐的init方式为：
+
+    -(id) init
+ 
+    {
+ 
+if(!(self = [super init]))
+ 
+{
+ 
+   return nil;
+ 
+}
+ 
+// Initialize members
+ 
+return self;
+ 
+    }
+
+    原文如下:
+ 
+    Update April, 2009:
+
+There's been hints from Apple that they might modify the standard -[NSObject init] method to try to re-use old object's memory, since it turns out that a very common usage pattern is for programs to keep creating and deallocating, say, 12 objects of the same class, over and over. Re-using the exact same memory ends up being a big win (and this is a trick the iPhone already does with its UITableViewCell class, and that is a HUGE win if you do it yourself on the iPhone).
+
+So, from now on, I recommend everyone uses:
+
+Subclassing NSColorPanel the Right Way
+ 
+- (id)init;
+ 
+{
+ 
+if (!(self = [super init]))
+ 
+   return nil;
+
+// other stuff
+ 
+return self;
+ 
+}
+
+I do.
+
+    我还是感到不解，看不出他的理由是什么。明天继续研究，也希望有高手能来指点一二。
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/Cheng_Tian/archive/2010/07/16/5740831.aspx

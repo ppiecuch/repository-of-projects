@@ -1,0 +1,177 @@
+UIView 继承的 UIResponder (负责UI事件处理) 类中提供了四个方法处理多点触控： 
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;
+
+ 
+touchesBegan方法在触控开始时被调用，
+touchesMoved方法在触控移动时被调用
+touchesEnded方法在触控结束时被调用
+touchesCancelled方法在系统强制结束触控时被调用
+ 
+上述方法的参数：
+event 为触控动作引发的UI事件，只有发生了UI事件UIResponder的相应处理方法才会被调用。传递给上述方法的UI事件都是“touch”类型的，它关联了一系列UITouch对象来代表发生该事件时所有处于各种状态(began, moved, ended, cancelled )下的触控动作。 
+touches 同样是一系列 UITouch 对象的集合(NSSet)，不过它只包含处于特定状态的触控动作。比方说调用touchesBegan 时传递的就是所有处在 began 状态(phase)的UITouch对象。
+
+
+相关类型说明：
+
+UIEvent 对象代表了 iPhone OS 中一个UI事件，主要有三种类型： touch，motion，remote control 。 
+UITouch对象代表一根手指在某一个UI事件发生时刻的动作，它有四种状态(phase)，began, moved, ended, cancelled 。 
+触控动作会引发 touch 类的UI事件，而这个UI事件中也就包括了一系列 UITouch 对象来记录当时的所有手指的动作。当 touch 类型的UI事件发生的时候会被交给 UIResponder 处理，继而调用上述四个方法。
+ 
+OpenGL ES 程序模板中的多点触控处理
+OES 程序模板中的类继承关系为   EAGLView ： UIView ： UIResponder  
+在 EAGLView 类中实现了上述四个方法，并分别在其中用不同的标签调用 ESRenderer 的 view 方法。 
+ESRenderer 协议（就是接口）中提供了四个同名同参的 view 方法，用标签(緑)来区分调用：
+@optional
+
+- (void)view:(UIView*)view touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event;
+
+- (void)view:(UIView*)view touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event;
+
+- (void)view:(UIView*)view touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event;
+
+- (void)view:(UIView*)view touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event;
+
+实现了ESRenderer接口的 ES1Renderer 和 ES2Renderer 最终在 View 方法中负责触控事件的处理。  
+
+获取各种触控信息的方法
+获取触控对象（UITouch）
+通过 event 参数获取 UITouch 集合  
+- (NSSet *)allTouches;                             所有关联的UITouch
+
+- (NSSet *)touchesForWindow:(UIWindow *)window;    指定窗口的UITouch
+
+- (NSSet *)touchesForView:(UIView *)view;          指定View上的UITouch
+
+- (NSSet *)touchesForGestureRecognizer:(UIGestureRecognizer *)gesture __OSX_AVAILABLE_STARTING(__MAC_NA,__IPHONE_3_2);
+
+touches 参数本身就是处在当前状态的UITouch集合 
+从 touches 集合中随机获取一个UITouch
+[touches anyObject];
+ UITouch 对象的各种属性
+timestamp   这个触控对象最后改变的时间戳。 用从系统启动到现在的时间来表示，float类型。开始时和移动时会更新。
+tapCount  连续点击的次数。一旦中断就重新计数。 
+phase   这个触控对象的所处状态。 枚举类型。 
+locationInView()  在自己所属View中的位置。
+ 
+示例代码（ Metronome by Apple ）
+ 
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+
+    UITouch *touch = [[event allTouches] anyObject];
+
+    lastLocation = [touch locationInView:self];
+
+}
+
+ 
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+
+    UITouch *touch = [[event allTouches] anyObject];
+
+    CGPoint location = [touch locationInView:self];
+
+        
+
+    CGFloat xDisplacement = location.x - lastLocation.x;
+
+    CGFloat yDisplacement = location.y - lastLocation.y;
+
+    CGFloat xDisplacementAbs = fabs(xDisplacement);
+
+    CGFloat yDisplacementAbs = fabs(yDisplacement);
+
+ 
+
+    // If the displacement is vertical, drag the weight up or down. This will impact the speed of the oscillation.
+
+    if ((xDisplacementAbs < yDisplacementAbs) && (yDisplacementAbs > 1)) {  
+
+        [self stopSoundAndArm];
+
+        [self dragWeightByYDisplacement:yDisplacement];
+
+        lastLocation = location;
+
+        tempoChangeInProgress = YES;
+
+    } else if (xDisplacementAbs >= yDisplacementAbs) {  
+
+        // If displacement is horizontal, drag arm left or right. This will start oscillation when the touch ends.
+
+        CGFloat radians = atan2f(location.y - kArmBaseY, location.x - kArmBaseX);
+
+        CGFloat rotation = RadiansToDegrees(radians) + 90.0;
+
+        [self rotateArmToDegree:rotation];
+
+    }
+
+}
+
+ 
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+
+    UITouch *touch = [[event allTouches] anyObject];
+
+    CGPoint location = [touch locationInView:self];
+
+    
+
+    CGFloat xDisplacement = location.x - lastLocation.x;
+
+    CGFloat yDisplacement = location.y - lastLocation.y;
+
+    CGFloat xDisplacementAbs = fabs(xDisplacement);
+
+    CGFloat yDisplacementAbs = fabs(yDisplacement);
+
+    
+
+    [self stopSoundAndArm];
+
+ 
+
+    if (tempoChangeInProgress) {  
+
+        [self dragWeightByYDisplacement:yDisplacement];
+
+        [self startSoundAndAnimateArmToRight:YES];
+
+        tempoChangeInProgress = NO;
+
+    } else if (xDisplacementAbs > yDisplacementAbs) {
+
+        // horizontal displacement, start oscillation
+
+        BOOL startToRight = (xDisplacement >= 0.0) ? YES : NO;
+
+        [self startSoundAndAnimateArmToRight:startToRight];
+
+    }
+
+}
+
+ 
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+
+    tempoChangeInProgress = NO;
+
+    [self stopSoundAndArm];
+
+}
+
+作者：鬼舞者
+原文：http://miaoshuanghe.blog.163.com/ 
+
+http://www.j2megame.org/index.php/content/view/2618/165.html

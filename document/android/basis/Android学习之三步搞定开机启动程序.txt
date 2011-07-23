@@ -1,0 +1,64 @@
+时间过的蛮快的，有一个月没写博客了，博客浏览量突破1w了，蛮高兴的，新版的CSDN blog还不错哟！CSDN还是很给力的嘛！别的话不多说，下面开始重点。
+
+要做到开机启动程序，其实蛮简单的，只要接收系统开机广播就OK啦，但貌似程序是装在手机内存中的才有用，装在SD上的我没试验成功。
+
+第一步：
+
+创建你的广播类：
+
+
+view plaincopy to clipboardprint?public class AutoStartBroadcast extends BroadcastReceiver {  
+  
+    public void onReceive(Context context, Intent intent) {  
+        System.out.println("开机启动");  
+        //指定你要启动的Activity或Service   
+        Intent auto_activity = new Intent(context,AutoStartActivity.class);  
+        auto_activity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
+        context.startActivity(auto_activity);  
+    }  
+}  
+public class AutoStartBroadcast extends BroadcastReceiver {
+
+	public void onReceive(Context context, Intent intent) {
+		System.out.println("开机启动");
+		//指定你要启动的Activity或Service
+		Intent auto_activity = new Intent(context,AutoStartActivity.class);
+		auto_activity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(auto_activity);
+	}
+}
+
+
+第二步：
+
+在AndroidManifest.xml中注册广播：
+
+
+view plaincopy to clipboardprint?<receiver android:name=".AutoStartBroadcast">  
+<span style="white-space:pre">    </span><intent-filter>  
+<span style="white-space:pre">        </span><action android:name="android.intent.action.BOOT_COMPLETED"/>  
+<span style="white-space:pre">    </span></intent-filter>  
+</receiver>  
+<receiver android:name=".AutoStartBroadcast">
+<span style="white-space:pre">	</span><intent-filter>
+<span style="white-space:pre">		</span><action android:name="android.intent.action.BOOT_COMPLETED"/>
+<span style="white-space:pre">	</span></intent-filter>
+</receiver>声明权限：
+
+
+view plaincopy to clipboardprint?<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>  
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+第三步：
+
+必须先启动应用程序，以完成广播的注册，下一次开机时你就能看到他开机启动你指定的Activity或Service了。
+
+
+
+
+我写了一个Demo，用于开机启动一个Activity。希望对大家有帮助。时候不早啦，洗洗睡啦！谢谢各位！
+
+下载地址为：
+
+还在审核中，有需要的童鞋可以留下您的邮箱！
+
+http://blog.csdn.net/ldj299/article/details/6612940
