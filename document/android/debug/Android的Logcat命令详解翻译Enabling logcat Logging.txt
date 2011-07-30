@@ -1,0 +1,176 @@
+2011/07/28
+
+Android LOG系统提供了收集和查看系统调试输出的功能。各种应用程序和系统其他部分输出的LOG都存储在一些循环缓冲区里，这些缓冲区可以通过 logcat 命令来查看和过滤使用。
+
+使用logcat命令
+
+你可以用 logcat 命令来查看和控制系统LOG Buffer里内容，通常用法：
+
+[adb] logcat [<option>] ... [<filter-spec>] ...
+
+这节下面内容解释过滤以及命令的选项。关于选项的全面总结可参看：logcat命令选项列表
+
+你可以在你的电脑，也可以通过运行在模拟器/设备上的远程adb shell端来使用logcat命令。在你的电脑上查看LOG输出：
+
+$ adb logcat
+
+通过远端 adb shell，可以这样：
+
+# logcat
+
+过滤Log输出
+
+Android LOG信息都有一个标签（tag）和它的优先级（priority）。
+
+·         LOG的标签是一个简短的描述来指示发生在哪一个系统部件内，在写LOG时指定。（比如：“View”就是查看VIEW系统的标签）.
+
+·         优先级有下列几种，按照优先级从低到高顺序排列为：
+
+o    V — Verbose (最低优先级)
+
+o    D — Debug
+
+o    I — Info
+
+o    W — Warning
+
+o    E — Error
+
+o    F — Fatal
+
+o    S — Silent (最高优先级，没有任何输出)
+
+在运行logcat 的时候在前两列的信息中你就可以看到 logcat 的标签列表和优先级别,它是这样标出的<priority>/<tag>.
+
+下面是一个logcat输出的例子,它的优先级就是“I”，标签是“ActivityManage”：
+
+I/ActivityManager(  585): Starting activity: Intent { action=android.intent.action...}
+
+为了让LOG输出达到可管理的级别，你还可以用过滤器来限制LOG输出，过滤器可以帮助只是显示你感兴趣的tag-priority组合的信息，而隐藏其他信息。
+
+A过滤器语句按照tag:priority ...格式描述。这里，tag 表示是感兴趣的标签，priority 是表示报告指定标签的最低等级。 包含上面tag的信息或者指定优先级之上的信息被写入LOG。你可以在一个过滤表达式中提供多个tag:priority 声明，这些声明之间用空白符间隔。
+
+下面有一个过滤表达式的例子，例子表示不显示其他所有的LOG信息，除了那些标签为“ActivityManager”且优先级为“Info”以上的和标签为“ MyApp”且优先级为“ Debug”以上的信息。
+
+adb logcat ActivityManager:I MyApp:D *:S
+
+上面表达式的最后的元素 *:S,，是设置所有标签的优先级为“silent”，这样保证只有“View”和“MyApp”的LOG才会显示。用 *:S 的是确保日志输出被限制在你明确指定的过滤表达式的极好方法——它使的你的过滤器在LOG输出时就像一个“白名单”。
+
+下面过滤语句显示优先级为warning或更高的LOG日志信息：
+
+adb logcat *:W
+
+如果你在电脑上运行logcat （相比远程运行adb shell），你还可以通过为环境变量ANDROID_LOG_TAGS指定一个参数来设置缺省的过滤器：
+
+export ANDROID_LOG_TAGS="ActivityManager:I MyApp:D *:S"
+
+需要注意，如果你从远端运行logcat 或者使用adb shell logcat，ANDROID_LOG_TAGS 过滤器并不能应用在模拟器/设备实例上 。
+
+控制LOG输出格式
+
+Log日志信息除了包括标签和优先级外，还有许多其他元数据域。可以修改日志的输出格式，来显示出特定的元数据域。可以通过-v 选项来指定下列所支持的格式化输出。
+
+·         brief — 显示priority/tag和打印LOG进程的PID（(缺省格式)。
+
+·         process — 仅仅显示PID。.
+
+·         tag — 仅仅显示priority/tag。
+
+·         thread — 显示进程:线程和priority/tag.
+
+·         raw — 显示原始LOG信息，不显示其他元数据域。
+
+·         time — 显示日期，发生时间，priority/tag和打印LOG进程的PID。
+
+·         long — 显示所有的元数据域和LOG信息，他们之间用空白行隔开。
+
+当启动了logcat，你可以通过-v选项来指定输出格式：
+
+[adb] logcat [-v <format>]
+
+下面是用 thread 输出格式来产生的LOG的例子：
+
+adb logcat -v thread
+
+要注意的是你只能用-v 选项来指定一个输出格式。 
+
+查看指定的LOG Buffer
+
+Android日志系统有多个循环缓冲区，并不是所有的LOG信息都把LOG输出到默认循环缓冲区。为了看到其他缓冲区的LOG信息，你需要通过-b 选项来启动logcat 。来看其他循环缓冲区。这些缓冲区有：
+
+·         radio — 查看与无线/电话相关的缓冲区里的信息。
+
+·         events — 查看和事件相关的的缓冲区。
+
+·         main — 查看main缓冲区里的LOG (缺省)
+
+-b  选项使用方法：
+
+[adb] logcat [-b <buffer>]
+
+下面的例子演示怎么查看包含radio 和 telephony信息的LOG缓冲区：
+
+adb logcat -b radio
+
+查看stdout和stderr
+
+在默认状态下，Android系统输出stdout 和 stderr  (System.out 和System.err)到/dev/null。在运行Dalvik VM的进程中，有一个系统可以备份日志输出。在这种情况下，系统会用stdout 和stderr和优先级 I.来记录日志信息。
+
+通过这种方法来指定输出的路径，你可以停止运行的模拟器/设备，然后通过用命令setprop 使输出重定向。
+
+$ adb shell stop
+$ adb shell setprop log.redirect-stdio true
+$ adb shell start
+
+系统在你关闭模拟器/设备前设置会一直保留这些设置。为了使这个设置作为你的模拟器/设备的默认设置，可以通过添加到设备的文件/data/local.prop 中。
+
+Logcat命令选项列表
+
+选项
+ 描述
+ 
+-b <buffer>
+ 加载一个指定的LOG Buffer供查看，比如event 或radio。 默认值是main 。具体参考查看指定的Log Buffers.
+ 
+-c
+ 清除整个 log并退出。
+ 
+-d
+ 输出LOG到屏幕上并退出。
+ 
+-f <filename>
+ 写LOG信息到 <filename>。默认是stdout.
+ 
+-g
+ 打印指定LOG Buffer的大小并退出。
+ 
+-n <count>
+ 设置日志的最大数目<count>，默认值是4，需要和选项-r一起使用。
+ 
+-r <kbytes>
+ Rotates每输出<kbytes> 写LOG文件，默认值为16，需要和选项-f一起使用。
+ 
+-s
+ 设置默认的过滤级别为silent。
+ 
+-v <format>
+ Sets 设置LOG的输出格式，默认的是brief 格式，要知道更多的支持的格式，参看控制LOG输出格式.
+ 
+
+ 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+附，大家看两张在WORD里编辑的效果：
+
+一、开头
+
+
+
+
+
+
+
+二、结尾
+
+http://blog.csdn.net/thl789/article/details/6639611

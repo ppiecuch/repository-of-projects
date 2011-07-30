@@ -1,0 +1,110 @@
+  iPhone,Safari,Mail都是Cocoa应用程序。运行环境上呈现Aqua用户界面和Mac OS其他可视部分（Finder，Dock等）集成。开发方面Cocoa是面向对象的软件组件-类-的集成套件。适合开发应用程序，命令行工具，插件等，可以使用多种编程语言。这些类可复用，可支配，可以直接使用或者根据需求扩展。 
+
+      主要开发语言Objective-C，是ANSI C的超。在ANSI C语法和语义特性上扩展，支持面向对象。可以将C和Objective-C混合，可以调用非Cocoa编程接口定义的所有函数比如Carbon和BSD。 Cocoa支持C++，Java。定义一个平行的Java类库，实现将Java接口映射到Objective-C实现的桥机制。通过 Python/Objective-C桥进行编程可以使Python对象和Objective-C对象相互传递消息。 
+
+      我们可以使用X-code和Interface Builder开发，可以使用Metrowerks的CodeWarrior管理编译调试Cocoa工程或者可以用Emacs编写代码用make file和命令连接编译，在命令行gdb调试。当然Xcode本质也是使用gcc编译gdb调试。 
+
+     Cocoa主要框架：Foundation和Application Kit(图形用户界面部分)框架.动态共享库,头文件,API文档等。 
+
+     图1.1
+
+     
+
+                                 图1.1 Mac OS X架构
+
+     图1.2
+
+     
+
+                             图1.2 Cocoa在Mac OS X架构中位置
+
+     图1.2中位于中间层代表包含在Core Services和Application Service两个框架下的系统软件，图中一个层都依赖于下面的其他层。在图1.1中负责Aqua用户界面渲染的系统组件Quartz(Core Graphics框架中实现)是Application Services层的一部分。构架的基础是Darwin，Cocoa在内的Mac OS X各个部分都依赖于Darwin。Cocoa编程接口是应用程序通常需要的基础访问通道。但是如果一些能力在Cocoa接口中找到或在需要更精细的控制，可以直接使用底层框架。比如Core Graphics，通过调用该框架或OpenGL函数，可以绘出比Cocoa绘画方法更复杂的图像。大多数依赖框架的编程接口是用ANSI C编写的，所以也很方便。Cocoa依赖的或在通过类和方法为之提供访问通道的主要基础框架有:
+
+      Core Foundation，Foundation框架很多类都基于Core Foundation中对应的封装类型。他们之间可以实现类型转换。一些     CoreFoundation 实现又基于Darwin层的BSD部分。 
+
+      Carbon，Cocoa使用了Carbon一些服务，Carbon框架在Core Services和Application Services层中定位为系统服务。Cocoa使用了Corbon Core提供的File Manager组件来进行不同文件系统表示之间的转换。 
+
+      Core Graphics(Quartz)，Cocoa描画和图像处理类基于CoreGraphics类，实现Quartz和窗口服务器组件。 
+
+      Launch Services，NSWorkspace类负责向外提供Launch Services。Cocoa使用Launch Services提供的应用程序注册功能和应用程序及文档相关联的图标。 
+
+      Print Core，Cocoa的打印类是打印子系统的一个面向对象接口。 
+
+      Cocoa还使用Carbon环境的Text Encoding Converter（文本编码转换器）服务来处理一些字符串编码转换。一些Cocoa方法向外提供I/O Kit框架（电源管理），QuickDraw框架（描画），Apple Event框架（Apple Event处理）和ATS框架（字体支持）。 
+
+图1.3
+
+      
+
+                                           图1.3   Cocoa架构主要依赖关系
+
+ 
+
+    
+
+Foundation框架概述： 
+
+      Foundation框架设计目标：为诸如内存管理、对象改变和通告这样的事物定义基本的对象行为和引入一直的规则。通过程序包技术和Unicode字符串支持国际化和本地化。支持对象的持久保存和分发。在一定程度上独立于OS，以支持移植。为编程的元类型提供对象封装或价物，数值、字符串、集合以及端口、线程、文件系统等为访问底层系统实体和服务提供的工具类。 
+
+      Foundation的几个范式和策略：对象所有权和对象的清除。建立一个对象所有权策略以代替垃圾收集机制。指定对象需要释放自己创建、拷贝、显示保留的其他对象。自动释放池（NSAutoreleasePool类中定义）实现一种迟缓释放（delayed-release）机制。变体。很多值和容器类的不可变类都有一个可以修改的变体。可变类的实例从不可变类中继承过来。类簇。是一个抽象类以及一组私有的具体子类的组合。抽象类是这些子类的雨伞接口。根据不同情况，类簇可以返回适当优化的类实例，比如NSString和NSMutableString就是针对不同的存储需要进行优化的各种私有子类实例的经纪类。通告是Cocoa主要设计模式。它基于广播机制，使一个对象可以在另一个对象进行某种任务或遇到某情况时，以用户或系统事件的方式得到通告。同步、异步和分布式通告。有NSNotification、NSNotificationCenter、NSNotificationQueue和 NSDistributeNotificationCenter类实现。
+
+
+
+
+
+
+
+      Foundation框架中的一些类： 
+
+Value Objects：NSData类为字节流提供面向对象的存储空间，NSValue和NSNumber类为简单的标量值数组提供面向对象的存储空间。 NSDate、NSCalendarDate、NSTimeZone、NSCalendar、NSDateComponents、NSLocale类提供了代表时间日期日历地域设置的对象。 
+
+Strings：NSString是另一类值对象，负责以null结尾、具有特定编码的字节数组提供面向对象的存储空间。支持UTF-16、 UTF-8、MacRoman和其他编码的字符串间转换。NSString还提供字符串检索组合比较以及文件系统路径操作的方法。用NSScanner对象对NSString对象中数字和词进行解析。NSCharacterSet代表可以在各个NSString和NSScanner方法中使用的一组字符。
+
+Collections：集合。NSArray NSDictionary NSSet NSEnumerator等类在之前学习中涉及到。 
+
+OS Services：访问底层操作系统服务，同时又隔离developer和OS。NSProcessInfo查询应用程序环境。NSHost主机在网络中名称和地址。NSTimer可以按指定时间间隔向其他对象发送消息。NSRunLoop可以管理程序输入源。NSUserDefaults存储全局和用户级的系统数据库提供编程接口。 
+
+File System and URL：NSFileManager为create rename del mov文件操作提供接口。NSFileHandle可以进行底层的文件操作（exp：文件内查找操作）。NSBundle可以寻找存储在程序包中的资源，可以动态装载某些资源（exp：nib文件，source code）。NSURL和NSURLHandle来表示 访问 管理源于URL的数据。 
+
+Interprocess Communication：NSPipe NSPort NSPortMessage代表不同的系统端口套接字和名字服务器，对实现底层IPC有用。NSPipe代表一个BSD管道。 
+
+Locking/Threading：NSTread类可以创建多线程程序，lock类为彼此竞争的线程在访问进程资源时提供控制机制。NSTask可以分出一个子进程来执行其他工作或进度检查。 
+
+Notifications：它基于广播机制，使一个对象可以在另一个对象进行某种任务或遇到某情况时，以用户或系统事件的方式得到通告。同步、异步和分布式通告。有NSNotification、NSNotificationCenter、NSNotificationQueue和 NSDistributeNotificationCenter类实现。 Archiving and Serialization归档和序列化：这里的类使对象分发和持久保留成为可能。NSCoder及其子类和NSCoding协议一起可以以独立于构架的方式来表示对象中包含的数据，可以将类信息和数据一起存储。 
+
+Objective-C Language Services:语言服务，NSException和NSAssertionHandler类为代码中的断言和例外处理提供了面向对象封装。 NSInvocation对象是OBJ-C消息的静态表示。NSMethodSignature对象负责记录方法的类型信息，可用于信息的推送。 NSClassDescription是一个抽象类，用于定义和查询类的关系和属性。 
+
+Predicates：条件判断类。NSPredicate、NSCompoundPredicate和NSComparisonPredicate类负责对获取或过滤对象的逻辑约束条件进行封装。NSExpression代表条件判断中的表达式。 
+
+Dis-Tributed Objects：我们可以通过分布式对象类来进行同台机器或一个网络中的不同机器的进程间通讯。NSConnection NSDISTantObjectRequest NSDistantObejct NSProtocolChecher其中后面两个类继承与NSProxy。其他所有上面的类都继承于NSObject。 Scripting：对AppleScript和Apple Event命令的支持。NSAppleEventManager NSAppleScript等。 
+
+ 
+
+      Application Kit框架概述 Appliaction Kit框架包含实现图形、事件驱动的用户界面需要的所有对象：窗口、对话框、按键、菜单、滚动条、文本输入框等的。App Kit处理所有细节。高效的进行屏幕描画、营建设备和屏幕缓冲区进行通讯，描画前清除屏幕上的区域已经视图裁剪。大多数App Kit类都是支持类，可以不用直接使用。用IB创建用户界面对象到应用程序控制器对象的连接，控制器对象负责管理用户界面，协调用户界面和内部数据之间的数据流。可能用到off-the-shelf控制器对象，可能需要实现一个或多个定制控制器类（特别是使用那些类的动作和委托方法）。如果我们都App Kit类和协议熟悉，我们可以以编程方式控制用户界面。也可以通过子类化NSView或在其他类实现自己的对象。 
+
+      App Kit有超过125个类和协议组成，都最终都从Foundation框架的NSObject类继承而来。App Kit类都比较宽且浅，从根类开始只有5个超类。最大的分支的根为NSResponder类，负责定义响应者链，对用户事件进行响应的有序的对象列表。 NSApplication、NSWindow、NSView等都继承自它。Exp：我们按键或鼠标点击，系统产生事件，并沿着响应者链向上传递，寻找可以响应该事件的对象。第二大分支继承自NSCell类，这组类和NSControl类（继承自NSView-NSResponder）的派生类有映像关系。对负责响应动作的用户界面对象，App Kit采用架构将其工作分为控件对象（control）和单元对象（cell）。NSControl和NSCell类和子类定义一组常见的用户界面对象，button，slider，browser等。控件对象和一个或多个单元对象相关联，单元对象负责实现描画细节和事件处理。一个button有 NSButton对象和NSButtoonCell对象组成。控件和单元的实现机制为target-action（目标）机制。单元对象可以保留用户点击时应该发送给特定对象的消息标识信息。用户操作一个控件时，控件从它的单元对象抽出必要信息，并向目标对象发送动作消息。Target-action机制可以指定目标对象以及应该调用的方法，赋予动作意义。IB中，按Control，鼠标从控件对象拖拽到应用程序或其他对象就可以，也可以编程完成。另一个设计模式委托（delegation）机制。界面上很多对象，都定义了委托。委托对象代表被委托对象进行各种动作或者与之相互协作。
+
+   
+
+            
+
+      App Kit框架的一些类和协议： 
+
+User Interface：全局应用程序对象。NSApplication，每个应用程序都使用一个NSApplication类的单件实例来控制主事件循环，跟踪应用程序的窗口、菜单，将事件分发给恰当的对象（应用程序本身或者他的一个窗口），建立高级别的自动释放池，接受应用程序级别的事件通告。 NSApplication对象有个委托对象，在应用程序启动或终止、被隐藏或被激活、即将打开用户选择的文件等适合，我们可以定制应用程序的行为，而不必生成NSApplication子类。 NSWindow and NSView，继承自NSResponder类。可对动作进行响应。NSApplication对象内维护一个NSWindow对象的列表，每个应用的每个窗口都有一个对象的对象。每个NSWindow对象都维护一些有层次结构的NSView对象。View层次用于窗口内部的描画和事件处理。 NSWindow对象负责窗口级的事件，将其分发给窗口中View对象，并为View对象提供一个描画区域。NSWindow对象也有个委托，用于定制窗口的行为。NSView是显示在窗口的所有对象的超类。所有NSView子类都借助图形函数描画。drawRect。创建时需要重载该方法。 NSController控制器类是一个抽象类。子类有NSObjectController、 NSArrayController、NSTreeControlller。都是Cocoa绑定实现的一部分。这里实际到模型-视图-设计模式，先前有文介绍。 NSPanel（面板对话框），是NSWindow子类。显示短暂全局或紧急信息。App Kit中常见对话框有Save Open和Print对话框。 NSMenu、NSMenuItem、NSCursor类负责程序显示给用户的菜单和光标的行为和外观。 NSBox、NSScrollView和NSSplitView类用于为窗口中的视图集合或者其他视图对象提供图形附件。NSBox类将窗口中元素分组，并为整组元素描画一个边界。NSSplitView类可以在垂直或者水平方向附加一些视图，并为每个视图分配一定的公共区域，用户可滑动控制条来重新分配视图区域。NSScrollView类及其辅助类SNClipView为用户提供滚动机制。RSRulerView类可以为一个滚动视图添加标尺和标志。表视图NSTableView类以行列方式显示视图，用于显示数据库记录等。大纲视图 NSOutlineView的实例，NSTableView的子类也提供了一种显示表格数据的方法。 NSBrowser类创建一个显示和漫游层次的数据对象。 
+
+      NSTextField和NSFont文本和字体：NSTextField类实现了一个简单的课编辑文本输入框。NSTextView类为更大的文本体提供编辑特性，是抽象类NSText的子类，定义了扩展文本系统的借口，支持富文本、添附文件、输入管理和按键绑定、标识文本属性，和Font窗口及 Font菜单、段落风格、Clipboard等组件相互协作。还允许通过委托和通告来定制。IB中NSTextField、NSForm、 NSScrollView等都包含了NSTextView对象，我们很少需要编程方式创建。NSTextStroage、NSLayoutManager 和NSTextContainer还可以实现更强大的文本操作。NSFont和NSFontManager类用于封装和管理字体的家族、尺寸和变体。每个不同的字体，NSFont类定义一个对象与之对应。NSFontPanel类定义了再用户界面上显示的Font窗口。 
+
+       NSImage和NSColor：NSImage和NSImageRep负责封装图形数据，可以访问存储在磁盘文件或显示在屏幕的图像。NSColor、 NSColorSpace、NSColorList等类来支持Cocoa的颜色。NSGraphicsContext、NSBezierPath和 NSAffineTransform类实现变量描画、支持图形变换比如缩放旋转转换等。 
+
+      NSPrinter、NSPrintPanel、NSPageLayout和NSPrintInfo类可将显示在窗口或视图上信息进行打印和传真，还可以创建NSView的PDF表示。 
+
+      NSFileWrapper，NSDocument:NSFileWrapper类创建与磁盘文件或目录对应的对象。将文件的内容保存在内存中，进行显示修改以及传递给其他程序。还提供了一个图标。也可以通过Foundation中的NSFileManager类访问或枚举文件和目录内容。   
+
+      NSDocumentControoler、NSDocument和NSWindowController类为创建经济与文档的应用程序定义了构架。 
+
+      NSInputSever、NSInputManager类和NSTextInput协议为程序提供访问文本输入管理系统的通道。该系统对不懂国际化键盘产生按键进行解析，将正确文本字符传递给文本视图对象。 
+
+      OS Services：和其他程序共享数据，NSPasteboard类定义了剪切板。拖拽NSDraggin…协议。拼写检查NSSpellServer类。 
+
+      Cocoa特性：基本应用程序框架，为事件驱动的行为和应用程序、窗口、工作空间管理提供基础设施，我们不需要直接处理事件或发送任何描画命令给渲染库；用户面向对象特性，为用户界面提供了很多对象在IB上可以选择，配置属性连接到其他对象（windows/text fields/radio buttons/drawers/sheets/tab views/table views/browsers/sliders/image views/color wells/combo boxes/text views）；系统交互能力，应用程序可以和文件系统、工作空间、以及其他应用交互；提供了多线程、空间时间处理、资源迟缓加载、内存管理、运行操作编程支持；基于文档的应用能力，脚本处理等特性。
+http://www.j2megame.org/index.php/content/view/2612/165.html

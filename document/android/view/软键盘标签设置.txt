@@ -1,0 +1,24 @@
+软键盘的Enter键默认显示的是“完成”文本，我们知道按Enter建表示前置工作已经准备完毕了，要去什么什么啦。比如，在一个搜索中，我们输入要搜索的文本，然后按Enter表示要去搜索了，但是默认的Enter键显示的是“完成”文本，看着不太合适，不符合搜索的语义，如果能显示“搜索”两个字或者显示一个表示搜索的图标多好。事实证明我们的想法是合理的，Android也为我们提供的这样的功能。通过设置android:imeOptions来改变默认的“完成”文本。这里举几个常用的常量值：
+
+1.
+actionUnspecified  未指定，对应常量EditorInfo.IME_ACTION_UNSPECIFIED.效果：
+
+2.
+actionNone 没有动作,对应常量EditorInfo.IME_ACTION_NONE效果：
+
+3.
+actionGo 去往，对应常量EditorInfo.IME_ACTION_GO效果：
+
+4.
+actionSearch 搜索，对应常量EditorInfo.IME_ACTION_SEARCH效果： 
+
+5.
+actionSend 发送，对应常量EditorInfo.IME_ACTION_SEND效果：
+
+6.
+actionNext 下一个，对应常量EditorInfo.IME_ACTION_NEXT效果：
+
+7.
+actionDone 完成，对应常量EditorInfo.IME_ACTION_DONE效果：
+
+http://www.cmd100.com/bbs/forum-redirect-tid-178779-goto-lastpost.html#lastpost
