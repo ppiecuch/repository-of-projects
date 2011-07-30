@@ -1,0 +1,79 @@
+SharedPreferences是以键值对来存储应用程序的配置信息的一种方式，它只能存储基本数据类型。一个程序的配置文件仅可以在本应用程序中使用，或者说只能在同一个包内使用，不能在不同的包之间使用。 实际上SharedPreferences是采用了XML格式将数据存储到设备中，在DDMS中的File Explorer中的/data/data/<package name>/shares_prefs下。 
+
+以下表格为获取SharedPreferences对象的两个方法： 返回值
+ 函数
+ 备注
+ 
+SharedPreferences
+ Context.getSharedPreferences(String name,int mode)
+ name为本组件的配置文件名（如果想要与本应用程序的其他组件共享此配置文件，可以用这个名字来检索到这个配置文件）。 
+
+mode为操作模式，默认的模式为0或MODE_PRIVATE，还可以使用MODE_WORLD_READABLE和MODE_WORLD_WRITEABLE。
+ 
+SharedPreferences
+ Activity.getPreferences(int mode)
+ 配置文件仅可以被调用的Activity使用。 
+
+mode为操作模式，默认的模式为0或MODE_PRIVATE，还可以使用MODE_WORLD_READABLE和MODE_WORLD_WRITEABLE。
+ 
+
+
+如果要读取配置文件信息，只需要直接使用SharedPreferences对象的getXXX()方法即可，而如果要写入配置信息，则必须先调用SharedPreferences对象的edit()方法，使其处于可编辑状态，然后再调用putXXX()方法写入配置信息，最后调用commit()方法提交更改后的配置文件。 
+
+以下是示例代码： import android.app.Activity; 
+
+import android.content.SharedPreferences; 
+
+public class Calc extends Activity { 
+
+public static final String PREFS_NAME = "MyPrefsFile"; 
+
+. . . 
+
+@Override 
+
+protected void onCreate(Bundle state){ 
+
+super.onCreate(state); 
+
+. . . 
+
+//载入配置文件 
+
+SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0); 
+
+//或者使用 SharedPreferences settings = getPreferences(0); 
+
+boolean silent = settings.getBoolean("silentMode", false); 
+
+setSilent(silent); 
+
+} 
+
+@Override 
+
+protected void onStop(){ 
+
+super.onStop(); 
+
+//写入配置文件。可以使用SharedPreferences.Editor来辅助解决。 
+
+SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0); 
+
+SharedPreferences.Editor editor = settings.edit(); 
+
+editor.putBoolean("silentMode", mSilentMode); 
+
+editor.commit(); //一定要记得提交 
+
+//或者再简单化一可以这样写 
+
+SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0); 
+
+setting.edit().putBoolean(“silentMode”,mSilentMode).commit(); 
+
+} 
+
+}
+ 
+http://dev.10086.cn/cmdn/supesite/?uid-50260-action-viewspace-itemid-1606
