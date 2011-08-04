@@ -21,3 +21,28 @@ dialog.setPositiveButton("确认",
 		}
 });
 dialog.setView(ll).show();
+
+////    		new AlertDialog.Builder(DaDouActivity.this).setTitle("Test").setPositiveButton("确认",new DialogInterface.OnClickListener(){
+////    			public void onClick(DialogInterface dialog, int which) {
+////    				Log.d("Dialog",""+which);
+////    			}
+////    		}).show();
+//    		
+//    		AlertDialog.Builder alert = new AlertDialog.Builder(DaDouActivity.this);
+//
+//    		alert.setTitle("Title");
+//    		alert.setMessage("Message");
+//    		
+//
+//    		final EditText text=new EditText(DaDouActivity.this);
+//    		alert.setView(text);
+//    		
+//    		
+//    		
+//    		
+//    		alert.setPositiveButton("确认",new DialogInterface.OnClickListener(){
+//    			public void onClick(DialogInterface dialog, int which) {
+//    				Log.d("Dialog",text.getText().toString());
+//    			}
+//    		});
+//    		alert.show();

@@ -1,0 +1,24 @@
+随着Android版本的增多，在不同的版本中使用不同的设计是必须的，根据程序运行的版本来提供不同的功能。这涉及到如何在程序中判断Android系统的版本。
+
+在Android api中的android.os.Build和android.os.Build.VERSION类中包含了Android版本信息。
+
+可以使用该信息来判断设备的系统版本：
+
+
+public static final int SDK_VERSION_ECLAIR = 5;
+public static final int SDK_VERSION_DONUT = 4;
+public static final int SDK_VERSION_CUPCAKE = 3;
+public static boolean PRE_CUPCAKE = 
+     getSDKVersionNumber() < SDK_VERSION_CUPCAKE ? true : false;
+
+public static int getSDKVersionNumber() {
+   int sdkVersion;
+   try {
+     sdkVersion = Integer.valueOf(android.os.Build.VERSION.SDK);
+   } catch (NumberFormatException e) {
+     sdkVersion = 0;
+   }
+   return sdkVersion;
+}
+
+

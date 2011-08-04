@@ -1,0 +1,247 @@
+分类： android中级 2011-08-03 17:22 104人阅读 评论(0) 收藏 举报 
+view plaincopy to clipboardprint?
+在应用开发中  经常用到图片转化，固定图片大小。于是，在这里封装好了 提供给大家用，以后直接拷贝到代码中就可以了。码农都是这样出来的。  
+如果要学的好。那么C++必须学好，如果不想做码农  那么C++。。。。  
+  
+  
+  
+  
+  
+  
+     // 缩放图片   
+    public static Bitmap zoomImg(String img, int newWidth ,int newHeight){  
+    // 图片源   
+        Bitmap bm = BitmapFactory.decodeFile(img);  
+        if(null!=bm){  
+            return zoomImg(bm,newWidth,newHeight);  
+        }  
+        return null;  
+    }  
+      
+    public static Bitmap zoomImg(Context context,String img, int newWidth ,int newHeight){  
+        // 图片源   
+        try {  
+            Bitmap bm = BitmapFactory.decodeStream(context.getAssets()  
+                    .open(img));  
+            if (null != bm) {  
+                return zoomImg(bm, newWidth, newHeight);  
+            }  
+        } catch (IOException e) {  
+            // TODO Auto-generated catch block   
+            e.printStackTrace();  
+        }  
+        return null;  
+        }  
+     // 缩放图片   
+    public static Bitmap zoomImg(Bitmap bm, int newWidth ,int newHeight){  
+        // 获得图片的宽高   
+        int width = bm.getWidth();  
+        int height = bm.getHeight();  
+        // 计算缩放比例   
+        float scaleWidth = ((float) newWidth) / width;  
+        float scaleHeight = ((float) newHeight) / height;  
+        // 取得想要缩放的matrix参数   
+        Matrix matrix = new Matrix();  
+        matrix.postScale(scaleWidth, scaleHeight);  
+        // 得到新的图片   
+        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);  
+        return newbm;  
+    }  
+在应用开发中  经常用到图片转化，固定图片大小。于是，在这里封装好了 提供给大家用，以后直接拷贝到代码中就可以了。码农都是这样出来的。
+如果要学的好。那么C++必须学好，如果不想做码农  那么C++。。。。
+
+
+
+
+
+
+     // 缩放图片
+    public static Bitmap zoomImg(String img, int newWidth ,int newHeight){
+    // 图片源
+        Bitmap bm = BitmapFactory.decodeFile(img);
+        if(null!=bm){
+            return zoomImg(bm,newWidth,newHeight);
+        }
+        return null;
+    }
+    
+    public static Bitmap zoomImg(Context context,String img, int newWidth ,int newHeight){
+        // 图片源
+        try {
+            Bitmap bm = BitmapFactory.decodeStream(context.getAssets()
+                    .open(img));
+            if (null != bm) {
+                return zoomImg(bm, newWidth, newHeight);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+        }
+     // 缩放图片
+    public static Bitmap zoomImg(Bitmap bm, int newWidth ,int newHeight){
+        // 获得图片的宽高
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        // 计算缩放比例
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // 取得想要缩放的matrix参数
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        // 得到新的图片
+        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+        return newbm;
+    }
+view plaincopy to clipboardprint?
+//将Drawable转化为Bitmap   
+ public static Bitmap drawableToBitmap(Drawable drawable){  
+     int width = drawable.getIntrinsicWidth();  
+     int height = drawable.getIntrinsicHeight();  
+     Bitmap bitmap = Bitmap.createBitmap(width, height,  
+       drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888  
+                        : Bitmap.Config.RGB_565);  
+     Canvas canvas = new Canvas(bitmap);  
+     drawable.setBounds(0,0,width,height);  
+     drawable.draw(canvas);  
+     return bitmap;  
+       
+    }  
+ //将Drawable转化为Bitmap
+  public static Bitmap drawableToBitmap(Drawable drawable){
+      int width = drawable.getIntrinsicWidth();
+      int height = drawable.getIntrinsicHeight();
+      Bitmap bitmap = Bitmap.createBitmap(width, height,
+        drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
+                         : Bitmap.Config.RGB_565);
+      Canvas canvas = new Canvas(bitmap);
+      drawable.setBounds(0,0,width,height);
+      drawable.draw(canvas);
+      return bitmap;
+      
+     } 
+
+
+
+
+
+
+view plaincopy to clipboardprint?
+//获得圆角图片的方法   
+ public static Bitmap getRoundedCornerBitmap(Bitmap bitmap,float roundPx){  
+    
+  Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap  
+    .getHeight(), Config.ARGB_8888);  
+  Canvas canvas = new Canvas(output);  
+   
+  final int color = 0xff424242;  
+  final Paint paint = new Paint();  
+  final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());  
+  final RectF rectF = new RectF(rect);  
+   
+  paint.setAntiAlias(true);  
+  canvas.drawARGB(0, 0, 0, 0);  
+  paint.setColor(color);  
+  canvas.drawRoundRect(rectF, roundPx, roundPx, paint);  
+   
+  paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));  
+  canvas.drawBitmap(bitmap, rect, rect, paint);  
+   
+  return output;  
+ }  
+//获得圆角图片的方法
+ public static Bitmap getRoundedCornerBitmap(Bitmap bitmap,float roundPx){
+  
+  Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
+    .getHeight(), Config.ARGB_8888);
+  Canvas canvas = new Canvas(output);
+ 
+  final int color = 0xff424242;
+  final Paint paint = new Paint();
+  final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+  final RectF rectF = new RectF(rect);
+ 
+  paint.setAntiAlias(true);
+  canvas.drawARGB(0, 0, 0, 0);
+  paint.setColor(color);
+  canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+ 
+  paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+  canvas.drawBitmap(bitmap, rect, rect, paint);
+ 
+  return output;
+ }
+view plaincopy to clipboardprint?
+//获得带倒影的图片方法   
+ public static Bitmap createReflectionImageWithOrigin(Bitmap bitmap){  
+  final int reflectionGap = 4;  
+  int width = bitmap.getWidth();  
+  int height = bitmap.getHeight();  
+    
+  Matrix matrix = new Matrix();  
+  matrix.preScale(1, -1);  
+    
+  Bitmap reflectionImage = Bitmap.createBitmap(bitmap,  
+    0, height/2, width, height/2, matrix, false);  
+    
+  Bitmap bitmapWithReflection = Bitmap.createBitmap(width, (height + height/2), Config.ARGB_8888);  
+    
+  Canvas canvas = new Canvas(bitmapWithReflection);  
+  canvas.drawBitmap(bitmap, 0, 0, null);  
+  Paint deafalutPaint = new Paint();  
+  canvas.drawRect(0, height,width,height + reflectionGap,  
+    deafalutPaint);  
+    
+  canvas.drawBitmap(reflectionImage, 0, height + reflectionGap, null);  
+    
+  Paint paint = new Paint();  
+  LinearGradient shader = new LinearGradient(0,  
+    bitmap.getHeight(), 0, bitmapWithReflection.getHeight()  
+    + reflectionGap, 0x70ffffff, 0x00ffffff, TileMode.CLAMP);  
+  paint.setShader(shader);  
+  // Set the Transfer mode to be porter duff and destination in   
+  paint.setXfermode(new PorterDuffXfermode(Mode.DST_IN));  
+  // Draw a rectangle using the paint with our linear gradient   
+  canvas.drawRect(0, height, width, bitmapWithReflection.getHeight()  
+    + reflectionGap, paint);  
+   
+  return bitmapWithReflection;  
+ }  
+//获得带倒影的图片方法
+ public static Bitmap createReflectionImageWithOrigin(Bitmap bitmap){
+  final int reflectionGap = 4;
+  int width = bitmap.getWidth();
+  int height = bitmap.getHeight();
+  
+  Matrix matrix = new Matrix();
+  matrix.preScale(1, -1);
+  
+  Bitmap reflectionImage = Bitmap.createBitmap(bitmap,
+    0, height/2, width, height/2, matrix, false);
+  
+  Bitmap bitmapWithReflection = Bitmap.createBitmap(width, (height + height/2), Config.ARGB_8888);
+  
+  Canvas canvas = new Canvas(bitmapWithReflection);
+  canvas.drawBitmap(bitmap, 0, 0, null);
+  Paint deafalutPaint = new Paint();
+  canvas.drawRect(0, height,width,height + reflectionGap,
+    deafalutPaint);
+  
+  canvas.drawBitmap(reflectionImage, 0, height + reflectionGap, null);
+  
+  Paint paint = new Paint();
+  LinearGradient shader = new LinearGradient(0,
+    bitmap.getHeight(), 0, bitmapWithReflection.getHeight()
+    + reflectionGap, 0x70ffffff, 0x00ffffff, TileMode.CLAMP);
+  paint.setShader(shader);
+  // Set the Transfer mode to be porter duff and destination in
+  paint.setXfermode(new PorterDuffXfermode(Mode.DST_IN));
+  // Draw a rectangle using the paint with our linear gradient
+  canvas.drawRect(0, height, width, bitmapWithReflection.getHeight()
+    + reflectionGap, paint);
+ 
+  return bitmapWithReflection;
+ }
+
+http://blog.csdn.net/sun6223508/article/details/6657550
