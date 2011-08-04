@@ -1,0 +1,71 @@
+1.
+    颜色对话框 
+    
+    CHOOSECOLOR  结构体来设置获取颜色对话框的相关信息  
+    成员变量m_cc 
+    m_cc.rgbResult  在IDOK之后保存的是选择的颜色RGB值 
+   
+
+    
+    COLORREF choose_color; 
+    CColorDialog  dlg;  //创建颜色对话框  
+   dlg.m_cc.Flags|=CC_RGBINIT ;//以用户选择的颜色进行初始化颜色打开对话框 
+   dlg.m_cc.Flags|=CC_FULLOPEN; //全部打开 包括用户自定义 
+   dlg.m_cc.rgbResult=choose_color;  //使用我们上次选择的颜色进行初始化 
+   if(IDOK==dlg.DoModal()) //创建模态对话框 
+   {
+    choose_color=dlg.m_cc.rgbResult;   //保存颜色选择   颜色选择会反映到 CHOOSECOLOR结构体中的 regResult变量中 
+   }
+
+
+2.  字体对话框 CFontDialog    
+       
+     CHOOSEFONT   结构体保存字体设置  
+     LOGFONT 结构体 间接创建字体
+   
+   
+    DeleteObject  删除与windows  GDI 相关的所有存储       这是资源 
+
+   CGDIObject是GDI类  判断类是否与某种资源相关联我们可以判断句柄   
+
+   
+
+
+        CFont m_font;  //定义CFont对象
+        CString FontName; //字体名字
+
+    
+        CFontDialog dlg;  //定义 CFontDialog对象
+ 
+ if(IDOK==dlg.DoModal())  //创建模态对话框
+ {
+  if(m_font.m_hObject)  //判断句柄是否存在
+   m_font.DeleteObject();  //相关资源 
+ m_font.CreateFontIndirect(dlg.m_cf.lpLogFont);  //通过CHOOSEFON结构体的LOGFON 成员创建字体 
+ FontName=dlg.m_cf.lpLogFont->lfFaceName; //字体名字 
+       
+
+
+ Invalidate();  //引起窗体无效 重画 进入OnDraw函数    
+
+ 
+
+4.  GetWindowRect 是获取到屏幕矩形区域的  我们获取控件矩形要用GetClientRect 来获得  
+
+   SCreenToClient()  屏幕坐标转换到客户坐标  
+   ClientToSCreen()  客户坐标转换成屏幕坐标 
+
+ 
+
+5.WM_CTLCOLOR 消息响应  我们可以通过这个消息函数来设置控件的背景颜色    函数必须返回一个画刷  这个函数被调用多次  每次对应一个控件 
+afx_msg HBRUSH OnCtlColor( 
+CDC* pDC,   //控件设备描述  
+CWnd* pWnd,  //指向控件的指针
+UINT nCtlColor );   //控件的类型
+
+CWnd::GetDlgCtrlID() //CWnd类的成员函数 通过对象来获取 一个控件的ID  包括对话框 ID 子窗口  顶层窗口返回值无效 
+CDC::SetBkMode(TRANSPARENT)设置背景模式 
+
+ 
+
+http://blog.csdn.net/yue7603835/article/details/6649391

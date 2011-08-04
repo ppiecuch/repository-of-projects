@@ -1,0 +1,420 @@
+现在Android已经很火了，我的一个哥们儿上个月找到一个Android应用开发的职位，月薪就有6K了，羡慕啊。这里分析下Android的内核结构，主要介绍Android和Linux之间的关系，以备以后可能的转型。大家都知道Android是基于Linux内核的操作系统，也曾经和Linux基金会因为内核问题产生过分歧。 
+    虽然Android基于Linux内核，但是它与Linux之间还是有很大的差别，比如Android在Linux内核的基础上添加了自己所特有的驱动程序。下面我们就来分析一下它们之间究竟有什么关系：
+
+一、Android为什么会选择Linux
+
+   成熟的操作系统有很多，但是Android为什么选择采用Linux内核呢?这就与Linux的一些特性有关了，比如：
+
+   1、强大的内存管理和进程管理方案
+
+   2、基于权限的安全模式
+
+   3、支持共享库
+
+   4、经过认证的驱动模型
+
+   5、Linux本身就是开源项目
+
+   更多关于上述特性的信息可以参考Linux 2.6版内核的官方文档，这便于我们在后面的学习中更好地理解Android所特有的功能特性。接下来分析Android与Linux的关系。
+
+二、Android不是Linux
+
+    看到这个标题大家可能会有些迷惑，前面不是一直说Android是基于Linux内核的吗，怎么现在又不是Linux了?迷惑也是正常的，请先看下面几个要点，然后我们将对每一个要点进行分析，看完后你就会觉得Android不是Linux了。
+
+    因为它没有本地窗口系统，没有glibc的支持，而且并不包括一整套标准的Linux使用程序，同时增强了Linux以支持其特有的驱动。
+
+1.它没有本地窗口系统
+
+    什么是本地窗口系统呢?本地窗口系统是指GNU/Linux上的X窗口系统，或者Mac OX X的Quartz等。不同的操作系统的窗口系统可能不一样，Android并没有使用(也不需要使用)Linux的X窗口系统，这是Android不是Linux的一个基本原因。
+
+2.它没有glibc支持
+
+    由于Android最初用于一些便携的移动设备上，所以，可能出于效率等方面的考虑，Android并没有采用glibc作为C库，而是Google自己开发了一套Bionic Libc来代替glibc。
+
+3.它并不包括一整套标准的Linux使用程序
+
+    Android并没有完全照搬Liunx系统的内核，除了修正部分Liunx的Bug之外，还增加了不少内容，比如：它基于ARM构架增加的Gold-Fish平台，以及yaffs2 FLASH文件系统等。
+
+4.Android专有的驱动程序
+
+    除了上面这些不同点之外，Android还对Linux设备驱动进行了增强，主要如下所示。
+
+    1)Android Binder 基于OpenBinder框架的一个驱动，用于提供 Android平台的进程间通信(InterProcess Communication，IPC)功能。源代码位于drivers/staging/android/binder.c。
+
+    2)Android电源管理(PM) 一个基于标准Linux电源管理系统的轻量级Android电源管理驱动，针对嵌入式设备做了很多优化。源代码位于：
+
+kernel/power/earlysuspend.c
+
+kernel/power/consoleearlysuspend.c
+
+kernel/power/fbearlysuspend.c
+
+kernel/power/wakelock.c
+
+kernel/power/userwakelock.c
+
+    3)低内存管理器(Low Memory Killer) 比Linux的标准的OOM(Out Of Memory)机制更加灵活，它可以根据需要杀死进程以释放需要的内存。源代码位于 drivers/staging/ android/lowmemorykiller.c。
+
+    4)匿名共享内存(Ashmem) 为进程间提供大块共享内存，同时为内核提供回收和管理这个内存的机制。源代码位于mm/ashmem.c。
+
+    5)Android PMEM(Physical) PMEM用于向用户空间提供连续的物理内存区域，DSP和某些设备只能工作在连续的物理内存上。源代码位于drivers/misc/pmem.c。
+
+    6)Android Logger 一个轻量级的日志设备，用于抓取Android系统的各种日志。源代码位于drivers/staging/android/logger.c。
+
+    7)Android Alarm 提供了一个定时器，用于把设备从睡眠状态唤醒，同时它还提供了一个即使在设备睡眠时也会运行的时钟基准。源代码位于drivers/rtc/alarm.c。
+
+    8)USB Gadget驱动 一个基于标准 Linux USB gadget驱动框架的设备驱动，Android的USB驱动是基于gaeget框架的。源代码位于drivers/usb/gadget/。
+
+    9)Android Ram Console 为了提供调试功能，Android允许将调试日志信息写入一个被称为RAM Console的设备里，它是一个基于RAM的Buffer。源代码位于drivers/staging/android / ram_console.c。
+
+    10)Android timed device 提供了对设备进行定时控制的功能，目前支持vibrator和LED设备。源代码位于drivers/staging/android /timed_output.c(timed_gpio.c)。
+
+    11)Yaffs2 文件系统 Android采用Yaffs2作为MTD nand flash文件系统，源代码位于fs/yaffs2/目录下。Yaffs2是一个快速稳定的应用于NAND和NOR Flash的跨平台的嵌入式设备文件系统，同其他Flash文件系统相比，Yaffs2能使用更小的内存来保存其运行状态，因此它占用内存小。Yaffs2的垃圾回收非常简单而且快速，因此能表现出更好的性能。Yaffs2在大容量的NAND Flash上的性能表现尤为突出，非常适合大容量的Flash存储。
+
+    上面这些要点足以说明Android不是Linux。看来，只要把Linux内核编程学好，想要做Android底层开发工作入门还是比较轻松的。在这里先总体浏览一下Android对Linux内核进行了哪些改动，在以后对Android做移植时就需要对这些改动加以调整了。
+
+    接下来详细列举下Android主要改动的部分：
+
+1 、Goldfish
+
+    Android模拟器通过运行一个Goldfish的虚拟CPU.Goldfish来运行arm926t指令集(arm926t属于armv5构架)，并且仿真了输入/输出，比如键盘输入和LCD 输出。这个模拟器其实是在qemu之上开发的，输入/输出是基于libSDL的。既然Goldfish是被模拟器运行的虚拟CPU，那么当Android在真实的硬件设备上运行时，我们就需要去掉它，因此，只有知道Google对Goldfish做了哪些具体改动之后才能正确地去掉。据统计，Android 内核对Goldfish的改动主要涉及44个文件，具体汇总如下。
+
+    这里被改动的文件前面加了Chg标记，在新增的文件前面加了New标记。
+
+1、Chg：arch/arm/Makefile添加CONFIG_ARCH_GOLDFISH
+
+2、New：arch/arm/configs/goldfish_defconfig默认配置文件
+
+3、New：arch/arm/mach-goldfish/Kconfig为Goldfish CPU添加Kernel配置文件
+
+4、New：arch/arm/mach-goldfish/Makefile添加board-goldfish.o
+
+5、New：arch/arm/mach-goldfish/Makefile.boot为Goldfish CPU进行启动配置
+
+6、New：arch/arm/mach-goldfish/audio.c Audio的输入/输出
+
+7、New：arch/arm/mach-goldfish/board-goldfish.c中断请求、输入/输出等
+
+8、New：arch/arm/mach-goldfish/pdev_bus.c设备总线
+
+9、New：arch/arm/mach-goldfish/pm.c电源管理
+
+10、New：arch/arm/mach-goldfish/switch.cSwitch控制
+
+11、New：arch/arm/mach-goldfish/timer.c获取和设置时间
+
+12、Chg：arch/arm/mm/Kconfig添加ARCH_GOLDFISH到支持列表
+
+13、Chg：drivers/char/Makefile添加goldfish_tty
+
+14、New：drivers/char/goldfish_tty.cTTY驱动
+
+15、Chg：drivers/input/keyboard/Kconfig为Goldfish的键盘事件添加配置文件
+
+16、Chg：drivers/input/keyboard/Makefile添加goldfish_events事件
+
+17、New：drivers/input/keyboard/goldfish_events.cGoldfish键盘驱动
+
+18、Chg：drivers/mmc/host/Kconfig添加Kernel配置选项Goldfish MMC卡
+
+19、Chg：drivers/mmc/host/Makefile添加Goldfish MMC卡驱动
+
+20、New：drivers/mmc/host/goldfish.c多媒体驱动
+
+21、Chg：drivers/mtd/devices/Kconfig为Goldfish的NAND flash device添加Kernel配置选项
+
+22、Chg：drivers/mtd/devices/Makefile添加goldfish_nand
+
+23、New：drivers/mtd/devices/goldfish_nand.cNAND flash驱动
+
+24、New：drivers/mtd/devices/goldfish_nand_reg.hNAND flash驱动
+
+25、Chg：drivers/power/Kconfig为Goldfish的battery(电池)驱动添加kernel配置选项
+
+26、Chg：drivers/power/Makefile添加Goldfish电池
+
+27、New：drivers/power/goldfish_battery.c能源和电池状态驱动
+
+28、Chg：drivers/rtc/Kconfig为Goldfish的rtc(时钟)驱动添加Kernel配置选项
+
+29、Chg：drivers/rtc/Makefile添加rtc-goldfish
+
+30、New：drivers/rtc/rtc-goldfish.c实时时钟驱动
+
+31、Chg：drivers/video/Kconfig添加Goldfish的framebuffer
+
+32、Chg：drivers/video/Makefile添加Goldfish的framebuffer
+
+33、New：drivers/video/goldfishfb.cframebuffer驱动
+
+34、New：include/asm-arm/arch-goldfish/dma.h
+
+35、New：include/asm-arm/arch-goldfish/entry-macro.S
+
+36、New：include/asm-arm/arch-goldfish/hardware.h
+
+37、New：include/asm-arm/arch-goldfish/io.h
+
+38、New：include/asm-arm/arch-goldfish/irqs.h
+
+39、New：include/asm-arm/arch-goldfish/memory.h
+
+40、New：include/asm-arm/arch-goldfish/system.h
+
+41、New：include/asm-arm/arch-goldfish/timer.h
+
+42、New：include/asm-arm/arch-goldfish/timex.h
+
+43、New：include/asm-arm/arch-goldfish/uncompress.h
+
+44、New：include/asm-arm/arch-goldfish/vmalloc.h 
+2 、YAFFS2 
+    不同于PC机(文件是存储在硬盘上的)，手机使用FLASH作为存储介质。HTC的G1使用的是NAND FLASH——这种存储目前已经相当普及了，而且种类也颇多(如SLC、MLC等)，存储密度也越来越高(已经出现几十GB大小的NANDFLASH)，价格也越来越低。
+
+    YAFFS2是专门用在FLASH上的文件系统，YAFFS2是“Yet Another Flash File System，2nd edition”的缩写。YAFFS2为Linux内核提供了一个高效访问NANDFLASH的接口。但是NANDFLASH的支持并不包含在标准的2.6.25内核中，所以Google在其中添加了对NANDFLASH的支持。据统计，为了支持YAFFS2，Google一共改动和增加了以下35个文件：
+
+1、Chg：fs/Kconfig添加YAFFS配置
+
+2、Chg： fs/Makefile添加YAFFS
+
+    以下为新增的YAFFS2：
+
+1、New：fs/yaffs2/Kconfig18New：fs/yaffs2/yaffs_mtddif2.h
+
+2、New：fs/yaffs2/Makefile19New：fs/yaffs2/yaffs_nand.c
+
+3、New：fs/yaffs2/devextras.h20New：fs/yaffs2/yaffs_nand.h
+
+4、New：fs/yaffs2/moduleconfig.h21New：fs/yaffs2/yaffs_nandemul2k.h
+
+5、New：fs/yaffs2/yaffs_checkptrw.c22New：fs/yaffs2/yaffs_packedtags1.c
+
+6、New：fs/yaffs2/yaffs_checkprtw.h23New：fs/yaffs2/yaffs_packedtags1.h
+
+7、New：fs/yaffs2/yaffs_ecc.c24New：fs/yaffs2/yaffs_packedtags2.c
+
+8、New：fs/yaffs2/yaffs_ecc.h25New：fs/yaffs2/yaffs_packedtags2.h
+
+9、New：fs/yaffs2/yaffs_fs.c26New：fs/yaffs2/yaffs_qsort.c
+
+10、New：fs/yaffs2/yaffs_getblockinfo.h27New：fs/yaffs2/yaffs_qsort.h
+
+11、New：fs/yaffs2/yaffs_guts.c28New：fs/yaffs2/yaffs_tagscompat.c
+
+12、New：fs/yaffs2/yaffs_guts.h29New：fs/yaffs2/yaffs_tagscompat.h
+
+13、New：fs/yaffs2/yaffs_mtdif.c30New：fs/yaffs2/yaffs_tagsvaliditiy.c
+
+14、New：fs/yaffs2/yaffs_mtdif.h31New：fs/yaffs2/yaffs_tagsvalidity.h
+
+15、New：fs/yaffs2/yaffs_mtddif1.c32New：fs/yaffs2/yaffsinterface.h
+
+16、New：fs/yaffs2/yaffs_mtddif1.h33New：fs/yaffs2/yportenv.h
+
+17、New：fs/yaffs2/yaffs_mtddif2.c
+
+3、 蓝牙
+
+    在蓝牙通信协议栈里Google修改了10个文件。这些改动修复了一些与蓝牙耳机相关的明显的Bug，以及一些与蓝牙调试和访问控制相关的函数，具体如下所示。
+
+1、Chg：drivers/bluetooth/Kconfig添加HCI UART Debug
+
+2、Chg：drivers/bluetooth/hci_II.c如果HCI UART Debug定义在Kernel配置中，则添加BT_DBG()宏
+
+3、Chg：net/bluetooth/Kconfig添加配置选项L2CAP, HCI_CORE, HCI_SOCK，以及通用接口和语音
+
+4、Chg：net/bluetooth/af_bluetooth.c如果CONFIG_ANDROID_PARANOID_NETWORK被定义，则添加蓝牙功能的安全检查
+
+5、Chg：net/bluetooth/hci_event.c修正蓝牙的加密Bug和增加语音的支持
+
+6、Chg：net/bluetooth/rfcomm/core.c修正Bug
+
+7、Chg：net/bluetooth/rfcomm/sock.c修复Bug
+
+8、Chg：net/bluetooth/sco.c禁用SCO链接
+
+9、Chg：include/net/bluetooth/hci_core.h禁用LMP_ESCO
+
+10、Chg：include/net/bluetooth/rfcomm.h在rfcomm_dlc中添加“out”参数
+
+4 、调度器(Scheduler)
+
+    Android内核还修改了与进程调度和时钟相关的策略。只改动了5个文件，如下：
+
+1、Chg：kernel/sched.c添加NORMALIZED_SLEEPER
+
+2、Chg：kernel/sched_fair.c修改内核的调度方式
+
+3、Chg：kernel/softirq.c修改为CPU调度
+
+4、Chg：kernel/time/tick-sched.c修改为CPU调度
+
+5、Chg：include/linux/tick.h如果CONFIG_NO_HZ被定义，则添加tick_nohz_ update_ stopped_ sched_tick()
+
+5、 Android新增的驱动
+
+    Android在Linux的基础上新增了许多特有的驱动，如下所示。
+
+    1)IPC Binder 一种IPC(进程间通信)机制。它的进程能够为其他进程提供服务——通过标准的Linux系统调用API。IPC Binder的概念起源于一家名为Be.Inc的公司，在Google之前就已经被Palm软件采用了。
+
+    2)Low Memory Killer 其实内核里已经有一个类似的功能，名称为oom killer(out of memory killer)。当内存不够的时候，该策略会试图结束一个进程。
+
+    3)Ashmem 匿名共享内存。该功能使得进程间能够共享大块的内存。比如说，系统可以使用Ashmem保存一些图标，多个应用程序可以访问这个共享内存来获取这些图标。Ashmem为内核提供了一种回收这些使用完的共享内存块的方法，如果某个进程试图访问这些已经被回收的内存块，它将会得到错误的返回值，以便它重新进行内存块分配和数据初始化。
+
+    4)RAM Console and Log Device 为了调试方便，Android添加了一个功能，使调试信息可以输入到一个内存块中。此外，Android还添加了一个独立的日志模块，这样用户空间的进程就能够读写日志消息，以及调试打印信息等。
+
+    5)Android Debug Bridge 嵌入式设备的调试的确比较麻烦，为了便于调试，Google设计了这个调试工具，可以简称为ADB，使用USB作为连接方式，ADB可以看做是连接Android设备和PC机的一套协议。
+
+    除了这些主要的功能之外，Android还增加了诸如 real-time clock、switch、timed GPIO等功能，所有这些改动和增加包含在以下28个文件之中。
+
+1、Chg：drivers/Kconfig进入配置文件
+
+2、Chg：drivers/Makefile添加switch，驱动等
+
+3、New：drivers/android/Kconfig添加BINDER_IPC、POWER、POWER_STAT、POWER_ ALARM、LOGGER、RAM_CONSOLE、TIMED_GPIO、PARANOID_NETWORK到配置中
+
+4、New：drivers/android/Makefile添加binder.o、power.o、alarm.o、logger.o、ram_console.o、timed_gpio
+
+5、New：drivers/android/alarm.c系统硬件时钟和实时时钟管理
+
+6、New：drivers/android/binder.cIPC机制(Binder)
+
+7、New：drivers/android/logger.cGoogle的日志API
+
+8、New：drivers/android/ram_console.cRAM控制台和日志设备方便调试 [1]
+
+9、New：drivers/android/timed_gpio.cGoogle的GPIO定时驱动
+
+10、New：drivers/switch/Kconfig为GPIO添加配置选项
+
+11、New：drivers/switch/Makefile引入GPIO驱动
+
+12、New：drivers/switch/switch_class.c
+
+13、New：drivers/switch/switch_gpio.c
+
+14、Chg：drivers/usb/gadget/Kconfig添加ADB配置选项
+
+15、Chg：drivers/usb/gadget/Makefile编译ADB所需的配置选项
+
+16、New：drivers/usb/gadget/android_adb.cADB驱动
+
+17、New：include/linux/android_aid.h添加AIDs、INET、networking
+
+18、New：include/linux/android_alarm.h时钟功能设置
+
+19、New：include/linux/android_timed_gpio.hGPIO结构体
+
+20、New：include/linux/ashmem.hAndroid共享内存
+
+21、New：include/linux/binder.hBinder IPC API定义
+
+22、New：include/linux/logger.hLogger定义
+
+23、New：include/linux/switch.hGPIO switch接口
+
+24、Chg：mm/Makefile添加ashmem.o
+
+25、New：mm/ashmem.c内存共享实现
+
+26、Chg：drivers/misc/Kconfig添加LOW_MEMORY_KILLER配置选项
+
+27、Chg：drivers/misc/Makefile添加lowmemorykiller.c
+
+28、New：drivers/misc/lowmemorykiller.c当内存过低时，选择并结束进程
+
+6 、电源管理
+
+    电源管理(Power Management)对于移动设备来说相当重要，也是最为复杂和开发难度最高的一个功能。Google添加了一个新的电源管理系统，不包含原有的apm和dpm等。这项改动主要涉及以下5个文件：
+
+1、New：include/linux/android_power.h定义电源管理API
+
+2、New：drivers/android/power.c电源管理API实现
+
+3、Chg：drivers/input/evdev.c修改Android电源处理方式
+
+4、Chg：fs/inotify_user.c修改Android电源处理方式
+
+5、Chg：kernel/power/process.c修改Android电源处理方式
+
+7、 杂项
+
+    除了上述改动之外，还有一些小改动，如新增的额外调试功能、键盘背光控制、TCP 网络管理等，共涉及36个文件，如下所示。
+
+1、New：Documentation/vm/pagemap.txt
+
+2、Chg：arch/arm/Kconfig添加HAVE_LATENCYTOP_SUPPORT和ARCH_GOLDFISH
+
+3、Chg：arch/arm/kernel/process.c添加dump_task_regs方法
+
+4、Chg：arch/arm/kernel/signal.c解决系统无法重新启动的问题
+
+5、Chg：arch/arm/kernel/stacktrace.c改进调试栈跟踪
+
+6、Chg：arch/arm/mm/abort-ev6.S
+
+7、Chg：drivers/char/Kconfig添加Memory device driver和Goldfish TTY driver
+
+8、Chg：drivers/char/mem.c使编译结果输出到/dev/kmem and /dev/mem
+
+9、Chg：drivers/leds/Kconfig当CPU运行时打开LEDS，但是屏幕是关闭的
+
+10、Chg：drivers/leds/Makefile添加编译ledtrig-sleep.o
+
+11、New：drivers/leds/ledtrig-sleep.c睡眠(当关闭屏幕后CPU仍然运行)
+
+12、Chg：drivers/rtc/class.c修正实时时钟误差的Bug
+
+13、Chg：fs/fat/dir.c添加VFAT_IOCTL_GET_VOLUME_ID到fat_dir_ioctl()
+
+14、Chg： fs/fat/inode.c
+
+15、Chg：fs/proc/base.c当内存不足时调整/proc文件
+
+16、Chg：fs/proc/proc_misc.c修正kpagecount_read和kpageflags_read返回的一些错误
+
+17、Chg：fs/proc/task_mmu.c简化add_to_pagemap中的错误检查
+
+18、Chg：include/asm-arm/elf.h添加ELF_CORE_COPY_TASK_REGS()宏调用dump_task_ regs(...)
+
+19、Chg：include/linux/mm.h添加shmem_set_file(...)函数原型
+
+20、Chg：include/linux/msdos_fs.h添加VFAT_IOCTL_GET_VOLUME_ID宏
+
+21、Chg：kernel/hrtimer.c修复run_hrtimer_pending错误
+
+22、Chg：init/Kconfig添加PANIC_TIMEOUT默认为0
+
+23、Chg：kernel/panic.c设置默认的panic_timeout：从kernel配置到PANIC_TIMEOUT
+
+24、Chg：kernel/power/console.c修复虚拟控制台的错误信息
+
+25、Chg：kernel/printk.c修复printk错误
+
+26、Chg：mm/filemap.c修正filemap_fault
+
+27、Chg：mm/shmmem.c重构shmem_zero_setup
+
+28、Chg：mm/tiny-shmem.c重构shmem_zero_setup
+
+29、Chg：include/linux/sockios.h添加SIOCKILLADDR控制
+
+30、Chg：include/net/tcp.h添加tcp_v4_nuke_addr函数
+
+31、Chg：net/ipv4/Makefile如果设置CONFIG_SYSFS，编译sysfs_net_ipv4
+
+32、Chg：net/ipv4/af_inet_c如果定义CONFIG_ANDROID_PARANOID_NETWORK，则添加安全检查
+
+33、Chg：net/ipv4/devinet.c添加SIOCKILLADDR
+
+34、Chg：net/ipv4/sysfs_net_ipv4.c控制TCP窗口长度
+
+35、Chg：net/ipv4/tcp_ipv4.c添加tcp_v4_nuke_addr函数
+
+36、Chg：net/ipv6/af_inet6.c如果定义CONFIG_ANDROID_PARANOID_NETWORK，则添加安全检查
+
+    上面这些看似简单，但是非常重要，当大家进行系统级应用开发和程序移植时都需要研究这些文件。对于每个文件的具体改动方式和实现，我们需要进一步查看Android的内核源代码，这是后面将要详细讲解的内容。
+
+    为了调试方便，Android 添加了一个功能，使得调试信息可以输入到一个内存块中。此外， Android 添加了一个独立的日志模块，这样用户空间的进程能够读写日志消息，调试打印信息等。 
+http://blog.csdn.net/juana1/article/details/6648518
+http://blog.csdn.net/juana1/article/details/6648526
