@@ -1,0 +1,348 @@
+好长时间没摸过二叉树了，纯属练手
+
+
+
+
+我发现功能描述发布出来就乱了，还是贴图吧
+
+
+
+
+
+
+
+view plaincopy to clipboardprint?
+#include <iostream>   
+  
+using namespace std;  
+#define Type char   
+#define MAX_BUFF 30   
+#define INC_BUFF 20   
+  
+typedef struct _TreeNode  
+{  
+    Type data;  
+    struct _TreeNode *lchild;  
+    struct _TreeNode *rchild;  
+}TreeNode;  
+  
+  
+TreeNode *createNode()  
+{  
+    TreeNode *node = (TreeNode *)malloc(sizeof(TreeNode));  
+    memset(node, 0, sizeof(TreeNode));  
+    return node;  
+}  
+/*************************** 
+function: createPreBinTree 
+description:根据先序历遍二叉树序列创建二叉树，历遍序列需要给出空树 
+如： 
+                                    A 
+                   /   \ 
+                         B     D 
+                /      / 
+                  C     E 
+                                \ 
+                 G 
+先序了变序列是： ABC@G@@@DE@@@ (其中@代表空树) 
+原理：每当操作一个节点就将其push压栈，遇到空@就pop。 
+pop的目的就是为了创建右孩子。 
+****************************/  
+TreeNode *createPreBinTree()  
+{  
+    char buff[MAX_BUFF];  
+    cin >> buff;  
+    char *pBuffer = buff;  
+  
+    TreeNode *stack[MAX_BUFF] = {0};//定义栈   
+    TreeNode **spHead = stack;  
+    TreeNode **spTail = stack;  
+    TreeNode *pTree = NULL;  
+    TreeNode *rootNode = NULL;  
+    bool isCreateR = false;  
+  
+    if ( '@' == *pBuffer)  
+        return NULL;  
+    else  
+    {  
+        rootNode = createNode();  
+        pTree = rootNode;  
+        rootNode->data = *pBuffer;  
+        pBuffer++;  
+        *(++spHead) = rootNode;  
+  
+        //if ('@' == *pBuffer)//判断root节点是否需要压栈   
+        //  isCreateR = true;   
+        //else   
+        //{   
+        //     
+        //  isCreateR = false;   
+        //}   
+    }  
+  
+    for (int i = 0;(*pBuffer); i++)  
+    {  
+        if ( '@' != *pBuffer)  
+        {  
+            if ( !isCreateR){//此时创建的是左孩子，需要压栈，压栈的目的是为了以后创建右孩子   
+                TreeNode *newNode = createNode();  
+                newNode->data = *pBuffer;  
+                pTree->lchild = newNode;  
+                pTree = newNode;  
+                *(++spHead) = newNode;  
+                /*spHead++; 
+                *spHead = newNode;*/  
+            }  
+            else  
+            {  
+                TreeNode *newNode = createNode();  
+                newNode->data = *pBuffer;  
+                pTree->rchild = newNode;  
+                pTree = newNode;  
+                *(++spHead) = newNode;  
+                isCreateR = false;  
+            }//if !isCreateR   
+        }  
+        else  
+        {  
+            if ( !isCreateR)  
+            {  
+                isCreateR = true;  
+                /*pTree = *spHead; 
+                *(spHead--) = NULL;*/  
+            }  
+            //else   
+            //{   
+            //  //isCreateR = true;//遇到右孩子是空，此时需要弹出栈顶   
+            //  if ( spHead == spTail)   
+            //      break;   
+            //}//if !isCreateR;   
+  
+            if (spHead == spTail)  
+                break;  
+            else  
+            {  
+                pTree = *spHead;  
+                *(spHead--) = NULL;  
+            }  
+        }//if @   
+        pBuffer++;  
+    }  
+    return rootNode;  
+}  
+  
+void visitNode(TreeNode *p)  
+{  
+    cout << p->data;  
+}  
+  
+//先序历遍二叉树   
+void preTraverse(TreeNode *p)  
+{  
+    TreeNode *stack[MAX_BUFF] = {0};  
+    TreeNode **spTail = stack;  
+    TreeNode **spHead = spTail + 1;  
+  
+    TreeNode *root = p;  
+    TreeNode *curr = root;  
+  
+    //visitNode(root);   
+    //*(++spHead) = root;   
+  
+    do  
+    {  
+        if (curr)  
+        {  
+            visitNode(curr);  
+            *(++spHead) = curr;  
+            curr = curr->lchild;  
+        }  
+        else   
+        {  
+            if (spHead -1 != spTail)  
+            {  
+                curr = *spHead;  
+                *(spHead--) = NULL;  
+                curr = curr->rchild;  
+            }  
+            else  
+                --spHead;  
+        }  
+    }while (spHead  != spTail);  
+}  
+  
+void main()  
+{  
+    TreeNode *node = createPreBinTree();  
+    preTraverse(node);  
+    cout << endl;  
+  
+}  
+#include <iostream>
+
+using namespace std;
+#define Type char
+#define MAX_BUFF 30
+#define INC_BUFF 20
+
+typedef struct _TreeNode
+{
+	Type data;
+	struct _TreeNode *lchild;
+	struct _TreeNode *rchild;
+}TreeNode;
+
+
+TreeNode *createNode()
+{
+	TreeNode *node = (TreeNode *)malloc(sizeof(TreeNode));
+	memset(node, 0, sizeof(TreeNode));
+	return node;
+}
+/***************************
+function: createPreBinTree
+description:根据先序历遍二叉树序列创建二叉树，历遍序列需要给出空树
+如：
+                                    A
+				   /   \
+		                 B     D
+				/      /
+			      C     E
+                                \
+				 G
+先序了变序列是： ABC@G@@@DE@@@ (其中@代表空树)
+原理：每当操作一个节点就将其push压栈，遇到空@就pop。
+pop的目的就是为了创建右孩子。
+****************************/
+TreeNode *createPreBinTree()
+{
+	char buff[MAX_BUFF];
+	cin >> buff;
+	char *pBuffer = buff;
+
+	TreeNode *stack[MAX_BUFF] = {0};//定义栈
+	TreeNode **spHead = stack;
+	TreeNode **spTail = stack;
+	TreeNode *pTree = NULL;
+	TreeNode *rootNode = NULL;
+	bool isCreateR = false;
+
+	if ( '@' == *pBuffer)
+		return NULL;
+	else
+	{
+		rootNode = createNode();
+		pTree = rootNode;
+		rootNode->data = *pBuffer;
+		pBuffer++;
+		*(++spHead) = rootNode;
+
+		//if ('@' == *pBuffer)//判断root节点是否需要压栈
+		//	isCreateR = true;
+		//else
+		//{
+		//	
+		//	isCreateR = false;
+		//}
+	}
+
+	for (int i = 0;(*pBuffer); i++)
+	{
+		if ( '@' != *pBuffer)
+		{
+			if ( !isCreateR){//此时创建的是左孩子，需要压栈，压栈的目的是为了以后创建右孩子
+				TreeNode *newNode = createNode();
+				newNode->data = *pBuffer;
+				pTree->lchild = newNode;
+				pTree = newNode;
+				*(++spHead) = newNode;
+				/*spHead++;
+				*spHead = newNode;*/
+			}
+			else
+			{
+				TreeNode *newNode = createNode();
+				newNode->data = *pBuffer;
+				pTree->rchild = newNode;
+				pTree = newNode;
+				*(++spHead) = newNode;
+				isCreateR = false;
+			}//if !isCreateR
+		}
+		else
+		{
+			if ( !isCreateR)
+			{
+				isCreateR = true;
+				/*pTree = *spHead;
+				*(spHead--) = NULL;*/
+			}
+			//else
+			//{
+			//	//isCreateR = true;//遇到右孩子是空，此时需要弹出栈顶
+			//	if ( spHead == spTail)
+			//		break;
+			//}//if !isCreateR;
+
+			if (spHead == spTail)
+				break;
+			else
+			{
+				pTree = *spHead;
+				*(spHead--) = NULL;
+			}
+		}//if @
+		pBuffer++;
+	}
+	return rootNode;
+}
+
+void visitNode(TreeNode *p)
+{
+	cout << p->data;
+}
+
+//先序历遍二叉树
+void preTraverse(TreeNode *p)
+{
+	TreeNode *stack[MAX_BUFF] = {0};
+	TreeNode **spTail = stack;
+	TreeNode **spHead = spTail + 1;
+
+	TreeNode *root = p;
+	TreeNode *curr = root;
+
+	//visitNode(root);
+	//*(++spHead) = root;
+
+	do
+	{
+		if (curr)
+		{
+			visitNode(curr);
+			*(++spHead) = curr;
+			curr = curr->lchild;
+		}
+		else 
+		{
+			if (spHead -1 != spTail)
+			{
+				curr = *spHead;
+				*(spHead--) = NULL;
+				curr = curr->rchild;
+			}
+			else
+				--spHead;
+		}
+	}while (spHead  != spTail);
+}
+
+void main()
+{
+	TreeNode *node = createPreBinTree();
+	preTraverse(node);
+	cout << endl;
+
+}
+代码测试过了。谈不上什么效率和算法，纯属练手
+http://blog.csdn.net/feiyinzilgd/article/details/6671125

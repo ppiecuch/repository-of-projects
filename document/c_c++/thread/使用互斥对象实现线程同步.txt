@@ -1,0 +1,78 @@
+使用互斥对象实现线程同步
+  互斥对象属于系统内核对象，它能够使线程拥有对某个资源的绝对访问权。互斥对象主要包含使用
+
+数量，线程ID和递归计数器等信息。其中线程ID表示当前拥有互斥对象的线程，递归计数器表示线程
+
+拥有互斥对象的次数。
+   互斥对象的使用方式:当互斥对象的线程ID为0时，表示互斥对象不被任何线程拥有，此时系统会
+
+发出该互斥对象的通知信号。等待互斥对象的某个线程将会拥有该互斥对象，同时互斥对象的线程ID
+
+为拥有该互斥对象线程的ID。
+                    当互斥对象的线程ID不是0时，表示当前有线程拥有该互斥对象。系统不会发
+
+出互斥对象的通知信号。其他等待互斥对象的线程继续等待，直到拥有互斥对象的线程释放互斥对象
+
+的拥有权
+  相关函数：
+  CreateMutex:创建互斥对象
+    HANDLE CreateMutex(LPSECURITY_ATTRBUTES,lpMutexAttributes,BOOL bInitialOwner,
+                       LPCTSTR lpName)
+         lpMutexAttributes:表示互斥对象的安全属性，可以为NULL；
+          bInitialOwner：表示互斥对象的初始状态。如果是TRUE,互斥对象的线程ID为当前调用 
+
+                        线程的ID，互斥对象的递归计数器为1，当前创建互斥对象的哦线程拥  
+
+                       有互斥对象的拥有权。如果是FALSE，互斥对象的的ID是0，计数器为    
+
+                       0，系统会发出该互斥对象的通知信号
+  ReleaseMutes;释放互斥对象的拥有权
+    BOOL ReleaseMutex(HANDLE hMutex)
+  WaitForSingleObject:获得互斥对象,具体见事件对象一节中
+             DWORD WaitForSingleObject( HANDLE hHandle，DWORD dwMillseconds);
+
+示例：
+UINT output11(LPVOID pThreadParam)
+{
+ CString text;
+ CAccessConflictDlg *pdlg=(CAccessConflictDlg *)pThreadParam;
+ while(pdlg->m_count<=100)
+ {
+  WaitForSingleObject(pdlg->m_mutex,INFINITE);//等待事件对象
+  text.Format("线程一输出%d",pdlg->m_count);
+  pdlg->m_count++;
+  pdlg->m_list.AddString(text);
+  Sleep(100);
+  ReleaseMutex(pdlg->m_mutex);
+ }
+ return 0;
+}
+UINT output22(LPVOID pThreadParam)
+{
+ CString text;
+ CAccessConflictDlg *pdlg=(CAccessConflictDlg *)pThreadParam;
+ while(pdlg->m_count<=100)
+ {
+  WaitForSingleObject(pdlg->m_mutex,INFINITE);//等待事件对象
+  text.Format("线程二输出%d",pdlg->m_count);
+  pdlg->m_count++;
+  pdlg->m_list.AddString(text);
+  Sleep(100);
+     ReleaseMutex(pdlg->m_mutex);
+ }
+ return 0;
+}
+void CAccessConflictDlg::OnButton1() 
+{
+  m_mutex=CreateMutex(NULL,FALSE,"MUTEX");
+ output1=AfxBeginThread(output11,this,0,0,0,NULL);
+ output2=AfxBeginThread(output22,this,0,0,0,NULL);
+ CloseHandle(output1->m_hThread);
+ CloseHandle(output2->m_hThread);
+ // TODO: Add your control notification handler code here
+ 
+}
+
+ 
+
+http://blog.csdn.net/jin123wang/article/details/6669000
