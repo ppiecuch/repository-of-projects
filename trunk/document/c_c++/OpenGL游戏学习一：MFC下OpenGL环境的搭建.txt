@@ -1,0 +1,233 @@
+ 你是否也是一个游戏设计的天才？你是否有无限的创意却苦于无法施展自己的才华？你是否也曾渴望能在这广阔的舞台上尽情挥洒自己的激情？在这里，让我们一起勇敢的迈出这艰难的一步，让我们在这里一起成长，一起烦恼，并最终一起快乐的微笑。
+
+    关于OpenGL的基础知识，大家可以参照本网站的OpenGL入门学习系列，写的非常详细。在这里我们介绍如何利用VC6.0的MFC环境和OpenGL开发3D游戏。正所谓“磨刀不误砍柴工”，为了能够顺利的编写3D程序，我们需要搭建一个在MFC下比较完美的OpenGL环境，这样我们就可以在这个基础上慢慢的去添加我们想要实现的功能。其实MFC下搭建OpenGL环境在网上也有不少，不过都有一些不同之处，可能是为了一些特定的应用而搭建的环境，这里我综合了几篇文章，搭建了一个比较完美的环境，介绍给大家，如有错误之处，还请高手指教，定将感激不尽！
+
+基于单文档的OpenGL框架
+
+一、选择一个编译环境  安装GLUT工具包
+
+       编译环境：VC6.0
+       安装GLUT工具包：
+                   1.下载glut库
+                     windows环境下找的glut下载地址：http://openglsource.com/download/download.htm 下载其中的glut-3.7.6-bin.zip
+                   2.Windows环境下安装GLUT的步骤： 
+                     1)解压下载的包 
+                     2)在我的电脑中找到文件夹（Program Files\Microsoft Visual Studio\VC98\Include\GL文件夹）。把解压得到的glut.h放到这个文件夹。 
+                     3)把解压得到的glut.lib和glut32.lib放到静态函数库所在文件夹（Program Files\Microsoft Visual Studio\VC98\lib文件夹）。 
+                     4)把解压得到的glut.dll,glut32.dll,opengl.dll放到操作系统目录下面的system32文件夹内。（C:\Windows\System32） 
+                     注：在安装时如果还少了ipl.dll和HfxClasses45.dll，都可以在www.zhaodll上重新下载，再放进操作系统目录下面的system32文件夹内
+
+二、在vc中的配置：
+
+　　1)创建一个MFC单文档应用程序。
+       File-->New-->MFC AppWizard(exe) 填入工程名(GameDemo)及保存的位置-->选择Single document-->Finish
+
+      2)链接OpenGL libraries。
+      在Visual C++中单击Project-->settings，找到Link单击，最后在Object/library modules 的最前面加上opengl32.lib glu32.lib glut32.lib glaux.lib 或者在project -> add to project ->files引入需要的头文件
+      以上的lib文件需要存在于VC6.0安装好的目录下的lib文件夹底下，例如：C:\Program Files\Microsoft Visual Studio\VC98\Lib
+      注：在这一步的时候，是链接glut32.lib ，而不要链接glut.lib 
+
+　　3)在StdAfx.h中添加OpenGL头文件(添加到最后一个#endif的后面)
+      #include <GL/glu.h>
+      #include <GL/gl.h>
+      #include <GL/glut.h>
+      #include <GL/glaux.h>
+
+        4)CMainFrame的PreCreateWindow函数中设置程序标题、风格
+      cs.style = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_MAXIMIZE;
+      cs.lpszName = "OpenGL基本框架";
+
+       5)设定OpenGL风格
+      CGameDemoView中的PreCreateWindow中添加cs.style |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN;// 在客户区绘制
+
+       6)在CGameDemoView的头文件中添加公有（public）成员变量
+      /************************************************************************/
+      /* 设置的变量是Rendering Context(着色描述表)。每一个OpenGL都被连接到一个着
+      色描述表上。着色描述表将所有的OpenGL调用命令连接到Device Context(设备描述表)上。
+      我将OpenGL的着色描述表定义为hRC 。要让您的程序能够绘制窗口的话，还需要创建一个
+      设备描述表，也就是第二行的内容。Windows的设备描述表被定义为hDC 。DC将窗口连接到
+      GDI(Graphics Device Interface图形设备接口)。而RC将OpenGL连接到DC                                                                     */
+      /************************************************************************/
+      HGLRC m_hRC;          //Rendering Context着色描述表
+      CClientDC* m_pDC;     //Device Context设备描述表
+
+       7)CMyView中添加保护（protected）成员函数
+      7.1、设置像素格式，即OpenGL怎样操作像素
+          BOOL CGameDemoView::SetupPixelFormat()
+          {
+              static PIXELFORMATDESCRIPTOR pfd =
+              {
+                  sizeof(PIXELFORMATDESCRIPTOR), // size of this pfd
+                  1,                                                     // version number
+                  PFD_DRAW_TO_WINDOW |           // support window
+                  PFD_SUPPORT_OPENGL |               // support OpenGL
+                  PFD_DOUBLEBUFFER,                     // double buffered
+                  PFD_TYPE_RGBA,                           // RGBA type
+                  24,                                                 // 24-bit color depth
+                  0, 0, 0, 0, 0, 0,                               // color bits ignored
+                  0,                                                   // no alpha buffer
+                  0,                                                   // shift bit ignored
+                  0,                                                   // no accumulation buffer
+                  0, 0, 0, 0,                                       // accum bits ignored
+                  32,                                                 // 32-bit z-buffer
+                  0,                                                   // no stencil buffer
+                  0,                                                   // no auxiliary buffer
+                  PFD_MAIN_PLANE,                         // main layer
+                  0,                                                   // reserved
+                  0, 0, 0                                            // layer masks ignored
+              };
+    
+              int m_nPixelFormat = ::ChoosePixelFormat(m_pDC->GetSafeHdc(), &pfd);
+              if ( m_nPixelFormat == 0 )
+              {
+                  MessageBox("ChoosePixelFormat failed.");
+                  return FALSE;
+              }
+              if ( ::SetPixelFormat(m_pDC->GetSafeHdc(), m_nPixelFormat, &pfd) == FALSE)
+              {
+                  MessageBox("SetPixelFormat failed.");
+                  return FALSE;
+              }
+              return TRUE;
+          }
+      7.2、创建着色描述表并当前化着色表
+          BOOL CGameDemoView::InitOpenGL()
+          {
+              //Get a DC for the Client Area
+              m_pDC = new CClientDC(this);
+              //Failure to Get DC
+              if(m_pDC == NULL)
+              {
+                  MessageBox("Error Obtaining DC");
+                  return FALSE;
+              }
+             //Failure to set the pixel format
+              if(!SetupPixelFormat())
+              {
+                  return FALSE;
+              }
+              //Create Rendering Context
+              m_hRC = ::wglCreateContext (m_pDC->GetSafeHdc());
+              //Failure to Create Rendering Context
+              if(m_hRC == 0)
+              {
+                  MessageBox("Error Creating RC");
+                  return FALSE;
+              }
+
+              //Make the RC Current
+              if(::wglMakeCurrent (m_pDC->GetSafeHdc (), m_hRC)==FALSE)
+              {
+                  MessageBox("Error making RC Current");
+                  return FALSE;
+              }
+
+              // 启用阴影平滑
+              ::glShadeModel(GL_SMOOTH);
+              //黑色背景
+              ::glClearColor(0.0f,0.0f,0.0f,0.0f);
+              //设置深度缓存
+              ::glClearDepth(1.0f);
+              //启用深度测试
+              ::glEnable(GL_DEPTH_TEST);
+              //所作深度测试的类型
+              ::glDepthFunc(GL_LEQUAL);   
+              //告诉系统对透视进行修正
+              ::glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  
+
+              return TRUE;
+          }
+      7.3 、删除着色表，响应WM_DESTROY消息
+          void CGameDemoView::OnDestroy()// 该函数在View->ClassWizard里面添加
+          {
+              CView::OnDestroy();
+              //Delete the RC
+              if(m_hRC)
+              {
+                  //Make the RC non-current
+                  if(::wglMakeCurrent (NULL,NULL) == FALSE)
+                  {
+                      ::MessageBox(NULL,"释放DC或RC失败。","关闭错误",MB_OK | MB_ICONINFORMATION);
+                  }
+                  //Delete the rendering context
+                  if(::wglDeleteContext (m_hRC)==FALSE)
+                  {
+                      ::MessageBox(NULL,"释放RC失败。","关闭错误",MB_OK | MB_ICONINFORMATION);
+                  }
+                  m_hRC = NULL;
+              }
+
+             //Delete the DC
+              if(m_pDC)
+              {
+                  delete m_pDC;
+              }
+              //Set it to NULL
+              m_pDC = NULL;
+          }
+
+    8)响应WM_CREATE消息// 该函数在View->ClassWizard里面添加
+      int CGameDemoView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+      {
+          if (CView::OnCreate(lpCreateStruct) == -1)
+          return -1;
+   
+          if(!InitOpenGL())
+          {
+              ::MessageBox(NULL,"初始化OpenGL失败.","错误",MB_OK|MB_ICONEXCLAMATION);
+              return -1;
+          }
+          return 0;
+      }
+
+    9)响应WM_SIZE消息// 该函数在View->ClassWizard里面添加
+      void CGameDemoView::OnSize(UINT nType, int cx, int cy)
+      {
+          CView::OnSize(nType, cx, cy);
+
+          // TODO: Add your message handler code here
+          if ( cx <= 0 || cy <= 0 )
+          {
+              return;
+          }
+          //选择投影矩阵
+          ::glMatrixMode(GL_PROJECTION);
+          //重置投影矩阵
+          ::glLoadIdentity();
+          //计算窗口的外观比例
+          ::gluPerspective(45.0f, (GLfloat)cx/(GLfloat)cy, 0.1f, 3.0*10e+11f);
+          //设置模型观察矩阵
+          ::glMatrixMode(GL_MODELVIEW);
+          //重置模型观察矩阵
+          ::glLoadIdentity();
+          //设置当前的视口
+          ::glViewport(0, 0, cx, cy);
+      }
+
+    10)绘制
+      void CGameDemoView:rawScene()// 普通函数
+      {
+          glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+          glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+          glLoadIdentity();
+          glColor3f(1.0f,0.0f,0.0f);
+          glTranslatef(-1.5f,0.0f,-6.0f);
+          glBegin(GL_TRIANGLES);　　　　　　　　　　　　// 绘制三角形
+　　　　　　　glVertex3f( 0.0f, 1.0f, 0.0f);　　　　　　// 上顶点
+　　　　　　　glVertex3f(-1.0f,-1.0f, 0.0f);　　　　　　// 左下
+　　　　　　　glVertex3f( 1.0f,-1.0f, 0.0f);　　　　　　// 右下
+　　　    glEnd();　
+          SwapBuffers(wglGetCurrentDC());　　　　　　
+      }
+
+      11)在OnDraw()中调用DrawScene()
+
+      12)这时框架已基本搭建完成，但是当改变窗口大小时会出现严重的闪烁，在CGameDemo里采用View的ClassWizard添加一个OnEraseBkgnd函数，避免Windows自己的窗口刷新闪烁。
+    BOOL CGameDemoView::OnEraseBkgnd(CDC* pDC) 
+    {
+        // TODO: Add your message handler code here and/or call default
+
+        //return CView::OnEraseBkgnd(pDC);//将该句注释掉换成return true ;
+        return TRUE;
+    }
+http://www.c3dn.net/forum.php?mod=viewthread&tid=52

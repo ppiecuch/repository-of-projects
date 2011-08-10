@@ -1,0 +1,342 @@
+这篇文章是我在学习高质量C++/C编程指南中的第7章"内存管理"后的一篇笔记,之前我也写过相关的文章指针以及内存分配,但我感觉那篇还不是很好,这篇我很把它更完善一些
+
+一.内存的常见分配方式
+  1. 从静态区分配,一般是全局变量和static类型变量
+
+  2.从栈区分配内存,一般是局部的变量,会随着所在函数的结束而自动释放
+
+  3.从堆中分配,一般是使用手动分配,使用malloc()函数和new来申请任意大小空间,不过要手动释放空间,相应的使用free()函数和delete释放,
+
+    如果不释放该空间,而且指向该空间的指针指向了别的空间.则该空间就无法释放,造成内存泄露,造成了内存浪费
+
+二.内存的使用规则
+  1.在使用malloc()或new申请空间时,要检查有没有分配空间成功,判断方法是判断指针是否为NULL,如申请一块很大的内存而没有这么大的内存则分配内存会失败
+
+  2.申请成功后最好是将该内存清空,使用memset()后ZeroMemory()清空,不然存在垃圾而造成有时候输出很大乱码
+
+  3.不要忘记为数组和动态内存赋初值。防止将未被初始化的内存作为右值使用。(这句话不太理解)
+
+  4.要防止数组或指针内存越界,
+
+  5.申请内存成功后,使用结束后要释放,系统不会自动释放手动分配的内存
+
+  6.内存释放后,指针还是指向那块地址,不过这指针已经是"野指针"了,所以释放内存后指针要指向NULL,不然很危险,容易出错,if()对野指针的判断不起作用
+
+三.指针和数组
+  1. 数组里的数据可以单个修改,但指针的不行,如我的例子,char str[] = "hello",数组的大小有6个字符(注意\0),可以通过str[0] = 'X'修改了的个字符,而指针
+
+char *p = "Word",p是指向了一串常量的字符串,常量字符串是不可修改的,如 p[0] = 'X',编译器编译时不会保存,但执行时会出错
+
+ 
+
+
+
+ 
+
+   2.内容的复制与比较
+
+   内容的复制要使用strcpy()函数,不要使用赋值符"=",内容的比较也是不要使用比较符号"<,>,==",使用strcmp()函数
+
+view plaincopy to clipboardprint?// 数组…   
+  
+    char a[] = "hello";  
+  
+    char b[10];  
+  
+    strcpy(b, a);           // 不能用   b = a;   
+  
+    if(strcmp(b, a) == 0)   // 不能用  if (b == a)  
+// 数组…
+
+    char a[] = "hello";
+
+    char b[10];
+
+    strcpy(b, a);           // 不能用   b = a;
+
+    if(strcmp(b, a) == 0)   // 不能用  if (b == a)
+
+
+view plaincopy to clipboardprint?// 指针…   
+  
+   int len = strlen(a);  
+  
+   char *p = (char *)malloc(sizeof(char)*(len+1));  
+  
+   strcpy(p,a);            // 不要用 p = a;   
+  
+   if(strcmp(p, a) == 0)   // 不要用 if (p == a)  
+ // 指针…
+
+    int len = strlen(a);
+
+    char *p = (char *)malloc(sizeof(char)*(len+1));
+
+    strcpy(p,a);            // 不要用 p = a;
+
+    if(strcmp(p, a) == 0)   // 不要用 if (p == a)
+
+ 
+    3,计算空间的大小
+
+ 对数组的计算是使用sizeof()函数,该函数会按照内存对齐的方式4的倍数计算,而指针的空间大小没法计算,只能记住在申请空间时的空间大小
+
+注意当数组作为函数的参数进行传递时，该数组自动退化为同类型的指针,不论数组a的容量是多少，sizeof(a)始终等于sizeof(char *)
+
+ 
+
+
+ 
+
+view plaincopy to clipboardprint?void Func(char a[100])  
+  
+    {  
+  
+        cout<< sizeof(a) << endl;   // 4字节而不是100字节   
+  
+}  
+void Func(char a[100])
+
+    {
+
+        cout<< sizeof(a) << endl;   // 4字节而不是100字节
+
+}
+ 
+
+ 
+
+四.指针的内存的传递
+如果函数的参数是指针,则不要使用该参数来申请内存空间,这样没有实际的用处,而且这样当函数结束时还得不到释放内存而造成内存泄露
+
+
+
+ 
+
+     这个问题可以使用"指针的指针"的方法可以解决,不然使用返回指针地址的办法,先看一下使用 "指针的指针"方法,
+
+还可以考虑一下引用
+
+ 
+
+
+
+ 
+
+使用返回内存地址的方法
+
+
+
+ 
+
+ 使用返回的方式传递内存地址容易出错的地方在于放回"栈内存"的指针,当GetMemory()函数结束时栈内存也被释放,
+
+ 
+
+ 
+
+ 像这个代码
+
+view plaincopy to clipboardprint?char *GetString2(void)  
+  
+{  
+  
+    char *p = "hello world";  
+  
+    return p;  
+  
+}  
+   
+void Test5(void)  
+  
+{  
+  
+    char *str = NULL;  
+  
+    str = GetString2();  
+  
+    cout<< str << endl;  
+  
+}  
+   
+char *GetString2(void)
+
+{
+
+    char *p = "hello world";
+
+    return p;
+
+}
+ 
+void Test5(void)
+
+{
+
+    char *str = NULL;
+
+    str = GetString2();
+
+    cout<< str << endl;
+
+}
+ 
+ 
+函数Test5运行虽然不会出错，但是函数GetString2的设计概念却是错误的。因为GetString2内的“hello world”是常量字符串，位于静态存储区，
+
+它在程序生命期内恒定不变。无论什么时候调用GetString2，它返回的始终是同一个“只读”的内存块。
+
+ 
+
+五.动态内存释放问题与野指针
+   1. 当我们使用free()和delete释放一块内存时,指针还是指向原来的地址,不过这时候的指针时野指针,
+
+可以验证一下.这图是我调试到if()语句时的情况,p还没有指向NULL,只是释放了p指向的空间了
+
+ 
+
+ 
+
+ 
+
+执行的结果可以看看...
+
+ 
+
+
+
+ 
+
+所以有这样的一些特征:
+
+1.指针销毁了,并不表示所指的空间也得到了释放 :内存泄露
+
+2.内存被释放了,并不表示指针也被销毁了或指向NULL :野指针
+
+ 
+六.malloc()/free()与new/delete的区别(摘抄原文)
+malloc与free是C++/C语言的标准库函数，new/delete是C++的运算符。它们都可用于申请动态内存和释放内存。对于非内部数据类型的对象而言，
+
+光用maloc/free无法满足动态对象的要求。对象在创建的同时要自动执行构造函数，对象在消亡之前要自动执行析构函数。由于malloc/free是库函
+
+数而不是运算符，不在编译器控制权限之内，不能够把执行构造函数和析构函数的任务强加于malloc/free。
+
+因此C++语言需要一个能完成动态内存分配和初始化工作的运算符new，以及一个能完成清理与释放内存工作的运算符delete。注意new/delete不是库函数。
+
+我们先看一看malloc/free和new/delete如何实现对象的动态内存管理,看代码
+
+view plaincopy to clipboardprint?class Obj  
+  
+{  
+  
+public :  
+  
+        Obj(void){ cout << “Initialization” << endl; }  
+  
+        ~Obj(void){ cout << “Destroy” << endl; }  
+  
+        void    Initialize(void){ cout << “Initialization” << endl; }  
+  
+        void    Destroy(void){ cout << “Destroy” << endl; }  
+  
+};  
+   
+void UseMallocFree(void)  
+  
+{  
+  
+    Obj  *a = (obj *)malloc(sizeof(obj));   // 申请动态内存   
+  
+    a->Initialize();                        // 初始化   
+  
+    //…   
+  
+    a->Destroy();   // 清除工作   
+  
+    free(a);        // 释放内存   
+  
+}  
+   
+void UseNewDelete(void)  
+  
+{  
+  
+    Obj  *a = new Obj;  // 申请动态内存并且初始化   
+  
+    //…   
+  
+    delete a;           // 清除并且释放内存   
+  
+}  
+   
+class Obj
+
+{
+
+public :
+
+        Obj(void){ cout << “Initialization” << endl; }
+
+        ~Obj(void){ cout << “Destroy” << endl; }
+
+        void    Initialize(void){ cout << “Initialization” << endl; }
+
+        void    Destroy(void){ cout << “Destroy” << endl; }
+
+};
+ 
+void UseMallocFree(void)
+
+{
+
+    Obj  *a = (obj *)malloc(sizeof(obj));   // 申请动态内存
+
+    a->Initialize();                        // 初始化
+
+    //…
+
+    a->Destroy();   // 清除工作
+
+    free(a);        // 释放内存
+
+}
+ 
+void UseNewDelete(void)
+
+{
+
+    Obj  *a = new Obj;  // 申请动态内存并且初始化
+
+    //…
+
+    delete a;           // 清除并且释放内存
+
+}
+ 
+
+
+       类Obj的函数Initialize模拟了构造函数的功能，函数Destroy模拟了析构函数的功能。函数UseMallocFree中，由于malloc/free不能执行构造函数与析构函数，必须调用成员函数Initialize和Destroy来完成初始化与清除工作。函数UseNewDelete则简单得多。
+
+       所以我们不要企图用malloc/free来完成动态对象的内存管理，应该用new/delete。由于内部数据类型的“对象”没有构造与析构的过程，对它们而言malloc/free和new/delete是等价的。
+
+    既然new/delete的功能完全覆盖了malloc/free，为什么C++不把malloc/free淘汰出局呢？这是因为C++程序经常要调用C函数，而C程序只能用malloc/free管理动态内存。
+
+如果用free释放“new创建的动态对象”，那么该对象因无法执行析构函数而可能导致程序出错。如果用delete释放“malloc申请的动态内存”，理论上讲程序不会出错，但是该程序的可读性很差。所以new/delete必须配对使用，malloc/free也一样。
+
+ 
+
+ 七.如何处理内存耗尽
+   1.判断指针是否为NULL，如果是则马上用return语句终止本函数
+
+   2.判断指针是否为NULL，如果是则马上用exit(1)终止整个程序的运行
+
+   3.为new和malloc设置异常处理函数。例如Visual C++可以用_set_new_hander函数为new设置用户自己定义的异常处理函数，
+
+      也可以让malloc享用与new相同的异常处理函数
+
+ 
+
+ 
+
+malloc()/free()和new/delete的使用要点网上有更详细的说明
+http://blog.csdn.net/bizhu12/article/details/6668834
