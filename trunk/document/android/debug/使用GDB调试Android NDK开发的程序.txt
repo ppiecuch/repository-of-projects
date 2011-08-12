@@ -1,0 +1,15 @@
+作者: Android开发网原创 时间: 2011-08-04 
+   很多网友不清楚Android NDK使用C/C++开发的应用，其实在Linux下调试我们主要使用GDB调试。当然使用Logcat或自己写入文件的方式调试也是可以的。有关Log打印可以参考Android开发网早期文章。今天Android123分享下GDB调试。
+
+  对于使用NDK编译出来的工具除了so库文件外，会会有gdbserver和gdb.setup文件，方法为
+
+  1. 在PC的命令提示符下进入ndk根目录，执行ndk-build NDK_DEBUG=1 这样，将会强制生成debug调试版的文件，将设我们NDK工程名为 cwj-test ，这里要说明的是编译出来的库文件在libs目录下是没有符号的，我们要obj下的文件，否则symbol无法正确加载。
+
+  2. 我们将生成的gdbserver和so库文件复制到/data目录下面，使用adb push命令，或者直接使用Eclipse中DDMS的File Explorer手动复制，不过对于真机可能没有这个列举目录的权限，你可以使用Android模拟器。
+
+  3. 进入Android手机或模拟器的命令行，我们使用adb shell命令，接下来进入刚才的文件夹，比如说adb shell /data/gdbserver 10.0.0.2:1987 ./cwj-test  这句你的手机ip假设为10.0.0.2端口号为1987，工程名为cwj-test 如果没有问题的话，会看到Listening on port 1987 这代表正在监听。
+
+  4. 接下来在新开一个PC命令行，这里Android123使用的是NDKr6，在 android-ndk-r6\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\bin\arm-linux-androideabi-gdb.exe ./cwj-test 执行
+
+  5. (gdb) target remote 10.0.0.2:1234 调试了，这里的ip和端口要和上面的对应，当然本机的ip你可以使用localhost代替。
+

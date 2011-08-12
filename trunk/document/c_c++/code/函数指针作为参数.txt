@@ -1,0 +1,55 @@
+void leftClicked(){
+	core::vector3df nodePosition = node->getPosition();
+	nodePosition.X -= MOVEMENT_SPEED;
+	node->setPosition(nodePosition);
+}
+
+void rightClicked(){
+	core::vector3df nodePosition = node->getPosition();
+	nodePosition.X += MOVEMENT_SPEED;
+	node->setPosition(nodePosition);
+}
+
+class AndroidEventReceiver:public IEventReceiver
+{
+private:
+	const IGUIEnvironment* env;
+	void (*leftClicked)();
+	void (*rightClicked)();
+public:
+	AndroidEventReceiver(const IGUIEnvironment* env,void (*leftClicked)(),void (*rightClicked)()){
+		this->env=env;
+		this->leftClicked=leftClicked;
+		this->rightClicked=rightClicked;
+	}
+	virtual bool OnEvent(const SEvent& event){
+		LOGD(LOG_TAG,"OnEvent()");
+		if (event.EventType == EET_GUI_EVENT)
+		{
+			s32 id = event.GUIEvent.Caller->getID();
+			switch(event.GUIEvent.EventType)
+			{
+				case EGET_BUTTON_CLICKED:
+					LOGD(LOG_TAG,"Clicked");
+					switch(id)
+					{
+						case GUI_ID_LEFT_BUTTON:
+							LOGD(LOG_TAG,"Left clicked");
+							(*leftClicked)();
+							return true;
+						case GUI_ID_RIGHT_BUTTON:
+							LOGD(LOG_TAG,"Right clicked");
+							(*rightClicked)();
+							return true;
+						default:
+							break;
+					}
+			}
+		}
+		return false;
+	}
+};
+
+.....
+
+receiver = new AndroidEventReceiver(guienv,leftClicked,rightClicked);

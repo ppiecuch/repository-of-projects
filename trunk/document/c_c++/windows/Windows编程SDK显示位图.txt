@@ -1,0 +1,315 @@
+一.相关函数
+1. HBITMAP LoadBitmap(
+
+                                      HINSTANCE hInstance,  // handle to application instance
+
+                                      LPCTSTR lpBitmapName  // name of bitmap resource
+
+                                      );
+
+如果想加载系统位图，那么将第一个参数设为NULL,如果不是系统位图,
+
+第一参数是实例的句柄,第二个参数可以用MAKEINTRESOURCE宏转换位图的ID,不然直接加位图的路径
+
+ 
+
+2, HANDLE LoadImage(
+
+                    HINSTANCE hinst,   // handle to instance
+
+                    LPCTSTR lpszName,  // image to load
+
+                    UINT uType,        // image type
+
+                    int cxDesired,     // desired width
+
+                    int cyDesired,     // desired height
+
+                    UINT fuLoad        // load options
+
+);
+
+第一个参数:实例句柄,若加载OEM图像则可以0;
+
+第二参数:如果加载外部位图,直接是位图路径,若加载OEM图像,可以使用MAKEINTRESOURCE宏,
+
+
+
+第三个参数:位图的类型
+
+
+
+ 
+
+第四和第五个参数是所加载的图像的宽度和高度,以像素为单位, 如果此参数为零并且参数fuLoad值为LR_DEFAULTSIZE，
+
+那么函数使用SM_CXICON或SM_CXCURSOR系统公制值设定宽度；如果此参数为零并且值LR_DEFAULTSIZE没有被使用，
+
+那么函数使用目前的资源宽度。
+
+ 
+
+第五参数:可以使用"|"进行组合
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+3. int GetObject(
+
+             HGDIOBJ hgdiobj,  // handle to graphics object
+
+             int cbBuffer,     // size of buffer for object information
+
+             LPVOID lpvObject  // buffer for object information
+
+              );
+
+  用这个函数获取位图的信息,如位图尺寸,
+
+第一个参数:图像的句柄,可以是一个逻辑位图、一个刷子、一种字体、一个调色板、笔或通过调用CreateDIBsection函数创建的与设备无关位图的句柄
+
+第二个参数:缓冲区的大小,
+
+第三个参数:
+
+ 
+
+:
+
+ 
+
+4.显示位图
+
+BOOL BitBlt  
+
+( 
+
+      HDC hdcDest,                 // 目地设备环境 
+
+      int nXDest, int nYDest,         //目地设备显示位图的基点
+
+      int nWidth, int nHeight,        // 显示区域的高宽 
+
+      HDC hdcSrc,                   // 源设备环境 
+
+      int nXSrc, int nYSrc,           // 源设备中位图的左上角坐标
+
+      DWORD dwRop               // 位图的显示方式 
+
+) 
+
+ 
+
+ 
+
+ 
+
+最后一个参数显示方式
+
+
+
+ 
+
+上文中的内容参考了MSDN,图片来自MSDN的截图
+
+ 
+
+二. 实现
+ 
+
+在"资源"上添加一张位图并手工简单绘画和添加菜单,在菜单中添加"打开资源位图"和"打开外部位图"
+
+
+
+ 
+
+ 
+
+ 
+
+我的实现代码....
+
+view plaincopy to clipboardprint?//开发工具:VS2008   
+//使用 Unicode 字符集   
+  
+#include <Windows.h>   
+#include <tchar.h> //_T或_TEXT需要的头文件   
+#include "resource.h"   
+  
+//设计一个窗口类；   
+//注册窗口类；   
+//创建窗口；   
+//显示及更新窗口。   
+//消息循环   
+//窗口函数   
+  
+//全局变量   
+TCHAR szWindowClass[] = _T("演示程序");  
+TCHAR szWindowTitle[] = _T("主窗口标题");  
+HINSTANCE  hBmpInstance;  
+HBITMAP  hBmp; //位图句柄   
+BITMAP   Bmp; //BITMAP是结构体   
+HDC hDc,hDcMem; //hDcMen兼容设备   
+PAINTSTRUCT  Ps;  
+RECT  WinRect;  
+TCHAR szPath[] = _T("..\\ShowBmp\\Show.bmp"); //外部位图路径   
+  
+//定义的窗口过程函数,是个回调函数,意思是该函数不是在程序中直接调用   
+//而是在特定的事件或条件发生时由Windows系统调用,对事件或条件的响应   
+LRESULT CALLBACK MyWindowProc(  
+                HWND hwnd,      // 窗口句柄   
+                UINT uMsg,      // 消息标识   
+                WPARAM wParam,  // first message parameter   
+                LPARAM lParam   // second message parameter   
+                );  
+//程序的入口函数   
+int WINAPI  WinMain(                                                                                                                                                HINSTANCE hInstance,  //记录程序当前运行的实例的句柄   
+        HINSTANCE hPrevInstance, //已经失去了意义,总为NULL   
+        LPSTR lpCmdLine, //命令行参数,记录当前运行程序的路径   
+        int nShowCmd     //指定程序窗口应该如何显示,通常不检查这个参数的值   
+        )  
+{  
+      
+    //获取实例   
+    hBmpInstance = hInstance;  
+    //设计窗口类,该窗口类并不是C++中的类,只是表示窗口特征的结构体   
+  
+    WNDCLASS MyWndClass; //WNDCLASS是个结构体,该结构体中的成员是指定窗口特征的数据   
+  
+    //这两个变量允许用户请求Windows内部提供额外的空间以便额外数据与窗口   
+    //实例发生联系,通常不分配空间   
+    MyWndClass.cbClsExtra = NULL;  
+    MyWndClass.cbWndExtra = NULL;  
+      
+    //MyWndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);   
+    MyWndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);  
+    MyWndClass.hIcon   = LoadIcon(NULL,IDI_WINLOGO);   
+      
+       //光标,LoadCursor()的使用与LoadIcon()相同   
+        MyWndClass.hCursor = LoadCursor(NULL,IDC_APPSTARTING);  
+      
+    MyWndClass.hInstance = hInstance; //当前实例的句柄   
+        MyWndClass.lpfnWndProc = MyWindowProc; //窗口函数(消息处理函数),lpfnWndProc是个函数指针   
+    MyWndClass.lpszClassName = szWindowClass; //窗口类名   
+       //MyWndClass.lpszMenuName  = NULL ;// 菜单,指定菜单资源的名字,NULL是表示没有菜单,   
+    MyWndClass.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);//一种,MAKEINTRESOURCE()加载菜单   
+        MyWndClass.style = CS_HREDRAW|CS_VREDRAW; //使用|把多种窗口样式连接在一起   
+    //窗口的样式   
+  
+    //注册窗口类,告诉Windows系统窗口类设计好了   
+    if(!RegisterClass(&MyWndClass))  
+    {  
+        return 0; //注册失败退出程序   
+    }  
+  
+    //创建窗口,返回窗口的句柄   
+    HWND hWnd = CreateWindow(  
+                szWindowClass, //窗口类名称   
+            szWindowTitle, //窗口标题   
+            WS_OVERLAPPEDWINDOW,  //窗口样式,多种样式   
+            CW_USEDEFAULT,  //x坐标,默认   
+            //CW_USEDEFAULT仅适用于WS_OVERLAPPED样式窗口   
+            CW_USEDEFAULT,  //y坐标,默认   
+            400,  //宽   
+            300,  //高   
+            NULL,           //父窗口   
+            NULL,           //第二种加菜单   
+            hInstance,      //窗口实例标记   
+            NULL            //窗口创建时传入的数据指针,   
+                                //多文档时必须指向CLIENTCREATESTRUCT   
+                 );  
+  
+     //如果窗口创建失败   
+    if(!hWnd)  
+        return 0;  
+  
+    //显示并更新窗口   
+    ShowWindow(hWnd,SW_SHOW);  
+    UpdateWindow(hWnd);  
+  
+    //消息循环,WM_QIUT才停止循环,或程序已经推出   
+    MSG Msg;  
+    while(GetMessage(&Msg,NULL,0,0))  
+    {  
+        TranslateMessage(&Msg);  //让Windows为与键盘相关的消息做一些转换   
+        DispatchMessage(&Msg);   //分派消息到窗口过程函数中对消息处理   
+    }      
+    return 1;  
+}  
+  
+//窗口过程函数的实现(消息处理函数)   
+LRESULT CALLBACK MyWindowProc(  
+                HWND hwnd,      // 窗口句柄   
+                UINT uMsg,      // 消息标识   
+                WPARAM wParam,  // first message parameter   
+                LPARAM lParam   // second message parameter   
+                 )  
+{  
+    
+   switch(uMsg)  
+   {  
+   case WM_PAINT:  
+       {  
+           TCHAR str[] = _T("这是一个Windows的SDK程序!");  
+           hDc =BeginPaint(hwnd,&Ps);//加载设备内容   
+           hDcMem = CreateCompatibleDC(hDc); //创建兼容设备   
+           SetTextColor(hDc,RGB(13,25,200)); //设置文本颜色   
+           TextOut(hDc,0,0,str,18); //输出文字     
+       };  
+       break;  
+   case WM_CLOSE: //点击"X"按钮时发送此消息,使消息循环停止    
+       if(IDYES == MessageBox(hwnd,_T("是否要退出?"),_T("提示"),MB_YESNO))  
+       {           
+          DestroyWindow(hwnd); //销毁窗口,发送WM_DESTROY消息,注意程序进程还没退出          
+       };        
+       break;  
+   case WM_DESTROY:  
+       EndPaint(hwnd,&Ps);  
+       DeleteDC(hDcMem);  
+       DeleteObject(hBmp); //清除位图   
+       PostQuitMessage(NULL); //进程结束,完全退出程序   
+       break;  
+   case WM_COMMAND:  
+       {  
+         switch(LOWORD(wParam))  
+         {  
+        case ID_40001://加载资源视图,菜单上的"打开资源位图"消息处理   
+              
+        //两种加载位图方法   
+            //hBmp = LoadBitmap(hBmpInstance,MAKEINTRESOURCE(IDB_BITMAP1));    
+        hBmp = (HBITMAP)LoadImage(hBmpInstance,MAKEINTRESOURCE(IDB_BITMAP1),IMAGE_BITMAP,300,200,LR_CREATEDIBSECTION);  
+                  
+        GetObject(hBmp,sizeof(BITMAP),&Bmp); //获取位图尺寸   
+        SelectObject(hDcMem,hBmp); //将位图加到设备中   
+        BitBlt(GetDC(hwnd),0,20,Bmp.bmWidth,Bmp.bmHeight,hDcMem,0,0,SRCCOPY); //显示位图   
+        TextOut(hDc,120,50,_T("资源位图"),4);  
+            break;  
+        case ID_40002: //外部位图,菜单上的"打开外部位图"消息处理   
+  
+        hBmp = (HBITMAP)LoadImage(hBmpInstance,szPath,IMAGE_BITMAP,200,120,LR_LOADFROMFILE|LR_CREATEDIBSECTION);  
+        GetObject(hBmp,sizeof(BITMAP),&Bmp);  
+            SelectObject(hDcMem,hBmp);   
+        BitBlt(GetDC(hwnd),0,100,Bmp.bmWidth,Bmp.bmHeight,hDcMem,0,0,SRCCOPY);  
+        TextOut(hDc,230,150,_T("外部位图"),4);  
+        break;  
+         }  
+       };  
+       break;  
+   default:  
+       return DefWindowProc(hwnd,uMsg,wParam,lParam); //处理未处理的消息   
+       break;  
+   }  
+  
+   return 0;  
+  
+}  
+http://blog.csdn.net/bizhu12/article/details/6680410

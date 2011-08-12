@@ -113,3 +113,20 @@ mksdcard: create a blank FAT32 image to be used with the Android emulator
    if < size> is an integer followed by 'K', it specifies a size in KiB   
    if < size> is an integer followed by 'M', it specifies a size in MiB   
    D:\android-sdk\tools>mksdcard.exe -l sdcard 2048M sdcard.img  
+   
+   
+   
+   
+Android 模拟器 获得 root权限（目前发现最简单的方法）
+2011-04-20 18:30启动一个模拟器，开始-运行-输入cmd，打开dos，依次输入
+
+adb shell
+
+mount -o remount,rw -t yaffs2 /dev/block/mtdblock3 /system
+
+cd /system/bin
+
+cat sh > su
+
+chmod 4755 su
+ 

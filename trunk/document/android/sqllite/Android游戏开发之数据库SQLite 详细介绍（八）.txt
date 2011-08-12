@@ -1,0 +1,767 @@
+雨松MOMO带你走进游戏开发的世界之数据库SQLite 详细介绍
+
+
+
+
+
+
+
+
+
+
+
+
+数据库SQLite介绍
+    
+
+        数据库最经典的四个操作 添加、删除、修改、查找，在处理大量数据的时候使用数据库可以帮我们迅速定位当前须要处理的数据，举个例子 好比现在要实现一个搜索功能 用数据库的话只须要其中一个搜索条件 一个数据库语句就可以迅速的在N条数据中找到我们需要的数据，如果不使用数据库那么查找起来会非常麻烦，效率大打折扣，所以在处理大量数据的时候使用数据库是明确的选择，在Android的开发中使用的数据库是SQLite ,它是一个轻量级的数据库 、非常小 、 移植性好、效率高、可靠 ，嵌入式设备因为受到硬件条件的限制所以非常适合使用 SQLite  数据库。
+
+
+
+
+
+创建与删除数据库
+
+        封装一个类去继承SQLiteOpenHelper  在构造函数中传入数据库名称与数据库版本号，数据库被创建的时候会调用onCreate(SQLiteDatabase db) 方法，数据库版本号发生改变的时候会调用onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)方法，可以方便的对软件游戏升级后做出相应处理避免覆盖安装数据库发生改变产生的错误。调用SQLiteOpenHelper  的getReadableDatabase()方法去创建数据库，如果数据库不存在则创建 并且返回SQLiteDatabase对象，如果数据库存在则不创建只返回SQLiteDatabase对象。调用deleteDatabase(DATABASE_NAME)方法 传入数据库名称则可删除数据库。
+
+
+
+
+
+
+
+
+
+
+
+
+
+       封装了一个DatabaseHelper类继承SQLiteOpenHelper 我使用了设计模式中的单例模式来处理这个类，这里说一下单例模式 单例模式是常见的代码设计模式之一 它的好处是在于避免在内存中频繁的实例化所以将它的对象写成static 静态 这样它的对象就只有一份存在静态内存区使用的时候只须要通过getInstance()就可以直接拿到这个静态对象。
+
+
+
+
+view plaincopy to clipboardprint?public class DatabaseHelper extends SQLiteOpenHelper {  
+    private static DatabaseHelper mInstance = null;  
+  
+    /** 数据库名称 **/  
+    public static final String DATABASE_NAME = "xys.db";  
+  
+    /** 数据库版本号 **/  
+    private static final int DATABASE_VERSION = 1;  
+  
+    /**数据库SQL语句 添加一个表**/  
+    private static final String NAME_TABLE_CREATE = "create table test("  
+        + "_id INTEGER PRIMARY KEY AUTOINCREMENT," + "name TEXT,"+"hp INTEGER DEFAULT 100,"+ "mp INTEGER DEFAULT 100,"  
+        + "number INTEGER);";  
+  
+    DatabaseHelper(Context context) {  
+    super(context, DATABASE_NAME, null, DATABASE_VERSION);  
+    }  
+      
+     /**单例模式**/  
+    static synchronized DatabaseHelper getInstance(Context context) {  
+    if (mInstance == null) {  
+        mInstance = new DatabaseHelper(context);  
+    }  
+    return mInstance;  
+    }  
+  
+    @Override  
+    public void onCreate(SQLiteDatabase db) {  
+    /**向数据中添加表**/  
+    db.execSQL(NAME_TABLE_CREATE);  
+    }  
+  
+    @Override  
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {  
+    /**可以拿到当前数据库的版本信息 与之前数据库的版本信息   用来更新数据库**/   
+    }  
+  
+      
+    /** 
+     * 删除数据库 
+     * @param context 
+     * @return 
+     */  
+    public boolean deleteDatabase(Context context) {  
+    return context.deleteDatabase(DATABASE_NAME);  
+    }  
+}  
+public class DatabaseHelper extends SQLiteOpenHelper {
+    private static DatabaseHelper mInstance = null;
+
+    /** 数据库名称 **/
+    public static final String DATABASE_NAME = "xys.db";
+
+    /** 数据库版本号 **/
+    private static final int DATABASE_VERSION = 1;
+
+    /**数据库SQL语句 添加一个表**/
+    private static final String NAME_TABLE_CREATE = "create table test("
+	    + "_id INTEGER PRIMARY KEY AUTOINCREMENT," + "name TEXT,"+"hp INTEGER DEFAULT 100,"+ "mp INTEGER DEFAULT 100,"
+	    + "number INTEGER);";
+
+    DatabaseHelper(Context context) {
+	super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+    
+     /**单例模式**/
+    static synchronized DatabaseHelper getInstance(Context context) {
+	if (mInstance == null) {
+	    mInstance = new DatabaseHelper(context);
+	}
+	return mInstance;
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+	/**向数据中添加表**/
+	db.execSQL(NAME_TABLE_CREATE);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	/**可以拿到当前数据库的版本信息 与之前数据库的版本信息   用来更新数据库**/ 
+    }
+
+    
+    /**
+     * 删除数据库
+     * @param context
+     * @return
+     */
+    public boolean deleteDatabase(Context context) {
+	return context.deleteDatabase(DATABASE_NAME);
+    }
+}
+
+
+
+
+
+在这个类中使用DatabaseHelper对象 实现创建与删除数据库、
+
+
+view plaincopy to clipboardprint?public class NewSQLite extends Activity {  
+    DatabaseHelper mDbHelper = null;  
+    SQLiteDatabase mDb = null;  
+    Context mContext = null;  
+    @Override  
+    protected void onCreate(Bundle savedInstanceState) {  
+    setContentView(R.layout.create_sql);  
+    mContext = this;  
+    //创建DatabaseHelper对象         
+    mDbHelper = DatabaseHelper.getInstance(mContext);  
+    //调用getReadableDatabase方法如果数据库不存在 则创建  如果存在则打开   
+    mDb= mDbHelper.getReadableDatabase();    
+  
+    Button button0 = (Button)findViewById(R.id.createDateBase);  
+    button0.setOnClickListener(new OnClickListener() {  
+          
+        @Override  
+        public void onClick(View arg0) {  
+  
+        Toast.makeText(NewSQLite.this, "成功创建数据库", Toast.LENGTH_LONG).show();    
+        }  
+    });  
+    Button button1 = (Button)findViewById(R.id.deleteDateBase);  
+    button1.setOnClickListener(new OnClickListener() {  
+          
+        @Override  
+        public void onClick(View arg0) {  
+        mDbHelper = DatabaseHelper.getInstance(mContext);  
+        // 调用getReadableDatabase方法如果数据库不存在 则创建 如果存在则打开   
+        mDb = mDbHelper.getReadableDatabase();  
+        // 关闭数据库   
+        mDbHelper.close();  
+        // 删除数据库   
+        mDbHelper.deleteDatabase(mContext);  
+        Toast.makeText(NewSQLite.this, "成功删除数据库", Toast.LENGTH_LONG).show();    
+        }  
+    });  
+      
+      
+      
+    super.onCreate(savedInstanceState);  
+    }  
+  
+}  
+public class NewSQLite extends Activity {
+    DatabaseHelper mDbHelper = null;
+    SQLiteDatabase mDb = null;
+    Context mContext = null;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	setContentView(R.layout.create_sql);
+	mContext = this;
+	//创建DatabaseHelper对象      
+	mDbHelper = DatabaseHelper.getInstance(mContext);
+	//调用getReadableDatabase方法如果数据库不存在 则创建  如果存在则打开
+	mDb= mDbHelper.getReadableDatabase();  
+
+	Button button0 = (Button)findViewById(R.id.createDateBase);
+	button0.setOnClickListener(new OnClickListener() {
+	    
+	    @Override
+	    public void onClick(View arg0) {
+
+		Toast.makeText(NewSQLite.this, "成功创建数据库", Toast.LENGTH_LONG).show();  
+	    }
+	});
+	Button button1 = (Button)findViewById(R.id.deleteDateBase);
+	button1.setOnClickListener(new OnClickListener() {
+	    
+	    @Override
+	    public void onClick(View arg0) {
+		mDbHelper = DatabaseHelper.getInstance(mContext);
+		// 调用getReadableDatabase方法如果数据库不存在 则创建 如果存在则打开
+		mDb = mDbHelper.getReadableDatabase();
+		// 关闭数据库
+		mDbHelper.close();
+		// 删除数据库
+		mDbHelper.deleteDatabase(mContext);
+		Toast.makeText(NewSQLite.this, "成功删除数据库", Toast.LENGTH_LONG).show();  
+	    }
+	});
+	
+	
+	
+	super.onCreate(savedInstanceState);
+    }
+
+}
+
+
+
+
+创建的数据库会被保存在当前项目中 databases 路径下 具体如图所示
+
+
+
+
+
+
+
+
+
+
+
+
+添加与删除数据库中的表
+
+        数据库是可以由多张数据表组成的 如果添加一张数据库的表的话 可以使用 数据库语句 create table 名称(内容) 来进行添加 。这里给出一条创建数据库的语句 。 意思是创建一张表 名称为gameInfo 表中包含的字段 为     _id  为INTEGER 类型 并且递增  name 为Text类型   hp mp 为INTEGER 默认数值为100 number 为INTEGER 类型。
+
+view plaincopy to clipboardprint?/**创建一张表的SQL语句**/  
+private static final String NAME_TABLE_CREATE = "create table gameInfo("  
+ + "_id INTEGER PRIMARY KEY AUTOINCREMENT," + "name TEXT,"+ "hp INTEGER DEFAULT 100,"+ "mp INTEGER DEFAULT 100,"  
+ + "number INTEGER);";  
+    /**创建一张表的SQL语句**/
+    private static final String NAME_TABLE_CREATE = "create table gameInfo("
+	    + "_id INTEGER PRIMARY KEY AUTOINCREMENT," + "name TEXT,"+ "hp INTEGER DEFAULT 100,"+ "mp INTEGER DEFAULT 100,"
+	    + "number INTEGER);";
+数据库中删除一张表 直接使用DROP TABLE  表名称 就可以删除
+
+
+view plaincopy to clipboardprint?/**删除一张表的SQL语句**/  
+private static final String NAME_TABLE_DELETE = "DROP TABLE gameInfo";  
+    /**删除一张表的SQL语句**/
+    private static final String NAME_TABLE_DELETE = "DROP TABLE gameInfo";
+在代码中去执行一条SQL语句 使用SQLiteDatabase对象去调用execSQL() 传入SQL语句就OK了。
+
+view plaincopy to clipboardprint?mDb.execSQL(NAME_TABLE_CREATE);  
+ mDb.execSQL(NAME_TABLE_CREATE);
+
+
+
+
+
+
+
+以创建一张名称为gameInfo的表为例 给出代码实现
+
+
+view plaincopy to clipboardprint?public class NewTable extends Activity {  
+    DatabaseHelper mDbHelper = null;  
+    SQLiteDatabase mDb = null;  
+    Context mContext = null;  
+    
+    /**创建一张表的SQL语句**/  
+    private static final String NAME_TABLE_CREATE = "create table gameInfo("  
+        + "_id INTEGER PRIMARY KEY AUTOINCREMENT," + "name TEXT,"+ "hp INTEGER DEFAULT 100,"+ "mp INTEGER DEFAULT 100,"  
+        + "number INTEGER);";  
+      
+      
+    /**删除一张表的SQL语句**/  
+    private static final String NAME_TABLE_DELETE = "DROP TABLE gameInfo";  
+      
+      
+    @Override  
+    protected void onCreate(Bundle savedInstanceState) {  
+    setContentView(R.layout.create_table);  
+    mContext = this;  
+    mDbHelper = DatabaseHelper.getInstance(mContext);  
+    mDb= mDbHelper.getReadableDatabase();    
+      
+    Button button0 = (Button)findViewById(R.id.createTable);  
+    button0.setOnClickListener(new OnClickListener() {  
+          
+        @Override  
+        public void onClick(View arg0) {  
+        try {  
+            mDb.execSQL(NAME_TABLE_CREATE);  
+            Toast.makeText(NewTable.this, "成功添加数据表", Toast.LENGTH_LONG).show();    
+        }catch(SQLiteException e) {  
+            Toast.makeText(NewTable.this, "数据库中已存此表", Toast.LENGTH_LONG).show();      
+        }  
+        }  
+    });  
+    Button button1 = (Button)findViewById(R.id.deleteTable);  
+    button1.setOnClickListener(new OnClickListener() {  
+          
+        @Override  
+        public void onClick(View arg0) {  
+        try {  
+            mDb.execSQL(NAME_TABLE_DELETE);  
+            Toast.makeText(NewTable.this, "成功删除数据表", Toast.LENGTH_LONG).show();   
+        }catch(SQLiteException e) {  
+            Toast.makeText(NewTable.this, "数据库中已无此表", Toast.LENGTH_LONG).show();      
+        }  
+  
+        }  
+    });  
+      
+      
+      
+    super.onCreate(savedInstanceState);  
+    }  
+  
+}  
+public class NewTable extends Activity {
+    DatabaseHelper mDbHelper = null;
+    SQLiteDatabase mDb = null;
+    Context mContext = null;
+  
+    /**创建一张表的SQL语句**/
+    private static final String NAME_TABLE_CREATE = "create table gameInfo("
+	    + "_id INTEGER PRIMARY KEY AUTOINCREMENT," + "name TEXT,"+ "hp INTEGER DEFAULT 100,"+ "mp INTEGER DEFAULT 100,"
+	    + "number INTEGER);";
+    
+    
+    /**删除一张表的SQL语句**/
+    private static final String NAME_TABLE_DELETE = "DROP TABLE gameInfo";
+    
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	setContentView(R.layout.create_table);
+	mContext = this;
+	mDbHelper = DatabaseHelper.getInstance(mContext);
+	mDb= mDbHelper.getReadableDatabase();  
+	
+	Button button0 = (Button)findViewById(R.id.createTable);
+	button0.setOnClickListener(new OnClickListener() {
+	    
+	    @Override
+	    public void onClick(View arg0) {
+		try {
+		    mDb.execSQL(NAME_TABLE_CREATE);
+		    Toast.makeText(NewTable.this, "成功添加数据表", Toast.LENGTH_LONG).show();  
+		}catch(SQLiteException e) {
+		    Toast.makeText(NewTable.this, "数据库中已存此表", Toast.LENGTH_LONG).show();    
+		}
+	    }
+	});
+	Button button1 = (Button)findViewById(R.id.deleteTable);
+	button1.setOnClickListener(new OnClickListener() {
+	    
+	    @Override
+	    public void onClick(View arg0) {
+		try {
+		    mDb.execSQL(NAME_TABLE_DELETE);
+		    Toast.makeText(NewTable.this, "成功删除数据表", Toast.LENGTH_LONG).show(); 
+		}catch(SQLiteException e) {
+		    Toast.makeText(NewTable.this, "数据库中已无此表", Toast.LENGTH_LONG).show();    
+		}
+
+	    }
+	});
+	
+	
+	
+	super.onCreate(savedInstanceState);
+    }
+
+}
+
+
+增加 删除 修改 查询 数据库中的数据
+
+使用SQLiteDatabase对象调用 insert()方法 传入标的名称与ContentValues 添加的内容 则可以向数据库表中写入一条数据 delete ()为删除一条数据 update()为更新一条数据。
+
+我详细说一下查找一条数据使用的方法 query 中 跟了8个参数 
+
+public Cursor query(String table,String[] columns,String selection,String[] selectionArgs,String groupBy,String having,String orderBy,String limit);
+
+参数说明：
+
+table:数据库表的名称
+
+columns:数据库列名称数组 写入后最后返回的Cursor中只能查到这里的列的内容 
+
+
+selection:查询条件 
+
+
+selectionArgs:查询结果 
+
+groupBy:分组列
+
+having:分组条件
+
+orderBy:排序列
+
+limit:分页查询限制
+
+Cursor:返回值，将查询到的结果都存在Cursor
+
+Cursor是一个游标接口，每次查询的结果都会保存在Cursor中 可以通过遍历Cursor的方法拿到当前查询到的所有信息。
+
+Cursor的方法
+
+moveToFirst() //将Curor的游标移动到第一条
+moveToLast()///将Curor的游标移动到最后一条
+move(int offset)//将Curor的游标移动到指定ID
+moveToNext()//将Curor的游标移动到下一条
+moveToPrevious()//将Curor的游标移动到上一条
+getCount() //得到Cursor 总记录条数
+isFirst() //判断当前游标是否为第一条记录
+isLast()//判断当前游标是否为最后一条数据
+getInt(int columnIndex)    //根据列名称获得列索引ID
+getString(int columnIndex)//根据索引ID 拿到表中存的字段
+
+
+
+
+
+
+
+
+这里给出一个例子遍历Cursor的例子
+
+
+
+view plaincopy to clipboardprint?   private void query(SQLiteDatabase db) {  
+// 把整张表的所有数据query到cursor中   
+Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null);  
+//判断cursor不为空 这个很重要   
+if (cursor != null) {  
+    // 循环遍历cursor   
+    while (cursor.moveToNext()) {  
+    // 拿到每一行name 与hp的数值   
+    String name = cursor.getString(cursor.getColumnIndex("name"));  
+    String hp = cursor.getString(cursor.getColumnIndex("hp"));  
+    Log.v("info", "姓名是 " + name + "hp为 " + hp);  
+    }  
+    // 关闭   
+    cursor.close();  
+}  
+   }  
+    private void query(SQLiteDatabase db) {
+	// 把整张表的所有数据query到cursor中
+	Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null);
+	//判断cursor不为空 这个很重要
+	if (cursor != null) {
+	    // 循环遍历cursor
+	    while (cursor.moveToNext()) {
+		// 拿到每一行name 与hp的数值
+		String name = cursor.getString(cursor.getColumnIndex("name"));
+		String hp = cursor.getString(cursor.getColumnIndex("hp"));
+		Log.v("info", "姓名是 " + name + "hp为 " + hp);
+	    }
+	    // 关闭
+	    cursor.close();
+	}
+    }
+
+
+
+
+
+向大家推荐一个查看数据库的软件非常好用, 名称是SQLiteSpy.exe  如图所示 打开xys.db 文件 可以清晰的看见数据库表中储存的内容并且该软件支持执行SQL语句 可以直接在软件中操作，我给出这款软件的下载地址。
+
+下载地址:http://download.csdn.net/source/3481140
+
+
+
+
+
+
+
+
+
+
+
+view plaincopy to clipboardprint?public class Newdate extends Activity {  
+    DatabaseHelper mDbHelper = null;  
+    SQLiteDatabase mDb = null;  
+    Context mContext = null;  
+  
+    /** 数据库字段 **/  
+  
+    public final static String TABLE_NAME = "test";  
+    public final static String ID = "_id";  
+    public final static String NAME = "name";  
+    public final static String HP = "hp";  
+    public final static String MP = "mp";  
+  
+    @Override  
+    protected void onCreate(Bundle savedInstanceState) {  
+    setContentView(R.layout.create_date);  
+    mContext = this;  
+    // 创建DatabaseHelper对象   
+    mDbHelper = DatabaseHelper.getInstance(mContext);  
+    // 调用getReadableDatabase方法如果数据库不存在 则创建 如果存在则打开   
+    mDb = mDbHelper.getReadableDatabase();  
+    // 初始化 给数据库表写入一些信息   
+    for (int i = 0; i < 10; i++) {  
+        insert(NAME, "雨松MOMO" + i);  
+    }  
+  
+    // 增加   
+    Button button0 = (Button) findViewById(R.id.add);  
+    button0.setOnClickListener(new OnClickListener() {  
+  
+        @Override  
+        public void onClick(View arg0) {  
+        insert(NAME, "新添加小可爱");  
+        Toast.makeText(Newdate.this, "添加一条数据名称为小可爱", Toast.LENGTH_LONG)  
+            .show();  
+        }  
+    });  
+    // 删除   
+    Button button1 = (Button) findViewById(R.id.delete);  
+    button1.setOnClickListener(new OnClickListener() {  
+  
+        @Override  
+        public void onClick(View arg0) {  
+        delete(ID, "1");  
+        Toast.makeText(Newdate.this, "删除一条_id=1的数据", Toast.LENGTH_LONG)  
+            .show();  
+        }  
+    });  
+    // 修改   
+    Button button2 = (Button) findViewById(R.id.modify);  
+    button2.setOnClickListener(new OnClickListener() {  
+  
+        @Override  
+        public void onClick(View arg0) {  
+        update(NAME, "雨松MOMO3", "小可爱3");  
+        Toast.makeText(Newdate.this, "更新名称雨松MOMO3 为小可爱3",  
+            Toast.LENGTH_LONG).show();  
+        }  
+    });  
+    // 查找   
+    Button button3 = (Button) findViewById(R.id.find);  
+    button3.setOnClickListener(new OnClickListener() {  
+  
+        @Override  
+        public void onClick(View arg0) {  
+        Cursor cursor = find(ID, "5");  
+        String name = cursor.getString(cursor.getColumnIndex(NAME));  
+        Toast.makeText(Newdate.this, "查找ID为5数据的名称是 " + name,  
+            Toast.LENGTH_LONG).show();  
+        }  
+    });  
+    super.onCreate(savedInstanceState);  
+    }  
+  
+    /** 
+     * 插入一条数据 
+     *  
+     * @param key 
+     * @param date 
+     */  
+    public void insert(String key, String date) {  
+    ContentValues values = new ContentValues();  
+    values.put(key, date);  
+    mDb.insert(TABLE_NAME, null, values);  
+    }  
+  
+    /** 
+     * 删除一掉数据 
+     *  
+     * @param key 
+     * @param date 
+     */  
+    public void delete(String key, String date) {  
+    mDb.delete(TABLE_NAME, key + "=?", new String[] { date });  
+    }  
+  
+    /** 
+     * 更新一条数据 
+     *  
+     * @param key 
+     * @param oldDate 
+     * @param newDate 
+     */  
+    public void update(String key, String oldDate, String newDate) {  
+    ContentValues values = new ContentValues();  
+    values.put(key, newDate);  
+    mDb.update(TABLE_NAME, values, key + "=?", new String[] { oldDate });  
+    }  
+  
+    /** 
+     * 查找一条数据 
+     *  
+     * @param key 
+     * @param date 
+     * @return 
+     */  
+    public Cursor find(String key, String date) {  
+  
+    Cursor cursor = mDb.query(TABLE_NAME, null, key + "=?",  
+        new String[] { date }, null, null, null);  
+    if (cursor != null) {  
+        cursor.moveToFirst();  
+    }  
+    return cursor;  
+    }  
+  
+}  
+public class Newdate extends Activity {
+    DatabaseHelper mDbHelper = null;
+    SQLiteDatabase mDb = null;
+    Context mContext = null;
+
+    /** 数据库字段 **/
+
+    public final static String TABLE_NAME = "test";
+    public final static String ID = "_id";
+    public final static String NAME = "name";
+    public final static String HP = "hp";
+    public final static String MP = "mp";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	setContentView(R.layout.create_date);
+	mContext = this;
+	// 创建DatabaseHelper对象
+	mDbHelper = DatabaseHelper.getInstance(mContext);
+	// 调用getReadableDatabase方法如果数据库不存在 则创建 如果存在则打开
+	mDb = mDbHelper.getReadableDatabase();
+	// 初始化 给数据库表写入一些信息
+	for (int i = 0; i < 10; i++) {
+	    insert(NAME, "雨松MOMO" + i);
+	}
+
+	// 增加
+	Button button0 = (Button) findViewById(R.id.add);
+	button0.setOnClickListener(new OnClickListener() {
+
+	    @Override
+	    public void onClick(View arg0) {
+		insert(NAME, "新添加小可爱");
+		Toast.makeText(Newdate.this, "添加一条数据名称为小可爱", Toast.LENGTH_LONG)
+			.show();
+	    }
+	});
+	// 删除
+	Button button1 = (Button) findViewById(R.id.delete);
+	button1.setOnClickListener(new OnClickListener() {
+
+	    @Override
+	    public void onClick(View arg0) {
+		delete(ID, "1");
+		Toast.makeText(Newdate.this, "删除一条_id=1的数据", Toast.LENGTH_LONG)
+			.show();
+	    }
+	});
+	// 修改
+	Button button2 = (Button) findViewById(R.id.modify);
+	button2.setOnClickListener(new OnClickListener() {
+
+	    @Override
+	    public void onClick(View arg0) {
+		update(NAME, "雨松MOMO3", "小可爱3");
+		Toast.makeText(Newdate.this, "更新名称雨松MOMO3 为小可爱3",
+			Toast.LENGTH_LONG).show();
+	    }
+	});
+	// 查找
+	Button button3 = (Button) findViewById(R.id.find);
+	button3.setOnClickListener(new OnClickListener() {
+
+	    @Override
+	    public void onClick(View arg0) {
+		Cursor cursor = find(ID, "5");
+		String name = cursor.getString(cursor.getColumnIndex(NAME));
+		Toast.makeText(Newdate.this, "查找ID为5数据的名称是 " + name,
+			Toast.LENGTH_LONG).show();
+	    }
+	});
+	super.onCreate(savedInstanceState);
+    }
+
+    /**
+     * 插入一条数据
+     * 
+     * @param key
+     * @param date
+     */
+    public void insert(String key, String date) {
+	ContentValues values = new ContentValues();
+	values.put(key, date);
+	mDb.insert(TABLE_NAME, null, values);
+    }
+
+    /**
+     * 删除一掉数据
+     * 
+     * @param key
+     * @param date
+     */
+    public void delete(String key, String date) {
+	mDb.delete(TABLE_NAME, key + "=?", new String[] { date });
+    }
+
+    /**
+     * 更新一条数据
+     * 
+     * @param key
+     * @param oldDate
+     * @param newDate
+     */
+    public void update(String key, String oldDate, String newDate) {
+	ContentValues values = new ContentValues();
+	values.put(key, newDate);
+	mDb.update(TABLE_NAME, values, key + "=?", new String[] { oldDate });
+    }
+
+    /**
+     * 查找一条数据
+     * 
+     * @param key
+     * @param date
+     * @return
+     */
+    public Cursor find(String key, String date) {
+
+	Cursor cursor = mDb.query(TABLE_NAME, null, key + "=?",
+		new String[] { date }, null, null, null);
+	if (cursor != null) {
+	    cursor.moveToFirst();
+	}
+	return cursor;
+    }
+
+}
+
+
+
+最后如果你还是觉得我写的不够详细 看的不够爽 不要紧我把源代码的下载地址贴出来 欢迎大家一起讨论学习雨松MOMO希望可以和大家一起进步。
+
+
+下载地址：http://download.csdn.net/source/3495642
+
+http://blog.csdn.net/xys289187120/article/details/6661099

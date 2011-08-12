@@ -1,0 +1,157 @@
+量命名   
+    
+           命名必须具有一定的实际意义,形式为xAbcFgh,x由变量类型确定,Abc、Fgh表示连续意   
+  义字符串,如果连续意义字符串仅两个,可都大写.如OK.   
+    
+  具体例程:   
+
+  BOOL类型   bEnable;   
+     
+  ch   *   char   chText   
+  c   *   类对象   cMain（对象实例）   
+  h   *   Handle（句柄）   hWnd   
+  i   *   int   
+  n   *   无符号整型   
+  p   *   指针   
+  sz,str   *   字符串   
+  w   WORD   
+  x,y   坐标   
+    
+        Char或者TCHAR类型   与Windows   API有直接联系的用szAppName[10]形式否则用   
+  FileName[10]形式,单个字符也可用小写字母表示;   
+    
+  Int类型   nCmdShow;   
+    
+  LONG类型   lParam;   
+    
+  UINT类型   uNotify;     
+    
+  DWORD类型   dwStart;   
+    
+  PSTR类型   pszTip;   
+    
+  LPSTR类型   lpCmdLine   
+    
+  LPTSTR类型   lpszClassName;   
+    
+  LPVOID类型   lpReserved   
+    
+  WPARAM类型   wParam,   
+    
+  LPARAM类型   lParam   
+    
+  HWND类型   hDlg;   
+    
+  HDC类型   hDC;   
+    
+  HINSTANCE类型   hInstance   
+    
+  HANDLE类型   hInstance,   
+    
+  HICON类型   hIcon;   
+    
+  int   iTmp   
+    
+  float   fTmp   
+    
+  DWORD   dw*   
+    
+  String   ,   AnsiString   str   *   
+    
+  m_   类成员变量   m_nVal,   m_bFlag   
+  g_   全局变量   g_nMsg,   g_bFlag   
+    
+  局部变量中可采用如下几个通用变量：nTemp，nResult，I，J（一般用于循环变量）。   
+    
+  其他资源句柄同上   
+    
+常量命名和宏定义   
+    
+  常量和宏定义必须具有一定的实际意义;   
+    
+  常量和宏定义在#include和函数定义之间;   
+    
+  常量和宏定义必须全部以大写字母来撰写,中间可根据意义的连续性用下划线连接,每一   
+  条定义的右侧必须有一简单的注释,说明其作用;   
+    
+  资源名字定义格式:   
+    
+  菜单:IDM_XX或者CM_XX   
+    
+  位图:IDB_XX   
+    
+  对话框:IDD_XX   
+    
+  字符串:IDS_XX   
+    
+  DLGINIT:DIALOG_XX   
+    
+  ICON:IDR_XX   
+    
+函数命名   
+    
+  函数原型说明包括引用外来函数及内部函数，外部引用必须在右侧注明函数来源：   模   
+  块名及文件名,   如是内部函数，只要注释其定义文件名;   
+    
+  第一个字母必须使用大写字母,要求用大小写字母组合规范函数命名,必要时可用下划线   
+  间隔,示例如下：   
+    
+  void   UpdateDB_Tfgd   (TRACK_NAME);   //Module   Name   :r01/sdw.c   
+    
+  void   PrintTrackData   (TRACK_NAME);   //Module   Name   :r04/tern.c   
+    
+  void   ImportantPoint   (void);   //Module   Name   :r01/sdw.c   
+    
+  void   ShowChar   (int   ,   int   ,   chtype);   //Local   Module   
+    
+  void   ScrollUp_V   (int   ,   int);   //Local   Module   
+    
+  .5结构体命名   
+    
+  结构体类型命名必须全部用大写字母,原则上前面以下划线开始;结构体变量命名必须用   
+  大小写字母组合，第一个字母必须使用大写字母,必要时可用下划线间隔。对于私有数   
+  据区，必须注明其所属的进程。全局数据定义只需注意其用途。   
+    
+  示例如下：   
+    
+  typedef   struct   
+    
+  {   
+    
+  char   szProductName[20];   
+    
+  char   szAuthor[20];   
+    
+    
+  char   szReleaseDate[16];   
+    
+  char   szVersion[10];     
+    
+    
+  unsigned   long   MaxTables;   
+    
+  unsigned   long   UsedTables;   
+    
+  }DBS_DATABASE;   
+    
+  DBS_DATABASE   GdataBase;   
+    
+    
+    
+控件的命名
+   
+  用小写前缀表示类别   
+    
+  用小写前缀表示类别：   
+  fm   窗口   
+  cmd   按钮   
+  cob   combo，下拉式列表框   
+  txt   文本输入框   
+  lab   labal，标签   
+  img   image，图象   
+  pic   picture   
+  grd   Grid，网格   
+  scr   滚动条   
+  lst   列表框   
+  frm   fram  
+http://www.cppblog.com/brucejini/articles/99178.html

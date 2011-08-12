@@ -1,0 +1,114 @@
+Mouse: Moving the Camera III
+Prev: The Mouse  Next: The Code So Far II  
+  
+In the previous example we changed the orientation of the camera with the keyboard. In here we are going to use the mouse instead.
+
+When the user presses the mouse left button we are going to record the X position of the mouse. As the mouse moves will check the new X position, and based on the difference we¡¯ll set a variable <I>deltaAngle</I>. This variable will be added to the initial angle to compute the direction of the camera.
+
+A variable to store the X position where the mouse is clicked is also required.
+
+float deltaAngle = 0.0f;
+int xOrigin = -1;Note that xOrigin is initialized to a value that never occurs when the mouse is pressed (it must be at least zero). This will enable us to distinguish if the user is pressing the left button or any other button.
+
+The next function is responsible for processing the button state changes:
+
+void mouseButton(int button, int state, int x, int y) {
+
+	// only start motion if the left button is pressed
+	if (button == GLUT_LEFT_BUTTON) {
+
+		// when the button is released
+		if (state == GLUT_UP) {
+			angle += deltaAngle;
+			xOrigin = -1;
+		}
+		else  {// state = GLUT_DOWN
+			xOrigin = x;
+		}
+	}
+}Notice that the var xOrigin is set to -1 when the left button is released.
+
+The function to process the motion of the mouse is now presented:
+
+void mouseMove(int x, int y) {
+
+	// this will only be true when the left button is down
+	if (xOrigin >= 0) {
+
+		// update deltaAngle
+		deltaAngle = (x - xOrigin) * 0.001f;
+
+		// update camera's direction
+		lx = sin(angle + deltaAngle);
+		lz = -cos(angle + deltaAngle);
+	}
+}In the main function we have to register the two new callback functions:
+
+void main(int argc, char **argv) {
+
+	// init GLUT and create window
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowPosition(100,100);
+	glutInitWindowSize(320,320);
+	glutCreateWindow("Lighthouse3D - GLUT Tutorial");
+
+	// register callbacks
+	glutDisplayFunc(renderScene);
+	glutReshapeFunc(changeSize);
+	glutIdleFunc(renderScene);
+
+	glutIgnoreKeyRepeat(1);
+	glutKeyboardFunc(processNormalKeys);
+	glutSpecialFunc(pressKey);
+	glutSpecialUpFunc(releaseKey);
+
+	// here are the two new functions
+	glutMouseFunc(mouseButton);
+	glutMotionFunc(mouseMove);
+
+	// OpenGL init
+	glEnable(GL_DEPTH_TEST);
+
+	// enter GLUT event processing cycle
+	glutMainLoop();
+}Check the next page to see the full source code.
+
+ 
+
+Prev: The Mouse  Next: The Code So Far II  
+  
+4 Responses to ¡°Mouse: Moving the Camera III¡± 
+Mario says: 
+28/06/2011 at 11:53 AM 
+Very useful tutorial, thanks!!
+However, if I try to run this program (I got no errors from the compiler), it appears a window that says:
+¡°The procedure entry point _glutIgnoreKeyRepeat@4 could not be located in the dynamic link library GULT32.dll¡±¡­.
+Do you have any idea of what does it means?
+Thanks
+mario
+
+Reply 
+ 
+ARF says: 
+28/06/2011 at 12:36 PM 
+Hi, if you have translated the message as is then the culprit is ¡°GULT32.dll¡±. It should be GLUT32.dll. Otherwise can you provide more info on your setup please?
+
+Reply 
+ 
+Mario says: 
+29/06/2011 at 6:53 AM 
+Sorry, the message was: ¡°The procedure entry point _glutIgnoreKeyRepeat@4 could not be located in the dynamic link library GLUT32.dll¡±
+I use Visual C++ 2008 Express edition, with the GLUT 3.7
+The previous codes of your tutorial work well. It seems that I have a problem
+with glutIgnoreKeyRepeat() and glutSpecialUpFunc()¡­
+Thanks
+mario
+
+Reply 
+ 
+ARF says: 
+29/06/2011 at 5:20 PM 
+Humm, not sure what the problem might be¡­ Maybe checking for multiple versions of GLUT in your system.
+
+http://www.lighthouse3d.com/tutorials/glut-tutorial/mouse-putting-it-all-together/
