@@ -1,0 +1,104 @@
+1.      创建Android项目：AndroidJUnitDemo。
+
+2.      创建被测试的类：Apps。包含两个被测试的方法：methodA()、methodB()，代码如下：
+
+
+package com.android.junit;
+
+/**
+
+ * 被测试的类
+
+*/
+
+public class Apps {
+
+    public void methodA() {
+
+       System.out.println("---Hello!");
+
+    }
+
+    
+
+    public void methodB(String name) {
+
+       System.out.println("---Hello " + name + "!");
+
+    }
+
+}
+ 
+
+ 
+
+3.      创建测试类：AndroidJUnitTester，
+
+Android测试类需要继承android.test.AndroidTestCase，代码如下
+
+ 
+
+package com.android.junit;
+
+import com.android.junit.Apps;
+
+import android.test.AndroidTestCase;
+
+/**
+
+ * Android JUnit测试类
+
+*/
+
+public class AppsTester extends AndroidTestCase {
+
+    Apps a = null;
+
+    protected void setUp() throws Exception {
+
+       a = new Apps();
+
+    }
+
+    // methodA()测试方法
+
+    public void testMethodA() {
+
+       a.methodA();
+
+    }
+
+    
+
+    // methodB()测试方法
+
+    public void testMethodB() {
+
+       a.methodB("Android");
+
+    }
+
+}
+ 
+
+ 
+
+4.      配置AndroidManifest.xml文件
+
+ 1)     <uses-libraryandroid:name="android.test.runner" />
+
+说明：与<activity>位置同级
+
+ 2)     <instrumentationandroid:targetPackage="com.android.junit" 
+
+         android:name="android.test.InstrumentationTestRunner"
+
+         android:label="AndroidJUnit测试" />
+
+ 说明：与<application>标签同级，targetPackage属性与上面mainfest的package属性内容相同即可 -->
+
+ 5.    测试方法：打开Eclipse->Outline试图，右键测试方法->Run as -> Android JUnit Test
+
+ 6.      实例代码下载地址：http://download.csdn.net/source/3504290
+
+http://blog.csdn.net/lupeng0527/article/details/6671235

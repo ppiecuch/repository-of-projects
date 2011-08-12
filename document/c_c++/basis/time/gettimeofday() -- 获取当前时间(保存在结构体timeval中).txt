@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <sys/time.h>
+#include <time.h>
+
+int main(int argc, char * argv[]){
+
+    struct timeval tv;                //(1)
+    while(1){
+        gettimeofday(&tv, NULL);      //(2)
+        printf("time %u:%u\n", tv.tv_sec, tv.tv_usec);
+        sleep(2);
+    }
+    return 0;
+
+}
+
+(1) struct--timeval
+--------------------------------------------------
+struct timeval {
+    time_t      tv_sec;     /* seconds */
+    suseconds_t tv_usec;    /* microseconds */
+};
+millisecond        毫秒
+microsecond        微秒
+
+timeval表示一个时间点，比如:
+timeval.tv_sec = 1   (s)
+timevat.tv_usec = 500 000 (μs)
+1:500 = 1s500000μs = 1.5s
+
+(2) gettimeofday()
+--------------------------------------------------
+int gettimeofday(struct timeval *tv, struct timezone *tz);
+
+    The functions gettimeofday() and settimeofday() can get and set the time as well as a timezone. 
+    The use of the timezone structure is obsolete; the tz argument should normally be specified as NULL.
+
+(3) 运行结果:
+--------------------------------------------------
+time 1181788367:991487
+time 1181788369:991602
+
+表示睡眠2秒经过的精确时间为： 2s115μs
+http://hi.baidu.com/zengzhaonong/blog/item/162213f4acd831ee7609d79c.html

@@ -1,0 +1,336 @@
+http://blog.csdn.net/hellogv/archive/2010/12/23/6094127.aspx 
+       在Android上使用JAVA实现彩图转换为灰度图，跟J2ME上的实现类似，不过遇到频繁地转换或者是大图转换时，就必须使用NDK来提高速度了。本文主要通过JAVA和NDK这两种方式来分别实现彩图转换为灰度图，并给出速度的对比。 
+
+先来简单地介绍一下Android的NDK使用步骤： 
+
+以NDK r4为例，或许以后新版的NDK的使用方法略有不同。 
+1、下载支持C++的android-ndk-r4-crystax，支持C++的话可玩性更强...... 
+2、下载cygwin，选择ftp://mirrors.kernel.org这个镜像，搜索  Devel Install 安装 gcc 和 make 等工具； 
+
+ 
+在搜索框里分别搜索gcc和make，必须是 Devel Install 栏的。 
+3、Cygwin安装目录下，找到home/username的目录下的.bash_profile文件，打开文件在最后加上： 
+    NDK=/cygdrive/d:cygwin/android-ndk-r4-crystax 
+   export NDK 
+PS：假设安装在D:\cygwin\android-ndk-r4-crystax。 
+4、运行cygwin，通过cd命令去到NDK\samples\例子目录\，运行$NDK/ndk-build来编译该目录下的Android.mk 
+
+以下是个人习惯....... 
+5、安装Eclipse的CDT，官方下载cdt安装包，解压缩后把plugins和feagures 复制覆盖到eclipse文件夹下即可 
+6、去到系统属性->环境变量->Path添加"D:\cygwin\bin"（假设cygwin安装在D:下）和"D:\cygwin\android-ndk-r4-crystax"，重启计算机，然后就可以在Eclipse里面建立基于cygwin的C/C++工程了，先通过这一步来验证NDK的程序能够编译成功，然后再通过第4步来生成SO文件。 
+
+接下来看看本文程序运行的效果： 
+
+ 
+从转换灰度图的耗时来说，NDK的确比JAVA所用的时间短不少。 
+
+main.xml源码如下： 
+Xml代码  
+<?xml version="1.0" encoding="utf-8" ?>      
+- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">     
+  <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/btnJAVA" android:text="使用JAVA转换灰度图" />      
+  <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/btnNDK" android:text="使用NDK转换灰度图" />      
+  <ImageView android:id="@+id/ImageView01" android:layout_width="fill_parent" android:layout_height="fill_parent" />      
+  </LinearLayout>    
+
+<?xml version="1.0" encoding="utf-8" ?>   
+- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">  
+  <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/btnJAVA" android:text="使用JAVA转换灰度图" />   
+  <Button android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/btnNDK" android:text="使用NDK转换灰度图" />   
+  <ImageView android:id="@+id/ImageView01" android:layout_width="fill_parent" android:layout_height="fill_parent" />   
+  </LinearLayout>  
+
+主程序testToGray.java的源码如下： 
+Java代码  
+package com.testToGray;     
+import android.app.Activity;     
+import android.graphics.Bitmap;     
+import android.graphics.Bitmap.Config;     
+import android.graphics.drawable.BitmapDrawable;     
+import android.os.Bundle;     
+import android.view.View;     
+import android.widget.Button;     
+import android.widget.ImageView;     
+public class testToGray extends Activity {     
+    /** Called when the activity is first created. */     
+    Button btnJAVA,btnNDK;     
+    ImageView imgView;     
+    @Override     
+    public void onCreate(Bundle savedInstanceState) {     
+        super.onCreate(savedInstanceState);     
+        setContentView(R.layout.main);     
+        this.setTitle("使用NDK转换灰度图---hellogv");     
+        btnJAVA=(Button)this.findViewById(R.id.btnJAVA);     
+        btnJAVA.setOnClickListener(new ClickEvent());     
+             
+        btnNDK=(Button)this.findViewById(R.id.btnNDK);     
+        btnNDK.setOnClickListener(new ClickEvent());     
+        imgView=(ImageView)this.findViewById(R.id.ImageView01);     
+    }     
+    class ClickEvent implements View.OnClickListener{     
+        @Override     
+        public void onClick(View v) {     
+            if(v==btnJAVA)     
+            {     
+                long current=System.currentTimeMillis();     
+                Bitmap img=ConvertGrayImg(R.drawable.cat);     
+                long performance=System.currentTimeMillis()-current;     
+                //显示灰度图     
+                imgView.setImageBitmap(img);     
+                testToGray.this.setTitle("w:"+String.valueOf(img.getWidth())+",h:"+String.valueOf(img.getHeight())     
+                        +" JAVA耗时 "+String.valueOf(performance)+" 毫秒");     
+            }     
+            else if(v==btnNDK)     
+            {     
+                long current=System.currentTimeMillis();     
+                     
+                //先打开图像并读取像素     
+                Bitmap img1=((BitmapDrawable) getResources().getDrawable(R.drawable.cat)).getBitmap();     
+                int w=img1.getWidth(),h=img1.getHeight();     
+                int[] pix = new int[w * h];     
+                img1.getPixels(pix, 0, w, 0, 0, w, h);     
+                //通过ImgToGray.so把彩色像素转为灰度像素     
+                int[] resultInt=LibFuns.ImgToGray(pix, w, h);     
+                Bitmap resultImg=Bitmap.createBitmap(w, h, Config.RGB_565);     
+                resultImg.setPixels(resultInt, 0, w, 0, 0,w, h);     
+                long performance=System.currentTimeMillis()-current;     
+                //显示灰度图     
+                imgView.setImageBitmap(resultImg);     
+                testToGray.this.setTitle("w:"+String.valueOf(img1.getWidth())+",h:"+String.valueOf(img1.getHeight())     
+                        +" NDK耗时 "+String.valueOf(performance)+" 毫秒");     
+            }     
+        }     
+    }     
+         
+    /**   
+     * 把资源图片转为灰度图   
+     * @param resID 资源ID   
+     * @return   
+     */     
+    public Bitmap ConvertGrayImg(int resID)     
+    {     
+        Bitmap img1=((BitmapDrawable) getResources().getDrawable(resID)).getBitmap();     
+             
+        int w=img1.getWidth(),h=img1.getHeight();     
+        int[] pix = new int[w * h];     
+        img1.getPixels(pix, 0, w, 0, 0, w, h);     
+             
+        int alpha=0xFF<<24;     
+        for (int i = 0; i < h; i++) {       
+            for (int j = 0; j < w; j++) {       
+                // 获得像素的颜色       
+                int color = pix[w * i + j];       
+                int red = ((color & 0x00FF0000) >> 16);       
+                int green = ((color & 0x0000FF00) >> 8);       
+                int blue = color & 0x000000FF;       
+                color = (red + green + blue)/3;       
+                color = alpha | (color << 16) | (color << 8) | color;       
+                pix[w * i + j] = color;     
+            }     
+        }     
+        Bitmap result=Bitmap.createBitmap(w, h, Config.RGB_565);     
+        result.setPixels(pix, 0, w, 0, 0,w, h);     
+        return result;     
+    }     
+}    
+
+package com.testToGray;  
+import android.app.Activity;  
+import android.graphics.Bitmap;  
+import android.graphics.Bitmap.Config;  
+import android.graphics.drawable.BitmapDrawable;  
+import android.os.Bundle;  
+import android.view.View;  
+import android.widget.Button;  
+import android.widget.ImageView;  
+public class testToGray extends Activity {  
+    /** Called when the activity is first created. */  
+    Button btnJAVA,btnNDK;  
+    ImageView imgView;  
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        setContentView(R.layout.main);  
+        this.setTitle("使用NDK转换灰度图---hellogv");  
+        btnJAVA=(Button)this.findViewById(R.id.btnJAVA);  
+        btnJAVA.setOnClickListener(new ClickEvent());  
+          
+        btnNDK=(Button)this.findViewById(R.id.btnNDK);  
+        btnNDK.setOnClickListener(new ClickEvent());  
+        imgView=(ImageView)this.findViewById(R.id.ImageView01);  
+    }  
+    class ClickEvent implements View.OnClickListener{  
+        @Override  
+        public void onClick(View v) {  
+            if(v==btnJAVA)  
+            {  
+                long current=System.currentTimeMillis();  
+                Bitmap img=ConvertGrayImg(R.drawable.cat);  
+                long performance=System.currentTimeMillis()-current;  
+                //显示灰度图  
+                imgView.setImageBitmap(img);  
+                testToGray.this.setTitle("w:"+String.valueOf(img.getWidth())+",h:"+String.valueOf(img.getHeight())  
+                        +" JAVA耗时 "+String.valueOf(performance)+" 毫秒");  
+            }  
+            else if(v==btnNDK)  
+            {  
+                long current=System.currentTimeMillis();  
+                  
+                //先打开图像并读取像素  
+                Bitmap img1=((BitmapDrawable) getResources().getDrawable(R.drawable.cat)).getBitmap();  
+                int w=img1.getWidth(),h=img1.getHeight();  
+                int[] pix = new int[w * h];  
+                img1.getPixels(pix, 0, w, 0, 0, w, h);  
+                //通过ImgToGray.so把彩色像素转为灰度像素  
+                int[] resultInt=LibFuns.ImgToGray(pix, w, h);  
+                Bitmap resultImg=Bitmap.createBitmap(w, h, Config.RGB_565);  
+                resultImg.setPixels(resultInt, 0, w, 0, 0,w, h);  
+                long performance=System.currentTimeMillis()-current;  
+                //显示灰度图  
+                imgView.setImageBitmap(resultImg);  
+                testToGray.this.setTitle("w:"+String.valueOf(img1.getWidth())+",h:"+String.valueOf(img1.getHeight())  
+                        +" NDK耗时 "+String.valueOf(performance)+" 毫秒");  
+            }  
+        }  
+    }  
+      
+    /** 
+     * 把资源图片转为灰度图 
+     * @param resID 资源ID 
+     * @return 
+     */  
+    public Bitmap ConvertGrayImg(int resID)  
+    {  
+        Bitmap img1=((BitmapDrawable) getResources().getDrawable(resID)).getBitmap();  
+          
+        int w=img1.getWidth(),h=img1.getHeight();  
+        int[] pix = new int[w * h];  
+        img1.getPixels(pix, 0, w, 0, 0, w, h);  
+          
+        int alpha=0xFF<<24;  
+        for (int i = 0; i < h; i++) {    
+            for (int j = 0; j < w; j++) {    
+                // 获得像素的颜色    
+                int color = pix[w * i + j];    
+                int red = ((color & 0x00FF0000) >> 16);    
+                int green = ((color & 0x0000FF00) >> 8);    
+                int blue = color & 0x000000FF;    
+                color = (red + green + blue)/3;    
+                color = alpha | (color << 16) | (color << 8) | color;    
+                pix[w * i + j] = color;  
+            }  
+        }  
+        Bitmap result=Bitmap.createBitmap(w, h, Config.RGB_565);  
+        result.setPixels(pix, 0, w, 0, 0,w, h);  
+        return result;  
+    }  
+}  
+
+封装NDK函数的JAVA类LibFuns.java的源码如下： 
+Java代码  
+package com.testToGray;     
+public class LibFuns {     
+    static {     
+        System.loadLibrary("ImgToGray");     
+    }     
+   /**   
+    * @param width the current view width   
+    * @param height the current view height   
+    */     
+         
+    public static native int[] ImgToGray(int[] buf, int w, int h);     
+}    
+
+package com.testToGray;  
+public class LibFuns {  
+    static {  
+        System.loadLibrary("ImgToGray");  
+    }  
+   /** 
+    * @param width the current view width 
+    * @param height the current view height 
+    */  
+      
+    public static native int[] ImgToGray(int[] buf, int w, int h);  
+}  
+
+彩图转换为灰度图的ImgToGray.cpp源码: 
+Java代码  
+#include <jni.h>     
+#include <stdio.h>     
+#include <stdlib.h>     
+extern "C" {     
+JNIEXPORT jintArray JNICALL Java_com_testToGray_LibFuns_ImgToGray(     
+        JNIEnv* env, jobject obj, jintArray buf, int w, int h);     
+}     
+;     
+JNIEXPORT jintArray JNICALL Java_com_testToGray_LibFuns_ImgToGray(     
+        JNIEnv* env, jobject obj, jintArray buf, int w, int h) {     
+    jint *cbuf;     
+    cbuf = env->GetIntArrayElements(buf, false);     
+    if (cbuf == NULL) {     
+        return 0; /* exception occurred */     
+    }     
+    int alpha = 0xFF << 24;     
+    for (int i = 0; i < h; i++) {     
+        for (int j = 0; j < w; j++) {     
+            // 获得像素的颜色     
+            int color = cbuf[w * i + j];     
+            int red = ((color & 0x00FF0000) >> 16);     
+            int green = ((color & 0x0000FF00) >> 8);     
+            int blue = color & 0x000000FF;     
+            color = (red + green + blue) / 3;     
+            color = alpha | (color << 16) | (color << 8) | color;     
+            cbuf[w * i + j] = color;     
+        }     
+    }     
+    int size=w * h;     
+    jintArray result = env->NewIntArray(size);     
+    env->SetIntArrayRegion(result, 0, size, cbuf);     
+    env->ReleaseIntArrayElements(buf, cbuf, 0);     
+    return result;     
+}    
+
+#include <jni.h>  
+#include <stdio.h>  
+#include <stdlib.h>  
+extern "C" {  
+JNIEXPORT jintArray JNICALL Java_com_testToGray_LibFuns_ImgToGray(  
+        JNIEnv* env, jobject obj, jintArray buf, int w, int h);  
+}  
+;  
+JNIEXPORT jintArray JNICALL Java_com_testToGray_LibFuns_ImgToGray(  
+        JNIEnv* env, jobject obj, jintArray buf, int w, int h) {  
+    jint *cbuf;  
+    cbuf = env->GetIntArrayElements(buf, false);  
+    if (cbuf == NULL) {  
+        return 0; /* exception occurred */  
+    }  
+    int alpha = 0xFF << 24;  
+    for (int i = 0; i < h; i++) {  
+        for (int j = 0; j < w; j++) {  
+            // 获得像素的颜色  
+            int color = cbuf[w * i + j];  
+            int red = ((color & 0x00FF0000) >> 16);  
+            int green = ((color & 0x0000FF00) >> 8);  
+            int blue = color & 0x000000FF;  
+            color = (red + green + blue) / 3;  
+            color = alpha | (color << 16) | (color << 8) | color;  
+            cbuf[w * i + j] = color;  
+        }  
+    }  
+    int size=w * h;  
+    jintArray result = env->NewIntArray(size);  
+    env->SetIntArrayRegion(result, 0, size, cbuf);  
+    env->ReleaseIntArrayElements(buf, cbuf, 0);  
+    return result;  
+}  
+
+Android.mk的源码： 
+Java代码  
+LOCAL_PATH:= $(call my-dir)     
+include $(CLEAR_VARS)     
+LOCAL_MODULE    := ImgToGray     
+LOCAL_SRC_FILES := ImgToGray.cpp     
+include $(BUILD_SHARED_LIBRARY)    
+http://gundumw100.iteye.com/blog/905372

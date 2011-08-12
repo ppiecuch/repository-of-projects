@@ -1,0 +1,169 @@
+Related Topics: OpenGL Pipeline, OpenGL Projection Matrix, Homogeneous Coordinates 
+Download: matrixModelView.zip, matrixProjection.zip, 
+
+Overview 
+OpenGL Transform Matrix 
+Example: GL_MODELVIEW Matrix 
+Example: GL_PROJECTION Matrix 
+Overview
+Geometric data such as vertex positions and normal vectors are transformed via Vertex Operation and Primitive Assembly operation in OpenGL pipeline before raterization process. 
+
+ 
+
+OpenGL vertex transformation
+Object Coordinates
+It is the local coordinate system of objects and is initial position and orientation of objects before any transform is applied. In order to transform objects, use glRotatef(), glTranslatef(), glScalef(). 
+
+Eye Coordinates
+It is yielded by multiplying GL_MODELVIEW matrix and object coordinates. Objects are transformed from object space to eye space using GL_MODELVIEW matrix in OpenGL. GL_MODELVIEW matrix is a combination of Model and View matrices (). Model transform is to convert from object space to world space. And, View transform is to convert from world space to eye space. 
+
+ 
+
+Note that there is no separate camera (view) matrix in OpenGL. Therefore, in order to simulate transforming the camera or view, the scene (3D objects and lights) must be transformed with the inverse of the view transformation. In other words, OpenGL defines that the camera is always located at (0, 0, 0) and facing to -Z axis in the eye space coordinates, and cannot be transformed. See more details of GL_MODELVIEW matrix in ModelView Matrix. 
+
+Normal vectors are also transformed from object coordinates to eye coordinates for lighting calculation. Note that normals are transformed in different way as vertices do. It is mutiplying the tranpose of the inverse of GL_MODELVIEW matrix by a normal vector. See more details in Normal Vector Transformation. 
+ 
+
+Clip Coordinates
+It is after applying eye coordinates into GL_PROJECTION matrix. Objects are clipped out from the viewing volume (frustum). Frustum is used to determine how objects are projected onto screen (perspective or orthogonal) and which objects or portions of objects are clipped out of the final image. See more details of GL_PROJECTION matrix in Projection Matrix. 
+
+ 
+
+Normalized Device Coordinates (NDC)
+It is yielded by dividing the clip coordinates by w. It is called perspective division. It is more like window (screen) coordinates, but has not been translated and scaled to screen pixels yet. The range of values is now normalized from -1 to 1 in all 3 axes. 
+
+ 
+
+Window Coordinates (Screen Coordinates)
+It is yielded by applying normalized device coordinates (NDC) to viewport transformation. The NDC are scaled and translated in order to fit into the rendering screen. The window coordinates finally are passed to the raterization process of OpenGL pipeline to become a fragment. glViewport() command is used to define the rectangle of the rendering area where the final image is mapped. And, glDepthRange() is used to determine the z value of the window coordinates. The window coordinates are computed with the given parameters of the above 2 functions; 
+glViewport(x, y, w, h); 
+glDepthRange(n, f); 
+
+ 
+
+The viewport transform formula is simply acquired by the linear relationship between NDC and the window coordinates; 
+ 
+
+OpenGL Transformation Matrix
+ 
+OpenGL Transform Matrix OpenGL uses 4 x 4 matrix for transformations. Notice that 16 elements in the matrix are stored as 1D array in column-major order. You need to transpose this matrix if you want to convert it to the standard convention, row-major format. 
+
+OpenGL has 4 different types of matrices; GL_MODELVIEW, GL_PROJECTION, GL_TEXTURE, and GL_COLOR. You can switch the current type by using glMatrixMode() in your code. For example, in order to select GL_MODELVIEW matrix, use glMatrixMode(GL_MODELVIEW). 
+
+Model-View Matrix (GL_MODELVIEW)
+GL_MODELVIEW matrix combines viewing matrix and modeling matrix into one matrix. In order to transform the view (camera), you need to move whole scene with the inverse transformation. gluLookAt() is particularly used to set viewing transform. 
+
+ 
+4 columns of GL_MODELVIEW matrix The 3 matrix elements of the rightmost column (m12, m13, m14) are for the translation transformation, glTranslatef(). The element m15 is the homogeneous coordinate. It is specially used for projective transformation. 
+
+3 elements sets, (m0, m1, m2), (m4, m5, m6) and (m8, m9, m10) are for Euclidean and affine transformation, such as rotation glRotatef() or scaling glScalef(). Note that these 3 sets are actually representing 3 orthogonal axes; 
+
+(m0, m1, m2)   : +X axis, left vector, (1, 0, 0) by default 
+(m4, m5, m6)   : +Y axis, up vector, (0, 1, 0) by default 
+(m8, m9, m10) : +Z axis, forward vector, (0, 0, 1) by default 
+We can directly construct GL_MODELVIEW matrix from angles or lookat vector without using OpenGL transform functions. Here are some useful codes to build GL_MODELVIEW matrix: 
+
+Angles to Axes 
+Lookat to Axes 
+Note that OpenGL performs matrices multiplications in reverse order if multiple transforms are applied to a vertex. For example, If a vertex is transformed by MA first, and transformed by MB second, then OpenGL performs MB x MA first before multiplying the vertex. So, the last transform comes first and the first transform occurs last in your code. 
+ 
+
+// Note that the object will be translated first then rotated
+glRotatef(angle, 1, 0, 0);   // rotate object angle degree around X-axis
+glTranslatef(x, y, z);       // move object to (x, y, z)
+drawObject();
+
+Projection Matrix (GL_PROJECTION)
+GL_PROJECTION matrix is used to define the frustum. This frustum determines which objects or portions of objects will be clipped out. Also, it determines how the 3D scene is projected onto the screen. (Please see more details how to construct the projection matrix.) 
+
+OpenGL provides 2 functions for GL_PROJECTION transformation. glFrustum() is to produce a perspective projection, and glOrtho() is to produce a orthographic (parallel) projection. Both functions require 6 parameters to specify 6 clipping planes; left, right, bottom, top, near and far planes. 8 vertices of the viewing frustum are shown in the following image. 
+
+ 
+OpenGL Perspective Viewing Frustum 
+The vertices of the far (back) plane can be simply calculated by the ratio of similar triangles, for example, the left of the far plane is; 
+ 
+
+ 
+OpenGL Orthographic Frustum For orthographic projection, this ratio will be 1, so the left, right, bottom and top values of the far plane will be same as on the near plane. 
+
+You may also use gluPerspective() and gluOrtho2D() functions with less number of parameters. gluPerspective() requires only 4 parameters; vertical field of view (FOV), the aspect ratio of width to height and the distances to near and far clipping planes. The equivalent conversion from gluPerspective() to glFrustum() is described in the following code. 
+
+// This creates a symmetric frustum.
+// It converts to 6 params (l, r, b, t, n, f) for glFrustum()
+// from given 4 params (fovy, aspect, near, far)
+void makeFrustum(double fovY, double aspectRatio, double front, double back)
+{
+    const double DEG2RAD = 3.14159265 / 180;
+
+    double tangent = tan(fovY/2 * DEG2RAD);   // tangent of half fovY
+    double height = front * tangent;          // half height of near plane
+    double width = height * aspectRatio;      // half width of near plane
+
+    // params: left, right, bottom, top, near, far
+    glFrustum(-width, width, -height, height, front, back);
+}
+
+ 
+An example of an asymmetric frustum However, you have to use glFrustum() directly if you need to create a non-symmetrical viewing volume. For example, if you want to render a wide scene into 2 adjoining screens, you can break down the frustum into 2 asymmetric frustums (left and right). Then, render the scene with each frustum. 
+
+Texture Matrix (GL_TEXTURE)
+Texture coordinates (s, t, r, q) are multiplied by GL_TEXTURE matrix before any texture mapping. By default it is the identity, so texture will be mapped to objects exactly where you assigned the texture coordinates. By modifying GL_TEXTURE, you can slide, rotate, stretch, and shrink the texture. 
+
+// rotate texture around X-axis
+glMatrixMode(GL_TEXTURE);
+glRotatef(angle, 1, 0, 0);
+
+Color Matrix (GL_COLOR)
+The color components (r, g, b, a) are multiplied by GL_COLOR matrix. It can be used for color space conversion and color component swaping. GL_COLOR matrix is not commonly used and is required GL_ARB_imaging extension. 
+
+Other Matrix Routines
+glPushMatrix() : push the current matrix into the current matrix stack.glPopMatrix() : pop the current matrix from the current matrix stack.glLoadIdentity() : set the current matrix to the identity matrix.glLoadMatrix{fd}(m) : replace the current matrix with the matrix m.glLoadTransposeMatrix{fd}(m) : replace the current matrix with the row-major ordered matrix m.glMultMatrix{fd}(m) : multiply the current matrix by the matrix m, and update the result to the current matrix.glMultTransposeMatrix{fd}(m) : multiply the current matrix by the row-major ordered matrix m, and update the result to the current matrix.glGetFloatv(GL_MODELVIEW_MATRIX, m) : return 16 values of GL_MODELVIEW matrix to m.  
+
+Example: ModelView Matrix
+ 
+This demo application shows how to manipulate GL_MODELVIEW matrix with glTranslatef() and glRotatef(). 
+
+Download the source and binary: matrixModelView.zip 
+(All OpenGL implementations are in ModelGL.cpp file.) 
+
+Note once again, OpenGL performs multiple transformations in reverse order, therefore, viewing transform comes first before modeling transform in your code. And, if you want to rotate then translate an object, put glTranslatef() first then glRotatef(). 
+
+...
+// initialze ModelView matrix
+glLoadIdentity();
+
+// ModelView matrix is product of viewing matrix and modeling matrix
+// ModelView_M = View_M * Model_M
+// First, transform the camera (viewing matrix) from world space to eye space
+// Notice all values are negated, because we move the whole scene with the
+// inverse of camera transform
+glRotatef(-cameraAngle[2], 0, 0, 1); // roll
+glRotatef(-cameraAngle[1], 0, 1, 0); // heading
+glRotatef(-cameraAngle[0], 1, 0, 0); // pitch
+glTranslatef(-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]);
+
+// transform the object
+// This modeling transform will modify modeling matrix,
+// convert object coords to world coords.
+glPushMatrix();
+glTranslatef(modelPosition[0], modelPosition[1], modelPosition[2]);
+glRotatef(modelAngle[0], 1, 0, 0);
+glRotatef(modelAngle[1], 0, 1, 0);
+glRotatef(modelAngle[2], 0, 0, 1);
+
+// draw objects
+draw();
+
+glPopMatrix();
+...
+
+Example: Projection Matrix
+ 
+This demo application is to show how to manipulate the projection transformation with glFrustum() or glOrtho(). 
+
+Download the source and binary: matrixProjection.zip 
+(All OpenGL implementations are in ModelGL.cpp file.) 
+
+Constructing 16 elements of GL_PROJECTION matrix is explained here. 
+
+http://www.songho.ca/opengl/gl_transform.html

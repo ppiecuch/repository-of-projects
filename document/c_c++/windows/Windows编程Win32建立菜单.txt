@@ -1,0 +1,532 @@
+在Win32编程下建立菜单有两种,一种是直接加载资源里的菜单,另一种是动态创建
+
+ 
+
+一.直接加载资源资源菜单,有两种方法,要包含头文件resource.h
+
+    在"资源文件"处右键"添加"中选择"资源",在弹出的资源框中选择"Menu",然后对菜单编辑,我这里的菜单的ID都没有改变
+
+   1. 在设计窗口类时将WNDCLASS结构体中的lpszMenuName成员关联菜单ID,使用MAKEINTRESOURCE()这个宏,将资源
+
+ ID转换为所对应的资源名,我的窗口类如下
+
+ 
+
+view plaincopy to clipboardprint?//设计窗口类,该窗口类并不是C++中的类,只是表示窗口特征的结构体   
+  
+    WNDCLASS MyWndClass; //WNDCLASS是个结构体,该结构体中的成员是指定窗口特征的数据   
+     
+    //WNDCLASS结构体   
+    /* 
+ 
+    typedef struct _WNDCLASS {  
+    UINT       style;  
+    WNDPROC    lpfnWndProc;  
+    int        cbClsExtra;  
+    int        cbWndExtra;  
+    HINSTANCE  hInstance;  
+    HICON      hIcon;  
+    HCURSOR    hCursor;  
+    HBRUSH     hbrBackground;  
+    LPCTSTR    lpszMenuName;  
+    LPCTSTR    lpszClassName;  
+    } WNDCLASS, *PWNDCLASS;  
+    Members 
+ 
+    */  
+  
+    //这两个变量允许用户请求Windows内部提供额外的空间以便额外数据与窗口   
+    //实例发生联系,通常不分配空间   
+    MyWndClass.cbClsExtra = NULL;  
+    MyWndClass.cbWndExtra = NULL;  
+      
+    //背景颜色,这里有两种方法   
+    //GetStockObject()返回的句柄是HGDIOBJ类型,需要转换,   
+    //可以加载画刷,也可以加载画笔,   
+    //GetStockObject()参数的值有(看MSDN)   
+    //BLACK_BRUSH     黑色画刷   
+    //DKGRAY_BRUSH    深灰色画刷   
+    //GRAY_BRUSH      灰色画刷   
+    //WHITE_BRUSH     白色画刷   
+    //MyWndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);   
+    MyWndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);  
+      
+    //窗口的图标,如果为NULL,系统将提供一个默认的图标   
+    //LoadIcon()加载图标资源,返回图标句柄,   
+    //如果加载系统标准的图标第一个参数必须为NULL,第二个参数值为   
+    //IDI_ERROR        错误图标   
+    //IDI_APPLICATION  默认应用程序图标   
+    //IDI_QUESTION     问号图标    
+    //IDI_EXCLAMATION  感叹号图标    
+    //IDI_ASTERISK     星号图标   
+    //IDI_WARNING      警告图标   
+    //IDI_WINLOGO      Windows图标   
+    //IDI_HAND         与IDI_ERROR相同   
+    //IDI_INFORMATION  消息图标   
+    //还有很多.....   
+    MyWndClass.hIcon   = LoadIcon(NULL,IDI_WINLOGO);   
+      
+        //光标,LoadCursor()的使用与LoadIcon()相同   
+        MyWndClass.hCursor = LoadCursor(NULL,IDC_APPSTARTING);  
+      
+    MyWndClass.hInstance = hInstance; //当前实例的句柄   
+        MyWndClass.lpfnWndProc = MyWindowProc; //窗口函数(消息处理函数),lpfnWndProc是个函数指针   
+    MyWndClass.lpszClassName = szWindowClass; //窗口类名   
+        //MyWndClass.lpszMenuName  = NULL ;// 菜单,指定菜单资源的名字,NULL是表示没有菜单,   
+    MyWndClass.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);//一种,MAKEINTRESOURCE()加载菜单   
+        MyWndClass.style = CS_HREDRAW|CS_VREDRAW; //使用|把多种窗口样式连接在一起   
+    //窗口的样式   
+        //CS_HREDRAW  表示当水平方向宽度发生变化时重绘整个窗口   
+        //CS_VREDRAW  表示当垂直方向高度发生变化时重绘整个窗口   
+    //CS_NOCLOSE  禁用系统菜单中的Close命令,既是没有关闭按钮   
+    //CS_DBLCLKS  当用户双击鼠标时向窗口过程函数发送鼠标双击消息   
+      
+//设计窗口类,该窗口类并不是C++中的类,只是表示窗口特征的结构体
+
+	WNDCLASS MyWndClass; //WNDCLASS是个结构体,该结构体中的成员是指定窗口特征的数据
+   
+	//WNDCLASS结构体
+	/*
+
+	typedef struct _WNDCLASS { 
+	UINT       style; 
+	WNDPROC    lpfnWndProc; 
+	int        cbClsExtra; 
+	int        cbWndExtra; 
+	HINSTANCE  hInstance; 
+	HICON      hIcon; 
+	HCURSOR    hCursor; 
+	HBRUSH     hbrBackground; 
+	LPCTSTR    lpszMenuName; 
+	LPCTSTR    lpszClassName; 
+	} WNDCLASS, *PWNDCLASS; 
+	Members
+
+	*/
+
+	//这两个变量允许用户请求Windows内部提供额外的空间以便额外数据与窗口
+	//实例发生联系,通常不分配空间
+	MyWndClass.cbClsExtra = NULL;
+	MyWndClass.cbWndExtra = NULL;
+    
+	//背景颜色,这里有两种方法
+	//GetStockObject()返回的句柄是HGDIOBJ类型,需要转换,
+	//可以加载画刷,也可以加载画笔,
+	//GetStockObject()参数的值有(看MSDN)
+	//BLACK_BRUSH     黑色画刷
+	//DKGRAY_BRUSH    深灰色画刷
+	//GRAY_BRUSH      灰色画刷
+	//WHITE_BRUSH     白色画刷
+	//MyWndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	MyWndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	
+	//窗口的图标,如果为NULL,系统将提供一个默认的图标
+	//LoadIcon()加载图标资源,返回图标句柄,
+	//如果加载系统标准的图标第一个参数必须为NULL,第二个参数值为
+	//IDI_ERROR        错误图标
+	//IDI_APPLICATION  默认应用程序图标
+	//IDI_QUESTION     问号图标 
+	//IDI_EXCLAMATION  感叹号图标 
+	//IDI_ASTERISK     星号图标
+	//IDI_WARNING      警告图标
+	//IDI_WINLOGO      Windows图标
+	//IDI_HAND         与IDI_ERROR相同
+	//IDI_INFORMATION  消息图标
+	//还有很多.....
+	MyWndClass.hIcon   = LoadIcon(NULL,IDI_WINLOGO); 
+    
+        //光标,LoadCursor()的使用与LoadIcon()相同
+        MyWndClass.hCursor = LoadCursor(NULL,IDC_APPSTARTING);
+	
+	MyWndClass.hInstance = hInstance; //当前实例的句柄
+        MyWndClass.lpfnWndProc = MyWindowProc; //窗口函数(消息处理函数),lpfnWndProc是个函数指针
+	MyWndClass.lpszClassName = szWindowClass; //窗口类名
+        //MyWndClass.lpszMenuName  = NULL ;// 菜单,指定菜单资源的名字,NULL是表示没有菜单,
+	MyWndClass.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);//一种,MAKEINTRESOURCE()加载菜单
+        MyWndClass.style = CS_HREDRAW|CS_VREDRAW; //使用|把多种窗口样式连接在一起
+	//窗口的样式
+        //CS_HREDRAW  表示当水平方向宽度发生变化时重绘整个窗口
+        //CS_VREDRAW  表示当垂直方向高度发生变化时重绘整个窗口
+	//CS_NOCLOSE  禁用系统菜单中的Close命令,既是没有关闭按钮
+	//CS_DBLCLKS  当用户双击鼠标时向窗口过程函数发送鼠标双击消息
+     
+  
+
+        而在创建窗口函数中菜单参数可以指定为NULL,如下:
+
+view plaincopy to clipboardprint?//创建窗口,返回窗口的句柄   
+    HWND hWnd = CreateWindow(  
+                szWindowClass, //窗口类名称   
+            szWindowTitle, //窗口标题   
+            WS_OVERLAPPEDWINDOW,  //窗口样式,多种样式   
+            //这个样式要与WNDCLASS的样式区别开,这个是指定某个具体窗口的样式   
+            //而WNDCLASS的样式是指基于该窗口类的所有窗口都具有的样式   
+            //WS_OVERLAPPED  一个可层叠窗口   
+                        //WS_CAPTION     有标题栏   
+            //WS_SYSMENU     在标题栏带有系统菜单,WS_CAPTION一起使用   
+            //WS_THICKFRAME  具有可调边框窗口   
+            //WS_MINIMIZEBOX 有最小按钮,必须设定WS_SYSMENU   
+            //WS_MAXIMIZEBOX 有最大按钮,必须设定WS_SYSMENU   
+  
+            CW_USEDEFAULT,  //x坐标,默认   
+            //CW_USEDEFAULT仅适用于WS_OVERLAPPED样式窗口   
+            CW_USEDEFAULT,  //y坐标,默认   
+            CW_USEDEFAULT,  //宽   
+            CW_USEDEFAULT,  //高   
+            NULL,           //父窗口   
+            NULL,           //第一种加载菜单   
+            //LoadMenu(hInstance,MAKEINTRESOURCE(IDR_MENU1)), //第二种加载菜单   
+            //hMenu, //动态菜单   
+            hInstance,      //窗口实例标记   
+            NULL            //窗口创建时传入的数据指针,   
+                        //多文档时必须指向CLIENTCREATESTRUCT   
+                 );  
+//创建窗口,返回窗口的句柄
+    HWND hWnd = CreateWindow(
+		        szWindowClass, //窗口类名称
+			szWindowTitle, //窗口标题
+			WS_OVERLAPPEDWINDOW,  //窗口样式,多种样式
+			//这个样式要与WNDCLASS的样式区别开,这个是指定某个具体窗口的样式
+			//而WNDCLASS的样式是指基于该窗口类的所有窗口都具有的样式
+			//WS_OVERLAPPED  一个可层叠窗口
+                        //WS_CAPTION     有标题栏
+			//WS_SYSMENU     在标题栏带有系统菜单,WS_CAPTION一起使用
+			//WS_THICKFRAME  具有可调边框窗口
+			//WS_MINIMIZEBOX 有最小按钮,必须设定WS_SYSMENU
+			//WS_MAXIMIZEBOX 有最大按钮,必须设定WS_SYSMENU
+
+			CW_USEDEFAULT,  //x坐标,默认
+			//CW_USEDEFAULT仅适用于WS_OVERLAPPED样式窗口
+			CW_USEDEFAULT,  //y坐标,默认
+			CW_USEDEFAULT,  //宽
+			CW_USEDEFAULT,  //高
+			NULL,           //父窗口
+			NULL,           //第一种加载菜单
+			//LoadMenu(hInstance,MAKEINTRESOURCE(IDR_MENU1)), //第二种加载菜单
+			//hMenu, //动态菜单
+			hInstance,      //窗口实例标记
+			NULL            //窗口创建时传入的数据指针,
+				        //多文档时必须指向CLIENTCREATESTRUCT
+		         );
+ 
+
+     2. 在设计窗口类时将WNDCLASS结构体中的lpszMenuName成员指定为NULL,直接在窗口的创建函数中加载
+
+代码如上面注释的第二种加载菜单方法,使用LoadMenu()加载,第一个参数为窗口的实例,第二个参数为菜单资源,
+
+一样要使用MAKEINTRESOURCE()宏来将ID转为资源名,
+
+    
+
+二.  动态菜单,不需要包含头文件resource.h,但需要定义一些宏,用于相应菜单的消息
+
+      
+
+view plaincopy to clipboardprint?//动态菜单   
+#define IDM_FILE_NEW  40001   
+#define IDM_FILE_OPEN 40002   
+#define IDM_EDIT_COPY 40003   
+#define IDM_EDIT_CUT  40004  
+//动态菜单
+#define IDM_FILE_NEW  40001
+#define IDM_FILE_OPEN 40002
+#define IDM_EDIT_COPY 40003
+#define IDM_EDIT_CUT  40004 
+我不清楚为什么要从40001开始
+
+ 
+
+创建菜单
+
+
+view plaincopy to clipboardprint?//动态菜单   
+    HMENU hMenu = CreateMenu(); //主菜单,水平   
+  
+    HMENU hMenuPop = CreateMenu(); //下拉的菜单,垂直   
+    AppendMenu(hMenuPop,MF_STRING,IDM_FILE_NEW,_T("New"));  
+    AppendMenu(hMenuPop,MF_STRING,IDM_FILE_OPEN,_T("Open"));  
+    AppendMenu(hMenu,MF_POPUP,(unsigned int)hMenuPop,_T("File"));  
+    //把下拉的菜单加载到主菜单第一个菜单,说的有点形象,   
+    //自己运行程序看效果   
+  
+    hMenuPop = CreateMenu();  
+    AppendMenu(hMenuPop,MF_STRING,IDM_EDIT_COPY,_T("Copy"));  
+    AppendMenu(hMenuPop,MF_STRING,IDM_EDIT_CUT,_T("Cut"));  
+    AppendMenu(hMenu,MF_POPUP,(unsigned int)hMenuPop,_T("Edit"));  
+//动态菜单
+	HMENU hMenu = CreateMenu(); //主菜单,水平
+
+	HMENU hMenuPop = CreateMenu(); //下拉的菜单,垂直
+	AppendMenu(hMenuPop,MF_STRING,IDM_FILE_NEW,_T("New"));
+	AppendMenu(hMenuPop,MF_STRING,IDM_FILE_OPEN,_T("Open"));
+	AppendMenu(hMenu,MF_POPUP,(unsigned int)hMenuPop,_T("File"));
+	//把下拉的菜单加载到主菜单第一个菜单,说的有点形象,
+	//自己运行程序看效果
+
+	hMenuPop = CreateMenu();
+	AppendMenu(hMenuPop,MF_STRING,IDM_EDIT_COPY,_T("Copy"));
+	AppendMenu(hMenuPop,MF_STRING,IDM_EDIT_CUT,_T("Cut"));
+	AppendMenu(hMenu,MF_POPUP,(unsigned int)hMenuPop,_T("Edit"));
+ 
+
+ 加载菜单,直接在创建窗口函数中把动态菜单的主菜单句柄hMenu给函数中的菜单参数,代码如上已经注释的代码
+
+ 
+
+下面代码执行的结果是加载动态菜单的结果,直接加载资源里的菜单已经注释起来了,代码中有对菜单消息的相应,
+
+看消息处理函数,代码是基于Windows编程|SDK我的这篇文章里的代码修改的
+
+view plaincopy to clipboardprint?//开发工具:VS2008   
+//使用 Unicode 字符集   
+  
+#include <Windows.h>   
+#include <tchar.h> //_T或_TEXT需要的头文件   
+//#include "resource.h"   
+  
+//设计一个窗口类；   
+//注册窗口类；   
+//创建窗口；   
+//显示及更新窗口。   
+//消息循环   
+//窗口函数   
+  
+//动态菜单   
+#define IDM_FILE_NEW  40001   
+#define IDM_FILE_OPEN 40002   
+#define IDM_EDIT_COPY 40003   
+#define IDM_EDIT_CUT  40004   
+//全局变量   
+TCHAR szWindowClass[] = _T("演示程序");  
+TCHAR szWindowTitle[] = _T("主窗口标题");  
+  
+//定义的窗口过程函数,是个回调函数,意思是该函数不是在程序中直接调用   
+//而是在特定的事件或条件发生时由Windows系统调用,对事件或条件的响应   
+LRESULT CALLBACK MyWindowProc(  
+            HWND hwnd,      // handle to window 窗口句柄   
+            UINT uMsg,      // message identifier   消息标识   
+            WPARAM wParam,  // first message parameter   
+            LPARAM lParam   // second message parameter   
+             );  
+//程序的入口函数   
+int WINAPI  WinMain(   
+        HINSTANCE hInstance,  //记录程序当前运行的实例的句柄   
+        HINSTANCE hPrevInstance, //已经失去了意义,总为NULL   
+        LPSTR lpCmdLine, //命令行参数,记录当前运行程序的路径   
+        int nShowCmd     //指定程序窗口应该如何显示,通常不检查这个参数的值   
+        )  
+{  
+  
+    //设计窗口类,该窗口类并不是C++中的类,只是表示窗口特征的结构体   
+  
+    WNDCLASS MyWndClass; //WNDCLASS是个结构体,该结构体中的成员是指定窗口特征的数据   
+     
+    //WNDCLASS结构体   
+    /* 
+ 
+    typedef struct _WNDCLASS {  
+    UINT       style;  
+    WNDPROC    lpfnWndProc;  
+    int        cbClsExtra;  
+    int        cbWndExtra;  
+    HINSTANCE  hInstance;  
+    HICON      hIcon;  
+    HCURSOR    hCursor;  
+    HBRUSH     hbrBackground;  
+    LPCTSTR    lpszMenuName;  
+    LPCTSTR    lpszClassName;  
+    } WNDCLASS, *PWNDCLASS;  
+    Members 
+ 
+    */  
+  
+    //这两个变量允许用户请求Windows内部提供额外的空间以便额外数据与窗口   
+    //实例发生联系,通常不分配空间   
+    MyWndClass.cbClsExtra = NULL;  
+    MyWndClass.cbWndExtra = NULL;  
+      
+    //背景颜色,这里有两种方法   
+    //GetStockObject()返回的句柄是HGDIOBJ类型,需要转换,   
+    //可以加载画刷,也可以加载画笔,   
+    //GetStockObject()参数的值有(看MSDN)   
+    //BLACK_BRUSH     黑色画刷   
+    //DKGRAY_BRUSH    深灰色画刷   
+    //GRAY_BRUSH      灰色画刷   
+    //WHITE_BRUSH     白色画刷   
+    //MyWndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);   
+    MyWndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);  
+      
+    //窗口的图标,如果为NULL,系统将提供一个默认的图标   
+    //LoadIcon()加载图标资源,返回图标句柄,   
+    //如果加载系统标准的图标第一个参数必须为NULL,第二个参数值为   
+    //IDI_ERROR        错误图标   
+    //IDI_APPLICATION  默认应用程序图标   
+    //IDI_QUESTION     问号图标    
+    //IDI_EXCLAMATION  感叹号图标    
+    //IDI_ASTERISK     星号图标   
+    //IDI_WARNING      警告图标   
+    //IDI_WINLOGO      Windows图标   
+    //IDI_HAND         与IDI_ERROR相同   
+    //IDI_INFORMATION  消息图标   
+    //还有很多.....   
+    MyWndClass.hIcon   = LoadIcon(NULL,IDI_WINLOGO);   
+      
+        //光标,LoadCursor()的使用与LoadIcon()相同   
+        MyWndClass.hCursor = LoadCursor(NULL,IDC_APPSTARTING);  
+      
+    MyWndClass.hInstance = hInstance; //当前实例的句柄   
+        MyWndClass.lpfnWndProc = MyWindowProc; //窗口函数(消息处理函数),lpfnWndProc是个函数指针   
+    MyWndClass.lpszClassName = szWindowClass; //窗口类名   
+        MyWndClass.lpszMenuName  = NULL ;// 菜单,指定菜单资源的名字,NULL是表示没有菜单,   
+    //MyWndClass.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);//一种,MAKEINTRESOURCE()加载菜单   
+        MyWndClass.style         = CS_HREDRAW|CS_VREDRAW; //使用|把多种窗口样式连接在一起   
+    //窗口的样式   
+        //CS_HREDRAW  表示当水平方向宽度发生变化时重绘整个窗口   
+        //CS_VREDRAW  表示当垂直方向高度发生变化时重绘整个窗口   
+    //CS_NOCLOSE  禁用系统菜单中的Close命令,既是没有关闭按钮   
+    //CS_DBLCLKS  当用户双击鼠标时向窗口过程函数发送鼠标双击消息   
+      
+    //注册窗口类,告诉Windows系统窗口类设计好了   
+    RegisterClass(&MyWndClass);  
+  
+    //动态菜单   
+    HMENU hMenu = CreateMenu(); //主菜单,水平   
+  
+    HMENU hMenuPop = CreateMenu(); //下拉的菜单,垂直   
+    AppendMenu(hMenuPop,MF_STRING,IDM_FILE_NEW,_T("New"));  
+    AppendMenu(hMenuPop,MF_STRING,IDM_FILE_OPEN,_T("Open"));  
+    AppendMenu(hMenu,MF_POPUP,(unsigned int)hMenuPop,_T("File"));  
+    //把下拉的菜单加载到主菜单第一个菜单,说的有点形象,   
+    //自己运行程序看效果   
+  
+    hMenuPop = CreateMenu();  
+    AppendMenu(hMenuPop,MF_STRING,IDM_EDIT_COPY,_T("Copy"));  
+    AppendMenu(hMenuPop,MF_STRING,IDM_EDIT_CUT,_T("Cut"));  
+    AppendMenu(hMenu,MF_POPUP,(unsigned int)hMenuPop,_T("Edit"));  
+  
+    //创建窗口,返回窗口的句柄   
+        HWND hWnd = CreateWindow(  
+                szWindowClass, //窗口类名称   
+            szWindowTitle, //窗口标题   
+            WS_OVERLAPPEDWINDOW,  //窗口样式,多种样式   
+            //这个样式要与WNDCLASS的样式区别开,这个是指定某个具体窗口的样式   
+            //而WNDCLASS的样式是指基于该窗口类的所有窗口都具有的样式   
+            //WS_OVERLAPPED  一个可层叠窗口   
+                        //WS_CAPTION     有标题栏   
+            //WS_SYSMENU     在标题栏带有系统菜单,WS_CAPTION一起使用   
+            //WS_THICKFRAME  具有可调边框窗口   
+            //WS_MINIMIZEBOX 有最小按钮,必须设定WS_SYSMENU   
+            //WS_MAXIMIZEBOX 有最大按钮,必须设定WS_SYSMENU   
+  
+            CW_USEDEFAULT,  //x坐标,默认   
+            //CW_USEDEFAULT仅适用于WS_OVERLAPPED样式窗口   
+            CW_USEDEFAULT,  //y坐标,默认   
+            CW_USEDEFAULT,  //宽   
+            CW_USEDEFAULT,  //高   
+            NULL,           //父窗口   
+            NULL,           //第一种加载菜单   
+            //LoadMenu(hInstance,MAKEINTRESOURCE(IDR_MENU1)), //第二种加载菜单   
+            //hMenu, //动态菜单   
+            hInstance,      //窗口实例标记   
+            NULL            //窗口创建时传入的数据指针,   
+                        //多文档时必须指向CLIENTCREATESTRUCT   
+                 );  
+  
+     //如果窗口创建失败   
+    if(!hWnd)  
+        return 0;  
+  
+    //显示并更新窗口   
+    ShowWindow(hWnd,SW_SHOW);  
+    UpdateWindow(hWnd);  
+  
+    //消息循环,WM_QIUT才停止循环,或程序已经推出   
+    /* 
+ 
+    BOOL GetMessage( 
+    LPMSG lpMsg,       //指向一个消息结构体MSG结构体对象, 
+                       //用于保存从消息队列中获取的消息  
+    HWND hWnd,         //指向某个窗口的句柄,NULL是指获取程序的所有消息 
+    UINT wMsgFilterMin, //消息队列中消息ID的最小值  
+    UINT wMsgFilterMax  //消息队列中消息ID的最大值 
+    //最后两个参数适用于指定消息ID的范围,如果都为0,表示获取消息队列所有消息 
+    ); 
+ 
+    //函数返回值总为TRUE,当获得WM_QIUT返回0,出错时返回-1 
+    //菜单中的"文件"中的"退出",窗口的"X"关闭按钮,窗口上系统菜单的"关闭"命令 
+    //上面的3中情况都会发送一个WM_QUIT消息 
+ 
+    */  
+  
+    MSG Msg;  
+    while(GetMessage(&Msg,NULL,0,0))  
+    {  
+    TranslateMessage(&Msg);  //让Windows为与键盘相关的消息做一些转换   
+    DispatchMessage(&Msg);   //分派消息到窗口过程函数中对消息处理   
+    }  
+      
+    return 1;  
+  
+}  
+  
+//窗口过程函数的实现(消息处理函数)   
+LRESULT CALLBACK MyWindowProc(  
+             HWND hwnd,      // handle to window 窗口句柄   
+             UINT uMsg,      // message identifier  消息标识   
+             WPARAM wParam,  // first message parameter   
+             LPARAM lParam   // second message parameter   
+            )  
+{  
+  
+   switch(uMsg)  
+   {  
+   case WM_PAINT:  
+       {  
+           TCHAR str[] = _T("这是一个Windows的SDK程序!");  
+           HDC hDc;  
+           PAINTSTRUCT  Ps;  
+           hDc = BeginPaint(hwnd,&Ps); //获取设备环境句柄   
+           SetTextColor(hDc,RGB(13,25,200)); //设置文本颜色   
+           TextOut(hDc,0,0,str,18); //输出文字   
+           EndPaint(hwnd,&Ps); //释放资源   
+           break;  
+       }  
+   case WM_CLOSE: //点击"X"按钮时发送此消息,使消息循环停止    
+       if(IDYES == MessageBox(hwnd,_T("是否要退出?"),_T("提示"),MB_YESNO))  
+       {  
+          DestroyWindow(hwnd); //销毁窗口,发送WM_DESTROY消息,注意程序进程还没退出   
+       }         
+       break;  
+   case WM_DESTROY:  
+       PostQuitMessage(NULL); //进程结束,完全退出程序   
+       break;  
+   case WM_LBUTTONDOWN:  
+       MessageBox(hwnd,_T("鼠标左键按下"),_T("提示"),MB_OK);  
+       break;  
+   case WM_COMMAND: //相应菜单消息   
+       switch(LOWORD(wParam))  
+       {  
+       //相应直接加载的菜单消息   
+           /* 
+       case ID_40001: MessageBox(hwnd,_T("菜单文件里的新建"),_T("菜单"),MB_OK); break; 
+       case ID_40002: MessageBox(hwnd,_T("菜单文件里的打开"),_T("菜单"),MB_OK);break; 
+       case ID_40003: MessageBox(hwnd,_T("菜单文件里的保存"),_T("菜单"),MB_OK);break; 
+       case ID_40004: MessageBox(hwnd,_T("菜单文件里的另存为"),_T("菜单"),MB_OK);break; 
+       case ID_40005:  PostQuitMessage(0);  break; 
+       */  
+       //相应动态菜单消息   
+       case IDM_FILE_NEW: MessageBox(hwnd,_T("动态菜单File里的New"),_T("菜单"),MB_OK); break;  
+       case IDM_FILE_OPEN: MessageBox(hwnd,_T("动态菜单File里的Open"),_T("菜单"),MB_OK); break;  
+       case IDM_EDIT_COPY: MessageBox(hwnd,_T("动态菜单Edit里的Copy"),_T("菜单"),MB_OK); break;  
+       case IDM_EDIT_CUT:  MessageBox(hwnd,_T("动态菜单Edit里的Cut"),_T("菜单"),MB_OK); break;  
+       }  
+       break;  
+   default:  
+       return DefWindowProc(hwnd,uMsg,wParam,lParam); //处理未处理的消息   
+       break;  
+   }  
+  
+   return 0;  
+  
+}  
+http://blog.csdn.net/bizhu12/article/details/6664210

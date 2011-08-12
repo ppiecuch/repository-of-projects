@@ -1,0 +1,89 @@
+/** 
+ * 与lg(n) 相关的排序算法,首先应该想到的是分治法,算法的思路如下:(为简单起见,不考虑取整的问题) 
+ * 利用折半比较，第一个与最后一个比较，然后第二个与倒数第二个比较，一直进行到中间，最坏情况就是n/2次. 
+ * 然后将每一对的较小元素放在 a[1...n/2] 数组中,较大的元素对应的放在 b[1...n/2]中. 
+ * 如果a的元素个数大于等于2，那么最小元素和次小元素一定在a数组中，再递归的在a中寻找第2小元素 
+ * 如果a的元素只有一个，则b中唯一的元素就是次小元素 
+ */  
+public class SecondMini {  
+  
+    /** 
+     * 利用折半比较，第一个与最后一个比较，然后第二个与倒数第二个比较，一直进行到中间，最坏情况就是n/2次. 
+     * 然后将每一对的较小元素放在 a[1...n/2] 数组中,较大的元素对应的放在 b[1...n/2]中. 
+     * 如果a的元素个数大于等于2，那么最小元素和次小元素一定在a数组中，再递归的在a中寻找第2小元素 
+     * 如果a的元素只有一个，则b中唯一的元素就是次小元素 
+     * @param arr 
+     */  
+    static int secondMini(int arr[]){  
+  
+        int a[] = new int[arr.length/2];  
+        int b[] =  new int[arr.length/2];  
+        for(int i = 0,j = arr.length-1;i<arr.length/2&&j>=arr.length/2;i++,j--){  
+            if(arr[i]<arr[j]){  
+                a[i] = arr[i];  
+                b[i] = arr[j];  
+            }else{  
+                a[i] = arr[j];  
+                b[i] = arr[i];  
+            }  
+        }  
+        //递归调用   
+        if(a.length>1)  
+            return secondMini(a);  
+        else{  
+            return b[0];  
+        }  
+    }  
+    public static void main(String[] args) {  
+        int arr[]  = {3,2,5,8,6,4,9,7};  
+        if(arr.length>=2){  
+            int result = secondMini(arr);  
+            System.out.println(result);  
+        }  
+    }  
+}  
+/**
+ * 与lg(n) 相关的排序算法,首先应该想到的是分治法,算法的思路如下:(为简单起见,不考虑取整的问题)
+ * 利用折半比较，第一个与最后一个比较，然后第二个与倒数第二个比较，一直进行到中间，最坏情况就是n/2次.
+ * 然后将每一对的较小元素放在 a[1...n/2] 数组中,较大的元素对应的放在 b[1...n/2]中.
+ * 如果a的元素个数大于等于2，那么最小元素和次小元素一定在a数组中，再递归的在a中寻找第2小元素
+ * 如果a的元素只有一个，则b中唯一的元素就是次小元素
+ */
+public class SecondMini {
+
+	/**
+	 * 利用折半比较，第一个与最后一个比较，然后第二个与倒数第二个比较，一直进行到中间，最坏情况就是n/2次.
+	 * 然后将每一对的较小元素放在 a[1...n/2] 数组中,较大的元素对应的放在 b[1...n/2]中.
+	 * 如果a的元素个数大于等于2，那么最小元素和次小元素一定在a数组中，再递归的在a中寻找第2小元素
+	 * 如果a的元素只有一个，则b中唯一的元素就是次小元素
+	 * @param arr
+	 */
+	static int secondMini(int arr[]){
+
+		int a[] = new int[arr.length/2];
+		int b[] =  new int[arr.length/2];
+		for(int i = 0,j = arr.length-1;i<arr.length/2&&j>=arr.length/2;i++,j--){
+			if(arr[i]<arr[j]){
+				a[i] = arr[i];
+				b[i] = arr[j];
+			}else{
+				a[i] = arr[j];
+				b[i] = arr[i];
+			}
+		}
+		//递归调用
+		if(a.length>1)
+			return secondMini(a);
+		else{
+			return b[0];
+		}
+	}
+	public static void main(String[] args) {
+		int arr[]  = {3,2,5,8,6,4,9,7};
+		if(arr.length>=2){
+			int result = secondMini(arr);
+			System.out.println(result);
+		}
+	}
+}
+http://blog.csdn.net/fg2006/article/details/6680527
