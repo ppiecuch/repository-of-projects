@@ -1,0 +1,940 @@
+创建时间：2003-03-26
+文章属性：原创
+文章来源：http://www.whitecell.org
+文章提交：sinister (jiasys_at_21cn.com)
+
+内核级HOOK的几种实现与应用
+
+Author  : sinister
+Email   : sinister@whitecell.org
+HomePage: http://www.whitecell.org  
+
+
+    实现内核级 HOOK 对于拦截、分析、跟踪系统内核起着致关重要的作用。实现的方法不同意味着应用侧重点的不同。如想要拦截 NATIVE API 那么可能常用的就是 HOOK SERVICE TABLE 的方法。如果要分析一些系统调用，那么可能想到用 HOOK INT 2E 中断来实现。如果想要拦截或跟踪其他内核 DRIVER 的调用，那么就要用到HOOK PE 的方法来实现。这里我们更注重的是实现，原理方面已有不少高手在网上发表过文章。大家可以结合起来读。下面以我写的几个实例程序来讲解一下各种方法的实现。错误之处还望各位指正。
+
+
+1、HOOK SERVICE TABLE 方法：
+   这种方法对于拦截 NATIVE API 来说用的比较多。原理就是通过替换系统导
+出的一个 SERVICE TABLE 中相应的 NATIVE API 的地址来达到拦截的目的。
+因为此方法较为简单，网上也有不少资料来介绍。所以这里就不给出实例程序了。SERVICE TABLE 的结构如下：
+
+typedef struct ServiceDescriptorEntry {
+    unsigned int *ServiceTableBase;
+    unsigned int *ServiceCounterTableBase; 
+    unsigned int NumberOfServices;
+    unsigned char *ParamTableBase;
+} ServiceDescriptorTableEntry_t, *PServiceDescriptorTableEntry_t;
+   
+
+2、HOOK INT 2E 方法：
+   这种方法对于跟踪、分析系统调用来说用的比较多。原理是通过替换 IDT
+表中的 INT 2E 中断，使之指向我们自己的中断服务处理例程来实现的。掌握
+此方法需要你对保护模式有一定的基础。下面的程序演示了这一过程。
+
+
+/*****************************************************************
+文件名        : WssHookInt2e.c
+描述          : 系统调用跟踪
+作者          : sinister
+最后修改日期  : 2002-11-02
+*****************************************************************/
+
+#include "ntddk.h"
+#include "string.h"
+
+#define DWORD unsigned __int32
+#define WORD unsigned __int16
+#define BYTE unsigned __int8
+#define BOOL __int32
+
+#define LOWORD(l)           ((WORD)(l))
+#define HIWORD(l)           ((WORD)(((DWORD)(l) >> 16) & 0xFFFF))
+#define LOBYTE(w)           ((BYTE)(w))
+#define HIBYTE(w)           ((BYTE)(((WORD)(w) >> 8) & 0xFF))
+
+#define MAKELONG(a, b) ((LONG) (((WORD) (a)) | ((DWORD) ((WORD) (b))) << 16)) 
+
+#define SYSTEMCALL 0x2e
+#define SYSNAME "System"
+#define PROCESSNAMELEN 16
+
+#pragma pack(1)
+
+//定义 IDTR 
+typedef struct tagIDTR {
+        WORD IDTLimit;
+        WORD LowIDTbase;
+        WORD HiIDTbase;
+}IDTR, *PIDTR;
+
+//定义 IDT 
+typedef struct tagIDTENTRY{
+    WORD OffsetLow;
+    WORD selector;
+    BYTE unused_lo;
+    unsigned char unused_hi:5;
+    unsigned char DPL:2;
+    unsigned char P:1;
+    WORD OffsetHigh;
+} IDTENTRY, *PIDTENTRY;
+
+
+#pragma pack()
+
+DWORD    OldInt2eService;
+ULONG    ProcessNameOffset;
+TCHAR   ProcessName[PROCESSNAMELEN];
+
+static NTSTATUS  MydrvDispatch (IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp);
+VOID DriverUnload (IN PDRIVER_OBJECT pDriverObject);
+ULONG GetProcessNameOffset();
+VOID GetProcessName( PCHAR Name );
+VOID InstallNewInt2e();
+VOID UninstallNewInt2e();
+
+VOID __fastcall NativeApiCall()
+{
+    KIRQL OldIrql;
+    
+    DWORD ServiceID;
+    DWORD ProcessId;
+
+    __asm mov ServiceID,eax;
+
+
+    ProcessId = (DWORD)PsGetCurrentProcessId();
+    GetProcessName(ProcessName);
+
+    KeRaiseIrql(HIGH_LEVEL, &OldIrql); // 提升当前的 IRQL 级别防止被中断
+
+
+    switch ( ServiceID )
+    {
+            case 0x20:
+                 DbgPrint("NEWINT2E: ProcessName: %s; ProcessID: %d; Native Api: NtCreateFile() \n",ProcessName,ProcessId);
+                 break;
+
+            case 0x2b:
+                 DbgPrint("NEWINT2E: ProcessName: %s; ProcessID: %d; Native Api: NtCreateSection() \n",ProcessName,ProcessId);                 
+                 break;
+
+
+            case 0x30:
+                 DbgPrint("NEWINT2E: ProcessName: %s; ProcessID: %d; Native Api: NtCreateToken() \n",ProcessName,ProcessId);                 
+                 break;
+                 
+    }
+
+    KeLowerIrql(OldIrql); //恢复原始 IRQL
+
+}
+
+__declspec(naked) NewInt2eService()
+{
+    __asm{
+        pushad
+        pushfd
+        push fs
+        mov bx,0x30
+        mov fs,bx
+        push ds
+        push es
+
+        sti
+        call NativeApiCall; // 调用记录函数
+        cli
+
+        pop es
+        pop ds
+        pop fs
+        popfd
+        popad
+
+        jmp    OldInt2eService;  //跳到原始 INT 2E 继续工作
+    }
+}
+
+VOID InstallNewInt2e()
+{
+
+    IDTR         idtr;
+    PIDTENTRY    OIdt;
+    PIDTENTRY    NIdt;
+
+    //得到 IDTR 中得段界限与基地址
+    __asm { 
+        sidt idtr;
+    }
+
+    //得到IDT基地址
+    OIdt = (PIDTENTRY)MAKELONG(idtr.LowIDTbase,idtr.HiIDTbase); 
+
+    //保存原来的 INT 2E 服务例程
+    OldInt2eService = MAKELONG(OIdt[SYSTEMCALL].OffsetLow,OIdt[SYSTEMCALL].OffsetHigh);
+    
+    NIdt = &(OIdt[SYSTEMCALL]);
+
+    __asm {
+        cli
+        lea eax,NewInt2eService;  //得到新的 INT 2E 服务例程偏移
+        mov ebx, NIdt;
+        mov [ebx],ax;   //INT 2E 服务例程低 16 位
+        shr eax,16      //INT 2E 服务例程高 16 位
+        mov [ebx+6],ax;
+        lidt idtr  //装入新的 IDT
+        sti
+    }
+
+}
+
+VOID UninstallNewInt2e()
+{
+    IDTR         idtr;
+    PIDTENTRY    OIdt;
+    PIDTENTRY    NIdt;
+
+    __asm {
+        sidt idtr;
+    }
+
+    OIdt = (PIDTENTRY)MAKELONG(idtr.LowIDTbase,idtr.HiIDTbase); 
+
+    NIdt = &(OIdt[SYSTEMCALL]);
+
+    _asm {
+        cli
+        lea eax,OldInt2eService;
+        mov ebx, NIdt;
+        mov [ebx],ax;
+        shr eax,16
+        mov [ebx+6],ax;
+        lidt idtr
+        sti
+    }
+
+}
+
+
+
+
+// 驱动入口
+NTSTATUS  DriverEntry( IN PDRIVER_OBJECT DriverObject,  IN PUNICODE_STRING RegistryPath ) 
+{
+    
+    UNICODE_STRING  nameString, linkString;
+    PDEVICE_OBJECT  deviceObject;
+    NTSTATUS        status;
+    HANDLE          hHandle;
+    int                i;
+    
+
+    //卸载驱动
+    DriverObject->DriverUnload = DriverUnload;
+
+    //建立设备
+    RtlInitUnicodeString( &nameString, L"\\Device\\WssHookInt2e" );
+    
+    status = IoCreateDevice( DriverObject,
+                             0,
+                             &nameString,
+                             FILE_DEVICE_UNKNOWN,
+                             0,
+                             TRUE,
+                             &deviceObject
+                           );
+                           
+
+    if (!NT_SUCCESS( status ))
+        return status;
+    
+
+    RtlInitUnicodeString( &linkString, L"\\DosDevices\\WssHookInt2e" );
+
+    status = IoCreateSymbolicLink (&linkString, &nameString);
+
+    if (!NT_SUCCESS( status ))
+    {
+        IoDeleteDevice (DriverObject->DeviceObject);
+        return status;
+    }    
+    
+
+    for ( i = 0; i < IRP_MJ_MAXIMUM_FUNCTION; i++)    {
+
+          DriverObject->MajorFunction[i] = MydrvDispatch;
+    }
+
+      DriverObject->DriverUnload = DriverUnload;
+
+    ProcessNameOffset = GetProcessNameOffset();
+    InstallNewInt2e();
+
+  return STATUS_SUCCESS; 
+} 
+
+
+
+//处理设备对象操作
+
+static NTSTATUS MydrvDispatch (IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
+{ 
+    Irp->IoStatus.Status = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0L;
+    IoCompleteRequest( Irp, 0 );
+    return Irp->IoStatus.Status;
+    
+}
+
+
+
+VOID DriverUnload (IN PDRIVER_OBJECT    pDriverObject)
+{
+    UNICODE_STRING  nameString;
+
+    UninstallNewInt2e();
+    RtlInitUnicodeString( &nameString, L"\\DosDevices\\WssHookInt2e" );    
+    IoDeleteSymbolicLink(&nameString);
+    IoDeleteDevice(pDriverObject->DeviceObject);
+
+    return;
+}
+
+
+
+ULONG GetProcessNameOffset()
+{
+        PEPROCESS curproc;
+        int i;
+        
+        curproc = PsGetCurrentProcess();
+
+        //
+        // Scan for 12KB, hopping the KPEB never grows that big!
+        //
+        for( i = 0; i < 3*PAGE_SIZE; i++ ) {
+
+            if( !strncmp( SYSNAME, (PCHAR) curproc + i, strlen(SYSNAME) )) {
+
+                return i;
+            }
+        }
+
+        //
+        // Name not found - oh, well
+        //
+        return 0;
+}
+
+VOID GetProcessName( PCHAR Name )
+{
+
+        PEPROCESS curproc;
+        char *nameptr;
+        ULONG i;
+
+        if( ProcessNameOffset ) {
+
+            curproc = PsGetCurrentProcess();
+            nameptr = (PCHAR) curproc + ProcessNameOffset;
+            strncpy( Name, nameptr, 16 );
+
+        } else {
+
+            strcpy( Name, "???");
+        }
+} 
+
+
+3、 HOOK PE 方法
+    这种方法对于拦截、分析其他内核驱动的函数调用来说用的比较多。原理
+是根据替换 PE 格式导出表中的相应函数来实现的。此方法中需要用到一些小
+技巧。如内核模式并没有直接提供类似应用层的 GetModuleHandl()、GetProcAddress() 等函数来获得模块的地址。那么我们就需要自己来编写，这
+里用到了一个未公开的函数与结构。ZwQuerySystemInformation 与 SYSTEM_MODULE_INFORMATION 来实现得到模块的基地址。这样我们就可以根据
+PE 格式来枚举导出表中的函数来替换了。但这又引出了一个问题，那就是从
+WINDOWS 2000 后内核数据的页属性都是只读的，不能更改。内核模式也没有
+提供类似应用层的 VirtualProtectEx() 等函数来修改页面属性。那么也需要
+我们自己来编写。因为我们是在内核模式所以我们可以通过修改 cr0 寄存器的
+的写保护位来达到我们的目的。这样我们所期望的拦截内核模式函数的功能便
+得以实现。此方法需要你对 PE 格式有一定的基础。下面的程序演示了这一过程。
+
+
+
+/*****************************************************************
+文件名        : WssHookPE.c
+描述          : 拦截内核函数
+作者          : sinister
+最后修改日期  : 2002-11-02
+*****************************************************************/
+
+#include "ntddk.h"
+#include "windef.h"
+
+
+typedef enum _SYSTEM_INFORMATION_CLASS {
+    SystemBasicInformation,
+    SystemProcessorInformation,
+    SystemPerformanceInformation,
+    SystemTimeOfDayInformation,
+    SystemNotImplemented1,
+    SystemProcessesAndThreadsInformation,
+    SystemCallCounts,
+    SystemConfigurationInformation,
+    SystemProcessorTimes,
+    SystemGlobalFlag,
+    SystemNotImplemented2,
+    SystemModuleInformation,
+    SystemLockInformation,
+    SystemNotImplemented3,
+    SystemNotImplemented4,
+    SystemNotImplemented5,
+    SystemHandleInformation,
+    SystemObjectInformation,
+    SystemPagefileInformation,
+    SystemInstructionEmulationCounts,
+    SystemInvalidInfoClass1,
+    SystemCacheInformation,
+    SystemPoolTagInformation,
+    SystemProcessorStatistics,
+    SystemDpcInformation,
+    SystemNotImplemented6,
+    SystemLoadImage,
+    SystemUnloadImage,
+    SystemTimeAdjustment,
+    SystemNotImplemented7,
+    SystemNotImplemented8,
+    SystemNotImplemented9,
+    SystemCrashDumpInformation,
+    SystemExceptionInformation,
+    SystemCrashDumpStateInformation,
+    SystemKernelDebuggerInformation,
+    SystemContextSwitchInformation,
+    SystemRegistryQuotaInformation,
+    SystemLoadAndCallImage,
+    SystemPrioritySeparation,
+    SystemNotImplemented10,
+    SystemNotImplemented11,
+    SystemInvalidInfoClass2,
+    SystemInvalidInfoClass3,
+    SystemTimeZoneInformation,
+    SystemLookasideInformation,
+    SystemSetTimeSlipEvent,
+    SystemCreateSession,
+    SystemDeleteSession,
+    SystemInvalidInfoClass4,
+    SystemRangeStartInformation,
+    SystemVerifierInformation,
+    SystemAddVerifier,
+    SystemSessionProcessesInformation
+} SYSTEM_INFORMATION_CLASS;
+
+
+typedef struct tagSYSTEM_MODULE_INFORMATION {
+    ULONG Reserved[2];
+    PVOID Base;
+    ULONG Size;
+    ULONG Flags;
+    USHORT Index;
+    USHORT Unknown;
+    USHORT LoadCount;
+    USHORT ModuleNameOffset;
+    CHAR ImageName[256];
+} SYSTEM_MODULE_INFORMATION, *PSYSTEM_MODULE_INFORMATION;
+
+#define IMAGE_DOS_SIGNATURE        0x5A4D      // MZ
+#define IMAGE_NT_SIGNATURE      0x50450000  // PE00
+#define IMAGE_NT_SIGNATURE1        0x00004550    // 00EP
+
+typedef struct _IMAGE_DOS_HEADER {      // DOS .EXE header
+    WORD   e_magic;                     // Magic number
+    WORD   e_cblp;                      // Bytes on last page of file
+    WORD   e_cp;                        // Pages in file
+    WORD   e_crlc;                      // Relocations
+    WORD   e_cparhdr;                   // Size of header in paragraphs
+    WORD   e_minalloc;                  // Minimum extra paragraphs needed
+    WORD   e_maxalloc;                  // Maximum extra paragraphs needed
+    WORD   e_ss;                        // Initial (relative) SS value
+    WORD   e_sp;                        // Initial SP value
+    WORD   e_csum;                      // Checksum
+    WORD   e_ip;                        // Initial IP value
+    WORD   e_cs;                        // Initial (relative) CS value
+    WORD   e_lfarlc;                    // File address of relocation table
+    WORD   e_ovno;                      // Overlay number
+    WORD   e_res[4];                    // Reserved words
+    WORD   e_oemid;                     // OEM identifier (for e_oeminfo)
+    WORD   e_oeminfo;                   // OEM information; e_oemid specific
+    WORD   e_res2[10];                  // Reserved words
+    LONG   e_lfanew;                    // File address of new exe header
+  } IMAGE_DOS_HEADER, *PIMAGE_DOS_HEADER;
+
+
+typedef struct _IMAGE_FILE_HEADER {
+    WORD    Machine;
+    WORD    NumberOfSections;
+    DWORD   TimeDateStamp;
+    DWORD   PointerToSymbolTable;
+    DWORD   NumberOfSymbols;
+    WORD    SizeOfOptionalHeader;
+    WORD    Characteristics;
+} IMAGE_FILE_HEADER, *PIMAGE_FILE_HEADER;
+
+typedef struct _IMAGE_DATA_DIRECTORY {
+    DWORD   VirtualAddress;
+    DWORD   Size;
+} IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY;
+
+#define IMAGE_NUMBEROF_DIRECTORY_ENTRIES    16
+
+//
+// Optional header format.
+//
+
+typedef struct _IMAGE_OPTIONAL_HEADER {
+    //
+    // Standard fields.
+    //
+
+    WORD    Magic;
+    BYTE    MajorLinkerVersion;
+    BYTE    MinorLinkerVersion;
+    DWORD   SizeOfCode;
+    DWORD   SizeOfInitializedData;
+    DWORD   SizeOfUninitializedData;
+    DWORD   AddressOfEntryPoint;
+    DWORD   BaseOfCode;
+    DWORD   BaseOfData;
+
+    //
+    // NT additional fields.
+    //
+
+    DWORD   ImageBase;
+    DWORD   SectionAlignment;
+    DWORD   FileAlignment;
+    WORD    MajorOperatingSystemVersion;
+    WORD    MinorOperatingSystemVersion;
+    WORD    MajorImageVersion;
+    WORD    MinorImageVersion;
+    WORD    MajorSubsystemVersion;
+    WORD    MinorSubsystemVersion;
+    DWORD   Win32VersionValue;
+    DWORD   SizeOfImage;
+    DWORD   SizeOfHeaders;
+    DWORD   CheckSum;
+    WORD    Subsystem;
+    WORD    DllCharacteristics;
+    DWORD   SizeOfStackReserve;
+    DWORD   SizeOfStackCommit;
+    DWORD   SizeOfHeapReserve;
+    DWORD   SizeOfHeapCommit;
+    DWORD   LoaderFlags;
+    DWORD   NumberOfRvaAndSizes;
+    IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
+} IMAGE_OPTIONAL_HEADER32, *PIMAGE_OPTIONAL_HEADER32;
+
+typedef struct _IMAGE_NT_HEADERS {
+    DWORD Signature;
+    IMAGE_FILE_HEADER FileHeader;
+    IMAGE_OPTIONAL_HEADER32 OptionalHeader;
+} IMAGE_NT_HEADERS32, *PIMAGE_NT_HEADERS32;
+
+typedef IMAGE_NT_HEADERS32                  IMAGE_NT_HEADERS;
+typedef PIMAGE_NT_HEADERS32                 PIMAGE_NT_HEADERS;
+
+//
+// Section header format.
+//
+
+#define IMAGE_SIZEOF_SHORT_NAME              8
+
+typedef struct _IMAGE_SECTION_HEADER {
+    BYTE    Name[IMAGE_SIZEOF_SHORT_NAME];
+    union {
+            DWORD   PhysicalAddress;
+            DWORD   VirtualSize;
+    } Misc;
+    DWORD   VirtualAddress;
+    DWORD   SizeOfRawData;
+    DWORD   PointerToRawData;
+    DWORD   PointerToRelocations;
+    DWORD   PointerToLinenumbers;
+    WORD    NumberOfRelocations;
+    WORD    NumberOfLinenumbers;
+    DWORD   Characteristics;
+} IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;
+
+#define IMAGE_SIZEOF_SECTION_HEADER          40
+//
+// Export Format
+//
+
+typedef struct _IMAGE_EXPORT_DIRECTORY {
+    DWORD   Characteristics;
+    DWORD   TimeDateStamp;
+    WORD    MajorVersion;
+    WORD    MinorVersion;
+    DWORD   Name;
+    DWORD   Base;
+    DWORD   NumberOfFunctions;
+    DWORD   NumberOfNames;
+    DWORD   AddressOfFunctions;     // RVA from base of image
+    DWORD   AddressOfNames;         // RVA from base of image
+    DWORD   AddressOfNameOrdinals;  // RVA from base of image
+} IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY;
+
+#define BASEADDRLEN 10
+
+NTSYSAPI
+NTSTATUS
+NTAPI
+ZwQuerySystemInformation(
+    IN SYSTEM_INFORMATION_CLASS SystemInformationClass,
+    IN OUT PVOID SystemInformation,
+    IN ULONG SystemInformationLength,
+    OUT PULONG ReturnLength OPTIONAL
+    );
+
+
+typedef NTSTATUS (* ZWCREATEFILE)(
+  OUT PHANDLE FileHandle,
+  IN ACCESS_MASK DesiredAccess,
+  IN POBJECT_ATTRIBUTES ObjectAttributes,
+  OUT PIO_STATUS_BLOCK IoStatusBlock,
+  IN PLARGE_INTEGER AllocationSize  OPTIONAL,
+  IN ULONG FileAttributes,
+  IN ULONG ShareAccess,
+  IN ULONG CreateDisposition,
+  IN ULONG CreateOptions,
+  IN PVOID EaBuffer  OPTIONAL,
+  IN ULONG EaLength
+  );
+
+ZWCREATEFILE    OldZwCreateFile;
+
+static NTSTATUS  MydrvDispatch (IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp);
+VOID DriverUnload (IN PDRIVER_OBJECT pDriverObject);
+VOID DisableWriteProtect( PULONG pOldAttr);
+VOID EnableWriteProtect( ULONG ulOldAttr );
+FARPROC HookFunction(    PCHAR pModuleBase, PCHAR pHookName, FARPROC pHookFunc );
+
+NTSTATUS  
+HookNtCreateFile(
+  OUT PHANDLE FileHandle,
+  IN ACCESS_MASK DesiredAccess,
+  IN POBJECT_ATTRIBUTES ObjectAttributes,
+  OUT PIO_STATUS_BLOCK IoStatusBlock,
+  IN PLARGE_INTEGER AllocationSize  OPTIONAL,
+  IN ULONG FileAttributes,
+  IN ULONG ShareAccess,
+  IN ULONG CreateDisposition,
+  IN ULONG CreateOptions,
+  IN PVOID EaBuffer  OPTIONAL,
+  IN ULONG EaLength
+  );
+
+
+
+PCHAR MyGetModuleBaseAddress( PCHAR pModuleName ) 
+{
+    PSYSTEM_MODULE_INFORMATION    pSysModule;    
+
+    ULONG            uReturn;
+    ULONG            uCount;
+    PCHAR            pBuffer = NULL;
+    PCHAR            pName    = NULL;
+    NTSTATUS        status;
+    UINT            ui;
+
+    CHAR            szBuffer[BASEADDRLEN];
+    PCHAR            pBaseAddress;
+    
+    status = ZwQuerySystemInformation( SystemModuleInformation, szBuffer, BASEADDRLEN, &uReturn );
+
+    pBuffer = ( PCHAR )ExAllocatePool( NonPagedPool, uReturn );
+
+    if ( pBuffer )
+    {
+        status = ZwQuerySystemInformation( SystemModuleInformation, pBuffer, uReturn, &uReturn );
+
+        if( status == STATUS_SUCCESS )
+        {
+            uCount = ( ULONG )*( ( ULONG * )pBuffer );
+            pSysModule = ( PSYSTEM_MODULE_INFORMATION )( pBuffer + sizeof( ULONG ) );
+
+            for ( ui = 0; ui < uCount; ui++ )
+            {
+                pName = MyStrchr( pSysModule->ImageName, '\\' );
+
+                if ( !pName ) 
+                {
+                    pName = pSysModule->ImageName;
+                }
+
+                else {
+                    pName++;
+                }
+
+                if( !_stricmp( pName, pModuleName ) )
+                {
+                    pBaseAddress = ( PCHAR )pSysModule->Base;
+                    ExFreePool( pBuffer );
+                    return pBaseAddress;
+                }
+
+                pSysModule ++;
+            }
+        }
+
+        ExFreePool( pBuffer );
+    }
+
+    return NULL;
+}
+
+
+FARPROC HookFunction( PCHAR pModuleBase, PCHAR HookFunName, FARPROC HookFun )
+{
+    PIMAGE_DOS_HEADER         pDosHdr;
+    PIMAGE_NT_HEADERS         pNtHdr;
+    PIMAGE_SECTION_HEADER     pSecHdr;
+    PIMAGE_EXPORT_DIRECTORY  pExtDir;
+
+    UINT                    ui,uj;
+    PCHAR                    FunName;
+    DWORD                    *dwAddrName;
+    DWORD                    *dwAddrFun;
+    FARPROC                    pOldFun;
+    ULONG                    uAttrib;
+
+
+    pDosHdr = ( PIMAGE_DOS_HEADER )pModuleBase;
+
+    if ( IMAGE_DOS_SIGNATURE == pDosHdr->e_magic )
+    {
+        pNtHdr = ( PIMAGE_NT_HEADERS )( pModuleBase + pDosHdr->e_lfanew );
+
+        if( IMAGE_NT_SIGNATURE  == pNtHdr->Signature ||    IMAGE_NT_SIGNATURE1 == pNtHdr->Signature )
+        {
+            pSecHdr = ( PIMAGE_SECTION_HEADER )( pModuleBase + pDosHdr->e_lfanew + sizeof( IMAGE_NT_HEADERS ) );
+
+            for ( ui = 0; ui < (UINT)pNtHdr->FileHeader.NumberOfSections; ui++ )
+            {
+                if ( !strcmp( pSecHdr->Name, ".edata" ) )
+                {                
+                    pExtDir = ( PIMAGE_EXPORT_DIRECTORY )( pModuleBase + pSecHdr->VirtualAddress );
+                    dwAddrName = ( PDWORD )(pModuleBase + pExtDir->AddressOfNames );
+                    dwAddrFun = ( PDWORD )(pModuleBase + pExtDir->AddressOfFunctions );
+
+                    for ( uj = 0; uj < (UINT)pExtDir->NumberOfFunctions; uj++ )
+                    {
+                        FunName = pModuleBase + *dwAddrName;
+
+                        if( !strcmp( FunName, HookFunName ) )
+                        {
+                            DbgPrint(" HOOK  %s()\n",FunName);
+                            DisableWriteProtect( &uAttrib );
+                            pOldFun = ( FARPROC )( pModuleBase + *dwAddrFun );
+                            *dwAddrFun = ( PCHAR )HookFun - pModuleBase;
+                            EnableWriteProtect( uAttrib );
+                            return pOldFun;
+                        }
+
+                      dwAddrName ++;
+                      dwAddrFun ++;
+                    }
+                }
+
+                pSecHdr++;
+            }
+        }
+    }
+
+    return NULL;
+}
+
+
+// 驱动入口
+NTSTATUS  DriverEntry( IN PDRIVER_OBJECT DriverObject,  IN PUNICODE_STRING RegistryPath ) 
+{
+    
+    UNICODE_STRING  nameString, linkString;
+    PDEVICE_OBJECT  deviceObject;
+    NTSTATUS        status;
+    HANDLE          hHandle;
+    PCHAR            pModuleAddress;
+    int                i;
+    
+
+    //卸载驱动
+    DriverObject->DriverUnload = DriverUnload;
+
+    //建立设备
+    RtlInitUnicodeString( &nameString, L"\\Device\\WssHookPE" );
+    
+    status = IoCreateDevice( DriverObject,
+                             0,
+                             &nameString,
+                             FILE_DEVICE_UNKNOWN,
+                             0,
+                             TRUE,
+                             &deviceObject
+                           );
+                           
+
+    if (!NT_SUCCESS( status ))
+        return status;
+    
+
+    RtlInitUnicodeString( &linkString, L"\\DosDevices\\WssHookPE" );
+
+    status = IoCreateSymbolicLink (&linkString, &nameString);
+
+    if (!NT_SUCCESS( status ))
+    {
+        IoDeleteDevice (DriverObject->DeviceObject);
+        return status;
+    }    
+    
+    pModuleAddress = MyGetModuleBaseAddress("ntoskrnl.exe");
+    if ( pModuleAddress == NULL)
+    {
+        DbgPrint(" MyGetModuleBaseAddress()\n");
+        return 0;
+    }
+
+    OldZwCreateFile = (ZWCREATEFILE)HookFunction( pModuleAddress, "ZwCreateFile",(ZWCREATEFILE)HookNtCreateFile);
+    if ( OldZwCreateFile == NULL)
+    {
+        DbgPrint(" HOOK FAILED\n");
+        return 0;
+    }
+
+    DbgPrint("HOOK SUCCEED\n");
+
+    for ( i = 0; i < IRP_MJ_MAXIMUM_FUNCTION; i++)    {
+
+          DriverObject->MajorFunction[i] = MydrvDispatch;
+    }
+
+      DriverObject->DriverUnload = DriverUnload;
+     
+  return STATUS_SUCCESS; 
+} 
+
+
+
+//处理设备对象操作
+
+static NTSTATUS MydrvDispatch (IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
+{ 
+    Irp->IoStatus.Status = STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0L;
+    IoCompleteRequest( Irp, 0 );
+    return Irp->IoStatus.Status;
+    
+}
+
+
+
+VOID DriverUnload (IN PDRIVER_OBJECT    pDriverObject)
+{
+    UNICODE_STRING  nameString;
+    PCHAR            pModuleAddress;
+
+    pModuleAddress = MyGetModuleBaseAddress("ntoskrnl.exe");
+    if ( pModuleAddress == NULL)
+    {
+        DbgPrint("MyGetModuleBaseAddress()\n");
+        return ;
+    }
+
+    OldZwCreateFile = (ZWCREATEFILE)HookFunction( pModuleAddress, "ZwCreateFile",(ZWCREATEFILE)OldZwCreateFile);
+    if ( OldZwCreateFile == NULL)
+    {
+        DbgPrint(" UNHOOK FAILED!\n");
+        return ;
+    }
+
+    DbgPrint("UNHOOK SUCCEED\n");
+
+    RtlInitUnicodeString( &nameString, L"\\DosDevices\\WssHookPE" );    
+    IoDeleteSymbolicLink(&nameString);
+    IoDeleteDevice(pDriverObject->DeviceObject);
+
+    return;
+}
+
+NTSTATUS  
+HookNtCreateFile(
+  OUT PHANDLE FileHandle,
+  IN ACCESS_MASK DesiredAccess,
+  IN POBJECT_ATTRIBUTES ObjectAttributes,
+  OUT PIO_STATUS_BLOCK IoStatusBlock,
+  IN PLARGE_INTEGER AllocationSize  OPTIONAL,
+  IN ULONG FileAttributes,
+  IN ULONG ShareAccess,
+  IN ULONG CreateDisposition,
+  IN ULONG CreateOptions,
+  IN PVOID EaBuffer  OPTIONAL,
+  IN ULONG EaLength
+  )
+{
+    NTSTATUS    status;
+
+    DbgPrint("Hook ZwCreateFile()\n");
+
+    status = ((ZWCREATEFILE)(OldZwCreateFile))(
+               FileHandle,
+               DesiredAccess,
+               ObjectAttributes,
+               IoStatusBlock,
+               AllocationSize,
+               FileAttributes,
+               ShareAccess,
+               CreateDisposition,
+               CreateOptions,
+               EaBuffer,
+               EaLength
+              );
+
+    return status;
+}
+
+
+VOID DisableWriteProtect( PULONG pOldAttr)
+{
+
+     ULONG uAttr;
+
+     _asm
+    {
+          push eax;
+          mov  eax, cr0;
+          mov  uAttr, eax;
+          and  eax, 0FFFEFFFFh; // CR0 16 BIT = 0
+          mov  cr0, eax;
+          pop  eax;
+    };
+
+     *pOldAttr = uAttr; //保存原有的 CRO 属性
+
+}
+
+VOID EnableWriteProtect( ULONG uOldAttr )
+{
+
+  _asm
+  {
+       push eax;
+       mov  eax, uOldAttr; //恢复原有 CR0 属性
+       mov  cr0, eax;
+       pop  eax;
+  };
+
+}
+
+
+关于我们： 
+
+WSS(Whitecell Security Systems)，一个非营利性民间技术组织，致力于各种系统安全技术的研究。坚持传统的hacker精神，追求技术的精纯。 
+WSS 主页：http://www.whitecell.org/ 
+http://www.xfocus.net/articles/200303/499.html
