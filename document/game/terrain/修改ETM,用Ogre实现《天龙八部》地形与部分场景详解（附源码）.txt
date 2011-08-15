@@ -1,0 +1,443 @@
+本文主要讲的是《天龙八部》游戏的地形和一部分场景的具体实现，使用C++, Ogre1.6，我摸索了段时间，可能方法用的并不是最好的，但好歹实现了。文章可能讲得有点罗嗦，很多简单的东西都讲了。我是修改了ETM（Editable Terrain Manager）实现的地形，其实单单实现天龙八部的地形场景等的载入根本不需要使用ETM，直接用Ogre的顶点->索引->纹理就可以搞定地形，但我要做的是可以实时编辑的，所以用了ETM，场景其由于很重要的粒子和model等部分我还没去看，所以等以后看了再详细写关于场景的部分，但这个Demo已经实现了基本的场景的载入。光，雾，环境，静态物等都能载入。 
+
+修改过的ETM和这个场景的Demo代码可以通过文章底下的链接下载。 
+
+Demo截图如下：（少林） 
+
+ 
+
+这个Demo比较简单，只能移动摄像机看看场景。 
+
+我研究这些的动机是当前在学校做一个网游项目，想做得类似于《Second Life》，苦于没有游戏美工，最近有马上要二期验收了，为了让游戏看上去光鲜一点，无奈之下只好借《天龙八部》的资源来用了。看了不少大牛的博客，将得感觉都有点不是很详细，只是大概把文件格式讲了一下而已，具体怎么实现说得不多（可能是觉得实现太容易，懒得多说了吧...）最主要的是，似乎没看到有人发完整的代码。 
+
+实际项目中用的程序代码我就不放出来了，场景部分差不多，只是多了个内建的编辑器，人物移动和网络通信部分等。 
+
+编辑器的截图晒一下，功能还不全 :-) 
+
+ 
+
+ 
+
+言归正传，先简单地说一下载入一个天龙八部场景的大致过程： 
+
+读取.Scene文件
+根据<Texture>读取.Terrain文件
+读取地砖大小(<tileSize>) 地形大小(xsize, ysize)，缩放值(<scale>)，地图中心坐标(<center>)。
+读取所有要用的地形贴图（<textures>中各项）。
+读取.gridinfo 文件，此文件中存放着每个格子对应的纹理坐标。
+根据3，4，5步的信息用修改过的ETM创建Terrain。
+读取lightmap, 是png格式的预处理的场景阴影图。
+读取场景中的各种模型等，并插入到场景Root中。 
+(注：天龙八部的场景包含很多个文件，用“劒蚩”的资源提取工具提取出来，文件夹下的基本都是，但我暂时不考虑寻路，碰撞等，所以就地形来讲只研究.Terrain文件，.Gridinfo文件。 资源提取的问题可访问http://www.cnitblog.com/sword/category/5167.htmlScene ) 
+
+  
+
+下面我分几个部分来具体讲如何实现天龙八部的场景Demo。 
+
+读取高度图
+做地形首先肯定是要读取高度图，《天龙八部》的高度图是保存在.Heightmap文件中，读取的方法是跳过前面8个字节，读地形的width和height，然后读取width*height个float型数据，上面说到.Terrain文件中有地形大小(xsize, ysize)，缩放值(<scale>)，地图中心坐标(<center>)，<scale>中有xyz 3个值(一般情况下是100,100,100)，分别是x,y,z轴的放大系数，用ETM创建地形的时候，直接用读取到的float型数据作为高度图数据，然后再用上面那些值作为参数，定义地形的大小，缩放值，和偏移。 
+
+这是读取高度图的代码,heightMapData是float型的数组，存放原始的高度图信息。
+
+void TileTerrainInfo::LoadHightMap( const char* fileName, const char* type )
+{
+    FILE* pf = fopen( fileName, "rb" );
+    fseek( pf, 8, SEEK_SET );
+    int height, width;
+    fread( &width, 4,1, pf );
+    fread( &height, 4,1, pf );
+
+    assert( height = this->height+1 );
+    assert( width == this->width+1 );
+
+    if( heightMapData )
+        delete []heightMapData;
+    
+    heightMapData = new float[height*width];
+    for( int i = 0; i < height; ++i )
+    {
+        for( int j  = 0; j < width; ++j )
+        {
+            float data;
+            fread( &data, 4,1,pf );
+            heightMapData[i*width+j] = data;
+        }    
+    }
+
+    fclose( pf );
+} 
+材质文件的分析
+我想先讲一下地形的材质，因为用别人的资源，首先要知道怎么用这些资源，一般情况下材质信息可以明显地反映出如何使用纹理资源（不排除有可能用代码动态生成材质）。 
+
+在每个.Terrain文件的最下面，有这些内容。 
+
+  <materials> 
+    <template material="Terrain/OneLayer" name="OneLayer"/> 
+    <template material="Terrain/OneLayerLightmap" name="OneLayerLightmap"/> 
+    <template material="Terrain/TwoLayer" name="TwoLayer"/> 
+    <template material="Terrain/TwoLayerLightmap" name="TwoLayerLightmap"/> 
+    <fog_replacement exp="Terrain/OneLayer_ps%fog_exp" exp2="Terrain/OneLayer_ps%fog_exp2" linear="Terrain/OneLayer_ps%fog_linear" none="Terrain/OneLayer_ps"/> 
+    <fog_replacement exp="Terrain/TwoLayer_ps%fog_exp" exp2="Terrain/TwoLayer_ps%fog_exp2" linear="Terrain/TwoLayer_ps%fog_linear" none="Terrain/TwoLayer_ps"/> 
+    <fog_replacement exp="Terrain/OneLayerLightmap_ps%fog_exp" exp2="Terrain/OneLayerLightmap_ps%fog_exp2" linear="Terrain/OneLayerLightmap_ps%fog_linear" none="Terrain/OneLayerLightmap_ps"/> 
+    <fog_replacement exp="Terrain/TwoLayerLightmap_ps%fog_exp" exp2="Terrain/TwoLayerLightmap_ps%fog_exp2" linear="Terrain/TwoLayerLightmap_ps%fog_linear" none="Terrain/TwoLayerLightmap_ps"/> 
+  </materials> 
+
+定义了一些材质模板。 
+
+我没有深究其他的，只考虑TwoLayerLightmap这个材质。 
+
+不记得是在哪个文件夹下，有一个文件FairyTerrain.material，其中就是地形的材质。 
+
+我修改了一些内容，将<lightmap>设tex_coord = 0. <layer0>设tex_coord=1,<layer1>设tex_coord=2。这是因为我想让ETM原有的地形和天龙八部的地形共存，而原有地形纹理坐标刚好和<lightmap>纹理坐标相符合，所以设为同一层。 
+
+这是我改过的材质 
+
+material Terrain/TwoLayerLightmap 
+{  
+
+   technique 
+    { 
+        pass 
+        { 
+            fragment_program_ref Terrain/TwoLayerLightmap_ps 
+            { 
+            } 
+
+            texture_unit 
+            { 
+                texture_alias <layer0> 
+                texture <layer0> 
+                tex_address_mode clamp 
+     tex_coord_set 1 
+            } 
+
+            texture_unit 
+            { 
+                texture_alias <layer1> 
+                texture <layer1> 
+                tex_address_mode clamp 
+                tex_coord_set 2 
+            } 
+
+            texture_unit 
+            { 
+                texture_alias <lightmap> 
+                texture <lightmap> 
+                tex_address_mode clamp 
+                tex_coord_set 0 
+
+            } 
+        } 
+    } 
+
+} 
+
+<layer0>，<layer1>，<lightmap>是一个pass中的3个texture_unit.也就是3层纹理。顾名思义<layer0>是第一层纹理，<layer1>是第二层纹理，<lightmap>是光照图纹理（阴影图），具体如何使用，如何使天龙八部的地形贴图资源对应到layer0,layer1，我下面会讲到。 
+
+从FairyTerrain.cg中我们可以找到对应的shader。 
+void TwoLayerLightmap_ps( 
+    in float2 uv0 : TEXCOORD0, 
+    in float2 uv1 : TEXCOORD1, 
+    in float2 uvLightmap : TEXCOORD2, 
+    in uniform sampler2D layer0, 
+    in uniform sampler2D layer1, 
+    in uniform sampler2D lightmap, 
+    in float4 diffuse : COLOR0, 
+    in float4 specular : COLOR1, 
+    out float4 oColour : COLOR) 
+{ 
+    float4 c0 = tex2D(layer0, uv0); 
+    float4 c1 = tex2D(layer1, uv1); 
+    float3 texturedColour = lerp(c0.rgb, c1.rgb, c1.a); 
+    float4 lightmapColour = tex2D(lightmap, uvLightmap); 
+    float4 baseColour = diffuse * lightmapColour; 
+    float3 finalColour = baseColour.rgb * texturedColour + specular.rgb * (1-c0.a) * (1-c1.a) * lightmapColour.a; 
+    float3 resultColour = Fogging(finalColour); 
+    oColour = float4(finalColour, baseColour.a); 
+} 
+
+很容易看出其大致思路是<layer1>的alpha值控制<layer0>和<layer1>进行混合。 
+
+可见，天龙八部的地形应该是部分像魔兽一样的格子式地形，部分权重图地形，也就是ETM原有的那种贴图模式，很多层纹理，然后又1-2层手动生成的纹理数据控制各层纹理的alpha值，达到混合的效果，只不过这里是只有一个alpha通道来控制纹理混合。
+
+两层纹理的效果比单独一层纹理好的多，我用OneLayerLightmap材质试过，效果比较赫人... 
+
+ 
+地形纹理的实现
+<lightmap>纹理很明显，是一整张纹理贴到整个地形，没什么好说的。 
+
+但<layer0> <layer1>这两层地形纹理应该怎么贴上去呢？ 
+
+对于材质中的这两层纹理，有两种可能。 
+
+1.<layer0>,<layer1>本身只是材质模板中纹理的名字，没有实际意义，在实际的程序中会为每一块地形从材质模板继承一个模板，然后修改材质中纹理的名称。 
+
+2.在程序中手动创建<layer0>,<layer1>。 
+
+  
+
+先说两种不能实现的方法： 
+
+1. 在程序中手动创建<layer0>,<layer1>, 为极大极大的贴图（和真实的地形一样大），该贴图根据.Terrain和.Gridinfo中的信息来组成，和lightmap一样，整个贴到地形上。 
+
+在小游戏，只有可能一个屏幕那么大的地形，也许可以用，而且效果可能不错，但在这种地形相对较大的游戏中是不可能的，首先，极大的浪费资源，一个地砖的纹理，可能被用到几十次几百次，那么在这个大纹理中，就会有几百个地砖纹理的拷贝，其次，不可能创建这么大的纹理（硬件不支持？反正我试过创建不出来..） 
+
+2. 像ETM一样，将所有要用到的纹理（假设有n张）一个一个作为texture_unit放在材质里面，然后用n/4张手动生成的纹理去控制这些纹理的alpha值。这个方法不是对于天龙八部的地形不是很现实，一般每个天龙八部的地形有大概十几个不同的纹理，如果用这个方法，每个pass一般支持8个texture_unit，十几个纹理，加n/4张控制纹理需要3-4个pass，效率似乎... 而且我们通过天龙的材质文件可以看出，游戏应该不是用的这个方法来实现的。 
+
+3. 每一个格子都有自己独自的材质，修改每个格子材质中的<layer0>, <layer1>， 改为它需要的材质文件，如 "05武当\褐色土地底层.jpg” 相当于将每一个格子作为单独的mesh。这个是可以实现的，我试过，将ETM的TileSize设为1，然后生成每个Tile的时候修改其材质，成功了，地形也显示出来了，完全正确，但帧率..... 呵呵，debug模式下fps 大于0小于1... 到release也许可以到十几吧，我没试，显然是不能这样搞的...  
+
+我最后实现地形贴图用的是texture atlas,手动创建一张纹理，将所有要用到的地形纹理组合成一张大纹理，然后每一个顶点设基于这张大纹理的UV坐标，texture atlas比每个格子设材质更好的原因很显而易见，具体可以参考附件中所带的文章，《“Batch, Batch, Batch:”What Does It Really Mean?》中的第30页:Batch Breaker: Texture Change. 
+
+下图就是将wudang.Terrain中 
+
+<textures> 
+
+  <textures> 
+
+    <texture filename="03南海/岩石海礁01.jpg" type="image"/> 
+
+    <texture filename="03南海/岩石海礁03.jpg" type="image"/> 
+
+    <texture filename="05武当/褐色土地底层.jpg" type="image"/> 
+
+    <texture filename="05武当/褐色土地上层.tga" type="image"/> 
+
+    <texture filename="05武当/青砖地底层.tga" type="image"/> 
+
+    <texture filename="13镜湖/镜湖桃花瓣.tga" type="image"/> 
+
+    ... ... 
+
+  </textures> 
+
+所定义的所有纹理组合成的一张大纹理。 
+
+ 
+
+可以发现，天龙八部中的地形贴图大小是不同的，但最大是256x256(就我目前所知)，所以我干脆将每一格划为256x256，共可容纳有ROW_SIZExCOL_SIZE张小贴图，这样大贴图的大小应该是256*COL_SIZE x 256*ROW_SIZE。  
+
+我这台机器支持的最大纹理大小似乎为4096x4096，那么理论上因该可以最多容纳16*16张小贴图，绰绰有余了。这样虽然浪费一点空间，但可以很方便地通过ID索引贴图坐标。 
+
+比如 <pixmap bottom="0.2480469" left="0.00390625" right="0.4960938" textureId="2" top="0.001953125"/> 通过这样一块pixmap的定义，我们可以根据textureId=2找到它所所在的位置。 
+
+其所在行为textureId/COL_SIZE，所在列为textureId%COL_SIZE。如上面那张大纹理的COLE_SIZE = 8（一行有8张小贴图） 
+
+所以textureId=2的这张小贴图所在行row=0，坐在列col=2. 
+
+我们知道纹理坐标范围为0.0f-1.0f，所以textureId=2的小贴图左上角的UV坐标为U = (float)col/COL_SIZE = 0.25f , V = (float)row/ROW_SIZE = 0.0f. 
+
+再根据pixmap中的信息left ,right, top, bottom 可以计算出小贴图四个点的坐标。在创建顶点时将纹理坐标附上即可。 
+
+具体的过程应该是 
+
+1.手动创建名字为<layer0>的texture 
+
+代码如下： 
+
+TexturePtr layer0 = TextureManager::getSingletonPtr()->createManual( 
+   "<layer0>", "General",TEX_TYPE_2D, 
+   layerTextureWidth,layerTextureHeight, 1, 3, PF_BYTE_RGBA, TU_WRITE_ONLY ); 
+
+2. 将材质中的texture_unit <layer1>中的texture_name 由<layer1>改为<layer0>，因为我们两层用的是同一张纹理，没必要复制一遍，直接改名指向同一张纹理就行了。 
+
+代码如下： 
+
+MaterialPtr material (MaterialManager::getSingleton().getByName("Terrain/TwoLayerLightmap")); 
+material->getTechnique(0)->getPass(0)->getTextureUnitState( 1 )->setTextureName( "<layer0>"); 
+
+3.读取.Texture文件，将要用到的纹理拼接为大纹理，如上面那张图。 
+
+ 
+地形的顶点与索引
+ 
+
+若地图为192x192，它就是应该有192*192个格子。一般情况下的做法下，它应该有193*193个顶点，织成一个网状，但由于我用的atlas， 
+
+可以知道，每一个非边缘的顶点将会有4个纹理坐标（左上，右上，左下，右下 ） 
+
+如下图 
+
+ 
+
+中间的顶点要同时负责A块的右下，B块的左下，C块的右上，D块的左上。 
+
+话说一个顶点确实是同时又多个纹理坐标的，只要设置不同的tex_coord。但天龙八部地形贴图一般有3层，<layer0>,<layer1>,<lightmap>，分别是两层地形，一层预处理的阴影。 
+
+一层<lightmap>不用多说的，就是一张大纹理，每个顶点的坐标是u=col/terrainColSize, v=row/terrainRowSize. 
+
+另外两层就是我们需要考虑的，因为有两层，这样每个点不止同时负责4块，要同时负责两层共8块，这样这个pass的8个texture_unit都满了，必须再用一个pass来做<lightmap>那一层，效率不行。 
+
+所以只好用另一方法，就是在非边缘的每一个位置，将4个顶点重合在一起，这4个顶点的纹理坐标不同，但位置相同，即每一个格子都有四个独立的顶点，相邻的两个格子有两个点重合。 
+
+也就是说192x192的地图，需要有192*192*4个顶点。索引方式还是差不多，每一个格子需要6个索引，所以一共要192*192*6个索引。 
+
+这样，ETM中生成顶点和索引的部分代码都需要改，生成顶点的代码在void Tile::createVertexData(size_t startx, size_t startz)中，生成索引的代码在void Tile::createIndexData()中。
+
+天龙八部的.Terrain文件一般有这么一行<scale x="100" y="100" z="100"/>，说明地形在3个方向都是放大100倍，x,z本是一格大小为1x1为单位的，放大后即为100x100， 
+
+一个192x192的地形实际游戏中的大小应该为19200*19200，而天龙的坐标系是正中间坐标为.Terrain文件中的<center>的值，若不存在则中心为(0,0), 正方向为正，负方向为负，所以当<center>值为（0，0），192x192的地形实际坐标范围应该是 (-9600，-9600)到（9600，9600）。 
+
+要注意的是不是将所有顶点作为一个mesh，而是应该根据.Terrain文件中的<tileSize>规定每一个TerrainTile的大小，每个TerrainTile中包含tileSize x tileSize 个地形网格，一个TerrainTile作为一个Entity插入到一个场景节点。 
+
+顶点位置和索引考虑完了，该是要考虑每个顶点的纹理坐标的问题了。
+
+要给每个顶点设UV必须用到.Gridinfo文件中的信息，该文件中定义了每一个格子对应的纹理信息。
+
+具体的文件格式可参考，我在这就不赘述了。
+
+http://www.cppblog.com/mybios/archive/2009/07/26/91267.html 
+
+此处是正解，其他地方似乎多多少少都有错，特别是op=8的时候，要注意是与对角线两边的两个点（不是对角线上的点）从上面复制到下面。 
+
+如图1应该是将左上角的顶点纹理坐标复制到右下角 
+
+图2应该是将右上角的纹理坐标复制到左下角。          
+
+ 
+
+        图1                   图2
+
+但还有一处我有不同，op=4的时候，我觉得应该是顺时针转90度，测试下来似乎没问题。 
+
+这是我的根据op操作UV坐标的代码，op=4的时候我貌似确实是在顺时针转吧……
+
+void changeGridInfoUV( AutoTexCoord& leftTop, AutoTexCoord& rightTop, AutoTexCoord& leftBottom, AutoTexCoord& rightBottom, uchar state, bool bIndex )
+{
+    //0 不变
+    //1 图片水平翻转
+    //2 图片垂直翻转
+    //4 顺时针旋转度
+    //8 对角线上方顶点纹理坐标复制到对角线下方顶点。（与对角线垂直的两个顶点）
+    uchar res1 = state&1;
+    uchar res2 = state&2;
+    uchar res3 = state&4;
+    uchar res4 = state&8;
+
+    if( res1 != 0 )
+    {
+        leftTop.Exchange( rightTop );
+        leftBottom.Exchange( rightBottom );
+    }
+
+    if( res2 != 0 )
+    {
+        leftTop.Exchange( leftBottom );
+        rightTop.Exchange( rightBottom );
+    }
+
+    if( res3 != 0 )
+    {
+        leftTop.Exchange( rightTop );
+        leftBottom.Exchange( rightTop );
+        rightBottom.Exchange( rightTop );
+    }
+
+    if( res4 != 0 )
+    {
+        // 非正常索引
+        if( bIndex ) {
+            (leftBottom.setX( rightTop.getX) );
+            leftBottom.setY( rightTop.getY() );
+        }
+        // 正常索引
+        else {
+            rightBottom.setX( leftTop.getX() );
+            rightBottom.setY( leftTop.getY() );
+        }
+    }
+}读取场景环境与模型
+ 
+
+先阶段我读取了一部分场景，包括环境和一些模型，粒子等部分还没看，所以这个场景是不完整的，不过大概的轮廓都出来了。
+
+读取场景其实就是用TinyXML读取.Scene中的各种XML项，然后根据读取的数据创建相应的场景节点，或设置相应的场景环境，如雾，skydome等。具体代码下载附件看吧，有点无聊，都是switch-case语句。但有一点一定要注意，在读取资源前一定要先调用一个函数setlocale( LC_CTYPE, "" );不然中文路径或文件名的.mesh文件是读不了的。地形和场景都搞定了，可以看看结果了！然而，悲剧出现了！远景的效果图，很明显，地形一格一格像有裂缝一样……
+
+ 
+
+近处的效果图， 近了以后，就没地形的裂缝了……
+
+ 
+
+ 
+
+地形裂缝问题
+问了一下我的一个学长，自己也思考些时间。估计是由于是用的atlas texture, 然后一定距离后的mipmap和texture filtering，产生了裂缝的问题。 
+
+通过附件中的《Improve Batching Using Texture Atlases 》在Applying Texture Filtering To Atlases节可以看讨论到texture filtering对texture atlas造成的影响，但是解决方案只是理论上的，并没有实现，一个是写shader,在不同的mipmap下调整纹理坐标，另一个是预留纹理，就是在已有纹理上加一圈和边缘相同的像素。文章中还提到：enabling anisotropic filtering minimizes these errors，我试了一下，设置了filtering anisotropic ， 并且将anisotropic_max 设为最大，结果却是略有好转，但帧率损失了50fps左右… 也许是我的显卡太水了？我最后还是没采用这个解决方案。
+
+
+我最后的解决方案是 
+
+1,手动创建纹理的时候，设置其mipmap的级别最多为3，这样就不会有更高级别的mipmap，导致更严重的失真。 
+
+2,手动创建mipmap，而不是让其自动生成。比如原来是1024*1024大小的贴图，1级mipmap的大小应该为512*512，默认它是自动生成的，我设为手动生成，先把个小贴图缩小为50%，再把他们组成一张512x512的贴图作为原来的贴图的mipmap,一次类推手动生成3层mipmap.这样情况稍微有了点改善。 
+
+3,小贴图合成大贴图之前，将他们统一resize到256*256的大小，在组合成大贴图，这样后感觉裂缝问题好转了不少。 
+
+4,预留纹理坐标，虽然天龙八部开始就预留了纹理坐标，可以.Terrain文件中的纹理坐标很多都不是绝对的0.0f 0.25f 0.5f 等，都是一些 0.2480469 ，0.00390625，0.4960938等，我不知道它本是出于什么原因。但我用了这样的坐标还是不行，还是要把它设地更加靠内才能避免裂缝。 
+
+所以读取纹理坐标的时候加上了一个fixFloat的过程，这个过程很不科学，但我试了一下似乎有点用处就用上了。
+
+static void fixFloat( float& f )
+{
+    if( f < 0.01f )
+        f = 0.005f;
+    else if( f > 0.24f && f < 0.25f )
+        f = 0.245f;
+    else if( f > 0.25f && f < 0.26f )
+        f = 0.255f;
+    else if( f > 0.49f && f < 0.50f )
+        f = 0.495f;
+    else if( f > 0.5f && f < 0.51f )
+        f = 0.505f;
+    else if( f > 0.74f && f < 0.75f )
+        f = 0.745f;
+    else if( f > 0.75f && f < 0.76f )
+        f = 0.755f;
+    else if( f > 0.99f )
+        f = 0.995f;
+}  
+
+这样也在一定程度上改善了裂缝的问题，但有的贴图看上去会不太吻合，但总比裂缝好。 
+
+随后地形基本上看不出有裂缝了，但还是有一点痕迹。
+
+ 
+
+
+
+这个地形裂缝的问题困扰了我许久，最后的解决方案我也觉得不甚满意，不知道有哪位有好点的解决方案请告诉我。
+
+ 
+
+代码下载：（包含修改过的ETM和一个天龙八部的场景Demo代码）  操作方式：WSAD上下左右平移，按住鼠标中间滚轮移动鼠标壳转换摄像机角度。
+
+两篇引用到的文章下载
+
+注：
+
+由于大小问题大部分资源文件,静态库都未包含，所以若要编译请自行添加Ogre自带的一些资源文件，静态库和TTLB的资源文件,并可能需要修改项目的一些路径设置。TTLB资源文件可由提取工具从游戏中提取。
+
+bin/Release文件夹下有可执行文件及其所需的动态库，包含了所需要的资源后应该就可以运行Demo。
+所需要的资源有：shaolin场景所需要的.mesh文件(media/TTLB/model)及其对应的纹理(media/TTLB/material/textures)，地形贴图文件(media/TTLB/brush)。
+
+Temp文件夹中有all.material文件，是所有模型的材质，现在的新版本TTLB中是加密的，建议不要加到资源目录中，不然载入很慢，可以挑要用到的新建一个材质文件。media/TTLB/material/scripts中已有少林场景要用到的材质文件。
+
+ 
+
+完整带资源版本下载( TTLBSceneDemo.rar 162.12M )  (提取码 083b253e) 
+
+注：
+
+带全部所需美术资源，debug和release文件夹下有所有需要的动态库和可执行文件，放在QQ文件中转站，估计一个星期后就没了~
+
+ 
+
+已经不行了，只能下载⑦次，太万恶了，要的留个QQ邮箱吧，发邮件应该不限制的吧。
+
+
+ 
+
+最近搞毕业的事情太忙，实在不好意思，很多留言都没回，我的QQ附件太久没动，早就过期了，现在也暂时没有可用版本，要的话找以前留过言的人要吧....
+
+http://www.cnblogs.com/syqking/archive/2009/10/20/1586993.html
