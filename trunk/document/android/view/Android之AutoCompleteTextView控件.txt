@@ -1,0 +1,103 @@
+java代码：
+
+< ?xml version="1.0" encoding="utf-8"? >
+
+< LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+android:orientation="vertical"
+
+android:layout_width="fill_parent"
+
+android:layout_height="fill_parent"
+
+>
+
+
+
+< TextView
+
+android:layout_width="fill_parent"
+
+android:layout_height="wrap_content"
+
+android:text="@string/hello"
+
+/ >
+
+
+
+< AutoCompleteTextView
+
+android:id="@+id/autotext"
+
+android:layout_width="fill_parent"
+
+android:layout_height="wrap_content"
+
+android:completionThreshold="1"
+
+>
+
+< /AutoCompleteTextView >
+
+< /LinearLayout >
+复制代码
+
+       Android:completionThreshold="1" 至少输入几个字符，它才会具有自动提示的功能
+
+java代码：
+
+package eoe.demo;
+
+
+
+import android.app.Activity;
+
+import android.os.Bundle;
+
+import android.widget.ArrayAdapter;
+
+import android.widget.AutoCompleteTextView;
+
+
+
+public class ProActivity extends Activity {
+
+private final String[] data={
+
+"Afghanistan", "Albania", "Algeria", "American Samoa", "Andorra",
+
+"Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina"
+
+};
+
+
+
+@Override
+
+public void onCreate(Bundle savedInstanceState) {
+
+super.onCreate(savedInstanceState);
+
+setContentView(R.layout.main);
+
+AutoCompleteTextView m_autotext=(AutoCompleteTextView)findViewById(R.id.autotext);
+
+
+
+// 数组适配器，它的作用就是一个数组和AutoCompleteTextView 之间的桥梁，它可以将数组里边定义的数据
+
+
+
+//一一对应的显示在AutoCompleteTextView 里边。三个参数的基本意思是 1,上下文2,布局模板3，数据
+
+
+
+ArrayAdapter adapter=new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, data);
+
+m_autotext.setAdapter(adapter);
+
+}
+
+}
+http://www.eoeandroid.com/thread-93693-1-1.html
