@@ -1,0 +1,245 @@
+在做C++的项目中发现，由于用惯了c#的lock（）{}和java的Synchronize（）｛｝，windows自带的临界区，互斥量，内核事件，信号量用起来不太习惯，于是打算自己在vc++中封装一个类似的东东。封装这个我决定采用一个临界区来做，最终的形式如下： 
+synchronize(object) 
+{
+ //....无论此处是否发生异常，object都能被释放掉。和c#的lock一样。
+}
+不多说，开始代码。先定义一个Mutex类
+class Mutex
+{
+public:
+    Mutex(void);
+    ~Mutex(void);
+    void Lock();
+    void UnLock();
+private:
+    CRITICAL_SECTION m_criticalSection;
+};
+实现如下
+Mutex.cpp文件
+#include "Mutex.h"
+
+Mutex::Mutex(void)
+{
+    InitializeCriticalSection(&m_criticalSection);
+}
+
+Mutex::~Mutex(void)
+{
+    DeleteCriticalSection(&m_criticalSection);//保证对象被析构时候能够删除临界区
+}
+
+void Mutex::Lock()
+{
+     EnterCriticalSection(&m_criticalSection);
+}
+
+void Mutex::UnLock()
+{
+    LeaveCriticalSection(&m_criticalSection);
+}
+在写一个Lock类来包装
+头文件文件
+//为了方便把头文件定义到了Mutex.h文件里面去了，修改Mutex.h如、//下：
+#define synchronized(M)  for(Lock M##_lock = M; M##_lock; M##_lock.SetUnlock())//这句话后面会用到
+
+class Mutex
+{
+public:
+    Mutex(void);
+    ~Mutex(void);
+    void Lock();
+    void UnLock();
+private:
+    CRITICAL_SECTION m_criticalSection;
+};
+
+class Lock
+{
+public:
+    Lock(Mutex &mutex);
+    ~Lock(void);
+    void SetUnlock();
+    operator bool () const;
+private:
+    Mutex &m_mutex;
+    bool m_locked;
+};
+
+Lock类的实现：Lock.cpp文件
+Code
+#include "Mutex.h"
+
+Lock::Lock(Mutex &mutex): m_mutex(mutex), m_locked(true)
+{
+    m_mutex.Lock();
+}
+
+Lock::~Lock(void)
+{/*一定要在析构函数中解锁，因为不管发生什么，只要对象离开他的生命周期（即离开大括号），都会调用其析构函数*/
+     m_mutex.UnLock();
+}
+
+void Lock::SetUnlock()
+{
+     m_locked = false;
+}
+
+Lock::operator bool() const
+{
+    return m_locked;
+
+}
+到这里算是基板上告一段落了，你可以这么用。
+Mutex _mutex;
+{
+Lock lock(_mutex);
+//...在这里同步
+}
+但还差一点点，我要的目标是synchronize（）｛.....｝
+简单！！！注意Mutex.h文件里面的宏，没错！就他了！！！ 
+#define synchronized(M)  for(Lock M##_lock = M; M##_lock; M##_lock.SetUnlock())
+大功告成！！！
+来测试下
+实际测试
+#include "Mutex.h"
+
+Mutex mutex1;//我的互斥量
+into thread_count = 0;
+DWORD CALLBACK thread_proc(LPVOID params)
+{
+    for(int i = 0; i < 10; ++i)
+    {
+            synchronized(mutex1)//这里同步！
+            {
+                for(char c = 'A'; c <= 'Z'; ++c)
+                {
+                    printf("%c",c);
+                    Sleep(2);
+                }
+                printf("\n");
+            }
+    }
+    thread_count--;
+    return 0;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+    thread_count = 4;
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    while (thread_count) 
+        Sleep(0);
+    getchar();
+    DeleteCriticalSection(&g_cs);
+    return 0;
+
+｝
+
+
+输出：
+ABCD...........Z
+ABCD............Z
+ABCD...........Z
+ABCD............Z
+ABCD...........Z
+ABCD............Z
+......................
+
+
+完美同步！
+
+
+      
+希望天一直是蓝的，真的很美......
+标签: c++, 同步
+绿色通道：好文要顶关注我收藏该文与我联系 
+vieri122
+关注 - 3
+粉丝 - 1+加关注10(请您对文章做出评价)« 博主前一篇：ip tcp udp mpeg4头结构的定义
+» 博主后一篇：Windows 临界区，内核事件，互斥量，信号量。
+« 首页前一篇：.NET使用OpenSSL生成的pem密钥文件(增加size为2048的密钥转换)【做电子商务的朋友可能需要】
+» 首页后一篇：qq四国军旗2.1 beat03 builde018记牌器开发思路（三）
+
+posted @ 2009-09-10 14:15 vieri122 阅读(1688) 评论(10) 编辑 收藏 
+评论
+1646195
+　回复　引用　查看　   #1楼2009-09-10 15:46 | amingo       怎么把文章发布到博客园首页？？？？
+
+　回复　引用　查看　   #2楼2009-09-10 15:52 | 别爱上哥，哥只是个传说！       留抓
+
+　回复　引用　查看　   #3楼[楼主]2009-09-10 15:54 | vieri122       引用amingo：怎么把文章发布到博客园首页？？？？
+随笔页面有个选项 可以让你选择是否把文章发布到首页!
+
+　回复　引用　   #4楼2009-09-10 18:02 | 问[未注册用户] 出现异常是怎么处理的？
+
+　回复　引用　查看　   #5楼2009-09-10 19:02 | amingo       什么选项引用vieri122：
+引用amingo：怎么把文章发布到博客园首页？？？？
+随笔页面有个选项 可以让你选择是否把文章发布到首页!
+什么选项
+
+　回复　引用　查看　   #6楼[楼主]2009-09-11 09:07 | vieri122       @问
+出现异常会自动释放锁的。因为C++的原理即使发生异常，也会调用对象的析构函数，这就是我为什么在析构函数里面释放锁的原因。
+
+　回复　引用　查看　   #7楼2009-09-11 20:07 | 别爱上哥，哥只是个传说！       给个DEMO,上代码才是王道 
+
+　回复　引用　查看　   #8楼2009-09-11 21:04 | OwnWaterloo       思想不错， 如果能无代价的实现：
+synchronize (mutex) {
+}
+就是一种值得提倡的技巧。
+可事实并不是这样：
+Lock 无端的添加了scalar test语意，以及m_locked。
+define synchronize(M) for ... 会有多余的2次测试以及1次函数调用。
+
+
+{
+Lock g(mutex);
+// work
+}
+在C++中，这已经是意图非常清晰的代码。
+这不是C#或者java，没有太大必要模拟出：模拟出：
+
+lock (mutex) {
+// work
+}
+
+synchronized(mutex) {
+// work
+}
+
+
+使用C++就应该按C++的方式， 而不是C#或者java的方式。
+除了lock和synchronized， 至少还体现在另外2方面：
+1. Mutex缺少合理的复制与赋值语意上。
+按"值"还是按"引用"使用object，是由客户代码决定，而不是由class的设计者决定。
+Mutex并不总是按引用语意使用， 且C++暂时没有垃圾收集， 所以复制、赋值语意得正确。
+
+2. 可用标识符集合
+我不知道C#和java语言中，对标识符具体有什么规定。
+但在C/C++中， 以下划线开头的标识符都是保留的 —— 虽然某些经典的书籍在这方面都犯规了（经典的C/C++书籍中会提及这个问题）。
+不要以为这些保留标识符会永远被保留， _Bool, _Complex, _LongLong已经出现了。 难保以后不会出现更多。
+避免的方式很简单， 不使用_mutex， 改为mutex_或者别的即可。
+
+
+
+多线程相关：
+使用vc++创建线程应该选择调用_beginthreadex函数(process.h)而不是CreateThread函数。
+
+
+等待、直到线程终止的最好方式是WaitForSingleObject；等待多个则使用WaitForMultipleObjects。
+
+
+如果使用计数，而不是WaitFunctions， 也应该使用其他合理的同步策略。
+thread_count--; 并不是原子的， 也不在synchronize的保护之中。
+while (thread_count) 也有可能被优化成死循环。为了确定没有被优化为死循环，每次都去看输出的汇编代码可不是省心的事。
+
+btw： 这里的模拟出的synchronized和C#中真正的lock还有java中的synchronized语意并不相同？ 是吗？
+这个模拟实现中， 锁和被锁的对象是分离的。
+
+　回复　引用　查看　   #9楼[楼主]2009-09-14 09:00 | vieri122       @别爱上哥，哥只是个传说！
+文章的代码就是所有的代码了！
+
+　回复　引用　查看　   #10楼[楼主]2009-09-14 17:07 | vieri122       @OwnWaterloo
+http://www.cnblogs.com/vieri122/archive/2009/09/10/1564003.html

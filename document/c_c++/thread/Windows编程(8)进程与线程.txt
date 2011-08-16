@@ -1,0 +1,1550 @@
+一. 进程与线程
+1. 进程
+
+ (1). 进程是资源的申请,调度和独立运行的单位,每个进程拥有自己独立的内存地址,
+
+ (2). 进程是由两部分组成:
+
+      1.内核对象,系统使用内核对象来管理进程,并且内核对象也是系统用来存放进程的统计信息的地方
+
+      2.地址空间,它包含了所有可执行的模块或DLL模块的代码和数据,还包含了动态分配的内存空间,如线程堆栈和堆分配空间
+
+ 
+
+2. 线程
+
+  (1). 线程的组成
+
+       1.线程的内核对象,系统使用其来管理线程以及存放线程的统计信息
+
+       2.线程堆栈,用于维护线程执行时代码的所有参数和局部变量
+
+  (2). 线程只有一个内核对象和一个线程堆栈,保存的记录也少,需要的内存空间也少
+
+  (3). 系统会为线程分配一定的CPU时间,称为时间片,系统通过一种循环为线程分配时片,
+
+  线程只能在自己的时间片内运行,所以若是多个CPU的话,多个线程可以同时运行,互不影响.若是单个CPU,则线程之间交互循环运行
+
+ 
+
+3. 进程与线程的关系与区别
+
+  (1). 进程不执行任何东西,进程是线程的容器,每个进程必须有一个线程,线程是在进程环境中创建的,每创建一个线程,系统会从进程的内存地址空间中分配一定的内存空间给线程,供线程的堆栈使用
+
+  (2). 要时进程完成某项工作时,必须由在该进程中运行的线程完成,线程负责执行进程中的内存地址空间中的代码
+
+  (3). 当一个进程创建时,同时也会创建第一个线程,称为主线程,一个进程可以拥有多个线程,线程之间运行不会互相影响
+
+  (4). 线程的创建总是在某个进程环境中创建,新的线程可以访问进程中的内核对象的所有句柄以及进程中所有内存,还有可以访问在同一个进程中其他线程的堆栈内存,使得多个线程之间的通信更加容易
+
+  (5). 创建多个线程而不创建多个进程来完成某项工作,是为了提高效率,多个线程之间的访问比多个进程之间的访问更加容易,而且线程所需要的开销(如内存)比进程小,所以这样还可以节省系统资源
+
+ 
+
+二.实现部分
+1.创建线程函数
+
+  HANDLECreateThread(
+
+                                    LPSECURITY_ATTRIBUTESlpThreadAttributes, //一般为空使用缺省值
+
+                                   DWORD dwStackSize,  //堆栈的大小,
+
+                                   LPTHREAD_START_ROUTINElpStartAddress, //线程函数
+
+                                    LPVOIDlpParameter,  //指定一个结构参数指针传给线程函数
+
+                                  DWORDdwCreationFlags, //创建线程标记
+
+                                 LPDWORDlpThreadId  //接收线程的标识(ID),若为0,则不使用该标识
+
+                            );
+
+ 
+
+使用CreateProcess()将创建一个进程和一个主线程,而使用CreateThread()是在所在的进程
+
+的主线程的基础上创建新的线程,介绍一下CreateThread()函数:
+
+  (1).第一个参数: 在现在的系统中一般为NULL,使用缺省值
+
+  (2).第二个参数: 给线程堆栈的大小,任若为0,系统会根据实际情况动态增长堆栈大小
+
+  (3).第三个参数: 线程函数,格式要为DWORD WINAPI ThreadProc(LPVOID lpParameter);函数名字可以改,函数的返回类型以及参数类型不可以修改
+
+  (4).第四个参数: 向线程传递的参数指针,若是多个参数可以使用结构体传递
+
+  (5).第五个参数: 线程的标记,可以使用CREATE_SUSPENDED,则线程创建成功后挂起等待DWORD ResumeThread(HANDLE hThread  // handle to thread);这个函数才能执行,若为NULL,则创建线程成功后马上执行线程
+
+  (6).第六个参数: 线程的标识,相当于线程的ID,这是用于接收该函数创建线程成功后返回的标识,
+
+      若为NULL,则不使用该标识
+
+ 
+
+创建线程成功后返回一个句柄,如果用不到该句柄的话可以关闭句柄,使用BOOL CloseHandle( HANDLE hObject);函数,
+
+现在一般不推荐使用CreateThread()函数创建线程,不过这里只是使用这个函数学习线程的相关概念,推荐使用BeginThread()函数
+
+ 
+
+view plaincopy to clipboardprint?//要使用windows.h头文件   
+DWORD WINAPI MyThread1(LPVOID lpParameter); //线程函数的定义   
+//主函数(主线程)中   
+HANDLE hThread1;  
+hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0); //创建线程   
+//线程函数的实现   
+DWORD WINAPI MyThread1(LPVOID lpParameter)  
+{  
+    cout << "MyThread1线程在执行" << endl;  
+    return 0;  
+}  
+//要使用windows.h头文件
+DWORD WINAPI MyThread1(LPVOID lpParameter); //线程函数的定义
+//主函数(主线程)中
+HANDLE hThread1;
+hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0); //创建线程
+//线程函数的实现
+DWORD WINAPI MyThread1(LPVOID lpParameter)
+{
+	cout << "MyThread1线程在执行" << endl;
+	return 0;
+}
+ 
+
+ 
+
+具体的代码....
+
+view plaincopy to clipboardprint?<span style="color:#000000;">//VS2008编译器   
+  
+#include "stdafx.h"   
+#include <Windows.h>   
+#include <iostream>   
+using namespace std;  
+  
+  
+DWORD WINAPI MyThread(LPVOID lpParameter);//声明线程函数   
+  
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    HANDLE hThread1; //句柄   
+    hThread1 = CreateThread(NULL,0,MyThread,NULL,0,0);//主线程中创建新的线程   
+    CloseHandle(hThread1); //不使用线程句柄,关掉句柄   
+      
+    cout << "主线程在运行" << endl;  
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread(LPVOID lpParameter)  
+{  
+    cout << "Thread1线程在执行" << endl;  
+    return 0;  
+}</span>  
+<span style="color:#000000;">//VS2008编译器
+
+#include "stdafx.h"
+#include <Windows.h>
+#include <iostream>
+using namespace std;
+
+
+DWORD WINAPI MyThread(LPVOID lpParameter);//声明线程函数
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread1; //句柄
+	hThread1 = CreateThread(NULL,0,MyThread,NULL,0,0);//主线程中创建新的线程
+	CloseHandle(hThread1); //不使用线程句柄,关掉句柄
+	
+	cout << "主线程在运行" << endl;
+	return 0;
+}
+
+DWORD WINAPI MyThread(LPVOID lpParameter)
+{
+	cout << "Thread1线程在执行" << endl;
+	return 0;
+}</span>view plaincopy to clipboardprint?<span style="color:#000000;"></span>   
+<span style="color:#000000;"></span>  
+ 
+
+执行效果....
+
+ 
+
+
+
+ 
+
+       执行的效果出现多种情况,我的电脑是双核4线程的i3的CPU,应该可以实现真正的同时运行这两个线程,为什么出现这个多种情况?
+
+我个人的观点认为因为当主线程结束时,其他线程一样会结束并退出程序,可能是有时主线程结束时子线程还没执行,有时候主线程
+
+结束时子线程已经执行,这可能跟系统与CPU的关系有关.....(牛人帮忙解释一下^_^)
+
+ 
+
+不过下面这个结果可以证明是同时执行的,因为同时输出,所以字母之间互相掺合造成了乱码,并不是我们所想得结果...
+
+ 
+
+三.互斥对象的使用
+先看一下一个没有使用互斥对象的例子,两个线程共同对一个资源操作
+
+ 
+
+view plaincopy to clipboardprint?//VS2008编译器   
+  
+#include "stdafx.h"   
+#include <Windows.h>   
+#include <iostream>   
+using namespace std;  
+  
+int  Count = 100;//一个全局的资源   
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数   
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数   
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    HANDLE hThread1; //句柄   
+    HANDLE hThread2;  
+    hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程   
+    hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程   
+    CloseHandle(hThread1); //不使用线程句柄,关掉句柄   
+    CloseHandle(hThread2); //不使用线程句柄,关掉句柄   
+          
+    Sleep(2000);//让主线程休眠,让线程队列中的其他线程执行   
+  
+    //cout << "主线程在运行" << endl;   
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread1(LPVOID lpParameter)  
+{  
+    //cout << "Thread1线程在执行" << endl;   
+    while (TRUE)  
+    {  
+        if (Count > 0)  
+        {  
+            cout << "MyThread1 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+    }  
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread2(LPVOID lpParameter)  
+{  
+    while (TRUE)  
+    {  
+        if (Count > 0)  
+        {  
+            cout << "MyThread2 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+    }  
+    return 0;  
+}  
+//VS2008编译器
+
+#include "stdafx.h"
+#include <Windows.h>
+#include <iostream>
+using namespace std;
+
+int  Count = 100;//一个全局的资源
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread1; //句柄
+	HANDLE hThread2;
+	hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程
+	hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程
+	CloseHandle(hThread1); //不使用线程句柄,关掉句柄
+	CloseHandle(hThread2); //不使用线程句柄,关掉句柄
+	   	
+	Sleep(2000);//让主线程休眠,让线程队列中的其他线程执行
+
+	//cout << "主线程在运行" << endl;
+	return 0;
+}
+
+DWORD WINAPI MyThread1(LPVOID lpParameter)
+{
+	//cout << "Thread1线程在执行" << endl;
+	while (TRUE)
+	{
+		if (Count > 0)
+		{
+			cout << "MyThread1 线程:" << Count-- << endl;
+		}
+		else
+			break;
+	}
+	return 0;
+}
+
+DWORD WINAPI MyThread2(LPVOID lpParameter)
+{
+	while (TRUE)
+	{
+		if (Count > 0)
+		{
+			cout << "MyThread2 线程:" << Count-- << endl;
+		}
+		else
+			break;
+	}
+	return 0;
+} 
+
+ 
+
+
+
+ 
+
+很有多种多样的重复结果,主要因为线程在自己的时间片里工作,当时间到以后该线程就结束,所以造成这样重复的结果
+
+上面的例子分析,根据我电脑的CPU,有时这两个线程同时输出,同时自减,还有一种情况是线程Thread1中执行到if()语句的判断
+
+结束后该线程的时间到,该线程结束,另外一个线程Thread2接着执行,这时候Count的值发生了改变,当Thread1开始执行的时候接着
+
+是从cout语句开始执行,这样输出的结果可能会有0或出现执行语句断层的现象,所以为了线程之间互斥访问某个对象,可以使用互斥对象,
+
+
+
+1.互斥对象属于内核对象，它能够确保线程拥有对单个资源的互斥访问权
+
+2.互斥对象是由一个使用数量值.一个ID和一个计算器组成
+
+3.ID号标识的是系统的进程的哪个线程当前用于该对象,而计算器则表示该线程拥有互斥对象的次数
+
+4.使用互斥对象是为了保护一个资源不被多个线程访问,可以通过保护一段执行语句来实现
+
+
+5.创建互斥对象函数  
+
+HANDLE CreateMutex(
+
+       LPSECURITY_ATTRIBUTESlpMutexAttributes,  // 使用缺省值
+
+       BOOLbInitialOwner,                   // TRUE:创建互斥对象的线程拥有该互斥对象
+
+                                                         //FALSE:创建互斥对象的线程没有拥有该互斥对象
+
+       LPCTSTRlpName                      //互斥对象的名字,NULL就是匿名对象
+
+       );
+
+
+6.使用互斥对象
+
+DWORD WaitForSingleObject( HANDLE hHandle, DWORDdwMilliseconds );
+
+第一个参数是句柄
+
+第二个参数定时时间间隔
+
+       WaitForSingleObject函数用来检测hHandle事件的信号状态，在某一线程中调用该函数时，线程暂
+
+时挂起，如果在挂起的dwMilliseconds毫秒内，线程所等待的对象变为有信号状态，则该函数立即
+
+返回；如果超时时间已经到达dwMilliseconds毫秒，但hHandle所指向的对象还没有变成有信号状
+
+态，函数照样返回。参数dwMilliseconds有两个具有特殊意义的值：0和INFINITE。若为0，则该
+
+函数立即返回；若为INFINITE，则线程一直被挂起，直到hHandle所指向的对象变为有信号状态
+
+时为止.
+
+      当执行该函数后hHandle所指向的对象变为无信号状态,直到该线程的互斥对象被释放或者该线程结束
+
+系统才会让互斥对象有信号,别的线程的WaitForSingleObject等待待有信号后才执行
+
+
+7.释放互斥对象
+
+BOOL ReleaseMutex(
+
+  HANDLEhMutex   // handle to mutex
+
+);
+
+释放后互斥对象才有信号,并且互斥对象的计算器也会自减1,
+
+WaitForSingleObject函数与ReleaseMutex()函数保护一段代码,这段代码必须执行完后别的线程才能执行,否则别的线程
+
+处于等待状态
+
+ 
+
+view plaincopy to clipboardprint?//VS2008编译器   
+  
+#include "stdafx.h"   
+#include <Windows.h>   
+#include <iostream>   
+using namespace std;  
+  
+HANDLE hMutex;  
+int  Count = 200;//一个全局的资源   
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数   
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数   
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    HANDLE hThread1; //句柄   
+    HANDLE hThread2;  
+    hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程   
+    hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程   
+    CloseHandle(hThread1); //不使用线程句柄,关掉句柄   
+    CloseHandle(hThread2); //不使用线程句柄,关掉句柄   
+    hMutex = CreateMutex(NULL,FALSE,NULL); //创建一个主线程没有该对象的匿名互斥对象   
+      
+    Sleep(3000);//让主线程休眠,让线程队列中的其他线程执行   
+  
+      
+  
+    //cout << "主线程在运行" << endl;   
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread1(LPVOID lpParameter)  
+{  
+    //cout << "Thread1线程在执行" << endl;   
+    while (TRUE)  
+    {   
+        WaitForSingleObject(hMutex,INFINITE); //使用互斥对象   
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread1 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+        ReleaseMutex(hMutex);//释放互斥对象   
+    }  
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread2(LPVOID lpParameter)  
+{  
+    while (TRUE)  
+    {  
+        WaitForSingleObject(hMutex,INFINITE);  
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread2 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+        ReleaseMutex(hMutex);  
+    }  
+    return 0;  
+}  
+//VS2008编译器
+
+#include "stdafx.h"
+#include <Windows.h>
+#include <iostream>
+using namespace std;
+
+HANDLE hMutex;
+int  Count = 200;//一个全局的资源
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread1; //句柄
+	HANDLE hThread2;
+	hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程
+	hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程
+	CloseHandle(hThread1); //不使用线程句柄,关掉句柄
+	CloseHandle(hThread2); //不使用线程句柄,关掉句柄
+	hMutex = CreateMutex(NULL,FALSE,NULL); //创建一个主线程没有该对象的匿名互斥对象
+   	
+	Sleep(3000);//让主线程休眠,让线程队列中的其他线程执行
+
+	
+
+	//cout << "主线程在运行" << endl;
+	return 0;
+}
+
+DWORD WINAPI MyThread1(LPVOID lpParameter)
+{
+	//cout << "Thread1线程在执行" << endl;
+	while (TRUE)
+	{ 
+		WaitForSingleObject(hMutex,INFINITE); //使用互斥对象
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread1 线程:" << Count-- << endl;
+		}
+		else
+			break;
+		ReleaseMutex(hMutex);//释放互斥对象
+	}
+	return 0;
+}
+
+DWORD WINAPI MyThread2(LPVOID lpParameter)
+{
+	while (TRUE)
+	{
+		WaitForSingleObject(hMutex,INFINITE);
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread2 线程:" << Count-- << endl;
+		}
+		else
+			break;
+		ReleaseMutex(hMutex);
+	}
+	return 0;
+} 
+
+ 
+
+加了互斥对象保护资源后就可以正常执行了....
+
+
+互斥对象的计算器的应用
+
+当使用CreateMutex()创建一个该线程也拥有其权限的互斥对象时(第二个参数为TRUE时)或使用WaitForSingleObject()函数
+
+时,互斥对象的值都会自动加1,要使用ReleaseMutex()函数释放互斥对象,只要当计算器为0时互斥对象才有信号,别的线程才能执行
+
+不然该线程一直是等待状态
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+四.事件对象
+1.组成:属于内核对象
+
+ (1).一个使用记数
+
+ (2).一个用于指明该事件是人工重置的事件还是自动重置事件的布尔值
+
+ (3).一个用于标识该事件是处于通知状态还是未通知状态
+
+2.类型:
+
+ (1).人工重置事件,等到事件得到通知时,等待该事件的所有子线程都可以调度,都可以执行
+
+ (2).自动重置事件,等到该事件得到通知时,等待该事件的所有线程中只有一个子线程可以调度
+
+ 
+
+3.创建匿名事件对象
+
+HANDLE CreateEvent(
+
+ LPSECURITY_ATTRIBUTES lpEventAttributes, // SD
+
+  BOOLbManualReset,                       //reset type
+
+  BOOLbInitialState,                      //initial state
+
+  LPCTSTRlpName                           // object name
+
+);
+
+第一个参数:是指向SECURITY_ATTRIBUTES结构体的指针,一般为NULL,使用系统默认安全性
+
+第二个参数:事件类型,TRUE为人工重置事件,当等到线程中的事件对象时要使用ResetEvent()函数将事件对象置为非信号状态,若为FALSE,为自动重置事件,,当线程被释放时系统会自动将事件置为非信号状态
+
+第三个参数:初始化时事件的状态,若TRUE初始化为有信号状态,否则为非信号状态
+
+第四个参数:事件对象名字,若NULL为创建一个匿名的事件对象
+
+ 
+
+先看一下代码,后面的测试和验证都是在该代码的基础上修改......
+
+view plaincopy to clipboardprint?<span style="color:#000000;">//VS2008编译器   
+//事件对象   
+#include "stdafx.h"   
+#include <Windows.h>   
+#include <iostream>   
+using namespace std;  
+  
+  
+HANDLE  hEvent;  
+int  Count = 100;//一个全局的资源   
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数   
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数   
+  
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    HANDLE hThread1; //句柄   
+    HANDLE hThread2;  
+      
+    hEvent = CreateEvent(NULL,TRUE,FALSE,NULL); //创建一个人工重置的匿名事件对象,初始化为非信号   
+    //SetEvent(hEvent); //设置事件对象为有信号状态   
+  
+    hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程   
+    hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程   
+    CloseHandle(hThread1); //不使用线程句柄,关掉句柄   
+    CloseHandle(hThread2); //不使用线程句柄,关掉句柄   
+  
+  
+    cout << "主线程执行" << endl;  
+      
+    Sleep(3000);//让主线程休眠,让线程队列中的其他线程执行   
+     
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread1(LPVOID lpParameter)  
+{  
+      
+    while (TRUE)  
+    {   
+        WaitForSingleObject(hEvent,INFINITE);//使用事件对象,等待事件对象有信号,否则一直等待下去   
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread1 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+  
+    }  
+  
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread2(LPVOID lpParameter)  
+{  
+  
+    while (TRUE)  
+    {  
+        WaitForSingleObject(hEvent,INFINITE);//使用事件对象   
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread2 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+  
+    }  
+      
+    return 0;  
+}</span>  
+<span style="color:#000000;">//VS2008编译器
+//事件对象
+#include "stdafx.h"
+#include <Windows.h>
+#include <iostream>
+using namespace std;
+
+
+HANDLE  hEvent;
+int  Count = 100;//一个全局的资源
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread1; //句柄
+	HANDLE hThread2;
+	
+	hEvent = CreateEvent(NULL,TRUE,FALSE,NULL); //创建一个人工重置的匿名事件对象,初始化为非信号
+	//SetEvent(hEvent); //设置事件对象为有信号状态
+
+	hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程
+	hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程
+	CloseHandle(hThread1); //不使用线程句柄,关掉句柄
+	CloseHandle(hThread2); //不使用线程句柄,关掉句柄
+
+
+	cout << "主线程执行" << endl;
+	
+	Sleep(3000);//让主线程休眠,让线程队列中的其他线程执行
+   
+	return 0;
+}
+
+DWORD WINAPI MyThread1(LPVOID lpParameter)
+{
+	
+	while (TRUE)
+	{ 
+        WaitForSingleObject(hEvent,INFINITE);//使用事件对象,等待事件对象有信号,否则一直等待下去
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread1 线程:" << Count-- << endl;
+		}
+		else
+			break;
+
+	}
+
+	return 0;
+}
+
+DWORD WINAPI MyThread2(LPVOID lpParameter)
+{
+
+	while (TRUE)
+	{
+        WaitForSingleObject(hEvent,INFINITE);//使用事件对象
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread2 线程:" << Count-- << endl;
+		}
+		else
+			break;
+
+	}
+	
+	return 0;
+}</span> 
+
+ 
+
+hEvent =CreateEvent(NULL,TRUE,FALSE,NULL); //创建一个人工重置的匿名事件对象,初始化为非信号
+
+ 因为信号为非信号状态,所以所有子线程都处于等待状态,不执行,等到主线程结束所有子线程都结束
+
+ 
+
+
+
+ 
+
+可以使用SetEvent()函数将事件对象置为有信号状态
+
+hEvent = CreateEvent(NULL,TRUE,FALSE,NULL); //创建一个人工重置的匿名事件对象,初始化为非信号
+
+SetEvent(hEvent); //设置事件对象为有信号状态
+
+置为有信号状态后的执行结果....
+
+ 
+
+ 
+
+这个正表明了人工重置事件有信号时所有的子线程都可以调度,都可以执行,因为这时候事件对象是
+
+有信号状态,所以所有子线程的WaitForSingleObject都可以执行无需等待,可以使用ResetEvent()将事
+
+件置为非信号状态,系统不会自动将人工事件置为非信号状态,这样就可以有办法使用人工重置事件
+
+对代码的保护
+
+WaitForSingleObject(hEvent,INFINITE);//使用事件对象,等待事件对象有信号,否则一直等待下去
+
+ResetEvent(hEvent); //设置事件为非信号
+
+            ……………..
+
+        保护的代码段
+
+        ……………..
+
+SetEvent(hEvent); //执行完保护的代码后置事件为有信号以便其他子线程可以执行
+
+              
+
+不过不推荐这种办法,这种办法还是有问题,现在一般都是使用自动重置事件的方法保护代码
+
+ 
+
+ 
+
+若是自动重置事件,当事件对象有信号时只有一个子线程可以调度,验证一下
+
+hEvent =CreateEvent(NULL,FALSE,FALSE,NULL); //创建一个自动重置的匿名事件对象,初始化为非信号
+
+SetEvent(hEvent); //设置事件对象为有信号状态
+
+
+
+ 
+
+       只有一个子线程执行,因为自动重置事件当一个子线程的WaitForSingleObject()函数结束时事件对象
+
+会被系统自动置为非信号状态,这样所有线程的WaitForSingleObject()函数一直处于等待状态造成相
+
+应的子线程无法执行下去,所以最后只有一个子线程执行一次循环,
+
+      使用上面的例子分析,MyThread2这个线程第一次执行了第一次循环后事件对象信号已经为非信号状态,轮到其他子线程执行时
+
+WaitForSingleObject()函数一直处于等待,该到本线程时, WaitForSingleObject()函数再次验证是否有
+
+信号,因为没有信号,所以本线程也处于等待,这样本线程也只执行了一次循环,
+
+       要想使用自动重置事件保护一段代码,则可以使用WaitForSingleObject()函数和SetEvent()函数将
+
+保护的代码保护起来, 
+
+WaitForSingleObject(hEvent,INFINITE);//使用事件对象
+
+.....................................
+
+保护的代码段
+
+.................................... 
+
+SetEvent(hEvent);
+
+执行效果.......
+
+
+
+ 
+
+ 
+
+4.可以创建一个有名字的事件对象,可以利用事件对象确保只有一个程序实例运行
+
+     当使用CreateEvent()函数创建一个有名字的事件对象时,如果这个名字已经存在,则会返回已经存
+
+在的事件对象句柄, GetLastError()函数将返回ERROR_ALREADY_EXISTS值,如果使用了CloseHandle()
+
+将事件对象的句柄关闭了或者程序退出了,则表示该事件对象已经不存在了.我测试时是使用了getchar()让程序暂停执行才测试出结果
+
+ 
+
+主函数的代码
+
+view plaincopy to clipboardprint?int _tmain(int argc, _TCHAR* argv[])  
+{  
+    HANDLE hThread1; //句柄   
+    HANDLE hThread2;  
+      
+    //hEvent = CreateEvent(NULL,TRUE,FALSE,NULL); //创建一个人工重置的匿名事件对象,初始化为非信号   
+    //hEvent = CreateEvent(NULL,FALSE,FALSE,NULL); //创建一个自动重置的匿名事件对象,初始化为非信号   
+    hEvent = CreateEvent(NULL,FALSE,FALSE,_T("MyEvent"));  
+    //创建一个自动重置的名字为"MyEvent"的事件对象,初始化为非信号   
+    if(hEvent)  
+    {  
+        if (ERROR_ALREADY_EXISTS == GetLastError())  
+        {  
+            cout << "这个程序已经运行" << endl;  
+            getchar();  
+            return 0;  
+        }  
+    }  
+    SetEvent(hEvent); //设置事件对象为有信号状态   
+  
+    hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程   
+    hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程   
+    CloseHandle(hThread1); //不使用线程句柄,关掉句柄   
+    CloseHandle(hThread2); //不使用线程句柄,关掉句柄   
+  
+  
+    cout << "主线程执行" << endl;  
+      
+    Sleep(3000);//让主线程休眠,让线程队列中的其他线程执行   
+        getchar(); //在这里暂停   
+    CloseHandle(hEvent); //将事件对象关闭   
+    return 0;  
+}  
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread1; //句柄
+	HANDLE hThread2;
+	
+	//hEvent = CreateEvent(NULL,TRUE,FALSE,NULL); //创建一个人工重置的匿名事件对象,初始化为非信号
+	//hEvent = CreateEvent(NULL,FALSE,FALSE,NULL); //创建一个自动重置的匿名事件对象,初始化为非信号
+	hEvent = CreateEvent(NULL,FALSE,FALSE,_T("MyEvent"));
+	//创建一个自动重置的名字为"MyEvent"的事件对象,初始化为非信号
+	if(hEvent)
+	{
+		if (ERROR_ALREADY_EXISTS == GetLastError())
+		{
+			cout << "这个程序已经运行" << endl;
+			getchar();
+			return 0;
+		}
+	}
+	SetEvent(hEvent); //设置事件对象为有信号状态
+
+	hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程
+	hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程
+	CloseHandle(hThread1); //不使用线程句柄,关掉句柄
+	CloseHandle(hThread2); //不使用线程句柄,关掉句柄
+
+
+	cout << "主线程执行" << endl;
+	
+	Sleep(3000);//让主线程休眠,让线程队列中的其他线程执行
+        getchar(); //在这里暂停
+	CloseHandle(hEvent); //将事件对象关闭
+	return 0;
+} 
+ 
+
+
+
+
+ 
+
+ 
+
+五.关键代码段(临界区)
+1. 关键代码段工作在用户方式下.
+
+2. 关键代码段是指一个小代码段,在代码能够执行前，它必须独占对某些资源的访问权。
+
+3. 建立的过程
+
+  (1). InitializeCriticalSection():初始化临界区对象
+
+  (2). EnterCriticalSection():等待临界区对象的所有权,如果所在的线程有了临界区对象的所有权这个函数将获得所有权并返回继续执行下去,否则一直等待
+
+  (3). LeaveCriticalSection():使用该函数释放该线程的临界区对象的所有权,以便其他线程可以获得临界区对象的所有权,其他线程才能执行,系统自动释放对象的所有权
+
+  (4).DeleteCriticalSection():删除没有被拥有的临界区对象
+
+
+ 
+
+view plaincopy to clipboardprint?//VS2008编译器   
+//关键代码段(临界区)                                                                                                               #include "stdafx.h"   
+#include <Windows.h>   
+#include <iostream>   
+using namespace std;  
+  
+  
+LPCRITICAL_SECTION MySection = new CRITICAL_SECTION;   
+  
+int  Count = 100;//一个全局的资源   
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数   
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数   
+  
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    HANDLE hThread1; //句柄   
+    HANDLE hThread2;      
+    InitializeCriticalSection(MySection); //初始化临界区     
+    hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程   
+    hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程   
+    CloseHandle(hThread1); //不使用线程句柄,关掉句柄   
+    CloseHandle(hThread2); //不使用线程句柄,关掉句柄   
+      
+    cout << "主线程执行" << endl;  
+      
+    Sleep(2000);//让主线程休眠,让线程队列中的其他线程执行   
+      
+    DeleteCriticalSection(MySection);//删除临界区   
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread1(LPVOID lpParameter)  
+{  
+     
+    while (TRUE)  
+    {   
+        EnterCriticalSection(MySection);//查看线程的临界区对象的所有权   
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread1 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+        LeaveCriticalSection(MySection);//释放所有权   
+          
+    }  
+  
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread2(LPVOID lpParameter)  
+{  
+     
+    while (TRUE)  
+    {  
+        EnterCriticalSection(MySection);  
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread2 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+        LeaveCriticalSection(MySection);  
+          
+    }  
+  
+    return 0;  
+}  
+//VS2008编译器
+//关键代码段(临界区)                                                                                                               #include "stdafx.h"
+#include <Windows.h>
+#include <iostream>
+using namespace std;
+
+
+LPCRITICAL_SECTION MySection = new CRITICAL_SECTION; 
+
+int  Count = 100;//一个全局的资源
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread1; //句柄
+	HANDLE hThread2;    
+	InitializeCriticalSection(MySection); //初始化临界区	
+	hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程
+	hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程
+	CloseHandle(hThread1); //不使用线程句柄,关掉句柄
+	CloseHandle(hThread2); //不使用线程句柄,关掉句柄
+	
+	cout << "主线程执行" << endl;
+	
+	Sleep(2000);//让主线程休眠,让线程队列中的其他线程执行
+	
+	DeleteCriticalSection(MySection);//删除临界区
+	return 0;
+}
+
+DWORD WINAPI MyThread1(LPVOID lpParameter)
+{
+   
+	while (TRUE)
+	{ 
+	    EnterCriticalSection(MySection);//查看线程的临界区对象的所有权
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread1 线程:" << Count-- << endl;
+		}
+		else
+			break;
+	    LeaveCriticalSection(MySection);//释放所有权
+        
+	}
+
+	return 0;
+}
+
+DWORD WINAPI MyThread2(LPVOID lpParameter)
+{
+   
+	while (TRUE)
+	{
+	    EnterCriticalSection(MySection);
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread2 线程:" << Count-- << endl;
+		}
+		else
+			break;
+	    LeaveCriticalSection(MySection);
+		
+	}
+
+	return 0;
+} 
+
+ 
+
+4.线程死锁
+
+  多个子线程之间互相等待临界区对象的所有权而造成所有子线程都处于等待状态,无法往下执行,
+
+在多线程技术中使用临界区时防止这种情况的发生
+
+ 
+
+view plaincopy to clipboardprint?//VS2008编译器   
+//线程死锁   
+#include "stdafx.h"   
+#include <Windows.h>   
+#include <iostream>   
+using namespace std;  
+  
+  
+LPCRITICAL_SECTION MySection1 = new CRITICAL_SECTION;   
+LPCRITICAL_SECTION MySection2 = new CRITICAL_SECTION;   
+  
+int  Count = 100;//一个全局的资源   
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数   
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数   
+  
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    HANDLE hThread1; //句柄   
+    HANDLE hThread2;      
+      
+    InitializeCriticalSection(MySection1); //初始化临界区    
+        InitializeCriticalSection(MySection2); //初始化临界区    
+  
+    hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程   
+    hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程   
+    CloseHandle(hThread1); //不使用线程句柄,关掉句柄   
+    CloseHandle(hThread2); //不使用线程句柄,关掉句柄   
+      
+    cout << "主线程执行" << endl;  
+      
+    Sleep(2000);//让主线程休眠,让线程队列中的其他线程执行   
+      
+    DeleteCriticalSection(MySection1);//删除临界区   
+    DeleteCriticalSection(MySection2);//删除临界区   
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread1(LPVOID lpParameter)  
+{  
+     
+    while (TRUE)  
+    {   
+            EnterCriticalSection(MySection1);//查看线程的临界区对象的所有权   
+            Sleep(1);  
+        EnterCriticalSection(MySection2);//查看线程的临界区对象的所有权   
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread1 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+            LeaveCriticalSection(MySection1);//释放所有权   
+        LeaveCriticalSection(MySection2);//释放所有权   
+          
+    }  
+  
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread2(LPVOID lpParameter)  
+{  
+     
+    while (TRUE)  
+    {  
+            EnterCriticalSection(MySection2);  
+        Sleep(1);  
+        EnterCriticalSection(MySection1);  
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread2 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+            LeaveCriticalSection(MySection1);  
+        LeaveCriticalSection(MySection2);  
+          
+    }  
+  
+    return 0;  
+}  
+//VS2008编译器
+//线程死锁
+#include "stdafx.h"
+#include <Windows.h>
+#include <iostream>
+using namespace std;
+
+
+LPCRITICAL_SECTION MySection1 = new CRITICAL_SECTION; 
+LPCRITICAL_SECTION MySection2 = new CRITICAL_SECTION; 
+
+int  Count = 100;//一个全局的资源
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread1; //句柄
+	HANDLE hThread2;    
+	
+	InitializeCriticalSection(MySection1); //初始化临界区	
+        InitializeCriticalSection(MySection2); //初始化临界区	
+
+	hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程
+	hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程
+	CloseHandle(hThread1); //不使用线程句柄,关掉句柄
+	CloseHandle(hThread2); //不使用线程句柄,关掉句柄
+	
+	cout << "主线程执行" << endl;
+	
+	Sleep(2000);//让主线程休眠,让线程队列中的其他线程执行
+	
+	DeleteCriticalSection(MySection1);//删除临界区
+	DeleteCriticalSection(MySection2);//删除临界区
+	return 0;
+}
+
+DWORD WINAPI MyThread1(LPVOID lpParameter)
+{
+   
+	while (TRUE)
+	{ 
+	        EnterCriticalSection(MySection1);//查看线程的临界区对象的所有权
+	        Sleep(1);
+		EnterCriticalSection(MySection2);//查看线程的临界区对象的所有权
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread1 线程:" << Count-- << endl;
+		}
+		else
+			break;
+	        LeaveCriticalSection(MySection1);//释放所有权
+		LeaveCriticalSection(MySection2);//释放所有权
+        
+	}
+
+	return 0;
+}
+
+DWORD WINAPI MyThread2(LPVOID lpParameter)
+{
+   
+	while (TRUE)
+	{
+	        EnterCriticalSection(MySection2);
+		Sleep(1);
+		EnterCriticalSection(MySection1);
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread2 线程:" << Count-- << endl;
+		}
+		else
+			break;
+	        LeaveCriticalSection(MySection1);
+		LeaveCriticalSection(MySection2);
+		
+	}
+
+	return 0;
+} 
+
+ 
+
+ 
+
+ 
+
+ 在上面的源代码中可以看到MyThread1线程函数与MyThread2线程函数使用EnterCriticalSection()函数查看线程的临界区对象的顺序不一样,
+
+MyThread1这个线程先获取临界区对象1的所有权,休眠一毫秒,结果执行了MyThread2线程获取了临界区对象2的所有权,接下来,MyThread线程
+
+要获取对象2的所有权,但对象2的所有权已经被MyThread2线程获取,所以MyThread1线程只能等待,而到MyThread2线程执行时要获取对象1的所有权,
+
+但对象1的所有权已经被MyThread1线程获取,所以MyThread2线程也只能等待,结果是两者都要等待,所以出现了线程死锁,所以所有的子线程都无法往下
+
+执行....
+
+ 
+
+六.信号量
+1. 信号量是用于对资源进行记数
+
+2. 有一个记数量,它包含
+
+一个最大资源数量,用于标识信号量能控制的最大资源数量
+
+一个是当前资源数量,用于标识还剩余的还可以控制资源的数量
+
+3. 信号量使用规则 
+
+(1). 如果当前资源的数量大于0，则发出信标信号。 
+
+(2). 如果当前资源数量是0，则不发出信标信号。 
+
+(3). 系统决不允许当前资源的数量为负值。 
+
+(4). 当前资源数量决不能大于最大资源数量。
+
+4. HANDLECreateSemaphore(
+
+         LPSECURITY_ATTRIBUTESlpSemaphoreAttributes, // SD
+
+         LONG lInitialCount,                          // initial count
+
+         LONGlMaximumCount,                         // maximum count
+
+         LPCTSTRlpName                               // object name
+
+        );
+
+  (1).安全性,使用默认的,NULL
+
+  (2).初始化时可用的资源数量,要大于或等于0,但小于最大数量
+
+  (3).最大的可用资源数量,大于0,
+
+  (4).信号量对象的名字
+
+ 
+
+ 
+
+5.在其他进程中这个进程创建的信号量对象,不过信号量必须是有名字的
+
+  HANDLE OpenSemaphore(
+
+     DWORDdwDesiredAccess,  // access
+
+     BOOLbInheritHandle,    // inheritance option
+
+     LPCTSTRlpName          // object name
+
+     );
+
+  这个函数是在别的进程中创建已经存在的已命名的信号量的新的句柄
+
+(1). 下面的值
+
+       SEMAPHORE_ALL_ACCESS 要求对事件对象的完全访问； 
+
+　　SEMAPHORE_MODIFY_STATE 允许使用ReleaseSemaphore函数； 
+
+　　SYNCHRONIZE 允许同步使用信号机对象。
+
+(2). 如果允许子进程继承句柄，则设为TRUE,否则为FALSE
+
+(3). 对象的名字
+
+ 
+
+6. BOOLReleaseSemaphore(
+
+     HANDLEhSemaphore,       // handle to semaphore
+
+     LONGlReleaseCount,      // count incrementamount
+
+     LPLONGlpPreviousCount   // previous count
+
+     );
+
+(1).信号量得句柄
+
+(2).可以使用资源数量的增量
+
+(3).先前的数量,若为NULL,则不需要关心这个值,忽略掉
+
+ 
+
+7. WaitForSingleObject（）和WaitForMultipleObjects（）用于判断当前可用的资源数量是否为0,是否有信号,当前线程是否可以继续往下执行,否则等待,
+
+当一个线程执行时,也就是有一个资源访问时,可用资源记数会减1,不过只要可用资源数大于0,就会有信号,其他线程一样可以访问,可以使用ReleaseSemaphore()
+
+使可用资源记数增加,根据增量增加可用资源数量,但不能大于最大的资源数量
+
+ 
+
+代码........
+
+view plaincopy to clipboardprint?//VS2008编译器   
+//信号量   
+#include "stdafx.h"   
+#include <Windows.h>   
+#include <iostream>   
+using namespace std;  
+  
+HANDLE hSemaphore;  
+int  Count = 100;//一个全局的资源   
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数   
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数   
+  
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    HANDLE hThread1; //句柄   
+    HANDLE hThread2;      
+   
+    hSemaphore = CreateSemaphore(NULL,0,2,NULL); //创建信号量对象   
+     
+    hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程   
+    hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程   
+    CloseHandle(hThread1); //不使用线程句柄,关掉句柄   
+    CloseHandle(hThread2); //不使用线程句柄,关掉句柄   
+  
+    cout << "主线程执行" << endl;  
+  
+    Sleep(2000);//让主线程休眠,让线程队列中的其他线程执行   
+  
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread1(LPVOID lpParameter)  
+{  
+  
+    while (TRUE)  
+    {    
+          
+        WaitForSingleObject(hSemaphore,INFINITE);  
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread1 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+      
+                ReleaseSemaphore(hSemaphore,1,NULL);  
+    }  
+  
+    return 0;  
+}  
+  
+DWORD WINAPI MyThread2(LPVOID lpParameter)  
+{  
+  
+    while (TRUE)  
+    {  
+        WaitForSingleObject(hSemaphore,INFINITE);  
+        if (Count > 0)  
+        {  
+            Sleep(1);  
+            cout << "MyThread2 线程:" << Count-- << endl;  
+        }  
+        else  
+            break;  
+      
+            ReleaseSemaphore(hSemaphore,1,NULL);  
+    }  
+  
+    return 0;  
+}  
+//VS2008编译器
+//信号量
+#include "stdafx.h"
+#include <Windows.h>
+#include <iostream>
+using namespace std;
+
+HANDLE hSemaphore;
+int  Count = 100;//一个全局的资源
+DWORD WINAPI MyThread1(LPVOID lpParameter);//声明线程函数
+DWORD WINAPI MyThread2(LPVOID lpParameter);//声明线程函数
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread1; //句柄
+	HANDLE hThread2;    
+ 
+	hSemaphore = CreateSemaphore(NULL,0,2,NULL); //创建信号量对象
+   
+	hThread1 = CreateThread(NULL,0,MyThread1,NULL,0,0);//主线程中创建新的线程
+	hThread2 = CreateThread(NULL,0,MyThread2,NULL,0,0);//主线程中创建新的线程
+	CloseHandle(hThread1); //不使用线程句柄,关掉句柄
+	CloseHandle(hThread2); //不使用线程句柄,关掉句柄
+
+	cout << "主线程执行" << endl;
+
+	Sleep(2000);//让主线程休眠,让线程队列中的其他线程执行
+
+	return 0;
+}
+
+DWORD WINAPI MyThread1(LPVOID lpParameter)
+{
+
+	while (TRUE)
+	{  
+		
+		WaitForSingleObject(hSemaphore,INFINITE);
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread1 线程:" << Count-- << endl;
+		}
+		else
+			break;
+	
+                ReleaseSemaphore(hSemaphore,1,NULL);
+	}
+
+	return 0;
+}
+
+DWORD WINAPI MyThread2(LPVOID lpParameter)
+{
+
+	while (TRUE)
+	{
+	    WaitForSingleObject(hSemaphore,INFINITE);
+		if (Count > 0)
+		{
+			Sleep(1);
+			cout << "MyThread2 线程:" << Count-- << endl;
+		}
+		else
+			break;
+	
+            ReleaseSemaphore(hSemaphore,1,NULL);
+	}
+
+	return 0;
+} 
+ 
+
+因为hSemaphore = CreateSemaphore(NULL,0,2,NULL)创建了一个0个可用资源数量,所以没有信号,所以的子线程都处于等待
+
+
+ 
+
+
+
+ 
+
+可以使用ReleaseSemaphore()函数增加可用资源数量,放在CreateSemaphore()函数后面,ReleaseSemaphore(hSemaphore,1,NULL);
+
+ 
+
+
+
+ 
+
+可以看出两个线程之间交换执行,一个线程结束后不会自动释放信号量,要使用ReleaseSemaphore()函数释放,因为我
+
+使用ReleaseSemaphore(hSemaphore,1,NULL);增加一个可用资源,总的可用资源数也就只有1,如果我把线程函数中
+
+的ReleaseSemaphore(hSemaphore,1,NULL);注释掉,则执行的结果为
+
+ 
+
+
+
+ 
+
+因为第一次访问时资源记数已经减为0,没有了信号,所以接下来所有的子线程都处于等待状态,
+
+所以要记得使用ReleaseSemaphore()函数释放信号量增加可用资源数量
+
+ 
+
+ 
+
+ 
+
+七.互斥对象.事件对象.信号量和临界区对象的区别
+1.互斥对象.事件对象和信号量对象都是属于内核对象,利用内核对象进行线程之间的同步比较慢,但是内核对象可以进行多个进程之间的线程同步
+
+2.临界区是工作在用户方式下,速度快,但是设定进入关键代码段后的时间值,容易出现死锁状态
+
+3.互斥对象是属于某个线程,而信号量不属于某个线程,互斥对象只能在相应的线程中释放,而信号量对象可以线程任意时刻释放
+
+4.在主线程结束前要使用CloseHandle()关闭一些对象的句柄,我上面的代码中有的忘了关闭句柄
+
+ 
+
+ 建议自己去看一下孙鑫的Windows编程的视频里的相关进程与线程部分.....
+
+http://blog.csdn.net/bizhu12/article/details/6688359

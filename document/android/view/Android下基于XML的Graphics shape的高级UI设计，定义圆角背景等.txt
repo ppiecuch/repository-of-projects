@@ -1,0 +1,373 @@
+大家很多人都用过新浪微博android客户端，感觉它的UI实在做到很精致，昨天晚上熬夜研究了新浪微博的UI相关的代码，于是有了下面这个文章。
+
+        以前的UI设计一般有两种方式，首先是UI把图形设计好，分解成UI设计元素后，在代码中直接使用，对于那些简单的图形，如矩形、扇形这样的图
+形，一般的系统的API会提供这样的接口，但是在Android下，有第三种画图方式，介于二者之间，结合二者的长处，如下的代码： 
+
+
+
+view plaincopy to clipboardprint?<item android:id="@android:id/secondaryProgress">   
+    <clip>   
+        
+        <shape>   
+            <corners android:radius="5dip" />   
+            <gradient   
+                    android:startColor="#0055ff88"   
+                    android:centerColor="#0055ff00"   
+                    android:centerY="0.75"   
+                    android:endColor="#00320077"   
+                    android:angle="270"   
+            />   
+        </shape>   
+    </clip>   
+</item>   
+    <item android:id="@android:id/secondaryProgress"> 
+        <clip> 
+          
+            <shape> 
+                <corners android:radius="5dip" /> 
+                <gradient 
+                        android:startColor="#0055ff88" 
+                        android:centerColor="#0055ff00" 
+                        android:centerY="0.75" 
+                        android:endColor="#00320077" 
+                        android:angle="270" 
+                /> 
+            </shape> 
+        </clip> 
+    </item> 
+
+这是一个Progress的style里面的代码，描述的是进度条的为达到的图形，原本以为这是一个图片，后来仔细的跟踪代码，
+发现居然是 xml，像这种shape corners gradient等等这还是第一次碰到。shape 表示是一个图形，corners表示是有半径
+为5像素的圆角，然后，gradient表示一个渐变。这样作图简单明了，并且可以做出要求很好的图形，并且节省资源 
+
+xml代码 
+
+
+view plaincopy to clipboardprint?<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">   
+   <gradient android:startColor="#FFFF0000" android:endColor="#80FF00FF"   
+            android:angle="270"/>   
+   <padding android:left="50dp" android:top="20dp"   
+            android:right="7dp" android:bottom="7dp" />   
+   <corners android:radius="8dp" />   
+</shape>  
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle"> 
+   <gradient android:startColor="#FFFF0000" android:endColor="#80FF00FF" 
+            android:angle="270"/> 
+   <padding android:left="50dp" android:top="20dp" 
+            android:right="7dp" android:bottom="7dp" /> 
+   <corners android:radius="8dp" /> 
+</shape>
+
+
+gradient 产生颜色渐变 android:angle 从哪个角度开始变 貌似只有90的整数倍可以 
+android:shape="rectangle" 默认的也是长方形 
+
+view plaincopy to clipboardprint?<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">   
+   <solid android:color="#ff4100ff"/>   
+   <stroke android:width="2dp" android:color="#ee31ff5e"   
+            android:dashWidth="3dp" android:dashGap="2dp" />   
+   <padding android:left="7dp" android:top="7dp"   
+            android:right="7dp" android:bottom="7dp" />   
+   <corners android:radius="6dp" />   
+</shape>   
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval"> 
+   <solid android:color="#ff4100ff"/> 
+   <stroke android:width="2dp" android:color="#ee31ff5e" 
+            android:dashWidth="3dp" android:dashGap="2dp" /> 
+   <padding android:left="7dp" android:top="7dp" 
+            android:right="7dp" android:bottom="7dp" /> 
+   <corners android:radius="6dp" /> 
+</shape>  
+
+
+
+
+
+#ff4100ff蓝色#ff4100ff绿色 
+<solid android:color="#ff4100ff"/>实心的 填充里面 
+<stroke 描边 采用那样的方式将外形轮廓线画出来 
+android:dashWidth="3dp" android:dashGap="2dp" 默认值为0 
+android:width="2dp" android:color="#FF00ff00"笔的粗细， 
+android:dashWidth="5dp" android:dashGap="5dp" 实现- - -这样的效果，dashWidth指的是一条小横线的宽度 
+dashGap 指的是 小横线与小横线的间距。 width="2dp" 不能太宽 
+
+
+shape等特殊xml
+
+1.用 shape 作为背景 
+
+
+view plaincopy to clipboardprint?<shape xmlns:android="http://schemas.android.com/apk/res/android">   
+   <solid android:color="#f0600000"/>   
+   <stroke android:width="3dp" color="#ffff8080"/>   
+   <corners android:radius="3dp" />   
+   <padding android:left="10dp" android:top="10dp"   
+    android:right="10dp" android:bottom="10dp" />   
+</shape>   
+<shape xmlns:android="http://schemas.android.com/apk/res/android"> 
+   <solid android:color="#f0600000"/> 
+   <stroke android:width="3dp" color="#ffff8080"/> 
+   <corners android:radius="3dp" /> 
+   <padding android:left="10dp" android:top="10dp" 
+    android:right="10dp" android:bottom="10dp" /> 
+</shape> 
+
+一定要注意solid android:color="#f0600000" 是背景色 要用8位 最好不要完全透明不然没有效果啊 这句话本来就不
+是背景色 的意思 
+
+2.类似多选的效果： 
+(1) listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+listView.setItemsCanFocus(false); 
+（2） define list item 
+CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android" 
+   android:orientation="vertical" 
+   android:layout_width="fill_parent" 
+   android:layout_height="?android:attr/listPreferredItemHeight" 
+   android:textAppearance="?android:attr/textAppearanceLarge" 
+   android:gravity="center_vertical" 
+   android:paddingLeft="6dip" 
+   android:paddingRight="6dip" 
+   android:checkMark="?android:attr/listChoiceIndicatorMultiple" 
+   android:background="@drawable/txt_view_bg"/> 
+(3) define drawable txt_view_bg.xml <item android:drawable="@drawable/selected" android:state_checked="true" /> <item android:drawable="@drawable/not_selected" />
+
+3. 
+<LinearLayout    android:layout_width ="100dp"    android:layout_height="wrap_content" /> 
+LinearLayour ll = new LinearLayout(this);parentView.addView(ll, new LinearLayout.LayoutParams(100, LayoutParams.WRAP_CONTENT));
+
+4. 当设置   TextView setEnabled(false)时 背景颜色你如果用#ffff之类的话可能不会显示 你最好使用 android:textColor这个属性而不是使用color。 
+<TextView    android:text="whatever text you want"    android:layout_width="wrap_content"    android:layout_height="wrap_content"    android:textColor="@color/example" />
+
+res/color/example.xml):
+
+<?xml version="1.0" encoding="utf-8"?><selector xmlns:android="http://schemas.android.com/apk/res/android">    <item android:state_enabled="false" android:color="@color/disabled_color" />    <item android:color="@color/normal_color"/></selector>
+
+http://developer.android.com/intl/zh-CN/reference/android/content/res/ColorStateList.html
+
+5. 
+http://android.amberfog.com/?p=9 
+
+
+view plaincopy to clipboardprint?<layer-list xmlns:android="http://schemas.android.com/apk/res/android">   
+   <item>   
+      <shape>   
+         <solid android:color="#FFF8F8F8" />   
+      </shape>   
+   </item>   
+   <item android:top="23px">   
+      <shape>   
+         <solid android:color="#FFE7E7E8" />   
+      </shape>   
+   </item>   
+</layer-list>   
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"> 
+   <item> 
+      <shape> 
+         <solid android:color="#FFF8F8F8" /> 
+      </shape> 
+   </item> 
+   <item android:top="23px"> 
+      <shape> 
+         <solid android:color="#FFE7E7E8" /> 
+      </shape> 
+   </item> 
+</layer-list> 
+
+You can simple combine several drawables into one using <layer-list> tag. 
+note: Unfortenately you cannot resize drawables in layer-list. You can only move it. 
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">   <item android:drawable="@drawable/shape_below"/>   <item android:top="10px" android:right="10px" android:drawable="@drawable/shape_cover"/></layer-list>
+
+
+include 
+You can put similar layout elements into separate XML and use <include> tag to use it. 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent" 
+    android:layout_height="64dip" 
+    android:gravity="center_vertical" 
+    android:ignoreGravity="@+id/icon">
+
+    <include layout="@layout/track_list_item_common" />;
+
+</RelativeLayout>
+
+track_list_item_common.xml 
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView android:id="@+id/icon" 
+        android:layout_alignParentLeft="true" 
+        android:layout_centerVertical="true" 
+        android:layout_marginLeft="4dip" 
+        android:layout_width="60px" 
+        android:layout_height="60px"/> 
+... 
+</merge>
+
+
+
+然后以目前系统的Button的selector为例说下:
+
+
+view plaincopy to clipboardprint?<shape>  
+       <gradient  
+           android:startColor="#ff8c00"  
+           android:endColor="#FFFFFF"  
+           android:angle="270" />  
+       <stroke  
+           android:width="2dp"  
+           android:color="#dcdcdc" />  
+       <corners  
+           android:radius="2dp" />  
+       <padding  
+           android:left="10dp"  
+           android:top="10dp"  
+           android:right="10dp"  
+           android:bottom="10dp" />  
+   </shape>  
+     <shape>
+            <gradient
+                android:startColor="#ff8c00"
+                android:endColor="#FFFFFF"
+                android:angle="270" />
+            <stroke
+                android:width="2dp"
+                android:color="#dcdcdc" />
+            <corners
+                android:radius="2dp" />
+            <padding
+                android:left="10dp"
+                android:top="10dp"
+                android:right="10dp"
+                android:bottom="10dp" />
+        </shape>
+
+
+
+    对于上面，这条shape的定义，分别为渐变，在gradient中startColor属性为开始的颜色，endColor为渐变结束的颜色，下面的angle是角度。接下来是stroke可以理解为边缘，corners为拐角这里radius属性为半径，最后是相对位置属性padding。
+
+ 对于一个Button完整的定义可以为
+
+
+view plaincopy to clipboardprint? <?xml version="1.0" encoding="utf-8"?>  
+ <selector  xmlns:android="http://schemas.android.com/apk/res/android">  
+    <item android:state_pressed="true" >  
+        <shape>  
+            <gradient  
+                android:startColor="#ff8c00"  
+                android:endColor="#FFFFFF"  
+                android:angle="270" />  
+            <stroke  
+                android:width="2dp"  
+                android:color="#dcdcdc" />  
+            <corners  
+                android:radius="2dp" />  
+            <padding  
+                android:left="10dp"  
+                android:top="10dp"  
+                android:right="10dp"  
+                android:bottom="10dp" />  
+        </shape>  
+    </item>  
+  
+    <item android:state_focused="true" >  
+        <shape>  
+            <gradient  
+                android:startColor="#ffc2b7"  
+                android:endColor="#ffc2b7"  
+                android:angle="270" />  
+            <stroke  
+                android:width="2dp"  
+                android:color="#dcdcdc" />  
+            <corners  
+                android:radius="2dp" />  
+            <padding  
+                android:left="10dp"  
+                android:top="10dp"  
+                android:right="10dp"  
+                android:bottom="10dp" />  
+        </shape>  
+    </item>  
+  
+    <item>          
+        <shape>  
+            <gradient  
+                android:startColor="#ff9d77"  
+                android:endColor="#ff9d77"  
+                android:angle="270" />  
+            <stroke  
+                android:width="2dp"  
+                android:color="#fad3cf" />  
+            <corners  
+                android:radius="2dp" />  
+            <padding  
+                android:left="10dp"  
+                android:top="10dp"  
+                android:right="10dp"  
+                android:bottom="10dp" />  
+        </shape>  
+    </item>  
+</selector>  
+ <?xml version="1.0" encoding="utf-8"?>
+ <selector  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" >
+        <shape>
+            <gradient
+                android:startColor="#ff8c00"
+                android:endColor="#FFFFFF"
+                android:angle="270" />
+            <stroke
+                android:width="2dp"
+                android:color="#dcdcdc" />
+            <corners
+                android:radius="2dp" />
+            <padding
+                android:left="10dp"
+                android:top="10dp"
+                android:right="10dp"
+                android:bottom="10dp" />
+        </shape>
+    </item>
+
+    <item android:state_focused="true" >
+        <shape>
+            <gradient
+                android:startColor="#ffc2b7"
+                android:endColor="#ffc2b7"
+                android:angle="270" />
+            <stroke
+                android:width="2dp"
+                android:color="#dcdcdc" />
+            <corners
+                android:radius="2dp" />
+            <padding
+                android:left="10dp"
+                android:top="10dp"
+                android:right="10dp"
+                android:bottom="10dp" />
+        </shape>
+    </item>
+
+    <item>        
+        <shape>
+            <gradient
+                android:startColor="#ff9d77"
+                android:endColor="#ff9d77"
+                android:angle="270" />
+            <stroke
+                android:width="2dp"
+                android:color="#fad3cf" />
+            <corners
+                android:radius="2dp" />
+            <padding
+                android:left="10dp"
+                android:top="10dp"
+                android:right="10dp"
+                android:bottom="10dp" />
+        </shape>
+    </item>
+</selector> 
+
+以上几个item的区别主要是体现在state_pressed按下或state_focused获得焦点时，当当来判断显示什么类型，而没有state_xxx属性的item可以看作是常规状态下。
+
+http://blog.csdn.net/offbye/article/details/6690413
