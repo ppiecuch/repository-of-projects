@@ -1,0 +1,138 @@
+进程可以说是OS的最基本的构件,因为有了进程才有了 伪并行 ,所谓伪并行是指 多道程序之间进行快速切换,以达到多任务处理的能力.更细致的说 是在 就绪态, 运行态 和 阻塞态之间的转换 .
+
+
+
+
+
+
+Running State -> Blocking State: 
+
+ 可能是进程发生IO请求,比如一个进程等待另一个进程提供输入时,或者等待来自另一个进程的信息时 ...
+
+Running State -> Ready State:  
+
+这个最常见,比如时钟中断,比如进程优先级
+
+Ready State -> Running State: 
+
+当前运行的进程用完CPU的时间,调度程序就从就绪态的进程中选择一个运行
+
+Blocking State -> Ready State: 
+
+当满足阻塞到就绪态的事件发生时,就会转换.
+
+
+
+
+伪并行
+
+可以看到A ,B ,C 三个进程, A遇到I/O读写,暂时放弃CPU,调度程序选择一个进程(B)来运行,这是来个高优先级的C ,B暂时挂起,让C运行,AI/O读写成功后 ,由于A优先级大于C所以C继续运行,运行完后先运行优先级高的C再运行B !
+
+
+
+
+进程树
+
+     进程是程序的一个动态的执行实体,随着程序的执行 而不断进行变化,它具有生命周期,进程就像大千生物一样 ,也有自己的父母,生成它的进程叫做父进程,每个进程只有一个父进程,可以有多个子进程,linux中可以通过fork来创建子进程.来看看linux中的进程,linux中有个init进程,PID为 1 , 可以说是所有进程的祖先进程,如果某个进程的父进程终止后,自己还live, 则该进程则变成孤儿进程(因为没有父进程了),但是有它祖先保佑着它,负责养它(它祖先长命着呢) 来看看这棵进程树!
+
+
+
+
+
+
+
+
+
+
+进程控制块
+
+ 创建一个进程时,就要为它建立一个PCB(process control block),进程退出时收回PCB,PCB可谓进程的核心,里面囊括了 标识符, 状态, 优先级, PC, 内存指针, 上下文, IO 等信息,正因为有了这些才可以中断一个进程的执行.
+
+linux中把对进程的描述结构叫做task_struct (PCB)
+
+
+view plaincopy to clipboardprint?
+struct task_struct {  
+　　long state;  
+　　long counter;  
+　　long priority;  
+　　long signal;  
+　　struct sigaction sigaction[32];  
+　　long blocked;  
+　　int exit_code;  
+　　unsigned long start_code,end_code,end_data,brk,start_stack;  
+　　long pid,father,pgrp,session,leader;  
+　　unsigned short uid,euid,suid;  
+　　unsigned short gid,egid,sgid;   
+　　long alarm;  
+　　long utime,stime,cutime,cstime,start_time;  
+　　unsigned short used_math;  
+　　/* file system info */  
+　　int tty;   
+　　unsigned short umask;  
+　　struct m_inode * pwd;  
+　　struct m_inode * root;  
+　　struct m_inode * executable;  
+　　unsigned long close_on_exec;  
+　　struct file * filp[NR_OPEN];  
+　　struct desc_struct ldt[3];  
+　　struct tss_struct tss;  
+}  
+struct task_struct {
+　　long state;
+　　long counter;
+　　long priority;
+　　long signal;
+　　struct sigaction sigaction[32];
+　　long blocked;
+　　int exit_code;
+　　unsigned long start_code,end_code,end_data,brk,start_stack;
+　　long pid,father,pgrp,session,leader;
+　　unsigned short uid,euid,suid;
+　　unsigned short gid,egid,sgid; 
+　　long alarm;
+　　long utime,stime,cutime,cstime,start_time;
+　　unsigned short used_math;
+　　/* file system info */
+　　int tty; 
+　　unsigned short umask;
+　　struct m_inode * pwd;
+　　struct m_inode * root;
+　　struct m_inode * executable;
+　　unsigned long close_on_exec;
+　　struct file * filp[NR_OPEN];
+　　struct desc_struct ldt[3];
+　　struct tss_struct tss;
+} 
+
+另外要说的是PCB是内核中频繁读写的数据结构,所以被常驻在内存中.
+
+还有一个重点是,PCB的存放,它是和内核栈存放在一起的,这是因为linux为了节约空间,所以把两者放在一起,占用8K的内存区.
+
+
+view plaincopy to clipboardprint?
+union task_union {  
+    struct task_struct task;  
+    unsigned long kernel_stack[2408];  
+};  
+union task_union {
+	struct task_struct task;
+	unsigned long kernel_stack[2408];
+};
+这是大概的数据结构,PCB大概占1KB左右,所以内核栈的大小不能超过7KB,否则内核张会覆盖PCB,从而导致崩溃!  
+
+除了节约空间,把两者放在一起 可以使内核更快的找到PCB,另外防止在创建进程时动态分配额外的内存.
+
+
+
+进程切换
+
+进程切换需要OS获得控制权,如果你有些底层代码的经验,你会知道进程切换的代价是非常高的! 我们来看看哪些会造成进程切换?
+
+-> 第一想到的就是系统中断中的IO操作了 .
+
+-> 第二想到的是system call,调用系统函数也会产生进程切换,所以调用系统函数开销是很大的. 
+
+-> 还有些 正常的时钟中断, 也就是说进程超过了最大规定的时间片,如果超过了进程必须切换到就绪态.调入另外一个进程
+
+http://blog.csdn.net/crazyjixiang/article/details/6693009
