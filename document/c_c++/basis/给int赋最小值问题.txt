@@ -1,0 +1,46 @@
+int n = -2147483648;
+
+        如此简单的一句代码，居然出现了警告？-2147483648是32位int类型可以存储的最小整型值，为什么会出项警告呢。在VC++6.0控制台程序下出现如下警告：warning C4146: unary minus operator applied to unsigned type, result still unsigned。在C-Free中出现：c:55: warning: decimal constant is so large that it is unsigned。
+
+        上网查了下，发现了原因：
+        一元负运算符应用于无符号类型，结果仍为无符号类型。无符号类型只能保存非负值，所以一元负（非）应用于无符号类型时通常无意义。操作数和结果都是非负的。 
+        实际上，当程序员试图表达最小整数值-2147483648 时，发生此问题。该值不能写为-2147483648，因为表达式处理分两个步骤： 
+        计算数字2147483648。因为2147483648 大于最大整数值2147483647，所以其类型不是int，而是unsigned int。 
+        将一元负应用于该值，得到无符号结果，该结果碰巧是 2147483648。无符号类型的结果可能导致意外行为。如果在比较中使用该结果，则可使用无符号比较，而不能出现另一个操作数是 int 时。这解释了下面的示例程序只输出一行的原因。 
+        预期的第二行为：1 is greater than the most negative int，但未输出，因为((unsigned int)1) > 2147483648为假。
+
+#include <stdio.h>
+
+main()
+{
+
+    check(-10);
+    check(1);
+
+    return 0;
+}
+
+
+void check(int i) 
+{ 
+    if (i > -2147483648)
+    printf("%d is greater than the most negative int\n", i); 
+}
+        
+        输出结果：
+
+    
+
+        上面的解释省略了一些细节，我来补充下。在if (i > -2147483648)中，由于i为int类型，而-2147483648为unsigned int类型，所有i就会被提升为unsigned int类型，这就是C语言的整型提升。-10提升为unsigned int类型后，其值肯定会大于2147483648，因此第一条语句会打印出来。当把正整数（比如本实验中的1）提升为unsigned int类型时，其值是不变的，因此肯定比2147483648要小，所有第二条语句不会打印。
+
+      那如何来解决这个可恶的警告呢。网上说：可以通过从 Limits.h 使用INT_MIN(一个宏定义) 来避免C4146 警告。INI_MIN宏有如何的魔力，竟然能够消除这个警告呢。打开源文件一看，原来是这样：
+
+#define INT_MAX        2147483647
+#define INT_MIN        (-INT_MAX-1)
+
+        哦，原来这样。因此，我们又可以这样赋值最小负整数：
+
+int n = -2147483647 - 1;
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/adupt/archive/2009/08/31/4503516.aspx
+

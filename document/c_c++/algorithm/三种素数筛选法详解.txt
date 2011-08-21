@@ -1,0 +1,288 @@
+转自：http://tr0217.blog.163.com/blog/static/3606648020099302135503/
+
+第一种：剔除2 3 4 5 6 ... ... 的倍数
+
+在i从2开始的增一变化过程中，剔除i的倍数即j*i（j是大于等于2的自然数，j的上限是问题规模M）
+为了减少重复步骤，可以每当i递增到等于第一个没有被剔除的（素）数时再剔除该数的倍数，
+重复上述过程至i到达问题规模m的平方根+1
+
+需要说明的三个问题：
+假设循环到第n个数，如果该数没有被剔除，那么该数不能是前边所有数的倍数，该数更不可能是后边数的倍数，该
+
+数就是素数。
+如果该数是合数却没被剔除，那么该数能分解为两个小于该数的数的积的形式，而前边剔除的数包含了所有小于该
+
+数的数之间的积，这是矛盾的。
+
+为什么筛选循环的第一层只循环至问题规模m的平方根+1
+因为，对于一个数m，所有大于该数平方根的数的积已经大于该数了，再剔除下去只是多余。
+
+为什么筛选循环的第二层只循环至MAX/i？
+因为此时j*MAX/i就等于MAX，此时需要标记为错误的数已经到了问题的规模即MAX，没有必要在标记比MAX大的值不
+
+是素数，此外用来标记i*j不是素数的数组只有MAX+1的容量，这样做是向不是自己申请的内存空间里写数据，是危
+
+险的。
+
+ 
+
+
+view plaincopy to clipboardprint?<span style="font-size:13px;">#include <iostream>  
+#include <cstdlib>   
+#include <cmath>   
+using namespace std;  
+const int MAX=1000;  
+  
+int main()  
+{  
+     int i=0,j=0,n=sqrt(MAX)+1;  
+     int a[MAX+1]={0};  
+  
+     for(i=2;i<=n;i++)  //筛选循环   
+       for(j=2;j<=MAX/i;j++)  
+           a[j*i]=1;  
+  
+        
+     for(i=2;i<=MAX;i++)  
+        if(a[i]==0)  
+        {  
+          cout.width(7);  
+          cout<<i<<" ";  
+        }  
+     system("pause");  
+     return 0;  
+       
+}  
+</span>  
+<span style="font-size:13px;">#include <iostream>
+#include <cstdlib>
+#include <cmath>
+using namespace std;
+const int MAX=1000;
+
+int main()
+{
+     int i=0,j=0,n=sqrt(MAX)+1;
+     int a[MAX+1]={0};
+
+     for(i=2;i<=n;i++)  //筛选循环
+       for(j=2;j<=MAX/i;j++)
+           a[j*i]=1;
+
+      
+     for(i=2;i<=MAX;i++)
+        if(a[i]==0)
+        {
+          cout.width(7);
+          cout<<i<<" ";
+        }
+     system("pause");
+     return 0;
+     
+}
+</span> 
+
+
+
+
+用a[i*j]来标记i*j不是素数，这一个相对来说比较容易想到
+
+ 
+
+再来看看下一个(第二种，稍作了优化)
+
+
+view plaincopy to clipboardprint?<span style="font-size:13px;">#include<stdio.h>  
+#include<math.h>   
+#define MAX_P  500   
+int nList[MAX_P] = {0};  
+void Calc()   
+{  
+    int n,p,t,sq=(int)sqrt(MAX_P*2+1);  
+    for (n=3;n<=sq;n+=2)  
+    {  
+        if (nList[n>>1]) continue;  
+        for (t=n*n;t<=MAX_P<<1;t+=n<<1) //筛选循环   
+            nList[t>>1] = 1;  
+    }  
+    printf("%5d", 2);  
+    for (n=t=1;t<MAX_P;++t)  
+    {  
+        if (nList[t]) continue;  
+        printf("%5d", (t<<1)+1);  
+        if (++n==10)  
+        {  
+            printf("\n");  
+            n=0;  
+        }  
+    }  
+}  
+int main(void)  
+{  
+    Calc();  
+    getchar();  
+    return  0;  
+}</span>  
+<span style="font-size:13px;">#include<stdio.h>
+#include<math.h>
+#define MAX_P  500
+int nList[MAX_P] = {0};
+void Calc() 
+{
+    int n,p,t,sq=(int)sqrt(MAX_P*2+1);
+    for (n=3;n<=sq;n+=2)
+    {
+        if (nList[n>>1]) continue;
+        for (t=n*n;t<=MAX_P<<1;t+=n<<1) //筛选循环
+            nList[t>>1] = 1;
+    }
+    printf("%5d", 2);
+    for (n=t=1;t<MAX_P;++t)
+    {
+        if (nList[t]) continue;
+        printf("%5d", (t<<1)+1);
+        if (++n==10)
+        {
+            printf("\n");
+            n=0;
+        }
+    }
+}
+int main(void)
+{
+    Calc();
+    getchar();
+    return  0;
+}</span>
+
+
+这个程序的方法是通过排除3 5 7 9 11 ... ...中的素数n的奇数倍来排除素数的
+用数组nList中的第[t/2]个元素的值（取1)来标记t不是素数。
+
+
+1、为什么是奇数的倍数？
+首先我们假设这个算法是正确的。由于素数除了2都是奇数，那么每次送入筛选循环的n值都是奇数，排除t时t的递
+
+增表达式可写为
+for（int i=0；i<MAX_P/2;i++）
+    t=n*（n+2i）
+n是奇数n+2i也是奇数。这与算法的思想是一致的。
+
+
+2、为什么3 5 7 9 11 ... ...中的素数n的倍数（奇数）要从n开始？
+
+就是说从1开始和从n开始的效果是一样，或者说n以前的奇数乘n都可以等于n以前（比n小的）素数的更大（比n大的
+
+）奇数倍数。由于n是奇数，可以设n以前（比n小的）的奇数为n-2i，比n大的奇数为n+2j；那么我们的任务就是，
+
+证明n*（n-2i）可以等于m*（n+2j），其中m为小于n的素数，i、j都是正整数。即n（n-m）=2mj+2ni。这有变成证
+
+明n-m是偶数，这是显然的，两个奇数之差必然是偶数。
+
+
+3、为什么筛选循环剔除了所有的非素数？
+
+不管该算法正确与否，3 5 7 9 11 ... ...中的任意n的奇数倍都排除了某些合数。
+首先我们假设n循环至某个n时，为合数却没有剔除，那么n可以分解因数为多个素数且是奇数（由于n是从3开始的奇
+
+数）的积，当然也可表示为一个素数a与一个奇数b的积的形式，那么这个a必然是小于n的素数。这个素数的奇数倍
+
+就必然在前次循环中排除了。这与没有被剔除矛盾。所以该算法正确
+
+
+最后我们来看看，第三种
+
+
+view plaincopy to clipboardprint?<span style="font-size:13px;">#define MAX_N 1000  
+int a[MAX_N+1];  
+int p[MAX_N+1];  
+int nCount=0;  
+  
+void Init(int n) //线性筛法，不过在小范围上(约n<1e7)不比上一个方法快   
+{  
+    for (int i=2;i<=n;i++)  
+    {  
+        if (a[i]==0)  
+        {  
+            p[++nCount]=i;  
+        }  
+        for (int j=1,k; (j<=nCount) && (k=i*p[j])<=n; j++) //筛选循环   
+        {  
+            a[k] = 1 ;  
+            if (i%p[j] == 0) break;  
+        }  
+    }  
+}  
+  
+#include <iostream>   
+int main(void)  
+{  
+    Init(MAX_N);  
+    for(int n=1; p[n]>1; ++n)  
+    {  
+        printf("%5d", p[n]);  
+    }  
+    return 0;  
+}</span>  
+<span style="font-size:13px;">#define MAX_N 1000
+int a[MAX_N+1];
+int p[MAX_N+1];
+int nCount=0;
+
+void Init(int n) //线性筛法，不过在小范围上(约n<1e7)不比上一个方法快
+{
+    for (int i=2;i<=n;i++)
+    {
+        if (a[i]==0)
+        {
+            p[++nCount]=i;
+        }
+        for (int j=1,k; (j<=nCount) && (k=i*p[j])<=n; j++) //筛选循环
+        {
+            a[k] = 1 ;
+            if (i%p[j] == 0) break;
+        }
+    }
+}
+
+#include <iostream>
+int main(void)
+{
+    Init(MAX_N);
+    for(int n=1; p[n]>1; ++n)
+    {
+        printf("%5d", p[n]);
+    }
+    return 0;
+}</span> 
+
+ 
+
+这一种可以说是对前种算法的直接变形
+用a[k]=1来标记k不是素数
+第一种是用筛选出来的正确的数（即素数）的倍数剔除合数
+
+第二种是用2到n乘筛选出正确的数，即素数
+
+如果你不以为然，我可以把for (n=3;n<=sq;n+=2)该为（n=3;n<sq;n++）
+着就和第一种算法接近了一些，既然第一中和第二中被证明是正确的，那么这一种就也是正确的。
+如果能够证明if (i%p[j] == 0) break;这一句添加进去是合理的
+
+这句可解释为当i第一次成为所挑选出来的正确的素数递增序列的某个数（设为n）的整数倍时，就没有必要让i在去
+
+乘递增素数序列里的比n大的素数，这又可以等价于 i乘比n大的合适的素数（设为max）可以等于比i大的整数（设
+
+为j）乘比n小的素数（设为min），且这个j不是m的整数倍，即i*max=j*min；
+又可以等价与j=i*max/min是一个不是min倍数的整数，根据以前做因式分解的经验一个整数必然能分解为一个递增
+
+的素数序列的积，如果我们假设i*max是这么一个整数，max是因数递增序列中稍大的素数，则min只要是递增序列中
+
+小于max的素数，就能使j为整数，很显然min包含于所有小于max的素数中，自然j是个整数，
+又由于i不是max的倍数，max又不是min的倍数（如果是，max是素数吗？）那么i必然是min的倍数，又i是第一次成
+
+为所挑选出来的正确的素数递增序列的某个数（设为n）的整数倍，i必然不是min平方的倍数，即i/min不是min的倍
+
+数，i/min*max也不是min的倍数
+至此就证明了if (i%p[j] == 0) break;这一句添加进去是合理的
+
+http://blog.csdn.net/tongyongzh/article/details/6693409

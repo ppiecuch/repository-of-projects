@@ -1,0 +1,600 @@
+ 在上一章的学习中我们已经知道如何处理游戏中的触摸事件，这一章将向同学们介绍绘制游戏触摸轨迹的曲线图，在onTouchEvent方法中我们可以拿到手指在屏幕中触摸点 X Y时时的坐标，这章我们研究的课题就是如何把这些点变成一种无规则轨迹并且将这条无规则曲线显示在屏幕中。
+
+
+
+
+        Android提供了一个Path类 ， 顾名思义这个类可以设置曲线路径轨迹。任何无规则的曲线实际上都是由若干条线段组成，而线段的定义为两点之间最短的一条线。path类就 可以记录这两点之间的轨迹，那么若干个Path 就是我们须要绘制的无规则曲线。
+
+
+
+
+下面介绍一下API 中path类设置轨迹路径的方法
+
+
+public class
+
+Path
+extends Object
+java.lang.Object
+        android.graphics.Path
+
+quadTo(float x1, float y1, float x2, float y2)
+Add a quadratic bezier from the last point, approaching control point (x1,y1), and ending at (x2,y2).
+
+
+
+
+解释：
+
+参数1 轨迹起始点X坐标
+
+参数2 轨迹起始点Y坐标
+
+参数3 轨迹结束点X坐标
+
+参数4 轨迹结束点Y坐标
+
+所以根据这个参数就可以设置一条线段轨迹。
+
+
+
+
+         同学们，我们先看一张效果图。 为了设置一条比较圆滑好看的曲线我们需要对游戏画笔进行一些设置。注释已经在代码中写的很清楚了，在这里我详细说一下 设置画笔风格  mPaint.setStyle(Paint.Style.STROKE); 意思是设置画笔的风格 android 画笔一共提供了三种风格Paint.Style.STROKE 、Paint.Style.FILL、Paint.Style.FILL_AND_STROKE 意思分别为 空心 、实心、实心与空心 。如果不设置的话默认为 Paint.Style.FILL，在这里必需设置成空心 因为如果一旦设置成实心或者实心与空心那么画笔会把path路径中间包住这样就不是曲线线段了，所以同学们注意一下这里。
+
+
+
+
+
+view plaincopy to clipboardprint?/** 创建曲线画笔 **/  
+mPaint = new Paint();  
+mPaint.setColor(Color.BLACK);  
+/**设置画笔抗锯齿**/  
+mPaint.setAntiAlias(true);  
+/**画笔的类型**/  
+mPaint.setStyle(Paint.Style.STROKE);  
+/**设置画笔变为圆滑状**/  
+mPaint.setStrokeCap(Paint.Cap.ROUND);  
+/**设置线的宽度**/  
+mPaint.setStrokeWidth(5);  
+	    /** 创建曲线画笔 **/
+	    mPaint = new Paint();
+	    mPaint.setColor(Color.BLACK);
+	    /**设置画笔抗锯齿**/
+	    mPaint.setAntiAlias(true);
+	    /**画笔的类型**/
+	    mPaint.setStyle(Paint.Style.STROKE);
+	    /**设置画笔变为圆滑状**/
+	    mPaint.setStrokeCap(Paint.Cap.ROUND);
+	    /**设置线的宽度**/
+	    mPaint.setStrokeWidth(5);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        在触摸按下事件中 通过moveTo() 方法设置触摸屏幕点为轨迹的起始点，这样在触摸移动事件中设置曲线的轨迹 起始点为上次触摸点 结束点为本次触摸点。使用quadTo方法记录每次移动产生的一个曲线线段 然后将所有的曲线线段绘制在屏幕中，如果触摸抬起将调用reset()方法重置曲线轨迹。
+
+
+
+
+
+
+
+
+view plaincopy to clipboardprint?@Override  
+public boolean onTouchEvent(MotionEvent event) {  
+    /** 拿到触摸的状态 **/  
+    int action = event.getAction();  
+    float x = event.getX();  
+    float y = event.getY();  
+    switch (action) {  
+    // 触摸按下的事件   
+    case MotionEvent.ACTION_DOWN:  
+    /**设置曲线轨迹起点 X Y坐标**/  
+    mPath.moveTo(x, y);  
+    break;  
+    // 触摸移动的事件   
+    case MotionEvent.ACTION_MOVE:  
+    /**设置曲线轨迹**/  
+    //参数1 起始点X坐标   
+    //参数2 起始点Y坐标   
+    //参数3 结束点X坐标   
+    //参数4 结束点Y坐标   
+    mPath.quadTo(mposX, mposY, x, y);  
+    break;  
+    // 触摸抬起的事件   
+    case MotionEvent.ACTION_UP:  
+    /**按键抬起后清空路径轨迹**/  
+    mPath.reset();  
+    break;  
+    }  
+   //记录当前触摸X Y坐标   
+    mposX = x;  
+    mposY = y;  
+    return true;  
+}  
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+	    /** 拿到触摸的状态 **/
+	    int action = event.getAction();
+	    float x = event.getX();
+	    float y = event.getY();
+	    switch (action) {
+	    // 触摸按下的事件
+	    case MotionEvent.ACTION_DOWN:
+		/**设置曲线轨迹起点 X Y坐标**/
+		mPath.moveTo(x, y);
+		break;
+	    // 触摸移动的事件
+	    case MotionEvent.ACTION_MOVE:
+		/**设置曲线轨迹**/
+		//参数1 起始点X坐标
+		//参数2 起始点Y坐标
+		//参数3 结束点X坐标
+		//参数4 结束点Y坐标
+		mPath.quadTo(mposX, mposY, x, y);
+		break;
+	    // 触摸抬起的事件
+	    case MotionEvent.ACTION_UP:
+		/**按键抬起后清空路径轨迹**/
+		mPath.reset();
+		break;
+	    }
+	   //记录当前触摸X Y坐标
+	    mposX = x;
+	    mposY = y;
+	    return true;
+	} 
+
+
+
+
+
+
+
+游戏绘制中调用drawPath方法将onTouchEvent中记录的路径曲线绘制在屏幕当中。
+
+
+
+
+
+
+
+view plaincopy to clipboardprint?private void Draw() {  
+    /**清空画布**/  
+    mCanvas.drawColor(Color.WHITE);  
+    /**绘制曲线**/  
+    mCanvas.drawPath(mPath, mPaint);  
+  
+    /**记录当前触点位置**/  
+    mCanvas.drawText("当前触笔 X：" + mposX, 0, 20,mTextPaint);  
+    mCanvas.drawText("当前触笔 Y：" + mposY, 0, 40,mTextPaint);  
+}  
+	private void Draw() {
+	    /**清空画布**/
+	    mCanvas.drawColor(Color.WHITE);
+	    /**绘制曲线**/
+	    mCanvas.drawPath(mPath, mPaint);
+	
+	    /**记录当前触点位置**/
+	    mCanvas.drawText("当前触笔 X：" + mposX, 0, 20,mTextPaint);
+	    mCanvas.drawText("当前触笔 Y：" + mposY, 0, 40,mTextPaint);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+给出整体代码的实现
+
+
+
+
+详细的注释已经在代码中写出 欢迎大家阅读喔 哇咔咔~~~~
+
+
+
+
+
+
+
+
+view plaincopy to clipboardprint?import android.app.Activity;  
+import android.content.Context;  
+import android.graphics.Canvas;  
+import android.graphics.Color;  
+import android.graphics.Paint;  
+import android.graphics.Path;  
+import android.os.Bundle;  
+import android.view.MotionEvent;  
+import android.view.SurfaceHolder;  
+import android.view.SurfaceView;  
+import android.view.Window;  
+import android.view.WindowManager;  
+import android.view.SurfaceHolder.Callback;  
+  
+  
+public class SurfaceViewAcitvity extends Activity {  
+  
+    MyView mAnimView = null;  
+  
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+    super.onCreate(savedInstanceState);  
+    // 全屏显示窗口   
+    requestWindowFeature(Window.FEATURE_NO_TITLE);  
+    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  
+        WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+    // 显示自定义的游戏View   
+    mAnimView = new MyView(this);  
+    setContentView(mAnimView);  
+    }  
+  
+    public class MyView extends SurfaceView implements Callback,Runnable {  
+  
+     /**每50帧刷新一次屏幕**/    
+    public static final int TIME_IN_FRAME = 50;   
+  
+    /** 游戏画笔 **/  
+    Paint mPaint = null;  
+    Paint mTextPaint = null;  
+    SurfaceHolder mSurfaceHolder = null;  
+  
+    /** 控制游戏更新循环 **/  
+    boolean mRunning = false;  
+  
+    /** 游戏画布 **/  
+    Canvas mCanvas = null;  
+  
+    /**控制游戏循环**/  
+    boolean mIsRunning = false;  
+      
+    /**曲线方向**/  
+    private Path mPath;  
+      
+    private float mposX, mposY;  
+      
+    public MyView(Context context) {  
+        super(context);  
+        /** 设置当前View拥有控制焦点 **/  
+        this.setFocusable(true);  
+        /** 设置当前View拥有触摸事件 **/  
+        this.setFocusableInTouchMode(true);  
+        /** 拿到SurfaceHolder对象 **/  
+        mSurfaceHolder = this.getHolder();  
+        /** 将mSurfaceHolder添加到Callback回调函数中 **/  
+        mSurfaceHolder.addCallback(this);  
+        /** 创建画布 **/  
+        mCanvas = new Canvas();  
+        /** 创建曲线画笔 **/  
+        mPaint = new Paint();  
+        mPaint.setColor(Color.BLACK);  
+        /**设置画笔抗锯齿**/  
+        mPaint.setAntiAlias(true);  
+        /**画笔的类型**/  
+        mPaint.setStyle(Paint.Style.STROKE);  
+        /**设置画笔变为圆滑状**/  
+        mPaint.setStrokeCap(Paint.Cap.ROUND);  
+        /**设置线的宽度**/  
+        mPaint.setStrokeWidth(5);  
+        /**创建路径对象**/  
+        mPath = new Path();  
+        /** 创建文字画笔 **/  
+        mTextPaint = new Paint();  
+        /**设置颜色**/  
+        mTextPaint.setColor(Color.BLACK);  
+        /**设置文字大小**/  
+        mTextPaint.setTextSize(15);  
+    }  
+  
+    @Override  
+    public boolean onTouchEvent(MotionEvent event) {  
+        /** 拿到触摸的状态 **/  
+        int action = event.getAction();  
+        float x = event.getX();  
+        float y = event.getY();  
+        switch (action) {  
+        // 触摸按下的事件   
+        case MotionEvent.ACTION_DOWN:  
+        /**设置曲线轨迹起点 X Y坐标**/  
+        mPath.moveTo(x, y);  
+        break;  
+        // 触摸移动的事件   
+        case MotionEvent.ACTION_MOVE:  
+        /**设置曲线轨迹**/  
+        //参数1 起始点X坐标   
+        //参数2 起始点Y坐标   
+        //参数3 结束点X坐标   
+        //参数4 结束点Y坐标   
+        mPath.quadTo(mposX, mposY, x, y);  
+        break;  
+        // 触摸抬起的事件   
+        case MotionEvent.ACTION_UP:  
+        /**按键抬起后清空路径轨迹**/  
+        mPath.reset();  
+        break;  
+        }  
+       //记录当前触摸X Y坐标   
+        mposX = x;  
+        mposY = y;  
+        return true;  
+    }  
+          
+    private void Draw() {  
+        /**清空画布**/  
+        mCanvas.drawColor(Color.WHITE);  
+        /**绘制曲线**/  
+        mCanvas.drawPath(mPath, mPaint);  
+      
+        /**记录当前触点位置**/  
+        mCanvas.drawText("当前触笔 X：" + mposX, 0, 20,mTextPaint);  
+        mCanvas.drawText("当前触笔 Y：" + mposY, 0, 40,mTextPaint);  
+    }  
+      
+    @Override  
+    public void surfaceChanged(SurfaceHolder holder, int format, int width,  
+        int height) {  
+  
+    }  
+  
+    @Override  
+    public void surfaceCreated(SurfaceHolder holder) {  
+        /**开始游戏主循环线程**/  
+        mIsRunning = true;  
+        new Thread(this).start();  
+    }  
+  
+    @Override  
+    public void surfaceDestroyed(SurfaceHolder holder) {  
+        mIsRunning = false;  
+    }  
+  
+    @Override  
+    public void run() {  
+        while (mIsRunning) {  
+  
+        /** 取得更新游戏之前的时间 **/  
+        long startTime = System.currentTimeMillis();  
+  
+        /** 在这里加上线程安全锁 **/  
+        synchronized (mSurfaceHolder) {  
+            /** 拿到当前画布 然后锁定 **/  
+            mCanvas = mSurfaceHolder.lockCanvas();  
+            Draw();  
+            /** 绘制结束后解锁显示在屏幕上 **/  
+            mSurfaceHolder.unlockCanvasAndPost(mCanvas);  
+        }  
+  
+        /** 取得更新游戏结束的时间 **/  
+        long endTime = System.currentTimeMillis();  
+  
+        /** 计算出游戏一次更新的毫秒数 **/  
+        int diffTime = (int) (endTime - startTime);  
+  
+        /** 确保每次更新时间为50帧 **/  
+        while (diffTime <= TIME_IN_FRAME) {  
+            diffTime = (int) (System.currentTimeMillis() - startTime);  
+            /** 线程等待 **/  
+            Thread.yield();  
+        }  
+  
+        }  
+  
+    }  
+    }  
+}  
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.SurfaceHolder.Callback;
+
+
+public class SurfaceViewAcitvity extends Activity {
+
+    MyView mAnimView = null;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+	super.onCreate(savedInstanceState);
+	// 全屏显示窗口
+	requestWindowFeature(Window.FEATURE_NO_TITLE);
+	getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+		WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	// 显示自定义的游戏View
+	mAnimView = new MyView(this);
+	setContentView(mAnimView);
+    }
+
+    public class MyView extends SurfaceView implements Callback,Runnable {
+
+	 /**每50帧刷新一次屏幕**/  
+	public static final int TIME_IN_FRAME = 50; 
+
+	/** 游戏画笔 **/
+	Paint mPaint = null;
+	Paint mTextPaint = null;
+	SurfaceHolder mSurfaceHolder = null;
+
+	/** 控制游戏更新循环 **/
+	boolean mRunning = false;
+
+	/** 游戏画布 **/
+	Canvas mCanvas = null;
+
+	/**控制游戏循环**/
+	boolean mIsRunning = false;
+	
+	/**曲线方向**/
+	private Path mPath;
+	
+	private float mposX, mposY;
+	
+	public MyView(Context context) {
+	    super(context);
+	    /** 设置当前View拥有控制焦点 **/
+	    this.setFocusable(true);
+	    /** 设置当前View拥有触摸事件 **/
+	    this.setFocusableInTouchMode(true);
+	    /** 拿到SurfaceHolder对象 **/
+	    mSurfaceHolder = this.getHolder();
+	    /** 将mSurfaceHolder添加到Callback回调函数中 **/
+	    mSurfaceHolder.addCallback(this);
+	    /** 创建画布 **/
+	    mCanvas = new Canvas();
+	    /** 创建曲线画笔 **/
+	    mPaint = new Paint();
+	    mPaint.setColor(Color.BLACK);
+	    /**设置画笔抗锯齿**/
+	    mPaint.setAntiAlias(true);
+	    /**画笔的类型**/
+	    mPaint.setStyle(Paint.Style.STROKE);
+	    /**设置画笔变为圆滑状**/
+	    mPaint.setStrokeCap(Paint.Cap.ROUND);
+	    /**设置线的宽度**/
+	    mPaint.setStrokeWidth(5);
+	    /**创建路径对象**/
+	    mPath = new Path();
+	    /** 创建文字画笔 **/
+	    mTextPaint = new Paint();
+	    /**设置颜色**/
+	    mTextPaint.setColor(Color.BLACK);
+	    /**设置文字大小**/
+	    mTextPaint.setTextSize(15);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+	    /** 拿到触摸的状态 **/
+	    int action = event.getAction();
+	    float x = event.getX();
+	    float y = event.getY();
+	    switch (action) {
+	    // 触摸按下的事件
+	    case MotionEvent.ACTION_DOWN:
+		/**设置曲线轨迹起点 X Y坐标**/
+		mPath.moveTo(x, y);
+		break;
+	    // 触摸移动的事件
+	    case MotionEvent.ACTION_MOVE:
+		/**设置曲线轨迹**/
+		//参数1 起始点X坐标
+		//参数2 起始点Y坐标
+		//参数3 结束点X坐标
+		//参数4 结束点Y坐标
+		mPath.quadTo(mposX, mposY, x, y);
+		break;
+	    // 触摸抬起的事件
+	    case MotionEvent.ACTION_UP:
+		/**按键抬起后清空路径轨迹**/
+		mPath.reset();
+		break;
+	    }
+	   //记录当前触摸X Y坐标
+	    mposX = x;
+	    mposY = y;
+	    return true;
+	}
+        
+	private void Draw() {
+	    /**清空画布**/
+	    mCanvas.drawColor(Color.WHITE);
+	    /**绘制曲线**/
+	    mCanvas.drawPath(mPath, mPaint);
+	
+	    /**记录当前触点位置**/
+	    mCanvas.drawText("当前触笔 X：" + mposX, 0, 20,mTextPaint);
+	    mCanvas.drawText("当前触笔 Y：" + mposY, 0, 40,mTextPaint);
+	}
+	
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+		int height) {
+
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+	    /**开始游戏主循环线程**/
+	    mIsRunning = true;
+	    new Thread(this).start();
+	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+	    mIsRunning = false;
+	}
+
+	@Override
+	public void run() {
+	    while (mIsRunning) {
+
+		/** 取得更新游戏之前的时间 **/
+		long startTime = System.currentTimeMillis();
+
+		/** 在这里加上线程安全锁 **/
+		synchronized (mSurfaceHolder) {
+		    /** 拿到当前画布 然后锁定 **/
+		    mCanvas = mSurfaceHolder.lockCanvas();
+		    Draw();
+		    /** 绘制结束后解锁显示在屏幕上 **/
+		    mSurfaceHolder.unlockCanvasAndPost(mCanvas);
+		}
+
+		/** 取得更新游戏结束的时间 **/
+		long endTime = System.currentTimeMillis();
+
+		/** 计算出游戏一次更新的毫秒数 **/
+		int diffTime = (int) (endTime - startTime);
+
+		/** 确保每次更新时间为50帧 **/
+		while (diffTime <= TIME_IN_FRAME) {
+		    diffTime = (int) (System.currentTimeMillis() - startTime);
+		    /** 线程等待 **/
+		    Thread.yield();
+		}
+
+	    }
+
+	}
+    }
+} 
+
+
+
+
+
+总体来说这章内容还是比较简单的，老规矩每篇文章都会附带源代码，最后如果你还是觉得我写的不够详细 看的不够爽 不要紧我把源代码的下载地址贴出来 欢迎大家一起讨论学习雨松MOMO希望可以和大家一起进步。
+
+
+http://blog.csdn.net/xys289187120/article/details/6696734

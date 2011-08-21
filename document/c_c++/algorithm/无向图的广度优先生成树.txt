@@ -1,0 +1,758 @@
+以邻接表为存储结构的无向图的广度优先生成树，以广度优先遍历的思想为主线。下面是代码：
+
+view plaincopy to clipboardprint?#include<iostream>   
+#include<string>   
+#include<time.h>   
+using namespace std;  
+  
+const int MAX_VERTEX_NUM=20; //顶点最大值   
+bool visited[20];//用于遍历时辅助使用   
+bool searched[20];//用于建树时辅助使用   
+  
+//循环队列模版   
+template<class T>  
+class My_queue;  
+  
+template<class T>  
+class Node  
+{  
+private:  
+    T data;  
+    Node<T> *next;  
+public:  
+    Node()  
+    {  
+        next=0;  
+    }  
+    Node(T d)  
+    {  
+        data=d;  
+        next=0;  
+    }  
+    friend My_queue<T>;  
+};  
+  
+template<class T>  
+class My_queue  
+{  
+private:  
+    Node<T> *tail;  
+public:  
+    My_queue()  
+    {  
+        tail=new Node<T>();  
+        tail->next=tail;  
+    }  
+  
+    bool empty()  
+    {  
+        return (tail->next==tail);  
+    }  
+  
+    void push(T d)  
+    {  
+        Node<T> *p=new Node<T>(d);  
+        p->next=tail->next;  
+        tail->next=p;  
+        tail=p;  
+    }  
+  
+    T front()  
+    {  
+        if(empty())  
+        {  
+            cout<<"queue is empty!"<<endl;  
+            exit(0);  
+        }  
+        Node<T> *p=tail->next;  
+        T data=p->next->data;  
+        return data;  
+    }  
+  
+    void pop()  
+    {  
+        Node<T> *p=tail->next;  
+        Node<T> *q=p->next;  
+        p->next=q->next;  
+        if(q==tail)  
+            tail=p;  
+        delete q;  
+    }  
+};  
+  
+class ALGraph;  
+class CS_Tree;  
+//树结点   
+class CSnode  
+{  
+    string data;  
+    CSnode *firstchild;  
+    CSnode *nextsibling;  
+    friend class CS_Tree;  
+    friend class ALGraph;  
+};  
+  
+//树类定义   
+class CS_Tree  
+{  
+public:  
+    void PreRoot_Traverse(CSnode *T) //先根遍历   
+    {  
+        if(T)  
+        {  
+            cout<<T->data<<"  ";  
+            PreRoot_Traverse(T->firstchild);  
+            PreRoot_Traverse(T->nextsibling);  
+        }  
+    }  
+  
+    void PostRoot_Traverse(CSnode *T) //后根遍历   
+    {  
+        if(T)  
+        {  
+            PostRoot_Traverse(T->firstchild);  
+            cout<<T->data<<"  ";  
+            PostRoot_Traverse(T->nextsibling);  
+        }  
+    }  
+  
+    void LevelOrder_Traverse(CSnode *T) //层次遍历   
+    {  
+        My_queue<CSnode *> q;  
+        CSnode *t;  
+        q.push(T);  
+        do  
+        {  
+            t=q.front();  
+            do  
+            {  
+                cout<<t->data<<"  ";  
+                if(t->firstchild)  
+                    q.push(t->firstchild);  
+                t=t->nextsibling;  
+            }while(t);  
+            q.pop();  
+        }while(!q.empty());  
+    }  
+};  
+  
+class VNode;  
+//表结点   
+class ArcNode  
+{  
+public:  
+    int adjvex;  
+    ArcNode *nextarc;  
+    friend class VNode;  
+};  
+  
+class ALGraph;  
+//头结点   
+class VNode  
+{  
+    string data;  
+    ArcNode *firstarc;  
+    friend class ALGraph;  
+};  
+  
+struct Info //结构体，存储结点的位置和该结点在生成树中的位置，辅助建树   
+{  
+    int data;  
+    CSnode *p;  
+};  
+  
+class ALGraph  
+{  
+private:  
+    VNode vertices[MAX_VERTEX_NUM];  
+    int vexnum;  
+    int arcnum;  
+public:  
+    void CreateUDG_ALG()  
+    {  
+        //采用邻接表构造无向图G   
+        string v1,v2;  
+        int i,j,k;  
+        cout<<"输入顶点数和边数：";  
+        cin>>vexnum>>arcnum;  
+  
+        cout<<"输入顶点民称：";  
+        for(i=0;i<vexnum;i++)  
+        {  
+            cin>>vertices[i].data;  
+            vertices[i].firstarc=NULL;  
+        }  
+  
+        //输入各弧并构造邻接表   
+        for(k=0;k<arcnum;k++)  
+        {  
+            cout<<"输入边所对应的两个顶点：";  
+            cin>>v1>>v2;  
+            i=Locate_Vex(v1);  
+            j=Locate_Vex(v2);  
+            while(i<0|| i>vexnum-1 || j<0 || j>vexnum-1)  
+            {  
+                cout<<"结点位置输入错误,重新输入: ";  
+                cin>>v1>>v2;  
+                i=Locate_Vex(v1);  
+                j=Locate_Vex(v2);     
+            }  
+  
+            ArcNode *p=new ArcNode;  
+            p->adjvex=j;  
+            p->nextarc=vertices[i].firstarc;  
+            vertices[i].firstarc=p;  
+  
+            ArcNode *q=new ArcNode;  
+            q->adjvex=i;  
+            q->nextarc=vertices[j].firstarc;  
+            vertices[j].firstarc=q;  
+        }  
+    }  
+  
+    int Locate_Vex(string v) //返回顶点在数组中的位置   
+    {  
+        for(int k=0;vertices[k].data!=v;k++);  
+        return k;  
+    }  
+  
+    void BFS_Traverse() //广度优先遍历   
+    {  
+        int i,k,w;  
+        My_queue<int> q;  
+        ArcNode *p;  
+        for(i=0;i<vexnum;i++)  
+            visited[i]=false;  
+        for(i=0;i<vexnum;i++)  
+        {  
+            if(!visited[i])  
+            {  
+                visited[i]=true;  
+                cout<<vertices[i].data<<"  ";  
+                if(vertices[i].firstarc)  
+                    q.push(i);  
+                while(!q.empty())  
+                {  
+                    k=q.front();  
+                    q.pop();  
+                    for(p=vertices[k].firstarc;p;p=p->nextarc)  
+                    {  
+                        w=p->adjvex;  
+                        if(!visited[w])  
+                        {  
+                            visited[w]=true;  
+                            cout<<vertices[w].data<<"  ";  
+                            if(vertices[w].firstarc)  
+                                q.push(w);  
+                        }  
+                    }  
+                }  
+            }  
+        }  
+    }  
+  
+    void BFS_Tree(int v,CSnode *&T,My_queue<Info> &qu)  
+    {  
+        /*------------------------------------------------- 
+        /广度优先生成树，从v位置开始建立以T为根节点的树   
+        /紧跟广度优先遍历的思路写的建树方式，通过将有相邻 
+        /结点的结点位置和该结点在树中的位置一起打包入队， 
+        /然后每次就递归进行以队列第一个结点为根节点的建树  
+        /过程，和广度优先遍历的思想是一样的 
+        /------------------------------------------------*/  
+  
+        Info child;  
+        int w,k;  
+        bool first=true; //是否为v位置的第一个为访问的相邻结点的标志   
+        CSnode *t,*q,*r;  
+        ArcNode *f;  
+      
+        if(!T) //第一次进来时，根节点为空的时候   
+        {  
+            T=new CSnode;  
+            T->data=vertices[v].data;  
+            searched[v]=true;  
+            T->firstchild=T->nextsibling=NULL;  
+        }  
+  
+        for(f=vertices[v].firstarc;f;f=f->nextarc)  
+        {  
+            w=f->adjvex;  
+            if(!searched[w])  
+            {  
+                searched[w]=true;  
+                q=new CSnode;  
+                q->data=vertices[w].data;  
+                q->firstchild=q->nextsibling=NULL;  
+                if(first)  
+                {  
+                    T->firstchild=q;  
+                    first=false;  
+                }  
+                else  
+                    t->nextsibling=q;  
+                t=q;  
+                if(vertices[w].firstarc)  
+                {  
+                    child.data=w;  
+                    child.p=t;  
+                    qu.push(child);  
+                }  
+            }  
+        }  
+        if(!qu.empty())  
+        {  
+            child=qu.front();  
+            qu.pop();  
+            k=child.data;  
+            r=child.p;  
+            BFS_Tree(k,r,qu); //以T的第一个孩子为根节点开始继续建树   
+        }  
+    }  
+};  
+  
+int main()  
+{  
+    CSnode *T=NULL;  
+    CS_Tree tree;  
+    ALGraph G;  
+    G.CreateUDG_ALG();  
+    cout<<"广度优先遍历图为：";  
+    G.BFS_Traverse();  
+    cout<<endl;  
+  
+    for(int i=0;i<20;i++)  
+        searched[i]=false;  
+      
+    cout<<"输入要从第几号顶点开始建立广度优先生成树：";  
+    int v;  
+    cin>>v;  
+    My_queue<Info> qu;  
+    cout<<"____建立广度优先生成树____"<<endl;  
+    G.BFS_Tree(v,T,qu);  
+    cout<<"____建树完成____"<<endl;  
+  
+    cout<<"生成树的先根遍历为：";  
+    tree.PreRoot_Traverse(T);  
+    cout<<endl;  
+  
+    cout<<"生成树的后根遍历为：";  
+    tree.PostRoot_Traverse(T);  
+    cout<<endl;  
+      
+    cout<<"生成树的层次遍历为：";  
+    tree.LevelOrder_Traverse(T);  
+    cout<<endl;  
+  
+    return 0;  
+}  
+#include<iostream>
+#include<string>
+#include<time.h>
+using namespace std;
+
+const int MAX_VERTEX_NUM=20; //顶点最大值
+bool visited[20];//用于遍历时辅助使用
+bool searched[20];//用于建树时辅助使用
+
+//循环队列模版
+template<class T>
+class My_queue;
+
+template<class T>
+class Node
+{
+private:
+	T data;
+	Node<T> *next;
+public:
+	Node()
+	{
+		next=0;
+	}
+	Node(T d)
+	{
+		data=d;
+		next=0;
+	}
+	friend My_queue<T>;
+};
+
+template<class T>
+class My_queue
+{
+private:
+	Node<T> *tail;
+public:
+	My_queue()
+	{
+		tail=new Node<T>();
+		tail->next=tail;
+	}
+
+	bool empty()
+	{
+		return (tail->next==tail);
+	}
+
+	void push(T d)
+	{
+		Node<T> *p=new Node<T>(d);
+		p->next=tail->next;
+		tail->next=p;
+		tail=p;
+	}
+
+	T front()
+	{
+		if(empty())
+		{
+			cout<<"queue is empty!"<<endl;
+			exit(0);
+		}
+		Node<T> *p=tail->next;
+		T data=p->next->data;
+		return data;
+	}
+
+	void pop()
+	{
+		Node<T> *p=tail->next;
+		Node<T> *q=p->next;
+		p->next=q->next;
+		if(q==tail)
+			tail=p;
+		delete q;
+	}
+};
+
+class ALGraph;
+class CS_Tree;
+//树结点
+class CSnode
+{
+	string data;
+	CSnode *firstchild;
+	CSnode *nextsibling;
+	friend class CS_Tree;
+	friend class ALGraph;
+};
+
+//树类定义
+class CS_Tree
+{
+public:
+	void PreRoot_Traverse(CSnode *T) //先根遍历
+	{
+		if(T)
+		{
+			cout<<T->data<<"  ";
+			PreRoot_Traverse(T->firstchild);
+			PreRoot_Traverse(T->nextsibling);
+		}
+	}
+
+	void PostRoot_Traverse(CSnode *T) //后根遍历
+	{
+		if(T)
+		{
+			PostRoot_Traverse(T->firstchild);
+			cout<<T->data<<"  ";
+			PostRoot_Traverse(T->nextsibling);
+		}
+	}
+
+	void LevelOrder_Traverse(CSnode *T) //层次遍历
+	{
+		My_queue<CSnode *> q;
+		CSnode *t;
+		q.push(T);
+		do
+		{
+			t=q.front();
+			do
+			{
+				cout<<t->data<<"  ";
+				if(t->firstchild)
+					q.push(t->firstchild);
+				t=t->nextsibling;
+			}while(t);
+			q.pop();
+		}while(!q.empty());
+	}
+};
+
+class VNode;
+//表结点
+class ArcNode
+{
+public:
+	int adjvex;
+	ArcNode *nextarc;
+	friend class VNode;
+};
+
+class ALGraph;
+//头结点
+class VNode
+{
+	string data;
+	ArcNode *firstarc;
+	friend class ALGraph;
+};
+
+struct Info //结构体，存储结点的位置和该结点在生成树中的位置，辅助建树
+{
+	int data;
+	CSnode *p;
+};
+
+class ALGraph
+{
+private:
+	VNode vertices[MAX_VERTEX_NUM];
+	int vexnum;
+	int arcnum;
+public:
+	void CreateUDG_ALG()
+	{
+		//采用邻接表构造无向图G
+		string v1,v2;
+		int i,j,k;
+		cout<<"输入顶点数和边数：";
+		cin>>vexnum>>arcnum;
+
+		cout<<"输入顶点民称：";
+		for(i=0;i<vexnum;i++)
+		{
+			cin>>vertices[i].data;
+			vertices[i].firstarc=NULL;
+		}
+
+		//输入各弧并构造邻接表
+		for(k=0;k<arcnum;k++)
+		{
+			cout<<"输入边所对应的两个顶点：";
+			cin>>v1>>v2;
+			i=Locate_Vex(v1);
+			j=Locate_Vex(v2);
+			while(i<0|| i>vexnum-1 || j<0 || j>vexnum-1)
+			{
+				cout<<"结点位置输入错误,重新输入: ";
+				cin>>v1>>v2;
+				i=Locate_Vex(v1);
+				j=Locate_Vex(v2);	
+			}
+
+			ArcNode *p=new ArcNode;
+			p->adjvex=j;
+			p->nextarc=vertices[i].firstarc;
+			vertices[i].firstarc=p;
+
+			ArcNode *q=new ArcNode;
+			q->adjvex=i;
+			q->nextarc=vertices[j].firstarc;
+			vertices[j].firstarc=q;
+		}
+	}
+
+	int Locate_Vex(string v) //返回顶点在数组中的位置
+	{
+		for(int k=0;vertices[k].data!=v;k++);
+		return k;
+	}
+
+	void BFS_Traverse() //广度优先遍历
+	{
+		int i,k,w;
+		My_queue<int> q;
+		ArcNode *p;
+		for(i=0;i<vexnum;i++)
+			visited[i]=false;
+		for(i=0;i<vexnum;i++)
+		{
+			if(!visited[i])
+			{
+				visited[i]=true;
+				cout<<vertices[i].data<<"  ";
+				if(vertices[i].firstarc)
+					q.push(i);
+				while(!q.empty())
+				{
+					k=q.front();
+					q.pop();
+					for(p=vertices[k].firstarc;p;p=p->nextarc)
+					{
+						w=p->adjvex;
+						if(!visited[w])
+						{
+							visited[w]=true;
+							cout<<vertices[w].data<<"  ";
+							if(vertices[w].firstarc)
+								q.push(w);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void BFS_Tree(int v,CSnode *&T,My_queue<Info> &qu)
+	{
+		/*-------------------------------------------------
+		/广度优先生成树，从v位置开始建立以T为根节点的树  
+		/紧跟广度优先遍历的思路写的建树方式，通过将有相邻
+		/结点的结点位置和该结点在树中的位置一起打包入队，
+		/然后每次就递归进行以队列第一个结点为根节点的建树 
+		/过程，和广度优先遍历的思想是一样的
+		/------------------------------------------------*/
+
+		Info child;
+		int w,k;
+		bool first=true; //是否为v位置的第一个为访问的相邻结点的标志
+		CSnode *t,*q,*r;
+		ArcNode *f;
+	
+		if(!T) //第一次进来时，根节点为空的时候
+		{
+			T=new CSnode;
+			T->data=vertices[v].data;
+			searched[v]=true;
+			T->firstchild=T->nextsibling=NULL;
+		}
+
+		for(f=vertices[v].firstarc;f;f=f->nextarc)
+		{
+			w=f->adjvex;
+			if(!searched[w])
+			{
+				searched[w]=true;
+				q=new CSnode;
+				q->data=vertices[w].data;
+				q->firstchild=q->nextsibling=NULL;
+				if(first)
+				{
+					T->firstchild=q;
+					first=false;
+				}
+				else
+					t->nextsibling=q;
+				t=q;
+				if(vertices[w].firstarc)
+				{
+					child.data=w;
+					child.p=t;
+					qu.push(child);
+				}
+			}
+		}
+		if(!qu.empty())
+		{
+			child=qu.front();
+			qu.pop();
+			k=child.data;
+			r=child.p;
+			BFS_Tree(k,r,qu); //以T的第一个孩子为根节点开始继续建树
+		}
+	}
+};
+
+int main()
+{
+	CSnode *T=NULL;
+	CS_Tree tree;
+	ALGraph G;
+	G.CreateUDG_ALG();
+	cout<<"广度优先遍历图为：";
+	G.BFS_Traverse();
+	cout<<endl;
+
+	for(int i=0;i<20;i++)
+		searched[i]=false;
+	
+	cout<<"输入要从第几号顶点开始建立广度优先生成树：";
+	int v;
+	cin>>v;
+	My_queue<Info> qu;
+	cout<<"____建立广度优先生成树____"<<endl;
+	G.BFS_Tree(v,T,qu);
+	cout<<"____建树完成____"<<endl;
+
+	cout<<"生成树的先根遍历为：";
+	tree.PreRoot_Traverse(T);
+	cout<<endl;
+
+	cout<<"生成树的后根遍历为：";
+	tree.PostRoot_Traverse(T);
+	cout<<endl;
+	
+	cout<<"生成树的层次遍历为：";
+	tree.LevelOrder_Traverse(T);
+	cout<<endl;
+
+	return 0;
+} 
+
+ 
+
+下面是测试结果：
+
+view plaincopy to clipboardprint?输入顶点数和边数：9 15  
+输入顶点民称：v1 v2 v3 v4 v5 v6 v7 v8 v9  
+输入边所对应的两个顶点：v1 v6  
+输入边所对应的两个顶点：v1 v7  
+输入边所对应的两个顶点：v1 v2  
+输入边所对应的两个顶点：v2 v7  
+输入边所对应的两个顶点：v2 v3  
+输入边所对应的两个顶点：v6 v5  
+输入边所对应的两个顶点：v6 v9  
+输入边所对应的两个顶点：v7 v9  
+输入边所对应的两个顶点：v7 v8  
+输入边所对应的两个顶点：v3 v8  
+输入边所对应的两个顶点：v3 v4  
+输入边所对应的两个顶点：v9 v5  
+输入边所对应的两个顶点：v9 v8  
+输入边所对应的两个顶点：v8 v4  
+输入边所对应的两个顶点：v5 v4  
+广度优先遍历图为：v1  v2  v7  v6  v3  v8  v9  v5  v4  
+输入要从第几号顶点开始建立广度优先生成树：0  
+____建立广度优先生成树____  
+____建树完成____  
+生成树的先根遍历为：v1  v2  v3  v4  v7  v8  v9  v6  v5  
+生成树的后根遍历为：v4  v3  v2  v8  v9  v7  v5  v6  v1  
+生成树的层次遍历为：v1  v2  v7  v6  v3  v8  v9  v5  v4  
+Press any key to continue  
+输入顶点数和边数：9 15
+输入顶点民称：v1 v2 v3 v4 v5 v6 v7 v8 v9
+输入边所对应的两个顶点：v1 v6
+输入边所对应的两个顶点：v1 v7
+输入边所对应的两个顶点：v1 v2
+输入边所对应的两个顶点：v2 v7
+输入边所对应的两个顶点：v2 v3
+输入边所对应的两个顶点：v6 v5
+输入边所对应的两个顶点：v6 v9
+输入边所对应的两个顶点：v7 v9
+输入边所对应的两个顶点：v7 v8
+输入边所对应的两个顶点：v3 v8
+输入边所对应的两个顶点：v3 v4
+输入边所对应的两个顶点：v9 v5
+输入边所对应的两个顶点：v9 v8
+输入边所对应的两个顶点：v8 v4
+输入边所对应的两个顶点：v5 v4
+广度优先遍历图为：v1  v2  v7  v6  v3  v8  v9  v5  v4
+输入要从第几号顶点开始建立广度优先生成树：0
+____建立广度优先生成树____
+____建树完成____
+生成树的先根遍历为：v1  v2  v3  v4  v7  v8  v9  v6  v5
+生成树的后根遍历为：v4  v3  v2  v8  v9  v7  v5  v6  v1
+生成树的层次遍历为：v1  v2  v7  v6  v3  v8  v9  v5  v4
+Press any key to continue 
+按照输入的边和结点 所生成的无向图和该图的广度优先生成树如下所示，其中红线是生成树的过程中的遍历路线：
+
+
+
+......一开始图片显示错误 现在改小了 应该可以了
+
+
+
+http://blog.csdn.net/kay_sprint/article/details/6685813
