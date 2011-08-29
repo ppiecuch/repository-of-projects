@@ -1,0 +1,100 @@
+ 这个小实例主要讲的就是让文本变的透明度不一样。这个其实就是用到了这个android.graphics.Color。我们利用android给我们的这个包来实现我们想要的效果，这个比较简单，在这里就不多和大家交流，下面就来看看代码是怎么实现的吧：
+
+java代码：
+package eoe.demo; 
+
+
+
+import android.widget.TextView;
+
+import android.os.Bundle;
+
+import android.view.ViewGroup;
+
+import android.app.Activity;
+
+import android.graphics.Color;
+
+import android.widget.LinearLayout;
+
+
+
+
+
+public class alphaTest extends Activity { 
+
+
+
+final int WRAP_CONTENT = ViewGroup.LayoutParams.WRAP_CONTENT; 
+
+
+
+public void onCreate(Bundle icicle) {
+
+super.onCreate(icicle); 
+
+
+
+LinearLayout linearLayout = new LinearLayout(this);
+
+linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+setContentView(linearLayout); 
+
+
+
+TextView TV1 = new TextView(this);
+
+TV1.setText(“全部不透明＝255″);
+
+TV1.setBackgroundColor(Color.argb(255, 0, 255, 0));
+
+linearLayout.addView(TV1, new LinearLayout.LayoutParams(WRAP_CONTENT,
+
+WRAP_CONTENT)); 
+
+
+
+TextView TV2 = new TextView(this);
+
+TV2.setText(“部分透明＝155″);
+
+TV2.setBackgroundColor(Color.argb(155, 0, 255, 0));
+
+linearLayout.addView(TV2, new LinearLayout.LayoutParams(WRAP_CONTENT,
+
+WRAP_CONTENT)); 
+
+
+
+TextView TV3 = new TextView(this);
+
+TV3.setText(“部分透明＝55″);
+
+TV3.setBackgroundColor(Color.argb(55, 0, 255, 0));
+
+linearLayout.addView(TV3, new LinearLayout.LayoutParams(WRAP_CONTENT,
+
+WRAP_CONTENT)); 
+
+
+
+TextView TV4 = new TextView(this);
+
+TV4.setText(“全部透明＝0″);
+
+TV4.setBackgroundColor(Color.argb(0, 0, 255, 0));
+
+linearLayout.addView(TV4, new LinearLayout.LayoutParams(WRAP_CONTENT,
+
+WRAP_CONTENT)); 
+
+
+
+} 
+
+
+
+} 
+复制代码
+http://www.eoeandroid.com/thread-96033-1-1.html

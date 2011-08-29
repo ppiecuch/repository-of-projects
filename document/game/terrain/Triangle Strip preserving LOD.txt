@@ -1,0 +1,294 @@
+Triangle Strip preserving LOD
+
+(T-Strip LOD)
+
+V 1.1 (last updated 5/15/2002)
+
+Computer Science 95.495B Honours Project
+By: Ernest Szoka
+Supervisor: Dr. Wilf R. LaLonde
+Carleton University
+Ottawa, Ontario, Canada
+April, 2002
+
+Demo
+
+T-Strip LOD (1.6 MB) Win32, OpenGL required. Unintentionly optimized for Nvidia cards, most ATI cards will experience a significant performance loss (at the time I wrote this).
+
+Read the ReadMe.txt for running instructions and different toggle keys. Remember the application will build the terrain texture which can take 30 seconds to generate before it starts. Terrain texture generation is done only once. Your video card must support texture sizes of 1024x1024 (3dfx users are out of luck, sorry). Software mode works, but it's slow and dark, so make the window size smaller to improve performance. Tested and working on all Nvidia based cards (TNT2,GeForce) and most ATI based cards. As always, make sure you have the latest video card drivers. The only extensions used are ARB multitexture.
+
+The source code is closed.
+
+Abstract
+
+Over the course of 6 months I have experimented and developed a 3D terrain engine that uses a unique and simple method of performing LOD (level of detail) that preserves the height map as a series of triangle strips. The idea was inspired by other LOD techniques which typically subdivide the triangles of a mesh to attain greater detail in the mesh closest to the viewer and less detail farther away. Instead of subdividing triangles I chose to subdivide lines. The idea was to retain this geometric structure so it would be faster to draw the triangles as a triangle strip. 
+
+Table of Contents
+
+Triangle Strips 
+Frustum Culling Terrain 
+T-Strip LOD 
+Features 
+Theory 
+LOD Metric 
+Data Structures 
+Performance Vs Traditional LOD 
+LOD Ratio 
+Transition Blocks 
+Geo-Morphing 
+Did the Triangle Strips Make a Difference? 
+Rendering Objects 
+Collision Detection 
+Applications of T-Strip LOD 
+Generating The Terrain Texture 
+Height Relief 
+Lighting and Shadows 
+Rendering The Terrain Texture 
+References 
+ 
+
+Triangle Strips
+
+A triangle strip is a geometric structure for rendering triangles whose vertices follow a contiguous path that make up a series of triangles. Triangles strips consume less memory and are processed faster on 3D hardware than triangles rendered individually[MARS2000]. 
+
+
+Fig 1. A trianlge strip, indices must point to each vertex in order shown
+
+Rendering triangle strips using vertex arrays involves creating an array of indices that point to each vertex in the contiguous path of the triangle strip, setting up the vertex array and sending the indicies to OpenGL.
+
+glEnableClientState(GL_VERTEX_ARRAY);
+glVertexPointer(3,GL_FLOAT,0, p_vertices);
+glDrawElements(GL_TRIANGLE_STRIP, numVertices, GL_UNSIGNED_INT, p_indices);
+
+Rendering a terrain heightmap brute force using triangle strips per line can offer up to 50-60% difference in performance over rendering each triangle individually, even with both methods using vertex arrays. The motivation was strong to create an LOD scheme to preserve this performance characteristic. 
+
+Frustum Culling Terrain
+
+Frustum culling is the process of identifying geometry that is to be drawn based on whether said geometry lies inside, outside or partially within the viewing frustum (the box that defines what lies in the cameras field of view). Typically frustum culling for terrains involves building a quad-tree (or oct-tree) to subdivide the terrain recursively into four smaller squares, to some minimum that encompasses the whole terrain. The frustum cull is accomplished by recursively checking if the parent of a given node (starting at the root) of the quad tree lies within the frustum, outside, or partially. If the whole node lies within the frustum, everything inside the node is drawn, if the node is completely outside, it is not drawn at all and if it is partially inside, then the procedure recursively delves deeper into the quadtree of that node until it reaches the bottom and/or finds all the nodes that must be rendered from the ones that shouldn't. A quadtree operates in two dimensions of the terrain, while an octree operates on three and is composed of 8 children nodes at each node. An octree provides the additional advantage of eliminating terrain geometry that is above or below you while a quadtree those not. Quad and Oct trees can also be used for collision detection as well as frustum culling.
+
+
+Fig 2. A snapshot of a frustum cull (the black outline is the polygon generated from the intersection)
+
+A faster technique slightly less accurate than an octree, but just as accurate as a quad tree is to perform an intersection of the frustums geometry with the min and max plane of the terrains heightmap. Collecting all the points caused in the intersection you flatten them to form a set of points on one plane, then obtain a convex hull by doing a graham scan on the points to get a set of points outlining the perimeter of the frustum within the extremities of the heightmap. The terrain can then be rendered by doing a polygon fill algorithm on the polygon substituting line segments of the terrain for the fill. The operation to cull this way is O(1) since it relies on a constant set of line interesections that make up the frustum. The resulting data structure is an array along the z axis containing the start and end along the x axis.
+
+T-Strip LOD
+
+Features
+
+Height map size must be 2^S + 1 with equal width and height (such that it creates 2^S+1 vertices and 2^S square blocks) 
+T-Strip LOD produces geometry that is symmetric and can easily be joined with adjacent terrain patches with little effort 
+Terrain can be modified in real time, T-Strip LOD does not require any extra computation for changing terrain. 
+LOD metric is based on distance from viewer, but does not take into account terrain topology, although a terrain topology metric is possible. 
+T-Strip LOD allows smooth geo-morphing (vertices are interpolated to prevent sudden popping) 
+Theory
+
+The T-Strip Algorithm recursively splits a line segment into 2 equally sized smaller line segments starting from the largest block size (the entire map) down to the smallest blocksize. Every split reduces the blocksize of the line by half. It is similar to the recursion of a quad tree with the big difference being that the splitting is done on a horizontal line segment and not 4 quads. The recursive step is repeated for eacy line segment until LOD has been satisfied. Individual lines make a contiguous string of triangles forming a triangle strip adding an extra performance benefit when rendering.
+
+
+Fig 3. Subdivision of Lines (top) as Triangle Strips (bottom)
+
+At a given line segment the algorithm decides whether the line segment will be split fully, not at all, or partially, but the split remains contiguous even if there is an area inside the spit that doesn't satisfy being split. The algorithm approaches the centre from both sides performing the LOD heuristic on each block, calculating the distance from the block centre to the viewer. 
+
+If the distance is less than the LOD heuristic for the current size of the block, then that block is flagged as being the split start or split end. The algorithm continues until both ends of the split are found or the center is reached. If there is a split, the line segment between the start and end is split into 2 lines and each recursively subdivided again. The recursion stops if the line is sufficiently small enough to satisfy the LOD heuristic or the minimum block size is reached. During each operation, the start and end of each line segment is pruned by the frustum cull, vertex morphing is applied on each subdivided block and transition blocks are applied to remove T sections. 
+
+We maintain a pointer to the top line for finding vertical transitions, the line z index (startZ) and line size (blockSize = 2^size or 1<<size)
+
+SubDivide( Line, TopLine, startZ, size)
+
+prune line startX and endX to frustum cull 
+if blocksize is 1 return 
+find subdivision start and end by starting at both ends and moving towards centre of line 
+if subdivision occurs 
+apply vertex morphing to all subdivided blocks that are within morphing range 
+split subdivision into two separate lines and subdivide each recursively 
+apply left and right transition blocks 
+apply top and bottom transition blocks (if TopLine has subdivisions apply top transitions on this Line, if this Line has subdivisions and TopLine does not then apply bottom transitions to TopLine) 
+
+Fig 4. Wireframe view of T-Strip LOD mesh
+
+LOD Metric
+
+The LOD metric is the test that is performed that determines whether a given block segment should be subdivided or not. This implementation relies solely on the distance of the block from the viewer as the LOD metric, although a heuristic based on Topology(slope and shape of the terrain) is possible. Tests involving topology as a factor showed that the number of transitions closely matched the number of strips, diluting the effectiveness of the triangle strips performance benefit as well as requiring more strips to satisfy the high degree of changes. Smooth geo-morphing was also problematic and special cases involving a high order block next to a block two or more levels down revealed nasty t-section cracks. Because of the large number of calls and longer processing time, topology as a significant contributing factor to the LOD of the mesh proved to be slower than a higher resolution distance-only LOD metric.
+
+
+Fig 5. T-Strip LOD with Topology Metric
+
+Data Structures
+
+Data structures used consist of the original heightmap, vertices that make up the mesh, sectors for each terrain block, and the LOD Line tree that is generated every time containing the subdivision structure of the Triangle Strip LOD mesh.
+
+Terrain
+ 
+float* heightmap
+ The heightmap representing the original terrain height of size 2^S+1 
+ 
+float* vertices
+ Vertices that make up the drawn terrain mesh (modified by geo-morphing), size: 3x(2^S+1)
+Each vertex that is modified through interpolation is recorded, drawn and reset after each render pass 
+ 
+Sector* sectors
+ Sectors for each block in the terrain, size: 2^S
+ 
+Line* LODLines
+ LOD Line tree containing subdivision information to draw LOD mesh
+ 
+
+The Sector information for every 2^S blocks on the heightmap, contains properties of that area, maximum height (for fast collision detection) and a list of objects occupying that space.
+
+Sector 
+ 
+BYTE maxHeight
+ maximum height of 4 vertices that make up this sector block
+ 
+List<Objects*> objects
+ list of objects (trees, buildings ect..)
+ 
+int properties
+ ie (impassable, terrain type (swamp, brush, grass, sand))
+ 
+
+The geometry generated by T-Strip LOD is stored in a tree with each line segment node carrying 2 pointers to it's subdivided line segments.
+
+Line
+ 
+bool bDraw 
+ does this line segment contain blocks to render?
+ 
+int startX 
+ start of line segment including child line segments
+ 
+int endX 
+ end of line segment including child line segments
+ 
+List<Block> blocks
+ list of different blocks of current size occupying line
+ 
+Line* pSubDiv1
+ first subdivided line
+ 
+Line* pSubDiv2
+ second subdivided line
+ 
+
+ 
+
+Block
+ 
+int startX
+ start of line block segment
+ 
+int endX
+ end of line block segment
+ 
+int type
+ is block type normal (triangle strip), or any combination of transition block (top left, right, bottom)
+ 
+
+ 
+
+Performance VS Traditional LOD
+
+Traditional LOD recursively subdivides triangles [MALI2000], while T-Strip recursively subdivides lines. The cost of subdivision it attributed to the cost of determining whether the distance is sufficient enough to cause a subdivision. Traditional LOD takes twice as many steps to get to the maximum resolution mesh that T-Strip does with each step costing twice as much as the previous step. T-Strip may only check the two endpoints of a line to see that it must subdivide, but it must also iterate through every block on the subdivided line to check if it should perform interpolation on a block, so it allways performs a heuristic calculation on every block. T-Strip performs the heuristic on individual square blocks and the cost is 4 times half the number of steps as regular LOD minus 1. . Although T-Strip has less fidelity that traditional LOD, it those pack the extra punch that all it's subdivisions are maintained as triangle strips and thus enjoy a performance benefit when finally being rendered. 
+
+
+Fig 6. Example of subdivision comparison and cost of T-Strip LOD vs. Traditional LOD
+
+Cost of Traditional LOD per level L:  2^L
+Cost of T-Strip LOD per level L:  4^(1/2*L -1) = 2^(L-2) (only when L is even)
+
+To find the total cost we take summation from 1 to N steps and apply the summation formula for geometric series.
+
+Total Cost of Traditional LOD: 
+
+Total Cost of T-Strip LOD: 
+
+The total cost of T-Strip LOD although still O(2^n) is a significant improvement for normal maps of size 2^N. Example for N=10, map size is1024x1024, traditional LOD would take 2046 steps while taking only 341 steps with T-Strip LOD, worst case for finding the maximum resolution mesh.
+
+LOD Ratio
+
+the LOD ratio represents the number of blocks till the next higher size and is used to generate a set of distance intervals for each block size. The intervals become the heuristic that is used to determine whether a block is subdivided or not based on its distance from the viewer. The LOD ratio is multiplied by the blocksize to get the interval and creates an even distribution of blocks of each size in the mesh. In this implemenation the interval for the smallest blocksize is doubled for greater accuracy closest to the viewer.
+
+
+Fig 7. Low Detail LOD Ratio is 4
+
+
+Fig 8. High Detail LOD Ratio is 18
+
+ 
+
+Transition Blocks
+
+A T section is a crack or visible seam that appears whenever a vertex is missing at a junction between 3 polygons. Every time a transition occurs from one blocksize to another blocksize a T-section crops up and must be dealt with by inserting a transition block in place of the larger block adjacent to the smaller ones. 3 edges must be inserted into a normal block just to take care of one T junction. Transitions blocks must be placed whenever there is a subdivision occurring to the left, right, top or bottom of a line segment.
+
+
+Fig 9. T-sections caused between two blocks of different sizes. Larger block must be replaced by a transition block 
+
+
+Fig 10. Step by step example of subdivision and transition blocks being applied
+
+Geo Morphing
+
+The process of geo-morphing or vertex interpolation is to eliminate the occurrence of obvious popping geometry while the camera is in motion. When the camera moves the terrain changes to reflect the LOD based on the camera's position, if the LOD is low and the geometry is big and crude, terrain features will suddenly pop into view as the viewer gets closer and a large block encompassing the feature is suddenly tessellated to reveal the feature. If the vertices of the feature are interpolated, such that when a larger block becomes 4 smaller blocks, the 4 smaller blocks assume the same height value and shape of the large block and gradually grow as the viewer gets closer, the subtle morphing will prove less obvious and obtrusive to the viewer. In this implementation vertex interpolation is set to half of the LOD range, so half the geometry is being interpolated at any given moment, while the remaining geometry is fixed at the correct size.
+
+
+Fig 11. Vertex interpolation using the block's centre vertex (blue) applied to adjacent vertices (red)
+
+Vertex interpolation is applied to the centre of each block in the subdivided segment before it is split and subdivided, given that it is close enough within range to be morphed. To save time the percentage of interpolation is attained from just the centre block and applied to the adjacent 4 vertices making up the subdivision, the next block which is an equal distance apart does the same and applies it's interpolation value averaging the value if a vertex has been changed previously. Because top and bottom Transition blocks are applied after the subdivision has occurred, all transition blocks apply their interpolated value to their adjacent vertex after the main LOD process.
+
+Did the Triangle Strips Make a Difference?
+
+Performance tests with triangle strips on and off while rendering the T-Strip LOD mesh resulted in a performance difference ranging from 10% to 25%. Although results may vary depending on graphics hardware, drivers and processor speed. There may still be some inherit performance benefit in rendering triangles contiguously even though triangle strips aren not used, so testing cannot be completely accurate, but a performance benefit does exist. The fact that the triangle strips are oriented horizontally has marginal effects on performance at different camera orientations, since the even shift in LOD sizes breaks up any symmetric favouring along a particular axis. The test system was a 1.2 Ghz Athlon with a Geforce 2 GTS.
+
+Rendering Objects
+
+Objects are organized based on their block location on the terrain and are only drawn if that segment of the terrain is draw as well. A drawn object that is a sprite (has transparency) is first collected into a List with it's squared distanced from the viewer calculated and stored. Once all objects have been collected and the terrain drawn the objects are quick sorted based on distance from the viewer and drawn farthest object first with Z-Buffer writing off. Transparent objects must be sorted and drawn last so as to ensure that they do not overlap other transparent objects.
+
+Because LOD is applied to the mesh, objects must constantly check the height beneath them so they can conform to the changing terrain and do not appear to float above the terrain. Objects are best rendered during the draw phase of the LOD process, so terrain height can be derived easily at the current level of block size. Objects are also only drawn if the blocksize beneath them is less than a certain size so that even though distant terrain features are drawn, the objects on the terrain feature are not because they are to small to be visble.
+
+Collision Detection
+
+Doing collision detection involves finding an intersection between a collision vector and the terrain¡¯s mesh as well as objects on the terrain. Objects have a spherical radius for collision detection. If the collision is user driven (a mouse click on a location) then the vector must be compared against the LOD mesh otherwise if the collision is simulation driven (objects in the environment interacting with each other) then the vector must be compared with the true terrain mesh. 
+
+Performing simulation driven collision detection on the terrain involves mapping the collision vector onto the terrain and executing a line-to algorithm that iterates through blocks along the path checking for collision with objects occupying the sector and the terrain itself. Checking terrain collision involves finding an intersection with one of the two triangles making up the sector block. Collision detection on the terrain is sped up by maintaining a maximum height variable for each sector such that only collision vectors that are below this height get checked. If objects are also to be checked, the line-to algorithm must generate a widened path equal to the radius of the object so that it can check an object in an adjacent sector whose radius overlaps the current one.
+
+
+Fig 12. An example of a collision ray, the line-to path (blue), a possible collision where the ray is less than the block max height (green) and the final terrain collision (red).
+
+Performing collision detection on an LOD mesh generated by T-Strip involves mapping the collision vector and doing a line-to procedure as in a simulation driven collision, objects can be checked the same way as before (since the object conform to the height of the LOD mesh), however a terrain collision check requires a pass through the LOD Line tree to attain the actual block size of a particular region. User driven collision detection is not implemented in the demo, because the error in the terrain tends to be negligible.
+
+Applications of T-Strip LOD
+
+Applications of T-Strip are the same as for Traditional LOD algorithms, which is to render large terrains in real-time. Applications include GIS and games. An obvious pitfall in using this technology is if the application has multiple users and is user driven (a multiplayer first person shooter) since the height of all other objects(possible users) is relative to the viewers perspective and does not reflect the true height of the actual object. So any application involving aiming in first person with multiple players would not be an accurate simulation unless the objects and players conformed to the true height (in which case it would float or be imbedded in the terrain).
+
+Generating the Terrain Texture 
+
+Height Relief
+
+In order to generate a realistic terrain texture with height relief where the texture changes according to the height of the location, the height of each pixel in the terrain texture is derived and used to interpolate between two other textures to form the final pixel.
+
+
+Fig 13. Terrain texture generated from heightmap using 4 textures to represent height relief
+
+
+Fig 14. The 4 textures used to generate the height relief in order
+
+Lighting and Shadows
+
+Because the terrain mesh is always changing and morphing, hardware lighting doesn't work because it relies on vertex normals attained from the vertices or faces that make up the mesh. Since the mesh is always changing the lighting will drasticly change while the camera moves. Instead the lighting must be pre-calculated in a lightmap and blended into the final texture. Lighting is accomplished by performing the dot product between the face normal at each pixel of the light map and the suns direction vector. The face normal is derived from the pixels location on the mesh. Shadows are generated by performing collision detection from each pixel to the suns position, if a collision occurs with the mesh, the sun is blocked and a shadow is generated at that pixel. Once the lightmap is generated it is blurred (each pixels light value is blended with all adjacent pixels) to soften the shadows and then the light map is combined with the blended height relief terrain texture to form the final terrain texture.
+
+
+Fig 15. Example of shadows on a small (33x33) test map using a high resolution 1024x1024 texture map. Large terrains have far less detail in their terrain texture than this.
+
+Rendering the Terrain Texture
+
+The terrain texture is rendered using OpenGL automatic texture generation. Texture size is limited to 1024x1024 on most hardware so representing greater details  becomes harder with larger heightmaps. To circumvent this problem, the heightmap can be split into 4 equal pieces multiple times and tiled together easily (because T-Strip LOD generates a symmetric mesh), with each tile having a texture of it's own. If an oversize terrain texture is split and tiled, each texture must have the edges equal to the texture adjacent to it so that seams are not visible when tiled [MALI2001]. In OpenGL the tiled texture must be created with the wrap parameter set to GL_CLAMP instead of the GL_REPEAT so that the bilinear filtering doesn't interpolate with the other side of the texture .
+
+  
+Fig 16.Visible seams show up when the texture is set to the default of GL_REPEAT on tiled terrain patches, top left shows a close up with detail texturing off.
+
+References
+
+[MALI2000] Malik, S. Dynamic Level of Detail Representation of Interactive 3D Worlds, April 2000.
+[MALI2001] Malik, S. Private Discussion. 
+[MARS2000] Marselas, H. Optimizing Vertex Submission for OpenGL, Game Programming Gems, pp. 353-360.
+http://www.ernestszoka.com/tstriplod/tstrip.htm
