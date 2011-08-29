@@ -1,6 +1,14 @@
 MFC中，TRACE("\r\n%s","fdsafdsfsda");
 
 
+CString name("中文");
+TRACE(TEXT("drop layer%s\r\n"),name);
+
+
+TRACE(TEXT("drop layer%s\r\n"),it.getNode()->getValue()->m_strName);
+如果m_strName是const CString& 会报错,如果是const CString则不会
+
+
 
 
 Win32代码中可以直接用OutputDebugString来达到相同效果

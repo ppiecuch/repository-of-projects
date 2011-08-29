@@ -1,4 +1,26 @@
 [异常]
+_CrtDbgReport: String too long or IO Error
+[解决]
+#include <locale.h>
+并在程序开始调用setlocale(LC_ALL, "chs");
+
+Microsoft Visual Studio Feedback上的反馈
+
+http://connect.microsoft.com/VisualStudio/feedback/details/425215/bug-with-trace-and-crtdbgreport
+
+There is a bug with TRACE and _CrtDbgReport when working with the wide string.
+_CrtDbgReport can't handle the wide string correctly when the wide string contains non-ascii characters. 
+
+貌似在Beta 2 of Visual Studio 2010.修正了该bug
+
+
+
+[异常]
+无法链接******API时
+[解决]
+少了#pragma comment(lib, "Irrlicht.lib")
+
+[异常]
 MSVCRT.lib(MSVCR100.dll) : error LNK2005: _strchr 已经在 libcmt.lib(strchr.obj) 中定义
 [解决]
 //1>MSVCRT.lib(MSVCR100.dll) : error LNK2005: _strchr 已经在 libcmt.lib(strchr.obj) 中定义

@@ -1,0 +1,28 @@
+//已知3点，求平面方程
+BOOL CGe::PanelEquationFromThreePt(CPoint3dArray ptArr, 
+                                   double &a,double &b,double &c,double &d)
+{//from http://blog.csdn.net/hoya5121
+    CPoint3d p1,p2,p3;
+
+    if(ptArr.GetSize() < 3)
+    {
+        return FALSE;
+    }
+    p1 = ptArr[0];
+    p2 = ptArr[1];
+    p3 = ptArr[2];
+    
+    a = ( (p2.y-p1.y)*(p3.z-p1.z)-(p2.z-p1.z)*(p3.y-p1.y) );
+    b = ( (p2.z-p1.z)*(p3.x-p1.x)-(p2.x-p1.x)*(p3.z-p1.z) );
+    c = ( (p2.x-p1.x)*(p3.y-p1.y)-(p2.y-p1.y)*(p3.x-p1.x) );
+    d = ( 0-(a*p1.x+b*p1.y+c*p1.z) );
+
+    return TRUE;
+}
+
+//点到面的距离，设点坐标为P(x, y, z)，平面方程为ax+by+cz+d=0。
+double CGe::DistPt2Panel(    double x,double y,double z,
+                            double a,double b,double c,double d)
+{
+    return    fabs(a*x+b*y+c*z+d) / sqrt(a*a+b*b+c*c);
+}
