@@ -1,0 +1,83 @@
+前面介绍了Codejock.Xtreme.Toolkit.Pro，下面介绍一下它的安装和编译。
+
+1.先下载Codejock.Xtreme.Toolkit.Pro
+
+2.安装：一路“下一步”，很简单
+
+3.安装完以后会出一个新的“codejock deployment wizard”窗口，这里你可以跟据需要，选择是否要UNICODE的版本，或者DLL 还是静态的LIB方式这里推荐LIB用LIB发布时不用带DLL了。
+
+4.选择完成后，会弹出一个CMD窗口开始自己编译，这个过程 比较慢慢
+
+5.编译完后，你可以编译例子了，编译前做一下设置，在Project->Setting->General->Microsoft Foundation Classes中选择
+
+Use MFC in a Static Library就可以编译了。
+
+静态链接注意事项
+
+1）程序动态链接到MFC库情况下，静态链接到XTP
+
+2）程序动态静态到MFC库情况下，静态链接到XTP
+
+不论哪种情况，配置_XTP_STATICLINK都可以使能静态链接，静态链接时记得在你工程里的rc2文件中，包含如下语句，否则调用XTP中的资源时会发生异常。
+
+　　#include <XTToolkitPro.rc>
+
+由于toolkit安装时，编译生成相应的lib非常慢，我当时只生成了静态的库。分别是：
+
+ToolkitPro1321vc80S.lib
+
+　　ToolkitPro1321vc80SD.lib
+
+　　ToolkitPro1321vc80SU.lib
+
+　　ToolkitPro1321vc80SUD.lib
+
+其中，S表示static, 后面的D表示debug, U表示unicode,
+
+//编译的时候，是有3个选项的
+
+a) As DLL
+
+b) As Static Library, for using MFC as DLL
+
+c) As Static Library, for using MFS as static library.
+
+//我选择了b，所以，生成以上libs：S.lib, SD.lib, SU.lib, SUD.lib.
+
+//如果选择了c)，则会生成DS.lib, DSD.lib, DSU.lib, DSUD.lib//前面的D表示using mfc as dll
+
+//如果选择了a)，则会生成" ".dll, D.dll, U.dll, UD.dll.
+
+假定xtreme toolkit安装在：C:\Program Files下。
+
+则比如会有如下目录存在：C:\Program Files\Codejock Software\MFC\Xtreme ToolkitPro v13.2.1\Source
+
+然后在项目属性中需要修改如下设置：
+
+a) c/c++ | 常规 | 附加包含目录，增加“C:\Program Files\Codejock Software\MFC\Xtreme ToolkitPro v13.2.1\Source”
+
+b) 链接器 | 常规 | 附加库目录：增加“C:Program Files\Codejock Software\MFC\Xtreme ToolkitPro v13.2.1\Lib\vc80”
+
+c) 链接器 | 输入 | 忽略特定库，增加“libcd.lib”。如果遵照文档，还需要忽略更多。我这就先填这个了。
+
+d) 资源 | 常规 | 附加包含目录，增加“C:\Program Files\Codejock Software\MFC\Xtreme ToolkitPro v13.2.1\Source”
+
+然后，在代码中需要进行如下修改：
+
+a) 在stdafx.h末尾增加 #include "XTToolkitPro.h"
+
+b) 在xx.rc2末尾增加   #include "XTToolkitPro.rc"
+
+c) 然后就是在mainfrm.h中的声明中加入继承关系：
+
+class CMainFrame : public CXTPMDIFrameWnd
+
+然后就可以顺利编译通过了。
+
+注意：千万不要将xtreme toolkit的任何东西加入到项目中。我之前就把XTPResource.h, XTToolkitPro.h, XTToolkitPro.rc加入到项目中，然后报cvt1100:重复资源，type:BITMAP,...错误。
+
+动态编译注意事项
+
+其实，和静态编译很像。静态编译可以参考我之前的“xtreme toolkit静态编译注意事项 ”只不过需要xtreme toolkit的.dll拷贝到system32下。或者放在exe的输出目录下。
+
+http://www.cnblogs.com/xiongxuanwen/archive/2011/03/31/2001996.html

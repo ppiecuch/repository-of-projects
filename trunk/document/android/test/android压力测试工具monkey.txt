@@ -1,0 +1,137 @@
+androidSDK中的android调试桥（adb）shell里，有一个用于测试的工具——monkey.
+
+    不知道最早monkey这个名字的来历，不过他确实如同一只调皮的猴子，在android app里各种乱按、乱晃、乱摸。
+
+    如何使用
+
+（只介绍linux下的操作，windows下 开始--》运行 --》cmd 之后，一样的执行即可）
+
+
+    进入命令行，来到androidSDK的platform-tools目录下，输入命令
+
+view plaincopy to clipboardprint?user@user:~/workspace/android-sdk-linux_x86/platform-tools$adb shell monkey   
+user@user:~/workspace/android-sdk-linux_x86/platform-tools$adb shell monkey 
+ 
+
+    即可查看到monkey工具的配置参数的用法。如下：
+
+usage: monkey [-p ALLOWED_PACKAGE [-p ALLOWED_PACKAGE] ...]
+              [-c MAIN_CATEGORY [-c MAIN_CATEGORY] ...]
+              [--ignore-crashes] [--ignore-timeouts]
+              [--ignore-security-exceptions]
+              [--monitor-native-crashes] [--ignore-native-crashes]
+              [--kill-process-after-error] [--hprof]
+              [--pct-touch PERCENT] [--pct-motion PERCENT]
+              [--pct-trackball PERCENT] [--pct-syskeys PERCENT]
+              [--pct-nav PERCENT] [--pct-majornav PERCENT]
+              [--pct-appswitch PERCENT] [--pct-flip PERCENT]
+              [--pct-anyevent PERCENT]
+              [--pkg-blacklist-file PACKAGE_BLACKLIST_FILE]
+              [--pkg-whitelist-file PACKAGE_WHITELIST_FILE]
+              [--wait-dbg] [--dbg-no-events]
+              [--setup scriptfile] [-f scriptfile [-f scriptfile] ...]
+              [--port port]
+              [-s SEED] [-v [-v] ...]
+              [--throttle MILLISEC] [--randomize-throttle]
+              COUNT
+
+
+
+
+
+看起来挺糊涂的？不用担心，大家可以参照文章末尾的附图，用法归纳的一目了然。
+
+在执行操作命令前，可以键入
+
+
+
+view plaincopy to clipboardprint?user@user:~/workspace/android-sdk-linux_x86/platform-tools$adb shell   
+user@user:~/workspace/android-sdk-linux_x86/platform-tools$adb shell 
+
+如此，便进入了adb shell ，可以直接输入monkey 来执行命令。否则，每次都需要输入adb shell monkey 进行操作。
+
+
+
+
+
+
+
+
+
+实战
+
+
+好了，不要纸上谈兵了，拿起自己的app，用monkey开始测试吧！
+
+
+
+
+1. just for fun
+
+
+最简单的入手方法是：
+
+
+view plaincopy to clipboardprint?adb shell monkey -p com.snake -v 100  
+adb shell monkey -p com.snake -v 100
+表示对 -p 后的软件包的app  进行 100 次完全随机的测试。 monkey会随机的生成100次事件。
+
+
+输出中将依次列出所产生的随机事件。
+
+
+
+
+
+2.针对性测试
+
+当然，不用app有不同的侧重点，我们需要测试的重心也就不一样，这时候，我们或许需要调整随机事件中不同事件的比例。
+
+--pct就是这个用处。比如：" --pct-touch 50 % " 表示生成的随机事件中触摸事件占有50%  ，而" --pct-syskeys 10% "则表示生成的随机事件中按键事件占10%。
+
+
+
+
+3. 调试分析
+
+
+随着测试的深入，我们需要忽略app的崩溃，而不是停住，monkey同样能做到。
+
+--ignore-crashes
+
+
+甚至，它还能生成profiling报告！
+
+--hprof
+
+
+还有更多的调试功能，见下表
+
+
+
+
+
+
+
+
+感谢下面这幅图的提供者
+
+
+该表对monkey 的用法做了较清晰而翔实的描述。
+
+
+
+
+
+
+
+
+
+
+
+
+分享到： 上一篇：《程序员的自我修养——链接、装载与库》 读书笔记 
+顶 
+0 踩 
+0 
+http://blog.csdn.net/biaobiaoqi/article/details/6731121

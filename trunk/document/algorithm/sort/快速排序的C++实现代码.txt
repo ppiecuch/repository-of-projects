@@ -1,0 +1,62 @@
+#include <iostream>
+
+using namespace std;
+
+template <typename T>
+void Swap(T &x,T &y)
+{
+    T tmp;
+    tmp = x;
+    x=y;
+    y=tmp;
+}
+
+/*template <typename T>
+int InitMid(T data[],int left,int right)
+{
+    int centre = (left+right)/2;
+    if(data[left]>data[centre])
+        Swap(data[left],data[centre]);
+    if(data[left]>data[right])
+        Swap(data[left],data[right]);
+    if(data[centre]>data[right])
+        Swap(data[centre],data[right]);
+    Swap(data[centre],data[right-1]);
+    return data[right-1];
+}*/
+
+//这种写法的快排交换次数比较多，如果不将标志元素和前后元素交换，只将前后元素交换可以减少
+
+//交换次数，稍后在研究这个
+
+
+template <typename T>
+void QickSort(T data[],int left,int right)
+{
+    int i=left;
+    int j=right;
+    T tmp = data[left];
+    while(i<j)
+    {
+        for(;i<j&&data[j]>=tmp;j--);//此处无等号在数组中有相同元素情况下会导致死循环
+        swap(data[i],data[j]);
+        for(;i<j&&data[i]<=tmp;i++);
+        swap(data[i],data[j]);
+    }
+    if(i-1>left)
+        QickSort(data,left,i-1);
+    if(i+1<right)
+        QickSort(data,i+1,right);
+}
+
+int main()
+{
+    int num[10]={2,5,1,3,8,7,4,9,6,0};
+    QickSort(num,0,9);
+    for(int i=0;i<10;i++)
+       cout<<num[i]<<" ";
+    cout<<endl;
+    return 1;
+}
+
+http://blog.csdn.net/sjjbupt/article/details/6712573
