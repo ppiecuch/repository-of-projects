@@ -1,0 +1,155 @@
+rt
+
+ 
+ 注册: 2010-8    状态: Offline 1   Top 
+ 
+笨笨雁
+Exp:121
+
+侦察兵
+  发表于: 2011-8-28 7:38:00档案|Email|短信| 树状|收藏|编辑|引用    
+
+--------------------------------------------------------------------------------
+Re: 如何查看x文件和md2文件的内容呀？用记事本打开全是乱码呀
+
+自己写程序打开啊,详见:
+http://bbs.gameres.com/showthread.asp?postid=1032176
+
+笨笨雁 2011-8-28 7:38:59
+ 
+ 注册: 2006-3    状态: Offline 2   Top 
+ 
+woaitmac1314
+Exp:21
+
+新成员
+  发表于: 2011-8-28 21:32:00档案|Email|短信| 树状|收藏|编辑|引用    
+
+--------------------------------------------------------------------------------
+Re:如何查看x文件和md2文件的内容呀？用记事本打开全是乱码呀
+
+其实我是想查看里面的模板结构，
+因为想学习用d3d加载md2模型动画。。所以想了解它内部的构造
+
+ 
+ 注册: 2010-8    状态: Offline 3   Top 
+ 
+笨笨雁
+Exp:121
+
+侦察兵
+  发表于: 2011-8-29 15:57:00档案|Email|短信| 树状|收藏|编辑|引用    
+
+--------------------------------------------------------------------------------
+Re:如何查看x文件和md2文件的内容呀？用记事本打开全是乱码呀
+
+哦,原来如此啊.恩恩
+.X文件啊,就用 ID3DXFile 接口.首先呢,先包含d3dx9xof.h,rmxfguid.h,rmxftmpl.h头文件,还有d3dxof.lib.
+
+然后啊,你就创建ID3DXFile接口,像这样,啊
+ID3DXFile * pXFile = NULL;
+HRESULT hr = D3DXFileCreate( &pXFile );
+
+紧接着,注册模板,因为只有注册了,ID3DXFile它才认得啊.一般注册D3DRM_XTEMPLATES就够啦,啊
+hr = pXFile->RegisterTemplates( D3DRM_XTEMPLATES, D3DRM_XTEMPLATE_BYTES );
+
+再接下去,创建ID3DXFileEnumObject接口,这个接口啊,它就相当于一个查询器,查询文件中的对象啊
+ID3DXFileEnumObject * pEnumObject = NULL;
+hr = pXFile->CreateEnumObject( szFile, D3DXF_FILELOAD_FROMFILE, &pEnumObject );
+
+好了,那么现在就可以获得文件的各个ID3DXFileData接口了,这个接口呢,它表示了一块数据,这块数据有可能是网格啊,或者材质啊什么别的东西,每一块数据呢,它都有一个名字,和GUID,我们呢,就通过判断这个GUID来识别这块数据到底啊它是个什么.
+
+SIZE_T numChildren = 0;
+ID3DXFileData * pFileData = NULL;
+pEnumObject->GetChildren( &numChildren );       // 获得整个X文件共有几个数据块
+for ( i = 0; i < numChildren; ++i )
+{
+           pFileData = NULL;
+pEnumObject->GetChild( i, &pFileData );    // 获得某个数据块
+this->LoadChunk( pFileData );              // 载入这个数据块
+}
+
+
+ 
+ 注册: 2006-3    状态: Offline 4   Top 
+ 
+笨笨雁
+Exp:121
+
+侦察兵
+  发表于: 2011-8-29 16:04:00档案|Email|短信| 树状|收藏|编辑|引用    
+
+--------------------------------------------------------------------------------
+Re: 如何查看x文件和md2文件的内容呀？用记事本打开全是乱码呀
+
+
+void LoadChunk( ID3DXFileData * pFileData ){	if ( pFileData == NULL || pFileData->IsReference() )		return;	GUID id;	char szName[256];	SIZE_T size = 256;	pFileData->GetType( &id );               // 获得这个块的GUID	pFileData->GetName( szName, &size );	if ( IsEqualGUID(id, TID_D3DRMMesh) )    // 看看这个块到底它是个什么	{		this->LoadMesh( pFileData );  //  是MESH,我们就载入MESH	}	else if ( IsEqualGUID(id, TID_D3DRMMaterial) )	{	}	SIZE_T numChildren = 0;	pFileData->GetChildren( &numChildren );         // 看看这个块里面又包含哪些子数据块	for ( SIZE_T i = 0; i < numChildren; ++i )	{		ID3DXFileData * pChildData = NULL;		pFileData->GetChild( i, &pChildData );		LoadChunk( pChildData );             // 递归的载入子块,看见没有啊?递归了这里	}}
+ 
+
+
+
+ 
+ 注册: 2006-3    状态: Offline 5   Top 
+ 
+笨笨雁
+Exp:121
+
+侦察兵
+  发表于: 2011-8-29 16:23:00档案|Email|短信| 树状|收藏|编辑|引用    
+
+--------------------------------------------------------------------------------
+Re: 如何查看x文件和md2文件的内容呀？用记事本打开全是乱码呀
+
+那么好了,我们再来看看这如何载入一个数据块的数据,比如MESH啊,首先找到D3D文档中MESH模板的定义,不要告诉我这个你都不会找啊,MESH的定义是
+
+template Mesh
+{
+    <3D82AB44-62DA-11CF-AB39-0020AF71E433>
+    DWORD nVertices;
+    array Vector vertices[nVertices];
+    DWORD nFaces;
+    array MeshFace faces[nFaces];
+    [...]
+}
+
+
+有的人看到这里就傻了,他就说啊,这是啥意思呢,看不懂啊.其实你要是认真的看文档,里面啊讲得是一清二楚,所以我早就说过现在的人懒得像猪一样,什么都要送到嘴边才肯吃,自己不会找吃的啊,我觉得这真的是不知所谓啊.
+
+那么这个 template Mesh 到底是什么意思呢?首先我们来看ID3DXFileData有Lock, Unlock两个方法,Lock方法返回了一个buffer,就是一块内存啊,这块内存呢它里面就存放了MESH的数据,怎么存放的,就按MESH的模板的定义来存放的,明白不明白?
+
+我们来看看这个MESH模板的定义,首先呢,他是一个<3D82AB44-62DA-11CF-AB39-0020AF71E433>,这其实是一个GUID,我说你不用管这个,直接跳过它.下来呢,是一个 DWORD nVertices;这个意思就是说,有一个DWORD的变量,这个变量保存了顶点的数量.再下来啊,是一个array Vector vertices[nVertices];这其实就是一系列的顶点的数据,那么这个Vector又是什么呢?同样的道理,查文档,既然有MESH的模板定义,那它就有Vector的模板定义,对不对?啊,说到这里,聪明的人已经知道怎么加载了,啊,傻的人还是稀里糊涂啊,那么直接看一些代码吧
+
+
+bool LoadMesh( ID3DXFileData *pFileData ){	const char * pBuf = NULL;	SIZE_T totalSize = 0;	SIZE_T readedSize = 0;	HRESULT hr = pFileData->Lock( &totalSize, (LPCVOID*)&pBuf );      // 先获得这个数据块的buffer	if ( FAILED(hr) )	{		return false;	}	else if ( totalSize == 0 || pBuf == NULL )	{		pFileData->Unlock();		return false;	}	DWORD dwData = 0;	dwData = *((DWORD*)pBuf);                // 得到有多少个顶点	pBuf += sizeof(DWORD);	for ( DWORD i = 0; i < dwData; ++i )                // 逐个的载入顶点	{		XVERTEX ver;		::memcpy( &ver, pBuf, sizeof(XVERTEX) );		pBuf += sizeof(XVERTEX);		pMesh->vertexArray.push_back( ver );	}           // ..............           // 下面还有很多代码,啊,我这里不写出来了,要不然让你养成这种抄代码的习惯}
+ 
+
+
+
+
+笨笨雁 2011-8-29 16:39:13
+ 
+ 注册: 2006-3    状态: Offline 6   Top 
+ 
+woaitmac1314
+Exp:21
+
+新成员
+  发表于: 2011-8-29 20:24:00档案|Email|短信| 树状|收藏|编辑|引用    
+
+--------------------------------------------------------------------------------
+Re: Re:如何查看x文件和md2文件的内容呀？用记事本打开全是乱码呀
+
+
+
+笨笨雁: Re:如何查看x文件和md2文件的内容呀？用记事本打开全是乱码呀
+
+哦,原来如此啊.恩恩
+.X文件啊,就用 ID3DXFile 接口.首先呢,先包含d3dx9xof.h,rmxfguid.h,rmxftmpl.h头文件...
+
+ 
+
+
+笨笨雁给力呀。。。。太谢谢啦。。虚心学习中。。。
+ 
+ 
+http://bbs.gameres.com/showthread.asp?threadid=171828

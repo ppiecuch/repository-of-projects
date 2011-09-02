@@ -1,0 +1,79 @@
+#include <iostream>
+
+using namespace std;
+
+
+
+
+//将一个数组的两个有序的部分可并为一个，并保证有序
+
+
+template <typename T>
+void Merge(T data[],int begin,int mid,int end)
+{
+    T *tmp = new T(end - begin + 1);
+    int i=begin;
+    int j=mid+1;
+    int k=0;
+    while(i<=mid && j<=end)
+    {
+        if(data[i]<data[j])
+        {
+            tmp[k]=data[i];
+            i++;
+        }
+        else
+        {
+            tmp[k]=data[j];
+            j++;
+        }
+        k++;
+    }
+    if(i<=mid)
+    {
+        for(;i<=mid;i++,k++)
+        {
+            tmp[k]=data[i];
+        }
+    }
+    else if(j<=end)
+    {
+        for(;j<=end;j++,k++)
+        {
+            tmp[k]=data[j];
+        }
+    }
+    for(i=begin,j=0;i<=end&&j<=end-begin;j++,i++)
+    {
+        data[i]=tmp[j];
+    }
+}
+//归并排序
+template <typename T>
+void MergeSort(T data[],int begin,int end)
+{
+    if(begin<end)
+    {
+        int mid = (begin+end)/2;
+        MergeSort(data,begin,mid);
+        MergeSort(data,mid+1,end);
+        Merge(data,begin,mid,end);
+    }
+    else
+        return;
+}
+
+int main()
+{
+    int num[10]={2,5,1,3,8,7,4,9,6,0};
+    MergeSort(num,0,9);
+    for(int i=0;i<10;i++)
+       cout<<num[i]<<" ";
+    cout<<endl;
+    return 1;
+
+}
+
+说明：
+.....
+http://blog.csdn.net/sjjbupt/article/details/6711241

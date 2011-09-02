@@ -1,0 +1,299 @@
+地形生成是一个很有意思的话题，通过简单的函数以及一些参数配置，就可以轻松的生成接近于自然地貌的地形。
+
+ 
+
+两种众所周知的地形生成算法分别是
+
+1、  Fault Formation
+
+2、  Midponit displacement (又名diamond square)
+
+ 
+
+Fault Formation 算法
+
+这个算法的本质其实很简单。想象一个方块，在这个方块中随机取一个点为起始点，再随机选择一个方向，形成一条射线，然后将高度图中这个射线左侧（或者右侧）的部分全部添加一个Delta。重复上述步骤若干次，每次将添加的Delta减小一些，一个简单的高度图就可以生成出来了。
+
+Delta应当与当前迭代次数与总迭代次数的比值成线性关系。
+
+Delta = MaxHeight – (MaxHeight – MinHeight) * CurrentItr / TotalItr;
+
+这样第一次迭代所产生的影响最大，而后的迭代中对整个高度图的影响依次递减，在之前的高度基础上继续增加高度图中的细节。通常来说，迭代次数越多，效果会越好。
+
+ 
+
+实现FaultFormation的伪码如下:
+
+ 
+
+Do_Formation(float* pfBuffer, int iLen, Point ptStart, Point ptEnd, float fDelta)
+
+{
+
+         Point ptDir = ptEnd – ptStart;
+
+ 
+
+         For (int z = 0; z < iLen; ++z)
+
+                   For (int x = 0; x < iLen; ++x)
+
+                   {
+
+                            Point ptDirCur = Point(x – ptStart.x, z – ptStart.z);
+
+                            // 直线方程，判断一个点位于直线的上方或下方
+
+                            If (ptDirCur.x * ptDir.x – ptCurDir.z * ptDir.z > 0)
+
+                                     pfBuffer[z * iLen + x] += fDelta;
+
+}
+
+}
+
+ 
+
+Proc_Fault_Formation(float* pfBuffer, int iLen, int iMinDelta, int iMaxDelta, int iIterationTimes)
+
+{
+
+         for (int iCurIteration; iCurIteration < iIterationTimes; ++iCurIteration)
+
+         {
+
+                   float fDelta = iMaxDelta – (iMaxDelta – iMinDelta) * iCurIteration / iIterationTimes;
+
+                   Point ptStart = randomPoint();
+
+                   Point ptEnd;
+
+Do
+
+ptEnd = randomPoint();
+
+                   While (ptEnd == ptStart);
+
+                   Do_Formation(pfBuffer, iLen, ptStart, ptEnd, fDelta);
+
+}
+
+}
+
+ 
+
+按照上述思路实现的高度图生成算法，产生的图片如下：
+
+迭代1次及32次时的效果：(为了区别背景色，我给图片增加了1像素的边框)
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+但是如果我们直接用这张图做地形的话，会遇到一个问题。地形的高度变化的边缘部分太过突兀了。我们需要增加一个模糊的步骤用以平滑高度突变(模糊可以采用任何一种模糊算法，比如常见的高斯模糊-有关高斯模糊的内容参考本文的附录)。
+
+ 
+
+下图为增加了模糊处理，迭代32次的高度图。
+
+
+
+ 
+
+使用Fault Formation算法生成地形的一个好处是分辨率不受限制，我们可以设置任意宽高的高度图。但是缺点是生成的地形细节往往不够丰富，不足以模拟大规模的地形场景。
+
+ 
+
+Mid-point displacement算法是一种过程生成机制，特别适合用于生成较大规模的地形场景。
+
+一篇很全面的介绍Mid-point displacement的文章可以参考 这里
+
+关于Mid-point displacement的原理也可以参考 这里
+
+ 
+
+单纯从算法上来看，Mid-point displacement所做的事情是很简单的：
+
+该算法只能生成边长（一条边上的顶点数目）为2^n + 1的高度图。为什么有这个限制？原因是这个算法必须要以一个正方形为一个递归单元，每次处理完一个正方形后，都必须将其划分为4个更小的正方形加以处理。只有2^n + 1边长的正方形才能满足此切分条件。(2 = 2^0 + 1, 3 = 2 ^ 1 + 1, 5 = 2 ^ 2 + 1, 33 = 2 ^5 + 1, 1025 = 2 ^ 10 + 1 以此类推)
+
+
+
+Midpoint displacement算法又名Diamond-square算法。该算法分为两个步骤：Diamond-step及Square-step。
+
+ 
+
+算法的初始，我们需要给地形的四个角的顶点赋初值。这个值可以指定，或者随机产生。
+
+如上图，四个角的值已有，为0, 2, 4, 8。而后，我们需要计算中点的值，图示中的3.5点的位置即为该图的中点。
+
+中点值通过将四个角做算术平均，并增加一个小的随机值得到，随机值可以为正也可以为负。
+
+上述步骤被称为Diamond-step。
+
+接下来，我们只需要根据已有的四个顶点处的值，计算四条边的中点的算术平均值即可。
+
+这一步被称为Square-step。
+
+完成上述步骤之后，我们得到了四个更小一级的方块，分别对这四个方块重复上述步骤，直到当前块的边长为2时即可结束。
+
+ 
+
+实际实现中，我们需要对所做的Displacement操作（即给中点附加一个随机值的操作），在每次迭代中，将随机的范围跟随当前边长逐步缩小。这样可以保障最终的高度图是逐步收敛并趋于稳定的。
+
+ 
+
+该算法的实现伪码如下：
+
+ 
+
+Displace(float cur_len, float total_len)
+
+         Return (rand(0.0f, 1.0f) – 0.5f) * cur_len / total_len * 1.5f;
+
+MidpointDisplacement(float* pfBuffer
+
+, int x
+
+, int y
+
+, int len
+
+, int pitch
+
+, float top_left
+
+, float top_right
+
+, float bottom_left
+
+, float bottom_right)
+
+{
+
+         Float mid_top, mid_left, mid_right, mid_bottom;
+
+         Float middle;
+
+         Int new_len = len / 2;
+
+         If (len == 2)
+
+         {
+
+                   pfBuffer[y * pitch + x] = top_left;
+
+                   pfBuffer[y * pitch + x + 1] = top_right;
+
+                   pfBuffer[(y + 1) * pitch + x] = bottom_left;
+
+                   pfBuffer[(y + 1) * pitch + x + 1] = bottom_right;
+
+                   return;
+
+}
+
+ 
+
+Middle = (top_left + top_right + bottom_left + bottom_right) / 4 + Displacement(len, pitch);
+
+Mid_top = (top_left + top_right) / 2;
+
+Mid_left = (top_left + bottom_left) / 2;
+
+Mid_bottom = (bottom_left + bottom_right) / 2;
+
+Mid_right = (top_right + bottom_right) / 2;
+
+ 
+
+         Clamp(middle, 0.f, 1.f);
+
+         MidpointDisplacement(pfBuffer, x, y, new_len, pitch, top_left, mid_top, mid_left, middle);
+
+         MidpointDisplacement(pfBuffer, x + new_len, y, new_len, pitch, mid_top, right_top, middle, mid_right);
+
+         MidpointDisplacement(pfBuffer, x, y + new_len, new_len, pitch, mid_left, middle, bottom_left, mid_bottom);
+
+         MidpointDisplacement(pfBuffer, x + new_len, y + new_len, new_len, pitch, middle, mid_right, mid_bottom, bottom_right);
+
+ 
+
+}
+
+ 
+
+使用上述算法所得的高度图如下：
+
+ 
+
+左图是未经过模糊的版本，颗粒状比较明显，如果在实际的地形中，会导致凹凸感较强的失真情况，右图是经过模糊的版本。
+
+
+
+ 
+
+参考文章：
+
+Focus on 3D Terrain Programming (Trend Polack)
+
+http://gameprogrammer.com/fractal.html
+
+ 
+
+附录：关于高斯模糊
+
+http://en.wikipedia.org/wiki/Gaussian_blur
+
+ 
+
+二维高斯模糊的方程如下：
+
+
+
+上述方程，用于通过制定的参数构造一个高斯滤波器（高斯滤波器是一个低通滤波器，会滤除信号中的高频部分–通俗的说就是突变较大的部分），该滤波器本质上就是一个R*R的矩阵，以该矩阵的中心点为原点，对矩阵中的每一个点(x,y)，将其值赋为G(x,y) ，则在该矩阵即被构造完成。
+
+ 
+
+理论上说，高斯矩阵的所有项之和应当为1。
+
+Wiki中给了一个当(with σ = 0.84089642)，R为7时的参考高斯矩阵：
+
+ 
+
+0.00000067 0.00002292 0.00019117 0.00038771 0.00019117 0.00002292 0.00000067 
+0.00002292 0.00078633 0.00655965 0.01330373 0.00655965 0.00078633 0.00002292 
+0.00019117 0.00655965 0.05472157 0.11098164 0.05472157 0.00655965 0.00019117 
+0.00038771 0.01330373 0.11098164 0.22508352 0.11098164 0.01330373 0.00038771 
+0.00019117 0.00655965 0.05472157 0.11098164 0.05472157 0.00655965 0.00019117 
+0.00002292 0.00078633 0.00655965 0.01330373 0.00655965 0.00078633 0.00002292 
+0.00000067 0.00002292 0.00019117 0.00038771 0.00019117 0.00002292 0.00000067 
+
+ 
+
+ 
+
+高斯模糊的过程就是对原图像的每一个像素点，将上述矩阵的中心点对准该像素点，并以矩阵中的值为系数，将原图像上的位于当前矩阵范围内的像素点的值，乘以对应矩阵项的系数，并求和，而后重新赋予当前像素的过程。
+
+ 
+
+模糊的过程较为简单，但是需要注意的是边界情况处理，当处理高斯矩阵的部分项超出原图像边界时，需要做一些特殊处理，以保障边界处的模糊是平滑的即可。
+
+ 
+
+p.s.接下来的目标是整理一下地形渲染中纹理，光照，以及LOD的内容。
+http://www.windameister.org/blog/2009/08/15/3d-terrain-learning-terrain-generation/

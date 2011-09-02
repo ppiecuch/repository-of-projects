@@ -1,0 +1,135 @@
+这里有些sscanf()的一些使用说明，都是从论坛，Blog里整理出来的。供大家使用。 
+   通过学习和使用个人认为，在字符串格式不是很复杂，但是也并不简单的时候用这个函数比较合适，这个尺度就要靠自己把握了，字符串不是很复杂，但自己写个处理的函数比较麻烦，效率也不高，就用这个函数，如果字符串很复杂，那就用正则表达式吧。 
+不多说了，看看下面这些介绍和列子吧！
+名称:sscanf() - 从一个字符串中读进与指定格式相符的数据. 
+函数原型: 
+Int sscanf( string str, string fmt, mixed var1, mixed var2 ... ); 
+int scanf( const char *format [,argument]... );
+说明： 
+sscanf与scanf类似，都是用于输入的，只是后者以屏幕(stdin)为输入源，前者以固定字符串为输入源。 
+其中的format可以是一个或多个 {%[*] [width] [{h | l | I64 | L}]type | ' ' | '\t' | '\n' | 非%符号}
+支持集合操作： 
+     %[a-z] 表示匹配a到z中任意字符，贪婪性(尽可能多的匹配) 
+     %[aB'] 匹配a、B、'中一员，贪婪性 
+     %[^a] 匹配非a的任意字符，贪婪性
+例子： 
+1. 常见用法。 
+    char buf[512] = {0}; 
+    sscanf("123456 ", "%s", buf); 
+    printf("%s\n", buf); 
+结果为：123456
+2. 取指定长度的字符串。如在下例中，取最大长度为4字节的字符串。 
+    sscanf("123456 ", "%4s", buf); 
+    printf("%s\n", buf); 
+结果为：1234
+3. 取到指定字符为止的字符串。如在下例中，取遇到空格为止字符串。 
+    sscanf("123456 abcdedf", "%[^ ]", buf); 
+    printf("%s\n", buf); 
+结果为：123456 
+
+4. 取仅包含指定字符集的字符串。如在下例中，取仅包含1到9和小写字母的字符串。 
+    sscanf("123456abcdedfBCDEF", "%[1-9a-z]", buf); 
+    printf("%s\n", buf); 
+结果为：123456abcdedf 
+
+5. 取到指定字符集为止的字符串。如在下例中，取遇到大写字母为止的字符串。 
+    sscanf("123456abcdedfBCDEF", "%[^A-Z]", buf); 
+    printf("%s\n", buf); 
+结果为：123456abcdedf
+6、给定一个字符串iios/12DDWDFF@122，获取 / 和 @ 之间的字符串，先将 "iios/"过滤掉，再将非'@'的一串内容送到buf中 
+    sscanf("iios/12DDWDFF@122", "%*[^/]/%[^@]", buf); 
+    printf("%s\n", buf); 
+结果为：12DDWDFF 
+
+7、给定一个字符串““hello, world”，仅保留world。（注意：“，”之后有一空格）
+    sscanf(“hello, world”, "%*s%s", buf);   
+    printf("%s\n", buf); 
+结果为：world 
+%*s表示第一个匹配到的%s被过滤掉，即hello被过滤了 
+如果没有空格则结果为NULL。 
+8、 
+char *s="1try234delete5" 
+则： 
+sscanf(s, "1%[^2]234%[^5]", s1, s2); 
+scanf的format中出现的非转换字符（%之前或转换字符之后的字符），即此例中的1234用来跳过输入中的相应字符； 
+‘[]’的含义与正则表达式中相同，表示匹配其中出现的字符序列；^表示相反。使用[ ]时接收输入的变量必须是有足够存储空间的char、signed char、unsigned char数组。记住[也是转换字符，所以没有s了。
+8、分割以某字符标记的字符串。
+char test[]="222,333,444,,,555,666"; 
+char s1[4],s2[4],s3[4],s4[4],s5[4],s6[4],s7[4]; 
+sscanf(test,"%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,]",s1,s2,s3,s4,s5,s6,s7); 
+printf("sssa1=%s",s1); 
+printf("sssa2=%s",s2); 
+printf("sssa3=%s",s3); 
+printf("sssa4=%s",s4); 
+printf("sssa5=%s",s5); 
+printf("sssa6=%s",s6); 
+printf("sssa7=%s",s7); 
+9、一个提取用户个人资料中邮件地址的例子 
+#include<cstdlib> 
+#include<cstdio> 
+using namespace std; 
+int main() 
+{ 
+    char a[20]={0}; 
+    char b[20]={0}; 
+    //假设email地址信息以';'结束 
+    sscanf("email:jimmywhr@gmail.com;","%*[^:]:%[^;]",a); 
+    //假设email地址信息没有特定的结束标志 
+    sscanf("email:jimmywhr@gmail.com","%*[^:]:%s",b); 
+    printf("%s\n",a); 
+    printf("%s\n",b); 
+    system("pause"); 
+    return 0; 
+} 
+关键是"%*[^:]:%[^;]"和"%*[^:]:%s"这两个参数的问题 
+%*[^:]    表示满足"[]"里的条件将被过滤掉，不会向目标参数中写入值。这里的意思是在 
+            第一个':'之前的字符会在写入时过滤掉,'^'是表示否定的意思，整个参数翻译 
+            成白话就是：将在遇到第一个':'之前的（不为':'的）字符全部过滤掉。 
+:         自然就是跳过':'的意思。 
+%[^;]     拷贝字符直到遇到';'。
+一下摘自：http://blog.csdn.net/lbird/archive/2007/08/03/1724429.aspx 
+%[ ] 的用法：%[ ]表示要读入一个字符集合, 如果[ 后面第一个字符是”^”，则表示反意思。
+                     [ ]内的字符串可以是1或更多字符组成。空字符集（%[]）是违反规定的，可
+                     导致不可预知的结果。%[^]也是违反规定的。 
+         
+%[a-z] 读取在 a-z 之间的字符串，如果不在此之前则停止，如
+              char s[]="hello, my friend” ;         // 注意: ,逗号在不 a-z之间
+              sscanf( s, “%[a-z]”, string ) ; // string=hello
+
+%[^a-z] 读取不在 a-z 之间的字符串，如果碰到a-z之间的字符则停止，如
+              char s[]="HELLOkitty” ;         // 注意: ,逗号在不 a-z之间
+              sscanf( s, “%[^a-z]”, string ) ; // string=HELLO
+
+%*[^=]    前面带 * 号表示不保存变量。跳过符合条件的字符串。
+              char s[]="notepad=1.0.0.1001" ;
+       char szfilename [32] = "" ;
+       int i = sscanf( s, "%*[^=]", szfilename ) ; // szfilename=NULL,因为没保存
+int i = sscanf( s, "%*[^=]=%s", szfilename ) ; // szfilename=1.0.0.1001
+%40c      读取40个字符
+       The run-time
+library does not automatically append a null terminator
+to the string, nor does reading 40 characters
+automatically terminate the scanf() function. Because the
+library uses buffered input, you must press the ENTER key
+to terminate the string scan. If you press the ENTER before
+the scanf() reads 40 characters, it is displayed normally,
+and the library continues to prompt for additional input
+until it reads 40 characters
+
+%[^=]     读取字符串直到碰到’=’号，’^’后面可以带更多字符,如：
+              char s[]="notepad=1.0.0.1001" ;
+       char szfilename [32] = "" ;
+       int i = sscanf( s, "%[^=]", szfilename ) ; // szfilename=notepad     
+       如果参数格式是：%[^=:] ，那么也可以从 notepad:1.0.0.1001读取notepad
+             
+使用例子：
+char s[]="notepad=1.0.0.1001" ;
+char szname [32] = "" ;
+char szver [32] = “” ;
+sscanf( s, "%[^=]=%s", szname , szver ) ; // szname=notepad, szver=1.0.0.1001
+总结：%[]有很大的功能，但是并不是很常用到，主要因为：
+1、许多系统的 scanf 函数都有漏洞. (典型的就是 TC 在输入浮点型时有时会出错).
+2、用法复杂, 容易出错.
+3、编译器作语法分析时会很困难, 从而影响目标代码的质量和执行效率.
+个人觉得第3点最致命，越复杂的功能往往执行效率越低下。而一些简单的字符串分析我们可以自已处理。
+http://www.cnblogs.com/gmh915/archive/2009/09/30/1576995.html

@@ -1,0 +1,592 @@
+今天我和同学们讨论一下Android平台下如何调用系统方法发送短信、接收短信、系统的短信库相关的问题。进入正题，我们先使用Eclipse工具模拟给自己的模拟器发送一条短信。在Eclipse下打开DDMS
+
+
+Incoming number: 这里须要填写的是发件人的手机号码，这里只能输入数字否则会无法发送。 
+Message: 这里为发送的内容
+send: 上面两项都填写完毕点击发送键可以给模拟器发送短信。
+
+
+
+
+
+
+
+
+
+
+点击发送后，模拟器中就可以看到自己收到了一条消息 发件人的号码为123456 发送内容为hello。收到短信后会将这条信息写入系统的短信库，下面我们分析分析Android系统的短信库的结构。
+
+
+
+
+
+
+
+
+
+
+
+
+
+系统的短信库存在data/data/com.android.providers.telephony/databases/mmssms.db 下图蓝框中就是模拟器的短信库，我们将它打开看看里面存的是什么东东。
+
+
+
+
+
+
+
+
+
+打开mmssms.db  在打开sms表 因为所有短信数据都储存在这张表上，下面分析一下这张表的字段。
+_id 不用说了吧，标示它的唯一性
+thread_id :这个字段很重要，同一个会话中他们的thread_id是一样的，也就是说通过thread_id就可以知道A与B在聊天 还是 A与C在聊天
+date :这条消息发送或接收的时间
+read:  0 表示未读 1表示已读
+type : 1表示接收 2 表示发出
+body  表示 消息的内容
+
+
+
+
+ 
+
+
+我给12345回一条消息我们会看的更清楚这些节点的意义。
+
+
+
+
+
+
+
+
+我们在看看thread_id指向的thread表
+上图中可以清晰的看到 收到消息与回复消息的thread_id都为1 ，那么在thread_id这张表中
+
+_id 不用说了吧，标示它的唯一性
+date:表示最后接收或者发送消息的时间
+message_count:表示发送消息的数量，这里我接收到了一条消息 也回复了一条消息那么它的数量就为2
+recipient_ids:联系人ID，指向表 canonical_addresses 里的id。
+snippet :最后收到或者发送的消息内容，就是上图body中存的东西
+
+
+
+
+ 
+
+
+
+
+这么看来如果须要短信库中的数据就去访问数据库中的这两张表，sms表 uri 指向的是 "content://mms-sms/" thread表 uri指向的是 "content://mms-sms/threadID" 具体访问的方法请看Android游戏开发之数据库SQLite 详细介绍（十七） 这里就不详细的说了。
+
+下面进入本章代码部分的正题，调用系统方法给联系人号码发送消息
+
+
+
+
+
+
+
+
+    /**
+     * 参数说明
+     * destinationAddress:收信人的手机号码
+     * scAddress:发信人的手机号码 
+     * text:发送信息的内容 
+     * sentIntent:发送是否成功的回执，用于监听短信是否发送成功。
+     * DeliveryIntent:接收是否成功的回执，用于监听短信对方是否接收成功。
+     */
+
+这里我主要说一下最后两个参数， SentIntent 这个intent用于接收这条信息自己发送成功还是自己发送失败， DeliveryIntent这个intent用于对方是否接受成功。 发送成功和接受成功是不一样的，发送只是把消息发到手机移动或联通运行商那里叫发送成功，至于以后怎么处理它不关心，只管发送是否成功。 而接受成功表示接受者是否将这条消息收到。
+
+
+
+
+view plaincopy to clipboardprint?   private void sendSMS(String phoneNumber, String message) {  
+// ---sends an SMS message to another device---   
+SmsManager sms = SmsManager.getDefault();  
+  
+// create the sentIntent parameter   
+Intent sentIntent = new Intent(SENT_SMS_ACTION);  
+PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, sentIntent,  
+    0);  
+  
+// create the deilverIntent parameter   
+Intent deliverIntent = new Intent(DELIVERED_SMS_ACTION);  
+PendingIntent deliverPI = PendingIntent.getBroadcast(this, 0,  
+    deliverIntent, 0);  
+  
+//如果短信内容超过70个字符 将这条短信拆成多条短信发送出去   
+if (message.length() > 70) {  
+    ArrayList<String> msgs = sms.divideMessage(message);  
+    for (String msg : msgs) {  
+    sms.sendTextMessage(phoneNumber, null, msg, sentPI, deliverPI);  
+    }  
+} else {  
+    sms.sendTextMessage(phoneNumber, null, message, sentPI, deliverPI);  
+}  
+   }  
+    private void sendSMS(String phoneNumber, String message) {
+	// ---sends an SMS message to another device---
+	SmsManager sms = SmsManager.getDefault();
+
+	// create the sentIntent parameter
+	Intent sentIntent = new Intent(SENT_SMS_ACTION);
+	PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, sentIntent,
+		0);
+
+	// create the deilverIntent parameter
+	Intent deliverIntent = new Intent(DELIVERED_SMS_ACTION);
+	PendingIntent deliverPI = PendingIntent.getBroadcast(this, 0,
+		deliverIntent, 0);
+
+	//如果短信内容超过70个字符 将这条短信拆成多条短信发送出去
+	if (message.length() > 70) {
+	    ArrayList<String> msgs = sms.divideMessage(message);
+	    for (String msg : msgs) {
+		sms.sendTextMessage(phoneNumber, null, msg, sentPI, deliverPI);
+	    }
+	} else {
+	    sms.sendTextMessage(phoneNumber, null, message, sentPI, deliverPI);
+	}
+    }
+
+
+注册 接收成功 或者发送成功的广播
+
+
+view plaincopy to clipboardprint?// 注册广播 发送消息   
+registerReceiver(sendMessage, new IntentFilter(SENT_SMS_ACTION));  
+registerReceiver(receiver, new IntentFilter(DELIVERED_SMS_ACTION));  
+	// 注册广播 发送消息
+	registerReceiver(sendMessage, new IntentFilter(SENT_SMS_ACTION));
+	registerReceiver(receiver, new IntentFilter(DELIVERED_SMS_ACTION));
+
+注册后 在BroadcaseRecevice中可以接收到发送 接收相关的广播
+
+
+
+view plaincopy to clipboardprint?   private BroadcastReceiver sendMessage = new BroadcastReceiver() {  
+  
+@Override  
+public void onReceive(Context context, Intent intent) {  
+    //判断短信是否发送成功   
+    switch (getResultCode()) {  
+    case Activity.RESULT_OK:  
+    Toast.makeText(context, "短信发送成功", Toast.LENGTH_SHORT).show();  
+    break;  
+    default:  
+    Toast.makeText(mContext, "发送失败", Toast.LENGTH_LONG).show();  
+    break;  
+    }  
+}  
+   };  
+     
+    
+   private BroadcastReceiver receiver = new BroadcastReceiver() {  
+  
+@Override  
+public void onReceive(Context context, Intent intent) {  
+    //表示对方成功收到短信   
+    Toast.makeText(mContext, "对方接收成功",Toast.LENGTH_LONG).show();  
+}  
+   };  
+    private BroadcastReceiver sendMessage = new BroadcastReceiver() {
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+	    //判断短信是否发送成功
+	    switch (getResultCode()) {
+	    case Activity.RESULT_OK:
+		Toast.makeText(context, "短信发送成功", Toast.LENGTH_SHORT).show();
+		break;
+	    default:
+		Toast.makeText(mContext, "发送失败", Toast.LENGTH_LONG).show();
+		break;
+	    }
+	}
+    };
+    
+   
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+	    //表示对方成功收到短信
+	    Toast.makeText(mContext, "对方接收成功",Toast.LENGTH_LONG).show();
+	}
+    };
+
+
+下面给出这个小例子的完整代码
+
+view plaincopy to clipboardprint?import java.util.ArrayList;  
+  
+import android.app.Activity;  
+import android.app.PendingIntent;  
+import android.content.BroadcastReceiver;  
+import android.content.Context;  
+import android.content.Intent;  
+import android.content.IntentFilter;  
+import android.os.Bundle;  
+import android.telephony.SmsManager;  
+import android.text.TextUtils;  
+import android.view.View;  
+import android.view.View.OnClickListener;  
+import android.widget.Button;  
+import android.widget.EditText;  
+import android.widget.Toast;  
+  
+public class ContactsActivity extends Activity {  
+  
+  
+    /**发送按钮**/  
+    Button button = null;  
+      
+    /**收件人电话**/  
+    EditText mNumber = null;  
+      
+    /**编辑信息**/  
+    EditText mMessage = null;  
+      
+    /**发送与接收的广播**/  
+    String SENT_SMS_ACTION = "SENT_SMS_ACTION";  
+    String DELIVERED_SMS_ACTION = "DELIVERED_SMS_ACTION";  
+   
+      
+      
+    Context mContext = null;  
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+    super.onCreate(savedInstanceState);  
+    setContentView(R.layout.message);  
+  
+    button = (Button) findViewById(R.id.button);  
+    mNumber = (EditText) findViewById(R.id.number);  
+    mMessage = (EditText) findViewById(R.id.message);  
+  
+    mContext = this;  
+    button.setOnClickListener(new OnClickListener() {  
+  
+        @Override  
+        public void onClick(View view) {  
+  
+        /** 拿到输入的手机号码 **/  
+        String number = mNumber.getText().toString();  
+        /** 拿到输入的短信内容 **/  
+        String text = mMessage.getText().toString();  
+  
+        /** 手机号码 与输入内容 必需不为空 **/  
+        if (!TextUtils.isEmpty(number) && !TextUtils.isEmpty(text)) {  
+            sendSMS(number, text);  
+        }  
+        }  
+    });  
+  
+      
+    // 注册广播 发送消息   
+    registerReceiver(sendMessage, new IntentFilter(SENT_SMS_ACTION));  
+    registerReceiver(receiver, new IntentFilter(DELIVERED_SMS_ACTION));  
+  
+    }  
+      
+    private BroadcastReceiver sendMessage = new BroadcastReceiver() {  
+  
+    @Override  
+    public void onReceive(Context context, Intent intent) {  
+        //判断短信是否发送成功   
+        switch (getResultCode()) {  
+        case Activity.RESULT_OK:  
+        Toast.makeText(context, "短信发送成功", Toast.LENGTH_SHORT).show();  
+        break;  
+        default:  
+        Toast.makeText(mContext, "发送失败", Toast.LENGTH_LONG).show();  
+        break;  
+        }  
+    }  
+    };  
+      
+     
+    private BroadcastReceiver receiver = new BroadcastReceiver() {  
+  
+    @Override  
+    public void onReceive(Context context, Intent intent) {  
+        //表示对方成功收到短信   
+        Toast.makeText(mContext, "对方接收成功",Toast.LENGTH_LONG).show();  
+    }  
+    };  
+      
+    /** 
+     * 参数说明 
+     * destinationAddress:收信人的手机号码 
+     * scAddress:发信人的手机号码  
+     * text:发送信息的内容  
+     * sentIntent:发送是否成功的回执，用于监听短信是否发送成功。 
+     * DeliveryIntent:接收是否成功的回执，用于监听短信对方是否接收成功。 
+     */  
+    private void sendSMS(String phoneNumber, String message) {  
+    // ---sends an SMS message to another device---   
+    SmsManager sms = SmsManager.getDefault();  
+  
+    // create the sentIntent parameter   
+    Intent sentIntent = new Intent(SENT_SMS_ACTION);  
+    PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, sentIntent,  
+        0);  
+  
+    // create the deilverIntent parameter   
+    Intent deliverIntent = new Intent(DELIVERED_SMS_ACTION);  
+    PendingIntent deliverPI = PendingIntent.getBroadcast(this, 0,  
+        deliverIntent, 0);  
+  
+    //如果短信内容超过70个字符 将这条短信拆成多条短信发送出去   
+    if (message.length() > 70) {  
+        ArrayList<String> msgs = sms.divideMessage(message);  
+        for (String msg : msgs) {  
+        sms.sendTextMessage(phoneNumber, null, msg, sentPI, deliverPI);  
+        }  
+    } else {  
+        sms.sendTextMessage(phoneNumber, null, message, sentPI, deliverPI);  
+    }  
+    }  
+  
+}  
+import java.util.ArrayList;
+
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+public class ContactsActivity extends Activity {
+
+
+    /**发送按钮**/
+    Button button = null;
+    
+    /**收件人电话**/
+    EditText mNumber = null;
+    
+    /**编辑信息**/
+    EditText mMessage = null;
+    
+    /**发送与接收的广播**/
+    String SENT_SMS_ACTION = "SENT_SMS_ACTION";
+    String DELIVERED_SMS_ACTION = "DELIVERED_SMS_ACTION";
+ 
+    
+    
+    Context mContext = null;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+	super.onCreate(savedInstanceState);
+	setContentView(R.layout.message);
+
+	button = (Button) findViewById(R.id.button);
+	mNumber = (EditText) findViewById(R.id.number);
+	mMessage = (EditText) findViewById(R.id.message);
+
+	mContext = this;
+	button.setOnClickListener(new OnClickListener() {
+
+	    @Override
+	    public void onClick(View view) {
+
+		/** 拿到输入的手机号码 **/
+		String number = mNumber.getText().toString();
+		/** 拿到输入的短信内容 **/
+		String text = mMessage.getText().toString();
+
+		/** 手机号码 与输入内容 必需不为空 **/
+		if (!TextUtils.isEmpty(number) && !TextUtils.isEmpty(text)) {
+		    sendSMS(number, text);
+		}
+	    }
+	});
+
+	
+	// 注册广播 发送消息
+	registerReceiver(sendMessage, new IntentFilter(SENT_SMS_ACTION));
+	registerReceiver(receiver, new IntentFilter(DELIVERED_SMS_ACTION));
+
+    }
+    
+    private BroadcastReceiver sendMessage = new BroadcastReceiver() {
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+	    //判断短信是否发送成功
+	    switch (getResultCode()) {
+	    case Activity.RESULT_OK:
+		Toast.makeText(context, "短信发送成功", Toast.LENGTH_SHORT).show();
+		break;
+	    default:
+		Toast.makeText(mContext, "发送失败", Toast.LENGTH_LONG).show();
+		break;
+	    }
+	}
+    };
+    
+   
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+	    //表示对方成功收到短信
+	    Toast.makeText(mContext, "对方接收成功",Toast.LENGTH_LONG).show();
+	}
+    };
+    
+	/**
+	 * 参数说明
+	 * destinationAddress:收信人的手机号码
+	 * scAddress:发信人的手机号码 
+	 * text:发送信息的内容 
+	 * sentIntent:发送是否成功的回执，用于监听短信是否发送成功。
+	 * DeliveryIntent:接收是否成功的回执，用于监听短信对方是否接收成功。
+	 */
+    private void sendSMS(String phoneNumber, String message) {
+	// ---sends an SMS message to another device---
+	SmsManager sms = SmsManager.getDefault();
+
+	// create the sentIntent parameter
+	Intent sentIntent = new Intent(SENT_SMS_ACTION);
+	PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, sentIntent,
+		0);
+
+	// create the deilverIntent parameter
+	Intent deliverIntent = new Intent(DELIVERED_SMS_ACTION);
+	PendingIntent deliverPI = PendingIntent.getBroadcast(this, 0,
+		deliverIntent, 0);
+
+	//如果短信内容超过70个字符 将这条短信拆成多条短信发送出去
+	if (message.length() > 70) {
+	    ArrayList<String> msgs = sms.divideMessage(message);
+	    for (String msg : msgs) {
+		sms.sendTextMessage(phoneNumber, null, msg, sentPI, deliverPI);
+	    }
+	} else {
+	    sms.sendTextMessage(phoneNumber, null, message, sentPI, deliverPI);
+	}
+    }
+
+}
+一定要在AndroidManifest.xml中添加发送短信的权限噢。
+
+view plaincopy to clipboardprint?<!--取得发短信的权限 -->  
+<uses-permission android:name="android.permission.SEND_SMS" />  
+    <!--取得发短信的权限 -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
+
+
+
+
+发送完消息后打开手机的发信箱发现没有看到刚才发的消息，这是为什么呢？ 是这样的。调用sendTextMessage 确实是发送消息 ，但是系统的短信库中没有这条消息 所以就看不到了。如果想要在系统的短信库中看到消息就必需把这条消息插到系统的短信库。
+
+
+下面这段代码在发短信的同时也将短信内容写入系统库，这样在发件箱中就可以看到我们发送的短信了。
+
+view plaincopy to clipboardprint?button.setOnClickListener(new OnClickListener() {  
+  
+    @Override  
+    public void onClick(View view) {  
+  
+    /** 拿到输入的手机号码 **/  
+    String number = mNumber.getText().toString();  
+    /** 拿到输入的短信内容 **/  
+    String text = mMessage.getText().toString();  
+  
+    /** 手机号码 与输入内容 必需不为空 **/  
+    if (!TextUtils.isEmpty(number) && !TextUtils.isEmpty(text)) {  
+        sendSMS(number, text);  
+      
+        /**将发送的短信插入数据库**/  
+        ContentValues values = new ContentValues();  
+        //发送时间   
+        values.put("date", System.currentTimeMillis());  
+        //阅读状态   
+        values.put("read", 0);  
+        //1为收 2为发   
+        values.put("type", 2);  
+        //送达号码   
+        values.put("address", number);  
+        //送达内容   
+        values.put("body", text);  
+        //插入短信库   
+        getContentResolver().insert(Uri.parse("content://sms"),values);  
+  
+    }  
+    }  
+});  
+	button.setOnClickListener(new OnClickListener() {
+
+	    @Override
+	    public void onClick(View view) {
+
+		/** 拿到输入的手机号码 **/
+		String number = mNumber.getText().toString();
+		/** 拿到输入的短信内容 **/
+		String text = mMessage.getText().toString();
+
+		/** 手机号码 与输入内容 必需不为空 **/
+		if (!TextUtils.isEmpty(number) && !TextUtils.isEmpty(text)) {
+		    sendSMS(number, text);
+		
+		    /**将发送的短信插入数据库**/
+		    ContentValues values = new ContentValues();
+		    //发送时间
+		    values.put("date", System.currentTimeMillis());
+		    //阅读状态
+		    values.put("read", 0);
+		    //1为收 2为发
+		    values.put("type", 2);
+		    //送达号码
+		    values.put("address", number);
+		    //送达内容
+		    values.put("body", text);
+		    //插入短信库
+		    getContentResolver().insert(Uri.parse("content://sms"),values);
+
+		}
+	    }
+	});
+
+还是一定要在AndroidManifest.xml中添加相关的权限噢。
+
+view plaincopy to clipboardprint?   <!--  发送消息-->  
+<uses-permission android:name="android.permission.SEND_SMS"/>  
+<!--  阅读消息-->  
+<uses-permission android:name="android.permission.READ_SMS"/>  
+<!--  写入消息-->  
+<uses-permission android:name="android.permission.WRITE_SMS" />  
+<!-- 接收消息 -->  
+<uses-permission android:name="android.permission.RECEIVE_SMS" />  
+    <!--  发送消息-->
+	<uses-permission android:name="android.permission.SEND_SMS"/>
+	<!--  阅读消息-->
+	<uses-permission android:name="android.permission.READ_SMS"/>
+	<!--  写入消息-->
+	<uses-permission android:name="android.permission.WRITE_SMS" />
+	<!-- 接收消息 -->
+	<uses-permission android:name="android.permission.RECEIVE_SMS" />
+
+
+由于最近老熬夜写代码 身体实在是吃不消了，昨天同事带我去看中医  医生嘱咐我一定要好好休息不要熬夜了，开了很多中药。冷冻在公司冰箱里每天饭后20分钟喝一次 现在的中药还挺好喝嘎嘎，比我印象中小时候喝的好喝多了。 哇咔咔~~  看样子MOMO得好好养病了，希望早日生龙活虎。这里在此感谢关心我的朋友，同事，还有我的开发群里的好伙伴们。
+
+
+
+
+
+老规矩每篇文章都会附带源代码，最后如果你还是觉得我写的不够详细 看的不够爽 不要紧我把源代码的下载地址贴出来 欢迎大家一起讨论学习雨松MOMO希望可以和大家一起进步。
+http://blog.csdn.net/xys289187120/article/details/6740933

@@ -1,0 +1,89 @@
+//本题用动态规划解出，动态规划的核心在于填表
+
+//本程序表的列代表从第几个矩阵开始
+
+//行代表乘到第几个矩阵
+
+//故解在最左下角
+
+
+#include <iostream>
+
+#include <vector>
+
+using namespace std;
+
+int MinMulti(vector<vector<int> >matrixs)
+{
+    int numMatrixs = matrixs.size();
+    vector<vector<int> > resultTable(numMatrixs,vector<int>(numMatrixs,0));
+//i为开始矩阵和结束矩阵的距离，从表的对角线开始向下填表
+    for(int i=0;i<numMatrixs;i++)
+    {
+        for(int j=0;j+i<numMatrixs;j++)
+
+        {
+
+//对角线上的也就是只有一个矩阵相乘的好确定
+
+
+            if(i==0)
+            {
+                resultTable[j][i+j]=matrixs[j][0]*matrixs[j][1];
+
+            }
+
+//靠着对角线的下方的也就是只有两个矩阵相乘的好确定
+
+
+            else if(i==1)
+            {
+                resultTable[j][i+j]=matrixs[j][0]*matrixs[j][1]*matrixs[j+i][1];
+
+            }
+
+//其他的根据递推式可以确定
+
+
+            else
+            {
+
+                int min=32767;
+
+//分割点在中间每一个位置的都要遍历，找出最小的
+
+
+                for(int k=0;k<i;k++)
+                {
+                    int tmp;
+                    tmp = resultTable[j][k+j] + resultTable[k+j+1][i+j] + matrixs[j][0]*matrixs[k+j][1]*matrixs[i+j][1];
+                    if(tmp<min)
+                        min=tmp;
+                }
+                resultTable[j][i+j]=min;
+            }
+        }
+    }
+
+    return resultTable[0][numMatrixs-1];
+}
+
+int main()
+{
+    int countM;
+    cout<<"输入矩阵数量:"<<endl;
+    cin>>countM;
+
+    cout<<"输入矩阵的行和列:"<<endl;
+    vector<vector<int> > matrixs(countM,vector<int>(2,0));
+    int line,cloumn;
+    for(int i=0;i<countM;i++)
+    {
+        cin>>line>>cloumn;
+        matrixs[i][0]=line;
+        matrixs[i][1]=cloumn;
+    }
+    cout<<MinMulti(matrixs)<<endl;
+    return 1;
+}
+http://blog.csdn.net/sjjbupt/article/details/6736520
