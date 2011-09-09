@@ -1,0 +1,117 @@
+推荐 "线性代数 "和 "计算机图型学 "(电子工业出版社的?就是从老外的教材翻译的那个) 
+我手上只有轴角 <-> 四元式   欧拉角 <-> 四元式   矩阵(行矩阵   3列X4行   ) <-> 四元式的转换的代码. 
+你可以再参考下网上3DMAX的开原部分,和网上的一些3D引擎. 
+附代码 
+
+void     Quat::ConvertFromEulerAngle(const   float   fYaw,const     float   fPitch,const   float   fRoll) 
+{ 
+float   fSinYaw       =   sinf(   fYaw/2.0f   ); 
+        float   fSinPitch   =   sinf(   fPitch/2.0f   ); 
+        float   fSinRoll     =   sinf(   fRoll/2.0f   ); 
+        float   fCosYaw       =   cosf(   fYaw/2.0f   ); 
+        float   fCosPitch   =   cosf(   fPitch/2.0f   ); 
+        float   fCosRoll     =   cosf(   fRoll/2.0f   ); 
+
+        x   =   fSinRoll   *   fCosPitch   *   fCosYaw   -   fCosRoll   *   fSinPitch   *   fSinYaw; 
+        y   =   fCosRoll   *   fSinPitch   *   fCosYaw   +   fSinRoll   *   fCosPitch   *   fSinYaw; 
+        z   =   fCosRoll   *   fCosPitch   *   fSinYaw   -   fSinRoll   *   fSinPitch   *   fCosYaw; 
+        w   =   fCosRoll   *   fCosPitch   *   fCosYaw   +   fSinRoll   *   fSinPitch   *   fSinYaw; 
+
+} 
+
+void     Quat::ConvertFromMatrix(const   Matrix3   &mat) 
+{ 
+float tr,   su; 
+int i; 
+
+
+tr=mat.m[0][0]+mat.m[1][1]+mat.m[2][2]; 
+if(tr> 0) 
+{ 
+su   =   sqrtf(tr   +   1.0f); 
+w   =   0.5f   *   su; 
+su   =0.5f/su; 
+x   =   (mat.m[2][1]   -   mat.m[1][2])   *   su; 
+y   =   (mat.m[0][2]   -   mat.m[2][0])   *   su; 
+z   =   (mat.m[1][0]   -   mat.m[0][1])   *   su; 
+} 
+else 
+{ 
+i   =0; 
+if(mat.m[1][1]   >   mat.m[0][0]) i   =   1; 
+if(mat.m[2][2]   >   mat.m[i][i]) i   =   2; 
+switch   (i) 
+{ 
+case   0: 
+su   =   sqrtf((mat.m[0][0]   -   (mat.m[1][1]   +   mat.m[2][2]))   +   1); 
+x   =   0.5f   *   su; 
+su   =0.5f/su; 
+y   =   (mat.m[0][1]   +   mat.m[1][0])   *   su; 
+z   =   (mat.m[2][0]   +   mat.m[0][2])   *   su; 
+w=(mat.m[2][1]   -   mat.m[1][2])   *   su; 
+break; 
+case   1: 
+su   =   sqrtf((mat.m[1][1]   -   (mat.m[2][2]   +   mat.m[0][0]))   +   1); 
+y   =   0.5f*su; 
+su   =   0.5f/su; 
+z   =   (mat.m[1][2]   +   mat.m[2][1])   *   su; 
+x   =   (mat.m[0][1]   +   mat.m[1][0])   *   su; 
+w   =   (mat.m[0][2]   -   mat.m[2][0])   *   su; 
+break; 
+case   2: 
+su   =   sqrtf((mat.m[2][2]-(mat.m[0][0]+mat.m[1][1]))+1); 
+z=0.5f*su; 
+su=0.5f/su; 
+x   =   (mat.m[2][0]+mat.m[0][2])   *   su; 
+y   =   (mat.m[1][2]+mat.m[2][1])   *   su; 
+w   =   (mat.m[1][0]-mat.m[0][1])   *   su; 
+break; 
+} 
+} 
+
+} 
+
+void     Quat::ConvertToMatrix     (   Matrix3   &tm) 
+{ 
+float   xx   =   x*x;   float   yy   =   y*y;   float   zz   =   z*z; 
+        float   xy   =   x*y;   float   xz   =   x*z;   float   yz   =   y*z; 
+        float   wx   =   w*x;   float   wy   =   w*y;   float   wz   =   w*z; 
+        
+        tm.m[0][0]   =   1   -   2   *   (   yy   +   zz   );   
+        tm.m[0][1]   =           2   *   (   xy   -   wz   ); 
+        tm.m[0][2]   =           2   *   (   xz   +   wy   ); 
+
+        tm.m[1][0]   =           2   *   (   xy   +   wz   ); 
+        tm.m[1][1]   =   1   -   2   *   (   xx   +   zz   ); 
+        tm.m[1][2]   =           2   *   (   yz   -   wx   ); 
+
+        tm.m[2][0]   =           2   *   (   xz   -   wy   ); 
+        tm.m[2][1]   =           2   *   (   yz   +   wx   ); 
+        tm.m[2][2]   =   1   -   2   *   (   xx   +   yy   ); 
+
+        tm.m[3][0]   =   tm.m[3][1]   =   tm.m[3][2]   =   0.0f; 
+        
+} 
+
+void     Quat::ConvertToAxisAngle   (Point3   &vector   ,float   &   angle     ) 
+{ 
+float   fTheta   =   acosf(w)   *   2.0f; 
+        vector.x         =   x   /   sinf(   fTheta/2.0f   ); 
+        vector.y         =   y   /   sinf(   fTheta/2.0f   ); 
+        vector.z         =   z   /   sinf(   fTheta/2.0f   ); 
+angle=fTheta; 
+} 
+
+
+void   Quat::ConvertFromAxisAngle(Point3   &vector   ,   float   &   angle   ) 
+{ 
+
+
+this-> w=cosf   (angle/2.0f);   
+this-> x=sinf(angle/2.0f)*vector.x; 
+this-> y=sinf(angle/2.0f)*vector.y; 
+this-> z=sinf(angle/2.0f)*vector.z; 
+
+
+} 
+http://hi.baidu.com/%C4%A6%F4%C9%D1%DB%C0%E1/blog/item/d9ea692014b2b92ac89559e8.html

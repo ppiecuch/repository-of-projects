@@ -1,0 +1,131 @@
+待机状态下，飞行模式切换流程分析：
+　　飞行模式切换比较复杂，它状态改变时涉及到极大模块状态切换：
+　　GSM模块，蓝牙模块，wifi模块。
+　　飞行模式的enabler层会发送广播消息：ACTION_AIRPLANE_MODE_CHANGED
+
+java代码：
+
+private void setAirplaneModeOn(boolean enabling) {
+
+mCheckBoxPref.setEnabled(false);
+
+mCheckBoxPref.setSummary(enabling ? R.string.airplane_mode_turning_on
+
+R.string.airplane_mode_turning_off);
+
+
+
+// Change the system setting
+
+
+
+
+
+Settings.System.putInt(mContext.getContentResolver(), Settings.System.AIRPLANE_MODE_ON,enabling ? 1 : 0);
+
+
+
+
+
+// Post the intent
+
+
+
+
+
+Intent intent = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+
+intent.putExtra("state", enabling);
+
+mContext.sendBroadcast(intent);
+
+}
+复制代码
+
+       因为GSM ，蓝牙，wifi模块分别注册了对 ACTION_AIRPLANE_MODE_CHANGED 消息的监测，所以收到
+　　该消息后，模块会进行切换。
+　　BluetoothDeviceService.java
+　　开启蓝牙：enable(false);
+　　关闭蓝牙：disable(false);
+
+　　PhoneApp.java (packages\apps\phone\src\com\android\phone)
+　　设置GSM模块状态 phone.setRadioPower(enabled);
+　　WifiService.java
+　　设置 wifi 状态 setWifiEnabledBlocking(wifiEnabled, false, Process.myUid());
+　　
+　　GSM模块切换过程分析：
+　　phone.setRadioPower(enabled)调用的是：
+　　文件 GSMPhone.java 中的的函数：
+　　public void setRadioPower(boolean power)
+　　mSST.setRadioPower(power);
+　　因为有 ServiceStateTracker mSST;
+　　mSST.setRadioPower 调用的是文件 ServiceStateTracker.java 中的函数：
+　　public void setRadioPower(boolean power)
+　　mDesiredPowerState = power;
+　　setPowerStateToDesired();
+　　cm.setRadioPower(true, null);
+　　或者
+　　cm.setRadioPower(false, null);
+　　因为有：
+　　CommandsInterface cm;
+　　public final class RIL extends BaseCommands implements CommandsInterface
+　　所以 cm.setRadioPower 调用的是文件 RIL.java 中的函数：
+　　public void setRadioPower(boolean on, Message result)
+　　RILRequest rr = RILRequest.obtain(RIL_REQUEST_RADIO_POWER, result);
+　　rr.mp.writeInt(1);
+　　...
+　　send(rr)
+　　通过 send 向 rild 发送 RIL_REQUEST_RADIO_POWER 请求来开启或者关闭GSM模块。
+　　rild 数据接收流程：
+　　收到 RIL_REQUEST_RADIO_POWER 执行：
+　　requestRadioPower(data, datalen, t);
+　　然后根据条件往无线模块发送模块开启和关闭请求
+　　主要的at命令有：
+　　err = at_send_command("AT+CFUN=0", &p_response);
+　　err = at_send_command("AT+CFUN=1", &p_response);
+　　
+　　蓝牙模块切换过程分析：
+　　enable(false);
+　　蓝牙开启调用文件 BluetoothDeviceService.java 中的函数：
+　　public synchronized boolean enable(boolean saveSetting)
+　　setBluetoothState(BluetoothDevice.BLUETOOTH_STATE_TURNING_ON);
+　　mEnableThread = new EnableThread(saveSetting);
+　　mEnableThread.start();
+　　
+　　disable(false)
+　　蓝牙关闭调用文件 中的函数：
+　　public synchronized boolean disable(boolean saveSetting)
+　　setBluetoothState(BluetoothDevice.BLUETOOTH_STATE_TURNING_OFF);
+　　
+　　wifi模块切换过程分析：
+　　广播 wifi 状态改变的消息：WIFI_STATE_CHANGED_ACTION
+　　setWifiEnabledState(enable ? WIFI_STATE_ENABLING : WIFI_STATE_DISABLING, uid);
+
+　　更新 wifi 状态：
+　　private void updateWifiState()
+
+　　如果需要使能开启 wifi 那么会发送：
+　　sendEnableMessage(true, false, mLastEnableUid);
+　　sendStartMessage(strongestLockMode == WifiManager.WIFI_MODE_SCAN_ONLY);
+　　mWifiHandler.sendEmptyMessage(MESSAGE_STOP_WIFI);
+
+　　消息循环中处理命令消息：
+　　public void handleMessage(Message msg)
+　　如果使能wifi：setWifiEnabledBlocking(true, msg.arg1 == 1, msg.arg2);
+　　开启wifi： mWifiStateTracker.setScanOnlyMode(msg.arg1 != 0);
+　　setWifiEnabledBlocking(false, msg.arg1 == 1, msg.arg2);
+　　断开 mWifiStateTracker.disconnectAndStop();
+
+　　开启过程步骤：
+　　1> 装载 wifi 驱动： WifiNative.loadDriver()
+　　2> 启动后退 daemo supplicant： WifiNative.startSupplicant()
+
+　　关闭过程步骤：
+　　1> 停止后退 daemo supplicant：WifiNative.stopSupplicant()
+　　2> 卸载 wifi 驱动: WifiNative.unloadDriver()
+　　如果 wifi 状态默认为开启那么 WifiService 服务的构造函数：
+　　WifiService(Context context, WifiStateTracker tracker)
+　　boolean wifiEnabled = getPersistedWifiEnabled();
+　　setWifiEnabledBlocking(wifiEnabled, false, Process.myUid());
+　　会开启wifi模块。
+http://www.eoeandroid.com/thread-97809-1-1.html

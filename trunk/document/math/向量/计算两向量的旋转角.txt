@@ -1,0 +1,77 @@
+向量的点乘和叉乘都是很有用的数学工具，不过他们也有局限性。关键是向量点乘可以得到两个向量之间的夹角， 而不是旋转角，这个角度是没有方向的，范围是[0-pi]， 而这往往不是我们想要的， 实际问题中我们常常要计算从向量p1沿逆时针方向转到与向量p2方向一致的确切角度，我把这个角度定义为旋转角。 旋转角的计算既需要夹角，还需要两个向量的叉乘， 以确定p1和p2的角度方向关系。 
+关于叉乘符号与向量的角度方向关系，请参考《算法导论》，我只给出结论:
+       p1 * p2 = x1y2  - x2 y1 = -p2 * p1
+If p1 * p2 is positive, then p1 is clockwise from p2 with respect to the origin (0, 0); if this cross product is negative, then p1 is counterclockwise from p2.
+ 另外考虑的是共线（collinear ）的问题， arcsine很难处理这个问题， 不过arecosine却能够明确的区分0和pi，因此作为特殊情况提前得出结论。 
+
+
+ps.因为主要是openGL要用， 所以返回的是角度值
+
+
+/************************************************************************/
+/* author  : Navy@hust
+* file    : angle.c
+* date     : 5/12/2007 
+* desc     : vector rotate angle calculation
+/************************************************************************/
+＃i nclude <stdio.h>
+＃i nclude <math.h>
+double getRotateAngle(double x1, double y1, double x2, double y2);
+int main(int argc, char **argv)
+{
+ double x1, x2, y1, y2;
+ double dist, dot, degree, angle;
+ freopen("angle.in", "r", stdin);
+ 
+ while(scanf("%lf%lf%lf%lf", &x1, &y1, &x2, &y2) == 4) {
+  printf("the rotate angle from p1 to p2 is %.3lf\n", 
+  getRotateAngle(x1, y1, x2, y2));
+ }
+}
+/*
+ * 两个向量之间的旋转角
+ * 首先明确几个数学概念：
+ * 1. 极轴沿逆时针转动的方向是正方向
+ * 2. 两个向量之间的夹角theta， 是指(A^B)/(|A|*|B|) = cos(theta)，0<=theta<=180 度， 而且没有方向之分
+ * 3. 两个向量的旋转角，是指从向量p1开始，逆时针旋转，转到向量p2时，所转过的角度， 范围是 0 ~ 360度
+ * 计算向量p1到p2的旋转角，算法如下：
+ * 首先通过点乘和arccosine的得到两个向量之间的夹角
+ * 然后判断通过差乘来判断两个向量之间的位置关系
+ * 如果p2在p1的顺时针方向, 返回arccose的角度值, 范围0 ~ 180.0(根据右手定理,可以构成正的面积)
+ * 否则返回 360.0 - arecose的值, 返回180到360(根据右手定理,面积为负)
+ */ 
+double getRotateAngle(double x1, double y1, double x2, double y2)
+{
+ const double epsilon = 1.0e-6;
+ const double nyPI = acos(-1.0);
+ double dist, dot, degree, angle;
+ 
+ // normalize
+ dist = sqrt( x1 * x1 + y1 * y1 );
+ x1 /= dist;
+ y1 /= dist;
+ dist = sqrt( x2 * x2 + y2 * y2 );
+ x2 /= dist;
+ y2 /= dist;
+ // dot product
+ dot = x1 * x2 + y1 * y2;
+ if ( fabs(dot-1.0) <= epsilon ) 
+  angle = 0.0;
+ else if ( fabs(dot+1.0) <= epsilon ) 
+  angle = nyPI;
+ else {
+  double cross;
+  
+  angle = acos(dot);
+  //cross product
+  cross = x1 * y2 - x2 * y1;
+  // vector p2 is clockwise from vector p1 
+  // with respect to the origin (0.0)
+  if (cross < 0 ) { 
+   angle = 2 * nyPI - angle;
+  }    
+ }
+ degree = angle *  180.0 / nyPI;
+ return degree;
+}
+http://www.cnblogs.com/lancidie/archive/2010/05/05/1728122.html

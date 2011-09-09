@@ -1,0 +1,105 @@
+在讨论「四元数」之前，我们来想想对三维直角座标而言，在物体旋转会有何影响，可以扩充三维直角座标系统的旋转为三角度系统（Three-angle system），在Game Programming Gems中有提供这么一段：
+
+Quaternions do not suffer from gimbal lock. With a three-angle(roll, pitch, yaw) system, there are always certain orientations in which there is no simple change to the trhee values to represent a simple local roation. You often see this rotation having "pitched up" 90 degree when you are trying to specify a local yaw for right.
+
+
+简单的说，三角度系统无法表现任意轴的旋转，只要一开始旋转，物体本身即失去对任意轴的自主性。
+
+四元数（Quaternions）为数学家Hamilton于1843年所创造的，您可能学过的是复数，例如：a + b i 这样的数，其中i * i = -1，Hamilton创造了三维的复数，其形式为w + x i + y j + z k，其中i、j、k的关系如下：
+
+i2 = j2 = k2 = -1
+i * j = k = -j * i
+j * k = i = -k * j
+k * i = j = -i * k
+
+
+假设有两个四元数：
+
+q1 = w1 + x1 i + y1 j + z1 k
+q2 = w2 + x2 i + y2 j + z2 k
+
+
+四元数的加法定义如下：
+
+q1 + q2 = (w1+w2) + (x1+x2) i + (y1+y2) j + (z1+z2) k
+
+
+四元数的乘法定义如下，利用简单的分配律就是了：
+
+q1 * q2 =
+
+(w1*w2 - x1*x2 - y1*y2 - z1*z2) +
+(w1*x2 + x1*w2 + y1*z2 - z1*y2) i +
+(w1*y2 - x1*z2 + y1*w2 + z1*x2) j +
+(w1*z2 + x1*y2 - y1*x2 + z1*w2) k
+
+由于q = w + x i + y j + z k中可以分为纯量w与向量x i + y j + z k，所以为了方便表示，将q表示为(S, V)，其中S表示纯量w，V表示向量x i + y j + z k，所以四元数乘法又可以表示为：
+
+q1 * q2 = (S1 + V1)*(S2 + V2) = S1*S2 - V1.V2 + V1XV2 + S1*V2 + S2*V1
+
+
+其中V1.V2表示向量内积，V1XV2表示向量外积。
+
+定义四元数q = w + x i + y j +ｚk 的norm为：
+
+N(q) = |q| = x2 + y2 + z2 + w2
+
+
+满足N(q) = 1的四元数集合，称之为单位四元数（Unit quaternions）。
+
+定义四元数定义四元数q = w + x i + y j +ｚk的共轭（Conjugate）为：
+
+q* = 定義四元數q = w - x i - y j -ｚk = [S - V]
+
+
+定义四元数的倒数为：
+
+1/ q = q* / N(q)
+
+
+说明了一些数学，您所关心的或许是，四元数与旋转究竟有何关係，假设有一任意旋转轴的向量A(Xa, Ya, Za)与一旋转角度θ，如下图所示：
+
+可以将之转换为四元数：
+
+x = s * Xa
+y = s * Xb
+z = s * Xc
+w = cos(θ/2)
+s = sin(θ/2)
+
+
+所以使用四元数来表示的好处是：我们可以简单的取出旋转轴与旋转角度。
+
+那麽四元数如何表示三维空间的任意轴旋转？假设有一向量P(X, Y, Z)对着一单位四元数q作旋转，则将P视为无纯量的四元数X i + Y j + Z k，则向量的旋转经导证如下：
+
+Rot(P) = q p q*
+
+
+四元数具有纯量与向量，为了计算方便，将之以矩阵的方式来表现四元数的乘法，假设将四元数表示如下：
+
+q = [w, x, y, z] = [S, V]
+
+
+两个四元数相乘q" = q * q'的矩阵表示法如下所示：
+
+
+
+
+若令q = [S, V] = [cosθ, u*sinθ]，其中u为单位向量，而令q'= [S', V']为一四元数，则经过导证，可以得出q * q' * q^(-1)会使得q'绕着u轴旋转2θ。
+
+ 
+
+由四元数的矩阵乘法与四元数的旋转，可以导证出上面的旋转公式可以使用以下的矩阵乘法来达成：
+
+
+
+讲了这麽多，其实就是要引出上面这个矩阵乘法，也就是说如果您要让向量(x', y', z')（w'为0）对某个单位向量轴u(x, y, z)旋转角度2θ，则w = cosθ，代入以上的矩阵乘法，即可得旋转后的(x", y", z")，如果为了方便，转换矩阵的最下列与最右行会省略不写出来，而如下所示：
+
+
+
+关于四元数的其它说明，您可以参考 向量外积与四元数 这篇文章。
+
+ 
+
+关于旋转的转换矩阵导证，在Game Programming Gems第二章有详细的说明。
+http://hi.baidu.com/%C4%A6%F4%C9%D1%DB%C0%E1/blog/item/8756bffdc6686c40252df2dd.html

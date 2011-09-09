@@ -1,0 +1,93 @@
+最近项目需要仿真加速，用了一下sse指令加速。
+
+sse说来是一个很老的东西了，早在Pentium III的时候，Intel 就设计了MMX指令集，那时候都还不知道是个什么神奇的玩意儿呢。简单的出发点是SIMD,即Single Instruction Multiple Data，一条指令同时做一组相同的计算，如四个浮点加法。如果程序设计得当，那么就可以快上4倍的速度了。
+
+SSE指令可以支持float32 浮点数4个同时操作，windows下visual studio 使用了 intel提供的header, <xmmintrin.h> 最基本的定义为：
+
+ 
+
+typedef union __declspec(intrin_type) _CRT_ALIGN(16) __m128 {
+
+     float               m128_f32[4];
+
+     unsigned __int64    m128_u64[2];
+
+     __int8              m128_i8[16];
+
+     __int16             m128_i16[8];
+
+     __int32             m128_i32[4];
+
+     __int64             m128_i64[2];
+
+     unsigned __int8     m128_u8[16];
+
+     unsigned __int16    m128_u16[8];
+
+     unsigned __int32    m128_u32[4];
+
+ } __m128;
+
+__m128类型表示了128bit的XMM寄存器，可以看成4个单精度float, 4个int32，等等。
+
+然后有一些指令集，分别为arithmetic（算术计算）, logic（逻辑运算）, comparison, memory set/load（内存set/load）。
+
+指令集使用函数表示形如： _mm_add_ps(),  或 _mm_add_ss() 这里的 ps表示packed, ss  表示scalar, 后面的s 什么意思不知道了。。 ss指令只对__m128中的第0个做运算，ps对所有4个做运算。
+
+ 
+
+另外要注意的是memory set/load指令中，需要使用16位对齐的内存，否则是不对的。16为对齐的内存分配可以使用 _mm_malloc(size, 16) 得到，而free则使用 _mm_free();
+
+ 
+
+上面的这些是windows visual studio下的情况，在linux gcc/g++下，情况有所不同了。主要是因为gcc使用了__m128不同的定义，他将__m128定义为这个怪东西：
+
+typedef float __m128 __attribute__ ((__vector_size__(16), __may_alias__));
+
+但是至今还不知道__vector__以及 __may_alias__是什么意思。有待补充了。
+
+但是我现在仅有这样的方法来使用mmx:
+
+typedef union my__m128 {
+
+__m128 m;
+
+float m128_f32[4];
+
+} my_m128;
+
+然后使用这个类型来做。调用_mm指令的时候，使用 union中的.m就可以了
+
+这样的方法，可能还是有很一定损失的，因为
+
+非sse代码，g++比windows快了近1倍！
+
+而这样的my_m128代码用到windows下，只会比linux慢10%左右。
+
+其实也发现，虚拟机性能实在不是一个问题，我的linux是在虚拟机里跑的，还比vs2010的快乐那么多。
+
+ 
+
+另外linux下的gcc/g++需要使用如下的开关来启动MMX:
+
+$(SSE_FLAG) = -march=native -msee2 -mfpmatch=sse
+
+这里 -march使用native,即使用本机的配置
+
+后面的一些开关看man g++，就不吐糟了。
+
+ 
+
+ 
+
+ 
+
+几个好的参考：
+
+http://www.csie.ntu.edu.tw/~r89004/hive/sse/page_1.html
+
+http://msdn.microsoft.com/en-us/library/t467de55(VS.71).aspx
+
+
+
+http://carlscoollife.blogbus.com/logs/65619799.html

@@ -1,0 +1,84 @@
+在3D世界中，为了增强场景的真实感与层次感，阴影处理非常重要。阴影是景物空间中光源不能直接照射到的区域，因此，要做出正确的阴影效果，需要对整个场景进行处理，并判断哪些物体会投射到哪些位置，即便对于飞速发展的PC 3D硬件来说，阴影处理也是一项非常繁重复杂的任务，而对于当前硬件设备和资源都极其有限的移动设备来说，只能通过一些特殊的方式来模拟实现阴影效果。本文就向大家介绍最常用的一种阴影处理方式—平面阴影渲染（Planar Shadow）。
+
+平面阴影原理
+
+平面阴影处理是将阴影看成是物体投射到某个平面的表面，也就是类似于将物体模型紧压在接受阴影的平面上，使其变成一个没有厚度的阴影区域。如图1所示，光源将物体的阴影投射到地面的表面，形成黑色的阴影部分。需要注意的是，如果地面有凹凸不平的起伏，平面阴影将无法适用，这也是该方法最大的限制。
+
+
+
+图1 平面阴影原理
+
+要模拟实现平面阴影，需要得知以下若干条件：
+
+光源方向和位置：通常为平行光或者点光源 
+接受阴影的平面：通常由平面法线和平面上某一点定义而成 
+通过以上条件，我们可以最终计算得到一个物体阴影变换矩阵（矩阵的推导过程参见：http://www.devmaster.net/articles/shadowprojection/）。使用时，将阴影变换矩阵与物体的当前模型视图矩阵相乘，最终得到将物体“压扁”到该平面的模拟阴影效果。
+
+计算平面阴影变换矩阵
+
+前面我们介绍过在OPhone中载入和渲染MS3D模型格式。这里我们将继续通过介绍对带有骨骼动画的模型进行阴影的实时渲染，来向大家展示平面阴影的使用方式。
+如图2所示，当3D场景中没有阴影的时候，模型和地面的接触会让人感觉失真，缺乏立体感。我们要做的，就是将3D模型“压扁”投影到地面上，并以黑色阴影色将压扁后的模型数据渲染到模型与地面接缝处来实现平面阴影效果。
+
+
+
+图2 不带阴影的3D场景
+
+我们将人物放置在世界坐标（1，0，1）处，将光源设置在人物头顶正上方（1，100，1）处，而用于接收阴影投射到地面（即图2中的红白方格地面），我们定义平面法线为竖直向上（0，1，0）。最终计算的平面阴影矩阵保存在mMatShadow中，供渲染时使用。程序中的相关定义如下：
+
+view plaincopy to clipboardprint?
+/** * 阴影平面法线 */ private Vector3f mvNormal = new Vector3f(0, 1, 0); /** * 阴影平面定位点 */ private Vector3f mvPoint = new Vector3f(1, 0, 1); /** * 阴影平面 */ private Vector4f mvShadowPlane = new Vector4f(); /** * 光照位置 */ private Vector4f mvLightPosition = new Vector4f(1.0f, 100.0f, 1.0f, 0.0f); /** * 最终的阴影矩阵 */ private Matrix4f mMatShadow = new Matrix4f();  
+
+/** * 阴影平面法线 */ private Vector3f mvNormal = new Vector3f(0, 1, 0); /** * 阴影平面定位点 */ private Vector3f mvPoint = new Vector3f(1, 0, 1); /** * 阴影平面 */ private Vector4f mvShadowPlane = new Vector4f(); /** * 光照位置 */ private Vector4f mvLightPosition = new Vector4f(1.0f, 100.0f, 1.0f, 0.0f); /** * 最终的阴影矩阵 */ private Matrix4f mMatShadow = new Matrix4f();
+之后我们通过调用computeShadowMatrix()来计算得到人物模型的平面阴影矩阵以供后边渲染阴影时使用。这里仅展示平面阴影矩阵计算具体的代码：
+
+view plaincopy to clipboardprint?
+/** * 计算阴影矩阵 */ private void computeShadowMatrix() { // 根据法线和定位点计算得到阴影平面 ShadowUtil.MakePlane(mvNormal, mvPoint, mvShadowPlane); // 根据阴影平面和虚拟光照位置计算得到阴影矩阵 ShadowUtil.MakeShadowMatrix(mMatShadow, mvShadowPlane, mvLightPosition); } /** * 根据平面法线和平面上的某一点计算得到平面 * @param normal - 平面法线 * @param point - 平面上某一点 * @param plane - 最终的平面定义 */ public static void MakePlane(Vector3f normal, Vector3f point, Vector4f plane) { plane.x = normal.x; plane.y = normal.y; plane.z = normal.z; plane.w = normal.x * point.x + normal.y * point.y + normal.z * point.z; plane.w = -plane.w; } /** * 创建一个阴影矩阵 * @param matOut - 最终的计算矩阵 * @param plane - 阴影平面 * @param lightPos - 光源位置 w = 1表示点光源; w = 0表示平行光 */ public static void MakeShadowMatrix(Matrix4f matOut, Vector4f plane, Vector4f lightPos) { matOut.setIdentity(); float fDot = plane.x * lightPos.x + plane.y * lightPos.y + plane.z * lightPos.z + plane.w * lightPos.w; matOut.m00 = fDot - lightPos.x * plane.x; matOut.m10 = 0 - lightPos.x * plane.y; matOut.m20 = 0 - lightPos.x * plane.z; matOut.m30 = 0 - lightPos.x * plane.w; matOut.m01 = 0 - lightPos.y * plane.x; matOut.m11 = fDot - lightPos.y * plane.y; matOut.m21 = 0 - lightPos.y * plane.z; matOut.m31 = 0 - lightPos.y * plane.w; matOut.m02 = 0 - lightPos.z * plane.x; matOut.m12 = 0 - lightPos.z * plane.y; matOut.m22 = fDot - lightPos.z * plane.z; matOut.m32 = 0 - lightPos.z * plane.w; matOut.m03 = 0 - lightPos.w * plane.x; matOut.m13 = 0 - lightPos.w * plane.y; matOut.m23 = 0 - lightPos.w * plane.z; matOut.m33 = fDot - lightPos.w * plane.w; matOut.transpose(); }  
+
+/** * 计算阴影矩阵 */ private void computeShadowMatrix() { // 根据法线和定位点计算得到阴影平面 ShadowUtil.MakePlane(mvNormal, mvPoint, mvShadowPlane); // 根据阴影平面和虚拟光照位置计算得到阴影矩阵 ShadowUtil.MakeShadowMatrix(mMatShadow, mvShadowPlane, mvLightPosition); } /** * 根据平面法线和平面上的某一点计算得到平面 * @param normal - 平面法线 * @param point - 平面上某一点 * @param plane - 最终的平面定义 */ public static void MakePlane(Vector3f normal, Vector3f point, Vector4f plane) { plane.x = normal.x; plane.y = normal.y; plane.z = normal.z; plane.w = normal.x * point.x + normal.y * point.y + normal.z * point.z; plane.w = -plane.w; } /** * 创建一个阴影矩阵 * @param matOut - 最终的计算矩阵 * @param plane - 阴影平面 * @param lightPos - 光源位置 w = 1表示点光源; w = 0表示平行光 */ public static void MakeShadowMatrix(Matrix4f matOut, Vector4f plane, Vector4f lightPos) { matOut.setIdentity(); float fDot = plane.x * lightPos.x + plane.y * lightPos.y + plane.z * lightPos.z + plane.w * lightPos.w; matOut.m00 = fDot - lightPos.x * plane.x; matOut.m10 = 0 - lightPos.x * plane.y; matOut.m20 = 0 - lightPos.x * plane.z; matOut.m30 = 0 - lightPos.x * plane.w; matOut.m01 = 0 - lightPos.y * plane.x; matOut.m11 = fDot - lightPos.y * plane.y; matOut.m21 = 0 - lightPos.y * plane.z; matOut.m31 = 0 - lightPos.y * plane.w; matOut.m02 = 0 - lightPos.z * plane.x; matOut.m12 = 0 - lightPos.z * plane.y; matOut.m22 = fDot - lightPos.z * plane.z; matOut.m32 = 0 - lightPos.z * plane.w; matOut.m03 = 0 - lightPos.w * plane.x; matOut.m13 = 0 - lightPos.w * plane.y; matOut.m23 = 0 - lightPos.w * plane.z; matOut.m33 = fDot - lightPos.w * plane.w; matOut.transpose(); }
+
+得到平面阴影变换矩阵之后，便可以在渲染时将阴影矩阵与当前人物模型视图矩阵相乘以便渲染出最终的阴影效果。
+
+渲染阴影
+
+在没有渲染阴影时，我们的渲染次序是先渲染地面，再渲染模型；而阴影是位于地面和模型之间的一个没有厚度的扁平面，因此渲染次序变为：
+
+view plaincopy to clipboardprint?
+// 渲染地面 mGround.draw(gl); // 渲染阴影 drawShadow(gl); // 渲染模型 mModel.render(gl);  
+
+// 渲染地面 mGround.draw(gl); // 渲染阴影 drawShadow(gl); // 渲染模型 mModel.render(gl);
+由于阴影只是或浓或淡的黑色区域，因此渲染阴影时，需要禁用相关纹理操作，并以纯色渲染。同时由于阴影往往与地面贴得极近，如果开启深度测试，则很容易造成深度冲突导致渲染时阴影和地面相互交错或者闪烁冲突，因此，在这个演示程序里，我们在渲染阴影时禁用了深度测试，同时关闭了深度写入，让之后的渲染物体可以覆盖阴影表面。我们将这些阴影渲染前后的操作封装如下：
+
+view plaincopy to clipboardprint?
+/** * 渲染阴影前进行一定设置 * @param gl */ public static void glBeginDrawShadow(GL10 gl) { //禁用深度测试 gl.glDisable(GL10.GL_DEPTH_TEST); //禁止深度写入 gl.glDepthMask(false); //禁用纹理贴图 gl.glDisable(GL10.GL_TEXTURE_2D); //启用颜色混合 gl.glEnable(GL10.GL_BLEND);; //设置阴影颜色为黑色不透明 gl.glColor4f(0.0f, 0.0f, 0.0f, 1.0f); } /** * 阴影渲染完毕后，重置相关操作 * @param gl */ public static void glEndDrawShadow(GL10 gl) { //启用深度测试 gl.glEnable(GL10.GL_DEPTH_TEST); //启用深度写入 gl.glDepthMask(true); //禁用颜色混合 gl.glDisable(GL10.GL_BLEND); }  
+
+/** * 渲染阴影前进行一定设置 * @param gl */ public static void glBeginDrawShadow(GL10 gl) { //禁用深度测试 gl.glDisable(GL10.GL_DEPTH_TEST); //禁止深度写入 gl.glDepthMask(false); //禁用纹理贴图 gl.glDisable(GL10.GL_TEXTURE_2D); //启用颜色混合 gl.glEnable(GL10.GL_BLEND);; //设置阴影颜色为黑色不透明 gl.glColor4f(0.0f, 0.0f, 0.0f, 1.0f); } /** * 阴影渲染完毕后，重置相关操作 * @param gl */ public static void glEndDrawShadow(GL10 gl) { //启用深度测试 gl.glEnable(GL10.GL_DEPTH_TEST); //启用深度写入 gl.glDepthMask(true); //禁用颜色混合 gl.glDisable(GL10.GL_BLEND); }
+我们在MS3D模型类中添加renderShadow()函数，并传入之前计算得到的阴影变换矩阵用于最终的渲染阴影，相关代码如下：
+ 
+
+view plaincopy to clipboardprint?
+/** * 根据阴影矩阵渲染阴影 * @param gl * @param matShadow - 阴影矩阵 */ public void renderShadow(GL10 gl, Matrix4f matShadow) { gl.glPushMatrix(); { //将阴影矩阵与当前模型视图矩阵相乘 gl.glMultMatrixf(matShadow.asFloatBuffer()); //开启阴影渲染模式 ShadowUtil.glBeginDrawShadow(gl); //仅启用顶点位置数据 gl.glEnableClientState(GL10.GL_VERTEX_ARRAY); // 遍历所有的MS3D Group，渲染每一个Group for (int i = 0; i < mpGroups.length; i++) { if (mpGroups[i].getTriangleCount() == 0) { // 如果该Group包含的三角形个数为零，则直接跳过 continue; } //绑定顶点数据 gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mpBufVertices[i]); //提交渲染 gl.glDrawArrays(GL10.GL_TRIANGLES, 0, mpGroups[i] .getTriangleCount() * 3); } //重置相关操作 gl.glDisableClientState(GL10.GL_VERTEX_ARRAY); //停止阴影渲染 ShadowUtil.glEndDrawShadow(gl); } gl.glPopMatrix(); }  
+
+/** * 根据阴影矩阵渲染阴影 * @param gl * @param matShadow - 阴影矩阵 */ public void renderShadow(GL10 gl, Matrix4f matShadow) { gl.glPushMatrix(); { //将阴影矩阵与当前模型视图矩阵相乘 gl.glMultMatrixf(matShadow.asFloatBuffer()); //开启阴影渲染模式 ShadowUtil.glBeginDrawShadow(gl); //仅启用顶点位置数据 gl.glEnableClientState(GL10.GL_VERTEX_ARRAY); // 遍历所有的MS3D Group，渲染每一个Group for (int i = 0; i < mpGroups.length; i++) { if (mpGroups[i].getTriangleCount() == 0) { // 如果该Group包含的三角形个数为零，则直接跳过 continue; } //绑定顶点数据 gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mpBufVertices[i]); //提交渲染 gl.glDrawArrays(GL10.GL_TRIANGLES, 0, mpGroups[i] .getTriangleCount() * 3); } //重置相关操作 gl.glDisableClientState(GL10.GL_VERTEX_ARRAY); //停止阴影渲染 ShadowUtil.glEndDrawShadow(gl); } gl.glPopMatrix(); }
+在上面的代码中，我们首先将阴影变换矩阵通过调用glMultMatrix()来与当前的模型视图矩阵相乘，来得到最终的变换矩阵。之后开启阴影渲染模式，并按照MS3D的模型渲染格式来将当前最新的模型渲染数据提交渲染。渲染完毕后，通知关闭阴影渲染模式，并重置相关状态。
+
+最终效果
+
+添加平面阴影渲染之后，最终的效果如图3所示。可以看到，阴影添加之后，随着人物模型动作的变换阴影也会实时的变化，这样大大增强了整个3D场景的真实感和层次感，并且对于这种平面的地面效果非常完美。大家可以通过上下左右拖动镜头来体验不同角度下的阴影表现。
+
+
+
+图3 添加阴影效果后的渲染图
+
+总结
+
+随着OPhone 2.0平台的发布和推广，移动设备的3D能力越来越强大。本文通过介绍如何使用OPhone中提供的3D API来实现平面阴影渲染，希望能引领更多开发者步入神奇的3D世界。
+
+文章所附源码可以在http://www.ophonesdn.com/forum/viewthread.jsp?tid=832 中下载。
+
+作者介绍
+
+薛永，专注于移动3D技术开发，目前正在完善跨PC/Iphone/Android NDK的统一3D引擎。
+
+（声明：本网的新闻及文章版权均属OPhone SDN网站所有，如需转载请与我们编辑团队联系。任何媒体、网站或个人未经本网书面协议授权，不得进行任何形式的转载。已经取得本网协议授权的媒体、网站，在转载使用时请注明稿件来源。）
+
+http://www.ophonesdn.com/article/show/312

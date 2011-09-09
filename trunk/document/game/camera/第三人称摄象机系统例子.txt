@@ -1,0 +1,1091 @@
+ 前言 
+Ogre是一款优秀的3D图形渲染引擎，在国内，很多前辈从04年甚至更早就对它有了深入的了解，并留了许多译文和心得，极大的便利了我的学习。虽然我起步比较晚，但仍希望自己学习间的这些记录和翻译能够帮助到他人，如您对Ogre有所心得和资料，望提供至Ogre中文Wiki http://ogre3d.cn/wiki中大家共享交流。
+
+因能力所限，翻译和整理难免有错误之处，欢迎各位指正。
+
+Blog： http://hi.baidu.com/freedomknightduzhi
+
+E-mail： duzhi5368@163.com
+
+大部分译文来自 http://www.ogre3d.org ，如原文内无说明，不再额外查证来源以及原作者名称。
+
+ 
+
+l        想法来源
+
+这个第三人称摄象机系统的想法来源于我玩的一款游戏《寂静岭2》，在其中有一些图象上的BUG，我甚至能从其中发现一些不正常的“线”，如果你也看过，你会明白我说的情况。
+
+       一般情况下，该系统中同一时刻内整个场景中有且仅有一个摄象机。和其他的第一/三人称摄象机系统不同的是，我的这套系统中，摄象机是完全独立与整个场景的（除根结点Root以外 --- 它是程序的核心）。
+
+       这个系统能使我们获得非常优秀的特效和软件环境，也提供了我们一个非常友好的方式来查看整个场景。
+
+       概括来说，这个核心摄象机ExtendedCamera由两个场景结点共同组成，它们分别是“摄象机管理器”和“摄象机的对象”。摄象机管理器用来保证摄象机永远朝向摄象机的对象。如果我们移动“对象”，摄象机将会平移。如果我们移动“管理器”，则会使摄象机围绕着“对象”进行旋转。当然，我们也可以两者一起移动获得更多的情况。
+
+       上面是对整个系统的一个简单功能的说明。我们还可以为摄象机增加一些震动特效，也可以通过虚拟摄象机实现一些电影效果等等。
+
+       下面，我将讲述如何在一个Demo中实现三种摄象机模式。
+
+l         可旋转第三人称摄象机
+
+首先，我们有一个主角，它有三重性质。首先，它本身是一个重要的场景结点（主角），又是一个可见的结点（我们的摄象机的目标结点），还是一个可旋转的摄象机结点（主角的眼睛本身可以进行旋转和观察）。还有很多方法可以实现同样的功能，但是我认为这种方法比较简单。
+
+       我们接下来要做的就是，使它本身“可见的结点”这一特性结点做为我们“摄象机的目标”，而“可旋转的摄象机结点”这一特性结点做为摄象机本身。
+
+       “可见的结点”意味着主角大部分时间应该处于屏幕的中心，但当主角处于“调查”状态时，它自身就变成了一个摄象机，这时它能够获得更宽阔的视野。
+
+       （译者：还不理解的朋友可以玩玩单机的《零》系列或射击类游戏。通常为第三人称，一旦开启瞄准镜时，就变成了第一人称，即作者所说的“主角成为了一个摄象机结点”。）
+
+l         绑定的第三人称摄象机
+
+这种类型的摄象机非常常见，例如《寂静岭》……（译者：- -看来作者是SH的粉丝……）这种摄象机意味着摄象机永远锁定主角，但仅锁定一个方面。（译者：简单来说即永远无法旋转摄象机看到主角的正面。）
+
+这种类型的摄象机与可旋转的第三人称摄象机类似。
+
+l         第一人称摄象机
+
+我们使用主角的位置作为摄象机的位置。在该模式下，我们将摄象机的“目标结点”设置为空，同时也将以主角结点为目标的摄象机隐藏起来。
+
+以上，就是三种摄象机的区别。
+
+l        需要紧记的一些事情
+
+l         调整系统
+
+如果摄象机受到场景中的一些对象影响，我们则需要对摄象机进行一些调整。
+
+l         摄象机移动
+
+摄象机以及摄象机目标点可以这样移动：我们计算摄象机坐标和目标点之间的差距，最终得到一个矩阵，让它作用于摄象机使其移动至目标点。
+
+l         紧密器
+
+按照我们上面说的移动方式，我们会感觉到摄象机的移动很生硬，不够平滑。所以这个“移动紧密器”的概念就出来了。这个紧密器因素是一个0,0 – 1.0之间的值，我们在计算出摄象机的移动转换矩阵时，用它来进行影响。
+
+       1：若该因素为1.0，则表明当目标单元移动，摄象机同样移动。
+
+       2：若该因素为0.0，则当目标单元移动时，摄象机完全不动。
+
+       3：该因素在0.0 – 1.0之间时，将会对摄象机的变换矩阵做出影响。
+
+l        源代码以及说明
+
+你可以从http://www.ugr.es/local/agsh/ogre/ExtendedCameraSample.zip这里下载Alberts的这套代码。
+
+       首先，我们包含OGRE的例子框架文件头。
+
+ 
+
+       // 摄象机系统例子 By Kencho
+
+       #include “ExampleApplication.h”
+
+ 
+
+       接下来，我们定义一个角色类。这个类中将定义一个对象所处的多种特性属性（即是摄象机又是摄象机的目标对象）。当然，在一个游戏中，你需要为角色类定义更多的属性。 ：）
+
+ 
+
+       // 普通角色类
+
+       Class Charater
+
+{
+
+       Protected:
+
+              SceneNode *mMainNode;      // 主角结点
+
+              SceneNode *mSightNode;      // 可见结点，主角应当一直看着这里
+
+              SceneNode *mCameraNode;  // 锁定摄象机结点，该结点围绕主角移动和旋转
+
+              Entity *mEntity;                   // 角色实体
+
+              SceneManager *mSceneMgr;
+
+       Public:
+
+              // 更新主角状态（如移动等……）
+
+              Virtual void update (Real elapsedTime, InputReader *input) = 0;
+
+              // 下面两个方法返回摄象机结点指针
+
+              SceneNode *getSightNode(){ return mSightNode ;}
+
+              SceneNode *getCameraNode(){ return mCameraNode; }
+
+              // 返回主角当前坐标（第一人称摄象机时需要）
+
+              Vector3 getWorldPosition(){ return mMainNode->getWorldPosition(); }
+
+};
+
+ 
+
+接下来，我们对角色类特化实现一下。我认为在Demo弄一个漂浮的食人魔脑袋做主角挺不错。所以我们写一个实例化的类。
+
+ 
+
+       // 特殊的实例化角色类 – 我们可爱的Ogre
+
+       Class OgreCharater : public Character
+
+{
+
+Protected:
+
+       String mName;
+
+Public:
+
+       OgreCharater(String name, SceneManager *sceneMgr)
+
+{
+
+       // 保存类成员变量
+
+       mName = name;
+
+       mSceneMgr = sceneMgr;
+
+       // 创建节点用来存放绑定第三人称的摄象机
+
+mMainNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mName);
+
+    mSightNode = mMainNode-> createChildSceneNode(mName + “_sight”, Vector3(0, 0, 100));
+
+    mCameraNode = mMainNode-> createChildSceneNode(mName + “_camera”, Vector3(0, 50, -100));
+
+    // 为角色绑定一个实体
+
+    mEntity = mSceneMgr->createEntity(mName, “OgreHead.mesh”);
+
+    mMainNode->attachObject(mEntity);
+
+}
+
+ 
+
+Void update(Real elapsedTime, InputReader *input)
+
+{
+
+       // 移动
+
+       If (input->isKeyDown(KC_W))
+
+{
+
+       mMainNode->translate(mMainNode->getOrientation() * Vector3(0, 0, 100 * elapsedTime));
+
+}
+
+       If (input->isKeyDown(KC_S))
+
+{
+
+       mMainNode->translate(mMainNode->getOrientation() * Vector3(0, 0, -50 * elapsedTime));
+
+}
+
+       If (input->isKeyDown(KC_A))
+
+{
+
+       mMainNode->yaw(Radian(2 * elapsedTime));;
+
+}
+
+       If (input->isKeyDown(KC_D))
+
+{
+
+       mMainNode->yaw(Radian(-2 * elapsedTime));;
+
+}
+
+}
+
+ 
+
+// 设置自身是否可见，这对于第一人称视角很有用。
+
+Void setVisible(bool visible)
+
+{
+
+       mMainNode->setVisible(visible);
+
+}
+
+};
+
+ 
+
+为了保证代码简单，我这里不再写一些关于主角的模型动画，控制等函数。
+
+       现在，进入有趣的部分：扩展的摄象机类。它就如我之前所说明的思路一样去设计的，所以，如果你对本部分代码有什么疑问，你可以看一下先前我的讲述。
+
+       
+
+       // 我们的扩展摄象机类
+
+       Class ExtendedCamera
+
+       {
+
+       Protected:
+
+              SceneNode *mTargetNode;    // 摄象机目标结点
+
+              SceneNode *mCameraNode;  // 摄象机自身结点
+
+              Camera *mCamera;              // Ogre摄象机
+
+              SceneManager *mSceneMgr; 
+
+              String mName;
+
+              Bool mOwnCamera;             // 判断是否是本类创建的摄象机，或是类外传入的摄象机
+
+              Real mTightness;                  // 摄象机捆绑紧密度。1.0表示摄象机与目标的移动保持完全一致。0.0表示摄象机不移动，完全不受目标移动的影响。
+
+       Public:
+
+              ExtendedCamera(String name, SceneManager *sceneMgr, Camera *camera = 0)
+
+{
+
+       mName = name;
+
+       mSceneMgr = sceneMgr;
+
+       // 创建摄象机结点结构
+
+       mCamreaNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mName);
+
+       mTargetNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mName + “_target”);
+
+       // 摄象机永远朝向目标结点
+
+mCameraNode->setAutoTracking(true, mTargetNode);
+
+// 因为需要自动跟踪，所以该项要设为true
+
+mCameraNode->setFixedYawAxis(true);
+
+ 
+
+// 假如没有从参数获得一个摄象机，我们则自己创建
+
+If (camera == 0)
+
+{
+
+       mCamera = mSceneMgr->createCamera(mName);
+
+       mOwnCamera = true;
+
+}else
+
+{
+
+       mCamera = camera;
+
+       mOwnCamera = false;
+
+}
+
+// 为摄象机结点绑定一个Ogre摄象机
+
+mCameraNode->attachObject(mCamera);
+
+// 默认的摄象机捆绑紧密系数
+
+mTightness = 0.01f;
+
+}
+
+ 
+
+~ExtendedCamera()
+
+{
+
+       mCameraNode->detachAllObjects();
+
+       if (mOwnCamera)
+
+              delete mCamera;
+
+       mSceneMgr->destroySceneNode(mName);
+
+       mSceneMgr-> destroySceneNode(mName + “_target”);
+
+}
+
+ 
+
+Void setTightness(Real tightness)
+
+{
+
+       mTightness = tightness;
+
+}
+
+ 
+
+Real getTightness()
+
+{
+
+       Return mTightness;
+
+}
+
+ 
+
+Vector3 getCameraPosition()
+
+{
+
+       Return mCameraNode->getPosition();
+
+}
+
+ 
+
+Void instantUpdate(Vertor3 cameraPosition, Vector3 targetPosition)
+
+{
+
+       mCameraNode->setPosition(cameraPosition);
+
+mTargetNode->setPosition(targetPosition);
+
+}
+
+ 
+
+Void update(Real elapsedTime, Vector3 cameraPosition, Vector3 targetPositon)
+
+{
+
+       // 管理移动
+
+       Vector3 displacement;
+
+       Displacement = (cameraPosition – mCameraNode->getPosition()) * mTightness;
+
+       mCameraNode->translate( displacement );
+
+       Displacement = (targetPosition – mTargetNode->getPosition()) * mTightness;
+
+       mTargetNode ->translate( displacement );    
+
+}
+
+};
+
+ 
+
+在每一桢的桢监听中，更变摄象机，角色和摄象机模式。
+
+ 
+
+       Class SampleListener : public ExampleFrameListener
+
+       {
+
+       Protected:
+
+              Character *mChar;
+
+              ExtendedCamera *mExCamera;
+
+              Unsigned int mMode;    // 摄象机模式，现在支持第一人称，绑定的第三人称摄象机和动态捕捉第三人称摄象机
+
+       Public:
+
+              SampleListener(RenderWindow *win, Camera *cam) : ExampleFrameListener(win, cam)
+
+              {
+
+                     mChar = 0;
+
+                     mExCamera = 0;
+
+                     mMode = 0;
+
+}
+
+ 
+
+Void setCharacter(Character * character)
+
+{
+
+       mChar = character;
+
+}
+
+ 
+
+Void setExtendedCamera(ExtendedCamera *cam)
+
+{
+
+       mExCamera = cam;
+
+}
+
+ 
+
+Bool frameStarted( const FrameEvent& evt )
+
+{
+
+       mInputDevice->capture();
+
+ 
+
+       if (mChar)
+
+       {
+
+              mChar->update(evt.timeSinceLastFrame, mInputDevice);
+
+              if (mExCamera)
+
+              {
+
+                     Switch(mMode)
+
+                     {
+
+                            // 动态捕捉型第三人称摄象机
+
+                            case 0: 
+
+mExCamera->update(evt.timeSinceLastFrame, mChar->getCameraNode()->getWorldPosition(), mChar->getSightNode()->getWorldPosition());
+
+break;
+
+                                          // 绑定的第三人称摄象机
+
+                                          case 1:
+
+                                                 mExCamera->update(evt.timeSinceLastFrame, Vector3(0, 200, 0), mChar->getSightNode()->getWorldPosition());
+
+                                                 break;
+
+                                          // 第一人称摄象机
+
+                                          case 2:
+
+                                                 mExCamera->update(evt.timeSinceLastFrame, mChar->getWorldPosition(), mChar->getSightNode()->getWorldPosition());
+
+                                                 break;
+
+}
+
+}
+
+}
+
+// F1键切换为动态捕捉型第三人称摄象机
+
+If (mInputDevice->isKeyDown(KC_F1))
+
+{
+
+       mMode = 0;
+
+       if (mChar)
+
+              static_cast<OgreCharacter* >(mChar)->setVisible(true);
+
+       if (mExCamera)
+
+       {
+
+              If (mChar)
+
+              {
+
+mExCamera->instantUpdate(mChar->getCameraNode()->getWorldPosition(), mChar->getSightNode()->getWorldPosition());
+
+}      
+
+              mExCamera->setTightness(0.01f);       
+
+}
+
+}
+
+//  F2切换为绑定的第三人称摄象机
+
+If( mInputDevice->isKeyDown(KC_F2))
+
+{
+
+       mMode = 1;
+
+       if (mChar)
+
+              static_cast<OgreCharacter*>(mChar)->setVisible(true);
+
+       if (mExCamera)
+
+       {
+
+              If (mChar)
+
+                     mExCamera->instanceUpdate(Vector3(0, 200, 0), mChar->getSightNode()->getWorldPosition());
+
+              mExCamera->setTightness(0.01f);
+
+}
+
+}
+
+ 
+
+// F3键切换为第一人称摄象机
+
+If (mInputDevice->isKeyDown(KC_F3))
+
+{
+
+       mMode = 2;
+
+       if (mChar) 
+
+              static_cast<OgreCharacter*>(mChar)->setVisible(true);
+
+       if(mExCamera)
+
+{
+
+              If (mChar)
+
+              {
+
+mExCamera->instantUpdate(mChar->getWorldPosition(), mChar->getSightNode()->getWorldPosition());
+
+}      
+
+              mExCamera->setTightness(1.0f);  
+
+}
+
+}
+
+// 若按下ESC就退出
+
+If (mInputDevice->isKeyDown(KC_ESCAPE))
+
+       Return false;
+
+ 
+
+Return true;
+
+}
+
+};
+
+ 
+
+下面是一个App程序的样本，如果你不理解这段代码，你可以看一下其他的Ogre文章。
+
+ 
+
+Class SampleApplication : public ExampleApplication
+
+{
+
+       Public:
+
+              SampleApplication(){}
+
+              ~ SampleApplication(){}
+
+       Protected:
+
+              // 创建场景
+
+              Void createScene(void)
+
+              {
+
+                     // 设置环境光
+
+                     mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
+
+                     // 创建一个点光源
+
+                     Light* l = mSceneMgr->createLight(“MainLight”);
+
+                     // 这个点光源使用默认设置
+
+                     l->setType(Light::LT_DIRECTIONAL);
+
+                     l->setDirection(-0.5, -0.5, 0);
+
+                     // 摄象机位置
+
+                     mCamera->setPosition(0, 0, 0);
+
+                     // 为场景添加一些实体对象
+
+                     SceneNode* razorNode;
+
+                     Entity* razorEntity;
+
+                     For (unsigned int i = 0; i< 30; ++i)
+
+                     {
+
+                            razorNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(StringConverter::toString(i), Vector3(Mesh::RangeRandom(-1000, 1000), 0, Math::RangeRandom(-1000, 1000)));
+
+                            razorEntity = mSceneMgr->createEntity(StringConverter::toString(i), “razor.mesh”);
+
+                            rezorNode->attachObject(razorEntity);
+
+}
+
+ 
+
+// 主角
+
+OgreCharacter *ogre = new OgreCharacter(“Ogre 1”, mSceneMgr);
+
+ExtendedCamera *exCamera = new ExtendedCamera(“Extended Camera”, mSceneMgr, mCamera);
+
+// 桢监听器用来管理主角和摄象机的更新和不同摄象机模式间的切换
+
+mFrameListener = new SampleListener(mWindow, mCamera);
+
+static_cast<SampleListener*>( mFrameListener)->setCharacter(ogre);
+
+static_cast<SampleListener*>( mFrameListener)->setExtendedCamera(exCamera);
+
+}
+
+ 
+
+Void destroyScene(void){}
+
+Void createFrameListener(void)
+
+{
+
+       // 放弃实例化我们自己的桢监听器
+
+       // mFrameListener = new SampleListener(mWindow, mCamera);
+
+       mRoot->addFrameListener(mFrameListener);
+
+}
+
+};
+
+ 
+
+注意：在createFrameListener（）函数中，我们并没有构造创建桢监听器，所以不会有两个监听器。这是非常重要的，若我们创建两个桢监听器，这个程序将会当机。
+
+ 
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+
+#define WIN32_LEAN_AND_MEAN
+
+#include “windows,h”
+
+ 
+
+INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
+
+#else
+
+Int main(int argc, char** argv)
+
+#endif
+
+{
+
+       // 创建APP实例
+
+       SampleApplication app;
+
+Try
+
+{ app.go(); }
+
+Catch( Exception & e)
+
+{
+
+              #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+
+       MessageBox( NULL, e.getFullDescription().c_str(), “An Exception has occurred!”, MB_OK | MB_ICONERROR );
+
+       #else
+
+       Fprintf(stderr, “An Exception has occurred: %s/n”, e.getFullDescription().c_str());
+
+       #endif
+
+}
+
+Return 0;
+
+}
+
+ 
+
+l        结束语
+
+希望这篇文章对你有用处，我会之后再更新它来进行更多的解释说明。感谢您的阅读。
+
+Kencho
+
+ 
+
+ 
+
+以下为整理的vc++代码
+
+ 
+
+  // 摄象机系统例子  
+
+   #include "ExampleApplication.h" 
+   #include <OIS/OIS.h> 
+    
+   using namespace Ogre; 
+    
+   // 普通角色类 
+   class Character 
+   { 
+   protected: 
+       SceneNode *mMainNode;      // 主角结点 
+       SceneNode *mSightNode;      // 可见结点，主角应当一直看着这里 
+       SceneNode *mCameraNode;  // 锁定摄象机结点，该结点围绕主角移动和旋转 
+       Entity *mEntity;                   // 角色实体 
+       SceneManager *mSceneMgr; 
+   public: 
+       // 更新主角状态（如移动等……） 
+       virtual void update (Real elapsedTime, OIS::Keyboard *keyboard) = 0; 
+       // 下面两个方法返回摄象机结点指针 
+       SceneNode *getSightNode(){ return mSightNode ;} 
+       SceneNode *getCameraNode(){ return mCameraNode; } 
+       // 返回主角当前坐标（第一人称摄象机时需要） 
+       Vector3 getWorldPosition(){ return mMainNode->getWorldPosition(); } 
+   }; 
+    
+   // 特殊的实例化角色类 – 我们可爱的Ogre 
+   class OgreCharacter : public Character 
+   { 
+   protected: 
+       String mName; 
+   public: 
+       OgreCharacter(String name, SceneManager *sceneMgr) 
+       { 
+           // 保存类成员变量 
+           mName = name; 
+           mSceneMgr = sceneMgr; 
+           // 创建节点用来存放绑定第三人称的摄象机 
+           mMainNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mName); 
+           mSightNode = mMainNode-> createChildSceneNode(mName + "_sight", Vector3(0, 0, 100)); 
+           mCameraNode = mMainNode-> createChildSceneNode(mName + "_camera", Vector3(0, 50, -100)); 
+           // 为角色绑定一个实体 
+           mEntity = mSceneMgr->createEntity(mName, "OgreHead.mesh"); 
+           mMainNode->attachObject(mEntity); 
+       } 
+    
+       void update(Real elapsedTime, OIS::Keyboard *keyboard) 
+       { 
+           using namespace OIS; 
+    
+           // 移动 
+           if (keyboard->isKeyDown(KC_W)) 
+           { 
+               mMainNode->translate(mMainNode->getOrientation() * Vector3(0, 0, 100 * elapsedTime)); 
+           } 
+           if (keyboard->isKeyDown(KC_S)) 
+           { 
+               mMainNode->translate(mMainNode->getOrientation() * Vector3(0, 0, -50 * elapsedTime)); 
+           } 
+           if (keyboard->isKeyDown(KC_A)) 
+           { 
+               mMainNode->yaw(Radian(2 * elapsedTime));; 
+           } 
+           if (keyboard->isKeyDown(KC_D)) 
+           { 
+               mMainNode->yaw(Radian(-2 * elapsedTime));; 
+           } 
+       } 
+    
+       // 设置自身是否可见，这对于第一人称视角很有用。 
+       void setVisible(bool visible) 
+       { 
+           mMainNode->setVisible(visible); 
+       } 
+   }; 
+    
+   // 我们的扩展摄象机类 
+   class ExtendedCamera 
+   { 
+   protected: 
+       SceneNode *mTargetNode;    // 摄象机目标结点 
+       SceneNode *mCameraNode;  // 摄象机自身结点 
+       Camera *mCamera;              // Ogre摄象机 
+       SceneManager *mSceneMgr;  
+       String mName; 
+       bool mOwnCamera;             // 判断是否是本类创建的摄象机，或是类外传入的摄象机 
+       Real mTightness;                  // 摄象机捆绑紧密度。1.0表示摄象机与目标的移动保持完全一致。0.0表示摄象机不移动，完全不受目标移动的影响。 
+   public: 
+       ExtendedCamera(String name, SceneManager *sceneMgr, Camera *camera = 0) 
+       { 
+           mName = name; 
+           mSceneMgr = sceneMgr; 
+           // 创建摄象机结点结构 
+           mCameraNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mName); 
+           mTargetNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(mName + "_target"); 
+           // 摄象机永远朝向目标结点 
+           mCameraNode->setAutoTracking(true, mTargetNode); 
+           // 因为需要自动跟踪，所以该项要设为true 
+           mCameraNode->setFixedYawAxis(true); 
+           // 假如没有从参数获得一个摄象机，我们则自己创建 
+           if (camera == 0) 
+           { 
+               mCamera = mSceneMgr->createCamera(mName); 
+               mOwnCamera = true; 
+           } 
+           else 
+           { 
+               mCamera = camera; 
+               mOwnCamera = false; 
+           } 
+           // 为摄象机结点绑定一个Ogre摄象机 
+           mCameraNode->attachObject(mCamera); 
+           // 默认的摄象机捆绑紧密系数 
+           mTightness = 0.01f; 
+       } 
+       ~ExtendedCamera() 
+       { 
+            mCameraNode->detachAllObjects(); 
+            if (mOwnCamera) 
+                 delete mCamera; 
+            mSceneMgr->destroySceneNode(mName); 
+            mSceneMgr-> destroySceneNode(mName + "_target"); 
+       } 
+       void setTightness(Real tightness) 
+       { 
+            mTightness = tightness; 
+       } 
+       Real getTightness() 
+       { 
+            return mTightness; 
+       } 
+       Vector3 getCameraPosition() 
+       { 
+            return mCameraNode->getPosition(); 
+       } 
+       void instantUpdate(Vector3 cameraPosition, Vector3 targetPosition) 
+       { 
+            mCameraNode->setPosition(cameraPosition); 
+            mTargetNode->setPosition(targetPosition); 
+       } 
+       void update(Real elapsedTime, Vector3 cameraPosition, Vector3 targetPositon) 
+       { 
+            // 管理移动 
+            Vector3 displacement = (cameraPosition - mCameraNode->getPosition()) * mTightness; 
+            mCameraNode->translate(displacement); 
+            displacement = (targetPositon - mTargetNode->getPosition()) * mTightness; 
+            mTargetNode->translate(displacement);   
+       } 
+   }; 
+    
+    
+   class SampleListener : public ExampleFrameListener 
+   { 
+   protected: 
+       Character *mChar; 
+       ExtendedCamera *mExCamera; 
+       unsigned int mMode;    // 摄象机模式，现在支持第一人称，绑定的第三人称摄象机和动态捕捉第三人称摄象机 
+   public: 
+       SampleListener(RenderWindow *win, Camera *cam) : ExampleFrameListener(win, cam) 
+       { 
+            mChar = 0; 
+            mExCamera = 0; 
+            mMode = 0; 
+       } 
+       void setCharacter(Character * character) 
+       { 
+            mChar = character; 
+       } 
+       void setExtendedCamera(ExtendedCamera *cam) 
+       { 
+            mExCamera = cam; 
+       } 
+       bool frameStarted( const FrameEvent& evt ) 
+       { 
+           using namespace OIS; 
+    
+           mKeyboard->capture(); 
+           mMouse->capture(); 
+           if (mChar) 
+           { 
+               mChar->update(evt.timeSinceLastFrame, mKeyboard); 
+               if (mExCamera) 
+               { 
+                   switch(mMode) 
+                   { 
+                   // 动态捕捉型第三人称摄象机 
+                   case 0:  
+                       mExCamera->update(evt.timeSinceLastFrame, mChar->getCameraNode()->getWorldPosition(), mChar->getSightNode()->getWorldPosition()); 
+                       break; 
+                   // 绑定的第三人称摄象机 
+                   case 1: 
+                       mExCamera->update(evt.timeSinceLastFrame, Vector3(0, 200, 0), mChar->getSightNode()->getWorldPosition()); 
+                       break; 
+                   // 第一人称摄象机 
+                   case 2: 
+                       mExCamera->update(evt.timeSinceLastFrame, mChar->getWorldPosition(), mChar->getSightNode()->getWorldPosition()); 
+                       break; 
+                   } 
+               } 
+           } 
+           // F1键切换为动态捕捉型第三人称摄象机 
+           if (mKeyboard->isKeyDown(KC_F1)) 
+           { 
+                 mMode = 0; 
+                 if (mChar) 
+                      static_cast<OgreCharacter* >(mChar)->setVisible(true); 
+                 if (mExCamera) 
+                 { 
+                      if (mChar) 
+                      { 
+                           mExCamera->instantUpdate(mChar->getCameraNode()->getWorldPosition(), mChar->getSightNode()->getWorldPosition()); 
+                      }       
+                      mExCamera->setTightness(0.01f);        
+                 } 
+            } 
+           //  F2切换为绑定的第三人称摄象机 
+           if (mKeyboard->isKeyDown(KC_F2)) 
+           { 
+                 mMode = 1; 
+                 if (mChar) 
+                      static_cast<OgreCharacter*>(mChar)->setVisible(true); 
+                 if (mExCamera) 
+                 { 
+                      if (mChar) 
+                          mExCamera->instantUpdate(Vector3(0, 200, 0), mChar->getSightNode()->getWorldPosition()); 
+                      mExCamera->setTightness(0.01f); 
+                 } 
+            } 
+           // F3键切换为第一人称摄象机 
+           if (mKeyboard->isKeyDown(KC_F3)) 
+           { 
+                 mMode = 2; 
+                 if (mChar)  
+                      static_cast<OgreCharacter*>(mChar)->setVisible(false); 
+                 if(mExCamera) 
+                 { 
+                      if (mChar) 
+                      { 
+                           mExCamera->instantUpdate(mChar->getWorldPosition(), mChar->getSightNode()->getWorldPosition()); 
+                      }       
+                      mExCamera->setTightness(1.0f);   
+                 } 
+            } 
+            // 若按下ESC就退出 
+            if(mKeyboard->isKeyDown(KC_ESCAPE)) 
+                return false; 
+            return true; 
+       } 
+   }; 
+    
+    
+   class SampleApplication : public ExampleApplication 
+   { 
+   public: 
+    
+       SampleApplication(){} 
+    
+       ~SampleApplication(){} 
+    
+   protected: 
+    
+       // 创建场景 
+       void createScene(void) 
+       { 
+           // 设置环境光 
+           mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2)); 
+    
+           // 创建一个点光源 
+           Light* l = mSceneMgr->createLight("MainLight"); 
+    
+           // 这个点光源使用默认设置 
+           l->setType(Light::LT_DIRECTIONAL); 
+           l->setDirection(-0.5, -0.5, 0); 
+    
+           // 摄象机位置 
+           mCamera->setPosition(0, 0, 0); 
+    
+           // 为场景添加一些实体对象 
+           SceneNode* razorNode; 
+           Entity* razorEntity; 
+           for (unsigned int i = 0; i< 30; ++i) 
+           { 
+               razorNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(StringConverter::toString(i), Vector3(Math::RangeRandom(-1000, 1000), 0, Math::RangeRandom(-1000, 1000))); 
+               razorEntity = mSceneMgr->createEntity(StringConverter::toString(i), "razor.mesh"); 
+               razorNode->attachObject(razorEntity); 
+           } 
+    
+           // 主角 
+           OgreCharacter *ogre = new OgreCharacter("Ogre 1", mSceneMgr); 
+           ExtendedCamera *exCamera = new ExtendedCamera("Extended Camera", mSceneMgr, mCamera); 
+    
+           // 桢监听器用来管理主角和摄象机的更新和不同摄象机模式间的切换 
+           mFrameListener = new SampleListener(mWindow, mCamera); 
+           static_cast<SampleListener*>( mFrameListener)->setCharacter(ogre); 
+           static_cast<SampleListener*>( mFrameListener)->setExtendedCamera(exCamera); 
+       } 
+    
+       void destroyScene(void){} 
+    
+       void createFrameListener(void) 
+       { 
+           mRoot->addFrameListener(mFrameListener); 
+       } 
+   }; 
+    
+   #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 
+   INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT ) 
+   #else 
+   int main(int argc, char **argv) 
+   #endif 
+   { 
+       // Create application object 
+       SampleApplication app; 
+    
+       try { 
+           app.go(); 
+       } catch( Exception& e ) { 
+   #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 
+           MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL); 
+   #else 
+           std::cerr << "An exception has occured: " << e.getFullDescription(); 
+   #endif 
+       } 
+    
+       return 0; 
+   } 
+
+http://blog.csdn.net/huangchonghai/article/details/3491960

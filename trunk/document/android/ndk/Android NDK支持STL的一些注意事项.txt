@@ -1,0 +1,10 @@
+Android NDK从r5b版本开始有官方支持的STL了，有一个crystax版本早已经支持。官方的支持有两个版本一个是gnu的，一个是stlport。如果你需要在你的NDK程序中使用STL，那么需要在Application.mk文件中添加一个选项，就是APP_STL := stlport_static。 其中APP_STL的取值有以下四种：
+    system --> 系统默认的最小支持的C++运行时库
+    stlport_static --> 以静态链接的方式使用stlport版本的STL
+    stlport_shared --> 以动态链接的方式使用stlport版本的STL
+    gnustl_static  --> 以静态链接的方式使用gnu版本的STL
+
+如果你和我一样并没有使用Android.mk和Application.mk，而是使用Code::Blocks或者Visual studio 2010，那么在配置环境时，如果需要STL的支持，那么就需要注意自己要指定stl的包含路径。链接就根据需要自己链接不同的版本。请注意，stlport有静态链接和动态链接两种方式，而gnu的仅有静态链接方法。
+
+另外一个需要注意的就是官方提供的这个stlport版本不支持RTTI和异常，换言之，如果你使用了stlport版本的STL，则不能使用-fexceptions和-frtti这两个编译选项。
+http://www.cppblog.com/kongque/archive/2011/06/29/149781.html

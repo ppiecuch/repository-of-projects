@@ -1,0 +1,9 @@
+1.每帧评估周围MapArea的可见度,对即将可见的区域送入预加载线程逻辑,对必须可见的区域送入即时加载模块.
+2.必须加载2*2,进入3/4距离处开始预加载,退出1距离处卸载,保证最大加载量为3*3.
+
+a.DX是有多线程支持,OpenGL渲染RC与线程相关,跨线程加载使用图形资源,如何解决?
+b.遇到更复杂的逻辑时,如何处理.
+c.是否要预加载全部,还是分Terrain,Model,Wmo加载.
+But it is just a design question.
+
+http://www.cnblogs.com/lancidie/archive/2011/04/20/2022045.html

@@ -1,0 +1,12 @@
+SSE（為 Streaming SIMD Extensions 的縮寫）是由 Intel 公司，在 1999 年推出 Pentium III 處理器時，同時推出的新指令集。如同其名稱所表示的，SSE 是一種 SIMD 指令集。所謂的 SIMD 是指 single instruction, multiple data，也就是一個指令同時對多個資料進行相同的動作。較早的 MMX 和 AMD 的 3DNow! 也都是 SIMD 指令集。因此，SSE 本質上是非常類似一個向量處理器的。SSE 指令包括了四個主要的部份：單精確度浮點數運算指令、整數運算指令（此為 MMX 之延伸，並和 MMX 使用同樣的暫存器）、Cache 控制指令、和狀態控制指令。這裡主要是介紹浮點數運算指令和 Cache 控制指令。
+
+SSE 新增了八個新的 128 位元暫存器，xmm0 ~ xmm7。這些 128 位元的暫存器，可以用來存放四個 32 位元的單精確度浮點數。SSE 的浮點數運算指令就是使用這些暫存器。和之前的 MMX 或 3DNow! 不同，這些暫存器並不是原來己有的暫存器（MMX 和 3DNow! 均是使用 x87 浮點數暫存器），所以不需要像 MMX 或 3DNow! 一樣，要使用 x87 指令之前，需要利用一個 EMMS 指令來清除暫存器的狀態。因此，不像 MMX 或 3DNow! 指令，SSE 的浮點數運算指令，可以很自由地和 x87 指令，或是 MMX 指令共用。但是，這樣做的主要缺點是，因為多工作業系統在進行 context switch 時，需要儲存所有暫存器的內容。而這些多出來的新暫存器，也是需要儲存的。因此，既存的作業系統需要修改，在 context switch 時，儲存這八個新暫存器的內容，才能正確支援 SSE 浮點運算指令。下圖是 SSE 新增的暫存器的示意圖：
+
+ 
+目前 Intel 新推出的 x86 CPU 均已支援 SSE 指令集，包括 Pentium III、Pentium 4、Celeron 533A 及之後的處理器。AMD 方面，在其 Athlon 處理器上，新增的 Enhanced 3DNow! 指令集中，即包含了 SSE 中的整數運算指令和 Cache 控制指令，但仍不包含浮點數指令和狀態控制指令。但在最新的 Athlon XP 處理器上，已將 SSE 中的浮點運算指令和狀態控制指令加入。因此 Athlon XP 已經是完全支援 SSE 指令集了。
+
+[Part 1] [Page 2] [Page 3] [Page 4] [Part 5] [Page 6] [Part 7] [Part 8]
+
+11/6/2001, Ping-Che Chen
+
+http://www.csie.ntu.edu.tw/~r89004/hive/sse/page_1.html
