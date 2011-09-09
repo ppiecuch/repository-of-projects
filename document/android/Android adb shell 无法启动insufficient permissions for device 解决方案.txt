@@ -1,0 +1,35 @@
+解决办法1：lsusb查看vendorId号，然后在/etc/udev/rules.d/目录下增加（或修改）51-android.rules文件。
+增加一条记录：
+SUBSYSTEM=="usb", SYSFS{idVendor}=="xxxx", MODE="0666" 其中xxxx是通过lsusb查看得到的值
+
+常见的情况如下，我都列出来了：
+# htc
+SUBSYSTEM=="usb", SYSFS{idVendor}=="0bb4", MODE="0666" 
+# Motorola
+SUBSYSTEM=="usb", SYSFS{idVendor}=="22b8", MODE="0666"
+# Acer 0502
+SUBSYSTEM=="usb", SYSFS{idVendor}=="0502", MODE="0666"
+# Dell 413c
+SUBSYSTEM=="usb", SYSFS{idVendor}=="413c", MODE="0666"
+# Huawei 12d1
+SUBSYSTEM=="usb", SYSFS{idVendor}=="12d1", MODE="0666"
+# LG 1004
+SUBSYSTEM=="usb", SYSFS{idVendor}=="1004", MODE="0666"
+# Nvidia 0955
+SUBSYSTEM=="usb", SYSFS{idVendor}=="0955", MODE="0666"
+# Samsung 04e8
+SUBSYSTEM=="usb", SYSFS{idVendor}=="04e8", MODE="0666"
+# Sharp 04dd
+SUBSYSTEM=="usb", SYSFS{idVendor}=="04dd", MODE="0666"
+# Sony Ericsson ofce
+SUBSYSTEM=="usb", SYSFS{idVendor}=="0fce", MODE="0666"
+# ZTE 19d2
+SUBSYSTEM=="usb", SYSFS{idVendor}=="19d2", MODE="0666"
+
+解决办法2：
+在51-android.rules中只写一句：
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", MODE="0666"  
+
+通杀方案啊
+
+http://www.cppblog.com/kongque/archive/2011/04/02/143247.html

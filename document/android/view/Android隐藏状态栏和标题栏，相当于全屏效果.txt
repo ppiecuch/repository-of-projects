@@ -1,0 +1,80 @@
+隐藏标题栏需要使用预定义样式：android:theme=”@android:style/Theme.NoTitleBar”. 
+隐藏状态栏：android:theme=”@android:style/Theme.NoTitleBar.Fullscreen”.
+标签： 状态栏 标题栏 Android SDK 代码片段(3)
+[图片] without.png
+
+[代码] [XML]代码
+view sourceprint?01 <?xml version="1.0" encoding="utf-8"?>  
+
+02 <manifest xmlns:android="http://schemas.android.com/apk/res/android" 
+
+03       package="de.vogella.android.temperature" 
+
+04       android:versionCode="1" 
+
+05       android:versionName="1.0">  
+
+06     <application android:icon="@drawable/icon" android:label="@string/app_name">  
+
+07         <activity android:name=".Convert" 
+
+08                   android:label="@string/app_name" 
+
+09                    android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >  
+
+10             <intent-filter>  
+
+11                 <action android:name="android.intent.action.MAIN" />  
+
+12                 <category android:name="android.intent.category.LAUNCHER" />  
+
+13             </intent-filter>  
+
+14         </activity>  
+
+15     
+
+16     </application>  
+
+17     <uses-sdk android:minSdkVersion="9" />  
+
+18     
+
+19 </manifest> 
+
+[代码] [Java]代码
+view sourceprint?01 @Override 
+
+02 public void onCreate(Bundle savedInstanceState) {  
+
+03     super.onCreate(savedInstanceState);  
+
+04     // hide titlebar of application  
+
+05     // must be before setting the layout  
+
+06     requestWindowFeature(Window.FEATURE_NO_TITLE);  
+
+07     // hide statusbar of Android  
+
+08     // could also be done later  
+
+09     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  
+
+10             WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+
+11     setContentView(R.layout.main);  
+
+12     text = (EditText) findViewById(R.id.EditText01);  
+
+13     
+
+14 } 
+
+
+
+requestWindowFeature(Window.FEATURE_NO_TITLE);  
+getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+
+
+http://www.oschina.net/code/snippet_12_3446

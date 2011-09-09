@@ -1,0 +1,194 @@
+3D引擎中最常见坐标变换是旋转。有几种方式可以实现旋转：矩阵，四元数和角度向量（角度或弧度）。最精确和限制最小的方式是将他们存储在矩阵中。矩阵是一个数学概念，它是一个以行和列形式组织的矩形数学块。当这些数字以正确的顺序与另一个矩阵或数字或引擎中最常见的点进行计算时，就可以改变对应的值。
+
+例如，一个变换矩阵只是将一个点移动到三维空间，这很简单。其他更为复杂的矩阵，比如旋转矩阵可以通过将一个点的坐标设置为新位置使点旋转。当然这只在与一个平移矩阵组合时有用，因为旋转一个（0，0，0）的是不会平移的。如果我们在旋转后再平移，我们将向正确的方向移动。最后一个常见矩阵是缩放矩阵，它只是将缩放到一个特定的尺寸。这也能使模型在屏幕上看起来较小，我不会讲解矩阵涉及的数学知识，但Riemer Grootjans写了一篇很棒的文章：http://www.riemers.net/eng/ExtraReading/matrices_maths.php（译者：这个链接现在好像打不开）
+
+现在我们知道了矩阵的工作原理，但我们如何使用它们？好吧，如果你一直在看我写的游戏引擎教程，那么你已经在使用矩阵了。I3DComponent有一个旋转矩阵存储了旋转量，在绘制模型时会计算另外两个位置和缩放向量。这可能是存储位置和缩放的最简单的方法。Vector的三个分量能储存点的三个坐标信息（即点的位置），同理也适用于缩放，我们可以为每个坐标轴存储一个标量。但如何处理旋转？
+
+那么，现在的问题是用一个向量的三个分量存储旋转是错误的做法。这里我不会讨论细节，你只需知道这通常是一个非常不好的主意。如果你真的需要知道为什么，请阅读这篇文章：http://www.sjbaker.org/steve/omniv/eulers_are_evil.html
+
+不幸的是，虽然“最好”的方法是用矩阵表示旋转，但这对普通人来说比较抽象。没有人愿意在更新对象的旋转量时计算矩阵中的16个值。最简单的方法是用一个Vector3表示围绕每根坐标轴的旋转量，然后在转化为矩阵（我们将这种Vector3称为欧拉角矢量）。显然我们不想一直做这件事，但如果只用于手工地设置一个变量（如在一个游戏编辑器中）它还是工作良好的。有许多方法可以在矩阵和欧拉角之间转换，但它们并不完美。下面我将详细讲述最可靠的方式。这个想法来自与XNA官方网站的论坛上：http://forums.xna.com/forums/p/4574/23763.aspx 
+
+矩阵和欧拉角之间的相互转换
+
+从欧拉角矢量转换很容易，困难的部分是转换回来。XNA提供了一个方法可以创建旋转矩阵，但它并没有提供转换回来的方法，因此我们将不得不自己实现。
+
+首先，我们转换为旋转矩阵，Matrix.CreateFromYawPitchRoll()方法可以做到这一点。如果这里使用欧拉角，我们需要以以下顺序提供坐标：
+
+·         Yaw（偏航）：欧拉角向量的y轴
+
+·         Pitch（俯仰）：欧拉角向量的x轴
+
+·         Roll（翻滚）： 欧拉角向量的z轴
+
+想象一下飞机，yaw指水平方向的机头指向，它绕y轴旋转。Pitch指与水平方向的夹角，绕x轴旋转。Roll指飞机的翻滚，绕z轴旋转。下面的代码演示了这一过程：
+
+// Converts a rotation vector into a rotation matrix
+
+Matrix Vector3ToMatrix(Vector3 Rotation)
+
+{
+
+    return Matrix.CreateFromYawPitchRoll(Rotation.Y, Rotation.X, Rotation.Z);
+
+}
+
+这种方法可以提供一个表示旋转的矩阵。下面是最难的部分：将矩阵转换为欧拉角。
+
+这个过程是将矩阵拆散：一个表示位置的Vecto3，另一个表示缩放，而四元数表示旋转。然后，我们必须将这个四元数转换为一个欧拉角矢量。我不打算详细讨论代码背后的数学原理，但如果你有兴趣，可以到前面链接中的网址上去看看。
+
+下面是将旋转矩阵转换为欧拉角的代码。
+
+// Returns Euler angles that point from one point to another
+
+Vector3 AngleTo(Vector3 from, Vector3 location)
+
+{
+
+    Vector3 angle = new Vector3();
+
+    Vector3 v3 = Vector3.Normalize(location - from);
+
+ 
+
+    angle.X = (float)Math.Asin(v3.Y);
+
+    angle.Y = (float)Math.Atan2((double)-v3.X, (double)-v3.Z);
+
+ 
+
+    return angle;
+
+}
+
+ 
+
+// Converts a Quaternion to Euler angles (X = Yaw, Y = Pitch, Z = Roll)
+
+Vector3 QuaternionToEulerAngleVector3(Quaternion rotation)
+
+{
+
+    Vector3 rotationaxes = new Vector3();
+
+    Vector3 forward = Vector3.Transform(Vector3.Forward, rotation);
+
+    Vector3 up = Vector3.Transform(Vector3.Up, rotation);
+
+ 
+
+    rotationaxes = AngleTo(new Vector3(), forward);
+
+ 
+
+    if (rotationaxes.X == MathHelper.PiOver2)
+
+    {
+
+        rotationaxes.Y = (float)Math.Atan2((double)up.X, (double)up.Z);
+
+        rotationaxes.Z = 0;
+
+    }
+
+    else if (rotationaxes.X == -MathHelper.PiOver2)
+
+    {
+
+        rotationaxes.Y = (float)Math.Atan2((double)-up.X, (double)-up.Z);
+
+        rotationaxes.Z = 0;
+
+    }
+
+    else
+
+    {
+
+        up = Vector3.Transform(up, Matrix.CreateRotationY(-rotationaxes.Y));
+
+        up = Vector3.Transform(up, Matrix.CreateRotationX(-rotationaxes.X));
+
+ 
+
+        rotationaxes.Z = (float)Math.Atan2((double)-up.Z, (double)up.Y);
+
+    }
+
+ 
+
+    return rotationaxes;
+
+}
+
+ 
+
+// Converts a Rotation Matrix to a quaternion, then into a Vector3 containing
+
+// Euler angles (X: Pitch, Y: Yaw, Z: Roll)
+
+Vector3 MatrixToEulerAngleVector3(Matrix Rotation)
+
+{
+
+    Vector3 translation, scale;
+
+    Quaternion rotation;
+
+ 
+
+    Rotation.Decompose(out scale, out rotation, out translation);
+
+ 
+
+    Vector3 eulerVec = QuaternionToEulerAngleVector3(rotation);
+
+ 
+
+    return eulerVec;
+
+}
+
+应当指出的是，所有的旋转信息都使用弧度。要获得角度（如果与你共事的人不习惯于弧度：比如他不是一个程序员或数学家）可以使用MathHelper.ToDegrees()方法，角度到弧度可使用MathHelper.ToRadians()方法。当处理旋转时请不要忘了转换： 
+
+Vector3 RadiansToDegrees(Vector3 Vector)
+
+{
+
+    return new Vector3(
+
+        MathHelper.ToDegrees(Vector.X),
+
+        MathHelper.ToDegrees(Vector.Y),
+
+        MathHelper.ToDegrees(Vector.Z));
+
+}
+
+ 
+
+Vector3 DegreesToRadians(Vector3 Vector)
+
+{
+
+    return new Vector3(
+
+        MathHelper.ToRadians(Vector.X),
+
+        MathHelper.ToRadians(Vector.Y),
+
+        MathHelper.ToRadians(Vector.Z));
+
+}
+
+您可以通过在对象中设置属性使用这些旋转矩阵的功能，可以使处理起来更简单：
+
+public Vector3 EulerRotation
+
+{
+
+      get { return RadiansToDegrees(MatrixToEulerAngleVector3(Rotation)); }
+
+      set { Rotation = Vector3ToMatrix(DegreesToRadians(value)); }
+
+}
+http://hi.baidu.com/%C4%A6%F4%C9%D1%DB%C0%E1/blog/item/7b12b717c3dc8e1b5aaf53c7.html

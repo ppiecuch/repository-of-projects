@@ -1,0 +1,1192 @@
+利用前面介绍的Perlin噪声，生成地形的程序，程序代码用opengl+glut编写：
+
+main.cpp
+
+Code
+#include <windows.h>
+#include <math.h>
+#include <gl\glut.h>
+#include <gl\gl.h>
+#include <gl\glu.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <olectl.h>  
+#include <list>
+int fps= 72;            //帧数
+#include "Misc.h"
+#include "Camera.h"
+
+float w, h, ratio;
+static int xpos = 0, ypos = 0, zpos = 0;
+static int yscope = 0;
+float Noise1(int x, int y);
+float SmoothNoise_1(int x, int y);
+float Cosine_Interpolate(float a, float b, float x);
+float InterpolatedNoise_1(float x, float y);
+float PerlinNoise_2D(float x, float y);
+
+GLuint texgrass;
+GLuint texlightspot;
+
+CCamera camera;
+CVect3 EyePosition;
+
+float angle;
+vec axis;
+
+struct Terrain
+{
+    float x, y, z;
+    float s, t;//纹理坐标
+    float norx, nory, norz;
+};
+
+//地形使用250*250的点阵
+Terrain terrain[250][250];
+
+//每个点的高度使用perlin函数生成
+//x范围-600到+596,z范围从-600到+596
+//为例坐标s,t的范围为0-249/15
+//纹理坐标
+void initTerrain()
+{
+    int x,z;
+    for(x=0;x<=249;x++)
+        for( z=0;z<=249;z++)
+        {
+            terrain[x][z].x =(float)(x- 125)*4.0f;
+            terrain[x][z].y =100.0f*PerlinNoise_2D((x+10000)/10.0f, (z+10000)/10.0f);
+            terrain[x][z].z =(float)(z- 125)*4.0f;
+            terrain[x][z].s =x/15.0f;
+            terrain[x][z].t =z/15.0f;
+        }
+    
+    for(x=0;x<=249;x++)
+        for(z=0;z<=249;z++)
+        {
+            if(x>0 && z>0 && x<249 && z<249)//法向计算
+            {
+                vec v1;
+                v1.x=terrain[x+1][z].y - terrain[x-1][z].y;
+                v1.y= 0.5f;
+                v1.z=terrain[x][z+1].y - terrain[x][z-1].y;
+                v1.Normalize();
+                terrain[x][z].norx =v1.x;
+                terrain[x][z].nory =v1.y;
+                terrain[x][z].norz =v1.z;
+            }
+            else
+            {
+                terrain[x][z].norx =0.0f;
+                terrain[x][z].nory =1.0f;
+                terrain[x][z].norz =0.0f;
+            }
+        }
+
+}
+
+
+void DrawTerrain()
+{
+    int z,x;
+    glEnable(GL_TEXTURE_2D);
+    
+    glPushMatrix();
+    glTranslatef(56, 6, 56);
+    //DrawModel(firewood);
+    glPopMatrix();
+    glBindTexture(GL_TEXTURE_2D, texgrass);
+    //glBindTexture(GL_TEXTURE_2D, 0);
+    for(z=0;z<=248;z++)
+    {
+        glBegin(GL_QUAD_STRIP);
+            for(x=0;x<=249;x++)
+            {
+                glNormal3f(terrain[x][z].norx , terrain[x][z].nory , terrain[x][z].norz); 
+                glTexCoord2f(terrain[x][z].s, terrain[x][z].t);
+                glVertex3f(terrain[x][z].x, terrain[x][z].y, terrain[x][z].z);
+                glNormal3f(terrain[x][z+1].norx , terrain[x][z+1].nory , terrain[x][z+1].norz); 
+                glTexCoord2f(terrain[x][z+1].s, terrain[x][z+1].t );
+                glVertex3f(terrain[x][z+1].x, terrain[x][z+1].y, terrain[x][z+1].z);
+            }
+        glEnd();
+    }
+
+    //画那个光斑
+    glBindTexture(GL_TEXTURE_2D, texlightspot);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glEnable(GL_BLEND);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_FOG);
+    glDepthMask(GL_FALSE);
+    glColor4f(0.9f, 0.9f, 0.3f, 0.8f);
+
+    int x1,z1;
+    x1 = (xpos%500)/4;
+    z1 = (zpos%500)/4;  
+    if(x1<-129)
+        x1 = -129;
+    if(x1>122)
+        x1 = 122;
+    if(z1<-129)
+        z1 = -129;
+    if(z1>122)
+        z1 = 122;
+
+    yscope = ypos ; 
+    if(yscope<=0) 
+        yscope = 0;
+    if(yscope%2!=0)
+        yscope++;
+    yscope = yscope%50;
+
+    if(130+z1-yscope/2<0)
+        yscope = 0;
+
+    for(z=130+z1-yscope/2; z<=148+z1+yscope/2;z++)
+    {
+        glBegin(GL_QUAD_STRIP);
+            for(x=130+x1-yscope/2;x<=147+x1+yscope/2;x++)
+            {
+                glTexCoord2f((x-130-x1+yscope/2)/(18.0f+yscope), (z-130-z1)/(18.0f+yscope));
+                glVertex3f(terrain[x][z].x, terrain[x][z].y, terrain[x][z].z);
+                glTexCoord2f((x-130-x1+yscope/2)/(18.0f+yscope), (z-129-z1)/(18.0f+yscope));
+                glVertex3f(terrain[x][z+1].x, terrain[x][z+1].y, terrain[x][z+1].z);
+            }
+        glEnd();
+    }
+
+    glDepthMask(GL_TRUE);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_FOG);
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+}
+
+
+/////////////////////////////////////////////////////////////
+// Perlin Noise Generator
+/////////////////////////////////////////////////////////////
+float persistence = 0.45f;
+int Number_Of_Octaves = 3;
+
+
+//一个噪声发生器
+float Noise1(int x, int y)
+{
+  x = x % 25;
+  y = y % 25;
+  int n = x + y * 57;
+  n = (n<<13) ^ n;
+  return ( 1.0f - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f); 
+}
+
+//一个光滑噪声发生器
+float SmoothNoise_1(int x, int y)
+{
+    float corners = ( Noise1(x-1, y-1)+Noise1(x+1, y-1)+Noise1(x-1, y+1)+Noise1(x+1, y+1) ) / 16.0f;
+    float sides   = ( Noise1(x-1, y)  +Noise1(x+1, y)  +Noise1(x, y-1)  +Noise1(x, y+1) ) /  8.0f;
+    float center  =  Noise1(x, y) / 4.0f;
+    return corners + sides + center;
+}
+
+//使用cosin插值函数
+float Cosine_Interpolate(float a, float b, float x)
+{
+    double ft = x * 3.1415927;
+    double f = (1 - cos(ft)) * 0.5f;
+
+    return  a*(1-f) + b*f;
+
+}
+
+//插值噪声发生器
+float InterpolatedNoise_1(float x, float y)
+{
+
+      int integer_X    = int(x);
+      float fractional_X = x - integer_X;
+
+      int integer_Y    = int(y);
+      float fractional_Y = y - integer_Y;
+
+      float v1 = SmoothNoise_1(integer_X,     integer_Y);
+      float v2 = SmoothNoise_1(integer_X + 1, integer_Y);
+      float v3 = SmoothNoise_1(integer_X,     integer_Y + 1);
+      float v4 = SmoothNoise_1(integer_X + 1, integer_Y + 1);
+
+      float i1 = Cosine_Interpolate(v1 , v2 , fractional_X);
+      float i2 = Cosine_Interpolate(v3 , v4 , fractional_X);
+
+      return Cosine_Interpolate(i1 , i2 , fractional_Y);
+}
+
+//最终的PERLIN NOISE
+ float PerlinNoise_2D(float x, float y)
+ {
+      float total = 0.0f;
+      float p = persistence;
+      int n = Number_Of_Octaves - 1;
+
+      for(int i=0;i<=n;i++)
+      {
+          float frequency = pow((float)2,i);
+          float amplitude = pow(p,i);
+
+          total = total + InterpolatedNoise_1(x * frequency, y * frequency) * amplitude;
+      }
+
+      return total;
+ } 
+
+
+////////////////////////// 绘制模型结束 ///////////////////////////////////////////////
+///////////////// 创建纹理 //////////////////////////////////
+
+BOOL BuildTexture(char *szPathName, GLuint &texid)
+{
+  HDC      hdcTemp;                        // The DC To Hold Our Bitmap
+  HBITMAP    hbmpTemp;                        // Holds The Bitmap Temporarily
+  IPicture  *pPicture;                        // IPicture Interface
+  OLECHAR    wszPath[MAX_PATH+1];                  // Full Path To Picture (WCHAR)
+  char    szPath[MAX_PATH+1];                    // Full Path To Picture
+  long    lWidth;                          // Width In Logical Units
+  long    lHeight;                        // Height In Logical Units
+  long    lWidthPixels;                      // Width In Pixels
+  long    lHeightPixels;                      // Height In Pixels
+  GLint    glMaxTexDim ;                      // Holds Maximum Texture Size
+
+  if (strstr(szPathName, "http://"))                  // If PathName Contains http:// Then
+  {
+    strcpy(szPath, szPathName);                    // Append The PathName To szPath
+  }
+  else                                // Otherwise We Are Loading From A File
+  {
+    GetCurrentDirectory(MAX_PATH, szPath);              // Get Our Working Directory
+    strcat(szPath, "\\");                      // Append "\" After The Working Directory
+    strcat(szPath, szPathName);                    // Append The PathName
+  }
+
+  MultiByteToWideChar(CP_ACP, 0, szPath, -1, wszPath, MAX_PATH);    // Convert From ASCII To Unicode
+  HRESULT hr = OleLoadPicturePath(wszPath, 0, 0, 0, IID_IPicture, (void**)&pPicture);
+
+  if(FAILED(hr))                            // If Loading Failed
+    return FALSE;                          // Return False
+
+  hdcTemp = CreateCompatibleDC(GetDC(0));                // Create The Windows Compatible Device Context
+  if(!hdcTemp)                            // Did Creation Fail?
+  {
+    pPicture->Release();                      // Decrements IPicture Reference Count
+    return FALSE;                          // Return False (Failure)
+  }
+
+  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &glMaxTexDim);          // Get Maximum Texture Size Supported
+  
+  pPicture->get_Width(&lWidth);                    // Get IPicture Width (Convert To Pixels)
+  lWidthPixels  = MulDiv(lWidth, GetDeviceCaps(hdcTemp, LOGPIXELSX), 2540);
+  pPicture->get_Height(&lHeight);                    // Get IPicture Height (Convert To Pixels)
+  lHeightPixels  = MulDiv(lHeight, GetDeviceCaps(hdcTemp, LOGPIXELSY), 2540);
+
+  // Resize Image To Closest Power Of Two
+  if (lWidthPixels <= glMaxTexDim) // Is Image Width Less Than Or Equal To Cards Limit
+    lWidthPixels = 1 << (int)floor((log((double)lWidthPixels)/log(2.0f)) + 0.5f); 
+  else // Otherwise Set Width To "Max Power Of Two" That The Card Can Handle
+    lWidthPixels = glMaxTexDim;
+ 
+  if (lHeightPixels <= glMaxTexDim) // Is Image Height Greater Than Cards Limit
+    lHeightPixels = 1 << (int)floor((log((double)lHeightPixels)/log(2.0f)) + 0.5f);
+  else // Otherwise Set Height To "Max Power Of Two" That The Card Can Handle
+    lHeightPixels = glMaxTexDim;
+  
+  //  Create A Temporary Bitmap
+  BITMAPINFO  bi = {0};                        // The Type Of Bitmap We Request
+  DWORD    *pBits = 0;                        // Pointer To The Bitmap Bits
+
+  bi.bmiHeader.biSize      = sizeof(BITMAPINFOHEADER);        // Set Structure Size
+  bi.bmiHeader.biBitCount    = 32;                  // 32 Bit
+  bi.bmiHeader.biWidth    = lWidthPixels;              // Power Of Two Width
+  bi.bmiHeader.biHeight    = lHeightPixels;            // Make Image Top Up (Positive Y-Axis)
+  bi.bmiHeader.biCompression  = BI_RGB;                // RGB Encoding
+  bi.bmiHeader.biPlanes    = 1;                  // 1 Bitplane
+
+  //  Creating A Bitmap This Way Allows Us To Specify Color Depth And Gives Us Imediate Access To The Bits
+  hbmpTemp = CreateDIBSection(hdcTemp, &bi, DIB_RGB_COLORS, (void**)&pBits, 0, 0);
+  
+  if(!hbmpTemp)                            // Did Creation Fail?
+  {
+    DeleteDC(hdcTemp);                        // Delete The Device Context
+    pPicture->Release();                      // Decrements IPicture Reference Count
+    return FALSE;                          // Return False (Failure)
+  }
+
+  SelectObject(hdcTemp, hbmpTemp);                  // Select Handle To Our Temp DC And Our Temp Bitmap Object
+
+  // Render The IPicture On To The Bitmap
+  pPicture->Render(hdcTemp, 0, 0, lWidthPixels, lHeightPixels, 0, lHeight, lWidth, -lHeight, 0);
+
+  // Convert From BGR To RGB Format And Add An Alpha Value Of 255
+  for(long i = 0; i < lWidthPixels * lHeightPixels; i++)        // Loop Through All Of The Pixels
+  {
+    BYTE* pPixel  = (BYTE*)(&pBits[i]);              // Grab The Current Pixel
+    BYTE temp    = pPixel[0];                  // Store 1st Color In Temp Variable (Blue)
+    pPixel[0]    = pPixel[2];                  // Move Red Value To Correct Position (1st)
+    pPixel[2]    = temp;                      // Move Temp Value To Correct Blue Position (3rd)
+
+    // This Will Make Any Black Pixels, Completely Transparent    (You Can Hardcode The Value If You Wish)
+    if ((pPixel[0]==0) && (pPixel[1]==0) && (pPixel[2]==0))      // Is Pixel Completely Black
+      pPixel[3]  = 0;                      // Set The Alpha Value To 0
+    else                              // Otherwise
+      pPixel[3]  = 255;                      // Set The Alpha Value To 255
+  }
+
+  glGenTextures(1, &texid);                      // Create The Texture
+
+  // Typical Texture Generation Using Data From The Bitmap
+  glBindTexture(GL_TEXTURE_2D, texid);                // Bind To The Texture ID
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);    // (Modify This For The Type Of Filtering You Want)
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // (Modify This For The Type Of Filtering You Want)
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR );    // (Modify This For The Type Of Filtering You Want)
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR ); // (Modify This For The Type Of Filtering You Want)
+  gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, lWidthPixels, lHeightPixels, GL_RGBA, GL_UNSIGNED_BYTE, pBits);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lWidthPixels, lHeightPixels, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBits);  // (Modify This If You Want Mipmaps)
+  
+  DeleteObject(hbmpTemp);                        // Delete The Object
+  DeleteDC(hdcTemp);                          // Delete The Device Context
+
+  pPicture->Release();                        // Decrements IPicture Reference Count
+
+  return TRUE;                            // Return True (All Good)
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////// 精准的计时器 ////////////////////////////////////////
+float GetTime()
+{
+  static bool init = false;
+  static bool hires = false;
+  static __int64 freq = 1;
+  if(!init)
+  {
+    hires = !QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
+    if(!hires)
+      freq = 1000;
+    init = true;
+  }
+
+  __int64 now;
+
+  if(hires)
+    QueryPerformanceCounter((LARGE_INTEGER *)&now);
+  else
+    now = GetTickCount();
+
+  return (float)((double)now / (double)freq);
+}
+
+float last_time(0.0f);
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// 精准的计时器结束 ////////////////////////////////////
+void changeSize(int w1, int h1)
+{
+    w=w1;
+    h=h1;
+
+    // Prevent a divide by zero, when window is too short
+    // (you cant make a window of zero width).
+    if(h == 0)
+        h = 1;
+
+    ratio = 1.0f * w / h;
+    // Reset the coordinate system before modifying
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    w=w1;
+    h=h1;
+    // Set the viewport to be the entire window
+    glViewport(0, 0, w, h);
+
+    // Set the clipping volume
+    gluPerspective(45,ratio,1,1000);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    //gluLookAt(0, 50, -200, 
+    //          0, 0, 0,
+    //          0.0f,1.0f,0.0f);
+
+    }
+GLfloat LightPosition[]={0.0f, 900.0f, 900.0f, 1.0f};
+
+int InitGL(GLvoid)                                        // All Setup For OpenGL Goes Here
+{
+    glShadeModel(GL_SMOOTH);                            // Enable Smooth Shading
+    glClearColor(0.0f, 0.0f, 0.0f, 0.5f);                // Black Background
+    glClearDepth(1.0f);                                    // Depth Buffer Setup
+    glEnable(GL_DEPTH_TEST);                            // Enables Depth Testing
+    glDepthFunc(GL_LEQUAL);                               // The Type Of Depth Testing To Do
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);    // Really Nice Perspective Calculations
+    
+    //得到显卡信息
+    //brand=(char*)glGetString(GL_RENDERER);
+ //   vendor=(char*)glGetString(GL_VENDOR);
+    //version=(char*)glGetString(GL_VERSION);
+
+    //BuildFont();        //建立字体
+
+    //设置灯光
+    GLfloat LightAmbient[]= { 0.7f, 0.7f, 0.7f, 1.0f };
+    GLfloat mat_shininess[] ={50.0f};
+    GLfloat LightDiffuse[]= { 0.1f, 0.1f, 0.1f, 1.0f };
+    GLfloat mat_specular[]= {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat LightPosition[]={0.0f, 100.0f, 100.0f, 1.0f};
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);
+    glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, LightDiffuse);
+    glEnable(GL_LIGHT1);    
+    
+    BuildTexture("grass2.jpg", texgrass);
+    BuildTexture("lightspot.jpg", texlightspot);
+
+    camera.PositionCamera(50.0f, 20.0f, 0.0f, 0.0f, 40.0f, 300.0f, 0.0f, 1.0f, 0.0f); 
+    initTerrain();
+
+    return TRUE;                                        // Initialization Went OK
+}
+
+void ViewOrtho()                            // Set Up An Ortho View
+{
+    glMatrixMode(GL_PROJECTION);                    // Select Projection
+    glPushMatrix();                            // Push The Matrix
+    glLoadIdentity();                        // Reset The Matrix
+    glOrtho( 0, 640 , 480 , 0, -3, 3 );                // Select Ortho Mode (640x480)
+    glMatrixMode(GL_MODELVIEW);                    // Select Modelview Matrix
+    glPushMatrix();                            // Push The Matrix
+    glLoadIdentity();                        // Reset The Matrix
+}
+
+void ViewPerspective()                            // Set Up A Perspective View
+{
+    glMatrixMode( GL_PROJECTION );                    // Select Projection
+    glPopMatrix();                            // Pop The Matrix
+    glMatrixMode( GL_MODELVIEW );                    // Select Modelview
+    glPopMatrix();                            // Pop The Matrix
+}
+CVect3 oldPos;
+CVect3 oldView;
+
+void ContrainMove()
+{
+    CVect3 newPos=camera.Position();
+    
+    if(newPos.x>156 || newPos.x<-44.0f ||
+       newPos.y>56.0f || newPos.y<6.0f ||
+       newPos.z>156.0f || newPos.z<-44.0f)
+    {
+    camera.PositionCamera(oldPos.x, oldPos.y, oldPos.z, 56, 6, 56, 
+                           0, 1, 0);
+        
+    }
+    
+}
+
+
+void renderScene(void) 
+{
+
+    glClearColor(58.0f / 255, 68.0f / 255, 184.0f / 255, 1.0f );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    // Clear Screen And Depth Buffer
+    glLoadIdentity();                                    // Reset The Current Modelview Matrix
+    
+    //////// Draw Scene /////////////////////
+    
+    camera.Look();
+    camera.SetViewByMouse();
+
+    oldPos=camera.Position();
+    oldView=camera.Position(); 
+
+    camera.Update();
+    ContrainMove();
+
+    EyePosition = camera.Position();
+
+    float fogColor[4] = { 19.5f / 255, 17.0f / 255, 46.0f / 255, 1.0f };
+
+
+
+    glFogfv(GL_FOG_COLOR, fogColor);    
+    glFogi(GL_FOG_MODE, GL_EXP);
+    glFogf(GL_FOG_DENSITY, 0.002f);
+    glFogf(GL_FOG_START, 100.0f);
+    glFogf(GL_FOG_END, 800.0f);
+    glEnable(GL_FOG);
+     glColor3f(0.6f, 0.6f, 0.9f);
+
+    
+    glEnable(GL_LIGHTING);
+        glPushMatrix();
+        glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);
+            DrawTerrain();
+        glPopMatrix();
+    glDisable(GL_LIGHTING);
+
+    /*CalcTheBillboard();*/
+
+    glPushMatrix();
+    glTranslated(xpos,ypos,zpos);
+
+    /*DrawFire();*/
+    glPopMatrix();
+
+    glutSwapBuffers();
+}
+
+void pressKey(int key, int x1, int y1)
+{
+    switch (key)
+    {
+        case GLUT_KEY_LEFT : 
+            break;
+        case GLUT_KEY_RIGHT : 
+            break;
+        case GLUT_KEY_UP : 
+            break;
+        case GLUT_KEY_DOWN : 
+            break;
+        case GLUT_KEY_F1 :
+            break;
+        case GLUT_KEY_F2 : 
+            break;
+
+    }
+}
+
+void releaseKey(int key, int x, int y)
+{
+
+    switch (key) 
+    {
+        case GLUT_KEY_LEFT : 
+        case GLUT_KEY_RIGHT : 
+            break;
+        case GLUT_KEY_UP : 
+        case GLUT_KEY_DOWN : 
+            break;
+        case GLUT_KEY_F1: 
+        case GLUT_KEY_F2: 
+            break;
+    }
+}
+
+void processNormalKeys(unsigned char key, int x, int y) {
+
+    if (key == 27) 
+        exit(0);
+    if (key == 'i')
+        xpos += 2;
+    if (key == 'o')
+        xpos -= 2;
+    if (key == 'j')
+        ypos += 2;
+    if (key == 'k')
+        ypos -= 2;
+    if (key == 'n')
+        zpos += 2;
+    if (key == 'm')
+        zpos -= 2;
+    printf("%d, %d, %d\n", xpos, ypos, zpos);
+    glutPostRedisplay();
+}
+
+int main(int argc, char **argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+    glutInitWindowPosition(100,100);
+    glutInitWindowSize(640,480);
+    glutCreateWindow("Fire");
+    InitGL();
+
+    glutIgnoreKeyRepeat(1);
+    glutKeyboardFunc(processNormalKeys);
+    glutSpecialFunc(pressKey);
+    glutSpecialUpFunc(releaseKey);
+
+    glutDisplayFunc(renderScene);
+    glutIdleFunc(renderScene);
+
+    glutReshapeFunc(changeSize);
+
+    glutMainLoop();
+
+    return(0);
+}
+
+misc.h
+
+ 
+
+Code
+/*
+    MISC.h
+*/
+
+#ifndef _MISC_
+#define _MISC_
+
+// Some useful constants
+const float PI = 3.1415926535897932384626433832795f;
+const float PI2 = 2*PI;
+
+// Determines whether we are in the given time frame
+#define in_time(a, x) (sceneTime >= (a) && sceneTime < (a)+(x))
+
+// A cool curve which is excellent for fading text
+#define io_curve(x) ((x)*(1-(x))*4)
+
+// Fades in & out during the given time frame
+#define fade_io(a, x) (io_curve((sceneTime-(a))/(x)))
+
+
+// Clamps the value to the given range
+template <class T>
+T clamp(T x, T min, T max)
+{
+    return x<min?min:(x>max?max:x);
+}
+
+// Windows has defined these as macros  I don't like that
+#undef min1
+#undef max1
+
+// Template minimum
+template <class T>
+T min1(T a, T b)
+{
+    return (a<b)?a:b;
+}
+
+// Maximum
+template <class T>
+T max1(T a, T b)
+{
+    return (a>b)?a:b;
+}
+
+// Linear interpolation
+template <class T>
+T lerp(T a, T b, float bal)
+{
+    bal = clamp<float>(bal, 0, 1);
+    return a + (b - a) * bal;
+}
+
+// Floating-point absolute using some binary tricks
+float absf(float x)
+{
+    *(long *)&x &= 0x7fffffff;
+    return x;
+}
+
+// Makes an int "wrap" to fit in the range 0..255
+int wrap(int x)
+{
+    return (x%256);
+}
+
+// A random number generator. Values range from -1..1
+float semirand(int x)
+{
+    x = (x<<13) ^ x;
+    return ( 1.0f - ( (x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f); 
+}
+
+// A simple vector class
+class vec
+{
+public:
+    // Share memory to allow different ways of accessing the same data
+    union
+    {
+        struct
+        {
+            float x, y, z;
+        };
+        float v[3];
+    };
+
+    // Default constructor
+    vec(float nx = 0, float ny = 0, float nz = 0): x(nx), y(ny), z(nz) {}
+    
+    // Copy constructor
+    vec(const vec &V): x(V.x), y(V.y), z(V.z) {}
+
+    // Negative
+    friend vec operator-(const vec &V)
+    {
+        return vec(-V.x, -V.y, -V.z);
+    }
+
+    // Assignment operator
+    vec &operator=(const vec &V)
+    {
+        x = V.x;
+        y = V.y;
+        z = V.z;
+
+        return *this;
+    }
+
+    // Increment
+    vec &operator+=(const vec &V)
+    {
+        x += V.x;
+        y += V.y;
+        z += V.z;
+
+        return *this;
+    }
+
+    // Scalar multiplication
+    vec &operator*=(float s)
+    {
+        x *= s;
+        y *= s;
+        z *= s;
+
+        return *this;
+    }
+
+    // Scalar division
+    vec &operator/=(float s)
+    {
+        float f = 1/s;
+
+        x *= f;
+        y *= f;
+        z *= f;
+
+        return *this;
+    }
+
+    // Addition
+    friend vec operator+(const vec a, const vec b)
+    {
+        return vec(a.x+b.x, a.y+b.y, a.z+b.z);
+    }
+
+    // Subtraction
+    friend vec operator-(const vec a, const vec b)
+    {
+        return vec(a.x-b.x, a.y-b.y, a.z-b.z);
+    }
+
+    // Cross product (vector product)
+    friend vec operator*(const vec a, const vec b)
+    {
+        return vec(a.y*b.z-a.z*b.y,
+                   a.z*b.x-a.x*b.z,
+                   a.z*b.y-a.y*b.x);
+    }
+
+    // Dot product (scalar product)
+    friend float operator%(const vec a, const vec b)
+    {
+        return a.x*b.x+a.y*b.y+a.z*b.z;
+    }
+
+    // Scalar multiplication
+    friend vec operator*(const vec V, float s)
+    {
+        return vec(V.x*s, V.y*s, V.z*s);
+    }
+
+    // Component multiplication
+    void ComponentMul(const vec &V)
+    {
+        x *= V.x;
+        y *= V.y;
+        z *= V.z;
+    }
+
+    // Resize the vector to unit length
+    void Normalize()
+    {
+        float s = 1/Length();
+        *this *= s;
+    }
+
+    // Make a normal of 3 given vertices
+    void NormalOf(const vec &a, const vec &b, const vec &c)
+    {
+        vec u = b - c;
+        vec v = b - a;
+        *this = u * v;
+    }
+
+    // Returns the length of the vector
+    float Length()
+    {
+        return sqrtf(x*x+y*y+z*z);
+    }
+
+    // Linear interpolation between two vectors
+    void Lerp(const vec &a, const vec &b, float bal)
+    {
+        x = lerp<float>(a.x, b.x, bal);
+        y = lerp<float>(a.y, b.y, bal);
+        z = lerp<float>(a.z, b.z, bal);
+    }
+};
+
+
+
+#endif // _MISC_
+ 
+
+camera.h
+
+ 
+
+Code
+#ifndef _CAMERA_H
+#define _CAMERA_H
+
+// 下面的类是一个3D矢量类
+class CVect3
+{
+public:
+
+    
+    // 缺省构造函数
+    CVect3() {}
+
+    // 用户构造函数
+    CVect3(float X, float Y, float Z) 
+    { 
+        x = X; y = Y; z = Z;
+    }
+
+    // 定义矢量之间的'+'法 
+    CVect3 operator+(CVect3 vVector)
+    {
+        // 返回结果
+        return CVect3(vVector.x + x, vVector.y + y, vVector.z + z);
+    }
+
+    // 定义矢量之间的'-'法 
+    CVect3 operator-(CVect3 vVector)
+    {
+        // 返回矢量相减的结果
+        return CVect3(x - vVector.x, y - vVector.y, z - vVector.z);
+    }
+    
+    // 定义矢量与数的'*'法
+    CVect3 operator*(float num)
+    {
+        // 返回结果
+        return CVect3(x * num, y * num, z * num);
+    }
+
+    // 定义矢量与数的'/'法
+    CVect3 operator/(float num)
+    {
+        // 返回结果
+        return CVect3(x / num, y / num, z / num);
+    }
+
+    float x, y, z;                        
+};
+
+// 摄像机类
+class CCamera {
+
+public:
+
+    // 摄像机类的构造函数
+    CCamera();    
+
+    // 下面的函数是获取有关摄像机的数据
+    CVect3 Position() {    return m_vPosition;        }
+    CVect3 View()        {    return m_vView;            }
+    CVect3 UpVector() {    return m_vUpVector;        }
+    CVect3 Strafe()    {    return m_vStrafe;        }
+    
+    //  摄像机位置
+    void PositionCamera(float positionX, float positionY, float positionZ,
+                         float viewX,     float viewY,     float viewZ,
+                        float upVectorX, float upVectorY, float upVectorZ);
+
+    // 旋转摄像机
+    void RotateView(float angle, float X, float Y, float Z);
+
+    // 移动视点
+    void SetViewByMouse(); 
+
+    // 绕一点旋转摄像机
+    void RotateAroundPoint(CVect3 vCenter, float X, float Y, float Z);
+    //  左右移动摄像机
+    void StrafeCamera(float speed);
+    //  移动摄像机
+    void MoveCamera(float speed);
+    // 键盘事件
+    void CheckForMovement();
+    void Update();
+    void Look();
+
+private:
+
+    // 摄像机的位置
+    CVect3 m_vPosition;                    
+    // 摄像机的视野
+    CVect3 m_vView;                        
+    // 摄像机的向上的位置
+    CVect3 m_vUpVector;        
+    //  摄像机左右方向    
+    CVect3 m_vStrafe;                        
+};
+
+
+#endif
+
+#define kSpeed    50.0f                                    
+
+float g_FrameInterval = 0.0f;
+
+
+
+
+
+//  下面的函数的功能是计算个矢量的叉积，即求与两个矢量都垂直的矢量
+CVect3 Cross(CVect3 vVector1, CVect3 vVector2)
+{
+    CVect3 vNormal;    
+
+    // 计算垂直矢量
+    vNormal.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
+    vNormal.y = ((vVector1.z * vVector2.x) - (vVector1.x * vVector2.z));
+    vNormal.z = ((vVector1.x * vVector2.y) - (vVector1.y * vVector2.x));
+
+    // 返回结果
+    return vNormal;                                         
+}
+
+
+//  下面的函数的功能是求矢量的长度
+float Magnitude(CVect3 vNormal)
+{
+    return (float)sqrt( (vNormal.x * vNormal.x) + 
+                        (vNormal.y * vNormal.y) + 
+                        (vNormal.z * vNormal.z) );
+}
+
+
+//  下面的函数的功能是将矢量单位化
+CVect3 Normalize(CVect3 vVector)
+{
+    // 获得矢量的长度
+    float magnitude = Magnitude(vVector);                
+
+    vVector = vVector / magnitude;        
+    
+    return vVector;                                        
+}
+
+
+//  下面的函数是类CCamera的构造函数
+CCamera::CCamera()
+{
+    CVect3 vZero = CVect3(0.0, 0.0, 0.0);        // 初始化摄像机位置
+    CVect3 vView = CVect3(0.0, 1.0, 0.5);        // 初始化摄像机方向 
+    CVect3 vUp   = CVect3(0.0, 0.0, 1.0);        // 初始化摄像机的向上方向
+
+    m_vPosition    = vZero;
+    m_vView        = vView;
+    m_vUpVector    = vUp;    
+
+}
+
+
+//  设置摄像机的位置、方向
+void CCamera::PositionCamera(float positionX, float positionY, float positionZ,
+                               float viewX,     float viewY,     float viewZ,
+                             float upVectorX, float upVectorY, float upVectorZ)
+{
+    CVect3 vPosition    = CVect3(positionX, positionY, positionZ);
+    CVect3 vView        = CVect3(viewX, viewY, viewZ);
+    CVect3 vUpVector    = CVect3(upVectorX, upVectorY, upVectorZ);
+
+    m_vPosition = vPosition;
+    m_vView     = vView;
+    m_vUpVector = vUpVector;
+}
+
+
+//  下面的函数的功能是通过鼠标设置视点
+void CCamera::SetViewByMouse()
+{
+    //POINT mousePos;    
+    //int middleX = 400;
+    //int middleY = 300;
+    //float angleY = 0.0f;
+    //float angleZ = 0.0f;
+    //static float currentRotX = 0.0f;
+    //
+    //// 获得鼠标的当前位置
+    //GetCursorPos(&mousePos);                        
+    //
+    //// 如果鼠标位于窗口的正中央，则返回
+    //if( (mousePos.x == middleX) && (mousePos.y == middleY) ) return;
+
+    //// 设置鼠标的位置为窗口正中央
+    //SetCursorPos(middleX, middleY);                            
+
+    //// 计算角度
+    //angleY = (float)( (middleX - mousePos.x) ) / 500.0f;        
+    //angleZ = (float)( (middleY - mousePos.y) ) / 500.0f;        
+
+    //currentRotX -= angleZ;  
+
+    //if(currentRotX > 1.0f)
+    //    currentRotX = 1.0f;
+    //else if(currentRotX < -1.0f)
+    //    currentRotX = -1.0f;
+    //// 旋转观察方向
+    //else
+    //{
+    //    CVect3 vAxis = Cross(m_vView - m_vPosition, m_vUpVector);
+    //    vAxis = Normalize(vAxis);
+
+    //    RotateView(angleZ, vAxis.x, vAxis.y, vAxis.z);
+    //    RotateView(angleY, 0, 1, 0);
+    //}
+}
+
+
+//  下面的函数的功能是将摄像机的观察方向绕某个方向轴旋转一定的角度
+void CCamera::RotateView(float angle, float x, float y, float z)
+{
+    CVect3 vNewView;
+
+    // 获得观察方向矢量
+    CVect3 vView = m_vView - m_vPosition;        
+
+    // 计算角度的cos和sin值
+    float cosTheta = (float)cos(angle);
+    float sinTheta = (float)sin(angle);
+
+    // 计算新的观察点坐标X
+    vNewView.x  = (cosTheta + (1 - cosTheta) * x * x)        * vView.x;
+    vNewView.x += ((1 - cosTheta) * x * y - z * sinTheta)    * vView.y;
+    vNewView.x += ((1 - cosTheta) * x * z + y * sinTheta)    * vView.z;
+
+    // 计算新的观察点坐标Y
+    vNewView.y  = ((1 - cosTheta) * x * y + z * sinTheta)    * vView.x;
+    vNewView.y += (cosTheta + (1 - cosTheta) * y * y)        * vView.y;
+    vNewView.y += ((1 - cosTheta) * y * z - x * sinTheta)    * vView.z;
+
+    // 计算新的观察点坐标Z
+    vNewView.z  = ((1 - cosTheta) * x * z - y * sinTheta)    * vView.x;
+    vNewView.z += ((1 - cosTheta) * y * z + x * sinTheta)    * vView.y;
+    vNewView.z += (cosTheta + (1 - cosTheta) * z * z)        * vView.z;
+    m_vView = m_vPosition + vNewView;
+}
+
+//  下面的函数的功能是向左向右移动摄像机
+void CCamera::StrafeCamera(float speed)
+{    
+    // Add the strafe vector to our position
+    m_vPosition.x += m_vStrafe.x * speed;
+    m_vPosition.z += m_vStrafe.z * speed;
+
+    // Add the strafe vector to our view
+    m_vView.x += m_vStrafe.x * speed;
+    m_vView.z += m_vStrafe.z * speed;
+}
+
+//  下面的函数的功能是根据一定的速度前后移动摄像机
+void CCamera::MoveCamera(float speed)
+{
+    // 获得当前摄像机方向
+    CVect3 vVector = m_vView - m_vPosition;
+    vVector = Normalize(vVector); //摄像机方向的单位向量
+
+    m_vPosition.x += vVector.x * speed;        // 移动摄像机的位置坐标X
+    m_vPosition.y += vVector.y * speed;        // 移动摄像机的位置坐标Y
+    m_vPosition.z += vVector.z * speed;        // 移动摄像机的位置坐标Z
+    m_vView.x += vVector.x * speed;            // 摄像机X方向移动
+    m_vView.y += vVector.y * speed;            // 摄像机Y方向移动
+    m_vView.z += vVector.z * speed;            // 摄像机Z方向移动
+}
+
+
+//  下面的函数的功能是根据不同的按键，移动摄像机
+void CCamera::CheckForMovement()
+{    
+    if(fps==0) fps=30;
+    
+    // 获得当前帧率
+    float speed = 30.0f/fps;
+
+    // 是否按下UP箭头键或'W'键
+    if(GetKeyState(VK_UP) & 0x80 || GetKeyState('W') & 0x80) {                
+
+        // 移动摄像机
+        MoveCamera(speed);                
+    }
+
+    // 是否按下DOWN键或'S'键
+    if(GetKeyState(VK_DOWN) & 0x80 || GetKeyState('S') & 0x80) {            
+
+        // 移动摄像机
+        MoveCamera(-speed);                
+    }
+
+    // 是否按下LEFT箭头键或'A'键
+    if(GetKeyState(VK_LEFT) & 0x80 || GetKeyState('A') & 0x80) {            
+
+        // 移动摄像机
+        StrafeCamera(-speed);
+    }
+
+    // 是否按下RIGHT箭头键或'D'键
+    if(GetKeyState(VK_RIGHT) & 0x80 || GetKeyState('D') & 0x80) {            
+
+        // 移动摄像机
+        StrafeCamera(speed);
+    }    
+}
+
+
+//  下面的函数的功能是更新摄像机方向
+void CCamera::Update() 
+{
+    // 初始化变量
+    CVect3 vCross = Cross(m_vView - m_vPosition, m_vUpVector);
+
+    // 规范化矢量
+    m_vStrafe = Normalize(vCross);
+
+    // 移动摄像机方向
+    SetViewByMouse();
+
+    // 判断是否有按键
+    CheckForMovement();
+    
+}
+
+
+//  下面的函数的功能是设置投影变换
+void CCamera::Look()
+{
+    // 根据摄像机的位置、方向和上下方向设置投影变换
+    gluLookAt(m_vPosition.x, m_vPosition.y, m_vPosition.z,    
+              m_vView.x,     m_vView.y,     m_vView.z,    
+              m_vUpVector.x, m_vUpVector.y, m_vUpVector.z);
+}
+
+http://www.cnblogs.com/lancidie/archive/2010/10/19/1855658.html

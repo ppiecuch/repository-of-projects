@@ -1,0 +1,36 @@
+今天在motorola的里程碑上调试opengl程序，因为程序总有crash，开始怀疑libGLESv1_CM_POWERVR_SGX530_121.so 。于是就想先把里程碑的opengl硬件加速去掉，而只使用软件渲染。
+
+过程如下：
+adb shell
+$ su
+# stop
+# getprop debug.sf.hw
+
+# setprop debug.sf.hw 0
+# mount -o remount,rw system system
+# cd system/lib/egl
+# ls
+libGLESv1_CM_POWERVR_SGX530_121.so
+libGLES_android.so
+libEGL_POWERVR_SGX530_121.so
+egl.cfg
+libGLESv2_POWERVR_SGX530_121.so
+# cat egl.cfg
+0 0 android
+0 1 POWERVR_SGX530_121
+# mv egl.cfg egl.cfg-ORIG
+# echo "0 0 android" > egl.cfg
+# ls
+egl.cfg
+egl.cfg-ORIG
+libGLESv1_CM_POWERVR_SGX530_121.so
+libGLES_android.so
+libEGL_POWERVR_SGX530_121.so
+libGLESv2_POWERVR_SGX530_121.so
+# cat egl.cfg
+0 0 android
+# start
+
+好了，现在手机使用软件渲染了。只是这个软件渲染实在是太慢太慢了。。。
+
+http://www.cppblog.com/kongque/archive/2011/03/30/143051.html
