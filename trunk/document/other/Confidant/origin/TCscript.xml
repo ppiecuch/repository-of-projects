@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+	<commander id="loop1" mode="loop" time="0">
+		<command type="checkColor" x="46" y="63" value="0xFFB1B1B0" delay="0" trueRef="checkSelectFar_YPressTab_NCheckFaceToTarget" falseRef="checkMinHP_YCheckMinMP_NRest"/>
+	</commander>
+	<commander id="checkSelectFar_YPressTab_NCheckFaceToTarget" mode="bunch">
+		<command type="checkColor" x="638" y="217" value="0xFFFF0000" delay="0" trueRef="pressTab" falseRef="notFaceToTarget_YAttack_NPressTab1"/>
+	</commander>
+	<commander id="checkMinHP_YCheckMinMP_NRest" mode="bunch">
+		<command type="checkColor" x="188" y="45" value="0xFFACAC0E" delay="0" trueRef="checkMinMP_YCheckMaxHP_NRest" falseRef="rest"/>
+	</commander>
+	<commander id="checkMinMP_YCheckMaxHP_NRest" mode="bunch">
+		<command type="checkColor" x="183" y="55" value="0xFF31A0C0" delay="0" trueRef="checkMaxHP_YCheckMaxMP_NContinue" falseRef="rest"/>
+	</commander>
+	<commander id="checkMaxHP_YCheckMaxMP_NContinue" mode="bunch">
+		<command type="checkColor" x="232" y="45" value="0xFFDB8449" delay="0" trueRef="checkMaxMP_YStandAndProvocation_NContinue" falseRef="continue"/>
+	</commander>
+	<commander id="checkMaxMP_YStandAndProvocation_NContinue" mode="bunch">
+		<command type="checkColor" x="206" y="55" value="0xFF31A3C4" delay="0" trueRef="isSit_YStand_ThenProvocation1" falseRef="continue"/>
+	</commander>
+	<commander id="isSit_YStand_ThenProvocation1" mode="bunch">
+		<command type="checkColor" x="29" y="109" value="0xFF30C2F5" delay="0" trueRef="pressV" falseRef="isSit_YStand_ThenProvocation2"/>
+	</commander>
+	<commander id="isSit_YStand_ThenProvocation2" mode="bunch">
+		<command type="checkColor" x="56" y="110" value="0xFF2799D7" delay="0" trueRef="pressV" falseRef="isSit_YStand_ThenProvocation3"/>
+	</commander>
+	<commander id="isSit_YStand_ThenProvocation3" mode="bunch">
+		<command type="checkColor" x="85" y="110" value="0xFF289CD9" delay="0" trueRef="pressV" falseRef="isSit_YStand_ThenProvocation4"/>
+	</commander>
+	<commander id="isSit_YStand_ThenProvocation4" mode="bunch">
+		<command type="checkColor" x="114" y="112" value="0xFF28A8E1" delay="0" trueRef="pressV"/>
+		<command type="key" value="9" delay="0" ctrl="false" alt="false" shift="false"/>
+		<command type="key" value="45" delay="0" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="notFaceToTarget_YAttack_NPressTab1" mode="bunch">
+		<command type="checkColor" x="710" y="215" value="0xFFFF0000" delay="0" trueRef="notFaceToTarget_YAttack_NPressTab2" falseRef="attack"/>
+	</commander>
+	<commander id="notFaceToTarget_YAttack_NPressTab2" mode="bunch">
+		<command type="checkColor" x="657" y="220" value="0xFFFF0000" delay="0" trueRef="pressTab" falseRef="attack"/>
+	</commander>
+	<commander id="attack" mode="bunch">
+		<command type="key" value="50" delay="100" ctrl="false" alt="false" shift="false"/>
+		<command type="key" value="51" delay="100" ctrl="false" alt="false" shift="false"/>
+		<command type="key" value="52" delay="100" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="rest" mode="bunch">
+		<command type="key" value="48" delay="0" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="continue" mode="bunch">
+		<command type="checkColor" x="29" y="109" value="0xFF30C2F5" delay="1000" falseRef="tabAndFarAttack"/>
+	</commander>
+	<commander id="tabAndFarAttack" mode="bunch">
+		<command type="key" value="9" delay="0" ctrl="false" alt="false" shift="false"/>
+		<command type="key" value="45" delay="0" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="pressV" mode="bunch">
+		<command type="key" value="86" delay="0" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="pressTab" mode="bunch">
+		<command type="key" value="9" delay="0" ctrl="false" alt="false" shift="false"/>
+	</commander>
+</System>

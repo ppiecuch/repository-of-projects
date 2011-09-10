@@ -1,0 +1,16 @@
+rest
+/skill [nofight,life<0.5]打坐
+/skill [nofight,mana<0.5]打坐
+
+defense
+/skill [nobuff:坐忘无我]坐忘无我
+/skill [nobuff:吐故纳新]吐故纳新
+
+attack
+/skill [fight]猛虎下山
+/skill [qidian>8]两仪化形
+/skill [nofight]太极无极
+/skill 四象轮回
+/skill 回风扫叶
+/skill 三柴剑法
+/skill [nofight,qidian<10] 凝神聚气

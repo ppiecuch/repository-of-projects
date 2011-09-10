@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+	<commander id="loop1" mode="loop" time="0">
+		<command type="call" value="defense" delay="0" />
+		<command type="checkColor" x="58" y="80" value="0xFFC9C9C8" delay="0" trueRef="checkEnemyAttackMe_YCheckFaceToTarget_NPressTab" falseRef="restOrNext"/>
+	</commander>
+	<commander id="checkEnemyAttackMe_YCheckFaceToTarget_NPressTab" mode="bunch">
+		<command type="checkColor" x="733" y="71" value="0xFFE6E604" delay="0" trueRef="isFaceToTarget_YAttack_NPressTab" falseRef="pressTab"/>
+	</commander>
+	<commander id="restOrNext" mode="bunch">
+		<command type="call" value="checkNeedRest" delay="0" />
+		<command type="call" value="checkFullLifeAndMana" delay="100" />
+	</commander>
+	<commander id="checkFullLifeAndMana" mode="bunch">
+		<command type="call" value="checkMaxHP_YCheckMaxMP_NTryProvocation" delay="0" />
+	</commander>
+	<commander id="checkMaxHP_YCheckMaxMP_NTryProvocation" mode="bunch">
+		<command type="checkColor" x="293" y="56" value="0xFFCB7C47" delay="0" trueRef="checkMaxMP_YStandAndProvocation_NTryProvocation" falseRef="isSit_NProvocation1"/>
+	</commander>
+	<commander id="checkMaxMP_YStandAndProvocation_NTryProvocation" mode="bunch">
+		<command type="checkColor" x="261" y="68" value="0xFF319BBB" delay="0" trueRef="standAndProvocation" falseRef="isSit_NProvocation1"/>
+	</commander>
+	<commander id="standAndProvocation" mode="bunch">
+		<command type="call" value="isSit_YStand1" delay="0" />
+		<command type="call" value="pressTab" delay="0" />
+		<command type="call" value="attack" delay="0" />
+	</commander>
+	<commander id="isSit_YStand1" mode="bunch">
+		<command type="checkColor" x="39" y="137" value="0xFFD2B8C3" delay="0" falseRef="isSit_YStand2"/>
+	</commander>
+	<commander id="isSit_YStand2" mode="bunch">
+		<command type="checkColor" x="75" y="137" value="0xFFD2B8C3" delay="0" falseRef="isSit_YStand3"/>
+	</commander>
+	<commander id="isSit_YStand3" mode="bunch">
+		<command type="checkColor" x="111" y="137" value="0xFFD2B8C3" delay="0" falseRef="isSit_YStand4"/>
+	</commander>
+	<commander id="isSit_YStand4" mode="bunch">
+		<command type="checkColor" x="147" y="137" value="0xFFD1B7C2" delay="0" falseRef="isSit_YStand5"/>
+	</commander>
+	<commander id="isSit_YStand5" mode="bunch">
+		<command type="checkColor" x="183" y="137" value="0xFFD1B7C2" delay="0" trueRef="pressV"/>
+	</commander>
+	<commander id="isSit_NProvocation1" mode="bunch">
+		<command type="checkColor" x="39" y="137" value="0xFFD2B8C3" delay="0" falseRef="isSit_NProvocation2"/>
+	</commander>
+	<commander id="isSit_NProvocation2" mode="bunch">
+		<command type="checkColor" x="75" y="137" value="0xFFD2B8C3" delay="0" falseRef="isSit_NProvocation3"/>
+	</commander>
+	<commander id="isSit_NProvocation3" mode="bunch">
+		<command type="checkColor" x="111" y="137" value="0xFFD2B8C3" delay="0" falseRef="isSit_NProvocation4"/>
+	</commander>
+	<commander id="isSit_NProvocation4" mode="bunch">
+		<command type="checkColor" x="147" y="137" value="0xFFD1B7C2" delay="0" falseRef="isSit_NProvocation5"/>
+	</commander>
+	<commander id="isSit_NProvocation5" mode="bunch">
+		<command type="checkColor" x="183" y="137" value="0xFFD1B7C2" delay="0" falseRef="provocation"/>
+	</commander>
+	<commander id="provocation" mode="bunch">
+		<command type="call" value="pressTab" delay="0" />
+		<command type="call" value="attack" delay="0" />
+	</commander>
+	<commander id="isFaceToTarget_YPressTab_NAttack1" mode="bunch">
+		<command type="checkColor" x="604" y="272" value="0xFFFF0000" delay="0" trueRef="isFaceToTarget_YPressTab_NAttack2" falseRef="attack"/>
+	</commander>
+	<commander id="isFaceToTarget_YPressTab_NAttack2" mode="bunch">
+		<command type="checkColor" x="615" y="272" value="0xFFFF0000" delay="0" trueRef="pressTab" falseRef="attack"/>
+	</commander>
+	<commander id="isFaceToTarget_YAttack_NPressTab" mode="bunch">
+		<command type="call" value="isFaceToTarget_YPressTab_NAttack1" delay="0" />
+	</commander>
+	<commander id="defense" mode="bunch">
+		<command type="key" value="56" delay="50" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="longCDAttack" mode="bunch">
+		<command type="key" value="52" delay="50" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="attack" mode="bunch">
+		<command type="key" value="57" delay="50" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="checkNeedRest" mode="bunch">
+		<command type="key" value="48" delay="50" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="pressV" mode="bunch">
+		<command type="key" value="86" delay="50" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="pressTab" mode="bunch">
+		<command type="key" value="9" delay="50" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="alarm" mode="bunch">
+		<command type="sendUDPMsg" value="will die" delay="0" ip="192.168.2.151"/>
+	</commander>
+
+
+	<commander id="get" mode="bunch" time="0">
+		<command type="rightMouse" x="412" y="470" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="432" y="480" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="452" y="490" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="472" y="500" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="492" y="510" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="512" y="520" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="532" y="530" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="552" y="540" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="572" y="550" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="592" y="560" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="612" y="570" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="632" y="580" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="652" y="590" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="672" y="600" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="692" y="610" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="712" y="620" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="732" y="630" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="752" y="640" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="772" y="650" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="792" y="660" delay="50" ctrl="false" alt="false" shift="false"/>
+
+		<command type="rightMouse" x="412" y="420" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="432" y="430" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="452" y="440" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="472" y="450" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="492" y="460" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="512" y="470" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="532" y="480" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="552" y="490" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="572" y="500" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="592" y="510" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="612" y="520" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="632" y="530" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="652" y="540" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="672" y="550" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="692" y="560" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="712" y="570" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="732" y="580" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="752" y="590" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="772" y="600" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="792" y="610" delay="50" ctrl="false" alt="false" shift="false"/>
+
+		<command type="rightMouse" x="412" y="370" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="432" y="380" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="452" y="390" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="472" y="400" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="492" y="410" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="512" y="420" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="532" y="430" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="552" y="440" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="572" y="450" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="592" y="460" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="612" y="470" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="632" y="480" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="652" y="490" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="672" y="500" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="692" y="510" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="712" y="520" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="732" y="530" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="752" y="540" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="772" y="550" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="792" y="560" delay="50" ctrl="false" alt="false" shift="false"/>
+
+		<command type="rightMouse" x="792" y="370" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="772" y="380" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="752" y="390" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="732" y="400" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="712" y="410" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="692" y="420" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="672" y="430" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="652" y="440" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="632" y="450" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="612" y="460" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="592" y="470" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="572" y="480" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="552" y="490" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="532" y="500" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="512" y="510" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="492" y="520" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="472" y="530" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="452" y="540" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="432" y="550" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="412" y="560" delay="50" ctrl="false" alt="false" shift="false"/>
+
+		<command type="rightMouse" x="792" y="420" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="772" y="430" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="752" y="440" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="732" y="450" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="712" y="460" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="692" y="470" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="672" y="480" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="652" y="490" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="632" y="500" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="612" y="510" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="592" y="520" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="572" y="530" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="552" y="540" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="532" y="550" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="512" y="560" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="492" y="570" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="472" y="580" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="452" y="590" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="432" y="600" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="412" y="610" delay="50" ctrl="false" alt="false" shift="false"/>
+
+		<command type="rightMouse" x="792" y="470" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="772" y="480" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="752" y="490" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="732" y="500" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="712" y="510" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="692" y="520" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="672" y="530" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="652" y="540" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="632" y="550" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="612" y="560" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="592" y="570" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="572" y="580" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="552" y="590" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="532" y="600" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="512" y="610" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="492" y="620" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="472" y="630" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="452" y="640" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="432" y="650" delay="50" ctrl="false" alt="false" shift="false"/>
+		<command type="rightMouse" x="412" y="660" delay="50" ctrl="false" alt="false" shift="false"/>
+	</commander>
+</System>
