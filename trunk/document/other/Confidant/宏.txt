@@ -8,6 +8,8 @@ defense
 
 attack
 /skill [fight]猛虎下山
+/skill [fight,distance<8]三才化生
+/skill [fight,distance<3,dnobuff:三才化生]九转归一
 /skill [qidian>8]两仪化形
 /skill [nofight]太极无极
 /skill 四象轮回
