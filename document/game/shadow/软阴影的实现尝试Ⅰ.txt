@@ -1,0 +1,58 @@
+
+软阴影（Soft - Shadow），并非一种图形学算法或技术的代名词。怎么说呢，它是图形学大师们孜孜不倦地追求的更逼近真实的阴影 效果 。——ZwqXin.com
+想起来，第一次接触阴影算法，是一年前这个博客刚刚成立不久的时候吧。阴影锥，阴影帖图，还有那个宝贵的大三寒假。好了，停止无缘由的感伤，给自己编一个可以重新站起来的理由？
+有一点很不能原谅自己的是，这篇小文，本应该是去年10月发出的……
+在已有的阴影DEMO上作改进，是当时很自然的想法。而选择了[Shadow Map Demo2] ，不知道，算不算是一个失策。Cascaded ShadowMap技术，从本质上说，只是分区间地调整投影矩阵，根据视距离使用不同分辨率的阴影图，促使效率与效果平衡而已。这是Shadow Map改进算法的一条路，但并非唯一。回想[Shadow Map阴影贴图技术之探Ⅲ] ，里面我简单地用乒乓式的采样，实现了一下3X3的阴影图模糊——PCF。虽然结果看上去很那个，但这昭示着Shadow Map改进算法的另一条路——图形学中的图像处理，调整阴影图。
+在我的上一个阴影DEMO中，主要的shader只有一个，它是在Shadow - Casting阶段完成场景阴影图的分层次贴附。在CPU上完成的是ShadowMap - Generating阶段，因为那里没有涉及像素层面，完全不需要GPU的并行计算能力。但如果要对一张贴图的内容进行像素级的处理……恩，这是通常的想法。但当时脑中另一个突然一闪的想法，让我决定先行对其进行捕获——场景后处理。
+一般说的DefferedShading并不等同于这个意义，但就字面来说它们也有那么一点共通。恩，题外话先免了，先暗自打个小算盘：
+场景后处理，我是想在最终画面上动手脚。在OpenGL流水线的尾部，无论是否双缓冲，必然是把显存上每个像素格的值传向显示器屏幕上的每个“真·像素”上，表示成颜色（譬如LCD是用彩色滤光片等结构对此转换的，可以理解为每个像素上又有红绿蓝三色子像素balabala……嘛，其实我也不怎么理解啊这些硬件的- -，呃离题了，回来~）。如果把这个覆盖屏幕的“结果”当作贴在一个Screen-Aligned-Quad（屏幕大矩形）的一张纹理，我们在显存-屏幕这个过程之前进行拦截，获得并处理这个“纹理”后再让它传向屏幕。
+有这方面基础的朋友都知道，FBO又该出来表演了[学一学，FBO] 。把Shadow - Casting的结果写入FBO绑定的一个纹理中，然后自己画一个Screen-Aligned-Quad，贴这个纹理——对这个过程启用shader处理。最后虽然屏幕上本质只有这么一个矩形，但是众多本该直接映射在屏幕上的场景元素已经完美地“被代表”了。看上去丝毫没有河蟹爬过的痕迹……完全没有。
+依然是模糊处理。高斯模糊。
+ 
+// 
+uniform int BSceneWidth; 
+uniform int BSceneHeight; 
+uniform float ishoriz; 
+  
+uniform int samplecount; 
+uniform float weights; 
+uniform float sigma; 
+  
+uniform sampler2D  BScenemap; 
+  
+void main() 
+{ 
+    gl_FragData[0] = BlurFilter(BScenemap, gl_TexCoord[0].xy)  ; 
+} 
+//uniform int BSceneWidth;uniform int BSceneHeight;uniform float ishoriz;uniform int samplecount;uniform float weights;uniform float sigma;uniform sampler2D  BScenemap;void main(){    gl_FragData[0] = BlurFilter(BScenemap, gl_TexCoord[0].xy)  ;}
+其中BlurFilter函数是对当前像素，在水平或垂直方向上采样（samplecount），采样值乘以一个高斯分布值而已（公式也就网上常见的，sigma为参数），跟PCF也就差不多那回事。很明显，我们需要在水平方向和垂直方向都模糊一次，这里用2个PASS。我们只需要模糊阴影，因此把阴影部分和场景部分分开写入纹理(MRT)，最后再统一。
+ 
+ // CastingShader, render to two textures  (MRT) 
+gl_FragData[0] = vec4(gl_Color.rgb * diffuse.rgb  * texColor.rgb, 1.0); 
+    
+gl_FragData[1] = shadeFactor;
+ // CastingShader, render to two textures  (MRT)gl_FragData[0] = vec4(gl_Color.rgb * diffuse.rgb  * texColor.rgb, 1.0);   gl_FragData[1] = shadeFactor; 
+//PostProcessingShader , as a texture to the screen-aligned quad 
+uniform sampler2D  Scenemap; 
+uniform sampler2D  Shademap; 
+  
+void main() 
+{    
+    vec4 shadeFact = texture2D(Shademap, gl_TexCoord[1].xy);  
+   gl_FragColor = texture2D(Scenemap, gl_TexCoord[0].xy) * shadeFact; 
+}
+//PostProcessingShader , as a texture to the screen-aligned quaduniform sampler2D  Scenemap;uniform sampler2D  Shademap;void main(){       vec4 shadeFact = texture2D(Shademap, gl_TexCoord[1].xy);    gl_FragColor = texture2D(Scenemap, gl_TexCoord[0].xy) * shadeFact;}
+写到FBO纹理后，屏幕矩形绑定之：
+
+软是软了，就边界效果而言是很好的（这里图片压缩了看上去糟糕而已）但有几个问题：1.很明显的边界问题，阴影与场景分离了，SampleNum越大分离得越明显；2..随着SampleNum增加帧率狂降。效果和效率都不行。
+首先，这种高采样带宽的东西本来就是帧率杀手，更不用说高斯分布权数的计算实在够呛。其次因为场景和阴影分离，而模糊的只是对于相机“可见”的那部分阴影，所以图中间隔线是活生生被当作阴影边界了。
+后来也考虑过再加入图像处理中的“膨胀”运算[形态学运算小结] ，但是有点吃力不讨好的感觉，无论膨胀多少次，还是能依稀见到狭缝，加上效率问题，宣告此法的破产。
+
+
+
+左-右，上-下依次 32p4p4pass1, 32p2p2pass1, 32p2p2pass2, 64p2p2pass1（自己猜，我什么都忘记了哈）
+
+本文来源于ZwqXin http://www.zwqxin.com/ , 转载请注明
+原文地址：http://www.zwqxin.com/archives/opengl/try-soft-shadow-1.html 
+
+

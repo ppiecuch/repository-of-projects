@@ -1,0 +1,4 @@
+随着图形硬件可编程能力的不断提高，材质编辑在现代（或者次世代）游戏开发中也开始受到关注。Unreal3 Editor中已经加入了MaterialEditor，它能很方便地帮助不会编写Shader代码的美工创造出令人惊叹的材质效果，这样，图形程序员被解放出来将精力更多地用于整个引擎的图形架构。
+    下图为笔者制作的一款MaterialEditor截图。该MaterialEditor使用了与Unreal3类似的fx模板，根据表达式的连接关系生成最终可用的fx文件。fx模板中采用Macro的方式来开启或禁用某个特性（如环境映射）。
+
+    图见：http://www.cppblog.com/heath/archive/2008/10/08/63488.html

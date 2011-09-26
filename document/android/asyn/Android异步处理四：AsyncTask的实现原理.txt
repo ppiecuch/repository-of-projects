@@ -1,0 +1,505 @@
+本博文地址：http://blog.csdn.net/mylzc/article/details/6774131，转载请注明出处
+
+在《Android异步处理二：使用AsyncTask异步更新UI界面》一文中，我们介绍了如何使用AsyncTask实现异步下载图片，并且更新图片到UI界面的方法。本篇我们将学习Framework层AsyncTask的实现原理。
+
+概述：AsyncTask的本质是一个线程池，所有提交的异步任务都会在这个线程池中的工作线程内执行，当工作线程需要跟UI线程交互时，工作线程会通过向在UI线程创建的Handler（原理见：《Android异步处理三：Handler+Looper+MessageQueue深入详解》）传递消息的方式，调用相关的回调函数，从而实现UI界面的更新。
+
+
+
+
+例子：
+
+本章还是以《Android异步处理二：使用AsyncTask异步更新UI界面》中的例子说明AsyncTask的实现原理。
+
+这个例子是在后台下载CSDN的LOGO，下载完成后在UI界面上显示出来。
+
+
+AsyncTask.java
+
+
+view plaincopy to clipboardprint?package com.zhuozhuo;  
+  
+  
+import org.apache.http.HttpResponse;  
+import org.apache.http.client.HttpClient;  
+import org.apache.http.client.methods.HttpGet;  
+import org.apache.http.impl.client.DefaultHttpClient;  
+  
+import android.app.Activity;  
+import android.graphics.Bitmap;  
+import android.graphics.BitmapFactory;  
+import android.os.AsyncTask;  
+import android.os.Bundle;  
+import android.view.View;  
+import android.view.View.OnClickListener;  
+import android.widget.Button;  
+import android.widget.ImageView;  
+import android.widget.ProgressBar;  
+import android.widget.Toast;  
+  
+public class AsyncTaskActivity extends Activity {  
+      
+    private ImageView mImageView;  
+    private Button mButton;  
+    private ProgressBar mProgressBar;  
+      
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        setContentView(R.layout.main);  
+          
+        mImageView= (ImageView) findViewById(R.id.imageView);  
+        mButton = (Button) findViewById(R.id.button);  
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);  
+        mButton.setOnClickListener(new OnClickListener() {  
+              
+            @Override  
+            public void onClick(View v) {  
+                GetCSDNLogoTask task = new GetCSDNLogoTask();  
+                task.execute("http://csdnimg.cn/www/images/csdnindex_logo.gif");  
+            }  
+        });  
+    }  
+      
+    class GetCSDNLogoTask extends AsyncTask<String,Integer,Bitmap> {//继承AsyncTask   
+  
+        @Override  
+        protected Bitmap doInBackground(String... params) {//处理后台执行的任务，在后台线程执行   
+            publishProgress(0);//将会调用onProgressUpdate(Integer... progress)方法   
+            HttpClient hc = new DefaultHttpClient();  
+            publishProgress(30);  
+            HttpGet hg = new HttpGet(params[0]);//获取csdn的logo   
+            final Bitmap bm;  
+            try {  
+                HttpResponse hr = hc.execute(hg);  
+                bm = BitmapFactory.decodeStream(hr.getEntity().getContent());  
+            } catch (Exception e) {  
+                  
+                return null;  
+            }  
+            publishProgress(100);  
+            //mImageView.setImageBitmap(result); 不能在后台线程操作ui   
+            return bm;  
+        }  
+          
+        protected void onProgressUpdate(Integer... progress) {//在调用publishProgress之后被调用，在ui线程执行   
+            mProgressBar.setProgress(progress[0]);//更新进度条的进度   
+         }  
+  
+         protected void onPostExecute(Bitmap result) {//后台任务执行完之后被调用，在ui线程执行   
+             if(result != null) {  
+                 Toast.makeText(AsyncTaskActivity.this, "成功获取图片", Toast.LENGTH_LONG).show();  
+                 mImageView.setImageBitmap(result);  
+             }else {  
+                 Toast.makeText(AsyncTaskActivity.this, "获取图片失败", Toast.LENGTH_LONG).show();  
+             }  
+         }  
+           
+         protected void onPreExecute () {//在 doInBackground(Params...)之前被调用，在ui线程执行   
+             mImageView.setImageBitmap(null);  
+             mProgressBar.setProgress(0);//进度条复位   
+         }  
+           
+         protected void onCancelled () {//在ui线程执行   
+             mProgressBar.setProgress(0);//进度条复位   
+         }  
+          
+    }  
+      
+  
+}  
+package com.zhuozhuo;
+
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+public class AsyncTaskActivity extends Activity {
+    
+	private ImageView mImageView;
+	private Button mButton;
+	private ProgressBar mProgressBar;
+	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        mImageView= (ImageView) findViewById(R.id.imageView);
+        mButton = (Button) findViewById(R.id.button);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				GetCSDNLogoTask task = new GetCSDNLogoTask();
+				task.execute("http://csdnimg.cn/www/images/csdnindex_logo.gif");
+			}
+		});
+    }
+    
+    class GetCSDNLogoTask extends AsyncTask<String,Integer,Bitmap> {//继承AsyncTask
+
+		@Override
+		protected Bitmap doInBackground(String... params) {//处理后台执行的任务，在后台线程执行
+			publishProgress(0);//将会调用onProgressUpdate(Integer... progress)方法
+			HttpClient hc = new DefaultHttpClient();
+			publishProgress(30);
+			HttpGet hg = new HttpGet(params[0]);//获取csdn的logo
+			final Bitmap bm;
+			try {
+				HttpResponse hr = hc.execute(hg);
+				bm = BitmapFactory.decodeStream(hr.getEntity().getContent());
+			} catch (Exception e) {
+				
+				return null;
+			}
+			publishProgress(100);
+			//mImageView.setImageBitmap(result); 不能在后台线程操作ui
+			return bm;
+		}
+		
+		protected void onProgressUpdate(Integer... progress) {//在调用publishProgress之后被调用，在ui线程执行
+			mProgressBar.setProgress(progress[0]);//更新进度条的进度
+	     }
+
+	     protected void onPostExecute(Bitmap result) {//后台任务执行完之后被调用，在ui线程执行
+	    	 if(result != null) {
+	    		 Toast.makeText(AsyncTaskActivity.this, "成功获取图片", Toast.LENGTH_LONG).show();
+	    		 mImageView.setImageBitmap(result);
+	    	 }else {
+	    		 Toast.makeText(AsyncTaskActivity.this, "获取图片失败", Toast.LENGTH_LONG).show();
+	    	 }
+	     }
+	     
+	     protected void onPreExecute () {//在 doInBackground(Params...)之前被调用，在ui线程执行
+	    	 mImageView.setImageBitmap(null);
+	    	 mProgressBar.setProgress(0);//进度条复位
+	     }
+	     
+	     protected void onCancelled () {//在ui线程执行
+	    	 mProgressBar.setProgress(0);//进度条复位
+	     }
+    	
+    }
+    
+
+}main.xml 
+
+
+view plaincopy to clipboardprint?<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical" android:layout_width="fill_parent"  
+    android:layout_height="fill_parent">  
+    <ProgressBar android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/progressBar" style="?android:attr/progressBarStyleHorizontal"></ProgressBar>  
+    <Button android:id="@+id/button" android:text="下载图片" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>  
+    <ImageView android:id="@+id/imageView" android:layout_height="wrap_content"  
+        android:layout_width="wrap_content" />  
+</LinearLayout>  
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+    <ProgressBar android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/progressBar" style="?android:attr/progressBarStyleHorizontal"></ProgressBar>
+    <Button android:id="@+id/button" android:text="下载图片" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+	<ImageView android:id="@+id/imageView" android:layout_height="wrap_content"
+		android:layout_width="wrap_content" />
+</LinearLayout>
+mainifest.xml
+view plaincopy to clipboardprint?<?xml version="1.0" encoding="utf-8"?>  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  
+      package="com.zhuozhuo"  
+      android:versionCode="1"  
+      android:versionName="1.0">  
+    <uses-sdk android:minSdkVersion="10" />  
+<uses-permission android:name="android.permission.INTERNET"></uses-permission>  
+    <application android:icon="@drawable/icon" android:label="@string/app_name">  
+        <activity android:name=".AsyncTaskActivity"  
+                  android:label="@string/app_name">  
+            <intent-filter>  
+                <action android:name="android.intent.action.MAIN" />  
+                <category android:name="android.intent.category.LAUNCHER" />  
+            </intent-filter>  
+        </activity>  
+  
+    </application>  
+</manifest>  
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.zhuozhuo"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <uses-sdk android:minSdkVersion="10" />
+<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <activity android:name=".AsyncTaskActivity"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>
+
+
+
+
+分析：
+
+在分析实现流程之前，我们先了解一下AsyncTask有哪些成员变量。
+
+
+view plaincopy to clipboardprint?private static final int CORE_POOL_SIZE =5;//5个核心工作线程   
+private static final int MAXIMUM_POOL_SIZE = 128;//最多128个工作线程   
+private static final int KEEP_ALIVE = 1;//空闲线程的超时时间为1秒   
+  
+private static final BlockingQueue<Runnable> sWorkQueue =  
+        new LinkedBlockingQueue<Runnable>(10);//等待队列   
+  
+private static final ThreadPoolExecutorsExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE,  
+        MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, sWorkQueue,sThreadFactory);//线程池是静态变量，所有的异步任务都会放到这个线程池的工作线程内执行。  
+   private static final int CORE_POOL_SIZE =5;//5个核心工作线程
+   private static final int MAXIMUM_POOL_SIZE = 128;//最多128个工作线程
+   private static final int KEEP_ALIVE = 1;//空闲线程的超时时间为1秒
+ 
+   private static final BlockingQueue<Runnable> sWorkQueue =
+           new LinkedBlockingQueue<Runnable>(10);//等待队列
+ 
+   private static final ThreadPoolExecutorsExecutor = new ThreadPoolExecutor(CORE_POOL_SIZE,
+           MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, sWorkQueue,sThreadFactory);//线程池是静态变量，所有的异步任务都会放到这个线程池的工作线程内执行。
+
+
+
+ 
+
+回到例子中，点击按钮之后会新建一个GetCSDNLogoTask对象：
+
+
+view plaincopy to clipboardprint?GetCSDNLogoTask task = new GetCSDNLogoTask();  
+GetCSDNLogoTask task = new GetCSDNLogoTask();
+
+
+此时会调用父类AsyncTask的构造函数：
+
+AsyncTask.java
+
+
+view plaincopy to clipboardprint?public AsyncTask() {  
+        mWorker = new WorkerRunnable<Params, Result>() {  
+            public Result call() throws Exception {  
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);  
+                return doInBackground(mParams);  
+            }  
+        };  
+  
+        mFuture = new FutureTask<Result>(mWorker) {  
+            @Override  
+            protected void done() {  
+                Message message;  
+                Result result = null;  
+  
+                try {  
+                    result = get();  
+                } catch (InterruptedException e) {  
+                    android.util.Log.w(LOG_TAG, e);  
+                } catch (ExecutionException e) {  
+                    throw new RuntimeException("An error occured while executing doInBackground()",  
+                            e.getCause());  
+                } catch (CancellationException e) {  
+                    message = sHandler.obtainMessage(MESSAGE_POST_CANCEL,  
+                            new AsyncTaskResult<Result>(AsyncTask.this, (Result[]) null));  
+                    message.sendToTarget();//取消任务，发送MESSAGE_POST_CANCEL消息   
+                    return;  
+                } catch (Throwable t) {  
+                    throw new RuntimeException("An error occured while executing "  
+                            + "doInBackground()", t);  
+                }  
+  
+                message = sHandler.obtainMessage(MESSAGE_POST_RESULT,  
+                        new AsyncTaskResult<Result>(AsyncTask.this, result));//完成任务，发送MESSAGE_POST_RESULT消息并传递result对象   
+                message.sendToTarget();  
+            }  
+        };  
+    }  
+public AsyncTask() {
+        mWorker = new WorkerRunnable<Params, Result>() {
+            public Result call() throws Exception {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                return doInBackground(mParams);
+            }
+        };
+
+        mFuture = new FutureTask<Result>(mWorker) {
+            @Override
+            protected void done() {
+                Message message;
+                Result result = null;
+
+                try {
+                    result = get();
+                } catch (InterruptedException e) {
+                    android.util.Log.w(LOG_TAG, e);
+                } catch (ExecutionException e) {
+                    throw new RuntimeException("An error occured while executing doInBackground()",
+                            e.getCause());
+                } catch (CancellationException e) {
+                    message = sHandler.obtainMessage(MESSAGE_POST_CANCEL,
+                            new AsyncTaskResult<Result>(AsyncTask.this, (Result[]) null));
+                    message.sendToTarget();//取消任务，发送MESSAGE_POST_CANCEL消息
+                    return;
+                } catch (Throwable t) {
+                    throw new RuntimeException("An error occured while executing "
+                            + "doInBackground()", t);
+                }
+
+                message = sHandler.obtainMessage(MESSAGE_POST_RESULT,
+                        new AsyncTaskResult<Result>(AsyncTask.this, result));//完成任务，发送MESSAGE_POST_RESULT消息并传递result对象
+                message.sendToTarget();
+            }
+        };
+    }
+
+
+
+WorkerRunnable类实现了callable接口的call()方法，该函数会调用我们在AsyncTask子类中实现的doInBackground(mParams)方法，由此可见，WorkerRunnable封装了我们要执行的异步任务。FutureTask中的protected void done() {}方法实现了异步任务状态改变后的操作。当异步任务被取消，会向UI线程传递MESSAGE_POST_CANCEL消息，当任务成功执行，会向UI线程传递MESSAGE_POST_RESULT消息，并把执行结果传递到UI线程。
+
+由此可知，AsyncTask在构造的时候已经定义好要异步执行的方法doInBackground(mParams)和任务状态变化后的操作（包括失败和成功）。
+
+当创建完GetCSDNLogoTask对象后，执行
+
+
+view plaincopy to clipboardprint?task.execute("http://csdnimg.cn/www/images/csdnindex_logo.gif");  
+task.execute("http://csdnimg.cn/www/images/csdnindex_logo.gif");
+
+
+此时会调用AsyncTask的execute(Params...params)方法
+
+
+AsyncTask.java
+
+
+view plaincopy to clipboardprint?public final AsyncTask<Params,Progress, Result> execute(Params... params) {  
+        if (mStatus != Status.PENDING) {  
+            switch (mStatus) {  
+                case RUNNING:  
+                    throw newIllegalStateException("Cannot execute task:"  
+                            + " the taskis already running.");  
+                case FINISHED:  
+                    throw newIllegalStateException("Cannot execute task:"  
+                            + " the taskhas already been executed "  
+                            + "(a task canbe executed only once)");  
+            }  
+        }  
+   
+        mStatus = Status.RUNNING;  
+   
+        onPreExecute();//运行在ui线程，在提交任务到线程池之前执行   
+   
+        mWorker.mParams = params;  
+        sExecutor.execute(mFuture);//提交任务到线程池   
+   
+        return this;  
+}  
+public final AsyncTask<Params,Progress, Result> execute(Params... params) {
+        if (mStatus != Status.PENDING) {
+            switch (mStatus) {
+                case RUNNING:
+                    throw newIllegalStateException("Cannot execute task:"
+                            + " the taskis already running.");
+                case FINISHED:
+                    throw newIllegalStateException("Cannot execute task:"
+                            + " the taskhas already been executed "
+                            + "(a task canbe executed only once)");
+            }
+        }
+ 
+        mStatus = Status.RUNNING;
+ 
+        onPreExecute();//运行在ui线程，在提交任务到线程池之前执行
+ 
+        mWorker.mParams = params;
+        sExecutor.execute(mFuture);//提交任务到线程池
+ 
+        return this;
+}
+
+
+
+当任务正在执行或者已经完成，会抛出IllegalStateException，由此可知我们不能够重复调用execute(Params...params)方法。在提交任务到线程池之前，调用了onPreExecute()方法。然后才执行sExecutor.execute(mFuture)是任务提交到线程池。
+
+前面我们说到，当任务的状态发生改变时（1、执行成功2、取消执行3、进度更新），工作线程会向UI线程的Handler传递消息。在《Android异步处理三：Handler+Looper+MessageQueue深入详解》一文中我们提到，Handler要处理其他线程传递过来的消息。在AsyncTask中，InternalHandler是在UI线程上创建的，它接收来自工作线程的消息，实现代码如下：
+
+
+AsyncTask.java
+
+
+view plaincopy to clipboardprint?private static class InternalHandler extends Handler {  
+       @SuppressWarnings({"unchecked","RawUseOfParameterizedType"})  
+        @Override  
+        public voidhandleMessage(Message msg) {  
+            AsyncTaskResult result =(AsyncTaskResult) msg.obj;  
+            switch (msg.what) {  
+                caseMESSAGE_POST_RESULT:  
+                    // There is onlyone result   
+                    result.mTask.finish(result.mData[0]);//执行任务成功   
+                    break;  
+                caseMESSAGE_POST_PROGRESS:  
+                   result.mTask.onProgressUpdate(result.mData);//进度更新   
+                    break;  
+                caseMESSAGE_POST_CANCEL:  
+                    result.mTask.onCancelled();//取消任务   
+                    break;  
+            }  
+        }  
+    }  
+private static class InternalHandler extends Handler {
+       @SuppressWarnings({"unchecked","RawUseOfParameterizedType"})
+        @Override
+        public voidhandleMessage(Message msg) {
+            AsyncTaskResult result =(AsyncTaskResult) msg.obj;
+            switch (msg.what) {
+                caseMESSAGE_POST_RESULT:
+                    // There is onlyone result
+                    result.mTask.finish(result.mData[0]);//执行任务成功
+                    break;
+                caseMESSAGE_POST_PROGRESS:
+                   result.mTask.onProgressUpdate(result.mData);//进度更新
+                    break;
+                caseMESSAGE_POST_CANCEL:
+                    result.mTask.onCancelled();//取消任务
+                    break;
+            }
+        }
+    }
+
+
+
+当接收到消息之后，AsyncTask会调用自身相应的回调方法。
+
+总结：
+
+1、 AsyncTask的本质是一个静态的线程池，AsyncTask派生出的子类可以实现不同的异步任务，这些任务都是提交到静态的线程池中执行。
+
+2、线程池中的工作线程执行doInBackground(mParams)方法执行异步任务
+
+3、当任务状态改变之后，工作线程会向UI线程发送消息，AsyncTask内部的InternalHandler响应这些消息，并调用相关的回调函数
+
+
+本博文地址：http://blog.csdn.net/mylzc/article/details/6774131，转载请注明出处
+
