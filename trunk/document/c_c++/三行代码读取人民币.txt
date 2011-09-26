@@ -1,0 +1,22 @@
+void ReadMoney3(char* pNumber)  
+{  
+    wchar_t numberArray[]=L"零壹贰叁肆伍陆柒捌玖";   
+    wchar_t posNumber[]=L"仟佰拾亿仟佰拾万仟佰拾元整角分";  
+    int nZero=0;  
+    for(int i=0,length;i<(length=strlen(pNumber));i++)  
+    {   setlocale(LC_ALL, ".936");//这行可以不算呵呵！   
+        if(pNumber[i]!='.')  
+        wprintf(L"%lc%lc",numberArray[pNumber[i]-48],posNumber[pNumber[length-3]=='.'? 15-length+i:12-length+i]);  
+        }  
+}  
+
+ 
+
+ 
+
+调用方式： char* pNumber="120110107.12";
+ ReadMoney3(pNumber);
+
+定义的几行就不算了，呵呵！
+
+http://blog.csdn.net/playstudy/article/details/6786518

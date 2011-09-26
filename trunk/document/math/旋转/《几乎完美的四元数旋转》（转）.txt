@@ -1,0 +1,83 @@
+《几乎完美的四元数旋转》
+DDM君，Flab3D.com
+
+
+人类最初用9个值的矩阵（Matrix），来表示一个三维物体的旋转位置。它的缺陷是数据大，和无法自动在两个角度间产生过度的角度。
+
+由于矩阵描述角度过于抽象，人类又发明了3个值的优拉角（Euler）。可优拉角是个很不负责任的家伙，旋转圈数和旋转顺序完全不做区分。三维动画师最厌恶的情况之一‘万向锁（Gimbal Lock）’就是这个家伙的问题。按不同轴以优拉角旋转几次后，出现x,y,z三个轴完全变成同向的情况，也就是说，优拉角很容易出现旋转到最后只剩一个方向可以旋转的情况，这就是恐怖的‘万向锁’。
+
+后来，聪明的爱尔兰数学家发明了我们今天要研究的四元数（Quaternion），这就是迄今为止描述三维空间旋转相对完美的方案。
+
+四元数和矩阵一样，不满足乘法交换率，也就是说，A*B不等于B*A。四元数之所以可以明确地表述三维旋转，是因为他实际上是一种‘四维’的算法。这里的‘四维’是数学上的使用，不需要去想象什么是四维的世界=_=,只是多一条轴，多一个参数而已。
+
+
+我们主要介绍PV3d里Quaternion常用的几个方法和其用法，不会涉及过深的数学知识，所以不用担心。Quaternion类位置在org-papervision-core-math包里。
+
+
+
+//构造四元数需要4个值（人家名字就叫4元嘛=_=）,x,y,z是个三维向量，表示‘任意轴’，w是个标量，表示旋转度数。这就是几乎完美的角度旋转。
+四元数之所以不是‘绝对完美’，是因为插值的时候过渡速率不恒定，且很难解决。不过这比起‘恐怖万向锁’已经是很小的问题。
+
+public function Quaternion( x:Number = 0, y:Number = 0, z:Number = 0, w:Number = 1 )
+
+
+//下面两个个分别是‘从优拉角换算出四元数’和‘从矩阵换算出四元数’。这是两个非常常用的方法，只要已知一个物体的优拉角或矩阵，即可生成对应的四元数。
+Pv3d里任何DisplayObject3D的tranform这个属性就是变换他的矩阵，由这个矩阵就能得到目前旋转的四元数。（我们研究所的Flab摄像机旋转就用到了这些方法）
+
+public static function createFromEuler( ax:Number, ay:Number, az:Number, useDegrees:Boolean = false )
+public static function createFromMatrix( matrix:Matrix3D )
+
+
+//和上面的刚好反向，分别是‘得到已知四元数的优拉角’和‘得到已知四元数的矩阵’
+
+public function toEuler()
+public function get matrix()
+
+
+//插值是四元数最重要的用处之一，slerp方法的参数中，qa为开始的旋转位置的四元数，qb为结束的旋转位置四元数，apha可以看成一个插值的位置的比例，数值在0-1之间。
+
+public static function slerp( qa:Quaternion, qb:Quaternion, alpha:Number )
+
+完美旋转的思路是这样的：
+我们必须要首先知道我们的开始位置和结束位置，结束位置很多情况用一个DisplayObject3D虚拟，我们可以用它的.tranform（是个矩阵值），变换成一个四元数
+知道两头的四元数，我们只需要每祯增加alpha值（从0-1），即可在这两个四元数之间插入任意多的过渡帧的四元数。
+然后将每祯的这个四元数反向为矩阵，在通过矩阵相乘目前物体的位置，即可得到物体每祯的新位置。
+了解更多矩阵变换请参考《矩阵变换》
+
+
+
+
+
+下面这些都是四元数的基本运算（一般使用没必要掌握），维基词典可以了解‘四元数’更专业的解释。
+维基词典-四元数（会打开新窗口）
+
+
+
+//求模，四元数到原点的距离，简单的说就是长度
+
+public function get modulo()
+//共轨
+
+public static function conjugate( a:Quaternion )
+//点乘
+
+public static function dot( a:Quaternion, b:Quaternion )
+//叉称
+
+public static function multiply( a:Quaternion, b:Quaternion )
+//求差 
+
+public static function sub(a:Quaternion, b:Quaternion)
+//求和
+
+public static function add(a:Quaternion, b:Quaternion)
+
+
+
+
+
+
+
+DDM君
+Flab3D.com
+http://hi.baidu.com/heroshu/blog/item/23a34e55145c2bceb745ae87.html

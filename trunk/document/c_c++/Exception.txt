@@ -1,4 +1,19 @@
 [异常]
+nafxcw.lib错误 
+nafxcw.lib(appcore.obj) : error LNK2001: unresolved external symbol ___argv 
+nafxcw.lib(appcore.obj) : error LNK2001: unresolved external symbol ___argc 
+nafxcw.lib(apphelp.obj) : error LNK2001: unresolved external symbol __mbctype 
+nafxcw.lib(filelist.obj) : error LNK2001: unresolved external symbol __mbctype 
+nafxcw.lib(dcprev.obj) : error LNK2001: unresolved external symbol __mbctype 
+nafxcw.lib(timecore.obj) : error LNK2001: unresolved external symbol __mbctype 
+在Preprocessor中定义_AFXDLL, PROJECT->SETING->C/C++->PREPROCESSOR->定义 _AFXDLL,完毕。
+如果它提示：fatal error C1189: #error : Please use the /MD switch for _AFXDLL builds 
+就这样改： 
+C/C++->Code Generation->Multithread DLL （即实现/MD选项） 
+
+
+
+[异常]
 _CrtDbgReport: String too long or IO Error
 [解决]
 #include <locale.h>

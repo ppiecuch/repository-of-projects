@@ -1,0 +1,30 @@
+基于Berlin噪声算法可以产生真实的水面效果，然而由于需要动态生成相应的normal map，所以效率较低。
+    昨天和同事讨论时，产生一个想法：采用多张静态normal maps和纹理动画。实验了一下效果还不错。笔者使用下图所示的两张法线贴图：
+
+
+    在ps中对根据时间对纹理坐标进行改变，而后对两张normal map进行采样取平均，下面为具体代码和效果图：
+float3 GetMaterialNormal(MaterialParameters Parameters)
+{
+    float2 texCoords = Parameters.TexCoords;
+    texCoords.x += g_fTime / 100;
+    texCoords.y += g_fTime / 50;
+    float3 normal1 = (2 * tex2D(g_Sampler0 , texCoords) - 1.0f).xyz;
+    //texCoords = Parameters.TexCoords / 2.0f;
+    texCoords.x -= g_fTime / 50;
+    texCoords.y -= g_fTime / 100;
+    float3 normal2 = (2 * tex2D(g_Sampler1 , texCoords) - 1.0f).xyz;
+    float3 normal = (normal1 + normal2) / 2.0f;
+    float3x3 TBN;
+    TBN[0]    =    Parameters.vTangent;
+    TBN[1]    =    Parameters.vBinormal;
+    TBN[2]    =    Parameters.vNormal;
+    return mul(normal , TBN);    
+}
+
+
+
+带环境反射的水面效果
+
+    P.S. 在MMOG中normal map制造水面足矣，在有效减少vertex的同时提高效率。
+
+http://www.cppblog.com/heath/archive/2008/12/06/68723.html

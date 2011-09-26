@@ -1,0 +1,26 @@
+当光到达材质的交界面时，一部分光被反射，而另一部分将发生折射，这个现象称为Fresnel Effect。Fresnel Effect混合了反射和折射，使得物体更真实。
+    理论物理中的Fresnel公式是很复杂的，因而在实时图形学中只要在最终效果上满足人们的视觉感受就可以了。笔者采用了以下简化公式：
+                                                                                      factor = bias + scale * (1.0f + I·N)power)
+                                                                                      color = factor * 反射光颜色 + (1 - factor) * 折射光颜色
+    其中，bias为偏移系数，scale为缩放系数，power为Fresnel指数，I为入射光方向向量，N为发向量。
+    由于不能颜色的光的波长不同，所以要真实模拟自然光通过不同介质的效果，还需要考虑光的散射。为此，需要给RGB分配不同的折射率来获取三色光折射后的方向向量。下面是Fresnel Effect部分的fx代码（既可放在vs也可以放在ps中）：
+
+#if ENV_MAP == 1
+    /**//// 菲涅耳效果
+    float3 etaRatio = float3(0.7f , 0.8f , 0.6f);
+    float3 I = worldpos - g_vEyeModel;
+    float3 R = reflect(I ,normal);
+    float3 Tred = refract(I , -normal , etaRatio.x);
+    float3 Tgreen = refract(I , -normal , etaRatio.y);
+    float3 Tblue = refract(I , -normal , etaRatio.z);
+    float refFactor = 0.1f + 0.1f * pow(1.0f + dot(I , normal) , 1.0f);
+    float4 reflectedColor = texCUBE(EnvSampler ,R);
+    float4 refractedColor;
+    refractedColor.r = texCUBE(EnvSampler , Tred).r;
+    refractedColor.g = texCUBE(EnvSampler , Tgreen).g;
+    refractedColor.b = texCUBE(EnvSampler , Tblue).b;
+    refractedColor.a = 1;
+    float4 combColor = lerp(refractedColor , reflectedColor , refFactor);
+    color = lerp(color , combColor , 0.8f);
+#endif效果图如下：
+http://www.cppblog.com/heath/archive/2008/10/09/63530.html
