@@ -1,0 +1,55 @@
+/* Listing 2: Code to perform box filtering using the algorithm
+given in the text.
+
+First call DoPreComputation giving a source image and dimensions.
+Pass the output of DoPreComputation (p) to DoBoxBlur to perform
+the blur. See Listing 5 for an example */
+
+void DoPreComputation(UBYTE *src, int src_w, int src_h, ULONG *dst)
+{
+	for (int y=0;y<src_h;y++)
+	{
+		for (int x=0;x<src_w;x++)
+		{
+			int tot=src[0];
+			if (x>0) tot+=dst[-1];
+			if (y>0) tot+=dst[-src_w];
+			if (x>0 && y>0) tot-=dst[-src_w-1];
+			*dst++=tot;
+			src++;
+		}
+	}
+}
+
+// this is a utility function used by DoBoxBlur below
+ULONG ReadP(ULONG *p, int w, int h, int x, int y)
+{
+	if (x<0) x=0; else if (x>=w) x=w-1;
+	if (y<0) y=0; else if (y>=h) y=h-1;
+	return p[x+y*w];
+}
+
+// the main meat of the algorithm lies here
+void DoBoxBlur(UBYTE *src, int src_w, int src_h, UBYTE *dst, ULONG *p, int boxw, int boxh)
+{
+	if (boxw<0 || boxh<0)
+	{
+		memcpy(dst,src,src_w*src_h); // deal with degenerate kernel sizes
+		return;
+	}
+	float mul=1.f/((boxw*2+1)*(boxh*2+1));
+	for (int y=0;y<src_h;y++)
+	{
+		for (int x=0;x<src_w;x++)
+		{
+			int tot=ReadP(p,src_w,src_h,x+boxw,y+boxh)
+				   +ReadP(p,src_w,src_h,x-boxw,y-boxh)
+				   -ReadP(p,src_w,src_h,x-boxw,y+boxh)
+				   -ReadP(p,src_w,src_h,x+boxw,y-boxh);
+			*dst++=UBYTE(tot*mul);
+			src++;
+		}
+	}
+}
+
+http://www.gamasutra.com/features/20010209/Listing2.cpp

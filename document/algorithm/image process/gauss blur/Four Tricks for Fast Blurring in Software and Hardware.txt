@@ -1,0 +1,200 @@
+With the ever-increasing resolutions made possible by modern 3D graphics cards, computer games and real-time graphics are acquiring a uniform "look," imposed largely by technical limitations and occasionally unimaginative programming. I'm talking about that sharp-edged, polygonal look. Great advances in texture resolution and per-pixel lighting have helped to fill in the previously fuzzy polygon interiors, but the edges and feel of the image often remain frustratingly synthetic and "clean." 
+
+Imaginative lighting, such as moving shadows, bump maps, and specular highlights, can help add variety to the rendered scene. These topics have been dealt with extensively elsewhere. However, one option that is often overlooked is blurring elements of the scene; for example, depth-of-field and focusing effects bring certain elements of an image into the foreground, hide unnecessary clutter, and reduce the need to resort to over-used fogging tricks. Blurring is a costly process, but a fundamentally simple and useful one. 
+
+被过滤广告
+This article presents a few tricks which can help make real-time blurring possible, and hopefully will provide enough material to inspire you to invent your own hybrid techniques. 
+
+The Basics of Blurring 
+
+There are many ways to blur an image, but at a basic level it always comes down to low-pass filtering of the image -- this can be achieved in many ways, often by convolution of the image with a filter. It's instructive to think about the basics of this blurring process so you can appreciate how the tricks work, and what their shortcomings are. 
+
+Figure 1 shows a source image, and the results of blurring it with two simple filters: the first is a box filter, and the second is a Gaussian type equivalent to a Photoshop Gaussian blur of 1.0 pixels. The Gaussian filter gives a "softer," more aesthetically pleasing look, but the box filter has computational advantages that I'll discuss later. 
+
+    
+ 
+ Figure 1. The effect of blurring an image with (from left to right) a box filter and a Photoshop-style Gaussian filter. The kernels of each these filters are given below. 
+ 
+
+Algorithmically, the filtering process is achieved by calculating a weighted average of a cluster of source pixels for every destination pixel. The kernels shown in Figure 1 dictate the weights of source pixels used to perform this average. Informally, you can think of this as "sliding" the small kernel image over the source image. At each position of the kernel, the average of the product of all the kernel pixels with the source pixels they overlap is computed, yielding a single destination pixel. The code to do this in the most obvious fashion is given in Listing 1, and illustrated in Figure 2. Note that all the examples given here assume a monochrome source image; colored images can be handled simply by dealing with each channel (red, green, and blue) independently. 
+
+    
+ 
+ Figure 2. An example of how a single destination pixel in a blurred image results from the weighted average of several source pixels. 
+ 
+
+Doing It Quickly 
+
+The blurring algorithm described thus far is simple, but slow. For large images, and for large kernels, the number of operations rapidly becomes prohibitively large for real-time operation. The problem is particularly acute when extreme blurring is required; either a small-kernel filter must be applied many times iteratively, or a filter with a kernel of a size comparable with the image must be used. That's approximately an n4 operation using the code in Figure 1 -- clearly no good. 
+
+The rest of this article describes a few tricks -- the first two entirely software-related, the latter two using the power of 3D graphics cards -- which help make real-time blurring possible. 
+
+Trick One: Box Filter to the Rescue 
+
+Look again at the box-filtered image in Figure 1, and at the kernel. It's a constant value everywhere. This can be used to great advantage. The general filtering operation used by Listing 1 is described by this mathematical expression (you can skip to the end of this section for the payoff if you don't like math): 
+
+
+Equation 1. Here x,y specifies the coordinate of the destination pixel, s is the source image, d is the destination image, ker is kernel, and 2k + 1 is the size (in pixels) of the kernel. 
+
+Allowing for a constant kernel value, this becomes: 
+
+
+Equation 2. Equation 1 rewritten for kernel with constant value c. Values of c other than 1 allow the brightness of the destination image to be changed. 
+
+However, the costly double sum per destination pixel still remains. This is where some nifty precomputation comes in handy. The key is to represent the source image in a different way. Rather than storing the brightness of each pixel in the image, we precompute a version of the image in which each pixel location holds the total of all the pixels above and to the left of it (see Figure 3). Mathematically, this is described by Equation 3: 
+
+
+Equation 3. Image p at a point x,y contains the sum of all the source pixels from 0,0 to x,y. 
+
+Note that this means that you need to store more than the usual 8 bits per pixel per channel -- the summed brightnesses toward the bottom right of the image can get very large. 
+
+Once this precomputation has been completed, the expression for the box-filtering process can be rewritten entirely in terms of sums starting at 0: 
+
+
+Equation 4. Equation 2 rewritten with sums from 0, where p is the precomputed image from Equation 3. 
+
+    
+ 
+ Figure 3. The values in the table on the left represent a source image. Each entry in the table on the right contains the sum of all the source pixels above and to the left of that position. 
+ 
+
+This equation gives exactly the same result as the basic box filtering algorithm in Equation 2; the trick is that each of the double sums in Equation 4 is just a single look-up into the precomputed image p. This means that the blurring operation for each destination pixel is reduced to four image look-ups, a few additions and subtractions, and a divide by a constant value (which can also be turned into a lookup with a simple multiplication table). Even more significantly, this algorithm's speed is independent of kernel size, meaning that it takes the same time to blur the image no matter how much blurring is required. Code which implements this algorithm is given in Listing 2. It's slightly complicated by having to deal with edge cases, but the core of the algorithm is still simple. Some impressive focusing and defocusing effects can be achieved with this code alone. It is particularly suited to static images (because you only have to perform the precomputation step once) such as front-end elements and text/fonts. 
+
+
+
+
+
+Trick Two: Moving Images and Motion Blur 
+
+The technique just described suffers from one drawback: the fairly costly precomputation step before any blurring can be performed. This is fine for static images, but for moving ones it significantly increases the storage and time required to perform a blur. 
+
+被过滤广告
+To solve this, let's consider a horizontal motion blur. That is, blurring an image horizontally only, rather like Photoshop's Motion Blur filter (see Figure 4). Like Trick Two, this can done quickly and independently of the amount of blur, but this trick requires no precomputation. 
+
+     
+ 
+ Figure 4. An example image, and the result of blurring horizontally along its scan-lines. 
+ 
+
+The motion blurring described here is exactly like the box filter above, except for the fact that the kernel is only one pixel high. That is, each destination pixel is simply the average of a short horizontal line of pixels in the source image. 
+
+
+Equation 5. The basic equation for a horizontal motion blur with a constant valued kernel of value c and width 2k + 1. 
+
+The heart of the trick to do this quickly lies in keeping a running total of source pixels as you move across the scan lines of the image. Imagine the situation halfway across an image, say at horizontal position 23. We've already computed destination pixel 22, so we must have known the sum of all the source pixels used to compute its color. Destination pixel 23 uses almost exactly the same source pixels, apart from the ends -- we have to lose one source pixel at the left edge, and gain one at the right edge. Mathematically, this is shown in Equation 6. 
+
+
+Equation 6. Equation 5 rewritten to exploit coherence between adjacent destination pixels. 
+
+In other words, the new total of source pixels can be adjusted to the value for position 23, by subtracting the original source pixel at the left edge, and adding on the value at the right edge. This is illustrated in Figure 5, with the code given in Listing 3. 
+
+    
+ 
+ Figure 5. The sum of the first five values shown is 12. To compute the sum of the adjacent five values, one merely needs to subtract the blue number and add the red number to the old sum. 
+ 
+
+With a little more effort, the same algorithm can be made to motion blur an image in any direction -- not just horizontally -- by processing the pixels in vertical strips (for vertical blurring) or even along "skewed scan lines" for blurring at an arbitrary angle. The vertical scan line routine is particularly useful, because if you motion blur an image twice -- that is, once horizontally and then filtering the result once vertically -- you achieve exactly the same effect as a box filter (see Figure 6). Thus, an arbitrary amount of box-filter blur can be achieved, as in Trick One, in constant time regardless of kernel size, without the need for any precomputation. 
+
+    
+ 
+ Figure 6. (From left to right) The original image, the result of blurring it horizontally, and the result of blurring that vertically. This final result is equivalent to a box filtered version of the original image. 
+ 
+
+Taking Stock 
+
+Being able to quickly blur images, both static and moving, is all very well, but thus far I have concentrated entirely on software techniques, which ignore the power of 3D graphics cards. The following two tricks allow parts of the scene, or whole scenes rendered on a 3D card, to be blurred or "defocused" rapidly, by borrowing techniques from MIP-mapping, bilinear filtering, and the software blurring tricks given above. 
+
+The key to both of the following tricks is the idea that a sharp image scaled down and then blown up with bilinear filtering looks blurry (see Figure 7). Just try walking very close up to a wall or object in a game that uses a 3D card (but doesn't use any detail mapping) and you'll know what I mean. The problem of blurring or defocusing is then reduced to producing a small, good-quality version of the image or object to be blurred, and then "blowing it up" by rendering a sprite or billboard with that small image texture-mapped onto it. 
+
+
+Trick Three: MIP-Mapping Abused for Full-Screen Blurs 
+
+In order to make this trick work, the engine must render the scene as usual and then generate MIP-maps of the rendered image -- that is, a series of scaled-down versions of the screen image each half the size of the last. Thus, if the screen resolution is 800x600, the MIP-mapped versions will be 400x300, 200x150, 100x75, and so on (how small you go depends on how much blurring you wish to apply). See Figure 7. 
+
+被过滤广告
+How these MIP-maps are generated depends on the chosen hardware platform and software API. I won't cover the details here, since it's such a standard technique -- although what we are going to do with the MIP-maps is less typical. 
+
+It may be possible to render the scene to an off-screen texture instead of to the back buffer, and then use API or hardware code to create the MIP-maps "auto-magically." Or it may be possible to treat the back buffer (to which you normally render your screen image) as a texture in itself and use that as a source for automatic MIP-map generation. 
+
+In the worst case, if the hardware/software doesn't support MIP-maps automatically, you have to "lock" the back buffer after 3D rendering is complete, read the pixels in "by hand," and then generate each smaller MIP-map by averaging groups of pixels. Since the scale factor is always one half, this isn't as bad as it sounds -- each destination MIP-map pixel is just the average of the four corresponding source pixels, arranged in a 2x2 square. Listing 4 gives an example of how to go about this four-to-one averaging, although it's possible to write much faster code than the one given. 
+
+    
+ 
+ Figure 7. (Clockwise from top left) The original image, its MIP-maps, and the smallest MIP-map blown up to the original size using bilinear filtering. 
+ 
+
+It's worth noting that the generation of the screen MIP-maps is crucial to the final look of the blur -- in effect, it's replacing the filter kernels of the first two tricks with a repeated averaging process. It is possible to generate MIP-maps just by throwing away three in four pixels, but the artifacts when you blow the results up to screen size are generally unacceptable. At the other extreme, replacing the MIP-map scaling and averaging process with something more exotic (such as a factor-of-two scale combined with a blur from Trick One or Trick Two) allows some great special effects, such as "Vaseline-lens" effects or motion-blurred depth of field. 
+
+Once the MIP-maps are safely downloaded as textures, the next step is to draw one of them as a screen-sized billboard over the top of the screen, making sure the graphics card's bilinear (or better) filtering is enabled. Which MIP-map you choose dictates how blurred the result looks: if you blow up a tiny MIP-map (say one-eighth the screen resolution or less) the result will be a very blurred look; if you choose the half-resolution MIP-map, a subtle blur will result. 
+
+Of course, it's also possible to change which MIP-map is chosen over time; thus the blur in or out of focus can be animated. If the fill rate is available, it's also possible to transition smoothly between MIP-maps by drawing two billboards over the screen with different MIP-maps on them. For example, rather than using the half-resolution MIP-map and then switching suddenly to the one-quarter-resolution one, which will cause a visible pop, cross-fade between them: use the graphics card's alpha-blending features to fade the half-resolution MIP-map out gradually, and simultaneously fade the one-quarter-resolution one in. Although this is definitely not "correct" for generating blur levels between those given by the two MIP-maps, it is visually indistinguishable from an extremely smooth change in the level of blur. I've found that users are extremely willing to believe that what they are seeing is a smooth blur in or out, and don't tend to see the transition in MIP-map levels at all. 
+
+A Couple of Optimizations 
+
+On cards supporting trilinear MIP-mapping, this cross-fading effect is even possible to implement in hardware -- in other words, it's possible to get two for the price of one. By adjusting the Z values of the billboard polygon, the card can be made to cross-fade between two MIP-map levels automatically, so that only one billboard drawing pass is required. 
+
+One other notable optimization which is possible on some hardware is that if the entire screen is to be blurred heavily, the initial rendering phase could be made to actually create an image at less than the full-screen resolution. This saves on fill rate and means that fewer MIP-maps are needed. For example, at a screen resolution of 800x600 where you intend to cover the screen in the one-eighth-resolution (100x75) MIP-map, it may be worthwhile to render the scene at 400x300 in the first place, and then use a one-quarter-resolution MIP-map instead, scaled up to the full 800x600. 
+
+Many other optimizations are possible, many of them dependent on specific hardware tricks. It's worth experimenting to see what works best for each target platform. 
+
+Bringing Back Some Clarity 
+
+It's all very well to be able to blur the entire screen, but it's quite an extreme effect and so not always that useful. Sometimes it's desirable to have some elements blurred and leave others sharp. Focusing, or depth-of-field-type effects, where only objects in the extreme distance or foreground are blurred, can lend a very impressive photorealistic look to a rendered image. 
+
+Sometimes it is possible to partition the scene into non-overlapping layers, and intersperse rendering and blurring passes to create a different level of blur on each layer. For example, you could render the background of a scene (the interior of a room for example, perhaps with unimportant characters standing in it), blur the result using Trick Three as described above, and then render foreground characters over the top of the blurred result (see Figure 8). This is surprisingly effective in reducing confusing background clutter, and causes the user's eye to concentrate on the more important, unblurred characters. 
+
+    
+ 
+ Figure 8. (Clockwise from top left) A background image, a foreground image, the two together, and finally the result of blurring the background while leaving the foreground sharp. (Image by Christian Bravery 
+Lionhead Studios Ltd.) 
+ 
+
+Depth of Field: Help from the Z-buffer 
+
+If it's impossible to partition the scene into these non-overlapping layers, the Z-buffer can be extremely useful. Instead of rendering a single MIP-map on a billboard over the whole screen, enable Z-buffering and render every MIP-map so that its billboard slices through the scene at a carefully chosen distance (see Figure 9). 
+
+Imagine the scene sliced by five planar billboards, each facing the viewer and each exactly covering the screen, but spaced evenly along the Z-axis from foreground to background. The front billboard shows the highest-resolution MIP-map, and each one behind it shows progressively lower resolution MIP-maps. Because of the action of the Z-buffer, the lowest-detail MIP-map will only cover (and thus appear to blur) objects behind it, in the extreme distance; middle-distance objects will be covered by the mid-resolution MIP-maps, and so on up to the extreme foreground. Objects that lie closer to the eye than the front-most billboard will be entirely unblurred. 
+
+In this way, it is possible to achieve a cheap depth-of-field effect -- provided you have sufficient fill rate to cover the screen several times. Objects progressively appear to become more blurred as they move away from the viewer. By reversing the normal sense of the Z-buffer (so that it allows pixels to be drawn only if the value in the Z-buffer is closer than the new pixel) and drawing the billboards from front to back, it is possible to reverse the sense of blurring -- so that extreme foreground objects become blurred, while distant scenery remains untouched. 
+
+Artifacts! 
+
+As with all the best graphical tricks, there are always downsides, and Trick 3 has its fair share. First of all, it uses a lot of fill rate, especially if you are rendering several Z-buffered billboards that cover the entire screen. Although very few polygons are involved, the amount of overdraw can quickly bring the fastest cards to their knees. Also, building the MIP-maps can be a costly process, especially at high resolution or on architectures where reading back from the screen and interspersing 2D and operations is costly. 
+
+Another drawback is that large objects that pass through several levels of blur (such as landscapes, roads, or large buildings) can have unsightly hard-edged lines which appear between levels of blur. This is because there are only a few levels of blur, and the Z-buffering process will cause a hard edge wherever objects intersect the blurred billboards. This can also be seen if an object moves slowly toward or away from the viewer, as it gradually cuts through the billboards. The problem can be made less obvious by using more billboards (levels of blur), or by reducing the overall level of blur. 
+
+And finally, objects in the unblurred areas of the screen may appear to have a blurry halo around them, caused by their image "bleeding" into the surrounding pixels. These halos actually lie in a more blurred area, behind the object (see Figure 9). Under certain circumstances, the effect can actually be used to some advantage as a kind of halo-like special-effect around objects -- for example, glowing magma or godly halos. 
+
+    
+ 
+ Figure 9. (Clockwise from top left) A scene from Black & White, its MIP-maps, the five layers formed by the billboards intersecting the Z-buffer, a side view of the billboards intersecting the scene, and the result of rendering the MIP-maps onto the billboards over the top of the original scene. (Image © Lionhead Studios Ltd.) 
+ 
+ 
+ Trick Four: Sprites Make a Comeback 
+
+If your game has many small objects spaced over a wide range of depths (or you want a wide range of blurs on the different objects), the full-screen tricks described so far aren't of much use. A space combat game, for example, would benefit from only blurring the small ships individually, rather than wasting time and memory blurring the (mostly black) nebulae in the background. 
+
+被过滤广告
+This last trick is actually a variation of Trick Three; rather than building MIP-maps of the entire screen, each object is rendered to its own small texture (that is, a dynamically rendered sprite). Then, instead of rendering the object itself to the screen, a billboard is drawn in its place, texture-mapped with the object's sprite. To perform blurring of these objects, MIP-maps are built of the sprite textures, exactly as in Trick Three. Then the sprite can be rendered with a MIP-map chosen appropriately for the level of blur. 
+
+For example, imagine that a spaceship is visible in the distance and covers a rectangle of screen area about 128x128 pixels. However, it's going to be heavily blurred. First, we render the ship to a 128x128 off-screen sprite and build MIP-maps of it down to, say, 16x16. Then, instead of rendering the original object to the screen, a billboard is drawn in its place using that 16x16 MIP-map. Because of the scaling-down followed by scaling-up process, the ship appears blurred. 
+
+As with Trick Three, if an object is to be drawn heavily blurred, it can be rendered to a sprite at a low resolution. In our example, you could start by rendering the ship into a 64x64 sprite, even though it covers a screen area of 128x128 (saving fill rate by a factor of four), and then generate a 16x16 MIP-map (as before, but requiring one less iteration of MIP-map generation). As before, the 16x16 MIP-map is then used to draw the ship to the screen. This trick doesn't just work for small objects, however; it can be thought of as an extended version of the two-layer blurring system illustrated in Figure 8. 
+
+When using this sprite-based system, there are several points to bear in mind: 
+
+Drawing order becomes important, as is the case when rendering normal alpha'd objects. 
+Objects become flat, so it is important they don't intersect each other or form cycles of overlapping parts between them. In effect, you've lost the use of the Z-buffer between objects. 
+Objects can only have a single level of blur on them; thus an object which covers a wide range of Z (and thus should be blurred by different amounts at its ends) will be incorrectly rendered. 
+Despite these caveats, the technique has a few unique advantages. Because of the MIP-mapping process, distant objects (even those which aren't meant to be blurred) can be made to look antialiased, even on cards where full-screen antialiasing is unavailable. 
+
+Even better, this trick provides an opportunity for an interesting optimization to the whole rendering process. It may actually be unnecessary to rerender the object sprites every frame, because if an object doesn't change orientation or lighting much between frames, its sprite can be reused in subsequent frames. This can massively increase rendering speeds, especially in the case of huge numbers of nonspinning objects. With a sufficiently ingenious (or sloppy) heuristic, which decides when objects can keep their sprites and when they need rerendering, the sprites may only need to be rendered every four or five frames. The heuristic can be even more generous (and stop rerendering) when an object is in the distance or blurred. As with LOD algorithms, the heuristic has to maintain the crucial balance between visual degradation and speed increase. A rule that works in one situation may be completely inappropriate to another type of scene or engine architecture. People have been experimenting with techniques like this for some years, and although it is difficult to balance correctly, under the right circumstances it not only gives you variable depth-of-field blurring but also huge frame-rate increases. 
+
+Rounding Up 
+
+Listing 5 gives an extremely simple example of how to use the other code listings given in this article. It reads an image in Photoshop Raw format and applies each of the algorithms in turn to output .RAW files, which can be loaded into an image viewer to see the results. 
+
+The tricks described in this article are just that -- tricks. There is a huge unexplored area in 3D-accelerated programming -- that of using the power of graphics cards in ways other than just drawing lit objects. I hope that the ideas presented in this article inspire some experimentation and development of even weirder and more wonderful techniques than those I've chosen to include here. 
+ 
+
+http://www.gamasutra.com/view/feature/3102/four_tricks_for_fast_blurring_in_.php
