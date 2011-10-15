@@ -1,0 +1,78 @@
+1.介绍 
+Log4cxx是开放源代码项目Apache Logging Service的子项目之一，是Java社区著名的log4j的c++移植版，用于为C++程序提供日志功能，以便开发者对目标程序进行调试和审计。 
+有关log4cxx的更多信息可以从Apache Logging Service的网站http://logging.apache.org获得。当前的稳定版本为0.9.7，本文内容及示例代码都是基于此版本。此外，示例代码的编译环境为Windows环境中的Microsoft Visual C++ .Net 2003。 
+2.编译 
+在此例中一律使用vc6.0实现,也可以使用vs2003编译.由于发行包不含编译后的代码,所以首先我们需要编译他的静态库和动态库.在Msvc中. 
+| Msvc/static：该工程产生log4cxx的静态链接库(lib4cxx.lib和lib4cxxs.lib); 
+| Msvc/dll：该工程产生log4cxx的动态链接库(lib4cxx.dll); 
+注意: 编译路径中不能含有带空格的文件夹.因为在unix系统中这是不允许的.所以在编译时最好选一个根目录放置进行编译. 
+5.配置环境 
+
+新建一个工程,设置vc编译环境的包含路径和静态库路径(工具->option->目录)将前面的三个文件包含进去. 
+注意: 同时还要加上的是"项目->setting->C/C++->项目预处理定义"中要加上",UNICODE". 
+4.示例代码 
+[code]
+
+// log4cppTest.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <string>
+#include <log4cxx/logger.h>
+#include <log4cxx/propertyconfigurator.h>
+#include <log4cxx/helpers/exception.h>
+using namespace log4cxx;
+using namespace log4cxx::helpers;
+
+int main(int argc, char* argv[])
+{
+ String msg = _T("e://log4cppTest//log4cxx.properties");
+ 
+ LoggerPtr rootLogger = Logger::getRootLogger();
+
+ log4cxx::PropertyConfigurator::configure(msg);
+
+ rootLogger->info(_T("Entering application."));
+
+ //LOG4CXX_INFO(rootLogger, _T("他的确工作了"));
+
+ return 0;
+}
+
+[/code]
+
+新建一个文本文件，命名为log4cxx.properties，并键入如下内容：
+
+[code]
+
+
+# 设置root logger为DEBUG级别，使用了ca和fa两个Appender
+log4j.rootLogger=DEBUG, ca, fa
+ 
+#对Appender fa进行设置：
+# 这是一个文件类型的Appender，
+# 其输出文件（File）为./output.log，
+# 输出方式（Append）为覆盖方式，
+# 输出格式（layout）为PatternLayout
+log4j.appender.fa=org.apache.log4j.FileAppender
+log4j.appender.fa.File=./output.log
+log4j.appender.fa.Append=true
+log4j.appender.fa.layout=org.apache.log4j.PatternLayout
+log4j.appender.fa.layout.ConversionPattern=%d [%t] %-5p %.16c - %m%n
+ 
+#对Appender ca进行设置：
+# 这是一个控制台类型的Appender
+#  输出格式（layout）为PatternLayout
+log4j.appender.ca=org.apache.log4j.ConsoleAppender
+log4j.appender.ca.layout=org.apache.log4j.PatternLayout
+log4j.appender.ca.layout.ConversionPattern=%d [%t] %-5p %.16c - %m%n
+
+[/code]
+
+复制log4cxx.dll到输出目录。在动态链接方式下，应用程序需要能够找到这个库文件。
+
+运行生成的文件,查看一下运行结果.
+
+注:log4cxx在代码中含有一个漏洞,如果使用LOG4CXX.INFO(*)会造成内存溢出,但使用rootlogger->info(*)没有这个问题.
+
+http://blog.csdn.net/zhengjie19/article/details/4395463
