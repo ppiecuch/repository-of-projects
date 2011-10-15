@@ -1,0 +1,21 @@
+#include <stdio.h>  
+#include <string.h>
+
+char *strtok_s( char *strToken, const char *strDelimit, char **context);
+
+改进后的strtok_s增加了一个参数，这个参数context是由调用者提供一个char*指针，
+strtok_s将每次调用后的字符串位置保存在这个指针中。而之前版本的strtok函数会将这个位置保存在一个函数
+内部的静态局部变量中，如果有多个线程同时调用这个函数，有可能出现冲突。与MSVC CRT类似，Glibc也提供
+了一个线程安全版本的strtok()叫做strtok_r()。
+
+
+char str[] ="a,b,c,d*e";  
+	const char * split = ",";  
+	char * p=NULL;    
+	char *pOut=NULL;
+
+	p = strtok_s(str,split,&pOut);    
+	while(p!=NULL) {    
+		printf ("%s\r\n",p);    
+		p = strtok_s(NULL,split,&pOut);  
+	}

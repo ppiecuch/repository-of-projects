@@ -1,0 +1,1471 @@
+董波
+
+QQ:84638372
+
+一 简介
+    字符串分词，即按照某一规则，将一个完整的字符串分割为更多的字段。在C库当中，strtok/wcstok提供了类似的功能，C++标准库兼容了C库。C++的stringstream有类似的功能，boost.string_algorithm也有提供类似的泛型算法。另外在boost当中专门提供了boost.tokenizer来做这样的工作，它的实现是对C++泛型设计的一个不错的诠释，当然，它远没有达到完美的程度。Matthew Wilson在它的stlsoft中也提供了类似的组件，stlsoft.string_tokeniser。它们各有各自的特点，接下来我们对此做一些探讨和研究。
+
+ 
+
+二 C库
+C库中提供了strtok/wcstok来实现类似的功能，但是它们具有明显的缺点：
+
+1.  不可重入性。这是因为它用内部的静态变量来保存相关状态。如果C库实现没有考虑TLS的话，则还有竞争条件的问题(更多信息可以参考<Windows via C/C++, Fifth Edition> Chapter 21: Thread-Local Storage)。
+
+2.  参数必须是可写入的。
+
+3.  参数必须是C风格字符串。
+
+4.  总是跳过空白。
+
+下面是一个早期字符串函数的例程（改编自Matthew Wilson《Extended STL, Volume 1》 Chapter 27 ）：
+
+#include <iostream>
+
+using namespace std;
+
+ 
+
+int main() 
+
+{
+
+   char str[] = "abc,def;ghi,jkl;;";
+
+   char* outer = NULL;
+
+   char* inner = NULL;
+
+ 
+
+   for( outer = strtok( str, ";") ; NULL != outer; outer = strtok(NULL, ";") )
+
+   {
+
+      printf( "Outer token: %s\n", outer );
+
+ 
+
+      //for( inner = strtok( outer, ","); NULL != inner; inner = strtok( NULL, ",") )
+
+      //{
+
+      // printf( "Inner token: %s\n", inner );
+
+      //}
+
+   }
+
+   
+
+   return 0;
+
+}
+
+如上面的程序，如果解注释那一段代码将导致工作不正常，也不会达到我们想要的目的，输出可能如下:
+
+Outer token: abc,def
+
+Inner token: abc
+
+Inner token: def
+
+请按任意键继续. . .
+
+在Windows下面，Visual C++ 2005起提供了新的安全版函数，在一定程度上可以解决这种问题(UNIX系统下面有strtok_r有类似的功能)，因为它们是可重入的。下面是上面例程的升级版：
+
+#include <iostream>
+
+using namespace std;
+
+ 
+
+int main() 
+
+{
+
+   char str[] = "abc,def;ghi,jkl;;";
+
+   char* outer = NULL;
+
+   char* inner = NULL;
+
+ 
+
+   char* pOut = NULL;
+
+   char* pIn = NULL;
+
+   for( outer = strtok_s( str, ";", &pOut ) ; NULL != outer; outer = strtok_s(NULL, ";", &pOut) )
+
+   {
+
+      printf_s( "Outer token: %s\n", outer );
+
+ 
+
+     for( inner = strtok_s( outer, ",", &pIn); NULL != inner; inner = strtok_s( NULL, ",", &pIn ) )
+
+      {
+
+         printf_s( "Inner token: %s\n", inner );
+
+      }
+
+   }
+
+   
+
+   return 0;
+
+}
+
+在我的机器上输出如下：
+
+szRes:<abc> || pTok: <abc>
+
+szRes:<abc> || pTok: <def>
+
+szRes:<abc> || pTok: <g>
+
+szRes:<abc> || pTok: <efg>
+
+请按任意键继续. . .
+
+    但是即便是如此，我们也不能解决它所存在的其它问题，比如刚才提到的2、3、4点。
+
+ 
+
+三 C++ stringstream
+这也是一种可以用来分词的方法，但是实际上用的并不多，而且功能也不够强大，而且很多人都不能很好的掌握stringstream，因为我们平时用得太少了。
+
+#include <iostream>
+
+#include <string>
+
+#include <sstream>
+
+using namespace std;
+
+ 
+
+int main() 
+
+{
+
+   stringstream str("abcd efg kk dd " );
+
+   string tok;
+
+   while( getline( str, tok, ' ' ) )
+
+   {
+
+      cout<<tok << endl;
+
+   }
+
+   
+
+   return 0;
+
+}
+
+输出如下：
+
+abcd
+
+efg
+
+kk
+
+dd
+
+请按任意键继续. . .
+
+ 
+
+四 boost字符串算法库
+在我写的《C++ String深入详解2.0》中对它做过一些介绍，但是那还不够，在未来的3.0版本中将会涵盖更多的相关内容。字符串算法库中也有提供字符串分词的泛型算法和迭代器。
+
+4.1 泛型算法
+这种方式基于Range的概念，需要我们提供一个可以容纳被拆分后字符串的容器，下面是它的一个简单例程：
+
+#include <iostream>
+
+#include <vector>
+
+#include <string>
+
+using namespace std;
+
+ 
+
+#include <boost/algorithm/string.hpp>
+
+ 
+
+int main() 
+
+{
+
+   string ss( "HelloWorld!He.lloWorld!he" );
+
+ 
+
+   vector<string> tmp;
+
+   // 以标点符号分开！
+
+   vector<string>& tt = boost::algorithm::split( tmp, ss, boost::algorithm::is_punct() );
+
+ 
+
+   assert( boost::addressof(tmp) == boost::addressof(tt) );
+
+ 
+
+   copy( tt.begin(),tt.end(),ostream_iterator< string >( cout,"\n" ) );
+
+   
+
+   return 0;
+
+}
+
+输出：
+
+HelloWorld
+
+He
+
+lloWorld
+
+he
+
+请按任意键继续. . .
+
+我们可以看到，我们对整个拆分过程是不可控的，即使在某些时候我们可能只对拆分后的前两个单词感兴趣我们也不得不用容器来获取和保存所有结果，这对于字符串很长的情况那实在是让人不能接受，或许我们应该“按需分配”，所以便有了迭代器的方法。
+
+4.2 迭代器
+boost::algorithm::split_iterator可以用来拆分字符串，同时还需要搭配一些Finder(比如token_finder)和断言式（或者说判断式）。当然我们也可以自己DIY一个Finder。下面是一个简单的例程：
+
+#include <iostream>
+
+#include <string>
+
+using namespace std;
+
+ 
+
+#include <boost/algorithm/string.hpp>
+
+ 
+
+int main() 
+
+{
+
+   string str("abc@ d*dd a");
+
+ 
+
+   boost::algorithm::split_iterator< string::iterator > iStr( 
+
+      str,
+
+      boost::algorithm::token_finder( boost::algorithm::is_any_of( "@* " ) ) 
+
+      );
+
+ 
+
+   boost::algorithm::split_iterator< string::iterator> end;
+
+ 
+
+   while( iStr != end )
+
+   {
+
+      cout<< *iStr << endl;
+
+      ++iStr;
+
+   }
+
+   
+
+   return 0;
+
+}
+
+输出：
+
+abc
+
+ 
+
+d
+
+dd
+
+a
+
+请按任意键继续. . .
+
+这个输出可能不是我们想要的，将代码做一点点修改：
+
+boost::algorithm::split_iterator< string::iterator > iStr( 
+
+      str,
+
+      boost::algorithm::token_finder(
+
+         boost::algorithm::is_any_of( "@* " ),
+
+         boost::algorithm::token_compress_on ) 
+
+      );
+
+这个时候将开启压缩，输出可能如下：
+
+abc
+
+d
+
+dd
+
+a
+
+请按任意键继续. . .
+
+相对于boost.tokenizer，字符串算法库提供的分词手法要少一些，如果要更多的功能的话我们还是需要自己DIY一个Finder的。自己DIY一个Finder并不复杂，我们只需要保证我们的Finder拥有与此类似的重载即可：
+
+template< typename ForwardIteratorT >
+
+                iterator_range<ForwardIteratorT>
+
+                operator()(
+
+                    ForwardIteratorT Begin,
+
+                    ForwardIteratorT End ) const;
+
+    至于这个Finder内部您要保存什么信息都可以由您自己决定。这和boost.tokenizer采用的策略也是类似的，因此它们两个的扩展性都是很强的。本来应该多说一些关于Boost字符串算法库的内容的，因为毕竟Tr2中有它，但是这不是这个文档的重点。
+
+ 
+
+五 boost.tokenizer
+    boost.tokenizer是一个专门提供的字符串分词库，它本身由视图容器和一些迭代器以及迭代器视图组成。虽然我认为可能随着Boost字符串算法库的日趋成熟和强大，这个库可能会被拿掉，但是研究和学习它的一些东西还是有一些价值的。
+
+ 
+
+5.1 组件
+5.1.1 tokenizer
+
+tokenizer是一个视图容器，它本身并不包含具体的数据，它存在于boost\tokenizer.hpp中。
+
+template <
+
+    typename TokenizerFunc = char_delimiters_separator<char>, 
+
+    typename Iterator = std::string::const_iterator,
+
+    typename Type = std::string
+
+  >
+
+  class tokenizer
+
+TokenizerFunc : 一个符合TokenizerFunc概念的拆分工具。
+
+Iterator : 用于访问每个拆分后数据的迭代器。
+
+Type: 用于保存拆分后的数据。
+
+ 
+
+5.1.2 token_iterator
+
+token_iterator是一个迭代器，它用于访问我们的拆分后数据，它位于boost\token_iterator.hpp中。
+
+template <class TokenizerFunc, class Iterator, class Type>
+
+  class token_iterator
+
+      : public iterator_facade<
+
+            token_iterator<TokenizerFunc, Iterator, Type>
+
+          , Type
+
+          , typename detail::minimum_category<
+
+                forward_traversal_tag
+
+              , typename iterator_traversal<Iterator>::type
+
+            >::type 
+
+          , const Type&
+
+        >
+
+这是它的声明，如果您不了解新式迭代器的概念以及模板元编程，可能理解这段代码有一些困难，但是这并不重要。我简单告诉您的就是从iterator_façade派生可以很轻松的得到一些迭代器的行为，同时只需要派生类实现一些必要的成员函数以符合其概念即可。后面的一个模板元过程只是保证我们的迭代器最多只能是前向迭代器，即使我们使用一个随机迭代器来具现化token_iterator也会被当做前向迭代器。通常从iterator_façade派生都需要将类iterator_core_access设置为友元类。
+
+迭代器token_iterator保存了如下数据成员：
+
+      TokenizerFunc f_;
+
+      Iterator begin_;
+
+      Iterator end_;
+
+      bool valid_;
+
+      Type tok_;
+
+它们分别是：分词工具类对象、开始位置、结束位置、有效位以及结果。
+
+在token_iterator的实现中，这两个函数很重要：
+
+void increment(){
+
+          BOOST_ASSERT(valid_);
+
+          valid_ = f_(begin_,end_,tok_);
+
+      }
+
+ 
+
+      const Type&  dereference() const {
+
+          BOOST_ASSERT(valid_);
+
+          return tok_;
+
+  }
+
+    他们分别对应了迭代器自增和提领操作。因此我们可以知道提领操作返回的只是一个常引用，并不会有什么太大的开销，而对于自增来说，它的开销取决于拆分工具的实现。更直接的来说就是取决于拆分工具的operator ()的实现。
+
+ 
+
+5.1.3 分词工具类(TokenizerFunc)的概念模型
+
+boost.tokenizer为我们提供了四个内置的工具类，它们分别是：char_separator、escaped_list_separator、offset_separator以及char_delimiters_separator。其中char_delimiters_separator已经被deprecated了，我们应该使用char_separator来代替它。它们的实现都位于boost\token_functions.hpp中。
+
+在详细介绍这种工具类之前必须描述一下它的模型和概念，因为如果我们要自己DIY一个分词工具类的话，那么就需要符合它的规则。
+
+首先TokenizerFunc在应用中被tokenizer和token_iterator按值保存，因此它应该是可拷贝构造的，参考源码我们可以发现类似的代码：
+
+void assign(Iterator first, Iterator last, const TokenizerFunc& f){
+
+      assign(first,last);
+
+      f_ = f;
+
+    }
+
+因此，TokenizerFunc应该是可赋值的。由于不存在友元关系，因此这两个函数应该必须是public的。
+
+参考tokenizer和token_iterator的实现还可以发现用到它的其它地方，下面是一个摘录：
+
+void initialize(){
+
+          if(valid_) return;
+
+          f_.reset();
+
+          valid_ = (begin_ != end_)?
+
+              f_(begin_,end_,tok_):false;
+
+      }
+
+    因此我们可以推断出TokenizerFunc应该具有一个reset的成员函数，它的意义应该是保证迭代器可以用于一个新的分析得以进行。另外还应该具有一个operator ()的重载，这个重载应该具有三个或者更多的参数，并且支持3个参数的调用（其它的参数有默认值）。这至少的三个参数是开始位置、结束位置以及保存分析结果的tok_，这里的tok_应该是作为引用传递的。并且这个operator()总是有一个bool返回值，如果返回true则代表分析可以继续；如果返回false则对迭代器的有效性产生影响。
+
+ 
+
+5.2 工具类解析
+5.2.1 char_separator
+
+    char_separator可能是我们最常用到的工具了，让我们先学会如何使用它。例子1(摘自boost文档)：
+
+#include <iostream>
+
+#include <string>
+
+#include <algorithm>
+
+using namespace std;
+
+ 
+
+#include <boost/tokenizer.hpp>
+
+ 
+
+int main()
+
+{ 
+
+   std::string str = ";;Hello|world||-foo--bar;yow;baz|";  
+
+   typedef boost::tokenizer<boost::char_separator<char> >     tokenizer;  
+
+   boost::char_separator<char> sep("-;|"); 
+
+   tokenizer tokens(str, sep); 
+
+   for (tokenizer::iterator tok_iter = tokens.begin();
+
+      tok_iter != tokens.end();
+
+      ++tok_iter) 
+
+   {
+
+      std::cout << "<" << *tok_iter << "> "; 
+
+   }
+
+   
+
+   std::cout << "\n";
+
+   
+
+   return 0;
+
+}
+
+输出：
+
+<Hello> <world> <foo> <bar> <yow> <baz>
+
+请按任意键继续. . .
+
+它除了分隔符之外其它全部使用默认的参数，这将使得分词过程将遗弃所有的sep参数中的字符。但是char_separator并不仅仅是作为strtok的替代物存在的，它比strtok强大得多。
+
+下面是char_separator的数据成员：
+
+private:
+
+    string_type m_kept_delims;
+
+    string_type m_dropped_delims;
+
+    bool m_use_ispunct;
+
+    bool m_use_isspace;
+
+    empty_token_policy m_empty_tokens;
+
+bool m_output_done;
+
+char_separator多了这样的一些概念：遗弃分隔符、保留分隔符以及empty开关。
+
+遗弃分隔符：我们可以简单的认为它就是不会出现在分割后的任何一个结果里面。
+
+保留分隔符：任何一个保留分隔符都将作为一个独立的结果存在。
+
+empty开关：处理是否将empty视为一个结果。
+
+ 
+
+将刚才的代码做一点点简单的修改：
+
+boost::char_separator<char> sep("-;", "|");
+
+其它不变，我们将得到输出：
+
+<Hello> <|> <world> <|> <|> <foo> <bar> <yow> <baz> <|>
+
+请按任意键继续. . .
+
+另外如果将输出字符串修改为这样：
+
+std::string str = ";;Hello|wor ld||-foo--bar;yo w;baz|";
+
+此时将得到输出：
+
+<Hello> <|> <wor ld> <|> <|> <foo> <bar> <yo w> <baz> <|>
+
+请按任意键继续. . .
+
+我们可以看到空格并没有被视为一个分隔符。要想将空格视为分隔符需要在sep的第一个参数中显式的指定，比如：
+
+boost::char_separator<char> sep("-; ", "|" );
+
+现在来看保留empty的情况，代码如下：
+
+#include <iostream>
+
+#include <string>
+
+#include <algorithm>
+
+using namespace std;
+
+ 
+
+#include <boost/tokenizer.hpp>
+
+ 
+
+int main()
+
+{ 
+
+   std::string str = ";;Hello|wor ld||-foo--bar;yo w;baz|";  
+
+   typedef boost::tokenizer<boost::char_separator<char> >     tokenizer;  
+
+   boost::char_separator<char> sep("-;", "|", boost::keep_empty_tokens ); 
+
+   tokenizer tokens(str, sep); 
+
+   for (tokenizer::iterator tok_iter = tokens.begin();
+
+      tok_iter != tokens.end();
+
+      ++tok_iter) 
+
+   {
+
+      std::cout << "<" << *tok_iter << "> "; 
+
+   }
+
+   
+
+   std::cout << "\n";
+
+   
+
+   return 0;
+
+}
+
+结果：
+
+<> <> <Hello> <|> <wor ld> <|> <> <|> <> <foo> <> <bar> <yo w> <baz> <|> <>
+
+请按任意键继续. . .
+
+其实，在绝大多数时候，我们都只需要使用默认的参数即可：
+
+explicit 
+
+         char_separator(const Char* dropped_delims,
+
+         const Char* kept_delims = 0,
+
+         empty_token_policy empty_tokens = drop_empty_tokens)
+
+下面是一个简单例程（选自boost文档）：
+
+#include <iostream>
+
+#include <string>
+
+#include <algorithm>
+
+using namespace std;
+
+ 
+
+#include <boost/tokenizer.hpp>
+
+ 
+
+int main()
+
+{ 
+
+   std::string str = "This is,  a test";
+
+   typedef boost::tokenizer<boost::char_separator<char> > Tok;
+
+   boost::char_separator<char> sep; // 缺省构造  
+
+   Tok tok(str, sep);
+
+   for(Tok::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter)
+
+      std::cout << "<" << *tok_iter << "> ";   
+
+   std::cout << "\n";
+
+ 
+
+   return 0;
+
+}
+
+输出：
+
+<This> <is> <,> <a> <test>
+
+请按任意键继续. . .
+
+ 
+
+5.2.2 escaped_list_separator
+
+这个组件用于分析和提取csv格式的字符串。关于csv: http://baike.baidu.com/view/468993.htm
+
+下面是一个简单例程(修改自boost文档)：
+
+#include <iostream>
+
+#include <string>
+
+#include <algorithm>
+
+using namespace std;
+
+ 
+
+#include <boost/tokenizer.hpp>
+
+using namespace boost;
+
+ 
+
+int main()
+
+{ 
+
+   try
+
+   {
+
+      string s = "Field 1,\"putting quotes around fields, allows commas\",Field 3";   
+
+      tokenizer<escaped_list_separator<char> > tok(s);  
+
+ 
+
+      for(tokenizer<escaped_list_separator<char> >::iterator beg=tok.begin(); beg!=tok.end();++beg)
+
+      {   
+
+         cout << *beg << "\n";  
+
+      }
+
+   }
+
+   catch( boost::escaped_list_error& e )
+
+   {
+
+      cerr<< e.what() << endl;
+
+   }
+
+ 
+
+   return 0;
+
+}
+
+输出：
+
+Field 1
+
+putting quotes around fields, allows commas
+
+Field 3
+
+请按任意键继续. . .
+
+    我建议您不要用它，因为它有很多问题，这个稍后再说。
+
+ 
+
+5.2.3 offset_separator
+
+这个工具类很简单，它的构造如下：
+
+template <typename Iter>
+
+      offset_separator(Iter begin, Iter end, bool wrap_offsets = true,
+
+         bool return_partial_last = true)
+
+         : offsets_(begin,end), current_offset_(0),
+
+         wrap_offsets_(wrap_offsets),
+
+         return_partial_last_(return_partial_last) { }
+
+ 
+
+      offset_separator()
+
+         : offsets_(1,1), current_offset_(),
+
+         wrap_offsets_(true), return_partial_last_(true) { }
+
+重要的概念有两个(选自boost文档)：
+
+wrap_offsets_: 指明当所有偏移量用完后是否回绕到偏移量序列的开头继续。例如字符串 "1225200101012002" 用偏移量 (2,2,4) 分解，如果 wrap_offsets_ 为 true, 则分解为 12 25 2001 01 01 2002. 如果 wrap_offsets_为 false, 则分解为 12 25 2001，然后就由于偏移量用完而结束。
+
+return_partial_last_: 指明当被分解序列在生成当前偏移量所需的字符数之前结束，是否创建一个单词，或是忽略它。例如字符串 "122501" 用偏移量 (2,2,4) 分解，如果 return_partial_last_ 为 true，则分解为 12 25 01. 如果为 false, 则分解为 12 25，然后就由于序列中只剩下2个字符不足4个而结束。
+
+ 
+
+简单的例程（选自boost文档）：
+
+#include <iostream>
+
+#include <string>
+
+#include <algorithm>
+
+using namespace std;
+
+ 
+
+#include <boost/tokenizer.hpp>
+
+using namespace boost;
+
+ 
+
+int main()
+
+{ 
+
+   string s = "12252001"; 
+
+   int offsets[] = {2,2,4};
+
+   offset_separator f(offsets, offsets+3);   
+
+   tokenizer<offset_separator> tok(s,f);  
+
+   for(
+
+      tokenizer<offset_separator>::iterator beg=tok.begin();
+
+      beg!=tok.end();
+
+      ++beg
+
+      )
+
+   {  
+
+      cout << *beg << "\n"; 
+
+   }
+
+ 
+
+   return 0;
+
+}
+
+输出：
+
+12
+
+25
+
+2001
+
+请按任意键继续. . .
+
+ 
+
+5.3 boost.tokenizer的缺陷
+    虽然boost.tokenizer是本文档的重点，但是我对于它的态度是这样的：认真的学习它，领会它好的地方，学会它的设计思路和方法，找出它的缺陷，然后永远不要用它或者自己优化之后再用它。
+
+ 
+
+5.3.1 效率问题
+
+参考escaped_list_separator的实现可以发现，对字符串的查找动作使用的是标准库泛型算法find_if。
+
+bool is_escape(Char e) {
+
+         char_eq f(e);
+
+         return std::find_if(escape_.begin(),escape_.end(),f)!=escape_.end();
+
+      }
+
+      bool is_c(Char e) {
+
+         char_eq f(e);
+
+         return std::find_if(c_.begin(),c_.end(),f)!=c_.end();
+
+      }
+
+      bool is_quote(Char e) {
+
+         char_eq f(e);
+
+         return std::find_if(quote_.begin(),quote_.end(),f)!=quote_.end();
+
+      }
+
+如上所示，很明显，这种搜索方法肯定不如字符串自带的find函数，实际上在这里find_if没有必要。参考Visual c++ 2008 sp1的STL中find_if的实现：
+
+template<class _InIt,
+
+   class _Pr> inline
+
+   _InIt _Find_if(_InIt _First, _InIt _Last, _Pr _Pred)
+
+   {  // find first satisfying _Pred
+
+   _DEBUG_RANGE(_First, _Last);
+
+   _DEBUG_POINTER(_Pred);
+
+   for (; _First != _Last; ++_First)
+
+      if (_Pred(*_First))
+
+         break;
+
+   return (_First);
+
+   }
+
+ 
+
+template<class _InIt,
+
+   class _Pr> inline
+
+   _InIt find_if(_InIt _First, _InIt _Last, _Pr _Pred)
+
+   {  // find first satisfying _Pred
+
+   _ASSIGN_FROM_BASE(_First,
+
+      _Find_if(_CHECKED_BASE(_First), _CHECKED_BASE(_Last), _Pred));
+
+   return (_First);
+
+   }
+
+    这并没有对字符串搜索做任何优化，同时也无从优化。另外find函数对字符串搜索使用::memchr进行优化。而basic_string的成员函数find使用的是char_traits::find，而这个find也是使用::memchr来进行了优化的，对于宽字符串来说使用::wmemchr进行优化。
+
+除了搜索算法不合理之外还有重复计算的问题。参考char_separator的实现中，在
+
+template <typename InputIterator, typename Token>
+
+      bool operator()(InputIterator& next, InputIterator end, Token& tok)
+
+中有这样的代码：
+
+else 
+
+      {
+
+          if (is_dropped(*next))
+
+         {
+
+            start=++next;
+
+         }
+
+         for (; next != end && !is_dropped(*next) && !is_kept(*next); ++next)
+
+         {
+
+            assigner::plus_equal(tok,*next);
+
+         }
+
+         m_output_done = true;
+
+      }
+
+    很明显，is_dropped很有可能会遭遇重复计算的问题，或许is_dropped效率很高，但是我想再快也比不过访问一个bool变量吧？这样的行为在其它地方也可以看到。
+
+ 
+
+5.3.2 字符集问题
+
+    支持多字符集是一个库是否强大的标志之一，因为标准库的basic_string提供了char和wchar_t的实现，那么我们的字符串分词也应该至少支持这两种字符，然而实际上我们发现boost.tokenizer做不到。
+
+比如下面的代码：
+
+explicit escaped_list_separator(Char  e = '\\',
+
+         Char c = ',',Char  q = '\"')
+
+         : escape_(1,e), c_(1,c), quote_(1,q), last_(false) { }
+
+比如当使用wchar_t来具现化的时候，这能通过编译吗？不能。
+
+再次参考char_separator的两个私有函数：
+
+       bool is_kept(Char E) const
+
+      {  
+
+         if (m_kept_delims.length())
+
+            return m_kept_delims.find(E) != string_type::npos;
+
+         else if (m_use_ispunct) {
+
+            return std::ispunct(E) != 0;
+
+         } else
+
+            return false;
+
+      }
+
+      bool is_dropped(Char E) const
+
+      {
+
+         if (m_dropped_delims.length())
+
+            return m_dropped_delims.find(E) != string_type::npos;
+
+         else if (m_use_isspace) {
+
+            return std::isspace(E) != 0;
+
+         } else
+
+            return false;
+
+      }
+
+    注意上面红色的部分，类似这样的操作是不能够写死的，这样无法支持wchar_t，这应该通过一个policy或者traits来实现。因此boost.tokenizer是不能很好的支持宽字符集的，至少库为我们提供的工具类不能很好的支持。相对而言，stlsoft在这方面处理的就好得多，当然我们也可以通过自己DIY一个Finder来实现更广泛的字符集支持和更具效率的字符串分词。
+
+ 
+
+六 stlsoft::string_tokeniser
+stlsoft是Matthew Wilson所做的一个程序库，它的网站是：http://www.stlsoft.org/ 
+
+我们可以免费得到它，而且它的实现全部位于头文件中，无需编译。在Matthew Wilson的书《Extended STL, Volume 1 : Collections and Iterators》中对这个字符串分词做了一些介绍，相对而言它是一个很不错的实现。其实现位于stlsoft\string\string_tokeniser.hpp中。
+
+在运行下面的程序之前，请确保已经安装和配置好了stlsoft。
+
+#include <iostream>
+
+#include <string>
+
+#include <algorithm>
+
+using namespace std;
+
+ 
+
+#include <stlsoft/string/string_tokeniser.hpp>
+
+ 
+
+int main()
+
+{
+
+   const wstring strRes(L":abc::def:ghi:jkl::?kk?dd::::::::");
+
+   stlsoft::string_tokeniser< wstring, wchar_t > tokens( strRes, L':' );
+
+ 
+
+   wcout.imbue( locale("chs") );
+
+   copy(
+
+      tokens.begin(),
+
+      tokens.end(),
+
+      ostream_iterator< wstring, wstring::value_type >( wcout, L"\n" ) );
+
+ 
+
+   return 0;
+
+};
+
+输出：
+
+abc
+
+def
+
+ghi
+
+jkl
+
+?kk?dd
+
+请按任意键继续. . .
+
+ 
+
+七 效率大PK
+现在让我们来对上面所提到的一些东东进行测试吧，首先说明一下这个测试是不完整的，并不代表它们每一个在各种不同情况下的表现。设计本来就是一个相互取舍的过程，也许它在这种情况下表现不好，但是到了另外一种情况下它反而是最好的选择，因此，不能以这样的一个简单的测试来彻底肯定或者彻底的否定它们中的任何一个。在这里我们忽略vector可能的内存重分配对效率的影响。
+
+源码如下：
+
+#include <iostream>
+
+#include <string>
+
+#include <vector>
+
+#include <functional>
+
+#include <algorithm>
+
+using namespace std;
+
+ 
+
+#define __HAVE_STL_SOFT__ // 如果没有安装stlsoft请注释这一行即可
+
+ 
+
+#ifdef __HAVE_STL_SOFT__
+
+#include <stlsoft/string/string_tokeniser.hpp>
+
+#endif // #ifdef __HAVE_STL_SOFT__
+
+ 
+
+#include <boost/tokenizer.hpp>
+
+#include <boost/algorithm/string.hpp>
+
+#include <boost/progress.hpp>
+
+ 
+
+using namespace boost;
+
+ 
+
+int main()
+
+{
+
+   const string str( "abc*def*eght*kkk*ddd" );
+
+   const int ciCount = 20000;
+
+ 
+
+   typedef std::vector< string>  STR_VEC;
+
+   STR_VEC vec;
+
+   vec.reserve( 1000 );
+
+   
+
+   {
+
+      cout<< "C-strtok_s: ";
+
+      char sz[100];      
+
+ 
+
+      boost::progress_timer timer;
+
+      int i = 0;
+
+      while( i++ < ciCount )
+
+      {
+
+         vec.clear();
+
+         char* pTok = NULL;
+
+         char* pContext = NULL;
+
+         pTok = strtok_s( sz, "*", &pContext );
+
+         while( pTok != NULL )
+
+         {
+
+            vec.push_back( pTok );
+
+            pTok = strtok_s( NULL, "*", &pContext );
+
+         }
+
+ 
+
+         strcpy_s( sz, str.c_str() );
+
+      }
+
+   }
+
+ 
+
+   vec.clear();
+
+ 
+
+   {
+
+      cout<<"boost.string_algorithm_container: ";
+
+      boost::progress_timer timer;
+
+      int i=0;
+
+      while ( i++ < ciCount )
+
+      {
+
+         vec.clear();
+
+         vec = boost::algorithm::split( vec, str, bind2nd( equal_to<char>(), '*' ) );
+
+      }
+
+   }
+
+ 
+
+   vec.resize(10); // 防止崩溃
+
+   {
+
+      cout<<"boost.string_algorithm_iterator: ";
+
+      boost::progress_timer timer;
+
+      int i=0;
+
+      while( i++ < ciCount )
+
+      {
+
+         boost::algorithm::split_iterator< string::const_iterator > iter(
+
+            str, boost::algorithm::token_finder( bind2nd( equal_to<char>(), '*' ) ) 
+
+            );
+
+         boost::algorithm::split_iterator< string::const_iterator > end;
+
+         int index =0;
+
+         while( iter != end )
+
+         {
+
+            // 防止多余的Copy动作
+
+            // vec.push_back( string( boost::begin(*iter), boost::end(*iter) ) );
+
+            vec[index++].assign( boost::begin(*iter), boost::end(*iter) );
+
+            ++iter;
+
+         }
+
+      }
+
+   }
+
+ 
+
+   {
+
+      cout<<"boost.tokenizer: ";
+
+      boost::progress_timer timer;
+
+      int i=0;
+
+      while( i++ < ciCount )
+
+      {
+
+         vec.clear();
+
+         boost::tokenizer< boost::char_separator<char> > tokens( str, boost::char_separator<char>("*") );
+
+ 
+
+         copy( tokens.begin(), tokens.end(), back_insert_iterator< STR_VEC >( vec ) );
+
+      }
+
+   }
+
+ 
+
+#ifdef __HAVE_STL_SOFT__
+
+   vec.clear();
+
+   {
+
+      cout<< "stlsoft.string_tokeniser: ";
+
+      boost::progress_timer timer;
+
+ 
+
+      int i=0;
+
+      while( i++ < ciCount )
+
+      {  
+
+         vec.clear();
+
+         stlsoft::string_tokeniser< string, char > tokens( str, '*' );
+
+         copy( tokens.begin(), tokens.end(), back_insert_iterator< STR_VEC >( vec ) );
+
+      }     
+
+   }
+
+#endif // #ifdef __HAVE_STL_SOFT__
+
+ 
+
+   return 0;
+
+};
+
+我们对同样的字符串执行同样的拆分操作2万次。在Debug模式下面有输出：
+
+C-strtok_s: 0.42 s
+
+ 
+
+boost.string_algorithm_container: 7.56 s
+
+ 
+
+boost.string_algorithm_iterator: 5.55 s
+
+ 
+
+boost.tokenizer: 2.53 s
+
+ 
+
+stlsoft.string_tokeniser: 2.19 s
+
+ 
+
+请按任意键继续. . .
+
+在Release下面有输出：
+
+C-strtok_s: 0.04 s
+
+ 
+
+boost.string_algorithm_container: 0.14 s
+
+ 
+
+boost.string_algorithm_iterator: 0.05 s
+
+ 
+
+boost.tokenizer: 0.14 s
+
+ 
+
+stlsoft.string_tokeniser: 0.05 s
+
+ 
+
+请按任意键继续. . .
+
+通过分析我们知道，C的自然是最快的，因为它不需要多余的Copy动作，而其它的都会有这样的操作，同时C库提供的字符串函数大多用汇编写的，所以比较快。但是当我们让编译器全速优化之后发现boost字符串算法库的迭代器和stlsoft的迭代器也是相当快的。最慢的当然是使用容器来存放结果了，因为它始终都会不断的拷贝。
+
+在实际应用当中我们应该具体问题具体分析，根据操作的环境选择最适合的处理方式。举个简单的例子，比如我们只对拆分结果的第某个感兴趣，那么很显然stlsoft的迭代器就更适合一些，为什么呢？刚才我们看过一些boost.tokenizer的源码，知道在迭代器中它保存了一个tok_作为结果的容器，每次自增都会将结果拷贝到这个tok_中，也就是说每次自增都会有拷贝发生，而对于stlsoft便不是如此，它在迭代器中保存的是两个迭代器所组成的范围，只要当我们提领的时候才会构造字符串：
+
+V operator *() const
+
+        {
+
+            return traits_type::create(m_find0, m_find1);
+
+        }
+
+很明显这种效率会高于boost.tokenizer。但是另外一个情况下，比如说我们需要多次提领同一迭代器，那么对于stlsoft来说便不合适了，因为每次提领它都会构造，使得最终我们多次构造字符串。而boost.tokenizer这时候更适合，因为它传回的是保存在内部的tok_的常引用:
+
+const Type&  dereference() const 
+
+{
+
+            BOOST_ASSERT(valid_);
+
+            return tok_;
+
+    }
+
+    这也从另外一个角度证明了一个观点：没有绝对的好与不好，只有适合与不适合的问题。
+
+ 
+
+本文原创，转帖请著名出处。参考资料已经于文中指出。另外不保证文中所有信息都是正确的，没有人是绝对正确的。如果您有不同的见解我很乐意与您讨论、与您相互分享知识。
+
+QQ :84638372
+
+Blog: http://84638372.qzone.qq.com/
+
+ 
+
+董波
+
+2009/5/21
+
+ 
+
+ 
+
+ 工整版的Word文档：
+
+
+http://ishare.iask.sina.com.cn/f/5164324.html
+ 
+
+ 
+
+posted on 2009-05-21 13:43 董波 阅读(2228) 评论(4)  编辑 收藏 引用 
+
+ C库、boost.tokenizer、stlsoft.string_tokeniser讨论" trackback:ping="http://www.cppblog.com/db123/services/trackbacks/83556.aspx" /> --> 
+评论
+# re: 【原创】C++字符串分词 -->C库、boost.tokenizer、stlsoft.string_tokeniser讨论 2009-05-21 16:50 janvyking999 
+群主真牛！！！  回复  更多评论    
+
+# re: 【原创】C++字符串分词 -->C库、boost.tokenizer、stlsoft.string_tokeniser讨论 2009-05-21 16:53 janvyking999 
+第一次坐个沙发，舒服啊！ 现在以我的水平还看不了这些，呵呵，以后看^_^  回复  更多评论    
+
+# re: 【原创】C++字符串分词 -->C库、boost.tokenizer、stlsoft.string_tokeniser讨论 2009-05-23 17:24 金庆 
+使用方便性上应该是boost::algorithm::split第1吧？  回复  更多评论    
+
+# re: 【原创】C++字符串分词 -->C库、boost.tokenizer、stlsoft.string_tokeniser讨论 2010-08-13 00:23 liuyix 
+其实我觉得复杂一点的分词工具还是交给词法分析器生成为好  回复  更多评论    
+
+http://www.cppblog.com/db123/archive/2009/05/21/83556.html
