@@ -1,0 +1,92 @@
+1、 为什么在纹理采样时需要texture filter（纹理过滤）。
+
+我们的纹理是要贴到三维图形表面的，而三维图形上的pixel中心和纹理上的texel中心并不一至（pixel不一定对应texture上的采样中心texel），大小也不一定一至。当纹理大于三维图形表面时，导至一个像素被映射到许多纹理像素上;当维理小于三维图形表面时，许多个象素都映射到同一纹理。
+
+当这些情况发生时，贴图就会变得模糊或发生错位，马赛克。要解决此类问题，必须通过技术平滑texel和pixel之间的对应。这种技术就是纹理滤波。
+
+不同的过滤模式，计算复杂度不一样，会得到不同的效果。过滤模式由简单到复杂包括：Nearest Point Sampling（最近点采样），Bilinear（双线性过滤）、Trilinear（三线性过滤）、Anisotropic Filtering（各向异性过滤）。
+
+在了解这些之前，有必要了解什么是MipMap和什么时各向同性，各向异性。
+
+2、 什么是MipMap?
+
+Mipmap由Lance Williams 在1983的一篇文章“Pyramidal parametrics”中提出。Wiki中有很详细的介绍( http://en.wikipedia.org/wiki/Mipmap ) . 比如一张256X256的图，在长和宽方向每次减少一倍，生成：128X128,64X64,32X32,16X16,8X8,4X4,2X2,1X1，八张图，组成MipMap,如下图示。
+
+
+
+Mipmap早已被硬件支持，硬件会自动为创建的Texture生成mipmap的各级。在D3D的API：CreateTexture中有一个参数levels，就是用于指定生成mipmap到哪个级别，当不指定时就一直生成到1X1。
+
+3、 什么是各向同性和各向异性？
+
+当需要贴图的三维表面平行于屏幕(viewport)，则是各向同性的。当要贴图的三维表面与屏幕有一定角度的倾斜，则是各向异性的。
+
+也可以这样理解，当一个texture贴到三维表面上从Camera看来没有变形，投射到屏幕空间中后U方向和V方向比例仍然是一样的，便可以理解成各向同性。反之则认为是各向异性。
+
+4、 Nearest Point Sampling（最近点采样）
+
+这个最简单，每个像素的纹理坐标，并不是刚好对应Texture上的一个采样点texel，怎么办呢？最近点采样取最接近的texel进行采样。
+
+当纹理的大小与贴图的三维图形的大小差不多时，这种方法非常有效和快捷。如果大小不同，纹理就需要进行放大或缩小，这样，结果就会变得矮胖、变形或模糊。
+
+5、 Bilinear（双线性过滤）
+
+双线性过滤以pixel对应的纹理坐标为中心，采该纹理坐标周围4个texel的像素，再取平均，以平均值作为采样值。
+
+双线性过滤像素之间的过渡更加平滑，但是它只作用于一个MipMap Level,它选取texel和pixel之间大小最接近的那一层MipMap进行采样。当和pixel大小匹配的texel大小在两层Mipmap level之间时，双线性过滤在有些情况效果就不太好。于是就有了三线性过滤。
+
+6、 Trilinear（三线性过滤）
+
+三线性过滤以双线性过滤为基础。会对pixel大小与texel大小最接近的两层Mipmap level分别进行双线性过滤，然后再对两层得到的结果进生线性插值。
+
+三线性过滤在一般情况下效果非常理想了。但是到目前为止，我们均是假设是texture投射到屏幕空间是各向同性的。但是当各向异性的情况时，效果仍然不理想，于是产生了Anisotropic Filtering（各向异性过滤）。
+
+7、 Anisotropic Filtering（各向异性过滤）
+
+先看效果，左边的图采用三线性过滤，右边的图采用各向异性过滤。
+
+
+
+
+ 
+
+ 
+
+
+    各向同性的过滤在采样的时候，是对正方形区域里行采样。各向异性过滤把纹理与屏幕空间的角度这个因素考虑时去。简单地说，它会考滤一个pixel(x:y=1:1)对应到纹理空间中在u和v方向上u和v的比例关系，当u:v不是1:1时，将会按比例在各方向上采样不同数量的点来计算最终的结果(这时采样就有可能是长方形区域)。
+
+我们一般指的Anisotropic Filtering(AF)均是基于三线过滤的Anisotropic Filtering，因此当u:v不为1:1时，则Anisotropic Filtering比Trilinear需要采样更多的点，具体要采多少，取决于是多少X的AF,现在的显卡最多技持到16X AF。
+
+当开启16X AF的时候，硬件并不是对所有的texture采样都用16X AF，而是需要先计算屏幕空间与纹理空间的夹角(量化后便是上面所说的u:v)，只有当夹角大到需要16X时，才会真正使用16X.
+
+如果想了解AF的实现原理，可以查阅此篇Paper: “Implementing an anisotropic texture filter”. 现在AF都是硬件实现，因此只有少数人才清楚AF就尽是怎样实现了（其实细节我也没搞清楚），其实完全可以由Pixel Shader来实现AF，当然性能和由硬件做是没得比的。
+
+8、 各过滤模式性能比较。
+
+ 下表是各种过滤模式采一个pixel需要sample的次数：
+
+ 
+ Sample Number
+ 
+Nearest Point Sampling
+ 1
+ 
+Bilinear
+ 4
+ 
+Trilinear
+ 8
+ 
+Anisotropic Filtering 4X
+ 32
+ 
+Anisotropic Filtering 16X
+ 128
+ 
+
+   
+
+Anisotropic Filtering 16X效果最好，但是显卡Performance会下降很多，当然也是测试你手中显卡Texture Unit的好方法。如果你觉得你的显卡够牛，那么就把AA和AF都打到最高再试试吧：）
+
+ 
+
+http://www.cnblogs.com/cxrs/archive/2009/10/18/1585270.html
