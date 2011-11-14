@@ -1,0 +1,103 @@
+/*  
+ * glversion_parse.cpp  
+ * Copyright (C) 2005 3Dlabs Inc. Ltd.  
+ * mew 2005-03-28  
+ *   
+ * This example demonstrates best-practices for parsing OpenGL version strings.  
+ *  
+ * From the OpenGL v2.0 Specification, Section 6.1.11:  
+ * The VERSION and SHADING LANGUAGE VERSION strings are laid out as follows:  
+ *     <version number><space><vendor-specific information>  
+ * The version number is either of the form major number.minor number or  
+ * major number.minor number.release number, where the numbers all have one or  
+ * more digits. The release number and vendor specific information are optional.  
+ *   
+ * The important point is version number is NOT a floating point number,  
+ * but rather a series of dot-delimited integers.  
+*/   
+   
+#ifdef WIN32    
+#include <windows.h>    
+#endif    
+#include <GL/glut.h>    
+#include <stdio.h>    
+#include <string.h>    
+   
+#ifndef GL_SHADING_LANGUAGE_VERSION    
+#define GL_SHADING_LANGUAGE_VERSION 0x8B8C    
+#endif    
+   
+/***************************************************************************/   
+/* Parse GL_VERSION and return the major and minor numbers in the supplied  
+ * integers.  
+ * If it fails for any reason, major and minor will be set to 0.  
+ * Assumes a valid OpenGL context.  
+*/   
+   
+void getGlVersion( int *major, int *minor )   
+{   
+    const char* verstr = (const char*)glGetString( GL_VERSION );   
+    if( (verstr == NULL) || (sscanf( verstr, "%d.%d", major, minor ) != 2) )   
+    {   
+        *major = *minor = 0;   
+        fprintf( stderr, "Invalid GL_VERSION format!!!\n" );   
+    }   
+}   
+   
+/***************************************************************************/   
+/* Parse GL_SHADING_LANGUAGE_VERSION and return the major and minor numbers  
+ * in the supplied integers.  
+ * If it fails for any reason, or GLSL is not supported, major and minor will  
+ * be set to 0.  
+ * Assumes a valid OpenGL context.  
+*/   
+   
+void getGlslVersion( int *major, int *minor )   
+{   
+    int gl_major, gl_minor;   
+    getGlVersion( &gl_major, &gl_minor );   
+   
+    *major = *minor = 0;   
+    if( gl_major == 1 )   
+    {   
+        /* GL v1.x can only provide GLSL v1.00 as an extension */   
+        const char* extstr = (const char*)glGetString( GL_EXTENSIONS );   
+        if( (extstr != NULL) && (strstr( extstr, "GL_ARB_shading_language_100" ) != NULL) )   
+        {   
+            *major = 1;   
+            *minor = 0;   
+        }   
+    }   
+    else if( gl_major >= 2 )   
+    {   
+        /* GL v2.0 and greater must parse the version string */   
+        const char* verstr = (const char*)glGetString( GL_SHADING_LANGUAGE_VERSION );   
+        if( (verstr == NULL) || (sscanf( verstr, "%d.%d", major, minor ) != 2) )   
+        {   
+            *major = *minor = 0;   
+            fprintf( stderr, "Invalid GL_SHADING_LANGUAGE_VERSION format!!!\n" );   
+        }   
+    }   
+}   
+   
+/***************************************************************************/   
+   
+int main(int argc, char** argv)   
+{   
+    /* use GLUT to create an OpenGL context */   
+    glutInit(&argc, argv);   
+    glutCreateWindow(argv[0]);   
+   
+    /* retrieve the GL_VERSION major and minor numbers. */   
+    int gl_major, gl_minor;   
+    getGlVersion( &gl_major, &gl_minor );   
+    printf( "GL_VERSION major=%d minor=%d\n", gl_major, gl_minor );   
+   
+    /* retrieve the GL_SHADING_LANGUAGE_VERSION major and minor numbers. */   
+    int glsl_major, glsl_minor;   
+    getGlslVersion( &glsl_major, &glsl_minor );   
+    printf( "GL_SHADING_LANGUAGE_VERSION major=%d minor=%d\n", glsl_major, glsl_minor );   
+   
+    return 0;    
+}   
+http://www.pudn.com/downloads94/sourcecode/graph/detail374283.html

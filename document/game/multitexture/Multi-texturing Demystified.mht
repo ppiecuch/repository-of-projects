@@ -1,0 +1,861 @@
+From: <¨®¨¦ Microsoft Internet Explorer 5 ¡À¡ê¡ä?>
+Subject: GameModel.com - Multi-texturing Demystified
+Date: Sat, 12 Nov 2011 17:50:55 +0800
+MIME-Version: 1.0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://ttoprpg.com/articles/multitexturing.htm
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.6157
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>GameModel.com - Multi-texturing Demystified</TITLE>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.2900.6148" name=3DGENERATOR></HEAD>
+<BODY text=3D#000000 bgColor=3D#ffffff>
+<DIV align=3Dcenter>
+<P><FONT face=3D"Verdana, Arial, Helvetica, =
+sans-serif"><B>Multi-texturing=20
+Demystified </B></FONT></P>
+<P align=3Dleft><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Not too=20
+long ago, I finally got into multi-texturing. Apparently, the most =
+recent video=20
+cards now accomplish multi-texturing through their pixel shader =
+abilities, and=20
+those abilities do offer a somewhat deeper level of control. That aside, =
+
+multi-texturing is a good introduction into the more advanced aspects of =
+texture=20
+mapping.</FONT></P>
+<P align=3Dleft><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>I had a=20
+hard time getting my mind around it, though, since there were plenty of =
+coding=20
+samples but no tutorials that properly illustrated the methodology =
+behind=20
+figuring out which parameters you need to set. Unfortunately, in order =
+to do so,=20
+you must have a fairly complete picture of everything the =
+multi-texturing=20
+pipeline can accomplish. I'll present a few samples here to get you =
+started=20
+(something I wish I would have found), and links to the primary =
+documentation=20
+for the API's.</FONT></P>
+<P align=3Dleft><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Here=20
+are the examples:</FONT></P></DIV>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>I =
+want to=20
+  render a texture on a polygon affected by light, then render an alpha =
+decal on=20
+  top of it that isn't affected by light</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>I =
+want to=20
+  simulate a spotlight shining on a wall, but also modulate the wall =
+with the=20
+  vertex colors to make it appear that two light sources are =
+illuminating the=20
+  wall.</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>I =
+have two=20
+  ground textures and want to blend them together on a heightmapped =
+terrain=20
+  using the alpha component of the vertices, then modulate the result =
+with the=20
+  color of the vertices to simulate lighting.</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+size=3D-1>Documentation:</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>NOTE: =
+Opening=20
+these documents right now may cause information overload, you may want =
+to look=20
+at my discussions below first.</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1><A=20
+  href=3D"http://www.opengl.org/sdk/docs/man/xhtml/glTexEnv.xml">OpenGL=20
+  multi-texturing</A> (via glTexEnv)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>DirectX <A=20
+  =
+href=3D"http://msdn.microsoft.com/archive/default.asp?url=3D/archive/en-u=
+s/directx9_c_Dec_2005/D3DTEXTURESTAGESTATETYPE.asp">Texture=20
+  Stage States</A>, <A=20
+  =
+href=3D"http://msdn.microsoft.com/archive/default.asp?url=3D/archive/en-u=
+s/directx9_c_Dec_2005/D3DTEXTUREOP.asp">Texture=20
+  Ops</A> and <A=20
+  =
+href=3D"http://msdn.microsoft.com/archive/default.asp?url=3D/archive/en-u=
+s/directx9_c_Dec_2005/D3DTA.asp">Texture=20
+  Op Arguments</A> via the SetTextureStageState =
+function.</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1><B>A =
+basic=20
+understanding</B></FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>To get =
+
+multi-texturing working, you have to enable the levels of the pipeline =
+you plan=20
+to use, load the textures into the stages, and set the operations you =
+want to=20
+perform at each stage. Note that the textures and stage operations may =
+not=20
+necessarily be intimately tied to each other. You could be working with =
+entirely=20
+different textures or results at each stage (although DirectX is a =
+little=20
+limited in this capacity).</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>In =
+order to tell=20
+DirectX you want to multitexture, you just enable color and alpha =
+operations=20
+beyond stage 0. Multi-texturing will continue until the API encounters a =
+stage=20
+where the color and alpha ops are disabled. Operations start at 0 and =
+work their=20
+way up, and the final result is what is rendered.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>For =
+OpenGL to=20
+multi-texture, you have to enable texturing at a target higher than=20
+GL_TEXTURE0_ARB (that is, GL_TEXTURE1_ARB and up). Multi-texturing =
+continues=20
+until the API encounter a texture level for which texturing is disabled. =
+
+Operations start at stage 0 and work their way up, and the final result =
+is what=20
+is rendered.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1><B>Example 1:=20
+</B></FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1><B>I =
+want to=20
+render a texture on a polygon affected by light, then render an alpha =
+decal on=20
+top of it that isn't affected by light</B></FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+size=3D-1>Pseudo-code:</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Texture 0=20
+  receives the texture to be lit</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Texture 1=20
+  received the texture decal to be applied afterwards</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Stage 0=20
+  modulates the texture with the vertex colors (and alpha if =
+appropriate)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Stage 1 takes=20
+  the result from stage 0 and applies the decal texture (assumed to be =
+an alpha=20
+  texture) to the color portion.</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>OpenGL:</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glActiveTextureARB(GL_TEXTURE0_ARB); // start populating =
+stage=20
+0</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glEnable(GL_TEXTURE_2D);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>glBindTexture=20
+  (GL_TEXTURE_2D, texture0ID); // lit texture</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, =
+GL_COMBINE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_RGB_ARB, =
+GL_MODULATE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_RGB_ARB, =
+GL_PRIMARY_COLOR);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR); =
+// vertex=20
+  colors (lit portion)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE1_RGB_ARB, =
+GL_TEXTURE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR); =
+// this=20
+  texture's colors (stage 0)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_ALPHA_ARB, =
+GL_MODULATE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_ALPHA_ARB,=20
+  GL_PRIMARY_COLOR);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_ALPHA_ARB, =
+GL_SRC_ALPHA); //=20
+  vertex alpha</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE1_ALPHA_ARB, =
+GL_TEXTURE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND1_ALPHA_ARB, =
+GL_SRC_ALPHA); // this=20
+  texture's alpha (stage 0)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glActiveTextureARB(GL_TEXTURE1_ARB); // start populating =
+stage=20
+1</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glEnable(GL_TEXTURE_2D);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>glBindTexture=20
+  (GL_TEXTURE_2D, texture1ID); // decal texture</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, =
+GL_COMBINE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_RGB_ARB, =
+GL_INTERPOLATE); //=20
+  Perform a blend</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_RGB_ARB, =
+GL_TEXTURE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR); =
+// this=20
+  texture's colors (stage 1, decal)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE1_RGB_ARB, =
+GL_PREVIOUS);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR); =
+// result=20
+  from stage 0 (lit texture)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE2_RGB_ARB, =
+GL_TEXTURE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND2_RGB_ARB, GL_ALPHA); // =
+decal's=20
+  alpha (ends up being an alpha blend)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_ALPHA_ARB, =
+GL_REPLACE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS); =
+// result=20
+  from stage 0</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_ALPHA_ARB, =
+GL_SRC_ALPHA); // just=20
+  use the alpha value from stage 0</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glActiveTextureARB(GL_TEXTURE2_ARB);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glDisable(GL_TEXTURE_2D);</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>You'll =
+notice a=20
+pattern to how things are set up in OpenGL. First I tell =
+GL_TEXTURE_ENV_MODE to=20
+use GL_COMBINE (you can set simpler operations, it will still pass the =
+result to=20
+the next stage). Then I set up operations and parameters for COLOR and =
+ALPHA. In=20
+each section, I tell OpenGL which COLOR combine operation I want, then =
+provide=20
+the parameters in the form of the source and what part of that source I =
+use (the=20
+operand). Then I repeat for the ALPHA combine portion. Operations can =
+require 1,=20
+2 or 3 parameters. GL_REPLACE only requires 1, GL_MODULATE requires 2, =
+and=20
+GL_INTERPOLATE requires 3. Disabling GL_TEXTURE2_ARB at the end tells =
+the=20
+multi-texturing pipeline to stop when it's done with stage 1.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>Also =
+note that for=20
+stage 0, instead of GL_COMBINE, I could have just used GL_MODULATE and =
+avoided=20
+setting up all the combine parameters, since a simple modulate is what =
+we are=20
+doing there.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>Here's =
+what the=20
+same thing looks like in DirectX:</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, =
+0); //=20
+  tell it to use u, v</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_COLOROP,=20
+  D3DTOP_MODULATE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_COLORARG1,=20
+  D3DTA_TEXTURE); // texture color</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_COLORARG2,=20
+  D3DTA_DIFFUSE); // vertex color</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_ALPHAOP,=20
+  D3DTOP_MODULATE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_ALPHAARG1,=20
+  D3DTOP_TEXTURE); // texture alpha</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_ALPHAARG2,=20
+  D3DTOP_DIFFUSE); // vertex alpha</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_TEXCOORDINDEX, =
+1); //=20
+  tell it to use u2, v2</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_COLOROP,=20
+  D3DTOP_BLENDTEXTUREALPHA);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_COLORARG1,=20
+  D3DTA_TEXTURE); // decal texture</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_COLORARG2,=20
+  D3DTA_CURRENT); // result from stage 0</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_ALPHAOP,=20
+  D3DTOP_SELECTARG1); // just use alpha from stage 0</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_ALPHAARG1,=20
+  D3DTOP_CURRENT);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(2, D3DTSS_COLOROP,=20
+  D3DTOP_DISABLE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(2, D3DTSS_ALPHAOP,=20
+  D3DTOP_DISABLE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTexture(0, texture0); </FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTexture(1, texture1); </FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>It =
+certainly=20
+doesn't take as much to set it up in DirectX. But you'll find that =
+OpenGL has a=20
+slightly more flexible setup, sometimes allowing OpenGL to accomplish =
+similar=20
+results with fewer texture stages, as you'll see.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>One =
+primary=20
+difference between DirectX and OpenGL is that when you are setting up =
+COLOR and=20
+ALPHA sources for the stage operations, you don't need to specify that =
+you are=20
+using the color or alpha portions of the sources. DirectX just assumes =
+that you=20
+are using color or alpha in the various sections. It is possible to =
+substitute=20
+the alpha for the color in the color section using the =
+D3DTA_ALPHAREPLICATE=20
+flag.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>Also =
+note the=20
+differences in the terminologies:</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>OpenGL:=20
+  GL_REPLACE; DirectX: D3DTA_SELECTARG1 // replacing with specified=20
+source</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>OpenGL:=20
+  GL_PREVIOUS; DirectX: D3DTA_CURRENT // result from last stage</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>OpenGL:=20
+  GL_PRIMARY_COLOR; DirectX: D3DTA_DIFFUSE // vertex =
+colors</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>DirectX has a=20
+specific Color op for blending texture alpha, but with OpenGL you must =
+use=20
+GL_INTERPOLATE and specify all three parameters.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>To =
+perform the=20
+actual rendering in OpenGL, it looks like this (using a quad as an=20
+example):</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glBegin(GL_QUADS);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>glColor3ub(128,=20
+  64, 192); // or white with lighting enabled, you'll need normals for =
+each=20
+  vertex</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glMultiTexCoord2fARB(GL_TEXTURE0_ARB, 0, 0);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0, 0);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glVertex3f(blah0, blah0, blah0);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glMultiTexCoord2fARB(GL_TEXTURE0_ARB, 0, 1);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0, 1);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glVertex3f(blah1, blah1, blah1);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glMultiTexCoord2fARB(GL_TEXTURE0_ARB, 1, 1);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1, 1);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glVertex3f(blah2, blah2, blah2);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glMultiTexCoord2fARB(GL_TEXTURE0_ARB, 1, 0);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1, 0);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glVertex3f(blah3, blah3, blah3);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glEnd();</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>For =
+DirectX, you=20
+must first tell D3D what vertex shader you're planning to use. Make sure =
+you=20
+specify one that makes use of two sets of texture coordinates (u, v, u2 =
+and v2=20
+in your vertex structure). u and v correspond to the GL_TEXTURE0_ARB =
+coordinates=20
+above, and u2 and v2 correspond to GL_TEXTURE1_ARB. Just populate a =
+4-element=20
+vertex array with your vertex, colors and texture coordinates then call=20
+DrawPrimitive (assuming you understand enough about DirectX rendering, =
+sorry to=20
+confuse you here).</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1><B>Example 2:=20
+</B></FONT><B><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>I want=20
+to simulate a spotlight shining on a wall, but also modulate the wall =
+with the=20
+vertex colors to make it appear that two light sources are illuminating =
+the=20
+wall.</FONT></B></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+size=3D-1>Pseudo-code:</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Texture 0 is=20
+  the spotlight (a pure alpha texture)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Texture 1 is=20
+  the wall</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Stage 0 will=20
+  take the vertex colors and do an additive blend with the spotlight to =
+arrive=20
+  at a final lightmap</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Stage 1 will=20
+  modulate the result with the wall</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>OpenGL:</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glActiveTextureARB(GL_TEXTURE0_ARB); // start populating =
+stage=20
+0</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glEnable(GL_TEXTURE_2D);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>glBindTexture=20
+  (GL_TEXTURE_2D, texture0ID); // spotlight texture</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, =
+GL_COMBINE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_RGB_ARB, GL_ADD);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_RGB_ARB, =
+GL_PRIMARY_COLOR);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR); =
+// vertex=20
+  colors (lit)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE1_RGB_ARB, =
+GL_TEXTURE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND1_RGB_ARB, GL_SRC_ALPHA); =
+//=20
+  spotlight's alpha (stage 0)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_ALPHA_ARB, =
+GL_REPLACE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_ALPHA_ARB,=20
+  GL_PRIMARY_COLOR);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_ALPHA_ARB, =
+GL_SRC_ALPHA); //=20
+  vertex alpha</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glActiveTextureARB(GL_TEXTURE1_ARB); // start populating =
+stage=20
+1</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glEnable(GL_TEXTURE_2D);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>glBindTexture=20
+  (GL_TEXTURE_2D, texture1ID); // wall texture</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, =
+GL_COMBINE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_RGB_ARB, =
+GL_MODULATE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_RGB_ARB, =
+GL_TEXTURE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR); =
+// this=20
+  texture's colors (stage 1, wall)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE1_RGB_ARB, =
+GL_PREVIOUS);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR); =
+// result=20
+  from stage 0 (lightmap)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_ALPHA_ARB, =
+GL_REPLACE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_ALPHA_ARB, =
+GL_PRIMARY_COLOR); //=20
+  vertex alphas</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_ALPHA_ARB, =
+GL_SRC_ALPHA);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glActiveTextureARB(GL_TEXTURE2_ARB);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glDisable(GL_TEXTURE_2D);</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>This =
+setup only=20
+allows a pure alpha spotlight with no color information. If you want to =
+set it=20
+up for a colored spotlight, you'll need a first stage that prepares the =
+colors=20
+as texture color * texture alpha, then add it to the vertex colors in =
+stage 1 to=20
+arrive at your lightmap, then modulate it with the wall texture in stage =
+2. You=20
+will need to have the spotlight color information in the texture itself, =
+since=20
+the wall is still lit via the color information in the vertices. If you =
+want to=20
+allow a dynamically colored spotlight, you will probably have to render =
+to an=20
+offscreen texture and use that to modulate with the wall.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>Note =
+how we don't=20
+even really use the vertex alphas until we get to stage 1. When we refer =
+to them=20
+in stage 0, it's just to skip past the alpha stage with as few operands =
+as=20
+possible.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>Here =
+is the same=20
+operation in DirectX:</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, =
+0); //=20
+  tell it to use u, v</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_COLOROP,=20
+  D3DTOP_ADD);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_COLORARG1, =
+D3DTA_TEXTURE=20
+  | D3DTA_ALPHAREPLICATE); // spotlight alpha</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_COLORARG2,=20
+  D3DTA_DIFFUSE); // vertex colors</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_ALPHAOP,=20
+  D3DTOP_SELECTARG1);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_ALPHAARG2,=20
+  D3DTOP_DIFFUSE); // vertex alpha</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_TEXCOORDINDEX, =
+1); //=20
+  tell it to use u2, v2</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_COLOROP,=20
+  D3DTOP_MODULATE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_COLORARG1,=20
+  D3DTA_TEXTURE); // wall texture</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_COLORARG2,=20
+  D3DTA_CURRENT); // result from stage 0</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_ALPHAOP,=20
+  D3DTOP_SELECTARG1); // just use alpha from vertices</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_ALPHAARG1,=20
+  D3DTOP_DIFFUSE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(2, D3DTSS_COLOROP,=20
+  D3DTOP_DISABLE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(2, D3DTSS_ALPHAOP,=20
+  D3DTOP_DISABLE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTexture(0, texture0); </FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTexture(1, texture1);</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>Note =
+the use of=20
+the D3DTA_ALPHAREPLICATE flag in stage 0 so we could access the texture =
+alpha in=20
+a color operation.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1><B>Example 3: I=20
+have two ground textures and want to blend them together on a =
+heightmapped=20
+terrain using the alpha component of the vertices, then modulate the =
+result with=20
+the color of the vertices to simulate lighting.</B></FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>If you =
+are only=20
+working with two textures on a terrain, the alpha portion of the =
+vertices is a=20
+good way to blend the textures together. The color portion of the =
+vertices,=20
+then, is still available to modulate afterwards to perform =
+lighting.</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glActiveTextureARB(GL_TEXTURE0_ARB); // start populating =
+stage=20
+0</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glEnable(GL_TEXTURE_2D);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>glBindTexture=20
+  (GL_TEXTURE_2D, texture0ID); // dirt texture</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, =
+GL_COMBINE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_RGB_ARB, =
+GL_INTERPOLATE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_RGB_ARB, =
+GL_TEXTURE0_ARB);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR); =
+// dirt=20
+  texture colors</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE1_RGB_ARB, =
+GL_TEXTURE1_ARB);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR); =
+// grass=20
+  texture colors</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE2_RGB_ARB, =
+GL_PRIMARY_COLOR);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND2_RGB_ARB, GL_SRC_ALPHA; =
+// use=20
+  vertex alpha to interpolate</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_ALPHA_ARB, =
+GL_REPLACE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_ALPHA_ARB,=20
+  GL_PRIMARY_COLOR);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_ALPHA_ARB, =
+GL_SRC_ALPHA); //=20
+  vertex alpha, just pass it on</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glActiveTextureARB(GL_TEXTURE1_ARB); // start populating =
+stage=20
+1</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glEnable(GL_TEXTURE_2D);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>glBindTexture=20
+  (GL_TEXTURE_2D, texture1ID); // grass texture</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, =
+GL_COMBINE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_RGB_ARB, GL_MODULATE); =
+//=20
+  Lighting</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_RGB_ARB, =
+GL_PREVIOUS);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR); =
+// color=20
+  result from stage 0</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE1_RGB_ARB, =
+GL_PRIMARY_COLOR);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR); =
+// vertex=20
+  colors</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_COMBINE_ALPHA_ARB, =
+GL_REPLACE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_SOURCE0_ALPHA_ARB, =
+GL_TEXTURE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glTexEnvi(GL_TEXTURE_2D, GL_OPERAND0_ALPHA_ARB, =
+GL_SRC_ALPHA); // just=20
+  use the alpha value this texture (assumed 255 since it's just an =
+RGB)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glActiveTextureARB(GL_TEXTURE2_ARB);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>glDisable(GL_TEXTURE_2D);</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>Notice =
+how in=20
+stage 0 we are actually referring directly to texture stages 0 and 1 for =
+the=20
+sources. DirectX can't do this. OpenGL allows you to grab texture data =
+from a=20
+stage you haven't gotten to yet in the process. DirectX can only look at =
+the=20
+results from the previous stage, so setting it up in DirectX is a little =
+
+trickier.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Important note:=20
+The documentation at opengl.org states that referring to GL_TEXTUREn_ARB =
+returns=20
+the results of the given texture stage. In this case, however, it =
+returned the=20
+colors for the texture I provided at stage n. So this is different from =
+the=20
+documentation. </FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+size=3D-1>DirectX:</FONT></P>
+<UL>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, =
+0); //=20
+  tell it to use u, v</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_COLOROP,=20
+  D3DTOP_SELECTARG1);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_COLORARG1,=20
+  D3DTA_TEXTURE); // pass the dirt texture colors on to stage 1</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_ALPHAOP,=20
+  D3DTOP_SELECTARG1);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(0, D3DTSS_ALPHAARG2,=20
+  D3DTOP_DIFFUSE); // pass on vertex alpha too, we don't use it yet =
+though=20
+  </FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_TEXCOORDINDEX, =
+1); //=20
+  tell it to use u2, v2</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_COLOROP,=20
+  D3DTOP_BLENDDIFFUSEALPHA); // use alpha from vertices now</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_COLORARG1,=20
+  D3DTA_TEXTURE); // grass texture</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_COLORARG2,=20
+  D3DTA_CURRENT); // result from stage 0 (dirt color)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_ALPHAOP,=20
+  D3DTOP_SELECTARG1); // just use alpha from stage 1 texture (assumed =
+255 since=20
+  it's an RGB)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(1, D3DTSS_ALPHAARG1,=20
+  D3DTOP_TEXTURE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(2, D3DTSS_COLOROP,=20
+  D3DTOP_MODULATE); // perform lighting</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(2, D3DTSS_COLORARG1,=20
+  D3DTA_CURRENT); // result from stage 1</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(2, D3DTSS_COLORARG2,=20
+  D3DTA_DIFFUSE); // vertex colors</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(2, D3DTSS_ALPHAOP,=20
+  D3DTOP_SELECTARG1); // just use alpha from stage 1 texture (assumed =
+255 since=20
+  it's an RGB)</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(2, D3DTSS_ALPHAARG1,=20
+  D3DTOP_CURRENT);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(3, D3DTSS_COLOROP,=20
+  D3DTOP_DISABLE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTextureStageState(3, D3DTSS_ALPHAOP,=20
+  D3DTOP_DISABLE);</FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTexture(0, texture0); </FONT>
+  <LI><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+  size=3D-1>d3ddevice-&gt;SetTexture(1, texture1);</FONT></LI></UL>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>We =
+needed 3 stages=20
+to pull it off in DirectX. Stage 0 was used to pass on relevent values =
+to stage=20
+1. Had we been able to look ahead to other stages, we could have just =
+performed=20
+the blend in stage 0. Also note that we only submitted textures in =
+stages 0 and=20
+1, but used operations in stages 0, 1 and 2. Remember, DirectX continues =
+until=20
+it hits disabled operations in the next texture stage.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1><B>A =
+pre-cursor to=20
+pixel shaders</B></FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>Pixel =
+shaders can=20
+do everything that multi-texturing can do, and then some. For example, =
+in the=20
+terrain multi-texture example above, a pixel shader could blend four =
+textures=20
+together using a base texture and then blending the other three on top =
+of it=20
+using an RGB mask texture and the red, green and blue components from =
+that=20
+texture to blend the other three textures on top. The multi-texturing =
+pipeline=20
+can't make specific use of the red, green and blue =
+components.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" size=3D-1>Then, =
+of course,=20
+there's all the fancy shmancy water, reflection, and ripply sci-fi =
+volume=20
+effects.</FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif"=20
+size=3D-1><B>Conclusion</B></FONT></P>
+<P><FONT face=3D"Verdana, Arial, Helvetica, sans-serif" =
+size=3D-1>Hopefully this at=20
+least gives you a start with multi-texturing. check out the =
+documentation for=20
+the API's to see what the other possible operations, sources, and =
+operands are,=20
+and for clarifications on the operations I used =
+here.</FONT></P></BODY></HTML>
