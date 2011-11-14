@@ -1,0 +1,36 @@
+1.glActiveTextureARB的Active不能理解为激活,使发生作用!!!
+应理解为选择(Select)某纹理单元(Texture Unit),即表示后续的glEnable(GL_TEXTURE_2D);glBindTexture(GL_TEXTURE_2D, texture);作用于此所选的纹理单元.而glEnable(GL_TEXTURE_2D)才是真正激活纹理单元的调用.
+
+glActiveTextureARB(GL_TEXTURE0_ARB);  // 选择TEXTURE0为设置目标 
+glEnable(GL_TEXTURE_2D);        // 激活TEXTURE0单元
+glBindTexture(GL_TEXTURE_2D, texture); // 为TEXTURE0单元绑定texture纹理图像
+ 
+glActiveTextureARB(GL_TEXTURE1_ARB);  // 选择TEXTURE1为设置目标
+glDisable(GL_TEXTURE_2D);        // 关闭禁用TEXTURE1单元
+ 
+glDrawArrays(GL_TRIANGLE_STRIP, 0, NUM_STRIP_VERTICE); // 由于TEXTURE1单元被关闭,执行此Pass渲染时只有TEXTURE0单元发生了作用。
+
+如果,
+glActiveTextureARB(GL_TEXTURE1_ARB);  // 选择TEXTURE1为设置目标
+glEnable(GL_TEXTURE_2D);        // 激活TEXTURE1单元
+glBindTexture(GL_TEXTURE_2D, alphaTex); // 为TEXTURE1单元绑定alphaTex纹理图像
+此时由于有2个纹理单元被激活,glDrawArrays调用将Blend两个纹理单元形成最终的画面.
+
+2.要设置纹理单元的纹理顶点数组,不能使用glActiveTextureARB,而应该使用glClientActiveTextureARB,如:
+glClientActiveTextureARB(GL_TEXTURE0_ARB);
+glTexCoordPointer(2, GL_FLOAT, 0, tp0); 
+glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+
+3.使用多重纹理一般都必须激活glEnable(GL_BLEND);glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+4.关闭多重纹理:禁用所有非GL_TEXTURE0_ARB层纹理,最后激活GL_TEXTURE0_ARB纹理
+glActiveTextureARB(GL_TEXTURE1_ARB);
+glDisable(GL_TEXTURE_2D);
+glActiveTextureARB(GL_TEXTURE0_ARB);
+glEnable(GL_TEXTURE_2D);
+
+5.特别需要小心的是:既不能在glActiveTextureARB状态下使用glTexCoordPointer设置当前纹理单元的纹理坐标数组指针,更不能在glClientActiveTextureARB状态下设置当前纹理单元的非Client属性,即此时调用的glEnable(GL_TEXTURE_2D);glBindTexture(GL_TEXTURE_2D, tex);均为无效操作.
+glEnableClientState必须进入glClientActiveTextureARB状态后设置才对纹理单元有效,在外部所作设置修改不了纹理单元的设置.
+
+http://www.cnitblog.com/linghuye/archive/2005/08/13/1856.html

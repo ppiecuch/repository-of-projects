@@ -1,0 +1,224 @@
+HardwareSkinning.cg
+
+=================================================
+
+//Ó²¼þÃÉÆ¤(1¶¥µã4¹Ç÷À)
+void HardwareSkinning4Weights_vp(
+ float4 position : POSITION,
+ float3 normal   : NORMAL,
+ float2 uv       : TEXCOORD0,
+ float4 blendIdx : BLENDINDICES,
+ float4 blendWgt : BLENDWEIGHT,
+ //out
+ out float4 oPosition : POSITION,
+ out float2 oUv       : TEXCOORD0,
+ out float4 colour           : COLOR,
+ // Support up to 70 bones of float3x4 for vs_2_0
+ uniform float3x4   worldMatrix3x4Array[70],
+ uniform float4x4 viewProjectionMatrix,
+ uniform float4   lightPos[2],
+ uniform float4   lightDiffuseColour[2],
+ uniform float4   ambient)
+{
+ // transform by indexed matrix
+ float4 blendPos = float4(0,0,0,0);
+ int i;
+ for (i = 0; i < 4; ++i)
+ {
+  blendPos += float4(mul(worldMatrix3x4Array[blendIdx[i]], position).xyz, 1.0) * blendWgt[i];
+ }
+ // view / projection
+ oPosition = mul(viewProjectionMatrix, blendPos);
+ // transform normal
+ float3 norm = float3(0,0,0);
+ for (i = 0; i < 4; ++i)
+ {
+  norm += mul((float3x3)worldMatrix3x4Array[blendIdx[i]], normal) * 
+  blendWgt[i];
+ }
+ norm = normalize(norm);
+ // Lighting - support point and directional
+ float3 lightDir0 =  normalize(lightPos[0].xyz -  (blendPos.xyz * lightPos[0].w));
+ float3 lightDir1 =  normalize(lightPos[1].xyz -  (blendPos.xyz * lightPos[1].w));
+ 
+ oUv = uv;
+ colour = ambient + 
+  (saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
+  (saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
+ 
+}
+//Ó²¼þÃÉÆ¤Í¶ÉäÒõÓ°(1¶¥µã4¹Ç÷À)
+void HardwareSkinning4WeightsCaster_vp(
+ float4 position : POSITION,
+ float3 normal   : NORMAL,
+ float2 uv       : TEXCOORD0,
+ float4 blendIdx : BLENDINDICES,
+ float4 blendWgt : BLENDWEIGHT,
+ //out
+ out float4 oPosition : POSITION,
+ out float4 colour           : COLOR,
+ // Support up to 70 bones of float3x4 for vs_2_0
+ uniform float3x4   worldMatrix3x4Array[70],
+ uniform float4x4 viewProjectionMatrix,
+ uniform float4   ambient)
+{
+ // transform by indexed matrix
+ float4 blendPos = float4(0,0,0,0);
+ int i;
+ for (i = 0; i < 4; ++i)
+ {
+  blendPos += float4(mul(worldMatrix3x4Array[blendIdx[i]], position).xyz, 1.0) * blendWgt[i];
+ }
+ oPosition = mul(viewProjectionMatrix, blendPos);
+ colour = ambient;
+}
+//Ó²¼þÃÉÆ¤(1¶¥µã3¹Ç÷À)
+void HardwareSkinning3Weights_vp(
+ float4 position : POSITION,
+ float3 normal   : NORMAL,
+ float2 uv       : TEXCOORD0,
+ float4 blendIdx : BLENDINDICES,
+ float4 blendWgt : BLENDWEIGHT,
+ //out
+ out float4 oPosition : POSITION,
+ out float2 oUv       : TEXCOORD0,
+ out float4 colour           : COLOR,
+ // Support up to 70 bones of float3x4 for vs_2_0
+ uniform float3x4   worldMatrix3x4Array[70],
+ uniform float4x4 viewProjectionMatrix,
+ uniform float4   lightPos[2],
+ uniform float4   lightDiffuseColour[2],
+ uniform float4   ambient)
+{
+ // transform by indexed matrix
+ float4 blendPos = float4(0,0,0,0);
+ int i;
+ for (i = 0; i < 3; ++i)
+ {
+  blendPos += float4(mul(worldMatrix3x4Array[blendIdx[i]], position).xyz, 1.0) * blendWgt[i];
+ }
+ // view / projection
+ oPosition = mul(viewProjectionMatrix, blendPos);
+ // transform normal
+ float3 norm = float3(0,0,0);
+ for (i = 0; i < 3; ++i)
+ {
+  norm += mul((float3x3)worldMatrix3x4Array[blendIdx[i]], normal) * 
+  blendWgt[i];
+ }
+ norm = normalize(norm);
+ // Lighting - support point and directional
+ float3 lightDir0 =  normalize(lightPos[0].xyz -  (blendPos.xyz * lightPos[0].w));
+ float3 lightDir1 =  normalize(lightPos[1].xyz -  (blendPos.xyz * lightPos[1].w));
+ 
+ oUv = uv;
+ colour = ambient + 
+  (saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
+  (saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
+ 
+}
+//Ó²¼þÃÉÆ¤Í¶ÉäÒõÓ°(1¶¥µã3¹Ç÷À)
+void HardwareSkinning3WeightsCaster_vp(
+ float4 position : POSITION,
+ float3 normal   : NORMAL,
+ float2 uv       : TEXCOORD0,
+ float4 blendIdx : BLENDINDICES,
+ float4 blendWgt : BLENDWEIGHT,
+ //out
+ out float4 oPosition : POSITION,
+ out float4 colour           : COLOR,
+ // Support up to 70 bones of float3x4 for vs_2_0
+ uniform float3x4   worldMatrix3x4Array[70],
+ uniform float4x4 viewProjectionMatrix,
+ uniform float4   ambient)
+{
+ // transform by indexed matrix
+ float4 blendPos = float4(0,0,0,0);
+ int i;
+ for (i = 0; i < 3; ++i)
+ {
+  blendPos += float4(mul(worldMatrix3x4Array[blendIdx[i]], position).xyz, 1.0) * blendWgt[i];
+ }
+ oPosition = mul(viewProjectionMatrix, blendPos);
+ colour = ambient;
+}
+
+=================================================
+
+100010112.material
+
+ =================================================
+
+//Ó²¼þÃÉÆ¤
+vertex_program HardwareSkinning3Weights cg
+{
+   source HardwareSkinning.cg
+   entry_point HardwareSkinning3Weights_vp
+   profiles vs_2_0 arbvp1
+   includes_skeletal_animation true
+
+   default_params
+   {
+     param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+     param_named_auto viewProjectionMatrix viewproj_matrix
+     param_named_auto lightPos[0] light_position 0
+     param_named_auto lightPos[1] light_position 1
+     param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
+     param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+     param_named_auto ambient ambient_light_colour
+   }
+}
+vertex_program HardwareSkinning3WeightsShadowCasterCg cg
+{
+   source HardwareSkinning.cg
+   entry_point HardwareSkinning3WeightsCaster_vp
+   profiles vs_2_0 arbvp1
+   includes_skeletal_animation true
+
+   default_params
+   {
+     param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+     param_named_auto viewProjectionMatrix viewproj_matrix
+     param_named_auto ambient ambient_light_colour
+   }
+}
+material 100010112
+{
+ receive_shadows off
+ technique
+ {
+  pass
+  {
+   alpha_rejection greater 128
+   cull_hardware none
+   cull_software none
+   vertex_program_ref HardwareSkinning3Weights
+   {
+   }
+   shadow_caster_vertex_program_ref HardwareSkinning3WeightsShadowCasterCg
+   {
+   }
+   texture_unit
+   {
+    texture 100010112_tga_01.dds
+          tex_address_mode clamp
+   }
+  }
+ }
+ technique
+ {
+  pass
+  {
+   specular 1 1 1 1 20
+   alpha_rejection greater 128
+   cull_hardware none
+   cull_software none
+   texture_unit
+   {
+    texture 100010112_tga_01.dds
+   }
+  }
+ }
+}
+
+http://hi.baidu.com/haibo19981984/blog/item/b05b1919a700fee01bd576b4.html

@@ -1,0 +1,133 @@
+多重纹理就是在渲染一个多边形的时候可以用到多张纹理图.把多张纹理图进行一些颜色的操作,可以达到一些效果.但是多重纹理必须是在显卡支持的情况下.但是还有一种多次渲染.可以替代多重纹理,但是这样做的话,速度会很慢。
+
+,在这个渲染过程中,你可以在不同的纹理单元分别放入第0次,第1次,第2次需要渲染的对象.当程序向屏幕绘图时,将这些渲染结果叠加起来,将最终结果显示到屏幕.  每个纹理单元对应有其纹理环境,这个纹理环境指明了渲染的纹理图片、渲染参数、过滤参数等等，其中有一个重要的项目指明了,程序在将渲染结果进行逐个叠加的过程中,当前的纹理单元内的内容如何与前面的内容进行混合.
+    这个些参数中包含了: 
+     a . 要进行混合的纹理的来源
+           这个来源要分两步指定:
+               1. 对象来自哪个纹理单元[例如GL_TEXTURE0, GL_TEXTURE1],  
+              2.该单元中的什么成分[例如:GL_SRC_COLOR,GL_ONE_MINUS_SRC_COLOR]
+     b. 混合所使用的函数
+           例如GL_ADD,GL_MODULATE,GL_INTERPLATE等
+    通俗一点来说呢, 如果我们要进行一次多重渲染就是要把两个纹理进行一次数学运算把得到的结果投放到屏幕。  
+    当然这个数学运算是需要你自己指定的这包括运算类型，操作数来源，操作数的值, 就像下面这个简单的代数式一样：
+            C = A + B 
+要算出这个结果，那么我们首先要指定要进行什么运算（这里是＋），然后指定这个运算的两个操作数（这里是a和b，对于渲染还要知道他们来自哪个纹理单元）.
+     这些参数的指定都是通过用不同的参数来调用glTexEnv 完成的。然后我们就可以运算了。这个C就是我们渲染的最终结果。
+    具体来说：如果我们要进行一次多重渲染：
+那么首先我们要在各个纹理单元里面放入不同的纹理图片
+例如在第0号单元 放入texture[0]所对应的图片：
+    glActiveTextureARB( GL_TEXTURE0_ARB );
+    glEnable( GL_TEXTURE_2D );
+    glBindTexture( GL_TEXTURE_2D, texture[0] ); 
+例如在第1号单元 放入texture[1]所对应的图片：
+    glActiveTextureARB( GL_TEXTURE2_ARB );
+    glEnable( GL_TEXTURE_2D );
+    glBindTexture( GL_TEXTURE_2D, texture[1] );
+然后 我们开始指定我们的代数运算：
+首先告诉OpenGL 我们要把两个单元的纹理进行混合：
+    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
+然后告诉OpenGL我们要进行的运算：
+    glTexEnvi( GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_INTERPOLATE_ARB );
+这里 INTERPOLATE 是指线性插值，它的公式是这样的:
+    C = Arg0*Arg2 + Arg1*(1-Arg2);
+    翻译成代数的是这样:
+    C = a*ω ＋ b*(1-ω) ； 这下大家可以清楚的看到它是一个线性插值表达式了吧
+ 其中： Arg0 是第一个操作数，Arg1是第二个操作数，Arg2 是线性插值的系数就是那个ω了。
+这些都要通过下面的函数调用来指定。当然，混合函数还可以是GL_ADD “加”，
+GL_SUBTRACT “减”,GL_MODULATE “乘” 等等.
+    下面来说 Arg0，Arg1，Arg2 的指定：
+前面提到过：要指定一个操作数，需要指定它来自于哪个纹理单元，和来自于该纹理单元的哪个部分：
+所以我们在下面可以看到，指定一个Arg用了两句话，第一个指定了这个操作数的内容来自哪个纹理单元，第二个指定了来自于纹理单元里的哪个部分：
+    //前一个 这里指0号单元
+    glTexEnvi( GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_PREVIOUS_ARB ); 
+    //0号单元中的COLOR部分即RGB
+    glTexEnvi( GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR ); 
+ 
+    //这个GL_TEXTURE指当前活动的纹理单元也就是1号纹理单元
+    glTexEnvi( GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_TEXTURE );
+    glTexEnvi( GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR ); 
+ 
+    //由纹理环境变量GL_PRIMARY_COLOR_ARB指定的值 
+    glTexEnvi( GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, GL_PRIMARY_COLOR_ARB );
+    glTexEnvi( GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, GL_SRC_COLOR );
+    
+有了他们 就完成了混合函数的指定了,下面要做的事就是给一个几何图像同时绑上不同的纹理让它们去按上面的公式混合吧 :
+        glBegin(GL_QUADS);
+        glNormal3f(0.0,0.0,1.0);
+        glMultiTexCoord2fARB(GL_TEXTURE0_ARB,0.0,0.0);
+        glMultiTexCoord2fARB(GL_TEXTURE1_ARB,0.0,0.0);
+        glVertex3f(0.0f,0.0f,0.0f);
+ 
+        glNormal3f(0.0,0.0,1.0);
+        glMultiTexCoord2fARB(GL_TEXTURE0_ARB,0.0,1.0);
+        glMultiTexCoord2fARB(GL_TEXTURE1_ARB,0.0,1.0);
+ 
+        glVertex3f(0.0f,1.0f,0.0f);
+ 
+        glNormal3f(0.0,0.0,1.0);
+        glMultiTexCoord2fARB(GL_TEXTURE0_ARB,1.0,1.0);
+        glMultiTexCoord2fARB(GL_TEXTURE1_ARB,1.0,1.0);
+        glVertex3f(1.0f,1.0f,0.0f);
+ 
+        glNormal3f(0.0,0.0,1.0);
+        glMultiTexCoord2fARB(GL_TEXTURE0_ARB,1.0,0.0);
+        glMultiTexCoord2fARB(GL_TEXTURE1_ARB,1.0,0.0);
+        glVertex3f(1.0f,0.0f,0.0f);
+    glEnd();
+ 
+   
+======================== 提供一些直观的对比 =====================================
+float arr0[4] = {g_T0Blend, g_T0Blend, g_T0Blend, g_T0Blend};
+float arr1[4] = {g_T1Blend, g_T1Blend, g_T1Blend, g_T1Blend};
+float arr2[4] = {g_T2Blend, g_T2Blend, g_T2Blend, g_T2Blend};
+如果:
+    g_T0Blend = 0.5f
+    g_T1Blend = 0.25f
+   g_T2Blend = 0.25f
+rn 为混合器n 的返回值
+tn 为第n单元的纹理值
+//Texture0  
+glActiveTextureARB(GL_TEXTURE0_ARB);
+glEnable(GL_TEXTURE_2D);
+glBindTexture(GL_TEXTURE_2D, tobjects[TO_EARTH1]);
+glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
+glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_CONSTANT);
+glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, arr0);
+glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE);
+glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+以上为纹理单元0 所作的操作,其公式是:
+r0 = 0.5*t0 
+//Texture1
+glActiveTextureARB(GL_TEXTURE1_ARB);
+glEnable(GL_TEXTURE_2D);
+glBindTexture(GL_TEXTURE_2D, tobjects[TO_EARTH1]);
+glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
+glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_TEXTURE);
+glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_PREVIOUS);
+glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_CONSTANT);
+glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_COLOR);
+glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, arr1);
+对应的公式是
+r1 = (0.25*t1) + ((1-0.25)*r0) = 0.25*t1 + 0.375*t0
+//Texture2
+glActiveTextureARB(GL_TEXTURE2_ARB);
+glEnable(GL_TEXTURE_2D);
+glBindTexture(GL_TEXTURE_2D, tobjects[TO_EARTH2]);
+glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
+glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_TEXTURE);
+glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_PREVIOUS);
+glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_CONSTANT);
+glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_COLOR);
+glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, arr2);
+对应的公式是:
+r2 = (0.25*t2) + ((1-0.25)*r1) = 0.25*t2 + 0.1875*t1 + 0.2813*t0
+
+http://www.cnblogs.com/ericleeviva/archive/2011/05/22/2053662.html
