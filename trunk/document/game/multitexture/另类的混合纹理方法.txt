@@ -1,0 +1,71 @@
+//--
+
+//--It doesn''t matter how many input textures there are, but
+
+//--right now lets just say there''s a grass texture and a dirt
+
+//--texture. To make it a little easier, say you have another
+
+//--texture for the height map. For this little example the 
+
+//--grass texture will be on the ground level and the dirt will 
+
+//--be blended up any hills or mountains. So there''s 3 textures
+
+//--to work with, sounds like fun :)
+
+//--
+
+//--INPUTS:
+
+//--(HeightData) will be the height map
+
+//--(GrassData) will be the grass texture
+
+//--(DirtData) will be the dirt data
+
+//--
+
+int   PixelID1 = 0;
+int   PixelID2 = 0;
+float Height   = 0;
+//
+
+//--Allocate memory for the destination pixel data
+
+//--After the destination data is filled in, you can do
+
+//--whatever you want with it. Save to a bitmap or targa, pass
+
+//--it to OpenGL and make a texture out of it, etc.
+
+unsigned char* Destination = (unsigned char)malloc(WidthOfTexture * HeightOfTexture * 4);
+//
+
+for(int X = 0; X < WidthOfTexture; X++)
+{
+    for(int Y = 0; Y < HeightOfTexture; Y++)
+    {
+        PixelID1 = 3 * (Y * HeightOfTexture + X);
+	PixelID2 = 4 * (Y * HeightOfTexture + X);
+	Height	 = (float)HeightData[PixelID1];
+//
+
+        Destination[PixelID2 + 0] = GrassData[PixelID1 + 0] + (unsigned char)((Height / 255) * (DirtData[PixelID1 + 0] - GrassData[PixelID1 + 0]));
+	Destination[PixelID2 + 1] = GrassData[PixelID1 + 1] + (unsigned char)((Height / 255) * (DirtData[PixelID1 + 1] - GrassData[PixelID1 + 1]));
+	Destination[PixelID2 + 2] = GrassData[PixelID1 + 2] + (unsigned char)((Height / 255) * (DirtData[PixelID1 + 2] - GrassData[PixelID1 + 2]));
+	Destination[PixelID2 + 3] = 255;
+    }
+}
+//
+
+//--If you don''t need the grass or dirt data anymore, you can
+
+//--free (or delete) them here. This will free up a lot of
+
+//--memory.
+
+//
+http://www.gamedev.net/topic/183321-blending-more-than-4-textures/
+
+--此方法应该不靠谱：因为不同区域，各贴图之间的混合权重肯定不同，难道每一个区域都要为其创建一张单独的纹理不成

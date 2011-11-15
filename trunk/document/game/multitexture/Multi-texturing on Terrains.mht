@@ -1,0 +1,1070 @@
+From: <ÓÉ Microsoft Internet Explorer 5 ±£´æ>
+Subject: Multi-texturing on Terrains
+Date: Tue, 15 Nov 2011 09:31:59 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CCA379.6C92EBC0"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.6157
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0000_01CCA379.6C92EBC0
+Content-Type: text/html;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.cs.auckland.ac.nz/~jvan006/multitex/multitex.html
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>Multi-texturing on Terrains</TITLE>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dgb2312">
+<META content=3D"Jarno van der Linden" name=3DAuthor>
+<META content=3D"MSHTML 6.00.2900.6148" name=3DGENERATOR></HEAD>
+<BODY text=3D#000000 bgColor=3D#d3d3d3><IMG=20
+src=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainBanner.jpg" =
+
+align=3Dmiddle>=20
+<H1>Four in two does go</H1>
+<H4>(or, Texturing a terrain in one pass using four greyscale detail =
+textures=20
+and a lightmap with only two texture units)</H4>
+<HR>
+
+<HR>
+
+<H3>INTRODUCTION</H3>Say you want to draw a terrain heightfield using a =
+vertex=20
+array or similar. A typical approach for making the terrain appear =
+detailed when=20
+viewed from close to the ground is to apply detail textures.=20
+<P>Detail textures are textures that are mixed and tiled over the =
+terrain at a=20
+relatively small scale. For example, a single instance of a texture may =
+cover an=20
+area of 3*3 grid squares, or even just a single grid square. The detail =
+textures=20
+add some variations to the colour of the terrain at a sub-polygon scale, =
+without=20
+the need for huge texture maps.=20
+<P>To bring more variation to the terrain, more than one detail texture =
+is=20
+usually used. The textures are mixed together in proportion to some =
+local=20
+properties of the terrain. For example, mountainous areas use =
+predominantly a=20
+rocky-looking detail texture, while water areas use a water surface =
+texture.=20
+Depending on altitude, a grass detail texture may be mixed in with =
+varying=20
+degrees. The more detail textures that are used, the more varied (and =
+hopefully=20
+more realistic) the terrain will look.=20
+<P>There is of course a cost to pay for using many different detail =
+textures. A=20
+graphics card can only apply a limited number of textures to a model at =
+the same=20
+time. This number is the number of texture units of a card, and ranges =
+from one=20
+for the oldest cards, to eight for the latest top of the line consumer =
+cards. So=20
+if we want to use four different detail textures mixed arbitrarily but =
+the=20
+graphics card has only two texture units, the scene would have to be =
+drawn=20
+twice. First with one pair of textures, then with the other pair.=20
+<P>When rendering a scene with a large number of polygons, which a =
+terrain=20
+typically has, multiple passes can reduce the framerate significantly.=20
+Maximising the number of detail textures applied per pass is therefore =
+crucial.=20
+Although it may appear at first that there is no way to use more than =
+the number=20
+of texture units per pass, with some trickery and simplification it is =
+actually=20
+possible.=20
+<P>
+<HR>
+
+<H3>THE PROBLEM</H3>Here is the specific problem I'm solving: apply =
+detail=20
+textures and a lightmap to a terrain rendered using vertex arrays in a =
+single=20
+pass on a NVidia Quadro2 graphics card. This card has all of two texture =
+units,=20
+no dependent texture reads (so no per-pixel fiddling with the texture=20
+coordinates), and no fancy fragment shading programmability (which would =
+pretty=20
+much remove the need for doing all this in the first place).=20
+<P>For those keeping score, before we even start with the detail =
+textures we=20
+already have to accommodate a lightmap and a map describing how to mix =
+the=20
+textures. One of these can be put in the vertex colours of the terrain =
+(as both=20
+maps are at the scale of the terrain), and the other would have to go =
+into a=20
+texture. So we're down one texture unit and we have barely left the =
+starting=20
+blocks.=20
+<P>
+<HR>
+
+<H3>OPENGL MULTI-TEXTURING BASICS</H3>Look it up on the <A=20
+href=3D"http://www.google.com/search?q=3DOpenGL+multitexturing">internet<=
+/A>.=20
+<P>Read it? Great. From here on I'll assume you know how to do =
+multi-texturing=20
+in OpenGL.=20
+<P>
+<HR>
+
+<H3>THE WORLD IS BLACK&amp;WHITE WITH A HINT OF COLOUR</H3>The first =
+step is to=20
+realise that detail textures need not be colour. Greyscale detail =
+textures work=20
+quite well. The colour of the terrain can come from the lightmap. A =
+greyscale=20
+detail texture only needs one colour channel, instead of the three (RGB) =
+that a=20
+colour detail texture needs. A texture unit has four channels (RGBA), so =
+four=20
+detail textures could be squeezed into one texture unit.=20
+<P>By putting them in the same texture unit, there are some limitations =
+which=20
+arise. The main one is that all the detail textures in the same texture =
+unit=20
+must be of the same size and scale. They all have to be the same width =
+and=20
+height in pixels, and they all must be applied to the terrain at the =
+same scale.=20
+The channels share the same texture coordinates.=20
+<P>Conveniently, the mixmap (which determines the amount of mixing of =
+the detail=20
+textures at each vertex) can be four channels, thereby giving the =
+contribution=20
+for each of the four detail textures individually.=20
+<P>Summarising the situation so far, we have to handle:=20
+<UL>
+  <LI>1 * Lightmap (RGB)=20
+  <LI>1 * Mixmap (RGBA)=20
+  <LI>4 * Detail texture (one each in R, G, B, A) </LI></UL>which is a =
+total of 11=20
+channels, while we have available:=20
+<UL>
+  <LI>1 * Vertex colours (RGBA)=20
+  <LI>2 * Texture units (RGBA) </LI></UL>which is 12 channels.=20
+<P><EM>It fits!</EM>=20
+<P>Now the channels "just" have to be mixed and matched to produce a =
+final=20
+colour.=20
+<P>
+<HR>
+
+<H3>MIXING AND MATCHING</H3>The next crucial step is to set up the =
+texture units=20
+in such a way that the detail textures are mixed together according to =
+the=20
+weights in the mixmap, and combine it all with the lightmap.=20
+<P>The various maps and textures are assigned as follows:=20
+<UL>
+  <LI>Primary (vertex) colours : mixmap=20
+  <LI>Texture unit 0 : detail textures=20
+  <LI>Texture unit 1 : lightmap </LI></UL>Other orderings are also =
+possible, as=20
+long as the detail textures are in a texture unit.=20
+<P>The texture combining is roughly done in two steps:=20
+<UL>
+  <LI>Texture unit 0 : mix detail textures according to mixmap=20
+  <LI>Texture unit 1 : combine previous result with lightmap </LI></UL>
+<P>The mixing of the first step needs to take the values of each of the =
+four=20
+detail textures, multiply them by their respective weights in the =
+mixmap, and=20
+sum those to produce a single value. The closest texture combining =
+method that=20
+does this is DOT3. However, that can only use as input the R, G, and B =
+channels.=20
+The detail texture in the A channel needs to be handled separately: =
+<PRE>  glActiveTexture(GL_TEXTURE0);
+
+  glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_DOT3_RGB);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_TEXTURE0);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_PRIMARY_COLOR);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+
+  glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_MODULATE);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_TEXTURE0);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_PRIMARY_COLOR);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
+</PRE>The RGB channels of both the mixmap and the detail textures need =
+to be=20
+pre-processed first to make them work with DOT3. This is explained =
+later.=20
+<P>The second step is to combine it with the lightmap. There is a =
+problem=20
+however. Both the values in the RGB channels and the alpha channel from =
+the=20
+first step need to be combined with the lightmap to produce an RGB =
+value. That's=20
+a total of three sources, two of which are in RGB channels and one in an =
+alpha=20
+channel, which need to result in an RGB output. Texture combining does =
+not=20
+provide for such functionality, or at least not in one step. =
+GL_INTERPOLATE=20
+comes close in that it takes three sources, but it results in Arg0 * =
+Arg2 - Arg1=20
+* Arg2 + Arg1. There will always be an Arg1 component which is not =
+modulated by=20
+the lightmap. Arg1 could be set to be the lightmap itself. That would =
+mean that=20
+either the previous RGB or the previous alpha is in Arg2. Arg2 would =
+dominate in=20
+the sense that if it is zero, Arg0 will not contribute to the final =
+result at=20
+all. This is not desired, as the previous RGB and alpha values should be =
+treated=20
+as being independent (being the results of independent detail textures). =
+
+<P>There is another way of modulating in some grey: by using blending. =
+The blend=20
+function can be set up to mix in shades of grey with the terrain =
+according to=20
+the value of the alpha channel of the textured terrain: <PRE>  =
+glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ZERO);
+  glEnable(GL_BLEND);
+</PRE>So now adding in the alpha channel created in step 1 can be left =
+to the=20
+blending stage. We only have to combine the RGB result of step 1 with =
+the=20
+lightmap: <PRE>  glActiveTexture(GL_TEXTURE1);
+
+  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+  glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_TEXTURE1);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_PREVIOUS);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_ONE_MINUS_SRC_COLOR);
+</PRE>Using GL_MODULATE can cause the terrain to become too dark. It can =
+be=20
+replaced with a GL_ADD_SIGNED, or even a GL_INTERPOLATE with the Arg2 =
+set to=20
+GL_CONSTANT to control the overall degree with which the detail textures =
+affect=20
+the terrain: <PRE>  glActiveTexture(GL_TEXTURE1);
+  glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, mixcol);
+
+  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+  glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_ONE_MINUS_SRC_COLOR);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_TEXTURE1);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, GL_CONSTANT);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, GL_SRC_COLOR);
+
+  glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_MODULATE);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_PREVIOUS);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
+  glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_CONSTANT);
+  glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
+</PRE>Another set of variations can be made by using GL_SRC_COLOR =
+instead of=20
+GL_ONE_MINUS_SRC_COLOR. Experiment to get the right balance.=20
+<P>
+<HR>
+
+<H3>PREPARING TEXTURES FOR DOT3 COMBINING</H3>The formula for =
+GL_DOT3_RGB=20
+combining is: <PRE>  t =3D 4 * ((Arg0_r - 0.5) * (Arg1_r - 0.5) +
+           (Arg0_g - 0.5) * (Arg1_g - 0.5) +
+           (Arg0_b - 0.5) * (Arg1_b - 0.5))
+</PRE>It is really intended for use with so-called normal maps, hence =
+the=20
+slightly strange subtractions of 0.5 and the multiplication by 4. For =
+our=20
+texturing purposes however, we only want to use it to multiply the =
+matching=20
+channels of the arguments and add up the results.=20
+<P>The range of values produces by DOT3 is -3 &lt;=3D t &lt;=3D 3. =
+Furthermore, if=20
+both arguments are (0,0,0) the result is the same as if they both were =
+(1,1,1).=20
+This is obviously not desirable if (0,0,0) is meant as no contribution =
+of any=20
+detail textures and (1,1,1) is meant as fully adding all detail =
+textures.=20
+<P>The solution is to restrict the RGB values of the two arguments to =
+the range=20
+0.5 to 1, which limits t to the range 0 &lt;=3D t &lt;=3D 3. Note that =
+any value of=20
+t about 1 will be clipped to 1 though.=20
+<P>The texture maps involved in the DOT3 computation in the first =
+texture step=20
+(the detail textures and the mixmap) are preprocessed by squashing the =
+values in=20
+the RGB channels into the range of 0.5 to 1.0. Note that the alpha =
+channel isn't=20
+touched, as it does not take part in the DOT3. If each colour channel is =
+a byte,=20
+converting to the needed range can be done using something like: <PRE>  =
+channel_value =3D (((int)channel_value) + 255) / 2;
+</PRE>
+<P>
+<HR>
+
+<H3>RESULTS</H3>These are screenshots taken from a simple terrain =
+renderer. It=20
+uses a 512 * 512 heightmap, a cubemap for the sky rendered with <A=20
+href=3D"http://www.planetside.co.uk/">Terragen</A>, and the =
+multitexturing methods=20
+described above. There is no level of detail control (the whole thing is =
+done as=20
+vertex arrays in a display list), and runs at 20+ frames per second.=20
+<UL>
+  <LI><A=20
+  =
+href=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainNumbers.png=
+"><IMG=20
+  =
+src=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainNumbers_smal=
+l.jpg"=20
+  align=3Dmiddle></A> detail textures are numbers, showing the mixing =
+(PNG 472kB)=20
+  </LI></UL>
+<UL>
+  <LI><A=20
+  =
+href=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWithout1.pn=
+g"><IMG=20
+  =
+src=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWithout1_sma=
+ll.jpg"=20
+  align=3Dmiddle></A> without detail textures (PNG 254kB)=20
+  <LI><A=20
+  =
+href=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWith1.png">=
+<IMG=20
+  =
+src=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWith1_small.=
+jpg"=20
+  align=3Dmiddle></A> with detail textures (PNG 358kB) </LI></UL>
+<UL>
+  <LI><A=20
+  =
+href=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWithout2.pn=
+g"><IMG=20
+  =
+src=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWithout2_sma=
+ll.jpg"=20
+  align=3Dmiddle></A> without detail textures (PNG 195kB)=20
+  <LI><A=20
+  =
+href=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWith2.png">=
+<IMG=20
+  =
+src=3D"http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWith2_small.=
+jpg"=20
+  align=3Dmiddle></A> with detail textures (PNG 299kB) </LI></UL>
+<P>
+<HR>
+
+<H3>CONCLUSION</H3>In conclusion, you can indeed do four greyscale =
+detail=20
+textures mixed arbitrarily plus a lightmap in a single pass using only =
+two=20
+texture units on a GeForce2-type card.=20
+<P>The disadvantages are that the detail textures all have to be the =
+same size,=20
+and they all use the same texture coordinates. In practise I've also =
+found that=20
+it can be tricky to get a good balance between the strength of the =
+detail=20
+textures and the strength of the colours in the lightmap. Lastly, =
+blending (like=20
+is used to add in the detail texture in the alpha channel) is done after =
+fog in=20
+the OpenGL pipeline. This means that the fourth detail texture can not =
+have any=20
+fog applied to it. As seen in the above results, this isn't too bad if =
+that=20
+texture is used for water.=20
+<P><IMG height=3D4 alt=3D----------------------=20
+src=3D"http://www.cs.auckland.ac.nz/~jvan006/line.gif" width=3D410 =
+align=3Dmiddle=20
+vspace=3D4><BR><FONT size=3D-2>Last Modified: 16-Jun-2003 by Jarno van =
+der=20
+Linden<FONT size=3D+0> <BR></TABLE></FONT></FONT></P></BODY></HTML>
+
+------=_NextPart_000_0000_01CCA379.6C92EBC0
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainBanner.jpg
+
+/9j/4AAQSkZJRgABAQEBLAEsAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcU
+FhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgo
+KCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCACoAyADASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCcw+1M
+MPtWs1qw/hP5VGYCOx/KvTuc5lGH2pph9q1DD7U0w+1FwMsw0ww+1ahh9qaYfancLGUYT6U0w+1a
+phphh9qLgZRh9qYYfatYw+1MMPtTuIyjD7Uww+1apg9qYYKdwsZRg9qYYK1jBTDB7UXCxkmE00xs
+K1TB7Uwwe1O4WMsqR2pMGtIwe1MMHtRcVihRVtoPamGCncCvRmpjCaYY2FADc0UpQjtSYPpQAUua
+bRQA7NGabmlzSAWlptLQAtGaBTgPegYmacGpQme9OEZpANBNPGT2pypjqKlRRmkBEqZ7U8Q57Veg
+EWcPWta2tpJ1cA/Wk5WHY5vyCO1IYeOK7ZdGtJeBMo/Glbw1ARxKPw//AF0udBY4RVYHpVy3hyw+
+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
+
+------=_NextPart_000_0000_01CCA379.6C92EBC0
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainNumbers_small.jpg
+
+/9j/4AAQSkZJRgABAQEBLAEsAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcU
+FhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgo
+KCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCACAAMgDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDqhbND
+IrIAzgfMYxlz+Ldv85qwIUuN1xdB9yrgKxwv5dDWjcW8JjkwS6sOeScVgakWtIglsqoh5JkJ/wAa
+zasaEOoCNLR3VUG47TtAz/KsTVmieKB0kkwOmBg59OKdq99IRHAzIu0ZJXByfzqjNPJOiQmdJwpH
+GwBh+JPNKLV9TOctNBXuSbyNZAPlAGTx296W3YSxyh+w4wMYxVaZsagOCgXHU47e1OthuuHGAScg
+YXP866/Q5yZ9jxIQxJQ47UrJtnWQZCuOew9/SoYV3RSIWHrkt3p5ObX5Tkoew/rQFw2hWeA4bPQm
+nKFkiG5SJY+3tUNw8ksMcicOp2/e5/SlcSBknI6/eG0nB/GgLizOQVmjycjDL/8AWHagsQgLfNCx
+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
+
+------=_NextPart_000_0000_01CCA379.6C92EBC0
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWithout1_small.jpg
+
+/9j/4AAQSkZJRgABAQEBLAEsAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcU
+FhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgo
+KCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCACAAMgDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDMMXtT
+DF7VuNYn0qNrJvSvreZHjamKYaaYfatlrRvSo2tT6UaBcyDD7Uhh9q1jbH0ppt/aiw7mT5NHk1qG
+39qaYPaiwXMwxU0xe1aZg9qjaLFKw7meY6aY6uutRcqcgD8RSY0VdmegzQIGPoPqavLI7/ebHsKc
+23HQVzzq8uhrGFyK0BgJIAye9WWvD61Wbb6VGQPSueUlJ3ZqlbYsPcse5qJpSe9R0mKjl7FXFLmk
+LUmKMH0pWC4ZpKXafSl2N6GiwDaKf5belKIXPagCOip1tmNFAHp7WPtUbWHtXTG19qQ2o9KaxBj7
+M5Y6f7UxtP8AaurNoPSmG0HpVLEi9mcm2ne1RPp3tXXmzHpUbWY9KpYkXszj2072qJtPHpXYPZ+1
+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
+dZy4IBrUXBGRXbTldESHAUUoorYk/9k=
+
+------=_NextPart_000_0000_01CCA379.6C92EBC0
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWith1_small.jpg
+
+/9j/4AAQSkZJRgABAQEBLAEsAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcU
+FhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgo
+KCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCACAAMgDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDMMXtT
+DF7VuNYn0qNrJvSvreZHjamKYaaYfatlrRvSo2tT6UaBcyDD7Uhh9q1jbH0ppt/aiw7mT5NHk1qG
+39qaYPaiwXMwxU0xe1aZg9qjaLFKw7meY6aY6uutRcqcgD8RSY0VdmegzQIGPoPqavLI7/ebHsKc
+23HQVzzq8uhrGFyK0BgJIAye9WWvD61Wbb6VGQPSueUlJ3ZqlbYsPcse5qJpSe9R0mKjl7FXFLmk
+LUmKMH0pWC4ZpKXafSl2N6GiwDaKf5belKIXPagCOip1tmNFAHp7WPtUbWHtXTG19qQ2o9KaxBj7
+M5Y6f7UxtP8AaurNoPSmG0HpVLEi9mcm2ne1RPp3tXXmzHpUbWY9KpYkXszj2072qJtPHpXYPZ+1
+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
+jHJJIx9OtFWI/9k=
+
+------=_NextPart_000_0000_01CCA379.6C92EBC0
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWithout2_small.jpg
+
+/9j/4AAQSkZJRgABAQEBLAEsAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcU
+FhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgo
+KCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCACAAMgDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDms0tJ
+iivXOYKaw9afSMMirjYllZsVAwNWylNKA1ukjNspFabsq8Yc0ww1ViblPbRtq0YjSeX7U7BcrbaN
+tWPLo8s07Bcr7KXy6n8s0uyiwiv5dHl1ZCUuynYLlXZS7Kt+XSiOnYVyqEpQlWhFSiKnYVysEpwS
+rPl0ojp2FcgCU4JU4jp4ip2C5XCUVaEdFOwrl1tPYHg0w2br2zXqN94StwhMU5Vv9rBrmb3SpLZy
+NyOPVTXnwdOex0y5o7nImAjqKQwmuha2GcMv51C9kD0FbqKRm5MwTCfSmGKtp7Nh2zURt/UYq7Cu
+ZPlml2H0rTNt6Cmm3PpTsK5neX7UhiFaHkH0pPI9qdguZ5gppg9q0vJPpS+T7U7CuZfk+1HlVqeR
+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
+
+------=_NextPart_000_0000_01CCA379.6C92EBC0
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://www.cs.auckland.ac.nz/~jvan006/multitex/TerrainWith2_small.jpg
+
+/9j/4AAQSkZJRgABAQEBLAEsAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcU
+FhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgo
+KCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCACAAMgDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDms0tJ
+iivXOYKaw9afSMMirjYllZsVAwNWylNKA1ukjNspFabsq8Yc0ww1ViblPbRtq0YjSeX7U7BcrbaN
+tWPLo8s07Bcr7KXy6n8s0uyiwiv5dHl1ZCUuynYLlXZS7Kt+XSiOnYVyqEpQlWhFSiKnYVysEpwS
+rPl0ojp2FcgCU4JU4jp4ip2C5XCUVaEdFOwrl1tPYHg0w2br2zXqN94StwhMU5Vv9rBrmb3SpLZy
+NyOPVTXnwdOex0y5o7nImAjqKQwmuha2GcMv51C9kD0FbqKRm5MwTCfSmGKtp7Nh2zURt/UYq7Cu
+ZPlml2H0rTNt6Cmm3PpTsK5neX7UhiFaHkH0pPI9qdguZ5gppg9q0vJPpS+T7U7CuZfk+1HlVqeR
+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
+
+------=_NextPart_000_0000_01CCA379.6C92EBC0
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://www.cs.auckland.ac.nz/~jvan006/line.gif
+
+R0lGODlhyAAEAKL/AMDAwABBawAAVQAAMwAAAAAAAAAAAAAAACH5BAEAAAAALAAAAADIAAQAAAMu
+CLrc/jDKSau9OOs9xfhgKI5kaZ5oqq5s677wKChBbN94ru98GXDAoHBILBorCQA7
+
+------=_NextPart_000_0000_01CCA379.6C92EBC0--
