@@ -1,0 +1,1458 @@
+在Android系统中，针对移动设备内存空间有限的特点，提供了一种在进程间共享数据的机制：匿名共享内存，它能够辅助内存管理系统来有效地管理内存，它的实现原理我们在前面已经分析过了。为了方便使用匿名共享内存机制，系统还提供了Java调用接口（MemoryFile）和C++调用接口（MemoryHeapBase、MemoryBase），Java接口在前面也已经分析过了，本文中将继续分析它的C++接口。
+
+        在前面一篇文章Android系统匿名共享内存Ashmem（Anonymous Shared Memory）驱动程序源代码分析中，我们分析了匿名共享内存驱动程序Ashmem的实现，重点介绍了它是如何辅助内存管理系统来有效地管理内存的，简单来说，它就是给使用者提供锁机制来辅助管理内存，当我们申请了一大块匿名共享内存时，中间过程有一部分不需要使用时，我们就可以将这一部分内存块解锁，这样内存管理系统就可以把它回收回去了。接着又在前面一篇文章Android系统匿名共享内存Ashmem（Anonymous Shared Memory）在进程间共享的原理分析中，我们分析了匿名共享内存是如何通过Binder进程间通信机制来实现在进程间共享的，简单来说，就是每一个匿名共享内存块都是一个文件，当我们需要在进程间共享时，就把这个文件的打开描述符通过Binder进程间通信机制传递给另一外进程，在传递的过程中，Binder驱动程序就通过这个复制这个打开文件描述符到目标进程中去，从而实现数据共享。在文章Android系统匿名共享内存Ashmem（Anonymous Shared Memory）简要介绍和学习计划中，我们介绍了如何在Android应用程序中使用匿名共享内存，主要是通过应用程序框架层提供的MemoryFile接口来使用的，而MemoryFile接口是通过JNI方法调用到系统运行时库层中的匿名共享内存C接口，最终通过这些C接口来使用内核空间中的匿名共享内存驱动模块。为了方便开发者灵活地使用匿名共享内存，Android系统在应用程序框架层中还提供了使用匿名共享内存的C++接口，例如，Android应用程序四大组件之一Content Provider，它在应用程序间共享数据时，就是通过匿名共享内存机制来实现，但是它并不是通过MemoryFile接口来使用，而是通过调用C++接口中的MemoryBase类和MemoryHeapBase类来使用。在接下来的内容中，我们就详细分析MemoryHeapBase类和MemoryBase类的实现，以及它们是如何实现在进程间共享数据的。
+
+        如果我们想在进程间共享一个完整的匿名共享内存块，可以通过使用MemoryHeapBase接口来实现，如果我们只想在进程间共享一个匿名共享内存块中的其中一部分时，就可以通过MemoryBase接口来实现。MemoryBase接口是建立在MemoryHeapBase接口的基础上面的，它们都可以作为一个Binder对象来在进程间传输，因此，希望读者在继续阅读本文之前，对Android系统的Binder进程间通信机制有一定的了解，具体可以参考前面一篇文章Android进程间通信（IPC）机制Binder简要介绍和学习计划。下面我们就首先分析MemoryHeapBase接口的实现，然后再分析MemoryBase接口的实现，最后，通过一个实例来说明它们是如何使用的。
+
+        1. MemoryHeapBase
+
+         前面说到，MemoryHeapBase类的对象可以作为Binder对象在进程间传输，作为一个Binder对象，就有Server端对象和Client端引用的概念，其中，Server端对象必须要实现一个BnInterface接口，而Client端引用必须要实现一个BpInterface接口。下面我们就先看一下MemoryHeapBase在Server端实现的类图：
+
+
+
+
+         这个类图中的类可以划分为两部分，一部分是和业务相关的，即跟匿名共享内存操作相关的类，包括MemoryHeapBase、IMemoryBase和RefBase三个类，另一部分是和Binder机制相关的，包括IInterface、BnInterface、BnMemoryHeap、IBinder、BBinder、ProcessState和IPCThreadState七个类。
+
+        我们先来看跟匿名共享内存业务相关的这部分类的逻辑关系。IMemoryBase定义了匿名共享内操作的接口，而MemoryHeapBase是作为Binder机制中的Server角色的，因此，它需要实现IMemoryBase接口，此外，MemoryHeapBase还继承了RefBase类。从前面一篇文章Android系统的智能指针（轻量级指针、强指针和弱指针）的实现原理分析中，我们知道，继承了RefBase类的子类，它们的对象都可以结合Android系统的智能指针来使用，因此，我们在实例化MemoryHeapBase类时，可以通过智能指针来管理它们的生命周期。
+
+        再来看和Binder机制相关的这部分类的逻辑关系。从Android系统进程间通信（IPC）机制Binder中的Server启动过程源代码分析这篇文章中，我们知道，所有的Binder对象都必须实现IInterface接口，无论是Server端实体对象，还是Client端引用对象，通过这个接口的asBinder成员函数我们可以获得Binder对象的IBinder接口，然后通过Binder驱动程序把它传输给另外一个进程。当一个类的对象作为Server端的实体对象时，它还必须实现一个模板类BnInterface，这里负责实例化模板类BnInterface的类便是BnMemoryHeap类了，它里面有一个重要的成员函数onTransact，当Client端引用请求Server端对象执行命令时，Binder系统就会调用BnMemoryHeap类的onTransact成员函数来执行具体的命令。当一个类的对象作为Server端的实体对象时，它还要继承于BBinder类，这是一个实现了IBinder接口的类，它里面有一个重要的成员函数transact，当我们从Server端线程中接收到Client端的请求时，就会调用注册在这个线程中的BBinder对象的transact函数来处理这个请求，而这个transact函数会将这些Client端请求转发给BnMemoryHeap类的onTransact成员函数来处理。最后，ProcessState和IPCThreadState两个类是负责和Binder驱动程序打交道的，其中，ProcessState负责打开Binder设备文件/dev/binder，打开了这个Binder设备文件后，就会得到一个打开设备文件描述符，而IPCThreadState就是通过这个设备文件描述符来和Binder驱动程序进行交互的，例如它通过一个for循环来不断地等待Binder驱动程序通知它有新的Client端请求到来了，一旦有新的Client端请求到来，它就会调用相应的BBinder对象的transact函数来处理。
+
+        本文我们主要是要关注和匿名共享内存业务相关的这部分类，即IMemoryBase和MemoryHeapBase类的实现，和Binder机制相关的这部分类的实现，可以参考Android进程间通信（IPC）机制Binder简要介绍和学习计划一文。
+
+        IMemoryBase类主要定义了几个重要的操作匿名共享内存的方法，它定义在frameworks/base/include/binder/IMemory.h文件中：
+
+
+view plaincopy to clipboardprint?class IMemoryHeap : public IInterface  
+{  
+public:  
+    ......  
+  
+    virtual int         getHeapID() const = 0;  
+    virtual void*       getBase() const = 0;  
+    virtual size_t      getSize() const = 0;  
+  
+    ......  
+};  
+class IMemoryHeap : public IInterface
+{
+public:
+	......
+
+	virtual int         getHeapID() const = 0;
+	virtual void*       getBase() const = 0;
+	virtual size_t      getSize() const = 0;
+
+	......
+};
+
+        成员函数getHeapID是用来获得匿名共享内存块的打开文件描述符的；成员函数getBase是用来获得匿名共享内存块的基地址的，有了这个地址之后，我们就可以在程序里面直接访问这块共享内存了；成员函数getSize是用来获得匿名共享内存块的大小的。
+        MemoryHeapBase类主要用来实现上面IMemoryBase类中列出来的几个成员函数的，这个类声明在frameworks/base/include/binder/MemoryHeapBase.h文件中：
+
+
+view plaincopy to clipboardprint?class MemoryHeapBase : public virtual BnMemoryHeap  
+{  
+public:  
+    ......  
+  
+    /* 
+    * maps memory from ashmem, with the given name for debugging 
+    */  
+    MemoryHeapBase(size_t size, uint32_t flags = 0, char const* name = NULL);  
+  
+    ......  
+  
+    /* implement IMemoryHeap interface */  
+    virtual int         getHeapID() const;  
+    virtual void*       getBase() const;  
+    virtual size_t      getSize() const;  
+  
+    ......  
+private:  
+    int         mFD;  
+    size_t      mSize;  
+    void*       mBase;  
+  
+    ......  
+}  
+class MemoryHeapBase : public virtual BnMemoryHeap
+{
+public:
+	......
+
+	/*
+	* maps memory from ashmem, with the given name for debugging
+	*/
+	MemoryHeapBase(size_t size, uint32_t flags = 0, char const* name = NULL);
+
+	......
+
+	/* implement IMemoryHeap interface */
+	virtual int         getHeapID() const;
+	virtual void*       getBase() const;
+	virtual size_t      getSize() const;
+
+	......
+private:
+	int         mFD;
+	size_t      mSize;
+	void*       mBase;
+
+	......
+}         MemoryHeapBase类的实现定义在frameworks/base/libs/binder/MemoryHeapBase.cpp文件中，我们先来看一下它的构造函数的实现：
+
+
+view plaincopy to clipboardprint?MemoryHeapBase::MemoryHeapBase(size_t size, uint32_t flags, char const * name)  
+: mFD(-1), mSize(0), mBase(MAP_FAILED), mFlags(flags),  
+mDevice(0), mNeedUnmap(false)  
+{  
+    const size_t pagesize = getpagesize();  
+    size = ((size + pagesize-1) & ~(pagesize-1));  
+    int fd = ashmem_create_region(name == NULL ? "MemoryHeapBase" : name, size);  
+    LOGE_IF(fd<0, "error creating ashmem region: %s", strerror(errno));  
+    if (fd >= 0) {  
+        if (mapfd(fd, size) == NO_ERROR) {  
+            if (flags & READ_ONLY) {  
+                ashmem_set_prot_region(fd, PROT_READ);  
+            }  
+        }  
+    }  
+}  
+MemoryHeapBase::MemoryHeapBase(size_t size, uint32_t flags, char const * name)
+: mFD(-1), mSize(0), mBase(MAP_FAILED), mFlags(flags),
+mDevice(0), mNeedUnmap(false)
+{
+	const size_t pagesize = getpagesize();
+	size = ((size + pagesize-1) & ~(pagesize-1));
+	int fd = ashmem_create_region(name == NULL ? "MemoryHeapBase" : name, size);
+	LOGE_IF(fd<0, "error creating ashmem region: %s", strerror(errno));
+	if (fd >= 0) {
+		if (mapfd(fd, size) == NO_ERROR) {
+			if (flags & READ_ONLY) {
+				ashmem_set_prot_region(fd, PROT_READ);
+			}
+		}
+	}
+}        这个构造函数有三个参数，其中size表示要创建的匿名共享内存的大小，flags是用来设置这块匿名共享内存的属性的，例如是可读写的还是只读的，name是用来标识这个匿名共享内存的名字的，可以传空值进来，这个参数只是作为调试信息使用的。
+
+        MemoryHeapBase类创建的匿名共享内存是以页为单位的，页的大小一般为4K，但是是可以设置的，这个函数首先通过getpagesize函数获得系统中一页内存的大小值，然后把size参数对齐到页大小去，即如果size不是页大小的整数倍时，就增加它的大小，使得它的值为页大小的整数倍：
+
+
+view plaincopy to clipboardprint?const size_t pagesize = getpagesize();  
+size = ((size + pagesize-1) & ~(pagesize-1));  
+const size_t pagesize = getpagesize();
+size = ((size + pagesize-1) & ~(pagesize-1));        调整好size的大小后，就调用系统运行时库层的C接口ashmem_create_region来创建一块共享内存了：
+
+
+view plaincopy to clipboardprint?int fd = ashmem_create_region(name == NULL ? "MemoryHeapBase" : name, size);  
+int fd = ashmem_create_region(name == NULL ? "MemoryHeapBase" : name, size);        这个函数我们在前面一篇文章Android系统匿名共享内存Ashmem（Anonymous Shared Memory）驱动程序源代码分析中可以介绍过了，这里不再详细，它只要就是通过Ashmem驱动程序来创建一个匿名共享内存文件，因此，它的返回值是一个文件描述符。
+
+        得到了这个匿名共享内存的文件描述符后，还需要调用mapfd成函数把它映射到进程地址空间去：
+
+
+view plaincopy to clipboardprint?status_t MemoryHeapBase::mapfd(int fd, size_t size, uint32_t offset)  
+{  
+    ......  
+  
+    if ((mFlags & DONT_MAP_LOCALLY) == 0) {  
+        void* base = (uint8_t*)mmap(0, size,  
+            PROT_READ|PROT_WRITE, MAP_SHARED, fd, offset);  
+        ......  
+        mBase = base;  
+        ......  
+    } else  {  
+        ......  
+    }  
+  
+    mFD = fd;  
+    mSize = size;  
+    return NO_ERROR;  
+}  
+status_t MemoryHeapBase::mapfd(int fd, size_t size, uint32_t offset)
+{
+	......
+
+	if ((mFlags & DONT_MAP_LOCALLY) == 0) {
+		void* base = (uint8_t*)mmap(0, size,
+			PROT_READ|PROT_WRITE, MAP_SHARED, fd, offset);
+		......
+		mBase = base;
+		......
+	} else  {
+		......
+	}
+
+	mFD = fd;
+	mSize = size;
+	return NO_ERROR;
+}        一般我们创建MemoryHeapBase类的实例时，都是需要把匿名共享内存映射到本进程的地址空间去的，因此，这里的条件(mFlags & DONT_MAP_LOCALLY == 0)为true，于是执行系统调用mmap来执行内存映射的操作。
+view plaincopy to clipboardprint?void* base = (uint8_t*)mmap(0, size,  
+    PROT_READ|PROT_WRITE, MAP_SHARED, fd, offset);  
+void* base = (uint8_t*)mmap(0, size,
+	PROT_READ|PROT_WRITE, MAP_SHARED, fd, offset);        传进去的第一个参数0表示由内核来决定这个匿名共享内存文件在进程地址空间的起始位置，第二个参数size表示要映射的匿名共享内文件的大小，第三个参数PROT_READ|PROT_WRITE表示这个匿名共享内存是可读写的，第四个参数fd指定要映射的匿名共享内存的文件描述符，第五个参数offset表示要从这个文件的哪个偏移位置开始映射。调用了这个函数之后，最后会进入到内核空间的ashmem驱动程序模块中去执行ashmem_map函数，这个函数的实现具体可以参考Android系统匿名共享内存Ashmem（Anonymous Shared Memory）驱动程序源代码分析一文，这里就不同详细描述了。调用mmap函数返回之后，就得这块匿名共享内存在本进程地址空间中的起始访问地址了，将这个地址保存在成员变量mBase中，最后，还将这个匿名共享内存的文件描述符和以及大小分别保存在成员变量mFD和mSize中。
+
+        回到前面MemoryHeapBase类的构造函数中，将匿名共享内存映射到本进程的地址空间去后，还看继续设置这块匿名共享内存的读写属性：
+
+
+view plaincopy to clipboardprint?if (fd >= 0) {  
+    if (mapfd(fd, size) == NO_ERROR) {  
+        if (flags & READ_ONLY) {  
+            ashmem_set_prot_region(fd, PROT_READ);  
+        }  
+    }  
+}  
+if (fd >= 0) {
+	if (mapfd(fd, size) == NO_ERROR) {
+		if (flags & READ_ONLY) {
+			ashmem_set_prot_region(fd, PROT_READ);
+		}
+	}
+}        上面调用mapfd函数来映射匿名共享内存时，指定这块内存是可读写的，但是如果传进来的参数flags设置了只读属性，那么还需要调用系统运行时库存层的ashmem_set_prot_region函数来设置这块匿名共享内存为只读，这个函数定义在system/core/libcutils/ashmem-dev.c文件，有兴趣的读者可以自己去研究一下。
+
+        这样，通过这个构造函数，一块匿名共享内存就建立好了，其余的三个成员函数getHeapID、getBase和getSize就简单了：
+
+
+view plaincopy to clipboardprint?int MemoryHeapBase::getHeapID() const {  
+    return mFD;  
+}  
+  
+void* MemoryHeapBase::getBase() const {  
+    return mBase;  
+}  
+  
+size_t MemoryHeapBase::getSize() const {  
+    return mSize;  
+}  
+int MemoryHeapBase::getHeapID() const {
+    return mFD;
+}
+
+void* MemoryHeapBase::getBase() const {
+    return mBase;
+}
+
+size_t MemoryHeapBase::getSize() const {
+    return mSize;
+}       接下来我们再来看一下MemoryHeapBase在Client端实现的类图：
+
+
+
+
+
+         这个类图中的类也是可以划分为两部分，一部分是和业务相关的，即跟匿名共享内存操作相关的类，包括BpMemoryHeap、IMemoryBase和RefBase三个类，另一部分是和Binder机制相关的，包括IInterface、BpInterface、BpRefBase、IBinder、BpBinder、ProcessState和IPCThreadState七个类。
+
+        在和匿名共享内存操作相关的类中，BpMemoryHeap类是前面分析的MemoryHeapBase类在Client端进程的远接接口类，当Client端进程从Service Manager或者其它途径获得了一个MemoryHeapBase对象的引用之后，就会在本地创建一个BpMemoryHeap对象来代表这个引用。BpMemoryHeap类同样是要实现IMemoryHeap接口，同时，它是从RefBase类继承下来的，因此，它可以与智能指针来结合使用。
+
+        在和Binder机制相关的类中，和Server端实现不一样的地方是，Client端不需要实现BnInterface和BBinder两个类，但是需要实现BpInterface、BpRefBase和BpBinder三个类。BpInterface类继承于BpRefBase类，而在BpRefBase类里面，有一个成员变量mRemote，它指向一个BpBinder对象，当BpMemoryHeap类需要向Server端对象发出请求时，它就会通过这个BpBinder对象的transact函数来发出这个请求。这里的BpBinder对象是如何知道要向哪个Server对象发出请深圳市的呢？它里面有一个成员变量mHandle，它表示的是一个Server端Binder对象的引用值，BpBinder对象就是要通过这个引用值来把请求发送到相应的Server端对象去的了，这个引用值与Server端Binder对象的对应关系是在Binder驱动程序内部维护的。这里的ProcessSate类和IPCThreadState类的作用和在Server端的作用是类似的，它们都是负责和底层的Binder驱动程序进行交互，例如，BpBinder对象的transact函数就通过线程中的IPCThreadState对象来将Client端请求发送出去的。这些实现具体可以参考Android系统进程间通信（IPC）机制Binder中的Client获得Server远程接口过程源代码分析一文。
+
+        这里我们主要关注BpMemoryHeap类是如何实现IMemoryHeap接口的，这个类声明和定义在frameworks/base/libs/binder/IMemory.cpp文件中：
+
+
+view plaincopy to clipboardprint?class BpMemoryHeap : public BpInterface<IMemoryHeap>  
+{  
+public:  
+    BpMemoryHeap(const sp<IBinder>& impl);  
+    ......  
+  
+    virtual int getHeapID() const;  
+    virtual void* getBase() const;  
+    virtual size_t getSize() const;  
+  
+    ......  
+private:  
+    mutable volatile int32_t mHeapId;  
+    mutable void*       mBase;  
+    mutable size_t      mSize;  
+  
+    ......  
+}  
+class BpMemoryHeap : public BpInterface<IMemoryHeap>
+{
+public:
+	BpMemoryHeap(const sp<IBinder>& impl);
+	......
+
+	virtual int getHeapID() const;
+	virtual void* getBase() const;
+	virtual size_t getSize() const;
+
+	......
+private:
+	mutable volatile int32_t mHeapId;
+	mutable void*       mBase;
+	mutable size_t      mSize;
+
+	......
+}        先来看构造函数BpMemoryHeap的实现：
+
+
+view plaincopy to clipboardprint?BpMemoryHeap::BpMemoryHeap(const sp<IBinder>& impl)  
+    : BpInterface<IMemoryHeap>(impl),  
+        mHeapId(-1), mBase(MAP_FAILED), mSize(0), mFlags(0), mRealHeap(false)  
+{  
+}  
+BpMemoryHeap::BpMemoryHeap(const sp<IBinder>& impl)
+    : BpInterface<IMemoryHeap>(impl),
+        mHeapId(-1), mBase(MAP_FAILED), mSize(0), mFlags(0), mRealHeap(false)
+{
+}        它的实现很简单，只是初始化一下各个成员变量，例如，表示匿名共享内存文件描述符的mHeapId值初化为-1、表示匿名内共享内存基地址的mBase值初始化为MAP_FAILED以及表示匿名共享内存大小的mSize初始为为0，它们都表示在Client端进程中，这个匿名共享内存还未准备就绪，要等到第一次使用时才会去创建。这里还需要注意的一点，参数impl指向的是一个BpBinder对象，它里面包含了一个指向Server端Binder对象，即MemoryHeapBase对象的引用。
+
+        其余三个成员函数getHeapID、getBase和getSize的实现是类似的：
+
+
+view plaincopy to clipboardprint?int BpMemoryHeap::getHeapID() const {  
+    assertMapped();  
+    return mHeapId;  
+}  
+  
+void* BpMemoryHeap::getBase() const {  
+    assertMapped();  
+    return mBase;  
+}  
+  
+size_t BpMemoryHeap::getSize() const {  
+    assertMapped();  
+    return mSize;  
+}  
+int BpMemoryHeap::getHeapID() const {
+    assertMapped();
+    return mHeapId;
+}
+
+void* BpMemoryHeap::getBase() const {
+    assertMapped();
+    return mBase;
+}
+
+size_t BpMemoryHeap::getSize() const {
+    assertMapped();
+    return mSize;
+}        即它们在使用之前，都会首先调用assertMapped函数来保证在Client端的匿名共享内存是已经准备就绪了的：
+
+
+view plaincopy to clipboardprint?void BpMemoryHeap::assertMapped() const  
+{  
+    if (mHeapId == -1) {  
+        sp<IBinder> binder(const_cast<BpMemoryHeap*>(this)->asBinder());  
+        sp<BpMemoryHeap> heap(static_cast<BpMemoryHeap*>(find_heap(binder).get()));  
+        heap->assertReallyMapped();  
+        if (heap->mBase != MAP_FAILED) {  
+            Mutex::Autolock _l(mLock);  
+            if (mHeapId == -1) {  
+                mBase   = heap->mBase;  
+                mSize   = heap->mSize;  
+                android_atomic_write( dup( heap->mHeapId ), &mHeapId );  
+            }  
+        } else {  
+            // something went wrong   
+            free_heap(binder);  
+        }  
+    }  
+}  
+void BpMemoryHeap::assertMapped() const
+{
+    if (mHeapId == -1) {
+        sp<IBinder> binder(const_cast<BpMemoryHeap*>(this)->asBinder());
+        sp<BpMemoryHeap> heap(static_cast<BpMemoryHeap*>(find_heap(binder).get()));
+        heap->assertReallyMapped();
+        if (heap->mBase != MAP_FAILED) {
+            Mutex::Autolock _l(mLock);
+            if (mHeapId == -1) {
+                mBase   = heap->mBase;
+                mSize   = heap->mSize;
+                android_atomic_write( dup( heap->mHeapId ), &mHeapId );
+            }
+        } else {
+            // something went wrong
+            free_heap(binder);
+        }
+    }
+}       在解释这个函数之前，我们需要先了解一下BpMemoryHeap是如何知道自己内部维护的这块匿名共享内存有没有准备就绪的。
+       在frameworks/base/libs/binder/IMemory.cpp文件中，定义了一个全局变量gHeapCache：
+
+
+view plaincopy to clipboardprint?static sp<HeapCache> gHeapCache = new HeapCache();  
+static sp<HeapCache> gHeapCache = new HeapCache();
+
+       它的类型为HeapCache，这也是一个定义在frameworks/base/libs/binder/IMemory.cpp文件的类，它里面维护了本进程中所有的MemoryHeapBase对象的引用。由于在Client端进程中，可能会有多个引用，即多个BpMemoryHeap对象，对应同一个MemoryHeapBase对象（这是由于可以用同一个BpBinder对象来创建多个BpMemoryHeap对象），因此，当第一个BpMemoryHeap对象在本进程中映射好这块匿名共享内存之后，后面的BpMemoryHeap对象就可以直接使用了，不需要再映射一次，当然重新再映射一次没有害处，但是会是多此一举，Google在设计这个类时，可以说是考虑得非常周到的。
+
+       我们来看一下HeapCache的实现：
+
+
+view plaincopy to clipboardprint?class HeapCache : public IBinder::DeathRecipient  
+{  
+public:  
+    HeapCache();  
+    virtual ~HeapCache();  
+  
+    ......  
+  
+    sp<IMemoryHeap> find_heap(const sp<IBinder>& binder);  
+    void free_heap(const sp<IBinder>& binder);  
+    sp<IMemoryHeap> get_heap(const sp<IBinder>& binder);  
+    ......  
+  
+private:  
+    // For IMemory.cpp   
+    struct heap_info_t {  
+        sp<IMemoryHeap> heap;  
+        int32_t         count;  
+    };  
+  
+    ......  
+  
+    Mutex mHeapCacheLock;  
+    KeyedVector< wp<IBinder>, heap_info_t > mHeapCache;  
+};  
+class HeapCache : public IBinder::DeathRecipient
+{
+public:
+    HeapCache();
+    virtual ~HeapCache();
+
+    ......
+
+    sp<IMemoryHeap> find_heap(const sp<IBinder>& binder);
+    void free_heap(const sp<IBinder>& binder);
+    sp<IMemoryHeap> get_heap(const sp<IBinder>& binder);
+    ......
+
+private:
+    // For IMemory.cpp
+    struct heap_info_t {
+        sp<IMemoryHeap> heap;
+        int32_t         count;
+    };
+
+    ......
+
+    Mutex mHeapCacheLock;
+    KeyedVector< wp<IBinder>, heap_info_t > mHeapCache;
+};       它里面定义了一个成员变量mHeapCache，用来维护本进程中的所有BpMemoryHeap对象，同时还提供了find_heap和get_heap函数来查找内部所维护的BpMemoryHeap对象的功能。函数find_heap和get_heap的区别是，在find_heap函数中，如果在mHeapCache找不到相应的BpMemoryHeap对象，就会把这个BpMemoryHeap对象加入到mHeapCache中去，而在get_heap函数中，则不会自动把这个BpMemoryHeap对象加入到mHeapCache中去。
+
+       这里，我们主要看一下find_heap函数的实现：
+
+
+view plaincopy to clipboardprint?sp<IMemoryHeap> HeapCache::find_heap(const sp<IBinder>& binder)  
+{  
+    Mutex::Autolock _l(mHeapCacheLock);  
+    ssize_t i = mHeapCache.indexOfKey(binder);  
+    if (i>=0) {  
+        heap_info_t& info = mHeapCache.editValueAt(i);  
+        LOGD_IF(VERBOSE,  
+                "found binder=%p, heap=%p, size=%d, fd=%d, count=%d",  
+                binder.get(), info.heap.get(),  
+                static_cast<BpMemoryHeap*>(info.heap.get())->mSize,  
+                static_cast<BpMemoryHeap*>(info.heap.get())->mHeapId,  
+                info.count);  
+        android_atomic_inc(&info.count);  
+        return info.heap;  
+    } else {  
+        heap_info_t info;  
+        info.heap = interface_cast<IMemoryHeap>(binder);  
+        info.count = 1;  
+        //LOGD("adding binder=%p, heap=%p, count=%d",   
+        //      binder.get(), info.heap.get(), info.count);   
+        mHeapCache.add(binder, info);  
+        return info.heap;  
+    }  
+}  
+sp<IMemoryHeap> HeapCache::find_heap(const sp<IBinder>& binder)
+{
+    Mutex::Autolock _l(mHeapCacheLock);
+    ssize_t i = mHeapCache.indexOfKey(binder);
+    if (i>=0) {
+        heap_info_t& info = mHeapCache.editValueAt(i);
+        LOGD_IF(VERBOSE,
+                "found binder=%p, heap=%p, size=%d, fd=%d, count=%d",
+                binder.get(), info.heap.get(),
+                static_cast<BpMemoryHeap*>(info.heap.get())->mSize,
+                static_cast<BpMemoryHeap*>(info.heap.get())->mHeapId,
+                info.count);
+        android_atomic_inc(&info.count);
+        return info.heap;
+    } else {
+        heap_info_t info;
+        info.heap = interface_cast<IMemoryHeap>(binder);
+        info.count = 1;
+        //LOGD("adding binder=%p, heap=%p, count=%d",
+        //      binder.get(), info.heap.get(), info.count);
+        mHeapCache.add(binder, info);
+        return info.heap;
+    }
+}        这个函数很简单，首先它以传进来的参数binder为关键字，在mHeapCache中查找，看看是否有对应的heap_info对象info存在，如果有的话，就增加它的引用计数info.count值，表示这个BpBinder对象多了一个使用者；如果没有的话，那么就需要创建一个heap_info对象info，并且将它加放到mHeapCache中去了。
+
+        回到前面BpMemoryHeap类中的assertMapped函数中，如果本BpMemoryHeap对象中的mHeapID等于-1，那么就说明这个BpMemoryHeap对象中的匿名共享内存还没准备就绪，因此，需要执行一次映射匿名共享内存的操作。
+
+        在执行映射操作之作，先要看看在本进程中是否有其它映射到同一个MemoryHeapBase对象的BpMemoryHeap对象存在：
+
+
+view plaincopy to clipboardprint?sp<IBinder> binder(const_cast<BpMemoryHeap*>(this)->asBinder());  
+sp<BpMemoryHeap> heap(static_cast<BpMemoryHeap*>(find_heap(binder).get()));  
+sp<IBinder> binder(const_cast<BpMemoryHeap*>(this)->asBinder());
+sp<BpMemoryHeap> heap(static_cast<BpMemoryHeap*>(find_heap(binder).get()));       这里的find_heap函数是BpMemoryHeap的成员函数，最终它调用了前面提到的全局变量gHeapCache来直正执行查找的操作：
+
+
+view plaincopy to clipboardprint?class BpMemoryHeap : public BpInterface<IMemoryHeap>  
+{     
+......  
+  
+private:  
+    static inline sp<IMemoryHeap> find_heap(const sp<IBinder>& binder) {  
+        return gHeapCache->find_heap(binder);  
+    }  
+  
+    ......  
+}  
+class BpMemoryHeap : public BpInterface<IMemoryHeap>
+{	
+......
+
+private:
+	static inline sp<IMemoryHeap> find_heap(const sp<IBinder>& binder) {
+		return gHeapCache->find_heap(binder);
+	}
+
+	......
+}        注意，这里通过find_heap函数得到BpMemoryHeap对象可能是和正在执行assertMapped函数中的BpMemoryHeap对象一样，也可能不一样，但是这没有关系，这两种情况的处理方式都是一样的，都是通过调用这个通过find_heap函数得到BpMemoryHeap对象的assertReallyMapped函数来进一步确认它内部的匿名共享内存是否已经映射到进程空间了：
+
+
+view plaincopy to clipboardprint?void BpMemoryHeap::assertReallyMapped() const  
+{  
+    if (mHeapId == -1) {  
+  
+        // remote call without mLock held, worse case scenario, we end up   
+        // calling transact() from multiple threads, but that's not a problem,   
+        // only mmap below must be in the critical section.   
+  
+        Parcel data, reply;  
+        data.writeInterfaceToken(IMemoryHeap::getInterfaceDescriptor());  
+        status_t err = remote()->transact(HEAP_ID, data, &reply);  
+        int parcel_fd = reply.readFileDescriptor();  
+        ssize_t size = reply.readInt32();  
+        uint32_t flags = reply.readInt32();  
+  
+        LOGE_IF(err, "binder=%p transaction failed fd=%d, size=%ld, err=%d (%s)",  
+            asBinder().get(), parcel_fd, size, err, strerror(-err));  
+  
+        int fd = dup( parcel_fd );  
+        LOGE_IF(fd==-1, "cannot dup fd=%d, size=%ld, err=%d (%s)",  
+            parcel_fd, size, err, strerror(errno));  
+  
+        int access = PROT_READ;  
+        if (!(flags & READ_ONLY)) {  
+            access |= PROT_WRITE;  
+        }  
+  
+        Mutex::Autolock _l(mLock);  
+        if (mHeapId == -1) {  
+            mRealHeap = true;  
+            mBase = mmap(0, size, access, MAP_SHARED, fd, 0);  
+            if (mBase == MAP_FAILED) {  
+                LOGE("cannot map BpMemoryHeap (binder=%p), size=%ld, fd=%d (%s)",  
+                    asBinder().get(), size, fd, strerror(errno));  
+                close(fd);  
+            } else {  
+                mSize = size;  
+                mFlags = flags;  
+                android_atomic_write(fd, &mHeapId);  
+            }  
+        }  
+    }  
+}  
+void BpMemoryHeap::assertReallyMapped() const
+{
+	if (mHeapId == -1) {
+
+		// remote call without mLock held, worse case scenario, we end up
+		// calling transact() from multiple threads, but that's not a problem,
+		// only mmap below must be in the critical section.
+
+		Parcel data, reply;
+		data.writeInterfaceToken(IMemoryHeap::getInterfaceDescriptor());
+		status_t err = remote()->transact(HEAP_ID, data, &reply);
+		int parcel_fd = reply.readFileDescriptor();
+		ssize_t size = reply.readInt32();
+		uint32_t flags = reply.readInt32();
+
+		LOGE_IF(err, "binder=%p transaction failed fd=%d, size=%ld, err=%d (%s)",
+			asBinder().get(), parcel_fd, size, err, strerror(-err));
+
+		int fd = dup( parcel_fd );
+		LOGE_IF(fd==-1, "cannot dup fd=%d, size=%ld, err=%d (%s)",
+			parcel_fd, size, err, strerror(errno));
+
+		int access = PROT_READ;
+		if (!(flags & READ_ONLY)) {
+			access |= PROT_WRITE;
+		}
+
+		Mutex::Autolock _l(mLock);
+		if (mHeapId == -1) {
+			mRealHeap = true;
+			mBase = mmap(0, size, access, MAP_SHARED, fd, 0);
+			if (mBase == MAP_FAILED) {
+				LOGE("cannot map BpMemoryHeap (binder=%p), size=%ld, fd=%d (%s)",
+					asBinder().get(), size, fd, strerror(errno));
+				close(fd);
+			} else {
+				mSize = size;
+				mFlags = flags;
+				android_atomic_write(fd, &mHeapId);
+			}
+		}
+	}
+}        如果成员变量mHeapId的值为-1，就说明还没有把在Server端的MemoryHeapBase对象中的匿名共享内存映射到本进程空间来，于是，就通过一个Binder进程间调用把Server端的MemoryHeapBase对象中的匿名共享内存对象信息取回来：
+
+
+view plaincopy to clipboardprint?Parcel data, reply;  
+data.writeInterfaceToken(IMemoryHeap::getInterfaceDescriptor());  
+status_t err = remote()->transact(HEAP_ID, data, &reply);  
+int parcel_fd = reply.readFileDescriptor();  
+ssize_t size = reply.readInt32();  
+uint32_t flags = reply.readInt32();  
+  
+......  
+  
+int fd = dup( parcel_fd );  
+          
+......  
+Parcel data, reply;
+data.writeInterfaceToken(IMemoryHeap::getInterfaceDescriptor());
+status_t err = remote()->transact(HEAP_ID, data, &reply);
+int parcel_fd = reply.readFileDescriptor();
+ssize_t size = reply.readInt32();
+uint32_t flags = reply.readInt32();
+
+......
+
+int fd = dup( parcel_fd );
+		
+......        取回来的信息包括MemoryHeapBase对象中的匿名共享内存在本进程中的文件描述符fd、大小size以及访问属性flags。如何把MemoryHeapBase对象中的匿名共享内存作为本进程的一个打开文件描述符，请参考前面一篇文章Android系统匿名共享内存Ashmem（Anonymous Shared Memory）在进程间共享的原理分析。有了这个文件描述符fd后，就可以对它进行内存映射操作了：
+
+
+view plaincopy to clipboardprint?Mutex::Autolock _l(mLock);  
+if (mHeapId == -1) {  
+    mRealHeap = true;  
+    mBase = mmap(0, size, access, MAP_SHARED, fd, 0);  
+    if (mBase == MAP_FAILED) {  
+        LOGE("cannot map BpMemoryHeap (binder=%p), size=%ld, fd=%d (%s)",  
+            asBinder().get(), size, fd, strerror(errno));  
+        close(fd);  
+    } else {  
+        mSize = size;  
+        mFlags = flags;  
+        android_atomic_write(fd, &mHeapId);  
+    }  
+}  
+Mutex::Autolock _l(mLock);
+if (mHeapId == -1) {
+	mRealHeap = true;
+	mBase = mmap(0, size, access, MAP_SHARED, fd, 0);
+	if (mBase == MAP_FAILED) {
+		LOGE("cannot map BpMemoryHeap (binder=%p), size=%ld, fd=%d (%s)",
+			asBinder().get(), size, fd, strerror(errno));
+		close(fd);
+	} else {
+		mSize = size;
+		mFlags = flags;
+		android_atomic_write(fd, &mHeapId);
+	}
+}        前面已经判断过mHeapId是否为-1了，这里为什么又要重新判断一次呢？这里因为，在上面执行Binder进程间调用的过程中，很有可能也有其它的线程也对这个BpMemoryHeap对象执行匿名共享内存映射的操作，因此，这里还要重新判断一下mHeapId的值是否为-1，如果是的话，就要执行匿名共享内存映射的操作了，这是通过调用mmap函数来进行的，这个函数我们前面在分析MemoryHeapBase类的实现时已经见过了。
+
+        从assertReallyMapped函数返回到assertMapped函数中：
+
+
+view plaincopy to clipboardprint?if (heap->mBase != MAP_FAILED) {  
+    Mutex::Autolock _l(mLock);  
+    if (mHeapId == -1) {  
+        mBase   = heap->mBase;  
+        mSize   = heap->mSize;  
+        android_atomic_write( dup( heap->mHeapId ), &mHeapId );  
+    }  
+} else {  
+    // something went wrong   
+    free_heap(binder);  
+}  
+if (heap->mBase != MAP_FAILED) {
+    Mutex::Autolock _l(mLock);
+    if (mHeapId == -1) {
+        mBase   = heap->mBase;
+        mSize   = heap->mSize;
+        android_atomic_write( dup( heap->mHeapId ), &mHeapId );
+    }
+} else {
+    // something went wrong
+    free_heap(binder);
+}        如果heap->mBase的值不为MAP_FAILED，就说明这个heap对象中的匿名共享内存已经映射好了。进入到里面的if语句，如果本BpMemoryHeap对象中的mHeap成员变量的值不等待-1，就说明前面通过find_heap函数得到的BpMemoryHeap对象和正在执行assertMapped函数的BpMemoryHeap对象是同一个对象了，因此，什么也不用做就可以返回了，否则的话，就要初始化一下本BpMemoryHeap对象的相关成员变量了：
+
+
+view plaincopy to clipboardprint?mBase   = heap->mBase;  
+mSize   = heap->mSize;  
+android_atomic_write( dup( heap->mHeapId ), &mHeapId );  
+mBase   = heap->mBase;
+mSize   = heap->mSize;
+android_atomic_write( dup( heap->mHeapId ), &mHeapId );        注意，由于这块匿名共享内存已经在本进程中映射好了，因此，这里不需要再执行一次mmap操作，只需要把heap对象的相应成员变量的值拷贝过来就行了，不过对于文件描述符，需要通过dup函数来复制一个。
+
+        这样，BpMemoryHeap对象中的匿名共享内存就准备就绪了，可以通过使用的它mBase成员变量来直接访问这块匿名共享内存。
+
+        至此，MemoryHeapBase类的实现就分析完了，下面我们继续分析MemoryBase类的实现。
+
+        2. MemoryBase
+
+        文章开始时说过，MemoryBase接口是建立在MemoryHeapBase接口的基础上的，它们都可以作为一个Binder对象来在进程间进行数据共享，它们的关系如下所示：
+
+
+
+
+        MemoryBase类包含了一个成员变量mHeap，它的类型的IMemoryHeap，MemoryBase类所代表的匿名共享内存就是通过这个成员变量来实现的。
+
+        与MemoryHeapBase的分析过程一样，我们先来看MemoryBase类在Server端的实现，然后再来看它在Client端的实现。
+
+        MemoryBase在Server端实现的类图如下所示：
+
+
+
+
+        MemoryBase类在Server端的实现与MemoryHeapBase类在Server端的实现是类似的，这里只要把IMemory类换成IMemoryHeap类、把BnMemory类换成BnMemoryHeap类以及MemoryBase类换成MemoryHeapBase类就变成是MemoryHeapBase类在Server端的实现了，因此，我们这里只简单分析IMemory类和MemoryBase类的实现。
+
+        IMemory类定义了MemoryBase类所需要实现的接口，这个类定义在frameworks/base/include/binder/IMemory.h文件中：
+
+
+view plaincopy to clipboardprint?class IMemory : public IInterface  
+{  
+public:  
+    ......  
+  
+    virtual sp<IMemoryHeap> getMemory(ssize_t* offset=0, size_t* size=0) const = 0;  
+  
+    ......  
+    void* pointer() const;  
+    size_t size() const;  
+    ssize_t offset() const;  
+};  
+class IMemory : public IInterface
+{
+public:
+	......
+
+	virtual sp<IMemoryHeap> getMemory(ssize_t* offset=0, size_t* size=0) const = 0;
+
+	......
+	void* pointer() const;
+	size_t size() const;
+	ssize_t offset() const;
+};        成员函数getMemory用来获取内部的MemoryHeapBase对象的IMemoryHeap接口；成员函数pointer()用来获取内部所维护的匿名共享内存的基地址；成员函数size()用来获取内部所维护的匿名共享内存的大小；成员函数offset()用来获取内部所维护的这部分匿名共享内存在整个匿名共享内存中的偏移量。
+
+        IMemory类本身实现了pointer、size和offset三个成员函数，因此，它的子类，即MemoryBase类，只需要实现getMemory成员函数就可以了。IMemory类的实现定义在frameworks/base/libs/binder/IMemory.cpp文件中：
+
+
+view plaincopy to clipboardprint?void* IMemory::pointer() const {  
+    ssize_t offset;  
+    sp<IMemoryHeap> heap = getMemory(&offset);  
+    void* const base = heap!=0 ? heap->base() : MAP_FAILED;  
+    if (base == MAP_FAILED)  
+        return 0;  
+    return static_cast<char*>(base) + offset;  
+}  
+  
+size_t IMemory::size() const {  
+    size_t size;  
+    getMemory(NULL, &size);  
+    return size;  
+}  
+  
+ssize_t IMemory::offset() const {  
+    ssize_t offset;  
+    getMemory(&offset);  
+    return offset;  
+}  
+void* IMemory::pointer() const {
+    ssize_t offset;
+    sp<IMemoryHeap> heap = getMemory(&offset);
+    void* const base = heap!=0 ? heap->base() : MAP_FAILED;
+    if (base == MAP_FAILED)
+        return 0;
+    return static_cast<char*>(base) + offset;
+}
+
+size_t IMemory::size() const {
+    size_t size;
+    getMemory(NULL, &size);
+    return size;
+}
+
+ssize_t IMemory::offset() const {
+    ssize_t offset;
+    getMemory(&offset);
+    return offset;
+}        MemoryBase类声明在frameworks/base/include/binder/MemoryBase.h文件中：
+
+
+view plaincopy to clipboardprint?class MemoryBase : public BnMemory  
+{  
+public:  
+    MemoryBase(const sp<IMemoryHeap>& heap, ssize_t offset, size_t size);  
+    ......  
+    virtual sp<IMemoryHeap> getMemory(ssize_t* offset, size_t* size) const;  
+  
+    ......  
+private:  
+    size_t          mSize;  
+    ssize_t         mOffset;  
+    sp<IMemoryHeap> mHeap;  
+};  
+class MemoryBase : public BnMemory
+{
+public:
+	MemoryBase(const sp<IMemoryHeap>& heap, ssize_t offset, size_t size);
+	......
+	virtual sp<IMemoryHeap> getMemory(ssize_t* offset, size_t* size) const;
+
+    ......
+private:
+	size_t          mSize;
+	ssize_t         mOffset;
+	sp<IMemoryHeap> mHeap;
+};       MemoryBase类实现在frameworks/base/libs/binder/MemoryBase.cpp文件中：
+
+
+view plaincopy to clipboardprint?MemoryBase::MemoryBase(const sp<IMemoryHeap>& heap,  
+        ssize_t offset, size_t size)  
+    : mSize(size), mOffset(offset), mHeap(heap)  
+{  
+}  
+  
+sp<IMemoryHeap> MemoryBase::getMemory(ssize_t* offset, size_t* size) const  
+{  
+    if (offset) *offset = mOffset;  
+    if (size)   *size = mSize;  
+    return mHeap;  
+}  
+MemoryBase::MemoryBase(const sp<IMemoryHeap>& heap,
+        ssize_t offset, size_t size)
+    : mSize(size), mOffset(offset), mHeap(heap)
+{
+}
+
+sp<IMemoryHeap> MemoryBase::getMemory(ssize_t* offset, size_t* size) const
+{
+    if (offset) *offset = mOffset;
+    if (size)   *size = mSize;
+    return mHeap;
+}        在它的构造函数中，接受三个参数，参数heap指向的是一个MemoryHeapBase对象，真正的匿名共享内存就是由它来维护的，参数offset表示这个MemoryBase对象所要维护的这部分匿名共享内存在整个匿名共享内存块中的起始位置，参数size表示这个MemoryBase对象所要维护的这部分匿名共享内存的大小。
+
+        成员函数getMemory的实现很简单，只是简单地返回内部的MemoryHeapBase对象的IMemoryHeap接口，如果传进来的参数offset和size不为NULL，还会把其内部维护的这部分匿名共享内存在整个匿名共享内存块中的偏移位置以及这部分匿名共享内存的大小返回给调用者。
+
+        这里我们可以看出，MemoryBase在Server端的实现只是简单地封装了MemoryHeapBase的实现。
+
+        下面我们再来看MemoryBase类在Client端的实现，同样，先看它们的类图关系：
+
+
+
+
+        这个图中我们可以看出，MemoryBase类在Client端的实现与MemoryHeapBase类在Client端的实现是类似的，这里只要把IMemory类换成IMemoryHeap类以及把BpMemory类换成BpMemoryHeap类就变成是MemoryHeapBase类在Client端的实现了，因此，我们这里只简单分析BpMemory类的实现，前面已经分析过IMemory类的实现了。
+
+
+        BpMemory类实现在frameworks/base/libs/binder/IMemory.cpp文件中，我们先看它的声明：
+
+
+view plaincopy to clipboardprint?class BpMemory : public BpInterface<IMemory>  
+{  
+public:  
+    BpMemory(const sp<IBinder>& impl);  
+    virtual ~BpMemory();  
+    virtual sp<IMemoryHeap> getMemory(ssize_t* offset=0, size_t* size=0) const;  
+  
+private:  
+    mutable sp<IMemoryHeap> mHeap;  
+    mutable ssize_t mOffset;  
+    mutable size_t mSize;  
+};  
+class BpMemory : public BpInterface<IMemory>
+{
+public:
+    BpMemory(const sp<IBinder>& impl);
+    virtual ~BpMemory();
+    virtual sp<IMemoryHeap> getMemory(ssize_t* offset=0, size_t* size=0) const;
+
+private:
+    mutable sp<IMemoryHeap> mHeap;
+    mutable ssize_t mOffset;
+    mutable size_t mSize;
+};       和MemoryBase类一样，它实现了IMemory类的getMemory成员函数，在它的成员变量中，mHeap的类型为IMemoryHeap，它指向的是一个BpMemoryHeap对象，mOffset表示这个BpMemory对象所要维护的这部分匿名共享内存在整个匿名共享内存块中的起始位置，mSize表示这个BpMemory对象所要维护的这部分匿名共享内存的大小。
+
+
+       下面我们就看一下BpMemory类的成员函数getMemory的实现：
+
+
+view plaincopy to clipboardprint?sp<IMemoryHeap> BpMemory::getMemory(ssize_t* offset, size_t* size) const  
+{  
+    if (mHeap == 0) {  
+        Parcel data, reply;  
+        data.writeInterfaceToken(IMemory::getInterfaceDescriptor());  
+        if (remote()->transact(GET_MEMORY, data, &reply) == NO_ERROR) {  
+            sp<IBinder> heap = reply.readStrongBinder();  
+            ssize_t o = reply.readInt32();  
+            size_t s = reply.readInt32();  
+            if (heap != 0) {  
+                mHeap = interface_cast<IMemoryHeap>(heap);  
+                if (mHeap != 0) {  
+                    mOffset = o;  
+                    mSize = s;  
+                }  
+            }  
+        }  
+    }  
+    if (offset) *offset = mOffset;  
+    if (size) *size = mSize;  
+    return mHeap;  
+}  
+sp<IMemoryHeap> BpMemory::getMemory(ssize_t* offset, size_t* size) const
+{
+    if (mHeap == 0) {
+        Parcel data, reply;
+        data.writeInterfaceToken(IMemory::getInterfaceDescriptor());
+        if (remote()->transact(GET_MEMORY, data, &reply) == NO_ERROR) {
+            sp<IBinder> heap = reply.readStrongBinder();
+            ssize_t o = reply.readInt32();
+            size_t s = reply.readInt32();
+            if (heap != 0) {
+                mHeap = interface_cast<IMemoryHeap>(heap);
+                if (mHeap != 0) {
+                    mOffset = o;
+                    mSize = s;
+                }
+            }
+        }
+    }
+    if (offset) *offset = mOffset;
+    if (size) *size = mSize;
+    return mHeap;
+}        如果成员变量mHeap的值为NULL，就表示这个BpMemory对象尚未建立好匿名共享内存，于是，就会通过一个Binder进程间调用去Server端请求匿名共享内存信息，在这些信息中，最重要的就是这个Server端的MemoryHeapBase对象的引用heap了，通过这个引用可以在Client端进程中创建一个BpMemoryHeap远程接口，最后将这个BpMemoryHeap远程接口保存在成员变量mHeap中，同时，从Server端获得的信息还包括这块匿名共享内存在整个匿名共享内存中的偏移位置以及大小。这样，这个BpMemory对象中的匿名共享内存就准备就绪了。
+
+
+        至此，MemoryBase类的实现就分析完了，下面我们将通过一个实例来说明如何使用MemoryBase类在进程间进行内存共享，因为MemoryBase内部使用了MemoryHeapBase类，所以，这个例子同时也可以说明MemoryHeapBase类的使用方法。
+
+        3. MemoryHeapBas类e和MemoryBase类的使用示例
+
+        在这个例子中，我们将在Android源代码工程的external目录中创建一个ashmem源代码工程，它里面包括两个应用程序，一个是Server端应用程序SharedBufferServer，它提供一段共享内存来给Client端程序使用，一个是Client端应用程序SharedBufferClient，它简单地对Server端提供的共享内存进行读和写的操作。Server端应用程序SharedBufferServer和Client端应用程序SharedBufferClient通过Binder进程间通信机制来交互，因此，我们需要定义自己的Binder对象接口ISharedBuffer。Server端应用程序SharedBufferServer在内部实现了一个服务SharedBufferService，这个服务托管给Service Manager来管理，因此，Client端应用程序SharedBufferClient可以向Service Manager请求这个SharedBufferService服务的一个远接接口，然后就可以通过这个服务来操作Server端提供的这段共享内存了。
+
+        这个工程由三个模块组成，第一个模块定义服务接口，它的相关源代码位于external/ashmem/common目录下，第二个模块实现Server端应用程序SharedBufferServer，它的相关源代码位于external/ashmem/server目录下，第三个模块实现Client端应用程序SharedBufferClient，它的相关源代码码位于external/ashmem/client目录下。
+
+        首先来看common模块中的服务接口的定义。在external/ashmem/common目录下，有两个源文件ISharedBuffer.h和ISharedBuffer.cpp。源文件ISharedBuffer.h定义了服务的接口：
+
+
+view plaincopy to clipboardprint?#ifndef ISHAREDBUFFER_H_   
+#define ISHAREDBUFFER_H_   
+  
+#include <utils/RefBase.h>   
+#include <binder/IInterface.h>   
+#include <binder/Parcel.h>   
+  
+#define SHARED_BUFFER_SERVICE "shy.luo.SharedBuffer"   
+#define SHARED_BUFFER_SIZE 4   
+  
+using namespace android;  
+  
+class ISharedBuffer: public IInterface  
+{  
+public:  
+        DECLARE_META_INTERFACE(SharedBuffer);  
+        virtual sp<IMemory> getBuffer() = 0;  
+};  
+  
+class BnSharedBuffer: public BnInterface<ISharedBuffer>  
+{  
+public:  
+        virtual status_t onTransact(uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags = 0);  
+};  
+  
+#endif  
+#ifndef ISHAREDBUFFER_H_
+#define ISHAREDBUFFER_H_
+
+#include <utils/RefBase.h>
+#include <binder/IInterface.h>
+#include <binder/Parcel.h>
+
+#define SHARED_BUFFER_SERVICE "shy.luo.SharedBuffer"
+#define SHARED_BUFFER_SIZE 4
+
+using namespace android;
+
+class ISharedBuffer: public IInterface
+{
+public:
+        DECLARE_META_INTERFACE(SharedBuffer);
+        virtual sp<IMemory> getBuffer() = 0;
+};
+
+class BnSharedBuffer: public BnInterface<ISharedBuffer>
+{
+public:
+        virtual status_t onTransact(uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags = 0);
+};
+
+#endif        这个文件定义了一个ISharedBuffer接口，里面只有一个成员函数getBuffer，通过这个成员函数，Client端可以从Server端获得一个匿名共享内存，这块匿名共享内存通过我们上面分析的MemoryBase类来维护。这个文件同时也定义了一个必须要在Server端实现的BnSharedBuffer接口，它里面只有一个成员函数onTransact，这个成员函数是用来处理Client端发送过来的请求的。除了定义这两个接口之外，这个文件还定义了两个公共信息，一个是定义常量SHARED_BUFFER_SERVICE，它是Server端提供的内存共享服务的名称，即这个内存共享服务在Service Manager中是以SHARED_BUFFER_SERVICE来作关键字索引的，另外一个是定义常量SHARED_BUFFER_SIZE，它定义了Server端共享的内存块的大小，它的大小设置为4个字节，在这个例子，将把这个共享内存当作一个整型变量来访问。
+
+        源代文件ISharedBuffer.cpp文件定义了一个在Client端使用的BpSharedBuffer接口，它是指向运行在Server端的实现了ISharedBuffer接口的内存共享服务的远程接口，同时，在这个文件里面，也实现了BnSharedBuffer类的onTransact成员函数：
+
+
+view plaincopy to clipboardprint?#define LOG_TAG "ISharedBuffer"   
+  
+#include <utils/Log.h>   
+#include <binder/MemoryBase.h>   
+  
+#include "ISharedBuffer.h"   
+  
+using namespace android;  
+  
+enum  
+{  
+    GET_BUFFER = IBinder::FIRST_CALL_TRANSACTION  
+};  
+  
+class BpSharedBuffer: public BpInterface<ISharedBuffer>  
+{  
+public:  
+    BpSharedBuffer(const sp<IBinder>& impl)  
+        : BpInterface<ISharedBuffer>(impl)  
+    {  
+  
+    }  
+  
+public:  
+    sp<IMemory> getBuffer()  
+    {  
+        Parcel data;  
+        data.writeInterfaceToken(ISharedBuffer::getInterfaceDescriptor());  
+  
+        Parcel reply;  
+        remote()->transact(GET_BUFFER, data, &reply);  
+  
+        sp<IMemory> buffer = interface_cast<IMemory>(reply.readStrongBinder());  
+  
+        return buffer;  
+    }  
+};  
+  
+IMPLEMENT_META_INTERFACE(SharedBuffer, "shy.luo.ISharedBuffer");  
+  
+status_t BnSharedBuffer::onTransact(uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)  
+{  
+    switch(code)  
+    {  
+    case GET_BUFFER:  
+        {  
+            CHECK_INTERFACE(ISharedBuffer, data, reply);  
+  
+            sp<IMemory> buffer = getBuffer();  
+            if(buffer != NULL)  
+            {  
+                reply->writeStrongBinder(buffer->asBinder());  
+            }  
+  
+            return NO_ERROR;  
+        }  
+    default:  
+        {  
+            return BBinder::onTransact(code, data, reply, flags);  
+        }  
+    }  
+}  
+#define LOG_TAG "ISharedBuffer"
+
+#include <utils/Log.h>
+#include <binder/MemoryBase.h>
+
+#include "ISharedBuffer.h"
+
+using namespace android;
+
+enum
+{
+	GET_BUFFER = IBinder::FIRST_CALL_TRANSACTION
+};
+
+class BpSharedBuffer: public BpInterface<ISharedBuffer>
+{
+public:
+	BpSharedBuffer(const sp<IBinder>& impl)
+		: BpInterface<ISharedBuffer>(impl)
+	{
+
+	}
+
+public:
+	sp<IMemory> getBuffer()
+	{
+		Parcel data;
+		data.writeInterfaceToken(ISharedBuffer::getInterfaceDescriptor());
+
+		Parcel reply;
+		remote()->transact(GET_BUFFER, data, &reply);
+
+		sp<IMemory> buffer = interface_cast<IMemory>(reply.readStrongBinder());
+
+		return buffer;
+	}
+};
+
+IMPLEMENT_META_INTERFACE(SharedBuffer, "shy.luo.ISharedBuffer");
+
+status_t BnSharedBuffer::onTransact(uint32_t code, const Parcel& data, Parcel* reply, uint32_t flags)
+{
+	switch(code)
+	{
+	case GET_BUFFER:
+		{
+			CHECK_INTERFACE(ISharedBuffer, data, reply);
+
+			sp<IMemory> buffer = getBuffer();
+			if(buffer != NULL)
+			{
+				reply->writeStrongBinder(buffer->asBinder());
+			}
+
+			return NO_ERROR;
+		}
+	default:
+		{
+			return BBinder::onTransact(code, data, reply, flags);
+		}
+	}
+}        在BpSharedBuffer类的成员函数transact中，向Server端发出了一个请求代码为GET_BUFFER的Binder进程间调用请求，请求Server端返回一个匿名共享内存对象的远程接口IMemory，它实际指向的是一个BpMemory对象，获得了这个对象之后，就将它返回给调用者；在BnSharedBuffer类的成员函数onTransact中，当它接收到从Client端发送过来的代码为GET_BUFFER的Binder进程间调用请求后，便调用其子类的getBuffer成员函数来获一个匿名共享内存对象接口IMemory，它实际指向的是一个MemoryBase对象，获得了这个对象之后，就把它返回给Client端。
+
+        接下来，我们再来看看server模块的实现。在external/ashmem/common目录下，只有一个源文件SharedBufferServer.cpp，它实现了内存共享服务SharedBufferService：
+
+
+view plaincopy to clipboardprint?#define LOG_TAG "SharedBufferServer"   
+  
+#include <utils/Log.h>   
+#include <binder/MemoryBase.h>   
+#include <binder/MemoryHeapBase.h>   
+#include <binder/IServiceManager.h>   
+#include <binder/IPCThreadState.h>   
+  
+#include "../common/ISharedBuffer.h"   
+  
+class SharedBufferService : public BnSharedBuffer  
+{  
+public:  
+    SharedBufferService()  
+    {  
+        sp<MemoryHeapBase> heap = new MemoryHeapBase(SHARED_BUFFER_SIZE, 0, "SharedBuffer");  
+        if(heap != NULL)  
+        {  
+            mMemory = new MemoryBase(heap, 0, SHARED_BUFFER_SIZE);  
+  
+            int32_t* data = (int32_t*)mMemory->pointer();  
+            if(data != NULL)  
+            {  
+                *data = 0;  
+            }  
+        }  
+    }  
+  
+    virtual ~SharedBufferService()  
+    {  
+        mMemory = NULL;  
+    }  
+  
+public:  
+    static void instantiate()  
+    {  
+        defaultServiceManager()->addService(String16(SHARED_BUFFER_SERVICE), new SharedBufferService());  
+    }  
+  
+    virtual sp<IMemory> getBuffer()  
+    {  
+        return mMemory;  
+    }  
+  
+private:  
+    sp<MemoryBase> mMemory;  
+};  
+  
+int main(int argc, char** argv)  
+{  
+    SharedBufferService::instantiate();  
+  
+    ProcessState::self()->startThreadPool();  
+    IPCThreadState::self()->joinThreadPool();  
+  
+    return 0;  
+}  
+#define LOG_TAG "SharedBufferServer"
+
+#include <utils/Log.h>
+#include <binder/MemoryBase.h>
+#include <binder/MemoryHeapBase.h>
+#include <binder/IServiceManager.h>
+#include <binder/IPCThreadState.h>
+
+#include "../common/ISharedBuffer.h"
+
+class SharedBufferService : public BnSharedBuffer
+{
+public:
+	SharedBufferService()
+	{
+		sp<MemoryHeapBase> heap = new MemoryHeapBase(SHARED_BUFFER_SIZE, 0, "SharedBuffer");
+		if(heap != NULL)
+		{
+			mMemory = new MemoryBase(heap, 0, SHARED_BUFFER_SIZE);
+
+			int32_t* data = (int32_t*)mMemory->pointer();
+			if(data != NULL)
+			{
+				*data = 0;
+			}
+		}
+	}
+
+	virtual ~SharedBufferService()
+	{
+		mMemory = NULL;
+	}
+
+public:
+	static void instantiate()
+	{
+		defaultServiceManager()->addService(String16(SHARED_BUFFER_SERVICE), new SharedBufferService());
+	}
+
+	virtual sp<IMemory> getBuffer()
+	{
+		return mMemory;
+	}
+
+private:
+	sp<MemoryBase> mMemory;
+};
+
+int main(int argc, char** argv)
+{
+	SharedBufferService::instantiate();
+
+	ProcessState::self()->startThreadPool();
+	IPCThreadState::self()->joinThreadPool();
+
+	return 0;
+}        SharedBufferService服务实现了BnSharedBuffer接口。在它的构造函数里面，首先是使用MemoryHeapBase类创建了一个匿名共享内存，大小为SHARED_BUFFER_SIZE。接着，又以这个MemoryHeapBase对象为参数，创建一个MemoryBase对象，这个MemoryBase对象指定要维护的匿名共享内存的的偏移位置为0，大小为SHARED_BUFFER_SIZE，并且，将这个匿名共享内存当作一个整型变量地址，将它初始化为0。最终，这个匿名共享内存对象保存在SharedBufferService类的成员变量mMemory中，这个匿名共享内存对象可以通过成员函数getBuffer来获得。
+
+        在Server端应用程序的入口函数main中，首先是调用SharedBufferService静态成员函数instantiate函数来创建一个SharedBufferService实例，然后通过defaultServiceManager函数来获得系统中的Service Manager接口，最后通过这个Service Manager接口的addService函数来把这个SharedBufferService服务添加到Service Manager中去，这样，Client端就可以通过Service Manager来获得这个共享内存服务了。有关Service Manager的实现，请参考前面一篇文章浅谈Service Manager成为Android进程间通信（IPC）机制Binder守护进程之路，而用来获取Service Manager接口的defaultServiceManager函数的实现可以参考另外一篇文章浅谈Android系统进程间通信（IPC）机制Binder中的Server和Client获得Service Manager接口之路。初始化好这个共享内存服务之后，程序就通过ProcessState::self()->startThreadPool()函数来创建一个线程等待Client端来请求服务了，最后，程序的主线程也通过IPCThreadState::self()->joinThreadPool()函数来进入到等待Client端来请求服务的状态中。
+
+       我们还需要为这个Server端应用程序编译一个编译脚本，在external/ashmem/server目录下，新建一个Android.mk文件，它的内容如下所示：
+
+
+view plaincopy to clipboardprint?LOCAL_PATH := $(call my-dir)  
+  
+include $(CLEAR_VARS)  
+  
+LOCAL_MODULE_TAGS := optional  
+  
+LOCAL_SRC_FILES := ../common/ISharedBuffer.cpp \  
+        SharedBufferServer.cpp  
+  
+LOCAL_SHARED_LIBRARIES:= libcutils libutils libbinder  
+  
+LOCAL_MODULE := SharedBufferServer  
+  
+include $(BUILD_EXECUTABLE)  
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_SRC_FILES := ../common/ISharedBuffer.cpp \
+        SharedBufferServer.cpp
+
+LOCAL_SHARED_LIBRARIES:= libcutils libutils libbinder
+
+LOCAL_MODULE := SharedBufferServer
+
+include $(BUILD_EXECUTABLE)        最后，我们再来看看client模块的实现。在external/ashmem/client目录下，只有一个源文件SharedBufferClient.cpp，它的内容如下所示：
+
+
+view plaincopy to clipboardprint?#define LOG_TAG "SharedBufferClient"   
+  
+#include <utils/Log.h>   
+#include <binder/MemoryBase.h>   
+#include <binder/IServiceManager.h>   
+  
+#include "../common/ISharedBuffer.h"   
+  
+int main()  
+{  
+        sp<IBinder> binder = defaultServiceManager()->getService(String16(SHARED_BUFFER_SERVICE));  
+        if(binder == NULL)  
+        {  
+                printf("Failed to get service: %s.\n", SHARED_BUFFER_SERVICE);  
+                return -1;  
+        }  
+  
+        sp<ISharedBuffer> service = ISharedBuffer::asInterface(binder);  
+        if(service == NULL)  
+        {  
+                return -2;  
+        }  
+  
+        sp<IMemory> buffer = service->getBuffer();  
+        if(buffer == NULL)  
+        {  
+                return -3;  
+        }  
+  
+        int32_t* data = (int32_t*)buffer->pointer();  
+        if(data == NULL)  
+        {  
+                return -4;  
+        }  
+  
+        printf("The value of the shared buffer is %d.\n", *data);  
+  
+        *data = *data + 1;  
+  
+        printf("Add value 1 to the shared buffer.\n");  
+  
+        return 0;  
+}  
+#define LOG_TAG "SharedBufferClient"
+
+#include <utils/Log.h>
+#include <binder/MemoryBase.h>
+#include <binder/IServiceManager.h>
+
+#include "../common/ISharedBuffer.h"
+
+int main()
+{
+        sp<IBinder> binder = defaultServiceManager()->getService(String16(SHARED_BUFFER_SERVICE));
+        if(binder == NULL)
+        {
+                printf("Failed to get service: %s.\n", SHARED_BUFFER_SERVICE);
+                return -1;
+        }
+
+        sp<ISharedBuffer> service = ISharedBuffer::asInterface(binder);
+        if(service == NULL)
+        {
+                return -2;
+        }
+
+        sp<IMemory> buffer = service->getBuffer();
+        if(buffer == NULL)
+        {
+                return -3;
+        }
+
+        int32_t* data = (int32_t*)buffer->pointer();
+        if(data == NULL)
+        {
+                return -4;
+        }
+
+        printf("The value of the shared buffer is %d.\n", *data);
+
+        *data = *data + 1;
+
+        printf("Add value 1 to the shared buffer.\n");
+
+        return 0;
+}        在这个文件中，主要就是定义了Client端应用程序的入口函数main，在这个main函数里面，首先通过Service Manager接口获得前面所实现的匿名共享内存服务SharedBufferService的远程接口service，然后通过这个远程接口的getBuffer成员函数获得由Server端提供的一块匿名共享内存接口buffer，最后通过这个匿名共享内存接口获得这个匿名共享内存的基地址data。有了这个匿名共享内存的地址data之后，我们就可以对它进行读写了，先是把这个匿名共享内存当作是一个整型变量地址进行访问，并输出它的值的大小，然后对这个整量变量进行加1的操作，并写回到原来的共享内存空间中去。这样，当Server端应用程序运行之后，第一次运行这个Client端应用程序时，输出的值为0，第二次运行这个个Client端应用程序时，输出的值为1，第三次运行这个个Client端应用程序时，输出的值为3......依次类推，后面我们将在模拟器中对这个分析进行验证，如果验证成功的话，就说明这个匿名共享内存成功地在Server端和Client端实现共享了。
+
+        同样，我们需要为这个Client端应用程序编译一个编译脚本，在external/ashmem/client目录下，新建一个Android.mk文件，它的内容如下所示：
+
+
+view plaincopy to clipboardprint?LOCAL_PATH := $(call my-dir)  
+  
+include $(CLEAR_VARS)  
+  
+LOCAL_MODULE_TAGS := optional  
+  
+LOCAL_SRC_FILES := ../common/ISharedBuffer.cpp \  
+        SharedBufferClient.cpp  
+  
+LOCAL_SHARED_LIBRARIES:= libcutils libutils libbinder  
+  
+LOCAL_MODULE := SharedBufferClient  
+  
+include $(BUILD_EXECUTABLE)  
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_SRC_FILES := ../common/ISharedBuffer.cpp \
+        SharedBufferClient.cpp
+
+LOCAL_SHARED_LIBRARIES:= libcutils libutils libbinder
+
+LOCAL_MODULE := SharedBufferClient
+
+include $(BUILD_EXECUTABLE)       源代码都准备好了之后，就可以对Server端和Client端应用程序进行编译了。关于如何单独编译Android源代码工程中的模块，以及如何打包system.img，请参考如何单独编译Android源代码中的模块一文。
+
+
+       执行以下命令进行编译和打包：
+
+
+view plaincopy to clipboardprint?USER-NAME@MACHINE-NAME:~/Android$ mmm external/ashmem/server     
+USER-NAME@MACHINE-NAME:~/Android$ mmm external/ashmem/client             
+USER-NAME@MACHINE-NAME:~/Android$ make snod   
+USER-NAME@MACHINE-NAME:~/Android$ mmm external/ashmem/server   
+USER-NAME@MACHINE-NAME:~/Android$ mmm external/ashmem/client           
+USER-NAME@MACHINE-NAME:~/Android$ make snod        这样，打包好的Android系统镜像文件system.img就包含我们前面创建的Server端应用程序SharedBufferServer和Client端应用程序SharedBufferClient了。
+       至此，我们就可以运行模拟器来验证我们的程序了。关于如何在Android源代码工程中运行模拟器，请参考在Ubuntu上下载、编译和安装Android最新源代码一文。
+       执行以下命令启动模拟器：
+
+
+view plaincopy to clipboardprint?USER-NAME@MACHINE-NAME:~/Android$ emulator    
+USER-NAME@MACHINE-NAME:~/Android$ emulator         模拟器运行起来后，就可以通过adb shell命令连上它：
+
+
+view plaincopy to clipboardprint?USER-NAME@MACHINE-NAME:~/Android$ adb shell    
+USER-NAME@MACHINE-NAME:~/Android$ adb shell         最后，进入到/system/bin/目录下：
+
+
+view plaincopy to clipboardprint?luo@ubuntu-11-04:~/Android$ adb shell  
+root@android:/ # cd system/bin   
+luo@ubuntu-11-04:~/Android$ adb shell
+root@android:/ # cd system/bin        进入到/system/bin/目录后，首先在后台中运行Server端应用程序SharedBufferServer：
+
+
+view plaincopy to clipboardprint?root@android:/system/bin # ./SharedBufferServer &  
+root@android:/system/bin # ./SharedBufferServer &       然后再在前台中重复运行Client端应用程序SharedBufferClient，以便验证程序的正确性：
+
+
+view plaincopy to clipboardprint?root@android:/system/bin # ./SharedBufferClient                                  
+The value of the shared buffer is 0.  
+Add value 1 to the shared buffer.  
+root@android:/system/bin # ./SharedBufferClient                                  
+The value of the shared buffer is 1.  
+Add value 1 to the shared buffer.  
+root@android:/system/bin # ./SharedBufferClient                                  
+The value of the shared buffer is 2.  
+Add value 1 to the shared buffer.  
+root@android:/system/bin # ./SharedBufferClient                                  
+The value of the shared buffer is 3.  
+Add value 1 to the shared buffer.  
+root@android:/system/bin # ./SharedBufferClient                                
+The value of the shared buffer is 0.
+Add value 1 to the shared buffer.
+root@android:/system/bin # ./SharedBufferClient                                
+The value of the shared buffer is 1.
+Add value 1 to the shared buffer.
+root@android:/system/bin # ./SharedBufferClient                                
+The value of the shared buffer is 2.
+Add value 1 to the shared buffer.
+root@android:/system/bin # ./SharedBufferClient                                
+The value of the shared buffer is 3.
+Add value 1 to the shared buffer.       如果我们看到这样的输出，就说明我们成功地在Server端应用程序SharedBufferServer和Client端应用程序SharedBufferClietn共享内存中的数据了。
+
+       至此，Android系统匿名共享内存的C++调用接口MemoryHeapBase和MemoryBase就分析完成了。
+
+
+http://blog.csdn.net/luoshengyang/article/details/6939890

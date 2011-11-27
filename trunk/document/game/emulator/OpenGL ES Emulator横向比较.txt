@@ -1,0 +1,97 @@
+转载请注明出处为KlayGE游戏引擎，本文地址为http://www.klayge.org/2011/04/20/opengl-es-emulator%e6%a8%aa%e5%90%91%e6%af%94%e8%be%83/ 
+ 
+
+OpenGL ES在移动设备上大行其道，在PC上要开发点东西，一般就需要一个OpenGL ES Emulator。目前常见的模拟器有来自AMD、ARM、Qualcomm和NVIDIA的。他们的能力如何呢？让我们来进行一次简单的横向比较。
+
+基本特性
+厂商 AMD ARM 
+名称 OpenGL ES 2.0 Emulator
+（已经卖给Qualcomm） OpenGL ES 2.0 Emulator v1.2
+ 
+模拟目标 AMD handheld GPU Mali 
+核心版本 2.0 1.x，2.0 
+扩展 GL_AMD_alpha_test
+GL_AMD_compressed_3DC_texture
+GL_AMD_compressed_ATC_texture
+GL_AMD_logic_op
+GL_AMD_program_binary_Z400
+GL_AMD_writeonly_rendering
+GL_EXT_texture_filter_anisotropic
+GL_EXT_texture_type_2_10_10_10_REV
+GL_OES_compressed_ETC1_RGB8_texture
+GL_OES_compressed_paletted_texture
+GL_OES_depth_texture
+GL_OES_depth24
+GL_OES_element_index_uint
+GL_OES_fragment_precision_high
+GL_OES_get_program_binary
+GL_OES_packed_depth_stencil
+GL_OES_rgb8_rgba8
+GL_OES_standard_derivatives
+GL_OES_texture_3D
+GL_OES_texture_float
+GL_OES_texture_float_linear
+GL_OES_texture_half_float
+GL_OES_texture_half_float_linear
+GL_OES_texture_npot
+GL_OES_vertex_half_float
+GL_OES_vertex_type_10_10_10_2 GL_OES_compressed_ETC1_RGB8_texture 
+厂商 Qualcomm NVIDIA 
+名称 Adreno SDK 2.2
+ x86 Windows OpenGL ES 2.0 Emulator
+ 
+模拟目标 QUALCOMM Adreno™ hardware Tegra 
+核心版本 2.0 2.0 
+扩展 GL_AMD_alpha_test
+GL_AMD_compressed_3DC_texture
+GL_AMD_compressed_ATC_texture
+GL_AMD_logic_op
+GL_AMD_shader_binary_Z400
+GL_EXT_texture_filter_anisotropic
+GL_EXT_texture_type_2_10_10_10_REV
+GL_OES_compressed_ETC1_RGB8_texture
+GL_OES_compressed_paletted_texture
+GL_OES_depth_texture
+GL_OES_depth24
+GL_OES_element_index_uint
+GL_OES_fragment_precision_high
+GL_OES_packed_depth_stencil
+GL_OES_rgb8_rgba8
+GL_OES_standard_derivatives
+GL_OES_texture_3D
+GL_OES_texture_float
+GL_OES_texture_float_linear
+GL_OES_texture_half_float
+GL_OES_texture_half_float_linear
+GL_OES_texture_npot
+GL_OES_vertex_half_float
+GL_OES_vertex_type_10_10_10_2 GL_EXT_texture_compression_dxt1
+GL_EXT_texture_compression_s3tc
+GL_NV_log_textures
+GL_OES_compressed_paletted_texture
+GL_OES_element_index_uint
+GL_OES_framebuffer_object
+GL_OES_mapbuffer
+GL_OES_rgb8_rgba8
+GL_OES_shader_source
+GL_OES_stencil8
+GL_OES_texture_half_float  
+ 
+ 
+
+特点
+AMD：老牌模拟器，已经随着AMD的手持设备业务一起卖给Qualcomm。这款模拟器基本上中规中矩，用于 桌面开发OpenGL ES 2的开发没问题。它的扩展能满足常见的特效需要，兼容性和速度也不错。AMD的OpenGL ES模拟器对ES标准的支持程度甚至好于AMD的OpenGL驱动对GL标准的支持。
+
+ARM：除了ES 2，它还支持ES 1.x。所以如果你想开发ES 1.x的程序可以选择ARM的。它的问题在于，扩展列表里只有ETC1一个，没法支持比较强大的特性比如浮点纹理。所以很多特效的使用可能受限制。需要注 意的是，因为它支持ES 1.x，eglChooseConfig的第二个参数里必须包含EGL_OPENGL_ES2_BIT才能建立ES 2.0的context。
+
+Qualcomm：直接继承自AMD的模拟器，两者几乎完全相同。但在使用中我遇到的问题是，在NV的显卡上， 这个模拟器的表现非常奇怪，他会建立一个server和一个client，通过socket连接，然后死锁...而在AMD的卡上则没有任何问题。总的来 说，我不是很推荐这个模拟器。
+
+NVIDIA：在这几个模拟器中，NVIDIA的最新，模拟的目标硬件也最强大。但在使用中的问题比较多：
+
+虽然看似提供了OpenGL ES 1.x和OpenVG的接口，但只是个空的链接，并没有实现代码。
+libGLESv2和libEGL的内容被合并到一个名为libGLES20的静态库中，所以link的地方需要做一些修改。
+libGLES20中的函数是__cdecl的调用方式，而不是其他模拟器使用的__stdcall，所以如果遇到link出错，就查查这个地方吧。
+glMapBufferOES虽然提供了，但返回总是NULL。
+目前我做得比较也就是这些。我比较推荐在AMD卡上用Qualcomm的，否则就用ARM的。NVIDIA的可能还需要一些时间，得等其稳定下来。
+
+http://www.cnblogs.com/gongminmin/archive/2011/04/25/2027684.html

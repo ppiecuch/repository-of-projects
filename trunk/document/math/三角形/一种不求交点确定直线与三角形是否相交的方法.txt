@@ -1,0 +1,14 @@
+假设输入参数为三角形的三个顶点（A,B,C），直线上的两个点（L1,L2）如图所示
+
+计算方法如下：
+1.先用点坐标相减计算出四个向量 L2A=A-L2，L2B=B-L2，L2C=C-L2以及直线的向量L1L2=L2-L1
+2.分别求出L2A和L2B的向量积L2E=cLoss(L2A,L2B)，L2B和L2C的向量积L2F=cLoss(L2B,L2C)，L2C和L2A的向量积L2G=cLoss(L2C,L2A)，如图所示
+3.然后用向量L1L2与向量AE，BF，CG计算数量积La=dot(L1L2,L2E)，Lb=dot(L1L2,L2F)，Lc=dot(L1L2,L2G)
+4.La,Lb,Lc如果同号则直线与三角形相交
+
+计算量：向量加法4次，向量积3次，数量积3次
+
+
+
+
+http://blog.sina.com.cn/s/blog_43a06c960100xhgh.html

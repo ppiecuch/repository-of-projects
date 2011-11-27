@@ -1,0 +1,26 @@
+不同分辨率下，字体大小怎么适应？
+
+假设需要适应320x240，480x320分辨率。在res目录下新建文件夹values-320x240, values-480x320。然后在文件夹 values ，values-320x240 和  values-480x320 下新建xml文件dimens.xml，该xml文件内容如下：
+
+
+view plaincopy to clipboardprint?<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+    <dimen name="btnTextSize">14dip</dimen>  
+</resources>  
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="btnTextSize">14dip</dimen>
+</resources>
+针对不同的分辨率，btnTextSize的值不同。在布局文件中，用下面的方式引用该值： 
+
+
+view plaincopy to clipboardprint?<TextView android:layout_width="fill_parent"  
+    android:layout_height="wrap_content" android:gravity="center"  
+    android:id="@+id/lblSet" style="@style/btntext" android:textSize="@dimen/btnTextSize">  
+</TextView>  
+<TextView android:layout_width="fill_parent"
+	android:layout_height="wrap_content" android:gravity="center"
+	android:id="@+id/lblSet" style="@style/btntext" android:textSize="@dimen/btnTextSize">
+</TextView>
+通过这种方法，可以方便设置在不同分辨率下，字体的大小了。当然，不仅仅字体大小，宽和高等其他的一些属性，也可以通过类似的方式来设置！ 
+http://blog.csdn.net/love__coder/article/details/6927031

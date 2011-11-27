@@ -22,6 +22,9 @@ Application.mk中加上
 APP_ABI := armeabi armeabi-v7a 
 APP_PLATFORM := android-4
 
+r4版使用：
+ndk-build APP_PLATFORM=android-8
+
 [异常]
 ERROR/AndroidRuntime(5059): java.lang.UnsatisfiedLinkError: nativeInit
 ERROR/AndroidRuntime(5059):     at org.tinder.studio.AndroidGLView.nativeInit(Native Method)

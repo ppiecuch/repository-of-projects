@@ -1,0 +1,156 @@
+protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AssetManager assetManager = getAssets();  
+        String[] files = null;  
+        try 
+        {  
+             files = assetManager.list("");  
+        }catch (IOException e) 
+        {  
+             Log.e(LOG_TAG, e.getMessage());  
+        }  
+        String strSdcardPath = "/sdcard/";
+        String strDestFile;
+        int iFileCnt = files.length;
+        for( int i = 0; i < iFileCnt; i++)
+        {
+           String strFileNameSrc = files[i];
+           if( strFileNameSrc.contentEquals("images"  ) ||
+                 strFileNameSrc.contentEquals("sounds" ) ||
+                 strFileNameSrc.contentEquals("skins" ) ||
+                 strFileNameSrc.contentEquals("webkit" ) )
+           {
+              // dont copy.. not really a asset file
+              continue;
+           }
+           strDestFile = strSdcardPath + strFileNameSrc;
+           VxCopyAsssetToSdcard(strFileNameSrc, strDestFile, true);         
+        }
+
+//////////////////////////////////
+   int VxCopyAsssetToSdcard( String strFileSrc, String strFileDest, boolean bDontCopyIfExistsAndSameSize )
+   {
+      int iSrcFileSize = 0;
+      int iDestFileSize = 0;
+      InputStream oInputStream = null;
+      OutputStream oOutputStream = null;
+      // get src file size and stream
+      try 
+      {
+         oInputStream = m_oRes.getAssets().open(strFileSrc);
+           if( null != oInputStream)
+           {
+              iSrcFileSize = oInputStream.available();
+           }
+           else
+           {
+                Log.e(LOG_TAG, "ERROR: VxCopyResourceToSdcard could not open file " + strFileSrc );  
+              return -1;
+           }
+      } 
+      catch (IOException e) 
+      {
+            Log.e(LOG_TAG, "ERROR: VxCopyResourceToSdcard could not open file " + strFileSrc );  
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+          return -1;
+      }
+      if( bDontCopyIfExistsAndSameSize )
+      {
+         // get dest file size and stream
+         try 
+         {
+            InputStream oTmpStream = null;
+            File readFile = new File( strFileDest); 
+            oTmpStream = new FileInputStream(readFile);  ;
+              if( null != oTmpStream)
+              {
+                 iDestFileSize = oTmpStream.available();
+                 oTmpStream.close();
+              }
+              else
+              {
+                   Log.e(LOG_TAG, "ERROR: VxCopyAsssetToSdcard could not get size of file " + strFileDest );  
+                 return -1;
+              }
+         } 
+         catch (IOException e) 
+         {
+               Log.e(LOG_TAG, "VxCopyAsssetToSdcard dest file doesnt exist.. will copy " + strFileDest );  
+         }
+      }
+      if( bDontCopyIfExistsAndSameSize && ( iSrcFileSize == iDestFileSize))
+      {
+            Log.i(LOG_TAG, "VxCopyAsssetToSdcard file exists " + strFileDest );
+            return 0;
+      }
+        // Read the entire asset into a local byte buffer.
+        byte[] buffer = new byte[iSrcFileSize];
+        try 
+        {
+         oInputStream.read(buffer);
+           oInputStream.close();
+      } 
+        catch (IOException e) 
+        {
+            Log.e(LOG_TAG, "ERROR: VxCopyAsssetToSdcard could not read file " + strFileSrc );  
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      // write buffer to destination file
+      try 
+      {
+         File oWriteFile = new File( strFileDest);
+         try
+         {  
+            oWriteFile.createNewFile();  
+         } 
+         catch (IOException e) 
+         {  
+            Log.e(LOG_TAG, "error creating file " + strFileDest, e);
+               e.printStackTrace();
+            return -1;
+         }
+         oOutputStream = new FileOutputStream(oWriteFile);  
+         //Don¡¯t forget to close stream
+         if (oOutputStream != null) 
+         {  
+             try 
+             {  
+               oOutputStream.write(buffer); 
+                oOutputStream.flush();  
+                oOutputStream.close();  
+                Log.i(LOG_TAG, "Success copying file " + strFileDest + " size " + iSrcFileSize );
+             } 
+             catch (IOException e) 
+             {  
+                   Log.e(LOG_TAG, "ERROR: VxCopyResourceToSdcard could not write file " + strFileDest );  
+                e.printStackTrace();
+                 return -1;
+             }  
+         }
+      }
+      catch (IOException e) 
+      {
+         Log.e(LOG_TAG, "ERROR: VxCopyAsssetToSdcard could not read file " + strFileSrc );  
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+         return -1;
+      }
+      return 0;
+   }
+boolean VxCreateDirectory( String strDirPath ) throws IOException
+   {
+      boolean bDirCreated = false;
+      File testDir = new File(strDirPath);  
+      bDirCreated = testDir.mkdirs();
+      if( false == bDirCreated)
+      {
+          //Log.i(LOG_TAG, "ERROR: Create Directory failed " + strDirPath);  
+      }
+      return bDirCreated;
+   }
+
+
+
+http://irrlicht.sourceforge.net/forum/viewtopic.php?f=6&t=37235&start=15
