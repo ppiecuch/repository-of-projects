@@ -1,0 +1,78 @@
+作者博客：crown
+
+
+图1旱桥的寻路（粉红色块为路径）
+
+
+图2螺旋楼梯的寻路（粉红色块为路径）
+
+
+　　当场景的碰撞使用3D以后相关的寻路也应该具有3D寻路功能，由于引擎中的碰撞格分为多层，所以在开启一个节点的时候就需要将每一层进行判断，判断条件主要是2个a碰撞格不能为红色b高度差不能超过一定的范围，为了寻路更有效率，增加了一个高度方向的启发值，当两个节点在平面方向与目标距离相等，但高度方向有区别那么与目标高度相差较小的节点优先遍历，其它的过程与2D的a*寻路[来源：GameRes.com]算法没什么区别。我的寻路算法中使用了二叉堆管理Open表，代码如下，供大家参考，SOpenMask是节点的结构定义，AddOpenMask函数功能是将一个节点放入Open表中，GetMinOpenMask函数是从Open表中取出具有最小权值的节点，上图是3d a*寻路算法的结果演示。
+
+struct SOpenMask
+{
+：
+：
+SOpenMask *pFather;
+SOpenMask *pLeft;
+SOpenMask *pRight;
+};
+
+int CAStarTrace::AddOpenMask( SOpenMask* pOpenMask, SOpenMask* pHead )
+{
+if( pHead == NULL )
+{
+  m_pOpenHead = pOpenMask;
+  return 0;
+}
+if( pHead->nDistance <= pOpenMask->nDistance )
+{
+  if( pHead->pRight == NULL )
+  {
+   pHead->pRight = pOpenMask;
+   pOpenMask->pFather = pHead;
+  }
+  else
+   AddOpenMask( pOpenMask, pHead->pRight );
+}
+else
+{
+  if( pHead->pLeft == NULL )
+  {
+   pHead->pLeft = pOpenMask;
+   pOpenMask->pFather = pHead;
+  }
+  else
+   AddOpenMask( pOpenMask, pHead->pLeft );
+}
+return 0;
+}
+
+SOpenMask* CAStarTrace::GetMinOpenMask( SOpenMask* pHead )
+{
+if( pHead == NULL )
+  return NULL;
+if( pHead->pLeft == NULL )
+{
+  SOpenMask * pMinNode = pHead;
+  if( pHead->pFather == NULL )
+  {
+   m_pOpenHead = pHead->pRight;
+   if( m_pOpenHead )
+    m_pOpenHead->pFather = NULL;
+  }
+  else
+  {
+   pHead->pFather->pLeft = pHead->pRight;
+   if( pHead->pRight )
+    pHead->pRight->pFather = pHead->pFather;
+  }
+  return pMinNode;
+}
+else
+  return GetMinOpenMask( pHead->pLeft );
+}
+
+
+
+http://bbs.gameres.com/showthread.asp?threadid=175137

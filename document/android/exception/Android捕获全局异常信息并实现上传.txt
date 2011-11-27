@@ -1,0 +1,246 @@
+在做项目时，经常会把错误利用异常抛出去，这样在开发时就可以通过手机抛出的异常排查错误。但是当程序开发完毕，版本稳定，需要上线时，为了避免抛出异常影响用户感受，可以用UncaughtExceptionHandler捕获全局异常，对异常做出处理。比如我们可以获取到抛出异常的时间、手机的硬件信息、错误的堆栈信息，然后将获取到的所有的信息发送到服务器中，也可以发送到指定的邮件中，以便及时修改bug。
+
+示例：
+
+自定义异常类实现UncaughtExceptionHandler接口，当某个页面出现异常就会调用uncaughtException这个方法，我们可以在这个方法中获取异常信息、时间等，然后将获取到的信息发送到我们指定的服务器
+
+view plaincopy to clipboardprint?/** 
+ * 自定义的 异常处理类 , 实现了 UncaughtExceptionHandler接口  
+ * @author Administrator 
+ * 
+ */  
+public class MyCrashHandler implements UncaughtExceptionHandler {  
+    // 需求是 整个应用程序 只有一个 MyCrash-Handler    
+    private static MyCrashHandler myCrashHandler ;  
+    private Context context;  
+    private DoubanService service;  
+    private SimpleDateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");  
+      
+    //1.私有化构造方法   
+    private MyCrashHandler(){  
+          
+    }  
+      
+    public static synchronized MyCrashHandler getInstance(){  
+        if(myCrashHandler!=null){  
+            return myCrashHandler;  
+        }else {  
+            myCrashHandler  = new MyCrashHandler();  
+            return myCrashHandler;  
+        }  
+    }  
+    public void init(Context context,DoubanService service){  
+        this.context = context;  
+        this.service = service;  
+    }  
+      
+  
+    public void uncaughtException(Thread arg0, Throwable arg1) {  
+        System.out.println("程序挂掉了 ");  
+        // 1.获取当前程序的版本号. 版本的id   
+        String versioninfo = getVersionInfo();  
+          
+        // 2.获取手机的硬件信息.   
+        String mobileInfo  = getMobileInfo();  
+          
+        // 3.把错误的堆栈信息 获取出来    
+        String errorinfo = getErrorInfo(arg1);  
+          
+        // 4.把所有的信息 还有信息对应的时间 提交到服务器    
+        try {  
+            service.createNote(new PlainTextConstruct(dataFormat.format(new Date())),   
+                    new PlainTextConstruct(versioninfo+mobileInfo+errorinfo), "public", "yes");  
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }  
+      
+        //干掉当前的程序    
+        android.os.Process.killProcess(android.os.Process.myPid());  
+    }  
+  
+    /** 
+     * 获取错误的信息  
+     * @param arg1 
+     * @return 
+     */  
+    private String getErrorInfo(Throwable arg1) {  
+        Writer writer = new StringWriter();  
+        PrintWriter pw = new PrintWriter(writer);  
+        arg1.printStackTrace(pw);  
+        pw.close();  
+        String error= writer.toString();  
+        return error;  
+    }  
+  
+    /** 
+     * 获取手机的硬件信息  
+     * @return 
+     */  
+    private String getMobileInfo() {  
+        StringBuffer sb = new StringBuffer();  
+        //通过反射获取系统的硬件信息    
+        try {  
+  
+            Field[] fields = Build.class.getDeclaredFields();  
+            for(Field field: fields){  
+                //暴力反射 ,获取私有的信息    
+                field.setAccessible(true);  
+                String name = field.getName();  
+                String value = field.get(null).toString();  
+                sb.append(name+"="+value);  
+                sb.append("\n");  
+            }  
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }  
+        return sb.toString();  
+    }  
+  
+    /** 
+     * 获取手机的版本信息 
+     * @return 
+     */  
+    private String getVersionInfo(){  
+        try {  
+            PackageManager pm = context.getPackageManager();  
+             PackageInfo info =pm.getPackageInfo(context.getPackageName(), 0);  
+             return  info.versionName;  
+        } catch (Exception e) {  
+            e.printStackTrace();  
+            return "版本号未知";  
+        }  
+    }  
+}  
+/**
+ * 自定义的 异常处理类 , 实现了 UncaughtExceptionHandler接口 
+ * @author Administrator
+ *
+ */
+public class MyCrashHandler implements UncaughtExceptionHandler {
+	// 需求是 整个应用程序 只有一个 MyCrash-Handler 
+	private static MyCrashHandler myCrashHandler ;
+	private Context context;
+	private DoubanService service;
+	private SimpleDateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+	
+	//1.私有化构造方法
+	private MyCrashHandler(){
+		
+	}
+	
+	public static synchronized MyCrashHandler getInstance(){
+		if(myCrashHandler!=null){
+			return myCrashHandler;
+		}else {
+			myCrashHandler  = new MyCrashHandler();
+			return myCrashHandler;
+		}
+	}
+	public void init(Context context,DoubanService service){
+		this.context = context;
+		this.service = service;
+	}
+	
+
+	public void uncaughtException(Thread arg0, Throwable arg1) {
+		System.out.println("程序挂掉了 ");
+		// 1.获取当前程序的版本号. 版本的id
+		String versioninfo = getVersionInfo();
+		
+		// 2.获取手机的硬件信息.
+		String mobileInfo  = getMobileInfo();
+		
+		// 3.把错误的堆栈信息 获取出来 
+		String errorinfo = getErrorInfo(arg1);
+		
+		// 4.把所有的信息 还有信息对应的时间 提交到服务器 
+		try {
+			service.createNote(new PlainTextConstruct(dataFormat.format(new Date())), 
+					new PlainTextConstruct(versioninfo+mobileInfo+errorinfo), "public", "yes");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+		//干掉当前的程序 
+		android.os.Process.killProcess(android.os.Process.myPid());
+	}
+
+	/**
+	 * 获取错误的信息 
+	 * @param arg1
+	 * @return
+	 */
+	private String getErrorInfo(Throwable arg1) {
+		Writer writer = new StringWriter();
+		PrintWriter pw = new PrintWriter(writer);
+		arg1.printStackTrace(pw);
+		pw.close();
+		String error= writer.toString();
+		return error;
+	}
+
+	/**
+	 * 获取手机的硬件信息 
+	 * @return
+	 */
+	private String getMobileInfo() {
+		StringBuffer sb = new StringBuffer();
+		//通过反射获取系统的硬件信息 
+		try {
+
+			Field[] fields = Build.class.getDeclaredFields();
+			for(Field field: fields){
+				//暴力反射 ,获取私有的信息 
+				field.setAccessible(true);
+				String name = field.getName();
+				String value = field.get(null).toString();
+				sb.append(name+"="+value);
+				sb.append("\n");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 获取手机的版本信息
+	 * @return
+	 */
+	private String getVersionInfo(){
+		try {
+			PackageManager pm = context.getPackageManager();
+			 PackageInfo info =pm.getPackageInfo(context.getPackageName(), 0);
+			 return  info.versionName;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "版本号未知";
+		}
+	}
+}
+ 
+
+创建一个Application实例将MyCrashHandler注册到整个应用程序上，创建出服务并进行传递：
+
+view plaincopy to clipboardprint?/** 
+ * 整个(app)程序初始化之前被调用  
+ * @author Administrator 
+ * 
+ */  
+public class DoubanApplication extends Application {  
+    public NoteEntry entry;  
+    @Override  
+    public void onCreate() {  
+        super.onCreate();  
+        String apiKey = "0fab7f9aa21f39cd2f027ecfe65dad67";  
+        String secret = "87fc1c5e99bfa5b3";  
+        // 获取到service   
+        DoubanService myService = new DoubanService("我的小豆豆", apiKey,  
+                secret);  
+        myService.setAccessToken("1fa4e5be0f808a0b5eeeb13a2e819e21", "56a622c1138dbfce");  
+        MyCrashHandler handler = MyCrashHandler.getInstance();  
+        handler.init(getApplicationContext(),myService);  
+        Thread.setDefaultUncaughtExceptionHandler(handler);  
+    }  
+}  
+http://blog.csdn.net/furongkang/article/details/7002577

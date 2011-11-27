@@ -1,0 +1,102 @@
+MFC中，TRACE("\r\n%s","fdsafdsfsda");
+
+
+CString name("中文");
+TRACE(TEXT("drop layer%s\r\n"),name);
+
+
+TRACE(TEXT("drop layer%s\r\n"),it.getNode()->getValue()->m_strName);
+如果m_strName是const CString& 会报错,如果是const CString则不会
+
+
+
+
+Win32代码中可以直接用OutputDebugString来达到相同效果
+
+#include <stdio.h>  
+#include <wtypes.h>  
+#include <stdarg.h>  
+#include <tchar.h>
+
+void Trace(LPCTSTR pszFormat, ...)
+{
+	va_list pArgs;
+	char szMessageBuffer[16380]={0};
+	va_start( pArgs, pszFormat );
+	_vsntprintf_s( szMessageBuffer, 16380, pszFormat, pArgs );
+	va_end( pArgs );   
+	OutputDebugString(szMessageBuffer);   
+}
+
+
+Win32代码中窗口弹出函数
+
+ view plaincopy to clipboardprint?
+void printDebugMsg(LPCTSTR pszFormat, ...)   
+{   
+    va_list pArgs;   
+  
+    char szMessageBuffer[512] ;   
+    va_start( pArgs, pszFormat );   
+    sprintf_s( szMessageBuffer,   pszFormat, pArgs );   
+    MessageBox(NULL,szMessageBuffer,"",NULL);   
+}  
+
+
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/whisperLin/archive/2009/10/20/4703346.aspx
+
+
+
+解决VS2008不能TRACE UNICODE汉字的方法 
+2010-07-30 15:30 334人阅读 评论(1) 收藏 举报 
+view plaincopy to clipboardprint?void JTrace(const wchar_t *pszFmt,...)   
+{  
+   va_list ptr; va_start(ptr, pszFmt);  
+   wchar_t szBuf[1024];  
+   ATL_CRT_ERRORCHECK_SPRINTF(_vsnwprintf_s(szBuf,_countof(szBuf),_countof(szBuf)-1, pszFmt, ptr));  
+   char chBuf[1024];  
+   WideCharToMultiByte(CP_ACP,0,szBuf,-1,chBuf,sizeof(chBuf),NULL,NULL);  
+   TRACE(chBuf);  
+   va_end(ptr);  
+}  
+  
+  
+#ifdef _DEBUG   
+ #define JTRACE JTrace   
+#else   
+ #define JTRACE (void)0   
+#endif  
+void JTrace(const wchar_t *pszFmt,...) 
+{
+   va_list ptr; va_start(ptr, pszFmt);
+   wchar_t szBuf[1024];
+   ATL_CRT_ERRORCHECK_SPRINTF(_vsnwprintf_s(szBuf,_countof(szBuf),_countof(szBuf)-1, pszFmt, ptr));
+   char chBuf[1024];
+   WideCharToMultiByte(CP_ACP,0,szBuf,-1,chBuf,sizeof(chBuf),NULL,NULL);
+   TRACE(chBuf);
+   va_end(ptr);
+}
+
+
+#ifdef _DEBUG
+ #define JTRACE JTrace
+#else
+ #define JTRACE (void)0
+#endif
+
+
+ 
+
+功能同VS自带的TRACE完全相同（在Release版本下不会加入JTrace调用），只是解决了VS自带的TRACE不能输出UNICODE中文的bug。
+
+使用示例：
+
+wchar_t w[] = TEXT("中国");
+
+JTRACE(TEXT("国家：%s"),w);
+
+这样，在VS的输出窗口就不会出乱码了，而且如果你想让TraceWin等工具捕捉输出，那么捕捉到的输出同样不会乱码。
+
+http://blog.csdn.net/jiakai1000/article/details/5776750

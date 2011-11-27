@@ -1,0 +1,533 @@
+步骤：
+
+1.检测当前版本的信息AndroidManifest.xml-->manifest-->android:versionName。
+
+2.从服务器获取版本号（版本号存在于xml文件中）并与当前检测到的版本进行匹配，如果不匹配，提示用户进行升级，如果匹配则进入程序主界面。
+
+3.当提示用户进行版本升级时，如果用户点击了确定，系统将自动从服务器上下载并进行自动升级，如果点击取消将进入程序主界面。
+
+效果图：
+
+      
+
+    
+
+
+获取当前程序的版本号:
+
+
+view plaincopy to clipboardprint?/* 
+ * 获取当前程序的版本号  
+ */  
+private String getVersionName() throws Exception{  
+    //获取packagemanager的实例    
+    PackageManager packageManager = getPackageManager();  
+    //getPackageName()是你当前类的包名，0代表是获取版本信息   
+    PackageInfo packInfo = packageManager.getPackageInfo(getPackageName(), 0);  
+    return packInfo.versionName;   
+}  
+	/*
+	 * 获取当前程序的版本号 
+	 */
+	private String getVersionName() throws Exception{
+		//获取packagemanager的实例 
+		PackageManager packageManager = getPackageManager();
+		//getPackageName()是你当前类的包名，0代表是获取版本信息
+		PackageInfo packInfo = packageManager.getPackageInfo(getPackageName(), 0);
+	    return packInfo.versionName; 
+	}获取服务器端的版本号： 
+
+
+view plaincopy to clipboardprint?/* 
+ * 用pull解析器解析服务器返回的xml文件 (xml封装了版本号) 
+ */  
+public static UpdataInfo getUpdataInfo(InputStream is) throws Exception{  
+    XmlPullParser  parser = Xml.newPullParser();    
+    parser.setInput(is, "utf-8");//设置解析的数据源    
+    int type = parser.getEventType();  
+    UpdataInfo info = new UpdataInfo();//实体   
+    while(type != XmlPullParser.END_DOCUMENT ){  
+        switch (type) {  
+        case XmlPullParser.START_TAG:  
+            if("version".equals(parser.getName())){  
+                info.setVersion(parser.nextText()); //获取版本号   
+            }else if ("url".equals(parser.getName())){  
+                info.setUrl(parser.nextText()); //获取要升级的APK文件   
+            }else if ("description".equals(parser.getName())){  
+                info.setDescription(parser.nextText()); //获取该文件的信息   
+            }  
+            break;  
+        }  
+        type = parser.next();  
+    }  
+    return info;  
+}  
+	/*
+	 * 用pull解析器解析服务器返回的xml文件 (xml封装了版本号)
+	 */
+	public static UpdataInfo getUpdataInfo(InputStream is) throws Exception{
+		XmlPullParser  parser = Xml.newPullParser();  
+		parser.setInput(is, "utf-8");//设置解析的数据源 
+		int type = parser.getEventType();
+		UpdataInfo info = new UpdataInfo();//实体
+		while(type != XmlPullParser.END_DOCUMENT ){
+			switch (type) {
+			case XmlPullParser.START_TAG:
+				if("version".equals(parser.getName())){
+					info.setVersion(parser.nextText());	//获取版本号
+				}else if ("url".equals(parser.getName())){
+					info.setUrl(parser.nextText());	//获取要升级的APK文件
+				}else if ("description".equals(parser.getName())){
+					info.setDescription(parser.nextText());	//获取该文件的信息
+				}
+				break;
+			}
+			type = parser.next();
+		}
+		return info;
+	}从服务器下载apk: 
+
+
+view plaincopy to clipboardprint?public static File getFileFromServer(String path, ProgressDialog pd) throws Exception{  
+    //如果相等的话表示当前的sdcard挂载在手机上并且是可用的   
+    if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){  
+        URL url = new URL(path);  
+        HttpURLConnection conn =  (HttpURLConnection) url.openConnection();  
+        conn.setConnectTimeout(5000);  
+        //获取到文件的大小    
+        pd.setMax(conn.getContentLength());  
+        InputStream is = conn.getInputStream();  
+        File file = new File(Environment.getExternalStorageDirectory(), "updata.apk");  
+        FileOutputStream fos = new FileOutputStream(file);  
+        BufferedInputStream bis = new BufferedInputStream(is);  
+        byte[] buffer = new byte[1024];  
+        int len ;  
+        int total=0;  
+        while((len =bis.read(buffer))!=-1){  
+            fos.write(buffer, 0, len);  
+            total+= len;  
+            //获取当前下载量   
+            pd.setProgress(total);  
+        }  
+        fos.close();  
+        bis.close();  
+        is.close();  
+        return file;  
+    }  
+    else{  
+        return null;  
+    }  
+}  
+	public static File getFileFromServer(String path, ProgressDialog pd) throws Exception{
+		//如果相等的话表示当前的sdcard挂载在手机上并且是可用的
+		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+			URL url = new URL(path);
+			HttpURLConnection conn =  (HttpURLConnection) url.openConnection();
+			conn.setConnectTimeout(5000);
+			//获取到文件的大小 
+			pd.setMax(conn.getContentLength());
+			InputStream is = conn.getInputStream();
+			File file = new File(Environment.getExternalStorageDirectory(), "updata.apk");
+			FileOutputStream fos = new FileOutputStream(file);
+			BufferedInputStream bis = new BufferedInputStream(is);
+			byte[] buffer = new byte[1024];
+			int len ;
+			int total=0;
+			while((len =bis.read(buffer))!=-1){
+				fos.write(buffer, 0, len);
+				total+= len;
+				//获取当前下载量
+				pd.setProgress(total);
+			}
+			fos.close();
+			bis.close();
+			is.close();
+			return file;
+		}
+		else{
+			return null;
+		}
+	}
+
+匹配、下载、自动安装： 
+
+
+view plaincopy to clipboardprint?/* 
+ * 从服务器获取xml解析并进行比对版本号  
+ */  
+public class CheckVersionTask implements Runnable{  
+  
+    public void run() {  
+        try {  
+            //从资源文件获取服务器 地址    
+            String path = getResources().getString(R.string.serverurl);  
+            //包装成url的对象    
+            URL url = new URL(path);  
+            HttpURLConnection conn =  (HttpURLConnection) url.openConnection();   
+            conn.setConnectTimeout(5000);  
+            InputStream is =conn.getInputStream();   
+            info =  UpdataInfoParser.getUpdataInfo(is);  
+              
+            if(info.getVersion().equals(versionname)){  
+                Log.i(TAG,"版本号相同无需升级");  
+                LoginMain();  
+            }else{  
+                Log.i(TAG,"版本号不同 ,提示用户升级 ");  
+                Message msg = new Message();  
+                msg.what = UPDATA_CLIENT;  
+                handler.sendMessage(msg);  
+            }  
+        } catch (Exception e) {  
+            // 待处理    
+            Message msg = new Message();  
+            msg.what = GET_UNDATAINFO_ERROR;  
+            handler.sendMessage(msg);  
+            e.printStackTrace();  
+        }   
+    }  
+}  
+  
+Handler handler = new Handler(){  
+      
+    @Override  
+    public void handleMessage(Message msg) {  
+        // TODO Auto-generated method stub   
+        super.handleMessage(msg);  
+        switch (msg.what) {  
+        case UPDATA_CLIENT:  
+            //对话框通知用户升级程序    
+            showUpdataDialog();  
+            break;  
+        case GET_UNDATAINFO_ERROR:  
+            //服务器超时    
+            Toast.makeText(getApplicationContext(), "获取服务器更新信息失败", 1).show();  
+            LoginMain();  
+            break;    
+        case DOWN_ERROR:  
+            //下载apk失败   
+            Toast.makeText(getApplicationContext(), "下载新版本失败", 1).show();  
+            LoginMain();  
+            break;    
+        }  
+    }  
+};  
+  
+/* 
+ *  
+ * 弹出对话框通知用户更新程序  
+ *  
+ * 弹出对话框的步骤： 
+ *  1.创建alertDialog的builder.   
+ *  2.要给builder设置属性, 对话框的内容,样式,按钮 
+ *  3.通过builder 创建一个对话框 
+ *  4.对话框show()出来   
+ */  
+protected void showUpdataDialog() {  
+    AlertDialog.Builder builer = new Builder(this) ;   
+    builer.setTitle("版本升级");  
+    builer.setMessage(info.getDescription());  
+    //当点确定按钮时从服务器上下载 新的apk 然后安装    
+    builer.setPositiveButton("确定", new OnClickListener() {  
+    public void onClick(DialogInterface dialog, int which) {  
+            Log.i(TAG,"下载apk,更新");  
+            downLoadApk();  
+        }     
+    });  
+    //当点取消按钮时进行登录   
+    builer.setNegativeButton("取消", new OnClickListener() {  
+        public void onClick(DialogInterface dialog, int which) {  
+            // TODO Auto-generated method stub   
+            LoginMain();  
+        }  
+    });  
+    AlertDialog dialog = builer.create();  
+    dialog.show();  
+}  
+  
+/* 
+ * 从服务器中下载APK 
+ */  
+protected void downLoadApk() {  
+    final ProgressDialog pd;    //进度条对话框   
+    pd = new  ProgressDialog(this);  
+    pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);  
+    pd.setMessage("正在下载更新");  
+    pd.show();  
+    new Thread(){  
+        @Override  
+        public void run() {  
+            try {  
+                File file = DownLoadManager.getFileFromServer(info.getUrl(), pd);  
+                sleep(3000);  
+                installApk(file);  
+                pd.dismiss(); //结束掉进度条对话框   
+            } catch (Exception e) {  
+                Message msg = new Message();  
+                msg.what = DOWN_ERROR;  
+                handler.sendMessage(msg);  
+                e.printStackTrace();  
+            }  
+        }}.start();  
+}  
+  
+//安装apk    
+protected void installApk(File file) {  
+    Intent intent = new Intent();  
+    //执行动作   
+    intent.setAction(Intent.ACTION_VIEW);  
+    //执行的数据类型   
+    intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");  
+    startActivity(intent);  
+}  
+  
+/* 
+ * 进入程序的主界面 
+ */  
+private void LoginMain(){  
+    Intent intent = new Intent(this,MainActivity.class);  
+    startActivity(intent);  
+    //结束掉当前的activity    
+    this.finish();  
+}  
+	/*
+	 * 从服务器获取xml解析并进行比对版本号 
+	 */
+	public class CheckVersionTask implements Runnable{
+
+		public void run() {
+			try {
+				//从资源文件获取服务器 地址 
+				String path = getResources().getString(R.string.serverurl);
+				//包装成url的对象 
+				URL url = new URL(path);
+				HttpURLConnection conn =  (HttpURLConnection) url.openConnection(); 
+				conn.setConnectTimeout(5000);
+				InputStream is =conn.getInputStream(); 
+				info =  UpdataInfoParser.getUpdataInfo(is);
+				
+				if(info.getVersion().equals(versionname)){
+					Log.i(TAG,"版本号相同无需升级");
+					LoginMain();
+				}else{
+					Log.i(TAG,"版本号不同 ,提示用户升级 ");
+					Message msg = new Message();
+					msg.what = UPDATA_CLIENT;
+					handler.sendMessage(msg);
+				}
+			} catch (Exception e) {
+				// 待处理 
+				Message msg = new Message();
+				msg.what = GET_UNDATAINFO_ERROR;
+				handler.sendMessage(msg);
+				e.printStackTrace();
+			} 
+		}
+	}
+	
+	Handler handler = new Handler(){
+		
+		@Override
+		public void handleMessage(Message msg) {
+			// TODO Auto-generated method stub
+			super.handleMessage(msg);
+			switch (msg.what) {
+			case UPDATA_CLIENT:
+				//对话框通知用户升级程序 
+				showUpdataDialog();
+				break;
+			case GET_UNDATAINFO_ERROR:
+				//服务器超时 
+				Toast.makeText(getApplicationContext(), "获取服务器更新信息失败", 1).show();
+				LoginMain();
+				break;	
+			case DOWN_ERROR:
+				//下载apk失败
+				Toast.makeText(getApplicationContext(), "下载新版本失败", 1).show();
+				LoginMain();
+				break;	
+			}
+		}
+	};
+	
+	/*
+	 * 
+	 * 弹出对话框通知用户更新程序 
+	 * 
+	 * 弹出对话框的步骤：
+	 * 	1.创建alertDialog的builder.  
+	 *	2.要给builder设置属性, 对话框的内容,样式,按钮
+	 *	3.通过builder 创建一个对话框
+	 *	4.对话框show()出来  
+	 */
+	protected void showUpdataDialog() {
+		AlertDialog.Builder builer = new Builder(this) ; 
+		builer.setTitle("版本升级");
+		builer.setMessage(info.getDescription());
+		//当点确定按钮时从服务器上下载 新的apk 然后安装 
+		builer.setPositiveButton("确定", new OnClickListener() {
+		public void onClick(DialogInterface dialog, int which) {
+				Log.i(TAG,"下载apk,更新");
+				downLoadApk();
+			}   
+		});
+		//当点取消按钮时进行登录
+		builer.setNegativeButton("取消", new OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				LoginMain();
+			}
+		});
+		AlertDialog dialog = builer.create();
+		dialog.show();
+	}
+	
+	/*
+	 * 从服务器中下载APK
+	 */
+	protected void downLoadApk() {
+		final ProgressDialog pd;	//进度条对话框
+		pd = new  ProgressDialog(this);
+		pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		pd.setMessage("正在下载更新");
+		pd.show();
+		new Thread(){
+			@Override
+			public void run() {
+				try {
+					File file = DownLoadManager.getFileFromServer(info.getUrl(), pd);
+					sleep(3000);
+					installApk(file);
+					pd.dismiss(); //结束掉进度条对话框
+				} catch (Exception e) {
+					Message msg = new Message();
+					msg.what = DOWN_ERROR;
+					handler.sendMessage(msg);
+					e.printStackTrace();
+				}
+			}}.start();
+	}
+	
+	//安装apk 
+	protected void installApk(File file) {
+		Intent intent = new Intent();
+		//执行动作
+		intent.setAction(Intent.ACTION_VIEW);
+		//执行的数据类型
+		intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+		startActivity(intent);
+	}
+	
+	/*
+	 * 进入程序的主界面
+	 */
+	private void LoginMain(){
+		Intent intent = new Intent(this,MainActivity.class);
+		startActivity(intent);
+		//结束掉当前的activity 
+		this.finish();
+	} 
+
+UpdataInfo：
+
+view plaincopy to clipboardprint?public class UpdataInfo {  
+    private String version;  
+    private String url;  
+    private String description;  
+    public String getVersion() {  
+        return version;  
+    }  
+    public void setVersion(String version) {  
+        this.version = version;  
+    }  
+    public String getUrl() {  
+        return url;  
+    }  
+    public void setUrl(String url) {  
+        this.url = url;  
+    }  
+    public String getDescription() {  
+        return description;  
+    }  
+    public void setDescription(String description) {  
+        this.description = description;  
+    }  
+}  
+public class UpdataInfo {
+	private String version;
+	private String url;
+	private String description;
+	public String getVersion() {
+		return version;
+	}
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+} 
+
+update.xml:
+
+view plaincopy to clipboardprint?<?xml version="1.0" encoding="utf-8"?>  
+<info>  
+    <version>2.0</version>  
+    <url>http://192.168.1.187:8080/mobilesafe.apk</url>  
+    <description>检测到最新版本，请及时更新！</description>  
+</info>  
+<?xml version="1.0" encoding="utf-8"?>
+<info>
+	<version>2.0</version>
+	<url>http://192.168.1.187:8080/mobilesafe.apk</url>
+	<description>检测到最新版本，请及时更新！</description>
+</info> 
+
+
+
+ 
+
+
+分享到： 上一篇：Java安全之对称加密与非对称加密 
+下一篇：Android九宫格 
+顶 
+22 踩 
+0 
+查看评论
+16楼 fangliang201110 2011-10-30 10:04发表 [回复] [引用] [举报]像这种应用程序更新，应该是系统自带的吧
+15楼 Oratis 2011-10-25 09:21发表 [回复] [引用] [举报]能不能把之前声明变量的一段也贴出来，updateinfoparser和那些大写字母的case还有geifilefromserver，总是错误，提示说要新建类。
+14楼 monlikey 2011-10-24 15:31发表 [回复] [引用] [举报]UpdataInfo 和DownLoadManager类你定义在哪里
+而且这样的版本升级问题，在服务器的那边一定是要访问manifest的xml文件吗，？
+thanks,
+kakarote
+Re: furongkang 2011-10-24 17:07发表 [回复] [引用] [举报]回复monlikey：UpdataInfo 是实体类，用来封装从服务器返回的数据
+DownLoadManager是从服务器下载最新版的apk也就是这个方法getFileFromServer
+不一定非要访问xml只要能从服务器端获取到最新的版本号和最新的apk的URL即可，个人感觉用xml比较方便。
+UpdataInfo和服务器中的updata.xml已贴出
+13楼 will88 2011-10-23 17:22发表 [回复] [引用] [举报]学习了
+12楼 tracy_meimei 2011-10-23 09:11发表 [回复] [引用] [举报]谢谢，很好的东西，找了好久，都没有这么全面的
+11楼 guyancanyun 2011-10-22 23:42发表 [回复] [引用] [举报]楼主好人啊。思路一下子清晰了
+10楼 xgvpxy 2011-10-22 17:17发表 [回复] [引用] [举报]好东西
+9楼 BIAOBIAOqi 2011-10-20 20:07发表 [回复] [引用] [举报]有点不懂的地方，
+app本身自己在运行，但又重新安装自己。这个是怎么个处理的办法啊？是因为app之前已经全部读入内存，所以存储空间的部分可以置换了么？
+谢谢～
+Re: furongkang 2011-10-20 20:55发表 [回复] [引用] [举报]回复BIAOBIAOqi：它是将新下载的apk进行替换安装，替换工程中将将会保存用户的数据。在安装之前会提示用户的，此图已贴。
+8楼 y13872888163 2011-10-20 18:40发表 [回复] [引用] [举报]写的很好 易懂
+7楼 a573742376a 2011-10-20 17:20发表 [回复] [引用] [举报]好东西啊！！！感谢楼主的分享。
+6楼 zhaoliang092011 2011-10-20 16:26发表 [回复] [引用] [举报]顶
+5楼 k1102k27 2011-10-20 15:54发表 [回复] [引用] [举报]有了思路，實現就是時間問題。
+支持！
+4楼 cndaijin 2011-10-20 14:52发表 [回复] [引用] [举报]非常好，谢谢楼主分享
+3楼 yiyaaixuexi 2011-10-20 14:44发表 [回复] [引用] [举报]好东西，谢谢分享。
+2楼 zxciop110 2011-10-20 14:23发表 [回复] [引用] [举报]谢谢 之前也是这么做的 今天看到 算是预习了一下
+1楼 hitlion2008 2011-10-20 09:53发表 [回复] [引用] [举报]很好，很强大。
+清晰，明明白白，一看就懂。感谢分享。
+http://blog.csdn.net/furongkang/article/details/6886526

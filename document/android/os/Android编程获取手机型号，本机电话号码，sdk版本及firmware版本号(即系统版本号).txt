@@ -1,0 +1,70 @@
+Android开发平台中，可通过TelephonyManager 获取本机号码。
+
+ 
+
+TelephonyManager phoneMgr=(TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);txtPhoneNumber.setText(phoneMgr.getLine1Number()); //txtPhoneNumber是一个EditText 用于显示手机号        
+注:
+
+根据Android的安全机制，在使用TelephonyManager时，必须在AndroidManifest.xml中添加<uses-permission android:name="READ_PHONE_STATE" /> 否则无法获得系统的许可。
+
+
+
+
+手机型号 Build.MODEL
+
+String MODEL The end-user-visible name for the end product. 
+
+sdk版本 Build.VERSION.SDK
+
+String SDK This constant is deprecated. Use SDK_INT to easily get this as an integer. 
+
+及frimware版本号(系统版本号) Build.VERSION.RELEASE
+
+String RELEASE The user-visible version string. 
+
+
+private void loadPhoneStatus(){  TelephonyManager phoneMgr=(TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);  txtPhoneModel.setText(Build.MODEL); //手机型号  txtPhoneNumber.setText(phoneMgr.getLine1Number());//本机电话号码  txtSdkVersion.setText(Build.VERSION.SDK);//SDK版本号  txtOsVersion.setText(Build.VERSION.RELEASE);//Firmware/OS 版本号}
+事实上，Build能向我们提供包括 硬件厂商，硬件编号，序列号等很多信息 调用方法也都同上，很简单。
+
+String BOARD The name of the underlying board, like "goldfish". 
+String BOOTLOADER The system bootloader version number. 
+String BRAND The brand (e.g., carrier) the software is customized for, if any. 
+String CPU_ABI The name of the instruction set (CPU type + ABI convention) of native code. 
+String CPU_ABI2 The name of the second instruction set (CPU type + ABI convention) of native code. 
+String DEVICE The name of the industrial design. 
+String DISPLAY A build ID string meant for displaying to the user 
+String FINGERPRINT A string that uniquely identifies this build. 
+String HARDWARE The name of the hardware (from the kernel command line or /proc). 
+String HOST   
+String ID Either a changelist number, or a label like "M4-rc20". 
+String MANUFACTURER The manufacturer of the product/hardware. 
+String MODEL The end-user-visible name for the end product. 
+String PRODUCT The name of the overall product. 
+String RADIO The radio firmware version number. 
+String SERIAL A hardware serial number, if available. 
+String TAGS Comma-separated tags describing the build, like "unsigned,debug". 
+long TIME   
+String TYPE The type of build, like "user" or "eng". 
+String UNKNOWN Value used for when a build property is unknown. 
+String USER
+
+ 
+
+最近在做韩国一家公司的Android平台软件开发，我的手机号是韩国的啦。所以看到010打头的号码，别太惊讶..
+
+
+
+我的联系方式:
+
+twitter: @mainroadlee 
+
+http://twitter.com/#!/mainroadlee
+
+
+talkbox id:mainroadlee
+
+手头做的项目涉及到Android平台中网络设置，数据库，http协议下的数据传输，支付系统，以及SNS API(twitter, facebook, me2day, etc), QR码扫描等模块。
+
+如果大家感兴趣的话，我会在开发闲暇时间陆续将常用的一些模块的开发调用，写成独立，简洁的教程发上来。
+
+http://www.cnblogs.com/mainroadlee/archive/2011/01/09/Get_Phone_Number_Model_SDKVersion_Information_in_Android_SDK.html

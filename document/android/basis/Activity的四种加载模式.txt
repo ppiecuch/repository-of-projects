@@ -1,0 +1,47 @@
+Activity之间的跳转，或者说加载一个新的Activity，一般对于开发者来说，都不是一个太难的问题。直到后来随着不断的深入，才发现原来Activity的加载还分为四种不同加载模式。灵活的使用合适的加载模式，可以避免产生大量的重复的Activity，从而优化性能，减少系统资源消耗。
+
+　　四种加载模式具体为：
+
+　　standard: 标准模式，一调用startActivity()方法就会产生一个新的实例。
+　　singleTop: 检查是否已经存在了一个实例位于Activity Stack的顶部，如果存在就不产生新的实例，反之则调用Activity的newInstance()方法产生一个新实例。
+　　singleTask: 在一个新的Task中产生这个实例，以后每次调用都会使用此实例，而避免产生新的实例。
+　　singleInstance: 这个基本上跟singleTask一样，只是有一点不同，那就是在这个模式下的Activity实例所处的Task中，只能有这一个Activity实例，而不能有其他的实例。
+
+　　这些启动模式可以Android清单文件AndroidManifest.xml中，通过<activity>中的launchMode属性进行设置，如：
+
+　　AndroidManifest.xml
+
+　　 <activity android:name="MainActivity" android:launchMode="singleTop">
+　　    <intent-filter>
+　　        <category android:name="android.intent.category.DEFAULT" />
+　　    </intent-filter>
+　　</activity>
+
+　　Java Code
+
+　　 Intent intent = new Intent(SrcActivity.this, TargetActivity.class);
+　　 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+　　 startActivity(intent);
+
+　　四种加载模式的区别如下：
+
+　　1.所属Task的区别：
+　　一般情况下,，“standard”和”singleTop”两种加载模式源Activity（即new Intent(arg0,arg1)中的第一个参数）和目标Activity（即new Intent(arg0,arg1)中的第二个参数）在同一个Task内，除非Intent包括了参数FLAG_ACTIVITY_NEW_TASK,如包含了此参数，目标Activity会起动到新的Task里；
+　　“singleTask”和“singleInstance” 总是把目标Activity作为一个Task的根元素，他们不会被启动到一个其他Task里。
+
+　　2.是否允许多个实例的区别：
+　　standard”和”singleTop”可以允许有多个实例，并且可以位于不同的Task中；
+　　singleTop要求如果Activity Stack顶部已经有目标Activity实例，则直接讲Intent发送给该实例，而不创建新实例。如Activity Stack没有该实例，则创建新实例；
+　　　“singleTask”和”singleInstance”则只产生一个实例，并且是Task的根元素。“standard”和”singleTop”可以被实例化多次，并且是可以存在于不同的task中；这种实例化时一个task可以包括一个activity的多个实例；“singleTask”和”singleInstance”则限制只生成一个实例，并且是task的根元素。
+
+　　3.是否允许其他Activity存在于本Task内的区别：
+　　“singleInstance”独占一个Task，其他Activity均不能存在于此Task中，如果它启动一个新的Activity，不管新的Activity的launch mode如何，新的Activity都将运行于其他Task里；　　　　　　
+　　另外三种模式则可以和其他Activity共存。
+
+　　4.是否每次都生成新实例的区别：
+　　“standar”模式每次都生成一个新的Activity实例；
+　　“singleTop”的Activity如果在Task的Activity Stack顶部则不生成新实例，直接使用此实例，否则生成一个新实例。
+　　“singleeInstance”是其所在Task的Activity Stack里的唯一Activity实例，它每次都会被重用
+　　“singleTask”如果在Task的Activity Stack的顶部，则接收intent，否则该intent会被丢弃，但仍然会该Task返回前台。
+
+http://blog.csdn.net/jgl5987/article/details/6985696

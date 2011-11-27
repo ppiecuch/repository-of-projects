@@ -1,0 +1,31 @@
+_MSC_VER 定义编译器的版本。下面是一些编译器版本的_MSC_VER值（参见扩展阅读中的参考文献2的链接） 
+　　MS VC++ 10.0 _MSC_VER = 1600 
+　　MS VC++ 9.0 _MSC_VER = 1500 
+　　MS VC++ 8.0 _MSC_VER = 1400 
+　　MS VC++ 7.1 _MSC_VER = 1310 
+　　MS VC++ 7.0 _MSC_VER = 1300 
+　　MS VC++ 6.0 _MSC_VER = 1200 
+　　MS VC++ 5.0 _MSC_VER = 1100 
+　　其中MS VC++ 10.0就是Visual C++ 2010，MS VC++ 9.0就是Visual C++ 2008，MS VC++ 8.0就是Visual C++ 2005。版本名称上的的对应关系参见扩展阅读中的参考文献1的链接. 
+　　在程序中加入_MSC_VER宏可以根据编译器版本让编译器选择性地编译一段程序。例如一个版本编译器产生的lib文件可能不能被另一个版本的编译器调用，那么在开发应用程序的时候，在该程序的lib调用库中放入多个版本编译器产生的lib文件。在程序中加入_MSC_VER宏，编译器就能够在调用的时根据其版本自动选择可以链接的lib库版本，如下所示。 
+　　#if _MSC_VER >= 1400 // for vc8, or vc9 
+　　#ifdef _DEBUG 
+　　#pragma comment( lib, "SomeLib-vc8-d.lib" ) 
+　　#else if 
+　　#pragma comment( lib, "SomeLib-vc8-r.lib" ) 
+　　#endif 
+　　#elif _MSC_VER >= 1310 // for vc71 
+　　#ifdef _DEBUG 
+　　#pragma comment( lib, "SomeLib-vc71-d.lib" ) 
+　　#else if 
+　　#pragma comment( lib, "SomeLib-vc71-r.lib" ) 
+　　#endif 
+　　#elif _MSC_VER >=1200 // for vc6 
+　　#ifdef _DEBUG 
+　　#pragma comment( lib, "SomeLib-vc6-d.lib" ) 
+　　#else if 
+　　#pragma comment( lib, "SomeLib-vc6-r.lib" ) 
+　　#endif 
+　　#endif 
+　　本编辑词条参考自扩展阅读中的链接。关于_MSC_VER更详细的说明请点击阅读扩展阅读中的参考文献3，4的链接。
+http://baike.baidu.com/view/1276757.htm

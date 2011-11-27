@@ -1,0 +1,80 @@
+C语言/C++怎样产生随机数：这里要用到的是rand()函数, srand()函数，C语言/C++里没有自带的random(int number)函数。
+
+(1)  如果你只要产生随机数而不需要设定范围的话，你只要用rand()就可以了：rand()会返回一随机数值, 范围在0至RAND_MAX 间。RAND_MAX定义在stdlib.h, 其值为2147483647。
+
+例如： 
+
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+void main()
+
+{
+
+       for(int i=0;i<10;i+)
+
+             printf("%d\n",rand());
+
+}
+
+
+(2)  如果你要随机生成一个在一定范围的数，你可以在宏定义中定义一个random(int number)函数，然后在main()里面直接调用random()函数： 
+
+
+例如：随机生成10个0~100的数：
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+#define random(x) (rand()%x)
+
+void main()
+
+{
+
+     for(int x=0;x<10;x++)
+
+           printf("%d\n",random(100));
+
+}
+
+
+ 
+
+(3)但是上面两个例子所生成的随机数都只能是一次性的，如果你第二次运行的时候输出结果仍和第一次一样。这与srand()函数有关。srand()用来设置rand()产生随机数时的随机数种子。在调用rand()函数产生随机数前，必须先利用srand()设好随机数种子（seed）, 如果未设随机数种子, rand()在调用时会自动设随机数种子为1。上面的两个例子就是因为没有设置随机数种子，每次随机数种子都自动设成相同值1 ，进而导致rand()所产生的随机数值都一样。
+
+srand()函数定义 ： void srand (unsigned int seed); 
+
+通常可以利用geypid()或time(0)的返回值来当做seed
+
+如果你用time(0)的话，要加入头文件#include<time.h> 
+
+
+例如：
+
+#include<stdio.h>
+
+#include<stdlib.h>
+
+#include<time.h>
+
+#define random(x) (rand()%x)
+
+void main()
+
+{
+
+     srand((int)time(0));
+
+     for(int x=0;x<10;x++)
+
+           printf("%d\n",random(100));
+
+}
+
+
+这样两次运行的结果就会不一样了！！
+http://3dgraphic.blog.163.com/blog/static/53673300200910118381129/

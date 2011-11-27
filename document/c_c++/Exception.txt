@@ -1,4 +1,28 @@
 [异常]
+使用  pthread_create时
+invalid conversion from `void*' to `void*(*)(void*)  
+
+[解决]
+SSVector& SSVector::assign2product4setup(const SVSet& A, const SSVector& x) 
+{ 
+int    ret_val=pthread_create(&pt,NULL,my_prefun,x); 
+} 
+
+void* SSVector::prefun (void* arg){ 
+const SSVector &tx =*((SSVector*) arg); 
+} 
+
+SSVector ss;
+void* my_prefun（void* arg){ 
+     ss.prefun(arg);
+}
+
+
+
+
+
+
+[异常]
 nafxcw.lib错误 
 nafxcw.lib(appcore.obj) : error LNK2001: unresolved external symbol ___argv 
 nafxcw.lib(appcore.obj) : error LNK2001: unresolved external symbol ___argc 

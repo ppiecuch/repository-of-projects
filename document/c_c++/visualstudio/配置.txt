@@ -1,0 +1,6 @@
+/** 禁止编译器出现类型转换的警告 */
+#pragma warning(disable: 4311)
+#pragma warning(disable: 4312)
+#pragma warning(disable: 4244)
+#pragma warning(disable: 4018)
+#pragma warning(disable: 4267)
