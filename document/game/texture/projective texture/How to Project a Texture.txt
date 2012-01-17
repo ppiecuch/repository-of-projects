@@ -1,0 +1,44 @@
+6.16.1 How to Project a Texture 
+Projecting a texture image into your synthetic environment requires many of the same steps that are used to project the rendered scene onto the display. The key to projecting a texture is the contents of the texture transform matrix. The matrix contains the concatenation of three transformations: 
+
+
+A modelview transform to orient the projection in the scene. 
+A projective transform (perspective or orthogonal). 
+A scale and bias to map the near clipping plane to texture coordinates. 
+The modelview and projection parts of the texture transform can be computed in the same way, with the same tools that are used for the modelview and projection transform. For example, you can use gluLookat() to orient the projection, and glFrustum() or gluPerspective() to define a perspective transformation. 
+
+The modelview transform is used in the same way as it is in the OpenGL viewing pipeline, to move the viewer to the origin and the projection centered along the negative  axis. In this case, viewer can be thought of a light source, and the near clipping plane of the projection as the location of the texture image, which can be thought of as printed on a transparent film. Alternatively, you can conceptualize a viewer at the view location, looking through the texture on the near plane, at the surfaces to be textured. 
+
+The projection operation converts eye space into Normalized Device Coordinate (NDC) space. In this space, the , , and  coordinates range from  to . When used in the texture matrix, the coordinates are , , and  instead. The projected texture can be visualized as laying on the surface of the near plane of the oriented projection defined by the modelview and projection parts to the transform. 
+
+The final part of the transform scales and biases the texture map, which is defined in texture coordinates ranging from  to , so that the entire texture image (or the desired portion of the image) covers the near plane defined by the projection. Since the near plane is now defined in NDC coordinates, Mapping the NDC near plane to match the texture image would require scaling by , then biasing by , in both  and . The texture image would be centered and cover the entire back plane. The texture could also be rotated if the orientation of the projected image needed to be changed. 
+
+The projections are ordered in the same as the graphics pipeline, the modelview transform happens first, then the projection, then the scale and bias to position the near plane onto the texture image: 
+
+
+glMatrixModeGL_ TEXTURE(GL_ TEXTURE) 
+glLoadIdentity( ) (clear current texture matrix) 
+glTranslatef.5f, .5f, 0.f(.5f, .5f, 0.f) 
+glScalef.5f, .5f, 1.f(.5f, .5f, 1.f) (texture covers entire NDC near plane) 
+Set the perspective transform (e.g., glFrustum()). 
+Set the modelview transform (e.g., gluLookAt()). 
+What about the texture coordinates for the primitives that the texture will be projected on? Since the projection and modelview parts of the matrix have been defined in terms of eye space (where the entire scene is assembled), the straightforward method is to create a 1-to-1 mapping between eye space and texture space. This can be done by enabling texture generation to eye linear and setting the eye planes to a one-to-one mapping: 
+
+
+GLfloat Splane[] = {1.f, 0.f, 0.f, 0.f}; 
+GLfloat Tplane[] = {0.f, 1.f, 0.f, 0.f}; 
+GLfloat Rplane[] = {0.f, 0.f, 1.f, 0.f}; 
+GLfloat Qplane[] = {0.f, 0.f, 0.f, 1.f}; 
+You could also use object space mapping, but then you'd have to take the current modelview transform into account. 
+
+So when you've done all this, what happens? As each primitive is rendered, texture coordinates matching the , , and  values that have been transformed by the modelview matrix are generated, then transformed by the texture transformation matrix. The matrix applies a modelview and projection transform; this orients and projects the primitive's texture coordinate values into NDC space (-1 to 1 in each dimension). These values are scaled and biased into texture coordinates. Then normal filtering and texture environment operations are performed using the texture image. 
+
+If transformation and texturing is being applied to all the rendered polygons, how do you limit the projected texture to a single area? There are a number of ways to do this. One is to simply only render the polygons you intend to project the texture on when you have projecting texture active and the projection in the texture transformation matrix. But this method is crude. Another way is to use the stencil buffer in a multipass algorithm to control what parts of the scene are updated by a projected texture. The scene can be rendered without the projected texture, the stencil buffer can be set to mask off an area, and the scene re-rendered with the projected texture, using the stencil buffer to mask off all but the desired area. This can allow you to create an arbitrary outline for the projected image, or to project a texture onto a surface that has a surface texture. 
+
+There is a very simple method that works when you want to project a non-repeating texture onto an untextured surface. Set the GL_ MODULATE texture environment, set the texture repeat mode to GL_ CLAMP, and set the texture border color to white. When the texture is projected, the surfaces outside the texture itself will default to the texture border color, and be modulated with white. This will leave the areas textured with the border color unchanged, since each color component will be scaled by one. 
+
+Filtering considerations are the same as for normal texturing; the size of the projected textures relative to screen pixels determines minification or magnification. If the projected image will be relatively small, mipmapping may be required to get good quality results. Using good filtering is especially important if the projected texture moves from frame to frame. 
+
+Please note that like the viewing projections, the texture projection is not really optical. Unless special steps are taken, the texture will affect all surfaces within the projection, both in front and in back of the projection. Since there is no implicit view volume clipping (like there is with the OpenGL viewing pipeline), the application needs to be carefully modeled to avoid undesired texture projections, or user defined clipping planes can be used to control where the projected texture appears. 
+
+http://www.bluevoid.com/opengl/sig00/advanced00/notes/node81.html

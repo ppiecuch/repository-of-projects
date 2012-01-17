@@ -1,0 +1,44 @@
+#include "stdafx.h"
+
+#include <stdarg.h>
+
+#define STR_MAX 1024
+void FormatOutput(TCHAR * formatstring, ...)
+{
+int nSize = 0;
+TCHAR *buff=new TCHAR[STR_MAX];
+//
+va_list args;
+va_start(args, formatstring);
+nSize = _vsntprintf_s( buff, STR_MAX*sizeof(TCHAR), STR_MAX-1, formatstring, args);
+_tprintf(L"nSize: %d, buff: %s\n", nSize, buff);
+va_end(args);
+//
+delete [] buff;
+}
+int _tmain(int argc, _TCHAR* argv[])
+{
+int x=1,y=2;
+FormatOutput(L"%d+%d=%d",x,y,x+y);
+return 0;
+}
+
+一个简单的调用，导致_vsntprintf_s出现内存越界，百思不得其解，在unicode时就是调用int _vsnwprintf_s( wchar_t *buffer, size_t sizeOfBuffer, size_t count, const wchar_t *format, va_list argptr )，这是在msdn上对_vsnwprintf_s函数的声明，第二个参数是sizeOfBuffer；
+
+但你进行代码跟踪，跟进vswprint.c时，发现
+int __cdecl _vsnwprintf_s (
+        wchar_t *string,
+        size_t sizeInWords,
+        size_t count,
+        const wchar_t *format,
+        va_list ap
+        )
+{
+    return _vsnwprintf_s_l(string, sizeInWords, count, format, NULL, ap);
+}
+
+
+第二个参数变成了"sizeInWords";
+
+事情明了了，第二个参数应该是多少个TCHAR，不是buffer的size。所以最上面的代码调用_vsntprintf_s时第二个参数用STR_MAX就可以了。
+http://hi.baidu.com/hensenxi/blog/item/695f2641a9ed9f1a9313c6f0.html

@@ -1,0 +1,13 @@
+MSDN的资料： 
+
+为加速生成过程，Visual   C++   提供了如下定义（这些定义通过排除一些不太常用的   API，减小了   Win32   头文件的大小）： 
+
+VC_EXTRALEAN 
+
+WIN32_LEAN_AND_MEAN 
+
+VC_EXTRALEAN   定义   WIN32_LEAN_AND_MEAN   和若干   NOservice   定义，如   NOCOMM   和   NOSOUND。（有关   NOservice   定义列表，请参见头文件   Windows.h   和   MFC   头文件   afxv_w32.h。） 
+
+用   Visual   C++   应用程序向导创建的应用程序自动使用   VC_EXTRALEAN。可以在旧式   MFC   应用程序中手动定义   VC_EXTRALEAN   以加速生成过程。 
+
+非   MFC   应用程序可以定义   WIN32_LEAN_AND_MEAN   和适用的   NOservice   定义以减少生成时间。

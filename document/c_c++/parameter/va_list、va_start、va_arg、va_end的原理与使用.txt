@@ -1,0 +1,180 @@
+概述
+由于在C语言中没有函数重载,解决不定数目函数参数问题变得比较麻烦;即使采用C++,如果参数个数不能确定,也很难采用函数重载.对这种情况,有些人采用指针参数来解决问题.下面就c语言中处理不定参数数目的问题进行讨论. 
+定义
+大家先看几宏.
+在VC++6.0的include有一个stdarg.h头文件,有如下几个宏定义:
+#define _INTSIZEOF(n)   ((sizeof(n)+sizeof(int)-1)&~(sizeof(int) - 1) ) 
+#define va_start(ap,v) ( ap = (va_list)&v + _INTSIZEOF(v) )           //第一个可选参数地址
+#define va_arg(ap,t) ( *(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)) ) //下一个参数地址
+#define va_end(ap)    ( ap = (va_list)0 )                            // 将指针置为无效
+如果对以上几个宏定义不理解,可以略过,接这看后面的内容. 
+参数在堆栈中分布,位置
+在进程中,堆栈地址是从高到低分配的.当执行一个函数的时候,将参数列表入栈,压入堆栈的高地址部分,然后入栈函数的返回地址,接着入栈函数的执行代码,这个入栈过程,堆栈地址不断递减,一些黑客就是在堆栈中修改函数返回地址,执行自己的代码来达到执行自己插入的代码段的目的.
+总之,函数在堆栈中的分布情况是:地址从高到低,依次是:函数参数列表,函数返回地址,函数执行代码段.
+堆栈中,各个函数的分布情况是倒序的.即最后一个参数在列表中地址最高部分,第一个参数在列表地址的最低部分.参数在堆栈中的分布情况如下:
+最后一个参数
+倒数第二个参数
+...
+第一个参数
+函数返回地址
+函数代码段 
+示例代码
+void arg_test(int i, ...);
+int main(int argc,char *argv[]) 
+{
+ int int_size = _INTSIZEOF(int);
+ printf("int_size=%d\n", int_size);
+ arg_test(0, 4);
+ 
+ arg_cnt(4,1,2,3,4);
+ return 0;
+}
+void arg_test(int i, ...)
+{
+ int j=0; 
+ va_list arg_ptr; 
+ 
+ va_start(arg_ptr, i); 
+ printf("&i = %p\n", &i);//打印参数i在堆栈中的地址
+ printf("arg_ptr = %p\n", arg_ptr);
+ //打印va_start之后arg_ptr地址,
+ //应该比参数i的地址高sizeof(int)个字节
+ //这时arg_ptr指向下一个参数的地址
+ 
+ j=*((int *)arg_ptr);
+ printf("%d %d\n", i, j); 
+ j=va_arg(arg_ptr, int); 
+ printf("arg_ptr = %p\n", arg_ptr);
+ //打印va_arg后arg_ptr的地址
+ //应该比调用va_arg前高sizeof(int)个字节
+ //这时arg_ptr指向下一个参数的地址
+ va_end(arg_ptr); 
+ printf("%d %d\n", i, j); 
+}
+
+
+代码说明:
+int int_size = _INTSIZEOF(int);得到int类型所占字节数
+ va_start(arg_ptr, i); 得到第一个可变参数地址, 
+根据定义(va_list)&v得到起始参数的地址, 再加上_INTSIZEOF(v) ,就是其实参数下一个参数的地址,即第一个可变参数地址.
+j=va_arg(arg_ptr, int); 得到第一个参参数的值,并且arg_ptr指针上移一个_INTSIZEOF(int),即指向下一个可变参数的地址.
+va_end(arg_ptr);置空arg_ptr,即arg_ptr=0;
+总结:读取可变参数的过程其实就是堆栈中,使用指针,遍历堆栈段中的参数列表,从低地址到高地址一个一个地把参数内容读出来的过程.
+
+在编程中应该注意的问题和解决办法
+虽然可以通过在堆栈中遍历参数列表来读出所有的可变参数,但是由于不知道可变参数有多少个,什么时候应该结束遍历,如果在堆栈中遍历太多,那么很可能读取一些无效的数据.
+解决办法:a.可以在第一个起始参数中指定参数个数,那么就可以在循环还中读取所有的可变参数;b.定义一个结束标记,在调用函数的时候,在最后一个参数中传递这个标记,这样在遍历可变参数的时候,可以根据这个标记结束可变参数的遍历;
+下面是一段示例代码:
+//第一个参数定义可选参数个数,用于循环取初参数内容
+void arg_cnt(int cnt, ...);
+int main(int argc,char *argv[]) 
+{
+ int int_size = _INTSIZEOF(int);
+ printf("int_size=%d\n", int_size);
+ arg_cnt(4,1,2,3,4);
+ return 0;
+}
+void arg_cnt(int cnt, ...)
+{
+ int value=0; 
+ int i=0;
+ int arg_cnt=cnt; 
+ va_list arg_ptr; 
+ va_start(arg_ptr, cnt); 
+ for(i = 0; i < cnt; i++)
+ {
+  value = va_arg(arg_ptr,int);
+  printf("value%d=%d\n", i+1, value);
+ }
+}
+
+虽然可以根据上面两个办法解决读取参数个数的问题,但是如果参数类型都是不定的,该怎么办,如果不知道参数的类型,即使读到了参数也没有办法进行处理.解决办法:可以自定义一些可能出现的参数类型,这样在可变参数列表中,可以可变参数列表中的那类型,然后根据类型,读取可变参数值,并进行准确地转换.传递参数的时候可以这样传递:参数数目,可变参数类型1,可变参数值1,可变参数类型2,可变参数值2,....
+这里给出一个完整的例子:
+#include <stdio.h>
+#include <stdarg.h>
+const int INT_TYPE  = 100000;
+const int STR_TYPE  = 100001;
+const int CHAR_TYPE  = 100002;
+const int LONG_TYPE  = 100003;
+const int FLOAT_TYPE = 100004;
+const int DOUBLE_TYPE = 100005;
+//第一个参数定义可选参数个数,用于循环取初参数内容
+//可变参数采用arg_type,arg_value...的形式传递,以处理不同的可变参数类型
+void arg_type(int cnt, ...);
+//第一个参数定义可选参数个数,用于循环取初参数内容
+void arg_cnt(int cnt, ...);
+//测试va_start,va_arg的使用方法,函数参数在堆栈中的地址分布情况
+void arg_test(int i, ...);
+int main(int argc,char *argv[]) 
+{
+ int int_size = _INTSIZEOF(int);
+ printf("int_size=%d\n", int_size);
+ arg_test(0, 4);
+ 
+ arg_cnt(4,1,2,3,4);
+ arg_type(2, INT_TYPE, 222, STR_TYPE, "ok,hello world!");
+ return 0;
+} 
+void arg_test(int i, ...)
+{
+ int j=0; 
+ va_list arg_ptr; 
+ 
+ va_start(arg_ptr, i); 
+ printf("&i = %p\n", &i);//打印参数i在堆栈中的地址
+ printf("arg_ptr = %p\n", arg_ptr);
+ //打印va_start之后arg_ptr地址,
+ //应该比参数i的地址高sizeof(int)个字节
+ //这时arg_ptr指向下一个参数的地址
+ 
+ j=*((int *)arg_ptr);
+ printf("%d %d\n", i, j); 
+ j=va_arg(arg_ptr, int); 
+ printf("arg_ptr = %p\n", arg_ptr);
+ //打印va_arg后arg_ptr的地址
+ //应该比调用va_arg前高sizeof(int)个字节
+ //这时arg_ptr指向下一个参数的地址
+ va_end(arg_ptr); 
+ printf("%d %d\n", i, j); 
+}
+void arg_cnt(int cnt, ...)
+{
+ int value=0; 
+ int i=0;
+ int arg_cnt=cnt; 
+ va_list arg_ptr; 
+ va_start(arg_ptr, cnt); 
+ for(i = 0; i < cnt; i++)
+ {
+  value = va_arg(arg_ptr,int);
+  printf("value%d=%d\n", i+1, value);
+ }
+}
+void arg_type(int cnt, ...)
+{
+ int arg_type = 0;
+ int int_value=0; 
+ int i=0;
+ int arg_cnt=cnt; 
+ char *str_value = NULL;
+ va_list arg_ptr; 
+ va_start(arg_ptr, cnt); 
+ for(i = 0; i < cnt; i++)
+ {
+  arg_type = va_arg(arg_ptr,int);
+  switch(arg_type)
+  {
+  case INT_TYPE:
+   int_value = va_arg(arg_ptr,int);
+   printf("value%d=%d\n", i+1, int_value);
+   break;
+  case STR_TYPE:
+   str_value = va_arg(arg_ptr,char*);
+   printf("value%d=%d\n", i+1, str_value);
+   break;
+  default:
+   break;
+  }
+ }
+}
+http://www.j2megame.org/index.php/content/view/2649/165.html

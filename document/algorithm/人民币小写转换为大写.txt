@@ -1,0 +1,123 @@
+package com.zzb.test0;  
+  
+import junit.framework.Assert;  
+  
+import org.junit.Test;  
+  
+/** 
+ * ≤‚ ‘»À√Ò±“–°–¥◊™¥Û–¥ 
+ * @author zhengzhb 
+ */  
+public class UpperMoney {  
+    public String upper(String money) throws Exception{  
+        if(!money.matches("^[1-9]+[0-9]*$|^[1-9]+[0-9]*.[0-9]+$" )){  
+            throw new Exception("«Æ ˝∏Ò Ω¥ÌŒÛ£°");  
+        }  
+        String[] part= money.split("\\.");  
+        StringBuffer integer = new StringBuffer();  
+        for(int i=0;i<part[0].length();i++){  
+            char perchar = part[0].charAt(i);  
+            integer.append(this.upperNumber(perchar));  
+            integer.append(this.upperNumber(part[0].length()-i-1));  
+        }  
+          
+        StringBuffer decimal = new StringBuffer();  
+        if(part.length>1 && !"00".equals(part[1])){  
+            int length = part[1].length()>=2?2:part[1].length();  
+            for(int i=0;i<length;i++){  
+                char perchar = part[1].charAt(i);  
+                decimal.append(this.upperNumber(perchar));  
+                if(i==0)decimal.append('Ω«');  
+                if(i==1)decimal.append('∑÷');  
+            }  
+        }  
+        String result = integer.toString()+decimal.toString();  
+        return this.dispose(result);  
+    }  
+  
+    private char upperNumber(char number){  
+        switch(number){  
+            case '0': return '¡„';  
+            case '1': return '“º';  
+            case '2': return '∑°';  
+            case '3': return '»˛';  
+            case '4': return 'À¡';  
+            case '5': return 'ŒÈ';  
+            case '6': return '¬Ω';  
+            case '7': return '∆‚';  
+            case '8': return '∞∆';  
+            case '9': return 'æ¡';  
+        }  
+        return 0;  
+    }  
+      
+    private char upperNumber(int index){  
+  
+        switch(index){  
+            case 0: return '‘≤';  
+            case 1: return ' ∞';  
+            case 2: return '∞€';  
+            case 3: return '«™';  
+            case 4: return 'ÕÚ';  
+            case 5: return ' ∞';  
+            case 6: return '∞€';  
+            case 7: return '«™';  
+            case 8: return '“⁄';  
+            case 9: return ' ∞';  
+            case 10: return '∞€';  
+            case 11: return '«™';  
+        }  
+        return 0;  
+    }  
+  
+    private String dispose(String result){  
+        result = result.replaceAll("¡„«™¡„∞€¡„ ∞|¡„«™¡„∞€|¡„∞€¡„ ∞|¡„«™|¡„∞€|¡„ ∞", "¡„")  
+            .replaceAll("¡„+", "¡„").replace("¡„“⁄", "“⁄");  
+        result = result.matches("^.*“⁄¡„ÕÚ[^¡„]«™.*$" )?result.replace("¡„ÕÚ", "¡„")  
+            :result.replace("¡„ÕÚ", "ÕÚ");  
+        result = result.replace("“⁄ÕÚ", "“⁄").replace("¡„‘≤", "‘≤").replace("¡„∑÷", "")  
+            .replaceAll("‘≤¡„Ω«¡„∑÷|‘≤¡„Ω«$|‘≤$" , "‘≤’˚");  
+        return result;  
+    }  
+  
+    @Test  
+    public void test(){  
+        try {  
+            Assert.assertEquals(upper("1"), "“º‘≤’˚");  
+            Assert.assertEquals(upper("10"), "“º ∞‘≤’˚");  
+            Assert.assertEquals(upper("20.7"), "∑° ∞‘≤∆‚Ω«");  
+            Assert.assertEquals(upper("10.70"), "“º ∞‘≤∆‚Ω«");  
+            Assert.assertEquals(upper("18.5"), "“º ∞∞∆‘≤ŒÈΩ«");  
+            Assert.assertEquals(upper("200.5"), "∑°∞€‘≤ŒÈΩ«");  
+            Assert.assertEquals(upper("2000"), "∑°«™‘≤’˚");  
+            Assert.assertEquals(upper("50000"), "ŒÈÕÚ‘≤’˚");  
+            Assert.assertEquals(upper("500000"), "ŒÈ ∞ÕÚ‘≤’˚");  
+            Assert.assertEquals(upper("5000000"), "ŒÈ∞€ÕÚ‘≤’˚");  
+            Assert.assertEquals(upper("50000000"), "ŒÈ«™ÕÚ‘≤’˚");  
+            Assert.assertEquals(upper("500000000"), "ŒÈ“⁄‘≤’˚");  
+            Assert.assertEquals(upper("5000000000"), "ŒÈ ∞“⁄‘≤’˚");  
+  
+            Assert.assertEquals(upper("5000000001"), "ŒÈ ∞“⁄¡„“º‘≤’˚");  
+            Assert.assertEquals(upper("5000000021"), "ŒÈ ∞“⁄¡„∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("5000000421"), "ŒÈ ∞“⁄¡„À¡∞€∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("5000005421"), "ŒÈ ∞“⁄¡„ŒÈ«™À¡∞€∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("5000035421"), "ŒÈ ∞“⁄¡„»˛ÕÚŒÈ«™À¡∞€∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("5000635421"), "ŒÈ ∞“⁄¡„¬Ω ∞»˛ÕÚŒÈ«™À¡∞€∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("5004635421"), "ŒÈ ∞“⁄¡„À¡∞€¬Ω ∞»˛ÕÚŒÈ«™À¡∞€∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("5024635421"), "ŒÈ ∞“⁄∑°«™À¡∞€¬Ω ∞»˛ÕÚŒÈ«™À¡∞€∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("5224635421"), "ŒÈ ∞∑°“⁄∑°«™À¡∞€¬Ω ∞»˛ÕÚŒÈ«™À¡∞€∑° ∞“º‘≤’˚");  
+  
+            Assert.assertEquals(upper("15224635421"), "“º∞€ŒÈ ∞∑°“⁄∑°«™À¡∞€¬Ω ∞»˛ÕÚŒÈ«™À¡∞€∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("215224635421"), "∑°«™“º∞€ŒÈ ∞∑°“⁄∑°«™À¡∞€¬Ω ∞»˛ÕÚŒÈ«™À¡∞€∑° ∞“º‘≤’˚");  
+  
+            Assert.assertEquals(upper("500021"), "ŒÈ ∞ÕÚ¡„∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("5000821"), "ŒÈ∞€ÕÚ¡„∞∆∞€∑° ∞“º‘≤’˚");  
+            Assert.assertEquals(upper("5050006501"), "ŒÈ ∞“⁄ŒÈ«™ÕÚ¬Ω«™ŒÈ∞€¡„“º‘≤’˚");  
+            Assert.assertEquals(upper("550300001"), "ŒÈ“⁄ŒÈ«™¡„»˛ ∞ÕÚ¡„“º‘≤’˚");  
+              
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }  
+    }  
+}  
+http://blog.csdn.net/zhengzhb/article/details/7173222

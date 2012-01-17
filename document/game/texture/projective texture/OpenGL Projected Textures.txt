@@ -1,0 +1,56 @@
+Here is some OpenGL GLUT-based source code demonstrating projected textures used to cast a spotlight or a "35mm slide" onto arbitrary surfaces. An extra example shows how to use OpenGL's 3rd texture coordinate in cojunction with OpenGL's texture matrix to introduce "sifting" texture effects even in static textured geometry.
+
+projtex.c
+texture.c
+texture.h
+
+Here are some snapshots from the example:
+
+This first snapshot shows a procedurally generated spotlight texture projected within a cube. The yellow lines show how the projection is done. Back face culling eliminates the exterior of the cube so that you can see "into" it. OpenGL's texture coordinate clamping is used to avoid replicating the spotlight. Check out:
+
+
+
+In the snapshot below, the famous "mandrill" image is projected as if it were a 35mm slide onto the surface of the cube:
+
+
+
+In the snapshot below, the same mandrill image is projected onto a dodecahedron (12 sided platonic solid):
+
+
+
+In the snapshot below, the yellow projection lines are removed (in the images above, they were added simply to help you see the nature of the projection):
+
+
+
+In the snapshot below, the spotlight texture is projected into the entire of a cube. Note that you can project the texture onto arbitrary geometry. Also, the spotlight texture in this case could be used to add in a Phong-style per-pixel shading effect simulating a specular highlight (far cheaper than actual per-pixel lighting calculations):
+
+
+
+The program below used the 3rd texture coordinate to add a (seemingly non-linear) sifting effect to an otherwise completely static textured surface. The texture matrix is used to "sift" the 3rd texture coordinate into various vertices within the textured image's mesh to add a sifting effect much like that seen in Quake's murky waters. Here is the source code (requires GLUT, OpenGL, and Sam Leffler's libtiff):
+
+tiffsift.c
+
+Here are some snapshots from the example. Be aware that no texture coordinates were updated by the application during each re-render. The only thing updated between each frame is adding a "sifting" effect to the texture matrix. The rendered geometry is actually completely static (captured in a display lists actually!).
+
+
+
+People are good at detecting details in faces, and so facial distortions are particularly noticable:
+
+
+
+(These distortions look much better when animated by the program instead of shown as static snapshots.)
+
+See the tiffsift.c source code for more details of how the texture matrix is loaded to generate the distortions to the otherwise static geometry and texture coordinates used in the program.
+
+The nice thing about using texture matrix to perform distortions is that when OpenGL's transformation stages are off-loaded to specialized hardware, the CPU does not need to alter the texture coordinates and thereby dirty its cache with updating values. When rendering large scenes with lots of objects, minimizing the amount of graphic data that must be massaged directly by the main CPU can be a big win.
+
+While tiffsift.c does not demonstrate this, an even more interesting distortion effect could be achieved by using the texture matrix to combine in the 4th coordinate of the texture matrix since this can accomplish dynamic scaling of static texture coordinates. You might be able to accomplish something like the rippling effect in a pond this way.
+
+Another use for texture coordinates beyond 2D is volume rendering. With 3D texture mapping, you can accomplish interactive volume rendering. In addition to its scientific applications, 3D texture mapping can be used to render materials with 3D texture such as craved wood grains or marbled objects. 3D textures are also good for rendering smoke and cloud effects. See the book Texturing and Modeling: A Procedural Approach for more details.
+
+I hope this gives you some interesting ideas about the full generality of OpenGL's texture coordinate system. For more information, see the SIGGRAPH '92 paper "Fast Shadows and Lighting Effects Using Texture Mapping" by Segal, Korobkin, van Widenfelt, Foran, and Haeberli. Also, check out the glTexCord3f, glTexCord4f, glMatrixMode, and glTexGen* manual pages.
+
+Also, here is a pointer to a note by Allen Akin and Mark Segal about projective texturing.
+
+- Mark (mjk@nvidia.com)
+http://www.opengl.org/resources/code/samples/mjktips/projtex/index.html

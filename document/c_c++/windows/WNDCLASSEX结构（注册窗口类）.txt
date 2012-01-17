@@ -1,0 +1,105 @@
+结构体原型： 
+
+　　typedef struct WNDCLASSEX { 
+
+　　UINT cbSize; 
+
+　　UINT style; 
+
+　　WNDPROC lpfnWndProc; 
+
+　　int cbClsExtra; 
+
+　　int cbWndExtra; 
+
+　　HINSTANCE hInstance; 
+
+　　HICON hIcon; 
+
+　　HCURSOR hCursor; 
+
+　　HBRUSH hbrBackground; 
+
+　　LPCTSTR lpszMenuName; 
+
+　　LPCTSTR lpszClassName; 
+
+　　HICON hIconSm; 
+
+　　} WNDCLASSEX, *PWNDCLASSEX;
+
+参数
+
+cbSize：
+　　WNDCLASSEX 的大小。我们可以用sizeof（WNDCLASSEX）来获得准确的值。 
+
+style：
+　　从这个窗口类派生的窗口具有的风格。您可以用“or”操作符来把几个风格或到一起。 
+
+lpfnWndProc：
+　　窗口处理函数的指针。 
+
+cbClsExtra：
+　　指定紧跟在窗口类结构后的附加字节数。 
+
+cbWndExtra：
+　　指定紧跟在窗口事例后的附加字节数。如果一个应用程序在资源中用CLASS伪指令注册一个对话框类时，则必须把这个成员设成DLGWINDOWEXTRA。 
+
+hInstance：
+　　本模块的事例句柄。 
+
+hIcon：
+　　图标的句柄。 
+
+hCursor：
+　　光标的句柄。 
+
+hbrBackground：
+　　背景画刷的句柄。 
+
+lpszMenuName：
+　　指向菜单的指针。 
+
+lpszClassName：
+　　指向类名称的指针。 
+
+hIconSm：
+　　和窗口类关联的小图标。如果该值为NULL。则把hIcon中的图标转换成大小合适的小图标
+
+注册实例： 
+
+　　ATOM MyRegisterClass( HINSTANCE hInstance ) 
+
+　　{ 
+
+　　WNDCLASSEX wcex; 
+
+　　wcex.cbSize = sizeof( WNDCLASSEX ); 
+
+　　wcex.style = CS_HREDRAW | CS_VREDRAW; 
+
+　　wcex.lpfnWndProc = (WNDPROC) WndProc; 
+
+　　wcex.cbClsExtra = 0; 
+
+　　wcex.cbWndExtra = 0; 
+
+　　wcex.hInstance = hInstance; 
+
+　　wcex.hIcon = LoadIcon( NULL, IDI_APPLICATION ); 
+
+　　wcex.hCursor = LoadCursor( NULL, IDC_ARROW ); 
+
+　　wcex.hbrBackground = (HBRUSH) GetStockObject( WHITE_BRUSH ); 
+
+　　wcex.lpszMenuName = NULL; 
+
+　　wcex.lpszClassName = "My Class"; 
+
+　　wcex.hIconSm = LoadIcon( NULL, IDI_WINLOGO ); 
+
+　　return RegisterClassEx( &wcex ); 
+
+　　}
+
+http://hi.baidu.com/fzd84/blog/item/ef9bbc6bf441e2cb81cb4a8e.html

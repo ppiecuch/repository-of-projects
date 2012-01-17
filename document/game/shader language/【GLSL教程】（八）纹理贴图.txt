@@ -1,0 +1,264 @@
+简单的纹理贴图（Simple Texture）
+为了在GLSL中应用纹理，我们需要访问每个顶点的纹理坐标。GLSL中提供了一些属性变量，每个纹理单元一个：
+view plaincopy to clipboardprint?attribute vec4 gl_MultiTexCoord0;  
+attribute vec4 gl_MultiTexCoord1;  
+attribute vec4 gl_MultiTexCoord2;  
+attribute vec4 gl_MultiTexCoord3;  
+attribute vec4 gl_MultiTexCoord4;  
+attribute vec4 gl_MultiTexCoord5;  
+attribute vec4 gl_MultiTexCoord6;  
+attribute vec4 gl_MultiTexCoord7;  
+attribute vec4 gl_MultiTexCoord0;
+attribute vec4 gl_MultiTexCoord1;
+attribute vec4 gl_MultiTexCoord2;
+attribute vec4 gl_MultiTexCoord3;
+attribute vec4 gl_MultiTexCoord4;
+attribute vec4 gl_MultiTexCoord5;
+attribute vec4 gl_MultiTexCoord6;
+attribute vec4 gl_MultiTexCoord7;GLSL还为访问每个纹理的纹理矩阵提供了一个一致变量数组：
+view plaincopy to clipboardprint?uniform mat4 gl_TextureMatrix[gl_MaxTextureCoords];  
+uniform mat4 gl_TextureMatrix[gl_MaxTextureCoords];顶点shader可以通过上面所示的内容访问OpenGL程序中指定的纹理坐标。然后必须为每个顶点计算纹理坐标，并保存在预先定义的易变变量gl_TexCoord[i]中，i表示纹理单元号。
+下面这条语句直接复制OpenGL程序中指定的纹理坐标，作为纹理单元0的顶点纹理坐标。
+view plaincopy to clipboardprint?gl_TexCoord[0]  = gl_MultiTexCoord0;  
+gl_TexCoord[0]  = gl_MultiTexCoord0;下面是个简单的例子，在顶点shader中设置纹理单元0的纹理坐标。
+view plaincopy to clipboardprint?void main()  
+{  
+    gl_TexCoord[0] = gl_MultiTexCoord0;  
+    gl_Position = ftransform();  
+}  
+void main()
+{
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+    gl_Position = ftransform();
+}如果你想使用纹理矩阵，可以这样操作：
+view plaincopy to clipboardprint?void main()  
+{  
+    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;  
+    gl_Position = ftransform();  
+}  
+void main()
+{
+    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+    gl_Position = ftransform();
+}前面说过，gl_TexCoord是一个易变变量，所以在片断shder中可以访问经过插值的纹理坐标。
+为了访问纹理的数值，在片断shader中有必要声明一个特殊的变量，对一个2D纹理可以可以这样写：
+view plaincopy to clipboardprint?uniform sampler2D tex;  
+uniform sampler2D tex;如果是1D或者3D的纹理，可以改成sampler1D和sampler3D。
+这个用户定义的变量tex包含我们将会使用的纹理单元，通过texture2D函数我们可以得到一个纹素（texel），这是一个纹理图片中的像素。函数参数分别为simpler2D以及纹理坐标：
+view plaincopy to clipboardprint?vec4 texture2D(sampler2D, vec2);  
+vec4 texture2D(sampler2D, vec2);函数的返回值已经考虑了所有在OpenGL程序中定义的纹理设置，比如过滤、mipmap、clamp等。
+我们的片断shader可以写成如下形式：
+view plaincopy to clipboardprint?uniform sampler2D tex;  
+  
+void main()  
+{  
+    vec4 color = texture2D(tex,gl_TexCoord[0].st);  
+    gl_FragColor = color;  
+}  
+uniform sampler2D tex;
+
+void main()
+{
+    vec4 color = texture2D(tex,gl_TexCoord[0].st);
+    gl_FragColor = color;
+}注意访问gl_TexCoord时选择子st的使用。在本教程前面关于数据类型和变量的讨论中说过，访问纹理坐标时可以使用如下选择子：s、t、p、q。（r因为和rgb选择子冲突而没有使用）
+
+
+
+本节内容Shader Designer的工程下载地址：
+http://www.lighthouse3d.com/wp-content/uploads/2011/03/textureSimple.zip
+
+组合纹理与片断
+
+OpenGL允许我们通过多种方式将纹理颜色和片断颜色联合到一起。下表显示了RGBA模式时可用的联合方式：
+
+GL_REPLACE C = Ct A = At 
+GL_MODULATE C = Ct*Cf  A = At*Af 
+GL_DECAL C = Cf * (1 – At) + Ct * At A = Af 
+表中Ct和At表示纹理的颜色和alpha值，Cf和Af表示片断（fragment）的颜色和alpha值，C和A表示最终的颜色和alpha值。
+上一节的例子就相当于使用了GL_REPLACE模式。下面我们我们准备在一个立方体上实现与GL_MODULATE等同的效果。两个shader只计算使用一个白色方向光的散射以及环境光成分，关于材质的完整定义请参照光照有关的章节。
+因为使用了光照，所以顶点shader中必须处理法线信息。必须将法线变换到视图空间然后归一化，光线方向向量也必须归一化（光线方向向量已经由OpenGL变换到了视图空间）。现在新的顶点shader如下：
+
+
+view plaincopy to clipboardprint?varying vec3 lightDir,normal;  
+  
+void main()  
+{  
+    normal = normalize(gl_NormalMatrix * gl_Normal);  
+  
+    lightDir = normalize(vec3(gl_LightSource[0].position));  
+    gl_TexCoord[0] = gl_MultiTexCoord0;  
+  
+    gl_Position = ftransform();  
+}  
+varying vec3 lightDir,normal;
+
+void main()
+{
+    normal = normalize(gl_NormalMatrix * gl_Normal);
+
+    lightDir = normalize(vec3(gl_LightSource[0].position));
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+
+    gl_Position = ftransform();
+}在片断shader中，光照得到的片断的颜色和alpha值在cf和af中分别计算。shader中剩余代码按照GL_MODULATE的公式计算：
+view plaincopy to clipboardprint?varying vec3 lightDir,normal;  
+uniform sampler2D tex;  
+  
+void main()  
+{  
+    vec3 ct,cf;  
+    vec4 texel;  
+    float intensity,at,af;  
+  
+    intensity = max(dot(lightDir,normalize(normal)),0.0);  
+    cf = intensity * (gl_FrontMaterial.diffuse).rgb +  
+                  gl_FrontMaterial.ambient.rgb;  
+    af = gl_FrontMaterial.diffuse.a;  
+  
+    texel = texture2D(tex,gl_TexCoord[0].st);  
+    ct = texel.rgb;  
+    at = texel.a;  
+  
+    gl_FragColor = vec4(ct * cf, at * af);  
+}  
+varying vec3 lightDir,normal;
+uniform sampler2D tex;
+
+void main()
+{
+    vec3 ct,cf;
+    vec4 texel;
+    float intensity,at,af;
+
+    intensity = max(dot(lightDir,normalize(normal)),0.0);
+    cf = intensity * (gl_FrontMaterial.diffuse).rgb +
+                  gl_FrontMaterial.ambient.rgb;
+    af = gl_FrontMaterial.diffuse.a;
+
+    texel = texture2D(tex,gl_TexCoord[0].st);
+    ct = texel.rgb;
+    at = texel.a;
+
+    gl_FragColor = vec4(ct * cf, at * af);
+} 
+
+
+Shader Designer的工程下载地址：
+http://www.lighthouse3d.com/wp-content/uploads/2011/03/textureComb.zip
+
+多重纹理
+在GLSL中实现多重纹理十分容易，我们只需要访问所有纹理即可。因为我们打算给每个纹理使用相同的纹理坐标，所以顶点shader不需要改动。片断shader中只需要进行些许改动，加上多个纹理的颜色值。
+view plaincopy to clipboardprint?varying vec3 lightDir,normal;  
+uniform sampler2D tex;  
+  
+void main()  
+{  
+    vec3 ct,cf;  
+    vec4 texel;  
+    float intensity,at,af;  
+  
+    intensity = max(dot(lightDir,normalize(normal)),0.0);  
+    cf = intensity * (gl_FrontMaterial.diffuse).rgb +  
+                  gl_FrontMaterial.ambient.rgb;  
+    af = gl_FrontMaterial.diffuse.a;  
+  
+    texel = texture2D(tex,gl_TexCoord[0].st) +  
+          texture2D(l3d,gl_TexCoord[0].st);  
+    ct = texel.rgb;  
+    at = texel.a;  
+  
+    gl_FragColor = vec4(ct * cf, at * af);  
+}  
+varying vec3 lightDir,normal;
+uniform sampler2D tex;
+
+void main()
+{
+    vec3 ct,cf;
+    vec4 texel;
+    float intensity,at,af;
+
+    intensity = max(dot(lightDir,normalize(normal)),0.0);
+    cf = intensity * (gl_FrontMaterial.diffuse).rgb +
+                  gl_FrontMaterial.ambient.rgb;
+    af = gl_FrontMaterial.diffuse.a;
+
+    texel = texture2D(tex,gl_TexCoord[0].st) +
+          texture2D(l3d,gl_TexCoord[0].st);
+    ct = texel.rgb;
+    at = texel.a;
+
+    gl_FragColor = vec4(ct * cf, at * af);
+}效果如下：
+
+
+
+下面添加点不同的效果：在黑暗中发光。我们希望第二个纹理能在黑暗中发光，在没有光照时达到最亮，在有光照时变暗。
+
+
+
+我们通过两步计算最终的颜色：首先将第一个纹理与片断颜色进行modulate计算，然后根据光照强度（indensity）加上第二个纹理单元。
+如果indensity是0，第二个纹理单元取最大值，如果indensity为1，只取第二个纹理单元颜色的10%，当indensity在0和1之间时按这两个大小进行插值。可以使用smoothstep函数实现这个要求：
+view plaincopy to clipboardprint?genType smoothStep(genType edge0, genType edge1, genType x);  
+genType smoothStep(genType edge0, genType edge1, genType x);如果x <= edge0结果是0，如果x >= edge1结果为1，如果edge0 < x < edge1结果在0和1之间进行Hermite插值。在本例中我们按如下方式调用：
+coef = smoothStep(1.0, 0.2, intensity);
+下面的片断shader实现了需要的效果：
+view plaincopy to clipboardprint?varying vec3 lightDir,normal;  
+uniform sampler2D tex,l3d;  
+  
+void main()  
+{  
+    vec3 ct,cf,c;  
+    vec4 texel;  
+    float intensity,at,af,a;  
+  
+    intensity = max(dot(lightDir,normalize(normal)),0.0);  
+  
+    cf = intensity * (gl_FrontMaterial.diffuse).rgb +  
+                      gl_FrontMaterial.ambient.rgb;  
+    af = gl_FrontMaterial.diffuse.a;  
+  
+    texel = texture2D(tex,gl_TexCoord[0].st);  
+  
+    ct = texel.rgb;  
+    at = texel.a;  
+  
+    c = cf * ct;  
+    a = af * at;  
+  
+    float coef = smoothstep(1.0,0.2,intensity);  
+    c += coef *  vec3(texture2D(l3d,gl_TexCoord[0].st));  
+  
+    gl_FragColor = vec4(c, a);  
+}  
+varying vec3 lightDir,normal;
+uniform sampler2D tex,l3d;
+
+void main()
+{
+    vec3 ct,cf,c;
+    vec4 texel;
+    float intensity,at,af,a;
+
+    intensity = max(dot(lightDir,normalize(normal)),0.0);
+
+    cf = intensity * (gl_FrontMaterial.diffuse).rgb +
+                      gl_FrontMaterial.ambient.rgb;
+    af = gl_FrontMaterial.diffuse.a;
+
+    texel = texture2D(tex,gl_TexCoord[0].st);
+
+    ct = texel.rgb;
+    at = texel.a;
+
+    c = cf * ct;
+    a = af * at;
+
+    float coef = smoothstep(1.0,0.2,intensity);
+    c += coef *  vec3(texture2D(l3d,gl_TexCoord[0].st));
+
+    gl_FragColor = vec4(c, a);
+}Shader Designer的工程下载地址：
+http://www.lighthouse3d.com/wp-content/uploads/2011/03/textureGlow.zip
+http://blog.csdn.net/racehorse/article/details/6664717
