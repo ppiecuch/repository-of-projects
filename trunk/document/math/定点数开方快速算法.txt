@@ -1,0 +1,21 @@
+public static int Math_DistPointPoint(int dx, int dy) {
+		if (dx < 0) {
+			dx = -dx;
+		}
+		if (dy < 0) {
+			dy = -dy;
+		}
+
+		int min, max;
+		if (dx < dy) {
+			min = dx;
+			max = dy;
+		} else {
+			min = dy;
+			max = dx;
+		}
+		return ((max << 8) - (max << 3) - (max << 1) + (min << 6) + (min << 5)
+				+ (min << 2) + (min << 1)) >> 8;
+	}
+	
+来自李瑞同事，取自GL的2D游戏

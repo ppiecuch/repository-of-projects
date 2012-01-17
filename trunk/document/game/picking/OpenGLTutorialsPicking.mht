@@ -1,0 +1,3792 @@
+From: <ÓÉ Microsoft Internet Explorer 5 ±£´æ>
+Subject: OpenGL:Tutorials:Picking - GPWiki
+Date: Thu, 5 Jan 2012 09:15:42 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CCCB8A.99487610"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.6157
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0000_01CCCB8A.99487610
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" =
+"http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML lang=3Den-gb dir=3Dltr><HEAD><TITLE>OpenGL:Tutorials:Picking - =
+GPWiki</TITLE>
+<META charset=3Dutf-8>
+<META content=3D"MSHTML 6.00.2900.6169" name=3DGENERATOR><LINK=20
+href=3D"http://content.gpwiki.org/favicon.ico" rel=3D"shortcut =
+icon"><LINK=20
+title=3D"GPWiki (en-gb)" href=3D"/opensearch_desc.php"=20
+type=3Dapplication/opensearchdescription+xml rel=3Dsearch><LINK=20
+href=3D"http://content.gpwiki.org/api.php?action=3Drsd" =
+type=3Dapplication/rsd+xml=20
+rel=3DEditURI><LINK =
+href=3D"http://www.gnu.org/licenses/old-licenses/fdl-1.2.txt"=20
+rel=3Dcopyright><LINK title=3D"GPWiki Atom feed"=20
+href=3D"/index.php?title=3DSpecial:RecentChanges&amp;feed=3Datom"=20
+type=3Dapplication/atom+xml rel=3Dalternate><LINK=20
+href=3D"http://content.gpwiki.org/load.php?debug=3Dfalse&amp;lang=3Den-gb=
+&amp;modules=3Dmediawiki.legacy.commonPrint%2Cshared%7Cskins.vector&amp;o=
+nly=3Dstyles&amp;skin=3Dvector&amp;*"=20
+rel=3Dstylesheet>
+<META content=3D"" name=3DResourceLoaderDynamicStyles><!--[if lt IE 7]>
+<STYLE type=3Dtext/css>BODY {
+	BEHAVIOR: url("/skins/vector/csshover.min.htc")
+}
+</STYLE>
+<![endif]--></HEAD>
+<BODY=20
+class=3D"mediawiki ltr ns-0 ns-subject page-OpenGL_Tutorials_Picking =
+skin-vector"><!-- Place this render call where appropriate -->
+<SCRIPT type=3Dtext/javascript>
+  window.___gcfg =3D {lang: 'en-GB'};
+
+  (function() {
+    var po =3D document.createElement('script'); po.type =3D =
+'text/javascript'; po.async =3D true;
+    po.src =3D 'https://apis.google.com/js/plusone.js';
+    var s =3D document.getElementsByTagName('script')[0]; =
+s.parentNode.insertBefore(po, s);
+  })();
+</SCRIPT>
+
+<DIV class=3Dnoprint id=3Dmw-page-base></DIV>
+<DIV class=3Dnoprint id=3Dmw-head-base></DIV><!-- content -->
+<DIV id=3Dcontent><A id=3Dtop></A>
+<DIV id=3Dmw-js-message style=3D"DISPLAY: none"></DIV><!-- firstHeading =
+-->
+<H1 class=3DfirstHeading id=3DfirstHeading>OpenGL:Tutorials:Picking =
+<G:PLUSONE=20
+size=3D"medium"></G:PLUSONE></H1><!-- /firstHeading --><!-- bodyContent =
+-->
+<DIV id=3DbodyContent><!-- tagline -->
+<DIV id=3DsiteSub>From GPWiki</DIV><!-- /tagline --><!-- subtitle -->
+<DIV id=3DcontentSub></DIV><!-- /subtitle --><!-- jumpto -->
+<DIV id=3Djump-to-nav>Jump to: <A=20
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#mw-h=
+ead">navigation</A>,=20
+<A=20
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#p-se=
+arch">search</A>=20
+</DIV><!-- /jumpto --><!-- bodytext -->
+<TABLE class=3Dtoc id=3Dtoc>
+  <TBODY>
+  <TR>
+    <TD>
+      <DIV id=3Dtoctitle>
+      <H2>Contents</H2></DIV>
+      <UL>
+        <LI class=3D"toclevel-1 tocsection-1"><A=20
+        =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#Pick=
+ing_with_OpenGL"><SPAN=20
+        class=3Dtocnumber>1</SPAN> <SPAN class=3Dtoctext>Picking with=20
+        OpenGL</SPAN></A>=20
+        <UL>
+          <LI class=3D"toclevel-2 tocsection-2"><A=20
+          =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#Pick=
+ing.3F"><SPAN=20
+          class=3Dtocnumber>1.1</SPAN> <SPAN =
+class=3Dtoctext>Picking?</SPAN></A>=20
+          <LI class=3D"toclevel-2 tocsection-3"><A=20
+          =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#How_=
+does_it_work.3F"><SPAN=20
+          class=3Dtocnumber>1.2</SPAN> <SPAN class=3Dtoctext>How does it =
+
+          work?</SPAN></A>=20
+          <LI class=3D"toclevel-2 tocsection-4"><A=20
+          =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#I_ge=
+t_it.2C_now_explain_to_me_how_to_code.21"><SPAN=20
+          class=3Dtocnumber>1.3</SPAN> <SPAN class=3Dtoctext>I get it, =
+now explain=20
+          to me how to code!</SPAN></A>=20
+          <UL>
+            <LI class=3D"toclevel-3 tocsection-5"><A=20
+            =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#The_=
+procedure"><SPAN=20
+            class=3Dtocnumber>1.3.1</SPAN> <SPAN class=3Dtoctext>The=20
+            procedure</SPAN></A>=20
+            <LI class=3D"toclevel-3 tocsection-6"><A=20
+            =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#The_=
+selection_buffer"><SPAN=20
+            class=3Dtocnumber>1.3.2</SPAN> <SPAN class=3Dtoctext>The =
+selection=20
+            buffer</SPAN></A> </LI></UL>
+          <LI class=3D"toclevel-2 tocsection-7"><A=20
+          =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#Code=
+.2C_finally.21"><SPAN=20
+          class=3Dtocnumber>1.4</SPAN> <SPAN class=3Dtoctext>Code,=20
+          finally!</SPAN></A>=20
+          <LI class=3D"toclevel-2 tocsection-8"><A=20
+          =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#Code=
+.2C_without_SDL"><SPAN=20
+          class=3Dtocnumber>1.5</SPAN> <SPAN class=3Dtoctext>Code, =
+without=20
+          SDL</SPAN></A> </LI></UL></LI></UL></TD></TR></TBODY></TABLE>
+<H1><SPAN class=3Dmw-headline id=3DPicking_with_OpenGL>Picking with=20
+OpenGL</SPAN></H1>
+<P>So you've chosen to interact with the world, right? If so, then you =
+are in=20
+the right place&nbsp;;) When I was young (about 14 I think), and =
+learning=20
+OpenGL, I felt the necessity to select an object in the screen when the =
+mouse=20
+was clicked on some point. To accomplish this, I tried to create an =
+algorithm=20
+that, given the coordinates of the cursor, calculates the spatial =
+coordinates in=20
+the world i was drawing to select an object. I never solved this =
+problem, so for=20
+some years I never used the mouse to select objects. </P>
+<P>Then I discovered picking, and life became easy. </P>
+<H2><SPAN class=3Dmw-headline id=3DPicking.3F>Picking?</SPAN></H2>
+<P>Yes, picking is the action that you do when you want to select =
+something on=20
+the screen: you just move the pointer over the object, and click to =
+select. This=20
+is done by picking. </P>
+<P>Every time you need to interact with the world, everytime you have =
+that mouse=20
+cursor to drag&amp;drop, select and move something, you need to pick an =
+object.=20
+So I think this is relevant in game programming. </P>
+<H2><SPAN class=3Dmw-headline id=3DHow_does_it_work.3F>How does it =
+work?</SPAN></H2>
+<P>Picking in OpenGL is actually a bit weird, since - as you probably =
+know -=20
+OpenGL is raw (yeah, I love raw things); this gives us lots of power, =
+but also=20
+it takes some time to understand well the concept and to get it working =
+as we=20
+need. </P>
+<P>As you may know - or if you don't know I'm explaining this right now =
+- OpenGL=20
+has 3 rendering modes: </P>
+<DL>
+  <DT>Render mode (GL_RENDER)&nbsp;
+  <DD>This is the default mode, and is used to draw something on the=20
+  framebuffer.=20
+  <DT>Select mode (GL_SELECT)&nbsp;
+  <DD>This is used to select, we'll see this later.=20
+  <DT>Feedback mode (GL_FEEDBACK)&nbsp;
+  <DD>This is used as feedback: instead of drawing something, this =
+produces lots=20
+  of info about the scene we are drawing. </DD></DL>
+<P>To change the render mode you can use the glRenderMode function, =
+which=20
+prototype is <CODE></P><PRE>GLint glRenderMode (GLenum mode)
+</PRE>
+<P></CODE>Actually we need only the render and select modes to =
+accomplish=20
+picking. The trick of picking is in this function: glRenderMode returns =
+a value,=20
+which doesn't depend on the new <B>mode</B> that you are passing, but =
+depends on=20
+the previous render mode. Here's the trick: imagine that when you are in =
+
+GL_SELECT mode, everytime you draw something that is visible, a counter =
+is=20
+incremented. Then, when you call glRenderMode(GL_RENDER) to actually =
+draw=20
+something on the framebuffer, the counter is returned to you. This =
+counter is=20
+the number of objects drawn when in GL_SELECT mode. If you restrict the =
+drawing=20
+area to half screen, the counter is incremented only for the object in =
+the=20
+visible area. I think you got the trick&nbsp;:) If you restrict the area =
+to a=20
+single pixel, which is where the mouse is, glRenderMode will return a =
+counter=20
+that is the number of objects under the mouse. In this way you can =
+determine=20
+which objects are under the mouse. </P>
+<P>"Umm no" - you may think - "I can't determine which objects are drawn =
+under=20
+the mouse only by knowing how many they are". This is true, infact to =
+get the=20
+selected object we need something else: the selection buffer. </P>
+<P>The selection buffer is a simple buffer managed by OpenGL, which is =
+filled=20
+with some data about the object we drawn in the region of the screen. =
+Using this=20
+buffer we can get a list of the objects under the cursor. </P>
+<P>Of course this is only an explanation about how this works, but there =
+is=20
+other. I hope this explanation is clear, because it took some time and =
+some code=20
+before i can figure it out, since tutorials and manuals explain to use =
+it, but=20
+not how it works (or it wasn't enough for me&nbsp;;). </P>
+<H2><SPAN class=3Dmw-headline =
+id=3DI_get_it.2C_now_explain_to_me_how_to_code.21>I=20
+get it, now explain to me how to code!</SPAN></H2>
+<P>To use picking in your program you have to understand a couple of =
+things:=20
+</P>
+<DL>
+  <DT>How can OpenGL understand what is actually an object? (If you draw =
+a cube=20
+  and a triangle under the cursor, how can OpenGL count the number of =
+objects=20
+  drawn?)=20
+  <DD>OpenGL can't know if two triangles are part of the same object or =
+not. So,=20
+  OpenGL can't figure it out: you have to tell it. Before drawing an =
+object (an=20
+  entity that can be selected), you have to say to OpenGL that what you =
+are=20
+  about to draw is a new object by assigning a name to it. You do this =
+with a=20
+  naming function: glLoadName. This function pushes a name (which is a =
+GLuint)=20
+  at the top of the name stack.=20
+  <DT>So, what is a name stack?=20
+  <DD>A name stack is a structure used in selection mode, which stores =
+unique=20
+  identifiers for each of the drawn objects. The stack is initialized by =
+the=20
+  glInitNames function. So, when you switch to the GL_SELECT mode, you =
+first=20
+  have to initialize the name stack before telling OpenGL the name of =
+the object=20
+  you are about to draw.=20
+  <DT>The name stack can only be filled when in selection mode.=20
+  <DD>This means that glLoadName, glInitNames and related functions, do =
+not work=20
+  in modes that aren't GL_SELECT. </DD></DL>
+<H3><SPAN class=3Dmw-headline id=3DThe_procedure>The =
+procedure</SPAN></H3>
+<P>Now that you have a background about how picking works, let's see how =
+to code=20
+it: </P>
+<OL>
+  <LI>Define a drawing function which draws N objects. Before drawing =
+each=20
+  object you define it's name by calling glLoadName(Ith)=20
+  <LI>Define a event handling function which can handle the mouse click. =
+
+  <UL>
+    <LI>When a click event is computed, you have to call a function =
+which=20
+    handles the selection </LI></UL>
+  <LI>Define a selection function, which does the following=20
+  <OL>
+    <LI>Initialize a selection buffer, which will contain data about =
+selected=20
+    objects=20
+    <LI>Save somewhere the info about the current viewport=20
+    <LI>Switch to GL_SELECT mode=20
+    <LI>Initialize the name stack=20
+    <LI>Restrict the drawing area around the mouse position=20
+    <LI>Draw the objects with their names=20
+    <LI>Get the number of hits=20
+    <LI>Handle the hits, and get the picked object </LI></OL>
+  <LI>Launch your application and wait for some clicks&nbsp;;) =
+</LI></OL>
+<H3><SPAN class=3Dmw-headline id=3DThe_selection_buffer>The selection=20
+buffer</SPAN></H3>
+<P>I know you want to code, but there is more to know before manage =
+picking: the=20
+selection buffer. This buffer is a simple GLuint buffer which is used by =
+OpenGL=20
+to store info about the hits </P>
+<UL>
+  <LI>You define a buffer=20
+  <LI>In selection mode, everytime the name stack changes, or when =
+glRenderMode=20
+  is called a hit is generated=20
+  <LI>A hit record is copied into the buffer </LI></UL>
+<P>The record contains 4 info about the hit: </P>
+<UL>
+  <LI>Number of the hits selected=20
+  <LI>Min depth value (Z)=20
+  <LI>Max depth value (Z)=20
+  <LI>Object name (glLoadName) </LI></UL>
+<P>So, to get info about the ith entry of the buffer, you've to: =
+<CODE></P><PRE>GLuint buffer[16];
+GLubyte *p;
+</PRE><PRE>p =3D (GLuint*)(&amp;buffer[i]);
+*p;        /* is Number of hits selected */
+*(p + 1);  /* is Min Z */
+*(p + 2);  /* is Max Z */
+*(p + 3);  /* is object name */
+</CODE>=20
+</PRE>
+<P>A last note, before the ending code </P>
+<UL>
+  <LI>If you use the glLoadName function, the number of selected hits =
+will be=20
+  always one=20
+  <LI>You can push more names on the stack by using glPushName and =
+glPopName=20
+  </LI></UL>
+<H2><SPAN class=3Dmw-headline id=3DCode.2C_finally.21>Code, =
+finally!</SPAN></H2>
+<P>Here an example code made in C, SDL and OpenGL. =
+<CODE></P><PRE>#include "SDL.h"
+#include "SDL_opengl.h"
+#include &lt;gl/glut.h&gt;
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#define SW 400
+#define SH 400
+
+int selected =3D 0;
+
+void gl_draw();
+void gl_init(int w, int h);
+void gl_select(int x, int y);
+void gl_selall(GLint hits, GLuint *buff);
+void sdl_events();
+void sdl_mousedw(int x, int y, int but);
+void draw_block(float x, float y, float z);
+void list_hits(GLint hits, GLuint *names);
+
+void gl_draw()
+{
+=09
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glTranslatef(0.0, 0.0, -5.0);
+
+	glColor3f(1.0, 0.0, 0.0);
+	glLoadName(7); /* Overwrite the first name in the buffer */
+	draw_block(-0.3, 0, -2);
+=09
+	glColor3f(0.0, 1.0, 0.0);
+	glLoadName(14); /* Overwrite the first name in the buffer */
+	draw_block(0, 0, -4);
+=09
+	glColor3f(0.0, 0.0, 1.0);
+	glLoadName(21); /* Overwrite the first name in the buffer */
+	draw_block(0.3, 0, -6);
+}
+
+void gl_init(int w, int h)
+{
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glViewport(0, 0, w, h);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	gluPerspective(60.0, 1.0, 0.0001, 1000.0);
+
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void sdl_events()
+{
+	SDL_Event event;
+
+	while (SDL_PollEvent(&amp;event))
+	{
+		switch (event.type)
+		{
+			case SDL_QUIT: exit(0);
+			case SDL_MOUSEBUTTONDOWN:
+			{
+				sdl_mousedw(event.button.x, event.button.y, event.button.button);
+			}; break;
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym)
+				{
+					case SDLK_ESCAPE: exit(0);
+				}
+		}
+	}
+}
+
+void sdl_mousedw(int x, int y, int but)
+{
+	printf("Mouse button&nbsp;%d pressed at&nbsp;%d&nbsp;%d\n", but, x, y);
+	if (but =3D=3D SDL_BUTTON_LEFT)
+		gl_select(x,SH-y); //Important: gl (0,0) ist bottom left but window =
+coords (0,0) are top left so we have to change this!
+}
+
+void gl_select(int x, int y)
+{
+	GLuint buff[64] =3D {0};
+	GLint hits, view[4];
+	int id;
+
+	/*
+		This choose the buffer where store the values for the selection data
+	*/
+	glSelectBuffer(64, buff);
+
+	/*
+		This retrieves info about the viewport
+	*/
+	glGetIntegerv(GL_VIEWPORT, view);
+=09
+	/*
+		Switching in selecton mode
+	*/
+	glRenderMode(GL_SELECT);
+
+	/*
+		Clearing the names' stack
+		This stack contains all the info about the objects
+	*/
+	glInitNames();
+
+	/*
+		Now fill the stack with one element (or glLoadName will generate an =
+error)
+	*/
+	glPushName(0);
+
+	/*
+		Now modify the viewing volume, restricting selection area around the =
+cursor
+	*/
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+		glLoadIdentity();
+
+		/*
+			restrict the draw to an area around the cursor
+		*/
+		gluPickMatrix(x, y, 1.0, 1.0, view);
+		gluPerspective(60, (float)view[2]/(float)view[3], 0.0001, 1000.0);
+
+		/*
+			Draw the objects onto the screen
+		*/
+		glMatrixMode(GL_MODELVIEW);
+	=09
+		/*
+			draw only the names in the stack, and fill the array
+		*/
+		gl_draw();
+
+		/*
+			Do you remeber? We do pushMatrix in PROJECTION mode
+		*/
+		glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	/*
+		get number of objects drawed in that area
+		and return to render mode
+	*/
+	hits =3D glRenderMode(GL_RENDER);
+
+	/*
+		Print a list of the objects
+	*/
+	list_hits(hits, buff);
+
+	/*
+		uncomment this to show the whole buffer
+	* /
+	gl_selall(hits, buff);
+	*/
+
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void gl_selall(GLint hits, GLuint *buff)
+{
+	GLuint *p;
+	int i;
+
+	gl_draw();
+
+	p =3D buff;
+	for (i =3D 0; i &lt; 6 * 4; i++)
+	{
+		printf("Slot&nbsp;%d: - Value:&nbsp;%d\n", i, p[i]);
+	}
+
+	printf("Buff size:&nbsp;%x\n", (GLbyte)buff[0]);
+}
+
+void draw_block(float x, float y, float z)
+{
+	glPushMatrix();
+		glTranslatef(x, y, z);
+		glutSolidCube(1.0);
+	glPopMatrix();
+}
+
+void list_hits(GLint hits, GLuint *names)
+{
+	int i;
+=09
+	/*
+		For each hit in the buffer are allocated 4 bytes:
+		1. Number of hits selected (always one,
+									beacuse when we draw each object
+									we use glLoadName, so we replace the
+									prevous name in the stack)
+		2. Min Z
+		3. Max Z
+		4. Name of the hit (glLoadName)
+	*/
+=09
+	printf("%d hits:\n", hits);
+=09
+	for (i =3D 0; i &lt; hits; i++)
+		printf(	"Number:&nbsp;%d\n"
+				"Min Z:&nbsp;%d\n"
+				"Max Z:&nbsp;%d\n"
+				"Name on stack:&nbsp;%d\n",
+				(GLubyte)names[i * 4],
+				(GLubyte)names[i * 4 + 1],
+				(GLubyte)names[i * 4 + 2],
+				(GLubyte)names[i * 4 + 3]
+				);
+=09
+	printf("\n");
+}
+
+int main(int argc, char **argv)
+{
+	if (SDL_Init(SDL_INIT_VIDEO) &lt; 0)
+	{
+		debug(SDL_GetError(), 0);
+		exit(1);
+	}
+
+	atexit(SDL_Quit);
+
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	if (!SDL_SetVideoMode(SW, SH, 0, SDL_OPENGL))
+	{
+		debug(SDL_GetError(), 0);
+		exit(1);
+	}
+=09
+	gl_init(SW, SH);
+
+	while (1)
+	{
+		sdl_events();
+		gl_draw();
+		SDL_GL_SwapBuffers();
+	}
+=09
+	return EXIT_SUCCESS;
+}
+</PRE>
+<P></CODE></P>
+<P><BR></P>
+<H2><SPAN class=3Dmw-headline id=3DCode.2C_without_SDL>Code, without =
+SDL</SPAN></H2>
+<P>Here the same code without SDL. Simplified as much as possible. =
+Worked with=20
+devcpp with glut package loaded. <CODE></P><PRE>#include =
+&lt;gl/glut.h&gt;
+</PRE><PRE>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+</PRE><PRE>#define SW 400
+#define SH 400
+</PRE><PRE>int selected =3D 0;
+</PRE><PRE>void gl_draw();
+void gl_init(int w, int h);
+void gl_select(int x, int y);
+void gl_selall(GLint hits, GLuint *buff);
+void mouseClick();
+void mousedw(int x, int y, int but);
+void draw_block(float x, float y, float z);
+void list_hits(GLint hits, GLuint *names);
+</PRE>
+<P><BR></P><PRE>void gl_draw()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+</PRE><PRE>	glTranslatef(0.0, 0.0, -5.0);
+</PRE><PRE>	glColor3f(1.0, 0.0, 0.0);
+	glLoadName(7); /* Overwrite the first name in the buffer */
+	draw_block(-0.3, 0, -2);
+</PRE><PRE>	glColor3f(0.0, 1.0, 0.0);
+	glLoadName(14); /* Overwrite the first name in the buffer */
+	draw_block(0, 0, -4);
+</PRE><PRE>	glColor3f(0.0, 0.0, 1.0);
+	glLoadName(21); /* Overwrite the first name in the buffer */
+	draw_block(0.3, 0, -6);
+</PRE><PRE>   glutSwapBuffers();
+}
+</PRE><PRE>void gl_init(int w, int h)
+{
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glViewport(0, 0, w, h);
+</PRE><PRE>	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+</PRE><PRE>	gluPerspective(60.0, 1.0, 0.0001, 1000.0);
+</PRE><PRE>	glMatrixMode(GL_MODELVIEW);
+}
+</PRE><PRE>void mouseClick(int button, int state, int x, int y)
+{
+   if 	((button =3D=3D GLUT_LEFT_BUTTON) &amp;&amp; (state =3D=3D =
+GLUT_DOWN))
+</PRE>
+<P>{ mousedw(x, y, button); } </P><PRE>}
+</PRE><PRE>void mousedw(int x, int y, int but)
+{
+	printf("Mouse button&nbsp;%d pressed at&nbsp;%d&nbsp;%d\n", but, x, y);
+	gl_select(x,SH-y); //Important: gl (0,0) ist bottom left but window =
+coords (0,0) are top left so we have to change this!
+}
+</PRE><PRE>void gl_select(int x, int y)
+{
+	GLuint buff[64] =3D {0};
+	GLint hits, view[4];
+	int id;
+</PRE><PRE>	/*
+		This choose the buffer where store the values for the selection data
+	*/
+	glSelectBuffer(64, buff);
+</PRE><PRE>	/*
+		This retrieve info about the viewport
+	*/
+	glGetIntegerv(GL_VIEWPORT, view);
+</PRE><PRE>	/*
+		Switching in selecton mode
+	*/
+	glRenderMode(GL_SELECT);
+</PRE><PRE>	/*
+		Clearing the name's stack
+		This stack contains all the info about the objects
+	*/
+	glInitNames();
+</PRE><PRE>	/*
+		Now fill the stack with one element (or glLoadName will generate an =
+error)
+	*/
+	glPushName(0);
+</PRE><PRE>	/*
+		Now modify the vieving volume, restricting selection area around the =
+cursor
+	*/
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+		glLoadIdentity();
+</PRE><PRE>		/*
+			restrict the draw to an area around the cursor
+		*/
+		gluPickMatrix(x, y, 1.0, 1.0, view);
+		gluPerspective(60, 1.0, 0.0001, 1000.0);
+</PRE><PRE>		/*
+			Draw the objects onto the screen
+		*/
+		glMatrixMode(GL_MODELVIEW);
+</PRE><PRE>		/*
+			draw only the names in the stack, and fill the array
+		*/
+		glutSwapBuffers();
+		gl_draw();
+</PRE><PRE>		/*
+			Do you remeber? We do pushMatrix in PROJECTION mode
+		*/
+		glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+</PRE><PRE>	/*
+		get number of objects drawed in that area
+		and return to render mode
+	*/
+	hits =3D glRenderMode(GL_RENDER);
+</PRE><PRE>	/*
+		Print a list of the objects
+	*/
+	list_hits(hits, buff);
+</PRE><PRE>	/*
+		uncomment this to show the whole buffer
+	* /
+	gl_selall(hits, buff);
+	*/
+</PRE><PRE>	glMatrixMode(GL_MODELVIEW);
+}
+</PRE><PRE>void gl_selall(GLint hits, GLuint *buff)
+{
+	GLuint *p;
+	int i;
+</PRE><PRE>	gl_draw();
+</PRE><PRE>	p =3D buff;
+	for (i =3D 0; i &lt; 6 * 4; i++)
+	{
+		printf("Slot&nbsp;%d: - Value:&nbsp;%d\n", i, p[i]);
+	}
+</PRE><PRE>	printf("Buff size:&nbsp;%x\n", (GLbyte)buff[0]);
+}
+</PRE><PRE>void draw_block(float x, float y, float z)
+{
+	glPushMatrix();
+		glTranslatef(x, y, z);
+		glutSolidCube(1.0);
+	glPopMatrix();
+}
+</PRE><PRE>void list_hits(GLint hits, GLuint *names)
+{
+	int i;
+</PRE><PRE>	/*
+		For each hit in the buffer are allocated 4 bytes:
+		1. Number of hits selected (always one,
+									beacuse when we draw each object
+									we use glLoadName, so we replace the
+									prevous name in the stack)
+		2. Min Z
+		3. Max Z
+		4. Name of the hit (glLoadName)
+	*/
+</PRE><PRE>	printf("%d hits:\n", hits);
+</PRE><PRE>	for (i =3D 0; i &lt; hits; i++)
+		printf(	"Number:&nbsp;%d\n"
+				"Min Z:&nbsp;%d\n"
+				"Max Z:&nbsp;%d\n"
+				"Name on stack:&nbsp;%d\n",
+				(GLubyte)names[i * 4],
+				(GLubyte)names[i * 4 + 1],
+				(GLubyte)names[i * 4 + 2],
+				(GLubyte)names[i * 4 + 3]
+				);
+</PRE><PRE>	printf("\n");
+}
+</PRE><PRE>int main(int argc, char **argv)
+{
+   glutInit(&amp;argc, argv);
+   glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE);
+   glutInitWindowSize(SW, SH);
+   glutInitWindowPosition(0, 0);
+   glutCreateWindow(argv[0]);
+   glutDisplayFunc(gl_draw);
+   glutMouseFunc(mouseClick);
+</PRE><PRE>   gl_init(SW, SH);
+</PRE><PRE>   glutMainLoop();
+</PRE><PRE>	return EXIT_SUCCESS;
+}
+</PRE>
+<P></CODE></P><!-- =0A=
+NewPP limit report=0A=
+Preprocessor node count: 50/1000000=0A=
+Post-expand include size: 175/2097152 bytes=0A=
+Template argument size: 28/2097152 bytes=0A=
+Expensive parser function count: 0/100=0A=
+--><!-- Saved in parser cache with key =
+gpw_mw_db-mw_:pcache:idhash:3133-0!*!0!!en-gb!*!edit=3D0 and timestamp =
+20120105011315 -->
+<DIV class=3Dprintfooter>Retrieved from "<A=20
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking">htt=
+p://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking</A>"</DIV><!-- =
+/bodytext --><!-- catlinks -->
+<DIV class=3Dcatlinks id=3Dcatlinks>
+<DIV id=3Dmw-normal-catlinks><A title=3DSpecial:Categories=20
+href=3D"http://content.gpwiki.org/index.php/Special:Categories">Categorie=
+s</A>:=20
+<SPAN dir=3Dltr><A title=3D"Category:C and OpenGL"=20
+href=3D"http://content.gpwiki.org/index.php/Category:C_and_OpenGL">C and =
+
+OpenGL</A></SPAN> | <SPAN dir=3Dltr><A title=3D"Category:All C articles" =
+
+href=3D"http://content.gpwiki.org/index.php/Category:All_C_articles">All =
+C=20
+articles</A></SPAN> | <SPAN dir=3Dltr><A title=3D"Category:All OpenGL =
+articles"=20
+href=3D"http://content.gpwiki.org/index.php/Category:All_OpenGL_articles"=
+>All=20
+OpenGL articles</A></SPAN></DIV></DIV><!-- /catlinks -->
+<DIV class=3DvisualClear></DIV></DIV><!-- /bodyContent --></DIV><!-- =
+/content --><!-- header -->
+<DIV class=3Dnoprint id=3Dmw-head><!-- 0 -->
+<DIV class=3D"" id=3Dp-personal>
+<H5>Personal tools</H5>
+<UL>
+  <LI id=3Dpt-login><A=20
+  title=3D"You are encouraged to log in; however, it is not mandatory =
+[o]"=20
+  accessKey=3Do=20
+  =
+href=3D"http://content.gpwiki.org/index.php?title=3DSpecial:UserLogin&amp=
+;returnto=3DOpenGL:Tutorials:Picking">Log=20
+  in / create account</A> </LI></UL></DIV><!-- /0 -->
+<DIV id=3Dleft-navigation><!-- 0 -->
+<DIV class=3DvectorTabs id=3Dp-namespaces>
+<H5>Namespaces</H5>
+<UL>
+  <LI class=3Dselected id=3Dca-nstab-main><SPAN><A title=3D"View the =
+content page [c]"=20
+  accessKey=3Dc=20
+  =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking">Pag=
+e</A></SPAN>=20
+  </LI>
+  <LI id=3Dca-talk><SPAN><A title=3D"Discussion about the content page =
+[t]"=20
+  accessKey=3Dt=20
+  =
+href=3D"http://content.gpwiki.org/index.php/Talk:OpenGL:Tutorials:Picking=
+">Discussion</A></SPAN>=20
+  </LI></UL></DIV><!-- /0 --><!-- 1 -->
+<DIV class=3D"vectorMenu emptyPortlet" id=3Dp-variants>
+<H5><SPAN>Variants</SPAN><A=20
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#"></=
+A></H5>
+<DIV class=3Dmenu>
+<UL></UL></DIV></DIV><!-- /1 --></DIV>
+<DIV id=3Dright-navigation><!-- 0 -->
+<DIV class=3DvectorTabs id=3Dp-views>
+<H5>Views</H5>
+<UL>
+  <LI class=3Dselected id=3Dca-view><SPAN><A=20
+  =
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking">Rea=
+d</A></SPAN>=20
+  </LI>
+  <LI id=3Dca-viewsource><SPAN><A=20
+  title=3D"This page is protected.&#10;You can view its source [e]" =
+accessKey=3De=20
+  =
+href=3D"http://content.gpwiki.org/index.php?title=3DOpenGL:Tutorials:Pick=
+ing&amp;action=3Dedit">View=20
+  source</A></SPAN> </LI>
+  <LI class=3D"collapsible " id=3Dca-history><SPAN><A=20
+  title=3D"Past revisions of this page [h]" accessKey=3Dh=20
+  =
+href=3D"http://content.gpwiki.org/index.php?title=3DOpenGL:Tutorials:Pick=
+ing&amp;action=3Dhistory">View=20
+  history</A></SPAN> </LI></UL></DIV><!-- /0 --><!-- 1 -->
+<DIV class=3D"vectorMenu emptyPortlet" id=3Dp-cactions>
+<H5><SPAN>Actions</SPAN><A=20
+href=3D"http://content.gpwiki.org/index.php/OpenGL:Tutorials:Picking#"></=
+A></H5>
+<DIV class=3Dmenu>
+<UL></UL></DIV></DIV><!-- /1 --><!-- 2 -->
+<DIV id=3Dp-search>
+<H5><LABEL for=3DsearchInput>Search</LABEL></H5>
+<FORM id=3Dcse-search-box action=3Dhttp://www.google.com/cse =
+target=3D_blank>
+<DIV><INPUT type=3Dhidden =
+value=3Dpartner-pub-8199339419526862:1119135372 name=3Dcx>=20
+<INPUT type=3Dhidden value=3DUTF-8 name=3Die> <INPUT name=3Dq> <INPUT =
+type=3Dsubmit value=3DSearch name=3Dsa> </DIV></FORM>
+<SCRIPT=20
+src=3D"http://www.google.com/coop/cse/brand?form=3Dcse-search-box&amp;lan=
+g=3Den"=20
+type=3Dtext/javascript></SCRIPT>
+</DIV><!-- /2 --></DIV></DIV><!-- /header --><!-- panel -->
+<DIV class=3Dnoprint id=3Dmw-panel><!-- logo -->
+<DIV id=3Dp-logo><A title=3D"Visit the main page"=20
+style=3D"BACKGROUND-IMAGE: url(/images/gpwikilogo.png)"=20
+href=3D"http://content.gpwiki.org/index.php/Main_Page"></A></DIV><!-- =
+/logo --><!-- navigation -->
+<DIV class=3Dportal id=3Dp-navigation>
+<H5>Navigation</H5>
+<DIV class=3Dbody>
+<UL>
+  <LI id=3Dn-Site-Homepage><A href=3D"http://www.gpwiki.org/">Site =
+Homepage</A>=20
+  <LI id=3Dn-Wiki-Main-Page><A href=3D"http://content.gpwiki.org/">Wiki =
+Main=20
+  Page</A>=20
+  <LI id=3Dn-Message-Board><A href=3D"http://forum.gpwiki.org/">Message =
+Board</A>=20
+  <LI id=3Dn-Featured-Image><A =
+href=3D"http://www.gpwiki.org/iotd">Featured=20
+  Image</A>=20
+  <LI id=3Dn-currentevents><A=20
+  title=3D"Find background information on current events"=20
+  =
+href=3D"http://content.gpwiki.org/index.php/GPWiki:Current_events">Curren=
+t=20
+  events</A>=20
+  <LI id=3Dn-recentchanges><A title=3D"The list of recent changes in the =
+wiki [r]"=20
+  accessKey=3Dr=20
+  =
+href=3D"http://content.gpwiki.org/index.php/Special:RecentChanges">Recent=
+=20
+  changes</A>=20
+  <LI id=3Dn-randompage><A title=3D"Load a random page [x]" =
+accessKey=3Dx=20
+  href=3D"http://content.gpwiki.org/index.php/Special:Random">Random =
+page</A>=20
+  <LI id=3Dn-help><A title=3D"The place to find out"=20
+  href=3D"http://content.gpwiki.org/index.php/Help:Contents">Help</A>=20
+</LI></UL></DIV></DIV><!-- /navigation --><!-- SEARCH --><!-- /SEARCH =
+--><!-- TOOLBOX -->
+<DIV class=3Dportal id=3Dp-tb>
+<H5>Toolbox</H5>
+<DIV class=3Dbody>
+<UL>
+  <LI id=3Dt-whatlinkshere><A title=3D"List of all wiki pages that link =
+here [j]"=20
+  accessKey=3Dj=20
+  =
+href=3D"http://content.gpwiki.org/index.php/Special:WhatLinksHere/OpenGL:=
+Tutorials:Picking">What=20
+  links here</A>=20
+  <LI id=3Dt-recentchangeslinked><A=20
+  title=3D"Recent changes in pages linked from this page [k]" =
+accessKey=3Dk=20
+  =
+href=3D"http://content.gpwiki.org/index.php/Special:RecentChangesLinked/O=
+penGL:Tutorials:Picking">Related=20
+  changes</A>=20
+  <LI id=3Dt-specialpages><A title=3D"List of all special pages [q]" =
+accessKey=3Dq=20
+  =
+href=3D"http://content.gpwiki.org/index.php/Special:SpecialPages">Special=
+=20
+  pages</A>=20
+  <LI id=3Dt-print><A title=3D"Printable version of this page [p]" =
+accessKey=3Dp=20
+  =
+href=3D"http://content.gpwiki.org/index.php?title=3DOpenGL:Tutorials:Pick=
+ing&amp;printable=3Dyes"=20
+  rel=3Dalternate>Printable version</A>=20
+  <LI id=3Dt-permalink><A title=3D"Permanent link to this revision of =
+the page"=20
+  =
+href=3D"http://content.gpwiki.org/index.php?title=3DOpenGL:Tutorials:Pick=
+ing&amp;oldid=3D22318">Permanent=20
+  link</A> </LI></UL></DIV>
+<CENTER><BR>
+<SCRIPT type=3Dtext/javascript><!--
+  google_ad_client =3D "ca-pub-8199339419526862";
+  /* GPWiki Menu Sidebar */
+  google_ad_slot =3D "4458594054";
+  google_ad_width =3D 120;
+  google_ad_height =3D 600;
+  //-->
+  </SCRIPT>
+
+<SCRIPT src=3D"http://pagead2.googlesyndication.com/pagead/show_ads.js"=20
+type=3Dtext/javascript>
+  </SCRIPT>
+</CENTER></DIV><!-- /TOOLBOX --><!-- LANGUAGES --><!-- /LANGUAGES =
+--></DIV><!-- /panel --><!-- footer -->
+<DIV id=3Dfooter>
+<UL id=3Dfooter-info>
+  <LI id=3Dfooter-info-lastmod>This page was last modified on 19 =
+December 2009, at=20
+  17:55.=20
+  <LI id=3Dfooter-info-viewcount>This page has been accessed 17,907 =
+times.=20
+  <LI id=3Dfooter-info-copyright>Content is available under <A =
+class=3D"external "=20
+  href=3D"http://www.gnu.org/licenses/old-licenses/fdl-1.2.txt">GNU Free =
+
+  Documentation License 1.2</A>. </LI></UL>
+<UL id=3Dfooter-places>
+  <LI id=3Dfooter-places-privacy><A title=3D"GPWiki:Privacy policy"=20
+  =
+href=3D"http://content.gpwiki.org/index.php/GPWiki:Privacy_policy">Privac=
+y=20
+  policy</A> </LI>
+  <LI id=3Dfooter-places-about><A title=3DGPWiki:About=20
+  href=3D"http://content.gpwiki.org/index.php/GPWiki:About">About =
+GPWiki</A> </LI>
+  <LI id=3Dfooter-places-disclaimer><A title=3D"GPWiki:General =
+disclaimer"=20
+  =
+href=3D"http://content.gpwiki.org/index.php/GPWiki:General_disclaimer">Di=
+sclaimers</A>=20
+  </LI></UL>
+<UL class=3Dnoprint id=3Dfooter-icons>
+  <LI id=3Dfooter-copyrightico><A=20
+  href=3D"http://www.gnu.org/licenses/old-licenses/fdl-1.2.txt"><IMG =
+height=3D31=20
+  alt=3D"GNU Free Documentation License 1.2"=20
+  src=3D"http://content.gpwiki.org/skins/common/images/gnu-fdl.png" =
+width=3D88></A>=20
+  </LI>
+  <LI id=3Dfooter-poweredbyico><A =
+href=3D"http://www.mediawiki.org/"><IMG height=3D31=20
+  alt=3D"Powered by MediaWiki"=20
+  =
+src=3D"http://content.gpwiki.org/skins/common/images/poweredby_mediawiki_=
+88x31.png"=20
+  width=3D88></A> </LI></UL>
+<DIV style=3D"CLEAR: both"></DIV></DIV><!-- /footer -->
+<SCRIPT=20
+src=3D"http://content.gpwiki.org/load.php?debug=3Dfalse&amp;lang=3Den-gb&=
+amp;modules=3Dstartup&amp;only=3Dscripts&amp;skin=3Dvector&amp;*"></SCRIP=
+T>
+
+<SCRIPT>if ( window.mediaWiki ) {=0A=
+	mediaWiki.config.set({"wgCanonicalNamespace": "", =
+"wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, =
+"wgPageName": "OpenGL:Tutorials:Picking", "wgTitle": =
+"OpenGL:Tutorials:Picking", "wgAction": "view", "wgArticleId": 3133, =
+"wgIsArticle": true, "wgUserName": null, "wgUserGroups": ["*"], =
+"wgCurRevisionId": 22318, "wgCategories": ["C and OpenGL", "All C =
+articles", "All OpenGL articles"], "wgBreakFrames": false, =
+"wgRestrictionEdit": [], "wgRestrictionMove": []});=0A=
+}=0A=
+</SCRIPT>
+
+<SCRIPT>if ( window.mediaWiki ) {=0A=
+	mediaWiki.loader.load(["mediawiki.util", "mediawiki.legacy.wikibits", =
+"mediawiki.legacy.ajax"]);=0A=
+	mediaWiki.loader.go();=0A=
+}=0A=
+</SCRIPT>
+
+<SCRIPT>if ( window.mediaWiki ) {=0A=
+	=
+mediaWiki.user.options.set({"ccmeonemails":0,"cols":80,"contextchars":50,=
+"contextlines":5,"date":"default","diffonly":0,"disablemail":0,"disablesu=
+ggest":0,"editfont":"default","editondblclick":0,"editsection":1,"editsec=
+tiononrightclick":0,"enotifminoredits":0,"enotifrevealaddr":0,"enotifuser=
+talkpages":1,"enotifwatchlistpages":0,"extendwatchlist":0,"externaldiff":=
+0,"externaleditor":0,"fancysig":0,"forceeditsummary":0,"gender":"unknown"=
+,"hideminor":0,"hidepatrolled":0,"highlightbroken":1,"imagesize":2,"justi=
+fy":0,"math":1,"minordefault":0,"newpageshidepatrolled":0,"nocache":0,"no=
+convertlink":0,"norollbackdiff":0,"numberheadings":0,"previewonfirst":0,"=
+previewontop":1,"quickbar":1,"rcdays":7,"rclimit":50,"rememberpassword":0=
+,"rows":25,"searchlimit":20,"showhiddencats":0,"showjumplinks":1,"shownum=
+berswatching":1,"showtoc":1,"showtoolbar":1,"skin":"vector","stubthreshol=
+d":0,"thumbsize":2,"underline":2,"uselivepreview":0,"usenewrc":0,"watchcr=
+eations":0,"watchdefault":0,"watchdeletion":0,=0A=
+	=
+"watchlistdays":3,"watchlisthideanons":0,"watchlisthidebots":0,"watchlist=
+hideliu":0,"watchlisthideminor":0,"watchlisthideown":0,"watchlisthidepatr=
+olled":0,"watchmoves":0,"wllimit":250,"variant":"en-gb","language":"en-gb=
+","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,=
+"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"=
+searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,=
+"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":fal=
+se,"searchNs510":false,"searchNs511":false});;mediaWiki.loader.state({"us=
+er.options":"ready"});=0A=
+}=0A=
+</SCRIPT>
+<!-- fixalpha -->
+<SCRIPT type=3Dtext/javascript> if ( window.isMSIE55 ) fixalpha(); =
+</SCRIPT>
+<!-- /fixalpha --><!-- Served in 0.251 secs. --></BODY></HTML>
+
+------=_NextPart_000_0000_01CCCB8A.99487610
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://content.gpwiki.org/skins/common/images/gnu-fdl.png
+
+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
+YII=
+
+------=_NextPart_000_0000_01CCCB8A.99487610
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://content.gpwiki.org/skins/common/images/poweredby_mediawiki_88x31.png
+
+iVBORw0KGgoAAAANSUhEUgAAAFgAAAAfCAYAAABjyArgAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJ
+bWFnZVJlYWR5ccllPAAADbdJREFUaN7tmgl0k2W6x+MVKVs3WgYEBBmvo8PoIOLgcrwouFxAHS/e
+o+NcvIjKMHYEdIpIuRTKNi0WZBkWWSwIdKH7TilNt7RNtzTNnjZL26RpkiZtmjRpSxH93+f9sBEo
+DJtzzngs5/xP3uX7nuf7ft+7PM9LeTz6p9frJ5FOk0wkDOmOZPqe5STGlqfT6R4idTocDly4cAHf
+fffdkO5AjCFjyZiSpjPAyV1dXVznxYsXh/QjiLF0Op0MchoD7Pzmm28wpB9fxNbN02q1+Pbbb2/b
+yIV+j7dsNhR4y/39vT9ruIwpY+sFzNaO25FBewC9PV2oF4RDVhTAtVl1+9GqS/jhuv6+27b/U9WP
+BrgqfyE08nBISpehQxaEbocWOpEfQbei12NDr/0r77WebtPPD7BGo7kjwNLSh2FWj4O6MAB2SQBM
+kvugLBuBZvV2GAh4h0UJW0s1tNXPokO7Hq4OzU3ZffbzDLz3dRE2pNd627o8vTe8z+HuuWZ751Xt
+3T19sLk8WJMs/GE22p14fmcW/niEj3ih7o4BM7YcYLbz9ff335T6+nrQZ/vaW1fWTIK1MRj2en/Y
+asbAVD0CjcIxcOt9YRA/SpB3wW2cCHiC0dnw6E37+d+YQpw/34/5e3Mg1Jjx/rESvH+iEPHlesQU
+N0JqbMdRgQJaswN7z6hQoWnDZymVCE2qwL5CGRrMHXh9fx6K1a3YebYeocllCEsQo9PZh5hyJd6n
+j/fOV3y8fiDvh3cx2am9GIlVWnx4ohzReXR9tweChjbsL5Ld9LMzMaYc4MbGRq5y/vz5K/TSe3s5
+RR8tJKh9SM6tw9SntiA2ToRNW9+AuyGIRm4SVOWvwaoYA0fNKDgFd6Ot9B60lfugo34EHJqx8LQF
+w9UeBGvTY0jMKcdD0/dBKGpCO42WnTHnMHNRJFZtSxzkf8bmZCw/WYJDJXJ8FCdAvswAl6cHi+l5
+orIlCE+twcu7c7E1uxbrUqq4+hsHz+JQsRxPRqZjU1YNQmJLkS1uwtPb07n2V/bl4k8nSjgbDgJX
+qW3j7hnwqbV04rkdmVh6vAibM0TYnS9FolCPtcmV4CsMg57xH4kxZWyvC/jffr0Cc9/5wluPPpKM
+kY+EcLBZvThuBozyAFhrxsMu5KGv/C58V8KDi+QsJNVQWT0SHS1B6LSPh0n+CVo1p7E1ei6UiiSv
+3eCnPsPsNz8f5P/3NPrau7q58vJTJShWmNBLvt88lA+x3oZnojKwJbOO+42tbMCOs2IsOVaIhEoN
+Po6tpA8jw+asWgJjxLxdmUiobsTaFCF2navHW0fOwtPbi/rmdvx+X57Xp9xow3sEl8F/dX8uVDSi
+5+3IwZ9PCG4J7hWAGxoauLCCgbtcfk+sxsIl+7my22VAQ92LuGCfBvQFord1JrTlz6MhZxjMBXfB
+mOMDc8JwmE4FwXCK1uL0keivHoae+mHo1PrDrhoLq9wXcPJQmR+IAkGF18+0FzbgRZopV/tfn1bl
+LUuabXgnpgBLCeAhvopr21co4YDsyKuHmkC0WT1YGV+GlXFl2JUvQY3ejN0FErh7ehGRUYNVCQKs
+TqyAzdmNwzQrPjhezNlblVDm9dNq78IiGtEfnCjC14IGru0F+jgxpapBz3cjMaaM7fUBz/orFiw5
+7K2fzqjEMwvehir/aejyx6CrPAAXy3xwvmQ4KqJ/gdrNEyHeFITaz/xQGzUVjcfHw1N4Dzx1PrDU
++MAo9oOsbi1449Yg84zca/f+eeF4YemeGz6wh0BZHa4bXmfudN5UO5sd7p6ea/phH4WVO5xuLKcl
+xU6/tw1YrVZzlV6aMpfLd1Yo5r99gCv3WHJRLXwcR48+A7vmSbibgtGj8sVF6T2wxI2FMiIApR8N
+R9oyf+SF+KJqpQ+qt/wCHTkj0Fd/FzpVw2GUzIGxpQqL3luAnKJar58BwFf7/1eRnUb87dzHmDK2
+1wU8ZtYazF+6iys7HWakJK+h6R4Mj5HAGR6ErXEi3FX+UEQHozZsFE6uDEDMxiDEhAUhNSQIdaFj
+0Jnqj+7aYWipCYBBMhnyqg14+Y/zkZ4vviHgeRQuRWRWX9F2sFiKuTszoTHbb/pF+YoWhKdXoa7J
+jA9pLb/udTIjbYo/9O+lDe64UH5pgNGIDjlVij209DBbCopgVtDGe/n9R2jZWZdaORiwSqXi4rYe
+mi6Xy5eWiPnvHvbWM3MKsDbsOZhES9FR+0t4JGPRnBuM4k8CUBwagINhgdjy2XB8uSkQGavHQbZh
+FEwJgbigHAa7dJHXDm9UOJLPiLx1DvC7ewb5H70iBlPWxsLc0cXVu90eLrK4+8MjqNaavNdJmi1o
+ae8cdL+qtR1GmwNJtLnNpY+lpY/CIAz0tzuckBvavbZlBivuXXPSa+uxiFS8tCv7ex9WTFsXh2KV
+AXFCNUro97ebk7y2LB1OnJM1I5b6BtoYU8bWC9jj8VwhDvDSA976seM1mPXqu+hufgUeQyC6laNw
+sdYH4g3+EHwciK9XT8AXH49E/F+CUBbig5qIcTAm+sMlGoF25XCKKKZBrxOB57sOWeckXrtTvwd8
+tf8nI1Mxh5KNQyVSrs6XGCncSsN/RKejhsIrQ5sLz32ehYc3JuDB8ARspoSEXWem8G/B3mw8sD4e
+j25KorArA29R5ME+ypIYPnfNqXIVB+zhDafJRyae2c5smqichZQaDexdLupLxKytqdz1ewvEXEwt
+UBtoExWgvMGIp7Zf6lt8kELJAhViSpT4hDbSgef3AlYqldcH/IdDXLnbZUN+5nLYlUHoawmEpZpi
+23KKFJSB6OH7Qho2EudC/JC5IhD5H/iiIGQ0xLvGwpQ1Am2VBFg9Cq1SSkLkv8KW6N9A27Df62fK
+nA3XBPy7v6XSlKyn2DWbqy87KqCYtxrz92SjjiKEt7/kY9mxUji73TRlrbg/LB58qQEfHi/HSztz
+0WTpgLzFiun/l4r/OnAGhYpmzInOgLrVhsBVJyhhaUSb3YG/n5WD96cjZLONoo0qhCZUoJBi7rcO
+n6WIIg8KGuX/c6QAB/gy5Ih1WLCHEp/GVry4KwsHzsnxREQm9wzh6ZV4bd+ZKwAztjyFQsFlHm63
++wpxmxwB5uqWQvDTZiMy6ncw1d5L2dpv0VU/Hl3SKejTjUNP4Wi0HhgOCYEuDx0N1V4/9JUEwl0X
+CFWaP1SC0ehr9YeusQq8ySuQklfs9TNlbjjmvbt7kP/pGxMJRjse35oMEY3YmZtSoaRp/DwlAnkS
+PaaEncJ/7s6hkXUG/02h1dSwOEpMivD4tiRUEoABO/E0bdmLFxHgBZQVHuRfWscv98VmC+uvbDTR
+spBFiYsQe85KsCGlGttzRXh2ewYaTe1IrW3kbNXqTJi89iQmfHoSCr2ds7EhXYhFlBUO2GRMGVue
+XC6/JuC7pn+Mhcu+8NaPxX+JmQvfRJuuAB7NDDQXTYBLMw1d6qnoE48GNKPQfO5BmHIno7dgBLor
+/eBsuBedlEYr8seiofQJiqW3gffvoUiiBGDA7qQ56/D0H6IH+WfT3tXdjZCTpXhqWwa9WO4lGFGp
+KJQ3U388tmXXIF2kQYZIS6NdTBtaEx7ZkoDsOp3Xzj4aoa/SvQzgfBp9JylNfmxr4hW+fhORiHyp
+Ht00Ep+OTON8V2tMyKlrwi/Xx+HlL7K56xKrLn2sKk0rntiahoU787EuVnxdwIwtTya7lGN308tc
+rhmvb8Pjb0Qh6vAZOp134WS8CD4TwyDiz0Zu6mJ0SCagW3sf3I3j4RDT0tEcCGPlc3AZH4GjguJe
+WjqczffBWDcFHksQYBuNtIz9GP9QJM6WKGAy27CdbE+Zux6LP40Z5P9eGh3ttMEVSJvBW34Yx4pU
+XPvDG+O5ER2RIMXsqGQUyJpo+kowPTwZzXT+EJ0hxdQ1iUiubsAxWhf9QmKx8O85tAnpMTsyhdZo
+Bx5Ym0hnDaXIpSm/hM4jmH1mh9l/62AB7g45DAe9c5PFzvWFUjLC+k7Rx2FLg0DVQoBT0UQb58R1
+x5BY2oQIStXZ8jXw/IwpY8sBZqmdy+W6plpard6yriENFoMIspoYWKQzYK2fDGn5OzDLpqHPRMtB
+xaewSn4FY+ko6CkRsanGwa5/ALr6fejQBdMaPAYaZeE1bV+tP58oJhid6Oxy4iMKkVroZVn7J/EC
+KChyYB89LKWcizRmRyUhW2jw3huZKcIjm2kD20FnErSu7qCoRaw3UapcxvVL1B147WAWfk2b3MpY
+AamUNrlWri9T1IhPaR1mZeZjGaXOxTT6WZ39bqHQUd5sxuokAdeWJzQj5HgZvipS4PPcWu8zMKYc
+YKlU+g8BX0sy4XpYTTKohW9zdavqfnTqR8Nm1qO+YCbqcvwg5Y9Eo+AVuFsn0BlEFhwdFjQrk9HZ
+rrslXz9VMaaMLU8ikXAV9p90tyKbuRrNWj5X1lY+Bn2tH1fWKzeigY4tlZWrYNHFQy/7Cu26ibds
+/6cuxpSx5YnF4tsCfLmkdYshqY301oX5L8Fmb4NadYira6TxaLeof3aAGVteXV0ddzjB/ut+SD+e
+GFPGlicSiYYA/5MAM7a8iooKJ8s8WCP7i5Qh3bkYS3YeQWzdPD6fn9bU1MQRZ2vHEKA7E2PIWDKm
+jC0vKytrOqmTHUyw8OJWD5aHdKUYQ8aSMWVsuT8APH369CRSMslCwpDuSJbvWXJ/Xfn/oEJmrvrb
+R4cAAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CCCB8A.99487610
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://content.gpwiki.org/load.php?debug=false&lang=en-gb&modules=mediawiki.legacy.commonPrint%2Cshared%7Cskins.vector&only=styles&skin=vector&*
+
+
+@media Print   =20
+{
+A.stub {
+	COLOR: #ba0000; TEXT-DECORATION: none
+}
+A.new {
+	COLOR: #ba0000; TEXT-DECORATION: none
+}
+#toc {
+	BORDER-RIGHT: #aaaaaa 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: =
+#aaaaaa 1px solid; PADDING-LEFT: 5px; PADDING-BOTTOM: 5px; BORDER-LEFT: =
+#aaaaaa 1px solid; PADDING-TOP: 5px; BORDER-BOTTOM: #aaaaaa 1px solid; =
+BACKGROUND-COLOR: #f9f9f9
+}
+.tocindent {
+	MARGIN-LEFT: 2em
+}
+.tocline {
+	MARGIN-BOTTOM: 0px
+}
+DIV.floatright {
+	CLEAR: right; FLOAT: right; MARGIN: 0.5em 0px 0.8em 1.4em; POSITION: =
+relative
+}
+DIV.floatright P {
+	FONT-STYLE: italic
+}
+DIV.floatleft {
+	CLEAR: left; FLOAT: left; MARGIN: 0.5em 1.4em 0.8em 0px; POSITION: =
+relative
+}
+DIV.floatleft P {
+	FONT-STYLE: italic
+}
+DIV.center {
+	TEXT-ALIGN: center
+}
+DIV.thumb {
+	MARGIN-TOP: 0.5em; MARGIN-BOTTOM: 0.8em; WIDTH: auto; BORDER-TOP-STYLE: =
+none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; =
+BACKGROUND-COLOR: transparent; BORDER-BOTTOM-STYLE: none
+}
+DIV.thumbinner {
+	BORDER-RIGHT: #cccccc 1px solid; PADDING-RIGHT: 3px! important; =
+BORDER-TOP: #cccccc 1px solid; PADDING-LEFT: 3px! important; FONT-SIZE: =
+94%; PADDING-BOTTOM: 3px! important; OVERFLOW: hidden; BORDER-LEFT: =
+#cccccc 1px solid; PADDING-TOP: 3px! important; BORDER-BOTTOM: #cccccc =
+1px solid; BACKGROUND-COLOR: white; TEXT-ALIGN: center
+}
+HTML .thumbimage {
+	BORDER-RIGHT: #cccccc 1px solid; BORDER-TOP: #cccccc 1px solid; =
+BORDER-LEFT: #cccccc 1px solid; BORDER-BOTTOM: #cccccc 1px solid
+}
+HTML .thumbcaption {
+	PADDING-RIGHT: 3px! important; PADDING-LEFT: 3px! important; FONT-SIZE: =
+94%; PADDING-BOTTOM: 3px! important; BORDER-TOP-STYLE: none; =
+LINE-HEIGHT: 1.4em; PADDING-TOP: 3px! important; BORDER-RIGHT-STYLE: =
+none; BORDER-LEFT-STYLE: none; TEXT-ALIGN: left; BORDER-BOTTOM-STYLE: =
+none
+}
+DIV.magnify {
+	DISPLAY: none
+}
+DIV.tright {
+	CLEAR: right; FLOAT: right; MARGIN: 0.5em 0px 0.8em 1.4em
+}
+DIV.tleft {
+	CLEAR: left; FLOAT: left; MARGIN: 0.5em 1.4em 0.8em 0px
+}
+IMG.thumbborder {
+	BORDER-RIGHT: #dddddd 1px solid; BORDER-TOP: #dddddd 1px solid; =
+BORDER-LEFT: #dddddd 1px solid; BORDER-BOTTOM: #dddddd 1px solid
+}
+TABLE.rimage {
+	FLOAT: right; MARGIN-BOTTOM: 1em; MARGIN-LEFT: 1em; WIDTH: 1pt; =
+POSITION: relative; TEXT-ALIGN: center
+}
+BODY {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND: white; =
+PADDING-BOTTOM: 0px; MARGIN: 0px; COLOR: black; PADDING-TOP: 0px
+}
+.noprint {
+	DISPLAY: none
+}
+DIV#jump-to-nav {
+	DISPLAY: none
+}
+DIV.top {
+	DISPLAY: none
+}
+DIV#column-one {
+	DISPLAY: none
+}
+#colophon {
+	DISPLAY: none
+}
+.editsection {
+	DISPLAY: none
+}
+.toctoggle {
+	DISPLAY: none
+}
+.tochidden {
+	DISPLAY: none
+}
+DIV#f-poweredbyico {
+	DISPLAY: none
+}
+DIV#f-copyrightico {
+	DISPLAY: none
+}
+LI#viewcount {
+	DISPLAY: none
+}
+LI#about {
+	DISPLAY: none
+}
+LI#disclaimer {
+	DISPLAY: none
+}
+LI#privacy {
+	DISPLAY: none
+}
+#footer-places {
+	DISPLAY: none
+}
+#mw-hidden-catlinks {
+	DISPLAY: none
+}
+UL {
+	LIST-STYLE-TYPE: square
+}
+#content {
+	PADDING-RIGHT: 0px! important; PADDING-LEFT: 0px! important; =
+BACKGROUND: none transparent scroll repeat 0% 0%; PADDING-BOTTOM: 0px! =
+important; MARGIN: 0px; BORDER-TOP-STYLE: none! important; PADDING-TOP: =
+0px! important; BORDER-RIGHT-STYLE: none! important; BORDER-LEFT-STYLE: =
+none! important; BORDER-BOTTOM-STYLE: none! important
+}
+#footer {
+	BORDER-TOP: black 1px solid; BACKGROUND: white; COLOR: black
+}
+H1 {
+	FONT-WEIGHT: bold
+}
+H2 {
+	FONT-WEIGHT: bold
+}
+H3 {
+	FONT-WEIGHT: bold
+}
+H4 {
+	FONT-WEIGHT: bold
+}
+H5 {
+	FONT-WEIGHT: bold
+}
+H6 {
+	FONT-WEIGHT: bold
+}
+P {
+	MARGIN: 1em 0px; LINE-HEIGHT: 1.2em
+}
+.documentDescription {
+	MARGIN: 1em 0px; LINE-HEIGHT: 1.2em
+}
+.tocindent P {
+	MARGIN: 0px
+}
+PRE {
+	BORDER-RIGHT: black 1pt dashed; PADDING-RIGHT: 0px; BORDER-TOP: black =
+1pt dashed; PADDING-LEFT: 0px; FONT-SIZE: 8pt; BACKGROUND: white; =
+PADDING-BOTTOM: 1em; OVERFLOW: auto; BORDER-LEFT: black 1pt dashed; =
+COLOR: black; PADDING-TOP: 1em; BORDER-BOTTOM: black 1pt dashed; =
+WHITE-SPACE: pre
+}
+TABLE.listing {
+	BORDER-RIGHT: black 1pt solid; BORDER-TOP: black 1pt solid; =
+BORDER-LEFT: black 1pt solid; BORDER-BOTTOM: black 1pt solid; =
+BORDER-COLLAPSE: collapse
+}
+TABLE.listing TD {
+	BORDER-RIGHT: black 1pt solid; BORDER-TOP: black 1pt solid; =
+BORDER-LEFT: black 1pt solid; BORDER-BOTTOM: black 1pt solid; =
+BORDER-COLLAPSE: collapse
+}
+A {
+	PADDING-RIGHT: 0px! important; PADDING-LEFT: 0px! important; =
+BACKGROUND: none transparent scroll repeat 0% 0%; PADDING-BOTTOM: 0px! =
+important; COLOR: black! important; PADDING-TOP: 0px! important
+}
+A:link {
+	BACKGROUND: none transparent scroll repeat 0% 0%; COLOR: #520; =
+TEXT-DECORATION: underline
+}
+A:visited {
+	BACKGROUND: none transparent scroll repeat 0% 0%; COLOR: #520; =
+TEXT-DECORATION: underline
+}
+#content A.text:unknown {
+	content: " (" attr(href) ") "
+}
+#content A.autonumber:unknown {
+	content: " (" attr(href) ") "
+}
+#globalWrapper {
+	WIDTH: 100%! important; min-width: 0
+}
+#content {
+	BACKGROUND: white; COLOR: black
+}
+#column-content {
+	MARGIN: 0px
+}
+#column-content #content {
+	PADDING-RIGHT: 1em; PADDING-LEFT: 1em; PADDING-BOTTOM: 1em; MARGIN: =
+0px; PADDING-TOP: 1em
+}
+A {
+	COLOR: black! important; TEXT-DECORATION: none! important
+}
+A.external {
+	COLOR: black! important; TEXT-DECORATION: none! important
+}
+A.new {
+	COLOR: black! important; TEXT-DECORATION: none! important
+}
+A.stub {
+	COLOR: black! important; TEXT-DECORATION: none! important
+}
+A {
+=09
+}
+A.external {
+=09
+}
+A.new {
+=09
+}
+A.stub {
+=09
+}
+IMG {
+	VERTICAL-ALIGN: middle; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: =
+none; BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+SPAN.texhtml {
+	FONT-FAMILY: serif
+}
+#siteNotice {
+	DISPLAY: none
+}
+LI.gallerybox {
+	BORDER-RIGHT: white 2px solid; BORDER-TOP: white 2px solid; DISPLAY: =
+inline-block; VERTICAL-ALIGN: top; BORDER-LEFT: white 2px solid; =
+BORDER-BOTTOM: white 2px solid; BACKGROUND-COLOR: #f9f9f9
+}
+UL.gallery {
+	DISPLAY: inline; ZOOM: 1
+}
+LI.gallerybox {
+	DISPLAY: inline; ZOOM: 1
+}
+UL.gallery {
+	PADDING-RIGHT: 2px; DISPLAY: block; PADDING-LEFT: 2px; PADDING-BOTTOM: =
+2px; MARGIN: 2px; PADDING-TOP: 2px
+}
+LI.gallerycaption {
+	DISPLAY: block; FONT-WEIGHT: bold; TEXT-ALIGN: center; WORD-WRAP: =
+break-word
+}
+LI.gallerybox DIV.thumb {
+	BORDER-RIGHT: #ccc 1px solid; BORDER-TOP: #ccc 1px solid; MARGIN: 2px; =
+BORDER-LEFT: #ccc 1px solid; BORDER-BOTTOM: #ccc 1px solid; TEXT-ALIGN: =
+center
+}
+DIV.gallerytext {
+	PADDING-RIGHT: 4px; PADDING-LEFT: 4px; FONT-SIZE: 94%; PADDING-BOTTOM: =
+2px; OVERFLOW: hidden; PADDING-TOP: 2px; WORD-WRAP: break-word
+}
+TABLE.diff {
+	BACKGROUND: white
+}
+TD.diff-otitle {
+	BACKGROUND: #ffffff
+}
+TD.diff-ntitle {
+	BACKGROUND: #ffffff
+}
+TD.diff-addedline {
+	BORDER-RIGHT: black 2px solid; BORDER-TOP: black 2px solid; FONT-SIZE: =
+smaller; BACKGROUND: #ccffcc; BORDER-LEFT: black 2px solid; =
+BORDER-BOTTOM: black 2px solid
+}
+TD.diff-deletedline {
+	BORDER-RIGHT: black 2px dotted; BORDER-TOP: black 2px dotted; =
+FONT-SIZE: smaller; BACKGROUND: #ffffaa; BORDER-LEFT: black 2px dotted; =
+BORDER-BOTTOM: black 2px dotted
+}
+TD.diff-context {
+	FONT-SIZE: smaller; BACKGROUND: #eeeeee
+}
+.diffchange {
+	FONT-WEIGHT: bold; COLOR: silver; TEXT-DECORATION: underline
+}
+TABLE.wikitable {
+	BORDER-RIGHT: #aaa 1px solid; BORDER-TOP: #aaa 1px solid; BACKGROUND: =
+white; MARGIN: 1em 1em 1em 0px; BORDER-LEFT: #aaa 1px solid; =
+BORDER-BOTTOM: #aaa 1px solid; BORDER-COLLAPSE: collapse
+}
+.wikitable TH {
+	BORDER-RIGHT: #aaa 1px solid; PADDING-RIGHT: 0.2em; BORDER-TOP: #aaa =
+1px solid; PADDING-LEFT: 0.2em; PADDING-BOTTOM: 0.2em; BORDER-LEFT: #aaa =
+1px solid; PADDING-TOP: 0.2em; BORDER-BOTTOM: #aaa 1px solid
+}
+.wikitable TD {
+	BORDER-RIGHT: #aaa 1px solid; PADDING-RIGHT: 0.2em; BORDER-TOP: #aaa =
+1px solid; PADDING-LEFT: 0.2em; PADDING-BOTTOM: 0.2em; BORDER-LEFT: #aaa =
+1px solid; PADDING-TOP: 0.2em; BORDER-BOTTOM: #aaa 1px solid
+}
+.wikitable TH {
+	FONT-WEIGHT: bold; BACKGROUND: white; TEXT-ALIGN: center
+}
+.wikitable CAPTION {
+	FONT-WEIGHT: bold
+}
+A.sortheader {
+	MARGIN: 0px 0.3em
+}
+.wikitable {
+	page-break-inside: avoid
+}
+.thumb {
+	page-break-inside: avoid
+}
+IMG {
+	page-break-inside: avoid
+}
+H2 {
+=09
+}
+H3 {
+=09
+}
+H4 {
+=09
+}
+H5 {
+=09
+}
+H6 {
+=09
+}
+h7 {
+=09
+}
+P {
+	widows: 3; orphans: 3
+}
+
+}
+
+@media Screen   =20
+{
+abbr {
+	CURSOR: help; BORDER-BOTTOM: black 1px dotted
+}
+ACRONYM {
+	CURSOR: help; BORDER-BOTTOM: black 1px dotted
+}
+.explain {
+	CURSOR: help; BORDER-BOTTOM: black 1px dotted
+}
+.mw-plusminus-pos {
+	COLOR: #006400
+}
+.mw-plusminus-neg {
+	COLOR: #8b0000
+}
+.mw-plusminus-null {
+	COLOR: #aaa
+}
+.allpagesredirect {
+	FONT-STYLE: italic
+}
+.redirect-in-category {
+	FONT-STYLE: italic
+}
+.watchlistredir {
+	FONT-STYLE: italic
+}
+SPAN.comment {
+	FONT-STYLE: italic
+}
+SPAN.changedby {
+	FONT-SIZE: 95%
+}
+.texvc {
+	DIRECTION: ltr; unicode-bidi: embed
+}
+IMG.tex {
+	VERTICAL-ALIGN: middle
+}
+SPAN.texhtml {
+	FONT-FAMILY: serif
+}
+.ontop#wikiPreview {
+	MARGIN-BOTTOM: 1em
+}
+#editform {
+	CLEAR: both
+}
+#toolbar {
+	CLEAR: both
+}
+#wpTextbox1 {
+	CLEAR: both
+}
+DIV#mw-js-message {
+	BORDER-RIGHT: #ddd 1px solid; PADDING-RIGHT: 2.5%; BORDER-TOP: #ddd 1px =
+solid; PADDING-LEFT: 2.5%; PADDING-BOTTOM: 0.5em; MARGIN: 1em 5%; =
+BORDER-LEFT: #ddd 1px solid; PADDING-TOP: 0.5em; BORDER-BOTTOM: #ddd 1px =
+solid; BACKGROUND-COLOR: #fcfcfc
+}
+.editsection {
+	FLOAT: right; MARGIN-LEFT: 5px
+}
+H2#filehistory {
+	CLEAR: both
+}
+TABLE.filehistory TH {
+	VERTICAL-ALIGN: top
+}
+TABLE.filehistory TD {
+	VERTICAL-ALIGN: top
+}
+TABLE.filehistory TH {
+	TEXT-ALIGN: left
+}
+TABLE.filehistory TD.mw-imagepage-filesize {
+	WHITE-SPACE: nowrap
+}
+TABLE.filehistory TH.mw-imagepage-filesize {
+	WHITE-SPACE: nowrap
+}
+TABLE.filehistory TD.filehistory-selected {
+	FONT-WEIGHT: bold
+}
+LI SPAN.deleted {
+	COLOR: #888; FONT-STYLE: italic; TEXT-DECORATION: line-through
+}
+SPAN.history-deleted {
+	COLOR: #888; FONT-STYLE: italic; TEXT-DECORATION: line-through
+}
+.not-patrolled {
+	BACKGROUND-COLOR: #ffa
+}
+.unpatrolled {
+	FONT-WEIGHT: bold; COLOR: red
+}
+DIV.patrollink {
+	FONT-SIZE: 75%; TEXT-ALIGN: right
+}
+TD.mw-label {
+	TEXT-ALIGN: right
+}
+TD.mw-input {
+	TEXT-ALIGN: left
+}
+TD.mw-submit {
+	TEXT-ALIGN: left
+}
+TD.mw-label {
+	VERTICAL-ALIGN: top
+}
+.prefsection TD.mw-label {
+	WIDTH: 20%
+}
+.prefsection TABLE {
+	WIDTH: 100%
+}
+TD.mw-submit {
+	WHITE-SPACE: nowrap
+}
+TABLE.mw-htmlform-nolabel TD.mw-label {
+	WIDTH: 0px! important
+}
+TR.mw-htmlform-vertical-label TD.mw-label {
+	TEXT-ALIGN: left! important
+}
+INPUT#wpSummary {
+	WIDTH: 80%
+}
+.thumbcaption {
+	TEXT-ALIGN: left
+}
+.magnify {
+	FLOAT: right
+}
+.mw-hidden-cats-hidden {
+	DISPLAY: none
+}
+.catlinks-allhidden {
+	DISPLAY: none
+}
+P.mw-ipb-conveniencelinks {
+	FONT-SIZE: 90%; FLOAT: right
+}
+P.mw-protect-editreasons {
+	FONT-SIZE: 90%; FLOAT: right
+}
+P.mw-filedelete-editreasons {
+	FONT-SIZE: 90%; FLOAT: right
+}
+P.mw-delete-editreasons {
+	FONT-SIZE: 90%; FLOAT: right
+}
+P.mw-revdel-editreasons {
+	FONT-SIZE: 90%; FLOAT: right
+}
+.searchresults {
+=09
+}
+.searchresults P {
+	MARGIN-TOP: 1em; MARGIN-BOTTOM: 1.2em; MARGIN-LEFT: 0.4em
+}
+DIV.searchresult {
+	FONT-SIZE: 95%; WIDTH: 38em
+}
+.mw-search-results {
+	MARGIN-LEFT: 0.4em
+}
+.mw-search-results LI {
+	LIST-STYLE-IMAGE: none; PADDING-BOTTOM: 1em; LIST-STYLE-TYPE: none
+}
+.mw-search-results LI A {
+	FONT-SIZE: 108%
+}
+.mw-search-result-data {
+	FONT-SIZE: 97%; COLOR: green
+}
+.mw-search-formheader {
+	BORDER-RIGHT: silver 1px solid; BORDER-TOP: silver 1px solid; =
+MARGIN-TOP: 1em; BORDER-LEFT: silver 1px solid; BORDER-BOTTOM: silver =
+1px solid; BACKGROUND-COLOR: #f3f3f3
+}
+.mw-search-formheader DIV.search-types {
+	PADDING-LEFT: 0.25em; FLOAT: left
+}
+.mw-search-formheader DIV.search-types UL {
+	PADDING-RIGHT: 0px! important; PADDING-LEFT: 0px! important; =
+PADDING-BOTTOM: 0px! important; MARGIN: 0px; PADDING-TOP: 0px! =
+important; LIST-STYLE-TYPE: none! important
+}
+.mw-search-formheader DIV.search-types UL LI {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FLOAT: left; PADDING-BOTTOM: =
+0px; MARGIN: 0px; PADDING-TOP: 0px
+}
+.mw-search-formheader DIV.search-types UL LI A {
+	PADDING-RIGHT: 0.5em; DISPLAY: block; PADDING-LEFT: 0.5em; =
+PADDING-BOTTOM: 0.5em; PADDING-TOP: 0.5em
+}
+.mw-search-formheader DIV.search-types UL LI.current A {
+	CURSOR: default; COLOR: #333333
+}
+.mw-search-formheader DIV.search-types UL LI.current A:hover {
+	TEXT-DECORATION: none
+}
+.mw-search-formheader DIV.results-info {
+	PADDING-RIGHT: 0.75em; PADDING-LEFT: 0.5em; FLOAT: right; =
+PADDING-BOTTOM: 0.5em; PADDING-TOP: 0.5em
+}
+.mw-search-formheader DIV.results-info UL {
+	PADDING-RIGHT: 0px! important; PADDING-LEFT: 0px! important; =
+PADDING-BOTTOM: 0px! important; MARGIN: 0px; PADDING-TOP: 0px! =
+important; LIST-STYLE-TYPE: none! important
+}
+.mw-search-formheader DIV.results-info UL LI {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FLOAT: right; PADDING-BOTTOM: =
+0px; MARGIN: 0px; PADDING-TOP: 0px
+}
+FIELDSET#mw-searchoptions {
+	BORDER-RIGHT: silver 1px solid; PADDING-RIGHT: 0.75em! important; =
+BORDER-TOP: silver 0px solid; PADDING-LEFT: 0.75em! important; =
+PADDING-BOTTOM: 0.5em! important; MARGIN: 0px; BORDER-LEFT: silver 1px =
+solid; PADDING-TOP: 0.5em! important; BORDER-BOTTOM: silver 1px solid; =
+BACKGROUND-COLOR: #f9f9f9
+}
+FIELDSET#mw-searchoptions LEGEND {
+	DISPLAY: none
+}
+FIELDSET#mw-searchoptions H4 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FLOAT: left; PADDING-BOTTOM: =
+0px; MARGIN: 0px; PADDING-TOP: 0px
+}
+FIELDSET#mw-searchoptions DIV#mw-search-togglebox {
+	FLOAT: right
+}
+FIELDSET#mw-searchoptions DIV#mw-search-togglebox LABEL {
+	MARGIN-RIGHT: 0.25em
+}
+FIELDSET#mw-searchoptions DIV#mw-search-togglebox INPUT {
+	MARGIN-LEFT: 0.25em
+}
+FIELDSET#mw-searchoptions TABLE {
+	FLOAT: left; MARGIN-RIGHT: 3em
+}
+FIELDSET#mw-searchoptions TABLE TD {
+	PADDING-RIGHT: 1em
+}
+FIELDSET#mw-searchoptions DIV.divider {
+	CLEAR: both; MARGIN-BOTTOM: 0.5em; PADDING-TOP: 0.5em; BORDER-BOTTOM: =
+#dddddd 1px solid
+}
+TD#mw-search-menu {
+	PADDING-LEFT: 6em; FONT-SIZE: 85%
+}
+DIV#mw-search-interwiki {
+	BORDER-RIGHT: #aaaaaa 1px solid; BORDER-TOP: #aaaaaa 1px solid; =
+MARGIN-TOP: 2ex; FLOAT: right; BORDER-LEFT: #aaaaaa 1px solid; WIDTH: =
+18em; BORDER-BOTTOM: #aaaaaa 1px solid
+}
+DIV#mw-search-interwiki LI {
+	FONT-SIZE: 95%
+}
+.mw-search-interwiki-more {
+	FONT-SIZE: 90%; FLOAT: right
+}
+DIV#mw-search-interwiki-caption {
+	FONT-WEIGHT: bold; FONT-SIZE: 95%; TEXT-ALIGN: center
+}
+.mw-search-interwiki-project {
+	PADDING-RIGHT: 0.15em; BORDER-TOP: #bbbbbb 1px solid; PADDING-LEFT: =
+0.2em; FONT-SIZE: 97%; PADDING-BOTTOM: 0.2em; PADDING-TOP: 0.15em; =
+BACKGROUND-COLOR: #ececec; TEXT-ALIGN: left
+}
+SPAN.searchalttitle {
+	FONT-SIZE: 95%
+}
+DIV.searchdidyoumean {
+	MARGIN-TOP: 0.8em; FONT-SIZE: 127%; COLOR: #c00
+}
+DIV.searchdidyoumean EM {
+	FONT-WEIGHT: bold
+}
+.searchmatch {
+	FONT-WEIGHT: bold
+}
+TD#mw-search-togglebox {
+	TEXT-ALIGN: right
+}
+TABLE#mw-search-powertable {
+	WIDTH: 100%
+}
+FORM#powersearch {
+	CLEAR: both
+}
+.mw-userrights-disabled {
+	COLOR: #888
+}
+TABLE.mw-userrights-groups  TD {
+	PADDING-RIGHT: 1.5em
+}
+TABLE.mw-userrights-groups  TH {
+	PADDING-RIGHT: 1.5em
+}
+.os-suggest {
+	BORDER-RIGHT: #aaaaaa 1px solid; BORDER-TOP: #aaaaaa 1px solid; =
+FONT-SIZE: 95%; Z-INDEX: 99; LEFT: 0px; OVERFLOW-X: hidden; OVERFLOW: =
+auto; BORDER-LEFT: #aaaaaa 1px solid; WIDTH: 0px; BORDER-BOTTOM: #aaaaaa =
+1px solid; POSITION: absolute; TOP: 0px; BACKGROUND-COLOR: window
+}
+TABLE.os-suggest-results {
+	BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; FONT-SIZE: 95%; =
+BORDER-BOTTOM-WIDTH: 0px; WIDTH: 100%; CURSOR: pointer; BORDER-COLLAPSE: =
+collapse; BORDER-RIGHT-WIDTH: 0px
+}
+.os-suggest-result {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; PADDING-BOTTOM: 2px; COLOR: =
+windowtext; PADDING-TOP: 2px; WHITE-SPACE: nowrap; BACKGROUND-COLOR: =
+window
+}
+.os-suggest-result-hl {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; PADDING-BOTTOM: 2px; COLOR: =
+windowtext; PADDING-TOP: 2px; WHITE-SPACE: nowrap; BACKGROUND-COLOR: =
+window
+}
+.os-suggest-result-hl {
+	COLOR: white; BACKGROUND-COLOR: #4c59a6
+}
+.os-suggest-result-hl-webkit {
+	COLOR: white; BACKGROUND-COLOR: #4c59a6
+}
+.os-suggest-result-hl {
+	COLOR: highlighttext; BACKGROUND-COLOR: highlight
+}
+.os-suggest-toggle {
+	FONT-SIZE: 65%; LEFT: 1ex; POSITION: relative
+}
+.os-suggest-toggle-def {
+	FONT-SIZE: 65%; LEFT: 0px; VISIBILITY: hidden; POSITION: absolute; TOP: =
+0px
+}
+.autocomment {
+	COLOR: gray
+}
+#pagehistory .history-user {
+	MARGIN-LEFT: 0.4em; MARGIN-RIGHT: 0.2em
+}
+#pagehistory SPAN.minor {
+	FONT-WEIGHT: bold
+}
+#pagehistory LI {
+	BORDER-RIGHT: white 1px solid; BORDER-TOP: white 1px solid; =
+BORDER-LEFT: white 1px solid; BORDER-BOTTOM: white 1px solid
+}
+#pagehistory LI.selected {
+	BORDER-RIGHT: #aaa 1px dashed; BORDER-TOP: #aaa 1px dashed; =
+BORDER-LEFT: #aaa 1px dashed; BORDER-BOTTOM: #aaa 1px dashed; =
+BACKGROUND-COLOR: #f9f9f9
+}
+.newpage {
+	FONT-WEIGHT: bold
+}
+.minor {
+	FONT-WEIGHT: bold
+}
+.bot {
+	FONT-WEIGHT: bold
+}
+.mw-uctop {
+	FONT-WEIGHT: bold
+}
+TABLE.mw-listgrouprights-table TR {
+	VERTICAL-ALIGN: top
+}
+.listgrouprights-revoked {
+	TEXT-DECORATION: line-through
+}
+TD.mw-statistics-numbers {
+	TEXT-ALIGN: right
+}
+H4.mw-specialpagesgroup {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; PADDING-BOTTOM: 2px; MARGIN: =
+0.3em 0em 0em; PADDING-TOP: 2px; BACKGROUND-COLOR: #dcdcdc
+}
+.mw-specialpagerestricted {
+	FONT-WEIGHT: bold
+}
+#shared-image-dup {
+	FONT-STYLE: italic
+}
+#shared-image-conflict {
+	FONT-STYLE: italic
+}
+TABLE.mw-emailuser-table {
+	WIDTH: 98%
+}
+TD#mw-emailuser-sender {
+	FONT-WEIGHT: bold
+}
+TD#mw-emailuser-recipient {
+	FONT-WEIGHT: bold
+}
+TABLE.mw-allpages-table-form {
+	WIDTH: 100%
+}
+TABLE.mw-allpages-table-chunk {
+	WIDTH: 100%
+}
+TD.mw-allpages-alphaindexline {
+	TEXT-ALIGN: right
+}
+TD.mw-allpages-nav {
+	FONT-SIZE: smaller; MARGIN-BOTTOM: 1em; TEXT-ALIGN: right
+}
+P.mw-allpages-nav {
+	FONT-SIZE: smaller; MARGIN-BOTTOM: 1em; TEXT-ALIGN: right
+}
+TABLE.mw-allpages-table-form TR {
+	VERTICAL-ALIGN: top
+}
+TABLE#mw-prefixindex-list-table {
+	WIDTH: 98%
+}
+TABLE#mw-prefixindex-nav-table {
+	WIDTH: 98%
+}
+TD#mw-prefixindex-nav-form {
+	FONT-SIZE: smaller; MARGIN-BOTTOM: 1em; VERTICAL-ALIGN: top; =
+TEXT-ALIGN: right
+}
+DIV.mw-warning-with-logexcerpt {
+	CLEAR: both; BORDER-RIGHT: #2f6fab 2px solid; PADDING-RIGHT: 3px; =
+BORDER-TOP: #2f6fab 2px solid; PADDING-LEFT: 3px; MARGIN-BOTTOM: 3px; =
+PADDING-BOTTOM: 3px; BORDER-LEFT: #2f6fab 2px solid; PADDING-TOP: 3px; =
+BORDER-BOTTOM: #2f6fab 2px solid
+}
+DIV.mw-warning-with-logexcerpt UL LI {
+	FONT-SIZE: 90%
+}
+SPAN.mw-revdelundel-link {
+	FONT-SIZE: 90%
+}
+STRONG.mw-revdelundel-link {
+	FONT-SIZE: 90%
+}
+SPAN.mw-revdelundel-hidden {
+	VISIBILITY: hidden
+}
+INPUT.mw-revdelundel-hidden {
+	VISIBILITY: hidden
+}
+TD.mw-revdel-checkbox {
+	PADDING-RIGHT: 10px; TEXT-ALIGN: center
+}
+TH.mw-revdel-checkbox {
+	PADDING-RIGHT: 10px; TEXT-ALIGN: center
+}
+A.feedlink {
+	PADDING-LEFT: 16px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/common/images/feed-icon.png?2011-08-2=
+0T20:55:00Z) no-repeat left center
+}
+.plainlinks A {
+	PADDING-RIGHT: 0px! important; PADDING-LEFT: 0px! important; =
+BACKGROUND: none transparent scroll repeat 0% 0%; PADDING-BOTTOM: 0px! =
+important; PADDING-TOP: 0px! important
+}
+TABLE.wikitable {
+	BORDER-RIGHT: #aaa 1px solid; BORDER-TOP: #aaa 1px solid; BACKGROUND: =
+#f9f9f9; MARGIN: 1em 1em 1em 0px; BORDER-LEFT: #aaa 1px solid; COLOR: =
+black; BORDER-BOTTOM: #aaa 1px solid; BORDER-COLLAPSE: collapse
+}
+.wikitable TH {
+	BORDER-RIGHT: #aaa 1px solid; PADDING-RIGHT: 0.2em; BORDER-TOP: #aaa =
+1px solid; PADDING-LEFT: 0.2em; PADDING-BOTTOM: 0.2em; BORDER-LEFT: #aaa =
+1px solid; PADDING-TOP: 0.2em; BORDER-BOTTOM: #aaa 1px solid
+}
+.wikitable TD {
+	BORDER-RIGHT: #aaa 1px solid; PADDING-RIGHT: 0.2em; BORDER-TOP: #aaa =
+1px solid; PADDING-LEFT: 0.2em; PADDING-BOTTOM: 0.2em; BORDER-LEFT: #aaa =
+1px solid; PADDING-TOP: 0.2em; BORDER-BOTTOM: #aaa 1px solid
+}
+.wikitable TH {
+	BACKGROUND: #f2f2f2; TEXT-ALIGN: center
+}
+.wikitable CAPTION {
+	FONT-WEIGHT: bold
+}
+TABLE.collapsed TR.collapsable {
+	DISPLAY: none
+}
+.success {
+	FONT-SIZE: larger; COLOR: green
+}
+.error {
+	FONT-SIZE: larger; COLOR: red
+}
+.errorbox {
+	BORDER-RIGHT: 2px solid; PADDING-RIGHT: 1em; BORDER-TOP: 2px solid; =
+PADDING-LEFT: 1em; FONT-SIZE: larger; FLOAT: left; MARGIN-BOTTOM: 2em; =
+PADDING-BOTTOM: 0.5em; BORDER-LEFT: 2px solid; COLOR: #000; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: 2px solid
+}
+.successbox {
+	BORDER-RIGHT: 2px solid; PADDING-RIGHT: 1em; BORDER-TOP: 2px solid; =
+PADDING-LEFT: 1em; FONT-SIZE: larger; FLOAT: left; MARGIN-BOTTOM: 2em; =
+PADDING-BOTTOM: 0.5em; BORDER-LEFT: 2px solid; COLOR: #000; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: 2px solid
+}
+.errorbox {
+	BORDER-LEFT-COLOR: red; BORDER-BOTTOM-COLOR: red; BORDER-TOP-COLOR: =
+red; BACKGROUND-COLOR: #fff2f2; BORDER-RIGHT-COLOR: red
+}
+.successbox {
+	BORDER-LEFT-COLOR: green; BORDER-BOTTOM-COLOR: green; BORDER-TOP-COLOR: =
+green; BACKGROUND-COLOR: #dfd; BORDER-RIGHT-COLOR: green
+}
+.errorbox H2 {
+	DISPLAY: inline; FONT-WEIGHT: bold; FONT-SIZE: 1em; MARGIN: 0px 0.5em =
+0px 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+.successbox H2 {
+	DISPLAY: inline; FONT-WEIGHT: bold; FONT-SIZE: 1em; MARGIN: 0px 0.5em =
+0px 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+.previewnote {
+	MARGIN-BOTTOM: 1em; COLOR: #c00
+}
+.previewnote P {
+	MARGIN: 0.8em 0px; TEXT-INDENT: 3em
+}
+.visualClear {
+	CLEAR: both
+}
+#mw_trackbacks {
+	BORDER-RIGHT: #bbbbff 1px solid; PADDING-RIGHT: 0.2em; BORDER-TOP: =
+#bbbbff 1px solid; PADDING-LEFT: 0.2em; PADDING-BOTTOM: 0.2em; =
+BORDER-LEFT: #bbbbff 1px solid; PADDING-TOP: 0.2em; BORDER-BOTTOM: =
+#bbbbff 1px solid; BACKGROUND-COLOR: #eeeeff
+}
+.TablePager {
+	BORDER-COLLAPSE: collapse; min-width: 80%
+}
+.TablePager_nav A {
+	TEXT-DECORATION: none
+}
+.TablePager {
+	BORDER-RIGHT: #aaaaaa 1px solid; PADDING-RIGHT: 0.15em; BORDER-TOP: =
+#aaaaaa 1px solid; PADDING-LEFT: 0.15em; PADDING-BOTTOM: 0px; =
+BORDER-LEFT: #aaaaaa 1px solid; PADDING-TOP: 0px; BORDER-BOTTOM: #aaaaaa =
+1px solid
+}
+.TablePager TD {
+	BORDER-RIGHT: #aaaaaa 1px solid; PADDING-RIGHT: 0.15em; BORDER-TOP: =
+#aaaaaa 1px solid; PADDING-LEFT: 0.15em; PADDING-BOTTOM: 0px; =
+BORDER-LEFT: #aaaaaa 1px solid; PADDING-TOP: 0px; BORDER-BOTTOM: #aaaaaa =
+1px solid
+}
+.TablePager TH {
+	BORDER-RIGHT: #aaaaaa 1px solid; PADDING-RIGHT: 0.15em; BORDER-TOP: =
+#aaaaaa 1px solid; PADDING-LEFT: 0.15em; PADDING-BOTTOM: 0px; =
+BORDER-LEFT: #aaaaaa 1px solid; PADDING-TOP: 0px; BORDER-BOTTOM: #aaaaaa =
+1px solid
+}
+.TablePager TH {
+	BACKGROUND-COLOR: #eeeeff
+}
+.TablePager TD {
+	BACKGROUND-COLOR: #ffffff
+}
+.TablePager TR:hover TD {
+	BACKGROUND-COLOR: #eeeeff
+}
+.imagelist TD {
+	WHITE-SPACE: nowrap
+}
+.imagelist TH {
+	WHITE-SPACE: nowrap
+}
+.imagelist .TablePager_col_links {
+	BACKGROUND-COLOR: #eeeeff
+}
+.imagelist .TablePager_col_img_description {
+	WHITE-SPACE: normal
+}
+.imagelist TH.TablePager_sort {
+	BACKGROUND-COLOR: #ccccff
+}
+#mw-allmessagestable .allmessages-customised TD.am_default {
+	BACKGROUND-COLOR: #fcffc4
+}
+#mw-allmessagestable TR.allmessages-customised:hover TD.am_default {
+	BACKGROUND-COLOR: #faff90
+}
+#mw-allmessagestable TD.am_actual {
+	BACKGROUND-COLOR: #e2ffe2
+}
+UNKNOWN {
+	BACKGROUND-COLOR: #b1ffb1
+}
+UL#filetoc {
+	BORDER-RIGHT: #aaaaaa 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: =
+#aaaaaa 1px solid; PADDING-LEFT: 5px; FONT-SIZE: 95%; MARGIN-BOTTOM: =
+0.5em; PADDING-BOTTOM: 5px; MARGIN-LEFT: 0px; BORDER-LEFT: #aaaaaa 1px =
+solid; MARGIN-RIGHT: 0px; PADDING-TOP: 5px; BORDER-BOTTOM: #aaaaaa 1px =
+solid; BACKGROUND-COLOR: #f9f9f9; TEXT-ALIGN: center
+}
+#filetoc LI {
+	PADDING-RIGHT: 2em; DISPLAY: inline; LIST-STYLE-TYPE: none
+}
+TABLE.mw_metadata {
+	FONT-SIZE: 0.8em; MARGIN-BOTTOM: 0.5em; MARGIN-LEFT: 0.5em; WIDTH: =
+300px
+}
+TABLE.mw_metadata CAPTION {
+	FONT-WEIGHT: bold
+}
+TABLE.mw_metadata TH {
+	FONT-WEIGHT: normal
+}
+TABLE.mw_metadata TD {
+	PADDING-RIGHT: 0.1em; PADDING-LEFT: 0.1em; PADDING-BOTTOM: 0.1em; =
+PADDING-TOP: 0.1em
+}
+TABLE.mw_metadata {
+	BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: =
+none; BORDER-COLLAPSE: collapse; BORDER-BOTTOM-STYLE: none
+}
+TABLE.mw_metadata TD {
+	BORDER-RIGHT: #aaaaaa 1px solid; PADDING-RIGHT: 0.1em; BORDER-TOP: =
+#aaaaaa 1px solid; PADDING-LEFT: 0.1em; BORDER-LEFT: #aaaaaa 1px solid; =
+BORDER-BOTTOM: #aaaaaa 1px solid; TEXT-ALIGN: center
+}
+TABLE.mw_metadata TH {
+	BORDER-RIGHT: #aaaaaa 1px solid; PADDING-RIGHT: 0.1em; BORDER-TOP: =
+#aaaaaa 1px solid; PADDING-LEFT: 0.1em; BORDER-LEFT: #aaaaaa 1px solid; =
+BORDER-BOTTOM: #aaaaaa 1px solid; TEXT-ALIGN: center
+}
+TABLE.mw_metadata TH {
+	BACKGROUND-COLOR: #f9f9f9
+}
+TABLE.mw_metadata TD {
+	BACKGROUND-COLOR: #fcfcfc
+}
+LI.gallerybox {
+	BORDER-RIGHT: white 2px solid; BORDER-TOP: white 2px solid; =
+VERTICAL-ALIGN: top; BORDER-LEFT: white 2px solid; BORDER-BOTTOM: white =
+2px solid; BACKGROUND-COLOR: #f9f9f9
+}
+UL.gallery {
+	DISPLAY: inline; ZOOM: 1
+}
+LI.gallerybox {
+	DISPLAY: inline; ZOOM: 1
+}
+UL.gallery {
+	PADDING-RIGHT: 2px; DISPLAY: block; PADDING-LEFT: 2px; PADDING-BOTTOM: =
+2px; MARGIN: 2px; PADDING-TOP: 2px
+}
+LI.gallerycaption {
+	DISPLAY: block; FONT-WEIGHT: bold; TEXT-ALIGN: center; WORD-WRAP: =
+break-word
+}
+LI.gallerybox DIV.thumb {
+	BORDER-RIGHT: #ccc 1px solid; BORDER-TOP: #ccc 1px solid; MARGIN: 2px; =
+BORDER-LEFT: #ccc 1px solid; BORDER-BOTTOM: #ccc 1px solid; TEXT-ALIGN: =
+center
+}
+DIV.gallerytext {
+	PADDING-RIGHT: 4px; PADDING-LEFT: 4px; FONT-SIZE: 94%; PADDING-BOTTOM: =
+2px; OVERFLOW: hidden; PADDING-TOP: 2px; WORD-WRAP: break-word
+}
+TABLE.mw-enhanced-rc {
+	BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; BACKGROUND: none =
+transparent scroll repeat 0% 0%; BORDER-BOTTOM-WIDTH: 0px; =
+BORDER-RIGHT-WIDTH: 0px; border-spacing: 0
+}
+TD.mw-enhanced-rc {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; =
+VERTICAL-ALIGN: top; PADDING-TOP: 0px; FONT-FAMILY: monospace; =
+WHITE-SPACE: nowrap
+}
+#mw-addcategory-prompt {
+	DISPLAY: inline; MARGIN-LEFT: 1em
+}
+#mw-addcategory-prompt INPUT {
+	MARGIN-LEFT: 0.5em; MARGIN-RIGHT: 0.5em
+}
+.mw-remove-category {
+	PADDING-RIGHT: 8px; BACKGROUND-POSITION: center center; PADDING-LEFT: =
+8px; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/common/images/remove.png?2011-08-20T2=
+0:55:00Z); PADDING-BOTTOM: 8px; PADDING-TOP: 8px; BACKGROUND-REPEAT: =
+no-repeat
+}
+.mw-ajax-addcategory {
+	BACKGROUND-POSITION: left center; PADDING-LEFT: 20px; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/common/images/add.png?2011-08-20T20:5=
+5:00Z); BACKGROUND-REPEAT: no-repeat
+}
+.mw-ajax-loader {
+	PADDING-RIGHT: 16px; BACKGROUND-POSITION: center center; PADDING-LEFT: =
+16px; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/common/images/ajax-loader.gif?2011-08=
+-20T20:55:00Z); PADDING-BOTTOM: 16px; PADDING-TOP: 16px; =
+BACKGROUND-REPEAT: no-repeat; POSITION: relative; TOP: -16px
+}
+.mw-small-spinner {
+	PADDING-RIGHT: 10px! important; BACKGROUND-POSITION: center center; =
+PADDING-LEFT: 10px! important; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/common/images/spinner.gif?2011-08-20T=
+20:55:00Z); PADDING-BOTTOM: 10px! important; MARGIN-RIGHT: 0.6em; =
+PADDING-TOP: 10px! important; BACKGROUND-REPEAT: no-repeat
+}
+A.sortheader {
+	MARGIN: 0px 0.3em
+}
+UNKNOWN {
+=09
+}
+UNKNOWN {
+=09
+}
+UNKNOWN {
+=09
+}
+.mw-help-field-hint {
+	PADDING-RIGHT: 0px; BACKGROUND-POSITION: left center; DISPLAY: none; =
+PADDING-LEFT: 15px; FONT-SIZE: 0.8em; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/common/images/help-question.gif?2011-=
+08-20T20:55:00Z); MARGIN-BOTTOM: -8px; PADDING-BOTTOM: 0px; MARGIN-LEFT: =
+2px; CURSOR: pointer; COLOR: #0645ad; PADDING-TOP: 0px; =
+BACKGROUND-REPEAT: no-repeat; TEXT-DECORATION: underline
+}
+.mw-help-field-hint:hover {
+	BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/common/images/help-question-hover.gif=
+?2011-08-20T20:55:00Z)
+}
+.mw-help-field-data {
+	BORDER-RIGHT: #5dc9f4 1px solid; PADDING-RIGHT: 8px; BORDER-TOP: =
+#5dc9f4 1px solid; DISPLAY: block; PADDING-LEFT: 8px; PADDING-BOTTOM: =
+4px; MARGIN-LEFT: 20px; BORDER-LEFT: #5dc9f4 1px solid; PADDING-TOP: =
+5px; BORDER-BOTTOM: #5dc9f4 1px solid; BACKGROUND-COLOR: #d6f3ff
+}
+.tipsy {
+	PADDING-RIGHT: 5px; PADDING-LEFT: 5px; FONT-SIZE: 12px; Z-INDEX: =
+100000; PADDING-BOTTOM: 10px; OVERFLOW: visible; PADDING-TOP: 5px; =
+POSITION: absolute
+}
+.tipsy-inner {
+	BORDER-RIGHT: #5dc9f4 1px solid; PADDING-RIGHT: 8px; BORDER-TOP: =
+#5dc9f4 1px solid; PADDING-LEFT: 8px; PADDING-BOTTOM: 4px; BORDER-LEFT: =
+#5dc9f4 1px solid; COLOR: black; PADDING-TOP: 5px; BORDER-BOTTOM: =
+#5dc9f4 1px solid; BACKGROUND-COLOR: #d6f3ff; TEXT-ALIGN: left; =
+max-width: 300px
+}
+.tipsy-arrow {
+	BACKGROUND: =
+url(http://content.gpwiki.org/skins/common/images/tipsy-arrow.gif?2011-08=
+-20T20:55:00Z) no-repeat left top; WIDTH: 13px; POSITION: absolute; =
+HEIGHT: 13px
+}
+.tipsy-se .tipsy-arrow {
+	BACKGROUND-POSITION: 0% 100%; RIGHT: 10px; BOTTOM: -2px
+}
+HTML {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-SIZE: 1em; PADDING-BOTTOM: =
+0px; MARGIN: 0px; PADDING-TOP: 0px; FONT-FAMILY: sans-serif; HEIGHT: =
+100%
+}
+BODY {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-SIZE: 1em; PADDING-BOTTOM: =
+0px; MARGIN: 0px; PADDING-TOP: 0px; FONT-FAMILY: sans-serif; HEIGHT: =
+100%
+}
+BODY {
+	BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/page-base.png?2011-08-2=
+0T20:56:40Z); BACKGROUND-COLOR: #f3f3f3
+}
+DIV#content {
+	PADDING-RIGHT: 1em; BACKGROUND-POSITION: left top; PADDING-LEFT: 1em; =
+BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/border.png?2011-08-20T2=
+0:56:40Z); PADDING-BOTTOM: 1em; MARGIN-LEFT: 10em; COLOR: black; =
+DIRECTION: ltr; PADDING-TOP: 1em; BACKGROUND-REPEAT: repeat-y; =
+BACKGROUND-COLOR: white
+}
+#mw-page-base {
+	BACKGROUND-POSITION: left bottom; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/page-fade.png?2011-08-2=
+0T20:56:40Z); BACKGROUND-REPEAT: repeat-x; HEIGHT: 5em; =
+BACKGROUND-COLOR: white
+}
+#mw-head-base {
+	BACKGROUND-POSITION: left bottom; MARGIN-TOP: -5em; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/border.png?2011-08-20T2=
+0:56:40Z); MARGIN-LEFT: 10em; BACKGROUND-REPEAT: repeat-x; HEIGHT: 5em
+}
+DIV#mw-head {
+	RIGHT: 0px; WIDTH: 100%; POSITION: absolute; TOP: 0px
+}
+DIV#mw-head H5 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+0px; PADDING-TOP: 0px
+}
+DIV.emptyPortlet {
+	DISPLAY: none
+}
+#p-personal {
+	RIGHT: 0.75em; POSITION: absolute; TOP: 0px
+}
+#p-personal H5 {
+	DISPLAY: none
+}
+#p-personal UL {
+	PADDING-LEFT: 10em; MARGIN: 0px; LIST-STYLE-TYPE: none
+}
+#p-personal LI {
+	FLOAT: left; LINE-HEIGHT: 1.12em
+}
+#p-personal LI {
+	MARGIN-TOP: 0.5em; FONT-SIZE: 0.75em; MARGIN-LEFT: 0.75em; WHITE-SPACE: =
+nowrap
+}
+#left-navigation {
+	LEFT: 10em; POSITION: absolute; TOP: 2.5em
+}
+#right-navigation {
+	MARGIN-TOP: 2.5em; FLOAT: right
+}
+DIV.vectorTabs H5 {
+	DISPLAY: none
+}
+DIV.vectorMenu H5 SPAN {
+	DISPLAY: none
+}
+DIV.vectorTabs {
+	FLOAT: left; HEIGHT: 2.5em
+}
+DIV.vectorTabs {
+	BACKGROUND-POSITION: left bottom; PADDING-LEFT: 1px; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/tab-break.png?2011-08-2=
+0T20:56:40Z); BACKGROUND-REPEAT: no-repeat
+}
+DIV.vectorTabs UL {
+	FLOAT: left
+}
+DIV.vectorTabs UL {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+0px; PADDING-TOP: 0px; LIST-STYLE-TYPE: none; HEIGHT: 100%
+}
+DIV.vectorTabs UL LI {
+	FLOAT: left
+}
+DIV.vectorTabs UL LI {
+	PADDING-RIGHT: 0px; BACKGROUND-POSITION: left bottom; DISPLAY: =
+inline-block; PADDING-LEFT: 0px; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/tab-normal-fade.png?201=
+1-08-20T20:56:40Z); PADDING-BOTTOM: 0px; MARGIN: 0px; LINE-HEIGHT: =
+1.12em; PADDING-TOP: 0px; BACKGROUND-REPEAT: repeat-x; WHITE-SPACE: =
+nowrap; HEIGHT: 100%; BACKGROUND-COLOR: #f3f3f3
+}
+UNKNOWN {
+	DISPLAY: block
+}
+DIV.vectorTabs LI.selected {
+	BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/tab-current-fade.png?20=
+11-08-20T20:56:40Z)
+}
+DIV.vectorTabs LI A {
+	PADDING-RIGHT: 0.5em; BACKGROUND-POSITION: right bottom; DISPLAY: =
+inline-block; PADDING-LEFT: 0.5em; FONT-SIZE: 0.8em; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/tab-break.png?2011-08-2=
+0T20:56:40Z); CURSOR: pointer; COLOR: #0645ad; BACKGROUND-REPEAT: =
+no-repeat; HEIGHT: 1.9em
+}
+UNKNOWN {
+	DISPLAY: block
+}
+DIV.vectorTabs SPAN A {
+	DISPLAY: inline-block; PADDING-TOP: 1.25em
+}
+UNKNOWN {
+	DISPLAY: block; FLOAT: left
+}
+DIV.vectorTabs LI.selected A {
+	COLOR: #333333; TEXT-DECORATION: none
+}
+DIV.vectorTabs LI.selected A:visited {
+	COLOR: #333333; TEXT-DECORATION: none
+}
+DIV.vectorTabs LI.new A {
+	COLOR: #a55858
+}
+DIV.vectorTabs LI.new A:visited {
+	COLOR: #a55858
+}
+DIV.vectorMenu {
+	BACKGROUND-POSITION: 100% 60%; FLOAT: left; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/arrow-down-icon.png?201=
+1-08-20T20:56:40Z); CURSOR: pointer; DIRECTION: ltr; BACKGROUND-REPEAT: =
+no-repeat
+}
+BODY.rtl DIV.vectorMenu {
+	DIRECTION: rtl
+}
+DIV#mw-head DIV.vectorMenu H5 {
+	FLOAT: left; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/tab-break.png?2011-08-2=
+0T20:56:40Z); BACKGROUND-REPEAT: no-repeat
+}
+DIV#mw-head DIV.vectorMenu H5 {
+	BACKGROUND-POSITION: left bottom; MARGIN-LEFT: -1px
+}
+UNKNOWN {
+	BACKGROUND-IMAGE: none
+}
+DIV#mw-head DIV.vectorMenu H4 {
+	DISPLAY: inline-block; PADDING-LEFT: 0.5em; FONT-WEIGHT: normal; =
+FONT-SIZE: 0.8em; FLOAT: left; BORDER-TOP-STYLE: none; PADDING-TOP: =
+1.37em; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; =
+BORDER-BOTTOM-STYLE: none
+}
+DIV.vectorMenu H5 A {
+	DISPLAY: inline-block; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/tab-break.png?2011-08-2=
+0T20:56:40Z); WIDTH: 24px; BACKGROUND-REPEAT: no-repeat; HEIGHT: 2.5em; =
+TEXT-DECORATION: none
+}
+DIV.vectorMenu H5 A {
+	BACKGROUND-POSITION: right bottom
+}
+UNKNOWN {
+	DISPLAY: block
+}
+DIV.vectorMenu DIV.menu {
+	CLEAR: both; DISPLAY: none; POSITION: relative; TEXT-ALIGN: left
+}
+BODY.rtl DIV.vectorMenu DIV.menu {
+	MARGIN-LEFT: 24px
+}
+UNKNOWN {
+	MARGIN-LEFT: auto
+}
+UNKNOWN {
+	MARGIN-LEFT: 23px
+}
+DIV.vectorMenu:hover DIV.menu {
+	DISPLAY: block
+}
+DIV.vectorMenu UL {
+	BORDER-RIGHT: silver 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: silver =
+0px solid; PADDING-LEFT: 0px; LIST-STYLE-IMAGE: none; PADDING-BOTTOM: =
+0px; MARGIN: 0px 0px 0px -1px; BORDER-LEFT: silver 1px solid; =
+PADDING-TOP: 0px; BORDER-BOTTOM: silver 1px solid; LIST-STYLE-TYPE: =
+none; POSITION: absolute; BACKGROUND-COLOR: white; TEXT-ALIGN: left
+}
+UNKNOWN {
+	min-width: 5em
+}
+UNKNOWN {
+	min-width: 0
+}
+DIV.vectorMenu LI {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+0px; LINE-HEIGHT: 1em; PADDING-TOP: 0px; TEXT-ALIGN: left
+}
+DIV.vectorMenu LI A {
+	PADDING-RIGHT: 0.5em; DISPLAY: inline-block; PADDING-LEFT: 0.5em; =
+FONT-SIZE: 0.8em; PADDING-BOTTOM: 0.5em; CURSOR: pointer; COLOR: =
+#0645ad; PADDING-TOP: 0.5em; WHITE-SPACE: nowrap
+}
+UNKNOWN {
+	DISPLAY: block
+}
+DIV.vectorMenu LI.selected A {
+	COLOR: #333333; TEXT-DECORATION: none
+}
+DIV.vectorMenu LI.selected A:visited {
+	COLOR: #333333; TEXT-DECORATION: none
+}
+#p-search H5 {
+	DISPLAY: none
+}
+#p-search {
+	FLOAT: left
+}
+#p-search {
+	MARGIN-LEFT: 0.5em; MARGIN-RIGHT: 0.5em
+}
+#p-search FORM {
+	MARGIN: 0.4em 0px 0px
+}
+#p-search INPUT {
+	MARGIN: 0.4em 0px 0px
+}
+DIV#simpleSearch {
+	BORDER-RIGHT: #aaaaaa 1px solid; BACKGROUND-POSITION: left top; =
+BORDER-TOP: #aaaaaa 1px solid; MARGIN-TOP: 0.65em; DISPLAY: block; =
+MIN-HEIGHT: 1px; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/search-fade.png?2011-08=
+-20T20:56:40Z); BORDER-LEFT: #aaaaaa 1px solid; WIDTH: 14em; COLOR: =
+black; BORDER-BOTTOM: #aaaaaa 1px solid; BACKGROUND-REPEAT: repeat-x; =
+POSITION: relative; HEIGHT: 1.4em; BACKGROUND-COLOR: white
+}
+DIV#simpleSearch LABEL {
+	FONT-SIZE: 13px; DIRECTION: ltr; TOP: 0.25em
+}
+DIV#simpleSearch INPUT {
+	COLOR: black; DIRECTION: ltr
+}
+DIV#simpleSearch INPUT:unknown {
+	outline: none
+}
+DIV#simpleSearch INPUT.placeholder {
+	COLOR: #999999
+}
+UNKNOWN {
+	COLOR: #999999
+}
+DIV#simpleSearch INPUT#searchInput {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0.2em; FONT-SIZE: 13px; LEFT: 0px; =
+PADDING-BOTTOM: 0.2em; MARGIN: 0px; WIDTH: 90%; DIRECTION: ltr; =
+BORDER-TOP-STYLE: none; PADDING-TOP: 0.2em; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; POSITION: absolute; TOP: 0px; BACKGROUND-COLOR: =
+transparent; BORDER-BOTTOM-STYLE: none; outline: none
+}
+DIV#simpleSearch BUTTON#searchButton {
+	PADDING-RIGHT: 0.4em; PADDING-LEFT: 0px; RIGHT: 0px; PADDING-BOTTOM: =
+0.2em; MARGIN: 0px; WIDTH: 10%; CURSOR: pointer; BORDER-TOP-STYLE: none; =
+PADDING-TOP: 0.2em; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; =
+POSITION: absolute; TOP: 0px; BACKGROUND-COLOR: transparent; =
+BORDER-BOTTOM-STYLE: none
+}
+DIV#simpleSearch BUTTON#searchButton IMG {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+-3px 0px 0px; BORDER-TOP-STYLE: none; PADDING-TOP: 0px; =
+BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: =
+none
+}
+UNKNOWN {
+	MARGIN: 0px
+}
+DIV#mw-panel {
+	LEFT: 0px; WIDTH: 10em; PADDING-TOP: 1em; POSITION: absolute; TOP: =
+160px
+}
+DIV#mw-panel DIV.portal {
+	PADDING-BOTTOM: 1.5em; DIRECTION: ltr
+}
+DIV#mw-panel DIV.portal H5 {
+	PADDING-RIGHT: 0.25em; PADDING-LEFT: 1.75em; FONT-WEIGHT: normal; =
+FONT-SIZE: 0.75em; PADDING-BOTTOM: 0.25em; CURSOR: default; COLOR: =
+#444444; BORDER-TOP-STYLE: none; PADDING-TOP: 0px; BORDER-RIGHT-STYLE: =
+none; BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+DIV#mw-panel DIV.portal DIV.body {
+	BACKGROUND-POSITION: left top; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/portal-break.png?2011-0=
+8-20T20:56:40Z); MARGIN: 0px 0px 0px 1.25em; PADDING-TOP: 0.5em; =
+BACKGROUND-REPEAT: no-repeat
+}
+DIV#mw-panel DIV.portal DIV.body UL {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; LIST-STYLE-IMAGE: none; =
+PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-TOP: 0px; LIST-STYLE-TYPE: =
+none
+}
+DIV#mw-panel DIV.portal DIV.body UL LI {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-SIZE: 0.75em; =
+PADDING-BOTTOM: 0.5em; MARGIN: 0px; OVERFLOW: hidden; LINE-HEIGHT: =
+1.12em; PADDING-TOP: 0px
+}
+DIV#mw-panel DIV.portal DIV.body UL LI A {
+	COLOR: #0645ad
+}
+DIV#mw-panel DIV.portal DIV.body UL LI A:visited {
+	COLOR: #0b0080
+}
+DIV#footer {
+	PADDING-RIGHT: 0.75em; BACKGROUND-POSITION: left top; MARGIN-TOP: 0px; =
+PADDING-LEFT: 0.75em; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/border.png?2011-08-20T2=
+0:56:40Z); PADDING-BOTTOM: 0.75em; MARGIN-LEFT: 10em; DIRECTION: ltr; =
+PADDING-TOP: 0.75em; BACKGROUND-REPEAT: repeat-x
+}
+DIV#footer UL {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; LIST-STYLE-IMAGE: none; =
+PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-TOP: 0px; LIST-STYLE-TYPE: =
+none
+}
+DIV#footer UL LI {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-SIZE: 0.7em; =
+PADDING-BOTTOM: 0.5em; MARGIN: 0px; COLOR: #333333; PADDING-TOP: 0.5em
+}
+DIV#footer #footer-icons {
+	FLOAT: right
+}
+BODY.ltr DIV#footer #footer-places {
+	FLOAT: left
+}
+DIV#footer #footer-info LI {
+	LINE-HEIGHT: 1.4em
+}
+DIV#footer #footer-icons LI {
+	FLOAT: left; MARGIN-LEFT: 0.5em; LINE-HEIGHT: 2em
+}
+DIV#footer #footer-places LI {
+	FLOAT: left; LINE-HEIGHT: 2em; MARGIN-RIGHT: 1em
+}
+#p-logo {
+	LEFT: 0px; WIDTH: 10em; POSITION: absolute; TOP: -160px; HEIGHT: 160px
+}
+#p-logo A {
+	BACKGROUND-POSITION: center center; DISPLAY: block; WIDTH: 10em; =
+BACKGROUND-REPEAT: no-repeat; HEIGHT: 160px; TEXT-DECORATION: none
+}
+#preftoc {
+	CLEAR: both; PADDING-RIGHT: 0px! important; BACKGROUND-POSITION: left =
+bottom; PADDING-LEFT: 0px! important; FLOAT: left; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/preferences-break.png?2=
+011-08-20T20:56:40Z); PADDING-BOTTOM: 0px! important; MARGIN: 0px; =
+WIDTH: 100%; PADDING-TOP: 0px! important; BACKGROUND-REPEAT: no-repeat
+}
+#preftoc LI {
+	PADDING-RIGHT: 1px; BACKGROUND-POSITION: right bottom; PADDING-LEFT: =
+0px; FLOAT: left; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/preferences-break.png?2=
+011-08-20T20:56:40Z); LIST-STYLE-IMAGE: none; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; PADDING-TOP: 0px; BACKGROUND-REPEAT: no-repeat; =
+WHITE-SPACE: nowrap; LIST-STYLE-TYPE: none; HEIGHT: 2.25em
+}
+#preftoc LI:unknown {
+	MARGIN-LEFT: 1px
+}
+#preftoc A {
+	PADDING-RIGHT: 0.5em; DISPLAY: inline-block; PADDING-LEFT: 0.5em; =
+FONT-SIZE: 0.9em; BACKGROUND-IMAGE: none; PADDING-BOTTOM: 0.5em; COLOR: =
+#0645ad; PADDING-TOP: 0.5em; POSITION: relative; TEXT-DECORATION: none
+}
+#preftoc A:active {
+	PADDING-RIGHT: 0.5em; DISPLAY: inline-block; PADDING-LEFT: 0.5em; =
+FONT-SIZE: 0.9em; BACKGROUND-IMAGE: none; PADDING-BOTTOM: 0.5em; COLOR: =
+#0645ad; PADDING-TOP: 0.5em; POSITION: relative; TEXT-DECORATION: none
+}
+#preftoc A:hover {
+	TEXT-DECORATION: underline
+}
+#preftoc A:unknown {
+	TEXT-DECORATION: underline
+}
+#preftoc LI.selected A {
+	BACKGROUND-POSITION: 50% bottom; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/preferences-fade.png?20=
+11-08-20T20:56:40Z); COLOR: #333333; BACKGROUND-REPEAT: repeat-x; =
+TEXT-DECORATION: none
+}
+#preferences {
+	CLEAR: both; BORDER-RIGHT: #cccccc 1px solid; BORDER-TOP: #cccccc 1px =
+solid; FLOAT: left; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/preferences-base.png?20=
+11-08-20T20:56:40Z); MARGIN: -2px 0px 0px; BORDER-LEFT: #cccccc 1px =
+solid; WIDTH: 100%; BORDER-BOTTOM: #cccccc 1px solid; BACKGROUND-COLOR: =
+#f9f9f9
+}
+#preferences FIELDSET.prefsection {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+1em; BORDER-TOP-STYLE: none; PADDING-TOP: 0px; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+#preferences FIELDSET.prefsection FIELDSET {
+	BORDER-TOP: #cccccc 1px solid; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+#preferences LEGEND {
+	COLOR: #666666
+}
+#preferences FIELDSET.prefsection LEGEND.mainLegend {
+	DISPLAY: none
+}
+#preferences TD {
+	PADDING-RIGHT: 0.5em; PADDING-LEFT: 0.5em
+}
+#preferences TD.htmlform-tip {
+	PADDING-RIGHT: 2em; PADDING-LEFT: 2em; FONT-SIZE: x-small; =
+PADDING-BOTTOM: 0.2em; COLOR: #666666; PADDING-TOP: 0.2em
+}
+#preferences DIV.mw-prefs-buttons {
+	PADDING-RIGHT: 1em; PADDING-LEFT: 1em; PADDING-BOTTOM: 1em; =
+PADDING-TOP: 1em
+}
+#preferences DIV.mw-prefs-buttons INPUT {
+	MARGIN-RIGHT: 0.25em
+}
+#userlogin {
+	BORDER-RIGHT: #cccccc 1px solid; PADDING-RIGHT: 1.2em; BORDER-TOP: =
+#cccccc 1px solid; PADDING-LEFT: 1.2em; FLOAT: left; PADDING-BOTTOM: =
+1.2em; MARGIN: 0.5em; BORDER-LEFT: #cccccc 1px solid; PADDING-TOP: =
+1.2em; BORDER-BOTTOM: #cccccc 1px solid
+}
+#userloginForm {
+	BORDER-RIGHT: #cccccc 1px solid; PADDING-RIGHT: 1.2em; BORDER-TOP: =
+#cccccc 1px solid; PADDING-LEFT: 1.2em; FLOAT: left; PADDING-BOTTOM: =
+1.2em; MARGIN: 0.5em; BORDER-LEFT: #cccccc 1px solid; PADDING-TOP: =
+1.2em; BORDER-BOTTOM: #cccccc 1px solid
+}
+#userlogin {
+	WIDTH: 40em; min-width: 20em; max-width: 90%
+}
+DIV#content {
+	LINE-HEIGHT: 1.5em
+}
+#bodyContent {
+	FONT-SIZE: 0.8em
+}
+A {
+	BACKGROUND: none transparent scroll repeat 0% 0%; COLOR: #0645ad; =
+TEXT-DECORATION: none
+}
+A:visited {
+	COLOR: #0b0080
+}
+A:active {
+	COLOR: #faa700
+}
+A:hover {
+	TEXT-DECORATION: underline
+}
+A:unknown {
+	TEXT-DECORATION: underline
+}
+A.stub {
+	COLOR: #772233
+}
+A.new {
+	COLOR: #ba0000
+}
+#p-personal A.new {
+	COLOR: #ba0000
+}
+A.new:visited {
+	COLOR: #a55858
+}
+#p-personal A.new:visited {
+	COLOR: #a55858
+}
+IMG {
+	VERTICAL-ALIGN: middle; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: =
+none; BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+HR {
+	BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; BORDER-BOTTOM-WIDTH: =
+0px; MARGIN: 0.2em 0px; COLOR: #aaa; HEIGHT: 1px; BACKGROUND-COLOR: =
+#aaa; BORDER-RIGHT-WIDTH: 0px
+}
+H1 {
+	FONT-WEIGHT: normal; BACKGROUND: none transparent scroll repeat 0% 0%; =
+PADDING-BOTTOM: 0.17em; MARGIN: 0px; OVERFLOW: hidden; WIDTH: auto; =
+COLOR: black; PADDING-TOP: 0.5em; BORDER-BOTTOM: #aaa 1px solid
+}
+H2 {
+	FONT-WEIGHT: normal; BACKGROUND: none transparent scroll repeat 0% 0%; =
+PADDING-BOTTOM: 0.17em; MARGIN: 0px; OVERFLOW: hidden; WIDTH: auto; =
+COLOR: black; PADDING-TOP: 0.5em; BORDER-BOTTOM: #aaa 1px solid
+}
+H3 {
+	FONT-WEIGHT: normal; BACKGROUND: none transparent scroll repeat 0% 0%; =
+PADDING-BOTTOM: 0.17em; MARGIN: 0px; OVERFLOW: hidden; WIDTH: auto; =
+COLOR: black; PADDING-TOP: 0.5em; BORDER-BOTTOM: #aaa 1px solid
+}
+H4 {
+	FONT-WEIGHT: normal; BACKGROUND: none transparent scroll repeat 0% 0%; =
+PADDING-BOTTOM: 0.17em; MARGIN: 0px; OVERFLOW: hidden; WIDTH: auto; =
+COLOR: black; PADDING-TOP: 0.5em; BORDER-BOTTOM: #aaa 1px solid
+}
+H5 {
+	FONT-WEIGHT: normal; BACKGROUND: none transparent scroll repeat 0% 0%; =
+PADDING-BOTTOM: 0.17em; MARGIN: 0px; OVERFLOW: hidden; WIDTH: auto; =
+COLOR: black; PADDING-TOP: 0.5em; BORDER-BOTTOM: #aaa 1px solid
+}
+H6 {
+	FONT-WEIGHT: normal; BACKGROUND: none transparent scroll repeat 0% 0%; =
+PADDING-BOTTOM: 0.17em; MARGIN: 0px; OVERFLOW: hidden; WIDTH: auto; =
+COLOR: black; PADDING-TOP: 0.5em; BORDER-BOTTOM: #aaa 1px solid
+}
+H1 {
+	FONT-SIZE: 188%
+}
+H1 .editsection {
+	FONT-SIZE: 53%
+}
+H2 {
+	FONT-SIZE: 150%
+}
+H2 .editsection {
+	FONT-SIZE: 67%
+}
+H3 {
+	FONT-WEIGHT: bold; BORDER-BOTTOM-STYLE: none
+}
+H4 {
+	FONT-WEIGHT: bold; BORDER-BOTTOM-STYLE: none
+}
+H5 {
+	FONT-WEIGHT: bold; BORDER-BOTTOM-STYLE: none
+}
+H6 {
+	FONT-WEIGHT: bold; BORDER-BOTTOM-STYLE: none
+}
+H3 {
+	FONT-SIZE: 132%
+}
+H3 .editsection {
+	FONT-WEIGHT: normal; FONT-SIZE: 76%
+}
+H4 {
+	FONT-SIZE: 116%
+}
+H4 .editsection {
+	FONT-WEIGHT: normal; FONT-SIZE: 86%
+}
+H5 {
+	FONT-SIZE: 100%
+}
+H5 .editsection {
+	FONT-WEIGHT: normal
+}
+H6 {
+	FONT-SIZE: 80%
+}
+H6 .editsection {
+	FONT-WEIGHT: normal; FONT-SIZE: 125%
+}
+.editsection {
+	FLOAT: right
+}
+P {
+	MARGIN: 0.4em 0px 0.5em; LINE-HEIGHT: 1.5em
+}
+P IMG {
+	MARGIN: 0px
+}
+Q {
+	FONT-STYLE: italic; FONT-FAMILY: Times,"Times New Roman",serif
+}
+PRE {
+	FONT-FAMILY: monospace,"Courier New"
+}
+CODE {
+	FONT-FAMILY: monospace,"Courier New"
+}
+TT {
+	FONT-FAMILY: monospace,"Courier New"
+}
+KBD {
+	FONT-FAMILY: monospace,"Courier New"
+}
+SAMP {
+	FONT-FAMILY: monospace,"Courier New"
+}
+CODE {
+	BACKGROUND-COLOR: #f9f9f9
+}
+PRE {
+	BORDER-RIGHT: #2f6fab 1px dashed; PADDING-RIGHT: 1em; BORDER-TOP: =
+#2f6fab 1px dashed; PADDING-LEFT: 1em; PADDING-BOTTOM: 1em; BORDER-LEFT: =
+#2f6fab 1px dashed; COLOR: black; LINE-HEIGHT: 1.1em; PADDING-TOP: 1em; =
+BORDER-BOTTOM: #2f6fab 1px dashed; BACKGROUND-COLOR: #f9f9f9
+}
+UL {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; LIST-STYLE-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/bullet-icon.png?2011-08=
+-20T20:56:40Z); PADDING-BOTTOM: 0px; MARGIN: 0.3em 0px 0px 1.5em; =
+LINE-HEIGHT: 1.5em; PADDING-TOP: 0px; LIST-STYLE-TYPE: square
+}
+OL {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; LIST-STYLE-IMAGE: none; =
+PADDING-BOTTOM: 0px; MARGIN: 0.3em 0px 0px 3.2em; LINE-HEIGHT: 1.5em; =
+PADDING-TOP: 0px
+}
+LI {
+	MARGIN-BOTTOM: 0.1em
+}
+DT {
+	FONT-WEIGHT: bold; MARGIN-BOTTOM: 0.1em
+}
+DL {
+	MARGIN-TOP: 0.2em; MARGIN-BOTTOM: 0.5em
+}
+DD {
+	MARGIN-BOTTOM: 0.1em; MARGIN-LEFT: 2em; LINE-HEIGHT: 1.5em
+}
+TABLE {
+	FONT-SIZE: 100%
+}
+FIELDSET {
+	BORDER-RIGHT: #2f6fab 1px solid; PADDING-RIGHT: 1em; BORDER-TOP: =
+#2f6fab 1px solid; PADDING-LEFT: 1em; PADDING-BOTTOM: 1em; MARGIN: 1em =
+0px; BORDER-LEFT: #2f6fab 1px solid; LINE-HEIGHT: 1.5em; PADDING-TOP: =
+0px; BORDER-BOTTOM: #2f6fab 1px solid
+}
+FIELDSET.nested {
+	PADDING-RIGHT: 0.5em; PADDING-LEFT: 0.5em; PADDING-BOTTOM: 0.5em; =
+MARGIN: 0px 0px 0.5em; PADDING-TOP: 0px
+}
+LEGEND {
+	PADDING-RIGHT: 0.5em; PADDING-LEFT: 0.5em; FONT-SIZE: 95%; =
+PADDING-BOTTOM: 0.5em; PADDING-TOP: 0.5em
+}
+FORM {
+	MARGIN: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+TEXTAREA {
+	PADDING-RIGHT: 0.1em; PADDING-LEFT: 0.1em; PADDING-BOTTOM: 0.1em; =
+WIDTH: 100%; PADDING-TOP: 0.1em
+}
+SELECT {
+	VERTICAL-ALIGN: top
+}
+#toc {
+	BORDER-RIGHT: #aaa 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: #aaa 1px =
+solid; PADDING-LEFT: 5px; FONT-SIZE: 95%; PADDING-BOTTOM: 5px; =
+BORDER-LEFT: #aaa 1px solid; PADDING-TOP: 5px; BORDER-BOTTOM: #aaa 1px =
+solid; BACKGROUND-COLOR: #f9f9f9
+}
+.toc {
+	BORDER-RIGHT: #aaa 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: #aaa 1px =
+solid; PADDING-LEFT: 5px; FONT-SIZE: 95%; PADDING-BOTTOM: 5px; =
+BORDER-LEFT: #aaa 1px solid; PADDING-TOP: 5px; BORDER-BOTTOM: #aaa 1px =
+solid; BACKGROUND-COLOR: #f9f9f9
+}
+.mw-warning {
+	BORDER-RIGHT: #aaa 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: #aaa 1px =
+solid; PADDING-LEFT: 5px; FONT-SIZE: 95%; PADDING-BOTTOM: 5px; =
+BORDER-LEFT: #aaa 1px solid; PADDING-TOP: 5px; BORDER-BOTTOM: #aaa 1px =
+solid; BACKGROUND-COLOR: #f9f9f9
+}
+#toc H2 {
+	PADDING-RIGHT: 0px; DISPLAY: inline; PADDING-LEFT: 0px; FONT-WEIGHT: =
+bold; FONT-SIZE: 100%; PADDING-BOTTOM: 0px; BORDER-TOP-STYLE: none; =
+PADDING-TOP: 0px; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; =
+BORDER-BOTTOM-STYLE: none
+}
+.toc H2 {
+	PADDING-RIGHT: 0px; DISPLAY: inline; PADDING-LEFT: 0px; FONT-WEIGHT: =
+bold; FONT-SIZE: 100%; PADDING-BOTTOM: 0px; BORDER-TOP-STYLE: none; =
+PADDING-TOP: 0px; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; =
+BORDER-BOTTOM-STYLE: none
+}
+#toc #toctitle {
+	TEXT-ALIGN: center
+}
+.toc #toctitle {
+	TEXT-ALIGN: center
+}
+#toc .toctitle {
+	TEXT-ALIGN: center
+}
+.toc .toctitle {
+	TEXT-ALIGN: center
+}
+#toc UL {
+	PADDING-LEFT: 0px; LIST-STYLE-IMAGE: none; MARGIN-LEFT: 0px; =
+LIST-STYLE-TYPE: none; TEXT-ALIGN: left
+}
+.toc UL {
+	PADDING-LEFT: 0px; LIST-STYLE-IMAGE: none; MARGIN-LEFT: 0px; =
+LIST-STYLE-TYPE: none; TEXT-ALIGN: left
+}
+#toc UL UL {
+	MARGIN: 0px 0px 0px 2em
+}
+.toc UL UL {
+	MARGIN: 0px 0px 0px 2em
+}
+#toc .toctoggle {
+	FONT-SIZE: 94%
+}
+.toc .toctoggle {
+	FONT-SIZE: 94%
+}
+DIV.floatright {
+	BORDER-TOP-WIDTH: 0px; CLEAR: right; BORDER-LEFT-WIDTH: 0px; FLOAT: =
+right; BORDER-BOTTOM-WIDTH: 0px; MARGIN: 0px 0px 0.5em 0.5em; POSITION: =
+relative; BORDER-RIGHT-WIDTH: 0px
+}
+TABLE.floatright {
+	BORDER-TOP-WIDTH: 0px; CLEAR: right; BORDER-LEFT-WIDTH: 0px; FLOAT: =
+right; BORDER-BOTTOM-WIDTH: 0px; MARGIN: 0px 0px 0.5em 0.5em; POSITION: =
+relative; BORDER-RIGHT-WIDTH: 0px
+}
+DIV.floatright P {
+	FONT-STYLE: italic
+}
+DIV.floatleft {
+	BORDER-TOP-WIDTH: 0px; CLEAR: left; BORDER-LEFT-WIDTH: 0px; FLOAT: =
+left; BORDER-BOTTOM-WIDTH: 0px; MARGIN: 0px 0.5em 0.5em 0px; POSITION: =
+relative; BORDER-RIGHT-WIDTH: 0px
+}
+TABLE.floatleft {
+	BORDER-TOP-WIDTH: 0px; CLEAR: left; BORDER-LEFT-WIDTH: 0px; FLOAT: =
+left; BORDER-BOTTOM-WIDTH: 0px; MARGIN: 0px 0.5em 0.5em 0px; POSITION: =
+relative; BORDER-RIGHT-WIDTH: 0px
+}
+DIV.floatleft P {
+	FONT-STYLE: italic
+}
+DIV.thumb {
+	MARGIN-BOTTOM: 0.5em; WIDTH: auto; BACKGROUND-COLOR: transparent
+}
+DIV.thumbinner {
+	BORDER-RIGHT: #ccc 1px solid; PADDING-RIGHT: 3px! important; =
+BORDER-TOP: #ccc 1px solid; PADDING-LEFT: 3px! important; FONT-SIZE: =
+94%; PADDING-BOTTOM: 3px! important; OVERFLOW: hidden; BORDER-LEFT: #ccc =
+1px solid; PADDING-TOP: 3px! important; BORDER-BOTTOM: #ccc 1px solid; =
+BACKGROUND-COLOR: #f9f9f9; TEXT-ALIGN: center
+}
+HTML .thumbimage {
+	BORDER-RIGHT: #ccc 1px solid; BORDER-TOP: #ccc 1px solid; BORDER-LEFT: =
+#ccc 1px solid; BORDER-BOTTOM: #ccc 1px solid
+}
+HTML .thumbcaption {
+	PADDING-RIGHT: 3px! important; PADDING-LEFT: 3px! important; FONT-SIZE: =
+94%; PADDING-BOTTOM: 3px! important; BORDER-TOP-STYLE: none; =
+LINE-HEIGHT: 1.4em; PADDING-TOP: 3px! important; BORDER-RIGHT-STYLE: =
+none; BORDER-LEFT-STYLE: none; TEXT-ALIGN: left; BORDER-BOTTOM-STYLE: =
+none
+}
+DIV.magnify {
+	BACKGROUND: none transparent scroll repeat 0% 0%; FLOAT: right; =
+BORDER-TOP-STYLE: none! important; BORDER-RIGHT-STYLE: none! important; =
+BORDER-LEFT-STYLE: none! important; BORDER-BOTTOM-STYLE: none! important
+}
+DIV.magnify A {
+	DISPLAY: block; BACKGROUND: none transparent scroll repeat 0% 0%; =
+BORDER-TOP-STYLE: none! important; BORDER-RIGHT-STYLE: none! important; =
+BORDER-LEFT-STYLE: none! important; BORDER-BOTTOM-STYLE: none! important
+}
+DIV.magnify IMG {
+	DISPLAY: block; BACKGROUND: none transparent scroll repeat 0% 0%; =
+BORDER-TOP-STYLE: none! important; BORDER-RIGHT-STYLE: none! important; =
+BORDER-LEFT-STYLE: none! important; BORDER-BOTTOM-STYLE: none! important
+}
+DIV.tright {
+	CLEAR: right; FLOAT: right; MARGIN: 0.5em 0px 1.3em 1.4em
+}
+DIV.tleft {
+	CLEAR: left; FLOAT: left; MARGIN: 0.5em 1.4em 1.3em 0px
+}
+IMG.thumbborder {
+	BORDER-RIGHT: #dddddd 1px solid; BORDER-TOP: #dddddd 1px solid; =
+BORDER-LEFT: #dddddd 1px solid; BORDER-BOTTOM: #dddddd 1px solid
+}
+.hiddenStructure {
+	DISPLAY: none
+}
+.mw-warning {
+	MARGIN-LEFT: 50px; MARGIN-RIGHT: 50px; TEXT-ALIGN: center
+}
+.usermessage {
+	BORDER-RIGHT: #ffa500 1px solid; PADDING-RIGHT: 1em; BORDER-TOP: =
+#ffa500 1px solid; PADDING-LEFT: 1em; FONT-WEIGHT: bold; PADDING-BOTTOM: =
+0.5em; MARGIN: 2em 0px 1em; VERTICAL-ALIGN: middle; BORDER-LEFT: #ffa500 =
+1px solid; COLOR: black; PADDING-TOP: 0.5em; BORDER-BOTTOM: #ffa500 1px =
+solid; BACKGROUND-COLOR: #ffce7b
+}
+#siteNotice {
+	FONT-SIZE: 0.8em; MARGIN: 0px; POSITION: relative; TEXT-ALIGN: center
+}
+#localNotice {
+	MARGIN-BOTTOM: 0.9em
+}
+.catlinks {
+	CLEAR: both; BORDER-RIGHT: #aaa 1px solid; PADDING-RIGHT: 5px; =
+BORDER-TOP: #aaa 1px solid; MARGIN-TOP: 1em; PADDING-LEFT: 5px; =
+PADDING-BOTTOM: 5px; BORDER-LEFT: #aaa 1px solid; PADDING-TOP: 5px; =
+BORDER-BOTTOM: #aaa 1px solid; BACKGROUND-COLOR: #f9f9f9
+}
+#siteSub {
+	DISPLAY: none
+}
+#jump-to-nav {
+	DISPLAY: none
+}
+#contentSub {
+	FONT-SIZE: 84%; MARGIN: 0px 0px 1.4em 1em; WIDTH: auto; COLOR: #7d7d7d; =
+LINE-HEIGHT: 1.2em
+}
+#contentSub2 {
+	FONT-SIZE: 84%; MARGIN: 0px 0px 1.4em 1em; WIDTH: auto; COLOR: #7d7d7d; =
+LINE-HEIGHT: 1.2em
+}
+SPAN.subpages {
+	DISPLAY: block
+}
+.center {
+	WIDTH: 100%; TEXT-ALIGN: center
+}
+.center  {
+	MARGIN-LEFT: auto; MARGIN-RIGHT: auto
+}
+.small {
+	FONT-SIZE: 94%
+}
+.small  {
+	FONT-SIZE: 94%
+}
+TABLE.small {
+	FONT-SIZE: 100%
+}
+H1 {
+	MARGIN-BOTTOM: 0.6em
+}
+H2 {
+	MARGIN-BOTTOM: 0.6em
+}
+H3 {
+	MARGIN-BOTTOM: 0.3em
+}
+H4 {
+	MARGIN-BOTTOM: 0.3em
+}
+H5 {
+	MARGIN-BOTTOM: 0.3em
+}
+#firstHeading {
+	MARGIN-TOP: 0px; FONT-SIZE: 1.6em; MARGIN-BOTTOM: 0.1em; =
+PADDING-BOTTOM: 0px; LINE-HEIGHT: 1.2em; PADDING-TOP: 0px
+}
+UNKNOWN {
+	PADDING-RIGHT: 13px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/external-link-ltr-icon.=
+png?2011-08-20T20:56:40Z) no-repeat right center
+}
+UNKNOWN {
+	PADDING-RIGHT: 13px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/lock-icon.png?2011-08-2=
+0T20:56:40Z) no-repeat right center
+}
+UNKNOWN {
+	PADDING-RIGHT: 13px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/mail-icon.png?2011-08-2=
+0T20:56:40Z) no-repeat right center
+}
+UNKNOWN {
+	PADDING-RIGHT: 13px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/news-icon.png?2011-08-2=
+0T20:56:40Z) no-repeat right center
+}
+UNKNOWN {
+	PADDING-RIGHT: 13px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/file-icon.png?2011-08-2=
+0T20:56:40Z) no-repeat right center
+}
+UNKNOWN {
+	PADDING-RIGHT: 13px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/talk-icon.png?2011-08-2=
+0T20:56:40Z) no-repeat right center
+}
+UNKNOWN {
+	PADDING-RIGHT: 13px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/audio-icon.png?2011-08-=
+20T20:56:40Z) no-repeat right center
+}
+UNKNOWN {
+	PADDING-RIGHT: 13px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/video-icon.png?2011-08-=
+20T20:56:40Z) no-repeat right center
+}
+UNKNOWN {
+	PADDING-RIGHT: 13px; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/document-icon.png?2011-=
+08-20T20:56:40Z) no-repeat right center
+}
+DIV#content A.extiw {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND: none transparent =
+scroll repeat 0% 0%; PADDING-BOTTOM: 0px; COLOR: #36b; PADDING-TOP: 0px
+}
+DIV#content A.extiw:active {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND: none transparent =
+scroll repeat 0% 0%; PADDING-BOTTOM: 0px; COLOR: #36b; PADDING-TOP: 0px
+}
+DIV#content A.external {
+	COLOR: #36b
+}
+DIV#content .printfooter {
+	DISPLAY: none
+}
+#pt-userpage {
+	PADDING-LEFT: 15px! important; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/user-icon.png?2011-08-2=
+0T20:56:40Z) no-repeat left top; TEXT-TRANSFORM: none
+}
+#pt-anonuserpage {
+	PADDING-LEFT: 15px! important; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/user-icon.png?2011-08-2=
+0T20:56:40Z) no-repeat left top; TEXT-TRANSFORM: none
+}
+#pt-login {
+	PADDING-LEFT: 15px! important; BACKGROUND: =
+url(http://content.gpwiki.org/skins/vector/images/user-icon.png?2011-08-2=
+0T20:56:40Z) no-repeat left top; TEXT-TRANSFORM: none
+}
+.toccolours {
+	BORDER-RIGHT: #aaa 1px solid; PADDING-RIGHT: 5px; BORDER-TOP: #aaa 1px =
+solid; PADDING-LEFT: 5px; FONT-SIZE: 95%; PADDING-BOTTOM: 5px; =
+BORDER-LEFT: #aaa 1px solid; PADDING-TOP: 5px; BORDER-BOTTOM: #aaa 1px =
+solid; BACKGROUND-COLOR: #f9f9f9
+}
+#bodyContent {
+	WIDTH: 100%; POSITION: relative
+}
+#mw-js-message {
+	FONT-SIZE: 0.8em
+}
+DIV#bodyContent {
+	LINE-HEIGHT: 1.5em
+}
+.icon#ca-unwatch {
+	MARGIN-RIGHT: 1px
+}
+.icon#ca-watch {
+	MARGIN-RIGHT: 1px
+}
+.icon#ca-unwatch A {
+	PADDING-RIGHT: 0px; DISPLAY: block; PADDING-LEFT: 0px; =
+BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/watch-icons.png?2011-08=
+-20T20:56:40Z); PADDING-BOTTOM: 0px; MARGIN: -0.8em 0px 0px; OVERFLOW: =
+hidden; WIDTH: 26px; PADDING-TOP: 3.1em; HEIGHT: 0px; outline: none
+}
+.icon#ca-watch A {
+	PADDING-RIGHT: 0px; DISPLAY: block; PADDING-LEFT: 0px; =
+BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/watch-icons.png?2011-08=
+-20T20:56:40Z); PADDING-BOTTOM: 0px; MARGIN: -0.8em 0px 0px; OVERFLOW: =
+hidden; WIDTH: 26px; PADDING-TOP: 3.1em; HEIGHT: 0px; outline: none
+}
+.icon#ca-unwatch A {
+	BACKGROUND-POSITION: -43px 60%
+}
+.icon#ca-watch A {
+	BACKGROUND-POSITION: 5px 60%
+}
+.icon#ca-unwatch A:hover {
+	BACKGROUND-POSITION: -67px 60%
+}
+.icon#ca-unwatch A:unknown {
+	BACKGROUND-POSITION: -67px 60%
+}
+.icon#ca-watch A:hover {
+	BACKGROUND-POSITION: -19px 60%
+}
+.icon#ca-watch A:unknown {
+	BACKGROUND-POSITION: -19px 60%
+}
+.icon#ca-unwatch A.loading {
+	BACKGROUND-POSITION: 5px 60%; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/watch-icon-loading.gif?=
+2011-08-20T20:56:40Z)
+}
+.icon#ca-watch A.loading {
+	BACKGROUND-POSITION: 5px 60%; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/watch-icon-loading.gif?=
+2011-08-20T20:56:40Z)
+}
+.icon#ca-unwatch A SPAN {
+	DISPLAY: none
+}
+.icon#ca-watch A SPAN {
+	DISPLAY: none
+}
+DIV.vectorTabs UL {
+	BACKGROUND-POSITION: right bottom; BACKGROUND-IMAGE: =
+url(http://content.gpwiki.org/skins/vector/images/tab-break.png?2011-08-2=
+0T20:56:40Z); BACKGROUND-REPEAT: no-repeat
+}
+P.mw-ipb-conveniencelinks {
+	FLOAT: right
+}
+P.mw-protect-editreasons {
+	FLOAT: right
+}
+P.mw-filedelete-editreasons {
+	FLOAT: right
+}
+P.mw-delete-editreasons {
+	FLOAT: right
+}
+.tipsy {
+	FONT-SIZE: 0.8em
+}
+
+}
+
+------=_NextPart_000_0000_01CCCB8A.99487610
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.google.com/coop/cse/brand?form=cse-search-box&lang=en
+
+=0A=
+(function() {=0A=
+var f =3D document.getElementById('cse-search-box');=0A=
+if (!f) {=0A=
+f =3D document.getElementById('searchbox_demo');=0A=
+}=0A=
+if (f && f['q']) {=0A=
+var q =3D f['q'];=0A=
+var n =3D navigator;=0A=
+var l =3D location;=0A=
+var su =3D function () {=0A=
+var u =3D document.createElement('input');=0A=
+var v =3D document.location.toString();=0A=
+var existingSiteurl =3D /(?:[?&]siteurl=3D)([^&#]*)/.exec(v);=0A=
+if (existingSiteurl) {=0A=
+v =3D decodeURI(existingSiteurl[1]);=0A=
+}=0A=
+var delimIndex =3D v.indexOf('://');=0A=
+if (delimIndex >=3D 0) {=0A=
+v =3D v.substring(delimIndex + '://'.length, v.length);=0A=
+}=0A=
+u.name =3D 'siteurl';=0A=
+u.value =3D v;=0A=
+u.type =3D 'hidden';=0A=
+f.appendChild(u);=0A=
+};=0A=
+if (n.appName =3D=3D 'Microsoft Internet Explorer') {=0A=
+var s =3D f.parentNode.childNodes;=0A=
+for (var i =3D 0; i < s.length; i++) {=0A=
+        if (s[i].nodeName =3D=3D 'SCRIPT' &&=0A=
+            s[i].attributes['src'] &&=0A=
+            s[i].attributes['src'].nodeValue =3D=3D =
+unescape('http:\x2F\x2Fwww.google.com\x2Fcoop\x2Fcse\x2Fbrand?form=3Dcse-=
+search-box\x26lang=3Den')) {=0A=
+          su();=0A=
+          break;=0A=
+        }=0A=
+      }=0A=
+    } else {=0A=
+      su();=0A=
+    }=0A=
+=0A=
+    =0A=
+    if (n.platform =3D=3D 'Win32') {=0A=
+      q.style.cssText =3D 'border: 1px solid #7e9db9; padding: 2px;';=0A=
+    }=0A=
+=0A=
+    =0A=
+    if (window.history.navigationMode) {=0A=
+      window.history.navigationMode =3D 'compatible';=0A=
+    }=0A=
+=0A=
+    var b =3D function() {=0A=
+      if (q.value =3D=3D '') {=0A=
+        q.style.background =3D '#FFFFFF =
+url(http:\x2F\x2Fwww.google.com\x2Fcse\x2Fintl\x2Fen\x2Fimages\x2Fgoogle_=
+custom_search_watermark.gif) left no-repeat';=0A=
+      }=0A=
+    };=0A=
+=0A=
+    var f =3D function() {=0A=
+      q.style.background =3D '#ffffff';=0A=
+    };=0A=
+=0A=
+    q.onfocus =3D f;=0A=
+    q.onblur =3D b;=0A=
+=0A=
+    =0A=
+    if (!/[&?]q=3D[^&]/.test(l.search)) {=0A=
+      b();=0A=
+    }=0A=
+  }=0A=
+})();=0A=
+
+------=_NextPart_000_0000_01CCCB8A.99487610
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://pagead2.googlesyndication.com/pagead/show_ads.js
+
+(function(){var g=3D!0,h=3Dnull,j=3D!1,k=3D(new Date).getTime();var =
+m=3Dthis,aa=3Dfunction(a,b){var c=3Da.split("."),e=3Dm;!(c[0]in =
+e)&&e.execScript&&e.execScript("var "+c[0]);for(var =
+d;c.length&&(d=3Dc.shift());)!c.length&&void =
+0!=3D=3Db?e[d]=3Db:e=3De[d]?e[d]:e[d]=3D{}},ba=3Dfunction(a,b,c){return =
+a.call.apply(a.bind,arguments)},ca=3Dfunction(a,b,c){if(!a)throw =
+Error();if(2<arguments.length){var =
+e=3DArray.prototype.slice.call(arguments,2);return function(){var =
+c=3DArray.prototype.slice.call(arguments);Array.prototype.unshift.apply(c=
+,e);return a.apply(b,c)}}return function(){return a.apply(b,=0A=
+arguments)}},n=3Dfunction(a,b,c){n=3DFunction.prototype.bind&&-1!=3DFunct=
+ion.prototype.bind.toString().indexOf("native code")?ba:ca;return =
+n.apply(h,arguments)};var =
+da=3D/&/g,ea=3D/</g,ga=3D/>/g,ha=3D/\"/g,o=3D{"\x00":"\\0","\u0008":"\\b"=
+,"\u000c":"\\f","\n":"\\n","\r":"\\r","\t":"\\t","\u000b":"\\x0B",'"':'\\=
+"',"\\":"\\\\"},r=3D{"'":"\\'"},ja=3Dfunction(a){for(var =
+b=3D0,c=3D(""+ia).replace(/^[\s\xa0]+|[\s\xa0]+$/g,"").split("."),a=3D(""=
++a).replace(/^[\s\xa0]+|[\s\xa0]+$/g,"").split("."),e=3DMath.max(c.length=
+,a.length),d=3D0;0=3D=3Db&&d<e;d++){var =
+f=3Dc[d]||"",qa=3Da[d]||"",v=3DRegExp("(\\d*)(\\D*)","g"),p=3DRegExp("(\\=
+d*)(\\D*)","g");do{var =
+i=3Dv.exec(f)||["","",""],l=3Dp.exec(qa)||["","",""];=0A=
+if(0=3D=3Di[0].length&&0=3D=3Dl[0].length)break;b=3D((0=3D=3Di[1].length?=
+0:parseInt(i[1],10))<(0=3D=3Dl[1].length?0:parseInt(l[1],10))?-1:(0=3D=3D=
+i[1].length?0:parseInt(i[1],10))>(0=3D=3Dl[1].length?0:parseInt(l[1],10))=
+?1:0)||((0=3D=3Di[2].length)<(0=3D=3Dl[2].length)?-1:(0=3D=3Di[2].length)=
+>(0=3D=3Dl[2].length)?1:0)||(i[2]<l[2]?-1:i[2]>l[2]?1:0)}while(0=3D=3Db)}=
+return b};var ka=3Ddocument,t=3Dwindow;var =
+u=3Dfunction(a){return"true"=3D=3Da?g:"false"=3D=3Da?j:j},la=3D/^([\w-]+\=
+.)*([\w-]{2,})(\:[0-9]+)?$/,w=3Dfunction(a){return!a?"pagead2.googlesyndi=
+cation.com":(a=3Da.match(la))?a[0]:"pagead2.googlesyndication.com"};var =
+x=3DparseFloat("0"),ma=3DisNaN(x)||1<x||0>x?0:x;var =
+na=3Du("false"),oa=3Du("false"),pa=3Du("false"),ra=3Du("false");var =
+sa=3Dfunction(){return w("")};var z,A,B,C,ta=3Dfunction(){return =
+m.navigator?m.navigator.userAgent:h};C=3DB=3DA=3Dz=3Dj;var =
+E;if(E=3Dta()){var =
+ua=3Dm.navigator;z=3D0=3D=3DE.indexOf("Opera");A=3D!z&&-1!=3DE.indexOf("M=
+SIE");B=3D!z&&-1!=3DE.indexOf("WebKit");C=3D!z&&!B&&"Gecko"=3D=3Dua.produ=
+ct}var F=3DA,G=3DC,va=3DB,H;=0A=
+a:{var I=3D"",J;if(z&&m.opera)var =
+K=3Dm.opera.version,I=3D"function"=3D=3Dtypeof K?K():K;else =
+if(G?J=3D/rv\:([^\);]+)(\)|;)/:F?J=3D/MSIE\s+([^\);]+)(\)|;)/:va&&(J=3D/W=
+ebKit\/(\S+)/),J)var wa=3DJ.exec(ta()),I=3Dwa?wa[1]:"";if(F){var =
+L,xa=3Dm.document;L=3Dxa?xa.documentMode:void =
+0;if(L>parseFloat(I)){H=3D""+L;break a}}H=3DI}var =
+ia=3DH,M=3D{},ya=3D{},za=3Dfunction(){return =
+ya[9]||(ya[9]=3DF&&document.documentMode&&9<=3Ddocument.documentMode)};!F=
+||za();if(G||F)if(!F||!za())G&&(M["1.9.1"]||(M["1.9.1"]=3D0<=3Dja("1.9.1"=
+)));F&&(M["9"]||(M["9"]=3D0<=3Dja("9")));w("");var =
+N=3Dfunction(a){return!!a&&"function"=3D=3Dtypeof =
+a&&!!a.call},Aa=3Dfunction(a,b){if(!(2>arguments.length))for(var =
+c=3D1,e=3Darguments.length;c<e;++c)a.push(arguments[c])};function =
+O(a){return"function"=3D=3Dtypeof =
+encodeURIComponent?encodeURIComponent(a):escape(a)}function =
+Ba(a,b){a.addEventListener?a.addEventListener("load",b,j):a.attachEvent&&=
+a.attachEvent("onload",b)};aa("google_protectAndRun",function(a,b,c){a=3D=
+n(b,m,a);b=3Dwindow.onerror;window.onerror=3Da;try{c()}catch(e){var =
+c=3De.toString(),d=3D"";e.fileName&&(d=3De.fileName);var =
+f=3D-1;if(e.lineNumber)f=3De.lineNumber;if(!a(c,d,f))throw =
+e;}window.onerror=3Db});=0A=
+aa("google_handleError",function(a,b,c,e){if(0.01>Math.random())a=3D["htt=
+p://",sa(),"/pagead/gen_204","?id=3Djserror","&jscb=3D",na?1:0,"&jscd=3D"=
+,oa?1:0,"&context=3D",O(a),"&msg=3D",O(b),"&file=3D",O(c),"&line=3D",O(e.=
+toString()),"&url=3D",O(ka.URL.substring(0,512)),"&ref=3D",O(ka.referrer.=
+substring(0,512))],a.push(["&client=3D",O(t.google_ad_client),"&format=3D=
+",O(t.google_ad_format),"&slotname=3D",O(t.google_ad_slot),"&output=3D",O=
+(t.google_ad_output),"&ad_type=3D",O(t.google_ad_type)].join("")),a=3Da.j=
+oin(""),t.google_image_requests||=0A=
+(t.google_image_requests=3D[]),b=3Dt.document.createElement("img"),b.src=3D=
+a,t.google_image_requests.push(b);return!pa});var =
+Ca=3Dfunction(a){try{var =
+b=3Da.google_test;a.google_test=3D!b;if(a.google_test=3D=3D=3D!b)return =
+a.google_test=3Db,g}catch(c){}return =
+j},Da=3Dh,Ea=3Dfunction(){if(!Da){for(var =
+a=3Dwindow;a!=3Da.parent&&Ca(a.parent);)a=3Da.parent;Da=3Da}return =
+Da};var =
+P,Q=3Dfunction(a){this.c=3D[];this.a=3Da||window;this.b=3D0;this.d=3Dh},F=
+a=3Dfunction(a,b){this.l=3Da;this.i=3Db};Q.prototype.n=3Dfunction(a,b){0=3D=
+=3Dthis.b&&0=3D=3Dthis.c.length&&(!b||b=3D=3Dwindow)?(this.b=3D2,this.g(n=
+ew =
+Fa(a,window))):this.h(a,b)};Q.prototype.h=3Dfunction(a,b){this.c.push(new=
+ =
+Fa(a,b||this.a));Ga(this)};Q.prototype.o=3Dfunction(a){this.b=3D1;if(a)th=
+is.d=3Dthis.a.setTimeout(n(this.f,this),a)};Q.prototype.f=3Dfunction(){if=
+(1=3D=3Dthis.b){if(this.d!=3Dh)this.a.clearTimeout(this.d),this.d=3Dh;thi=
+s.b=3D0}Ga(this)};=0A=
+Q.prototype.p=3Dfunction(){return =
+g};Q.prototype.nq=3DQ.prototype.n;Q.prototype.nqa=3DQ.prototype.h;Q.proto=
+type.al=3DQ.prototype.o;Q.prototype.rl=3DQ.prototype.f;Q.prototype.sz=3DQ=
+.prototype.p;var =
+Ga=3Dfunction(a){a.a.setTimeout(n(a.m,a),0)};Q.prototype.m=3Dfunction(){i=
+f(0=3D=3Dthis.b&&this.c.length){var =
+a=3Dthis.c.shift();this.b=3D2;a.i.setTimeout(n(this.g,this,a),0);Ga(this)=
+}};Q.prototype.g=3Dfunction(a){this.b=3D0;a.l()};=0A=
+var Ha=3Dfunction(a){try{return a.sz()}catch(b){return =
+j}},Ja=3Dfunction(a){return!!a&&("object"=3D=3Dtypeof =
+a||"function"=3D=3Dtypeof =
+a)&&Ha(a)&&N(a.nq)&&N(a.nqa)&&N(a.al)&&N(a.rl)},Ka=3Dfunction(){if(P&&Ha(=
+P))return P;var a=3DEa(),b=3Da.google_jobrunner;return =
+Ja(b)?P=3Db:a.google_jobrunner=3DP=3Dnew =
+Q(a)},La=3Dfunction(a,b){Ka().nq(a,b)},Ma=3Dfunction(a,b){Ka().nqa(a,b)};=
+var Na=3D/MSIE =
+[2-7]|PlayStation|Gecko\/20090226/i,Oa=3D/Android|Opera/,Pa=3Dfunction(){=
+var =
+a=3DS,b=3DT.google_ad_width,c=3DT.google_ad_height,e=3D["<iframe"],d;for(=
+d in =
+a)a.hasOwnProperty(d)&&Aa(e,d+"=3D"+a[d]);e.push('style=3D"left:0;positio=
+n:absolute;top:0;"');e.push("></iframe>");b=3D"border:none;height:"+c+"px=
+;margin:0;padding:0;position:relative;visibility:visible;width:"+b+"px";r=
+eturn['<ins style=3D"display:inline-table;',b,'"><ins =
+id=3D"',a.id+"_anchor",'" style=3D"display:block;',b,'">',e.join(" =
+"),"</ins></ins>"].join("")};var =
+Qa=3Dfunction(){},Sa=3Dfunction(a,b,c){switch(typeof b){case =
+"string":Ra(b,c);break;case =
+"number":c.push(isFinite(b)&&!isNaN(b)?b:"null");break;case =
+"boolean":c.push(b);break;case "undefined":c.push("null");break;case =
+"object":if(b=3D=3Dh){c.push("null");break}if(b instanceof Array){var =
+e=3Db.length;c.push("[");for(var =
+d=3D"",f=3D0;f<e;f++)c.push(d),Sa(a,b[f],c),d=3D",";c.push("]");break}c.p=
+ush("{");e=3D"";for(d in =
+b)b.hasOwnProperty(d)&&(f=3Db[d],"function"!=3Dtypeof =
+f&&(c.push(e),Ra(d,c),c.push(":"),Sa(a,f,c),e=3D=0A=
+","));c.push("}");break;case "function":break;default:throw =
+Error("Unknown type: "+typeof =
+b);}},Ta=3D{'"':'\\"',"\\":"\\\\","/":"\\/","\u0008":"\\b","\u000c":"\\f"=
+,"\n":"\\n","\r":"\\r","\t":"\\t","\u000b":"\\u000b"},Ua=3D/\uffff/.test(=
+"\uffff")?/[\\\"\x00-\x1f\x7f-\uffff]/g:/[\\\"\x00-\x1f\x7f-\xff]/g,Ra=3D=
+function(a,b){b.push('"');b.push(a.replace(Ua,function(a){if(a in =
+Ta)return Ta[a];var =
+b=3Da.charCodeAt(0),d=3D"\\u";16>b?d+=3D"000":256>b?d+=3D"00":4096>b&&(d+=
+=3D"0");return Ta[a]=3Dd+b.toString(16)}));b.push('"')};var =
+U=3D"google_ad_block,google_ad_channel,google_ad_client,google_ad_format,=
+google_ad_height,google_ad_host,google_ad_host_channel,google_ad_host_tie=
+r_id,google_ad_output,google_ad_override,google_ad_region,google_ad_secti=
+on,google_ad_slot,google_ad_type,google_ad_width,google_adtest,google_all=
+ow_expandable_ads,google_alternate_ad_url,google_alternate_color,google_a=
+nalytics_domain_name,google_analytics_uacct,google_bid,google_city,google=
+_color_bg,google_color_border,google_color_line,google_color_link,google_=
+color_text,google_color_url,google_container_id,google_contents,google_co=
+untry,google_cpm,google_ctr_threshold,google_cust_age,google_cust_ch,goog=
+le_cust_gender,google_cust_id,google_cust_interests,google_cust_job,googl=
+e_cust_l,google_cust_lh,google_cust_u_url,google_disable_video_autoplay,g=
+oogle_ed,google_eids,google_enable_ose,google_encoding,google_font_face,g=
+oogle_font_size,google_frame_id,google_gl,google_hints,google_image_size,=
+google_kw,google_kw_type,google_language,google_max_num_ads,google_max_ra=
+dlink_len,google_num_radlinks,google_num_radlinks_per_unit,google_num_slo=
+ts_to_rotate,google_only_ads_with_video,google_only_pyv_ads,google_only_u=
+serchoice_ads,google_override_format,google_page_url,google_previous_watc=
+h,google_previous_searches,google_referrer_url,google_region,google_reuse=
+_colors,google_rl_dest_url,google_rl_filtering,google_rl_mode,google_rt,g=
+oogle_safe,google_scs,google_skip,google_tag_info,google_targeting,google=
+_tfs,google_tl,google_ui_features,google_ui_version,google_video_doc_id,g=
+oogle_video_product_type,google_with_pyv_ads".split(",");var =
+V=3Dfunction(a){this.a=3Da;a.google_iframe_oncopy||(a.google_iframe_oncop=
+y=3D{handlers:{},log:[],img:0.01>Math.random()?[]:h});this.e=3Da.google_i=
+frame_oncopy;a.setTimeout(n(this.k,this),3E4)},Va;var W=3D"var =
+i=3Dthis.id,s=3Dwindow.google_iframe_oncopy,H=3Ds&&s.handlers,h=3DH&&H[i]=
+,w=3Dthis.contentWindow,d;try{d=3Dw.document}catch(e){}if(h&&d&&(!d.body|=
+|!d.body.firstChild)){if(h.call){i+=3D'.call';setTimeout(h,0)}else =
+if(h.match){i+=3D'.nav';w.location.replace(h)}s.log&&s.log.push(i)}";=0A=
+/[&<>\"]/.test(W)&&(-1!=3DW.indexOf("&")&&(W=3DW.replace(da,"&amp;")),-1!=
+=3DW.indexOf("<")&&(W=3DW.replace(ea,"&lt;")),-1!=3DW.indexOf(">")&&(W=3D=
+W.replace(ga,"&gt;")),-1!=3DW.indexOf('"')&&(W=3DW.replace(ha,"&quot;")))=
+;Va=3DW;V.prototype.set=3Dfunction(a,b){this.e.handlers[a]=3Db;this.a.add=
+EventListener&&this.a.addEventListener("load",n(this.j,this,a),j)};V.prot=
+otype.j=3Dfunction(a){var =
+a=3Dthis.a.document.getElementById(a),b=3Da.contentWindow.document;if(a.o=
+nload&&b&&(!b.body||!b.body.firstChild))a.onload()};=0A=
+V.prototype.k=3Dfunction(){if(this.e.img){var =
+a=3Dthis.e.log,b=3Dthis.a.document;if(a.length)b=3D["http://",sa(),"/page=
+ad/gen_204?id=3Diframecopy&log=3D",O(a.join("-")),"&url=3D",O(b.URL.subst=
+ring(0,512)),"&ref=3D",O(b.referrer.substring(0,512))].join(""),a.length=3D=
+0,a=3Dnew Image,this.e.img.push(a),a.src=3Db}};var Wa=3Dfunction(){var =
+a=3D"script",b=3Dw(""),c=3D"",c=3Dra?"https":"http";return["<",a,' =
+src=3D"',[c,"://",b,"/pagead/js/r20111207/r20110914/show_ads_impl.js"].jo=
+in(""),'"></',a,">"].join("")},Xa=3Dfunction(a,b,c,e){return =
+function(){var d=3Dj;e&&Ka().al(3E4);try{var =
+f;try{f=3D!!a.document.getElementById(b).contentWindow.document}catch(qa)=
+{f=3Dj}if(f){var v=3D=0A=
+a.document.getElementById(b).contentWindow,p=3Dv.document;if(!p.body||!p.=
+body.firstChild)p.open(),v.google_async_iframe_close=3Dg,p.write(c)}else{=
+var =
+i=3Da.document.getElementById(b).contentWindow,l;f=3Dc;f=3D""+f;if(f.quot=
+e)l=3Df.quote();else{v=3D['"'];for(p=3D0;p<f.length;p++){var =
+R=3Df.charAt(p),Ia=3DR.charCodeAt(0),ob=3Dv,pb=3Dp+1,fa;if(!(fa=3Do[R])){=
+var D;if(31<Ia&&127>Ia)D=3DR;else{var s=3DR;if(s in r)D=3Dr[s];else if(s =
+in o)D=3Dr[s]=3Do[s];else{var =
+q=3Ds,y=3Ds.charCodeAt(0);if(31<y&&127>y)q=3Ds;else{if(256>y){if(q=3D"\\x=
+",16>y||256<=0A=
+y)q+=3D"0"}else =
+q=3D"\\u",4096>y&&(q+=3D"0");q+=3Dy.toString(16).toUpperCase()}D=3Dr[s]=3D=
+q}}fa=3DD}ob[pb]=3Dfa}v.push('"');l=3Dv.join("")}i.location.replace("java=
+script:"+l)}d=3Dg}catch(wb){i=3DEa().google_jobrunner,Ja(i)&&i.rl()}d&&(n=
+ew =
+V(a)).set(b,Xa(a,b,c,j))}};window.google_loader_used=3Dg;(function(a){if(=
+!("google_onload_fired"in =
+a))a.google_onload_fired=3Dj,Ba(a,function(){a.google_onload_fired=3Dg})}=
+)(window);if(!window.google_loader_experiment){var Ya;a:{var =
+Za=3D["async_bad_black","block_bad_black"];if(!(1.0E-4>Math.random())){va=
+r =
+$a=3DMath.random();if($a<ma){Ya=3DZa[Math.floor($a/ma*Za.length)];break =
+a}}Ya=3Dh}window.google_loader_experiment=3DYa||""||"launch"}var ab;=0A=
+a:{try{if(window.google_enable_async!=3D=3Dg&&"blockodd"=3D=3Dwindow.goog=
+le_loader_experiment&&1=3D=3Dwindow.top.location.hostname.length%2){ab=3D=
+j;break a}}catch(bb){}ab=3Dg}var cb;if(cb=3Dab){var =
+db;if(window.google_enable_async=3D=3D=3Dj)db=3D0;else{var =
+eb=3Dnavigator.userAgent,fb=3Dwindow.google_loader_experiment;db=3D(Na.te=
+st(eb)?j:Oa.test(eb)?"async_bad_black"=3D=3Dfb:g)&&!window.google_contain=
+er_id&&(!window.google_ad_output||"html"=3D=3Dwindow.google_ad_output)}cb=
+=3Ddb}=0A=
+if(cb){var =
+gb=3Dwindow;gb.google_unique_id?++gb.google_unique_id:gb.google_unique_id=
+=3D1;var =
+X=3Dwindow;if(!X.google_slot_list||!X.google_slot_list.push)X.google_slot=
+_list=3D[];X.google_slot_list.push([X.google_ad_slot||"",X.google_ad_form=
+at||"",X.google_ad_width||"",X.google_ad_height||""].join("."));for(var =
+Y=3Dwindow,_script$$inline_107=3D"script",Z,T=3DY,S=3D{allowtransparency:=
+'"true"',frameborder:'"0"',height:'"'+Y.google_ad_height+'"',hspace:'"0"'=
+,marginwidth:'"0"',marginheight:'"0"',onload:'"'+Va+'"',scrolling:'"no"',=0A=
+vspace:'"0"',width:'"'+Y.google_ad_width+'"'},hb=3DT.document,$=3DS.id,ib=
+=3D0;!$||T.document.getElementById($);)$=3D"aswift_"+ib++;S.id=3D$;S.name=
+=3D$;hb.write(Pa());Z=3D$;var =
+jb;Y.google_page_url&&(Y.google_page_url=3D""+Y.google_page_url);for(var =
+kb=3D[],lb=3D0,mb=3DU.length;lb<mb;lb++){var =
+nb=3DU[lb];if(Y[nb]!=3Dh){var qb;try{var rb=3D[];Sa(new =
+Qa,Y[nb],rb);qb=3Drb.join("")}catch(sb){}qb&&Aa(kb,nb,"=3D",qb,";")}}jb=3D=
+kb.join("");for(var tb=3D0,ub=3DU.length;tb<ub;tb++)Y[U[tb]]=3Dh;var =
+vb=3D(new Date).getTime(),xb=3Dwindow.google_loader_experiment,=0A=
+yb=3D["<!doctype =
+html><html><body><",_script$$inline_107,">",jb,"google_show_ads_impl=3Dtr=
+ue;google_unique_id=3D",Y.google_unique_id,';google_async_iframe_id=3D"',=
+Z,'";google_start_time=3D',k,";",xb?'google_loader_experiment=3D"'+xb+'";=
+':"","google_bpp=3D",vb>k?vb-k:1,";</",_script$$inline_107,">",Wa(),"</bo=
+dy></html>"].join("");(Y.document.getElementById(Z)?La:Ma)(Xa(Y,Z,yb,g))}=
+else window.q=3Dk,document.write(Wa());})();=0A=
+
+------=_NextPart_000_0000_01CCCB8A.99487610
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://content.gpwiki.org/load.php?debug=false&lang=en-gb&modules=startup&only=scripts&skin=vector&*
+
+var =
+isCompatible=3Dfunction(){if(navigator.appVersion.indexOf('MSIE')!=3D=3D-=
+1&&parseFloat(navigator.appVersion.split('MSIE')[1])<6){return =
+false;}return true;};var =
+startUp=3Dfunction(){mediaWiki.loader.register([["site","1320541239",[],"=
+site"],["startup","20111109130705",[],"startup"],["user","1320541239",[],=
+"user"],["user.options","1320541239",[],"private"],["skins.vector","13205=
+41239",[]],["skins.monobook","1320541239",[]],["skins.simple","1320541239=
+",[]],["skins.chick","1320541239",[]],["skins.modern","1320541239",[]],["=
+skins.cologneblue","1320541239",[]],["skins.nostalgia","1320541239",[]],[=
+"skins.standard","1320541239",[]],["jquery","1320541239",[]],["jquery.asy=
+nc","1320541239",[]],["jquery.autoEllipsis","1320541239",["jquery.highlig=
+htText"]],["jquery.checkboxShiftClick","1320541239",[]],["jquery.client",=
+"1320541239",[]],["jquery.collapsibleTabs","1320541239",[]],["jquery.colo=
+r","1320541239",[]],["jquery.cookie","1320541239",[]],["jquery.delayedBin=
+d","1320541239",[]],[=0A=
+"jquery.expandableField","1320541239",[]],["jquery.highlightText","132054=
+1239",[]],["jquery.placeholder","1320541239",[]],["jquery.localize","1320=
+541239",[]],["jquery.suggestions","1320541239",["jquery.autoEllipsis"]],[=
+"jquery.tabIndex","1320541239",[]],["jquery.textSelection","1320541239",[=
+]],["jquery.tipsy","1320541239",[]],["jquery.ui.core","1320541239",["jque=
+ry"]],["jquery.ui.widget","1320541239",[]],["jquery.ui.mouse","1320541239=
+",["jquery.ui.widget"]],["jquery.ui.position","1320541239",[]],["jquery.u=
+i.draggable","1320541239",["jquery.ui.core","jquery.ui.mouse","jquery.ui.=
+widget"]],["jquery.ui.droppable","1320541239",["jquery.ui.core","jquery.u=
+i.mouse","jquery.ui.widget","jquery.ui.draggable"]],["jquery.ui.resizable=
+","1320541239",["jquery.ui.core","jquery.ui.widget","jquery.ui.mouse"]],[=
+"jquery.ui.selectable","1320541239",["jquery.ui.core","jquery.ui.widget",=
+"jquery.ui.mouse"]],["jquery.ui.sortable","1320541239",["jquery.ui.core",=
+"jquery.ui.widget","jquery.ui.mouse"]],[=0A=
+"jquery.ui.accordion","1320541239",["jquery.ui.core","jquery.ui.widget"]]=
+,["jquery.ui.autocomplete","1320541239",["jquery.ui.core","jquery.ui.widg=
+et","jquery.ui.position"]],["jquery.ui.button","1320541239",["jquery.ui.c=
+ore","jquery.ui.widget"]],["jquery.ui.datepicker","1320541239",["jquery.u=
+i.core"]],["jquery.ui.dialog","1320541239",["jquery.ui.core","jquery.ui.w=
+idget","jquery.ui.button","jquery.ui.draggable","jquery.ui.mouse","jquery=
+.ui.position","jquery.ui.resizable"]],["jquery.ui.progressbar","132054123=
+9",["jquery.ui.core","jquery.ui.widget"]],["jquery.ui.slider","1320541239=
+",["jquery.ui.core","jquery.ui.widget","jquery.ui.mouse"]],["jquery.ui.ta=
+bs","1320541239",["jquery.ui.core","jquery.ui.widget"]],["jquery.effects.=
+core","1320541239",["jquery"]],["jquery.effects.blind","1320541239",["jqu=
+ery.effects.core"]],["jquery.effects.bounce","1320541239",["jquery.effect=
+s.core"]],["jquery.effects.clip","1320541239",["jquery.effects.core"]],["=
+jquery.effects.drop","1320541239",[=0A=
+"jquery.effects.core"]],["jquery.effects.explode","1320541239",["jquery.e=
+ffects.core"]],["jquery.effects.fold","1320541239",["jquery.effects.core"=
+]],["jquery.effects.highlight","1320541239",["jquery.effects.core"]],["jq=
+uery.effects.pulsate","1320541239",["jquery.effects.core"]],["jquery.effe=
+cts.scale","1320541239",["jquery.effects.core"]],["jquery.effects.shake",=
+"1320541239",["jquery.effects.core"]],["jquery.effects.slide","1320541239=
+",["jquery.effects.core"]],["jquery.effects.transfer","1320541239",["jque=
+ry.effects.core"]],["mediawiki","1320541239",[]],["mediawiki.util","13205=
+41239",["jquery.checkboxShiftClick","jquery.client","jquery.placeholder"]=
+],["mediawiki.action.history","1320541239",["mediawiki.legacy.history"]],=
+["mediawiki.action.edit","1320541239",[]],["mediawiki.action.view.rightCl=
+ickEdit","1320541239",[]],["mediawiki.special.preferences","2011110913070=
+5",[]],["mediawiki.special.search","1320541239",[]],["mediawiki.language"=
+,"1320541239",[]],["mediawiki.legacy.ajax",=0A=
+"20111106010217",["mediawiki.legacy.wikibits"]],["mediawiki.legacy.ajaxwa=
+tch","1320541239",["mediawiki.legacy.wikibits"]],["mediawiki.legacy.block=
+","1320541239",["mediawiki.legacy.wikibits"]],["mediawiki.legacy.commonPr=
+int","1320541239",[]],["mediawiki.legacy.config","1320541239",["mediawiki=
+.legacy.wikibits"]],["mediawiki.legacy.diff","1320541239",["mediawiki.leg=
+acy.wikibits"],"mediawiki.action.history"],["mediawiki.legacy.edit","1320=
+541239",["mediawiki.legacy.wikibits"]],["mediawiki.legacy.enhancedchanges=
+","1320541239",["mediawiki.legacy.wikibits"]],["mediawiki.legacy.history"=
+,"1320541239",["mediawiki.legacy.wikibits"],"mediawiki.action.history"],[=
+"mediawiki.legacy.htmlform","1320541239",["mediawiki.legacy.wikibits"]],[=
+"mediawiki.legacy.IEFixes","1320541239",["mediawiki.legacy.wikibits"]],["=
+mediawiki.legacy.metadata","20111106195507",["mediawiki.legacy.wikibits"]=
+],["mediawiki.legacy.mwsuggest","1320541239",["mediawiki.legacy.wikibits"=
+]],["mediawiki.legacy.prefs","1320541239",[=0A=
+"mediawiki.legacy.wikibits","mediawiki.legacy.htmlform"]],["mediawiki.leg=
+acy.preview","1320541239",["mediawiki.legacy.wikibits"]],["mediawiki.lega=
+cy.protect","1320541239",["mediawiki.legacy.wikibits"]],["mediawiki.legac=
+y.search","1320541239",["mediawiki.legacy.wikibits"]],["mediawiki.legacy.=
+shared","1320541239",[]],["mediawiki.legacy.oldshared","1320541239",[]],[=
+"mediawiki.legacy.upload","1320541239",["mediawiki.legacy.wikibits"]],["m=
+ediawiki.legacy.wikibits","20111106010218",["mediawiki.language"]],["medi=
+awiki.legacy.wikiprintable","1320541239",[]]]);mediaWiki.config.set({"wgL=
+oadScript":"/load.php","debug":false,"skin":"vector","stylepath":"/skins"=
+,"wgUrlProtocols":"http\\:\\/\\/|https\\:\\/\\/|ftp\\:\\/\\/|irc\\:\\/\\/=
+|gopher\\:\\/\\/|telnet\\:\\/\\/|nntp\\:\\/\\/|worldwind\\:\\/\\/|mailto\=
+\:|news\\:|svn\\:\\/\\/|git\\:\\/\\/|mms\\:\\/\\/","wgArticlePath":"/inde=
+x.php/$1","wgScriptPath":"","wgScriptExtension":".php","wgScript":"/index=
+.php","wgVariantArticlePath":false,"wgActionPaths":=0A=
+[],"wgServer":"http://content.gpwiki.org","wgUserLanguage":"en-gb","wgCon=
+tentLanguage":"en-gb","wgVersion":"1.17.0","wgEnableAPI":true,"wgEnableWr=
+iteAPI":true,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":=
+["",""],"wgMainPageTitle":"Main =
+Page","wgFormattedNamespaces":{"-2":"Media","-1":"Special","0":"","1":"Ta=
+lk","2":"User","3":"User talk","4":"GPWiki","5":"GPWiki =
+talk","6":"File","7":"File talk","8":"MediaWiki","9":"MediaWiki =
+talk","10":"Template","11":"Template talk","12":"Help","13":"Help =
+talk","14":"Category","15":"Category =
+talk","510":"D3DBook","511":"D3DBook =
+talk"},"wgNamespaceIds":{"media":-2,"special":-1,"":0,"talk":1,"user":2,"=
+user_talk":3,"gpwiki":4,"gpwiki_talk":5,"file":6,"file_talk":7,"mediawiki=
+":8,"mediawiki_talk":9,"template":10,"template_talk":11,"help":12,"help_t=
+alk":13,"category":14,"category_talk":15,"d3dbook":510,"d3dbook_talk":511=
+,"image":6,"image_talk":7},"wgSiteName":"GPWiki","wgFileExtensions":["png=
+","gif","jpg","jpeg","zip","txt","gz"],"wgDBname":=0A=
+"gpw_mw_db","wgExtensionAssetsPath":"/extensions","wgResourceLoaderMaxQue=
+ryLength":-1});};if(isCompatible()){document.write("\x3cscript =
+src=3D\"/load.php?debug=3Dfalse\x26amp;lang=3Den-gb\x26amp;modules=3Djque=
+ry%7Cmediawiki\x26amp;only=3Dscripts\x26amp;skin=3Dvector\x26amp;version=3D=
+20110820T205500Z\"\x3e\x3c/script\x3e");}delete isCompatible;;
+------=_NextPart_000_0000_01CCCB8A.99487610--

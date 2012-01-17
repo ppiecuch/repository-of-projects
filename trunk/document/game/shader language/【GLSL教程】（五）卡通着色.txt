@@ -1,0 +1,296 @@
+引言
+卡通着色可能是最简单的非真实模式shader。它使用很少的颜色，通常是几种色调（tone），因此不同色调之间是突变的效果。下图显示的就是我们试图达到的效果：
+
+茶壶上的色调是通过角度的余弦值选择的，这个角度是指光线和面的法线之间的夹角角度。如果法线和光的夹角比较小，我们使用较亮的色调，随着夹角变大，逐步使用更暗的色调。换句话说，角度余弦值将决定色调的强度。
+在本教程中，我们先介绍逐顶点计算色调强度（intensity）的方法，之后把这个计算移到片断shader中，此外还将介绍如何访问OpenGL中光源的方向。
+
+卡通着色——版本1
+这个版本使用逐顶点计算色调强度的方法，之后片断shader使用顶点色调强度的插值来决定片断选择那个色调。因此顶点shader必须声明一个易变变量保存强度值，片断shader中也需要声明一个同名的易变变量，用来接收经过插值的强度值。
+在顶点shader中，光线方向可以定义为一个局部变量或者常量，不过定义为一个一致变量将可以获得更大的灵活性，因为这样就可以在OpenGL程序中任意设置了。所以我们在shader中这样定义光的方向：
+view plaincopy to clipboardprint?uniform vec3 lightDir;  
+uniform vec3 lightDir;现在起我们假设光的方向定义在世界空间之中。
+顶点shader通过属性变量gl_Normal来访问在OpenGL程序中指定的法线，这些法线在OpenGL程序中通过glNormal函数定义，因此位于模型空间。
+如果在OpenGL程序中没有对模型进行旋转或缩放等操作，那么传给顶点shader的位于世界空间的gl_Normal正好等于模型空间中定义的法线。另外法线只包含方向，所以不受移动变换的影响。
+由于法线和光线方向定义在相同的空间中，顶点shader可以直接进行余弦计算，两个方向分别为lightDir和gl_Normal。计算余弦的公式如下：
+cos(lightDir,normal) = lightDir . normal / (|lightDir| * |normal|)
+公式中的“.”表示内积，亦称为点积。如果lightDir和gl_Normal已经经过了归一化：
+| normal | = 1
+| lightDir | = 1
+那么计算余弦的公式可以简化为：
+cos(lightDir,normal) = lightDir . normal
+因为lightDir是由OpenGL程序提供的，所以我们可以假定它传到shader之前已经归一化了。只有光线方向改变时，才需要重新计算归一化。此外OpenGL程序传过来的法线也应该是经过归一化的。
+我们将定义一个名为intensity的变量保存余弦值，这个值可以直接使用GLSL提供的dot函数计算。
+view plaincopy to clipboardprint?intensity = dot(lightDir, gl_Normal);  
+intensity = dot(lightDir, gl_Normal);最后顶点要做的就是变换顶点坐标。顶点shader的完整代码如下：
+view plaincopy to clipboardprint?uniform vec3 lightDir;  
+varying float intensity;  
+  
+void main()  
+{  
+    intensity = dot(lightDir,gl_Normal);  
+    gl_Position = ftransform();  
+}  
+uniform vec3 lightDir;
+varying float intensity;
+
+void main()
+{
+    intensity = dot(lightDir,gl_Normal);
+    gl_Position = ftransform();
+}如果想使用OpenGL中的变量作为光的方向，那么可以用gl_LightSource[0].position代替一致变量lightDir，代码如下：
+view plaincopy to clipboardprint?varying float intensity;  
+  
+void main()  
+{  
+    vec3 lightDir = normalize(vec3(gl_LightSource[0].position));  
+    intensity = dot(lightDir,gl_Normal);  
+  
+    gl_Position = ftransform();  
+}  
+varying float intensity;
+
+void main()
+{
+    vec3 lightDir = normalize(vec3(gl_LightSource[0].position));
+    intensity = dot(lightDir,gl_Normal);
+
+    gl_Position = ftransform();
+}现在在片断shader中唯一要做的就是根据intensity定义片断的颜色。前面已经提到，变量intensity在两个shader中都定义为易变变量，所以它将会在顶点shader中写入，然后再片断shader中读出。片断shader中的颜色可以用如下方式计算：
+view plaincopy to clipboardprint?vec4 color;  
+  
+if (intensity > 0.95)  
+    color = vec4(1.0,0.5,0.5,1.0);  
+else if (intensity > 0.5)  
+    color = vec4(0.6,0.3,0.3,1.0);  
+else if (intensity > 0.25)  
+    color = vec4(0.4,0.2,0.2,1.0);  
+else  
+    color = vec4(0.2,0.1,0.1,1.0);  
+vec4 color;
+
+if (intensity > 0.95)
+    color = vec4(1.0,0.5,0.5,1.0);
+else if (intensity > 0.5)
+    color = vec4(0.6,0.3,0.3,1.0);
+else if (intensity > 0.25)
+    color = vec4(0.4,0.2,0.2,1.0);
+else
+    color = vec4(0.2,0.1,0.1,1.0);可以看到，余弦大于0.95时使用最亮的颜色，小于0.25时使用最暗的颜色。得到这个颜色后只需要再将其写入gl_FragColor即可，片断shader的完整代码如下：
+view plaincopy to clipboardprint?varying float intensity;  
+  
+void main()  
+{  
+    vec4 color;  
+    if (intensity > 0.95)  
+  
+        color = vec4(1.0,0.5,0.5,1.0);  
+    else if (intensity > 0.5)  
+        color = vec4(0.6,0.3,0.3,1.0);  
+    else if (intensity > 0.25)  
+        color = vec4(0.4,0.2,0.2,1.0);  
+    else  
+        color = vec4(0.2,0.1,0.1,1.0);  
+    gl_FragColor = color;  
+}  
+varying float intensity;
+
+void main()
+{
+    vec4 color;
+    if (intensity > 0.95)
+
+        color = vec4(1.0,0.5,0.5,1.0);
+    else if (intensity > 0.5)
+        color = vec4(0.6,0.3,0.3,1.0);
+    else if (intensity > 0.25)
+        color = vec4(0.4,0.2,0.2,1.0);
+    else
+        color = vec4(0.2,0.1,0.1,1.0);
+    gl_FragColor = color;
+}下图显示出本节的最终效果，看起来不是很好。主要原因是因为我们对intensity进行插值，插值的结果与用片断法线算出的intensity有区别，下一节我们将展示如何更好的实现卡通着色效果。
+
+
+卡通着色——版本2
+本节中我们要实现逐片断的卡通着色效果。为了达到这个目的，我们需要访问每个片断的法线。顶点shader中需要将顶点的法线写入一个易变变量，这样在片断shader中就可以得到经过插值的法线。
+顶点shader比上一版变得更简单了，因为颜色强度的计算移到片断shader中进行了。一致变量lightDir也要移到片断shader中，下面就是新的顶点shader代码：
+view plaincopy to clipboardprint?varying vec3 normal;  
+  
+void main()  
+{  
+    normal = gl_Normal;  
+    gl_Position = ftransform();  
+}  
+varying vec3 normal;
+
+void main()
+{
+    normal = gl_Normal;
+    gl_Position = ftransform();
+}在片断shader中，我们需要声明一致变量lightDir，还需要一个易变变量接收插值后的法线。片断shader的代码如下：
+view plaincopy to clipboardprint?uniform vec3 lightDir;  
+varying vec3 normal;  
+  
+void main()  
+{  
+    float intensity;  
+    vec4 color;  
+    intensity = dot(lightDir,normal);  
+  
+    if (intensity > 0.95)  
+        color = vec4(1.0,0.5,0.5,1.0);  
+    else if (intensity > 0.5)  
+        color = vec4(0.6,0.3,0.3,1.0);  
+    else if (intensity > 0.25)  
+        color = vec4(0.4,0.2,0.2,1.0);  
+    else  
+        color = vec4(0.2,0.1,0.1,1.0);  
+    gl_FragColor = color;  
+}  
+uniform vec3 lightDir;
+varying vec3 normal;
+
+void main()
+{
+    float intensity;
+    vec4 color;
+    intensity = dot(lightDir,normal);
+
+    if (intensity > 0.95)
+        color = vec4(1.0,0.5,0.5,1.0);
+    else if (intensity > 0.5)
+        color = vec4(0.6,0.3,0.3,1.0);
+    else if (intensity > 0.25)
+        color = vec4(0.4,0.2,0.2,1.0);
+    else
+        color = vec4(0.2,0.1,0.1,1.0);
+    gl_FragColor = color;
+}下图就是渲染结果：
+
+令人吃惊的是新的渲染结果居然和前一节的一模一样，这是为什么呢？
+让我们仔细看看这两个版本的区别。在第一版中，我们在顶点shader中计算出一个intensity值，然后在片断shader中使用这个值的插值结果。在第二个版中，我们先对法线插值，然后在片断shader中计算点积。插值和点积都是线性运算，所以两者运算的顺序并不影响结果。
+真正的问题在于片断shader中对插值后的法线进行点积运算的时候，尽管这时法线的方向是对的，但是它并没有归一化。
+我们说法线方向是对的，因为我们假定传入顶点shader的法线是经过归一化的，对法线插值可以得到一个方向正确的向量。但是，这个向量的长度在大部分情况下都是错的，因为对归一化法线进行插值时，只有在所有法线的方向一致时才会得到一个单位长度的向量。（关于法线插值的问题，后面的教程会专门解释）
+综上所述，在片断shader中，我们接收到的是一个方向正确长度错误的法线，为了修正这个问题，我们必须将这个法线归一化。下面是正确实现的代码：
+view plaincopy to clipboardprint?uniform vec3 lightDir;  
+varying vec3 normal;  
+  
+void main()  
+{  
+    float intensity;  
+    vec4 color;  
+    intensity = dot(lightDir,normalize(normal));  
+  
+    if (intensity > 0.95)  
+        color = vec4(1.0,0.5,0.5,1.0);  
+    else if (intensity > 0.5)  
+        color = vec4(0.6,0.3,0.3,1.0);  
+    else if (intensity > 0.25)  
+        color = vec4(0.4,0.2,0.2,1.0);  
+    else  
+        color = vec4(0.2,0.1,0.1,1.0);  
+    gl_FragColor = color;  
+}  
+uniform vec3 lightDir;
+varying vec3 normal;
+
+void main()
+{
+    float intensity;
+    vec4 color;
+    intensity = dot(lightDir,normalize(normal));
+
+    if (intensity > 0.95)
+        color = vec4(1.0,0.5,0.5,1.0);
+    else if (intensity > 0.5)
+        color = vec4(0.6,0.3,0.3,1.0);
+    else if (intensity > 0.25)
+        color = vec4(0.4,0.2,0.2,1.0);
+    else
+        color = vec4(0.2,0.1,0.1,1.0);
+    gl_FragColor = color;
+}下图就是新版本卡通着色的效果，看起来漂亮多了，虽然并不完美。图中物体还有些锯齿（aliasing）问题，不过这超出了本教程讨论的范围。
+
+下一节我们将在OpenGL程序中设置shader中的光线方向。
+
+卡通着色——版本3
+结束关于卡通着色的内容之前，还有一件事需要解决：使用OpenGL中的光来代替变量lightDir。我们需要在OpenGL程序中定义一个光源，然后在我们的shader中使用这个光源的方向数据。注意：不需要用glEnable打开这个光源，因为我们使用了shader。
+我们假设OpenGL程序中定义的1号光源（GL_LIGHT0）是方向光。GLSL已经声明了一个C语言形式的结构体，描述光源属性。这些结构体组成一个数组，保存所有光源的信息。
+view plaincopy to clipboardprint?struct gl_LightSourceParameters  
+{  
+    vec4 ambient;  
+    vec4 diffuse;  
+    vec4 specular;  
+    vec4 position;  
+    ...  
+};  
+  
+uniform gl_LightSourceParameters gl_LightSource[gl_MaxLights];  
+struct gl_LightSourceParameters
+{
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    vec4 position;
+    ...
+};
+
+uniform gl_LightSourceParameters gl_LightSource[gl_MaxLights];这意味着我们可以在shader中访问光源的方向（使用结构体中的position域），这里依然假定OpenGL程序对光源方向进行了归一化。
+OpenGL标准中规定，当一个光源的位置确定后，将自动转换到视点空间（eye space）的坐标系中，例如摄像机坐标系。如果模型视图矩阵的左上3×3子阵是正交的（如果使用gluLookAt并且不使用缩放变换就可以满足这点），便能保证光线方向向量在自动变换到视点空间之后保持归一化。
+我们必须将法线也变换到视点空间，然后计算其与光线的点积。只有在相同空间，计算两个向量的点积得到余弦值才有意义。
+为了将法线变换到视点空间，我们必须使用预先定义的mat3型的一致变量gl_NormalMatrix。这个矩阵是模型视图矩阵的左上3×3子阵的逆矩阵的转置矩阵（关于这个问题，后面的教程会专门解释）。需要对每个法线进行这个变换，现在顶点shader变为如下形式：
+view plaincopy to clipboardprint?varying vec3 normal;  
+  
+void main()  
+{  
+    normal = gl_NormalMatrix * gl_Normal;  
+    gl_Position = ftransform();  
+}  
+varying vec3 normal;
+
+void main()
+{
+    normal = gl_NormalMatrix * gl_Normal;
+    gl_Position = ftransform();
+}在片断shader中，我们必须访问光线方向来计算intensity值：
+view plaincopy to clipboardprint?varying vec3 normal;  
+  
+void main()  
+{  
+    float intensity;  
+    vec4 color;  
+    vec3 n = normalize(normal);  
+    intensity = dot(vec3(gl_LightSource[0].position),n);  
+  
+    if (intensity > 0.95)  
+        color = vec4(1.0,0.5,0.5,1.0);  
+    else if (intensity > 0.5)  
+        color = vec4(0.6,0.3,0.3,1.0);  
+    else if (intensity > 0.25)  
+        color = vec4(0.4,0.2,0.2,1.0);  
+    else  
+        color = vec4(0.2,0.1,0.1,1.0);  
+    gl_FragColor = color;  
+}  
+varying vec3 normal;
+
+void main()
+{
+    float intensity;
+    vec4 color;
+    vec3 n = normalize(normal);
+    intensity = dot(vec3(gl_LightSource[0].position),n);
+
+    if (intensity > 0.95)
+        color = vec4(1.0,0.5,0.5,1.0);
+    else if (intensity > 0.5)
+        color = vec4(0.6,0.3,0.3,1.0);
+    else if (intensity > 0.25)
+        color = vec4(0.4,0.2,0.2,1.0);
+    else
+        color = vec4(0.2,0.1,0.1,1.0);
+    gl_FragColor = color;
+}本小节内容的Shader Desinger工程下载地址：
+http://lighthouse3d.com/wptest/wp-content/uploads/2011/03/toonf2.zip
+基于GLEW的源代码下载地址：
+http://lighthouse3d.com/wptest/wp-content/uploads/2011/03/toonglut_2.0.zip
+http://blog.csdn.net/racehorse/article/details/6641623

@@ -1,0 +1,129 @@
+static void pngReaderCallback(png_structp png_ptr, png_bytep data, png_size_t length)  
+{  
+    ImageSource* isource = (ImageSource*)png_get_io_ptr(png_ptr);  
+  
+    if(isource->offset + length <= isource->size)  
+    {  
+       memcpy(data, (unsigned char *)isource->data + isource->offset, length);  
+       isource->offset += length;  
+    }  
+    else  
+    {  
+        png_error(png_ptr,"pngReaderCallback failed");  
+    }  
+}  
+  
+static HBITMAP LoadPNGFromMemory(void * lpData, UINT size, HDC hdc, BYTE **m_ppBits, int &width, int &height)  
+{  
+  
+    HBITMAP hBitBmp=NULL;  
+  
+    if (lpData==NULL || size==0) return NULL;  
+  
+  
+    png_structp png_ptr;  
+    png_infop   info_ptr;  
+  
+    /* initialize stuff */  
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);  
+      
+    if (!png_ptr) return NULL;  
+  
+  
+    info_ptr = png_create_info_struct(png_ptr);  
+  
+    if (!info_ptr)  return NULL;  
+  
+    if (setjmp(png_jmpbuf(png_ptr)))  
+    {  
+        png_destroy_read_struct(&png_ptr, &info_ptr, 0);  
+        return false;  
+    }  
+  
+  
+    ImageSource imgsource;  
+    imgsource.data = lpData;  
+    imgsource.size = size;  
+    imgsource.offset = 0;  
+  
+    png_set_read_fn(png_ptr, &imgsource, pngReaderCallback);  
+  
+  
+    png_read_info(png_ptr, info_ptr);  
+  
+    unsigned long x,y,i;  
+    BYTE r,g,b,a;  
+  
+    png_bytep * row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * info_ptr->height);  
+  
+    if (row_pointers)  
+    {  
+        for (y=0; y<info_ptr->height; y++)  
+            row_pointers[y] = (png_byte*) malloc(info_ptr->rowbytes);  
+  
+        png_read_image(png_ptr, row_pointers);  
+  
+  
+        BITMAPINFOHEADER m_bmpHeader;  
+        memset(&m_bmpHeader,NULL,sizeof(m_bmpHeader));  
+        m_bmpHeader.biSize = sizeof(m_bmpHeader);  
+        m_bmpHeader.biBitCount = 32;;  
+        m_bmpHeader.biCompression = BI_RGB;  
+        m_bmpHeader.biWidth = info_ptr->width;  
+        m_bmpHeader.biHeight = info_ptr->height;  
+        m_bmpHeader.biPlanes = 1;  
+  
+        BYTE *pBits;  
+  
+        hBitBmp = CreateDIBSection(hdc, (BITMAPINFO *)&m_bmpHeader, DIB_RGB_COLORS, (void **)&pBits, NULL, 0);  
+  
+        if (hBitBmp && (pBits))  
+        {  
+  
+            width=info_ptr->width;  
+            height=info_ptr->height;  
+  
+            for (y=0; y<info_ptr->height; y++)  
+            {  
+                memcpy(pBits+(info_ptr->height-y-1)*info_ptr->rowbytes, row_pointers[y], info_ptr->rowbytes);  
+            }  
+  
+            *m_ppBits=pBits;  
+  
+  
+            for (y=0; y<info_ptr->height; y++)  
+            {  
+                for (x=0; x<info_ptr->width; x++)  
+                {  
+                    i=(info_ptr->height-1-y)*info_ptr->width*4+x*4;  
+  
+                    r=pBits[i+0];  
+                    g=pBits[i+1];  
+                    b=pBits[i+2];  
+                    a=pBits[i+3];  
+  
+                    // RGBA -> BGRA and to AlphaBend() Colors   
+                    pBits[i+0]=BYTE(b * a / 255);  
+                    pBits[i+1]=BYTE(g * a / 255);  
+                    pBits[i+2]=BYTE(r * a / 255);  
+                }  
+  
+            }  
+  
+  
+        }  
+  
+        for (y=0; y<info_ptr->height; y++)  
+        {  
+            free(row_pointers[y]);  
+        }  
+  
+        free(row_pointers);  
+    }  
+  
+    // free memory   
+    png_destroy_read_struct(&png_ptr, &info_ptr, 0);  
+  
+    return hBitBmp;  
+}  
+http://blog.csdn.net/tdgx2004/article/details/6444022

@@ -1,0 +1,390 @@
+设置GLSL
+
+这一节讲述在OpenGL中配置GLSL，假设你已经写好了顶点shader和像素shader。如果你还没有准备好，可以从如下网址获得相关内容：
+
+http://www.3dshaders.com/home/
+
+http://www.opengl.org/sdk/tools/ShaderDesigner/
+
+http://developer.amd.com/archive/gpu/rendermonkey/pages/default.aspx
+
+在OpenGL中，GLSL的shader使用的流程与C语言相似，每个shader类似一个C模块，首先需要单独编译（compile），然后一组编译好的shader连接（link）成一个完整程序。
+
+这里将忽略ARB扩展，只列举OpenGL2.0的代码。建议使用GLEW库：
+
+http://glew.sourceforge.net/
+
+下面的代码检查OpenGL 2.0是否可用：
+
+
+view plaincopy to clipboardprint?#include <GL/glew.h>   
+#include <GL/glut.h>   
+  
+void main(int argc, char **argv)  
+{  
+    glutInit(&argc, argv);  
+    ...  
+    glewInit();  
+  
+    if (glewIsSupported("GL_VERSION_2_0"))  
+        printf("Ready for OpenGL 2.0\n");  
+    else  
+    {  
+        printf("OpenGL 2.0 not supported\n");  
+        exit(1);  
+    }  
+    setShaders();  
+  
+    glutMainLoop();  
+}  
+#include <GL/glew.h>
+#include <GL/glut.h>
+
+void main(int argc, char **argv)
+{
+    glutInit(&argc, argv);
+    ...
+    glewInit();
+
+    if (glewIsSupported("GL_VERSION_2_0"))
+        printf("Ready for OpenGL 2.0\n");
+    else
+    {
+        printf("OpenGL 2.0 not supported\n");
+        exit(1);
+    }
+    setShaders();
+
+    glutMainLoop();
+}
+
+下图显示了创建shader的必要步骤，函数的具体使用方法将在下面各小结描述：
+
+
+
+
+
+
+创建shader
+
+下图显示了创建shader的步骤：
+
+
+
+
+首先创建一个对象作为shader的容器，这个创建函数将返回容器的句柄。
+
+
+view plaincopy to clipboardprint?GLuint glCreateShader(GLenum shaderType);  
+参数：  
+·shaderType – GL_VERTEX_SHADER or GL_FRAGMENT_SHADER.  
+GLuint glCreateShader(GLenum shaderType);
+参数：
+·shaderType – GL_VERTEX_SHADER or GL_FRAGMENT_SHADER.你可以创建许多shader，但记住所有的顶点shader只能有一个main函数，所有像素shader也一样。
+
+下一步将添加源代码。shader的源代码是一个字符串数组，添加的语法如下：
+
+
+view plaincopy to clipboardprint?void glShaderSource(GLuint shader, int numOfStrings, const char **strings, int *lenOfStrings);  
+参数：  
+·shader – the handler to the shader.  
+·numOfStrings – the number of strings in the array.  
+·strings – the array of strings.  
+·lenOfStrings – an array with the length of each string, or NULL, meaning that the strings are NULL terminated.  
+void glShaderSource(GLuint shader, int numOfStrings, const char **strings, int *lenOfStrings);
+参数：
+·shader – the handler to the shader.
+·numOfStrings – the number of strings in the array.
+·strings – the array of strings.
+·lenOfStrings – an array with the length of each string, or NULL, meaning that the strings are NULL terminated.最后编译shader：
+
+
+view plaincopy to clipboardprint?void glCompileShader(GLuint shader);  
+参数：  
+•shader – the handler to the shader.  
+void glCompileShader(GLuint shader);
+参数：
+•shader – the handler to the shader.
+
+
+
+
+创建程序
+
+下图显示了获得一个可以运行的shader程序的步骤：
+
+
+
+
+首先创建一个对象，作为程序的容器。此函数返回容器的句柄。
+
+
+view plaincopy to clipboardprint?GLuint glCreateProgram(void);  
+GLuint glCreateProgram(void);
+
+你可以创建任意多个程序，在渲染时，可以在不同程序中切换，甚至在某帧返回固定功能流水线。比如你想用折射和反射shader绘制一个茶杯，然后回到固定功能生成立方体环境贴图（cube map）显示背景。
+
+下面将把上一节编译的shader附加到刚刚创建的程序中。方法如下：
+
+
+view plaincopy to clipboardprint?void glAttachShader(GLuint program, GLuint shader);  
+参数：  
+·program – the handler to the program.  
+·shader – the handler to the shader you want to attach.  
+void glAttachShader(GLuint program, GLuint shader);
+参数：
+·program – the handler to the program.
+·shader – the handler to the shader you want to attach.如果同时有顶点shader和片断shader，你需要把它们都附加到程序中。你可以把多个相同类型（顶点或像素）的shader附加到一个程序中，如同一个C程序可以有多个模块一样，但它们只能有一个main函数。
+
+你也可以把一个shader附加到多个程序，比如你想在不同程序中使用某个相同的shader。
+
+最后一步是连接程序。方法如下：
+
+
+view plaincopy to clipboardprint?void glLinkProgram(GLuint program);  
+参数：  
+·program – the handler to the program.  
+void glLinkProgram(GLuint program);
+参数：
+·program – the handler to the program.在连接操作之后，shader的源代码可以被修改并重编译，并不会影响到整个程序。
+
+程序连接后，可以调用glUseProgram来使用程序。每个程序都分配了一个句柄，你可以事先连接多个程序以备使用。
+
+
+view plaincopy to clipboardprint?void glUseProgram(GLuint prog);  
+参数：  
+·prog – the handler to the program you want to use, or zero to return to fixed functionality.  
+void glUseProgram(GLuint prog);
+参数：
+·prog – the handler to the program you want to use, or zero to return to fixed functionality.当一个程序被使用后，如果被再次连接，它将被自动替换并投入使用，所以没有必要再次调用上面这个函数。如果使用的参数为0，表示将使用固定功能流水线。
+
+ 例子
+
+下面的代码包含了上面描述的所有步骤，参数p,f,v是全局的GLuint型变量。
+
+
+view plaincopy to clipboardprint?void setShaders()  
+{  
+    char *vs,*fs;  
+  
+    v = glCreateShader(GL_VERTEX_SHADER);  
+    f = glCreateShader(GL_FRAGMENT_SHADER);    
+  
+    vs = textFileRead("toon.vert");  
+    fs = textFileRead("toon.frag");  
+  
+    const char *vv = vs;  
+    const char *ff = fs;  
+  
+    glShaderSource(v, 1, &vv, NULL);  
+    glShaderSource(f, 1, &ff, NULL);  
+  
+    free(vs);free(fs);  
+  
+    glCompileShader(v);  
+    glCompileShader(f);  
+  
+    p = glCreateProgram();  
+  
+    glAttachShader(p, v);  
+    glAttachShader(p, f);  
+  
+    glLinkProgram(p);  
+    glUseProgram(p);  
+}  
+void setShaders()
+{
+    char *vs,*fs;
+
+    v = glCreateShader(GL_VERTEX_SHADER);
+    f = glCreateShader(GL_FRAGMENT_SHADER);  
+
+    vs = textFileRead("toon.vert");
+    fs = textFileRead("toon.frag");
+
+    const char *vv = vs;
+    const char *ff = fs;
+
+    glShaderSource(v, 1, &vv, NULL);
+    glShaderSource(f, 1, &ff, NULL);
+
+    free(vs);free(fs);
+
+    glCompileShader(v);
+    glCompileShader(f);
+
+    p = glCreateProgram();
+
+    glAttachShader(p, v);
+    glAttachShader(p, f);
+
+    glLinkProgram(p);
+    glUseProgram(p);
+}GLUT版的完整例子如下：
+
+http://lighthouse3d.com/wptest/wp-content/uploads/2011/03/glutglsl_2.0.zip
+
+完整例子中包含了shader代码及文本文件读入程序。
+
+ 
+
+错误处理
+
+调试shader是很困难的。目前还没有像printf这样的东西，虽然未来可能出现有调试功能的开发工具。
+
+编译阶段的状态可以用如下函数获得：
+
+
+view plaincopy to clipboardprint?void glGetShaderiv(GLuint object, GLenum type, int *param);  
+参数：  
+·object – the handler to the object. Either a shader or a program  
+·type – GL_COMPILE_STATUS.  
+·param – the return value, GL_TRUE if OK, GL_FALSE otherwise.  
+void glGetShaderiv(GLuint object, GLenum type, int *param);
+参数：
+·object – the handler to the object. Either a shader or a program
+·type – GL_COMPILE_STATUS.
+·param – the return value, GL_TRUE if OK, GL_FALSE otherwise.连接阶段的状态可以用如下函数获得：
+
+
+view plaincopy to clipboardprint?void glGetProgramiv(GLuint object, GLenum type, int *param);  
+参数：  
+·object – the handler to the object. Either a shader or a program  
+·type – GL_LINK_STATUS.  
+·param – the return value, GL_TRUE if OK, GL_FALSE otherwise.  
+void glGetProgramiv(GLuint object, GLenum type, int *param);
+参数：
+·object – the handler to the object. Either a shader or a program
+·type – GL_LINK_STATUS.
+·param – the return value, GL_TRUE if OK, GL_FALSE otherwise.如果发生错误，就需要从InfoLog中找到更多的信息。这个日志保存了最后一次操作的信息，比如编译时的警告、错误，连接时发生的各种问题。这个日志甚至可以告诉你硬件是否支持你的shader。不幸的是InfoLog没有一个规范，所以不同的驱动/硬件可能产生不同的日志信息。
+
+为了获得特定shader或程序的日志，可以使用如下程序：
+
+
+view plaincopy to clipboardprint?void glGetShaderInfoLog(GLuint object, int maxLen, int *len, char *log);  
+void glGetProgramInfoLog(GLuint object, int maxLen, int *len, char *log);  
+参数：  
+·object – the handler to the object. Either a shader or a program  
+·maxLen – The maximum number of chars to retrieve from the InfoLog.  
+·len – returns the actual length of the retrieved InfoLog.  
+·log – The log itself.  
+void glGetShaderInfoLog(GLuint object, int maxLen, int *len, char *log);
+void glGetProgramInfoLog(GLuint object, int maxLen, int *len, char *log);
+参数：
+·object – the handler to the object. Either a shader or a program
+·maxLen – The maximum number of chars to retrieve from the InfoLog.
+·len – returns the actual length of the retrieved InfoLog.
+·log – The log itself.GLSL规范有必要在这里进行一些改进：你必须知道接收InfoLog的长度。为了找到这个准确的值，使用下面的函数：
+
+
+view plaincopy to clipboardprint?void glGetShaderiv(GLuint object, GLenum type, int *param);  
+void glGetProgramiv(GLuint object, GLenum type, int *param);  
+参数：  
+·object – the handler to the object. Either a shader or a program  
+·type – GL_INFO_LOG_LENGTH.  
+·param – the return value, the length of the InfoLog.  
+void glGetShaderiv(GLuint object, GLenum type, int *param);
+void glGetProgramiv(GLuint object, GLenum type, int *param);
+参数：
+·object – the handler to the object. Either a shader or a program
+·type – GL_INFO_LOG_LENGTH.
+·param – the return value, the length of the InfoLog.
+下面的函数可以用来打印InfoLog的内容：
+
+
+view plaincopy to clipboardprint?void printShaderInfoLog(GLuint obj)  
+{  
+    int infologLength = 0;  
+    int charsWritten  = 0;  
+    char *infoLog;  
+   
+    glGetShaderiv(obj, GL_INFO_LOG_LENGTH,&infologLength);  
+   
+    if (infologLength > 0)  
+    {  
+        infoLog = (char *)malloc(infologLength);  
+        glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);  
+        printf("%s\n",infoLog);  
+        free(infoLog);  
+    }  
+}   
+  
+void printProgramInfoLog(GLuint obj)  
+{  
+    int infologLength = 0;  
+    int charsWritten  = 0;  
+    char *infoLog;  
+   
+    glGetProgramiv(obj, GL_INFO_LOG_LENGTH,&infologLength);  
+   
+    if (infologLength > 0)  
+    {  
+        infoLog = (char *)malloc(infologLength);  
+        glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);  
+        printf("%s\n",infoLog);  
+        free(infoLog);  
+    }  
+}  
+void printShaderInfoLog(GLuint obj)
+{
+    int infologLength = 0;
+    int charsWritten  = 0;
+    char *infoLog;
+ 
+    glGetShaderiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
+ 
+    if (infologLength > 0)
+    {
+        infoLog = (char *)malloc(infologLength);
+        glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
+        printf("%s\n",infoLog);
+        free(infoLog);
+    }
+} 
+
+void printProgramInfoLog(GLuint obj)
+{
+    int infologLength = 0;
+    int charsWritten  = 0;
+    char *infoLog;
+ 
+    glGetProgramiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
+ 
+    if (infologLength > 0)
+    {
+        infoLog = (char *)malloc(infologLength);
+        glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
+        printf("%s\n",infoLog);
+        free(infoLog);
+    }
+}
+
+
+
+清理
+
+前面的小节讲到了附加一个shader到一个程序中，这里的调用是将shader从程序中分离：
+
+
+view plaincopy to clipboardprint?void glDetachShader(GLuint program, GLuint shader);  
+参数：  
+·program – The program to detach from.  
+·shader – The shader to detach.  
+void glDetachShader(GLuint program, GLuint shader);
+参数：
+·program – The program to detach from.
+·shader – The shader to detach.注意，只有没有附加到任何程序的shader可以被删除，删除shader和程序的调用如下：
+
+
+view plaincopy to clipboardprint?void glDeleteShader(GLuint id);  
+void glDeleteProgram(GLuint id);  
+参数：  
+·id – The hanuler of the shader or program to delete.  
+void glDeleteShader(GLuint id);
+void glDeleteProgram(GLuint id);
+参数：
+·id – The hanuler of the shader or program to delete.
+
+如果一个shader还附加在某个程序中，这个shader并不能真正删除，只能标记为删除。当这个shader从所有程序中分离之后，才会被最终删除。
+
+http://blog.csdn.net/racehorse/article/details/6616256

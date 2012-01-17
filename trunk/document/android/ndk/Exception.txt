@@ -1,4 +1,12 @@
 [异常]
+erver didn't ACK
+adb]* failed to start daemon *
+DeviceMonitor]adb restart attempts: 29
+[解决]
+重启eclipse即可 
+
+
+[异常]
 java.lang.UnsatisfiedLinkError: nativeInit
 [解决]
 

@@ -1,0 +1,2809 @@
+From: <ÓÉ Microsoft Internet Explorer 5 ±£´æ>
+Subject: Gambas Documentation - Gl.GetFloatv (gb.opengl)
+Date: Tue, 13 Dec 2011 17:34:10 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CCB9BD.6C491C70"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.6157
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" =
+"http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML lang=3Den dir=3Dltr><HEAD><TITLE>Gambas Documentation - =
+Gl.GetFloatv (gb.opengl)</TITLE>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3DUTF-8">
+<META language=3Den><LINK href=3D"http://gambasdoc.org/style.css" =
+rel=3Dstylesheet>
+<META content=3D"MSHTML 6.00.2900.6148" name=3DGENERATOR></HEAD>
+<BODY>
+<DIV class=3Dlang20>
+<TABLE cellSpacing=3D0 cellPadding=3D0 width=3D"100%" border=3D0>
+  <TBODY>
+  <TR>
+    <TD width=3D16>
+      <DIV class=3Dpath><SELECT id=3Dversion=20
+      =
+onchange=3D"window.location.href=3D'/help/comp/gb.opengl/gl/getfloatv?v' =
++ this.value.substr(0,1);">=20
+        <OPTION selected>2.0</OPTION> =
+<OPTION>3.0</OPTION></SELECT></DIV></TD>
+    <TD noWrap>&nbsp;&nbsp;
+      <DIV class=3Dpath><A class=3Dflag =
+href=3D"http://gambasdoc.org/help?v2"><IMG=20
+      class=3Dflag alt=3DHome =
+src=3D"http://gambasdoc.org/img/lang/en.png"=20
+      align=3Dtop></A>&nbsp;<B>&gt;</B>&nbsp;<A=20
+      =
+href=3D"http://gambasdoc.org/help/comp">comp</A>&nbsp;<B>&gt;</B>&nbsp;<A=
+=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl">gb.opengl</A>&nbsp;<B>&=
+gt;</B>&nbsp;<A=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl">gl</A>&nbsp;<B>&gt;<=
+/B>&nbsp;getfloatv&nbsp;</DIV></TD>
+    <TD align=3Dright>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?fr"><IMG=20
+      class=3Dflag alt=3Dfr src=3D"http://gambasdoc.org/img/lang/fr.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?de"><IMG=20
+      class=3Dflag alt=3Dde src=3D"http://gambasdoc.org/img/lang/de.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?es"><IMG=20
+      class=3Dflag alt=3Des src=3D"http://gambasdoc.org/img/lang/es.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?it"><IMG=20
+      class=3Dflag alt=3Dit src=3D"http://gambasdoc.org/img/lang/it.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?nl"><IMG=20
+      class=3Dflag alt=3Dnl src=3D"http://gambasdoc.org/img/lang/nl.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?pl"><IMG=20
+      class=3Dflag alt=3Dpl src=3D"http://gambasdoc.org/img/lang/pl.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?pt"><IMG=20
+      class=3Dflag alt=3Dpt src=3D"http://gambasdoc.org/img/lang/pt.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?pt_BR"><IMG=
+=20
+      class=3Dflag alt=3Dpt_BR =
+src=3D"http://gambasdoc.org/img/lang/pt_BR.png"=20
+      align=3Dtop border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?mk"><IMG=20
+      class=3Dflag alt=3Dmk src=3D"http://gambasdoc.org/img/lang/mk.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?sq"><IMG=20
+      class=3Dflag alt=3Dsq src=3D"http://gambasdoc.org/img/lang/sq.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?ca"><IMG=20
+      class=3Dflag alt=3Dca src=3D"http://gambasdoc.org/img/lang/ca.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?hu"><IMG=20
+      class=3Dflag alt=3Dhu src=3D"http://gambasdoc.org/img/lang/hu.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?cs"><IMG=20
+      class=3Dflag alt=3Dcs src=3D"http://gambasdoc.org/img/lang/cs.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?tr"><IMG=20
+      class=3Dflag alt=3Dtr src=3D"http://gambasdoc.org/img/lang/tr.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?ar"><IMG=20
+      class=3Dflag alt=3Dar src=3D"http://gambasdoc.org/img/lang/ar.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?fa"><IMG=20
+      class=3Dflag alt=3Dfa src=3D"http://gambasdoc.org/img/lang/fa.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?id"><IMG=20
+      class=3Dflag alt=3Did src=3D"http://gambasdoc.org/img/lang/id.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?vi"><IMG=20
+      class=3Dflag alt=3Dvi src=3D"http://gambasdoc.org/img/lang/vi.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?ko"><IMG=20
+      class=3Dflag alt=3Dko src=3D"http://gambasdoc.org/img/lang/ko.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?ja"><IMG=20
+      class=3Dflag alt=3Dja src=3D"http://gambasdoc.org/img/lang/ja.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?ru"><IMG=20
+      class=3Dflag alt=3Dru src=3D"http://gambasdoc.org/img/lang/ru.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?zh"><IMG=20
+      class=3Dflag alt=3Dzh src=3D"http://gambasdoc.org/img/lang/zh.png" =
+align=3Dtop=20
+      border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?zh_TW"><IMG=
+=20
+      class=3Dflag alt=3Dzh_TW =
+src=3D"http://gambasdoc.org/img/lang/zh_TW.png"=20
+      align=3Dtop border=3D0></A>&nbsp;<A class=3Dflag=20
+      =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?eo"><IMG=20
+      class=3Dflag alt=3Deo src=3D"http://gambasdoc.org/img/lang/eo.png" =
+align=3Dtop=20
+      border=3D0></A></TD></TR></TBODY></TABLE></DIV><A =
+id=3Dlicense-logo=20
+href=3D"http://gambasdoc.org/help/license"><IMG=20
+src=3D"http://gambasdoc.org/img/license.png" border=3D0></A> <A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/geterror">Previous</A=
+>&nbsp;&nbsp;<A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfogcolor">Next</A>=
+&nbsp;&nbsp;<A=20
+href=3D"http://gambasdoc.org/edit/comp/gb.opengl/gl/getfloatv">Edit</A>&n=
+bsp;&nbsp;<A=20
+href=3D"http://gambasdoc.org/rename/comp/gb.opengl/gl/getfloatv">Rename</=
+A>&nbsp;&nbsp;<A=20
+href=3D"http://gambasdoc.org/edit/comp/gb.opengl/gl/getfloatv?undo">Undo<=
+/A>&nbsp;&nbsp;<A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getfloatv?refresh">Re=
+fresh</A>&nbsp;&nbsp;<A=20
+href=3D"http://gambasdoc.org/help/search">Search</A>&nbsp;&nbsp;<A=20
+href=3D"http://gambasdoc.org/admin">Administration</A>&nbsp;&nbsp;=20
+<TABLE class=3D"tabheader frame" cellSpacing=3D0 cellPadding=3D0 =
+width=3D"100%">
+  <TBODY>
+  <TR>
+    <TD class=3Dtabon width=3D1><FONT =
+size=3D-1><B>Documentation</B></FONT></TD>
+    <TD class=3Dtaboff width=3D1>
+      <DIV style=3D"HEIGHT: 4px"></DIV>
+      <TABLE cellSpacing=3D0>
+        <TBODY>
+        <TR>
+          <TD class=3Dtaboffr><FONT size=3D-1><A=20
+            =
+href=3D"http://gambasdoc.org/hist/comp/gb.opengl/gl/getfloatv">History</A=
+></FONT>=20
+          </TD></TR></TBODY></TABLE></TD>
+    <TD class=3Dtabnone>&nbsp;</TD></TR></TBODY></TABLE>
+<DIV class=3D"tab frame">
+<DIV class=3Dtitle>Gl.GetFloatv (gb.opengl)</DIV><PRE =
+class=3Dsyntax><FONT color=3Dblue>STATIC</FONT> <FONT =
+color=3Dblue>FUNCTION</FONT> <B>GetFloatv</B> <FONT =
+color=3Dblue>(</FONT> <U>Parameter</U> <FONT color=3Dblue>AS</FONT> =
+<FONT color=3D#0080ff>Integer</FONT> <B>[</B> <FONT =
+color=3Dblue>,</FONT> <U>Size</U> <FONT color=3Dblue>AS</FONT> <FONT =
+color=3D#0080ff>Integer</FONT> <B>]</B> <FONT color=3Dblue>)</FONT> =
+<FONT color=3Dblue>AS</FONT> <FONT color=3D#0080ff><A class=3Darrow =
+href=3D"http://gambasdoc.org/help/comp/gb/float[]">Float[]</A></FONT></PR=
+E>
+<P>Return the value or values of a selected parameter.=20
+<P>
+<H3>Parameters</H3>
+<DL>
+  <DT><U>pname</U>
+  <DD>
+  <P>Specifies the parameter value to be returned. The symbolic =
+constants in the=20
+  list below are accepted. </P>
+  <DT><U>params</U>
+  <DD>
+  <P>Returns the value or values of the specified parameter. =
+</P></DD></DL>
+<P>
+<H3>C Specification</H3>
+<TABLE cellSpacing=3D0 cellPadding=3D0 summary=3D"Function synopsis" =
+border=3D0>
+  <TBODY>
+  <TR>
+    <TD>void <B class=3Dfsfunc>glGetIntegeri_v</B>(</TD>
+    <TD>GLenum &nbsp;</TD>
+    <TD><VAR class=3Dpdparam>pname</VAR>, </TD></TR>
+  <TR>
+    <TD>&nbsp;</TD>
+    <TD>GLuint &nbsp;</TD>
+    <TD><VAR class=3Dpdparam>index</VAR>, </TD></TR>
+  <TR>
+    <TD>&nbsp;</TD>
+    <TD>GLint * &nbsp;</TD>
+    <TD><VAR class=3Dpdparam>data</VAR>);</TD></TR></TBODY></TABLE>
+<P>
+<H3>C Specification</H3>
+<TABLE cellSpacing=3D0 cellPadding=3D0 summary=3D"Function synopsis" =
+border=3D0>
+  <TBODY>
+  <TR>
+    <TD>void <B class=3Dfsfunc>glGetInteger64i_v</B>(</TD>
+    <TD>GLenum &nbsp;</TD>
+    <TD><VAR class=3Dpdparam>pname</VAR>, </TD></TR>
+  <TR>
+    <TD>&nbsp;</TD>
+    <TD>GLuint &nbsp;</TD>
+    <TD><VAR class=3Dpdparam>index</VAR>, </TD></TR>
+  <TR>
+    <TD>&nbsp;</TD>
+    <TD>GLint64 * &nbsp;</TD>
+    <TD><VAR class=3Dpdparam>data</VAR>);</TD></TR></TBODY></TABLE>
+<P>
+<H3>Parameters</H3>
+<DL>
+  <DT><U>pname</U>
+  <DD>
+  <P>Specifies the parameter value to be returned. The symbolic =
+constants in the=20
+  list below are accepted. </P>
+  <DT><U>index</U>
+  <DD>
+  <P>Specifies the index of the particular element being queried. </P>
+  <DT><U>data</U>
+  <DD>
+  <P>Returns the value or values of the specified parameter. =
+</P></DD></DL>
+<P>
+<H3>Description</H3>
+<P>These four commands return values for simple state variables in GL.=20
+<U>pname</U> is a symbolic constant indicating the state <A=20
+href=3D"http://gambasdoc.org/help/def/variable">variable</A> to be =
+returned, and=20
+<U>params</U> is a pointer to an array of the indicated type in which to =
+place=20
+the returned data.=20
+<P>Type conversion is performed if <U>params</U> has a different type =
+than the=20
+state variable value being requested. If <B><A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getbooleanv">Gl.GetBo=
+oleanv</A></B>=20
+is called, a floating-point (or integer) value is converted to Gl.FALSE =
+if and=20
+only if it is 0.0 (or 0). Otherwise, it is converted to Gl.TRUE. If =
+<B><A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getintegerv">Gl.GetIn=
+tegerv</A></B>=20
+is called, boolean values are returned as Gl.TRUE or Gl.FALSE, and most=20
+floating-point values are rounded to the nearest integer value. =
+Floating-point=20
+colors and normals, however, are returned with a linear mapping that =
+maps 1.0 to=20
+the most positive representable integer value and <MATH =
+overflow=3D"scroll"=20
+xmlns=3D"http://www.w3.org/1998/Math/MathML"><MN>-1.0</MN> </MATH>to the =
+most=20
+negative representable integer value. If <B>Gl.GetFloatv</B> or=20
+<B>Gl.GetDoublev</B> is called, boolean values are returned as Gl.TRUE =
+or=20
+Gl.FALSE, and integer values are converted to floating-point values.=20
+<P>The following symbolic constants are accepted by <U>pname</U>:=20
+<DL>
+  <DT>Gl.ACTIVE_TEXTURE
+  <DD>
+  <P><U>params</U> returns a single value indicating the active =
+multitexture=20
+  unit. The initial value is Gl.TEXTURE0. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/activetexture">Gl.Act=
+iveTexture</A>.=20
+  </P>
+  <DT>Gl.ALIASED_LINE_WIDTH_RANGE
+  <DD>
+  <P><U>params</U> returns a pair of values indicating the range of =
+widths=20
+  supported for aliased lines. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/linewidth">Gl.LineWid=
+th</A>.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/smooth_line_width_ran=
+ge">Gl.SMOOTH_LINE_WIDTH_RANGE</A>
+  <DD>
+  <P><U>params</U> returns a pair of values indicating the range of =
+widths=20
+  supported for smooth (antialiased) lines. See Gl.LineWidth. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/smooth_line_width_gra=
+nularity">Gl.SMOOTH_LINE_WIDTH_GRANULARITY</A>
+  <DD>
+  <P><U>params</U> returns a single value indicating the level of =
+quantization=20
+  applied to smooth line width parameters. </P>
+  <DT>Gl.ARRAY_BUFFER_BINDING
+  <DD>
+  <P><U>params</U> returns a single value, the name of the buffer <A=20
+  href=3D"http://gambasdoc.org/help/def/object">object</A> currently =
+bound to the=20
+  target Gl.ARRAY_BUFFER. If no buffer object is bound to this target, 0 =
+is=20
+  returned. The initial value is 0. See Gl.BindBuffer. </P>
+  <DT><A =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/blend">Gl.BLEND</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+blending is=20
+  enabled. The initial value is Gl.FALSE. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/blendfunc">Gl.BlendFu=
+nc</A>.=20
+  </P>
+  <DT>Gl.BLEND_COLOR
+  <DD>
+  <P><U>params</U> returns four values, the red, green, blue, and alpha =
+values=20
+  which are the components of the blend color. See Gl.BlendColor. </P>
+  <DT>Gl.BLEND_DST_ALPHA
+  <DD>
+  <P><U>params</U> returns one value, the symbolic constant identifying =
+the=20
+  alpha destination blend function. The initial value is <A=20
+  href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/zero">Gl.ZERO</A>. =
+See=20
+  Gl.BlendFunc and Gl.BlendFuncSeparate. </P>
+  <DT>Gl.BLEND_DST_RGB
+  <DD>
+  <P><U>params</U> returns one value, the symbolic constant identifying =
+the RGB=20
+  destination blend function. The initial value is Gl.ZERO. See =
+Gl.BlendFunc and=20
+  Gl.BlendFuncSeparate. </P>
+  <DT>Gl.BLEND_EQUATION_RGB
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+whether the=20
+  RGB blend equation is Gl.FUNC_ADD, Gl.FUNC_SUBTRACT, =
+Gl.FUNC_REVERSE_SUBTRACT,=20
+  Gl.MIN or Gl.MAX. See Gl.BlendEquationSeparate. </P>
+  <DT>Gl.BLEND_EQUATION_ALPHA
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+whether the=20
+  Alpha blend equation is Gl.FUNC_ADD, Gl.FUNC_SUBTRACT,=20
+  Gl.FUNC_REVERSE_SUBTRACT, Gl.MIN or Gl.MAX. See =
+Gl.BlendEquationSeparate. </P>
+  <DT>Gl.BLEND_SRC_ALPHA
+  <DD>
+  <P><U>params</U> returns one value, the symbolic constant identifying =
+the=20
+  alpha source blend function. The initial value is <A=20
+  href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/one">Gl.ONE</A>. =
+See=20
+  Gl.BlendFunc and Gl.BlendFuncSeparate. </P>
+  <DT>Gl.BLEND_SRC_RGB
+  <DD>
+  <P><U>params</U> returns one value, the symbolic constant identifying =
+the RGB=20
+  source blend function. The initial value is Gl.ONE. See Gl.BlendFunc =
+and=20
+  Gl.BlendFuncSeparate. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/color_clear_value">Gl=
+.COLOR_CLEAR_VALUE</A>
+  <DD>
+  <P><U>params</U> returns four values: the red, green, blue, and alpha =
+values=20
+  used to clear the color buffers. <A=20
+  href=3D"http://gambasdoc.org/help/lang/type/integer">Integer</A> =
+values, if=20
+  requested, are linearly mapped from the internal floating-point =
+representation=20
+  such that 1.0 returns the most positive representable integer value, =
+and <MATH=20
+  overflow=3D"scroll" =
+xmlns=3D"http://www.w3.org/1998/Math/MathML"><MN>-1.0</MN>=20
+  </MATH>returns the most negative representable integer value. The =
+initial=20
+  value is (0, 0, 0, 0). See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/clearcolor">Gl.ClearC=
+olor</A>.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/color_logic_op">Gl.CO=
+LOR_LOGIC_OP</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether a=20
+  fragment's RGBA color values are merged into the framebuffer using a =
+logical=20
+  operation. The initial value is Gl.FALSE. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/logicop">Gl.LogicOp</=
+A>.=20
+</P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/color_writemask">Gl.C=
+OLOR_WRITEMASK</A>
+  <DD>
+  <P><U>params</U> returns four boolean values: the red, green, blue, =
+and alpha=20
+  write enables for the color buffers. The initial value is (Gl.TRUE, =
+Gl.TRUE,=20
+  Gl.TRUE, Gl.TRUE). See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/colormask">Gl.ColorMa=
+sk</A>.=20
+  </P>
+  <DT>Gl.COMPRESSED_TEXTURE_FORMATS
+  <DD>
+  <P><U>params</U> returns a list of symbolic constants of length=20
+  Gl.NUM_COMPRESSED_TEXTURE_FORMATS indicating which compressed texture =
+formats=20
+  are available. See Gl.CompressedTexImage2D. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/cull_face">Gl.CULL_FA=
+CE</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+polygon=20
+  culling is enabled. The initial value is Gl.FALSE. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/cullface">Gl.CullFace=
+</A>.=20
+  </P>
+  <DT>Gl.CURRENT_PROGRAM
+  <DD>
+  <P><U>params</U> returns one value, the name of the program object =
+that is=20
+  currently active, or 0 if no program object is active. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl.glsl/gl/useprogram">Gl.u=
+seProgram</A>.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/depth_clear_value">Gl=
+.DEPTH_CLEAR_VALUE</A>
+  <DD>
+  <P><U>params</U> returns one value, the value that is used to clear =
+the depth=20
+  buffer. Integer values, if requested, are linearly mapped from the =
+internal=20
+  floating-point representation such that 1.0 returns the most positive=20
+  representable integer value, and <MATH overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MN>-1.0</MN> =
+</MATH>returns the=20
+  most negative representable integer value. The initial value is 1. See =
+<A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/cleardepth">Gl.ClearD=
+epth</A>.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/depth_func">Gl.DEPTH_=
+FUNC</A>
+  <DD>
+  <P><U>params</U> returns one value, the symbolic constant that =
+indicates the=20
+  depth comparison function. The initial value is <A=20
+  href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/less">Gl.LESS</A>. =
+See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/depthfunc">Gl.DepthFu=
+nc</A>.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/depth_range">Gl.DEPTH=
+_RANGE</A>
+  <DD>
+  <P><U>params</U> returns two values: the near and far mapping limits =
+for the=20
+  depth buffer. Integer values, if requested, are linearly mapped from =
+the=20
+  internal floating-point representation such that 1.0 returns the most =
+positive=20
+  representable integer value, and <MATH overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MN>-1.0</MN> =
+</MATH>returns the=20
+  most negative representable integer value. The initial value is (0, =
+1). See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/depthrange">Gl.DepthR=
+ange</A>.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/depth_test">Gl.DEPTH_=
+TEST</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+depth=20
+  testing of fragments is enabled. The initial value is Gl.FALSE. See=20
+  Gl.DepthFunc and Gl.DepthRange. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/depth_writemask">Gl.D=
+EPTH_WRITEMASK</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating if the =
+depth buffer=20
+  is enabled for writing. The initial value is Gl.TRUE. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/depthmask">Gl.DepthMa=
+sk</A>.=20
+  </P>
+  <DT><A =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/dither">Gl.DITHER</A>=
+
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+dithering=20
+  of fragment colors and indices is enabled. The initial value is =
+Gl.TRUE. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/doublebuffer">Gl.DOUB=
+LEBUFFER</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+double=20
+  buffering is supported. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/draw_buffer">Gl.DRAW_=
+BUFFER</A>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+which=20
+  buffers are being drawn to. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/drawbuffer">Gl.DrawBu=
+ffer</A>.=20
+  The initial value is <A=20
+  href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/back">Gl.BACK</A> =
+if there=20
+  are back buffers, otherwise it is <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/front">Gl.FRONT</A>. =
+</P>
+  <DT>Gl.DRAW_BUFFER<I>i</I>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+which=20
+  buffers are being drawn to by the corresponding output color. See=20
+  Gl.DrawBuffers. The initial value of Gl.DRAW_BUFFER0 is Gl.BACK if =
+there are=20
+  back buffers, otherwise it is Gl.FRONT. The initial values of draw =
+buffers for=20
+  all other output colors is <A=20
+  href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/none">Gl.NONE</A>. =
+</P>
+  <DT>Gl.DRAW_FRAMEBFUFER_BINDING
+  <DD>
+  <P><U>params</U> returns one value, the name of the framebuffer object =
+
+  currently bound to the Gl.DRAW_FRAMEBUFFER target. If the default =
+framebuffer=20
+  is bound, this value will be zero. The initial value is zero. See=20
+  Gl.BindFramebuffer. </P>
+  <DT>Gl.READ_FRAMEBFUFER_BINDING
+  <DD>
+  <P><U>params</U> returns one value, the name of the framebuffer object =
+
+  currently bound to the Gl.READ_FRAMEBUFFER target. If the default =
+framebuffer=20
+  is bound, this value will be zero. The initial value is zero. See=20
+  Gl.BindFramebuffer. </P>
+  <DT>Gl.ELEMENT_ARRAY_BUFFER_BINDING
+  <DD>
+  <P><U>params</U> returns a single value, the name of the buffer object =
+
+  currently bound to the target Gl.ELEMENT_ARRAY_BUFFER. If no buffer =
+object is=20
+  bound to this target, 0 is returned. The initial value is 0. See=20
+  Gl.BindBuffer. </P>
+  <DT>Gl.RENDERBUFFER_BINDING
+  <DD>
+  <P><U>params</U> returns a single value, the name of the renderbuffer =
+object=20
+  currently bound to the target Gl.RENDERBUFFER. If no renderbuffer =
+object is=20
+  bound to this target, 0 is returned. The initial value is 0. See=20
+  Gl.BindRenderbuffer. </P>
+  <DT>Gl.FRAGMENT_SHADER_DERIVATIVE_HINT
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating the =
+mode of=20
+  the derivative accuracy hint for fragment shaders. The initial value =
+is <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/dont_care">Gl.DONT_CA=
+RE</A>.=20
+  See <A =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/hint">Gl.Hint</A>.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/line_smooth">Gl.LINE_=
+SMOOTH</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether=20
+  antialiasing of lines is enabled. The initial value is Gl.FALSE. See=20
+  Gl.LineWidth. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/line_smooth_hint">Gl.=
+LINE_SMOOTH_HINT</A>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating the =
+mode of=20
+  the line antialiasing hint. The initial value is Gl.DONT_CARE. See =
+Gl.Hint.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/line_width">Gl.LINE_W=
+IDTH</A>
+  <DD>
+  <P><U>params</U> returns one value, the line width as specified with=20
+  Gl.LineWidth. The initial value is 1. </P>
+  <DT>Gl.LINE_WIDTH_GRANULARITY
+  <DD>
+  <P><U>params</U> returns one value, the width difference between =
+adjacent=20
+  supported widths for antialiased lines. See Gl.LineWidth. </P>
+  <DT>Gl.LINE_WIDTH_RANGE
+  <DD>
+  <P><U>params</U> returns two values: the smallest and largest =
+supported widths=20
+  for antialiased lines. See Gl.LineWidth. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/logic_op_mode">Gl.LOG=
+IC_OP_MODE</A>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating the =
+
+  selected logic operation mode. The initial value is <A=20
+  href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/copy">Gl.COPY</A>. =
+See=20
+  Gl.LogicOp. </P>
+  <DT>Gl.MAX_3D_TEXTURE_SIZE
+  <DD>
+  <P><U>params</U> returns one value, a rough estimate of the largest 3D =
+texture=20
+  that the GL can handle. The value must be at least 64. Use =
+Gl.PROXY_TEXTURE_3D=20
+  to determine if a texture is too large. See Gl.TexImage3D. </P>
+  <DT>Gl.MAX_CLIP_DISTANCES
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of =
+application-defined=20
+  clipping distances. The value must be at least 8. </P>
+  <DT>Gl.MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the number of words for fragment =
+shader=20
+  uniform variables in all uniform blocks (including default). The value =
+must be=20
+  at least 1. See Gl.uniform. </P>
+  <DT>Gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS
+  <DD>
+  <P><U>params</U> returns one value, the maximum supported texture =
+image units=20
+  that can be used to access texture maps from the vertex shader and the =
+
+  fragment processor combined. If both the vertex shader and the =
+fragment=20
+  processing stage access the same texture image unit, then that counts =
+as using=20
+  two texture image units against this limit. The value must be at least =
+48. See=20
+  Gl.ActiveTexture. </P>
+  <DT>Gl.MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the number of words for vertex =
+shader=20
+  uniform variables in all uniform blocks (including default). The value =
+must be=20
+  at least 1. See Gl.uniform. </P>
+  <DT>Gl.MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the number of words for geometry =
+shader=20
+  uniform variables in all uniform blocks (including default). The value =
+must be=20
+  at least 1. See Gl.uniform. </P>
+  <DT>Gl.MAX_VARYING_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the number components for varying=20
+  variables, which must be at least 60. </P>
+  <DT>Gl.MAX_COMBINED_UNIFORM_BLOCKS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of uniform =
+blocks per=20
+  program. The value must be at least 36. See Gl.uniformBlockBinding. =
+</P>
+  <DT>Gl.MAX_CUBE_MAP_TEXTURE_SIZE
+  <DD>
+  <P><U>params</U> returns one value. The value gives a rough estimate =
+of the=20
+  largest cube-map texture that the GL can handle. The value must be at =
+least=20
+  1024. Use Gl.PROXY_TEXTURE_CUBE_MAP to determine if a texture is too =
+large.=20
+  See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/teximage2d">Gl.TexIma=
+ge2D</A>.=20
+  </P>
+  <DT>Gl.MAX_DRAW_BUFFERS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of simultaneous =
+outputs=20
+  that may be written in a fragment shader. The value must be at least =
+8. See=20
+  Gl.DrawBuffers. </P>
+  <DT>Gl.MAX_DUALSOURCE_DRAW_BUFFERS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of active draw =
+buffers=20
+  when using dual-source blending. The value must be at least 1. See=20
+  Gl.BlendFunc and Gl.BlendFuncSeparate. </P>
+  <DT>Gl.MAX_ELEMENTS_INDICES
+  <DD>
+  <P><U>params</U> returns one value, the recommended maximum number of =
+vertex=20
+  array indices. See Gl.DrawRangeElements. </P>
+  <DT>Gl.MAX_ELEMENTS_VERTICES
+  <DD>
+  <P><U>params</U> returns one value, the recommended maximum number of =
+vertex=20
+  array vertices. See Gl.DrawRangeElements. </P>
+  <DT>Gl.MAX_FRAGMENT_UNIFORM_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of individual=20
+  floating-point, integer, or boolean values that can be held in uniform =
+
+  variable storage for a fragment shader. The value must be at least =
+1024. See=20
+  Gl.uniform. </P>
+  <DT>Gl.MAX_FRAGMENT_UNIFORM_BLOCKS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of uniform =
+blocks per=20
+  fragment shader. The value must be at least 12. See =
+Gl.uniformBlockBinding.=20
+  </P>
+  <DT>Gl.MAX_FRAGMENT_INPUT_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of components =
+of the=20
+  inputs read by the fragment shader, which must be at least 128. </P>
+  <DT>Gl.MIN_PROGRAM_TEXEL_OFFSET
+  <DD>
+  <P><U>params</U> returns one value, the minimum texel offset allowed =
+in a=20
+  texture lookup, which must be at most -8. </P>
+  <DT>Gl.MAX_PROGRAM_TEXEL_OFFSET
+  <DD>
+  <P><U>params</U> returns one value, the maximum texel offset allowed =
+in a=20
+  texture lookup, which must be at least 7. </P>
+  <DT>Gl.MAX_RECTANGLE_TEXTURE_SIZE
+  <DD>
+  <P><U>params</U> returns one value. The value gives a rough estimate =
+of the=20
+  largest rectangular texture that the GL can handle. The value must be =
+at least=20
+  1024. Use Gl.PROXY_RECTANGLE_TEXTURE to determine if a texture is too =
+large.=20
+  See Gl.TexImage2D. </P>
+  <DT>Gl.MAX_TEXTURE_IMAGE_UNITS
+  <DD>
+  <P><U>params</U> returns one value, the maximum supported texture =
+image units=20
+  that can be used to access texture maps from the fragment shader. The =
+value=20
+  must be at least 16. See Gl.ActiveTexture. </P>
+  <DT>Gl.MAX_TEXTURE_LOD_BIAS
+  <DD>
+  <P><U>params</U> returns one value, the maximum, absolute value of the =
+texture=20
+  level-of-detail bias. The value must be at least 2.0. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/max_texture_size">Gl.=
+MAX_TEXTURE_SIZE</A>
+  <DD>
+  <P><U>params</U> returns one value. The value gives a rough estimate =
+of the=20
+  largest texture that the GL can handle. The value must be at least =
+1024. Use a=20
+  proxy texture target such as Gl.PROXY_TEXTURE_1D or =
+Gl.PROXY_TEXTURE_2D to=20
+  determine if a texture is too large. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/teximage1d">Gl.TexIma=
+ge1D</A>=20
+  and Gl.TexImage2D. </P>
+  <DT>Gl.MAX_RENDERBUFFER_SIZE
+  <DD>
+  <P><U>params</U> returns one value. The value indicates the maximum =
+supported=20
+  size for renderbuffers. See Gl.FramebufferRenderbuffer. </P>
+  <DT>Gl.MAX_ARRAY_TEXTURE_LAYERS
+  <DD>
+  <P><U>params</U> returns one value. The value indicates the maximum =
+number of=20
+  layers allowed in an array texture, and must be at least 256. See=20
+  Gl.TexImage2D. </P>
+  <DT>Gl.MAX_TEXTURE_BUFFER_SIZE
+  <DD>
+  <P><U>params</U> returns one value. The value gives the maximum number =
+of=20
+  texels allowed in the texel array of a texture buffer object. Value =
+must be at=20
+  least 65536. </P>
+  <DT>Gl.MAX_UNIFORM_BLOCK_SIZE
+  <DD>
+  <P><U>params</U> returns one value, the maximum size in basic machine =
+units of=20
+  a uniform block. The value must be at least 16384. See =
+Gl.uniformBlockBinding.=20
+  </P>
+  <DT>Gl.MAX_VARYING_FLOATS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of =
+interpolators=20
+  available for processing varying variables used by vertex and fragment =
+
+  shaders. This value represents the number of individual floating-point =
+values=20
+  that can be interpolated; varying variables declared as vectors, =
+matrices, and=20
+  arrays will all consume multiple interpolators. The value must be at =
+least 32.=20
+  </P>
+  <DT>Gl.MAX_VERTEX_ATTRIBS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of 4-<A=20
+  href=3D"http://gambasdoc.org/help/def/component">component</A> generic =
+vertex=20
+  attributes accessible to a vertex shader. The value must be at least =
+16. See=20
+  Gl.VertexAttrib. </P>
+  <DT>Gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS
+  <DD>
+  <P><U>params</U> returns one value, the maximum supported texture =
+image units=20
+  that can be used to access texture maps from the vertex shader. The =
+value may=20
+  be at least 16. See Gl.ActiveTexture. </P>
+  <DT>Gl.MAX_GEOMETRY_TEXTURE_IMAGE_UNITS
+  <DD>
+  <P><U>params</U> returns one value, the maximum supported texture =
+image units=20
+  that can be used to access texture maps from the geometry shader. The =
+value=20
+  must be at least 16. See Gl.ActiveTexture. </P>
+  <DT>Gl.MAX_VERTEX_UNIFORM_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of individual=20
+  floating-point, integer, or boolean values that can be held in uniform =
+
+  variable storage for a vertex shader. The value must be at least 1024. =
+See=20
+  Gl.uniform. </P>
+  <DT>Gl.MAX_VERTEX_OUTPUT_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of components =
+of output=20
+  written by a vertex shader, which must be at least 64. </P>
+  <DT>Gl.MAX_GEOMETRY_UNIFORM_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of individual=20
+  floating-point, integer, or boolean values that can be held in uniform =
+
+  variable storage for a geometry shader. The value must be at least =
+1024. See=20
+  Gl.uniform. </P>
+  <DT>Gl.MAX_SAMPLE_MASK_WORDS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of sample mask =
+words.=20
+  </P>
+  <DT>Gl.MAX_COLOR_TEXTURE_SAMPLES
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of samples in a =
+color=20
+  multisample texture. </P>
+  <DT>Gl.MAX_DEPTH_TEXTURE_SAMPLES
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of samples in a =
+
+  multisample depth or depth-stencil texture. </P>
+  <DT>Gl.MAX_DEPTH_TEXTURE_SAMPLES
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of samples in a =
+
+  multisample depth or depth-stencil texture. </P>
+  <DT>Gl.MAX_INTEGER_SAMPLES
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of samples =
+supported in=20
+  integer format multisample buffers. </P>
+  <DT>Gl.MAX_SERVER_WAIT_TIMEOUT
+  <DD>
+  <P><U>params</U> returns one value, the maximum Gl.WaitSync timeout =
+interval.=20
+  </P>
+  <DT>Gl.MAX_UNIFORM_BUFFER_BINDINGS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of uniform =
+buffer=20
+  binding points on the context, which must be at least 36. </P>
+  <DT>Gl.MAX_UNIFORM_BLOCK_SIZE
+  <DD>
+  <P><U>params</U> returns one value, the maximum size in basic machine =
+units of=20
+  a uniform block, which must be at least 16384. </P>
+  <DT>Gl.UNIFORM_BUFFER_OFFSET_ALIGNMENT
+  <DD>
+  <P><U>params</U> returns one value, the minimum required alignment for =
+uniform=20
+  buffer sizes and offsets. </P>
+  <DT>Gl.MAX_VERTEX_UNIFORM_BLOCKS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of uniform =
+blocks per=20
+  vertex shader. The value must be at least 12. See =
+Gl.uniformBlockBinding. </P>
+  <DT>Gl.MAX_GEOMETRY_UNIFORM_BLOCKS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of uniform =
+blocks per=20
+  geometry shader. The value must be at least 12. See =
+Gl.uniformBlockBinding.=20
+  </P>
+  <DT>Gl.MAX_GEOMETRY_INPUT_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of components =
+of inputs=20
+  read by a geometry shader, which must be at least 64. </P>
+  <DT>Gl.MAX_GEOMETRY_OUTPUT_COMPONENTS
+  <DD>
+  <P><U>params</U> returns one value, the maximum number of components =
+of=20
+  outputs written by a geometry shader, which must be at least 128. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/max_viewport_dims">Gl=
+.MAX_VIEWPORT_DIMS</A>
+  <DD>
+  <P><U>params</U> returns two values: the maximum supported width and =
+height of=20
+  the viewport. These must be at least as large as the visible =
+dimensions of the=20
+  display being rendered to. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/viewport">Gl.Viewport=
+</A>.=20
+  </P>
+  <DT>Gl.NUM_COMPRESSED_TEXTURE_FORMATS
+  <DD>
+  <P><U>params</U> returns a single integer value indicating the number =
+of=20
+  available compressed texture formats. The minimum value is 4. See=20
+  Gl.CompressedTexImage2D. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/pack_alignment">Gl.PA=
+CK_ALIGNMENT</A>
+  <DD>
+  <P><U>params</U> returns one value, the byte alignment used for =
+writing pixel=20
+  data to memory. The initial value is 4. See Gl.PixelStore. </P>
+  <DT>Gl.PACK_IMAGE_HEIGHT
+  <DD>
+  <P><U>params</U> returns one value, the image height used for writing =
+pixel=20
+  data to memory. The initial value is 0. See Gl.PixelStore. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/pack_lsb_first">Gl.PA=
+CK_LSB_FIRST</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+single-bit=20
+  pixels being written to memory are written first to the least =
+significant bit=20
+  of each unsigned byte. The initial value is Gl.FALSE. See =
+Gl.PixelStore. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/pack_row_length">Gl.P=
+ACK_ROW_LENGTH</A>
+  <DD>
+  <P><U>params</U> returns one value, the row length used for writing =
+pixel data=20
+  to memory. The initial value is 0. See Gl.PixelStore. </P>
+  <DT>Gl.PACK_SKIP_IMAGES
+  <DD>
+  <P><U>params</U> returns one value, the number of pixel images skipped =
+before=20
+  the first pixel is written into memory. The initial value is 0. See=20
+  Gl.PixelStore. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/pack_skip_pixels">Gl.=
+PACK_SKIP_PIXELS</A>
+  <DD>
+  <P><U>params</U> returns one value, the number of pixel locations =
+skipped=20
+  before the first pixel is written into memory. The initial value is 0. =
+See=20
+  Gl.PixelStore. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/pack_skip_rows">Gl.PA=
+CK_SKIP_ROWS</A>
+  <DD>
+  <P><U>params</U> returns one value, the number of rows of pixel =
+locations=20
+  skipped before the first pixel is written into memory. The initial =
+value is 0.=20
+  See Gl.PixelStore. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/pack_swap_bytes">Gl.P=
+ACK_SWAP_BYTES</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether the =
+bytes=20
+  of two-byte and four-byte pixel indices and components are swapped =
+before=20
+  being written to memory. The initial value is Gl.FALSE. See =
+Gl.PixelStore.=20
+</P>
+  <DT>Gl.PIXEL_PACK_BUFFER_BINDING
+  <DD>
+  <P><U>params</U> returns a single value, the name of the buffer object =
+
+  currently bound to the target Gl.PIXEL_PACK_BUFFER. If no buffer =
+object is=20
+  bound to this target, 0 is returned. The initial value is 0. See=20
+  Gl.BindBuffer. </P>
+  <DT>Gl.PIXEL_UNPACK_BUFFER_BINDING
+  <DD>
+  <P><U>params</U> returns a single value, the name of the buffer object =
+
+  currently bound to the target Gl.PIXEL_UNPACK_BUFFER. If no buffer =
+object is=20
+  bound to this target, 0 is returned. The initial value is 0. See=20
+  Gl.BindBuffer. </P>
+  <DT>Gl.POINT_FADE_THRESHOLD_SIZE
+  <DD>
+  <P><U>params</U> returns one value, the point size threshold for =
+determining=20
+  the point size. See Gl.PointParameter. </P>
+  <DT>Gl.PRIMITIVE_RESTART_INDEX
+  <DD>
+  <P><U>params</U> returns one value, the current primitive restart =
+index. The=20
+  initial value is 0. See Gl.PrimitiveRestartIndex. </P>
+  <DT>Gl.PROVOKING_VERTEX
+  <DD>
+  <P><U>params</U> returns one value, the currently selected provoking =
+vertex=20
+  convention. The initial value is Gl.LAST_VERTEX_CONVENTION. See=20
+  Gl.ProvokingVertex. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/point_size">Gl.POINT_=
+SIZE</A>
+  <DD>
+  <P><U>params</U> returns one value, the point size as specified by <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/pointsize">Gl.PointSi=
+ze</A>.=20
+  The initial value is 1. </P>
+  <DT>Gl.POINT_SIZE_GRANULARITY
+  <DD>
+  <P><U>params</U> returns one value, the size difference between =
+adjacent=20
+  supported sizes for antialiased points. See Gl.PointSize. </P>
+  <DT>Gl.POINT_SIZE_RANGE
+  <DD>
+  <P><U>params</U> returns two values: the smallest and largest =
+supported sizes=20
+  for antialiased points. The smallest size must be at most 1, and the =
+largest=20
+  size must be at least 1. See Gl.PointSize. </P>
+  <DT>Gl.POLYGON_OFFSET_FACTOR
+  <DD>
+  <P><U>params</U> returns one value, the scaling factor used to =
+determine the=20
+  variable offset that is added to the depth value of each fragment =
+generated=20
+  when a polygon is rasterized. The initial value is 0. See =
+Gl.PolygonOffset.=20
+  </P>
+  <DT>Gl.POLYGON_OFFSET_UNITS
+  <DD>
+  <P><U>params</U> returns one value. This value is multiplied by an=20
+  implementation-specific value and then added to the depth value of =
+each=20
+  fragment generated when a polygon is rasterized. The initial value is =
+0. See=20
+  Gl.PolygonOffset. </P>
+  <DT>Gl.POLYGON_OFFSET_FILL
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+polygon=20
+  offset is enabled for polygons in fill mode. The initial value is =
+Gl.FALSE.=20
+  See Gl.PolygonOffset. </P>
+  <DT>Gl.POLYGON_OFFSET_LINE
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+polygon=20
+  offset is enabled for polygons in line mode. The initial value is =
+Gl.FALSE.=20
+  See Gl.PolygonOffset. </P>
+  <DT>Gl.POLYGON_OFFSET_POINT
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+polygon=20
+  offset is enabled for polygons in point mode. The initial value is =
+Gl.FALSE.=20
+  See Gl.PolygonOffset. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/polygon_smooth">Gl.PO=
+LYGON_SMOOTH</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether=20
+  antialiasing of polygons is enabled. The initial value is Gl.FALSE. =
+See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/polygonmode">Gl.Polyg=
+onMode</A>.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/polygon_smooth_hint">=
+Gl.POLYGON_SMOOTH_HINT</A>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating the =
+mode of=20
+  the polygon antialiasing hint. The initial value is Gl.DONT_CARE. See =
+Gl.Hint.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/read_buffer">Gl.READ_=
+BUFFER</A>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+which color=20
+  buffer is selected for reading. The initial value is Gl.BACK if there =
+is a=20
+  back buffer, otherwise it is Gl.FRONT. See Gl.ReadPixels. </P>
+  <DT>Gl.SAMPLE_BUFFERS
+  <DD>
+  <P><U>params</U> returns a single integer value indicating the number =
+of=20
+  sample buffers associated with the framebuffer. See Gl.SampleCoverage. =
+</P>
+  <DT>Gl.SAMPLE_COVERAGE_VALUE
+  <DD>
+  <P><U>params</U> returns a single positive floating-point value =
+indicating the=20
+  current sample coverage value. See Gl.SampleCoverage. </P>
+  <DT>Gl.SAMPLE_COVERAGE_INVERT
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating if the =
+temporary=20
+  coverage value should be inverted. See Gl.SampleCoverage. </P>
+  <DT>Gl.SAMPLER_BINDING
+  <DD>
+  <P><U>params</U> returns a single value, the name of the sampler =
+object=20
+  currently bound to the active texture unit. The initial value is 0. =
+See=20
+  Gl.BindSampler. </P>
+  <DT>Gl.SAMPLES
+  <DD>
+  <P><U>params</U> returns a single integer value indicating the =
+coverage mask=20
+  size. See Gl.SampleCoverage. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/scissor_box">Gl.SCISS=
+OR_BOX</A>
+  <DD>
+  <P><U>params</U> returns four values: the <MATH overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MI=20
+  mathvariant=3D"italic">x</MI></MATH> and <MATH overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MI=20
+  mathvariant=3D"italic">y</MI></MATH> window coordinates of the scissor =
+box,=20
+  followed by its width and height. Initially the <MATH =
+overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MI=20
+  mathvariant=3D"italic">x</MI></MATH> and <MATH overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MI=20
+  mathvariant=3D"italic">y</MI></MATH> window coordinates are both 0 and =
+the width=20
+  and height are set to the size of the window. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/scissor">Gl.Scissor</=
+A>.=20
+</P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/scissor_test">Gl.SCIS=
+SOR_TEST</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+scissoring=20
+  is enabled. The initial value is Gl.FALSE. See Gl.Scissor. </P>
+  <DT>Gl.STENCIL_BACK_FAIL
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+what action=20
+  is taken for back-facing polygons when the stencil test fails. The =
+initial=20
+  value is <A=20
+  href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/keep">Gl.KEEP</A>. =
+See=20
+  Gl.StencilOpSeparate. </P>
+  <DT>Gl.STENCIL_BACK_FUNC
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+what=20
+  function is used for back-facing polygons to compare the stencil =
+reference=20
+  value with the stencil buffer value. The initial value is <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/always">Gl.ALWAYS</A>=
+. See=20
+  Gl.StencilFuncSeparate. </P>
+  <DT>Gl.STENCIL_BACK_PASS_DEPTH_FAIL
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+what action=20
+  is taken for back-facing polygons when the stencil test passes, but =
+the depth=20
+  test fails. The initial value is Gl.KEEP. See Gl.StencilOpSeparate. =
+</P>
+  <DT>Gl.STENCIL_BACK_PASS_DEPTH_PASS
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+what action=20
+  is taken for back-facing polygons when the stencil test passes and the =
+depth=20
+  test passes. The initial value is Gl.KEEP. See Gl.StencilOpSeparate. =
+</P>
+  <DT>Gl.STENCIL_BACK_REF
+  <DD>
+  <P><U>params</U> returns one value, the reference value that is =
+compared with=20
+  the contents of the stencil buffer for back-facing polygons. The =
+initial value=20
+  is 0. See Gl.StencilFuncSeparate. </P>
+  <DT>Gl.STENCIL_BACK_VALUE_MASK
+  <DD>
+  <P><U>params</U> returns one value, the mask that is used for =
+back-facing=20
+  polygons to mask both the stencil reference value and the stencil =
+buffer value=20
+  before they are compared. The initial value is all 1's. See=20
+  Gl.StencilFuncSeparate. </P>
+  <DT>Gl.STENCIL_BACK_WRITEMASK
+  <DD>
+  <P><U>params</U> returns one value, the mask that controls writing of =
+the=20
+  stencil bitplanes for back-facing polygons. The initial value is all =
+1's. See=20
+  Gl.StencilMaskSeparate. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencil_clear_value">=
+Gl.STENCIL_CLEAR_VALUE</A>
+  <DD>
+  <P><U>params</U> returns one value, the index to which the stencil =
+bitplanes=20
+  are cleared. The initial value is 0. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/clearstencil">Gl.Clea=
+rStencil</A>.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencil_fail">Gl.STEN=
+CIL_FAIL</A>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+what action=20
+  is taken when the stencil test fails. The initial value is Gl.KEEP. =
+See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencilop">Gl.Stencil=
+Op</A>.=20
+  This stencil state only affects non-polygons and front-facing =
+polygons.=20
+  Back-facing polygons use separate stencil state. See =
+Gl.StencilOpSeparate.=20
+</P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencil_func">Gl.STEN=
+CIL_FUNC</A>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+what=20
+  function is used to compare the stencil reference value with the =
+stencil=20
+  buffer value. The initial value is Gl.ALWAYS. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencilfunc">Gl.Stenc=
+ilFunc</A>.=20
+  This stencil state only affects non-polygons and front-facing =
+polygons.=20
+  Back-facing polygons use separate stencil state. See =
+Gl.StencilFuncSeparate.=20
+  </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencil_pass_depth_fa=
+il">Gl.STENCIL_PASS_DEPTH_FAIL</A>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+what action=20
+  is taken when the stencil test passes, but the depth test fails. The =
+initial=20
+  value is Gl.KEEP. See Gl.StencilOp. This stencil state only affects=20
+  non-polygons and front-facing polygons. Back-facing polygons use =
+separate=20
+  stencil state. See Gl.StencilOpSeparate. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencil_pass_depth_pa=
+ss">Gl.STENCIL_PASS_DEPTH_PASS</A>
+  <DD>
+  <P><U>params</U> returns one value, a symbolic constant indicating =
+what action=20
+  is taken when the stencil test passes and the depth test passes. The =
+initial=20
+  value is Gl.KEEP. See Gl.StencilOp. This stencil state only affects=20
+  non-polygons and front-facing polygons. Back-facing polygons use =
+separate=20
+  stencil state. See Gl.StencilOpSeparate. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencil_ref">Gl.STENC=
+IL_REF</A>
+  <DD>
+  <P><U>params</U> returns one value, the reference value that is =
+compared with=20
+  the contents of the stencil buffer. The initial value is 0. See=20
+  Gl.StencilFunc. This stencil state only affects non-polygons and =
+front-facing=20
+  polygons. Back-facing polygons use separate stencil state. See=20
+  Gl.StencilFuncSeparate. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencil_test">Gl.STEN=
+CIL_TEST</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+stencil=20
+  testing of fragments is enabled. The initial value is Gl.FALSE. See=20
+  Gl.StencilFunc and Gl.StencilOp. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencil_value_mask">G=
+l.STENCIL_VALUE_MASK</A>
+  <DD>
+  <P><U>params</U> returns one value, the mask that is used to mask both =
+the=20
+  stencil reference value and the stencil buffer value before they are =
+compared.=20
+  The initial value is all 1's. See Gl.StencilFunc. This stencil state =
+only=20
+  affects non-polygons and front-facing polygons. Back-facing polygons =
+use=20
+  separate stencil state. See Gl.StencilFuncSeparate. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencil_writemask">Gl=
+.STENCIL_WRITEMASK</A>
+  <DD>
+  <P><U>params</U> returns one value, the mask that controls writing of =
+the=20
+  stencil bitplanes. The initial value is all 1's. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stencilmask">Gl.Stenc=
+ilMask</A>.=20
+  This stencil state only affects non-polygons and front-facing =
+polygons.=20
+  Back-facing polygons use separate stencil state. See =
+Gl.StencilMaskSeparate.=20
+  </P>
+  <DT><A =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/stereo">Gl.STEREO</A>=
+
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+stereo=20
+  buffers (left and right) are supported. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/subpixel_bits">Gl.SUB=
+PIXEL_BITS</A>
+  <DD>
+  <P><U>params</U> returns one value, an estimate of the number of bits =
+of=20
+  subpixel resolution that are used to position rasterized geometry in =
+window=20
+  coordinates. The value must be at least 4. </P>
+  <DT>Gl.TEXTURE_BINDING_1D
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/texture_1d">Gl.TEXTUR=
+E_1D</A>.=20
+  The initial value is 0. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/bindtexture">Gl.BindT=
+exture</A>.=20
+  </P>
+  <DT>Gl.TEXTURE_BINDING_1D_ARRAY
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target Gl.TEXTURE_1D_ARRAY. The initial value is 0. See=20
+  Gl.BindTexture. </P>
+  <DT>Gl.TEXTURE_BINDING_2D
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/texture_2d">Gl.TEXTUR=
+E_2D</A>.=20
+  The initial value is 0. See Gl.BindTexture. </P>
+  <DT>Gl.TEXTURE_BINDING_2D_ARRAY
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target Gl.TEXTURE_2D_ARRAY. The initial value is 0. See=20
+  Gl.BindTexture. </P>
+  <DT>Gl.TEXTURE_BINDING_2D_MULTISAMPLE
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target Gl.TEXTURE_2D_MULTISAMPLE. The initial value is 0. =
+See=20
+  Gl.BindTexture. </P>
+  <DT>Gl.TEXTURE_BINDING_2D_MULTISAMPLE_ARRAY
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target Gl.TEXTURE_2D_MULTISAMPLE_ARRAY. The initial value =
+is 0.=20
+  See Gl.BindTexture. </P>
+  <DT>Gl.TEXTURE_BINDING_3D
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target Gl.TEXTURE_3D. The initial value is 0. See =
+Gl.BindTexture.=20
+  </P>
+  <DT>Gl.TEXTURE_BINDING_BUFFER
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target Gl.TEXTURE_BUFFER. The initial value is 0. See=20
+  Gl.BindTexture. </P>
+  <DT>Gl.TEXTURE_BINDING_CUBE_MAP
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target Gl.TEXTURE_CUBE_MAP. The initial value is 0. See=20
+  Gl.BindTexture. </P>
+  <DT>Gl.TEXTURE_BINDING_RECTANGLE
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+currently=20
+  bound to the target Gl.TEXTURE_RECTANGLE. The initial value is 0. See=20
+  Gl.BindTexture. </P>
+  <DT>Gl.TEXTURE_COMPRESSION_HINT
+  <DD>
+  <P><U>params</U> returns a single value indicating the mode of the =
+texture=20
+  compression hint. The initial value is Gl.DONT_CARE. </P>
+  <DT>Gl.TEXTURE_BUFFER_BINDING
+  <DD>
+  <P><U>params</U> returns a single value, the name of the texture =
+buffer object=20
+  currently bound. The initial value is 0. See Gl.BindBuffer. </P>
+  <DT>Gl.TIMESTAMP
+  <DD>
+  <P><U>params</U> returns a single value, the 64-bit value of the =
+current GL=20
+  time. See Gl.QueryCounter. </P>
+  <DT>Gl.TRANSFORM_FEEDBACK_BUFFER_BINDING
+  <DD>
+  <P>When used with non-indexed variants of <B><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/~get">Gl.Get</A></B> =
+(such=20
+  as <B>Gl.GetIntegerv</B>), <U>params</U> returns a single value, the =
+name of=20
+  the buffer object currently bound to the target =
+Gl.TRANSFORM_FEEDBACK_BUFFER.=20
+  If no buffer object is bound to this target, 0 is returned. When used =
+with=20
+  indexed variants of <B>Gl.Get</B> (such as <B>Gl.GetIntegeri_v</B>),=20
+  <U>params</U> returns a single value, the name of the buffer object =
+bound to=20
+  the indexed transform feedback attribute <A=20
+  href=3D"http://gambasdoc.org/help/def/stream">stream</A>. The initial =
+value is 0=20
+  for all targets. See Gl.BindBuffer, Gl.BindBufferBase, and =
+Gl.BindBufferRange.=20
+  </P>
+  <DT>Gl.TRANSFORM_FEEDBACK_BUFFER_START
+  <DD>
+  <P>When used with indexed variants of <B>Gl.Get</B> (such as=20
+  <B>Gl.GetInteger64i_v</B>), <U>params</U> returns a single value, the =
+start=20
+  offset of the binding range for each transform feedback attribute =
+stream. The=20
+  initial value is 0 for all streams. See Gl.BindBufferRange. </P>
+  <DT>Gl.TRANSFORM_FEEDBACK_BUFFER_SIZE
+  <DD>
+  <P>When used with indexed variants of <B>Gl.Get</B> (such as=20
+  <B>Gl.GetInteger64i_v</B>), <U>params</U> returns a single value, the =
+size of=20
+  the binding range for each transform feedback attribute stream. The =
+initial=20
+  value is 0 for all streams. See Gl.BindBufferRange. </P>
+  <DT>Gl.UNIFORM_BUFFER_BINDING
+  <DD>
+  <P>When used with non-indexed variants of <B>Gl.Get</B> (such as=20
+  <B>Gl.GetIntegerv</B>), <U>params</U> returns a single value, the name =
+of the=20
+  buffer object currently bound to the target Gl.UNIFORM_BUFFER. If no =
+buffer=20
+  object is bound to this target, 0 is returned. When used with indexed =
+variants=20
+  of <B>Gl.Get</B> (such as <B>Gl.GetIntegeri_v</B>), <U>params</U> =
+returns a=20
+  single value, the name of the buffer object bound to the indexed =
+uniform=20
+  buffer binding point. The initial value is 0 for all targets. See=20
+  Gl.BindBuffer, Gl.BindBufferBase, and Gl.BindBufferRange. </P>
+  <DT>Gl.UNIFORM_BUFFER_START
+  <DD>
+  <P>When used with indexed variants of <B>Gl.Get</B> (such as=20
+  <B>Gl.GetInteger64i_v</B>), <U>params</U> returns a single value, the =
+start=20
+  offset of the binding range for each indexed uniform buffer binding. =
+The=20
+  initial value is 0 for all bindings. See Gl.BindBufferRange. </P>
+  <DT>Gl.UNIFORM_BUFFER_SIZE
+  <DD>
+  <P>When used with indexed variants of <B>Gl.Get</B> (such as=20
+  <B>Gl.GetInteger64i_v</B>), <U>params</U> returns a single value, the =
+size of=20
+  the binding range for each indexed uniform buffer binding. The initial =
+value=20
+  is 0 for all bindings. See Gl.BindBufferRange. </P>
+  <DT>Gl.UNIFORM_BUFFER_OFFSET_ALIGNMENT
+  <DD>
+  <P><U>params</U> returns a single value, the minimum required =
+alignment for=20
+  uniform buffer sizes and offset. The initial value is 1. See=20
+  Gl.uniformBlockBinding. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/unpack_alignment">Gl.=
+UNPACK_ALIGNMENT</A>
+  <DD>
+  <P><U>params</U> returns one value, the byte alignment used for =
+reading pixel=20
+  data from memory. The initial value is 4. See Gl.PixelStore. </P>
+  <DT>Gl.UNPACK_IMAGE_HEIGHT
+  <DD>
+  <P><U>params</U> returns one value, the image height used for reading =
+pixel=20
+  data from memory. The initial is 0. See Gl.PixelStore. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/unpack_lsb_first">Gl.=
+UNPACK_LSB_FIRST</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+single-bit=20
+  pixels being read from memory are read first from the least =
+significant bit of=20
+  each unsigned byte. The initial value is Gl.FALSE. See Gl.PixelStore. =
+</P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/unpack_row_length">Gl=
+.UNPACK_ROW_LENGTH</A>
+  <DD>
+  <P><U>params</U> returns one value, the row length used for reading =
+pixel data=20
+  from memory. The initial value is 0. See Gl.PixelStore. </P>
+  <DT>Gl.UNPACK_SKIP_IMAGES
+  <DD>
+  <P><U>params</U> returns one value, the number of pixel images skipped =
+before=20
+  the first pixel is read from memory. The initial value is 0. See=20
+  Gl.PixelStore. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/unpack_skip_pixels">G=
+l.UNPACK_SKIP_PIXELS</A>
+  <DD>
+  <P><U>params</U> returns one value, the number of pixel locations =
+skipped=20
+  before the first pixel is read from memory. The initial value is 0. =
+See=20
+  Gl.PixelStore. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/unpack_skip_rows">Gl.=
+UNPACK_SKIP_ROWS</A>
+  <DD>
+  <P><U>params</U> returns one value, the number of rows of pixel =
+locations=20
+  skipped before the first pixel is read from memory. The initial value =
+is 0.=20
+  See Gl.PixelStore. </P>
+  <DT><A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/unpack_swap_bytes">Gl=
+.UNPACK_SWAP_BYTES</A>
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether the =
+bytes=20
+  of two-byte and four-byte pixel indices and components are swapped =
+after being=20
+  read from memory. The initial value is Gl.FALSE. See Gl.PixelStore. =
+</P>
+  <DT>Gl.NUM_EXTENSIONS
+  <DD>
+  <P><U>params</U> returns one value, the number of extensions supported =
+by the=20
+  GL implementation for the current context. See <A=20
+  =
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getstring">Gl.GetStri=
+ng</A>.=20
+  </P>
+  <DT>Gl.MAJOR_VERSION
+  <DD>
+  <P><U>params</U> returns one value, the major version number of the =
+OpenGL API=20
+  supported by the current context. </P>
+  <DT>Gl.MINOR_VERSION
+  <DD>
+  <P><U>params</U> returns one value, the minor version number of the =
+OpenGL API=20
+  supported by the current context. </P>
+  <DT>Gl.CONTEXT_FLAGS
+  <DD>
+  <P><U>params</U> returns one value, the flags with which the context =
+was=20
+  created (such as debugging functionality). </P>
+  <DT>Gl.VERTEX_PROGRAM_POINT_SIZE
+  <DD>
+  <P><U>params</U> returns a single boolean value indicating whether =
+vertex=20
+  program point size mode is enabled. If enabled, and a vertex shader is =
+active,=20
+  then the point size is taken from the shader built-in gl_PointSize. If =
+
+  disabled, and a vertex shader is active, then the point size is taken =
+from the=20
+  point state as specified by Gl.PointSize. The initial value is =
+Gl.FALSE. </P>
+  <DT>Gl.VIEWPORT
+  <DD>
+  <P><U>params</U> returns four values: the <MATH overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MI=20
+  mathvariant=3D"italic">x</MI></MATH> and <MATH overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MI=20
+  mathvariant=3D"italic">y</MI></MATH> window coordinates of the =
+viewport,=20
+  followed by its width and height. Initially the <MATH =
+overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MI=20
+  mathvariant=3D"italic">x</MI></MATH> and <MATH overflow=3D"scroll"=20
+  xmlns=3D"http://www.w3.org/1998/Math/MathML"><MI=20
+  mathvariant=3D"italic">y</MI></MATH> window coordinates are both set =
+to 0, and=20
+  the width and height are set to the width and height of the window =
+into which=20
+  the GL will do its rendering. See Gl.Viewport. </P></DD></DL>
+<P>Many of the boolean parameters can also be queried more easily using =
+<A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/isenabled">Gl.IsEnabl=
+ed</A>.=20
+<P>
+<H3>Notes</H3>
+<P>The following parameters return the associated value for the active =
+texture=20
+unit: <A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/texture_1d">Gl.TEXTUR=
+E_1D</A>,=20
+Gl.TEXTURE_BINDING_1D, <A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/texture_2d">Gl.TEXTUR=
+E_2D</A>,=20
+Gl.TEXTURE_BINDING_2D, Gl.TEXTURE_3D and Gl.TEXTURE_BINDING_3D.=20
+<P>Gl.MAX_RECTANGLE_TEXTURE_SIZE, Gl.MAX_TEXTURE_BUFFER_SIZE,=20
+Gl.UNIFORM_BUFFER_BINDING, Gl.TEXTURE_BUFFER_BINDING,=20
+Gl.MAX_VERTEX_UNIFORM_BLOCKS, Gl.MAX_FRAGMENT_UNIFORM_BLOCKS,=20
+Gl.MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS,=20
+Gl.MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS =
+Gl.MAX_COMBINED_UNIFORM_BLOCKS,=20
+Gl.MAX_UNIFORM_BLOCK_SIZE, and Gl.UNIFORM_BUFFER_OFFSET_ALIGNMENT are =
+available=20
+only if the GL version is 3.1 or greater.=20
+<P>Gl.MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS, =
+Gl.MAX_GEOMETRY_UNIFORM_BLOCKS,=20
+Gl.MAX_GEOMETRY_INPUT_COMPONENTS, Gl.MAX_GEOMETRY_OUTPUT_COMPONENTS,=20
+Gl.MAX_GEOMETRY_OUTPUT_VERTICES, Gl.MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS =
+and=20
+Gl.MAX_GEOMETRY_TEXTURE_IMAGE_UNITS are available only if the GL version =
+is 3.2=20
+or greater.=20
+<P><B>Gl.GetInteger64v</B> and <B>Gl.GetInteger64i_v</B> are available =
+only if=20
+the GL version is 3.2 or greater.=20
+<P>Gl.MAX_DUALSOURCE_DRAW_BUFFERS, Gl.SAMPLER_BINDING, and Gl.TIMESTAMP =
+are=20
+available only if the GL version is 3.3 or greater.=20
+<P>
+<H3>Errors</H3>
+<P><A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/invalid_enum">Gl.INVA=
+LID_ENUM</A>=20
+is generated if <U>pname</U> is not an accepted value.=20
+<P><A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/invalid_value">Gl.INV=
+ALID_VALUE</A>=20
+is generated on any of <B>Gl.GetBooleani_v</B>, <B>Gl.GetIntegeri_v</B>, =
+or=20
+<B>Gl.GetInteger64i_v</B> if <U>index</U> is outside of the valid range =
+for the=20
+indexed state <U>target</U>.=20
+<P>
+<DIV class=3Dseealso>
+<H3>See also</H3>
+<P>Gl.GetActiveUniform, <A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl.glsl/gl/getattachedshade=
+rs">Gl.GetAttachedShaders</A>,=20
+Gl.GetAttribLocation, Gl.GetBufferParameter, Gl.GetBufferPointerv,=20
+Gl.GetBufferSubData, Gl.GetCompressedTexImage, <A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/geterror">Gl.GetError=
+</A>,=20
+Gl.GetProgram, <A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl.glsl/gl/getprograminfolo=
+g">Gl.GetProgramInfoLog</A>,=20
+Gl.GetQueryiv, Gl.GetQueryObject, Gl.GetShader, <A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl.glsl/gl/getshaderinfolog=
+">Gl.GetShaderInfoLog</A>,=20
+<A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl.glsl/gl/getshadersource"=
+>Gl.GetShaderSource</A>,=20
+<A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/getstring">Gl.GetStri=
+ng</A>,=20
+Gl.GetTexImage, Gl.GetTexLevelParameter, Gl.GetTexParameter, =
+Gl.GetUniform, <A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl.glsl/gl/getuniformlocati=
+on">Gl.GetUniformLocation</A>,=20
+Gl.GetVertexAttrib, Gl.GetVertexAttribPointerv, <A=20
+href=3D"http://gambasdoc.org/help/comp/gb.opengl/gl/isenabled">Gl.IsEnabl=
+ed</A>=20
+</P></DIV>
+<P><FONT size=3D-2><A =
+href=3D"http://www.opengl.org/sdk/docs/man3/xhtml/glGet.xml"=20
+target=3D_blank>See original documentation on OpenGL website</A></FONT>=20
+</P></DIV></BODY></HTML>
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/en.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgoTOIzrVAAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAI2SURBVHjandJba9MAFAfwpEm7NLde
+t643ZK5sK3YzUyveV5lTCyKIMhHRFdEHUdFvIOKLfVLElwpFkb6oIOJtXpiIuumkvkzZ5mY7atsl
+pte0SdM0a2sq+wT7w//xxzkHDgCsKaDSixs2kr3dHb59iZxGWjHm0tlBykyNh0WGeeM7FY5EMWfn
+sZ1dAR3X5zDqjx6BLRaVwiYgezUvOhfmr589cPr4lhogp+mMVOabK3W5Adhdtqu7jZc1iQGftz56
+8varRYXAStMCPOOhhr2bS2/fr+vpunJhTzyWqoyLQB0Y2uoagfKDJsAeuBRrkpF7k78WU6ssOLbd
+7XZ7+vtrub90LI60MT2SuMALMAhSsIBu85Dru8Gq1M79OefVlfuAZ3f/M/2nSSdfSb9+xySTuUSy
+ks02ZBlWq9U4nrxxS9fRzut0MILUmo0SzxdKnEJat1Eej8QLhQxbWKbFYrHZaKgguA1BtDiOEQSK
+orAWqYOAIIocX5ZkeXVJ85kAy7AAyzpUjbokgSUONRnoO2EMx6jgNS1BCvmiIEkCV1Znc02pCnye
+aLHzoem6LPj3uwewWuXR4yRI4P5DdlsngSBJzGow6zGBp1+8/Anpn6fk+BKtEEip//CJ0YO9jrlv
+bOThNGwNLaEkie2oMSSJf9XYQ/c/Ijaj2WVV/4iauOWSBpmbnWpNG9tlYR+E55nyUy31YVbUyxWz
+gUTzBAxBMASyqUzw5u9NlH1kaNgy833vl+iTtX2Wkn9xpPLwn/Nb8gAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/fr.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgoV0e9OYQAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAGZSURBVHjanZBpbtswEIW1UBKHtGwY
+cBCocBu0DRA0RoH8ySHSkyQ9Qw+VSyVhHbmWLFELFzMjS+kBQnAIcMCP897zvA8t/3T+wcqyz1+/
+Xf+6u/390Bdlvt8XSilHiP/0xO/vU4B0teLLZchY/PhIRnq5XGXZxeb6RkpdlEVdH7RS2A+CIIpj
+mM0Y55CmIYA6vR8wxmZZ9uXq6qdzUZ7vyvJgjHKoxPfjOE4A2GLO+Czi3AZB03UTdn6+Xq+/L+Zn
+4m91PBZt24ShRYoQQpMEGGPzRQxwJKTVumzkhH3KLi4vf+x2rRCF70tjbBh6YRgmyOAopWia+kHQ
+WVs1TSWbQTzWZnNT13q7LV9EdThMllAepTBYAggoxW7ddfuq7oyZsKOLt9vq+bn8t+sxvNESAGWc
+MQCMZLDU9xhUb3X7H8vzGuW9vrZNY50bLCUJRXUMGPLOudESkq023ZgwlhB7IWRVWWu9KHq3xBil
+ie/5fd9XUqKlTmvc+MUUyYuoy1Lj9RQDQYZz1MdwrDK6lnKQZwy6Qmac9sH1BhpU4H4dQ0eSAAAA
+AElFTkSuQmCC
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/de.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgop/oAy5gAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAGrSURBVHjanY7tatswFIYtW5L1YcvJ
+EigehbFSKEvo2h+F3cVuajeUG9k9JH/qrzixZ1uSIzue2mS7gB7Qy3tAD89xnA8N+N/iOP56d/f8
+9FSW5W632263thhjEEKc8/l8vlwubTLGNpuNe2HsbrH1atW2bZ7nSZLUdW0Zz/MIIWEYCiFsUkov
+/6F9M8a+xPH3hwc8TUWeH15f1eHgas0BIL4vOF8IsYgiW6DrKq2v2K+bm/Xt7TcR/cnSLEmqojBS
+Os6EsM8ZexNFEQ8CB0JpzEF2mwv2En/+cX+vyvKUprMsY00zjSNEiFAa2PPeGRdjNY5Ayr6TV9vj
+eqXatsyzQ5rqunaMAZ6HCIFhiIWweabUXlZrvW9aOQxXDOHpWOT1MTmp0vE0CAAmPhWcLQT7FKGI
+D9CVSldD2yOjz/+w7ue+ShK1L8ZegmmC2CecUSHYLMJBcHahlqauOln3Sg1anpzf71il027IRtw4
+cPQg8hmlYciiiIQBgFj3Y3OWzSi1azQwEpirrS0T09ZgNK7r+R6hOOREMD+EgJ56p2t0dWx6aT2D
+kubN9uH5CwdX3aTRjo9aAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/es.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgod3zTGUwAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAHcSURBVHjandJhbtMwGAbgJI2T2ImT
+JY02OsoKrUTVCTFVIDGJA3AYzsAN4BIcAO0nEhcACQlp0hC/0LqJdnRNl6SJ7dhOTVqVC+yTv5+P
+Xr22Ne1eozf7TtOUph11OqN+//TkhCbJ7WSSXV7yJFFCmAA4rovDEMexG4YmQubZmdmw9UMtjsJH
+/c741bGURcrnmT9jh5lqC6PVMqFjB9iJfDvEugvZNm3D8FvUe9p5fjoUrv37OuNyUVdLvWa6rlu2
+DVGT5SMcNKF1bZAV095vWbd3MBh24wfB10/29y8yfsxGb4jeUqbZGIS2xoaeUiajIidlQ4xme0eH
+o9Ewna6Ni29Olq+jgyIPDQ3YAEIbIydwgKcrq6L1Kid5SnZs/OK4Ksj1Zzj7lUzt7s35a3IxtoDj
+QIyQDx3cakHOtaJgd3cFq+SuGwBqMZsv89s/pMyufrSjuTXobip5PnIDYLlSGoSwNCuqSjD6nxVk
+sZDT9Fm5j9L65yoeWPwlAYEPm2uA3lqZVIiMlGVVUSGp4Du2/HDDJtN9lphSPml6nCvrirl7keV6
+yrUYrTNKsgWhUpSFKLnYMfJxpv6mDuXNKznIQns4iDy3jQGGXNcoYat0JbjkzakEZ/x+H2sz/wD8
+PecXARPzgQAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/it.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgkuS8n0hgAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAGHSURBVHjanZHhToMwEIChZVDK3DI1
+MTMzRrNkiSbGv/oAPoaP4XP5VIJjbOsKpeXo6jFI/L9L29CWL3dfz/POCr9bPrplvpg/LB/f39++
+Xr9qUQshmqbB80AI8vk5DsPJ9XUymxHOo+/voKdnVzPEnl+eKl3txb6RDQDgOSEkDMPReMwZYxcX
+JI7h9H+H8YQjs3paOeLyXY55aEudc77vI8OsjaYTzuJRklhCKq0H7GZ+s7hfTC+nWZFtilzVKqGJ
+73tBEERRxH0STabIuyCoAQ6qGrDbu9vlallIhLJCFLa1HvUo7Zg4jvlohEXiG2hrpVKHSg0YKpW6
+XG9/012mTe081yt1DOcMwMUMai213stSt23njPNI3Xq3/tmkW1mY1gxKjPFTYDJLaGWMKEtt4R/b
+CCwuzQ+5AoWpBqVTIH90rm4aVEJSQ6tPXekwVMp2v9JIe7Q905eHH3hrjEElWSkDgE+i+sbgTLep
+UAIsUEpZyAYlxnCL3Surcl/Kum27AdBnOzP+AGyf522zynFWAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/nl.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAggyRtOZiAAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAG5SURBVHjanZJLbtswEIYlinqQ1jNO
+CwRojcI7J0ZTI1k05+oBummv0HMkB+mu68IpUqRyJUuURJEU9eg4NXKAEBxgOMOP8/8ADeNFy4T4
+/JQtzs5Wy+XN5aXI87/392y77fLc0Brbtjeb+UkSnp7SJEGUottb9J9+lSSAbc7PddOw3a5+fNSM
+AYMsy/E8EgQ0DL0gsAjRT/cxhB9Gi8Xb9+u1g3GRpizLOs6naTIJAcYLQzqf05MTO4p6jLmUR+zN
+1y/L9fr1alUxxtJUMDZqDepBnkspzIHtUDoahmjbqtgbd3cH7N3V9cXNRyFEqRSP44FSKFoYuyDP
+94EB2EBISVkjVCkF3YO3zeaD1uClrJsGkkMVIcdxCCEwDGRalgX1pmnKopTPIg1k5/siyxnnchxH
+ExjLRpaLbYIdMplYyL6umywrai44F0fs07efvx52v/+wutXjZDi2Hfg0joN5MkRh52CzU21V7pu6
+VLKVgh+x7z9224ciL6XuJ9vGs5kpBzxZDvgT3TD2EoCKFZ3inWzVM5bu6xr6cHARIW4Y0Tjxoxh8
+YXPSqmt5y8ZRDYPqB3havuxjHdY/Uf/mXGjuRIIAAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/pl.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAggiW2SJ7AAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAGRSURBVHjanZHbTuMwEIaTOOdNU6lS
+uditqlUlLgCponfs0/Wdlit4GcSqC6mCaBzb8SkH/rSFB2DksaLJfOOZfxznW+bCt9st7uVyeXV9
+/efuTkpZliWl1BiDuO/7cRxnWZbneZqm3slO9Hw+B7a5vbXWAmCM4QNxJIRhmCQJAMCEkHMcjkpg
+1us1Muq6Pr0zDIPruoggOz1aEARt2wohzthisVitVhfzC845rSo02fe9647tRVF0YsAjiF8oO3YO
+//3z183lpaxpVZaC0k5rBAkYP0g8LyUkQg1jtFLscKjf38/Y5vHB3v+l/3fs+Z8tS0frcaQ0TabT
+dDaLZzOS/TCDw4WoqkoZfcaC/f6w29GnJ/PyMnAOcSFCDN1cdxzI81rOhVIVpUpJaT4l4W9vtHiF
+6n3TOMPgh+E4ELDpNMyy3veltXUjhNbStuq4lRGrikIU+44xp+v8IIig92QCJsoyJwx117GmqUWj
+rMWRXwtgxSuW5VjrEQK9RybP48mEJAlSONrjTLUtTgPs+No37QNoheiKx31OEgAAAABJRU5ErkJg
+gg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/pt.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAggd7QKk0QAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAHMSURBVHjanZBBb9MwGIadxG4TO2ka
+UZgyqklMK0MbDIQ0BJzYiQsnxIE/wu/hL4wDd26gHXYAJBBCaGxoSdOlaZrYieN4wSmRuO+T/Z38
+6H0fA3Cl0dr1BIAG+GP/1mTzwaP7G9/j1+9+JycnPI4bISBCJiGO5zmjEfE8A2N0eKi3WAO8a55/
+09+9u5PTfBpFWRCINFWMZhjINC3HsQYD03F0y6pWaS2GCVbM9p1tHTayjlDvnI7mFSl1Tev1+ypK
+Mdh1ESFS1ynnCoHqrvlr443x9RvuPTkrPhX2uU6TfrFfjD4bJsd4xfRs+xLCQoglo13a+nh9a7KF
+QeIvpo/r2/bLN/OnzxEw5IGFHUcxpm1rvR6XMmNsSVmH7e7t5EWepdOjMDoDTUjkAjcYEstzVJQS
+M1ZKeVkmWV7WdVfyUmuiJPq5CA6agH77sMdhQ0/Bq773vlOqdZ2V5SLPuRT/sYv0IoyDs3BWe+zH
+/q9nx28fTobu1+Hwj4uGrVIpRMoo47wQdVlVHRbOwnA+XfLs6FR+GaBqE7/4iB0yML1WqVwpZZQp
+WB0mROcWxEFKUyGFgQwITYvZNmqVoGWpJ7Stl/G6VvXUT/5Lu+L8BXIc6gk0rWnjAAAAAElFTkSu
+QmCC
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/pt_BR.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgsIq/IT+QAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAIoSURBVHjanZLNa9NwGMd/ad6ahLZL
+m25NjMXVzdVW7dCh3XDTyxTFHvQiyPDiUQ9604Mnr4P5DwxE8CAiTBiUoTh1glWcw5d1dY7ZVue6
+1Kxrk6ZJfk1jg/0L9sDznJ4Pn+cLDwC7KsQZwwDYgBf53v7I4GBCrskCWbg4kMcReeoVnF3GCZxh
+OZbr4lgfSxP0zLUZzMFswAZYXuDj0RiFqpdiEqUZ8xlBM4IXIpXzh6qPvnikutdDeyicApZDOBjN
+0HyIjx4cSPbZp/ZK6QXq7nS8KrcAglAe4tbltemr689yvjc/mabp0qHeRtB2iyfEkaHemyl+NCx9
+X9PuPTiGYQQXwEIcRVJMbj1yNGZfGbUPh4hCGRY21MJ8wbFNjAt3JvqAJZfLpVze70bb25rf6+MD
+HoKm1TqzUgRnk5l9XdaNpPYU0V7/P3L8ZMzVUis7W4paWv9jreQrGNNEK1Bo2EEWFXu6+8WgYQBV
+1euKypLNTraHH+zZJWlsz6bAyPsF00CgG6dphoyIPShOEW6God/rurH6W32cgS+zzU628JnwYu7X
+k4+bEKpj0RpFkMVynHT5AEpzXHfqeH44+ja9pEzNNZaL0ISmvCg7ttLfUknZkmvK/RfWQh6/fe7r
+SALLFoe8fjMZXeUC2cm5+vNPmmlC2ILQgB0bmkC3a9uGZaAEWmtQ7zZ8Rw6A66md0wkpK8uT6cbn
+H1XYarZFhm6auqF8U3b3W+AfPAfwaiR3xVcAAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/mk.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A
+/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9gIGwgeOQCGSdIAAAIPSURBVCjP
+rZO/ahVREIe/OXv3b/YayCUxJBKFiCksEo2CWFjYWYsWCqaxEQSbqIUv4BMoNhba+gQ2FmpSiCIE
+CxUDkWhMJNzEu/fubvbsGYsN5AUy9fD9vplhBFAOoVoAd8Y7pOcqpudhZKnNye9tSlW6tSW9nbFn
+lc3nCR5CIMLYecupxYJ6JWDrWcLs528NyBWCtxyTFIbLDy3bL0u233j01WE2DKoggC/C6EXLiYWC
+7tMh+kshldMDo1gM457PxNeY9ftCfDPDFIbqXYu9TQGkgVyqGD1T8+fRMGbXo1YlVwc0Qfp4YoJp
+CZn2Q/rOseNqmC1xKGKUlhEiY0g8g/sQEopBgVwdmWe5srraGF14XDA/qfR+lmz8gHwdBluCy4Rj
+dwuiAHafpMQjwpFre0TjNdqp2YkskVfDdTAAszMtKgv/Bo6sdNjGFiMQ+BBHQuQZQk/wBKzTpneg
+WKsHo32amWG3cHRtTaEOBdK5irAlxIGQtoTE8/BF6L71ydTRrWsKHLSUG2trjVE/V7LaUarDpI6j
+CwOCBMqPAXEoRJFh8D5EYqVzLyMfspTqUAUqaewBeq4mV0cyVzG52Kf4EpAvh4TGMDyltKca/a3X
+Ab+WPToPeiRz1T5ADs5fpjUjV3OS0xV/X8TYlYBYhEiE9nGH7ylWlczV7Cx5+L2QsVs56VlL71UM
+v/d3dBgv8h8SnerSOAO4pwAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/sq.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A
+/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9gIGwgdCpR7ewcAAAGLSURBVCjP
+rZO9bhNBFEbPd2f2zwTHIUF2hCgQQnKVgjwECBo6HoGCF+IVQDwL1NBDRUiQ7djr9c6lsNfZIMrc
+aqQ5OnfuNzMCnDuoCPCuPAZgYpEnoeAsltTuXHrL3FuaXa+AyBEDGfdkVDIEnF9+34oAjiwwsYxp
+KPi6WTJS4HP9h0mIOPCzbXiV3+dHajnPKgoJg32TCFDJmFjGs1gQJWae+FRf8Su1fGtXABjiY33F
+i3xIKSMiWpylpxvR2CKPLOOBAgtPXKSGNc6XzTVCADjOy3zImkSGSMDKnUVfdGoZT0NO7c7ME5UC
+1hN0VUiMlQHQ7NhOZADTULDBmXvLwhMrTxxivM6HjCwwssjbYsSJIhv8Frvp39o2l5aZJxqcAwVO
+Q8bv1PI8VESJkQUeW86BjGtPe9b7YS89MfdEvds4scDYBiScD6sLgos3+SEDGfU/rPonmnli6Ym0
+sw9k+/fyvjymkPHQImt35rvGHdtlGYFbswqRIUoZpcQ0lkRE859cOna7vqMv8hcdO79aJJ5ThgAA
+AABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/ca.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
+WXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1woDDDEHyslaDQAAAVFJREFUKM+t001uE0EQhuHHnvH8
+YSIWwAociQ0CAlJWiANwDiSQuAFrTsFROFUI9njsDJ5xbBZTtqxkm5Z60epXn+qt6h5h7wFWCj/j
+MMMbfEKLK9ToTuACU5yhwjh2Cr7w7Amzl1y+px9TL2mW9P1Q83hEllGWVCVFSZLSbfE5gqYXzF7z
+4SPZU+Zz6j90N+x3jEZkOUVF9XjYk5ztlnVzovbiB6/wHMvQabHDKKA8VCpkcdcGfww6/8W7t7Qb
+FjXrFbfbAUgS8oNSRV4M6ZuOec1yhW8RdPmVPqG+prmm30RfxmQF5aNBp5iSTOg66r8n7KGirGR+
+MqF9KGUxpYPSBFs0d9hj0Oo39YL2hl00N03I80GnqoaJ7dC291nfI2hxwbrmNh5Mkg69KKdUZ+Tx
+YDb/mF/dZ48VNef0UeI4lMrQKZCERh1ad1nRigf5Iv8BVEZzTgS239oAAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/hu.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A
+/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9kHFwsTGPjdYlQAAAAZdEVYdENv
+bW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAABMklEQVQoz62TzW7CMBCEPyeA82cheizXqjT0
+2gvQF+o78XpIlDQEFRTVUn56yCoY2ko94JN3vZ6dGa8V0HKDNQB4k2AGvAAribdADnxJPARiYAzc
+AZ7klbNnCjw6IAegAKzEPhAIkHEvyvKQDjPgVZKlMLGiWwEaiAREOwDWlfawXvO8XGLSlLquyTcb
+TkVBXVUoBaORJkwSzGRCPB73IE3TsH/fwv20Y/Q0n5OmKQBZlvF5PFJVVddpMCQMQ5IkwRhzIWe3
+27HfF2dpq8Wi8+VwoCgKrO0I+75PEATEcYwxBs87O3Nd25+UZUme51hradsWpRRaa6IowhiD1mdn
+rmt7j1St4AM4AbW4OwJCcTd29DT8rO0ZZcARqJwnCIFEgC6M+aW2B/rvwPw1XELsJl/kG+Dtbzjt
+IEOXAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/cs.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A
+/wD/oL2nkwAAAAlwSFlzAABOIAAATiABFn2Z3gAAAAd0SU1FB9oJBBIDM3ZcJQQAAAAZdEVYdENv
+bW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAB7UlEQVQoz52STWsTURiFn3cmySS5uYZWRAXB
+j51YK4KW1i5EpX9AXIorF+50pyK41p/hTygIghs/QBDBjYgiCi4KklIyqZOJyczce18XTdOue5Yv
+vM85HI4Ad4A1oOJgqgNva8CN5as3b5860WX58gUuLS2xurICQK/Xo9/vM5lMdj7qdYwxdLtd5ufn
+iaIIABEJEaDZqODb74JffyIWFi4CMBgMSNOUoigAiOOYZrOJMQZr7QwylUYALjSod47xc+sQ956+
+Yv31V9I0pSxLQgiICEmS0G63sdaSJMmMMDWSGoCL5yjkMGmu9PMBD5+/5NyZDndvLXL0iKHRaNBq
+tbDWYoyZQUIIpGkfINQAsrLLZGxhPCSUGcGNeP+5z8cvG6xdO8+j0zm0DFjLUGQG2tweMMjyvUS5
+Hkf+TlA/hmqIaoUCJzXnyotnbI83sUmLao9BpoEt7ylVAagBqqoEXxJcTggVqsKD8SfW3AZdUTqm
+Q3NfkrEqmVdcHCP7QDXvHb4agi9ZdD0e//vAHBUNiWlGEUkIhN1egNQ7cg043QHsgrxzE+qu4Mno
+DYtuk7pALBEGoYPMXAHS4BmFgJ/e4ukMakB8vfjB/eE7FEUkIhGhLYIRYf9aMg1kIez1IkKCAEQC
+rAJnp6kPogj4/h/yq9zCYzKLkwAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/tr.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A
+/wD/oL2nkwAAAAlwSFlzAABOIAAATiABFn2Z3gAAAAd0SU1FB9kDAQ82KygF1foAAAAZdEVYdENv
+bW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAABx0lEQVQoz62Tz0rcUBTGf8kkmfQ2dSG2RRcW
+BJG2WnVw04WCiG5dDfgCAy7dKUjbB3DvK3Tlwp0PIIjQUvwDA5ZYiwiFcTq9kw6pyUxOF3Mjadde
+OIt778fvfOeDYwHCAxwH4IO5jAIvgbcLC8S+TyNJ0NfXJGF4L/aBABgAFGCbcnLiU2B0aorZ+XnS
+7W20bRM1m6RHR7Czg31xgQc8MgAfKAFJ0VFg3LxZW8Pb2qLVaqE3Nki6XUQEa2kJr9fDD0OUAblA
+F+gUxpOPIOeLiyLfrkRrLWG1Kl9APoF8BjkZG5Ovg4PyA6SzuysZSA+kDXLVz1gcgBfA68lJ4ufP
++NVo0Dk+pme6lIDy5WV/pP19yisr4Lrc1Wq0gLbR2QCzQJplaK2JoohU5P7zn1xWVykdHpLWamgg
+AtIiyAPaYYiu10mSBKlUsMy7D6iJCdTQUD+X5WUiQJugpRj2b0AfHBBPT5NVq1jv3+EoRdl1Ua6L
+GhnB29sju70lNpAYyADLgCxAvucdKhUYH8dZX8cfHiYIAgbOzlCbm9inp/wBGgU3uZOZHHQO3Bmb
+NuDPzfE4CHjiOAQ3N7j1OgnwE2j+rwVe5aCHWJG/8mqwcxtrgRkAAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/ar.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAggUlN4cdQAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAG9SURBVHjandHdbpswFAdwm88AiQkr
+rEmUSUtVJdEmbVO0l5i0h+0b9AWqXveqazUtgRRD+TS2Ac9M7AV6ZJ27n33+PgC8qeDQfgAgwHK9
+3Gyvvn3/igv8fHx+Oj/hCvOe65ru2I6HPH/uy24b9s3PG21gAngXnmSfv3yqaBUnMc4wZ9yABlSg
+qZszc4ZsNLNnlmaBdhADsx1bmt1+F9jBYXa4TW891/MD39CNiEWaqW0X20f6mPBEEUpDmpFdri7X
+H9fuhVsUOYPUgQ5r2TDPxIETqE/0w/qgZdrd6Y5TXhfVyFYfVte7a5zjKqn8JiCMLJwFEaTmNdPY
+Ei1xhyGAHe/qsq7KemQyUtmU5yT6Hf25/3WfscxSLa5yhNDm/eaoHKfEoYw1TVNmZcvakfWqOOPz
+EZ+iIixJOfyRKdAUIQsBBfSir2Ug0pS5NJzT/yzO4jA+veQvNasNzdi/28tgrjufT93ADXzLfwgf
+khxTQjlrOWUjC+MwfI0KWnSiUzVVJhGdAD1QBOxJL+dPi7SqarkS3gxnZKf0lJFMblZVVdM0oQmh
+BZWJ0qu9vCvKo9cklZFa2jLG2b/X3lh/AefUBeKYmkp7AAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/fa.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgkwscbJ5QAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAHMSURBVHjanZDNctMwFIXlf1m2XCdO
+Fx6YybS0hEA9DYUNPAEbXhBWHTZdZtN3YIaXSBZ1iIPjf8my/IMMeYKeGZ3V/XTuuQA8S9JoX0bz
+X/oXry9XH2/jPN7utptoE1cx77imahayJs5k5s6EIx2tv67lkRjAZDrxX/jvgrclLaM42sW7rMp4
+yxVJgTrEJnYsByNsqibgI6GK93n+6Wpxtfrwfuq5T4cQQng+OyeTWlFVXVYcjM/wmYtdBzkigBG2
+ButxyR/390Fws3yzLIriKQrTIgcdUPd7pe+N5WLmeIal26YtRgmhx+PxerEY0y4ur2+CW1LTvCQ9
+B1C3QPhb/vkLGoYznVnzV7YOJUWmlFaEloQKZOy2uluxlqdpmpV5zZsegB50GhggraCFDAiBKrGG
+FWVxTFPK6lM3VZaSJMmShBEC+k5qW20+N+5KNAAzCLRhaJuW5HkqBiihVXXCqoeH7M+BRoe+plLb
+qYpiuq6FMfJ9/fGxlxXaNFm0F8WEavH1fyz9/q3abLs4BpyL6xkYCwx5HvQ8GZp06MtiVN2wmjWU
+sVO3Mgx5kkiMKZJkGIaJkGXbyLZVXedDXxEibsuapm64iK3/Yc/UX84V8R9Y/8/IAAAAAElFTkSu
+QmCC
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/id.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAAAXNSR0IArs4c6QAAABl0RVh0Q29t
+bWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAEuSURBVCjPrZNNU8IwEIaftKVtmgYHr14d0fGI
+N/xD/nKcltoOdIqZ6YcHVgjikT1lN2+eZN8kCpi4QUQAH5IsgTdgLfknUAHfks8AA9wB90AgdeWN
+eQCePEgD1ICTPARSAVl/oUSA7LAE3qXYyUmc9K2ABMgEkngA54MegVcRDQJpZayAGNAybzzICHz5
+oGfgRQolsAN6z0QN5ALyo/BAEcB6Ol5c0zTUmw3ucIBpIgxD0izDzOfYxYIgOTd1oV2tzp51XUdV
+VTjnmKYJpRRJkpBlGdZaEg/yV3tqbRgGqu2Wtm0ZhgGlII5jtNZYazHm7Mw4jlfaE6gsS3b7PX1/
+dCaKZmityfMcay+dKYriSnsC1XWNc8eLDMOQNE0xxmCtJQiCS1/+0f4+ypt8kR+6UIAWltXBhgAA
+AABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/vi.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgYTlDmkWAAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAHFSURBVHjanZLPb9MwFMft/HBsJ44V
+rdNUqBiqJk1sQgPtMi5cufM/IP4K/gouiANXrjtzgQuHaX8EnYSatF3WZkkd165nnCr8A3vyO370
+fZ/3DMCjCrr+BIAF4Nlw+GI8vjg7a8tycXNTTSaqLK3WQRjiOGZZxgaDOMs8StHlpQd2zCDLHPbq
+5EQ1zWo+v89zZSubaOj7IcaEMZKmmDGPELVL67CEUse8PD4Ora3n82o6VXd39lzC9xBFkYtyDOU8
+jGPjeWKz6bHRwcF4NNpP+fr2drXM23phlABvbPAWYU7pIKVDjpLkIQharSuxdkjg+nD45PToSJTl
+qijWezPzoQax8Z+HESbkO6OY458JvELSmFqIei36tNennVI1n90XhfpVga/aQz7iGGeMjlLyg/lX
+nVIj5bJu5HbbY/+Vcrc60Ep4DdHviOCYximd8vA63sJOadU0G6PbHdYN2TilIm8XCyMEtDZ4GuF3
+lHxLqeboY/JwGMhJp+TIVm+lUj3WKRUzU9fAGD8Mo31CvjD6l+MsgZ+RTHolqbV7bis9Vhe5riqg
+tef7CGNcMmpTssd8d6U/oBFy2dROyY0nHKbU4z5WV/8AxsHyh7MaPPIAAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/ko.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A
+/wD/oL2nkwAAAAlwSFlzAABOIAAATiABFn2Z3gAAAAd0SU1FB9oCHBQ4CvMbcOcAAAAZdEVYdENv
+bW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAACCElEQVQoz62TP2gaARjFf3q5RkhCoBTBHDiU
+EHsB0TRZki7WMSnclDW1ox0DQSgcpbPQQSgiJkiHDOlQHNxdUl1M8U9Ag4iQEryQqplsAidfh+DZ
+7nnzx/vee9/7XIDwCJgBiMfjAAQCAX6USryORIjH41iWRb/f5+7uDgBVVcnn81xdXZFOp3G73QC4
+XC7cE0ZN0+h2u/y6vCSZTFIoFBgOh9zf3wOgKAr1ep2joyOq1Sq5XO4/RW6AxcVFbNsmn88DcHBw
+gK7rVKJRKuvr/NzYoLW9TSQSIZFIYNs2p6enNJtNZ9EMwPLyMltbW3i9XlqtFm92digZBn8sCxeg
+AvR6dHd3eV8uMz8/j8/nIxAIcH1tTYlerK6i6zq6rju5jOXhBrPAW77xjAEl5QsAe3t7AFiWxWAw
+nFp7tbkJwO3trZPLRz7R5ymzAHj4zXPe8dXJ5N9ZRxHAaDQilUpxcXHB/v4+c4z4wGdgDngyMQjA
+4eEhqqoSCoUQmbZHbNuWk5MT0TRNgsGgmKYpjUZDlpa+CxQEiuL3l0VEJJvNysu1NdE0TTKZjJyd
+VWTSRen1enJ+fi6maUowGBRN0+T4+Fhubm5kPB7LBMViUfx+v4RCITFNUyqVitRqNQFkBnC8GoZB
+p9NhZWWFaDTKwsKCUzqAcDhMLBaj3W5jGAaKouDxeB5K+Vgv8hc4kPzb8yA7FQAAAABJRU5ErkJg
+gg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/ja.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgkrO6MACQAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAG7SURBVHjanZG7ahtBFIZXMzujnb1J
+jVwJRagIsUV0wQIroEDqFIF0adKFNG5SpBcklR/AfopAqmBwZbsxBIKxEwIhD5CERdm7Zm+S/Mta
+/AA+MFss8/3nO2cU5V5VwZlOp/i2Wq3tnZ0n47GU0nEc3/ezLMN/VVU1TTNN07ZtXdfJbakbutFo
+ABsOBnmeAwh+/ZxfnK5SyR6PeH8khAAAmFJaZuEgCUyv1+Ocu677/8sn7/Bj8ceBSaVukNf7+tv3
+wBhjRVHEcQyE4DSbzU6ns9XYiqLI/X7pHh0Us1lFrNQ650Kjx5/5j29IXC6X8A8Cv8TaD9rdblcm
+0vO84Owk//tPoQuqMg1udUu3a+r1V1xL0zQMwyAIS2w43IzkhVGUzRwlzwmhHKMYlm7ZomYRZYkL
+cPFcL0mSEmOcB+jtB1makkd9wiqcV4VhGFidXWPMUB72MBJcklTKOwwxaAVv2NO9p+L5y+pKF8wW
+1RpfmXTQz3cniAW5hqQsN4mYOJ4vFovyld590Cbn4veVYZq8Py72noVJhpGS25J3WBiFUF+3JgQb
+g5714pVpvsHG8UprE8/dMHMpN9g96wYc4+npK7/PqQAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/ru.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAggWetB9WQAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAG1SURBVHjanZJNjtMwGIbt+D9N3Om0
+XYCgG0CIsimshstwBY7QFadhyTVYs0EatdKMStOmrR03cez8YGi5wHzy+8l65cd+bRmAJxUMWi6X
+oc9ms3fz+ae7u6qqdrudUso5F3yMMec8SRIpZRzH0aUu9HQ6DdiHxcJ7H4CiKMIk+GEBpVQIEYAA
+I4QuPg5qkZCT5y9fz42Hh+yQ7fbmXLZtByFklA6iqGMYtqSxoD1XpjBX7Ns9f8OSH7TbHn6tHrcP
+mVKVa3vACEmTeDSUk5G7SS1FwNuyOB2v2OTZi9mrt9tjsd7k60znhfVNTwhmiGDKGeeYsK7ry7o2
+WuuT/hs+6P3io6mb7KQ3J6NsyB4hSngcpzKVw6BUCApAZ+vKmKJp/98Ndb3K9vkmKw8a1I0AUHAm
+CbzleMzxEAHsbUjnjnlUGWirK/bl+9ftaq0eHp3WoO0Io4MkTW9Hcjwe3AwBY6V3B62VMaWrz7b+
+fMHE/c/RajXIc+A9JoSjQQKRRHEMq8hDW3dHY8KO0DniHKrr62nq96ZUKjAQIRIeIE2plKH3QoRA
+ytq9KcqmMWF4f/73B55YfwCmLeqe/uH4SQAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/zh.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgozA+LLnAAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAFxSURBVHjanZLJTsMwEIadNEvjpglh
+FYvYhEAsAiFx4Wl4FF6JAxLvwQsAEiJu2kAdO+vEDROIOKBywZo5fv7n85iQfx0N+xZ7kWx768eb
++9dXF/lSPH544U/PVRwTAMM0+4OBGwTe8jINAp1S/e7OaNkFsnITbB+uXz6dAJP8MRIyhJQjo/d6
+Vr/vDIfU8/rDYc9xqq80Hdu1KTLne0dW3iRRxN/equS9gULTNMu2MQoZ6vvmYFDrelqWiLRpW97a
+/v3W6pmfhIyHYa7GM8i0sjEQovSbsVx3Zhg5QJKlHba7snG6c5A/x9NXlo5GqhYkUz3DtB2nHc/3
+bdclllUqJbIsSbNuyMvTE5CSRyMxYUA5eQe9/K0EhMiimApZ1HWXZjbNR6sUVlHcKpF5SshIWSjI
+fzA5mXAW5uPxDAdQjWHPV8LHyKEuqqobcspYykZKCKIUbukvpQIAC6/oMMFC4PO31ClJgUpYGWJV
+9b+P1Z5Pq3zoONlbIw0AAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/zh_TW.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAIAAADgcHrrAAAAB3RJTUUH1AYEAgci3PyVIwAAAAlw
+SFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAGcSURBVHjanZFLTuNAEIbb7farbSd4
+QCJBEN4SSCMWHIE9C27DHokFEus5AltOwBmAxWwQYxwCdh6TcWK7bXfbCZVgDRvYUKpafvXX/xdC
+3yoJ5oe2i4n082Dv8PCg1dx6/PPqen7oueftG8ozoii6aVqOU1taoo6DKcXX1xiwEk3XVpvHJ0dn
+F6d7+83R32HX7yVhiITAsqzqumHbtFbTbVs2DDFXm2EWNRecxfW1zSRKOu1uEPTC4ZhnXJIkVdNA
+ChharyumWWCc5DkgBGa50Ww0Wp47/nV39fv+4dUfMi4kCRNV0Sh9Z1TLmhCSCjFmSYVtrK7s7+x4
+D48vbd9zn/MklvnUVrBO6Oy8el2zLKSqeVlGjI0TVmGX2zoa3Pae2333Ke32JnCGhG1CF2zzvyWO
+UJxlYRRnRVFhrYL/Czp5x1P6/oTFEK5mGFSXrZr9YQmYOM5Kkc6xWSTxYDAK/LTfnzCGplOiqp9a
+gjBSUWScV1gYBEnQLaMIlSV8CaQ+tZQJAQ0rKiwKfDEaffWlmaU4AkvQDLC52jfrDRDH5fXLOA++
+AAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/lang/eo.png
+
+iVBORw0KGgoAAAANSUhEUgAAABIAAAAMCAYAAABvEu28AAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
+WXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1woDDDg109ywxAAAATRJREFUKM+t0jFPGzEYxvFfjpA0
+dGJD4qREqroxhAEp3dj6VfgWETPfC6SuHTozMYSomAPc5po7BjvhlKHtgKVXtuzHj5/3L/fQeofR
+h/l8Di57l66/3vgym4kxWiwWxt/G1B31AAf4iBF6OE1T6wKHmGCKPe6O7yyXSyffT1LmAsN8+SBX
+X3rkLB27+nTFET5jn/vJvRCC1WqVTHpp3wAfcvWxRkxhCyjLkpL2vCUSHh7EGDVNk0z2dkz20eAX
+njuMxpOJdtaKMbotb4UQrNfrpNiYDLPJIPOqUeGpk+h0OlXXtRCCqqrUdaJbFEV6fZNkmG/8ySbP
+eb1JNPoxSgc/c9wmc+m20+XykpPUb5+nIAN7xO+Oyd+47Gq3RlUWZCz/5LKr3Rp1elX4by5brc2H
+fIfxCofkdIw3kgiOAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://gambasdoc.org/img/license.png
+
+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
+AABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://gambasdoc.org/style.css
+
+BODY {
+	PADDING-RIGHT: 0px; MARGIN-TOP: 0px; PADDING-LEFT: 0px; BACKGROUND: =
+white; PADDING-BOTTOM: 0px; PADDING-TOP: 0px; FONT-FAMILY: sans-serif
+}
+BODY.view {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; BACKGROUND: white; =
+PADDING-BOTTOM: 8px; MARGIN: 0px; PADDING-TOP: 8px; max-width: 860px
+}
+BODY.none {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; BACKGROUND: white; =
+PADDING-BOTTOM: 8px; MARGIN: 0px; PADDING-TOP: 8px
+}
+FRAMESET {
+	BACKGROUND: white
+}
+FRAME {
+	BACKGROUND: white
+}
+TABLE.menu {
+	BORDER-RIGHT: 0px; PADDING-RIGHT: 0px; BORDER-TOP: 0px; PADDING-LEFT: =
+0px; BACKGROUND-ATTACHMENT: fixed; BACKGROUND-IMAGE: url(menu.png); =
+PADDING-BOTTOM: 0px; BORDER-LEFT: 0px; PADDING-TOP: 0px; BORDER-BOTTOM: =
+0px; BACKGROUND-REPEAT: no-repeat
+}
+TABLE.none {
+	BORDER-RIGHT: 0px; PADDING-RIGHT: 0px; BORDER-TOP: 0px; PADDING-LEFT: =
+0px; BACKGROUND: none transparent scroll repeat 0% 0%; PADDING-BOTTOM: =
+0px; BORDER-LEFT: 0px; PADDING-TOP: 0px; BORDER-BOTTOM: 0px
+}
+P {
+	MARGIN: 0.5em 0px
+}
+.limit {
+	BORDER-TOP: #95c1e6 2px solid; MARGIN: 4px 0px; HEIGHT: 1px
+}
+.lang {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; BACKGROUND: black; =
+MARGIN-BOTTOM: 4px; PADDING-BOTTOM: 4px; MARGIN-LEFT: -8px; COLOR: =
+white; MARGIN-RIGHT: -8px; PADDING-TOP: 4px; BORDER-BOTTOM: #c0c0c0 4px =
+solid
+}
+.lang20 {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; BACKGROUND: black; =
+MARGIN-BOTTOM: 4px; PADDING-BOTTOM: 4px; MARGIN-LEFT: -8px; COLOR: =
+white; MARGIN-RIGHT: -8px; PADDING-TOP: 4px; BORDER-BOTTOM: #80c0ff 4px =
+solid
+}
+.lang30 {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; BACKGROUND: black; =
+MARGIN-BOTTOM: 4px; PADDING-BOTTOM: 4px; MARGIN-LEFT: -8px; COLOR: =
+white; MARGIN-RIGHT: -8px; PADDING-TOP: 4px; BORDER-BOTTOM: #df6b00 4px =
+solid
+}
+.frame {
+=09
+}
+TABLE.tabheader {
+	PADDING-RIGHT: 0px; MARGIN-TOP: 2px; PADDING-LEFT: 0px; PADDING-BOTTOM: =
+0px; WIDTH: 100%; PADDING-TOP: 0px
+}
+PRE {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 4px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 4px; PADDING-BOTTOM: 4px; BORDER-LEFT: =
+#c0c0c0 1px solid; COLOR: black; PADDING-TOP: 4px; BORDER-BOTTOM: =
+#c0c0c0 1px solid; BACKGROUND-COLOR: white
+}
+.space {
+	PADDING-RIGHT: 4px; PADDING-LEFT: 4px; PADDING-BOTTOM: 4px; =
+PADDING-TOP: 4px
+}
+.header {
+	BORDER-RIGHT: #000000 1px solid; PADDING-RIGHT: 2px; BORDER-TOP: =
+#000000 1px solid; PADDING-LEFT: 2px; BACKGROUND: #b2e8ff; =
+PADDING-BOTTOM: 2px; BORDER-LEFT: #000000 1px solid; WIDTH: 100%; =
+PADDING-TOP: 2px; BORDER-BOTTOM: #000000 1px solid
+}
+A {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+0px; PADDING-TOP: 0px; TEXT-DECORATION: none
+}
+A.image:hover {
+	BACKGROUND: none transparent scroll repeat 0% 0%; BORDER-TOP-STYLE: =
+none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; =
+TEXT-DECORATION: none; BORDER-BOTTOM-STYLE: none
+}
+A:hover {
+	BACKGROUND: #c0c0e0; TEXT-DECORATION: none
+}
+.header hover {
+	BACKGROUND: white; TEXT-DECORATION: none
+}
+.left A:link {
+	COLOR: white
+}
+.left A:visited {
+	COLOR: white
+}
+.left A:unknown {
+	content: ""
+}
+.title {
+	PADDING-RIGHT: 0px; MARGIN-TOP: 4px; PADDING-LEFT: 0px; FONT-WEIGHT: =
+bold; FONT-SIZE: xx-large; MARGIN-BOTTOM: 8px; PADDING-BOTTOM: 0px; =
+COLOR: black; PADDING-TOP: 0px; BORDER-BOTTOM: #808080 1px solid; =
+LETTER-SPACING: 2px; text-shadow: 2px 2px 2px #C0C0C0
+}
+TD.tabon {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 6px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 6px; PADDING-BOTTOM: 4px; BORDER-LEFT: =
+#c0c0c0 1px solid; COLOR: black; PADDING-TOP: 4px; BACKGROUND-COLOR: =
+white
+}
+TD.taboff {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; =
+PADDING-TOP: 0px; BORDER-BOTTOM: #c0c0c0 1px solid
+}
+UNKNOWN {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 6px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 6px; PADDING-BOTTOM: 2px; PADDING-TOP: =
+2px
+}
+UNKNOWN {
+	PADDING-RIGHT: 6px; BORDER-TOP: #c0c0c0 1px solid; PADDING-LEFT: 6px; =
+PADDING-BOTTOM: 2px; BORDER-LEFT: #c0c0c0 1px solid; PADDING-TOP: 2px
+}
+.taboffl {
+	PADDING-RIGHT: 6px; BORDER-TOP: #c0c0c0 1px solid; PADDING-LEFT: 6px; =
+PADDING-BOTTOM: 2px; BORDER-LEFT: #c0c0c0 1px solid; PADDING-TOP: 2px
+}
+TD.tabnone {
+	PADDING-RIGHT: 6px; PADDING-LEFT: 6px; PADDING-BOTTOM: 2px; =
+PADDING-TOP: 2px; BORDER-BOTTOM: #c0c0c0 1px solid
+}
+UNKNOWN {
+	MARGIN-TOP: 0px; PADDING-LEFT: 8px; PADDING-BOTTOM: 8px; BORDER-LEFT: =
+#c0c0c0 1px solid; PADDING-TOP: 1px; BORDER-BOTTOM: #c0c0c0 1px solid
+}
+UNKNOWN {
+	BORDER-TOP: #808080 1px solid; MARGIN-TOP: 2px; PADDING-LEFT: 8px; =
+PADDING-BOTTOM: 8px; BORDER-LEFT: #808080 1px solid; PADDING-TOP: 1px; =
+BORDER-BOTTOM: #808080 1px solid
+}
+UNKNOWN {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 8px; MARGIN-TOP: 0px; =
+PADDING-BOTTOM: 8px; PADDING-TOP: 1px; BORDER-BOTTOM: #c0c0c0 1px solid
+}
+UNKNOWN {
+	BORDER-RIGHT: #808080 1px solid; PADDING-RIGHT: 8px; BORDER-TOP: =
+#808080 1px solid; MARGIN-TOP: 2px; PADDING-BOTTOM: 8px; PADDING-TOP: =
+1px; BORDER-BOTTOM: #808080 1px solid
+}
+TABLE.table {
+	BORDER-RIGHT: #c0c0c0 0px; PADDING-RIGHT: 0px; BORDER-TOP: #c0c0c0 1px =
+solid; PADDING-LEFT: 0px; BACKGROUND: white; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT: #c0c0c0 1px solid; PADDING-TOP: 0px; =
+BORDER-BOTTOM: #c0c0c0 1px solid
+}
+.table TH {
+	BORDER-TOP-WIDTH: 1px; BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: =
+6px; PADDING-LEFT: 6px; BORDER-LEFT-WIDTH: 1px; BACKGROUND: #e8e8e8; =
+PADDING-BOTTOM: 6px; PADDING-TOP: 6px; BORDER-BOTTOM: #c0c0c0 1px solid; =
+TEXT-ALIGN: left
+}
+.none .table TH {
+	BORDER-TOP-WIDTH: 1px; BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: =
+6px; PADDING-LEFT: 6px; BORDER-LEFT-WIDTH: 1px; BACKGROUND: #e8e8e8; =
+PADDING-BOTTOM: 6px; PADDING-TOP: 6px; BORDER-BOTTOM: #c0c0c0 1px solid; =
+TEXT-ALIGN: left
+}
+.table TD {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 6px; PADDING-LEFT: 6px; =
+PADDING-BOTTOM: 6px; PADDING-TOP: 6px
+}
+.none .table TD {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 6px; PADDING-LEFT: 6px; =
+PADDING-BOTTOM: 6px; PADDING-TOP: 6px
+}
+.none TH {
+	BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: =
+none; BORDER-BOTTOM-STYLE: none
+}
+.none TD {
+	BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: =
+none; BORDER-BOTTOM-STYLE: none
+}
+TR.dark {
+	BACKGROUND: #f0f0f0
+}
+.box {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 8px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 8px; PADDING-BOTTOM: 8px; MARGIN: 0px; =
+BORDER-LEFT: #c0c0c0 1px solid; PADDING-TOP: 8px; BORDER-BOTTOM: #c0c0c0 =
+1px solid
+}
+.example {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 8px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 8px; PADDING-BOTTOM: 8px; MARGIN: 0px; =
+BORDER-LEFT: #c0c0c0 1px solid; DIRECTION: ltr; PADDING-TOP: 8px; =
+BORDER-BOTTOM: #c0c0c0 1px solid; FONT-FAMILY: monospace; =
+BACKGROUND-COLOR: white
+}
+.code {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 8px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 8px; PADDING-BOTTOM: 8px; MARGIN: 0.5em =
+0px; BORDER-LEFT: #c0c0c0 1px solid; DIRECTION: ltr; PADDING-TOP: 8px; =
+BORDER-BOTTOM: #c0c0c0 1px solid; FONT-FAMILY: monospace; =
+BACKGROUND-COLOR: white
+}
+.message {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 4px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 4px; PADDING-BOTTOM: 4px; BORDER-LEFT: =
+#c0c0c0 1px solid; PADDING-TOP: 4px; BORDER-BOTTOM: #c0c0c0 1px solid; =
+moz-border-radius: 6px; webkit-border-radius: 6px
+}
+.warning {
+	BACKGROUND: #ffffbf
+}
+.info {
+	BACKGROUND: none transparent scroll repeat 0% 0%
+}
+.critical {
+	BACKGROUND: #ffbfbf
+}
+.tip {
+	BACKGROUND: #bfdfff
+}
+.vb {
+	BACKGROUND: #ffefbf
+}
+.black {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 8px; PADDING-BOTTOM: 2px; MARGIN: =
+0px; COLOR: white; BORDER-TOP-STYLE: none; PADDING-TOP: 2px; =
+BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; BACKGROUND-COLOR: =
+#c0c0c0; BORDER-BOTTOM-STYLE: none
+}
+.gray {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 8px; PADDING-BOTTOM: 2px; MARGIN: =
+0px; COLOR: white; BORDER-TOP-STYLE: none; PADDING-TOP: 2px; =
+BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; BACKGROUND-COLOR: =
+#c0c0c0; BORDER-BOTTOM-STYLE: none
+}
+.syntax {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; PADDING-BOTTOM: 8px; MARGIN: =
+0px; BORDER-LEFT: #c0c0c0 8px solid; DIRECTION: ltr; BORDER-TOP-STYLE: =
+none; PADDING-TOP: 8px; BORDER-RIGHT-STYLE: none; BACKGROUND-COLOR: =
+white; BORDER-BOTTOM-STYLE: none
+}
+.space {
+	PADDING-RIGHT: 4px; PADDING-LEFT: 4px; PADDING-BOTTOM: 4px; =
+PADDING-TOP: 4px
+}
+.alert {
+	BORDER-RIGHT: #ff8000 2px dotted; PADDING-RIGHT: 6px; BORDER-TOP: =
+#ff8000 2px dotted; PADDING-LEFT: 6px; BACKGROUND: white; =
+PADDING-BOTTOM: 6px; MARGIN: 6px 0px; BORDER-LEFT: #ff8000 2px dotted; =
+PADDING-TOP: 6px; BORDER-BOTTOM: #ff8000 2px dotted
+}
+.header {
+	BORDER-RIGHT: #95c1e6 1px solid; PADDING-RIGHT: 2px; BORDER-TOP: =
+#95c1e6 1px solid; PADDING-LEFT: 2px; BACKGROUND: #a4e2ff; =
+PADDING-BOTTOM: 2px; BORDER-LEFT: #95c1e6 1px solid; WIDTH: 100%; =
+PADDING-TOP: 2px; BORDER-BOTTOM: #95c1e6 1px solid
+}
+DIV.border {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 4px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 4px; PADDING-BOTTOM: 4px; BORDER-LEFT: =
+#c0c0c0 1px solid; PADDING-TOP: 4px; BORDER-BOTTOM: #c0c0c0 1px solid
+}
+HR {
+	BORDER-RIGHT: #c0c0c0 1px; PADDING-RIGHT: 0px; BORDER-TOP: #c0c0c0 1px =
+solid; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 6px -4px; =
+BORDER-LEFT: #c0c0c0 1px; PADDING-TOP: 0px; BORDER-BOTTOM: #c0c0c0 1px
+}
+.footer {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; PADDING-BOTTOM: 2px; =
+BORDER-TOP-STYLE: none; PADDING-TOP: 2px; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BACKGROUND-COLOR: #ffcc99; BORDER-BOTTOM-STYLE: =
+none
+}
+A.flag {
+	FONT-SIZE: 9px
+}
+UNKNOWN {
+	COLOR: white
+}
+UNKNOWN {
+	COLOR: white
+}
+IMG.flag {
+	BORDER-RIGHT: white 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: white =
+1px solid; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; =
+BORDER-LEFT: white 1px solid; PADDING-TOP: 0px; BORDER-BOTTOM: white 1px =
+solid
+}
+.path {
+	PADDING-RIGHT: 0px; DISPLAY: inline; PADDING-LEFT: 0px; FONT-WEIGHT: =
+bold; PADDING-BOTTOM: 0px; MARGIN: 0px; COLOR: white; PADDING-TOP: 0px
+}
+.pathlimit {
+	PADDING-RIGHT: 0px; DISPLAY: inline; PADDING-LEFT: 0px; PADDING-BOTTOM: =
+0px; MARGIN-LEFT: 2px; BORDER-LEFT: #95c1e6 2px solid; WIDTH: 2px; =
+PADDING-TOP: 0px
+}
+UNKNOWN {
+	BORDER-RIGHT: #808080 1px solid; BORDER-TOP: #808080 1px solid; =
+BORDER-LEFT: #808080 1px solid; BORDER-BOTTOM: #808080 1px solid
+}
+TEXTAREA {
+	BORDER-RIGHT: #808080 1px solid; BORDER-TOP: #808080 1px solid; =
+BORDER-LEFT: #808080 1px solid; BORDER-BOTTOM: #808080 1px solid
+}
+H2 {
+	FONT-WEIGHT: normal; MARGIN-BOTTOM: 0.5em; COLOR: black; BORDER-BOTTOM: =
+#c0c0c0 1px solid; LETTER-SPACING: 2px
+}
+H3 {
+	MARGIN-BOTTOM: 0.5em; COLOR: black; LETTER-SPACING: 1px
+}
+.seealso {
+	MARGIN-TOP: 20px; PADDING-LEFT: 8px; BORDER-LEFT: #c0c0c0 8px solid
+}
+.seealso H3 {
+	MARGIN-BOTTOM: 2px
+}
+.box H3 {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 2px
+}
+.only-in {
+	BORDER-RIGHT: #c00000 2px solid; PADDING-RIGHT: 6px; BORDER-TOP: =
+#c00000 2px solid; DISPLAY: inline; PADDING-LEFT: 6px; BACKGROUND: =
+#ff6060; PADDING-BOTTOM: 2px; MARGIN: 0px; BORDER-LEFT: #c00000 2px =
+solid; COLOR: white; PADDING-TOP: 2px; BORDER-BOTTOM: #c00000 2px solid; =
+text-shadow: 2px 2px 2px #808080
+}
+TD.only-3 {
+	PADDING-RIGHT: 4px; PADDING-LEFT: 4px; BACKGROUND: #ff6060; =
+PADDING-BOTTOM: 4px; COLOR: white; PADDING-TOP: 4px; text-shadow: 2px =
+2px 2px #808080
+}
+DIV.only-3-title {
+	PADDING-RIGHT: 1px; MARGIN-TOP: -8px; DISPLAY: inline; PADDING-LEFT: =
+1px; FONT-WEIGHT: bold; FONT-SIZE: x-small; BACKGROUND: #ff6060; FLOAT: =
+right; PADDING-BOTTOM: 1px; WIDTH: 24px; COLOR: white; MARGIN-RIGHT: =
+-8px; PADDING-TOP: 1px; HEIGHT: 20px; TEXT-ALIGN: right; =
+moz-border-radius: 0px 0px 0px 24px; webkit-border-radius: 0px 0px 0px =
+24px
+}
+TD.only-2 {
+	PADDING-RIGHT: 4px; PADDING-LEFT: 4px; BACKGROUND: #60ff60; =
+PADDING-BOTTOM: 4px; COLOR: white; PADDING-TOP: 4px; text-shadow: 2px =
+2px 2px #808080
+}
+DIV.only-2-title {
+	PADDING-RIGHT: 1px; MARGIN-TOP: -8px; DISPLAY: inline; PADDING-LEFT: =
+1px; FONT-WEIGHT: bold; FONT-SIZE: x-small; BACKGROUND: #60ff60; FLOAT: =
+right; PADDING-BOTTOM: 1px; WIDTH: 24px; COLOR: white; MARGIN-RIGHT: =
+-8px; PADDING-TOP: 1px; HEIGHT: 20px; TEXT-ALIGN: right; =
+moz-border-radius: 0px 0px 0px 24px; webkit-border-radius: 0px 0px 0px =
+24px
+}
+TD.only-contents {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; PADDING-BOTTOM: 8px; =
+PADDING-TOP: 8px
+}
+TABLE.only-3 {
+	BORDER-RIGHT: #ff6060 1px solid; BORDER-TOP: #ff6060 1px solid; =
+BACKGROUND: #ffe0e0; BORDER-LEFT: #ff6060 1px solid; BORDER-BOTTOM: =
+#ff6060 1px solid
+}
+TABLE.only-2 {
+	BORDER-RIGHT: #60ff60 1px solid; BORDER-TOP: #60ff60 1px solid; =
+BACKGROUND: #e0ffe0; BORDER-LEFT: #60ff60 1px solid; BORDER-BOTTOM: =
+#60ff60 1px solid
+}
+.top-left-corner {
+	FLOAT: left
+}
+.top-right-corner {
+	FLOAT: right
+}
+.bottom-left-corner {
+	FLOAT: left
+}
+.bottom-right-corner {
+	FLOAT: right
+}
+.top-corner {
+	HEIGHT: 8px
+}
+.bottom-corner {
+	HEIGHT: 8px
+}
+IMG.screenshot {
+	BORDER-RIGHT: #c0c0c0 4px solid; PADDING-RIGHT: 8px; BORDER-TOP: =
+#c0c0c0 4px solid; PADDING-LEFT: 8px; BACKGROUND: black; PADDING-BOTTOM: =
+8px; BORDER-LEFT: #c0c0c0 4px solid; PADDING-TOP: 8px; BORDER-BOTTOM: =
+#c0c0c0 4px solid; moz-border-radius: 8px; webkit-border-radius: 8px; =
+border-radius: 8px
+}
+IMG.control {
+	BORDER-RIGHT: gray 1px solid; BORDER-TOP: gray 1px solid; FLOAT: right; =
+MARGIN: 0px 16px 8px 8px; BORDER-LEFT: gray 1px solid; BORDER-BOTTOM: =
+gray 1px solid; box-shadow: 8px 8px 8px gray
+}
+.license {
+	BORDER-RIGHT: black 6px solid; PADDING-RIGHT: 16px; BORDER-TOP: black =
+6px solid; MARGIN-TOP: 8px; PADDING-LEFT: 16px; FONT-SIZE: x-small; =
+BACKGROUND: none transparent scroll repeat 0% 0%; PADDING-BOTTOM: 16px; =
+BORDER-LEFT: black 6px solid; PADDING-TOP: 16px; BORDER-BOTTOM: black =
+6px solid
+}
+UNKNOWN {
+	PADDING-LEFT: 32px; MARGIN: 0.5em 0px; LINE-HEIGHT: 1.5em; =
+LIST-STYLE-TYPE: square
+}
+UNKNOWN {
+	PADDING-RIGHT: 32px; MARGIN: 0.5em 0px; LINE-HEIGHT: 1.5em; =
+LIST-STYLE-TYPE: square
+}
+.index-border {
+	MARGIN-TOP: 8px; MARGIN-BOTTOM: 8px
+}
+UNKNOWN {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 16px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 2px; FONT-SIZE: small; BACKGROUND: =
+white; PADDING-BOTTOM: 2px; BORDER-LEFT: #c0c0c0 1px solid; PADDING-TOP: =
+8px; BORDER-BOTTOM: #c0c0c0 1px solid
+}
+UNKNOWN {
+	BORDER-RIGHT: #c0c0c0 1px solid; PADDING-RIGHT: 2px; BORDER-TOP: =
+#c0c0c0 1px solid; PADDING-LEFT: 16px; FONT-SIZE: small; BACKGROUND: =
+white; PADDING-BOTTOM: 2px; BORDER-LEFT: #c0c0c0 1px solid; PADDING-TOP: =
+8px; BORDER-BOTTOM: #c0c0c0 1px solid
+}
+TT {
+	PADDING-RIGHT: 1px; PADDING-LEFT: 1px; FONT-SIZE: 100%; BACKGROUND: =
+#e0e0e0; PADDING-BOTTOM: 1px; PADDING-TOP: 1px
+}
+#license-logo {
+	RIGHT: 8px; POSITION: absolute
+}
+
+------=_NextPart_000_0000_01CCB9BD.6C491C70--

@@ -1,0 +1,223 @@
+GLSL的Hello World
+
+这一节中包含一个最基本的shader，它提供如下功能：顶点变换然后使用单一的颜色渲染图元。
+
+顶点shader
+
+前面已经说过，顶点shader负责完成顶点变换。这里将按照固定功能的方程完成顶点变换。
+
+固定功能流水线中一个顶点通过模型视图矩阵以及投影矩阵进行变换，使用如下公式：
+
+
+view plaincopy to clipboardprint?vTrans = projection * modelview *incomingVertex  
+vTrans = projection * modelview *incomingVertex首先GLSL需要访问OpenGL状态，获得公式中的前两个矩阵。前面讲过，GLSL可以获取某些OpenGL状态信息的，这两个矩阵当然包括在内。可以通过预先定义的一致变量来获取它们： 
+
+view plaincopy to clipboardprint?uniform mat4 gl_ModelViewMatrix;  
+uniform mat4 gl_ProjectionMatrix;  
+uniform mat4 gl_ModelViewMatrix;
+uniform mat4 gl_ProjectionMatrix;接下来需要得到输入的顶点。通过预先定义的属性变量，所有的顶点将可以一个个传入顶点shader中。 
+
+view plaincopy to clipboardprint?attribute vec4 gl_Vertex;  
+attribute vec4 gl_Vertex;为了输出变换后的顶点，shader必须写入预先定义的vec4型变量gl_Position中，注意这个变量没有修饰符。 
+现在我们可以写一个仅仅进行顶点变换的顶点shader了。注意所有其他功能都将丧失，比如没有光照计算。顶点shader必须有一个main函数，如下面的代码所示：
+
+view plaincopy to clipboardprint?void main()  
+{  
+    gl_Position =gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;  
+}  
+void main()
+{
+    gl_Position =gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
+}上面代码中变换每个顶点时，投影矩阵都将乘上模型视图矩阵，这显然非常浪费时间，因为这些矩阵不是随每个顶点变化的。注意这些矩阵是一致变量。 
+GLSL提供一些派生的矩阵，也就是说gl_ModelViewProjectionMatrix是上面两个矩阵的乘积，所以顶点shader也可以写成下面这样：
+
+view plaincopy to clipboardprint?void main()  
+{  
+    gl_Position =gl_ModelViewProjectionMatrix * gl_Vertex;  
+}  
+void main()
+{
+    gl_Position =gl_ModelViewProjectionMatrix * gl_Vertex;
+}上面的操作能够获得和固定功能流水线相同的结果吗？理论上是如此，但实际上对顶点变换操作的顺序可能会不同。顶点变换通常在显卡中是高度优化的任务，所以有一个利用了这种优化的特定函数用来处理这个任务。这个神奇的函数如下： 
+
+view plaincopy to clipboardprint?vec4 ftransform(void);  
+vec4 ftransform(void);使用这个函数的另一个原因是float数据类型的精度限制。由于数据精度的限制，当使用不同的顺序计算时，可能得到不同的结果，因此GLSL提供这个函数保证获得最佳性能的同时，还能得到与固定功能流水线相同的结果。 
+这个函数按照与固定功能相同的步骤对输入顶点进行变换，然后返回变换后的顶点。所以shader可以重新写成如下形式：
+
+view plaincopy to clipboardprint?void main()  
+{  
+    gl_Position =ftransform();  
+}  
+void main()
+{
+    gl_Position =ftransform();
+}片断shader 
+片断shader也有预先定义的变量gl_FragColor，可以向其中写入片断的颜色值。下面的代码就是一个片断shader，将所有片断绘制成淡蓝色：
+
+view plaincopy to clipboardprint?void main()  
+{  
+    gl_FragColor =vec4(0.4,0.4,0.8,1.0);  
+}  
+void main()
+{
+    gl_FragColor =vec4(0.4,0.4,0.8,1.0);
+}可以在此获得本节例子的源码： 
+http://lighthouse3d.com/wptest/wp-content/uploads/2011/03/glutglsl5_2.0.zip
+
+
+
+
+颜色shader
+
+GLSL可以读取一些OpenGL状态，在本节我们将学习如何访问在OpenGL中设置的glColor变量。
+
+GLSL有一个属性变量记录当前颜色，也提供易变变量从顶点shader向片断shader传递颜色值。
+
+view plaincopy to clipboardprint?attribute vec4 gl_Color;  
+varying vec4 gl_FrontColor; // writable onthe vertex shader   
+varying vec4 gl_BackColor; // writable onthe vertex shader   
+varying vec4 gl_Color; // readable on thefragment shader  
+attribute vec4 gl_Color;
+varying vec4 gl_FrontColor; // writable onthe vertex shader
+varying vec4 gl_BackColor; // writable onthe vertex shader
+varying vec4 gl_Color; // readable on thefragment shader变量使用思想如下： 
+1、OpenGL程序通过glColor传送颜色信息。
+
+2、顶点shader通过属性gl_Color接收颜色值。
+
+3、顶点shader计算正面和反面的颜色，然后分别保存在gl_FrontColor和gl_BackColor中。
+
+4、片断shader接收易变变量gl_Color中存储的插值产生的颜色，由当前图元的方向决定颜色是gl_FrontColor还是gl_BackColor插值产生的。
+
+5、片断shader根据易变变量gl_Color设置gl_FragColor。
+
+前 面说过顶点shader和片断shader中传递的易变变量要有相同的名字，但这里是个例外，顶点shader中的gl_FrontColor和 gl_BackColor会根据图元的方向，自动转变为片断shader中的gl_Color。还要注意属性变量gl_Color和易变变量 gl_Color没有冲突，因为前者只存在于顶点shader，后者只存在于片断shader。
+
+下面是顶点shader的例子，只计算了正面颜色：
+
+view plaincopy to clipboardprint?void main()  
+{  
+    gl_FrontColor =gl_Color;  
+    gl_Position =ftransform();  
+}  
+void main()
+{
+    gl_FrontColor =gl_Color;
+    gl_Position =ftransform();
+} 
+片断shader更加简单：
+
+
+
+view plaincopy to clipboardprint?void main()  
+{  
+    gl_FragColor = gl_Color;  
+}  
+void main()
+{
+    gl_FragColor = gl_Color;
+}基于GLEW的源代码： 
+http://lighthouse3d.com/wptest/wp-content/uploads/2011/03/colorglut_2.0.zip
+
+ 
+
+扁平shader（Flatten Shader）
+
+着色器编程让我们可以探索一些新效果，本节的例子展示了用奇怪的方法操作顶点得到的效果。
+
+首先我们要得到一个扁平的3D模型，只需要在应用模型视图变换时将模型顶点的z坐标设为0就行了。下面是顶点shader的代码：
+
+view plaincopy to clipboardprint?void main(void)  
+{  
+    vec4 v = vec4(gl_Vertex);  
+    v.z = 0.0;  
+  
+    gl_Position =gl_ModelViewProjectionMatrix * v;  
+}  
+void main(void)
+{
+    vec4 v = vec4(gl_Vertex);
+    v.z = 0.0;
+
+    gl_Position =gl_ModelViewProjectionMatrix * v;
+}我们先将gl_Vertex变量复制到一个局部变量v中。gl_Vertex是一个GLSL提供的属性变量，所以在顶点shader中它是只读的。 
+片断shader与“GLSL中的Hello World”一节相同，就只用设置一种颜色。
+
+一个扁平的茶壶效果如下：
+
+
+
+
+更进一步，我们需要在z坐标上使用一个正弦函数。将z坐标作为x坐标的函数，这样茶杯将呈现波浪的效果：
+
+view plaincopy to clipboardprint?void main(void)  
+{  
+    vec4 v =vec4(gl_Vertex);  
+    v.z = sin(5.0*v.x)*0.25;  
+    gl_Position =gl_ModelViewProjectionMatrix * v;  
+}  
+void main(void)
+{
+    vec4 v =vec4(gl_Vertex);
+    v.z = sin(5.0*v.x)*0.25;
+    gl_Position =gl_ModelViewProjectionMatrix * v;
+}最后我们需要加入一些顶点动画效果。为了达到这个目的我们需要增加一个变量记录变化的时间，或者帧数。一个顶点shader是无法记录不同顶点值的，更不用 说记录不同的帧了。所以我们需要在OpenGL程序中定义这个变量，然后作为一致变量传递给shader。假设在OpenGL程序中有一个名为time的 帧计数器，在shader中有个同名的一致变量。 
+顶点shader的代码如下：
+
+view plaincopy to clipboardprint?uniform float time;  
+  
+void main(void)  
+{  
+    vec4 v =vec4(gl_Vertex);  
+    v.z = sin(5.0*v.x +time*0.01)*0.25;  
+    gl_Position =gl_ModelViewProjectionMatrix * v;  
+}  
+uniform float time;
+
+void main(void)
+{
+    vec4 v =vec4(gl_Vertex);
+    v.z = sin(5.0*v.x +time*0.01)*0.25;
+    gl_Position =gl_ModelViewProjectionMatrix * v;
+}在有关一致变量的小节讲过，在OpenGL程序中需要两个步骤： 
+·setup: 获取一致变量的存储位置
+
+·render: 更新一致变量
+
+设置（setup）步骤只有一条语句：
+
+
+view plaincopy to clipboardprint?loc =glGetUniformLocation(p,"time");  
+loc =glGetUniformLocation(p,"time");这里p是程序的句柄，time与顶点shader中定义的一致变量名称相同。变量loc是Glint类型的，必须定义在下面的渲染（render）函数也可以访问到的地方。渲染函数如下所示： 
+
+view plaincopy to clipboardprint?void renderScene(void)  
+{  
+    glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);  
+    glLoadIdentity();  
+    gluLookAt(0.0,0.0,5.0,  
+          0.0,0.0,0.0,  
+          0.0f,1.0f,0.0f);  
+    glUniform1f(loc, time);  
+  
+    glutSolidTeapot(1);  
+    time+=0.01;  
+    glutSwapBuffers();  
+}  
+void renderScene(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    gluLookAt(0.0,0.0,5.0,
+          0.0,0.0,0.0,
+          0.0f,1.0f,0.0f);
+    glUniform1f(loc, time);
+
+    glutSolidTeapot(1);
+    time+=0.01;
+    glutSwapBuffers();
+}函数中的变量time在程序一开始初始化，然后每帧都会进行自增运算。 
+本节的GLEW源代码：
+
+http://lighthouse3d.com/wptest/wp-content/uploads/2011/03/flatten_2.0.zip
+
+http://blog.csdn.net/racehorse/article/details/6638455

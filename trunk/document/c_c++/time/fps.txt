@@ -1,0 +1,22 @@
+#include "sys/timeb.h"//头文件中包含
+float total_time;
+struct _timeb beg, end;
+#define FRAME 100
+unsigned int frame=0;
+
+
+if(frame==0)
+	_ftime64_s(&beg); 
+DrawFrame();
+if(frame==FRAME)
+{
+	_ftime64_s(&end); 
+	total_time = (float)(end.time - beg.time) + (float)(end.millitm - beg.millitm) / 1000;
+	swprintf_s(buffer,L"OpenGL ES1 Framework(fps: %.2f)", (float)100.0/total_time);
+	SetWindowText(hwnd,buffer);
+	frame=0;
+}
+else
+{
+	++frame;
+}

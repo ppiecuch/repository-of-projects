@@ -28,6 +28,21 @@ void Trace(LPCTSTR pszFormat, ...)
 	OutputDebugString(szMessageBuffer);   
 }
 
+#include <stdio.h>
+#include <wtypes.h>
+#include <stdarg.h>
+#include <tchar.h>
+
+inline void TRACE(const char * pszFormat, ...)
+{
+	va_list pArgs;
+	char szMessageBuffer[16380]={0};
+	va_start( pArgs, pszFormat );
+	vsnprintf_s( szMessageBuffer, 16380,16380-1,pszFormat, pArgs );
+	va_end( pArgs );   
+	OutputDebugStringA(szMessageBuffer);   
+}
+
 
 Win32代码中窗口弹出函数
 

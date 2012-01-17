@@ -1,3 +1,34 @@
+[编译错误]
+MSVCRTD.lib(crtexe.obj) : error LNK2019: 无法解析的外部符号 _main，该符号在函数 ___tmainCRTStartup 中被引用
+[解决]
+将
+int WINAPI WinMain
+改为
+int main
+
+[异常]
+收藏 不显示删除回复显示所有回复显示星级回复显示得分回复 不能将参数 4 从“const char [9]”转换为“LPCWSTR”
+[解决]
+这个问题，可以这样解决（ＶＳ　２００８中），项目->属性—>配置属性->C/C++->预处理器—>预处理器定义->单击浏览按钮，去掉从父级和项目设置继承
+
+[乱码问题]
+1、确定CPP文件是以Unicode形式保存的（可以重建一个新的CPP试试）
+2、#include <locale>，::setlocale(LC_ALL, "chs"); 试试
+
+[异常]
+“函数”: 从“char [13]”到“LPCWSTR”的类型不兼容
+[解决]
+1、用THCAR代替char
+2、字符串加_T("")，如_T("你好")
+3、用_tcscpy等代替strcpy等
+ANSI操作函数以str开头，如strcpy()，strcat()，strlen()；
+Unicode操作函数以wcs开头，如wcscpy，wcscpy()，wcslen()；
+ANSI/Unicode互为兼容的操作函数以_tcs开头 _tcscpy(C运行期库)；
+ANSI/Unicode互为兼容的操作函数以lstr开头 lstrcpy(Windows函数)；
+考虑ANSI和Unicode的兼容，我们需要使用以_tcs开头或lstr开头的通用字符串操作函数。
+最后加上头文件 #include <tchar.h>
+
+
 [异常]
 使用  pthread_create时
 invalid conversion from `void*' to `void*(*)(void*)  

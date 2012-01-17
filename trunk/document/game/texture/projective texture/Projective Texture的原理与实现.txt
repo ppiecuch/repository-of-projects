@@ -1,0 +1,429 @@
+Projective Texture是比较常见的一种技术，实现起来代码也就区区的不过百行，了解其原理及技术细节是我们的重点，知其然，知其所以然。
+       粗略的说就是想象场景中有台投影仪（Projector），texture就是我们投影的内容，把纹理放在近裁剪面（near clip plane）上，沿着投影仪的方向把纹理投影到场景中。Xheartblue兄翻译了一篇文章，很好的给投影纹理的原理进行的阐述[1]，有兴趣阅读原文的可以访问这里[2]，这本书可以是好东东啊！！
+在这里有几个概念不能混淆了：Camera——人眼坐标；Projector——投影仪坐标。在纹理坐标自动生成过程中，关键的就是如何把人眼坐标系中的vertex转换到Projector Space，进而转换到Projector clip plane，最后规范化为纹理坐标[0，1]。在我的实现中是把Projector定义为一个Camera（注意：不同于显示场景的Camera），所以Projector有Camera的各项属性，我们可以通过gluPerspective,gluLookAt对其进行设置。如何为Projective texture自动生成纹理坐标是重点，这个过程和物体顶点变换为窗口坐标是类似的。在NV Developer Document[3]中有篇文档说的很详细，截图如下：
+
+对上图可以这么理解，Camera用于物体顶点坐标到规范化设备的生成，Projector用于物体顶点纹理坐标的生成。而在不同模式下纹理坐标的生成方式是不同。
+
+根据glTexGen的不同参数GL_OBJECT_LINEAR,GL_EYE_LINEAR来确定纹理生成的函数。在Projective texture mapping一文中给出的纹理坐标生成公式是：
+
+
+
+注意：此处Vo是基于物体坐标系的，无论物体在人眼坐标系中如何变换，其物体坐标是不变的，根据公式其纹理坐标也是不变的。所以在GL_OBJECT_LINEAR模式下看到的纹理是紧贴在物体表面的。而Ve是基于人眼坐标系的，在Projector设置好位置后是基于人眼坐标不变的。
+
+我们来看Object Linear模式下纹理坐标是如何生成的：
+
+
+
+此处的M（Model Matrix）是模型变换矩阵，不同于OPENGL的MODELVIEW MATRIX（这在模型变换的基础上还进行了视图变换）。顶点坐标左乘M后变换到World Space，为什么要变换到World Space呢？？这是因为Camera和Projector都是通过gluLookAt而定义在世界坐标中，这就像座桥梁，唯有通过它才能使得人眼视图体中的顶点转换到Projector定义的视图体内，才能进一步求出相应的纹理坐标。Vp是projector的view matrix（由gluLookAt定义），累加左乘得到projector space中的坐标。Pp是projector的projection matrix（由gluPerspective定义），累加左乘得到projector clip space中的坐标。最后累加偏移矩阵，使纹理坐标的s、t、r映射到[0，1]内。
+
+本文关注的是Eye Linear模式下纹理坐标的生成，有了以上对Object Linear的理解就好办了，公式如下：
+
+
+
+Eye Linear模式是把人眼坐标下的顶点左乘OPENGL的MODELVIEW逆矩阵转换到world space中。Eye Linear和Object Linear的最后一项略有不同，Ve-1是Camera视图矩阵的逆矩阵，目的是把人眼坐标下的顶点转换到世界坐标系中（还记得为什么一定要转换到世界坐标中吗？桥梁的作用，前面已经讲过了^_^）。总之，无论何种模式下使用何种方法都需要把物体顶点转换到世界坐标系中，这样才能通过累加Vp（Projector的view matrix）、Pp（Projector的projection matrix）、偏移矩阵得到纹理坐标。
+
+Pointer在其BLOG中对上述问题也有详细的描述[4]，有很好的启发作用。值得拜读！
+
+ 
+
+纹理坐标的自动生成大致就如此了，看点代码或许能更好的理解吧！
+
+ 
+
+//----------------------------------------ProjTexture.h------------------------------------
+
+/********************************************************
+
+Usage Instruction:
+
+       //in init()
+
+       glGenTextures(1, &id);
+
+       glBindTexture(GL_TEXTURE_2D, id);
+
+       glTexImage2D(GL_TEXTURE_2D, ......, texImage);
+
+ 
+
+       ProjectiveTexture lightmap;
+
+       lightmap.SetupTexture(id);
+
+       lightmap.SetupMatrix(Camera* lightCam);
+
+ 
+
+       //in the render pipe loop...
+
+       lightmap.SetupMatrix(lightCam);
+
+       lightmap.BeginRender();
+
+       draw scene...
+
+       lightmap.EndRender();
+
+ 
+
+********************************************************/
+
+#ifndef    _PROJTEXTURE_H_
+
+#define    _PROJTEXTURE_H_
+
+ 
+
+#include "stdafx.h"
+
+#include <gl/gl.h>
+
+#include <gl/glu.h>
+
+#include <gl/glext.h>
+
+#include "Camera.h"
+
+ 
+
+class ProjectiveTexture
+
+{
+
+private:
+
+       GLuint    textureID;
+
+       float        matrix[16];
+
+ 
+
+public:
+
+       ProjectiveTexture() {}
+
+       virtual ~ProjectiveTexture() { glDeleteTextures(1, &textureID); }
+
+ 
+
+       //绑定纹理，设置纹理单元过滤操作、环境应用等参数
+
+       void SetupTexture(GLuint id)
+
+       {
+
+              textureID = id;
+
+ 
+
+              glBindTexture(GL_TEXTURE_2D, id);
+
+              glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+
+              glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+              glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+              glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+              glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+
+//            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+       }
+
+ 
+
+       //lightCam是我们定义的一个Camera类，此处代表Projector
+
+       void SetupMatrix(Camera* lightCam)
+
+       {
+
+              glMatrixMode(GL_TEXTURE);
+
+ 
+
+              glPushMatrix();
+
+              static float biasMatrix[16] = { 0.5, 0.0, 0.0, 0.0,
+
+                                                                      0.0, 0.5, 0.0, 0.0,
+
+                                                                      0.0, 0.0, 0.5, 0.0,
+
+                                                                      0.5, 0.5, 0.5, 1.0 };
+
+ 
+
+              static double modelviewMatrix[16];
+
+              static double projMatrix[16];
+
+ 
+
+              //获得Projector的模型视图矩阵，用于把world space的顶点转换到projector space
+
+              lightCam->GetModelViewMatrix(modelviewMatrix);
+
+              //获得Projector的投影矩阵，用于把projector space的顶点转换到projector clip space
+
+              lightCam->GetProjectionMatrix(projMatrix);
+
+ 
+
+              glLoadMatrixf(biasMatrix);
+
+              glMultMatrixd(projMatrix);
+
+              glMultMatrixd(modelviewMatrix);
+
+ 
+
+              glGetFloatv(GL_TEXTURE_MATRIX, matrix);          //获得纹理矩阵
+
+ 
+
+              glPopMatrix();
+
+       }
+
+ 
+
+       void BeginRender()
+
+       {
+
+              static float planeS[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
+
+              static float planeT[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
+
+              static float planeR[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
+
+              static float planeQ[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+ 
+
+              glBindTexture(GL_TEXTURE_2D,textureID);
+
+ 
+
+              glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
+
+              glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
+
+              glTexGeni(GL_R,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
+
+              glTexGeni(GL_Q,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
+
+ 
+
+              glTexGenfv(GL_S,GL_EYE_PLANE,planeS);
+
+              glTexGenfv(GL_T,GL_EYE_PLANE,planeT);
+
+              glTexGenfv(GL_R,GL_EYE_PLANE,planeR);
+
+              glTexGenfv(GL_Q,GL_EYE_PLANE,planeQ);
+
+ 
+
+              glEnable(GL_TEXTURE_GEN_S);
+
+              glEnable(GL_TEXTURE_GEN_T);
+
+              glEnable(GL_TEXTURE_GEN_R);
+
+              glEnable(GL_TEXTURE_GEN_Q);
+
+ 
+
+              glMatrixMode(GL_TEXTURE);
+
+              glLoadMatrixf(matrix);                               // load our texture matrix
+
+ 
+
+              //渲染管线就像流水线，顶点是我们的操作对象，何时把相关的操作传入渲染管线，
+
+        //何时把不必要的操作卸下是我们该考虑的。物体顶点坐标应该是在模型视图矩阵
+
+        //（GL_MODELVIEW）转换到世界坐标，然后进入纹理矩阵模式下求出纹理坐标
+
+              glMatrixMode(GL_MODELVIEW);             
+
+       }
+
+ 
+
+       void EndRender()
+
+       {
+
+              glDisable(GL_TEXTURE_GEN_S);
+
+              glDisable(GL_TEXTURE_GEN_T);
+
+              glDisable(GL_TEXTURE_GEN_R);
+
+              glDisable(GL_TEXTURE_GEN_Q);
+
+       }
+
+};
+
+ 
+
+#endif
+
+ 
+
+void ProjectiveTextureViewer::Init()
+
+{
+
+       glEnable(GL_CULL_FACE);
+
+ 
+
+       glGenTextures(1, &texdecal);
+
+       glBindTexture(GL_TEXTURE_2D, texdecal);
+
+       read_ppm("Data//decal_image.ppm");
+
+ 
+
+       glGenTextures(1, &texspotlight);
+
+       glBindTexture(GL_TEXTURE_2D, texspotlight);
+
+       read_ppm("Data//spotlight_image.ppm");
+
+ 
+
+       ……
+
+       ……
+
+       ……
+
+ 
+
+       pLightMap = new Camera();         //create Projector
+
+ 
+
+       lightmap.SetupTexture(texspotlight);     //ProjectiveTexture lightmap
+
+       lightmap.SetupMatrix(pLightMap);
+
+}
+
+ 
+
+void ProjectiveTextureViewer::Draw()
+
+{
+
+       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+ 
+
+       glMatrixMode(GL_MODELVIEW);
+
+       glEnable(GL_TEXTURE_2D);
+
+ 
+
+       //画一个圆球，代表Projector
+
+       glPushMatrix();
+
+       glMultMatrixd(pLightMap->frame()->matrix());
+
+       glColor3f(1.0, 1.0, 0.0);
+
+       gluSphere(q, 0.02, 12, 12);
+
+       glPopMatrix();
+
+ 
+
+       //因为Projector是可以控制的，所以需要实时更新纹理矩阵
+
+       lightmap.SetupMatrix(pLightMap);
+
+       lightmap.BeginRender();
+
+ 
+
+       glMatrixMode(GL_MODELVIEW);
+
+ 
+
+       glPushMatrix();
+
+       glMultMatrixd(pRoom->matrix()); 
+
+       DrawRoom2();
+
+       glPopMatrix();
+
+ 
+
+       glPushMatrix();
+
+       glMultMatrixd(pObject->matrix());
+
+       DrawObject2();
+
+       glPopMatrix();
+
+ 
+
+       lightmap.EndRender();
+
+}
+
+    现在来看看效果图吧：）
+
+    黄色小球为Projector（可控），ProjectiveTexture用的是一张笑脸纹理。
+
+ 
+
+
+
+
+
+    上面三副图从不同角度给出了投影纹理的效果图，效果还是可以的。这里没有考虑遮挡的问题，导致墙上的一些纹理本应被立方体阻挡的也渲染出来了，或许获取一个基于Projector的depth map可以解决，这就该是Shadow Mapping了，有待解决^_^，希望高人可以指点一下了！！
+
+
+
+
+
+    又一问题，从这两张图中可以看出Reverse Projection的问题，当Projector出现在两堵墙的同侧，墙上的纹理方向一致，如果Projector出现在两堵墙的中间，则一个沿着projector的视线方向，另一个则为相反方向，通过定义一个裁剪平面能否解决这个问题呢？思考一下……
+
+ 
+
+       只是简单实现了一个投影纹理，发现问题还是瞒多的，fighting……
+
+ 
+
+ 
+
+ 
+
+see also:
+
+[1]、http://dev.gameres.com/Program/Visual/3D/ProjectTexture.htm
+
+[2]、http://www.bluevoid.com/opengl/sig00/advanced00/notes/node81.html
+
+[3]、http://www.nvidia.com/object/Projective_Texture_Mapping.html
+
+[4]、http://pointer.cnblogs.com/archive/2004/12/30/84367.html
+
+ 
+
+http://blog.csdn.net/pizi0475/article/details/6714826

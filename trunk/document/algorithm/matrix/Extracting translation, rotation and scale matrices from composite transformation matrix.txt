@@ -1,0 +1,205 @@
+Last post 2007/3/13 15:04 by ZiggyTheZygote. 8 replies. 
+ 2007/3/12 8:48   
+
+Toni Greco
+ (0) 
+
+Posts 37 
+ Extracting translation, rotation and scale matrices from composite transformation matrix Reply Quote  
+How can I extract translation, rotation and scale matrices from composite transformation matrix?
+I know how do it if there is not scaling in composite transformation matrix, but I need to handle also this case.
+Thank you. 
+Toni Greco
+--------------------------------------------------------------------------------
+
+http://tonigreco.spaces.live.com 
+ 
+ 
+  
+
+ 2007/3/12 13:27  In reply to  
+
+Shawn Hargreaves
+ (24903) 
+Member XNA Team Posts 11,667 
+ Re: Extracting translation, rotation and scale matrices from composite transformation matrix Reply Quote  
+Funnily enough, we're adding a Matrix.Decompose method in the next release that will do exactly this.
+
+There's no easy way to do this at the moment though.
+
+
+XNA Framework Developer - blog - homepage 
+ 
+ 
+  
+
+ 2007/3/12 14:45  In reply to  
+
+ZiggyTheZygote
+ (0) 
+
+Posts 89 
+ Re: Extracting translation, rotation and scale matrices from composite transformation matrix Reply Quote  
+While you're waiting for the Matrix.Decompose from Microsoft  you can check out my sample on decomposing an XNA matrix:
+
+ 
+
+Decomposing an XNA Matrix
+
+ 
+
+ 
+
+ 
+
+Ziggyware XNA News and Tutorials 
+ 
+ 
+  
+
+ 2007/3/12 15:47  In reply to  
+
+Toni Greco
+ (0) 
+
+Posts 37 
+ Re: Extracting translation, rotation and scale matrices from composite transformation matrix Reply Quote  
+Thank you, this is what I need to extend "Skinning Sample" for doing better keyframes interpolation and more.
+
+But I don't understand why
+
+vScale.X = new Vector3(mat.M11,mat.M12,mat.M13).Length();
+
+can you explain me this please? 
+
+ 
+
+Toni Greco
+--------------------------------------------------------------------------------
+
+http://tonigreco.spaces.live.com 
+ 
+ 
+  
+
+ 2007/3/12 18:23  In reply to  
+
+ZiggyTheZygote
+ (0) 
+
+Posts 89 
+ Re: Extracting translation, rotation and scale matrices from composite transformation matrix Reply Quote  
+The scale in the x,y,z axis is the length of the matrix column vector values ;) The scaling must be removed from the translation and rotation in order to retrieve the proper values.
+
+ 
+
+ 
+
+Ziggyware XNA News and Tutorials 
+ 
+ 
+  
+
+ 2007/3/13 10:39  In reply to  
+
+Toni Greco
+ (0) 
+
+Posts 37 
+ Re: Extracting translation, rotation and scale matrices from composite transformation matrix Reply Quote  
+ ZiggyTheZygote:
+The scale in the x,y,z axis is the length of the matrix column vector values ;) The scaling must be removed from the translation and rotation in order to retrieve the proper values.
+Ok, I see that from your source code, what I wanna ask is why?
+Last night I tryed by my self:
+
+M =             S             *           Rx             *            T    |Sx    0         0      0| |1     0         0      0| |1     0         0      0|M = |0     Sy        0      0|*|0  cos(Θx)   sin(Θx)   0|*|0     1         0      0|=    |0     0         Sz     0| |0  -sin(Θx)  cos(Θx)   0| |0     0         1      0|    |0     0         0      1| |0     0         0      1| |Tx    Ty        Tz     1|  |Sx    0         0        0| |1     0         0      0|= |0  Sy*cos(Θx) Sy*sin(Θx) 0|*|0     1         0      0|=  |0 -Sz*sin(Θx) Sz*cos(Θx) 0| |0     0         1      0|  |0     0         0        1| |Tx    Ty        Tz     1|  |Sx    0         0        0| |1     0         0      0|= |0  Sy*cos(Θx) Sy*sin(Θx) 0|*|0     1         0      0|=  |0 -Sz*sin(Θx) Sz*cos(Θx) 0| |0     0         1      0|  |0     0         0        1| |Tx    Ty        Tz     1|  |Sx    0         0        0| |1     0         0      0|= |0  Sy*cos(Θx) Sy*sin(Θx) 0|*|0     1         0      0|=  |0 -Sz*sin(Θx) Sz*cos(Θx) 0| |0     0         1      0|  |0     0         0        1| |Tx    Ty        Tz     1|  |Sx    0         0        0| = |0  Sy*cos(Θx) Sy*sin(Θx) 0|  |0 -Sz*sin(Θx) Sz*cos(Θx) 0|  |Tx    Ty        Tz       1|thenVector3(Sx, 0, 0).Length = SxVector3(0, Sy*cos(Θx) Sy*sin(Θx)).Length == Sqrt(0^2 + (Sy*cos(Θx))^2 + (Sy*sin(Θx))^2) == Sqrt(Sy^2*(cos(Θx)^2 + sin(Θx)^2)) = |Sy|ok becouse useful Sy is not <0..... it works also with other rotations (Y and Z) and their compositions.Of course this don't work if we change multiply order, but this order is the best intuitive. But now I don't understand why you divide M41 to Sx (if Sx!=0) to calculate Tx: M41 is already Tx.
+
+Toni Greco
+--------------------------------------------------------------------------------
+
+http://tonigreco.spaces.live.com 
+ 
+ 
+  
+
+ 2007/3/13 12:39  In reply to  
+
+ZiggyTheZygote
+ (0) 
+
+Posts 89 
+ Re: Extracting translation, rotation and scale matrices from composite transformation matrix Reply Quote  
+Here is one of the test cases I used when testing:
+
+Matrix mat = Matrix.CreateRotationX(1.0f); 
+Vector3 v = Vector3.Right; 
+Vector3 vT = Vector3.Transform(v, mat); 
+mat = mat * Matrix.CreateTranslation(Vector3.Forward * 10.0f); 
+mat = mat * Matrix.CreateScale(40.0f); 
+Vector3 vTrans,vScale; Matrix matRot; 
+MatrixDecompose(mat, out vTrans, out vScale, out matRot); 
+v = Vector3.Right; 
+vT = Vector3.Transform(v,matRot);
+
+
+If you remove the scaling divisors then the translation will come out scaled by 40
+
+Ziggyware XNA News and Tutorials 
+ 
+ 
+  
+
+ 2007/3/13 13:18  In reply to  
+
+Toni Greco
+ (0) 
+
+Posts 37 
+ Re: Extracting translation, rotation and scale matrices from composite transformation matrix Reply Quote  
+ ZiggyTheZygote:
+Here is one of the test cases I used when testing:
+.........
+If you remove the scaling divisors then the translation will come out scaled by 40
+I understand, but if you don't remove it, then it don't work in this case: 
+
+
+            Matrix m1 = Matrix.CreateRotationX(1.57f) *                        Matrix.CreateRotationY(1.57f) *                        Matrix.CreateRotationZ(1.57f);            Matrix m2 = Matrix.CreateScale(-2.5f, 3.6f, 4.8f) * m1 *                        Matrix.CreateTranslation(1, 2, 3);            Matrix rot;            Vector3 t, s;            MatrixDecompose(m2, out t, out s, out rot);t become x=0,4 -  y=0,55555555 - z=0,625.
+
+I think there aren't a solution that work in all cases of composing transform.
+
+The scale*rotation*translation composition is the basic physically intuitive composition (I think, but I am not sure, that keyframe transform work in this way), but there are many other useful. But we can use more than one version of your MatrixDecompose().
+
+Toni Greco
+--------------------------------------------------------------------------------
+
+http://tonigreco.spaces.live.com 
+ 
+ 
+  
+
+ 2007/3/13 15:04  In reply to  
+
+ZiggyTheZygote
+ (0) 
+
+Posts 89 
+ Re: Extracting translation, rotation and scale matrices from composite transformation matrix Reply Quote  
+Yea I see what you're saying. I guess my decompose isn't totally correct then :(
+
+It seems to work properly if you remove the division of the transformation however in my sample the transformation division is required :)
+
+ I'll poke around a bit to see if there is something i've missed. 
+
+If anyone else has an idea please let us know.
+
+Ziggyware XNA News and Tutorials 
+ 
+ 
+  
+ 
+Page 1 of 1 (9 posts) Previous Discussion Next Discussion  
+ 
+  
+需要帮助吗?使用条款应用程序提供商协议隐私声明行为准则 © 2011 Microsoft Corporation 
+保留所有权利 
+http://forums.create.msdn.com/forums/t/410.aspx

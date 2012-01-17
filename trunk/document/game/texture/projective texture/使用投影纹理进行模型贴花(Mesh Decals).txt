@@ -1,0 +1,173 @@
+Decals Using Projective Texture Mapping
+
+讲投影纹理的好文章网上是很多的，在此给大家一个参考链接，我就不再呈述了。　此文章的描述很易懂。
+
+投影纹理映射（Projective Texture Mapping）
+
+http://wwwnno00.irrlicht3d.cn:8011/redirect.php?tid=54109&goto=lastpost
+
+ 
+
+上面的文章从原理上讲述了投影纹理是什么，本文则利用投影纹理进行一个实际的应用。
+
+在游戏中贴花最常见的地方就是用鼠标选择一个目标后，地上出现的一个圆圈，或者范围魔法在施放时的提示区域。
+
+这个纹理会随着模型和地图的表面进地扭曲，而非一个平面，所以，我们不论怎么做，都会进行一个“投影”的思想，才能让贴上去
+
+的纹理在某一个方向上看的时候，是一个完整的画面。（我们地上的圈，就是从上往下贴的，所以你从上往下看时，会看到一个完整无扭曲的图片）。
+
+ 
+
+什么？　地上是一圈？是的，但是呢，我们的纹理是方的。　我们看到是圈，并不表示我们要把纹理贴到一个圈上。
+
+下面是我在RenderMonkey里测试的结果。
+
+ 
+
+ 
+
+ 
+
+ 
+
+OK，围观完毕，下面简单说一下如何实现。
+
+ 
+
+用投影纹理进行贴花有两种做法。 
+
+第一种。
+
+１、正常渲染模型。
+
+无它！
+
+２、根据投影方向，投影半径找到投影时需要渲染的三角形组。
+
+这种贴花的效率损耗就是花在这里了，所以三角形剔除算法要比较高效才行。
+
+３、将此三角形组进行渲染（相当于做为一个模型渲染），纹理映射时采用投影纹理。
+
+渲染时，要打开全局混合开关。
+
+ 
+
+采用这一种渲染方式时，不需要占用纹理通道，也就是可以在模型上贴无数个花。
+
+ 
+
+第二种。
+
+这是一种占用纹理通道的做法。就是只渲染一次，而在PS中，进行纹理混合。
+
+ 
+
+本文演示的是第一种情况，因为它更贴近于实际应用。并且并未做三角面剔除，而是仅仅将模型渲染了两次。
+
+ 
+
+下面是投影纹理的HLSL代码，以及相关解释。
+
+ 
+
+VS：
+
+struct VS_INPUT 
+{
+   float4 Position : POSITION0;
+}; 
+
+struct VS_OUTPUT 
+{
+   float4 Position : POSITION0;
+   float3 WorldPos : TEXCOORD0;
+}; 
+
+VS_OUTPUT vs_main( VS_INPUT Input )
+{
+   VS_OUTPUT Output; 
+
+   Output.Position = mul( Input.Position, matViewProjection );
+   Output.WorldPos = Input.Position;
+   return( Output ); 
+} 
+
+VS所做的工作并没有什么特别的，仅是需要多向PS传递一个空间位置。 
+
+ 
+
+ 
+
+PS：　
+
+sampler2D baseMap;
+sampler2D Texture1;　//贴这张纹理时，其UV寻址方式最好为CLAMP
+struct PS_INPUT 
+{
+   float3 WorldPos : TEXCOORD0;
+}; 
+
+float4 ps_main( PS_INPUT Input ) : COLOR0
+{
+   float3 Center = float3(0, 0, 20);//投影中心，Y值被忽略。
+   float Radius = 4;//投影范围
+   float3 UVector = float3(1, 0, 0)/(2 * Radius);//将世界坐标变换到纹理投影空间坐标并规范化到0-1之间（正投影）
+   float3 VVector = float3(0, 0, 1)/(-2 * Radius);//同上
+   float2 coord;  
+   coord.x = dot(Input.WorldPos - Center, UVector) + 0.5;
+   coord.y = dot(Input.WorldPos - Center, VVector) + 0.5;
+  // if(coord.x < 1 && coord.y < 1 && coord.x>0 && coord.y>0)
+   return tex2D( Texture1, coord);
+   //else
+   //return 0;
+} 
+
+ 
+
+ 
+
+ 
+
+PS所做的工作就是将世界坐标转换到投影空间，再转换为纹理坐标。
+
+需要说明一点的是，为了测试方便，我仅假设此时摄相机观察和投影方向为-Y方向。所以
+
+dot(Input.WorldPos - Center, UVector)+0.5
+
+上面这句话其实相当于是mul(Input.WorldPos,matProjTexture)/2.0+0.5;
+
+ 
+
+另外，对于
+
+  // if(coord.x < 1 && coord.y < 1 && coord.x>0 && coord.y>0)
+
+这句话，我写在这里，是作为裁剪使用，若没有这个.　就算你设置为了CLAMP，那么当你的纹理边缘的ALPHA不为0时，你会看到
+
+纹理会左右延伸。
+
+ 
+
+而若你未选择CLAMP寻址方式，那你的效果就百般神奇了。　也可以将上面屏蔽的代码解开，用于裁剪。
+
+ 
+
+结尾：
+
+一、投影纹理进行模型贴花时，主要是进行三角面剔除，使在渲染贴花时，提交最少的三角面。
+
+二、在贴花PASS中，需要将全局混合开启，并设置相应的SRCBLEND(SRC_ALPHA)和DESTBLEND(DEST_ALPHA)值。括号内为我用的值。
+
+当然，如果你不想让贴花与场景（模型）混合，则可以不开启。　
+
+三、请注意纹理的寻址方式以及纹理边缘的ALPHA情况。　若纹理边缘ALPHA不为0，则可以手工进行裁剪。
+
+四、本文仅是采用了固定的投影方向和SHADER内部定义变量的方式来进行贴花渲染。　并且，并未进行模型三角面剔除。所以若要使用，则需要注意第一个问题。
+
+五、本文灵感来源于此贴：http://forums.create.msdn.com/forums/p/34339/198791.aspx
+
+六、支持邮件交流:BoYueGame#Gmail#com
+
+posted on 2011-01-07 00:37 Unknown 阅读(1650) 评论(3)  编辑 收藏 引用 所属分类: GPU and Graphic 
+
+http://www.cppblog.com/Leaf/archive/2011/01/07/138093.html

@@ -1,0 +1,40 @@
+uniform sampler2D image;  
+
+02    
+
+03 out vec4 FragmentColor;  
+
+04    
+
+05 uniform float offset[5] = float[]( 0.0, 1.0, 2.0, 3.0, 4.0 );  
+
+06 uniform float weight[5] = float[]( 0.2270270270, 0.1945945946, 0.1216216216,  
+
+07                                    0.0540540541, 0.0162162162 );  
+
+08    
+
+09 void main(void)  
+
+10 {  
+
+11     FragmentColor = texture2D( image, vec2(gl_FragCoord)/1024.0 ) * weight[0];  
+
+12     for (int i=1; i<5; i++) {  
+
+13         FragmentColor +=  
+
+14             texture2D( image, ( vec2(gl_FragCoord)+vec2(0.0, offset[i]) )/1024.0 )  
+
+15                 * weight[i];  
+
+16         FragmentColor +=  
+
+17             texture2D( image, ( vec2(gl_FragCoord)-vec2(0.0, offset[i]) )/1024.0 )  
+
+18                 * weight[i];  
+
+19     }  
+
+20 } 
+http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/

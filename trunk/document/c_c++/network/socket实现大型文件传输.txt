@@ -1,0 +1,485 @@
+最近需要做网络传输的项目，需要实现较大文件的传输。在网上收集了不少资料，但是各有各的做法，尤其是关于文件自动接收这一块不太清楚。 经过图书馆查阅后还是找到了一种解决办法，虽然做的不太专业，但是思路比较精简、清晰，也希望能给大家尤其是刚学习socket套接字的人一些启示。
+
+                               
+
+   对于套接字socket我其实也不太懂，并且一般资料都可以查找到，所以不交易累赘了，直接说如何实现文件的传输吧。
+
+    对于发送文件，有三步：发送文件长度，发送文件名，发送文件内容。 
+
+    关于发送文件内容，又可以根据文件大小进行直接传输和分块传输，如果是分块传输还需要多线程，否则会容易使程序失去响应。 在这里其实我也有一个疑惑，就是通过CFileDialog类GetFileName函数获取文件名，一般没有问题，但是当文件名很长（如大于60）时不能完整读取，导致接收方无法判别文件类型。 所以保险起见，我就从GetFilePath中截取出了文件名。
+
+view plaincopy to clipboardprint?void CChatDlg::OnSend()   
+{  
+    if(flag==-1)  
+    {  
+        MessageBox("处于未连接状态");  
+        return;  
+    }  
+      
+    CFileDialog  dlg(TRUE);  
+    dlg.m_ofn.lpstrTitle="选择图片";  
+    dlg.m_ofn.lpstrFilter="All Files";  
+    CString path="";  
+    CString name="";  
+    if(dlg.DoModal()==IDOK)  
+    {  
+        path=dlg.GetPathName();//获取文件路径名   
+        //name=dlg.GetFileName();//获取文件名   
+    }  
+    if(path=="")  
+        return ;//表示没有选择任何元素   
+  
+     //不直接读取文件名，而是从路径名中截取   
+    int pos=0,start=0;  
+    while(1)  
+    {  
+        start=pos;  
+        pos=path.Find('\\',start+1);  
+        if(pos<0)  
+            break;  
+    }  
+    name=path.Right(path.GetLength()-start-1);  
+    file.Open(path,CFile::modeRead);//打开文件   
+     dwlen=file.GetLength();//获取文件长度   
+    m_se.SetRange32(0,dwlen);  
+    CString te;  
+    te.Format("%d",dwlen);  
+    if(flag==0)//发送图片数据   
+        send(m_accept, te.GetBuffer(0), 10, 0);//发送文件的长度   
+    if(flag==1)  
+        send(m_local, te.GetBuffer(0), 10, 0);  
+    Sleep(500);//延时   
+      
+    if(flag==0)//发送图片数据   
+        send(m_accept, name.GetBuffer(0), name.GetLength(), 0);//发送文件的名   
+    if(flag==1)  
+        send(m_local, name.GetBuffer(0), name.GetLength(), 0);  
+    Sleep(500);//延时   
+      
+      
+    if(dwlen<=1024*1024)//如果小于1M就直接传输   
+    {  
+        if(date!=NULL)  
+        {  
+            delete []date;  
+            date=NULL;  
+        }  
+        date=new char[dwlen];//开辟neicun   
+        memset(date,0,dwlen);//初始化   
+        file.Read(date,dwlen);//读取文件   
+        file.Close();  
+        int n=0;  
+        if(flag==0)//发送图片数据   
+            n=send(m_accept, date, dwlen, 0);  
+        if(flag==1)  
+            n=send(m_local, date, dwlen, 0);  
+        m_se.SetPos(n);  
+        CString ss;  
+        ss.Format("%d   %d",dwlen,n);    
+        ss+="发送完成";  
+        MessageBox(ss);  
+        delete []date;  
+        date=NULL;  
+    }  
+    else  
+    {  
+       //需要选择多线程，创建一个线程   
+        p_thread=AfxBeginThread(SEND,this,0,0,0,NULL);//开启一个线程   
+    }     
+}  
+void CChatDlg::OnSend() 
+{
+	if(flag==-1)
+	{
+		MessageBox("处于未连接状态");
+		return;
+	}
+	
+	CFileDialog	 dlg(TRUE);
+	dlg.m_ofn.lpstrTitle="选择图片";
+	dlg.m_ofn.lpstrFilter="All Files";
+	CString path="";
+	CString name="";
+	if(dlg.DoModal()==IDOK)
+	{
+		path=dlg.GetPathName();//获取文件路径名
+		//name=dlg.GetFileName();//获取文件名
+	}
+	if(path=="")
+		return ;//表示没有选择任何元素
+
+	 //不直接读取文件名，而是从路径名中截取
+	int pos=0,start=0;
+	while(1)
+	{
+		start=pos;
+		pos=path.Find('\\',start+1);
+		if(pos<0)
+			break;
+	}
+	name=path.Right(path.GetLength()-start-1);
+	file.Open(path,CFile::modeRead);//打开文件
+	 dwlen=file.GetLength();//获取文件长度
+	m_se.SetRange32(0,dwlen);
+	CString te;
+	te.Format("%d",dwlen);
+	if(flag==0)//发送图片数据
+		send(m_accept, te.GetBuffer(0), 10, 0);//发送文件的长度
+	if(flag==1)
+		send(m_local, te.GetBuffer(0), 10, 0);
+	Sleep(500);//延时
+	
+	if(flag==0)//发送图片数据
+		send(m_accept, name.GetBuffer(0), name.GetLength(), 0);//发送文件的名
+	if(flag==1)
+		send(m_local, name.GetBuffer(0), name.GetLength(), 0);
+	Sleep(500);//延时
+	
+	
+	if(dwlen<=1024*1024)//如果小于1M就直接传输
+	{
+		if(date!=NULL)
+		{
+			delete []date;
+			date=NULL;
+		}
+		date=new char[dwlen];//开辟neicun
+		memset(date,0,dwlen);//初始化
+		file.Read(date,dwlen);//读取文件
+		file.Close();
+		int n=0;
+		if(flag==0)//发送图片数据
+			n=send(m_accept, date, dwlen, 0);
+		if(flag==1)
+			n=send(m_local, date, dwlen, 0);
+		m_se.SetPos(n);
+		CString ss;
+		ss.Format("%d   %d",dwlen,n);  
+		ss+="发送完成";
+		MessageBox(ss);
+		delete []date;
+		date=NULL;
+	}
+	else
+	{
+	   //需要选择多线程，创建一个线程
+		p_thread=AfxBeginThread(SEND,this,0,0,0,NULL);//开启一个线程
+	}	
+}
+    注解中的什么图片的是错误的，是可以传输任意格式的文件的。大家可以看到我提取文件名的过程繁琐，原因我
+
+上面一段已经说明了，也希望大家更好的解决方法。其中flag的值时表示是服务端还是客户端，0-服务端，1-客户端，集合在了一个程序中。  
+
+     注意：：： 其中的Sleep(500)的延时是因为为了让接受方有足够多的时间获取文件长度和文件名关键信息，如果不延时，接收方会先接受到文件内容后接收到文件长度和文件名，顺序是相反的，具体原因我也没弄清楚，希望大家指教。
+
+      最后是关于一个线程的函数，具体如下：
+
+view plaincopy to clipboardprint?UINT SEND(LPVOID pThreadParam)//线程函数   
+{  
+    CChatDlg *dlg=(CChatDlg *)pThreadParam;  
+    if(date!=NULL)  
+        {  
+            delete []date;  
+            date=NULL;  
+        }  
+        int total=0,len=0;  
+        while(total<dwlen)//直到全部发送完成   
+        {   
+                if(dwlen-total>=1024*100)  
+                {  
+                   date=new char[1024*100];  
+                   memset(date,0,1024*100);  
+                   file.Read(date,1024*100);  
+                   if(dlg->flag==0)//发送数据   
+                    len=send(dlg->m_accept, date, 1024*100, 0);  
+                if(dlg->flag==1)  
+                    len=send(dlg->m_local, date, 1024*100, 0);  
+                }  
+                else  
+                {  
+                    date=new char[dwlen-total];  
+                     memset(date,0,dwlen-total);  
+                    file.Read(date,dwlen-total);  
+                    if(dlg->flag==0)//发送数据   
+                    len=send(dlg->m_accept, date, dwlen-total, 0);  
+                    if(dlg->flag==1)  
+                    len=send(dlg->m_local, date, dwlen-total, 0);  
+                }  
+            Sleep(1);  
+            total+=len;//累计已经发送的数据   
+            dlg->m_se.SetPos(total);  
+            delete []date;  
+            date=NULL; //回收内存空间   
+        }  
+        file.Close();  
+        CString ss;  
+        ss.Format("%d",total);    
+        ss+="发送完成";  
+        MessageBox(dlg->m_hWnd,ss,"提示",MB_OK);  
+           
+        DWORD exit=0;  
+   
+        BOOL ret=GetExitCodeThread(dlg->p_thread->m_hThread,&exit);//获取线程退出代码   
+        if(exit==STILL_ACTIVE) //如果进程仍在进行   
+        {  
+            dlg->p_thread->ExitInstance();//退出进程   
+            dlg->p_thread=NULL;  
+        }  
+      
+    return 0;  
+}  
+UINT SEND(LPVOID pThreadParam)//线程函数
+{
+	CChatDlg *dlg=(CChatDlg *)pThreadParam;
+	if(date!=NULL)
+		{
+			delete []date;
+			date=NULL;
+		}
+		int total=0,len=0;
+		while(total<dwlen)//直到全部发送完成
+		{ 
+				if(dwlen-total>=1024*100)
+				{
+				   date=new char[1024*100];
+				   memset(date,0,1024*100);
+				   file.Read(date,1024*100);
+				   if(dlg->flag==0)//发送数据
+					len=send(dlg->m_accept, date, 1024*100, 0);
+				if(dlg->flag==1)
+					len=send(dlg->m_local, date, 1024*100, 0);
+				}
+				else
+				{
+					date=new char[dwlen-total];
+				     memset(date,0,dwlen-total);
+					file.Read(date,dwlen-total);
+					if(dlg->flag==0)//发送数据
+					len=send(dlg->m_accept, date, dwlen-total, 0);
+				    if(dlg->flag==1)
+					len=send(dlg->m_local, date, dwlen-total, 0);
+				}
+		    Sleep(1);
+		   	total+=len;//累计已经发送的数据
+			dlg->m_se.SetPos(total);
+			delete []date;
+			date=NULL; //回收内存空间
+		}
+		file.Close();
+		CString ss;
+		ss.Format("%d",total);  
+		ss+="发送完成";
+		MessageBox(dlg->m_hWnd,ss,"提示",MB_OK);
+		 
+        DWORD exit=0;
+ 
+		BOOL ret=GetExitCodeThread(dlg->p_thread->m_hThread,&exit);//获取线程退出代码
+		if(exit==STILL_ACTIVE) //如果进程仍在进行
+		{
+			dlg->p_thread->ExitInstance();//退出进程
+			dlg->p_thread=NULL;
+		}
+	
+	return 0;
+}
+
+   线程的好处是不会让程序失去响应，而且对于大型文件传输来说这是必须的。
+
+    其次，关于文件的接受，就是一个注册的OnSocket中的FD_READ,通过这个方式设置WSAAsyncSelect模型的。
+
+view plaincopy to clipboardprint?int nRet = WSAAsyncSelect(m_local, m_hWnd, WM_SOCKET, FD_ACCEPT|FD_CONNECT|FD_READ|FD_WRITE|FD_CLOSE);  
+    if (nRet != 0)  
+    {  
+        TRACE("设置WSAAsyncSelect模型失败");  
+    }  
+      
+int nRet = WSAAsyncSelect(m_local, m_hWnd, WM_SOCKET, FD_ACCEPT|FD_CONNECT|FD_READ|FD_WRITE|FD_CLOSE);
+	if (nRet != 0)
+	{
+		TRACE("设置WSAAsyncSelect模型失败");
+	}
+	    关于OnSocket 函数完整如下，处理FD_READ|FD_CONNECT|FD_ACCEPT等消息
+
+view plaincopy to clipboardprint?void CChatDlg::OnSocket(WPARAM wParam,LPARAM lParam)  
+{  
+    int nError = WSAGETSELECTERROR(lParam);     //读取错误代码   
+    int nEvent = WSAGETSELECTEVENT(lParam);     //读取网络事件   
+    SOCKET sock = wParam;  
+    switch (nEvent)   
+    {  
+    case FD_ACCEPT:  
+        {  
+            //接收客户端的连接   
+            closesocket(m_accept);  
+            sockaddr_in sockAddr;  
+            int nAddrSize = sizeof(sockaddr_in);  
+            m_accept = accept(sock, (sockaddr*)&sockAddr, &nAddrSize);  
+            WSAAsyncSelect(m_accept, m_hWnd, WM_SOCKET, FD_CLOSE|FD_READ);  
+            state=true;  
+            flag=0; //表示作为服务器   
+            m_connect.EnableWindow(FALSE);//由于被连接，需要是连接功能丧失   
+            break;  
+        }  
+    case FD_READ:   //接收数据   
+        {  
+            switch(flag1)  
+            {  
+            case 1:  
+                memset(buffer,0,10);  
+                recv(sock, buffer, 10, 0);//这个语句用于接收文件的长   
+                   m_length=atoi(buffer);  
+                   UpdateData(false);  
+                   flag1=2;  //做接下来一步   
+                   m_get.SetRange32(0,m_length); //设置接受进度条的范围   
+                   break;  
+            case 2: recv(sock, filename, 200, 0); //接受文件名   
+                flag1=3;//做接下来一步   
+                f.Open(filename,CFile::modeCreate|CFile::modeWrite);//创建一个文件   
+                break;  
+            case 3:if(temp!=NULL)  
+                   {  
+                       delete [] temp;  
+                       temp=NULL;  
+                   }  
+                temp=new char[1024*56];//开辟一个内存   
+                memset(temp,0,1024*56);  
+                x=recv(sock,temp,1024*56,0);  
+                f.Write(temp,x);  
+                total+=x;  
+                m_get.SetPos(total);  
+                delete []temp;  
+                temp=NULL;  
+                if(total>=m_length)//表示接受完成   
+                {  
+                    f.Close();  
+                    memset(filename,0,200);  
+                    flag1=1;  
+                  CString sd; sd.Format("%d",total);sd+="接受完成";  
+                  MessageBox(sd);  
+                  total=x=0;  
+                }  
+                break;  
+            }  
+        }  
+        break;  
+    case FD_CLOSE:  
+        {  
+            if(flag==0)  
+                closesocket(m_accept);  
+            state= FALSE;  
+            flag=-1;  
+            m_connect.EnableWindow(TRUE);//是连接功能恢复正常   
+            break;  
+        }  
+    case FD_CONNECT:                            //连接网络事件   
+        {  
+            if(nError == 0)                     //连接成功   
+            {  
+                state= TRUE;  
+                flag=1;//表示作为客户端   
+                MessageBox("连接成功");  
+            }  
+            break;  
+        }  
+          
+    }     
+}  
+void CChatDlg::OnSocket(WPARAM wParam,LPARAM lParam)
+{
+	int nError = WSAGETSELECTERROR(lParam);		//读取错误代码
+	int nEvent = WSAGETSELECTEVENT(lParam);		//读取网络事件
+	SOCKET sock = wParam;
+	switch (nEvent) 
+	{
+	case FD_ACCEPT:
+		{
+			//接收客户端的连接
+			closesocket(m_accept);
+			sockaddr_in sockAddr;
+			int nAddrSize = sizeof(sockaddr_in);
+			m_accept = accept(sock, (sockaddr*)&sockAddr, &nAddrSize);
+			WSAAsyncSelect(m_accept, m_hWnd, WM_SOCKET, FD_CLOSE|FD_READ);
+			state=true;
+			flag=0; //表示作为服务器
+			m_connect.EnableWindow(FALSE);//由于被连接，需要是连接功能丧失
+			break;
+		}
+	case FD_READ:	//接收数据
+		{
+			switch(flag1)
+			{
+			case 1:
+				memset(buffer,0,10);
+				recv(sock, buffer, 10, 0);//这个语句用于接收文件的长
+	               m_length=atoi(buffer);
+				   UpdateData(false);
+				   flag1=2;  //做接下来一步
+				   m_get.SetRange32(0,m_length); //设置接受进度条的范围
+				   break;
+			case 2: recv(sock, filename, 200, 0); //接受文件名
+				flag1=3;//做接下来一步
+				f.Open(filename,CFile::modeCreate|CFile::modeWrite);//创建一个文件
+				break;
+			case 3:if(temp!=NULL)
+				   {
+					   delete [] temp;
+					   temp=NULL;
+				   }
+				temp=new char[1024*56];//开辟一个内存
+				memset(temp,0,1024*56);
+				x=recv(sock,temp,1024*56,0);
+				f.Write(temp,x);
+			    total+=x;
+				m_get.SetPos(total);
+				delete []temp;
+				temp=NULL;
+				if(total>=m_length)//表示接受完成
+				{
+					f.Close();
+					memset(filename,0,200);
+					flag1=1;
+				  CString sd; sd.Format("%d",total);sd+="接受完成";
+				  MessageBox(sd);
+				  total=x=0;
+				}
+				break;
+			}
+		}
+		break;
+	case FD_CLOSE:
+		{
+			if(flag==0)
+				closesocket(m_accept);
+			state= FALSE;
+			flag=-1;
+			m_connect.EnableWindow(TRUE);//是连接功能恢复正常
+			break;
+		}
+	case FD_CONNECT:							//连接网络事件
+		{
+			if(nError == 0)						//连接成功
+			{
+				state= TRUE;
+				flag=1;//表示作为客户端
+				MessageBox("连接成功");
+			}
+			break;
+		}
+		
+	}	
+}
+     其中接受就在FD_READ消息中，flag1-1接受文件长度,flag1-2接受文件名，flag1-3接受文件内容。
+
+     当然整个函数太长了，本来应该一些语句应该设置成一些函数的，那样也更直观。
+
+     这基本上是这个工程的全部了，还是比较简洁的。在同一台电脑上测试结果是：732577734字节共耗时114秒，平均6.12M/s,也不是体太慢。
+
+       整个项目还是有不少弊端的，有疑惑的可以相互交流讨论。
+
+    完整工程下载地址：
+
+    http://download.csdn.net/detail/jin123wang/3937052
+
+
+
+http://blog.csdn.net/jin123wang/article/details/7081814

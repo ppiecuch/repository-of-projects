@@ -1,0 +1,114 @@
+原文出处：SGI OpenGL 教程
+翻译：心蓝 潘李亮。 Email: Xheartblue@etang.com 
+
+译者前言：
+　　影子有两种经典的实现方法：一是Shadow Volume 。二是Shadow Mapping。如何用Light Mapping来实现投影影子呢？这就要用到Project Texture.直接翻译的意思就是投影纹理----把一个纹理像放幻灯片一样投影到场景中去，假想有一个电影机在放电影，沿着镜头方向，电影将被投在墙上，而投影纹理就类似于这种情况，我们想要使用的纹理就是电影机里Film。
+
+　　以下是我在SGI的教程中找到的文章。奉献给大家。
+
+How to Project a Texture
+http://www.sgi.com/software/opengl/advanced98/notes/node49.html 
+
+
+　　投影一个纹理图象到你自己合成的环境里在许多步骤上和投影渲染场景到显示器上的步骤是一样的。投影纹理的关键是纹理变换矩阵的内容。该变换矩阵由以下三个变换串联起来：
+
+　　　　1．视图/模型变换 -- 朝着需要投影到场景的方向。
+
+　　　　2．投影变换（透视或者正交）
+
+　　　　3．缩放和偏移（bias 是叫偏移吗？），它将近裁剪面到纹理坐标。
+
+　　Projecting a texture image into your synthetic environment requires many of the same steps that are used to project the rendered scene onto the display. The key to projecting a texture is the contents of the texture transform matrix. The matrix contains the concatenation of three transformations: 
+
+　　　　1. A modelview transform to orient the projection in the scene. 
+
+　　　　2. A projective transform (perspective or orthogonal). 
+
+　　　　3. A scale and bias to map the near clipping plane to texture coordinates. 
+
+　　纹理变换中模型/视图变换部分可以和普通的图形管道一样计算，可以使用一般的模型/视图变换工具，举个例子，你可以使用gluLookAt()来投射一个观察方向，也可以用glFrustum或者gluPerspective()来定义一个透视变换。
+
+　　The modelview and projection parts of the texture transform can be computed in the same way, with the same tools that are used for the modelview and projection transform. For example, you can use gluLookat() to orient the projection, and glFrustum() or gluPerspective() to define a perspective transformation. 
+
+　　模型/视图变换的作用和它在OpenGL 观察管道里的作用是一样的，它将观察者沿-Z方向移动到原点和投影中心，在这种情况下，观察者就好比是是光源，近裁剪平面好比是需要投影的纹理图象的所处的位置，纹理图象可以被看作一个在投影的透明胶片。或者，你也可以想象一个观察者在观察位置，透过近平面上纹理去看那些需要被贴上纹理（投影纹理）的表面。
+
+　　The modelview transform is used in the same way as it is in the OpenGL viewing pipeline, to move the viewer to the origin and the projection centered along the negative z axis. In this case, viewer can be thought of a light source, and the near clipping plane of the projection as the location of the texture image, which can be thought of as printed on a transparent film. Alternatively, you can conceptualize a viewer at the view location, looking through the texture on the near plane, at the surfaces to be textured. 
+
+　　投影操作把眼空间变换到规格化的设备空间，在这个空间里，x,y,z坐标的范围都是-1到1。投影纹理则可以被想象成安放在投影方向的近平面上，这个投影就是由模型/视图和投影变换矩阵定义的。
+
+　　The projection operation converts eye space into Normalized Device Coordinate (NDC) space. In this space, the x, y, and z coordinates range from -1 to 1. When used in the texture matrix, the coordinates are s, t, and r instead. The projected texture can be visualized as laying on the surface of the near plane of the oriented projection defined by the modelview and projection parts to the transform. 
+
+　　变换的最后一部分是对纹理映射进行缩放和偏移，它让文理坐标的范围变成0到1，这样，整个纹理图象（或者期望的区域）能覆盖整个投影近平面。因为近平面被定义为NDC（规格化设备坐标）坐标。把NDC坐标下的近平面对应到纹理图象上需要把s和t方向的坐标都缩小1/2，然后平移1/2。（注：[-1,1] * 1/2 + 1/2 = [0,1]）。纹理图象将居中而且覆盖整个近平面（我一直没有看懂Back Plane是什么）。纹理在投影图象的方向被改变时候也可以旋转。
+
+　　The final part of the transform scales and biases the texture map, which is defined in texture coordinates ranging from 0 to 1, so that the entire texture image (or the desired portion of the image) covers the near plane defined by the projection. Since the near plane is now defined in NDC coordinates, Mapping the NDC near plane to match the texture image would require scaling by 1/2, then biasing by 1/2, in both s and t. The texture image would be centered and cover the entire back plane. The texture could also be rotated if the orientation of the projected image needed to be changed. 
+
+投影的次序和普通的图形管道是一样的。首先是Model/View变换，然后是投影变换，最后是缩放和平移近平面的位置到纹理图象上去：
+
+　　1. glMatrixMode(GL_TEXTURE);
+
+　　2. glLoadIdentity();开始。
+
+　　3. glTranslatef(0.5f,0.5f,0.5f);
+
+　　4. glScalef(0.5f,0.5f,1.0f);
+
+　　5. 设置投影矩阵（如：glFrustum()）
+
+　　6. 设置视图/模型矩阵（如：gluLookAt()）。
+
+The projections are ordered in the same as the graphics pipeline, the modelview transform happens first, then the projection, then the scale and bias to position the near plane onto the texture image: 
+
+　　1. glMatrixModeGL_TEXTURE(GL_TEXTURE) 
+
+　　2. glLoadIdentity() (start over) 
+
+　　3. glTranslatef.5f, .5f, 0.f(.5f, .5f, 0.f) 
+
+　　4. glScalef.5f, .5f, 1.f(.5f, .5f, 1.f) (texture covers entire NDC near plane) 
+
+　　5. Set the perspective transform (e.g., glFrustum()). 
+
+　　6. Set the modelview transform (e.g., gluLookAt()). 
+
+那么该如何定义图元的纹理坐标的映射方式呢？因为我们的投影和视图/模型变换是在眼空间中定义的（所有的场景都是在这个空间中被安装起来的）。最直接的方法就是在纹理坐标空间和眼空间创建一个 1对1的对应关系，这个方法可以通过把纹理坐标生成方式设置成Eye Linear方式，同时把Eye Planes设置成1对1的映射：（具体见OpenGL的纹理坐标生成，D3D的方法也可以找到。）
+
+　　GLfloat Splane[] = {1.f, 0.f, 0.f, 0.f}; 
+　　GLfloat Tplane[] = {0.f, 1.f, 0.f, 0.f}; 
+　　GLfloat Rplane[] = {0.f, 0.f, 1.f, 0.f}; 
+　　GLfloat Qplane[] = {0.f, 0.f, 0.f, 1.f}; 
+
+What about the texture coordinates for the primitives that the texture will be projected on? Since the projection and modelview parts of the matrix have been defined in terms of eye space (where the entire scene is assembled), the straightforward method is to create a 1-to-1 mapping between eye space and texture space. This can be done by enabling texture generation to eye linear and setting the eye planes to a one-to-one mapping: 
+
+　　GLfloat Splane[] = {1.f, 0.f, 0.f, 0.f}; 
+　　GLfloat Tplane[] = {0.f, 1.f, 0.f, 0.f}; 
+　　GLfloat Rplane[] = {0.f, 0.f, 1.f, 0.f}; 
+　　GLfloat Qplane[] = {0.f, 0.f, 0.f, 1.f}; 
+
+你也可以使用物体空间的影射方式，但是建立影射的时候也要把Model/View变换包含在内。
+
+You could also use object space mapping, but then you'd have to take the current modelview transform into account. 
+
+
+　　现在一切都做了。将会发生什么呢？当每个图元被渲染的时候，纹理坐标对应的x,y,z值（顶点的坐标）将被生成的模型/视图矩阵变换，然后经过纹理的变换矩阵的变换。首先应用一个视图/模型和投影变换矩阵，这个矩阵将图元的纹理坐标影射到规格化设备坐标(-1.1)。然后缩放和平移这个坐标。然后，对纹理图象施加滤波和纹理环境操作。
+
+　　So when you've done all this, what happens? As each primitive is rendered, texture coordinates matching the x, y, and z values that have been transformed by the modelview matrix are generated, then transformed by the texture transformation matrix. The matrix applies a modelview and projection transform; this orients and projects the primitive's texture coordinate values into NDC space (-1 to 1 in each dimension). These values are scaled and biased into texture coordinates. Then normal filtering and texture environment operations are performed using the texture image. 
+
+　　当变换和纹理映射被施加在所有需要渲染的多边形上的时候，如何去把投影纹理限制在一个单一的区域里呢？有许多的办法可以达到这个目的的。最简单的方法就是你当你打开投影纹理和设置纹理变换矩阵的时候仅仅渲染那些你试图把纹理投射上去的多边形。但是这样方法是粗糙的。另外一个办法是在多遍渲染中使用模板缓存的算法来控制场景中那些部分将被投影纹理更新。场景先不使用投影纹理来渲染一遍，然后使用Stencil Buffer来遮盖一个特定的区域，并且场景以打开投影纹理的状态下被重新渲染一遍。Stencil Buffer可以把整个不希望被使用投影纹理的区域都遮盖住，这允许你创建一个投影图象任意的轮廓线，或者把一个纹理投影到有纹理的表面上（就是多遍纹理了.而且不需ARB_Muti_Texture的支持哦。）
+
+　　If transformation and texturing is being applied to all the rendered polygons, how do you limit the projected texture to a single area? There are a number of ways to do this. One is to simply only render the polygons you intend to project the texture on when you have projecting texture active and the projection in the texture transformation matrix. But this method is crude. Another way is to use the stencil buffer in a multipass algorithm to control what parts of the scene are updated by a projected texture. The scene can be rendered without the projected texture, the stencil buffer can be set to mask off an area, and the scene re-rendered with the projected texture, using the stencil buffer to mask off all but the desired area. This can allow you to create an arbitrary outline for the projected image, or to project a texture onto a surface that has a surface texture. 
+
+　　这里有一个非常简单的方法来实现一个非重复(Repeat)的纹理到一个没有映射过纹理的表面：把纹理环境设置成GL_MODULATE。把纹理的重复设置成夹断GL_CLAMP，然后把纹理的边界颜色设置成白色。当投影纹理的时候，没有被投射到纹理的表面将自动被设置成纹理的边界颜色---白色，然后和白色调制在一起。这样它们的颜色将保持不变，因为这相当于每个颜色成分都乘1。
+
+　　There is a very simple method that works when you want to project a non-repeating texture onto an untextured surface. Set the GL_MODULATE texture environment, set the texture repeat mode to GL_CLAMP, and set the texture border color to white. When the texture is projected, the surfaces outside the texture itself will default to the texture border color, and be modulated with white. This will leave the areas textured with the border color unchanged, since each color component will be scaled by one. 
+
+　　纹理过滤和普通的纹理映射是一样的。投影纹理相对屏幕像素是缩小和放大倍率来决定的。 当需要小的图象时候，需要MipMapping来达到更好的结果。如果投影纹理在场景中移来移去的话，使用一个好的纹理过滤方法是很重要的。
+
+　　Filtering considerations are the same as for normal texturing; the size of the projected textures relative to screen pixels determines minification or magnification. If the projected image will be relatively small, mipmapping may be required to get good quality results. Using good filtering is especially important if the projected texture moves from frame to frame. 
+
+　　请注意，就像观察和投影，纹理投影也不是完全符合光学原理的。除非采用特殊的方法，纹理将会影响到所有的表面----不管是前面的还是后面的（译者注：就是电影机后面也会有电影图象，当然这是不符合光学原理的）。因为没有默认的视见体裁剪（View Volume ），应用程序需要小心的避免不希望出现的投影纹理效果。用户自定义裁剪面（附加裁剪面）有助于更好的控制投影纹理该出现在什么地方。
+
+　　Please note that like the viewing projections, the texture projection is not really optical. Unless special steps are taken, the texture will affect all surfaces within the projection, both in front and in back of the projection. Since there is no implicit view volume clipping (like there is with the OpenGL viewing pipeline), the application needs to be carefully modeled to avoid undesired texture projections, or user defined clipping planes can be used to control where the projected texture appears.  　 
+ 
+    
+ 
+http://dev.gameres.com/Program/Visual/3D/ProjectTexture.htm

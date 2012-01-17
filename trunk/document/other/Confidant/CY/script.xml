@@ -2,7 +2,7 @@
 <System>
 	<commander id="loop1" mode="loop" time="0">
 		<command type="call" value="defense" delay="0" />
-		<command type="checkColor" x="58" y="80" value="0xFFC9C9C8" delay="0" trueRef="checkEnemyAttackMe_YCheckFaceToTarget_NPressTab" falseRef="restOrNext"/>
+		<command type="call" value="attack" delay="0" />
 	</commander>
 	<commander id="checkEnemyAttackMe_YCheckFaceToTarget_NPressTab" mode="bunch">
 		<command type="checkColor" x="671" y="88" value="0xFFCC6140" delay="0" trueRef="isFaceToTarget_YAttack_NPressTab" falseRef="pressTab"/>

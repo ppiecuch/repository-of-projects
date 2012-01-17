@@ -1,0 +1,46 @@
+通常，在您呼叫GetDC或BeginPaint时，Windows用默认值建立一个新的设备内容，您对属性所做的一切改变在设备内容用 ReleaseDC或EndPaint呼叫释放时，都会丢失。如果您的程序需要使用非内定的设备内容属性，则您必须在每次取得设备内容句柄时初始化设备内 容：
+
+case WM_PAINT:
+        
+    hdc = BeginPaint (hwnd, &ps) ;
+        
+    设备内容属性
+        
+    绘制窗口显示区域
+        
+    EndPaint (hwnd, &ps) ;
+        
+    return 0 ;
+        虽然在通常情况下这种方法已经很令人满意了，但是您还可能想要在释放设备内容之后，仍然保存程序中对设备内容属性所做的改变，以便在下一次呼叫GetDC 和BeginPaint时它们仍然能够起作用。为此，可在登录窗口类别时，将CS_OWNDC旗标纳入窗口类别的一部分：
+
+wndclass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC ;
+        现在，依据这个窗口类别所建立的每个窗口都将拥有自己的设备内容，它一直存在，直到窗口被删除。如果使用了CS_OWNDC风格，就只需初始化设备内容一次，可以在处理WM_CREATE消息处理期间完成这一操作：
+
+case        WM_CREATE:
+        
+      hdc = GetDC (hwnd) ;
+        
+初始化设备内容属性
+        
+       ReleaseDC (hwnd, hdc) ;
+        这些属性在改变之前一直有效。
+
+CS_OWNDC风格只影响GetDC和BeginPaint获得的设备内容，不影响其它函数（如GetWindowDC）获得的设备内容。以前不提倡使用CS_OWNDC风格，因为它需要内存；现在，在处理大量图形的Windows NT应用程序中，它可以提高性能。即使用了CS_OWNDC，您仍然应该在退出窗口消息处理程序之前释放设备内容。
+
+某些情况下，您可能想改变某些设备内容属性，用改变后的属性进行绘图，然后恢复原来的设备内容。要简化这一过程，可以通过如下呼叫来保存设备内容的状态：
+
+idSaved = SaveDC (hdc) ;
+        现在，可以改变一些属性，在想要回到呼叫SaveDC前存在的设备内容时，呼叫：
+
+RestoreDC (hdc, idSaved) ;
+        您可以在呼叫RestoreDC之前呼叫SaveDC数次。
+
+大多数程序写作者以不同的方式使用SaveDC和RestoreDC。然而，更像汇编语言中的PUSH和POP指令，当您呼叫SaveDC时，不需要保存传回值：
+
+SaveDC (hdc) ;
+        然后，您可以更改某些属性并再次呼叫SaveDC。要将设备内容恢复到一个已经保存的状态，呼叫：
+
+RestoreDC (hdc, -1) ;
+        这就将设备内容恢复到最近由SaveDC函数保存的状态中。
+
+http://my.oschina.net/tonyyang/blog/14269

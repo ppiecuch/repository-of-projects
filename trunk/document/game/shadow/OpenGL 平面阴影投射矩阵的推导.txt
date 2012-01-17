@@ -1,0 +1,24 @@
+OpenGL SuperBible 这本书介绍了一种阴影的实现方法, 将模型视图矩阵压平, 所有被绘制的物体都将位于这个平面的二维世界中. 不过这本书没有介绍该平面阴影投射矩阵是如何推导的.
+假设平面方程 Ax + By + Cz + D = 0 已知, 光的方向L(Lx, Ly, Lz, 0)已知. 则模型视图空间的点 P(Px, Py, Pz, 1), 沿着光的方向投射到平面上的点为 S(Sx, Sy, Sz, 1). 其中我们设置向量 N(A, B, C, D). 现在我们需要求的是矩阵M, 使得 MP = S. 即 M左乘点P得到点S.
+由于点S是P沿着光的方向L到达的, 所以可假设 S = P + kL. (k >= 0)
+因为点S是平面上的一点, 所以 A*Sx + B*Sy + C*Sz + D = 0. 即 S*N = 0. 由于 S = P + kL, 所以 (P + kL) * N = 0, 推导可得出 k = -(P*N)/L*N
+即 K = -(A*Px + B*Py + C*Pz + D)/(A*Lx + B*Ly + C*Lz), 代入 S = P + kL
+Sx = Px + k*Lx = Px - (A*Px + B*Py + C*Pz + D)*lX/(A*Lx + B*Ly + C*Lz) 
+= [Px*(B*Ly + C*Lz) - Py*(B*Lx) - Px*(C*Lx) - 1*D*Lx]/(A*Lx + B*Ly + C*Lz) 
+= P*((B*Ly + C*Lz), -B*Lx, -C*Lx, -D*Lx)/(A*Lx + B*Ly + C*Lz) 
+同理 
+Sy = P*(-A*Ly, (A*Lx + C*Lz), -C*Ly, -D*Ly)/(A*Lx + B*Ly + C*Lz) 
+Sz = P*(-A*Lz, -B*Lz, (A*LX + B*Ly), -D*Lx)/(A*Lx + B*Ly + C*Lz) 
+Sw = P*(0, 0, 0, (A*Lx + B*Ly + C*Lz))/(A*Lx + B*Ly + C*Lz) 
+所以可得到矩阵M 
+
+        
+B*Ly + C*Lz -B*Lx -C*Lx -D*Lx 
+-A*Ly A*Lx + C*Lz -C*Ly -D*Ly 
+-A*Lz -B*Lz A*LX + B*Ly -D*Lx 
+0 0 0 A*Lx + B*Ly + C*Lz 
+
+在SuperBible这本书的源代码里有该矩阵的实现代码, 位于文件 math3d.cpp 中, 可参考上面公式的实现
+
+?1234567891011121314151617181920212223242526272829303132333435 void m3dMakePlanarShadowMatrix(M3DMatrix44f proj, const M3DVector4f planeEq, const M3DVector3f vLightPos) {     // These just make the code below easier to read. They will be      // removed by the optimizer.         float a = planeEq[0];     float b = planeEq[1];     float c = planeEq[2];     float d = planeEq[3];       float dx = -vLightPos[0];     float dy = -vLightPos[1];     float dz = -vLightPos[2];       // Now build the projection matrix     proj[0] = b * dy + c * dz;     proj[1] = -a * dy;     proj[2] = -a * dz;     proj[3] = 0.0;       proj[4] = -b * dx;     proj[5] = a * dx + c * dz;     proj[6] = -b * dz;     proj[7] = 0.0;       proj[8] = -c * dx;     proj[9] = -c * dy;     proj[10] = a * dx + b * dy;     proj[11] = 0.0;       proj[12] = -d * dx;     proj[13] = -d * dy;     proj[14] = -d * dz;     proj[15] = a * dx + b * dy + c * dz;     // Shadow matrix ready } 
+http://www.cnblogs.com/summericeyl/archive/2011/03/14/1983978.html
