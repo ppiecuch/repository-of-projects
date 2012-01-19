@@ -1,0 +1,60 @@
+求最大公约数的Euclid算法需要用到大量的取模运算，这在大多数计算机上是一项复杂的工作，相比之下减法运算、测试数的奇偶性、折半运算的执行速度都要更快些。
+
+二进制最大公约数算法避免了Euclid算法的取余数过程。
+
+二进制最大公约数基于下述事实：
+
+
+
+若a、b都是偶数，则gcd(a,b)=2*gcd(a/2,b/2)
+若a是奇数、b是偶数，则gcd(a,b)=gcd(a/2,b/2)
+
+若a、b都是奇数，则gcd(a,b)=gcd((a-b)/2,b)
+
+因此可写出二进制最大公约数算法如下（C语言版）：
+
+
+
+[cpp] view plaincopyprint?int gcd(int a,int b){  
+    int c=1;  
+    while(a-b){  
+        if(a&1){  
+            if(b&1){  
+                if(a>b)a=(a-b)>>1;else b=(b-a)>>1;  
+            }  
+            else b>>=1;  
+        }  
+        else{  
+            if(b&1)a>>=1;else c<<=1,a>>=1,b>>=1;  
+        }  
+    }  
+    return c*a;  
+}  
+int gcd(int a,int b){
+	int c=1;
+	while(a-b){
+		if(a&1){
+			if(b&1){
+				if(a>b)a=(a-b)>>1;else b=(b-a)>>1;
+			}
+			else b>>=1;
+		}
+		else{
+			if(b&1)a>>=1;else c<<=1,a>>=1,b>>=1;
+		}
+	}
+	return c*a;
+} 
+或者
+
+[cpp] view plaincopyprint?int gcd(int u,int v){  
+    int k=1,t;  
+    while(~u&1 && ~v&1)k<<=1,u>>=1,v>>=1;  
+    t=(u&1)?-v:u>>1;  
+    do{  
+        while(~t&1)t>>=1;  
+        if(t>0)u=t;else v=-t;  
+    }while(t=u-v);  
+    return u*k;  
+}  
+http://blog.csdn.net/kingwolfofsky/article/details/7209029
