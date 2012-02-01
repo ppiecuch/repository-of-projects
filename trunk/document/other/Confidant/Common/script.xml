@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+	<commander id="loop1" mode="loop" time="0">
+		<command type="call" value="defense" delay="0" />
+		<command type="call" value="attack" delay="0" />
+	</commander>
+	<commander id="defense" mode="bunch">
+		<command type="key" value="56" delay="20" ctrl="false" alt="false" shift="false"/>
+	</commander>
+	<commander id="attack" mode="bunch">
+		<command type="key" value="57" delay="30" ctrl="false" alt="false" shift="false"/>
+	</commander>
+
+
+</System>
