@@ -1,0 +1,36 @@
+原创作品，允许转载，转载时请务必以超链接形式标明文章 原始出处 、作者信息和本声明。否则将追究法律责任。http://liangbing8612.blog.51cto.com/2633208/471849 
+ 一、安装所需软件
+
+           1.   下载安装VS2008；
+           2.   下载qt-win-opensource-4.7.0-vs2008.exe，并安装。这里我们假设安装在C:\Qt4.7.0下；
+           3.   下载qt-vs-addin-1.1.7.exe，并安装。
+            这三个软件安装好后，在VS的菜单界面上就会出现"QT"选项了。
+ 
+ 二、环境配置
+         1.   用VS新建一个win32控制台应用程序,我们假设工程名为：Hello。
+         2.   选择工具->选项->项目和解决方案->VC++目录。
+               (1)  选择“可执行文件”，在里面添加：C:\Qt4.7.0\bin;
+               (2)  选择“包含文件”，在里面添加：C:\Qt4.7.0\include;   C:\Qt4.7.0\include\Qt;   
+                      C:\Qt4.7.0\include\QtCore;   C:\Qt4.7.0\include\QtGui
+               (3)  选择“库文件”，在里面添加：C:\Qt4.7.0\lib；
+ 
+三、开始编程 （这里举一个简单的例子） 
+         1.     选择菜单上的“QT”选项- >“Launch Designer” ,启动designer : 放入一个“label”,内容
+                 写为：helloQT。然后保存为Hello.ui，再将它添加到源文件中。
+                 右击“Hello.ui”->“属性”->“自定义生成步骤”：
+                             命令行：uic.exe Hello.ui -o HelloUi.h
+                             输出：HelloUi.h
+                             附加依赖项：uic.exe; Hello.ui
+                 然后，点击“确定”。这时再右击“Hello.ui”，选择“编译”，则会生成HelloUi.h。
+                 将它添加到工程 中。
+         2.   在Hello.cpp中编写代码如下：
+#include "stdafx.h"  #include "HelloUi.h"  #include <QtGui/QApplication> #include <QtGui/QMainWindow>  int _tmain(int argc, _TCHAR* argv[])  {      QApplication app(argc,argv);      QMainWindow *dlg=new QMainWindow();      Ui::Form ui;      ui.setupUi(dlg);      dlg->show();      return app.exec();  }          3.   选择“项目”，“Hello属性”，“配置属性”：
+               (1)  “常规”：选择“字符集”为“使用多字节字符集”；
+               (2)  “调试”：填写“环境”值为：PATH=C:\Qt4.7.0\bin；
+                              填写“合并环境”值为：是；
+               (3)  “链接器”：进入“常规”选项，填写“附加库目录”为：C:\Qt4.7.0\lib;
+                                进入“输入”选项，填写“附加依赖项”为：qtcore4.lib qtgui4.lib
+                               （注意，这两个库之间为空格，不能写逗号）
+四、 调试运行
+             到了这里，运行程序，则可正常编译，成功运行。如有不能正常运行，请留言。
+http://liangbing8612.blog.51cto.com/2633208/471849
