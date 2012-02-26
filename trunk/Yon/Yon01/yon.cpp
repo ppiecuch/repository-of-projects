@@ -5,7 +5,7 @@ namespace yon{
 
 	YON_API YonEngine* CreateEngine(const SYonEngineParameters& param){
 
-		printf("CreateEngine(%d,%d,%d)\n",param.videoType,param.windowSize.w,param.windowSize.h);
+		printf("CreateEngine(%d,%d)\n",param.windowSize.w,param.windowSize.h);
 
 #ifdef YON_COMPILE_WITH_WIN32
 #endif
