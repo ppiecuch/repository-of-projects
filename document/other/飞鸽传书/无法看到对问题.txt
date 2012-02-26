@@ -1,0 +1,6 @@
+1、关掉防火墙，windows的和(瑞星的)； 
+2、arp -s 目标人的IP 目标人的MAC 
+3、让目标人也执行：arp -s 你的IP 你的MAC 
+ 
+现在学校网络中心为了防止arp攻击，把所有的交换机都设置了不允许自动arp学习，所以需要配置静态的arp。如果没有配置静态arp，则只能实现连接在同一端口(由学校提供的接口)的机器之间的无限互通。 
+http://bbs.ustb.edu.cn/wForum/disparticle.php?boardName=PCHospital&ID=1961
