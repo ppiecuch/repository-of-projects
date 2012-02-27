@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Template</title>
+		<style type="text/css">
+			body {
+				font-family: Arial, Helvetica, Sans-Serif;
+				font-size: 0.8em;
+			}
+			#report {
+				border-collapse: collapse;
+			}
+			#report h4 {
+				margin: 0px;
+				padding: 0px;
+			}
+			#report img {
+				float: right;
+			}
+			#report ul {
+				margin: 10px 0 10px 40px;
+				padding: 0px;
+			}
+			#report th {
+				background: #7CB8E2 url(header_bkg.png) repeat-x scroll center left;
+				color: #fff;
+				padding: 7px 15px;
+				text-align: left;
+			}
+			#report td {
+				background: #e6f1fa none repeat-x scroll center left;
+				color: #000;
+				padding: 7px 15px;
+			}
+			#report tr.odd td {
+				background: #fff url(row_bkg.png) repeat-x scroll center left;
+				cursor: pointer;
+			}
+			#report div.arrow {
+				background: transparent url(arrows.png) no-repeat scroll 0px -16px;
+				width: 16px;
+				height: 16px;
+				display: block;
+			}
+			#report div.up {
+				background-position: 0px 0px;
+			}
+		</style>
+		<script src="jquery-1.4.2.min.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#report tr:odd").addClass("odd");
+				$("#report tr:not(.odd)").hide();
+				$("#report tr:first-child").show();
+
+				$("#report tr.odd").click(function() {
+					$(this).next("tr").toggle();
+					$(this).find(".arrow").toggleClass("up");
+				});
+				//$("#report").jExpand();
+			});
+
+		</script>
+	</head>
+	<body>
+		<table id="report">
+			<tr>
+				<th>Title1</th>
+				<th>Title2</th>
+				<th>Title3</th>
+				<th></th>
+			</tr>
+			<tr>
+				<td>United States of America</td>
+				<td>306,939,000</td>
+				<td>9,826,630 km2</td>
+				<td><div class="arrow">&nbsp;</div></td>
+			</tr>
+			<tr>
+				<td colspan="4">
+					Test
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
