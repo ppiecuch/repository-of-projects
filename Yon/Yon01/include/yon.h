@@ -3,8 +3,17 @@
 
 #include "config.h"
 
-#include "YonEngine.h"
-#include "YonEngineParameters.h"
+#include "color.h" 
+#include "config.h" 
+#include "dimension2d.h" 
+#include "IReferencable.h" 
+#include "ITimer.h" 
+#include "rect.h" 
+#include "string.h" 
+#include "SYonEngineParameters.h" 
+#include "types.h" 
+#include "yon.h" 
+#include "YonEngine.h" 
 
 namespace yon{
 

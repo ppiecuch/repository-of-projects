@@ -204,6 +204,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\SYonEngineParameters.h"
+				>
+			</File>
+			<File
 				RelativePath=".\yon.cpp"
 				>
 			</File>
@@ -213,10 +217,6 @@
 			</File>
 			<File
 				RelativePath=".\include\YonEngine.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\YonEngineParameters.h"
 				>
 			</File>
 			<Filter
@@ -235,6 +235,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\rect.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\string.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\types.h"
 					>
 				</File>
@@ -247,7 +255,7 @@
 				Name="video"
 				>
 				<File
-					RelativePath=".\IVideo.h"
+					RelativePath=".\IVideoRenderer.h"
 					>
 				</File>
 				<Filter
