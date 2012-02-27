@@ -200,6 +200,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\ITimer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\yon.cpp"
 				>
 			</File>
@@ -219,11 +223,15 @@
 				Name="core"
 				>
 				<File
-					RelativePath=".\color.h"
+					RelativePath=".\include\color.h"
 					>
 				</File>
 				<File
 					RelativePath=".\include\dimension2d.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\IReferencable.h"
 					>
 				</File>
 				<File
