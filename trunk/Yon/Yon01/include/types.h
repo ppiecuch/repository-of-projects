@@ -13,6 +13,8 @@ typedef __int32				s32;
 typedef signed int			s32;
 #endif
 
+typedef char				c8;
+typedef wchar_t				c16;
 typedef float				f32;
 
 #endif 
