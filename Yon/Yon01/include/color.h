@@ -1,4 +1,4 @@
-#ifndef _YON_CORE_COLOR_H_
+ #ifndef _YON_CORE_COLOR_H_
 #define _YON_CORE_COLOR_H_
 
 #include "types.h"
