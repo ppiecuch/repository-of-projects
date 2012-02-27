@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Template</title>
+		<link type="text/css"  href="css.css" rel="stylesheet" media="all" />
+		<style type="text/css">
+			#report div.arrow {
+				background: transparent url(arrows.png) no-repeat scroll 0px -16px;
+				width: 16px;
+				height: 16px;
+				display: block;
+			}
+			#report div.up {
+				background-position: 0px 0px;
+			}
+		</style>
+		<script src="jquery-1.4.2.min.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#report tr:odd").addClass("odd");
+				$("#report tr:even td").addClass("alt");
+				$("#report tr:not(.odd)").hide();
+				$("#report tr:first-child").show();
+				
+				$("#report tr th:first-child").addClass("first");
+				$("#report tr td:first-child").addClass("first");
+
+				$("#report tr.odd").click(function() {
+					$(this).next("tr").toggle();
+					$(this).find(".arrow").toggleClass("up");
+				});
+			});
+
+		</script>
+	</head>
+	<body>
+		<table id="report" cellspacing="0" class="groovy_table">
+			<thead>
+				<tr>
+				<th>Title1</th>
+				<th>Title2</th>
+				<th>Title3</th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+				<tr>
+				<td>United States of America</td>
+				<td>306,939,000</td>
+				<td>9,826,630 km2</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="4"> Test </td>
+			</tr>
+			</tbody>
+		</table>
+	</body>
+</html>
