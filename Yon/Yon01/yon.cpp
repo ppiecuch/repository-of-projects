@@ -7,14 +7,9 @@ namespace yon{
 
 		printf("CreateEngine(%d,%d)\n",param.windowSize.w,param.windowSize.h);
 
-#ifdef YON_COMPILE_WITH_WIN32
+#ifdef YON_VIDEO_MODE_OGLES1
 #endif
 
-#ifdef YOU_COMPILE_WITH_ANDROID
-#endif
-
-#ifdef YOU_COMPILE_WITH_MAXOSX
-#endif
 
 		return NULL;
 	}
