@@ -1,7 +1,7 @@
 #ifndef _YON_CORE_RECT_H_
 #define _YON_CORE_RECT_H_
 
-#include "types.h"
+#include "yonTypes.h"
 
 namespace yon{
 	namespace core{

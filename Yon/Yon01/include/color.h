@@ -1,7 +1,7 @@
  #ifndef _YON_CORE_COLOR_H_
 #define _YON_CORE_COLOR_H_
 
-#include "types.h"
+#include "yonTypes.h"
 
 namespace yon{
 	namespace core{

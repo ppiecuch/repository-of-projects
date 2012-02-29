@@ -1,5 +1,7 @@
-#ifndef _YON_CORE_STRING_H_
-#define _YON_CORE_STRING_H_
+#ifndef _YON_CORE_YONSTRING_H_
+#define _YON_CORE_YONSTRING_H_
+
+#include "yonTypes.h"
 
 namespace yon{
 	namespace core{

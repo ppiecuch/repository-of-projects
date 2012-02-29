@@ -22,6 +22,7 @@ int main(int argc, char* argv[])
 	SYonEngineParameters params;
 	YonEngine* pYE=CreateEngine(params);
 
+	
 	//setlocale(LC_ALL,"zh_CN.utf8");
 	setlocale(LC_ALL,"chs");
 
