@@ -239,11 +239,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\string.h"
+					RelativePath=".\include\yonString.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\types.h"
+					RelativePath=".\include\yonTypes.h"
 					>
 				</File>
 			</Filter>
@@ -278,6 +278,26 @@
 			<Filter
 				Name="gui"
 				>
+			</Filter>
+			<Filter
+				Name="platform"
+				>
+				<File
+					RelativePath=".\CYonPlatformWin32.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CYonPlatformWin32.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\IYonPlatform.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\SYonPlatformInfo.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

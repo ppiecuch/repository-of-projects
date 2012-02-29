@@ -2,7 +2,7 @@
 #define _YON_ITIMER_H_
 
 #include "IReferencable.h"
-#include "types.h"
+#include "yonTypes.h"
 
 namespace yon{
 	class ITimer : public virtual core::IReferencable{
