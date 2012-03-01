@@ -18,6 +18,7 @@ namespace yon{
 		*/
 
 		class color{
+		public:
 			color():colour(0){}
 			color(u32 r,u32 g,u32 b,u32 a)
 				:colour((r & 0xff)<<24 | (g & 0xff)<<16 | (b & 0xff)<<8 | (a & 0xff)) {}

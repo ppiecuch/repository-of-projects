@@ -12,11 +12,11 @@
 #include "SYonEngineParameters.h" 
 #include "yonTypes.h" 
 #include "yon.h" 
-#include "YonEngine.h" 
+#include "IYonEngine.h" 
 
 namespace yon{
 
-	extern "C" YON_API YonEngine* CreateEngine(const SYonEngineParameters& param);
+	extern "C" YON_API IYonEngine* CreateEngine(const SYonEngineParameters& param);
 }
 
 #endif
