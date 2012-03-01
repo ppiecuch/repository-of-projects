@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	EnableMemLeakCheck();
 
 	SYonEngineParameters params;
-	YonEngine* pYE=CreateEngine(params);
+	IYonEngine* pYE=CreateEngine(params);
 
 	
 	//setlocale(LC_ALL,"zh_CN.utf8");

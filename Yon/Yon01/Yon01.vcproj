@@ -204,6 +204,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\IYonEngine.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\SYonEngineParameters.h"
 				>
 			</File>
@@ -213,10 +217,6 @@
 			</File>
 			<File
 				RelativePath=".\include\yon.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\YonEngine.h"
 				>
 			</File>
 			<Filter
@@ -255,12 +255,28 @@
 				Name="video"
 				>
 				<File
-					RelativePath=".\IVideoRenderer.h"
+					RelativePath=".\include\IVideoDriver.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\SVideoDriverInfo.h"
 					>
 				</File>
 				<Filter
-					Name="OpenGLES1"
+					Name="OGLES1"
 					>
+					<File
+						RelativePath=".\COGLES1Driver.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\COGLES1Driver.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SOGLES1Parameters.h"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -283,15 +299,11 @@
 				Name="platform"
 				>
 				<File
-					RelativePath=".\CYonPlatformWin32.cpp"
+					RelativePath=".\CYonEngineWin32.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\CYonPlatformWin32.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\IYonPlatform.h"
+					RelativePath=".\CYonEngineWin32.h"
 					>
 				</File>
 				<File

@@ -9,6 +9,7 @@ namespace yon{
 		struct SYonPlatformInfo{
 			yon::core::stringc osName;
 			yon::core::stringc osVersion;
+			yon::core::stringc vendor;
 		};
 	}
 }

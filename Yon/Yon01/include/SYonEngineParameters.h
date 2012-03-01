@@ -12,6 +12,11 @@ namespace yon{
 			windowId(NULL),
 			windowCaption(L"YonApplication")
 			{}
+		SYonEngineParameters(const SYonEngineParameters& params):
+			windowSize(params.windowSize),
+			windowId(params.windowId),
+			windowCaption(params.windowCaption)
+			{}
 
 		//´°¿Ú³ß´ç
 		core::dimension2du windowSize;
