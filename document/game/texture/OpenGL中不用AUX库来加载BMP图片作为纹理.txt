@@ -1,0 +1,43 @@
+大家在OpenGL中一般是用aux库的auxDIBImageLoad()函数来加载BMP格式的图片来作为纹理，这个确实是比较简单易用，但aux库的性能不佳，经常会出问题，稳定性较差。所以一般最好不要用aux库，可以用glut库，但glut库没有纹理加载函数。而有些程序是直接读取BMP格式来获得图像数据，从而生成纹理的，这种方法虽然很强大，但比较复杂，需要了解BMP的格式，对初学者比较困难。而下面的一段程序是用windows的API函数LoadImage()来实现这个功能，这种实现方法很简单，可以说比auxDIBImageLoad()函数复杂不了多少。
+
+首先，加上头文件：
+
+#include 
+
+这是因为后面的GL_BGR_EXT是定义在这个头文件里的，因为BMP格式是按Blue,Green,Red顺序储存图像数据的，这与OpenGL中正好相反。GL_BGR_EXT就是完成两者之间的转换的。
+
+下面就是不用AUX库来加载BMP图片作为纹理的函数：
+
+bool LoadTexture(LPTSTR szFileName, GLuint &texid) // Creates Texture From A Bitmap File
+{
+HBITMAP hBMP; // Handle Of The Bitmap
+BITMAP BMP; // Bitmap Structure
+
+glGenTextures(1, &texid); // Create The Texture
+hBMP=(HBITMAP)LoadImage(GetModuleHandle(NULL), szFileName, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE );
+
+if (!hBMP) // Does The Bitmap Exist?
+return FALSE; // If Not Return False
+
+GetObject(hBMP, sizeof(BMP), &BMP); // Get The Object
+// hBMP: Handle To Graphics Object
+// sizeof(BMP): Size Of Buffer For Object Information
+// &BMP: Buffer For Object Information
+
+glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Pixel Storage Mode (Word Alignment / 4 Bytes)
+
+// Typical Texture Generation Using Data From The Bitmap
+glBindTexture(GL_TEXTURE_2D, texid); // Bind To The Texture ID
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Linear Min Filter
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Linear Mag Filter
+glTexImage2D(GL_TEXTURE_2D, 0, 3, BMP.bmWidth, BMP.bmHeight, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, BMP.bmBits);
+
+DeleteObject(hBMP); // Delete The Object
+
+return TRUE; // Loading Was Successful
+}
+
+
+简单吧，以后就用这个函数来加载BMP图片作为纹理吧，很方便的！
+
+http://www.job168.com/info/read_100777.html
