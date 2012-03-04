@@ -8,6 +8,13 @@
 namespace yon{
 	namespace video{
 
+		enum E_MATRIX{
+			E_MATRIX_VIEW = 0,		//视图空间矩阵
+			E_MATRIX_WORLD,			//世界空间矩阵
+			E_MATRIX_PROJECTION,	//投影空间矩阵
+			E_MATRIX_COUNT
+		};
+
 		//视频驱动器接口
 		class IVideoDriver:public virtual yon::core::IReferencable{
 		public:

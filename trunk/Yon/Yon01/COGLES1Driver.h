@@ -36,6 +36,8 @@ namespace yon{
 				EGLDisplay m_eglDisplay;
 				EGLSurface m_eglSurface;
 				EGLContext m_eglContext;
+
+				void DrawFrame();
 #endif//YON_COMPILE_WITH_WIN32
 			};
 		}
