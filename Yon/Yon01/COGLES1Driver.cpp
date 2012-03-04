@@ -3,11 +3,67 @@
 namespace yon{
 namespace video{
 namespace ogles1{
+	unsigned char mIndices[] = { 0, 1, 2 };
+	signed short mVertices[] = {
+		-50, -29, 0,
+		50, -29, 0,
+		0,  58, 0
+	};
+	void InitGL()
+	{
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_SHORT, 0, mVertices);
+
+		glMatrixMode(GL_PROJECTION);
+		glOrthox(-160<<16, 160<<16, -120<<16, 120<<16, -128<<16, 128<<16);
+
+		glMatrixMode(GL_MODELVIEW);
+
+		glClearColor(0.1f,0.2f,0.3f,1);
+		glColor4x(0x10000, 0, 0, 0);
+	}
+	void COGLES1Driver::DrawFrame()
+	{
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, mIndices);
+		glRotatex(2<<16, 0, 0, 0x10000);
+		eglSwapBuffers(m_eglDisplay, m_eglSurface);
+	}
+
+
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param){
 
 #ifdef YON_COMPILE_WITH_WIN32
 		initEGL(param.hWnd);
 #endif//YON_COMPILE_WITH_WIN32
+
+		glViewport(0, 0, param.windowSize.w,param.windowSize.h);
+
+		InitGL();
+
+		bool bDone=false;
+		MSG sMessage;
+		while(!bDone)
+		{
+			if(PeekMessage(&sMessage, NULL, 0, 0, PM_REMOVE))
+			{
+				if(sMessage.message == WM_QUIT)
+				{
+					bDone = true;
+				}
+				else 
+				{
+					TranslateMessage(&sMessage);
+					DispatchMessage(&sMessage);
+				}
+			}
+
+
+			DrawFrame();
+			
+
+			Sleep(20);
+		}
 
 	}
 

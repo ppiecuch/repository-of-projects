@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
 	IYonEngine* pYE=CreateEngine(params);
 
 	
+	
 	//setlocale(LC_ALL,"zh_CN.utf8");
 	setlocale(LC_ALL,"chs");
 
@@ -47,6 +48,6 @@ int main(int argc, char* argv[])
 	core::stringc tstr("ÄãºÃ");
 	printf("%s\n\n\n",tstr);
 
-	getchar();
+	//getchar();
 	return 0;
 }
