@@ -235,6 +235,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\matrix4.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\rect.h"
 					>
 				</File>
