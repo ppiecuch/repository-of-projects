@@ -1,0 +1,51 @@
+一直都找不到一个合心意的java脚本，kahlua这个项目已开发有一段时间的了，今天来测试一吓
+
+以下是一个测试例子 
+
+java代码
+
+public static void main(String[] args) throws FileNotFoundException,
+   IOException {
+  long l = System.currentTimeMillis();
+  LuaState state = new LuaState(System.out);
+  UserdataArray.register(state);
+  OsLib.register(state);
+  LuaCompiler.register(state);
+  state.getEnvironment().rawset("setPosition", new JavaFunctionSetPosition());
+  // state = runLua(dir, state, new File(dir, "stdlib.lbc"));
+  File testhelper = new File("E:/work/zincscript/res/test.lua");
+  LuaClosure closure = LuaCompiler.loadis(new FileInputStream(testhelper), testhelper.getName(), state.getEnvironment());
+  for (int i = 0; i < 10; i++) {
+   state.call(closure, null);
+  }
+  System.out.println(System.currentTimeMillis() – l);
+ }
+ 
+class JavaFunctionSetPosition implements JavaFunction {
+ 
+ @Override
+ public int call(LuaCallFrame callFrame, int nArguments) {
+  // System.out.println(callFrame.get(0));
+  return 1;
+ }
+ 
+}
+ 
+
+lua 代码
+
+ 
+
+a=0
+do print(a) end
+for i = 1, 1000000 do
+ a = a+1
+ setPosition(i)
+end
+do print(a) end
+
+以上意思是运行1000000次setPosition方法 , setPosition是一个java的方法。
+运行结果是700ms，1000000 次才700ms非常不错了
+groovy运行时间也是700ms左右
+
+http://www.oschina.net/question/16_8733
