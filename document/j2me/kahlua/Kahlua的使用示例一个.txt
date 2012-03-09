@@ -1,0 +1,300 @@
+ 最近有朋友反映想在J2ME下使用Kahlua做lua的脚步解释器，开发手机游戏的脚本，但完全不知道如何入手，头上一朵云，不知道lua的代码怎么在j2me里跑起来，他们怎么交互的！！所以写下了一个简单的例子，希望对有类似问题的朋友有所引导。
+
+    什么是Kahlua(卡鲁瓦)？
+
+    中文名字念着还是比较顺口的，简单的说，kahlua是一款基于CLDC1.1且非常小巧的Lua解释器，它很容易扩展。只需要配合一个Lua编译器，就可以执行编译后的Lua源代码。目前新版本已经带了编译器。
+
+    J2me平台的lua解释器主要有mochalua和Kahlua，mochalua在08年中期后就没有人在维护和更新了，Kahlua最新版本是2009年6月11日的，本次示例就以该版本为基础。
+
+ 
+
+    Kahlua和Mochalua的区别？
+
+    Mochalua是一个目标尽可能完整实现Lua C功能的解释器，而Kahlua目标是实现LUA JVM最小功能集合的解释器，并且Kahlua在不增加额外开销的情况下，尽可能的模拟实现更多的Lua原版的库函数。所以两者的目标是不同的，一个是尽可能完整，一个是尽可能精简到够用。 毕竟Mochalua原先是给一个GPS项目移植平台使用的，是由一个公司开发的。
+
+    Kahlua的目标是jar尽可能的小，只包含核心功能的jar文件为56KB，Mochalua则有200多KB，对于java游戏而言，当然Jar越小越好。Kahlua的代码也非常轻量级，原先的版本只有4605行代码，而Mochalua有16951行代码。所以对比后，哪个更适合你，你可以根据情况决定了！！
+
+ 
+
+   下载Kahlua
+
+   最新版的源代码下载地址： http://kahlua.googlecode.com/files/kahlua-release-20090611.zip
+
+   二进制库地址：                http://kahlua.googlecode.com/files/kahlua.jar
+
+ 
+
+  下载好Kahlua.jar的库后，我们就可以准备开始了！！我们来写一个最简单的例子，lua脚本里调用j2me code编写的一个彩色字符串的函数。
+
+  第一步：
+
+  在Eclipse下创建一个新的J2me工程。创建Midlet和一个Canvas的子类，为方便查看，我们把代码写在一个文件里！
+
+ 
+[java:showcolumns] view plaincopy
+·········10········20········30········40········50········60········70········80········90········100·······110·······120·······130·······140·······150
+public class Kahlua extends MIDlet {  
+      
+    KahluaCanvas  _canvas;  
+    public Kahlua() {  
+        // TODO Auto-generated constructor stub  
+        _canvas = new KahluaCanvas();  
+        Display.getDisplay(this).setCurrent(_canvas);  
+    }  
+  
+    protected void destroyApp(boolean arg0) throws MIDletStateChangeException {  
+        // TODO Auto-generated method stub  
+  
+    }  
+  
+    protected void pauseApp() {  
+        // TODO Auto-generated method stub  
+  
+    }  
+  
+    protected void startApp() throws MIDletStateChangeException {  
+        // TODO Auto-generated method stub  
+        new Thread(_canvas).start();  
+    }  
+      
+    /** 
+     * Canvas 
+     * @author fasasas 
+     * 
+     */  
+    public static class KahluaCanvas extends GameCanvas implements Runnable{  
+          
+        public static  Graphics _g;  
+          
+        protected KahluaCanvas() {  
+            super(true);  
+            // TODO Auto-generated constructor stub  
+            //得到Graphics的引用  
+            _g = this.getGraphics();  
+        }  
+          
+        /** 
+         * 绘制函数 
+         */  
+        private void render() {  
+            // TODO Auto-generated method stub  
+            _g.setColor(0xff0000);  
+            _g.drawString("Hello World", 10, 10, 0);  
+              
+            //绘制的到屏幕上  
+            flushGraphics();  
+        }  
+          
+        public void keyPressed( int keyCode){  
+            switch( keyCode ){  
+            case Canvas.KEY_NUM0:  
+                break;  
+            case Canvas.KEY_NUM1:  
+                break;  
+            }  
+        }  
+          
+        //运行第一段脚本  
+        private void runLua1(){  
+              
+        }  
+        //运行第二段脚本  
+        private void runLua2(){  
+              
+        }  
+          
+        //主循环  
+        public void run() {  
+            // TODO Auto-generated method stub  
+            while(true){  
+                render();  
+                try {  
+                    Thread.sleep(100);  
+                } catch (InterruptedException e) {  
+                    // TODO Auto-generated catch block  
+                    e.printStackTrace();  
+                }  
+            }  
+        }  
+    }  
+}  
+
+ 
+
+编辑运行后， 可以看到通过代码，我输出一串红色的字符串，HelloWorld！！现在需求改了，有人想要显示红色的，有人要显示绿色，有的要蓝色的，有的干脆要现实其他的字符串，但是我们已经在代码里写死了，这么多不同的需求，我们都需要重新编辑代码然后生成，还要维护多个版本代码，有什么办法不更改程序代码就可以满足需求呢，这个时候我们就可以通过使用脚本实现了！！！
+
+   
+
+把Kahlua.jar文件添加到我们创建的工程里。   
+
+在代码里继续编辑，添加一个供lua调用的java函数，初始化好kahlua的运行环境，设置对应的函数映射关系，就只等准备调用lua编辑的文件啦！！
+
+ 
+
+[java] view plaincopy
+/** 
+     * 解释和运行Lua编译代码 
+     * @author fasasas 
+     * 
+     */  
+    public static class LuaScript{  
+          
+        private static LuaScript _ins;  
+          
+        //得到实例  
+        public LuaScript getInStance(){  
+            if( _ins == null){  
+                _ins = new LuaScript();  
+            }  
+            return _ins;  
+        }  
+          
+        //lua  
+        public LuaState _luaState;  
+          
+        private  LuaScript(){  
+            //创建luaState  
+            _luaState = new LuaState(System.out);  
+              
+            //设置lua的运行环境的运行参数  
+            //这句话很关键  
+            //设置了一个函数调用的映射关系，我们在lua代码中调用 PrintColorText实际会调用  
+            //JavaCode里实现JavaFunction接口的JavaColorText类的call函数  
+            _luaState.getEnvironment().rawset("PrintColorText", new JavaColorText());  
+        }  
+          
+          
+        /** 
+         * 运行一个lua编译文件 
+         * @param fileName 
+         */  
+        public void  runScript( String fileName){  
+            //根据lua编译文件，得到一个lua运行的闭包  
+            LuaClosure lc =_luaState.loadByteCodeFromResource(fileName, _luaState.getEnvironment());  
+            //调用返回的闭包  
+            _luaState.call(lc, null, null, null);  
+        }  
+    }  
+      
+      
+    /** 
+     * 一个供lua调用的java函数 
+     * 必须实现JavaFunction的接口 
+     * @author  
+     * 
+     */  
+    public static class  JavaColorText implements JavaFunction{  
+          
+        /** 
+         * 调用该函数 
+         * @callFrame 函数调用框架 
+         * @param     函数调用的参数个数 
+         */  
+        public int call(LuaCallFrame callFrame, int paraNum) {  
+            // TODO Auto-generated method stub  
+            //得到第1个参数，并转为String类型  
+            String text  = BaseLib.rawTostring(callFrame.get(0));   
+            //得到第2个参数，转为int类型  
+            int    color = (BaseLib.rawTonumber(callFrame.get(1))).intValue();  
+            int    x     = (BaseLib.rawTonumber(callFrame.get(2))).intValue();  
+            int    y     = (BaseLib.rawTonumber(callFrame.get(3))).intValue();  
+            //调用绘制函数  
+            drawColorText(text,color,x,y);  
+            //函数返回的参数 0个  
+            return 0;  
+        }  
+          
+        /** 
+         * 绘制字符串 
+         * 调用了J2me里的函数 
+         * @param text 
+         * @param color 
+         */  
+        public void drawColorText( String text,int x,int y,int color){  
+            KahluaCanvas._g.setColor(color);  
+            KahluaCanvas._g.drawString(text, x, y, 0);  
+        }  
+    }  
+
+ 
+
+为了方便编译和查看，我们还是继续写着一个类文件里，虽然这么多类放一个文件看着不舒服，但大家方便粘贴复制，编译运行。
+
+ 
+
+最激动的时候开始了，我们要编写lua脚本了！！！
+
+在上面的代码中我们看到，我们给lua的运行环境映射的一个函数.
+
+_luaState.getEnvironment().rawset("PrintColorText", new JavaColorText());
+
+ 
+
+我们在在编写的lua代码里调用我们映射的 printColorText函数，该函数需要4个参数！！一个String要现实的内容，坐标X,Y,和字符串颜色Color!!
+
+ 
+
+编写Lua
+
+如下，我们编写lua文件PrintColorText.lua
+
+ 
+
+[java] view plaincopy
+PrintColorText("Hello World",30,40,0xeeeeee);  
+PrintColorText("Hello World",60,140,0x00ff00);  
+
+ 
+
+编辑该文件，得到一个名为 PrintColorText.luac 的lua编译后文件，更改后缀名为lbc, 为 PrintColorText.lbc,
+
+loadByteCodeFromResource调用的编译文件默认后缀名为lbc,并且调用只传入脚本文件的路径和文件名，不需要带后缀名！
+
+ 
+
+注：我是用Windows平台下的Lua的可视化编辑工具SciTe编辑和编译。
+
+我上传到CSDN 上，有需要的朋友可以下载
+
+ http://download.csdn.net/source/2405000
+
+通过命令行也可以编译Lua文件！！！也一样很方便。
+
+ 
+
+运行我们的脚本
+
+ 1、拷贝PrintColorText.lbc文件到工程里的Res目录下。
+
+ 2、修改代码 ，在KeyPressed里，当用户按 按键0时，
+[java] view plaincopy
+public void keyPressed( int keyCode){  
+    switch( keyCode ){  
+    case Canvas.KEY_NUM0:  
+        LuaScript.getInStance().runScript("/PrintColorText");  
+        break;  
+    case Canvas.KEY_NUM1:  
+        break;  
+    }  
+}  
+
+ 运行我们写的脚本文件 "/PrintColorText"
+
+
+查看运行结果
+
+ 
+
+
+
+ 
+
+哈哈，运行结果看到我们在脚本里调用的绘制字符串函数！想改变颜色和字符串内容都很方便~~~！！！
+
+ 
+
+ 
+
+这只是一个非常简单的例子，kahlua和lua的功能当然远远不限于此，希望大家能多多学习和交流！！
+
+ http://blog.csdn.net/ttohippo/article/details/5632055
