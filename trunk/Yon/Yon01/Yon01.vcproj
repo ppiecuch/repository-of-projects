@@ -243,6 +243,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\vector3d.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\yonMath.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\yonString.h"
 					>
 				</File>
