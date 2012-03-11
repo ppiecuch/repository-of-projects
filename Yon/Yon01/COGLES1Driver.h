@@ -25,10 +25,12 @@ namespace yon{
 				virtual void begin(bool zBuffer,core::color c);
 				virtual void end();
 				virtual void setViewPort(const core::recti& rec);
+				virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat);
+				virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const;
 				//virtual u32 getFPS() const;
 
 			private:
-
+				core::matrix4f m_matrix[ENUM_TRANSFORM_COUNT];
 #ifdef YON_COMPILE_WITH_WIN32
 				bool initEGL(const HWND& hwnd);
 				void destroyEGL();

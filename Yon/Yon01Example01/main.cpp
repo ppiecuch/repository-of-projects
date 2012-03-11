@@ -1,4 +1,5 @@
 #include "stdio.h"
+#include<windows.h>
 
 #include <crtdbg.h>
 #include <typeinfo>
@@ -26,8 +27,23 @@ int main(int argc, char* argv[])
 {
 	EnableMemLeakCheck();
 
-	//SYonEngineParameters params;
-	//IYonEngine* pYE=CreateEngine(params);
+	SYonEngineParameters params;
+	IYonEngine* pYE=CreateEngine(params);
+
+	
+
+	while(pYE->run()){
+		//driver->beginScene(true, true, SColor(255,100,101,140));
+
+		//smgr->drawAll();
+		//guienv->drawAll();
+
+		//driver->endScene();
+		Sleep(20);
+		printf("run\n");
+	}
+
+	pYE->drop();
 
 	
 #if 0
@@ -56,6 +72,7 @@ int main(int argc, char* argv[])
 	printf("%s\n\n\n",tstr);
 #endif
 
+#if 0
 	matrix4f m;
 	m.makeIdentity();
 	print(m);
@@ -79,6 +96,8 @@ int main(int argc, char* argv[])
 	printf("==>");
 	print(r);
 
+	print(IDENTITY_MATRIX);
+
 	l.makeInverse();
 	print(l);
 
@@ -99,8 +118,8 @@ int main(int argc, char* argv[])
 	print(k);
 
 	
+#endif
 
-
-	getchar();
+	//getchar();
 	return 0;
 }

@@ -5,7 +5,7 @@ namespace yon{
 namespace platform{
 
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
-		:m_hWnd(NULL),m_bExternalWindow(false),m_videoDriver(NULL),m_params(params)
+		:m_hWnd(NULL),m_bExternalWindow(false),m_videoDriver(NULL),m_params(params),m_bClose(false)
 	{
 		if(params.windowId==NULL)
 		{
@@ -30,6 +30,25 @@ namespace platform{
 		if(m_videoDriver!=NULL)
 			m_videoDriver->drop();
 		DestroyWindow(m_hWnd);
+		printf("~CYonEngineWin32\n");
+	}
+
+	bool CYonEngineWin32::run(){
+		MSG msg;
+		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			if(msg.message == WM_QUIT)
+			{
+				m_bClose=true;
+			}
+			else 
+			{
+				//TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+		//Sleep(20);
+		return !m_bClose;
 	}
 
 	//
