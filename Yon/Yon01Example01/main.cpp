@@ -60,8 +60,8 @@ int main(int argc, char* argv[])
 	m.makeIdentity();
 	print(m);
 
-	vector3df v(3,2,3);
-	m.setTranslation(v);
+	//vector3df v(3,2,3);
+	m.setTranslation(3,2,3);
 	print(m);
 
 	matrix4f n;
@@ -77,6 +77,16 @@ int main(int argc, char* argv[])
 	matrix4f l(temp);
 	r=m*l;
 	printf("==>");
+	print(r);
+
+	l.makeInverse();
+	print(l);
+
+	//r.perspective(60,2,1,100);
+	//r.ortho(-5,5,-3,3,1,100);
+	r.lookAt(1,2,3,6,5,4,0,1,0);
+	//r.makeIdentity();
+	//r.scale(1,2,3);
 	print(r);
 
 	r.rotate(60,1,1,1);
