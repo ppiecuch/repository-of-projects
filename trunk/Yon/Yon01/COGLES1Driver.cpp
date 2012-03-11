@@ -30,6 +30,33 @@ namespace ogles1{
 		eglSwapBuffers(m_eglDisplay, m_eglSurface);
 	}
 
+	void COGLES1Driver::setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat){
+		m_matrix[transform] = mat;
+		switch(transform)
+		{
+		case ENUM_TRANSFORM_VIEW:
+		case ENUM_TRANSFORM_WORLD:
+			{
+				//OpenGL ES1中只存在ModelView矩阵,其实就是由World矩阵与View矩阵相乘而成
+				glMatrixMode(GL_MODELVIEW);
+				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
+			}
+			break;
+		case ENUM_TRANSFORM_PROJECTION:
+			{
+				glMatrixMode(GL_PROJECTION);
+				glLoadMatrixf(m_matrix[ENUM_TRANSFORM_PROJECTION].pointer());
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	const core::matrix4f& COGLES1Driver::getTransform(ENUM_TRANSFORM transform) const{
+		return m_matrix[transform];
+	}
+
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param){
 
@@ -37,33 +64,13 @@ namespace ogles1{
 		initEGL(param.hWnd);
 #endif//YON_COMPILE_WITH_WIN32
 
+		u32 i;
 		glViewport(0, 0, param.windowSize.w,param.windowSize.h);
+		
+		for (i=0; i<ENUM_TRANSFORM_COUNT; ++i)
+			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
 
 		InitGL();
-
-		bool bDone=false;
-		MSG sMessage;
-		while(!bDone)
-		{
-			if(PeekMessage(&sMessage, NULL, 0, 0, PM_REMOVE))
-			{
-				if(sMessage.message == WM_QUIT)
-				{
-					bDone = true;
-				}
-				else 
-				{
-					TranslateMessage(&sMessage);
-					DispatchMessage(&sMessage);
-				}
-			}
-
-
-			DrawFrame();
-			
-
-			Sleep(20);
-		}
 
 	}
 
@@ -72,7 +79,7 @@ namespace ogles1{
 #ifdef YON_COMPILE_WITH_WIN32
 		destroyEGL();
 #endif//YON_COMPILE_WITH_WIN32
-
+		printf("~COGLES1Driver\n");
 	}
 
 	void COGLES1Driver::begin(bool zBuffer,core::color c){

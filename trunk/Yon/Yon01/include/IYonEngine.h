@@ -13,7 +13,9 @@ namespace yon{
 
 	class IYonEngine:public virtual core::IReferencable{
 	public:
+		virtual ~IYonEngine(){};
 		virtual video::IVideoDriver* getVideoDriver() = 0;
+		virtual bool run() = 0;
 		//更新
 		//包括更新计时器
 		//virtual void update() = 0;

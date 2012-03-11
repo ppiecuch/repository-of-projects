@@ -1,6 +1,7 @@
 #ifndef _YON_CORE_MATRIX4_H_
 #define _YON_CORE_MATRIX4_H_
 
+#include "config.h"
 #include "yonTypes.h"
 #include "yonMath.h"
 #include "vector3d.h"
@@ -23,7 +24,11 @@ namespace yon{
 			}
 		public:
 			T m[4][4];
-			matrix4(){}
+			matrix4(bool identity=false){
+				if(identity==true){
+					makeIdentity();
+				}
+			}
 			matrix4(const T t[16]){
 				for(int i=0;i<4;++i){
 					for(int j=0;j<4;++j){
@@ -34,6 +39,10 @@ namespace yon{
 			matrix4(const matrix4<T>& other){
 				*this=other;
 			}
+
+			const T* pointer() const { return &m[0][0]; }
+			T* pointer() { return &m[0][0];}
+
 			inline void makeIdentity(){
 				memset(m, 0x0, sizeof(m));
 				m[0][0] = 1.0f;
@@ -348,6 +357,8 @@ namespace yon{
 		};
 
 		typedef matrix4<f32> matrix4f;
+
+		YON_API extern const matrix4f IDENTITY_MATRIX;
 	}
 }
 #endif
