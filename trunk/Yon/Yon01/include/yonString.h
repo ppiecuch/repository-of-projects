@@ -15,11 +15,11 @@ namespace yon{
 				//0x0对应的字符是'\0'；空格对应'\x20'；0x30对应数字0
 				elements[0]=0x0;
 			}
-			string(const string<T>& other):elements(NULL),capacity(1),len(0){
+			string(const string<T>& other):elements(NULL),capacity(0),len(0){
 				*this=other;
 			}
 
-			string(const T* const other):elements(NULL),capacity(1),len(0){
+			string(const T* const other):elements(NULL),capacity(0),len(0){
 				*this=other;
 			}
 
@@ -40,7 +40,7 @@ namespace yon{
 					return *this;
 
 				len=other.len;
-				if(len>capacity){
+				if(len>=capacity){
 					delete[] elements;
 					capacity=len+1;
 					elements=new T[capacity];
@@ -102,7 +102,7 @@ namespace yon{
 					++p;
 				}
 
-				if(len+size>capacity)
+				if(len+size>=capacity)
 					reallocate(len+size);
 				for(u32 i=0;i<size;++i)
 					elements[len+i]=*(other+i);

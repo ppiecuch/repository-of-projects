@@ -14,6 +14,7 @@ inline void EnableMemLeakCheck()
 #include "yon.h"
 using namespace yon;
 using namespace yon::core;
+using namespace yon::debug;
 
 #pragma comment(lib, "Yon.lib")
 
@@ -33,11 +34,14 @@ int main(int argc, char* argv[])
 {
 	EnableMemLeakCheck();
 
+	setlocale(LC_ALL,"chs");
+
 	SYonEngineParameters params;
 	IYonEngine* pYE=CreateEngine(params);
 
-	
-
+	ILogger* logger=pYE->getLogger();
+	logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
+	int num=0;
 	while(pYE->run()){
 		//driver->beginScene(true, true, SColor(255,100,101,140));
 
@@ -47,6 +51,9 @@ int main(int argc, char* argv[])
 		//driver->endScene();
 		Sleep(20);
 		printf("run\n");
+		num++;
+		logger->info("%d %s\n",num,"testÄãºÃ");
+		logger->info("TEST\n");
 	}
 
 	pYE->drop();
@@ -76,6 +83,8 @@ int main(int argc, char* argv[])
 
 	core::stringc tstr("ÄãºÃ");
 	printf("%s\n\n\n",tstr);
+
+	printf("%s\n",(tstr+"1").c_str());
 #endif
 
 #if 0

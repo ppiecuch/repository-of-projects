@@ -3,15 +3,19 @@
 
 #include "config.h"
 #include "IReferencable.h"
+#include "yonString.h"
 
-#ifdef YON_COMPILE_WITH_WIN32
-#include <windows.h>
-#else
-#include <pthread.h>
-#endif
+
 
 namespace yon{
 namespace debug{
+
+	enum MASK_FORMAT{
+		MASK_FORMAT_DATE = 0,		//日期
+		MASK_FORMAT_TIME,			//时间
+		MASK_FORMAT_LEVEL,			//日志级别
+		MASK_FORMAT_COUNT
+	};
 
 	enum MASK_APPENDER{
 		MASK_APPENDER_CONSOLE = 0,	//控制台
@@ -29,27 +33,20 @@ namespace debug{
 		ENUM_LOG_LEVEL_COUNT
 	};
 
-	class ILogger : public IReferencable{
-	private:
-
-	#ifdef YON_COMPILE_WITH_WIN32
-		CRITICAL_SECTION	m_mutex;
-	#else
-		pthread_mutex_t		m_mutex;
-	#endif
-
+	class ILogger : public core::IReferencable{
 	public:
+		virtual ~ILogger(){};
+		virtual void setPath(const core::stringc& path) = 0;
+		virtual void setFileName(const core::stringc& name) = 0;
 
+		virtual void setFormat(s32 mask) = 0;
 		virtual void setLevel(ENUM_LOG_LEVEL level) = 0;
-		virtual void setAppender(MASK_APPENDER mask) = 0;
+		virtual void setAppender(s32 mask) = 0;
 
-		virtual void debug() = 0;
-		virtual void info() = 0;
-		virtual void warn() = 0;
-		virtual void error() = 0;
-
-		virtual void lock() = 0;
-		virtual void unlock() = 0;
+		virtual void debug(const c8* pFmt, ...) = 0;
+		virtual void info(const c8* pFmt, ...) = 0;
+		virtual void warn(const c8* pFmt, ...) = 0;
+		virtual void error(const c8* pFmt, ...) = 0;;
 
 	};
 }//debug

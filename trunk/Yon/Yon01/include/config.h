@@ -20,7 +20,8 @@
 #define YON_API __declspec(dllimport)
 #endif
 
-#define YON_HIDE_CONSOLE
+//隐藏控制台
+//#define YON_HIDE_CONSOLE
 
 //过期声明
 //用法:

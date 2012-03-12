@@ -21,6 +21,7 @@ namespace yon{
 			~CYonEngineWin32();
 
 			video::IVideoDriver* getVideoDriver(){return  m_videoDriver;}
+			debug::ILogger* getLogger();
 			virtual bool run();
 
 			//virtual yon::ITimer* getTimer();
@@ -45,6 +46,7 @@ namespace yon{
 			yon::SYonEngineParameters m_params;
 
 			video::IVideoDriver* m_videoDriver;
+			debug::ILogger* m_pLogger;
 
 			bool m_bClose;
 		};
