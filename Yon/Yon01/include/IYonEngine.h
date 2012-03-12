@@ -7,6 +7,7 @@
 #include "SYonPlatformInfo.h"
 #include "ITimer.h"
 #include "IVideoDriver.h"
+#include "ILogger.h"
 
 
 namespace yon{
@@ -15,6 +16,7 @@ namespace yon{
 	public:
 		virtual ~IYonEngine(){};
 		virtual video::IVideoDriver* getVideoDriver() = 0;
+		virtual debug::ILogger* getLogger() = 0;
 		virtual bool run() = 0;
 		//更新
 		//包括更新计时器

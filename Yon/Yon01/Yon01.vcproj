@@ -231,6 +231,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\exception.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\IReferencable.h"
 					>
 				</File>
@@ -262,6 +266,14 @@
 			<Filter
 				Name="debug"
 				>
+				<File
+					RelativePath=".\CLogger.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CLogger.h"
+					>
+				</File>
 				<File
 					RelativePath=".\include\ILogger.h"
 					>
