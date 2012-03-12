@@ -262,6 +262,10 @@
 			<Filter
 				Name="debug"
 				>
+				<File
+					RelativePath=".\include\ILogger.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="video"

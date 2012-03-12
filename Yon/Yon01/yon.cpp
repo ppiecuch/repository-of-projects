@@ -2,7 +2,6 @@
 
 #include "CYonEngineWin32.h"
 
-
 namespace yon{
 
 	namespace core
