@@ -17,6 +17,12 @@ using namespace yon::core;
 
 #pragma comment(lib, "Yon.lib")
 
+
+#ifdef YON_HIDE_CONSOLE
+#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
+#endif//YON_HIDE_CONSOLE
+
+
 void print(const matrix4f& m){
 	for(int i=0;i<4;++i)
 		printf("%.2f\t%.2f\t%.2f\t%.2f\n",m.m[0][i],m.m[1][i],m.m[2][i],m.m[3][i]);

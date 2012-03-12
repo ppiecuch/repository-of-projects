@@ -20,6 +20,8 @@
 #define YON_API __declspec(dllimport)
 #endif
 
+#define YON_HIDE_CONSOLE
+
 //过期声明
 //用法:
 //YON_DEPRECATED void fun(...){...}
