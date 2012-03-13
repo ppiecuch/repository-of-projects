@@ -6,7 +6,7 @@ namespace yon{
 namespace platform{
 
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
-		:m_hWnd(NULL),m_bExternalWindow(false),m_videoDriver(NULL),m_pLogger(NULL),
+		:m_hWnd(NULL),m_bExternalWindow(false),m_videoDriver(NULL),m_pLogger(new debug::CLogger()),
 		m_params(params),m_bClose(false)
 	{
 		if(params.windowId==NULL)
@@ -31,16 +31,12 @@ namespace platform{
 	CYonEngineWin32::~CYonEngineWin32(){
 		if(m_videoDriver!=NULL)
 			m_videoDriver->drop();
-		if(m_pLogger!=NULL)
-			m_pLogger->drop();
 		DestroyWindow(m_hWnd);
-		printf("~CYonEngineWin32\n");
+		m_pLogger->info("~CYonEngineWin32\n");
+		m_pLogger->drop();
 	}
 
 	debug::ILogger* CYonEngineWin32::getLogger(){
-		if(m_pLogger==NULL){
-			m_pLogger=new debug::CLogger();
-		}
 		return m_pLogger;
 	}
 
