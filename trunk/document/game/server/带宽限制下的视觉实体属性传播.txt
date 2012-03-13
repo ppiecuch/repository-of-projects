@@ -1,0 +1,188 @@
+1. Introduction
+简介
+ 
+The Saga of Ryzom is a persistent massively-multiplayer online game (MMORPG) released in September 2004 throughout Europe and North America, localised in 3 languages so far. It has been developed by Nevrax since 2000, and was taken over by Gameforge in late 2006.
+The Sage of Ryzom是一款在2004年9月发布的MMOPRG，最开始发布在欧洲和北美，目前已经被本地化为3种不同的语言。它由Nevrax在2000年开发，在2006年末时由Gameforge接管。
+ 
+The Nevrax team built Ryzom from scratch, starting with the Nevrax Library (NeL), made available as free software under the General Public License (GPL). On top of NeL, a server technology was created to handle an immersive virtual world. This article focuses on the network techniques developed to display a smooth scene of moving entities, the dynamic properties of which are propagated to all connected end-user clients having an avatar in the same virtual area.
+Ryzom由Nevrax团队独立开发，包括了Nevrax Library (NeL)，该库基于GPL协议发布。在NeL之上，开发出了一项服务器技术用来处理高度仿真的虚拟世界。这篇文章关注于所开发出的如何平滑地移动实体和将动态属性传播给所有相同区域内其他客户端的网络技术。
+ 
+I would like to thank Daniel Miller, CTO of Nevrax and Gameforge France, for his enlightening contributions and reviews of this article.
+Daniel Miller，Nevrax和Gameforge France的CTO，感谢他所做出的巨大贡献和对这篇文章的最终审查。
+ 
+Purpose of the Works
+工作目标
+ 
+Our client software had to display an animated 3D scene figuring moving and animated entities. Players would have direct control over their avatars, as point & click control (the alternative usually found in 2D or ¾ perspective games, even sometimes in 3D games) was considered not immersive enough. While the role-playing genre usually does not require fast input from the players, like in first person shooters (where the first player to shoot, will be the one who survives) or in sport games (where synchronization is very important for collective actions), movements had to be consistent & smooth.
+我们的客户端软件需要显示一个包含移动实体及其动画的3D动画场景。玩家会通过类似鼠标点击等行为来直接控制自己的角色。与需要对移动完全进行同步和平滑显示的第一人称射击游戏和体育游戏不大一样，角色扮演类游戏通常并不需要非常快速的输入处理。
+ 
+We wanted visible micro-teleportations, or position jolts, to be less frequent than in other MMOGs, in which, at least at the time when the Ryzom project started, entities often seemed to go back in time or jump forward. Another important feature was to allow the characters to move in a seamless environment, without loading time between predetermined small geographical zones, during which the player would be idle.
+在Ryzom 项目启动的时候，其他游戏中的实体经常会出现一些位置回退和跳跃前进的情况，我们希望在我们的游戏中，这类可以看见的位置跳转或者位置颠簸情况要比其他MMOG少。另一个重要特性是允许玩家在一个无缝的环境中移动，不会出现一些预先定义的小地理区域的加载过程，因为在这些加载时间里，玩家只能停下来等待。
+ 
+In the present article, which explains the techniques we tried and which ones were eventually chosen, a visual property refers to any dynamic state or attribute of a player or non-player entity that must be known by client software to render it, such as position & heading, 3D model identifier, clothes set, current animation, etc. We assume the client software has local access to some static data such as 3D models, textures and animations. In most of the document we will focus on the propagation of position, because the continuous nature of position paths makes greatly noticeable when smooth propagation is not achieved.
+在这篇文章中，将会解释一些我们曾经尝试过和最终我们所选择的技术。视觉属性是指客户端软件在渲染玩家或NPC实体时所需要的任意的动态状态或者描述属性, 比如位置和头顶文字，3D模型ID，服装，当前播放的动画，等等。我们假设客户端软件能够在本地获取到类似于3D模型，贴图和动画这些静态数据。这篇文章的大部分内容将重点关注于位置的广播，因为当平滑自然的位置路径广播未实现时，客户端将非常容易地看出来。
+ 
+Challenges
+挑战
+ 
+In an online game, especially a massively multiplayer one, the bandwidth constraints prevents from trivially sending every position change to all players. At the planned time of Ryzom launch, 56k modems still were widespread among players, ADSL was still in its infancy. Our MMORPG had to work nominally on a 56k or even 14k connection.
+对一个在线游戏，特别是一个大量玩家同时在线的游戏来说，带宽的限制将使得我们不能直接将所有的位置改变消息发送给所有的玩家。在Ryzom项目立项的时候，56K调制解调器在玩家中仍然被广泛使用，ADSL仍处于起步阶段。我们的MMORPG必须在56K甚至14K的连接下工作。
+ 
+Besides, in an online game, cheating utterly destroys the game experience of the victims (the players put at a disadvantage) and must be prevented. From the ever-popular adage “Don’t trust the client”, even more present as Nevrax’s founders’ intention was to release the Ryzom client under a free software license, it was quickly clear that the client would be a display and input device, while all game logic would have to be on the server.
+此外，对一款在线游戏来说，作弊行为完全地毁掉了受害者的游戏体验，所以必须有技术手段来防止这类行为的出现。“不要相信客户端”已经成为一句越来越流行的格言了，而最近Nevrax创始人的计划是要将Ryzom客户端在自由软件协议之下发布，这更加迅速地显示出客户端只是一个显示和输入设备，所有的游戏逻辑都必须在服务器端完成。
+ 
+Handling dynamic game information on the server side would prevent the appearance of player-made radars, for instance. Then, after excluding a peer-to-peer network solution, the bandwidth constraints did not only originate from the low bandwidth available in consumers’ homes, but also in the server farms that we would have to rent.
+在服务器端处理动态的游戏信息将有效地防止作弊行为的出现，比如一些玩家制作的用于偷看其他玩家数据的雷达。然后，避免使用点对点的网络方案，这样也导致带宽的限制不仅仅只出现在使用低带宽的玩家电脑上，在租用带宽的服务器机房也会出现。
+ 
+MMORPG playing experience was known to come with lag, an unpleasant noticeable delay between an action and its viewing, often visible as a stopped animation or animation jerk. This lag phenomenon had to be minimized by design. It usually originated either from an inadequate information propagation system under tight bandwidth constraints and latency-prone networks such as the Internet, or from delay in CPU-processing by the server.
+MMORPG的游戏体验与延迟是联系在一起的，经常在发出的动作指令与其显示效果之间出现一段可以看见的而且令人非常不愉快的停顿，有时是动画停止，有时是动画颠簸。这种延迟现象必须通过设计来使其最小化。它通常是由于在严格的带宽限制和高延迟的网络环境下使用了不合适的信息广播系统而导致，也有可能是由于服务器的CPU处理导致了延迟。
+ 
+Our work then had to focus on studying the known techniques of visual property propagation, and possibly creating better ones. The CPU performance of the software was also critical, to avoid time-consuming peaks.
+我们的工作就必须关注于学习当前已知的视觉属性传播技术，并且尽可能地创建一个更好的技术。为了避免高的时间开销，软件的CPU性能也是很重要的。
+ 
+ 
+2. Dead Reckoning – Extrapolation
+导航预测算法 -- 推理
+ 
+Early distributed simulation projects, such as Distributed Interactive Simulation (DIS), dealt with moving objects having high-inertia movements. In this aircraft simulation context, uniform rectilinear movements are the norm, and variation from these occur in a gradual way. It is then possible to replicate the movements by simulating a replica of an actuated entity, and applying behaviour change events.
+早期的分布式仿真项目，比如DIS，只处理具有高度惯性行为的移动对象。在这项飞机飞行模拟实验中，只是标准的匀速直线运动，然后做一些渐进的变化。这样它才能通过模拟一个实际实体的复制品来复制其移动，并且应用一些行为改变事件。
+ 
+For example, if the actuated entity reduces its speed by s, an update is sent to the replica to make it reduce its speed by s as well. Of course, the update can take a non-negligible time to transit from the actuator to the observer. The position of the replica is extrapolated until the update is received, leading to a position correction, thus the actual path observed on the replica may be slightly different than the original one.
+比如，如果实际的实体降低速度s，一个更新数据包将会发送给它的复制体以使其也降低速度s。当然，这个更新包将会有一段无法避免的传输时间。在更新包到达之前，该复制体对象的位置还在继续按原来的速度改变，这样就必然导致了需要有一个位置修正，也使得在复制体上观察到的对象移动路径与其实际路径会有一些轻微的偏差。
+ 
+This positional inaccuracy may be lowered by introducing additional information in the update message: for example a timestamp stating from which point the speed change was done will make the replicated path finally rejoin the original one, although the temporary phase during when the update message is transitting will have a different path.
+这种位置上的偏差可以通过在更新包中引入额外信息来降低：比如一个表示速度从什么时候开始改变的时间戳可以使得复制体的移动路径最终与实际路径合并上，虽然在更新包传输的过程中，复制体还是会产生一个不大一样的路径。
+ 
+Then, we need to implement an algorithm that will blend the temporary inaccurate path with the corrected path, the result of which will depend on the depth of the blending (using the history of previously received positions, for example [Bernier]).
+这样，我们需要实现一种算法来将临时的不准确路径与其正确的路径进行混合，最终的结果依赖于混合的深度(比如可以使用之前收到的位置历史数据)。
+ 
+To reduce the frequency of updates, we can send an update only when the original path and the replicated path diverge by a defined amount (Figure 1) (it may then be necessary to run both the master entity and the replicate by the master process to compare them). We now have a dead reckoning system (see prototype screenshot on Figure 2), named after the ancient naval navigation techniques used when the stars were not visible.
+为了降低更新的频率，我们可以只在原始路径和复制体的移动路径发生指定数量的偏离时才发送更新包(这可能需要在主处理器上同时运行主实体和其复制体的运动模拟，以用来对这两条路径进行比较)。现在我们就有了一个导航预测系统，该系统以古代航海学上在星星不可见时用来导航的技术而命名。
+ 
+However, in most MMORPG the primary controlled avatar is a humanoid, which is not known for high-inertia movements but random movements. Using Dead Reckoning would lead to frequent state correction updates, increasing both network traffic and visible jolts (because a quick position jump is sometimes needed when the blended replicated path differs to much from the original path).
+ 但是，在大多数MMORPG中，主要被控制的对象都是人类角色，他们的运动都是高度随机的。使用导航预测算法可能会导致非常频繁地发送状态校正更新包，网络流量和视觉上的震动都会大大增加(因为当混合后的复制体路径与原始路径相差较大时，有时候不得不做一些迅速的位置跳转)。
+ 
+Dead Reckoning may still be used for vehicles, AI entities having steady movements (although too steady movements for AI entities might not be wanted, because of their unnatural feeling). To allow for a large number of player-controlled entities, we focused on a different strategy: transmitting "good-old" position updates, but simulating interpolated natural movement in a virtual time space and maintaining total control of update frequency.
+导航预测算法仍然可被用于交通工具，AI控制对象这类具有大体上固定移动规律的实体。为了能够处理大量玩家控制的实体，我们转向了另外一种不同的策略：传输"good-old"位置更新包，同时使用插值的方法模拟一段时间内的自动移动，并且保持对更新频率完全控制。
+ 
+ 
+3. Virtual Time Space - Interpolation
+虚拟的时间空间 - 插值
+ 
+Yahn W. Bernier of Valve, made a presentation about Half-Life & Team Fortress Networking at the Game Developer Conference in 2000 [Bernier]. The idea was that instead of trying to predict the future (the principle of Dead Reckoning), why not make the past look like the present? When a client has received all updates for all entities in a scene, they are able to display an accurate and smooth animated view of the scene.
+Vavle的Yahn W. Bernier在2000年的游戏开发者大会上做过一段关于Half-Life & Team Fortree Networking的发言。其中有一个想法是，除了试图预测未来之外(也就是导航预测算法的原理)，为什么不可以将过去的情况作为现在来处理呢？当一个客户端接收到场景内所有其他实体的所有更新包后，他们就可以非常平滑地显示出场景的实际动画。
+ 
+That is why a delay, called Lag Compensation Time (LCT), is introduced between the real action and the display on the other side of the transmission pipeline. The higher the LCT, the higher the number of updates received, the smoother the movements: if an avatar reaches a position before the next position is received from the server then it will have to stop and wait.
+这也是为什么会有一个延迟，也被称为滞后补偿时间(LCT)，被引入到实际动作和在网络传输管道的另一端显示之间。LCT越高，所接收到的更新包也越多，移动也就会越平滑：如果一个角色到达了一个位置，但这时从服务器发来的另一个位置更新包又还没到，那么它将不得不停下来等待。
+ 
+This results in jerky start-stop movement, especially if the position update rhythm varies, which is unavoidable when coming over the Internet. The goal of the LCT is to ensure that this doesn't happen, but the LCT needs to be as small as possible as it represents a lag or temporal inconsistency.
+这将导致停停走走式的移动，特别是当位置更新包发送频率不规则时，这也是在通过internet发送数据时无法避免的问题。LCT的目标就是确保这样的情况不会发生，但是LCT又需要尽可能的小，因为它代表着滞后或时间不一致的情况。
+ 
+If two players have their screens side by side (Figure 3), they obviously will notice that their display is shifted in time. In some other situations, it may be noticed: for example, when two characters are trying to run together at the same time, they will have the feeling the other one is always behind, because their controlled character is not shifted in time (that would be a terrible control experience!).
+如果两个玩家的屏幕挨在一起，他们显然会发现，他们的显示位置一直在交换。在另外一些情况下还可能会注意到：比如，当两个角色试图同时移动时，他们会感觉到另一个玩家一直在自己后面，因为他们控制的角色一直都没有发生位置交换(那将会是一个非常严重的操作体验)。
+ 
+This raises the problem of interaction between objects displayed in present time space (the player's avatar) and objects displayed in a past time space (remote characters, AI entities). One solution is to make the LCT vary according to the distance from the player's avatar. This idea is called temporal perception, or presentation time or sometimes local perception filters and comes from the analogy with the appearance of the stars in the sky: the farther the distance, the longer the time the light takes to come to us [Singhal-Zyda].
+这也产生了一个显示在当前时间空间的对象(玩家自己控制的角色)与显示在过去时间空间的对象(远程角色对象，AI控制实体)之间的交互问题。一种解决方案是让LCT随着与角色对象的距离而变化。这一方案被称作暂时感知，或呈现时间，或者有时候叫做本地感知过滤，这是来自于对天空中星星出现情况的推理：距离越远，光线到达我们这里需要的时间就越长。
+ 
+Anyway, if we want more accurate movement around the player’s avatar than at distant sight, updates of entities in the immediate vicinity of the observer should then have a higher priority than updates from distant entities. The goal is to minimize the error magnitude: a foreground entity (such as a melee adversary) may be displayed in a strikingly wrong position with less than 1 meter of positional error, while an entity farther away may not be perceptibly badly positioned despite a positional error of several meters which may only correspond to only a few pixels or less. With position updates that are less frequent for distant entities, the required LCT is greater. A flexible LCT allows one to minimise the lag for nearby characters while still avoiding jerkiness for background characters
+无论如何，如果我们希望使玩家附近的实体比远处的实体更准确地移动，那我们就应该将观察者附近对象的更新包的优先级设置高一些。目的是为了最大限度地减少误差幅度：跟前的一个实体(如正在战斗中的对手)最多只能出现1米以内的位置误差，而远处的一个实体尽管位置偏离了好几米，但显示出来的结果可能只有几个象素距离的误差，甚至还会更少。远处的实体应用低频率的位置更新，这样需要的LCT就可以比较大。灵活的LCT可以尽可能地减少近处玩家的延迟，同时也能够避免远处玩家实体的位置颠簸。
+ 
+It means we need a way to control the frequency of updates of viewed entities. 
+这也意味着我们需要一种方法来控制被观察对象的更新包的发送频率。
+ 
+Time Synchronisation 
+时间同步
+ 
+Maintaining times across several machines needs a synchronization mechanism. Common synchronization schemes compute a delta between the local time of the client machine and a reference time, and transmitting a timestamp relative to the reference time. However, we noticed that many consumer PCs had internal clocks with a different speed, leading to desynchronization.
+在多台机器之间维护时间需要一种同步机制。通常的同步方案是，在本地机器时间与服务器时间之间计算一个差值和参考时间，然后传输与参考时间之间的时间戳。但是，我们注意到一些机器的内部时钟速度不一样，这样会导致错误的同步。
+ 
+Moreover, for our server applications we adopted a flexible time system based on “ticks” sent by a conductor service, that would increase the current game cycle at a rate that was sustainable by all server applications: if a service had a sudden increase of workload, all services would wait for it, avoiding a vicious circle of congestion. The client time synchronization was thus based on the average time between two received messages, assuming the server regularly sends a message to each client.
+此外，我们的服务器应用程序采用了一种灵活的时间系统，该系统基于一个可发送”ticks”的指挥服务，这样可以以所有的服务器应用程序都接受的比率增加当前游戏循环的速度：如果一个服务突然增加了工作负载，所有的服务都可以停下来等它，以避免恶意循环的阻塞。客户端时间同步因此基于收到的两个消息包的平均时间，假设服务器定期地发送数据包到所有的客户端。
+ 
+4. Update Frequency Control - Prioritizing
+更新频率控制 - 优先级策略
+ 
+Although everyone believed the consumer modems & bandwidths would probably increase a lot in the following years, keeping a low transfer rate had the advantage of keeping low server bandwith cost. After all, running thousands of players on a single server (which is the essence of MMOGs) would certainly need fat internet connections which are inevitably expensive.
+虽然大家都认为消费者的调制解调器和带宽在未来几年内会增加很多，但是保持一个低的传输率仍然具有降低带宽使用费用的优势。毕竟，运行一台支持数以千计的玩家同时游戏的服务器(这也是MMOG的本质)仍然需要很大的网络连接，而这也不可避免地是相当的昂贵。
+ 
+Transmitting position updates of a populated 3D scene in 13 kbit/s (the throttle that was eventually set) raised the following problems:
+在一个比较热闹的3D场景中以13kb/s的速度(一般设置的瓶颈值)传输位置更新包也给我们带来了以下问题：
+Which updates would have priority?
+哪些更新包具有高的优先级
+The need for CPU-efficiency?
+需要的CPU效率是多少
+Several algorithms were tried. The principle of them is the same. For a particular observer, at a given time:
+我们也尝试了多种算法，他们的基本原理也都是相同的。对一个特定的观察者来说，在一个给定的时间：
+Determine which entities are in the neighbourhood of the observer, within the seamless environment, and communicate the changes of this list (called "vision”) to the client.
+Associate a priority to each entity of this list based on distance.
+Iterate over the entities in order of (highest to lowest), and compare their states with a copy of the state as known by the client. here significant difference is found, add an update record to the send buffer. Stop when then send buffer size has reached the bandwidth threshold.
+在无缝的世界环境中决定哪些实体在观察者的周围，并且发送这个列表的更新到客户端。
+根据距离来为列表中的这些实体指定优先级。
+根据优先级高低顺序遍历这些实体, 比较他们当前的服务器端状态与客户端保留状态的差别，添加更新数据包到缓冲区，到缓冲区大小达到带宽瓶颈时停止。
+Computing the list of visible entities
+计算可见实体
+ 
+Two main algorithms are used in Ryzom.
+Ryzom中使用了两种主要的算法。
+ 
+The first one is used in “mainland” Ryzom. Space is partitioned by a grid, and computing the list of visible entities consists in taking entities from the same cell and iterating on the neighbour cells by drawing a spiral, until the desired number of visible entities is reached.
+第一种被用于Ryzom的大陆。空间被一个网格所划分，首先获取与要计算的实体在同一网格的实体，然后以螺旋状的方式遍历周围的网格，并添加其中的实体，直接找到足够数量的实体。
+ 
+For Ryzom Ring instances, where areas are much smaller, a newer algorithm is used: dynamic groups are formed, based on the distance from an entity to the centre of gravity of the group. If an entity moves too far away from the group, the group is split in two: a new group is created.
+对于Ryzom Ring副本来说，区域一般都比较小，所以采用了一种新的算法：根据实体当前位置与组重心的距离来创建动态组。如果实体移动到离组很远的地方，就将组一分为二：创建一个新组出来。
+ 
+In both cases the result is the same: a per-client set of associations between game entities and viewed entities. Explaining these algorithms in detail is beyond the scope of this article, but now we will see how and when the associations and their properties are transmitted to clients.
+这两种情况的结果都是相同的：每个客户端游戏实体都与一个其可见的实体集合相关联。解释这些算法的细节已经超出了本篇文章的范畴，但接下来我们将看到这些关联和他们的属性是如何以及何时发送给客户端的。
+ 
+Priorities: relevance of information
+ 优先级：信息的相关性
+ 
+One of the algorithms that we tried was built from the following approach: trying to correlate the update frequency of a property with the “number of pixels” eventually affected by a property change on the viewer’s screen. Practically, the first budget-based algorithm that was developped dealt with each property: each tuple (viewer client, viewed entity, property) was assigned a priority, and a data structure representing “shelves & buckets” was browsed when sending updates to the client. The priority helped assigning a property change event into the right bucket. It was computed from several criteria:
+我们曾经尝试过的一种算法是通过以下方法构造的：试图将一个属性的更新频率与该属性更新所引起的观察者屏幕上受影响的象素数量相关联。实际上，第一个基于预算的算法被开发用来处理每个属性：每个元组(观察者客户端，观察的实体，属性)被赋予一个优先级，还有一个数据结构用于表示"架子和桶"，这些在发送更新包到客户端时会被浏览到。优先级帮助将一个属性的改变事件映射到一个正确的桶上。它是通过一些标准计算出来的：
+ 
+Distance from observer to entity (the "manhattan distance" approximation is used for performance improvement)
+从观察者到实体的距离
+Magnitude of the difference between the copy of the state as known by the client and the actual value.
+客户端所知道的状态拷贝与其实际数据之间的差值
+ 
+For positions, we tackled the problem which would occur if the difference was eventually low while the entity had moved for a long path: for example, when walking around a wall, the starting position and the ending position might be very close, while in this case the change is “important”. Instead of comparing the positions, we compared “quantity of movement”, called mileage, that we had to accumulate every time an entity move was detected.
+对于位置来说，我们解决了当实体移动了一段很长的距离而实际差值却非常小时可能会引起的问题：比如，当在墙上行走时，开始点和结束点可能会非常接近，而在这种情况下的改变又是很重要的。我们通过比较”移动的数量”来代替移动的位置，这样我们也就不得不在每次检测到实体移动之后都进行累积。
+ 
+Other properties were taken into account as well. For example, if a viewed entity suddenly put on their hat, without moving, the entity would get a higher update priority.
+其他属性也同样被列入考虑。比如，如果一个被观察实体突然戴上了他的帽子，而并没有移动，这个实体也同样会获得一个比较高的更新优先级。
+ 
+This algorithm proved too CPU-intensive for our target of 25 x 250 x 1000 pairs (1000 clients per front-end service, each displaying 250 entities having 25 dynamic properties). Hence a different algorithm was developed, computing a score for pairs (viewer, viewed entity) from the following criterion:
+这个算法在我们25*250*1000个元组(每个前端服务有1000个客户端，每个客户端显示250个实体，每个实体有25个动态属性)的目标上被证明是太过于耗费CPU资源的。因此，另外一个不同的算法又被开发出来，通过下面的标准为每个元组(观察者，被观察的实体)计算分值：
+ 
+l  Distance from observer to entity (the "manhattan distance" approximation is used for performance improvement)
+l  观察者到实体的距离
+ 
+The score of an entity was incremented proportionally to the inverse of the distance to the viewer, and would be reset when sending the state to the viewer client. Then another step was required to filter which properties would be sent to a viewer when processing a particular viewed entity.
+实体分值的增长与它到观察者的距离成反比，当状态更新包被发送到观察者的客户端后，分值被重置。另外一个步骤用来对特定的被观察的实体进行处理，以决定哪些属性需要发送给观察者。
+ 
+Arbitrating which properties are to be sent
+决定哪些属性需要被发送
+ 
+When iterating over viewed entities sorted by descending priority, we compare the current value of the properties to the previous values stored during the last send. If they don't match, by a sufficient threshold, we include them in the update record to be sent. The mileage trick described in the previous section was retained for position arbitration. As this comparison is a critical part because it is called a large number of times, we used several tricks to optimise it. We later optimised the whole step by comparing only properties relevant to the entity type. For example, we know in advance that an intelligent plant is a still entity in Ryzom, so we don't need to compare the positions.
+当根据优先级遍历被观察的实体时，我们会将实体当前的属性与保存下来的上一次发送更新时的属性值进行比较，发送改变过的部分。如果他们不匹配，我们会在有足够的资源时将他们包含进更新数据包中并且发送。上一节中描述过的路程跟踪被保留用来做位置仲裁。这个比较也是一个非常关键的部分，因为其被调用的次数非常多，我们也使用了相当多的手段来对其进行优化。我们随后通过仅比较那些与实体类型有关的属性来对整个步骤进行了优化。比如，我们提前已经知道在Ryzom中智能植物是一种位置固定的实体，这样我们就不需要比较它的位置属性是否已改变了。
+ 
+Optimizations
+优化
+ 
+To reduce the number of operations to do in a game cycle, a system to split up computation over several game cycles was added. As a result, only an incremental subset of visibility pairs is prioritised at a time.
+为了减少一个游戏循环中所做的操作的次数，我们添加了一个用来将游戏循环分隔为多个游戏循环的系统。这样，一次只会有一部分的可见实体做优先级计算。
+ 
+Another optimisation consisted in taking advantage of the multiprocessor machines we had (and later, hyper threaded multiprocessors): the computation part and the sending part were pipelined using several threads.
+另一项优化策略在于使用多处理器的优势：计算部分和发送部分被安排在不同的线程中。
+ 
+Low-level optimisations were also done: by displaying the assembly code generated by the C++ compiler, we could rework the data structures so that the processor had minimal overhead and cache misses when accessing them.
+低级的优化处理也做过：通过显示c++编译器生成的汇编代码，我们重新设计了数据结构，以使得处理器在获取这些数据的时候尽可能地减少缓存未命中的情况。
+ 
+
+ 
+
+原文地址：
+
+http://www.gamasutra.com/view/feature/1421/propagation_of_visual_entity_.php
+
+http://blog.csdn.net/lfhfut/article/details/2138512

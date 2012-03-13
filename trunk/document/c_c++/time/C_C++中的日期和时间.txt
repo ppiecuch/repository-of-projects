@@ -110,7 +110,7 @@ char * ctime(const time_t *timer);
 此外，time.h还提供了两种不同的函数将日历时间（一个用time_t表示的整数）转换为我们平时看到的把年月日时分秒分开显示的时间格式tm：
 
 struct tm * gmtime(const time_t *timer);                                          
-struct tm * localtime(const time_t * timer);
+struct tm * localtime(const time_t * timer);==>localtime_s()
 
 通过查阅MSDN，我们可以知道Microsoft C/C++ 7.0中时间点的值（time_t对象的值）是从1899年12月31日0时0分0秒到该时间点所经过的秒数，而其它各种版本的Microsoft C/C++和所有不同版本的Visual C++都是计算的从1970年1月1日0时0分0秒到该时间点所经过的秒数。
 
