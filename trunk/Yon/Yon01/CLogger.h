@@ -35,15 +35,14 @@ namespace yon{
 		//缓冲区
 			const static u32 BUFFER_SIZE=1024;
 			c8 m_buffer[BUFFER_SIZE];
-		//缓冲数据
-			core::stringc m_levelStr;
+		//日志级别名称
+			const static core::stringc LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];
 		protected:
 			virtual void lock();
 			virtual void unlock();
 			virtual void output(ENUM_LOG_LEVEL level,const c8* pFmt, va_list args);
 			virtual void appendDateTime(int& index);
-			virtual void appendLevel(int& index);
-			virtual void resetLevelStr();
+			virtual void appendLevel(int& index,ENUM_LOG_LEVEL level);
 		public:
 			CLogger();
 			virtual ~CLogger();

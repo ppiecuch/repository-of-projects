@@ -7,12 +7,11 @@ namespace yon{
 	namespace debug{
 
 		#define _TRUNCATE ((size_t)-1)
+		const core::stringc CLogger::LEVEL_NAME[ENUM_LOG_LEVEL_COUNT]={"DEBUG","INFO","WARN","ERROR"};
 		CLogger::CLogger():
 			m_path(""),m_name("log.txt"),m_pFile(NULL),
 			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_LEVEL),
 			m_level(ENUM_LOG_LEVEL_INFO),m_appender(MASK_APPENDER_FILE){
-
-				resetLevelStr();
 
 				#ifdef YON_COMPILE_WITH_WIN32
 				InitializeCriticalSection(&m_mutex);
@@ -41,26 +40,9 @@ namespace yon{
 		}
 		void CLogger::setLevel(ENUM_LOG_LEVEL level){
 			m_level=level;
-			resetLevelStr();
 		}
 		void CLogger::setAppender(s32 mask){
 			m_appender=mask;
-		}
-		void CLogger::resetLevelStr(){
-			switch(m_level){
-			case ENUM_LOG_LEVEL_DEBUG:
-				m_levelStr="DEBUG";
-				break;
-			case ENUM_LOG_LEVEL_INFO:
-				m_levelStr="INFO";
-				break;
-			case ENUM_LOG_LEVEL_WARN:
-				m_levelStr="WARN";
-				break;
-			case ENUM_LOG_LEVEL_ERROR:
-				m_levelStr="ERROR";
-				break;
-			}
 		}
 		void CLogger::lock(){
 			#ifdef YON_COMPILE_WITH_WIN32
@@ -98,10 +80,10 @@ namespace yon{
 				++index;
 			}
 		}
-		void CLogger::appendLevel(int& index){
+		void CLogger::appendLevel(int& index,ENUM_LOG_LEVEL level){
 			if(m_format&MASK_FORMAT_LEVEL){
-				sprintf_s(m_buffer+index,8,"[%s]",m_levelStr.c_str());
-				index+=m_levelStr.length()+2;
+				sprintf_s(m_buffer+index,8,"[%s]",LEVEL_NAME[level].c_str());
+				index+=LEVEL_NAME[level].length()+2;
 			}
 		}
 		void CLogger::output(ENUM_LOG_LEVEL level,const c8* pFmt,va_list args){
@@ -121,13 +103,13 @@ namespace yon{
 			lock();
 			memset(m_buffer,0x0,BUFFER_SIZE);
 			int index=0;
-			//appendDateTime(index);
-			//appendLevel(index);
+			appendDateTime(index);
+			appendLevel(index,level);
 			//_vsnprintf_s(m_buffer,BUFFER_SIZE,pFmt,args);
 			//vsnprintf_s和_vsnprintf_s没有多少区别只是和以前的相兼容
 			//使用_vsnprintf_s偶尔会发生内存泄露
 			//而使用vsnprintf_s则不会
-			vsnprintf_s(m_buffer+index,BUFFER_SIZE,_TRUNCATE,pFmt,args);
+			vsnprintf_s(m_buffer+index,BUFFER_SIZE-index,_TRUNCATE,pFmt,args);
 			unlock();
 			if(m_appender&MASK_APPENDER_FILE){
 				fprintf(m_pFile,"%s",m_buffer);
