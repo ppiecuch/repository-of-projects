@@ -72,7 +72,7 @@ namespace yon{
 					++p;
 				}
 
-				if(size>capacity)
+				if(size>=capacity)
 					reallocate(size);
 				for(u32 i=0;i<size;++i)
 					elements[i]=*(other+i);

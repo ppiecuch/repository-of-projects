@@ -1,14 +1,18 @@
 #include "CLogger.h"
 #include "exception.h"
 #include <memory.h>
+#include  <time.h>
 
 namespace yon{
 	namespace debug{
 
+		#define _TRUNCATE ((size_t)-1)
 		CLogger::CLogger():
 			m_path(""),m_name("log.txt"),m_pFile(NULL),
 			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_LEVEL),
 			m_level(ENUM_LOG_LEVEL_INFO),m_appender(MASK_APPENDER_FILE){
+
+				resetLevelStr();
 
 				#ifdef YON_COMPILE_WITH_WIN32
 				InitializeCriticalSection(&m_mutex);
@@ -37,11 +41,27 @@ namespace yon{
 		}
 		void CLogger::setLevel(ENUM_LOG_LEVEL level){
 			m_level=level;
+			resetLevelStr();
 		}
 		void CLogger::setAppender(s32 mask){
 			m_appender=mask;
 		}
-		
+		void CLogger::resetLevelStr(){
+			switch(m_level){
+			case ENUM_LOG_LEVEL_DEBUG:
+				m_levelStr="DEBUG";
+				break;
+			case ENUM_LOG_LEVEL_INFO:
+				m_levelStr="INFO";
+				break;
+			case ENUM_LOG_LEVEL_WARN:
+				m_levelStr="WARN";
+				break;
+			case ENUM_LOG_LEVEL_ERROR:
+				m_levelStr="ERROR";
+				break;
+			}
+		}
 		void CLogger::lock(){
 			#ifdef YON_COMPILE_WITH_WIN32
 			EnterCriticalSection(&m_mutex);
@@ -57,6 +77,32 @@ namespace yon{
 			if(pthread_mutex_unlock(&m_mutex) != 0 )!
 				throw core::exception("can not unlock mutex!(pthread_mutex_unlock return nonzero)");
 			#endif
+		}
+		void CLogger::appendDateTime(int& index){
+			if((m_format&MASK_FORMAT_DATE)||(m_format&MASK_FORMAT_TIME)){
+				static struct tm newtime;
+				static time_t lt1;
+				time(&lt1);
+				localtime_s(&newtime,&lt1);
+				if(m_format&MASK_FORMAT_DATE){
+					strftime(m_buffer+index,10,"[%y-%m-%d",&newtime);
+					index+=9;
+				}
+				if(m_format&MASK_FORMAT_TIME){
+					strftime(m_buffer+index,10," %H:%M:%S",&newtime);
+					index+=9;
+				}
+				//int sprintf_s(char *buffer,size_t sizeOfBuffer,const char *format [,argument] ...);
+				//sprintf_s()是sprintf()的安全版本，通过指定缓冲区长度来避免sprintf()存在的溢出风险
+				sprintf_s(m_buffer+index,2,"]");
+				++index;
+			}
+		}
+		void CLogger::appendLevel(int& index){
+			if(m_format&MASK_FORMAT_LEVEL){
+				sprintf_s(m_buffer+index,8,"[%s]",m_levelStr.c_str());
+				index+=m_levelStr.length()+2;
+			}
 		}
 		void CLogger::output(ENUM_LOG_LEVEL level,const c8* pFmt,va_list args){
 			if(level<m_level)
@@ -74,7 +120,14 @@ namespace yon{
 			}
 			lock();
 			memset(m_buffer,0x0,BUFFER_SIZE);
-			_vsnprintf_s(m_buffer,BUFFER_SIZE,pFmt,args);
+			int index=0;
+			//appendDateTime(index);
+			//appendLevel(index);
+			//_vsnprintf_s(m_buffer,BUFFER_SIZE,pFmt,args);
+			//vsnprintf_s和_vsnprintf_s没有多少区别只是和以前的相兼容
+			//使用_vsnprintf_s偶尔会发生内存泄露
+			//而使用vsnprintf_s则不会
+			vsnprintf_s(m_buffer+index,BUFFER_SIZE,_TRUNCATE,pFmt,args);
 			unlock();
 			if(m_appender&MASK_APPENDER_FILE){
 				fprintf(m_pFile,"%s",m_buffer);
@@ -85,21 +138,6 @@ namespace yon{
 			if(m_appender&MASK_APPENDER_VS){
 				OutputDebugStringA(m_buffer);
 			}
-			/*if(m_appender&MASK_APPENDER_FILE){
-				lock();
-				vfprintf(m_pFile,pFmt,args);
-				unlock();
-			}
-			if(m_appender&MASK_APPENDER_CONSOLE){
-				vprintf( pFmt,args);
-			}
-			if(m_appender&MASK_APPENDER_VS){
-				lock();
-				memset(m_buffer,0x0,BUFFER_SIZE);
-				sprintf_s(m_buffer,pFmt,args);
-				unlock();
-				OutputDebugStringA(m_buffer);
-			}*/
 		}
 		void CLogger::debug(const c8* pFmt, ...){
 			va_list arg;
@@ -125,5 +163,6 @@ namespace yon{
 			output(ENUM_LOG_LEVEL_ERROR,pFmt,arg);
 			va_end(arg);
 		}
-	}
-}
+		#undef _TRUNCATE
+	}//debug
+}//yon
