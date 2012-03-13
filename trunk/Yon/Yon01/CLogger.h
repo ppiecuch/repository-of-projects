@@ -35,10 +35,15 @@ namespace yon{
 		//»º³åÇø
 			const static u32 BUFFER_SIZE=1024;
 			c8 m_buffer[BUFFER_SIZE];
+		//»º³åÊý¾Ý
+			core::stringc m_levelStr;
 		protected:
 			virtual void lock();
 			virtual void unlock();
 			virtual void output(ENUM_LOG_LEVEL level,const c8* pFmt, va_list args);
+			virtual void appendDateTime(int& index);
+			virtual void appendLevel(int& index);
+			virtual void resetLevelStr();
 		public:
 			CLogger();
 			virtual ~CLogger();

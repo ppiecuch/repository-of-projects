@@ -40,7 +40,9 @@ int main(int argc, char* argv[])
 	IYonEngine* pYE=CreateEngine(params);
 
 	ILogger* logger=pYE->getLogger();
-	logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
+	//logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
+	logger->setAppender(MASK_APPENDER_CONSOLE);
+	//logger->setLevel(ENUM_LOG_LEVEL_DEBUG);
 	int num=0;
 	while(pYE->run()){
 		//driver->beginScene(true, true, SColor(255,100,101,140));
@@ -50,7 +52,7 @@ int main(int argc, char* argv[])
 
 		//driver->endScene();
 		Sleep(20);
-		printf("run\n");
+		//printf("run\n");
 		num++;
 		logger->info("%d %s\n",num,"testÄãºÃ");
 		logger->info("TEST\n");
