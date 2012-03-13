@@ -2,6 +2,8 @@
 #define _YON_CORE_YONSTRING_H_
 
 #include "yonTypes.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 namespace yon{
 	namespace core{
@@ -19,9 +21,53 @@ namespace yon{
 				*this=other;
 			}
 
-			string(const T* const other):elements(NULL),capacity(0),len(0){
+			/*string(const T* const other):elements(NULL),capacity(0),len(0){
 				*this=other;
+			}*/
+			
+			string(const c8* const pFmt,...):elements(NULL),capacity(0),len(0){
+				va_list args;
+				va_start(args,pFmt);
+				T buffer[1024];
+				vsprintf_s(buffer,1024,pFmt,args);
+				va_end(args);
+
+				*this=buffer;
 			}
+
+			string(const c16* const pFmt,...):elements(NULL),capacity(0),len(0){
+				va_list args;
+				va_start(args,pFmt);
+				T buffer[1024];
+				vswprintf_s(buffer,1024,pFmt,args);
+				va_end(args);
+
+				*this=buffer;
+			}
+
+			/*explicit string(const double number):elements(NULL),capacity(0),len(0){
+				c8 tmpbuf[255];
+				sprintf_s(tmpbuf, 255, "%0.6f", number);
+				*this = tmpbuf;
+			}
+
+			explicit string(const int number):elements(NULL),capacity(0),len(0){
+				c8 tmpbuf[16];
+				sprintf_s(tmpbuf, 16, "%d", number);
+				*this = tmpbuf;
+			}
+
+			explicit string(const unsigned int number):elements(NULL),capacity(0),len(0){
+				c8 tmpbuf[16];
+				sprintf_s(tmpbuf, 16, "%d", number);
+				*this = tmpbuf;
+			}
+
+			explicit string(const long number):elements(NULL),capacity(0),len(0){
+				c8 tmpbuf[32];
+				sprintf_s(tmpbuf, 32, "%ld", number);
+				*this = tmpbuf;
+			}*/
 
 			~string(){
 				delete[] elements;
@@ -80,7 +126,18 @@ namespace yon{
 				len=size;
 				return *this;
 			}
-
+			/*void operator+=(const int num){
+				*this+=core::string<T>(num);
+			}
+			void operator+=(const unsigned int num){
+				*this+=core::string<T>(num);
+			}
+			void operator+=(const long num){
+				*this+=core::string<T>(num);
+			}
+			void operator+=(const double num){
+				*this+=core::string<T>(num);
+			}*/
 			void operator+=(const string<T>& other) {
 				u32 size=other.len+1;
 				if(len+size>capacity)
@@ -110,6 +167,26 @@ namespace yon{
 				len+=size;
 			}
 
+			/*string<T> operator+(const int num){
+				string<T> str(*this);
+				str+=num;
+				return str;
+			}
+			string<T> operator+(const unsigned int num){
+				string<T> str(*this);
+				str+=num;
+				return str;
+			}
+			string<T> operator+(const long num){
+				string<T> str(*this);
+				str+=num;
+				return str;
+			}
+			string<T> operator+(const double num){
+				string<T> str(*this);
+				str+=num;
+				return str;
+			}*/
 			string<T> operator+(const string<T>& other) const{
 				string<T> str(*this);
 				str+=other;

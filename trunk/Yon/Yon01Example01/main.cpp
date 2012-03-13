@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 	SYonEngineParameters params;
 	IYonEngine* pYE=CreateEngine(params);
 
-	ILogger* logger=pYE->getLogger();
+	/*ILogger* logger=Logger;
 	logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
 	//logger->setAppender(MASK_APPENDER_CONSOLE);
 	logger->setLevel(ENUM_LOG_LEVEL_DEBUG);
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 		num++;
 		logger->debug("%d %s\n",num,"test你好");
 		logger->info("TEST\n");
-	}
+	}*/
 
 	pYE->drop();
 
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	core::stringc str1=str+"test";
 	printf("%d,%s\n",str1.length(),str1);
 
-	core::stringw wstr;
+	core::stringw wstr(L"%s",L"天天向上");
 	wprintf(L"%d,%s\n",wstr.length(),wstr);
 
 	wstr+=L"中华人民共和国";

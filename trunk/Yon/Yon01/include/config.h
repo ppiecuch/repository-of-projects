@@ -20,6 +20,10 @@
 #define YON_API __declspec(dllimport)
 #endif
 
+//日志格式
+#define YON_LOG_SUCCEED_FORMAT "%-64s【√】\n"
+#define YON_LOG_FAILED_FORMAT "%-64s【╳】\n"
+
 //隐藏控制台
 //#define YON_HIDE_CONSOLE
 

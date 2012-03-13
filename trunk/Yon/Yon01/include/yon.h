@@ -15,6 +15,7 @@
 #include "SYonEngineParameters.h" 
 #include "yon.h" 
 #include "IYonEngine.h" 
+#include "ILogger.h"
 
 namespace yon{
 

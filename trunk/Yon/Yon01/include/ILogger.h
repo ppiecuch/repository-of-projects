@@ -11,16 +11,18 @@ namespace yon{
 namespace debug{
 
 	enum MASK_FORMAT{
+		MASK_FORMAT_NONE = 0,		//空
 		MASK_FORMAT_DATE = 0x1,		//日期
-		MASK_FORMAT_TIME = 0x2,			//时间
-		MASK_FORMAT_LEVEL = 0x4,			//日志级别
-		MASK_FORMAT_COUNT = 3
+		MASK_FORMAT_TIME = 0x2,		//时间
+		MASK_FORMAT_LEVEL = 0x4,	//日志级别
+		MASK_FORMAT_LOG = 0x8,		//日志信息
+		MASK_FORMAT_COUNT = 5
 	};
 
 	enum MASK_APPENDER{
 		MASK_APPENDER_CONSOLE = 0x1,	//控制台
 		MASK_APPENDER_VS = 0x2,			//VS输出窗口
-		MASK_APPENDER_FILE = 0x4,			//单一文件
+		MASK_APPENDER_FILE = 0x4,		//单一文件
 		//MASK_APPENDER_DAILY,		//每日产生一文件
 		MASK_APPENDER_COUNT = 3
 	};
@@ -49,6 +51,8 @@ namespace debug{
 		virtual void error(const c8* pFmt, ...) = 0;;
 
 	};
+	//日志对象,供多方共享
+	YON_API extern ILogger* Logger;
 }//debug
 }//yon
 #endif
