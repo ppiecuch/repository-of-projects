@@ -1,18 +1,29 @@
 #include "yon.h"
-
+#include "CLogger.h"
 #include "CYonEngineWin32.h"
 
 namespace yon{
+
+	
 
 	namespace core
 	{
 		const matrix4f IDENTITY_MATRIX(true);
 	}
 
+	namespace debug{
+		ILogger* Logger=NULL;
+	}
+
+	using namespace debug;
 
 	YON_API IYonEngine* CreateEngine(const SYonEngineParameters& param){
 
-		printf("CreateEngine(%d,%d)\n",param.windowSize.w,param.windowSize.h);
+		if(Logger==NULL){
+			Logger=new debug::CLogger();
+		}else{
+			Logger->grab();
+		}
 
 		IYonEngine* engine;
 
@@ -21,6 +32,8 @@ namespace yon{
 #endif
 
 		YON_DEBUG_BREAK_IF(engine==NULL)
+
+		Logger->info(YON_LOG_SUCCEED_FORMAT,core::stringc("CreateEngine(%d,%d)",param.windowSize.w,param.windowSize.h).c_str());
 
 		return engine;
 	}

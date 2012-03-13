@@ -6,12 +6,12 @@
 namespace yon{
 	namespace debug{
 
-		#define _TRUNCATE ((size_t)-1)
+		//#define _TRUNCATE ((size_t)-1)
 		const core::stringc CLogger::LEVEL_NAME[ENUM_LOG_LEVEL_COUNT]={"DEBUG","INFO","WARN","ERROR"};
 		CLogger::CLogger():
 			m_path(""),m_name("log.txt"),m_pFile(NULL),
-			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_LEVEL),
-			m_level(ENUM_LOG_LEVEL_INFO),m_appender(MASK_APPENDER_FILE){
+			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_LEVEL|MASK_FORMAT_LOG),
+			m_level(ENUM_LOG_LEVEL_INFO),m_appender(MASK_APPENDER_FILE|MASK_APPENDER_VS){
 
 				#ifdef YON_COMPILE_WITH_WIN32
 				InitializeCriticalSection(&m_mutex);
@@ -66,13 +66,19 @@ namespace yon{
 				static time_t lt1;
 				time(&lt1);
 				localtime_s(&newtime,&lt1);
+				sprintf_s(m_buffer+index,2,"[");
+				++index;
 				if(m_format&MASK_FORMAT_DATE){
-					strftime(m_buffer+index,10,"[%y-%m-%d",&newtime);
-					index+=9;
+					strftime(m_buffer+index,11,"%Y-%m-%d",&newtime);
+					index+=10;
+				}
+				if((m_format&MASK_FORMAT_DATE)&&(m_format&MASK_FORMAT_TIME)){
+					sprintf_s(m_buffer+index,2," ");
+					++index;
 				}
 				if(m_format&MASK_FORMAT_TIME){
-					strftime(m_buffer+index,10," %H:%M:%S",&newtime);
-					index+=9;
+					strftime(m_buffer+index,9,"%H:%M:%S",&newtime);
+					index+=8;
 				}
 				//int sprintf_s(char *buffer,size_t sizeOfBuffer,const char *format [,argument] ...);
 				//sprintf_s()是sprintf()的安全版本，通过指定缓冲区长度来避免sprintf()存在的溢出风险
@@ -109,7 +115,12 @@ namespace yon{
 			//vsnprintf_s和_vsnprintf_s没有多少区别只是和以前的相兼容
 			//使用_vsnprintf_s偶尔会发生内存泄露
 			//而使用vsnprintf_s则不会
-			vsnprintf_s(m_buffer+index,BUFFER_SIZE-index,_TRUNCATE,pFmt,args);
+			//vsnprintf_s(m_buffer+index,BUFFER_SIZE-index,_TRUNCATE,pFmt,args);
+			if(m_format&MASK_FORMAT_LOG){
+				vsprintf_s(m_buffer+index,BUFFER_SIZE-index,pFmt,args);
+			}else{
+				sprintf_s(m_buffer+index,2,"\n");
+			}
 			unlock();
 			if(m_appender&MASK_APPENDER_FILE){
 				fprintf(m_pFile,"%s",m_buffer);
@@ -145,6 +156,6 @@ namespace yon{
 			output(ENUM_LOG_LEVEL_ERROR,pFmt,arg);
 			va_end(arg);
 		}
-		#undef _TRUNCATE
+		//#undef _TRUNCATE
 	}//debug
 }//yon

@@ -1,6 +1,8 @@
 #include "COGLES1Driver.h"
+#include "ILogger.h"
 
 namespace yon{
+	using namespace debug;
 namespace video{
 namespace ogles1{
 	unsigned char mIndices[] = { 0, 1, 2 };
@@ -79,7 +81,7 @@ namespace ogles1{
 #ifdef YON_COMPILE_WITH_WIN32
 		destroyEGL();
 #endif//YON_COMPILE_WITH_WIN32
-		printf("~COGLES1Driver\n");
+		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy COGLES1Driver");
 	}
 
 	void COGLES1Driver::begin(bool zBuffer,core::color c){
@@ -118,12 +120,13 @@ namespace ogles1{
 		EGLint majorVersion, minorVersion;
 		if (!eglInitialize( m_eglDisplay, &majorVersion, &minorVersion ) )
 		{
-			MessageBox(NULL,TEXT("Could not initialize OpenGL-ES1 display."),TEXT("Error"),MB_OK);
+			//MessageBox(NULL,TEXT("Could not initialize OpenGL-ES1 display."),TEXT("Error"),MB_OK);
+			Logger->info(YON_LOG_FAILED_FORMAT,"Initialize EglDisplay Object");
 			return false;
 		}
 		else
 		{
-			printf("EglDisplay initialized. Egl version %d.%d\n", majorVersion, minorVersion);
+			Logger->info("EglDisplay initialized. Egl version %d.%d\n", majorVersion, minorVersion);
 		}
 
 		//EGL_RED_SIZE: bits of red in the color buffer
@@ -167,7 +170,8 @@ namespace ogles1{
 		//number of configs returned to 1.
 		if (!eglChooseConfig(m_eglDisplay, attribs, &config, 1, &num_configs))
 		{
-			MessageBox(NULL,TEXT("Could not get config for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
+			//MessageBox(NULL,TEXT("Could not get config for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
+			Logger->info(YON_LOG_FAILED_FORMAT,"Choose EGLConfig");
 			return false;
 		}
 
@@ -189,7 +193,8 @@ namespace ogles1{
 			m_eglSurface = eglCreateWindowSurface(m_eglDisplay, config, NULL, NULL);
 		if (EGL_NO_SURFACE==m_eglSurface)
 		{
-			MessageBox(NULL,TEXT("Could not create surface for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
+			//MessageBox(NULL,TEXT("Could not create surface for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
+			Logger->info(YON_LOG_FAILED_FORMAT,"Create EGLSurface");
 			return false;
 		}
 
@@ -227,7 +232,7 @@ namespace ogles1{
 		//back or copied,which is taken from the frame buffer values of read.
 		//eglMakeCurrent returns EGL_FALSE on failure.
 		if(eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
-			//TODO print
+			Logger->info(YON_LOG_FAILED_FORMAT,"Bind Contexts and Drawables");
 			return false;
 		}
 		return true;
@@ -239,7 +244,11 @@ namespace ogles1{
 		//eglDestroySurface or eglDestroyContext here.
 		//To release the current context without assigning a new one, set ctx to EGL_NO_CONTEXT and set draw and read to
 		//EGL_NO_SURFACE.
-		eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+		if(eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)==EGL_TRUE){
+			Logger->info(YON_LOG_SUCCEED_FORMAT,"Unbind GL contexts and surface");
+		}else{
+			Logger->info(YON_LOG_FAILED_FORMAT,"Unbind GL contexts and surface");
+		}
 		eglDestroyContext(m_eglDisplay, m_eglContext);
 		eglDestroySurface(m_eglDisplay, m_eglSurface);
 
@@ -249,7 +258,11 @@ namespace ogles1{
 		//deletion.Handles to all such resources are invalid as soon as eglTerminate returns,but the dpy handle itself remains
 		//valid.
 		//eglTerminate returns EGL_TRUE on success.
-		eglTerminate(m_eglDisplay);
+		if(eglTerminate(m_eglDisplay)==EGL_TRUE){
+			Logger->info(YON_LOG_SUCCEED_FORMAT,"Release all resources in EGL and display");
+		}else{
+			Logger->info(YON_LOG_FAILED_FORMAT,"Release all resources in EGL and display");
+		}
 	}
 #endif//YON_COMPILE_WITH_WIN32
 
