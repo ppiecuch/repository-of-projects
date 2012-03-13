@@ -1,0 +1,337 @@
+init是一个进程，它是linux系统中用户空间的第一个进程，其进程PID是1，父进程为linux
+系统内核的0号进程。所以其被赋予很多极其重要的职责,linux内核初始化完成后就开始执行它。
+
+
+代码路径：\system\core\init\init.c
+
+
+下面就分析一下先吧，只分析重点的函数功能：
+int main(int argc, char **argv)
+{
+
+     // 1、设置子进程退出的信号处理函数：sigchld_handler
+
+    
+act.sa_handler = sigchld_handler;
+    
+act.sa_flags = SA_NOCLDSTOP;
+    
+act.sa_mask = 0;
+    
+act.sa_restorer = NULL;
+    
+sigaction(SIGCHLD, &act, 0);
+
+    
+// 2、创建文件夹，并挂载设备
+    
+mkdir("/dev", 0755);
+    
+mkdir("/proc", 0755);
+   
+ ....
+    
+    
+// 3、重定向标准输入输出错误到 /dev/__null__
+    
+open_devnull_stdio();
+    
+    
+// 4、解析 init.rc 脚本
+    
+parse_config_file("/init.rc");
+
+
+     // 5、解析机器相关的配置文件，一般相关的放在init.rc中利用service action调过去
+     snprintf(tmp, sizeof(tmp), "/init.%s.rc", hardware);
+    
+parse_config_file(tmp);
+
+
+     // 6、建立 uevent,用于与linux kernel交互的socket
+     device_fd = device_init();
+
+     // 7、初始化及加载属性相关资源，这里利用ashmem共享，属于整个系统的资源
+     property_init();
+
+     // 8、执行 on init 、early-boot 及 boot 片段动作,这些定义于 init.rc 中
+    
+/* execute all the boot actions to get us started */
+    
+action_for_each_trigger("init", action_add_queue_tail);
+    
+drain_action_queue();
+    
+    
+/* execute all the boot actions to get us started */
+    
+action_for_each_trigger("early-boot", action_add_queue_tail);
+    
+action_for_each_trigger("boot", action_add_queue_tail);
+
+  
+// 9、这里定义的init进程需要关注的四个方面事情  
+ufds[0].fd = device_fd;
+    
+ufds[0].events = POLLIN;   // Uevent事件
+    
+ufds[1].fd = property_set_fd;
+    
+ufds[1].events = POLLIN;   // 属性事件
+    
+ufds[2].fd = signal_recv_fd;
+    
+ufds[2].events = POLLIN;   // 子进程事件
+    
+fd_count = 3;
+
+
+   
+ufds[3].fd = keychord_fd;
+    
+ufds[3].events = POLLIN;  // keychord热键事件
+    
+fd_count++;
+
+// ok, 下面就是init进程的处理循环
+for(;;) {
+// I、执行init.rc 脚本中的动作
+        
+drain_action_queue();
+        
+        
+// II、执行标志为SVC_RESTARTING的进程，利用fork+execve启动新的进程
+        
+restart_processes();
+
+
+// III、调用poll轮询上述的四个事件
+        
+nr = poll(ufds, fd_count, timeout);
+        
+if (nr <= 0)
+            
+continue;
+
+
+// IV、依次处理各个事件
+        
+if (ufds[2].revents == POLLIN) {
+            
+/* we got a SIGCHLD - reap and restart as needed */
+            
+read(signal_recv_fd, tmp, sizeof(tmp));
+            
+while (!wait_for_one_process(0))
+                
+;
+            
+continue;
+       
+ }
+
+
+        
+if (ufds[0].revents == POLLIN)
+            
+handle_device_fd(device_fd);
+
+
+       
+ 
+if (ufds[1].revents == POLLIN)
+            
+handle_property_set_fd(property_set_fd);
+        
+if (ufds[3].revents == POLLIN)
+            
+handle_keychord(keychord_fd);
+...
+}
+
+return 0;
+}
+
+
+这里我们重点关注一下service的解析过程：
+
+
+这里以启动 zygote 为例讲解一下：
+service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-system-server
+    socket zygote stream 666   //创建一个stream流式套接字
+    onrestart write /sys/android_power/request_state wake
+    onrestart write /sys/power/state on
+    onrestart restart media
+
+
+服务名称： zygote
+进程路径： /system/bin/app_process
+进程启动参数：-Xzygote /system/bin --zygote --start-system-server
+
+解析入口函数：parse_new_section
+
+void parse_new_section(struct parse_state *state, int kw,
+                       int nargs, char **args)
+{
+    switch(kw) {
+    case K_service:
+        state->context = parse_service(state, nargs, args);
+        if (state->context) {
+            state->parse_line = parse_line_service;
+            return;
+        }
+        break;
+...
+}
+
+
+--> 其中所有的解析的service放在如下双链表结构中
+struct service {
+    /* list of all services */
+    struct listnode slist;
+
+
+    const char *name;
+    const char *classname; //所属class名字，默认为"default"
+
+
+    unsigned flags;
+    pid_t pid;
+
+
+    struct socketinfo *sockets;
+    struct svcenvinfo *envvars;
+
+
+    struct action onrestart;  /* Actions to execute on restart. */
+    ...
+};
+
+
+static void *parse_service(struct parse_state *state, int nargs, char **args)
+{
+    struct service *svc;
+
+    svc = service_find_by_name(args[1]);
+
+    svc->name = args[1];
+    svc->classname = "default";
+    memcpy(svc->args, args + 2, sizeof(char*) * nargs);
+    svc->args[nargs] = 0;
+    svc->nargs = nargs;
+    svc->onrestart.name = "onrestart";
+    list_init(&svc->onrestart.commands);
+
+
+    // 加入到全局 service_list 链表中
+    list_add_tail(&service_list, &svc->slist);
+    return svc;
+}
+
+
+然后执行点都使用 list_for_each(node, &service_list) 循环遍历所有服务及执行动作
+
+
+service 启动：
+
+
+在解析 init.rc 脚本中 
+class_start default 
+这个class_start 是一个COMMAND,其对应的函数是 do_class_start ,注意类似的COMMAND也一样
+加上前缀 do_xxx 即函数名称： ex: mount 对应于 do_mount 
+代码：/system/core/init/builtins.c
+
+
+do_class_start()
+-->service_start_if_not_disabled()
+--> service_start(svc, NULL);
+
+
+void service_start(struct service *svc, const char *dynamic_args)
+{
+    // 已经运行则直接返回
+    if (svc->flags & SVC_RUNNING) {
+        return;
+    }
+
+    
+    NOTICE("starting '%s'\n", svc->name);
+    pid = fork();  //创建子进程 
+    if(pid == 0){
+    
+// 运行于子进程中
+    
+
+    
+// 准备好执行环境
+    
+add_environment(ei->name, ei->value);
+    create_socket(si->name,
+                         !strcmp(si->type, "dgram") ? 
+                         SOCK_DGRAM : SOCK_STREAM,
+                         si->perm, si->uid, si->gid);    
+    
+
+    
+// 开始执行具体的进程
+    
+execve(svc->args[0], (char**) arg_ptrs, (char**) ENV);
+    }
+
+
+    svc->time_started = gettime();
+    svc->pid = pid;
+    svc->flags |= SVC_RUNNING;
+
+
+    notify_service_state(svc->name, "running");
+}
+
+
+onrestart 用于重启使用，这就是最开始那个 sigchld_handler 函数：
+
+
+static void sigchld_handler(int s)
+{
+    write(signal_fd, &s, 1); // 写数据
+}
+
+读取数据处理：
+在 init 进程的main函数中处理:
+    if (ufds[2].revents == POLLIN) {
+        /* we got a SIGCHLD - reap and restart as needed */
+        read(signal_recv_fd, tmp, sizeof(tmp));
+        while (!wait_for_one_process(0))
+            ;
+        continue;
+    }
+
+-->
+static int wait_for_one_process(int block)
+{
+    while ( (pid = waitpid(-1, &status, block ? 0 : WNOHANG)) == -1 && errno == EINTR );
+
+
+// 如果zygote 死则整个系统崩溃
+    if (!(svc->flags & SVC_ONESHOT)) {
+        kill(-pid, SIGKILL);
+        NOTICE("process '%s' killing any children in process group\n", svc->name);
+    }
+
+//超时及重启次数系统重启进入recovery模式
+    if (svc->flags & SVC_CRITICAL) {
+        if (svc->time_crashed + CRITICAL_CRASH_WINDOW >= now) {
+            if (++svc->nr_crashed > CRITICAL_CRASH_THRESHOLD) {
+                ERROR("critical process '%s' exited %d times in %d minutes; "
+                      "rebooting into recovery mode\n", svc->name,
+                      CRITICAL_CRASH_THRESHOLD, CRITICAL_CRASH_WINDOW / 60);
+                sync();
+                __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
+                         LINUX_REBOOT_CMD_RESTART2, "recovery");
+                return 0;
+            }
+        }
+...
+}
+
+http://blog.csdn.net/andyhuabing/article/details/7346203

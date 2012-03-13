@@ -1,4 +1,4 @@
-#Sun Feb 26 23:03:30 CST 2012
+#Tue Mar 13 16:27:56 CST 2012
 eclipse.preferences.version=1
 encoding//3dsmax/3dsmax\u63D2\u4EF6.txt=UTF-8
 encoding//algorithm/image\ process/gauss\ blur/Four\ Tricks\ for\ Fast\ Blurring\ in\ Software\ and\ Hardware.txt=UTF-8
@@ -7,6 +7,7 @@ encoding//android/engine/irrlicht/Generating\ terrain\ with\ different\ textures
 encoding//c_c++/basis/C++\u5B57\u7B26\u4E32\u5206\u8BCD.txt=UTF-8
 encoding//c_c++/thread/\u5728C++\u4E2D\u5B9E\u73B0\u540C\u6B65\u9501,\u7C7B\u4F3CSynchronize\uFF08object\uFF09.txt=UTF-8
 encoding//game/emulator/OpenGL\ ES\ Emulator\u6A2A\u5411\u6BD4\u8F83.txt=UTF-8
+encoding//game/server/\u5E26\u5BBD\u9650\u5236\u4E0B\u7684\u89C6\u89C9\u5B9E\u4F53\u5C5E\u6027\u4F20\u64AD.txt=UTF-8
 encoding//game/shader\ language/\u3010GLSL\u6559\u7A0B\u3011\uFF08\u4E03\uFF09\u9010\u50CF\u7D20\u7684\u5149\u7167.txt=UTF-8
 encoding//game/shader\ language/\u3010GLSL\u6559\u7A0B\u3011\uFF08\u4E5D\uFF09\u5176\u4ED6\u8BF4\u660E.txt=UTF-8
 encoding//game/shader\ language/\u3010GLSL\u6559\u7A0B\u3011\uFF08\u4E8C\uFF09\u5728OpenGL\u4E2D\u4F7F\u7528GLSL.txt=UTF-8
