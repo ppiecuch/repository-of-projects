@@ -36,6 +36,8 @@ int main(int argc, char* argv[])
 
 	setlocale(LC_ALL,"chs");
 
+	
+
 	SYonEngineParameters params;
 	IYonEngine* pYE=CreateEngine(params);
 
@@ -57,6 +59,27 @@ int main(int argc, char* argv[])
 		logger->debug("%d %s\n",num,"test你好");
 		logger->info("TEST\n");
 	}*/
+
+#if 0
+	array<u32> arr(12);
+	array<u32> brr(13);
+	//效率与irrlicht相当
+	Logger->info("start\n");
+	for(u32 i=0;i<10000000;++i){
+		arr=brr;
+	}
+	Logger->info("end\n");
+#endif
+#if 1
+	//效率比irrlicht差1/3
+	Logger->info("start\n");
+	for(u32 i=0;i<10000000;++i){
+		array<u32> arr(12);
+		array<u32> brr(13);
+		arr=brr;
+	}
+	Logger->info("end\n");
+#endif
 
 	pYE->drop();
 
