@@ -35,7 +35,7 @@ namespace debug{
 		ENUM_LOG_LEVEL_COUNT
 	};
 
-	class ILogger : public core::IReferencable{
+	class ILogger : public virtual core::IReferencable{
 	public:
 		virtual ~ILogger(){};
 		virtual void setPath(const core::stringc& path) = 0;

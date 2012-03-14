@@ -247,7 +247,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\vector2d.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\vector3d.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\yonArray.h"
 					>
 				</File>
 				<File
@@ -310,6 +318,18 @@
 			<Filter
 				Name="scene"
 				>
+				<File
+					RelativePath=".\include\IMeshBuffer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\ISceneManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\SVertex.h"
+					>
+				</File>
 				<Filter
 					Name="camera"
 					>
@@ -336,6 +356,18 @@
 				</File>
 				<File
 					RelativePath=".\include\SYonPlatformInfo.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="io"
+				>
+				<File
+					RelativePath=".\include\IFileSystem.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\path.h"
 					>
 				</File>
 			</Filter>

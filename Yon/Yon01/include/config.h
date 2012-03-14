@@ -24,6 +24,9 @@
 #define YON_LOG_SUCCEED_FORMAT "%-64s【√】\n"
 #define YON_LOG_FAILED_FORMAT "%-64s【╳】\n"
 
+//路径使用宽字节
+#define YON_WCHAR_FILESYSTEM
+
 //隐藏控制台
 //#define YON_HIDE_CONSOLE
 

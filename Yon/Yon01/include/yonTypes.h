@@ -1,6 +1,8 @@
 #ifndef _YON_CORE_YONTYPES_H_
 #define _YON_CORE_YONTYPES_H_
 
+#include "config.h"
+
 //ÖÐ¶Ïºê
 
 #if defined(_DEBUG)
@@ -17,6 +19,8 @@
 	#define YON_DEBUG_BREAK_IF( _CONDITION_ )
 #endif
 
+namespace yon{
+
 #ifdef _MSC_VER
 typedef unsigned __int32	u32;
 #else
@@ -32,5 +36,13 @@ typedef signed int			s32;
 typedef char				c8;
 typedef wchar_t				c16;
 typedef float				f32;
+
+#ifdef YON_WCHAR_FILESYSTEM
+typedef wchar_t fschar;
+#else
+typedef char fschar;
+#endif
+
+}//yon
 
 #endif 
