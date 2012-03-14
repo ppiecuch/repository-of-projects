@@ -1,0 +1,42 @@
+为了实现这种方式，STL使用了placement new，通过在自己管理的内存空间上使用placement new来构造对象，以达到原有new operator所具有的功能。
+
+template <class T1, class T2>
+inline void construct(T1* p, const T2& value)
+{
+new(p) T1(value);
+}
+　　此函数接收一个已构造的对象，通过拷贝构造的方式在给定的内存地址p上构造一个新对 象，代码中后半截T1(value)便是placement new语法中调用构造函数的写法，如果传入的对象value正是所要求的类型T1，那么这里就相当于调用拷贝构造函数。类似的，因使用了 placement new，编译器不会自动产生调用析构函数的代码，需要手工的实现：
+
+template <class T>
+inline void destory(T* pointer)
+{
+pointer->~T();
+}
+　　与此同时，STL中还有一个接收两个迭代器的destory版本，可将某容器上指定范 围内的对象全部销毁。典型的实现方式就是通过一个循环来对此范围内的对象逐一调用析构函数。如果所传入的对象是非简单类型，这样做是必要的，但如果传入的 是简单类型，或者根本没有必要调用析构函数的自定义类型（例如只包含数个int成员的结构体），那么再逐一调用析构函数是没有必要的，也浪费了时间。为 此，STL使用了一种称为“type traits”的技巧，在编译器就判断出所传入的类型是否需要调用析构函数：
+
+template <class ForwardIterator>
+inline void destory(ForwardIterator first, ForwardIterator last)
+{
+_destory(first, last, value_type(first));
+}
+　　其中value_type()用于取出迭代器所指向的对象的类型信息，于是：
+
+template<class ForwardIterator, class T>
+inline void __destory(ForwardIterator first, ForwardIterator last, T*)
+{
+typedef typename __type_traits<T>::has_trivial_destructor trivial_destructor;
+__destory_aux(first, last, trivial_destructor());
+}
+//如果需要调用析构函数：
+template<class ForwardIterator>
+inline void __destory_aux(ForwardIterator first, ForwardIterator last, __false_type)
+{
+for(; first < last; ++first)
+destory(&*first); //因first是迭代器，*first取出其真正内容，然后再用&取地址
+}
+//如果不需要，就什么也不做：
+tempalte<class ForwardIterator>
+inline void __destory_aux(ForwardIterator first, ForwardIterator last, __true_type)
+{}
+
+http://www.51testing.com/html/31/n-213531-4.html
