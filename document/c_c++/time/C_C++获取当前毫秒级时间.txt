@@ -1,0 +1,23 @@
+ #include <sys/timeb.h>
+#include <time.h>
+
+void fun
+
+{
+
+......
+
+   struct _timeb timebuffer;
+   _ftime64_s( &timebuffer ); 
+
+   CString strTime;
+   CString strMillTime;
+   strTime.Format(_T("%d"), timebuffer.time);
+   strMillTime.Format(_T("%d"), timebuffer.millitm);
+   strTime += strMillTime;
+
+......
+
+}
+
+http://hi.baidu.com/%B2%BB%BF%CF%B0%B2%D0%AA%B5%C4%C1%E9%BB%EA/blog/item/486233f2d0fcb0d20a46e0d9.html
