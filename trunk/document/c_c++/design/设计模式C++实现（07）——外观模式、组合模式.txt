@@ -1,0 +1,148 @@
+软件领域中的设计模式为开发人员提供了一种使用专家设计经验的有效途径。设计模式中运用了面向对象编程语言的重要特性：封装、继承、多态，真正领悟设计模式的精髓是可能一个漫长的过程，需要大量实践经验的积累。最近看设计模式的书，对于每个模式，用C++写了个小例子，加深一下理解。主要参考《大话设计模式》和《设计模式:可复用面向对象软件的基础》（DP）两本书。本文介绍外观模式和组合模式的实现。
+       外观模式应该是用的很多的一种模式，特别是当一个系统很复杂时，系统提供给客户的是一个简单的对外接口，而把里面复杂的结构都封装了起来。客户只需使用这些简单接口就能使用这个系统，而不需要关注内部复杂的结构。DP一书的定义：为子系统中的一组接口提供一个一致的界面， 外观模式定义了一个高层接口，这个接口使得这一子系统更加容易使用。举个编译器的例子，假设编译一个程序需要经过四个步骤：词法分析、语法分析、中间代码生成、机器码生成。学过编译都知道，每一步都很复杂。对于编译器这个系统，就可以使用外观模式。可以定义一个高层接口，比如名为Compiler的类，里面有一个名为Run的函数。客户只需调用这个函数就可以编译程序，至于Run函数内部的具体操作，客户无需知道。下面给出UML图，以编译器为实例。
+
+        相应的代码实现为：
+[cpp] view plaincopyprint?
+class Scanner  
+{  
+public:  
+    void Scan() { cout<<"词法分析"<<endl; }  
+};  
+class Parser  
+{  
+public:  
+    void Parse() { cout<<"语法分析"<<endl; }  
+};  
+class GenMidCode  
+{  
+public:  
+    void GenCode() { cout<<"产生中间代码"<<endl; }  
+};  
+class GenMachineCode  
+{  
+public:  
+    void GenCode() { cout<<"产生机器码"<<endl;}  
+};  
+//高层接口  
+class Compiler  
+{  
+public:  
+    void Run()   
+    {  
+        Scanner scanner;  
+        Parser parser;  
+        GenMidCode genMidCode;  
+        GenMachineCode genMacCode;  
+        scanner.Scan();  
+        parser.Parse();  
+        genMidCode.GenCode();  
+        genMacCode.GenCode();  
+    }  
+};  
+       客户使用方式：
+[cpp] view plaincopyprint?
+int main()  
+{  
+    Compiler compiler;  
+    compiler.Run();  
+    return 0;  
+}  
+       这就是外观模式，它有几个特点（摘自DP一书），（1）它对客户屏蔽子系统组件，因而减少了客户处理的对象的数目并使得子系统使用起来更加方便。（2）它实现了子系统与客户之间的松耦合关系，而子系统内部的功能组件往往是紧耦合的。（3）如果应用需要，它并不限制它们使用子系统类。
+       结合上面编译器这个例子，进一步说明。对于（1），编译器类对客户屏蔽了子系统组件，客户只需处理编译器的对象就可以方便的使用子系统。对于（2），子系统的变化，不会影响到客户的使用，体现了子系统与客户的松耦合关系。对于（3），如果客户希望使用词法分析器，只需定义词法分析的类对象即可，并不受到限制。
+      外观模式在构建大型系统时非常有用。接下来介绍另一种模式，称为组合模式。感觉有点像外观模式，刚才我们实现外观模式时，在Compiler这个类中包含了多个类的对象，就像把这些类组合在了一起。组合模式是不是这个意思，有点相似，其实不然。
+      DP书上给出的定义：将对象组合成树形结构以表示“部分-整体”的层次结构。组合使得用户对单个对象和组合对象的使用具有一致性。注意两个字“树形”。这种树形结构在现实生活中随处可见，比如一个集团公司，它有一个母公司，下设很多家子公司。不管是母公司还是子公司，都有各自直属的财务部、人力资源部、销售部等。对于母公司来说，不论是子公司，还是直属的财务部、人力资源部，都是它的部门。整个公司的部门拓扑图就是一个树形结构。
+      下面给出组合模式的UML图。从图中可以看到，FinanceDepartment、HRDepartment两个类作为叶结点，因此没有定义添加函数。而ConcreteCompany类可以作为中间结点，所以可以有添加函数。那么怎么添加呢？这个类中定义了一个链表，用来放添加的元素。
+
+       相应的代码实现为：
+[cpp] view plaincopyprint?
+class Company    
+{  
+public:  
+    Company(string name) { m_name = name; }  
+    virtual ~Company(){}  
+    virtual void Add(Company *pCom){}  
+    virtual void Show(int depth) {}  
+protected:  
+    string m_name;  
+};  
+//具体公司  
+class ConcreteCompany : public Company    
+{  
+public:  
+    ConcreteCompany(string name): Company(name) {}  
+    virtual ~ConcreteCompany() {}  
+    void Add(Company *pCom) { m_listCompany.push_back(pCom); } //位于树的中间，可以增加子树  
+    void Show(int depth)  
+    {  
+        for(int i = 0;i < depth; i++)  
+            cout<<"-";  
+        cout<<m_name<<endl;  
+        list<Company *>::iterator iter=m_listCompany.begin();  
+        for(; iter != m_listCompany.end(); iter++) //显示下层结点  
+            (*iter)->Show(depth + 2);  
+    }  
+private:  
+    list<Company *> m_listCompany;  
+};  
+//具体的部门，财务部  
+class FinanceDepartment : public Company   
+{  
+public:  
+    FinanceDepartment(string name):Company(name){}  
+    virtual ~FinanceDepartment() {}  
+    virtual void Show(int depth) //只需显示，无限添加函数，因为已是叶结点  
+    {  
+        for(int i = 0; i < depth; i++)  
+            cout<<"-";  
+        cout<<m_name<<endl;  
+    }  
+};  
+//具体的部门，人力资源部  
+class HRDepartment :public Company    
+{  
+public:  
+    HRDepartment(string name):Company(name){}  
+    virtual ~HRDepartment() {}  
+    virtual void Show(int depth) //只需显示，无限添加函数，因为已是叶结点  
+    {  
+        for(int i = 0; i < depth; i++)  
+            cout<<"-";  
+        cout<<m_name<<endl;  
+    }  
+};  
+         客户使用方式：
+[cpp] view plaincopyprint?
+int main()  
+{  
+    Company *root = new ConcreteCompany("总公司");  
+    Company *leaf1=new FinanceDepartment("财务部");  
+    Company *leaf2=new HRDepartment("人力资源部");  
+    root->Add(leaf1);  
+    root->Add(leaf2);  
+  
+    //分公司A  
+    Company *mid1 = new ConcreteCompany("分公司A");  
+    Company *leaf3=new FinanceDepartment("财务部");  
+    Company *leaf4=new HRDepartment("人力资源部");  
+    mid1->Add(leaf3);  
+    mid1->Add(leaf4);  
+    root->Add(mid1);  
+    //分公司B  
+    Company *mid2=new ConcreteCompany("分公司B");  
+    FinanceDepartment *leaf5=new FinanceDepartment("财务部");  
+    HRDepartment *leaf6=new HRDepartment("人力资源部");  
+    mid2->Add(leaf5);  
+    mid2->Add(leaf6);  
+    root->Add(mid2);  
+    root->Show(0);  
+  
+    delete leaf1; delete leaf2;  
+    delete leaf3; delete leaf4;  
+    delete leaf5; delete leaf6;   
+    delete mid1; delete mid2;  
+    delete root;  
+    return 0;  
+}  
+        上面的实现方式有缺点，就是内存的释放不好，需要客户自己动手，非常不方便。有待改进，比较好的做法是让ConcreteCompany类来释放。因为所有的指针都是存在ConcreteCompany类的链表中。C++的麻烦，没有垃圾回收机制。
+        
+        http://blog.csdn.net/wuzhekai1985/article/details/6667564
