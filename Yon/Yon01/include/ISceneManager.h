@@ -9,6 +9,8 @@ namespace yon{
 		class ISceneManager : public virtual core::IReferencable{
 		public:
 			virtual ~ISceneManager() {}
+
+			virtual void render() = 0;
 		};
 
 	}//scene

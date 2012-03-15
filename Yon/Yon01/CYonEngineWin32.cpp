@@ -3,7 +3,6 @@
 #include "ILogger.h"
 
 namespace yon{
-	using namespace debug;
 namespace platform{
 
 	

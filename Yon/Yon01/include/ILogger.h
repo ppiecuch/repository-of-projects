@@ -14,9 +14,10 @@ namespace debug{
 		MASK_FORMAT_NONE = 0,		//空
 		MASK_FORMAT_DATE = 0x1,		//日期
 		MASK_FORMAT_TIME = 0x2,		//时间
-		MASK_FORMAT_LEVEL = 0x4,	//日志级别
-		MASK_FORMAT_LOG = 0x8,		//日志信息
-		MASK_FORMAT_COUNT = 5
+		MASK_FORMAT_MSEC = 0x4,		//毫秒
+		MASK_FORMAT_LEVEL = 0x8,	//日志级别
+		MASK_FORMAT_LOG = 0x10,		//日志信息
+		MASK_FORMAT_COUNT = 6
 	};
 
 	enum MASK_APPENDER{
@@ -54,5 +55,6 @@ namespace debug{
 	//日志对象,供多方共享
 	YON_API extern ILogger* Logger;
 }//debug
+	using namespace debug;
 }//yon
 #endif

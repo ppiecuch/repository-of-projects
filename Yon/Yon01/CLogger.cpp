@@ -1,7 +1,8 @@
 #include "CLogger.h"
 #include "exception.h"
 #include <memory.h>
-#include  <time.h>
+#include <time.h>
+#include <sys/timeb.h>
 
 namespace yon{
 	namespace debug{
@@ -10,8 +11,8 @@ namespace yon{
 		const core::stringc CLogger::LEVEL_NAME[ENUM_LOG_LEVEL_COUNT]={"DEBUG","INFO","WARN","ERROR"};
 		CLogger::CLogger():
 			m_path(""),m_name("log.txt"),m_pFile(NULL),
-			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_LEVEL|MASK_FORMAT_LOG),
-			m_level(ENUM_LOG_LEVEL_INFO),m_appender(MASK_APPENDER_FILE|MASK_APPENDER_VS){
+			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_MSEC|MASK_FORMAT_LEVEL|MASK_FORMAT_LOG),
+			m_level(ENUM_LOG_LEVEL_DEBUG),m_appender(MASK_APPENDER_FILE|MASK_APPENDER_VS){
 
 				#ifdef YON_COMPILE_WITH_WIN32
 				InitializeCriticalSection(&m_mutex);
@@ -63,6 +64,32 @@ namespace yon{
 		void CLogger::appendDateTime(int& index){
 			if((m_format&MASK_FORMAT_DATE)||(m_format&MASK_FORMAT_TIME)){
 				static struct tm newtime;
+				static struct _timeb timebuffer;
+				_ftime64_s(&timebuffer); 
+				localtime_s(&newtime,&timebuffer.time);
+				sprintf_s(m_buffer+index,2,"[");
+				++index;
+				if(m_format&MASK_FORMAT_DATE){
+					strftime(m_buffer+index,11,"%Y-%m-%d",&newtime);
+					index+=10;
+				}
+				if((m_format&MASK_FORMAT_DATE)&&(m_format&MASK_FORMAT_TIME)){
+					sprintf_s(m_buffer+index,2," ");
+					++index;
+				}
+				if(m_format&MASK_FORMAT_TIME){
+					strftime(m_buffer+index,9,"%H:%M:%S",&newtime);
+					index+=8;
+				}
+				if((m_format&MASK_FORMAT_TIME)&&(m_format&MASK_FORMAT_MSEC)){
+					sprintf_s(m_buffer+index,2,".");
+					++index;
+				}
+				if(m_format&MASK_FORMAT_MSEC){
+					sprintf_s(m_buffer+index,4,"%03d",timebuffer.millitm);
+					index+=3;
+				}
+				/*static struct tm newtime;
 				static time_t lt1;
 				time(&lt1);
 				localtime_s(&newtime,&lt1);
@@ -79,7 +106,7 @@ namespace yon{
 				if(m_format&MASK_FORMAT_TIME){
 					strftime(m_buffer+index,9,"%H:%M:%S",&newtime);
 					index+=8;
-				}
+				}*/
 				//int sprintf_s(char *buffer,size_t sizeOfBuffer,const char *format [,argument] ...);
 				//sprintf_s()是sprintf()的安全版本，通过指定缓冲区长度来避免sprintf()存在的溢出风险
 				sprintf_s(m_buffer+index,2,"]");

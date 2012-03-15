@@ -319,11 +319,31 @@
 				Name="scene"
 				>
 				<File
-					RelativePath=".\include\IMeshBuffer.h"
+					RelativePath=".\CEntity.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CUnit.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\IEntity.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\IGeometryFactory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\IModel.h"
 					>
 				</File>
 				<File
 					RelativePath=".\include\ISceneManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\IUnit.h"
 					>
 				</File>
 				<File

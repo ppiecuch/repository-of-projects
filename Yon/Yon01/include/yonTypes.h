@@ -28,6 +28,12 @@ typedef unsigned int		u32;
 #endif
 
 #ifdef _MSC_VER
+typedef unsigned __int16	u16;
+#else
+typedef unsigned short		u16;
+#endif
+
+#ifdef _MSC_VER
 typedef __int32				s32;
 #else
 typedef signed int			s32;

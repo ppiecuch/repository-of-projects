@@ -12,9 +12,9 @@ namespace yon{
 			IReferencable():referenced(1){}
 			virtual ~IReferencable(){}
 
-			void grab() const{++referenced;}
+			inline void grab() const{++referenced;}
 
-			bool drop() const
+			inline bool drop() const
 			{
 				YON_DEBUG_BREAK_IF(referenced<=0)
 
