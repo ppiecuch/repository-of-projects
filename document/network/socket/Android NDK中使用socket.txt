@@ -1,0 +1,71 @@
+
+Android NDK中使用socket的整个过程分为以下几部分：
+
+第一部分: 创建socket并绑定IP和端口
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+#define MAX_DATA_BUF_LEN 10240
+
+int sd = INVALID_SOCKET;
+sockaddr_in addr_org;  // 发送端地址
+
+sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);  // 创建socket
+
+addr_org.sin_family = AF_INET;
+addr_org.sin_addr.s_addr = inet_addr("192.128.0.1");  // 发送端IP
+addr_org.sin_port = htons(8080);  // 发送端端口
+
+bind(sd, (struct sockaddr *)&(addr_org), sizeof(struct sockaddr_in));  // 绑定IP和端口
+复制代码
+
+
+第二部分: 发送数据
+sockaddr_in addr_dst;  // 接收端地址
+
+addr_dst.sin_family = AF_INET;
+addr_dst.sin_addr.s_addr = inet_addr("192.128.0.2");  // 接收端IP
+addr_dst.sin_port = htons(8080);  // 接收端端口
+
+... // 生成要发送的数据到SendDataBuff, 长度为ulLen
+sendto(sd, SendDataBuff, ulLen, 0, (struct sockaddr *)&(addr_dst), sizeof(sockaddr_in));  // 发送SendDataBuff中的数据
+复制代码
+
+
+第三部分: 在线程中接收数据(非阻塞式)
+void *SocketReceiveThread(void *pParam)
+{
+    fd_set fdset;
+    struct timeval delayval;
+    unsigned long lRetVal;
+
+    delayval.tv_sec  = 0;
+    delayval.tv_usec = 5000;    /*5ms延时*/
+
+    while (!end_flag)
+    {
+        FD_ZERO(&fdset);
+        FD_SET(sd, &fdset);
+
+        lRetVal = select(sd+1, &fdset, NULL, NULL, &delayval); // 尤其要注意第一个参数
+        if (0 == lRetVal)
+        {
+            continue;
+        }
+        else if (SOCKET_ERROR == lRetVal)
+        {
+            break;
+        }
+        else if (FD_ISSET(sd, &fdset) != 0)
+        {
+            char RecvDataBuff[MAX_DATA_BUF_LEN];  // 接收数据buffer
+            unsigned long ulLen = recvfrom(sd, RecvDataBuff, MAX_DATA_BUF_LEN, 0, NULL, NULL);
+            ... // 处理接收到的数据
+        }
+    }
+}
+复制代码
+
+第四部分: 关闭socket
+close(sd);
