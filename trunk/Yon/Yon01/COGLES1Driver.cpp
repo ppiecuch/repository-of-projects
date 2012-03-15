@@ -2,7 +2,6 @@
 #include "ILogger.h"
 
 namespace yon{
-	using namespace debug;
 namespace video{
 namespace ogles1{
 	unsigned char mIndices[] = { 0, 1, 2 };

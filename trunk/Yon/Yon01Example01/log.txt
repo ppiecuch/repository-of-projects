@@ -1,0 +1,338 @@
+[2012-03-15 20:31:21][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 20:31:21][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 20:31:21][INFO]start
+[2012-03-15 20:32:14][INFO]end
+[2012-03-15 20:32:14][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 20:32:14][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 20:32:14][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 20:32:14][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 20:32:14][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:37:24][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:37:24][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:37:24][INFO]start
+[2012-03-15 22:38:18][INFO]end
+[2012-03-15 22:38:18][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:38:18][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:38:18][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:38:18][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:38:18][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:38:53.335][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:38:53.694][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:38:53.694][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:38:53.709][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:38:53.709][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:38:53.709][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:38:53.709][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:40:04.128][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:40:04.456][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:40:04.471][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:40:04.487][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:40:04.487][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:40:04.487][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:40:04.487][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:42:53.611][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:42:53.923][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:42:53.923][INFO]start
+[2012-03-15 22:42:54.843][INFO]end
+[2012-03-15 22:42:54.843][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:42:54.843][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:42:54.843][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:42:54.859][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:42:54.859][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:43:51.816][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:43:52.157][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:43:52.157][INFO]start
+[2012-03-15 22:43:52.796][INFO]end
+[2012-03-15 22:43:52.796][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:43:52.812][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:43:52.812][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:43:52.812][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:43:52.812][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:44:43.747][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:44:44.077][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:44:44.077][INFO]start
+[2012-03-15 22:44:44.718][INFO]size:0
+[2012-03-15 22:44:44.718][INFO]end
+[2012-03-15 22:44:44.718][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:44:44.733][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:44:44.733][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:44:44.749][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:44:44.749][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:46:05.419][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:46:05.762][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:46:05.762][INFO]start
+[2012-03-15 22:46:08.055][INFO]size:10000000
+[2012-03-15 22:46:08.055][INFO]end
+[2012-03-15 22:46:08.055][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:46:08.075][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:46:08.075][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:46:08.085][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:46:08.085][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:49:13.454][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:49:13.750][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:49:13.750][INFO]start
+[2012-03-15 22:49:13.750][DEBUG]start array reallocate[2012-03-15 22:49:13.750][DEBUG]end array reallocate[2012-03-15 22:49:13.750][DEBUG]start array reallocate[2012-03-15 22:49:13.750][DEBUG]end array reallocate[2012-03-15 22:49:13.750][DEBUG]start array reallocate[2012-03-15 22:49:13.750][DEBUG]end array reallocate[2012-03-15 22:49:13.750][DEBUG]start array reallocate[2012-03-15 22:49:13.750][DEBUG]end array reallocate[2012-03-15 22:49:13.750][DEBUG]start array reallocate[2012-03-15 22:49:13.750][DEBUG]end array reallocate[2012-03-15 22:49:13.750][DEBUG]start array reallocate[2012-03-15 22:49:13.750][DEBUG]end array reallocate[2012-03-15 22:49:13.750][DEBUG]start array reallocate[2012-03-15 22:49:13.750][DEBUG]end array reallocate[2012-03-15 22:49:13.766][DEBUG]start array reallocate[2012-03-15 22:49:13.766][DEBUG]end array reallocate[2012-03-15 22:49:13.766][DEBUG]start array reallocate[2012-03-15 22:49:13.766][DEBUG]end array reallocate[2012-03-15 22:49:13.782][DEBUG]start array reallocate[2012-03-15 22:49:13.782][DEBUG]end array reallocate[2012-03-15 22:49:13.782][DEBUG]start array reallocate[2012-03-15 22:49:13.782][DEBUG]end array reallocate[2012-03-15 22:49:13.797][DEBUG]start array reallocate[2012-03-15 22:49:13.797][DEBUG]end array reallocate[2012-03-15 22:49:13.828][DEBUG]start array reallocate[2012-03-15 22:49:13.828][DEBUG]end array reallocate[2012-03-15 22:49:13.860][DEBUG]start array reallocate[2012-03-15 22:49:13.860][DEBUG]end array reallocate[2012-03-15 22:49:13.922][DEBUG]start array reallocate[2012-03-15 22:49:13.922][DEBUG]end array reallocate[2012-03-15 22:49:14.016][DEBUG]start array reallocate[2012-03-15 22:49:14.016][DEBUG]end array reallocate[2012-03-15 22:49:14.156][DEBUG]start array reallocate[2012-03-15 22:49:14.156][DEBUG]end array reallocate[2012-03-15 22:49:14.382][DEBUG]start array reallocate[2012-03-15 22:49:14.382][DEBUG]end array reallocate[2012-03-15 22:49:14.732][DEBUG]start array reallocate[2012-03-15 22:49:14.732][DEBUG]end array reallocate[2012-03-15 22:49:15.282][DEBUG]start array reallocate[2012-03-15 22:49:15.282][DEBUG]end array reallocate[2012-03-15 22:49:16.152][DEBUG]start array reallocate[2012-03-15 22:49:16.152][DEBUG]end array reallocate[2012-03-15 22:49:17.472][DEBUG]start array reallocate[2012-03-15 22:49:17.472][DEBUG]end array reallocate[2012-03-15 22:49:19.619][DEBUG]start array reallocate[2012-03-15 22:49:19.619][DEBUG]end array reallocate[2012-03-15 22:49:22.801][DEBUG]start array reallocate[2012-03-15 22:49:22.801][DEBUG]end array reallocate[2012-03-15 22:49:27.806][DEBUG]start array reallocate[2012-03-15 22:49:27.806][DEBUG]end array reallocate[2012-03-15 22:49:35.653][DEBUG]start array reallocate[2012-03-15 22:49:35.653][DEBUG]end array reallocate[2012-03-15 22:49:48.174][DEBUG]start array reallocate[2012-03-15 22:49:48.189][DEBUG]end array reallocate[2012-03-15 22:50:05.480][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:50:05.792][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:50:05.792][INFO]start
+[2012-03-15 22:50:05.792][DEBUG]start array reallocate[2012-03-15 22:50:05.792][DEBUG]end array reallocate[2012-03-15 22:50:05.792][DEBUG]start array reallocate[2012-03-15 22:50:05.792][DEBUG]end array reallocate[2012-03-15 22:50:05.792][DEBUG]start array reallocate[2012-03-15 22:50:05.792][DEBUG]end array reallocate[2012-03-15 22:50:05.792][DEBUG]start array reallocate[2012-03-15 22:50:05.792][DEBUG]end array reallocate[2012-03-15 22:50:05.792][DEBUG]start array reallocate[2012-03-15 22:50:05.792][DEBUG]end array reallocate[2012-03-15 22:50:05.792][DEBUG]start array reallocate[2012-03-15 22:50:05.792][DEBUG]end array reallocate[2012-03-15 22:50:05.792][DEBUG]start array reallocate[2012-03-15 22:50:05.792][DEBUG]end array reallocate[2012-03-15 22:50:05.792][DEBUG]start array reallocate[2012-03-15 22:50:05.792][DEBUG]end array reallocate[2012-03-15 22:50:05.808][DEBUG]start array reallocate[2012-03-15 22:50:05.808][DEBUG]end array reallocate[2012-03-15 22:50:05.808][DEBUG]start array reallocate[2012-03-15 22:50:05.808][DEBUG]end array reallocate[2012-03-15 22:50:05.823][DEBUG]start array reallocate[2012-03-15 22:50:05.823][DEBUG]end array reallocate[2012-03-15 22:50:05.839][DEBUG]start array reallocate[2012-03-15 22:50:05.839][DEBUG]end array reallocate[2012-03-15 22:50:05.870][DEBUG]start array reallocate[2012-03-15 22:50:05.870][DEBUG]end array reallocate[2012-03-15 22:50:05.901][DEBUG]start array reallocate[2012-03-15 22:50:05.901][DEBUG]end array reallocate[2012-03-15 22:50:05.964][DEBUG]start array reallocate[2012-03-15 22:50:05.964][DEBUG]end array reallocate[2012-03-15 22:50:06.042][DEBUG]start array reallocate[2012-03-15 22:50:06.042][DEBUG]end array reallocate[2012-03-15 22:50:06.182][DEBUG]start array reallocate[2012-03-15 22:50:06.198][DEBUG]end array reallocate[2012-03-15 22:50:06.416][DEBUG]start array reallocate[2012-03-15 22:50:06.416][DEBUG]end array reallocate[2012-03-15 22:50:06.762][DEBUG]start array reallocate[2012-03-15 22:50:06.772][DEBUG]end array reallocate[2012-03-15 22:50:07.182][INFO]size:10000
+[2012-03-15 22:50:07.182][INFO]end
+[2012-03-15 22:50:07.182][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:50:07.202][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:50:07.202][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:50:07.212][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:50:07.212][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:50:31.300][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:50:31.612][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:50:31.612][INFO]start
+[2012-03-15 22:50:31.612][DEBUG]start array reallocate
+[2012-03-15 22:50:31.675][DEBUG]end array reallocate
+[2012-03-15 22:50:31.675][DEBUG]start array reallocate
+[2012-03-15 22:50:31.675][DEBUG]end array reallocate
+[2012-03-15 22:50:31.675][DEBUG]start array reallocate
+[2012-03-15 22:50:31.675][DEBUG]end array reallocate
+[2012-03-15 22:50:31.675][DEBUG]start array reallocate
+[2012-03-15 22:50:31.675][DEBUG]end array reallocate
+[2012-03-15 22:50:31.675][DEBUG]start array reallocate
+[2012-03-15 22:50:31.675][DEBUG]end array reallocate
+[2012-03-15 22:50:31.675][DEBUG]start array reallocate
+[2012-03-15 22:50:31.675][DEBUG]end array reallocate
+[2012-03-15 22:50:31.675][DEBUG]start array reallocate
+[2012-03-15 22:50:31.675][DEBUG]end array reallocate
+[2012-03-15 22:50:31.675][DEBUG]start array reallocate
+[2012-03-15 22:50:31.675][DEBUG]end array reallocate
+[2012-03-15 22:50:31.675][DEBUG]start array reallocate
+[2012-03-15 22:50:31.675][DEBUG]end array reallocate
+[2012-03-15 22:50:31.690][DEBUG]start array reallocate
+[2012-03-15 22:50:31.690][DEBUG]end array reallocate
+[2012-03-15 22:50:31.706][DEBUG]start array reallocate
+[2012-03-15 22:50:31.706][DEBUG]end array reallocate
+[2012-03-15 22:50:31.721][DEBUG]start array reallocate
+[2012-03-15 22:50:31.721][DEBUG]end array reallocate
+[2012-03-15 22:50:31.737][DEBUG]start array reallocate
+[2012-03-15 22:50:31.737][DEBUG]end array reallocate
+[2012-03-15 22:50:31.784][DEBUG]start array reallocate
+[2012-03-15 22:50:31.784][DEBUG]end array reallocate
+[2012-03-15 22:50:31.831][DEBUG]start array reallocate
+[2012-03-15 22:50:31.831][DEBUG]end array reallocate
+[2012-03-15 22:50:31.924][DEBUG]start array reallocate
+[2012-03-15 22:50:31.924][DEBUG]end array reallocate
+[2012-03-15 22:50:32.065][DEBUG]start array reallocate
+[2012-03-15 22:50:32.065][DEBUG]end array reallocate
+[2012-03-15 22:50:32.299][DEBUG]start array reallocate
+[2012-03-15 22:50:32.299][DEBUG]end array reallocate
+[2012-03-15 22:50:32.642][DEBUG]start array reallocate
+[2012-03-15 22:50:32.642][DEBUG]end array reallocate
+[2012-03-15 22:50:33.063][INFO]size:10000
+[2012-03-15 22:50:33.063][INFO]end
+[2012-03-15 22:50:33.063][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:50:33.079][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:50:33.079][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:50:33.079][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:50:33.079][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:52:13.687][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:52:13.984][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:52:13.984][INFO]start
+[2012-03-15 22:52:13.984][DEBUG]start array reallocate
+[2012-03-15 22:52:13.984][DEBUG]end array reallocate
+[2012-03-15 22:52:13.984][DEBUG]start array reallocate
+[2012-03-15 22:52:13.999][DEBUG]end array reallocate
+[2012-03-15 22:52:13.999][DEBUG]start array reallocate
+[2012-03-15 22:52:13.999][DEBUG]end array reallocate
+[2012-03-15 22:52:13.999][DEBUG]start array reallocate
+[2012-03-15 22:52:13.999][DEBUG]end array reallocate
+[2012-03-15 22:52:13.999][DEBUG]start array reallocate
+[2012-03-15 22:52:13.999][DEBUG]end array reallocate
+[2012-03-15 22:52:13.999][DEBUG]start array reallocate
+[2012-03-15 22:52:13.999][DEBUG]end array reallocate
+[2012-03-15 22:52:13.999][DEBUG]start array reallocate
+[2012-03-15 22:52:13.999][DEBUG]end array reallocate
+[2012-03-15 22:52:13.999][DEBUG]start array reallocate
+[2012-03-15 22:52:13.999][DEBUG]end array reallocate
+[2012-03-15 22:52:13.999][DEBUG]start array reallocate
+[2012-03-15 22:52:13.999][DEBUG]end array reallocate
+[2012-03-15 22:52:14.015][DEBUG]start array reallocate
+[2012-03-15 22:52:14.015][DEBUG]end array reallocate
+[2012-03-15 22:52:14.030][DEBUG]start array reallocate
+[2012-03-15 22:52:14.030][DEBUG]end array reallocate
+[2012-03-15 22:52:14.046][DEBUG]start array reallocate
+[2012-03-15 22:52:14.046][DEBUG]end array reallocate
+[2012-03-15 22:52:14.062][DEBUG]start array reallocate
+[2012-03-15 22:52:14.062][DEBUG]end array reallocate
+[2012-03-15 22:52:14.108][DEBUG]start array reallocate
+[2012-03-15 22:52:14.108][DEBUG]end array reallocate
+[2012-03-15 22:52:14.155][DEBUG]start array reallocate
+[2012-03-15 22:52:14.155][DEBUG]end array reallocate
+[2012-03-15 22:52:14.249][DEBUG]start array reallocate
+[2012-03-15 22:52:14.249][DEBUG]end array reallocate
+[2012-03-15 22:52:14.389][DEBUG]start array reallocate
+[2012-03-15 22:52:14.389][DEBUG]end array reallocate
+[2012-03-15 22:52:14.623][DEBUG]start array reallocate
+[2012-03-15 22:52:14.623][DEBUG]end array reallocate
+[2012-03-15 22:52:14.966][DEBUG]start array reallocate
+[2012-03-15 22:52:14.966][DEBUG]end array reallocate
+[2012-03-15 22:52:15.512][DEBUG]start array reallocate
+[2012-03-15 22:52:15.512][DEBUG]end array reallocate
+[2012-03-15 22:52:16.386][DEBUG]start array reallocate
+[2012-03-15 22:52:16.386][DEBUG]end array reallocate
+[2012-03-15 22:52:17.696][DEBUG]start array reallocate
+[2012-03-15 22:52:17.696][DEBUG]end array reallocate
+[2012-03-15 22:52:19.756][DEBUG]start array reallocate
+[2012-03-15 22:52:19.756][DEBUG]end array reallocate
+[2012-03-15 22:52:22.938][DEBUG]start array reallocate
+[2012-03-15 22:52:22.938][DEBUG]end array reallocate
+[2012-03-15 22:52:27.932][DEBUG]start array reallocate
+[2012-03-15 22:52:27.932][DEBUG]end array reallocate
+[2012-03-15 22:52:35.794][DEBUG]start array reallocate
+[2012-03-15 22:52:35.794][DEBUG]end array reallocate
+[2012-03-15 22:52:48.015][DEBUG]start array reallocate
+[2012-03-15 22:52:48.015][DEBUG]end array reallocate
+[2012-03-15 22:53:07.055][DEBUG]start array reallocate
+[2012-03-15 22:53:07.055][DEBUG]end array reallocate
+[2012-03-15 22:53:36.975][DEBUG]start array reallocate
+[2012-03-15 22:53:36.975][DEBUG]end array reallocate
+[2012-03-15 22:54:23.684][DEBUG]start array reallocate
+[2012-03-15 22:54:23.699][DEBUG]end array reallocate
+[2012-03-15 22:54:31.312][INFO]size:100000
+[2012-03-15 22:54:31.312][INFO]end
+[2012-03-15 22:54:31.312][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:54:31.328][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:54:31.328][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:54:31.328][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:54:31.328][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 22:56:50.166][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 22:56:50.478][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 22:56:50.478][INFO]start
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.478][DEBUG]start array reallocate
+[2012-03-15 22:56:50.478][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.494][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.494][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.494][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.494][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.494][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.494][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.494][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.494][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.494][DEBUG]end array reallocate
+[2012-03-15 22:56:50.494][DEBUG]start array reallocate
+[2012-03-15 22:56:50.509][DEBUG]end array reallocate
+[2012-03-15 22:56:50.509][DEBUG]start array reallocate
+[2012-03-15 22:56:50.509][DEBUG]end array reallocate
+[2012-03-15 22:56:50.509][DEBUG]start array reallocate
+[2012-03-15 22:56:50.509][DEBUG]end array reallocate
+[2012-03-15 22:56:50.509][DEBUG]start array reallocate
+[2012-03-15 22:56:50.525][DEBUG]end array reallocate
+[2012-03-15 22:56:50.525][DEBUG]start array reallocate
+[2012-03-15 22:56:50.525][DEBUG]end array reallocate
+[2012-03-15 22:56:50.525][DEBUG]start array reallocate
+[2012-03-15 22:56:50.540][DEBUG]end array reallocate
+[2012-03-15 22:56:50.540][DEBUG]start array reallocate
+[2012-03-15 22:56:50.540][DEBUG]end array reallocate
+[2012-03-15 22:56:50.540][DEBUG]start array reallocate
+[2012-03-15 22:56:50.556][DEBUG]end array reallocate
+[2012-03-15 22:56:50.556][DEBUG]start array reallocate
+[2012-03-15 22:56:50.572][DEBUG]end array reallocate
+[2012-03-15 22:56:50.572][DEBUG]start array reallocate
+[2012-03-15 22:56:50.587][DEBUG]end array reallocate
+[2012-03-15 22:56:50.603][DEBUG]start array reallocate
+[2012-03-15 22:56:50.618][DEBUG]end array reallocate
+[2012-03-15 22:56:50.618][DEBUG]start array reallocate
+[2012-03-15 22:56:50.650][DEBUG]end array reallocate
+[2012-03-15 22:56:50.650][DEBUG]start array reallocate
+[2012-03-15 22:56:50.681][DEBUG]end array reallocate
+[2012-03-15 22:56:50.696][DEBUG]start array reallocate
+[2012-03-15 22:56:50.728][DEBUG]end array reallocate
+[2012-03-15 22:56:50.743][DEBUG]start array reallocate
+[2012-03-15 22:56:50.774][DEBUG]end array reallocate
+[2012-03-15 22:56:50.806][DEBUG]start array reallocate
+[2012-03-15 22:56:50.852][DEBUG]end array reallocate
+[2012-03-15 22:56:50.884][DEBUG]start array reallocate
+[2012-03-15 22:56:50.946][DEBUG]end array reallocate
+[2012-03-15 22:56:50.993][DEBUG]start array reallocate
+[2012-03-15 22:56:51.055][DEBUG]end array reallocate
+[2012-03-15 22:56:51.102][DEBUG]start array reallocate
+[2012-03-15 22:56:51.196][DEBUG]end array reallocate
+[2012-03-15 22:56:51.258][DEBUG]start array reallocate
+[2012-03-15 22:56:51.367][DEBUG]end array reallocate
+[2012-03-15 22:56:51.445][DEBUG]start array reallocate
+[2012-03-15 22:56:51.586][DEBUG]end array reallocate
+[2012-03-15 22:56:51.679][DEBUG]start array reallocate
+[2012-03-15 22:56:51.835][DEBUG]end array reallocate
+[2012-03-15 22:56:51.960][DEBUG]start array reallocate
+[2012-03-15 22:56:52.178][DEBUG]end array reallocate
+[2012-03-15 22:56:52.334][DEBUG]start array reallocate
+[2012-03-15 22:56:52.615][DEBUG]end array reallocate
+[2012-03-15 22:56:52.756][INFO]size:10000000
+[2012-03-15 22:56:52.756][INFO]end
+[2012-03-15 22:56:52.756][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 22:56:52.771][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 22:56:52.771][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 22:56:52.787][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 22:56:52.787][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 23:09:12.405][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 23:09:12.717][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 23:09:12.717][INFO]start
+[2012-03-15 23:09:14.948][INFO]size:10000000
+[2012-03-15 23:09:14.948][INFO]end
+[2012-03-15 23:09:14.948][INFO]start
+[2012-03-15 23:09:15.634][INFO]size:0
+[2012-03-15 23:09:15.634][INFO]end
+[2012-03-15 23:09:15.634][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 23:09:15.650][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 23:09:15.650][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 23:09:15.665][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 23:09:15.665][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-15 23:13:09.357][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-15 23:13:09.667][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-15 23:13:09.667][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-15 23:13:09.677][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-15 23:13:09.677][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-15 23:13:09.697][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-15 23:13:09.697][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-03-16 01:34:56.485][INFO]EglDisplay initialized. Egl version 1.3
+[2012-03-16 01:34:56.805][INFO]CreateEngine(800,600)                                           ¡¾¡Ì¡¿
+[2012-03-16 01:34:56.805][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-03-16 01:34:56.815][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-03-16 01:34:56.815][INFO]Destroy COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-03-16 01:34:56.835][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-03-16 01:34:56.835][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿

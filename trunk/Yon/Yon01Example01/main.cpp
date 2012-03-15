@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 	}
 	Logger->info("end\n");
 #endif
-#if 1
+#if 0
 	//效率比irrlicht差1/3
 	Logger->info("start\n");
 	for(u32 i=0;i<10000000;++i){
@@ -80,7 +80,34 @@ int main(int argc, char* argv[])
 	}
 	Logger->info("end\n");
 #endif
+#if 0
+	//10万级别,1分20秒
+	array<u32> arr;
+	Logger->info("start\n");
+	for(u32 i=0;i<100000;++i){
+		arr.insert(1,0);
+	}
+	Logger->info("size:%d\n",arr.size());
+	Logger->info("end\n");
+#endif
+#if 0
+	//千万级,2秒,重新分配50次
+	array<u32> arr;
+	Logger->info("start\n");
+	for(u32 i=0;i<10000000;++i){
+		arr.push(1);
+	}
+	Logger->info("size:%d\n",arr.size());
+	Logger->info("end\n");
 
+	//千万级,1.5秒,重新分配50次
+	Logger->info("start\n");
+	for(u32 i=0;i<10000000;++i){
+		arr.pop();
+	}
+	Logger->info("size:%d\n",arr.size());
+	Logger->info("end\n");
+#endif
 	pYE->drop();
 
 	
