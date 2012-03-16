@@ -1,0 +1,47 @@
+一、前言
+VS包含了VC.VB,VJ,VC#，是一个大集成的开发平台。
+VC++是Visual C++的简称，是Visual Studio编程套件的一个部分，支持语言C/C++的编译。 
+VC和VS对应版本关系：
+ 
+VC6.0 —————— VISUAL STUDIO 6.0
+
+ 
+
+VC7.0 —————— VISUAL STUDIO 2002
+
+ 
+
+VC7.1 —————— VISUAL STUDIO 2003
+
+ 
+
+VC8.0 —————— VISUAL STUDIO 2005
+
+ 
+
+VC9.0 —————— VISUAL STUDIO 2008
+
+ 
+
+VC10.0 —————  VISUAL STUDIO 2010
+
+二、C++编译器
+
+Visual C++：Windows平台上最流行的编译器，和VS集成的很好，编译效率和编译后的代码效率都不错 
+
+GCC/G++：开源的，Linux/Unix平台上的首选，而且支持N中硬件平台，如果想进行跨平台编译的话，这是一个不错的选择。
+
+编译效率和编译后的代码效率都不错。据说Linux内核的开发者都用2.95版的，这个版本编译出来的C代码应该是效率最好的。
+
+GCC（GNU Compiler Collection，GNU编译器套装）：是一套由 GNU 开发的编程语言编译器。它是一套以 GPL 及 LGPL 许可证所发行的自由软件，也是 GNU计划 的关键部分，亦是自由的 类Unix 及苹果计算机 Mac OS X 操作系统的标准编译器。GCC（特别是其中的C语言编译器）也常被认为是跨平台编译器的事实标准。
+
+GCC 原名为 GNU C 语言编译器（GNU C Compiler），因为它原本只能处理 C语言。GCC 很快地扩展，变得可处理 C++。之后也变得可处理 Fortran、Pascal、Objective-C、Java, 以及 Ada 与其他语言。 
+
+Intel C++：收费的，Intel做的，号称在是X86上最好的编译器，安腾上也是。Intel自家的编译器，对自家硬件的支持当然是不用说了。Windows和Linux上都可以用，一般用于一些对性能要求极高的领域，比如内核、游戏等等。缺点是文档不多，尤其是中文的，不是很流行，有一定的门槛。
+不过随着多核的日益普及，要在Intel的平台上做出好的应用，Intel C++编译器应该是不错的选择，尤其是刚发布的10.0版，直接纳入了对多核编程的支持，值得学习。
+
+Borland C++：不少C++ Builder fans的最爱，和Visual C++有种既生瑜何生亮的感觉。说实话，这真是不错的编译器，Borland的都是一帮牛人啊！只可惜，唉....
+
+Life is like a box of chocolate, you never know what you are going to get.
+
+http://www.cnblogs.com/mars9/archive/2012/01/13/2321710.html
