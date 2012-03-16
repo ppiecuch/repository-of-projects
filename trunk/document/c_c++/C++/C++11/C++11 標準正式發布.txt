@@ -1,0 +1,73 @@
+C++11 基本上就是之前介紹過的 C++0x 的最後名稱，他基本上就是目前最新 C++ 程式語言的標準規範。在繼 C++98（ISO/IEC 14882:1998）和 C++03（ISO/IEC 14882:2003）之後，又過了八年，終於又有新的 C++ 程式語言標準了！
+
+之前 Heresy 介紹的時候，基本上都還只是草案，不過現在算是正式發布、成為新一代的標準了∼詳細的新聞可以參考 ISO 官方的正式介紹：《C++ language gets high marks on performance with new ISO/IEC standard》。不過，標準的文件是要花錢購買的（線上購買）、而且還不便宜，所以一般人大概不會真的去買來看吧。 ^^"
+
+而如果真的有興趣的話，或許可以參考 2011/02/28 的草案 PDF，基本上差異應該不大才對。
+
+Heresy 一開始整理的時候，主要是根據 Microsoft Visual C++ 2010 有支援的 Core Language 的部分來寫的，所以只列了六項：
+
+auto：《C++0x: auto 和 decltype》[MSDN]
+decltype：《C++0x: auto 和 decltype》[MSDN]
+Lambda Expressions：《C++0x：Lambda expression》[MSDN]
+Rvalue Reference：[MSDN]
+static_assert：《C++0x：static_assert 和 nullptr》[MSDN]
+nullptr：《C++0x：static_assert 和 nullptr》[MSDN]
+而實際上，除了上面這六項功能之外，C++11 還包含了更多的功能；如果想知道完整功能的部分，在維基百科上，就可以找到滿詳細的功能列表了∼Heresy 這邊大概摘錄一下他的列表：
+
+Core Language
+
+Runtime performance enhancements
+Rvalue references and move constructors
+Generalized constant expressions
+Modification to the definition of plain old data
+Build time performance enhancements
+Extern template
+Usability enhancements
+Initializer lists
+Uniform initialization
+Type inference
+Range-based for-loop
+Lambda functions and expressions
+Alternative function syntax
+Object construction improvement
+Explicit overrides and final
+Null pointer constant
+Strongly typed enumerations
+Right angle bracket
+Explicit conversion operators
+Template aliases
+Unrestricted unions
+Identifiers with special meaning
+Functionality improvements
+Variadic templates
+New string literals
+User-defined literals
+Multitasking memory model
+hread-local storage
+Explicitly defaulted and deleted special member functions
+Type long long int
+Static assertions
+Allow sizeof to work on members of classes without an explicit object
+Allow garbage collected implementations
+Standard Library
+
+Upgrades to standard library components
+Threading facilities
+Tuple types
+Hash tables
+Regular expressions
+General-purpose smart pointers
+Extensible random number facility
+Wrapper reference
+Polymorphic wrappers for function objects
+Type traits for metaprogramming
+Uniform method for computing the return type of function objects
+不過，由於維基百科本身就是多人共筆的性質，所以 Heresy 也不確定是否完整就是了。但是實際上更大的問題，應該還是目前沒有哪個編譯器，是可以完整支援的。 ^^"
+
+而如果想知道 C++11 的 Core Language 新功能在幾個主要的編譯器上的支援度比較的話，可以參考 http://stdcxx.apache.org/ 提供的這張支援度列表（連結）（話說，裡面有有的編譯器 Heresy 根本沒聽過）。
+
+以 Visual C++ 2010 來說，就可以找到很多不支援的功能，而也有不少功能，是要到 Visual C++ 11 才支援的。不過以 Heresy 自己滿想用的「Range-based for-loop」（link）來說，似乎就是算到了 VC11 都還是不支援啊…
+
+至於標準函式庫的部分，C++11 應該算是把大部分 TR1 的函式庫，都提升為標準函式庫了∼這樣程式寫起來，也就更方便了！尤其是加入了 thread 這個 library，以後就可以用標準函式庫來寫 threading，而不必再靠 boost::thread 或 pthread 了∼（不過，VC 要到下一代的 VC11 才支援就是了）
+
+http://viml.nchc.org.tw/blog/paper_info.php?CLASS_ID=1&SUB_ID=1&PAPER_ID=265

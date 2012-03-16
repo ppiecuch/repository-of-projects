@@ -1,0 +1,36 @@
+具体步骤如下：
+
+1.删除安装用的临时文件夹（在cygwin里输入命令）（如果你没设可以跳过这步，可以去c盘看看有没有什么文件夹是在安装了cygwin之后产生的，一般那就是了）
+
+$ rm -f /cygdrive/c/你的临时文件夹
+
+2.停止cron service（没开启此服务的可以跳过，我的默认就没开启）
+
+$ cygrunsrv --stop cron
+
+$ cygrunsrv --remove cron
+
+3.停止并删除inetd服务（我的默认也没开启）
+
+$ net stop inetd
+
+$/usr/sbin/inetd --remove-as-service
+
+4.删除安装文件夹，默认是c:\cygwin
+
+5.删除桌面上的icon，和开始菜单里的启动文件夹
+
+6.删除注册表里的相关项
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Cygnus Solutions
+
+HKEY_CURRENT_USER\Software\Cygnus Solutions
+
+7.删除环境变量（PATH, CYGWIN）
+
+环境变量PATH里的c:\cygwin\bin; 还有名叫CYGWIN的变量
+
+要注意的是不要用cygwin的setup来卸载，可能会在cygwin产生令你删不掉的文件或文件夹，如果你已经这么干了，那么你可以重新安装，只安装默认的软件包就行了，在cygwin里用命令删除那个删不掉的，以后再按照以上方法卸载就ok了
+
+
+http://lhwhxu.blog.163.com/blog/static/10253754120092184644318/
