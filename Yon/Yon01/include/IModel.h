@@ -7,7 +7,8 @@ namespace yon{
 	namespace scene{
 
 		class IModel : public virtual core::IReferencable{
-
+		public:
+			virtual void render() = 0;
 		};
 	}//scene
 }//yon

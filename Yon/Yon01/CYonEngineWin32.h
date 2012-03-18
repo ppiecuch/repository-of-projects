@@ -11,6 +11,7 @@
 #include "SYonEngineParameters.h"
 #include "SOGLES1Parameters.h"
 #include "COGLES1Driver.h"
+#include "CSceneManager.h"
 
 namespace yon{
 	namespace platform{
@@ -20,7 +21,8 @@ namespace yon{
 			CYonEngineWin32(const yon::SYonEngineParameters& params);
 			~CYonEngineWin32();
 
-			video::IVideoDriver* getVideoDriver(){return  m_videoDriver;}
+			virtual video::IVideoDriver* getVideoDriver(){return  m_videoDriver;}
+			virtual scene::ISceneManager* getSceneManager(){return m_sceneManager;}
 			virtual bool run();
 
 			//virtual yon::ITimer* getTimer();
@@ -45,6 +47,7 @@ namespace yon{
 			yon::SYonEngineParameters m_params;
 
 			video::IVideoDriver* m_videoDriver;
+			scene::ISceneManager* m_sceneManager;
 
 			bool m_bClose;
 		};

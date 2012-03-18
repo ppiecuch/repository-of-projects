@@ -231,6 +231,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\dimension3d.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\exception.h"
 					>
 				</File>
@@ -320,6 +324,30 @@
 				>
 				<File
 					RelativePath=".\CEntity.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CGeometryFactory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CGeometryFactory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CModel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CModel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CSceneManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CSceneManager.h"
 					>
 				</File>
 				<File

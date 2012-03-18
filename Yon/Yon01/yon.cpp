@@ -9,6 +9,8 @@ namespace yon{
 	namespace core
 	{
 		const matrix4f IDENTITY_MATRIX(true);
+
+		const color COLOR_GRAY(0x88888888);
 	}
 
 	namespace debug{

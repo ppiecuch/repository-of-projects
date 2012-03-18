@@ -17,7 +17,7 @@ namespace yon{
 			virtual IUnit* getUnit(u32 index) const{
 				return m_units[index];
 			}
-			virtual void addUnit(const IUnit* unit){
+			virtual void addUnit(IUnit* unit){
 				if(unit!=NULL){
 					//TODO 这里与yonArray.reallocate中的delete[] temp不冲突?
 					unit->grab();

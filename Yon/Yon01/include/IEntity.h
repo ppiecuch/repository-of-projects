@@ -7,12 +7,11 @@
 namespace yon{
 	namespace scene{
 
-		class IEntity : public virtual IReferencable{
+		//相当于irrlicht的IMesh
+		class IEntity : public virtual core::IReferencable{
 		public:
-			virtual ~IEntity() = 0;
 			virtual u32 getUnitCount() const = 0;
 			virtual IUnit* getUnit(u32 index) const = 0;
-			virtual void addUnit(const IUnit* unit) = 0;
 		};
 	}//scene
 }//yon

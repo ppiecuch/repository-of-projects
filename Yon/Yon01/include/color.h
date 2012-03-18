@@ -1,6 +1,7 @@
  #ifndef _YON_CORE_COLOR_H_
 #define _YON_CORE_COLOR_H_
 
+#include "config.h"
 #include "yonTypes.h"
 
 namespace yon{
@@ -30,6 +31,8 @@ namespace yon{
 			u32 getAlpha() const { return colour&0xff; }
 			u32 colour;
 		};
+
+		YON_API extern const color COLOR_GRAY;
 	}
 }
 #endif

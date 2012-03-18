@@ -18,7 +18,7 @@ namespace yon{
 		public:
 			virtual ~IUnit(){}
 
-			virtual const void* getVertices() const = 0;
+			virtual const SVertex* getVertices() const = 0;
 			virtual SVertex* getVertices() = 0;
 			virtual u32 getVertexCount() const = 0;
 
