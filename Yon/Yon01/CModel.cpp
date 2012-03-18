@@ -6,6 +6,11 @@ namespace yon{
 		CModel::CModel(IEntity* entity,IModel* parent):m_entity(NULL),IModel(parent){
 			setEntity(entity);
 		}
+		CModel::~CModel(){
+			if(m_entity){
+				m_entity->drop();
+			}
+		}
 
 
 		void CModel::render(video::IVideoDriver* driver){

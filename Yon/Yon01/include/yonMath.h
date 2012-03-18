@@ -13,8 +13,9 @@ namespace core{
 #endif
 
 const f32 PI=3.1415926535897932384626433832795f;
+const f32 PI2=PI+PI;
 const f32 RECIPROCAL_PI	= 1.0f/PI;
-const f32 HALF_PI	= PI/2.0f;
+const f32 HALF_PI	= PI*0.5f;
 
 //从角度转为弧度
 const f32 DEGTORAD = PI / 180.0f;

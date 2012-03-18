@@ -171,6 +171,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\yonArrayTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\yonArrayTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\yonListTestCase.cpp"
 			>
 		</File>

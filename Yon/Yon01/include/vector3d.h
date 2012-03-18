@@ -9,7 +9,9 @@ namespace yon{
 		template<class T>
 		class vector3d{
 		public:
-			T x,y,z;
+			T x;
+			T y;
+			T z;
 			vector3d():x(0),y(0),z(0){}
 			vector3d(T x,T y,T z):x(x),y(y),z(z){}
 			vector3d(const vector3d<T>& other) : x(other.x), y(other.y), z(other.z) {}
