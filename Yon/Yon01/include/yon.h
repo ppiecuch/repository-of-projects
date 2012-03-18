@@ -11,6 +11,7 @@
 #include "vector2d.h" 
 #include "vector3d.h" 
 #include "yonArray.h" 
+#include "yonList.h"
 #include "yonMath.h" 
 #include "yonString.h" 
 #include "matrix4.h" 

@@ -45,6 +45,10 @@ int main(int argc, char* argv[])
 
 	IVideoDriver* driver=pYE->getVideoDriver();
 	ISceneManager* sceneMgr=pYE->getSceneManager();
+	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
+
+	IEntity* cube=geometryFty->createCube();
+	sceneMgr->addModel(cube);
 
 	/*ILogger* logger=Logger;
 	logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
@@ -54,7 +58,7 @@ int main(int argc, char* argv[])
 	while(pYE->run()){
 		driver->begin(true,COLOR_GRAY);
 
-		sceneMgr->render();
+		sceneMgr->render(driver);
 
 		//smgr->drawAll();
 		//guienv->drawAll();
@@ -67,6 +71,11 @@ int main(int argc, char* argv[])
 		//logger->info("TEST\n");
 		driver->end();
 	}
+#if 0
+	list<u32> l;
+	l.push_back(1);
+	l.clear();
+#endif
 
 #if 0
 	array<u32> arr(12);

@@ -156,7 +156,7 @@ namespace yon{
 
 			T& operator [](u32 index)
 			{
-				YON_DEBUG_BREAK_IF(index>=len);
+				YON_DEBUG_BREAK_IF(index>=capacity);
 
 				return elements[index];
 			}

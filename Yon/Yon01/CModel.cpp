@@ -3,12 +3,16 @@
 namespace yon{
 	namespace scene{
 
-		CModel::CModel(IEntity* entity):m_entity(NULL){
+		CModel::CModel(IEntity* entity,IModel* parent):m_entity(NULL),IModel(parent){
 			setEntity(entity);
 		}
 
 
-		void CModel::render(){}
+		void CModel::render(video::IVideoDriver* driver){
+			for(u32 i=0;i<m_entity->getUnitCount();++i){
+				driver->drawUnit(m_entity->getUnit(i));
+			}
+		}
 
 		void CModel::setEntity(IEntity* entity){
 			
