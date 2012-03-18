@@ -1,0 +1,144 @@
+如果你问一个IT人士“C++如何实现类似Java的反射？”，结果会怎样呢？~！@＃￥%……&*，估计大部分人都会要稍微思考了一下，或者直接说“C++根本就不支持反射的呀！”。
+
+是的，C++语言本身是不支持反射的，但实际应用中总是会有将对象序列化的需求，总不可能C++不支持，我们就不用C++了，既然发明C++的大师们没有考虑这个，那我们只有自己动手了，毛主席说过“自己动手，丰衣足食”！
+
+天生限制
+
+C++语言本身不支持反射机制，但C++对象总是要序列化的，序列化就是存储到磁盘上，将对象变成一定格式的二进制编码，然后要用的时候再将保存在磁盘上的二进制编码转化成一个内存中的对象，这个过程中总是需要有一个指示来告诉编译器要生成什么样的对象，最简单的方式当然就是类名了，例如：将一个ClassXXX对象存储到磁盘上，再从磁盘读取的时候让编译器根据“ClassXXX”名称来new一个对象。
+
+但是问题出现了，C++语言本身不支持反射，也就是说不能通过如下方式生成一个对象：
+
+ClassXXX object = new “ClassXXX”；
+
+ 
+
+工厂方法
+
+当然，这样的方法不行，那我们只有另辟蹊径。最简单的就是工厂方法了：
+
+ClassXXX* object = FactoryCreate（“ClassXXX”）；
+
+至于FactoryCreate的设计就很简单了，if的集合就可以了：
+
+if(name = “ClassXXX”)
+
+return new ClassXXX;
+
+if(name = “ClassYYY”)
+
+return new ClassYYY;
+
+ 
+
+看起来不错，来个类名就可以生成对应的对象，功能上解决了根据类名生成对象的问题。
+
+假如以上所有的代码都有你一个人编写，那当然问题不大，但是假如有一天你的公司扩大了，这部分代码由两个不同的组A和B来维护，啊哈，问题来了，A组每添加或者修改一个类，都要通知B组更新FactoryCreate函数，也就是说A组的任何关于类的修改，都需要B组来修改，但实际上B的修改不产生任何价值，而且不胜其烦，永无止尽！！如果哪天来了一个新员工，由于对这个规定还不清楚，忘记了通知，那就完了：编译通不过！
+
+一个公司内都会产生如此多的问题，更何况微软这样的大公司是面对全球的各种各样的客户，如果微软把这部分做进框架代码中，呵呵，那微软所有的人不用干其他事情了，每天处理来自全球的要求修改FactoryCreate函数的邮件和电话就够他们忙的了：）
+
+ 
+
+回调工厂
+
+既然此路不好走，那么我们再考虑其它方法吧，一个可选的方法是将FactoryCreate做成回调函数，框架提供注册接口RegisterFactoryCreate，框架函数如此实现：
+
+typedef CObject* （*FactoryCreate_PTR）(String name);
+
+RegisterFactoryCreate(FactoryCreate_PTR fc_ptr);
+
+应用代码如此实现：
+
+CObject* MyFactoryCreate（String name）;
+
+RegisterFactoryCreate(MyFactoryCreate);
+
+到这里一个框架和应用分离的反射机制基本实现了，你是否长吁一口气，然后准备泡杯咖啡，稍微放松一下呢？确实可以稍微休息一下了，毕竟我们完成了一件非常了不起的事情，让C++实现了反射。
+
+ 
+
+但你只悠闲了一两天，麻烦事就来了。员工张三跑来向你抱怨“老大，李四注册的反射函数把我的覆盖了”！哦，你仔细一看，My god，这个注册函数只能注册一个反射函数，后注册的就把前面的覆盖了！
+
+怎么办？总不可能又要求所有的类的反射函数都在一个工厂里实现吧，那这样就又回到了工厂方法中描述的时代了。
+
+当然，聪明的你估计很快就能想出问题的解决方法，将RegisterFactoryCreate函数稍加修改就能满足要求了，新的实现如下：
+
+RegisterFactoryCreate（FactoryCreate_PTR fc_ptr，String className）
+
+然后要求每个类都单独写自己的FactoryCreate_PTR函数，类似如下方式：
+
+static CObject* ClassXXX::CreateClassXXX (){
+
+       return new ClassXXX;
+
+};
+
+ 
+
+static CObject* ClassYYY::CreateClassYYY(){
+
+       return new ClassYYY;
+
+};
+
+ 
+
+到此为此终于大功告成，通过我们的智慧实现了C++的反射功能！一股自豪感油然升起：）
+
+ 
+
+最后的杀手锏：宏
+
+当你为自己的聪明才智而骄傲的时候，那边却有几个开发的兄弟在发出抱怨“唉，这么多相似的函数，看着都眼花，每个类都要写，烦死了”。
+
+或者有一天，你要在每个类的CreateClass函数中增加一个其它功能（例如日志），那么开发的兄弟真的是要烦“死了”！！！
+
+ 
+
+其实仔细一看，包括函数申明、函数定义、函数注册，每个类的代码除了类名外其它都是一模一样的，有没有简单的方法呢？
+
+肯定是有的，这个方法就是宏了，按照如下方法定义宏：
+
+#define DECLARE_CLASS_CREATE(class_name) /
+
+static CObject* CreateClass## class_name ();
+
+ 
+
+#define IMPL_CLASS_CREATE(class_name) /
+
+static CObject* CreateClass## class_name (){  /
+
+       return new class_name;             /
+
+};
+
+ 
+
+#define REG_CLASS_CREATE(class_name) /
+
+RegisterFactoryCreate(class_name::CreateClass## class_name, #class_name);
+
+注：##是连接符，将两个字符串连接起来，#是将class_name作为字符串处理。
+
+ 
+
+大家可以比较一下，用了宏和不用宏是不是代码感觉完全不一样呢？而且那天需要增加一个简单的功能，只需要改宏定义就ok了，不要全文搜索所有相关函数，然后一个一个的重复添加。
+
+ 
+
+到这里才真正是大功告成！！
+
+ 
+
+后记
+
+某天分析Spring的IOC时，看到Digester最后利用的实际上是Java的反射机制来根据XML文件定义生成Java对象，突发奇想：如果是C++该怎么办？
+
+于是自己就开始分析起来，分析了一段时间突然想起微软的MFC不正是要支持C++对象序列化的吗？
+
+赶紧打开深入浅出MFC，重新将这部分研究了一下。看到微软的天才们在MFC中用宏来实现RTTI、Dynamic Create、Seralize功能时，我反过来思考“如果是我，我会如何设计？”、“为什么会这么设计”？然后一一分析这些各种可能的实现方式，一步一步的推导，最后发现竟然自然而然的就推出了MFC的这种实现方式！
+
+当然，MFC的实现代码和我给出的代码不一样（注册方式不一样），但设计思想是一样的，各位看官可以自行稍加分析就明白了。
+
+MFC的详细实现可以参考侯捷的《深入浅出MFC》。
+http://blog.csdn.net/yah99_wolf/article/details/4039493
