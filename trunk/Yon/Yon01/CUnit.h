@@ -1,17 +1,18 @@
 #ifndef _YON_SCENE_CUNIT_H_
 #define _YON_SCENE_CUNIT_H_
 
-#include "IMesh.h"
+#include "IUnit.h"
 #include "yonArray.h"
 
 namespace yon{
 	namespace scene{
+		class CGeometryFactory;
 
 		class CUnit : public IUnit{
 		public:
 			virtual ~CUnit(){}
 
-			virtual const void* getVertices() const{
+			virtual const SVertex* getVertices() const{
 				return m_vertices.pointer();
 			}
 			virtual SVertex* getVertices(){
@@ -58,6 +59,8 @@ namespace yon{
 		private:
 			core::array<SVertex> m_vertices;
 			core::array<u16> m_indices;
+
+			friend class CGeometryFactory;
 		};
 	}//scene
 }//yon

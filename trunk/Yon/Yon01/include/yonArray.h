@@ -116,7 +116,7 @@ namespace yon{
 				}
 				if (length < len)
 					len = length;
-				delete[] temp;
+				delete[] temp;//C++允许删除空指针而不造成任何问题
 				//Logger->debug("end array reallocate\n");
 			}
 

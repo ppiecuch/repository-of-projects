@@ -15,6 +15,8 @@ inline void EnableMemLeakCheck()
 using namespace yon;
 using namespace yon::core;
 using namespace yon::debug;
+using namespace yon::video;
+using namespace yon::scene;
 
 #pragma comment(lib, "Yon.lib")
 
@@ -41,24 +43,30 @@ int main(int argc, char* argv[])
 	SYonEngineParameters params;
 	IYonEngine* pYE=CreateEngine(params);
 
+	IVideoDriver* driver=pYE->getVideoDriver();
+	ISceneManager* sceneMgr=pYE->getSceneManager();
+
 	/*ILogger* logger=Logger;
 	logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
 	//logger->setAppender(MASK_APPENDER_CONSOLE);
 	logger->setLevel(ENUM_LOG_LEVEL_DEBUG);
-	int num=0;
+	int num=0;*/
 	while(pYE->run()){
-		//driver->beginScene(true, true, SColor(255,100,101,140));
+		driver->begin(true,COLOR_GRAY);
+
+		sceneMgr->render();
 
 		//smgr->drawAll();
 		//guienv->drawAll();
 
 		//driver->endScene();
-		Sleep(20);
+		//Sleep(20);
 		//printf("run\n");
-		num++;
-		logger->debug("%d %s\n",num,"testÄãºÃ");
-		logger->info("TEST\n");
-	}*/
+		//num++;
+		//logger->debug("%d %s\n",num,"testÄãºÃ");
+		//logger->info("TEST\n");
+		driver->end();
+	}
 
 #if 0
 	array<u32> arr(12);

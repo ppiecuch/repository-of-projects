@@ -1,5 +1,6 @@
 #include "CYonEngineWin32.h"
-#include <stdio.h>
+#include "CSceneManager.h"
+
 #include "ILogger.h"
 
 namespace yon{
@@ -7,7 +8,8 @@ namespace platform{
 
 	
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
-		:m_hWnd(NULL),m_bExternalWindow(false),m_videoDriver(NULL),
+		:m_hWnd(NULL),m_bExternalWindow(false),
+		m_videoDriver(NULL),m_sceneManager(new scene::CSceneManager()),
 		m_params(params),m_bClose(false)
 	{
 		if(params.windowId==NULL)
@@ -32,6 +34,7 @@ namespace platform{
 	CYonEngineWin32::~CYonEngineWin32(){
 		if(m_videoDriver!=NULL)
 			m_videoDriver->drop();
+		m_sceneManager->drop();
 		DestroyWindow(m_hWnd);
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineWin32");
@@ -69,7 +72,7 @@ namespace platform{
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
 		switch(uiMsg) {
 		case WM_CREATE:
-			printf("窗口创建成功\n");
+			Logger->info(YON_LOG_SUCCEED_FORMAT,"Create window");
 			break;
 		case WM_CLOSE:
 			PostQuitMessage(0);
@@ -156,7 +159,7 @@ namespace platform{
 
 		if (!m_hWnd)
 		{
-			MessageBox(NULL,TEXT("Error in CreateWindow()!"),TEXT("Error"),MB_OK);
+			Logger->info(YON_LOG_FAILED_FORMAT,"Create window");
 			return false;
 		}
 

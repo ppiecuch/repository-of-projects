@@ -1,4 +1,5 @@
 #include "COGLES1Driver.h"
+#include "SVertex.h"
 #include "ILogger.h"
 
 namespace yon{
@@ -23,12 +24,52 @@ namespace ogles1{
 		glClearColor(0.1f,0.2f,0.3f,1);
 		glColor4x(0x10000, 0, 0, 0);
 	}
-	void COGLES1Driver::DrawFrame()
+	
+
+
+	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param){
+
+#ifdef YON_COMPILE_WITH_WIN32
+		initEGL(param.hWnd);
+#endif//YON_COMPILE_WITH_WIN32
+
+		u32 i;
+		glViewport(0, 0, param.windowSize.w,param.windowSize.h);
+		
+		for (i=0; i<ENUM_TRANSFORM_COUNT; ++i)
+			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
+
+		InitGL();
+
+		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Driver");
+
+	}
+
+	COGLES1Driver::~COGLES1Driver(){
+
+#ifdef YON_COMPILE_WITH_WIN32
+		destroyEGL();
+#endif//YON_COMPILE_WITH_WIN32
+		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
+	}
+
+	void COGLES1Driver::begin(bool zBuffer,core::color c)
 	{
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, mIndices);
-		glRotatex(2<<16, 0, 0, 0x10000);
+	}
+	void COGLES1Driver::end()
+	{
 		eglSwapBuffers(m_eglDisplay, m_eglSurface);
+	}
+	void COGLES1Driver::setViewPort(const core::recti& rec){
+	}
+
+	void COGLES1Driver::drawUnit(const scene::IUnit* unit) const{
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(SVertex),&unit->getVertices()[0].pos);
+		//OpenGL ES下支持GL_UNSIGNED_BYTE 或GL_UNSIGNED_SHORT.
+		glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
+		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 
 	void COGLES1Driver::setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat){
@@ -57,39 +98,6 @@ namespace ogles1{
 	const core::matrix4f& COGLES1Driver::getTransform(ENUM_TRANSFORM transform) const{
 		return m_matrix[transform];
 	}
-
-
-	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param){
-
-#ifdef YON_COMPILE_WITH_WIN32
-		initEGL(param.hWnd);
-#endif//YON_COMPILE_WITH_WIN32
-
-		u32 i;
-		glViewport(0, 0, param.windowSize.w,param.windowSize.h);
-		
-		for (i=0; i<ENUM_TRANSFORM_COUNT; ++i)
-			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
-
-		InitGL();
-
-	}
-
-	COGLES1Driver::~COGLES1Driver(){
-
-#ifdef YON_COMPILE_WITH_WIN32
-		destroyEGL();
-#endif//YON_COMPILE_WITH_WIN32
-		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy COGLES1Driver");
-	}
-
-	void COGLES1Driver::begin(bool zBuffer,core::color c){
-	}
-	void COGLES1Driver::end(){
-	}
-	void COGLES1Driver::setViewPort(const core::recti& rec){
-	}
-
 #ifdef YON_COMPILE_WITH_WIN32
 	bool COGLES1Driver::initEGL(const HWND& hwnd){
 
