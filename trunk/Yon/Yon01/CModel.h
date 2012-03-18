@@ -10,6 +10,7 @@ namespace yon{
 		class CModel : public IModel{
 		public:
 			CModel(IEntity* entity,IModel* parent);
+			~CModel();
 
 			virtual void render(video::IVideoDriver* driver);
 			virtual void setEntity(IEntity* entity);

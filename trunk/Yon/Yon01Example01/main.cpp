@@ -6,7 +6,7 @@
 
 inline void EnableMemLeakCheck()
 {
-	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) |  _CRTDBG_LEAK_CHECK_DF);
 }
 
 #include <locale.h>
@@ -32,6 +32,12 @@ void print(const matrix4f& m){
 	printf("\n");
 }
 
+struct Object : public virtual core::IReferencable{
+	int a;
+	int b;
+};
+
+#define _CRTDBG_MAP_ALLOC
 int main(int argc, char* argv[])
 {
 	EnableMemLeakCheck();
@@ -47,8 +53,13 @@ int main(int argc, char* argv[])
 	ISceneManager* sceneMgr=pYE->getSceneManager();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 
-	IEntity* cube=geometryFty->createCube();
-	sceneMgr->addModel(cube);
+	/*IEntity* cube=geometryFty->createCube();
+	IModel* model=sceneMgr->addModel(cube);
+	cube->drop();*/
+
+	IEntity* sphere=geometryFty->createSphere();
+	IModel* model=sceneMgr->addModel(sphere);
+	sphere->drop();
 
 	/*ILogger* logger=Logger;
 	logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
@@ -72,8 +83,14 @@ int main(int argc, char* argv[])
 		driver->end();
 	}
 #if 0
-	list<u32> l;
-	l.push_back(1);
+	IEntity* cube=geometryFty->createCube();
+	cube->drop();
+#endif 
+#if 0
+	Object* o=new Object();
+	list<Object*> l;
+	l.push_back(o);
+	o->drop();
 	l.clear();
 #endif
 

@@ -10,7 +10,11 @@ namespace yon{
 
 		class CEntity : public IEntity{
 		public:
-			virtual ~CEntity(){}
+			virtual ~CEntity(){
+				for(u32 i=0;i<m_units.size();++i){
+					m_units[i]->drop();
+				}
+			}
 			virtual u32 getUnitCount() const{
 				return m_units.size();
 			}

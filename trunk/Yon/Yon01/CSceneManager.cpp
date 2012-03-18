@@ -23,6 +23,7 @@ namespace yon{
 		IModel* CSceneManager::addModel(IEntity* entity){
 			CModel* model=new CModel(entity,this);
 			addChild(model);
+			model->drop();
 
 			Logger->debug("CSceneManager::addModel size:%d\n",m_children.size());
 			return model;

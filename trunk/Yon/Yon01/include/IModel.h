@@ -4,6 +4,8 @@
 #include "IRenderable.h"
 #include "yonList.h"
 
+#include "ILogger.h"
+
 namespace yon{
 	namespace scene{
 
@@ -46,7 +48,7 @@ namespace yon{
 				core::list<IModel*>::Iterator it = m_children.begin();
 				for (; it != m_children.end(); ++it)
 				{
-					(*it)->m_parent = 0;
+					(*it)->m_parent = NULL;
 					(*it)->drop();
 				}
 				m_children.clear();
@@ -56,6 +58,7 @@ namespace yon{
 			{
 				// delete all children
 				clearChildren();
+				//Logger->debug("clearChildren\n");
 			}
 			virtual bool removeFromParent(){
 				if(m_parent){

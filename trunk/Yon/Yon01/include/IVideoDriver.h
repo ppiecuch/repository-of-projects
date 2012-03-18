@@ -28,7 +28,7 @@ namespace yon{
 			virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat) =0;
 			virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const =0;
 
-			virtual void drawUnit(const scene::IUnit* unit) const = 0;
+			virtual void drawUnit(scene::IUnit* unit) const = 0;
 			//virtual u32 getFPS() const = 0;
 		};
 	}
