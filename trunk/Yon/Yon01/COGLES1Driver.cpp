@@ -66,7 +66,7 @@ namespace ogles1{
 
 	void COGLES1Driver::drawUnit(const scene::IUnit* unit) const{
 		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(SVertex),&unit->getVertices()[0].pos);
+		glVertexPointer(3, GL_FLOAT, sizeof(scene::SVertex),&unit->getVertices()[0].pos);
 		//OpenGL ES下支持GL_UNSIGNED_BYTE 或GL_UNSIGNED_SHORT.
 		glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
 		glDisableClientState(GL_VERTEX_ARRAY);

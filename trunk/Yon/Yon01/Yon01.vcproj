@@ -243,6 +243,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\IRenderable.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\matrix4.h"
 					>
 				</File>
@@ -260,6 +264,10 @@
 				</File>
 				<File
 					RelativePath=".\include\yonArray.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\yonList.h"
 					>
 				</File>
 				<File
@@ -423,6 +431,10 @@
 		<Filter
 			Name="doc"
 			>
+			<File
+				RelativePath=".\design.vsd"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\readme.htm"

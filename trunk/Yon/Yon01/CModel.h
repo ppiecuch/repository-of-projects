@@ -9,9 +9,9 @@ namespace yon{
 
 		class CModel : public IModel{
 		public:
-			CModel(IEntity* entity);
+			CModel(IEntity* entity,IModel* parent);
 
-			virtual void render();
+			virtual void render(video::IVideoDriver* driver);
 			virtual void setEntity(IEntity* entity);
 		protected:
 			IEntity* m_entity;
