@@ -118,7 +118,9 @@ namespace ogles1{
 	
 
 
-	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param){
+	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param):
+		m_renderModeChange(true),
+		IVideoDriver(){
 
 #ifdef YON_COMPILE_WITH_WIN32
 		initEGL(param.hWnd);
@@ -131,17 +133,17 @@ namespace ogles1{
 		for (i=0; i<ENUM_TRANSFORM_COUNT; ++i)
 			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
 
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
+		
 		//InitGL();
-		glMatrixMode(GL_PROJECTION);
+		/*glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		gluPerspective(60.0f,(float)param.windowSize.w/(float)param.windowSize.w,1,600);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		gluLookAt(0,0,10,0,0,-50,0,1,0);
+		gluLookAt(0,0,5,0,0,-50,0,1,0);*/
+		setRender3DMode();
+
 		glClearColor(0.1f,0.2f,0.3f,1);
 		glColor4f(1, 1, 1, 1);
 
@@ -203,6 +205,39 @@ namespace ogles1{
 	const core::matrix4f& COGLES1Driver::getTransform(ENUM_TRANSFORM transform) const{
 		return m_matrix[transform];
 	}
+
+	void COGLES1Driver::setRender3DMode(){
+		if (m_renderMode != ENUM_RENDER_MODE_3D)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glClearDepthf(1.0f);
+			glDepthFunc(GL_LEQUAL);
+
+			glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+			glHint(GL_GENERATE_MIPMAP_HINT, GL_FASTEST);
+			glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);
+			glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
+
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+			glFrontFace(GL_CCW);
+
+			glDisable(GL_BLEND);
+			glDisable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_GREATER, 0.f);
+			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+
+			glMatrixMode(GL_MODELVIEW);
+			glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadMatrixf(m_matrix[ENUM_TRANSFORM_PROJECTION].pointer());
+
+			m_renderModeChange = true;
+		}
+		m_renderMode=ENUM_RENDER_MODE_3D;
+	}
+	void COGLES1Driver::setRender2DMode(){}
 #ifdef YON_COMPILE_WITH_WIN32
 	bool COGLES1Driver::initEGL(const HWND& hwnd){
 

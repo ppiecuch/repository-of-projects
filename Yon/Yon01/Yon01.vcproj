@@ -390,10 +390,22 @@
 					Name="camera"
 					>
 				</Filter>
+				<Filter
+					Name="animator"
+					>
+					<File
+						RelativePath=".\include\IAnimator.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="event"
 				>
+				<File
+					RelativePath=".\include\IEventListener.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="gui"

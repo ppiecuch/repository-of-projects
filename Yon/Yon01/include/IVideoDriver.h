@@ -19,7 +19,16 @@ namespace yon{
 
 		//视频驱动器接口
 		class IVideoDriver:public virtual yon::core::IReferencable{
+		protected:
+			enum ENUM_RENDER_MODE{
+				ENUM_RENDER_MODE_NONE = 0,
+				ENUM_RENDER_MODE_2D,
+				ENUM_RENDER_MODE_3D,
+				ENUM_RENDER_MODE_COUNT
+			};
+			ENUM_RENDER_MODE m_renderMode;
 		public:
+			IVideoDriver():m_renderMode(ENUM_RENDER_MODE_NONE){}
 			virtual ~IVideoDriver(){};
 			virtual void begin(bool zBuffer=true,yon::core::color c=yon::core::color(0x000000FF)) = 0;
 			virtual void end() = 0;
