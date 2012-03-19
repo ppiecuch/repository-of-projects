@@ -29,10 +29,14 @@ namespace yon{
 				virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const;
 
 				virtual void drawUnit(scene::IUnit* unit) const;
+
+				void setRender3DMode();
+				void setRender2DMode();
 				//virtual u32 getFPS() const;
 
 			private:
 				core::matrix4f m_matrix[ENUM_TRANSFORM_COUNT];
+				bool m_renderModeChange;
 #ifdef YON_COMPILE_WITH_WIN32
 				bool initEGL(const HWND& hwnd);
 				void destroyEGL();

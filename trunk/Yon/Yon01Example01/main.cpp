@@ -47,6 +47,8 @@ int main(int argc, char* argv[])
 	
 
 	SYonEngineParameters params;
+	params.windowSize.w=400;
+	params.windowSize.h=400;
 	IYonEngine* pYE=CreateEngine(params);
 
 	IVideoDriver* driver=pYE->getVideoDriver();
