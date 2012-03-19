@@ -1,0 +1,70 @@
+free store （自由存储区）和 heap （堆），在C/C++中经常会遇到。他们是否有区别呢？
+
+偶最早发现这两个概念性问题是在《Exceptional C++》一书中。
+
+其中提到C++中使用new分配所得的内存是分配在 freestore 上，而C 风格的内存分配 malloc 分配所得的内存是在 heap 上。
+
+额。这个有什么区别呢？
+
+通过在 Google 的搜索，所得的中文资料相当少，英文的倒是不少，而且不少还有争议性质。
+
+不过部分观点是已经达成共识的。
+
+
+这里，作为翻译，略微加上一点自己的思想，写在这里——
+
+
+首先呢，有必要知道malloc内存分配和new内存分配上的区别。
+
+前者，是C 语言中很典型的分配方法，它的作用就是根据参数指定大小，分配一定的动态内存空间。
+
+操作系统会处理这件事情，它会遍历系统维护的空闲内存链表来找到大小与之最匹配的内存区域。
+
+（当然也有其他分配算法）
+
+获得了这部分内存，返回给程序员的是一个 void* 类型的指针（其实是无类型）。
+
+释放使用free，其实就是告诉操作系统，这一部分的内存区域不再使用，你可以回收了。
+
+那么，操作系统就会乖乖地把这个内存区的首地址再加入到自身维护的空闲内存链表中。
+
+如果忘记free，后果就是恐怖的“内存泄露”（memory leakage）。
+
+
+然后，我们再看new。C++中new已经是一个“运算符”了，我们可以重载operator new 和 placement new。
+
+它也是分配内存，同时在这块内存上执行所要new 的对象的构造函数以建立起这个对象。
+
+（说“对象”，略微有点不严格，不过没关系，这个区别已经淡化了，
+
+built-in type ，也就是内置类型，他们也可以被new，执行是这些基本类型的伪构造函数）
+
+对应free，这里有delete。它不仅是free了这块内存，而且执行了对应对象的析构函数。
+
+……
+
+某文献上有这么几句：
+
+Note that the heap and free-store may reside on distinct physical memory regions and they might be controlled by different underlying memory managers.
+
+Technically, free-store is an abstract term referring to unused memory that is available for dynamic allocations. Heap is the data model used by virtually all C++ compilers to implement the free-store. In practice, however, the distinction between heap and free-store is roughly equivalent to the differences between the memory models of C and C++.
+
+个人翻译：
+
+注意的是，堆（heap）和自由存储区（freestore）可能是位于不同的物理内存区域，并且它们可能被不同的底层内存管理器控制。
+
+从技术角度来说，freestore 是一个抽象的术语，它表示那些用来动态分配内存的未占用空间。
+
+而 heap 是一个具体形象的数据模型概念，它通过C++编译器去实现扩充了freestore。
+
+事实上，两者的区别有点像是 C 和 C++ 的内存模型的差异。
+
+因为毕竟C++中用malloc，calloc，realloc 和 free 并不多，除非一些特定情况，我们需要获取一部分原始内存（raw memory）。
+
+概念的问题，争论的太深入也没太大必要。有时候毕竟没必要区别他们那么清。
+
+如果你有更好的理解，欢迎在这里提出。
+
+谢谢！~
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/stone_x_boy/archive/2008/01/29/2071957.aspx
