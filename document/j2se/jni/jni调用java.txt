@@ -1,0 +1,9 @@
+蜗牛√(704947) 2012/3/19 23:21:14
+res = (*env)->CallIntMethod(env,cls,mid,sd);
+我在jni中调用java的方法，为什么没有任何反应，貌似没有进入 java 方法，c这段代码也没出错，什么情况
+蜗牛√(704947) 2012/3/19 23:44:44
+(*env)->CallVoidMethod(env,cls,mid,sd);
+程序不报错，就是 这个java方法没被调用。什么情况
+蜗牛√(704947)  9:18:35
+后来改成 CallStaticVoidMethod 就行了
+可能我是在一个线程中 调用 jni，然后在底层访问其他类，会不会有跨线程问题？后来我其他类的方法改成 static就行了
