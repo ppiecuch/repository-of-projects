@@ -1,0 +1,4 @@
+final static int Math_Div10 (int a)
+	{
+		return ((a * 6554 ) >> 16);
+	}
