@@ -251,6 +251,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\plane.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\rect.h"
 					>
 				</File>
@@ -389,6 +393,18 @@
 				<Filter
 					Name="camera"
 					>
+					<File
+						RelativePath=".\CCamera.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\ICamera.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\SViewFrustum.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="animator"
