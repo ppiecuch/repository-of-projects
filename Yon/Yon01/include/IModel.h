@@ -14,7 +14,9 @@ namespace yon{
 			IModel* m_parent;
 			core::list<IModel*> m_children;
 			
-			IModel(IModel* parent):m_parent(parent){
+			IModel(IModel* parent,const core::vector3df& pos):m_parent(parent),
+				IRenderable(pos)
+			{
 				if(parent!=NULL){
 					m_parent->addChild(this);
 				}
