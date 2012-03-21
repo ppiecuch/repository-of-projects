@@ -1,0 +1,6 @@
+如项目在D:\Development\Software\android-ndk-r7-crystax-5.beta2\samples\JNI\
+
+cmd中进入D:\Development\Software\android-ndk-r7-crystax-5.beta2\samples\JNI\bin\classes>javah -classpath . jni.demo.JNIActivity
+
+-classpath .表示装载当前路径为类路径
+执行后会在classes目录中生成两个文件
