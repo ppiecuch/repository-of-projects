@@ -42,6 +42,7 @@ typedef signed int			s32;
 typedef char				c8;
 typedef wchar_t				c16;
 typedef float				f32;
+typedef double				f64;
 
 #ifdef YON_WCHAR_FILESYSTEM
 typedef wchar_t fschar;

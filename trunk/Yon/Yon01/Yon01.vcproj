@@ -394,6 +394,10 @@
 					Name="camera"
 					>
 					<File
+						RelativePath=".\CCamera.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\CCamera.h"
 						>
 					</File>

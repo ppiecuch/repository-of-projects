@@ -25,6 +25,7 @@ namespace yon{
 					ENUM_FRUSTUM_TRANSFORM_PROJECTION,		//Õ∂”∞ø’º‰æÿ’Û
 					ENUM_FRUSTUM_TRANSFORM_COUNT
 				};
+				core::vector3df m_position;
 				core::matrix4f m_matrixs[ENUM_FRUSTUM_TRANSFORM_COUNT];
 			public:
 
@@ -32,7 +33,13 @@ namespace yon{
 				SViewFrustum(const SViewFrustum& other);
 
 				void transform(const core::matrix4f& mat);
-
+				
+				inline void setPosition(const core::vector3df& pos){
+					m_position=pos;
+				}
+				inline const core::vector3df& getPosition() const{
+					return m_position;
+				}
 
 				inline const core::matrix4f& SViewFrustum::getViewTransform() const{
 					return m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW];

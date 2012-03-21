@@ -21,6 +21,20 @@ namespace yon{
 			{
 				return x*other.x + y*other.y + z*other.z;
 			}
+
+			vector3d<T>& normalize(){
+				f64 length = x*x + y*y + z*z;
+				if (core::equals(length, 0.0)) // this check isn't an optimization but prevents getting NAN in the sqrt.
+					return *this;
+				//length = core::reciprocal_squareroot(length);
+				length = 1.0f/sqrt(length);
+
+				x = (T)(x * length);
+				y = (T)(y * length);
+				z = (T)(z * length);
+				return *this;
+			}
+
 		};
 
 		typedef vector3d<f32> vector3df;

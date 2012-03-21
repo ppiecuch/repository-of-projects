@@ -13,9 +13,11 @@ namespace yon{
 		protected:
 			IModel* m_parent;
 			core::list<IModel*> m_children;
+
 			
-			IModel(IModel* parent,const core::vector3df& pos):m_parent(parent),
-				IRenderable(pos)
+			
+			IModel(IModel* parent,const core::vector3df& pos):
+				m_parent(parent),m_position(pos)
 			{
 				if(parent!=NULL){
 					m_parent->addChild(this);
