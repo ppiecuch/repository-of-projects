@@ -8,8 +8,11 @@ namespace yon{
 		namespace camera{
 		
 			class ICamera : public core::IRenderable{
+			protected:
+				bool m_needRender;
 			public:
-				ICamera(const core::vector3df& pos):IRenderable(pos){}
+				ICamera(const core::vector3df& pos,const core::vector3df& rot,const core::vector3df& scale,bool needRender=false):
+				IRenderable(pos,rot,scale),m_needRender(needRender){}
 
 				virtual void setUpVector(const core::vector3df& pos) =0;
 				virtual const core::vector3df& getUpVector() const =0;
@@ -25,6 +28,13 @@ namespace yon{
 
 				virtual f32 getFovy() const =0;
 				virtual void setFovy(f32 fovy) =0;
+
+				virtual void setNeedRender(bool on){
+					m_needRender=on;
+				}
+				virtual bool getNeedRender() const{
+					return m_needRender;
+				}
 			};
 		}
 	}
