@@ -1,0 +1,73 @@
+Andoird 中使用了一种不同传统Java JNI的方式来定义其native的函数。其中很重要的区别是Andorid使用了一种Java 和 C 函数的映射表数组，并在其中描述了函数的参数和返回值。这个数组的类型是JNINativeMethod，定义如下：
+
+
+typedef struct {
+const char* name;
+const char* signature;
+void* fnPtr;
+} JNINativeMethod;
+
+第一个变量name是Java中函数的名字。
+
+第二个变量signature，用字符串是描述了函数的参数和返回值
+
+第三个变量fnPtr是函数指针，指向C函数。
+
+
+其中比较难以理解的是第二个参数，例如
+
+"()V"
+
+"(II)V"
+
+"(Ljava/lang/String;Ljava/lang/String;)V"
+
+
+实际上这些字符是与函数的参数类型一一对应的。
+
+"()" 中的字符表示参数，后面的则代表返回值。例如"()V" 就表示void Func();
+
+"(II)V" 表示 void Func(int, int);
+
+
+具体的每一个字符的对应关系如下
+
+
+字符 Java类型 C类型
+
+V      void            void
+Z       jboolean     boolean
+I        jint              int
+J       jlong            long
+D      jdouble       double
+F      jfloat            float
+B      jbyte            byte
+C      jchar           char
+S      jshort          short
+
+
+数组则以"["开始，用两个字符表示
+
+
+[I       jintArray      int[]
+[F     jfloatArray    float[]
+[B     jbyteArray    byte[]
+[C    jcharArray    char[]
+[S    jshortArray   short[]
+[D    jdoubleArray double[]
+[J     jlongArray     long[]
+[Z    jbooleanArray boolean[]
+
+
+上面的都是基本类型。如果Java函数的参数是class，则以"L"开头，以";"结尾中间是用"/" 隔开的包及类名。而其对应的C函数名的参数则为jobject. 一个例外是String类，其对应的类为jstring
+
+
+Ljava/lang/String; String jstring
+Ljava/net/Socket; Socket jobject
+
+
+如果JAVA函数位于一个嵌入类，则用$作为类名间的分隔符。
+
+例如 "(Ljava/lang/String;Landroid/os/FileUtils$FileStatus;)Z"
+
+http://www.androidmi.com/Androidkaifa/rumen/201005/633.html
