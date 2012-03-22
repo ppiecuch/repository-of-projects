@@ -2,7 +2,11 @@
 #define _YON_CORE_YONARRAY_H_
 
 #include "yonTypes.h"
-#include <new.h>//欲用placement new;需先包含此文件
+#ifdef YON_COMPILE_WITH_WIN32
+#include <new.h>
+#elif defined(YON_COMPILE_WITH_ANDROID)
+#include <new>
+#endif
 
 #include "ILogger.h"
 

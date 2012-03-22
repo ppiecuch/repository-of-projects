@@ -10,6 +10,8 @@
 #pragma comment(lib,"libGLESv1_CM.lib")
 #include <EGL/egl.h>
 #include <GLES/gl.h>
+#elif defined(YON_COMPILE_WITH_ANDROID)
+#include <GLES/gl.h>
 #endif//YON_COMPILE_WITH_WIN32
 
 namespace yon{
@@ -24,7 +26,8 @@ namespace yon{
 
 				virtual void begin(bool zBuffer,core::color c);
 				virtual void end();
-				virtual void setViewPort(const core::recti& rec);
+				virtual void setViewPort(const yon::core::recti& r);
+				virtual void onResize(const yon::core::dimension2du& size);
 				virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat);
 				virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const;
 
@@ -44,8 +47,6 @@ namespace yon{
 				EGLDisplay m_eglDisplay;
 				EGLSurface m_eglSurface;
 				EGLContext m_eglContext;
-
-				void DrawFrame();
 #endif//YON_COMPILE_WITH_WIN32
 			};
 		}

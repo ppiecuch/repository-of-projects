@@ -3,6 +3,7 @@
 
 #include "IReferencable.h"
 #include "color.h"
+#include "dimension2d.h"
 #include "rect.h"
 #include "matrix4.h"
 #include "IUnit.h"
@@ -32,7 +33,8 @@ namespace yon{
 			virtual ~IVideoDriver(){};
 			virtual void begin(bool zBuffer=true,yon::core::color c=yon::core::color(0x000000FF)) = 0;
 			virtual void end() = 0;
-			virtual void setViewPort(const yon::core::recti& rec) = 0;
+			virtual void setViewPort(const yon::core::recti& r) = 0;
+			virtual void onResize(const yon::core::dimension2du& size) = 0;
 
 			virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat) =0;
 			virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const =0;

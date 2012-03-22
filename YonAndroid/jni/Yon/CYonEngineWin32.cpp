@@ -1,3 +1,7 @@
+#include "config.h"
+
+#ifdef YON_COMPILE_WITH_WIN32
+
 #include "CYonEngineWin32.h"
 #include "CSceneManager.h"
 
@@ -6,11 +10,28 @@
 namespace yon{
 namespace platform{
 
+	struct SEnginePair
+	{
+		HWND hWnd;
+		CYonEngineWin32* engine;
+	};
+	core::list<SEnginePair> EngineMap;
+
+	CYonEngineWin32* getEngineByHWnd(HWND hWnd)
+	{
+		core::list<SEnginePair>::Iterator it = EngineMap.begin();
+		for (; it!= EngineMap.end(); ++it)
+			if ((*it).hWnd == hWnd)
+				return (*it).engine;
+
+		return NULL;
+	}
+
 	
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
 		m_videoDriver(NULL),m_sceneManager(new scene::CSceneManager()),
-		m_params(params),m_bClose(false)
+		m_params(params),m_bClose(false),m_bResized(false)
 	{
 		if(params.windowId==NULL)
 		{
@@ -30,6 +51,11 @@ namespace platform{
 
 		//初始化视频驱动器
 		createDriver();
+
+		SEnginePair ep;
+		ep.hWnd=m_hWnd;
+		ep.engine=this;
+		EngineMap.push_back(ep);
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
 		if(m_videoDriver!=NULL)
@@ -57,8 +83,23 @@ namespace platform{
 				DispatchMessage(&msg);
 			}
 		}
+		if(!m_bClose)
+			resizeIfNecessary();
 		//Sleep(20);
 		return !m_bClose;
+	}
+
+	void CYonEngineWin32::resizeIfNecessary()
+	{
+		if (!m_bResized)
+			return;
+
+		RECT r;
+		GetClientRect(m_hWnd, &r);
+
+		m_videoDriver->onResize(core::dimension2du((u32)r.right, (u32)r.bottom));
+		Logger->info("Resize:%d,%d\n",r.right,r.bottom);
+		m_bResized = false;
 	}
 
 	//
@@ -70,17 +111,22 @@ namespace platform{
 	//目的: 处理主窗口的消息。
 	//
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
+		CYonEngineWin32* engine=NULL;
 		switch(uiMsg) {
 		case WM_CREATE:
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Create window");
 			break;
-		case WM_CLOSE:
+		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
 		case WM_ACTIVATE:
 		case WM_KEYDOWN:
 		case WM_KEYUP:
 		case WM_SIZE:
+			engine=getEngineByHWnd(hWnd);
+			if(engine){
+				engine->needResize();
+			}
 			return 0;
 		}
 		return DefWindowProc(hWnd, uiMsg, wParam, lParam);
@@ -180,4 +226,4 @@ namespace platform{
 	//yon::ITimer* yon::platform::CYonEngineWin32::getTimer(){return NULL;}
 }//namespace platform
 }//namespace yon
-
+#endif

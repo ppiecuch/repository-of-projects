@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#ifdef YON_COMPILE_WITH_ANDROID
+#include <wchar.h>
+#endif
+
 namespace yon{
 	namespace core{
 

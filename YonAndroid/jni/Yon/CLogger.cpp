@@ -4,15 +4,29 @@
 #include <time.h>
 #include <sys/timeb.h>
 
+#ifdef YON_COMPILE_WITH_ANDROID
+#include <android/log.h>
+#endif
+
 namespace yon{
 	namespace debug{
 
-		//#define _TRUNCATE ((size_t)-1)
+#ifdef YON_COMPILE_WITH_ANDROID
+//在标准C里，你不能省略可变参数，但是你却可以给它传递一个空的参数。为了解决这个问题，CPP使用一个特殊的‘##’操作。
+#define LOGD(fmt,...) __android_log_print(ANDROID_LOG_DEBUG,YON_ENGINE_NAME,fmt,##__VA_ARGS__)
+#define LOGI(fmt,...) __android_log_print(ANDROID_LOG_INFO,YON_ENGINE_NAME,fmt,##__VA_ARGS__)
+#define LOGW(fmt,...) __android_log_print(ANDROID_LOG_WARN,YON_ENGINE_NAME,fmt,##__VA_ARGS__)
+#define LOGE(fmt,...) __android_log_print(ANDROID_LOG_ERROR,YON_ENGINE_NAME,fmt,##__VA_ARGS__)
+#endif
+
 		const core::stringc CLogger::LEVEL_NAME[ENUM_LOG_LEVEL_COUNT]={"DEBUG","INFO","WARN","ERROR"};
 		CLogger::CLogger():
 			m_path(""),m_name("log.txt"),m_pFile(NULL),
 			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_MSEC|MASK_FORMAT_LEVEL|MASK_FORMAT_LOG),
-			m_level(ENUM_LOG_LEVEL_DEBUG),m_appender(MASK_APPENDER_FILE|MASK_APPENDER_VS){
+			m_level(ENUM_LOG_LEVEL_DEBUG),
+			//m_appender(MASK_APPENDER_FILE|MASK_APPENDER_VS)
+			m_appender(MASK_APPENDER_CONSOLE|MASK_APPENDER_VS)
+		{
 
 				#ifdef YON_COMPILE_WITH_WIN32
 				InitializeCriticalSection(&m_mutex);
@@ -63,14 +77,22 @@ namespace yon{
 		}
 		void CLogger::appendDateTime(int& index){
 			if((m_format&MASK_FORMAT_DATE)||(m_format&MASK_FORMAT_TIME)){
-				static struct tm newtime;
+#ifdef YON_COMPILE_WITH_WIN32
+				static struct tm ttime;
 				static struct _timeb timebuffer;
 				_ftime64_s(&timebuffer); 
-				localtime_s(&newtime,&timebuffer.time);
+				localtime_s(&ttime,&timebuffer.time);
+				struct tm* newtime=&ttime;
+#elif defined(YON_COMPILE_WITH_ANDROID)
+				static struct tm* newtime;
+				static struct timeb timebuffer;
+				ftime (&timebuffer);
+				newtime=localtime(&timebuffer.time);
+#endif
 				sprintf_s(m_buffer+index,2,"[");
 				++index;
 				if(m_format&MASK_FORMAT_DATE){
-					strftime(m_buffer+index,11,"%Y-%m-%d",&newtime);
+					strftime(m_buffer+index,11,"%Y-%m-%d",newtime);
 					index+=10;
 				}
 				if((m_format&MASK_FORMAT_DATE)&&(m_format&MASK_FORMAT_TIME)){
@@ -78,7 +100,7 @@ namespace yon{
 					++index;
 				}
 				if(m_format&MASK_FORMAT_TIME){
-					strftime(m_buffer+index,9,"%H:%M:%S",&newtime);
+					strftime(m_buffer+index,9,"%H:%M:%S",newtime);
 					index+=8;
 				}
 				if((m_format&MASK_FORMAT_TIME)&&(m_format&MASK_FORMAT_MSEC)){
@@ -123,9 +145,13 @@ namespace yon{
 			if(level<m_level)
 				return;
 			if(m_pFile==NULL&&(m_appender&MASK_APPENDER_FILE)){
-				//m_pFile = fopen((m_path+m_name).c_str(),"ab");
+#ifdef YON_COMPILE_WITH_WIN32
 				errno_t result=fopen_s(&m_pFile,(m_path+m_name).c_str(),"a+");
 				if(result)
+#elif defined(YON_COMPILE_WITH_ANDROID)
+				m_pFile = fopen((m_path+m_name).c_str(),"ab");
+				if(m_pFile)
+#endif
 				{
 					core::stringc msg("open log file:");
 					msg+=m_path+m_name;
@@ -153,7 +179,25 @@ namespace yon{
 				fprintf(m_pFile,"%s",m_buffer);
 			}
 			if(m_appender&MASK_APPENDER_CONSOLE){
+#ifdef YON_COMPILE_WITH_WIN32
 				printf("%s",m_buffer);
+#elif defined(YON_COMPILE_WITH_ANDROID)
+				switch(level)
+				{
+				case ENUM_LOG_LEVEL_DEBUG:
+					LOGD("%s",m_buffer);
+					break;
+				case ENUM_LOG_LEVEL_INFO:
+					LOGI("%s",m_buffer);
+					break;
+				case ENUM_LOG_LEVEL_WARN:
+					LOGW("%s",m_buffer);
+					break;
+				case ENUM_LOG_LEVEL_ERROR:
+					LOGE("%s",m_buffer);
+					break;
+				}
+#endif//YON_COMPILE_WITH_WIN32
 			}
 			if(m_appender&MASK_APPENDER_VS){
 				OutputDebugStringA(m_buffer);
@@ -183,6 +227,5 @@ namespace yon{
 			output(ENUM_LOG_LEVEL_ERROR,pFmt,arg);
 			va_end(arg);
 		}
-		//#undef _TRUNCATE
 	}//debug
 }//yon

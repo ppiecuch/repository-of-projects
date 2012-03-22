@@ -6,6 +6,22 @@
 namespace yon{
 	namespace scene{
 		namespace camera{
+
+			enum ENUM_CAMERA_TYPE{
+				ENUM_CAMERA_TYPE_PERSP = 0,
+				ENUM_CAMERA_TYPE_ORTHO,
+				ENUM_CAMERA_TYPE_COUNT
+			};
+
+			enum ENUM_VIEW_PLANE{
+				ENUM_VIEW_PLANE_FAR = 0,
+				ENUM_VIEW_PLANE_NEAR,
+				ENUM_VIEW_PLANE_LEFT,
+				ENUM_VIEW_PLANE_RIGHT,
+				ENUM_VIEW_PLANE_TOP,
+				ENUM_VIEW_PLANE_BOTTOM,
+				ENUM_VIEW_PLANE_COUNT
+			};
 		
 			class ICamera : public core::IRenderable{
 			protected:
@@ -23,18 +39,14 @@ namespace yon{
 				virtual f32 getFar() const =0;
 				virtual void setFar(f32 far) =0;
 
-				virtual f32 getAspectRatio() const =0;
-				virtual void setAspectRatio(f32 aspect) =0;
-
-				virtual f32 getFovy() const =0;
-				virtual void setFovy(f32 fovy) =0;
-
 				virtual void setNeedRender(bool on){
 					m_needRender=on;
 				}
 				virtual bool getNeedRender() const{
 					return m_needRender;
 				}
+
+				virtual ENUM_CAMERA_TYPE getType() const = 0;
 			};
 		}
 	}

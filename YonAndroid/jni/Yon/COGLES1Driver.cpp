@@ -165,9 +165,15 @@ namespace ogles1{
 	}
 	void COGLES1Driver::end()
 	{
+#ifdef YON_COMPILE_WITH_WIN32
 		eglSwapBuffers(m_eglDisplay, m_eglSurface);
+#endif//YON_COMPILE_WITH_WIN32
 	}
-	void COGLES1Driver::setViewPort(const core::recti& rec){
+	void COGLES1Driver::setViewPort(const yon::core::recti& r){
+		glViewport(0, 0, r.w, r.h);
+	}
+	void COGLES1Driver::onResize(const yon::core::dimension2du& size){
+		setViewPort(core::recti(0,0,size.w,size.h));
 	}
 	void COGLES1Driver::drawUnit(scene::IUnit* unit) const{
 		glEnableClientState(GL_VERTEX_ARRAY);
