@@ -21,7 +21,7 @@ namespace yon{
 		}
 
 		IModel* CSceneManager::addModel(IEntity* entity){
-			CModel* model=new CModel(entity,this);
+			CModel* model=new CModel(this,entity);
 			addChild(model);
 			model->drop();
 
