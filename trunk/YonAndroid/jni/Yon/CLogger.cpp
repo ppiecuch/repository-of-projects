@@ -49,7 +49,7 @@ namespace yon{
 			#ifdef YON_COMPILE_WITH_WIN32
 			EnterCriticalSection(&m_mutex);
 			#else
-			if(pthread_mutex_lock(&m_mutex) != 0 )!
+			if(pthread_mutex_lock(&m_mutex) != 0 )
 				throw core::exception("can not lock mutex!(pthread_mutex_lock return nonzero)");
 			#endif
 		}
@@ -57,7 +57,7 @@ namespace yon{
 			#ifdef YON_COMPILE_WITH_WIN32
 			LeaveCriticalSection(&m_mutex);
 			#else
-			if(pthread_mutex_unlock(&m_mutex) != 0 )!
+			if(pthread_mutex_unlock(&m_mutex) != 0 )
 				throw core::exception("can not unlock mutex!(pthread_mutex_unlock return nonzero)");
 			#endif
 		}
