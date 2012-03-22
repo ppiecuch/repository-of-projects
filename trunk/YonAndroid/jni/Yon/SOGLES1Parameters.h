@@ -17,6 +17,8 @@ namespace yon{
 #ifdef YON_COMPILE_WITH_WIN32
 				SOGLES1Parameters(HWND& hwnd,const core::dimension2du& windowSize):hWnd(hwnd),windowSize(windowSize){}
 				HWND hWnd;
+#elif defined(YON_COMPILE_WITH_ANDROID)
+				SOGLES1Parameters(const core::dimension2du& windowSize):windowSize(windowSize){}
 #endif//YON_COMPILE_WITH_WIN32
 
 				//´°¿Ú³ß´ç

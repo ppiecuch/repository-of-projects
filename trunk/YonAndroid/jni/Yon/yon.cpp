@@ -1,6 +1,7 @@
 #include "yon.h"
 #include "CLogger.h"
 #include "CYonEngineWin32.h"
+#include "CYonEngineAndroid.h"
 
 namespace yon{
 
@@ -31,8 +32,10 @@ namespace yon{
 
 		IYonEngine* engine;
 
-#ifdef YON_VIDEO_MODE_OGLES1
+#ifdef YON_COMPILE_WITH_WIN32
 		engine=new platform::CYonEngineWin32(param);
+#elif defined(YON_COMPILE_WITH_ANDROID)
+		engine=new platform::CYonEngineAndroid(param);
 #endif
 
 		YON_DEBUG_BREAK_IF(engine==NULL)

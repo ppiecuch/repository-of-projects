@@ -14,8 +14,6 @@ namespace yon{
 		}
 
 		CSceneManager::~CSceneManager(){
-			IModel::~IModel();
-
 			m_geometryFactory->drop();
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Release CSceneManager");
 		}

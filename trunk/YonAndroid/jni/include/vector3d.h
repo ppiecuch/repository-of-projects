@@ -2,7 +2,7 @@
 #define _YON_CORE_VECTOR3D_H_
 
 #include "config.h"
-#include "vector3d.h"
+#include "yonMath.h"
 
 namespace yon{
 	namespace core{

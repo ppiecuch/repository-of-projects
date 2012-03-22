@@ -30,12 +30,15 @@ namespace yon{
 			const HWND& getHWND() const{
 				return m_hWnd;
 			}
+			void needResize(){
+				m_bResized=true;
+			}
 		protected:
 			virtual void createDriver();
 		private:
 			//初始化窗口，成功则返回true，失败则返回false
 			bool initWindow(const yon::SYonEngineParameters& params);
-
+			void resizeIfNecessary();
 			//窗口句柄
 			//Microsoft Windows 运行环境，通过给应用程序中的每个窗体和控件分配一个句柄（或 hWnd）来标识它们。
 			//hWnd 属性用于Windows API调用。许多 Windows 运行环境函数需要活动窗口的 hWnd 作为参数。
@@ -50,6 +53,7 @@ namespace yon{
 			scene::ISceneManager* m_sceneManager;
 
 			bool m_bClose;
+			bool m_bResized;
 		};
 	}
 }

@@ -6,6 +6,9 @@
 #include "yonMath.h"
 #include "vector3d.h"
 #include <memory.h>
+#ifdef YON_COMPILE_WITH_ANDROID
+#include <string.h>
+#endif
 namespace yon{
 	namespace core{
 

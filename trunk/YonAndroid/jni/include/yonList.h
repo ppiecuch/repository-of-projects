@@ -2,7 +2,11 @@
 #define _YON_CORE_YONLIST_H_
 
 #include "yonTypes.h"
+#ifdef YON_COMPILE_WITH_WIN32
 #include <new.h>
+#elif defined(YON_COMPILE_WITH_ANDROID)
+#include <new>
+#endif
 
 namespace yon{
 	namespace core{

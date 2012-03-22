@@ -1,6 +1,18 @@
 #include "yon_AndroidGLView.h"
+#include "include/yon.h"
 #include "log.h"
 #include <GLES/gl.h>
+#include <locale.h>
+
+using namespace yon;
+using namespace yon::core;
+using namespace yon::debug;
+using namespace yon::video;
+using namespace yon::scene;
+
+IYonEngine* engine=NULL;
+IVideoDriver* driver=NULL;
+ISceneManager* sceneMgr=NULL;
 
 #define JNI_VERSION_1_1 0x00010001
 #define JNI_VERSION_1_2 0x00010002
@@ -36,6 +48,19 @@ void checkJNIVersion(JNIEnv *pEnv){
 
 void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jstring apkFilePath, jstring sdcardPath){
 	checkJNIVersion(pEnv);
+	//setlocale(LC_CTYPE,"UTF-8");
+
+	SYonEngineParameters params;
+	engine=CreateEngine(params);
+
+	driver=engine->getVideoDriver();
+	sceneMgr=engine->getSceneManager();
+	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
+
+	IEntity* cube=geometryFty->createCube();
+	IModel* model=sceneMgr->addModel(cube);
+	cube->drop();
+
 	LOGD(LOG_TAG,"nativeOnSurfaceCreated");
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
@@ -43,8 +68,23 @@ void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, ji
 }
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	//LOGD(LOG_TAG,"nativeOnDrawFrame");
-	glClearColor(0.1f,0.2f,0.3f,1);
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	//glClearColor(0.1f,0.2f,0.3f,1);
+	//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+	driver->begin(true,COLOR_GRAY);
+
+	sceneMgr->render(driver);
+
+	//smgr->drawAll();
+	//guienv->drawAll();
+
+	//driver->endScene();
+	//Sleep(20);
+	//printf("run\n");
+	//num++;
+	Logger->debug("%s\n","test你好");
+	//logger->info("TEST\n");
+	driver->end();
 }
 void Java_yon_AndroidGLView_nativeOnPause(JNIEnv *pEnv, jobject obj){
 	LOGD(LOG_TAG,"nativeOnPause");
@@ -81,6 +121,7 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
      }
      //回调java中的方法
      LOGI(LOG_TAG,"callbackDestroy function");
+	 engine->drop();
      pEnv->CallVoidMethod(obj, destroy);
 	 return true;
 }

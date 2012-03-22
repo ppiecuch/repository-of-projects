@@ -50,6 +50,14 @@ typedef wchar_t fschar;
 typedef char fschar;
 #endif
 
+//º¯Êýºê¶¨Òå
+#ifdef YON_COMPILE_WITH_ANDROID
+#define sprintf_s(buffer,size,args...) sprintf(buffer,args)
+#define vsprintf_s(buffer,size,fmt,args...) vsprintf(buffer,fmt,args)
+#define vswprintf_s(buffer,size,fmt,args...)  swprintf(buffer,size,fmt,args)
+#define OutputDebugStringA(args...)
+#endif
+
 }//yon
 
 #endif 

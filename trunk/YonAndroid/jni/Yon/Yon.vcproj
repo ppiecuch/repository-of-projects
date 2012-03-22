@@ -314,6 +314,14 @@
 				Name="platform"
 				>
 				<File
+					RelativePath=".\CYonEngineAndroid.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CYonEngineAndroid.h"
+					>
+				</File>
+				<File
 					RelativePath=".\CYonEngineWin32.cpp"
 					>
 				</File>
@@ -382,10 +390,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\SOGLES1Parameters.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\SVertex.h"
 					>
 				</File>
@@ -402,6 +406,14 @@
 					</File>
 					<File
 						RelativePath="..\include\ICamera.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\IOrthoCamera.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\IPerspCamera.h"
 						>
 					</File>
 					<File
@@ -422,14 +434,6 @@
 				Name="video"
 				>
 				<File
-					RelativePath=".\COGLES1Driver.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\COGLES1Driver.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\IVideoDriver.h"
 					>
 				</File>
@@ -437,8 +441,28 @@
 					RelativePath="..\include\SVideoDriverInfo.h"
 					>
 				</File>
+				<Filter
+					Name="ogles1"
+					>
+					<File
+						RelativePath=".\COGLES1Driver.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\COGLES1Driver.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SOGLES1Parameters.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath="..\Android.mk"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -42,7 +42,8 @@ int main(int argc, char* argv[])
 {
 	EnableMemLeakCheck();
 
-	setlocale(LC_ALL,"chs");
+	//setlocale(LC_ALL,"chs");
+	setlocale(LC_CTYPE,"UTF-8");
 
 	
 
@@ -80,7 +81,7 @@ int main(int argc, char* argv[])
 		//Sleep(20);
 		//printf("run\n");
 		//num++;
-		//logger->debug("%d %s\n",num,"testÄãºÃ");
+		//Logger->debug("%s\n","testÄãºÃ");
 		//logger->info("TEST\n");
 		driver->end();
 	}
