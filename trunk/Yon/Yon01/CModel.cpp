@@ -3,7 +3,9 @@
 namespace yon{
 	namespace scene{
 
-		CModel::CModel(IEntity* entity,IModel* parent):m_entity(NULL),IModel(parent){
+		CModel::CModel(IModel* parent,IEntity* entity,
+			const core::vector3df& pos,const core::vector3df& rot,const core::vector3df& scale):
+			m_entity(NULL),IModel(parent,pos,rot,scale){
 			setEntity(entity);
 		}
 		CModel::~CModel(){

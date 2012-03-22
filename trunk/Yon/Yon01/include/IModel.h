@@ -16,8 +16,10 @@ namespace yon{
 
 			
 			
-			IModel(IModel* parent,const core::vector3df& pos):
-				m_parent(parent),m_position(pos)
+			IModel(IModel* parent,const core::vector3df& pos=core::vector3df(0,0,0),
+				const core::vector3df& rot=core::vector3df(0,0,0),
+				const core::vector3df& scale=core::vector3df(1,1,1)):
+				m_parent(parent),IRenderable(pos,rot,scale)
 			{
 				if(parent!=NULL){
 					m_parent->addChild(this);
