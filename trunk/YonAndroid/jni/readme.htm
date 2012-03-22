@@ -1,0 +1,119 @@
+<html>
+
+<head>
+<title>Read Me</title>
+<style type="text/css">
+caption{
+	font-weight:bolder;
+}
+table {
+ width: 500px;
+ padding: 0;
+ margin: 0;
+ border:1px solid #0da2af
+}
+td {
+ background: #fff;
+ font-size:12px;
+ padding: 6px 6px 6px 12px;
+ margin:0;
+ color: #4f6b72;
+}
+.spec_title
+{
+	background:#CAE8EA;
+	font-weight:bolder;
+	text-align:center;
+}
+.spec_note
+{
+	background:#f9e2be;
+	color:Black;
+	font-family:宋体;
+}
+</style>
+</head>
+
+<body>
+<h1>说明</h1>
+<table>
+<caption>概要</caption>
+<tr><td>名称</td><td>Yon(远方)</td></tr>
+<tr><td>版本</td><td>0.1</td></tr>
+<tr><td>作者</td><td>洪智标</td></tr>
+<tr>
+<td>功能</td>
+<td>
+<p>描述如下：</p>
+</td>
+</tr>
+</table>
+
+<table>
+<caption>代码规范</caption>
+
+<tr><td class="spec_title" colspan=2>文件命名</td></tr>
+<tr><td>类文件</td><td>类名</td></tr>
+<tr><td>函数文件</td><td>小写</td></tr>
+<tr><td>枚举文件</td><td>E(首字母大写)</td></tr>
+<tr><td class="spec_title" colspan=2>类命名</td></tr>
+<tr><td>接口类</td><td>I</td></tr>
+<tr><td>实例类</td><td>C</td></tr>
+<tr><td>实体类</td><td>S</td></tr>
+<tr><td class="spec_title" colspan=2>变量命名</td></tr>
+<tr><td>全局变量</td><td>g_</td></tr>
+<tr><td>静态变量</td><td>s_</td></tr>
+<tr><td>类成员变量</td><td>m_</td></tr>
+
+<tr><td>指针</td><td>p</td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+
+<tr><td class="spec_title" colspan=2>其他命名</td></tr>
+<tr><td>筛选器</td><td>按功能划分(小写)</td></tr>
+<tr><td>枚举</td><td>ENUM_(大写)</td></tr>
+<tr><td>枚举元素</td><td>类型名_元素名(大写)</td></tr>
+<tr><td>掩码</td><td>MASK_(大写)</td></tr>
+<tr><td>掩码元素</td><td>类型名_元素名(大写)</td></tr>
+<tr><td class="spec_note" colspan=2>注意：以上规则不对core包中的类进行规范，主要是考虑到core中的类多是数学相关，它们在使用过程中简洁最重要且多是模板类</td></tr>
+</table>
+<pre>
+主版本号 . 子版本号 [ 修正版本号 [. 编译版本号 ]]
+英文对照 : Major_Version_Number.Minor_Version_Number[Revision_Number[.Build_Number]]
+应根据下面的约定使用这些部分：
+Major ：具有相同名称但不同主版本号的程序集不可互换。例如，这适用于对产品的大量重写，这些重写使得无法实现向后兼容性。
+Minor ：如果两个程序集的名称和主版本号相同，而次版本号不同，这指示显著增强，但照顾到了向后兼容性。例如，这适用于产品的修正版或完全向后兼容的新版本。
+Build ：内部版本号的不同表示对相同源所作的重新编译。这适合于更改处理器、平台或编译器的情况。
+Revision ：名称、主版本号和次版本号都相同但修订号不同的程序集应是完全可互换的。这适用于修复以前发布的程序集中的安全漏洞。
+</pre>
+
+<h3>include列表</h3>
+<pre>
+color.h 
+config.h 
+dimension2d.h 
+IReferencable.h 
+ITimer.h 
+types.h 
+yon.h 
+YonEngine.h 
+YonEngineParameters.h 
+</pre>
+
+<h3>异常</h3>
+<pre>
+1>d:\Development\Workspace\VS2008\Yon\Yon01\include\string.h(10) : error C2894: 模板不能声明为有“C”链接
+1>C:\Program Files\Microsoft SDKs\Windows\v6.0A\include\guiddef.h(161) : error C3861: “memcmp”: 找不到标识符
+1>C:\Program Files\Microsoft SDKs\Windows\v6.0A\include\propidl.h(1145) : error C3861: “memset”: 找不到标识符
+1>C:\Program Files\Microsoft SDKs\Windows\v6.0A\include\stralign.h(110) : error C3861: “wcscpy”: 找不到标识符
+【解决】
+将string.h改为yonString.h解决
+</pre>
+</body>
+</html>
