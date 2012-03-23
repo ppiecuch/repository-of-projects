@@ -65,6 +65,10 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, js
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	LOGD(LOG_TAG,"nativeOnSurfaceChanged->w:%d,h:%d",w,h);
+	core::dimension2du size;
+	size.w = w;
+	size.h = h;
+	driver->onResize(size);
 }
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	//LOGD(LOG_TAG,"nativeOnDrawFrame");
@@ -82,7 +86,7 @@ void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	//Sleep(20);
 	//printf("run\n");
 	//num++;
-	Logger->debug("%s\n","testÄãºÃ");
+	//Logger->debug("%s\n","testÄãºÃ");
 	//logger->info("TEST\n");
 	driver->end();
 }
