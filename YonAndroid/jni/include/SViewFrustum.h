@@ -10,7 +10,7 @@ namespace yon{
 
 			
 
-			class SViewFrustum{
+			class YON_DEPRECATED SViewFrustum{
 			private:
 				enum ENUM_FRUSTUM_TRANSFORM{
 					ENUM_FRUSTUM_TRANSFORM_VIEW = 0,		// ”Õºø’º‰æÿ’Û

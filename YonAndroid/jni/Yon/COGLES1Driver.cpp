@@ -171,6 +171,7 @@ namespace ogles1{
 	}
 	void COGLES1Driver::setViewPort(const yon::core::recti& r){
 		glViewport(0, 0, r.w, r.h);
+		Logger->debug("setViewPort(0,0,%d,%d)\n",r.w,r.h);
 	}
 	void COGLES1Driver::onResize(const yon::core::dimension2du& size){
 		setViewPort(core::recti(0,0,size.w,size.h));

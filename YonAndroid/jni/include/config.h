@@ -2,6 +2,7 @@
 #define _YON_CONFIG_H_
 
 #define YON_ENGINE_NAME "YonEngine"
+
 #define YON_VERSION_MAJOR 0 //主版本号
 #define YON_VERSION_MINOR 1	//子版本号
 
@@ -36,6 +37,9 @@
 //#define YON_HIDE_CONSOLE
 
 //过期声明
+//用法:
+//YON_DEPRECATED void fun(...){...}
+//class YON_DEPRECATED object{...}
 #ifdef YON_COMPILE_WITH_WIN32
 #define YON_DEPRECATED __declspec(deprecated)
 #else
