@@ -56,6 +56,9 @@ namespace platform{
 		ep.hWnd=m_hWnd;
 		ep.engine=this;
 		EngineMap.push_back(ep);
+		Logger->debug("EngineMap.push_back(ep)\n");
+		//系统WM_SIZE消息可能在将本对象push进EngineMap之前已经处理完,为了确保完整性,这里再发送一次WM_SIZE
+		PostMessage(m_hWnd,WM_SIZE,0,0);
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
 		if(m_videoDriver!=NULL)
@@ -68,6 +71,10 @@ namespace platform{
 			Logger=NULL;
 		}
 	}
+
+		void CYonEngineWin32::onResize(u32 w,u32 h){
+			m_bResized=true;
+		}
 
 	bool CYonEngineWin32::run(){
 		MSG msg;
@@ -98,7 +105,7 @@ namespace platform{
 		GetClientRect(m_hWnd, &r);
 
 		m_videoDriver->onResize(core::dimension2du((u32)r.right, (u32)r.bottom));
-		Logger->info("Resize:%d,%d\n",r.right,r.bottom);
+		m_sceneManager->onResize(core::dimension2du((u32)r.right, (u32)r.bottom));
 		m_bResized = false;
 	}
 
@@ -114,7 +121,7 @@ namespace platform{
 		CYonEngineWin32* engine=NULL;
 		switch(uiMsg) {
 		case WM_CREATE:
-			Logger->info(YON_LOG_SUCCEED_FORMAT,"Create window");
+			Logger->debug("WM_CREATE\n");
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
@@ -123,9 +130,12 @@ namespace platform{
 		case WM_KEYDOWN:
 		case WM_KEYUP:
 		case WM_SIZE:
+			Logger->debug("WM_SIZE\n");
 			engine=getEngineByHWnd(hWnd);
 			if(engine){
-				engine->needResize();
+				engine->onResize(0,0);
+			}else{
+				Logger->warn(YON_LOG_WARN_FORMAT,"getEngineByHWnd==NULL");
 			}
 			return 0;
 		}

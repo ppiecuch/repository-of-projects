@@ -126,12 +126,11 @@ namespace ogles1{
 		initEGL(param.hWnd);
 #endif//YON_COMPILE_WITH_WIN32
 
-		u32 i;
-		glViewport(0, 0, param.windowSize.w,param.windowSize.h);
-		Logger->debug("serViewport:%d,%d\n",param.windowSize.w,param.windowSize.h);
-		
-		for (i=0; i<ENUM_TRANSFORM_COUNT; ++i)
-			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
+			u32 i;
+			onResize(param.windowSize);
+
+			for (i=0; i<ENUM_TRANSFORM_COUNT; ++i)
+				setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
 
 		
 		//InitGL();
@@ -191,17 +190,28 @@ namespace ogles1{
 		switch(transform)
 		{
 		case ENUM_TRANSFORM_VIEW:
+			{
+				glMatrixMode(GL_MODELVIEW);
+				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
+				Logger->debug("setViewMatrix:\n");
+				m_matrix[ENUM_TRANSFORM_VIEW].print();
+			}
+			break;
 		case ENUM_TRANSFORM_WORLD:
 			{
 				//OpenGL ES1中只存在ModelView矩阵,其实就是由World矩阵与View矩阵相乘而成
 				glMatrixMode(GL_MODELVIEW);
 				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
+				Logger->debug("setWorldMatrix:\n");
+				m_matrix[ENUM_TRANSFORM_WORLD].print();
 			}
 			break;
 		case ENUM_TRANSFORM_PROJECTION:
 			{
 				glMatrixMode(GL_PROJECTION);
 				glLoadMatrixf(m_matrix[ENUM_TRANSFORM_PROJECTION].pointer());
+				Logger->debug("setProjectionMatrix:\n");
+				m_matrix[ENUM_TRANSFORM_PROJECTION].print();
 			}
 			break;
 		default:

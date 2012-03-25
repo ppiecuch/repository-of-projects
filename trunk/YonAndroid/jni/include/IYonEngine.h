@@ -18,6 +18,7 @@ namespace yon{
 		virtual video::IVideoDriver* getVideoDriver() = 0;
 		virtual scene::ISceneManager* getSceneManager() = 0;
 		virtual bool run() = 0;
+		virtual void onResize(u32 w,u32 h) = 0;
 		//更新
 		//包括更新计时器
 		//virtual void update() = 0;

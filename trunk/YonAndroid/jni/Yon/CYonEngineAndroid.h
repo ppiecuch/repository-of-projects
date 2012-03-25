@@ -22,11 +22,15 @@ namespace yon{
 			virtual scene::ISceneManager* getSceneManager(){return m_sceneManager;}
 			virtual bool run();
 
+			virtual void onResize(u32 w,u32 h);
+
 			//virtual yon::ITimer* getTimer();
 
 		protected:
 			virtual void createDriver();
 		private:
+			void resizeIfNecessary();
+
 			//参数结构体
 			yon::SYonEngineParameters m_params;
 
@@ -34,6 +38,7 @@ namespace yon{
 			scene::ISceneManager* m_sceneManager;
 
 			bool m_bClose;
+			bool m_bResized;
 		};
 	}
 }

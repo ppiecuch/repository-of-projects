@@ -9,6 +9,7 @@ using namespace yon::core;
 using namespace yon::debug;
 using namespace yon::video;
 using namespace yon::scene;
+using namespace yon::scene::camera;
 
 IYonEngine* engine=NULL;
 IVideoDriver* driver=NULL;
@@ -57,7 +58,9 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, js
 	sceneMgr=engine->getSceneManager();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 
-	IEntity* cube=geometryFty->createCube();
+	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,-100,0));
+
+	IEntity* cube=geometryFty->createCube(core::dimension3df(100,100,100));
 	IModel* model=sceneMgr->addModel(cube);
 	cube->drop();
 
@@ -65,16 +68,13 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, js
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	LOGD(LOG_TAG,"nativeOnSurfaceChanged->w:%d,h:%d",w,h);
-	core::dimension2du size;
-	size.w = w;
-	size.h = h;
-	driver->onResize(size);
+	engine->onResize(w,h);
 }
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	//LOGD(LOG_TAG,"nativeOnDrawFrame");
 	//glClearColor(0.1f,0.2f,0.3f,1);
 	//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
+	engine->run();
 	driver->begin(true,COLOR_GRAY);
 
 	sceneMgr->render(driver);

@@ -9,6 +9,9 @@
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <string.h>
 #endif
+
+#include "ILogger.h"
+
 namespace yon{
 	namespace core{
 
@@ -41,6 +44,11 @@ namespace yon{
 			}
 			matrix4(const matrix4<T>& other){
 				*this=other;
+			}
+
+			inline void print(){
+				for(u32 i=0;i<4;++i)
+					Logger->debug("%.3f,%.3f,%.3f,%.3f\n",m[0][i],m[1][i],m[2][i],m[3][i]);
 			}
 
 			const T* pointer() const { return &m[0][0]; }
@@ -262,7 +270,7 @@ namespace yon{
 					return;
 
 				ort.m[0][0] = (T)2.0f / deltaX;
-				ort.m[0][1] = (T)ort.m[0][2] = ort.m[0][3] = 0.0f;
+				ort.m[0][1] = ort.m[0][2] = ort.m[0][3] = (T)0.0f;
 				ort.m[1][1] = (T)2.0f / deltaY;
 				ort.m[1][0] = ort.m[1][2] = ort.m[1][3] = (T)0.0f;
 				ort.m[2][2] = (T)-2.0f / deltaZ;
