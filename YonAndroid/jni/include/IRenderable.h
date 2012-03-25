@@ -4,12 +4,15 @@
 #include "IReferencable.h"
 #include "IVideoDriver.h"
 #include "vector3d.h"
+#include "matrix4.h"
 
 namespace yon{
 	namespace core{
 
 		class IRenderable : public virtual IReferencable{
 		protected:
+			bool m_bTransformationChanged;
+			core::matrix4f m_transformation;
 			core::vector3df m_position;
 			core::vector3df m_rotation;
 			core::vector3df m_scale;
@@ -17,7 +20,8 @@ namespace yon{
 			IRenderable(const core::vector3df& pos=core::vector3df(0,0,0),
 				const core::vector3df& rot=core::vector3df(0,0,0),
 				const core::vector3df& scale=core::vector3df(1,1,1)):
-				m_position(pos),m_rotation(rot),m_scale(scale){}
+				m_position(pos),m_rotation(rot),m_scale(scale),
+				m_bTransformationChanged(true){}
 			virtual void render(video::IVideoDriver* driver) = 0;
 
 			virtual void setPosition(const core::vector3df& pos){
@@ -39,6 +43,20 @@ namespace yon{
 			}
 			virtual const core::vector3df& getScale() const{
 				return m_scale;
+			}
+
+			virtual const core::matrix4f& getAbsoluteTransformation()
+			{
+				return getRelativeTransformation();
+			}
+
+			virtual const core::matrix4f& getRelativeTransformation()
+			{
+				if(m_bTransformationChanged){
+					m_transformation.makeIdentity();
+					//m_transformation.rotate(m_rotation);
+				}
+				return m_transformation;
 			}
 		};
 	}

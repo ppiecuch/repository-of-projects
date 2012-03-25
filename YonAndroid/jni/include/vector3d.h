@@ -4,6 +4,8 @@
 #include "config.h"
 #include "yonMath.h"
 
+#include "ILogger.h"
+
 namespace yon{
 	namespace core{
 
@@ -16,6 +18,14 @@ namespace yon{
 			vector3d():x(0),y(0),z(0){}
 			vector3d(T x,T y,T z):x(x),y(y),z(z){}
 			vector3d(const vector3d<T>& other) : x(other.x), y(other.y), z(other.z) {}
+
+			inline void print(){
+				if(Logger){
+					Logger->debug("%.3f,%.3f,%.3f\n",x,y,z);
+				}else{
+					printf("%.3f,%.3f,%.3f\n",x,y,z);
+				}
+			}
 
 			vector3d<T> operator-() const { return vector3d<T>(-x, -y, -z); }
 
@@ -40,6 +50,27 @@ namespace yon{
 			vector3d<T>& operator/=(const vector3d<T>& other) { x/=other.x; y/=other.y; z/=other.z; return *this; }
 			vector3d<T> operator/(const T v) const { T i=(T)1.0/v; return vector3d<T>(x * i, y * i, z * i); }
 			vector3d<T>& operator/=(const T v) { T i=(T)1.0/v; x*=i; y*=i; z*=i; return *this; }
+
+			bool operator==(const vector3d<T>& other) const
+			{
+				return this->equals(other);
+			}
+
+			bool operator!=(const vector3d<T>& other) const
+			{
+				return !this->equals(other);
+			}
+
+			// functions
+
+			//! returns if this vector equals the other one, taking floating point rounding errors into account
+			bool equals(const vector3d<T>& other, const T tolerance = (T)ROUNDING_ERROR_f32 ) const
+			{
+				return core::equals(x, other.x, tolerance) &&
+					core::equals(y, other.y, tolerance) &&
+					core::equals(z, other.z, tolerance);
+			}
+
 
 			vector3d<T>& set(const T nx, const T ny, const T nz) {x=nx; y=ny; z=nz; return *this;}
 			vector3d<T>& set(const vector3d<T>& p) {x=p.x; y=p.y; z=p.z;return *this;}
@@ -68,6 +99,7 @@ namespace yon{
 		typedef vector3d<f32> vector3df;
 
 		YON_API extern const vector3df UP_VECTOR3DF;
+		YON_API extern const vector3df IDENTITY_VECTOR3DF;
 	}//core
 }//yon
 #endif

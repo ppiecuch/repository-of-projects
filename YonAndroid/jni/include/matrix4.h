@@ -47,8 +47,13 @@ namespace yon{
 			}
 
 			inline void print(){
-				for(u32 i=0;i<4;++i)
-					Logger->debug("%.3f,%.3f,%.3f,%.3f\n",m[0][i],m[1][i],m[2][i],m[3][i]);
+				if(Logger){
+					for(u32 i=0;i<4;++i)
+						Logger->debug("%.3f,%.3f,%.3f,%.3f\n",m[0][i],m[1][i],m[2][i],m[3][i]);
+				}else{
+					for(u32 i=0;i<4;++i)
+						printf("%.3f,%.3f,%.3f,%.3f\n",m[0][i],m[1][i],m[2][i],m[3][i]);
+				}
 			}
 
 			const T* pointer() const { return &m[0][0]; }
@@ -232,6 +237,13 @@ namespace yon{
 				u32 remainder=index-quotient;
 				return m[quotient][remainder];
 			}*/
+			inline void rotateVector( vector3df& vect ) const{
+				vector3df tmp = vect;
+				vect.x = tmp.x*m[0][0] + tmp.y*m[1][0] + tmp.z*m[2][0];
+				vect.y = tmp.x*m[0][1] + tmp.y*m[1][1] + tmp.z*m[2][1];
+				vect.z = tmp.x*m[0][2] + tmp.y*m[1][2] + tmp.z*m[2][2];
+			}
+
 			inline void frustum(f32 left, f32 right, f32 bottom, f32 top, f32 nearZ, f32 farZ){
 				f32	deltaX = right - left;
 				f32	deltaY = top - bottom;
