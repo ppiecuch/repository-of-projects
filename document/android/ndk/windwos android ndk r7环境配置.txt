@@ -1,0 +1,20 @@
+ 在2011年的珠海变冷的一个冬天,论坛上< DEVDIV版主xyz_lmn特别推出Android JNI入门系列教程>进入我的眼球.于是在我的好奇心上,我就决定去学习jni了.那就得由环境配置开始了.现在ndk版本已经出到r7了.当然.我们也该从r7入手啦.
+     r7和以前的版本不一样.这里大家得注意一下.r7之前的版本,是需要用户自己去下载cygwin,并配置环境的,但r7后,google已经把cygwin集成到ndk里面了.ndk-build.cmdb会帮我们完成一切以前繁琐的事情.这里我很感慨,觉得,开发越来越面向小学生了.真的是少壮不努力,老来干IT.好了.简单介绍了下r7,就开始进入实操中了.
+     1.我们要下载NDK R7 http://developer.android.com/sdk/ndk/index.html 并解压,我是放在d:\android-ndk-r7下的.其实到这里,我们的环境就已经配置好了.是不是好坑爹的感觉.哈哈
+     2.到了eclipse,我们要进行编写,修改,方便编译,就得下载CDT.http://www.eclipse.org/cdt/downloads.php 大家对应自己的版本下载就是了.我是重新把eclipse 也重新下载个Indigo 3.7.1版本的.和cdt-master-8.0.1.zip的.然后就进行安装重启就 可以了.这部没什么问题的.到了这里,环境就配置好了.但编译环境就要每次简历项目的时候重新设置
+     3.我们新建一个android的工程,并建立jni文件夹,这里,大家把android-ndk-r7\samples\hello-jni下的jni文件复制到工程的jni文件夹下.然后也把hellojni文件也复制到自己工程的com.example.hellojni文件夹下.然后再配置下androidmanifest.xml的启动配置为helojni.
+     4.配置builder属性.右键项目properties->builders->new 
+      4.1 locatioin 只要配置ndk-build.cmd的路径,
+      4.2 Working Directory选择当前的项目
+
+      4.3把refresh的refresh resources upon completion选上
+
+      4.4把build options 的During auto builds 和specify working set of relevant resources选上
+
+      4.5在specify resources把jni文件夹勾上就可以了.这样勾是告诉builder,这个设置只编译这文件夹的文件即可.然后ok保存 就回在控制台出现编译的信息
+
+
+     5.最后,运行程序,咆哮吧!!!jni环境就好了.就会看到程序了!!!好吧.往后在努力研究下去其他吧.
+
+
+http://www.devdiv.com/home.php?mod=space&uid=14327&do=blog&id=6711
