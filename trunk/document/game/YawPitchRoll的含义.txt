@@ -1,8 +1,8 @@
 刚刚在wikipedia看到了一个非常好的图示Yaw, Pitch, Roll，摘录如下：
 
-YAW:左右转
-PITCH:前后倒
-ROLL:左右倾
+YAW:左右转==>绕Y
+PITCH:前后倒==>绕X
+ROLL:左右倾==>绕Z
 
 左手原则
 
