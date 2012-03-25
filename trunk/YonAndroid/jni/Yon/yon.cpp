@@ -12,6 +12,7 @@ namespace yon{
 		const matrix4f IDENTITY_MATRIX(true);
 
 		const vector3df UP_VECTOR3DF(0,1,0);
+		const vector3df IDENTITY_VECTOR3DF(1,1,1);
 
 		const color COLOR_GRAY(0x88888888);
 	}

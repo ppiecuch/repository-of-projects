@@ -171,6 +171,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\matrixTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\matrixTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\yonArrayTestCase.cpp"
 			>
 		</File>
