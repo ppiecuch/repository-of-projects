@@ -13,7 +13,7 @@ namespace yon{
 
 		CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params):
 			m_videoDriver(NULL),m_sceneManager(new scene::CSceneManager()),
-			m_params(params),m_bClose(false)
+			m_params(params),m_bClose(false),m_bResized(true)
 		{
 			//初始化视频驱动器
 			createDriver();
@@ -29,7 +29,25 @@ namespace yon{
 		}
 
 		bool CYonEngineAndroid::run(){
+			if(!m_bClose)
+				resizeIfNecessary();
 			return !m_bClose;
+		}
+		void CYonEngineAndroid::onResize(u32 w,u32 h){
+			m_bResized=true;
+			m_params.windowSize.w=w;
+			m_params.windowSize.h=h;
+			Logger->debug("CYonEngineAndroid::onResize(%d,%d)",w,h);
+		}
+
+		void CYonEngineAndroid::resizeIfNecessary()
+		{
+			if (!m_bResized)
+				return;
+
+			m_videoDriver->onResize(m_params.windowSize);
+			m_sceneManager->onResize(m_params.windowSize);
+			m_bResized = false;
 		}
 
 		void CYonEngineAndroid::createDriver(){

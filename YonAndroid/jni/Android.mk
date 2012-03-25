@@ -14,7 +14,7 @@ LOCAL_SRC_FILES :=   \
 		yon/CLogger.cpp \
 		yon/CModel.cpp \
 		yon/CGeometryFactory.cpp \
-		yon/CCamera.cpp \
+		yon/COrthoCamera.cpp \
 		yon/CSceneManager.cpp \
 		yon/COGLES1Driver.cpp \
 		yon/CYonEngineAndroid.cpp \

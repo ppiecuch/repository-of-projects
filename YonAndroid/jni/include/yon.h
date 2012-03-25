@@ -24,6 +24,7 @@
 #include "ILogger.h" 
 #include "IModel.h" 
 #include "IReferencable.h" 
+#include "ICamera.h"
 #include "ISceneManager.h" 
 #include "ITimer.h" 
 #include "IUnit.h" 

@@ -397,11 +397,19 @@
 					Name="camera"
 					>
 					<File
-						RelativePath=".\CCamera.cpp"
+						RelativePath=".\COrthoCamera.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\CCamera.h"
+						RelativePath=".\COrthoCamera.h"
+						>
+					</File>
+					<File
+						RelativePath=".\CPerspCamera.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CPerspCamera.h"
 						>
 					</File>
 					<File
@@ -414,10 +422,6 @@
 					</File>
 					<File
 						RelativePath="..\include\IPerspCamera.h"
-						>
-					</File>
-					<File
-						RelativePath="..\include\SViewFrustum.h"
 						>
 					</File>
 				</Filter>

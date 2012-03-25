@@ -29,6 +29,7 @@
 //日志格式
 #define YON_LOG_SUCCEED_FORMAT "%-64s【√】\n"
 #define YON_LOG_FAILED_FORMAT "%-64s【╳】\n"
+#define YON_LOG_WARN_FORMAT "%-64s【!】\n"
 
 //路径使用宽字节
 #define YON_WCHAR_FILESYSTEM

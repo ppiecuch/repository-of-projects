@@ -25,13 +25,12 @@ namespace yon{
 			virtual scene::ISceneManager* getSceneManager(){return m_sceneManager;}
 			virtual bool run();
 
-			//virtual yon::ITimer* getTimer();
+			virtual void onResize(u32 w,u32 h);
+
+			//virtual ITimer* getTimer();
 
 			const HWND& getHWND() const{
 				return m_hWnd;
-			}
-			void needResize(){
-				m_bResized=true;
 			}
 		protected:
 			virtual void createDriver();

@@ -17,6 +17,7 @@ using namespace yon::core;
 using namespace yon::debug;
 using namespace yon::video;
 using namespace yon::scene;
+using namespace yon::scene::camera;
 
 #pragma comment(lib, "Yon.lib")
 
@@ -50,17 +51,20 @@ int main(int argc, char* argv[])
 	SYonEngineParameters params;
 	params.windowSize.w=400;
 	params.windowSize.h=400;
-	IYonEngine* pYE=CreateEngine(params);
+	IYonEngine* engine=CreateEngine(params);
 
-	IVideoDriver* driver=pYE->getVideoDriver();
-	ISceneManager* sceneMgr=pYE->getSceneManager();
+	IVideoDriver* driver=engine->getVideoDriver();
+	ISceneManager* sceneMgr=engine->getSceneManager();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 
-	/*IEntity* cube=geometryFty->createCube();
+	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,-10));
+
+	/*IEntity* cube=geometryFty->createCube(core::dimension3df(100,100,100));
 	IModel* model=sceneMgr->addModel(cube);
 	cube->drop();*/
 
-	IEntity* sphere=geometryFty->createSphere();
+
+	IEntity* sphere=geometryFty->createSphere(10);
 	IModel* model=sceneMgr->addModel(sphere);
 	sphere->drop();
 
@@ -69,7 +73,11 @@ int main(int argc, char* argv[])
 	//logger->setAppender(MASK_APPENDER_CONSOLE);
 	logger->setLevel(ENUM_LOG_LEVEL_DEBUG);
 	int num=0;*/
-	while(pYE->run()){
+	while(engine->run()){
+
+		//const core::vector3df pos=camera->getPosition();
+		//camera->setPosition(core::vector3df(pos.x,pos.y+0.005f ,pos.z));
+
 		driver->begin(true,COLOR_GRAY);
 
 		sceneMgr->render(driver);
@@ -145,7 +153,7 @@ int main(int argc, char* argv[])
 	Logger->info("size:%d\n",arr.size());
 	Logger->info("end\n");
 #endif
-	pYE->drop();
+	engine->drop();
 
 	
 #if 0
