@@ -21,6 +21,10 @@ namespace yon{
 		ILogger* Logger=NULL;
 	}
 
+	namespace video{
+		const SMaterial DEFAULT_MATERIAL;
+	}
+
 	using namespace debug;
 
 	YON_API IYonEngine* CreateEngine(const SYonEngineParameters& param){

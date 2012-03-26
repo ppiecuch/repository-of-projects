@@ -14,9 +14,9 @@ namespace camera{
 		f32 m_fAspectRatio;
 	public:
 		IPerspCamera(
-			const core::vector3df& pos = core::vector3df(0,0,-1),
+			const core::vector3df& pos = core::vector3df(0,0,1),
 			const core::vector3df& up=core::vector3df(0,1,0),
-			const core::vector3df& lookat = core::vector3df(0,0,100)):
+			const core::vector3df& lookat = core::vector3df(0,0,-1)):
 			ICamera(pos,up,lookat),m_fFovy(core::PI2/5),m_fAspectRatio(1)
 		{}
 		virtual f32 getAspectRatio() const{

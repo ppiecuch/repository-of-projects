@@ -30,7 +30,7 @@ namespace platform{
 	
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
-		m_videoDriver(NULL),m_sceneManager(new scene::CSceneManager()),
+		m_videoDriver(NULL),m_sceneManager(NULL),m_fileSystem(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
 	{
 		if(params.windowId==NULL)
@@ -49,8 +49,14 @@ namespace platform{
 			m_bExternalWindow = true;
 		}
 
+		//初始化文件系统
+		m_fileSystem=io::createFileSystem();
+
 		//初始化视频驱动器
 		createDriver();
+
+		//初始化场景管理器
+		m_sceneManager=scene::createSceneManager();
 
 		SEnginePair ep;
 		ep.hWnd=m_hWnd;
@@ -64,6 +70,7 @@ namespace platform{
 		if(m_videoDriver!=NULL)
 			m_videoDriver->drop();
 		m_sceneManager->drop();
+			m_fileSystem->drop();
 		DestroyWindow(m_hWnd);
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineWin32");

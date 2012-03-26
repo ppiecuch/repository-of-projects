@@ -13,9 +13,9 @@ namespace camera{
 		bool m_bFrustumChanged;
 	public:
 		COrthoCamera(
-			const core::vector3df& pos = core::vector3df(0,0,-1),
+			const core::vector3df& pos=core::vector3df(0,0,1),
 			const core::vector3df& up=core::vector3df(0,1,0),
-			const core::vector3df& lookat = core::vector3df(0,0,100));
+			const core::vector3df& lookat = core::vector3df(0,0,-1));
 
 		virtual void render(video::IVideoDriver* driver);
 

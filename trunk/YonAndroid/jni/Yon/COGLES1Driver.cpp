@@ -12,93 +12,6 @@ namespace ogles1{
 		50, -29, 0,
 		0,  58, 0
 	};
-	void gluPerspective(double fovy, double aspect, double zNear, double zFar)
-	{
-		const static  f32 PI=3.1415926535897932384626433832795f;
-		glLoadIdentity();
-		double xmin, xmax, ymin, ymax;
-		ymax = zNear * tan(fovy * PI / 360);
-		ymin = -ymax;
-		xmin = ymin * aspect;
-		xmax = ymax * aspect;
-		glFrustumf((GLfloat)xmin, (GLfloat)xmax, (GLfloat)ymin, (GLfloat)ymax, (GLfloat)zNear, (GLfloat)zFar);
-	}
-	void gluLookAt(GLfloat eyex, GLfloat eyey, GLfloat eyez,GLfloat centerx, GLfloat centery, GLfloat centerz,GLfloat upx, GLfloat upy, GLfloat upz)
-	{
-		GLfloat m[16];
-		GLfloat x[3], y[3], z[3];
-		GLfloat mag;
-
-		/* Make rotation matrix */
-
-		/* Z vector */
-		z[0] = eyex - centerx;
-		z[1] = eyey - centery;
-		z[2] = eyez - centerz;
-		mag = (float)sqrt(z[0] * z[0] + z[1] * z[1] + z[2] * z[2]);
-		if (mag) {			/* mpichler, 19950515 */
-			z[0] /= mag;
-			z[1] /= mag;
-			z[2] /= mag;
-		}
-
-		/* Y vector */
-		y[0] = upx;
-		y[1] = upy;
-		y[2] = upz;
-
-		/* X vector = Y cross Z */
-		x[0] = y[1] * z[2] - y[2] * z[1];
-		x[1] = -y[0] * z[2] + y[2] * z[0];
-		x[2] = y[0] * z[1] - y[1] * z[0];
-
-		/* Recompute Y = Z cross X */
-		//似乎多余，但可能是为了防止用户提供的数据有误时处理
-		y[0] = z[1] * x[2] - z[2] * x[1];
-		y[1] = -z[0] * x[2] + z[2] * x[0];
-		y[2] = z[0] * x[1] - z[1] * x[0];
-
-		/* mpichler, 19950515 */
-		/* cross product gives area of parallelogram, which is < 1.0 for
-		* non-perpendicular unit-length vectors; so normalize x, y here
-		*/
-
-		mag = (float)sqrt(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
-		if (mag) {
-			x[0] /= mag;
-			x[1] /= mag;
-			x[2] /= mag;
-		}
-
-		mag = (float)sqrt(y[0] * y[0] + y[1] * y[1] + y[2] * y[2]);
-		if (mag) {
-			y[0] /= mag;
-			y[1] /= mag;
-			y[2] /= mag;
-		}
-
-		GLfloat mat[16];
-		mat[0]=x[0];
-		mat[4]=x[1];
-		mat[8]=x[2];
-		mat[12]=-eyex;
-
-		mat[1]=y[0];
-		mat[5]=y[1];
-		mat[9]=y[2];
-		mat[13]=-eyey;
-
-		mat[2]=z[0];
-		mat[6]=z[1];
-		mat[10]=z[2];
-		mat[14]=-eyez;
-
-		mat[3]=0.0;
-		mat[7]=0.0;
-		mat[11]=0.0;
-		mat[15]=1.0;
-		glMultMatrixf(mat);
-	}
 	void InitGL()
 	{
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -111,7 +24,6 @@ namespace ogles1{
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		gluLookAt(0,10,30,0,10,-50,0,1,0);
 		glClearColor(0.1f,0.2f,0.3f,1);
 		glColor4x(0x10000, 0, 0, 0);
 	}
@@ -181,7 +93,6 @@ namespace ogles1{
 		glVertexPointer(3, GL_FLOAT, sizeof(scene::SVertex),&unit->getVertices()[0].pos);
 		//OpenGL ES下支持GL_UNSIGNED_BYTE 或GL_UNSIGNED_SHORT.
 		glDrawElements(GL_LINES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
-		glRotatex(2<<8, 0x10000, 0, 0x10000);
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 
@@ -192,7 +103,8 @@ namespace ogles1{
 		case ENUM_TRANSFORM_VIEW:
 			{
 				glMatrixMode(GL_MODELVIEW);
-				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
+				//glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
+				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
 				Logger->debug("setViewMatrix:\n");
 				m_matrix[ENUM_TRANSFORM_VIEW].print();
 			}
@@ -201,7 +113,8 @@ namespace ogles1{
 			{
 				//OpenGL ES1中只存在ModelView矩阵,其实就是由World矩阵与View矩阵相乘而成
 				glMatrixMode(GL_MODELVIEW);
-				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
+				//glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
+				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
 				Logger->debug("setWorldMatrix:\n");
 				m_matrix[ENUM_TRANSFORM_WORLD].print();
 			}
@@ -236,6 +149,7 @@ namespace ogles1{
 			glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
 
 			glEnable(GL_CULL_FACE);
+			//glDisable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
 			glFrontFace(GL_CCW);
 

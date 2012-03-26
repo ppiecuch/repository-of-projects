@@ -7,10 +7,10 @@
 #include "ILogger.h"
 
 namespace yon{
-	namespace scene{
+namespace scene{
 
-		CSceneManager::CSceneManager():
-		m_geometryFactory(new CGeometryFactory()),m_activeCamera(NULL),
+	CSceneManager::CSceneManager()
+			:m_geometryFactory(new CGeometryFactory()),m_activeCamera(NULL),
 		IModel(NULL){
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance CSceneManager");
 	}
@@ -40,8 +40,8 @@ namespace yon{
 
 	camera::ICamera* CSceneManager::addCamera(const core::vector3df& pos,const core::vector3df& up,
 		const core::vector3df& lookat,bool makeActive){
-			//camera::COrthoCamera* camera=new camera::COrthoCamera();
-			camera::CPerspCamera* camera=new camera::CPerspCamera(pos,up,lookat);
+			camera::COrthoCamera* camera=new camera::COrthoCamera(pos,up,lookat);
+			//camera::CPerspCamera* camera=new camera::CPerspCamera(pos,up,lookat);
 			m_cameras.push(camera);
 			if(makeActive){
 				setActiveCamera(camera);
@@ -80,5 +80,9 @@ namespace yon{
 	const IGeometryFactory* CSceneManager::getGeometryFactory() const{
 		return m_geometryFactory;
 	}
+
+	ISceneManager* createSceneManager(){
+		return new CSceneManager();
 	}
-}
+}//scene
+}//yon

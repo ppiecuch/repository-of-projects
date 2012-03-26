@@ -8,6 +8,7 @@
 #include "ITimer.h"
 #include "IVideoDriver.h"
 #include "ISceneManager.h"
+#include "IFileSystem.h"
 
 
 namespace yon{
@@ -15,8 +16,9 @@ namespace yon{
 	class IYonEngine:public virtual core::IReferencable{
 	public:
 		virtual ~IYonEngine(){};
-		virtual video::IVideoDriver* getVideoDriver() = 0;
-		virtual scene::ISceneManager* getSceneManager() = 0;
+		virtual video::IVideoDriver* getVideoDriver() const= 0;
+		virtual scene::ISceneManager* getSceneManager() const = 0;
+		virtual io::IFileSystem* getFileSystem() const = 0;
 		virtual bool run() = 0;
 		virtual void onResize(u32 w,u32 h) = 0;
 		//¸üÐÂ

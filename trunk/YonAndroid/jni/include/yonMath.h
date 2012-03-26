@@ -28,6 +28,34 @@ const f32 DEGTORAD = PI / 180.0f;
 //从弧度转为角度
 const f32 RADTODEG   = 180.0f / PI;
 
+//! returns minimum of two values. Own implementation to get rid of the STL (VS6 problems)
+template<class T>
+inline const T& min_(const T& a, const T& b)
+{
+	return a < b ? a : b;
+}
+
+//! returns minimum of three values. Own implementation to get rid of the STL (VS6 problems)
+template<class T>
+inline const T& min_(const T& a, const T& b, const T& c)
+{
+	return a < b ? min_(a, c) : min_(b, c);
+}
+
+//! returns maximum of two values. Own implementation to get rid of the STL (VS6 problems)
+template<class T>
+inline const T& max_(const T& a, const T& b)
+{
+	return a < b ? b : a;
+}
+
+//! returns maximum of three values. Own implementation to get rid of the STL (VS6 problems)
+template<class T>
+inline const T& max_(const T& a, const T& b, const T& c)
+{
+	return a < b ? max_(b, c) : max_(a, c);
+}
+
 
 inline bool equals(const f64 a, const f64 b, const f64 tolerance = ROUNDING_ERROR_f64)
 {

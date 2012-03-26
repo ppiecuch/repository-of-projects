@@ -11,9 +11,21 @@
 #include "SYonEngineParameters.h"
 #include "SOGLES1Parameters.h"
 #include "COGLES1Driver.h"
-#include "CSceneManager.h"
+#include "ISceneManager.h"
+#include "IFileSystem.h"
 
 namespace yon{
+
+	namespace scene{
+		ISceneManager* createSceneManager();
+	}
+
+	namespace io
+	{
+		IFileSystem* createFileSystem();
+	}
+
+
 	namespace platform{
 		
 		class CYonEngineWin32:public IYonEngine{
@@ -21,8 +33,10 @@ namespace yon{
 			CYonEngineWin32(const yon::SYonEngineParameters& params);
 			~CYonEngineWin32();
 
-			virtual video::IVideoDriver* getVideoDriver(){return  m_videoDriver;}
-			virtual scene::ISceneManager* getSceneManager(){return m_sceneManager;}
+			virtual video::IVideoDriver* getVideoDriver() const{return  m_videoDriver;}
+			virtual scene::ISceneManager* getSceneManager() const{return m_sceneManager;}
+			virtual io::IFileSystem* getFileSystem() const{return m_fileSystem;}
+
 			virtual bool run();
 
 			virtual void onResize(u32 w,u32 h);
@@ -50,6 +64,7 @@ namespace yon{
 
 			video::IVideoDriver* m_videoDriver;
 			scene::ISceneManager* m_sceneManager;
+			io::IFileSystem* m_fileSystem;
 
 			bool m_bClose;
 			bool m_bResized;

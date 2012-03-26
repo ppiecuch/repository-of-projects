@@ -16,14 +16,10 @@
 //#define  YON_VIDEO_MODE_OGLES2
 
 //DLL导入导出
-#ifdef YON_COMPILE_WITH_WIN32
 #ifdef YON_EXPORTS
 #define YON_API __declspec(dllexport)
 #else
 #define YON_API __declspec(dllimport)
-#endif
-#else
-#define YON_API
 #endif
 
 //日志格式
@@ -32,7 +28,7 @@
 #define YON_LOG_WARN_FORMAT "%-64s【!】\n"
 
 //路径使用宽字节
-#define YON_WCHAR_FILESYSTEM
+//#define YON_WCHAR_FILESYSTEM
 
 //隐藏控制台
 //#define YON_HIDE_CONSOLE
@@ -41,10 +37,18 @@
 //用法:
 //YON_DEPRECATED void fun(...){...}
 //class YON_DEPRECATED object{...}
-#ifdef YON_COMPILE_WITH_WIN32
 #define YON_DEPRECATED __declspec(deprecated)
-#else
+
+//材质（目前只支持一层）
+#define YON_MATERIAL_MAX_TEXTURES 1
+
+//宏修正
+#ifdef YON_COMPILE_WITH_WIN32
+#elif defined(YON_COMPILE_WITH_ANDROID)
+//Unix和Linux系统不支持unicode.没有任何unicode版库函数.
+#undef YON_WCHAR_FILESYSTEM
 #define YON_DEPRECATED
+#define YON_API
 #endif
 
 #include <stdio.h>

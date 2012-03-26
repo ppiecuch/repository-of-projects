@@ -38,6 +38,13 @@ namespace yon{
 				*this=other;
 			}
 
+			template <class B>
+			string(const string<B>& other):elements(NULL),capacity(0),len(0)
+			{
+				*this = other;
+			}
+
+
 			/*string(const T* const other):elements(NULL),capacity(0),len(0){
 				*this=other;
 			}*/
@@ -96,6 +103,49 @@ namespace yon{
 
 			const T& operator[](u32 i) const{
 				return *(elements+i);
+			}
+
+			template <class B>
+			string<T>& operator=(const B* const str)
+			{
+				if (!str)
+				{
+					if (!elements)
+					{
+						capacity = 1;
+						elements = new T[capacity];
+					}
+					len = 0;
+					elements[0] = 0x0;
+					return *this;
+				}
+
+				if ((void*)str == (void*)elements)
+					return *this;
+
+				u32 size = 0;
+				const B* p = str;
+				do
+				{
+					++size;
+				} while(*p++);
+
+				T* oldArray = elements;
+
+				len = size;
+				if (len>=capacity)
+				{
+					capacity = len+1;
+					elements = new T[capacity];
+				}
+
+				for (u32 i = 0; i<len; ++i)
+					elements[i] = (T)str[i];
+
+				if (oldArray != elements)
+					delete[] oldArray;
+
+				return *this;
 			}
 
 			string<T>& operator=(const string<T>& other){
@@ -244,6 +294,12 @@ namespace yon{
 						return false;
 
 				return len == other.len;
+			}
+			void replace(T toReplace, T replaceWith)
+			{
+				for (u32 i=0; i<len; ++i)
+					if (elements[i] == toReplace)
+						elements[i] = replaceWith;
 			}
 			void makeLower()
 			{
