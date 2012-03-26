@@ -143,6 +143,9 @@ namespace yon{
 				m[3][1]=y;
 				m[3][2]=z;
 			}
+			inline void setTranslation( const vector3d<T>& v){
+				setTranslation(v.x,v.y,v.z);
+			}
 			/*inline void setTranslation(const vector3d<T>& translation){
 				m[3][0]=translation.x;
 				m[3][1]=translation.y;
@@ -209,6 +212,9 @@ namespace yon{
 				temp.makeIdentity();
 				temp.setScale(x,y,z);
 				*this*=temp;
+			}
+			inline void scale(const vector3d<T>& v){
+				scale(v.x,v.y,v.z);
 			}
 			inline void setScale(f32 x,f32 y,f32 z){
 				m[0][0] = (T)x;
@@ -389,7 +395,7 @@ namespace yon{
 			{
 				f32 frustumW, frustumH;
 
-				frustumH = tanf(fovy*DEGTORAD/2) * nearZ;
+				frustumH = tanf(fovy/2) * nearZ;
 				frustumW = frustumH * aspect;
 
 				frustum(-frustumW, frustumW, -frustumH, frustumH, nearZ, farZ );

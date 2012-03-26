@@ -302,7 +302,27 @@
 				Name="io"
 				>
 				<File
+					RelativePath=".\CFileSystem.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CFileSystem.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CReadFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CReadFile.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IFileSystem.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IReadFile.h"
 					>
 				</File>
 				<File
@@ -378,6 +398,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\IImage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IImageLoader.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IModel.h"
 					>
 				</File>
@@ -386,7 +414,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\ITexture.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IUnit.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\SColor.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\SMaterial.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\SMaterialLayer.h"
 					>
 				</File>
 				<File
@@ -433,6 +477,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="image"
+					>
+					<File
+						RelativePath=".\CImageLoaderPNG.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CImageLoaderPNG.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="video"
@@ -458,6 +514,106 @@
 					</File>
 					<File
 						RelativePath=".\SOGLES1Parameters.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="lib"
+				>
+				<Filter
+					Name="lpng"
+					>
+					<File
+						RelativePath=".\lpng\png.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\png.h"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngconf.h"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngdebug.h"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngerror.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngget.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pnginfo.h"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pnglibconf.h"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngmem.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngpread.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngpriv.h"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngread.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngrio.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngrtran.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngrutil.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngset.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngstruct.h"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngtrans.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngwio.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngwrite.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngwtran.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\pngwutil.c"
+						>
+					</File>
+					<File
+						RelativePath=".\lpng\README"
 						>
 					</File>
 				</Filter>

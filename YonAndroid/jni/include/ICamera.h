@@ -42,9 +42,9 @@ namespace yon{
 				f32 m_fNear;
 				f32 m_fFar;
 			public:
-				ICamera(const core::vector3df& pos=core::vector3df(0,0,-1),
+				ICamera(const core::vector3df& pos=core::vector3df(0,0,1),
 					const core::vector3df& up=core::vector3df(0,1,0),
-					const core::vector3df& lookat = core::vector3df(0,0,100),bool visible=false):
+					const core::vector3df& lookat = core::vector3df(0,0,-1),bool visible=false):
 					IRenderable(pos),m_up(up),m_target(lookat),m_direction(lookat-pos),m_bVisible(visible),m_fNear(1),m_fFar(3000.0f){
 						m_up.normalize();
 						m_direction.normalize();

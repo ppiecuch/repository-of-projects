@@ -15,6 +15,7 @@ inline void EnableMemLeakCheck()
 using namespace yon;
 using namespace yon::core;
 using namespace yon::debug;
+using namespace yon::io;
 using namespace yon::video;
 using namespace yon::scene;
 using namespace yon::scene::camera;
@@ -55,16 +56,18 @@ int main(int argc, char* argv[])
 
 	IVideoDriver* driver=engine->getVideoDriver();
 	ISceneManager* sceneMgr=engine->getSceneManager();
+	IFileSystem* fs=engine->getFileSystem();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 
-	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,-10));
+	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,300));
 
 	/*IEntity* cube=geometryFty->createCube(core::dimension3df(100,100,100));
 	IModel* model=sceneMgr->addModel(cube);
 	cube->drop();*/
 
+	Logger->debug("%d\n",fs->existFile("D:/java1.exe"));
 
-	IEntity* sphere=geometryFty->createSphere(10);
+	IEntity* sphere=geometryFty->createSphere(100);
 	IModel* model=sceneMgr->addModel(sphere);
 	sphere->drop();
 
@@ -77,6 +80,12 @@ int main(int argc, char* argv[])
 
 		//const core::vector3df pos=camera->getPosition();
 		//camera->setPosition(core::vector3df(pos.x,pos.y+0.005f ,pos.z));
+
+		const core::vector3df rot=model->getRotation();
+		model->setRotation(core::vector3df(rot.x,rot.y,rot.z+0.05f));
+
+		//const core::vector3df sca=model->getScale();
+		//model->setScale(core::vector3df(sca.x+0.001f,sca.y+0.001f,sca.z+0.001f));
 
 		driver->begin(true,COLOR_GRAY);
 

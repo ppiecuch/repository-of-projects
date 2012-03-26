@@ -26,6 +26,7 @@ namespace yon{
 
 			virtual void setPosition(const core::vector3df& pos){
 				m_position=pos;
+				m_bTransformationChanged=true;
 			}
 			virtual const core::vector3df& getPosition() const{
 				return m_position;
@@ -33,6 +34,7 @@ namespace yon{
 
 			virtual void setRotation(const core::vector3df& rotation){
 				m_rotation=rotation;
+				m_bTransformationChanged=true;
 			}
 			virtual const core::vector3df& getRotation() const{
 				return m_rotation;
@@ -40,6 +42,7 @@ namespace yon{
 
 			virtual void setScale(const core::vector3df& scale){
 				m_scale=scale;
+				m_bTransformationChanged=true;
 			}
 			virtual const core::vector3df& getScale() const{
 				return m_scale;
@@ -54,7 +57,13 @@ namespace yon{
 			{
 				if(m_bTransformationChanged){
 					m_transformation.makeIdentity();
-					//m_transformation.rotate(m_rotation);
+					m_transformation.setRotationDegrees(m_rotation); 
+					m_transformation.setTranslation(m_position);
+					if (m_scale != core::IDENTITY_VECTOR3DF)
+					{
+						m_transformation.scale(m_scale);
+					}
+					m_bTransformationChanged=false;
 				}
 				return m_transformation;
 			}

@@ -16,6 +16,7 @@ namespace yon{
 
 
 		void CModel::render(video::IVideoDriver* driver){
+			driver->setTransform(video::ENUM_TRANSFORM_WORLD, getAbsoluteTransformation());
 			for(u32 i=0;i<m_entity->getUnitCount();++i){
 				driver->drawUnit(m_entity->getUnit(i));
 			}
