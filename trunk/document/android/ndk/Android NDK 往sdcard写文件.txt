@@ -1,0 +1,44 @@
+File IO works fine on Android using JNI. Perhaps you are trying to open a file with a bad path and not checking the return code? I modified the hello-jni example to demonstrate that it is indeed possible to open file and write to it. I hope this helps.
+/*
+* Copyright (C) 2009 The Android Open Source Project
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+*/
+#include
+#include
+#include
+/* This is a trivial JNI example where we use a native method
+* to return a new VM String. See the corresponding Java source
+* file located at:
+*
+* apps/samples/hello-jni/project/src/com/example/HelloJni/HelloJni.java
+*/
+jstring
+Java_com_example_hellojni_HelloJni_stringFromJNI( JNIEnv* env,
+jobject thiz )
+{
+FILE* file = fopen("/sdcard/hello.txt","w+");
+if (file != NULL)
+{
+fputs("HELLO WORLD!\n", file);
+fflush(file);
+fclose(file);
+}
+return (*env)->NewStringUTF(env, "Hello from JNI (with file io)!");
+}
+Here is the result after running it on my phone (with an SD card):
+$ adb -d shell cat /sdcard/hello.txt
+HELLO WORLD!
+
+http://www.cnblogs.com/dmyss/archive/2011/05/14/2046021.html
