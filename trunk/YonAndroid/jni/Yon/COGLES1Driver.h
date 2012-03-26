@@ -26,8 +26,8 @@ namespace yon{
 
 				virtual void begin(bool zBuffer,core::color c);
 				virtual void end();
-				virtual void setViewPort(const yon::core::recti& r);
-				virtual void onResize(const yon::core::dimension2du& size);
+				virtual void setViewPort(const core::recti& r);
+				virtual void onResize(const core::dimension2du& size);
 				virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat);
 				virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const;
 

@@ -232,6 +232,14 @@ namespace yon{
 				setByProduct(temp,other);
 				return *this;
 			}
+			inline bool operator==(const matrix4<T> &other) const
+			{
+				for (u32 i = 0; i < 4; ++i)
+					for (u32 j = 0; j < 4; ++j)
+						if (core::equals(m[i][j],other.m[i][j])==false)
+							return false;
+				return true;
+			}
 			/*const T& operator[](u32 index) const{
 				u32 quotient=index>>2;
 				u32 remainder=index-quotient;
@@ -242,6 +250,89 @@ namespace yon{
 				vect.x = tmp.x*m[0][0] + tmp.y*m[1][0] + tmp.z*m[2][0];
 				vect.y = tmp.x*m[0][1] + tmp.y*m[1][1] + tmp.z*m[2][1];
 				vect.z = tmp.x*m[0][2] + tmp.y*m[1][2] + tmp.z*m[2][2];
+			}
+
+			inline matrix4<T>& setRotationDegrees( const vector3d<T>& rotation )
+			{
+				return setRotationRadians( rotation * core::DEGTORAD );
+			}
+
+			inline matrix4<T>& setRotationRadians( const vector3d<T>& rotation )
+			{
+				const f64 cr = cos( rotation.x );
+				const f64 sr = sin( rotation.x );
+				const f64 cp = cos( rotation.y );
+				const f64 sp = sin( rotation.y );
+				const f64 cy = cos( rotation.z );
+				const f64 sy = sin( rotation.z );
+
+				/*m[0][0] = (T)( cp*cy );
+				m[0][1] = (T)( -cp*sy );
+				m[0][2] = (T)( sp );
+
+				const f64 srsp = sr*sp;
+				const f64 crsp = cr*sp;
+
+				m[1][0] = (T)( srsp*cy+cr*sy );
+				m[1][1] = (T)( -srsp*sy+cr*cy );
+				m[1][2] = (T)( -sr*cp );
+
+				m[2][0] = (T)( -crsp*cy+sr*sy );
+				m[2][1] = (T)( crsp*sy+sr*cy );
+				m[2][2] = (T)( cr*cp );
+
+				m[0][0] = (T)( cp*cy );
+				m[0][1] = (T)( cp*sy );
+				m[0][2] = (T)( -sp );
+
+				const f64 srsp = sr*sp;
+				const f64 crsp = cr*sp;
+
+				m[1][0] = (T)( srsp*cy-cr*sy );
+				m[1][1] = (T)( srsp*sy+cr*cy );
+				m[1][2] = (T)( sr*cp );
+
+				m[2][0] = (T)( crsp*cy+sr*sy );
+				m[2][1] = (T)( crsp*sy-sr*cy );
+				m[2][2] = (T)( cr*cp );*/
+
+				//cb*cc,cb*-sc,sb
+				//-sa*-sb*cc+ca*sc,-sa*-sb*-sc+ca*cc,-sa*cb
+				//ca*-sb*cc+sa*sc,ca*-sb*-sc+sa*cc,ca*cb
+				/*m[0][0] = (T)( cp*cy );
+				m[0][1] = (T)( -cp*sy );
+				m[0][2] = (T)( sp );
+
+				const f64 srsp = sr*sp;
+				const f64 crsp = cr*sp;
+
+				m[1][0] = (T)( srsp*cy+cr*sy );
+				m[1][1] = (T)( -srsp*sy+cr*cy );
+				m[1][2] = (T)( -sr*cp );
+
+				m[2][0] = (T)( -crsp*cy+sr*sy );
+				m[2][1] = (T)( crsp*sy+sr*cy );
+				m[2][2] = (T)( cr*cp );*/
+
+				//cb*cc,cb*sc,-sb
+				//sa*sb*cc+ca*-sc,sa*sb*sc+ca*cc,sa*cb
+				//ca*sb*cc+-sa*-sc,ca*sb*sc+-sa*cc,ca*cb
+				m[0][0] = (T)( cp*cy );
+				m[0][1] = (T)( cp*sy );
+				m[0][2] = (T)( -sp );
+
+				const f64 srsp = sr*sp;
+				const f64 crsp = cr*sp;
+
+				m[1][0] = (T)( srsp*cy-cr*sy );
+				m[1][1] = (T)( srsp*sy+cr*cy );
+				m[1][2] = (T)( sr*cp );
+
+				m[2][0] = (T)( crsp*cy+sr*sy );
+				m[2][1] = (T)( crsp*sy-sr*cy );
+				m[2][2] = (T)( cr*cp );
+
+				return *this;
 			}
 
 			inline void frustum(f32 left, f32 right, f32 bottom, f32 top, f32 nearZ, f32 farZ){

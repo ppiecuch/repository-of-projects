@@ -12,6 +12,19 @@
 namespace yon{
 	namespace core{
 
+		//! Returns a character converted to lower case
+		static inline u32 locale_lower ( u32 x )
+		{
+			// ansi
+			return x >= 'A' && x <= 'Z' ? x + 0x20 : x;
+		}
+
+		//! Returns a character converted to upper case
+		static inline u32 locale_upper ( u32 x )
+		{
+			// ansi
+			return x >= 'a' && x <= 'z' ? x + ( 'A' - 'a' ) : x;
+		}
 		//capacity°üº¬'\0',len²»°üº¬'\0'
 		template<class T>
 		class string{
@@ -200,6 +213,49 @@ namespace yon{
 				string<T> str(*this);
 				str+=other;
 				return str;
+			}
+			bool operator !=(const T* const str) const
+			{
+				return !(*this == str);
+			}
+
+			bool operator !=(const string<T>& other) const
+			{
+				return !(*this == other);
+			}
+			bool operator ==(const T* const str) const
+			{
+				if (!str)
+					return false;
+
+				u32 i;
+				for(i=0; elements[i] && str[i]; ++i)
+					if (elements[i] != str[i])
+						return false;
+
+				return !elements[i] && !str[i];
+			}
+
+
+			bool operator ==(const string<T>& other) const
+			{
+				for(u32 i=0; elements[i] && other.elements[i]; ++i)
+					if (elements[i] != other.elements[i])
+						return false;
+
+				return len == other.len;
+			}
+			void makeLower()
+			{
+				for (u32 i=0; i<len; ++i)
+					elements[i] = locale_lower( elements[i] );
+			}
+
+
+			void makeUpper()
+			{
+				for (u32 i=0; i<len; ++i)
+					elements[i] = locale_upper( elements[i] );
 			}
 			const T* c_str() const
 			{

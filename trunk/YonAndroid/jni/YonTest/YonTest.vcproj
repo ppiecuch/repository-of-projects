@@ -179,6 +179,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\stringTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\stringTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\yonArrayTestCase.cpp"
 			>
 		</File>
