@@ -53,8 +53,8 @@ namespace yon{
 		void CYonEngineAndroid::createDriver(){
 
 #ifdef YON_VIDEO_MODE_OGLES1
-			yon::video::ogles1::SOGLES1Parameters params(m_params.windowSize);
-			m_videoDriver=new yon::video::ogles1::COGLES1Driver(params);
+			video::ogles1::SOGLES1Parameters params(m_params.windowSize);
+			m_videoDriver=new video::ogles1::COGLES1Driver(params);
 #endif //Yon_VIDEO_MODE_OGLES1
 		}
 		//yon::ITimer* yon::platform::CYonEngineAndroid::getTimer(){return NULL;}

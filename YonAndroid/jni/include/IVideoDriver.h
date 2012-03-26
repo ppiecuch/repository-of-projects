@@ -19,7 +19,7 @@ namespace yon{
 		};
 
 		//视频驱动器接口
-		class IVideoDriver:public virtual yon::core::IReferencable{
+		class IVideoDriver:public virtual core::IReferencable{
 		protected:
 			enum ENUM_RENDER_MODE{
 				ENUM_RENDER_MODE_NONE = 0,
@@ -31,10 +31,10 @@ namespace yon{
 		public:
 			IVideoDriver():m_renderMode(ENUM_RENDER_MODE_NONE){}
 			virtual ~IVideoDriver(){};
-			virtual void begin(bool zBuffer=true,yon::core::color c=yon::core::color(0x000000FF)) = 0;
+			virtual void begin(bool zBuffer=true,core::color c=core::color(0x000000FF)) = 0;
 			virtual void end() = 0;
-			virtual void setViewPort(const yon::core::recti& r) = 0;
-			virtual void onResize(const yon::core::dimension2du& size) = 0;
+			virtual void setViewPort(const core::recti& r) = 0;
+			virtual void onResize(const core::dimension2du& size) = 0;
 
 			virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat) =0;
 			virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const =0;

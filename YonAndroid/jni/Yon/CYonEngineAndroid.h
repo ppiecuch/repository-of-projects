@@ -15,7 +15,7 @@ namespace yon{
 
 		class CYonEngineAndroid:public IYonEngine{
 		public:
-			CYonEngineAndroid(const yon::SYonEngineParameters& params);
+			CYonEngineAndroid(const SYonEngineParameters& params);
 			~CYonEngineAndroid();
 
 			virtual video::IVideoDriver* getVideoDriver(){return  m_videoDriver;}
