@@ -6,6 +6,44 @@
 namespace yon{
 namespace video{
 
+
+	//! Convert A1R5G5B5 color to A8R8G8B8 color
+	/** build a nicer 32bit Color by extending dest lower bits with source high bits. */
+	inline u32 A1R5G5B5toA8R8G8B8(u16 color)
+	{
+		return ( (( -( (s32) color & 0x00008000 ) >> (s32) 31 ) & 0xFF000000 ) |
+			(( color & 0x00007C00 ) << 9) | (( color & 0x00007000 ) << 4) |
+			(( color & 0x000003E0 ) << 6) | (( color & 0x00000380 ) << 1) |
+			(( color & 0x0000001F ) << 3) | (( color & 0x0000001C ) >> 2)
+			);
+	}
+
+	//! Convert R5G5B5A1 color to R8G8B8A8 color
+	inline u32 R5G5B5A1toR8G8B8A8(u16 color)
+	{
+		//TODO
+		return 0;
+	}
+
+
+	//! Returns R5G6B5 color to A8R8G8B8 color
+	inline u32 R5G6B5toA8R8G8B8(u16 color)
+	{
+		return 0xFF000000 |
+			((color & 0xF800) << 8)|
+			((color & 0x07E0) << 5)|
+			((color & 0x001F) << 3);
+	}
+
+	//! Returns R5G6B5 color to R8G8B8A8 color
+	inline u32 R5G6B5toR8G8B8A8(u16 color)
+	{
+		//TODO
+		return 0;
+	}
+
+	
+
 	class SColor
 	{
 	public:

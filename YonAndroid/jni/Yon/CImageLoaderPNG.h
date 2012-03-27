@@ -5,15 +5,14 @@
 
 namespace yon{
 namespace video{
-namespace image{
 
 	class CImageLoaderPng : public video::IImageLoader
 	{
 	public:
-		virtual bool canLoad(const io::path& filename) const;
+		virtual bool checkFileExtension(const io::path& filename) const;
+		virtual bool checkFileHeader(io::IReadFile* file) const;
 		virtual video::IImage* loadImage(io::IReadFile* file) const;
 	};
-}
 }
 }
 #endif

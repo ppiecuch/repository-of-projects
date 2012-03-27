@@ -3,7 +3,6 @@
 #ifdef YON_COMPILE_WITH_WIN32
 
 #include "CYonEngineWin32.h"
-#include "CSceneManager.h"
 
 #include "ILogger.h"
 
@@ -30,7 +29,7 @@ namespace platform{
 	
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
-		m_videoDriver(NULL),m_sceneManager(NULL),m_fileSystem(NULL),
+		m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
 	{
 		if(params.windowId==NULL)
@@ -50,13 +49,13 @@ namespace platform{
 		}
 
 		//初始化文件系统
-		m_fileSystem=io::createFileSystem();
+		m_pFileSystem=io::createFileSystem();
 
 		//初始化视频驱动器
 		createDriver();
 
 		//初始化场景管理器
-		m_sceneManager=scene::createSceneManager();
+		m_pSceneManager=scene::createSceneManager();
 
 		SEnginePair ep;
 		ep.hWnd=m_hWnd;
@@ -67,11 +66,10 @@ namespace platform{
 		PostMessage(m_hWnd,WM_SIZE,0,0);
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
-		if(m_videoDriver!=NULL)
-			m_videoDriver->drop();
-		m_sceneManager->drop();
-			m_fileSystem->drop();
-		DestroyWindow(m_hWnd);
+			m_pVideoDriver->drop();
+			m_pSceneManager->drop();
+			m_pFileSystem->drop();
+			DestroyWindow(m_hWnd);
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineWin32");
 		if(Logger->drop()){
@@ -111,8 +109,8 @@ namespace platform{
 		RECT r;
 		GetClientRect(m_hWnd, &r);
 
-		m_videoDriver->onResize(core::dimension2du((u32)r.right, (u32)r.bottom));
-		m_sceneManager->onResize(core::dimension2du((u32)r.right, (u32)r.bottom));
+		m_pVideoDriver->onResize(core::dimension2du((u32)r.right, (u32)r.bottom));
+		m_pSceneManager->onResize(core::dimension2du((u32)r.right, (u32)r.bottom));
 		m_bResized = false;
 	}
 
@@ -236,8 +234,8 @@ namespace platform{
 	void CYonEngineWin32::createDriver(){
 
 #ifdef YON_VIDEO_MODE_OGLES1
-	video::ogles1::SOGLES1Parameters params(m_hWnd,m_params.windowSize);
-	m_videoDriver=new video::ogles1::COGLES1Driver(params);
+			video::ogles1::SOGLES1Parameters params(m_hWnd,m_params.windowSize);
+			m_pVideoDriver=new video::ogles1::COGLES1Driver(params,m_pFileSystem);
 #endif //YON_VIDEO_MODE_OGLES1
 	}
 	//yon::ITimer* yon::platform::CYonEngineWin32::getTimer(){return NULL;}

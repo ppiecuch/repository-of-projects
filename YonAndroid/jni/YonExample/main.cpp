@@ -65,7 +65,8 @@ int main(int argc, char* argv[])
 	IModel* model=sceneMgr->addModel(cube);
 	cube->drop();*/
 
-	Logger->debug("%d\n",fs->existFile("D:/java1.exe"));
+	//Logger->debug("%d\n",fs->existFile("D:/java1.exe"));
+	driver->getTexture("D:/test.png");
 
 	IEntity* sphere=geometryFty->createSphere(100);
 	IModel* model=sceneMgr->addModel(sphere);

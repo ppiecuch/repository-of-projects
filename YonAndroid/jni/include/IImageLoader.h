@@ -11,7 +11,8 @@ namespace video{
 	
 	class IImageLoader : public virtual core::IReferencable{
 	public:
-		virtual bool canLoad(const io::path& filename) const = 0;
+		virtual bool checkFileExtension(const io::path& filename) const = 0;
+		virtual bool checkFileHeader(io::IReadFile* file) const = 0;
 		virtual video::IImage* loadImage(io::IReadFile* file) const = 0;
 	};
 }

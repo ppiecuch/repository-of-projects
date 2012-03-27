@@ -33,9 +33,9 @@ namespace yon{
 			CYonEngineWin32(const yon::SYonEngineParameters& params);
 			~CYonEngineWin32();
 
-			virtual video::IVideoDriver* getVideoDriver() const{return  m_videoDriver;}
-			virtual scene::ISceneManager* getSceneManager() const{return m_sceneManager;}
-			virtual io::IFileSystem* getFileSystem() const{return m_fileSystem;}
+			virtual video::IVideoDriver* getVideoDriver() const{return  m_pVideoDriver;}
+			virtual scene::ISceneManager* getSceneManager() const{return m_pSceneManager;}
+			virtual io::IFileSystem* getFileSystem() const{return m_pFileSystem;}
 
 			virtual bool run();
 
@@ -62,9 +62,9 @@ namespace yon{
 			//参数结构体
 			yon::SYonEngineParameters m_params;
 
-			video::IVideoDriver* m_videoDriver;
-			scene::ISceneManager* m_sceneManager;
-			io::IFileSystem* m_fileSystem;
+			video::IVideoDriver* m_pVideoDriver;
+			scene::ISceneManager* m_pSceneManager;
+			io::IFileSystem* m_pFileSystem;
 
 			bool m_bClose;
 			bool m_bResized;

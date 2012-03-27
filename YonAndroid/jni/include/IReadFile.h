@@ -16,6 +16,8 @@ namespace io{
 		//relative:相对于当前位置
 		virtual bool seek(long offset, bool relative = false) = 0;
 
+		virtual FILE* pointer() const = 0;
+
 		//获取文件大小，以字节为单位
 		virtual long getSize() const = 0;
 
@@ -24,6 +26,8 @@ namespace io{
 
 		//文件名
 		virtual const io::path& getFileName() const = 0;
+		//路径名
+		virtual const io::path& getPathName() const = 0;
 	};
 
 	IReadFile* createReadFile(const io::path& fileName);

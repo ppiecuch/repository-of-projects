@@ -1,5 +1,6 @@
 #include "COGLES1Driver.h"
 #include "SVertex.h"
+#include "COGLES1Texture.h"
 
 #include "ILogger.h"
 
@@ -30,9 +31,11 @@ namespace ogles1{
 	
 
 
-	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param):
-		m_renderModeChange(true),
-		IVideoDriver(){
+	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs):
+			m_renderModeChange(true),
+		IVideoDriver(fs){
+
+		m_imageLoaders.push(createImageLoaderPNG());
 
 #ifdef YON_COMPILE_WITH_WIN32
 		initEGL(param.hWnd);
@@ -44,16 +47,7 @@ namespace ogles1{
 			for (i=0; i<ENUM_TRANSFORM_COUNT; ++i)
 				setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
 
-		
-		//InitGL();
-		/*glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(60.0f,(float)param.windowSize.w/(float)param.windowSize.w,1,600);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		gluLookAt(0,0,5,0,0,-50,0,1,0);*/
-		setRender3DMode();
+			setRender3DMode();
 
 		glClearColor(0.1f,0.2f,0.3f,1);
 		glColor4f(1, 1, 1, 1);
@@ -63,7 +57,11 @@ namespace ogles1{
 	}
 
 	COGLES1Driver::~COGLES1Driver(){
+		for(u32 i=0;i<m_imageLoaders.size();++i)
+			m_imageLoaders[i]->drop();
 
+		for(u32 i=0;i<m_textures.size();++i)
+			m_textures[i]->drop();
 #ifdef YON_COMPILE_WITH_WIN32
 		destroyEGL();
 #endif//YON_COMPILE_WITH_WIN32
@@ -137,6 +135,106 @@ namespace ogles1{
 
 	const core::matrix4f& COGLES1Driver::getTransform(ENUM_TRANSFORM transform) const{
 		return m_matrix[transform];
+	}
+
+	IImage* COGLES1Driver::createImageFromFile(io::IReadFile* file){
+		if (!file)
+			return NULL;
+
+		IImage* image = NULL;
+
+		u32 i;
+
+		for (i=0; i<m_imageLoaders.size(); ++i)
+		{
+			if (m_imageLoaders[i]->checkFileExtension(file->getFileName()))
+			{
+				// reset file position which might have changed due to previous loadImage calls
+				file->seek(0);
+				image = m_imageLoaders[i]->loadImage(file);
+				if (image)
+					return image;
+			}
+		}
+
+		for (i=0; i<m_imageLoaders.size(); ++i)
+		{
+			file->seek(0);
+			if (m_imageLoaders[i]->checkFileHeader(file))
+			{
+				file->seek(0);
+				image = m_imageLoaders[i]->loadImage(file);
+				if (image)
+					return image;
+			}
+		}
+
+		return NULL;
+	}
+
+	video::ITexture* COGLES1Driver::findTexture(const io::path& filename){
+		//TODO ÓÅ»¯
+		const io::path absolutePath = m_pFileSystem->getAbsolutePath(filename);
+		for(u32 i=0;i<m_textures.size();++i){
+			if(m_textures[i]->getPath()==filename){
+				return m_textures[i];
+			}
+		}
+		return NULL;
+	}
+
+	void COGLES1Driver::addTexture(video::ITexture* texture)
+	{
+		if (texture)
+		{
+			texture->grab();
+			m_textures.push(texture);
+		}
+	}
+
+	video::ITexture* COGLES1Driver::loadTextureFromFile(io::IReadFile* file){
+		ITexture* texture = NULL;
+		IImage* image = createImageFromFile(file);
+
+		if (image)
+		{
+			texture = createDeviceDependentTexture(image, file->getPathName());
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("load texture:%s",file->getPathName().c_str()).c_str());
+			image->drop();
+		}
+
+		return texture;
+	}
+
+	video::ITexture* COGLES1Driver::createDeviceDependentTexture(IImage* image, const io::path& name)
+	{
+		return new COGLES1Texture(image, name, this);
+	}
+
+	ITexture* COGLES1Driver::getTexture(const io::path& filename){
+		ITexture* texture = findTexture(filename);
+		if (texture)
+			return texture;
+
+		io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
+
+		if(!file)
+		{
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("getTexture(%s) failed,for file do not exist!",filename.c_str()).c_str());
+			return NULL;
+		}
+
+		texture = loadTextureFromFile(file);
+		file->drop();
+
+		if (texture)
+		{
+			addTexture(texture);
+			texture->drop(); // drop it because we created it, one grab too much
+		}
+		else
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("addTexture for %s failed!",filename.c_str()).c_str());
+		return texture;
 	}
 
 	void COGLES1Driver::setRender3DMode(){
