@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;./"
+				AdditionalIncludeDirectories="../include;./zlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;YON_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -398,14 +398,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\IImage.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\IImageLoader.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\IModel.h"
 					>
 				</File>
@@ -414,23 +406,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\ITexture.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\IUnit.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\SColor.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\SMaterial.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\SMaterialLayer.h"
 					>
 				</File>
 				<File
@@ -477,24 +453,40 @@
 						>
 					</File>
 				</Filter>
-				<Filter
-					Name="image"
-					>
-					<File
-						RelativePath=".\CImageLoaderPNG.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\CImageLoaderPNG.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="video"
 				>
 				<File
+					RelativePath=".\CImage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IImage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IImageLoader.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\ITexture.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IVideoDriver.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\SColor.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\SMaterial.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\SMaterialLayer.h"
 					>
 				</File>
 				<File
@@ -514,6 +506,18 @@
 					</File>
 					<File
 						RelativePath=".\SOGLES1Parameters.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="image"
+					>
+					<File
+						RelativePath=".\CImageLoaderPNG.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CImageLoaderPNG.h"
 						>
 					</File>
 				</Filter>
@@ -614,6 +618,118 @@
 					</File>
 					<File
 						RelativePath=".\lpng\README"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="zlib"
+					>
+					<File
+						RelativePath=".\zlib\adler32.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\compress.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\crc32.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\crc32.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\deflate.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\deflate.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\gzclose.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\gzguts.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\gzlib.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\gzread.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\gzwrite.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\infback.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\inffast.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\inffast.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\inffixed.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\inflate.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\inflate.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\inftrees.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\inftrees.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\README"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\trees.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\trees.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\uncompr.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\zconf.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\zlib.h"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\zutil.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\zutil.h"
 						>
 					</File>
 				</Filter>

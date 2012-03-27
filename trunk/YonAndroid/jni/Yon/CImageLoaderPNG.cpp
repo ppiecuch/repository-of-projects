@@ -6,13 +6,16 @@
 #include "CReadFile.h"
 
 namespace yon{
-namespace scene{
+namespace video{
 namespace image{
 
 	bool CImageLoaderPng::canLoad(const io::path& filename) const{
+		return false;
 	}
 
-	IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const{}
+	IImage* CImageLoaderPng::loadImage(io::IReadFile* file) const{
+		return NULL;
+	}
 }//image
-}//scene
+}//video
 }//yon

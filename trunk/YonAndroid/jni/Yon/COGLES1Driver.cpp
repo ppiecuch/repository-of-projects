@@ -103,6 +103,9 @@ namespace ogles1{
 		case ENUM_TRANSFORM_VIEW:
 			{
 				glMatrixMode(GL_MODELVIEW);
+				//TODO
+				//OpenGL对顶点先进行模型变换，再进行视图变换，即v'=V*M*v，运算顺序从右到左，因为矩阵运算满足结合律，故有：
+				//v'=(V*M)*v（不过还有一个终点,matrix4中对矩阵进行scale时却是*this*=scale）
 				//glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
 				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
 				Logger->debug("setViewMatrix:\n");
@@ -115,8 +118,8 @@ namespace ogles1{
 				glMatrixMode(GL_MODELVIEW);
 				//glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
 				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
-				Logger->debug("setWorldMatrix:\n");
-				m_matrix[ENUM_TRANSFORM_WORLD].print();
+				//Logger->debug("setWorldMatrix:\n");
+				//m_matrix[ENUM_TRANSFORM_WORLD].print();
 			}
 			break;
 		case ENUM_TRANSFORM_PROJECTION:

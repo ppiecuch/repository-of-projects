@@ -272,22 +272,8 @@ namespace yon{
 				const f64 cy = cos( rotation.z );
 				const f64 sy = sin( rotation.z );
 
+				//zyx
 				/*m[0][0] = (T)( cp*cy );
-				m[0][1] = (T)( -cp*sy );
-				m[0][2] = (T)( sp );
-
-				const f64 srsp = sr*sp;
-				const f64 crsp = cr*sp;
-
-				m[1][0] = (T)( srsp*cy+cr*sy );
-				m[1][1] = (T)( -srsp*sy+cr*cy );
-				m[1][2] = (T)( -sr*cp );
-
-				m[2][0] = (T)( -crsp*cy+sr*sy );
-				m[2][1] = (T)( crsp*sy+sr*cy );
-				m[2][2] = (T)( cr*cp );
-
-				m[0][0] = (T)( cp*cy );
 				m[0][1] = (T)( cp*sy );
 				m[0][2] = (T)( -sp );
 
@@ -301,42 +287,25 @@ namespace yon{
 				m[2][0] = (T)( crsp*cy+sr*sy );
 				m[2][1] = (T)( crsp*sy-sr*cy );
 				m[2][2] = (T)( cr*cp );*/
-
-				//cb*cc,cb*-sc,sb
-				//-sa*-sb*cc+ca*sc,-sa*-sb*-sc+ca*cc,-sa*cb
-				//ca*-sb*cc+sa*sc,ca*-sb*-sc+sa*cc,ca*cb
-				/*m[0][0] = (T)( cp*cy );
-				m[0][1] = (T)( -cp*sy );
-				m[0][2] = (T)( sp );
-
+				//yxz
+				//cp*cy+sp*sr*sy,	cp*-sy+sp*sr*cy,	sp*cr
+				//cr*sy,			cr*cy,				-sr
+				//-sp*cy+cp*sr*sy,	-sp*-sy+cp*sr*cy,	cp*cr
 				const f64 srsp = sr*sp;
-				const f64 crsp = cr*sp;
+				const f64 srcp = sr*cp;
 
-				m[1][0] = (T)( srsp*cy+cr*sy );
-				m[1][1] = (T)( -srsp*sy+cr*cy );
-				m[1][2] = (T)( -sr*cp );
+				m[0][0] = (T)( cp*cy+srsp*sy );
+				m[0][1] = (T)( cr*sy );
+				m[0][2] = (T)( -sp*cy+srcp*sy );
 
-				m[2][0] = (T)( -crsp*cy+sr*sy );
-				m[2][1] = (T)( crsp*sy+sr*cy );
-				m[2][2] = (T)( cr*cp );*/
+				m[1][0] = (T)( srsp*cy-cp*sy );
+				m[1][1] = (T)( cr*cy );
+				m[1][2] = (T)( srcp*cy+sy*sp );
 
-				//cb*cc,cb*sc,-sb
-				//sa*sb*cc+ca*-sc,sa*sb*sc+ca*cc,sa*cb
-				//ca*sb*cc+-sa*-sc,ca*sb*sc+-sa*cc,ca*cb
-				m[0][0] = (T)( cp*cy );
-				m[0][1] = (T)( cp*sy );
-				m[0][2] = (T)( -sp );
-
-				const f64 srsp = sr*sp;
-				const f64 crsp = cr*sp;
-
-				m[1][0] = (T)( srsp*cy-cr*sy );
-				m[1][1] = (T)( srsp*sy+cr*cy );
-				m[1][2] = (T)( sr*cp );
-
-				m[2][0] = (T)( crsp*cy+sr*sy );
-				m[2][1] = (T)( crsp*sy-sr*cy );
+				m[2][0] = (T)( cr*sp );
+				m[2][1] = (T)( -sr );
 				m[2][2] = (T)( cr*cp );
+
 
 				return *this;
 			}

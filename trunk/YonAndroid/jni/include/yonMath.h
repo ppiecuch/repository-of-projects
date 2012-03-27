@@ -55,7 +55,12 @@ inline const T& max_(const T& a, const T& b, const T& c)
 {
 	return a < b ? max_(b, c) : max_(a, c);
 }
-
+//! clamps a value between low and high
+template <class T>
+inline const T clamp (const T& value, const T& low, const T& high)
+{
+	return min_ (max_(value,low), high);
+}
 
 inline bool equals(const f64 a, const f64 b, const f64 tolerance = ROUNDING_ERROR_f64)
 {
