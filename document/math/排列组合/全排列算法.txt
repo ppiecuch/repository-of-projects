@@ -1,0 +1,58 @@
+全排列：从n个不同元素中任取m（m≤n）个元素，按照一定的顺序排列起来，叫做从n个不同元素中取出m个元素的一个排列。
+当m＝n时所有的排列情况叫全排列。
+该算法源码如下：
+[html] view plaincopy
+<span style="font-size:16px;">package com.andyidea.algorithms;  
+  
+/**  
+ * 全排列算法  
+ * @author Andy.Chen  
+ *  
+ */  
+public class PermutationSorter<T> {  
+      
+    /**  
+     * 全排列输出  
+     * @param array 要输出的字符数组  
+     * @param from 输出字符数组的起始位置  
+     * @param len 输出字符数组的长度  
+     */  
+    public final void permutation(T[] array, int from, int len){  
+        int i;  
+        if(from < len-1){  
+            permutation(array, from+1, len);  
+            for(i=from+1;i<len;i++){  
+                swap(array,from,i);  
+                permutation(array, from+1, len);  
+                swap(array,from,i);  
+            }  
+        }else{  
+            printResult(array);  
+        }  
+    }  
+      
+    /**  
+     * 交换算法  
+     * @param array  
+     * @param from  
+     * @param to  
+     */  
+    public final void swap(T[] array,int from,int to){  
+        T tmp = array[from];  
+        array[from] = array[to];  
+        array[to] = tmp;  
+    }  
+      
+    /**  
+     * 打印输出全排列结果  
+     * @param array  
+     */  
+    public void printResult(T[] array) {  
+        for(int j = 0; j < array.length; j++){  
+            System.out.print(array[j]);  
+        }  
+        System.out.println();  
+    }  
+      
+}
+http://blog.csdn.net/cjjky/article/details/7397226
