@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 		//camera->setPosition(core::vector3df(pos.x,pos.y+0.005f ,pos.z));
 
 		const core::vector3df rot=model->getRotation();
-		model->setRotation(core::vector3df(rot.x,rot.y,rot.z+0.05f));
+		model->setRotation(core::vector3df(rot.x+0.05f,rot.y,rot.z));
 
 		//const core::vector3df sca=model->getScale();
 		//model->setScale(core::vector3df(sca.x+0.001f,sca.y+0.001f,sca.z+0.001f));

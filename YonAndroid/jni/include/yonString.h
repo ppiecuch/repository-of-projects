@@ -295,11 +295,31 @@ namespace yon{
 
 				return len == other.len;
 			}
+			s32 findLast(T c, s32 start = -1) const
+			{
+				start = core::clamp(start<0?(s32)(len)-1:start, 0, (s32)(len) - 1);
+				for (s32 i=start; i>=0; --i)
+					if (elements[i] == c)
+						return i;
+
+				return -1;
+			}
 			void replace(T toReplace, T replaceWith)
 			{
 				for (u32 i=0; i<len; ++i)
 					if (elements[i] == toReplace)
 						elements[i] = replaceWith;
+			}
+			bool equalsSubstringIgnoreCase(const string<T>&other, const s32 fromIndex = 0 ) const
+			{
+				if ((u32)fromIndex>len)
+					return false;
+
+				u32 i;
+				for( i=0; elements[fromIndex + i] && other[i]; ++i)
+					if (locale_lower(elements[fromIndex + i]) != locale_lower(other[i]))
+						return false;
+				return elements[fromIndex + i] == 0 && other[i] == 0;
 			}
 			void makeLower()
 			{
