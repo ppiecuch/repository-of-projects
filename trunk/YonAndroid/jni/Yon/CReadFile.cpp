@@ -1,5 +1,7 @@
 #include "CReadFile.h"
 
+#include "ILogger.h"
+
 namespace yon{
 namespace io{
 
@@ -7,12 +9,14 @@ namespace io{
 		: m_pFile(NULL), m_fileSize(0), m_filename(fileName)
 	{
 		openFile();
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CReadFile");
 	}
 
 	CReadFile::~CReadFile()
 	{
 		if (m_pFile)
 			fclose(m_pFile);
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CReadFile");
 	}
 
 	void CReadFile::openFile()
@@ -22,7 +26,7 @@ namespace io{
 			m_pFile = NULL;
 			return;
 		}
-#ifdef XC_COMPILE_WITH_WIN32
+#ifdef YON_COMPILE_WITH_WIN32
 #if defined(YON_WCHAR_FILESYSTEM)
 		m_pFile = _wfopen(m_filename.c_str(), L"rb");
 #else

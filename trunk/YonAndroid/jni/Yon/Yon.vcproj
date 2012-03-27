@@ -273,6 +273,10 @@
 					RelativePath="..\include\yonTypes.h"
 					>
 				</File>
+				<File
+					RelativePath="..\include\yonUtil.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="debug"
@@ -458,7 +462,19 @@
 				Name="video"
 				>
 				<File
+					RelativePath=".\CImage.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\CImage.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CImageLoaderPNG.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CImageLoaderPNG.h"
 					>
 				</File>
 				<File
@@ -505,19 +521,15 @@
 						>
 					</File>
 					<File
+						RelativePath=".\COGLES1Texture.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\COGLES1Texture.h"
+						>
+					</File>
+					<File
 						RelativePath=".\SOGLES1Parameters.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="image"
-					>
-					<File
-						RelativePath=".\CImageLoaderPNG.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\CImageLoaderPNG.h"
 						>
 					</File>
 				</Filter>

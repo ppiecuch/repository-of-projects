@@ -38,7 +38,7 @@ namespace io{
 	}
 
 	IReadFile* CFileSystem::createAndOpenFile(const io::path& filename){
-		return createAndOpenFile(filename);
+		return createReadFile(getAbsolutePath(filename));
 	}
 	io::path CFileSystem::getAbsolutePath(const io::path& filename) const{
 		return filename;

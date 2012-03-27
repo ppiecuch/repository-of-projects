@@ -18,6 +18,10 @@ namespace io{
 		CReadFile(const io::path& fileName);
 		virtual ~CReadFile();
 
+		virtual FILE* pointer() const{
+			return m_pFile;
+		}
+
 		virtual s32 read(void* buffer, u32 sizeToRead);
 		virtual bool seek(long offset, bool relative);
 		virtual long getPos() const;
@@ -27,6 +31,9 @@ namespace io{
 		}
 		virtual const io::path& getFileName() const
 		{
+			return m_filename;
+		}
+		virtual const io::path& getPathName() const{
 			return m_filename;
 		}
 
