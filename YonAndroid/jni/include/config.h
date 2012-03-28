@@ -47,6 +47,8 @@
 #elif defined(YON_COMPILE_WITH_ANDROID)
 //Unix和Linux系统不支持unicode.没有任何unicode版库函数.
 #undef YON_WCHAR_FILESYSTEM
+#undef YON_DEPRECATED
+#undef YON_API
 #define YON_DEPRECATED
 #define YON_API
 #endif

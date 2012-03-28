@@ -3,6 +3,7 @@
 
 #include "IUnit.h"
 #include "yonArray.h"
+#include "CMaterial.h"
 
 namespace yon{
 	namespace scene{
@@ -10,7 +11,19 @@ namespace yon{
 
 		class CUnit : public IUnit{
 		public:
-			virtual ~CUnit(){}
+			CUnit()
+				:m_pMaterial(new video::CMaterial()){}
+			virtual ~CUnit(){
+				m_pMaterial->drop();
+			}
+
+			virtual video::IMaterial* getMaterial(){
+				return m_pMaterial;
+			}
+			virtual const video::IMaterial* getMaterial() const{
+				return m_pMaterial;
+			}
+
 
 			virtual const SVertex* getVertices() const{
 				return m_vertices.pointer();
@@ -59,6 +72,8 @@ namespace yon{
 		private:
 			core::array<SVertex> m_vertices;
 			core::array<u16> m_indices;
+
+			video::CMaterial* m_pMaterial;
 
 			friend class CGeometryFactory;
 		};

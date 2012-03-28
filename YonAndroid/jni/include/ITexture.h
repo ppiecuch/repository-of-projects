@@ -15,7 +15,6 @@ namespace video{
 	public:
 		ITexture(const io::path& p) : m_namePath(p)
 		{}
-		virtual ~ITexture(){}
 		virtual const core::dimension2du& getSize() const = 0;
 		const io::path& getPath() const { return m_namePath.getPath(); }
 

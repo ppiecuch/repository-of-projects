@@ -4,6 +4,7 @@
 #include "yonTypes.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include "yonMath.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <wchar.h>

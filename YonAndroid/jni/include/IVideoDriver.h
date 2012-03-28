@@ -10,8 +10,19 @@
 #include "IFileSystem.h"
 #include "ITexture.h"
 #include "IImageLoader.h"
+#include "IMaterial.h"
 
 namespace yon{
+
+	namespace scene{
+		class ISceneManager;
+		ISceneManager* createSceneManager();
+	}
+	namespace io
+	{
+		IFileSystem* createFileSystem();
+	}
+
 	namespace video{
 
 		IImageLoader* createImageLoaderPNG();
@@ -49,6 +60,7 @@ namespace yon{
 			virtual void setViewPort(const core::recti& r) = 0;
 			virtual void onResize(const core::dimension2du& size) = 0;
 
+			virtual IImage* createImageFromFile(const io::path& filename) = 0;
 			virtual IImage* createImageFromFile(io::IReadFile* file) =0;
 
 			virtual ITexture* getTexture(const io::path& filename) = 0;
@@ -57,7 +69,9 @@ namespace yon{
 			virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat) =0;
 			virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const =0;
 
-			virtual void drawUnit(scene::IUnit* unit) const = 0;
+			virtual void setMaterial(IMaterial* material) = 0;
+
+			virtual void drawUnit(scene::IUnit* unit) = 0;
 			//virtual u32 getFPS() const = 0;
 		};
 	}

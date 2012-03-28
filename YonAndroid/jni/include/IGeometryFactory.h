@@ -13,7 +13,7 @@ namespace yon{
 		public:
 
 			virtual IEntity* createCube(const core::dimension3df& size=core::dimension3df(1,1,1)) const = 0;
-			virtual IEntity* createSphere(f32 radius=1.0f,const core::dimension2du& detail=core::dimension2du(8,8)) const = 0;
+			virtual IEntity* createSphere(f32 radius=1.0f,u32 hSteps=8,u32 vSteps=8) const = 0;
 		};
 
 	}//scene

@@ -242,6 +242,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\randomizer.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\rect.h"
 					>
 				</File>
@@ -478,11 +482,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\CMaterial.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IImage.h"
 					>
 				</File>
 				<File
 					RelativePath="..\include\IImageLoader.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IMaterial.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IMaterialRenderer.h"
 					>
 				</File>
 				<File
@@ -495,10 +511,6 @@
 				</File>
 				<File
 					RelativePath="..\include\SColor.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\SMaterial.h"
 					>
 				</File>
 				<File
@@ -518,6 +530,10 @@
 					</File>
 					<File
 						RelativePath=".\COGLES1Driver.h"
+						>
+					</File>
+					<File
+						RelativePath=".\COGLES1MaterialRenderer.h"
 						>
 					</File>
 					<File

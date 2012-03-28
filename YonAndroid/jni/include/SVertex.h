@@ -3,6 +3,7 @@
 
 #include "yonTypes.h"
 #include "vector3d.h"
+#include "vector2d.h"
 
 namespace yon{
 	namespace scene{
@@ -13,9 +14,10 @@ namespace yon{
 
 		struct SVertex{
 			SVertex(){}
-			SVertex(f32 x,f32 y,f32 z):pos(x,y,z){}
+			SVertex(f32 x,f32 y,f32 z,f32 tu, f32 tv):pos(x,y,z),texcoords(tu,tv){}
 
 			core::vector3df pos;
+			core::vector2df texcoords;
 		};
 	}//scene
 }//yon

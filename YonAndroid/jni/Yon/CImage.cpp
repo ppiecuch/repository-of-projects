@@ -1,6 +1,10 @@
 #include "CImage.h"
 #include <memory.h>
 
+#ifdef YON_COMPILE_WITH_ANDROID
+#include <string.h>
+#endif
+
 #include "ILogger.h"
 
 namespace yon{
@@ -12,7 +16,7 @@ namespace video{
 			m_bytesPerRow=m_bytesPerPixel*m_size.w;
 			m_pData = new u8[m_size.h * m_bytesPerRow];
 
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CImage");
+			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CImage");
 	}
 
 	CImage::CImage(ENUM_COLOR_FORMAT format, const core::dimension2d<u32>& size,
@@ -28,13 +32,13 @@ namespace video{
 				m_pData=(u8*)data;
 			}
 
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CImage");
+			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CImage");
 	}
 
 	CImage::~CImage(){
 		if(m_bDeleteData)
 			delete[] m_pData;
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CImage");
+		//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CImage");
 	}
 
 	SColor CImage::getPixel(u32 x, u32 y) const

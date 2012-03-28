@@ -4,6 +4,7 @@
 #include "IReferencable.h"
 #include "yonTypes.h"
 #include "SVertex.h"
+#include "IMaterial.h"
 
 namespace yon{
 	namespace scene{
@@ -17,6 +18,9 @@ namespace yon{
 		class IUnit : public virtual core::IReferencable{
 		public:
 			virtual ~IUnit(){}
+
+			virtual video::IMaterial* getMaterial() = 0;
+			virtual const video::IMaterial* getMaterial() const = 0;
 
 			virtual const SVertex* getVertices() const = 0;
 			virtual SVertex* getVertices() = 0;

@@ -73,9 +73,18 @@ namespace ogles1{
 		//pixels
 		//Specifies a pointer to the image data in memory.
 
+		GLint tmpTexture;
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmpTexture);
+
 		void* source = m_pImage->lock();
+		//Logger->debug("glTexImage2D:%d,%d\n", m_pImage->getDimension().w,m_pImage->getDimension().h);
+		glBindTexture(GL_TEXTURE_2D, m_textureId);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, m_pImage->getDimension().w,m_pImage->getDimension().h, 0, format, pixelType, source);
 		m_pImage->unlock();
+
+		glBindTexture(GL_TEXTURE_2D, tmpTexture);
+
+		//m_pDriver->checkGLError(__FILE__,__LINE__);
 
 		//TODO testGLError
 

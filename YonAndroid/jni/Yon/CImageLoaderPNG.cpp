@@ -14,13 +14,13 @@ namespace video{
 
 	static void png_cpexcept_error(png_structp png_ptr, png_const_charp msg)
 	{
-		Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("libpng occur error:%s",msg));
+		Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("libpng occur error:%s",msg).c_str());
 		//longjmp(png_ptr->longjmp_buffer, 1);
 	}
 
 	static void png_cpexcept_warn(png_structp png_ptr, png_const_charp msg)
 	{
-		Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("libpng occur warn:%s",msg));
+		Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("libpng occur warn:%s",msg).c_str());
 	}
 
 	bool CImageLoaderPng::checkFileExtension(const io::path& filename) const{
@@ -61,7 +61,7 @@ namespace video{
 			return NULL;
 		if(png_sig_cmp(header,0,sig_read))
 		{
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s check header failed!",file->getFileName().c_str()));
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s check header failed!",file->getFileName().c_str()).c_str());
 			return NULL;
 		}
 
@@ -69,7 +69,7 @@ namespace video{
 		png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL, png_cpexcept_error, png_cpexcept_warn);
 		if (png_ptr == NULL)
 		{
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s fail to initialize png_struct!",file->getFileName().c_str()));
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s fail to initialize png_struct!",file->getFileName().c_str()).c_str());
 			return NULL;
 		}
 
@@ -77,13 +77,13 @@ namespace video{
 		info_ptr = png_create_info_struct(png_ptr);
 		if (info_ptr == NULL)
 		{
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s fail to initialize start png_info!",file->getFileName().c_str()));
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s fail to initialize start png_info!",file->getFileName().c_str()).c_str());
 			png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 			return NULL;
 		}
 		end_info = png_create_info_struct(png_ptr);
 		if (!end_info) {
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s fail to initialize end png_info!",file->getFileName().c_str()));
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s fail to initialize end png_info!",file->getFileName().c_str()).c_str());
 			png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp) NULL);
 			return NULL;
 		}
@@ -92,7 +92,7 @@ namespace video{
 		//通过调用setjmp和png_jmpbuf(png_ptr)实现
 		if (setjmp(png_jmpbuf(png_ptr)))
 		{
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("fail to parse png file: %s",file->getFileName().c_str()));
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("fail to parse png file: %s",file->getFileName().c_str()).c_str());
 			png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
 			return NULL;
 		}
@@ -171,7 +171,7 @@ namespace video{
 			image = new CImage(ENUM_COLOR_FORMAT_R8G8B8, core::dimension2d<u32>(width, height));
 		if (!image)
 		{
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("fail to create image from png file: %s",file->getFileName().c_str()));
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("fail to create image from png file: %s",file->getFileName().c_str()).c_str());
 			png_destroy_read_struct(&png_ptr, NULL, NULL);
 			return NULL;
 		}
@@ -180,7 +180,7 @@ namespace video{
 		u8** rowPointers = new png_bytep[height];
 		if (!rowPointers)
 		{
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("fail to create row pointers for png file: %s",file->getFileName().c_str()));
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("fail to create row pointers for png file: %s",file->getFileName().c_str()).c_str());
 			png_destroy_read_struct(&png_ptr, NULL, NULL);
 			image->drop();
 			return NULL;
@@ -190,7 +190,7 @@ namespace video{
 		u8* data = (u8*)image->lock();
 		for (u32 i=0; i<height; ++i)
 		{
-			rowPointers[i]=data;
+			rowPointers[height-i-1]=data;
 			data += image->getByteCountPerRow();
 		}
 
@@ -214,7 +214,7 @@ namespace video{
 		delete [] rowPointers;
 		image->unlock();
 		// Clean up memory
-		png_destroy_read_struct(&png_ptr,&info_ptr, 0); 
+		png_destroy_read_struct(&png_ptr,&info_ptr, &end_info); 
 
 		return image;
 	}

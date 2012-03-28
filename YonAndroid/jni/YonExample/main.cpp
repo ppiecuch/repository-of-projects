@@ -61,15 +61,30 @@ int main(int argc, char* argv[])
 
 	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,300));
 
-	/*IEntity* cube=geometryFty->createCube(core::dimension3df(100,100,100));
-	IModel* model=sceneMgr->addModel(cube);
-	cube->drop();*/
+	IMaterial* material;
+
+	IEntity* cube=geometryFty->createCube(core::dimension3df(50,50,50));
+	IModel* cubeModel=sceneMgr->addModel(cube);
+	material=cubeModel->getMaterial(0);
+	cubeModel->setPosition(core::vector3df(20,20,0));
+	material->setTexture(0,driver->getTexture("../media/test.png"));
+	cube->drop();
 
 	//Logger->debug("%d\n",fs->existFile("D:/java1.exe"));
-	driver->getTexture("D:/test.png");
 
-	IEntity* sphere=geometryFty->createSphere(100);
-	IModel* model=sceneMgr->addModel(sphere);
+	//driver->getTexture("D:/test.png");
+	//driver->getTexture("D:/test.png");
+
+	//IImage* image=driver->createImageFromFile("D:/test.png");
+	//image->drop();
+
+
+
+	IEntity* sphere=geometryFty->createSphere(100,16,16);
+	IModel* sphereModel=sceneMgr->addModel(sphere);
+	material=sphereModel->getMaterial(0);
+	sphereModel->setPosition(core::vector3df(-50,-50,0));
+	material->setTexture(0,driver->getTexture("../media/earth.png"));
 	sphere->drop();
 
 	/*ILogger* logger=Logger;
@@ -82,8 +97,11 @@ int main(int argc, char* argv[])
 		//const core::vector3df pos=camera->getPosition();
 		//camera->setPosition(core::vector3df(pos.x,pos.y+0.005f ,pos.z));
 
-		const core::vector3df rot=model->getRotation();
-		model->setRotation(core::vector3df(rot.x+0.05f,rot.y,rot.z));
+		const core::vector3df crot=cubeModel->getRotation();
+		cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.05f ,crot.z));
+
+		const core::vector3df srot=sphereModel->getRotation();
+		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.02f ,srot.z));
 
 		//const core::vector3df sca=model->getScale();
 		//model->setScale(core::vector3df(sca.x+0.001f,sca.y+0.001f,sca.z+0.001f));
