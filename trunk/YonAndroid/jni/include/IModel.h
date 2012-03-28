@@ -3,6 +3,8 @@
 
 #include "IRenderable.h"
 #include "yonList.h"
+#include "ITexture.h"
+#include "IMaterial.h"
 
 #include "ILogger.h"
 
@@ -71,6 +73,29 @@ namespace yon{
 					return m_parent->removeChild(this);
 				}
 				return false;
+			}
+
+			virtual void setMaterialTexture(u32 textureLayer, video::ITexture* texture) const{
+				if (textureLayer>=video::MATERIAL_MAX_TEXTURES)
+					return;
+
+				for (u32 i=0; i<getMaterialCount(); ++i)
+					getMaterial(i)->setTexture(textureLayer, texture);
+			}
+
+			virtual u32 getMaterialCount() const
+			{
+				return 0;
+			}
+
+			virtual video::IMaterial* getMaterial(u32 num) const{
+				return NULL;
+			}
+
+			void setMaterialType(video::ENUM_MATERIAL_TYPE newType)
+			{
+				for (u32 i=0; i<getMaterialCount(); ++i)
+					getMaterial(i)->setMaterialType(newType);
 			}
 		};
 	}//scene

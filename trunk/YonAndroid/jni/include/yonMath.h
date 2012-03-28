@@ -55,11 +55,12 @@ inline const T& max_(const T& a, const T& b, const T& c)
 {
 	return a < b ? max_(b, c) : max_(a, c);
 }
+
 //! clamps a value between low and high
 template <class T>
-inline const T clamp (const T& value, const T& low, const T& high)
+inline const T clamp(const T& value, const T& low, const T& high)
 {
-	return min_ (max_(value,low), high);
+	return min_(max_(value,low), high);
 }
 
 inline bool equals(const f64 a, const f64 b, const f64 tolerance = ROUNDING_ERROR_f64)
@@ -67,7 +68,7 @@ inline bool equals(const f64 a, const f64 b, const f64 tolerance = ROUNDING_ERRO
 	return (a + tolerance >= b) && (a - tolerance <= b);
 }
 
-//! returns if a equals b, taking possible rounding errors into account
+// returns if a equals b, taking possible rounding errors into account
 inline bool equals(const f32 a, const f32 b, const f32 tolerance = ROUNDING_ERROR_f32)
 {
 	return (a + tolerance >= b) && (a - tolerance <= b);

@@ -9,14 +9,14 @@ namespace io{
 		: m_pFile(NULL), m_fileSize(0), m_filename(fileName)
 	{
 		openFile();
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CReadFile");
+		//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CReadFile");
 	}
 
 	CReadFile::~CReadFile()
 	{
 		if (m_pFile)
 			fclose(m_pFile);
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CReadFile");
+		//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CReadFile");
 	}
 
 	void CReadFile::openFile()

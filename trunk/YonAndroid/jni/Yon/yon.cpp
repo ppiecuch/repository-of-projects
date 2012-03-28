@@ -21,10 +21,6 @@ namespace yon{
 		ILogger* Logger=NULL;
 	}
 
-	namespace video{
-		const SMaterial DEFAULT_MATERIAL;
-	}
-
 	using namespace debug;
 
 	YON_API IYonEngine* CreateEngine(const SYonEngineParameters& param){
@@ -45,7 +41,7 @@ namespace yon{
 
 		YON_DEBUG_BREAK_IF(engine==NULL)
 
-			Logger->info(YON_LOG_SUCCEED_FORMAT,core::stringc("CreateEngine(%d,%d),version:%d.%d",param.windowSize.w,param.windowSize.h,YON_VERSION_MAJOR,YON_VERSION_MINOR).c_str());
+		Logger->info(YON_LOG_SUCCEED_FORMAT,core::stringc("CreateEngine(%d,%d),version:%d.%d",param.windowSize.w,param.windowSize.h,YON_VERSION_MAJOR,YON_VERSION_MINOR).c_str());
 
 		return engine;
 	}

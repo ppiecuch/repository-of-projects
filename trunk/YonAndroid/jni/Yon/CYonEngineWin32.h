@@ -15,17 +15,6 @@
 #include "IFileSystem.h"
 
 namespace yon{
-
-	namespace scene{
-		ISceneManager* createSceneManager();
-	}
-
-	namespace io
-	{
-		IFileSystem* createFileSystem();
-	}
-
-
 	namespace platform{
 		
 		class CYonEngineWin32:public IYonEngine{

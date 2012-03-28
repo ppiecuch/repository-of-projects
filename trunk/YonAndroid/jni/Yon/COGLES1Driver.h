@@ -5,6 +5,8 @@
 #include "SOGLES1Parameters.h"
 #include "yonArray.h"
 #include "ITexture.h"
+#include "IMaterial.h"
+#include "IMaterialRenderer.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 //加载OpenGL ES1需要的库及头文件
@@ -30,28 +32,41 @@ namespace yon{
 				virtual void end();
 				virtual void setViewPort(const core::recti& r);
 				virtual void onResize(const core::dimension2du& size);
+
+				virtual IImage* createImageFromFile(const io::path& filename);
 				virtual IImage* createImageFromFile(io::IReadFile* file);
+
+				virtual bool setTexture(u32 stage, const video::ITexture* texture);
 				virtual ITexture* getTexture(const io::path& filename);
 				virtual video::ITexture* findTexture(const io::path& filename);
+
 				virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat);
 				virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const;
 
-				virtual void drawUnit(scene::IUnit* unit) const;
+				virtual void setMaterial(IMaterial* material);
 
+				virtual void drawUnit(scene::IUnit* unit);
+
+				virtual bool checkGLError(const c8* file,s32 line);
+ 
 				void setRender3DMode();
 				void setRender2DMode();
 				//virtual u32 getFPS() const;
 
 			private:
+				void checkMaterial();
 				void addTexture(video::ITexture* texture);
 				video::ITexture* loadTextureFromFile(io::IReadFile* file);
 				video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
 
 				core::matrix4f m_matrix[ENUM_TRANSFORM_COUNT];
-				bool m_renderModeChange;
+				bool m_bRenderModeChange;
+
+				video::IMaterial *m_pLastMaterial,*m_pCurrentMaterial;
 
 				core::array<video::ITexture*> m_textures;
 				core::array<video::IImageLoader*> m_imageLoaders;
+				core::array<video::IMaterialRenderer*> m_materialRenderers;
 #ifdef YON_COMPILE_WITH_WIN32
 				bool initEGL(const HWND& hwnd);
 				void destroyEGL();

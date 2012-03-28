@@ -19,6 +19,7 @@
 #include "matrix4.h" 
 #include "rect.h" 
 #include "IReferencable.h" 
+#include "randomizer.h"
 
 #include "path.h" 
 #include "IFileSystem.h" 
@@ -31,7 +32,8 @@
 #include "IImageLoader.h"
 #include "ITexture.h"
 #include "SMaterialLayer.h"
-#include "SMaterial.h"
+#include "IMaterial.h"
+#include "IMaterialRenderer.h"
 #include "IEntity.h" 
 #include "IGeometryFactory.h" 
 #include "IModel.h" 
@@ -42,7 +44,6 @@
 #include "IVideoDriver.h" 
 #include "IYonEngine.h" 
 
-#include "SVertex.h" 
 #include "SVideoDriverInfo.h" 
 #include "SYonEngineParameters.h" 
 #include "SYonPlatformInfo.h" 

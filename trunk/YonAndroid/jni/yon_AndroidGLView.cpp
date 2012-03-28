@@ -6,6 +6,7 @@
 
 using namespace yon;
 using namespace yon::core;
+using namespace yon::io;
 using namespace yon::debug;
 using namespace yon::video;
 using namespace yon::scene;
@@ -14,6 +15,9 @@ using namespace yon::scene::camera;
 IYonEngine* engine=NULL;
 IVideoDriver* driver=NULL;
 ISceneManager* sceneMgr=NULL;
+
+IModel* cubeModel=NULL;
+IModel* sphereModel=NULL;
 
 #define JNI_VERSION_1_1 0x00010001
 #define JNI_VERSION_1_2 0x00010002
@@ -57,12 +61,24 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, js
 	driver=engine->getVideoDriver();
 	sceneMgr=engine->getSceneManager();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
+	IFileSystem* fs=engine->getFileSystem();
+	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,300));
 
-	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,-100,0));
+	IMaterial* material;
 
-	IEntity* cube=geometryFty->createCube(core::dimension3df(100,100,100));
-	IModel* model=sceneMgr->addModel(cube);
+	IEntity* cube=geometryFty->createCube(core::dimension3df(50,50,50));
+	cubeModel=sceneMgr->addModel(cube);
+	//material=cubeModel->getMaterial(0);
+	cubeModel->setPosition(core::vector3df(20,20,0));
+	//material->setTexture(0,driver->getTexture("D:/test.png"));
 	cube->drop();
+
+	IEntity* sphere=geometryFty->createSphere(50,16,16);
+	sphereModel=sceneMgr->addModel(sphere);
+	//material=sphereModel->getMaterial(0);
+	sphereModel->setPosition(core::vector3df(-20,-20,0));
+	//material->setTexture(0,driver->getTexture("D:/earth.png"));
+	sphere->drop();
 
 	LOGD(LOG_TAG,"nativeOnSurfaceCreated");
 }
@@ -76,6 +92,12 @@ void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	engine->run();
 	driver->begin(true,COLOR_GRAY);
+
+	const core::vector3df crot=cubeModel->getRotation();
+	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
+
+	const core::vector3df srot=sphereModel->getRotation();
+	sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.5f ,srot.z));
 
 	sceneMgr->render(driver);
 

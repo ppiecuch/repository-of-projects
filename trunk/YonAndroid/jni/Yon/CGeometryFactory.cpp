@@ -45,38 +45,44 @@ namespace scene{
 		mhh=phh-size.h;
 		mhd=phd-size.d;
 
+		f32 u0,u1,v0,v1;
+		u0=v0=0;
+		u1=v1=1;
+
 		Logger->debug("half cube size:%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",phw,phh,phd,mhw,mhh,mhd);
 
-		unit->m_vertices.push(SVertex(mhw,mhh,mhd));
-		unit->m_vertices.push(SVertex(mhw,mhh,phd));
-		unit->m_vertices.push(SVertex(phw,mhh,phd));
-		unit->m_vertices.push(SVertex(phw,mhh,mhd));
+		unit->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v1));
+		unit->m_vertices.push(SVertex(mhw,mhh,phd,u0,v0));
+		unit->m_vertices.push(SVertex(phw,mhh,phd,u1,v0));
+		unit->m_vertices.push(SVertex(phw,mhh,mhd,u1,v1));
 
-		unit->m_vertices.push(SVertex(mhw,phh,mhd));
-		unit->m_vertices.push(SVertex(mhw,phh,phd));
-		unit->m_vertices.push(SVertex(phw,phh,phd));
-		unit->m_vertices.push(SVertex(phw,phh,mhd));
+		unit->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1));
+		unit->m_vertices.push(SVertex(mhw,phh,phd,u0,v0));
+		unit->m_vertices.push(SVertex(phw,phh,phd,u1,v0));
+		unit->m_vertices.push(SVertex(phw,phh,mhd,u1,v1));
 
-		unit->m_vertices.push(SVertex(mhw,mhh,mhd));
-		unit->m_vertices.push(SVertex(mhw,phh,mhd));
-		unit->m_vertices.push(SVertex(phw,phh,mhd));
-		unit->m_vertices.push(SVertex(phw,mhh,mhd));
+		unit->m_vertices.push(SVertex(mhw,mhh,mhd,u1,v0));
+		unit->m_vertices.push(SVertex(mhw,phh,mhd,u1,v1));
+		unit->m_vertices.push(SVertex(phw,phh,mhd,u0,v1));
+		unit->m_vertices.push(SVertex(phw,mhh,mhd,u0,v0));
 
-		unit->m_vertices.push(SVertex(mhw,mhh,phd));
-		unit->m_vertices.push(SVertex(mhw,phh,phd));
-		unit->m_vertices.push(SVertex(phw,phh,phd));
-		unit->m_vertices.push(SVertex(phw,mhh,phd));
+		unit->m_vertices.push(SVertex(mhw,mhh,phd,u0,v1));
+		unit->m_vertices.push(SVertex(mhw,phh,phd,u0,v0));
+		unit->m_vertices.push(SVertex(phw,phh,phd,u1,v0));
+		unit->m_vertices.push(SVertex(phw,mhh,phd,u1,v1));
 
-		unit->m_vertices.push(SVertex(mhw,mhh,mhd));
-		unit->m_vertices.push(SVertex(mhw,mhh,phd));
-		unit->m_vertices.push(SVertex(mhw,phh,phd));
-		unit->m_vertices.push(SVertex(mhw,phh,mhd));
+		//左
+		unit->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v0));
+		unit->m_vertices.push(SVertex(mhw,mhh,phd,u1,v0));
+		unit->m_vertices.push(SVertex(mhw,phh,phd,u1,v1));
+		unit->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1));
 
-		unit->m_vertices.push(SVertex(phw,mhh,mhd));
-		unit->m_vertices.push(SVertex(phw,mhh,phd));
-		unit->m_vertices.push(SVertex(phw,phh,phd));
-		unit->m_vertices.push(SVertex(phw,phh,mhd));
-		
+		//右
+		unit->m_vertices.push(SVertex(phw,mhh,mhd,u1,v0));
+		unit->m_vertices.push(SVertex(phw,mhh,phd,u0,v0));
+		unit->m_vertices.push(SVertex(phw,phh,phd,u0,v1));
+		unit->m_vertices.push(SVertex(phw,phh,mhd,u1,v1));
+
 		CEntity* entity=new CEntity();
 		entity->addUnit(unit);
 
@@ -84,11 +90,8 @@ namespace scene{
 
 		return entity;
 	}
-	IEntity* CGeometryFactory::createSphere(f32 radius,const core::dimension2du& detail) const{
+	IEntity* CGeometryFactory::createSphere(f32 radius,u32 hSteps,u32 vSteps) const{
 		CUnit* unit=new CUnit();
-
-		u32 hSteps=detail.w;
-		u32 vSteps=detail.h;
 
 		f32 dtheta=(float)360/hSteps;	//水平方向步增
 		f32 dphi=(float)180/vSteps;		//垂直方向步增
@@ -104,14 +107,20 @@ namespace scene{
 		f32 phi=0;
 		f32 theta=0;
 		f32 x,y,z;
+		f32 u,v;
+		vector3df temp;
 		for(u32 i=0;i<vSteps;++i,phi+=dphi)
 		{
 			for(u32 j=0;j<hSteps;++j,theta+=dtheta)
 			{
-				z = (float) (radius * sinf(phi*DEGTORAD) * cosf(DEGTORAD*theta));
-				x = (float) (radius * sinf(phi*DEGTORAD) * sinf(DEGTORAD*theta));
-				y = (float) (radius * cosf(phi*DEGTORAD));
-				unit->m_vertices.push(SVertex(x,y,z));
+				z = (f32) (radius * sinf(phi*DEGTORAD) * cosf(DEGTORAD*theta));
+				x = (f32) (radius * sinf(phi*DEGTORAD) * sinf(DEGTORAD*theta));
+				y = (f32) (radius * cosf(phi*DEGTORAD));
+				temp.set(x,y,z);
+				temp.normalize();
+				u = (f32)j/hSteps;
+				v = (f32)asinf(temp.y)/PI+0.5f;
+				unit->m_vertices.push(SVertex(x,y,z,u,v));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -128,7 +137,11 @@ namespace scene{
 				z = (float) (radius * sinf((phi+dphi)*DEGTORAD) * cosf(DEGTORAD*theta));
 				x = (float) (radius * sinf((phi+dphi)*DEGTORAD) * sinf(DEGTORAD*theta));
 				y = (float) (radius * cosf((phi+dphi)*DEGTORAD));
-				unit->m_vertices.push(SVertex(x,y,z));
+				temp.set(x,y,z);
+				temp.normalize();
+				u = (f32)j/hSteps;
+				v = (f32)asinf(temp.y)/PI+0.5f;
+				unit->m_vertices.push(SVertex(x,y,z,u,v));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -145,7 +158,11 @@ namespace scene{
 				z  = (float) (radius * sinf((phi+dphi)*DEGTORAD) * cosf(DEGTORAD*(theta+dtheta)));
 				x  = (float) (radius * sinf((phi+dphi)*DEGTORAD) * sinf(DEGTORAD*(theta+dtheta)));
 				y  = (float) (radius * cosf((phi+dphi)*DEGTORAD));
-				unit->m_vertices.push(SVertex(x,y,z));
+				temp.set(x,y,z);
+				temp.normalize();
+				u = (f32)(j+1)/hSteps;
+				v = (f32)asinf(temp.y)/PI+0.5f;
+				unit->m_vertices.push(SVertex(x,y,z,u,v));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -162,7 +179,11 @@ namespace scene{
 				z  = (float) (radius * sinf(phi*DEGTORAD) * cosf(DEGTORAD*(theta+dtheta)));
 				x  = (float) (radius * sinf(phi*DEGTORAD) * sinf(DEGTORAD*(theta+dtheta)));
 				y  = (float) (radius * cosf(phi*DEGTORAD));
-				unit->m_vertices.push(SVertex(x,y,z));
+				temp.set(x,y,z);
+				temp.normalize();
+				u = (f32)(j+1)/hSteps;
+				v = (f32)asinf(temp.y)/PI+0.5f;
+				unit->m_vertices.push(SVertex(x,y,z,u,v));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{

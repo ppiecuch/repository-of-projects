@@ -3,6 +3,8 @@
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include <io.h> // for _access
+#include <stdlib.h> //for _MAX_PATH
+#include <direct.h> //for _getcwd
 #define F_OK 00 //Existence only
 #define W_OK 02 //Write-only
 #define R_OK 04 //Read-only
@@ -41,8 +43,44 @@ namespace io{
 		return createReadFile(getAbsolutePath(filename));
 	}
 	io::path CFileSystem::getAbsolutePath(const io::path& filename) const{
-		return filename;
+#ifdef YON_COMPILE_WITH_WIN32
+		fschar *p=0;
+		fschar fpath[_MAX_PATH];
+		p = _fullpath(fpath, filename.c_str(), _MAX_PATH);
+		core::stringc tmp(p);
+		tmp.replace('\\', '/');
+		return tmp;
+#elif defined(YON_COMPILE_WITH_ANDROID)
+		//TODO
+#endif
 	}
+	const io::path& CFileSystem::getWorkingDirectory(){
+		if(m_workingDirectory.length()==0){
+#ifdef YON_COMPILE_WITH_WIN32
+			fschar tmp[_MAX_PATH];
+			_getcwd(tmp, _MAX_PATH);
+			m_workingDirectory=tmp;
+			m_workingDirectory.replace('\\', '/');
+#elif defined(YON_COMPILE_WITH_ANDROID)
+			u32 pathSize=256;
+			char *tmpPath = new char[pathSize];
+			while ((pathSize < (1<<16)) && !(getcwd(tmpPath,pathSize)))
+			{
+				delete [] tmpPath;
+				pathSize *= 2;
+				tmpPath = new char[pathSize];
+			}
+			if (tmpPath)
+			{
+				m_workingDirectory = tmpPath;
+				delete [] tmpPath;
+			}
+#endif
+			Logger->debug("workingDirection:%s\n",m_workingDirectory.c_str());
+		}
+		return m_workingDirectory;
+	}
+
 
 	IFileSystem* createFileSystem()
 	{

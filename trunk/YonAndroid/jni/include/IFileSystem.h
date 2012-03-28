@@ -14,6 +14,7 @@ namespace yon{
 			//使用完后记得drop
 			virtual IReadFile* createAndOpenFile(const io::path& filename) = 0;
 			virtual io::path getAbsolutePath(const io::path& filename) const = 0;
+			virtual const io::path& getWorkingDirectory() = 0;
 		};
 	}//io
 }//yon

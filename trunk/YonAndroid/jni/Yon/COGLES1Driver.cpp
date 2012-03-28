@@ -1,6 +1,7 @@
 #include "COGLES1Driver.h"
 #include "SVertex.h"
 #include "COGLES1Texture.h"
+#include "COGLES1MaterialRenderer.h"
 
 #include "ILogger.h"
 
@@ -32,10 +33,12 @@ namespace ogles1{
 
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs):
-			m_renderModeChange(true),
+			m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
 		IVideoDriver(fs){
 
 		m_imageLoaders.push(createImageLoaderPNG());
+
+		m_materialRenderers.push(createMaterialRendererSolid(this));
 
 #ifdef YON_COMPILE_WITH_WIN32
 		initEGL(param.hWnd);
@@ -57,11 +60,30 @@ namespace ogles1{
 	}
 
 	COGLES1Driver::~COGLES1Driver(){
-		for(u32 i=0;i<m_imageLoaders.size();++i)
-			m_imageLoaders[i]->drop();
 
-		for(u32 i=0;i<m_textures.size();++i)
+		if(m_pLastMaterial)
+			m_pLastMaterial->drop();
+		if(m_pCurrentMaterial)
+			m_pCurrentMaterial->drop();
+
+		u32 i=0;
+		u32 size=0;
+
+		size=m_imageLoaders.size();
+		for(i=0;i<m_imageLoaders.size();++i)
+			m_imageLoaders[i]->drop();
+		Logger->info("Release %d/%d ImageLoader\n",i,size);
+
+		size=m_textures.size();
+		for(i=0;i<m_textures.size();++i)
 			m_textures[i]->drop();
+		Logger->info("Release %d/%d Texture\n",i,size);
+
+		size=m_materialRenderers.size();
+		for(i=0;i<m_materialRenderers.size();++i)
+			m_materialRenderers[i]->drop();
+		Logger->info("Release %d/%d MaterialRenderer\n",i,size);
+
 #ifdef YON_COMPILE_WITH_WIN32
 		destroyEGL();
 #endif//YON_COMPILE_WITH_WIN32
@@ -85,13 +107,32 @@ namespace ogles1{
 	void COGLES1Driver::onResize(const yon::core::dimension2du& size){
 		setViewPort(core::recti(0,0,size.w,size.h));
 	}
-	void COGLES1Driver::drawUnit(scene::IUnit* unit) const{
+	void COGLES1Driver::drawUnit(scene::IUnit* unit){
+		setRender3DMode();
+		checkMaterial();
+
 		glEnableClientState(GL_VERTEX_ARRAY);
-		
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glVertexPointer(3, GL_FLOAT, sizeof(scene::SVertex),&unit->getVertices()[0].pos);
-		//OpenGL ES下支持GL_UNSIGNED_BYTE 或GL_UNSIGNED_SHORT.
-		glDrawElements(GL_LINES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
+		glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&unit->getVertices()[0].texcoords);
+		glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
+		//Logger->debug("drawUnit:%08x\n",unit);
+	}
+
+	bool COGLES1Driver::setTexture(u32 stage, const video::ITexture* texture){
+		if (!texture){
+			glDisable(GL_TEXTURE_2D);
+		}
+		else{
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D,static_cast<const COGLES1Texture*>(texture)->getTextureId());
+
+			//Logger->debug("glBindTexture:%d\n",static_cast<const COGLES1Texture*>(texture)->getTextureId());
+			//checkGLError(__FILE__,__LINE__);
+		}
+		return true;
 	}
 
 	void COGLES1Driver::setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat){
@@ -135,6 +176,13 @@ namespace ogles1{
 
 	const core::matrix4f& COGLES1Driver::getTransform(ENUM_TRANSFORM transform) const{
 		return m_matrix[transform];
+	}
+
+	IImage* COGLES1Driver::createImageFromFile(const io::path& filename){
+		io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
+		IImage* image=createImageFromFile(file);
+		file->drop();
+		return image;
 	}
 
 	IImage* COGLES1Driver::createImageFromFile(io::IReadFile* file){
@@ -194,12 +242,13 @@ namespace ogles1{
 
 	video::ITexture* COGLES1Driver::loadTextureFromFile(io::IReadFile* file){
 		ITexture* texture = NULL;
+		Logger->debug("start load texture:%s\n",file->getPathName().c_str());
 		IImage* image = createImageFromFile(file);
 
 		if (image)
 		{
 			texture = createDeviceDependentTexture(image, file->getPathName());
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("load texture:%s",file->getPathName().c_str()).c_str());
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("end load texture:%s",file->getPathName().c_str()).c_str());
 			image->drop();
 		}
 
@@ -213,8 +262,10 @@ namespace ogles1{
 
 	ITexture* COGLES1Driver::getTexture(const io::path& filename){
 		ITexture* texture = findTexture(filename);
-		if (texture)
+		if (texture){
+			Logger->debug("getTexture(%s) finded!\n",filename.c_str());
 			return texture;
+		}
 
 		io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
 
@@ -235,6 +286,34 @@ namespace ogles1{
 		else
 			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("addTexture for %s failed!",filename.c_str()).c_str());
 		return texture;
+	}
+
+	void  COGLES1Driver::setMaterial(IMaterial* material){
+		if(material==NULL||m_pCurrentMaterial==material)
+			return;
+		material->grab();
+		if(m_pCurrentMaterial)
+			m_pCurrentMaterial->drop();
+		m_pCurrentMaterial=material;
+	}
+
+	void COGLES1Driver::checkMaterial(){
+		if(m_pLastMaterial!=m_pCurrentMaterial){
+			m_pCurrentMaterial->grab();
+			if(m_pLastMaterial){
+				ENUM_MATERIAL_TYPE lmt=m_pLastMaterial->getMaterialType();
+				ENUM_MATERIAL_TYPE cmt=m_pCurrentMaterial->getMaterialType();
+				if(lmt!=cmt)
+					m_materialRenderers[lmt]->onUnsetMaterial();
+				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial);
+
+				m_pLastMaterial->drop();
+			}else{
+				ENUM_MATERIAL_TYPE cmt=m_pCurrentMaterial->getMaterialType();
+				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial);
+			}
+			m_pLastMaterial=m_pCurrentMaterial;
+		}
 	}
 
 	void COGLES1Driver::setRender3DMode(){
@@ -260,16 +339,43 @@ namespace ogles1{
 			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 
 			glMatrixMode(GL_MODELVIEW);
-			glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
+			glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadMatrixf(m_matrix[ENUM_TRANSFORM_PROJECTION].pointer());
 
-			m_renderModeChange = true;
+			m_bRenderModeChange = true;
+
+			m_renderMode=ENUM_RENDER_MODE_3D;
 		}
-		m_renderMode=ENUM_RENDER_MODE_3D;
 	}
-	void COGLES1Driver::setRender2DMode(){}
+	void COGLES1Driver::setRender2DMode(){
+	}
+
+	bool COGLES1Driver::checkGLError(const c8* file,s32 line)
+	{
+		GLenum g = glGetError();
+		switch(g)
+		{
+		case GL_NO_ERROR:
+			Logger->info(YON_LOG_SUCCEED_FORMAT,core::stringc("GL_NO_ERROR at line:%i(%s) ",line,file).c_str());break;
+			return false;
+		case GL_INVALID_ENUM:
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("GL_INVALID_ENUM at line:%i(%s) ",line,file).c_str());break;
+		case GL_INVALID_VALUE:
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("GL_INVALID_VALUE at line:%i(%s) ",line,file).c_str());break;
+		case GL_INVALID_OPERATION:
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("GL_INVALID_OPERATION at line:%i(%s) ",line,file).c_str());break;
+		case GL_STACK_OVERFLOW:
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("GL_STACK_OVERFLOW at line:%i(%s) ",line,file).c_str());break;
+		case GL_STACK_UNDERFLOW:
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("GL_STACK_UNDERFLOW at line:%i(%s) ",line,file).c_str());break;
+		case GL_OUT_OF_MEMORY:
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("GL_OUT_OF_MEMORY at line:%i(%s) ",line,file).c_str());break;
+		};
+		return true;
+	}
+
 #ifdef YON_COMPILE_WITH_WIN32
 	bool COGLES1Driver::initEGL(const HWND& hwnd){
 

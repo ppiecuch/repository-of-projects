@@ -12,16 +12,23 @@ namespace yon{
 
 
 		CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params):
-			m_videoDriver(NULL),m_sceneManager(new scene::CSceneManager()),
+			m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
 			m_params(params),m_bClose(false),m_bResized(true)
 		{
+			//初始化文件系统
+			m_pFileSystem=io::createFileSystem();
+
 			//初始化视频驱动器
 			createDriver();
+
+			//初始化场景管理器
+			m_pSceneManager=scene::createSceneManager();
+
 		}
 		CYonEngineAndroid::~CYonEngineAndroid(){
-			if(m_videoDriver!=NULL)
-				m_videoDriver->drop();
-			m_sceneManager->drop();
+			m_pVideoDriver->drop();
+			m_pSceneManager->drop();
+			m_pFileSystem->drop();
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineAndroid");
 			if(Logger->drop()){
 				Logger=NULL;
@@ -45,8 +52,8 @@ namespace yon{
 			if (!m_bResized)
 				return;
 
-			m_videoDriver->onResize(m_params.windowSize);
-			m_sceneManager->onResize(m_params.windowSize);
+			m_pVideoDriver->onResize(m_params.windowSize);
+			m_pSceneManager->onResize(m_params.windowSize);
 			m_bResized = false;
 		}
 
@@ -54,7 +61,7 @@ namespace yon{
 
 #ifdef YON_VIDEO_MODE_OGLES1
 			video::ogles1::SOGLES1Parameters params(m_params.windowSize);
-			m_videoDriver=new video::ogles1::COGLES1Driver(params);
+			m_pVideoDriver=new video::ogles1::COGLES1Driver(params,m_pFileSystem);
 #endif //Yon_VIDEO_MODE_OGLES1
 		}
 		//yon::ITimer* yon::platform::CYonEngineAndroid::getTimer(){return NULL;}
