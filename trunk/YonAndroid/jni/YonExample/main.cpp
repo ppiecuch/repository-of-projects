@@ -66,7 +66,8 @@ int main(int argc, char* argv[])
 	IEntity* cube=geometryFty->createCube(core::dimension3df(50,50,50));
 	IModel* cubeModel=sceneMgr->addModel(cube);
 	material=cubeModel->getMaterial(0);
-	cubeModel->setPosition(core::vector3df(20,20,0));
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
+	cubeModel->setPosition(core::vector3df(70,40,0));
 	material->setTexture(0,driver->getTexture("../media/test.png"));
 	cube->drop();
 
@@ -83,15 +84,34 @@ int main(int argc, char* argv[])
 	IEntity* sphere=geometryFty->createSphere(100,16,16);
 	IModel* sphereModel=sceneMgr->addModel(sphere);
 	material=sphereModel->getMaterial(0);
-	sphereModel->setPosition(core::vector3df(-50,-50,0));
+	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	sphereModel->setPosition(core::vector3df(-50,-50,-150));
 	material->setTexture(0,driver->getTexture("../media/earth.png"));
 	sphere->drop();
+
+	IEntity* plane=geometryFty->createXYPlane(core::dimension2df(50,50));
+	IModel* planeModel=sceneMgr->addModel(plane);
+	material=planeModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	planeModel->setPosition(core::vector3df(-50,20,0));
+	material->setTexture(0,driver->getTexture("../media/aura.png"));
+	plane->drop();
+
+	IEntity* nav=geometryFty->createXYPlane(core::dimension2df(128,128));
+	IModel* navModel=sceneMgr->addModel(nav);
+	material=navModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
+	navModel->setPosition(core::vector3df(-100,-100,0));
+	material->setTexture(0,driver->getTexture("../media/nav.png"));
+	nav->drop();
+
 
 	/*ILogger* logger=Logger;
 	logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
 	//logger->setAppender(MASK_APPENDER_CONSOLE);
 	logger->setLevel(ENUM_LOG_LEVEL_DEBUG);
 	int num=0;*/
+	f32 factor=1.001f;
 	while(engine->run()){
 
 		//const core::vector3df pos=camera->getPosition();
@@ -103,10 +123,17 @@ int main(int argc, char* argv[])
 		const core::vector3df srot=sphereModel->getRotation();
 		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.02f ,srot.z));
 
+		const core::vector3df psca=planeModel->getScale();
+		if(psca.x>2)
+			factor=0.999f;
+		else if(psca.x<1)
+			factor=1.001f;
+		planeModel->setScale(psca*factor);
+
 		//const core::vector3df sca=model->getScale();
 		//model->setScale(core::vector3df(sca.x+0.001f,sca.y+0.001f,sca.z+0.001f));
 
-		driver->begin(true,COLOR_GRAY);
+		driver->begin(true,COLOR_BLACK);
 
 		sceneMgr->render(driver);
 

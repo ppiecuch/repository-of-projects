@@ -77,7 +77,7 @@ namespace ogles1{
 		glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmpTexture);
 
 		void* source = m_pImage->lock();
-		//Logger->debug("glTexImage2D:%d,%d\n", m_pImage->getDimension().w,m_pImage->getDimension().h);
+		Logger->debug("glTexImage2D:%d,%d,%d,%s\n", m_textureId,m_pImage->getDimension().w,m_pImage->getDimension().h,COLOR_FORMAT_NAME[m_pImage->getColorFormat()]);
 		glBindTexture(GL_TEXTURE_2D, m_textureId);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, m_pImage->getDimension().w,m_pImage->getDimension().h, 0, format, pixelType, source);
 		m_pImage->unlock();

@@ -4,6 +4,10 @@
 #include "dimension2d.h"
 #include "yonString.h"
 
+#ifdef XC_COMPILE_WITH_ANDROID
+#include <jni.h>
+#endif
+
 namespace yon{
 	struct SYonEngineParameters{
 
@@ -24,6 +28,8 @@ namespace yon{
 		void* windowId;
 		//窗口标题
 		core::stringw windowCaption;
+		//JNIEnv接口
+		void *pJNIEnv;
 	};
 }
 #endif

@@ -2,7 +2,6 @@
 #define _YON_VIDEO_IVIDEODRIVER_H_
 
 #include "IReferencable.h"
-#include "color.h"
 #include "dimension2d.h"
 #include "rect.h"
 #include "matrix4.h"
@@ -11,6 +10,7 @@
 #include "ITexture.h"
 #include "IImageLoader.h"
 #include "IMaterial.h"
+#include "SColor.h"
 
 namespace yon{
 
@@ -55,7 +55,7 @@ namespace yon{
 				if(m_pFileSystem)
 					m_pFileSystem->drop();
 			};
-			virtual void begin(bool zBuffer=true,core::color c=core::color(0x000000FF)) = 0;
+			virtual void begin(bool zBuffer=true,video::SColor c=video::SColor(0x000000FF)) = 0;
 			virtual void end() = 0;
 			virtual void setViewPort(const core::recti& r) = 0;
 			virtual void onResize(const core::dimension2du& size) = 0;

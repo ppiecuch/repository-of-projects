@@ -28,7 +28,7 @@ namespace yon{
 				COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs);
 				virtual ~COGLES1Driver();
 
-				virtual void begin(bool zBuffer,core::color c);
+				virtual void begin(bool zBuffer,video::SColor c);
 				virtual void end();
 				virtual void setViewPort(const core::recti& r);
 				virtual void onResize(const core::dimension2du& size);

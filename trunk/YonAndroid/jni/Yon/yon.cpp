@@ -13,12 +13,15 @@ namespace yon{
 
 		const vector3df UP_VECTOR3DF(0,1,0);
 		const vector3df IDENTITY_VECTOR3DF(1,1,1);
-
-		const color COLOR_GRAY(0x88888888);
 	}
 
 	namespace debug{
 		ILogger* Logger=NULL;
+	}
+
+	namespace video{
+		const SColor COLOR_BLACK(0x000000FF);
+		const SColor COLOR_WHITE(0xFF00FFFF);
 	}
 
 	using namespace debug;

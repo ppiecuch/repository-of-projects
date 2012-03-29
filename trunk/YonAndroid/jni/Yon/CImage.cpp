@@ -36,9 +36,11 @@ namespace video{
 	}
 
 	CImage::~CImage(){
-		if(m_bDeleteData)
+		if(m_bDeleteData){
 			delete[] m_pData;
-		//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CImage");
+			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CImage.m_pData");
+		}
+		//Logger->debug(XC_LOG_SUCCEED_FORMAT,"Release CImage");
 	}
 
 	SColor CImage::getPixel(u32 x, u32 y) const

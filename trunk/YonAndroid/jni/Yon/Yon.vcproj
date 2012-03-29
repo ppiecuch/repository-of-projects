@@ -210,10 +210,6 @@
 				Name="core"
 				>
 				<File
-					RelativePath="..\include\color.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\dimension2d.h"
 					>
 				</File>

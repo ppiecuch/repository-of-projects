@@ -19,43 +19,12 @@ ISceneManager* sceneMgr=NULL;
 IModel* cubeModel=NULL;
 IModel* sphereModel=NULL;
 
-#define JNI_VERSION_1_1 0x00010001
-#define JNI_VERSION_1_2 0x00010002
-#define JNI_VERSION_1_4 0x00010004
-#define JNI_VERSION_1_5 0x00010005
-#define JNI_VERSION_1_6 0x00010006
-
 const char* LOG_TAG = "yon_AndroidGLView";
 
-void checkJNIVersion(JNIEnv *pEnv){
-	jint version= pEnv->GetVersion();
-	switch(version){
-	case JNI_VERSION_1_1:
-		LOGI(LOG_TAG,"jni version:1.1");
-		break;
-	case JNI_VERSION_1_2:
-		LOGI(LOG_TAG,"jni version:1.2");
-		break;
-	case JNI_VERSION_1_4:
-		LOGI(LOG_TAG,"jni version:1.4");
-		break;
-	case JNI_VERSION_1_5:
-		LOGI(LOG_TAG,"jni version:1.5");
-		break;
-	case JNI_VERSION_1_6:
-		LOGI(LOG_TAG,"jni version:1.6");
-		break;
-	default:
-		LOGI(LOG_TAG,"jni version:%d",version);
-		break;
-	}
-}
-
 void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jstring apkFilePath, jstring sdcardPath){
-	checkJNIVersion(pEnv);
-	//setlocale(LC_CTYPE,"UTF-8");
-
+	LOGD(LOG_TAG,"pEnv:%08x,nativeOnSurfaceCreated",pEnv);
 	SYonEngineParameters params;
+	params.pJNIEnv=pEnv;
 	engine=CreateEngine(params);
 
 	driver=engine->getVideoDriver();
@@ -68,16 +37,16 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, js
 
 	IEntity* cube=geometryFty->createCube(core::dimension3df(50,50,50));
 	cubeModel=sceneMgr->addModel(cube);
-	material=cubeModel->getMaterial(0);
+	//material=cubeModel->getMaterial(0);
 	cubeModel->setPosition(core::vector3df(20,20,0));
-	material->setTexture(0,driver->getTexture("/media/test.png"));
+	//material->setTexture(0,driver->getTexture("/media/test.png"));
 	cube->drop();
 
 	IEntity* sphere=geometryFty->createSphere(50,16,16);
 	sphereModel=sceneMgr->addModel(sphere);
-	material=sphereModel->getMaterial(0);
+	//material=sphereModel->getMaterial(0);
 	sphereModel->setPosition(core::vector3df(-20,-20,0));
-	material->setTexture(0,driver->getTexture("/media/earth.png"));
+	//material->setTexture(0,driver->getTexture("/media/earth.png"));
 	sphere->drop();
 
 	LOGD(LOG_TAG,"nativeOnSurfaceCreated");

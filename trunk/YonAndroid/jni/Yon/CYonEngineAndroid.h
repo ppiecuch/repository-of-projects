@@ -31,11 +31,14 @@ namespace yon{
 
 		protected:
 			virtual void createDriver();
+			void checkJNIVersion();
 		private:
 			void resizeIfNecessary();
 
 			//参数结构体
 			yon::SYonEngineParameters m_params;
+			//平台相关信息
+			SYonPlatformInfo m_pfInfo;
 
 			video::IVideoDriver* m_pVideoDriver;
 			scene::ISceneManager* m_pSceneManager;

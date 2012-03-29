@@ -14,6 +14,8 @@ namespace ogles1{
 		50, -29, 0,
 		0,  58, 0
 	};
+	GLubyte mColors[12]={255,0,0,64,  0,255,0,255,  0,0,255,0};
+	GLfloat mTexcoords[6]={0,0,1,0,0.5f,1};
 	void InitGL()
 	{
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -39,6 +41,9 @@ namespace ogles1{
 		m_imageLoaders.push(createImageLoaderPNG());
 
 		m_materialRenderers.push(createMaterialRendererSolid(this));
+		m_materialRenderers.push(createMaterialRendererLighten(this));
+		m_materialRenderers.push(createMaterialRendererTransparent(this));
+		m_materialRenderers.push(createMaterialRendererTransparentBlendColor(this));
 
 #ifdef YON_COMPILE_WITH_WIN32
 		initEGL(param.hWnd);
@@ -90,7 +95,7 @@ namespace ogles1{
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
 	}
 
-	void COGLES1Driver::begin(bool zBuffer,core::color c)
+	void COGLES1Driver::begin(bool zBuffer,video::SColor c)
 	{
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	}
@@ -111,12 +116,27 @@ namespace ogles1{
 		setRender3DMode();
 		checkMaterial();
 
+		/*glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_COLOR_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glVertexPointer(3, GL_SHORT, 0, mVertices);
+		glColorPointer(4,GL_UNSIGNED_BYTE,0,mColors);
+		glTexCoordPointer(2, GL_FLOAT, 0,mTexcoords);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, mIndices);
+		glRotatex(2<<16, 0, 0, 0x10000);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);*/
+
 		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_COLOR_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glVertexPointer(3, GL_FLOAT, sizeof(scene::SVertex),&unit->getVertices()[0].pos);
+		glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::SVertex),&unit->getVertices()[0].color);
 		glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&unit->getVertices()[0].texcoords);
 		glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
 		//Logger->debug("drawUnit:%08x\n",unit);
 	}
@@ -224,7 +244,8 @@ namespace ogles1{
 		//TODO ÓÅ»¯
 		const io::path absolutePath = m_pFileSystem->getAbsolutePath(filename);
 		for(u32 i=0;i<m_textures.size();++i){
-			if(m_textures[i]->getPath()==filename){
+			//Logger->debug("check %s==%s\n",m_textures[i]->getPath().c_str(),absolutePath.c_str());
+			if(m_textures[i]->getPath()==absolutePath){
 				return m_textures[i];
 			}
 		}
@@ -335,8 +356,6 @@ namespace ogles1{
 
 			glDisable(GL_BLEND);
 			glDisable(GL_ALPHA_TEST);
-			glAlphaFunc(GL_GREATER, 0.f);
-			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 
 			glMatrixMode(GL_MODELVIEW);
 			glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
