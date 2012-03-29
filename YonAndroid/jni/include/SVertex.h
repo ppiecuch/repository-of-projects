@@ -4,6 +4,7 @@
 #include "yonTypes.h"
 #include "vector3d.h"
 #include "vector2d.h"
+#include "SColor.h"
 
 namespace yon{
 	namespace scene{
@@ -14,10 +15,12 @@ namespace yon{
 
 		struct SVertex{
 			SVertex(){}
-			SVertex(f32 x,f32 y,f32 z,f32 tu, f32 tv):pos(x,y,z),texcoords(tu,tv){}
+			SVertex(f32 x,f32 y,f32 z,f32 tu, f32 tv,video::SColor c):pos(x,y,z),texcoords(tu,tv),color(c){}
+			//SVertex(f32 x,f32 y,f32 z,f32 tu, f32 tv):pos(x,y,z),texcoords(tu,tv){}
 
 			core::vector3df pos;
 			core::vector2df texcoords;
+			video::SColor color;
 		};
 	}//scene
 }//yon

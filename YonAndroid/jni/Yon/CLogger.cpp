@@ -19,24 +19,25 @@ namespace yon{
 #define LOGE(fmt,...) __android_log_print(ANDROID_LOG_ERROR,YON_ENGINE_NAME,fmt,##__VA_ARGS__)
 #endif
 
-		const core::stringc CLogger::LEVEL_NAME[ENUM_LOG_LEVEL_COUNT]={"DEBUG","INFO","WARN","ERROR"};
+		const core::stringc CLogger::LEVEL_NAME[ENUM_LOG_LEVEL_COUNT]={"DEBG","INFO","WARN","EROR"};
 		CLogger::CLogger():
-			m_path(""),m_name("log.txt"),m_pFile(NULL),
+			m_name("log.txt"),m_pFile(NULL),
 			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_MSEC|MASK_FORMAT_LEVEL|MASK_FORMAT_LOG),
 			m_level(ENUM_LOG_LEVEL_DEBUG),
 #ifdef YON_COMPILE_WITH_WIN32
+			m_path(""),
 			m_appender(MASK_APPENDER_FILE|MASK_APPENDER_VS)
 #elif defined(YON_COMPILE_WITH_ANDROID)
-			m_appender(MASK_APPENDER_CONSOLE)
+			m_path("/sdcard/"),
+			m_appender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE)
 #endif
 		{
-
-				#ifdef YON_COMPILE_WITH_WIN32
+#ifdef YON_COMPILE_WITH_WIN32
 				InitializeCriticalSection(&m_mutex);
-				#else
+#else
 				pthread_mutex_init(&m_mutex,NULL);
-				#endif
-			}
+#endif
+		}
 		CLogger::~CLogger(){
 			if(m_pFile)
 				fclose(m_pFile);
@@ -151,16 +152,25 @@ namespace yon{
 #ifdef YON_COMPILE_WITH_WIN32
 				errno_t result=fopen_s(&m_pFile,(m_path+m_name).c_str(),"a+");
 				if(result)
-#elif defined(YON_COMPILE_WITH_ANDROID)
-				m_pFile = fopen((m_path+m_name).c_str(),"ab");
-				if(m_pFile)
-#endif
 				{
 					core::stringc msg("open log file:");
 					msg+=m_path+m_name;
 					msg+=" failed!";
 					throw core::exception(msg);
 				}
+
+#elif defined(YON_COMPILE_WITH_ANDROID)
+				m_pFile = fopen((m_path+m_name).c_str(),"w+");
+				if(m_pFile==NULL)
+				{
+					core::stringc msg("open log file:");
+					msg+=m_path+m_name;
+					msg+=" failed!";
+					LOGE("%s",msg.c_str());
+				}else{
+					LOGI("create log:%s%s success",m_path.c_str(),m_name.c_str());
+				}
+#endif
 			}
 			lock();
 			memset(m_buffer,0x0,BUFFER_SIZE);

@@ -15,6 +15,13 @@ namespace video{
 		ENUM_COLOR_FORMAT_R8G8B8A8,
 		ENUM_COLOR_FORMAT_COUNT
 	};
+	const static c8* COLOR_FORMAT_NAME[]=
+	{
+		"R5G5B5A1",
+		"R5G6B5",
+		"R8G8B8",
+		"R8G8B8A8"
+	};
 	static u32 getPixelBitsByFormat(const ENUM_COLOR_FORMAT format)
 	{
 		switch(format)

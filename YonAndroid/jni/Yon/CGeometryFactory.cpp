@@ -11,6 +11,46 @@ using namespace yon::core;
 namespace yon{
 namespace scene{
 
+	IEntity* CGeometryFactory::createXYPlane(const core::dimension2df& size) const{
+		CUnit* unit=new CUnit();
+
+		// Create indices
+		const u16 u[6] = {
+			0,  2,  1,
+			0,  3,  2
+		};
+
+		unit->m_indices.reallocate(6);
+		for (u32 i=0; i<6; ++i)
+			unit->m_indices.push(u[i]);
+
+		//Create vertexs
+		unit->m_vertices.reallocate(4);
+
+		f32 phw,phh,mhw,mhh;
+		phw=size.w/2;
+		phh=size.h/2;
+		mhw=phw-size.w;
+		mhh=phh-size.h;
+
+		f32 u0,u1,v0,v1;
+		u0=v0=0;
+		u1=v1=1;
+
+		unit->m_vertices.push(SVertex(mhw,mhh,0,u0,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,phh,0,u0,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,phh,0,u1,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,mhh,0,u1,v1,video::COLOR_WHITE));
+
+		CEntity* entity=new CEntity();
+		entity->addUnit(unit);
+
+		unit->drop();
+
+		return entity;
+
+	}
+
 	IEntity* CGeometryFactory::createCube(const core::dimension3df& size) const{
 
 		CUnit* unit=new CUnit();
@@ -51,37 +91,37 @@ namespace scene{
 
 		Logger->debug("half cube size:%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",phw,phh,phd,mhw,mhh,mhd);
 
-		unit->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v1));
-		unit->m_vertices.push(SVertex(mhw,mhh,phd,u0,v0));
-		unit->m_vertices.push(SVertex(phw,mhh,phd,u1,v0));
-		unit->m_vertices.push(SVertex(phw,mhh,mhd,u1,v1));
+		unit->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,mhh,phd,u0,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,mhh,phd,u1,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,mhh,mhd,u1,v1,video::COLOR_WHITE));
 
-		unit->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1));
-		unit->m_vertices.push(SVertex(mhw,phh,phd,u0,v0));
-		unit->m_vertices.push(SVertex(phw,phh,phd,u1,v0));
-		unit->m_vertices.push(SVertex(phw,phh,mhd,u1,v1));
+		unit->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,phh,phd,u0,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,phh,phd,u1,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,phh,mhd,u1,v1,video::COLOR_WHITE));
 
-		unit->m_vertices.push(SVertex(mhw,mhh,mhd,u1,v0));
-		unit->m_vertices.push(SVertex(mhw,phh,mhd,u1,v1));
-		unit->m_vertices.push(SVertex(phw,phh,mhd,u0,v1));
-		unit->m_vertices.push(SVertex(phw,mhh,mhd,u0,v0));
+		unit->m_vertices.push(SVertex(mhw,mhh,mhd,u1,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,phh,mhd,u1,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,phh,mhd,u0,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,mhh,mhd,u0,v0,video::COLOR_WHITE));
 
-		unit->m_vertices.push(SVertex(mhw,mhh,phd,u0,v1));
-		unit->m_vertices.push(SVertex(mhw,phh,phd,u0,v0));
-		unit->m_vertices.push(SVertex(phw,phh,phd,u1,v0));
-		unit->m_vertices.push(SVertex(phw,mhh,phd,u1,v1));
+		unit->m_vertices.push(SVertex(mhw,mhh,phd,u0,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,phh,phd,u0,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,phh,phd,u1,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,mhh,phd,u1,v1,video::COLOR_WHITE));
 
 		//×ó
-		unit->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v0));
-		unit->m_vertices.push(SVertex(mhw,mhh,phd,u1,v0));
-		unit->m_vertices.push(SVertex(mhw,phh,phd,u1,v1));
-		unit->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1));
+		unit->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,mhh,phd,u1,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,phh,phd,u1,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1,video::COLOR_WHITE));
 
 		//ÓÒ
-		unit->m_vertices.push(SVertex(phw,mhh,mhd,u1,v0));
-		unit->m_vertices.push(SVertex(phw,mhh,phd,u0,v0));
-		unit->m_vertices.push(SVertex(phw,phh,phd,u0,v1));
-		unit->m_vertices.push(SVertex(phw,phh,mhd,u1,v1));
+		unit->m_vertices.push(SVertex(phw,mhh,mhd,u1,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,mhh,phd,u0,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,phh,phd,u0,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,phh,mhd,u1,v1,video::COLOR_WHITE));
 
 		CEntity* entity=new CEntity();
 		entity->addUnit(unit);
@@ -120,7 +160,7 @@ namespace scene{
 				temp.normalize();
 				u = (f32)j/hSteps;
 				v = (f32)asinf(temp.y)/PI+0.5f;
-				unit->m_vertices.push(SVertex(x,y,z,u,v));
+				unit->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -141,7 +181,7 @@ namespace scene{
 				temp.normalize();
 				u = (f32)j/hSteps;
 				v = (f32)asinf(temp.y)/PI+0.5f;
-				unit->m_vertices.push(SVertex(x,y,z,u,v));
+				unit->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -162,7 +202,7 @@ namespace scene{
 				temp.normalize();
 				u = (f32)(j+1)/hSteps;
 				v = (f32)asinf(temp.y)/PI+0.5f;
-				unit->m_vertices.push(SVertex(x,y,z,u,v));
+				unit->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -183,7 +223,7 @@ namespace scene{
 				temp.normalize();
 				u = (f32)(j+1)/hSteps;
 				v = (f32)asinf(temp.y)/PI+0.5f;
-				unit->m_vertices.push(SVertex(x,y,z,u,v));
+				unit->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{

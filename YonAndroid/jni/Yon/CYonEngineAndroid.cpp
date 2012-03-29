@@ -10,11 +10,46 @@
 namespace yon{
 	namespace platform{
 
+		#define JNI_VERSION_1_1 0x00010001
+		#define JNI_VERSION_1_2 0x00010002
+		#define JNI_VERSION_1_4 0x00010004
+		#define JNI_VERSION_1_5 0x00010005
+		#define JNI_VERSION_1_6 0x00010006
+
+		void CYonEngineAndroid::checkJNIVersion(){
+			JNIEnv* evn=(JNIEnv*)m_params.pJNIEnv;
+			jint version= evn->GetVersion();
+			switch(version){
+				case JNI_VERSION_1_1:
+					m_pfInfo.jniVersion="1.1";
+					break;
+				case JNI_VERSION_1_2:
+					m_pfInfo.jniVersion="1.2";
+					break;
+				case JNI_VERSION_1_4:
+					m_pfInfo.jniVersion="1.4";
+					break;
+				case JNI_VERSION_1_5:
+					m_pfInfo.jniVersion="1.5";
+					break;
+				case JNI_VERSION_1_6:
+					m_pfInfo.jniVersion="1.6";
+					break;
+				default:
+					m_pfInfo.jniVersion="unknown";
+					break;
+			}
+		}
+
 
 		CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params):
 			m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
 			m_params(params),m_bClose(false),m_bResized(true)
 		{
+			//检测jni版本
+			//checkJNIVersion();
+			//Logger->info("JNI Version:%s\n",m_pfInfo.jniVersion.c_str());
+
 			//初始化文件系统
 			m_pFileSystem=io::createFileSystem();
 

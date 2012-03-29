@@ -99,6 +99,9 @@ namespace video{
 		u32 color;
 
 	};
+
+	YON_API extern const SColor COLOR_BLACK;
+	YON_API extern const SColor COLOR_WHITE;
 }
 }
 #endif

@@ -10,6 +10,9 @@ namespace video{
 	class IVideoDriver;
 	class IMaterialRenderer;
 	IMaterialRenderer* createMaterialRendererSolid(IVideoDriver* driver);
+	IMaterialRenderer* createMaterialRendererLighten(IVideoDriver* driver);
+	IMaterialRenderer* createMaterialRendererTransparent(IVideoDriver* driver);
+	IMaterialRenderer* createMaterialRendererTransparentBlendColor(IVideoDriver* driver);
 
 	class IMaterialRenderer : public virtual core::IReferencable{
 	public:
