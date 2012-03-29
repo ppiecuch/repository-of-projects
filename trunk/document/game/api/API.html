@@ -2,14 +2,14 @@
 <html>
 	<head>
 		<title>API</title>
-		<link type="text/css"  href="../resources/css.css" rel="stylesheet" media="all" />
-		<script type="text/javascript" src="../resources/shCore.js"></script>
-		<script type="text/javascript" src="../resources/shBrushGL.js"></script>
-		<link type="text/css" rel="stylesheet" href="../resources/shCoreMidnight.css"/>
+		<link type="text/css"  href="resources/css.css" rel="stylesheet" media="all" />
+		<script type="text/javascript" src="resources/shCore.js"></script>
+		<script type="text/javascript" src="resources/shBrushGL.js"></script>
+		<link type="text/css" rel="stylesheet" href="resources/shCoreMidnight.css"/>
 		<script type="text/javascript">SyntaxHighlighter.all();</script>
 		<style type="text/css">
 			#report div.arrow {
-				background: transparent url(../resources/arrows.png) no-repeat scroll 0px -16px;
+				background: transparent url(resources/arrows.png) no-repeat scroll 0px -16px;
 				width: 16px;
 				height: 16px;
 				display: block;
@@ -18,7 +18,7 @@
 				background-position: 0px 0px;
 			}
 		</style>
-		<script src="../resources/jquery-1.4.2.min.js" type="text/javascript"></script>
+		<script src="resources/jquery-1.4.2.min.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			$(document).ready(function() {
 				$("#report tr:odd").addClass("odd");
@@ -49,7 +49,7 @@
 			</tr>
 			</thead>
 			<tbody>
-				<tr>
+			<tr>
 				<td>void glPixelStorei(GLenum pname,GLint param);</td>
 				<td>支持</td>
 				<td>&nbsp;</td>
@@ -120,6 +120,27 @@ http://wenku.baidu.com/view/bb1b57d97f1922791688e804.html
 http://www.cocoachina.com/bbs/read.php?tid=38052
 </pre>
 
+				</td>
+			</tr>
+			<tr>
+				<td>void glTexSubImage2D(GLenum target,GLint level,GLint xoffset,GLint yoffset,GLsizei width,GLsizei height,GLenum format,GLenum type,const GLvoid * pixels);</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【描述】
+如果有多个使用周期较短且大小相同的纹理, 可以调用函数glTexSubImage2D()将不同的图像加载到已有的纹理对象中.与删除并重新创建纹理对象相比, 这样做的效率可能更高
+</pre>
+<pre>
+http://apps.hi.baidu.com/share/detail/48145190
+</pre>
 				</td>
 			</tr>
 			</tbody>
