@@ -1,0 +1,25 @@
+在系列（1）中讲到，Java与native code的操作有两种方式：（1）在Java中加载动态链接库（2）使用JNI Invocation inteface，在native code中创建JVM
+JavaVM接口
+
+第一种方式，在加载动态链接库的时候，JVM会调用JNI_OnLoad(JavaVM* jvm, void* reserved)（如果定义了该函数）。第一个参数会传入JavaVM指针。
+第二种方式，在native code中调用JNI_CreateJavaVM(&jvm, (void**)&env, &vm_args)可以得到JavaVM指针。
+两种情况下，都可以用全局变量，比如JavaVM* g_jvm来保存获得的指针以便在任意上下文中使用。
+Android系统是利用第二种方式Invocation interface来创建JVM的。
+JNIEnv接口
+
+JNI开发最常见的错误就是滥用了JNIEnv接口。需要强调的是JNIEnv是跟线程相关的。
+在native method中，JNIEnv作为第一个参数传入。那么在JNIEnv不作为参数传入的时候，该如何获得它？JNI提供了两个函数：（*jvm)->AttachCurrentThread(jvm, (void**)&env, NULL)和(*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)。两个函数都利用JavaVM接口获得JNIEnv接口，上面已经讲到如何获得JavaVM接口。
+JNI规范也说明，可以将获得JNIEnv封装成一个函数。
+1
+JNIEnv* JNU_GetEnv()
+2
+{
+3
+    JNIEnv* env;
+4
+    (*g_jvm)->GetEnv(g_jvm, (void**)&env, JNI_VERSION_1_2);
+5
+    return env;
+6
+}
+http://archive.cnblogs.com/a/1857348/
