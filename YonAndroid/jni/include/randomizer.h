@@ -4,7 +4,7 @@
 namespace yon{
 namespace core{
 
-	class randomizer{
+	/*class randomizer{
 	public:
 		static void reset();
 		static s32 rand();
@@ -28,7 +28,7 @@ namespace core{
 	void randomizer::reset()
 	{
 		seed = 0x0f0f0f0f;
-	}
+	}*/
 
 }//core
 }//yon

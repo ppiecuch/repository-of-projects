@@ -68,16 +68,16 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, js
 
 	IEntity* cube=geometryFty->createCube(core::dimension3df(50,50,50));
 	cubeModel=sceneMgr->addModel(cube);
-	//material=cubeModel->getMaterial(0);
+	material=cubeModel->getMaterial(0);
 	cubeModel->setPosition(core::vector3df(20,20,0));
-	//material->setTexture(0,driver->getTexture("D:/test.png"));
+	material->setTexture(0,driver->getTexture("/media/test.png"));
 	cube->drop();
 
 	IEntity* sphere=geometryFty->createSphere(50,16,16);
 	sphereModel=sceneMgr->addModel(sphere);
-	//material=sphereModel->getMaterial(0);
+	material=sphereModel->getMaterial(0);
 	sphereModel->setPosition(core::vector3df(-20,-20,0));
-	//material->setTexture(0,driver->getTexture("D:/earth.png"));
+	material->setTexture(0,driver->getTexture("/media/earth.png"));
 	sphere->drop();
 
 	LOGD(LOG_TAG,"nativeOnSurfaceCreated");

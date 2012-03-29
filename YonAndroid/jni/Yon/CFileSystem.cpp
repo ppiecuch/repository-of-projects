@@ -51,7 +51,8 @@ namespace io{
 		tmp.replace('\\', '/');
 		return tmp;
 #elif defined(YON_COMPILE_WITH_ANDROID)
-		//TODO
+		core::stringc tmp("/sdcard%s",filename.c_str());
+		return tmp;
 #endif
 	}
 	const io::path& CFileSystem::getWorkingDirectory(){
