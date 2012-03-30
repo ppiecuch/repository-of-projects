@@ -42,8 +42,9 @@ namespace yon{
 		}
 
 
-		CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params):
-			m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
+		CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params)
+			:m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
+			m_pUserListener(NULL),
 			m_params(params),m_bClose(false),m_bResized(true)
 		{
 			//¼ì²âjni°æ±¾
@@ -90,6 +91,22 @@ namespace yon{
 			m_pVideoDriver->onResize(m_params.windowSize);
 			m_pSceneManager->onResize(m_params.windowSize);
 			m_bResized = false;
+		}
+
+		bool CYonEngineAndroid::postEventFromUser(const event::SEvent& event){
+			bool absorbed = false;
+
+			if (m_pUserListener)
+				absorbed = m_pUserListener->OnEvent(event);
+
+			//TODO GUI
+			//if (!absorbed && GUIEnvironment)
+			//	absorbed = GUIEnvironment->postEventFromUser(event);
+
+			if (!absorbed && m_pSceneManager)
+				absorbed = m_pSceneManager->postEventFromUser(event);
+
+			return absorbed;
 		}
 
 		void CYonEngineAndroid::createDriver(){

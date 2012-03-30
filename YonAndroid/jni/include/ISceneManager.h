@@ -6,6 +6,7 @@
 #include "IModel.h"
 #include "dimension2d.h"
 #include "ICamera.h"
+#include "IEventListener.h"
 
 namespace yon{
 	namespace scene{
@@ -20,10 +21,12 @@ namespace yon{
 				const core::vector3df& lookat = core::vector3df(0,0,100),bool makeActive=true) = 0;
 			virtual void setActiveCamera(camera::ICamera* camera) = 0;
 
-			virtual const IGeometryFactory* getGeometryFactory() const = 0;
+			virtual IGeometryFactory* getGeometryFactory() const = 0;
 
 			//TODO protected
 			virtual void onResize(const core::dimension2du& size) = 0;
+
+			virtual bool postEventFromUser(const event::SEvent& evt) = 0;
 		};
 
 	}//scene

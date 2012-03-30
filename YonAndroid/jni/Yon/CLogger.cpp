@@ -19,7 +19,9 @@ namespace yon{
 #define LOGE(fmt,...) __android_log_print(ANDROID_LOG_ERROR,YON_ENGINE_NAME,fmt,##__VA_ARGS__)
 #endif
 
-		const core::stringc CLogger::LEVEL_NAME[ENUM_LOG_LEVEL_COUNT]={"DEBG","INFO","WARN","EROR"};
+		//MFC下内存泄漏检测比const static对象的释放要早执行，所以会报内存泄漏
+		//const core::stringc CLogger::LEVEL_NAME[ENUM_LOG_LEVEL_COUNT]={"DEBG","INFO","WARN","EROR"};
+		const c8* CLogger::LEVEL_NAME[ENUM_LOG_LEVEL_COUNT]={"DEBG","INFO","WARN","EROR"};
 		CLogger::CLogger():
 			m_name("log.txt"),m_pFile(NULL),
 			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_MSEC|MASK_FORMAT_LEVEL|MASK_FORMAT_LOG),
@@ -39,6 +41,7 @@ namespace yon{
 #endif
 		}
 		CLogger::~CLogger(){
+			info(YON_LOG_SUCCEED_FORMAT,"Release Logger");
 			if(m_pFile)
 				fclose(m_pFile);
 			#ifdef YON_COMPILE_WITH_WIN32
@@ -141,8 +144,8 @@ namespace yon{
 		}
 		void CLogger::appendLevel(int& index,ENUM_LOG_LEVEL level){
 			if(m_format&MASK_FORMAT_LEVEL){
-				sprintf_s(m_buffer+index,8,"[%s]",LEVEL_NAME[level].c_str());
-				index+=LEVEL_NAME[level].length()+2;
+				sprintf_s(m_buffer+index,8,"[%s]",LEVEL_NAME[level]);
+				index+=6;
 			}
 		}
 		void CLogger::output(ENUM_LOG_LEVEL level,const c8* pFmt,va_list args){

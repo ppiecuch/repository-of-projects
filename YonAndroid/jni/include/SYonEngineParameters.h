@@ -4,7 +4,7 @@
 #include "dimension2d.h"
 #include "yonString.h"
 
-#ifdef XC_COMPILE_WITH_ANDROID
+#ifdef YON_COMPILE_WITH_ANDROID
 #include <jni.h>
 #endif
 
@@ -19,7 +19,8 @@ namespace yon{
 		SYonEngineParameters(const SYonEngineParameters& params):
 			windowSize(params.windowSize),
 			windowId(params.windowId),
-			windowCaption(params.windowCaption)
+			windowCaption(params.windowCaption),
+			pJNIEnv(params.pJNIEnv)
 			{}
 
 		//´°¿Ú³ß´ç

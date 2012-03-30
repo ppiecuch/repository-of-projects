@@ -36,7 +36,8 @@ namespace yon{
 			const static u32 BUFFER_SIZE=1024;
 			c8 m_buffer[BUFFER_SIZE];
 		//日志级别名称
-			const static core::stringc LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];
+			//const static core::stringc LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];
+			const static c8* LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];
 		protected:
 			virtual void lock();
 			virtual void unlock();
