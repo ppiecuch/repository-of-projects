@@ -1,0 +1,21 @@
+Android多点触控在本质上需要LCD驱动和程序本身设计上支持，目前市面上HTC、Motorola和Samsung等知名厂商只要使用电容屏触控原理的手机均可以支持多点触控Multitouch技术，对于网页缩放、手势操作上有更好的用户体验。 在Android平台上事件均使用了MotionEvent对象方式处理，比如开始触控时会触发ACTION_DOWN而移动操作时为ACTION_MOVE最终放开手指时触发ACTION_UP事件。当然还有用户无规则的操作可能触发ACTION_CANCEL这个动作。
+
+  首先提醒大家多点触控需要LCD驱动和应用软件两个支持才能实现，所以部分比较老的，比如Android 2.1以前或在北美上市的手机可能无法支持多点触控在固件上，由于Apple专利原因在欧洲和亚太地区的Android 2.1以后的新款机型固件均已经在屏幕驱动中支持，同时模拟器也无法实现多点触控的测试。
+
+  下面Android123一起用Android 2.0或以上SDK中的方法来实现如何通过应用层支持多点触控操作，对于常规的控件触控操作在内部为View的setOnTouchListener()接口实现的onTouchEvent()方法来处理。对于onTouchEvent方法的参数MotionEvent我们可以详细处理来实现对多点触控的了解，比如
+
+   event.getAction() //获取触控动作比如ACTION_DOWN
+   event.getPointerCount(); //获取触控点的数量，比如2则可能是两个手指同时按压屏幕
+   event.getPointerId(nID); //对于每个触控的点的细节，我们可以通过一个循环执行getPointerId方法获取索引
+   event.getX(nID); //获取第nID个触控点的x位置
+   event.getY(nID); //获取第nID个点触控的y位置
+   event.getPressure(nID); //LCD可以感应出用户的手指压力，当然具体的级别由驱动和物理硬件决定的
+ 
+  event.getDownTime() //按下开始时间
+
+  event.getEventTime() // 事件结束时间
+
+  event.getEventTime()-event.getDownTime()); //总共按下时花费时间
+
+   有关Android多点触控的更详细技术由于目前兼容性和固件问题将会在以后的内容中详细讨论，这里给大家起到抛砖引玉的作用。
+http://dev.10086.cn/cmdn/wiki/index.php?edition-view-4616-1.html
