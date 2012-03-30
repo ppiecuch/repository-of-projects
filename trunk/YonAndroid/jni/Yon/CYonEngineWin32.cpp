@@ -16,6 +16,8 @@ namespace platform{
 	};
 	core::list<SEnginePair> EngineMap;
 
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
+
 	CYonEngineWin32* getEngineByHWnd(HWND hWnd)
 	{
 		core::list<SEnginePair>::Iterator it = EngineMap.begin();
@@ -30,6 +32,7 @@ namespace platform{
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
+		m_pUserListener(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
 	{
 		if(params.windowId==NULL)
@@ -64,11 +67,15 @@ namespace platform{
 		Logger->debug("EngineMap.push_back(ep)\n");
 		//系统WM_SIZE消息可能在将本对象push进EngineMap之前已经处理完,为了确保完整性,这里再发送一次WM_SIZE
 		PostMessage(m_hWnd,WM_SIZE,0,0);
+
+		SetActiveWindow(m_hWnd);
+		SetForegroundWindow(m_hWnd);
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
-			m_pVideoDriver->drop();
-			m_pSceneManager->drop();
-			m_pFileSystem->drop();
+		m_pVideoDriver->drop();
+		m_pSceneManager->drop();
+		m_pFileSystem->drop();
+		if(m_bExternalWindow==false)
 			DestroyWindow(m_hWnd);
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineWin32");
@@ -85,7 +92,7 @@ namespace platform{
 		MSG msg;
 		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			if(msg.message == WM_QUIT)
+			/*if(msg.message == WM_QUIT)
 			{
 				m_bClose=true;
 			}
@@ -93,6 +100,21 @@ namespace platform{
 			{
 				//TranslateMessage(&msg);
 				DispatchMessage(&msg);
+			}*/
+				
+			/*if(msg.message==WM_DESTROY){
+				Logger->debug("PeekMessage WM_DESTROY\n");
+			}else if(msg.message==WM_QUIT){
+				Logger->debug("PeekMessage WM_QUIT\n");
+			}*/
+			if (m_bExternalWindow && msg.hwnd == m_hWnd)
+				WndProc(m_hWnd, msg.message, msg.wParam, msg.lParam);
+			else
+				DispatchMessage(&msg);
+
+			if(msg.message == WM_QUIT)
+			{
+				m_bClose=true;
 			}
 		}
 		if(!m_bClose)
@@ -114,6 +136,21 @@ namespace platform{
 		m_bResized = false;
 	}
 
+	bool CYonEngineWin32::postEventFromUser(const event::SEvent& event){
+		bool absorbed = false;
+
+		if (m_pUserListener)
+			absorbed = m_pUserListener->OnEvent(event);
+
+		//TODO GUI
+		//if (!absorbed && GUIEnvironment)
+		//	absorbed = GUIEnvironment->postEventFromUser(event);
+
+		if (!absorbed && m_pSceneManager)
+			absorbed = m_pSceneManager->postEventFromUser(event);
+
+		return absorbed;
+	}
 	//
 	//函数: WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	//hWnd: handle to window 窗口句柄
@@ -123,12 +160,98 @@ namespace platform{
 	//目的: 处理主窗口的消息。
 	//
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
+
+		event::SEvent evt;
+
+		static s32 clickCount=0;
+		if (GetCapture() != hWnd && clickCount > 0)
+			clickCount = 0;
+
+		struct MessageMap
+		{
+			s32 group;
+			UINT winMessage;
+			s32 xcMessage;
+		};
+
+		static MessageMap mouseMap[] =
+		{
+			{0, WM_LBUTTONDOWN, event::ENUM_MOUSE_INPUT_TYPE_LDOWN},
+			{1, WM_LBUTTONUP,   event::ENUM_MOUSE_INPUT_TYPE_LUP},
+			{0, WM_RBUTTONDOWN, event::ENUM_MOUSE_INPUT_TYPE_RDOWN},
+			{1, WM_RBUTTONUP,   event::ENUM_MOUSE_INPUT_TYPE_RUP},
+			{0, WM_MBUTTONDOWN, event::ENUM_MOUSE_INPUT_TYPE_MDOWN},
+			{1, WM_MBUTTONUP,   event::ENUM_MOUSE_INPUT_TYPE_MUP},
+			{2, WM_MOUSEMOVE,   event::ENUM_MOUSE_INPUT_TYPE_MOVED},
+			{3, WM_MOUSEWHEEL,  event::ENUM_MOUSE_INPUT_TYPE_WHEEL},
+			{-1, 0, 0}
+		};
+
+		MessageMap * m = mouseMap;
+		while ( m->group >=0 && m->winMessage != uiMsg )
+			m += 1;
+		if ( m->group >= 0 )
+		{
+			if ( m->group == 0 )	// down
+			{
+				clickCount++;
+				SetCapture(hWnd);
+			}
+			else
+			{
+				if ( m->group == 1 )	// up
+				{
+					clickCount--;
+					if (clickCount<1)
+					{
+						clickCount=0;
+						ReleaseCapture();
+					}
+				}
+			}
+			evt.type=event::ENUM_EVENT_TYPE_MOUSE;
+			evt.mouseInput.type = (event::ENUM_MOUSE_INPUT_TYPE) m->xcMessage;
+			evt.mouseInput.x = (short)LOWORD(lParam);
+			evt.mouseInput.y = (short)HIWORD(lParam);
+			evt.mouseInput.buttonMasks = wParam & ( MK_LBUTTON | MK_RBUTTON | MK_MBUTTON);
+			evt.mouseInput.wheel = 0.f;
+
+			// wheel
+			if ( m->group == 3 )
+			{
+				POINT p;
+				p.x = 0; p.y = 0;
+				ClientToScreen(hWnd, &p);
+				evt.mouseInput.x -= p.x;
+				evt.mouseInput.y -= p.y;
+				evt.mouseInput.wheel = ((f32)((short)HIWORD(wParam))) / (f32)WHEEL_DELTA;
+			}
+
+			IYonEngine* engine = getEngineByHWnd(hWnd);
+			if (engine)
+			{
+				engine->postEventFromUser(evt);
+
+				//TODO 双击事件/三击事件
+			}
+			return 0;
+		}
+
+
 		CYonEngineWin32* engine=NULL;
 		switch(uiMsg) {
+		case WM_PAINT:
+			PAINTSTRUCT ps;
+			BeginPaint(hWnd, &ps);
+			EndPaint(hWnd, &ps);
+			return 0;
+		case WM_ERASEBKGND:
+			return 0;
 		case WM_CREATE:
 			Logger->debug("WM_CREATE\n");
 			break;
 		case WM_DESTROY:
+			Logger->debug("WM_DESTROY\n");
 			PostQuitMessage(0);
 			return 0;
 		case WM_ACTIVATE:

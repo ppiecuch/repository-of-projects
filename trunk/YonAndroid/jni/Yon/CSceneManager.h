@@ -24,9 +24,11 @@ namespace yon{
 
 			virtual void render(video::IVideoDriver* driver);
 
-			virtual const IGeometryFactory* getGeometryFactory() const;
+			virtual IGeometryFactory* getGeometryFactory() const;
 
 			virtual void onResize(const core::dimension2du& size);
+
+			virtual bool postEventFromUser(const event::SEvent& evt);
 		private:
 			IGeometryFactory* m_geometryFactory;
 		};

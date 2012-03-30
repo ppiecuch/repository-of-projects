@@ -6,6 +6,7 @@
 
 using namespace yon;
 using namespace yon::core;
+using namespace yon::event;
 using namespace yon::io;
 using namespace yon::debug;
 using namespace yon::video;
@@ -18,6 +19,13 @@ ISceneManager* sceneMgr=NULL;
 
 IModel* cubeModel=NULL;
 IModel* sphereModel=NULL;
+
+const static s32 ACTION_MASK = 255;
+const static s32 ACTION_DOWN = 0;
+const static s32 ACTION_UP = 1;
+const static s32 ACTION_MOVE = 2;
+const static s32 ACTION_POINTER_DOWN = 5;
+const static s32 ACTION_POINTER_UP = 6;
 
 const char* LOG_TAG = "yon_AndroidGLView";
 
@@ -60,7 +68,7 @@ void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	//glClearColor(0.1f,0.2f,0.3f,1);
 	//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	engine->run();
-	driver->begin(true,COLOR_GRAY);
+	driver->begin(true,COLOR_BLACK);
 
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
@@ -122,6 +130,26 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 }
 jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iAction, jfloat fX, jfloat fY){
 	LOGD(LOG_TAG,"nativeOnTouch:action:%d,%.2f,%.2f",iAction,fX,fY);
+	SEvent evt;
+	evt.type=ENUM_EVENT_TYPE_TOUCH;
+	evt.touchInput.x=fX;
+	evt.touchInput.y=fY;
+	switch (iAction&ACTION_MASK){
+	case ACTION_DOWN:
+		evt.touchInput.type=ENUM_TOUCH_INPUT_TYPE_DOWN;
+		break;  
+	case ACTION_UP:
+		evt.touchInput.type=ENUM_TOUCH_INPUT_TYPE_UP;
+		break;
+	case ACTION_POINTER_UP:
+		//evt.touchInput.type=ENUM_TOUCH_INPUT_TYPE_UP;
+	case ACTION_POINTER_DOWN:
+		break;
+	case ACTION_MOVE: 
+		evt.touchInput.type=ENUM_TOUCH_INPUT_TYPE_MOVE;
+		break;
+	}
+	engine->postEventFromUser(evt);
 	return false;
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceDestroy(JNIEnv *pEnv, jobject obj){

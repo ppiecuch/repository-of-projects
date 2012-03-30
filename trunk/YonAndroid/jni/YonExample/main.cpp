@@ -4,6 +4,8 @@
 #include <crtdbg.h>
 #include <typeinfo>
 
+//#include <vld.h>
+
 inline void EnableMemLeakCheck()
 {
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) |  _CRTDBG_LEAK_CHECK_DF);

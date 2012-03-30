@@ -30,6 +30,8 @@ namespace yon{
 
 			virtual void onResize(u32 w,u32 h);
 
+			virtual bool postEventFromUser(const event::SEvent& event);
+
 			//virtual ITimer* getTimer();
 
 			const HWND& getHWND() const{
@@ -54,6 +56,8 @@ namespace yon{
 			video::IVideoDriver* m_pVideoDriver;
 			scene::ISceneManager* m_pSceneManager;
 			io::IFileSystem* m_pFileSystem;
+
+			event::IEventListener* m_pUserListener;
 
 			bool m_bClose;
 			bool m_bResized;
