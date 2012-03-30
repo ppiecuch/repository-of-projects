@@ -1,0 +1,336 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>API</title>
+		<link type="text/css"  href="resources/css.css" rel="stylesheet" media="all" />
+		<script type="text/javascript" src="resources/shCore.js"></script>
+		<script type="text/javascript" src="resources/shBrushWin.js"></script>
+		<link type="text/css" rel="stylesheet" href="resources/shCoreMidnight.css"/>
+		<script type="text/javascript">SyntaxHighlighter.all();</script>
+		<style type="text/css">
+			#report div.arrow {
+				background: transparent url(resources/arrows.png) no-repeat scroll 0px -16px;
+				width: 16px;
+				height: 16px;
+				display: block;
+			}
+			#report div.up {
+				background-position: 0px 0px;
+			}
+		</style>
+		<script src="resources/jquery-1.4.2.min.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#report tr:odd").addClass("odd");
+				$("#report tr:even td").addClass("alt");
+				$("#report tr:not(.odd)").hide();
+				$("#report tr:first-child").show();
+				
+				$("#report tr th:first-child").addClass("first");
+				$("#report tr td:first-child").addClass("first");
+
+				$("#report tr.odd").click(function() {
+					$(this).next("tr").toggle();
+					$(this).find(".arrow").toggleClass("up");
+				});
+			});
+
+		</script>
+	</head>
+	<body>
+		<table id="report" cellspacing="0" class="groovy_table" width="90%">
+			<thead>
+				<tr>
+				<th>函数</th>
+				<th>NT</th>
+				<th>CE</th>
+				<th>头文件</th>
+				<th>输入库</th>
+				<th>&nbsp;</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td>HDC BeginPaint(HWND hwnd,LPPAINTSTRUCT lpPaint)</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+为指定窗口进行绘图工作的准备，并用将和绘图有关的信息填充到一个PAINTSTRUCT结构中。
+【参数】
+hwnd:[输入]被重绘的窗口句柄
+lpPaint:[输出]指向一个用来接收绘画信息的PAINTSTRUCT结构
+【返回值】
+如果函数成功，返回值是指定窗口的“显示设备描述表”句柄。
+如果函数失败，返回值是NULL，表明没有得到显示设备的内容。
+Windows NT/2000/XP: 使用GetLastError得到更多的错误信息。
+【备注】
+BeginPaint函数自动设置显示设备内容的剪切区域，而排除任何更新区域外的区域。该更新区域可以通过InvalidateRect或InvalidateRgn函数设置，也可以是系统在改变大小、移动、创建、滚动后设置的，
+亦是其他的影响客户区的操作来设置的。如果更新区域被标记为可擦除的，BeginPaint发送一个WM_ERASEBKGND消息给窗口。
+一个应用程序除了响应WM_PAINT消息外，不应该调用BeginPaint。每次调用BeginPaint都应该有相应的EndPaint函数。
+如果被绘画的客户区中有一个caret（caret：插入符。是窗口客户区中的一个闪烁的线，块，或位图。插入符通常表示文本或图形将被插入的地方。即一闪一闪的光标），BeginPaint自动隐藏该符号，而保证它不被擦除。
+如果窗口类有一个背景刷，BeginPaint使用这个刷子来擦除更新区域的背景。
+
+【BeginPaint()和EndPaint()】
+BeginPaint()和EndPaint()可以删除消息队列中的WM_PAINT消息，并使无效区域有效。
+GetDC()和ReleaseDC()并不删除也不能使无效区域有效，因此当程序跳出 WM_PAINT 时 ，无效区域仍然存在。系统就回不断发送WM_PAINT消息，于是程序不断处理WM_PAINT消息。
+相当于BeginPaint、EndPaint会告诉GDI内部，这个窗口需要重画的地方已经重画了，这样WM_PAINT处理完返回给系统后，系统不会再重发WM_PAINT，
+而GetDC没有告诉系统这个窗口需要重画的地方已经画过，在你把程序返回给系统后，系统一直以为通知你的重画命令你还没有乖乖的执行或者执行出错，所以在消息空闲时，
+它还会不断地发WM_PAINT催促你画，导致程序卡死。
+
+无效区域 ：
+无效区域就是指需要重画的区域，无效的意思是：当前内容是旧的，过时的。
+假设A是新弹出的一个对话框或被激活的现有对话框，A对话框置于原来的活动对话框B前面，造成对话框B的部分或全部被覆盖，当对话框A移开或关闭后，使对话框B原来被覆盖的地方重新可见。
+那部分被覆盖的地方就称为无效区域。
+只有当一个窗口消息空闲时，系统才会抽空检查一下这个窗口的无效区域是否为非空（WM_PAINT的优先级是最低的。
+这也就是为什么系统很忙时窗口和桌面往往会出现变白、刷新不了、留拖拽痕迹等现象的原因），如果非空，系统就发送WM_PAINT。所以一定要用BeginPaint、EndPaint把无效区域设为空，否则WM_PAINT将一直被发送。
+
+为什么WINDOWS要提出无效区域的概念？
+这是为了加速。
+因为BeginPaint和EndPaint用到的设备描述符只会在当前的无效区域内绘画，在有效区域内的绘画会自动被过滤，大家都知道，WIN GDI的绘画速度是比较慢的，所以能节省一个象素就节省一个，不用吝啬，这样可以有效加快绘画速度。
+可见BeginPaint、EndPaint是比较“被动”的，只在窗口新建时和被摧残时才重画。
+而GetDC用于主动绘制，只要你指到哪，它就打到哪。它不加判断就都画上去，无效区域跟它没关系。
+对话框没被覆盖没被摧残，它很健康，系统没要求它重画，但开发者有些情况下需要它主动重画：比如一个定时换外观的窗口，这时候就要在WM_TIMER处理代码用GetDC。
+这时候再用 BeginPaint、EndPaint的话，会因为无效区域为空，所有绘画操作都将被过滤掉。;
+</pre>
+<pre>
+http://baike.baidu.com/view/1014019.htm
+http://blog.csdn.net/newstarao/article/details/3278945
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>BOOL ClientToScreen(HWND hWnd,LPPOINT lpPoint)</td>
+				<td>≥3.1</td>
+				<td>≥1.0</td>
+				<td>winuser.h</td>
+				<td>user32.lib</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+该函数将指定点，或者矩形的用户坐标转换成屏幕坐标。
+【参数】
+hWnd ：用户区域用于转换的窗口句柄。
+lpPoint：指向一个含有要转换的用户坐标的结构的指针，如果函数调用成功，新屏幕坐标复制到此结构。
+【返回值】
+如果函数调用成功，返回值为非零值，否则为零。
+【备注】
+函数用屏幕坐标取代POINT结构中的用户坐标，屏幕坐标与屏幕左上角相关联。
+</pre>
+http://baike.baidu.com/view/1080483.htm
+<pre>
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>BOOL EndPaint(HWND hWnd,CONST PAINTSTRUCT *lpPaint)</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+标记指定窗口的绘画过程结束；这个函数在每次调用BeginPaint函数之后被请求，但仅仅在绘画完成以后。
+【参数】
+hWnd：[输入]已经被重画的窗口的HANDLE
+lpPaint：[输入]指向一个PAINTSTRUCT结构，该结构包含了绘画信息，是BeginPaint函数返回的返回值
+【返回值】
+返回值始终为非0
+【备注】
+PAINTSTRUCT 结构体包含了用于绘制窗口客户区的信息。
+PAINTSTRUCT定义：
+typedef struct tagPAINTSTRUCT {
+　　HDC hdc;
+　　BOOL fErase;
+　　RECT rcPaint;
+　　BOOL fRestore;
+　　BOOL fIncUpdate;
+　　BYTE rgbReserved[32];
+} PAINTSTRUCT, *PPAINTSTRUCT;
+hdc是用于绘制的句柄，fErase如果为非零值则擦除背景，否则不擦除背景，rcPaint 通过制定左上角和右下角的坐标确定一个要绘制的矩形范围，
+该矩形单位相对于客户区左上角，后面三个参数都是系统预留的，编程一般用不到。
+</pre>
+<pre>
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>HWND GetCapture（VOID）</td>
+				<td>≥4.0</td>
+				<td>≥1.0</td>
+				<td>winuser.h</td>
+				<td>user32.lib</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+该函数取得捕获了鼠标的窗口（如果存在）的句柄。在同一时刻，只有一个窗口能捕获鼠标；此时，该窗口接收鼠标的输入，无论光标是否在其范围内。
+【参数】
+无
+【返回值】
+返回值是与当前线程相关联的捕获窗口的句柄。如果当前线程里没有窗口捕获到鼠标，则返回NULL。
+【备注】
+返回NULL并不意味着系统里没有其他进程或线程捕获到鼠标，只表示当前线程没有捕获到鼠标。
+</pre>
+<pre>
+http://baike.baidu.com/view/1080202.htm
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>HWND SetCapture（HWND hwnd）</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>winuser.h</td>
+				<td>user32.lib</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+该函数在属于当前线程的指定窗口里设置鼠标捕获。一旦窗口捕获了鼠标，所有鼠标输入都针对该窗口，无论光标是否在窗口的边界内。
+同一时刻只能有一个窗口捕获鼠标。如果鼠标光标在另一个线程创建的窗口上，只有当鼠标键按下时系统才将鼠标输入指向指定的窗口。
+【参数】
+hWnd：当前线程里要捕获鼠标的窗口句柄。
+【返回值】
+返回值是上次捕获鼠标的窗口句柄。如果不存在那样的句柄，返回值是NULL。
+【备注】
+只有前台窗口才能捕获鼠标。如果一个后台窗口想捕获鼠标，则该窗口仅为其光标热点在该窗口可见部份的鼠标事件接收消息。
+另外，即使前台窗口已捕获了鼠标，用户也可点击另一个窗口，将其调入前台。当一个窗口不再需要所有的鼠标输入时，
+创建该窗口的线程应当调用函数ReleaseCapture来释放鼠标。此函数不能被用来捕获另一进程的鼠标输入。
+</pre>
+<pre>
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>BOOL ReleaseCapture（VOlD）</td>
+				<td>≥3.1</td>
+				<td>≥1.0</td>
+				<td>winuser.h</td>
+				<td>user32.lib</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+该函数从当前线程中的窗口释放鼠标捕获，并恢复通常的鼠标输入处理。捕获鼠标的窗口接收所有的鼠标输入（无论光标的位置在哪里），除非点击鼠标键时，光标热点在另一个线程的窗口中。
+【参数】
+无
+【返回值】
+如果函数调用成功，返回非零值；如果函数调用失败，返回值是零。若想获得更多的错误信息，请调用GetlastError函数。
+【备注】
+应用程序在调用函数SetCapture之后调用此函数。
+</pre>
+<pre>
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM)</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+
+【参数】
+参数hwnd让窗口消息处理程序知道是哪个窗口在接收消息。
+参数message是WM_SIZE。
+参数wParam的值是SIZE_RESTORED、SIZE_MINIMIZED、SIZE_MAXIMIZED、SIZE_MAXSHOW或SIZE_MAXHIDE （在WINUSER.H头文件中分别定义为数字0到4）。
+也就是说，参数wParam表明窗口是非最小化还是非最大化，是最小化、最大化，还是隐藏。
+【返回值】
+
+【备注】
+窗口消息处理程序与窗口类别相关，窗口类别是程序调用RegisterClass注册的。依据该类别建立的窗口使用这个窗口消息处理程序来处理窗口的所有消息。
+Windows通过调用窗口消息处理程序对窗口发送消息。
+Windows可以发送给窗口消息处理程序的消息通常都以WM开头的名字标识，并且都在WINUSER.H头文件中定义。
+窗口中发生的一切都以消息的形式传给窗口消息处理程序。然后，窗口消息处理程序以某种方式回应这个消息，或者将消息传给DefWindowProc，进行默认处理。
+</pre>
+<pre>
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>模板</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+
+【参数】
+
+【返回值】
+
+【备注】
+
+</pre>
+<pre>
+</pre>
+
+				</td>
+			</tr>
+			
+			</tbody>
+		</table>
+	</body>
+</html>
