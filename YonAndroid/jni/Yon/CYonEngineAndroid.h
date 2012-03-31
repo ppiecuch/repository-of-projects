@@ -29,7 +29,7 @@ namespace yon{
 
 			virtual bool postEventFromUser(const event::SEvent& event);
 
-			//virtual yon::ITimer* getTimer();
+			//virtual ITimer* getTimer();
 
 		protected:
 			virtual void createDriver();

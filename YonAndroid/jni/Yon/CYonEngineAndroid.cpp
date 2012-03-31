@@ -91,6 +91,8 @@ namespace yon{
 			m_pVideoDriver->onResize(m_params.windowSize);
 			m_pSceneManager->onResize(m_params.windowSize);
 			m_bResized = false;
+			
+			Logger->debug("CYonEngineAndroid::resizeIfNecessary\n");
 		}
 
 		bool CYonEngineAndroid::postEventFromUser(const event::SEvent& event){
