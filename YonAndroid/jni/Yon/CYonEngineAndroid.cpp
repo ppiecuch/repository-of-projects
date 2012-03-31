@@ -66,6 +66,9 @@ namespace yon{
 			m_pSceneManager->drop();
 			m_pFileSystem->drop();
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineAndroid");
+			if(video::DEFAULT_MATERIAL->drop()){
+				video::DEFAULT_MATERIAL=NULL;
+			}
 			if(Logger->drop()){
 				Logger=NULL;
 			}

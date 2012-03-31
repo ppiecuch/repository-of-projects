@@ -79,12 +79,15 @@ namespace ogles1{
 		void* source = m_pImage->lock();
 		Logger->debug("glTexImage2D:%d,%d,%d,%s\n", m_textureId,m_pImage->getDimension().w,m_pImage->getDimension().h,COLOR_FORMAT_NAME[m_pImage->getColorFormat()]);
 		glBindTexture(GL_TEXTURE_2D, m_textureId);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, m_pImage->getDimension().w,m_pImage->getDimension().h, 0, format, pixelType, source);
 		m_pImage->unlock();
 
+		//m_pDriver->checkGLError(__FILE__,__LINE__);
+
 		glBindTexture(GL_TEXTURE_2D, tmpTexture);
 
-		//m_pDriver->checkGLError(__FILE__,__LINE__);
 
 		//TODO testGLError
 

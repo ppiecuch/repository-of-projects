@@ -44,6 +44,7 @@ namespace video{
 
 	
 
+	//TODO改为RGBA-->错了,OpenGL中顶点颜色使用的就是ABGR
 	class SColor
 	{
 	public:

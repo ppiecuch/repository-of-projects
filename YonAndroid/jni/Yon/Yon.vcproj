@@ -238,6 +238,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\position2d.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\randomizer.h"
 					>
 				</File>
@@ -287,6 +291,14 @@
 				</File>
 				<File
 					RelativePath=".\CLogger.h"
+					>
+				</File>
+				<File
+					RelativePath=".\DebugFont.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\DebugFont.h"
 					>
 				</File>
 				<File

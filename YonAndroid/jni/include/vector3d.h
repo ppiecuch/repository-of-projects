@@ -98,6 +98,7 @@ namespace yon{
 
 		typedef vector3d<f32> vector3df;
 
+		YON_API extern const vector3df ORIGIN_VECTOR3DF;
 		YON_API extern const vector3df UP_VECTOR3DF;
 		YON_API extern const vector3df IDENTITY_VECTOR3DF;
 	}//core

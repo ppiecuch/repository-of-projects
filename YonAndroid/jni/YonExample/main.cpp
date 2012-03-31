@@ -114,6 +114,33 @@ int main(int argc, char* argv[])
 	logger->setLevel(ENUM_LOG_LEVEL_DEBUG);
 	int num=0;*/
 	f32 factor=1.001f;
+	ITexture* tex=driver->getTexture("../media/firework.png");
+	DEFAULT_MATERIAL->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+
+	/*IReadFile* t=fs->createAndOpenFile("../media/debug_font.png");
+	long size=t->getSize();
+	byte* buffer=new byte[size];
+	t->read(buffer,size);
+	Logger->setFormat(MASK_FORMAT_LOG);
+	for(u32 i=0;i<(u32)size;++i)
+		Logger->debug("%d,",buffer[i]);
+	Logger->debug("\n");
+	delete[] buffer;
+	t->drop();*/
+	/*IImage* t=driver->createImageFromFile("../media/debug_font.png");
+	const dimension2du d=t->getDimension();
+	u32 count=d.h*t->getByteCountPerRow();
+	u8* buffer=(u8*)t->lock();
+	Logger->setFormat(MASK_FORMAT_LOG);
+	for(u32 i=0;i<count;++i)
+	{
+		if(i%40==0)Logger->debug("\n");
+		Logger->debug("%d,",buffer[i]);
+	}
+	Logger->debug("\n");
+	t->drop();*/
+	//DEFAULT_MATERIAL->setTexture(0,tex);
+	DEFAULT_MATERIAL->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
 	while(engine->run()){
 
 		//const core::vector3df pos=camera->getPosition();
@@ -126,9 +153,9 @@ int main(int argc, char* argv[])
 		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.02f ,srot.z));
 
 		const core::vector3df psca=planeModel->getScale();
-		if(psca.x>2)
+		if(psca.x>4)
 			factor=0.999f;
-		else if(psca.x<1)
+		else if(psca.x<2)
 			factor=1.001f;
 		planeModel->setScale(psca*factor);
 
@@ -139,8 +166,10 @@ int main(int argc, char* argv[])
 
 		sceneMgr->render(driver);
 
-		//smgr->drawAll();
-		//guienv->drawAll();
+		driver->setMaterial(DEFAULT_MATERIAL);
+		//driver->draw2DImage(tex,ORIGIN_POSITION2DI,core::recti(ORIGIN_POSITION2DI,tex->getSize()),NULL,COLOR_BLACK);
+
+		Logger->drawString(core::stringc(" !#01234ABCDhelloworld"));
 
 		//driver->endScene();
 		//Sleep(20);

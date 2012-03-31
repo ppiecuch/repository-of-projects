@@ -31,11 +31,13 @@ namespace yon{
 				virtual void begin(bool zBuffer,video::SColor c);
 				virtual void end();
 				virtual void setViewPort(const core::recti& r);
+				virtual const core::dimension2du& getCurrentRenderTargetSize() const;
 				virtual void onResize(const core::dimension2du& size);
 
 				virtual IImage* createImageFromFile(const io::path& filename);
 				virtual IImage* createImageFromFile(io::IReadFile* file);
 
+				virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
 				virtual bool setTexture(u32 stage, const video::ITexture* texture);
 				virtual ITexture* getTexture(const io::path& filename);
 				virtual video::ITexture* findTexture(const io::path& filename);
@@ -46,6 +48,7 @@ namespace yon{
 				virtual void setMaterial(IMaterial* material);
 
 				virtual void drawUnit(scene::IUnit* unit);
+				virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,const core::recti& sourceRect, const core::recti* clipRect,video::SColor color, bool useAlphaChannelOfTexture);
 
 				virtual bool checkGLError(const c8* file,s32 line);
  
@@ -57,7 +60,6 @@ namespace yon{
 				void checkMaterial();
 				void addTexture(video::ITexture* texture);
 				video::ITexture* loadTextureFromFile(io::IReadFile* file);
-				video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
 
 				core::matrix4f m_matrix[ENUM_TRANSFORM_COUNT];
 				bool m_bRenderModeChange;
@@ -67,6 +69,8 @@ namespace yon{
 				core::array<video::ITexture*> m_textures;
 				core::array<video::IImageLoader*> m_imageLoaders;
 				core::array<video::IMaterialRenderer*> m_materialRenderers;
+
+				core::dimension2du m_windowSize;
 #ifdef YON_COMPILE_WITH_WIN32
 				bool initEGL(const HWND& hwnd);
 				void destroyEGL();

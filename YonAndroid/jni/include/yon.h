@@ -9,6 +9,8 @@
 #include "dimension2d.h" 
 #include "dimension3d.h" 
 #include "exception.h" 
+#include "plane.h"
+#include "position2d.h"
 #include "vector2d.h" 
 #include "vector3d.h" 
 #include "yonArray.h" 

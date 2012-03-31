@@ -24,6 +24,8 @@ namespace video{
 		virtual ENUM_MATERIAL_TYPE getMaterialType() const = 0;
 		virtual void setMaterialType(ENUM_MATERIAL_TYPE type) = 0;
 	};
+
+	YON_API extern IMaterial* DEFAULT_MATERIAL;
 }
 }
 #endif
