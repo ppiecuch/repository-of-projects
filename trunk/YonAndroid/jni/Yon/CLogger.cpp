@@ -3,6 +3,7 @@
 #include <memory.h>
 #include <time.h>
 #include <sys/timeb.h>
+#include "DebugFont.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <android/log.h>
@@ -49,6 +50,10 @@ namespace yon{
 			#else
 			pthread_mutex_destroy(&m_mutex);
 			#endif
+		}
+
+		void CLogger::drawString(const core::stringc& str,const core::position2di& pos){
+			DebugFont::getInstance().drawString(str,pos);
 		}
 
 		void CLogger::setPath(const core::stringc& path){

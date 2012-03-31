@@ -1,6 +1,7 @@
 #ifndef _YON_CORE_VECTOR2D_H_
 #define _YON_CORE_VECTOR2D_H_
 
+#include "config.h"
 #include "yonTypes.h"
 
 namespace yon{
@@ -16,6 +17,9 @@ namespace yon{
 		};
 
 		typedef vector2d<f32> vector2df;
+
+		YON_API extern const vector2df ORIGIN_VECTOR2DF;
+		YON_API extern const vector2df IDENTITY_VECTOR2DF;
 	}//core
 }//yon
 #endif

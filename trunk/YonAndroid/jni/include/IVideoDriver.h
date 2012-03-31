@@ -58,11 +58,13 @@ namespace yon{
 			virtual void begin(bool zBuffer=true,video::SColor c=video::SColor(0x000000FF)) = 0;
 			virtual void end() = 0;
 			virtual void setViewPort(const core::recti& r) = 0;
+			virtual const core::dimension2du& getCurrentRenderTargetSize() const = 0;
 			virtual void onResize(const core::dimension2du& size) = 0;
 
 			virtual IImage* createImageFromFile(const io::path& filename) = 0;
 			virtual IImage* createImageFromFile(io::IReadFile* file) =0;
 
+			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name) = 0;
 			virtual ITexture* getTexture(const io::path& filename) = 0;
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;
 
@@ -72,6 +74,9 @@ namespace yon{
 			virtual void setMaterial(IMaterial* material) = 0;
 
 			virtual void drawUnit(scene::IUnit* unit) = 0;
+			virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,
+				const core::recti& sourceRect, const core::recti* clipRect =NULL,
+				video::SColor color=video::COLOR_WHITE, bool useAlphaChannelOfTexture=false) =0;
 			//virtual u32 getFPS() const = 0;
 		};
 	}

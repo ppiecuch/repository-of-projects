@@ -2,6 +2,7 @@
 #include "CLogger.h"
 #include "CYonEngineWin32.h"
 #include "CYonEngineAndroid.h"
+#include "CMaterial.h"
 
 namespace yon{
 
@@ -11,6 +12,13 @@ namespace yon{
 	{
 		const matrix4f IDENTITY_MATRIX(true);
 
+		const vector2df ORIGIN_VECTOR2DF(0,0);
+		const vector2df IDENTITY_VECTOR2DF(1,1);
+
+		const position2df ORIGIN_POSITION2DF(0,0);
+		const position2di ORIGIN_POSITION2DI(0,0);
+
+		const vector3df ORIGIN_VECTOR3DF(0,0,0);
 		const vector3df UP_VECTOR3DF(0,1,0);
 		const vector3df IDENTITY_VECTOR3DF(1,1,1);
 	}
@@ -20,8 +28,10 @@ namespace yon{
 	}
 
 	namespace video{
-		const SColor COLOR_BLACK(0x000000FF);
-		const SColor COLOR_WHITE(0xFF00FFFF);
+		const SColor COLOR_BLACK(0xFFFF0000);
+		const SColor COLOR_WHITE(0xFFFFFFFF);
+
+		IMaterial* DEFAULT_MATERIAL=NULL;
 	}
 
 	using namespace debug;
@@ -32,6 +42,12 @@ namespace yon{
 			Logger=new debug::CLogger();
 		}else{
 			Logger->grab();
+		}
+
+		if(video::DEFAULT_MATERIAL==NULL){
+			video::DEFAULT_MATERIAL=new video::CMaterial();
+		}else{
+			video::DEFAULT_MATERIAL->grab();
 		}
 
 		IYonEngine* engine;

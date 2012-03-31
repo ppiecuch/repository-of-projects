@@ -2,7 +2,7 @@
 #include "SVertex.h"
 #include "COGLES1Texture.h"
 #include "COGLES1MaterialRenderer.h"
-
+#include "DebugFont.h"
 #include "ILogger.h"
 
 namespace yon{
@@ -34,9 +34,9 @@ namespace ogles1{
 	
 
 
-	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs):
-			m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
-		IVideoDriver(fs){
+	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs)
+		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
+		m_windowSize(param.windowSize),IVideoDriver(fs){
 
 		m_imageLoaders.push(createImageLoaderPNG());
 
@@ -62,6 +62,13 @@ namespace ogles1{
 
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Driver");
 
+		video::IImage* image=DebugFont::getInstance().createImage();
+		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
+		addTexture(tex);
+		tex->drop();
+		image->drop();
+		DebugFont::getInstance().m_pTexture=tex;
+		DebugFont::getInstance().m_pDriver=this;
 	}
 
 	COGLES1Driver::~COGLES1Driver(){
@@ -105,11 +112,14 @@ namespace ogles1{
 		eglSwapBuffers(m_eglDisplay, m_eglSurface);
 #endif//YON_COMPILE_WITH_WIN32
 	}
-	void COGLES1Driver::setViewPort(const yon::core::recti& r){
-		glViewport(0, 0, r.w, r.h);
-		Logger->debug("setViewPort(0,0,%d,%d)\n",r.w,r.h);
+	void COGLES1Driver::setViewPort(const core::recti& r){
+		glViewport(0, 0, r.getWidth(), r.getHeight());
+		Logger->debug("setViewPort(0,0,%d,%d)\n",r.getWidth(), r.getHeight());
 	}
-	void COGLES1Driver::onResize(const yon::core::dimension2du& size){
+	const core::dimension2du& COGLES1Driver::getCurrentRenderTargetSize() const{
+		return m_windowSize;
+	}
+	void COGLES1Driver::onResize(const core::dimension2du& size){
 		setViewPort(core::recti(0,0,size.w,size.h));
 	}
 	void COGLES1Driver::drawUnit(scene::IUnit* unit){
@@ -139,6 +149,127 @@ namespace ogles1{
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
 		//Logger->debug("drawUnit:%08x\n",unit);
+	}
+
+	void COGLES1Driver::draw2DImage(const video::ITexture* texture, const core::position2di& destPos,const core::recti& sourceRect, const core::recti* clipRect,video::SColor color, bool useAlphaChannelOfTexture)
+	{
+		if (!texture)
+			return;
+
+		if (!sourceRect.isValid())
+			return;
+
+		core::position2di targetPos(destPos);
+		core::position2di sourcePos(sourceRect.topLeft);
+		core::dimension2di sourceSize(sourceRect.getSize());
+		if (clipRect)
+		{
+			if (targetPos.x < clipRect->topLeft.x)
+			{
+				sourceSize.w += targetPos.x - clipRect->topLeft.x;
+				if (sourceSize.w <= 0)
+					return;
+
+				sourcePos.x -= targetPos.x - clipRect->topLeft.x;
+				targetPos.x = clipRect->topLeft.x;
+			}
+
+			if (targetPos.x + sourceSize.w > clipRect->bottomRight.x)
+			{
+				sourceSize.w -= (targetPos.x + sourceSize.w) - clipRect->bottomRight.x;
+				if (sourceSize.w <= 0)
+					return;
+			}
+
+			if (targetPos.y < clipRect->topLeft.y)
+			{
+				sourceSize.h += targetPos.y - clipRect->topLeft.y;
+				if (sourceSize.h <= 0)
+					return;
+
+				sourcePos.y -= targetPos.y - clipRect->topLeft.y;
+				targetPos.y = clipRect->topLeft.y;
+			}
+
+			if (targetPos.y + sourceSize.h > clipRect->bottomRight.y)
+			{
+				sourceSize.h -= (targetPos.y  + sourceSize.h) - clipRect->bottomRight.y;
+				if (sourceSize.h <= 0)
+					return;
+			}
+		}
+
+		if (targetPos.x<0)
+		{
+			sourceSize.w += targetPos.x;
+			if (sourceSize.w <= 0)
+				return;
+
+			sourcePos.x -= targetPos.x;
+			targetPos.x = 0;
+		}
+
+		if (targetPos.y<0)
+		{
+			sourceSize.h += targetPos.y;
+			if (sourceSize.h <= 0)
+				return;
+
+			sourcePos.y -= targetPos.y;
+			targetPos.y = 0;
+		}
+
+		const core::dimension2du& renderTargetSize = getCurrentRenderTargetSize();
+
+		if (targetPos.x + sourceSize.w > (s32)renderTargetSize.w)
+		{
+			sourceSize.w -= (targetPos.x + sourceSize.w) - renderTargetSize.w;
+			if (sourceSize.w <= 0)
+				return;
+		}
+
+		if (targetPos.y + sourceSize.h > (s32)renderTargetSize.h)
+		{
+			sourceSize.h -= (targetPos.y + sourceSize.h) - renderTargetSize.h;
+			if (sourceSize.h <= 0)
+				return;
+		}
+
+		// ok, we've clipped everything.
+		// now draw it.
+		const core::dimension2du& ss = texture->getSize();
+		const f32 invW = 1.f / static_cast<f32>(ss.w);
+		const f32 invH = 1.f / static_cast<f32>(ss.h);
+		const core::rectf tcoords(
+			sourcePos.x * invW,sourcePos.y * invH,
+			(sourcePos.x + sourceSize.w) * invW,(sourcePos.y + sourceSize.h) * invH);
+		const core::recti poss(targetPos, sourceSize);
+
+		setRender2DMode();
+		checkMaterial();
+
+		if (!setTexture(0, texture))
+			return;
+
+		static u16 indices[] = {0,1,2,3};
+		scene::SVertex vertices[4];
+		vertices[0] = scene::SVertex((f32)poss.topLeft.x, (f32)poss.topLeft.y, 0, tcoords.topLeft.x, tcoords.topLeft.y, color);
+		vertices[1] = scene::SVertex((f32)poss.bottomRight.x, (f32)poss.topLeft.y, 0, tcoords.bottomRight.x, tcoords.topLeft.y, color);
+		vertices[2] = scene::SVertex((f32)poss.topLeft.x, (f32)poss.bottomRight.y, 0, tcoords.topLeft.x, tcoords.bottomRight.y, color);
+		vertices[3] = scene::SVertex((f32)poss.bottomRight.x, (f32)poss.bottomRight.y, 0, tcoords.bottomRight.x, tcoords.bottomRight.y, color);
+
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_COLOR_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(scene::SVertex),&vertices[0].pos);
+		glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::SVertex),&vertices[0].color);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&vertices[0].texcoords);
+		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT,indices);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);
+
 	}
 
 	bool COGLES1Driver::setTexture(u32 stage, const video::ITexture* texture){
@@ -357,11 +488,11 @@ namespace ogles1{
 			glDisable(GL_BLEND);
 			glDisable(GL_ALPHA_TEST);
 
-			glMatrixMode(GL_MODELVIEW);
-			glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
+			//glMatrixMode(GL_MODELVIEW);
+			//glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
 
-			glMatrixMode(GL_PROJECTION);
-			glLoadMatrixf(m_matrix[ENUM_TRANSFORM_PROJECTION].pointer());
+			//glMatrixMode(GL_PROJECTION);
+			//glLoadMatrixf(m_matrix[ENUM_TRANSFORM_PROJECTION].pointer());
 
 			m_bRenderModeChange = true;
 
@@ -369,6 +500,16 @@ namespace ogles1{
 		}
 	}
 	void COGLES1Driver::setRender2DMode(){
+		if (m_renderMode != ENUM_RENDER_MODE_2D)
+		{
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			m_bRenderModeChange = true;
+
+			m_renderMode=ENUM_RENDER_MODE_2D;
+		}
 	}
 
 	bool COGLES1Driver::checkGLError(const c8* file,s32 line)

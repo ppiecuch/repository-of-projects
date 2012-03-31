@@ -58,6 +58,8 @@ namespace yon{
 			virtual void info(const c8* pFmt, ...);
 			virtual void warn(const c8* pFmt, ...);
 			virtual void error(const c8* pFmt, ...);
+
+			virtual void drawString(const core::stringc& str,const core::position2di& pos=core::position2di(0,0));
 		};
 	}//debug
 }//yon

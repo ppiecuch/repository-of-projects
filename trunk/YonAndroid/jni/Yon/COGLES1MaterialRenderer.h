@@ -59,6 +59,7 @@ namespace ogles1{
 
 		virtual void onUnsetMaterial(){
 			glDisable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 	};
 	class COGLES1MaterialRendererTransparent : public COGLES1MaterialRenderer
@@ -81,7 +82,6 @@ namespace ogles1{
 
 			glEnable(GL_BLEND);
 			glEnable(GL_ALPHA_TEST);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glAlphaFunc(GL_GREATER, 0.f);
 		}
 
@@ -118,7 +118,6 @@ namespace ogles1{
 
 			glEnable(GL_BLEND);
 			glEnable(GL_ALPHA_TEST);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glAlphaFunc(GL_GREATER, 0.f);
 		}
 

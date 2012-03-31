@@ -19,6 +19,7 @@ ISceneManager* sceneMgr=NULL;
 
 IModel* cubeModel=NULL;
 IModel* sphereModel=NULL;
+IModel* planeModel=NULL;
 
 const static s32 ACTION_MASK = 255;
 const static s32 ACTION_DOWN = 0;
@@ -56,6 +57,14 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, js
 	sphereModel->setPosition(core::vector3df(-20,-20,0));
 	//material->setTexture(0,driver->getTexture("/media/earth.png"));
 	sphere->drop();
+	
+	IEntity* plane=geometryFty->createXYPlane(core::dimension2df(50,50));
+	planeModel=sceneMgr->addModel(plane);
+	material=planeModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	planeModel->setPosition(core::vector3df(-20,20,100));
+	material->setTexture(0,driver->getTexture("/media/aura.png"));
+	plane->drop();
 
 	LOGD(LOG_TAG,"nativeOnSurfaceCreated");
 }
@@ -63,6 +72,7 @@ void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, ji
 	LOGD(LOG_TAG,"nativeOnSurfaceChanged->w:%d,h:%d",w,h);
 	engine->onResize(w,h);
 }
+f32 factor=1.01f;
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	//LOGD(LOG_TAG,"nativeOnDrawFrame");
 	//glClearColor(0.1f,0.2f,0.3f,1);
@@ -75,6 +85,13 @@ void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 
 	const core::vector3df srot=sphereModel->getRotation();
 	sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.5f ,srot.z));
+
+	const core::vector3df psca=planeModel->getScale();
+	if(psca.x>4)
+		factor= 0.99f;
+	else if(psca.x<2)
+		factor=1.01f;
+	planeModel->setScale(psca*factor);
 
 	sceneMgr->render(driver);
 

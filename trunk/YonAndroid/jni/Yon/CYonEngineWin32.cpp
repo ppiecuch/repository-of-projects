@@ -79,10 +79,14 @@ namespace platform{
 			DestroyWindow(m_hWnd);
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineWin32");
-		if(Logger->drop()){
-			Logger=NULL;
+			if(video::DEFAULT_MATERIAL->drop()){
+				video::DEFAULT_MATERIAL=NULL;
+			}
+			if(Logger->drop()){
+				Logger=NULL;
+			}
+			
 		}
-	}
 
 		void CYonEngineWin32::onResize(u32 w,u32 h){
 			m_bResized=true;
