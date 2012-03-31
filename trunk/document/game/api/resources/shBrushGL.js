@@ -28,13 +28,17 @@
 		var functions =
 			'glCompressedTexImage2D ' +
 			'glCompressedTexSubImage2D ' +
+			'glDisable ' +
+			'glEnable ' +
 			'glPixelStorei ' +
 			'glReadPixels ' +
+			'glScissor ' +
 			'glTexImage2D ' +
 			'glTexSubImage2D '
 			;
 		var constants =	
 			'GL_PACK_ALIGNMENT ' +
+			'GL_SCISSOR_TEST ' +
 			'GL_UNPACK_ALIGNMENT '
 			;
 
@@ -46,7 +50,8 @@
 			{ regex: r.singleLineCComments,							css: 'comments' },			// one line comments
 			{ regex: r.multiLineCComments,							css: 'comments' },			// multiline comments
 			{ regex: /\s*#.*/gm,									css: 'preprocessor' },		// preprocessor tags like #region and #endregion
-			{ regex: /\u3010.*\u3011/gm,			css: 'h3' },				// h3
+			{ regex: /\u2605.*/gm,									css: 'green' },				// preprocessor tags like #region and #endregion
+			{ regex: /\u3010.*\u3011/gm,							css: 'h3' },				// h3
 			{ regex: new RegExp(this.getKeywords(keywords), 'gm'),	css: 'keyword' },			// keywords
 			{ regex: new RegExp(this.getKeywords(constants), 'gm'),	css: 'constants' },			// constants
 			{ regex: new RegExp(this.getKeywords(functions), 'gm'),	css: 'functions' }			// functions

@@ -123,6 +123,49 @@ http://www.cocoachina.com/bbs/read.php?tid=38052
 				</td>
 			</tr>
 			<tr>
+				<td>void glScissor(	GLint x,GLint y,GLsizei width,GLsizei height)</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+glScissor defines a rectangle, called the scissor box, in window coordinates.
+The first two arguments, x and y, specify the lower left corner of the box. 
+width and height specify the width and height of the box.
+
+To enable and disable the scissor test, call glEnable and glDisable with argument GL_SCISSOR_TEST. 
+The scissor test is initially disabled. While scissor test is enabled, only pixels that lie within the scissor box 
+can be modified by drawing commands. Window coordinates have integer values at the shared corners of frame buffer pixels. 
+glScissor(0, 0, 1, 1) allows modification of only the lower left pixel in the window, and glScissor(0, 0, 0, 0) doesn't 
+allow modification of any pixels in the window.
+
+★When the scissor test is disabled, it is as though the scissor box includes the entire window.
+【参数】
+x, y
+Specify the lower left corner of the scissor box, in pixels. The initial value is (0, 0).
+width, height
+Specify the width and height of the scissor box. When a GL context is first attached to a surface (e.g. window), 
+width and height are set to the dimensions of that surface.
+
+【返回值】
+无
+【备注】
+设置剪裁区域，如果启用了GL_SCISSOR_TEST，只有在剪裁区域的绘制的内容才显示。
+</pre>
+<pre>
+参考文档：
+http://www.khronos.org/opengles/sdk/1.1/docs/man/
+</pre>
+				</td>
+			</tr>
+			<tr>
 				<td>void glTexSubImage2D(GLenum target,GLint level,GLint xoffset,GLint yoffset,GLsizei width,GLsizei height,GLenum format,GLenum type,const GLvoid * pixels);</td>
 				<td>支持</td>
 				<td>&nbsp;</td>
@@ -140,6 +183,30 @@ http://www.cocoachina.com/bbs/read.php?tid=38052
 </pre>
 <pre>
 http://apps.hi.baidu.com/share/detail/48145190
+</pre>
+				</td>
+			</tr>
+			<tr>
+				<td>template</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+【参数】
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+
 </pre>
 				</td>
 			</tr>
