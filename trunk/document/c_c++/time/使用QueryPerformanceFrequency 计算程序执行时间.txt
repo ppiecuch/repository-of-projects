@@ -1,0 +1,36 @@
+#include <iostream>
+03
+#include <windows.h>
+04
+using namespace    std;
+05
+////////////////////////////////////////////////
+06
+void main()
+07
+{
+08
+    _LARGE_INTEGER time_start;    /*开始时间*/
+09
+    _LARGE_INTEGER time_over;        /*结束时间*/
+10
+    double dqFreq;                /*计时器频率*/
+11
+    LARGE_INTEGER f;            /*计时器频率*/
+12
+    QueryPerformanceFrequency(&f);
+13
+    dqFreq=(double)f.QuadPart;
+14
+    QueryPerformanceCounter(&time_start);
+15
+    Sleep(1000);/*循环耗时*/
+16
+    QueryPerformanceCounter(&time_over);
+17
+    cout<<((time_over.QuadPart-time_start.QuadPart)/dqFreq)<<endl;//单位为秒，精度为1000 000/（cpu主频）微秒
+18
+}
+
+
+http://www.oschina.net/code/snippet_197161_6789

@@ -1,0 +1,82 @@
+1.
+深入Windows計時器
+http://eric.netgenes.org/InsideWindowsTimer/InsideWindowsTimer.htm
+
+2.
+實戰VC時間控制函數
+http://www.pcvc.net/category/content.asp?sendid=30
+孫鶴泉 
+　　隨著軟硬件的飛速發展，計算機技術已經廣泛地應用到自動化控制領域，為了實現實時控制，控制程序必須能夠精確地完成定時和計時功能。VC提供了很多關於時間操作的函數，下面根據它們精度的不同，分別進行說明。 
+
+一般時控函數 
+
+　　VC程序員都會利用Windows的WM_TIMER消息映射來進行簡單的時間控制：1.調用函數SetTimer()設置定時間隔，如SetTimer(0,200,NULL)即為設置200毫秒的時間間隔；2.在應用程序中增加定時響應函數OnTimer()，並在該函數中添加響應的處理語句，用來完成時間到時的操作。這種定時方法是非常簡單的，但其定時功能如同Sleep()函數的延時功能一樣，精度較低，只可以用來實現諸如位圖的動態顯示等對定時精度要求不高的情況，而在精度要求較高的條件下，這種方法應避免採用。 
+
+精度時控函數 
+
+　　在要求誤差不大於1毫秒的情況下，可以採用GetTickCount()函數，該函數的返回值是DWORD型，表示以毫秒為單位的計算機啟動後經歷的時間間隔。使用下面的編程語句，可以實現50毫秒的精確定時，其誤差小於1毫秒。 
+
+　　DWORD dwStart, dwStop; 
+
+　　// 起始值和終止值 
+
+　　dwStop = GetTickCount(); 
+
+　　while(TRUE) 
+　　{ 
+        dwStart = dwStop; 
+　　// 上一次的終止值變成新的起始值 
+　　// 此處添加相應控制語句
+　　 do
+　　 {
+        dwStop = GetTickCount();
+　　 }while(dwStop - 50 < dwStart);
+　　} 
+
+高精度時控函數 
+
+　　對於一般的實時控制，使用GetTickCount()函數就可以滿足精度要求，但要進一步提高計時精度，就要採用QueryPerformanceFrequency()函數和QueryPerformanceCounter()函數。這兩個函數是VC提供的僅供Windows 9X使用的高精度時間函數，並要求計算機從硬件上支持高精度計時器。QueryPerformanceFrequency()函數和QueryPerformanceCounter()函數的原型為： 
+
+　　BOOL QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency);
+
+　　BOOL QueryPerformanceCounter(LARGE_INTEGER *lpCount);
+
+　　數據類型LARGE—INTEGER既可以是一個作為8字節長的整型數，也可以是作為兩個4字節長的整型數的聯合結構，其具體用法根據編譯器是否支持64位而定。該類型的定義如下： 
+
+　　typedef union _LARGE_INTEGER
+　　{
+　　 struct
+　　 {
+        DWORD LowPart; // 4字節整型數 
+        LONG　　HighPart; // 4字節整型數 
+    }; 
+　　LONGLONG　　QuadPart; 
+
+　　// 8字節整型數 
+　　} LARGE_INTEGER; 
+
+　　在進行計時之前，應該先調用QueryPerformanceFrequency()函數獲得機器內部計時器的時鐘頻率]。筆者在主頻為266、300、333的三種PentiumⅡ機器上使用該函數，得到的時鐘頻率都是1193180Hz。接著，筆者在需要嚴格計時的事件發生之前和發生之後分別調用QueryPerformanceCounter()函數，利用兩次獲得的計數之差和時鐘頻率，就可以計算出事件經歷的精確時間。以下程序是用來測試函數Sleep(100)的精確持續時間。 
+
+　　LARGE—INTEGER litmp; 
+　　LONGLONG QPart1,QPart2; 
+　　double dfMinus, dfFreq, dfTim; 
+
+　　QueryPerformanceFrequency(&litmp); 
+　　// 獲得計數器的時鐘頻率 
+　　dfFreq = (double)litmp.QuadPart; 
+　　QueryPerformanceCounter(&litmp); 
+　　// 獲得初始值 
+　　QPart1 = litmp.QuadPart; 
+　　Sleep(100) ; 
+　　QueryPerformanceCounter(&litmp); 
+　　// 獲得終止值 
+　　QPart2 = litmp.QuadPart;
+　　dfMinus = (double)(QPart2 － QPart1);
+　　dfTim = dfMinus / dfFreq;
+　　// 獲得對應的時間值
+
+　　執行上面程序，得到的結果為dfTim=0.097143767076216(秒)。細心的讀者會發現，每次執行的結果都不一樣，存在一定的差別，這是由於Sleep()自身的誤差所致。
+　　本文介紹了三種定時或計時的實現方法，讀者可以根據自己的實際情況進行選擇，以達到程序的定時和計時功能。以上程序均在VC 6.0、Windows 98環境下調試通過。
+
+
+http://delphi.ktop.com.tw/board.php?cid=168&fid=914&tid=30062
