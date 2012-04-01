@@ -18,6 +18,7 @@ namespace debug{
 
 	video::IImage* createDebugPrinterTextureImage();
 	core::dimension2du getDebugPrinterFontSize();
+	core::dimension2du getDebugPrinterFontStep();
 
 	class IDebugPrinter : public virtual core::IReferencable{
 	public:

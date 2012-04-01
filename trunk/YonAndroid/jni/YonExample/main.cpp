@@ -60,6 +60,9 @@ int main(int argc, char* argv[])
 	ISceneManager* sceneMgr=engine->getSceneManager();
 	IFileSystem* fs=engine->getFileSystem();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
+	ITimer* timer=engine->getTimer();
+
+	Logger->debug("time:%d\n",timer->getTime());
 
 	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,300));
 
@@ -169,8 +172,9 @@ int main(int argc, char* argv[])
 		driver->setMaterial(DEFAULT_MATERIAL);
 		//driver->draw2DImage(tex,ORIGIN_POSITION2DI,core::recti(ORIGIN_POSITION2DI,tex->getSize()),NULL,COLOR_BLACK);
 
-		Logger->drawString(core::stringc(" !#01234ABCDhelloworld"),ORIGIN_POSITION2DI,COLOR_GREEN);
+		//Logger->drawString(core::stringc(" !#01234ABCDhelloworld"),ORIGIN_POSITION2DI,COLOR_GREEN);
 
+		Logger->render();
 		//driver->endScene();
 		//Sleep(20);
 		//printf("run\n");

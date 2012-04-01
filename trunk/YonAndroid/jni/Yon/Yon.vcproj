@@ -302,14 +302,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\DebugFont.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\DebugFont.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\IDebugPrinter.h"
 					>
 				</File>
@@ -361,6 +353,22 @@
 			<Filter
 				Name="platform"
 				>
+				<File
+					RelativePath=".\CTimerAndroid.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CTimerAndroid.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CTimerWin32.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CTimerWin32.h"
+					>
+				</File>
 				<File
 					RelativePath=".\CYonEngineAndroid.cpp"
 					>
@@ -415,6 +423,10 @@
 				</File>
 				<File
 					RelativePath=".\CUnit.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CUnit2D.h"
 					>
 				</File>
 				<File

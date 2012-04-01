@@ -2,6 +2,7 @@
 #define _YON_DEBUG_CLOGGER_H_
 
 #include "ILogger.h"
+#include "yonList.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include <windows.h>
@@ -40,6 +41,7 @@ namespace yon{
 			const static c8* LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];
 		//文件打印机
 			IDebugPrinter* m_pPrinter;
+			core::list<core::stringc> queue;
 		protected:
 			virtual void lock();
 			virtual void unlock();
@@ -63,6 +65,7 @@ namespace yon{
 
 			virtual void setDebugPrinter(IDebugPrinter* printer);
 			virtual void drawString(const core::stringc& str,const core::position2di& pos,const video::SColor& color);
+			virtual void render();
 		};
 	}//debug
 }//yon

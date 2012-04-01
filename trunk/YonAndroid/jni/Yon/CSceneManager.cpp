@@ -83,7 +83,7 @@ namespace scene{
 
 	bool CSceneManager::postEventFromUser(const event::SEvent& evt){
 		//TODO
-		//Logger->debug("%d,%d,%d,%d\n",evt.type,evt.mouseInput.type,evt.mouseInput.x,evt.mouseInput.y);
+		Logger->debug("%d,%d,%d,%d\n",evt.type,evt.mouseInput.type,evt.mouseInput.x,evt.mouseInput.y);
 		return false;
 	}
 

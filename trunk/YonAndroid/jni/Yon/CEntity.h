@@ -9,7 +9,10 @@ namespace yon{
 	namespace scene{
 
 		class CEntity : public IEntity{
+		protected:
+			const ENUM_DIMEN_MODE m_mode;
 		public:
+			CEntity(ENUM_DIMEN_MODE mode=ENUM_DIMEN_MODE_3D):m_mode(mode){}
 			virtual ~CEntity(){
 				for(u32 i=0;i<m_units.size();++i){
 					m_units[i]->drop();
@@ -27,6 +30,9 @@ namespace yon{
 					unit->grab();
 					m_units.push(unit);
 				}
+			}
+			virtual ENUM_DIMEN_MODE getDimenMode() const{
+				return m_mode;
 			}
 		private:
 			core::array<IUnit*> m_units;

@@ -15,6 +15,7 @@ namespace debug{
 		video::ITexture* m_pTexture;
 		core::dimension2du m_fontSize;
 		core::recti*** m_texcoords;
+		core::dimension2du m_fontStep;
 	public:
 		CDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture);
 		~CDebugPrinter();

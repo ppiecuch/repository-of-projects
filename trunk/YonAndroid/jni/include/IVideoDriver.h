@@ -34,6 +34,34 @@ namespace yon{
 			ENUM_TRANSFORM_COUNT
 		};
 
+		/*
+		#define GL_POINTS                         0x0000
+		#define GL_LINES                          0x0001
+		#define GL_LINE_LOOP                      0x0002
+		#define GL_LINE_STRIP                     0x0003
+		#define GL_TRIANGLES                      0x0004
+		#define GL_TRIANGLE_STRIP                 0x0005
+		#define GL_TRIANGLE_FAN                   0x0006
+		*/
+		enum ENUM_PRIMITIVE_TYPE{
+			ENUM_PRIMITIVE_TYPE_TRIANGLES = 0x0004,
+			ENUM_PRIMITIVE_TYPE_COUNT = 1
+		};
+
+		/*
+		#define GL_BYTE                           0x1400
+		#define GL_UNSIGNED_BYTE                  0x1401
+		#define GL_SHORT                          0x1402
+		#define GL_UNSIGNED_SHORT                 0x1403
+		#define GL_FLOAT                          0x1406
+		#define GL_FIXED                          0x140C
+		*/
+		enum ENUM_INDEX_TYPE{
+			ENUM_INDEX_TYPE_8BIT = 0x1401,
+			ENUM_INDEX_TYPE_16BIT = 0x1403,
+			ENUM_INDEX_TYPE_COUNT = 2
+		};
+
 		//视频驱动器接口
 		class IVideoDriver:public virtual core::IReferencable{
 		protected:
@@ -77,6 +105,10 @@ namespace yon{
 			virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,
 				const core::recti& sourceRect, const core::recti* clipRect =NULL,
 				video::SColor color=video::COLOR_WHITE, bool useAlphaChannelOfTexture=false) =0;
+			virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,
+				const void* indexList, u32 primCount,
+				ENUM_PRIMITIVE_TYPE pType=ENUM_PRIMITIVE_TYPE_TRIANGLES,
+				ENUM_INDEX_TYPE iType=ENUM_INDEX_TYPE_16BIT) =0;
 			//virtual u32 getFPS() const = 0;
 		};
 	}
