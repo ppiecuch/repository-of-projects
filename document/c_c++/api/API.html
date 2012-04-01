@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+!DOCTYPE HTML>
 <html>
 	<head>
 		<title>API</title>
@@ -209,11 +209,11 @@ http://baike.baidu.com/view/1080202.htm
 				</td>
 			</tr>
 			<tr>
-				<td>HWND SetCapture（HWND hwnd）</td>
+				<td>BOOL QueryPerformanceCounter(LARGE_INTEGER *lpCount)</td>
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
-				<td>winuser.h</td>
-				<td>user32.lib</td>
+				<td>kernel32</td>
+				<td>&nbsp;</td>
 				<td>
 				<div class="arrow">
 					&nbsp;
@@ -223,18 +223,62 @@ http://baike.baidu.com/view/1080202.htm
 				<td colspan="5" >
 <pre class="brush: win;auto-links:true;">
 【函数功能】
-该函数在属于当前线程的指定窗口里设置鼠标捕获。一旦窗口捕获了鼠标，所有鼠标输入都针对该窗口，无论光标是否在窗口的边界内。
-同一时刻只能有一个窗口捕获鼠标。如果鼠标光标在另一个线程创建的窗口上，只有当鼠标键按下时系统才将鼠标输入指向指定的窗口。
+获取CPU运行到现在的Tick数
 【参数】
-hWnd：当前线程里要捕获鼠标的窗口句柄。
+数据类型LARGEINTEGER既可以是一个作为8字节长的整数，也可以是作为两个4字节长的整数的联合结构，其具体用法根据编译器是否支持64位而定。该类型的定义如下：
+typeef union _ LARGE_INTEGER
+{
+	struct
+	{
+		DWORD LowPart;
+		LONG HighPart;
+	};
+　　 LONGLONG QuadPart;
+}LARGE_INTEGER;
+
+如果你有编译器直接支持64位整数可以直接使用QuadPart（64位）,否则分别对LowPart(32位)和HighPart（32位）存取,HighPart的最高位为符号位。 
+表示数的范围：--3689348814741910324到+4611686018427387903 
+LARGE_INTEGER的值等4000000000,在内存中的布局: 
+00   28   6B   EE   00   00   00   00        
+	（低字节）       （高字节）   
 【返回值】
-返回值是上次捕获鼠标的窗口句柄。如果不存在那样的句柄，返回值是NULL。
+If the installed hardware supports a high-resolution performance counter, the return value is nonzero. 
+If the installed hardware does not support a high-resolution performance counter, the return value is zero. 
 【备注】
-只有前台窗口才能捕获鼠标。如果一个后台窗口想捕获鼠标，则该窗口仅为其光标热点在该窗口可见部份的鼠标事件接收消息。
-另外，即使前台窗口已捕获了鼠标，用户也可点击另一个窗口，将其调入前台。当一个窗口不再需要所有的鼠标输入时，
-创建该窗口的线程应当调用函数ReleaseCapture来释放鼠标。此函数不能被用来捕获另一进程的鼠标输入。
+
 </pre>
 <pre>
+http://ahan.sourceforge.net/api/Q/QueryPerformanceCounter/
+http://www.cnblogs.com/whiteyun/archive/2009/09/17/1568240.html
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>BOOL QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency)</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>kernel32</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+获取硬件支持的高精度计数器的频率。
+【参数】
+参考：QueryPerformanceCounter
+【返回值】
+非零，硬件支持高精度计数器；零，硬件不支持，读取失败。
+【备注】
+在定时前应该先调用QueryPerformanceFrequency()函数获得机器内部计时器的时钟频率。
+</pre>
+<pre>
+http://blog.csdn.net/daoyuly/article/details/3947868
 </pre>
 
 				</td>
@@ -267,6 +311,82 @@ hWnd：当前线程里要捕获鼠标的窗口句柄。
 
 				</td>
 			</tr>
+			<td>DWORD_PTR SetThreadAffinityMask( HANDLE hThread, DWORD_PTR dwThreadAffinityMask )</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+sets a processor affinity mask for the specified thread.
+【参数】
+hThread 
+[in] Handle to the thread whose affinity mask is to be set. 
+This handle must have the THREAD_SET_INFORMATION and THREAD_QUERY_INFORMATION access rights. For more information, see Thread Security and Access Rights. 
+
+dwThreadAffinityMask 
+[in] Affinity mask for the thread. 
+Windows Me/98/95:  This value must be 1. 
+【返回值】
+If the function succeeds, the return value is the thread's previous affinity mask. 
+
+Windows Me/98/95:  The return value is 1. To succeed, hThread must be valid and dwThreadAffinityMask must be 1. 
+
+If the function fails, the return value is zero. To get extended error information, call GetLastError. 
+【备注】
+若要将3个线程限制到CPU1、2和3上去运行，可以这样操作：
+//Thread 0 can only run on CPU 0.
+SetThreadAffinityMask(hThread0, 0x00000001); //第0位是1
+//Threads 1, 2, 3 run on CPUs 1, 2, 3.//第1 2 3位是1
+SetThreadAffinityMask(hThread1, 0x0000000E);
+SetThreadAffinityMask(hThread2, 0x0000000E);
+SetThreadAffinityMask(hThread3, 0x0000000E);
+</pre>
+<pre>
+http://cooker.iteye.com/blog/652604
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>HWND SetCapture（HWND hwnd）</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>winuser.h</td>
+				<td>user32.lib</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+该函数在属于当前线程的指定窗口里设置鼠标捕获。一旦窗口捕获了鼠标，所有鼠标输入都针对该窗口，无论光标是否在窗口的边界内。
+同一时刻只能有一个窗口捕获鼠标。如果鼠标光标在另一个线程创建的窗口上，只有当鼠标键按下时系统才将鼠标输入指向指定的窗口。
+【参数】
+hWnd：当前线程里要捕获鼠标的窗口句柄。
+【返回值】
+返回值是上次捕获鼠标的窗口句柄。如果不存在那样的句柄，返回值是NULL。
+【备注】
+只有前台窗口才能捕获鼠标。如果一个后台窗口想捕获鼠标，则该窗口仅为其光标热点在该窗口可见部份的鼠标事件接收消息。
+另外，即使前台窗口已捕获了鼠标，用户也可点击另一个窗口，将其调入前台。当一个窗口不再需要所有的鼠标输入时，
+创建该窗口的线程应当调用函数ReleaseCapture来释放鼠标。此函数不能被用来捕获另一进程的鼠标输入。
+</pre>
+<pre>
+</pre>
+
+				</td>
+			</tr>
+			
 			<tr>
 				<td>LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM)</td>
 				<td>&nbsp;</td>

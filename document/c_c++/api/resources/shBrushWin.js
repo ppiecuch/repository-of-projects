@@ -39,6 +39,7 @@
 			'ReleaseCapture ' +
 			'ReleaseDC ' +
 			'RegisterClass '+
+			'SetThreadAffinityMask ' +
 			'SetCapture ' 
 			;
 		var constants =	
@@ -51,7 +52,9 @@
 			'SIZE_MAXIMIZED ' +
 			'SIZE_MAXSHOW ' +
 			'SIZE_MAXHIDE '+
-			'SIZE_RESTORED '
+			'SIZE_RESTORED ' +
+			'THREAD_QUERY_INFORMATION ' +
+			'THREAD_SET_INFORMATION '
 			;
 
 		var r = SyntaxHighlighter.regexLib;
