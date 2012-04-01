@@ -16,7 +16,7 @@ namespace yon{
 	}
 	namespace debug{
 
-		class DebugFont{
+		class YON_DEPRECATED DebugFont{
 		private:
 			const static u32 CHAR_COUNT_PER_ROW=16;
 			const static u32 ROW_COUNT=8;

@@ -2,8 +2,8 @@
 #include "SVertex.h"
 #include "COGLES1Texture.h"
 #include "COGLES1MaterialRenderer.h"
-#include "DebugFont.h"
 #include "ILogger.h"
+#include "CDebugPrinter.h"
 
 namespace yon{
 namespace video{
@@ -36,6 +36,7 @@ namespace ogles1{
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs)
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
+		m_pDebugPrinter(NULL),
 		m_windowSize(param.windowSize),IVideoDriver(fs){
 
 		m_imageLoaders.push(createImageLoaderPNG());
@@ -62,16 +63,26 @@ namespace ogles1{
 
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Driver");
 
-		video::IImage* image=DebugFont::getInstance().createImage();
+		/*video::IImage* image=DebugFont::getInstance().createImage();
 		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
 		addTexture(tex);
 		tex->drop();
 		image->drop();
 		DebugFont::getInstance().m_pTexture=tex;
-		DebugFont::getInstance().m_pDriver=this;
+		DebugFont::getInstance().m_pDriver=this;*/
+		video::IImage* image=debug::createDebugPrinterTextureImage();
+		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
+		addTexture(tex);
+		tex->drop();
+		image->drop();
+		m_pDebugPrinter=debug::createDebugPrinter(this,tex);
+		Logger->setDebugPrinter(m_pDebugPrinter);
 	}
 
 	COGLES1Driver::~COGLES1Driver(){
+
+		if(m_pDebugPrinter)
+			m_pDebugPrinter->drop();
 
 		if(m_pLastMaterial)
 			m_pLastMaterial->drop();

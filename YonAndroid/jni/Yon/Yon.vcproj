@@ -286,6 +286,14 @@
 				Name="debug"
 				>
 				<File
+					RelativePath=".\CDebugPrinter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CDebugPrinter.h"
+					>
+				</File>
+				<File
 					RelativePath=".\CLogger.cpp"
 					>
 				</File>
@@ -299,6 +307,10 @@
 				</File>
 				<File
 					RelativePath=".\DebugFont.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IDebugPrinter.h"
 					>
 				</File>
 				<File

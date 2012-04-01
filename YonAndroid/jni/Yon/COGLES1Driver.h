@@ -7,6 +7,7 @@
 #include "ITexture.h"
 #include "IMaterial.h"
 #include "IMaterialRenderer.h"
+#include "IDebugPrinter.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 //加载OpenGL ES1需要的库及头文件
@@ -37,7 +38,6 @@ namespace yon{
 				virtual IImage* createImageFromFile(const io::path& filename);
 				virtual IImage* createImageFromFile(io::IReadFile* file);
 
-				virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
 				virtual bool setTexture(u32 stage, const video::ITexture* texture);
 				virtual ITexture* getTexture(const io::path& filename);
 				virtual video::ITexture* findTexture(const io::path& filename);
@@ -60,11 +60,14 @@ namespace yon{
 				void checkMaterial();
 				void addTexture(video::ITexture* texture);
 				video::ITexture* loadTextureFromFile(io::IReadFile* file);
+				virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
 
 				core::matrix4f m_matrix[ENUM_TRANSFORM_COUNT];
 				bool m_bRenderModeChange;
 
 				video::IMaterial *m_pLastMaterial,*m_pCurrentMaterial;
+
+				debug::IDebugPrinter* m_pDebugPrinter;
 
 				core::array<video::ITexture*> m_textures;
 				core::array<video::IImageLoader*> m_imageLoaders;

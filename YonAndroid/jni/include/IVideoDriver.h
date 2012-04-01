@@ -45,6 +45,7 @@ namespace yon{
 			};
 			ENUM_RENDER_MODE m_renderMode;
 			io::IFileSystem* m_pFileSystem;
+			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name) = 0;
 		public:
 			IVideoDriver(io::IFileSystem* fs)
 				:m_renderMode(ENUM_RENDER_MODE_NONE),m_pFileSystem(fs){
@@ -64,7 +65,6 @@ namespace yon{
 			virtual IImage* createImageFromFile(const io::path& filename) = 0;
 			virtual IImage* createImageFromFile(io::IReadFile* file) =0;
 
-			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name) = 0;
 			virtual ITexture* getTexture(const io::path& filename) = 0;
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;
 
