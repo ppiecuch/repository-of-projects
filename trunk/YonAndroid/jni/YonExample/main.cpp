@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 		driver->setMaterial(DEFAULT_MATERIAL);
 		//driver->draw2DImage(tex,ORIGIN_POSITION2DI,core::recti(ORIGIN_POSITION2DI,tex->getSize()),NULL,COLOR_BLACK);
 
-		Logger->drawString(core::stringc(" !#01234ABCDhelloworld"));
+		Logger->drawString(core::stringc(" !#01234ABCDhelloworld"),ORIGIN_POSITION2DI,COLOR_GREEN);
 
 		//driver->endScene();
 		//Sleep(20);

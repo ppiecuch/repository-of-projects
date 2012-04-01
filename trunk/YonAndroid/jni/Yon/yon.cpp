@@ -28,8 +28,11 @@ namespace yon{
 	}
 
 	namespace video{
-		const SColor COLOR_BLACK(0xFFFF0000);
+		const SColor COLOR_BLACK(0xFF000000);
 		const SColor COLOR_WHITE(0xFFFFFFFF);
+		const SColor COLOR_RED(0xFF0000FF);
+		const SColor COLOR_GREEN(0xFF00FF00);
+		const SColor COLOR_BLUE(0xFFFF0000);
 
 		IMaterial* DEFAULT_MATERIAL=NULL;
 	}

@@ -5,11 +5,13 @@
 #include "IReferencable.h"
 #include "yonString.h"
 #include "position2d.h"
-
+#include "SColor.h"
 
 
 namespace yon{
 namespace debug{
+
+	class IDebugPrinter;
 
 	enum MASK_FORMAT{
 		MASK_FORMAT_NONE = 0,		//空
@@ -50,9 +52,10 @@ namespace debug{
 		virtual void debug(const c8* pFmt, ...) = 0;
 		virtual void info(const c8* pFmt, ...) = 0;
 		virtual void warn(const c8* pFmt, ...) = 0;
-		virtual void error(const c8* pFmt, ...) = 0;;
+		virtual void error(const c8* pFmt, ...) = 0;
 
-		virtual void drawString(const core::stringc& str,const core::position2di& pos=core::position2di(0,0)) = 0;
+		virtual void setDebugPrinter(IDebugPrinter* printer) = 0;
+		virtual void drawString(const core::stringc& str,const core::position2di& pos=core::position2di(0,0),const video::SColor& color=video::COLOR_WHITE) = 0;
 
 	};
 	//日志对象,供多方共享

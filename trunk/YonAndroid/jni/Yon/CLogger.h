@@ -38,6 +38,8 @@ namespace yon{
 		//日志级别名称
 			//const static core::stringc LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];
 			const static c8* LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];
+		//文件打印机
+			IDebugPrinter* m_pPrinter;
 		protected:
 			virtual void lock();
 			virtual void unlock();
@@ -59,7 +61,8 @@ namespace yon{
 			virtual void warn(const c8* pFmt, ...);
 			virtual void error(const c8* pFmt, ...);
 
-			virtual void drawString(const core::stringc& str,const core::position2di& pos=core::position2di(0,0));
+			virtual void setDebugPrinter(IDebugPrinter* printer);
+			virtual void drawString(const core::stringc& str,const core::position2di& pos,const video::SColor& color);
 		};
 	}//debug
 }//yon

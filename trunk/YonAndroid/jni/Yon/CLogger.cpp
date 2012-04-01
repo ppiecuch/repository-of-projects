@@ -3,7 +3,7 @@
 #include <memory.h>
 #include <time.h>
 #include <sys/timeb.h>
-#include "DebugFont.h"
+#include "IDebugPrinter.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <android/log.h>
@@ -26,7 +26,7 @@ namespace yon{
 		CLogger::CLogger():
 			m_name("log.txt"),m_pFile(NULL),
 			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_MSEC|MASK_FORMAT_LEVEL|MASK_FORMAT_LOG),
-			m_level(ENUM_LOG_LEVEL_DEBUG),
+			m_level(ENUM_LOG_LEVEL_DEBUG),m_pPrinter(NULL),
 #ifdef YON_COMPILE_WITH_WIN32
 			m_path(""),
 			m_appender(MASK_APPENDER_FILE|MASK_APPENDER_VS)
@@ -52,8 +52,12 @@ namespace yon{
 			#endif
 		}
 
-		void CLogger::drawString(const core::stringc& str,const core::position2di& pos){
-			DebugFont::getInstance().drawString(str,pos);
+		void CLogger::drawString(const core::stringc& str,const core::position2di& pos,const video::SColor& color){
+			if(m_pPrinter)
+				m_pPrinter->drawString(str,pos,color);
+		}
+		void CLogger::setDebugPrinter(IDebugPrinter* printer){
+			m_pPrinter=printer;
 		}
 
 		void CLogger::setPath(const core::stringc& path){
