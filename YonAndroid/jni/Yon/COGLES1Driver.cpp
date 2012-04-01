@@ -50,13 +50,16 @@ namespace ogles1{
 		initEGL(param.hWnd);
 #endif//YON_COMPILE_WITH_WIN32
 
-			u32 i;
-			onResize(param.windowSize);
+		u32 i;
+		onResize(param.windowSize);
 
-			for (i=0; i<ENUM_TRANSFORM_COUNT; ++i)
-				setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
+		for(i=0; i<ENUM_TRANSFORM_COUNT; ++i)
+			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
 
-			setRender3DMode();
+		for(i=0;i<YON_MATERIAL_MAX_TEXTURES;++i)
+			m_currentTextures[i]=NULL;
+
+		setRender3DMode();
 
 		glClearColor(0.1f,0.2f,0.3f,1);
 		glColor4f(1, 1, 1, 1);
@@ -147,7 +150,7 @@ namespace ogles1{
 		glRotatex(2<<16, 0, 0, 0x10000);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
-		glDisableClientState(GL_VERTEX_ARRAY);*/
+		glDisableClientState(GL_VERTEX_ARRAY);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_COLOR_ARRAY);
@@ -158,9 +161,34 @@ namespace ogles1{
 		glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);*/
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_COLOR_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].pos);
+		glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].color);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].texcoords);
+		glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
 		//Logger->debug("drawUnit:%08x\n",unit);
 	}
+
+	void COGLES1Driver::drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indexList, u32 primCount,ENUM_PRIMITIVE_TYPE pType,ENUM_INDEX_TYPE iType){
+		/*glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_COLOR_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glVertexPointer(3, GL_FLOAT, sizeof(scene::SVertex),&unit->getVertices()[0].pos);
+		glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::SVertex),&unit->getVertices()[0].color);
+		glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&unit->getVertices()[0].texcoords);
+		glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);*/
+	}
+
 
 	void COGLES1Driver::draw2DImage(const video::ITexture* texture, const core::position2di& destPos,const core::recti& sourceRect, const core::recti* clipRect,video::SColor color, bool useAlphaChannelOfTexture)
 	{
@@ -284,12 +312,16 @@ namespace ogles1{
 	}
 
 	bool COGLES1Driver::setTexture(u32 stage, const video::ITexture* texture){
+		if(m_currentTextures[stage]==texture)
+			return true;
 		if (!texture){
 			glDisable(GL_TEXTURE_2D);
+			m_currentTextures[stage]=NULL;
 		}
 		else{
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D,static_cast<const COGLES1Texture*>(texture)->getTextureId());
+			m_currentTextures[stage]=const_cast<video::ITexture*>(texture);
 
 			//Logger->debug("glBindTexture:%d\n",static_cast<const COGLES1Texture*>(texture)->getTextureId());
 			//checkGLError(__FILE__,__LINE__);

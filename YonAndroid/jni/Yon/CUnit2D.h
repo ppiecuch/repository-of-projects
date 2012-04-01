@@ -1,5 +1,5 @@
-#ifndef _YON_SCENE_CUNIT_H_
-#define _YON_SCENE_CUNIT_H_
+#ifndef _YON_SCENE_CUNIT2D_H_
+#define _YON_SCENE_CUNIT2D_H_
 
 #include "IUnit.h"
 #include "yonArray.h"
@@ -9,11 +9,11 @@ namespace yon{
 	namespace scene{
 		class CGeometryFactory;
 
-		class CUnit : public IUnit{
+		class CUnit2D : public IUnit{
 		public:
-			CUnit()
+			CUnit2D()
 				:m_pMaterial(new video::CMaterial()){}
-			virtual ~CUnit(){
+			virtual ~CUnit2D(){
 				m_pMaterial->drop();
 			}
 
@@ -54,12 +54,12 @@ namespace yon{
 
 				m_vertices.reallocate(vertexCount+numVertices);
 				for (i=0; i<numVertices; ++i){
-					m_vertices.push(((SVertex*)vertices)[i]);
+					m_vertices.push(((S2DVertex*)vertices)[i]);
 				}
 
 				m_indices.reallocate(getIndexCount()+numIndices);
 				for (i=0; i<numIndices; ++i){
-					m_indices.push(((u16*)indices)[i]+vertexCount);
+					m_indices.push(((u8*)indices)[i]+vertexCount);
 				}
 			}
 
@@ -70,8 +70,8 @@ namespace yon{
 				append(other->getVertices(),other->getVertexCount(),other->getIndices(),other->getIndexCount());
 			}
 		private:
-			core::array<SVertex> m_vertices;
-			core::array<u16> m_indices;
+			core::array<S2DVertex> m_vertices;
+			core::array<u8> m_indices;
 
 			video::CMaterial* m_pMaterial;
 

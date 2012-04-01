@@ -1,7 +1,8 @@
 #include "CGeometryFactory.h"
-#include "CUnit.h"
 #include "SVertex.h"
+#include "CUnit.h"
 #include "CEntity.h"
+#include "CUnit2D.h"
 #include "yonMath.h"
 
 #include "ILogger.h"
@@ -11,7 +12,47 @@ using namespace yon::core;
 namespace yon{
 namespace scene{
 
-	IEntity* CGeometryFactory::createXYPlane(const core::dimension2df& size) const{
+	IEntity* CGeometryFactory::createXYPlane2D(const core::dimension2df& size) const{
+		CUnit2D* unit=new CUnit2D();
+
+		// Create indices
+		const u8 u[6] = {
+			0,  2,  1,
+			0,  3,  2
+		};
+
+		unit->m_indices.reallocate(6);
+		for (u32 i=0; i<6; ++i)
+			unit->m_indices.push(u[i]);
+
+		//Create vertexs
+		unit->m_vertices.reallocate(4);
+
+		f32 phw,phh,mhw,mhh;
+		phw=size.w/2;
+		phh=size.h/2;
+		mhw=phw-size.w;
+		mhh=phh-size.h;
+
+		f32 u0,u1,v0,v1;
+		u0=v0=0;
+		u1=v1=1;
+
+		unit->m_vertices.push(S2DVertex(mhw,mhh,u0,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(S2DVertex(mhw,phh,u0,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(S2DVertex(phw,phh,u1,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(S2DVertex(phw,mhh,u1,v1,video::COLOR_WHITE));
+
+		CEntity* entity=new CEntity(ENUM_DIMEN_MODE_2D);
+		entity->addUnit(unit);
+
+		unit->drop();
+
+		return entity;
+
+	}
+
+	IEntity* CGeometryFactory::createXYPlane(const core::dimension2df& size,f32 z) const{
 		CUnit* unit=new CUnit();
 
 		// Create indices
@@ -37,10 +78,10 @@ namespace scene{
 		u0=v0=0;
 		u1=v1=1;
 
-		unit->m_vertices.push(SVertex(mhw,mhh,0,u0,v1,video::COLOR_WHITE));
-		unit->m_vertices.push(SVertex(mhw,phh,0,u0,v0,video::COLOR_WHITE));
-		unit->m_vertices.push(SVertex(phw,phh,0,u1,v0,video::COLOR_WHITE));
-		unit->m_vertices.push(SVertex(phw,mhh,0,u1,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,mhh,z,u0,v1,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(mhw,phh,z,u0,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,phh,z,u1,v0,video::COLOR_WHITE));
+		unit->m_vertices.push(SVertex(phw,mhh,z,u1,v1,video::COLOR_WHITE));
 
 		CEntity* entity=new CEntity();
 		entity->addUnit(unit);

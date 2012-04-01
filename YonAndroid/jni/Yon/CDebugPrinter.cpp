@@ -6,7 +6,8 @@ namespace yon{
 namespace debug{
 
 	CDebugPrinter::CDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture)
-		:m_pDriver(driver),m_pTexture(texture),m_texcoords(NULL),m_fontSize(getDebugPrinterFontSize()){
+		:m_pDriver(driver),m_pTexture(texture),m_texcoords(NULL),
+		m_fontSize(getDebugPrinterFontSize()),m_fontStep(getDebugPrinterFontStep()){
 			u32 charSize=m_fontSize.w;
 			u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 			u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
@@ -43,12 +44,20 @@ namespace debug{
 		static s32 r,d;
 		static u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 		for(u32 i=0;i<str.length();++i){
-			d=(str[i]-32)/charCountPerRow;
-			r=(str[i]-32)%charCountPerRow;
+			if(str[i]>=32&&str[i]<=128){
+				d=(str[i]-32)/charCountPerRow;
+				r=(str[i]-32)%charCountPerRow;
+			}else if(str[i]==10){
+				d=0;
+				r=0;
+			}else{
+				d=6;
+				r=1;
+			}
 			//Logger->debug("%c,%d,%d,%d\n",str[i],str[i],d,r);
 			//m_texcoords[d][r]->print();
 			m_pDriver->draw2DImage(m_pTexture,p,*m_texcoords[d][r],NULL,color);
-			p.x+=m_fontSize.w;
+			p.x+=m_fontStep.w;
 		}
 	}
 
@@ -58,6 +67,10 @@ namespace debug{
 
 	core::dimension2du getDebugPrinterFontSize(){
 		return core::dimension2du(8,8);
+	}
+
+	core::dimension2du getDebugPrinterFontStep(){
+		return core::dimension2du(6,8);
 	}
 
 	video::IImage* createDebugPrinterTextureImage(){

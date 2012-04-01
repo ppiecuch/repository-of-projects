@@ -32,7 +32,9 @@ namespace yon{
 
 			virtual bool postEventFromUser(const event::SEvent& event);
 
-			//virtual ITimer* getTimer();
+			virtual ITimer* getTimer(){
+				return m_pTimer;
+			}
 
 			const HWND& getHWND() const{
 				return m_hWnd;
@@ -56,6 +58,7 @@ namespace yon{
 			video::IVideoDriver* m_pVideoDriver;
 			scene::ISceneManager* m_pSceneManager;
 			io::IFileSystem* m_pFileSystem;
+			ITimer* m_pTimer;
 
 			event::IEventListener* m_pUserListener;
 

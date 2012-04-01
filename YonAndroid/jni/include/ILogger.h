@@ -27,6 +27,7 @@ namespace debug{
 		MASK_APPENDER_CONSOLE = 0x1,	//控制台
 		MASK_APPENDER_VS = 0x2,			//VS输出窗口
 		MASK_APPENDER_FILE = 0x4,		//单一文件
+		MASK_APPENDER_SCREEN = 0x8,		//屏幕
 		//MASK_APPENDER_DAILY,		//每日产生一文件
 		MASK_APPENDER_COUNT = 3
 	};
@@ -56,6 +57,7 @@ namespace debug{
 
 		virtual void setDebugPrinter(IDebugPrinter* printer) = 0;
 		virtual void drawString(const core::stringc& str,const core::position2di& pos=core::position2di(0,0),const video::SColor& color=video::COLOR_WHITE) = 0;
+		virtual void render() = 0;
 
 	};
 	//日志对象,供多方共享

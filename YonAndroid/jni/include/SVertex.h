@@ -22,6 +22,15 @@ namespace yon{
 			core::vector2df texcoords;
 			video::SColor color;
 		};
+
+		struct S2DVertex{
+			S2DVertex(){}
+			S2DVertex(f32 x,f32 y,f32 tu, f32 tv,video::SColor c):pos(x,y),texcoords(tu,tv),color(c){}
+
+			core::vector2df pos;
+			core::vector2df texcoords;
+			video::SColor color;
+		};
 	}//scene
 }//yon
 #endif

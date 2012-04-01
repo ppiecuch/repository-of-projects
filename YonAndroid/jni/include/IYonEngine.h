@@ -28,8 +28,7 @@ namespace yon{
 		//包括更新计时器
 		//virtual void update() = 0;
 
-		//TODO
-		//virtual yon::ITimer* getTimer() = 0;
+		virtual ITimer* getTimer() = 0;
 		//virtual bool getPlatformInfo(SYonPlatformInfo& info) = 0;
 	protected:
 		virtual void createDriver() = 0;

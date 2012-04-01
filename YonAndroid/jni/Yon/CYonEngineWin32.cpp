@@ -32,7 +32,7 @@ namespace platform{
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
-		m_pUserListener(NULL),
+		m_pUserListener(NULL),m_pTimer(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
 	{
 		if(params.windowId==NULL)
@@ -50,6 +50,9 @@ namespace platform{
 			m_params.windowSize.h = r.bottom - r.top;
 			m_bExternalWindow = true;
 		}
+
+		//初始化计时器
+		m_pTimer=yon::createTimer();
 
 		//初始化文件系统
 		m_pFileSystem=io::createFileSystem();
@@ -75,16 +78,17 @@ namespace platform{
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
+		m_pTimer->drop();
 		if(m_bExternalWindow==false)
 			DestroyWindow(m_hWnd);
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineWin32");
-			if(video::DEFAULT_MATERIAL->drop()){
-				video::DEFAULT_MATERIAL=NULL;
-			}
-			if(Logger->drop()){
-				Logger=NULL;
-			}
+		if(video::DEFAULT_MATERIAL->drop()){
+			video::DEFAULT_MATERIAL=NULL;
+		}
+		if(Logger->drop()){
+			Logger=NULL;
+		}
 			
 		}
 
