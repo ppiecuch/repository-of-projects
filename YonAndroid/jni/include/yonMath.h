@@ -74,6 +74,18 @@ inline bool equals(const f32 a, const f32 b, const f32 tolerance = ROUNDING_ERRO
 	return (a + tolerance >= b) && (a - tolerance <= b);
 }
 
+inline s32 ceil32( f32 x )
+{
+	//TODO优化
+	return (s32) ceilf ( x );
+}
+
+inline f32 reciprocal(const f32 f)
+{
+	//TODO优化
+	return 1.f/f;
+}
+
 }//core
 }//yon
 

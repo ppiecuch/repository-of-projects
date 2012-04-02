@@ -67,14 +67,17 @@ int main(int argc, char* argv[])
 	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,300));
 
 	IMaterial* material;
+	IShap *shap,*shap1,*shap2;
+	IUnit* unit;
+	IEntity* entity;
 
-	IEntity* cube=geometryFty->createCube(core::dimension3df(50,50,50));
+	/*IEntity* cube=geometryFty->createCube(core::dimension3df(50,50,50));
 	IModel* cubeModel=sceneMgr->addModel(cube);
 	material=cubeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
 	cubeModel->setPosition(core::vector3df(70,40,0));
 	material->setTexture(0,driver->getTexture("../media/test.png"));
-	cube->drop();
+	cube->drop();*/
 
 	//Logger->debug("%d\n",fs->existFile("D:/java1.exe"));
 
@@ -85,30 +88,62 @@ int main(int argc, char* argv[])
 	//image->drop();
 
 
-
-	IEntity* sphere=geometryFty->createSphere(100,16,16);
-	IModel* sphereModel=sceneMgr->addModel(sphere);
+	shap=geometryFty->createSphere(100,16,16);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	IModel* sphereModel=sceneMgr->addModel(entity);
 	material=sphereModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	sphereModel->setPosition(core::vector3df(-50,-50,-150));
 	material->setTexture(0,driver->getTexture("../media/earth.png"));
-	sphere->drop();
+	shap->drop();
+	unit->drop();
+	entity->drop();
 
-	IEntity* plane=geometryFty->createXYPlane(core::dimension2df(50,50));
+	/*IEntity* plane=geometryFty->createXYPlane(core::dimension2df(50,50));
 	IModel* planeModel=sceneMgr->addModel(plane);
 	material=planeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
 	planeModel->setPosition(core::vector3df(-50,20,0));
 	material->setTexture(0,driver->getTexture("../media/aura.png"));
-	plane->drop();
+	plane->drop();*/
 
-	IEntity* nav=geometryFty->createXYPlane(core::dimension2df(128,128));
+	shap=geometryFty->createXYRectangle(-25,-25,25,25);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	IModel* planeModel=sceneMgr->addModel(entity);
+	material=planeModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	planeModel->setPosition(core::vector3df(-50,20,0));
+	material->setTexture(0,driver->getTexture("../media/aura.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
+	/*IEntity* nav=geometryFty->createXYPlane(core::dimension2df(128,128));
 	IModel* navModel=sceneMgr->addModel(nav);
 	material=navModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
 	navModel->setPosition(core::vector3df(-100,-100,0));
 	material->setTexture(0,driver->getTexture("../media/nav.png"));
+	nav->drop();*/
+
+	
+	shap1=geometryFty->createXYRectangle(0,0,128,128,0,0,1,1);
+	shap2=geometryFty->createXYRectangle(128,0,256,128,0,0,1,1);
+	shap1->append(shap2);
+	shap2->drop();
+	unit=geometryFty->createUnit(shap1);
+	IEntity* nav=geometryFty->createEntity(unit);
+	IModel* navModel=sceneMgr->addModel(nav);
+	material=navModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
+	navModel->setPosition(core::vector3df(-100,-100,0));
+	material->setTexture(0,driver->getTexture("../media/nav.png"));
+	//material->setTexture(0,Logger->getDebugPrinter()->getTexture());
 	nav->drop();
+	unit->drop();
+	shap1->drop();
 
 
 	/*ILogger* logger=Logger;
@@ -149,8 +184,8 @@ int main(int argc, char* argv[])
 		//const core::vector3df pos=camera->getPosition();
 		//camera->setPosition(core::vector3df(pos.x,pos.y+0.005f ,pos.z));
 
-		const core::vector3df crot=cubeModel->getRotation();
-		cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.05f ,crot.z));
+		//const core::vector3df crot=cubeModel->getRotation();
+		//cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.05f ,crot.z));
 
 		const core::vector3df srot=sphereModel->getRotation();
 		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.02f ,srot.z));
@@ -169,10 +204,10 @@ int main(int argc, char* argv[])
 
 		sceneMgr->render(driver);
 
-		driver->setMaterial(DEFAULT_MATERIAL);
+		//driver->setMaterial(DEFAULT_MATERIAL);
 		//driver->draw2DImage(tex,ORIGIN_POSITION2DI,core::recti(ORIGIN_POSITION2DI,tex->getSize()),NULL,COLOR_BLACK);
 
-		//Logger->drawString(core::stringc(" !#01234ABCDhelloworld"),ORIGIN_POSITION2DI,COLOR_GREEN);
+		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),ORIGIN_POSITION2DI,COLOR_GREEN);
 
 		Logger->render();
 		//driver->endScene();

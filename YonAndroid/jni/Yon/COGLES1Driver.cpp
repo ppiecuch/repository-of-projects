@@ -34,10 +34,10 @@ namespace ogles1{
 	
 
 
-	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,scene::IGeometryFactory* geometryFty)
+	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty)
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
 		m_pDebugPrinter(NULL),
-		m_windowSize(param.windowSize),IVideoDriver(fs){
+		m_windowSize(param.windowSize),IVideoDriver(fs,timer){
 
 		m_imageLoaders.push(createImageLoaderPNG());
 
@@ -125,6 +125,7 @@ namespace ogles1{
 #ifdef YON_COMPILE_WITH_WIN32
 		eglSwapBuffers(m_eglDisplay, m_eglSurface);
 #endif//YON_COMPILE_WITH_WIN32
+		m_FPSCounter.registerFrame(m_pTimer->getRealTime(),0);
 	}
 	void COGLES1Driver::setViewPort(const core::recti& r){
 		glViewport(0, 0, r.getWidth(), r.getHeight());
@@ -137,7 +138,10 @@ namespace ogles1{
 		setViewPort(core::recti(0,0,size.w,size.h));
 	}
 	void COGLES1Driver::drawUnit(scene::IUnit* unit){
-		setRender3DMode();
+		if(unit->getDimenMode()==ENUM_DIMEN_MODE_3D)
+			setRender3DMode();
+		else
+			setRender2DMode();
 		checkMaterial();
 
 		/*glEnableClientState(GL_VERTEX_ARRAY);
@@ -163,16 +167,41 @@ namespace ogles1{
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);*/
 
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_COLOR_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glVertexPointer(3, GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].pos);
-		glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].color);
-		glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].texcoords);
-		glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		glDisableClientState(GL_COLOR_ARRAY);
-		glDisableClientState(GL_VERTEX_ARRAY);
+		if(unit->getDimenMode()==ENUM_DIMEN_MODE_3D)
+		{
+			/*glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glVertexPointer(unit->getDimenMode(), GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].pos);
+			glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].color);
+			glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].texcoords);
+			glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisableClientState(GL_COLOR_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);*/
+
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glVertexPointer(unit->getDimenMode(), GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getShap()->getVertices())[0].pos);
+			glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::SVertex),&((scene::SVertex*)unit->getShap()->getVertices())[0].color);
+			glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getShap()->getVertices())[0].texcoords);
+			glDrawElements(GL_TRIANGLES, unit->getShap()->getIndexCount(), GL_UNSIGNED_SHORT,unit->getShap()->getIndices());
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisableClientState(GL_COLOR_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
+		}else{
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glVertexPointer(unit->getDimenMode(), GL_FLOAT, sizeof(scene::S2DVertex),&((scene::S2DVertex*)unit->getShap()->getVertices())[0].pos);
+			glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::S2DVertex),&((scene::S2DVertex*)unit->getShap()->getVertices())[0].color);
+			glTexCoordPointer(2, GL_FLOAT, sizeof(scene::S2DVertex),&((scene::S2DVertex*)unit->getShap()->getVertices())[0].texcoords);
+			glDrawElements(GL_TRIANGLES, unit->getShap()->getIndexCount(), GL_UNSIGNED_SHORT,unit->getShap()->getIndices());
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisableClientState(GL_COLOR_ARRAY);
+			glDisableClientState(GL_VERTEX_ARRAY);
+		}
 		//Logger->debug("drawUnit:%08x\n",unit);
 	}
 

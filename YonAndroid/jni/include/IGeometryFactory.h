@@ -19,12 +19,14 @@ namespace yon{
 			//´øz×ø±ê,¼´3DVertex
 			virtual IEntity* createXYPlane(const core::dimension2df& size=core::dimension2df(1,1),f32 z=0) const = 0;
 			virtual IEntity* createCube(const core::dimension3df& size=core::dimension3df(1,1,1)) const = 0;
-			virtual IEntity* createSphere(f32 radius=1.0f,u32 hSteps=8,u32 vSteps=8) const = 0;
 
-			virtual Shap2D* createXYRectangle(u32 x0,u32 y0,u32 x1,u32 y1,f32 u0,f32 v0,f32 u1,f32 v1,
+			virtual IShap* createSphere(f32 radius=1.0f,u32 hSteps=8,u32 vSteps=8) const = 0;
+
+			virtual IShap* createXYRectangle(s32 x0,s32 y0,s32 x1,s32 y1,f32 u0=0,f32 v0=0,f32 u1=1,f32 v1=1,
 				const video::SColor& color=video::COLOR_WHITE) const = 0;
 
-			virtual IUnit* createUnit(Shap2D* shap) = 0;
+			virtual IUnit* createUnit(IShap* shap) const = 0;
+			virtual IEntity* createEntity(IUnit* unit) const = 0;
 		};
 
 	}//scene

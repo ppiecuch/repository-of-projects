@@ -11,6 +11,7 @@
 #include "IImageLoader.h"
 #include "IMaterial.h"
 #include "SColor.h"
+#include "ITimer.h"
 
 namespace yon{
 
@@ -73,16 +74,21 @@ namespace yon{
 			};
 			ENUM_RENDER_MODE m_renderMode;
 			io::IFileSystem* m_pFileSystem;
+			ITimer* m_pTimer;
 			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name) = 0;
 		public:
-			IVideoDriver(io::IFileSystem* fs)
-				:m_renderMode(ENUM_RENDER_MODE_NONE),m_pFileSystem(fs){
+			IVideoDriver(io::IFileSystem* fs,ITimer* timer)
+				:m_renderMode(ENUM_RENDER_MODE_NONE),m_pFileSystem(fs),m_pTimer(timer){
 					if(m_pFileSystem)
 						m_pFileSystem->grab();
+					if(m_pTimer)
+						m_pTimer->grab();
 			}
 			virtual ~IVideoDriver(){
 				if(m_pFileSystem)
 					m_pFileSystem->drop();
+				if(m_pTimer)
+					m_pTimer->drop();
 			};
 			virtual void begin(bool zBuffer=true,video::SColor c=video::SColor(0x000000FF)) = 0;
 			virtual void end() = 0;
@@ -109,7 +115,7 @@ namespace yon{
 				const void* indexList, u32 primCount,
 				ENUM_PRIMITIVE_TYPE pType=ENUM_PRIMITIVE_TYPE_TRIANGLES,
 				ENUM_INDEX_TYPE iType=ENUM_INDEX_TYPE_16BIT) =0;
-			//virtual u32 getFPS() const = 0;
+			virtual u32 getFPS() const = 0;
 		};
 	}
 }

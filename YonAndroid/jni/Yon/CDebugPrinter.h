@@ -22,6 +22,12 @@ namespace debug{
 		CDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture,scene::IGeometryFactory* geometryFty);
 		~CDebugPrinter();
 		virtual void drawString(const core::stringc& str,const core::position2di& pos,const video::SColor& color);
+		virtual video::ITexture* getTexture() const{
+			return m_pTexture;
+		};
+		virtual void setTexture(video::ITexture* texture){
+			m_pTexture=texture;
+		}
 	};
 }
 }

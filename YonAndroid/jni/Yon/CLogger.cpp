@@ -60,12 +60,15 @@ namespace yon{
 			if(m_pPrinter==NULL)
 				return;
 			core::list<core::stringc>::Iterator it=queue.begin(); 
-			core::position2di pos(0,0);
+			core::position2di pos(0,300);
 			static core::dimension2du step(getDebugPrinterFontStep());
-			//for(;it!=queue.end();++it){
+			core::stringc str;
+			for(;it!=queue.end();++it){
 				m_pPrinter->drawString(*it,pos,video::COLOR_GREEN);
-				pos.y+=step.h;
-			//}
+				pos.y-=step.h;
+				//str+=core::stringc("%s%c",it->c_str(),0x1);
+			}
+			//m_pPrinter->drawString(str,pos,video::COLOR_GREEN);
 		}
 		void CLogger::setDebugPrinter(IDebugPrinter* printer){
 			m_pPrinter=printer;
@@ -213,7 +216,7 @@ namespace yon{
 			unlock();
 			if(m_appender&MASK_APPENDER_SCREEN){
 				queue.push_back(core::stringc(m_buffer));
-				if(queue.size()>6)
+				if(queue.size()>20)
 					queue.erase(queue.begin());
 			}
 			if(m_appender&MASK_APPENDER_FILE){

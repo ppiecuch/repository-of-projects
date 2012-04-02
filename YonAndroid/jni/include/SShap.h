@@ -1,7 +1,7 @@
 #ifndef _YON_SCENE_SSHAP_H_
 #define _YON_SCENE_SSHAP_H_
 
-#include "IReferencable.h"
+#include "IShap.h"
 #include "yonArray.h"
 #include "SVertex.h"
 
@@ -11,13 +11,13 @@ namespace scene{
 	class CGeometryFactory;
 
 	template<class V,class I,size_t M>
-	class SShap : public virtual core::IReferencable{
+	class SShap : public IShap{
 	protected:
 		core::array<V> m_vertices;
 		core::array<I> m_indices;
 		friend class CGeometryFactory;
 	public:
-		virtual const V* getVertices() const{
+		/*virtual const V* getVertices() const{
 			return m_vertices.pointer();
 		}
 		virtual V* getVertices(){
@@ -56,6 +56,52 @@ namespace scene{
 		}
 
 		virtual void append(const SShap* const other){
+			if (this==other)
+				return;
+
+			append(other->getVertices(),other->getVertexCount(),other->getIndices(),other->getIndexCount());
+		}*/
+
+		virtual const void* getVertices() const{
+			return m_vertices.pointer();
+		}
+		virtual void* getVertices(){
+			return m_vertices.pointer();
+		}
+		virtual u32 getVertexCount() const{
+			return m_vertices.size();
+		}
+
+		virtual const void* getIndices() const{
+			return m_indices.pointer();
+		}
+		virtual void* getIndices(){
+			return m_indices.pointer();
+		}
+		virtual u32 getIndexCount() const{
+			return m_indices.size();
+		}
+
+		virtual void append(const  void* const vertices, u32 numVertices, const void* const indices, u32 numIndices){
+			if (vertices == getVertices())
+				return;
+
+			const u32 vertexCount = getVertexCount();
+			u32 i;
+
+			m_vertices.reallocate(vertexCount+numVertices);
+			for (i=0; i<numVertices; ++i){
+				m_vertices.push(((V*)vertices)[i]);
+			}
+
+			m_indices.reallocate(getIndexCount()+numIndices);
+			for (i=0; i<numIndices; ++i){
+				m_indices.push(((I*)indices)[i]+vertexCount);
+			}
+		}
+
+		virtual void append(const IShap* const other){
+			YON_DEBUG_BREAK_IF(getDimenMode()!=other->getDimenMode());
 			if (this==other)
 				return;
 

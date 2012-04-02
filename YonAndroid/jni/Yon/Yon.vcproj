@@ -446,6 +446,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\IShap.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IUnit.h"
 					>
 				</File>
@@ -501,6 +505,14 @@
 			<Filter
 				Name="video"
 				>
+				<File
+					RelativePath=".\CFPSCounter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CFPSCounter.h"
+					>
+				</File>
 				<File
 					RelativePath=".\CImage.cpp"
 					>
