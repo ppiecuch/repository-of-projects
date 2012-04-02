@@ -450,6 +450,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\SShap.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\SVertex.h"
 					>
 				</File>

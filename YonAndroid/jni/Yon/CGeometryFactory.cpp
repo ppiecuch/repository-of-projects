@@ -12,6 +12,47 @@ using namespace yon::core;
 namespace yon{
 namespace scene{
 
+	/*
+	----------x1,y1
+	|			|
+	|			|
+	x0,y0------
+	*/
+	Shap2D* CGeometryFactory::createXYRectangle(u32 x0,u32 y0,u32 x1,u32 y1,f32 u0,f32 v0,f32 u1,f32 v1,const video::SColor& color) const{
+		Shap2D* shap=new Shap2D();
+
+		// Create indices
+		const static u8 u[6] = {0,  1,  3,  3,  1,  2};
+
+		shap->m_indices.reallocate(6);
+		for (u32 i=0; i<6; ++i)
+			shap->m_indices.push(u[i]);
+
+		//Create vertexs
+		shap->m_vertices.reallocate(4);
+
+		shap->m_vertices.push(S2DVertex((u32)x0,(u32)y0,u0,v0,color));
+		shap->m_vertices.push(S2DVertex((u32)x1,(u32)y0,u1,v0,color));
+		shap->m_vertices.push(S2DVertex((u32)x1,(u32)y1,u1,v1,color));
+		shap->m_vertices.push(S2DVertex((u32)x0,(u32)y1,u0,v1,color));
+
+		return shap;
+
+	}
+
+	IUnit* CGeometryFactory::createUnit(Shap2D* shap){
+		if(shap->getDimenMode()==ENUM_DIMEN_MODE_2D){
+			CUnit2D* unit=new CUnit2D();
+			unit->setShap(shap);
+			return unit;
+		}else if(shap->getDimenMode()==ENUM_DIMEN_MODE_3D){
+			CUnit* unit=new CUnit();
+			unit->setShap(shap);
+			return unit;
+		}
+		return NULL;
+	}
+
 	IEntity* CGeometryFactory::createXYPlane2D(const core::dimension2df& size) const{
 		CUnit2D* unit=new CUnit2D();
 

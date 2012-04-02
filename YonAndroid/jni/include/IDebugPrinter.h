@@ -14,6 +14,9 @@ namespace yon{
 		class ITexture;
 		class IImage;
 	}
+	namespace scene{
+		class IGeometryFactory;
+	}
 namespace debug{
 
 	video::IImage* createDebugPrinterTextureImage();
@@ -25,7 +28,7 @@ namespace debug{
 		virtual void drawString(const core::stringc& str,const core::position2di& pos=core::ORIGIN_POSITION2DI,const video::SColor& color=video::COLOR_WHITE) = 0;
 	};
 
-	IDebugPrinter* createDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture);
+	IDebugPrinter* createDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture,scene::IGeometryFactory* geometryFty);
 }
 }
 #endif

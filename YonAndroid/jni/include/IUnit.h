@@ -5,6 +5,7 @@
 #include "yonTypes.h"
 #include "SVertex.h"
 #include "IMaterial.h"
+#include "SShap.h"
 
 namespace yon{
 	namespace scene{
@@ -33,6 +34,9 @@ namespace yon{
 			virtual void append(const  void* const vertices, u32 numVertices, const void* const indices, u32 numIndices) = 0;
 
 			virtual void append(const IUnit* const other) = 0;
+
+			virtual const Shap2D* getShap() const = 0;
+			virtual void setShap(Shap2D* shap) = 0;
 		};
 	}//scene
 }//yon
