@@ -57,11 +57,11 @@ namespace platform{
 		//初始化文件系统
 		m_pFileSystem=io::createFileSystem();
 
-		//初始化视频驱动器
-		createDriver();
-
 		//初始化场景管理器
 		m_pSceneManager=scene::createSceneManager();
+
+		//初始化视频驱动器
+		createDriver();
 
 		SEnginePair ep;
 		ep.hWnd=m_hWnd;
@@ -366,7 +366,7 @@ namespace platform{
 
 #ifdef YON_VIDEO_MODE_OGLES1
 			video::ogles1::SOGLES1Parameters params(m_hWnd,m_params.windowSize);
-			m_pVideoDriver=new video::ogles1::COGLES1Driver(params,m_pFileSystem);
+			m_pVideoDriver=new video::ogles1::COGLES1Driver(params,m_pFileSystem,m_pSceneManager->getGeometryFactory());
 #endif //YON_VIDEO_MODE_OGLES1
 	}
 	//yon::ITimer* yon::platform::CYonEngineWin32::getTimer(){return NULL;}

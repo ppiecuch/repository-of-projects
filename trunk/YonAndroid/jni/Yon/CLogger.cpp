@@ -62,10 +62,10 @@ namespace yon{
 			core::list<core::stringc>::Iterator it=queue.begin(); 
 			core::position2di pos(0,0);
 			static core::dimension2du step(getDebugPrinterFontStep());
-			for(;it!=queue.end();++it){
+			//for(;it!=queue.end();++it){
 				m_pPrinter->drawString(*it,pos,video::COLOR_GREEN);
 				pos.y+=step.h;
-			}
+			//}
 		}
 		void CLogger::setDebugPrinter(IDebugPrinter* printer){
 			m_pPrinter=printer;

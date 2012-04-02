@@ -34,7 +34,7 @@ namespace ogles1{
 	
 
 
-	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs)
+	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,scene::IGeometryFactory* geometryFty)
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
 		m_pDebugPrinter(NULL),
 		m_windowSize(param.windowSize),IVideoDriver(fs){
@@ -78,7 +78,7 @@ namespace ogles1{
 		addTexture(tex);
 		tex->drop();
 		image->drop();
-		m_pDebugPrinter=debug::createDebugPrinter(this,tex);
+		m_pDebugPrinter=debug::createDebugPrinter(this,tex,geometryFty);
 		Logger->setDebugPrinter(m_pDebugPrinter);
 	}
 

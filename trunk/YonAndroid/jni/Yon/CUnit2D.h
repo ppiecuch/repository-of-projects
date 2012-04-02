@@ -24,6 +24,14 @@ namespace yon{
 				return m_pMaterial;
 			}
 
+			virtual const Shap2D* getShap()const {
+				return m_pShap;
+			}
+			virtual void setShap(Shap2D* shap){
+				shap->grab();
+				m_pShap=shap;
+			}
+
 
 			virtual const void* getVertices() const{
 				return m_vertices.pointer();
@@ -70,10 +78,14 @@ namespace yon{
 				append(other->getVertices(),other->getVertexCount(),other->getIndices(),other->getIndexCount());
 			}
 		private:
+			Shap2D* m_pShap;
+
+			video::CMaterial* m_pMaterial;
+
 			core::array<S2DVertex> m_vertices;
 			core::array<u8> m_indices;
 
-			video::CMaterial* m_pMaterial;
+			
 
 			friend class CGeometryFactory;
 		};

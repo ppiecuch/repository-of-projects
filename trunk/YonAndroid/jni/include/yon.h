@@ -41,6 +41,7 @@
 #include "ISceneManager.h" 
 #include "ITimer.h" 
 #include "IUnit.h" 
+#include "SShap.h"
 #include "IVideoDriver.h" 
 #include "IYonEngine.h" 
 

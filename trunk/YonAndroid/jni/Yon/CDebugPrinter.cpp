@@ -1,27 +1,36 @@
 #include "CDebugPrinter.h"
 #include "IVideoDriver.h"
 #include "CImage.h"
+#include "IGeometryFactory.h"
 
 namespace yon{
 namespace debug{
 
-	CDebugPrinter::CDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture)
-		:m_pDriver(driver),m_pTexture(texture),m_texcoords(NULL),
+	CDebugPrinter::CDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture,scene::IGeometryFactory* geometryFty)
+		:m_pDriver(driver),m_pTexture(texture),m_pGeometryFty(geometryFty),m_texcoords(NULL),
 		m_fontSize(getDebugPrinterFontSize()),m_fontStep(getDebugPrinterFontStep()){
 			u32 charSize=m_fontSize.w;
 			u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 			u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
 
-			m_texcoords=(core::recti***)new core::recti**[rowCount]; 
+			//m_texcoords=(core::recti***)new core::recti**[rowCount]; 
+			m_texcoords=(core::rectf***)new core::rectf**[rowCount]; 
 			for(u32 i=0;i<rowCount;++i){
-				m_texcoords[i]=(core::recti**)new core::recti*[charCountPerRow];
+				//m_texcoords[i]=(core::recti**)new core::recti*[charCountPerRow];
+				m_texcoords[i]=(core::rectf**)new core::rectf*[charCountPerRow];
 				for(u32 j=0;j<charCountPerRow;++j){
-					m_texcoords[i][j]=new core::recti();
+					/*m_texcoords[i][j]=new core::recti();
 					core::recti* r=m_texcoords[i][j];
 					r->topLeft.x=j*charSize;
 					r->bottomRight.x=(j+1)*charSize;
 					r->topLeft.y=(rowCount-i-1)*charSize;
-					r->bottomRight.y=(rowCount-i)*charSize;
+					r->bottomRight.y=(rowCount-i)*charSize;*/
+					m_texcoords[i][j]=new core::rectf();
+					core::rectf* r=m_texcoords[i][j];
+					r->topLeft.x=(f32)j/charCountPerRow;
+					r->bottomRight.x=(f32)(j+1)/charCountPerRow;
+					r->topLeft.y=(f32)i/rowCount;
+					r->bottomRight.y=(f32)(i+1)/rowCount;
 				}
 			}
 	}
@@ -40,9 +49,18 @@ namespace debug{
 	}
 
 	void CDebugPrinter::drawString(const core::stringc& str,const core::position2di& pos,const video::SColor& color){
-		core::position2di p(pos);
+		if(str.length()==0)
+			return;
+		//core::position2di p(pos);
+		static u32 x0,y0,x1,y1;
+		static f32 u0,v0,u1,v1;
 		static s32 r,d;
 		static u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
+		x0=pos.x;
+		y0=pos.y;
+		x1=x0+m_fontSize.w;
+		y1=y0+m_fontSize.h;
+		scene::Shap2D* shap=NULL;
 		for(u32 i=0;i<str.length();++i){
 			if(str[i]>=32&&str[i]<=128){
 				d=(str[i]-32)/charCountPerRow;
@@ -56,13 +74,30 @@ namespace debug{
 			}
 			//Logger->debug("%c,%d,%d,%d\n",str[i],str[i],d,r);
 			//m_texcoords[d][r]->print();
-			m_pDriver->draw2DImage(m_pTexture,p,*m_texcoords[d][r],NULL,color);
-			p.x+=m_fontStep.w;
+			//m_pDriver->draw2DImage(m_pTexture,p,*m_texcoords[d][r],NULL,color);
+			u0=m_texcoords[d][r]->topLeft.x;
+			v0=m_texcoords[d][r]->bottomRight.y;
+			u1=m_texcoords[d][r]->bottomRight.x;
+			v1=m_texcoords[d][r]->topLeft.y;
+			if(shap==NULL){
+				shap=m_pGeometryFty->createXYRectangle(x0,y0,x1,y1,u0,v0,u1,v1,color);
+			}else{
+				scene::Shap2D* temp=m_pGeometryFty->createXYRectangle(x0,y0,x1,y1,u0,v0,u1,v1,color);
+				shap->append(temp);
+				temp->drop();
+			}
+			//p.x+=m_fontStep.w;
+			x0+=m_fontStep.w;
+			x1=x0+m_fontSize.w;
 		}
+		scene::IUnit* unit=m_pGeometryFty->createUnit(shap);
+		shap->drop();
+		m_pDriver->drawUnit(unit);
+		unit->drop();
 	}
 
-	IDebugPrinter* createDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture){
-		return new CDebugPrinter(driver,texture);
+	IDebugPrinter* createDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture,scene::IGeometryFactory* geometryFty){
+		return new CDebugPrinter(driver,texture,geometryFty);
 	}
 
 	core::dimension2du getDebugPrinterFontSize(){

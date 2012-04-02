@@ -8,6 +8,7 @@
 #include "IMaterial.h"
 #include "IMaterialRenderer.h"
 #include "IDebugPrinter.h"
+#include "IGeometryFactory.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 //加载OpenGL ES1需要的库及头文件
@@ -26,7 +27,7 @@ namespace yon{
 			class COGLES1Driver:public IVideoDriver{
 			public:
 
-				COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs);
+				COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,scene::IGeometryFactory* geometryFty);
 				virtual ~COGLES1Driver();
 
 				virtual void begin(bool zBuffer,video::SColor c);

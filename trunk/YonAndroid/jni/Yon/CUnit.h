@@ -12,9 +12,12 @@ namespace yon{
 		class CUnit : public IUnit{
 		public:
 			CUnit()
-				:m_pMaterial(new video::CMaterial()){}
+				:m_pMaterial(new video::CMaterial()),m_pShap(NULL){}
 			virtual ~CUnit(){
 				m_pMaterial->drop();
+				//TODOÈ¥µôÅÐ¶Ï
+				if(m_pShap)
+					m_pShap->drop();
 			}
 
 			virtual video::IMaterial* getMaterial(){
@@ -22,6 +25,14 @@ namespace yon{
 			}
 			virtual const video::IMaterial* getMaterial() const{
 				return m_pMaterial;
+			}
+
+			virtual const Shap2D* getShap()const {
+				return m_pShap;
+			}
+			virtual void setShap(Shap2D* shap){
+				shap->grab();
+				m_pShap=shap;
 			}
 
 
@@ -70,10 +81,14 @@ namespace yon{
 				append(other->getVertices(),other->getVertexCount(),other->getIndices(),other->getIndexCount());
 			}
 		private:
-			core::array<SVertex> m_vertices;
-			core::array<u16> m_indices;
+
+			Shap2D* m_pShap;
 
 			video::CMaterial* m_pMaterial;
+
+
+			core::array<SVertex> m_vertices;
+			core::array<u16> m_indices;
 
 			friend class CGeometryFactory;
 		};
