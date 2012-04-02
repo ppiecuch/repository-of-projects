@@ -9,6 +9,7 @@
 #include "IMaterialRenderer.h"
 #include "IDebugPrinter.h"
 #include "IGeometryFactory.h"
+#include "CFPSCounter.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 //加载OpenGL ES1需要的库及头文件
@@ -27,7 +28,7 @@ namespace yon{
 			class COGLES1Driver:public IVideoDriver{
 			public:
 
-				COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,scene::IGeometryFactory* geometryFty);
+				COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty);
 				virtual ~COGLES1Driver();
 
 				virtual void begin(bool zBuffer,video::SColor c);
@@ -56,7 +57,9 @@ namespace yon{
  
 				void setRender3DMode();
 				void setRender2DMode();
-				//virtual u32 getFPS() const;
+				virtual u32 getFPS() const{
+					return m_FPSCounter.getFPS();
+				}
 
 			private:
 				void checkMaterial();
@@ -76,6 +79,8 @@ namespace yon{
 				core::array<video::ITexture*> m_textures;
 				core::array<video::IImageLoader*> m_imageLoaders;
 				core::array<video::IMaterialRenderer*> m_materialRenderers;
+
+				CFPSCounter m_FPSCounter;
 
 				core::dimension2du m_windowSize;
 #ifdef YON_COMPILE_WITH_WIN32

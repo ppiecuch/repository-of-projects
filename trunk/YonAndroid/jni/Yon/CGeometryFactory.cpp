@@ -18,7 +18,7 @@ namespace scene{
 	|			|
 	x0,y0------
 	*/
-	Shap2D* CGeometryFactory::createXYRectangle(u32 x0,u32 y0,u32 x1,u32 y1,f32 u0,f32 v0,f32 u1,f32 v1,const video::SColor& color) const{
+	IShap* CGeometryFactory::createXYRectangle(s32 x0,s32 y0,s32 x1,s32 y1,f32 u0,f32 v0,f32 u1,f32 v1,const video::SColor& color) const{
 		Shap2D* shap=new Shap2D();
 
 		// Create indices
@@ -31,16 +31,16 @@ namespace scene{
 		//Create vertexs
 		shap->m_vertices.reallocate(4);
 
-		shap->m_vertices.push(S2DVertex((u32)x0,(u32)y0,u0,v0,color));
-		shap->m_vertices.push(S2DVertex((u32)x1,(u32)y0,u1,v0,color));
-		shap->m_vertices.push(S2DVertex((u32)x1,(u32)y1,u1,v1,color));
-		shap->m_vertices.push(S2DVertex((u32)x0,(u32)y1,u0,v1,color));
+		shap->m_vertices.push(S2DVertex((f32)x0,(f32)y0,u0,v0,color));
+		shap->m_vertices.push(S2DVertex((f32)x1,(f32)y0,u1,v0,color));
+		shap->m_vertices.push(S2DVertex((f32)x1,(f32)y1,u1,v1,color));
+		shap->m_vertices.push(S2DVertex((f32)x0,(f32)y1,u0,v1,color));
 
 		return shap;
 
 	}
 
-	IUnit* CGeometryFactory::createUnit(Shap2D* shap){
+	IUnit* CGeometryFactory::createUnit(IShap* shap)const {
 		if(shap->getDimenMode()==ENUM_DIMEN_MODE_2D){
 			CUnit2D* unit=new CUnit2D();
 			unit->setShap(shap);
@@ -52,6 +52,13 @@ namespace scene{
 		}
 		return NULL;
 	}
+
+	IEntity* CGeometryFactory::createEntity(IUnit* unit)const {
+		CEntity* entity=new CEntity(unit->getDimenMode());
+		entity->addUnit(unit);
+		return entity;
+	}
+
 
 	IEntity* CGeometryFactory::createXYPlane2D(const core::dimension2df& size) const{
 		CUnit2D* unit=new CUnit2D();
@@ -94,7 +101,7 @@ namespace scene{
 	}
 
 	IEntity* CGeometryFactory::createXYPlane(const core::dimension2df& size,f32 z) const{
-		CUnit* unit=new CUnit();
+		/*CUnit* unit=new CUnit();
 
 		// Create indices
 		const u16 u[6] = {
@@ -123,6 +130,47 @@ namespace scene{
 		unit->m_vertices.push(SVertex(mhw,phh,z,u0,v0,video::COLOR_WHITE));
 		unit->m_vertices.push(SVertex(phw,phh,z,u1,v0,video::COLOR_WHITE));
 		unit->m_vertices.push(SVertex(phw,mhh,z,u1,v1,video::COLOR_WHITE));
+
+		CEntity* entity=new CEntity();
+		entity->addUnit(unit);
+
+		unit->drop();
+
+		return entity;*/
+
+		CUnit* unit=new CUnit();
+		Shap3D* shap=new Shap3D();
+
+		// Create indices
+		const u16 u[6] = {
+			0,  2,  1,
+			0,  3,  2
+		};
+
+		shap->m_indices.reallocate(6);
+		for (u32 i=0; i<6; ++i)
+			shap->m_indices.push(u[i]);
+
+		//Create vertexs
+		shap->m_vertices.reallocate(4);
+
+		f32 phw,phh,mhw,mhh;
+		phw=size.w/2;
+		phh=size.h/2;
+		mhw=phw-size.w;
+		mhh=phh-size.h;
+
+		f32 u0,u1,v0,v1;
+		u0=v0=0;
+		u1=v1=1;
+
+		shap->m_vertices.push(SVertex(mhw,mhh,z,u0,v1,video::COLOR_WHITE));
+		shap->m_vertices.push(SVertex(mhw,phh,z,u0,v0,video::COLOR_WHITE));
+		shap->m_vertices.push(SVertex(phw,phh,z,u1,v0,video::COLOR_WHITE));
+		shap->m_vertices.push(SVertex(phw,mhh,z,u1,v1,video::COLOR_WHITE));
+
+		unit->setShap(shap);
+		shap->drop();
 
 		CEntity* entity=new CEntity();
 		entity->addUnit(unit);
@@ -212,8 +260,9 @@ namespace scene{
 
 		return entity;
 	}
-	IEntity* CGeometryFactory::createSphere(f32 radius,u32 hSteps,u32 vSteps) const{
-		CUnit* unit=new CUnit();
+	IShap* CGeometryFactory::createSphere(f32 radius,u32 hSteps,u32 vSteps) const{
+		//CUnit* unit=new CUnit();
+		Shap3D* shap=new Shap3D();
 
 		f32 dtheta=(float)360/hSteps;	//水平方向步增
 		f32 dphi=(float)180/vSteps;		//垂直方向步增
@@ -221,8 +270,8 @@ namespace scene{
 		u32 numVertices=vSteps*hSteps<<2;
 		u32 numIndices=vSteps*hSteps*6;
 	
-		unit->m_vertices.reallocate(numVertices);
-		unit->m_indices.reallocate(numIndices);
+		shap->m_vertices.reallocate(numVertices);
+		shap->m_indices.reallocate(numIndices);
 
 		u32 index=0;
 		//u32 index2=0;
@@ -242,7 +291,7 @@ namespace scene{
 				temp.normalize();
 				u = (f32)j/hSteps;
 				v = (f32)asinf(temp.y)/PI+0.5f;
-				unit->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
+				shap->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -263,7 +312,7 @@ namespace scene{
 				temp.normalize();
 				u = (f32)j/hSteps;
 				v = (f32)asinf(temp.y)/PI+0.5f;
-				unit->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
+				shap->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -284,7 +333,7 @@ namespace scene{
 				temp.normalize();
 				u = (f32)(j+1)/hSteps;
 				v = (f32)asinf(temp.y)/PI+0.5f;
-				unit->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
+				shap->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -305,7 +354,7 @@ namespace scene{
 				temp.normalize();
 				u = (f32)(j+1)/hSteps;
 				v = (f32)asinf(temp.y)/PI+0.5f;
-				unit->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
+				shap->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
 				/*NORMALIZE_VERTEX_TO((*vertices)[index*3+0],(*vertices)[index*3+1],(*vertices)[index*3+2],temp);
 				if(texCoords!=NULL)
 				{
@@ -320,12 +369,12 @@ namespace scene{
 				}*/
 				++index;
 
-				unit->m_indices.push(index-4);
-				unit->m_indices.push(index-3);
-				unit->m_indices.push(index-2);
-				unit->m_indices.push(index-4);
-				unit->m_indices.push(index-2);
-				unit->m_indices.push(index-1);
+				shap->m_indices.push(index-4);
+				shap->m_indices.push(index-3);
+				shap->m_indices.push(index-2);
+				shap->m_indices.push(index-4);
+				shap->m_indices.push(index-2);
+				shap->m_indices.push(index-1);
 
 				/*if(indices!=NULL)
 				{
@@ -339,12 +388,12 @@ namespace scene{
 			}
 		}
 
-		CEntity* entity=new CEntity();
-		entity->addUnit(unit);
+		//CEntity* entity=new CEntity();
+		//entity->addUnit(unit);
 
-		unit->drop();
+		//unit->drop();
 
-		return entity;
+		return shap;
 	}
 }//scene
 }//yon

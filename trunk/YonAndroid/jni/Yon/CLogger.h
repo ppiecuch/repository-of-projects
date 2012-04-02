@@ -64,6 +64,9 @@ namespace yon{
 			virtual void error(const c8* pFmt, ...);
 
 			virtual void setDebugPrinter(IDebugPrinter* printer);
+			virtual IDebugPrinter* getDebugPrinter() const{
+				return m_pPrinter;
+			}
 			virtual void drawString(const core::stringc& str,const core::position2di& pos,const video::SColor& color);
 			virtual void render();
 		};

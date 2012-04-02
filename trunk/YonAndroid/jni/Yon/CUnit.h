@@ -27,10 +27,10 @@ namespace yon{
 				return m_pMaterial;
 			}
 
-			virtual const Shap2D* getShap()const {
+			virtual const IShap* getShap()const {
 				return m_pShap;
 			}
-			virtual void setShap(Shap2D* shap){
+			virtual void setShap(IShap* shap){
 				shap->grab();
 				m_pShap=shap;
 			}
@@ -80,9 +80,13 @@ namespace yon{
 
 				append(other->getVertices(),other->getVertexCount(),other->getIndices(),other->getIndexCount());
 			}
+
+			virtual ENUM_DIMEN_MODE getDimenMode() const{
+				return ENUM_DIMEN_MODE_3D;
+			}
 		private:
 
-			Shap2D* m_pShap;
+			IShap* m_pShap;
 
 			video::CMaterial* m_pMaterial;
 

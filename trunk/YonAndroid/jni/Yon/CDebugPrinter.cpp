@@ -27,10 +27,10 @@ namespace debug{
 					r->bottomRight.y=(rowCount-i)*charSize;*/
 					m_texcoords[i][j]=new core::rectf();
 					core::rectf* r=m_texcoords[i][j];
-					r->topLeft.x=(f32)j/charCountPerRow;
-					r->bottomRight.x=(f32)(j+1)/charCountPerRow;
-					r->topLeft.y=(f32)i/rowCount;
-					r->bottomRight.y=(f32)(i+1)/rowCount;
+					r->bottomLeft.x=(f32)j/charCountPerRow;
+					r->topRight.x=(f32)(j+1)/charCountPerRow;
+					r->bottomLeft.y=(f32)i/rowCount;
+					r->topRight.y=(f32)(i+1)/rowCount;
 				}
 			}
 	}
@@ -55,34 +55,40 @@ namespace debug{
 		static u32 x0,y0,x1,y1;
 		static f32 u0,v0,u1,v1;
 		static s32 r,d;
+		static u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
 		static u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 		x0=pos.x;
 		y0=pos.y;
 		x1=x0+m_fontSize.w;
 		y1=y0+m_fontSize.h;
-		scene::Shap2D* shap=NULL;
+		scene::IShap* shap=NULL;
 		for(u32 i=0;i<str.length();++i){
 			if(str[i]>=32&&str[i]<=128){
-				d=(str[i]-32)/charCountPerRow;
+				d=rowCount-1-(str[i]-32)/charCountPerRow;
 				r=(str[i]-32)%charCountPerRow;
 			}else if(str[i]==10){
 				d=0;
 				r=0;
+			/*}else if(str[i]==1){
+				y0-=m_fontStep.h;
+				y1=y0+m_fontSize.h;
+				x0=pos.x;
+				x1=x0+m_fontSize.w;*/
 			}else{
-				d=6;
+				d=1;
 				r=1;
 			}
 			//Logger->debug("%c,%d,%d,%d\n",str[i],str[i],d,r);
 			//m_texcoords[d][r]->print();
 			//m_pDriver->draw2DImage(m_pTexture,p,*m_texcoords[d][r],NULL,color);
-			u0=m_texcoords[d][r]->topLeft.x;
-			v0=m_texcoords[d][r]->bottomRight.y;
-			u1=m_texcoords[d][r]->bottomRight.x;
-			v1=m_texcoords[d][r]->topLeft.y;
+			u0=m_texcoords[d][r]->bottomLeft.x;
+			v0=m_texcoords[d][r]->bottomLeft.y;
+			u1=m_texcoords[d][r]->topRight.x;
+			v1=m_texcoords[d][r]->topRight.y;
 			if(shap==NULL){
 				shap=m_pGeometryFty->createXYRectangle(x0,y0,x1,y1,u0,v0,u1,v1,color);
 			}else{
-				scene::Shap2D* temp=m_pGeometryFty->createXYRectangle(x0,y0,x1,y1,u0,v0,u1,v1,color);
+				scene::IShap* temp=m_pGeometryFty->createXYRectangle(x0,y0,x1,y1,u0,v0,u1,v1,color);
 				shap->append(temp);
 				temp->drop();
 			}
@@ -91,7 +97,11 @@ namespace debug{
 			x1=x0+m_fontSize.w;
 		}
 		scene::IUnit* unit=m_pGeometryFty->createUnit(shap);
+		unit->getMaterial()->setTexture(0,m_pTexture);
+		unit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_LIGHTEN);
 		shap->drop();
+		//m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
+		m_pDriver->setMaterial(unit->getMaterial());
 		m_pDriver->drawUnit(unit);
 		unit->drop();
 	}

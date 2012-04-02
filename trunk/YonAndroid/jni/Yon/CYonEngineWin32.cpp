@@ -73,6 +73,9 @@ namespace platform{
 
 		SetActiveWindow(m_hWnd);
 		SetForegroundWindow(m_hWnd);
+
+		//Æô¶¯¼ÆÊ±Æ÷
+		m_pTimer->start();
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
 		m_pVideoDriver->drop();
@@ -97,6 +100,7 @@ namespace platform{
 		}
 
 	bool CYonEngineWin32::run(){
+		m_pTimer->tick();
 		MSG msg;
 		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -366,7 +370,7 @@ namespace platform{
 
 #ifdef YON_VIDEO_MODE_OGLES1
 			video::ogles1::SOGLES1Parameters params(m_hWnd,m_params.windowSize);
-			m_pVideoDriver=new video::ogles1::COGLES1Driver(params,m_pFileSystem,m_pSceneManager->getGeometryFactory());
+			m_pVideoDriver=new video::ogles1::COGLES1Driver(params,m_pFileSystem,m_pTimer,m_pSceneManager->getGeometryFactory());
 #endif //YON_VIDEO_MODE_OGLES1
 	}
 	//yon::ITimer* yon::platform::CYonEngineWin32::getTimer(){return NULL;}

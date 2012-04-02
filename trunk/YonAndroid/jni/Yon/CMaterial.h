@@ -17,10 +17,10 @@ namespace video{
 
 		CMaterial()
 			:m_materialType(ENUM_MATERIAL_TYPE_SOLID){
-				Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
+				//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
 		}
 		~CMaterial(){
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CMaterial");
+			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CMaterial");
 		}
 
 		virtual ENUM_MATERIAL_TYPE getMaterialType() const{
