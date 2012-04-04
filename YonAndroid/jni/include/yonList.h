@@ -250,7 +250,7 @@ namespace yon{
 				return ConstIterator(last);
 			}
 
-			Iterator erase(Iterator& it)
+			Iterator erase(Iterator it)
 			{
 				// suggest changing this to a const Iterator& and
 				// working around line: it.Current = 0 (possibly with a mutable, or just let it be garbage?)

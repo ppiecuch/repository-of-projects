@@ -12,11 +12,12 @@ namespace video{
 	class CMaterial : public IMaterial{
 	protected:
 		ENUM_MATERIAL_TYPE m_materialType;
+		ENUM_POLYGON_MODE m_polygonMode;
 		SMaterialLayer m_textureLayers[MATERIAL_MAX_TEXTURES];
 	public:
 
 		CMaterial()
-			:m_materialType(ENUM_MATERIAL_TYPE_SOLID){
+			:m_materialType(ENUM_MATERIAL_TYPE_SOLID),m_polygonMode(ENUM_POLYGON_MODE_FILL){
 				//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
 		}
 		~CMaterial(){
@@ -28,6 +29,13 @@ namespace video{
 		}
 		virtual void setMaterialType(ENUM_MATERIAL_TYPE type){
 			m_materialType=type;
+		}
+
+		virtual ENUM_POLYGON_MODE getPolygonMode() const{
+			return m_polygonMode;
+		}
+		virtual void setPolygonMode(ENUM_POLYGON_MODE mode){
+			m_polygonMode= mode;
 		}
 
 		virtual void setTexture(u32 i, ITexture* tex)

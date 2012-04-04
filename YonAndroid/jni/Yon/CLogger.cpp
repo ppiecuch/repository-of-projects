@@ -32,7 +32,7 @@ namespace yon{
 			m_appender(MASK_APPENDER_FILE|MASK_APPENDER_VS|MASK_APPENDER_SCREEN)
 #elif defined(YON_COMPILE_WITH_ANDROID)
 			m_path("/sdcard/"),
-			m_appender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE)
+			m_appender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_SCREEN)
 #endif
 		{
 #ifdef YON_COMPILE_WITH_WIN32
@@ -59,15 +59,20 @@ namespace yon{
 		void CLogger::render(){
 			if(m_pPrinter==NULL)
 				return;
-			core::list<core::stringc>::Iterator it=queue.begin(); 
-			core::position2di pos(0,300);
+			core::position2di pos(0,0);
 			static core::dimension2du step(getDebugPrinterFontStep());
+			static u32 count,i;
 			core::stringc str;
-			for(;it!=queue.end();++it){
+			lock();
+			core::list<core::stringc>::Iterator it=queue.begin(); 
+			count=queue.size();
+			for(i=0;it!=queue.end();++it,++i){
+				pos.y=(count-i)*step.h;
 				m_pPrinter->drawString(*it,pos,video::COLOR_GREEN);
-				pos.y-=step.h;
+				
 				//str+=core::stringc("%s%c",it->c_str(),0x1);
 			}
+			unlock();
 			//m_pPrinter->drawString(str,pos,video::COLOR_GREEN);
 		}
 		void CLogger::setDebugPrinter(IDebugPrinter* printer){
@@ -215,9 +220,11 @@ namespace yon{
 			}
 			unlock();
 			if(m_appender&MASK_APPENDER_SCREEN){
+				lock();
 				queue.push_back(core::stringc(m_buffer));
 				if(queue.size()>20)
 					queue.erase(queue.begin());
+				unlock();
 			}
 			if(m_appender&MASK_APPENDER_FILE){
 				fprintf(m_pFile,"%s",m_buffer);

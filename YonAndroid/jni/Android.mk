@@ -42,6 +42,7 @@ zlib_SOURCES :=\
 		Yon/zlib/zutil.c
 
 yon_SOURCES :=   \
+		Yon/CDebugPrinter.cpp \
 		Yon/CLogger.cpp \
 		Yon/CFileSystem.cpp \
 		Yon/CReadFile.cpp \
@@ -49,6 +50,8 @@ yon_SOURCES :=   \
 		Yon/CGeometryFactory.cpp \
 		Yon/CModel.cpp \
 		Yon/CSceneManager.cpp \
+		Yon/CTimerAndroid.cpp \
+		Yon/CFPSCounter.cpp \
 		Yon/COGLES1Driver.cpp \
 		Yon/COGLES1Texture.cpp \
 		Yon/CYonEngineAndroid.cpp \

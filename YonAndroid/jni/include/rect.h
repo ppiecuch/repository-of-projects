@@ -76,7 +76,7 @@ namespace yon{
 					bottomRight.y = other.bottomRight.y;
 
 				if (other.topLeft.x > topLeft.x)
-					topLeft.x = other.topLeft.x
+					topLeft.x = other.topLeft.x;
 				if (other.topLeft.y > topLeft.y)
 					topLeft.y = other.topLeft.y;
 

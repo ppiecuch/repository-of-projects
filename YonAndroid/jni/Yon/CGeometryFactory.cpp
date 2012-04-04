@@ -260,6 +260,79 @@ namespace scene{
 
 		return entity;
 	}
+	IShap* CGeometryFactory::createCube(f32 width,f32 height,f32 depth,const video::SColor& color) const{
+		Shap3D* shap=new Shap3D();
+
+		// Create indices
+		const u16 u[36] = {
+			0,  2,  1,
+			0,  3,  2, 
+			4,  5,  6,
+			4,  6,  7,
+			8,  9,  10,
+			8,  10, 11, 
+			12, 15, 14,
+			12, 14, 13, 
+			16, 17, 18,
+			16, 18, 19, 
+			20, 23, 22,
+			20, 22, 21
+		};
+		shap->m_indices.reallocate(36);
+		for (u32 i=0; i<36; ++i)
+			shap->m_indices.push(u[i]);
+
+		//Create vertexs
+		shap->m_vertices.reallocate(24);
+
+		f32 phw,phh,phd,mhw,mhh,mhd;
+		phw=width/2;
+		phh=height/2;
+		phd=depth/2;
+		mhw=phw-width;
+		mhh=phh-height;
+		mhd=phd-depth;
+
+		f32 u0,u1,v0,v1;
+		u0=v0=0;
+		u1=v1=1;
+
+		Logger->debug("half cube size:%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",phw,phh,phd,mhw,mhh,mhd);
+
+		shap->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v1,color));
+		shap->m_vertices.push(SVertex(mhw,mhh,phd,u0,v0,color));
+		shap->m_vertices.push(SVertex(phw,mhh,phd,u1,v0,color));
+		shap->m_vertices.push(SVertex(phw,mhh,mhd,u1,v1,color));
+
+		shap->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1,color));
+		shap->m_vertices.push(SVertex(mhw,phh,phd,u0,v0,color));
+		shap->m_vertices.push(SVertex(phw,phh,phd,u1,v0,color));
+		shap->m_vertices.push(SVertex(phw,phh,mhd,u1,v1,color));
+
+		shap->m_vertices.push(SVertex(mhw,mhh,mhd,u1,v0,color));
+		shap->m_vertices.push(SVertex(mhw,phh,mhd,u1,v1,color));
+		shap->m_vertices.push(SVertex(phw,phh,mhd,u0,v1,color));
+		shap->m_vertices.push(SVertex(phw,mhh,mhd,u0,v0,color));
+
+		shap->m_vertices.push(SVertex(mhw,mhh,phd,u0,v1,color));
+		shap->m_vertices.push(SVertex(mhw,phh,phd,u0,v0,color));
+		shap->m_vertices.push(SVertex(phw,phh,phd,u1,v0,color));
+		shap->m_vertices.push(SVertex(phw,mhh,phd,u1,v1,color));
+
+		//左
+		shap->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v0,color));
+		shap->m_vertices.push(SVertex(mhw,mhh,phd,u1,v0,color));
+		shap->m_vertices.push(SVertex(mhw,phh,phd,u1,v1,color));
+		shap->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1,color));
+
+		//右
+		shap->m_vertices.push(SVertex(phw,mhh,mhd,u1,v0,color));
+		shap->m_vertices.push(SVertex(phw,mhh,phd,u0,v0,color));
+		shap->m_vertices.push(SVertex(phw,phh,phd,u0,v1,color));
+		shap->m_vertices.push(SVertex(phw,phh,mhd,u1,v1,color));
+
+		return shap;
+	}
 	IShap* CGeometryFactory::createSphere(f32 radius,u32 hSteps,u32 vSteps) const{
 		//CUnit* unit=new CUnit();
 		Shap3D* shap=new Shap3D();
@@ -392,6 +465,75 @@ namespace scene{
 		//entity->addUnit(unit);
 
 		//unit->drop();
+
+		return shap;
+	}
+
+	//x=(R+r*cosθ)cosΦ
+	//y=(R+r*cosθ)sinΦ
+	//z=r*sinθ
+	IShap* CGeometryFactory::createTorus(f32 cirRadius,f32 orbitRadius,u32 cirSteps,u32 orbitSteps,const video::SColor& color) const{
+		Shap3D* shap=new Shap3D();
+
+		f32 dtheta=(float)PI2/cirSteps;		//形圆角步增
+		f32 dphi=(float)PI2/orbitSteps;		//轨圆角步增
+
+		u32 numVertices=cirSteps*orbitSteps<<2;
+		u32 numIndices=cirSteps*orbitSteps*6;
+
+		shap->m_vertices.reallocate(numVertices);
+		shap->m_indices.reallocate(numIndices);
+
+		u32 index=0;
+		f32 phi=0;
+		f32 theta=0;
+		f32 x,y,z;
+		f32 u,v;
+		for(u32 i=0;i<orbitSteps;++i,phi+=dphi)
+		{
+			for(u32 j=0;j<cirSteps;++j,theta+=dtheta)
+			{
+				
+				x = (f32) ((cirRadius * cosf(theta)+orbitRadius)*cosf(phi+dphi));
+				y = (f32) ((cirRadius * cosf(theta)+orbitRadius)*sinf(phi+dphi));
+				z = (f32) (cirRadius * sinf(theta));
+				u = (f32)(i+1)/orbitSteps;
+				v = (f32)j/cirSteps;
+				shap->m_vertices.push(SVertex(x,y,z,u,v,color));
+				++index;
+
+				x = (f32) ((cirRadius * cosf(theta+dtheta)+orbitRadius)*cosf(phi+dphi));
+				y = (f32) ((cirRadius * cosf(theta+dtheta)+orbitRadius)*sinf(phi+dphi));
+				z = (f32) (cirRadius * sinf(theta+dtheta));
+				u = (f32)(i+1)/orbitSteps;
+				v = (f32)(j+1)/cirSteps;
+				shap->m_vertices.push(SVertex(x,y,z,u,v,color));
+				++index;
+
+				x = (f32) ((cirRadius * cosf(theta+dtheta)+orbitRadius)*cosf(phi));
+				y = (f32) ((cirRadius * cosf(theta+dtheta)+orbitRadius)*sinf(phi));
+				z = (f32) (cirRadius * sinf(theta+dtheta));
+				u = (f32)i/orbitSteps;
+				v = (f32)(j+1)/cirSteps;
+				shap->m_vertices.push(SVertex(x,y,z,u,v,color));
+				++index;
+
+				x = (f32) ((cirRadius * cosf(theta)+orbitRadius)*cosf(phi));
+				y = (f32) ((cirRadius * cosf(theta)+orbitRadius)*sinf(phi));
+				z = (f32) (cirRadius * sinf(theta));
+				u = (f32)i/orbitSteps;
+				v = (f32)j/cirSteps;
+				shap->m_vertices.push(SVertex(x,y,z,u,v,color));
+				++index;
+
+				shap->m_indices.push(index-4);//0
+				shap->m_indices.push(index-3);//1
+				shap->m_indices.push(index-2);//2
+				shap->m_indices.push(index-4);//0
+				shap->m_indices.push(index-2);//2
+				shap->m_indices.push(index-1);//3
+			}
+		}
 
 		return shap;
 	}

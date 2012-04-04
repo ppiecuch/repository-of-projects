@@ -71,13 +71,17 @@ int main(int argc, char* argv[])
 	IUnit* unit;
 	IEntity* entity;
 
-	/*IEntity* cube=geometryFty->createCube(core::dimension3df(50,50,50));
-	IModel* cubeModel=sceneMgr->addModel(cube);
+	shap=geometryFty->createCube(50,50,50);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	IModel* cubeModel=sceneMgr->addModel(entity);
 	material=cubeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
-	cubeModel->setPosition(core::vector3df(70,40,0));
+	cubeModel->setPosition(core::vector3df(50,50,200));
 	material->setTexture(0,driver->getTexture("../media/test.png"));
-	cube->drop();*/
+	shap->drop();
+	unit->drop();
+	entity->drop();
 
 	//Logger->debug("%d\n",fs->existFile("D:/java1.exe"));
 
@@ -87,18 +91,33 @@ int main(int argc, char* argv[])
 	//IImage* image=driver->createImageFromFile("D:/test.png");
 	//image->drop();
 
-
 	shap=geometryFty->createSphere(100,16,16);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	IModel* sphereModel=sceneMgr->addModel(entity);
 	material=sphereModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
-	sphereModel->setPosition(core::vector3df(-50,-50,-150));
+	sphereModel->setPosition(core::vector3df(100,100,100));
 	material->setTexture(0,driver->getTexture("../media/earth.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
+	
+
+	shap=geometryFty->createTorus(10,30,16,16,COLOR_BLUE);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	IModel* toruseModel=sceneMgr->addModel(entity);
+	material=toruseModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
+	material->setPolygonMode(ENUM_POLYGON_MODE_FILL);
+	toruseModel->setPosition(core::vector3df(230,230,0));
+	material->setTexture(0,driver->getTexture("../media/gunny.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
+	
 
 	/*IEntity* plane=geometryFty->createXYPlane(core::dimension2df(50,50));
 	IModel* planeModel=sceneMgr->addModel(plane);
@@ -114,7 +133,7 @@ int main(int argc, char* argv[])
 	IModel* planeModel=sceneMgr->addModel(entity);
 	material=planeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
-	planeModel->setPosition(core::vector3df(-50,20,0));
+	planeModel->setPosition(core::vector3df(150,120,0));
 	material->setTexture(0,driver->getTexture("../media/aura.png"));
 	shap->drop();
 	unit->drop();
@@ -138,7 +157,7 @@ int main(int argc, char* argv[])
 	IModel* navModel=sceneMgr->addModel(nav);
 	material=navModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
-	navModel->setPosition(core::vector3df(-100,-100,0));
+	navModel->setPosition(core::vector3df(100,100,0));
 	material->setTexture(0,driver->getTexture("../media/nav.png"));
 	//material->setTexture(0,Logger->getDebugPrinter()->getTexture());
 	nav->drop();
@@ -151,7 +170,7 @@ int main(int argc, char* argv[])
 	//logger->setAppender(MASK_APPENDER_CONSOLE);
 	logger->setLevel(ENUM_LOG_LEVEL_DEBUG);
 	int num=0;*/
-	f32 factor=1.001f;
+	f32 factor=1.01f;
 	ITexture* tex=driver->getTexture("../media/firework.png");
 	DEFAULT_MATERIAL->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 
@@ -184,18 +203,21 @@ int main(int argc, char* argv[])
 		//const core::vector3df pos=camera->getPosition();
 		//camera->setPosition(core::vector3df(pos.x,pos.y+0.005f ,pos.z));
 
-		//const core::vector3df crot=cubeModel->getRotation();
-		//cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.05f ,crot.z));
+		const core::vector3df crot=cubeModel->getRotation();
+		cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 		const core::vector3df srot=sphereModel->getRotation();
-		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.02f ,srot.z));
+		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.2f ,srot.z));
 
 		const core::vector3df psca=planeModel->getScale();
 		if(psca.x>4)
-			factor=0.999f;
+			factor=0.99f;
 		else if(psca.x<2)
-			factor=1.001f;
+			factor=1.01f;
 		planeModel->setScale(psca*factor);
+
+		const core::vector3df trot=toruseModel->getRotation();
+		toruseModel->setRotation(core::vector3df(trot.x+1.0f,trot.y,trot.z));
 
 		//const core::vector3df sca=model->getScale();
 		//model->setScale(core::vector3df(sca.x+0.001f,sca.y+0.001f,sca.z+0.001f));
@@ -207,7 +229,7 @@ int main(int argc, char* argv[])
 		//driver->setMaterial(DEFAULT_MATERIAL);
 		//driver->draw2DImage(tex,ORIGIN_POSITION2DI,core::recti(ORIGIN_POSITION2DI,tex->getSize()),NULL,COLOR_BLACK);
 
-		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),ORIGIN_POSITION2DI,COLOR_GREEN);
+		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::position2di(0,driver->getCurrentRenderTargetSize().h-8),COLOR_GREEN);
 
 		Logger->render();
 		//driver->endScene();
