@@ -1,6 +1,8 @@
 #include "CFPSCounter.h"
 #include "yonMath.h"
 
+#include "ILogger.h"
+
 namespace yon{
 	namespace video{
 
@@ -15,6 +17,7 @@ namespace yon{
 				m_fps = core::ceil32(( 1000 * m_framesCounted ) * invMilli);
 				m_framesCounted=0;
 				m_lastTime=now;
+				//Logger->debug("recal fps\n");
 			}
 		}
 

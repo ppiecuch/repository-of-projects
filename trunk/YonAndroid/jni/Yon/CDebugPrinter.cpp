@@ -100,7 +100,7 @@ namespace debug{
 		unit->getMaterial()->setTexture(0,m_pTexture);
 		unit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_LIGHTEN);
 		shap->drop();
-		//m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
 		m_pDriver->setMaterial(unit->getMaterial());
 		m_pDriver->drawUnit(unit);
 		unit->drop();
