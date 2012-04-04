@@ -123,6 +123,36 @@ http://www.cocoachina.com/bbs/read.php?tid=38052
 				</td>
 			</tr>
 			<tr>
+				<td>void glPolygonMode(	GLenum face,GLenum mode)</td>
+				<td>不支持</td>
+				<td>不支持</td>
+				<td>支持</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+【参数】
+face
+Specifies the polygons that mode applies to. Must be GL_FRONT for front-facing polygons, GL_BACK for back-facing polygons, 
+or GL_FRONT_AND_BACK for front- and back-facing polygons.
+mode
+Specifies how polygons will be rasterized. Accepted values are GL_POINT, GL_LINE, and GL_FILL. 
+The initial value is GL_FILL for both front- and back-facing polygons.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+http://www.opengl.org/sdk/docs/man/xhtml/glPolygonMode.xml
+</pre>
+				</td>
+			</tr>
+			<tr>
 				<td>void glScissor(	GLint x,GLint y,GLsizei width,GLsizei height)</td>
 				<td>支持</td>
 				<td>&nbsp;</td>
@@ -162,6 +192,56 @@ width and height are set to the dimensions of that surface.
 <pre>
 参考文档：
 http://www.khronos.org/opengles/sdk/1.1/docs/man/
+</pre>
+				</td>
+			</tr>
+			<tr>
+				<td>void glTexImage2D(GLenum target,GLint level,GLint internalformat,GLsizei width,GLsizei height,GLint border,GLenum format,GLenum type,const GLvoid * pixels)</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+【参数】
+target
+Specifies the target texture. Must be GL_TEXTURE_2D.
+
+level
+Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image. Must be greater or equal 0.
+
+internalformat
+Specifies the color components in the texture. Must be same as format. The following symbolic values are accepted: GL_ALPHA, GL_RGB, GL_RGBA, GL_LUMINANCE, or GL_LUMINANCE_ALPHA.
+
+width
+Specifies the width of the texture image. Must be 2n for some integer n. All implementations support texture images that are at least 64 texels wide.
+
+height
+Specifies the height of the texture image. Must be 2m for some integer m. All implementations support texture images that are at least 64 texels high.
+
+border
+Specifies the width of the border. Must be 0.
+
+format
+Specifies the format of the pixel data. Must be same as internalformat. The following symbolic values are accepted: GL_ALPHA, GL_RGB, GL_RGBA, GL_LUMINANCE, and GL_LUMINANCE_ALPHA.
+
+type
+Specifies the data type of the pixel data. The following symbolic values are accepted: GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_4_4_4_4, and GL_UNSIGNED_SHORT_5_5_5_1.
+
+pixels
+Specifies a pointer to the image data in memory.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+
 </pre>
 				</td>
 			</tr>
