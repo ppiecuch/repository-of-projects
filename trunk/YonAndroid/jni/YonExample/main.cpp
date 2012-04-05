@@ -4,7 +4,7 @@
 #include <crtdbg.h>
 #include <typeinfo>
 
-//#include <vld.h>
+#include <vld.h>
 
 inline void EnableMemLeakCheck()
 {
@@ -44,7 +44,7 @@ struct Object : public virtual core::IReferencable{
 #define _CRTDBG_MAP_ALLOC
 int main(int argc, char* argv[])
 {
-	EnableMemLeakCheck();
+	//EnableMemLeakCheck();
 
 	//setlocale(LC_ALL,"chs");
 	setlocale(LC_CTYPE,"UTF-8");
@@ -91,13 +91,14 @@ int main(int argc, char* argv[])
 	//IImage* image=driver->createImageFromFile("D:/test.png");
 	//image->drop();
 
-	shap=geometryFty->createSphere(100,16,16);
+	shap=geometryFty->createSphere(80,16,16);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	IModel* sphereModel=sceneMgr->addModel(entity);
 	material=sphereModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
-	sphereModel->setPosition(core::vector3df(100,100,100));
+	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
+	sphereModel->setPosition(core::vector3df(300,100,100));
 	material->setTexture(0,driver->getTexture("../media/earth.png"));
 	shap->drop();
 	unit->drop();
@@ -164,6 +165,20 @@ int main(int argc, char* argv[])
 	unit->drop();
 	shap1->drop();
 
+	shap=geometryFty->createXYRectangle(-25,-25,25,25);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	IModel* coatModel=sceneMgr->addModel(entity);
+	material=coatModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	coatModel->setPosition(core::vector3df(350,320,0));
+	material->setTexture(0,driver->getTexture("../media/dirt.png"));
+	material->setTexture(1,driver->getTexture("../media/rift.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
 
 	/*ILogger* logger=Logger;
 	logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
@@ -207,7 +222,7 @@ int main(int argc, char* argv[])
 		cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 		const core::vector3df srot=sphereModel->getRotation();
-		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.2f ,srot.z));
+		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.8f ,srot.z));
 
 		const core::vector3df psca=planeModel->getScale();
 		if(psca.x>4)
