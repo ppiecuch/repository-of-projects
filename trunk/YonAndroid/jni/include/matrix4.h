@@ -28,21 +28,45 @@ namespace yon{
 					}
 				}
 			}
+			inline void checkIdentity(){
+				m_bIsChanged=false;
+				m_bIsIdentity=true;
+				if (!core::equals( m[0][0], (T)1 ) ||
+					!core::equals( m[1][1], (T)1 ) ||
+					!core::equals( m[2][2], (T)1 ) ||
+					!core::equals( m[3][3], (T)1 )){
+					m_bIsIdentity=false;
+					return;
+				}
+					
+
+				for (s32 i=0; i<4; ++i)
+					for (s32 j=0; j<4; ++j)
+						if ((j != i) && (!iszero((*this)(i,j)))){
+							m_bIsIdentity=false;
+							return;
+						}
+			}
+			bool m_bIsIdentity : 1;
+			bool m_bIsChanged : 1;
 		public:
 			T m[4][4];
-			matrix4(bool identity=false){
+			matrix4(bool identity=false)
+				:m_bIsIdentity(false),m_bIsChanged(true){
 				if(identity==true){
 					makeIdentity();
 				}
 			}
-			matrix4(const T t[16]){
+			matrix4(const T t[16])
+				:m_bIsIdentity(false),m_bIsChanged(true){
 				for(int i=0;i<4;++i){
 					for(int j=0;j<4;++j){
 						m[i][j]=t[(i<<2)+j];
 					}
 				}
 			}
-			matrix4(const matrix4<T>& other){
+			matrix4(const matrix4<T>& other)
+				:m_bIsIdentity(false),m_bIsChanged(true){
 				*this=other;
 			}
 
@@ -59,12 +83,22 @@ namespace yon{
 			const T* pointer() const { return &m[0][0]; }
 			T* pointer() { return &m[0][0];}
 
+			inline bool isIdentity() const
+			{
+				if(m_bIsChanged)
+					checkIdentity();
+				return m_bIsIdentity;
+			}
+
 			inline void makeIdentity(){
 				memset(m, 0x0, sizeof(m));
 				m[0][0] = 1.0f;
 				m[1][1] = 1.0f;
 				m[2][2] = 1.0f;
 				m[3][3] = 1.0f;
+
+				m_bIsChanged = false;
+				m_bIsIdentity = true;
 			}
 			inline void makeTranspose(){
 				T temp;
@@ -75,6 +109,8 @@ namespace yon{
 						m[j][i]=temp;
 					}
 				}
+				//不用调整，转置行为不影响是否单位变化
+				//m_bIsChanged = true;
 			}
 			//不存在逆矩阵则返回false
 			inline bool makeInverse(){
@@ -130,6 +166,9 @@ namespace yon{
 					}
 				}
 				*this=result;
+
+				//不用调整，取逆行为不影响是否单位变化
+				//m_bIsChanged = true;
 				return true;
 			}
 			inline void translate(T x,T y,T z){
@@ -137,11 +176,15 @@ namespace yon{
 				m[3][1]+=m[0][1]*x+m[1][1]*y+m[2][1]*z;
 				m[3][2]+=m[0][2]*x+m[1][2]*y+m[2][2]*z;
 				m[3][3]+=m[0][3]*x+m[1][3]*y+m[2][3]*z;
+
+				m_bIsChanged=true;
 			}
 			inline void setTranslation(T x,T y,T z){
 				m[3][0]=x;
 				m[3][1]=y;
 				m[3][2]=z;
+
+				m_bIsChanged=true;
 			}
 			inline void setTranslation( const vector3d<T>& v){
 				setTranslation(v.x,v.y,v.z);
@@ -156,6 +199,8 @@ namespace yon{
 				rot.makeIdentity();
 				rot.setRotation(degree,x,y,z);
 				*this*=rot;
+
+				m_bIsChanged=true;
 			}
 			inline void setRotation(f32 degree,f32 x,f32 y,f32 z){
 				f32 mag=sqrt(x*x+y*y+z*z);
@@ -205,6 +250,8 @@ namespace yon{
 					m[0][2] = (T)(oneMinusCos * zx) - ys;
 					m[1][2] = (T)(oneMinusCos * yz) + xs;
 					m[2][2] = (T)(oneMinusCos * zz) + cosAngle;
+
+					m_bIsChanged=true;
 				}
 			}
 			inline void scale(f32 x,f32 y,f32 z){
@@ -212,6 +259,8 @@ namespace yon{
 				temp.makeIdentity();
 				temp.setScale(x,y,z);
 				*this*=temp;
+
+				m_bIsChanged=true;
 			}
 			inline void scale(const vector3d<T>& v){
 				scale(v.x,v.y,v.z);
@@ -221,6 +270,8 @@ namespace yon{
 				m[1][1] = (T)y;
 				m[2][2] = (T)z;
 				m[3][3] = (T)1.0f;
+
+				m_bIsChanged=true;
 			}
 			inline matrix4<T> operator*(const matrix4<T>& other) const{
 				 matrix4<T> r;
@@ -231,11 +282,14 @@ namespace yon{
 				if(this==&other)
 					return *this;
 				memcpy(m,other.m,sizeof(m));
+				m_bIsChanged=other.m_bIsChanged;
+				m_bIsIdentity=other.m_bIsIdentity;
 				return *this;
 			}
 			inline matrix4<T>& operator*=(const matrix4<T>& other){
 				matrix4 temp(*this);
 				setByProduct(temp,other);
+				m_bIsChanged=true;
 				return *this;
 			}
 			inline bool operator==(const matrix4<T> &other) const
@@ -306,6 +360,8 @@ namespace yon{
 				m[2][1] = (T)( -sr );
 				m[2][2] = (T)( cr*cp );
 
+				m_bIsChanged=true;
+
 
 				return *this;
 			}
@@ -335,6 +391,8 @@ namespace yon{
 				frust.m[3][0] = frust.m[3][1] = frust.m[3][3] = (T)0.0f;
 
 				*this*=frust;
+
+				m_bIsChanged=true;
 			}
 			inline void ortho(f32 left, f32 right, float bottom, float top, float nearZ, float farZ)
 			{
@@ -363,6 +421,8 @@ namespace yon{
 				ort.m[3][3] = (T)1.0f;
 
 				*this*=ort;
+
+				m_bIsChanged=true;
 			}
 			inline void perspective(f32 fovy, f32 aspect, f32 nearZ, f32 farZ)
 			{
@@ -446,6 +506,8 @@ namespace yon{
 
 				*this*=mat;
 				translate(-eyex,-eyey,-eyez);
+
+				m_bIsChanged=true;
 			}
 		};
 

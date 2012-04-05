@@ -296,8 +296,18 @@ namespace yon{
 
 				return len == other.len;
 			}
+			s32 findFirst(T c) const
+			{
+				//TODO优化
+				for (u32 i=0; i<len; ++i)
+					if (elements[i] == c)
+						return i;
+
+				return -1;
+			}
 			s32 findLast(T c, s32 start = -1) const
 			{
+				//TODO优化
 				start = core::clamp(start<0?(s32)(len)-1:start, 0, (s32)(len) - 1);
 				for (s32 i=start; i>=0; --i)
 					if (elements[i] == c)
