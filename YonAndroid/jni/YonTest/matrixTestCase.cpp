@@ -1,9 +1,48 @@
 #include "matrixTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
 
 void matrixTestCase::setUp()
 {
+}
+void matrixTestCase::isIdentity(){
+	matrix4f m1;
+	CPPUNIT_ASSERT(m1.isIdentity()==false);
+	matrix4f m2(true);
+	CPPUNIT_ASSERT(m2.isIdentity()==true);
+	m1.makeIdentity();
+	CPPUNIT_ASSERT(m1.isIdentity()==true);
+	m2.makeIdentity();
+	CPPUNIT_ASSERT(m2.isIdentity()==true);
+
+	m1.makeTranspose();
+	CPPUNIT_ASSERT(m1.isIdentity()==true);
+	m2.setTranslation(1,1,1);
+	CPPUNIT_ASSERT(m2.isIdentity()==false);
+
+	m1*=m2;
+	CPPUNIT_ASSERT(m1.isIdentity()==false);
+
+	m2.setRotation(32,1,0,0);
+	CPPUNIT_ASSERT(m2.isIdentity()==false);
+
+	m1.makeIdentity();
+	m1*=m2;
+	CPPUNIT_ASSERT(m1.isIdentity()==false);
+
+	m2.makeIdentity();
+	m2.setScale(2,2,2);
+	CPPUNIT_ASSERT(m2.isIdentity()==false);
+	m1.makeIdentity();
+	m1*=m2;
+	CPPUNIT_ASSERT(m1.isIdentity()==false);
+
+	m1.makeIdentity();
+	m1.makeInverse();
+	CPPUNIT_ASSERT(m1.isIdentity()==true);
+	m2.setScale(2,2,2);
+	CPPUNIT_ASSERT(m2.isIdentity()==false);
+
 }
 void matrixTestCase::setRotationDegrees(){
 	matrix4f m1,m2;

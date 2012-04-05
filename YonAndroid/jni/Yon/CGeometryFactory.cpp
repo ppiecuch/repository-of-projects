@@ -337,22 +337,58 @@ namespace scene{
 		//CUnit* unit=new CUnit();
 		Shap3D* shap=new Shap3D();
 
-		f32 dtheta=(float)360/hSteps;	//水平方向步增
-		f32 dphi=(float)180/vSteps;		//垂直方向步增
+		f32 dtheta=(float)PI2/hSteps;	//水平方向步增
+		f32 dphi=(float)PI/vSteps;		//垂直方向步增
 
-		u32 numVertices=vSteps*hSteps<<2;
+		u32 numVertices=(vSteps+1)*(hSteps+1);
 		u32 numIndices=vSteps*hSteps*6;
 	
 		shap->m_vertices.reallocate(numVertices);
 		shap->m_indices.reallocate(numIndices);
 
-		u32 index=0;
-		//u32 index2=0;
 		f32 phi=0;
 		f32 theta=0;
 		f32 x,y,z;
 		f32 u,v;
-		vector3df temp;
+		u32 v0,v1,v2,v3;
+		for(u32 i=0;i<=vSteps;++i,phi+=dphi)
+		{
+			theta=0;
+			for(u32 j=0;j<=hSteps;++j,theta+=dtheta)
+			{
+				z = (f32) (radius * sinf(phi) * cosf(theta));
+				x = (f32) (radius * sinf(phi) * sinf(theta));
+				y = (f32) (radius * cosf(phi));
+
+				u = (f32)j/hSteps;
+				v = (f32)(vSteps-i)/vSteps;
+				shap->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
+
+				//Logger->debug("v[%d][%d]={%.2f,%.2f,%.2f}\n",i,j,x,y,z);
+			}
+		}
+		u32 count=hSteps+1;
+		for(u32 i=0;i<vSteps;++i)
+		{
+			for(u32 j=0;j<hSteps;++j)
+			{
+				v0=i*count+j;
+				v1=(i+1)*count+j;
+				v2=(i+1)*count+j+1;
+				v3=i*count+j+1;
+
+				shap->m_indices.push(v0);
+				shap->m_indices.push(v1);
+				shap->m_indices.push(v2);
+				shap->m_indices.push(v0);
+				shap->m_indices.push(v2);
+				shap->m_indices.push(v3);
+
+				//Logger->debug("i[%d][%d]=%d,%d,%d--%d,%d,%d\n",i,j,v0,v1,v2,v0,v2,v3);
+
+			}
+		}
+#if 0
 		for(u32 i=0;i<vSteps;++i,phi+=dphi)
 		{
 			for(u32 j=0;j<hSteps;++j,theta+=dtheta)
@@ -460,70 +496,13 @@ namespace scene{
 				}*/
 			}
 		}
+#endif
+		Logger->debug("shpere.v:%d,i:%d\n",shap->getVertexCount(),shap->getIndexCount());
 
 		//CEntity* entity=new CEntity();
 		//entity->addUnit(unit);
 
 		//unit->drop();
-
-		/*
-		private void build()
-		{
-		int r, c;
-
-		Number3d n = new Number3d();
-		Number3d pos = new Number3d();
-		Number3d posFull = new Number3d();
-
-		if( defaultColor() == null ) defaultColor(new Color4());
-		// Build vertices
-
-		for (r = 0; r <= _rows; r++)
-		{
-		float v = (float)r / (float)_rows; // [0,1]
-		float theta1 = v * (float)Math.PI; // [0,PI]
-
-		n.setAll(0,1,0);
-		n.rotateZ(theta1); 
-
-		// each 'row' assigned random color. for the hell of it.
-
-		for (c = 0; c <= _cols; c++)
-		{
-		float u = (float)c / (float)_cols; // [0,1]
-		float theta2 = u * (float)(Math.PI * 2f); // [0,2PI]
-		pos.setAllFrom(n);
-		pos.rotateY(theta2);
-
-		posFull.setAllFrom(pos);
-		posFull.multiply(_radius);
-
-
-		this.vertices().addVertex(posFull.x,posFull.y,posFull.z,  u,v,  pos.x,pos.y,pos.z,  defaultColor().r,defaultColor().g,defaultColor().b,defaultColor().a);
-		}
-		}
-
-
-		// Add faces
-
-		int colLength = _cols + 1;
-
-		for (r = 0; r < _rows; r++)
-		{
-		int offset = r * colLength; 
-
-		for (c = 0; c < _cols; c++)
-		{
-		int ul = offset  +  c;
-		int ur = offset  +  c+1;
-		int br = offset  +  (int)(c + 1 + colLength);
-		int bl = offset  +  (int)(c + 0 + colLength);
-
-		Utils.addQuad(this, ul,ur,br,bl);
-		}
-		}
-		}
-		*/
 
 		return shap;
 	}
@@ -532,7 +511,9 @@ namespace scene{
 	//y=(R+r*cosθ)sinΦ
 	//z=r*sinθ
 	IShap* CGeometryFactory::createTorus(f32 cirRadius,f32 orbitRadius,u32 cirSteps,u32 orbitSteps,const video::SColor& color) const{
-		Shap3D* shap=new Shap3D();
+		
+		
+		/*Shap3D* shap=new Shap3D();
 
 		f32 dtheta=(float)PI2/cirSteps;		//形圆角步增
 		f32 dphi=(float)PI2/orbitSteps;		//轨圆角步增
@@ -591,6 +572,59 @@ namespace scene{
 				shap->m_indices.push(index-4);//0
 				shap->m_indices.push(index-2);//2
 				shap->m_indices.push(index-1);//3
+			}
+		}*/
+
+		Shap3D* shap=new Shap3D();
+
+		f32 dtheta=(float)PI2/cirSteps;		//形圆角步增
+		f32 dphi=(float)PI2/orbitSteps;		//轨圆角步增
+
+		u32 numVertices=(orbitSteps+1)*(cirSteps+1);
+		u32 numIndices=orbitSteps*cirSteps*6;
+
+		shap->m_vertices.reallocate(numVertices);
+		shap->m_indices.reallocate(numIndices);
+
+		f32 phi=0;
+		f32 theta=0;
+		f32 x,y,z;
+		f32 u,v;
+		u32 v0,v1,v2,v3;
+		for(u32 i=0;i<=orbitSteps;++i,phi+=dphi)
+		{
+			theta=0;
+			for(u32 j=0;j<=cirSteps;++j,theta+=dtheta)
+			{
+				x = (f32) ((cirRadius * cosf(theta)+orbitRadius)*cosf(phi));
+				y = (f32) ((cirRadius * cosf(theta)+orbitRadius)*sinf(phi));
+				z = (f32) (cirRadius * sinf(theta));
+				u = (f32)i/orbitSteps;
+				v = (f32)j/cirSteps;
+				shap->m_vertices.push(SVertex(x,y,z,u,v,color));
+
+				//Logger->debug("v[%d][%d]={%.2f,%.2f,%.2f}\n",i,j,x,y,z);
+			}
+		}
+		u32 count=cirSteps+1;
+		for(u32 i=0;i<orbitSteps;++i)
+		{
+			for(u32 j=0;j<cirSteps;++j)
+			{
+				v0=i*count+j;
+				v1=(i+1)*count+j;
+				v2=(i+1)*count+j+1;
+				v3=i*count+j+1;
+
+				shap->m_indices.push(v0);
+				shap->m_indices.push(v1);
+				shap->m_indices.push(v2);
+				shap->m_indices.push(v0);
+				shap->m_indices.push(v2);
+				shap->m_indices.push(v3);
+
+				//Logger->debug("i[%d][%d]=%d,%d,%d--%d,%d,%d\n",i,j,v0,v1,v2,v0,v2,v3);
+
 			}
 		}
 

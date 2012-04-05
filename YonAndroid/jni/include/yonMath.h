@@ -86,6 +86,26 @@ inline f32 reciprocal(const f32 f)
 	return 1.f/f;
 }
 
+inline bool iszero(const f64 a, const f64 tolerance = ROUNDING_ERROR_f64)
+{
+	return fabs(a) <= tolerance;
+}
+
+inline bool iszero(const f32 a, const f32 tolerance = ROUNDING_ERROR_f32)
+{
+	return fabsf(a) <= tolerance;
+}
+
+inline bool iszero(const s32 a, const s32 tolerance = 0)
+{
+	return ( a & 0x7ffffff ) <= tolerance;
+}
+
+inline bool iszero(const u32 a, const u32 tolerance = 0)
+{
+	return a <= tolerance;
+}
+
 }//core
 }//yon
 

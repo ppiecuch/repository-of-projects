@@ -15,7 +15,8 @@ class matrixTestCase : public CPPUNIT_NS::TestFixture
 {
 	CPPUNIT_TEST_SUITE( matrixTestCase );
 	//CPPUNIT_TEST( rotateVector );
-	CPPUNIT_TEST( setRotationDegrees );
+	//CPPUNIT_TEST( setRotationDegrees );
+	CPPUNIT_TEST( isIdentity );
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -24,6 +25,7 @@ public:
 protected:
 	void rotateVector();
 	void setRotationDegrees();
+	void isIdentity();
 };
 
 #endif

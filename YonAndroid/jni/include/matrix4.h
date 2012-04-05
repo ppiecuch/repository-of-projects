@@ -42,7 +42,7 @@ namespace yon{
 
 				for (s32 i=0; i<4; ++i)
 					for (s32 j=0; j<4; ++j)
-						if ((j != i) && (!iszero((*this)(i,j)))){
+						if ((j != i) && (!iszero(m[i][j]))){
 							m_bIsIdentity=false;
 							return;
 						}
@@ -83,7 +83,7 @@ namespace yon{
 			const T* pointer() const { return &m[0][0]; }
 			T* pointer() { return &m[0][0];}
 
-			inline bool isIdentity() const
+			inline bool isIdentity()
 			{
 				if(m_bIsChanged)
 					checkIdentity();
