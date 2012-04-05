@@ -30,6 +30,8 @@
 			'glCompressedTexSubImage2D ' +
 			'glDisable ' +
 			'glEnable ' +
+			'glLoadMatrix ' +
+			'glMatrixMode ' +
 			'glPixelStorei ' +
 			'glReadPixels ' +
 			'glScissor ' +

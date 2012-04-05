@@ -50,6 +50,43 @@
 			</thead>
 			<tbody>
 			<tr>
+				<td>void glLoadMatrixf(const GLfloat * m);<br>void glLoadMatrixx(const GLfixed * m);</td>
+				<td>支持</td>
+				<td>不支持</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+glLoadMatrix replaces the current matrix with the one whose elements are specified by m. 
+The current matrix is the projection matrix, modelview matrix, or texture matrix, depending on the current matrix mode (see glMatrixMode).
+
+The current matrix, M, defines a transformation of coordinates. 
+For instance, assume M refers to the modelview matrix. 
+If v= v[0] v[1] v[2] v[3] is the set of object coordinates of a vertex, and m points to an array of 16 fixed-point or single-precision floating-point values m[0], m[1], ... m[15] , 
+then the modelview transformation Mv does the following:
+Mv= ( m[0] m[4] m[8] m[12] m[1] m[5] m[9] m[13] m[2] m[6] m[10] m[14] m[3] m[7] m[11] m[15] ) x ( v[0] v[1] v[2] v[3] )
+Where ``x'' denotes matrix multiplication.
+
+Projection and texture transformations are similarly defined.
+【参数】
+m
+Specifies a pointer to 16 consecutive values, which are used as the elements of a 4x4 column-major matrix.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+
+</pre>
+				</td>
+			</tr>
+			<tr>
 				<td>void glPixelStorei(GLenum pname,GLint param);</td>
 				<td>支持</td>
 				<td>&nbsp;</td>
