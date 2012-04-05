@@ -26,6 +26,7 @@
 			'GLuint '
 			;
 		var functions =
+			'glActiveTexture ' +
 			'glCompressedTexImage2D ' +
 			'glCompressedTexSubImage2D ' +
 			'glDisable ' +
@@ -39,8 +40,11 @@
 			'glTexSubImage2D '
 			;
 		var constants =	
+			'GL_MAX_TEXTURE_UNITS ' +
 			'GL_PACK_ALIGNMENT ' +
 			'GL_SCISSOR_TEST ' +
+			'GL_TEXTURE0 ' +
+			'GL_TEXTUREi ' +
 			'GL_UNPACK_ALIGNMENT '
 			;
 

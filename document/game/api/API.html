@@ -50,6 +50,37 @@
 			</thead>
 			<tbody>
 			<tr>
+				<td>void glActiveTexture(GLenum texture)</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+glActiveTexture selects which texture unit subsequent texture state calls will affect. 
+The number of texture units an implementation supports is implementation dependent, it must be at least 2.
+【参数】
+texture
+Specifies which texture unit to make active. 
+The number of texture units is implementation dependent, but must be at least two. 
+texture must be one of GL_TEXTUREi, where 0 <= i < GL_MAX_TEXTURE_UNITS , which is an implementation-dependent value. 
+The intial value is GL_TEXTURE0.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+http://www.khronos.org/opengles/sdk/1.1/docs/man/
+</pre>
+				</td>
+			</tr>
+			<tr>
 				<td>void glLoadMatrixf(const GLfloat * m);<br>void glLoadMatrixx(const GLfixed * m);</td>
 				<td>支持</td>
 				<td>不支持</td>
