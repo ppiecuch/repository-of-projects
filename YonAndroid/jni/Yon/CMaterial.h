@@ -48,6 +48,27 @@ namespace video{
 		{
 			return i < MATERIAL_MAX_TEXTURES ? m_textureLayers[i].texture : 0;
 		}
+
+		virtual ENUM_WRAP_MODE getWrapModeU(u32 index) const{
+			return m_textureLayers[index].wrapU;
+		}
+		virtual void setWrapModeU(u32 index,ENUM_WRAP_MODE mode){
+			m_textureLayers[index].wrapU=mode;
+		}
+		virtual ENUM_WRAP_MODE getWrapModeV(u32 index) const{
+			return m_textureLayers[index].wrapV;
+		}
+		virtual void setWrapModeV(u32 index,ENUM_WRAP_MODE mode){
+			m_textureLayers[index].wrapV=mode;
+		}
+
+
+		virtual void setTextureMatrix(u32 index, const core::matrix4f& mat){
+			m_textureLayers[index].textureMatrix=mat;
+		}
+		virtual const core::matrix4f& getTextureMatrix(u32 index) const{
+			return m_textureLayers[index].textureMatrix;
+		}
 	};
 }//video
 }//yon

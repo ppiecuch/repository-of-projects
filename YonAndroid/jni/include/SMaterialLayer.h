@@ -1,19 +1,14 @@
 #ifndef _YON_VIDEO_SMATERIALLAYER_H_
 #define _YON_VIDEO_SMATERIALLAYER_H_
 
-#include "ITexture.h"
+#include "IMaterial.h"
 
 namespace yon{
 namespace video{
 
-	enum ENUM_WRAP_MODE
-	{
-		ENUM_WRAP_MODE_REPEAT = 0,
-		ENUM_WRAP_MODE_CLAMP_TO_EDGE,
-		ENUM_WRAP_MODE_COUNT
-	};
 	struct SMaterialLayer{
 		ITexture* texture;
+		core::matrix4f textureMatrix;
 		bool bilinearFilter;
 		ENUM_WRAP_MODE wrapU,wrapV;
 
@@ -21,7 +16,8 @@ namespace video{
 			:texture(NULL),
 			wrapU(ENUM_WRAP_MODE_REPEAT),
 			wrapV(ENUM_WRAP_MODE_REPEAT),
-			bilinearFilter(true)
+			bilinearFilter(true),
+			textureMatrix(core::IDENTITY_MATRIX)
 		{}
 		SMaterialLayer(const SMaterialLayer& other)
 		{
