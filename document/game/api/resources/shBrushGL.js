@@ -40,12 +40,23 @@
 			'glTexSubImage2D '
 			;
 		var constants =	
+			'GL_DST_ALPHA ' +
+			'GL_DST_COLOR ' +
 			'GL_MAX_TEXTURE_UNITS ' +
+			'GL_ONE ' +
+			'GL_ONE_MINUS_DST_ALPHA ' +
+			'GL_ONE_MINUS_DST_COLOR ' +
+			'GL_ONE_MINUS_SRC_ALPHA ' +
+			'GL_ONE_MINUS_SRC_COLOR ' +
 			'GL_PACK_ALIGNMENT ' +
 			'GL_SCISSOR_TEST ' +
+			'GL_SRC_ALPHA ' +
+			'GL_SRC_ALPHA_SATURATE ' +
+			'GL_SRC_COLOR ' +
 			'GL_TEXTURE0 ' +
 			'GL_TEXTUREi ' +
-			'GL_UNPACK_ALIGNMENT '
+			'GL_UNPACK_ALIGNMENT ' +
+			'GL_ZERO' 
 			;
 
 		var r = SyntaxHighlighter.regexLib;
