@@ -81,6 +81,39 @@ http://www.khronos.org/opengles/sdk/1.1/docs/man/
 				</td>
 			</tr>
 			<tr>
+				<td>void glBlendFunc(GLenum sfactor,GLenum dfactor);</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+【参数】
+sfactor
+Specifies how the red, green, blue, and alpha source blending factors are computed. The following symbolic constants are accepted: 
+GL_ZERO, GL_ONE, GL_DST_COLOR, GL_ONE_MINUS_DST_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA, and GL_SRC_ALPHA_SATURATE. 
+The initial value is GL_ONE.
+
+dfactor
+Specifies how the red, green, blue, and alpha destination blending factors are computed. Eight symbolic constants are accepted: 
+GL_ZERO, GL_ONE, GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_DST_ALPHA, and GL_ONE_MINUS_DST_ALPHA. 
+The initial value is GL_ZERO.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+
+</pre>
+				</td>
+			</tr>
+			<tr>
 				<td>void glLoadMatrixf(const GLfloat * m);<br>void glLoadMatrixx(const GLfixed * m);</td>
 				<td>支持</td>
 				<td>不支持</td>
