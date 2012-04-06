@@ -40,7 +40,7 @@
 #define YON_DEPRECATED __declspec(deprecated)
 
 //材质（目前只支持一层）
-#define YON_MATERIAL_MAX_TEXTURES 1
+#define YON_MATERIAL_MAX_TEXTURES 2
 
 //宏修正
 #ifdef YON_COMPILE_WITH_WIN32

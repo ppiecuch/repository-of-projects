@@ -18,14 +18,14 @@ namespace video{
 
 		CMaterial()
 			:m_materialType(ENUM_MATERIAL_TYPE_SOLID),m_polygonMode(ENUM_POLYGON_MODE_FILL){
-				Logger->setAppender(MASK_APPENDER_VS);
-				Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
-				Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS|MASK_APPENDER_SCREEN);
+				//Logger->setAppender(MASK_APPENDER_VS);
+				//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
+				//Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
 		}
 		~CMaterial(){
-			Logger->setAppender(MASK_APPENDER_VS);
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CMaterial");
-			Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS|MASK_APPENDER_SCREEN);
+			//Logger->setAppender(MASK_APPENDER_VS);
+			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CMaterial");
+			//Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
 		}
 
 		virtual ENUM_MATERIAL_TYPE getMaterialType() const{

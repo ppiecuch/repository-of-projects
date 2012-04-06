@@ -4,7 +4,7 @@
 #include <crtdbg.h>
 #include <typeinfo>
 
-#include <vld.h>
+//#include <vld.h>
 
 inline void EnableMemLeakCheck()
 {
@@ -44,7 +44,7 @@ struct Object : public virtual core::IReferencable{
 #define _CRTDBG_MAP_ALLOC
 int main(int argc, char* argv[])
 {
-	//EnableMemLeakCheck();
+	EnableMemLeakCheck();
 
 	//setlocale(LC_ALL,"chs");
 	setlocale(LC_CTYPE,"UTF-8");
@@ -62,6 +62,7 @@ int main(int argc, char* argv[])
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	ITimer* timer=engine->getTimer();
 
+	Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
 	Logger->debug("time:%d\n",timer->getTime());
 
 	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,300));
@@ -91,7 +92,7 @@ int main(int argc, char* argv[])
 	//IImage* image=driver->createImageFromFile("D:/test.png");
 	//image->drop();
 
-	shap=geometryFty->createSphere(80,16,16);
+	/*shap=geometryFty->createSphere(80,16,16);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	IModel* sphereModel=sceneMgr->addModel(entity);
@@ -116,7 +117,7 @@ int main(int argc, char* argv[])
 	material->setTexture(0,driver->getTexture("../media/gunny.png"));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
 	
 
@@ -165,12 +166,12 @@ int main(int argc, char* argv[])
 	unit->drop();
 	shap1->drop();
 
-	shap=geometryFty->createXYRectangle(-25,-25,25,25);
+	shap=geometryFty->createXYRectangle(-25,-25,25,25,0,0,1,1,video::SColor(0x55FFFFFF));
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	IModel* coatModel=sceneMgr->addModel(entity);
 	material=coatModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_COAT);
 	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	coatModel->setPosition(core::vector3df(350,320,0));
 	material->setTexture(0,driver->getTexture("../media/dirt.png"));
@@ -221,8 +222,8 @@ int main(int argc, char* argv[])
 		const core::vector3df crot=cubeModel->getRotation();
 		cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
-		const core::vector3df srot=sphereModel->getRotation();
-		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.8f ,srot.z));
+		//const core::vector3df srot=sphereModel->getRotation();
+		//sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.8f ,srot.z));
 
 		const core::vector3df psca=planeModel->getScale();
 		if(psca.x>4)
@@ -231,8 +232,8 @@ int main(int argc, char* argv[])
 			factor=1.01f;
 		planeModel->setScale(psca*factor);
 
-		const core::vector3df trot=toruseModel->getRotation();
-		toruseModel->setRotation(core::vector3df(trot.x+1.0f,trot.y,trot.z));
+		//const core::vector3df trot=toruseModel->getRotation();
+		//toruseModel->setRotation(core::vector3df(trot.x+1.0f,trot.y,trot.z));
 
 		//const core::vector3df sca=model->getScale();
 		//model->setScale(core::vector3df(sca.x+0.001f,sca.y+0.001f,sca.z+0.001f));
@@ -244,9 +245,9 @@ int main(int argc, char* argv[])
 		//driver->setMaterial(DEFAULT_MATERIAL);
 		//driver->draw2DImage(tex,ORIGIN_POSITION2DI,core::recti(ORIGIN_POSITION2DI,tex->getSize()),NULL,COLOR_BLACK);
 
-		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::position2di(0,driver->getCurrentRenderTargetSize().h-8),COLOR_GREEN);
+		//Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::position2di(0,driver->getCurrentRenderTargetSize().h-8),COLOR_GREEN);
 
-		Logger->render();
+		//Logger->render();
 		//driver->endScene();
 		//Sleep(20);
 		//printf("run\n");
