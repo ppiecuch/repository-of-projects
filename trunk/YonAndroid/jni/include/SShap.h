@@ -114,6 +114,7 @@ namespace scene{
 	};
 
 	typedef SShap<SVertex,u16,ENUM_DIMEN_MODE_3D> Shap3D;
+	typedef SShap<SVertex2TCoords,u16,ENUM_DIMEN_MODE_3D> Shap3D2T;
 	typedef SShap<S2DVertex,u16,ENUM_DIMEN_MODE_2D> Shap2D;
 } 
 }

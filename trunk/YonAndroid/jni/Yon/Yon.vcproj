@@ -458,6 +458,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\SUnit.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\SVertex.h"
 					>
 				</File>
