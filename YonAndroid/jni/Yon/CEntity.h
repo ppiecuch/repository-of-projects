@@ -10,9 +10,10 @@ namespace yon{
 
 		class CEntity : public IEntity{
 		protected:
-			const ENUM_DIMEN_MODE m_mode;
+			//const ENUM_DIMEN_MODE m_mode;
+			//const ENUM_VERTEX_TYPE m_mode;
 		public:
-			CEntity(ENUM_DIMEN_MODE mode=ENUM_DIMEN_MODE_3D):m_mode(mode){}
+			//CEntity(ENUM_VERTEX_TYPE mode=ENUM_VERTEX_TYPE_3V1T1C):m_mode(mode){}
 			virtual ~CEntity(){
 				for(u32 i=0;i<m_units.size();++i){
 					m_units[i]->drop();
@@ -31,9 +32,9 @@ namespace yon{
 					m_units.push(unit);
 				}
 			}
-			virtual ENUM_DIMEN_MODE getDimenMode() const{
+			/*virtual ENUM_VERTEX_TYPE getVertexMode() const{
 				return m_mode;
-			}
+			}*/
 		private:
 			core::array<IUnit*> m_units;
 		};

@@ -51,7 +51,7 @@ namespace yon{
 
 				virtual void drawUnit(scene::IUnit* unit);
 				virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,const core::recti& sourceRect, const core::recti* clipRect,video::SColor color, bool useAlphaChannelOfTexture);
-				virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indexList, u32 primCount,ENUM_PRIMITIVE_TYPE pType,ENUM_INDEX_TYPE iType);
+				virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,ENUM_PRIMITIVE_TYPE pType,scene::ENUM_VERTEX_TYPE vType);
 
 				virtual bool checkGLError(const c8* file,s32 line);
  

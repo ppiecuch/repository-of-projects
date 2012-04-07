@@ -10,13 +10,16 @@ namespace yon{
 namespace scene{
 
 	CSceneManager::CSceneManager()
-			:m_geometryFactory(new CGeometryFactory()),m_activeCamera(NULL),
+		:m_geometryFactory(new CGeometryFactory()),
+		m_pAnimatorFactory(animator::createAnimatorFactory()),
+		m_activeCamera(NULL),
 		IModel(NULL){
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance CSceneManager");
 	}
 
 	CSceneManager::~CSceneManager(){
 		m_geometryFactory->drop();
+		m_pAnimatorFactory->drop();
 
 		for(u32 i=0;i<m_cameras.size();++i){
 			m_cameras[i]->drop();
@@ -79,6 +82,10 @@ namespace scene{
 
 	IGeometryFactory* CSceneManager::getGeometryFactory() const{
 		return m_geometryFactory;
+	}
+
+	animator::IAnimatorFactory* CSceneManager::getAnimatorFactory() const{
+		return m_pAnimatorFactory;
 	}
 
 	bool CSceneManager::postEventFromUser(const event::SEvent& evt){

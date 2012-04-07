@@ -64,10 +64,12 @@ typedef char fschar;
 #define OutputDebugStringA(args...)
 #endif
 
+/*
 enum ENUM_DIMEN_MODE{
 	ENUM_DIMEN_MODE_2D = 2,
 	ENUM_DIMEN_MODE_3D = 3
 };
+*/
 
 }//yon
 

@@ -32,6 +32,8 @@ namespace yon{
 			ENUM_TRANSFORM_VIEW = 0,		//视图空间矩阵
 			ENUM_TRANSFORM_WORLD,			//世界空间矩阵
 			ENUM_TRANSFORM_PROJECTION,		//投影空间矩阵
+			ENUM_TRANSFORM_TEXTURE0,		//纹理0矩阵
+			ENUM_TRANSFORM_TEXTURE1,		//纹理1矩阵
 			ENUM_TRANSFORM_COUNT
 		};
 
@@ -45,7 +47,10 @@ namespace yon{
 		#define GL_TRIANGLE_FAN                   0x0006
 		*/
 		enum ENUM_PRIMITIVE_TYPE{
+			ENUM_PRIMITIVE_TYPE_POINTS = 0x0000,
+			ENUM_PRIMITIVE_TYPE_LINES = 0x0001,
 			ENUM_PRIMITIVE_TYPE_TRIANGLES = 0x0004,
+			ENUM_PRIMITIVE_TYPE_TRIANGLE_STRIP = 0x0005,
 			ENUM_PRIMITIVE_TYPE_COUNT = 1
 		};
 
@@ -112,9 +117,9 @@ namespace yon{
 				const core::recti& sourceRect, const core::recti* clipRect =NULL,
 				video::SColor color=video::COLOR_WHITE, bool useAlphaChannelOfTexture=false) =0;
 			virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,
-				const void* indexList, u32 primCount,
+				const void* indice, u32 indexCount,
 				ENUM_PRIMITIVE_TYPE pType=ENUM_PRIMITIVE_TYPE_TRIANGLES,
-				ENUM_INDEX_TYPE iType=ENUM_INDEX_TYPE_16BIT) =0;
+				scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) =0;
 			virtual u32 getFPS() const = 0;
 		};
 	}

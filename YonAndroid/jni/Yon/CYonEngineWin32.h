@@ -60,7 +60,8 @@ namespace yon{
 			io::IFileSystem* m_pFileSystem;
 			ITimer* m_pTimer;
 
-			event::IEventListener* m_pUserListener;
+			//TODO是否有存在必要，改名？
+			event::IEventReceiver* m_pUserListener;
 
 			bool m_bClose;
 			bool m_bResized;

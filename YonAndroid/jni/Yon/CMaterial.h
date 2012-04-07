@@ -70,7 +70,7 @@ namespace video{
 		virtual void setTextureMatrix(u32 index, const core::matrix4f& mat){
 			m_textureLayers[index].textureMatrix=mat;
 		}
-		virtual const core::matrix4f& getTextureMatrix(u32 index) const{
+		virtual core::matrix4f& getTextureMatrix(u32 index){
 			return m_textureLayers[index].textureMatrix;
 		}
 	};

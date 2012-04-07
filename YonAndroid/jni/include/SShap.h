@@ -10,7 +10,7 @@ namespace scene{
 
 	class CGeometryFactory;
 
-	template<class V,class I,size_t M>
+	template<class V,class I,size_t VT>
 	class SShap : public IShap{
 	protected:
 		core::array<V> m_vertices;
@@ -101,21 +101,25 @@ namespace scene{
 		}
 
 		virtual void append(const IShap* const other){
-			YON_DEBUG_BREAK_IF(getDimenMode()!=other->getDimenMode());
+			YON_DEBUG_BREAK_IF(getVertexType()!=other->getVertexType());
 			if (this==other)
 				return;
 
 			append(other->getVertices(),other->getVertexCount(),other->getIndices(),other->getIndexCount());
 		}
 
-		virtual ENUM_DIMEN_MODE getDimenMode() const{
+		/*virtual ENUM_DIMEN_MODE getDimenMode() const{
 			return static_cast<const ENUM_DIMEN_MODE>(M);
+		}*/
+
+		virtual ENUM_VERTEX_TYPE getVertexType() const{
+			return static_cast<const ENUM_VERTEX_TYPE>(VT);
 		}
 	};
 
-	typedef SShap<SVertex,u16,ENUM_DIMEN_MODE_3D> Shap3D;
-	typedef SShap<SVertex2TCoords,u16,ENUM_DIMEN_MODE_3D> Shap3D2T;
-	typedef SShap<S2DVertex,u16,ENUM_DIMEN_MODE_2D> Shap2D;
+	typedef SShap<SVertex,u16,ENUM_VERTEX_TYPE_3V1T1C> Shap3D;
+	typedef SShap<SVertex2TCoords,u16,ENUM_VERTEX_TYPE_3V2T1C> Shap3D2T;
+	typedef SShap<S2DVertex,u16,ENUM_VERTEX_TYPE_2V1T1C> Shap2D;
 } 
 }
 #endif

@@ -139,7 +139,6 @@ namespace ogles1{
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-			glActiveTexture(GL_TEXTURE0);
 			m_pDriver->setTexture(0, material->getTexture(0));
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
@@ -149,7 +148,6 @@ namespace ogles1{
 			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			
 
-			glActiveTexture(GL_TEXTURE1);
 			m_pDriver->setTexture(1, material->getTexture(1));
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
@@ -162,10 +160,8 @@ namespace ogles1{
 
 		}
 		virtual void onUnsetMaterial(){
-			glActiveTexture(GL_TEXTURE1);
 			m_pDriver->setTexture(1, NULL);
-			glActiveTexture(GL_TEXTURE0);
-
+			m_pDriver->setTexture(0, NULL);
 			glDisable(GL_BLEND);
 		}
 	};

@@ -2,6 +2,7 @@
 #define _YON_SCENE_ISHAP_H_
 
 #include "IReferencable.h"
+#include "SVertex.h"
 
 namespace yon{
 	namespace scene{
@@ -19,7 +20,7 @@ namespace yon{
 			virtual void append(const  void* const vertices, u32 numVertices, const void* const indices, u32 numIndices) = 0;
 			virtual void append(const IShap* const other) = 0;
 
-			virtual ENUM_DIMEN_MODE getDimenMode() const = 0;
+			virtual ENUM_VERTEX_TYPE getVertexType() const = 0;
 		};
 	} 
 }

@@ -5,6 +5,7 @@
 #include "yonArray.h"
 #include "CMaterial.h"
 
+/*
 namespace yon{
 	namespace scene{
 		class CGeometryFactory;
@@ -98,4 +99,5 @@ namespace yon{
 		};
 	}//scene
 }//yon
+*/
 #endif

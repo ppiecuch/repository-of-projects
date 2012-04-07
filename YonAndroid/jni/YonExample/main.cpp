@@ -21,6 +21,7 @@ using namespace yon::io;
 using namespace yon::video;
 using namespace yon::scene;
 using namespace yon::scene::camera;
+using namespace yon::scene::animator;
 
 #pragma comment(lib, "Yon.lib")
 
@@ -61,8 +62,9 @@ int main(int argc, char* argv[])
 	IFileSystem* fs=engine->getFileSystem();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	ITimer* timer=engine->getTimer();
+	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 
-	Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
+	//Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
 	Logger->debug("time:%d\n",timer->getTime());
 
 	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,300));
@@ -99,7 +101,7 @@ int main(int argc, char* argv[])
 	material=sphereModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
-	sphereModel->setPosition(core::vector3df(300,100,100));
+	sphereModel->setPosition(core::vector3df(300,100,0));
 	material->setTexture(0,driver->getTexture("../media/earth.png"));
 	shap->drop();
 	unit->drop();
@@ -150,7 +152,7 @@ int main(int argc, char* argv[])
 	nav->drop();*/
 
 	
-	shap1=geometryFty->createXYRectangle(0,0,128,128,0,0,1,1);
+	/*shap1=geometryFty->createXYRectangle(0,0,128,128,0,0,1,1);
 	shap2=geometryFty->createXYRectangle(128,0,256,128,0,0,1,1);
 	shap1->append(shap2);
 	shap2->drop();
@@ -164,20 +166,30 @@ int main(int argc, char* argv[])
 	//material->setTexture(0,Logger->getDebugPrinter()->getTexture());
 	nav->drop();
 	unit->drop();
-	shap1->drop();
+	shap1->drop();*/
 
-	shap=geometryFty->createXYRectangle(-25,-25,25,25);
+	
+
+	shap=geometryFty->createXYRectangle2T(-25,-50,25,50,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	IModel* coatModel=sceneMgr->addModel(entity);
-	material=coatModel->getMaterial(0);
+	IModel* waterfallModel=sceneMgr->addModel(entity);
+	material=waterfallModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_MASK);
-	coatModel->setPosition(core::vector3df(250,220,0));
+	waterfallModel->setPosition(core::vector3df(300,100,120));
 	material->setTexture(0,driver->getTexture("../media/waterfall.png"));
 	material->setTexture(1,driver->getTexture("../media/mask.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
+
+	SAnimatorParam aniParam;
+	aniParam.type=ENUM_ANIMATOR_TYPE_UV;
+	aniParam.animatorUV.unitIndex=0;
+	aniParam.animatorUV.stage=0;
+	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
+	waterfallModel->addAnimator(uvAnimator);
+	uvAnimator->drop();
 
 
 	/*ILogger* logger=Logger;

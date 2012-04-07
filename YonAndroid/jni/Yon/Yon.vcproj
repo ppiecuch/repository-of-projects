@@ -242,6 +242,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\position3d.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\randomizer.h"
 					>
 				</File>
@@ -314,7 +318,11 @@
 				Name="event"
 				>
 				<File
-					RelativePath="..\include\IEventListener.h"
+					RelativePath="..\include\IEventReceiver.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IEventSender.h"
 					>
 				</File>
 			</Filter>
@@ -501,7 +509,27 @@
 					Name="animator"
 					>
 					<File
+						RelativePath=".\CAnimatorFactory.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CAnimatorFactory.h"
+						>
+					</File>
+					<File
+						RelativePath=".\CAnimatorSurround.h"
+						>
+					</File>
+					<File
+						RelativePath=".\CAnimatorUV.h"
+						>
+					</File>
+					<File
 						RelativePath="..\include\IAnimator.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\IAnimatorFactory.h"
 						>
 					</File>
 				</Filter>
