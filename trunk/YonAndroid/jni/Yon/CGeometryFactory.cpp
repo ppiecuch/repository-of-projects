@@ -1,9 +1,10 @@
 #include "CGeometryFactory.h"
 #include "SVertex.h"
-#include "CUnit.h"
+//#include "CUnit.h"
 #include "CEntity.h"
-#include "CUnit2D.h"
+//#include "CUnit2D.h"
 #include "yonMath.h"
+#include "SUnit.h"
 
 #include "ILogger.h"
 
@@ -40,28 +41,70 @@ namespace scene{
 
 	}
 
+	IShap* CGeometryFactory::createXYRectangle2T(s32 x0,s32 y0,s32 x1,s32 y1,f32 u0,f32 v0,f32 u1,f32 v1,f32 s0,f32 t0,f32 s1,f32 t1,const video::SColor& color) const{
+		Shap3D2T* shap=new Shap3D2T();
+
+		// Create indices
+		const static u8 u[6] = {0,  1,  3,  3,  1,  2};
+
+		shap->m_indices.reallocate(6);
+		for (u32 i=0; i<6; ++i)
+			shap->m_indices.push(u[i]);
+
+		//Create vertexs
+		shap->m_vertices.reallocate(4);
+
+		shap->m_vertices.push(SVertex2TCoords((f32)x0,(f32)y0,0,u0,v0,s0,t0,color));
+		shap->m_vertices.push(SVertex2TCoords((f32)x1,(f32)y0,0,u1,v0,s1,t0,color));
+		shap->m_vertices.push(SVertex2TCoords((f32)x1,(f32)y1,0,u1,v1,s1,t1,color));
+		shap->m_vertices.push(SVertex2TCoords((f32)x0,(f32)y1,0,u0,v1,s0,t1,color));
+
+		return shap;
+	}
+
 	IUnit* CGeometryFactory::createUnit(IShap* shap)const {
-		if(shap->getDimenMode()==ENUM_DIMEN_MODE_2D){
-			CUnit2D* unit=new CUnit2D();
+		switch(shap->getVertexType())
+		{
+		case ENUM_VERTEX_TYPE_2V1T1C:
+			{
+				Unit2D* unit=new Unit2D();
+				unit->setShap(shap);
+				return unit;
+			}
+		case ENUM_VERTEX_TYPE_3V1T1C:
+			{
+				Unit3D* unit=new Unit3D();
+				unit->setShap(shap);
+				return unit;
+			}
+		case ENUM_VERTEX_TYPE_3V2T1C:
+			{
+				Unit3D2T* unit=new Unit3D2T();
+				unit->setShap(shap);
+				return unit;
+			}
+		}
+		/*if(shap->getDimenMode()==ENUM_DIMEN_MODE_2D){
+			Unit2D* unit=new Unit2D();
 			unit->setShap(shap);
 			return unit;
 		}else if(shap->getDimenMode()==ENUM_DIMEN_MODE_3D){
-			CUnit* unit=new CUnit();
+			Unit3D* unit=new Unit3D();
 			unit->setShap(shap);
 			return unit;
-		}
+		}*/
 		return NULL;
 	}
 
 	IEntity* CGeometryFactory::createEntity(IUnit* unit)const {
-		CEntity* entity=new CEntity(unit->getDimenMode());
+		CEntity* entity=new CEntity();
 		entity->addUnit(unit);
 		return entity;
 	}
 
 
-	IEntity* CGeometryFactory::createXYPlane2D(const core::dimension2df& size) const{
-		CUnit2D* unit=new CUnit2D();
+	/*IEntity* CGeometryFactory::createXYPlane2D(const core::dimension2df& size) const{
+		Unit2D* unit=new Unit2D();
 
 		// Create indices
 		const u8 u[6] = {
@@ -101,42 +144,7 @@ namespace scene{
 	}
 
 	IEntity* CGeometryFactory::createXYPlane(const core::dimension2df& size,f32 z) const{
-		/*CUnit* unit=new CUnit();
-
-		// Create indices
-		const u16 u[6] = {
-			0,  2,  1,
-			0,  3,  2
-		};
-
-		unit->m_indices.reallocate(6);
-		for (u32 i=0; i<6; ++i)
-			unit->m_indices.push(u[i]);
-
-		//Create vertexs
-		unit->m_vertices.reallocate(4);
-
-		f32 phw,phh,mhw,mhh;
-		phw=size.w/2;
-		phh=size.h/2;
-		mhw=phw-size.w;
-		mhh=phh-size.h;
-
-		f32 u0,u1,v0,v1;
-		u0=v0=0;
-		u1=v1=1;
-
-		unit->m_vertices.push(SVertex(mhw,mhh,z,u0,v1,video::COLOR_WHITE));
-		unit->m_vertices.push(SVertex(mhw,phh,z,u0,v0,video::COLOR_WHITE));
-		unit->m_vertices.push(SVertex(phw,phh,z,u1,v0,video::COLOR_WHITE));
-		unit->m_vertices.push(SVertex(phw,mhh,z,u1,v1,video::COLOR_WHITE));
-
-		CEntity* entity=new CEntity();
-		entity->addUnit(unit);
-
-		unit->drop();
-
-		return entity;*/
+		
 
 		CUnit* unit=new CUnit();
 		Shap3D* shap=new Shap3D();
@@ -259,7 +267,8 @@ namespace scene{
 		unit->drop();
 
 		return entity;
-	}
+	}*/
+
 	IShap* CGeometryFactory::createCube(f32 width,f32 height,f32 depth,const video::SColor& color) const{
 		Shap3D* shap=new Shap3D();
 

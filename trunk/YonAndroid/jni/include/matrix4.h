@@ -28,7 +28,7 @@ namespace yon{
 					}
 				}
 			}
-			inline void checkIdentity(){
+			inline void checkIdentity() const{
 				m_bIsChanged=false;
 				m_bIsIdentity=true;
 				if (!core::equals( m[0][0], (T)1 ) ||
@@ -47,8 +47,8 @@ namespace yon{
 							return;
 						}
 			}
-			bool m_bIsIdentity : 1;
-			bool m_bIsChanged : 1;
+			mutable bool m_bIsIdentity : 1;
+			mutable bool m_bIsChanged : 1;
 		public:
 			T m[4][4];
 			matrix4(bool identity=false)
@@ -83,7 +83,7 @@ namespace yon{
 			const T* pointer() const { return &m[0][0]; }
 			T* pointer() { return &m[0][0];}
 
-			inline bool isIdentity()
+			inline bool isIdentity() const
 			{
 				if(m_bIsChanged)
 					checkIdentity();

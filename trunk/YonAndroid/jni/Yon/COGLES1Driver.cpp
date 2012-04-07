@@ -142,10 +142,14 @@ namespace ogles1{
 		setViewPort(core::recti(0,0,size.w,size.h));
 	}
 	void COGLES1Driver::drawUnit(scene::IUnit* unit){
-		if(unit->getDimenMode()==ENUM_DIMEN_MODE_3D)
+		/*if(unit->getDimenMode()==ENUM_DIMEN_MODE_3D)
 			setRender3DMode();
 		else
+			setRender2DMode();*/
+		if(unit->getVertexType()==scene::ENUM_VERTEX_TYPE_2V1T1C)
 			setRender2DMode();
+		else
+			setRender3DMode();
 		checkMaterial();
 
 		/*glEnableClientState(GL_VERTEX_ARRAY);
@@ -171,22 +175,31 @@ namespace ogles1{
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);*/
 
-		static GLenum mode;
+		static ENUM_PRIMITIVE_TYPE mode;
 		switch(m_pCurrentMaterial->getPolygonMode()){
 		case ENUM_POLYGON_MODE_FILL:
-			mode=GL_TRIANGLES;
+			mode=ENUM_PRIMITIVE_TYPE_TRIANGLES;
 			break;
 		case ENUM_POLYGON_MODE_LINE:
-			mode=GL_LINES;
+			mode=ENUM_PRIMITIVE_TYPE_LINES;
 			break;
 		case ENUM_POLYGON_MODE_POINT:
-			mode=GL_POINTS;
+			mode=ENUM_PRIMITIVE_TYPE_POINTS;
 			break;
 		default:
-			mode=GL_TRIANGLES;
+			mode=ENUM_PRIMITIVE_TYPE_TRIANGLES;
 			break;
 		}
 
+		const void* vertice=unit->getShap()->getVertices();
+		const void* indice=unit->getShap()->getIndices();
+		u32 vertexCount=unit->getShap()->getVertexCount();
+		u32 indexCount=unit->getShap()->getIndexCount();
+
+		drawVertexPrimitiveList(vertice,vertexCount,indice,indexCount,mode,unit->getVertexType());
+
+		
+#if 0
 		if(unit->getDimenMode()==ENUM_DIMEN_MODE_3D)
 		{
 			/*glEnableClientState(GL_VERTEX_ARRAY);
@@ -222,10 +235,75 @@ namespace ogles1{
 			glDisableClientState(GL_COLOR_ARRAY);
 			glDisableClientState(GL_VERTEX_ARRAY);
 		}
+#endif
 		//Logger->debug("drawUnit:%08x\n",unit);
 	}
 
-	void COGLES1Driver::drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indexList, u32 primCount,ENUM_PRIMITIVE_TYPE pType,ENUM_INDEX_TYPE iType){
+	void COGLES1Driver::drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,ENUM_PRIMITIVE_TYPE pType,scene::ENUM_VERTEX_TYPE vType){
+		switch(vType){
+		case scene::ENUM_VERTEX_TYPE_2V1T1C:
+			{
+				static u32 stride=sizeof(scene::S2DVertex);
+				scene::S2DVertex* v=(scene::S2DVertex*)vertices;
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glEnableClientState(GL_COLOR_ARRAY);
+				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+				glVertexPointer(2, GL_FLOAT, stride,&v[0].pos);
+				glColorPointer(4,GL_UNSIGNED_BYTE, stride,&v[0].color);
+				glTexCoordPointer(2, GL_FLOAT, stride,&v[0].texcoords);
+				glDrawElements(pType, indexCount, GL_UNSIGNED_SHORT,indice);
+				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+				glDisableClientState(GL_COLOR_ARRAY);
+				glDisableClientState(GL_VERTEX_ARRAY);
+			}
+			break;
+		case scene::ENUM_VERTEX_TYPE_3V1T1C:
+			{
+				static u32 stride=sizeof(scene::SVertex);
+				scene::SVertex* v=(scene::SVertex*)vertices;
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glEnableClientState(GL_COLOR_ARRAY);
+				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+				glVertexPointer(3, GL_FLOAT, stride,&v[0].pos);
+				glColorPointer(4,GL_UNSIGNED_BYTE, stride,&v[0].color);
+				glTexCoordPointer(2, GL_FLOAT, stride,&v[0].texcoords);
+				glDrawElements(pType, indexCount, GL_UNSIGNED_SHORT,indice);
+				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+				glDisableClientState(GL_COLOR_ARRAY);
+				glDisableClientState(GL_VERTEX_ARRAY);
+			}
+			break;
+		case scene::ENUM_VERTEX_TYPE_3V2T1C:
+			{
+				static u32 stride=sizeof(scene::SVertex2TCoords);
+				scene::SVertex2TCoords* v=(scene::SVertex2TCoords*)vertices;
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glEnableClientState(GL_COLOR_ARRAY);
+				
+				glVertexPointer(3, GL_FLOAT, stride,&v[0].pos);
+				glColorPointer(4,GL_UNSIGNED_BYTE, stride,&v[0].color);
+
+				glClientActiveTexture(GL_TEXTURE0);
+				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+				glTexCoordPointer(2, GL_FLOAT, stride,&v[0].texcoords0);
+
+				glClientActiveTexture(GL_TEXTURE1);
+				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+				glTexCoordPointer(2, GL_FLOAT, stride,&v[0].texcoords1);
+
+				glDrawElements(pType, indexCount, GL_UNSIGNED_SHORT,indice);
+
+				glClientActiveTexture(GL_TEXTURE1);
+				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+				glClientActiveTexture(GL_TEXTURE0);
+				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+				glDisableClientState(GL_COLOR_ARRAY);
+				glDisableClientState(GL_VERTEX_ARRAY);
+			}
+			break;
+		}
+
+		
 		/*glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_COLOR_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -347,7 +425,7 @@ namespace ogles1{
 		vertices[3] = scene::SVertex((f32)poss.bottomRight.x, (f32)poss.bottomRight.y, 0, tcoords.bottomRight.x, tcoords.bottomRight.y, color);
 
 
-		glEnableClientState(GL_VERTEX_ARRAY);
+		/*glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_COLOR_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glVertexPointer(3, GL_FLOAT, sizeof(scene::SVertex),&vertices[0].pos);
@@ -356,13 +434,16 @@ namespace ogles1{
 		glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT,indices);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
-		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);*/
+
+		drawVertexPrimitiveList(vertices,4,indices,4,ENUM_PRIMITIVE_TYPE_TRIANGLE_STRIP,scene::ENUM_VERTEX_TYPE_3V1T1C);
 
 	}
 
 	bool COGLES1Driver::setTexture(u32 stage, const video::ITexture* texture){
 		if(m_currentTextures[stage]==texture)
 			return true;
+		glActiveTexture(GL_TEXTURE0 + stage);
 		if (!texture){
 			glDisable(GL_TEXTURE_2D);
 			m_currentTextures[stage]=NULL;
@@ -412,7 +493,20 @@ namespace ogles1{
 				m_matrix[ENUM_TRANSFORM_PROJECTION].print();
 			}
 			break;
+		case ENUM_TRANSFORM_TEXTURE0:
+		case ENUM_TRANSFORM_TEXTURE1:
+			if(m_pCurrentMaterial!=NULL){
+				const u32 i = transform - ENUM_TRANSFORM_TEXTURE0;
+				glActiveTexture(GL_TEXTURE0 + i);
+				glMatrixMode(GL_TEXTURE);
+				if(mat.isIdentity())
+					glLoadIdentity();
+				else
+					glLoadMatrixf(mat.pointer());
+			}
+			break;
 		default:
+			Logger->warn(YON_LOG_WARN_FORMAT,"Set unknown transform");
 			break;
 		}
 	}
@@ -539,6 +633,11 @@ namespace ogles1{
 		if(m_pCurrentMaterial)
 			m_pCurrentMaterial->drop();
 		m_pCurrentMaterial=material;
+		//TODO优化，有些材质并不需要加载所有矩阵
+		for (s32 i = MATERIAL_MAX_TEXTURES-1; i>= 0; --i)
+		{
+			setTransform ((ENUM_TRANSFORM)( ENUM_TRANSFORM_TEXTURE0+i),m_pCurrentMaterial->getTextureMatrix(i));
+		}
 	}
 
 	void COGLES1Driver::checkMaterial(){

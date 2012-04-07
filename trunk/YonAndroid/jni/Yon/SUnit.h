@@ -3,21 +3,19 @@
 
 #include "IUnit.h"
 #include "yonArray.h"
-#include "IMaterial.h"
+#include "CMaterial.h"
 
 namespace yon{
 namespace scene{
 
-	template<size_t M>
+	template<size_t VT>
 	struct SUnit : public IUnit{
 	private:
 		IShap* m_pShap;
-
 		video::IMaterial* m_pMaterial;
 	public:
 		SUnit()
-			:m_pMaterial(video::DEFAULT_MATERIAL),m_pShap(NULL){
-				m_pMaterial->grab();
+			:m_pMaterial(new video::CMaterial()),m_pShap(NULL){
 		}
 
 		virtual ~SUnit(){
@@ -37,16 +35,19 @@ namespace scene{
 			return m_pShap;
 		}
 		virtual void setShap(IShap* shap){
-			YON_DEBUG_BREAK_IF(shap->getDimenMode()!=getDimenMode());
+			YON_DEBUG_BREAK_IF(shap->getVertexType()!=getVertexType());
 			shap->grab();
 			m_pShap=shap;
 		}
 
-		virtual ENUM_DIMEN_MODE getDimenMode() const{
-			return static_cast<const ENUM_DIMEN_MODE>(M);;
-		
-
+		virtual ENUM_VERTEX_TYPE getVertexType() const{
+			return static_cast<const ENUM_VERTEX_TYPE>(VT);
+		}
 	};
+
+	typedef SUnit<ENUM_VERTEX_TYPE_3V1T1C> Unit3D;
+	typedef SUnit<ENUM_VERTEX_TYPE_2V1T1C> Unit2D;
+	typedef SUnit<ENUM_VERTEX_TYPE_3V2T1C> Unit3D2T;
 }
 }
 #endif

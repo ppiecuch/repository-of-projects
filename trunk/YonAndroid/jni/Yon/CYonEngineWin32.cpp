@@ -152,7 +152,7 @@ namespace platform{
 		bool absorbed = false;
 
 		if (m_pUserListener)
-			absorbed = m_pUserListener->OnEvent(event);
+			absorbed = m_pUserListener->onEvent(event);
 
 		//TODO GUI
 		//if (!absorbed && GUIEnvironment)

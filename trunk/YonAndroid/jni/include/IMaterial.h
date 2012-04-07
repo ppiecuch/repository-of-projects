@@ -50,7 +50,7 @@ namespace video{
 		virtual void setWrapModeV(u32 index,ENUM_WRAP_MODE mode) = 0;
 
 		virtual void setTextureMatrix(u32 index, const core::matrix4f& mat) = 0;
-		virtual const core::matrix4f& getTextureMatrix(u32 index) const = 0;
+		virtual core::matrix4f& getTextureMatrix(u32 index) = 0;
 	};
 
 	YON_API extern IMaterial* DEFAULT_MATERIAL;

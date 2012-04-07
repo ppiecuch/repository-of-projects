@@ -18,6 +18,9 @@ namespace yon{
 		const position2df ORIGIN_POSITION2DF(0,0);
 		const position2di ORIGIN_POSITION2DI(0,0);
 
+		const position3df ORIGIN_POSITION3DF(0,0,0);
+		const position3di ORIGIN_POSITION3DI(0,0,0);
+
 		const vector3df ORIGIN_VECTOR3DF(0,0,0);
 		const vector3df UP_VECTOR3DF(0,1,0);
 		const vector3df IDENTITY_VECTOR3DF(1,1,1);

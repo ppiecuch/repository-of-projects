@@ -12,7 +12,8 @@ namespace yon{
 		public:
 			virtual u32 getUnitCount() const = 0;
 			virtual IUnit* getUnit(u32 index) const = 0;
-			virtual ENUM_DIMEN_MODE getDimenMode() const = 0;
+			//virtual ENUM_DIMEN_MODE getDimenMode() const = 0;
+			//virtual ENUM_VERTEX_TYPE getVertexMode() const = 0;
 		};
 	}//scene
 }//yon

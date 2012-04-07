@@ -23,7 +23,7 @@ namespace yon{
 			virtual video::IMaterial* getMaterial() = 0;
 			virtual const video::IMaterial* getMaterial() const = 0;
 
-			virtual const void* getVertices() const = 0;
+			/*virtual const void* getVertices() const = 0;
 			virtual void* getVertices() = 0;
 			virtual u32 getVertexCount() const = 0;
 
@@ -33,12 +33,13 @@ namespace yon{
 
 			virtual void append(const  void* const vertices, u32 numVertices, const void* const indices, u32 numIndices) = 0;
 
-			virtual void append(const IUnit* const other) = 0;
+			virtual void append(const IUnit* const other) = 0;*/
 
 			virtual const IShap* getShap() const = 0;
 			virtual void setShap(IShap* shap) = 0;
 
-			virtual ENUM_DIMEN_MODE getDimenMode() const = 0;
+			//virtual ENUM_DIMEN_MODE getDimenMode() const = 0;
+			virtual ENUM_VERTEX_TYPE getVertexType() const = 0;
 		};
 	}//scene
 }//yon

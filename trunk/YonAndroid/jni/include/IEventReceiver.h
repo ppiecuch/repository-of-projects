@@ -1,5 +1,5 @@
-#ifndef _YON_EVENT_IEVENTLISTENER_H_
-#define _YON_EVENT_IEVENTLISTENER_H_
+#ifndef _YON_EVENT_IEVENTRECEIVER_H_
+#define _YON_EVENT_IEVENTRECEIVER_H_
 
 namespace yon{
 	namespace event{
@@ -72,10 +72,10 @@ namespace yon{
 			};
 		};
 
-		class IEventListener{
+		class IEventReceiver{
 		public:
-			virtual ~IEventListener(){}
-			virtual bool OnEvent(const SEvent& event) = 0;
+			virtual ~IEventReceiver(){}
+			virtual bool onEvent(const SEvent& event) = 0;
 		};
 	}
 }

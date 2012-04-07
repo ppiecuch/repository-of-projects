@@ -26,11 +26,14 @@ namespace yon{
 
 			virtual IGeometryFactory* getGeometryFactory() const;
 
+			virtual animator::IAnimatorFactory* getAnimatorFactory() const;
+
 			virtual void onResize(const core::dimension2du& size);
 
 			virtual bool postEventFromUser(const event::SEvent& evt);
 		private:
 			IGeometryFactory* m_geometryFactory;
+			animator::IAnimatorFactory* m_pAnimatorFactory;
 		};
 	}
 }

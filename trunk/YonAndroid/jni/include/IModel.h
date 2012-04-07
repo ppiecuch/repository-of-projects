@@ -5,6 +5,7 @@
 #include "yonList.h"
 #include "ITexture.h"
 #include "IMaterial.h"
+#include "IAnimator.h"
 
 #include "ILogger.h"
 
@@ -15,6 +16,7 @@ namespace yon{
 		protected:
 			IModel* m_parent;
 			core::list<IModel*> m_children;
+			core::list<animator::IAnimator*> m_animators;
 
 			
 			
@@ -61,12 +63,21 @@ namespace yon{
 				}
 				m_children.clear();
 			}
+			virtual void clearAnimators()
+			{
+				core::list<animator::IAnimator*>::Iterator it = m_animators.begin();
+				for (; it != m_animators.end(); ++it)
+					(*it)->drop();
+
+				m_animators.clear();
+			}
 		public:
 			virtual ~IModel()
 			{
 				// delete all children
 				clearChildren();
 				//Logger->debug("clearChildren\n");
+				clearAnimators();
 			}
 			virtual bool removeFromParent(){
 				if(m_parent){
@@ -97,6 +108,16 @@ namespace yon{
 				for (u32 i=0; i<getMaterialCount(); ++i)
 					getMaterial(i)->setMaterialType(newType);
 			}
+
+			virtual void addAnimator(animator::IAnimator* animator)
+			{
+				if (animator)
+				{
+					m_animators.push_back(animator);
+					animator->grab();
+				}
+			}
+
 		};
 	}//scene
 }//yon

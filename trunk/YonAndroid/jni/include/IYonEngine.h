@@ -9,7 +9,7 @@
 #include "IVideoDriver.h"
 #include "ISceneManager.h"
 #include "IFileSystem.h"
-#include "IEventListener.h"
+#include "IEventReceiver.h"
 
 
 namespace yon{
@@ -23,6 +23,7 @@ namespace yon{
 		virtual bool run() = 0;
 		virtual void onResize(u32 w,u32 h) = 0;
 
+		//TODO改为继承自IEventSender
 		virtual bool postEventFromUser(const event::SEvent& evt) = 0;
 		//更新
 		//包括更新计时器

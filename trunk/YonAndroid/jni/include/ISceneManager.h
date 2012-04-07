@@ -6,7 +6,8 @@
 #include "IModel.h"
 #include "dimension2d.h"
 #include "ICamera.h"
-#include "IEventListener.h"
+#include "IEventReceiver.h"
+#include "IAnimatorFactory.h"
 
 namespace yon{
 	namespace scene{
@@ -22,6 +23,8 @@ namespace yon{
 			virtual void setActiveCamera(camera::ICamera* camera) = 0;
 
 			virtual IGeometryFactory* getGeometryFactory() const = 0;
+
+			virtual animator::IAnimatorFactory* getAnimatorFactory() const = 0;
 
 			//TODO protected
 			virtual void onResize(const core::dimension2du& size) = 0;

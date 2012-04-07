@@ -17,7 +17,7 @@ namespace video{
 			wrapU(ENUM_WRAP_MODE_REPEAT),
 			wrapV(ENUM_WRAP_MODE_REPEAT),
 			bilinearFilter(true),
-			textureMatrix(core::IDENTITY_MATRIX)
+			textureMatrix(true)
 		{}
 		SMaterialLayer(const SMaterialLayer& other)
 		{
