@@ -1,0 +1,109 @@
+在浏览器客户端数据初始化数据优化时过程中，由于多次看到使用SharedPreferences保存数据。于是查了下客户端的SharedPreferencesManager的源码，发现我们提交数据时的代码形式如下：
+
+public void putFloat(String key, float value) 
+    { 
+        editor.putFloat(key, value); 
+        editor.commit(); 
+    } 
+即我们每次都使用事务提交数据，这样操作对客户端来说是很安全的，能确保每次数据能够及时写入，但是，由此也带来了一个小问题，那就是commit操作本身耗时时间时比较长的，多次commit必然会带来时间和性能上的比较大的开销。客户端做了一个Demo来调研该设想，代码如下：
+
+1.每次使用commit提交数据，循环50次，每次提交3条数据
+ 
+
+button.setOnClickListener(new OnClickListener() { 
+            
+            @Override 
+            public void onClick(View v) { 
+                SharedPreferenceManager manager = SharedPreferenceManager.getInstance(); 
+                Long startTime = Calendar.getInstance().getTimeInMillis(); 
+                Log.e("start","~"+startTime ); 
+                for(int i=0;i<50;i++){ 
+                    manager.putIntCom("first"+i, 1); 
+                    manager.putIntCom("second"+i, 2); 
+                    manager.putIntCom("third"+i, 3); 
+                } 
+//                manager.commit(); 
+                Long endTime = Calendar.getInstance().getTimeInMillis(); 
+                Log.e("endTime","~"+endTime ); 
+                Log.e("time---->", ""+(endTime-startTime)); 
+                Log.e("average", ""+(endTime-startTime)/50); 
+            } 
+        }); 
+manager.putIntCom的方法如下：
+
+public void putIntCom(String key, int value){ 
+        editor.putInt(key, value); 
+        editor.commit(); 
+    } 
+
+来看日志：
+ 
+
+04-05 03:38:54.224: E/start(9713): ~1333597134230 
+04-05 03:38:55.024: D/dalvikvm(9713): GC_FOR_MALLOC freed 2463 objects / 413552 bytes in 107ms 
+04-05 03:38:55.774: D/dalvikvm(9713): GC_FOR_MALLOC freed 1698 objects / 566968 bytes in 89ms 
+04-05 03:38:56.724: D/dalvikvm(9713): GC_FOR_MALLOC freed 1678 objects / 507304 bytes in 48ms 
+04-05 03:38:58.254: D/dalvikvm(9713): GC_FOR_MALLOC freed 1600 objects / 529256 bytes in 45ms 
+04-05 03:39:00.273: D/dalvikvm(9713): GC_FOR_MALLOC freed 1623 objects / 505208 bytes in 44ms 
+04-05 03:39:01.264: D/dalvikvm(9713): GC_FOR_MALLOC freed 1600 objects / 529216 bytes in 46ms 
+04-05 03:39:01.554: D/dalvikvm(9713): GC_FOR_MALLOC freed 1623 objects / 505152 bytes in 47ms 
+04-05 03:39:01.874: D/dalvikvm(9713): GC_FOR_MALLOC freed 1600 objects / 529216 bytes in 45ms 
+04-05 03:39:02.094: E/endTime(9713): ~1333597142101 
+04-05 03:39:02.094: E/time---->(9713): 7871 
+04-05 03:39:02.094: E/average(9713): 157 
+日志的最后一条显示：平均提交耗时约为157毫秒，当然这里每次提交3条记录，那么每次commit大概耗时52毫秒
+
+2.采用先提交，最后一次性commit方法
+ 
+
+button.setOnClickListener(new OnClickListener() { 
+            
+            @Override 
+            public void onClick(View v) { 
+                SharedPreferenceManager manager = SharedPreferenceManager.getInstance(); 
+                Long startTime = Calendar.getInstance().getTimeInMillis(); 
+                Log.e("start","~"+startTime ); 
+                for(int i=0;i<50;i++){ 
+                    manager.putInt("first"+i, 1); 
+                    manager.putInt("second"+i, 2); 
+                    manager.putInt("third"+i, 3); 
+                } 
+                manager.commit(); 
+                Long endTime = Calendar.getInstance().getTimeInMillis(); 
+                Log.e("endTime","~"+endTime ); 
+                Log.e("time---->", ""+(endTime-startTime)); 
+                Log.e("average", ""+(endTime-startTime)/50); 
+            } 
+        }); 
+Manager.putInt()方法形如：
+ 
+
+public void putInt(String key, int value) 
+    { 
+        editor.putInt(key, value); 
+    } 
+日志如下：
+ 
+
+04-05 03:36:46.214: E/start(9167): ~1333597006214 
+04-05 03:36:46.244: E/endTime(9167): ~1333597006253 
+04-05 03:36:46.244: E/time---->(9167): 39 
+04-05 03:36:46.254: E/average(9167): 0 
+这里显示的数据很让人吃惊！
+
+我们来查下Sharedpreferences的实现方式
+ 
+
+private static final class SharedPreferencesImpl implements SharedPreferences  
+在实现putXxx时使用其内部的Map缓存，将数据保存在Map中，当commit时，遍历Map，将数据通过其监听器Listeners提示更新数据文件。
+
+ 
+
+listener.onSharedPreferenceChanged(SharedPreferencesImpl.this, key); 
+默认情况下，我们没有重写onSharedPreferenceChanged方法，这里就交由Android本身去实现了。但是可以确定的是commit方法涉及到同步，遍历等操作，本身是比较耗时的。
+所以减少commit操作本身就是一件可以优化的事情。
+
+结论：
+Commit操作本身比较耗时，在保证数据安全的情况下，在数据实时性要求不高的地方，可以尽量累计更改，一次提交，以提高效率。
+
+http://blog.csdn.net/hopezhangbo/article/details/7434282
