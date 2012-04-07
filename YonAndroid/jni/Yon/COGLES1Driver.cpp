@@ -45,7 +45,7 @@ namespace ogles1{
 		m_materialRenderers.push(createMaterialRendererLighten(this));
 		m_materialRenderers.push(createMaterialRendererTransparent(this));
 		m_materialRenderers.push(createMaterialRendererTransparentBlendColor(this));
-		m_materialRenderers.push(createMaterialRendererCoat(this));
+		m_materialRenderers.push(createMaterialRendererMask(this));
 
 #ifdef YON_COMPILE_WITH_WIN32
 		initEGL(param.hWnd);
