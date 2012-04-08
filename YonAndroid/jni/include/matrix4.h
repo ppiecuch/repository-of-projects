@@ -405,10 +405,8 @@ namespace yon{
 					(deltaX <= 0.0f) || (deltaY <= 0.0f) || (deltaZ <= 0.0f) )
 					return;
 
-				//ort.m[0][0] = (T)2.0f / deltaX;
 				ort.m[0][0] = (T)2.0f / deltaX;
 				ort.m[0][1] = ort.m[0][2] = ort.m[0][3] = (T)0.0f;
-				//ort.m[1][1] = (T)2.0f / deltaY;
 				ort.m[1][1] = (T)2.0f / deltaY;
 				ort.m[1][0] = ort.m[1][2] = ort.m[1][3] = (T)0.0f;
 				ort.m[2][2] = (T)-2.0f / deltaZ;
