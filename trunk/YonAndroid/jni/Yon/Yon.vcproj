@@ -346,11 +346,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\CReadStream.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IFileSystem.h"
 					>
 				</File>
 				<File
 					RelativePath="..\include\IReadFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IStream.h"
 					>
 				</File>
 				<File
