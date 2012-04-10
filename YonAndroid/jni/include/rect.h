@@ -112,8 +112,8 @@ namespace yon{
 			position2d<T> topLeft;
 			position2d<T> bottomRight;
 
-			position2d<T> bottomLeft;
-			position2d<T> topRight;
+			//position2d<T> bottomLeft;
+			//position2d<T> topRight;
 		};
 
 

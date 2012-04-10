@@ -1,10 +1,27 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "stringTestCase.h"
+#include "yonUtil.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
 
 void stringTestCase::setUp()
 {
+}
+void stringTestCase::subString(){
+	core::stringc str1("Make");
+	CPPUNIT_ASSERT( str1.subString(0)=="Make" );
+	core::stringc str2("Make");
+	CPPUNIT_ASSERT( str2.subString(5)=="" );
+	core::stringc str3("Make");
+	CPPUNIT_ASSERT( str3.subString(1)=="ake" );
+	core::stringc str4("Make");
+	CPPUNIT_ASSERT( str4.subString(1,2)=="ak" );
+
+	io::path str5("../Make.txt");
+	printf("\ngetFileName:%s\n", core::getFileName(str5).c_str());
+	//printf("\ngetFileName:%s\n", str5.subString(2).c_str());
+	//CPPUNIT_ASSERT(  core::getFileName(str5)=="Make.txt" );
+	
 }
 void stringTestCase::makeLower(){
 	core::stringc str("Make");

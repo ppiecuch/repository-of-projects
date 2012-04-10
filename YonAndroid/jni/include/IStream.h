@@ -22,7 +22,7 @@ namespace io{
 		
 	class IReadStream : public virtual core::IReferencable{
 	protected:
-		io::path m_name;
+		io::path m_path;
 		ENUM_ENDIAN_MODE m_endianMode;
 		ENUM_STREAM_TYPE m_streamType;
 
@@ -35,7 +35,7 @@ namespace io{
 			return value;
 		}
 	public:
-		IReadStream(const io::path& name,ENUM_STREAM_TYPE type,ENUM_ENDIAN_MODE mode=ENUM_ENDIAN_MODE_LITTLE): m_name(name),m_streamType(type),m_endianMode(mode){}
+		IReadStream(const io::path& name,ENUM_STREAM_TYPE type,ENUM_ENDIAN_MODE mode=ENUM_ENDIAN_MODE_LITTLE): m_path(name),m_streamType(type),m_endianMode(mode){}
 		virtual ~IReadStream(){}
 		ENUM_STREAM_TYPE getType() const{return m_streamType;}
 		ENUM_ENDIAN_MODE getEndianMode() const{return m_endianMode;}
@@ -50,12 +50,13 @@ namespace io{
 		//当前位置，以字节为单位
 		virtual u32 getPos() const = 0;
 
+		//使用前转换为对应的类型，如文件流转为(FILE*)
 		virtual void* pointer() const = 0;
 
 		//获取流大小，以字节为单位
 		virtual u32 getSize() const = 0;
 
-		virtual const io::path& getName() const{return m_name;}
+		virtual const io::path& getPath() const{return m_path;}
 
 		
 		inline bool readBool(){return readByte()!=0;}
@@ -71,9 +72,6 @@ namespace io{
 		inline f64 readDouble(){return read<f64>();}
 
 	};
-
-	IReadStream* createReadFileStream(const io::path& name,ENUM_ENDIAN_MODE mode);
-	IReadStream* createReadMemoryStream(const io::path& name,void* memory, long size,bool deleteMemoryWhenDropped,ENUM_ENDIAN_MODE mode);
 }
 }
 #endif

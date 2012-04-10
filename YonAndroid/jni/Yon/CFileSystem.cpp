@@ -1,5 +1,6 @@
 #include "CFileSystem.h"
 #include "CReadFile.h"
+#include "CReadFileStream.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include <io.h> // for _access
@@ -42,6 +43,12 @@ namespace io{
 	IReadFile* CFileSystem::createAndOpenFile(const io::path& filename){
 		return createReadFile(getAbsolutePath(filename));
 	}
+
+	IReadStream* CFileSystem::createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode){
+		return createReadFileStream(filename,mode);
+	}
+
+
 	io::path CFileSystem::getAbsolutePath(const io::path& filename) const{
 #ifdef YON_COMPILE_WITH_WIN32
 		fschar *p=0;

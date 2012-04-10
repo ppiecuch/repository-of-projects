@@ -22,6 +22,8 @@ namespace io{
 		virtual u32 getSize() const{return m_fileSize;}
 		virtual void* pointer() const{return m_pFile;}
 	};
+
+	IReadStream* createReadFileStream(const io::path& name,ENUM_ENDIAN_MODE mode);
 }
 }
 #endif

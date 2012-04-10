@@ -18,6 +18,7 @@ class stringTestCase : public CPPUNIT_NS::TestFixture
 	CPPUNIT_TEST( makeUpper );
 	CPPUNIT_TEST( findLast );
 	CPPUNIT_TEST( equalsSubstringIgnoreCase );
+	CPPUNIT_TEST( subString );
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -28,6 +29,7 @@ protected:
 	void makeUpper();
 	void findLast();
 	void equalsSubstringIgnoreCase();
+	void subString();
 };
 
 #endif

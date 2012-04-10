@@ -26,6 +26,7 @@
 #include "path.h" 
 #include "IFileSystem.h" 
 #include "IReadFile.h"
+#include "IStream.h"
 
 
 #include "SColor.h"

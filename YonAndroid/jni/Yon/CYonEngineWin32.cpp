@@ -3,6 +3,7 @@
 #ifdef YON_COMPILE_WITH_WIN32
 
 #include "CYonEngineWin32.h"
+#include "CGraphicsAdapter.h"
 
 #include "ILogger.h"
 
@@ -31,7 +32,8 @@ namespace platform{
 	
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
-		m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
+		m_pVideoDriver(NULL),m_pSceneManager(NULL),
+		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),
 		m_pUserListener(NULL),m_pTimer(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
 	{
@@ -63,6 +65,9 @@ namespace platform{
 		//初始化视频驱动器
 		createDriver();
 
+		//初始化Graphics适配器
+		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
+
 		SEnginePair ep;
 		ep.hWnd=m_hWnd;
 		ep.engine=this;
@@ -78,6 +83,7 @@ namespace platform{
 		m_pTimer->start();
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
+		m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();

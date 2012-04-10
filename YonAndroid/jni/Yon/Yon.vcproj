@@ -422,6 +422,10 @@
 				Name="scene"
 				>
 				<File
+					RelativePath=".\CEntity.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\CEntity.h"
 					>
 				</File>
@@ -431,6 +435,14 @@
 				</File>
 				<File
 					RelativePath=".\CGeometryFactory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CGraphicsAdapter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CGraphicsAdapter.h"
 					>
 				</File>
 				<File
@@ -463,6 +475,10 @@
 				</File>
 				<File
 					RelativePath="..\include\IGeometryFactory.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IGraphicsAdapter.h"
 					>
 				</File>
 				<File

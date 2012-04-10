@@ -9,6 +9,7 @@
 namespace yon{
 	namespace scene{
 
+		class IVideoDriver;
 		class CSceneManager : public ISceneManager, public IModel{
 		protected:
 			core::array<camera::ICamera*> m_cameras;
@@ -18,6 +19,9 @@ namespace yon{
 			virtual ~CSceneManager();
 
 			virtual IModel* addModel(IEntity* entity);
+			virtual void clearModels(){
+				clearChildren();
+			}
 			virtual camera::ICamera* addCamera(const core::vector3df& pos,const core::vector3df& up,
 				const core::vector3df& lookat,bool makeActive);
 			virtual void setActiveCamera(camera::ICamera* camera);

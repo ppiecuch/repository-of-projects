@@ -43,8 +43,8 @@ namespace scene{
 
 	camera::ICamera* CSceneManager::addCamera(const core::vector3df& pos,const core::vector3df& up,
 		const core::vector3df& lookat,bool makeActive){
-			//camera::COrthoCamera* camera=new camera::COrthoCamera(pos,up,lookat);
-			camera::CPerspCamera* camera=new camera::CPerspCamera(pos,up,lookat);
+			camera::COrthoCamera* camera=new camera::COrthoCamera(pos,up,lookat);
+			//camera::CPerspCamera* camera=new camera::CPerspCamera(pos,up,lookat);
 			m_cameras.push(camera);
 			if(makeActive){
 				setActiveCamera(camera);

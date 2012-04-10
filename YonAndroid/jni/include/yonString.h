@@ -332,6 +332,34 @@ namespace yon{
 						return false;
 				return elements[fromIndex + i] == 0 && other[i] == 0;
 			}
+			string<T> subString(u32 begin, s32 size) const
+			{
+				if ((size <= 0) || (begin>=length()))
+					return string<T>("");
+				// clamp length to maximal value
+				if ((size+begin) > length())
+					size = length()-begin;
+
+				string<T> o;
+				o.reallocate(size);
+
+				for (s32 i=0; i<size; ++i)
+					o.elements[i] = elements[i+begin];
+
+				o.elements[size] = 0x0;
+				o.len = size;
+
+				return o;
+			}
+			string<T> subString(u32 begin) const
+			{
+				if (begin>=length())
+					return string<T>("");
+
+				u32 size=length()-begin;
+
+				return subString(begin,size);
+			}
 			void makeLower()
 			{
 				for (u32 i=0; i<len; ++i)

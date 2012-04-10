@@ -14,6 +14,13 @@ namespace yon{
 			virtual IUnit* getUnit(u32 index) const = 0;
 			//virtual ENUM_DIMEN_MODE getDimenMode() const = 0;
 			//virtual ENUM_VERTEX_TYPE getVertexMode() const = 0;
+
+			virtual void add(IUnit* unit) = 0;
+			//添加单一纹理的Unit
+			virtual void add(video::ITexture* texture,video::ENUM_MATERIAL_TYPE materialType,IShap* shap) = 0;
+			//TODO
+			//virtual remove(...) = 0;
+			virtual void clear() = 0;
 		};
 	}//scene
 }//yon

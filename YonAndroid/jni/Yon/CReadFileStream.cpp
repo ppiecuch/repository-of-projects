@@ -9,30 +9,30 @@ namespace io{
 	CReadFileStream::CReadFileStream(const io::path& name,ENUM_ENDIAN_MODE mode)
 		:IReadStream(name,ENUM_STREAM_TYPE_FILE,mode),m_pFile(NULL),m_fileSize(0){
 			openFile();
-			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CReadFileStream");
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CReadFileStream");
 	}
 
 	CReadFileStream::~CReadFileStream(){
 		if (m_pFile)
 			fclose(m_pFile);
-		//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CReadFile");
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CReadFileStream");
 	}
 
 	void CReadFileStream::openFile()
 	{
-		if (m_name.length() == 0)
+		if (m_path.length() == 0)
 		{
 			m_pFile = NULL;
 			return;
 		}
 #ifdef YON_COMPILE_WITH_WIN32
 #if defined(YON_WCHAR_FILESYSTEM)
-		m_pFile = _wfopen(m_name.c_str(), L"rb");
+		m_pFile = _wfopen(m_path.c_str(), L"rb");
 #else
-		errno_t result=fopen_s(&m_pFile,m_name.c_str(),"rb");
+		errno_t result=fopen_s(&m_pFile,m_path.c_str(),"rb");
 #endif
 #elif defined(YON_COMPILE_WITH_ANDROID)
-		m_pFile = fopen(m_name.c_str(),"rb");
+		m_pFile = fopen(m_path.c_str(),"rb");
 #endif
 		if (m_pFile)
 		{
@@ -48,8 +48,10 @@ namespace io{
 		if(m_endianMode==ENUM_ENDIAN_MODE_LITTLE){
 			fread(data, 1, sizeToRead, m_pFile);
 		}else{
-			for(u32 i=sizeToRead-1;i>=0;--i){
-				fread(&((u8*)data)[i], 1, 1, m_pFile);
+			u8 temp[8];
+			fread(temp, 1, sizeToRead, m_pFile);
+			for(u32 i=0;i<sizeToRead;++i){
+				((u8*)data)[sizeToRead-1-i]=temp[i];
 			}
 		}
 	}
@@ -68,6 +70,10 @@ namespace io{
 	}
 	u32 CReadFileStream::getPos() const{
 		return ftell(m_pFile);
+	}
+
+	IReadStream* createReadFileStream(const io::path& name,ENUM_ENDIAN_MODE mode){
+		return new CReadFileStream(name,mode);
 	}
 }
 }
