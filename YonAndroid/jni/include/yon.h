@@ -3,6 +3,7 @@
 
 #include "config.h" 
 #include "yonTypes.h" 
+#include "heapsort.h"
 
 #include "ILogger.h" 
 #include "IDebugPrinter.h"

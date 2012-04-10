@@ -167,6 +167,14 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\heapsortTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\heapsortTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\main.cpp"
 			>
 		</File>
