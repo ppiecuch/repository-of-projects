@@ -222,6 +222,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\heapsort.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IReferencable.h"
 					>
 				</File>
