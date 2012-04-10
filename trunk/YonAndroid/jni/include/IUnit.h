@@ -35,7 +35,7 @@ namespace yon{
 
 			virtual void append(const IUnit* const other) = 0;*/
 
-			virtual const IShap* getShap() const = 0;
+			virtual IShap* getShap() const = 0;
 			virtual void setShap(IShap* shap) = 0;
 
 			//virtual ENUM_DIMEN_MODE getDimenMode() const = 0;

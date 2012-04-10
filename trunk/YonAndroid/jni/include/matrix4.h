@@ -411,10 +411,10 @@ namespace yon{
 				ort.m[1][0] = ort.m[1][2] = ort.m[1][3] = (T)0.0f;
 				ort.m[2][2] = (T)-2.0f / deltaZ;
 				ort.m[2][0] = ort.m[2][1] = ort.m[2][3] = (T)0.0f;
-				//ort.m[3][0] = (T)-(right + left) / deltaX;
-				ort.m[3][0] = (T)-2.0f*right / deltaX;
-				//ort.m[3][1] = (T)-(top + bottom) / deltaY;
-				ort.m[3][1] = (T)-2.0f*top / deltaY;
+				ort.m[3][0] = (T)-(right + left) / deltaX;
+				//ort.m[3][0] = (T)-2.0f*right / deltaX;
+				ort.m[3][1] = (T)-(top + bottom) / deltaY;
+				//ort.m[3][1] = (T)-2.0f*top / deltaY;
 				ort.m[3][2] = (T)-(nearZ + farZ) / deltaZ;
 				ort.m[3][3] = (T)1.0f;
 

@@ -37,8 +37,15 @@ namespace yon{
 				virtual const core::dimension2du& getCurrentRenderTargetSize() const;
 				virtual void onResize(const core::dimension2du& size);
 
+				virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest){
+					const core::dimension2du& size=getCurrentRenderTargetSize();
+					dest.x=src.x-(f32)size.w/2;
+					dest.y=src.y+(f32)size.h/2;
+				}
+
 				virtual IImage* createImageFromFile(const io::path& filename);
 				virtual IImage* createImageFromFile(io::IReadFile* file);
+				virtual IImage* createImageFromFile(io::IReadStream* file);
 
 				virtual bool setTexture(u32 stage, const video::ITexture* texture);
 				virtual ITexture* getTexture(const io::path& filename);
@@ -64,7 +71,8 @@ namespace yon{
 			private:
 				void checkMaterial();
 				void addTexture(video::ITexture* texture);
-				video::ITexture* loadTextureFromFile(io::IReadFile* file);
+				YON_DEPRECATED video::ITexture* loadTextureFromFile(io::IReadFile* file);
+				video::ITexture* loadTextureFromFile(io::IReadStream* file);
 				virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
 
 				core::matrix4f m_matrix[ENUM_TRANSFORM_COUNT];

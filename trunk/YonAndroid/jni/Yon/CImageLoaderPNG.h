@@ -12,6 +12,8 @@ namespace video{
 		virtual bool checkFileExtension(const io::path& filename) const;
 		virtual bool checkFileHeader(io::IReadFile* file) const;
 		virtual video::IImage* loadImage(io::IReadFile* file) const;
+		virtual bool checkFileHeader(io::IReadStream* file) const;
+		virtual video::IImage* loadImage(io::IReadStream* file) const;
 	};
 }
 }

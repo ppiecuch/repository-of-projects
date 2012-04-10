@@ -67,7 +67,7 @@ namespace yon{
 			core::list<core::stringc>::Iterator it=queue.begin(); 
 			count=queue.size();
 			for(i=0;it!=queue.end();++it,++i){
-				pos.y=(count-i)*step.h;
+				pos.y=(i-count)*step.h;
 				m_pPrinter->drawString(*it,pos,video::COLOR_GREEN);
 				
 				//str+=core::stringc("%s%c",it->c_str(),0x1);

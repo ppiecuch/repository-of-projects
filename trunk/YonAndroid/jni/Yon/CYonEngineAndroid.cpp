@@ -58,7 +58,7 @@ namespace yon{
 		m_pFileSystem=io::createFileSystem();
 
 		//初始化场景管理器
-		m_pSceneManager=scene::createSceneManager();
+		m_pSceneManager=scene::createSceneManager(this);
 
 		//初始化视频驱动器
 		createDriver();

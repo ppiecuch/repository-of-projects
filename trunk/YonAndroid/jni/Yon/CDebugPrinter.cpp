@@ -27,10 +27,14 @@ namespace debug{
 					r->bottomRight.y=(rowCount-i)*charSize;*/
 					m_texcoords[i][j]=new core::rectf();
 					core::rectf* r=m_texcoords[i][j];
-					r->bottomLeft.x=(f32)j/charCountPerRow;
+					/*r->bottomLeft.x=(f32)j/charCountPerRow;
 					r->topRight.x=(f32)(j+1)/charCountPerRow;
 					r->bottomLeft.y=(f32)i/rowCount;
-					r->topRight.y=(f32)(i+1)/rowCount;
+					r->topRight.y=(f32)(i+1)/rowCount;*/
+					r->topLeft.x=(f32)j/charCountPerRow;
+					r->bottomRight.x=(f32)(j+1)/charCountPerRow;
+					r->bottomRight.y=(f32)i/rowCount;
+					r->topLeft.y=(f32)(i+1)/rowCount;
 				}
 			}
 	}
@@ -51,16 +55,18 @@ namespace debug{
 	void CDebugPrinter::drawString(const core::stringc& str,const core::position2di& pos,const video::SColor& color){
 		if(str.length()==0)
 			return;
-		//core::position2di p(pos);
+		core::position2di src(pos);
+		core::position2df dest;
+		m_pDriver->convertPosCoordinate(src,dest);
 		static u32 x0,y0,x1,y1;
 		static f32 u0,v0,u1,v1;
 		static s32 r,d;
 		static u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
 		static u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
-		x0=pos.x;
-		y0=pos.y;
+		x0=dest.x;
+		y0=dest.y-m_fontSize.h;
 		x1=x0+m_fontSize.w;
-		y1=y0+m_fontSize.h;
+		y1=dest.y;
 		scene::IShap* shap=NULL;
 		for(u32 i=0;i<str.length();++i){
 			if(str[i]>=32&&str[i]<=128){
@@ -81,10 +87,10 @@ namespace debug{
 			//Logger->debug("%c,%d,%d,%d\n",str[i],str[i],d,r);
 			//m_texcoords[d][r]->print();
 			//m_pDriver->draw2DImage(m_pTexture,p,*m_texcoords[d][r],NULL,color);
-			u0=m_texcoords[d][r]->bottomLeft.x;
-			v0=m_texcoords[d][r]->bottomLeft.y;
-			u1=m_texcoords[d][r]->topRight.x;
-			v1=m_texcoords[d][r]->topRight.y;
+			u0=m_texcoords[d][r]->topLeft.x;
+			v0=m_texcoords[d][r]->bottomRight.y;
+			u1=m_texcoords[d][r]->bottomRight.x;
+			v1=m_texcoords[d][r]->topLeft.y;
 			if(shap==NULL){
 				shap=m_pGeometryFty->createXYRectangle(x0,y0,x1,y1,u0,v0,u1,v1,color);
 			}else{

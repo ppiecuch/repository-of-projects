@@ -4,6 +4,7 @@
 #include "COGLES1MaterialRenderer.h"
 #include "ILogger.h"
 #include "CDebugPrinter.h"
+#include "yonUtil.h"
 
 namespace yon{
 namespace video{
@@ -516,7 +517,8 @@ namespace ogles1{
 	}
 
 	IImage* COGLES1Driver::createImageFromFile(const io::path& filename){
-		io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
+		//io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
+		io::IReadStream* file = m_pFileSystem->createAndOpenReadFileStream(filename);
 		IImage* image=createImageFromFile(file);
 		file->drop();
 		return image;
@@ -533,6 +535,41 @@ namespace ogles1{
 		for (i=0; i<m_imageLoaders.size(); ++i)
 		{
 			if (m_imageLoaders[i]->checkFileExtension(file->getFileName()))
+			{
+				// reset file position which might have changed due to previous loadImage calls
+				file->seek(0);
+				image = m_imageLoaders[i]->loadImage(file);
+				if (image)
+					return image;
+			}
+		}
+
+		for (i=0; i<m_imageLoaders.size(); ++i)
+		{
+			file->seek(0);
+			if (m_imageLoaders[i]->checkFileHeader(file))
+			{
+				file->seek(0);
+				image = m_imageLoaders[i]->loadImage(file);
+				if (image)
+					return image;
+			}
+		}
+
+		return NULL;
+	}
+
+	IImage* COGLES1Driver::createImageFromFile(io::IReadStream* file){
+		if (!file)
+			return NULL;
+
+		IImage* image = NULL;
+
+		u32 i;
+
+		for (i=0; i<m_imageLoaders.size(); ++i)
+		{
+			if (m_imageLoaders[i]->checkFileExtension(file->getPath()))
 			{
 				// reset file position which might have changed due to previous loadImage calls
 				file->seek(0);
@@ -593,9 +630,24 @@ namespace ogles1{
 		return texture;
 	}
 
+	video::ITexture* COGLES1Driver::loadTextureFromFile(io::IReadStream* file){
+		ITexture* texture = NULL;
+		Logger->debug("start load texture:%s\n",getFileName(file->getPath()).c_str());
+		IImage* image = createImageFromFile(file);
+
+		if (image)
+		{
+			texture = createDeviceDependentTexture(image, file->getPath());
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("end load texture:%s",getFileName(file->getPath()).c_str()).c_str());
+			image->drop();
+		}
+
+		return texture;
+	}
+
 	video::ITexture* COGLES1Driver::createDeviceDependentTexture(IImage* image, const io::path& name)
 	{
-		return new COGLES1Texture(image, name, this);
+		return new COGLES1Texture(image, m_pFileSystem->getAbsolutePath(name), this);
 	}
 
 	ITexture* COGLES1Driver::getTexture(const io::path& filename){
@@ -605,7 +657,8 @@ namespace ogles1{
 			return texture;
 		}
 
-		io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
+		//io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
+		io::IReadStream* file = m_pFileSystem->createAndOpenReadFileStream(filename);
 
 		if(!file)
 		{

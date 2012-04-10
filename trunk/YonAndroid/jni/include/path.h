@@ -36,6 +36,14 @@ namespace io{
 			return m_internalName;
 		}
 
+		const path getFileName() const
+		{
+			s32 index = m_internalName.findLast('/');
+			if(index<0)
+				return m_internalName;
+			return m_internalName.subString(index);
+		}
+
 		//! Implicit cast to io::path
 		operator core::stringc() const
 		{

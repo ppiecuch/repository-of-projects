@@ -3,6 +3,7 @@
 
 #include "IReferencable.h"
 #include "dimension2d.h"
+#include "position2d.h"
 #include "rect.h"
 #include "matrix4.h"
 #include "IUnit.h"
@@ -18,10 +19,6 @@ namespace yon{
 	namespace scene{
 		class ISceneManager;
 		ISceneManager* createSceneManager();
-	}
-	namespace io
-	{
-		IFileSystem* createFileSystem();
 	}
 
 	namespace video{
@@ -101,8 +98,12 @@ namespace yon{
 			virtual const core::dimension2du& getCurrentRenderTargetSize() const = 0;
 			virtual void onResize(const core::dimension2du& size) = 0;
 
+			//从2D的XY坐标系（以左上角为原点,，x向右，y向下）转为3DXYY坐标系（以屏幕中心为原点，x向右，y向上）
+			virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest) = 0;
+
 			virtual IImage* createImageFromFile(const io::path& filename) = 0;
-			virtual IImage* createImageFromFile(io::IReadFile* file) =0;
+			virtual YON_DEPRECATED IImage* createImageFromFile(io::IReadFile* file) =0;
+			virtual IImage* createImageFromFile(io::IReadStream* file) =0;
 
 			virtual ITexture* getTexture(const io::path& filename) = 0;
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;

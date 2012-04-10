@@ -30,5 +30,9 @@ namespace io{
 		m_uPos+=sizeToRead;
 		return sizeToRead;
 	}
+
+	IReadStream* createReadMemoryStream(const io::path& name,void* memory, long size,bool deleteMemoryWhenDropped,ENUM_ENDIAN_MODE mode){
+		return new CReadMemoryStream(name,memory,size,deleteMemoryWhenDropped,mode);
+	}
 }
 }

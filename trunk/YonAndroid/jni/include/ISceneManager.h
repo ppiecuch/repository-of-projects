@@ -17,6 +17,7 @@ namespace yon{
 			virtual ~ISceneManager() {}
 
 			virtual IModel* addModel(IEntity* entity) = 0;
+			virtual void clearModels() = 0;
 			virtual camera::ICamera* addCamera(const core::vector3df& pos = core::vector3df(0,-1,0),
 				const core::vector3df& up=core::vector3df(0,1,0),
 				const core::vector3df& lookat = core::vector3df(0,0,100),bool makeActive=true) = 0;

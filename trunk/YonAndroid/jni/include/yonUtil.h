@@ -3,6 +3,7 @@
 
 #include "yonString.h"
 #include "path.h"
+#include "yonMath.h"
 
 namespace yon{
 namespace core{
@@ -25,6 +26,15 @@ namespace core{
 		const io::path& ext0,const io::path& ext1 = "",const io::path& ext2 = "")
 	{
 		return isFileExtension( filename,ext0,ext1,ext2)>0;
+	}
+
+	inline const io::path getFileName(const io::path& pathname){
+		s32 index1 = pathname.findLast('/');
+		s32 index2 = pathname.findLast('\\');
+		s32 index = max_(index1,index2);
+		if(index<0)
+			return pathname;
+		return pathname.subString(index+1);
 	}
 }//core
 }//yon

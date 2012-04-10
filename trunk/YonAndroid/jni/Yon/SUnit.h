@@ -17,6 +17,10 @@ namespace scene{
 		SUnit()
 			:m_pMaterial(new video::CMaterial()),m_pShap(NULL){
 		}
+		SUnit(video::IMaterial* material)
+			:m_pMaterial(material),m_pShap(NULL){
+				m_pMaterial->grab();
+		}
 
 		virtual ~SUnit(){
 			m_pMaterial->drop();
@@ -31,7 +35,7 @@ namespace scene{
 			return m_pMaterial;
 		}
 
-		virtual const IShap* getShap()const {
+		virtual IShap* getShap()const {
 			return m_pShap;
 		}
 		virtual void setShap(IShap* shap){

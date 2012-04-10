@@ -59,6 +59,7 @@ int main(int argc, char* argv[])
 
 	IVideoDriver* driver=engine->getVideoDriver();
 	ISceneManager* sceneMgr=engine->getSceneManager();
+	IGraphicsAdapter* gfAdapter=engine->getGraphicsAdapter();
 	IFileSystem* fs=engine->getFileSystem();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	ITimer* timer=engine->getTimer();
@@ -85,6 +86,11 @@ int main(int argc, char* argv[])
 	shap->drop();
 	unit->drop();
 	entity->drop();
+
+	IReadStream* rs=fs->createAndOpenReadFileStream("D:/kemulator.cfg",io::ENUM_ENDIAN_MODE_BIG);
+	Logger->debug("read:%c\n",rs->readByte());
+	Logger->debug("read:%04x\n",rs->readInt());
+	rs->drop();
 
 	//Logger->debug("%d\n",fs->existFile("D:/java1.exe"));
 
@@ -191,6 +197,11 @@ int main(int argc, char* argv[])
 	waterfallModel->addAnimator(uvAnimator);
 	uvAnimator->drop();
 
+	gfAdapter->beginBatch(0);
+	gfAdapter->drawImage("../media/nav.png",0,0,64,64,0,0,true);
+	gfAdapter->drawImage("../media/nav.png",64,64,64,64,100,0,true);
+	gfAdapter->endBatch();
+
 
 	/*ILogger* logger=Logger;
 	logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_VS);
@@ -224,7 +235,7 @@ int main(int argc, char* argv[])
 	Logger->debug("\n");
 	t->drop();*/
 	//DEFAULT_MATERIAL->setTexture(0,tex);
-	DEFAULT_MATERIAL->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	//DEFAULT_MATERIAL->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
 	while(engine->run()){
 
 		//const core::vector3df pos=camera->getPosition();
@@ -256,7 +267,7 @@ int main(int argc, char* argv[])
 		//driver->setMaterial(DEFAULT_MATERIAL);
 		//driver->draw2DImage(tex,ORIGIN_POSITION2DI,core::recti(ORIGIN_POSITION2DI,tex->getSize()),NULL,COLOR_BLACK);
 
-		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::position2di(0,driver->getCurrentRenderTargetSize().h-8),COLOR_GREEN);
+		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 		Logger->render();
 		//driver->endScene();
