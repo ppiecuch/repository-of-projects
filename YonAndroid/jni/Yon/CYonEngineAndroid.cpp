@@ -4,6 +4,7 @@
 
 #include "CYonEngineAndroid.h"
 #include "CSceneManager.h"
+#include "CGraphicsAdapter.h"
 
 #include "ILogger.h"
 
@@ -44,7 +45,7 @@ namespace yon{
 
 		CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params)
 			:m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
-			m_pUserListener(NULL),
+			m_pUserListener(NULL),m_pGraphicsAdapter(NULL),
 			m_params(params),m_bClose(false),m_bResized(true)
 		{
 			//检测jni版本
@@ -52,22 +53,25 @@ namespace yon{
 			//Logger->info("JNI Version:%s\n",m_pfInfo.jniVersion.c_str());
 
 		//初始化计时器
-		m_pTimer=yon::createTimer();
+		m_pTimer=createTimer();
 
 		//初始化文件系统
 		m_pFileSystem=io::createFileSystem();
 
 		//初始化场景管理器
-		m_pSceneManager=scene::createSceneManager(this);
+		m_pSceneManager=scene::createSceneManager();
 
 		//初始化视频驱动器
 		createDriver();
 
+		//初始化Graphics适配器
+		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
 		//启动计时器
 		m_pTimer->start();
 	}
 		CYonEngineAndroid::~CYonEngineAndroid(){
+		m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
@@ -110,7 +114,7 @@ namespace yon{
 			bool absorbed = false;
 
 			if (m_pUserListener)
-				absorbed = m_pUserListener->OnEvent(event);
+				absorbed = m_pUserListener->onEvent(event);
 
 			//TODO GUI
 			//if (!absorbed && GUIEnvironment)

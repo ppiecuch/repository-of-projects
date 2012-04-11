@@ -19,7 +19,7 @@ namespace scene{
 	|			|
 	x0,y0------
 	*/
-	IShap* CGeometryFactory::createXYRectangle(s32 x0,s32 y0,s32 x1,s32 y1,f32 u0,f32 v0,f32 u1,f32 v1,const video::SColor& color) const{
+	IShap* CGeometryFactory::createXYRectangle2D(s32 x0,s32 y0,s32 x1,s32 y1,f32 u0,f32 v0,f32 u1,f32 v1,const video::SColor& color) const{
 		Shap2D* shap=new Shap2D();
 
 		// Create indices
@@ -40,7 +40,7 @@ namespace scene{
 		return shap;
 
 	}
-	IShap* CGeometryFactory::createXYRectangle(s32 x0,s32 y0,s32 x1,s32 y1,f32 z,f32 u0,f32 v0,f32 u1,f32 v1,const video::SColor& color) const{
+	IShap* CGeometryFactory::createXYRectangle3D(s32 x0,s32 y0,s32 x1,s32 y1,f32 z,f32 u0,f32 v0,f32 u1,f32 v1,const video::SColor& color) const{
 		Shap3D* shap=new Shap3D();
 
 		// Create indices
@@ -62,7 +62,7 @@ namespace scene{
 
 	}
 
-	IShap* CGeometryFactory::createXYRectangle2T(s32 x0,s32 y0,s32 x1,s32 y1,f32 u0,f32 v0,f32 u1,f32 v1,f32 s0,f32 t0,f32 s1,f32 t1,const video::SColor& color) const{
+	IShap* CGeometryFactory::createXYRectangle2D2T(s32 x0,s32 y0,s32 x1,s32 y1,f32 u0,f32 v0,f32 u1,f32 v1,f32 s0,f32 t0,f32 s1,f32 t1,const video::SColor& color) const{
 		Shap3D2T* shap=new Shap3D2T();
 
 		// Create indices

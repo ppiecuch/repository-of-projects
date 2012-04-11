@@ -10,6 +10,7 @@ LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/Yon/zlib \
 		$(LOCAL_PATH)/Yon/lpng \
 		$(LOCAL_PATH)/include/ \
+		$(LOCAL_PATH)/Yon/ \
 		$(LOCAL_PATH)/ 
 		
 lpng_SOURCES := \
@@ -46,9 +47,14 @@ yon_SOURCES :=   \
 		Yon/CLogger.cpp \
 		Yon/CFileSystem.cpp \
 		Yon/CReadFile.cpp \
+		Yon/CReadFileStream.cpp \
+		Yon/CReadMemoryStream.cpp \
 		Yon/COrthoCamera.cpp \
 		Yon/CGeometryFactory.cpp \
+		Yon/CEntity.cpp \
 		Yon/CModel.cpp \
+		Yon/CAnimatorFactory.cpp \
+		Yon/CGraphicsAdapter.cpp \
 		Yon/CSceneManager.cpp \
 		Yon/CTimerAndroid.cpp \
 		Yon/CFPSCounter.cpp \

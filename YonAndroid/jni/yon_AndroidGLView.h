@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (Ljava/lang/String;Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeOnSurfaceCreated
-  (JNIEnv *, jobject, jstring, jstring);
+  (JNIEnv *, jobject, jint, jint, jstring, jstring);
 
 /*
  * Class:     yon_AndroidGLView

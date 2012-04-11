@@ -11,7 +11,7 @@ namespace scene{
 	public:
 		virtual ~IGraphicsAdapter(){}
 
-		virtual void beginBatch(u32 layerId) = 0;
+		virtual void beginBatch(s32 layerId) = 0;
 		virtual void endBatch() = 0;
 
 		//绘制成功返回true，否则返回false

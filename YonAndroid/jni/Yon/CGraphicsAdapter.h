@@ -19,25 +19,27 @@ namespace scene{
 	class CGraphicsAdapter : public IGraphicsAdapter{
 	private:
 		struct SLayer{
-			u32 layerId;
+			s32 layerId;
 			IEntity* entity;
 
-			SLayer(u32 layerId,IEntity* entity)
+			SLayer(s32 layerId,IEntity* entity)
 				:layerId(layerId),entity(entity){}
 
 			~SLayer(){
 				entity->drop();
 			}
 		};
+		const static s32 Z_INC=1;
 		core::array<SLayer*> m_layers;
 		ISceneManager* m_pSceneMgr;
 		video::IVideoDriver* m_pDriver;
 		u32 m_uCurrentLayerIndex;
+		s32 m_iZValue;//根据layerId与调用drawImage顺序计算的z值
 	public:
 		CGraphicsAdapter(video::IVideoDriver* driver,ISceneManager* sceneMgr);
 		virtual ~CGraphicsAdapter();
 
-		virtual void beginBatch(u32 layerId);
+		virtual void beginBatch(s32 layerId);
 		virtual void endBatch();
 
 		

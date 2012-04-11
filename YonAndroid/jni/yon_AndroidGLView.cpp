@@ -16,6 +16,7 @@ using namespace yon::scene::camera;
 IYonEngine* engine=NULL;
 IVideoDriver* driver=NULL;
 ISceneManager* sceneMgr=NULL;
+IGraphicsAdapter* gfAdapter=NULL;
 
 IModel* cubeModel=NULL;
 IModel* sphereModel=NULL;
@@ -30,14 +31,17 @@ const static s32 ACTION_POINTER_UP = 6;
 
 const char* LOG_TAG = "yon_AndroidGLView";
 
-void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jstring apkFilePath, jstring sdcardPath){
-	LOGD(LOG_TAG,"pEnv:%08x,nativeOnSurfaceCreated",pEnv);
+void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jint width, jint height, jstring apkFilePath, jstring sdcardPath){
+	LOGD(LOG_TAG,"screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",width,height,pEnv);
 	SYonEngineParameters params;
 	params.pJNIEnv=pEnv;
+	params.windowSize.w=width;
+	params.windowSize.h=height;
 	engine=CreateEngine(params);
 
 	driver=engine->getVideoDriver();
 	sceneMgr=engine->getSceneManager();
+	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IFileSystem* fs=engine->getFileSystem();
 	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,300));
@@ -47,63 +51,47 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, js
 	IUnit* unit;
 	IEntity* entity;
 
-	/*IEntity* cube=geometryFty->createCube(core::dimension3df(50,50,50));
-	cubeModel=sceneMgr->addModel(cube);
-	//material=cubeModel->getMaterial(0);
-	cubeModel->setPosition(core::vector3df(20,20,0));
-	//material->setTexture(0,driver->getTexture("/media/test.png"));
-	cube->drop();*/
+
 	shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
 	material=cubeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
-	cubeModel->setPosition(core::vector3df(70,40,0));
+	cubeModel->setPosition(core::vector3df(50,-40,0));
 	material->setTexture(0,driver->getTexture("/media/test.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
 
-	/*IEntity* sphere=geometryFty->createSphere(50,16,16);
-	sphereModel=sceneMgr->addModel(sphere);
-	//material=sphereModel->getMaterial(0);
-	sphereModel->setPosition(core::vector3df(-20,-20,0));
-	//material->setTexture(0,driver->getTexture("/media/earth.png"));
-	sphere->drop();*/
+	/*
 	shap=geometryFty->createSphere(100,16,16);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	sphereModel=sceneMgr->addModel(entity);
 	material=sphereModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
-	sphereModel->setPosition(core::vector3df(-50,-50,-150));
+	sphereModel->setPosition(core::vector3df(0,0,-150));
 	material->setTexture(0,driver->getTexture("/media/earth.png"));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 	
-	/*IEntity* plane=geometryFty->createXYPlane(core::dimension2df(50,50));
-	planeModel=sceneMgr->addModel(plane);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
-	planeModel->setPosition(core::vector3df(-20,20,100));
-	material->setTexture(0,driver->getTexture("/media/aura.png"));
-	plane->drop();*/
-	shap=geometryFty->createXYRectangle(-25,-25,25,25);
+
+	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
 	material=planeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
-	planeModel->setPosition(core::vector3df(-50,20,0));
+	planeModel->setPosition(core::vector3df(0,0,0));
 	material->setTexture(0,driver->getTexture("/media/aura.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
 
-	shap1=geometryFty->createXYRectangle(0,0,128,128,0,0,1,1);
-	shap2=geometryFty->createXYRectangle(128,0,256,128,0,0,1,1);
+	/*shap1=geometryFty->createXYRectangle2D(0,0,128,128,0,0,1,1);
+	shap2=geometryFty->createXYRectangle2D(128,0,256,128,0,0,1,1);
 	shap1->append(shap2);
 	shap2->drop();
 	unit=geometryFty->createUnit(shap1);
@@ -111,12 +99,12 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, js
 	IModel* navModel=sceneMgr->addModel(nav);
 	material=navModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
-	navModel->setPosition(core::vector3df(-100,-100,0));
+	navModel->setPosition(core::vector3df(-50,-50,0));
 	material->setTexture(0,driver->getTexture("/media/nav.png"));
 	//material->setTexture(0,Logger->getDebugPrinter()->getTexture());
 	nav->drop();
 	unit->drop();
-	shap1->drop();
+	shap1->drop();*/
 
 	LOGD(LOG_TAG,"nativeOnSurfaceCreated");
 }
@@ -135,8 +123,8 @@ void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
-	const core::vector3df srot=sphereModel->getRotation();
-	sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.5f ,srot.z));
+	//const core::vector3df srot=sphereModel->getRotation();
+	//sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.5f ,srot.z));
 
 	const core::vector3df psca=planeModel->getScale();
 	if(psca.x>4)
@@ -146,6 +134,11 @@ void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	planeModel->setScale(psca*factor);
 
 	sceneMgr->render(driver);
+
+	gfAdapter->beginBatch(0);
+	gfAdapter->drawImage("/media/nav.png",0,0,128,128,0,0,true);
+	gfAdapter->drawImage("/media/nav.png",0,0,128,128,100,0,true);
+	gfAdapter->endBatch();
 
 	Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),ORIGIN_POSITION2DI,COLOR_GREEN);
 	Logger->render();

@@ -63,6 +63,9 @@ inline void heapsort(T* elements,u32 size){
 		heaprise(elements,1,i-1);
 	}*/
 
+	if(size<=1)
+		return;
+
 	u32 i;
 	T* virtualArray=elements-1;
 	//将elements[0...size-1]建成大顶堆

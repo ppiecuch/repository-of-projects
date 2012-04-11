@@ -16,6 +16,7 @@ class heapsortTestCase : public CPPUNIT_NS::TestFixture
 	CPPUNIT_TEST_SUITE( heapsortTestCase );
 	CPPUNIT_TEST( sort1 );
 	CPPUNIT_TEST( sort2 );
+	CPPUNIT_TEST( sort3 );
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -24,6 +25,7 @@ public:
 protected:
 	void sort1();
 	void sort2();
+	void sort3();
 };
 
 #endif
