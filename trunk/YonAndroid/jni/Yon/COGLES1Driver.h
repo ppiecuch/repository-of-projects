@@ -40,7 +40,7 @@ namespace yon{
 				virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest){
 					const core::dimension2du& size=getCurrentRenderTargetSize();
 					dest.x=src.x-(f32)size.w/2;
-					dest.y=src.y+(f32)size.h/2;
+					dest.y=(f32)size.h/2-src.y;
 				}
 
 				virtual IImage* createImageFromFile(const io::path& filename);

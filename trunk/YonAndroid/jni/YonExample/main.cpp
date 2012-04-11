@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 	material->setTexture(0,driver->getTexture("../media/aura.png"));
 	plane->drop();*/
 
-	shap=geometryFty->createXYRectangle(-25,-25,25,25);
+	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	IModel* planeModel=sceneMgr->addModel(entity);
@@ -176,7 +176,7 @@ int main(int argc, char* argv[])
 
 	
 
-	shap=geometryFty->createXYRectangle2T(-25,-50,25,50,0,0,1,0.1f);
+	shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	IModel* waterfallModel=sceneMgr->addModel(entity);
@@ -196,11 +196,6 @@ int main(int argc, char* argv[])
 	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
 	waterfallModel->addAnimator(uvAnimator);
 	uvAnimator->drop();
-
-	gfAdapter->beginBatch(0);
-	gfAdapter->drawImage("../media/nav.png",0,0,64,64,0,0,true);
-	gfAdapter->drawImage("../media/nav.png",64,64,64,64,100,0,true);
-	gfAdapter->endBatch();
 
 
 	/*ILogger* logger=Logger;
@@ -266,6 +261,11 @@ int main(int argc, char* argv[])
 
 		//driver->setMaterial(DEFAULT_MATERIAL);
 		//driver->draw2DImage(tex,ORIGIN_POSITION2DI,core::recti(ORIGIN_POSITION2DI,tex->getSize()),NULL,COLOR_BLACK);
+
+		gfAdapter->beginBatch(0);
+		gfAdapter->drawImage("../media/nav.png",0,0,128,128,0,0,true);
+		gfAdapter->drawImage("../media/nav.png",0,0,128,128,100,0,true);
+		gfAdapter->endBatch();
 
 		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 

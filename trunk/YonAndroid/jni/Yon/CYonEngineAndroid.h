@@ -21,6 +21,7 @@ namespace yon{
 
 			virtual video::IVideoDriver* getVideoDriver() const{return  m_pVideoDriver;}
 			virtual scene::ISceneManager* getSceneManager() const{return m_pSceneManager;}
+			virtual scene::IGraphicsAdapter* getGraphicsAdapter() const{return m_pGraphicsAdapter;}
 			virtual io::IFileSystem* getFileSystem() const{return m_pFileSystem;}
 
 			virtual bool run();
@@ -46,10 +47,11 @@ namespace yon{
 
 			video::IVideoDriver* m_pVideoDriver;
 			scene::ISceneManager* m_pSceneManager;
+			scene::IGraphicsAdapter* m_pGraphicsAdapter;
 			io::IFileSystem* m_pFileSystem;
 			ITimer* m_pTimer;
 
-			event::IEventListener* m_pUserListener;
+			event::IEventReceiver* m_pUserListener;
 
 			bool m_bClose;
 			bool m_bResized;

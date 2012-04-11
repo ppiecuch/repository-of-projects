@@ -58,7 +58,7 @@ namespace debug{
 		core::position2di src(pos);
 		core::position2df dest;
 		m_pDriver->convertPosCoordinate(src,dest);
-		static u32 x0,y0,x1,y1;
+		static f32 x0,y0,x1,y1;
 		static f32 u0,v0,u1,v1;
 		static s32 r,d;
 		static u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
@@ -92,9 +92,9 @@ namespace debug{
 			u1=m_texcoords[d][r]->bottomRight.x;
 			v1=m_texcoords[d][r]->topLeft.y;
 			if(shap==NULL){
-				shap=m_pGeometryFty->createXYRectangle(x0,y0,x1,y1,u0,v0,u1,v1,color);
+				shap=m_pGeometryFty->createXYRectangle2D(x0,y0,x1,y1,u0,v0,u1,v1,color);
 			}else{
-				scene::IShap* temp=m_pGeometryFty->createXYRectangle(x0,y0,x1,y1,u0,v0,u1,v1,color);
+				scene::IShap* temp=m_pGeometryFty->createXYRectangle2D(x0,y0,x1,y1,u0,v0,u1,v1,color);
 				shap->append(temp);
 				temp->drop();
 			}

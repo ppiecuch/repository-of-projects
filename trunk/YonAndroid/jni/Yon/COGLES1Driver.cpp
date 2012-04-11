@@ -647,7 +647,7 @@ namespace ogles1{
 
 	video::ITexture* COGLES1Driver::createDeviceDependentTexture(IImage* image, const io::path& name)
 	{
-		return new COGLES1Texture(image, m_pFileSystem->getAbsolutePath(name), this);
+		return new COGLES1Texture(image, name, this);
 	}
 
 	ITexture* COGLES1Driver::getTexture(const io::path& filename){

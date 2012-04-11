@@ -366,7 +366,6 @@ namespace yon{
 					elements[i] = locale_lower( elements[i] );
 			}
 
-
 			void makeUpper()
 			{
 				for (u32 i=0; i<len; ++i)

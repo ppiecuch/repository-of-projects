@@ -1,5 +1,9 @@
 #include "CReadMemoryStream.h"
 
+#ifdef YON_COMPILE_WITH_ANDROID
+#include <string.h>
+#endif
+
 namespace yon{
 namespace io{
 

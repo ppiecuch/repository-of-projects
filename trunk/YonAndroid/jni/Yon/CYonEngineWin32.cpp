@@ -54,7 +54,7 @@ namespace platform{
 		}
 
 		//初始化计时器
-		m_pTimer=yon::createTimer();
+		m_pTimer=createTimer();
 
 		//初始化文件系统
 		m_pFileSystem=io::createFileSystem();

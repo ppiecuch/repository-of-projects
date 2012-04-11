@@ -45,7 +45,7 @@ namespace io{
 	}
 
 	IReadStream* CFileSystem::createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode){
-		return createReadFileStream(filename,mode);
+		return createReadFileStream(getAbsolutePath(filename),mode);
 	}
 
 

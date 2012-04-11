@@ -8,6 +8,7 @@ import yon.util.Util;
 import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -16,8 +17,9 @@ public class AndroidGLView extends GLSurfaceView{
 	
 	AndroidGLRender renderer;
 	Activity activity;
+	int screenWidth,screenHeight;
 	
-	private native void nativeOnSurfaceCreated(String apkFilePath,String sdcardPath);
+	private native void nativeOnSurfaceCreated(int width,int height,String apkFilePath,String sdcardPath);
 	private native void nativeOnSurfaceChanged(int width, int height);
 	private native void nativeOnDrawFrame();
 	private native void nativeOnPause();
@@ -33,6 +35,12 @@ public class AndroidGLView extends GLSurfaceView{
 	public AndroidGLView(Context context) {
 		super(context);
 		this.activity=(Activity)context;
+		
+		DisplayMetrics dm = new DisplayMetrics();
+		activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+		screenWidth = dm.widthPixels;
+		screenHeight = dm.heightPixels;
+		
 		renderer=new AndroidGLRender();
 		setRenderer(renderer);
 	}
@@ -89,7 +97,7 @@ public class AndroidGLView extends GLSurfaceView{
 		 * 当窗口创建的时候需要调用onSurfaceCreated，所以我们可以在里面对OpenGL做一些初始化的工作 
 		 */
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-			nativeOnSurfaceCreated(Util.getAPKFilePath(activity),Util.getSdCardPath());
+			nativeOnSurfaceCreated(screenWidth,screenHeight,Util.getAPKFilePath(activity),Util.getSdCardPath());
 		}
 		
 	}

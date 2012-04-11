@@ -163,6 +163,7 @@ namespace ogles1{
 			m_pDriver->setTexture(1, NULL);
 			m_pDriver->setTexture(0, NULL);
 			glDisable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 	};
 }//ogles1
