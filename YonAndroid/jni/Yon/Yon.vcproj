@@ -210,6 +210,10 @@
 				Name="core"
 				>
 				<File
+					RelativePath="..\include\btree.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\dimension2d.h"
 					>
 				</File>
