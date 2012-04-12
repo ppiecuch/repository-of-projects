@@ -40,11 +40,17 @@ namespace io{
 			m_fileSize = getPos();
 			fseek(m_pFile, 0, SEEK_SET);
 		}
+		else
+		{
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("file:%s open failed!",m_path.c_str()).c_str());
+		}
 	}
 
 	void CReadFileStream::readDataInEndianMode(void* data,u32 sizeToRead){
-		if (m_pFile==NULL)
-			return;
+		if (m_pFile==NULL){
+			Logger->warn(YON_LOG_WARN_FORMAT,"No file is opened!");
+			return ;
+		}
 		if(m_endianMode==ENUM_ENDIAN_MODE_LITTLE){
 			fread(data, 1, sizeToRead, m_pFile);
 		}else{
@@ -57,8 +63,10 @@ namespace io{
 	}
 
 	s32 CReadFileStream::read(u8* buffer,u32 sizeToRead){
-		if (m_pFile==NULL)
+		if (m_pFile==NULL){
+			Logger->warn(YON_LOG_WARN_FORMAT,"No file is opened!");
 			return 0;
+		}
 
 		return (s32)fread(buffer, 1, sizeToRead, m_pFile);
 	}
