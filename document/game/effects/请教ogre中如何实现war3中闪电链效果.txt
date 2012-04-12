@@ -1,0 +1,23 @@
+请教ogre中如何实现war3中闪电链效果
+ogre中如何实现war3中闪电链效果, 使用user-object么, 大家有什么思路么?
+9 months ago
+Like CommentFollow Flag More
+fheng Z. likes this
+3 comments
+ 
+Pizza
+Pizza .. • 公告板链(Billboard Chains)和带状轨迹(Ribbon Trails) 
+定义轨迹动画（比如闪电链的轨迹） 
+
+或者使用粒子（这个貌似用默认的粒子插件不是很好做）
+9 months ago
+ 
+Wu
+Wu S. • 恩, 感觉带状轨迹(Ribbon Trails)是可以的, 但是我觉得难点在于如何让这个轨迹链接在两个实体上
+9 months ago
+ 
+Pizza
+Pizza .. • 我想可以通过获得两个实体的位置作为参数，传递给一个叫 闪电链 的函数中，里面获取这2个位置参数做实时的轨迹计算，然后通过开始动画来播放这个“实时”生成的效果。 
+难的应该在实时计算轨迹的那个地方，不过你可以试试
+
+http://www.linkedin.com/groupItem?view=&gid=3885713&type=member&item=59154807&commentID=42991739

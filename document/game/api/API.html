@@ -81,6 +81,64 @@ http://www.khronos.org/opengles/sdk/1.1/docs/man/
 				</td>
 			</tr>
 			<tr>
+				<td>void glBindBuffer(GLenum target,GLuint buffer)</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+glBindBuffer lets you create or use a named buffer object. 
+Calling glBindBuffer with target set to GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER and buffer set to the name of the new buffer object binds the buffer object name to the target. 
+When a buffer object is bound to a target, the previous binding for that target is automatically broken.
+
+Buffer object names are unsigned integers. The value zero is reserved, but there is no default buffer object for each buffer object target. 
+Instead, buffer set to zero effectively unbinds any buffer object previously bound, and restores client memory usage for that buffer object target. 
+Buffer object names and the corresponding buffer object contents are local to the shared buffer-object space (see eglCreateContext) of the current GL rendering context.
+
+You may use glGenBuffers to generate a set of new buffer object names.
+
+The state of a buffer object immediately after it is first bound is an unmapped zero-sized memory buffer with GL_READ_WRITE access and GL_STATIC_DRAW usage.
+
+While a non-zero buffer object name is bound, GL operations on the target to which it is bound affect the bound buffer object, and queries of the target to 
+which it is bound return state from the bound buffer object. While buffer object name zero is bound, as in the initial state, attempts to modify or query 
+state on the target to which it is bound generates an GL_INVALID_OPERATION error.
+
+When vertex array pointer state is changed, for example by a call to glNormalPointer, the current buffer object binding (GL_ARRAY_BUFFER_BINDING) is copied 
+into the corresponding client state for the vertex array type being changed, for example GL_NORMAL_ARRAY_BUFFER_BINDING. 
+While a non-zero buffer object is bound to the GL_ARRAY_BUFFER target, the vertex array pointer parameter that is traditionally interpreted as a pointer to 
+client-side memory is instead interpreted as an offset within the buffer object measured in basic machine units.
+
+While a non-zero buffer object is bound to the GL_ELEMENT_ARRAY_BUFFER target, the indices parameter of glDrawElements that is traditionally interpreted as 
+a pointer to client-side memory is instead interpreted as an offset within the buffer object measured in basic machine units.
+
+A buffer object binding created with glBindBuffer remains active until a different buffer object name is bound to the same target, or until the bound buffer 
+object is deleted with glDeleteBuffers.
+
+Once created, a named buffer object may be re-bound to any target as often as needed. However, the GL implementation may make choices about how to optimize 
+the storage of a buffer object based on its initial binding target.
+【参数】
+target
+Specifies the target to which the buffer is bound. The symbolic constant must be GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
+
+buffer
+Specifies the name of a buffer object.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+http://www.khronos.org/opengles/sdk/1.1/docs/man/
+</pre>
+				</td>
+			</tr>
+			<tr>
 				<td>void glBlendFunc(GLenum sfactor,GLenum dfactor);</td>
 				<td>支持</td>
 				<td>&nbsp;</td>
@@ -110,6 +168,146 @@ The initial value is GL_ZERO.
 <pre>
 参考文档：
 
+</pre>
+				</td>
+			</tr>
+			<tr>
+				<td>void glBufferData(GLenum target,GLsizeiptr size,const GLvoid * data,GLenum usage)</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+glBufferData creates a new data store for the buffer object currently bound to target. Any pre-existing data store is deleted. 
+The new data store is created with the specified size in bytes and usage. If data is not NULL, the data store is initialized with data from this pointer.
+
+usage is a hint to the GL implementation as to how a buffer object's data store will be accessed. 
+This enables the GL implementation to make more intelligent decisions that may significantly impact buffer object performance. 
+It does not, however, constrain the actual usage of the data store.
+
+usage may be one of these:
+
+GL_STATIC_DRAW
+The data store contents will be modified once and used many times as the source for GL drawing commands.
+
+GL_DYNAMIC_DRAW
+The data store contents will be modified repeatedly and used many times as the source for GL drawing commands.
+【参数】
+target
+Specifies the target buffer object. The symbolic constant must be GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
+
+size
+Specifies the size in bytes of the buffer object's new data store.
+
+data
+Specifies a pointer to data that will be copied into the data store for initialization, or NULL if no data is to be copied.
+
+usage
+Specifies the expected usage pattern of the data store. The symbolic constant must be GL_STATIC_DRAW or GL_DYNAMIC_DRAW.
+【返回值】
+【备注】
+为了把顶点数据复制到图形硬件，首先绑定需要使用的缓冲区对象，然后调用glBufferData函数。
+void glBufferData(GLenum target,GLsizeiptr size,const GLvoid * data,GLenum usage)
+
+其中，target必须是 GL_ARRAY_BUFFER 或 GL_ELEMENT_ARRAY_BUFFER，size表示顶点数组的长度（以字节为单位）。最后一个参数说明如下：
+
+GL_DYNAMIC_DRAW
+存储在缓冲区对象的数据可能会经常变化，并且很可能多次作为绘图的来源。这个提示告诉OpenGL实现把数据放在更新开销不太大的地方。
+GL_STATIC_DRAW
+存储在缓冲区对象的数据可能不太会变化，并且可能多次作为绘图的来源。这个提示告诉OpenGL实现把数据放在可以快速读取但不必快速更新的地方。
+GL_STREAM_DRAW(ES1不支持，ES2支持)
+存储在缓冲区对象的数据可能不太会变化，并且只有一次作为绘图的来源（或次数非常少）。这个提示OpenGL实现有一些时间敏感的数据（例如动画几何图形）将只使用
+一次，然后被替换。关键是数据要放在可以快速更新的地方，即使需要付出更快渲染的代价。
+</pre>
+<pre>
+参考文档：
+http://www.khronos.org/opengles/sdk/1.1/docs/man/
+《OpenGL超级宝典》p294
+</pre>
+				</td>
+			</tr>
+			<tr>
+				<td>void glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr size,const GLvoid * data)</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+glBufferSubData redefines some or all of the data store for the buffer object currently bound to target. 
+Data starting at byte offset offset and extending for size bytes is copied to the data store from the memory pointed to by data. 
+An error is thrown if offset and size together define a range beyond the bounds of the buffer object's data store.
+【参数】
+target
+Specifies the target buffer object. The symbolic constant must be GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
+
+offset
+Specifies the offset into the buffer object's data store where data replacement will begin, measured in bytes.
+
+size
+Specifies the size in bytes of the data store region being replaced.
+
+data
+Specifies a pointer to the new data that will be copied into the data store.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+http://www.khronos.org/opengles/sdk/1.1/docs/man/
+</pre>
+				</td>
+			</tr>
+			<tr>
+				<td>void glGenBuffers(GLsizei n,GLuint * buffers)</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+glGenBuffers returns n buffer object names in buffers. There is no guarantee that the names form a contiguous set of integers; 
+however, it is guaranteed that none of the names was in use immediately before the call to glGenBuffers.
+
+Buffer object names returned by a call to glGenBuffers are not returned by subsequent calls, 
+unless they are first deleted with glDeleteBuffers.
+
+No buffer objects are associated with the returned buffer object names until they are first bound by calling glBindBuffer.
+
+OpenGL提供一个特性：对几何图形吞吐量提供了终极控制。当我们使用顶点数组时，可以把单个数组从客户内存（CPU可以访问）传输到图形硬件。
+这个特性称为顶点缓冲区对象，我们按照与加载和管理纹理相似的方式使用和管理顶点数组数据。但是，顶点缓冲区对象比纹理对象灵活得多。
+【参数】
+n
+Specifies the number of buffer object names to be generated.
+
+buffers
+Specifies an array in which the generated buffer object names are stored.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+http://www.khronos.org/opengles/sdk/1.1/docs/man/
+《OpenGL超级宝典》p294
 </pre>
 				</td>
 			</tr>

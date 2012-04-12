@@ -23,16 +23,24 @@
 	{
 		var keywords =
 			'int ' +
-			'GLuint '
+			'GLuint ' +
+			'NULL '
 			;
 		var functions =
 			'glActiveTexture ' +
+			'glBindBuffer ' +
+			'glBufferData ' +
+			'glBufferSubData ' +
 			'glCompressedTexImage2D ' +
 			'glCompressedTexSubImage2D ' +
+			'glDeleteBuffers ' +
 			'glDisable ' +
+			'glDrawElements ' +
 			'glEnable ' +
+			'glGenBuffers ' +
 			'glLoadMatrix ' +
 			'glMatrixMode ' +
+			'glNormalPointer ' +
 			'glPixelStorei ' +
 			'glReadPixels ' +
 			'glScissor ' +
@@ -40,19 +48,28 @@
 			'glTexSubImage2D '
 			;
 		var constants =	
+			'GL_ARRAY_BUFFER ' +
+			'GL_ARRAY_BUFFER_BINDING ' +
 			'GL_DST_ALPHA ' +
 			'GL_DST_COLOR ' +
+			'GL_DYNAMIC_DRAW ' +
+			'GL_ELEMENT_ARRAY_BUFFER ' +
+			'GL_INVALID_OPERATION ' +
 			'GL_MAX_TEXTURE_UNITS ' +
+			'GL_NORMAL_ARRAY_BUFFER_BINDING ' +
 			'GL_ONE ' +
 			'GL_ONE_MINUS_DST_ALPHA ' +
 			'GL_ONE_MINUS_DST_COLOR ' +
 			'GL_ONE_MINUS_SRC_ALPHA ' +
 			'GL_ONE_MINUS_SRC_COLOR ' +
 			'GL_PACK_ALIGNMENT ' +
+			'GL_READ_WRITE ' +
 			'GL_SCISSOR_TEST ' +
 			'GL_SRC_ALPHA ' +
 			'GL_SRC_ALPHA_SATURATE ' +
 			'GL_SRC_COLOR ' +
+			'GL_STATIC_DRAW ' +
+			'GL_STREAM_DRAW ' +
 			'GL_TEXTURE0 ' +
 			'GL_TEXTUREi ' +
 			'GL_UNPACK_ALIGNMENT ' +
@@ -62,8 +79,8 @@
 		var r = SyntaxHighlighter.regexLib;
 		
 		this.regexList = [
-			{ regex: r.multiLineDoubleQuotedString,					css: 'string' },			// double quoted strings
-			{ regex: r.multiLineSingleQuotedString,					css: 'string' },			// single quoted strings
+			//{ regex: r.multiLineDoubleQuotedString,					css: 'string' },			// double quoted strings
+			//{ regex: r.multiLineSingleQuotedString,					css: 'string' },			// single quoted strings
 			{ regex: r.singleLineCComments,							css: 'comments' },			// one line comments
 			{ regex: r.multiLineCComments,							css: 'comments' },			// multiline comments
 			{ regex: /\s*#.*/gm,									css: 'preprocessor' },		// preprocessor tags like #region and #endregion
