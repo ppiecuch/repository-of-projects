@@ -1,6 +1,8 @@
 #ifndef _YON_CORE_BTREE_H_
 #define _YON_CORE_BTREE_H_
 
+#include <stdio.h>
+
 namespace yon{
 namespace core{
 
@@ -11,11 +13,27 @@ namespace core{
 
 		btreenode* leftChild;
 		btreenode* rightChild;
-	public:
 
+		T value;
+	public:
+		btreenode(T value):parent(NULL),leftChild(NULL),rightChild(NULL),value(value){}
 		inline btreenode* getLeftChild(){return leftChild;}
 		inline btreenode* getRightChild(){return rightChild;}
 		inline btreenode* getParent(){return parent;}
+		inline T& getValue(){return value;}
+
+		//ÖÐÐò±éÀú
+		inline void inorderTraversal(){
+			if(isRoot())
+				printf("\n");
+			printf("%c",value);
+			if(leftChild)
+				leftChild->inorderTraversal();
+			if(rightChild)
+				rightChild->inorderTraversal();
+			if(isRoot())
+				printf("\n");
+		}
 		
 		inline bool isRoot(){return parent==NULL;}
 		inline bool isLeftChild(){return !isRoot()&&parent->leftChild==this;}

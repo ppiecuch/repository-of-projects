@@ -4,6 +4,7 @@
 #include "config.h" 
 #include "yonTypes.h" 
 #include "heapsort.h"
+#include "btree.h"
 
 #include "ILogger.h" 
 #include "IDebugPrinter.h"

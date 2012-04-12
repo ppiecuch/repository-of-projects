@@ -1,6 +1,6 @@
 #include "heapsortTestCase.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( heapsortTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( heapsortTestCase );
 
 void heapsortTestCase::setUp()
 {

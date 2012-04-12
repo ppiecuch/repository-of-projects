@@ -167,6 +167,14 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\btreeTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\btreeTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\heapsortTestCase.cpp"
 			>
 		</File>
@@ -200,6 +208,14 @@
 		</File>
 		<File
 			RelativePath=".\timerTestCase.h"
+			>
+		</File>
+		<File
+			RelativePath=".\vector2dTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\vector2dTestCase.h"
 			>
 		</File>
 		<File
