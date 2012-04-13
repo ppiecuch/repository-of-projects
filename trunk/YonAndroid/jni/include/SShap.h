@@ -15,8 +15,14 @@ namespace scene{
 	protected:
 		core::array<V> m_vertices;
 		core::array<I> m_indices;
+		
+		u32 m_uVerticesChangedId;
+		u32 m_uIndicesChangedId;
+
 		friend class CGeometryFactory;
 	public:
+		SShap()
+			:m_uVerticesChangedId(1),m_uIndicesChangedId(1){}
 		/*virtual const V* getVertices() const{
 			return m_vertices.pointer();
 		}
@@ -62,6 +68,13 @@ namespace scene{
 			append(other->getVertices(),other->getVertexCount(),other->getIndices(),other->getIndexCount());
 		}*/
 
+		virtual u32 getVerticesChangedId() const{
+			return m_uVerticesChangedId;
+		}
+		virtual u32 getIndicesChangedId() const{
+			return m_uIndicesChangedId;
+		}
+
 		virtual const void* getVertices() const{
 			return m_vertices.pointer();
 		}
@@ -98,6 +111,9 @@ namespace scene{
 			for (i=0; i<numIndices; ++i){
 				m_indices.push(((I*)indices)[i]+vertexCount);
 			}
+
+			++m_uVerticesChangedId;
+			++m_uIndicesChangedId;
 		}
 
 		virtual void append(const IShap* const other){
@@ -114,6 +130,12 @@ namespace scene{
 
 		virtual ENUM_VERTEX_TYPE getVertexType() const{
 			return static_cast<const ENUM_VERTEX_TYPE>(VT);
+		}
+		virtual u32 getVertexSize() const{
+			return sizeof(V);
+		}
+		virtual u32 getIndexSize() const{
+			return sizeof(I);
 		}
 	};
 

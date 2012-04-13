@@ -13,6 +13,7 @@
 #include "IMaterial.h"
 #include "SColor.h"
 #include "ITimer.h"
+#include "IHardwareBuffer.h"
 
 namespace yon{
 

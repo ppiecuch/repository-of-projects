@@ -5,6 +5,7 @@
 #include "ILogger.h"
 #include "CDebugPrinter.h"
 #include "yonUtil.h"
+#include "COGLES1HardwareBuffer.h"
 
 namespace yon{
 namespace video{
@@ -96,6 +97,15 @@ namespace ogles1{
 
 		u32 i=0;
 		u32 size=0;
+
+		//TODO map.drop
+		size=m_pHardwareBuffers.size();
+		for(i=0;i<m_pHardwareBuffers.size();++i){
+			delete m_pHardwareBuffers[i];
+		}
+		Logger->info("Release %d/%d Hardwarebuffer\n",i,size);
+
+		
 
 		size=m_imageLoaders.size();
 		for(i=0;i<m_imageLoaders.size();++i)
@@ -192,12 +202,30 @@ namespace ogles1{
 			break;
 		}
 
-		const void* vertice=unit->getShap()->getVertices();
-		const void* indice=unit->getShap()->getIndices();
-		u32 vertexCount=unit->getShap()->getVertexCount();
-		u32 indexCount=unit->getShap()->getIndexCount();
+		if(needHardwareBuffer(unit)){
+			//TODO map.find
+			IHardwareBuffer* buffer=NULL;
+			for(u32 i=0;i<m_pHardwareBuffers.size();++i){
+				if(m_pHardwareBuffers[i]->unit==unit){
+					buffer=m_pHardwareBuffers[i]->buffer;
+					break;
+				}
+			}
+			if(buffer==NULL){
+				buffer=createHardwareBuffer(unit);
+				m_pHardwareBuffers.push(new SHardwareBufferPair());
+				m_pHardwareBuffers[m_pHardwareBuffers.size()-1]->unit=unit;
+				m_pHardwareBuffers[m_pHardwareBuffers.size()-1]->buffer=buffer;
+			}
+			buffer->draw(mode);
+		}else{
+			const void* vertice=unit->getShap()->getVertices();
+			const void* indice=unit->getShap()->getIndices();
+			u32 vertexCount=unit->getShap()->getVertexCount();
+			u32 indexCount=unit->getShap()->getIndexCount();
 
-		drawVertexPrimitiveList(vertice,vertexCount,indice,indexCount,mode,unit->getVertexType());
+			drawVertexPrimitiveList(vertice,vertexCount,indice,indexCount,mode,unit->getVertexType());
+		}
 
 		
 #if 0

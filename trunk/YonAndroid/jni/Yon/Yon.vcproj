@@ -610,6 +610,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\IHardwareBuffer.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IImage.h"
 					>
 				</File>
@@ -654,6 +658,14 @@
 					</File>
 					<File
 						RelativePath=".\COGLES1Driver.h"
+						>
+					</File>
+					<File
+						RelativePath=".\COGLES1HardwareBuffer.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\COGLES1HardwareBuffer.h"
 						>
 					</File>
 					<File
