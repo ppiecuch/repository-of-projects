@@ -20,6 +20,14 @@ namespace core{
 		inline btreenode* getLeftChild(){return leftChild;}
 		inline btreenode* getRightChild(){return rightChild;}
 		inline btreenode* getParent(){return parent;}
+		inline btreenode* getSibling(){
+			if(isRoot())
+				return NULL;
+			if(parent->leftChild==this)
+				return parent->rightChild;
+			if(parent->rightChild==this)
+				return parent->leftChild;
+		}
 		inline T& getValue(){return value;}
 
 		//ÖĞĞò±éÀú

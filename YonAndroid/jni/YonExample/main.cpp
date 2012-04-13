@@ -100,14 +100,15 @@ int main(int argc, char* argv[])
 	//IImage* image=driver->createImageFromFile("D:/test.png");
 	//image->drop();
 
-	shap=geometryFty->createSphere(80,16,16);
+	shap=geometryFty->createSphere(80,64,64);
 	unit=geometryFty->createUnit(shap);
+	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	entity=geometryFty->createEntity(unit);
 	IModel* sphereModel=sceneMgr->addModel(entity);
 	material=sphereModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
-	sphereModel->setPosition(core::vector3df(300,100,0));
+	sphereModel->setPosition(core::vector3df(100,100,0));
 	material->setTexture(0,driver->getTexture("../media/earth.png"));
 	shap->drop();
 	unit->drop();
@@ -116,12 +117,13 @@ int main(int argc, char* argv[])
 
 	shap=geometryFty->createTorus(10,30,16,16,COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
+	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	entity=geometryFty->createEntity(unit);
 	IModel* toruseModel=sceneMgr->addModel(entity);
 	material=toruseModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
 	material->setPolygonMode(ENUM_POLYGON_MODE_FILL);
-	toruseModel->setPosition(core::vector3df(230,230,0));
+	toruseModel->setPosition(core::vector3df(130,130,100));
 	material->setTexture(0,driver->getTexture("../media/gunny.png"));
 	shap->drop();
 	unit->drop();
@@ -139,6 +141,7 @@ int main(int argc, char* argv[])
 
 	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
+	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	entity=geometryFty->createEntity(unit);
 	IModel* planeModel=sceneMgr->addModel(entity);
 	material=planeModel->getMaterial(0);
@@ -178,11 +181,12 @@ int main(int argc, char* argv[])
 
 	shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
+	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	entity=geometryFty->createEntity(unit);
 	IModel* waterfallModel=sceneMgr->addModel(entity);
 	material=waterfallModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_MASK);
-	waterfallModel->setPosition(core::vector3df(300,100,120));
+	waterfallModel->setPosition(core::vector3df(90,100,120));
 	material->setTexture(0,driver->getTexture("../media/waterfall.png"));
 	material->setTexture(1,driver->getTexture("../media/mask.png"));
 	shap->drop();
@@ -262,10 +266,10 @@ int main(int argc, char* argv[])
 		//driver->setMaterial(DEFAULT_MATERIAL);
 		//driver->draw2DImage(tex,ORIGIN_POSITION2DI,core::recti(ORIGIN_POSITION2DI,tex->getSize()),NULL,COLOR_BLACK);
 
-		gfAdapter->beginBatch(0);
+		/*gfAdapter->beginBatch(0);
 		gfAdapter->drawImage("../media/nav.png",0,0,128,128,0,0,true);
 		gfAdapter->drawImage("../media/nav.png",0,0,128,128,100,0,true);
-		gfAdapter->endBatch();
+		gfAdapter->endBatch();*/
 
 		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 

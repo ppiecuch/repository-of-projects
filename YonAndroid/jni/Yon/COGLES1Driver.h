@@ -73,7 +73,11 @@ namespace yon{
 				void addTexture(video::ITexture* texture);
 				YON_DEPRECATED video::ITexture* loadTextureFromFile(io::IReadFile* file);
 				video::ITexture* loadTextureFromFile(io::IReadStream* file);
-				virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
+				video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
+
+				bool needHardwareBuffer(scene::IUnit* unit){
+					return unit->getHardwareBufferUsageType()!=ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE;
+				}
 
 				core::matrix4f m_matrix[ENUM_TRANSFORM_COUNT];
 				bool m_bRenderModeChange;
@@ -87,6 +91,16 @@ namespace yon{
 				core::array<video::ITexture*> m_textures;
 				core::array<video::IImageLoader*> m_imageLoaders;
 				core::array<video::IMaterialRenderer*> m_materialRenderers;
+				//TODO map
+				struct SHardwareBufferPair{
+					scene::IUnit* unit;
+					video::IHardwareBuffer* buffer;
+
+					~SHardwareBufferPair(){
+						buffer->drop();
+					}
+				};
+				core::array<SHardwareBufferPair*> m_pHardwareBuffers;
 
 				CFPSCounter m_FPSCounter;
 

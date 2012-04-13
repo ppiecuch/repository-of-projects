@@ -13,12 +13,13 @@ namespace scene{
 	private:
 		IShap* m_pShap;
 		video::IMaterial* m_pMaterial;
+		video::ENUM_HARDWARDBUFFER_USAGE_TYPE m_usageType;
 	public:
 		SUnit()
-			:m_pMaterial(new video::CMaterial()),m_pShap(NULL){
+			:m_pMaterial(new video::CMaterial()),m_pShap(NULL),m_usageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE){
 		}
 		SUnit(video::IMaterial* material)
-			:m_pMaterial(material),m_pShap(NULL){
+			:m_pMaterial(material),m_pShap(NULL),m_usageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE){
 				m_pMaterial->grab();
 		}
 
@@ -33,6 +34,14 @@ namespace scene{
 		}
 		virtual const video::IMaterial* getMaterial() const{
 			return m_pMaterial;
+		}
+
+		virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getHardwareBufferUsageType() const{
+			return m_usageType;
+
+		}
+		virtual void setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type){
+			m_usageType=type;
 		}
 
 		virtual IShap* getShap()const {

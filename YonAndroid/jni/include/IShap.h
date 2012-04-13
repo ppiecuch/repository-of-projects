@@ -21,6 +21,13 @@ namespace yon{
 			virtual void append(const IShap* const other) = 0;
 
 			virtual ENUM_VERTEX_TYPE getVertexType() const = 0;
+			//获取每个顶点/索引的字节数
+			virtual u32 getVertexSize() const = 0;
+			virtual u32 getIndexSize() const = 0;
+
+			//当顶点/索引变化时，changedId跟着改变
+			virtual u32 getVerticesChangedId() const = 0;
+			virtual u32 getIndicesChangedId() const = 0;
 		};
 	} 
 }
