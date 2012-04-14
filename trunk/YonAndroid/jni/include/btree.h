@@ -48,6 +48,19 @@ namespace core{
 		inline bool isRightChild(){return !isRoot()&&parent->rightChild==this;}
 		inline bool isLeaf(){return leftChild==NULL&&rightChild==NULL;}
 
+		//查找
+		virtual btreenode* find(T& t) const {
+			return NULL;
+		}
+		//插入，如果已经存在t，返回false，否则返回true
+		virtual bool insert(T& t) {
+			return false;
+		}
+		//删除
+		virtual bool remove(T& t){
+			return false;
+		}
+
 		inline void makeRoot(){parent=NULL;}
 		inline void setLeftChild(btreenode* node){
 			leftChild=node;
