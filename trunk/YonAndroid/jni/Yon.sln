@@ -21,6 +21,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonExampleMFC", "YonExample
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonExampleDlg", "YonExampleDlg\YonExampleDlg.vcproj", "{6CAAA19D-61FC-446B-8AF7-C5DE447BCE8C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -47,6 +52,10 @@ Global
 		{6BD5448F-556F-4969-9254-A90761DA8EEA}.Debug|Win32.Build.0 = Debug|Win32
 		{6BD5448F-556F-4969-9254-A90761DA8EEA}.Release|Win32.ActiveCfg = Release|Win32
 		{6BD5448F-556F-4969-9254-A90761DA8EEA}.Release|Win32.Build.0 = Release|Win32
+		{6CAAA19D-61FC-446B-8AF7-C5DE447BCE8C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6CAAA19D-61FC-446B-8AF7-C5DE447BCE8C}.Debug|Win32.Build.0 = Debug|Win32
+		{6CAAA19D-61FC-446B-8AF7-C5DE447BCE8C}.Release|Win32.ActiveCfg = Release|Win32
+		{6CAAA19D-61FC-446B-8AF7-C5DE447BCE8C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

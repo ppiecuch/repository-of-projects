@@ -112,6 +112,9 @@ namespace yon{
 				EGLDisplay m_eglDisplay;
 				EGLSurface m_eglSurface;
 				EGLContext m_eglContext;
+
+				HDC m_hDc;
+				HWND m_hWnd;
 #endif//YON_COMPILE_WITH_WIN32
 			};
 		}

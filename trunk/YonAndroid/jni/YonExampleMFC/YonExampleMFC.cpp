@@ -72,7 +72,7 @@ BOOL CYonExampleMFCApp::InitInstance()
 	// 注册应用程序的文档模板。文档模板
 	// 将用作文档、框架窗口和视图之间的连接
 	CSingleDocTemplate* pDocTemplate;
-	pDocTemplate = new CSingleDocTemplate(
+ 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
 		RUNTIME_CLASS(CYonExampleMFCDoc),
 		RUNTIME_CLASS(CMainFrame),       // 主 SDI 框架窗口

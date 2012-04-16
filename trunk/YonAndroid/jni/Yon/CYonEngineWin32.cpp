@@ -28,6 +28,18 @@ namespace platform{
 
 		return NULL;
 	}
+	void eraseEngineByHWnd(HWND hWnd)
+	{
+		core::list<SEnginePair>::Iterator it = EngineMap.begin();
+		for (; it!= EngineMap.end(); ++it)
+		{
+			if ((*it).hWnd == hWnd)
+			{
+				EngineMap.erase(it);
+				break;
+			}
+		}
+	}
 
 	
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
@@ -66,7 +78,7 @@ namespace platform{
 		createDriver();
 
 		//³õÊ¼»¯GraphicsÊÊÅäÆ÷
-		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
+		//m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
 		SEnginePair ep;
 		ep.hWnd=m_hWnd;
@@ -83,7 +95,8 @@ namespace platform{
 		m_pTimer->start();
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
-		m_pGraphicsAdapter->drop();
+		eraseEngineByHWnd(m_hWnd);
+		//m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
@@ -106,6 +119,7 @@ namespace platform{
 		}
 
 	bool CYonEngineWin32::run(){
+		return true;
 		m_pTimer->tick();
 		MSG msg;
 		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -273,8 +287,10 @@ namespace platform{
 			PostQuitMessage(0);
 			return 0;
 		case WM_ACTIVATE:
+			return 0;
 		case WM_KEYDOWN:
 		case WM_KEYUP:
+			return 0;
 		case WM_SIZE:
 			Logger->debug("WM_SIZE\n");
 			engine=getEngineByHWnd(hWnd);
