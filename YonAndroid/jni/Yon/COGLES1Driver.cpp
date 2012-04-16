@@ -38,34 +38,34 @@ namespace ogles1{
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty)
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
-		m_pDebugPrinter(NULL),
+		m_pDebugPrinter(NULL),m_hDc(NULL),m_hWnd(param.hWnd),
 		m_windowSize(param.windowSize),IVideoDriver(fs,timer){
 
-		m_imageLoaders.push(createImageLoaderPNG());
+		//m_imageLoaders.push(createImageLoaderPNG());
 
-		m_materialRenderers.push(createMaterialRendererSolid(this));
+		/*m_materialRenderers.push(createMaterialRendererSolid(this));
 		m_materialRenderers.push(createMaterialRendererLighten(this));
 		m_materialRenderers.push(createMaterialRendererTransparent(this));
 		m_materialRenderers.push(createMaterialRendererTransparentBlendColor(this));
-		m_materialRenderers.push(createMaterialRendererMask(this));
+		m_materialRenderers.push(createMaterialRendererMask(this));*/
 
 #ifdef YON_COMPILE_WITH_WIN32
-		initEGL(param.hWnd);
+		//initEGL(m_hWnd);
 #endif//YON_COMPILE_WITH_WIN32
 
 		u32 i;
 		onResize(param.windowSize);
 
-		for(i=0; i<ENUM_TRANSFORM_COUNT; ++i)
-			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
+		//for(i=0; i<ENUM_TRANSFORM_COUNT; ++i)
+			//setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
 
 		for(i=0;i<YON_MATERIAL_MAX_TEXTURES;++i)
 			m_currentTextures[i]=NULL;
 
-		setRender3DMode();
+		//setRender3DMode();
 
-		glClearColor(0.1f,0.2f,0.3f,1);
-		glColor4f(1, 1, 1, 1);
+		//glClearColor(0.1f,0.2f,0.3f,1);
+		//glColor4f(1, 1, 1, 1);
 
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Driver");
 
@@ -76,13 +76,13 @@ namespace ogles1{
 		image->drop();
 		DebugFont::getInstance().m_pTexture=tex;
 		DebugFont::getInstance().m_pDriver=this;*/
-		video::IImage* image=debug::createDebugPrinterTextureImage();
+		/*video::IImage* image=debug::createDebugPrinterTextureImage();
 		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
 		addTexture(tex);
 		tex->drop();
 		image->drop();
 		m_pDebugPrinter=debug::createDebugPrinter(this,tex,geometryFty);
-		Logger->setDebugPrinter(m_pDebugPrinter);
+		Logger->setDebugPrinter(m_pDebugPrinter);*/
 	}
 
 	COGLES1Driver::~COGLES1Driver(){
@@ -123,7 +123,7 @@ namespace ogles1{
 		Logger->info("Release %d/%d MaterialRenderer\n",i,size);
 
 #ifdef YON_COMPILE_WITH_WIN32
-		destroyEGL();
+		//destroyEGL();
 #endif//YON_COMPILE_WITH_WIN32
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
 	}
@@ -141,7 +141,7 @@ namespace ogles1{
 		m_FPSCounter.registerFrame(m_pTimer->getRealTime(),0);
 	}
 	void COGLES1Driver::setViewPort(const core::recti& r){
-		glViewport(0, 0, r.getWidth(), r.getHeight());
+		//glViewport(0, 0, r.getWidth(), r.getHeight());
 		Logger->debug("setViewPort(0,0,%d,%d)\n",r.getWidth(), r.getHeight());
 	}
 	const core::dimension2du& COGLES1Driver::getCurrentRenderTargetSize() const{
@@ -813,7 +813,7 @@ namespace ogles1{
 
 		EGLConfig config;
 		EGLint num_configs;
-		HDC hdc = GetDC(hwnd);
+		m_hDc = GetDC(hwnd);
 
 		//First Step£ºGet EGLDisplay Object
 		//The type and format of display_id are implementation-specific,
@@ -822,7 +822,12 @@ namespace ogles1{
 		//display_id to be a Windows Device Context.
 		//If no display matching display_id is available,EGL_NO_DISPLAY is returned;
 		//no error condition is raised in this case.
-		m_eglDisplay = eglGetDisplay(hdc);
+		m_eglDisplay = eglGetDisplay(m_hDc);
+		/*if(m_eglDisplay == EGL_NO_DISPLAY)
+		{
+			m_eglDisplay = eglGetDisplay((NativeDisplayType) EGL_DEFAULT_DISPLAY);
+			Logger->info("eglGetDisplay(EGL_DEFAULT_DISPLAY)\n");
+		}*/
 
 		//Second Step:Initialize EglDisplay Object
 		//EGL_TRUE is returned on success, and major and minor are updated with
@@ -869,7 +874,7 @@ namespace ogles1{
 			EGL_ALPHA_SIZE, 1,
 			EGL_BUFFER_SIZE, 16,
 			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-			EGL_DEPTH_SIZE, 1,
+			EGL_DEPTH_SIZE, 16,
 			EGL_STENCIL_SIZE, false,
 			EGL_SAMPLE_BUFFERS, 0,
 			EGL_SAMPLES, 0,
@@ -915,6 +920,8 @@ namespace ogles1{
 			return false;
 		}
 
+		//eglBindAPI(EGL_OPENGL_ES_API);
+
 		//The list is terminated with EGL_NONE.
 		//If an attribute is not specified in eglAttributes,then the default value is used.
 		//If EGL_DONT_CARE is specified as an attribute value,then the attribute will not
@@ -939,6 +946,7 @@ namespace ogles1{
 		//EGL_CONTEXT_CLIENT_VERSION determines which version of an OpenGL ES context to create.An attribute value of 1 specifies creation
 		//of an OpenGL ES 1.x context.An attribute value of 2 specifies creation of an OpenGL ES 2.x context.(Default:1)
 		m_eglContext = eglCreateContext(m_eglDisplay, config, EGL_NO_CONTEXT, eglAttributes);
+		//m_eglContext = eglCreateContext(m_eglDisplay, config, EGL_NO_CONTEXT, NULL);
 
 		//TODO check error
 
@@ -979,6 +987,11 @@ namespace ogles1{
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Release all resources in EGL and display");
 		}else{
 			Logger->info(YON_LOG_FAILED_FORMAT,"Release all resources in EGL and display");
+		}
+		if (m_hDc&&ReleaseDC((HWND)m_hWnd, m_hDc)){
+			Logger->info(YON_LOG_SUCCEED_FORMAT,"Release DC");
+		}else{
+			Logger->info(YON_LOG_FAILED_FORMAT,"Release DC");
 		}
 	}
 #endif//YON_COMPILE_WITH_WIN32

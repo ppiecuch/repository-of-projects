@@ -1,94 +1,103 @@
-// YonExampleMFCView.cpp : CYonExampleMFCView 类的实现
+// YonExampleDlgDlg.cpp : 实现文件
 //
 
 #include "stdafx.h"
-#include "YonExampleMFC.h"
-
-#include "YonExampleMFCDoc.h"
-#include "YonExampleMFCView.h"
+#include "YonExampleDlg.h"
+#include "YonExampleDlgDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CYonExampleMFCView
+// 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
-IMPLEMENT_DYNCREATE(CYonExampleMFCView, CFormView)
+class CAboutDlg : public CDialog
+{
+public:
+	CAboutDlg();
 
-BEGIN_MESSAGE_MAP(CYonExampleMFCView, CFormView)
-	ON_WM_CREATE()
-	ON_WM_DESTROY()
+// 对话框数据
+	enum { IDD = IDD_ABOUTBOX };
+
+	protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+
+// 实现
+protected:
+	DECLARE_MESSAGE_MAP()
+};
+
+CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
+{
+}
+
+void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
+END_MESSAGE_MAP()
+
+
+// CYonExampleDlgDlg 对话框
+
+
+
+
+CYonExampleDlgDlg::CYonExampleDlgDlg(CWnd* pParent /*=NULL*/)
+	: CDialog(CYonExampleDlgDlg::IDD, pParent)
+{
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+}
+
+void CYonExampleDlgDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+}
+
+BEGIN_MESSAGE_MAP(CYonExampleDlgDlg, CDialog)
+	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
+	ON_WM_QUERYDRAGICON()
+	//}}AFX_MSG_MAP
+	ON_WM_DESTROY()
 	ON_WM_ERASEBKGND()
-	ON_WM_SIZE()
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
-// CYonExampleMFCView 构造/析构
 
-CYonExampleMFCView::CYonExampleMFCView()
-	: CFormView(CYonExampleMFCView::IDD)
+// CYonExampleDlgDlg 消息处理程序
+
+BOOL CYonExampleDlgDlg::OnInitDialog()
 {
-	// TODO: 在此处添加构造代码
+	CDialog::OnInitDialog();
 
-}
+	// 将“关于...”菜单项添加到系统菜单中。
 
-CYonExampleMFCView::~CYonExampleMFCView()
-{
-}
+	// IDM_ABOUTBOX 必须在系统命令范围内。
+	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+	ASSERT(IDM_ABOUTBOX < 0xF000);
 
-void CYonExampleMFCView::DoDataExchange(CDataExchange* pDX)
-{
-	CFormView::DoDataExchange(pDX);
-}
+	CMenu* pSysMenu = GetSystemMenu(FALSE);
+	if (pSysMenu != NULL)
+	{
+		CString strAboutMenu;
+		strAboutMenu.LoadString(IDS_ABOUTBOX);
+		if (!strAboutMenu.IsEmpty())
+		{
+			pSysMenu->AppendMenu(MF_SEPARATOR);
+			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+		}
+	}
 
-BOOL CYonExampleMFCView::PreCreateWindow(CREATESTRUCT& cs)
-{
-	// TODO: 在此处通过修改
-	//  CREATESTRUCT cs 来修改窗口类或样式
+	// 设置此对话框的图标。当应用程序主窗口不是对话框时，框架将自动
+	//  执行此操作
+	SetIcon(m_hIcon, TRUE);			// 设置大图标
+	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	return CFormView::PreCreateWindow(cs);
-}
-
-void CYonExampleMFCView::OnInitialUpdate()
-{
-	CFormView::OnInitialUpdate();
-	GetParentFrame()->RecalcLayout();
-	ResizeParentToFit();
-
-}
-
-
-// CYonExampleMFCView 诊断
-
-#ifdef _DEBUG
-void CYonExampleMFCView::AssertValid() const
-{
-	CFormView::AssertValid();
-}
-
-void CYonExampleMFCView::Dump(CDumpContext& dc) const
-{
-	CFormView::Dump(dc);
-}
-
-CYonExampleMFCDoc* CYonExampleMFCView::GetDocument() const // 非调试版本是内联的
-{
-	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CYonExampleMFCDoc)));
-	return (CYonExampleMFCDoc*)m_pDocument;
-}
-#endif //_DEBUG
-
-
-// CYonExampleMFCView 消息处理程序
-
-int CYonExampleMFCView::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (CFormView::OnCreate(lpCreateStruct) == -1)
-		return -1;
-
-	// TODO:  在此添加您专用的创建代码
+	// TODO: 在此添加额外的初始化代码
 	HWND hWnd=this->GetSafeHwnd();
 	if(hWnd==NULL)
 	{
@@ -106,102 +115,67 @@ int CYonExampleMFCView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	fs=engine->getFileSystem();
 
 	initEGL(hWnd);
-
-	//geometryFty=sceneMgr->getGeometryFactory();
-
-	//camera=sceneMgr->addCamera(core::vector3df(0,0,300));
-	//animatorFty=sceneMgr->getAnimatorFactory();
-
-	IMaterial* material;
-	IShap *shap,*shap1,*shap2;
-	IUnit* unit;
-	scene::IEntity* entity;
-
-	/*shap=geometryFty->createSphere(80,64,64);
-	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
-	entity=geometryFty->createEntity(unit);
-	sphereModel=sceneMgr->addModel(entity);
-	material=sphereModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
-	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
-	sphereModel->setPosition(core::vector3df(100,100,0));
-	material->setTexture(0,driver->getTexture("../media/earth.png"));
-	shap->drop();
-	unit->drop();
-	entity->drop();*/
-
-	/*shap=geometryFty->createCube(50,50,50);
-	unit=geometryFty->createUnit(shap);
-	entity=geometryFty->createEntity(unit);
-	cubeModel=sceneMgr->addModel(entity);
-	material=cubeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
-	cubeModel->setPosition(core::vector3df(50,50,200));
-	material->setTexture(0,driver->getTexture("../media/test.png"));
-	shap->drop();
-	unit->drop();
-	entity->drop();
-
-
-	shap=geometryFty->createTorus(10,30,16,16,COLOR_BLUE);
-	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
-	entity=geometryFty->createEntity(unit);
-	toruseModel=sceneMgr->addModel(entity);
-	material=toruseModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
-	material->setPolygonMode(ENUM_POLYGON_MODE_FILL);
-	toruseModel->setPosition(core::vector3df(130,130,100));
-	material->setTexture(0,driver->getTexture("../media/gunny.png"));
-	shap->drop();
-	unit->drop();
-	entity->drop();
-
-	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
-	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
-	entity=geometryFty->createEntity(unit);
-	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
-	planeModel->setPosition(core::vector3df(150,120,0));
-	material->setTexture(0,driver->getTexture("../media/aura.png"));
-	shap->drop();
-	unit->drop();
-	entity->drop();
-
-	shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
-	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
-	entity=geometryFty->createEntity(unit);
-	IModel* waterfallModel=sceneMgr->addModel(entity);
-	material=waterfallModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_MASK);
-	waterfallModel->setPosition(core::vector3df(90,100,120));
-	material->setTexture(0,driver->getTexture("../media/waterfall.png"));
-	material->setTexture(1,driver->getTexture("../media/mask.png"));
-	shap->drop();
-	unit->drop();
-	entity->drop();
-
-	SAnimatorParam aniParam;
-	aniParam.type=ENUM_ANIMATOR_TYPE_UV;
-	aniParam.animatorUV.unitIndex=0;
-	aniParam.animatorUV.stage=0;
-	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
-	waterfallModel->addAnimator(uvAnimator);
-	uvAnimator->drop();*/
-
-
 	SetTimer(WM_RENDER_FRAME,RENDER_INTERVAL,NULL);// n 替换为你需要定时的周期，单位毫秒。
 
-	return 0;
+	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
-void CYonExampleMFCView::OnDestroy()
+void CYonExampleDlgDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	CFormView::OnDestroy();
+	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+	{
+		CAboutDlg dlgAbout;
+		dlgAbout.DoModal();
+	}
+	else
+	{
+		CDialog::OnSysCommand(nID, lParam);
+	}
+}
+
+// 如果向对话框添加最小化按钮，则需要下面的代码
+//  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
+//  这将由框架自动完成。
+
+void CYonExampleDlgDlg::OnPaint()
+{
+	if (IsIconic())
+	{
+		CPaintDC dc(this); // 用于绘制的设备上下文
+
+		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+
+		// 使图标在工作区矩形中居中
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		// 绘制图标
+		dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		//CDialog::OnPaint();
+		if(engine->run())
+		{
+		}
+	}
+}
+
+//当用户拖动最小化窗口时系统调用此函数取得光标
+//显示。
+HCURSOR CYonExampleDlgDlg::OnQueryDragIcon()
+{
+	return static_cast<HCURSOR>(m_hIcon);
+}
+
+
+void CYonExampleDlgDlg::OnDestroy()
+{
+	CDialog::OnDestroy();
 
 	// TODO: 在此处添加消息处理程序代码
 	KillTimer(WM_RENDER_FRAME);
@@ -209,56 +183,16 @@ void CYonExampleMFCView::OnDestroy()
 	destroyEGL();
 	engine->drop();
 }
-f32 factor=1.01f;
-void CYonExampleMFCView::OnPaint()
-{
-	CPaintDC dc(this); // device context for painting
-	// TODO: 在此处添加消息处理程序代码
-	// 不为绘图消息调用 CFormView::OnPaint()
-	if(engine->run())
-	{
-		/*const core::vector3df crot=cubeModel->getRotation();
-		cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
-		//const core::vector3df srot=sphereModel->getRotation();
-		//sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.8f ,srot.z));
-
-		const core::vector3df psca=planeModel->getScale();
-		if(psca.x>4)
-			factor=0.99f;
-		else if(psca.x<2)
-			factor=1.01f;
-		planeModel->setScale(psca*factor);
-
-		const core::vector3df trot=toruseModel->getRotation();
-		toruseModel->setRotation(core::vector3df(trot.x+1.0f,trot.y,trot.z));*/
-
-		//driver->begin(true,COLOR_BLACK);
-
-		//sceneMgr->render(driver);
-
-		//Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
-
-		//driver->end();
-	}
-}
-
-BOOL CYonExampleMFCView::OnEraseBkgnd(CDC* pDC)
+BOOL CYonExampleDlgDlg::OnEraseBkgnd(CDC* pDC)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 
+	//return CDialog::OnEraseBkgnd(pDC);
 	return TRUE;
 }
 
-void CYonExampleMFCView::OnSize(UINT nType, int cx, int cy)
-{
-	CFormView::OnSize(nType, cx, cy);
-
-	// TODO: 在此处添加消息处理程序代码
-	engine->onResize(cx,cy);
-}
-
-void CYonExampleMFCView::OnTimer(UINT_PTR nIDEvent)
+void CYonExampleDlgDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	if(nIDEvent==WM_RENDER_FRAME)
@@ -266,11 +200,9 @@ void CYonExampleMFCView::OnTimer(UINT_PTR nIDEvent)
 		//更新窗口整个客户区域，同时重画时不擦除背景。
 		InvalidateRect(NULL,FALSE);
 	}
-
-	CFormView::OnTimer(nIDEvent);
+	CDialog::OnTimer(nIDEvent);
 }
-
-bool CYonExampleMFCView::initEGL(const HWND& hwnd){
+bool CYonExampleDlgDlg::initEGL(const HWND& hwnd){
 
 	EGLConfig config;
 	EGLint num_configs;
@@ -424,7 +356,7 @@ bool CYonExampleMFCView::initEGL(const HWND& hwnd){
 	return true;
 }
 
-void CYonExampleMFCView::destroyEGL(){
+void CYonExampleDlgDlg::destroyEGL(){
 	//Finial Step: Terminate OpenGL ES and destroy the window(if present).
 	//eglTerminate takes care of destroying any context or surface created with this display,so we don't need to call
 	//eglDestroySurface or eglDestroyContext here.
