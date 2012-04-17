@@ -262,6 +262,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\rbtree.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\rect.h"
 					>
 				</File>
