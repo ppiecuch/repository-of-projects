@@ -78,7 +78,7 @@ namespace platform{
 		createDriver();
 
 		//³õÊ¼»¯GraphicsÊÊÅäÆ÷
-		//m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
+		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
 		SEnginePair ep;
 		ep.hWnd=m_hWnd;
@@ -96,7 +96,7 @@ namespace platform{
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
 		eraseEngineByHWnd(m_hWnd);
-		//m_pGraphicsAdapter->drop();
+		m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
@@ -119,7 +119,6 @@ namespace platform{
 		}
 
 	bool CYonEngineWin32::run(){
-		return true;
 		m_pTimer->tick();
 		MSG msg;
 		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))

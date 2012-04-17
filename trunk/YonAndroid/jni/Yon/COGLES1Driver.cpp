@@ -41,31 +41,31 @@ namespace ogles1{
 		m_pDebugPrinter(NULL),m_hDc(NULL),m_hWnd(param.hWnd),
 		m_windowSize(param.windowSize),IVideoDriver(fs,timer){
 
-		//m_imageLoaders.push(createImageLoaderPNG());
+		m_imageLoaders.push(createImageLoaderPNG());
 
-		/*m_materialRenderers.push(createMaterialRendererSolid(this));
+		m_materialRenderers.push(createMaterialRendererSolid(this));
 		m_materialRenderers.push(createMaterialRendererLighten(this));
 		m_materialRenderers.push(createMaterialRendererTransparent(this));
 		m_materialRenderers.push(createMaterialRendererTransparentBlendColor(this));
-		m_materialRenderers.push(createMaterialRendererMask(this));*/
+		m_materialRenderers.push(createMaterialRendererMask(this));
 
 #ifdef YON_COMPILE_WITH_WIN32
-		//initEGL(m_hWnd);
+		initEGL(m_hWnd);
 #endif//YON_COMPILE_WITH_WIN32
 
 		u32 i;
 		onResize(param.windowSize);
 
-		//for(i=0; i<ENUM_TRANSFORM_COUNT; ++i)
-			//setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
+		for(i=0; i<ENUM_TRANSFORM_COUNT; ++i)
+			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
 
 		for(i=0;i<YON_MATERIAL_MAX_TEXTURES;++i)
 			m_currentTextures[i]=NULL;
 
-		//setRender3DMode();
+		setRender3DMode();
 
-		//glClearColor(0.1f,0.2f,0.3f,1);
-		//glColor4f(1, 1, 1, 1);
+		glClearColor(0.1f,0.2f,0.3f,1);
+		glColor4f(1, 1, 1, 1);
 
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Driver");
 
@@ -76,13 +76,13 @@ namespace ogles1{
 		image->drop();
 		DebugFont::getInstance().m_pTexture=tex;
 		DebugFont::getInstance().m_pDriver=this;*/
-		/*video::IImage* image=debug::createDebugPrinterTextureImage();
+		video::IImage* image=debug::createDebugPrinterTextureImage();
 		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
 		addTexture(tex);
 		tex->drop();
 		image->drop();
 		m_pDebugPrinter=debug::createDebugPrinter(this,tex,geometryFty);
-		Logger->setDebugPrinter(m_pDebugPrinter);*/
+		Logger->setDebugPrinter(m_pDebugPrinter);
 	}
 
 	COGLES1Driver::~COGLES1Driver(){
@@ -123,7 +123,7 @@ namespace ogles1{
 		Logger->info("Release %d/%d MaterialRenderer\n",i,size);
 
 #ifdef YON_COMPILE_WITH_WIN32
-		//destroyEGL();
+		destroyEGL();
 #endif//YON_COMPILE_WITH_WIN32
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
 	}
@@ -141,7 +141,7 @@ namespace ogles1{
 		m_FPSCounter.registerFrame(m_pTimer->getRealTime(),0);
 	}
 	void COGLES1Driver::setViewPort(const core::recti& r){
-		//glViewport(0, 0, r.getWidth(), r.getHeight());
+		glViewport(0, 0, r.getWidth(), r.getHeight());
 		Logger->debug("setViewPort(0,0,%d,%d)\n",r.getWidth(), r.getHeight());
 	}
 	const core::dimension2du& COGLES1Driver::getCurrentRenderTargetSize() const{
