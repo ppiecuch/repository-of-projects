@@ -167,6 +167,14 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\bstreeTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\bstreeTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\btreeTestCase.cpp"
 			>
 		</File>
@@ -192,6 +200,14 @@
 		</File>
 		<File
 			RelativePath=".\matrixTestCase.h"
+			>
+		</File>
+		<File
+			RelativePath=".\rbtreeTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\rbtreeTestCase.h"
 			>
 		</File>
 		<File
