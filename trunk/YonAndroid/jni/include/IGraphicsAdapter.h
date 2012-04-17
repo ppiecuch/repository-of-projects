@@ -11,6 +11,7 @@ namespace scene{
 	public:
 		virtual ~IGraphicsAdapter(){}
 
+		//注意：如果绘制过程不打算调用sceneMgr->render，那么记得绘制之前先调用camera->render
 		virtual void beginBatch(s32 layerId) = 0;
 		virtual void endBatch() = 0;
 

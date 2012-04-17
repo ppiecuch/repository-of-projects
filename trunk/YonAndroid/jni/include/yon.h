@@ -5,6 +5,8 @@
 #include "yonTypes.h" 
 #include "heapsort.h"
 #include "btree.h"
+#include "bstree.h"
+#include "rbtree.h"
 
 #include "ILogger.h" 
 #include "IDebugPrinter.h"
