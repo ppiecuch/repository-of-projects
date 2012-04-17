@@ -13,11 +13,6 @@ using namespace yon::scene;
 using namespace yon::scene::camera;
 using namespace yon::scene::animator;
 
-#pragma comment(lib,"libEGL.lib")
-#pragma comment(lib,"libGLESv1_CM.lib")
-#include <EGL/egl.h>
-#include <GLES/gl.h>
-
 #pragma comment(lib, "yon.lib")
 
 // CYonExampleDlgDlg 对话框
@@ -49,15 +44,9 @@ protected:
 	IAnimatorFactory*  animatorFty;
 	ICamera* camera;
 
-	bool initEGL(const HWND& hwnd);
-	void destroyEGL();
-
-	EGLDisplay m_eglDisplay;
-	EGLSurface m_eglSurface;
-	EGLContext m_eglContext;
-
-	HDC m_hDc;
-	HWND m_hWnd;
+	IModel* cubeModel;
+	IModel* planeModel;
+	IModel* toruseModel;
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
