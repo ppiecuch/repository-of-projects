@@ -34,6 +34,18 @@ namespace core{
 			return NULL;
 		}
 	public:
+		bstreenode():btreenode(){}
+		bstreenode(T value):btreenode(value){}
+		virtual btreenode* getMin(){
+			while(leftChild)
+				return leftChild->getMin();
+			return this;
+		}
+		virtual btreenode* getMax(){
+			while(rightChild)
+				return rightChild->getMin();
+			return this;
+		}
 		//查找
 		virtual btreenode* find(T t) {
 			if(t==value)
@@ -48,11 +60,10 @@ namespace core{
 		virtual btreenode* insert(T t) {
 			return bsInsert(t);
 		}
-		//删除
+		//删除，如果删除成功返回true，否则返回false
 		virtual bool remove(T t){
 			return false;
 		}
-
 	};
 
 	#define  bstree bstreenode

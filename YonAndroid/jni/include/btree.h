@@ -19,6 +19,14 @@ namespace core{
 	public:
 		btreenode():parent(NULL),leftChild(NULL),rightChild(NULL),value(0),nil(true){}
 		btreenode(T value):parent(NULL),leftChild(NULL),rightChild(NULL),value(value),nil(false){}
+
+
+		virtual ~btreenode(){
+			if(leftChild)
+				delete leftChild;
+			if(rightChild)
+				delete rightChild;
+		}
 		inline btreenode* getLeftChild(){return leftChild;}
 		inline btreenode* getRightChild(){return rightChild;}
 		inline btreenode* getParent(){return parent;}
@@ -33,6 +41,8 @@ namespace core{
 				return parent->leftChild;
 			return NULL;
 		}
+		virtual btreenode* getMin(){return NULL;}
+		virtual btreenode* getMax(){return NULL;}
 		inline T& getValue(){return value;}
 		virtual void setValue(T t){this->value=t;nil=false;}
 
@@ -92,6 +102,9 @@ namespace core{
 			}
 		}
 		
+		inline bool isEmpty(){return nil;}
+		inline bool isLeftEmpty(){return leftChild==NULL||leftChild->isEmpty();}
+		inline bool isRightEmpty(){return rightChild==NULL||rightChild->isEmpty();}
 		inline bool isRoot(){return parent==NULL;}
 		inline bool isLeftChild(){return !isRoot()&&parent->leftChild==this;}
 		inline bool isRightChild(){return !isRoot()&&parent->rightChild==this;}
@@ -105,7 +118,7 @@ namespace core{
 		virtual btreenode* insert(T t) {
 			return false;
 		}
-		//删除
+		//删除，如果删除成功返回true，否则返回false
 		virtual bool remove(T t){
 			return false;
 		}
