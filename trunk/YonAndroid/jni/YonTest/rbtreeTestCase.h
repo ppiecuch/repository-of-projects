@@ -14,10 +14,14 @@ using namespace yon::core;
 class rbtreeTestCase : public CPPUNIT_NS::TestFixture
 {
 	CPPUNIT_TEST_SUITE( rbtreeTestCase );
-	CPPUNIT_TEST( insert1 );
-	CPPUNIT_TEST( insert2 );
-	CPPUNIT_TEST( insert3 );
-	CPPUNIT_TEST( insert4 );
+	//CPPUNIT_TEST( insert1 );
+	//CPPUNIT_TEST( insert2 );
+	//CPPUNIT_TEST( insert3 );
+	//CPPUNIT_TEST( insert4 );
+	CPPUNIT_TEST( remove1 );
+	CPPUNIT_TEST( remove2 );
+	CPPUNIT_TEST( remove3 );
+	CPPUNIT_TEST( remove4 );
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -28,6 +32,10 @@ protected:
 	void insert2();
 	void insert3();
 	void insert4();
+	void remove1();
+	void remove2();
+	void remove3();
+	void remove4();
 };
 
 #endif

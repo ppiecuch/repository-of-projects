@@ -78,9 +78,144 @@ namespace core{
 			if(isRightChild()&&p->isRightChild())
 				g->rotateLeft();
 		}
+
+		inline void poseRemove1(){
+			if(isRed()){
+				executeRemove();
+				return;
+			}
+			rbtreenode* c=static_cast<rbtreenode*>(leftChild->isEmpty()?rightChild:leftChild);
+			if(c->isRed()){
+				executeRemove();
+				setBlack();
+				return;
+			}
+			executeRemove();
+			postRemove2();
+		}
+
+		inline void postRemove2(){
+			rbtreenode* p=static_cast<rbtreenode*>(getParent());
+			if(p==NULL)
+				return;
+			rbtreenode* s=static_cast<rbtreenode*>(getSibling());
+			if(s->isRed()){
+				p->swapColor(s);
+				if(isLeftChild())
+					p->rotateLeft();
+				else
+					p->rotateRight();
+				s=static_cast<rbtreenode*>(getSibling());
+			}
+			rbtreenode* sl=static_cast<rbtreenode*>(s->leftChild);
+			rbtreenode* sr=static_cast<rbtreenode*>(s->rightChild);
+			if(sr->isBlack()&&sl->isBlack()){
+				if(p->isBlack()){
+					s->setRed();
+					p->postRemove2();
+				}else{
+					p->swapColor(s);
+				}
+				return;
+			}
+			if(isLeftChild()){
+				if(sl->isRed()&&sr->isBlack()){
+					s->swapColor(sl);
+					s->rotateRight();
+				}
+			}else if(sl->isBlack()&&sr->isRed()){
+				s->swapColor(sr);
+				s->rotateLeft();
+			}
+			s=static_cast<rbtreenode*>(getSibling());
+			sl=static_cast<rbtreenode*>(s->leftChild);
+			sr=static_cast<rbtreenode*>(s->rightChild);
+
+			p->swapColor(s);
+			if(isLeftChild()){
+				if(sl->isBlack()&&sr->isRed()){
+					sr->setBlack();
+					p->rotateLeft();
+				}
+			}else if(sl->isRed()&&sr->isBlack()){
+				sl->setBlack();
+				p->rotateRight();
+			}
+ 			/*if(sr->isBlack()){
+				if(sl->isBlack()){
+					if(p->isBlack()){
+						s->setRed();
+						p->postRemove2();
+					}else{
+						p->swapColor(s);
+					}
+					return;
+				}else{
+					if(isLeftChild()){
+						s->swapColor(sl);
+						s->rotateRight();
+					}
+					else{
+						s->swapColor(sr);
+						s->rotateLeft();
+					}
+					s=static_cast<rbtreenode*>(getSibling());
+					sl=static_cast<rbtreenode*>(s->leftChild);
+					sr=static_cast<rbtreenode*>(s->rightChild);
+				}
+			}
+			if(sr->isRed()){
+				p->swapColor(s);
+				if(isLeftChild()){
+					sr->setBlack();
+					p->rotateLeft();
+				}else{
+					sl->setBlack();
+					p->rotateRight();
+				}
+			}*/
+		}
+
+		inline void executeRemove(){
+			//删除，将单儿子（如果是两个nil儿子，使用任意一个）替换删除节点
+			if(leftChild->isEmpty()==false){
+				rbtreenode* c=static_cast<rbtreenode*>(leftChild);
+				delete rightChild;
+				setExceptParent(*c);
+				c->setLeftChild(NULL);
+				c->setRightChild(NULL);
+				delete c;
+			}
+			else{
+				rbtreenode* c=static_cast<rbtreenode*>(rightChild);
+				delete leftChild;
+				setExceptParent(*c);
+				c->setLeftChild(NULL);
+				c->setRightChild(NULL);
+				delete c;
+			}
+		}
+
+		inline void setExceptParent(rbtreenode& node){
+			value=node.value;
+			red=node.red;
+			nil=node.nil;
+			leftChild=node.leftChild;
+			rightChild=node.rightChild;
+		}
 	public:
 		rbtreenode():bstreenode(),red(false){}
 		rbtreenode(T value):bstreenode(value),red(false){fill();}
+		virtual btreenode* getMin(){
+			while(leftChild->isEmpty()==false)
+				return leftChild->getMin();
+			return this;
+		}
+		virtual btreenode* getMax(){
+			while(rightChild->isEmpty()==false)
+				return rightChild->getMin();
+			return this;
+		}
 		virtual void setValue(T t){bstreenode::setValue(t);fill();}
 		virtual void print(){
 			switch(sizeof(value)){
@@ -104,9 +239,20 @@ namespace core{
 			node->postInsert1();
 			return node;
 		}
-		//删除
+		//删除，如果删除成功返回true，否则返回false
 		virtual bool remove(T t){
-			return false;
+			rbtreenode* node=static_cast<rbtreenode*>(bstreenode::find(t));
+			if(node==NULL)
+				return false;
+			//如果存在双儿子，则转换为单儿子
+			if(node->isLeftEmpty()==false&&node->isRightEmpty()==false){
+				rbtreenode* m=static_cast<rbtreenode*>(node->rightChild->getMin());
+				node->setValue(m->getValue());
+				m->fill();
+				node=m;
+			}
+			node->poseRemove1();
+			return true;
 		}
 	};
 

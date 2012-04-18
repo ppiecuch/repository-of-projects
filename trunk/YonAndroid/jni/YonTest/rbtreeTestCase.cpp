@@ -23,6 +23,128 @@ rbtreenode<s32>* print(rbtreenode<s32>* tree){
 	tree->inorderTraversal();
 	return tree;
 }
+void rbtreeTestCase::remove1()
+{
+	rbtree<c8>* tree=new rbtree<c8>();
+	rbtreenode<c8>* node=(rbtreenode<c8>*)tree->insert('u');
+
+	tree=print(tree);
+
+	tree->remove('u');
+
+	CPPUNIT_ASSERT(tree->isEmpty());
+}
+void rbtreeTestCase::remove2()
+{
+	rbtree<c8>* tree=new rbtree<c8>();
+	tree->insert('p');
+	tree->insert('z');
+	tree->insert('u');
+
+	tree=print(tree);
+
+	tree->remove('u');
+
+	tree=print(tree);
+
+	tree->remove('z');
+
+	tree=print(tree);
+
+	CPPUNIT_ASSERT(tree->getValue()=='p');
+}
+
+void rbtreeTestCase::remove3()
+{
+	rbtree<c8>* tree=new rbtree<c8>();
+	tree->insert('z');
+	tree->insert('u');
+	tree=print(tree);
+	tree->insert('k');
+	tree=print(tree);
+	tree->insert('a');
+	tree=print(tree);
+	tree->insert('g');
+	tree=print(tree);
+	tree->insert('n');
+	tree=print(tree);
+
+	tree->remove('k');
+	tree=print(tree);
+	tree->remove('a');
+	tree=print(tree);
+	tree->remove('u');
+	tree=print(tree);
+	tree->remove('z');
+	tree=print(tree);
+	tree->remove('g');
+	tree=print(tree);
+
+	CPPUNIT_ASSERT(tree->getValue()=='n');
+}
+
+void rbtreeTestCase::remove4()
+{
+	rbtree<s32>* tree=new rbtree<s32>();
+	tree->insert(4);
+	tree->insert(6);
+	tree=print(tree);
+	tree->insert(9);
+	tree=print(tree);
+	tree->insert(8);
+	tree=print(tree);
+	tree->insert(11);
+	tree=print(tree);
+	tree->insert(12);
+	tree=print(tree);
+	tree->insert(14);
+	tree=print(tree);
+	tree->insert(1);
+	tree=print(tree);
+	tree->insert(3);
+	tree=print(tree);
+	tree->insert(7);
+	tree=print(tree);
+	tree->insert(5);
+	tree=print(tree);
+	tree->insert(2);
+	tree=print(tree);
+	tree->insert(10);
+	tree=print(tree);
+	tree->insert(13);
+	tree=print(tree);
+
+	tree->remove(6);
+	tree=print(tree);
+	tree->remove(5);
+	tree=print(tree);
+	tree->remove(4);
+	tree=print(tree);
+	tree->remove(7);
+	tree=print(tree);
+	tree->remove(8);
+	tree=print(tree);
+	tree->remove(9);
+	tree=print(tree);
+	tree->remove(3);
+	tree=print(tree);
+	tree->remove(10);
+	tree=print(tree);
+	tree->remove(11);
+	tree=print(tree);
+	tree->remove(12);
+	tree=print(tree);
+	tree->remove(2);
+	tree=print(tree);
+	tree->remove(14);
+	tree=print(tree);
+	tree->remove(13);
+	tree=print(tree);
+	tree->remove(1);
+	tree=print(tree);
+
+	CPPUNIT_ASSERT(tree->isEmpty());
+}
 void rbtreeTestCase::insert1()
 {
 	rbtree<c8> tree;
