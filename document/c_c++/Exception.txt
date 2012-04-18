@@ -1,4 +1,12 @@
 [编译错误]
+编译就出现error C2248错误。
+vs2008下，从“类”创建的对象无法访问该“类”的 protected 或 private 成员，不可以执行拷贝构造函数
+解决方法：自己编写新类的复制构造函数和赋值构造函数：
+GeologicalItem(const GeologicalItem &item);
+GeologicalItem& operator=(const GeologicalItem &item);
+编译，成功通过！
+
+[编译错误]
 MSVCRTD.lib(crtexe.obj) : error LNK2019: 无法解析的外部符号 _main，该符号在函数 ___tmainCRTStartup 中被引用
 [解决]
 将
