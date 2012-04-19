@@ -1,6 +1,6 @@
 #include "rbtreeTestCase.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( rbtreeTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( rbtreeTestCase );
 
 void rbtreeTestCase::setUp()
 {

@@ -286,6 +286,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\yonMap.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\yonMath.h"
 					>
 				</File>
