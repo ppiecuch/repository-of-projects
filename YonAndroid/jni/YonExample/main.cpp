@@ -92,6 +92,16 @@ int main(int argc, char* argv[])
 	Logger->debug("read:%04x\n",rs->readInt());
 	rs->drop();
 
+	map<s32,c8> m;
+	m.insert(4,'4');
+	m.insert(6,'6');
+	m.insert(9,'9');
+	m.remove(6);
+	m.remove(5);
+	m.remove(4);
+	Logger->debug("map.size:%d\n",m.size());
+	m.clear();
+
 	//Logger->debug("%d\n",fs->existFile("D:/java1.exe"));
 
 	//driver->getTexture("D:/test.png");
