@@ -349,15 +349,8 @@ namespace core{
 			}
 
 			Node* c=n->getLeftChild();
-			if(n==NULL)
+			if(c==NULL)
 				c=n->getRightChild();
-
-			if(c)
-				c->setParent(n->getParent());
-			if(n->isLeftChild())
-				n->getParent()->setLeftChild(c);
-			else if(n->isRightChild())
-				n->getParent()->setRightChild(c);
 
 			if(n->isBlack()){
 				if(c&&c->isRed())
@@ -388,7 +381,6 @@ namespace core{
 									continue;
 								}else{
 									p->setBlack();
-									break;
 								}
 							}else{
 								if(slr){
@@ -406,7 +398,6 @@ namespace core{
 								p->setBlack();
 								s->getRightChild()->setBlack();
 								rotateLeft(p);
-								break;
 							}
 						}else{
 							s=p->getLeftChild();
@@ -425,7 +416,6 @@ namespace core{
 									continue;
 								}else{
 									p->setBlack();
-									break;
 								}
 							}else{
 								if(srr){
@@ -443,14 +433,26 @@ namespace core{
 								p->setBlack();
 								s->getLeftChild()->setBlack();
 								rotateRight(p);
-								break;
 							}
 						}
+						break;
 					}
 				}
 			}
 
+			n=tmp;
+
+			if(c)
+				c->setParent(n->getParent());
+			if(n->isLeftChild())
+				n->getParent()->setLeftChild(c);
+			else if(n->isRightChild())
+				n->getParent()->setRightChild(c);
+			else if(n->isRoot())
+				setRoot(c);
+
 			delete n;
+			--count;
 	
 			/*
 			//ÒÉÎÊ£ºÂú×ãÐÔÖÊ5£¿

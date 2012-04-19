@@ -100,9 +100,10 @@ void yonMapTestCase::remove(){
 	m.preorderTraversal(m.getRoot());
 	m.remove(13);
 	m.preorderTraversal(m.getRoot());
+	m.remove(1);
 
 
-	CPPUNIT_ASSERT(m.getRoot()->getKey()==1);
+	CPPUNIT_ASSERT(m.size()==0);
 }
 
 void yonMapTestCase::insertAndRemove(){
