@@ -6,6 +6,7 @@
 namespace yon{
 namespace core{
 
+	//此结构目前处理测试阶段，不能直接使用，使用方法见Test项目
 	template<class T>
 	class rbtreenode : public bstreenode<T>{
 	protected:

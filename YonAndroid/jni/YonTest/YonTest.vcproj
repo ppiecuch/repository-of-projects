@@ -250,6 +250,14 @@
 			RelativePath=".\yonListTestCase.h"
 			>
 		</File>
+		<File
+			RelativePath=".\yonMapTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\yonMapTestCase.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

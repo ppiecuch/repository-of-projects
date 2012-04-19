@@ -22,6 +22,7 @@
 #include "yonArray.h" 
 #include "yonList.h"
 #include "yonMath.h" 
+#include "yonMap.h"
 #include "yonString.h" 
 #include "matrix4.h" 
 #include "rect.h" 
