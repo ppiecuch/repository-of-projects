@@ -106,6 +106,25 @@ inline bool iszero(const u32 a, const u32 tolerance = 0)
 	return a <= tolerance;
 }
 
+//注意0不是2的N次幂
+inline bool isPowerOf2(const u32 a)
+{
+	return a&&!(a&(a-1));
+}
+
+//获取n二进制表示中1的个数
+inline u32 countBits(const u32 a)
+{
+	u32 s=0;
+	u32 n=a;
+	while(n)  
+	{  
+		n &= (n - 1);  
+		++s;  
+	}
+	return s;
+}
+
 }//core
 }//yon
 
