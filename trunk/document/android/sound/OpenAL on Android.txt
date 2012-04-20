@@ -1,0 +1,730 @@
+
+OpenAL on Android
+Posted on December 14, 2010
+Although being slightly late with 3D Audio Support for Android 2.3 announced – this tutorial shows how to compile OpenAL for Android, so you can provide 3D Sound in your apps with 2.2 and below. The code has successfully been tested with the Nexus One (2.2) and the G1 (1.6).
+
+Update: the resulting project for download as a single .zip file. To run the example create a directory called wav on your device’s SD card and put a sound file called lake.wav into it.
+
+Update: some people reported latency issues. It can possibly be fixed in the OpenAL source. See last paragraph for a possible solution.
+
+Update: if you are using a NativeActivity, and the app crashes on device = alcOpenDevice( NULL ); please take a look at Garen’s fix to the getEnv() method: http://pielot.org/2010/12/14/openal-on-android/#comment-1160
+
+ 
+
+Preparation
+
+Understand how to compile NDK resources
+
+This tutorial requires working with the Android NDK. We will have to compile OpenAL from source into a native Shared Object and then build a Java Native Interface to work with it. The techniques I use to work with the NDK (on Windows) have been described in a previous tutorial. You might want to take a look to understand what exactly I am doing.
+
+Remember to PRESS F5 after you COMPILED the SHARED OBJECT. Otherwise, Eclipse will not use the new .so.
+
+Create HelloOpenAL Project
+
+Create a normal Android SDK Project.
+
+package org.pielot.helloopenal;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+
+public class HelloOpenAL extends Activity {
+ /** Called when the activity is first created. */
+ @Override
+ public void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.main);
+ }
+
+ private native int play(String filename);
+}
+Compile OpenAL for Android
+
+The first step will be to compile OpenAL for Android. The goal will be to produce a Shared Object library libopenal.so that can be loaded into Android apps.
+
+Download patched source of OpenAL
+
+ 
+
+Thanks to Martins Mozeiko and Chris Robinson a version of OpenAL exists that has been adapted to the Android platform. Go to http://repo.or.cz/w/openal-soft/android.git and download latest version of the patched OpenAL sourcecode. For this tutorial I used version that can be downloaded here.
+
+Extract into project folder. Rename top folder of downloaded source from ‘android’ to ‘openal’.
+
+Create config.h
+
+To compile OpenAL a file called config.h is needed.Copy it from <PROJECT_HOME>/openal/android/jni to <PROJECT_HOME>/openal/include.
+
+Create Android.mk
+
+To tell the NDK compiler what files to compile, we now need to create Android.mk in <PROJECT_HOME>/jni . The file should contain:
+
+TARGET_PLATFORM := android-3
+ROOT_PATH := $(call my-dir)
+
+########################################################################################################
+include $(CLEAR_VARS)
+
+LOCAL_MODULE     := openal
+LOCAL_ARM_MODE   := arm
+LOCAL_PATH       := $(ROOT_PATH)
+LOCAL_C_INCLUDES := $(LOCAL_PATH) $(LOCAL_PATH)/../openal/include $(LOCAL_PATH)/../openal/OpenAL32/Include
+LOCAL_SRC_FILES  := ../openal/OpenAL32/alAuxEffectSlot.c \
+ ../openal/OpenAL32/alBuffer.c        \
+ ../openal/OpenAL32/alDatabuffer.c    \
+ ../openal/OpenAL32/alEffect.c        \
+ ../openal/OpenAL32/alError.c         \
+ ../openal/OpenAL32/alExtension.c     \
+ ../openal/OpenAL32/alFilter.c        \
+ ../openal/OpenAL32/alListener.c      \
+ ../openal/OpenAL32/alSource.c        \
+ ../openal/OpenAL32/alState.c         \
+ ../openal/OpenAL32/alThunk.c         \
+ ../openal/Alc/ALc.c                  \
+ ../openal/Alc/alcConfig.c            \
+ ../openal/Alc/alcEcho.c              \
+ ../openal/Alc/alcModulator.c         \
+ ../openal/Alc/alcReverb.c            \
+ ../openal/Alc/alcRing.c              \
+ ../openal/Alc/alcThread.c            \
+ ../openal/Alc/ALu.c                  \
+ ../openal/Alc/android.c              \
+ ../openal/Alc/bs2b.c                 \
+ ../openal/Alc/null.c                 \
+
+LOCAL_CFLAGS     := -DAL_BUILD_LIBRARY -DAL_ALEXT_PROTOTYPES
+LOCAL_LDLIBS     := -llog -Wl,-s
+
+include $(BUILD_SHARED_LIBRARY)
+
+########################################################################################################
+Compile OpenAL
+
+Now compile the source code using the NDK. I used a technique described in another tutorial on Using cygwin with the Android NDK on Windows. I am creating a batch file make.bat in the projects directory containing:
+
+@echo on
+
+@set BASHPATH="C:\cygwin\bin\bash"
+@set PROJECTDIR="/cygdrive/d/dev/workspace-android/helloopenal"
+@set NDKDIR="/cygdrive/d/dev/SDKs/android-ndk-r4b/ndk-build"
+
+%BASHPATH% --login -c "cd %PROJECTDIR% && %NDKDIR%
+
+@pause:
+Save the file and execute it. If there is no error you have just compiled the OpenAL library into a Shared Object! You can find it in <PROJECT_HOME>/libs/armeabi. Now let’s see how we can make use of it.
+
+The Native Interface
+
+The next steps will be to create a Java Native Interface that allows us to access to OpenAL Shared Object.
+
+Define Native Interface in Activity
+
+Extend the HelloOpenAL Activity, so it looks like
+
+package org.pielot.helloopenal;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+
+public class HelloOpenAL extends Activity {
+ /** Called when the activity is first created. */
+ @Override
+ public void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.main);
+
+ System.loadLibrary("openal");
+ System.loadLibrary("openaltest");
+ int ret = play("/sdcard/wav/lake.wav");
+ Log.i("HelloOpenAL", ""+ret);
+ }
+
+ private native int play(String filename);
+}
+Implement Native Interface
+
+In <PROJECT_HOME> execute
+
+javah.exe -classpath bin -d jni org.pielot.helloopenal.HelloOpenAL
+to create the c header for the native function. Now <PROJECT_HOME>/jni should contain the file org_pielot_helloopenal_HelloOpenAL.h. Create org_pielot_helloopenal_HelloOpenAL.c in <PROJECT_HOME>/jni and fill it with
+
+#include "org_pielot_helloopenal_HelloOpenAL.h"
+
+JNIEXPORT jint JNICALL Java_org_pielot_helloopenal_HelloOpenAL_play
+ (JNIEnv * env, jobject obj, jstring filename) {
+ return 0;
+}
+Compile Native Interface
+
+Add new library to Android.mk
+
+########################################################################################################
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE     := openaltest
+LOCAL_ARM_MODE   := arm
+LOCAL_PATH       := $(ROOT_PATH)
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../openal/include
+LOCAL_SRC_FILES  := org_pielot_helloopenal_HelloOpenAL.c     \
+
+LOCAL_LDLIBS     := -llog -Wl,-s
+
+LOCAL_SHARED_LIBRARIES := libopenal
+
+include $(BUILD_SHARED_LIBRARY)
+
+########################################################################################################
+Now compile again. The above created make.bat will do. You now should have two libraries in <PROJECT_HOME>/libs/armeabi/, namely libopenal.so and libopenalwrapper.so.
+
+I you want you can run the app now. It should not crash and print ‘HelloOpenAL   0’ into the log.
+
+Testing OpenAL
+
+Now we have two libraries, one containing OpenAL and the other a native interface. We will now fill the latter with life to demonstrate the use of OpenAL.
+
+Initialize and Release Audio Components
+
+Therefore open org_pielot_helloopenal_HelloOpenAL.c and extend the existing code by:
+
+#include "org_pielot_helloopenal_HelloOpenAL.h"
+
+#include <stdio.h>
+#include <stddef.h>
+#include <string.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+
+JNIEXPORT jint JNICALL Java_org_pielot_helloopenal_HelloOpenAL_play
+ (JNIEnv * env, jobject obj, jstring filename) {
+
+ // Global Variables
+ ALCdevice* device = 0;
+ ALCcontext* context = 0;
+ const ALint context_attribs[] = { ALC_FREQUENCY, 22050, 0 };
+
+ // Initialization
+ device = alcOpenDevice(0);
+ context = alcCreateContext(device, context_attribs);
+ alcMakeContextCurrent(context);
+
+ // More code to come here ...
+
+ // Cleaning up
+ alcMakeContextCurrent(0);
+ alcDestroyContext(context);
+ alcCloseDevice(device);
+
+ return 0;
+}
+This code will now acquire the audio resource and release them. You should be able to compile the code and execute the HelloOpenAL app. However, nothing will yet happen, as we still have to load and play sound.
+
+Methods for Loading Audio Data
+
+Now we need to load audio data. Unfortunately, OpenAL does not come with functions for loading audio data. There has been the very popular ALut toolkit, but this is not part of OpenAL anymore. We therefore need to provide our own methods to load .wav files.
+
+The following code snippets have been posted by Gorax at www.gamedev.net. These are one struct and two methods methods to load .wav data and buffer it in the memory.
+
+Add the following code to org_pielot_helloopenal_HelloOpenAL.c. Add the code above JNIEXPORT jint JNICALL Java_org_pielot_helloopenal_HelloOpenAL_play
+
+typedef struct {
+ char  riff[4];//'RIFF'
+ unsigned int riffSize;
+ char  wave[4];//'WAVE'
+ char  fmt[4];//'fmt '
+ unsigned int fmtSize;
+ unsigned short format;
+ unsigned short channels;
+ unsigned int samplesPerSec;
+ unsigned int bytesPerSec;
+ unsigned short blockAlign;
+ unsigned short bitsPerSample;
+ char  data[4];//'data'
+ unsigned int dataSize;
+}BasicWAVEHeader;
+
+//WARNING: This Doesn't Check To See If These Pointers Are Valid
+char* readWAV(char* filename,BasicWAVEHeader* header){
+ char* buffer = 0;
+ FILE* file = f open(filename,"rb");
+ if (!file) {
+ return 0;
+ }
+
+ if (f read(header,sizeof(BasicWAVEHeader),1,file)){
+ if (!(//these things *must* be valid with this basic header
+ memcmp("RIFF",header->riff,4) ||
+ memcmp("WAVE",header->wave,4) ||
+ memcmp("fmt ",header->fmt,4)  ||
+ memcmp("data",header->data,4)
+ )){
+
+ buffer = (char*)malloc(header->dataSize);
+ if (buffer){
+ if (f read(buffer,header->dataSize,1,file)){
+ f close(file);
+ return buffer;
+ }
+ free(buffer);
+ }
+ }
+ }
+ f close(file);
+ return 0;
+}
+
+ALuint createBufferFromWave(char* data,BasicWAVEHeader header){
+
+ ALuint buffer = 0;
+ ALuint format = 0;
+ switch (header.bitsPerSample){
+ case 8:
+ format = (header.channels == 1) ? AL_FORMAT_MONO8 : AL_FORMAT_STEREO8;
+ break;
+ case 16:
+ format = (header.channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+ break;
+ default:
+ return 0;
+ }
+
+ alGenBuffers(1,&buffer);
+ alBufferData(buffer,format,data,header.dataSize,header.samplesPerSec);
+ return buffer;
+}
+WARNING, I had to put spaces into the word f open, f read, and f close. Delete the spaces when you copy that piece of code. For some reason, WordPress does not accept the words without space in a post.
+
+Load Audio Data into Buffer
+
+In method JNIEXPORT jint JNICALL Java_org_pielot_helloopenal_HelloOpenAL_play located the comment
+
+// TODO More Code comes here
+and replace it by
+
+// Create audio buffer
+ ALuint buffer;
+ const char* fnameptr = (*env)->GetStringUTFChars(env, filename, NULL);
+ BasicWAVEHeader header;
+ char* data = readWAV(fnameptr,&header);
+ if (data){
+ //Now We've Got A Wave In Memory, Time To Turn It Into A Usable Buffer
+ buffer = createBufferFromWave(data,header);
+ if (!buffer){
+ free(data);
+ return -1;
+ }
+
+ } else {
+ return -1;
+ }
+
+ // TODO turn buffer into playing source
+
+ // Release audio buffer
+ alDeleteBuffers(1, &buffer);
+This piece of code tries to load PCM .wav audio data from the passed filename. The audio data is loaded into an OpenAL buffer. The buffer itself is merely the cached audio data but cannot be played. It therefore has to be attached to a sound source.
+
+Create a playing source from the buffer
+
+In method JNIEXPORT jint JNICALL Java_org_pielot_helloopenal_HelloOpenAL_play located the comment
+
+// TODO turn buffer into playing source
+and replace it by
+
+ // Create source from buffer and play it
+ ALuint source = 0;
+ alGenSources(1, &source );
+ alSourcei(source, AL_BUFFER, buffer);
+
+ // Play source
+ alSourcePlay(source);
+
+ int        sourceState = AL_PLAYING;
+ do {
+ alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
+ } while(sourceState == AL_PLAYING);
+
+ // Release source
+ alDeleteSources(1, &source);
+This piece of code creates a sound source from the buffer and plays it once.
+
+Test on the Device
+
+Compile the native code again by using make.bat. It should compile without errors. If you are using Eclipse, select the project HelloOpenAL in the Package Explorer and press F5. Otherwise, Eclipse might not be aware that the Shared Objects were updated.
+
+Next, go to your devices SD Card and add a .wav file. I created a folder called “wav” and put a mono .wav file called “lake.wav” into this folder. Make sure it matches the filename you passed play(String filename) in the HelloOpenAL activity.
+
+Now it time for the big test! Once you start the app, the .wav file should be played once.
+
+This has been tested on the Nexus One and the G1/HTC Dream.
+
+Solving Latency Issues
+
+Some people seem to have experienced a 0.5 sec lag between triggering the sound and the actual playback. In the comments aegisdino suggested the following solution:
+
+In alcOpenDevice() of ALc.c source,
+“device->NumUpdates” seems to apply the lag issue.
+In normal cases, device->NumUpdates will be 4, then I can feel about 0.5sec lag.
+But when I fix it to 1, the lag disappeared.
+
+I did not test the solution, but as NumUpdates was 1 in my version of ALc.c it could be the solution.
+
+This entry was posted in Android, NDK and tagged android, ndk, OpenAL by martin. Bookmark the permalink.
+40 THOUGHTS ON “OPENAL ON ANDROID”
+teupoui on January 7, 2011 at 11:14 said:
+Hello,
+
+Thank you for this tutorial, very interesting, especially for Android < 2.3 targets.
+
+I was wondering if the license of OpenAL was compatible with such an operation ?
+
+As far as I know some licences, like the GPL, are not compatible with iPhone development, because they require dynamic linking, while there is no such possibility on the iPhone.
+
+I believe here we also have static linking, but the OpenAL is probably under a license that allows it ?
+
+Reply ↓
+teupoui on January 7, 2011 at 17:15 said:
+Ok, OpenAL is under LGPL licence. This allows use in non-free programs but only under some conditions :
+
+Essentially, if it is a “work that uses the library”, then it must be possible for the software to be linked with a newer version of the LGPL-covered program. The most commonly used method for doing so is to use “a suitable shared library mechanism for linking“. Alternatively, a statically linked library is allowed if either source code or linkable object files are provided.
+
+In case I do not want to publish my source code, I need to know if the system of dynamic linking on Android is compatible with this way of doing. (iPhone’s is not as there is no dynamic linking possible anyway.)
+
+Reply ↓
+martin on January 7, 2011 at 17:58 said:
+Dear teupoui,
+
+Thanks, you are bringing up an important topic. I am afraid I do not know the exact answer, but I believe Android provides a form of dynamic linking.
+
+If you follow the tutorial, you will end up with two .so libraries, one containing OpenAL only, and the other containing the native interface implementation. Thus, the OpenAL code is perfectly separated in its own library.
+
+Also, I assume that the idea behind OpenAL is that it is being used to power e.g. 3D games, so it would hardly make sense to require every app to be open source which uses the library.
+
+Best wishes,
+Martin
+
+Reply ↓
+Kcm on January 19, 2011 at 16:00 said:
+Hello,
+
+Thanks for your tuturial, it helps me a lot…
+I have a little question : do you know how to reduce latency?
+I have 0.4s after alSourcePlay call…
+
+Reply ↓
+
+martin
+on January 27, 2011 at 17:57 said:
+Hi Kcm,
+
+Sorry, I am no expert about the actual implementation of this OpenAL library. You might want to ask the people who provided the OpenAL sourcecode: http://repo.or.cz/w/openal-soft/android.git
+
+All I can say is that I did not experience such problems, but I know this does not help you.
+
+Best wishes,
+Martin
+
+Reply ↓
+John on January 27, 2011 at 14:05 said:
+Hi Martin,
+Thanks for your tutorial, but do you happen to have the resulting project from this example? And if so, could you please make it available?
+
+Regards
+John
+
+Reply ↓
+
+martin
+on January 27, 2011 at 23:51 said:
+I uploaded resulting project as a .zip file. You’ll find the link on the top of the post.
+
+Reply ↓
+cheke on February 14, 2011 at 21:04 said:
+Thanks for the tutorial.
+I learned a lot from the use of NDK( by this tutorial).
+The use of wav files is fine for me for use with sound_effects, but I wish to use for background music ogg files, I see that in your tutorial you had deployed but not used.
+I want to use it, I have two days of headache XDjavascript:grin(‘:lol:’)
+sorry for my English
+thanks for all
+
+Reply ↓
+cheke on February 16, 2011 at 18:38 said:
+I already got, now I want to check performance, add options, and try various channels (one for Background music and other for effects).
+Thanks for your tutorial.
+
+Reply ↓
+ola on March 8, 2011 at 19:37 said:
+Thanks for the tutorial, its saved me lots of time and provided a good way to enhance droids woeful media api.
+
+Reply ↓
+Deepak on April 11, 2011 at 19:41 said:
+Hi Martin,
+Excellent post, Do you know how to integrate capture device processing with this openal. It looks like only rendering is working on this version.
+
+Thanks
+
+Reply ↓
+
+martin
+on April 11, 2011 at 20:53 said:
+Sorry, I have no cue about the OpenAL implementation itself except for how to compile it.
+
+Maybe you could visit http://repo.or.cz/w/openal-soft/android.git contact the person that provides the OpenAL source.
+
+Reply ↓
+Guy on April 15, 2011 at 18:47 said:
+Hi,
+You’re missing a }
+between
+
+unsigned int dataSize;
+and
+BasicWAVEHeader;
+
+It is in your sample code, but not the code above, I got it to work in the end though.
+
+Do you know what would be a good place to learn up more on openAL/the implementation here? I’ts completely new to me, but I got it working in my app and would really like to be able to retain my audio source so that I can play it at low-latency multiple times.
+
+Thanks for any help
+
+Reply ↓
+
+martin
+on April 15, 2011 at 22:22 said:
+Hi, thanks for the hint with the missing bracket. I will fix it.
+
+I don’t know any good OpenAL tutorial I could point you to, sorry. Just try and play with the code above. You can actually create several buffers and sources at any time as long as you store the id somewhere. Also, once you get a grasp of the basics the OpenAL manual is really helpful.
+
+Reply ↓
+Knight on April 18, 2011 at 01:14 said:
+Hi,
+Thanks for this. I been doing research on implementing low-latency audio for a game that already has OpenAL support. I assume this code will help port that over to Android and allow to release publicly correct? I really appreciate this as the other audio choices were rather disappointing.
+
+Reply ↓
+developer on June 30, 2011 at 09:05 said:
+hey nice tutorial,
+
+i am a beginner on android development,
+when i wrote a test code on eclipse and executed the code,i got an error saying “path for project must have only 1 segment” and i could not make out what that meant
+
+please help
+
+Reply ↓
+aegisdino on July 12, 2011 at 12:58 said:
+It’s a good tutorial.
+
+But, I think it’s very hard to use this library for games for the following two reasons.
+
+- OpenAL library uses a cpu hogging thread to mix audio samples to androi’s AudioPlayer stream.
+- Furthermore, the mixing introduces lag of about 0.5 sec and you can hear sound after so much delay!
+
+But, it may be a better solution than Andoid SoundPool library which has has many defects to use in game(a sample played twice, hang an application sometimes).
+
+Reply ↓
+
+martin
+on July 12, 2011 at 16:13 said:
+Thanks, you are not the first one to raise the “lag” issue, but it does not seem to appear everywhere. In two different applications tested on Nexus One and G1/HTC Dream I did not have that lag.
+
+Cheers,
+Martin
+
+Reply ↓
+
+aegisdino
+on July 12, 2011 at 16:27 said:
+I’m testing with GalaxyS 2.
+And it seems that I found a solution to the lag issue.
+
+In alcOpenDevice() of ALc.c source,
+“device->NumUpdates” seems to apply the lag issue.
+In normal cases, device->NumUpdates will be 4, then I can feel about 0.5sec lag.
+But when I fix it to 1, the lag disappeared.
+
+I think that NumUpdates affects how much samples to be buffered in streaming queue.
+But, I’m not sure 
+
+Thanks very much martin!
+
+Reply ↓
+
+martin
+on July 12, 2011 at 22:11 said:
+I see. In my version of ALc.c the code already read
+
+device->NumUpdates = 1
+
+thus, I experienced no lag.
+
+I will add your fix to the blog post, thanks!
+
+Reply ↓
+Serge on July 19, 2011 at 15:11 said:
+Hi, thanks for tutorial, it’s nice, but I have an error in block:
+ALuint buffer;
+const char* fnameptr = (*env)->GetStringUTFChars(env, filename, NULL);
+BasicWAVEHeader header;
+char* data = readWAV(fnameptr,&header);
+if (data){
+//Now We’ve Got A Wave In Memory, Time To Turn It Into A Usable Buffer
+buffer = createBufferFromWave(data,header);
+if (!buffer){
+free(data);
+return -1;
+}
+
+} else {
+return -1;
+}
+
+in the last else. Can you, please help me in my trouble?
+
+Reply ↓
+Bipin Vayalu on July 22, 2011 at 14:47 said:
+Hi,
+Thanks for code.
+
+Please, let me know how can i play small sound file till user clicks the stop button.
+
+Again Thanks for Code.
+
+Reply ↓
+Bipin Vayalu on July 22, 2011 at 16:05 said:
+Hello,
+
+please, help me !
+
+How to play two or more sound in sync.and how can i load/buffer sound files before play screen loaded.
+
+Thanks in advance !
+
+Reply ↓
+Garen on August 10, 2011 at 17:19 said:
+Good stuff, thanks very much.
+
+I wonder if anyone has had any experience doing this completely natively. While the sample project in the zip works for me, when I try to integrate it into my own app that uses NativeActivity on Gingerbread, OpenAL crashes on the device = alcOpenDevice( NULL ); call.
+
+Reply ↓
+
+Garen
+on August 28, 2011 at 23:05 said:
+I discovered a bug–in the OpenAL android.c file, the GetEnv() call is not properly accessing the JNIEnv when using a NativeActivity. This is because NativeActivity is in a separate thread. I’m currently trying to figure out how to pass the proper JNIEnv pointer to the OpenAL source, but I’m having trouble linking between my source and the OpenAL modifications.
+
+Reply ↓
+
+Garen
+on August 29, 2011 at 08:01 said:
+Continuing my own replies (I have no idea if this is reaching you, Martin): the fix is quite simple. I changed GetENV() to
+
+static JNIEnv* GetEnv()
+{
+JNIEnv* env = NULL;
+
+if (javaVM) (*javaVM)->GetEnv(javaVM, (void**)&env, JNI_VERSION_1_2);
+
+(*javaVM)->AttachCurrentThread(javaVM, &env, NULL);
+return env;
+}
+
+AttachCurrentThread() is a necessity when using the new NativeActivity code. Otherwise, the JNI call here
+
+cAudioTrack = (*envNA)->FindClass(envNA, “android/media/AudioTrack”);
+
+completely fails.
+
+Reply ↓
+
+martin
+on August 29, 2011 at 09:30 said:
+Hi Garen,
+
+thanks a lot for sharing your fix. I added a link to your comment to the first paragraph of the post.
+
+Cheers,
+Martin
+
+Reply ↓
+telos on September 7, 2011 at 09:52 said:
+Hi there,
+the project compiled but when I load the it on the phone(galaxy s) I only see the text but I don’t hear anything o.O
+Can anyone help please?
+
+Reply ↓
+Zeba on September 28, 2011 at 13:48 said:
+Hi,
+I tried to run this project, but i get an error:
+“java.lang.UnsatisfiedLinkError: Library openal not found”
+How do I solve this?
+Please help….
+Thank you.
+
+Reply ↓
+martin on September 29, 2011 at 19:37 said:
+This error means that the native library was not found by System.loadLibrary(“openal”);
+
+To give you a more targeted hint it is necessary to know what you did exactly. Did you download the .zip file or did you follow the tutorial? Were you able to compile the two native libraries without error? …
+
+Reply ↓
+Rajkiran Bande on October 10, 2011 at 16:47 said:
+Hello,
+Thanks for the tutorial. I tried follwing all the steps right from creating project and project runs without any error but no sound plays. I don’t know what the problem is. Please help, I have also put the lake.wav at correct location and media volume is also full.
+
+Reply ↓
+Pingback: OpenAL4Android | Martin Pielot
+
+Pingback: OpenAL on Android « jaianism の blog
+
+Roger on January 31, 2012 at 04:03 said:
+Hello!
+Thanks for this great tutorial!
+The only problem for me is that when I compile the jni sources with ndk-build, it erases all the .so files from libs/armeabi, losing the openal.so 
+Do you know a way to avoid this?
+
+Reply ↓
+
+Roger
+on January 31, 2012 at 04:16 said:
+Nevermind… I was doing 2 compiles, now I understood you use the same Android.mk for both compiles.
+
+Reply ↓
+Cancé on March 19, 2012 at 11:16 said:
+I’m actually porting my games onto Android platform, and I’ve succeeded in playing sound with your help. I’ve noticed that for my second port the lib do not work properly it makes ticks sound and not sound data playing. I’m still seeking why…
+
+Reply ↓
+
+Cancé
+on March 19, 2012 at 13:28 said:
+The sound played is saturated.
+I did not found why the sound runs like that.
+
+Reply ↓
+
+martin
+on March 20, 2012 at 13:01 said:
+Hi, thanks for sharing your experiences. I am sorry to hear that there are problems. As far I as know, the underlying OpenAL port uses software rendering, so the number of sounds that can be played is limited. Could that be the problem?
+
+Reply ↓
+
+Cancé
+on March 20, 2012 at 15:17 said:
+I do not think the number of sounds played caused the problem. I think therefore a problem of MOTODEV that I used for compilation or something like that. My pinball runs with sound but my Minigolf got tricky sound with the same code for sounds. I have already find that sometimes it doesnt compile without errors.
+
+Reply ↓
+Cancé on March 20, 2012 at 07:24 said:
+I’ve tried the last version of openal for android : http://repo.or.cz/w/openal-soft/android.git it does the same, the sound strach and crisis.
+
+Reply ↓
+Leave a Reply
+Your email address will not be published. Required fields are marked *
+
+Name *
+
+Email *
+
+Website
+
+Comment
+Proudly powered by WordPress
+
+http://pielot.org/2010/12/14/openal-on-android/
