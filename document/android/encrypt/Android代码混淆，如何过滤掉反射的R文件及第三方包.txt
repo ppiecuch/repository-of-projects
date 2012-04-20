@@ -1,0 +1,13 @@
+解决方案：在Proguard.cfg方件中添加以下设定：
+
+过滤R文件的混淆：
+-keep class **.R$* {  
+ *;  
+}
+
+过滤第三方包的混淆：
+-keep class packagename.** {*;}
+
+（其中packagename为第三方包的包名）
+
+http://blog.csdn.net/kepoon/article/details/7479953

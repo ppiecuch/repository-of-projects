@@ -1,0 +1,197 @@
+OpenAL is a 3D audio library that is available across multiple platforms.
+Although it supports 3D sound, it can also be used as a 2D audio library.
+
+First, some concepts:
+
+1. The context: Pretty much like OpenGL, you first need a context to work with. You have to create at least one context before having any sound. I'd recommend creating one for the default device(NULL) and then just keep using that one.
+2. The listener: It doesn't matter what is playing around the world if there's nobody there to hear it. To have OpenAL working we have to initialize a listener.
+3. The source: Similarly, it doesn't matter who is listening if there's nothing being played. Just like listeners *receive* sounds, sources *emit* sounds.
+4. The buffer: So, we have a context, a listener and a source. The listener listens to sounds and the source plays those sounds. But exactly what sounds does the source play? The buffers store data to be played by sources. We will load our audio data to buffers, and then assign those buffers to sources.
+
+So, let's get started:
+Code: (C) [Select]
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <cstdio>
+
+int main() {
+        return 0;
+}
+
+Compile the code above using:
+Code: [Select]
+g++ -Wall -lopenal file.cpp -o program
+
+Make sure you have everything you need installed, in particular the headers and libraries.
+
+Now, our program doesn't do anything.
+So we'll start by creating a context.
+
+Code: (C) [Select]
+ALCdevice* device = alcOpenDevice(NULL);
+ALCcontext* context = alcCreateContext(device, NULL);
+alcMakeContextCurrent(context);
+
+In the example above, we open the default audio device(NULL), and then create a context for that device.
+Finally, we use that context.
+
+Now, we're going to define our listener:
+
+Code: (C) [Select]
+alListener3f(AL_POSITION, 0, 0, 0);
+alListener3f(AL_VELOCITY, 0, 0, 0);
+alListener3f(AL_ORIENTATION, 0, 0, -1);
+
+Since we only want 2D sound, leave those values as they are. We're telling OpenAL where the listener is, where it is moving, etc.
+We're going to put all listeners and sources in the origin with no speed.
+
+Finally, we are going to have to load a audio file to a buffer and play it.
+In this case, we're going to load the entire file to memory and play it all at once.
+
+So first we are going to create a source:
+
+Code: (C) [Select]
+ALuint source;
+alGenSources(1, &source);
+
+alSourcef(source, AL_PITCH, 1);
+alSourcef(source, AL_GAIN, 1);
+alSource3f(source, AL_POSITION, 0, 0, 0);
+alSource3f(source, AL_VELOCITY, 0, 0, 0);
+alSourcei(source, AL_LOOPING, AL_FALSE);
+
+Note how you first allocate a source. We're also setting the properties of the source.
+In particular, you might find the LOOPING value to be interesting. Set it to AL_TRUE to loop the audio instead of just playing it once.
+AL_PITCH means how "fast" the sound is. 1 is the normal speed. Below 1 the sound will take longer to play. For instance, a 1 minute sound with pitch 0.5 will take 2 minutes, and only 30 seconds with a pitch of 2.
+Do note that modifying the pitch of the sound will make the track sound differently.  Try it yourself and you'll see what I mean.
+
+However, you won't listen to anything yet because the source has no buffer.
+So, we must create a buffer first:
+
+Code: (C) [Select]
+alGenBuffers(1, &buffer);
+
+//TODO Load data to buffer
+
+alSourcei(source, AL_BUFFER, buffer);
+
+So our big problem is how to load data to the buffer.
+I am going to be using the WAV sound format for now. Other formats may be added later.
+
+The code I am using is the following. I will paste it once and then explain it:
+
+Code: (C) [Select]
+FILE* f = fopen("audio.wav", "fb");
+char xbuffer[5];
+xbuffer[5] = '\0';
+if (fread(xbuffer, sizeof(char), 4, file) != 4 || strcmp(xbuffer, "RIFF") != 0)
+        throw "Not a WAV file";
+
+file_read_int32_le(xbuffer, file);
+
+if (fread(xbuffer, sizeof(char), 4, file) != 4 || strcmp(xbuffer, "WAVE") != 0)
+        throw "Not a WAV file";
+
+if (fread(xbuffer, sizeof(char), 4, file) != 4 || strcmp(xbuffer, "fmt ") != 0)
+        throw "Invalid WAV file";
+
+file_read_int32_le(xbuffer, file);
+short audioFormat = file_read_int16_le(xbuffer, file);
+short channels = file_read_int16_le(xbuffer, file);
+int sampleRate = file_read_int32_le(xbuffer, file);
+int byteRate = file_read_int32_le(xbuffer, file);
+file_read_int16_le(xbuffer, file);
+short bitsPerSample = file_read_int16_le(xbuffer, file);
+
+if (audioFormat != 16) {
+        short extraParams = file_read_int16_le(xbuffer, file);
+        file_ignore_bytes(file, extraParams);
+}
+
+if (fread(xbuffer, sizeof(char), 4, file) != 4 || strcmp(xbuffer, "data") != 0)
+        throw "Invalid WAV file";
+
+int dataChunkSize = file_read_int32_le(xbuffer, file);
+unsigned char* bufferData = file_allocate_and_read_bytes(file, (size_t) dataChunkSize);
+
+float duration = float(dataChunkSize) / byteRate;
+alBufferData(buffer, GetFormatFromInfo(channels, bitsPerSample), bufferData, dataChunkSize, sampleRate);
+free(bufferData);
+fclose(f);
+
+So now what is that big thing?
+First we read the WAV header and extract the information from it, such as number of channels and rate.
+Then, when we reach the section that contains the actual audio data, we load the entire thing to memory and load it to the buffer using alBufferData.
+
+I have used multiple auxiliary functions:
+
+1. file_read_int32_le(xbuffer, file) - I am using this function to read an integer of 32 bits from a file in little endian
+2. file_read_int16_le(xbuffer, file) - This one is used to read 16 bits in little endian
+3. file_ignore_bytes(file, nbytes) - Ignores N bytes from the file
+4. file_allocate_and_read_bytes(file, nbytes) - Allocates a char* with N bytes and loads those bytes from the file
+5. GetFormatFromInfo(channels, bitsPerSample) - Gets the AL format for the sound.
+
+One possible (though incomplete) implementation of GetFormatFromInfo is:
+
+Code: (C) [Select]
+static inline ALenum GetFormatFromInfo(short channels, short bitsPerSample) {
+        if (channels == 1)
+                return AL_FORMAT_MONO16;
+        return AL_FORMAT_STEREO16;
+}
+
+file_ignore_bytes can be implemented with a while+fgetc, or more efficiently in other ways.
+file_allocate_and_read_bytes is essentially a malloc and a fread.
+file_read_int32_le/file_read_int16_le is essentially a fread to the buffer, using count=4, and then using bit shifts and bitwise ors to format the data.
+
+These functions are pretty easy to implement, so I'll leave them to you (the reader) as a C exercise.
+You can also load WAV using ALUT, if you have it installed.
+
+So now that we have this working, we're going to play the sound (and let it keep playing)
+
+Code: (C) [Select]
+alSourcePlay(source);
+fgetc(stdin);
+
+This will keep playing the sound until the user presses enter in the console.
+
+Finally, we'll do some cleanup:
+
+Code: (C) [Select]
+alDeleteSources(1, &source);
+alDeleteBuffers(1, &buffer);
+alcDestroyContext(context);
+alcCloseDevice(device);
+
+Now, try it. It should be playing whatever file named "audio.wav" you have in your current path.
+
+Some gems:
+1. You can use alSourcePause(source) to pause the source, and then alSourcePlay(source) to start it again
+2. You can use alSourceStop(source) to stop the source. Calling alSourcePlay(source) after that will start it over from the beginning
+3. You can change your mind about looping at the middle of the stream. Want to loop the sound? No problem, just set AL_LOOPING to AL_TRUE.
+4. You can also change the pitch while the sound is playing. For instance, if you have a game and your character dies, you could have the pitch go progressively lower to indicate a "Game Over".
+
+Some limitations:
+1. GetFormatFromInfo is incomplete. For instance, MONO8 and STEREO8 aren't properly supported.
+2. The entire file is loaded to memory. Depending on the size of the file it might be a problem.
+3. Loading the entire file at once might be slow. However, in my experience, even for large files, this isn't much of a problem for WAV files. Memory consumption, as indicated in 2, might be significantly worse.
+
+Bonus Tricks:
+
+1. How to find the current position of the sound being played?
+
+Code: (C) [Select]
+int byteoffset;
+alGetSourcei(source, AL_BYTE_OFFSET, &byteoffset);
+return float(byteoffset) / byteRate;
+
+Will return the number of seconds since the beginning of the sound file.
+
+2. How to change the current position (e.g. skip some part of the sound)?
+
+Code: (C) [Select]
+alSourcei(source, AL_BYTE_OFFSET, int(position * byteRate));
+
+Both of these tricks only work when the entire file is in a single buffer.
+
+http://enigma-dev.org/forums/index.php?topic=730.0

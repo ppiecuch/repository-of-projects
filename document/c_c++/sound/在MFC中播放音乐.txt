@@ -1,0 +1,7 @@
+增加头文件：#include <vfw.h>
+    在Project->Setting->Link-> input分类下的-> Object/library modules->下面加入： vfw32.lib
+    然后在合适位置加入代码：
+    HWND g_hWndMCIWnd = MCIWndCreate(this->m_hWnd,::AfxGetApp()->m_hInstance,WS_CAPTION,"e:\\02.mp3");  
+    MCIWndPlay(g_hWndMCIWnd); 
+    
+    http://topic.csdn.net/u/20080504/10/4588fb56-aa26-41d7-8f3e-4cb2540876d3.html

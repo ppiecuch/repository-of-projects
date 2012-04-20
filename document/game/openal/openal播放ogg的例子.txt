@@ -1,0 +1,127 @@
+#include <AL/al.h>  
+#include <AL/alut.h>  
+#include <al/alc.h>  
+#include <vorbis/vorbisfile.h>  
+#include <cstdio>  
+#include <iostream>  
+#include <vector>  
+  
+#define BUFFER_SIZE     32768       // 32 KB buffers  
+  
+#pragma comment(lib,"vorbisfile_static_d.lib")  
+#pragma comment(lib,"ogg_d.lib")  
+#pragma comment(lib,"vorbisenc_static_d.lib")   
+#pragma comment(lib,"vorbis_d.lib")  
+  
+typedef struct ALCdevice_struct ALCdevice;  
+typedef struct ALCcontext_struct ALCcontext;  
+  
+using namespace std;  
+  
+bool LoadOGG(char *name, vector<char> &buffer, ALenum &format, ALsizei &freq)  
+{  
+    int endian = 0;                         // 0 for Little-Endian, 1 for Big-Endian  
+    int bitStream;  
+    long bytes;  
+    char array[BUFFER_SIZE];                // Local fixed size array  
+    FILE *f;  
+   
+    f = fopen(name, "rb");  
+  
+    if (f == NULL)  
+        return false;   
+  
+    vorbis_info *pInfo;  
+    OggVorbis_File oggFile;  
+  
+    // Try opening the given file  
+    if (ov_open(f, &oggFile, NULL, 0) != 0)  
+        return false;   
+   
+    pInfo = ov_info(&oggFile, -1);  
+   
+    if (pInfo->channels == 1)  
+        format = AL_FORMAT_MONO16;  
+    else  
+        format = AL_FORMAT_STEREO16;  
+    
+    freq = pInfo->rate;  
+   
+    do  
+    {   
+        bytes = ov_read(&oggFile, array, BUFFER_SIZE, endian, 2, 1, &bitStream);  
+  
+        if (bytes < 0)  
+            {  
+            ov_clear(&oggFile);  
+            cerr << "Error decoding " << fileName << "..." << endl;  
+            exit(-1);  
+            }  
+   
+        buffer.insert(buffer.end(), array, array + bytes);  
+    }  
+    while (bytes > 0);  
+   
+    ov_clear(&oggFile);  
+    return true;   
+}  
+   
+int main(int argc, char *argv[])  
+{  
+  
+    ALCdevice* pDevice;  
+    ALCcontext* pContext;  
+   
+    ALint state;                            // The state of the sound source  
+    ALuint bufferID;                        // The OpenAL sound buffer ID  
+    ALuint sourceID;                        // The OpenAL sound source  
+    ALenum format;                          // The sound data format  
+    ALsizei freq;                           // The frequency of the sound data  
+    vector<char> bufferData;                // The sound buffer data from file  
+       
+     ALCdevice *device;  
+     ALCcontext *context;   
+  
+       device = alcOpenDevice(0);  
+       context = alcCreateContext(device,0);  
+       ALboolean initStatus = alcMakeContextCurrent(context);      
+  
+    // Create sound buffer and source  
+    alGenBuffers(1, &bufferID);  
+    alGenSources(1, &sourceID);  
+  
+    // Set the source and listener to the same location  
+    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);  
+    alSource3f(sourceID, AL_POSITION, 0.0f, 0.0f, 0.0f);  
+  
+    // Load the OGG file into memory  
+    LoadOGG("Bomb.ogg", bufferData, format, freq);  
+  
+    // Upload sound data to buffer  
+    alBufferData(bufferID, format, &bufferData[0], static_cast<ALsizei>(bufferData.size()), freq);  
+  
+    // Attach sound buffer to source  
+    alSourcei(sourceID, AL_BUFFER, bufferID);  
+      
+    alSourcef (sourceID, AL_GAIN, 1.0 );  
+  
+    // Finally, play the sound!!!  
+    alSourcePlay(sourceID);  
+   
+    do  
+    {  
+        // Query the state of the souce  
+        alGetSourcei(sourceID, AL_SOURCE_STATE, &state);  
+    }  
+    while (state != AL_STOPPED);  
+  
+    // Clean up sound buffer and source  
+    alDeleteBuffers(1, &bufferID);  
+    alDeleteSources(1, &sourceID);  
+   
+    alcDestroyContext(context);  
+    alcCloseDevice(device);     
+  
+    return 0;  
+}  
+http://blog.csdn.net/ccsdu2004/article/details/4264751
