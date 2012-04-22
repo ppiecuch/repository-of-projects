@@ -261,9 +261,9 @@ int Update(void)
 	printf("Stereo sample.  Non-Positional\n");
 
 	// Wait till it has finished (As im not taking into account frame time, this will be different on your PC!)
-	alGetSourcei(source[0], AL_SOURCE_STATE, &sourceState);
-	while(sourceState == AL_PLAYING)
-		alGetSourcei(source[0], AL_SOURCE_STATE, &sourceState);
+	//alGetSourcei(source[0], AL_SOURCE_STATE, &sourceState);
+	//while(sourceState == AL_PLAYING)
+	//	alGetSourcei(source[0], AL_SOURCE_STATE, &sourceState);
 
 	// Finished
 	return 1;
@@ -297,6 +297,8 @@ int main(void)
 	Init();
 	Update();
 	Shutdown();
+
+	getchar();
 
 	return 0;
 }
