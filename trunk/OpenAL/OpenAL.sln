@@ -14,6 +14,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freealut", "freealut\freeal
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openal", "openal\openal.vcproj", "{B0831882-BA8C-488F-911D-6E75ACBCE0AF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01Helloworld", "01Helloworld\01Helloworld.vcproj", "{57A815A4-2FA9-4941-AE65-A09ADD6B4EE0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{557BF17C-91B5-4737-B1FF-0BDE3C588382} = {557BF17C-91B5-4737-B1FF-0BDE3C588382}
+		{B0831882-BA8C-488F-911D-6E75ACBCE0AF} = {B0831882-BA8C-488F-911D-6E75ACBCE0AF}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -32,6 +38,10 @@ Global
 		{B0831882-BA8C-488F-911D-6E75ACBCE0AF}.Debug|Win32.Build.0 = Debug|Win32
 		{B0831882-BA8C-488F-911D-6E75ACBCE0AF}.Release|Win32.ActiveCfg = Release|Win32
 		{B0831882-BA8C-488F-911D-6E75ACBCE0AF}.Release|Win32.Build.0 = Release|Win32
+		{57A815A4-2FA9-4941-AE65-A09ADD6B4EE0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{57A815A4-2FA9-4941-AE65-A09ADD6B4EE0}.Debug|Win32.Build.0 = Debug|Win32
+		{57A815A4-2FA9-4941-AE65-A09ADD6B4EE0}.Release|Win32.ActiveCfg = Release|Win32
+		{57A815A4-2FA9-4941-AE65-A09ADD6B4EE0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
