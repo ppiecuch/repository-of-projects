@@ -1,0 +1,82 @@
+核心OPENAL函数
+前言
+本文件来源于因特网,版权归原作者所有.这篇文件的中译版版权归antking所有,如您对本文件有任何建议,请联系我.(antking@gmail.cn)
+
+与缓冲器相关
+
+alGenBuffers
+描述:
+用于描述一个或多个缓冲器.
+函数原型:
+ALvoid alGenBuffers(ALsizei n,ALuint *buffers);
+参数:
+n                  缓冲器的个数
+*buffers           指针(用于指向新缓冲器的名字)
+返回变量:
+None
+评论:
+如果得到的缓冲器数不能建立,alGetError将得到错误.如果错误发生,表示没有缓冲器建立.如果n为0,表示alGenBuffers没有做任何事,并且没有错误返回.
+
+alDeleteBuffers
+描述:
+用于删除一个或多个缓冲器.
+函数原型:
+ALvoid alDeleteBuffers(ALsizei n,ALuint *buffers);
+参数:
+n                  删除的缓冲器的个数
+*buffer            指针(指向被删除的缓冲器)
+返回值:
+None
+评论:
+如果返回的缓冲器不能被删除,alGetError将得到错误,如果错误出现,没有缓冲器删除.如果n等于0,alDeleteBuffers没有做任何事,并且没有错误返回.
+allsBuffer
+描述:
+测试缓冲器名字的正确性.
+函数原型:
+ALboolean  allsBuffer(ALuint  buffer);
+参数:
+buffer                  用于测试的缓冲器的名字
+返回值:
+AL_TRUE 表示正确, AL_FALSE表示错误.
+
+alBufferData
+描述:
+用声音数据填充缓冲器.
+函数原型:
+ALvoid alBufferData(ALuint buffer,ALenum format,ALvoid *data,ALsizei size,ALsizei freq);
+参数:
+buffer                  用于填充的缓冲器的名字
+format                  AL_FORMAT_MONO8,AL_FORMAT_MODO16,AL_FORMAT_STEREO8,AL_FORMAT_STEREO16
+*data                   指向声音数据
+size                    用字节表示声音数据的大小
+freq                    声音数据的频率
+返回值:
+None
+
+alGetBufferf
+描述:
+用于恢复一个缓冲器的浮点指针.
+函数原型:
+ALvoid alGetBufferf(ALuint buffer,ALenum pname,ALfloat *value);
+参数:
+buffer                  被恢复的缓冲器的名字
+pname                   用于恢复的名字
+*value                  被恢复数据的浮点指针
+返回值:
+None
+评论:
+目前没有用于缓冲器的浮点属性.
+
+alGetBufferi
+描述:
+用于恢复缓冲器的整数指针.
+函数原型:
+ALvoid alGetBufferi(ALuint buffer,ALenum pname,ALint *value);
+参数:
+buffer                  被恢复的缓冲器的名字
+pname                   AL_FREQUENCY,AL_BITS,AL_CHANNELS,AL_SIZE,AL_DATA
+*value                  被恢复数据的整数指针
+返回值:
+None
+
+http://hi.baidu.com/wind_liao/blog/item/420ebc3c81424430b8998ff6.html

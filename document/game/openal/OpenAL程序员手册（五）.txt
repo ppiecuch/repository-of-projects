@@ -1,0 +1,155 @@
+与状态有关
+前言
+本文件来源于因特网,版权归原作者所有.这篇文件的中译版版权归antking所有,如
+您对本文件有任何建议,请联系我.(antking@gmail.cn)
+
+
+alEnable
+描述:
+能使用OPENAL设备的功能.
+函数原型:
+ALvoid alEnable(ALenum capability);
+参数:
+capability                 被使用的功能的名字
+返回值:
+NONE
+评论:
+当前,用这个函数不能释放功能,因此,当 被调用时有错误AL_INVALID_ENUM被引起.
+
+alDisable
+描述:
+用于释放OPENAL的功能.
+函数原型:
+ALvoid alDisable(ALenum capability);
+参数:
+capability                 被释放的功能的名字
+返回值:
+NONE
+评论:
+当前,没有一个功能能被这个函数释放,因此,当 被调用时有错误AL_INVALID_ENUM被引起.
+
+allsEnabled
+描述:
+当一个特别的功能能被OPENAL设置启用时,返回一个boolean标识.
+函数原型:
+ALboolean allsEnabled(ALenum capability);
+参数:
+capability                 被启用的功能的名字
+返回值:
+AL_TRUE                表示功能启用
+AL_FLASE               表示功能释放
+评论:
+当前,这个函数总是返回AL_FLASE,也没有功能定义.当 被调用时有错误AL_INVALID_ENUM被设置.
+
+alGetBoolean
+描述:
+返回boolean openal状态.
+函数原型:
+ALboolean alGetBoolean(ALenum pname);
+参数:
+pname                      被质问的状态
+返回值:
+返回值用pname来描述.
+评论:
+当前,没有任何的boolean状态被定义,因此这个函数总是发生AL_INVALID_ENUM错误.
+
+alGetDouble
+描述:
+返回两个精确的浮点值指向OPENAL状态.
+函数原型:
+ALdouble alGetDouble(ALenum pname);
+参数:
+pname                      被质问的状态
+返回值:
+用pname指定两个值.
+评论:
+当前没有任何东西,因此将产生错误.
+
+alGetFloat
+描述:
+返回一个浮点值指向OPENAL状态.
+函数原型:
+ALfloat alGetFloat(ALenum pname);
+参数:
+pname                      被质问的状态
+AL_DOPPLER_FACTOR
+AL_DOPPLER_VELOCITY
+返回值:
+用pname来描述.
+
+alGetInteger
+描述:
+返回一个指向OPENAL状态的整型值.
+函数原型:
+ALint alGetIneger(ALenum pname);
+参数:
+pname                      被质问的状态
+AL_DISTANCE_MODEL
+返回值:
+用pname来描述.
+
+alGetBooleanv
+描述:
+用boolean值描述OPENAL的状态.
+函数原型:
+ALvoid alGetBooleanv(ALenum pname,ALboolean *data);
+参数:
+pname                      返回的状态
+*data                      指向状态存放的位置
+返回值:
+NONE
+评论:
+当前,没有任何描述,因此总是返回错误.
+
+alGetDoublev
+描述:
+得到指向OPENAL状态的两个精确浮点值.
+函数原型:
+ALvoid alGetDoublev(ALenum pname,ALdouble *data);
+参数:
+pname                      返回的状态
+*data                      指向状态存放的位置
+返回值:
+NONE
+评论:
+(同上)
+
+alGetFloatv
+描述:
+得到指向OPENAL状态的浮点值.
+函数原型:
+ALvoid alGetFloatv(ALenum pname,ALfloat *data);
+参数:
+pname                      得到的状态
+AL_DOPPLER_FACTOR
+AL_DOPPLER_VELOCITY
+*data                      指向状态存放的位置
+返回值:
+NONE
+alGetIntegerv
+描述:
+得到一个指向OPENAL状态的整型数组.
+函数原型:
+ALvoid alGetIntegerv(ALenum pname,ALint *data);
+参数:
+pname                      返回的状态
+AL_DISTANCE_MODEL
+*data                      指向状态存放的位置
+返回值:
+NONE
+
+alGetString
+描述:
+得到一个OPENAL字符串.
+函数原型:
+ALubyte *alGetString(ALenum pname);
+参数:
+pname                      返回的值
+AL_VENDOR
+AL_VERSION
+AL_RENDERER
+AL_EXTENSIONS
+返回值:
+NONE
+
+http://hi.baidu.com/wind_liao/blog/item/420ebc3c81454430b8998ff1.html

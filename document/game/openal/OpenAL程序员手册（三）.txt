@@ -1,0 +1,245 @@
+与声源相关
+前言
+本文件来源于因特网,版权归原作者所有.这篇文件的中译版版权归antking所有,如
+您对本文件有任何建议,请联系我.(antking@gmail.cn)
+
+alGenSources
+描述:
+用于产生一个或多个声源.
+函数原型:
+ALvoid alGenSources(ALsizei n,ALuint *sources);
+参数:
+n                       产生的声源的个数
+*sources                以整形的方式指向新声源的名字的缓冲器
+返回值:
+None
+评论:
+如果得到的声源没有建立,那么alGetError将得到错误;如果错误是真的,没有声源
+产生;如果n为0,alGenSources没有做任何事,并且没有错误返回.
+
+alDeleteSources
+描述:
+用于删除一个或多个声源.
+函数原型:
+ALvoid alDeleteSources(ALsizei n,ALuint *sources);
+参数:
+n                       被删除的声源
+*sources                指向被删除的声源
+返回值:
+None
+评论:
+与上相同.
+
+allsSource
+描述:
+测试声源名字是否正确.
+函数原型:
+ALboolean allsSource(ALuint source);
+参数:
+source                  用于测试的声源名字.
+返回值:
+AL_TRUE,AL_FLASE
+
+alSourcef
+描述:
+用于设置声源的浮点指针.
+函数原型:
+ALvoid alSourcef(ALuint source,ALenum pname,ALfloat value);
+参数:
+source                  被设置的声源的名字.
+pname                   AL_PITCH,AL_GAIN,AL_MAX_DISTANCE,AL_ROLLOFF_FACTOR,
+AL_REFERENCE_DISTANCE,AL_MIN_GAIN,AL_MAN_GAIN,
+AL_CONE_OUTER_GAIN
+value                   用于设置属性
+返回值:
+None
+
+alSourcefv
+描述:
+用于设置声源的浮点指针矢量.
+函数原型:
+ALvoid alSourcefv(ALuint source,ALenum pname,ALfloat *values);
+参数:
+source                  被设置的声源的名字
+pname                   AL_POSITION,AL_VELOCITY,AL_DIRECTION
+*values                 指向矢量
+返回值:
+None
+评论:
+这个函数取决于函数alSource3f.
+
+alSource3f
+描述:
+用3个浮点指针变量设置声源.
+函数原型:
+ALvoid alSource3f(ALuint source,ALenum pname,ALfloat v1,ALfloat v2,
+ALfloat v3);
+参数:
+source                   被设置的声源的名字
+pname                    AL_POSITION,AL_VELOCITY,AL_DIRECTION
+v1,v2,v3                 三个浮点变量
+返回值:
+None
+评论:
+这个函数取决于alSourcefv.
+
+alSourcei
+描述:
+用于设置声源的整型值
+函数原型:
+ALvoid alSourcei(ALuint source,ALenum pname,ALint value);
+参数:
+source                   用于设置的声源的名字
+pname                    AL_SOURCE_RELATIVE,AL_CONE_INTVER_ANGLE,
+AL_CONE_OUTER_ANGLE,AL_LOOPING,AL_BUFFER,
+AL_SOURCE_STATE
+value                    用于设置的变量
+返回值:
+None
+
+alGetSourcef
+描述:
+用于恢复声源的浮点指针值.
+函数原型:
+ALvoid alGetSourcef(ALuint source,ALenum pname,ALfloat *value);
+参数:
+source                   被恢复的声源的名字.
+pname                    AL_PITCH,AL_GAIN,AL_MIN_GAIN,AL_MAX_GAIN,AL_NAX_DIST
+ANCE,AL_ROLLOFF_FACTOR,AL_CONE_OUTER_GAIN,AL_CONE_IN
+NER_ANGLE,AL_CONE_OUTER_ANGLE,AL_REFERENCE_DISTANCE
+*value                   指向被恢复的浮点指针值
+
+alGetSourcefv
+描述:
+用于恢复声源的浮点指针矢量.
+函数原型:
+ALvoid alGetSourcefv(ALuint source,ALenum pname,ALfloat *valuts);
+参数:
+source                    被恢复的声源的名字.
+pname                     AL_POSITION,AL_VELOCITY,AL_DIRECTION
+*values                   指向被恢复的矢量.
+返回值:
+NONE
+
+alGetSourcei
+描述:
+用于恢复声源的整型权.
+函数原型:
+ALvoid alGetSourcei(ALuint source,ALenum pname,ALint *value);
+参数:
+source                    被释放的声源的名字.
+pname                     AL_SOURCE_RELATIVE,AL_BUFFER,
+AL_SOURCE_STATE,AL_BUFFER_QUEUED
+AL_BUFFERS_PROCESSED
+*value                    指向被释放的整型指针.
+返回值:
+NONE
+
+alSourcePlay
+描述:
+用于播放声音.
+函数原型:
+ALvoid alSourcePlay(ALuint source);
+参数:
+source                    用于播放的声源.
+返回值:
+NONE
+
+alSourcePlayv
+描述:
+用于播放一系列声源.
+函数原型:
+ALvoid alSourcePlayv(ALsizei n,ALuint *sources);
+参数:
+n                         用于播放的声源的个数.
+*sources                  指向一组用于播放的声源.
+返回值:
+NONE
+
+alSourcePause
+描述:
+用于暂停.
+函数原型:
+ALvoid alSourcePause(ALuint source);
+参数:
+source                    用于暂停的声源的名字.
+
+alSourcePausev
+描述:
+用于暂停一组声源.
+函数原型:
+ALvoid alSourcePausev(ALsizei n,ALuint *sources);
+参数:
+n                         被暂停的声源的个数.
+*sources                  指向被暂停的一组声源.
+返回值:
+NONE
+alSourceStop
+描述:
+用于停止一个声源.
+函数原型:
+ALvoid alSourceStop(ALuint source);
+参数:
+source                    被停止的声源的名字
+返回值:
+NONE
+
+alSourceStopv
+描述:
+用于停止一组声源.
+函数原型:
+ALvoid alSourceStopv(ALsizei n,ALuint *sources);
+参数:
+n                          被停止的声源的个数
+*sources                   指向被停止的一组声源
+返回值:
+NONE
+
+alSourceRewind
+描述:
+停止声源并且设置他的状态为AL_INITIAL.
+函数原型:
+ALvoid alSourceRewind(ALuint source);
+参数:
+source                     被停止的声源的名子
+返回值:
+NONE
+
+alSourceRewindv
+描述:
+停止一组声源并且设置它们的状态为AL_INITIAL.
+函数原型:
+ALvoid alSourceRewindv(ALsizei n,ALuint *sources);
+参数:
+n                          被停止的声源的个数
+*sources                   指向一组被停止的声源
+返回值:
+NONE
+
+alSourceQueueBuffers
+描述:
+用于把一个声源排列在一列缓冲器中.
+函数原型:
+ALvoid alSourceQueueBuffers(ALuint source,ALsizei n,ALuint *buffers);
+参数:
+source                     被排列的声源的个数
+n                          排在第几个缓冲器中
+*buffers                   指向一组被排队的缓冲器的名字
+返回值:
+NONE
+
+alSourceUnqueueBuffers
+描述:
+用于将一个声源所用的一系列缓冲器退出队列.
+函数原型:
+ALvoid alSourceUnqueueBuffers(ALuint source,ALsizei n,ALuint *buffers);
+参数:
+source                     被退出队列的声源的名字
+n                          退出的缓冲器的个数
+*buffers                   指向用于删除的缓冲器的名字的数组
+返回值:
+NONE
+评论:
+这个函数只在所有的缓冲器能被删除时 变换位置.
+
+http://hi.baidu.com/wind_liao/blog/item/b205058b139fa5ee513d92f7.html

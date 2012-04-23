@@ -1,0 +1,76 @@
+OpenAL程序员手册
+前言
+本文件来源于因特网,版权归原作者所有.这篇文件的中译版版权归antking所有,如您对本文件有任何建议,请联系我.(antking@gmail.cn)
+
+OpenAL 引言
+
+    关于OPENAL的使要围绕在三个对象:Buffer(缓冲器),Sources(声源)和Listener(听众).缓冲器用于装载数据,然后把它附加在声源上,声源设置并播放.这样,听众就能根据位置和方向听到声音.建立几个声源和一个听众,然后更改声源的位置和方向.听众就能听见3D的声音.
+
+加载/卸载
+
+   一个很容易的方法是用alutInit函数,用参数(0,NULL)初始化设备,这样做就避免了调用OPENAL文本描述.如想用EAX,通过名字调用allsExtansionPresent检查EAX,然后用alGetProcAddress分配变量给函数指针.如想用PCM数据的缓冲器用allBufferData,如果PCM数据是以WAV格式存储,alutLoadWAVFile或alutLoadWAVMen可以恢复它并用alBufferData提供所需的信息.对于通常用的声音,可以用alGetError得到错误信息.调用alGetSources能得到声源的数量.缓冲器附加到声源上用alSourcei.在退出程序前用alutExit清除OPENAL.
+
+缓冲器参数
+
+   每个缓冲器是由alGenBuffers附加一个参数引起的.alGenBuffer[f,i]函数用到下面的参数:
+参数              数据类型              描述
+AL_FREQUENCY           i          用Hz表示缓冲器的频率
+AL_BITS                i          缓冲器的位深度
+AL_CHANIVELS           i          缓冲器的频道数(>1 有效,缓冲器不能在播放时定位)
+AL_SIZE                i          用字节表示缓冲器的大小
+AL_DATA                i          数据在缓冲器的初始位置
+
+声音参数
+
+   声源由alGenSources加一个参数引起的.函数alSource[f,3f,fv,i]和alSource[f,3f,fv,i]用于设置和使用下面的声源参数:
+参数              数据类型              描述
+AL_PITCH               f          pitch相对总是确定的
+AL_GAIN                f          声源获得变量是确定的
+AL_MAX_DISTANCE        f          used with the Inverse(lampde distance model to set the distance where there will to no langer beany attenuation of the source.
+AL_ROLLOFF_FACTOR      f          声源的rolloff率,默认的是1.0
+AL_REFERENCE_DISTANCE  f          声源的音量在距离上减少一半
+AL_MIN_GAIN            f          声音的最小获得
+AL_MAX_GAIN            f          声音的最大获得
+AL_CONE_OUTER_GAIN     f          在定向的圆锥以外的获得
+AL_CONE_INNER_ANGLE    f,i        在定向的圆锥内的获得
+AL_CONE_OUTER_ANGLE    f,i        圆锥的角度,默认为360
+AL_POSITION            fv,3f      X,Y,Z位置
+AL_VELOCITY            fv,3f      速度矢量
+AL_DIRECTION           fv,3f      方向矢量
+AL_SOURCE_RECATIVE     i          决定位置是否与听众有联系,默认为AL_FLASE
+AL_LOOPING             i          设置循环播放(AL_TRUE)或者(AL_FLASE)
+AL_BUFFER              i          被附加到声源的缓冲器ID
+AL_SOURCE_STATE        i          声源的状态(AL_STOPPED,AL_PLAYING,...)
+AL_BUFFERS_QUEUED*     i          队列中声源缓冲器的个数
+AL_BUFFERS_PROCESSED*  i          在处理的声源的缓冲器的个数
+一个声源的队列缓冲器
+
+    连续的声音不能打断,就需要缓冲器队列.把缓冲器排队,缓冲器和声源用通常的方式表示,但是alSourcei不能把大量缓冲器附加在声源上.代替它的是函数alSourceQueueBuffers和alSourceUnqueueBuffers.函数alSourceQueueBuffers能把一个缓冲器或多个缓冲器附加在一个声源上,并且能在声源上调用alSourcePlay.到声源在播放时,alSourceUnqueueBuffers能释放已播放的缓冲器.这些被留出的缓冲器能用来装载数据或被丢弃.alSourceQueueBuffers函数能从新把新的或重新加载的缓冲器附加到播放中的声源.只要有一个新的缓冲器在队列中播放,那声源就不断的播放.也有一些OPENAL的执行体不能在队列中执行,可以注意下面的方法:
+1.一个流式的声源用alSourceQueueBuffers附加在缓冲器队列上;
+2.用alSourceQueueBuffers加载的多个缓冲器的源应有相同的声音格式;
+
+Dopple Shift(多普勒效应)
+
+    如果速度应用于听众对象或者任意声源对象,那么,Dopple Shift将运用于声音.在OPENAL创造性的执行体上,下面的公式是用于Dopple Shift(多普勒效应):
+DV=AL_DOPPLER_VELOCITY
+DF=AL_DOPPLER_FACTOR
+VI=听众速度
+VS=声源速度
+F=实例速度
+F'=多普勒效应频率
+F'=F*(DV-DF*VI)/(DV+DF*VS).
+多普勒速度用声音的秒数表示,默认为343.如果用分/小表示,那么多普勒速度也相应改变.多普勒因子用于夸大或强调多普勒效应.
+
+错误处理
+
+    alGetError用于表示OPENAL任何时候的错误情况.alGetError用于清除OPENAL的错误,因此在重要情况时,应调用alGetError来清除错误.
+错误参数                     描述
+AL_NO_ERROR           当前没有任何错误
+AL_INVALID_NAME       通过OPENAL函数的一个错误ID
+AL_INVALID_ENUM       通过OPENAL函数的一个错误的变量
+AL_INVALID_value      通过OPENAL函数的一个错误变量
+AL_INVALID_OPERATION  返回操作是错误的
+AL_OUT_OF_MEMORY      返回操作结果益出内存
+
+
+http://hi.baidu.com/wind_liao/blog/item/7548b11ba9bb7cdca78669f4.html

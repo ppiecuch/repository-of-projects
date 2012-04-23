@@ -1,0 +1,104 @@
+2011-03-07 17:49
+与听众有关
+alListenerf
+描述:
+这个函数为听众设置一个浮点指针.
+函数原型:
+ALvoid alListenerf(ALenum pname,ALfloat value);
+参数:
+pname                      被设置的属性的名字
+value                      设置属性为浮点值
+返回值:
+NONE
+alListenerf
+描述:
+这个函数为听众设置浮点指针.
+函数原型:
+ALvoid alListenerf(ALenum pname,ALfloat v1,ALfloat v2,ALfloat v3);
+参数:
+pname                      被设置的属性的名字
+AL_POSITION ,AL_VELOCITY
+v1,v2,v3                   被设置的属性的值
+返回值:
+NONE
+
+alListenerfv
+描述:
+这个函数为听众设置浮点指针矢量.
+函数原型:
+ALvoid alListenerfv(ALenum pname,ALfloat *values);
+参数:
+pname                      被设置的属性的名字
+AL_POSITION
+AL_VELOCITY
+AL_ORIENTATION
+*values                    指向浮点指针矢量
+返回值:
+NONE
+
+alListeneri
+描述:
+这个函数为听众设置一个整型值.
+函数原型:
+ALvoid alListeneri(ALenum pname,ALint value);
+参数:
+pname                      被设置的属性的名字
+value                      用整型值设置属性
+返回值:
+NONE
+评论:
+当前没有整型听众属性.
+
+alGetListenerf
+描述:
+这个函数用于取得听众的浮点指针.
+函数原型:
+ALvoid alGetListenerf(ALenum pname,ALfloat *value);
+参数:
+pname                      被取得的属性的名字
+AL_GAIN
+*value                     被取得的浮点指针值
+返回值:
+NONE
+
+alGetListener3f
+描述:
+这个函数取得听众的一列三个浮点指针值.
+函数原型:
+ALvoid alGetListener3f(ALenum pname,ALfloat *v1,ALfloat *v2,ALfloat *v3);
+参数:
+pname                      被取得的参数的名字
+AL_POSITION
+AL_VELOCITY
+*v1,*v2,*v3                用于存放三个浮点指针
+返回值:
+NONE
+
+alGetListenerfv
+描述:
+从听众处取得一个浮点指针矢量.
+函数原型:
+ALvoid alGetListenerfv(ALenum pname,ALfloat *values);
+参数:
+pname                      被取得的属性的名字
+AL_POSITION
+AL_VELOCITY
+AL_ORIENTATION
+*values                    用于存放浮点指针矢量
+返回值:
+NONE
+
+alGetListeneri
+描述:
+从听众处取得一个整型值.
+函数原型:
+ALvoid alGetListeneri(ALenum pname,ALint *value);
+参数:
+pname                      被取得的属性的名字
+*value                     用于存放整型值
+返回值:
+NONE
+评论:
+当前没有整型听众属性.
+
+http://hi.baidu.com/wind_liao/blog/item/420ebc3c81444430b8998ff0.html
