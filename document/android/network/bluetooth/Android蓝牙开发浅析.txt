@@ -1,0 +1,216 @@
+由于近期正在开发一个通过蓝牙进行数据传递的模块，在参考了有关资料，并详细阅读了Android的官方文档后，总结了Android中蓝牙模块的使用。
+
+1. 使用蓝牙的响应权限
+[html] view plaincopy
+<uses-permission android:name="android.permission.BLUETOOTH" />  
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />  
+
+
+2. 配置本机蓝牙模块
+在这里首先要了解对蓝牙操作一个核心类BluetoothAdapter
+[java] view plaincopy
+BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();  
+//直接打开系统的蓝牙设置面板  
+Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);  
+startActivityForResult(intent, 0x1);  
+//直接打开蓝牙  
+adapter.enable();  
+//关闭蓝牙  
+adapter.disable();  
+//打开本机的蓝牙发现功能（默认打开120秒，可以将时间最多延长至300秒）  
+discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);//设置持续时间（最多300秒）Intent discoveryIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);  
+
+3.搜索蓝牙设备
+使用BluetoothAdapter的startDiscovery()方法来搜索蓝牙设备
+startDiscovery()方法是一个异步方法，调用后会立即返回。该方法会进行对其他蓝牙设备的搜索，该过程会持续12秒。该方法调用后，搜索过程实际上是在一个System Service中进行的，所以可以调用cancelDiscovery()方法来停止搜索（该方法可以在未执行discovery请求时调用）。
+请求Discovery后，系统开始搜索蓝牙设备，在这个过程中，系统会发送以下三个广播：
+ACTION_DISCOVERY_START：开始搜索
+ACTION_DISCOVERY_FINISHED：搜索结束
+ACTION_FOUND：找到设备，这个Intent中包含两个extra fields：EXTRA_DEVICE和EXTRA_CLASS，分别包含BluetooDevice和BluetoothClass。
+我们可以自己注册相应的BroadcastReceiver来接收响应的广播，以便实现某些功能
+[java] view plaincopy
+// 创建一个接收ACTION_FOUND广播的BroadcastReceiver  
+private final BroadcastReceiver mReceiver = new BroadcastReceiver() {  
+    public void onReceive(Context context, Intent intent) {  
+        String action = intent.getAction();  
+        // 发现设备  
+        if (BluetoothDevice.ACTION_FOUND.equals(action)) {  
+            // 从Intent中获取设备对象  
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);  
+            // 将设备名称和地址放入array adapter，以便在ListView中显示  
+            mArrayAdapter.add(device.getName() + "\n" + device.getAddress());  
+        }  
+    }  
+};  
+// 注册BroadcastReceiver  
+IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);  
+registerReceiver(mReceiver, filter); // 不要忘了之后解除绑定  
+
+
+4. 蓝牙Socket通信
+如果打算建议两个蓝牙设备之间的连接，则必须实现服务器端与客户端的机制。当两个设备在同一个RFCOMM channel下分别拥有一个连接的BluetoothSocket，这两个设备才可以说是建立了连接。
+服务器设备与客户端设备获取BluetoothSocket的途径是不同的。服务器设备是通过accepted一个incoming connection来获取的，而客户端设备则是通过打开一个到服务器的RFCOMM channel来获取的。
+
+服务器端的实现
+通过调用BluetoothAdapter的listenUsingRfcommWithServiceRecord(String, UUID)方法来获取BluetoothServerSocket（UUID用于客户端与服务器端之间的配对）
+调用BluetoothServerSocket的accept()方法监听连接请求，如果收到请求，则返回一个BluetoothSocket实例（此方法为block方法，应置于新线程中）
+如果不想在accept其他的连接，则调用BluetoothServerSocket的close()方法释放资源（调用该方法后，之前获得的BluetoothSocket实例并没有close。但由于RFCOMM一个时刻只允许在一条channel中有一个连接，则一般在accept一个连接后，便close掉BluetoothServerSocket）
+[java] view plaincopy
+private class AcceptThread extends Thread {  
+    private final BluetoothServerSocket mmServerSocket;  
+  
+    public AcceptThread() {  
+        // Use a temporary object that is later assigned to mmServerSocket,  
+        // because mmServerSocket is final  
+        BluetoothServerSocket tmp = null;  
+        try {  
+            // MY_UUID is the app's UUID string, also used by the client code  
+            tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);  
+        } catch (IOException e) { }  
+        mmServerSocket = tmp;  
+    }  
+  
+    public void run() {  
+        BluetoothSocket socket = null;  
+        // Keep listening until exception occurs or a socket is returned  
+        while (true) {  
+            try {  
+                socket = mmServerSocket.accept();  
+            } catch (IOException e) {  
+                break;  
+            }  
+            // If a connection was accepted  
+            if (socket != null) {  
+                // Do work to manage the connection (in a separate thread)  
+                manageConnectedSocket(socket);  
+                mmServerSocket.close();  
+                break;  
+            }  
+        }  
+    }  
+  
+    /** Will cancel the listening socket, and cause the thread to finish */  
+    public void cancel() {  
+        try {  
+            mmServerSocket.close();  
+        } catch (IOException e) { }  
+    }  
+}  
+
+
+客户端的实现
+通过搜索得到服务器端的BluetoothService
+调用BluetoothService的listenUsingRfcommWithServiceRecord(String, UUID)方法获取BluetoothSocket（该UUID应该同于服务器端的UUID）
+调用BluetoothSocket的connect()方法（该方法为block方法），如果UUID同服务器端的UUID匹配，并且连接被服务器端accept，则connect()方法返回
+注意：在调用connect()方法之前，应当确定当前没有搜索设备，否则连接会变得非常慢并且容易失败
+[java] view plaincopy
+private class ConnectThread extends Thread {  
+    private final BluetoothSocket mmSocket;  
+    private final BluetoothDevice mmDevice;  
+  
+    public ConnectThread(BluetoothDevice device) {  
+        // Use a temporary object that is later assigned to mmSocket,  
+        // because mmSocket is final  
+        BluetoothSocket tmp = null;  
+        mmDevice = device;  
+  
+        // Get a BluetoothSocket to connect with the given BluetoothDevice  
+        try {  
+            // MY_UUID is the app's UUID string, also used by the server code  
+            tmp = device.createRfcommSocketToServiceRecord(MY_UUID);  
+        } catch (IOException e) { }  
+        mmSocket = tmp;  
+    }  
+  
+    public void run() {  
+        // Cancel discovery because it will slow down the connection  
+        mBluetoothAdapter.cancelDiscovery();  
+  
+        try {  
+            // Connect the device through the socket. This will block  
+            // until it succeeds or throws an exception  
+            mmSocket.connect();  
+        } catch (IOException connectException) {  
+            // Unable to connect; close the socket and get out  
+            try {  
+                mmSocket.close();  
+            } catch (IOException closeException) { }  
+            return;  
+        }  
+  
+        // Do work to manage the connection (in a separate thread)  
+        manageConnectedSocket(mmSocket);  
+    }  
+  
+    /** Will cancel an in-progress connection, and close the socket */  
+    public void cancel() {  
+        try {  
+            mmSocket.close();  
+        } catch (IOException e) { }  
+    }  
+}  
+
+
+连接管理（数据通信）
+分别通过BluetoothSocket的getInputStream()和getOutputStream()方法获取InputStream和OutputStream
+使用read(bytes[])和write(bytes[])方法分别进行读写操作
+注意：read(bytes[])方法会一直block，知道从流中读取到信息，而write(bytes[])方法并不是经常的block（比如在另一设备没有及时read或者中间缓冲区已满的情况下，write方法会block）
+[java] view plaincopy
+private class ConnectedThread extends Thread {  
+    private final BluetoothSocket mmSocket;  
+    private final InputStream mmInStream;  
+    private final OutputStream mmOutStream;  
+  
+    public ConnectedThread(BluetoothSocket socket) {  
+        mmSocket = socket;  
+        InputStream tmpIn = null;  
+        OutputStream tmpOut = null;  
+  
+        // Get the input and output streams, using temp objects because  
+        // member streams are final  
+        try {  
+            tmpIn = socket.getInputStream();  
+            tmpOut = socket.getOutputStream();  
+        } catch (IOException e) { }  
+  
+        mmInStream = tmpIn;  
+        mmOutStream = tmpOut;  
+    }  
+  
+    public void run() {  
+        byte[] buffer = new byte[1024];  // buffer store for the stream  
+        int bytes; // bytes returned from read()  
+  
+        // Keep listening to the InputStream until an exception occurs  
+        while (true) {  
+            try {  
+                // Read from the InputStream  
+                bytes = mmInStream.read(buffer);  
+                // Send the obtained bytes to the UI Activity  
+                mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)  
+                        .sendToTarget();  
+            } catch (IOException e) {  
+                break;  
+            }  
+        }  
+    }  
+  
+    /* Call this from the main Activity to send data to the remote device */  
+    public void write(byte[] bytes) {  
+        try {  
+            mmOutStream.write(bytes);  
+        } catch (IOException e) { }  
+    }  
+  
+    /* Call this from the main Activity to shutdown the connection */  
+    public void cancel() {  
+        try {  
+            mmSocket.close();  
+        } catch (IOException e) { }  
+    }  
+}  
+
+
+引用资料：Android官方SDK、《Android/OPhone完全开发讲义》
+
+http://blog.csdn.net/gd920129/article/details/7487761

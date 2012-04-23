@@ -1,0 +1,71 @@
+1, #include <mmsystem.h>
+
+2, 配置库
+
+    Project => Setting... => Link标签 "Object/Library Modules"选项开始处加上Winmm.lib
+
+3, 在想播放声音的地方调用函数PlaySound，如PlaySound("xxx.wav", NULL, SND_SYNC | SND_FILENAME);
+
+ 
+
+ 
+
+停止声音播放：PlaySound(NULL, NULL, 0);
+
+ 
+
+---------------------------
+
+PlaySound函数的声明为：
+
+BOOL PlaySound(LPCSTR pszSound, HMODULE hmod,DWORD fdwSound);
+
+
+
+      参数pszSound是指定了要播放声音的字符串，该参数可以是WAVE文件的名字，或是WAV资源的名字，或是内存中声音数据的指针，或是在系统注册表WIN.INI中定义的系统事件声音。如果该参数为NULL则停止正在播放的声音。
+      参数hmod是应用程序的实例句柄，当播放WAV资源时要用到该参数，否则它必须为NULL。
+      参数fdwSound是标志的组合，如下表所示。若成功则函数返回TRUE，否则返回FALSE。
+
+播放标志以及含义：
+
+SND_APPLICATION
+用应用程序指定的关联来播放声音。
+
+SND_ALIAS
+pszSound参数指定了注册表或WIN.INI中的系统事件的别名。
+
+SND_ALIAS_ID
+pszSound参数指定了预定义的声音标识符。
+
+SND_ASYNC
+用异步方式播放声音，PlaySound函数在开始播放后立即返回。
+
+SND_FILENAME
+pszSound参数指定了WAVE文件名。
+
+SND_LOOP
+重复播放声音，必须与SND_ASYNC标志一块使用。
+
+SND_MEMORY
+播放载入到内存中的声音，此时pszSound是指向声音数据的指针。
+
+SND_NODEFAULT
+不播放缺省声音，若无此标志，则PlaySound在没找到声音时会播放缺省声音。
+
+SND_NOSTOP
+PlaySound不打断原来的声音播出并立即返回FALSE。
+
+SND_NOWAIT
+如果驱动程序正忙则函数就不播放声音并立即返回。
+
+SND_PURGE
+停止所有与调用任务有关的声音。若参数pszSound为NULL，就停止所有的声音，否则，停止pszSound指定的声音。
+
+SND_RESOURCE
+pszSound参数是WAVE资源的标识符，这时要用到hmod参数。
+
+SND_SYNC
+同步播放声音，在播放完后PlaySound函数才返回。
+
+
+http://blog.csdn.net/hbuxiaoshe/article/details/5337201
