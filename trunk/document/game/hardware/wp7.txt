@@ -1,0 +1,16 @@
+windows mobile 7(window phone 7)配置要求公布
+
+2010-03-20 16:46:00 来自: [已注销]
+对于微软最新智能手机操作系统Windows Phone 7的硬件要求一直是大众关注的焦点，除了之前传闻的高分辨率再最近有所变动外，微软也终于再刚刚的MIX 2010大会上公布了最低标准，赶紧来看吧： 
+　　1.电容式触控（Capacitive touch）：支持4个或更多触控点； 
+　　2.传感器：A-GPS、加速器、电子指南针、光测距传感器； 
+　　3.摄像头：500万像素或更高，Flash闪光灯，摄像头按钮； 
+　　4.多媒体：编解码加速器； 
+　　5.内存：256MB RAM或更高，8GB Flash或更高； 
+　　6.GPU：DirectX 9； 
+　　7.CPU：ARM v7 Cortex/Scorpion或更高。 
+　　相信看到如上几条要求后，大家心里多少还是有了一些谱，看来Windows Phone 7的硬件要求再某些方面并没有我们想象中高（比如RAM大小）。不过这只是最低要求，要想流畅的运行的该系统恐怕还没这么简单，要知道，微软的操作系统向来都是对硬件要求颇为苛刻的。而具体情况还是让我们等产品出来再看吧。
+
+
+
+Android and iOS have native support for OpenGL but on Windows Phone 7 a layer to convert the OpenGL calls to XNA has been written.

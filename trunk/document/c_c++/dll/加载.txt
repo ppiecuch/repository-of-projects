@@ -1,0 +1,11 @@
+ g_hVorbisFileDLL = LoadLibrary(_T("vorbisfile.dll"));
+    if (g_hVorbisFileDLL)
+    {
+        fn_ov_open = (LPOVOPEN)GetProcAddress(g_hVorbisFileDLL, "ov_open");
+        fn_ov_clear = (LPOVCLEAR)GetProcAddress(g_hVorbisFileDLL, "ov_clear");
+        fn_ov_read = (LPOVREAD)GetProcAddress(g_hVorbisFileDLL, "ov_read");
+        fn_ov_pcm_total = (LPOVPCMTOTAL)GetProcAddress(g_hVorbisFileDLL, "ov_pcm_total");
+        fn_ov_info = (LPOVINFO)GetProcAddress(g_hVorbisFileDLL, "ov_info");
+        fn_ov_comment = (LPOVCOMMENT)GetProcAddress(g_hVorbisFileDLL, "ov_comment");
+        fn_ov_open_callbacks = (LPOVOPENCALLBACKS)GetProcAddress(g_hVorbisFileDLL, "ov_open_callbacks");
+    }
