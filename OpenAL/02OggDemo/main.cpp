@@ -306,7 +306,21 @@ int main(void)
 
 	// Set the source and listener to the same location  
 	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);  
-	alSource3f(sourceID, AL_POSITION, 0.0f, 0.0f, 0.0f);  
+	alSource3f(sourceID, AL_POSITION, 0.0f, 0.0f, 0.0f);
+	//Al.AL_PITCH Field. Specifies the pitch to be applied, either at source, or on mixer results, at listener. The accepted range is 0.5 to 2.0, the default value is 1.0.
+	//源的AL_PITCH属性用于控制某一声音的相对音高。取值为1.0的时候，渲染的音源上无需调高。每减少50%会导致一个八度（-12半音）的音高变化。
+	alSourcef(sourceID, AL_PITCH, 0.5f);
+	//alSourcef(sourceID, AL_GAIN, 0.2f);
+	//alSourcei(sourceID, AL_LOOPING,AL_TRUE);
+	//OpenAL的核心是将声音的衰减表现为某一距离函数。OpenAL有一系列的距离模型可以在运行的时候选择。
+	//函数alDistaneceModel()用于在不同的距离模型中进行了选择。默认的距离模型是AL_INVERSE_DISTANCE，遵守下面的公式：
+	//G_db=clamp(GAIN-20*log10(1+Rf*(dist-Rd)/Rd, MinG, MaxG))
+	//此公式中Rf和Ed对应于音源的两个属性：AL_ROLLOFF_FACTOR和AL_RDFERENCE_DISTANCE。
+	//MinG和MaxG分别对应于音源的最小增益属性AL_MIN_GAIN和最大增益属性AL_MAX_GAIN。
+	//参考距离dist是listen体验增益（GAIN）的距离。依音源而定的rolloff系数（高低频规律性衰减系数）能够在值变化量的
+	//负方向上改变音源的范围。当rolloff系数为0表明对于音源没有衰减。
+	//alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.2);
+	//alSourcei(sourceID, AL_SOURCE_RELATIVE, AL_FALSE);
 
 	// Load the OGG file into memory  
 	LoadOGG("bg.ogg", bufferData, format, freq);  
@@ -316,8 +330,9 @@ int main(void)
 
 	// Attach sound buffer to source  
 	alSourcei(sourceID, AL_BUFFER, bufferID);  
+	
 
-	alSourcef (sourceID, AL_GAIN, 1.0 );  
+	//alSourcef (sourceID, AL_GAIN, 1.0 );  
 
 	// Finally, play the sound!!!  
 	alSourcePlay(sourceID);  
@@ -327,14 +342,15 @@ int main(void)
 		// Query the state of the souce  
 		alGetSourcei(sourceID, AL_SOURCE_STATE, &state);  
 	}  
-	while (state != AL_STOPPED);  
+	while (state == AL_PLAYING);  
 
 	// Clean up sound buffer and source  
-	alDeleteBuffers(1, &bufferID);  
 	alDeleteSources(1, &sourceID);  
-
+	alDeleteBuffers(1, &bufferID);  
+	
+	alcMakeContextCurrent(NULL);
 	alcDestroyContext(context);  
-	alcCloseDevice(device);     
+	alcCloseDevice(device);
 
 	return 0;  
 }

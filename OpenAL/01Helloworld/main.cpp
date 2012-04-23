@@ -15,6 +15,15 @@ int main(void)
 	//set active constext
 	alcMakeContextCurrent(cc);
 
+	const char *actual_devicename;
+	actual_devicename=alcGetString(dev,ALC_DEVICE_SPECIFIER);
+	int major,minor;
+
+	alcGetIntegerv(dev,ALC_MAJOR_VERSION,sizeof(int),&major);
+	alcGetIntegerv(dev,ALC_MINOR_VERSION,sizeof(int),&minor);
+
+	printf("device: <%s>,openal version: %d.%d\n",actual_devicename,major,minor);
+
 	const ALchar* version=alGetString(AL_VERSION);
 	const ALchar* renderer=alGetString(AL_RENDERER);
 	const ALchar* vendor=alGetString(AL_VENDOR);
