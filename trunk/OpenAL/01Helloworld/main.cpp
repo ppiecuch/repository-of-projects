@@ -8,9 +8,21 @@
 int main(void)
 {
 	//打开设备，创建设备
+	//open default device
 	ALCdevice *dev = alcOpenDevice(NULL);
+	//create context
 	ALCcontext *cc = alcCreateContext(dev, NULL);
+	//set active constext
 	alcMakeContextCurrent(cc);
+
+	const ALchar* version=alGetString(AL_VERSION);
+	const ALchar* renderer=alGetString(AL_RENDERER);
+	const ALchar* vendor=alGetString(AL_VENDOR);
+	const ALchar* extensions=alGetString(AL_EXTENSIONS);
+	printf("version:%s\n",version);
+	printf("renderer:%s\n",renderer);
+	printf("vendor:%s\n",vendor);
+	printf("extensions:%s\n",extensions);
 
 	//创建音源和缓冲器
 	ALuint bid, sid;
@@ -37,7 +49,9 @@ int main(void)
 		alGetSourcei(sid, AL_SOURCE_STATE, &state);
 	}while(state == AL_PLAYING);
 
+	//A playing source can be deleted--the source will be stopped automatically and the deleted.
 	alDeleteSources(1, &sid);
+	//A buffer which is attached to a source can not be deleted.
 	alDeleteBuffers(1, &bid);
 
 	alcMakeContextCurrent(NULL);
