@@ -1,12 +1,31 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "yonListTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( yonListTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( yonListTestCase );
 
 void yonListTestCase::setUp()
 {
 }
-
+void yonListTestCase::insert_before()
+{
+	l.push_back(1);
+	l.push_back(3);
+	l.insert_after(l.begin(),2);
+	list<u32>::Iterator it=l.begin();
+	++it;
+	printf("\n%d\n",(*it));
+	CPPUNIT_ASSERT((*it)==2);
+}
+void yonListTestCase::insert_after()
+{
+	l.push_back(1);
+	l.push_back(3);
+	l.insert_before(l.getLast(),2);
+	list<u32>::Iterator it=l.begin();
+	++it;
+	printf("\n%d\n",(*it));
+	CPPUNIT_ASSERT((*it)==2);
+}
 void yonListTestCase::push_back()
 {
 	l.push_back(1);

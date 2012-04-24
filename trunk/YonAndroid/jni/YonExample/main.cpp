@@ -102,6 +102,11 @@ int main(int argc, char* argv[])
 	Logger->debug("map.size:%d\n",m.size());
 	m.clear();
 
+	list<u32> l;
+	l.push_back(1);
+	l.push_back(3);
+	l.insert_after(l.begin(),2);
+
 	//Logger->debug("%d\n",fs->existFile("D:/java1.exe"));
 
 	//driver->getTexture("D:/test.png");

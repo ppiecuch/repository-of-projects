@@ -69,7 +69,7 @@ namespace scene{
 	}
 
 
-	bool CGraphicsAdapter::drawImage(c8* imageName, s32 srcX, s32 srcY, u32 srcWidth, u32 srcHeight, s32 destX, s32 destY, bool useAlpha,u32 color){
+	bool CGraphicsAdapter::drawImage(const c8* imageName, s32 srcX, s32 srcY, u32 srcWidth, u32 srcHeight, s32 destX, s32 destY, bool useAlpha,u32 color){
 		video::ITexture* texture=m_pDriver->getTexture(imageName);
 		if(texture==NULL)
 			return false;
