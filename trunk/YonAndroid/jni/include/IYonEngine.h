@@ -11,6 +11,7 @@
 #include "IFileSystem.h"
 #include "IEventReceiver.h"
 #include "IGraphicsAdapter.h"
+#include "IAudioDriver.h"
 
 
 namespace yon{
@@ -22,6 +23,7 @@ namespace yon{
 		virtual scene::ISceneManager* getSceneManager() const = 0;
 		virtual scene::IGraphicsAdapter* getGraphicsAdapter() const = 0;
 		virtual io::IFileSystem* getFileSystem() const = 0;
+		virtual audio::IAudioDriver* getAudioDriver() const = 0;
 		virtual bool run() = 0;
 		virtual void onResize(u32 w,u32 h) = 0;
 

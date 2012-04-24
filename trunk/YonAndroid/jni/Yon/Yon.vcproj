@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;./zlib;./libogg;./libvorbis"
+				AdditionalIncludeDirectories="../include;./zlib;./libogg;./libvorbis;./openal/include;./openal/include/AL;./openal/OpenAL32/Include;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;YON_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -1233,6 +1233,106 @@
 						</File>
 					</Filter>
 				</Filter>
+				<Filter
+					Name="openal"
+					>
+					<Filter
+						Name="include"
+						>
+						<File
+							RelativePath=".\openal\include\config.h"
+							>
+						</File>
+						<Filter
+							Name="AL"
+							>
+							<File
+								RelativePath=".\openal\include\AL\al.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\include\AL\alc.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\include\AL\alext.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\include\AL\alut.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\include\AL\efx-creative.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\include\AL\efx.h"
+								>
+							</File>
+						</Filter>
+					</Filter>
+					<Filter
+						Name="OpenAL32"
+						>
+						<Filter
+							Name="Include"
+							>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alAuxEffectSlot.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alBuffer.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alDatabuffer.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alEffect.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alError.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alFilter.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alListener.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alMain.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alSource.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alState.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alThunk.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\alu.h"
+								>
+							</File>
+							<File
+								RelativePath=".\openal\OpenAL32\Include\bs2b.h"
+								>
+							</File>
+						</Filter>
+					</Filter>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="audio"
@@ -1242,9 +1342,33 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\IListener.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\ISound.h"
 					>
 				</File>
+				<Filter
+					Name="oal"
+					>
+					<File
+						RelativePath=".\COALAudioDriver.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\COALAudioDriver.h"
+						>
+					</File>
+					<File
+						RelativePath=".\COALSound.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\COALSound.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<File
