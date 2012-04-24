@@ -14,12 +14,14 @@ using namespace yon::core;
 class yonListTestCase : public CPPUNIT_NS::TestFixture
 {
 	CPPUNIT_TEST_SUITE( yonListTestCase );
-	CPPUNIT_TEST( push_back );
-	CPPUNIT_TEST( push_front );
-	CPPUNIT_TEST( empty );
-	CPPUNIT_TEST( clear );
-	CPPUNIT_TEST( begin );
-	CPPUNIT_TEST( erase );
+	//CPPUNIT_TEST( push_back );
+	//CPPUNIT_TEST( push_front );
+	//CPPUNIT_TEST( empty );
+	//CPPUNIT_TEST( clear );
+	//CPPUNIT_TEST( begin );
+	//CPPUNIT_TEST( erase );
+	CPPUNIT_TEST( insert_before );
+	CPPUNIT_TEST( insert_after );
 	CPPUNIT_TEST_SUITE_END();
 protected:
 	list<u32> l;
@@ -34,6 +36,8 @@ protected:
 	void clear();
 	void begin();
 	void erase();
+	void insert_before();
+	void insert_after();
 };
 
 #endif

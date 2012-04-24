@@ -145,6 +145,53 @@ namespace yon{
 				return (first == NULL);
 			}
 
+			//! Inserts an element after an element.
+			/** \param it Iterator pointing to element after which the new element
+			should be inserted.
+			\param element The new element to be inserted into the list.
+			*/
+			void insert_after(const Iterator& it, const T& element)
+			{
+				YonListNode* node = (YonListNode*)operator new(sizeof(YonListNode));
+				new (node) YonListNode(element);
+
+				node->next = it.current->next;
+
+				if (it.current->next)
+					it.current->next->prev = node;
+
+				node->prev = it.current;
+				it.current->next = node;
+				++len;
+
+				if (it.current == last)
+					last = node;
+			}
+
+
+			//! Inserts an element before an element.
+			/** \param it Iterator pointing to element before which the new element
+			should be inserted.
+			\param element The new element to be inserted into the list.
+			*/
+			void insert_before(const Iterator& it, const T& element)
+			{
+				YonListNode* node = (YonListNode*)operator new(sizeof(YonListNode));
+				new (node) YonListNode(element);
+
+				node->prev = it.current->prev;
+
+				if (it.current->prev)
+					it.current->prev->next = node;
+
+				node->next = it.current;
+				it.current->prev = node;
+				++len;
+
+				if (it.current == first)
+					first = node;
+			}
+
 			void push_back(const T& element){
 				YonListNode* node=(YonListNode*)operator new(sizeof(YonListNode));
 				new (node) YonListNode(element);

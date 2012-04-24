@@ -1234,6 +1234,18 @@
 					</Filter>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="audio"
+				>
+				<File
+					RelativePath="..\include\IAudioDriver.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\ISound.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath="..\Android.mk"

@@ -16,7 +16,7 @@ namespace scene{
 		virtual void endBatch() = 0;
 
 		//绘制成功返回true，否则返回false
-		virtual bool drawImage(c8* imageName, s32 srcX, s32 srcY, u32 srcWidth, u32 srcHeight, s32 destX, s32 destY,bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
+		virtual bool drawImage(const c8* imageName, s32 srcX, s32 srcY, u32 srcWidth, u32 srcHeight, s32 destX, s32 destY,bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
 	};
 }
 }
