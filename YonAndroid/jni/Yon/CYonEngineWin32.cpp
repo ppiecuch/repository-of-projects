@@ -46,7 +46,7 @@ namespace platform{
 		:m_hWnd(NULL),m_bExternalWindow(false),
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),
 		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),
-		m_pUserListener(NULL),m_pTimer(NULL),
+		m_pUserListener(NULL),m_pTimer(NULL),m_pAudioDriver(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
 	{
 		if(params.windowId==NULL)
@@ -80,6 +80,9 @@ namespace platform{
 		//³õÊ¼»¯GraphicsÊÊÅäÆ÷
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
+		//³õÊ¼»¯ÉùÒôÇý¶¯Æ÷
+		m_pAudioDriver=audio::createAudioDriver();
+
 		SEnginePair ep;
 		ep.hWnd=m_hWnd;
 		ep.engine=this;
@@ -96,6 +99,7 @@ namespace platform{
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
 		eraseEngineByHWnd(m_hWnd);
+		m_pAudioDriver->drop();
 		m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
