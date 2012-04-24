@@ -215,9 +215,9 @@ bool LoadOGG(char *name, vector<char> &buffer, ALenum &format, ALsizei &freq)
 
 		buffer.insert(buffer.end(), array, array + bytes);  
 	}  
-	while (bytes > 0);  
+	while (bytes > 0);
 
-	ov_clear(&oggFile);  
+	ov_clear(&oggFile);
 	return true;   
 }  
 
@@ -300,6 +300,9 @@ int main(void)
 	context = alcCreateContext(device,0);  
 	ALboolean initStatus = alcMakeContextCurrent(context);      
 
+	//set distance mode
+	alDistanceModel(AL_NONE);
+
 	// Create sound buffer and source  
 	alGenBuffers(1, &bufferID);  
 	alGenSources(1, &sourceID);  
@@ -309,11 +312,15 @@ int main(void)
 	alSource3f(sourceID, AL_POSITION, 0.0f, 0.0f, 0.0f);
 	//Al.AL_PITCH Field. Specifies the pitch to be applied, either at source, or on mixer results, at listener. The accepted range is 0.5 to 2.0, the default value is 1.0.
 	//源的AL_PITCH属性用于控制某一声音的相对音高。取值为1.0的时候，渲染的音源上无需调高。每减少50%会导致一个八度（-12半音）的音高变化。
-	alSourcef(sourceID, AL_PITCH, 0.5f);
+	//alSourcef(sourceID, AL_PITCH, 0.5f);
 	//alSourcef(sourceID, AL_GAIN, 0.2f);
+	//AL_LOOPING is a flag that indicates that the source will not be in AL_STOPPED state once it reaches the end of last buffer in the buffer queue.
+	//Instead, the source will immediately promote to AL_INITIAL and AL_PLAYING. The default vale is immediately promote to AL_INITIAL and AL_PLAYING.
+	//The default value is AL_FALSE.
+	//AL_LOOPING can be chaned on a source in any execution state.In particular, it can be changed on a AL_PLAYING source.
 	//alSourcei(sourceID, AL_LOOPING,AL_TRUE);
 	//OpenAL的核心是将声音的衰减表现为某一距离函数。OpenAL有一系列的距离模型可以在运行的时候选择。
-	//函数alDistaneceModel()用于在不同的距离模型中进行了选择。默认的距离模型是AL_INVERSE_DISTANCE，遵守下面的公式：
+	//函数alDistaneceModel()用于在不同的距离模型中进行了选择。默认的距离模型是AL_INVERSE_DISTANCE_CLAMPED，遵守下面的公式：
 	//G_db=clamp(GAIN-20*log10(1+Rf*(dist-Rd)/Rd, MinG, MaxG))
 	//此公式中Rf和Ed对应于音源的两个属性：AL_ROLLOFF_FACTOR和AL_RDFERENCE_DISTANCE。
 	//MinG和MaxG分别对应于音源的最小增益属性AL_MIN_GAIN和最大增益属性AL_MAX_GAIN。
@@ -342,7 +349,8 @@ int main(void)
 		// Query the state of the souce  
 		alGetSourcei(sourceID, AL_SOURCE_STATE, &state);  
 	}  
-	while (state == AL_PLAYING);  
+	//while (state == AL_PLAYING);  
+	while(state!=AL_STOPPED);
 
 	// Clean up sound buffer and source  
 	alDeleteSources(1, &sourceID);  

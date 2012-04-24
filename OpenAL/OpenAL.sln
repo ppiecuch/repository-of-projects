@@ -34,6 +34,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02OggDemo", "02OggDemo\02Og
 		{8C87B189-C088-4721-A418-E10267C9B84E} = {8C87B189-C088-4721-A418-E10267C9B84E}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03MultiSound", "03MultiSound\03MultiSound.vcproj", "{F14A216A-4581-48B4-81FD-A429FED88A03}"
+	ProjectSection(ProjectDependencies) = postProject
+		{557BF17C-91B5-4737-B1FF-0BDE3C588382} = {557BF17C-91B5-4737-B1FF-0BDE3C588382}
+		{B0831882-BA8C-488F-911D-6E75ACBCE0AF} = {B0831882-BA8C-488F-911D-6E75ACBCE0AF}
+		{8C87B189-C088-4721-A418-E10267C9B84E} = {8C87B189-C088-4721-A418-E10267C9B84E}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -68,6 +75,10 @@ Global
 		{41BC547A-96DA-4846-B816-01CFF0868A7F}.Debug|Win32.Build.0 = Debug|Win32
 		{41BC547A-96DA-4846-B816-01CFF0868A7F}.Release|Win32.ActiveCfg = Release|Win32
 		{41BC547A-96DA-4846-B816-01CFF0868A7F}.Release|Win32.Build.0 = Release|Win32
+		{F14A216A-4581-48B4-81FD-A429FED88A03}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F14A216A-4581-48B4-81FD-A429FED88A03}.Debug|Win32.Build.0 = Debug|Win32
+		{F14A216A-4581-48B4-81FD-A429FED88A03}.Release|Win32.ActiveCfg = Release|Win32
+		{F14A216A-4581-48B4-81FD-A429FED88A03}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

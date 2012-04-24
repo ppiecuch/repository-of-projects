@@ -3,6 +3,9 @@
 #include <alu.h>
 #include <alut.h>
 
+#include <vector>
+#include <iostream>
+
 #include <stdio.h>
 
 int main(void)
@@ -32,6 +35,28 @@ int main(void)
 	printf("renderer:%s\n",renderer);
 	printf("vendor:%s\n",vendor);
 	printf("extensions:%s\n",extensions);
+
+	ALCint count;
+	alcGetIntegerv( dev, ALC_ATTRIBUTES_SIZE, 1, &count);
+	std::vector<ALCint> attrs(count);
+	alcGetIntegerv( dev, ALC_ALL_ATTRIBUTES, count, &attrs[0] );
+	for(int i=0; i<attrs.size(); ++i)
+	{
+		if( attrs[i] == ALC_MONO_SOURCES )
+		{
+			std::cout << "max mono sources: " << attrs.at(i+1) << std::endl;
+		}
+		else if( attrs[i] == ALC_STEREO_SOURCES )
+		{
+			std::cout << "max stereo sources: " << attrs.at(i+1) << std::endl;
+		}
+	}
+
+	ALCint nummono, numstereo;
+	alcGetIntegerv(dev, ALC_MONO_SOURCES, 1, &nummono);
+	alcGetIntegerv(dev, ALC_STEREO_SOURCES, 1, &numstereo);
+	std::cout << "max mono sources: " << nummono << std::endl;
+	std::cout << "max stereo sources: " << numstereo << std::endl;
 
 	//创建音源和缓冲器
 	ALuint bid, sid;
