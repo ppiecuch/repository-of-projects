@@ -188,9 +188,23 @@ bool LoadOGG(char *name, vector<char> &buffer, ALenum &format, ALsizei &freq)
 	vorbis_info *pInfo;  
 	OggVorbis_File oggFile;  
 
+	//ov_open is one of three initialization functions used to initialize an OggVorbis_File structure and prepare a bitstream for playback.
+	//The first argument must be a file pointer to an already opened file or pipe 
+	//(it need not be seekable--though this obviously restricts what can be done with the bitstream). 
+	//vf should be a pointer to the OggVorbis_File structure -- this is used for ALL the externally visible libvorbisfile functions. 
+	//Once this has been called, the same OggVorbis_File struct should be passed to all the libvorbisfile functions.
+	//The vf structure initialized using ov_fopen() must eventually be cleaned using ov_clear(). 
+	//Once a FILE * handle is passed to ov_open() successfully, the application MUST NOT fclose() or in any other way manipulate that file handle. 
+	//Vorbisfile will close the file in ov_clear(). 
+	//If the application must be able to close the FILE * handle itself, see ov_open_callbacks() with the use of OV_CALLBACKS_NOCLOSE.
 	// Try opening the given file  
+#if WITH_CLOSE
 	if (ov_open(f, &oggFile, NULL, 0) != 0)  
 		return false;   
+#else
+	if (ov_open_callbacks(f, &oggFile, NULL, 0, OV_CALLBACKS_NOCLOSE) != 0)
+		return false;   
+#endif
 
 	pInfo = ov_info(&oggFile, -1);  
 
@@ -199,8 +213,87 @@ bool LoadOGG(char *name, vector<char> &buffer, ALenum &format, ALsizei &freq)
 	else  
 		format = AL_FORMAT_STEREO16;  
 
-	freq = pInfo->rate;  
+	freq = pInfo->rate;
 
+	// Get playtime in secs
+	//mPlayTime = static_cast<float>(ov_time_total(&mOggStream, -1));
+
+	//http://droughtdeer.googlecode.com/svn/trunk/OgreOggSound/src/OgreOggStaticSound.cpp
+	unsigned int mBufferSize=0;
+	/*switch(pInfo->channels)
+	{
+	case 1:
+		{
+			//mFormat = AL_FORMAT_MONO16;
+			// Set BufferSize to 250ms (Frequency * 2 (16bit) divided by 4 (quarter of a second))
+			mBufferSize = pInfo->rate >> 1;
+			// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
+			mBufferSize -= (mBufferSize % 2);
+		}
+		break;
+	case 2:
+		{
+			//mFormat = AL_FORMAT_STEREO16;
+			// Set BufferSize to 250ms (Frequency * 4 (16bit stereo) divided by 4 (quarter of a second))
+			mBufferSize = pInfo->rate;
+			// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
+			mBufferSize -= (mBufferSize % 4);
+		}
+		break;
+	case 4:
+		{
+			//mFormat = alGetEnumValue("AL_FORMAT_QUAD16");
+			//if (!mFormat) return false;
+			// Set BufferSize to 250ms (Frequency * 8 (16bit 4-channel) divided by 4 (quarter of a second))
+			mBufferSize = pInfo->rate * 2;
+			// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
+			mBufferSize -= (mBufferSize % 8);
+		}
+		break;
+	case 6:
+		{
+			//mFormat = alGetEnumValue("AL_FORMAT_51CHN16");
+			//if (!mFormat) return false;
+			// Set BufferSize to 250ms (Frequency * 12 (16bit 6-channel) divided by 4 (quarter of a second))
+			mBufferSize = pInfo->rate * 3;
+			// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
+			mBufferSize -= (mBufferSize % 12);
+		}
+		break;
+	case 7:
+		{
+			//mFormat = alGetEnumValue("AL_FORMAT_61CHN16");
+			//if (!mFormat) return false;
+			// Set BufferSize to 250ms (Frequency * 16 (16bit 7-channel) divided by 4 (quarter of a second))
+			mBufferSize = pInfo->rate * 4;
+			// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
+			mBufferSize -= (mBufferSize % 16);
+		}
+		break;
+	case 8:
+		{
+			//mFormat = alGetEnumValue("AL_FORMAT_71CHN16");
+			//if (!mFormat) return false;
+			// Set BufferSize to 250ms (Frequency * 20 (16bit 8-channel) divided by 4 (quarter of a second))
+			mBufferSize = pInfo->rate * 5;
+			// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
+			mBufferSize -= (mBufferSize % 20);
+		}
+		break;
+	default:
+		{
+			// Couldn't determine buffer format so log the error and default to mono
+			//Ogre::LogManager::getSingleton().logMessage("!!WARNING!! Could not determine buffer format!  Defaulting to MONO");
+
+			//mFormat = AL_FORMAT_MONO16;
+			// Set BufferSize to 250ms (Frequency * 2 (16bit) divided by 4 (quarter of a second))
+			mBufferSize = pInfo->rate >> 1;
+			// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment ...
+			mBufferSize -= (mBufferSize % 2);
+		}
+		break;
+	}*/
+	unsigned int count=0;
 	do  
 	{   
 		bytes = ov_read(&oggFile, array, BUFFER_SIZE, endian, 2, 1, &bitStream);  
@@ -214,10 +307,18 @@ bool LoadOGG(char *name, vector<char> &buffer, ALenum &format, ALsizei &freq)
 		}  
 
 		buffer.insert(buffer.end(), array, array + bytes);  
+
+		count+=bytes;
 	}  
 	while (bytes > 0);
 
+	printf("mBufferSize:%d,bytes:%d\n",mBufferSize,count);
+
 	ov_clear(&oggFile);
+#if WITH_CLOSE
+#else
+	fclose(f);
+#endif
 	return true;   
 }  
 
