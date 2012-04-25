@@ -1346,6 +1346,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\CWaveLoaderOGG.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CWaveLoaderOGG.h"
+					>
+				</File>
+				<File
 					RelativePath=".\CWaveLoaderWAV.cpp"
 					>
 				</File>

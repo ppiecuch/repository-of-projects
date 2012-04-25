@@ -1,5 +1,6 @@
 #include "COALAudioDriver.h"
 #include "CWaveLoaderWAV.h"
+#include "CWaveLoaderOGG.h"
 #include "COALSound.h"
 
 #include "ILogger.h"
@@ -15,6 +16,7 @@ namespace oal{
 			alcMakeContextCurrent(m_pContext);
 			
 			m_waveLoaders.push(createWaveLoaderWAV());
+			m_waveLoaders.push(createWaveLoaderOGG());
 
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COALAudioDriver");
 	}
@@ -87,6 +89,10 @@ namespace oal{
 			sound = new COALSound(wave, file->getPath());
 			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("end load sound:%s",file->getPath().c_str()).c_str());
 			wave->drop();
+		}
+		else
+		{
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("loadSoundFromFile for %s failed!",file->getPath().c_str()).c_str());
 		}
 
 		return sound;
