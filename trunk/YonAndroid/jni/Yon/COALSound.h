@@ -2,14 +2,19 @@
 #define _YON_AUDIO_OAL_COALSOUND_H_
 
 #include "ISound.h"
+#include "COALAudioDriver.h"
+#include "IWave.h"
 
 namespace yon{
 namespace audio{
 namespace oal{
 
 	class COALSound : public ISound{
+	protected:
+		ALuint m_source;
+		ALuint m_buffer;
 	public:
-		COALSound(const io::path& p);
+		COALSound(IWave* wave,const io::path& p);
 		virtual ~COALSound();
 
 		virtual void play();

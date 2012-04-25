@@ -81,7 +81,7 @@ namespace platform{
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
 		//³õÊ¼»¯ÉùÒôÇı¶¯Æ÷
-		m_pAudioDriver=audio::createAudioDriver();
+		m_pAudioDriver=audio::createAudioDriver(m_pFileSystem);
 
 		SEnginePair ep;
 		ep.hWnd=m_hWnd;
