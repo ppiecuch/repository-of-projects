@@ -22,6 +22,7 @@ using namespace yon::video;
 using namespace yon::scene;
 using namespace yon::scene::camera;
 using namespace yon::scene::animator;
+using namespace yon::audio;
 
 #pragma comment(lib, "Yon.lib")
 
@@ -58,12 +59,16 @@ int main(int argc, char* argv[])
 	IYonEngine* engine=CreateEngine(params);
 
 	IVideoDriver* driver=engine->getVideoDriver();
+	IAudioDriver* audioDriver=engine->getAudioDriver();
 	ISceneManager* sceneMgr=engine->getSceneManager();
 	IGraphicsAdapter* gfAdapter=engine->getGraphicsAdapter();
 	IFileSystem* fs=engine->getFileSystem();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	ITimer* timer=engine->getTimer();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
+
+	ISound* sound=audioDriver->getSound("../media/helloworld.wav");
+	sound->play();
 
 	//Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
 	Logger->debug("time:%d\n",timer->getTime());
@@ -100,7 +105,19 @@ int main(int argc, char* argv[])
 	m.remove(5);
 	m.remove(4);
 	Logger->debug("map.size:%d\n",m.size());
+	map<s32,c8>::Iterator it=m.getIterator();
+	for(;it.atEnd()==false;++it)
+		Logger->debug("%c\n",it->getValue());
 	m.clear();
+
+	map<s32,s32*> mm;
+	mm.insert(4,new s32(4));
+	map<s32,s32*>::Iterator mit=mm.getIterator();
+	for(;mit.atEnd()==false;mit++)
+		delete mit->getValue();
+	mm.clear();
+
+	
 
 	list<u32> l;
 	l.push_back(1);
@@ -115,7 +132,7 @@ int main(int argc, char* argv[])
 	//IImage* image=driver->createImageFromFile("D:/test.png");
 	//image->drop();
 
-	shap=geometryFty->createSphere(80,64,64);
+	/*shap=geometryFty->createSphere(80,64,64);
 	unit=geometryFty->createUnit(shap);
 	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	entity=geometryFty->createEntity(unit);
@@ -142,7 +159,7 @@ int main(int argc, char* argv[])
 	material->setTexture(0,driver->getTexture("../media/gunny.png"));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
 	
 
@@ -194,7 +211,7 @@ int main(int argc, char* argv[])
 
 	
 
-	shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
+	/*shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
 	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	entity=geometryFty->createEntity(unit);
@@ -214,7 +231,7 @@ int main(int argc, char* argv[])
 	aniParam.animatorUV.stage=0;
 	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
 	waterfallModel->addAnimator(uvAnimator);
-	uvAnimator->drop();
+	uvAnimator->drop();*/
 
 
 	/*ILogger* logger=Logger;
@@ -258,8 +275,8 @@ int main(int argc, char* argv[])
 		const core::vector3df crot=cubeModel->getRotation();
 		cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
-		const core::vector3df srot=sphereModel->getRotation();
-		sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.8f ,srot.z));
+		//const core::vector3df srot=sphereModel->getRotation();
+		//sphereModel->setRotation(core::vector3df(srot.x,srot.y-0.8f ,srot.z));
 
 		const core::vector3df psca=planeModel->getScale();
 		if(psca.x>4)
@@ -268,8 +285,8 @@ int main(int argc, char* argv[])
 			factor=1.01f;
 		planeModel->setScale(psca*factor);
 
-		const core::vector3df trot=toruseModel->getRotation();
-		toruseModel->setRotation(core::vector3df(trot.x+1.0f,trot.y,trot.z));
+		//const core::vector3df trot=toruseModel->getRotation();
+		//toruseModel->setRotation(core::vector3df(trot.x+1.0f,trot.y,trot.z));
 
 		//const core::vector3df sca=model->getScale();
 		//model->setScale(core::vector3df(sca.x+0.001f,sca.y+0.001f,sca.z+0.001f));
@@ -288,7 +305,7 @@ int main(int argc, char* argv[])
 
 		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
-		Logger->render();
+		//Logger->render();
 		//driver->endScene();
 		//Sleep(20);
 		//printf("run\n");

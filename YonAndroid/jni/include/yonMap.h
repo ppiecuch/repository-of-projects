@@ -119,15 +119,18 @@ namespace core{
 		public:
 			Iterator():root(NULL),current(NULL){}
 			explicit Iterator(Node* root):root(root),current(getMin(root)){}
+			Iterator(const Iterator& it){
+				*this=it;
+			}
 
 			inline bool atEnd() const{return current==NULL;}
 			inline Node* getNode(){return current;}
 
 			Iterator& operator=(const Iterator& src){root=src.root;current=src.current;return *this;}
 			Iterator& operator++(){inc();return *this;}
-			Iterator operator++(int){Node* tmp=current;inc();return *tmp;}
+			Iterator operator++(int){inc();return Iterator(root);}
 			Iterator& operator--(){dec();return *this;}
-			Iterator operator--(int){Node* tmp=current;dec();return *tmp;}
+			Iterator operator--(int){dec();return Iterator(root);}
 			Node* operator->(){return getNode();}
 			Node& operator*(){YON_DEBUG_BREAK_IF(atEnd());return *getNode();}
 		};
@@ -161,13 +164,16 @@ namespace core{
 		public:
 			PostorderIterator():root(NULL),current(NULL){}
 			explicit PostorderIterator(Node* root):root(root),current(getMin(root)){}
+			PostorderIterator(const PostorderIterator& it){
+				*this=it;
+			}
 
 			inline bool atEnd() const{return current==NULL;}
 			inline Node* getNode(){return current;}
 
 			PostorderIterator& operator=(const PostorderIterator& src){root=src.root;current=src.current;return *this;}
 			PostorderIterator& operator++(){inc();return *this;}
-			PostorderIterator operator++(int){Node* tmp=current;inc();return *tmp;}
+			PostorderIterator operator++(int){inc();return PostorderIterator(root);}
 			Node* operator->(){return getNode();}
 			Node& operator*(){YON_DEBUG_BREAK_IF(atEnd());return *getNode();}
 		};

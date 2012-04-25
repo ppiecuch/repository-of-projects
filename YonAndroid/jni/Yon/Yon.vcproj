@@ -1338,6 +1338,22 @@
 				Name="audio"
 				>
 				<File
+					RelativePath=".\CWave.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CWave.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CWaveLoaderWAV.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CWaveLoaderWAV.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IAudioDriver.h"
 					>
 				</File>
@@ -1347,6 +1363,14 @@
 				</File>
 				<File
 					RelativePath="..\include\ISound.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IWave.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IWaveLoader.h"
 					>
 				</File>
 				<Filter

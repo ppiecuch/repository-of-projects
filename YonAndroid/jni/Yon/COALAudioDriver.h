@@ -2,6 +2,8 @@
 #define _YON_AUDIO_OAL_COALAUDIODRIVER_H_
 
 #include "IAudioDriver.h"
+#include "yonArray.h"
+#include "IWaveLoader.h"
 
 #include <al.h>
 #include <alc.h>
@@ -21,11 +23,22 @@ namespace oal{
 	private:
 		ALCdevice *m_pDevice;
 		ALCcontext *m_pContext;
+
+		core::array<audio::ISound*> m_sounds;
+		core::array<audio::IWaveLoader*> m_waveLoaders;
+
+		void addSound(audio::ISound* sound);
+		audio::ISound* loadSoundFromFile(io::IReadStream* file);
 	public:
-		COALAudioDriver();
+		COALAudioDriver(io::IFileSystem* fs);
 		virtual ~COALAudioDriver();
 
 		virtual ISound* getSound(const io::path& filename);
+		virtual ISound* findSound(const io::path& filename) const;
+
+		virtual IWave* createWaveFromFile(const io::path& filename);
+		virtual IWave* createWaveFromFile(io::IReadStream* file);
+
 		virtual IListener* getListener();
 		virtual bool checkError(const c8* file,s32 line);
 	};

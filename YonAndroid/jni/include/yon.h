@@ -8,6 +8,12 @@
 #include "bstree.h"
 #include "rbtree.h"
 
+#include "ISound.h"
+#include "IWave.h"
+#include "IWaveLoader.h"
+#include "IAudioDriver.h"
+#include "IListener.h"
+
 #include "ILogger.h" 
 #include "IDebugPrinter.h"
 

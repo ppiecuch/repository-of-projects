@@ -843,7 +843,7 @@ namespace ogles1{
 		if (!eglInitialize( m_eglDisplay, &majorVersion, &minorVersion ) )
 		{
 			//MessageBox(NULL,TEXT("Could not initialize OpenGL-ES1 display."),TEXT("Error"),MB_OK);
-			Logger->info(YON_LOG_FAILED_FORMAT,"Initialize EglDisplay Object");
+			Logger->error(YON_LOG_FAILED_FORMAT,"Initialize EglDisplay Object");
 			return false;
 		}
 		else
@@ -893,7 +893,7 @@ namespace ogles1{
 		if (!eglChooseConfig(m_eglDisplay, attribs, &config, 1, &num_configs))
 		{
 			//MessageBox(NULL,TEXT("Could not get config for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
-			Logger->info(YON_LOG_FAILED_FORMAT,"Choose EGLConfig");
+			Logger->error(YON_LOG_FAILED_FORMAT,"Choose EGLConfig");
 			return false;
 		}
 
@@ -916,7 +916,7 @@ namespace ogles1{
 		if (EGL_NO_SURFACE==m_eglSurface)
 		{
 			//MessageBox(NULL,TEXT("Could not create surface for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
-			Logger->info(YON_LOG_FAILED_FORMAT,"Create EGLSurface");
+			Logger->error(YON_LOG_FAILED_FORMAT,"Create EGLSurface");
 			return false;
 		}
 
@@ -972,7 +972,7 @@ namespace ogles1{
 		if(eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)==EGL_TRUE){
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Unbind GL contexts and surface");
 		}else{
-			Logger->info(YON_LOG_FAILED_FORMAT,"Unbind GL contexts and surface");
+			Logger->error(YON_LOG_FAILED_FORMAT,"Unbind GL contexts and surface");
 		}
 		eglDestroyContext(m_eglDisplay, m_eglContext);
 		eglDestroySurface(m_eglDisplay, m_eglSurface);
@@ -986,12 +986,12 @@ namespace ogles1{
 		if(eglTerminate(m_eglDisplay)==EGL_TRUE){
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Release all resources in EGL and display");
 		}else{
-			Logger->info(YON_LOG_FAILED_FORMAT,"Release all resources in EGL and display");
+			Logger->error(YON_LOG_FAILED_FORMAT,"Release all resources in EGL and display");
 		}
 		if (m_hDc&&ReleaseDC((HWND)m_hWnd, m_hDc)){
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Release DC");
 		}else{
-			Logger->info(YON_LOG_FAILED_FORMAT,"Release DC");
+			Logger->error(YON_LOG_FAILED_FORMAT,"Release DC");
 		}
 	}
 #endif//YON_COMPILE_WITH_WIN32

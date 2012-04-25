@@ -308,6 +308,7 @@ namespace video{
 			height=h;
 		}
 
+#if 1
 		//如果是索引颜色，转为RGB色
 		if (color_type == PNG_COLOR_TYPE_PALETTE)
 			png_set_palette_to_rgb(png_ptr);
@@ -327,6 +328,8 @@ namespace video{
 		if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)){
 			//加入ALPHA通道
 			png_set_tRNS_to_alpha(png_ptr);
+			//修正从PALETTE+RGBA->RGBA时color_type仍为3的问题
+			color_type=PNG_COLOR_TYPE_RGB_ALPHA;
 		}
 
 		if (bit_depth == 16){
@@ -350,12 +353,12 @@ namespace video{
 #endif
 
 		//经过一番转换后再次调用API查询图像信息
-		{
+		/*{
 			png_uint_32 w,h;
 			png_get_IHDR(png_ptr, info_ptr, &w, &h, &bit_depth, &color_type,NULL, NULL, NULL);
 			width=w;
 			height=h;
-		}
+		}*/
 
 		//创建图像对象并填充数据
 		if (color_type==PNG_COLOR_TYPE_RGB_ALPHA)
@@ -400,6 +403,7 @@ namespace video{
 		//Read data using the library function that handles all transformations including interlacing
 		png_read_image(png_ptr, rowPointers);
 
+
 		//Read the end of the PNG file.  Will not read past the end of the
 		//file, will verify the end is accurate, and will read any comments
 		//or time information at the end of the file, if info is not NULL.
@@ -408,7 +412,137 @@ namespace video{
 		image->unlock();
 		// Clean up memory
 		png_destroy_read_struct(&png_ptr,&info_ptr, &end_info); 
+#else
+		u32 component=0;
+		if(color_type == PNG_COLOR_TYPE_GRAY)
+		{
+			component = 1;
+		}
+		else if(color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+		{
+			component = 2;
+		}
+		else if(color_type == PNG_COLOR_TYPE_RGB)
+		{
+			component = 3;
+		}
+		else if(color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+		{
+			component = 4;
+		}
 
+		//转换格式
+		if (color_type == PNG_COLOR_TYPE_PALETTE)
+		{
+			png_set_palette_to_rgb(png_ptr);
+			component = 3;
+		}
+		else if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
+		{
+			png_set_expand_gray_1_2_4_to_8(png_ptr);
+		}
+		if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
+		{
+			png_set_tRNS_to_alpha(png_ptr);
+			component = 4;
+			//修正从PALETTE+RGBA->RGBA时color_type仍为3的问题
+			color_type=PNG_COLOR_TYPE_RGB_ALPHA;
+		}
+		if (bit_depth == 16)
+		{
+			png_set_strip_16(png_ptr);
+		}
+		else if (bit_depth < 8)
+		{
+			png_set_packing(png_ptr);
+		}
+
+		//经过一番转换后再次调用API查询图像信息
+		/*{
+			png_uint_32 w,h;
+			png_get_IHDR(png_ptr, info_ptr, &w, &h, &bit_depth, &color_type,NULL, NULL, NULL);
+			width=w;
+			height=h;
+		}*/
+
+		//创建图像对象并填充数据
+		if (color_type==PNG_COLOR_TYPE_RGB_ALPHA)
+			image = new CImage(ENUM_COLOR_FORMAT_R8G8B8A8, core::dimension2d<u32>(width, height));
+		else
+			image = new CImage(ENUM_COLOR_FORMAT_R8G8B8, core::dimension2d<u32>(width, height));
+		if (!image)
+		{
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("fail to create image from png file: %s",file->getPath().c_str()).c_str());
+			png_destroy_read_struct(&png_ptr, NULL, NULL);
+			return NULL;
+		}
+
+
+
+		//分配内存,需在使用后自行删除
+		/*png_uint_32 rowbytes = width * component;
+		(*dataBuf) = new png_byte[rowbytes*height];
+
+		//读取数据
+		for(png_uint_32 y=0; y < height; y++)
+		{
+			png_bytep row = (*dataBuf) +  rowbytes * (height - y - 1);
+			png_read_rows(png_ptr, &row, (png_bytepp)NULL, 1);
+		}
+
+		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+		fclose(fp);*/
+		//图像数据的二维数组
+		u8** rowPointers = new png_bytep[height];
+		if (!rowPointers)
+		{
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("fail to create row pointers for png file: %s",file->getPath().c_str()).c_str());
+			png_destroy_read_struct(&png_ptr, NULL, NULL);
+			image->drop();
+			return NULL;
+		}
+
+		//赋值每行指针
+		u8* data = (u8*)image->lock();
+		//png_uint_32 rowbytes = width * component;
+		for (u32 i=0; i<height; ++i)
+		{
+			rowPointers[height-i-1]=data;
+			data += image->getByteCountPerRow();
+			//data += rowbytes;
+		}
+
+		// for proper error handling
+		if (setjmp(png_jmpbuf(png_ptr)))
+		{
+			png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+			delete [] rowPointers;
+			image->unlock();
+			image->drop();
+			return NULL;
+		}
+
+		//Read data using the library function that handles all transformations including interlacing
+		png_read_image(png_ptr, rowPointers);
+		/*unsigned char* mDataBuf;
+		png_bytepp dataBuf=&mDataBuf;
+		(*dataBuf) = new png_byte[image->getByteCountPerRow()*height];
+		for(png_uint_32 y=0; y < height; y++)
+		{
+			png_bytep row = (*dataBuf) +  image->getByteCountPerRow() * (height - y - 1);
+			png_read_rows(png_ptr, &row, (png_bytepp)NULL, 1);
+		}*/
+
+
+		//Read the end of the PNG file.  Will not read past the end of the
+		//file, will verify the end is accurate, and will read any comments
+		//or time information at the end of the file, if info is not NULL.
+		png_read_end(png_ptr, NULL);
+		delete [] rowPointers;
+		image->unlock();
+		// Clean up memory
+		png_destroy_read_struct(&png_ptr,&info_ptr, &end_info); 
+#endif
 		return image;
 	}
 
