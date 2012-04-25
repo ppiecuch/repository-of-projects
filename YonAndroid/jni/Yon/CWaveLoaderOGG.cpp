@@ -1,0 +1,70 @@
+#include "CWaveLoaderOGG.h"
+#include "yonUtil.h"
+#include "CWave.h"
+
+#include "ILogger.h"
+
+#include <ogg/ogg.h>
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
+
+#include <vector>
+using namespace std;  
+
+namespace yon{
+namespace audio{
+
+	bool CWaveLoaderOGG::checkFileExtension(const io::path& filename) const{
+		return core::hasFileExtension(filename,"ogg");
+	}
+	bool CWaveLoaderOGG::checkFileHeader(io::IReadStream* file) const{
+		//TODO
+		return true;
+	}
+	audio::IWave* CWaveLoaderOGG::loadWave(io::IReadStream* file) const{
+		vorbis_info *pInfo;
+		OggVorbis_File oggFile;
+		
+		if (ov_open_callbacks(file->pointer(), &oggFile, NULL, 0, OV_CALLBACKS_NOCLOSE) != 0){
+			Logger->warn(YON_LOG_FAILED_FORMAT,core::stringc("ov_open_callbacks(%s)",file->getPath().c_str()).c_str());
+			return NULL;
+		}
+		pInfo=ov_info(&oggFile, -1);
+
+		ENUM_WAVE_FORMAT format;
+		if (pInfo->channels == 1)
+			format = ENUM_WAVE_FORMAT_MONO16;
+		else
+			format = ENUM_WAVE_FORMAT_STEREO16;
+
+		u32 freq = pInfo->rate;
+
+		long bytes;
+		long count=0;
+		int bitStream;
+		int endian = 0;                         // 0 for Little-Endian, 1 for Big-Endian
+		c8 buffer[32768];
+		vector<c8> result;
+		do{
+			bytes = ov_read(&oggFile, buffer, 32768, endian, 2, 1, &bitStream);
+			if (bytes < 0){
+				ov_clear(&oggFile);  
+				Logger->warn(YON_LOG_FAILED_FORMAT,core::stringc("Decode(%s)",file->getPath().c_str()).c_str());
+				return NULL;
+			}
+			result.insert(result.end(), buffer, buffer + bytes);
+			count+=bytes;
+		}while(bytes > 0);
+
+		ov_clear(&oggFile);
+
+		CWave* wave=new CWave(format,count,freq,&result[0],true,true);
+		return wave;
+	}
+
+	IWaveLoader* createWaveLoaderOGG()
+	{
+		return new CWaveLoaderOGG();
+	}
+}
+}

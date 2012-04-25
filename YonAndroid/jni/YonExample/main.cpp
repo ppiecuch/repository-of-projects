@@ -67,8 +67,11 @@ int main(int argc, char* argv[])
 	ITimer* timer=engine->getTimer();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 
-	ISound* sound=audioDriver->getSound("../media/helloworld.wav");
+	ISound* sound=audioDriver->getSound("../media/bg.ogg");
 	sound->play();
+	sound=audioDriver->getSound("../media/helloworld.wav");
+	sound->play();
+	
 
 	//Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
 	Logger->debug("time:%d\n",timer->getTime());
