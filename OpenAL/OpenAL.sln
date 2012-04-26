@@ -41,6 +41,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03MultiSound", "03MultiSoun
 		{8C87B189-C088-4721-A418-E10267C9B84E} = {8C87B189-C088-4721-A418-E10267C9B84E}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "alsoft", "alsoft\alsoft.vcproj", "{25718D34-AF1B-45D1-97F2-1E530C123640}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04AlsoftDemo", "04AlsoftDemo\04AlsoftDemo.vcproj", "{BA377124-DD90-4D94-BC23-1DAD9185AF25}"
+	ProjectSection(ProjectDependencies) = postProject
+		{25718D34-AF1B-45D1-97F2-1E530C123640} = {25718D34-AF1B-45D1-97F2-1E530C123640}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -79,6 +86,14 @@ Global
 		{F14A216A-4581-48B4-81FD-A429FED88A03}.Debug|Win32.Build.0 = Debug|Win32
 		{F14A216A-4581-48B4-81FD-A429FED88A03}.Release|Win32.ActiveCfg = Release|Win32
 		{F14A216A-4581-48B4-81FD-A429FED88A03}.Release|Win32.Build.0 = Release|Win32
+		{25718D34-AF1B-45D1-97F2-1E530C123640}.Debug|Win32.ActiveCfg = Debug|Win32
+		{25718D34-AF1B-45D1-97F2-1E530C123640}.Debug|Win32.Build.0 = Debug|Win32
+		{25718D34-AF1B-45D1-97F2-1E530C123640}.Release|Win32.ActiveCfg = Release|Win32
+		{25718D34-AF1B-45D1-97F2-1E530C123640}.Release|Win32.Build.0 = Release|Win32
+		{BA377124-DD90-4D94-BC23-1DAD9185AF25}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BA377124-DD90-4D94-BC23-1DAD9185AF25}.Debug|Win32.Build.0 = Debug|Win32
+		{BA377124-DD90-4D94-BC23-1DAD9185AF25}.Release|Win32.ActiveCfg = Release|Win32
+		{BA377124-DD90-4D94-BC23-1DAD9185AF25}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
