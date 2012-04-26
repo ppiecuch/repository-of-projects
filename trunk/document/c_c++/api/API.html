@@ -1,4 +1,4 @@
-!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html>
 	<head>
 		<title>API</title>
@@ -305,6 +305,36 @@ http://blog.csdn.net/daoyuly/article/details/3947868
 如果函数调用成功，返回非零值；如果函数调用失败，返回值是零。若想获得更多的错误信息，请调用GetlastError函数。
 【备注】
 应用程序在调用函数SetCapture之后调用此函数。
+</pre>
+<pre>
+</pre>
+
+				</td>
+			</tr>
+			<tr>
+				<td>int ReleaseDC(HWND hWnd, HDC hdc)</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: win;auto-links:true;">
+【函数功能】
+函数释放设备上下文环境（DC）供其他应用程序使用。函数的效果与设备上下文环境类型有关。它只释放公用的和设备上下文环境，对于类或私有的则无效。
+【参数】
+hWnd：指向要释放的设备上下文环境所在的窗口的句柄。
+hDC：指向要释放的设备上下文环境的句柄。
+【返回值】
+返回值说明了设备上下文环境是否释放；如果释放成功，则返回值为1；如果没有释放成功，则返回值为0。
+【备注】
+每次调用GetWindowDC和GetDC函数检索公用设备上下文环境之后，应用程序必须调用ReleaseDC函数来释放设备上下文环境。
+应用程序不能调用ReleaseDC函数来释放由CreateDC函数创建的设备上下文环境，只能使用DeleteDC函数。
 </pre>
 <pre>
 </pre>

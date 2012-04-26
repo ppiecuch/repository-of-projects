@@ -29,7 +29,9 @@
 			;
 		var functions =
 			'BeginPaint ' +
+			'CreateDC ' +
 			'DefWindowProc '+
+			'DeleteDC ' +
 			'EndPaint ' +
 			'GetCapture ' +
 			'GetDC ' +
