@@ -1,7 +1,7 @@
 #ifndef _AL_SOURCE_H_
 #define _AL_SOURCE_H_
 
-#define MAX_SENDS                 4
+#define MAX_SENDS                 2
 
 #include "alFilter.h"
 #include "alu.h"
@@ -14,7 +14,7 @@ extern "C" {
 typedef enum {
     POINT_RESAMPLER = 0,
     LINEAR_RESAMPLER,
-    CUBIC_RESAMPLER,
+    COSINE_RESAMPLER,
 
     RESAMPLER_MAX,
     RESAMPLER_MIN = -1,
@@ -22,15 +22,10 @@ typedef enum {
 } resampler_t;
 extern resampler_t DefaultResampler;
 
-extern const ALsizei ResamplerPadding[RESAMPLER_MAX];
-extern const ALsizei ResamplerPrePadding[RESAMPLER_MAX];
-
-
 typedef struct ALbufferlistitem
 {
     struct ALbuffer         *buffer;
     struct ALbufferlistitem *next;
-    struct ALbufferlistitem *prev;
 } ALbufferlistitem;
 
 typedef struct ALsource
@@ -60,9 +55,9 @@ typedef struct ALsource
 
     struct ALbuffer *Buffer;
 
-    ALbufferlistitem *queue; // Linked list of buffers in queue
-    ALuint BuffersInQueue;   // Number of buffers in queue
-    ALuint BuffersPlayed;    // Number of buffers played on this loop
+    struct ALbufferlistitem *queue; // Linked list of buffers in queue
+    ALuint       BuffersInQueue;    // Number of buffers in queue
+    ALuint       BuffersPlayed;     // Number of buffers played on this loop
 
     ALfilter DirectFilter;
 
@@ -86,31 +81,30 @@ typedef struct ALsource
     // Source Type (Static, Streaming, or Undetermined)
     ALint  lSourceType;
 
+    // Current gains, which are ramped while mixed
+    ALfloat DryGains[OUTPUTCHANNELS];
+    ALfloat WetGains[MAX_SENDS];
+    ALboolean FirstStart;
+
     // Current target parameters used for mixing
     ALboolean NeedsUpdate;
     struct {
-        ALint Step;
-
-        /* A mixing matrix. First subscript is the channel number of the input
-         * data (regardless of channel configuration) and the second is the
-         * channel target (eg. FRONT_LEFT) */
-        ALfloat DryGains[MAXCHANNELS][MAXCHANNELS];
-        FILTER iirFilter;
-        ALfloat history[MAXCHANNELS*2];
+        ALfloat DryGains[OUTPUTCHANNELS];
+        ALfloat WetGains[MAX_SENDS];
+        ALfloat Pitch;
 
         struct {
-            ALfloat WetGain;
             FILTER iirFilter;
-            ALfloat history[MAXCHANNELS];
+            ALfloat history[OUTPUTCHANNELS];
         } Send[MAX_SENDS];
-    } Params;
 
-    ALvoid (*Update)(struct ALsource *self, const ALCcontext *context);
+        FILTER iirFilter;
+        ALfloat history[OUTPUTCHANNELS*2];
+    } Params;
 
     // Index to itself
     ALuint source;
 } ALsource;
-#define ALsource_Update(s,a)  ((s)->Update(s,a))
 
 ALvoid ReleaseALSources(ALCcontext *Context);
 

@@ -5,7 +5,6 @@
 #include "AL/alc.h"
 #include "AL/alext.h"
 
-#include <limits.h>
 #include <math.h>
 #ifdef HAVE_FLOAT_H
 #include <float.h>
@@ -72,54 +71,113 @@ typedef enum {
     SIDE_LEFT,
     SIDE_RIGHT,
 
-    MAXCHANNELS
+    OUTPUTCHANNELS
 } Channel;
 
-#define BUFFERSIZE 4096
+#define BUFFERSIZE 8192
 
-#define FRACTIONBITS (14)
-#define FRACTIONONE  (1<<FRACTIONBITS)
-#define FRACTIONMASK (FRACTIONONE-1)
-
-/* Size for temporary stack storage of buffer data. Larger values need more
- * stack, while smaller values may need more iterations. The value needs to be
- * a sensible size, however, as it constrains the max stepping value used for
- * mixing.
- * The mixer requires being able to do two samplings per mixing loop. A 16KB
- * buffer can hold 512 sample frames for a 7.1 float buffer. With the cubic
- * resampler (which requires 3 padding sample frames), this limits the maximum
- * step to about 508. This means that buffer_freq*source_pitch cannot exceed
- * device_freq*508 for an 8-channel 32-bit buffer. */
-#ifndef STACK_DATA_SIZE
-#define STACK_DATA_SIZE  16384
-#endif
-
-
-static __inline ALdouble lerp(ALdouble val1, ALdouble val2, ALdouble mu)
+/* NOTE: The AL_FORMAT_REAR* enums aren't handled here because they're
+ *       converted to AL_FORMAT_QUAD* when loaded */
+static __inline ALuint aluBytesFromFormat(ALenum format)
 {
-    return val1 + (val2-val1)*mu;
+    switch(format)
+    {
+        case AL_FORMAT_MONO8:
+        case AL_FORMAT_STEREO8:
+        case AL_FORMAT_QUAD8_LOKI:
+        case AL_FORMAT_QUAD8:
+        case AL_FORMAT_51CHN8:
+        case AL_FORMAT_61CHN8:
+        case AL_FORMAT_71CHN8:
+            return 1;
+
+        case AL_FORMAT_MONO16:
+        case AL_FORMAT_STEREO16:
+        case AL_FORMAT_QUAD16_LOKI:
+        case AL_FORMAT_QUAD16:
+        case AL_FORMAT_51CHN16:
+        case AL_FORMAT_61CHN16:
+        case AL_FORMAT_71CHN16:
+            return 2;
+
+        case AL_FORMAT_MONO_FLOAT32:
+        case AL_FORMAT_STEREO_FLOAT32:
+        case AL_FORMAT_QUAD32:
+        case AL_FORMAT_51CHN32:
+        case AL_FORMAT_61CHN32:
+        case AL_FORMAT_71CHN32:
+            return 4;
+
+        case AL_FORMAT_MONO_DOUBLE_EXT:
+        case AL_FORMAT_STEREO_DOUBLE_EXT:
+            return 8;
+
+        default:
+            return 0;
+    }
 }
-static __inline ALdouble cubic(ALdouble val0, ALdouble val1, ALdouble val2, ALdouble val3, ALdouble mu)
+static __inline ALuint aluChannelsFromFormat(ALenum format)
 {
-    ALdouble mu2 = mu*mu;
-    ALdouble a0 = -0.5*val0 +  1.5*val1 + -1.5*val2 +  0.5*val3;
-    ALdouble a1 =      val0 + -2.5*val1 +  2.0*val2 + -0.5*val3;
-    ALdouble a2 = -0.5*val0             +  0.5*val2;
-    ALdouble a3 =                  val1;
+    switch(format)
+    {
+        case AL_FORMAT_MONO8:
+        case AL_FORMAT_MONO16:
+        case AL_FORMAT_MONO_FLOAT32:
+        case AL_FORMAT_MONO_DOUBLE_EXT:
+            return 1;
 
-    return a0*mu*mu2 + a1*mu2 + a2*mu + a3;
+        case AL_FORMAT_STEREO8:
+        case AL_FORMAT_STEREO16:
+        case AL_FORMAT_STEREO_FLOAT32:
+        case AL_FORMAT_STEREO_DOUBLE_EXT:
+            return 2;
+
+        case AL_FORMAT_QUAD8_LOKI:
+        case AL_FORMAT_QUAD16_LOKI:
+        case AL_FORMAT_QUAD8:
+        case AL_FORMAT_QUAD16:
+        case AL_FORMAT_QUAD32:
+            return 4;
+
+        case AL_FORMAT_51CHN8:
+        case AL_FORMAT_51CHN16:
+        case AL_FORMAT_51CHN32:
+            return 6;
+
+        case AL_FORMAT_61CHN8:
+        case AL_FORMAT_61CHN16:
+        case AL_FORMAT_61CHN32:
+            return 7;
+
+        case AL_FORMAT_71CHN8:
+        case AL_FORMAT_71CHN16:
+        case AL_FORMAT_71CHN32:
+            return 8;
+
+        default:
+            return 0;
+    }
+}
+static __inline ALuint aluFrameSizeFromFormat(ALenum format)
+{
+    return aluBytesFromFormat(format) * aluChannelsFromFormat(format);
 }
 
-struct ALsource;
+static __inline ALint aluCart2LUTpos(ALfloat re, ALfloat im)
+{
+    ALint pos = 0;
+    ALfloat denom = aluFabs(re) + aluFabs(im);
+    if(denom > 0.0f)
+        pos = (ALint)(QUADRANT_NUM*aluFabs(im) / denom + 0.5);
+
+    if(re < 0.0)
+        pos = 2 * QUADRANT_NUM - pos;
+    if(im < 0.0)
+        pos = LUT_NUM - pos;
+    return pos%LUT_NUM;
+}
 
 ALvoid aluInitPanning(ALCdevice *Device);
-ALint aluCart2LUTpos(ALfloat re, ALfloat im);
-
-ALvoid CalcSourceParams(struct ALsource *ALSource, const ALCcontext *ALContext);
-ALvoid CalcNonAttnSourceParams(struct ALsource *ALSource, const ALCcontext *ALContext);
-
-ALvoid MixSource(struct ALsource *Source, ALCdevice *Device, ALuint SamplesToDo);
-
 ALvoid aluMixData(ALCdevice *device, ALvoid *buffer, ALsizei size);
 ALvoid aluHandleDisconnect(ALCdevice *device);
 

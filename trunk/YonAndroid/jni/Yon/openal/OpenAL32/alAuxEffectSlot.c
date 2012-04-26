@@ -40,61 +40,60 @@ static ALvoid InitializeEffect(ALCcontext *Context, ALeffectslot *EffectSlot, AL
 AL_API ALvoid AL_APIENTRY alGenAuxiliaryEffectSlots(ALsizei n, ALuint *effectslots)
 {
     ALCcontext *Context;
-    ALCdevice *Device;
+    ALsizei i=0, j;
 
     Context = GetContextSuspended();
     if(!Context) return;
 
-    Device = Context->Device;
-    if(n < 0 || IsBadWritePtr((void*)effectslots, n * sizeof(ALuint)))
-        alSetError(Context, AL_INVALID_VALUE);
-    else if((ALuint)n > Device->AuxiliaryEffectSlotMax - Context->EffectSlotMap.size)
-        alSetError(Context, AL_INVALID_VALUE);
-    else
+    if(n > 0)
     {
-        ALenum err;
-        ALsizei i, j;
+        ALCdevice *Device = Context->Device;
 
-        i = 0;
-        while(i < n)
+        if(Context->EffectSlotMap.size+n <= (ALsizei)Device->AuxiliaryEffectSlotMax)
         {
-            ALeffectslot *slot = calloc(1, sizeof(ALeffectslot));
-            if(!slot || !(slot->EffectState=NoneCreate()))
+            // Check that enough memory has been allocted in the 'effectslots' array for n Effect Slots
+            if(!IsBadWritePtr((void*)effectslots, n * sizeof(ALuint)))
             {
-                free(slot);
-                // We must have run out or memory
-                alSetError(Context, AL_OUT_OF_MEMORY);
-                alDeleteAuxiliaryEffectSlots(i, effectslots);
-                break;
+                ALenum err;
+
+                while(i < n)
+                {
+                    ALeffectslot *slot = calloc(1, sizeof(ALeffectslot));
+                    if(!slot || !(slot->EffectState=NoneCreate()))
+                    {
+                        free(slot);
+                        // We must have run out or memory
+                        alSetError(Context, AL_OUT_OF_MEMORY);
+                        alDeleteAuxiliaryEffectSlots(i, effectslots);
+                        break;
+                    }
+
+                    slot->effectslot = (ALuint)ALTHUNK_ADDENTRY(slot);
+                    err = InsertUIntMapEntry(&Context->EffectSlotMap,
+                                             slot->effectslot, slot);
+                    if(err != AL_NO_ERROR)
+                    {
+                        ALTHUNK_REMOVEENTRY(slot->effectslot);
+                        ALEffect_Destroy(slot->EffectState);
+                        free(slot);
+
+                        alSetError(Context, err);
+                        alDeleteAuxiliaryEffectSlots(i, effectslots);
+                        break;
+                    }
+
+                    effectslots[i++] = slot->effectslot;
+
+                    slot->Gain = 1.0;
+                    slot->AuxSendAuto = AL_TRUE;
+                    for(j = 0;j < BUFFERSIZE;j++)
+                        slot->WetBuffer[j] = 0.0f;
+                    slot->refcount = 0;
+                }
             }
-
-            slot->effectslot = (ALuint)ALTHUNK_ADDENTRY(slot);
-            err = InsertUIntMapEntry(&Context->EffectSlotMap,
-                                     slot->effectslot, slot);
-            if(err != AL_NO_ERROR)
-            {
-                ALTHUNK_REMOVEENTRY(slot->effectslot);
-                ALEffect_Destroy(slot->EffectState);
-                free(slot);
-
-                alSetError(Context, err);
-                alDeleteAuxiliaryEffectSlots(i, effectslots);
-                break;
-            }
-
-            effectslots[i++] = slot->effectslot;
-
-            slot->Gain = 1.0;
-            slot->AuxSendAuto = AL_TRUE;
-            for(j = 0;j < BUFFERSIZE;j++)
-                slot->WetBuffer[j] = 0.0f;
-            for(j = 0;j < 1;j++)
-            {
-                slot->ClickRemoval[j] = 0.0f;
-                slot->PendingClicks[j] = 0.0f;
-            }
-            slot->refcount = 0;
         }
+        else
+            alSetError(Context, AL_INVALID_OPERATION);
     }
 
     ProcessContext(Context);
@@ -104,53 +103,52 @@ AL_API ALvoid AL_APIENTRY alDeleteAuxiliaryEffectSlots(ALsizei n, ALuint *effect
 {
     ALCcontext *Context;
     ALeffectslot *EffectSlot;
-    ALboolean SlotsValid = AL_FALSE;
     ALsizei i;
 
     Context = GetContextSuspended();
     if(!Context) return;
 
-    if(n < 0)
-        alSetError(Context, AL_INVALID_VALUE);
-    else
+    if (n >= 0)
     {
-        SlotsValid = AL_TRUE;
         // Check that all effectslots are valid
-        for(i = 0;i < n;i++)
+        for (i = 0; i < n; i++)
         {
             if((EffectSlot=LookupEffectSlot(Context->EffectSlotMap, effectslots[i])) == NULL)
             {
                 alSetError(Context, AL_INVALID_NAME);
-                SlotsValid = AL_FALSE;
                 break;
             }
-            else if(EffectSlot->refcount > 0)
+            else
             {
-                alSetError(Context, AL_INVALID_NAME);
-                SlotsValid = AL_FALSE;
-                break;
+                if(EffectSlot->refcount > 0)
+                {
+                    alSetError(Context, AL_INVALID_NAME);
+                    break;
+                }
+            }
+        }
+
+        if (i == n)
+        {
+            // All effectslots are valid
+            for (i = 0; i < n; i++)
+            {
+                // Recheck that the effectslot is valid, because there could be duplicated names
+                if((EffectSlot=LookupEffectSlot(Context->EffectSlotMap, effectslots[i])) != NULL)
+                {
+                    ALEffect_Destroy(EffectSlot->EffectState);
+
+                    RemoveUIntMapKey(&Context->EffectSlotMap, EffectSlot->effectslot);
+                    ALTHUNK_REMOVEENTRY(EffectSlot->effectslot);
+
+                    memset(EffectSlot, 0, sizeof(ALeffectslot));
+                    free(EffectSlot);
+                }
             }
         }
     }
-
-    if(SlotsValid)
-    {
-        // All effectslots are valid
-        for(i = 0;i < n;i++)
-        {
-            // Recheck that the effectslot is valid, because there could be duplicated names
-            if((EffectSlot=LookupEffectSlot(Context->EffectSlotMap, effectslots[i])) == NULL)
-                continue;
-
-            ALEffect_Destroy(EffectSlot->EffectState);
-
-            RemoveUIntMapKey(&Context->EffectSlotMap, EffectSlot->effectslot);
-            ALTHUNK_REMOVEENTRY(EffectSlot->effectslot);
-
-            memset(EffectSlot, 0, sizeof(ALeffectslot));
-            free(EffectSlot);
-        }
-    }
+    else
+        alSetError(Context, AL_INVALID_VALUE);
 
     ProcessContext(Context);
 }
@@ -173,7 +171,6 @@ AL_API ALboolean AL_APIENTRY alIsAuxiliaryEffectSlot(ALuint effectslot)
 
 AL_API ALvoid AL_APIENTRY alAuxiliaryEffectSloti(ALuint effectslot, ALenum param, ALint iValue)
 {
-    ALCdevice *Device;
     ALCcontext *Context;
     ALboolean updateSources = AL_FALSE;
     ALeffectslot *EffectSlot;
@@ -181,7 +178,6 @@ AL_API ALvoid AL_APIENTRY alAuxiliaryEffectSloti(ALuint effectslot, ALenum param
     Context = GetContextSuspended();
     if(!Context) return;
 
-    Device = Context->Device;
     if((EffectSlot=LookupEffectSlot(Context->EffectSlotMap, effectslot)) != NULL)
     {
         switch(param)
@@ -190,7 +186,7 @@ AL_API ALvoid AL_APIENTRY alAuxiliaryEffectSloti(ALuint effectslot, ALenum param
             ALeffect *effect = NULL;
 
             if(iValue == 0 ||
-               (effect=LookupEffect(Device->EffectMap, iValue)) != NULL)
+               (effect=LookupEffect(Context->Device->EffectMap, iValue)) != NULL)
             {
                 InitializeEffect(Context, EffectSlot, effect);
                 updateSources = AL_TRUE;
@@ -226,7 +222,7 @@ AL_API ALvoid AL_APIENTRY alAuxiliaryEffectSloti(ALuint effectslot, ALenum param
         {
             ALsource *source = Context->SourceMap.array[pos].value;
             ALuint i;
-            for(i = 0;i < Device->NumAuxSends;i++)
+            for(i = 0;i < MAX_SENDS;i++)
             {
                 if(!source->Send[i].Slot ||
                    source->Send[i].Slot->effectslot != effectslot)
@@ -449,7 +445,7 @@ static ALvoid NoneUpdate(ALeffectState *State, ALCcontext *Context, const ALeffe
     (void)Context;
     (void)Effect;
 }
-static ALvoid NoneProcess(ALeffectState *State, const ALeffectslot *Slot, ALuint SamplesToDo, const ALfloat *SamplesIn, ALfloat (*SamplesOut)[MAXCHANNELS])
+static ALvoid NoneProcess(ALeffectState *State, const ALeffectslot *Slot, ALuint SamplesToDo, const ALfloat *SamplesIn, ALfloat (*SamplesOut)[OUTPUTCHANNELS])
 {
     (void)State;
     (void)Slot;

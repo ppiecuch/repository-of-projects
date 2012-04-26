@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#ifdef ANDROID_NDK
+
 #include <stdlib.h>
 #include <jni.h>
 #include <pthread.h>
@@ -277,3 +279,4 @@ void alc_android_probe(int type)
         AppendAllDeviceList(android_device);
     }
 }
+#endif

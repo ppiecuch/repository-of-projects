@@ -35,41 +35,36 @@ typedef struct {
 } null_data;
 
 
-static const ALCchar nullDevice[] = "No Output";
+static const ALCchar nullDevice[] = "Null Output";
 
 static ALuint NullProc(ALvoid *ptr)
 {
     ALCdevice *Device = (ALCdevice*)ptr;
     null_data *data = (null_data*)Device->ExtraData;
-    ALuint now, start;
-    ALuint64 avail, done;
-    const ALuint restTime = (ALuint64)Device->UpdateSize * 1000 /
-                            Device->Frequency / 2;
+    ALuint frameSize;
+    ALuint now, last;
+    ALuint avail;
 
-    done = 0;
-    start = timeGetTime();
+    frameSize = aluFrameSizeFromFormat(Device->Format);
+
+    last = timeGetTime()<<8;
     while(!data->killNow && Device->Connected)
     {
-        now = timeGetTime();
+        now = timeGetTime()<<8;
 
-        avail = (ALuint64)(now-start) * Device->Frequency / 1000;
-        if(avail < done)
+        avail = (ALuint64)(now-last) * Device->Frequency / (1000<<8);
+        if(avail < Device->UpdateSize)
         {
-            /* Timer wrapped. Add the remainder of the cycle to the available
-             * count and reset the number of samples done */
-            avail += (ALuint64)0xFFFFFFFFu*Device->Frequency/1000 - done;
-            done = 0;
-        }
-        if(avail-done < Device->UpdateSize)
-        {
-            Sleep(restTime);
+            Sleep(1);
             continue;
         }
 
-        while(avail-done >= Device->UpdateSize)
+        while(avail >= Device->UpdateSize)
         {
             aluMixData(Device, data->buffer, Device->UpdateSize);
-            done += Device->UpdateSize;
+
+            avail -= Device->UpdateSize;
+            last += (ALuint64)Device->UpdateSize * (1000<<8) / Device->Frequency;
         }
     }
 
@@ -104,8 +99,7 @@ static ALCboolean null_reset_playback(ALCdevice *device)
 {
     null_data *data = (null_data*)device->ExtraData;
 
-    data->size = device->UpdateSize * FrameSizeFromDevFmt(device->FmtChans,
-                                                          device->FmtType);
+    data->size = device->UpdateSize * aluFrameSizeFromFormat(device->Format);
     data->buffer = malloc(data->size);
     if(!data->buffer)
     {

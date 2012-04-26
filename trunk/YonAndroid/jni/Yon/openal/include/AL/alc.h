@@ -5,9 +5,7 @@
 extern "C" {
 #endif
 
-#if defined(AL_LIBTYPE_STATIC)
- #define ALC_API
-#elif defined(_WIN32) && !defined(_XBOX)
+#if defined(_WIN32) && !defined(_XBOX)
  #if defined(AL_BUILD_LIBRARY)
   #define ALC_API __declspec(dllexport)
  #else

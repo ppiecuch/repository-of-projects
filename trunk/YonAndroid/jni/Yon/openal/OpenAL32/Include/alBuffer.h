@@ -7,78 +7,19 @@
 extern "C" {
 #endif
 
-/* Input formats (some are currently theoretical) */
-enum UserFmtType {
-    UserFmtByte,   /* AL_BYTE */
-    UserFmtUByte,  /* AL_UNSIGNED_BYTE */
-    UserFmtShort,  /* AL_SHORT */
-    UserFmtUShort, /* AL_UNSIGNED_SHORT */
-    UserFmtInt,    /* AL_INT */
-    UserFmtUInt,   /* AL_UNSIGNED_INT */
-    UserFmtFloat,  /* AL_FLOAT */
-    UserFmtDouble, /* AL_DOUBLE */
-    UserFmtMulaw,  /* AL_MULAW */
-    UserFmtIMA4,   /* AL_IMA4 */
-};
-enum UserFmtChannels {
-    UserFmtMono,   /* AL_MONO */
-    UserFmtStereo, /* AL_STEREO */
-    UserFmtRear,   /* AL_REAR */
-    UserFmtQuad,   /* AL_QUAD */
-    UserFmtX51,    /* AL_5POINT1 (WFX order) */
-    UserFmtX61,    /* AL_6POINT1 (WFX order) */
-    UserFmtX71,    /* AL_7POINT1 (WFX order) */
-};
-
-ALboolean DecomposeUserFormat(ALenum format, enum UserFmtChannels *chans,
-                              enum UserFmtType *type);
-ALuint BytesFromUserFmt(enum UserFmtType type);
-ALuint ChannelsFromUserFmt(enum UserFmtChannels chans);
-static __inline ALuint FrameSizeFromUserFmt(enum UserFmtChannels chans,
-                                            enum UserFmtType type)
-{
-    return ChannelsFromUserFmt(chans) * BytesFromUserFmt(type);
-}
-
-
-/* Storable formats */
-enum FmtType {
-    FmtUByte = UserFmtUByte,
-    FmtShort = UserFmtShort,
-    FmtFloat = UserFmtFloat,
-};
-enum FmtChannels {
-    FmtMono = UserFmtMono,
-    FmtStereo = UserFmtStereo,
-    FmtRear = UserFmtRear,
-    FmtQuad = UserFmtQuad,
-    FmtX51 = UserFmtX51,
-    FmtX61 = UserFmtX61,
-    FmtX71 = UserFmtX71,
-};
-
-ALboolean DecomposeFormat(ALenum format, enum FmtChannels *chans, enum FmtType *type);
-ALuint BytesFromFmt(enum FmtType type);
-ALuint ChannelsFromFmt(enum FmtChannels chans);
-static __inline ALuint FrameSizeFromFmt(enum FmtChannels chans, enum FmtType type)
-{
-    return ChannelsFromFmt(chans) * BytesFromFmt(type);
-}
-
+#define BUFFER_PADDING 2
 
 typedef struct ALbuffer
 {
-    ALvoid  *data;
+    ALfloat *data;
     ALsizei  size;
 
-    ALsizei          Frequency;
-    enum FmtChannels FmtChannels;
-    enum FmtType     FmtType;
+    ALenum   format;
+    ALenum   eOriginalFormat;
+    ALsizei  frequency;
 
-    enum UserFmtChannels OriginalChannels;
-    enum UserFmtType     OriginalType;
-    ALsizei OriginalSize;
-    ALsizei OriginalAlign;
+    ALsizei  OriginalSize;
+    ALsizei  OriginalAlign;
 
     ALsizei  LoopStart;
     ALsizei  LoopEnd;
