@@ -46,38 +46,42 @@ AL_API ALvoid AL_APIENTRY alGenEffects(ALsizei n, ALuint *effects)
     Context = GetContextSuspended();
     if(!Context) return;
 
-    if(n < 0 || IsBadWritePtr((void*)effects, n * sizeof(ALuint)))
-        alSetError(Context, AL_INVALID_VALUE);
-    else
+    if (n > 0)
     {
         ALCdevice *device = Context->Device;
-        ALenum err;
 
-        while(i < n)
+        // Check that enough memory has been allocted in the 'effects' array for n Effects
+        if (!IsBadWritePtr((void*)effects, n * sizeof(ALuint)))
         {
-            ALeffect *effect = calloc(1, sizeof(ALeffect));
-            if(!effect)
+            ALenum err;
+
+            while(i < n)
             {
-                alSetError(Context, AL_OUT_OF_MEMORY);
-                alDeleteEffects(i, effects);
-                break;
+                ALeffect *effect = calloc(1, sizeof(ALeffect));
+                if(!effect)
+                {
+                    alSetError(Context, AL_OUT_OF_MEMORY);
+                    alDeleteEffects(i, effects);
+                    break;
+                }
+
+                effect->effect = ALTHUNK_ADDENTRY(effect);
+                err = InsertUIntMapEntry(&device->EffectMap, effect->effect,
+                                         effect);
+                if(err != AL_NO_ERROR)
+                {
+                    ALTHUNK_REMOVEENTRY(effect->effect);
+                    memset(effect, 0, sizeof(ALeffect));
+                    free(effect);
+
+                    alSetError(Context, err);
+                    alDeleteEffects(i, effects);
+                    break;
+                }
+
+                effects[i++] = effect->effect;
+                InitEffectParams(effect, AL_EFFECT_NULL);
             }
-
-            effect->effect = ALTHUNK_ADDENTRY(effect);
-            err = InsertUIntMapEntry(&device->EffectMap, effect->effect, effect);
-            if(err != AL_NO_ERROR)
-            {
-                ALTHUNK_REMOVEENTRY(effect->effect);
-                memset(effect, 0, sizeof(ALeffect));
-                free(effect);
-
-                alSetError(Context, err);
-                alDeleteEffects(i, effects);
-                break;
-            }
-
-            effects[i++] = effect->effect;
-            InitEffectParams(effect, AL_EFFECT_NULL);
         }
     }
 
@@ -87,52 +91,48 @@ AL_API ALvoid AL_APIENTRY alGenEffects(ALsizei n, ALuint *effects)
 AL_API ALvoid AL_APIENTRY alDeleteEffects(ALsizei n, ALuint *effects)
 {
     ALCcontext *Context;
-    ALCdevice *device;
     ALeffect *ALEffect;
-    ALboolean Failed;
     ALsizei i;
 
     Context = GetContextSuspended();
     if(!Context) return;
 
-    Failed = AL_TRUE;
-    device = Context->Device;
-    if(n < 0)
-        alSetError(Context, AL_INVALID_VALUE);
-    else
+    if (n >= 0)
     {
-        Failed = AL_FALSE;
+        ALCdevice *device = Context->Device;
+
         // Check that all effects are valid
-        for(i = 0;i < n;i++)
+        for (i = 0; i < n; i++)
         {
             if(!effects[i])
                 continue;
 
-            if(LookupEffect(device->EffectMap, effects[i]) == NULL)
+            if(!LookupEffect(device->EffectMap, effects[i]))
             {
                 alSetError(Context, AL_INVALID_NAME);
-                Failed = AL_TRUE;
                 break;
             }
         }
-    }
 
-    if(!Failed)
-    {
-        // All effects are valid
-        for(i = 0;i < n;i++)
+        if (i == n)
         {
-            // Recheck that the effect is valid, because there could be duplicated names
-            if((ALEffect=LookupEffect(device->EffectMap, effects[i])) == NULL)
-                continue;
+            // All effects are valid
+            for (i = 0; i < n; i++)
+            {
+                // Recheck that the effect is valid, because there could be duplicated names
+                if((ALEffect=LookupEffect(device->EffectMap, effects[i])) != NULL)
+                {
+                    RemoveUIntMapKey(&device->EffectMap, ALEffect->effect);
+                    ALTHUNK_REMOVEENTRY(ALEffect->effect);
 
-            RemoveUIntMapKey(&device->EffectMap, ALEffect->effect);
-            ALTHUNK_REMOVEENTRY(ALEffect->effect);
-
-            memset(ALEffect, 0, sizeof(ALeffect));
-            free(ALEffect);
+                    memset(ALEffect, 0, sizeof(ALeffect));
+                    free(ALEffect);
+                }
+            }
         }
     }
+    else
+        alSetError(Context, AL_INVALID_VALUE);
 
     ProcessContext(Context);
 }

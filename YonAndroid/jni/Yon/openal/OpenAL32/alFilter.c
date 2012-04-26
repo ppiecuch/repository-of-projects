@@ -42,38 +42,42 @@ AL_API ALvoid AL_APIENTRY alGenFilters(ALsizei n, ALuint *filters)
     Context = GetContextSuspended();
     if(!Context) return;
 
-    if(n < 0 || IsBadWritePtr((void*)filters, n * sizeof(ALuint)))
-        alSetError(Context, AL_INVALID_VALUE);
-    else
+    if (n > 0)
     {
         ALCdevice *device = Context->Device;
-        ALenum err;
 
-        while(i < n)
+        // Check that enough memory has been allocted in the 'filters' array for n Filters
+        if (!IsBadWritePtr((void*)filters, n * sizeof(ALuint)))
         {
-            ALfilter *filter = calloc(1, sizeof(ALfilter));
-            if(!filter)
+            ALenum err;
+
+            while(i < n)
             {
-                alSetError(Context, AL_OUT_OF_MEMORY);
-                alDeleteFilters(i, filters);
-                break;
+                ALfilter *filter = calloc(1, sizeof(ALfilter));
+                if(!filter)
+                {
+                    alSetError(Context, AL_OUT_OF_MEMORY);
+                    alDeleteFilters(i, filters);
+                    break;
+                }
+
+                filter->filter = ALTHUNK_ADDENTRY(filter);
+                err = InsertUIntMapEntry(&device->FilterMap, filter->filter,
+                                         filter);
+                if(err != AL_NO_ERROR)
+                {
+                    ALTHUNK_REMOVEENTRY(filter->filter);
+                    memset(filter, 0, sizeof(ALfilter));
+                    free(filter);
+
+                    alSetError(Context, err);
+                    alDeleteFilters(i, filters);
+                    break;
+                }
+
+                filters[i++] = filter->filter;
+                InitFilterParams(filter, AL_FILTER_NULL);
             }
-
-            filter->filter = ALTHUNK_ADDENTRY(filter);
-            err = InsertUIntMapEntry(&device->FilterMap, filter->filter, filter);
-            if(err != AL_NO_ERROR)
-            {
-                ALTHUNK_REMOVEENTRY(filter->filter);
-                memset(filter, 0, sizeof(ALfilter));
-                free(filter);
-
-                alSetError(Context, err);
-                alDeleteFilters(i, filters);
-                break;
-            }
-
-            filters[i++] = filter->filter;
-            InitFilterParams(filter, AL_FILTER_NULL);
         }
     }
 
@@ -83,52 +87,48 @@ AL_API ALvoid AL_APIENTRY alGenFilters(ALsizei n, ALuint *filters)
 AL_API ALvoid AL_APIENTRY alDeleteFilters(ALsizei n, ALuint *filters)
 {
     ALCcontext *Context;
-    ALCdevice *device;
     ALfilter *ALFilter;
-    ALboolean Failed;
     ALsizei i;
 
     Context = GetContextSuspended();
     if(!Context) return;
 
-    Failed = AL_TRUE;
-    device = Context->Device;
-    if(n < 0)
-        alSetError(Context, AL_INVALID_VALUE);
-    else
+    if (n >= 0)
     {
-        Failed = AL_FALSE;
+        ALCdevice *device = Context->Device;
+
         // Check that all filters are valid
-        for(i = 0;i < n;i++)
+        for (i = 0; i < n; i++)
         {
             if(!filters[i])
                 continue;
 
-            if(LookupFilter(device->FilterMap, filters[i]) == NULL)
+            if(!LookupFilter(device->FilterMap, filters[i]))
             {
                 alSetError(Context, AL_INVALID_NAME);
-                Failed = AL_TRUE;
                 break;
             }
         }
-    }
 
-    if(!Failed)
-    {
-        // All filters are valid
-        for(i = 0;i < n;i++)
+        if (i == n)
         {
-            // Recheck that the filter is valid, because there could be duplicated names
-            if((ALFilter=LookupFilter(device->FilterMap, filters[i])) == NULL)
-                continue;
+            // All filters are valid
+            for (i = 0; i < n; i++)
+            {
+                // Recheck that the filter is valid, because there could be duplicated names
+                if((ALFilter=LookupFilter(device->FilterMap, filters[i])) != NULL)
+                {
+                    RemoveUIntMapKey(&device->FilterMap, ALFilter->filter);
+                    ALTHUNK_REMOVEENTRY(ALFilter->filter);
 
-            RemoveUIntMapKey(&device->FilterMap, ALFilter->filter);
-            ALTHUNK_REMOVEENTRY(ALFilter->filter);
-
-            memset(ALFilter, 0, sizeof(ALfilter));
-            free(ALFilter);
+                    memset(ALFilter, 0, sizeof(ALfilter));
+                    free(ALFilter);
+                }
+            }
         }
     }
+    else
+        alSetError(Context, AL_INVALID_VALUE);
 
     ProcessContext(Context);
 }

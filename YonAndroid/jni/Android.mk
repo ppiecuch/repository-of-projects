@@ -69,10 +69,9 @@ openal_SOURCES :=\
 		Yon/openal/Alc/alcRing.c \
 		Yon/openal/Alc/alcThread.c \
 		Yon/openal/Alc/ALu.c \
+		Yon/openal/Alc/android.c \
 		Yon/openal/Alc/bs2b.c \
-		Yon/openal/Alc/mixer.c \
-		Yon/openal/Alc/null.c \
-		Yon/openal/Alc/panning.c
+		Yon/openal/Alc/null.c 
 		
 		
 

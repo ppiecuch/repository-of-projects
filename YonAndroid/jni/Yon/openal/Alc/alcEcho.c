@@ -49,7 +49,7 @@ typedef struct ALechoState {
 
     ALfloat FeedGain;
 
-    ALfloat Gain[MAXCHANNELS];
+    ALfloat Scale;
 
     FILTER iirFilter;
     ALfloat history[2];
@@ -90,13 +90,8 @@ static ALboolean EchoDeviceUpdate(ALeffectState *effect, ALCdevice *Device)
     for(i = 0;i < state->BufferLength;i++)
         state->SampleBuffer[i] = 0.0f;
 
-    for(i = 0;i < MAXCHANNELS;i++)
-        state->Gain[i] = 0.0f;
-    for(i = 0;i < Device->NumChan;i++)
-    {
-        Channel chan = Device->Speaker2Chan[i];
-        state->Gain[chan] = 1.0f;
-    }
+    state->Scale = aluSqrt(Device->NumChan / 6.0f);
+    state->Scale = __min(state->Scale, 1.0f);
 
     return AL_TRUE;
 }
@@ -125,14 +120,14 @@ static ALvoid EchoUpdate(ALeffectState *effect, ALCcontext *Context, const ALeff
     state->iirFilter.coeff = a;
 }
 
-static ALvoid EchoProcess(ALeffectState *effect, const ALeffectslot *Slot, ALuint SamplesToDo, const ALfloat *SamplesIn, ALfloat (*SamplesOut)[MAXCHANNELS])
+static ALvoid EchoProcess(ALeffectState *effect, const ALeffectslot *Slot, ALuint SamplesToDo, const ALfloat *SamplesIn, ALfloat (*SamplesOut)[OUTPUTCHANNELS])
 {
     ALechoState *state = (ALechoState*)effect;
     const ALuint mask = state->BufferLength-1;
     const ALuint tap1 = state->Tap[0].delay;
     const ALuint tap2 = state->Tap[1].delay;
     ALuint offset = state->Offset;
-    const ALfloat gain = Slot->Gain;
+    const ALfloat gain = Slot->Gain * state->Scale;
     ALfloat samp[2], smp;
     ALuint i;
 
@@ -156,12 +151,12 @@ static ALvoid EchoProcess(ALeffectState *effect, const ALeffectslot *Slot, ALuin
         samp[0] *= gain;
         samp[1] *= gain;
 
-        SamplesOut[i][FRONT_LEFT]  += state->Gain[FRONT_LEFT]  * samp[0];
-        SamplesOut[i][FRONT_RIGHT] += state->Gain[FRONT_RIGHT] * samp[1];
-        SamplesOut[i][SIDE_LEFT]   += state->Gain[SIDE_LEFT]   * samp[0];
-        SamplesOut[i][SIDE_RIGHT]  += state->Gain[SIDE_RIGHT]  * samp[1];
-        SamplesOut[i][BACK_LEFT]   += state->Gain[BACK_LEFT]   * samp[0];
-        SamplesOut[i][BACK_RIGHT]  += state->Gain[BACK_RIGHT]  * samp[1];
+        SamplesOut[i][FRONT_LEFT]  += samp[0];
+        SamplesOut[i][FRONT_RIGHT] += samp[1];
+        SamplesOut[i][SIDE_LEFT]   += samp[0];
+        SamplesOut[i][SIDE_RIGHT]  += samp[1];
+        SamplesOut[i][BACK_LEFT]   += samp[0];
+        SamplesOut[i][BACK_RIGHT]  += samp[1];
     }
     state->Offset = offset;
 }
@@ -187,6 +182,8 @@ ALeffectState *EchoCreate(void)
     state->Offset = 0;
     state->GainL = 0.0f;
     state->GainR = 0.0f;
+
+    state->Scale = 1.0f;
 
     state->iirFilter.coeff = 0.0f;
     state->iirFilter.history[0] = 0.0f;

@@ -13,6 +13,16 @@
 #include "AL/alc.h"
 #include "AL/alext.h"
 
+#ifndef AL_EXT_buffer_sub_data
+#define AL_EXT_buffer_sub_data 1
+#define AL_BYTE_RW_OFFSETS_EXT                   0x1031
+#define AL_SAMPLE_RW_OFFSETS_EXT                 0x1032
+typedef ALvoid (AL_APIENTRY*PFNALBUFFERSUBDATAEXTPROC)(ALuint,ALenum,const ALvoid*,ALsizei,ALsizei);
+#ifdef AL_ALEXT_PROTOTYPES
+AL_API ALvoid AL_APIENTRY alBufferSubDataEXT(ALuint buffer,ALenum format,const ALvoid *data,ALsizei offset,ALsizei length);
+#endif
+#endif
+
 #ifndef AL_EXT_sample_buffer_object
 #define AL_EXT_sample_buffer_object 1
 typedef ptrdiff_t ALintptrEXT;
@@ -69,6 +79,10 @@ AL_API ALvoid AL_APIENTRY alUnmapDatabufferEXT(ALuint uiBuffer);
 #endif
 #endif
 
+#ifndef AL_EXT_loop_points
+#define AL_EXT_loop_points 1
+#define AL_LOOP_POINTS                           0x2015
+#endif
 
 #if defined(HAVE_STDINT_H)
 #include <stdint.h>
@@ -115,6 +129,10 @@ typedef DWORD tls_type;
 #include <sys/time.h>
 #include <time.h>
 #include <errno.h>
+
+#ifdef ANDROID
+#include <android/log.h>
+#endif
 
 #define IsBadWritePtr(a,b) ((a) == NULL && (b) != 0)
 
@@ -170,26 +188,16 @@ static __inline void DeleteCriticalSection(CRITICAL_SECTION *cs)
  * as opposed to the actual time. */
 static __inline ALuint timeGetTime(void)
 {
+    int ret;
 #if _POSIX_TIMERS > 0
     struct timespec ts;
-    int ret = -1;
 
-#if defined(_POSIX_MONOTONIC_CLOCK) && (_POSIX_MONOTONIC_CLOCK >= 0)
-#if _POSIX_MONOTONIC_CLOCK == 0
-    static int hasmono = 0;
-    if(hasmono > 0 || (hasmono == 0 &&
-                       (hasmono=sysconf(_SC_MONOTONIC_CLOCK)) > 0))
-#endif
-        ret = clock_gettime(CLOCK_MONOTONIC, &ts);
-#endif
-    if(ret != 0)
-        ret = clock_gettime(CLOCK_REALTIME, &ts);
+    ret = clock_gettime(CLOCK_REALTIME, &ts);
     assert(ret == 0);
 
     return ts.tv_nsec/1000000 + ts.tv_sec*1000;
 #else
     struct timeval tv;
-    int ret;
 
     ret = gettimeofday(&tv, NULL);
     assert(ret == 0);
@@ -291,6 +299,9 @@ void alc_wave_probe(int type);
 void alc_pulse_init(BackendFuncs *func_list);
 void alc_pulse_deinit(void);
 void alc_pulse_probe(int type);
+void alc_android_init(BackendFuncs *func_list);
+void alc_android_deinit(void);
+void alc_android_probe(int type);
 void alc_null_init(BackendFuncs *func_list);
 void alc_null_deinit(void);
 void alc_null_probe(int type);
@@ -309,31 +320,25 @@ void InitUIntMap(UIntMap *map);
 void ResetUIntMap(UIntMap *map);
 ALenum InsertUIntMapEntry(UIntMap *map, ALuint key, ALvoid *value);
 void RemoveUIntMapKey(UIntMap *map, ALuint key);
-ALvoid *LookupUIntMapKey(UIntMap *map, ALuint key);
 
-/* Device formats */
-enum DevFmtType {
-    DevFmtByte,   /* AL_BYTE */
-    DevFmtUByte,  /* AL_UNSIGNED_BYTE */
-    DevFmtShort,  /* AL_SHORT */
-    DevFmtUShort, /* AL_UNSIGNED_SHORT */
-    DevFmtFloat,  /* AL_FLOAT */
-};
-enum DevFmtChannels {
-    DevFmtMono,   /* AL_MONO */
-    DevFmtStereo, /* AL_STEREO */
-    DevFmtQuad,   /* AL_QUAD */
-    DevFmtX51,    /* AL_5POINT1 */
-    DevFmtX61,    /* AL_6POINT1 */
-    DevFmtX71,    /* AL_7POINT1 */
-};
-
-ALuint BytesFromDevFmt(enum DevFmtType type);
-ALuint ChannelsFromDevFmt(enum DevFmtChannels chans);
-static __inline ALuint FrameSizeFromDevFmt(enum DevFmtChannels chans,
-                                           enum DevFmtType type)
+static __inline ALvoid *LookupUIntMapKey(UIntMap *map, ALuint key)
 {
-    return ChannelsFromDevFmt(chans) * BytesFromDevFmt(type);
+    if(map->size > 0)
+    {
+        ALsizei low = 0;
+        ALsizei high = map->size - 1;
+        while(low < high)
+        {
+            ALsizei mid = low + (high-low)/2;
+            if(map->array[mid].key < key)
+                low = mid + 1;
+            else
+                high = mid;
+        }
+        if(map->array[low].key == key)
+            return map->array[low].value;
+    }
+    return NULL;
 }
 
 
@@ -345,8 +350,7 @@ struct ALCdevice_struct
     ALuint       Frequency;
     ALuint       UpdateSize;
     ALuint       NumUpdates;
-    enum DevFmtChannels FmtChans;
-    enum DevFmtType     FmtType;
+    ALenum       Format;
 
     ALCchar      *szDeviceName;
 
@@ -384,18 +388,15 @@ struct ALCdevice_struct
     ALboolean    DuplicateStereo;
 
     // Dry path buffer mix
-    ALfloat DryBuffer[BUFFERSIZE][MAXCHANNELS];
+    float DryBuffer[BUFFERSIZE][OUTPUTCHANNELS];
 
-    ALuint DevChannels[MAXCHANNELS];
+    ALuint DevChannels[OUTPUTCHANNELS];
 
-    ALfloat ChannelMatrix[MAXCHANNELS][MAXCHANNELS];
+    ALfloat ChannelMatrix[OUTPUTCHANNELS][OUTPUTCHANNELS];
 
-    Channel Speaker2Chan[MAXCHANNELS];
-    ALfloat PanningLUT[MAXCHANNELS * LUT_NUM];
+    Channel Speaker2Chan[OUTPUTCHANNELS];
+    ALfloat PanningLUT[OUTPUTCHANNELS * LUT_NUM];
     ALuint  NumChan;
-
-    ALfloat ClickRemoval[MAXCHANNELS];
-    ALfloat PendingClicks[MAXCHANNELS];
 
     // Contexts created on this device
     ALCcontext  **Contexts;
@@ -448,6 +449,8 @@ struct ALCcontext_struct
 
     ALCcontext *next;
 };
+
+ALCvoid ReleaseALC(ALCvoid);
 
 void AppendDeviceList(const ALCchar *name);
 void AppendAllDeviceList(const ALCchar *name);

@@ -1,77 +1,67 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "yonConfig.h"
-
 /* Define to the library version */
-#define ALSOFT_VERSION "1.13"
+#define ALSOFT_VERSION "1.12.854"
+
+#ifdef ANDROID_NDK
+/* Define if we have the Android backend */
+#define HAVE_ANDROID 1
+
 
 /* Define if we have the ALSA backend */
-/* #undef HAVE_ALSA */
+/* #cmakedefine HAVE_ALSA */
 
 /* Define if we have the OSS backend */
-/* #undef HAVE_OSS */
+/* #cmakedefine HAVE_OSS */
 
 /* Define if we have the Solaris backend */
-/* #undef HAVE_SOLARIS */
+/* #cmakedefine HAVE_SOLARIS */
 
 /* Define if we have the DSound backend */
-#ifdef YON_COMPILE_WITH_WIN32
-#define HAVE_DSOUND
-#endif
-
-/* Define if we have the Windows Multimedia backend */
-#ifdef YON_COMPILE_WITH_WIN32
-#define HAVE_WINMM
-#endif
-
-/* Define if we have the PortAudio backend */
-/* #undef HAVE_PORTAUDIO */
-
-/* Define if we have the PulseAudio backend */
-/* #undef HAVE_PULSEAUDIO */
+/* #cmakedefine HAVE_DSOUND */
 
 /* Define if we have the Wave Writer backend */
-#ifdef YON_COMPILE_WITH_WIN32
-#define HAVE_WAVE
-#endif
+/* #cmakedefine HAVE_WAVE */
+
+/* Define if we have the Windows Multimedia backend */
+/* #cmakedefine HAVE_WINMM */
+
+/* Define if we have the PortAudio backend */
+/* #cmakedefine HAVE_PORTAUDIO */
+
+/* Define if we have the PulseAudio backend */
+/* #cmakedefine HAVE_PULSEAUDIO */
 
 /* Define if we have dlfcn.h */
-#ifdef YON_COMPILE_WITH_ANDROID
 #define HAVE_DLFCN_H 1
-#endif
 
 /* Define if we have the stat function */
 #define HAVE_STAT 1
 
-#ifdef YON_COMPILE_WITH_ANDROID
 /* Define if we have the powf function */
-#define HAVE_POWF
+#define HAVE_POWF 1
 
 /* Define if we have the sqrtf function */
-#define HAVE_SQRTF
+#define HAVE_SQRTF 1
 
 /* Define if we have the acosf function */
-#define HAVE_ACOSF
+#define HAVE_ACOSF 1
 
 /* Define if we have the atanf function */
-#define HAVE_ATANF
+#define HAVE_ATANF 1
 
 /* Define if we have the fabsf function */
-#define HAVE_FABSF
+#define HAVE_FABSF 1
 
 /* Define if we have the strtof function */
-#define HAVE_STRTOF
+#define HAVE_STRTOF 1
 
 /* Define if we have stdint.h */
-#define HAVE_STDINT_H
-#endif
+#define HAVE_STDINT_H 1
 
 /* Define if we have the __int64 type */
-#ifdef YON_COMPILE_WITH_WIN32
-#define HAVE___INT64
-#endif
-
+/* #cmakedefine HAVE___INT64 */
 
 /* Define to the size of a long int type */
 #define SIZEOF_LONG 4
@@ -85,21 +75,109 @@
 /* Define to the size of a void pointer type */
 #define SIZEOF_VOIDP 4
 
-#ifdef YON_COMPILE_WITH_ANDROID
 /* Define if we have GCC's destructor attribute */
-#define HAVE_GCC_DESTRUCTOR
+#define HAVE_GCC_DESTRUCTOR 1
 
 /* Define if we have GCC's format attribute */
-#define HAVE_GCC_FORMAT
-#endif
+#define HAVE_GCC_FORMAT 1
+
+/* Define if we have pthread_np.h */
+/* #cmakedefine HAVE_PTHREAD_NP_H */
+
+/* Define if we have float.h */
+/* #cmakedefine HAVE_FLOAT_H */
+
+/* Define if we have fenv.h */
+#define HAVE_FENV_H 1
+
+/* Define if we have fesetround() */
+/* #cmakedefine HAVE_FESETROUND */
+
+/* Define if we have _controlfp() */
+/* #cmakedefine HAVE__CONTROLFP */
+
+/* Define if we have pthread_setschedparam() */
+#define HAVE_PTHREAD_SETSCHEDPARAM 1
+
+#elif defined(WIN32)
+
+/* Define if we have the ALSA backend */
+/* #undef HAVE_ALSA */
+
+/* Define if we have the OSS backend */
+/* #undef HAVE_OSS */
+
+/* Define if we have the Solaris backend */
+/* #undef HAVE_SOLARIS */
+
+/* Define if we have the DSound backend */
+#define HAVE_DSOUND 1
+
+/* Define if we have the Windows Multimedia backend */
+#define HAVE_WINMM 1
+
+/* Define if we have the PortAudio backend */
+/* #undef HAVE_PORTAUDIO */
+
+/* Define if we have the PulseAudio backend */
+/* #undef HAVE_PULSEAUDIO */
+
+/* Define if we have the Wave Writer backend */
+#define HAVE_WAVE 1
+
+/* Define if we have dlfcn.h */
+/* #undef HAVE_DLFCN_H */
+
+/* Define if we have the stat function */
+#define HAVE_STAT 1
+
+/* Define if we have the powf function */
+/* #undef HAVE_POWF */
+
+/* Define if we have the sqrtf function */
+/* #undef HAVE_SQRTF */
+
+/* Define if we have the acosf function */
+/* #undef HAVE_ACOSF */
+
+/* Define if we have the atanf function */
+/* #undef HAVE_ATANF */
+
+/* Define if we have the fabsf function */
+/* #undef HAVE_FABSF */
+
+/* Define if we have the strtof function */
+/* #undef HAVE_STRTOF */
+
+/* Define if we have stdint.h */
+/* #undef HAVE_STDINT_H */
+
+/* Define if we have the __int64 type */
+#define HAVE___INT64
+
+/* Define to the size of a long int type */
+#define SIZEOF_LONG 4
+
+/* Define to the size of a long long int type */
+#define SIZEOF_LONG_LONG 8
+
+/* Define to the size of an unsigned int type */
+#define SIZEOF_UINT 4
+
+/* Define to the size of a void pointer type */
+#define SIZEOF_VOIDP 4
+
+/* Define if we have GCC's destructor attribute */
+/* #undef HAVE_GCC_DESTRUCTOR */
+
+/* Define if we have GCC's format attribute */
+/* #undef HAVE_GCC_FORMAT */
 
 /* Define if we have pthread_np.h */
 /* #undef HAVE_PTHREAD_NP_H */
 
 /* Define if we have float.h */
-#ifdef YON_COMPILE_WITH_WIN32
 #define HAVE_FLOAT_H
-#endif
 
 /* Define if we have fenv.h */
 /* #undef HAVE_FENV_H */
@@ -108,13 +186,9 @@
 /* #undef HAVE_FESETROUND */
 
 /* Define if we have _controlfp() */
-#ifdef YON_COMPILE_WITH_WIN32
 #define HAVE__CONTROLFP
-#endif
 
 /* Define if we have pthread_setschedparam() */
-#ifdef YON_COMPILE_WITH_ANDROID
-#define HAVE_PTHREAD_SETSCHEDPARAM
+/* #undef HAVE_PTHREAD_SETSCHEDPARAM */
 #endif
-
 #endif
