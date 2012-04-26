@@ -1,7 +1,7 @@
 #ifndef _YON_CORE_POSITION2D_H_
 #define _YON_CORE_POSITION2D_H_
 
-#include "config.h"
+#include "yonConfig.h"
 #include "vector2d.h"
 
 #define position2d vector2d

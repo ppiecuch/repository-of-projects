@@ -1,4 +1,4 @@
-#include "config.h"
+#include "yonConfig.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 
@@ -46,7 +46,7 @@ namespace platform{
 		:m_hWnd(NULL),m_bExternalWindow(false),
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),
 		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),
-		m_pUserListener(NULL),m_pTimer(NULL),m_pAudioDriver(NULL),
+		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),m_pAudioDriver(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
 	{
 		if(params.windowId==NULL)

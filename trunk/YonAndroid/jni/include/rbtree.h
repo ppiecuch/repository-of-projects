@@ -26,8 +26,8 @@ namespace core{
 			n2->red=n1->red=temp;
 		}
 
-		virtual btreenode* generate(){
-			rbtreenode* n=new rbtreenode();
+		virtual btreenode<T>* generate(){
+			rbtreenode<T>* n=new rbtreenode();
 			n->fill();
 			return n;
 		}
@@ -207,12 +207,12 @@ namespace core{
 	public:
 		rbtreenode():bstreenode(),red(false){}
 		rbtreenode(T value):bstreenode(value),red(false){fill();}
-		virtual btreenode* getMin(){
+		virtual btreenode<T>* getMin(){
 			while(leftChild->isEmpty()==false)
 				return leftChild->getMin();
 			return this;
 		}
-		virtual btreenode* getMax(){
+		virtual btreenode<T>* getMax(){
 			while(rightChild->isEmpty()==false)
 				return rightChild->getMin();
 			return this;

@@ -2,7 +2,7 @@
 #define _YON_IYONENGINE_H_
 
 
-#include "config.h"
+#include "yonConfig.h"
 #include "IReferencable.h"
 #include "SYonPlatformInfo.h"
 #include "ITimer.h"

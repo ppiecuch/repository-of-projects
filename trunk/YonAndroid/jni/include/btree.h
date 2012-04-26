@@ -28,12 +28,12 @@ namespace core{
 			if(rightChild)
 				delete rightChild;
 		}
-		inline btreenode* getLeftChild(){return leftChild;}
-		inline btreenode* getRightChild(){return rightChild;}
-		inline btreenode* getParent(){return parent;}
-		inline btreenode* getGrandfather(){return parent?parent->parent:NULL;}
-		inline btreenode* getUncle(){return parent?parent->getSibling():NULL;}
-		inline btreenode* getSibling(){
+		inline btreenode<T>* getLeftChild(){return leftChild;}
+		inline btreenode<T>* getRightChild(){return rightChild;}
+		inline btreenode<T>* getParent(){return parent;}
+		inline btreenode<T>* getGrandfather(){return parent?parent->parent:NULL;}
+		inline btreenode<T>* getUncle(){return parent?parent->getSibling():NULL;}
+		inline btreenode<T>* getSibling(){
 			if(isRoot())
 				return NULL;
 			if(parent->leftChild==this)
@@ -42,8 +42,8 @@ namespace core{
 				return parent->leftChild;
 			return NULL;
 		}
-		virtual btreenode* getMin(){return NULL;}
-		virtual btreenode* getMax(){return NULL;}
+		virtual btreenode<T>* getMin(){return NULL;}
+		virtual btreenode<T>* getMax(){return NULL;}
 		inline T& getValue(){return value;}
 		virtual void setValue(T t){this->value=t;nil=false;}
 

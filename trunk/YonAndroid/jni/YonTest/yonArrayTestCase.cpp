@@ -1,7 +1,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "yonArrayTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( yonArrayTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( yonArrayTestCase );
 
 void yonArrayTestCase::setUp()
 {
@@ -24,4 +24,54 @@ void yonArrayTestCase::push()
 	arr.push(v3);
 	//delete v;
 	CPPUNIT_ASSERT( arr.size()==3&&arr[1]->x==1&&arr[1]->y==2&&arr[1]->z==3 );
+}
+
+void yonArrayTestCase::insert1()
+{
+	buffer.push(0);
+	buffer.push(1);
+	buffer.push(2);
+	buffer.push(3);
+	buffer.push(4);
+	s32 temp[3]={5,6,7};
+	buffer.insert(5,temp,3);
+	buffer.print();
+	CPPUNIT_ASSERT( buffer.size()==8);
+}
+
+void yonArrayTestCase::insert2()
+{
+	buffer.push(0);
+	buffer.push(1);
+	buffer.push(2);
+	buffer.push(3);
+	buffer.push(4);
+	s32 temp[3]={5,6,7};
+	buffer.insert(2,temp,3);
+	buffer.print();
+	CPPUNIT_ASSERT( buffer.size()==8);
+}
+void yonArrayTestCase::insert3()
+{
+	buffer.push(0);
+	buffer.push(1);
+	buffer.push(2);
+	buffer.push(3);
+	buffer.push(4);
+	s32 temp[3]={5,6,7};
+	buffer.insert(1,temp,3);
+	buffer.print();
+	CPPUNIT_ASSERT( buffer.size()==8);
+}
+void yonArrayTestCase::insert4()
+{
+	buffer.push(0);
+	buffer.push(1);
+	buffer.push(2);
+	buffer.push(3);
+	buffer.push(4);
+	s32 temp[5]={5,6,7,8,9};
+	buffer.insert(0,temp,5);
+	buffer.print();
+	CPPUNIT_ASSERT( buffer.size()==10);
 }

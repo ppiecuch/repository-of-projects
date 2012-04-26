@@ -27,6 +27,13 @@ namespace yon{
 				clear();
 			}
 
+			void print(){
+				printf("\n");
+				for(u32 i=0;i<len;++i)
+					printf("%d,",elements[i]);
+				printf("\n");
+			}
+
 			u32 size() const{
 				return len;
 			}
@@ -47,6 +54,53 @@ namespace yon{
 			}
 			T& pop(){
 				return erase(len-1);
+			}
+
+			//TODO比vector慢，待优化
+			//在index索引上插入arr[0,count]元素组
+			void insert(u32 index,const T* arr,u32 count){
+				YON_DEBUG_BREAK_IF(index>len);
+
+				if(len+count>capacity){
+					u32 newCapacity=len+count+(capacity<500? (capacity<5?5:capacity): capacity>> 2);
+					reallocate(newCapacity);
+				}
+
+				s32 i;
+				if(index==len){
+					for(i=0;i<count;++i)
+						new (&elements[len+i]) T(arr[i]);
+					len+=count;
+					return;
+				}
+
+				//剩下的都是index<len
+				s32 tlen=len-index;//需要后移的部分的长度
+				if(tlen<count){
+					for(i=0;i<tlen;++i)
+						new (&elements[len-1+count-i]) T(elements[len-1-i]);
+					tlen=count-tlen;
+					for(i=0;i<tlen;++i)
+						new (&elements[len-1+tlen-i]) T(arr[count-1-i]);
+					tlen=count-tlen;
+					for(i=0;i<tlen;++i){
+						elements[len-1-i].~T();
+						new (&elements[len-1-i]) T(arr[tlen-1-i]);
+					}
+				}else{
+					for(i=0;i<count;++i)
+						new (&elements[len-1+count-i]) T(elements[len-1-i]);
+					tlen=tlen-count;
+					for(i=0;i<tlen;++i){
+						elements[len-1-i].~T();
+						new (&elements[len-1-i]) T(elements[len-1-count-i]);
+					}
+					for(i=count-1;i>=0;--i){
+						elements[index+i].~T();
+						new (&elements[index+i]) T(arr[i]);
+					}
+				}
+				len+=count;
 			}
 
 
@@ -78,7 +132,7 @@ namespace yon{
 
 			}
 
-			T& erase(u32 index)
+			T erase(u32 index)
 			{
 				YON_DEBUG_BREAK_IF(index>=len);
 

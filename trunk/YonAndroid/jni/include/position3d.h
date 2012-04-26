@@ -1,7 +1,7 @@
 #ifndef _YON_CORE_POSITION3D_H_
 #define _YON_CORE_POSITION3D_H_
 
-#include "config.h"
+#include "yonConfig.h"
 #include "vector3d.h"
 
 #define position3d vector3d

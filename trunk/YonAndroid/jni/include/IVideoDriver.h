@@ -6,18 +6,18 @@
 #include "position2d.h"
 #include "rect.h"
 #include "matrix4.h"
-#include "IUnit.h"
 #include "IFileSystem.h"
 #include "ITexture.h"
 #include "IImageLoader.h"
 #include "IMaterial.h"
 #include "SColor.h"
 #include "ITimer.h"
-#include "IHardwareBuffer.h"
+#include "SVertex.h"
 
 namespace yon{
 
 	namespace scene{
+		class IUnit;
 		class ISceneManager;
 		ISceneManager* createSceneManager();
 	}

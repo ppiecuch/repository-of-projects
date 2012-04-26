@@ -1,7 +1,7 @@
 #ifndef _YON_DEBUG_ILOGGER_H_
 #define _YON_DEBUG_ILOGGER_H_
 
-#include "config.h"
+#include "yonConfig.h"
 #include "IReferencable.h"
 #include "yonString.h"
 #include "position2d.h"

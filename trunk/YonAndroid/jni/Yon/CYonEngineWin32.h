@@ -1,7 +1,7 @@
 #ifndef _YON_PLATFORM_CYONENGINEWIN32_H_
 #define _YON_PLATFORM_CYONENGINEWIN32_H_
 
-#include "config.h"
+#include "yonConfig.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 ////加载Window程序需要的头文件

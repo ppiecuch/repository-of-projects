@@ -1,7 +1,7 @@
 #ifndef _YON_VIDEO_OGLES1_SOGLES1PARAMETERS_H_
 #define _YON_VIDEO_OGLES1_SOGLES1PARAMETERS_H_
 
-#include "config.h"
+#include "yonConfig.h"
 #include "dimension2d.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
