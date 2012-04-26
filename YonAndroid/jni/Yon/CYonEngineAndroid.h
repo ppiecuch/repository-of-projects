@@ -1,7 +1,7 @@
 #ifndef _YON_PLATFORM_CXCENGINEANDROID_H_
 #define _YON_PLATFORM_CXCENGINEANDROID_H_
 
-#include "config.h"
+#include "yonConfig.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include "IYonEngine.h"
@@ -23,6 +23,7 @@ namespace yon{
 			virtual scene::ISceneManager* getSceneManager() const{return m_pSceneManager;}
 			virtual scene::IGraphicsAdapter* getGraphicsAdapter() const{return m_pGraphicsAdapter;}
 			virtual io::IFileSystem* getFileSystem() const{return m_pFileSystem;}
+			virtual audio::IAudioDriver* getAudioDriver() const{return m_pAudioDriver;}
 
 			virtual bool run();
 
@@ -49,6 +50,7 @@ namespace yon{
 			scene::ISceneManager* m_pSceneManager;
 			scene::IGraphicsAdapter* m_pGraphicsAdapter;
 			io::IFileSystem* m_pFileSystem;
+			audio::IAudioDriver* m_pAudioDriver;
 			ITimer* m_pTimer;
 
 			event::IEventReceiver* m_pUserListener;

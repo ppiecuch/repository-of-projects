@@ -1,7 +1,7 @@
 #ifndef _YON_CORE_VECTOR3D_H_
 #define _YON_CORE_VECTOR3D_H_
 
-#include "config.h"
+#include "yonConfig.h"
 #include "yonMath.h"
 
 #include "ILogger.h"

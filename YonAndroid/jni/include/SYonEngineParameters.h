@@ -3,6 +3,7 @@
 
 #include "dimension2d.h"
 #include "yonString.h"
+#include "IEventReceiver.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <jni.h>
@@ -14,13 +15,16 @@ namespace yon{
 		SYonEngineParameters():
 			windowSize(core::dimension2du(800,600)),
 			windowId(NULL),
-			windowCaption(L"YonApplication")
+			windowCaption(L"YonApplication"),
+			pJNIEnv(NULL),
+			pEventReceiver(NULL)
 			{}
 		SYonEngineParameters(const SYonEngineParameters& params):
 			windowSize(params.windowSize),
 			windowId(params.windowId),
 			windowCaption(params.windowCaption),
-			pJNIEnv(params.pJNIEnv)
+			pJNIEnv(params.pJNIEnv),
+			pEventReceiver(params.pEventReceiver)
 			{}
 
 		//窗口尺寸
@@ -31,6 +35,8 @@ namespace yon{
 		core::stringw windowCaption;
 		//JNIEnv接口
 		void *pJNIEnv;
+		//自定义事件监听器
+		event::IEventReceiver* pEventReceiver;
 	};
 }
 #endif

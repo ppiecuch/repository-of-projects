@@ -1,12 +1,12 @@
 #ifndef _YON_YON_H_
 #define _YON_YON_H_
 
-#include "config.h" 
+#include "yonConfig.h"
 #include "yonTypes.h" 
 #include "heapsort.h"
-#include "btree.h"
-#include "bstree.h"
-#include "rbtree.h"
+//#include "btree.h"
+//#include "bstree.h"
+//#include "rbtree.h"
 
 #include "ISound.h"
 #include "IWave.h"

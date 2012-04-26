@@ -1,7 +1,7 @@
 #ifndef _YON_CORE_YONTYPES_H_
 #define _YON_CORE_YONTYPES_H_
 
-#include "config.h"
+#include "yonConfig.h"
 
 //ÖÐ¶Ïºê
 

@@ -183,10 +183,6 @@
 			Name="yon"
 			>
 			<File
-				RelativePath="..\include\config.h"
-				>
-			</File>
-			<File
 				RelativePath="..\include\ITimer.h"
 				>
 			</File>
@@ -204,6 +200,10 @@
 			</File>
 			<File
 				RelativePath="..\include\yon.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\yonConfig.h"
 				>
 			</File>
 			<Filter
@@ -924,6 +924,10 @@
 						Name="ogg"
 						>
 						<File
+							RelativePath=".\libogg\ogg\config_types.h"
+							>
+						</File>
+						<File
 							RelativePath=".\libogg\ogg\ogg.def"
 							>
 						</File>
@@ -1256,10 +1260,6 @@
 							</File>
 							<File
 								RelativePath=".\openal\include\AL\alext.h"
-								>
-							</File>
-							<File
-								RelativePath=".\openal\include\AL\alut.h"
 								>
 							</File>
 							<File

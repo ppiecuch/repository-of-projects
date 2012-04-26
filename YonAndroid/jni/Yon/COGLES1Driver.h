@@ -10,6 +10,8 @@
 #include "IDebugPrinter.h"
 #include "IGeometryFactory.h"
 #include "CFPSCounter.h"
+#include "IUnit.h"
+#include "IHardwareBuffer.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 //加载OpenGL ES1需要的库及头文件

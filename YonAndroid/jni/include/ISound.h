@@ -18,18 +18,22 @@ namespace audio{
 
 		const io::path& getPath() const { return m_namePath.getPath(); }
 
+		//播放控制
 		virtual void play() = 0;
 		virtual void pause() = 0;
 		virtual void stop() = 0;
 		virtual void rewind() = 0;
 
+		//状态查询
 		virtual bool isPlaying() = 0;
 		virtual bool isPaused() = 0;
 		virtual bool isStopped() = 0;
 
+		//循环播放
 		virtual void setLooping(bool on = true) = 0;
 		virtual bool isLooping() = 0;
 
+		//音量[0.0,1.0]
 		virtual void setGain(f32 gain) = 0;
 		virtual f32 getGain() = 0;
 

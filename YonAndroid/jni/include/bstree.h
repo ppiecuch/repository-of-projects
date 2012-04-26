@@ -7,13 +7,14 @@ namespace yon{
 namespace core{
 
 	//此结构目前处理测试阶段，不能直接使用，使用方法见Test项目
+	//cygwin下编译不过
 	template<class T>
 	class bstreenode : public btreenode<T>{
 	protected:
-		virtual btreenode* generate(){
-			return new btreenode();
+		virtual btreenode<T>* generate(){
+			return new bstreenode();
 		}
-		btreenode* bsInsert(T t){
+		btreenode<T>* bsInsert(T t){
 			if(nil){
 				setValue(t);
 				return this;
@@ -37,18 +38,18 @@ namespace core{
 	public:
 		bstreenode():btreenode(){}
 		bstreenode(T value):btreenode(value){}
-		virtual btreenode* getMin(){
+		virtual btreenode<T>* getMin(){
 			while(leftChild)
 				return leftChild->getMin();
 			return this;
 		}
-		virtual btreenode* getMax(){
+		virtual btreenode<T>* getMax(){
 			while(rightChild)
 				return rightChild->getMin();
 			return this;
 		}
 		//查找
-		virtual btreenode* find(T t) {
+		virtual btreenode<T>* find(T t) {
 			if(t==value)
 				return this;
 			if(t<value&&leftChild!=NULL)
@@ -58,7 +59,7 @@ namespace core{
 			return NULL;
 		}
 		//插入，如果已经存在t，返回NULL，否则返回插入的节点
-		virtual btreenode* insert(T t) {
+		virtual btreenode<T>* insert(T t) {
 			return bsInsert(t);
 		}
 		//删除，如果删除成功返回true，否则返回false

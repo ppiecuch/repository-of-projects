@@ -16,6 +16,7 @@ inline void EnableMemLeakCheck()
 #include "yon.h"
 using namespace yon;
 using namespace yon::core;
+using namespace yon::event;
 using namespace yon::debug;
 using namespace yon::io;
 using namespace yon::video;
@@ -43,7 +44,27 @@ struct Object : public virtual core::IReferencable{
 	int b;
 };
 
+class MyEventReceiver : public IEventReceiver{
+public:
+	virtual bool onEvent(const SEvent& evt){
+		switch(evt.type)
+		{
+		case event::ENUM_EVENT_TYPE_MOUSE:
+			switch(evt.mouseInput.type)
+			{
+			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
+				printf("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				return true;
+			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
+				printf("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				return true;
+			}
+		}
+	}
+};
+
 #define _CRTDBG_MAP_ALLOC
+SYonEngineParameters params;
 int main(int argc, char* argv[])
 {
 	EnableMemLeakCheck();
@@ -53,9 +74,9 @@ int main(int argc, char* argv[])
 
 	
 
-	SYonEngineParameters params;
 	params.windowSize.w=400;
 	params.windowSize.h=400;
+	params.pEventReceiver=new MyEventReceiver();
 	IYonEngine* engine=CreateEngine(params);
 
 	IVideoDriver* driver=engine->getVideoDriver();
@@ -68,6 +89,8 @@ int main(int argc, char* argv[])
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 
 	ISound* sound=audioDriver->getSound("../media/bg.ogg");
+	sound->setLooping(true);
+	sound->setGain(0.5f);
 	sound->play();
 	sound=audioDriver->getSound("../media/helloworld.wav");
 	sound->play();
@@ -378,7 +401,7 @@ int main(int argc, char* argv[])
 	Logger->info("end\n");
 #endif
 	engine->drop();
-
+	delete params.pEventReceiver;
 	
 #if 0
 	//setlocale(LC_ALL,"zh_CN.utf8");

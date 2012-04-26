@@ -12,6 +12,9 @@
 #define YON_COMPILE_WITH_WIN32
 #elif defined(unix)
 #define YON_COMPILE_WITH_ANDROID
+#ifndef __CYGWIN__
+#define __CYGWIN__
+#endif
 #else
 #define YON_COMPILE_WITH_MACOSX
 #endif // WIN32

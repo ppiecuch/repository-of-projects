@@ -38,7 +38,10 @@ namespace ogles1{
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty)
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
-		m_pDebugPrinter(NULL),m_hDc(NULL),m_hWnd(param.hWnd),
+		m_pDebugPrinter(NULL),
+#ifdef YON_COMPILE_WITH_WIN32
+		m_hDc(NULL),m_hWnd(param.hWnd),
+#endif
 		m_windowSize(param.windowSize),IVideoDriver(fs,timer){
 
 		m_imageLoaders.push(createImageLoaderPNG());
@@ -813,7 +816,7 @@ namespace ogles1{
 
 		EGLConfig config;
 		EGLint num_configs;
-		m_hDc = GetDC(hwnd);
+		m_hDc = ::GetDC(hwnd);
 
 		//First Step£ºGet EGLDisplay Object
 		//The type and format of display_id are implementation-specific,
@@ -988,10 +991,10 @@ namespace ogles1{
 		}else{
 			Logger->error(YON_LOG_FAILED_FORMAT,"Release all resources in EGL and display");
 		}
-		if (m_hDc&&ReleaseDC((HWND)m_hWnd, m_hDc)){
-			Logger->info(YON_LOG_SUCCEED_FORMAT,"Release DC");
+		if (m_hDc&&!::ReleaseDC((HWND)m_hWnd, m_hDc)){
+			Logger->warn(YON_LOG_WARN_FORMAT,"Release DC");
 		}else{
-			Logger->error(YON_LOG_FAILED_FORMAT,"Release DC");
+			Logger->info(YON_LOG_SUCCEED_FORMAT,"Release DC");
 		}
 	}
 #endif//YON_COMPILE_WITH_WIN32

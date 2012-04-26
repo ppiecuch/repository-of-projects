@@ -2,6 +2,7 @@
 #define _YON_VIDEO_IHARDWAREBUFFER_H_
 
 #include "IReferencable.h"
+#include "IVideoDriver.h"
 
 namespace yon{
 namespace video{
@@ -12,13 +13,11 @@ namespace video{
 		ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC		//数据可能不太会变化，使用可以快速读取但不必快速更新的方案
 	};
 
-	enum ENUM_PRIMITIVE_TYPE;
-
 	class IHardwareBuffer : public virtual core::IReferencable{
 	public:
 		virtual ~IHardwareBuffer(){}
 
-		virtual void draw(ENUM_PRIMITIVE_TYPE pType) = 0;
+		virtual void draw(video::ENUM_PRIMITIVE_TYPE pType) = 0;
 	};
 }
 }

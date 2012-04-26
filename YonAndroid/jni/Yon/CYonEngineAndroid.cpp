@@ -1,4 +1,4 @@
-#include "config.h"
+#include "yonConfig.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 
@@ -45,7 +45,8 @@ namespace yon{
 
 		CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params)
 			:m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
-			m_pUserListener(NULL),m_pGraphicsAdapter(NULL),
+			m_pUserListener(params.pEventReceiver),m_pGraphicsAdapter(NULL),
+			m_pAudioDriver(NULL),
 			m_params(params),m_bClose(false),m_bResized(true)
 		{
 			//¼ì²âjni°æ±¾
@@ -67,10 +68,14 @@ namespace yon{
 		//³õÊ¼»¯GraphicsÊÊÅäÆ÷
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
+		//³õÊ¼»¯ÉùÒôÇý¶¯Æ÷
+		m_pAudioDriver=audio::createAudioDriver(m_pFileSystem);
+
 		//Æô¶¯¼ÆÊ±Æ÷
 		m_pTimer->start();
 	}
 		CYonEngineAndroid::~CYonEngineAndroid(){
+		m_pAudioDriver->drop();
 		m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();

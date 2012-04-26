@@ -8,8 +8,9 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-#include <vector>
-using namespace std;  
+//#include <vector>
+//using namespace std;  
+#include "yonArray.h"
 
 namespace yon{
 namespace audio{
@@ -44,7 +45,9 @@ namespace audio{
 		int bitStream;
 		int endian = 0;                         // 0 for Little-Endian, 1 for Big-Endian
 		c8 buffer[32768];
-		vector<c8> result;
+		core::array<c8> result;
+		//vector<c8> result;
+		Logger->debug("start ov_read:%s\n",file->getPath().c_str());
 		do{
 			bytes = ov_read(&oggFile, buffer, 32768, endian, 2, 1, &bitStream);
 			if (bytes < 0){
@@ -52,13 +55,16 @@ namespace audio{
 				Logger->warn(YON_LOG_FAILED_FORMAT,core::stringc("Decode(%s)",file->getPath().c_str()).c_str());
 				return NULL;
 			}
-			result.insert(result.end(), buffer, buffer + bytes);
+			//result.insert(result.end(), buffer, buffer+bytes);//¿ìÁËÈý±¶
+			result.insert(result.size(), buffer, bytes);
 			count+=bytes;
 		}while(bytes > 0);
-
+		Logger->debug("end ov_read:%s\n",file->getPath().c_str());
 		ov_clear(&oggFile);
 
-		CWave* wave=new CWave(format,count,freq,&result[0],true,true);
+		CWave* wave=new CWave(format,count,freq,result.pointer(),true,true);
+		//CWave* wave=new CWave(format,count,freq,&result[0],true,true);
+		Logger->debug("create wave completed:%s\n",file->getPath().c_str());
 		return wave;
 	}
 

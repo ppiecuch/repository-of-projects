@@ -13,25 +13,28 @@ namespace oal{
 	protected:
 		ALuint m_source;
 		ALuint m_buffer;
+
+		ALint getState();
 	public:
 		COALSound(IWave* wave,const io::path& p);
 		virtual ~COALSound();
 
 		virtual void play();
-		virtual void pause(){}
-		virtual void stop(){}
-		virtual void rewind(){}
+		virtual void pause();
+		virtual void stop();
+		virtual void rewind();
 
-		virtual bool isPlaying(){return false;}
-		virtual bool isPaused(){return false;}
-		virtual bool isStopped(){return false;}
+		virtual bool isPlaying();
+		virtual bool isPaused();
+		virtual bool isStopped();
 
-		virtual void setLooping(bool on = true){}
-		virtual bool isLooping(){return false;}
+		virtual void setLooping(bool on);
+		virtual bool isLooping();
 
-		virtual void setGain(f32 gain){}
-		virtual f32 getGain(){return 0;}
+		virtual void setGain(f32 gain);
+		virtual f32 getGain();
 
+		//TODO
 		virtual void setPitch(f32 pitch){}
 		virtual f32 getPitch(){return 0;}
 

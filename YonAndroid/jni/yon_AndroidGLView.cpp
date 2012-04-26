@@ -12,9 +12,11 @@ using namespace yon::debug;
 using namespace yon::video;
 using namespace yon::scene;
 using namespace yon::scene::camera;
+using namespace yon::audio;
 
 IYonEngine* engine=NULL;
 IVideoDriver* driver=NULL;
+IAudioDriver* audioDriver=NULL;
 ISceneManager* sceneMgr=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
 
@@ -31,20 +33,59 @@ const static s32 ACTION_POINTER_UP = 6;
 
 const char* LOG_TAG = "yon_AndroidGLView";
 
+class MyEventReceiver : public IEventReceiver{
+public:
+	virtual bool onEvent(const SEvent& evt){
+		switch(evt.type)
+		{
+		case event::ENUM_EVENT_TYPE_MOUSE:
+			switch(evt.mouseInput.type)
+			{
+			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
+				LOGD(LOG_TAG,"[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				return true;
+			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
+				LOGD(LOG_TAG,"[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				return true;
+			}
+		case event::ENUM_EVENT_TYPE_TOUCH:
+			switch(evt.mouseInput.type)
+			{
+			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
+				LOGD(LOG_TAG,"[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				return true;
+			case event::ENUM_TOUCH_INPUT_TYPE_UP:
+				LOGD(LOG_TAG,"[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				return true;
+			}
+		}
+		return false;
+	}
+};
+SYonEngineParameters params;
 void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jint width, jint height, jstring apkFilePath, jstring sdcardPath){
 	LOGD(LOG_TAG,"screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",width,height,pEnv);
-	SYonEngineParameters params;
+	
 	params.pJNIEnv=pEnv;
 	params.windowSize.w=width;
 	params.windowSize.h=height;
+	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 
 	driver=engine->getVideoDriver();
+	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IFileSystem* fs=engine->getFileSystem();
 	ICamera* camera=sceneMgr->addCamera(core::vector3df(0,0,300));
+
+	ISound* sound=audioDriver->getSound("/media/bg.ogg");
+	sound->setLooping(true);
+	sound->setGain(0.5f);
+	sound->play();
+	sound=audioDriver->getSound("/media/helloworld.wav");
+	sound->play();
 
 	IMaterial* material;
 	IShap *shap,*shap1,*shap2;
@@ -135,10 +176,10 @@ void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 
 	sceneMgr->render(driver);
 
-	gfAdapter->beginBatch(0);
+	/*gfAdapter->beginBatch(0);
 	gfAdapter->drawImage("/media/nav.png",0,0,128,128,0,0,true);
 	gfAdapter->drawImage("/media/nav.png",0,0,128,128,100,0,true);
-	gfAdapter->endBatch();
+	gfAdapter->endBatch();*/
 
 	Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),ORIGIN_POSITION2DI,COLOR_GREEN);
 	Logger->render();
@@ -190,6 +231,7 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
      //回调java中的方法
      LOGI(LOG_TAG,"callbackDestroy function");
 	 engine->drop();
+	 delete params.pEventReceiver;
      pEnv->CallVoidMethod(obj, destroy);
 	 return true;
 }
