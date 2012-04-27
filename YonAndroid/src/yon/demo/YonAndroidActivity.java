@@ -26,10 +26,10 @@ public class YonAndroidActivity extends Activity {
         SysApplication.getInstance().addActivity(this);
         
         if(Util.detectOpenGLES20(this)){
-        	Log.i("XC2D", "support opengles 2.0");
+        	Log.i("Yon", "support opengles 2.0");
         }
         else{
-        	Log.i("XC2D", "unsupport opengles 2.0");
+        	Log.i("Yon", "unsupport opengles 2.0");
         }
     }
     

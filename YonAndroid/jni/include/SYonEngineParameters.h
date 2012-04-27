@@ -17,14 +17,16 @@ namespace yon{
 			windowId(NULL),
 			windowCaption(L"YonApplication"),
 			pJNIEnv(NULL),
-			pEventReceiver(NULL)
+			pEventReceiver(NULL),
+			fpsLimit(0)
 			{}
 		SYonEngineParameters(const SYonEngineParameters& params):
 			windowSize(params.windowSize),
 			windowId(params.windowId),
 			windowCaption(params.windowCaption),
 			pJNIEnv(params.pJNIEnv),
-			pEventReceiver(params.pEventReceiver)
+			pEventReceiver(params.pEventReceiver),
+			fpsLimit(params.fpsLimit)
 			{}
 
 		//窗口尺寸
@@ -37,6 +39,8 @@ namespace yon{
 		void *pJNIEnv;
 		//自定义事件监听器
 		event::IEventReceiver* pEventReceiver;
+		//FPS上限(默认为0表示不作限制)
+		u32 fpsLimit;
 	};
 }
 #endif

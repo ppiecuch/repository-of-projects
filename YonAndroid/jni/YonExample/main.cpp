@@ -13,6 +13,28 @@ inline void EnableMemLeakCheck()
 
 #include <locale.h>
 
+#ifdef YON_HIDE_CONSOLE
+#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
+#endif//YON_HIDE_CONSOLE
+
+#include "framework.h"
+
+int main(int argc, char* argv[])
+{
+	EnableMemLeakCheck();
+
+	//setlocale(LC_ALL,"chs");
+	setlocale(LC_CTYPE,"UTF-8");
+
+	init(NULL,400,400);
+	while(getEngine()->run()){
+		drawFrame();
+	}
+	destroy();
+}
+
+#if 0
+
 #include "yon.h"
 using namespace yon;
 using namespace yon::core;
@@ -27,10 +49,6 @@ using namespace yon::audio;
 
 #pragma comment(lib, "Yon.lib")
 
-
-#ifdef YON_HIDE_CONSOLE
-#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
-#endif//YON_HIDE_CONSOLE
 
 
 void print(const matrix4f& m){
@@ -482,3 +500,5 @@ int main(int argc, char* argv[])
 	//getchar();
 	return 0;
 }
+
+#endif

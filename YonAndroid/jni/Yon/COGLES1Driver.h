@@ -26,6 +26,15 @@
 namespace yon{
 	namespace video{
 		namespace ogles1{
+
+			struct FPSAssist{
+				bool limit;
+				s32 timeCounter;
+				s32 frameCounter;
+				u32 timeUnit;
+				u32 frameUnit;
+				u32 refreshedTime;
+			};
 			
 			class COGLES1Driver:public IVideoDriver{
 			public:
@@ -105,6 +114,7 @@ namespace yon{
 				core::array<SHardwareBufferPair*> m_pHardwareBuffers;
 
 				CFPSCounter m_FPSCounter;
+				FPSAssist m_FPSAssist;
 
 				core::dimension2du m_windowSize;
 #ifdef YON_COMPILE_WITH_WIN32

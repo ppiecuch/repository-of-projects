@@ -2,6 +2,7 @@
 #include "CWaveLoaderWAV.h"
 #include "CWaveLoaderOGG.h"
 #include "COALSound.h"
+#include "yonUtil.h"
 
 #include "ILogger.h"
 
@@ -42,7 +43,7 @@ namespace oal{
 	ISound* COALAudioDriver::getSound(const io::path& filename){
 		ISound* sound = findSound(filename);
 		if (sound){
-			Logger->debug("getSound(%s) finded!\n",filename.c_str());
+			Logger->debug("getSound(%s) finded!\n",getFileName(filename).c_str());
 			return sound;
 		}
 
@@ -81,18 +82,18 @@ namespace oal{
 
 	audio::ISound* COALAudioDriver::loadSoundFromFile(io::IReadStream* file){
 		ISound* sound = NULL;
-		Logger->debug("start load sound:%s\n",file->getPath().c_str());
+		Logger->debug("start load sound:%s\n",getFileName(file->getPath()).c_str());
 		IWave* wave = createWaveFromFile(file);
 
 		if (wave)
 		{
 			sound = new COALSound(wave, file->getPath());
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("end load sound:%s",file->getPath().c_str()).c_str());
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("end load sound:%s",getFileName(file->getPath()).c_str()).c_str());
 			wave->drop();
 		}
 		else
 		{
-			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("loadSoundFromFile for %s failed!",file->getPath().c_str()).c_str());
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("loadSoundFromFile for %s failed!",getFileName(file->getPath()).c_str()).c_str());
 		}
 
 		return sound;
