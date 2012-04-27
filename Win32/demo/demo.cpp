@@ -42,6 +42,18 @@ public:
 	}
 };
 int MyThread::counter=0;
+
+inline int gcd(unsigned int a,unsigned int b){  
+	int k=1,t;  
+	while(~a&1 && ~b&1)k<<=1,a>>=1,b>>=1;  
+	t=(a&1)?-b:a>>1;  
+	do{  
+		while(~t&1)t>>=1;  
+		if(t>0)a=t;else b=-t;  
+	}while(t=a-b);  
+	return a*k;  
+}  
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	/*Trace("%d\r\n",argc);
@@ -61,14 +73,18 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	t1.start();*/
 
-	try{
+	/*try{
 		cout<<"test"<<endl;
 		throw MyException("exp");
 	}catch(Exception& e){
 		cout<<e.getClassName()<<endl;
 		cout<<e.getMessage().c_str()<<endl;
 	}
-	cout<<"outer"<<endl;
+	cout<<"outer"<<endl;*/
+
+	cout<<gcd(60,1000)<<endl;
+	cout<<gcd(5,1000)<<endl;
+	cout<<gcd(7,1000)<<endl;
 
 
 	getchar();
