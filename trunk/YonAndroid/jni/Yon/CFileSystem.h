@@ -16,7 +16,8 @@ namespace io{
 		virtual bool existFile(const path& filename) const;
 		virtual IReadFile* createAndOpenFile(const io::path& filename);
 		virtual IReadStream* createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode);
-		virtual io::path getAbsolutePath(const io::path& filename) const;
+		virtual io::path getAbsolutePath(const io::path& filename,bool inWorkingDirectory=true) const;
+		virtual void setWorkingDirectory(const io::path& newDirectory);
 		virtual const io::path& getWorkingDirectory();
 	};
 }//io

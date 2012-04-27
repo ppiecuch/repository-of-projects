@@ -5,6 +5,12 @@
 #include "path.h"
 #include "yonMath.h"
 
+#ifdef YON_COMPILE_WITH_WIN32
+#include <windows.h>
+#elif defined(YON_COMPILE_WITH_ANDROID)
+#include <unistd.h>
+#endif
+
 namespace yon{
 namespace core{
 
@@ -35,6 +41,15 @@ namespace core{
 		if(index<0)
 			return pathname;
 		return pathname.subString(index+1);
+	}
+
+	inline void yonSleep(s64 pMilliseconds)
+	{
+#ifdef YON_COMPILE_WITH_WIN32
+		Sleep(pMilliseconds);
+#elif defined(YON_COMPILE_WITH_ANDROID)
+		::usleep((pMilliseconds<<10)-24);
+#endif
 	}
 }//core
 }//yon

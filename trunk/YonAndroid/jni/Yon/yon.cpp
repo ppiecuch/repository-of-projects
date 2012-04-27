@@ -14,10 +14,11 @@ namespace yon{
 
 		const vector2df ORIGIN_VECTOR2DF(0,0);
 		const vector2df IDENTITY_VECTOR2DF(1,1);
+		const vector2di ORIGIN_VECTOR2DI(0,0);
+		const vector2di IDENTITY_VECTOR2DI(1,1);
 
 		const position2df ORIGIN_POSITION2DF(0,0);
 		const position2di ORIGIN_POSITION2DI(0,0);
-
 		const position3df ORIGIN_POSITION3DF(0,0,0);
 		const position3di ORIGIN_POSITION3DI(0,0,0);
 

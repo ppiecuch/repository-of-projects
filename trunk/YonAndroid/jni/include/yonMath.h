@@ -106,6 +106,16 @@ inline bool iszero(const u32 a, const u32 tolerance = 0)
 	return a <= tolerance;
 }
 
+inline f32 squareroot(const f32 f)
+{
+	return sqrtf(f);
+}
+
+inline s32 squareroot(const s32 f)
+{
+	return static_cast<s32>(squareroot(static_cast<f32>(f)));
+}
+
 //注意0不是2的N次幂
 inline bool isPowerOf2(const u32 a)
 {
@@ -124,6 +134,18 @@ inline u32 countBits(const u32 a)
 	}
 	return s;
 }
+
+//获取a和b的最大公约数
+inline s32 gcd(u32 a,u32 b){  
+	s32 k=1,t;  
+	while(~a&1 && ~b&1)k<<=1,a>>=1,b>>=1;  
+	t=(a&1)?-b:a>>1;  
+	do{  
+		while(~t&1)t>>=1;  
+		if(t>0)a=t;else b=-t;  
+	}while(t=a-b);  
+	return a*k;  
+}  
 
 }//core
 }//yon

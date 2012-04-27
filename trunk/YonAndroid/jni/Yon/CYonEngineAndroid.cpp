@@ -1,7 +1,7 @@
 #include "yonConfig.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
-
+#include <jni.h>
 #include "CYonEngineAndroid.h"
 #include "CSceneManager.h"
 #include "CGraphicsAdapter.h"
@@ -9,49 +9,50 @@
 #include "ILogger.h"
 
 namespace yon{
-	namespace platform{
+namespace platform{
 
-		#define JNI_VERSION_1_1 0x00010001
-		#define JNI_VERSION_1_2 0x00010002
-		#define JNI_VERSION_1_4 0x00010004
-		#define JNI_VERSION_1_5 0x00010005
-		#define JNI_VERSION_1_6 0x00010006
+	#define JNI_VERSION_1_1 0x00010001
+	#define JNI_VERSION_1_2 0x00010002
+	#define JNI_VERSION_1_4 0x00010004
+	#define JNI_VERSION_1_5 0x00010005
+	#define JNI_VERSION_1_6 0x00010006
 
-		void CYonEngineAndroid::checkJNIVersion(){
-			JNIEnv* evn=(JNIEnv*)m_params.pJNIEnv;
-			jint version= evn->GetVersion();
-			switch(version){
-				case JNI_VERSION_1_1:
-					m_pfInfo.jniVersion="1.1";
-					break;
-				case JNI_VERSION_1_2:
-					m_pfInfo.jniVersion="1.2";
-					break;
-				case JNI_VERSION_1_4:
-					m_pfInfo.jniVersion="1.4";
-					break;
-				case JNI_VERSION_1_5:
-					m_pfInfo.jniVersion="1.5";
-					break;
-				case JNI_VERSION_1_6:
-					m_pfInfo.jniVersion="1.6";
-					break;
-				default:
-					m_pfInfo.jniVersion="unknown";
-					break;
-			}
+	void CYonEngineAndroid::checkJNIVersion(){
+		JNIEnv* evn=(JNIEnv*)m_params.pJNIEnv;
+		jint version= evn->GetVersion();
+		switch(version){
+			case JNI_VERSION_1_1:
+				m_pfInfo.jniVersion="1.1";
+				break;
+			case JNI_VERSION_1_2:
+				m_pfInfo.jniVersion="1.2";
+				break;
+			case JNI_VERSION_1_4:
+				m_pfInfo.jniVersion="1.4";
+				break;
+			case JNI_VERSION_1_5:
+				m_pfInfo.jniVersion="1.5";
+				break;
+			case JNI_VERSION_1_6:
+				m_pfInfo.jniVersion="1.6";
+				break;
+			default:
+				m_pfInfo.jniVersion="unknown";
+				break;
 		}
+	}
 
 
-		CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params)
-			:m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
-			m_pUserListener(params.pEventReceiver),m_pGraphicsAdapter(NULL),
-			m_pAudioDriver(NULL),
-			m_params(params),m_bClose(false),m_bResized(true)
-		{
-			//检测jni版本
-			//checkJNIVersion();
-			//Logger->info("JNI Version:%s\n",m_pfInfo.jniVersion.c_str());
+	CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params)
+		:m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
+		m_pUserListener(params.pEventReceiver),m_pGraphicsAdapter(NULL),
+		m_pAudioDriver(NULL),
+		m_params(params),m_bClose(false),m_bResized(true)
+	{
+		Logger->debug("start instance CYonEngineAndroid\n");
+		//检测jni版本
+		checkJNIVersion();
+		Logger->info("JNI Version:%s\n",m_pfInfo.jniVersion.c_str());
 
 		//初始化计时器
 		m_pTimer=createTimer();
@@ -74,72 +75,72 @@ namespace yon{
 		//启动计时器
 		m_pTimer->start();
 	}
-		CYonEngineAndroid::~CYonEngineAndroid(){
-		m_pAudioDriver->drop();
-		m_pGraphicsAdapter->drop();
-		m_pVideoDriver->drop();
-		m_pSceneManager->drop();
-		m_pFileSystem->drop();
-		m_pTimer->drop();
-			Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineAndroid");
-			if(video::DEFAULT_MATERIAL->drop()){
-				video::DEFAULT_MATERIAL=NULL;
-			}
-			if(Logger->drop()){
-				Logger=NULL;
-			}
+	CYonEngineAndroid::~CYonEngineAndroid(){
+	m_pAudioDriver->drop();
+	m_pGraphicsAdapter->drop();
+	m_pVideoDriver->drop();
+	m_pSceneManager->drop();
+	m_pFileSystem->drop();
+	m_pTimer->drop();
+		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineAndroid");
+		if(video::DEFAULT_MATERIAL->drop()){
+			video::DEFAULT_MATERIAL=NULL;
 		}
-
-		bool CYonEngineAndroid::run(){
-			m_pTimer->tick();
-			if(!m_bClose)
-				resizeIfNecessary();
-			return !m_bClose;
+		if(Logger->drop()){
+			Logger=NULL;
 		}
-		void CYonEngineAndroid::onResize(u32 w,u32 h){
-			m_bResized=true;
-			m_params.windowSize.w=w;
-			m_params.windowSize.h=h;
-			Logger->debug("CYonEngineAndroid::onResize(%d,%d)",w,h);
-		}
+	}
 
-		void CYonEngineAndroid::resizeIfNecessary()
-		{
-			if (!m_bResized)
-				return;
+	bool CYonEngineAndroid::run(){
+		m_pTimer->tick();
+		if(!m_bClose)
+			resizeIfNecessary();
+		return !m_bClose;
+	}
+	void CYonEngineAndroid::onResize(u32 w,u32 h){
+		m_bResized=true;
+		m_params.windowSize.w=w;
+		m_params.windowSize.h=h;
+		Logger->debug("CYonEngineAndroid::onResize(%d,%d)",w,h);
+	}
 
-			m_pVideoDriver->onResize(m_params.windowSize);
-			m_pSceneManager->onResize(m_params.windowSize);
-			m_bResized = false;
-			
-			Logger->debug("CYonEngineAndroid::resizeIfNecessary\n");
-		}
+	void CYonEngineAndroid::resizeIfNecessary()
+	{
+		if (!m_bResized)
+			return;
 
-		bool CYonEngineAndroid::postEventFromUser(const event::SEvent& event){
-			bool absorbed = false;
+		m_pVideoDriver->onResize(m_params.windowSize);
+		m_pSceneManager->onResize(m_params.windowSize);
+		m_bResized = false;
+		
+		Logger->debug("CYonEngineAndroid::resizeIfNecessary\n");
+	}
 
-			if (m_pUserListener)
-				absorbed = m_pUserListener->onEvent(event);
+	bool CYonEngineAndroid::postEventFromUser(const event::SEvent& event){
+		bool absorbed = false;
 
-			//TODO GUI
-			//if (!absorbed && GUIEnvironment)
-			//	absorbed = GUIEnvironment->postEventFromUser(event);
+		if (m_pUserListener)
+			absorbed = m_pUserListener->onEvent(event);
 
-			if (!absorbed && m_pSceneManager)
-				absorbed = m_pSceneManager->postEventFromUser(event);
+		//TODO GUI
+		//if (!absorbed && GUIEnvironment)
+		//	absorbed = GUIEnvironment->postEventFromUser(event);
 
-			return absorbed;
-		}
+		if (!absorbed && m_pSceneManager)
+			absorbed = m_pSceneManager->postEventFromUser(event);
 
-		void CYonEngineAndroid::createDriver(){
+		return absorbed;
+	}
+
+	void CYonEngineAndroid::createDriver(){
 
 #ifdef YON_VIDEO_MODE_OGLES1
-			video::ogles1::SOGLES1Parameters params(m_params.windowSize);
-			m_pVideoDriver=new video::ogles1::COGLES1Driver(params,m_pFileSystem,m_pTimer,m_pSceneManager->getGeometryFactory());
+		video::ogles1::SOGLES1Parameters params(m_params.windowSize,m_params.fpsLimit);
+		m_pVideoDriver=new video::ogles1::COGLES1Driver(params,m_pFileSystem,m_pTimer,m_pSceneManager->getGeometryFactory());
 #endif //Yon_VIDEO_MODE_OGLES1
-		}
-		//yon::ITimer* yon::platform::CYonEngineAndroid::getTimer(){return NULL;}
-	}//platform
+	}
+	//yon::ITimer* yon::platform::CYonEngineAndroid::getTimer(){return NULL;}
+}//platform
 }//yon
 
 #endif//YON_COMPILE_WITH_ANDROID

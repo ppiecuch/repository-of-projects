@@ -4,9 +4,11 @@
 #include "yonConfig.h"
 #include "yonTypes.h" 
 #include "heapsort.h"
-//#include "btree.h"
-//#include "bstree.h"
-//#include "rbtree.h"
+#ifdef YON_COMPILE_WITH_WIN32
+#include "btree.h"
+#include "bstree.h"
+#include "rbtree.h"
+#endif
 
 #include "ISound.h"
 #include "IWave.h"

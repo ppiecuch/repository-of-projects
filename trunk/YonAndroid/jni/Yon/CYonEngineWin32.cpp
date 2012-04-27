@@ -394,7 +394,7 @@ namespace platform{
 	void CYonEngineWin32::createDriver(){
 
 #ifdef YON_VIDEO_MODE_OGLES1
-			video::ogles1::SOGLES1Parameters params(m_hWnd,m_params.windowSize);
+			video::ogles1::SOGLES1Parameters params(m_hWnd,m_params.windowSize,m_params.fpsLimit);
 			m_pVideoDriver=new video::ogles1::COGLES1Driver(params,m_pFileSystem,m_pTimer,m_pSceneManager->getGeometryFactory());
 #endif //YON_VIDEO_MODE_OGLES1
 	}

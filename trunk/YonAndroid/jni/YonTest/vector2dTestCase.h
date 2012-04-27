@@ -15,6 +15,7 @@ class vector2dTestCase : public CPPUNIT_NS::TestFixture
 {
 	CPPUNIT_TEST_SUITE( vector2dTestCase );
 	CPPUNIT_TEST( rotateBy );
+	CPPUNIT_TEST( getAngle );
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -22,6 +23,7 @@ public:
 
 protected:
 	void rotateBy();
+	void getAngle();
 };
 
 #endif

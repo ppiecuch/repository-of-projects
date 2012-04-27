@@ -7,6 +7,7 @@
 #include "yonUtil.h"
 #include "COGLES1HardwareBuffer.h"
 
+
 namespace yon{
 namespace video{
 namespace ogles1{
@@ -70,7 +71,21 @@ namespace ogles1{
 		glClearColor(0.1f,0.2f,0.3f,1);
 		glColor4f(1, 1, 1, 1);
 
-		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Driver");
+		//FPS¿ØÖÆ¼ÆËã
+		if(param.fpsLimit==0){
+			m_FPSAssist.limit=false;
+			Logger->debug("no FPS limit\n");
+		}else{
+			s32 g=core::gcd(param.fpsLimit,1000);
+			m_FPSAssist.limit=true;
+			m_FPSAssist.frameUnit=param.fpsLimit/g;
+			m_FPSAssist.timeUnit=1000/g;
+			m_FPSAssist.timeCounter=16;
+			m_FPSAssist.frameCounter=0;
+			m_FPSAssist.refreshedTime=timer->getRealTime();
+
+			Logger->debug("{frameLimit:%d,timeUnit:%d}\n",m_FPSAssist.frameUnit,m_FPSAssist.timeUnit);
+		}
 
 		/*video::IImage* image=DebugFont::getInstance().createImage();
 		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
@@ -86,6 +101,8 @@ namespace ogles1{
 		image->drop();
 		m_pDebugPrinter=debug::createDebugPrinter(this,tex,geometryFty);
 		Logger->setDebugPrinter(m_pDebugPrinter);
+
+		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Driver");
 	}
 
 	COGLES1Driver::~COGLES1Driver(){
@@ -142,6 +159,22 @@ namespace ogles1{
 #endif//YON_COMPILE_WITH_WIN32
 		//Logger->debug("realtime:%d\n",m_pTimer->getRealTime());
 		m_FPSCounter.registerFrame(m_pTimer->getRealTime(),0);
+
+		if(!m_FPSAssist.limit)
+			return;
+		++m_FPSAssist.frameCounter;
+		if(m_pTimer->getRealTime()-m_FPSAssist.refreshedTime>m_FPSAssist.timeUnit){
+			if(m_FPSAssist.frameCounter<m_FPSAssist.frameUnit){
+				--m_FPSAssist.timeCounter;
+				if(m_FPSAssist.timeCounter<0)
+					m_FPSAssist.frameCounter=0;
+			}else if(m_FPSAssist.frameCounter>m_FPSAssist.frameUnit){
+				++m_FPSAssist.timeCounter;
+			}
+			m_FPSAssist.frameCounter=0;
+			m_FPSAssist.refreshedTime=m_pTimer->getRealTime();
+		}
+		core::yonSleep(m_FPSAssist.timeCounter);
 	}
 	void COGLES1Driver::setViewPort(const core::recti& r){
 		glViewport(0, 0, r.getWidth(), r.getHeight());

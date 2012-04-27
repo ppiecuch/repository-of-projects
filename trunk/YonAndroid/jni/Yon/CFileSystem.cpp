@@ -49,7 +49,21 @@ namespace io{
 	}
 
 
-	io::path CFileSystem::getAbsolutePath(const io::path& filename) const{
+	io::path CFileSystem::getAbsolutePath(const io::path& filename,bool inWorkingDirectory) const{
+		if(inWorkingDirectory){
+#ifdef YON_COMPILE_WITH_WIN32
+			core::stringc temp("%s%s",m_workingDirectory.c_str(),filename.c_str());
+			fschar *p=0;
+			fschar fpath[_MAX_PATH];
+			p = _fullpath(fpath, temp.c_str(), _MAX_PATH);
+			core::stringc tmp(p);
+			tmp.replace('\\', '/');
+			return tmp;
+#elif defined(YON_COMPILE_WITH_ANDROID)
+			core::stringc tmp("/sdcard/%s%s",m_workingDirectory.c_str(),filename.c_str());
+			return tmp;
+#endif
+		}
 #ifdef YON_COMPILE_WITH_WIN32
 		fschar *p=0;
 		fschar fpath[_MAX_PATH];
@@ -58,9 +72,13 @@ namespace io{
 		tmp.replace('\\', '/');
 		return tmp;
 #elif defined(YON_COMPILE_WITH_ANDROID)
-		core::stringc tmp("/sdcard%s",filename.c_str());
+		core::stringc tmp("/sdcard/%s",filename.c_str());
 		return tmp;
 #endif
+	}
+	void CFileSystem::setWorkingDirectory(const io::path& newDirectory){
+		m_workingDirectory=newDirectory;
+		m_workingDirectory.replace('\\', '/');
 	}
 	const io::path& CFileSystem::getWorkingDirectory(){
 		if(m_workingDirectory.length()==0){
