@@ -83,9 +83,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
 	material=cubeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
-	cubeModel->setPosition(core::vector3df(200,200,0));
-	material->setTexture(0,videoDriver->getTexture("test.png"));
+	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	cubeModel->setPosition(core::vector3df(100,100,0));
+	material->setTexture(0,videoDriver->getTexture("luminance.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
