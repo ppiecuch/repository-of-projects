@@ -1,0 +1,14 @@
+#ifdef _WIN32
+    #include <windows.h>
+    inline void sleep(unsigned pMilliseconds)
+    {
+        ::Sleep(pMilliseconds);
+    }
+#else
+    #include <unistd.h>
+    inline void sleep(unsigned pMilliseconds)
+    {
+        static const unsigned MilliToMicro = 1000;
+        ::usleep(pmilliseconds * MilliToMicro);
+    }
+#endif
