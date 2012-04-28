@@ -1,0 +1,15 @@
+APR(Apache portable Run-time libraries，Apache可移植运行库)的目的如其名称一样，主要为上层的应用程序提供一个可以跨越多操作
+系统平台使用的底层支持接口库。在早期 的Apache版本中，应用程序本身必须能够处理各种具体操作系统平台的细节，并针对不同的平台调用不同的处理函数。
+
+随着Apache的进一步开 发，Apache组织决定将这些通用的函数独立出来并发展成为一个新的项目。这样，APR的开发就从Apache中独立出来，
+Apache仅仅是使用 APR而已。目前APR主要还是由Apache使用，不过由于APR的较好的移植性，因此一些需要进行移植的C程序也开始使用APR，
+开源项目比如 Flood loader tester(http://httpd.apache.org/test/flood/，该项目用于服务器压力测试，不仅仅适用于Apache)、
+
+
+The mission of the Apache Portable Runtime (APR) project is to create and maintain software libraries that provide a 
+predictable and consistent interface to underlying platform-specific implementations. The primary goal is to provide 
+an API to which software developers may code and be assured of predictable if not identical behaviour regardless of the 
+platform on which their software is built, relieving them of the need to code special-case conditions to work around or 
+take advantage of platform-specific deficiencies or features.
+
+http://apr.apache.org/download.cgi
