@@ -1,0 +1,33 @@
+【版本策略】
+1、PATCH版本策略
+在前表中我们看到，PATCH的变化并不影响版本的源代码和二进制级别的兼容性，包括向前和向后兼容，
+因此，我们很容易看出，PATCH版本变化通常意味着对版本的修修补补，即BUG的修复。
+这些工作通常被局限于函数内部的修改，或者是API函数内部，或者是APR内部static函数的变化。
+任何对API的增加、修改、删除都是不允许的。
+2、次版本号策略
+任何新函数，新变量以及新常量的引入以及任何现有函数的废除都将可能导致次版本号的变化：
+1)、新函数的引入
+An application coded against an older minor release will still have all of its functions available with their original signatures. Once an application begins to use a new function, however, they will be unable to work against older minor versions.
+It is tempting to say that introducing new functions might create incompatibility across minor releases. If an application takes advantage of an API that was introduced in version 2.3 of a library, then it is not going to work against version 2.2. However, we have stated that an any application built against version 2.2 will continue to work for all 2.x releases. Thus, an application that states "requires 2.3 or later" is perfectly acceptable -- the user or administrator simply upgrades the installed library to 2.3. This is a safe operation and will not break any other application that was using the 2.2 library.
+In other words, yes an incompatibility arises by mandating that a specific version needs to be installed. But in practice, this will not be a problem since upgrading to newer versions is always safe.
+2)、新常量的引入
+Similar to functions, all of the original (old) constants will be available to an application. An application can then choose to use new constants to pick up new semantics and features. 
+3)、函数替换
+This gets a bit trickier. The original function must remain available at the link-level so that an application compiled against a minor version will continue to work with later minor versions. Further, if an application is designed to work with an earlier minor version, then we don't want to suddenly change the requirements for that application. This means that the headers cannot silently map an old function into a newer function, as that would turn an application, say, based on 1.2 into an application requiring the 1.4 or later release. 
+This means that functions cannot truly be replaced. The new, alternate function can be made available in the header and applications can choose to use it (and become dependent upon the minor release where the function appears).
+It is possible to design a set of headers where a macro will always refer to the "latest" function available. Of course, if an application chooses to use this macro, then the resulting compiled-binary will be dependent upon whatever version it was compiled against. This strategy adds the new functionality for applications, yet retains the necessary source and binary compatibility for applications designed or built against previous minor releases.
+Constants (enumerated values and preprocessor macros) are not allowed to change since an older application will still be using them. Similarly, function signatures at the link-level may not change, so that support for older, compiled applications is maintained.
+4)、函数作废
+随着APR的升级，APR中的一些API可能将作废，不再使用，但是这些API并不能从APR库中移除。因为一旦API被移除，向后兼容性将被破坏。因此我们能够做的仅仅是宣布其作废。
+If you deprecate a function in APR, please mark it as such in the function documentation, using the doxygen "\deprecated" tag. Deprecated functions can only be removed in major releases.
+A deprecated function should remain available through the original header. The function prototype should remain in the same header, or if moved to a "deprecated functions" header, then the alternate header should be included by the original header. This requirement is to ensure that source compatibility is retained.
+
+Finally, if you are deprecating a function so that you can change the name of the function, please use the method described above under "Replacing functions", so that projects which use APR can retain binary compatibility.
+Note that all deprecated functions will be removed at the next major version bump.
+3、主版本号策略
+下面的任何一种变化都将可能导致主版本号的变化︰
+1)、常量的移除或者更改
+2)、函数移除或者作为
+3)、fold together macro-ized function replacements
+
+http://www.ixpub.net/thread-615242-1-1.html
