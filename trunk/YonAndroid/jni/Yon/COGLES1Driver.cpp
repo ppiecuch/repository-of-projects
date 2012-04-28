@@ -1010,8 +1010,8 @@ namespace ogles1{
 		}else{
 			Logger->error(YON_LOG_FAILED_FORMAT,"Unbind GL contexts and surface");
 		}
-		eglDestroyContext(m_eglDisplay, m_eglContext);
-		eglDestroySurface(m_eglDisplay, m_eglSurface);
+		//eglDestroyContext(m_eglDisplay, m_eglContext);
+		//eglDestroySurface(m_eglDisplay, m_eglSurface);
 
 		//To release resources associated with use of EGL and client APIs on a display, call
 		//EGLBoolean eglTerminate(EGLDisplay dpy);

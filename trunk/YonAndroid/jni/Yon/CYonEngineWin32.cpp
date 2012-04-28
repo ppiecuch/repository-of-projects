@@ -41,6 +41,7 @@ namespace platform{
 		}
 	}
 
+	const c16* szWindowClass=TEXT("CYonPlatformWin32");
 	
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
@@ -105,9 +106,12 @@ namespace platform{
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
 		m_pTimer->drop();
-		if(m_bExternalWindow==false)
+		if(m_bExternalWindow==false){
 			DestroyWindow(m_hWnd);
-		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
+			Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
+		}
+		if(UnregisterClass(szWindowClass, GetModuleHandle(NULL)))
+			Logger->info(YON_LOG_SUCCEED_FORMAT,"UnregisterClass");
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineWin32");
 		if(video::DEFAULT_MATERIAL->drop()){
 			video::DEFAULT_MATERIAL=NULL;
@@ -116,7 +120,7 @@ namespace platform{
 			Logger=NULL;
 		}
 			
-		}
+	}
 
 		void CYonEngineWin32::onResize(u32 w,u32 h){
 			m_bResized=true;
@@ -311,7 +315,7 @@ namespace platform{
 		WNDCLASS wc;
 		RECT wRect;
 		HINSTANCE hInstance;
-		const c16* szWindowClass=TEXT("CYonPlatformWin32");
+		
 
 		wRect.left = 0L;
 		wRect.right = (long)params.windowSize.w;
