@@ -48,6 +48,9 @@ namespace scene{
 		f32 calcZ();
 
 		virtual bool drawImage(const c8* imageName, s32 srcX, s32 srcY, u32 srcWidth, u32 srcHeight, s32 destX, s32 destY, bool useAlpha,u32 color);
+
+		virtual bool drawImage(const c8* imageName, s32 x, s32 y, MASK_ACTHOR anchor);
+		virtual bool drawRegion(const c8* imageName, s32 x_src, s32 y_src, s32 width, s32 height, ENUM_TRANS transform, s32 x_dest, s32 y_dest, MASK_ACTHOR anchor);
 	};
 	IGraphicsAdapter* createGraphicsAdapter(video::IVideoDriver* driver,scene::ISceneManager* sceneMgr);
 }

@@ -7,6 +7,31 @@
 namespace yon{
 namespace scene{
 
+	//锚点对齐方式（掩码，与javax.microedition.lcdui.Graphics常量保持一致）
+	//三个水平定位和四个垂直定位，其中BASELINE用于文字定位（可能没用，暂留）。
+	//在指定绘制时，定位点是成对使用的，所以必须选择一个水平和一个垂直点。
+	enum MASK_ACTHOR{
+		MASK_ACTHOR_HCENTER = 1,
+		MASK_ACTHOR_VCENTER = 2,
+		MASK_ACTHOR_LEFT    = 4,
+		MASK_ACTHOR_RIGHT   = 8,
+		MASK_ACTHOR_TOP     = 16,
+		MASK_ACTHOR_BOTTOM  = 32,
+		MASK_ACTHOR_BASELINE= 64
+	};
+
+	//变换方式（与javax.microedition.lcdui.game.Sprite常量保持一致）
+	enum ENUM_TRANS{
+		ENUM_TRANS_MIRROR			= 2,
+		ENUM_TRANS_MIRROR_ROT180	= 1,
+		ENUM_TRANS_MIRROR_ROT270	= 4,
+		ENUM_TRANS_MIRROR_ROT90		= 7,
+		ENUM_TRANS_NONE				= 0,
+		ENUM_TRANS_ROT180			= 3,
+		ENUM_TRANS_ROT270			= 6,
+		ENUM_TRANS_ROT90			= 5
+	};
+
 	class IGraphicsAdapter : public virtual core::IReferencable{
 	public:
 		virtual ~IGraphicsAdapter(){}
@@ -17,6 +42,16 @@ namespace scene{
 
 		//绘制成功返回true，否则返回false
 		virtual bool drawImage(const c8* imageName, s32 srcX, s32 srcY, u32 srcWidth, u32 srcHeight, s32 destX, s32 destY,bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
+
+		//Draws the specified image by using the anchor point.
+		//anchor默认为TOP|LEFT
+		//绘制成功返回true，否则返回false
+		virtual bool drawImage(const c8* imageName, s32 x, s32 y, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP)) = 0;
+
+		//Copies a region of the specified source image to a location within the destination, possibly transforming (rotating and reflecting) the image data using the chosen transform function.
+		//transform默认为ENUM_TRANS_NONE，anchor默认为TOP|LEFT
+		//绘制成功返回true，否则返回false
+		virtual bool drawRegion(const c8* imageName, s32 x_src, s32 y_src, s32 width, s32 height, ENUM_TRANS transform=ENUM_TRANS_NONE, s32 x_dest=0, s32 y_dest=0, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP)) = 0;
 	};
 }
 }
