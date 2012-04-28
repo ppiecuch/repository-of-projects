@@ -71,12 +71,12 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	/*ISound* sound=audioDriver->getSound("bg.ogg");
+	ISound* sound=audioDriver->getSound("bg.ogg");
 	sound->setLooping(true);
 	sound->setGain(0.5f);
 	sound->play();
 	sound=audioDriver->getSound("helloworld.wav");
-	sound->play();*/
+	sound->play();
 
 	/*shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
@@ -125,7 +125,7 @@ void drawFrame(){
 
 	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
-	gfAdapter->beginBatch(0);
+	//gfAdapter->beginBatch(0);
 	//gfAdapter->drawImage("nav.png",0,0,128,128,0,0,true);
 	//gfAdapter->drawImage("nav.png",0,0,128,128,100,0,true);
 	
@@ -139,9 +139,9 @@ void drawFrame(){
 	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT180);
 	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT90);
 	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT90);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT270,100,100,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
+	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT270,100,100,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
 	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT270,100,100,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
-	gfAdapter->endBatch();
+	//gfAdapter->endBatch();
 	videoDriver->end();
 }
 void destroy(){
