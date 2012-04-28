@@ -43,6 +43,14 @@ namespace core{
 		return pathname.subString(index+1);
 	}
 
+	template <class T1, class T2>
+	inline void swap(T1& a, T2& b)
+	{
+		T1 c(a);
+		a = b;
+		b = c;
+	}
+
 	inline void yonSleep(s64 pMilliseconds)
 	{
 #ifdef YON_COMPILE_WITH_WIN32

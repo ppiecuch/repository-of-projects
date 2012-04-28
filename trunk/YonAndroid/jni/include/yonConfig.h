@@ -5,12 +5,12 @@
 
 #define YON_VERSION_MAJOR 0 //主版本号
 #define YON_VERSION_MINOR 1	//子版本号
-#define YON_VERSION_REVISION 0//修订版本号
+#define YON_VERSION_PATCH 0 //修订版本号
 
 //编译平台(Win32/Android/MacOSX)
 #ifdef WIN32
 #define YON_COMPILE_WITH_WIN32
-#elif defined(unix)
+#elif defined(ANDROID_NDK)
 #define YON_COMPILE_WITH_ANDROID
 #ifndef __CYGWIN__
 #define __CYGWIN__
@@ -22,6 +22,9 @@
 //视频模式(OpenGLES1/OpenGLES2)
 #define  YON_VIDEO_MODE_OGLES1
 //#define  YON_VIDEO_MODE_OGLES2
+
+//音频模式(OpenAL)
+#define YON_AUDIO_MODE_OAL
 
 //DLL导入导出
 #ifdef YON_EXPORTS

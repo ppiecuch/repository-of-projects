@@ -62,6 +62,27 @@ namespace scene{
 
 	}
 
+	IShap* CGeometryFactory::createXYRectangle3D(s32 x0,s32 y0,s32 x1,s32 y1,f32 z,f32 u0,f32 v0,f32 u1,f32 v1,f32 u2,f32 v2,f32 u3,f32 v3,const video::SColor& color) const{
+		Shap3D* shap=new Shap3D();
+
+		// Create indices
+		const static u8 u[6] = {0,  1,  3,  3,  1,  2};
+
+		shap->m_indices.reallocate(6);
+		for (u32 i=0; i<6; ++i)
+			shap->m_indices.push(u[i]);
+
+		//Create vertexs
+		shap->m_vertices.reallocate(4);
+
+		shap->m_vertices.push(SVertex((f32)x0,(f32)y0,z,u0,v0,color));
+		shap->m_vertices.push(SVertex((f32)x1,(f32)y0,z,u1,v1,color));
+		shap->m_vertices.push(SVertex((f32)x1,(f32)y1,z,u2,v2,color));
+		shap->m_vertices.push(SVertex((f32)x0,(f32)y1,z,u3,v3,color));
+
+		return shap;
+	}
+
 	IShap* CGeometryFactory::createXYRectangle2D2T(s32 x0,s32 y0,s32 x1,s32 y1,f32 u0,f32 v0,f32 u1,f32 v1,f32 s0,f32 t0,f32 s1,f32 t1,const video::SColor& color) const{
 		Shap3D2T* shap=new Shap3D2T();
 

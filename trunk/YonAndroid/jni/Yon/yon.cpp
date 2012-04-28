@@ -67,7 +67,7 @@ namespace yon{
 
 		YON_DEBUG_BREAK_IF(engine==NULL)
 
-		Logger->info(YON_LOG_SUCCEED_FORMAT,core::stringc("CreateEngine(%d,%d),version:%d.%d.%d",param.windowSize.w,param.windowSize.h,YON_VERSION_MAJOR,YON_VERSION_MINOR,YON_VERSION_REVISION).c_str());
+		Logger->info(YON_LOG_SUCCEED_FORMAT,core::stringc("CreateEngine(%d,%d),version:%d.%d.%d",param.windowSize.w,param.windowSize.h,YON_VERSION_MAJOR,YON_VERSION_MINOR,YON_VERSION_PATCH).c_str());
 
 		return engine;
 	}

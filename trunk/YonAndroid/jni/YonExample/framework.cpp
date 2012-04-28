@@ -12,7 +12,7 @@ ILogger* logger=NULL;
 
 IModel* cubeModel=NULL;
 IModel* planeModel=NULL;
-f32 factor=1.01f;
+f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -71,21 +71,21 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	ISound* sound=audioDriver->getSound("bg.ogg");
+	/*ISound* sound=audioDriver->getSound("bg.ogg");
 	sound->setLooping(true);
 	sound->setGain(0.5f);
 	sound->play();
 	sound=audioDriver->getSound("helloworld.wav");
-	sound->play();
+	sound->play();*/
 
-	shap=geometryFty->createCube(50,50,50);
+	/*shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
 	material=cubeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	cubeModel->setPosition(core::vector3df(100,100,0));
-	material->setTexture(0,videoDriver->getTexture("luminance.png"));
+	material->setTexture(0,videoDriver->getTexture("test.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -100,7 +100,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material->setTexture(0,videoDriver->getTexture("aura.png"));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
 	return true;
 }
@@ -108,27 +108,40 @@ void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
 void drawFrame(){
-	engine->run();
+
 	videoDriver->begin(true,COLOR_BLACK);
 
-	const core::vector3df crot=cubeModel->getRotation();
+	/*const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 	const core::vector3df psca=planeModel->getScale();
 	if(psca.x>4)
-		factor= 0.99f;
+		factor= 0.9f;
 	else if(psca.x<2)
-		factor=1.01f;
-	planeModel->setScale(psca*factor);
+		factor=1.1f;
+	planeModel->setScale(psca*factor);*/
 
 	sceneMgr->render(videoDriver);
 
 	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
-	/*gfAdapter->beginBatch(0);
-	gfAdapter->drawImage("nav.png",0,0,128,128,0,0,true);
-	gfAdapter->drawImage("nav.png",0,0,128,128,100,0,true);
-	gfAdapter->endBatch();*/
+	gfAdapter->beginBatch(0);
+	//gfAdapter->drawImage("nav.png",0,0,128,128,0,0,true);
+	//gfAdapter->drawImage("nav.png",0,0,128,128,100,0,true);
+	
+	//gfAdapter->drawImage("test.png",100,100,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
+	//gfAdapter->drawImage("firework.png",100,100);
+	//gfAdapter->drawImage("test.png",100,100,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
+
+	//gfAdapter->drawRegion("trans.png",0,0,128,64);
+	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT180);
+	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR);
+	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT180);
+	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT90);
+	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT90);
+	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT270,100,100,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
+	//gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT270,100,100,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
+	gfAdapter->endBatch();
 	videoDriver->end();
 }
 void destroy(){
