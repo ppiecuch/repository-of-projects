@@ -53,6 +53,11 @@ namespace yon{
 					dest.x=src.x-(f32)size.w/2;
 					dest.y=(f32)size.h/2-src.y;
 				}
+				virtual void convertPosCoordinate(const core::position2di& src,core::position2di& dest){
+					const core::dimension2du& size=getCurrentRenderTargetSize();
+					dest.x=src.x-size.w/2;
+					dest.y=size.h/2-src.y;
+				}
 
 				virtual IImage* createImageFromFile(const io::path& filename);
 				virtual IImage* createImageFromFile(io::IReadFile* file);
@@ -70,6 +75,7 @@ namespace yon{
 				virtual void drawUnit(scene::IUnit* unit);
 				virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,const core::recti& sourceRect, const core::recti* clipRect,video::SColor color, bool useAlphaChannelOfTexture);
 				virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,ENUM_PRIMITIVE_TYPE pType,scene::ENUM_VERTEX_TYPE vType);
+				virtual void draw3DLine(const core::vector3df& start,const core::vector3df& end, video::SColor color);
 
 				virtual bool checkGLError(const c8* file,s32 line);
  
@@ -127,7 +133,7 @@ namespace yon{
 
 				HDC m_hDc;
 				HWND m_hWnd;
-#endif//YON_COMPILE_WITH_WIN32
+#endif
 			};
 		}
 	}

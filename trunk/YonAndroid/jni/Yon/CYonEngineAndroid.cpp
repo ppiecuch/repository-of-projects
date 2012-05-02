@@ -76,12 +76,12 @@ namespace platform{
 		m_pTimer->start();
 	}
 	CYonEngineAndroid::~CYonEngineAndroid(){
-	m_pAudioDriver->drop();
-	m_pGraphicsAdapter->drop();
-	m_pVideoDriver->drop();
-	m_pSceneManager->drop();
-	m_pFileSystem->drop();
-	m_pTimer->drop();
+		m_pAudioDriver->drop();
+		m_pGraphicsAdapter->drop();
+		m_pVideoDriver->drop();
+		m_pSceneManager->drop();
+		m_pFileSystem->drop();
+		m_pTimer->drop();
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineAndroid");
 		if(video::DEFAULT_MATERIAL->drop()){
 			video::DEFAULT_MATERIAL=NULL;

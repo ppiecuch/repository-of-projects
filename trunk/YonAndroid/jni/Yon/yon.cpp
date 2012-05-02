@@ -19,6 +19,7 @@ namespace yon{
 
 		const position2df ORIGIN_POSITION2DF(0,0);
 		const position2di ORIGIN_POSITION2DI(0,0);
+
 		const position3df ORIGIN_POSITION3DF(0,0,0);
 		const position3di ORIGIN_POSITION3DI(0,0,0);
 

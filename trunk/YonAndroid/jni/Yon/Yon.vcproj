@@ -242,6 +242,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\line2d.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\matrix4.h"
 					>
 				</File>
@@ -1405,6 +1409,10 @@
 		</Filter>
 		<File
 			RelativePath="..\Android.mk"
+			>
+		</File>
+		<File
+			RelativePath="..\AndroidExample.mk"
 			>
 		</File>
 	</Files>

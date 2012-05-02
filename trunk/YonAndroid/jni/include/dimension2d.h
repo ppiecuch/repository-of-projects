@@ -3,10 +3,13 @@
 
 #include "yonTypes.h"
 #include "yonMath.h"
-#include "vector2d.h"
 
 namespace yon{
 	namespace core{
+
+		template <class T>
+		class vector2d;
+
 		template <class T>
 		class dimension2d{
 		public:
@@ -15,6 +18,7 @@ namespace yon{
 			dimension2d():w(0),h(0){}
 			dimension2d(const T& width,const T& height):w(width),h(height){}
 			dimension2d(const dimension2d<T>& d):w(d.w),h(d.h){}
+			dimension2d(const vector2d<T>& other); // Defined in vector2d.h
 
 			template <class U>
 			dimension2d<T>& operator=(const dimension2d<U>& other)

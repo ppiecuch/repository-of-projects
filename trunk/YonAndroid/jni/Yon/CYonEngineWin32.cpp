@@ -122,9 +122,9 @@ namespace platform{
 			
 	}
 
-		void CYonEngineWin32::onResize(u32 w,u32 h){
-			m_bResized=true;
-		}
+	void CYonEngineWin32::onResize(u32 w,u32 h){
+		m_bResized=true;
+	}
 
 	bool CYonEngineWin32::run(){
 		m_pTimer->tick();
