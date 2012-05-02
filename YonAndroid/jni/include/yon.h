@@ -22,6 +22,7 @@
 #include "dimension2d.h" 
 #include "dimension3d.h" 
 #include "exception.h" 
+#include "line2d.h"
 #include "plane.h"
 #include "position2d.h"
 #include "position3d.h"

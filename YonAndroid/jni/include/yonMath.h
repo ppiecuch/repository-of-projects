@@ -19,6 +19,7 @@ const f64 ROUNDING_ERROR_f64 = 0.00000001;
 
 //PI相关定义
 const f32 PI=3.1415926535897932384626433832795f;
+const f64 PI64= 3.1415926535897932384626433832795028841971693993751;
 const f32 PI2=PI+PI;
 const f32 RECIPROCAL_PI	= 1.0f/PI;
 const f32 HALF_PI	= PI*0.5f;
@@ -27,6 +28,7 @@ const f32 HALF_PI	= PI*0.5f;
 const f32 DEGTORAD = PI / 180.0f;
 //从弧度转为角度
 const f32 RADTODEG   = 180.0f / PI;
+const f64 RADTODEG64 = 180.0 / PI64;
 
 //! returns minimum of two values. Own implementation to get rid of the STL (VS6 problems)
 template<class T>
@@ -111,9 +113,21 @@ inline f32 squareroot(const f32 f)
 	return sqrtf(f);
 }
 
+inline f64 squareroot(const f64 f)
+{
+	return sqrt(f);
+}
 inline s32 squareroot(const s32 f)
 {
 	return static_cast<s32>(squareroot(static_cast<f32>(f)));
+}
+inline f32 reciprocal_squareroot(const f32 f)
+{
+	return 1.f/ sqrtf(f);
+}
+inline s32 reciprocal_squareroot(const s32 x)
+{
+	return static_cast<s32>(reciprocal_squareroot(static_cast<f32>(x)));
 }
 
 //注意0不是2的N次幂

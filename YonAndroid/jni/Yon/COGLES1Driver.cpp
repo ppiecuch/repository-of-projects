@@ -80,7 +80,7 @@ namespace ogles1{
 			m_FPSAssist.limit=true;
 			m_FPSAssist.frameUnit=param.fpsLimit/g;
 			m_FPSAssist.timeUnit=1000/g;
-			m_FPSAssist.timeCounter=16;
+			m_FPSAssist.timeCounter=10*param.fpsLimit;
 			m_FPSAssist.frameCounter=0;
 			m_FPSAssist.refreshedTime=timer->getRealTime();
 
@@ -503,6 +503,18 @@ namespace ogles1{
 
 		drawVertexPrimitiveList(vertices,4,indices,4,ENUM_PRIMITIVE_TYPE_TRIANGLE_STRIP,scene::ENUM_VERTEX_TYPE_3V1T1C);
 
+	}
+
+	void COGLES1Driver::draw3DLine(const core::vector3df& start,const core::vector3df& end, video::SColor color){
+		setRender3DMode();
+		checkMaterial();
+
+		//TODOÓÅ»¯
+		static u16 indices[] = {0,1};
+		scene::SVertex vertices[2];
+		vertices[0] = scene::SVertex(start.x,start.y,start.z,0,0,color);
+		vertices[1] = scene::SVertex(end.x,end.y,end.z,0,0,color);
+		drawVertexPrimitiveList(vertices, 2, indices, 2, ENUM_PRIMITIVE_TYPE_LINES, scene::ENUM_VERTEX_TYPE_3V1T1C);
 	}
 
 	bool COGLES1Driver::setTexture(u32 stage, const video::ITexture* texture){
@@ -1010,8 +1022,8 @@ namespace ogles1{
 		}else{
 			Logger->error(YON_LOG_FAILED_FORMAT,"Unbind GL contexts and surface");
 		}
-		//eglDestroyContext(m_eglDisplay, m_eglContext);
-		//eglDestroySurface(m_eglDisplay, m_eglSurface);
+		eglDestroyContext(m_eglDisplay, m_eglContext);
+		eglDestroySurface(m_eglDisplay, m_eglSurface);
 
 		//To release resources associated with use of EGL and client APIs on a display, call
 		//EGLBoolean eglTerminate(EGLDisplay dpy);

@@ -49,10 +49,16 @@ namespace yon{
 				return elements;
 			}
 
+			T& getLast()
+			{
+				YON_DEBUG_BREAK_IF(len==0) // access violation
+				return elements[len-1];
+			}
+
 			void push(const T& element){
 				insert(element, len);
 			}
-			T& pop(){
+			T pop(){
 				return erase(len-1);
 			}
 

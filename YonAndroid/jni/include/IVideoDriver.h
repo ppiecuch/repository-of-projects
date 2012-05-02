@@ -101,6 +101,8 @@ namespace yon{
 
 			//从2D的XY坐标系（以左上角为原点,，x向右，y向下）转为3DXYY坐标系（以屏幕中心为原点，x向右，y向上）
 			virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest) = 0;
+			virtual void convertPosCoordinate(const core::position2di& src,core::position2di& dest) = 0;
+
 
 			virtual IImage* createImageFromFile(const io::path& filename) = 0;
 			virtual YON_DEPRECATED IImage* createImageFromFile(io::IReadFile* file) =0;
@@ -122,6 +124,7 @@ namespace yon{
 				const void* indice, u32 indexCount,
 				ENUM_PRIMITIVE_TYPE pType=ENUM_PRIMITIVE_TYPE_TRIANGLES,
 				scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) =0;
+			virtual void draw3DLine(const core::vector3df& start,const core::vector3df& end, video::SColor color=video::COLOR_WHITE) =0;
 			virtual u32 getFPS() const = 0;
 		};
 	}
