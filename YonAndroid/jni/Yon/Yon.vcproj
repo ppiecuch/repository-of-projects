@@ -533,6 +533,10 @@
 					RelativePath="..\include\SVertex.h"
 					>
 				</File>
+				<File
+					RelativePath=".\teapot.h"
+					>
+				</File>
 				<Filter
 					Name="camera"
 					>

@@ -5,6 +5,7 @@
 //#include "CUnit2D.h"
 #include "yonMath.h"
 #include "SUnit.h"
+#include "teapot.h"
 
 #include "ILogger.h"
 
@@ -681,5 +682,23 @@ namespace scene{
 
 		return shap;
 	}
+
+	IShap* CGeometryFactory::createTeapot(f32 scale,const video::SColor& color) const{
+		Shap3D* shap=new Shap3D();
+
+		u32 count=teapotFacesCount*3;
+		shap->m_indices.reallocate(count);
+		for(u32 i=0; i<count; ++i)
+			shap->m_indices.push(teapotIndices[i]-1);
+
+		shap->m_vertices.reallocate(teapotVerticesCount);
+
+		//暂不支持纹理坐标
+		count=teapotVerticesCount*3;
+		for(u32 i=0; i<count; i+=3)
+			shap->m_vertices.push(SVertex(teapotVertices[i]*scale,teapotVertices[i+1]*scale,teapotVertices[i+2]*scale,0,0,color));
+
+		return shap;
+	}
 }//scene
-}//yon
+}//yon 

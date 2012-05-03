@@ -12,6 +12,7 @@ ILogger* logger=NULL;
 
 IModel* cubeModel=NULL;
 IModel* planeModel=NULL;
+IModel* teapotModel=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -90,6 +91,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
+	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	teapotModel=sceneMgr->addModel(entity);
+	teapotModel->setPosition(core::vector3df(50,-50,0));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
 	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
@@ -114,6 +124,9 @@ void drawFrame(){
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
+	const core::vector3df trot=teapotModel->getRotation();
+	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
+
 	const core::vector3df psca=planeModel->getScale();
 	if(psca.x>4)
 		factor= 0.9f;
@@ -128,7 +141,7 @@ void drawFrame(){
 	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
 	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
 
-	gfAdapter->beginBatch(0);
+	/*gfAdapter->beginBatch(0);
 	gfAdapter->drawImage("nav.png",0,0,128,128,0,0,true);
 	//gfAdapter->drawImage("nav.png",0,0,128,128,100,0,true);
 	
@@ -144,7 +157,8 @@ void drawFrame(){
 	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT90,100,320);
 	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT270,200,320,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
 	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT270,300,320,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
-	gfAdapter->endBatch();
+	gfAdapter->endBatch();*/
+
 	videoDriver->end();
 }
 void destroy(){
