@@ -1,1 +1,5 @@
 http://www.eoeandroid.com/forum.php?mod=viewthread&tid=67201
+
+必须确认obj文件的f 参数下必须有
+f 1137/1/1 1212/2/2 1115/3/3
+对应顶点座标、材质座标、法向量座标
