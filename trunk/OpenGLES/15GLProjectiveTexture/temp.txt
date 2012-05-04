@@ -1,0 +1,233 @@
+#include <GL/glew.h>
+#include <GL/glut.h>
+#include <windows.h>
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glu32.lib")
+#pragma  comment(lib, "glew32.lib")
+
+#include "Texture.h"
+#include "ProjectiveTexture.h"
+#include "matrix4x4.h"
+
+#pragma comment(lib, "Texture.lib")
+
+#include <crtdbg.h>
+#include <typeinfo>
+inline void EnableMemLeakCheck()
+{
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+}
+
+
+struct VertexData
+{
+	float u,v;
+	float r,g,b,a;
+	float nx,ny,nz;
+	float x,y,z;
+};
+
+VertexData cube[] = 
+{
+	{1.0,0.0,	1.0,1.0,1.0,1.0,	0.0,0.0,1.0,	-0.5,-0.5,0.5},
+	{0.0,0.0,	1.0,1.0,1.0,1.0,	0.0,0.0,1.0,	0.5,-0.5,0.5},
+	{0.0,1.0,	1.0,1.0,1.0,1.0,	0.0,0.0,1.0,	0.5,0.5,0.5},
+	{1.0,1.0,	1.0,1.0,1.0,1.0,	0.0,0.0,1.0,	-0.5,0.5,0.5},
+
+	{1.0,0.0,	1.0,1.0,1.0,1.0,	1.0,0.0,0.0,	0.5,-0.5,0.5},
+	{0.0,0.0,	1.0,1.0,1.0,1.0,	1.0,0.0,0.0,	0.5,-0.5,-0.5},
+	{0.0,1.0,	1.0,1.0,1.0,1.0,	1.0,0.0,0.0,	0.5,0.5,-0.5},
+	{1.0,1.0,	1.0,1.0,1.0,1.0,	1.0,0.0,0.0,	0.5,0.5,0.5},
+
+	{0.0,0.0,	1.0,1.0,1.0,1.0,	0.0,0.0,-1.0,	-0.5,-0.5,-0.5},
+	{0.0,1.0,	1.0,1.0,1.0,1.0,	0.0,0.0,-1.0,	-0.5,0.5,-0.5},
+	{1.0,1.0,	1.0,1.0,1.0,1.0,	0.0,0.0,-1.0,	0.5,0.5,-0.5},
+	{1.0,0.0,	1.0,1.0,1.0,1.0,	0.0,0.0,-1.0,	0.5,-0.5,-0.5},
+
+	{1.0,0.0,	1.0,1.0,1.0,1.0,	-1.0,0.0,0.0,	-0.5,-0.5,-0.5},
+	{0.0,0.0,	1.0,1.0,1.0,1.0,	-1.0,0.0,0.0,	-0.5,-0.5,0.5},
+	{0.0,1.0,	1.0,1.0,1.0,1.0,	-1.0,0.0,0.0,	-0.5,0.5,0.5},
+	{1.0,1.0,	1.0,1.0,1.0,1.0,	-1.0,0.0,0.0,	-0.5,0.5,-0.5},
+
+	{0.0,1.0,	1.0,1.0,1.0,1.0,	0.0,-1.0,0.0,	-0.5,-0.5,-0.5},
+	{1.0,1.0,	1.0,1.0,1.0,1.0,	0.0,-1.0,0.0,	0.5,-0.5,-0.5},
+	{1.0,0.0,	1.0,1.0,1.0,1.0,	0.0,-1.0,0.0,	0.5,-0.5,0.5},
+	{0.0,0.0,	1.0,1.0,1.0,1.0,	0.0,-1.0,0.0,	-0.5,-0.5,0.5},
+
+	{0.0,0.0,	1.0,1.0,1.0,1.0,	0.0,1.0,0.0,	-0.5,0.5,-0.5},
+	{0.0,1.0,	1.0,1.0,1.0,1.0,	0.0,1.0,0.0,	-0.5,0.5,0.5},
+	{1.0,1.0,	1.0,1.0,1.0,1.0,	0.0,1.0,0.0,	0.5,0.5,0.5},
+	{1.0,0.0,	1.0,1.0,1.0,1.0,	0.0,1.0,0.0,	0.5,0.5,-0.5},
+};
+
+PFNGLACTIVETEXTUREARBPROC   glActiveTextureARB = NULL;
+CTexture* texture=NULL;
+CProjectiveTexture* pTexture=NULL;
+
+#if 0
+void BeginRender()
+{
+	static float planeS[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
+	static float planeT[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
+	static float planeR[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
+	static float planeQ[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	glBindTexture(GL_TEXTURE_2D,textureID);
+	glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
+	glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
+	glTexGeni(GL_R,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
+	glTexGeni(GL_Q,GL_TEXTURE_GEN_MODE,GL_EYE_LINEAR);
+
+	glTexGenfv(GL_S,GL_EYE_PLANE,planeS);
+	glTexGenfv(GL_T,GL_EYE_PLANE,planeT);
+	glTexGenfv(GL_R,GL_EYE_PLANE,planeR);
+	glTexGenfv(GL_Q,GL_EYE_PLANE,planeQ);
+
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+	glEnable(GL_TEXTURE_GEN_R);
+	glEnable(GL_TEXTURE_GEN_Q);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadMatrixf(matrix);                               // load our texture matrix
+	//渲染管线就像流水线，顶点是我们的操作对象，何时把相关的操作传入渲染管线，
+	//何时把不必要的操作卸下是我们该考虑的。物体顶点坐标应该是在模型视图矩阵
+	//（GL_MODELVIEW）转换到世界坐标，然后进入纹理矩阵模式下求出纹理坐标
+	glMatrixMode(GL_MODELVIEW);             
+}
+#endif
+
+
+GLdouble theta = 0;//旋转角度
+Matrix4x4f ObjectTransform, TextureTransform;
+float MVmatrix[16];
+
+void display(void) { 
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	glPushMatrix();
+	glLoadIdentity();
+	glGetFloatv(GL_MODELVIEW_MATRIX,MVmatrix);
+	TextureTransform.setMatrix(MVmatrix);
+	glPopMatrix();
+	pTexture->textureProjection(TextureTransform);
+
+	glLoadIdentity();
+	gluLookAt(0.0, 0.0, 0.5, 0.0, 0.0, -3.0, 0.0, 1.0, 0.0);
+	glRotatef(theta, 0, 1, 0);
+	glInterleavedArrays(GL_T2F_C4F_N3F_V3F,0,cube);
+	glDrawArrays(GL_QUADS,0,24);
+	theta +=0.02;
+	if(theta >= 360)
+		theta = 0;
+	glutSwapBuffers();
+}
+#include <stdio.h>
+/** 检查是否支持扩展 */
+bool isExtensionSupported(const char* string)
+{
+	char *extension;			/**< 指向扩展字符串的指针 */
+	char *end;				    /**< 最后一个字符指针 */
+	int idx;
+
+	extension = (char*)glGetString(GL_EXTENSIONS);
+	if (extension == NULL)
+		return false;	
+
+	/** 得到最后一个字符 */
+	end = extension + strlen(extension);	
+
+	/** 循环查找字符串string */
+	while (extension < end)
+	{
+		/** 找到空格前的一个字符串 */
+		idx = strcspn(extension, " ");
+
+		/** 检查是否找到字符串string */
+		if ( (strlen(string) == idx) && (strncmp(string, extension, idx) == 0))
+		{
+			return true;
+		}
+
+		/** 当前串不是string,继续下一个字符串 */
+		extension += (idx + 1);
+	}
+	/** 没有找到,则返回false */
+	return false;   
+}
+void init()
+{
+	/** 检查是否支持扩展 */
+	if (isExtensionSupported("GL_ARB_multitexture"))
+	{
+
+		/** 获得函数指针地址 */
+		glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC) wglGetProcAddress("glActiveTextureARB");
+		printf("GL_ARB_multitexture success\n");
+	}
+
+	glShadeModel(GL_SMOOTH);
+	glClearColor(0.1, 0.2, 0.3, 1); 
+	glViewport(0,0,640,480);
+
+	glEnable(GL_DEPTH_TEST);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0f,(double)640/(double)480,0.1f,100.0f);
+	glMatrixMode(GL_MODELVIEW);
+
+	glActiveTextureARB(GL_TEXTURE0);
+	glEnable(GL_TEXTURE_2D);
+	texture=new CTexture("D:\\Development\\Workspace\\VS2008\\OpenGLES\\15GLProjectiveTexture\\wood.png");
+	texture->bind();
+
+	glActiveTextureARB(GL_TEXTURE1);
+	glEnable(GL_TEXTURE_2D);
+	pTexture=new CProjectiveTexture("D:\\Development\\Workspace\\VS2008\\OpenGLES\\15GLProjectiveTexture\\test.png");
+	pTexture->bind();
+}
+void resize(int width,int height)
+{
+	if(texture)
+		delete texture;
+	if(pTexture)
+		delete pTexture;
+}
+void idle()
+{
+	//glutPostRedisplay 标记当前窗口需要重新绘制。通过glutMainLoop下一次循环时，窗口显示将被回调以重新显示窗口的正常面板。
+	//多次调用glutPostRedisplay，在下一个显示回调只产生单一的重新显示回调。 
+	glutPostRedisplay();
+}
+void key(unsigned char key, int x, int y)
+{
+}
+void mouse(int btn, int state, int x, int y)
+{
+}
+void motion(int x, int y)
+{
+}
+
+int main(int argc, char **argv)
+{
+	EnableMemLeakCheck();
+
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
+	glutInitWindowPosition(100,100); 
+	glutInitWindowSize(640,480); 
+	(void) glutCreateWindow("GL ProjectiveTexture");
+
+	init();
+
+	glutDisplayFunc(display);
+	glutIdleFunc(idle);
+	glutReshapeFunc(resize);
+	glutKeyboardFunc(key);
+	glutMouseFunc(mouse);
+	glutMotionFunc(motion);
+	glutMainLoop();
+	return 0;             /* ANSI C requires main to return int. */
+}
