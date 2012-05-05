@@ -167,6 +167,18 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\glext.h"
+			>
+		</File>
+		<File
+			RelativePath=".\glInfo.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\glInfo.h"
+			>
+		</File>
+		<File
 			RelativePath=".\main.cpp"
 			>
 		</File>

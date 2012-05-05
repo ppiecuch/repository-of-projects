@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Utility"
-	ProjectGUID="{EB8C1093-ACCD-45E8-BCBD-33BC6EF6A778}"
-	RootNamespace="Utility"
+	Name="FBO"
+	ProjectGUID="{3C680B75-92A2-4CB4-920E-8346C069735C}"
+	RootNamespace="FBO"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -20,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)bin"
 			IntermediateDirectory="$(SolutionDir)obj\$(ProjectName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;UTILITY_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -62,7 +62,7 @@
 				Name="VCLinkerTool"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -91,7 +91,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -114,7 +114,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;UTILITY_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -134,7 +134,7 @@
 				Name="VCLinkerTool"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -166,31 +166,31 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\fish.cpp"
+			RelativePath=".\glext.h"
 			>
 		</File>
 		<File
-			RelativePath=".\FPSCounter.cpp"
+			RelativePath=".\glInfo.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\FPSCounter.h"
+			RelativePath=".\glInfo.h"
 			>
 		</File>
 		<File
-			RelativePath=".\global.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\global.h"
-			>
-		</File>
-		<File
-			RelativePath=".\macro.h"
+			RelativePath=".\main.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\teapot.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Timer.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Timer.h"
 			>
 		</File>
 	</Files>
