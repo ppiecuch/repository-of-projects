@@ -315,6 +315,34 @@ namespace yon{
 
 				return -1;
 			}
+
+			template <class B>
+			s32 find(const B* const str, const u32 start = 0) const
+			{
+				if (str && *str)
+				{
+					u32 index = 0;
+
+					while (str[index])
+						++index;
+
+					if (index > len-1)
+						return -1;
+
+					for (u32 i=start; i<len-index; ++i)
+					{
+						u32 j=0;
+
+						while(str[j] && elements[i+j] == str[j])
+							++j;
+
+						if (!str[j])
+							return i;
+					}
+				}
+
+				return -1;
+			}
 			void replace(T toReplace, T replaceWith)
 			{
 				for (u32 i=0; i<len; ++i)

@@ -14,11 +14,12 @@ using namespace yon::core;
 class stringTestCase : public CPPUNIT_NS::TestFixture
 {
 	CPPUNIT_TEST_SUITE( stringTestCase );
-	CPPUNIT_TEST( makeLower );
+	/*CPPUNIT_TEST( makeLower );
 	CPPUNIT_TEST( makeUpper );
 	CPPUNIT_TEST( findLast );
 	CPPUNIT_TEST( equalsSubstringIgnoreCase );
-	CPPUNIT_TEST( subString );
+	CPPUNIT_TEST( subString );*/
+	CPPUNIT_TEST( find );
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -30,6 +31,7 @@ protected:
 	void findLast();
 	void equalsSubstringIgnoreCase();
 	void subString();
+	void find();
 };
 
 #endif

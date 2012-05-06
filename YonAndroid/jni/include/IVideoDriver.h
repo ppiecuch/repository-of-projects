@@ -66,6 +66,11 @@ namespace yon{
 			ENUM_INDEX_TYPE_COUNT = 2
 		};
 
+		enum ENUM_VIDEO_FEATURE{
+			ENUM_VIDEO_FEATURE_FBO = 0,
+			ENUM_VIDEO_FEATURE_COUNT
+		};
+
 		//视频驱动器接口
 		class IVideoDriver:public virtual core::IReferencable{
 		protected:
@@ -99,15 +104,29 @@ namespace yon{
 			virtual const core::dimension2du& getCurrentRenderTargetSize() const = 0;
 			virtual void onResize(const core::dimension2du& size) = 0;
 
+
+			//是否支持feature特性
+			virtual bool queryFeature(ENUM_VIDEO_FEATURE feature) const =0;
+
 			//从2D的XY坐标系（以左上角为原点,，x向右，y向下）转为3DXYY坐标系（以屏幕中心为原点，x向右，y向上）
 			virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest) = 0;
 			virtual void convertPosCoordinate(const core::position2di& src,core::position2di& dest) = 0;
+
+			//添加一张用于渲染缓冲的纹理,size必须是2的N次幂,并且长度都不可超过后缓冲区的大小
+			virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,
+				const io::path& name = "rtt", const video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G5B5A1) =0;
+			//参数texture:必须是由addRenderTargetTexture生成的texture
+			//参数color:render target的背景色
+			virtual bool setRenderTarget(video::ITexture* texture,
+				bool clearBackBuffer=true, bool clearZBuffer=true,video::SColor color=video::COLOR_BLACK) =0;
 
 
 			virtual IImage* createImageFromFile(const io::path& filename) = 0;
 			virtual YON_DEPRECATED IImage* createImageFromFile(io::IReadFile* file) =0;
 			virtual IImage* createImageFromFile(io::IReadStream* file) =0;
 
+			virtual ITexture* addTexture(const core::dimension2du& size,
+				const io::path& name, ENUM_COLOR_FORMAT format = ENUM_COLOR_FORMAT_R8G8B8A8) = 0;
 			virtual ITexture* getTexture(const io::path& filename) = 0;
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;
 

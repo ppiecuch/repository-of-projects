@@ -38,6 +38,23 @@ namespace video{
 			return 0;
 		}
 	}
+	//! test if the color format is only viable for RenderTarget textures
+	/** Since we don't have support for e.g. floating point IImage formats
+	one should test if the color format can be used for arbitrary usage, or
+	if it is restricted to RTTs. */
+	static bool isRenderTargetOnlyFormat(const ENUM_COLOR_FORMAT format)
+	{
+		switch(format)
+		{
+		case ENUM_COLOR_FORMAT_R5G5B5A1:
+		case ENUM_COLOR_FORMAT_R5G6B5:
+		case ENUM_COLOR_FORMAT_R8G8B8:
+		case ENUM_COLOR_FORMAT_R8G8B8A8:
+			return false;
+		default:
+			return true;
+		}
+	}
 	class IImage : public virtual core::IReferencable{
 	public:
 		virtual const core::dimension2du& getDimension() const = 0;

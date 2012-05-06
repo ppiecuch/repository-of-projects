@@ -681,6 +681,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\COGLES1ExtensionHandler.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\COGLES1ExtensionHandler.h"
+						>
+					</File>
+					<File
 						RelativePath=".\COGLES1HardwareBuffer.cpp"
 						>
 					</File>

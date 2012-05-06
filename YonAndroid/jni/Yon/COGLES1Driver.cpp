@@ -43,7 +43,7 @@ namespace ogles1{
 #ifdef YON_COMPILE_WITH_WIN32
 		m_hDc(NULL),m_hWnd(param.hWnd),
 #endif
-		m_windowSize(param.windowSize),IVideoDriver(fs,timer){
+		m_windowSize(param.windowSize),IVideoDriver(fs,timer),COGLES1ExtensionHandler(){
 
 		m_imageLoaders.push(createImageLoaderPNG());
 
@@ -56,6 +56,8 @@ namespace ogles1{
 #ifdef YON_COMPILE_WITH_WIN32
 		initEGL(m_hWnd);
 #endif//YON_COMPILE_WITH_WIN32
+
+		initExtensionHandler();
 
 		u32 i;
 		onResize(param.windowSize);
@@ -592,6 +594,32 @@ namespace ogles1{
 		return m_matrix[transform];
 	}
 
+	ITexture* COGLES1Driver::addRenderTargetTexture(const core::dimension2du& size,const io::path& name, const video::ENUM_COLOR_FORMAT format){
+		//disable mip-mapping
+		//const bool generateMipLevels = getTextureCreationFlag(ETCF_CREATE_MIP_MAPS);
+		//setTextureCreationFlag(ETCF_CREATE_MIP_MAPS, false);
+
+		video::ITexture* rtt = 0;
+		return rtt;
+
+		if(queryFeature(ENUM_VIDEO_FEATURE_FBO))
+		{
+			//TODO
+		}
+		else
+		{
+			core::dimension2du destSize(core::min_(size.w,m_windowSize.w), core::min_(size.h,m_windowSize.h));
+			//but why?
+			//destSize = destSize.getOptimalSize((size==size.getOptimalSize()), false, false);
+			destSize = destSize.getOptimalSize(true, false, false);
+			rtt = addTexture(destSize, name, video::ENUM_COLOR_FORMAT_R8G8B8A8);
+		}
+
+	}
+	bool COGLES1Driver::setRenderTarget(video::ITexture* texture,bool clearBackBuffer, bool clearZBuffer,video::SColor color){
+		return false;
+	}
+
 	IImage* COGLES1Driver::createImageFromFile(const io::path& filename){
 		//io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
 		io::IReadStream* file = m_pFileSystem->createAndOpenReadFileStream(filename);
@@ -680,6 +708,30 @@ namespace ogles1{
 			}
 		}
 		return NULL;
+	}
+
+	ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format){
+		if(IImage::isRenderTargetOnlyFormat(format))
+		{
+			Logger->warn("Could not create ITexture, format only supported for render target textures.\n");
+			return NULL;
+		}
+
+		if ( 0 == name.size () )
+		{
+			Logger->warn("Could not create ITexture with name is empty.\n");
+			return NULL;
+		}
+
+		IImage* image = new CImage(format, size);
+		ITexture* t = createDeviceDependentTexture(image, name);
+		image->drop();
+		addTexture(t);
+
+		if (t)
+			t->drop();
+
+		return t;
 	}
 
 	void COGLES1Driver::addTexture(video::ITexture* texture)

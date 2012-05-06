@@ -61,6 +61,63 @@ namespace yon{
 			T getArea() const{
 				return w*h;
 			}
+
+			//! Get the optimal size according to some properties
+			/** This is a function often used for texture dimension
+			calculations. The function returns the next larger or
+			smaller dimension which is a power-of-two dimension
+			(2^n,2^m) and/or square (Width=Height).
+			\param requirePowerOfTwo Forces the result to use only
+			powers of two as values.
+			\param requireSquare Makes width==height in the result
+			\param larger Choose whether the result is larger or
+			smaller than the current dimension. If one dimension
+			need not be changed it is kept with any value of larger.
+			\param maxValue Maximum texturesize. if value > 0 size is
+			clamped to maxValue
+			\return The optimal dimension under the given
+			constraints. */
+			dimension2d<T> getOptimalSize(
+					bool requirePowerOfTwo=true,
+					bool requireSquare=false,
+					bool larger=true,
+					u32 maxValue = 0) const
+			{
+				u32 i=1;
+				u32 j=1;
+				if (requirePowerOfTwo)
+				{
+					while (i<(u32)w)
+						i<<=1;
+					if (!larger && i!=1 && i!=(u32)w)
+						i>>=1;
+					while (j<(u32)h)
+						j<<=1;
+					if (!larger && j!=1 && j!=(u32)h)
+						j>>=1;
+				}
+				else
+				{
+					i=(u32)w;
+					j=(u32)h;
+				}
+
+				if (requireSquare)
+				{
+					if ((larger && (i>j)) || (!larger && (i<j)))
+						j=i;
+					else
+						i=j;
+				}
+
+				if ( maxValue > 0 && i > maxValue)
+					i = maxValue;
+
+				if ( maxValue > 0 && j > maxValue)
+					j = maxValue;
+
+				return dimension2d<T>((T)i,(T)j);
+			}
 		};
 		typedef dimension2d<f32> dimension2df;
 		typedef dimension2d<u32> dimension2du;

@@ -2,11 +2,22 @@
 #include "stringTestCase.h"
 #include "yonUtil.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
 
 void stringTestCase::setUp()
 {
 }
+void stringTestCase::find(){
+	core::stringc str1("Make In China");
+	CPPUNIT_ASSERT(str1.find("Make")==0);
+
+	core::stringc str2("Make In China");
+	CPPUNIT_ASSERT(str2.find("In")==5);
+
+	core::stringc str3("Make In China");
+	CPPUNIT_ASSERT(str3.find("China ")==-1);
+}
+
 void stringTestCase::subString(){
 	core::stringc str1("Make");
 	CPPUNIT_ASSERT( str1.subString(0)=="Make" );

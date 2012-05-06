@@ -12,6 +12,7 @@
 #include "CFPSCounter.h"
 #include "IUnit.h"
 #include "IHardwareBuffer.h"
+#include "COGLES1ExtensionHandler.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 //加载OpenGL ES1需要的库及头文件
@@ -36,7 +37,7 @@ namespace yon{
 				u32 refreshedTime;
 			};
 			
-			class COGLES1Driver:public IVideoDriver{
+			class COGLES1Driver:public IVideoDriver,COGLES1ExtensionHandler{
 			public:
 
 				COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty);
@@ -47,6 +48,10 @@ namespace yon{
 				virtual void setViewPort(const core::recti& r);
 				virtual const core::dimension2du& getCurrentRenderTargetSize() const;
 				virtual void onResize(const core::dimension2du& size);
+
+				virtual bool queryFeature(ENUM_VIDEO_FEATURE feature) const{
+					return isFeatureAvailable(feature);
+				}
 
 				virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest){
 					const core::dimension2du& size=getCurrentRenderTargetSize();
@@ -59,10 +64,15 @@ namespace yon{
 					dest.y=size.h/2-src.y;
 				}
 
+				virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name, const video::ENUM_COLOR_FORMAT format);
+				virtual bool setRenderTarget(video::ITexture* texture,bool clearBackBuffer, bool clearZBuffer,video::SColor color);
+
+
 				virtual IImage* createImageFromFile(const io::path& filename);
 				virtual IImage* createImageFromFile(io::IReadFile* file);
 				virtual IImage* createImageFromFile(io::IReadStream* file);
 
+				virtual ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format);
 				virtual bool setTexture(u32 stage, const video::ITexture* texture);
 				virtual ITexture* getTexture(const io::path& filename);
 				virtual video::ITexture* findTexture(const io::path& filename);
