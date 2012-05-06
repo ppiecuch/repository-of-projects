@@ -150,7 +150,7 @@ inline u32 countBits(const u32 a)
 }
 
 //获取a和b的最大公约数
-inline s32 gcd(u32 a,u32 b){  
+inline s32 gcd(s32 a,s32 b){  
 	s32 k=1,t;  
 	while(~a&1 && ~b&1)k<<=1,a>>=1,b>>=1;  
 	t=(a&1)?-b:a>>1;  

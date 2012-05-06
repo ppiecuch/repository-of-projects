@@ -1,7 +1,7 @@
 #include "vector2dTestCase.h"
 #include <Windows.h>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( vector2dTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( vector2dTestCase );
 
 void vector2dTestCase::setUp()
 {

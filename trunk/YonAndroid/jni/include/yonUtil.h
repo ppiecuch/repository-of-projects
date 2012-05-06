@@ -51,7 +51,7 @@ namespace core{
 		b = c;
 	}
 
-	inline void yonSleep(s64 pMilliseconds)
+	inline void yonSleep(s32 pMilliseconds)
 	{
 #ifdef YON_COMPILE_WITH_WIN32
 		Sleep(pMilliseconds);
