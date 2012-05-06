@@ -13,7 +13,7 @@
 //
 // Copyright (c) 2005 Song Ho Ahn
 ///////////////////////////////////////////////////////////////////////////////
-
+#include <windows.h>
 #include <GL/gl.h>
 #include <iostream>
 #include <sstream>
