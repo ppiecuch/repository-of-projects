@@ -17,6 +17,7 @@ namespace ogles1{
 
 		GLuint m_textureId;
 		
+		bool m_bIsRenderTarget;
 
 		virtual void uploadTexture();
 	public:
@@ -35,7 +36,10 @@ namespace ogles1{
 			return m_pImage->getColorFormat();
 		}
 
-		
+		virtual bool isRenderTarget() const{return m_bIsRenderTarget;}
+		virtual void setIsRenderTarget(bool on){m_bIsRenderTarget=on;}
+		virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color);
+		virtual void endRTT(bool willRenderFrameBuffer);
 	};
 }//ogles1
 }//video

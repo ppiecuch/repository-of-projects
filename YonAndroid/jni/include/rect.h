@@ -17,6 +17,13 @@ namespace yon{
 			rect(T x,T y,T w,T h):x(x),y(y),w(w),h(h){}
 			T x,y,w,h;*/
 
+
+			//0--------->x
+			//|
+			//|
+			//|
+			//\/y
+
 			rect() : topLeft(0,0), bottomRight(0,0) {}
 			rect(T x, T y, T x2, T y2)
 				: topLeft(x,y), bottomRight(x2,y2) {}

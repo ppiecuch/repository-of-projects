@@ -5,6 +5,7 @@
 #include "path.h"
 #include "dimension2d.h"
 #include "IImage.h"
+#include "SColor.h"
 
 namespace yon{
 namespace video{
@@ -19,6 +20,12 @@ namespace video{
 		const io::path& getPath() const { return m_namePath.getPath(); }
 
 		virtual ENUM_COLOR_FORMAT getColorFormat() const = 0;
+
+		//RTT相关
+		virtual bool isRenderTarget() const = 0;
+		virtual void beginRTT(bool clearBackBuffer=true, bool clearZBuffer=true,video::SColor color=video::COLOR_BLACK) = 0;
+		//参数renderFrameBuffer：是否接下来的操作重新指向帧缓冲
+		virtual void endRTT(bool willRenderFrameBuffer) = 0;
 	};
 }
 }

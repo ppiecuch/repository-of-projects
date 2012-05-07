@@ -16,6 +16,9 @@ namespace yon{
 
 
 		void CModel::render(video::IVideoDriver* driver){
+			if(m_bVisible==false)
+				return;
+
 			core::list<animator::IAnimator*>::Iterator it = m_animators.begin();
 			for (; it != m_animators.end(); ++it)
 				(*it)->animateNode(this,0);
