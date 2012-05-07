@@ -1,0 +1,109 @@
+2.2以后SDK提供TrafficStats类可以获取这些，但2.2以前没有这个类
+
+TrafficStats类中方法有：
+
+static long  getMobileRxBytes()  //获取通过Mobile连接收到的字节总数，这里Android123提示大家不包含WiFi
+   static long  getMobileRxPackets()  //获取Mobile连接收到的数据包总数
+   static long  getMobileTxBytes()  //Mobile发送的总字节数
+   static long  getMobileTxPackets()  //Mobile发送的总数据包数
+   static long  getTotalRxBytes()  //获取总的接受字节数，包含Mobile和WiFi等
+   static long  getTotalRxPackets()  //总的接受数据包数，包含Mobile和WiFi等
+   static long  getTotalTxBytes()  //总的发送字节数，包含Mobile和WiFi等
+   static long  getTotalTxPackets()  //发送的总数据包数，包含Mobile和WiFi等
+
+查看TrafficStats.java源码：
+
+public class TrafficStats {
+
+ public static native long getMobileTxPackets();
+
+ public static native long getMobileRxPackets();
+
+ public static native long getMobileRxBytes();
+
+.....
+
+发现也是通过调用本地c/c++方法实现的流量统计。
+
+再查看android_net_TrafficStats.cpp源码：
+
+static jlong getMobileTxBytes(JNIEnv* env, jobject clazz) {
+
+    return tryBoth(
+
+            "/sys/class/net/rmnet0/statistics/tx_bytes",
+
+            "/sys/class/net/ppp0/statistics/tx_bytes");
+
+}
+
+static jlong getUidRxBytes(JNIEnv* env, jobject clazz, jint uid) {
+
+    char filename[80];
+
+    sprintf(filename, "/proc/uid_stat/%d/tcp_rcv", uid);
+
+    return readNumber(filename);
+
+}
+
+到这就可以知道，Trafficstats这个类也是通过c/c++读取文件实现的，那么在2.2以前没有这个类，我们也可以实现流量统计，那就是
+
+直接读取这些流量统计文件。
+
+1》首先查看有哪些网络设备，/sys/class/net/这个目录下就是当前设备的所有网络设备，不同手机可能有所不同，以中兴v8880为例
+
+lo
+
+dummy0
+
+rmnet0
+
+rmnet1
+
+rmnet2
+
+tunl0
+
+gre0
+
+sit0
+
+ip6tnl0
+
+usb0
+
+wlan0
+
+lo指的是local,rmnet0指3G，GPRS网络等，wlan0指wifi2》获取3G，GPRS等流量统计数据，只需读取相应文件统计数据即可发送包：/sys/class/net/rmnet0/statistics/tx_packets接收包：/sys/class/net/rmnet0/statistics/rx_packets发送字节：/sys/class/net/rmnet0/statistics/tx_bytes接收字节：/sys/class/net/rmnet0/statistics/rx_bytes
+其实/sys/class/net/rmnet0/statistics这个目录下还有很数据可以获取，比如错误包数，丢包数等。
+
+3》获取总的流量数据，同理
+
+获取/sys/class/net目录下除lo设备以外的所有目录下的流量发送和接收数据即可
+
+4》统计某个应用程序的上传或下载流量
+
+通过TrafficStats源码可以看出也是读取相应文件中的流量统计数据，那文件在哪里呢？
+
+其实就是下面两个文件：
+
+/proc/uid_stat/应用UID号/tcp_rcv //该应用下载流量字节
+
+/proc/uid_stat/应用UID号/tcp_snd//该应用上传流量字节
+
+这个应用UID号可以两种方法获取：
+
+1） int uid = Process.myUid(); 可以获取当前应用的UID
+
+2）PackageInfo p = new PackageInfo();
+
+      int uid =  p.applicationInfo.uid; 这样也可以获取
+
+根据自己需要获取！
+
+所以在2.2系统之前就可以使用这种方法实现总的流量或者当个程序的流量监控。
+
+呵呵...小的也是新手，如有错误，请指正，谢谢....
+
+http://hi.baidu.com/123330524/blog/item/f2b4342418601d7f34a80fd8.html

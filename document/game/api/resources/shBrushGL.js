@@ -33,6 +33,8 @@
 			'glBufferSubData ' +
 			'glCompressedTexImage2D ' +
 			'glCompressedTexSubImage2D ' +
+			'glCopyTexImage2D ' +
+			'glCopyTexSubImage2D ' +
 			'glDeleteBuffers ' +
 			'glDisable ' +
 			'glDrawElements ' +
@@ -48,6 +50,7 @@
 			'glTexSubImage2D '
 			;
 		var constants =	
+			'GL_ALPHA ' +
 			'GL_ARRAY_BUFFER ' +
 			'GL_ARRAY_BUFFER_BINDING ' +
 			'GL_DST_ALPHA ' +
@@ -55,6 +58,8 @@
 			'GL_DYNAMIC_DRAW ' +
 			'GL_ELEMENT_ARRAY_BUFFER ' +
 			'GL_INVALID_OPERATION ' +
+			'GL_LUMINANCE ' +
+			'GL_LUMINANCE_ALPHA ' +
 			'GL_MAX_TEXTURE_UNITS ' +
 			'GL_NORMAL_ARRAY_BUFFER_BINDING ' +
 			'GL_ONE ' +
@@ -64,6 +69,8 @@
 			'GL_ONE_MINUS_SRC_COLOR ' +
 			'GL_PACK_ALIGNMENT ' +
 			'GL_READ_WRITE ' +
+			'GL_RGB ' +
+			'GL_RGBA ' +
 			'GL_SCISSOR_TEST ' +
 			'GL_SRC_ALPHA ' +
 			'GL_SRC_ALPHA_SATURATE ' +
@@ -72,6 +79,7 @@
 			'GL_STREAM_DRAW ' +
 			'GL_TEXTURE0 ' +
 			'GL_TEXTUREi ' +
+			'GL_TEXTURE_2D ' +
 			'GL_UNPACK_ALIGNMENT ' +
 			'GL_ZERO' 
 			;
