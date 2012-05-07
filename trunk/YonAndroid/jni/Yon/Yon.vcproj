@@ -689,6 +689,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\COGLES1FBOTexture.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\COGLES1FBOTexture.h"
+						>
+					</File>
+					<File
 						RelativePath=".\COGLES1HardwareBuffer.cpp"
 						>
 					</File>
