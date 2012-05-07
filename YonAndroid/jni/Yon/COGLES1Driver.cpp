@@ -7,6 +7,7 @@
 #include "yonUtil.h"
 #include "COGLES1HardwareBuffer.h"
 #include "CImage.h"
+#include "COGLES1FBOTexture.h"
 
 
 namespace yon{
@@ -631,7 +632,13 @@ namespace ogles1{
 		if(queryFeature(ENUM_VIDEO_FEATURE_FBO))
 		{
 			//TODO
-			Logger->error(YON_LOG_FAILED_FORMAT,"Currently do not support FBO!");
+			//Logger->error(YON_LOG_FAILED_FORMAT,"Currently do not support FBO!");
+			rtt = new COGLES1FBOTexture(size, name, this, format);
+			if (rtt)
+			{
+				addTexture(rtt);
+				rtt->drop();
+			}
 		}
 		else
 		{

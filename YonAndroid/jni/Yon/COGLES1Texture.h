@@ -9,7 +9,7 @@ namespace video{
 namespace ogles1{
 
 	class COGLES1Texture : public ITexture{
-	private:
+	protected:
 		core::dimension2d<u32> m_textureSize;
 
 		COGLES1Driver* m_pDriver;
@@ -20,6 +20,9 @@ namespace ogles1{
 		bool m_bIsRenderTarget;
 
 		virtual void uploadTexture();
+
+		//用于子类构造
+		COGLES1Texture(const io::path& name, COGLES1Driver* driver);
 	public:
 		COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver);
 		virtual ~COGLES1Texture();

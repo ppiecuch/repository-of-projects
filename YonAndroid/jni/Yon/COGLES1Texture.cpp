@@ -7,9 +7,13 @@ namespace yon{
 namespace video{
 namespace ogles1{
 
+	COGLES1Texture::COGLES1Texture(const io::path& name, COGLES1Driver* driver)
+		:ITexture(name),m_pDriver(driver), m_pImage(NULL),
+		m_textureId(0),m_bIsRenderTarget(false){}
+
 	COGLES1Texture::COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver)
 		:ITexture(name), m_pDriver(driver), m_pImage(image),m_textureSize(image->getDimension()),
-		m_textureId(-1),m_bIsRenderTarget(false){
+		m_textureId(0),m_bIsRenderTarget(false){
 			glGenTextures(1, &m_textureId);
 			m_pImage->grab();
 
@@ -18,8 +22,10 @@ namespace ogles1{
 			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Texture");
 	}
 	COGLES1Texture::~COGLES1Texture(){
-		glDeleteTextures(1, &m_textureId);
-		m_pImage->drop();
+		if(m_textureId)
+			glDeleteTextures(1, &m_textureId);
+		if(m_pImage)
+			m_pImage->drop();
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Texture");
 	}
