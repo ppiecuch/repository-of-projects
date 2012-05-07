@@ -9,7 +9,7 @@ namespace ogles1{
 
 	COGLES1Texture::COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver)
 		:ITexture(name), m_pDriver(driver), m_pImage(image),m_textureSize(image->getDimension()),
-		m_textureId(-1){
+		m_textureId(-1),m_bIsRenderTarget(false){
 			glGenTextures(1, &m_textureId);
 			m_pImage->grab();
 
@@ -24,6 +24,7 @@ namespace ogles1{
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Texture");
 	}
 
+	//TODO GL_DEPTH_COMPONENTÖ§³Ö
 	void COGLES1Texture::uploadTexture(){
 
 		GLenum format;
@@ -91,6 +92,23 @@ namespace ogles1{
 
 		//TODO testGLError
 
+	}
+
+	void COGLES1Texture::beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color)
+	{
+		glViewport(0, 0, m_textureSize.w,m_textureSize.h);
+		m_pDriver->clearView(clearBackBuffer,clearZBuffer,color);
+	}
+	void COGLES1Texture::endRTT(bool willRenderFrameBuffer)
+	{
+		glBindTexture(GL_TEXTURE_2D, m_textureId);
+		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_textureSize.w,m_textureSize.h);
+
+		if(willRenderFrameBuffer){
+			const video::SClearSetting& setting=m_pDriver->getClearSetting();
+			m_pDriver->clearView(setting.clearBackBuffer,setting.clearZBuffer,setting.color);
+			glViewport(0,0,m_pDriver->getCurrentRenderTargetSize().w,m_pDriver->getCurrentRenderTargetSize().h);
+		}
 	}
 }//ogles1
 }//video

@@ -13,6 +13,7 @@ ILogger* logger=NULL;
 IModel* cubeModel=NULL;
 IModel* planeModel=NULL;
 IModel* teapotModel=NULL;
+video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -31,7 +32,7 @@ public:
 				return true;
 			}
 		case event::ENUM_EVENT_TYPE_TOUCH:
-			switch(evt.mouseInput.type)
+			switch(evt.touchInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
 				logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
@@ -46,8 +47,8 @@ public:
 };
 
 bool init(void *pJNIEnv,u32 width,u32 height){
-	params.windowSize.w=400;
-	params.windowSize.h=400;
+	params.windowSize.w=width;
+	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	params.fpsLimit=10;
 	params.pEventReceiver=new MyEventReceiver();
@@ -72,30 +73,22 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	/*ISound* sound=audioDriver->getSound("bg.ogg");
-	sound->setLooping(true);
-	sound->setGain(0.5f);
-	sound->play();
-	sound=audioDriver->getSound("helloworld.wav");
-	sound->play();*/
-
-	shap=geometryFty->createCube(50,50,50);
+	shap=geometryFty->createCube(150,150,150);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
 	material=cubeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	cubeModel->setPosition(core::vector3df(100,100,0));
-	material->setTexture(0,videoDriver->getTexture("test.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
 
-	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	shap=geometryFty->createTeapot(7,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
-	teapotModel->setPosition(core::vector3df(50,-50,0));
+	teapotModel->setPosition(core::vector3df(0,-70,0));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -112,6 +105,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(512,512), "RTT");
+	cubeModel->setMaterialTexture(0, rtt); 
+
 	return true;
 }
 void resize(u32 width,u32 height){
@@ -120,6 +116,21 @@ void resize(u32 width,u32 height){
 void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0x00032E87));
+
+	rtt->beginRTT(true,true,COLOR_WHITE);
+
+	teapotModel->setVisible(true);
+	cubeModel->setVisible(false);
+	planeModel->setVisible(false);
+
+	sceneMgr->render(videoDriver);
+
+	teapotModel->setVisible(false);
+	cubeModel->setVisible(true);
+	planeModel->setVisible(true);
+
+
+	rtt->endRTT(true);
 
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));

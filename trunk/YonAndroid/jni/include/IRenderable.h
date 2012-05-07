@@ -16,12 +16,13 @@ namespace yon{
 			core::vector3df m_position;
 			core::vector3df m_rotation;
 			core::vector3df m_scale;
+			bool m_bVisible;
 		public:
 			IRenderable(const core::vector3df& pos=core::vector3df(0,0,0),
 				const core::vector3df& rot=core::vector3df(0,0,0),
 				const core::vector3df& scale=core::vector3df(1,1,1)):
 				m_position(pos),m_rotation(rot),m_scale(scale),
-				m_bTransformationChanged(true){}
+				m_bTransformationChanged(true),m_bVisible(true){}
 			virtual void render(video::IVideoDriver* driver) = 0;
 
 			virtual void setPosition(const core::vector3df& pos){
@@ -66,6 +67,13 @@ namespace yon{
 					m_bTransformationChanged=false;
 				}
 				return m_transformation;
+			}
+
+			virtual bool isVisible() const{
+				return m_bVisible;
+			}
+			virtual void setVisible(bool on){
+				m_bVisible=on;
 			}
 		};
 	}

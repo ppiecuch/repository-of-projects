@@ -71,6 +71,15 @@ namespace yon{
 			ENUM_VIDEO_FEATURE_COUNT
 		};
 
+		struct SClearSetting{
+			bool clearBackBuffer;
+			bool clearZBuffer;
+			video::SColor color;
+
+			SClearSetting(bool backBuffer=true,bool zBuffer=true,video::SColor color=video::COLOR_BLACK)
+				:clearBackBuffer(backBuffer),clearZBuffer(zBuffer),color(color){}
+		};
+
 		//视频驱动器接口
 		class IVideoDriver:public virtual core::IReferencable{
 		protected:
@@ -98,7 +107,8 @@ namespace yon{
 				if(m_pTimer)
 					m_pTimer->drop();
 			};
-			virtual void begin(bool zBuffer=true,video::SColor c=video::SColor(0x000000FF)) = 0;
+			virtual const SClearSetting& getClearSetting() const = 0;
+			virtual void begin(bool backBuffer=true,bool zBuffer=true,video::SColor color=video::SColor(0x000000FF)) = 0;
 			virtual void end() = 0;
 			virtual void setViewPort(const core::recti& r) = 0;
 			virtual const core::dimension2du& getCurrentRenderTargetSize() const = 0;
@@ -117,8 +127,8 @@ namespace yon{
 				const io::path& name = "rtt", const video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G5B5A1) =0;
 			//参数texture:必须是由addRenderTargetTexture生成的texture
 			//参数color:render target的背景色
-			virtual bool setRenderTarget(video::ITexture* texture,
-				bool clearBackBuffer=true, bool clearZBuffer=true,video::SColor color=video::COLOR_BLACK) =0;
+			//virtual bool setRenderTarget(video::ITexture* texture,
+			//	bool clearBackBuffer=true, bool clearZBuffer=true,video::SColor color=video::COLOR_BLACK) =0;
 
 
 			virtual IImage* createImageFromFile(const io::path& filename) = 0;

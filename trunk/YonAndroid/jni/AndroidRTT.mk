@@ -132,8 +132,8 @@ yon_SOURCES :=   \
 		Yon/CImage.cpp \
 		Yon/CImageLoaderPNG.cpp \
 		Yon/yon.cpp \
-		YonExample/framework.cpp \
-		yon_AndroidGLView.cpp
+		YonRTT/framework.cpp \
+		YonRTT/yon_AndroidGLView.cpp
 		
 LOCAL_MODULE    := yon
 		

@@ -6,6 +6,7 @@
 #include "CDebugPrinter.h"
 #include "yonUtil.h"
 #include "COGLES1HardwareBuffer.h"
+#include "CImage.h"
 
 
 namespace yon{
@@ -150,9 +151,34 @@ namespace ogles1{
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
 	}
 
-	void COGLES1Driver::begin(bool zBuffer,video::SColor c)
+	void COGLES1Driver::clearView(const bool& backBuffer,const bool& zBuffer,const video::SColor& color) const{
+		GLbitfield mask = 0;
+
+		if (backBuffer)
+		{
+			const static f32 inv = 1.0f / 255.0f;
+			glClearColor(color.getRed() * inv, color.getGreen() * inv,color.getBlue() * inv, color.getAlpha() * inv);
+
+			mask |= GL_COLOR_BUFFER_BIT;
+		}
+
+		if (zBuffer)
+		{
+			glDepthMask(GL_TRUE);
+			//LastMaterial.ZWriteEnable=true;
+			mask |= GL_DEPTH_BUFFER_BIT;
+		}
+
+		glClear(mask);
+	}
+
+	void COGLES1Driver::begin(bool backBuffer,bool zBuffer,video::SColor color)
 	{
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		clearView(backBuffer,zBuffer,color);
+
+		m_clearSetting.clearBackBuffer=backBuffer;
+		m_clearSetting.clearZBuffer=zBuffer;
+		m_clearSetting.color=color;
 	}
 	void COGLES1Driver::end()
 	{
@@ -600,11 +626,12 @@ namespace ogles1{
 		//setTextureCreationFlag(ETCF_CREATE_MIP_MAPS, false);
 
 		video::ITexture* rtt = 0;
-		return rtt;
+		
 
 		if(queryFeature(ENUM_VIDEO_FEATURE_FBO))
 		{
 			//TODO
+			Logger->error(YON_LOG_FAILED_FORMAT,"Currently do not support FBO!");
 		}
 		else
 		{
@@ -612,13 +639,20 @@ namespace ogles1{
 			//but why?
 			//destSize = destSize.getOptimalSize((size==size.getOptimalSize()), false, false);
 			destSize = destSize.getOptimalSize(true, false, false);
+			//why not format,but use ENUM_COLOR_FORMAT_R8G8B8A8?
 			rtt = addTexture(destSize, name, video::ENUM_COLOR_FORMAT_R8G8B8A8);
+			if (rtt)
+				static_cast<COGLES1Texture*>(rtt)->setIsRenderTarget(true);
+
+			Logger->debug("addRenderTargetTexture:%s\n",name.c_str());
 		}
 
+		return rtt;
+
 	}
-	bool COGLES1Driver::setRenderTarget(video::ITexture* texture,bool clearBackBuffer, bool clearZBuffer,video::SColor color){
-		return false;
-	}
+	//bool COGLES1Driver::setRenderTarget(video::ITexture* texture,bool clearBackBuffer, bool clearZBuffer,video::SColor color){
+	//	return false;
+	//}
 
 	IImage* COGLES1Driver::createImageFromFile(const io::path& filename){
 		//io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
@@ -710,14 +744,14 @@ namespace ogles1{
 		return NULL;
 	}
 
-	ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format){
+	ITexture* COGLES1Driver::addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format){
 		if(IImage::isRenderTargetOnlyFormat(format))
 		{
 			Logger->warn("Could not create ITexture, format only supported for render target textures.\n");
 			return NULL;
 		}
 
-		if ( 0 == name.size () )
+		if ( 0 == name.length () )
 		{
 			Logger->warn("Could not create ITexture with name is empty.\n");
 			return NULL;

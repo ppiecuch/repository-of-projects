@@ -43,7 +43,11 @@ namespace yon{
 				COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty);
 				virtual ~COGLES1Driver();
 
-				virtual void begin(bool zBuffer,video::SColor c);
+				virtual const SClearSetting& getClearSetting() const{
+					return m_clearSetting;
+				}
+				void clearView(const bool& backBuffer,const bool& zBuffer,const video::SColor& color) const;
+				virtual void begin(bool backBuffer,bool zBuffer,video::SColor color);
 				virtual void end();
 				virtual void setViewPort(const core::recti& r);
 				virtual const core::dimension2du& getCurrentRenderTargetSize() const;
@@ -65,7 +69,7 @@ namespace yon{
 				}
 
 				virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name, const video::ENUM_COLOR_FORMAT format);
-				virtual bool setRenderTarget(video::ITexture* texture,bool clearBackBuffer, bool clearZBuffer,video::SColor color);
+				//virtual bool setRenderTarget(video::ITexture* texture,bool clearBackBuffer, bool clearZBuffer,video::SColor color);
 
 
 				virtual IImage* createImageFromFile(const io::path& filename);
@@ -132,6 +136,7 @@ namespace yon{
 				CFPSCounter m_FPSCounter;
 				FPSAssist m_FPSAssist;
 
+				video::SClearSetting m_clearSetting;
 				core::dimension2du m_windowSize;
 #ifdef YON_COMPILE_WITH_WIN32
 				bool initEGL(const HWND& hwnd);
