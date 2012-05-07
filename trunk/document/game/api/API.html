@@ -272,6 +272,104 @@ http://www.khronos.org/opengles/sdk/1.1/docs/man/
 				</td>
 			</tr>
 			<tr>
+				<td>void glCopyTexImage2D(GLenum target,GLint level,GLenum internalformat,GLint x,GLint y,GLsizei width,GLsizei height,GLint border)</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+glCopyTexImage2D defines a two-dimensional texture image with pixels from the color buffer.
+The screen-aligned pixel rectangle with lower left corner at (x, y) and with a width of width and a height of height 
+defines the texture array at the mipmap level specified by level. internalformat specifies the color components of the texture.
+The red, green, blue, and alpha components of each pixel that is read are converted to an internal fixed-point or floating-point 
+format with unspecified precision. The conversion maps the largest representable component value to 1.0, and component value 0 to 0.0. 
+The values are then converted to the texture's internal format for storage in the texel array.
+internalformat must be chosen such that color buffer components can be dropped during conversion to the internal format, but new 
+components cannot be added. For example, an GL_RGB color buffer can be used to create GL_LUMINANCE or GL_RGB textures, 
+but not GL_ALPHA, GL_LUMINANCE_ALPHA or GL_RGBA textures.
+Pixel ordering is such that lower x and y screen coordinates correspond to lower s and t texture coordinates.
+If any of the pixels within the specified rectangle of the color buffer are outside the window associated with the current rendering 
+context, then the values obtained for those pixels are undefined.
+【参数】
+target
+Specifies the target texture. Must be GL_TEXTURE_2D.
+level
+Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
+internalformat
+Specifies the color components of the texture. Must be one of the following symbolic constants: GL_ALPHA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_RGB, or GL_RGBA.
+x, y
+Specify the window coordinates of the lower left corner of the rectangular region of pixels to be copied.
+width
+Specifies the width of the texture image. Must be 0 or 2n for some integer n.
+height
+Specifies the height of the texture image. Must be 0 or 2m for some integer m.
+border
+Specifies the width of the border. Must be 0.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+
+</pre>
+				</td>
+			</tr>
+			<tr>
+				<td>void glCopyTexSubImage2D(GLenum target,GLint level,GLint xoffset,GLint yoffset,GLint x,GLint y,GLsizei width,GLsizei height)</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+glCopyTexSubImage2D replaces a rectangular portion of a two-dimensional texture image with pixels from the color buffer.
+The screen-aligned pixel rectangle with lower left corner at ( x, y) and with width width and height height replaces the portion of the texture array with x indices xoffset through xoffset+width-1 , 
+inclusive, and y indices yoffset through yoffset+height-1 , inclusive, at the mipmap level specified by level.
+The pixels in the rectangle are processed the same way as with glCopyTexImage2D.
+glCopyTexSubImage2D requires that the internal format of the currently bound texture is such that color buffer components can be dropped during conversion to the internal format, 
+but new components cannot be added. For example, an GL_RGB color buffer can be used to create GL_LUMINANCE or GL_RGB textures, but not GL_ALPHA, GL_LUMINANCE_ALPHA or GL_RGBA textures.
+The destination rectangle in the texture array may not include any texels outside the texture array as it was originally specified. It is not an error to specify a subtexture with zero width or height, 
+but such a specification has no effect.
+If any of the pixels within the specified rectangle of the current color buffer are outside the read window associated with the current rendering context, then the values obtained for those pixels are undefined.
+No change is made to the internalformat, width, height, or border parameters of the specified texture array or to texel values outside the specified subregion.
+【参数】
+target
+Specifies the target texture. Must be GL_TEXTURE_2D.
+level
+Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
+xoffset
+Specifies a texel offset in the x direction within the texture array.
+yoffset
+Specifies a texel offset in the y direction within the texture array.
+x, y
+Specify the window coordinates of the lower left corner of the rectangular region of pixels to be copied.
+width
+Specifies the width of the texture subimage.
+height
+Specifies the height of the texture subimage.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+
+</pre>
+				</td>
+			</tr>
+			<tr>
 				<td>void glDeleteBuffers(GLsizei n,const GLuint * buffers)</td>
 				<td>支持</td>
 				<td>&nbsp;</td>
