@@ -7,9 +7,9 @@ namespace yon{
 namespace video{
 namespace ogles1{
 
-	COGLES1Texture::COGLES1Texture(const io::path& name, COGLES1Driver* driver)
+	COGLES1Texture::COGLES1Texture(const core::dimension2du& size,const io::path& name, COGLES1Driver* driver)
 		:ITexture(name),m_pDriver(driver), m_pImage(NULL),
-		m_textureId(0),m_bIsRenderTarget(false){}
+		m_textureId(0),m_bIsRenderTarget(false),m_textureSize(size){}
 
 	COGLES1Texture::COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver)
 		:ITexture(name), m_pDriver(driver), m_pImage(image),m_textureSize(image->getDimension()),

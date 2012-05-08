@@ -2,11 +2,20 @@
 #include "stringTestCase.h"
 #include "yonUtil.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
 
 void stringTestCase::setUp()
 {
 }
+/*void stringTestCase::splits(){
+	core::stringc str1("Make In China");
+	core::array<core::stringc> arr;
+	str1.split(arr," ");
+	printf("\n");
+	for(u32 i=0;i<arr.size();++i)
+		printf("%s\n",arr[i].c_str());
+	CPPUNIT_ASSERT(arr.size()==3);
+}*/
 void stringTestCase::find(){
 	core::stringc str1("Make In China");
 	CPPUNIT_ASSERT(str1.find("Make")==0);

@@ -8,7 +8,7 @@ namespace ogles1{
 
 	COGLES1FBOTexture::COGLES1FBOTexture(const core::dimension2du& size,
 		const io::path& name,COGLES1Driver* driver, const ENUM_COLOR_FORMAT format)
-		:COGLES1Texture(name,driver),m_textureSize(size),m_fboId(0),m_rboId(0),m_format(format){
+		:COGLES1Texture(size,name,driver),m_fboId(0),m_rboId(0),m_format(format){
 
 		GLint textureFormat;
 		switch(format)

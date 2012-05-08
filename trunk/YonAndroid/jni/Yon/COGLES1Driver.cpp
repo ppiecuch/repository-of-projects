@@ -629,7 +629,7 @@ namespace ogles1{
 		video::ITexture* rtt = 0;
 		
 
-		if(queryFeature(ENUM_VIDEO_FEATURE_FBO))
+		/*if(queryFeature(ENUM_VIDEO_FEATURE_FBO))
 		{
 			//TODO
 			//Logger->error(YON_LOG_FAILED_FORMAT,"Currently do not support FBO!");
@@ -640,7 +640,7 @@ namespace ogles1{
 				rtt->drop();
 			}
 		}
-		else
+		else*/
 		{
 			core::dimension2du destSize(core::min_(size.w,m_windowSize.w), core::min_(size.h,m_windowSize.h));
 			//but why?

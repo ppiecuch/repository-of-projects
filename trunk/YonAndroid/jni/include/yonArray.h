@@ -58,6 +58,9 @@ namespace yon{
 			void push(const T& element){
 				insert(element, len);
 			}
+			void push_back(const T& element){
+				insert(element, len);
+			}
 			T pop(){
 				return erase(len-1);
 			}
@@ -160,7 +163,8 @@ namespace yon{
 				for (u32 i=0; i<len; ++i){
 					elements[i].~T();
 				}
-				delete[] elements;
+				//delete[] elements;
+				operator delete(elements);
 				elements=NULL;
 				capacity=0;
 				len=0;
@@ -178,6 +182,8 @@ namespace yon{
 					//稍微微快一点点
 					new (&elements[i]) T(temp[i]);
 				}
+				for (u32 i=0;i<len;++i)
+					temp[i].~T();
 				if (length < len)
 					len = length;
 				delete[] temp;//C++允许删除空指针而不造成任何问题

@@ -1,12 +1,22 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "yonArrayTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( yonArrayTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( yonArrayTestCase );
 
 void yonArrayTestCase::setUp()
 {
 }
+void yonArrayTestCase::pushString()
+{
+	//全局变量没问题
+	strArray.push(core::stringc("test"));
+	CPPUNIT_ASSERT( strArray.size()==1);
 
+	//局部变量出错
+	core::array<core::stringc> temps;
+	temps.push(core::stringc("test"));
+	CPPUNIT_ASSERT( temps.size()==1);
+}
 void yonArrayTestCase::reallocate()
 {
 	arr.reallocate(36);
@@ -24,6 +34,10 @@ void yonArrayTestCase::push()
 	arr.push(v3);
 	//delete v;
 	CPPUNIT_ASSERT( arr.size()==3&&arr[1]->x==1&&arr[1]->y==2&&arr[1]->z==3 );
+
+	array<s32> temps;
+	temps.push(1);
+	CPPUNIT_ASSERT( temps.size()==1);
 }
 
 void yonArrayTestCase::insert1()

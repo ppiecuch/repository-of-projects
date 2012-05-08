@@ -112,6 +112,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
+	core::array<core::stringc> arr;
+	arr.push("test");
+
 	return true;
 }
 void resize(u32 width,u32 height){

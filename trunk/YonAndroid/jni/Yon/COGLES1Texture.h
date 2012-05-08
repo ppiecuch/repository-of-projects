@@ -22,7 +22,7 @@ namespace ogles1{
 		virtual void uploadTexture();
 
 		//用于子类构造
-		COGLES1Texture(const io::path& name, COGLES1Driver* driver);
+		COGLES1Texture(const core::dimension2du& size,const io::path& name, COGLES1Driver* driver);
 	public:
 		COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver);
 		virtual ~COGLES1Texture();
