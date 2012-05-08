@@ -1,0 +1,34 @@
+之前临时看了下mygui，发一下跟踪的信息，以备参考:
+一。 创建每个widget, 用所得皮肤进行初始化,
+一个皮肤可以由子皮肤以及子控件组合成。
+1. 创建皮肤对应的一个贴图并创建皮肤下所有子皮肤（存入mSubSkinChildo数组中, 它们都是使用此相同贴图)，并加到mSubSkinChild以及mDrawItems中。
+2. 然后设置该皮肤对应的属性值。
+3. 创建该皮肤所有子控件(存入widget中的mWidgetChildSkin数组中)
+
+二。将所创建的控件加入到对应的layernode中:   
+LayerManager::getInstance().attachToLayerNode(_layer, widget);
+其中会遍历widget中所有mDrawItems(子皮肤),加到对应的layernode中，
+当前子皮肤(SubSkin)使用该widget中的mTexture来创建mRenderItem(在layernode中有映射表按textrue来归类, 其中文字放入mFirstRenderItems，其它放入mSecondRenderItems)
+而mRenderItem中也有一个mDrawItems数组，用来存入SubSkin的. 同时mRenderItem中有mVertexBuffer，当渲染时，会遍历所有mDrawItems，将它们收集到mVertexBuffer中进行批次渲染.
+
+
+三。渲染:
+遍历所有mLayerNodes进行渲染
+1. 遍历mFirstRenderItems和mSecondRenderItems中所有RenderItem进行渲染
+   在RenderItem中遍历mDrawItems，调用其doRender()方法，将顶点渲染到mVertexBuffer中.
+
+2. 渲染mChildItems中所有
+
+
+四。 关于文字的渲染:
+simpletext是一个renderitem
+
+simpletext从edittext中派生
+edittext::updateRawData会使用mTextView生成贴图uv等数据
+每个RenderItem提供一个vertext buf，供其中的数据进行填充批次渲染
+
+
+文字的渲染由于是一次读入的（老外就是不考虑中文），如果中文修改范围直接用的话则加载时必定卡。。。
+而且中文字多，一般不好全部一次存入贴图中，只能使用贴图缓存方式处理。
+
+http://www.cppblog.com/flipcode/archive/2011/06/24/149388.html
