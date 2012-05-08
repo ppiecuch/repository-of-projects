@@ -10,7 +10,7 @@ namespace scene{
 		if(unit!=NULL){
 			//TODO 这里与yonArray.reallocate中的delete[] temp不冲突?
 			unit->grab();
-			m_units.push(unit);
+			m_units.push_back(unit);
 		}
 	}
 

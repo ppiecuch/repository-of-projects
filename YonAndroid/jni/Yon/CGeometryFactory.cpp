@@ -28,15 +28,15 @@ namespace scene{
 
 		shap->m_indices.reallocate(6);
 		for (u32 i=0; i<6; ++i)
-			shap->m_indices.push(u[i]);
+			shap->m_indices.push_back(u[i]);
 
 		//Create vertexs
 		shap->m_vertices.reallocate(4);
 
-		shap->m_vertices.push(S2DVertex((f32)x0,(f32)y0,u0,v0,color));
-		shap->m_vertices.push(S2DVertex((f32)x1,(f32)y0,u1,v0,color));
-		shap->m_vertices.push(S2DVertex((f32)x1,(f32)y1,u1,v1,color));
-		shap->m_vertices.push(S2DVertex((f32)x0,(f32)y1,u0,v1,color));
+		shap->m_vertices.push_back(S2DVertex((f32)x0,(f32)y0,u0,v0,color));
+		shap->m_vertices.push_back(S2DVertex((f32)x1,(f32)y0,u1,v0,color));
+		shap->m_vertices.push_back(S2DVertex((f32)x1,(f32)y1,u1,v1,color));
+		shap->m_vertices.push_back(S2DVertex((f32)x0,(f32)y1,u0,v1,color));
 
 		return shap;
 
@@ -49,15 +49,15 @@ namespace scene{
 
 		shap->m_indices.reallocate(6);
 		for (u32 i=0; i<6; ++i)
-			shap->m_indices.push(u[i]);
+			shap->m_indices.push_back(u[i]);
 
 		//Create vertexs
 		shap->m_vertices.reallocate(4);
 
-		shap->m_vertices.push(SVertex((f32)x0,(f32)y0,z,u0,v0,color));
-		shap->m_vertices.push(SVertex((f32)x1,(f32)y0,z,u1,v0,color));
-		shap->m_vertices.push(SVertex((f32)x1,(f32)y1,z,u1,v1,color));
-		shap->m_vertices.push(SVertex((f32)x0,(f32)y1,z,u0,v1,color));
+		shap->m_vertices.push_back(SVertex((f32)x0,(f32)y0,z,u0,v0,color));
+		shap->m_vertices.push_back(SVertex((f32)x1,(f32)y0,z,u1,v0,color));
+		shap->m_vertices.push_back(SVertex((f32)x1,(f32)y1,z,u1,v1,color));
+		shap->m_vertices.push_back(SVertex((f32)x0,(f32)y1,z,u0,v1,color));
 
 		return shap;
 
@@ -71,15 +71,15 @@ namespace scene{
 
 		shap->m_indices.reallocate(6);
 		for (u32 i=0; i<6; ++i)
-			shap->m_indices.push(u[i]);
+			shap->m_indices.push_back(u[i]);
 
 		//Create vertexs
 		shap->m_vertices.reallocate(4);
 
-		shap->m_vertices.push(SVertex((f32)x0,(f32)y0,z,u0,v0,color));
-		shap->m_vertices.push(SVertex((f32)x1,(f32)y0,z,u1,v1,color));
-		shap->m_vertices.push(SVertex((f32)x1,(f32)y1,z,u2,v2,color));
-		shap->m_vertices.push(SVertex((f32)x0,(f32)y1,z,u3,v3,color));
+		shap->m_vertices.push_back(SVertex((f32)x0,(f32)y0,z,u0,v0,color));
+		shap->m_vertices.push_back(SVertex((f32)x1,(f32)y0,z,u1,v1,color));
+		shap->m_vertices.push_back(SVertex((f32)x1,(f32)y1,z,u2,v2,color));
+		shap->m_vertices.push_back(SVertex((f32)x0,(f32)y1,z,u3,v3,color));
 
 		return shap;
 	}
@@ -92,15 +92,15 @@ namespace scene{
 
 		shap->m_indices.reallocate(6);
 		for (u32 i=0; i<6; ++i)
-			shap->m_indices.push(u[i]);
+			shap->m_indices.push_back(u[i]);
 
 		//Create vertexs
 		shap->m_vertices.reallocate(4);
 
-		shap->m_vertices.push(SVertex2TCoords((f32)x0,(f32)y0,0,u0,v0,s0,t0,color));
-		shap->m_vertices.push(SVertex2TCoords((f32)x1,(f32)y0,0,u1,v0,s1,t0,color));
-		shap->m_vertices.push(SVertex2TCoords((f32)x1,(f32)y1,0,u1,v1,s1,t1,color));
-		shap->m_vertices.push(SVertex2TCoords((f32)x0,(f32)y1,0,u0,v1,s0,t1,color));
+		shap->m_vertices.push_back(SVertex2TCoords((f32)x0,(f32)y0,0,u0,v0,s0,t0,color));
+		shap->m_vertices.push_back(SVertex2TCoords((f32)x1,(f32)y0,0,u1,v0,s1,t0,color));
+		shap->m_vertices.push_back(SVertex2TCoords((f32)x1,(f32)y1,0,u1,v1,s1,t1,color));
+		shap->m_vertices.push_back(SVertex2TCoords((f32)x0,(f32)y1,0,u0,v1,s0,t1,color));
 
 		return shap;
 	}
@@ -332,7 +332,7 @@ namespace scene{
 		};
 		shap->m_indices.reallocate(36);
 		for (u32 i=0; i<36; ++i)
-			shap->m_indices.push(u[i]);
+			shap->m_indices.push_back(u[i]);
 
 		//Create vertexs
 		shap->m_vertices.reallocate(24);
@@ -351,37 +351,37 @@ namespace scene{
 
 		Logger->debug("half cube size:%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",phw,phh,phd,mhw,mhh,mhd);
 
-		shap->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v1,color));
-		shap->m_vertices.push(SVertex(mhw,mhh,phd,u0,v0,color));
-		shap->m_vertices.push(SVertex(phw,mhh,phd,u1,v0,color));
-		shap->m_vertices.push(SVertex(phw,mhh,mhd,u1,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,mhh,mhd,u0,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,mhh,phd,u0,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,mhh,phd,u1,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,mhh,mhd,u1,v1,color));
 
-		shap->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1,color));
-		shap->m_vertices.push(SVertex(mhw,phh,phd,u0,v0,color));
-		shap->m_vertices.push(SVertex(phw,phh,phd,u1,v0,color));
-		shap->m_vertices.push(SVertex(phw,phh,mhd,u1,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,phh,mhd,u0,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,phh,phd,u0,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,phh,phd,u1,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,phh,mhd,u1,v1,color));
 
-		shap->m_vertices.push(SVertex(mhw,mhh,mhd,u1,v0,color));
-		shap->m_vertices.push(SVertex(mhw,phh,mhd,u1,v1,color));
-		shap->m_vertices.push(SVertex(phw,phh,mhd,u0,v1,color));
-		shap->m_vertices.push(SVertex(phw,mhh,mhd,u0,v0,color));
+		shap->m_vertices.push_back(SVertex(mhw,mhh,mhd,u1,v0,color));
+		shap->m_vertices.push_back(SVertex(mhw,phh,mhd,u1,v1,color));
+		shap->m_vertices.push_back(SVertex(phw,phh,mhd,u0,v1,color));
+		shap->m_vertices.push_back(SVertex(phw,mhh,mhd,u0,v0,color));
 
-		shap->m_vertices.push(SVertex(mhw,mhh,phd,u0,v1,color));
-		shap->m_vertices.push(SVertex(mhw,phh,phd,u0,v0,color));
-		shap->m_vertices.push(SVertex(phw,phh,phd,u1,v0,color));
-		shap->m_vertices.push(SVertex(phw,mhh,phd,u1,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,mhh,phd,u0,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,phh,phd,u0,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,phh,phd,u1,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,mhh,phd,u1,v1,color));
 
 		//左
-		shap->m_vertices.push(SVertex(mhw,mhh,mhd,u0,v0,color));
-		shap->m_vertices.push(SVertex(mhw,mhh,phd,u1,v0,color));
-		shap->m_vertices.push(SVertex(mhw,phh,phd,u1,v1,color));
-		shap->m_vertices.push(SVertex(mhw,phh,mhd,u0,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,mhh,mhd,u0,v0,color));
+		shap->m_vertices.push_back(SVertex(mhw,mhh,phd,u1,v0,color));
+		shap->m_vertices.push_back(SVertex(mhw,phh,phd,u1,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,phh,mhd,u0,v1,color));
 
 		//右
-		shap->m_vertices.push(SVertex(phw,mhh,mhd,u1,v0,color));
-		shap->m_vertices.push(SVertex(phw,mhh,phd,u0,v0,color));
-		shap->m_vertices.push(SVertex(phw,phh,phd,u0,v1,color));
-		shap->m_vertices.push(SVertex(phw,phh,mhd,u1,v1,color));
+		shap->m_vertices.push_back(SVertex(phw,mhh,mhd,u1,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,mhh,phd,u0,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,phh,phd,u0,v1,color));
+		shap->m_vertices.push_back(SVertex(phw,phh,mhd,u1,v1,color));
 
 		return shap;
 	}
@@ -414,7 +414,7 @@ namespace scene{
 
 				u = (f32)j/hSteps;
 				v = (f32)(vSteps-i)/vSteps;
-				shap->m_vertices.push(SVertex(x,y,z,u,v,video::COLOR_WHITE));
+				shap->m_vertices.push_back(SVertex(x,y,z,u,v,video::COLOR_WHITE));
 
 				//Logger->debug("v[%d][%d]={%.2f,%.2f,%.2f}\n",i,j,x,y,z);
 			}
@@ -429,12 +429,12 @@ namespace scene{
 				v2=(i+1)*count+j+1;
 				v3=i*count+j+1;
 
-				shap->m_indices.push(v0);
-				shap->m_indices.push(v1);
-				shap->m_indices.push(v2);
-				shap->m_indices.push(v0);
-				shap->m_indices.push(v2);
-				shap->m_indices.push(v3);
+				shap->m_indices.push_back(v0);
+				shap->m_indices.push_back(v1);
+				shap->m_indices.push_back(v2);
+				shap->m_indices.push_back(v0);
+				shap->m_indices.push_back(v2);
+				shap->m_indices.push_back(v3);
 
 				//Logger->debug("i[%d][%d]=%d,%d,%d--%d,%d,%d\n",i,j,v0,v1,v2,v0,v2,v3);
 
@@ -653,7 +653,7 @@ namespace scene{
 				z = (f32) (cirRadius * sinf(theta));
 				u = (f32)i/orbitSteps;
 				v = (f32)j/cirSteps;
-				shap->m_vertices.push(SVertex(x,y,z,u,v,color));
+				shap->m_vertices.push_back(SVertex(x,y,z,u,v,color));
 
 				//Logger->debug("v[%d][%d]={%.2f,%.2f,%.2f}\n",i,j,x,y,z);
 			}
@@ -668,12 +668,12 @@ namespace scene{
 				v2=(i+1)*count+j+1;
 				v3=i*count+j+1;
 
-				shap->m_indices.push(v0);
-				shap->m_indices.push(v1);
-				shap->m_indices.push(v2);
-				shap->m_indices.push(v0);
-				shap->m_indices.push(v2);
-				shap->m_indices.push(v3);
+				shap->m_indices.push_back(v0);
+				shap->m_indices.push_back(v1);
+				shap->m_indices.push_back(v2);
+				shap->m_indices.push_back(v0);
+				shap->m_indices.push_back(v2);
+				shap->m_indices.push_back(v3);
 
 				//Logger->debug("i[%d][%d]=%d,%d,%d--%d,%d,%d\n",i,j,v0,v1,v2,v0,v2,v3);
 
@@ -689,14 +689,14 @@ namespace scene{
 		u32 count=teapotFacesCount*3;
 		shap->m_indices.reallocate(count);
 		for(u32 i=0; i<count; ++i)
-			shap->m_indices.push(teapotIndices[i]-1);
+			shap->m_indices.push_back(teapotIndices[i]-1);
 
 		shap->m_vertices.reallocate(teapotVerticesCount);
 
 		//暂不支持纹理坐标
 		count=teapotVerticesCount*3;
 		for(u32 i=0; i<count; i+=3)
-			shap->m_vertices.push(SVertex(teapotVertices[i]*scale,teapotVertices[i+1]*scale,teapotVertices[i+2]*scale,0,0,color));
+			shap->m_vertices.push_back(SVertex(teapotVertices[i]*scale,teapotVertices[i+1]*scale,teapotVertices[i+2]*scale,0,0,color));
 
 		return shap;
 	}

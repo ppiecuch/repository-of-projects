@@ -20,7 +20,7 @@ class yonArrayTestCase : public CPPUNIT_NS::TestFixture
 	CPPUNIT_TEST( insert2 );
 	CPPUNIT_TEST( insert3 );
 	CPPUNIT_TEST( insert4 );
-	//CPPUNIT_TEST( pushString );
+	CPPUNIT_TEST( pushString );
 	CPPUNIT_TEST_SUITE_END();
 protected:
 	array<vector3df*> arr;

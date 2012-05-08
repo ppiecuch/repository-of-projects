@@ -76,7 +76,7 @@ namespace scene{
 		}
 
 		virtual const void* getVertices() const{
-			return m_vertices.pointer();
+			return m_vertices.const_pointer();
 		}
 		virtual void* getVertices(){
 			return m_vertices.pointer();
@@ -86,7 +86,7 @@ namespace scene{
 		}
 
 		virtual const void* getIndices() const{
-			return m_indices.pointer();
+			return m_indices.const_pointer();
 		}
 		virtual void* getIndices(){
 			return m_indices.pointer();
@@ -104,12 +104,12 @@ namespace scene{
 
 			m_vertices.reallocate(vertexCount+numVertices);
 			for (i=0; i<numVertices; ++i){
-				m_vertices.push(((V*)vertices)[i]);
+				m_vertices.push_back(((V*)vertices)[i]);
 			}
 
 			m_indices.reallocate(getIndexCount()+numIndices);
 			for (i=0; i<numIndices; ++i){
-				m_indices.push(((I*)indices)[i]+vertexCount);
+				m_indices.push_back(((I*)indices)[i]+vertexCount);
 			}
 
 			++m_uVerticesChangedId;

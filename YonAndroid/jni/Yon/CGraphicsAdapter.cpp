@@ -49,7 +49,7 @@ namespace scene{
 				return;
 			}
 		}
-		m_layers.push(new SLayer(layerId,new CEntity()));
+		m_layers.push_back(new SLayer(layerId,new CEntity()));
 		m_uCurrentLayerIndex=m_layers.size()-1;
 		return;
 	}

@@ -38,17 +38,10 @@ namespace ogles1{
 	void COGLES1ExtensionHandler::initExtensionHandler(){
 		m_extensions=(const c8*)glGetString(GL_EXTENSIONS);
 		Logger->info("GL_EXTENSIONS:\n");
-		//m_extensions.split(arr," ");
-		u32 lastpos = 0;
-		for (u32 i=0; i<m_extensions.length(); ++i){
-			if(m_extensions[i]==' '){
-				Logger->info("%s\n",m_extensions.subString(lastpos,i-lastpos).c_str());
-				lastpos=i+1;
-				++i;
-			}
-		}
-		if (m_extensions.length() > lastpos)
-			Logger->info("%s\n",m_extensions.subString(lastpos, m_extensions.length()- lastpos).c_str());
+		core::array<core::stringc> arr;
+		m_extensions.split(arr," ");
+		for(u32 i=0;i<arr.size();++i)
+			Logger->info("%s\n",arr[i].c_str());
 
 		for(u32 i=0;i<ENUM_VIDEO_FEATURE_COUNT;++i){
 			m_featureAvailables[i]=m_extensions.find(OGLESFeatureStrings[i])!=-1;

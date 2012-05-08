@@ -72,12 +72,12 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	/*ISound* sound=audioDriver->getSound("bg.ogg");
+	ISound* sound=audioDriver->getSound("bg.ogg");
 	sound->setLooping(true);
-	sound->setGain(0.5f);
+	//sound->setGain(0.5f);
 	sound->play();
-	sound=audioDriver->getSound("helloworld.wav");
-	sound->play();*/
+	//sound=audioDriver->getSound("helloworld.wav");
+	//sound->play();
 
 	shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
@@ -112,8 +112,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	core::array<core::stringc> arr;
-	arr.push("test");
+	//core::array<core::stringc> arr;
+	//arr.push_back("test");
 
 	return true;
 }

@@ -47,13 +47,13 @@ namespace ogles1{
 #endif
 		m_windowSize(param.windowSize),IVideoDriver(fs,timer),COGLES1ExtensionHandler(){
 
-		m_imageLoaders.push(createImageLoaderPNG());
+		m_imageLoaders.push_back(createImageLoaderPNG());
 
-		m_materialRenderers.push(createMaterialRendererSolid(this));
-		m_materialRenderers.push(createMaterialRendererLighten(this));
-		m_materialRenderers.push(createMaterialRendererTransparent(this));
-		m_materialRenderers.push(createMaterialRendererTransparentBlendColor(this));
-		m_materialRenderers.push(createMaterialRendererMask(this));
+		m_materialRenderers.push_back(createMaterialRendererSolid(this));
+		m_materialRenderers.push_back(createMaterialRendererLighten(this));
+		m_materialRenderers.push_back(createMaterialRendererTransparent(this));
+		m_materialRenderers.push_back(createMaterialRendererTransparentBlendColor(this));
+		m_materialRenderers.push_back(createMaterialRendererMask(this));
 
 #ifdef YON_COMPILE_WITH_WIN32
 		initEGL(m_hWnd);
@@ -278,7 +278,7 @@ namespace ogles1{
 			}
 			if(buffer==NULL){
 				buffer=createHardwareBuffer(unit);
-				m_pHardwareBuffers.push(new SHardwareBufferPair());
+				m_pHardwareBuffers.push_back(new SHardwareBufferPair());
 				m_pHardwareBuffers[m_pHardwareBuffers.size()-1]->unit=unit;
 				m_pHardwareBuffers[m_pHardwareBuffers.size()-1]->buffer=buffer;
 			}
@@ -780,7 +780,7 @@ namespace ogles1{
 		if (texture)
 		{
 			texture->grab();
-			m_textures.push(texture);
+			m_textures.push_back(texture);
 		}
 	}
 
