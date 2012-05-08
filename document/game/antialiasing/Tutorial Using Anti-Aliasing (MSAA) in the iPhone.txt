@@ -1,0 +1,133 @@
+This will be a rather short but useful tutorial where we will check out how to implement MSAA Anti-Aliasing on iPhone, iPad and iPod Touch. I will also showing a difference between using no anti-aliasing and using 4x anti-aliasing in the upcoming game that we are working on in Gando Games. ( Hex Reaction ).
+So first, what impact does anti-alias have in a game?
+
+Non anti-aliased screenshot of the game.
+
+Using 4x Anti-Alias in-game
+(You can click the images to expand them)
+The screenshot to the left shows no anti-aliasing at all. Notice how the edges of the Hexagons look quite  jagged in contrast to the picture at the right where you can see that the hexagon edges are far smoother. I didin¡¯t want that kind of ¡°jagged¡± look for Hex Reaction, so I decided to aim for newer devices and use 4x Anti-Alias. I mention newer devices because anti-aliasing is nice but  it does use quite a bit of processing power, so iPhone 3GS up are able to handle it with no real problems, but it¡¯s hard to get full performance using 4x anti-aliasing on an iPhone 3G.
+In the iPhone we have Multi Sample Anti Aliasing (MSAA) completely sorted out and you won¡¯t have to do it ¡°manually¡±. That¡¯s quite a time saver, and I strongly recommend you to experiment with antialias.
+So, what is MSAA ?
+Quoting the SGIS_Multisample Specification 0.6
+The technique is to sample all primitives multiple times at each pixel.  The color   sample values are resolved to a single, displayable color each time   a pixel is updated, so the antialiasing appears to be automatic at   the application level.  Because each sample includes depth and   stencil information, the depth and stencil functions perform   equivalently to the single-sample mode.
+Fortunately for iPhone/iPod touch/iPad developers, it¡¯s quite easy to get Multi Sample Anti-Aliasing (MSAA) running. It is a great way to smooth out polygon edges in either 2D or 3D.
+So let¡¯s do some coding:
+The first thing we need to do is to setup the following variables in our EAGLView.h (or equivalent):
+GLint backingWidth,
+      backingHeight;
+ 
+//Buffer definitions for the view.
+GLuint viewRenderbuffer,
+       viewFramebuffer;
+ 
+//Buffer definitions for the MSAA
+GLuint msaaFramebuffer,
+       msaaRenderBuffer,
+       msaaDepthBuffer;
+The view buffers shouldn¡¯t be anything new for you, on the other side we have declared a Framebuffer plus a render and a depth buffer for the MSAA.
+The next piece of code shouldn¡¯t be anything new to you, it¡¯s included in the classic Apple OpenGL ES template, and just init the viewRenderBuffers, etc. If it is something you want to explore in-depth, you can check out this post that explains the following code with more detail.
+//Create our viewFrame and render Buffers.
+glGenFramebuffersOES(1, &amp;viewFramebuffer);
+glGenRenderbuffersOES(1, &amp;viewRenderbuffer);
+ 
+//Bind the buffers.
+glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
+glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
+[context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:(CAEAGLLayer*)self.layer];
+glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, viewRenderbuffer);
+ 
+glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &amp;backingWidth);
+glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &amp;backingHeight);
+So, we have init and bound the viewFramebuffer and the viewRenderbuffer. Still, nothing new¡­ But now it get¡¯s a bit different 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+//Generate our MSAA Frame and Render buffers
+glGenFramebuffersOES(1, &amp;msaaFramebuffer);
+glGenRenderbuffersOES(1, &amp;msaaRenderBuffer);
+ 
+//Bind our MSAA buffers
+glBindFramebufferOES(GL_FRAMEBUFFER_OES, msaaFramebuffer);
+glBindRenderbufferOES(GL_RENDERBUFFER_OES, msaaRenderBuffer);
+ 
+// Generate the msaaDepthBuffer.
+// 4 will be the number of pixels that the MSAA buffer will use in order to make one pixel on the render buffer.
+glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER_OES, 4, GL_RGB5_A1_OES, backingWidth, backingHeight);
+glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, msaaRenderBuffer);
+glGenRenderbuffersOES(1, &amp;msaaDepthBuffer); 
+ 
+//Bind the msaa depth buffer.
+glBindRenderbufferOES(GL_RENDERBUFFER_OES, msaaDepthBuffer);
+glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER_OES, 4, GL_DEPTH_COMPONENT16_OES, backingWidth , backingHeight);
+glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, msaaDepthBuffer);
+The previous snippet of code, generates 3 buffers in the lines 2, 3 and 13. This buffers will hold the Frame, Render and Depth buffer for the MSAA. The ¡°magic¡± will come in our ¡°Draw¡± method, which should basically look like:
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+- (void) draw
+{
+    [EAGLContext setCurrentContext:context];
+ 
+    //
+    // Do your drawing here
+    //
+ 
+    // Apple (and the khronos group) encourages you to discard depth
+    // render buffer contents whenever is possible
+    GLenum attachments[] = {GL_DEPTH_ATTACHMENT_OES};
+    glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 1, attachments);
+ 
+    //Bind both MSAA and View FrameBuffers.
+    glBindFramebufferOES(GL_READ_FRAMEBUFFER_APPLE, msaaFramebuffer);
+    glBindFramebufferOES(GL_DRAW_FRAMEBUFFER_APPLE, viewFramebuffer);
+ 
+    // Call a resolve to combine both buffers
+    glResolveMultisampleFramebufferAPPLE();
+ 
+    // Present final image to screen
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
+    [context presentRenderbuffer:GL_RENDERBUFFER_OES];
+}
+Notice the lines 11 and 12, where we discard what we don¡¯t really need of our depth buffer, this is nice for better performance.
+As a conclusion, you can see that it is really easy to use MSAA now, you don¡¯t have to do it 100% ¡°by hand¡± like in the past. I encourage other developers to use anti-aliasing to improve the look of their games and apps, since a lot of them could benefit from this technique.
+>Be sure to check other tutorials in the tutorials section!
+
+
+
+http://www.gandogames.com/2010/07/tutorial-using-anti-aliasing-msaa-in-the-iphone/
