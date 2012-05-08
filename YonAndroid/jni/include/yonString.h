@@ -95,7 +95,8 @@ namespace yon{
 			}*/
 
 			~string(){
-				delete[] elements;
+				//delete[] elements;
+				operator delete(elements);
 			}
 
 			T& operator[](u32 i){
@@ -388,6 +389,41 @@ namespace yon{
 
 				return subString(begin,size);
 			}
+			//! split string into parts.
+			/** This method will split a string at certain delimiter characters
+			into the container passed in as reference. The type of the container
+			has to be given as template parameter. It must provide a push_back and
+			a size method.
+			\param ret The result container
+			\param c C-style string of delimiter characters
+			\param count Number of delimiter characters
+			//编译出错（内存释放进，原因暂时不明）
+			template<class container>
+			u32 split(container& ret, const T* const c, u32 count=1) const
+			{
+				if (!c)
+					return 0;
+
+				const u32 oldSize=ret.size();
+				u32 lastpos = 0;
+				for (u32 i=0; i<len; ++i)
+				{
+					for (u32 j=0; j<count; ++j)
+					{
+						if (elements[i] == c[j])
+						{
+							ret.push_back(subString(lastpos, i - lastpos));
+							lastpos = i + 1;
+							i+=count;
+							break;
+						}
+					}
+				}
+				if (len > lastpos)
+					ret.push_back(subString(lastpos, len- lastpos));
+				return ret.size()-oldSize;
+			}
+			*/
 			void makeLower()
 			{
 				for (u32 i=0; i<len; ++i)

@@ -19,7 +19,8 @@ class stringTestCase : public CPPUNIT_NS::TestFixture
 	CPPUNIT_TEST( findLast );
 	CPPUNIT_TEST( equalsSubstringIgnoreCase );
 	CPPUNIT_TEST( subString );*/
-	CPPUNIT_TEST( find );
+	//CPPUNIT_TEST( find );
+	//CPPUNIT_TEST( splits);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -32,6 +33,7 @@ protected:
 	void equalsSubstringIgnoreCase();
 	void subString();
 	void find();
+	//void splits();
 };
 
 #endif

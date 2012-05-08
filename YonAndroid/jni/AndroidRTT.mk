@@ -6,7 +6,8 @@ LOCAL_CFLAGS := -DANDROID_NDK \
                 -DDISABLE_IMPORTGL \
                 -O3 \
                 -DAL_BUILD_LIBRARY \
-                -DAL_ALEXT_PROTOTYPES 
+                -DAL_ALEXT_PROTOTYPES \
+                -DGL_GLEXT_PROTOTYPES
 
 LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/Yon/zlib \
@@ -127,6 +128,7 @@ yon_SOURCES :=   \
 		Yon/COGLES1ExtensionHandler.cpp \
 		Yon/COGLES1Driver.cpp \
 		Yon/COGLES1Texture.cpp \
+		Yon/COGLES1FBOTexture.cpp \
 		Yon/COGLES1HardwareBuffer.cpp \
 		Yon/CYonEngineAndroid.cpp \
 		Yon/CImage.cpp \
