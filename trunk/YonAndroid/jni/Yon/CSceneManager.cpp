@@ -45,7 +45,7 @@ namespace scene{
 		const core::vector3df& lookat,bool makeActive){
 			camera::COrthoCamera* camera=new camera::COrthoCamera(pos,up,lookat);
 			//camera::CPerspCamera* camera=new camera::CPerspCamera(pos,up,lookat);
-			m_cameras.push(camera);
+			m_cameras.push_back(camera);
 			if(makeActive){
 				setActiveCamera(camera);
 			}

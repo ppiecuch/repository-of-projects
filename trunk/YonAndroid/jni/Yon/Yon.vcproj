@@ -282,6 +282,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\yonAllocator.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\yonArray.h"
 					>
 				</File>

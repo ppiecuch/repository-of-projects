@@ -397,7 +397,7 @@ namespace yon{
 			\param ret The result container
 			\param c C-style string of delimiter characters
 			\param count Number of delimiter characters
-			//编译出错（内存释放进，原因暂时不明）
+			**/
 			template<class container>
 			u32 split(container& ret, const T* const c, u32 count=1) const
 			{
@@ -423,7 +423,6 @@ namespace yon{
 					ret.push_back(subString(lastpos, len- lastpos));
 				return ret.size()-oldSize;
 			}
-			*/
 			void makeLower()
 			{
 				for (u32 i=0; i<len; ++i)

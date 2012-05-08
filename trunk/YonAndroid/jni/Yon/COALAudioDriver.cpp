@@ -16,8 +16,8 @@ namespace oal{
 			m_pContext=alcCreateContext(m_pDevice, NULL);
 			alcMakeContextCurrent(m_pContext);
 			
-			m_waveLoaders.push(createWaveLoaderWAV());
-			m_waveLoaders.push(createWaveLoaderOGG());
+			m_waveLoaders.push_back(createWaveLoaderWAV());
+			m_waveLoaders.push_back(createWaveLoaderOGG());
 
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COALAudioDriver");
 	}
@@ -143,7 +143,7 @@ namespace oal{
 		if (sound)
 		{
 			sound->grab();
-			m_sounds.push(sound);
+			m_sounds.push_back(sound);
 		}
 	}
 
