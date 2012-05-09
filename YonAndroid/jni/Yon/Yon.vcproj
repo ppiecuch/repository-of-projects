@@ -2521,7 +2521,15 @@
 						>
 					</File>
 					<File
+						RelativePath=".\CTexture.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\CTexture.h"
+						>
+					</File>
+					<File
+						RelativePath=".\CVertexBuffer.cpp"
 						>
 					</File>
 					<File
