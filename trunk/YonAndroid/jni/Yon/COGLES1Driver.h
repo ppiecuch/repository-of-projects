@@ -70,6 +70,7 @@ namespace ogles1{
 		virtual bool setTexture(u32 stage, const video::ITexture* texture);
 		virtual ITexture* getTexture(const io::path& filename);
 		virtual video::ITexture* findTexture(const io::path& filename);
+		virtual void removeTexture(ITexture* texture);
 
 		virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat);
 		virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const;
@@ -109,6 +110,7 @@ namespace ogles1{
 
 		debug::IDebugPrinter* m_pDebugPrinter;
 
+		//TODO map(irrlicht÷– π”√SSurface)
 		core::array<video::ITexture*> m_textures;
 		core::array<video::IImageLoader*> m_imageLoaders;
 		core::array<video::IMaterialRenderer*> m_materialRenderers;

@@ -39,6 +39,9 @@ namespace ogles1{
 			return m_pImage->getColorFormat();
 		}
 
+		void* lock();
+		void unlock();
+
 		virtual bool isRenderTarget() const{return m_bIsRenderTarget;}
 		virtual void setIsRenderTarget(bool on){m_bIsRenderTarget=on;}
 		virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color);

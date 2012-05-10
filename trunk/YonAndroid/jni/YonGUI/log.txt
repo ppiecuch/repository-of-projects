@@ -1,0 +1,699 @@
+[2012-05-10 17:58:56.372][DEBG]WM_CREATE
+[2012-05-10 17:58:56.429][DEBG]WM_SIZE
+[2012-05-10 17:58:56.431][WARN]getEngineByHWnd==NULL                                           ¡¾!¡¿
+[2012-05-10 17:58:56.444][INFO]Instance CFileSystem                                            ¡¾¡Ì¡¿
+[2012-05-10 17:58:56.444][INFO]Instance CSceneManager                                          ¡¾¡Ì¡¿
+[2012-05-10 17:58:56.530][INFO]EglDisplay initialized. Egl version 1.3
+[2012-05-10 17:58:56.731][INFO]GL_EXTENSIONS:
+[2012-05-10 17:58:56.732][INFO]OES_byte_coordinates
+[2012-05-10 17:58:56.732][INFO]OES_compressed_paletted_texture
+[2012-05-10 17:58:56.732][INFO]OES_fixed_point
+[2012-05-10 17:58:56.733][INFO]GL_OES_compressed_ETC1_RGB8_texture
+[2012-05-10 17:58:56.733][INFO]OES_single_precision
+[2012-05-10 17:58:56.733][DEBG]setViewPort(0,0,400,400)
+[2012-05-10 17:58:56.734][DEBG]setViewMatrix:
+[2012-05-10 17:58:56.734][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 17:58:56.734][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 17:58:56.734][DEBG]0.000,0.000,1.000,0.000
+[2012-05-10 17:58:56.734][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 17:58:56.734][DEBG]setProjectionMatrix:
+[2012-05-10 17:58:56.734][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 17:58:56.734][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 17:58:56.735][DEBG]0.000,0.000,1.000,0.000
+[2012-05-10 17:58:56.735][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 17:58:56.736][DEBG]{frameLimit:1,timeUnit:100}
+[2012-05-10 17:58:56.736][DEBG]glTexImage2D:1,128,64,R8G8B8
+[2012-05-10 17:58:56.738][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 17:58:56.738][INFO]Instance COGLES1Driver                                          ¡¾¡Ì¡¿
+[2012-05-10 17:58:56.738][DEBG]initialize COGLES1MyGUIRenderManager                            ¡¾¡Ì¡¿
+[2012-05-10 17:58:56.739][INFO]initialize MyGUIDataManager                                     ¡¾¡Ì¡¿
+[2012-05-10 17:58:56.771][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/YonGUI/MyGUI_Core.xml¡¾¨w¡¿
+[2012-05-10 17:58:56.772][INFO]Instance COGLES1MyGUIEnvirenment                                ¡¾¡Ì¡¿
+[2012-05-10 17:58:56.773][INFO]Instance CGraphicsAdapter                                       ¡¾¡Ì¡¿
+[2012-05-10 17:58:57.335][INFO]Instance COALAudioDriver                                        ¡¾¡Ì¡¿
+[2012-05-10 17:58:57.335][DEBG]EngineMap.push_back(ep)
+[2012-05-10 17:58:57.336][INFO]CreateEngine(400,400),version:0.1.0                             ¡¾¡Ì¡¿
+[2012-05-10 17:58:57.336][DEBG]CSceneManager::addCamera size:1
+[2012-05-10 17:58:57.356][DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[2012-05-10 17:58:57.357][DEBG]start load sound:bg.ogg
+[2012-05-10 17:58:57.404][DEBG]start ov_read:bg.ogg
+[2012-05-10 17:59:17.054][DEBG]end ov_read:bg.ogg
+[2012-05-10 17:59:17.083][DEBG]create wave completed:bg.ogg
+[2012-05-10 17:59:18.375][DEBG]end load sound:bg.ogg                                           ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.385][DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.387][DEBG]half cube size:25.00,25.00,25.00,-25.00,-25.00,-25.00
+[2012-05-10 17:59:18.388][DEBG]CSceneManager::addModel size:1
+[2012-05-10 17:59:18.403][DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.403][DEBG]start load texture:test.png
+[2012-05-10 17:59:18.405][DEBG]glTexImage2D:2,64,64,R8G8B8
+[2012-05-10 17:59:18.406][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.406][DEBG]end load texture:test.png                                       ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.406][DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.407][DEBG]CSceneManager::addModel size:2
+[2012-05-10 17:59:18.408][DEBG]CSceneManager::addModel size:3
+[2012-05-10 17:59:18.408][DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.408][DEBG]start load texture:aura.png
+[2012-05-10 17:59:18.467][DEBG]glTexImage2D:3,256,256,R8G8B8
+[2012-05-10 17:59:18.469][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.470][DEBG]end load texture:aura.png                                       ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.470][DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[2012-05-10 17:59:18.473][DEBG]WM_SIZE
+[2012-05-10 17:59:18.475][DEBG]setViewPort(0,0,400,400)
+[2012-05-10 17:59:18.475][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 17:59:18.520][DEBG]setViewMatrix:
+[2012-05-10 17:59:18.520][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 17:59:18.520][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 17:59:18.520][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 17:59:18.520][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 17:59:18.521][DEBG]setProjectionMatrix:
+[2012-05-10 17:59:18.521][DEBG]0.005,0.000,0.000,0.000
+[2012-05-10 17:59:18.521][DEBG]0.000,0.005,0.000,0.000
+[2012-05-10 17:59:18.521][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 17:59:18.521][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:00:01.627][DEBG]WM_SIZE
+[2012-05-10 18:00:01.645][DEBG]WM_SIZE
+[2012-05-10 18:00:01.656][DEBG]WM_SIZE
+[2012-05-10 18:00:01.666][DEBG]WM_SIZE
+[2012-05-10 18:00:01.678][DEBG]WM_SIZE
+[2012-05-10 18:00:01.691][DEBG]WM_SIZE
+[2012-05-10 18:00:01.700][DEBG]WM_SIZE
+[2012-05-10 18:00:01.711][DEBG]WM_SIZE
+[2012-05-10 18:00:01.724][DEBG]WM_SIZE
+[2012-05-10 18:00:01.733][DEBG]WM_SIZE
+[2012-05-10 18:00:01.747][DEBG]WM_SIZE
+[2012-05-10 18:00:01.760][DEBG]WM_SIZE
+[2012-05-10 18:00:01.775][DEBG]WM_SIZE
+[2012-05-10 18:00:01.833][DEBG]WM_SIZE
+[2012-05-10 18:00:01.843][DEBG]WM_SIZE
+[2012-05-10 18:00:01.855][DEBG]WM_SIZE
+[2012-05-10 18:00:01.865][DEBG]WM_SIZE
+[2012-05-10 18:00:01.877][DEBG]WM_SIZE
+[2012-05-10 18:00:01.889][DEBG]WM_SIZE
+[2012-05-10 18:00:01.899][DEBG]WM_SIZE
+[2012-05-10 18:00:01.911][DEBG]WM_SIZE
+[2012-05-10 18:00:01.922][DEBG]WM_SIZE
+[2012-05-10 18:00:01.927][DEBG]setViewPort(0,0,963,682)
+[2012-05-10 18:00:01.928][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:00:01.931][DEBG]setViewMatrix:
+[2012-05-10 18:00:01.931][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:00:01.931][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:00:01.932][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:00:01.932][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:00:01.932][DEBG]setProjectionMatrix:
+[2012-05-10 18:00:01.933][DEBG]0.002,0.000,0.000,0.001
+[2012-05-10 18:00:01.933][DEBG]0.000,0.003,0.000,0.000
+[2012-05-10 18:00:01.933][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:00:01.933][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:00:03.286][DEBG]WM_SIZE
+[2012-05-10 18:00:03.300][DEBG]WM_SIZE
+[2012-05-10 18:00:03.316][DEBG]WM_SIZE
+[2012-05-10 18:00:03.325][DEBG]WM_SIZE
+[2012-05-10 18:00:03.339][DEBG]WM_SIZE
+[2012-05-10 18:00:03.353][DEBG]WM_SIZE
+[2012-05-10 18:00:03.365][DEBG]WM_SIZE
+[2012-05-10 18:00:03.375][DEBG]WM_SIZE
+[2012-05-10 18:00:03.386][DEBG]WM_SIZE
+[2012-05-10 18:00:03.399][DEBG]WM_SIZE
+[2012-05-10 18:00:03.409][DEBG]WM_SIZE
+[2012-05-10 18:00:03.423][DEBG]WM_SIZE
+[2012-05-10 18:00:03.432][DEBG]WM_SIZE
+[2012-05-10 18:00:03.443][DEBG]WM_SIZE
+[2012-05-10 18:00:03.454][DEBG]WM_SIZE
+[2012-05-10 18:00:03.465][DEBG]WM_SIZE
+[2012-05-10 18:00:03.487][DEBG]setViewPort(0,0,748,601)
+[2012-05-10 18:00:03.487][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:00:03.489][DEBG]setViewMatrix:
+[2012-05-10 18:00:03.539][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:00:03.539][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:00:03.539][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:00:03.540][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:00:03.540][DEBG]setProjectionMatrix:
+[2012-05-10 18:00:03.540][DEBG]0.003,0.000,0.000,0.000
+[2012-05-10 18:00:03.540][DEBG]0.000,0.003,0.000,0.002
+[2012-05-10 18:00:03.541][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:00:03.541][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:00:16.846][DEBG]WM_SIZE
+[2012-05-10 18:00:16.863][DEBG]WM_SIZE
+[2012-05-10 18:00:16.871][DEBG]WM_SIZE
+[2012-05-10 18:00:16.884][DEBG]WM_SIZE
+[2012-05-10 18:00:16.897][DEBG]WM_SIZE
+[2012-05-10 18:00:16.909][DEBG]WM_SIZE
+[2012-05-10 18:00:16.922][DEBG]WM_SIZE
+[2012-05-10 18:00:16.935][DEBG]WM_SIZE
+[2012-05-10 18:00:16.947][DEBG]WM_SIZE
+[2012-05-10 18:00:16.960][DEBG]WM_SIZE
+[2012-05-10 18:00:16.975][DEBG]WM_SIZE
+[2012-05-10 18:00:16.990][DEBG]WM_SIZE
+[2012-05-10 18:00:17.002][DEBG]WM_SIZE
+[2012-05-10 18:00:17.015][DEBG]WM_SIZE
+[2012-05-10 18:00:17.029][DEBG]WM_SIZE
+[2012-05-10 18:00:17.042][DEBG]WM_SIZE
+[2012-05-10 18:00:17.055][DEBG]WM_SIZE
+[2012-05-10 18:00:17.066][DEBG]WM_SIZE
+[2012-05-10 18:00:17.287][DEBG]setViewPort(0,0,1426,751)
+[2012-05-10 18:00:17.287][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:00:17.289][DEBG]setViewMatrix:
+[2012-05-10 18:00:17.289][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:00:17.289][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:00:17.289][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:00:17.289][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:00:17.290][DEBG]setProjectionMatrix:
+[2012-05-10 18:00:17.290][DEBG]0.001,0.000,0.000,0.000
+[2012-05-10 18:00:17.290][DEBG]0.000,0.003,0.000,0.001
+[2012-05-10 18:00:17.290][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:00:17.290][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:00:21.395][DEBG]WM_SIZE
+[2012-05-10 18:00:21.409][DEBG]WM_SIZE
+[2012-05-10 18:00:21.422][DEBG]WM_SIZE
+[2012-05-10 18:00:21.442][DEBG]WM_SIZE
+[2012-05-10 18:00:21.452][DEBG]WM_SIZE
+[2012-05-10 18:00:21.465][DEBG]WM_SIZE
+[2012-05-10 18:00:21.479][DEBG]WM_SIZE
+[2012-05-10 18:00:21.494][DEBG]WM_SIZE
+[2012-05-10 18:00:21.507][DEBG]WM_SIZE
+[2012-05-10 18:00:21.516][DEBG]WM_SIZE
+[2012-05-10 18:00:21.533][DEBG]WM_SIZE
+[2012-05-10 18:00:21.546][DEBG]WM_SIZE
+[2012-05-10 18:00:21.559][DEBG]WM_SIZE
+[2012-05-10 18:00:21.580][DEBG]WM_SIZE
+[2012-05-10 18:00:21.595][DEBG]WM_SIZE
+[2012-05-10 18:00:21.610][DEBG]WM_SIZE
+[2012-05-10 18:00:21.622][DEBG]WM_SIZE
+[2012-05-10 18:00:21.632][DEBG]WM_SIZE
+[2012-05-10 18:00:21.645][DEBG]WM_SIZE
+[2012-05-10 18:00:21.658][DEBG]WM_SIZE
+[2012-05-10 18:00:21.667][DEBG]WM_SIZE
+[2012-05-10 18:00:21.679][DEBG]WM_SIZE
+[2012-05-10 18:00:21.694][DEBG]WM_SIZE
+[2012-05-10 18:00:21.703][DEBG]WM_SIZE
+[2012-05-10 18:00:21.713][DEBG]WM_SIZE
+[2012-05-10 18:00:21.730][DEBG]WM_SIZE
+[2012-05-10 18:00:21.744][DEBG]WM_SIZE
+[2012-05-10 18:00:21.760][DEBG]WM_SIZE
+[2012-05-10 18:00:21.773][DEBG]WM_SIZE
+[2012-05-10 18:00:21.785][DEBG]WM_SIZE
+[2012-05-10 18:00:21.796][DEBG]WM_SIZE
+[2012-05-10 18:00:21.806][DEBG]WM_SIZE
+[2012-05-10 18:00:21.818][DEBG]WM_SIZE
+[2012-05-10 18:00:21.831][DEBG]WM_SIZE
+[2012-05-10 18:00:21.847][DEBG]WM_SIZE
+[2012-05-10 18:00:21.860][DEBG]WM_SIZE
+[2012-05-10 18:00:21.870][DEBG]WM_SIZE
+[2012-05-10 18:00:21.884][DEBG]WM_SIZE
+[2012-05-10 18:00:21.894][DEBG]WM_SIZE
+[2012-05-10 18:00:21.903][DEBG]WM_SIZE
+[2012-05-10 18:00:21.914][DEBG]WM_SIZE
+[2012-05-10 18:00:21.927][DEBG]WM_SIZE
+[2012-05-10 18:00:21.937][DEBG]WM_SIZE
+[2012-05-10 18:00:21.951][DEBG]WM_SIZE
+[2012-05-10 18:00:21.996][DEBG]WM_SIZE
+[2012-05-10 18:00:22.005][DEBG]WM_SIZE
+[2012-05-10 18:00:22.014][DEBG]WM_SIZE
+[2012-05-10 18:00:22.024][DEBG]WM_SIZE
+[2012-05-10 18:00:22.183][DEBG]setViewPort(0,0,1622,897)
+[2012-05-10 18:00:22.183][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:00:22.187][DEBG]setViewMatrix:
+[2012-05-10 18:00:22.187][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:00:22.187][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:00:22.187][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:00:22.188][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:00:22.188][DEBG]setProjectionMatrix:
+[2012-05-10 18:00:22.188][DEBG]0.001,0.000,0.000,0.000
+[2012-05-10 18:00:22.188][DEBG]0.000,0.002,0.000,0.001
+[2012-05-10 18:00:22.188][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:00:22.188][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:00:33.938][DEBG]WM_DESTROY
+[2012-05-10 18:00:33.953][INFO]Release 2/2 WaveLoader
+[2012-05-10 18:00:33.959][INFO]Release 1/1 Sound
+[2012-05-10 18:00:34.178][INFO]Release COALAudioDriver                                         ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.179][INFO]Release CGraphicsAdapter                                        ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.181][DEBG]shutdown COGLES1MyGUIRenderManager                              ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.182][INFO]shutdown MyGUIDataManager                                       ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.182][INFO]Release COGLES1MyGUIEnvirenment                                 ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.182][DEBG]Release CDebugPrinter                                           ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.182][INFO]Release 0/0 Hardwarebuffer
+[2012-05-10 18:00:34.182][INFO]Release 1/1 ImageLoader
+[2012-05-10 18:00:34.183][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.183][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.183][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.183][INFO]Release 3/3 Texture
+[2012-05-10 18:00:34.184][INFO]Release 5/5 MaterialRenderer
+[2012-05-10 18:00:34.184][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.268][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.269][WARN]Release DC                                                      ¡¾!¡¿
+[2012-05-10 18:00:34.269][INFO]Release COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.269][INFO]Release CSceneManager                                           ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.270][INFO]Release CFileSystem                                             ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.270][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.271][INFO]UnregisterClass                                                 ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.271][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-05-10 18:00:34.271][INFO]Release Logger                                                  ¡¾¡Ì¡¿
+[2012-05-10 18:07:28.619][DEBG]WM_CREATE
+[2012-05-10 18:07:28.666][DEBG]WM_SIZE
+[2012-05-10 18:07:28.666][WARN]getEngineByHWnd==NULL                                           ¡¾!¡¿
+[2012-05-10 18:07:28.667][INFO]Instance CFileSystem                                            ¡¾¡Ì¡¿
+[2012-05-10 18:07:28.667][INFO]Instance CSceneManager                                          ¡¾¡Ì¡¿
+[2012-05-10 18:07:28.747][INFO]EglDisplay initialized. Egl version 1.3
+[2012-05-10 18:07:28.952][INFO]GL_EXTENSIONS:
+[2012-05-10 18:07:28.953][INFO]OES_byte_coordinates
+[2012-05-10 18:07:28.953][INFO]OES_compressed_paletted_texture
+[2012-05-10 18:07:28.953][INFO]OES_fixed_point
+[2012-05-10 18:07:28.953][INFO]GL_OES_compressed_ETC1_RGB8_texture
+[2012-05-10 18:07:28.953][INFO]OES_single_precision
+[2012-05-10 18:07:28.953][DEBG]setViewPort(0,0,400,400)
+[2012-05-10 18:07:28.953][DEBG]setViewMatrix:
+[2012-05-10 18:07:28.954][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:07:28.954][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:07:28.954][DEBG]0.000,0.000,1.000,0.000
+[2012-05-10 18:07:28.954][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:07:28.954][DEBG]setProjectionMatrix:
+[2012-05-10 18:07:28.955][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:07:28.955][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:07:28.955][DEBG]0.000,0.000,1.000,0.000
+[2012-05-10 18:07:28.955][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:07:28.956][DEBG]{frameLimit:1,timeUnit:100}
+[2012-05-10 18:07:28.956][DEBG]glTexImage2D:1,128,64,R8G8B8
+[2012-05-10 18:07:28.956][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 18:07:28.957][INFO]Instance COGLES1Driver                                          ¡¾¡Ì¡¿
+[2012-05-10 18:07:28.957][DEBG]initialize COGLES1MyGUIRenderManager                            ¡¾¡Ì¡¿
+[2012-05-10 18:07:28.957][INFO]initialize MyGUIDataManager                                     ¡¾¡Ì¡¿
+[2012-05-10 18:07:28.967][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/YonGUI/MyGUI_Core.xml¡¾¨w¡¿
+[2012-05-10 18:07:28.969][INFO]Instance COGLES1MyGUIEnvirenment                                ¡¾¡Ì¡¿
+[2012-05-10 18:07:28.969][INFO]Instance CGraphicsAdapter                                       ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.205][INFO]Instance COALAudioDriver                                        ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.206][DEBG]EngineMap.push_back(ep)
+[2012-05-10 18:07:29.206][INFO]CreateEngine(400,400),version:0.1.0                             ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.206][DEBG]CSceneManager::addCamera size:1
+[2012-05-10 18:07:29.207][DEBG]half cube size:25.00,25.00,25.00,-25.00,-25.00,-25.00
+[2012-05-10 18:07:29.207][DEBG]CSceneManager::addModel size:1
+[2012-05-10 18:07:29.207][DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.207][DEBG]start load texture:test.png
+[2012-05-10 18:07:29.208][DEBG]glTexImage2D:2,64,64,R8G8B8
+[2012-05-10 18:07:29.208][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.209][DEBG]end load texture:test.png                                       ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.209][DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.210][DEBG]CSceneManager::addModel size:2
+[2012-05-10 18:07:29.211][DEBG]CSceneManager::addModel size:3
+[2012-05-10 18:07:29.212][DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.212][DEBG]start load texture:aura.png
+[2012-05-10 18:07:29.218][DEBG]glTexImage2D:3,256,256,R8G8B8
+[2012-05-10 18:07:29.221][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.221][DEBG]end load texture:aura.png                                       ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.221][DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[2012-05-10 18:07:29.225][DEBG]WM_SIZE
+[2012-05-10 18:07:29.228][DEBG]setViewPort(0,0,400,400)
+[2012-05-10 18:07:29.229][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:07:29.240][DEBG]setViewMatrix:
+[2012-05-10 18:07:29.240][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:07:29.240][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:07:29.240][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:07:29.240][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:07:29.241][DEBG]setProjectionMatrix:
+[2012-05-10 18:07:29.242][DEBG]0.005,0.000,0.000,0.000
+[2012-05-10 18:07:29.243][DEBG]0.000,0.005,0.000,0.000
+[2012-05-10 18:07:29.243][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:07:29.244][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:07:37.137][DEBG]WM_DESTROY
+[2012-05-10 18:07:37.147][INFO]Release 2/2 WaveLoader
+[2012-05-10 18:07:37.147][INFO]Release 0/0 Sound
+[2012-05-10 18:07:37.364][INFO]Release COALAudioDriver                                         ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.365][INFO]Release CGraphicsAdapter                                        ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.366][DEBG]shutdown COGLES1MyGUIRenderManager                              ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.367][INFO]shutdown MyGUIDataManager                                       ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.367][INFO]Release COGLES1MyGUIEnvirenment                                 ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.367][DEBG]Release CDebugPrinter                                           ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.367][INFO]Release 0/0 Hardwarebuffer
+[2012-05-10 18:07:37.367][INFO]Release 1/1 ImageLoader
+[2012-05-10 18:07:37.367][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.368][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.368][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.368][INFO]Release 3/3 Texture
+[2012-05-10 18:07:37.368][INFO]Release 5/5 MaterialRenderer
+[2012-05-10 18:07:37.369][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.456][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.456][WARN]Release DC                                                      ¡¾!¡¿
+[2012-05-10 18:07:37.456][INFO]Release COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.456][INFO]Release CSceneManager                                           ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.457][INFO]Release CFileSystem                                             ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.457][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.457][INFO]UnregisterClass                                                 ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.458][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-05-10 18:07:37.458][INFO]Release Logger                                                  ¡¾¡Ì¡¿
+[2012-05-10 18:16:03.773][DEBG]WM_CREATE
+[2012-05-10 18:16:03.832][DEBG]WM_SIZE
+[2012-05-10 18:16:03.832][WARN]getEngineByHWnd==NULL                                           ¡¾!¡¿
+[2012-05-10 18:16:03.833][INFO]Instance CFileSystem                                            ¡¾¡Ì¡¿
+[2012-05-10 18:16:03.833][INFO]Instance CSceneManager                                          ¡¾¡Ì¡¿
+[2012-05-10 18:16:03.909][INFO]EglDisplay initialized. Egl version 1.3
+[2012-05-10 18:16:04.109][INFO]GL_EXTENSIONS:
+[2012-05-10 18:16:04.110][INFO]OES_byte_coordinates
+[2012-05-10 18:16:04.111][INFO]OES_compressed_paletted_texture
+[2012-05-10 18:16:04.112][INFO]OES_fixed_point
+[2012-05-10 18:16:04.112][INFO]GL_OES_compressed_ETC1_RGB8_texture
+[2012-05-10 18:16:04.113][INFO]OES_single_precision
+[2012-05-10 18:16:04.113][DEBG]setViewPort(0,0,400,400)
+[2012-05-10 18:16:04.113][DEBG]setViewMatrix:
+[2012-05-10 18:16:04.113][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:16:04.114][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:16:04.115][DEBG]0.000,0.000,1.000,0.000
+[2012-05-10 18:16:04.115][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:04.115][DEBG]setProjectionMatrix:
+[2012-05-10 18:16:04.115][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:16:04.115][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:16:04.116][DEBG]0.000,0.000,1.000,0.000
+[2012-05-10 18:16:04.116][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:04.116][DEBG]{frameLimit:1,timeUnit:100}
+[2012-05-10 18:16:04.116][DEBG]glTexImage2D:1,128,64,R8G8B8
+[2012-05-10 18:16:04.117][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.117][INFO]Instance COGLES1Driver                                          ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.117][INFO]Instance COGLES1MyGUIEnvirenment                                ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.117][INFO]Instance CGraphicsAdapter                                       ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.389][INFO]Instance COALAudioDriver                                        ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.389][DEBG]EngineMap.push_back(ep)
+[2012-05-10 18:16:04.390][INFO]CreateEngine(400,400),version:0.1.0                             ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.390][DEBG]CSceneManager::addCamera size:1
+[2012-05-10 18:16:04.390][DEBG]initialize COGLES1MyGUIRenderManager                            ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.391][INFO]initialize MyGUIDataManager                                     ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.409][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_Fonts.xml¡¾¨w¡¿
+[2012-05-10 18:16:04.410][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_Images.xml¡¾¨w¡¿
+[2012-05-10 18:16:04.410][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_CommonSkins.xml¡¾¨w¡¿
+[2012-05-10 18:16:04.411][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_BlueWhiteTheme.xml¡¾¨w¡¿
+[2012-05-10 18:16:04.411][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_Pointers.xml¡¾¨w¡¿
+[2012-05-10 18:16:04.411][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_Layers.xml¡¾¨w¡¿
+[2012-05-10 18:16:04.412][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_Settings.xml¡¾¨w¡¿
+[2012-05-10 18:16:04.413][DEBG]half cube size:25.00,25.00,25.00,-25.00,-25.00,-25.00
+[2012-05-10 18:16:04.414][DEBG]CSceneManager::addModel size:1
+[2012-05-10 18:16:04.414][DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.414][DEBG]start load texture:test.png
+[2012-05-10 18:16:04.415][DEBG]glTexImage2D:2,64,64,R8G8B8
+[2012-05-10 18:16:04.416][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.416][DEBG]end load texture:test.png                                       ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.416][DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.417][DEBG]CSceneManager::addModel size:2
+[2012-05-10 18:16:04.418][DEBG]CSceneManager::addModel size:3
+[2012-05-10 18:16:04.418][DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.418][DEBG]start load texture:aura.png
+[2012-05-10 18:16:04.425][DEBG]glTexImage2D:3,256,256,R8G8B8
+[2012-05-10 18:16:04.427][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.427][DEBG]end load texture:aura.png                                       ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.428][DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[2012-05-10 18:16:04.429][DEBG]WM_SIZE
+[2012-05-10 18:16:04.430][DEBG]setViewPort(0,0,400,400)
+[2012-05-10 18:16:04.430][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:16:04.439][DEBG]setViewMatrix:
+[2012-05-10 18:16:04.439][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:16:04.439][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:16:04.439][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:16:04.440][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:04.440][DEBG]setProjectionMatrix:
+[2012-05-10 18:16:04.440][DEBG]0.005,0.000,0.000,0.000
+[2012-05-10 18:16:04.440][DEBG]0.000,0.005,0.000,0.000
+[2012-05-10 18:16:04.440][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:16:04.440][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:10.006][DEBG]WM_SIZE
+[2012-05-10 18:16:10.022][DEBG]WM_SIZE
+[2012-05-10 18:16:10.040][DEBG]WM_SIZE
+[2012-05-10 18:16:10.053][DEBG]WM_SIZE
+[2012-05-10 18:16:10.065][DEBG]WM_SIZE
+[2012-05-10 18:16:10.076][DEBG]WM_SIZE
+[2012-05-10 18:16:10.086][DEBG]WM_SIZE
+[2012-05-10 18:16:10.095][DEBG]WM_SIZE
+[2012-05-10 18:16:10.105][DEBG]WM_SIZE
+[2012-05-10 18:16:10.116][DEBG]WM_SIZE
+[2012-05-10 18:16:10.126][DEBG]WM_SIZE
+[2012-05-10 18:16:10.137][DEBG]WM_SIZE
+[2012-05-10 18:16:10.149][DEBG]WM_SIZE
+[2012-05-10 18:16:10.157][DEBG]WM_SIZE
+[2012-05-10 18:16:10.168][DEBG]WM_SIZE
+[2012-05-10 18:16:10.184][DEBG]WM_SIZE
+[2012-05-10 18:16:10.192][DEBG]WM_SIZE
+[2012-05-10 18:16:10.202][DEBG]WM_SIZE
+[2012-05-10 18:16:10.211][DEBG]WM_SIZE
+[2012-05-10 18:16:10.221][DEBG]WM_SIZE
+[2012-05-10 18:16:10.233][DEBG]WM_SIZE
+[2012-05-10 18:16:10.242][DEBG]WM_SIZE
+[2012-05-10 18:16:10.253][DEBG]WM_SIZE
+[2012-05-10 18:16:10.262][DEBG]WM_SIZE
+[2012-05-10 18:16:10.274][DEBG]WM_SIZE
+[2012-05-10 18:16:10.283][DEBG]WM_SIZE
+[2012-05-10 18:16:10.291][DEBG]WM_SIZE
+[2012-05-10 18:16:10.303][DEBG]WM_SIZE
+[2012-05-10 18:16:10.311][DEBG]WM_SIZE
+[2012-05-10 18:16:10.321][DEBG]WM_SIZE
+[2012-05-10 18:16:10.334][DEBG]WM_SIZE
+[2012-05-10 18:16:10.337][DEBG]setViewPort(0,0,770,400)
+[2012-05-10 18:16:10.337][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:16:10.338][DEBG]setViewMatrix:
+[2012-05-10 18:16:10.338][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:16:10.338][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:16:10.339][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:16:10.339][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:10.339][DEBG]setProjectionMatrix:
+[2012-05-10 18:16:10.339][DEBG]0.003,0.000,0.000,0.000
+[2012-05-10 18:16:10.339][DEBG]0.000,0.005,0.000,0.000
+[2012-05-10 18:16:10.339][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:16:10.339][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:13.216][DEBG]WM_SIZE
+[2012-05-10 18:16:13.233][DEBG]WM_SIZE
+[2012-05-10 18:16:13.249][DEBG]WM_SIZE
+[2012-05-10 18:16:13.265][DEBG]WM_SIZE
+[2012-05-10 18:16:13.277][DEBG]WM_SIZE
+[2012-05-10 18:16:13.291][DEBG]WM_SIZE
+[2012-05-10 18:16:13.304][DEBG]WM_SIZE
+[2012-05-10 18:16:13.318][DEBG]WM_SIZE
+[2012-05-10 18:16:13.332][DEBG]WM_SIZE
+[2012-05-10 18:16:13.343][DEBG]WM_SIZE
+[2012-05-10 18:16:13.357][DEBG]WM_SIZE
+[2012-05-10 18:16:13.369][DEBG]WM_SIZE
+[2012-05-10 18:16:13.378][DEBG]WM_SIZE
+[2012-05-10 18:16:13.389][DEBG]WM_SIZE
+[2012-05-10 18:16:13.400][DEBG]WM_SIZE
+[2012-05-10 18:16:13.411][DEBG]WM_SIZE
+[2012-05-10 18:16:13.428][DEBG]WM_SIZE
+[2012-05-10 18:16:13.443][DEBG]WM_SIZE
+[2012-05-10 18:16:13.458][DEBG]WM_SIZE
+[2012-05-10 18:16:13.473][DEBG]WM_SIZE
+[2012-05-10 18:16:13.485][DEBG]WM_SIZE
+[2012-05-10 18:16:13.497][DEBG]WM_SIZE
+[2012-05-10 18:16:13.502][DEBG]setViewPort(0,0,1144,792)
+[2012-05-10 18:16:13.503][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:16:13.504][DEBG]setViewMatrix:
+[2012-05-10 18:16:13.505][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:16:13.505][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:16:13.506][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:16:13.506][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:13.507][DEBG]setProjectionMatrix:
+[2012-05-10 18:16:13.507][DEBG]0.002,0.000,0.000,0.000
+[2012-05-10 18:16:13.508][DEBG]0.000,0.003,0.000,0.000
+[2012-05-10 18:16:13.508][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:16:13.508][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:14.177][DEBG]WM_SIZE
+[2012-05-10 18:16:14.189][DEBG]WM_SIZE
+[2012-05-10 18:16:14.210][DEBG]WM_SIZE
+[2012-05-10 18:16:14.226][DEBG]WM_SIZE
+[2012-05-10 18:16:14.240][DEBG]WM_SIZE
+[2012-05-10 18:16:14.257][DEBG]WM_SIZE
+[2012-05-10 18:16:14.270][DEBG]WM_SIZE
+[2012-05-10 18:16:14.282][DEBG]WM_SIZE
+[2012-05-10 18:16:14.298][DEBG]WM_SIZE
+[2012-05-10 18:16:14.313][DEBG]WM_SIZE
+[2012-05-10 18:16:14.326][DEBG]WM_SIZE
+[2012-05-10 18:16:14.343][DEBG]WM_SIZE
+[2012-05-10 18:16:14.362][DEBG]WM_SIZE
+[2012-05-10 18:16:14.378][DEBG]WM_SIZE
+[2012-05-10 18:16:14.396][DEBG]WM_SIZE
+[2012-05-10 18:16:14.401][DEBG]setViewPort(0,0,1300,844)
+[2012-05-10 18:16:14.402][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:16:14.404][DEBG]setViewMatrix:
+[2012-05-10 18:16:14.406][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:16:14.406][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:16:14.406][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:16:14.406][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:14.407][DEBG]setProjectionMatrix:
+[2012-05-10 18:16:14.407][DEBG]0.002,0.000,0.000,0.000
+[2012-05-10 18:16:14.408][DEBG]0.000,0.002,0.000,0.000
+[2012-05-10 18:16:14.408][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:16:14.408][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:16:15.793][DEBG]WM_DESTROY
+[2012-05-10 18:16:15.808][INFO]Release 2/2 WaveLoader
+[2012-05-10 18:16:15.809][INFO]Release 0/0 Sound
+[2012-05-10 18:16:16.030][INFO]Release COALAudioDriver                                         ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.030][INFO]Release CGraphicsAdapter                                        ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.033][DEBG]shutdown COGLES1MyGUIRenderManager                              ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.033][INFO]shutdown MyGUIDataManager                                       ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.033][INFO]Release COGLES1MyGUIEnvirenment                                 ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.034][DEBG]Release CDebugPrinter                                           ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.034][INFO]Release 0/0 Hardwarebuffer
+[2012-05-10 18:16:16.034][INFO]Release 1/1 ImageLoader
+[2012-05-10 18:16:16.034][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.035][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.035][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.035][INFO]Release 3/3 Texture
+[2012-05-10 18:16:16.036][INFO]Release 5/5 MaterialRenderer
+[2012-05-10 18:16:16.036][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.117][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.118][WARN]Release DC                                                      ¡¾!¡¿
+[2012-05-10 18:16:16.118][INFO]Release COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.118][INFO]Release CSceneManager                                           ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.118][INFO]Release CFileSystem                                             ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.119][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.119][INFO]UnregisterClass                                                 ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.119][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-05-10 18:16:16.119][INFO]Release Logger                                                  ¡¾¡Ì¡¿
+[2012-05-10 18:18:00.470][DEBG]WM_CREATE
+[2012-05-10 18:18:00.520][DEBG]WM_SIZE
+[2012-05-10 18:18:00.521][WARN]getEngineByHWnd==NULL                                           ¡¾!¡¿
+[2012-05-10 18:18:00.521][INFO]Instance CFileSystem                                            ¡¾¡Ì¡¿
+[2012-05-10 18:18:00.522][INFO]Instance CSceneManager                                          ¡¾¡Ì¡¿
+[2012-05-10 18:18:00.610][INFO]EglDisplay initialized. Egl version 1.3
+[2012-05-10 18:18:00.821][INFO]GL_EXTENSIONS:
+[2012-05-10 18:18:00.822][INFO]OES_byte_coordinates
+[2012-05-10 18:18:00.822][INFO]OES_compressed_paletted_texture
+[2012-05-10 18:18:00.822][INFO]OES_fixed_point
+[2012-05-10 18:18:00.823][INFO]GL_OES_compressed_ETC1_RGB8_texture
+[2012-05-10 18:18:00.823][INFO]OES_single_precision
+[2012-05-10 18:18:00.823][DEBG]setViewPort(0,0,400,400)
+[2012-05-10 18:18:00.823][DEBG]setViewMatrix:
+[2012-05-10 18:18:00.823][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:18:00.823][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:18:00.823][DEBG]0.000,0.000,1.000,0.000
+[2012-05-10 18:18:00.823][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:18:00.823][DEBG]setProjectionMatrix:
+[2012-05-10 18:18:00.824][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:18:00.824][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:18:00.824][DEBG]0.000,0.000,1.000,0.000
+[2012-05-10 18:18:00.824][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:18:00.824][DEBG]{frameLimit:1,timeUnit:100}
+[2012-05-10 18:18:00.824][DEBG]glTexImage2D:1,128,64,R8G8B8
+[2012-05-10 18:18:00.825][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 18:18:00.826][INFO]Instance COGLES1Driver                                          ¡¾¡Ì¡¿
+[2012-05-10 18:18:00.826][INFO]Instance COGLES1MyGUIEnvirenment                                ¡¾¡Ì¡¿
+[2012-05-10 18:18:00.826][INFO]Instance CGraphicsAdapter                                       ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.031][INFO]Instance COALAudioDriver                                        ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.031][DEBG]EngineMap.push_back(ep)
+[2012-05-10 18:18:01.032][INFO]CreateEngine(400,400),version:0.1.0                             ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.032][DEBG]CSceneManager::addCamera size:1
+[2012-05-10 18:18:01.032][DEBG]initialize COGLES1MyGUIRenderManager                            ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.033][INFO]initialize MyGUIDataManager                                     ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.045][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/DejaVuSans.ttf¡¾¨w¡¿
+[2012-05-10 18:18:01.241][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/simsun.ttc¡¾¨w¡¿
+[2012-05-10 18:18:01.252][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_BlueWhiteImages.xml¡¾¨w¡¿
+[2012-05-10 18:18:01.252][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_BlueWhiteSkins.xml¡¾¨w¡¿
+[2012-05-10 18:18:01.252][INFO]open d:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/MyGUI_BlueWhiteTemplates.xml¡¾¨w¡¿
+[2012-05-10 18:18:01.262][DEBG]half cube size:25.00,25.00,25.00,-25.00,-25.00,-25.00
+[2012-05-10 18:18:01.262][DEBG]CSceneManager::addModel size:1
+[2012-05-10 18:18:01.262][DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.263][DEBG]start load texture:test.png
+[2012-05-10 18:18:01.263][DEBG]glTexImage2D:2,64,64,R8G8B8
+[2012-05-10 18:18:01.263][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.264][DEBG]end load texture:test.png                                       ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.264][DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.265][DEBG]CSceneManager::addModel size:2
+[2012-05-10 18:18:01.266][DEBG]CSceneManager::addModel size:3
+[2012-05-10 18:18:01.266][DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.266][DEBG]start load texture:aura.png
+[2012-05-10 18:18:01.272][DEBG]glTexImage2D:3,256,256,R8G8B8
+[2012-05-10 18:18:01.275][DEBG]Instance COGLES1Texture                                         ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.275][DEBG]end load texture:aura.png                                       ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.275][DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[2012-05-10 18:18:01.278][DEBG]WM_SIZE
+[2012-05-10 18:18:01.281][DEBG]setViewPort(0,0,400,400)
+[2012-05-10 18:18:01.282][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:18:01.291][DEBG]setViewMatrix:
+[2012-05-10 18:18:01.291][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:18:01.291][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:18:01.292][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:18:01.292][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:18:01.292][DEBG]setProjectionMatrix:
+[2012-05-10 18:18:01.292][DEBG]0.005,0.000,0.000,0.000
+[2012-05-10 18:18:01.292][DEBG]0.000,0.005,0.000,0.000
+[2012-05-10 18:18:01.292][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:18:01.292][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:18:04.312][DEBG]WM_SIZE
+[2012-05-10 18:18:04.325][DEBG]WM_SIZE
+[2012-05-10 18:18:04.336][DEBG]WM_SIZE
+[2012-05-10 18:18:04.346][DEBG]WM_SIZE
+[2012-05-10 18:18:04.360][DEBG]WM_SIZE
+[2012-05-10 18:18:04.374][DEBG]WM_SIZE
+[2012-05-10 18:18:04.386][DEBG]WM_SIZE
+[2012-05-10 18:18:04.395][DEBG]WM_SIZE
+[2012-05-10 18:18:04.407][DEBG]WM_SIZE
+[2012-05-10 18:18:04.416][DEBG]WM_SIZE
+[2012-05-10 18:18:04.427][DEBG]WM_SIZE
+[2012-05-10 18:18:04.437][DEBG]WM_SIZE
+[2012-05-10 18:18:04.446][DEBG]WM_SIZE
+[2012-05-10 18:18:04.457][DEBG]WM_SIZE
+[2012-05-10 18:18:04.466][DEBG]WM_SIZE
+[2012-05-10 18:18:04.478][DEBG]WM_SIZE
+[2012-05-10 18:18:04.491][DEBG]WM_SIZE
+[2012-05-10 18:18:04.500][DEBG]WM_SIZE
+[2012-05-10 18:18:04.517][DEBG]WM_SIZE
+[2012-05-10 18:18:04.528][DEBG]WM_SIZE
+[2012-05-10 18:18:04.539][DEBG]WM_SIZE
+[2012-05-10 18:18:04.548][DEBG]WM_SIZE
+[2012-05-10 18:18:04.559][DEBG]WM_SIZE
+[2012-05-10 18:18:04.561][DEBG]setViewPort(0,0,797,645)
+[2012-05-10 18:18:04.562][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:18:04.563][DEBG]setViewMatrix:
+[2012-05-10 18:18:04.565][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:18:04.565][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:18:04.565][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:18:04.565][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:18:04.565][DEBG]setProjectionMatrix:
+[2012-05-10 18:18:04.565][DEBG]0.003,0.000,0.000,0.001
+[2012-05-10 18:18:04.565][DEBG]0.000,0.003,0.000,0.002
+[2012-05-10 18:18:04.566][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:18:04.566][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:18:05.093][DEBG]WM_SIZE
+[2012-05-10 18:18:05.101][DEBG]WM_SIZE
+[2012-05-10 18:18:05.112][DEBG]WM_SIZE
+[2012-05-10 18:18:05.128][DEBG]WM_SIZE
+[2012-05-10 18:18:05.137][DEBG]WM_SIZE
+[2012-05-10 18:18:05.152][DEBG]WM_SIZE
+[2012-05-10 18:18:05.166][DEBG]WM_SIZE
+[2012-05-10 18:18:05.179][DEBG]WM_SIZE
+[2012-05-10 18:18:05.193][DEBG]WM_SIZE
+[2012-05-10 18:18:05.203][DEBG]WM_SIZE
+[2012-05-10 18:18:05.216][DEBG]WM_SIZE
+[2012-05-10 18:18:05.230][DEBG]WM_SIZE
+[2012-05-10 18:18:05.250][DEBG]WM_SIZE
+[2012-05-10 18:18:05.263][DEBG]WM_SIZE
+[2012-05-10 18:18:05.279][DEBG]WM_SIZE
+[2012-05-10 18:18:05.284][DEBG]setViewPort(0,0,1138,838)
+[2012-05-10 18:18:05.286][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-05-10 18:18:05.287][DEBG]setViewMatrix:
+[2012-05-10 18:18:05.288][DEBG]1.000,0.000,0.000,0.000
+[2012-05-10 18:18:05.288][DEBG]0.000,1.000,0.000,0.000
+[2012-05-10 18:18:05.290][DEBG]0.000,0.000,1.000,-300.000
+[2012-05-10 18:18:05.290][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:18:05.290][DEBG]setProjectionMatrix:
+[2012-05-10 18:18:05.290][DEBG]0.002,0.000,0.000,0.000
+[2012-05-10 18:18:05.290][DEBG]0.000,0.002,0.000,0.000
+[2012-05-10 18:18:05.291][DEBG]0.000,0.000,-0.001,-1.001
+[2012-05-10 18:18:05.291][DEBG]0.000,0.000,0.000,1.000
+[2012-05-10 18:18:06.789][DEBG]WM_DESTROY
+[2012-05-10 18:18:06.791][INFO]Release 2/2 WaveLoader
+[2012-05-10 18:18:06.793][INFO]Release 0/0 Sound
+[2012-05-10 18:18:07.038][INFO]Release COALAudioDriver                                         ¡¾¡Ì¡¿
+[2012-05-10 18:18:07.038][INFO]Release CGraphicsAdapter                                        ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.166][DEBG]shutdown COGLES1MyGUIRenderManager                              ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.166][INFO]shutdown MyGUIDataManager                                       ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.167][INFO]Release COGLES1MyGUIEnvirenment                                 ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.167][DEBG]Release CDebugPrinter                                           ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.167][INFO]Release 0/0 Hardwarebuffer
+[2012-05-10 18:18:08.167][INFO]Release 1/1 ImageLoader
+[2012-05-10 18:18:08.167][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.168][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.168][DEBG]Release COGLES1Texture                                          ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.168][INFO]Release 3/3 Texture
+[2012-05-10 18:18:08.168][INFO]Release 5/5 MaterialRenderer
+[2012-05-10 18:18:08.168][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.236][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.236][WARN]Release DC                                                      ¡¾!¡¿
+[2012-05-10 18:18:08.236][INFO]Release COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.236][INFO]Release CSceneManager                                           ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.237][INFO]Release CFileSystem                                             ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.237][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.237][INFO]UnregisterClass                                                 ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.238][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-05-10 18:18:08.238][INFO]Release Logger                                                  ¡¾¡Ì¡¿

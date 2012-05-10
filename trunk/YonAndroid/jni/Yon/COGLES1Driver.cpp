@@ -739,6 +739,20 @@ namespace ogles1{
 		return NULL;
 	}
 
+	void COGLES1Driver::removeTexture(ITexture* texture){
+		if (!texture)
+			return;
+
+		for (u32 i=0; i<m_textures.size(); ++i)
+		{
+			if (m_textures[i] == texture)
+			{
+				texture->drop();
+				m_textures.erase(i);
+			}
+		}
+	}
+
 	video::ITexture* COGLES1Driver::findTexture(const io::path& filename){
 		//TODO ÓÅ»¯
 		const io::path absolutePath = m_pFileSystem->getAbsolutePath(filename);
@@ -764,7 +778,12 @@ namespace ogles1{
 			return NULL;
 		}
 
-		IImage* image = new CImage(format, size);
+		IImage* image= new CImage(format, size);
+		/*if(empty)
+			 image = new CImage(format, size, NULL, false, false);
+		else
+			 image = new CImage(format, size);
+		 */
 		ITexture* t = createDeviceDependentTexture(image, name);
 		image->drop();
 		addTexture(t);

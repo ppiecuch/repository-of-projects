@@ -100,6 +100,41 @@ namespace ogles1{
 
 	}
 
+	void* COGLES1Texture::lock(){
+		glBindTexture(GL_TEXTURE_2D, m_textureId);
+		return m_pImage->lock();
+	}
+	void COGLES1Texture::unlock(){
+		GLenum format;
+		GLenum pixelType;
+
+		switch (m_pImage->getColorFormat())
+		{
+		case ENUM_COLOR_FORMAT_R5G5B5A1:
+			format=GL_RGBA;
+			pixelType=GL_UNSIGNED_SHORT_5_5_5_1;
+			break;
+		case ENUM_COLOR_FORMAT_R5G6B5:
+			format=GL_RGB;
+			pixelType=GL_UNSIGNED_SHORT_5_6_5;
+			break;
+		case ENUM_COLOR_FORMAT_R8G8B8:
+			format=GL_RGB;
+			pixelType=GL_UNSIGNED_BYTE;
+			break;
+		case ENUM_COLOR_FORMAT_R8G8B8A8:
+			format=GL_RGBA;
+			pixelType=GL_UNSIGNED_BYTE;
+			break;
+		default:
+			Logger->error(YON_LOG_FAILED_FORMAT,"Unsupported texture format");
+			break;
+		}
+		void* source = m_pImage->lock();
+		glTexSubImage2D(GL_TEXTURE_2D, 0, format, m_pImage->getDimension().w,m_pImage->getDimension().h, 0, format, pixelType, source);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	void COGLES1Texture::beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color)
 	{
 		glViewport(0, 0, m_textureSize.w,m_textureSize.h);
