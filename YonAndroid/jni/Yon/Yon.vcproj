@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;./zlib;./libogg;./libvorbis;./openal/include;./openal/include/AL;./openal/OpenAL32/Include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;YON_EXPORTS"
+				AdditionalIncludeDirectories="../include;./zlib;./freetype/include;./MyGUIEngine/include;./libogg;./libvorbis;./openal/include;./openal/include/AL;./openal/OpenAL32/Include;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;YON_EXPORTS;MYGUI_USE_FREETYPE;MYGUI_BUILD;MyGUIEngine_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,6 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="freetype2311_D.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -2372,10 +2373,6 @@
 							>
 						</File>
 						<File
-							RelativePath=".\MyGUIEngine\src\MyGUI_TabControl.cpp.bak.cc"
-							>
-						</File>
-						<File
 							RelativePath=".\MyGUIEngine\src\MyGUI_TabItem.cpp"
 							>
 						</File>
@@ -2433,6 +2430,18 @@
 						</File>
 						<File
 							RelativePath=".\MyGUIEngine\src\MyGUI_XmlDocument.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="freetype"
+					>
+					<Filter
+						Name="include"
+						>
+						<File
+							RelativePath=".\freetype\include\ft2build.h"
 							>
 						</File>
 					</Filter>
@@ -2509,33 +2518,77 @@
 			<Filter
 				Name="gui"
 				>
+				<File
+					RelativePath="..\include\IGUIEnvirenment.h"
+					>
+				</File>
 				<Filter
 					Name="mygui"
 					>
 					<File
-						RelativePath=".\CDataManager.h"
+						RelativePath=".\IMyGUIEnvirenment.h"
 						>
 					</File>
 					<File
-						RelativePath=".\CRenderManager.h"
+						RelativePath=".\IMyGUIRenderManager.h"
 						>
 					</File>
 					<File
-						RelativePath=".\CTexture.cpp"
+						RelativePath=".\IMyGUITexture.h"
 						>
 					</File>
 					<File
-						RelativePath=".\CTexture.h"
+						RelativePath=".\IMyGUIVertexBuffer.h"
 						>
 					</File>
 					<File
-						RelativePath=".\CVertexBuffer.cpp"
+						RelativePath=".\MyGUIDataManager.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\CVertexBuffer.h"
+						RelativePath=".\MyGUIDataManager.h"
 						>
 					</File>
+					<File
+						RelativePath=".\MyGUIFileSystemInfo.h"
+						>
+					</File>
+					<Filter
+						Name="ogles1"
+						>
+						<File
+							RelativePath=".\COGLES1MyGUIEnvirenment.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\COGLES1MyGUIEnvirenment.h"
+							>
+						</File>
+						<File
+							RelativePath=".\COGLES1MyGUIRenderManager.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\COGLES1MyGUIRenderManager.h"
+							>
+						</File>
+						<File
+							RelativePath=".\COGLES1MyGUITexture.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\COGLES1MyGUITexture.h"
+							>
+						</File>
+						<File
+							RelativePath=".\COGLES1MyGUIVertexBuffer.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\COGLES1MyGUIVertexBuffer.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 		</Filter>

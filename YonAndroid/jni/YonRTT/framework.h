@@ -7,6 +7,7 @@ using namespace yon::core;
 using namespace yon::event;
 using namespace yon::debug;
 using namespace yon::io;
+using namespace yon::gui;
 using namespace yon::video;
 using namespace yon::scene;
 using namespace yon::scene::camera;

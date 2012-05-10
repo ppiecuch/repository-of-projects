@@ -31,6 +31,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonRTT", "YonRTT\YonRTT.vcp
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonGUI", "YonGUI\YonGUI.vcproj", "{42A82283-7D98-47CF-85E9-B6206BB988CD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -65,6 +70,10 @@ Global
 		{EAE7710E-AD1C-4B57-9F9D-0F8A60EDE31C}.Debug|Win32.Build.0 = Debug|Win32
 		{EAE7710E-AD1C-4B57-9F9D-0F8A60EDE31C}.Release|Win32.ActiveCfg = Release|Win32
 		{EAE7710E-AD1C-4B57-9F9D-0F8A60EDE31C}.Release|Win32.Build.0 = Release|Win32
+		{42A82283-7D98-47CF-85E9-B6206BB988CD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{42A82283-7D98-47CF-85E9-B6206BB988CD}.Debug|Win32.Build.0 = Debug|Win32
+		{42A82283-7D98-47CF-85E9-B6206BB988CD}.Release|Win32.ActiveCfg = Release|Win32
+		{42A82283-7D98-47CF-85E9-B6206BB988CD}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -46,8 +46,9 @@ namespace platform{
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),
+		m_pGUIEnvirenment(NULL),m_pAudioDriver(NULL),
 		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),
-		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),m_pAudioDriver(NULL),
+		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
 	{
 		if(params.windowId==NULL)
@@ -78,6 +79,9 @@ namespace platform{
 		//初始化视频驱动器
 		createDriver();
 
+		//初始化GUI环境
+		m_pGUIEnvirenment=gui::createGUIEnvirenment(m_pFileSystem,m_pVideoDriver,m_pTimer);
+
 		//初始化Graphics适配器
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
@@ -102,6 +106,7 @@ namespace platform{
 		eraseEngineByHWnd(m_hWnd);
 		m_pAudioDriver->drop();
 		m_pGraphicsAdapter->drop();
+		m_pGUIEnvirenment->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
@@ -170,8 +175,10 @@ namespace platform{
 		RECT r;
 		GetClientRect(m_hWnd, &r);
 
-		m_pVideoDriver->onResize(core::dimension2du((u32)r.right, (u32)r.bottom));
-		m_pSceneManager->onResize(core::dimension2du((u32)r.right, (u32)r.bottom));
+		core::dimension2du newsize((u32)r.right, (u32)r.bottom);
+		m_pVideoDriver->onResize(newsize);
+		m_pSceneManager->onResize(newsize);
+		m_pGUIEnvirenment->onResize(newsize);
 		m_bResized = false;
 	}
 

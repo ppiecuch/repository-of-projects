@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Layout" version="3.2.0">
+    <Widget type="Button" skin="Button" position="175 375 150 40" align="Default" layer="Main" >
+        <Property key="Caption" value="好 OK"/>
+    </Widget>
+    <Widget type="Button" skin="CheckBox" position="115 250 100 25" align="Default" layer="Main" >
+        <Property key="Caption" value="#FF0000订阅中文邮件"/>
+    </Widget>
+    <Widget type="Button" skin="RadioButton" position="115 285 100 20" align="Default" layer="Main" >
+        <Property key="Caption" value="#FF0000男"/>
+    </Widget>
+    <Widget type="Button" skin="RadioButton" position="115 315 105 25" align="Default" layer="Main" >
+        <Property key="Caption" value="#FF0000女"/>
+    </Widget>
+</MyGUI>
