@@ -108,7 +108,7 @@ namespace yon{
 					m_pTimer->drop();
 			};
 			virtual const SClearSetting& getClearSetting() const = 0;
-			virtual void begin(bool backBuffer=true,bool zBuffer=true,video::SColor color=video::SColor(0x000000FF)) = 0;
+			virtual void begin(bool backBuffer=true,bool zBuffer=true,video::SColor color=video::SColor(0x00000000)) = 0;
 			virtual void end() = 0;
 			virtual void setViewPort(const core::recti& r) = 0;
 			virtual const core::dimension2du& getCurrentRenderTargetSize() const = 0;

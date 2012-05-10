@@ -49,6 +49,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4661"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -352,58 +353,6 @@
 				</File>
 				<File
 					RelativePath="..\include\IEventSender.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="io"
-				>
-				<File
-					RelativePath=".\CFileSystem.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CFileSystem.h"
-					>
-				</File>
-				<File
-					RelativePath=".\CReadFile.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CReadFile.h"
-					>
-				</File>
-				<File
-					RelativePath=".\CReadFileStream.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CReadFileStream.h"
-					>
-				</File>
-				<File
-					RelativePath=".\CReadMemoryStream.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CReadMemoryStream.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\IFileSystem.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\IReadFile.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\IStream.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\path.h"
 					>
 				</File>
 			</Filter>
@@ -2590,6 +2539,58 @@
 						</File>
 					</Filter>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="io"
+				>
+				<File
+					RelativePath=".\CFileSystem.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CFileSystem.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CReadFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CReadFile.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CReadFileStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CReadFileStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CReadMemoryStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CReadMemoryStream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IFileSystem.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IReadFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IStream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\path.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<File

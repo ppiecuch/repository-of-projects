@@ -14,7 +14,6 @@ namespace ogles1{
 	private:
 		std::string m_name;
 		bool m_bLock;
-		MyGUI::PixelFormat m_format;
 		MyGUI::TextureUsage m_usage;
 		size_t m_numElemBytes;
 
@@ -52,7 +51,20 @@ namespace ogles1{
 		}
 
 		virtual MyGUI::PixelFormat getFormat(){
-			return m_format;
+			if(m_pTexture){
+				switch(m_pTexture->getColorFormat())
+				{
+				case video::ENUM_COLOR_FORMAT_L8:
+					return MyGUI::PixelFormat::L8;
+				case video::ENUM_COLOR_FORMAT_L8A8:
+					return MyGUI::PixelFormat::L8A8;
+				case video::ENUM_COLOR_FORMAT_R8G8B8:
+					return MyGUI::PixelFormat::R8G8B8;
+				case video::ENUM_COLOR_FORMAT_R8G8B8A8:
+					return MyGUI::PixelFormat::R8G8B8A8;
+				}
+			}
+			return MyGUI::PixelFormat::Unknow;
 		}
 		virtual MyGUI::TextureUsage getUsage(){
 			return m_usage;

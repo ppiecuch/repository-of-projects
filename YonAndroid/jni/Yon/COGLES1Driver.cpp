@@ -183,6 +183,7 @@ namespace ogles1{
 	}
 	void COGLES1Driver::end()
 	{
+
 #ifdef YON_COMPILE_WITH_WIN32
 		eglSwapBuffers(m_eglDisplay, m_eglSurface);
 #endif//YON_COMPILE_WITH_WIN32
@@ -779,6 +780,7 @@ namespace ogles1{
 		}
 
 		IImage* image= new CImage(format, size);
+		//IImage* image = new CImage(format, size, NULL, false, false);
 		/*if(empty)
 			 image = new CImage(format, size, NULL, false, false);
 		else

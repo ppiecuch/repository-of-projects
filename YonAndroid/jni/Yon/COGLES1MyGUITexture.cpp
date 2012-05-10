@@ -12,7 +12,7 @@ namespace ogles1{
 
 	COGLES1MyGUITexture::COGLES1MyGUITexture(const std::string& name,video::ogles1::COGLES1Driver* driver)
 		:m_name(name),m_bLock(false),m_pDriver(driver),m_pTexture(NULL),
-		m_format(MyGUI::PixelFormat::Unknow),m_usage(MyGUI::TextureUsage::Default),m_numElemBytes(0){
+		m_usage(MyGUI::TextureUsage::Default),m_numElemBytes(0){
 	}
 	COGLES1MyGUITexture::~COGLES1MyGUITexture(){
 		destroy();
@@ -108,17 +108,19 @@ namespace ogles1{
 	void  COGLES1MyGUITexture::createManual(int _width, int _height, MyGUI::TextureUsage _usage, MyGUI::PixelFormat _format){
 		video::ENUM_COLOR_FORMAT format;
 		if (_format == MyGUI::PixelFormat::L8){
-			Logger->warn(YON_LOG_WARN_FORMAT,"do not support LUMINACE currently!");
-			return;
+			//Logger->warn(YON_LOG_WARN_FORMAT,"do not support LUMINACE currently!");
+			//return;
+			format=video::ENUM_COLOR_FORMAT_L8;
 		}else if (_format == MyGUI::PixelFormat::L8A8){
-			Logger->warn(YON_LOG_WARN_FORMAT,"do not support LUMINACE currently!");
-			return;
+			//Logger->warn(YON_LOG_WARN_FORMAT,"do not support LUMINACE currently!");
+			//return;
+			format=video::ENUM_COLOR_FORMAT_L8A8;
 		}else if (_format == MyGUI::PixelFormat::R8G8B8){
 			format=video::ENUM_COLOR_FORMAT_R8G8B8;
 		}else if (_format == MyGUI::PixelFormat::R8G8B8A8){
 			format=video::ENUM_COLOR_FORMAT_R8G8B8A8;
 		}else{
-			Logger->warn(YON_LOG_WARN_FORMAT,"do not support LUMINACE currently!");
+			Logger->warn(YON_LOG_WARN_FORMAT,"do not support PixelFormatcurrently!");
 			return;
 		}
 
@@ -145,6 +147,8 @@ namespace ogles1{
 		destroy();
 		//getTexture
 		m_pTexture=static_cast<video::ogles1::COGLES1Texture*>(m_pDriver->getTexture(io::path(_filename.c_str())));
+
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("loadFromFile:%s",_filename.c_str()));
 	}
 	void  COGLES1MyGUITexture::saveToFile(const std::string& _filename){
 		//TODO
@@ -287,7 +291,6 @@ namespace ogles1{
 
 		m_bLock = false;
 		m_numElemBytes = 0;
-		m_format = MyGUI::PixelFormat::Unknow;
 		m_usage = MyGUI::TextureUsage::Default;
 	}
 

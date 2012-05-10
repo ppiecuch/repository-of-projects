@@ -9,6 +9,7 @@ namespace yon{
 namespace gui{
 namespace mygui{
 
+	
 	MyGUIDataManager::MyGUIDataManager(io::IFileSystem* fs)
 		:m_bIsInitialise(false),m_pFileSystem(fs){
 
@@ -59,6 +60,8 @@ namespace mygui{
 
 		io::path fullpath=m_pFileSystem->getAbsolutePath(io::path(_name.c_str()));
 
+		Logger->debug("start getData:%s\n",_name.c_str());
+
 		std::ifstream* stream = new std::ifstream();
 		stream->open(fullpath.c_str(), std::ios_base::binary);
 
@@ -71,12 +74,17 @@ namespace mygui{
 
 		MyGUI::DataFileStream* data = new MyGUI::DataFileStream(stream);
 
+		Logger->debug("end getData:%s\n",_name.c_str());
+
 		return data;
 	}
 
 	bool MyGUIDataManager::isDataExist(const std::string& _name){
-		const MyGUI::VectorString& files = getDataListNames(_name);
-		return files.size() == 1;
+		/*const MyGUI::VectorString& files = getDataListNames(_name);
+		if(files.size()==0)
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s not exist",_name.c_str()));
+		return files.size() == 1;*/
+		return true;
 	}
 
 	const MyGUI::VectorString& MyGUIDataManager::getDataListNames(const std::string& _pattern){

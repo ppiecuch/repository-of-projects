@@ -70,6 +70,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 #endif
 
 	guiEnv->init();
+	//MyGUI::LayoutManager::getInstance().loadLayout("Wallpaper.layout");
+	const MyGUI::VectorWidgetPtr& root = MyGUI::LayoutManager::getInstance().loadLayout("HelpPanel.layout");
+	root.at(0)->findWidget("Text")->castType<MyGUI::TextBox>()->setCaption("Sample colour picker implementation. Select text in EditBox and then select colour to colour selected part of text.");
+
+	MyGUI::EditBox* mEdit = MyGUI::Gui::getInstance().createWidget<MyGUI::EditBox>("EditBoxStretch", MyGUI::IntCoord(10, 80, 100, 100), MyGUI::Align::Default, "Overlapped");
+	mEdit->setCaption("some edit");
+	mEdit->setTextAlign(MyGUI::Align::Center);
+	mEdit->setEditMultiLine(true);
 
 	IMaterial* material;
 	IShap *shap,*shap1,*shap2;
@@ -126,9 +134,9 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin(true,true,video::SColor(0x00032E87));
+	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
-	const core::vector3df crot=cubeModel->getRotation();
+	/*const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 	const core::vector3df trot=teapotModel->getRotation();
@@ -141,11 +149,15 @@ void drawFrame(){
 		factor=1.1f;
 	planeModel->setScale(psca*factor);
 
-	sceneMgr->render(videoDriver);
+	sceneMgr->render(videoDriver);*/
+	pCamera->render(videoDriver);
+	guiEnv->render();
 
-	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	//Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
+
+	;
 }
 void destroy(){
 	engine->drop();

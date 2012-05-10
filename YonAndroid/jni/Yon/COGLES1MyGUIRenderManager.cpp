@@ -3,6 +3,7 @@
 #include "COGLES1MyGUITexture.h"
 
 #include "ILogger.h"
+
 namespace yon{
 namespace gui{
 namespace mygui{
@@ -84,10 +85,13 @@ namespace ogles1{
 		return texture;
 		*/
 		MapTexture::const_iterator item = m_textures.find(_name);
+
 		YON_DEBUG_BREAK_IF(item!=m_textures.end());
 		
 		COGLES1MyGUITexture* texture = new COGLES1MyGUITexture(_name,m_pDriver);
 		m_textures[_name] = texture;
+
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("COGLES1MyGUIRenderManager.createTexture:%s",_name.c_str()));
 		return texture;
 	}
 	
@@ -102,8 +106,11 @@ namespace ogles1{
 		mTextures.erase(item);
 		delete _texture;
 		*/
-		if (_texture == nullptr)
+		YON_DEBUG_BREAK_IF(_texture==nullptr);
+
+		if (_texture == nullptr){
 			return;
+		}
 
 		MapTexture::iterator item = m_textures.find(_texture->getName());
 		YON_DEBUG_BREAK_IF(item==m_textures.end());
@@ -120,8 +127,12 @@ namespace ogles1{
 		return item->second;
 		*/
 		MapTexture::const_iterator item = m_textures.find(_name);
-		if (item == m_textures.end())
+		if (item == m_textures.end()){
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("COGLES1MyGUIRenderManager.getTexture:%s",_name.c_str()));
 			return nullptr;
+		}else{
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("COGLES1MyGUIRenderManager.getTexture:%s",_name.c_str()));
+		}
 		return item->second;
 	}
 
@@ -255,6 +266,7 @@ namespace ogles1{
 			textureId = texture->getTextureId();
 			//MYGUI_PLATFORM_ASSERT(texture_id, "Texture is not created");
 		}
+		//glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textureId);
 		// enable vertex arrays
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -276,6 +288,7 @@ namespace ogles1{
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glBindTexture(GL_TEXTURE_2D, 0);
+		//glDisable(GL_TEXTURE_2D);
 	}
 
 	const MyGUI::RenderTargetInfo& COGLES1MyGUIRenderManager::getInfo(){
