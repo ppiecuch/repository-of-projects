@@ -44,6 +44,7 @@ namespace ogles1{
 	}
 
 	void COGLES1MyGUIEnvirenment::render(){
+		//glLoadIdentity();
 		m_pRenderManager->drawOneFrame();
 	}
 

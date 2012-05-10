@@ -12,6 +12,7 @@ namespace camera{
 	void COrthoCamera::recalculateProjectionMatrix(){
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].makeIdentity();
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].ortho(m_fLeft,m_fRight,m_fBottom,m_fTop,m_fNear,m_fFar);
+		//m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].ortho(-1, 1, -1, 1, -1, 1);
 		m_bFrustumChanged=true;
 	}
 	//TODO≥ÈœÛµΩICamera÷–

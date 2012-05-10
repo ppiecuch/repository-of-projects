@@ -30,13 +30,8 @@ namespace ogles1{
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Texture");
 	}
 
-	//TODO GL_DEPTH_COMPONENT支持
-	void COGLES1Texture::uploadTexture(){
-
-		GLenum format;
-		GLenum pixelType;
-
-		switch (m_pImage->getColorFormat())
+	void getGLFormat(ENUM_COLOR_FORMAT colorFormat,GLenum& format,GLenum& pixelType){
+		switch(colorFormat)
 		{
 		case ENUM_COLOR_FORMAT_R5G5B5A1:
 			format=GL_RGBA;
@@ -54,10 +49,31 @@ namespace ogles1{
 			format=GL_RGBA;
 			pixelType=GL_UNSIGNED_BYTE;
 			break;
+		case ENUM_COLOR_FORMAT_L8:
+			format=GL_LUMINANCE;
+			pixelType=GL_UNSIGNED_BYTE;
+			break;
+		case ENUM_COLOR_FORMAT_A8:
+			format=GL_ALPHA;
+			pixelType=GL_UNSIGNED_BYTE;
+			break;
+		case ENUM_COLOR_FORMAT_L8A8:
+			format=GL_LUMINANCE_ALPHA;
+			pixelType=GL_UNSIGNED_BYTE;
+			break;
 		default:
 			Logger->error(YON_LOG_FAILED_FORMAT,"Unsupported texture format");
 			break;
 		}
+	}
+
+	//TODO GL_DEPTH_COMPONENT支持
+	void COGLES1Texture::uploadTexture(){
+
+		GLenum format=0;
+		GLenum pixelType=0;
+
+		getGLFormat(m_pImage->getColorFormat(),format,pixelType);
 
 		//Opengl ES1.1
 		//void glTexImage2D(GLenum target,GLint level,GLint internalformat,GLsizei width,GLsizei height,GLint border,GLenum format,GLenum type,const GLvoid * pixels);
@@ -105,33 +121,16 @@ namespace ogles1{
 		return m_pImage->lock();
 	}
 	void COGLES1Texture::unlock(){
-		GLenum format;
-		GLenum pixelType;
+		GLenum format=0;
+		GLenum pixelType=0;
 
-		switch (m_pImage->getColorFormat())
-		{
-		case ENUM_COLOR_FORMAT_R5G5B5A1:
-			format=GL_RGBA;
-			pixelType=GL_UNSIGNED_SHORT_5_5_5_1;
-			break;
-		case ENUM_COLOR_FORMAT_R5G6B5:
-			format=GL_RGB;
-			pixelType=GL_UNSIGNED_SHORT_5_6_5;
-			break;
-		case ENUM_COLOR_FORMAT_R8G8B8:
-			format=GL_RGB;
-			pixelType=GL_UNSIGNED_BYTE;
-			break;
-		case ENUM_COLOR_FORMAT_R8G8B8A8:
-			format=GL_RGBA;
-			pixelType=GL_UNSIGNED_BYTE;
-			break;
-		default:
-			Logger->error(YON_LOG_FAILED_FORMAT,"Unsupported texture format");
-			break;
-		}
+		getGLFormat(m_pImage->getColorFormat(),format,pixelType);
+
 		void* source = m_pImage->lock();
-		glTexSubImage2D(GL_TEXTURE_2D, 0, format, m_pImage->getDimension().w,m_pImage->getDimension().h, 0, format, pixelType, source);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_pImage->getDimension().w,m_pImage->getDimension().h, format, pixelType, source);
+		
+		//m_pDriver->checkGLError(__FILE__,__LINE__);
+
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 

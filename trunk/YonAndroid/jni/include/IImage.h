@@ -13,6 +13,9 @@ namespace video{
 		ENUM_COLOR_FORMAT_R5G6B5,
 		ENUM_COLOR_FORMAT_R8G8B8,
 		ENUM_COLOR_FORMAT_R8G8B8A8,
+		ENUM_COLOR_FORMAT_A8,
+		ENUM_COLOR_FORMAT_L8,
+		ENUM_COLOR_FORMAT_L8A8,
 		ENUM_COLOR_FORMAT_COUNT
 	};
 	const static c8* COLOR_FORMAT_NAME[]=
@@ -20,7 +23,10 @@ namespace video{
 		"R5G5B5A1",
 		"R5G6B5",
 		"R8G8B8",
-		"R8G8B8A8"
+		"R8G8B8A8",
+		"A8",
+		"L8",
+		"L8A8"
 	};
 	static u32 getPixelBitsByFormat(const ENUM_COLOR_FORMAT format)
 	{
@@ -34,6 +40,12 @@ namespace video{
 			return 24;
 		case ENUM_COLOR_FORMAT_R8G8B8A8:
 			return 32;
+		case ENUM_COLOR_FORMAT_A8:
+			return 8;
+		case ENUM_COLOR_FORMAT_L8:
+			return 8;
+		case ENUM_COLOR_FORMAT_L8A8:
+			return 16;
 		default:
 			return 0;
 		}
@@ -64,6 +76,9 @@ namespace video{
 			case ENUM_COLOR_FORMAT_R5G6B5:
 			case ENUM_COLOR_FORMAT_R8G8B8:
 			case ENUM_COLOR_FORMAT_R8G8B8A8:
+			case ENUM_COLOR_FORMAT_A8:
+			case ENUM_COLOR_FORMAT_L8:
+			case ENUM_COLOR_FORMAT_L8A8:
 				return false;
 			default:
 				return true;
