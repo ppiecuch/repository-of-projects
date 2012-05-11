@@ -24,7 +24,9 @@ namespace mygui{
 		std::string m_resourceFileName;
 	public:
 		IMyGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer)
-			:m_pDataManager(NULL),m_pLogManager(new MyGUI::LogManager()),m_resourceFileName("MyGUI_Core.xml"){}
+			:m_pDataManager(NULL),m_pLogManager(new MyGUI::LogManager()),m_resourceFileName("MyGUI_Core.xml"){
+				MyGUI::LogManager::getInstance().createDefaultSource("MyGUI.log");
+		}
 		virtual ~IMyGUIEnvirenment(){
 			delete m_pLogManager;
 		}

@@ -50,7 +50,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	params.windowSize.w=400;
 	params.windowSize.h=400;
 	params.pJNIEnv=pJNIEnv;
-	params.fpsLimit=10;
+	//params.fpsLimit=10;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -75,7 +75,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	root.at(0)->findWidget("Text")->castType<MyGUI::TextBox>()->setCaption("Sample colour picker implementation. Select text in EditBox and then select colour to colour selected part of text.");
 
 	MyGUI::EditBox* mEdit = MyGUI::Gui::getInstance().createWidget<MyGUI::EditBox>("EditBoxStretch", MyGUI::IntCoord(10, 80, 100, 100), MyGUI::Align::Default, "Overlapped");
-	mEdit->setCaption("some edit");
+	mEdit->setCaption("Hello world");
 	mEdit->setTextAlign(MyGUI::Align::Center);
 	mEdit->setEditMultiLine(true);
 
@@ -97,7 +97,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	cubeModel=sceneMgr->addModel(entity);
 	material=cubeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
-	cubeModel->setPosition(core::vector3df(100,100,0));
+	cubeModel->setPosition(core::vector3df(100,100,0)); 
 	material->setTexture(0,videoDriver->getTexture("test.png"));
 	shap->drop();
 	unit->drop();
@@ -136,7 +136,7 @@ void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
-	/*const core::vector3df crot=cubeModel->getRotation();
+	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 	const core::vector3df trot=teapotModel->getRotation();
@@ -149,11 +149,14 @@ void drawFrame(){
 		factor=1.1f;
 	planeModel->setScale(psca*factor);
 
-	sceneMgr->render(videoDriver);*/
-	pCamera->render(videoDriver);
+	sceneMgr->render(videoDriver);
+	
+	//pCamera->render(videoDriver);
 	guiEnv->render();
 
-	//Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	
+
+	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 

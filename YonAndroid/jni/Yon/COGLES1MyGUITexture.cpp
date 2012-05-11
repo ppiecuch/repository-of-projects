@@ -120,7 +120,7 @@ namespace ogles1{
 		}else if (_format == MyGUI::PixelFormat::R8G8B8A8){
 			format=video::ENUM_COLOR_FORMAT_R8G8B8A8;
 		}else{
-			Logger->warn(YON_LOG_WARN_FORMAT,"do not support PixelFormatcurrently!");
+			Logger->warn(YON_LOG_WARN_FORMAT,"do not support PixelFormat currently!");
 			return;
 		}
 
@@ -147,7 +147,7 @@ namespace ogles1{
 		destroy();
 		//getTexture
 		m_pTexture=static_cast<video::ogles1::COGLES1Texture*>(m_pDriver->getTexture(io::path(_filename.c_str())));
-
+		m_pTexture->upsidedown();
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("loadFromFile:%s",_filename.c_str()));
 	}
 	void  COGLES1MyGUITexture::saveToFile(const std::string& _filename){

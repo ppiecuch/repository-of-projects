@@ -273,6 +273,8 @@ namespace yon{
 
 				m_bIsChanged=true;
 			}
+
+
 			inline matrix4<T> operator*(const matrix4<T>& other) const{
 				 matrix4<T> r;
 				 r.setByProduct(*this,other);

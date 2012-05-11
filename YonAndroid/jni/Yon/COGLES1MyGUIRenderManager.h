@@ -24,6 +24,10 @@ namespace ogles1{
 
 		video::ogles1::COGLES1Driver* m_pDriver;
 		ITimer* m_pTimer;
+		core::matrix4f m_projection;
+		core::matrix4f m_oldProjection;
+		core::matrix4f m_oldWorld;
+		core::matrix4f m_oldView;
 
 		void destroyAllResources();
 	public:
