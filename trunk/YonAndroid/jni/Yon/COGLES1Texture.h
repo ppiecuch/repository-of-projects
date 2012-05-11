@@ -41,6 +41,7 @@ namespace ogles1{
 
 		void* lock();
 		void unlock();
+		void upsidedown();
 
 		virtual bool isRenderTarget() const{return m_bIsRenderTarget;}
 		virtual void setIsRenderTarget(bool on){m_bIsRenderTarget=on;}

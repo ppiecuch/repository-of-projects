@@ -88,7 +88,7 @@ namespace ogles1{
 			m_FPSAssist.frameCounter=0;
 			m_FPSAssist.refreshedTime=timer->getRealTime();
 
-			Logger->debug("{frameLimit:%d,timeUnit:%d}\n",m_FPSAssist.frameUnit,m_FPSAssist.timeUnit);
+			Logger->debug("{fpsLimit:%d,frameLimit:%d,timeUnit:%d}\n",param.fpsLimit,m_FPSAssist.frameUnit,m_FPSAssist.timeUnit);
 		}
 
 		/*video::IImage* image=DebugFont::getInstance().createImage();
@@ -127,24 +127,24 @@ namespace ogles1{
 		for(i=0;i<m_pHardwareBuffers.size();++i){
 			delete m_pHardwareBuffers[i];
 		}
-		Logger->info("Release %d/%d Hardwarebuffer\n",i,size);
+		Logger->debug("Release %d/%d Hardwarebuffer\n",i,size);
 
 		
 
 		size=m_imageLoaders.size();
 		for(i=0;i<m_imageLoaders.size();++i)
 			m_imageLoaders[i]->drop();
-		Logger->info("Release %d/%d ImageLoader\n",i,size);
+		Logger->debug("Release %d/%d ImageLoader\n",i,size);
 
 		size=m_textures.size();
 		for(i=0;i<m_textures.size();++i)
 			m_textures[i]->drop();
-		Logger->info("Release %d/%d Texture\n",i,size);
+		Logger->debug("Release %d/%d Texture\n",i,size);
 
 		size=m_materialRenderers.size();
 		for(i=0;i<m_materialRenderers.size();++i)
 			m_materialRenderers[i]->drop();
-		Logger->info("Release %d/%d MaterialRenderer\n",i,size);
+		Logger->debug("Release %d/%d MaterialRenderer\n",i,size);
 
 #ifdef YON_COMPILE_WITH_WIN32
 		destroyEGL();
@@ -578,8 +578,8 @@ namespace ogles1{
 				//v'=(V*M)*v（不过还有一个终点,matrix4中对矩阵进行scale时却是*this*=scale）
 				//glLoadMatrixf((m_matrix[ENUM_TRANSFORM_WORLD]*m_matrix[ENUM_TRANSFORM_VIEW]).pointer());
 				glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
-				Logger->debug("setViewMatrix:\n");
-				m_matrix[ENUM_TRANSFORM_VIEW].print();
+				//Logger->debug("setViewMatrix:\n");
+				//m_matrix[ENUM_TRANSFORM_VIEW].print();
 			}
 			break;
 		case ENUM_TRANSFORM_WORLD:
@@ -596,8 +596,8 @@ namespace ogles1{
 			{
 				glMatrixMode(GL_PROJECTION);
 				glLoadMatrixf(m_matrix[ENUM_TRANSFORM_PROJECTION].pointer());
-				Logger->debug("setProjectionMatrix:\n");
-				m_matrix[ENUM_TRANSFORM_PROJECTION].print();
+				//Logger->debug("setProjectionMatrix:\n");
+				//m_matrix[ENUM_TRANSFORM_PROJECTION].print();
 			}
 			break;
 		case ENUM_TRANSFORM_TEXTURE0:
@@ -914,10 +914,10 @@ namespace ogles1{
 			glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);
 			glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
 
-			glEnable(GL_CULL_FACE);
+			//glEnable(GL_CULL_FACE);
 			//glDisable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
-			glFrontFace(GL_CCW);
+			//glCullFace(GL_BACK);
+			//glFrontFace(GL_CCW);
 
 			glDisable(GL_BLEND);
 			glDisable(GL_ALPHA_TEST);

@@ -19,7 +19,7 @@ namespace ogles1{
 
 			uploadTexture();
 
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Texture");
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Instance COGLES1Texture:%d",m_textureId));
 	}
 	COGLES1Texture::~COGLES1Texture(){
 		if(m_textureId)
@@ -27,7 +27,7 @@ namespace ogles1{
 		if(m_pImage)
 			m_pImage->drop();
 
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Texture");
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Release COGLES1Texture:%d",m_textureId));
 	}
 
 	void getGLFormat(ENUM_COLOR_FORMAT colorFormat,GLenum& format,GLenum& pixelType){
@@ -132,6 +132,11 @@ namespace ogles1{
 		//m_pDriver->checkGLError(__FILE__,__LINE__);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	void COGLES1Texture::upsidedown(){
+		lock();
+		m_pImage->upsidedown();
+		unlock();
 	}
 
 	void COGLES1Texture::beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color)

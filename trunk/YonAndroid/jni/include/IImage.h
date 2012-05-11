@@ -64,6 +64,8 @@ namespace video{
 
 		virtual void unlock() = 0;
 
+		virtual void upsidedown() = 0;
+
 		//! test if the color format is only viable for RenderTarget textures
 		/** Since we don't have support for e.g. floating point IImage formats
 		one should test if the color format can be used for arbitrary usage, or

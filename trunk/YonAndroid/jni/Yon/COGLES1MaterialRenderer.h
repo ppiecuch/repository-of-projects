@@ -88,6 +88,8 @@ namespace ogles1{
 		virtual void onUnsetMaterial(){
 			glDisable(GL_BLEND);
 			glDisable(GL_ALPHA_TEST);
+
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		}
 	};
 

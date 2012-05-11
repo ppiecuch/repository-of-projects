@@ -30,6 +30,8 @@ namespace video{
 
 		virtual void unlock() {}
 
+		virtual void upsidedown();
+
 		virtual ~CImage();
 
 		virtual const core::dimension2d<u32>& getDimension() const{

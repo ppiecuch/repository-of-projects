@@ -31,6 +31,13 @@ namespace video{
 		ENUM_WRAP_MODE_COUNT
 	};
 
+	enum MASK_CULLING_MODE
+	{
+		MASK_CULLING_MODE_NONE = 0,
+		MASK_CULLING_MODE_BACK = 1,
+		MASK_CULLING_MODE_FRONT = 2
+	};
+
 	const static u32 MATERIAL_MAX_TEXTURES = YON_MATERIAL_MAX_TEXTURES;
 
 	class IMaterial : public virtual core::IReferencable{
@@ -44,6 +51,18 @@ namespace video{
 		virtual void setTexture(u32 i, ITexture* tex) = 0;
 		virtual ITexture* getTexture(u32 i) const = 0;
 
+		virtual void setLightingable(bool on) = 0;
+		virtual bool isLightingable() const = 0;
+
+		virtual void setDepthTest(bool on) = 0;
+		virtual bool isDepthTest() const = 0;
+
+		virtual void setFogEnable(bool on) = 0;
+		virtual bool isFogEnable() const = 0;
+
+		virtual void setCullingMode(MASK_CULLING_MODE mode) = 0;
+		virtual MASK_CULLING_MODE getCullingMode() const = 0;
+
 		virtual ENUM_WRAP_MODE getWrapModeU(u32 index) const = 0;
 		virtual void setWrapModeU(u32 index,ENUM_WRAP_MODE mode) = 0;
 		virtual ENUM_WRAP_MODE getWrapModeV(u32 index) const = 0;
@@ -54,6 +73,7 @@ namespace video{
 	};
 
 	YON_API extern IMaterial* DEFAULT_MATERIAL;
+	YON_API extern IMaterial* UI_MATERIAL;
 }
 }
 #endif

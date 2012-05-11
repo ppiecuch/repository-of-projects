@@ -106,7 +106,7 @@ namespace mygui{
 		return result;
 		*/
 		static MyGUI::VectorString result;
-		VectorWString wresult;
+		/*VectorWString wresult;
 		result.clear();
 
 		for (VectorArhivInfo::const_iterator item = m_paths.begin(); item != m_paths.end(); ++item)
@@ -117,7 +117,7 @@ namespace mygui{
 		for (VectorWString::const_iterator item = wresult.begin(); item != wresult.end(); ++item)
 		{
 			result.push_back(MyGUI::UString(*item).asUTF8());
-		}
+		}*/
 
 		return result;
 	}
@@ -142,7 +142,7 @@ namespace mygui{
 		return path;
 		*/
 		static std::string path;
-		MyGUI::VectorString result;
+		/*MyGUI::VectorString result;
 		VectorWString wresult;
 
 		for (VectorArhivInfo::const_iterator item = m_paths.begin(); item != m_paths.end(); ++item)
@@ -155,15 +155,15 @@ namespace mygui{
 			result.push_back(MyGUI::UString(*item).asUTF8());
 		}
 
-		path = result.size() == 1 ? result[0] : "";
+		path = result.size() == 1 ? result[0] : "";*/
 		return path;
 	}
 
 	void MyGUIDataManager::addResourceLocation(const std::string& _name, bool _recursive){
-		ArhivInfo info;
+		/*ArhivInfo info;
 		info.name = MyGUI::UString(_name).asWStr();
 		info.recursive = _recursive;
-		m_paths.push_back(info);
+		m_paths.push_back(info);*/
 	}
 }
 }

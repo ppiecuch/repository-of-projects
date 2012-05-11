@@ -387,6 +387,7 @@ namespace video{
 		for (u32 i=0; i<height; ++i)
 		{
 			rowPointers[height-i-1]=data;
+			//rowPointers[i]=data;
 			data += image->getByteCountPerRow();
 		}
 

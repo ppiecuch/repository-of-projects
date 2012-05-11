@@ -13,7 +13,11 @@ namespace ogles1{
 		:m_bUpdate(false),
 		m_bIsInitialise(false),
 		m_pDriver(driver),
-		m_pTimer(timer){}
+		m_pTimer(timer){
+
+			m_projection.makeIdentity();
+			m_projection.ortho(-1, 1, -1, 1, -1, 1);
+	}
 
 	void COGLES1MyGUIRenderManager::initialise(){
 		/*
@@ -174,14 +178,24 @@ namespace ogles1{
 		glEnable(GL_TEXTURE_2D);
 		*/
 
-		glMatrixMode(GL_PROJECTION);
+		//经测试两种方法效率相当
+
+		m_oldProjection=m_pDriver->getTransform(video::ENUM_TRANSFORM_PROJECTION);
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_projection);
+		m_oldWorld=m_pDriver->getTransform(video::ENUM_TRANSFORM_WORLD);
+		m_oldView=m_pDriver->getTransform(video::ENUM_TRANSFORM_VIEW);
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_VIEW,core::IDENTITY_MATRIX);
+		
+		/*glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
 		glOrthof(-1, 1, -1, 1, -1, 1);
 
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		glLoadIdentity();
+		glLoadIdentity();*/
+		
 
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
@@ -208,10 +222,14 @@ namespace ogles1{
 #endif
 		*/
 
-		glPopMatrix();
+		/*glPopMatrix();
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
-		glMatrixMode(GL_MODELVIEW);
+		glMatrixMode(GL_MODELVIEW);*/
+
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_oldProjection);
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,m_oldWorld);
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_VIEW,m_oldView);
 	}
 
 	void COGLES1MyGUIRenderManager::doRender(MyGUI::IVertexBuffer* _buffer, MyGUI::ITexture* _texture, size_t _count){
@@ -266,6 +284,8 @@ namespace ogles1{
 			textureId = texture->getTextureId();
 			//MYGUI_PLATFORM_ASSERT(texture_id, "Texture is not created");
 		}
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 		//glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textureId);
 		// enable vertex arrays

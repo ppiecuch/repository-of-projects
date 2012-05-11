@@ -43,6 +43,20 @@ namespace video{
 		//Logger->debug(XC_LOG_SUCCEED_FORMAT,"Release CImage");
 	}
 
+	void CImage::upsidedown(){
+		u8* temp=new u8[m_bytesPerRow];
+		u32 halfHeight=m_size.h>>1;
+		u8 *pointer1,*pointer2;
+		for(u32 i=0;i<halfHeight;++i){
+			pointer1=m_pData+m_bytesPerRow*i;
+			pointer2=m_pData+m_bytesPerRow*(m_size.h-1-i);
+			memcpy(temp,pointer1,m_bytesPerRow);
+			memcpy(pointer1,pointer2,m_bytesPerRow);
+			memcpy(pointer2,temp,m_bytesPerRow);
+		}
+		delete[] temp;
+	}
+
 	SColor CImage::getPixel(u32 x, u32 y) const
 	{
 		if (x >= m_size.w || y >= m_size.h)
