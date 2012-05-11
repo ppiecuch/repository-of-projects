@@ -31,6 +31,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oggdemo", "oggdemo\oggdemo.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundDemo", "SoundDemo\SoundDemo.vcproj", "{CBB7F3E9-B30E-4A37-B7D1-451184288D59}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mask", "mask\mask.vcproj", "{364BB7E8-CE51-4308-B213-88D7108752E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -97,6 +99,10 @@ Global
 		{CBB7F3E9-B30E-4A37-B7D1-451184288D59}.Debug|Win32.Build.0 = Debug|Win32
 		{CBB7F3E9-B30E-4A37-B7D1-451184288D59}.Release|Win32.ActiveCfg = Release|Win32
 		{CBB7F3E9-B30E-4A37-B7D1-451184288D59}.Release|Win32.Build.0 = Release|Win32
+		{364BB7E8-CE51-4308-B213-88D7108752E2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{364BB7E8-CE51-4308-B213-88D7108752E2}.Debug|Win32.Build.0 = Debug|Win32
+		{364BB7E8-CE51-4308-B213-88D7108752E2}.Release|Win32.ActiveCfg = Release|Win32
+		{364BB7E8-CE51-4308-B213-88D7108752E2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
