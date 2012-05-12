@@ -1,7 +1,18 @@
 
 #include "MyGUIDataManager.h"
-#include "MyGUIFileSystemInfo.h"
 #include "MyGUI_DataFileStream.h"
+
+#include <MyGUI.h>
+#if MYGUI_PLATFORM == MYGUI_PLATFORM_WIN32
+#include <windows.h>
+#include <io.h>
+#else
+#include <unistd.h>
+#include <dirent.h>
+#endif
+
+#include <string>
+#include <vector>
 
 #include "ILogger.h"
 

@@ -16,6 +16,83 @@ IModel* planeModel=NULL;
 IModel* teapotModel=NULL;
 f32 factor=1.1f;
 
+MyGUI::Widget* mDemoView=NULL;
+MyGUI::ComboBox* mComboSkins=NULL;
+void notifyComboAccept(MyGUI::ComboBox* _sender, size_t _index);
+void createDemo(size_t _index);
+void destroyDemo();
+void colourWidgets(MyGUI::Widget* _widget, const MyGUI::Colour& _colour);
+void createDemo(size_t _index)
+{
+	destroyDemo();
+
+	if (_index == 0)
+	{
+		MyGUI::ResourceManager::getInstance().load("MyGUI_BlueWhiteTheme.xml");
+	}
+	else if (_index == 1)
+	{
+		MyGUI::ResourceManager::getInstance().load("MyGUI_BlackBlueTheme.xml");
+	}
+	else if (_index == 2)
+	{
+		MyGUI::ResourceManager::getInstance().load("MyGUI_BlackOrangeTheme.xml");
+	}
+	/*else if (_index == 3)
+	{
+		MyGUI::LanguageManager::getInstance().loadUserTags("core_theme_grayscale_tag.xml");
+		MyGUI::ResourceManager::getInstance().load("core_skin.xml");
+	}*/
+
+	MyGUI::VectorWidgetPtr windows = MyGUI::LayoutManager::getInstance().loadLayout("Themes.layout");
+	MYGUI_ASSERT(windows.size() == 1, "Error load layout");
+	mDemoView = windows[0];
+	if (_index == 3)
+	{
+		colourWidgets(mDemoView, MyGUI::Colour::Green);
+	}
+
+	mComboSkins = MyGUI::Gui::getInstance().findWidget<MyGUI::ComboBox>("Combo");
+	mComboSkins->setComboModeDrop(true);
+	mComboSkins->addItem("blue & white");
+	mComboSkins->addItem("black & blue");
+	mComboSkins->addItem("black & orange");
+	//mComboSkins->addItem("gray");
+
+	mComboSkins->setIndexSelected(_index);
+	mComboSkins->eventComboAccept += MyGUI::newDelegate(notifyComboAccept);
+}
+
+void colourWidgets(MyGUI::Widget* _widget, const MyGUI::Colour& _colour)
+{
+	_widget->setColour(_colour);
+	MyGUI::EnumeratorWidgetPtr enumerator = _widget->getEnumerator();
+	while (enumerator.next())
+	{
+		colourWidgets(enumerator.current(), _colour);
+	}
+}
+
+void notifyComboAccept(MyGUI::ComboBox* _sender, size_t _index)
+{
+	createDemo(_index);
+}
+
+void destroyDemo()
+{
+	if (mDemoView)
+	{
+		MyGUI::WidgetManager::getInstance().destroyWidget(mDemoView);
+		mDemoView = 0;
+	}
+	if (mComboSkins)
+	{
+		//MyGUI::WidgetManager::getInstance().destroyWidget(mComboSkins);
+		mComboSkins = 0;
+	}
+}
+
+
 class MyEventReceiver : public IEventReceiver{
 public:
 	virtual bool onEvent(const SEvent& evt){
@@ -70,14 +147,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 #endif
 
 	guiEnv->init();
-	//MyGUI::LayoutManager::getInstance().loadLayout("Wallpaper.layout");
-	const MyGUI::VectorWidgetPtr& root = MyGUI::LayoutManager::getInstance().loadLayout("HelpPanel.layout");
-	root.at(0)->findWidget("Text")->castType<MyGUI::TextBox>()->setCaption("Sample colour picker implementation. Select text in EditBox and then select colour to colour selected part of text.");
+	
 
-	MyGUI::EditBox* mEdit = MyGUI::Gui::getInstance().createWidget<MyGUI::EditBox>("EditBoxStretch", MyGUI::IntCoord(10, 80, 100, 100), MyGUI::Align::Default, "Overlapped");
-	mEdit->setCaption("Hello world");
-	mEdit->setTextAlign(MyGUI::Align::Center);
-	mEdit->setEditMultiLine(true);
+	createDemo(0);
 
 	IMaterial* material;
 	IShap *shap,*shap1,*shap2;
@@ -163,6 +235,7 @@ void drawFrame(){
 	;
 }
 void destroy(){
+	destroyDemo();
 	engine->drop();
 	delete params.pEventReceiver;
 }

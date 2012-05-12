@@ -83,6 +83,7 @@ namespace ogles1{
 		virtual void draw3DLine(const core::vector3df& start,const core::vector3df& end, video::SColor color);
 
 		virtual bool checkGLError(const c8* file,s32 line);
+		static bool checkError(const c8* file,s32 line);
 
 		void setRender3DMode();
 		void setRender2DMode();
@@ -90,9 +91,9 @@ namespace ogles1{
 			return m_FPSCounter.getFPS();
 		}
 
-		void checkMaterial();
-	private:
 		
+	private:
+		void checkMaterial();
 		void addTexture(video::ITexture* texture);
 		YON_DEPRECATED video::ITexture* loadTextureFromFile(io::IReadFile* file);
 		video::ITexture* loadTextureFromFile(io::IReadStream* file);
