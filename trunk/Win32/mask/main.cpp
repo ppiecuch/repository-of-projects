@@ -5,32 +5,90 @@
 #include <Windows.h>
 #include <atlstr.h>
 
+const static char* MATERIAL_STATE_NAMES[]=
+{
+	"AlphaTest",
+	"Blend",
+	"ColorMaterial",
+	"CullFace",
+	"DepthTest",
+	"Dither",
+	"Fog",
+	"Lighting",
+	"LineSmooth",
+	"Normalize",
+	"RescaleNormal",
+	"ScissorTest",
+	"StencilTest"
+};
+
+enum ENUM_MATERIAL_STATE
+{
+	ENUM_MATERIAL_STATE_ALPHA_TEST = 0,
+	ENUM_MATERIAL_STATE_BLEND,
+	ENUM_MATERIAL_STATE_COLOR_MATERIAL,
+	ENUM_MATERIAL_STATE_CULL_FACE,
+	ENUM_MATERIAL_STATE_DEPTH_TEST,
+	ENUM_MATERIAL_STATE_DITHER,
+	ENUM_MATERIAL_STATE_FOG,
+	ENUM_MATERIAL_STATE_LIGHTING,
+	ENUM_MATERIAL_STATE_LINESMOOTH,
+	ENUM_MATERIAL_STATE_NORMALIZE,
+	ENUM_MATERIAL_STATE_RESCALE_NORMALIZE,
+	ENUM_MATERIAL_STATE_SCISSOR_TEST,
+	ENUM_MATERIAL_STATE_STENCIL_TEST,
+	ENUM_MATERIAL_STATE_COUNT
+};
+
 class Material
 {
 public:
 
 	struct State{
-		bool counterClockWise:1;
-		bool light:1;
-		bool fog:1;
-		bool cullingBack:1;
-		bool cullingFront:1;
-		bool depthTest:1;
-		bool depthWritable:1;
-		bool alphaTest:1;
+		State()
+			:AlphaTest(false),
+			Blend(false),
+			ColorMaterial(false),
+			CullFace(false),
+			DepthTest(false),
+			Dither(true),
+			Fog(false),
+			Lighting(false),
+			LineSmooth(false),
+			Normalize(false),
+			RescaleNormal(false),
+			ScissorTest(false),
+			StencilTest(false){}
+
+		bool AlphaTest:1;
+		bool Blend:1;
+		bool ColorMaterial:1;
+		bool CullFace:1;
+		bool DepthTest:1;
+		bool Dither:1;
+		bool Fog:1;
+		bool Lighting:1;
+		bool LineSmooth:1;
+		bool Normalize:1;
+		bool RescaleNormal:1;
+		bool ScissorTest:1;
+		bool StencilTest:1;
+
+		int operator ^(const State& other) const{
+			return getInt()^other.getInt();
+		}
 
 		bool operator !=(const State& other) const{
-			return xor(other)!=0;
+			return ((*this)^other)!=0;
 		}
 		bool operator ==(const State& other) const{
 			return !(*this!=other);
 		}
 
-		int xor(const State& other) const{
-			int *a,*b;
+		int getInt() const{
+			int *a;
 			a=reinterpret_cast<int*>((void*)(this));
-			b= reinterpret_cast<int*>((void*)&other);
-			return *a^*b;
+			return *a;
 		}
 	};
 
@@ -42,25 +100,35 @@ int main(int argc, char* argv[])
 	Material m1;
 	Material m2;
 
-	m1.states.counterClockWise=false;
-	m1.states.light=false;
-	m1.states.fog=false;
-	m1.states.cullingBack=false;
-	m1.states.cullingFront=false;
-	m1.states.depthTest=false;
-	m1.states.depthWritable=false;
-	m1.states.alphaTest=false;
 
-	m2.states.counterClockWise=false;
-	m2.states.light=false;
-	m2.states.fog=false;
-	m2.states.cullingBack=false;
-	m2.states.cullingFront=false;
-	m2.states.depthTest=false;
-	m2.states.depthWritable=false;
-	m2.states.alphaTest=false;
+	m2.states.AlphaTest=true;
+	m2.states.Blend=false;
+	m2.states.ColorMaterial=true;
+	m2.states.CullFace=true;
+	m2.states.DepthTest=true;
+	m2.states.Dither=false;
+	m2.states.Fog=true;
+	m2.states.Lighting=true;
+	m2.states.LineSmooth=false;
+	m2.states.Normalize=true;
+	m2.states.RescaleNormal=true;
+	m2.states.ScissorTest=false;
+	m2.states.StencilTest=true;
 
-	printf("%d\n",m1.states.xor(m2.states));
+	printf("%d\n",m1.states^(m2.states));
+
+	int xor=m1.states^(m2.states);
+
+	int powOf2=1;
+	for(int i=0;i<ENUM_MATERIAL_STATE_COUNT;++i)
+	{
+		if(xor&powOf2)
+			if(m2.states.getInt()&powOf2)
+				printf("%s change to true\n",MATERIAL_STATE_NAMES[i]);
+			else
+				printf("%s change to false\n",MATERIAL_STATE_NAMES[i]);
+		powOf2<<=1;
+	}
 
 	struct _timeb start;
 	_ftime64_s( &start ); 
