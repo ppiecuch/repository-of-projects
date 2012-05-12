@@ -11,9 +11,9 @@ namespace gui{
 namespace mygui{
 namespace ogles1{
 
-	COGLES1MyGUIEnvirenment::COGLES1MyGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer)
-		:m_bIsInitialise(false),IMyGUIEnvirenment(fs,driver,timer){
-			m_pRenderManager = new COGLES1MyGUIRenderManager(static_cast<video::ogles1::COGLES1Driver*>(driver),timer);
+	COGLES1MyGUIEnvirenment::COGLES1MyGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer,scene::IGeometryFactory* geometryFty)
+		:m_bIsInitialise(false),IMyGUIEnvirenment(fs,driver,timer,geometryFty){
+			m_pRenderManager = new COGLES1MyGUIRenderManager(static_cast<video::ogles1::COGLES1Driver*>(driver),timer,geometryFty);
 			m_pDataManager = new MyGUIDataManager(fs);
 			//initialise();
 
@@ -97,8 +97,8 @@ namespace ogles1{
 	}
 }
 }
-	IGUIEnvirenment* createGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer){
-		return new mygui::ogles1::COGLES1MyGUIEnvirenment(fs,driver,timer);
+	IGUIEnvirenment* createGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer,scene::IGeometryFactory* geometryFty){
+		return new mygui::ogles1::COGLES1MyGUIEnvirenment(fs,driver,timer,geometryFty);
 	}
 }
 }

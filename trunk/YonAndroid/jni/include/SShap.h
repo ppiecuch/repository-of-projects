@@ -5,6 +5,7 @@
 #include "yonArray.h"
 #include "SVertex.h"
 
+
 namespace yon{
 namespace scene{
 
@@ -13,6 +14,8 @@ namespace scene{
 	template<class V,class I,size_t VT>
 	class SShap : public IShap{
 	protected:
+		static u64 s_lCounter;
+
 		core::array<V> m_vertices;
 		core::array<I> m_indices;
 		
@@ -22,7 +25,9 @@ namespace scene{
 		friend class CGeometryFactory;
 	public:
 		SShap()
-			:m_uVerticesChangedId(1),m_uIndicesChangedId(1){}
+			:m_uVerticesChangedId((s_lCounter<<16)+1),m_uIndicesChangedId((s_lCounter<<16)+1){
+				++s_lCounter;
+		}
 		/*virtual const V* getVertices() const{
 			return m_vertices.pointer();
 		}
@@ -142,6 +147,9 @@ namespace scene{
 	typedef SShap<SVertex,u16,ENUM_VERTEX_TYPE_3V1T1C> Shap3D;
 	typedef SShap<SVertex2TCoords,u16,ENUM_VERTEX_TYPE_3V2T1C> Shap3D2T;
 	typedef SShap<S2DVertex,u16,ENUM_VERTEX_TYPE_2V1T1C> Shap2D;
+
+	template<class V,class I,size_t VT>
+	u64 SShap<V,I,VT>::s_lCounter=1;
 } 
 }
 #endif

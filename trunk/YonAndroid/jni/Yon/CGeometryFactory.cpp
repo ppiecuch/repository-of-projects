@@ -105,6 +105,67 @@ namespace scene{
 		return shap;
 	}
 
+	IShap* CGeometryFactory::createShap(ENUM_VERTEX_TYPE type,u32 verticeCount,u32 indiceCount) const{
+		switch(type)
+		{
+		case ENUM_VERTEX_TYPE_2V1T1C:
+			{
+				Shap2D* shap=new Shap2D();
+				shap->m_vertices.set_used(verticeCount);
+				shap->m_indices.set_used(indiceCount);
+				return shap;
+			}
+		case ENUM_VERTEX_TYPE_3V1T1C:
+			{
+				Shap3D* shap=new Shap3D();
+				shap->m_vertices.set_used(verticeCount);
+				shap->m_indices.set_used(indiceCount);
+				return shap;
+			}
+		case ENUM_VERTEX_TYPE_3V2T1C:
+			{
+				Shap3D2T* shap=new Shap3D2T();
+				shap->m_vertices.set_used(verticeCount);
+				shap->m_indices.set_used(indiceCount);
+				return shap;
+			}
+		}
+		return NULL;
+	}
+
+	void CGeometryFactory::fillShapIndices(IShap* shap) const{
+		if(shap)
+		{
+			switch(shap->getVertexType())
+			{
+			case ENUM_VERTEX_TYPE_2V1T1C:
+				{
+					Shap2D* s=static_cast<Shap2D*>(shap);
+					u32 vCount=s->getVertexCount();
+					s->m_indices.set_used(vCount);
+					for(u32 i=0;i<vCount;++i)
+						s->m_indices[i]=i;
+				}
+			case ENUM_VERTEX_TYPE_3V1T1C:
+				{
+					Shap3D* s=static_cast<Shap3D*>(shap);
+					u32 vCount=s->getVertexCount();
+					s->m_indices.set_used(vCount);
+					for(u32 i=0;i<vCount;++i)
+						s->m_indices[i]=i;
+				}
+			case ENUM_VERTEX_TYPE_3V2T1C:
+				{
+					Shap3D2T* s=static_cast<Shap3D2T*>(shap);
+					u32 vCount=s->getVertexCount();
+					s->m_indices.set_used(vCount);
+					for(u32 i=0;i<vCount;++i)
+						s->m_indices[i]=i;
+				}
+			}
+		}
+	}
+
 	IUnit* CGeometryFactory::createUnit(IShap* shap)const {
 		switch(shap->getVertexType())
 		{

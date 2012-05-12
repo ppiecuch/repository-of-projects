@@ -51,7 +51,7 @@ namespace video{
 		//"Blend",
 		"ColorMaterial",
 		"CullFace",
-		"DepthTest",
+		//"DepthTest",
 		"Dither",
 		"Fog",
 		"Lighting",
@@ -68,7 +68,7 @@ namespace video{
 		//ENUM_MATERIAL_STATE_BLEND,
 		ENUM_MATERIAL_STATE_COLOR_MATERIAL = 0,
 		ENUM_MATERIAL_STATE_CULL_FACE,
-		ENUM_MATERIAL_STATE_DEPTH_TEST,
+		//ENUM_MATERIAL_STATE_DEPTH_TEST,
 		ENUM_MATERIAL_STATE_DITHER,
 		ENUM_MATERIAL_STATE_FOG,
 		ENUM_MATERIAL_STATE_LIGHTING,
@@ -91,7 +91,7 @@ namespace video{
 				//Blend(false),
 				ColorMaterial(false),
 				CullFace(false),
-				DepthTest(false),
+				//DepthTest(false),
 				Dither(true),
 				Fog(false),
 				Lighting(false),
@@ -105,7 +105,7 @@ namespace video{
 			//bool Blend:1;
 			bool ColorMaterial:1;
 			bool CullFace:1;
-			bool DepthTest:1;
+			//bool DepthTest:1;
 			bool Dither:1;
 			bool Fog:1;
 			bool Lighting:1;
@@ -152,9 +152,9 @@ namespace video{
 			case ENUM_MATERIAL_STATE_CULL_FACE:
 				states.CullFace=on;
 				break;
-			case ENUM_MATERIAL_STATE_DEPTH_TEST:
-				states.DepthTest=on;
-				break;
+			//case ENUM_MATERIAL_STATE_DEPTH_TEST:
+			//	states.DepthTest=on;
+			//	break;
 			case ENUM_MATERIAL_STATE_DITHER:
 				states.Dither=on;
 				break;
@@ -188,8 +188,8 @@ namespace video{
 				return states.ColorMaterial;
 			case ENUM_MATERIAL_STATE_CULL_FACE:
 				return states.CullFace;
-			case ENUM_MATERIAL_STATE_DEPTH_TEST:
-				return states.DepthTest;
+			//case ENUM_MATERIAL_STATE_DEPTH_TEST:
+			//	return states.DepthTest;
 			case ENUM_MATERIAL_STATE_DITHER:
 				return states.Dither;
 			case ENUM_MATERIAL_STATE_FOG:
@@ -226,8 +226,8 @@ namespace video{
 	};
 
 	YON_API extern IMaterial* DEFAULT_MATERIAL;
-	YON_API extern IMaterial* DEFAULT_3D_MATERIAL;
-	YON_API extern IMaterial* DEFAULT_2D_MATERIAL;
+	//YON_API extern IMaterial* DEFAULT_3D_MATERIAL;
+	//YON_API extern IMaterial* DEFAULT_2D_MATERIAL;
 	YON_API extern IMaterial* MYGUI_MATERIAL;
 }
 }

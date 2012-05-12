@@ -20,7 +20,7 @@ namespace ogles1{
 	protected:
 		virtual void shutdown();
 	public:
-		COGLES1MyGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer);
+		COGLES1MyGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer,scene::IGeometryFactory* geometryFty);
 		virtual ~COGLES1MyGUIEnvirenment();
 
 		virtual IMyGUIRenderManager* getRenderManagerPtr(){

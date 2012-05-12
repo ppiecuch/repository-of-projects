@@ -3,6 +3,8 @@
 
 #include "IMyGUIRenderManager.h"
 #include "COGLES1Driver.h"
+#include "IGeometryFactory.h"
+#include "SUnit.h"
 
 namespace yon{
 namespace gui{
@@ -24,14 +26,17 @@ namespace ogles1{
 
 		video::ogles1::COGLES1Driver* m_pDriver;
 		ITimer* m_pTimer;
+		scene::IGeometryFactory* m_pGeometryFty;
 		core::matrix4f m_projection;
 		core::matrix4f m_oldProjection;
 		core::matrix4f m_oldWorld;
 		core::matrix4f m_oldView;
 
+		scene::Unit3D m_unit;
+
 		void destroyAllResources();
 	public:
-		COGLES1MyGUIRenderManager(video::ogles1::COGLES1Driver* driver,ITimer* timer);
+		COGLES1MyGUIRenderManager(video::ogles1::COGLES1Driver* driver,ITimer* timer,scene::IGeometryFactory* geometryFty);
 
 		/** @see OpenGLRenderManager::getViewSize */
 		virtual const MyGUI::IntSize& getViewSize() const;
