@@ -2498,10 +2498,6 @@
 						RelativePath=".\MyGUIDataManager.h"
 						>
 					</File>
-					<File
-						RelativePath=".\MyGUIFileSystemInfo.h"
-						>
-					</File>
 					<Filter
 						Name="ogles1"
 						>

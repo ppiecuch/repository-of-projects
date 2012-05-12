@@ -1,4 +1,5 @@
 #include "COGLES1HardwareBuffer.h"
+#include "COGLES1Driver.h"
 
 #include "ILogger.h"
 
@@ -43,8 +44,9 @@ namespace ogles1{
 		u32 vertexBufferSize=m_pUnit->getShap()->getVertexSize()*m_pUnit->getShap()->getVertexCount();
 		glBindBuffer(GL_ARRAY_BUFFER,m_vboIds[0]);
 		glBufferSubData(GL_ARRAY_BUFFER,0,vertexBufferSize,m_pUnit->getShap()->getVertices());
+		//COGLES1Driver::checkError(__FILE__,__LINE__);
 		glBindBuffer(GL_ARRAY_BUFFER,0);
-
+	
 		m_uVerticesChangedId=m_pUnit->getShap()->getVerticesChangedId();
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"update COGLES1HardwareBuffer.vertices");
@@ -53,6 +55,7 @@ namespace ogles1{
 		u32 indexBufferSize=m_pUnit->getShap()->getIndexSize()*m_pUnit->getShap()->getIndexCount();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_vboIds[1]);
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,0,indexBufferSize,m_pUnit->getShap()->getIndices());
+		//COGLES1Driver::checkError(__FILE__,__LINE__);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
 		m_uIndicesChangedId=m_pUnit->getShap()->getIndicesChangedId();
@@ -94,7 +97,7 @@ namespace ogles1{
 				glVertexPointer(3, GL_FLOAT, m_uStride,m_vertexPosOffset);
 				glColorPointer(4,GL_UNSIGNED_BYTE, m_uStride,m_vertexColorOffset);
 				glTexCoordPointer(2, GL_FLOAT, m_uStride,m_vertexTexcoordOffsets[0]);
-				Logger->debug("%08x,%d,%d\n",m_pUnit->getShap(),m_pUnit->getShap()->getVertexCount(),m_pUnit->getShap()->getIndexCount());
+				//Logger->debug("%08x,%d,%d\n",m_pUnit->getShap(),m_pUnit->getShap()->getVertexCount(),m_pUnit->getShap()->getIndexCount());
 				glDrawElements(pType, m_pUnit->getShap()->getIndexCount(), GL_UNSIGNED_SHORT,0);
 				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 				glDisableClientState(GL_COLOR_ARRAY);

@@ -226,6 +226,8 @@ namespace ogles1{
 			setRender2DMode();*/
 		if(unit->getVertexType()==scene::ENUM_VERTEX_TYPE_2V1T1C)
 			setRender2DMode();
+		else if(m_pCurrentMaterial==video::MYGUI_MATERIAL)
+			setRender2DMode();
 		else
 			setRender3DMode();
 		checkMaterial();
@@ -995,6 +997,11 @@ namespace ogles1{
 	}
 
 	bool COGLES1Driver::checkGLError(const c8* file,s32 line)
+	{
+		return checkError(file,line);
+	}
+
+	bool COGLES1Driver::checkError(const c8* file,s32 line)
 	{
 		GLenum g = glGetError();
 		switch(g)
