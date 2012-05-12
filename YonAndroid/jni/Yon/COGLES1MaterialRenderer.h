@@ -8,6 +8,23 @@ namespace yon{
 namespace video{
 namespace ogles1{
 
+	const static u32 MATERIAL_GLSTATES[]=
+	{
+		//GL_ALPHA_TEST 0
+		//GL_BLEND 0
+		GL_COLOR_MATERIAL,// 0
+		GL_CULL_FACE,// 0
+		GL_DEPTH_TEST,// 0
+		GL_DITHER,// 1
+		GL_FOG,// 0
+		GL_LIGHTING,// 0
+		GL_LINE_SMOOTH,// 0
+		GL_NORMALIZE,// 0
+		GL_RESCALE_NORMAL,// 0
+		GL_SCISSOR_TEST,// 0
+		GL_STENCIL_TEST
+	};
+
 	class COGLES1MaterialRenderer : public IMaterialRenderer{
 	public:
 		COGLES1MaterialRenderer(COGLES1Driver* driver):m_pDriver(driver){}
@@ -169,6 +186,9 @@ namespace ogles1{
 		}
 	};
 }//ogles1
+	IMaterialRenderer* createMaterialRendererNone(IVideoDriver* driver){
+		return new ogles1::COGLES1MaterialRenderer((ogles1::COGLES1Driver*)driver);
+	}
 	IMaterialRenderer* createMaterialRendererSolid(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererSolid((ogles1::COGLES1Driver*)driver);
 	}
