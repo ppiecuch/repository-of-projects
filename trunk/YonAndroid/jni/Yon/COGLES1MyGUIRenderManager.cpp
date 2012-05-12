@@ -197,9 +197,11 @@ namespace ogles1{
 		glLoadIdentity();*/
 		
 
-		glDisable(GL_LIGHTING);
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_FOG);
+		//glDisable(GL_LIGHTING);
+		//glDisable(GL_DEPTH_TEST);
+		//glDisable(GL_FOG);
+		m_pDriver->setMaterial(video::MYGUI_MATERIAL);
+		m_pDriver->checkMaterial();
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

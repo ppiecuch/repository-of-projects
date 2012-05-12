@@ -121,6 +121,15 @@ namespace platform{
 		if(video::DEFAULT_MATERIAL->drop()){
 			video::DEFAULT_MATERIAL=NULL;
 		}
+		if(video::DEFAULT_3D_MATERIAL->drop()){
+			video::DEFAULT_3D_MATERIAL=NULL;
+		}
+		if(video::DEFAULT_2D_MATERIAL->drop()){
+			video::DEFAULT_2D_MATERIAL=NULL;
+		}
+		if(video::MYGUI_MATERIAL->drop()){
+			video::MYGUI_MATERIAL=NULL;
+		}
 		if(Logger->drop()){
 			Logger=NULL;
 		}

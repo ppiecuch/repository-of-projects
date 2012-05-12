@@ -90,8 +90,9 @@ namespace ogles1{
 			return m_FPSCounter.getFPS();
 		}
 
-	private:
 		void checkMaterial();
+	private:
+		
 		void addTexture(video::ITexture* texture);
 		YON_DEPRECATED video::ITexture* loadTextureFromFile(io::IReadFile* file);
 		video::ITexture* loadTextureFromFile(io::IReadStream* file);

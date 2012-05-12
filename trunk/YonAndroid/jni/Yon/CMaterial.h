@@ -13,11 +13,14 @@ namespace video{
 	protected:
 		ENUM_MATERIAL_TYPE m_materialType;
 		ENUM_POLYGON_MODE m_polygonMode;
+		ENUM_CULLING_MODE m_cullingMode;
+		ENUM_FRONT_FACE m_frontFace;
 		SMaterialLayer m_textureLayers[MATERIAL_MAX_TEXTURES];
 	public:
 
 		CMaterial()
-			:m_materialType(ENUM_MATERIAL_TYPE_SOLID),m_polygonMode(ENUM_POLYGON_MODE_FILL){
+			:m_materialType(ENUM_MATERIAL_TYPE_SOLID),m_polygonMode(ENUM_POLYGON_MODE_FILL),
+			m_cullingMode(ENUM_CULLING_MODE_BACK),m_frontFace(ENUM_FRONT_FACE_CCW){
 				//Logger->setAppender(MASK_APPENDER_VS);
 				//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
 				//Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
@@ -51,6 +54,20 @@ namespace video{
 		ITexture* getTexture(u32 i) const
 		{
 			return i < MATERIAL_MAX_TEXTURES ? m_textureLayers[i].texture : 0;
+		}
+
+		virtual void setCullingMode(ENUM_CULLING_MODE mode){
+			m_cullingMode=mode;
+		}
+		virtual ENUM_CULLING_MODE getCullingMode() const{
+			return m_cullingMode;
+		}
+
+		virtual void setFrontFace(ENUM_FRONT_FACE f){
+			m_frontFace=f;
+		}
+		virtual ENUM_FRONT_FACE getFrontFace() const{
+			return m_frontFace;
 		}
 
 		virtual ENUM_WRAP_MODE getWrapModeU(u32 index) const{

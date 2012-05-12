@@ -49,6 +49,7 @@ namespace ogles1{
 
 		m_imageLoaders.push_back(createImageLoaderPNG());
 
+		m_materialRenderers.push_back(createMaterialRendererNone(this));
 		m_materialRenderers.push_back(createMaterialRendererSolid(this));
 		m_materialRenderers.push_back(createMaterialRendererLighten(this));
 		m_materialRenderers.push_back(createMaterialRendererTransparent(this));
@@ -890,12 +891,53 @@ namespace ogles1{
 				ENUM_MATERIAL_TYPE lmt=m_pLastMaterial->getMaterialType();
 				ENUM_MATERIAL_TYPE cmt=m_pCurrentMaterial->getMaterialType();
 				if(lmt!=cmt)
+				{
+					if(m_pLastMaterial->states!=m_pCurrentMaterial->states)
+					{
+						int xor=m_pLastMaterial->states^(m_pCurrentMaterial->states);
+						int mask=1;
+						int cmask=m_pCurrentMaterial->states.getInt();
+						for(int i=0;i<ENUM_MATERIAL_STATE_COUNT;++i)
+						{
+							if(xor&mask)
+							{
+								if(cmask&mask){
+									Logger->debug("%s change to true\n",MATERIAL_STATE_NAMES[i]);
+									glEnable(MATERIAL_GLSTATES[i]);
+								}else{
+									Logger->debug("%s change to false\n",MATERIAL_STATE_NAMES[i]);
+									glDisable(MATERIAL_GLSTATES[i]);
+								}
+							}
+							mask<<=1;
+						}
+					}
+					if(m_pLastMaterial->getCullingMode()!=m_pCurrentMaterial->getCullingMode())
+						glCullFace(m_pCurrentMaterial->getCullingMode());
+					if(m_pLastMaterial->getFrontFace()!=m_pCurrentMaterial->getFrontFace())
+						glFrontFace(m_pCurrentMaterial->getFrontFace());
 					m_materialRenderers[lmt]->onUnsetMaterial();
+				}
 				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial);
 
 				m_pLastMaterial->drop();
 			}else{
 				ENUM_MATERIAL_TYPE cmt=m_pCurrentMaterial->getMaterialType();
+				int mask=1;
+				int cmask=m_pCurrentMaterial->states.getInt();
+				for(int i=0;i<ENUM_MATERIAL_STATE_COUNT;++i)
+				{
+					if(cmask&mask){
+						Logger->debug("%s change to true\n",MATERIAL_STATE_NAMES[i]);
+						glEnable(MATERIAL_GLSTATES[i]);
+					}else{
+						Logger->debug("%s change to false\n",MATERIAL_STATE_NAMES[i]);
+						glDisable(MATERIAL_GLSTATES[i]);
+					}
+					mask<<=1;
+				}
+				glCullFace(m_pCurrentMaterial->getCullingMode());
+				glFrontFace(m_pCurrentMaterial->getFrontFace());
 				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial);
 			}
 			m_pLastMaterial=m_pCurrentMaterial;
@@ -905,7 +947,7 @@ namespace ogles1{
 	void COGLES1Driver::setRender3DMode(){
 		if (m_renderMode != ENUM_RENDER_MODE_3D)
 		{
-			glEnable(GL_DEPTH_TEST);
+			//glEnable(GL_DEPTH_TEST);
 			glClearDepthf(1.0f);
 			glDepthFunc(GL_LEQUAL);
 
@@ -922,6 +964,9 @@ namespace ogles1{
 			glDisable(GL_BLEND);
 			glDisable(GL_ALPHA_TEST);
 
+			//setMaterial(video::DEFAULT_3D_MATERIAL);
+			//checkMaterial();
+
 			//glMatrixMode(GL_MODELVIEW);
 			//glLoadMatrixf((m_matrix[ENUM_TRANSFORM_VIEW]*m_matrix[ENUM_TRANSFORM_WORLD]).pointer());
 
@@ -936,9 +981,12 @@ namespace ogles1{
 	void COGLES1Driver::setRender2DMode(){
 		if (m_renderMode != ENUM_RENDER_MODE_2D)
 		{
-			glDisable(GL_DEPTH_TEST);
+			//glDisable(GL_DEPTH_TEST);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			//setMaterial(video::DEFAULT_2D_MATERIAL);
+			//checkMaterial();
 
 			m_bRenderModeChange = true;
 
