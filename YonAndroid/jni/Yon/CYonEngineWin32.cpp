@@ -80,7 +80,7 @@ namespace platform{
 		createDriver();
 
 		//初始化GUI环境
-		m_pGUIEnvirenment=gui::createGUIEnvirenment(m_pFileSystem,m_pVideoDriver,m_pTimer);
+		m_pGUIEnvirenment=gui::createGUIEnvirenment(m_pFileSystem,m_pVideoDriver,m_pTimer,m_pSceneManager->getGeometryFactory());
 
 		//初始化Graphics适配器
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
@@ -121,12 +121,12 @@ namespace platform{
 		if(video::DEFAULT_MATERIAL->drop()){
 			video::DEFAULT_MATERIAL=NULL;
 		}
-		if(video::DEFAULT_3D_MATERIAL->drop()){
-			video::DEFAULT_3D_MATERIAL=NULL;
-		}
-		if(video::DEFAULT_2D_MATERIAL->drop()){
-			video::DEFAULT_2D_MATERIAL=NULL;
-		}
+		//if(video::DEFAULT_3D_MATERIAL->drop()){
+		//	video::DEFAULT_3D_MATERIAL=NULL;
+		//}
+		//if(video::DEFAULT_2D_MATERIAL->drop()){
+		//	video::DEFAULT_2D_MATERIAL=NULL;
+		//}
 		if(video::MYGUI_MATERIAL->drop()){
 			video::MYGUI_MATERIAL=NULL;
 		}

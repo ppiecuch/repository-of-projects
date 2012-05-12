@@ -9,14 +9,20 @@ namespace gui{
 namespace mygui{
 namespace ogles1{
 
-	COGLES1MyGUIRenderManager::COGLES1MyGUIRenderManager(video::ogles1::COGLES1Driver* driver,ITimer* timer)
+	COGLES1MyGUIRenderManager::COGLES1MyGUIRenderManager(video::ogles1::COGLES1Driver* driver,ITimer* timer,scene::IGeometryFactory* geometryFty)
 		:m_bUpdate(false),
 		m_bIsInitialise(false),
 		m_pDriver(driver),
-		m_pTimer(timer){
+		m_pTimer(timer),
+		m_pGeometryFty(geometryFty),
+		m_unit(video::MYGUI_MATERIAL)
+	{
 
 			m_projection.makeIdentity();
 			m_projection.ortho(-1, 1, -1, 1, -1, 1);
+
+			//³ö´í TODO
+			//m_unit.setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	}
 
 	void COGLES1MyGUIRenderManager::initialise(){
@@ -69,7 +75,7 @@ namespace ogles1{
 		/*
 		return new OpenGLVertexBuffer();
 		*/
-		return new COGLES1MyGUIVertexBuffer();
+		return new COGLES1MyGUIVertexBuffer(m_pGeometryFty);
 	}
 	
 	void COGLES1MyGUIRenderManager::destroyVertexBuffer(MyGUI::IVertexBuffer* _buffer){
@@ -200,14 +206,15 @@ namespace ogles1{
 		//glDisable(GL_LIGHTING);
 		//glDisable(GL_DEPTH_TEST);
 		//glDisable(GL_FOG);
+
 		m_pDriver->setMaterial(video::MYGUI_MATERIAL);
-		m_pDriver->checkMaterial();
+		//m_pDriver->checkMaterial();
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glEnable(GL_TEXTURE_2D);
+		//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		//glEnable(GL_TEXTURE_2D);
 	}
 
 	void COGLES1MyGUIRenderManager::end(){
@@ -278,6 +285,7 @@ namespace ogles1{
 		glBindTexture(GL_TEXTURE_2D, 0);
 		*/
 
+		/*
 		COGLES1MyGUIVertexBuffer* buffer = static_cast<COGLES1MyGUIVertexBuffer*>(_buffer);
 		unsigned int textureId = 0;
 		if (_texture)
@@ -288,7 +296,7 @@ namespace ogles1{
 		}
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		//glEnable(GL_TEXTURE_2D);
+		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textureId);
 		// enable vertex arrays
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -310,7 +318,28 @@ namespace ogles1{
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		//glDisable(GL_TEXTURE_2D);
+		glDisable(GL_TEXTURE_2D);
+		*/
+		
+
+		
+		//glMatrixMode(GL_MODELVIEW);
+		//glLoadIdentity();
+		
+		
+		COGLES1MyGUIVertexBuffer* buffer = static_cast<COGLES1MyGUIVertexBuffer*>(_buffer);
+		if (_texture)
+		{
+			COGLES1MyGUITexture* texture = static_cast<COGLES1MyGUITexture*>(_texture);
+			m_pDriver->setTexture(0,texture->getTexture());
+			m_unit.getMaterial()->setTexture(0,texture->getTexture());
+		}
+		buffer->fillShapIndices();
+		scene::IShap* shap=buffer->getShap();
+		m_unit.setShap(shap);
+		m_pDriver->drawUnit(&m_unit);
+		m_pDriver->setTexture(0,NULL);
+		
 	}
 
 	const MyGUI::RenderTargetInfo& COGLES1MyGUIRenderManager::getInfo(){

@@ -81,6 +81,10 @@ namespace ogles1{
 			return 0;
 		}
 
+		virtual video::ITexture* getTexture() const{
+			return m_pTexture;
+		}
+
 	};
 }
 }

@@ -101,6 +101,7 @@ namespace scene{
 		IShap* shap=m_pSceneMgr->getGeometryFactory()->createXYRectangle3D(rpos.x,rpos.y-srcHeight,rpos.x+srcWidth,rpos.y,calcZ(),uv.topLeft.x,uv.bottomRight.y,uv.bottomRight.x,uv.topLeft.y,video::SColor(color));
 		m_layers[m_uCurrentLayerIndex]->entity->add(texture,materialType,shap);
 		shap->drop();
+		return true;
 	}
 
 	bool CGraphicsAdapter::drawImage(const c8* imageName, s32 x, s32 y, MASK_ACTHOR anchor){

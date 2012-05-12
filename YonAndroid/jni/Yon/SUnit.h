@@ -48,8 +48,12 @@ namespace scene{
 			return m_pShap;
 		}
 		virtual void setShap(IShap* shap){
+			if(shap==NULL||shap==m_pShap)
+				return;
 			YON_DEBUG_BREAK_IF(shap->getVertexType()!=getVertexType());
 			shap->grab();
+			if(m_pShap)
+				m_pShap->drop();
 			m_pShap=shap;
 		}
 

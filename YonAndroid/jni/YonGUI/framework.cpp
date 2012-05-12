@@ -136,7 +136,7 @@ void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
-	const core::vector3df crot=cubeModel->getRotation();
+	/*const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 	const core::vector3df trot=teapotModel->getRotation();
@@ -149,9 +149,9 @@ void drawFrame(){
 		factor=1.1f;
 	planeModel->setScale(psca*factor);
 
-	sceneMgr->render(videoDriver);
+	sceneMgr->render(videoDriver);*/
 	
-	//pCamera->render(videoDriver);
+	pCamera->render(videoDriver);
 	guiEnv->render();
 
 	

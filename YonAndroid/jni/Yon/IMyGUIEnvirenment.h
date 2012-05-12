@@ -11,6 +11,7 @@
 #include "IVideoDriver.h"
 #include "IEventReceiver.h"
 #include "IGUIEnvirenment.h"
+#include "IGeometryFactory.h"
 
 namespace yon{
 namespace gui{
@@ -23,7 +24,7 @@ namespace mygui{
 		MyGUI::Gui* m_pGUI;
 		std::string m_resourceFileName;
 	public:
-		IMyGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer)
+		IMyGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer,scene::IGeometryFactory* geometryFty)
 			:m_pDataManager(NULL),m_pLogManager(new MyGUI::LogManager()),m_resourceFileName("MyGUI_Core.xml"){
 				MyGUI::LogManager::getInstance().createDefaultSource("MyGUI.log");
 		}
@@ -41,7 +42,7 @@ namespace mygui{
 	};
 
 }
-	IGUIEnvirenment* createGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer);
+	IGUIEnvirenment* createGUIEnvirenment(io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer,scene::IGeometryFactory* geometryFty);
 }
 }
 #endif

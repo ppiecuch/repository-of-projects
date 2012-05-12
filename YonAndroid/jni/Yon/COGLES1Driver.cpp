@@ -947,7 +947,7 @@ namespace ogles1{
 	void COGLES1Driver::setRender3DMode(){
 		if (m_renderMode != ENUM_RENDER_MODE_3D)
 		{
-			//glEnable(GL_DEPTH_TEST);
+			glEnable(GL_DEPTH_TEST);
 			glClearDepthf(1.0f);
 			glDepthFunc(GL_LEQUAL);
 
@@ -981,7 +981,7 @@ namespace ogles1{
 	void COGLES1Driver::setRender2DMode(){
 		if (m_renderMode != ENUM_RENDER_MODE_2D)
 		{
-			//glDisable(GL_DEPTH_TEST);
+			glDisable(GL_DEPTH_TEST);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

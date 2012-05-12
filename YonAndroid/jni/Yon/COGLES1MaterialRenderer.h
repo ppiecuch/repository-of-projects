@@ -14,7 +14,7 @@ namespace ogles1{
 		//GL_BLEND 0
 		GL_COLOR_MATERIAL,// 0
 		GL_CULL_FACE,// 0
-		GL_DEPTH_TEST,// 0
+		//GL_DEPTH_TEST,// 0
 		GL_DITHER,// 1
 		GL_FOG,// 0
 		GL_LIGHTING,// 0

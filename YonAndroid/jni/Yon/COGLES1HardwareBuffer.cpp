@@ -30,7 +30,7 @@ namespace ogles1{
 				m_vertexTexcoordOffsets[i]=getVertexTexcoordOffset(m_pUnit->getVertexType(),i);
 			m_uStride=m_pUnit->getShap()->getVertexSize();
 
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Instance COGLES1HardwareBuffer,offset:{%d,%d,%d,%d},stride:%d",m_vertexPosOffset,m_vertexColorOffset,m_vertexTexcoordOffsets[0],m_vertexTexcoordOffsets[1],m_uStride).c_str());
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Instance COGLES1HardwareBuffer,offset:{%d,%d,%d,%d},changedId:{%d,%d},stride:%d",m_vertexPosOffset,m_vertexColorOffset,m_vertexTexcoordOffsets[0],m_vertexTexcoordOffsets[1],m_uVerticesChangedId,m_uIndicesChangedId,m_uStride).c_str());
 	}
 	COGLES1HardwareBuffer::~COGLES1HardwareBuffer(){
 		glDeleteBuffers(2,m_vboIds);
@@ -94,6 +94,7 @@ namespace ogles1{
 				glVertexPointer(3, GL_FLOAT, m_uStride,m_vertexPosOffset);
 				glColorPointer(4,GL_UNSIGNED_BYTE, m_uStride,m_vertexColorOffset);
 				glTexCoordPointer(2, GL_FLOAT, m_uStride,m_vertexTexcoordOffsets[0]);
+				Logger->debug("%08x,%d,%d\n",m_pUnit->getShap(),m_pUnit->getShap()->getVertexCount(),m_pUnit->getShap()->getIndexCount());
 				glDrawElements(pType, m_pUnit->getShap()->getIndexCount(), GL_UNSIGNED_SHORT,0);
 				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 				glDisableClientState(GL_COLOR_ARRAY);
