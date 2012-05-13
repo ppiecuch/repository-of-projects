@@ -101,7 +101,7 @@ namespace ogles1{
 		COGLES1MyGUITexture* texture = new COGLES1MyGUITexture(_name,m_pDriver);
 		m_textures[_name] = texture;
 
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("COGLES1MyGUIRenderManager.createTexture:%s",_name.c_str()));
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("COGLES1MyGUIRenderManager.createTexture:%s",_name.c_str()).c_str());
 		return texture;
 	}
 	
@@ -138,10 +138,10 @@ namespace ogles1{
 		*/
 		MapTexture::const_iterator item = m_textures.find(_name);
 		if (item == m_textures.end()){
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("COGLES1MyGUIRenderManager.getTexture:%s",_name.c_str()));
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("COGLES1MyGUIRenderManager.getTexture:%s",_name.c_str()).c_str());
 			return nullptr;
 		}else{
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("COGLES1MyGUIRenderManager.getTexture:%s",_name.c_str()));
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("COGLES1MyGUIRenderManager.getTexture:%s",_name.c_str()).c_str());
 		}
 		return item->second;
 	}

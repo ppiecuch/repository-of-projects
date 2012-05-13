@@ -896,12 +896,12 @@ namespace ogles1{
 				{
 					if(m_pLastMaterial->states!=m_pCurrentMaterial->states)
 					{
-						int xor=m_pLastMaterial->states^(m_pCurrentMaterial->states);
+						int xorValue=m_pLastMaterial->states^(m_pCurrentMaterial->states);
 						int mask=1;
 						int cmask=m_pCurrentMaterial->states.getInt();
 						for(int i=0;i<ENUM_MATERIAL_STATE_COUNT;++i)
 						{
-							if(xor&mask)
+							if(xorValue&mask)
 							{
 								if(cmask&mask){
 									Logger->debug("%s change to true\n",MATERIAL_STATE_NAMES[i]);

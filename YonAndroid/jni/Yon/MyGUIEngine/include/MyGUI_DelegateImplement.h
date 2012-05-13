@@ -175,10 +175,18 @@ namespace delegates
 	};
 #endif //SCRIPT_DELEGATE_DEF
 
+//@hzb
+/*
 #if MYGUI_SUFFIX	//not 0
 #define  MYGUI_SCRIPT_ARGS	,##MYGUI_ARGS
 #else
 #define MYGUI_SCRIPT_ARGS	MYGUI_ARGS
+#endif
+*/
+#if MYGUI_SUFFIX	//not 0
+#define  MYGUI_SCRIPT_ARGS_COMMA	,
+#else
+#define MYGUI_SCRIPT_ARGS_COMMA
 #endif
 
 	// Script delegate
@@ -202,7 +210,8 @@ namespace delegates
 			if (mFunctionName.size() && ScriptEngineManager::sharedScriptEngineManager()->getScriptEngine())
 			{
 //				ScriptEngineManager::sharedScriptEngineManager()->getScriptEngine()->executeCallFunc0(mFunctionName.c_str());
-				ScriptEngineManager::sharedScriptEngineManager()->getScriptEngine()->executeCallFunc(mFunctionName.c_str() MYGUI_SCRIPT_ARGS);
+//				ScriptEngineManager::sharedScriptEngineManager()->getScriptEngine()->executeCallFunc(mFunctionName.c_str() MYGUI_SCRIPT_ARGS);
+				ScriptEngineManager::sharedScriptEngineManager()->getScriptEngine()->executeCallFunc(mFunctionName.c_str() MYGUI_SCRIPT_ARGS_COMMA MYGUI_ARGS);
 			}
 		}
 
@@ -491,6 +500,7 @@ namespace delegates
 	#undef MYGUI_ARGS
 	#undef MYGUI_TYPENAME
 
-	#undef MYGUI_SCRIPT_ARGS
+//	#undef MYGUI_SCRIPT_ARGS
+	#undef MYGUI_SCRIPT_ARGS_COMMA
 
 } // namespace delegates

@@ -79,7 +79,7 @@ namespace mygui{
 		if (!stream->is_open())
 		{
 			delete stream;
-			Logger->info(YON_LOG_FAILED_FORMAT,core::stringc("open %s",fullpath.c_str()));
+			Logger->info(YON_LOG_FAILED_FORMAT,core::stringc("open %s",fullpath.c_str()).c_str());
 			return nullptr;
 		}
 

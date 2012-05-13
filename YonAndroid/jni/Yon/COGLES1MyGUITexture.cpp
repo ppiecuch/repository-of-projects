@@ -148,7 +148,7 @@ namespace ogles1{
 		//getTexture
 		m_pTexture=static_cast<video::ogles1::COGLES1Texture*>(m_pDriver->getTexture(io::path(_filename.c_str())));
 		m_pTexture->upsidedown();
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("loadFromFile:%s",_filename.c_str()));
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("loadFromFile:%s",_filename.c_str()).c_str());
 	}
 	void  COGLES1MyGUITexture::saveToFile(const std::string& _filename){
 		//TODO
