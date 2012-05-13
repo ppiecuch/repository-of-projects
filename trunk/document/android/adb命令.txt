@@ -3,3 +3,4 @@ android list targets:   这条命令是列出我们所有的SDK可用版本
 adb devices:  这条命令是列出所有装载的设置
 adb shell mkdir yourfolder 建立目录
 adb -d shell cat /sdcard/log.txt 查看TXT文件
+adb push luan.jpg /sdcard/sdcard
