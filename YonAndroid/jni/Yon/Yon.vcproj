@@ -683,6 +683,10 @@
 					Name="lpng"
 					>
 					<File
+						RelativePath=".\lpng\Android.mk"
+						>
+					</File>
+					<File
 						RelativePath=".\lpng\png.c"
 						>
 					</File>
@@ -780,6 +784,10 @@
 					>
 					<File
 						RelativePath=".\zlib\adler32.c"
+						>
+					</File>
+					<File
+						RelativePath=".\zlib\Android.mk"
 						>
 					</File>
 					<File
@@ -891,6 +899,10 @@
 					Name="libogg"
 					>
 					<File
+						RelativePath=".\libogg\Android.mk"
+						>
+					</File>
+					<File
 						RelativePath=".\libogg\bitwise.c"
 						>
 					</File>
@@ -924,6 +936,10 @@
 					>
 					<File
 						RelativePath=".\libvorbis\analysis.c"
+						>
+					</File>
+					<File
+						RelativePath=".\libvorbis\Android.mk"
 						>
 					</File>
 					<File
@@ -1218,6 +1234,10 @@
 				<Filter
 					Name="openal"
 					>
+					<File
+						RelativePath=".\openal\Android.mk"
+						>
+					</File>
 					<Filter
 						Name="include"
 						>
@@ -1314,6 +1334,10 @@
 				<Filter
 					Name="mygui"
 					>
+					<File
+						RelativePath=".\MyGUIEngine\Android.mk"
+						>
+					</File>
 					<Filter
 						Name="include"
 						>
@@ -2386,6 +2410,10 @@
 				<Filter
 					Name="freetype"
 					>
+					<File
+						RelativePath=".\freetype\Android.mk"
+						>
+					</File>
 					<Filter
 						Name="include"
 						>
@@ -2590,11 +2618,7 @@
 			</Filter>
 		</Filter>
 		<File
-			RelativePath="..\Android.mk"
-			>
-		</File>
-		<File
-			RelativePath="..\AndroidExample.mk"
+			RelativePath=".\Android.mk"
 			>
 		</File>
 	</Files>
