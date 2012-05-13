@@ -19,7 +19,7 @@ namespace ogles1{
 
 			uploadTexture();
 
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Instance COGLES1Texture:%d",m_textureId));
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Instance COGLES1Texture:%d",m_textureId).c_str());
 	}
 	COGLES1Texture::~COGLES1Texture(){
 		if(m_textureId)
@@ -27,7 +27,7 @@ namespace ogles1{
 		if(m_pImage)
 			m_pImage->drop();
 
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Release COGLES1Texture:%d",m_textureId));
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Release COGLES1Texture:%d",m_textureId).c_str());
 	}
 
 	void getGLFormat(ENUM_COLOR_FORMAT colorFormat,GLenum& format,GLenum& pixelType){

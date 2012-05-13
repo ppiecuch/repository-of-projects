@@ -66,6 +66,9 @@ namespace platform{
 		//初始化视频驱动器
 		createDriver();
 
+		//初始化GUI环境
+		m_pGUIEnvirenment=gui::createGUIEnvirenment(m_pFileSystem,m_pVideoDriver,m_pTimer,m_pSceneManager->getGeometryFactory());
+
 		//初始化Graphics适配器
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
@@ -78,6 +81,7 @@ namespace platform{
 	CYonEngineAndroid::~CYonEngineAndroid(){
 		m_pAudioDriver->drop();
 		m_pGraphicsAdapter->drop();
+		m_pGUIEnvirenment->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
@@ -85,6 +89,15 @@ namespace platform{
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineAndroid");
 		if(video::DEFAULT_MATERIAL->drop()){
 			video::DEFAULT_MATERIAL=NULL;
+		}
+		//if(video::DEFAULT_3D_MATERIAL->drop()){
+		//	video::DEFAULT_3D_MATERIAL=NULL;
+		//}
+		//if(video::DEFAULT_2D_MATERIAL->drop()){
+		//	video::DEFAULT_2D_MATERIAL=NULL;
+		//}
+		if(video::MYGUI_MATERIAL->drop()){
+			video::MYGUI_MATERIAL=NULL;
 		}
 		if(Logger->drop()){
 			Logger=NULL;
@@ -111,6 +124,7 @@ namespace platform{
 
 		m_pVideoDriver->onResize(m_params.windowSize);
 		m_pSceneManager->onResize(m_params.windowSize);
+		m_pGUIEnvirenment->onResize(m_params.windowSize);
 		m_bResized = false;
 		
 		Logger->debug("CYonEngineAndroid::resizeIfNecessary\n");

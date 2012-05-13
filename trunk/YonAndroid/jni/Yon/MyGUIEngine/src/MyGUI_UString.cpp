@@ -1730,7 +1730,7 @@ namespace MyGUI
 		if (( cp & ~_lead3_mask ) == _lead3 ) return 4;
 		if (( cp & ~_lead4_mask ) == _lead4 ) return 5;
 		if (( cp & ~_lead5_mask ) == _lead5 ) return 6;
-		throw invalid_data( "invalid UTF-8 sequence header value" );
+//		throw invalid_data( "invalid UTF-8 sequence header value" );	//@Guo Huafeng comment
 	}
 
 	size_t UString::_utf8_char_length( unicode_char uc )
@@ -1749,7 +1749,7 @@ namespace MyGUI
 		if ( !( uc & ~0x001FFFFF ) ) return 4;
 		if ( !( uc & ~0x03FFFFFF ) ) return 5;
 		if ( !( uc & ~0x7FFFFFFF ) ) return 6;
-		throw invalid_data( "invalid UTF-32 value" );
+//		throw invalid_data( "invalid UTF-32 value" );	//@Guo Huafeng comment
 	}
 
 	size_t UString::_utf8_to_utf32( const unsigned char in_cp[6], unicode_char& out_uc )
@@ -1782,7 +1782,8 @@ namespace MyGUI
 
 		for ( ++i; i < len; i++ ) { // load each continuation byte
 			if (( in_cp[i] & ~_cont_mask ) != _cont )
-				throw invalid_data( "bad UTF-8 continuation byte" );
+//				throw invalid_data( "bad UTF-8 continuation byte" );
+				;	//@Guo Huafeng comment
 			c <<= 6;
 			c |= ( in_cp[i] & _cont_mask );
 		}
@@ -1835,6 +1836,7 @@ namespace MyGUI
 		return _verifyUTF8( tmp );
 	}
 
+//@Guo Huafeng comment
 	UString::size_type UString::_verifyUTF8( const std::string& str )
 	{
 		std::string::const_iterator i, ie = str.end();
@@ -1849,43 +1851,43 @@ namespace MyGUI
 
 				// get continuation byte count and test for overlong sequences
 				if (( c & ~_lead1_mask ) == _lead1 ) { // 1 additional byte
-					if ( c == _lead1 ) throw invalid_data( "overlong UTF-8 sequence" );
+//					if ( c == _lead1 ) throw invalid_data( "overlong UTF-8 sequence" );
 					contBytes = 1;
 
 				} else if (( c & ~_lead2_mask ) == _lead2 ) { // 2 additional bytes
 					contBytes = 2;
 					if ( c == _lead2 ) { // possible overlong UTF-8 sequence
 						c = ( *( i + 1 ) ); // look ahead to next byte in sequence
-						if (( c & _lead2 ) == _cont ) throw invalid_data( "overlong UTF-8 sequence" );
+//						if (( c & _lead2 ) == _cont ) throw invalid_data( "overlong UTF-8 sequence" );
 					}
 
 				} else if (( c & ~_lead3_mask ) == _lead3 ) { // 3 additional bytes
 					contBytes = 3;
 					if ( c == _lead3 ) { // possible overlong UTF-8 sequence
 						c = ( *( i + 1 ) ); // look ahead to next byte in sequence
-						if (( c & _lead3 ) == _cont ) throw invalid_data( "overlong UTF-8 sequence" );
+//						if (( c & _lead3 ) == _cont ) throw invalid_data( "overlong UTF-8 sequence" );
 					}
 
 				} else if (( c & ~_lead4_mask ) == _lead4 ) { // 4 additional bytes
 					contBytes = 4;
 					if ( c == _lead4 ) { // possible overlong UTF-8 sequence
 						c = ( *( i + 1 ) ); // look ahead to next byte in sequence
-						if (( c & _lead4 ) == _cont ) throw invalid_data( "overlong UTF-8 sequence" );
+//						if (( c & _lead4 ) == _cont ) throw invalid_data( "overlong UTF-8 sequence" );
 					}
 
 				} else if (( c & ~_lead5_mask ) == _lead5 ) { // 5 additional bytes
 					contBytes = 5;
 					if ( c == _lead5 ) { // possible overlong UTF-8 sequence
 						c = ( *( i + 1 ) ); // look ahead to next byte in sequence
-						if (( c & _lead5 ) == _cont ) throw invalid_data( "overlong UTF-8 sequence" );
+//						if (( c & _lead5 ) == _cont ) throw invalid_data( "overlong UTF-8 sequence" );
 					}
 				}
 
 				// check remaining continuation bytes for
 				while ( contBytes-- ) {
 					c = ( *( ++i ) ); // get next byte in sequence
-					if (( c & ~_cont_mask ) != _cont )
-						throw invalid_data( "bad UTF-8 continuation byte" );
+//					if (( c & ~_cont_mask ) != _cont )
+//						throw invalid_data( "bad UTF-8 continuation byte" );
 				}
 			}
 			length++;
