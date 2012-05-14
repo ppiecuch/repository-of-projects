@@ -6,6 +6,10 @@
 #include "yonMath.h"
 #include "SUnit.h"
 #include "teapot.h"
+#include <memory.h>
+#ifdef YON_COMPILE_WITH_ANDROID
+#include <string.h>
+#endif
 
 #include "ILogger.h"
 
@@ -113,6 +117,8 @@ namespace scene{
 				Shap2D* shap=new Shap2D();
 				shap->m_vertices.set_used(verticeCount);
 				shap->m_indices.set_used(indiceCount);
+				memset(shap->m_vertices.pointer(), 0x0, shap->getVertexSize()*shap->getVertexCount());
+				memset(shap->m_indices.pointer(), 0x0, shap->getIndexSize()*shap->getIndexCount());
 				return shap;
 			}
 		case ENUM_VERTEX_TYPE_3V1T1C:
@@ -120,6 +126,8 @@ namespace scene{
 				Shap3D* shap=new Shap3D();
 				shap->m_vertices.set_used(verticeCount);
 				shap->m_indices.set_used(indiceCount);
+				memset(shap->m_vertices.pointer(), 0x0, shap->getVertexSize()*shap->getVertexCount());
+				memset(shap->m_indices.pointer(), 0x0, shap->getIndexSize()*shap->getIndexCount());
 				return shap;
 			}
 		case ENUM_VERTEX_TYPE_3V2T1C:
@@ -127,6 +135,8 @@ namespace scene{
 				Shap3D2T* shap=new Shap3D2T();
 				shap->m_vertices.set_used(verticeCount);
 				shap->m_indices.set_used(indiceCount);
+				memset(shap->m_vertices.pointer(), 0x0, shap->getVertexSize()*shap->getVertexCount());
+				memset(shap->m_indices.pointer(), 0x0, shap->getIndexSize()*shap->getIndexCount());
 				return shap;
 			}
 		}
