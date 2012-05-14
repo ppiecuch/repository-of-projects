@@ -173,9 +173,7 @@ namespace ogles1{
 		glDisable(GL_TEXTURE_GEN_T);
 		glDisable(GL_TEXTURE_GEN_R);
 #endif
-		//glFrontFace(GL_CW);
-		//glCullFace(GL_BACK);
-		//glEnable(GL_CULL_FACE);
+		
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -202,19 +200,24 @@ namespace ogles1{
 		glPushMatrix();
 		glLoadIdentity();*/
 		
+		/*
+		glFrontFace(GL_CW);
+		glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_FOG);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		//glDisable(GL_LIGHTING);
-		//glDisable(GL_DEPTH_TEST);
-		//glDisable(GL_FOG);
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glEnable(GL_TEXTURE_2D);
+		*/
 
 		m_pDriver->setMaterial(video::MYGUI_MATERIAL);
 		//m_pDriver->checkMaterial();
 
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		//glEnable(GL_TEXTURE_2D);
+		
 	}
 
 	void COGLES1MyGUIRenderManager::end(){
@@ -318,8 +321,8 @@ namespace ogles1{
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		glDisable(GL_TEXTURE_2D);
-		*/
+		glDisable(GL_TEXTURE_2D);*/
+		
 		
 
 		
@@ -338,7 +341,8 @@ namespace ogles1{
 		scene::IShap* shap=buffer->getShap();
 		m_unit.setShap(shap);
 		m_pDriver->drawUnit(&m_unit);
-		m_pDriver->setTexture(0,NULL);
+		//Logger->debug("doRender:%08X(v:%d,i:%d)\n",shap,shap->getVertexCount(),shap->getIndexCount());
+		//m_pDriver->setTexture(0,NULL);
 		
 	}
 

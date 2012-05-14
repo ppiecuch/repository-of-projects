@@ -21,6 +21,7 @@ namespace video{
 		CMaterial()
 			:m_materialType(ENUM_MATERIAL_TYPE_SOLID),m_polygonMode(ENUM_POLYGON_MODE_FILL),
 			m_cullingMode(ENUM_CULLING_MODE_BACK),m_frontFace(ENUM_FRONT_FACE_CCW){
+				states.CullFace=true;
 				//Logger->setAppender(MASK_APPENDER_VS);
 				//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
 				//Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);

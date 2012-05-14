@@ -1,5 +1,7 @@
 #include "COGLES1MyGUIVertexBuffer.h"
 
+#include "ILogger.h"
+
 namespace yon{
 namespace gui{
 namespace mygui{
@@ -62,6 +64,8 @@ namespace ogles1{
 		if(m_bHasFillIndices==false){
 			m_pGeometryFty->fillShapIndices(m_pShap);
 			m_bHasFillIndices=true;
+
+			Logger->debug("fillShapIndices:%08X(v:%d,i:%d)\n",m_pShap,m_pShap->getVertexCount(),m_pShap->getIndexCount());
 		}
 	}
 }

@@ -1,3 +1,7 @@
+################
+#try to build libcore separately,but failed
+################
+
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -5,7 +9,6 @@ include $(CLEAR_VARS)
 LOCAL_CFLAGS := -DANDROID_NDK \
                 -DDISABLE_IMPORTGL \
                 -O3 \
-                -Z_PREFIX \
                 -DAL_BUILD_LIBRARY \
                 -DAL_ALEXT_PROTOTYPES \
                 -DGL_GLEXT_PROTOTYPES \

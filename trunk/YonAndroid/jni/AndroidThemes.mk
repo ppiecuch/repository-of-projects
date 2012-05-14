@@ -19,12 +19,12 @@ LOCAL_MODULE    := yon
 LOCAL_STATIC_LIBRARIES :=core
 		
 LOCAL_SRC_FILES := \
-		YonGUI/framework.cpp \
-		YonGUI/yon_AndroidGLView.cpp
+		YonThemes/framework.cpp \
+		YonThemes/yon_AndroidGLView.cpp
 		
 #LOCAL_CPP_FEATURES := rtti 
 LOCAL_ARM_MODE   := arm 
-#LOCAL_ARM_MODE   := thumb 
+#LOCAL_ARM_MODE   := thumb
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lstdc++ -Wl -lz
 #LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -Wl
 include $(BUILD_SHARED_LIBRARY)

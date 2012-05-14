@@ -151,7 +151,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 	
-	pCamera->render(videoDriver);
+	//pCamera->render(videoDriver);
 	guiEnv->render();
 
 	

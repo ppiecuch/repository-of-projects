@@ -156,12 +156,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	/*ISound* sound=audioDriver->getSound("bg.ogg");
+	/*
+	ISound* sound=audioDriver->getSound("bg.ogg");
 	sound->setLooping(true);
 	//sound->setGain(0.5f);
 	sound->play();
 	//sound=audioDriver->getSound("helloworld.wav");
-	//sound->play();*/
+	//sound->play();
+	*/
 
 	shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
@@ -223,7 +225,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 	
-	pCamera->render(videoDriver);
+	//pCamera->render(videoDriver);
 	guiEnv->render();
 
 	
