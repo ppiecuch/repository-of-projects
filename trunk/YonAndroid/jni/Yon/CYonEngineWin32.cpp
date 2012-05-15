@@ -46,7 +46,7 @@ namespace platform{
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),
-		m_pGUIEnvirenment(NULL),m_pAudioDriver(NULL),
+		m_pAudioDriver(NULL),
 		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),
 		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
@@ -79,9 +79,6 @@ namespace platform{
 		//初始化视频驱动器
 		createDriver();
 
-		//初始化GUI环境
-		m_pGUIEnvirenment=gui::createGUIEnvirenment(m_pFileSystem,m_pVideoDriver,m_pTimer,m_pSceneManager->getGeometryFactory());
-
 		//初始化Graphics适配器
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
@@ -106,7 +103,7 @@ namespace platform{
 		eraseEngineByHWnd(m_hWnd);
 		m_pAudioDriver->drop();
 		m_pGraphicsAdapter->drop();
-		m_pGUIEnvirenment->drop();
+		//m_pGUIEnvirenment->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
@@ -121,12 +118,6 @@ namespace platform{
 		if(video::DEFAULT_MATERIAL->drop()){
 			video::DEFAULT_MATERIAL=NULL;
 		}
-		//if(video::DEFAULT_3D_MATERIAL->drop()){
-		//	video::DEFAULT_3D_MATERIAL=NULL;
-		//}
-		//if(video::DEFAULT_2D_MATERIAL->drop()){
-		//	video::DEFAULT_2D_MATERIAL=NULL;
-		//}
 		if(video::MYGUI_MATERIAL->drop()){
 			video::MYGUI_MATERIAL=NULL;
 		}
@@ -187,7 +178,13 @@ namespace platform{
 		core::dimension2du newsize((u32)r.right, (u32)r.bottom);
 		m_pVideoDriver->onResize(newsize);
 		m_pSceneManager->onResize(newsize);
-		m_pGUIEnvirenment->onResize(newsize);
+
+		event::SEvent evt;
+		evt.type=event::ENUM_EVENT_TYPE_SYSTEM;
+		evt.systemInput.type=event::ENUM_SYSTEM_INPUT_TYPE_RESIZE;
+		evt.systemInput.screenWidth=newsize.w;
+		evt.systemInput.screenHeight=newsize.h;
+		postEventFromUser(evt);
 		m_bResized = false;
 	}
 

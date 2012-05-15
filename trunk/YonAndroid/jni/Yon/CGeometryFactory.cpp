@@ -176,24 +176,36 @@ namespace scene{
 		}
 	}
 
-	IUnit* CGeometryFactory::createUnit(IShap* shap)const {
+	IUnit* CGeometryFactory::createUnit(IShap* shap,video::IMaterial* material)const {
 		switch(shap->getVertexType())
 		{
 		case ENUM_VERTEX_TYPE_2V1T1C:
 			{
-				Unit2D* unit=new Unit2D();
+				Unit2D* unit;
+				if(material)
+					unit=new Unit2D(material);
+				else
+					unit=new Unit2D();
 				unit->setShap(shap);
 				return unit;
 			}
 		case ENUM_VERTEX_TYPE_3V1T1C:
 			{
-				Unit3D* unit=new Unit3D();
+				Unit3D* unit;
+				if(material)
+					unit=new Unit3D(material);
+				else
+					unit=new Unit3D();
 				unit->setShap(shap);
 				return unit;
 			}
 		case ENUM_VERTEX_TYPE_3V2T1C:
 			{
-				Unit3D2T* unit=new Unit3D2T();
+				Unit3D2T* unit;
+				if(material)
+					unit=new Unit3D2T(material);
+				else
+					unit=new Unit3D2T();
 				unit->setShap(shap);
 				return unit;
 			}

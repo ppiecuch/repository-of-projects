@@ -8,7 +8,7 @@
 #include "ITimer.h"
 #include "IVideoDriver.h"
 #include "ISceneManager.h"
-#include "IGUIEnvirenment.h"
+//#include "IGUIEnvirenment.h"
 #include "IFileSystem.h"
 #include "IEventReceiver.h"
 #include "IGraphicsAdapter.h"
@@ -22,7 +22,7 @@ namespace yon{
 		virtual ~IYonEngine(){};
 		virtual video::IVideoDriver* getVideoDriver() const= 0;
 		virtual scene::ISceneManager* getSceneManager() const = 0;
-		virtual gui::IGUIEnvirenment* getGUIEnvirentment() const = 0;
+		//virtual gui::IGUIEnvirenment* getGUIEnvirentment() const = 0;
 		virtual scene::IGraphicsAdapter* getGraphicsAdapter() const = 0;
 		virtual io::IFileSystem* getFileSystem() const = 0;
 		virtual audio::IAudioDriver* getAudioDriver() const = 0;

@@ -39,9 +39,9 @@ namespace ogles1{
 			return m_pImage->getColorFormat();
 		}
 
-		void* lock();
-		void unlock();
-		void upsidedown();
+		virtual void* lock();
+		virtual void unlock();
+		virtual void upsidedown();
 
 		virtual bool isRenderTarget() const{return m_bIsRenderTarget;}
 		virtual void setIsRenderTarget(bool on){m_bIsRenderTarget=on;}

@@ -137,6 +137,7 @@ namespace yon{
 
 			virtual ITexture* addTexture(const core::dimension2du& size,
 				const io::path& name, ENUM_COLOR_FORMAT format = ENUM_COLOR_FORMAT_R8G8B8A8) = 0;
+			virtual bool setTexture(u32 stage, const video::ITexture* texture) = 0;
 			virtual ITexture* getTexture(const io::path& filename) = 0;
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;
 			virtual void removeTexture(ITexture* texture) =0;

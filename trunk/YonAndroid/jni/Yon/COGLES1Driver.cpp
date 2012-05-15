@@ -904,10 +904,10 @@ namespace ogles1{
 							if(xorValue&mask)
 							{
 								if(cmask&mask){
-									Logger->debug("%s change to true\n",MATERIAL_STATE_NAMES[i]);
+									//Logger->debug("%s change to true\n",MATERIAL_STATE_NAMES[i]);
 									glEnable(MATERIAL_GLSTATES[i]);
 								}else{
-									Logger->debug("%s change to false\n",MATERIAL_STATE_NAMES[i]);
+									//Logger->debug("%s change to false\n",MATERIAL_STATE_NAMES[i]);
 									glDisable(MATERIAL_GLSTATES[i]);
 								}
 							}

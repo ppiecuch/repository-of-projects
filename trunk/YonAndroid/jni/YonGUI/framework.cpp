@@ -5,11 +5,13 @@ IYonEngine* engine=NULL;
 IVideoDriver* videoDriver=NULL;
 IAudioDriver* audioDriver=NULL;
 ISceneManager* sceneMgr=NULL;
-IGUIEnvirenment* guiEnv=NULL;
+//IGUIEnvirenment* guiEnv=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
+
+MyGUI::MyGUIAdapter* guiAdapter;
 
 IModel* cubeModel=NULL;
 IModel* planeModel=NULL;
@@ -31,6 +33,7 @@ public:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return true;
 			}
+			break;
 		case event::ENUM_EVENT_TYPE_TOUCH:
 			switch(evt.mouseInput.type)
 			{
@@ -41,6 +44,15 @@ public:
 				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			}
+			break;
+		case event::ENUM_EVENT_TYPE_SYSTEM:
+			switch(evt.systemInput.type)
+			{
+			case event::ENUM_SYSTEM_INPUT_TYPE_RESIZE:
+				guiAdapter->onResize(core::dimension2du(evt.systemInput.screenWidth,evt.systemInput.screenHeight));
+				return true;
+			}
+			break;
 		}
 		return false;
 	}
@@ -56,7 +68,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
-	guiEnv=engine->getGUIEnvirentment();
+	//guiEnv=engine->getGUIEnvirentment();
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
@@ -69,7 +81,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->setWorkingDirectory("media/");
 #endif
 
-	guiEnv->init();
+	guiAdapter=MyGUI::createMyGUIAdapter(fs,videoDriver,engine->getTimer(),geometryFty);
+
+	//guiEnv->init();
 	//MyGUI::LayoutManager::getInstance().loadLayout("Wallpaper.layout");
 	const MyGUI::VectorWidgetPtr& root = MyGUI::LayoutManager::getInstance().loadLayout("HelpPanel.layout");
 	root.at(0)->findWidget("Text")->castType<MyGUI::TextBox>()->setCaption("Sample colour picker implementation. Select text in EditBox and then select colour to colour selected part of text.");
@@ -150,11 +164,12 @@ void drawFrame(){
 	planeModel->setScale(psca*factor);
 
 	sceneMgr->render(videoDriver);
-	
-	//pCamera->render(videoDriver);
-	guiEnv->render();
 
-	
+	pCamera->render(videoDriver);
+	//guiEnv->render();
+	guiAdapter->render();
+
+
 
 	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
@@ -163,6 +178,7 @@ void drawFrame(){
 	;
 }
 void destroy(){
+	delete guiAdapter;
 	engine->drop();
 	delete params.pEventReceiver;
 }
