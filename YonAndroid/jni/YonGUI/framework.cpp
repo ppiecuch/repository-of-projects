@@ -28,10 +28,15 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				return true;
+				return MyGUI::InputManager::getInstance().injectMousePress(evt.mouseInput.x, evt.mouseInput.y, MyGUI::MouseButton::Left);
+				//return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				return true;
+				return MyGUI::InputManager::getInstance().injectMouseRelease(evt.mouseInput.x, evt.mouseInput.y, MyGUI::MouseButton::Left);
+				//return true;
+			case event::ENUM_MOUSE_INPUT_TYPE_MOVED:
+				logger->debug("[LM]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				return MyGUI::InputManager::getInstance().injectMouseMove(evt.mouseInput.x, evt.mouseInput.y, 0);
 			}
 			break;
 		case event::ENUM_EVENT_TYPE_TOUCH:
