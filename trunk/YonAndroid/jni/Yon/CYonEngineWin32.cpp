@@ -223,7 +223,7 @@ namespace platform{
 		{
 			s32 group;
 			UINT winMessage;
-			s32 xcMessage;
+			s32 engineMessage;
 		};
 
 		static MessageMap mouseMap[] =
@@ -262,7 +262,7 @@ namespace platform{
 				}
 			}
 			evt.type=event::ENUM_EVENT_TYPE_MOUSE;
-			evt.mouseInput.type = (event::ENUM_MOUSE_INPUT_TYPE) m->xcMessage;
+			evt.mouseInput.type = (event::ENUM_MOUSE_INPUT_TYPE) m->engineMessage;
 			evt.mouseInput.x = (short)LOWORD(lParam);
 			evt.mouseInput.y = (short)HIWORD(lParam);
 			evt.mouseInput.buttonMasks = wParam & ( MK_LBUTTON | MK_RBUTTON | MK_MBUTTON);
