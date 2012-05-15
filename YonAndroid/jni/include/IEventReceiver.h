@@ -6,6 +6,7 @@ namespace yon{
 		enum ENUM_EVENT_TYPE{
 			ENUM_EVENT_TYPE_TOUCH = 0,
 			ENUM_EVENT_TYPE_MOUSE,
+			ENUM_EVENT_TYPE_SYSTEM,
 			ENUM_EVENT_TYPE_GUI,
 			ENUM_EVENT_TYPE_COUNT
 		};
@@ -42,6 +43,11 @@ namespace yon{
 			ENUM_MOUSE_INPUT_TYPE_COUNT
 		};
 
+		enum ENUM_SYSTEM_INPUT_TYPE{
+			ENUM_SYSTEM_INPUT_TYPE_RESIZE = 0,
+			ENUM_SYSTEM_INPUT_TYPE_COUNT
+		};
+
 		enum MASK_MOUSE_BUTTON{
 			MASK_MOUSE_BUTTON_LEFT = 0x01,
 			MASK_MOUSE_BUTTON_MIDDLE = 0x02,
@@ -63,12 +69,18 @@ namespace yon{
 			bool isMiddlePressed() const { return 0 != ( buttonMasks & MASK_MOUSE_BUTTON_MIDDLE ); }
 			bool isRightPressed() const { return 0 != ( buttonMasks & MASK_MOUSE_BUTTON_RIGHT ); }
 		};
+		struct SSystemInput{
+			ENUM_SYSTEM_INPUT_TYPE type;
+			u32 screenWidth;
+			u32 screenHeight;
+		};
 
 		struct SEvent{
 			ENUM_EVENT_TYPE type;
 			union{
 				STouchInput touchInput;
 				SMouseInput mouseInput;
+				SSystemInput systemInput;
 			};
 		};
 

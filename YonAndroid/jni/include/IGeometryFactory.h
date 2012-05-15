@@ -7,6 +7,7 @@
 #include "dimension2d.h"
 #include "SShap.h"
 #include "IUnit.h"
+#include "IMaterial.h"
 
 namespace yon{
 	namespace scene{
@@ -40,7 +41,7 @@ namespace yon{
 			virtual IShap* createShap(ENUM_VERTEX_TYPE type,u32 verticeCount,u32 indiceCount) const = 0;
 			virtual void fillShapIndices(IShap* shap) const = 0;
 
-			virtual IUnit* createUnit(IShap* shap) const = 0;
+			virtual IUnit* createUnit(IShap* shap,video::IMaterial* material=NULL) const = 0;
 			virtual IEntity* createEntity(IUnit* unit) const = 0;
 		};
 

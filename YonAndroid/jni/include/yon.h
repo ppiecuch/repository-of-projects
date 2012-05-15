@@ -37,9 +37,6 @@
 #include "rect.h" 
 #include "IReferencable.h" 
 
-#include <MyGUI.h>
-#include "IGUIEnvirenment.h"
-
 #include "path.h" 
 #include "IFileSystem.h" 
 #include "IReadFile.h"

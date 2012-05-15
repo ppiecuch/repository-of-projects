@@ -66,9 +66,6 @@ namespace platform{
 		//初始化视频驱动器
 		createDriver();
 
-		//初始化GUI环境
-		m_pGUIEnvirenment=gui::createGUIEnvirenment(m_pFileSystem,m_pVideoDriver,m_pTimer,m_pSceneManager->getGeometryFactory());
-
 		//初始化Graphics适配器
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
@@ -81,7 +78,6 @@ namespace platform{
 	CYonEngineAndroid::~CYonEngineAndroid(){
 		m_pAudioDriver->drop();
 		m_pGraphicsAdapter->drop();
-		m_pGUIEnvirenment->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
@@ -90,12 +86,6 @@ namespace platform{
 		if(video::DEFAULT_MATERIAL->drop()){
 			video::DEFAULT_MATERIAL=NULL;
 		}
-		//if(video::DEFAULT_3D_MATERIAL->drop()){
-		//	video::DEFAULT_3D_MATERIAL=NULL;
-		//}
-		//if(video::DEFAULT_2D_MATERIAL->drop()){
-		//	video::DEFAULT_2D_MATERIAL=NULL;
-		//}
 		if(video::MYGUI_MATERIAL->drop()){
 			video::MYGUI_MATERIAL=NULL;
 		}
@@ -124,7 +114,13 @@ namespace platform{
 
 		m_pVideoDriver->onResize(m_params.windowSize);
 		m_pSceneManager->onResize(m_params.windowSize);
-		m_pGUIEnvirenment->onResize(m_params.windowSize);
+
+		event::SEvent evt;
+		evt.type=event::ENUM_EVENT_TYPE_SYSTEM;
+		evt.systemInput.type=event::ENUM_SYSTEM_INPUT_TYPE_RESIZE;
+		evt.systemInput.screenWidth=m_params.windowSize.w;
+		evt.systemInput.screenHeight=m_params.windowSize.h;
+		postEventFromUser(evt);
 		m_bResized = false;
 		
 		Logger->debug("CYonEngineAndroid::resizeIfNecessary\n");

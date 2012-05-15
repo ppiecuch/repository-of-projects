@@ -13,7 +13,6 @@
 #include "COGLES1Driver.h"
 #include "ISceneManager.h"
 #include "IFileSystem.h"
-#include "IMyGUIEnvirenment.h"
 
 namespace yon{
 	namespace platform{
@@ -25,7 +24,6 @@ namespace yon{
 
 			virtual video::IVideoDriver* getVideoDriver() const{return  m_pVideoDriver;}
 			virtual scene::ISceneManager* getSceneManager() const{return m_pSceneManager;}
-			virtual gui::IGUIEnvirenment* getGUIEnvirentment() const{return m_pGUIEnvirenment;}
 			virtual scene::IGraphicsAdapter* getGraphicsAdapter() const{return m_pGraphicsAdapter;}
 			virtual io::IFileSystem* getFileSystem() const{return m_pFileSystem;}
 			virtual audio::IAudioDriver* getAudioDriver() const{return m_pAudioDriver;}
@@ -61,7 +59,6 @@ namespace yon{
 
 			video::IVideoDriver* m_pVideoDriver;
 			scene::ISceneManager* m_pSceneManager;
-			gui::IGUIEnvirenment* m_pGUIEnvirenment;
 			scene::IGraphicsAdapter* m_pGraphicsAdapter;
 			io::IFileSystem* m_pFileSystem;
 			audio::IAudioDriver* m_pAudioDriver;

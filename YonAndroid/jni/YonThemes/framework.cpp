@@ -5,11 +5,13 @@ IYonEngine* engine=NULL;
 IVideoDriver* videoDriver=NULL;
 IAudioDriver* audioDriver=NULL;
 ISceneManager* sceneMgr=NULL;
-IGUIEnvirenment* guiEnv=NULL;
+//IGUIEnvirenment* guiEnv=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
+
+MyGUI::MyGUIAdapter* guiAdapter;
 
 IModel* cubeModel=NULL;
 IModel* planeModel=NULL;
@@ -40,8 +42,8 @@ void createDemo(size_t _index)
 	}
 	/*else if (_index == 3)
 	{
-		MyGUI::LanguageManager::getInstance().loadUserTags("core_theme_grayscale_tag.xml");
-		MyGUI::ResourceManager::getInstance().load("core_skin.xml");
+	MyGUI::LanguageManager::getInstance().loadUserTags("core_theme_grayscale_tag.xml");
+	MyGUI::ResourceManager::getInstance().load("core_skin.xml");
 	}*/
 
 	MyGUI::VectorWidgetPtr windows = MyGUI::LayoutManager::getInstance().loadLayout("Themes.layout");
@@ -103,11 +105,14 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				return true;
+				return MyGUI::InputManager::getInstance().injectMousePress(evt.mouseInput.x, evt.mouseInput.y, MyGUI::MouseButton::Left);
+				//return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				return true;
+				return MyGUI::InputManager::getInstance().injectMouseRelease(evt.mouseInput.x, evt.mouseInput.y, MyGUI::MouseButton::Left);
+				//return true;
 			}
+			break;
 		case event::ENUM_EVENT_TYPE_TOUCH:
 			switch(evt.mouseInput.type)
 			{
@@ -118,6 +123,15 @@ public:
 				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			}
+			break;
+		case event::ENUM_EVENT_TYPE_SYSTEM:
+			switch(evt.systemInput.type)
+			{
+			case event::ENUM_SYSTEM_INPUT_TYPE_RESIZE:
+				guiAdapter->onResize(core::dimension2du(evt.systemInput.screenWidth,evt.systemInput.screenHeight));
+				return true;
+			}
+			break;
 		}
 		return false;
 	}
@@ -133,7 +147,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
-	guiEnv=engine->getGUIEnvirentment();
+	//guiEnv=engine->getGUIEnvirentment();
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
@@ -146,8 +160,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->setWorkingDirectory("media/");
 #endif
 
-	guiEnv->init();
-	
+	//guiEnv->init();
+	guiAdapter=MyGUI::createMyGUIAdapter(fs,videoDriver,engine->getTimer(),geometryFty);
+
 
 	createDemo(0);
 
@@ -224,11 +239,12 @@ void drawFrame(){
 	planeModel->setScale(psca*factor);
 
 	sceneMgr->render(videoDriver);
-	
-	//pCamera->render(videoDriver);
-	guiEnv->render();
 
-	
+	//pCamera->render(videoDriver);
+	//guiEnv->render();
+	guiAdapter->render();
+
+
 
 	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
@@ -238,6 +254,7 @@ void drawFrame(){
 }
 void destroy(){
 	destroyDemo();
+	delete guiAdapter;
 	engine->drop();
 	delete params.pEventReceiver;
 }

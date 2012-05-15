@@ -238,7 +238,7 @@ namespace yon{
 				}
 
 				last = NULL;
-				len = NULL;
+				len = 0;
 			}
 
 			void operator=(const list<T>& other)

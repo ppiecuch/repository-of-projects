@@ -25,7 +25,7 @@ namespace yon{
 			virtual IShap* createShap(ENUM_VERTEX_TYPE type,u32 verticeCount,u32 indiceCount) const;
 			virtual void fillShapIndices(IShap* shap) const;
 
-			virtual IUnit* createUnit(IShap* shap)const;
+			virtual IUnit* createUnit(IShap* shap,video::IMaterial* material)const;
 			virtual IEntity* createEntity(IUnit* unit)const;
 		};
 	}

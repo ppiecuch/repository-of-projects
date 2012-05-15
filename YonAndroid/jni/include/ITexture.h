@@ -21,6 +21,10 @@ namespace video{
 
 		virtual ENUM_COLOR_FORMAT getColorFormat() const = 0;
 
+		virtual void* lock() = 0;
+		virtual void unlock() = 0;
+		virtual void upsidedown() = 0;
+
 		//RTTœ‡πÿ
 		virtual bool isRenderTarget() const = 0;
 		virtual void beginRTT(bool clearBackBuffer=true, bool clearZBuffer=true,video::SColor color=video::COLOR_BLACK) = 0;
