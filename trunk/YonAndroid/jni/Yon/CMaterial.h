@@ -26,6 +26,10 @@ namespace video{
 				//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
 				//Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
 		}
+		CMaterial(ENUM_MATERIAL_TYPE materialType)
+			:m_materialType(materialType),m_polygonMode(ENUM_POLYGON_MODE_FILL){
+				//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
+		}
 		~CMaterial(){
 			//Logger->setAppender(MASK_APPENDER_VS);
 			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CMaterial");

@@ -121,9 +121,12 @@ public:
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
 				logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				MyGUI::InputManager::getInstance().injectMouseMove((u32)evt.touchInput.x, (u32)evt.touchInput.y, 0);
+				MyGUI::InputManager::getInstance().injectMousePress((u32)evt.touchInput.x, (u32)evt.touchInput.y, MyGUI::MouseButton::Left);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
 				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				MyGUI::InputManager::getInstance().injectMouseRelease((u32)evt.touchInput.x, (u32)evt.touchInput.y, MyGUI::MouseButton::Left);
 				return true;
 			}
 			break;

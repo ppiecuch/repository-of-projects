@@ -85,8 +85,10 @@ namespace scene{
 
 	bool CGraphicsAdapter::drawImage(const c8* imageName, s32 srcX, s32 srcY, u32 srcWidth, u32 srcHeight, s32 destX, s32 destY, bool useAlpha,u32 color){
 		video::ITexture* texture=m_pDriver->getTexture(imageName);
-		if(texture==NULL)
+		if(texture==NULL){
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("image:%s can not found!",imageName).c_str());
 			return false;
+		}
 		video::ENUM_MATERIAL_TYPE materialType=useAlpha?video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR:video::ENUM_MATERIAL_TYPE_SOLID;
 		//计算位置坐标(左上角)
 		core::position2di spos(destX,destY);

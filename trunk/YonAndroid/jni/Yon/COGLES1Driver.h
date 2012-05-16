@@ -37,7 +37,7 @@ namespace ogles1{
 			return m_clearSetting;
 		}
 		void clearView(const bool& backBuffer,const bool& zBuffer,const video::SColor& color) const;
-		virtual void begin(bool backBuffer,bool zBuffer,video::SColor color);
+		virtual void begin(bool backBuffer,bool zBuffer,const video::SColor& color);
 		virtual void end();
 		virtual void setViewPort(const core::recti& r);
 		virtual const core::dimension2du& getCurrentRenderTargetSize() const;

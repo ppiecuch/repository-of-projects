@@ -95,8 +95,7 @@ namespace yon{
 			}*/
 
 			~string(){
-				//delete[] elements;
-				operator delete(elements);
+				delete[] elements;
 			}
 
 			T& operator[](u32 i){

@@ -103,7 +103,6 @@ namespace platform{
 		eraseEngineByHWnd(m_hWnd);
 		m_pAudioDriver->drop();
 		m_pGraphicsAdapter->drop();
-		//m_pGUIEnvirenment->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();

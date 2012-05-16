@@ -1215,11 +1215,7 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\jni\Android.mk"
-			>
-		</File>
-		<File
-			RelativePath=".\jni\Application.mk"
+			RelativePath=".\Android.mk"
 			>
 		</File>
 	</Files>

@@ -40,8 +40,7 @@ namespace yon{
 		const SColor COLOR_BLUE(0xFFFF0000);
 
 		IMaterial* DEFAULT_MATERIAL=NULL;
-		//IMaterial* DEFAULT_3D_MATERIAL=NULL;
-		//IMaterial* DEFAULT_2D_MATERIAL=NULL;
+
 		IMaterial* MYGUI_MATERIAL=NULL;
 	}
 
@@ -60,23 +59,6 @@ namespace yon{
 		}else{
 			video::DEFAULT_MATERIAL->grab();
 		}
-
-		/*if(video::DEFAULT_3D_MATERIAL==NULL){
-			video::DEFAULT_3D_MATERIAL=new video::CMaterial();
-			video::DEFAULT_3D_MATERIAL->setMaterialType(video::ENUM_MATERIAL_TYPE_NONE);
-			video::DEFAULT_3D_MATERIAL->setState(video::ENUM_MATERIAL_STATE_DEPTH_TEST,true);
-			video::DEFAULT_3D_MATERIAL->setState(video::ENUM_MATERIAL_STATE_CULL_FACE,true);
-		}else{
-			video::DEFAULT_3D_MATERIAL->grab();
-		}
-
-		if(video::DEFAULT_2D_MATERIAL==NULL){
-			video::DEFAULT_2D_MATERIAL=new video::CMaterial();
-			video::DEFAULT_2D_MATERIAL->setMaterialType(video::ENUM_MATERIAL_TYPE_NONE);
-			video::DEFAULT_2D_MATERIAL->setState(video::ENUM_MATERIAL_STATE_CULL_FACE,true);
-		}else{
-			video::DEFAULT_2D_MATERIAL->grab();
-		}*/
 
 		if(video::MYGUI_MATERIAL==NULL){
 			video::MYGUI_MATERIAL=new video::CMaterial();
