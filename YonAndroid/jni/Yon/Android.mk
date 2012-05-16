@@ -137,7 +137,7 @@ yon_SOURCES :=   \
 		CImageLoaderPNG.cpp \
 		yon.cpp
 		
-LOCAL_MODULE    := core
+LOCAL_MODULE    := engine
 		
 LOCAL_SRC_FILES := \
 		$(zlib_SOURCES) \

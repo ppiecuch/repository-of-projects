@@ -174,7 +174,7 @@ namespace ogles1{
 		glClear(mask);
 	}
 
-	void COGLES1Driver::begin(bool backBuffer,bool zBuffer,video::SColor color)
+	void COGLES1Driver::begin(bool backBuffer,bool zBuffer,const video::SColor& color)
 	{
 		clearView(backBuffer,zBuffer,color);
 

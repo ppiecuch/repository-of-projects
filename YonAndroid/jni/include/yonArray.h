@@ -127,6 +127,15 @@ namespace core{
 			insert(element);
 		}
 
+		void pop_back(){
+			return erase(used-1);
+		}
+
+		void pop_front(){
+			return erase(0);
+		}
+
+
 		s32 binary_search(const T& element)
 		{
 			sort();
