@@ -4,3 +4,4 @@ adb devices:  这条命令是列出所有装载的设置
 adb shell mkdir yourfolder 建立目录
 adb -d shell cat /sdcard/log.txt 查看TXT文件
 adb push luan.jpg /sdcard/sdcard
+adb pull /sdcard/001.jpg .              (下载 /sdcard 目录下的文件)  
