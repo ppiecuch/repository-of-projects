@@ -1,0 +1,31 @@
+在windows下编译OK的东东放到linux下就成了问题，即例是java也难逃这样的局限，因为有路径和JNI在，java还得面对具体的平台。
+问题是这样的，java中字符串是unicode编码的，当调用的C代码是多字节编码时，传入的字符串参数就必须进行转换，这个在windows下没问题。到了linux平台下呢，是不是也是转成多字节编码呢？网上给了很多的解决方案，大都使用类似下面的一个函数：
+char* jstringToAnsi(JNIEnv  *env, jstring jstr )
+{
+    int length = env->GetStringLength(jstr );
+    const jchar* jcstr = env->GetStringChars(jstr, 0 );
+    char* rtn = (char*)malloc( length*2+1 );
+    int size = 0;
+    //size = WideCharToMultiByte( CP_ACP, 0, (LPCWSTR)jcstr, length, rtn,(length*2+1), NULL, NULL );// window使用这个
+        size = wcstombs(rtn, (const wchar_t*)jcstr, length*2+1);// linux使用这个
+    if( size <= 0 )
+        return NULL;
+    env->ReleaseStringChars(jstr, jcstr );
+    rtn[size] = 0;
+    return rtn;
+}
+我也试图用这样的函数来做字节流的转换，但是不能成功。Java下用unicode编码是不会有问题的，为什么转换后的字符串是乱码呢？原因只有一个，就是linux下可能用的不是多字节编码（GBK或GB2312）。怎么查linux下的字符编码设置呢，google之，原来是放在i18n中：
+ vi /etc/sysconfig/i18n
+果然不是多字节编码，文件上写着：LANG="zh_CN.UTF-8"。好了既然是UTF8，而JNI又有从java的字符串中得到utf8的方法，解决起来就容易了，上面的函数写成下面的样子就得了：
+char* jstringToUTF(JNIEnv* env, jstring jstr) {
+  int length = env->GetStringLength(jstr);
+  const char* utfStr = env->GetStringUTFChars(jstr, 0);
+  char* rtn = (char*)malloc( length*2+1 );
+  strcpy(rtn, utfStr);
+  env->ReleaseStringUTFChars(jstr, utfStr);
+  return rtn;
+}
+
+搞清楚字符的源编码和目标编码，轻松搞定问题。
+
+http://blog.csdn.net/revv/article/details/3413870
