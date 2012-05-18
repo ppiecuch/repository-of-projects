@@ -670,6 +670,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\EGLInfo.h"
+						>
+					</File>
+					<File
 						RelativePath=".\SOGLES1Parameters.h"
 						>
 					</File>

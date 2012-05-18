@@ -177,6 +177,41 @@ namespace core{
 			Node* operator->(){return getNode();}
 			Node& operator*(){YON_DEBUG_BREAK_IF(atEnd());return *getNode();}
 		};
+
+		// AccessClass is a temporary class used with the [] operator.
+		// It makes it possible to have different behavior in situations like:
+		// myTree["Foo"] = 32;
+		// If "Foo" already exists update its value else insert a new element.
+		// int i = myTree["Foo"]
+		// If "Foo" exists return its value.
+		class AccessClass
+		{
+			// Let map be the only one who can instantiate this class.
+			friend class map<K, V>;
+		public:
+			// Assignment operator. Handles the myTree["Foo"] = 32; situation
+			void operator=(const V& value)
+			{
+				// Just use the Set method, it handles already exist/not exist situation
+				m_tree.set(m_key,value);
+			}
+
+			// ValueType operator
+			operator V()
+			{
+				Node* node = m_tree.find(m_key);
+
+				// Not found
+				YON_DEBUG_BREAK_IF(node==0) // access violation
+				return node->getValue();
+			}
+		private:
+			AccessClass(map& tree, const K& key) : m_tree(tree), m_key(key) {}
+			AccessClass();
+
+			map& m_tree;
+			const K& m_key;
+		}; // AccessClass
 	private:
 		//禁止复制构造与赋值
 		explicit map(const map& src);
@@ -530,6 +565,15 @@ namespace core{
 		//获取迭代器
 		Iterator getIterator(){Iterator it(getRoot());return it;}
 		PostorderIterator getPostorderIterator(){PostorderIterator it(getRoot());return it;}
+
+		
+
+		//! operator [] for access to elements
+		/** for example myMap["key"] */
+		AccessClass operator[](const K& k)
+		{
+			return AccessClass(*this, k);
+		}
 
 	};
 }
