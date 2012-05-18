@@ -7,6 +7,20 @@
 void stringTestCase::setUp()
 {
 }
+void stringTestCase::les()
+{
+	core::stringc str1("hello");
+	core::stringc str2("hello");
+	CPPUNIT_ASSERT(str1<str2==false);
+
+	core::stringc str3("hello");
+	core::stringc str4("Hello");
+	CPPUNIT_ASSERT(str3<str4==false);
+
+	core::stringc str5("hello");
+	core::stringc str6("");
+	CPPUNIT_ASSERT(str5<str6==false);
+}
 /*void stringTestCase::splits(){
 	core::stringc str1("Make In China");
 	core::array<core::stringc> arr;

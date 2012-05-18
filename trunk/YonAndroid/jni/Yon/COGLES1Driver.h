@@ -14,6 +14,7 @@
 #include "IHardwareBuffer.h"
 #include "COGLES1ExtensionHandler.h"
 
+
 namespace yon{
 namespace video{
 namespace ogles1{
@@ -134,6 +135,8 @@ namespace ogles1{
 		core::dimension2du m_windowSize;
 #ifdef YON_COMPILE_WITH_WIN32
 		bool initEGL(const HWND& hwnd);
+		void printEGLConfig(EGLConfig& config);
+		void printEGLAttribute(EGLint attribs[]);
 		void destroyEGL();
 
 		EGLDisplay m_eglDisplay;

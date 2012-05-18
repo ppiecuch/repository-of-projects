@@ -1,9 +1,31 @@
 #include "yonMapTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( yonMapTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( yonMapTestCase );
 
 void yonMapTestCase::setUp()
 {
+}
+void yonMapTestCase::stringMap()
+{
+	core::map<u16,core::stringc> temp;
+	CPPUNIT_ASSERT(temp.size()==0);
+	temp[1]="1";
+	CPPUNIT_ASSERT(((core::stringc)temp[1])=="1");
+#define TEST_MACRO 0x3024
+	temp[TEST_MACRO]="0x3024";
+	CPPUNIT_ASSERT(((core::stringc)temp[TEST_MACRO])=="0x3024");
+#undef TEST_MACRO
+}
+void yonMapTestCase::access()
+{
+	m[1]='1';
+	m[2]='2';
+	m[3]='3';
+
+	printf("\n%d\n",m.find(2)->getValue());
+	printf("\n%d\n",(u8)m[2]);
+
+	CPPUNIT_ASSERT(m[2]=='2');
 }
 void yonMapTestCase::size(){
 	CPPUNIT_ASSERT(m.size()==0);

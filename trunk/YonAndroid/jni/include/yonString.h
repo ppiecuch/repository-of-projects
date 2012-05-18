@@ -296,6 +296,20 @@ namespace yon{
 
 				return len == other.len;
 			}
+
+			//! Is smaller comparator
+			bool operator <(const string<T>& other) const
+			{
+				for(u32 i=0; elements[i] && other.elements[i]; ++i)
+				{
+					s32 diff = elements[i] - other.elements[i];
+					if ( diff )
+						return diff < 0;
+				}
+
+				return len < other.len;
+			}
+
 			s32 findFirst(T c) const
 			{
 				//TODOÓÅ»¯

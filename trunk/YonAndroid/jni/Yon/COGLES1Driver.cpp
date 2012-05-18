@@ -8,35 +8,103 @@
 #include "COGLES1HardwareBuffer.h"
 #include "CImage.h"
 #include "COGLES1FBOTexture.h"
-
+#include "EGLInfo.h"
 
 namespace yon{
 namespace video{
 namespace ogles1{
-	unsigned char mIndices[] = { 0, 1, 2 };
-	signed short mVertices[] = {
-		-50, -29, 0,
-		50, -29, 0,
-		0,  58, 0
-	};
-	GLubyte mColors[12]={255,0,0,64,  0,255,0,255,  0,0,255,0};
-	GLfloat mTexcoords[6]={0,0,1,0,0.5f,1};
-	void InitGL()
+
+#ifdef YON_COMPILE_WITH_WIN32
+	/*
+	core::map<s32,core::stringc> EGL_NAME_FLAGS;
+	//EGL_NAME_FLAGS[(s32)EGL_RED_SIZE]="EGL_RED_SIZE";
+	EGL_NAME_FLAGS.set(EGL_RED_SIZE,"EGL_RED_SIZE");
+	EGL_NAME_FLAGS[EGL_GREEN_SIZE]="EGL_GREEN_SIZE";
+	EGL_NAME_FLAGS[EGL_BLUE_SIZE]="EGL_BLUE_SIZE";
+	EGL_NAME_FLAGS[EGL_ALPHA_SIZE]="EGL_ALPHA_SIZE";
+	EGL_NAME_FLAGS[EGL_BUFFER_SIZE]="EGL_BUFFER_SIZE";
+	//EGL_NAME_FLAGS[EGL_SURFACE_TYPE]="EGL_SURFACE_TYPE";
+	EGL_NAME_FLAGS[EGL_DEPTH_SIZE]="EGL_DEPTH_SIZE";
+	EGL_NAME_FLAGS[EGL_STENCIL_SIZE]="EGL_STENCIL_SIZE";
+	EGL_NAME_FLAGS[EGL_SAMPLE_BUFFERS]="EGL_SAMPLE_BUFFERS";
+	EGL_NAME_FLAGS[EGL_SAMPLES]="EGL_SAMPLES";
+	//EGL_NAME_FLAGS[EGL_RENDERABLE_TYPE]="EGL_RENDERABLE_TYPE";
+	EGL_NAME_FLAGS[EGL_NONE]="EGL_NONE";
+
+	core::map<u16,core::stringc> EGL_SURFACE_FLAGS;
+	EGL_SURFACE_FLAGS[EGL_PBUFFER_BIT]="EGL_PBUFFER_BIT";
+	EGL_SURFACE_FLAGS[EGL_PIXMAP_BIT]="EGL_PIXMAP_BIT";
+	EGL_SURFACE_FLAGS[EGL_WINDOW_BIT]="EGL_WINDOW_BIT";
+	EGL_SURFACE_FLAGS[EGL_VG_COLORSPACE_LINEAR_BIT]="EGL_VG_COLORSPACE_LINEAR_BIT";
+	EGL_SURFACE_FLAGS[EGL_VG_ALPHA_FORMAT_PRE_BIT]="EGL_VG_ALPHA_FORMAT_PRE_BIT";
+	EGL_SURFACE_FLAGS[EGL_MULTISAMPLE_RESOLVE_BOX_BIT]="EGL_MULTISAMPLE_RESOLVE_BOX_BIT";
+	EGL_SURFACE_FLAGS[EGL_SWAP_BEHAVIOR_PRESERVED_BIT]="EGL_SWAP_BEHAVIOR_PRESERVED_BIT";
+
+	core::map<u16,core::stringc> EGL_RENDERABLE_FLAGS;
+	EGL_RENDERABLE_FLAGS[EGL_OPENGL_ES_BIT]="EGL_OPENGL_ES_BIT";
+	EGL_RENDERABLE_FLAGS[EGL_OPENVG_BIT]="EGL_OPENVG_BIT";
+	EGL_RENDERABLE_FLAGS[EGL_OPENGL_ES2_BIT]="EGL_OPENGL_ES2_BIT";
+	EGL_RENDERABLE_FLAGS[EGL_OPENGL_BIT]="EGL_OPENGL_BIT";
+	*/
+	void COGLES1Driver::printEGLConfig(EGLConfig& config)
 	{
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_SHORT, 0, mVertices);
-
-		glMatrixMode(GL_PROJECTION);
-		//glOrthox(-160<<16, 160<<16, -120<<16, 120<<16, -128<<16, 128<<16);
-
-		//gluPerspective(60.0f,(float)/(float)height,0.1f,200);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glClearColor(0.1f,0.2f,0.3f,1);
-		glColor4x(0x10000, 0, 0, 0);
+		EGLint value;
+		core::map<u16,core::stringc>::Iterator it=EGLInfo::EGL_NAME_FLAGS.getIterator();
+		for (;!it.atEnd();++it)
+		{
+			eglGetConfigAttrib(m_eglDisplay, config, it->getKey(), &value);
+			Logger->debug("%s:%d\n",it->getValue().c_str(),value);
+		}
+		if(eglGetConfigAttrib(m_eglDisplay, config, EGL_SURFACE_TYPE, &value))
+		{
+			core::stringc result;
+			core::map<u16,core::stringc>::Iterator it=EGLInfo::EGL_SURFACE_FLAGS.getIterator();
+			for (;!it.atEnd();++it)
+			{
+				if(it->getKey()&value)
+				{
+					if(result.length()>0)
+						result+=",";
+					result+=it->getValue();
+				}
+			}
+			Logger->debug("EGL_SURFACE_TYPE:%s\n",result);
+		}
+		else
+			Logger->debug("EGL_SURFACE_TYPE:Unknown\n");
+		if(eglGetConfigAttrib(m_eglDisplay, config, EGL_RENDERABLE_TYPE, &value))
+		{
+			core::stringc result;
+			core::map<u16,core::stringc>::Iterator it=EGLInfo::EGL_RENDERABLE_FLAGS.getIterator();
+			for (;!it.atEnd();++it)
+			{
+				if(it->getKey()&value)
+				{
+					if(result.length()>0)
+						result+=",";
+					result+=it->getValue();
+				}
+			}
+			Logger->debug("EGL_RENDERABLE_TYPE:%s\n",result);
+		}
+		else
+			Logger->debug("EGL_RENDERABLE_TYPE:Unknown\n");
 	}
-	
+	void COGLES1Driver::printEGLAttribute(EGLint attribs[])
+	{
+		s32 i=0;
+		while(attribs[i]!=EGL_NONE)
+		{
+			if(attribs[i]==EGL_SURFACE_TYPE)
+				Logger->debug("EGL_SURFACE_TYPE:%s\n",((core::stringc)EGLInfo::EGL_SURFACE_FLAGS[attribs[i+1]]).c_str());
+			else if(attribs[i]==EGL_RENDERABLE_TYPE)
+				Logger->debug("EGL_RENDERABLE_TYPE:%s\n",((core::stringc)EGLInfo::EGL_RENDERABLE_FLAGS[attribs[i+1]]).c_str());
+			else
+				Logger->debug("%s:%d\n",((core::stringc)EGLInfo::EGL_NAME_FLAGS[attribs[i]]).c_str(),attribs[i+1]);
+			i+=2;
+		}
+	}
+#endif
 
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty)
@@ -57,6 +125,7 @@ namespace ogles1{
 		m_materialRenderers.push_back(createMaterialRendererMask(this));
 
 #ifdef YON_COMPILE_WITH_WIN32
+		EGLInfo::init();
 		initEGL(m_hWnd);
 #endif//YON_COMPILE_WITH_WIN32
 
@@ -1083,7 +1152,8 @@ namespace ogles1{
 		//Creation of a client API context based on an EGLConfig will fail unless the EGLConfig's
 		//EGL_RENDERABLE_TYPE attribute include the bit corresponding to that API and version.
 		//				(Default:EGL_OPENGL_ES_BIT)
-		EGLint attribs[] =
+
+		/*EGLint attribs[] =
 		{
 			EGL_RED_SIZE, 5,
 			EGL_GREEN_SIZE, 5,
@@ -1097,7 +1167,109 @@ namespace ogles1{
 			EGL_SAMPLES, 0,
 			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
 			EGL_NONE, 0
+		};*/
+		EGLint attribs[] =
+		{
+			EGL_RED_SIZE, 8,
+			EGL_GREEN_SIZE, 8,
+			EGL_BLUE_SIZE, 8,
+			EGL_ALPHA_SIZE, 8,
+			EGL_BUFFER_SIZE, 32,
+			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+			EGL_DEPTH_SIZE, 24,
+			EGL_STENCIL_SIZE, false,
+			EGL_SAMPLE_BUFFERS, 0,
+			EGL_SAMPLES, 0,
+#ifdef EGL_VERSION_1_3
+			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+#endif
+			EGL_NONE, 0
 		};
+
+		/*
+		reference:http://pastebin.com/3dirn3yT
+		EGLConfig* configs = NULL;
+		if (eglGetConfigs(m_eglDisplay, 0, 0, &num_configs) != EGL_TRUE) {
+			Logger->error(YON_LOG_FAILED_FORMAT,"Unable to acquire EGL configurations");
+			return false;
+		} else {
+			if (num_configs == 0) {
+				Logger->error(YON_LOG_FAILED_FORMAT,"No EGL configurations available.");
+				return false;
+			}
+			configs = static_cast<EGLConfig*>(malloc(num_configs * sizeof(*configs)));
+			eglGetConfigs(m_eglDisplay, configs, num_configs, &num_configs);
+			if(configs==NULL){
+				Logger->error(YON_LOG_FAILED_FORMAT,"No EGL configurations returned");
+				return false;
+			}
+			for(s32 i=0; i<num_configs; ++i) {
+				int attributeVal = 0;
+
+				eglGetConfigAttrib(m_eglDisplay, configs[i], EGL_SURFACE_TYPE, &attributeVal);
+				if (!(attributeVal & EGL_WINDOW_BIT)) {
+					continue;
+				}
+
+				eglGetConfigAttrib(m_eglDisplay, configs[i], EGL_RENDERABLE_TYPE, &attributeVal);
+				if (!(attributeVal & EGL_OPENGL_ES_BIT)) {
+					continue;
+				}
+
+				eglGetConfigAttrib(m_eglDisplay, configs[i], EGL_DEPTH_SIZE, &attributeVal);
+				if (attributeVal == 0) {
+					continue;
+				}
+
+				eglGetConfigAttrib(m_eglDisplay, configs[i], EGL_RED_SIZE, &attributeVal);
+				if (attributeVal != 8) {
+					continue;
+				}
+				eglGetConfigAttrib(m_eglDisplay, configs[i], EGL_GREEN_SIZE, &attributeVal);
+				if (attributeVal != 8) {
+					continue;
+				}
+
+				eglGetConfigAttrib(m_eglDisplay, configs[i], EGL_BLUE_SIZE, &attributeVal);
+				if (attributeVal != 8) {
+					continue;
+				}
+
+				eglGetConfigAttrib(m_eglDisplay, configs[i], EGL_BUFFER_SIZE, &attributeVal);
+				if (attributeVal != 32) {
+					continue;
+				}
+
+				config = configs[i];
+			}
+		}
+
+		if(config==NULL){
+			Logger->error(YON_LOG_FAILED_FORMAT,"Could not get config for OpenGL-ES display");
+			return false;
+		}*/
+
+		EGLConfig* configs = NULL;
+		if (eglGetConfigs(m_eglDisplay, 0, 0, &num_configs) != EGL_TRUE) {
+			Logger->error(YON_LOG_FAILED_FORMAT,"Unable to acquire EGL configurations");
+			return false;
+		} else {
+			if (num_configs == 0) {
+				Logger->error(YON_LOG_FAILED_FORMAT,"No EGL configurations available.");
+				return false;
+			}
+			configs = new EGLConfig[num_configs];
+			eglGetConfigs(m_eglDisplay, configs, num_configs, &num_configs);
+
+			for(u32 i=0;i<num_configs;++i)
+			{
+				Logger->debug("Support Config:\n");
+				printEGLConfig(configs[i]);
+			}
+
+			delete[] configs;
+			configs=NULL;
+		}
 
 		//Third Step: Choose EGLConfig
 		//API: EGLBoolean eglChooseConfig(EGLDisplay dpy,const EGLint *attrib_list,
@@ -1113,6 +1285,71 @@ namespace ogles1{
 			Logger->error(YON_LOG_FAILED_FORMAT,"Choose EGLConfig");
 			return false;
 		}
+		
+		/*
+		Logger->debug("Try Config:\n");
+		printEGLAttribute(attribs);
+
+		int steps=5;
+		while (!eglChooseConfig(m_eglDisplay, attribs, &config, 1, &num_configs) || !num_configs)
+		{
+			switch (steps)
+			{
+			case 5: // samples
+				if (attribs[19]>2)
+				{
+					--attribs[19];
+				}
+				else
+				{
+					attribs[17]=0;
+					attribs[19]=0;
+					--steps;
+				}
+				break;
+			case 4: // alpha
+				if (attribs[7])
+				{
+					attribs[7]=0;
+
+				}
+				else
+					--steps;
+				break;
+			case 3: // stencil
+				if (attribs[15])
+				{
+					attribs[15]=0;
+
+				}
+				else
+					--steps;
+				break;
+			case 2: // depth size
+				if (attribs[13]>16)
+				{
+					attribs[13]-=8;
+				}
+				else
+					--steps;
+				break;
+			case 1: // buffer size
+				if (attribs[9]>16)
+				{
+					attribs[9]-=8;
+				}
+				else
+					--steps;
+				break;
+			default:
+				Logger->error(YON_LOG_FAILED_FORMAT,"Choose EGLConfig");
+				return false;
+			}
+
+			Logger->debug("Try Config:\n");
+			printEGLAttribute(attribs);
+		}
+		*/
 
 		//Fourth Step: Create EGLSurface
 		//EGLSurface eglCreateWindowSurface(EGLDisplay dpy,EGLConfig config,
