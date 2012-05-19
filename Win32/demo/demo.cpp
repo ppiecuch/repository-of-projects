@@ -7,6 +7,8 @@
 #include "Thread.h"
 #include <iostream>
 #include <string>
+#include <stdio.h>
+
 using namespace std;
 
 inline void EnableMemLeakCheck()
@@ -54,6 +56,22 @@ inline int gcd(unsigned int a,unsigned int b){
 	return a*k;  
 }  
 
+class SColor
+{
+public:
+	SColor()
+		:color(0){}
+
+	SColor(unsigned int clr)
+		: color(clr) {}
+
+	void print(){
+		printf("%X\n",color);
+	}
+
+	unsigned int color;
+};
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	/*Trace("%d\r\n",argc);
@@ -64,6 +82,11 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout<<argv[i]<<endl;
 	}*/
 	EnableMemLeakCheck();
+
+	SColor c1(0xFF132E47);
+
+	SColor c2=c1;
+	c2.print();
 
 	/*
 	MyThread t1;
