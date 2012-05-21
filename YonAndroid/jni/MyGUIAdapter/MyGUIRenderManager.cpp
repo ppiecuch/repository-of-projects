@@ -108,11 +108,12 @@ namespace MyGUI{
 			//Logger->debug("setTexture:%s\n",texture->getTexture()->getPath());
 
 		}
-		buffer->fillShapIndices();
+		buffer->fillShapIndices(_count);
 		scene::IShap* shap=buffer->getShap();
 		m_pUnit->setShap(shap);
 		m_pDriver->drawUnit(m_pUnit);
 		//Logger->debug("doRender:%08X(v:%d,i:%d)\n",shap,shap->getVertexCount(),shap->getIndexCount());
+		printf("doRender:%08X(v:%d,i:%d),_count:%d\n",shap,shap->getVertexCount(),shap->getIndexCount(),_count);
 	}
 
 	void MyGUIRenderManager::drawOneFrame(){

@@ -39,7 +39,7 @@ namespace MyGUI{
 			return m_pShap;
 		}
 
-		virtual void fillShapIndices();
+		virtual void fillShapIndices(size_t count);
 
 	};
 }

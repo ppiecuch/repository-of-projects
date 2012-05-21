@@ -39,7 +39,8 @@ namespace yon{
 				const video::SColor& color=video::COLOR_WHITE) const = 0;
 
 			virtual IShap* createShap(ENUM_VERTEX_TYPE type,u32 verticeCount,u32 indiceCount) const = 0;
-			virtual void fillShapIndices(IShap* shap) const = 0;
+			//对shap的indices进行0,1,2,.....填充，结果indices数量为count
+			virtual void fillShapIndices(IShap* shap,u32 count) const = 0;
 
 			virtual IUnit* createUnit(IShap* shap,video::IMaterial* material=NULL) const = 0;
 			virtual IEntity* createEntity(IUnit* unit) const = 0;

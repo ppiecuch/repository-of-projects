@@ -23,7 +23,7 @@ namespace yon{
 			virtual IShap* createXYRectangle2D2T(s32 x0,s32 y0,s32 x1,s32 y1,f32 u0,f32 v0,f32 u1,f32 v1,f32 s0,f32 t0,f32 s1,f32 t1,const video::SColor& color) const;
 
 			virtual IShap* createShap(ENUM_VERTEX_TYPE type,u32 verticeCount,u32 indiceCount) const;
-			virtual void fillShapIndices(IShap* shap) const;
+			virtual void fillShapIndices(IShap* shap,u32 count) const;
 
 			virtual IUnit* createUnit(IShap* shap,video::IMaterial* material)const;
 			virtual IEntity* createEntity(IUnit* unit)const;
