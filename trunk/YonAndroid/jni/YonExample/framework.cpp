@@ -72,21 +72,22 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	ISound* sound=audioDriver->getSound("bg.ogg");
+	/*ISound* sound=audioDriver->getSound("bg.ogg");
 	sound->setLooping(true);
 	//sound->setGain(0.5f);
 	sound->play();
 	//sound=audioDriver->getSound("helloworld.wav");
-	//sound->play();
+	//sound->play();*/
 
 	shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
 	material=cubeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
 	cubeModel->setPosition(core::vector3df(100,100,0));
-	material->setTexture(0,videoDriver->getTexture("test.png"));
+	material->setTexture(0,videoDriver->getTexture("120.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();

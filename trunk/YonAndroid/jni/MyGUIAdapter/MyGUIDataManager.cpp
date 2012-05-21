@@ -53,7 +53,7 @@ namespace MyGUI{
 	}
 
 	const std::string& MyGUIDataManager::getDataPath(const std::string& _name){
-		static std::string path;
+		static std::string path("");
 		return path;
 	}
 }

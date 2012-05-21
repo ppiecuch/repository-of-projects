@@ -24,9 +24,9 @@ namespace MyGUI{
 
 	}
 
-	void MyGUIVertexBuffer::fillShapIndices(){
+	void MyGUIVertexBuffer::fillShapIndices(size_t count){
 		if(m_bHasFillIndices==false){
-			m_pGeometryFty->fillShapIndices(m_pShap);
+			m_pGeometryFty->fillShapIndices(m_pShap,count);
 			m_bHasFillIndices=true;
 
 			Logger->debug("fillShapIndices:%08X(v:%d,i:%d)\n",m_pShap,m_pShap->getVertexCount(),m_pShap->getIndexCount());

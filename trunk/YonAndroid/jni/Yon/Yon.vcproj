@@ -686,10 +686,6 @@
 					Name="lpng"
 					>
 					<File
-						RelativePath=".\lpng\Android.mk"
-						>
-					</File>
-					<File
 						RelativePath=".\lpng\png.c"
 						>
 					</File>
@@ -702,10 +698,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\lpng\pngdebug.h"
-						>
-					</File>
-					<File
 						RelativePath=".\lpng\pngerror.c"
 						>
 					</File>
@@ -714,23 +706,11 @@
 						>
 					</File>
 					<File
-						RelativePath=".\lpng\pnginfo.h"
-						>
-					</File>
-					<File
-						RelativePath=".\lpng\pnglibconf.h"
-						>
-					</File>
-					<File
 						RelativePath=".\lpng\pngmem.c"
 						>
 					</File>
 					<File
 						RelativePath=".\lpng\pngpread.c"
-						>
-					</File>
-					<File
-						RelativePath=".\lpng\pngpriv.h"
 						>
 					</File>
 					<File
@@ -754,10 +734,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\lpng\pngstruct.h"
-						>
-					</File>
-					<File
 						RelativePath=".\lpng\pngtrans.c"
 						>
 					</File>
@@ -775,10 +751,6 @@
 					</File>
 					<File
 						RelativePath=".\lpng\pngwutil.c"
-						>
-					</File>
-					<File
-						RelativePath=".\lpng\README"
 						>
 					</File>
 				</Filter>
