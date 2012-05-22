@@ -159,6 +159,7 @@ namespace scene{
 							s->m_indices[i]=i;
 					}
 				}
+				break;
 			case ENUM_VERTEX_TYPE_3V1T1C:
 				{
 					Shap3D* s=static_cast<Shap3D*>(shap);
@@ -170,6 +171,7 @@ namespace scene{
 							s->m_indices[i]=i;
 					}
 				}
+				break;
 			case ENUM_VERTEX_TYPE_3V2T1C:
 				{
 					Shap3D2T* s=static_cast<Shap3D2T*>(shap);

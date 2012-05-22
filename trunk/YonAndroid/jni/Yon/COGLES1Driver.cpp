@@ -742,41 +742,6 @@ namespace ogles1{
 		return image;
 	}
 
-	IImage* COGLES1Driver::createImageFromFile(io::IReadFile* file){
-		if (!file)
-			return NULL;
-
-		IImage* image = NULL;
-
-		u32 i;
-
-		for (i=0; i<m_imageLoaders.size(); ++i)
-		{
-			if (m_imageLoaders[i]->checkFileExtension(file->getFileName()))
-			{
-				// reset file position which might have changed due to previous loadImage calls
-				file->seek(0);
-				image = m_imageLoaders[i]->loadImage(file);
-				if (image)
-					return image;
-			}
-		}
-
-		for (i=0; i<m_imageLoaders.size(); ++i)
-		{
-			file->seek(0);
-			if (m_imageLoaders[i]->checkFileHeader(file))
-			{
-				file->seek(0);
-				image = m_imageLoaders[i]->loadImage(file);
-				if (image)
-					return image;
-			}
-		}
-
-		return NULL;
-	}
-
 	IImage* COGLES1Driver::createImageFromFile(io::IReadStream* file){
 		if (!file)
 			return NULL;
@@ -875,21 +840,6 @@ namespace ogles1{
 			texture->grab();
 			m_textures.push_back(texture);
 		}
-	}
-
-	video::ITexture* COGLES1Driver::loadTextureFromFile(io::IReadFile* file){
-		ITexture* texture = NULL;
-		Logger->debug("start load texture:%s\n",file->getPathName().c_str());
-		IImage* image = createImageFromFile(file);
-
-		if (image)
-		{
-			texture = createDeviceDependentTexture(image, file->getPathName());
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("end load texture:%s",file->getPathName().c_str()).c_str());
-			image->drop();
-		}
-
-		return texture;
 	}
 
 	video::ITexture* COGLES1Driver::loadTextureFromFile(io::IReadStream* file){

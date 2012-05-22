@@ -15,7 +15,7 @@ namespace MyGUI{
 	private:
 		const scene::IGeometryFactory* m_pGeometryFty;
 		scene::IShap* m_pShap;
-		bool m_bHasFillIndices;
+		//bool m_bHasFillIndices;
 
 	public:
 		MyGUIVertexBuffer(const scene::IGeometryFactory* geometryFty);
