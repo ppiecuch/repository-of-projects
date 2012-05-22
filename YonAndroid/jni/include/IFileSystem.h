@@ -2,7 +2,6 @@
 #define _YON_IO_IFILESYSTEM_H_
 
 #include "IReferencable.h"
-#include "IReadFile.h"
 #include "IStream.h"
 
 namespace yon{
@@ -12,8 +11,6 @@ namespace yon{
 		public:
 			virtual ~IFileSystem(){}
 			virtual bool existFile(const path& filename) const =0;
-			//使用完后记得drop
-			virtual YON_DEPRECATED IReadFile* createAndOpenFile(const io::path& filename) = 0;
 			virtual IReadStream* createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode=ENUM_ENDIAN_MODE_LITTLE) = 0;
 			//获取绝对路径
 			//参数inWorkingDirectory，是否按工作空间路径获取

@@ -132,7 +132,6 @@ namespace yon{
 
 
 			virtual IImage* createImageFromFile(const io::path& filename) = 0;
-			virtual YON_DEPRECATED IImage* createImageFromFile(io::IReadFile* file) =0;
 			virtual IImage* createImageFromFile(io::IReadStream* file) =0;
 
 			virtual ITexture* addTexture(const core::dimension2du& size,

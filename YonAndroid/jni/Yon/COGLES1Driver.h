@@ -64,7 +64,6 @@ namespace ogles1{
 
 
 		virtual IImage* createImageFromFile(const io::path& filename);
-		virtual IImage* createImageFromFile(io::IReadFile* file);
 		virtual IImage* createImageFromFile(io::IReadStream* file);
 
 		virtual ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format);
@@ -96,7 +95,6 @@ namespace ogles1{
 	private:
 		void checkMaterial();
 		void addTexture(video::ITexture* texture);
-		YON_DEPRECATED video::ITexture* loadTextureFromFile(io::IReadFile* file);
 		video::ITexture* loadTextureFromFile(io::IReadStream* file);
 		video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
 

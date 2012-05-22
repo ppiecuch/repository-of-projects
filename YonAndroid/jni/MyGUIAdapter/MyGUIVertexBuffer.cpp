@@ -4,9 +4,9 @@
 
 namespace MyGUI{
 	MyGUIVertexBuffer::MyGUIVertexBuffer(const scene::IGeometryFactory* geometryFty)
-		:m_pGeometryFty(geometryFty),
-		m_pShap(NULL),
-		m_bHasFillIndices(false)
+		:m_pGeometryFty(geometryFty)
+		,m_pShap(NULL)
+		//,m_bHasFillIndices(false)
 	{}
 
 	MyGUIVertexBuffer::~MyGUIVertexBuffer(){
@@ -19,15 +19,16 @@ namespace MyGUI{
 			if(m_pShap)
 				m_pShap->drop();
 			m_pShap=m_pGeometryFty->createShap(scene::ENUM_VERTEX_TYPE_3V1T1C,_count,0);
-			m_bHasFillIndices=false;
+			//m_bHasFillIndices=false;
 		}
 
 	}
 
 	void MyGUIVertexBuffer::fillShapIndices(size_t count){
-		if(m_bHasFillIndices==false){
+		//if(m_bHasFillIndices==false){
+		if(m_pShap&&m_pShap->getIndexCount()!=count){
 			m_pGeometryFty->fillShapIndices(m_pShap,count);
-			m_bHasFillIndices=true;
+			//m_bHasFillIndices=true;
 
 			Logger->debug("fillShapIndices:%08X(v:%d,i:%d)\n",m_pShap,m_pShap->getVertexCount(),m_pShap->getIndexCount());
 		}

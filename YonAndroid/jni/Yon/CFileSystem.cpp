@@ -1,5 +1,4 @@
 #include "CFileSystem.h"
-#include "CReadFile.h"
 #include "CReadFileStream.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -38,10 +37,6 @@ namespace io{
 #elif defined(YON_COMPILE_WITH_ANDROID)
 		return (access(filename.c_str(), F_OK) != -1);
 #endif
-	}
-
-	IReadFile* CFileSystem::createAndOpenFile(const io::path& filename){
-		return createReadFile(getAbsolutePath(filename));
 	}
 
 	IReadStream* CFileSystem::createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode){

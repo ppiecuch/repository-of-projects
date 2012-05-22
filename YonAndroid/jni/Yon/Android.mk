@@ -2,12 +2,13 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS := -DANDROID_NDK \
+LOCAL_CFLAGS := $(LOCAL_C_INCLUDES:%=-I%) \
+				-DANDROID_NDK \
                 -DDISABLE_IMPORTGL \
                 -O3 \
                 -DAL_BUILD_LIBRARY \
                 -DAL_ALEXT_PROTOTYPES \
-                -DGL_GLEXT_PROTOTYPES 
+                -DGL_GLEXT_PROTOTYPES
 
 LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/zlib \
@@ -19,8 +20,6 @@ LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/libvorbis \
 		$(LOCAL_PATH)/../include \
 		$(LOCAL_PATH)/ 
-		
-
 		
 lpng_SOURCES := \
 		lpng/png.c \
@@ -115,7 +114,6 @@ yon_SOURCES :=   \
 		CDebugPrinter.cpp \
 		CLogger.cpp \
 		CFileSystem.cpp \
-		CReadFile.cpp \
 		CReadFileStream.cpp \
 		CReadMemoryStream.cpp \
 		COrthoCamera.cpp \
@@ -149,7 +147,7 @@ LOCAL_SRC_FILES := \
 		
 		
 LOCAL_ARM_MODE   := arm 
-LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lstdc++ -Wl
+LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog
 include $(BUILD_STATIC_LIBRARY)
 #include $(call all-makefiles-under,$(LOCAL_PATH))
 

@@ -1387,14 +1387,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\CReadFile.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\CReadFile.h"
-					>
-				</File>
-				<File
 					RelativePath=".\CReadFileStream.cpp"
 					>
 				</File>
@@ -1412,10 +1404,6 @@
 				</File>
 				<File
 					RelativePath="..\include\IFileSystem.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\IReadFile.h"
 					>
 				</File>
 				<File

@@ -3,7 +3,6 @@
 
 #include "IReferencable.h"
 #include "path.h"
-#include "IReadFile.h"
 #include "IStream.h"
 #include "IImage.h"
 
@@ -13,8 +12,6 @@ namespace video{
 	class IImageLoader : public virtual core::IReferencable{
 	public:
 		virtual bool checkFileExtension(const io::path& filename) const = 0;
-		virtual YON_DEPRECATED bool checkFileHeader(io::IReadFile* file) const = 0;
-		virtual YON_DEPRECATED video::IImage* loadImage(io::IReadFile* file) const = 0;
 		virtual bool checkFileHeader(io::IReadStream* file) const = 0;
 		virtual video::IImage* loadImage(io::IReadStream* file) const = 0;
 	};
