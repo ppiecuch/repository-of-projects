@@ -1,7 +1,7 @@
-#include "yon_AndroidGLView.h"
-#include "YonExample/framework.h"
+#include "../yon_AndroidGLView.h"
+#include "framework.h"
 #include <GLES/gl.h>
-#include "log.h"
+#include "../log.h"
 
 const char* LOG_TAG = "yon_AndroidGLView";
 
