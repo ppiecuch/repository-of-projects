@@ -1,0 +1,9 @@
+目前版本的ADT(10.0.1)需要Ant 1.8的支持
+如果不更新1.8，会报以下的错误:
+The Android Ant-based build system requires Ant 1.8.0 or later. Current version is 1.7.1...
+1)到网站（http://ant.apache.org/）下载Ant的目前最新的版本1.8
+2)下载解压到本地的一个目录, 如 /opt/apache-ant-1.8.2
+3)打开eclipse->Preferences->Ant->Runtime
+删除 Ant Home Entries下关于1.7的所有选项,
+然后 点击 Ant Home ,点位到已经解压出来的ant( /opt/apache-ant-1.8.2)
+一次点击确定/OK 即可
