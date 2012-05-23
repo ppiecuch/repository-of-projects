@@ -119,9 +119,9 @@ LOCAL_SRC_FILES := \
 		YonThemes/framework.cpp \
 		YonThemes/yon_AndroidGLView.cpp
 		
-LOCAL_STATIC_LIBRARIES := freetype core
+LOCAL_STATIC_LIBRARIES := freetype engine
 LOCAL_LDFLAGS := \
-	$(LOCAL_PATH)/libcore.a \
+	$(LOCAL_PATH)/libengine.a \
 	$(LOCAL_PATH)/libfreetype.a \
 	$(LOCAL_PATH)/libmyguiadapter.a
 	

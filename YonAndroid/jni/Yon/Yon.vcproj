@@ -184,6 +184,18 @@
 			Name="yon"
 			>
 			<File
+				RelativePath=".\CRandomizer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CRandomizer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\IRandomizer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\ITimer.h"
 				>
 			</File>
@@ -260,10 +272,6 @@
 				</File>
 				<File
 					RelativePath="..\include\position3d.h"
-					>
-				</File>
-				<File
-					RelativePath="..\include\randomizer.h"
 					>
 				</File>
 				<File

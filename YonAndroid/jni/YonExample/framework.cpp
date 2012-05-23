@@ -9,6 +9,7 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
+IRandomizer* randomizer=NULL;
 
 IModel* cubeModel=NULL;
 IModel* planeModel=NULL;
@@ -60,12 +61,19 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(core::vector3df(0,0,300));
 	logger=Logger;
+	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->setWorkingDirectory("../media/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->setWorkingDirectory("media/");
 #endif
+
+	for(u32 i=0;i<100;++i){
+		Logger->debug("rand:%d\n",randomizer->rand());
+		Logger->debug("rand:%d\n",randomizer->rand(0,20));
+	}
+	
 
 	IMaterial* material;
 	IShap *shap,*shap1,*shap2;
@@ -87,7 +95,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
 	cubeModel->setPosition(core::vector3df(100,100,0));
-	material->setTexture(0,videoDriver->getTexture("120.png"));
+	material->setTexture(0,videoDriver->getTexture("png8/120.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -112,9 +120,6 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap->drop();
 	unit->drop();
 	entity->drop();
-
-	//core::array<core::stringc> arr;
-	//arr.push_back("test");
 
 	return true;
 }

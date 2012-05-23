@@ -4,6 +4,7 @@
 
 #include "CYonEngineWin32.h"
 #include "CGraphicsAdapter.h"
+#include "CRandomizer.h"
 
 #include "ILogger.h"
 
@@ -46,7 +47,7 @@ namespace platform{
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),
-		m_pAudioDriver(NULL),
+		m_pAudioDriver(NULL),m_pRandomizer(NULL),
 		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),
 		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),
 		m_params(params),m_bClose(false),m_bResized(false)
@@ -66,6 +67,9 @@ namespace platform{
 			m_params.windowSize.h = r.bottom - r.top;
 			m_bExternalWindow = true;
 		}
+
+		//初始化随机生成器
+		m_pRandomizer=createRandomizer();
 
 		//初始化计时器
 		m_pTimer=createTimer();
@@ -107,6 +111,7 @@ namespace platform{
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
 		m_pTimer->drop();
+		m_pRandomizer->drop();
 		if(m_bExternalWindow==false){
 			DestroyWindow(m_hWnd);
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
