@@ -119,6 +119,7 @@ namespace ogles1{
 
 		m_materialRenderers.push_back(createMaterialRendererNone(this));
 		m_materialRenderers.push_back(createMaterialRendererSolid(this));
+		m_materialRenderers.push_back(createMaterialRendererBlend(this));
 		m_materialRenderers.push_back(createMaterialRendererLighten(this));
 		m_materialRenderers.push_back(createMaterialRendererTransparent(this));
 		m_materialRenderers.push_back(createMaterialRendererTransparentBlendColor(this));
