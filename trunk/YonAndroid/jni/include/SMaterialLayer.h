@@ -9,14 +9,16 @@ namespace video{
 	struct SMaterialLayer{
 		ITexture* texture;
 		core::matrix4f textureMatrix;
-		bool bilinearFilter;
+		//bool bilinearFilter;
+		ENUM_FILTER_MODE filter;
 		ENUM_WRAP_MODE wrapU,wrapV;
 
 		SMaterialLayer()
 			:texture(NULL),
 			wrapU(ENUM_WRAP_MODE_REPEAT),
 			wrapV(ENUM_WRAP_MODE_REPEAT),
-			bilinearFilter(true),
+			//bilinearFilter(true),
+			filter(ENUM_FILTER_MODE_BILINEAR),
 			textureMatrix(true)
 		{}
 		SMaterialLayer(const SMaterialLayer& other)
@@ -32,7 +34,8 @@ namespace video{
 			texture = other.texture;
 			wrapU = other.wrapU;
 			wrapV = other.wrapV;
-			bilinearFilter = other.bilinearFilter;
+			//bilinearFilter = other.bilinearFilter;
+			filter = other.filter;
 			return *this;
 		}
 		inline bool operator!=(const SMaterialLayer& other) const
@@ -41,7 +44,8 @@ namespace video{
 				texture != other.texture ||
 				wrapU != other.wrapU ||
 				wrapV != other.wrapV ||
-				bilinearFilter != other.bilinearFilter;
+				//bilinearFilter != other.bilinearFilter;
+				filter != other.filter;
 			if (different)
 				return true;
 			return false;

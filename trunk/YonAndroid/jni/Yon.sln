@@ -63,6 +63,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyGUIAdapter", "MyGUIAdapte
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Build", "Build\Build.vcproj", "{C327A5C8-7F19-4366-B518-184A3EEDC2C7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonMask", "YonMask\YonMask.vcproj", "{E7EFF892-AC04-442E-8D2D-73BFC5A01520}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -121,6 +126,10 @@ Global
 		{C327A5C8-7F19-4366-B518-184A3EEDC2C7}.Debug|Win32.Build.0 = Debug|Win32
 		{C327A5C8-7F19-4366-B518-184A3EEDC2C7}.Release|Win32.ActiveCfg = Release|Win32
 		{C327A5C8-7F19-4366-B518-184A3EEDC2C7}.Release|Win32.Build.0 = Release|Win32
+		{E7EFF892-AC04-442E-8D2D-73BFC5A01520}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E7EFF892-AC04-442E-8D2D-73BFC5A01520}.Debug|Win32.Build.0 = Debug|Win32
+		{E7EFF892-AC04-442E-8D2D-73BFC5A01520}.Release|Win32.ActiveCfg = Release|Win32
+		{E7EFF892-AC04-442E-8D2D-73BFC5A01520}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

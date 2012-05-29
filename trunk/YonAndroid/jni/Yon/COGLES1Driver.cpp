@@ -908,6 +908,20 @@ namespace ogles1{
 	void COGLES1Driver::checkMaterial(){
 		if(m_pLastMaterial!=m_pCurrentMaterial){
 			m_pCurrentMaterial->grab();
+			ENUM_MATERIAL_TYPE cmt=m_pCurrentMaterial->getMaterialType();
+			if(m_pLastMaterial){
+				ENUM_MATERIAL_TYPE lmt=m_pLastMaterial->getMaterialType();
+				if(lmt!=cmt)
+					m_materialRenderers[lmt]->onUnsetMaterial();
+				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial,m_pLastMaterial);
+				m_pLastMaterial->drop();
+			}else{
+				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial,m_pLastMaterial);
+			}
+			m_pLastMaterial=m_pCurrentMaterial;
+		}
+		/*if(m_pLastMaterial!=m_pCurrentMaterial){
+			m_pCurrentMaterial->grab();
 			if(m_pLastMaterial){
 				ENUM_MATERIAL_TYPE lmt=m_pLastMaterial->getMaterialType();
 				ENUM_MATERIAL_TYPE cmt=m_pCurrentMaterial->getMaterialType();
@@ -939,7 +953,7 @@ namespace ogles1{
 						glFrontFace(m_pCurrentMaterial->getFrontFace());
 					m_materialRenderers[lmt]->onUnsetMaterial();
 				}
-				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial);
+				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial,m_pLastMaterial);
 
 				m_pLastMaterial->drop();
 			}else{
@@ -959,10 +973,10 @@ namespace ogles1{
 				}
 				glCullFace(m_pCurrentMaterial->getCullingMode());
 				glFrontFace(m_pCurrentMaterial->getFrontFace());
-				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial);
+				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial,NULL);
 			}
 			m_pLastMaterial=m_pCurrentMaterial;
-		}
+		}*/
 	}
 
 	void COGLES1Driver::setRender3DMode(){

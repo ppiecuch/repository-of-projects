@@ -24,6 +24,7 @@ namespace yon{
 			virtual scene::IGraphicsAdapter* getGraphicsAdapter() const{return m_pGraphicsAdapter;}
 			virtual io::IFileSystem* getFileSystem() const{return m_pFileSystem;}
 			virtual audio::IAudioDriver* getAudioDriver() const{return m_pAudioDriver;}
+			virtual IRandomizer* getRandomizer(){return m_pRandomizer;}
 
 			virtual bool run();
 
@@ -52,6 +53,7 @@ namespace yon{
 			io::IFileSystem* m_pFileSystem;
 			audio::IAudioDriver* m_pAudioDriver;
 			ITimer* m_pTimer;
+			IRandomizer* m_pRandomizer;
 
 			event::IEventReceiver* m_pUserListener;
 

@@ -18,7 +18,7 @@ namespace video{
 
 	class IMaterialRenderer : public virtual core::IReferencable{
 	public:
-		virtual void onSetMaterial(const IMaterial* material) {}
+		virtual void onSetMaterial(const IMaterial* current,const IMaterial* last) {}
 		virtual void onUnsetMaterial() {}
 	};
 }//video
