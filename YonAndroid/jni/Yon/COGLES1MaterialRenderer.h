@@ -26,6 +26,21 @@ namespace ogles1{
 		GL_STENCIL_TEST
 	};
 
+	const static u32 MATERIAL_GLBLENDS[]=
+	{
+		GL_ZERO,
+		GL_ONE,
+		GL_DST_COLOR,
+		GL_ONE_MINUS_DST_COLOR,
+		GL_SRC_COLOR,
+		GL_ONE_MINUS_SRC_COLOR,
+		GL_SRC_ALPHA,
+		GL_ONE_MINUS_SRC_ALPHA,
+		GL_DST_ALPHA,
+		GL_ONE_MINUS_DST_ALPHA,
+		GL_SRC_ALPHA_SATURATE
+	};
+
 	class COGLES1MaterialRenderer : public IMaterialRenderer{
 	public:
 		COGLES1MaterialRenderer(COGLES1Driver* driver):m_pDriver(driver){}
@@ -122,7 +137,47 @@ namespace ogles1{
 			m_pDriver->setTexture(0, current->getTexture(0));
 			setBasicRenderStates(current,last);
 
-			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_RGB, GL_PREVIOUS);	
+			glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, (f32)current->getModulate());
+
+			glBlendFunc(MATERIAL_GLBLENDS[current->getBlendSrcFactor()], MATERIAL_GLBLENDS[current->getBlendDstFactor()]);
+			glEnable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_GREATER, 0.f);
+			glEnable(GL_BLEND);
+
+			if(blendFactorHasAlpha(current->getBlendSrcFactor())||blendFactorHasAlpha(current->getBlendDstFactor()))
+			{
+				switch(current->getAlphaSource())
+				{
+				case ENUM_ALPHA_SOURCE_VERTEX:
+					glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
+					glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_ALPHA, GL_PRIMARY_COLOR);
+					break;
+				case ENUM_ALPHA_SOURCE_TEXTURE:
+					glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
+					glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_ALPHA, GL_TEXTURE);
+					break;
+				default:
+					glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_MODULATE);
+					glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_ALPHA, GL_TEXTURE);
+					glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_ALPHA, GL_PRIMARY_COLOR);
+				}
+				glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_RGB, GL_PRIMARY_COLOR);
+			}
+		}
+
+		virtual void onUnsetMaterial(){
+			glDisable(GL_BLEND);
+			glDisable(GL_ALPHA_TEST);
+
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_MODULATE);
+			glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 1.f );
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_RGB, GL_PREVIOUS);
 		}
 	};
 
@@ -271,6 +326,9 @@ namespace ogles1{
 	}
 	IMaterialRenderer* createMaterialRendererSolid(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererSolid((ogles1::COGLES1Driver*)driver);
+	}
+	IMaterialRenderer* createMaterialRendererBlend(IVideoDriver* driver){
+		return new ogles1::COGLES1MaterialRendererBlend((ogles1::COGLES1Driver*)driver);
 	}
 	IMaterialRenderer* createMaterialRendererLighten(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererLighten((ogles1::COGLES1Driver*)driver);

@@ -25,9 +25,16 @@ namespace video{
 
 	enum ENUM_MODULATE
 	{
-		EMFN_MODULATE_1X	= 1,
-		EMFN_MODULATE_2X	= 2,
-		EMFN_MODULATE_4X	= 4
+		ENUM_MODULATE_1X	= 1,
+		ENUM_MODULATE_2X	= 2,
+		ENUM_MODULATE_4X	= 4
+	};
+
+	enum ENUM_ALPHA_SOURCE
+	{
+		ENUM_ALPHA_SOURCE_NONE = 0,
+		ENUM_ALPHA_SOURCE_VERTEX,
+		ENUM_ALPHA_SOURCE_TEXTURE
 	};
 
 	enum ENUM_MATERIAL_TYPE{
@@ -112,6 +119,21 @@ namespace video{
 	};
 
 	const static u32 MATERIAL_MAX_TEXTURES = YON_MATERIAL_MAX_TEXTURES;
+
+	inline bool blendFactorHasAlpha(const ENUM_BLEND_FACTOR factor)
+	{
+		switch (factor)
+		{
+		case ENUM_BLEND_FACTOR_SRC_ALPHA:
+		case ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA:
+		case ENUM_BLEND_FACTOR_DST_ALPHA:
+		case ENUM_BLEND_FACTOR_ONE_MINUS_DST_ALPHA:
+		case ENUM_BLEND_FACTOR_SRC_ALPHA_SATURATE:
+			return true;
+		default:
+			return false;
+		}
+	}
 
 	class IMaterial : public virtual core::IReferencable{
 	public:
@@ -254,6 +276,17 @@ namespace video{
 
 		virtual ENUM_FILTER_MODE getFilterMode(u32 index) const = 0;
 		virtual void setFilterMode(u32 index,ENUM_FILTER_MODE mode) = 0;
+
+		virtual ENUM_BLEND_FACTOR getBlendSrcFactor() const = 0;
+		virtual void setBlendSrcFactor(ENUM_BLEND_FACTOR factor) = 0;
+		virtual ENUM_BLEND_FACTOR getBlendDstFactor() const = 0;
+		virtual void setBlendDstFactor(ENUM_BLEND_FACTOR factor) = 0;
+
+		virtual ENUM_MODULATE getModulate() const = 0;
+		virtual void setModulate(ENUM_MODULATE m) = 0;
+
+		virtual ENUM_ALPHA_SOURCE getAlphaSource() const = 0;
+		virtual void setAlphaSource(ENUM_ALPHA_SOURCE source) = 0;
 
 		virtual void setTextureMatrix(u32 index, const core::matrix4f& mat) = 0;
 		virtual core::matrix4f& getTextureMatrix(u32 index) = 0;
