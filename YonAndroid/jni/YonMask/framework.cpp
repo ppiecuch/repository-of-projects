@@ -50,7 +50,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	params.windowSize.w=400;
 	params.windowSize.h=400;
 	params.pJNIEnv=pJNIEnv;
-	params.fpsLimit=10;
+	//params.fpsLimit=10;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -58,6 +58,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	sceneMgr=engine->getSceneManager();
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
+	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(core::vector3df(0,0,300));
 	logger=Logger;
@@ -71,11 +72,11 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	/*
 	for(u32 i=0;i<100;++i){
-		Logger->debug("rand:%d\n",randomizer->rand());
-		Logger->debug("rand:%d\n",randomizer->rand(0,20));
+	Logger->debug("rand:%d\n",randomizer->rand());
+	Logger->debug("rand:%d\n",randomizer->rand(0,20));
 	}
 	*/
-	
+
 
 	IMaterial* material;
 	IShap *shap,*shap1,*shap2;
@@ -126,6 +127,27 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
+	shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
+	unit=geometryFty->createUnit(shap);
+	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	entity=geometryFty->createEntity(unit);
+	IModel* waterfallModel=sceneMgr->addModel(entity);
+	material=waterfallModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_MASK);
+	waterfallModel->setPosition(core::vector3df(90,100,120));
+	material->setTexture(0,videoDriver->getTexture("waterfall.png"));
+	material->setTexture(1,videoDriver->getTexture("mask.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+	SAnimatorParam aniParam;
+	aniParam.type=ENUM_ANIMATOR_TYPE_UV;
+	aniParam.animatorUV.unitIndex=0;
+	aniParam.animatorUV.stage=0;
+	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
+	waterfallModel->addAnimator(uvAnimator);
+	uvAnimator->drop();
+
 	return true;
 }
 void resize(u32 width,u32 height){
@@ -151,27 +173,6 @@ void drawFrame(){
 	sceneMgr->render(videoDriver);
 
 	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
-
-	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
-	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
-
-	/*gfAdapter->beginBatch(0);
-	gfAdapter->drawImage("nav.png",0,0,128,128,0,0,true);
-	//gfAdapter->drawImage("nav.png",0,0,128,128,100,0,true);
-	
-	//gfAdapter->drawImage("test.png",100,100,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
-	//gfAdapter->drawImage("firework.png",100,100);
-	//gfAdapter->drawImage("test.png",100,100,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
-
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_NONE,0,120);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT180,100,120);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR,200,120);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT180,300,120);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT90,0,320);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT90,100,320);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT270,200,320,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT270,300,320,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
-	gfAdapter->endBatch();*/
 
 	videoDriver->end();
 }

@@ -8,9 +8,32 @@
 namespace yon{
 namespace video{
 
+	enum ENUM_BLEND_FACTOR{
+		ENUM_BLEND_FACTOR_ZERO	= 0,				//!< src & dest	(0, 0, 0, 0)
+		ENUM_BLEND_FACTOR_ONE,						//!< src & dest	(1, 1, 1, 1)
+		ENUM_BLEND_FACTOR_DST_COLOR, 				//!< src (destR, destG, destB, destA)
+		ENUM_BLEND_FACTOR_ONE_MINUS_DST_COLOR, 		//!< src (1-destR, 1-destG, 1-destB, 1-destA)
+		ENUM_BLEND_FACTOR_SRC_COLOR,				//!< dest (srcR, srcG, srcB, srcA)
+		ENUM_BLEND_FACTOR_ONE_MINUS_SRC_COLOR, 		//!< dest (1-srcR, 1-srcG, 1-srcB, 1-srcA)
+		ENUM_BLEND_FACTOR_SRC_ALPHA,				//!< src & dest	(srcA, srcA, srcA, srcA)
+		ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,		//!< src & dest	(1-srcA, 1-srcA, 1-srcA, 1-srcA)
+		ENUM_BLEND_FACTOR_DST_ALPHA,				//!< src & dest	(destA, destA, destA, destA)
+		ENUM_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,		//!< src & dest	(1-destA, 1-destA, 1-destA, 1-destA)
+		ENUM_BLEND_FACTOR_SRC_ALPHA_SATURATE,		//!< src (min(srcA, 1-destA), idem, ...)
+		ENUM_BLEND_FACTOR_COUNT
+	};
+
+	enum ENUM_MODULATE
+	{
+		EMFN_MODULATE_1X	= 1,
+		EMFN_MODULATE_2X	= 2,
+		EMFN_MODULATE_4X	= 4
+	};
+
 	enum ENUM_MATERIAL_TYPE{
 		ENUM_MATERIAL_TYPE_NONE = 0,
 		ENUM_MATERIAL_TYPE_SOLID,
+		ENUM_MATERIAL_TYPE_BLEND,
 		ENUM_MATERIAL_TYPE_LIGHTEN,
 		ENUM_MATERIAL_TYPE_TRANSPARENT,
 		ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR,
@@ -27,9 +50,17 @@ namespace video{
 
 	enum ENUM_WRAP_MODE
 	{
-		ENUM_WRAP_MODE_REPEAT = 0,
-		ENUM_WRAP_MODE_CLAMP_TO_EDGE,
-		ENUM_WRAP_MODE_COUNT
+		ENUM_WRAP_MODE_REPEAT = 0x2901,
+		ENUM_WRAP_MODE_CLAMP_TO_EDGE = 0x812F
+	};
+
+	//或者放到Engine层面更合适（变更是否需要重新生成纹理？）
+	enum ENUM_FILTER_MODE
+	{
+		ENUM_FILTER_MODE_NEAREST = 0,	//最近点采样
+		ENUM_FILTER_MODE_BILINEAR,		//双线性过滤
+		ENUM_FILTER_MODE_TRILINEAR,		//三线性过滤
+		ENUM_FILTER_MODE_ANISOTROPIC	//各向异性过滤
 	};
 
 	enum ENUM_CULLING_MODE
@@ -220,6 +251,9 @@ namespace video{
 		virtual void setWrapModeU(u32 index,ENUM_WRAP_MODE mode) = 0;
 		virtual ENUM_WRAP_MODE getWrapModeV(u32 index) const = 0;
 		virtual void setWrapModeV(u32 index,ENUM_WRAP_MODE mode) = 0;
+
+		virtual ENUM_FILTER_MODE getFilterMode(u32 index) const = 0;
+		virtual void setFilterMode(u32 index,ENUM_FILTER_MODE mode) = 0;
 
 		virtual void setTextureMatrix(u32 index, const core::matrix4f& mat) = 0;
 		virtual core::matrix4f& getTextureMatrix(u32 index) = 0;

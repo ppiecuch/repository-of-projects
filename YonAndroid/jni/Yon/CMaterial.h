@@ -88,6 +88,13 @@ namespace video{
 			m_textureLayers[index].wrapV=mode;
 		}
 
+		virtual ENUM_FILTER_MODE getFilterMode(u32 index) const{
+			return m_textureLayers[index].filter;
+		}
+		virtual void setFilterMode(u32 index,ENUM_FILTER_MODE mode){
+			m_textureLayers[index].filter=mode;
+		}
+
 
 		virtual void setTextureMatrix(u32 index, const core::matrix4f& mat){
 			m_textureLayers[index].textureMatrix=mat;

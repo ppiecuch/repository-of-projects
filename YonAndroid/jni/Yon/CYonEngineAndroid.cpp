@@ -5,6 +5,7 @@
 #include "CYonEngineAndroid.h"
 #include "CSceneManager.h"
 #include "CGraphicsAdapter.h"
+#include "CRandomizer.h"
 
 #include "ILogger.h"
 
@@ -54,6 +55,9 @@ namespace platform{
 		checkJNIVersion();
 		Logger->info("JNI Version:%s\n",m_pfInfo.jniVersion.c_str());
 
+		//初始化随机生成器
+		m_pRandomizer=createRandomizer();
+
 		//初始化计时器
 		m_pTimer=createTimer();
 
@@ -82,6 +86,7 @@ namespace platform{
 		m_pSceneManager->drop();
 		m_pFileSystem->drop();
 		m_pTimer->drop();
+		m_pRandomizer->drop();
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy CYonEngineAndroid");
 		if(video::DEFAULT_MATERIAL->drop()){
 			video::DEFAULT_MATERIAL=NULL;
