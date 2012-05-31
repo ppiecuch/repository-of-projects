@@ -14,18 +14,20 @@ namespace ogles1{
 
 	class EGLInfo{
 	public:
-		static core::map<u16,core::stringc> EGL_NAME_FLAGS;
-		static core::map<u16,core::stringc> EGL_SURFACE_FLAGS;
-		static core::map<u16,core::stringc> EGL_RENDERABLE_FLAGS;
+		//static core::map<u16,core::stringc> EGL_NAME_FLAGS;
+		//static core::map<u16,core::stringc> EGL_SURFACE_FLAGS;
+		//static core::map<u16,core::stringc> EGL_RENDERABLE_FLAGS;
 
 		void static init();
 	};
 
-	core::map<u16,core::stringc> EGLInfo::EGL_NAME_FLAGS;
-	core::map<u16,core::stringc> EGLInfo::EGL_SURFACE_FLAGS;
-	core::map<u16,core::stringc> EGLInfo::EGL_RENDERABLE_FLAGS;
+	//core::map<u16,core::stringc> EGLInfo::EGL_NAME_FLAGS;
+	//core::map<u16,core::stringc> EGLInfo::EGL_SURFACE_FLAGS;
+	//core::map<u16,core::stringc> EGLInfo::EGL_RENDERABLE_FLAGS;
 
+	
 	void EGLInfo::init(){
+		/*
 		EGL_NAME_FLAGS[EGL_RED_SIZE]="EGL_RED_SIZE";
 		//EGL_NAME_FLAGS.set(EGL_RED_SIZE,"EGL_RED_SIZE");
 		EGL_NAME_FLAGS[EGL_GREEN_SIZE]="EGL_GREEN_SIZE";
@@ -52,7 +54,9 @@ namespace ogles1{
 		EGL_RENDERABLE_FLAGS[EGL_OPENVG_BIT]="EGL_OPENVG_BIT";
 		EGL_RENDERABLE_FLAGS[EGL_OPENGL_ES2_BIT]="EGL_OPENGL_ES2_BIT";
 		EGL_RENDERABLE_FLAGS[EGL_OPENGL_BIT]="EGL_OPENGL_BIT";
+		*/
 	}
+	
 }
 }
 }

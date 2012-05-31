@@ -46,6 +46,8 @@ namespace ogles1{
 	EGL_RENDERABLE_FLAGS[EGL_OPENGL_ES2_BIT]="EGL_OPENGL_ES2_BIT";
 	EGL_RENDERABLE_FLAGS[EGL_OPENGL_BIT]="EGL_OPENGL_BIT";
 	*/
+
+	/*
 	void COGLES1Driver::printEGLConfig(EGLConfig& config)
 	{
 		EGLint value;
@@ -104,6 +106,7 @@ namespace ogles1{
 			i+=2;
 		}
 	}
+	*/
 #endif
 
 
@@ -1117,7 +1120,8 @@ namespace ogles1{
 		//EGL_RENDERABLE_TYPE attribute include the bit corresponding to that API and version.
 		//				(Default:EGL_OPENGL_ES_BIT)
 
-		/*EGLint attribs[] =
+#if 1
+		EGLint attribs[] =
 		{
 			EGL_RED_SIZE, 5,
 			EGL_GREEN_SIZE, 5,
@@ -1131,7 +1135,8 @@ namespace ogles1{
 			EGL_SAMPLES, 0,
 			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
 			EGL_NONE, 0
-		};*/
+		};
+#else
 		EGLint attribs[] =
 		{
 			EGL_RED_SIZE, 8,
@@ -1149,7 +1154,7 @@ namespace ogles1{
 #endif
 			EGL_NONE, 0
 		};
-
+#endif
 		/*
 		reference:http://pastebin.com/3dirn3yT
 		EGLConfig* configs = NULL;
@@ -1213,7 +1218,7 @@ namespace ogles1{
 			return false;
 		}*/
 
-		EGLConfig* configs = NULL;
+		/*EGLConfig* configs = NULL;
 		if (eglGetConfigs(m_eglDisplay, 0, 0, &num_configs) != EGL_TRUE) {
 			Logger->error(YON_LOG_FAILED_FORMAT,"Unable to acquire EGL configurations");
 			return false;
@@ -1233,7 +1238,7 @@ namespace ogles1{
 
 			delete[] configs;
 			configs=NULL;
-		}
+		}*/
 
 		//Third Step: Choose EGLConfig
 		//API: EGLBoolean eglChooseConfig(EGLDisplay dpy,const EGLint *attrib_list,
