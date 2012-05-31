@@ -33,7 +33,10 @@ namespace video{
 				//Logger->setAppender(MASK_APPENDER_FILE|MASK_APPENDER_VS);
 		}
 		CMaterial(ENUM_MATERIAL_TYPE materialType)
-			:m_materialType(materialType),m_polygonMode(ENUM_POLYGON_MODE_FILL){
+			:m_materialType(materialType),m_polygonMode(ENUM_POLYGON_MODE_FILL),
+			m_cullingMode(ENUM_CULLING_MODE_BACK),m_frontFace(ENUM_FRONT_FACE_CCW),
+			m_blendSrc(ENUM_BLEND_FACTOR_SRC_ALPHA),m_blendDst(ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA),
+			m_modulate(ENUM_MODULATE_1X),m_alphaSource(ENUM_ALPHA_SOURCE_NONE){
 				//Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CMaterial");
 		}
 		~CMaterial(){

@@ -117,7 +117,6 @@ namespace ogles1{
 
 		m_imageLoaders.push_back(createImageLoaderPNG());
 
-		m_materialRenderers.push_back(createMaterialRendererNone(this));
 		m_materialRenderers.push_back(createMaterialRendererSolid(this));
 		m_materialRenderers.push_back(createMaterialRendererBlend(this));
 		m_materialRenderers.push_back(createMaterialRendererLighten(this));

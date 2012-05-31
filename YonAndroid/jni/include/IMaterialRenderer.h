@@ -9,7 +9,6 @@ namespace video{
 
 	class IVideoDriver;
 	class IMaterialRenderer;
-	IMaterialRenderer* createMaterialRendererNone(IVideoDriver* driver);
 	IMaterialRenderer* createMaterialRendererSolid(IVideoDriver* driver);
 	IMaterialRenderer* createMaterialRendererLighten(IVideoDriver* driver);
 	IMaterialRenderer* createMaterialRendererTransparent(IVideoDriver* driver);

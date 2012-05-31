@@ -106,6 +106,101 @@ namespace video{
 	YON_API extern const SColor COLOR_RED;
 	YON_API extern const SColor COLOR_GREEN;
 	YON_API extern const SColor COLOR_BLUE;
+
+	class SColorf
+	{
+	public:
+		//! Default constructor for SColorf.
+		/** Sets red, green and blue to 0.0f and alpha to 1.0f. */
+		SColorf() : r(0.0f), g(0.0f), b(0.0f), a(1.0f) {}
+
+		//! Constructs a color from up to four color values: red, green, blue, and alpha.
+		/** \param r: Red color component. Should be a value between
+		0.0f meaning no red and 1.0f, meaning full red.
+		\param g: Green color component. Should be a value between 0.0f
+		meaning no green and 1.0f, meaning full green.
+		\param b: Blue color component. Should be a value between 0.0f
+		meaning no blue and 1.0f, meaning full blue.
+		\param a: Alpha color component of the color. The alpha
+		component defines how transparent a color should be. Has to be
+		a value between 0.0f and 1.0f, 1.0f means not transparent
+		(opaque), 0.0f means fully transparent. */
+		SColorf(f32 r, f32 g, f32 b, f32 a = 1.0f) : r(r), g(g), b(b), a(a) {}
+
+		//! Constructs a color from 32 bit Color.
+		/** \param c: 32 bit color from which this SColorf class is
+		constructed from. */
+		SColorf(SColor c)
+		{
+			const f32 inv = 1.0f / 255.0f;
+			r = c.getRed() * inv;
+			g = c.getGreen() * inv;
+			b = c.getBlue() * inv;
+			a = c.getAlpha() * inv;
+		}
+
+		//! Converts this color to a SColor without floats.
+		SColor toSColor() const
+		{
+			return SColor((u32)core::round32(a*255.0f), (u32)core::round32(r*255.0f), (u32)core::round32(g*255.0f), (u32)core::round32(b*255.0f));
+		}
+
+		//! Sets three color components to new values at once.
+		/** \param rr: Red color component. Should be a value between 0.0f meaning
+		no red (=black) and 1.0f, meaning full red.
+		\param gg: Green color component. Should be a value between 0.0f meaning
+		no green (=black) and 1.0f, meaning full green.
+		\param bb: Blue color component. Should be a value between 0.0f meaning
+		no blue (=black) and 1.0f, meaning full blue. */
+		void set(f32 rr, f32 gg, f32 bb) {r = rr; g =gg; b = bb; }
+
+		//! Sets all four color components to new values at once.
+		/** \param aa: Alpha component. Should be a value between 0.0f meaning
+		fully transparent and 1.0f, meaning opaque.
+		\param rr: Red color component. Should be a value between 0.0f meaning
+		no red and 1.0f, meaning full red.
+		\param gg: Green color component. Should be a value between 0.0f meaning
+		no green and 1.0f, meaning full green.
+		\param bb: Blue color component. Should be a value between 0.0f meaning
+		no blue and 1.0f, meaning full blue. */
+		void set(f32 aa, f32 rr, f32 gg, f32 bb) {a = aa; r = rr; g =gg; b = bb; }
+
+		//! Sets a color component by index. R=0, G=1, B=2, A=3
+		void setColorComponentValue(s32 index, f32 value)
+		{
+			switch(index)
+			{
+			case 0: r = value; break;
+			case 1: g = value; break;
+			case 2: b = value; break;
+			case 3: a = value; break;
+			}
+		}
+
+		//! Returns the alpha component of the color in the range 0.0 (transparent) to 1.0 (opaque)
+		f32 getAlpha() const { return a; }
+
+		//! Returns the red component of the color in the range 0.0 to 1.0
+		f32 getRed() const { return r; }
+
+		//! Returns the green component of the color in the range 0.0 to 1.0
+		f32 getGreen() const { return g; }
+
+		//! Returns the blue component of the color in the range 0.0 to 1.0
+		f32 getBlue() const { return b; }
+
+		//! red color component
+		f32 r;
+
+		//! green color component
+		f32 g;
+
+		//! blue component
+		f32 b;
+
+		//! alpha color component
+		f32 a;
+	};
 }
 }
 #endif

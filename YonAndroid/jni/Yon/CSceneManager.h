@@ -19,6 +19,10 @@ namespace yon{
 			virtual ~CSceneManager();
 
 			virtual IModel* addModel(IEntity* entity);
+			virtual IModel* getRootModel(){
+				return this;
+			}
+
 			virtual void clearModels(){
 				clearChildren();
 			}

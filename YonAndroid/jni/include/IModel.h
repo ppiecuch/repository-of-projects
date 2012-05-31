@@ -6,6 +6,7 @@
 #include "ITexture.h"
 #include "IMaterial.h"
 #include "IAnimator.h"
+#include "IEntity.h"
 
 #include "ILogger.h"
 
@@ -100,6 +101,10 @@ namespace yon{
 			}
 
 			virtual video::IMaterial* getMaterial(u32 num) const{
+				return NULL;
+			}
+
+			virtual IEntity* getEntity(){
 				return NULL;
 			}
 
