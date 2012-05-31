@@ -794,5 +794,38 @@ namespace scene{
 
 		return shap;
 	}
+
+	IShap* CGeometryFactory::createWeed(f32 scale) const{
+		Shap3D* shap=new Shap3D();
+
+		// Create indices
+		const u16 u[18] = {
+			0,  1,  3,
+			3,  1,  2, 
+			4,  5,  7,
+			7,  5,  6,
+			8,  9,  11,
+			11, 9,  10
+		};
+		shap->m_indices.reallocate(18);
+
+		for(u32 i=0; i<18; ++i)
+			shap->m_indices.push_back(u[i]);
+
+		//Create vertexs
+		shap->m_vertices.reallocate(12);
+
+		f32 dtheta=(float)PI2/6;		//½Ç²½Ôö
+		f32 theta=0;
+		for(u32 i=0;i<3;++i,theta+=dtheta)
+		{
+			shap->m_vertices.push_back(SVertex(cosf(theta)*scale,0,sinf(theta)*scale,0,0,video::COLOR_WHITE));
+			shap->m_vertices.push_back(SVertex(cosf(theta)*scale,1*scale,sinf(theta)*scale,0,1,video::COLOR_WHITE));
+			shap->m_vertices.push_back(SVertex(cosf(theta+PI)*scale,1*scale,sinf(theta+PI)*scale,1,1,video::COLOR_WHITE));
+			shap->m_vertices.push_back(SVertex(cosf(theta+PI)*scale,0,sinf(theta+PI)*scale,1,0,video::COLOR_WHITE));
+		}
+		
+		return shap;
+	}
 }//scene
 }//yon 

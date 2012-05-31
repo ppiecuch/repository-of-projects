@@ -1,5 +1,6 @@
 #include "CFileSystem.h"
 #include "CReadFileStream.h"
+#include "CWriteFileStream.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include <io.h> // for _access
@@ -42,9 +43,15 @@ namespace io{
 	IReadStream* CFileSystem::createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode){
 		return createReadFileStream(getAbsolutePath(filename),mode);
 	}
-
+	IWriteStream* CFileSystem::createAndOpenWriteFileStream(const path& filename, bool append, ENUM_ENDIAN_MODE mode){
+		return createWriteFileStream(getAbsolutePath(filename),append,mode);
+	}
 
 	io::path CFileSystem::getAbsolutePath(const io::path& filename,bool inWorkingDirectory) const{
+		//如果是绝对路径
+		if(filename.findFirst(':')!=-1)
+			return filename;
+
 		if(inWorkingDirectory){
 #ifdef YON_COMPILE_WITH_WIN32
 			core::stringc temp("%s%s",m_workingDirectory.c_str(),filename.c_str());

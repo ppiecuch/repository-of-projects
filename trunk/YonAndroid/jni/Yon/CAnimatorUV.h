@@ -19,13 +19,14 @@ namespace animator{
 		virtual void animateNode(IModel* model, u32 timeMs){
 			video::IMaterial* material=model->getMaterial(m_uUnitIndex);
 			core::matrix4f& mat=material->getTextureMatrix(m_uStage);
+			//TODO
 			mat.translate(0,0.01f,0);
 		}
 		virtual ENUM_ANIMATOR_TYPE getType() const{
 			return ENUM_ANIMATOR_TYPE_UV;
 		}
 	};
-}//animator
-}//scene
-}//yon
+}
+}
+}
 #endif

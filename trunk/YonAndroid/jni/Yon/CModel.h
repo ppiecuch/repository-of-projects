@@ -18,6 +18,10 @@ namespace yon{
 			virtual void render(video::IVideoDriver* driver);
 			virtual void setEntity(IEntity* entity);
 
+			virtual IEntity* getEntity(){
+				return m_entity;
+			}
+
 			virtual video::IMaterial* getMaterial(u32 i) const{
 				if(i>=getMaterialCount())
 					return NULL;

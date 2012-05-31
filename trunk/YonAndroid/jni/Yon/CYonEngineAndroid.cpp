@@ -47,7 +47,7 @@ namespace platform{
 	CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params)
 		:m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
 		m_pUserListener(params.pEventReceiver),m_pGraphicsAdapter(NULL),
-		m_pAudioDriver(NULL),
+		m_pAudioDriver(NULL),m_pRandomizer(NULL),
 		m_params(params),m_bClose(false),m_bResized(true)
 	{
 		Logger->debug("start instance CYonEngineAndroid\n");

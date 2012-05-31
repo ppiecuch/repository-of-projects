@@ -7,8 +7,10 @@
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include <windows.h>
+#include <direct.h>//for mkdir
 #elif defined(YON_COMPILE_WITH_ANDROID)
 #include <unistd.h>
+#include <sys/stat.h>//for mkdir
 #endif
 
 namespace yon{
@@ -43,6 +45,43 @@ namespace core{
 		return pathname.subString(index+1);
 	}
 
+	inline const io::path getParentName(const io::path& pathname){
+		s32 index1 = pathname.findLast('/');
+		s32 index2 = pathname.findLast('\\');
+		s32 index = max_(index1,index2);
+		if(index<0)
+			return pathname;
+		return pathname.subString(0,index);
+	}
+
+	inline s32 _mkdirs(c8* path)
+	{
+		s32 retval;
+
+#ifdef YON_COMPILE_WITH_WIN32
+		while (0 != (retval = _mkdir(path)))
+#elif defined(YON_COMPILE_WITH_ANDROID)
+		while (0 != (retval = mkdir(path,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)))
+#endif
+		{
+			c8 subpath[512] = "";
+			c8 *delim;
+
+			if (NULL == (delim = strrchr(path, '/')))
+				return retval;
+
+			strncat(subpath, path, delim - path);
+			_mkdirs(subpath);
+		}
+		return retval;
+	}
+	inline s32 mkdirs(const io::path& pathname)
+	{
+		io::path temp=pathname;
+		temp.replace('\\','/');
+		return _mkdirs(const_cast<c8*>(temp.c_str()));
+	}
+
 	template <class T1, class T2>
 	inline void swap(T1& a, T2& b)
 	{
@@ -59,6 +98,6 @@ namespace core{
 		::usleep((pMilliseconds<<10)-24);
 #endif
 	}
-}//core
-}//yon
+}
+}
 #endif

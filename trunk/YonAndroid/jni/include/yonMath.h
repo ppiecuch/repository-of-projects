@@ -82,6 +82,16 @@ inline s32 ceil32( f32 x )
 	return (s32) ceilf ( x );
 }
 
+inline f32 round_( f32 x )
+{
+	return floorf( x + 0.5f );
+}
+
+inline s32 round32(f32 x)
+{
+	return (s32) round_(x);
+}
+
 inline f32 reciprocal(const f32 f)
 {
 	//TODOÓÅ»¯

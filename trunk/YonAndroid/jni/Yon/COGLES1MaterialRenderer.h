@@ -145,7 +145,6 @@ namespace ogles1{
 
 			glBlendFunc(MATERIAL_GLBLENDS[current->getBlendSrcFactor()], MATERIAL_GLBLENDS[current->getBlendDstFactor()]);
 			glEnable(GL_ALPHA_TEST);
-			glAlphaFunc(GL_GREATER, 0.f);
 			glEnable(GL_BLEND);
 
 			if(blendFactorHasAlpha(current->getBlendSrcFactor())||blendFactorHasAlpha(current->getBlendDstFactor()))
@@ -170,10 +169,10 @@ namespace ogles1{
 		}
 
 		virtual void onUnsetMaterial(){
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glDisable(GL_BLEND);
 			glDisable(GL_ALPHA_TEST);
 
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_MODULATE);
 			glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, 1.f );
@@ -321,9 +320,9 @@ namespace ogles1{
 		}
 	};
 }//ogles1
-	IMaterialRenderer* createMaterialRendererNone(IVideoDriver* driver){
-		return new ogles1::COGLES1MaterialRenderer((ogles1::COGLES1Driver*)driver);
-	}
+// 	IMaterialRenderer* createMaterialRendererNone(IVideoDriver* driver){
+// 		return new ogles1::COGLES1MaterialRenderer((ogles1::COGLES1Driver*)driver);
+// 	}
 	IMaterialRenderer* createMaterialRendererSolid(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererSolid((ogles1::COGLES1Driver*)driver);
 	}

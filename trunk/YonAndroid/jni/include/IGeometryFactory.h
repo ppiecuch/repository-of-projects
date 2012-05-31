@@ -21,6 +21,7 @@ namespace yon{
 			virtual IEntity* createXYPlane(const core::dimension2df& size=core::dimension2df(1,1),f32 z=0) const = 0;
 			virtual IEntity* createCube(const core::dimension3df& size=core::dimension3df(1,1,1)) const = 0;*/
 
+			virtual IShap* createWeed(f32 scale=1.f) const = 0;
 			virtual IShap* createTeapot(f32 scale=1.f,const video::SColor& color=video::COLOR_WHITE) const = 0;
 			virtual IShap* createTorus(f32 cirRadius=1.0f,f32 orbitRadius=2.0f,u32 cirSteps=8,u32 orbitSteps=8,const video::SColor& color=video::COLOR_WHITE) const = 0;
 			virtual IShap* createSphere(f32 radius=1.0f,u32 hSteps=8,u32 vSteps=8) const = 0;
@@ -30,6 +31,12 @@ namespace yon{
 			//TODO·ÏÆú
 			virtual IShap* createXYRectangle3D(s32 x0,s32 y0,s32 x1,s32 y1,f32 z,f32 u0=0,f32 v0=0,f32 u1=1,f32 v1=1,
 				const video::SColor& color=video::COLOR_WHITE) const = 0;
+			/*
+			----------x1,y1
+			|			|
+			|			|
+			x0,y0------
+			*/
 			//u3,v3------u2,v2
 			// |          |
 			//u0,v0------u1,v1

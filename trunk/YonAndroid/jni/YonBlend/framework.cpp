@@ -12,6 +12,7 @@ ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 
 IModel* cubeModel=NULL;
+IModel* weedModel=NULL;
 IModel* planeModel=NULL;
 IModel* teapotModel=NULL;
 f32 factor=1.1f;
@@ -105,6 +106,20 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
+	shap=geometryFty->createWeed(100);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	weedModel=sceneMgr->addModel(entity);
+	material=weedModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
+	material->states.CullFace=false;
+	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+	weedModel->setPosition(core::vector3df(20,100,0));
+	material->setTexture(0,videoDriver->getTexture("plant00.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
 	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
@@ -122,12 +137,21 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material->setMaterialType(ENUM_MATERIAL_TYPE_BLEND);
 	material->setBlendSrcFactor(ENUM_BLEND_FACTOR_SRC_ALPHA);
 	material->setBlendDstFactor(ENUM_BLEND_FACTOR_ONE);
-	material->setAlphaSource(ENUM_ALPHA_SOURCE_TEXTURE);
+	//material->setAlphaSource(ENUM_ALPHA_SOURCE_TEXTURE);
 	planeModel->setPosition(core::vector3df(0,0,0));
 	material->setTexture(0,videoDriver->getTexture("aura.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
+	SAnimatorParam alphaParam;
+	alphaParam.type=ENUM_ANIMATOR_TYPE_ALPHA;
+	alphaParam.animatorAlpha.unitIndex=0;
+	alphaParam.animatorAlpha.minValue=0;
+	alphaParam.animatorAlpha.maxValue=255;
+	alphaParam.animatorAlpha.increment=5;
+	IAnimator* alphaAnimator=animatorFty->createAnimator(alphaParam);
+	planeModel->addAnimator(alphaAnimator);
+	alphaAnimator->drop();
 
 	shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
@@ -142,11 +166,11 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap->drop();
 	unit->drop();
 	entity->drop();
-	SAnimatorParam aniParam;
-	aniParam.type=ENUM_ANIMATOR_TYPE_UV;
-	aniParam.animatorUV.unitIndex=0;
-	aniParam.animatorUV.stage=0;
-	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
+	SAnimatorParam uvParam;
+	uvParam.type=ENUM_ANIMATOR_TYPE_UV;
+	uvParam.animatorUV.unitIndex=0;
+	uvParam.animatorUV.stage=0;
+	IAnimator* uvAnimator=animatorFty->createAnimator(uvParam);
 	waterfallModel->addAnimator(uvAnimator);
 	uvAnimator->drop();
 
@@ -161,6 +185,9 @@ void drawFrame(){
 
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
+
+	const core::vector3df wrot=weedModel->getRotation();
+	weedModel->setRotation(core::vector3df(wrot.x,wrot.y+0.2f ,wrot.z));
 
 	const core::vector3df trot=teapotModel->getRotation();
 	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));

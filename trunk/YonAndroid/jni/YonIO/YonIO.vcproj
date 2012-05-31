@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="YonBlend"
-	ProjectGUID="{27E45365-58CB-4608-8A83-5F3D9EAC21C9}"
-	RootNamespace="YonBlend"
+	Name="YonIO"
+	ProjectGUID="{7FD5B1B1-D672-48F5-81A4-40DD17871BE7}"
+	RootNamespace="YonIO"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -167,7 +167,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\AndroidBlend.mk"
+			RelativePath="..\AndroidIO.mk"
 			>
 		</File>
 		<File

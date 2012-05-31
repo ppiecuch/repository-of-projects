@@ -534,6 +534,10 @@
 					Name="animator"
 					>
 					<File
+						RelativePath=".\CAnimatorAlpha.h"
+						>
+					</File>
+					<File
 						RelativePath=".\CAnimatorFactory.cpp"
 						>
 					</File>
@@ -1408,6 +1412,14 @@
 				</File>
 				<File
 					RelativePath=".\CReadMemoryStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\CWriteFileStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CWriteFileStream.h"
 					>
 				</File>
 				<File

@@ -11,6 +11,7 @@ namespace animator{
 	enum ENUM_ANIMATOR_TYPE{
 		ENUM_ANIMATOR_TYPE_UV = 0,
 		ENUM_ANIMATOR_TYPE_SURROUND,
+		ENUM_ANIMATOR_TYPE_ALPHA,
 		ENUM_ANIMATOR_TYPE_COUNT
 	};
 
@@ -26,10 +27,18 @@ namespace animator{
 			f32 x,y,z;
 		};
 
+		struct SAnimatorAlpha{
+			u32 unitIndex;
+			u8 minValue;
+			u8 maxValue;
+			u8 increment;
+		};
+
 		ENUM_ANIMATOR_TYPE type;
 		union{
 			struct SAnimatorUV animatorUV;
 			struct SAnimatorSurround animatorSurround;
+			struct SAnimatorAlpha animatorAlpha;
 		};
 	};
 

@@ -13,6 +13,7 @@ namespace yon{
 			virtual IEntity* createXYPlane(const core::dimension2df& size,f32 z) const;
 			virtual IEntity* createCube(const core::dimension3df& size) const;*/
 
+			virtual IShap* createWeed(f32 scale) const;
 			virtual IShap* createTeapot(f32 scale,const video::SColor& color) const;
 			virtual IShap* createTorus(f32 cirRadius,f32 orbitRadius,u32 cirSteps,u32 orbitSteps,const video::SColor& color) const;
 			virtual IShap* createSphere(f32 radius,u32 hSteps,u32 vSteps) const;
