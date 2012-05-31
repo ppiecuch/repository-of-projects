@@ -1,6 +1,3 @@
-// YonExampleDlgDlg.h : 头文件
-//
-
 #pragma once
 
 #include "yon.h"
@@ -14,25 +11,17 @@ using namespace yon::scene::camera;
 using namespace yon::scene::animator;
 
 #pragma comment(lib, "yon.lib")
-// CYonExampleDlgDlg 对话框
-class CYonExampleDlgDlg : public CDialog
+// CDialog2 对话框
+
+class CDialog2 : public CDialog
 {
+	DECLARE_DYNAMIC(CDialog2)
+
+public:
 	const static UINT WM_RENDER_FRAME=1;
 	const static UINT RENDER_INTERVAL=20;
-// 构造
-public:
-	CYonExampleDlgDlg(CWnd* pParent = NULL);	// 标准构造函数
-
-// 对话框数据
-	enum { IDD = IDD_YONEXAMPLEDLG_DIALOG };
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
-
-
-// 实现
-protected:
-	HICON m_hIcon;
+	CDialog2(CWnd* pParent = NULL);   // 标准构造函数
+	virtual ~CDialog2();
 
 	IYonEngine* engine;
 
@@ -43,18 +32,18 @@ protected:
 	IAnimatorFactory*  animatorFty;
 	ICamera* camera;
 
-	IModel* cubeModel;
-	IModel* planeModel;
-	IModel* toruseModel;
+// 对话框数据
+	enum { IDD = IDD_DIALOG2 };
 
-	// 生成的消息映射函数
-	virtual BOOL OnInitDialog();
-	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+
 	DECLARE_MESSAGE_MAP()
 public:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnDestroy();
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnPaint();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

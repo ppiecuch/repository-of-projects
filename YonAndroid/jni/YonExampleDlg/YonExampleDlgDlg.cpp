@@ -249,7 +249,7 @@ void CYonExampleDlgDlg::OnPaint()
 			const core::vector3df trot=toruseModel->getRotation();
 			toruseModel->setRotation(core::vector3df(trot.x+1.0f,trot.y,trot.z));
 
-			driver->begin(true,COLOR_BLACK);
+			driver->begin(true,true,COLOR_BLACK);
 
 			sceneMgr->render(driver);
 

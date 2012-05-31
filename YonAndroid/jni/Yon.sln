@@ -83,6 +83,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonIO", "YonIO\YonIO.vcproj
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonMFC", "YonMFC\YonMFC.vcproj", "{B311E303-4EF8-41F3-98B5-FA179BDC61BD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -157,6 +162,10 @@ Global
 		{7FD5B1B1-D672-48F5-81A4-40DD17871BE7}.Debug|Win32.Build.0 = Debug|Win32
 		{7FD5B1B1-D672-48F5-81A4-40DD17871BE7}.Release|Win32.ActiveCfg = Release|Win32
 		{7FD5B1B1-D672-48F5-81A4-40DD17871BE7}.Release|Win32.Build.0 = Release|Win32
+		{B311E303-4EF8-41F3-98B5-FA179BDC61BD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B311E303-4EF8-41F3-98B5-FA179BDC61BD}.Debug|Win32.Build.0 = Debug|Win32
+		{B311E303-4EF8-41F3-98B5-FA179BDC61BD}.Release|Win32.ActiveCfg = Release|Win32
+		{B311E303-4EF8-41F3-98B5-FA179BDC61BD}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
