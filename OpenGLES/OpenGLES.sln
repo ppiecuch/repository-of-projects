@@ -125,6 +125,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FBO", "FBO\FBO.vcproj", "{3
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "30TransparentModel", "30TransparentModel\30TransparentModel.vcproj", "{15D85105-172B-4B8F-8CA9-4718BFC7720F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "31MultiWindow", "31MultiWindow\31MultiWindow.vcproj", "{A8AD311C-BE34-4C24-A3D3-6FEE0FE7D75D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9C995D29-0CBC-4CDB-A06F-DFD1F9BDE5D2} = {9C995D29-0CBC-4CDB-A06F-DFD1F9BDE5D2}
+		{A4E4DA7F-B87F-4CD8-B611-FE42A734A95A} = {A4E4DA7F-B87F-4CD8-B611-FE42A734A95A}
+		{EB8C1093-ACCD-45E8-BCBD-33BC6EF6A778} = {EB8C1093-ACCD-45E8-BCBD-33BC6EF6A778}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -291,6 +298,10 @@ Global
 		{15D85105-172B-4B8F-8CA9-4718BFC7720F}.Debug|Win32.Build.0 = Debug|Win32
 		{15D85105-172B-4B8F-8CA9-4718BFC7720F}.Release|Win32.ActiveCfg = Release|Win32
 		{15D85105-172B-4B8F-8CA9-4718BFC7720F}.Release|Win32.Build.0 = Release|Win32
+		{A8AD311C-BE34-4C24-A3D3-6FEE0FE7D75D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A8AD311C-BE34-4C24-A3D3-6FEE0FE7D75D}.Debug|Win32.Build.0 = Debug|Win32
+		{A8AD311C-BE34-4C24-A3D3-6FEE0FE7D75D}.Release|Win32.ActiveCfg = Release|Win32
+		{A8AD311C-BE34-4C24-A3D3-6FEE0FE7D75D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
