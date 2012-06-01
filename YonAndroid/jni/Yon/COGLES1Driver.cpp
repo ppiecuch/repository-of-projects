@@ -184,6 +184,10 @@ namespace ogles1{
 
 	COGLES1Driver::~COGLES1Driver(){
 
+		if(eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
+			Logger->debug("Could not Bind Contexts and Drawables for OpenGL-ES1 display.\n");
+		}
+
 		if(m_pDebugPrinter)
 			m_pDebugPrinter->drop();
 
@@ -248,6 +252,9 @@ namespace ogles1{
 
 	void COGLES1Driver::begin(bool backBuffer,bool zBuffer,const video::SColor& color)
 	{
+		if(eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
+			Logger->debug("Could not Bind Contexts and Drawables for OpenGL-ES1 display.\n");
+		}
 		clearView(backBuffer,zBuffer,color);
 
 		m_clearSetting.clearBackBuffer=backBuffer;
@@ -256,7 +263,6 @@ namespace ogles1{
 	}
 	void COGLES1Driver::end()
 	{
-
 #ifdef YON_COMPILE_WITH_WIN32
 		eglSwapBuffers(m_eglDisplay, m_eglSurface);
 #endif//YON_COMPILE_WITH_WIN32
@@ -280,6 +286,9 @@ namespace ogles1{
 		core::yonSleep(m_FPSAssist.timeCounter);
 	}
 	void COGLES1Driver::setViewPort(const core::recti& r){
+		if(eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
+			Logger->debug("Could not Bind Contexts and Drawables for OpenGL-ES1 display.\n");
+		}
 		glViewport(0, 0, r.getWidth(), r.getHeight());
 		Logger->debug("setViewPort(0,0,%d,%d)\n",r.getWidth(), r.getHeight());
 	}
@@ -1370,6 +1379,11 @@ namespace ogles1{
 		//of an OpenGL ES 1.x context.An attribute value of 2 specifies creation of an OpenGL ES 2.x context.(Default:1)
 		m_eglContext = eglCreateContext(m_eglDisplay, config, EGL_NO_CONTEXT, eglAttributes);
 		//m_eglContext = eglCreateContext(m_eglDisplay, config, EGL_NO_CONTEXT, NULL);
+
+		/*if(m_eglContext==EGL_NO_CONTEXT){
+			Logger->error(YON_LOG_FAILED_FORMAT,"Create EGLContext");
+			return false;
+		}*/
 
 		//TODO check error
 

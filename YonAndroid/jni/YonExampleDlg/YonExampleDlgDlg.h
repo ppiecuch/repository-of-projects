@@ -14,6 +14,7 @@ using namespace yon::scene::camera;
 using namespace yon::scene::animator;
 
 #pragma comment(lib, "yon.lib")
+
 // CYonExampleDlgDlg ¶Ô»°¿ò
 class CYonExampleDlgDlg : public CDialog
 {

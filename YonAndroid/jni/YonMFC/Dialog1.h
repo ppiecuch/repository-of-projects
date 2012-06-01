@@ -47,4 +47,6 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+protected:
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 };
