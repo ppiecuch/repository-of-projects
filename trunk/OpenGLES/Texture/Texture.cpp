@@ -1,8 +1,22 @@
 #include "config.h"
 #include "Texture.h"
+#include <stdio.h>
+#include <wtypes.h>
+#include <stdarg.h>
+#include <tchar.h>
+
+inline void TRACE(const char * pszFormat, ...)
+{
+	va_list pArgs;
+	char szMessageBuffer[16380]={0};
+	va_start( pArgs, pszFormat );
+	vsnprintf_s( szMessageBuffer, 16380,16380-1,pszFormat, pArgs );
+	va_end( pArgs );   
+	OutputDebugStringA(szMessageBuffer);   
+}
 
 
-CTexture::CTexture(const string& name):mTextureId(-1),mName(name),mDataBuf(NULL)
+CTexture::CTexture(const string& name):mTextureId(0),mName(name),mDataBuf(NULL)
 {
 	int components;
 	if(CPngFile::load(name.c_str(),&mDataBuf, &mWidth, &mHeight, &components)==false)
@@ -45,7 +59,7 @@ CTexture::CTexture(const string& name):mTextureId(-1),mName(name),mDataBuf(NULL)
 #endif
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	printf("load texture %s(w:%d,h:%d,id:%d) success\n",name.c_str(),mWidth,mHeight,mTextureId);
+	TRACE("load texture %s(w:%d,h:%d,id:%d) success\n",name.c_str(),mWidth,mHeight,mTextureId);
 }
 
 CTexture::~CTexture(void)
@@ -54,11 +68,12 @@ CTexture::~CTexture(void)
 	{
 		delete[] mDataBuf;
 	}
-	if(mTextureId>-1)
+	if(mTextureId)
 	{
 		glDeleteTextures(1, &mTextureId);
-		printf("delete texture %s success\n",mName.c_str());
+		TRACE("delete texture %s success\n",mName.c_str());
 	}
+	TRACE("~CTexture\n");
 }
 void CTexture::bind()
 {
