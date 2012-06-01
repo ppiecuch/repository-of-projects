@@ -1,3 +1,12 @@
+[链接错误]
+缺少libc.lib
+解决这个问题的方法是去掉链接到libc.lib，具体地点：项目-〉属性-〉配置属性-〉链接器-〉忽略特定库libc.lib
+
+[链接错误]
+unresolved external symbol __iob
+这个__iob找不到的问题费 了我大部分的时间。跟踪到stdio.h文件，发现那里有个关于iob的宏，终于搞定。加入一句话到.cpp文件中：
+extern "C" { FILE _iob[3] = {__iob_func()[0], __iob_func()[1], __iob_func()[2]}; }
+
 [编译错误]
 编译就出现error C2248错误。
 vs2008下，从“类”创建的对象无法访问该“类”的 protected 或 private 成员，不可以执行拷贝构造函数
