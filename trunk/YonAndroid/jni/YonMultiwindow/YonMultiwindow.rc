@@ -54,7 +54,7 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
     "#pragma code_page(936)\r\n"
-    "#include ""res\\YonMFC.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
+    "#include ""res\\YonMultiwindow.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
     "#include ""l.CHS\\afxres.rc""      // 标准组件\r\n"
     "#endif\r\n"
     "\0"
@@ -70,7 +70,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\YonMFC.ico"
+IDR_MAINFRAME           ICON                    "res\\YonMultiwindow.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -79,32 +79,32 @@ IDR_MAINFRAME           ICON                    "res\\YonMFC.ico"
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "关于 YonMFC"
+CAPTION "关于 YonMultiwindow"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
-    LTEXT           "YonMFC，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "YonMultiwindow，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2012",IDC_STATIC,42,26,114,8
     DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
 END
 
-IDD_YONMFC_DIALOG DIALOGEX 0, 0, 533, 200
+IDD_YONMULTIWINDOW_DIALOG DIALOGEX 0, 0, 320, 200
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
-CAPTION "YonMFC"
+CAPTION "YonMultiwindow"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    LTEXT           "静态1",IDC_STATIC1,25,7,249,186
-    LTEXT           "静态2",IDC_STATIC2,396,7,130,186
+    LTEXT           "static1",IDC_STATIC1,7,7,116,186
+    LTEXT           "静态2",IDC_STATIC2,163,7,150,186
 END
 
-IDD_DIALOG1 DIALOGEX 0, 0, 175, 148
+IDD_DIALOG1 DIALOGEX 0, 0, 151, 183
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
 END
 
-IDD_DIALOG2 DIALOGEX 0, 0, 197, 165
+IDD_DIALOG2 DIALOGEX 0, 0, 153, 183
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -136,9 +136,9 @@ BEGIN
             VALUE "CompanyName", "TODO: <公司名>"
             VALUE "FileDescription", "TODO: <文件说明>"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "YonMFC.exe"
+            VALUE "InternalName", "YonMultiwindow.exe"
             VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
-            VALUE "OriginalFilename", "YonMFC.exe"
+            VALUE "OriginalFilename", "YonMultiwindow.exe"
             VALUE "ProductName", "TODO: <产品名>"
             VALUE "ProductVersion", "1.0.0.1"
         END
@@ -166,10 +166,10 @@ BEGIN
         BOTTOMMARGIN, 55
     END
 
-    IDD_YONMFC_DIALOG, DIALOG
+    IDD_YONMULTIWINDOW_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 526
+        RIGHTMARGIN, 313
         TOPMARGIN, 7
         BOTTOMMARGIN, 193
     END
@@ -177,17 +177,17 @@ BEGIN
     IDD_DIALOG1, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 168
+        RIGHTMARGIN, 144
         TOPMARGIN, 7
-        BOTTOMMARGIN, 141
+        BOTTOMMARGIN, 176
     END
 
     IDD_DIALOG2, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 190
+        RIGHTMARGIN, 146
         TOPMARGIN, 7
-        BOTTOMMARGIN, 158
+        BOTTOMMARGIN, 176
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -200,7 +200,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_ABOUTBOX            "关于 YonMFC(&A)..."
+    IDS_ABOUTBOX            "关于 YonMultiwindow(&A)..."
 END
 
 #endif    // 中文(中华人民共和国) resources
@@ -221,7 +221,7 @@ END
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
 #pragma code_page(936)
-#include "res\YonMFC.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "res\YonMultiwindow.rc2"  // 非 Microsoft Visual C++ 编辑的资源
 #include "l.CHS\afxres.rc"      // 标准组件
 #endif
 

@@ -62,7 +62,7 @@ namespace yon{
 				return;
 			core::position2di pos(0,0);
 			static core::dimension2du step(getDebugPrinterFontStep());
-			static u32 count,i;
+			u32 count,i;
 			core::stringc str;
 			lock();
 			core::list<core::stringc>::Iterator it=queue.begin(); 

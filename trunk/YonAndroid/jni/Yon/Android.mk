@@ -106,6 +106,7 @@ vorbis_SOURCES :=\
 		
 
 yon_SOURCES :=   \
+		CRandomizer.cpp \
 		CWave.cpp \
 		CWaveLoaderWAV.cpp \
 		CWaveLoaderOGG.cpp \
@@ -115,6 +116,7 @@ yon_SOURCES :=   \
 		CLogger.cpp \
 		CFileSystem.cpp \
 		CReadFileStream.cpp \
+		CWriteFileStream.cpp \
 		CReadMemoryStream.cpp \
 		COrthoCamera.cpp \
 		CGeometryFactory.cpp \

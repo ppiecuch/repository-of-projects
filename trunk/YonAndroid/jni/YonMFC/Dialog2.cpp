@@ -54,6 +54,8 @@ int CDialog2::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	params.windowId=hWnd;
 	engine=CreateEngine(params);
 
+	Logger->debug("Create Dialog2 engine\n");
+
 	driver=engine->getVideoDriver();
 	sceneMgr=engine->getSceneManager();
 	fs=engine->getFileSystem();
@@ -71,12 +73,13 @@ int CDialog2::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CDialog2::OnDestroy()
 {
+	TRACE("2OnDestroy start\n");
 	CDialog::OnDestroy();
 
 	// TODO: 在此处添加消息处理程序代码
 	KillTimer(WM_RENDER_FRAME);
-	Logger->debug("CYonExampleMFCView::OnDestroy\n");
 	engine->drop();
+	TRACE("2OnDestroy end\n");
 }
 
 BOOL CDialog2::OnEraseBkgnd(CDC* pDC)
@@ -122,4 +125,19 @@ void CDialog2::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CDialog::OnTimer(nIDEvent);
+}
+
+BOOL CDialog2::PreCreateWindow(CREATESTRUCT& cs)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	/*cs.lpszClass = AfxRegisterWndClass( CS_DBLCLKS |
+		CS_HREDRAW |
+		CS_VREDRAW |
+		CS_SAVEBITS |
+		CS_NOCLOSE |
+		//CS_OWNDC
+		CS_CLASSDC
+		,AfxGetApp()->LoadStandardCursor(IDC_ARROW), 0 ,AfxGetApp()->LoadStandardIcon(IDI_APPLICATION));*/
+
+	return CDialog::PreCreateWindow(cs);
 }
