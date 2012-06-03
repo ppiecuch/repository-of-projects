@@ -109,6 +109,7 @@ namespace ogles1{
 	*/
 #endif
 
+	u32 COGLES1Driver::s_uInstanceCount=0;
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty)
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
@@ -179,14 +180,19 @@ namespace ogles1{
 		m_pDebugPrinter=debug::createDebugPrinter(this,tex,geometryFty);
 		Logger->setDebugPrinter(m_pDebugPrinter);
 
-		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1Driver");
+		//实例计数器加1
+		++s_uInstanceCount;
+
+		Logger->info(YON_LOG_SUCCEED_FORMAT,core::stringc("Instance COGLES1Driver:%d",s_uInstanceCount).c_str());
 	}
 
 	COGLES1Driver::~COGLES1Driver(){
 
-		if(eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
+#ifdef YON_COMPILE_WITH_WIN32
+		if(s_uInstanceCount>1&&eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
 			Logger->debug("Could not Bind Contexts and Drawables for OpenGL-ES1 display.\n");
 		}
+#endif
 
 		if(m_pDebugPrinter)
 			m_pDebugPrinter->drop();
@@ -226,6 +232,10 @@ namespace ogles1{
 #ifdef YON_COMPILE_WITH_WIN32
 		destroyEGL();
 #endif//YON_COMPILE_WITH_WIN32
+
+		//实例计数器减1-->不减,因为最后一个被释放时,也需要MakeCurrent
+		//--s_uInstanceCount;
+
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
 	}
 
@@ -252,9 +262,11 @@ namespace ogles1{
 
 	void COGLES1Driver::begin(bool backBuffer,bool zBuffer,const video::SColor& color)
 	{
-		if(eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
+#ifdef YON_COMPILE_WITH_WIN32
+		if(s_uInstanceCount>1&&eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
 			Logger->debug("Could not Bind Contexts and Drawables for OpenGL-ES1 display.\n");
 		}
+#endif
 		clearView(backBuffer,zBuffer,color);
 
 		m_clearSetting.clearBackBuffer=backBuffer;
@@ -286,9 +298,11 @@ namespace ogles1{
 		core::yonSleep(m_FPSAssist.timeCounter);
 	}
 	void COGLES1Driver::setViewPort(const core::recti& r){
-		if(eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
+#ifdef YON_COMPILE_WITH_WIN32
+		if(s_uInstanceCount>1&&eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
 			Logger->debug("Could not Bind Contexts and Drawables for OpenGL-ES1 display.\n");
 		}
+#endif
 		glViewport(0, 0, r.getWidth(), r.getHeight());
 		Logger->debug("setViewPort(0,0,%d,%d)\n",r.getWidth(), r.getHeight());
 	}
