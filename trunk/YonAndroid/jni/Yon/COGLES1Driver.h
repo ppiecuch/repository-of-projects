@@ -131,6 +131,9 @@ namespace ogles1{
 
 		video::SClearSetting m_clearSetting;
 		core::dimension2du m_windowSize;
+
+		static u32 s_uInstanceCount;
+
 #ifdef YON_COMPILE_WITH_WIN32
 		bool initEGL(const HWND& hwnd);
 		void printEGLConfig(EGLConfig& config);
