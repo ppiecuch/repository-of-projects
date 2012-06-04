@@ -7,6 +7,15 @@
 namespace yon{
 namespace io{
 
+	//编码类型
+	enum ENUM_ENCODING{
+		ENUM_ENCODING_ASCII = 0,
+		ENUM_ENCODING_UTF8,
+		ENUM_ENCODING_UTF16,
+		ENUM_ENCODING_UTF32,
+		ENUM_ENCODING_COUNT
+	};
+
 	enum ENUM_ENDIAN_MODE{
 		ENUM_ENDIAN_MODE_BIG = 0,		//大端模式
 		ENUM_ENDIAN_MODE_LITTLE			//小端模式

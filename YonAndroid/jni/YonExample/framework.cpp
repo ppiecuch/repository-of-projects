@@ -150,7 +150,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
 	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
