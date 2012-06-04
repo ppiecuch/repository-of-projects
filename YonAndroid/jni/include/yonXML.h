@@ -1,6 +1,8 @@
 #ifndef _YON_IO_YONXML_H_
 #define _YON_IO_YONXML_H_
 
+#include "yonTypes.h"
+
 namespace yon{
 namespace io{
 
@@ -27,6 +29,16 @@ namespace io{
 		//! Unknown element.
 		ENUM_XML_NODE_UNKNOWN
 	};
+
+	//! Empty class to be used as parent class for IXMLReader.
+	/** If you need another class as base class for the xml reader, you can do this by creating
+	the reader using for example new CXMLReaderImpl<char, YourBaseClass>(yourcallback);
+	The Engine for example needs IReferencable.h as base class for every object to
+	let it automaticly reference countend, hence it replaces IXMLBase with IReferencable.h. */
+	class IXMLBase
+	{
+	};
+
 
 	template<class char_type, class super_class>
 	class IXMLReader : public super_class
@@ -108,6 +120,13 @@ namespace io{
 		//! Returns if an element is an empty element, like &lt;foo />
 		virtual bool isEmptyElement() const = 0;
 	};
+
+	//! A UTF-8 or ASCII character xml parser.
+	typedef IXMLReader<c8,IXMLBase> XMLReader;
+	//! A UTF-16 xml parser.
+	typedef IXMLReader<c16,IXMLBase> XMLReaderUTF16;
+	//! A UTF-32 xml parser.
+	typedef IXMLReader<c32,IXMLBase> XMLReaderUTF32;
 }
 }
 #endif
