@@ -42,7 +42,7 @@ namespace platform{
 		}
 	}
 
-	const c16* szWindowClass=TEXT("CYonPlatformWin32");
+	const wchar_t* szWindowClass=TEXT("CYonPlatformWin32");
 	
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
 		:m_hWnd(NULL),m_bExternalWindow(false),

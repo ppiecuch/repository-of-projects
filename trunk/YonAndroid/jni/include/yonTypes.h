@@ -71,7 +71,10 @@ typedef signed long long	s64;
 #endif
 
 typedef char				c8;
-typedef wchar_t				c16;
+//wchar_t has 16 bit on windows and 32 bit on other operating systems.
+//typedef wchar_t				c16;
+typedef unsigned short		c16;
+typedef unsigned long		c32;
 typedef float				f32;
 typedef double				f64;
 
@@ -95,6 +98,15 @@ enum ENUM_DIMEN_MODE{
 	ENUM_DIMEN_MODE_3D = 3
 };
 */
+
+//±‡¬Î¿‡–Õ
+enum ENUM_ENCODING{
+	ENUM_ENCODING_ASCII = 0,
+	ENUM_ENCODING_UTF8,
+	ENUM_ENCODING_UTF16,
+	ENUM_ENCODING_UTF32,
+	ENUM_ENCODING_COUNT
+};
 
 }//yon
 

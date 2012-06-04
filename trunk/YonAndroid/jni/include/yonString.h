@@ -60,7 +60,7 @@ namespace yon{
 				*this=buffer;
 			}
 
-			string(const c16* const pFmt,...):elements(NULL),capacity(0),len(0){
+			string(const wchar_t* const pFmt,...):elements(NULL),capacity(0),len(0){
 				va_list args;
 				va_start(args,pFmt);
 				T buffer[1024];
@@ -472,7 +472,7 @@ namespace yon{
 			u32 len;
 		};
 		typedef string<c8> stringc;
-		typedef string<c16> stringw;
+		typedef string<wchar_t> stringw;
 	}
 }
 #endif
