@@ -1,0 +1,41 @@
+程序中一些逻辑是用C写的，使用jni调用C代码，使用基本的打log的方式很难查看大型数组，了解到android ndk sdk中有个工具叫ndk-gdb可以很方便地对c代码进行调试，使用过程并不顺利，遇到两个错误，耗时一周终于解决。
+
+如果是在windows下，需要安装cygwin。
+
+
+
+首先，在cygwin命令行下进入到你工程的根目录下
+
+如果你要调试的程序已经在运行了，直接运行ndk-gdb
+如果你要调试的程序没有运行，可以使用ndk-gdb --start
+ 
+键入ndk-gdb命令，会出现一系列库文件加载的信息，这些库可能会加载失败，不过没有关系
+出现<gdb>提示符，输入help命令可以查看一系列命令
+
+使用l命令列出c文件的内容，但是遇到 No symbol table is loaded.  Use the "file" command.
+
+使用以下命令加载需要调试的so文件：
+file obj/local/armeabi/libsearch-algorithm.so
+
+使用list或者l可以查看加载的c文件。
+
+使用b 100，在c文件的第100行设置断点。
+使用c或者continue命令继续运行程序。
+出现错误：
+Continuing.
+Warning:
+Cannot insert breakpoint 1.
+Error accessing memory address 0x11a0: Input/output error.
+
+错误原因：使用ndk-gdb --start 启动程序第一个activity，但是此时so文件并没有被加载。
+解决方法：首先打开程序并使用，在保证so文件已经被使用的情况下，调用ndk-gdb命令调试程序进程。
+正确流程：
+1.创建一个模拟器或者使用真机运行想要调试的程序，确保so文件已经被加载。
+2.在此程序的根目录下调用ndk-gdb，出现gdb提示符。
+3.使用l命令，应该可以打印出c文件。
+4.使用b 10，可以在c文件的第十行打印断点。
+5.使用c命令恢复程序运行。
+6.更多操作请参考gdb使用手册。
+
+
+http://blog.csdn.net/xinfuqizao/article/details/7625886
