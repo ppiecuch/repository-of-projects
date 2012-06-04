@@ -9,6 +9,9 @@
 
 
 namespace yon{
+	namespace video{
+		class IVideoDriver;
+	}
 namespace debug{
 
 	class IDebugPrinter;
@@ -55,10 +58,11 @@ namespace debug{
 		virtual void warn(const c8* pFmt, ...) = 0;
 		virtual void error(const c8* pFmt, ...) = 0;
 
-		virtual void setDebugPrinter(IDebugPrinter* printer) = 0;
-		virtual IDebugPrinter* getDebugPrinter() const = 0;
-		virtual void drawString(const core::stringc& str,const core::position2di& pos=core::position2di(0,0),const video::SColor& color=video::COLOR_WHITE) = 0;
-		virtual void render() = 0;
+		virtual void setDebugPrinter(const video::IVideoDriver* driver,IDebugPrinter* printer) = 0;
+		//virtual IDebugPrinter* getDebugPrinter() const = 0;
+		virtual IDebugPrinter* getDebugPrinter(const video::IVideoDriver* driver) const = 0;
+		virtual void drawString(const video::IVideoDriver* driver,const core::stringc& str,const core::position2di& pos=core::position2di(0,0),const video::SColor& color=video::COLOR_WHITE) = 0;
+		virtual void render(const video::IVideoDriver* driver) = 0;
 
 	};
 	//日志对象,供多方共享

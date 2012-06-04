@@ -178,7 +178,7 @@ namespace ogles1{
 		tex->drop();
 		image->drop();
 		m_pDebugPrinter=debug::createDebugPrinter(this,tex,geometryFty);
-		Logger->setDebugPrinter(m_pDebugPrinter);
+		Logger->setDebugPrinter(this,m_pDebugPrinter);
 
 		//实例计数器加1
 		++s_uInstanceCount;
@@ -648,6 +648,7 @@ namespace ogles1{
 	bool COGLES1Driver::setTexture(u32 stage, const video::ITexture* texture){
 		if(m_currentTextures[stage]==texture)
 			return true;
+
 		glActiveTexture(GL_TEXTURE0 + stage);
 		if (!texture){
 			glDisable(GL_TEXTURE_2D);

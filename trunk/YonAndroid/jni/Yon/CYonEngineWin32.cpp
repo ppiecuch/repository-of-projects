@@ -87,7 +87,7 @@ namespace platform{
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
 
 		//³õÊ¼»¯ÉùÒôÇý¶¯Æ÷
-		m_pAudioDriver=audio::createAudioDriver(m_pFileSystem);
+		//m_pAudioDriver=audio::createAudioDriver(m_pFileSystem);
 
 		SEnginePair ep;
 		ep.hWnd=m_hWnd;
@@ -105,7 +105,7 @@ namespace platform{
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
 		eraseEngineByHWnd(m_hWnd);
-		m_pAudioDriver->drop();
+		//m_pAudioDriver->drop();
 		m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();

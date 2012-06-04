@@ -1372,6 +1372,14 @@
 					<File
 						RelativePath=".\COALAudioDriver.cpp"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\COALAudioDriver.h"
@@ -1380,6 +1388,14 @@
 					<File
 						RelativePath=".\COALSound.cpp"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\COALSound.h"
@@ -1432,6 +1448,10 @@
 				</File>
 				<File
 					RelativePath="..\include\path.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\yonXML.h"
 					>
 				</File>
 			</Filter>
