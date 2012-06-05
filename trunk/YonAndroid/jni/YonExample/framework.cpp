@@ -99,7 +99,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
 	cubeModel->setPosition(core::vector3df(100,100,0));
 	//material->setTexture(0,videoDriver->getTexture("png8/120.png"));
-	material->setTexture(0,videoDriver->getTexture("test-png8.png"));
+	material->setTexture(0,videoDriver->getTexture("38.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
