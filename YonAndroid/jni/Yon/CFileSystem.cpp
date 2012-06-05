@@ -46,6 +46,10 @@ namespace io{
 	IWriteStream* CFileSystem::createAndOpenWriteFileStream(const path& filename, bool append, ENUM_ENDIAN_MODE mode){
 		return createWriteFileStream(getAbsolutePath(filename),append,mode);
 	}
+	XMLReader* CFileSystem::createXMLReader(IReadStream* stream){
+		//TODO
+		return NULL;
+	}
 
 	io::path CFileSystem::getAbsolutePath(const io::path& filename,bool inWorkingDirectory) const{
 		//如果是绝对路径

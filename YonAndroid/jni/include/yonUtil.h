@@ -16,6 +16,50 @@
 namespace yon{
 namespace core{
 
+	//! Convert a simple string of base 10 digits into a signed 32 bit integer.
+	//! \param[in] in: The string of digits to convert. Only a leading - or + followed 
+	//!					by digits 0 to 9 will be considered.  Parsing stops at the
+	//!					first non-digit.
+	//! \param[out] out: (optional) If provided, it will be set to point at the first
+	//!					 character not used in the calculation.
+	//! \return The signed integer value of the digits. If the string specifies too many
+	//!			digits to encode in an s32 then +INT_MAX or -INT_MAX will be returned.
+	inline s32 strtol10(const char* in, const char** out=0)
+	{
+		if(!in)
+			return 0;
+
+		bool negative = false;
+		if('-' == *in)
+		{
+			negative = true;
+			++in;
+		}
+		else if('+' == *in)
+			++in;
+
+		u32 unsignedValue = 0;
+
+		while ( ( *in >= '0') && ( *in <= '9' ))
+		{
+			unsignedValue = ( unsignedValue * 10 ) + ( *in - '0' );
+			++in;
+
+			if(unsignedValue > (u32)INT_MAX)
+			{
+				unsignedValue = (u32)INT_MAX;
+				break;
+			}
+		}
+		if (out)
+			*out = in;
+
+		if(negative)
+			return -((s32)unsignedValue);
+		else
+			return (s32)unsignedValue;
+	}
+
 	inline s32 isFileExtension (const io::path& filename,
 		const io::path& ext0,const io::path& ext1,const io::path& ext2)
 	{
