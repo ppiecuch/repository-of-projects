@@ -1,0 +1,25 @@
+我们提到了Google Earth/Google Maps 中用于三维建筑模型的DAE文件，DAE是英文Digital Asset Exchange的首字母缩写，意思为数据资源交换。DAE文件并非 Google为 Google Earth、Google Maps创立的文件格式，它是COLLADA的模型文件。
+
+把三维地标文件后缀由.kmz改成.zip，然后解压缩，一般会有3个图标，如下所述。
+images文件夹：放置模型的背景和纹理画片 (其中有一个或多个文件)。
+models文件夹：放置描述模型的DAE文件 (其中有一个或多个文件)。
+doc.kml文件：KML文件主要起到调用DAE文件的作用，并描述其在 Google Earth上的位置、比例等属性。
+
+        COLLADA是由索尼 (Sony)提出的基于XML的一个开放的、免费的数据交换标准，通过XMLSchema的技术展现三维数字模型，正因为 COLLADA基于XML技术，所以这个标准有着十分优秀的移植性，居于不同平台的实时引擎只要支持这个标准，就可以实时表现三维模型。
+
+        COLLADA标准主要应用于娱乐领域的交互式应用。从某种意义上来讲，COLLADA的目标就是把每一个使用者都当成一个 Player，为其展示三维全景模型，与其交流互动。目前支持 COLLADA标准的应用平台很多，不仅应用在电脑游戏中，而且在Web 程序、智能手机、Sony的PS3上都有它的身影。这些应用程序中有我们常见的Google Eallh、SketchUp，有老牌三维建模软件3ds max与Maya，还有网页里的Flux Player插件等。最新的 COLLADA版本是 1.4.1，在著名的 Khronos Group 的官方网站上，有关于COLLADA 的介绍 (网址为http：//www.khronos.org/collada/)，读者可以自行查看在此不再赘述。
+
+        DAE文件其实是一个文本文件，其中的内容是基于XML格式的三维模型的 COLLADA描述，实质上就是一个XML文档，所以也可以将*.dae的后缀名称改为*.xml，或者根据不同的应用程序需要将其改成其他任何后缀名称。从理论上讲，所有可以按照COLLADA标准生成XML文件的工具都可以生成DAE文件，最终保存成.dae文件即可，而并不仅仅是 Google的建模工具SketchUp才能够建立 DAE文件，高级用户甚至可以使用文本编辑器手工编制一个模型文件。
+
+        但是 Google Earth 中使用 DAE 模型有一些限制，COLLADA 的一些特性无法适用于Google Earth的平台之上，比如动画和过于复杂的图形，具体如下所述：
+KML只支持三角形 (Triangles)和线条 (Lines)作为图元。
+其中三角形的数日最多不超过21 845个。
+KML不支持动画和皮肤特效。
+以上 3个注意点可以在http：//code.google.com/apis/Iiml/documentation/kml-tags  21.html#model 中查到相关说明。
+本文介绍的相关技术的网络资源如下。
+COLLADA的介绍(英文PDF文档)：http：//www.khronos.org/files/collada一spec_1_4.pdf。
+COLLADA的Schema文档：http：//www.khronos.org/files/collada_schema一1-4。
+COLLADA的教程(英文)：http：//collada.org/mediawiki/index.php/Getting一started_with_COLLADA。
+COLLADA的维客 (英文)：http：//collada.org/mediawil(i/index.phpiMain-Page。
+
+本文转载自：http://www.cnblogs.com/mazhenyu/archive/2011/01/13/1934249.html
