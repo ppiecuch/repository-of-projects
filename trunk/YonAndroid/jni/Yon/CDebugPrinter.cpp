@@ -6,9 +6,11 @@
 namespace yon{
 namespace debug{
 
+	u32 Shap2DRecyclable::indices[6]={0,1,3,3,1,2};
+
 	CDebugPrinter::CDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture,scene::IGeometryFactory* geometryFty)
 		:m_pDriver(driver),m_pTexture(texture),m_pGeometryFty(geometryFty),m_texcoords(NULL),
-		m_fontSize(getDebugPrinterFontSize()),m_fontStep(getDebugPrinterFontStep()){
+		m_fontSize(getDebugPrinterFontSize()),m_fontStep(getDebugPrinterFontStep()),m_pool(Shap2DPool(5)){
 			u32 charSize=m_fontSize.w;
 			u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 			u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
@@ -40,6 +42,7 @@ namespace debug{
 	}
 
 	CDebugPrinter::~CDebugPrinter(){
+		m_pool.clear();
 		u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
 		u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 		for(u32 i=0;i<rowCount;++i){
@@ -93,10 +96,19 @@ namespace debug{
 			v1=m_texcoords[d][r]->topLeft.y;
 			if(shap==NULL){
 				shap=m_pGeometryFty->createXYRectangle2D(x0,y0,x1,y1,u0,v0,u1,v1,color);
+				/*shap=m_pGeometryFty->createShap(scene::ENUM_VERTEX_TYPE_2V1T1C,0,0);
+				Shap2DRecyclable* s=m_pool.get();
+				s->set(x0,y0,x1,y1,u0,v0,u1,v1,color);
+				shap->append(s->vertices,4,s->indices,6);
+				m_pool.recycle(s);*/
 			}else{
-				scene::IShap* temp=m_pGeometryFty->createXYRectangle2D(x0,y0,x1,y1,u0,v0,u1,v1,color);
-				shap->append(temp);
-				temp->drop();
+				//scene::IShap* temp=m_pGeometryFty->createXYRectangle2D(x0,y0,x1,y1,u0,v0,u1,v1,color);
+				//shap->append(temp);
+				//temp->drop();
+				Shap2DRecyclable* s=m_pool.get();
+				s->set(x0,y0,x1,y1,u0,v0,u1,v1,color);
+				shap->append(s->vertices,4,s->indices,6);
+				m_pool.recycle(s);
 			}
 			//p.x+=m_fontStep.w;
 			x0+=m_fontStep.w;
