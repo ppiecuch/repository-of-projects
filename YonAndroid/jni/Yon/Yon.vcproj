@@ -263,6 +263,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\objectpool.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\plane.h"
 					>
 				</File>

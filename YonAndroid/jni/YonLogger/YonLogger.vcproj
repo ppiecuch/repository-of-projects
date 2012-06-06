@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="YonTest"
-	ProjectGUID="{D02D7F00-A6B3-4EAE-BA2F-D2A7FF1553A9}"
-	RootNamespace="Yon01Test"
+	Name="YonLogger"
+	ProjectGUID="{C9E89229-4D85-483F-B044-0D5E7674559E}"
+	RootNamespace="YonLogger"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;../cppunit/include;../Yon"
+				AdditionalIncludeDirectories="../Yon/MyGUIEngine/include;../include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -167,103 +167,15 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\bstreeTestCase.cpp"
+			RelativePath=".\framework.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\bstreeTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\btreeTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\btreeTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\heapsortTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\heapsortTestCase.h"
+			RelativePath=".\framework.h"
 			>
 		</File>
 		<File
 			RelativePath=".\main.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\matrixTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\matrixTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\objectpoolTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\objectpoolTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\rbtreeTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\rbtreeTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\stringTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\stringTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\timerTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\timerTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\vector2dTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\vector2dTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonArrayTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\yonArrayTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonListTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\yonListTestCase.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonMapTestCase.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\yonMapTestCase.h"
 			>
 		</File>
 	</Files>
