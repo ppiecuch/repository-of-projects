@@ -41,16 +41,21 @@ namespace yon{
 				core::vector3df m_direction;//保持归一化
 				f32 m_fNear;
 				f32 m_fFar;
+				bool m_bNeedUpload;
 			public:
 				ICamera(const core::vector3df& pos=core::vector3df(0,0,1),
 					const core::vector3df& up=core::vector3df(0,1,0),
 					const core::vector3df& lookat = core::vector3df(0,0,-1),bool visible=false):
-					IRenderable(pos),m_up(up),m_target(lookat),m_direction(lookat-pos),m_bVisible(visible),m_fNear(1),m_fFar(3000.0f){
+					IRenderable(pos),m_up(up),m_target(lookat),m_direction(lookat-pos),m_bVisible(visible),m_fNear(1),m_fFar(3000.0f),m_bNeedUpload(true){
 						m_up.normalize();
 						m_direction.normalize();
 						//for(u32 i=0;i<ENUM_FRUSTUM_TRANSFORM_COUNT;++i)
 						//	m_matrixs[i].makeIdentity();
 					}
+
+				void setNeedUpload(){
+						m_bNeedUpload=true;
+				}
 
 				virtual void onResize(const core::dimension2du& size) = 0;
 

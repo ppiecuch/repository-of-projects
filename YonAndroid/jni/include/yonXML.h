@@ -2,6 +2,7 @@
 #define _YON_IO_YONXML_H_
 
 #include "yonTypes.h"
+#include "IReferencable.h"
 
 namespace yon{
 namespace io{
@@ -122,11 +123,18 @@ namespace io{
 	};
 
 	//! A UTF-8 or ASCII character xml parser.
-	typedef IXMLReader<c8,IXMLBase> XMLReader;
+	typedef IXMLReader<c8,IXMLBase> BaseXMLReader;
 	//! A UTF-16 xml parser.
-	typedef IXMLReader<c16,IXMLBase> XMLReaderUTF16;
+	typedef IXMLReader<c16,IXMLBase> BaseXMLReaderUTF16;
 	//! A UTF-32 xml parser.
-	typedef IXMLReader<c32,IXMLBase> XMLReaderUTF32;
+	typedef IXMLReader<c32,IXMLBase> BaseXMLReaderUTF32;
+
+	//! An xml reader for wide characters, derived from IReferencable.
+	typedef IXMLReader<wchar_t,core::IReferencable> XMLReader;
+
+	//! An xml reader for ASCII or UTF-8 characters, derived from IReferencable.
+	typedef IXMLReader<c8,core::IReferencable> XMLReaderUTF8;
+
 }
 }
 #endif

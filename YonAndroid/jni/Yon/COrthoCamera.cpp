@@ -5,28 +5,28 @@ namespace yon{
 namespace scene{
 namespace camera{
 	COrthoCamera::COrthoCamera(const core::vector3df& pos,const core::vector3df& up,const core::vector3df& lookat):
-		IOrthoCamera(pos,up,lookat),m_bFrustumChanged(true){
+		IOrthoCamera(pos,up,lookat){
 			recalculateProjectionMatrix();
 			recalculateViewMatrix();
 	}
 	void COrthoCamera::recalculateProjectionMatrix(){
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].makeIdentity();
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].ortho(m_fLeft,m_fRight,m_fBottom,m_fTop,m_fNear,m_fFar);
-		m_bFrustumChanged=true;
+		m_bNeedUpload=true;
 	}
 	//TODO³éÏóµ½ICameraÖÐ
 	void COrthoCamera::recalculateViewMatrix(){
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW].makeIdentity();
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW].lookAt(m_position.x,m_position.y,m_position.z,m_target.x,m_target.y,m_target.z,m_up.x,m_up.y,m_up.z);
-		m_bFrustumChanged=true;
+		m_bNeedUpload=true;
 	}
 
 	void COrthoCamera::render(video::IVideoDriver* driver){
-		if(m_bFrustumChanged==false)
+		if(m_bNeedUpload==false)
 			return;
 		driver->setTransform(video::ENUM_TRANSFORM_VIEW,m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW]);
 		driver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION]);
-		m_bFrustumChanged=false;
+		m_bNeedUpload=false;
 	}
 
 	void COrthoCamera::onResize(const core::dimension2du& size){
@@ -57,6 +57,6 @@ namespace camera{
 		IOrthoCamera::setRotation(rot);
 		recalculateViewMatrix();
 	}
-}//camera
-}//scene
-}//yon
+}
+}
+}

@@ -41,10 +41,14 @@ namespace scene{
 		return model;
 	}
 
-	camera::ICamera* CSceneManager::addCamera(const core::vector3df& pos,const core::vector3df& up,
+	camera::ICamera* CSceneManager::addCamera(camera::ENUM_CAMERA_TYPE cameraType,
+		const core::vector3df& pos,const core::vector3df& up,
 		const core::vector3df& lookat,bool makeActive){
-			//camera::COrthoCamera* camera=new camera::COrthoCamera(pos,up,lookat);
-			camera::CPerspCamera* camera=new camera::CPerspCamera(pos,up,lookat);
+			camera::ICamera* camera=NULL;
+			if(cameraType==camera::ENUM_CAMERA_TYPE_ORTHO)
+				camera=new camera::COrthoCamera(pos,up,lookat);
+			else
+				camera=new camera::CPerspCamera(pos,up,lookat);
 			m_cameras.push_back(camera);
 			if(makeActive){
 				setActiveCamera(camera);
@@ -55,6 +59,7 @@ namespace scene{
 	void CSceneManager::setActiveCamera(camera::ICamera* camera){
 		if(camera){
 			camera->grab();
+			camera->setNeedUpload();
 		}
 		if(m_activeCamera){
 			m_activeCamera->drop();

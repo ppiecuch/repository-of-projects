@@ -7,7 +7,8 @@ IAudioDriver* audioDriver=NULL;
 ISceneManager* sceneMgr=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
-ICamera* pCamera=NULL;
+ICamera* pOCamera=NULL;
+ICamera* pPCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
@@ -48,7 +49,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	params.windowSize.w=400;
 	params.windowSize.h=400;
 	params.pJNIEnv=pJNIEnv;
-	params.fpsLimit=0;
+	params.fpsLimit=60;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -57,7 +58,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(core::vector3df(0,0,300)); 
+	pOCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300)); 
+	pPCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_PERSP,core::vector3df(0,0,300)); 
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
@@ -67,6 +69,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->setWorkingDirectory("media/");
 #endif
+
 
 	IMaterial* material;
 	IShap *shap;
@@ -81,9 +84,11 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
-	cubeModel->setPosition(core::vector3df(100,50,0));
-	//material->setTexture(0,videoDriver->getTexture("png8/120.png"));
-	material->setTexture(0,videoDriver->getTexture("38.png"));
+	//material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
+	material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+	cubeModel->setPosition(core::vector3df(100,-150,-300));
+	//material->setTexture(0,videoDriver->getTexture("shanti2.png"));
+	material->setTexture(0,videoDriver->getTexture("test-png8.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -101,9 +106,12 @@ void drawFrame(){
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
+	sceneMgr->setActiveCamera(pPCamera);
 	sceneMgr->render(videoDriver);
 
-	//Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	sceneMgr->setActiveCamera(pOCamera);
+	pOCamera->render(videoDriver);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }

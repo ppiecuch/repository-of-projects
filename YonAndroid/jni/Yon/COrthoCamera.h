@@ -10,7 +10,7 @@ namespace camera{
 	protected:
 		virtual void recalculateProjectionMatrix();
 		virtual void recalculateViewMatrix();
-		bool m_bFrustumChanged;
+		
 	public:
 		COrthoCamera(
 			const core::vector3df& pos=core::vector3df(0,0,1),

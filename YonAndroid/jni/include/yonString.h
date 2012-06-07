@@ -310,6 +310,23 @@ namespace yon{
 				return len < other.len;
 			}
 
+			//TODO 待测试
+			//! Appends a string to this string
+			/** \param other: String to append. */
+			void append(const string<T>& other)
+			{
+				--len;
+				u32 olen = other.length()+1;
+
+				if (len + olen > capacity)
+					reallocate(len + olen);
+
+				for (u32 l=0; l<olen; ++l)
+					elements[len+l] = other[l];
+
+				len += olen;
+			}
+
 			s32 findFirst(T c) const
 			{
 				//TODO优化
@@ -319,6 +336,22 @@ namespace yon{
 
 				return -1;
 			}
+
+			//TODO 待测试
+			//! finds next occurrence of character in string
+			/** \param c: Character to search for.
+			\param startPos: Position in string to start searching.
+			\return Position where the character has been found,
+			or -1 if not found. */
+			s32 findNext(T c, u32 startPos) const
+			{
+				for (u32 i=startPos; i<len; ++i)
+					if (elements[i] == c)
+						return i;
+
+				return -1;
+			}
+
 			s32 findLast(T c, s32 start = -1) const
 			{
 				//TODO优化
