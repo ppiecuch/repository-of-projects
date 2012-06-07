@@ -22,6 +22,7 @@
 #include "dimension2d.h" 
 #include "dimension3d.h" 
 #include "exception.h" 
+#include "fastatof.h"
 #include "line2d.h"
 #include "objectpool.h"
 #include "plane.h"

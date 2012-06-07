@@ -98,6 +98,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonLogger", "YonLogger\YonL
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonMipMap", "YonMipMap\YonMipMap.vcproj", "{6272C7EE-7C29-417E-B7CE-5F956DC8B752}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -184,6 +189,10 @@ Global
 		{C9E89229-4D85-483F-B044-0D5E7674559E}.Debug|Win32.Build.0 = Debug|Win32
 		{C9E89229-4D85-483F-B044-0D5E7674559E}.Release|Win32.ActiveCfg = Release|Win32
 		{C9E89229-4D85-483F-B044-0D5E7674559E}.Release|Win32.Build.0 = Release|Win32
+		{6272C7EE-7C29-417E-B7CE-5F956DC8B752}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6272C7EE-7C29-417E-B7CE-5F956DC8B752}.Debug|Win32.Build.0 = Debug|Win32
+		{6272C7EE-7C29-417E-B7CE-5F956DC8B752}.Release|Win32.ActiveCfg = Release|Win32
+		{6272C7EE-7C29-417E-B7CE-5F956DC8B752}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

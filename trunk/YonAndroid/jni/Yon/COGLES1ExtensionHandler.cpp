@@ -1,5 +1,6 @@
 #include "COGLES1ExtensionHandler.h"
 #include "COGLES1Driver.h"
+#include "fastatof.h"
 
 #include "ILogger.h"
 
@@ -36,6 +37,9 @@ namespace ogles1{
 	}
 
 	void COGLES1ExtensionHandler::initExtensionHandler(){
+		m_version=(const c8*)glGetString(GL_VERSION);
+		f32 version=core::fastatof(m_version.c_str());
+		Logger->info("GL_VERSION:%s(%.2f)\n",m_version.c_str(),version);
 		m_extensions=(const c8*)glGetString(GL_EXTENSIONS);
 		Logger->info("GL_EXTENSIONS:\n");
 		core::array<core::stringc> arr;
@@ -43,8 +47,17 @@ namespace ogles1{
 		for(u32 i=0;i<arr.size();++i)
 			Logger->info("%s\n",arr[i].c_str());
 
+		
+
 		for(u32 i=0;i<ENUM_VIDEO_FEATURE_COUNT;++i){
-			m_featureAvailables[i]=m_extensions.find(OGLESFeatureStrings[i])!=-1;
+			switch(i)
+			{
+			case ENUM_VIDEO_FEATURE_GENERATE_MIPMAP:
+				m_featureAvailables[i]=version>=1.1f;//GL_GENERATE_MIPMAP从OpenGL1.4开始受支持
+				break;
+			default:
+				m_featureAvailables[i]=m_extensions.find(OGLESFeatureStrings[i])!=-1;
+			}	
 		}
 
 #ifdef YON_COMPILE_WITH_WIN32

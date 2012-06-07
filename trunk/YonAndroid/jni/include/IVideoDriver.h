@@ -68,6 +68,8 @@ namespace yon{
 
 		enum ENUM_VIDEO_FEATURE{
 			ENUM_VIDEO_FEATURE_FBO = 0,
+			//items below are not in GL_EXTENSIONS list,need be processed separately
+			ENUM_VIDEO_FEATURE_GENERATE_MIPMAP,
 			ENUM_VIDEO_FEATURE_COUNT
 		};
 

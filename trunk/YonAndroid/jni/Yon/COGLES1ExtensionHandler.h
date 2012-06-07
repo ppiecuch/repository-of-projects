@@ -74,6 +74,7 @@ extern PFNGLGENERATEMIPMAPOESPROC pglGenerateMipmapOES;
 
 	class COGLES1ExtensionHandler{
 	private:
+		core::stringc m_version;
 		core::stringc m_extensions;
 		bool m_featureAvailables[ENUM_VIDEO_FEATURE_COUNT];
 	public:

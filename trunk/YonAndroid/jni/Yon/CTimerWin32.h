@@ -32,7 +32,7 @@ namespace platform{
 		virtual bool isPaused(){ return m_bSetup==false;}
 		virtual void setSpeed(f32 speed);
 		virtual u32 getTime() const;
-		virtual u32 getRealTime() const;
+		virtual u32 getRealTime();
 		virtual void tick();
 	};
 }

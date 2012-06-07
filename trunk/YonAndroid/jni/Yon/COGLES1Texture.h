@@ -18,13 +18,14 @@ namespace ogles1{
 		GLuint m_textureId;
 		
 		bool m_bIsRenderTarget;
+		bool m_bHasMipMap;
 
 		virtual void uploadTexture();
 
 		//用于子类构造
 		COGLES1Texture(const core::dimension2du& size,const io::path& name, COGLES1Driver* driver);
 	public:
-		COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver);
+		COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver,bool mipmap=true);
 		virtual ~COGLES1Texture();
 
 		GLuint getTextureId() const{
@@ -37,6 +38,10 @@ namespace ogles1{
 
 		virtual ENUM_COLOR_FORMAT getColorFormat() const{
 			return m_pImage->getColorFormat();
+		}
+
+		virtual bool hasMipMap() const{
+			return m_bHasMipMap;
 		}
 
 		virtual void* lock();

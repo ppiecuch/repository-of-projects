@@ -253,7 +253,7 @@ void CYonExampleDlgDlg::OnPaint()
 
 			sceneMgr->render(driver);
 
-			Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+			Logger->drawString(driver,core::stringc("FPS:%d",driver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 			driver->end();
 		}

@@ -8,6 +8,7 @@
 #include "objectpool.h"
 #include "SColor.h"
 #include "SVertex.h"
+#include "IUnit.h"
 
 namespace yon{
 namespace debug{
@@ -15,7 +16,7 @@ namespace debug{
 	class Shap2DRecyclable : public core::IRecyclable{
 	public:
 		scene::S2DVertex vertices[4];
-		static u32 indices[6];
+		static u16 indices[6];
 
 		virtual void reset(){}
 
@@ -53,6 +54,11 @@ namespace debug{
 		core::rectf*** m_texcoords;
 		core::dimension2du m_fontStep;
 		Shap2DPool m_pool;
+		scene::IShap* m_pShap;
+		scene::IUnit* m_pUnit;
+
+		u32 m_uRowCount;
+		u32 m_uCharCountPerRow;
 	public:
 		CDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture,scene::IGeometryFactory* geometryFty);
 		~CDebugPrinter();
@@ -62,6 +68,8 @@ namespace debug{
 		};
 		virtual void setTexture(video::ITexture* texture){
 			m_pTexture=texture;
+
+			m_uRowCount=m_pTexture->getSize().h/m_fontSize.h;
 		}
 	};
 }

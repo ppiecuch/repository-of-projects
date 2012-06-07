@@ -142,6 +142,11 @@ namespace scene{
 		virtual u32 getIndexSize() const{
 			return sizeof(I);
 		}
+
+		virtual void setSize(u32 size){
+			m_vertices.set_used(0);
+			m_indices.set_used(0);
+		}
 	};
 
 	typedef SShap<SVertex,u16,ENUM_VERTEX_TYPE_3V1T1C> Shap3D;

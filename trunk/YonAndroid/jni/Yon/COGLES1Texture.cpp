@@ -9,11 +9,11 @@ namespace ogles1{
 
 	COGLES1Texture::COGLES1Texture(const core::dimension2du& size,const io::path& name, COGLES1Driver* driver)
 		:ITexture(name),m_pDriver(driver), m_pImage(NULL),
-		m_textureId(0),m_bIsRenderTarget(false),m_textureSize(size){}
+		m_textureId(0),m_bIsRenderTarget(false),m_textureSize(size),m_bHasMipMap(false){}
 
-	COGLES1Texture::COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver)
+	COGLES1Texture::COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver,bool mipmap)
 		:ITexture(name), m_pDriver(driver), m_pImage(image),m_textureSize(image->getDimension()),
-		m_textureId(0),m_bIsRenderTarget(false){
+		m_textureId(0),m_bIsRenderTarget(false),m_bHasMipMap(mipmap){
 			glGenTextures(1, &m_textureId);
 			m_pImage->grab();
 
@@ -102,8 +102,32 @@ namespace ogles1{
 		void* source = m_pImage->lock();
 		Logger->debug("glTexImage2D:%d,%d,%d,%s\n", m_textureId,m_pImage->getDimension().w,m_pImage->getDimension().h,COLOR_FORMAT_NAME[m_pImage->getColorFormat()]);
 		glBindTexture(GL_TEXTURE_2D, m_textureId);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+		if(m_bHasMipMap)
+		{
+			if(m_pDriver->queryFeature(ENUM_VIDEO_FEATURE_GENERATE_MIPMAP))
+			{
+				glTexParameteri(GL_TEXTURE_2D,GL_GENERATE_MIPMAP,GL_TRUE);
+				// enable bilinear mipmap filter
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			}
+			else
+			{
+				//TODO generate mipmap manually
+				// temporarily for has no mipmap
+				// just enable bilinear filter without mipmaps
+				m_bHasMipMap=false;
+				Logger->warn(YON_LOG_WARN_FORMAT,"Currently do not support hw mipmap generation,disable it!");
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			}
+		}
+		else
+		{
+			// enable bilinear filter without mipmaps
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
 		glTexImage2D(GL_TEXTURE_2D, 0, format, m_pImage->getDimension().w,m_pImage->getDimension().h, 0, format, pixelType, source);
 		m_pImage->unlock();
 

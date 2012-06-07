@@ -243,6 +243,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\fastatof.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\heapsort.h"
 					>
 				</File>

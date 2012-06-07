@@ -3,6 +3,8 @@
 
 #include "yonTypes.h"
 #include <math.h>
+#include <float.h> //For FLT_MAX
+#include <limits.h> // For INT_MAX / UINT_MAX
 
 namespace yon{
 namespace core{
