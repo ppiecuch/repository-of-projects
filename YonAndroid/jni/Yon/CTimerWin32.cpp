@@ -51,8 +51,12 @@ namespace platform{
 	u32 CTimerWin32::getTime() const{
 		return m_uVirtualTime;
 	}
-	u32 CTimerWin32::getRealTime() const{
-		return m_uStaticTime-m_uStartStaticTime;
+	u32 CTimerWin32::getRealTime(){
+		//return m_uStaticTime-m_uStartStaticTime;
+		//如果还没start()，则返回0
+		if(m_uStartStaticTime==0)
+			return 0;
+		return getStaticTime()-m_uStartStaticTime;
 	}
 	void CTimerWin32::tick(){
 		m_uLastStaticTime=m_uStaticTime;

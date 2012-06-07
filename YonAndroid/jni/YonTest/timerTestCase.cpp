@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include "CTimerWin32.cpp"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( timerTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( timerTestCase );
 
 void timerTestCase::setUp()
 {
@@ -45,25 +45,25 @@ void timerTestCase::getRealTime(){
 	printf("%d\n",time);
 	CPPUNIT_ASSERT( time==0 );
 	timer->start();
-	timer->tick();
+	//timer->tick();
 	start=timer->getRealTime();
 	Sleep(20);
-	timer->tick();
+	//timer->tick();
 	end=timer->getRealTime();
 	printf("\n%d,%d\n",start,end);
 	CPPUNIT_ASSERT( end>start );
 	timer->pause();
 	start=timer->getRealTime();
 	Sleep(20);
-	timer->tick();
+	//timer->tick();
 	end=timer->getRealTime();
 	printf("\n%d,%d\n",start,end);
 	CPPUNIT_ASSERT( end>start );
 	timer->resume();
-	timer->tick();
+	//timer->tick();
 	start=timer->getRealTime();
 	Sleep(20);
-	timer->tick();
+	//timer->tick();
 	end=timer->getRealTime();
 	printf("\n%d,%d\n",start,end);
 	CPPUNIT_ASSERT( end>start );

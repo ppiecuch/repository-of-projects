@@ -6,21 +6,24 @@
 namespace yon{
 namespace debug{
 
-	u32 Shap2DRecyclable::indices[6]={0,1,3,3,1,2};
+	u16 Shap2DRecyclable::indices[6]={0,1,3,3,1,2};
 
 	CDebugPrinter::CDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture,scene::IGeometryFactory* geometryFty)
 		:m_pDriver(driver),m_pTexture(texture),m_pGeometryFty(geometryFty),m_texcoords(NULL),
-		m_fontSize(getDebugPrinterFontSize()),m_fontStep(getDebugPrinterFontStep()),m_pool(Shap2DPool(5)){
-			u32 charSize=m_fontSize.w;
-			u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
-			u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
+		m_fontSize(getDebugPrinterFontSize()),m_fontStep(getDebugPrinterFontStep()),m_pool(Shap2DPool(5)),
+		m_pShap(NULL),m_pUnit(NULL){
+			//u32 charSize=m_fontSize.w;
+			//u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
+			//u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
+			m_uRowCount=m_pTexture->getSize().h/m_fontSize.h;
+			m_uCharCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 
 			//m_texcoords=(core::recti***)new core::recti**[rowCount]; 
-			m_texcoords=(core::rectf***)new core::rectf**[rowCount]; 
-			for(u32 i=0;i<rowCount;++i){
+			m_texcoords=(core::rectf***)new core::rectf**[m_uRowCount]; 
+			for(u32 i=0;i<m_uRowCount;++i){
 				//m_texcoords[i]=(core::recti**)new core::recti*[charCountPerRow];
-				m_texcoords[i]=(core::rectf**)new core::rectf*[charCountPerRow];
-				for(u32 j=0;j<charCountPerRow;++j){
+				m_texcoords[i]=(core::rectf**)new core::rectf*[m_uCharCountPerRow];
+				for(u32 j=0;j<m_uCharCountPerRow;++j){
 					/*m_texcoords[i][j]=new core::recti();
 					core::recti* r=m_texcoords[i][j];
 					r->topLeft.x=j*charSize;
@@ -33,20 +36,28 @@ namespace debug{
 					r->topRight.x=(f32)(j+1)/charCountPerRow;
 					r->bottomLeft.y=(f32)i/rowCount;
 					r->topRight.y=(f32)(i+1)/rowCount;*/
-					r->topLeft.x=(f32)j/charCountPerRow;
-					r->bottomRight.x=(f32)(j+1)/charCountPerRow;
-					r->bottomRight.y=(f32)i/rowCount;
-					r->topLeft.y=(f32)(i+1)/rowCount;
+					r->topLeft.x=(f32)j/m_uCharCountPerRow;
+					r->bottomRight.x=(f32)(j+1)/m_uCharCountPerRow;
+					r->bottomRight.y=(f32)i/m_uRowCount;
+					r->topLeft.y=(f32)(i+1)/m_uRowCount;
 				}
 			}
+
+			m_pShap=m_pGeometryFty->createShap(scene::ENUM_VERTEX_TYPE_2V1T1C,0,0);
+			m_pUnit=m_pGeometryFty->createUnit(m_pShap);
+			m_pUnit->getMaterial()->setTexture(0,m_pTexture);
+			m_pUnit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_LIGHTEN);
+			m_pUnit->getMaterial()->setFilterMode(0,video::ENUM_FILTER_MODE_NEAREST);
 	}
 
 	CDebugPrinter::~CDebugPrinter(){
+		m_pUnit->drop();
+		m_pShap->drop();
 		m_pool.clear();
-		u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
-		u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
-		for(u32 i=0;i<rowCount;++i){
-			for(u32 j=0;j<charCountPerRow;++j)
+		//u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
+		//u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
+		for(u32 i=0;i<m_uRowCount;++i){
+			for(u32 j=0;j<m_uCharCountPerRow;++j)
 				delete m_texcoords[i][j];
 			delete m_texcoords[i];
 		}
@@ -62,19 +73,21 @@ namespace debug{
 		core::position2df dest;
 		m_pDriver->convertPosCoordinate(src,dest);
 		f32 x0,y0,x1,y1;
-		f32 u0,v0,u1,v1;
+		//f32 u0,v0,u1,v1;
 		s32 r,d;
-		u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
-		u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
+		//u32 m_uRowCount=m_pTexture->getSize().h/m_fontSize.h;
+		//u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 		x0=dest.x;
 		y0=dest.y-m_fontSize.h;
 		x1=x0+m_fontSize.w;
 		y1=dest.y;
-		scene::IShap* shap=NULL;
+		//scene::IShap* shap=NULL;
+		//清空之前的缓存
+		m_pShap->setSize(0);
 		for(u32 i=0;i<str.length();++i){
 			if(str[i]>=32&&str[i]<=128){
-				d=rowCount-1-(str[i]-32)/charCountPerRow;
-				r=(str[i]-32)%charCountPerRow;
+				d=m_uRowCount-1-(str[i]-32)/m_uCharCountPerRow;
+				r=(str[i]-32)%m_uCharCountPerRow;
 			}else if(str[i]==10){
 				d=0;
 				r=0;
@@ -90,17 +103,19 @@ namespace debug{
 			//Logger->debug("%c,%d,%d,%d\n",str[i],str[i],d,r);
 			//m_texcoords[d][r]->print();
 			//m_pDriver->draw2DImage(m_pTexture,p,*m_texcoords[d][r],NULL,color);
-			u0=m_texcoords[d][r]->topLeft.x;
-			v0=m_texcoords[d][r]->bottomRight.y;
-			u1=m_texcoords[d][r]->bottomRight.x;
-			v1=m_texcoords[d][r]->topLeft.y;
+// 			u0=m_texcoords[d][r]->topLeft.x;
+// 			v0=m_texcoords[d][r]->bottomRight.y;
+// 			u1=m_texcoords[d][r]->bottomRight.x;
+// 			v1=m_texcoords[d][r]->topLeft.y;
+			//Logger->debug("%.2f,%.2f,%.2f,%.2f\n",u0,v0,u1,v1);
+#if 0
 			if(shap==NULL){
-				shap=m_pGeometryFty->createXYRectangle2D(x0,y0,x1,y1,u0,v0,u1,v1,color);
-				/*shap=m_pGeometryFty->createShap(scene::ENUM_VERTEX_TYPE_2V1T1C,0,0);
+				//shap=m_pGeometryFty->createXYRectangle2D(x0,y0,x1,y1,u0,v0,u1,v1,color);
+				//shap=m_pGeometryFty->createShap(scene::ENUM_VERTEX_TYPE_2V1T1C,0,0);
 				Shap2DRecyclable* s=m_pool.get();
 				s->set(x0,y0,x1,y1,u0,v0,u1,v1,color);
 				shap->append(s->vertices,4,s->indices,6);
-				m_pool.recycle(s);*/
+				m_pool.recycle(s);
 			}else{
 				//scene::IShap* temp=m_pGeometryFty->createXYRectangle2D(x0,y0,x1,y1,u0,v0,u1,v1,color);
 				//shap->append(temp);
@@ -110,18 +125,26 @@ namespace debug{
 				shap->append(s->vertices,4,s->indices,6);
 				m_pool.recycle(s);
 			}
+#endif
+			Shap2DRecyclable* s=m_pool.get();
+			s->set(x0,y0,x1,y1,m_texcoords[d][r]->topLeft.x,m_texcoords[d][r]->bottomRight.y,m_texcoords[d][r]->bottomRight.x,m_texcoords[d][r]->topLeft.y,color);
+			m_pShap->append(s->vertices,4,s->indices,6);
+			m_pool.recycle(s);
+
 			//p.x+=m_fontStep.w;
 			x0+=m_fontStep.w;
 			x1=x0+m_fontSize.w;
 		}
-		scene::IUnit* unit=m_pGeometryFty->createUnit(shap);
-		unit->getMaterial()->setTexture(0,m_pTexture);
-		unit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_LIGHTEN);
-		shap->drop();
+// 		scene::IUnit* unit=m_pGeometryFty->createUnit(shap);
+// 		unit->getMaterial()->setTexture(0,m_pTexture);
+// 		unit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_LIGHTEN);
+// 		shap->drop();
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
-		m_pDriver->setMaterial(unit->getMaterial());
-		m_pDriver->drawUnit(unit);
-		unit->drop();
+// 		m_pDriver->setMaterial(unit->getMaterial());
+// 		m_pDriver->drawUnit(unit);
+// 		unit->drop();
+		m_pDriver->setMaterial(m_pUnit->getMaterial());
+		m_pDriver->drawUnit(m_pUnit);
 	}
 
 	IDebugPrinter* createDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture,scene::IGeometryFactory* geometryFty){

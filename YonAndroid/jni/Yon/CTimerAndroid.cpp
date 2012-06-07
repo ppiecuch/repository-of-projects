@@ -33,8 +33,12 @@ namespace yon{
 		void CTimerAndroid::setSpeed(f32 speed){
 			m_fVirtualTimerSpeed=speed;
 		}
-		u32 CTimerAndroid::getRealTime() const{
-			return m_uStaticTime-m_uStartStaticTime;
+		u32 CTimerAndroid::getRealTime(){
+			//return m_uStaticTime-m_uStartStaticTime;
+			//如果还没start()，则返回0
+			if(m_uStartStaticTime==0)
+				return 0;
+			return getStaticTime()-m_uStartStaticTime;
 		}
 		void CTimerAndroid::tick(){
 			m_uLastStaticTime=m_uStaticTime;

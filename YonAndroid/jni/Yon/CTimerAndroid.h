@@ -30,7 +30,7 @@ namespace yon{
 			virtual u32 getTime() const{
 				return m_uVirtualTime;
 			}
-			virtual u32 getRealTime() const;
+			virtual u32 getRealTime();
 			virtual void tick();
 		};
 	}

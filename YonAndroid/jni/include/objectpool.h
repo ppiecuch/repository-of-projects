@@ -45,6 +45,7 @@ namespace core{
 			for(u32 i=0;i<num;++i)
 				m_pool.push_back(new Element());
 			m_uCapacity+=num;
+			Logger->debug("Extend element->%d\n",m_uCapacity);
 		}
 	public:
 		CObjectPool(u32 increment=5)

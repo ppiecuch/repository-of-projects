@@ -158,7 +158,7 @@ namespace ogles1{
 			m_FPSAssist.limit=true;
 			m_FPSAssist.frameUnit=param.fpsLimit/g;
 			m_FPSAssist.timeUnit=1000/g;
-			m_FPSAssist.timeCounter=10*param.fpsLimit;
+			m_FPSAssist.timeCounter=30;
 			m_FPSAssist.frameCounter=0;
 			m_FPSAssist.refreshedTime=timer->getRealTime();
 
@@ -284,17 +284,20 @@ namespace ogles1{
 		if(!m_FPSAssist.limit)
 			return;
 		++m_FPSAssist.frameCounter;
+		
 		if(m_pTimer->getRealTime()-m_FPSAssist.refreshedTime>m_FPSAssist.timeUnit){
-			if(m_FPSAssist.frameCounter<m_FPSAssist.frameUnit){
+			//Logger->debug("frameCounter:%d,frameUnit:%d\n",m_FPSAssist.frameCounter,m_FPSAssist.frameUnit);
+			if(m_FPSAssist.frameCounter<=m_FPSAssist.frameUnit){
 				--m_FPSAssist.timeCounter;
 				if(m_FPSAssist.timeCounter<0)
-					m_FPSAssist.frameCounter=0;
+					m_FPSAssist.timeCounter=0;
 			}else if(m_FPSAssist.frameCounter>m_FPSAssist.frameUnit){
 				++m_FPSAssist.timeCounter;
 			}
 			m_FPSAssist.frameCounter=0;
 			m_FPSAssist.refreshedTime=m_pTimer->getRealTime();
 		}
+		//Logger->debug("%d\n",m_FPSAssist.timeCounter);
 		core::yonSleep(m_FPSAssist.timeCounter);
 	}
 	void COGLES1Driver::setViewPort(const core::recti& r){

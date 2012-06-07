@@ -19,6 +19,8 @@ namespace video{
 		virtual const core::dimension2du& getSize() const = 0;
 		const io::path& getPath() const { return m_namePath.getPath(); }
 
+		virtual bool hasMipMap() const = 0;
+
 		virtual ENUM_COLOR_FORMAT getColorFormat() const = 0;
 
 		virtual void* lock() = 0;

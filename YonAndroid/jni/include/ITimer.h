@@ -14,7 +14,7 @@ namespace yon{
 		virtual bool isPaused() = 0;
 		virtual void setSpeed(f32 speed=1.0f) = 0;
 		virtual u32 getTime() const = 0;
-		virtual u32 getRealTime() const = 0;
+		virtual u32 getRealTime() = 0;
 		virtual void tick() = 0;
 	};
 

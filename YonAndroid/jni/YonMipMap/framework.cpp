@@ -12,6 +12,8 @@ ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
 
+IModel* cubeModel=NULL;
+
 class MyEventReceiver : public IEventReceiver{
 public:
 	virtual bool onEvent(const SEvent& evt){
@@ -49,8 +51,6 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	params.fpsLimit=0;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
-	Logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_SCREEN);
-	//Logger->setFormat(MASK_FORMAT_LOG);
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
@@ -68,6 +68,25 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->setWorkingDirectory("media/");
 #endif
 
+	IMaterial* material;
+	IShap *shap;
+	IUnit* unit;
+	IEntity* entity;
+
+	shap=geometryFty->createCube(150,150,150);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	cubeModel=sceneMgr->addModel(entity);
+	material=cubeModel->getMaterial(0);
+	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
+	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+	cubeModel->setPosition(core::vector3df(100,50,0));
+	//material->setTexture(0,videoDriver->getTexture("png8/120.png"));
+	material->setTexture(0,videoDriver->getTexture("38.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
 	
 
 	return true;
@@ -79,17 +98,12 @@ void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
+	const core::vector3df crot=cubeModel->getRotation();
+	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
+
 	sceneMgr->render(videoDriver);
 
-	
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
-	//Logger->drawString(videoDriver,core::stringc("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),core::position2di(0,20),COLOR_GREEN);
-	//Logger->drawString(videoDriver,core::stringc("abcdefghijklmnopqrstuvwxyz"),core::position2di(0,40),COLOR_GREEN);
-	//Logger->drawString(videoDriver,core::stringc("0123456789+-*/\,./?<>|="),core::position2di(0,60),COLOR_GREEN);
-	u32 start=timer->getRealTime();
-	Logger->render(videoDriver);
-	u32 end=timer->getRealTime();
-	Logger->drawString(videoDriver,core::stringc("use time:%d",end-start),core::position2di(0,200),COLOR_GREEN);
+	//Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }
