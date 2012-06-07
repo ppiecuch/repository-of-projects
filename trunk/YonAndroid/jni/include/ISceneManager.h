@@ -20,7 +20,8 @@ namespace yon{
 			virtual IModel* getRootModel() = 0;
 
 			virtual void clearModels() = 0;
-			virtual camera::ICamera* addCamera(const core::vector3df& pos = core::vector3df(0,-1,0),
+			virtual camera::ICamera* addCamera(camera::ENUM_CAMERA_TYPE cameraType=camera::ENUM_CAMERA_TYPE_ORTHO,
+				const core::vector3df& pos = core::vector3df(0,-1,0),
 				const core::vector3df& up=core::vector3df(0,1,0),
 				const core::vector3df& lookat = core::vector3df(0,0,100),bool makeActive=true) = 0;
 			virtual void setActiveCamera(camera::ICamera* camera) = 0;
