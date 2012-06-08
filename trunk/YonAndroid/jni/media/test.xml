@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" name="我"?>
+<node name="test"/>
+<node   id="0" style="0.0.0.0" own="我"/>
+<element>
+	<![CDATA[test]]>
+</element>
+<![CDATA[文本内容]]>
+<element attr="1">
+</element>
+<!--just a test comment-->
+<element>
+</element>

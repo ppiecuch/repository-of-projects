@@ -1,7 +1,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "yonListTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( yonListTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( yonListTestCase );
 
 void yonListTestCase::setUp()
 {
@@ -75,4 +75,19 @@ void yonListTestCase::erase()
 	printf("begin:%d\n",*iterator);
 	l.erase(iterator);
 	CPPUNIT_ASSERT( l.size()==0 );
+}
+
+void yonListTestCase::eraseSpecific()
+{
+	l.push_back(1);
+	l.push_back(3);
+	list<u32>::Iterator iterator=l.getLast();
+	l.insert_before(iterator,2);
+	list<u32>::Iterator iterator2=--iterator;
+	l.erase(iterator2);
+	CPPUNIT_ASSERT( l.size()==2 );
+	iterator=l.begin();
+	printf("begin:%d\n",*iterator);
+	iterator=l.getLast();
+	printf("last:%d\n",*iterator);
 }

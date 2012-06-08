@@ -1,6 +1,7 @@
 #include "CFileSystem.h"
 #include "CReadFileStream.h"
 #include "CWriteFileStream.h"
+#include "CXMLReaderImpl.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include <io.h> // for _access
@@ -47,8 +48,8 @@ namespace io{
 		return createWriteFileStream(getAbsolutePath(filename),append,mode);
 	}
 	XMLReader* CFileSystem::createXMLReader(IReadStream* stream){
-		//TODO
-		return NULL;
+		return new CXMLReaderImpl<c8,core::IReferencable>(stream);
+		//return NULL;
 	}
 
 	io::path CFileSystem::getAbsolutePath(const io::path& filename,bool inWorkingDirectory) const{
