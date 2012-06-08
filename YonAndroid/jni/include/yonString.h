@@ -53,7 +53,7 @@ namespace yon{
 			string(const c8* const pFmt,...):elements(NULL),capacity(0),len(0){
 				va_list args;
 				va_start(args,pFmt);
-				T buffer[1024];
+				c8 buffer[1024];
 				vsprintf_s(buffer,1024,pFmt,args);
 				va_end(args);
 
@@ -63,7 +63,7 @@ namespace yon{
 			string(const wchar_t* const pFmt,...):elements(NULL),capacity(0),len(0){
 				va_list args;
 				va_start(args,pFmt);
-				T buffer[1024];
+				wchar_t buffer[1024];
 				vswprintf_s(buffer,1024,pFmt,args);
 				va_end(args);
 
@@ -309,6 +309,49 @@ namespace yon{
 
 				return len < other.len;
 			}
+
+			//TODO ´ý²âÊÔ
+			//! Constructor for copying a string from a pointer with a given length
+			template <class B>
+			void build(const B* const c, u32 length)
+			{
+				if(capacity>0)
+				{
+					delete[] elements;
+					capacity=len=0;
+				}
+
+				if (!c)
+				{
+					// correctly init the string to an empty one
+					*this="";
+					return;
+				}
+
+				len=length;
+				capacity = length+1;
+				elements = new T[capacity];
+
+				for (u32 l = 0; l<len; ++l)
+					elements[l] = (T)c[l];
+
+				elements[len] = 0;
+			}
+
+			//TODO ´ý²âÊÔ
+			//! Appends a character to this string
+			/** \param character: Character to append. */
+			void append(T character)
+			{
+				if (len+1 > capacity)
+					reallocate(len + 1);
+
+				++len;
+
+				elements[len-1] = character;
+				elements[len] = 0;
+			}
+
 
 			//TODO ´ý²âÊÔ
 			//! Appends a string to this string

@@ -53,6 +53,7 @@ namespace io{
 
 		inline void writeBool(bool value){ writeByte(value?true:false);}
 		inline void writeByte(s8 value){ write<s8>(value);}
+		inline void writeChar(c8 value){ write<c8>(value);}
 		inline void writeUnsignedByte(u8 value){ write<u8>(value);}
 		inline void writeShort(s16 value){ write<s16>(value);}
 		inline void writeUnsignedShort(u16 value){ write<u16>(value);}
@@ -105,6 +106,10 @@ namespace io{
 		
 		inline bool readBool(){return readByte()!=0;}
 		inline s8 readByte(){return read<s8>();}
+		inline c8 readChar(){return read<c8>();}
+		inline c16 readChar16(){return read<c16>();}
+		inline c32 readChar32(){return read<c32>();}
+		inline wchar_t readWChar(){return read<wchar_t>();}
 		inline u8 readUnsignedByte(){return read<u8>();}
 		inline s16 readShort(){return read<s16>();}
 		inline u16 readUnsignedShort(){return read<u16>();}

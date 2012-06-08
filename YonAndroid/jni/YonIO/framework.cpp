@@ -61,7 +61,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
@@ -89,7 +89,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	Logger->debug("%.2f\n",rs->readFloat());
 	Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
-#else
+#elif 0
 	IWriteStream* ws=fs->createAndOpenWriteFileStream("/tst/tst/tst/test.txt",true,ENUM_ENDIAN_MODE_BIG);
 	ws->writeBool(true);
 	ws->writeFloat(2.1f);
@@ -104,9 +104,16 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//Logger->debug("%.2f\n",rs->readFloat());
 	//Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
+#else
+	IReadStream* rs=fs->createAndOpenReadFileStream("/test.xml");
+	XMLReader* reader=fs->createXMLReader(rs);
+	rs->drop();
+
+	while(reader->read());
+	reader->drop();
 #endif
 
-	return true;
+	return true; 
 }
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
@@ -117,7 +124,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }

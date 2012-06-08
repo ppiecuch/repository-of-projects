@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include "CTimerWin32.cpp"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( timerTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( timerTestCase );
 
 void timerTestCase::setUp()
 {

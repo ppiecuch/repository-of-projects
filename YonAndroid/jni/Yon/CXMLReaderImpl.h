@@ -7,6 +7,7 @@
 #include "yonArray.h"
 #include "fastatof.h"
 
+#include "ILogger.h"
 
 namespace yon{
 namespace io{
@@ -21,26 +22,113 @@ namespace io{
 			core::string<char_type> Value;
 		};
 
+		IReadStream* m_pStream;
+		ENUM_ENCODING m_encoding;									// encoding of the xml file
+		s32 m_iSizeOfCharType;										// byte size of the char_type
+
+		ENUM_XML_NODE m_currentNodeType;							// type of the currently parsed node
+		core::string<char_type> m_nodeName;							// name of the node currently in
+		core::string<char_type> m_emptyString;						// empty string to be returned by getSafe() methods
+
+		core::array<core::string<char_type>> m_specialCharacters;	// see createSpecialCharacterList()
+		core::array<SAttribute> m_attributes;						// attributes of current element
+
+		/*
 		char_type* TextData;         // data block of the text file
 		char_type* P;                // current point in text to parse
 		char_type* TextBegin;        // start of text to parse
 		unsigned int TextSize;       // size of text to parse in characters, not bytes
-
-		ENUM_XML_NODE CurrentNodeType;  // type of the currently parsed node
-		ENUM_ENCODING SourceFormat;		// source format of the xml file
 
 		core::string<char_type> NodeName;    // name of the node currently in
 		core::string<char_type> EmptyString; // empty string to be returned by getSafe() methods
 
 		bool IsEmptyElement;       // is the currently parsed node empty?
 
-		core::array<core::string<char_type>> SpecialCharacters; // see createSpecialCharacterList()
-		core::array<SAttribute> Attributes; // attributes of current element
+		
+		*/
+		// finds a current attribute by name, returns 0 if not found
+		const SAttribute* getAttributeByName(const char_type* name) const
+		{
+			if (!name)
+				return 0;
+
+			core::string<char_type> n = name;
+
+			for (int i=0; i<(int)m_attributes.size(); ++i)
+				if (m_attributes[i].Name == n)
+					return &m_attributes[i];
+
+			return 0;
+		}
+
+
+		inline char_type readNext()
+		{
+#if 0
+			switch(m_iSizeOfCharType)
+			{
+			case 2:
+				return m_pStream->readChar16();
+			case 4:
+				return m_pStream->readChar32();
+			default:
+				return m_pStream->readChar();
+			}
+#else
+			if(m_iSizeOfCharType==1)
+				return m_pStream->readChar();
+			else
+				return m_pStream->readWChar();
+#endif
+		}
+
+		void readString(core::string<char_type>& str,u32 start,u32 end)
+		{
+			u32 temp=m_pStream->getPos();
+			m_pStream->seek(start);
+			YON_DEBUG_BREAK_IF(end-start>1024);
+			static u8 buffer[1024];
+			m_pStream->read(buffer,end-start-1);
+			str.build(buffer,end-start-1);
+			m_pStream->seek(temp);
+		}
+
+		inline bool reachEnd()
+		{
+			YON_DEBUG_BREAK_IF(m_pStream->getPos()>m_pStream->getSize());
+			return m_pStream->getPos()==m_pStream->getSize();
+		}
+
+		//trim the stream from start to end,if the result is not null return true,or return false
+		inline bool trim(u32 start,u32 end)
+		{
+			if(end<=start)
+				return false;
+			m_pStream->seek(start);
+			char_type c;
+			do{
+				c=readNext();
+			}while(isWhiteSpace(c));
+			if(m_pStream->getPos()==end)
+				return false;
+			//TODO
+			return true;
+		}
+
+		//! ignores an xml definition like <?xml something />
+		void ignoreDefinition()
+		{
+			m_currentNodeType = ENUM_XML_NODE_UNKNOWN;
+
+			// move until end marked with '>' reached
+			while(readNext() != L'>');
+		}
 
 		// Reads the current xml node
 		// return false if no further node is found
 		bool parseCurrentNode()
 		{
+#if 0
 			char_type* start = P;
 
 			// more forward until '<' found
@@ -78,188 +166,128 @@ namespace io{
 				break;
 			}
 			return true;
-		}
-
-		//! sets the state that text was found. Returns true if set should be set
-		bool setText(char_type* start, char_type* end)
-		{
-			// check if text is more than 2 characters, and if not, check if there is 
-			// only white space, so that this text won't be reported
-			if (end - start < 3)
-			{
-				char_type* p = start;
-				for(; p != end; ++p)
-					if (!isWhiteSpace(*p))
-						break;
-
-				if (p == end)
-					return false;
+#endif
+			u32 start=m_pStream->getPos();
+			char_type c;
+			wchar_t t=L'<';
+			while((c=readNext())!=L'<'&&!reachEnd());
+			if(reachEnd())
+				return false;
+			u32 end=m_pStream->getPos();
+			if(trim(start,end)){
+				Logger->debug("trim:true\n");
+				return true;
 			}
-
-			// set current text to the parsed text, and replace xml special characters
-			core::string<char_type> s(start, (int)(end - start));
-			NodeName = replaceSpecialCharacters(s);
-
-			// current XML node type is text
-			CurrentNodeType = ENUM_XML_NODE_TEXT;
-
+			switch(readNext())
+			{
+			case L'/':
+				Logger->debug("end\n");
+				parseClosingXMLElement();
+				Logger->debug("<%s>\n",m_nodeName.c_str());
+				break;
+			case L'?':
+				Logger->debug("header->ignore\n");
+				ignoreDefinition();	
+				break;
+			case L'!':
+				if (!parseCDATA()){
+					parseComment();	
+					Logger->debug("comment:%s\n",m_nodeName.c_str());
+				}
+				else
+					Logger->debug("cdata:%s\n",m_nodeName.c_str());
+				break;
+			default:
+				{
+					Logger->debug("common:\n");
+					parseOpeningXMLElement();
+					Logger->debug("<%s>(%d)\n",m_nodeName.c_str(),m_attributes.size());
+					for(u32 i=0;i<m_attributes.size();++i)
+						Logger->debug("%s:%s",m_attributes[i].Name.c_str(),m_attributes[i].Value.c_str());
+					Logger->debug("\n");
+					break;
+				}
+			}
 			return true;
-		}
-
-		//! ignores an xml definition like <?xml something />
-		void ignoreDefinition()
-		{
-			CurrentNodeType = ENUM_XML_NODE_UNKNOWN;
-
-			// move until end marked with '>' reached
-			while(*P != L'>')
-				++P;
-
-			++P;
 		}
 
 		//! parses a comment
 		void parseComment()
 		{
-			CurrentNodeType = ENUM_XML_NODE_COMMENT;
-			P += 1;
+			//CurrentNodeType = EXN_COMMENT;
+			//P += 1;
+			m_currentNodeType = ENUM_XML_NODE_COMMENT;
 
-			char_type *pCommentBegin = P;
+			//char_type *pCommentBegin = P;
+			u32 commentStart=m_pStream->getPos()+1;
 
-			int count = 1;
+			//int count = 1;
+			char_type c;
+			s32 count = 1;
+
+			do{
+				c=readNext();
+				if(c==L'>')
+					--count;
+				else if(c==L'<')
+					++count;
+			}while(count);
+
+			u32 commentEnd=m_pStream->getPos()-2;
+			readString(m_nodeName,commentStart,commentEnd);
 
 			// move until end of comment reached
-			while(count)
-			{
-				if (*P == L'>')
-					--count;
-				else
-					if (*P == L'<')
-						++count;
+// 			while(count)
+// 			{
+// 				if (*P == L'>')
+// 					--count;
+// 				else
+// 					if (*P == L'<')
+// 						++count;
+// 
+// 				++P;
+// 			}
 
-				++P;
-			}
-
-			P -= 3;
-			NodeName = core::string<char_type>(pCommentBegin+2, (int)(P - pCommentBegin-2));
-			P += 3;
-		}
-
-		//! parses an opening xml element and reads attributes
-		void parseOpeningXMLElement()
-		{
-			CurrentNodeType = ENUM_XML_NODE_ELEMENT;
-			IsEmptyElement = false;
-			Attributes.clear();
-
-			// find name
-			const char_type* startName = P;
-
-			// find end of element
-			while(*P != L'>' && !isWhiteSpace(*P))
-				++P;
-
-			const char_type* endName = P;
-
-			// find Attributes
-			while(*P != L'>')
-			{
-				if (isWhiteSpace(*P))
-					++P;
-				else
-				{
-					if (*P != L'/')
-					{
-						// we've got an attribute
-
-						// read the attribute names
-						const char_type* attributeNameBegin = P;
-
-						while(!isWhiteSpace(*P) && *P != L'=')
-							++P;
-
-						const char_type* attributeNameEnd = P;
-						++P;
-
-						// read the attribute value
-						// check for quotes and single quotes, thx to murphy
-						while( (*P != L'\"') && (*P != L'\'') && *P) 
-							++P;
-
-						if (!*P) // malformatted xml file
-							return;
-
-						const char_type attributeQuoteChar = *P;
-
-						++P;
-						const char_type* attributeValueBegin = P;
-
-						while(*P != attributeQuoteChar && *P)
-							++P;
-
-						if (!*P) // malformatted xml file
-							return;
-
-						const char_type* attributeValueEnd = P;
-						++P;
-
-						SAttribute attr;
-						attr.Name = core::string<char_type>(attributeNameBegin, 
-							(int)(attributeNameEnd - attributeNameBegin));
-
-						core::string<char_type> s(attributeValueBegin, 
-							(int)(attributeValueEnd - attributeValueBegin));
-
-						attr.Value = replaceSpecialCharacters(s);
-						Attributes.push_back(attr);
-					}
-					else
-					{
-						// tag is closed directly
-						++P;
-						IsEmptyElement = true;
-						break;
-					}
-				}
-			}
-
-			// check if this tag is closing directly
-			if (endName > startName && *(endName-1) == L'/')
-			{
-				// directly closing tag
-				IsEmptyElement = true;
-				endName--;
-			}
-
-			NodeName = core::string<char_type>(startName, (int)(endName - startName));
-
-			++P;
-		}
-
-		//! parses an closing xml tag
-		void parseClosingXMLElement()
-		{
-			CurrentNodeType = ENUM_XML_NODE_ELEMENT_END;
-			IsEmptyElement = false;
-			Attributes.clear();
-
-			++P;
-			const char_type* pBeginClose = P;
-
-			while(*P != L'>')
-				++P;
-
-			NodeName = core::string<char_type>(pBeginClose, (int)(P - pBeginClose));
-			++P;
+			//P -= 3;
+			//NodeName = core::string<char_type>(pCommentBegin+2, (int)(P - pCommentBegin-2));
+			//P += 3;
 		}
 
 		//! parses a possible CDATA section, returns false if begin was not a CDATA section
 		bool parseCDATA()
 		{
-			if (*(P+1) != L'[')
+			//if (*(P+1) != L'[')
+			//	return false;
+			char_type c=readNext();
+			if(c!=L'[')
 				return false;
 
-			CurrentNodeType = ENUM_XML_NODE_CDATA;
+			m_currentNodeType = ENUM_XML_NODE_CDATA;
+			// skip '<![CDATA['
+			m_pStream->seek(6,true);
+			if(reachEnd())
+				return true;
+
+			u32 cdataStart=m_pStream->getPos();
+			u32 cdataEnd=0;
+			char_type lastc=0;
+			char_type lastlastc=0;
+			do{
+				lastlastc=lastc;
+				lastc=c;
+				c=readNext();
+				if(c==L'>'&&lastc==L']'&&lastlastc==L']')
+					cdataEnd=m_pStream->getPos()-2;
+			}while(c&&!cdataEnd);
+
+			if(cdataEnd)
+				readString(m_nodeName,cdataStart,cdataEnd);
+			else
+				m_nodeName="";
+
+
+			/*
+			CurrentNodeType = EXN_CDATA;
 
 			// skip '<![CDATA['
 			int count=0;
@@ -292,28 +320,134 @@ namespace io{
 				NodeName = core::string<char_type>(cDataBegin, (int)(cDataEnd - cDataBegin));
 			else
 				NodeName = "";
-
+			*/
 			return true;
 		}
 
-		// finds a current attribute by name, returns 0 if not found
-		const SAttribute* getAttributeByName(const char_type* name) const
+		//! parses an closing xml tag
+		void parseClosingXMLElement()
 		{
-			if (!name)
-				return 0;
+			m_currentNodeType = ENUM_XML_NODE_ELEMENT_END;
+			//IsEmptyElement = false;
+			m_attributes.clear();
 
-			core::string<char_type> n = name;
+			//++P;
+			//const char_type* pBeginClose = P;
+			u32 nameStart=m_pStream->getPos();
+			char_type c;
 
-			for (int i=0; i<(int)Attributes.size(); ++i)
-				if (Attributes[i].Name == n)
-					return &Attributes[i];
+			//while(*P != L'>')
+			//	++P;
+			do{
+				c=readNext();
+			}while(c!=L'>');
 
-			return 0;
+			//NodeName = core::string<char_type>(pBeginClose, (int)(P - pBeginClose));
+			//++P;
+			u32 nameEnd=m_pStream->getPos();
+			readString(m_nodeName,nameStart,nameEnd);
+		}
+
+
+		//! parses an opening xml element and reads attributes
+		void parseOpeningXMLElement()
+		{
+			m_currentNodeType = ENUM_XML_NODE_ELEMENT;
+			m_attributes.clear();
+
+			// find name
+			u32 nameStart = m_pStream->getPos()-1;
+
+			// find end of element
+			char_type c=0;
+			char_type lastc=0;
+			do{
+				lastc=c;
+				c=readNext();
+			}while(c!=L'>'&&!isWhiteSpace(c));
+
+			u32 nameEnd = m_pStream->getPos();
+
+			// find Attributes
+			while(c!=L'>')
+			{
+				if(isWhiteSpace(c))
+					c=readNext();
+				else
+				{
+					if(c!=L'/')
+					{
+						// we've got an attribute
+
+						// read the attribute names
+						u32 attributeNameBegin = m_pStream->getPos()-1;
+
+						do{
+							c=readNext();
+						}while(c!=L'='&&!isWhiteSpace(c));
+
+						u32 attributeNameEnd =  m_pStream->getPos();
+
+						// read the attribute value
+						// check for quotes and single quotes, thx to murphy
+						do{
+							c=readNext();
+						}while(c!=L'\"'&&c!='\''&&c);
+
+						if (!c) // malformatted xml file
+							return;
+
+						char_type attributeQuoteChar = c;
+
+						u32 attributeValueBegin = m_pStream->getPos();
+
+						do{
+							c=readNext();
+						}while(c!=attributeQuoteChar&&c);
+
+						if (!c) // malformatted xml file
+							return;
+
+						u32 attributeValueEnd = m_pStream->getPos();
+
+						SAttribute attr;
+						//attr.Name = core::string<char_type>(attributeNameBegin, (int)(attributeNameEnd - attributeNameBegin));
+						readString(attr.Name,attributeNameBegin,attributeNameEnd);
+
+						//core::string<char_type> s(attributeValueBegin, (int)(attributeValueEnd - attributeValueBegin));
+						core::string<char_type> s;
+						readString(s,attributeValueBegin,attributeValueEnd);
+
+						attr.Value = replaceSpecialCharacters(s);
+						m_attributes.push_back(attr);
+					}
+					else
+					{
+						// tag is closed directly
+						//++P;
+						// IsEmptyElement = true;
+						break;
+					}
+					c=readNext();
+				}
+			}
+
+			// check if this tag is closing directly
+			if (nameEnd > nameStart && lastc == L'/')
+			{
+				// directly closing tag
+				//IsEmptyElement = true;
+				//endName--;
+				--nameEnd;
+			}
+
+			//NodeName = core::string<char_type>(startName, (int)(endName - startName));
+			//++P;
+			readString(m_nodeName,nameStart,nameEnd);
 		}
 
 		// replaces xml special characters in a string and creates a new one
-		core::string<char_type> replaceSpecialCharacters(
-			core::string<char_type>& origstr)
+		core::string<char_type> replaceSpecialCharacters(core::string<char_type>& origstr)
 		{
 			int pos = origstr.findFirst(L'&');
 			int oldPos = 0;
@@ -323,16 +457,16 @@ namespace io{
 
 			core::string<char_type> newstr;
 
-			while(pos != -1 && pos < (int)origstr.size()-2)
+			while(pos != -1 && pos < (int)origstr.length()-2)
 			{
 				// check if it is one of the special characters
 
 				int specialChar = -1;
-				for (int i=0; i<(int)SpecialCharacters.size(); ++i)
+				for (int i=0; i<(int)m_specialCharacters.size(); ++i)
 				{
 					const char_type* p = &origstr.c_str()[pos]+1;
 
-					if (equalsn(&SpecialCharacters[i][1], p, SpecialCharacters[i].size()-1))
+					if (equalsn(&m_specialCharacters[i][1], p, m_specialCharacters[i].length()-1))
 					{
 						specialChar = i;
 						break;
@@ -342,8 +476,8 @@ namespace io{
 				if (specialChar != -1)
 				{
 					newstr.append(origstr.subString(oldPos, pos - oldPos));
-					newstr.append(SpecialCharacters[specialChar][0]);
-					pos += SpecialCharacters[specialChar].size();
+					newstr.append(m_specialCharacters[specialChar][0]);
+					pos += m_specialCharacters[specialChar].length();
 				}
 				else
 				{
@@ -356,87 +490,11 @@ namespace io{
 				pos = origstr.findNext(L'&', pos);		
 			}
 
-			if (oldPos < (int)origstr.size()-1)
-				newstr.append(origstr.subString(oldPos, origstr.size()-oldPos));
+			if (oldPos < (int)origstr.length()-1)
+				newstr.append(origstr.subString(oldPos, origstr.length()-oldPos));
 
 			return newstr;
 		}
-
-		//! reads the xml file and converts it into the wanted character format.
-		bool readFile(IFileReadCallBack* callback)
-		{
-			long size = callback->getSize();		
-			if (size<0)
-				return false;
-			size += 4; // We need four terminating 0's at the end.
-			// For ASCII we need 1 0's, for UTF-16 2, for UTF-32 4.
-
-			char* data8 = new char[size];
-
-			if (!callback->read(data8, size-4))
-			{
-				delete [] data8;
-				return false;
-			}
-
-			// add zeros at end
-
-			memset(data8+size-4, 0, 4);
-
-			char16* data16 = reinterpret_cast<char16*>(data8);
-			char32* data32 = reinterpret_cast<char32*>(data8);	
-
-			// now we need to convert the data to the desired target format
-			// based on the byte order mark.
-
-			const unsigned char UTF8[] = {0xEF, 0xBB, 0xBF}; // 0xEFBBBF;
-			const int UTF16_BE = 0xFFFE;
-			const int UTF16_LE = 0xFEFF;
-			const int UTF32_BE = 0xFFFE0000;
-			const int UTF32_LE = 0x0000FEFF;
-
-			// check source for all utf versions and convert to target data format
-
-			if (size >= 4 && data32[0] == (char32)UTF32_BE)
-			{
-				// UTF-32, big endian
-				SourceFormat = ETF_UTF32_BE;
-				convertTextData(data32+1, data8, (size/4)-1); // data32+1 because we need to skip the header
-			}
-			else if (size >= 4 && data32[0] == (char32)UTF32_LE)
-			{
-				// UTF-32, little endian
-				SourceFormat = ETF_UTF32_LE;
-				convertTextData(data32+1, data8, (size/4)-1); // data32+1 because we need to skip the header
-			}
-			else if (size >= 2 && data16[0] == UTF16_BE)
-			{
-				// UTF-16, big endian
-				SourceFormat = ETF_UTF16_BE;
-				convertTextData(data16+1, data8, (size/2)-1); // data16+1 because we need to skip the header
-			}
-			else if (size >= 2 && data16[0] == UTF16_LE)
-			{
-				// UTF-16, little endian
-				SourceFormat = ETF_UTF16_LE;
-				convertTextData(data16+1, data8, (size/2)-1); // data16+1 because we need to skip the header
-			}
-			else if (size >= 3 && memcmp(data8,UTF8,3)==0)
-			{
-				// UTF-8
-				SourceFormat = ETF_UTF8;
-				convertTextData(data8+3, data8, size-3); // data8+3 because we need to skip the header
-			}
-			else
-			{
-				// ASCII
-				SourceFormat = ETF_ASCII;
-				convertTextData(data8, data8, size);
-			}
-
-			return true;
-		}
-
 
 		//! returns true if a character is whitespace
 		inline bool isWhiteSpace(char_type c)
@@ -451,11 +509,11 @@ namespace io{
 			// the first character is the special character,
 			// the following is the symbol string without trailing &.
 
-			SpecialCharacters.push_back("&amp;");
-			SpecialCharacters.push_back("<lt;");
-			SpecialCharacters.push_back(">gt;");
-			SpecialCharacters.push_back("\"quot;");
-			SpecialCharacters.push_back("'apos;");
+			m_specialCharacters.push_back("&amp;");
+			m_specialCharacters.push_back("<lt;");
+			m_specialCharacters.push_back(">gt;");
+			m_specialCharacters.push_back("\"quot;");
+			m_specialCharacters.push_back("'apos;");
 
 		}
 
@@ -469,32 +527,44 @@ namespace io{
 					return false;
 
 			// if one (or both) of the strings was smaller then they
-			// are only equal if they have the same lenght
+			// are only equal if they have the same length
 			return (i == len) || (str1[i] == 0 && str2[i] == 0);
 		}
 
 	public:
-		CXMLReaderImpl(IReadStream* stream, bool deleteStream = true)
-			: TextData(0), P(0), TextBegin(0), TextSize(0), 
-			CurrentNodeType(ENUM_XML_NODE_NONE),SourceFormat(ENUM_ENCODING_ASCII)
+		CXMLReaderImpl(IReadStream* stream)
+			: m_pStream(stream), //TextData(0), P(0), TextBegin(0), TextSize(0),SourceFormat(ENUM_ENCODING_ASCII),
+			m_currentNodeType(ENUM_XML_NODE_NONE),m_iSizeOfCharType(sizeof(char_type))
 		{
 			// read whole xml file
-			readFile(stream);
+			//readFile(stream);
 
 			// clean up
-			if (deleteStream)
-				delete stream;
+			//if (deleteStream)
+			//	delete stream;
+
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CXMLReaderImpl");
+
+			if(!stream||stream->pointer()==NULL){
+				m_pStream=NULL;
+				return;
+			}
 
 			// create list with special characters
 			createSpecialCharacterList();
 
+			stream->grab();
+
 			// set pointer to text begin
-			P = TextBegin;
+			//P = TextBegin;
 		}
 
 		virtual ~CXMLReaderImpl()
 		{
-			delete [] TextData;
+			if(m_pStream)
+				m_pStream->drop();
+			//delete [] TextData;
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CXMLReaderImpl");
 		}
 
 
@@ -502,42 +572,47 @@ namespace io{
 		//! \return Returns false, if there was no further node. 
 		virtual bool read()
 		{
+#if 0
 			// if not end reached, parse the node
 			if (P && (unsigned int)(P - TextBegin) < TextSize - 1 && *P != 0)
 			{
 				return parseCurrentNode();
 			}
 			return false;
+#endif
+			if(!m_pStream||reachEnd())
+				return false;
+			return parseCurrentNode();
 		}
 
 		//! Returns the type of the current XML node.
 		virtual ENUM_XML_NODE getNodeType() const
 		{
-			return CurrentNodeType;
+			return m_currentNodeType;
 		}
 
 		//! Returns attribute count of the current XML node.
 		virtual unsigned int getAttributeCount() const
 		{
-			return Attributes.size();
+			return m_attributes.size();
 		}
 
 		//! Returns name of an attribute.
 		virtual const char_type* getAttributeName(int idx) const
 		{
-			if ((u32)idx >= Attributes.size())
+			if ((u32)idx >= m_attributes.size())
 				return 0;
 
-			return Attributes[idx].Name.c_str();
+			return m_attributes[idx].Name.c_str();
 		}
 
 		//! Returns the value of an attribute. 
 		virtual const char_type* getAttributeValue(int idx) const
 		{
-			if ((unsigned int)idx >= Attributes.size())
+			if ((unsigned int)idx >= m_attributes.size())
 				return 0;
 
-			return Attributes[idx].Value.c_str();
+			return m_attributes[idx].Value.c_str();
 		}
 
 		//! Returns the value of an attribute. 
@@ -555,7 +630,7 @@ namespace io{
 		{
 			const SAttribute* attr = getAttributeByName(name);
 			if (!attr)
-				return EmptyString.c_str();
+				return m_emptyString.c_str();
 
 			return attr->Value.c_str();
 		}
@@ -607,26 +682,25 @@ namespace io{
 		//! Returns the name of the current node.
 		virtual const char_type* getNodeName() const
 		{
-			return NodeName.c_str();
+			return m_nodeName.c_str();
 		}
 
 		//TODO为什么跟getNodeName一样的实现?
 		//! Returns data of the current node.
 		virtual const char_type* getNodeData() const
 		{
-			return NodeName.c_str();
+			return m_nodeName.c_str();
 		}
 
 		//! Returns if an element is an empty element, like <foo />
-		virtual bool isEmptyElement() const
-		{
-			return IsEmptyElement;
-		}
+// 		virtual bool isEmptyElement() const
+// 		{
+// 			return IsEmptyElement;
+// 		}
 
-		//! Returns format of the source xml file.
-		virtual ENUM_ENCODING getSourceFormat() const
+		virtual ENUM_ENCODING getEncoding() const
 		{
-			return SourceFormat;
+			return m_encoding;
 		}
 
 	};

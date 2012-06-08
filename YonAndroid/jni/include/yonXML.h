@@ -27,6 +27,10 @@ namespace io{
 		//! An xml cdata section like &lt;![CDATA[ this is some CDATA ]]&gt;
 		ENUM_XML_NODE_CDATA,
 
+		//TODO ´ý²¹³ä
+		//! An xml header like &lt;? xml version="1.0" encoding="UTF-8"&gt;
+		ENUM_XML_NODE_HEADER,
+
 		//! Unknown element.
 		ENUM_XML_NODE_UNKNOWN
 	};
@@ -119,7 +123,10 @@ namespace io{
 		virtual const char_type* getNodeData() const = 0;
 
 		//! Returns if an element is an empty element, like &lt;foo />
-		virtual bool isEmptyElement() const = 0;
+		//virtual bool isEmptyElement() const = 0;
+
+		//! Returns the encoding of the xml
+		virtual ENUM_ENCODING getEncoding() const = 0;
 	};
 
 	//! A UTF-8 or ASCII character xml parser.
@@ -130,7 +137,7 @@ namespace io{
 	typedef IXMLReader<c32,IXMLBase> BaseXMLReaderUTF32;
 
 	//! An xml reader for wide characters, derived from IReferencable.
-	typedef IXMLReader<wchar_t,core::IReferencable> XMLReader;
+	typedef IXMLReader<c8,core::IReferencable> XMLReader;
 
 	//! An xml reader for ASCII or UTF-8 characters, derived from IReferencable.
 	typedef IXMLReader<c8,core::IReferencable> XMLReaderUTF8;

@@ -20,8 +20,9 @@ class yonListTestCase : public CPPUNIT_NS::TestFixture
 	//CPPUNIT_TEST( clear );
 	//CPPUNIT_TEST( begin );
 	//CPPUNIT_TEST( erase );
-	CPPUNIT_TEST( insert_before );
-	CPPUNIT_TEST( insert_after );
+	//CPPUNIT_TEST( insert_before );
+	//CPPUNIT_TEST( insert_after );
+	CPPUNIT_TEST ( eraseSpecific );
 	CPPUNIT_TEST_SUITE_END();
 protected:
 	list<u32> l;
@@ -38,6 +39,7 @@ protected:
 	void erase();
 	void insert_before();
 	void insert_after();
+	void eraseSpecific();
 };
 
 #endif
