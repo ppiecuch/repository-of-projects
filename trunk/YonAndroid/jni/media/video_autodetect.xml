@@ -1,0 +1,762 @@
+<DeviceList>
+	<!-- Detail types: Lowest, Low, Medium, High, Highest -->
+	
+	<!-- Specific vendor/device combos. Format is <VendorDeviceCombo><Vendor /><Device /><Detail /></VendorDeviceCombo>. -->
+	<VendorDeviceCombos>
+		<!-- NVIDIA -->
+		<Vendor ID="0x10DE">
+			<Detail Level="Lowest">
+				<Device ID="0x0008" />
+				<Device ID="0x0009" />
+				<Device ID="0x0010" />
+				<Device ID="0x0018" />
+				<Device ID="0x0019" />
+				<Device ID="0x001D" />
+				<Device ID="0x0020" />
+				<Device ID="0x0029" />
+				<Device ID="0x002A" />
+				<Device ID="0x002B" />
+				<Device ID="0x002C" />
+				<Device ID="0x002D" />
+				<Device ID="0x002E" />
+				<Device ID="0x002F" />
+				<Device ID="0x0040" />
+				<Device ID="0x0041" />
+				<Device ID="0x0042" />
+				<Device ID="0x0043" />
+				<Device ID="0x0044" />
+				<Device ID="0x0045" />
+				<Device ID="0x0046" />
+				<Device ID="0x0047" />
+				<Device ID="0x0048" />
+				<Device ID="0x0049" />
+				<Device ID="0x004D" />
+				<Device ID="0x004E" />
+				<Device ID="0x0093" />
+				<Device ID="0x0094" />
+				<Device ID="0x0098" />
+				<Device ID="0x0099" />
+				<Device ID="0x009C" />
+				<Device ID="0x009D" />
+				<Device ID="0x009E" />
+				<Device ID="0x00A0" />
+				<Device ID="0x00C0" />
+				<Device ID="0x00C1" />
+				<Device ID="0x00C2" />
+				<Device ID="0x00C3" />
+				<Device ID="0x00C8" />
+				<Device ID="0x00C9" />
+				<Device ID="0x00CC" />
+				<Device ID="0x00CD" />
+				<Device ID="0x00CE" />
+				<Device ID="0x00F0" />
+				<Device ID="0x00F1" />
+				<Device ID="0x00F2" />
+				<Device ID="0x00F3" />
+				<Device ID="0x00F4" />
+				<Device ID="0x00F5" />
+				<Device ID="0x00F6" />
+				<Device ID="0x00F8" />
+				<Device ID="0x00F9" />
+				<Device ID="0x00FA" />
+				<Device ID="0x00FB" />
+				<Device ID="0x00FC" />
+				<Device ID="0x00FD" />
+				<Device ID="0x00FE" />
+				<Device ID="0x00FF" />
+				<Device ID="0x0100" />
+				<Device ID="0x0101" />
+				<Device ID="0x0102" />
+				<Device ID="0x0103" />
+				<Device ID="0x0110" />
+				<Device ID="0x0111" />
+				<Device ID="0x0112" />
+				<Device ID="0x0113" />
+				<Device ID="0x0140" />
+				<Device ID="0x0141" />
+				<Device ID="0x0142" />
+				<Device ID="0x0143" />
+				<Device ID="0x0144" />
+				<Device ID="0x0145" />
+				<Device ID="0x0146" />
+				<Device ID="0x0147" />
+				<Device ID="0x0148" />
+				<Device ID="0x0149" />
+				<Device ID="0x014A" />
+				<Device ID="0x014B" />
+				<Device ID="0x014C" />
+				<Device ID="0x014D" />
+				<Device ID="0x014E" />
+				<Device ID="0x014F" />
+				<Device ID="0x0150" />
+				<Device ID="0x0151" />
+				<Device ID="0x0152" />
+				<Device ID="0x0153" />
+				<Device ID="0x0160" />
+				<Device ID="0x0161" />
+				<Device ID="0x0162" />
+				<Device ID="0x0163" />
+				<Device ID="0x0164" />
+				<Device ID="0x0165" />
+				<Device ID="0x0166" />
+				<Device ID="0x0167" />
+				<Device ID="0x0168" />
+				<Device ID="0x0169" />
+				<Device ID="0x016A" />
+				<Device ID="0x016B" />
+				<Device ID="0x016C" />
+				<Device ID="0x016D" />
+				<Device ID="0x016E" />
+				<Device ID="0x0170" />
+				<Device ID="0x0171" />
+				<Device ID="0x0172" />
+				<Device ID="0x0173" />
+				<Device ID="0x0174" />
+				<Device ID="0x0175" />
+				<Device ID="0x0176" />
+				<Device ID="0x0177" />
+				<Device ID="0x0178" />
+				<Device ID="0x017A" />
+				<Device ID="0x017B" />
+				<Device ID="0x017C" />
+				<Device ID="0x017D" />
+				<Device ID="0x0181" />
+				<Device ID="0x0182" />
+				<Device ID="0x0183" />
+				<Device ID="0x0185" />
+				<Device ID="0x0186" />
+				<Device ID="0x0187" />
+				<Device ID="0x0188" />
+				<Device ID="0x018A" />
+				<Device ID="0x018B" />
+				<Device ID="0x018C" />
+				<Device ID="0x018D" />
+				<Device ID="0x0197" />
+				<Device ID="0x019E" />
+				<Device ID="0x01A0" />
+				<Device ID="0x01D0" />
+				<Device ID="0x01D1" />
+				<Device ID="0x01D2" />
+				<Device ID="0x01D3" />
+				<Device ID="0x01D5" />
+				<Device ID="0x01D7" />
+				<Device ID="0x01D8" />
+				<Device ID="0x01DB" />
+				<Device ID="0x01DC" />
+				<Device ID="0x01DD" />
+				<Device ID="0x01DE" />
+				<Device ID="0x01DF" />
+				<Device ID="0x01F0" />
+				<Device ID="0x0200" />
+				<Device ID="0x0201" />
+				<Device ID="0x0202" />
+				<Device ID="0x0203" />
+				<Device ID="0x0210" />
+				<Device ID="0x0211" />
+				<Device ID="0x0212" />
+				<Device ID="0x0215" />
+				<Device ID="0x0218" />
+				<Device ID="0x0220" />
+				<Device ID="0x0222" />
+				<Device ID="0x0228" />
+				<Device ID="0x0240" />
+				<Device ID="0x0241" />
+				<Device ID="0x0242" />
+				<Device ID="0x0244" />
+				<Device ID="0x0245" />
+				<Device ID="0x0247" />
+				<Device ID="0x0250" />
+				<Device ID="0x0251" />
+				<Device ID="0x0252" />
+				<Device ID="0x0253" />
+				<Device ID="0x0258" />
+				<Device ID="0x0259" />
+				<Device ID="0x025B" />
+				<Device ID="0x026C" />
+				<Device ID="0x0280" />
+				<Device ID="0x0281" />
+				<Device ID="0x0282" />
+				<Device ID="0x0286" />
+				<Device ID="0x0288" />
+				<Device ID="0x0289" />
+				<Device ID="0x028C" />
+				<Device ID="0x0297" />
+				<Device ID="0x0298" />
+				<Device ID="0x0299" />
+				<Device ID="0x02A0" />
+				<Device ID="0x02E0" />
+				<Device ID="0x02E1" />
+				<Device ID="0x02E2" />
+				<Device ID="0x0300" />
+				<Device ID="0x0301" />
+				<Device ID="0x0302" />
+				<Device ID="0x0308" />
+				<Device ID="0x0309" />
+				<Device ID="0x030A" />
+				<Device ID="0x0311" />
+				<Device ID="0x0312" />
+				<Device ID="0x0313" />
+				<Device ID="0x0314" />
+				<Device ID="0x0316" />
+				<Device ID="0x0317" />
+				<Device ID="0x0318" />
+				<Device ID="0x0319" />
+				<Device ID="0x031A" />
+				<Device ID="0x031B" />
+				<Device ID="0x031C" />
+				<Device ID="0x031D" />
+				<Device ID="0x031E" />
+				<Device ID="0x031F" />
+				<Device ID="0x0320" />
+				<Device ID="0x0321" />
+				<Device ID="0x0322" />
+				<Device ID="0x0323" />
+				<Device ID="0x0324" />
+				<Device ID="0x0325" />
+				<Device ID="0x0326" />
+				<Device ID="0x0327" />
+				<Device ID="0x0328" />
+				<Device ID="0x0329" />
+				<Device ID="0x032A" />
+				<Device ID="0x032B" />
+				<Device ID="0x032C" />
+				<Device ID="0x032D" />
+				<Device ID="0x032F" />
+				<Device ID="0x0330" />
+				<Device ID="0x0331" />
+				<Device ID="0x0332" />
+				<Device ID="0x0333" />
+				<Device ID="0x0334" />
+				<Device ID="0x033F" />
+				<Device ID="0x0338" />
+				<Device ID="0x0341" />
+				<Device ID="0x0342" />
+				<Device ID="0x0343" />
+				<Device ID="0x0344" />
+				<Device ID="0x0345" />
+				<Device ID="0x0347" />
+				<Device ID="0x0348" />
+				<Device ID="0x0349" />
+				<Device ID="0x034B" />
+				<Device ID="0x034C" />
+				<Device ID="0x034E" />
+				<Device ID="0x034F" />
+				<Device ID="0x038B" />
+				<Device ID="0x0390" />
+				<Device ID="0x0391" />
+				<Device ID="0x0392" />
+				<Device ID="0x0393" />
+				<Device ID="0x0394" />
+				<Device ID="0x0395" />
+				<Device ID="0x0398" />
+				<Device ID="0x039E" />
+				<Device ID="0x03D0" />
+				<Device ID="0x03D1" />
+				<Device ID="0x03D2" />
+				<Device ID="0x03D5" />
+				<Device ID="0x0400" />
+				<Device ID="0x0401" />
+				<Device ID="0x0402" />
+				<Device ID="0x0403" />
+				<Device ID="0x0404" />
+				<Device ID="0x0406" />
+				<Device ID="0x0407" />
+				<Device ID="0x040C" />
+				<Device ID="0x040E" />
+				<Device ID="0x040F" />
+				<Device ID="0x0420" />
+				<Device ID="0x0422" />
+				<Device ID="0x0423" />
+				<Device ID="0x0424" />
+				<Device ID="0x0425" />
+				<Device ID="0x0426" />
+				<Device ID="0x0427" />
+				<Device ID="0x0428" />
+				<Device ID="0x0429" />
+				<Device ID="0x042B" />
+				<Device ID="0x042C" />
+				<Device ID="0x042D" />
+				<Device ID="0x042F" />
+				<Device ID="0x0531" />
+				<Device ID="0x053A" />
+				<Device ID="0x053B" />
+				<Device ID="0x053E" />
+				<Device ID="0x0533" />
+				<Device ID="0x05E6" />
+				<Device ID="0x05E7" />
+				<Device ID="0x05F8" />
+				<Device ID="0x05F9" />
+				<Device ID="0x05FD" />
+				<Device ID="0x05FE" />
+				<Device ID="0x0619" />
+				<Device ID="0x061A" />
+				<Device ID="0x061B" />
+				<Device ID="0x0642" />
+				<Device ID="0x065C" />
+				<Device ID="0x06E0" />
+				<Device ID="0x06E1" />
+				<Device ID="0x06E2" />
+				<Device ID="0x06E3" />
+				<Device ID="0x06E4" />
+				<Device ID="0x06E7" />
+				<Device ID="0x06E9" />
+				<Device ID="0x06EA" />
+				<Device ID="0x06EB" />
+				<Device ID="0x07E0" />
+				<Device ID="0x07E1" />
+				<Device ID="0x07E2" />
+				<Device ID="0x07E3" />
+				<Device ID="0x07E5" />
+				<Device ID="0x0848" />
+				<Device ID="0x0849" />
+				<Device ID="0x084B" />
+				<Device ID="0x084F" />
+				<Device ID="0x086F" />
+				<Device ID="0x1112" />
+				<Device ID="0x9876" />
+			</Detail>
+			<Detail Level="Low">
+				<Device ID="0x0090" />
+				<Device ID="0x0091" />
+				<Device ID="0x0092" />
+				<Device ID="0x0095" />
+				<Device ID="0x0193" />
+				<Device ID="0x019D" />
+				<Device ID="0x0290" />
+				<Device ID="0x0291" />
+				<Device ID="0x0292" />
+				<Device ID="0x0293" />
+				<Device ID="0x0294" />
+				<Device ID="0x0295" />
+				<Device ID="0x029C" />
+				<Device ID="0x029D" />
+				<Device ID="0x029E" />
+				<Device ID="0x029F" />
+				<Device ID="0x02E3" />
+				<Device ID="0x02E4" />
+				<Device ID="0x0405" />
+				<Device ID="0x0421" />
+				<Device ID="0x0600" />
+				<Device ID="0x0602" />
+				<Device ID="0x0606" />
+				<Device ID="0x060D" />
+				<Device ID="0x0610" />
+				<Device ID="0x0623" />
+				<Device ID="0x0625" />
+				<Device ID="0x062D" />
+				<Device ID="0x062E" />
+				<Device ID="0x0637" />
+				<Device ID="0x0638" />
+				<Device ID="0x0643" />
+				<Device ID="0x0646" />
+				<Device ID="0x0648" />
+				<Device ID="0x0649" />
+				<Device ID="0x064A" />
+				<Device ID="0x0652" />
+				<Device ID="0x06DD" />
+				<Device ID="0x06E6" />
+				<Device ID="0x06EF" />
+				<Device ID="0x0860" />
+				<Device ID="0x0861" />
+				<Device ID="0x0863" />
+				<Device ID="0x0864" />
+				<Device ID="0x0865" />
+				<Device ID="0x086A" />
+				<Device ID="0x086C" />
+				<Device ID="0x086D" />
+				<Device ID="0x0871" />
+				<Device ID="0x087A" />
+				<Device ID="0x0A75" />
+			</Detail>
+			<Detail Level="Medium">
+				<Device ID="0x0191" />
+				<Device ID="0x0194" />
+				<Device ID="0x040A" />
+				<Device ID="0x05E2" />
+				<Device ID="0x0601" />
+				<Device ID="0x0604" />
+				<Device ID="0x0605" />
+				<Device ID="0x0608" />
+				<Device ID="0x060B" />
+				<Device ID="0x0611" />
+				<Device ID="0x0612" />
+				<Device ID="0x0613" />
+				<Device ID="0x0614" />
+				<Device ID="0x0615" />
+				<Device ID="0x0622" />
+				<Device ID="0x062C" />
+				<Device ID="0x0640" />
+				<Device ID="0x0641" />
+				<Device ID="0x0644" />
+				<Device ID="0x0645" />
+				<Device ID="0x06F8" />
+				<Device ID="0x06F9" />
+				<Device ID="0x06FA" />
+				<Device ID="0x06FD" />
+				<Device ID="0x0A22" />
+				<Device ID="0x0A65" />
+				<Device ID="0x0CA3" />
+			</Detail>
+			<Detail Level="High">
+				<Device ID="0x05E0" />
+				<Device ID="0x05E1" />
+				<Device ID="0x05E3" />
+				<Device ID="0x0658" />
+				<Device ID="0x0DCD" />
+				<Device ID="0x0DF5" />
+			</Detail>
+			<Detail Level="Highest">
+				<Device ID="0x06C0" />
+				<Device ID="0x06C4" />
+				<Device ID="0x06CD" />
+				<Device ID="0x0DC4" />
+				<Device ID="0x0E22" />
+			</Detail>
+		</Vendor>
+		
+		<!-- AMD/ATI -->
+		<Vendor ID="0x1002">
+			<Detail Level="Lowest">
+			</Detail>
+			<Detail Level="Low">
+				<Device ID="0x9513" />
+				<Device ID="0x944A" />
+				<Device ID="0x944B" />
+				<Device ID="0x945A" />
+				<Device ID="0x9480" />
+				<Device ID="0x9488" />
+				<Device ID="0x94A0" />
+				<Device ID="0x94A1" />
+				<Device ID="0x958F" />
+				<Device ID="0x9590" />
+				<Device ID="0x9593" />
+				<Device ID="0x9595" />
+				<Device ID="0x9597" />
+				<Device ID="0x9598" />
+				<Device ID="0x959B" />
+				<Device ID="0x9712" />
+				<Device ID="0x9713" />
+			</Detail>
+			<Detail Level="Medium">
+				<Device ID="0x68A0" />
+				<Device ID="0x68A1" />
+				<Device ID="0x68B0" />
+				<Device ID="0x944E" />
+				<Device ID="0x9460" />
+				<Device ID="0x9462" />
+				<Device ID="0x9490" />
+				<Device ID="0x94B3" />
+				<Device ID="0x94B4" />
+				<Device ID="0x94B5" />
+				<Device ID="0x9501" />
+				<Device ID="0x9505" />
+				<Device ID="0x9515" />
+				<Device ID="0x950F" />
+				<Device ID="0x9540" />
+				<Device ID="0x9555" />
+			</Detail>
+			<Detail Level="High">
+				<Device ID="0x68B8" />
+				<Device ID="0x68BE" />
+				<Device ID="0x9441" />
+				<Device ID="0x9442" />
+				<Device ID="0x9443" />
+				<Device ID="0x944C" />
+
+				<Device ID="0x6898" />
+				<Device ID="0x6899" />
+				<Device ID="0x689C" />
+				<Device ID="0x68f9" />
+			</Detail>
+			<Detail Level="Highest">
+				<Device ID="0x6719" />
+			</Detail>
+		</Vendor>
+		
+		<!-- Intel -->
+		<Vendor ID="0x8086">
+			<Detail Level="Lowest">
+				<Device ID="0x2582" Type="Intel(R) 82915G/GV/910GL Express Chipset Family" />
+				<Device ID="0x2782" Type="Intel(R) 82915G/GV/910GL Express Chipset Family" />
+				<Device ID="0x2592" Type="Mobile Intel(R) 82915GM/GMS, 910GML Express Chipset Family" />
+				<Device ID="0x2792" Type="Mobile Intel(R) 82915GM/GMS, 910GML Express Chipset Family" />
+				<Device ID="0x2772" Type="Intel(R) 82945G Express Chipset Family" />
+				<Device ID="0x2776" Type="Intel(R) 82945G Express Chipset Family" />
+				<Device ID="0x27A2" Type="Mobile Intel(R) 945GM Express Chipset Family" />
+				<Device ID="0x27A6" Type="Mobile Intel(R) 945GM Express Chipset Family" />
+				<Device ID="0x2972" Type="Intel(R) 946GZ Express Chipset Family" />
+				<Device ID="0x2973" Type="Intel(R) 946GZ Express Chipset Family" />
+				<Device ID="0x2992" Type="Intel(R) Q965/Q963 Express Chipset Family" />
+				<Device ID="0x2993" Type="Intel(R) Q965/Q963 Express Chipset Family" />
+				<Device ID="0x29B2" Type="Intel(R) Q35 Express Chipset Family" />
+				<Device ID="0x29B3" Type="Intel(R) Q35 Express Chipset Family" />
+				<Device ID="0x29C2" Type="Intel(R) G33/G31 Express Chipset Family" />
+				<Device ID="0x29C3" Type="Intel(R) G33/G31 Express Chipset Family" />
+				<Device ID="0x29D2" Type="Intel(R) Q33 Express Chipset Family" />
+				<Device ID="0x29D3" Type="Intel(R) Q33 Express Chipset Family" />
+				<Device ID="0xA001" Type="Intel(R) NetTop Atom D410 (GMA 3150)" />
+				<Device ID="0xA002" Type="Intel(R) NetTop Atom D510 (GMA 3150)" />
+				<Device ID="0xA011" Type="Intel(R) NetBook Atom N4x0 (GMA 3150)" />
+				<Device ID="0xA012" Type="Intel(R) NetBook Atom N4x0 (GMA 3150)" />
+				<Device ID="0x29A2" Type="Intel(R) G965 Express Chipset Family" />
+				<Device ID="0x29A3" Type="Intel(R) G965 Express Chipset Family" />
+				<Device ID="0x8108" Type="Intel(R) GMA 500 (Poulsbo) on MID platforms" />
+				<Device ID="0x8109" Type="Intel(R) GMA 500 (Poulsbo) on MID platforms" />
+				<Device ID="0x2982" Type="Intel(R) G35 Express Chipset Family" />
+				<Device ID="0x2983" Type="Intel(R) G35 Express Chipset Family" />
+				<Device ID="0x2A02" Type="Mobile Intel(R) 965 Express Chipset Family" />
+				<Device ID="0x2A03" Type="Mobile Intel(R) 965 Express Chipset Family" />
+				<Device ID="0x2A12" Type="Mobile Intel(R) 965 Express Chipset Family" />
+				<Device ID="0x2A13" Type="Mobile Intel(R) 965 Express Chipset Family" />
+				<Device ID="0x2A42" Type="Mobile Intel(R) 4 Series Express Chipset Family" />
+				<Device ID="0x2A43" Type="Mobile Intel(R) 4 Series Express Chipset Family" />
+				<Device ID="0x2E02" Type="Intel(R) 4 Series Express Chipset" />
+				<Device ID="0x2E03" Type="Intel(R) 4 Series Express Chipset" />
+				<Device ID="0x2E22" Type="Intel(R) G45/G43 Express Chipset" />
+				<Device ID="0x2E23" Type="Intel(R) G45/G43 Express Chipset" />
+				<Device ID="0x2E12" Type="Intel(R) Q45/Q43 Express Chipset" />
+				<Device ID="0x2E13" Type="Intel(R) Q45/Q43 Express Chipset" />
+				<Device ID="0x2E32" Type="Intel(R) G41 Express Chipset" />
+				<Device ID="0x2E33" Type="Intel(R) G41 Express Chipset" />
+				<Device ID="0x2E42" Type="Intel(R) B43 Express Chipset" />
+				<Device ID="0x2E43" Type="Intel(R) B43 Express Chipset" />
+				<Device ID="0x2E92" Type="Intel(R) B43 Express Chipset" />
+				<Device ID="0x2E93" Type="Intel(R) B43 Express Chipset" />
+				<Device ID="0x0046" Type="Intel(R) HD Graphics - Core i3/i5/i7 Mobile Processors" />
+				<Device ID="0x0042" Type="Intel(R) HD Graphics - Core i3/i5 + Pentium G9650 Processors" />
+			</Detail>
+			<Detail Level="Low">
+				<Device ID="0x0106" Type="Mobile SandyBridge GT1" />
+				<Device ID="0x0102" Type="Desktop SandyBridge GT1" />
+				<Device ID="0x010A" Type="SandyBridge Server" />
+			</Detail>
+			<Detail Level="Medium">
+				<Device ID="0x0112" Type="Desktop SandyBridge GT2" />
+				<Device ID="0x0122" Type="Desktop SandyBridge GT2+" />
+				<Device ID="0x0116" Type="Mobile SandyBridge GT2" />
+				<Device ID="0x0126" Type="Mobile SandyBrdige GT2+" />
+			</Detail>
+			<Detail Level="High">
+			</Detail>
+			<Detail Level="Highest">
+			</Detail>
+		</Vendor>
+	</VendorDeviceCombos>
+	
+	<!-- Main search strings. Format is <Device><SearchKey /><Detail /></Device> -->
+	<MainNames>
+		<Device>
+			<SearchKey>ATI Radeon HD 5900 Series</SearchKey>
+			<Detail>Highest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>ATI Radeon HD 5800 Series</SearchKey>
+			<Detail>Highest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>ATI Radeon HD 5700 Series</SearchKey>
+			<Detail>Highest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>ATI Radeon HD 4800 Series</SearchKey>
+			<Detail>High</Detail>
+		</Device>
+		<Device>
+			<SearchKey>RADEON X850 Series</SearchKey>
+			<Detail>Lowest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce 7800 GTX</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>Radeon X1950 Pro</SearchKey>
+			<Detail>Lowest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce 7800 GT</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce 6800</SearchKey>
+			<Detail>Lowest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>Radeon X1300/X1550 Series</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>ATI Radeon HD 2600 XT</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>ATI Radeon HD 3600 Series</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce 8600 GTS</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce 8800 GTS 512</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce 8800 GTX</SearchKey>
+			<Detail>Medium</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce 9600 GT</SearchKey>
+			<Detail>Medium</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce 9800</SearchKey>
+			<Detail>Medium</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce GTX 260</SearchKey>
+			<Detail>High</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce GTX 280</SearchKey>
+			<Detail>High</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce GTX 290</SearchKey>
+			<Detail>High</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce GTX 470</SearchKey>
+			<Detail>Highest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>NVIDIA GeForce GTX 480</SearchKey>
+			<Detail>Highest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>ATI Radeon HD 2400 PRO</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>ATI Radeon HD 3400 Series</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>ATI Radeon HD 3870</SearchKey>
+			<Detail>Medium</Detail>
+		</Device>
+	</MainNames>
+	<![CDATA[test<test>]]>
+	<!-- Substring searches. Format is <Device><SearchKey /><Detail /></Device> -->
+	<Heuristics>
+		<Device>
+			<SearchKey>5900</SearchKey>
+			<Detail>Highest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>5800</SearchKey>
+			<Detail>Highest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>5700</SearchKey>
+			<Detail>Highest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>4800</SearchKey>
+			<Detail>Highest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>X850</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>X800</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>X700</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>X600</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>7800</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>7900</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>X1950</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>X1800</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>X1300</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>X1400</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>X1550</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>2400</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>2600</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>3400</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>3600</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>3870</SearchKey>
+			<Detail>Medium</Detail>
+		</Device>
+		<Device>
+			<SearchKey>8600</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>8800</SearchKey>
+			<Detail>Medium</Detail>
+		</Device>
+		<Device>
+			<SearchKey>9600</SearchKey>
+			<Detail>Medium</Detail>
+		</Device>
+		<Device>
+			<SearchKey>6600</SearchKey>
+			<Detail>Lowest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>6800</SearchKey>
+			<Detail>Lowest</Detail>
+		</Device>
+		<Device>
+			<SearchKey>7300</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+		<Device>
+			<SearchKey>8600</SearchKey>
+			<Detail>Low</Detail>
+		</Device>
+	</Heuristics>
+</DeviceList>
+
