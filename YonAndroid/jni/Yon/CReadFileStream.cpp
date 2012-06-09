@@ -1,5 +1,5 @@
 #include "CReadFileStream.h"
-
+#include <memory.h>
 #include "ILogger.h"
 
 namespace yon{
@@ -52,12 +52,19 @@ namespace io{
 			return ;
 		}
 		if(m_endianMode==ENUM_ENDIAN_MODE_LITTLE){
-			fread(data, 1, sizeToRead, m_pFile);
+			s32 n=fread(data, 1, sizeToRead, m_pFile);
+			if(n==0)
+				memset(data,0x0,sizeToRead);
 		}else{
 			u8 temp[8];
-			fread(temp, 1, sizeToRead, m_pFile);
-			for(u32 i=0;i<sizeToRead;++i){
-				((u8*)data)[sizeToRead-1-i]=temp[i];
+			s32 n=fread(temp, 1, sizeToRead, m_pFile);
+			if(n==0)
+				memset(data,0x0,sizeToRead);
+			else
+			{
+				for(u32 i=0;i<sizeToRead;++i){
+					((u8*)data)[sizeToRead-1-i]=temp[i];
+				}
 			}
 		}
 	}

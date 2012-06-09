@@ -33,19 +33,8 @@ namespace io{
 		core::array<core::string<char_type>> m_specialCharacters;	// see createSpecialCharacterList()
 		core::array<SAttribute> m_attributes;						// attributes of current element
 
-		/*
-		char_type* TextData;         // data block of the text file
-		char_type* P;                // current point in text to parse
-		char_type* TextBegin;        // start of text to parse
-		unsigned int TextSize;       // size of text to parse in characters, not bytes
+		//bool IsEmptyElement;       // is the currently parsed node empty?
 
-		core::string<char_type> NodeName;    // name of the node currently in
-		core::string<char_type> EmptyString; // empty string to be returned by getSafe() methods
-
-		bool IsEmptyElement;       // is the currently parsed node empty?
-
-		
-		*/
 		// finds a current attribute by name, returns 0 if not found
 		const SAttribute* getAttributeByName(const char_type* name) const
 		{
@@ -102,8 +91,8 @@ namespace io{
 		//trim the stream from start to end,if the result is not null return true,or return false
 		inline bool trim(u32 start,u32 end)
 		{
-			if(end<=start)
-				return false;
+			YON_DEBUG_BREAK_IF(end<=start);
+			u32 origin=m_pStream->getPos();
 			m_pStream->seek(start);
 			char_type c;
 			do{
@@ -111,7 +100,15 @@ namespace io{
 			}while(isWhiteSpace(c));
 			if(m_pStream->getPos()==end)
 				return false;
-			//TODO
+
+			// set current text to the parsed text, and replace xml special characters
+			core::string<char_type> s;
+			readString(s,start-1,end);
+			m_nodeName = replaceSpecialCharacters(s);
+			// current XML node type is text
+			m_currentNodeType=ENUM_XML_NODE_TEXT;
+
+			m_pStream->seek(origin-1);
 			return true;
 		}
 
@@ -121,69 +118,34 @@ namespace io{
 			m_currentNodeType = ENUM_XML_NODE_UNKNOWN;
 
 			// move until end marked with '>' reached
-			while(readNext() != L'>');
+			char_type c;
+			do{
+				c=readNext();
+			}while(c!= L'>');
 		}
 
 		// Reads the current xml node
 		// return false if no further node is found
 		bool parseCurrentNode()
 		{
-#if 0
-			char_type* start = P;
-
-			// more forward until '<' found
-			while(*P != L'<' && *P)
-				++P;
-
-			// not a node, so return false
-			if (!*P)
-				return false;
-
-			if (P - start > 0)
-			{
-				// we found some text, store it
-				if (setText(start, P))
-					return true;
-			}
-
-			++P;
-
-			// based on current token, parse and report next element
-			switch(*P)
-			{
-			case L'/':
-				parseClosingXMLElement(); 
-				break;
-			case L'?':
-				ignoreDefinition();	
-				break;
-			case L'!':
-				if (!parseCDATA())
-					parseComment();	
-				break;
-			default:
-				parseOpeningXMLElement();
-				break;
-			}
-			return true;
-#endif
 			u32 start=m_pStream->getPos();
-			char_type c;
-			wchar_t t=L'<';
-			while((c=readNext())!=L'<'&&!reachEnd());
-			if(reachEnd())
+			char_type c=0;
+			do{
+				c=readNext();
+			}while(c!=L'<'&&c);
+
+			if(!c)
 				return false;
 			u32 end=m_pStream->getPos();
-			if(trim(start,end)){
-				Logger->debug("trim:true\n");
+			if(end-start>2&&trim(start,end)){
+				Logger->debug("text:%s\n",m_nodeName.c_str());
 				return true;
 			}
 			switch(readNext())
 			{
 			case L'/':
-				Logger->debug("end\n");
 				parseClosingXMLElement();
-				Logger->debug("<%s>\n",m_nodeName.c_str());
+				Logger->debug("</%s>\n",m_nodeName.c_str());
 				break;
 			case L'?':
 				Logger->debug("header->ignore\n");
@@ -199,12 +161,14 @@ namespace io{
 				break;
 			default:
 				{
-					Logger->debug("common:\n");
 					parseOpeningXMLElement();
-					Logger->debug("<%s>(%d)\n",m_nodeName.c_str(),m_attributes.size());
+					core::string<char_type> str;
 					for(u32 i=0;i<m_attributes.size();++i)
-						Logger->debug("%s:%s",m_attributes[i].Name.c_str(),m_attributes[i].Value.c_str());
-					Logger->debug("\n");
+						if(i<m_attributes.size()-1)
+							str+=core::string<char_type>("%s:%s,",m_attributes[i].Name.c_str(),m_attributes[i].Value.c_str());
+						else
+							str+=core::string<char_type>("%s:%s",m_attributes[i].Name.c_str(),m_attributes[i].Value.c_str());
+					Logger->debug("<%s>(%d):%s\n",m_nodeName.c_str(),m_attributes.size(),str.c_str());
 					break;
 				}
 			}
@@ -214,14 +178,9 @@ namespace io{
 		//! parses a comment
 		void parseComment()
 		{
-			//CurrentNodeType = EXN_COMMENT;
-			//P += 1;
 			m_currentNodeType = ENUM_XML_NODE_COMMENT;
-
-			//char_type *pCommentBegin = P;
 			u32 commentStart=m_pStream->getPos()+1;
 
-			//int count = 1;
 			char_type c;
 			s32 count = 1;
 
@@ -235,29 +194,11 @@ namespace io{
 
 			u32 commentEnd=m_pStream->getPos()-2;
 			readString(m_nodeName,commentStart,commentEnd);
-
-			// move until end of comment reached
-// 			while(count)
-// 			{
-// 				if (*P == L'>')
-// 					--count;
-// 				else
-// 					if (*P == L'<')
-// 						++count;
-// 
-// 				++P;
-// 			}
-
-			//P -= 3;
-			//NodeName = core::string<char_type>(pCommentBegin+2, (int)(P - pCommentBegin-2));
-			//P += 3;
 		}
 
 		//! parses a possible CDATA section, returns false if begin was not a CDATA section
 		bool parseCDATA()
 		{
-			//if (*(P+1) != L'[')
-			//	return false;
 			char_type c=readNext();
 			if(c!=L'[')
 				return false;
@@ -285,42 +226,6 @@ namespace io{
 			else
 				m_nodeName="";
 
-
-			/*
-			CurrentNodeType = EXN_CDATA;
-
-			// skip '<![CDATA['
-			int count=0;
-			while( *P && count<8 )
-			{
-				++P;
-				++count;
-			}
-
-			if (!*P)
-				return true;
-
-			char_type *cDataBegin = P;
-			char_type *cDataEnd = 0;
-
-			// find end of CDATA
-			while(*P && !cDataEnd)
-			{
-				if (*P == L'>' && 
-					(*(P-1) == L']') &&
-					(*(P-2) == L']'))
-				{
-					cDataEnd = P - 2;
-				}
-
-				++P;
-			}
-
-			if ( cDataEnd )
-				NodeName = core::string<char_type>(cDataBegin, (int)(cDataEnd - cDataBegin));
-			else
-				NodeName = "";
-			*/
 			return true;
 		}
 
@@ -331,19 +236,13 @@ namespace io{
 			//IsEmptyElement = false;
 			m_attributes.clear();
 
-			//++P;
-			//const char_type* pBeginClose = P;
 			u32 nameStart=m_pStream->getPos();
 			char_type c;
 
-			//while(*P != L'>')
-			//	++P;
 			do{
 				c=readNext();
 			}while(c!=L'>');
 
-			//NodeName = core::string<char_type>(pBeginClose, (int)(P - pBeginClose));
-			//++P;
 			u32 nameEnd=m_pStream->getPos();
 			readString(m_nodeName,nameStart,nameEnd);
 		}
@@ -443,6 +342,7 @@ namespace io{
 
 			//NodeName = core::string<char_type>(startName, (int)(endName - startName));
 			//++P;
+			readNext();
 			readString(m_nodeName,nameStart,nameEnd);
 		}
 
@@ -536,17 +436,9 @@ namespace io{
 			: m_pStream(stream), //TextData(0), P(0), TextBegin(0), TextSize(0),SourceFormat(ENUM_ENCODING_ASCII),
 			m_currentNodeType(ENUM_XML_NODE_NONE),m_iSizeOfCharType(sizeof(char_type))
 		{
-			// read whole xml file
-			//readFile(stream);
-
-			// clean up
-			//if (deleteStream)
-			//	delete stream;
-
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CXMLReaderImpl");
-
 			if(!stream||stream->pointer()==NULL){
 				m_pStream=NULL;
+				Logger->debug(YON_LOG_WARN_FORMAT,"Instance empty CXMLReaderImpl");
 				return;
 			}
 
@@ -555,15 +447,13 @@ namespace io{
 
 			stream->grab();
 
-			// set pointer to text begin
-			//P = TextBegin;
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance CXMLReaderImpl");
 		}
 
 		virtual ~CXMLReaderImpl()
 		{
 			if(m_pStream)
 				m_pStream->drop();
-			//delete [] TextData;
 			Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CXMLReaderImpl");
 		}
 
@@ -572,14 +462,6 @@ namespace io{
 		//! \return Returns false, if there was no further node. 
 		virtual bool read()
 		{
-#if 0
-			// if not end reached, parse the node
-			if (P && (unsigned int)(P - TextBegin) < TextSize - 1 && *P != 0)
-			{
-				return parseCurrentNode();
-			}
-			return false;
-#endif
 			if(!m_pStream||reachEnd())
 				return false;
 			return parseCurrentNode();
