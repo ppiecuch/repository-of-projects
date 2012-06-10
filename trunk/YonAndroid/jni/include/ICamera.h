@@ -54,7 +54,7 @@ namespace yon{
 					}
 
 				void setNeedUpload(){
-						m_bNeedUpload=true;
+					m_bNeedUpload=true;
 				}
 
 				virtual void onResize(const core::dimension2du& size) = 0;

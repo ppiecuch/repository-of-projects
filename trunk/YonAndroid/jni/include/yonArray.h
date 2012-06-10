@@ -142,6 +142,7 @@ namespace core{
 			return binary_search(element, 0, used-1);
 		}
 
+		//由小到大进行排序
 		void sort()
 		{
 			if (!is_sorted && used>1)

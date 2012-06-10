@@ -32,6 +32,12 @@ namespace yon{
 			virtual const core::vector3df& getPosition() const{
 				return m_position;
 			}
+			//! Gets the absolute position of the node in world coordinates.
+			virtual core::vector3df getAbsolutePosition()
+			{
+				//return AbsoluteTransformation.getTranslation();
+				return getAbsoluteTransformation().getTranslation();
+			}
 
 			virtual void setRotation(const core::vector3df& rotation){
 				m_rotation=rotation;

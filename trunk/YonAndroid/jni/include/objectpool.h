@@ -59,7 +59,11 @@ namespace core{
 		virtual u32 getCapacity() const {return m_uCapacity;}
 		virtual void clear(){
 			u32 count=getSize();
-			core::list<Element*>::Iterator it=m_pool.begin();
+			//This because std::vector<A<T> *> is dependent on the template parameter (T) of the class template (A). 
+			//To enable correct parsing of the template without having to make any assumptions about possible specializations of any other templates, 
+			//the language rules require you to indicate which dependent names denote types by using the typename keyword.
+			//reference: http://stackoverflow.com/questions/2841757/c-template-is-not-derived-from-type
+			typename core::list<Element*>::Iterator it=m_pool.begin();
 			while(it!=m_pool.end()){
 				delete *it;
 				++it;

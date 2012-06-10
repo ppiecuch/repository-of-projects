@@ -189,6 +189,9 @@ namespace yon{
 			inline void setTranslation( const vector3d<T>& v){
 				setTranslation(v.x,v.y,v.z);
 			}
+			inline vector3d<T> getTranslation() const{
+				return vector3d<T>(m[3][0],m[3][1],m[3][2]);
+			}
 			/*inline void setTranslation(const vector3d<T>& translation){
 				m[3][0]=translation.x;
 				m[3][1]=translation.y;

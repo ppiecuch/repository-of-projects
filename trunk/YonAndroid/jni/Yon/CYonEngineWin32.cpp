@@ -5,7 +5,7 @@
 #include "CYonEngineWin32.h"
 #include "CGraphicsAdapter.h"
 #include "CRandomizer.h"
-
+#include "yonList.h"
 #include "ILogger.h"
 
 namespace yon{
