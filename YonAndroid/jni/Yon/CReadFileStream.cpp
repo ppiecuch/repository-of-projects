@@ -1,5 +1,8 @@
 #include "CReadFileStream.h"
 #include <memory.h>
+#ifdef YON_COMPILE_WITH_ANDROID
+#include <string.h> //for memset
+#endif
 #include "ILogger.h"
 
 namespace yon{

@@ -86,6 +86,11 @@ namespace ogles1{
 				}
 			}
 
+			if(isTransparent(current->getMaterialType()))
+				glDepthMask(false);
+			else
+				glDepthMask(true);
+
 			//设置过滤方式和环绕方式
 			GLint mag_filter;
 			GLint min_filter;

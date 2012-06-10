@@ -134,6 +134,20 @@ namespace video{
 		}
 	}
 
+	inline bool isTransparent(ENUM_MATERIAL_TYPE type)
+	{
+		switch(type)
+		{
+		case ENUM_MATERIAL_TYPE_BLEND:
+		case ENUM_MATERIAL_TYPE_TRANSPARENT:
+		case ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR:
+		case ENUM_MATERIAL_TYPE_MASK:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	class IMaterial : public virtual core::IReferencable{
 	public:
 

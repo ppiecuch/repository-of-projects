@@ -3,7 +3,7 @@
 
 #include "IRenderable.h"
 #include "IGeometryFactory.h"
-#include "IModel.h"
+//#include "IModel.h"
 #include "dimension2d.h"
 #include "ICamera.h"
 #include "IEventReceiver.h"
@@ -11,6 +11,30 @@
 
 namespace yon{
 	namespace scene{
+
+		//! Enumeration for render passes.
+		enum ENUM_SCENE_PASS
+		{
+			//! Camera pass. The active view is set up here. The very first pass.
+			//ENUM_SCENE_PASS_CAMERA =0,
+			//! No pass currently active
+			ENUM_SCENE_PASS_NONE = 0,
+
+			//! Solid scene models
+			ENUM_SCENE_PASS_SOLID,
+
+			//! Transparent scene models
+			ENUM_SCENE_PASS_TRANSPARENT,
+
+			//! Transparent effect scene models
+			ENUM_SCENE_PASS_EFFECT,
+
+			ENUM_SCENE_PASS_AUTOMATIC,
+
+			ENUM_SCENE_PASS_COUNT
+		};
+
+		class IModel;
 
 		class ISceneManager : public virtual core::IRenderable{
 		public:
@@ -30,10 +54,24 @@ namespace yon{
 
 			virtual animator::IAnimatorFactory* getAnimatorFactory() const = 0;
 
+			//! Registers a model for rendering it at a specific time.
+			//return the model will be render(passed culling)
+			virtual bool registerForRender(IModel* model,ENUM_SCENE_PASS pass=ENUM_SCENE_PASS_AUTOMATIC) = 0;
+
+			//! Get current render pass.
+			virtual ENUM_SCENE_PASS getRenderingPass() const = 0;
+
 			//TODO protected
 			virtual void onResize(const core::dimension2du& size) = 0;
 
 			virtual bool postEventFromUser(const event::SEvent& evt) = 0;
+
+			//! Check if node is culled in current view frustum
+			// return True if node is not visible in the current scene, else false.
+			virtual bool isCulled(const IModel* model) const{
+				//TODO ¡Ÿ ±
+				return false;
+			}
 		};
 
 	}//scene

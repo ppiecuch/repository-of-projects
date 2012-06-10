@@ -106,7 +106,7 @@ int CYonExampleSDIView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	geometryFty=sceneMgr->getGeometryFactory();
 
-	camera=sceneMgr->addCamera(core::vector3df(0,0,300));
+	camera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
 	animatorFty=sceneMgr->getAnimatorFactory();
 
 	IMaterial* material;
@@ -240,7 +240,7 @@ void CYonExampleSDIView::OnPaint()
 
 		sceneMgr->render(driver);
 
-		Logger->drawString(core::stringc("FPS:%d",driver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+		Logger->drawString(driver,core::stringc("FPS:%d",driver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 		driver->end();
 	}

@@ -12,7 +12,7 @@ namespace scene{
 	CSceneManager::CSceneManager()
 		:m_geometryFactory(new CGeometryFactory()),
 		m_pAnimatorFactory(animator::createAnimatorFactory()),
-		m_activeCamera(NULL),
+		m_activeCamera(NULL),m_renderingPass(ENUM_SCENE_PASS_NONE),m_cameraPosition(core::ORIGIN_VECTOR3DF),
 		IModel(NULL){
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance CSceneManager");
 	}
@@ -67,16 +67,138 @@ namespace scene{
 		m_activeCamera=camera;
 	}
 
+	bool CSceneManager::registerForRender(IModel* model,ENUM_SCENE_PASS pass){
+		switch(pass)
+		{
+		case ENUM_SCENE_PASS_SOLID:
+			if (!isCulled(model))
+			{
+				m_solids.push_back(model);
+				return true;
+			}
+			break;
+		case ENUM_SCENE_PASS_TRANSPARENT:
+			if (!isCulled(model))
+			{
+				TransparentModelEntry t(model, m_cameraPosition);
+				m_transparents.push_back(t);
+				return true;
+			}
+			break;
+		case ENUM_SCENE_PASS_EFFECT:
+			if (!isCulled(model))
+			{
+				TransparentModelEntry t(model, m_cameraPosition);
+				m_effects.push_back(t);
+				return true;
+			}
+			break;
+		case ENUM_SCENE_PASS_AUTOMATIC:
+			if (!isCulled(model))
+			{
+				IEntity* entity=model->getEntity();
+				const u32 count=entity->getUnitCount();
+				bool transparent=false;
+				bool solid=false;
+				for (u32 i=0; i<count; ++i)
+				{
+					if(isTransparent(entity->getUnit(i)->getMaterial()->getMaterialType()))
+						transparent=true;
+					else
+						solid=true;
+
+					if(transparent&&solid)
+						break;
+				}
+				if(transparent)
+				{
+					// register as transparent node
+					TransparentModelEntry t(model, m_cameraPosition);
+					m_transparents.push_back(t);
+				}
+				if(solid)
+				{
+					DefaultModelEntry d(model);
+					m_solids.push_back(d);
+				}
+				return true;
+			}
+			break;
+		case ENUM_SCENE_PASS_NONE: //ignore
+			break;
+		}
+		return false;
+	}
+
+	void CSceneManager::onRegisterForRender(ISceneManager* manager){
+		if (m_bVisible)
+		{
+			core::list<IModel*>::Iterator it = m_children.begin();
+			for (; it != m_children.end(); ++it)
+				(*it)->onRegisterForRender(manager);
+		}
+	}
+
 	void CSceneManager::render(video::IVideoDriver* driver){
 		YON_DEBUG_BREAK_IF(m_activeCamera==NULL);
 
-		m_activeCamera->render(driver);
+		// do animations and other stuff.
+		//onAnimate(time);
+		u32 i;
 
-		core::list<IModel*>::Iterator it = m_children.begin();
-		for (; it != m_children.end(); ++it)
+		m_activeCamera->render(driver);
+		m_cameraPosition=m_activeCamera->getAbsolutePosition();
+
+		//core::list<IModel*>::Iterator it = m_children.begin();
+		//for (; it != m_children.end(); ++it)
+		//{
+		//	(*it)->render(driver);
+		//}
+
+		// let all nodes register themselves
+		onRegisterForRender(this);
+
+
+		// render default objects
 		{
-			(*it)->render(driver);
+			m_renderingPass=ENUM_SCENE_PASS_SOLID;
+
+			m_solids.sort(); // sort by textures
+
+			for (i=0; i<m_solids.size(); ++i)
+				m_solids[i].m_pModel->render(driver);
+
+			m_solids.set_used(0);
 		}
+
+		//TODO render shadows
+
+		// render transparent objects.
+		{
+			m_renderingPass=ENUM_SCENE_PASS_TRANSPARENT;
+
+			m_transparents.sort(); // sort by distance from camera
+
+			for (i=0; i<m_transparents.size(); ++i)
+				m_transparents[i].m_pModel->render(driver);
+
+			m_transparents.set_used(0);
+		}
+
+		// render transparent effect objects.
+		{
+			m_renderingPass=ENUM_SCENE_PASS_EFFECT;
+
+			m_effects.sort(); // sort by distance from camera
+
+			for (i=0; i<m_effects.size(); ++i)
+				m_effects[i].m_pModel->render(driver);
+
+			m_effects.set_used(0);
+		}
+
+		m_renderingPass=ENUM_SCENE_PASS_NONE;
+
 	}
 
 	void CSceneManager::onResize(const core::dimension2du& size){

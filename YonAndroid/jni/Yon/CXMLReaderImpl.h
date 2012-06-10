@@ -30,7 +30,15 @@ namespace io{
 		core::string<char_type> m_nodeName;							// name of the node currently in
 		core::string<char_type> m_emptyString;						// empty string to be returned by getSafe() methods
 
-		core::array<core::string<char_type>> m_specialCharacters;	// see createSpecialCharacterList()
+		//When you declare your vector, 
+		//typedef vector<pair<T,T>> stacktype;
+		//some compilers will choke with the <pair<T,T>> part because it wants it the have a space between the two >. 
+		//For example:
+		//typedef vector<pair<T,T> > stacktype;
+		//instead of 
+		//typedef vector<pair<T,T>> stacktype;
+		//reference: http://www.velocityreviews.com/forums/t602903-problem-with-vector-pair-type-type.html
+		core::array<core::string<char_type> > m_specialCharacters;	// see createSpecialCharacterList()
 		core::array<SAttribute> m_attributes;						// attributes of current element
 
 		//bool IsEmptyElement;       // is the currently parsed node empty?
