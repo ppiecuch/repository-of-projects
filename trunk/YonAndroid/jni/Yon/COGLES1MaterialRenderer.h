@@ -98,6 +98,8 @@ namespace ogles1{
 			{
 				mag_filter=current->getFilterMode(i)>=ENUM_FILTER_MODE_BILINEAR ? GL_LINEAR : GL_NEAREST;
 				min_filter=current->getFilterMode(i)>=ENUM_FILTER_MODE_TRILINEAR?GL_LINEAR_MIPMAP_NEAREST:current->getFilterMode(i)>=ENUM_FILTER_MODE_BILINEAR ? GL_LINEAR : GL_NEAREST;
+				//mag_filter=current->getFilterMode(i)>=ENUM_FILTER_MODE_BILINEAR ? GL_LINEAR : GL_NEAREST;
+				//min_filter=current->getFilterMode(i)>=ENUM_FILTER_MODE_BILINEAR ? GL_LINEAR : GL_NEAREST;
 
 				glActiveTexture(GL_TEXTURE0 + i);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,mag_filter);

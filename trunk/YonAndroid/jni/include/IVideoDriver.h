@@ -109,6 +109,10 @@ namespace yon{
 				if(m_pTimer)
 					m_pTimer->drop();
 			};
+			io::IFileSystem* getFileSystem() const{
+				return m_pFileSystem;
+			}
+
 			virtual const SClearSetting& getClearSetting() const = 0;
 			virtual void begin(bool backBuffer=true,bool zBuffer=true,const video::SColor& color=video::SColor(0xFF132E47)) = 0;
 			virtual void end() = 0;
@@ -123,6 +127,8 @@ namespace yon{
 			//从2D的XY坐标系（以左上角为原点,，x向右，y向下）转为3DXYY坐标系（以屏幕中心为原点，x向右，y向上）
 			virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest) = 0;
 			virtual void convertPosCoordinate(const core::position2di& src,core::position2di& dest) = 0;
+			virtual void convertPosCoordinate(const core::position2df& src,core::position2df& dest) = 0;
+			virtual void convertPosCoordinate(s32 srcX,s32 srcY,s32& destX,s32& destY) = 0;
 
 			//添加一张用于渲染缓冲的纹理,size必须是2的N次幂,并且长度都不可超过后缓冲区的大小
 			virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,
@@ -147,6 +153,7 @@ namespace yon{
 			virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const =0;
 
 			virtual void setMaterial(IMaterial* material) = 0;
+			virtual IMaterial* createMaterial() = 0;
 
 			virtual void drawUnit(scene::IUnit* unit) = 0;
 			virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,

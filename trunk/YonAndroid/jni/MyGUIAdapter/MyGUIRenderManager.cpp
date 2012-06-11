@@ -6,7 +6,7 @@
 
 namespace MyGUI{
 
-	MyGUIRenderManager::MyGUIRenderManager(video::IVideoDriver* driver,const ITimer* timer,const scene::IGeometryFactory* geometryFty)
+	MyGUIRenderManager::MyGUIRenderManager(video::IVideoDriver* driver,ITimer* timer,const scene::IGeometryFactory* geometryFty)
 		:m_bUpdate(false),
 		m_pDriver(driver),
 		m_pTimer(timer),

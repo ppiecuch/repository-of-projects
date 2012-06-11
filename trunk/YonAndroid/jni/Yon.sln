@@ -108,6 +108,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonTransparent", "YonTransp
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonEffect", "YonEffect\YonEffect.vcproj", "{B506DD4C-EF30-4404-8BDB-3A0102C0B350}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonGraphics", "YonGraphics\YonGraphics.vcproj", "{FA095739-6CCD-452C-B4A7-D8A35E903BA3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -202,6 +212,14 @@ Global
 		{F63F0B7A-AB7C-44EC-874D-A385DB09C926}.Debug|Win32.Build.0 = Debug|Win32
 		{F63F0B7A-AB7C-44EC-874D-A385DB09C926}.Release|Win32.ActiveCfg = Release|Win32
 		{F63F0B7A-AB7C-44EC-874D-A385DB09C926}.Release|Win32.Build.0 = Release|Win32
+		{B506DD4C-EF30-4404-8BDB-3A0102C0B350}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B506DD4C-EF30-4404-8BDB-3A0102C0B350}.Debug|Win32.Build.0 = Debug|Win32
+		{B506DD4C-EF30-4404-8BDB-3A0102C0B350}.Release|Win32.ActiveCfg = Release|Win32
+		{B506DD4C-EF30-4404-8BDB-3A0102C0B350}.Release|Win32.Build.0 = Release|Win32
+		{FA095739-6CCD-452C-B4A7-D8A35E903BA3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FA095739-6CCD-452C-B4A7-D8A35E903BA3}.Debug|Win32.Build.0 = Debug|Win32
+		{FA095739-6CCD-452C-B4A7-D8A35E903BA3}.Release|Win32.ActiveCfg = Release|Win32
+		{FA095739-6CCD-452C-B4A7-D8A35E903BA3}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

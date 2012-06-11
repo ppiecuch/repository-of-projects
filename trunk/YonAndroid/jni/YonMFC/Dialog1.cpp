@@ -62,7 +62,7 @@ int CDialog1::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	geometryFty=sceneMgr->getGeometryFactory();
 
-	camera=sceneMgr->addCamera(core::vector3df(0,0,300));
+	camera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
 	animatorFty=sceneMgr->getAnimatorFactory();
 
 	SetTimer(WM_RENDER_FRAME,RENDER_INTERVAL,NULL);// n 替换为你需要定时的周期，单位毫秒。

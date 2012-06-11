@@ -18,6 +18,7 @@ namespace video{
 		ENUM_BLEND_FACTOR m_blendSrc,m_blendDst;
 		ENUM_MODULATE m_modulate;
 		ENUM_ALPHA_SOURCE m_alphaSource;
+		bool m_bChanged;
 		SMaterialLayer m_textureLayers[MATERIAL_MAX_TEXTURES];
 	public:
 
@@ -25,7 +26,7 @@ namespace video{
 			:m_materialType(ENUM_MATERIAL_TYPE_SOLID),m_polygonMode(ENUM_POLYGON_MODE_FILL),
 			m_cullingMode(ENUM_CULLING_MODE_BACK),m_frontFace(ENUM_FRONT_FACE_CCW),
 			m_blendSrc(ENUM_BLEND_FACTOR_SRC_ALPHA),m_blendDst(ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA),
-			m_modulate(ENUM_MODULATE_1X),m_alphaSource(ENUM_ALPHA_SOURCE_NONE)
+			m_modulate(ENUM_MODULATE_1X),m_alphaSource(ENUM_ALPHA_SOURCE_NONE),m_bChanged(true)
 		{
 				states.CullFace=true;
 				//Logger->setAppender(MASK_APPENDER_VS);
@@ -50,6 +51,7 @@ namespace video{
 		}
 		virtual void setMaterialType(ENUM_MATERIAL_TYPE type){
 			m_materialType=type;
+			m_bChanged=true;
 		}
 
 		virtual ENUM_POLYGON_MODE getPolygonMode() const{
@@ -57,6 +59,7 @@ namespace video{
 		}
 		virtual void setPolygonMode(ENUM_POLYGON_MODE mode){
 			m_polygonMode= mode;
+			m_bChanged=true;
 		}
 
 		virtual void setTexture(u32 i, ITexture* tex)
@@ -64,6 +67,7 @@ namespace video{
 			if (i>=MATERIAL_MAX_TEXTURES)
 				return;
 			m_textureLayers[i].texture = tex;
+			m_bChanged=true;
 		}
 		ITexture* getTexture(u32 i) const
 		{
@@ -72,6 +76,7 @@ namespace video{
 
 		virtual void setCullingMode(ENUM_CULLING_MODE mode){
 			m_cullingMode=mode;
+			m_bChanged=true;
 		}
 		virtual ENUM_CULLING_MODE getCullingMode() const{
 			return m_cullingMode;
@@ -79,6 +84,7 @@ namespace video{
 
 		virtual void setFrontFace(ENUM_FRONT_FACE f){
 			m_frontFace=f;
+			m_bChanged=true;
 		}
 		virtual ENUM_FRONT_FACE getFrontFace() const{
 			return m_frontFace;
@@ -89,12 +95,14 @@ namespace video{
 		}
 		virtual void setWrapModeU(u32 index,ENUM_WRAP_MODE mode){
 			m_textureLayers[index].wrapU=mode;
+			m_bChanged=true;
 		}
 		virtual ENUM_WRAP_MODE getWrapModeV(u32 index) const{
 			return m_textureLayers[index].wrapV;
 		}
 		virtual void setWrapModeV(u32 index,ENUM_WRAP_MODE mode){
 			m_textureLayers[index].wrapV=mode;
+			m_bChanged=true;
 		}
 
 		virtual ENUM_FILTER_MODE getFilterMode(u32 index) const{
@@ -102,6 +110,7 @@ namespace video{
 		}
 		virtual void setFilterMode(u32 index,ENUM_FILTER_MODE mode){
 			m_textureLayers[index].filter=mode;
+			m_bChanged=true;
 		}
 
 		virtual ENUM_BLEND_FACTOR getBlendSrcFactor() const{
@@ -109,12 +118,14 @@ namespace video{
 		}
 		virtual void setBlendSrcFactor(ENUM_BLEND_FACTOR factor){
 			m_blendSrc=factor;
+			m_bChanged=true;
 		}
 		virtual ENUM_BLEND_FACTOR getBlendDstFactor() const{
 			return m_blendDst;
 		}
 		virtual void setBlendDstFactor(ENUM_BLEND_FACTOR factor){
 			m_blendDst=factor;
+			m_bChanged=true;
 		}
 
 		virtual ENUM_MODULATE getModulate() const{
@@ -122,6 +133,7 @@ namespace video{
 		}
 		virtual void setModulate(ENUM_MODULATE m){
 			m_modulate=m;
+			m_bChanged=true;
 		}
 
 		virtual ENUM_ALPHA_SOURCE getAlphaSource() const{
@@ -129,10 +141,21 @@ namespace video{
 		}
 		virtual void setAlphaSource(ENUM_ALPHA_SOURCE source){
 			m_alphaSource=source;
+			m_bChanged=true;
+		}
+
+		virtual bool checkChanged(){
+			if(m_bChanged)
+			{
+				m_bChanged=false;
+				return true;
+			}
+			return false;
 		}
 
 		virtual void setTextureMatrix(u32 index, const core::matrix4f& mat){
 			m_textureLayers[index].textureMatrix=mat;
+			m_bChanged=true;
 		}
 		virtual core::matrix4f& getTextureMatrix(u32 index){
 			return m_textureLayers[index].textureMatrix;
