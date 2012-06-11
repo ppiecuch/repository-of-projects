@@ -50,13 +50,23 @@ namespace ogles1{
 
 		virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest){
 			const core::dimension2du& size=getCurrentRenderTargetSize();
-			dest.x=src.x-(f32)size.w/2;
-			dest.y=(f32)size.h/2-src.y;
+			dest.x=src.x-(f32)size.w*0.5f;
+			dest.y=(f32)size.h*0.5f-src.y;
 		}
 		virtual void convertPosCoordinate(const core::position2di& src,core::position2di& dest){
 			const core::dimension2du& size=getCurrentRenderTargetSize();
-			dest.x=src.x-size.w/2;
-			dest.y=size.h/2-src.y;
+			dest.x=src.x-size.w*0.5f;
+			dest.y=size.h*0.5f-src.y;
+		}
+		virtual void convertPosCoordinate(const core::position2df& src,core::position2df& dest){
+			const core::dimension2du& size=getCurrentRenderTargetSize();
+			dest.x=src.x-(f32)size.w*0.5f;
+			dest.y=(f32)size.h*0.5f-src.y;
+		}
+		virtual void convertPosCoordinate(s32 srcX,s32 srcY,s32& destX,s32& destY){
+			const core::dimension2du& size=getCurrentRenderTargetSize();
+			destX=srcX-(f32)size.w*0.5f;
+			destY=(f32)size.h*0.5f-srcY;
 		}
 
 		virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name, const video::ENUM_COLOR_FORMAT format);
@@ -76,6 +86,7 @@ namespace ogles1{
 		virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const;
 
 		virtual void setMaterial(IMaterial* material);
+		virtual IMaterial* createMaterial();
 
 		virtual void drawUnit(scene::IUnit* unit);
 		virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,const core::recti& sourceRect, const core::recti* clipRect,video::SColor color, bool useAlphaChannelOfTexture);
@@ -93,6 +104,7 @@ namespace ogles1{
 
 		
 	private:
+		virtual void drawVertex(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,ENUM_PRIMITIVE_TYPE pType,scene::ENUM_VERTEX_TYPE vType);
 		void checkMaterial();
 		void addTexture(video::ITexture* texture);
 		video::ITexture* loadTextureFromFile(io::IReadStream* file);

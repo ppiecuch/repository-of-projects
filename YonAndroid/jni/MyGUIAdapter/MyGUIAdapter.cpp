@@ -2,7 +2,7 @@
 
 namespace MyGUI{
 
-	MyGUIAdapter::MyGUIAdapter(const io::IFileSystem* fs,video::IVideoDriver* driver,const ITimer* timer,const scene::IGeometryFactory* geometryFty)
+	MyGUIAdapter::MyGUIAdapter(const io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer,const scene::IGeometryFactory* geometryFty)
 		:m_pDataManager(NULL),m_pRenderManager(NULL),m_pLogManager(new MyGUI::LogManager()),m_resourceFileName("MyGUI_Core.xml"){
 			m_pRenderManager = new MyGUIRenderManager(driver,timer,geometryFty);
 			m_pDataManager = new MyGUIDataManager(fs);
@@ -37,7 +37,7 @@ namespace MyGUI{
 		m_pRenderManager->drawOneFrame();
 	}
 
-	MyGUIAdapter* createMyGUIAdapter(const io::IFileSystem* fs,video::IVideoDriver* driver,const ITimer* timer,const scene::IGeometryFactory* geometryFty){
+	MyGUIAdapter* createMyGUIAdapter(const io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer,const scene::IGeometryFactory* geometryFty){
 		return new MyGUIAdapter(fs,driver,timer,geometryFty);
 	}
 

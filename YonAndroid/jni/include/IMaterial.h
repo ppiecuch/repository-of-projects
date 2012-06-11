@@ -301,6 +301,8 @@ namespace video{
 		virtual ENUM_ALPHA_SOURCE getAlphaSource() const = 0;
 		virtual void setAlphaSource(ENUM_ALPHA_SOURCE source) = 0;
 
+		virtual bool checkChanged() = 0;
+
 		virtual void setTextureMatrix(u32 index, const core::matrix4f& mat) = 0;
 		virtual core::matrix4f& getTextureMatrix(u32 index) = 0;
 	};

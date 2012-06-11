@@ -84,8 +84,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
-	//material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
-	material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
+	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
 	cubeModel->setPosition(core::vector3df(100,-150,-300));
 	//material->setTexture(0,videoDriver->getTexture("shanti2.png"));
 	material->setTexture(0,videoDriver->getTexture("test-png8.png"));

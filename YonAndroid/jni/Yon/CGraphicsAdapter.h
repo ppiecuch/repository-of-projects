@@ -7,10 +7,13 @@
 #include "position2d.h"
 #include "yonArray.h"
 #include "IEntity.h"
+#include "objectpool.h"
 
 namespace yon{
 	namespace video{
 		class IVideoDriver;
+		class ITexture;
+		class IMaterial;
 	}
 namespace scene{
 
@@ -18,6 +21,68 @@ namespace scene{
 	class IGeometryFactory;
 	class CGraphicsAdapter : public IGraphicsAdapter{
 	private:
+		const static u16 INDICES[6];
+		struct DefaultUnit : public core::IRecyclable
+		{
+			virtual void reset(){
+				m_pTexture=0;
+				m_vertices.set_used(0);
+			}
+
+			core::array<SVertex> m_vertices;
+			video::ITexture* m_pTexture;
+		};
+		struct SolidEntry{
+
+			SolidEntry(DefaultUnit* unit):m_pUnit(unit){}
+
+			bool operator < (const SolidEntry& other) const
+			{
+				return (m_pUnit->m_pTexture < other.m_pUnit->m_pTexture);
+			}
+
+			DefaultUnit* m_pUnit;
+		};
+		struct TransparentEntry{
+			TransparentEntry(DefaultUnit* unit,f32 z):m_pUnit(unit),m_fZ(z){}
+
+			bool operator < (const TransparentEntry& other) const
+			{
+				return m_fZ<other.m_fZ;
+			}
+
+			f32 m_fZ;
+			DefaultUnit* m_pUnit;
+		};
+		struct EffectEntry{
+			EffectEntry(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType,f32 z)
+				:m_pVertices(vertices),m_uVertexCount(vertexCount),m_pIndice(indice),m_uIndexCount(indexCount),m_vertexType(vType),m_fZ(z)
+			{}
+
+			bool operator < (const EffectEntry& other) const
+			{
+				return m_fZ<other.m_fZ;
+			}
+
+			f32 m_fZ;
+			const void* m_pVertices;
+			u32 m_uVertexCount;
+			const void* m_pIndice;
+			u32 m_uIndexCount;
+			scene::ENUM_VERTEX_TYPE m_vertexType;
+		};
+		
+		//typedef core::CObjectPoolNill<DefaultUnit> DefaultUnitPool;
+		typedef core::CObjectPool<DefaultUnit> DefaultUnitPool;
+		DefaultUnitPool m_defaultPool;
+
+		core::array<SolidEntry> m_solids;
+		core::array<TransparentEntry> m_transparents;
+		core::array<EffectEntry> m_effects;
+
+		video::IMaterial* m_pSolidMaterial;
+		video::IMaterial* m_pTransparentMaterial;
+
 		struct SLayer{
 			s32 layerId;
 			IEntity* entity;
@@ -51,6 +116,12 @@ namespace scene{
 
 		virtual bool drawImage(const c8* imageName, s32 x, s32 y, MASK_ACTHOR anchor);
 		virtual bool drawRegion(const c8* imageName, s32 x_src, s32 y_src, s32 width, s32 height, ENUM_TRANS transform, s32 x_dest, s32 y_dest, MASK_ACTHOR anchor);
+
+		virtual void clearZ(s32 z);
+		virtual bool drawRegion(const c8* imageName, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform, MASK_ACTHOR anchor,bool useAlpha, u32 color);
+		virtual bool drawRegion(const c8* imageName, const core::rectf& uv, const core::position2di poss[4], ENUM_TRANS transform, bool useAlpha, u32 color);
+		virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType);
+		virtual void render();
 	};
 	IGraphicsAdapter* createGraphicsAdapter(video::IVideoDriver* driver,scene::ISceneManager* sceneMgr);
 }

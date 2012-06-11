@@ -24,7 +24,7 @@ namespace MyGUI{
 		MapTexture m_textures;
 
 		video::IVideoDriver* m_pDriver;
-		const ITimer* m_pTimer;
+		ITimer* m_pTimer;
 		const scene::IGeometryFactory* m_pGeometryFty;
 		core::matrix4f m_projection;
 		core::matrix4f m_oldProjection;
@@ -33,7 +33,7 @@ namespace MyGUI{
 		scene::IUnit* m_pUnit;
 
 	public:
-		MyGUIRenderManager(video::IVideoDriver* driver,const ITimer* timer,const scene::IGeometryFactory* geometryFty);
+		MyGUIRenderManager(video::IVideoDriver* driver,ITimer* timer,const scene::IGeometryFactory* geometryFty);
 		~MyGUIRenderManager();
 
 		/** @see OpenGLRenderManager::getViewSize */

@@ -27,6 +27,7 @@ namespace core{
 	template<class Element>
 	class CObjectPoolNill : public IObjectPool<Element>{
 	public:
+		CObjectPoolNill(u32 num){}
 		virtual u32 getSize() const{return 0;}
 		virtual u32 getCapacity() const{return 0;}
 		virtual void clear(){}

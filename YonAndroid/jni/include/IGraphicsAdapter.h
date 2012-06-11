@@ -3,6 +3,8 @@
 
 #include "IReferencable.h"
 #include "SColor.h"
+#include "SVertex.h"
+#include "rect.h"
 
 namespace yon{
 namespace scene{
@@ -52,6 +54,14 @@ namespace scene{
 		//transform默认为ENUM_TRANS_NONE，anchor默认为TOP|LEFT
 		//绘制成功返回true，否则返回false
 		virtual bool drawRegion(const c8* imageName, s32 x_src, s32 y_src, s32 width, s32 height, ENUM_TRANS transform=ENUM_TRANS_NONE, s32 x_dest=0, s32 y_dest=0, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP)) = 0;
+
+
+		virtual void clearZ(s32 z) = 0;
+		virtual bool drawRegion(const c8* imageName, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform=ENUM_TRANS_NONE, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
+		virtual bool drawRegion(const c8* imageName, const core::rectf& uv, const core::position2di poss[4], ENUM_TRANS transform=ENUM_TRANS_NONE, bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
+		//特效专用接口
+		virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) =0;
+		virtual void render() = 0;
 	};
 }
 }

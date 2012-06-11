@@ -9,6 +9,7 @@
 #include "CImage.h"
 #include "COGLES1FBOTexture.h"
 #include "EGLInfo.h"
+#include "CMaterial.h"
 
 namespace yon{
 namespace video{
@@ -391,7 +392,8 @@ namespace ogles1{
 			u32 vertexCount=unit->getShap()->getVertexCount();
 			u32 indexCount=unit->getShap()->getIndexCount();
 
-			drawVertexPrimitiveList(vertice,vertexCount,indice,indexCount,mode,unit->getVertexType());
+			//drawVertexPrimitiveList(vertice,vertexCount,indice,indexCount,mode,unit->getVertexType());
+			drawVertex(vertice,vertexCount,indice,indexCount,mode,unit->getVertexType());
 		}
 
 		
@@ -436,6 +438,17 @@ namespace ogles1{
 	}
 
 	void COGLES1Driver::drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,ENUM_PRIMITIVE_TYPE pType,scene::ENUM_VERTEX_TYPE vType){
+		if(vType==scene::ENUM_VERTEX_TYPE_2V1T1C)
+			setRender2DMode();
+		else if(m_pCurrentMaterial==video::MYGUI_MATERIAL)
+			setRender2DMode();
+		else
+			setRender3DMode();
+		checkMaterial();
+		drawVertex(vertices,vertexCount,indice,indexCount,pType,vType);
+	}
+
+	void COGLES1Driver::drawVertex(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,ENUM_PRIMITIVE_TYPE pType,scene::ENUM_VERTEX_TYPE vType){
 		switch(vType){
 		case scene::ENUM_VERTEX_TYPE_2V1T1C:
 			{
@@ -632,7 +645,8 @@ namespace ogles1{
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);*/
 
-		drawVertexPrimitiveList(vertices,4,indices,4,ENUM_PRIMITIVE_TYPE_TRIANGLE_STRIP,scene::ENUM_VERTEX_TYPE_3V1T1C);
+		//drawVertexPrimitiveList(vertices,4,indices,4,ENUM_PRIMITIVE_TYPE_TRIANGLE_STRIP,scene::ENUM_VERTEX_TYPE_3V1T1C);
+		drawVertex(vertices,4,indices,4,ENUM_PRIMITIVE_TYPE_TRIANGLE_STRIP,scene::ENUM_VERTEX_TYPE_3V1T1C);
 
 	}
 
@@ -645,12 +659,16 @@ namespace ogles1{
 		scene::SVertex vertices[2];
 		vertices[0] = scene::SVertex(start.x,start.y,start.z,0,0,color);
 		vertices[1] = scene::SVertex(end.x,end.y,end.z,0,0,color);
-		drawVertexPrimitiveList(vertices, 2, indices, 2, ENUM_PRIMITIVE_TYPE_LINES, scene::ENUM_VERTEX_TYPE_3V1T1C);
+		//drawVertexPrimitiveList(vertices, 2, indices, 2, ENUM_PRIMITIVE_TYPE_LINES, scene::ENUM_VERTEX_TYPE_3V1T1C);
+		drawVertex(vertices, 2, indices, 2, ENUM_PRIMITIVE_TYPE_LINES, scene::ENUM_VERTEX_TYPE_3V1T1C);
 	}
 
 	bool COGLES1Driver::setTexture(u32 stage, const video::ITexture* texture){
 		if(m_currentTextures[stage]==texture)
+		{
+			//Logger->debug("same texture:%d\n",static_cast<const COGLES1Texture*>(texture)->getTextureId());
 			return true;
+		}
 
 		glActiveTexture(GL_TEXTURE0 + stage);
 		if (!texture){
@@ -895,7 +913,7 @@ namespace ogles1{
 	ITexture* COGLES1Driver::getTexture(const io::path& filename){
 		ITexture* texture = findTexture(filename);
 		if (texture){
-			Logger->debug("getTexture(%s) finded!\n",filename.c_str());
+			//Logger->debug("getTexture(%s) finded!\n",filename.c_str());
 			return texture;
 		}
 
@@ -921,9 +939,14 @@ namespace ogles1{
 		return texture;
 	}
 
+	IMaterial* COGLES1Driver::createMaterial(){
+		return new CMaterial();
+	}
+
 	void  COGLES1Driver::setMaterial(IMaterial* material){
 		if(material==NULL||m_pCurrentMaterial==material)
 			return;
+		//Logger->debug("setMaterial:%08X\n",material);
 		material->grab();
 		if(m_pCurrentMaterial)
 			m_pCurrentMaterial->drop();
@@ -936,9 +959,9 @@ namespace ogles1{
 	}
 
 	void COGLES1Driver::checkMaterial(){
+		ENUM_MATERIAL_TYPE cmt=m_pCurrentMaterial->getMaterialType();
 		if(m_pLastMaterial!=m_pCurrentMaterial){
 			m_pCurrentMaterial->grab();
-			ENUM_MATERIAL_TYPE cmt=m_pCurrentMaterial->getMaterialType();
 			if(m_pLastMaterial){
 				ENUM_MATERIAL_TYPE lmt=m_pLastMaterial->getMaterialType();
 				if(lmt!=cmt)
@@ -949,6 +972,8 @@ namespace ogles1{
 				m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial,m_pLastMaterial);
 			}
 			m_pLastMaterial=m_pCurrentMaterial;
+		}else if(m_pCurrentMaterial->checkChanged()){
+			m_materialRenderers[cmt]->onSetMaterial(m_pCurrentMaterial,m_pLastMaterial);
 		}
 		/*if(m_pLastMaterial!=m_pCurrentMaterial){
 			m_pCurrentMaterial->grab();

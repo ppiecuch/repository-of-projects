@@ -36,7 +36,7 @@ namespace MyGUI{
 		std::string m_resourceFileName;
 		std::string m_rootMedia;
 	public:
-		MyGUIAdapter(const io::IFileSystem* fs,video::IVideoDriver* driver,const ITimer* timer,const scene::IGeometryFactory* geometryFty);
+		MyGUIAdapter(const io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer,const scene::IGeometryFactory* geometryFty);
 		virtual ~MyGUIAdapter();
 
 		MyGUIRenderManager* getRenderManagerPtr(){
@@ -54,7 +54,7 @@ namespace MyGUI{
 		//virtual bool postEventFromUser(const event::SEvent& evt) = 0;
 	};
 
-	MYGUI_ADAPTER_API MyGUIAdapter* createMyGUIAdapter(const io::IFileSystem* fs,video::IVideoDriver* driver,const ITimer* timer,const scene::IGeometryFactory* geometryFty);
+	MYGUI_ADAPTER_API MyGUIAdapter* createMyGUIAdapter(const io::IFileSystem* fs,video::IVideoDriver* driver,ITimer* timer,const scene::IGeometryFactory* geometryFty);
 
 }
 #endif
