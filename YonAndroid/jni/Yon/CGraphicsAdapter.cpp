@@ -350,8 +350,6 @@ namespace scene{
 		if(texture==NULL)
 			return false;
 
-		//TODO
-		/*
 		f32 u0,u1,u2,u3,v0,v1,v2,v3;
 		//如果是转置变换
 		if(transform>=ENUM_TRANS_MIRROR_ROT270){
@@ -410,21 +408,41 @@ namespace scene{
 		}
 
 		//计算位置坐标
-		core::position2df rpos[4];
+		core::position2di rpos[4];
 		m_pDriver->convertPosCoordinate(poss[0],rpos[0]);
 		m_pDriver->convertPosCoordinate(poss[1],rpos[1]);
 		m_pDriver->convertPosCoordinate(poss[2],rpos[2]);
 		m_pDriver->convertPosCoordinate(poss[3],rpos[3]);
 		//Logger->debug("convertPosCoordinate:%d,%d->%.2f,%.2f\n",spos.x,spos.y,rpos.x,rpos.y);
 		//创建形态
-		IShap* shap=m_pSceneMgr->getGeometryFactory()->createXYRectangle3D(rpos,calcZ(),u0,v0,u1,v1,u2,v2,u3,v3,video::SColor(color));
-		m_layers[m_uCurrentLayerIndex]->entity->add(texture,materialType,shap);
-		shap->drop();
-		*/
+		//IShap* shap=m_pSceneMgr->getGeometryFactory()->createXYRectangle3D(rpos,calcZ(),u0,v0,u1,v1,u2,v2,u3,v3,video::SColor(color));
+		//m_layers[m_uCurrentLayerIndex]->entity->add(texture,materialType,shap);
+		//shap->drop();
+		f32 z=calcZ();
+		video::SColor c(color);
+		DefaultUnit* unit=m_defaultPool.get();
+		unit->m_vertices.push_back(SVertex(rpos[0].x,rpos[0].y,z,u0,v0,c));
+		unit->m_vertices.push_back(SVertex(rpos[1].x,rpos[1].y,z,u1,v1,c));
+		unit->m_vertices.push_back(SVertex(rpos[2].x,rpos[2].y,z,u2,v2,c));
+		unit->m_vertices.push_back(SVertex(rpos[3].x,rpos[3].y,z,u3,v3,c));
+		unit->m_pTexture=texture;
+		if(useAlpha)
+		{
+			TransparentEntry entry(unit,z);
+			m_transparents.push_back(entry);
+		}
+		else
+		{
+			SolidEntry entry(unit);
+			m_solids.push_back(entry);
+		}
 		return true;
 	}
-	void CGraphicsAdapter::drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType){
+	void CGraphicsAdapter::drawVertexPrimitiveList(video::IMaterial* material,const void* vertices, u32 vertexCount,const void* indices, u32 indexCount,scene::ENUM_VERTEX_TYPE vType){
 		//TODO
+		f32 z=calcZ();
+		EffectEntry entry(material,vertices,vertexCount,indices,indexCount,vType,z);
+		m_effects.push_back(entry);
 	}
 
 	void CGraphicsAdapter::render(){
@@ -453,6 +471,16 @@ namespace scene{
 			m_defaultPool.recycle(m_transparents[i].m_pUnit);
 		}
 		m_transparents.set_used(0);
+
+
+		m_effects.sort();
+		for (i=0; i<m_effects.size(); ++i)
+		{
+			m_pDriver->setMaterial(m_effects[i].m_pMaterial);
+			m_pDriver->drawVertexPrimitiveList(m_effects[i].m_pVertices,m_effects[i].m_uVertexCount,m_effects[i].m_pIndices,m_effects[i].m_uIndexCount,video::ENUM_PRIMITIVE_TYPE_TRIANGLES,m_effects[i].m_vertexType);
+		}
+		m_effects.set_used(0);
+
 	}
 
 	IGraphicsAdapter* createGraphicsAdapter(video::IVideoDriver* driver,ISceneManager* sceneMgr){

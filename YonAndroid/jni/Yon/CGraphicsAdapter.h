@@ -55,8 +55,8 @@ namespace scene{
 			DefaultUnit* m_pUnit;
 		};
 		struct EffectEntry{
-			EffectEntry(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType,f32 z)
-				:m_pVertices(vertices),m_uVertexCount(vertexCount),m_pIndice(indice),m_uIndexCount(indexCount),m_vertexType(vType),m_fZ(z)
+			EffectEntry(video::IMaterial* material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType,f32 z)
+				:m_pMaterial(material),m_pVertices(vertices),m_uVertexCount(vertexCount),m_pIndices(indice),m_uIndexCount(indexCount),m_vertexType(vType),m_fZ(z)
 			{}
 
 			bool operator < (const EffectEntry& other) const
@@ -65,9 +65,10 @@ namespace scene{
 			}
 
 			f32 m_fZ;
+			video::IMaterial* m_pMaterial;
 			const void* m_pVertices;
 			u32 m_uVertexCount;
-			const void* m_pIndice;
+			const void* m_pIndices;
 			u32 m_uIndexCount;
 			scene::ENUM_VERTEX_TYPE m_vertexType;
 		};
@@ -120,7 +121,7 @@ namespace scene{
 		virtual void clearZ(s32 z);
 		virtual bool drawRegion(const c8* imageName, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform, MASK_ACTHOR anchor,bool useAlpha, u32 color);
 		virtual bool drawRegion(const c8* imageName, const core::rectf& uv, const core::position2di poss[4], ENUM_TRANS transform, bool useAlpha, u32 color);
-		virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType);
+		virtual void drawVertexPrimitiveList(video::IMaterial* material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType);
 		virtual void render();
 	};
 	IGraphicsAdapter* createGraphicsAdapter(video::IVideoDriver* driver,scene::ISceneManager* sceneMgr);
