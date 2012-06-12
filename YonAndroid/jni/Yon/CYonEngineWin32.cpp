@@ -312,8 +312,17 @@ namespace platform{
 			return 0;
 		case WM_ACTIVATE:
 			return 0;
+		case WM_SYSKEYDOWN:
+			Logger->debug("WM_SYSKEYDOWN:%c\n",wParam);
+			return 0;
+		case WM_SYSKEYUP:
+			Logger->debug("WM_SYSKEYUP:%c\n",wParam);
+			return 0;
 		case WM_KEYDOWN:
+			Logger->debug("WM_KEYDOWN:%c\n",wParam);
+			return 0;
 		case WM_KEYUP:
+			Logger->debug("WM_KEYUP:%c\n",wParam);
 			return 0;
 		case WM_SIZE:
 			Logger->debug("WM_SIZE\n");
