@@ -61,7 +61,7 @@ namespace io{
 
 		inline char_type readNext()
 		{
-#if 0
+#if 1
 			switch(m_iSizeOfCharType)
 			{
 			case 2:

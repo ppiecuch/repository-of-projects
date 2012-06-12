@@ -194,10 +194,16 @@ int CCircleEmiter::emit( int now,int timeSinceLastCall,CSparticle*& outArray )
 		//随机生成发射位置
 		position2df temp_pos=pos;
 
-		if(posVar.x)
+		/*if(posVar.x)
 			temp_pos.x+=-posVar.x+rand()%((int)(2*posVar.x));
 		if(posVar.y)
-			temp_pos.y+=-posVar.y+rand()%((int)(2*posVar.y));
+			temp_pos.y+=-posVar.y+rand()%((int)(2*posVar.y));*/
+		//@hzb
+		if(posVar.x)
+			temp_pos.x+=-posVar.x+CParticleEmiter::randomizer->rand(0,INT_MAX)%((int)(2*posVar.x));
+		if(posVar.y)
+			temp_pos.y+=-posVar.y+CParticleEmiter::randomizer->rand(0,INT_MAX)%((int)(2*posVar.y));
+
 
 
        

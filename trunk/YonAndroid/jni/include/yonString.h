@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "yonMath.h"
+#include "fastatof.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <wchar.h>
@@ -522,6 +523,22 @@ namespace yon{
 			{
 				for (u32 i=0; i<len; ++i)
 					elements[i] = locale_upper( elements[i] );
+			}
+
+			//忽略字符串前面N个非数字字符，直到找到数字字符，对之进行atof
+			//如果不存在数字字符，返回0.0f
+			f32 intelatof()
+			{
+				int index=0;
+				for(int i=0;i<len;++i)
+				{
+					if(elements[i]>='0'&&elements[i]<='9'||elements[i]=='.')
+					{
+						index=i;
+						break;
+					}
+				}
+				return fastatof(&elements[index]);
 			}
 			const T* c_str() const
 			{

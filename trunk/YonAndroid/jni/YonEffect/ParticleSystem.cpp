@@ -489,6 +489,7 @@ void CParticleSystem::draw()
 	if(driver==NULL)return ;
 	if(draw_buffer_v.size()==0)return ;
 	
+#if 0
 	if(p_material)
 	{
 		p_material->setMaterialType(ENUM_MATERIAL_TYPE_BLEND);
@@ -505,7 +506,19 @@ void CParticleSystem::draw()
 	driver->setTransform(ENUM_TRANSFORM_WORLD,IDENTITY_MATRIX);
 
 	driver->drawVertexPrimitiveList(&draw_buffer_v[0],Particles.size()*4,&draw_buffer_i[0],Particles.size()*6,ENUM_PRIMITIVE_TYPE_TRIANGLES,ENUM_VERTEX_TYPE_3V1T1C);
+#else
+	if(p_material)
+	{
+		p_material->setMaterialType(ENUM_MATERIAL_TYPE_BLEND);
+		p_material->setBlendSrcFactor(src_fator);
+		p_material->setBlendDstFactor(dst_fator);
+		p_material->setAlphaSource((ENUM_ALPHA_SOURCE)alphasource);
+		//p_material->states.CullFace=false;
+		p_material->setModulate(modufun);
+	}
+	gfAdapter->drawVertexPrimitiveList(p_material,&draw_buffer_v[0],Particles.size()*4,&draw_buffer_i[0],Particles.size()*6,ENUM_VERTEX_TYPE_3V1T1C);
 
+#endif
 	
 }
 

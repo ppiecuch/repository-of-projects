@@ -6,6 +6,11 @@
 namespace yon{
 namespace video{
 
+	inline u32 toRGB(s32 r,s32 g,s32 b)
+	{
+		return ((u32)(((u8)(r)|((u16)((u8)(g))<<8))|(((u16)(u8)(b))<<16)));
+	}
+
 
 	//! Convert A1R5G5B5 color to A8R8G8B8 color
 	/** build a nicer 32bit Color by extending dest lower bits with source high bits. */

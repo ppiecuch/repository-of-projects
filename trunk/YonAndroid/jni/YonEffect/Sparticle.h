@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _SPARTICLE_H_
+#define _SPARTICLE_H_
+
 #include "framework.h"
 class CSparticle
 {
@@ -75,3 +77,6 @@ public:
 	CSparticle(void);
 	~CSparticle(void);
 };
+
+
+#endif

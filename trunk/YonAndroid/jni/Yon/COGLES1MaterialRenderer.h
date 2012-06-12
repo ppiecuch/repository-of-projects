@@ -103,7 +103,6 @@ namespace ogles1{
 
 				glActiveTexture(GL_TEXTURE0 + i);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,mag_filter);
-				//TODO mimmap
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,min_filter);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, current->getWrapModeU(i));
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, current->getWrapModeV(i));

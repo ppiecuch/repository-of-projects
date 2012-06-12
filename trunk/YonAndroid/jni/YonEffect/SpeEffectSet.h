@@ -1,5 +1,5 @@
-#ifndef  SPEEFFECT_SET
-#define  SPEEFFECT_SET
+#ifndef  _SPEEFFECT_SET_H_
+#define  _SPEEFFECT_SET_H_
 
 ///特效集合，是面对技能的接口单位
 #include "SpeEffect.h"
@@ -21,7 +21,9 @@ public:
 
 
 	IVideoDriver        * driver;           //绘图引擎
+	scene::IGraphicsAdapter* gfAdapter;
 	void  setVideoDriver(IVideoDriver  * driver){this->driver=driver;}
+	void  setGraphicsAdapter(scene::IGraphicsAdapter* adapter){this->gfAdapter=adapter;}
 
 	void  load(IReadStream  *FileReader);
 	void  setZ(int Z);

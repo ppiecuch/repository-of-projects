@@ -108,6 +108,6 @@ enum ENUM_ENCODING{
 	ENUM_ENCODING_COUNT
 };
 
-}//yon
+}
 
 #endif 

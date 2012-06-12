@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _PARTICLEEMITER_H_
+#define _PARTICLEEMITER_H_
+
 #include "math.h"
 #include  "Sparticle.h"
 //#include "FileReader.h"
@@ -9,7 +11,8 @@
 public: virtual varType get##VarFName(void){return varName;}\
 public: virtual void set##VarFName(varType var){varName=var;}
 
-#define CCRANDOM_MINUS1_1() ((2.0f*((float)rand()/RAND_MAX))-1.0f)                         //-1~1的随机浮点数
+//#define CCRANDOM_MINUS1_1() ((2.0f*((float)rand()/RAND_MAX))-1.0f)                         //-1~1的随机浮点数
+
  
 #define CC_DEGREES_TO_RADIANS(__ANGLE__) ((__ANGLE__) * 0.01745329252f)                    //角度转换成弧度
  
@@ -35,8 +38,16 @@ enum  ROTATION_MODE
 class CParticleEmiter
 {
 public:
-     
+
 	
+     
+	//@hzb
+	static IRandomizer* randomizer;
+	static void setRandomizer(IRandomizer* randomizer){CParticleEmiter::randomizer=randomizer;}
+	inline f32  CCRANDOM_MINUS1_1(){
+		return (2.0f*(f32)randomizer->rand(0,INT_MAX)/INT_MAX)-1.0f;
+	}
+
     //发射位置 对应于点发射器的位置，  方形发射器和圆形发射器的中心
 	position2df  pos;                             //设置为浮点数结构，为以后粒子运动做好准备。
     //位置的浮动值
@@ -250,3 +261,4 @@ public:
 	virtual ~CParticleEmiter(void);
 
 };
+#endif

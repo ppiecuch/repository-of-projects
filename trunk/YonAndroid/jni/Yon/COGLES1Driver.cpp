@@ -841,6 +841,13 @@ namespace ogles1{
 
 	video::ITexture* COGLES1Driver::findTexture(const io::path& filename){
 		//TODO ”≈ªØ
+		for(u32 i=0;i<m_textures.size();++i){
+			//Logger->debug("check %s==%s\n",m_textures[i]->getPath().c_str(),absolutePath.c_str());
+			if(m_textures[i]->getPath()==filename){
+				return m_textures[i];
+			}
+		}
+
 		const io::path absolutePath = m_pFileSystem->getAbsolutePath(filename);
 		for(u32 i=0;i<m_textures.size();++i){
 			//Logger->debug("check %s==%s\n",m_textures[i]->getPath().c_str(),absolutePath.c_str());

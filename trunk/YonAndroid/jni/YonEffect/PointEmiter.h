@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _POINTEMITER_H_
+#define _POINTEMITER_H_
+
 #include "ParticleEmiter.h"
 class CPointEmiter :
 	public CParticleEmiter
@@ -11,3 +13,5 @@ public:
 	CPointEmiter(void);
 	~CPointEmiter(void);
 };
+
+#endif

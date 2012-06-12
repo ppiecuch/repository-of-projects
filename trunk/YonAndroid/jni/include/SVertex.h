@@ -60,7 +60,7 @@ namespace scene{
 		}
 	};
 
-	/*inline u32 getSizeByVertexType(ENUM_VERTEX_TYPE type){
+	inline u32 getSizeByVertexType(ENUM_VERTEX_TYPE type){
 		switch(type){
 		case ENUM_VERTEX_TYPE_2V1T1C:
 			return sizeof(S2DVertex);
@@ -69,7 +69,7 @@ namespace scene{
 		default:
 			return sizeof(SVertex);
 		}
-	}*/
+	}
 
 	inline u8* getVertexPosOffset(ENUM_VERTEX_TYPE type)
 	{

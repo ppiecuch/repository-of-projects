@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _PARTICLESYSTEM_H_
+#define _PARTICLESYSTEM_H_
+
 #include "ParticleEmiter.h"
 #include "PointEmiter.h"
 #include "BoxEmiter.h"
@@ -21,6 +23,7 @@ class CParticleSystem
 {
 private:
 	video::IVideoDriver    * driver;                     //绘图引擎
+	scene::IGraphicsAdapter* gfAdapter;
      CParticleEmiter * emiter;
 	 core::array<CSparticle>Particles;        //粒子集
 	 int lastEmitTime;                             //上次发射的时间
@@ -38,6 +41,7 @@ public:
 	
 
 	void setDriver(IVideoDriver    * driver_);
+	void  setGraphicsAdapter(scene::IGraphicsAdapter* adapter){this->gfAdapter=adapter;}
 	void setEmiter(CParticleEmiter * emiter_);     //设置发射器
 	void setTexture(c8 * path_);                   //设置纹理
 	//CString texPath;                               //保存纹理路径
@@ -173,3 +177,4 @@ public:
 
 
 };
+#endif
