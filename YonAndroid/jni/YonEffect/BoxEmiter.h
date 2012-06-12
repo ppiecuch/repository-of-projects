@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _BOXEMITER_H_
+#define _BOXEMITER_H_
+
 #include "particleemiter.h"
 
 class CBoxEmiter :
@@ -21,3 +23,4 @@ public:
 	CBoxEmiter(void);
 	~CBoxEmiter(void);
 };
+#endif

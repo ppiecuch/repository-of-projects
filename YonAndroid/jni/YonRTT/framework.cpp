@@ -59,7 +59,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -120,7 +120,7 @@ void drawFrame(){
 	rtt->beginRTT(true,true,COLOR_WHITE);
 
 	teapotModel->setVisible(true);
-	cubeModel->setVisible(false);
+	cubeModel->setVisible(true);
 	planeModel->setVisible(false);
 
 	sceneMgr->render(videoDriver);
@@ -147,7 +147,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
 	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);

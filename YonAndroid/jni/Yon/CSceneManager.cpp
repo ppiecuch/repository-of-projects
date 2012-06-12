@@ -96,13 +96,12 @@ namespace scene{
 		case ENUM_SCENE_PASS_AUTOMATIC:
 			if (!isCulled(model))
 			{
-				IEntity* entity=model->getEntity();
-				const u32 count=entity->getUnitCount();
+				const u32 count=model->getMaterialCount();
 				bool transparent=false;
 				bool solid=false;
 				for (u32 i=0; i<count; ++i)
 				{
-					if(isTransparent(entity->getUnit(i)->getMaterial()->getMaterialType()))
+					if(isTransparent(model->getMaterial(i)->getMaterialType()))
 						transparent=true;
 					else
 						solid=true;

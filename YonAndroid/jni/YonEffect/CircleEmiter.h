@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _CIRCLEEMITER_H_
+#define _CIRCLEEMITER_H_
+
 #include "particleemiter.h"
 
 class CCircleEmiter :
@@ -87,3 +89,4 @@ public:
 	CCircleEmiter(void);
     ~CCircleEmiter(void);
 };
+#endif

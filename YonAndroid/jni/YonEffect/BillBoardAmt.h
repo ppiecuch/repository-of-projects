@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _BILLBOARDAMT_H_
+#define _BILLBOARDAMT_H_
+
 /*
 
 动画公告板管理数据
@@ -8,6 +10,7 @@
 */
 
 #include "BillBoard.h"
+
 
 
 class CBillBoardAmt
@@ -28,6 +31,7 @@ public:
 
 	//封装billboard的接口，以便代理
 	void  setDriver(video::IVideoDriver  * driver);        //设置引擎
+	void  setGraphicsAdapter(scene::IGraphicsAdapter* adapter);
 	void  setTexture(video::ITexture * texture);           //设置纹理
 	void  setTextureAlpha(video::ITexture * texture_a);    //设置通道纹理
 	void  setPos(position2di origin);            //设置原点
@@ -150,7 +154,7 @@ public:
 	//颜色变化数据
 	struct COLOR_INFO
 	{
-		COLORREF col;
+		u32 col;
 		int time_l;          //持续时间
 		int time_start;      //变化时间
 	
@@ -158,7 +162,7 @@ public:
 
 	core::array<COLOR_INFO>color_ary;        //颜色变化数组
 
-    COLORREF GetColor(int time_current);
+    u32 GetColor(int time_current);
     
 	void  SetColorAry(core::array<COLOR_INFO>color_ary_);
 
@@ -214,3 +218,4 @@ public:
 
 
 };
+#endif

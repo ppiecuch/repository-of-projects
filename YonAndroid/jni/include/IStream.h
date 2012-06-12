@@ -109,7 +109,6 @@ namespace io{
 		inline c8 readChar(){return read<c8>();}
 		inline c16 readChar16(){return read<c16>();}
 		inline c32 readChar32(){return read<c32>();}
-		inline wchar_t readWChar(){return read<wchar_t>();}
 		inline u8 readUnsignedByte(){return read<u8>();}
 		inline s16 readShort(){return read<s16>();}
 		inline u16 readUnsignedShort(){return read<u16>();}

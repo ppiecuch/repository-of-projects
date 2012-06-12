@@ -32,7 +32,7 @@ void objectpoolTestCase::recycle()
 #define COUNT 100000
 	struct _timeb start1;
 	_ftime64_s( &start1 ); 
-	CObjectPoolNill<CRecyclableObject>* pool1=new CObjectPoolNill<CRecyclableObject>();
+	CObjectPoolNill<CRecyclableObject>* pool1=new CObjectPoolNill<CRecyclableObject>(5);
 	for(int i=0;i<COUNT;++i){
 		CRecyclableObject* obj=pool1->get();
 		pool1->recycle(obj);

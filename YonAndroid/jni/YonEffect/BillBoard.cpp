@@ -179,6 +179,7 @@ void CBillBoard::render()
 
 	//driver->draw2DVertexPrimitiveList(vec,4,indices,2, irr::video::EVT_STANDARD, irr::scene::EPT_TRIANGLES);
 
+#if 0
 	if(p_material)
 	{
 		if(p_texture)
@@ -198,7 +199,23 @@ void CBillBoard::render()
 	driver->setTransform(ENUM_TRANSFORM_WORLD,IDENTITY_MATRIX);
 	driver->drawVertexPrimitiveList(vec,4,indices,6,ENUM_PRIMITIVE_TYPE_TRIANGLES,ENUM_VERTEX_TYPE_3V1T1C);
 
+#else
+	if(p_material)
+	{
+		if(p_texture)
+			p_material->setTexture(0,p_texture);
 
+		p_material->setMaterialType(mix_type);
+		p_material->setBlendSrcFactor(src_blend);
+		p_material->setBlendDstFactor(dst_blend);
+		p_material->setAlphaSource((ENUM_ALPHA_SOURCE)alphasource);
+		//p_material->states.CullFace=false;
+		p_material->setModulate(modufun);
+	}
+
+	gfAdapter->drawVertexPrimitiveList(p_material,vec,4,indices,6,ENUM_VERTEX_TYPE_3V1T1C);
+
+#endif
   
 
 }

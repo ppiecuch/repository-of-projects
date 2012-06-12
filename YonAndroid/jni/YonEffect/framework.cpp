@@ -2,6 +2,7 @@
 #include "BillBoardAmt.h"
 #include "ParticleSystem.h"
 #include "SpeEffectSet.h"
+#include "ParticleEmiter.h"
 SYonEngineParameters params;
 IYonEngine* engine=NULL;
 IVideoDriver* videoDriver=NULL;
@@ -12,6 +13,7 @@ IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 ITimer* timer=NULL;
+IRandomizer* randomizer=NULL;
 int     lastTime=0;
 
 IModel* cubeModel=NULL;
@@ -65,6 +67,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
 	logger=Logger;
 	timer=engine->getTimer();
+	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->setWorkingDirectory("../media/");
@@ -183,9 +186,11 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	p_SpeEffectSet->SpeArray.push_back(p_SpeEffect);
 
 */	
-	
+	CParticleEmiter::setRandomizer(randomizer);
+
   p_SpeEffectSet=new CSpeEffectSet();
    p_SpeEffectSet->setVideoDriver(videoDriver);
+   p_SpeEffectSet->setGraphicsAdapter(gfAdapter);
    IReadStream *p_FileReader=engine->getFileSystem()->createAndOpenReadFileStream("exportSpe/5.EFF");
    p_SpeEffectSet->load(p_FileReader);
    p_FileReader->drop();
@@ -241,6 +246,17 @@ void drawFrame(){
 	//p_BillboardAmt->draw();
    
 
+	gfAdapter->clearZ(-1000);
+
+	core::rectf r(0,0,1,1);
+	//for(u32 i=0;i<100;++i){
+	gfAdapter->drawRegion("shadow.png",r,250,120,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
+	gfAdapter->drawRegion("trans.png",r,0,120,128,64,ENUM_TRANS_NONE);
+	gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
+	gfAdapter->drawRegion("trans.png",r,200,120,128,64,ENUM_TRANS_MIRROR);
+	gfAdapter->drawRegion("trans.png",r,300,120,128,64,ENUM_TRANS_MIRROR_ROT180);
+	
+
 	if(lastTime!=0)
 	{
 		
@@ -265,7 +281,14 @@ void drawFrame(){
 	else
 		lastTime=timer->getRealTime();
 
+	gfAdapter->drawRegion("test.png",r,200,120,128,64,ENUM_TRANS_ROT90);
+	gfAdapter->drawRegion("shadow.png",r,50,170,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
+	gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);
+	gfAdapter->drawRegion("trans.png",r,200,320,128,64,ENUM_TRANS_MIRROR_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
+	gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
 
+
+	gfAdapter->render();
 
 	// p_ParticleSystem->update(25);
 	// p_ParticleSystem->draw();

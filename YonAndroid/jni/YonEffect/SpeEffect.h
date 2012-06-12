@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _SPEEFFECT_H_
+#define _SPEEFFECT_H_
+
 
 #include "ParticleSystem.h"            //粒子系统
 #include "BillBoardAmt.h"              //公告板
@@ -51,8 +53,10 @@ public:
 	void update(int timediff);                //特效的绘制的更新
 	void draw();                              //特效的绘制，内部调用公告板，粒子，或欧罗拉动画绘制
     
-	IVideoDriver  * driver;                    
+	IVideoDriver  * driver;      
+	scene::IGraphicsAdapter* gfAdapter;
 	void setDriver(IVideoDriver * driver);
+	void  setGraphicsAdapter(scene::IGraphicsAdapter* adapter){this->gfAdapter=adapter;}
 
 	void setPos(position2di pos);
 	position2df  getPos();
@@ -101,3 +105,5 @@ public:
 	~CSpeEffect(void);
 	
 };
+
+#endif

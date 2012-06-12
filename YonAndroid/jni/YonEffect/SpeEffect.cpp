@@ -56,6 +56,7 @@ void CSpeEffect::load(c8 * filePath)
 			m_SpeEffect.p_BillBoard=new CBillBoardAmt();
 
 		m_SpeEffect.p_BillBoard->setDriver(driver);
+		m_SpeEffect.p_BillBoard->setGraphicsAdapter(gfAdapter);
 
 		m_SpeEffect.p_BillBoard->load(p_FileReader);
 
@@ -72,6 +73,7 @@ void CSpeEffect::load(c8 * filePath)
 
 		//ÉèÖÃ»æÖÆÒýÇæ
 		m_SpeEffect.p_ParticleSystem->setDriver(driver);
+		m_SpeEffect.p_ParticleSystem->setGraphicsAdapter(gfAdapter);
 
 		m_SpeEffect.p_ParticleSystem->load(p_FileReader);
 

@@ -142,6 +142,7 @@ void CSpeEffectSet::load( IReadStream *FileReader )
 		CSpeEffect  *NewSpeEffect=new CSpeEffect();
 
 		NewSpeEffect->setDriver(driver);
+		NewSpeEffect->setGraphicsAdapter(gfAdapter);
 
 		NewSpeEffect->load(FileReader);
 

@@ -42,11 +42,11 @@ void CBillBoardAmt::update( int time )
 
 	//由启动的时间判断各个参数  ：颜色
 
-	COLORREF col=GetColor(time_since_start);
+	u32 col=GetColor(time_since_start);
 
 	int r=(0x00ff0000&col)>>16;
 	int b=(0x000000ff&col)<<16;
-    COLORREF col2=(col&0x0000ff00)|r|b;
+    u32 col2=(col&0x0000ff00)|r|b;
 	//billboard.setColor(0xff000000|col);
 
 
@@ -87,7 +87,7 @@ void CBillBoardAmt::update( int time )
 /*
 *得到颜色数组的当前颜色,如无当前颜色，返回 白色
 */
-COLORREF CBillBoardAmt::GetColor( int time_current )
+u32 CBillBoardAmt::GetColor( int time_current )
 {
 	
 	
@@ -98,10 +98,10 @@ COLORREF CBillBoardAmt::GetColor( int time_current )
 
 	if(time_current>time_length && draw_model!=-1)
 	{
-		COLORREF col=color_ary[size-1].col;
+		u32 col=color_ary[size-1].col;
 		int r=(0x00ff0000&col)>>16;
 		int b=(0x000000ff&col)<<16;
-		COLORREF col2=(col&0x0000ff00)|r|b;
+		u32 col2=(col&0x0000ff00)|r|b;
 
 		return  col2;
 
@@ -122,8 +122,8 @@ COLORREF CBillBoardAmt::GetColor( int time_current )
 		  if(i<(size-1))
 		  {
 		
-			 COLORREF col_ref=col_info.col;
-             COLORREF col_ref2=color_ary[i+1].col;
+			 u32 col_ref=col_info.col;
+             u32 col_ref2=color_ary[i+1].col;
              
 			 int b=(col_ref&0x00ff0000)>>16;
 			 int g=(col_ref&0x0000ff00)>>8;
@@ -138,10 +138,10 @@ COLORREF CBillBoardAmt::GetColor( int time_current )
 		  }		  
 		  
 		  {
-			  COLORREF col=col_info.col;
+			  u32 col=col_info.col;
 			  int r=(0x00ff0000&col)>>16;
 			  int b=(0x000000ff&col)<<16;
-			  COLORREF col2=(col&0x0000ff00)|r|b;
+			  u32 col2=(col&0x0000ff00)|r|b;
 
 			  return  col2;
 		  }
@@ -156,10 +156,10 @@ COLORREF CBillBoardAmt::GetColor( int time_current )
 	}
 
 	//找不到返回最后一种颜色
-	COLORREF col=color_ary[size-1].col;
+	u32 col=color_ary[size-1].col;
 	int r=(0x00ff0000&col)>>16;
 	int b=(0x000000ff&col)<<16;
-	COLORREF col2=(col&0x0000ff00)|r|b;
+	u32 col2=(col&0x0000ff00)|r|b;
 
 	return  col2;
 
@@ -196,6 +196,10 @@ void CBillBoardAmt::setDriver( IVideoDriver * driver )
      
       billboard.SetDriver(driver);
 
+}
+
+void  CBillBoardAmt::setGraphicsAdapter(scene::IGraphicsAdapter* adapter){
+	billboard.setGraphicsAdapter(adapter);
 }
 
 

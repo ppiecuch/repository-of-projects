@@ -7,6 +7,18 @@
 void stringTestCase::setUp()
 {
 }
+void stringTestCase::intelatof()
+{
+	core::stringc str1("OpenGL ES-CM 1.1");
+	printf("\n%.2f\n",str1.intelatof());
+	CPPUNIT_ASSERT(core::equals(str1.intelatof(),1.1f));
+
+	core::stringc str2(".1");
+	CPPUNIT_ASSERT(core::equals(str2.intelatof(),0.1f));
+
+	core::stringc str3("hello");
+	CPPUNIT_ASSERT(core::equals(str3.intelatof(),0.0f));
+}
 void stringTestCase::les()
 {
 	core::stringc str1("hello");

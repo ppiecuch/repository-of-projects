@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _BILLBOARD_H_
+#define _BILLBOARD_H_
+
 /*
 *
 *公告板类
@@ -124,8 +126,10 @@ public:
 	*/
    
 	IVideoDriver  * driver;                                                           //绘图引擎
+	scene::IGraphicsAdapter* gfAdapter;
   
 	void   SetDriver(IVideoDriver * drv);                                             //设置绘制引擎
+	void  setGraphicsAdapter(scene::IGraphicsAdapter* adapter){this->gfAdapter=adapter;}
 
   
 	//内部数据
@@ -199,3 +203,4 @@ public:
 
 
 };
+#endif

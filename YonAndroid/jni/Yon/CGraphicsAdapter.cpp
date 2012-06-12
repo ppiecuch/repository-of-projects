@@ -439,8 +439,11 @@ namespace scene{
 		return true;
 	}
 	void CGraphicsAdapter::drawVertexPrimitiveList(video::IMaterial* material,const void* vertices, u32 vertexCount,const void* indices, u32 indexCount,scene::ENUM_VERTEX_TYPE vType){
-		//TODO
 		f32 z=calcZ();
+		u32 offset=(u32)getVertexPosOffset(vType)+8;
+		u32 size=getSizeByVertexType(vType);
+		for(u32 i=0;i<vertexCount;++i)
+			memcpy((u8*)vertices+offset+size*i,&z,4);
 		EffectEntry entry(material,vertices,vertexCount,indices,indexCount,vType,z);
 		m_effects.push_back(entry);
 	}

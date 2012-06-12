@@ -70,7 +70,11 @@ namespace core{
 			if (NULL == (delim = strrchr(path, '/')))
 				return retval;
 
+#ifdef YON_COMPILE_WITH_WIN32
+			strncat_s(subpath, path, delim - path);
+#elif defined(YON_COMPILE_WITH_ANDROID)
 			strncat(subpath, path, delim - path);
+#endif
 			_mkdirs(subpath);
 		}
 		return retval;
