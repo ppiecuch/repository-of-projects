@@ -100,7 +100,6 @@ namespace ogles1{
 		glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmpTexture);
 
 		void* source = m_pImage->lock();
-		Logger->debug("glTexImage2D:%d,%d,%d,%s\n", m_textureId,m_pImage->getDimension().w,m_pImage->getDimension().h,COLOR_FORMAT_NAME[m_pImage->getColorFormat()]);
 		glBindTexture(GL_TEXTURE_2D, m_textureId);
 		if(m_bHasMipMap)
 		{
@@ -110,6 +109,7 @@ namespace ogles1{
 				// enable bilinear mipmap filter
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				Logger->debug("glTexImage2D:%d,%d,%d,mipmap:%d,%s\n", m_textureId,m_pImage->getDimension().w,m_pImage->getDimension().h,hasMipMap(),COLOR_FORMAT_NAME[m_pImage->getColorFormat()]);
 			}
 			else
 			{
@@ -120,6 +120,7 @@ namespace ogles1{
 				Logger->warn(YON_LOG_WARN_FORMAT,"Currently do not support hw mipmap generation,disable it!");
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				Logger->debug("glTexImage2D:%d,%d,%d,mipmap:%d,%s\n", m_textureId,m_pImage->getDimension().w,m_pImage->getDimension().h,hasMipMap(),COLOR_FORMAT_NAME[m_pImage->getColorFormat()]);
 			}
 		}
 		else
@@ -127,6 +128,7 @@ namespace ogles1{
 			// enable bilinear filter without mipmaps
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			Logger->debug("glTexImage2D:%d,%d,%d,mipmap:%d,%s\n", m_textureId,m_pImage->getDimension().w,m_pImage->getDimension().h,hasMipMap(),COLOR_FORMAT_NAME[m_pImage->getColorFormat()]);
 		}
 		glTexImage2D(GL_TEXTURE_2D, 0, format, m_pImage->getDimension().w,m_pImage->getDimension().h, 0, format, pixelType, source);
 		m_pImage->unlock();
@@ -170,13 +172,22 @@ namespace ogles1{
 	}
 	void COGLES1Texture::endRTT(bool willRenderFrameBuffer)
 	{
+		//因为Driver的currentTexture记录的还是之前的textureId，所以这里要做一下恢复
+		GLint tmpTexture;
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmpTexture);
+
 		glBindTexture(GL_TEXTURE_2D, m_textureId);
 		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_textureSize.w,m_textureSize.h);
+		//glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGB,0,0,m_textureSize.w,m_textureSize.h,0);
+
+
+		//m_pDriver->checkGLError(__FILE__,__LINE__);
 
 		if(willRenderFrameBuffer){
 			const video::SClearSetting& setting=m_pDriver->getClearSetting();
-			m_pDriver->clearView(setting.clearBackBuffer,setting.clearZBuffer,setting.color);
 			glViewport(0,0,m_pDriver->getCurrentRenderTargetSize().w,m_pDriver->getCurrentRenderTargetSize().h);
+			m_pDriver->clearView(setting.clearBackBuffer,setting.clearZBuffer,setting.color);
+			glBindTexture(GL_TEXTURE_2D, tmpTexture);
 		}
 	}
 }//ogles1

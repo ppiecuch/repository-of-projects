@@ -69,14 +69,14 @@ namespace ogles1{
 			destY=(f32)size.h*0.5f-srcY;
 		}
 
-		virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name, const video::ENUM_COLOR_FORMAT format);
+		virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name, video::ENUM_COLOR_FORMAT format);
 		//virtual bool setRenderTarget(video::ITexture* texture,bool clearBackBuffer, bool clearZBuffer,video::SColor color);
 
 
 		virtual IImage* createImageFromFile(const io::path& filename);
 		virtual IImage* createImageFromFile(io::IReadStream* file);
 
-		virtual ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format);
+		virtual ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format,bool mipmap);
 		virtual bool setTexture(u32 stage, const video::ITexture* texture);
 		virtual ITexture* getTexture(const io::path& filename);
 		virtual video::ITexture* findTexture(const io::path& filename);
@@ -108,7 +108,7 @@ namespace ogles1{
 		void checkMaterial();
 		void addTexture(video::ITexture* texture);
 		video::ITexture* loadTextureFromFile(io::IReadStream* file);
-		video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
+		video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name,bool mipmap);
 
 		bool needHardwareBuffer(scene::IUnit* unit){
 			return unit->getHardwareBufferUsageType()!=ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE;

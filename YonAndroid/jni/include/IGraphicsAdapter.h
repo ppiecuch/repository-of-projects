@@ -42,8 +42,8 @@ namespace scene{
 		virtual ~IGraphicsAdapter(){}
 
 		//注意：如果绘制过程不打算调用sceneMgr->render，那么记得绘制之前先调用camera->render
-		virtual void beginBatch(s32 layerId) = 0;
-		virtual void endBatch() = 0;
+		//virtual void beginBatch(s32 layerId) = 0;
+		//virtual void endBatch() = 0;
 
 		//绘制成功返回true，否则返回false
 		virtual bool drawImage(const c8* imageName, s32 srcX, s32 srcY, u32 srcWidth, u32 srcHeight, s32 destX, s32 destY,bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
@@ -51,12 +51,12 @@ namespace scene{
 		//Draws the specified image by using the anchor point.
 		//anchor默认为TOP|LEFT
 		//绘制成功返回true，否则返回false
-		virtual bool drawImage(const c8* imageName, s32 x, s32 y, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP)) = 0;
+		//virtual bool drawImage(const c8* imageName, s32 x, s32 y, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP)) = 0;
 
 		//Copies a region of the specified source image to a location within the destination, possibly transforming (rotating and reflecting) the image data using the chosen transform function.
 		//transform默认为ENUM_TRANS_NONE，anchor默认为TOP|LEFT
 		//绘制成功返回true，否则返回false
-		virtual bool drawRegion(const c8* imageName, s32 x_src, s32 y_src, s32 width, s32 height, ENUM_TRANS transform=ENUM_TRANS_NONE, s32 x_dest=0, s32 y_dest=0, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP)) = 0;
+		//virtual bool drawRegion(const c8* imageName, s32 x_src, s32 y_src, s32 width, s32 height, ENUM_TRANS transform=ENUM_TRANS_NONE, s32 x_dest=0, s32 y_dest=0, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP)) = 0;
 
 
 		virtual void clearZ(s32 z) = 0;

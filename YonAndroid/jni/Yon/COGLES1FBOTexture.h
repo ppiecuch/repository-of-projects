@@ -11,6 +11,7 @@ namespace ogles1{
 		GLuint m_fboId;
 		GLuint m_rboId;
 		ENUM_COLOR_FORMAT m_format;
+		bool checkFBOError();
 	public:
 		COGLES1FBOTexture(const core::dimension2du& size,
 			const io::path& name,COGLES1Driver* driver, const ENUM_COLOR_FORMAT format);

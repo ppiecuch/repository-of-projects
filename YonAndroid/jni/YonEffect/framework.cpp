@@ -251,7 +251,7 @@ void drawFrame(){
 	core::rectf r(0,0,1,1);
 	//for(u32 i=0;i<100;++i){
 	gfAdapter->drawRegion("shadow.png",r,250,120,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
-	gfAdapter->drawRegion("trans.png",r,0,120,128,64,ENUM_TRANS_NONE);
+	gfAdapter->drawRegion("trans.png",r,0,120,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),false,0xFF0000FF);
 	gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
 	gfAdapter->drawRegion("trans.png",r,200,120,128,64,ENUM_TRANS_MIRROR);
 	gfAdapter->drawRegion("trans.png",r,300,120,128,64,ENUM_TRANS_MIRROR_ROT180);
@@ -286,6 +286,8 @@ void drawFrame(){
 	gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);
 	gfAdapter->drawRegion("trans.png",r,200,320,128,64,ENUM_TRANS_MIRROR_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
 	gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
+
+	gfAdapter->drawImage("shadow.png",0,0,64,32,50,50,true,0xAA000000);
 
 
 	gfAdapter->render();

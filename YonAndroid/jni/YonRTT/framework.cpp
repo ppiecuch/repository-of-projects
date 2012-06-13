@@ -50,7 +50,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
-	params.fpsLimit=10;
+	params.fpsLimit=0;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -105,7 +105,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(512,512), "RTT");
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(256,256), "RTT");
 	cubeModel->setMaterialTexture(0, rtt); 
 
 	return true;
@@ -117,17 +117,17 @@ void drawFrame(){
 
 	videoDriver->begin();
 
-	rtt->beginRTT(true,true,COLOR_WHITE);
+	rtt->beginRTT(true,true,video::SColor(0xFF133E67));
 
 	teapotModel->setVisible(true);
-	cubeModel->setVisible(true);
-	planeModel->setVisible(false);
+	cubeModel->setVisible(false);
+	//planeModel->setVisible(false);
 
 	sceneMgr->render(videoDriver);
 
 	teapotModel->setVisible(false);
 	cubeModel->setVisible(true);
-	planeModel->setVisible(true);
+	//planeModel->setVisible(true);
 
 
 	rtt->endRTT(true);
