@@ -370,6 +370,10 @@
 					RelativePath="..\include\IEventSender.h"
 					>
 				</File>
+				<File
+					RelativePath="..\include\keycodes.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="platform"
