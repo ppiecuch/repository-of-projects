@@ -126,6 +126,7 @@ namespace ogles1{
 		m_materialRenderers.push_back(createMaterialRendererBlend(this));
 		m_materialRenderers.push_back(createMaterialRendererLighten(this));
 		m_materialRenderers.push_back(createMaterialRendererTransparent(this));
+		m_materialRenderers.push_back(createMaterialRendererTransparentRef(this));
 		m_materialRenderers.push_back(createMaterialRendererTransparentBlendColor(this));
 		m_materialRenderers.push_back(createMaterialRendererMask(this));
 
@@ -174,7 +175,7 @@ namespace ogles1{
 		DebugFont::getInstance().m_pTexture=tex;
 		DebugFont::getInstance().m_pDriver=this;*/
 		video::IImage* image=debug::createDebugPrinterTextureImage();
-		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
+		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"),false);
 		addTexture(tex);
 		tex->drop();
 		image->drop();
@@ -742,7 +743,7 @@ namespace ogles1{
 		return m_matrix[transform];
 	}
 
-	ITexture* COGLES1Driver::addRenderTargetTexture(const core::dimension2du& size,const io::path& name, const video::ENUM_COLOR_FORMAT format){
+	ITexture* COGLES1Driver::addRenderTargetTexture(const core::dimension2du& size,const io::path& name, video::ENUM_COLOR_FORMAT format){
 		//disable mip-mapping
 		//const bool generateMipLevels = getTextureCreationFlag(ETCF_CREATE_MIP_MAPS);
 		//setTextureCreationFlag(ETCF_CREATE_MIP_MAPS, false);
@@ -750,10 +751,10 @@ namespace ogles1{
 		video::ITexture* rtt = 0;
 		
 
-		/*if(queryFeature(ENUM_VIDEO_FEATURE_FBO))
+		if(queryFeature(ENUM_VIDEO_FEATURE_FBO))
 		{
-			//TODO
-			//Logger->error(YON_LOG_FAILED_FORMAT,"Currently do not support FBO!");
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,"use fast RTT for supporting FBO!");
+
 			rtt = new COGLES1FBOTexture(size, name, this, format);
 			if (rtt)
 			{
@@ -761,14 +762,24 @@ namespace ogles1{
 				rtt->drop();
 			}
 		}
-		else*/
+		else
 		{
+			Logger->warn(YON_LOG_WARN_FORMAT,"use slow RTT for not supporting FBO!");
+
+			//android上不支持R8G8B8A8/R5G5B5A1，glTexSubImage2D出现GL_INVALID_OPERATION
+#ifdef YON_COMPILE_WITH_ANDROID
+			if(video::hasAlpha(format))
+			{
+				video::ENUM_COLOR_FORMAT newFormat=video::discardAlpha(format);
+				Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("not support %s, change to %s!",COLOR_FORMAT_NAME[format],COLOR_FORMAT_NAME[newFormat]).c_str());
+				format=newFormat;
+			}
+#endif
 			core::dimension2du destSize(core::min_(size.w,m_windowSize.w), core::min_(size.h,m_windowSize.h));
 			//but why?
 			//destSize = destSize.getOptimalSize((size==size.getOptimalSize()), false, false);
 			destSize = destSize.getOptimalSize(true, false, false);
-			//why not format,but use ENUM_COLOR_FORMAT_R8G8B8A8?
-			rtt = addTexture(destSize, name, video::ENUM_COLOR_FORMAT_R8G8B8A8);
+			rtt = addTexture(destSize, name, format, false);
 			if (rtt)
 				static_cast<COGLES1Texture*>(rtt)->setIsRenderTarget(true);
 
@@ -858,7 +869,7 @@ namespace ogles1{
 		return NULL;
 	}
 
-	ITexture* COGLES1Driver::addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format){
+	ITexture* COGLES1Driver::addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format,bool mipmap){
 		if(IImage::isRenderTargetOnlyFormat(format))
 		{
 			Logger->warn("Could not create ITexture, format only supported for render target textures.\n");
@@ -878,7 +889,7 @@ namespace ogles1{
 		else
 			 image = new CImage(format, size);
 		 */
-		ITexture* t = createDeviceDependentTexture(image, name);
+		ITexture* t = createDeviceDependentTexture(image, name, mipmap);
 		image->drop();
 		addTexture(t);
 
@@ -904,7 +915,7 @@ namespace ogles1{
 
 		if (image)
 		{
-			texture = createDeviceDependentTexture(image, file->getPath());
+			texture = createDeviceDependentTexture(image, file->getPath(),true);
 			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("end load texture:%s",getFileName(file->getPath()).c_str()).c_str());
 			image->drop();
 		}
@@ -912,9 +923,9 @@ namespace ogles1{
 		return texture;
 	}
 
-	video::ITexture* COGLES1Driver::createDeviceDependentTexture(IImage* image, const io::path& name)
+	video::ITexture* COGLES1Driver::createDeviceDependentTexture(IImage* image, const io::path& name,bool mipmap)
 	{
-		return new COGLES1Texture(image, name, this);
+		return new COGLES1Texture(image, name, this, mipmap);
 	}
 
 	ITexture* COGLES1Driver::getTexture(const io::path& filename){

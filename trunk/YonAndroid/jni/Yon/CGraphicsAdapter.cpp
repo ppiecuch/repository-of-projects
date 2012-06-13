@@ -24,32 +24,29 @@ namespace scene{
 	const u16 CGraphicsAdapter::INDICES[6]={0,1,3,3,1,2};
 
 	CGraphicsAdapter::CGraphicsAdapter(video::IVideoDriver* driver,ISceneManager* sceneMgr)
-		:m_pSceneMgr(sceneMgr),m_pDriver(driver),m_uCurrentLayerIndex(0),m_iZValue(0),
-		m_defaultPool(DefaultUnitPool(3)),m_pSolidMaterial(NULL),m_pTransparentMaterial(NULL)
+		:m_pSceneMgr(sceneMgr),m_pDriver(driver),m_iZValue(0.0f),
+		m_defaultPool(DefaultUnitPool(3)),m_pTransparentRefMaterial(NULL),m_pTransparentMaterial(NULL)
 	{
-		m_pSolidMaterial=driver->createMaterial();
+		//m_pSolidMaterial=driver->createMaterial();
+		m_pTransparentRefMaterial=driver->createMaterial();
 		m_pTransparentMaterial=driver->createMaterial();
+		m_pTransparentRefMaterial->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_REF);
 		m_pTransparentMaterial->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance CGraphicsAdapter");
 	}
 	CGraphicsAdapter::~CGraphicsAdapter(){
 		m_pTransparentMaterial->drop();
-		m_pSolidMaterial->drop();
+		m_pTransparentRefMaterial->drop();
+		//m_pSolidMaterial->drop();
 		m_defaultPool.clear();
 
-		for(u32 i=0;i<m_layers.size();++i)
-			delete m_layers[i];
+		//for(u32 i=0;i<m_layers.size();++i)
+		//	delete m_layers[i];
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release CGraphicsAdapter");
 	}
 
-	void CGraphicsAdapter::beginBatch(s32 layerId){
-		/*core::list<SLayer*>::Iterator it = m_layers.begin();
-		for (; it != m_layers.end(); ++it){
-			if((*it)->layerId==layerId)
-				return (*it)->entity;
-		}
-		SLayer* layer=new SLayer(layerId,new CEntity());
-		return layer->entity;*/
+	/*void CGraphicsAdapter::beginBatch(s32 layerId){
+
 		m_iZValue=layerId;
 		//TODO优化
 		if(m_layers.size()>0&&m_layers[m_uCurrentLayerIndex]->layerId==layerId)
@@ -78,11 +75,14 @@ namespace scene{
 		delete m_layers[m_uCurrentLayerIndex];
 		m_layers.erase(m_uCurrentLayerIndex);
 		m_uCurrentLayerIndex=0;
-	}
+	}*/
 
 	f32 CGraphicsAdapter::calcZ(){
 		m_iZValue+=Z_INC;
 		return m_iZValue;
+	}
+	void CGraphicsAdapter::clearZ(s32 z){
+		m_iZValue=z;
 	}
 	void CGraphicsAdapter::convertUVCoordinate(const core::recti& src,const core::dimension2du& size,core::rectf& uv){
 		const f32 invW = 1.f / static_cast<f32>(size.w);
@@ -100,24 +100,52 @@ namespace scene{
 			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("image:%s can not found!",imageName).c_str());
 			return false;
 		}
-		video::ENUM_MATERIAL_TYPE materialType=useAlpha?video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR:video::ENUM_MATERIAL_TYPE_SOLID;
+		//video::ENUM_MATERIAL_TYPE materialType=useAlpha?video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR:video::ENUM_MATERIAL_TYPE_SOLID;
 		//计算位置坐标(左上角)
 		core::position2di spos(destX,destY);
 		core::position2df rpos;
 		m_pDriver->convertPosCoordinate(spos,rpos);
-		Logger->debug("convertPosCoordinate:%d,%d->%.2f,%.2f\n",spos.x,spos.y,rpos.x,rpos.y);
+		//Logger->debug("convertPosCoordinate:%d,%d->%.2f,%.2f\n",spos.x,spos.y,rpos.x,rpos.y);
 		//计算UV坐标
 		core::recti src(srcX,srcY,srcX+srcWidth,srcY+srcHeight);
 		const core::dimension2du& size=texture->getSize();
 		core::rectf uv;
 		convertUVCoordinate(src,size,uv);
-		IShap* shap=m_pSceneMgr->getGeometryFactory()->createXYRectangle3D(rpos.x,rpos.y-srcHeight,rpos.x+srcWidth,rpos.y,calcZ(),uv.topLeft.x,uv.bottomRight.y,uv.bottomRight.x,uv.topLeft.y,video::SColor(color));
-		m_layers[m_uCurrentLayerIndex]->entity->add(texture,materialType,shap);
-		shap->drop();
+		//IShap* shap=m_pSceneMgr->getGeometryFactory()->createXYRectangle3D(rpos.x,rpos.y-srcHeight,rpos.x+srcWidth,rpos.y,calcZ(),uv.topLeft.x,uv.bottomRight.y,uv.bottomRight.x,uv.topLeft.y,video::SColor(color));
+		//m_layers[m_uCurrentLayerIndex]->entity->add(texture,materialType,shap);
+		//shap->drop();
+		//创建形态
+		f32 x0,y0,x1,y1,z,u0,v0,u1,v1;
+		u0=uv.topLeft.x;
+		v0=uv.bottomRight.y;
+		u1=uv.bottomRight.x;
+		v1=uv.topLeft.y;
+		x0=rpos.x;
+		y0=rpos.y-srcHeight;
+		x1=rpos.x+srcWidth;
+		y1=rpos.y;
+		z=calcZ();
+		video::SColor c(color);
+		DefaultUnit* unit=m_defaultPool.get();
+		unit->m_vertices.push_back(SVertex(x0,y0,z,u0,v0,c));
+		unit->m_vertices.push_back(SVertex(x1,y0,z,u1,v0,c));
+		unit->m_vertices.push_back(SVertex(x1,y1,z,u1,v1,c));
+		unit->m_vertices.push_back(SVertex(x0,y1,z,u0,v1,c));
+		unit->m_pTexture=texture;
+		if(useAlpha)
+		{
+			TransparentEntry entry(unit,z);
+			m_transparents.push_back(entry);
+		}
+		else
+		{
+			SolidEntry entry(unit);
+			m_solids.push_back(entry);
+		}
 		return true;
 	}
 
-	bool CGraphicsAdapter::drawImage(const c8* imageName, s32 x, s32 y, MASK_ACTHOR anchor){
+	/*bool CGraphicsAdapter::drawImage(const c8* imageName, s32 x, s32 y, MASK_ACTHOR anchor){
 		video::ITexture* texture=m_pDriver->getTexture(imageName);
 		if(texture==NULL)
 			return false;
@@ -233,11 +261,9 @@ namespace scene{
 		m_layers[m_uCurrentLayerIndex]->entity->add(texture,materialType,shap);
 		shap->drop();
 		return true;
-	}
+	}*/
 
-	void CGraphicsAdapter::clearZ(s32 z){
-		m_iZValue=z;
-	}
+	
 
 	bool CGraphicsAdapter::drawRegion(const c8* imageName, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform, MASK_ACTHOR anchor,bool useAlpha, u32 color){
 		video::ITexture* texture=m_pDriver->getTexture(imageName);
@@ -453,11 +479,11 @@ namespace scene{
 
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD, core::IDENTITY_MATRIX);
 
-		m_pDriver->setMaterial(m_pSolidMaterial);
+		m_pDriver->setMaterial(m_pTransparentRefMaterial);
 		m_solids.sort();
 		for (i=0; i<m_solids.size(); ++i)
 		{
-			m_pSolidMaterial->setTexture(0,m_solids[i].m_pUnit->m_pTexture);
+			m_pTransparentRefMaterial->setTexture(0,m_solids[i].m_pUnit->m_pTexture);
 			// /Logger->debug("draw:%d,%d\n",m_solids[i].m_pUnit->m_pTexture,m_solids[i].m_pUnit->m_vertices.size());
 			m_pDriver->drawVertexPrimitiveList(m_solids[i].m_pUnit->m_vertices.const_pointer(),m_solids[i].m_pUnit->m_vertices.size(),CGraphicsAdapter::INDICES,6);
 			m_defaultPool.recycle(m_solids[i].m_pUnit);

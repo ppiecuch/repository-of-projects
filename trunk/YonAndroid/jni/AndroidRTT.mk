@@ -105,6 +105,7 @@ vorbis_SOURCES :=\
 		Yon/libvorbis/window.c 
 
 yon_SOURCES :=   \
+		Yon/CRandomizer.cpp \
 		Yon/CWave.cpp \
 		Yon/CWaveLoaderWAV.cpp \
 		Yon/CWaveLoaderOGG.cpp \
@@ -113,10 +114,11 @@ yon_SOURCES :=   \
 		Yon/CDebugPrinter.cpp \
 		Yon/CLogger.cpp \
 		Yon/CFileSystem.cpp \
-		Yon/CReadFile.cpp \
 		Yon/CReadFileStream.cpp \
+		Yon/CWriteFileStream.cpp \
 		Yon/CReadMemoryStream.cpp \
 		Yon/COrthoCamera.cpp \
+		Yon/CPerspCamera.cpp \
 		Yon/CGeometryFactory.cpp \
 		Yon/CEntity.cpp \
 		Yon/CModel.cpp \

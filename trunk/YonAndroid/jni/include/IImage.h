@@ -50,6 +50,35 @@ namespace video{
 			return 0;
 		}
 	}
+
+	static bool hasAlpha(const ENUM_COLOR_FORMAT format)
+	{
+		switch(format)
+		{
+		case ENUM_COLOR_FORMAT_R5G5B5A1:
+		case ENUM_COLOR_FORMAT_R8G8B8A8:
+		case ENUM_COLOR_FORMAT_A8:
+		case ENUM_COLOR_FORMAT_L8A8:
+			return true;
+		}
+		return false;
+	}
+	
+	static ENUM_COLOR_FORMAT discardAlpha(const ENUM_COLOR_FORMAT format)
+	{
+		switch(format)
+		{
+		case ENUM_COLOR_FORMAT_R5G5B5A1:
+			return ENUM_COLOR_FORMAT_R5G6B5;
+		case ENUM_COLOR_FORMAT_R8G8B8A8:
+			return ENUM_COLOR_FORMAT_R8G8B8;
+		case ENUM_COLOR_FORMAT_L8A8:
+			return ENUM_COLOR_FORMAT_L8;
+		case ENUM_COLOR_FORMAT_A8:	//TODO
+			return ENUM_COLOR_FORMAT_R8G8B8;
+		}
+		return format;
+	}
 	
 	class IImage : public virtual core::IReferencable{
 	public:

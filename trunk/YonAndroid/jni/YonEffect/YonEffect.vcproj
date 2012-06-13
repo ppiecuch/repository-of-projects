@@ -167,6 +167,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\AndroidEffect.mk"
+			>
+		</File>
+		<File
 			RelativePath=".\BillBoard.cpp"
 			>
 		</File>

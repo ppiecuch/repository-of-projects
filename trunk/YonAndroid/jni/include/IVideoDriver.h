@@ -94,7 +94,7 @@ namespace yon{
 			ENUM_RENDER_MODE m_renderMode;
 			io::IFileSystem* m_pFileSystem;
 			ITimer* m_pTimer;
-			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name) = 0;
+			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name,bool mipmap) = 0;
 		public:
 			IVideoDriver(io::IFileSystem* fs,ITimer* timer)
 				:m_renderMode(ENUM_RENDER_MODE_NONE),m_pFileSystem(fs),m_pTimer(timer){
@@ -132,7 +132,7 @@ namespace yon{
 
 			//添加一张用于渲染缓冲的纹理,size必须是2的N次幂,并且长度都不可超过后缓冲区的大小
 			virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,
-				const io::path& name = "rtt", const video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G5B5A1) =0;
+				const io::path& name = "rtt", video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G6B5) =0;
 			//参数texture:必须是由addRenderTargetTexture生成的texture
 			//参数color:render target的背景色
 			//virtual bool setRenderTarget(video::ITexture* texture,
@@ -143,7 +143,7 @@ namespace yon{
 			virtual IImage* createImageFromFile(io::IReadStream* file) =0;
 
 			virtual ITexture* addTexture(const core::dimension2du& size,
-				const io::path& name, ENUM_COLOR_FORMAT format = ENUM_COLOR_FORMAT_R8G8B8A8) = 0;
+				const io::path& name, ENUM_COLOR_FORMAT format = ENUM_COLOR_FORMAT_R8G8B8A8,bool mipmap=true) = 0;
 			virtual bool setTexture(u32 stage, const video::ITexture* texture) = 0;
 			virtual ITexture* getTexture(const io::path& filename) = 0;
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;
