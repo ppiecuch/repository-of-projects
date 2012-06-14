@@ -28,7 +28,7 @@ namespace yon{
 			ENUM_MOUSE_INPUT_TYPE_RUP,
 			ENUM_MOUSE_INPUT_TYPE_MUP,
 
-			ENUM_MOUSE_INPUT_TYPE_MOVED,
+			ENUM_MOUSE_INPUT_TYPE_MOVE,
 			ENUM_MOUSE_INPUT_TYPE_WHEEL,
 
 			//TODO
@@ -57,7 +57,10 @@ namespace yon{
 
 		struct STouchInput{
 			ENUM_TOUCH_INPUT_TYPE type;
-			f32 x,y;
+			u8 id;
+			s32 xs[YON_TOUCH_MAX_INPUTS];
+			s32 ys[YON_TOUCH_MAX_INPUTS];
+			s32 count;
 		};
 		struct SMouseInput{
 			ENUM_MOUSE_INPUT_TYPE type;

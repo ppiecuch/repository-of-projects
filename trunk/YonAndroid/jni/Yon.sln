@@ -118,6 +118,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonGraphics", "YonGraphics\
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonMultitouch", "YonMultitouch\YonMultitouch.vcproj", "{ED8F21E3-BE28-4197-86C2-D51B2E770D85}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -220,6 +225,10 @@ Global
 		{FA095739-6CCD-452C-B4A7-D8A35E903BA3}.Debug|Win32.Build.0 = Debug|Win32
 		{FA095739-6CCD-452C-B4A7-D8A35E903BA3}.Release|Win32.ActiveCfg = Release|Win32
 		{FA095739-6CCD-452C-B4A7-D8A35E903BA3}.Release|Win32.Build.0 = Release|Win32
+		{ED8F21E3-BE28-4197-86C2-D51B2E770D85}.Debug|Win32.ActiveCfg = Debug|Win32
+		{ED8F21E3-BE28-4197-86C2-D51B2E770D85}.Debug|Win32.Build.0 = Debug|Win32
+		{ED8F21E3-BE28-4197-86C2-D51B2E770D85}.Release|Win32.ActiveCfg = Release|Win32
+		{ED8F21E3-BE28-4197-86C2-D51B2E770D85}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -25,7 +25,7 @@ public class AndroidGLView extends GLSurfaceView{
 	private native void nativeOnPause();
 	private native void nativeOnResume();
 	private native boolean nativeOnBack();
-	private native boolean nativeOnTouch(int action,float x,float y);
+	private native boolean nativeOnTouch(int action,float[] xs,float[] ys,int count);
 	
 	private void callbackDestroy(){
 		activity.finish();
@@ -63,7 +63,24 @@ public class AndroidGLView extends GLSurfaceView{
 	
 	public boolean onTouchEvent(final MotionEvent event) {
 		//long start=SystemClock.uptimeMillis();
-		nativeOnTouch(event.getAction(),event.getX(),event.getY());
+		switch (event.getAction() & MotionEvent.ACTION_MASK) 
+		{
+        case MotionEvent.ACTION_DOWN:
+        case MotionEvent.ACTION_UP:
+        case MotionEvent.ACTION_POINTER_DOWN:
+        case MotionEvent.ACTION_POINTER_UP:
+        case MotionEvent.ACTION_MOVE:
+		}
+		int count=event.getPointerCount();
+    	float xs[]=new float[count];
+    	float ys[]=new float[count];
+    	for(int i=0;i<count;++i)
+    	{
+    		xs[i]=event.getX(i);
+    		ys[i]=event.getY(i);
+    	}
+		//nativeOnTouch(event.getAction(),event.getX(),event.getY());
+    	nativeOnTouch(event.getAction(),xs,ys,count);
 		//Log.d("AndroidGLView","use:"+(SystemClock.uptimeMillis()-start)+"ms");
 		//必须reture true,否则up/move事件无法捕抓
 		return true;

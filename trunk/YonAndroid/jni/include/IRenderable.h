@@ -75,6 +75,15 @@ namespace yon{
 				return m_transformation;
 			}
 
+			virtual void setTransformation(const core::matrix4f& m)
+			{
+				m_transformation=m;
+				//TODO
+				//m_rotation=m.getRotation();
+				m_position=m.getTranslation();
+				//m_scale=m.getScale();
+			}
+
 			virtual bool isVisible() const{
 				return m_bVisible;
 			}
