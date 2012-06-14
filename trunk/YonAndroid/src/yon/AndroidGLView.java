@@ -25,7 +25,8 @@ public class AndroidGLView extends GLSurfaceView{
 	private native void nativeOnPause();
 	private native void nativeOnResume();
 	private native boolean nativeOnBack();
-	private native boolean nativeOnTouch(int action,float[] xs,float[] ys,int count);
+	private native boolean nativeOnTouch(int action,int id,float x,float y);
+	private native boolean nativeOnMove(int action,int ids[],float[] xs,float[] ys,int count);
 	
 	private void callbackDestroy(){
 		activity.finish();
@@ -63,27 +64,35 @@ public class AndroidGLView extends GLSurfaceView{
 	
 	public boolean onTouchEvent(final MotionEvent event) {
 		//long start=SystemClock.uptimeMillis();
+		int id=(event.getAction()&MotionEvent.ACTION_POINTER_ID_MASK)>>MotionEvent.ACTION_POINTER_ID_SHIFT;
+		id=event.getPointerId(id);
 		switch (event.getAction() & MotionEvent.ACTION_MASK) 
 		{
         case MotionEvent.ACTION_DOWN:
         case MotionEvent.ACTION_UP:
         case MotionEvent.ACTION_POINTER_DOWN:
         case MotionEvent.ACTION_POINTER_UP:
+        	nativeOnTouch(event.getAction(),id,event.getX(),event.getY());
+        	return true;
         case MotionEvent.ACTION_MOVE:
+        	int count=event.getPointerCount();
+        	int ids[]=new int[count];
+        	float xs[]=new float[count];
+        	float ys[]=new float[count];
+        	for(int i=0;i<count;++i)
+        	{
+        		ids[i]=event.getPointerId(i);
+        		xs[i]=event.getX(i);
+        		ys[i]=event.getY(i);
+        	}
+        	nativeOnMove(event.getAction(),ids,xs,ys,count);
+        	return true;
 		}
-		int count=event.getPointerCount();
-    	float xs[]=new float[count];
-    	float ys[]=new float[count];
-    	for(int i=0;i<count;++i)
-    	{
-    		xs[i]=event.getX(i);
-    		ys[i]=event.getY(i);
-    	}
 		//nativeOnTouch(event.getAction(),event.getX(),event.getY());
-    	nativeOnTouch(event.getAction(),xs,ys,count);
+    	//nativeOnTouch(event.getAction(),xs,ys,count);
 		//Log.d("AndroidGLView","use:"+(SystemClock.uptimeMillis()-start)+"ms");
 		//必须reture true,否则up/move事件无法捕抓
-		return true;
+		return false;
 	}
 	
 	/*
