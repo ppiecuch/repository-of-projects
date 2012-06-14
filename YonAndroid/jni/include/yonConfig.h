@@ -53,6 +53,9 @@
 //材质（目前只支持一层）
 #define YON_MATERIAL_MAX_TEXTURES 2
 
+//触控
+#define YON_TOUCH_MAX_INPUTS 8
+
 //宏修正
 #ifdef YON_COMPILE_WITH_WIN32
 #elif defined(YON_COMPILE_WITH_ANDROID)

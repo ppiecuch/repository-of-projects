@@ -10,7 +10,7 @@ extern "C" {
 /*
  * Class:     yon_AndroidGLView
  * Method:    nativeOnSurfaceCreated
- * Signature: (Ljava/lang/String;Ljava/lang/String;)V
+ * Signature: (IILjava/lang/String;Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeOnSurfaceCreated
   (JNIEnv *, jobject, jint, jint, jstring, jstring);
@@ -58,10 +58,10 @@ JNIEXPORT jboolean JNICALL Java_yon_AndroidGLView_nativeOnBack
 /*
  * Class:     yon_AndroidGLView
  * Method:    nativeOnTouch
- * Signature: (IFF)Z
+ * Signature: (I[F[FI)Z
  */
 JNIEXPORT jboolean JNICALL Java_yon_AndroidGLView_nativeOnTouch
-  (JNIEnv *, jobject, jint, jfloat, jfloat);
+  (JNIEnv *, jobject, jint, jfloatArray, jfloatArray, jint);
 
 #ifdef __cplusplus
 }

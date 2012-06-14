@@ -35,10 +35,10 @@ public:
 			switch(evt.mouseInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
-				logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
-				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			}
 		}
@@ -59,7 +59,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
@@ -99,7 +99,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
 	cubeModel->setPosition(core::vector3df(100,100,0));
 	//material->setTexture(0,videoDriver->getTexture("png8/120.png"));
-	material->setTexture(0,videoDriver->getTexture("38.png"));
+	material->setTexture(0,videoDriver->getTexture("error.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
