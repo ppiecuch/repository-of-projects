@@ -18,6 +18,7 @@ public class AndroidGLView extends GLSurfaceView{
 	AndroidGLRender renderer;
 	Activity activity;
 	int screenWidth,screenHeight;
+	MoveEvent currentMoveEvent,lastMoveEvent;
 	
 	private native void nativeOnSurfaceCreated(int width,int height,String apkFilePath,String sdcardPath);
 	private native void nativeOnSurfaceChanged(int width, int height);
@@ -42,6 +43,9 @@ public class AndroidGLView extends GLSurfaceView{
 		screenWidth = dm.widthPixels;
 		screenHeight = dm.heightPixels;
 		
+		currentMoveEvent=new MoveEvent();
+		lastMoveEvent=new MoveEvent();
+		
 		renderer=new AndroidGLRender();
 		setRenderer(renderer);
 	}
@@ -62,6 +66,65 @@ public class AndroidGLView extends GLSurfaceView{
 		return super.onKeyDown(keyCode, event);
 	}
 	
+	class MoveEvent{
+		private static final int MAX_EVENT=16;
+		public int count=-1;
+		public int[] ids=new int[MAX_EVENT];
+		public float[] xs=new float[MAX_EVENT];
+		public float[] ys=new float[MAX_EVENT];
+		
+		private boolean equals(int[] a,int[] b)
+		{
+			/*if(a==null&&b==null)
+				return true;
+			if(a==null)
+				return false;
+			if(b==null)
+				return false;
+			if(a.length!=b.length)
+				return false;*/
+			for(int i=0;i<count;++i)
+				if(a[i]!=b[i])
+					return false;
+			return true;
+		}
+		
+		private boolean equals(float[] a,float[] b)
+		{
+			/*if(a==null&&b==null)
+				return true;
+			if(a==null)
+				return false;
+			if(b==null)
+				return false;
+			if(a.length!=b.length)
+				return false;*/
+			for(int i=0;i<count;++i)
+				if(a[i]!=b[i])
+					return false;
+			return true;
+		}
+		
+		public void set(MoveEvent e)
+		{
+			count=e.count;
+			for(int i=0;i<count;++i)
+			{
+				ids[i]=e.ids[i];
+				xs[i]=e.xs[i];
+				ys[i]=e.ys[i];
+			}
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if(o instanceof MoveEvent==false)
+				return false;
+			MoveEvent m=(MoveEvent)o;
+			return m.count==count&&equals(ids, m.ids)&&equals(xs, m.xs)&&equals(ys, m.ys);
+		}
+	}
+	
 	public boolean onTouchEvent(final MotionEvent event) {
 		//long start=SystemClock.uptimeMillis();
 		int id=(event.getAction()&MotionEvent.ACTION_POINTER_ID_MASK)>>MotionEvent.ACTION_POINTER_ID_SHIFT;
@@ -75,17 +138,20 @@ public class AndroidGLView extends GLSurfaceView{
         	nativeOnTouch(event.getAction(),id,event.getX(),event.getY());
         	return true;
         case MotionEvent.ACTION_MOVE:
-        	int count=event.getPointerCount();
-        	int ids[]=new int[count];
-        	float xs[]=new float[count];
-        	float ys[]=new float[count];
-        	for(int i=0;i<count;++i)
+        	currentMoveEvent.count=event.getPointerCount();
+        	//int ids[]=new int[count];
+        	//float xs[]=new float[count];
+        	//float ys[]=new float[count];
+        	for(int i=0;i<currentMoveEvent.count;++i)
         	{
-        		ids[i]=event.getPointerId(i);
-        		xs[i]=event.getX(i);
-        		ys[i]=event.getY(i);
+        		currentMoveEvent.ids[i]=event.getPointerId(i);
+        		currentMoveEvent.xs[i]=event.getX(i);
+        		currentMoveEvent.ys[i]=event.getY(i);
         	}
-        	nativeOnMove(event.getAction(),ids,xs,ys,count);
+        	if(lastMoveEvent.equals(currentMoveEvent))
+        		return true;
+        	lastMoveEvent.set(currentMoveEvent);
+        	nativeOnMove(event.getAction(),currentMoveEvent.ids,currentMoveEvent.xs,currentMoveEvent.ys,currentMoveEvent.count);
         	return true;
 		}
 		//nativeOnTouch(event.getAction(),event.getX(),event.getY());

@@ -99,7 +99,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
 	cubeModel->setPosition(core::vector3df(100,100,0));
 	//material->setTexture(0,videoDriver->getTexture("png8/120.png"));
-	material->setTexture(0,videoDriver->getTexture("error.png"));
+	//material->setTexture(0,videoDriver->getTexture("error.png"));
+	material->setTexture(0,videoDriver->getTexture("aura_rgba.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -118,10 +119,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
 	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_BLEND);
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+	//material->setWrapModeU(0,ENUM_WRAP_MODE_CLAMP_TO_EDGE);
+	//material->setWrapModeV(0,ENUM_WRAP_MODE_CLAMP_TO_EDGE);
+	material->setBlendSrcFactor(ENUM_BLEND_FACTOR_SRC_ALPHA);
+	material->setBlendDstFactor(ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA);
 	planeModel->setPosition(core::vector3df(0,0,0));
-	material->setTexture(0,videoDriver->getTexture("aura.png"));
+	//material->setTexture(0,videoDriver->getTexture("aura.png"));
+	material->setTexture(0,videoDriver->getTexture("hierogram1.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
