@@ -20,6 +20,12 @@ class MyEventReceiver : public IEventReceiver{
 		ENUM_MODE_DRAG,
 		ENUM_MODE_SCALE
 	};
+	static c8* MODE_STRING[];
+
+	struct EventEntry{
+		s32 id;
+		core::vector2di start,end;
+	};
 
 	class AccessClass{
 	public:
@@ -28,7 +34,7 @@ class MyEventReceiver : public IEventReceiver{
 		}
 		void operator = (const ENUM_MODE& m)
 		{
-			logger->debug("%d->%d\n",mode,m);
+			logger->debug("%s->%s\n",MODE_STRING[mode],MODE_STRING[m]);
 			mode=m;
 		}
 
@@ -42,7 +48,8 @@ class MyEventReceiver : public IEventReceiver{
 
 	AccessClass mode;
 
-	core::vector2di start1,start2,end1,end2;
+	//core::vector2di start1,start2,end1,end2;
+	EventEntry input1,input2;
 	core::matrix4f mat;
 public:
 	MyEventReceiver():mode(ENUM_MODE_NONE),mat(core::IDENTITY_MATRIX){}
@@ -51,7 +58,7 @@ public:
 		bool move=false;
 		bool result=false;
 		bool changed=false;
-		Logger->debug("evt.type:%d\n",evt.type);
+		//Logger->debug("evt.type:%d\n",evt.type);
 		switch(evt.type)
 		{
 		case event::ENUM_EVENT_TYPE_MOUSE:
@@ -60,7 +67,8 @@ public:
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				//logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				mode=ENUM_MODE_DRAG;
-				start1.set(evt.mouseInput.x,evt.mouseInput.y);
+				//start1.set(evt.mouseInput.x,evt.mouseInput.y);
+				input1.start.set(evt.mouseInput.x,evt.mouseInput.y);
 				result=true;
 				break;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
@@ -74,7 +82,8 @@ public:
 				if(mode==ENUM_MODE_DRAG)
 				{
 					move=true;
-					end1.set(evt.mouseInput.x,evt.mouseInput.y);
+					//end1.set(evt.mouseInput.x,evt.mouseInput.y);
+					input1.end.set(evt.mouseInput.x,evt.mouseInput.y);
 				}
 				result=true;
 				break;
@@ -85,32 +94,32 @@ public:
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
 				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
-				if(evt.touchInput.count==2)
+				if(evt.touchInput.ids[0]==1)
 				{
 					mode=ENUM_MODE_SCALE;
-					start2.set(evt.touchInput.xs[1],evt.touchInput.ys[1]);
-					end2=start2;
-					logger->debug("end2=start2:%d,%d\n",start2.x,start2.y);
+					//start2.set(evt.touchInput.xs[0],evt.touchInput.ys[0]);
+					//end2=start2;
+					//logger->debug("end2=start2:%d,%d\n",start2.x,start2.y);
 					changed=true;
 				}
-				else if(evt.touchInput.count==1)
+				else if(evt.touchInput.ids[0]==0)
 				{
 					mode=ENUM_MODE_DRAG;
-					start1.set(evt.touchInput.xs[0],evt.touchInput.ys[0]);
-					end1=start1;
-					logger->debug("end1=start1:%d,%d\n",start1.x,start1.y);
+					//start1.set(evt.touchInput.xs[0],evt.touchInput.ys[0]);
+					//end1=start1;
+					//logger->debug("end1=start1:%d,%d\n",start1.x,start1.y);
 					changed=true;
 				}
 				result=true;
 				break;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
 				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
-				if(evt.touchInput.count==2)
+				if(evt.touchInput.ids[0]==1)
 				{
 					mode=ENUM_MODE_DRAG;
 					changed=true;
 				}
-				else if(evt.touchInput.count==1)
+				else if(evt.touchInput.ids[0]==0)
 				{
 					mode=ENUM_MODE_NONE;
 					mat.makeIdentity();
@@ -122,21 +131,15 @@ public:
 				move=true;
 				if(mode==ENUM_MODE_DRAG)
 				{
-					end1.set(evt.touchInput.xs[0],evt.touchInput.ys[0]);
-					logger->debug("end1:%d,%d\n",end1.x,end1.y);
+					//end1.set(evt.touchInput.xs[0],evt.touchInput.ys[0]);
+					//logger->debug("end1:%d,%d\n",end1.x,end1.y);
 				}
 				else if(mode==ENUM_MODE_SCALE)
 				{
-					if(evt.touchInput.id==0)
-					{
-						end1.set(evt.touchInput.xs[0],evt.touchInput.ys[0]);
-						logger->debug("end1:%d,%d\n",end1.x,end1.y);
-					}
-					else if(evt.touchInput.id==1)
-					{
-						end2.set(evt.touchInput.xs[1],evt.touchInput.ys[1]);
-						logger->debug("end2:%d,%d\n",end2.x,end2.y);
-					}
+					//end1.set(evt.touchInput.xs[0],evt.touchInput.ys[0]);
+					//logger->debug("end1:%d,%d\n",end1.x,end1.y);
+					//end2.set(evt.touchInput.xs[1],evt.touchInput.ys[1]);
+					//logger->debug("end2:%d,%d\n",end2.x,end2.y);
 				}
 				result=true;
 				break;
@@ -148,17 +151,17 @@ public:
 			switch(mode)
 			{
 			case ENUM_MODE_DRAG:
-				mat.setTranslation(end1.x-start1.x,start1.y-end1.y,0);
+				mat.setTranslation(input1.end.x-input1.start.x,input1.start.y-input1.end.y,0);
 				changed=true;
 				break;
 			case ENUM_MODE_SCALE:
-				f32 scale=start1.getDistanceFrom(start2);
+				/*f32 scale=start1.getDistanceFrom(start2);
 				if(core::equals(scale,0.0f))
 					scale=1;
 				else
 					scale=end2.getDistanceFrom(end1)/scale;
 				logger->debug("scale:%.2f\n",scale);
-				mat.setScale(scale,scale,scale);
+				mat.setScale(scale,scale,scale);*/
 				changed=true;
 				break;
 			}
@@ -173,7 +176,11 @@ public:
 		return result;
 	}
 };
-
+c8* MyEventReceiver::MODE_STRING[]={
+	"NONE",
+	"DRAG",
+	"SCALE"
+};
 bool init(void *pJNIEnv,u32 width,u32 height){
 	params.windowSize.w=400;
 	params.windowSize.h=400;

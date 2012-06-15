@@ -65,23 +65,13 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	pEnv->CallVoidMethod(obj, callbackDestroy);
 	return true;
 }
-jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iAction, jfloatArray xs, jfloatArray ys, jint count){
-	//Logger->debug("nativeOnTouch:action:%d,%.2f,%.2f\n",iAction,fX,fY);
+jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iAction, jint id, jfloat x, jfloat y){
 	SEvent evt;
 	evt.type=ENUM_EVENT_TYPE_TOUCH;
-	evt.touchInput.count=core::min_(count,YON_TOUCH_MAX_INPUTS);
-		
-	jfloat* fxs = pEnv->GetFloatArrayElements(xs,0);
-	jfloat* fys = pEnv->GetFloatArrayElements(ys,0);
-	for(int i=0;i<evt.touchInput.count;++i)
-	{
-		evt.touchInput.xs[i]=fxs[i];
-		evt.touchInput.ys[i]=fys[i];
-	}
-	pEnv->ReleaseFloatArrayElements(xs, fxs, 0);
-	pEnv->ReleaseFloatArrayElements(ys, fys, 0);
-	
-	evt.touchInput.id=(iAction&ACTION_POINTER_ID_MASK)>>ACTION_POINTER_ID_SHIFT;
+	evt.touchInput.count=1;
+	evt.touchInput.ids[0]=(iAction&ACTION_POINTER_ID_MASK)>>ACTION_POINTER_ID_SHIFT;
+	evt.touchInput.xs[0]=(f32)x;
+	evt.touchInput.ys[0]=(f32)y;
 	switch (iAction&ACTION_MASK){
 	case ACTION_DOWN:
 		evt.touchInput.type=ENUM_TOUCH_INPUT_TYPE_DOWN;
@@ -95,12 +85,35 @@ jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iA
 	case ACTION_POINTER_DOWN:
 		evt.touchInput.type=ENUM_TOUCH_INPUT_TYPE_DOWN;
 		break;
-	case ACTION_MOVE: 
-		evt.touchInput.type=ENUM_TOUCH_INPUT_TYPE_MOVE;
-		break;
+	default:
+		Logger->warn("unexpect event %d, do nothing!\n",iAction);
+		return false;
 	}
 	getEngine()->postEventFromUser(evt);
-	return false;
+	return true;
+}
+jboolean Java_yon_AndroidGLView_nativeOnMove(JNIEnv *pEnv, jobject obj, jint iAction, jintArray ids, jfloatArray xs, jfloatArray ys, jint count){
+	//Logger->debug("nativeOnTouch:action:%d,%.2f,%.2f\n",iAction,fX,fY);
+	SEvent evt;
+	evt.type=ENUM_EVENT_TYPE_TOUCH;
+	evt.touchInput.count=core::min_(count,YON_TOUCH_MAX_INPUTS);
+	evt.touchInput.type=ENUM_TOUCH_INPUT_TYPE_MOVE;
+		
+	jint* iids = pEnv->GetIntArrayElements(ids,0);
+	jfloat* fxs = pEnv->GetFloatArrayElements(xs,0);
+	jfloat* fys = pEnv->GetFloatArrayElements(ys,0);
+	for(int i=0;i<evt.touchInput.count;++i)
+	{
+		evt.touchInput.ids[i]=iids[i];
+		evt.touchInput.xs[i]=fxs[i];
+		evt.touchInput.ys[i]=fys[i];
+	}
+	pEnv->ReleaseIntArrayElements(ids, iids, 0);
+	pEnv->ReleaseFloatArrayElements(xs, fxs, 0);
+	pEnv->ReleaseFloatArrayElements(ys, fys, 0);
+	
+	getEngine()->postEventFromUser(evt);
+	return true;
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceDestroy(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnSurfaceDestroy\n");

@@ -57,7 +57,7 @@ namespace yon{
 
 		struct STouchInput{
 			ENUM_TOUCH_INPUT_TYPE type;
-			u8 id;
+			s32 ids[YON_TOUCH_MAX_INPUTS];
 			s32 xs[YON_TOUCH_MAX_INPUTS];
 			s32 ys[YON_TOUCH_MAX_INPUTS];
 			s32 count;
