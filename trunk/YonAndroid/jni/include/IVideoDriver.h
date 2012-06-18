@@ -117,7 +117,7 @@ namespace yon{
 			virtual void begin(bool backBuffer=true,bool zBuffer=true,const video::SColor& color=video::SColor(0xFF132E47)) = 0;
 			virtual void end() = 0;
 			virtual void setViewPort(const core::recti& r) = 0;
-			virtual const core::dimension2du& getCurrentRenderTargetSize() const = 0;
+			virtual const core::dimension2di& getCurrentRenderTargetSize() const = 0;
 			virtual void onResize(const core::dimension2du& size) = 0;
 
 

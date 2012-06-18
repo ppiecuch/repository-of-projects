@@ -61,7 +61,7 @@ JNIEXPORT jboolean JNICALL Java_yon_AndroidGLView_nativeOnBack
  * Signature: (IIFF)Z
  */
 JNIEXPORT jboolean JNICALL Java_yon_AndroidGLView_nativeOnTouch
-  (JNIEnv *, jobject, jint, jint, jfloat, jfloat);
+  (JNIEnv *, jobject, jint, jint, jfloat, jfloat, jint);
 
 /*
  * Class:     yon_AndroidGLView

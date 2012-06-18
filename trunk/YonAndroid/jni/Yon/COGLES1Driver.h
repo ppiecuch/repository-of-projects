@@ -41,7 +41,7 @@ namespace ogles1{
 		virtual void begin(bool backBuffer,bool zBuffer,const video::SColor& color);
 		virtual void end();
 		virtual void setViewPort(const core::recti& r);
-		virtual const core::dimension2du& getCurrentRenderTargetSize() const;
+		virtual const core::dimension2di& getCurrentRenderTargetSize() const;
 		virtual void onResize(const core::dimension2du& size);
 
 		virtual bool queryFeature(ENUM_VIDEO_FEATURE feature) const{
@@ -49,22 +49,22 @@ namespace ogles1{
 		}
 
 		virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest){
-			const core::dimension2du& size=getCurrentRenderTargetSize();
+			const core::dimension2di& size=getCurrentRenderTargetSize();
 			dest.x=src.x-(f32)size.w*0.5f;
 			dest.y=(f32)size.h*0.5f-src.y;
 		}
 		virtual void convertPosCoordinate(const core::position2di& src,core::position2di& dest){
-			const core::dimension2du& size=getCurrentRenderTargetSize();
+			const core::dimension2di& size=getCurrentRenderTargetSize();
 			dest.x=src.x-size.w*0.5f;
 			dest.y=size.h*0.5f-src.y;
 		}
 		virtual void convertPosCoordinate(const core::position2df& src,core::position2df& dest){
-			const core::dimension2du& size=getCurrentRenderTargetSize();
+			const core::dimension2di& size=getCurrentRenderTargetSize();
 			dest.x=src.x-(f32)size.w*0.5f;
 			dest.y=(f32)size.h*0.5f-src.y;
 		}
 		virtual void convertPosCoordinate(s32 srcX,s32 srcY,s32& destX,s32& destY){
-			const core::dimension2du& size=getCurrentRenderTargetSize();
+			const core::dimension2di& size=getCurrentRenderTargetSize();
 			destX=srcX-(f32)size.w*0.5f;
 			destY=(f32)size.h*0.5f-srcY;
 		}
@@ -142,7 +142,7 @@ namespace ogles1{
 		FPSAssist m_FPSAssist;
 
 		video::SClearSetting m_clearSetting;
-		core::dimension2du m_windowSize;
+		core::dimension2di m_windowSize;
 
 		static u32 s_uInstanceCount;
 

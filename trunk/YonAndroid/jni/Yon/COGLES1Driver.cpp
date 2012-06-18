@@ -118,7 +118,7 @@ namespace ogles1{
 #ifdef YON_COMPILE_WITH_WIN32
 		m_hDc(NULL),m_hWnd(param.hWnd),
 #endif
-		m_windowSize(param.windowSize),IVideoDriver(fs,timer),COGLES1ExtensionHandler(){
+		m_windowSize(core::dimension2di((s32)param.windowSize.w,(s32)param.windowSize.h)),IVideoDriver(fs,timer),COGLES1ExtensionHandler(){
 
 		m_imageLoaders.push_back(createImageLoaderPNG());
 
@@ -311,12 +311,12 @@ namespace ogles1{
 		glViewport(0, 0, r.getWidth(), r.getHeight());
 		Logger->debug("setViewPort(0,0,%d,%d)\n",r.getWidth(), r.getHeight());
 	}
-	const core::dimension2du& COGLES1Driver::getCurrentRenderTargetSize() const{
+	const core::dimension2di& COGLES1Driver::getCurrentRenderTargetSize() const{
 		return m_windowSize;
 	}
 	void COGLES1Driver::onResize(const core::dimension2du& size){
-		m_windowSize.w=size.w;
-		m_windowSize.h=size.h;
+		m_windowSize.w=(s32)size.w;
+		m_windowSize.h=(s32)size.h;
 		setViewPort(core::recti(0,0,size.w,size.h));
 	}
 	void COGLES1Driver::drawUnit(scene::IUnit* unit){
@@ -595,7 +595,7 @@ namespace ogles1{
 			targetPos.y = 0;
 		}
 
-		const core::dimension2du& renderTargetSize = getCurrentRenderTargetSize();
+		const core::dimension2di& renderTargetSize = getCurrentRenderTargetSize();
 
 		if (targetPos.x + sourceSize.w > (s32)renderTargetSize.w)
 		{
@@ -775,7 +775,7 @@ namespace ogles1{
 				format=newFormat;
 			}
 #endif
-			core::dimension2du destSize(core::min_(size.w,m_windowSize.w), core::min_(size.h,m_windowSize.h));
+			core::dimension2du destSize(core::min_(size.w,(u32)m_windowSize.w), core::min_(size.h,(u32)m_windowSize.h));
 			//but why?
 			//destSize = destSize.getOptimalSize((size==size.getOptimalSize()), false, false);
 			destSize = destSize.getOptimalSize(true, false, false);

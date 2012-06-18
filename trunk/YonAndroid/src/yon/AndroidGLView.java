@@ -26,7 +26,7 @@ public class AndroidGLView extends GLSurfaceView{
 	private native void nativeOnPause();
 	private native void nativeOnResume();
 	private native boolean nativeOnBack();
-	private native boolean nativeOnTouch(int action,int id,float x,float y);
+	private native boolean nativeOnTouch(int action,int id,float x,float y,int count);
 	private native boolean nativeOnMove(int action,int ids[],float[] xs,float[] ys,int count);
 	
 	private void callbackDestroy(){
@@ -127,21 +127,25 @@ public class AndroidGLView extends GLSurfaceView{
 	
 	public boolean onTouchEvent(final MotionEvent event) {
 		//long start=SystemClock.uptimeMillis();
-		int id=(event.getAction()&MotionEvent.ACTION_POINTER_ID_MASK)>>MotionEvent.ACTION_POINTER_ID_SHIFT;
-		id=event.getPointerId(id);
+		final int id=(event.getAction()&MotionEvent.ACTION_POINTER_ID_MASK)>>MotionEvent.ACTION_POINTER_ID_SHIFT;
+		currentMoveEvent.count=event.getPointerCount();
 		switch (event.getAction() & MotionEvent.ACTION_MASK) 
 		{
         case MotionEvent.ACTION_DOWN:
         case MotionEvent.ACTION_UP:
         case MotionEvent.ACTION_POINTER_DOWN:
         case MotionEvent.ACTION_POINTER_UP:
-        	nativeOnTouch(event.getAction(),id,event.getX(),event.getY());
+        	nativeOnTouch(event.getAction(),event.getPointerId(id),event.getX(id),event.getY(id),currentMoveEvent.count);
+        	//未确定是否有必要使用queueEvent
+        	/*
+        	queueEvent(new Runnable() {
+				@Override
+				public void run() {
+					nativeOnTouch(event.getAction(),event.getPointerId(id),event.getX(id),event.getY(id),currentMoveEvent.count);
+				}
+			});*/
         	return true;
         case MotionEvent.ACTION_MOVE:
-        	currentMoveEvent.count=event.getPointerCount();
-        	//int ids[]=new int[count];
-        	//float xs[]=new float[count];
-        	//float ys[]=new float[count];
         	for(int i=0;i<currentMoveEvent.count;++i)
         	{
         		currentMoveEvent.ids[i]=event.getPointerId(i);
@@ -152,6 +156,12 @@ public class AndroidGLView extends GLSurfaceView{
         		return true;
         	lastMoveEvent.set(currentMoveEvent);
         	nativeOnMove(event.getAction(),currentMoveEvent.ids,currentMoveEvent.xs,currentMoveEvent.ys,currentMoveEvent.count);
+        	/*queueEvent(new Runnable() {
+				@Override
+				public void run() {
+					nativeOnMove(event.getAction(),currentMoveEvent.ids,currentMoveEvent.xs,currentMoveEvent.ys,currentMoveEvent.count);
+				}
+			});*/
         	return true;
 		}
 		//nativeOnTouch(event.getAction(),event.getX(),event.getY());
