@@ -1,0 +1,14 @@
+Posted by Michael Larabel on May 27, 2012
+
+
+
+While OpenGL ES 3.0 has been speculated about for months, the specification will be formally released by the Khronos Group this summer. 
+
+OpenGL ES 3.0 "Haiti" basically brings OpenGL 3.2 -- and some elements of GL4 -- to the mobile space. OpenGL ES 3.0 has been in development for years and is the successor to the five-year-old OpenGL ES 2.0. In turn, WebGL 2.0 will be based upon OpenGL ES 3.0. Due to WebGL and other initiatives, OpenGL ES has also worked its way onto the Linux and Windows desktops as well. OpenGL ES 2.0 is showing its age these days with the exploding number of mobile devices and this embedded API being derived from the OpenGL 2.0 era. 
+
+The OpenGL ES 3.0 specification is most likely to be released by the Khronos Group next month during the E3 gaming conference or in early August during SIGGRAPGH 2012 -- the specification is effectively done at this point already and the preliminary documents in the hands of vendors. OpenGL 4.3 will also most likely be released on the same day since OpenGL 4.2 is nearly one year old and it's been the Khronos trend to release multiple specifications at the same time. 
+
+While the proprietary NVIDIA and AMD graphics drivers will likely introduce OpenGL ES 3.0 support right away (it should not be an issue for any GL4-capable desktop graphics card), the open-source driver support will sadly take a while. Among the mobile GPUs capable of doing OpenGL ES 3.0 will be the Mali T600 series and the forthcoming NVIDIA Tegra 4. With OpenGL ES 3.0 being based upon OpenGL 3.2+ functionality, it will be a while before the support is there in Mesa/Gallium3D. OpenGL 3.1 isn't even likely until next year in Mesa. Hopefully a need for OpenGL ES 3.0 on Linux in the mobile space will lead to greater overall work on GL/GLES enablement, but that remains to be seen. Based upon the current timing and trends, OpenGL ES 3.0 isn't likely to appear in Mesa/Gallium3D until H2'2013 or early 2014, but let's hope that changes.
+
+
+http://www.phoronix.com/scan.php?page=news_item&px=MTEwNzk
