@@ -26,6 +26,9 @@ class MyEventReceiver : public IEventReceiver{
 
 	struct EventEntry{
 		//ENUM_SELECT mode;
+
+		EventEntry():id(-1),start(core::ORIGIN_POSITION2DI),end(core::ORIGIN_POSITION2DI){}
+
 		s32 id;
 		core::vector2di start,end;
 
@@ -42,7 +45,7 @@ class MyEventReceiver : public IEventReceiver{
 	//×óÏÂ½Ç²ÅÎª×ó
 	bool inLeft(s32 x,s32 y)
 	{
-		return x<0&&y<0;
+		return x<200&&y>200;
 	}
 public:
 	MyEventReceiver(){}
@@ -60,16 +63,41 @@ public:
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				if(inLeft(evt.mouseInput.x,evt.mouseInput.y))
 				{
+					inputLeft.id=0;
 					inputLeft.start.set(evt.mouseInput.x,evt.mouseInput.y);
+					inputLeft.end=inputLeft.start;
 				}
 				else
 				{
+					inputRight.id=0;
 					inputRight.start.set(evt.mouseInput.x,evt.mouseInput.y);
+					inputRight.end=inputRight.start;
 				}
+				result=true;
 				break;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
+				if(inputLeft.id==0)
+				{
+					inputLeft.id=-2;
+					inputLeft.end=inputLeft.start=core::ORIGIN_POSITION2DI;
+				}
+				else if(inputRight.id==0)
+				{
+					inputRight.id=-2;
+					inputRight.end=inputRight.start=core::ORIGIN_POSITION2DI;
+				}
+				result=true;
 				break;
 			case event::ENUM_MOUSE_INPUT_TYPE_MOVE:
+				if(inputLeft.id==0)
+				{
+					inputLeft.end.set(evt.mouseInput.x,evt.mouseInput.y);
+				}
+				else if(inputRight.id==0)
+				{
+					inputRight.end.set(evt.mouseInput.x,evt.mouseInput.y);			
+				};
+				result=true;
 				break;
 			}
 			break;
@@ -77,26 +105,69 @@ public:
 			switch(evt.touchInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
-				if(evt.touchInput.count==1)
+				if(inLeft(evt.touchInput.xs[0],evt.touchInput.ys[0]))
 				{
+					if(inputLeft.id<0)
+					{
+						inputLeft.id=evt.touchInput.ids[0];
+						inputLeft.start.set(evt.touchInput.xs[0],evt.touchInput.ys[0]);
+						inputLeft.end=inputLeft.start;
+					}
 				}
-				else if(evt.touchInput.count==2)
+				else
 				{
+					if(inputRight.id<0)
+					{
+						inputRight.id=evt.touchInput.ids[0];
+						inputRight.start.set(evt.touchInput.xs[0],evt.touchInput.ys[0]);
+						inputRight.end=inputRight.start;
+					}
 				}
+				result=true;
 				break;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
-				if(evt.touchInput.count==1)
+				if(inputLeft.id==evt.touchInput.ids[0])
 				{
+					inputLeft.id=-2;
+					inputLeft.end=inputLeft.start=core::ORIGIN_POSITION2DI;
 				}
-				else if(evt.touchInput.count==2)
+				else if(inputRight.id==evt.touchInput.ids[0])
 				{
+					inputRight.id=-2;
+					inputRight.end=inputRight.start=core::ORIGIN_POSITION2DI;
 				}
 				break;
 			case event::ENUM_TOUCH_INPUT_TYPE_MOVE:
-				move=true;
+				for(u32 i=0;i<evt.touchInput.count;++i)
+				{
+					if(evt.touchInput.ids[i]==inputLeft.id)
+					{
+						inputLeft.end.set(evt.touchInput.xs[i],evt.touchInput.ys[i]);
+						logger->debug("move left:%d,%d\n",inputLeft.end.x,inputLeft.end.y);
+					}
+					else if(evt.touchInput.ids[i]==inputRight.id)
+					{
+						inputRight.end.set(evt.touchInput.xs[i],evt.touchInput.ys[i]);
+						logger->debug("move right:%d,%d\n",inputRight.end.x,inputRight.end.y);
+					}
+				}
+				result=true;
 				break;
 			}
 			break;
+		}
+
+		if(inputLeft.id!=-1)
+		{
+			core::vector2di d=inputLeft.end-inputLeft.start;
+			core::position3df n=core::position3df(teapotPos1.x+d.x,teapotPos1.y-d.y,0);
+			teapotModel1->setPosition(n);
+		}
+		if(inputRight.id!=-1)
+		{
+			core::vector2di d=inputRight.end-inputRight.start;
+			core::position3df n=core::position3df(teapotPos2.x+d.x,teapotPos2.y-d.y,0);
+			teapotModel2->setPosition(n);
 		}
 		
 		return result;
@@ -137,7 +208,6 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	teapotModel1=sceneMgr->addModel(entity);
 	teapotPos1.set(100.0f-videoDriver->getCurrentRenderTargetSize().w/2,-videoDriver->getCurrentRenderTargetSize().h/2+200.0f,0);
 	teapotModel1->setPosition(teapotPos1);
-	Logger->debug("%.2f\n",teapotModel1->getPosition().x);
 	shap->drop();
 	unit->drop();
 	entity->drop();
