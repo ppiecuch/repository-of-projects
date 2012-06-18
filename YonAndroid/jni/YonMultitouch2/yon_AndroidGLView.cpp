@@ -66,6 +66,11 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	return true;
 }
 jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iAction, jint id, jfloat x, jfloat y, jint count){
+	if(id>=YON_TOUCH_MAX_INPUTS)
+	{
+		Logger->warn("exceed max touch input limit: %d>=%d, ignore it!\n",id,YON_TOUCH_MAX_INPUTS);
+		return true;
+	}
 	SEvent evt;
 	evt.type=ENUM_EVENT_TYPE_TOUCH;
 	evt.touchInput.count=core::min_(count,YON_TOUCH_MAX_INPUTS);
