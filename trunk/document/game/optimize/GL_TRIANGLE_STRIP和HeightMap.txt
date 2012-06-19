@@ -1,0 +1,56 @@
+Linking together triangle strips with degenerate triangles
+The examples above assumed that we would render each row of the heightmap with a separate call to glDrawArrays() or glDrawElements(). How can we link up each row to the next? After all, the end of the first row is all the way on the right, and the beginning of the second row on the left. How do we link the two?
+
+We don¡¯t need to get fancy and start drawing right to left or anything like that. We can instead use what¡¯s known as a degenerate triangle. A degenerate triangle is a triangle that has no area, and when the GPU encounters such triangles, it will simply skip over them.
+
+Let¡¯s look at our index buffer again:
+
+indexBuffer = {
+    1, 6, 2, 7, 3, 8, 4, 9, ...
+}
+When drawing with GL_TRIANGLE_STRIP, OpenGL will build triangles by taking each set of three vertices, advancing by one vertex for each triangle. Every subsequent triangle shares two vertices with the previous triangle. For example, here are the sets of vertices that would be grouped into triangles:
+
+Triangle 1 = 1, 6, 2
+Triangle 2 = 6, 2, 7
+Triangle 3 = 2, 7, 3
+Triangle 4 = 7, 3, 8
+Triangle 5 = 3, 8, 4
+Triangle 6 = 8, 4, 9
+¡­
+OpenGL also maintains a specific order, or winding when building the triangles. The order of the first 3 vertices determines the order for the rest. If the first triangle is counter-clockwise, the rest will be counter-clockwise, too. OpenGL does this by swapping the first two vertices of every even triangle (swapped vertices are in bold):
+
+Triangle 1 = 1, 6, 2
+Triangle 2 = 2, 6, 7
+Triangle 3 = 2, 7, 3
+Triangle 4 = 3, 7, 8
+Triangle 5 = 3, 8, 4
+Triangle 6 = 4, 8, 9
+¡­
+Let¡¯s show the entire index buffer, including the missing link between each row of the height map:
+
+indexBuffer = {
+    1, 6, 2, 7, 3, 8, 4, 9, 5, 10, ..., 6, 11, 7, 12, 8, 13, 9, 14, 10, 15
+}
+What do we need to put in between, in order to link up the triangles? We¡¯ll need an even number of new triangles in order to preserve the winding. We can do this by repeating the last vertex of the first row, and the first vertex of the second row. Here¡¯s the new index buffer below, with the duplicated vertices in bold:
+
+indexBuffer = {
+    1, 6, 2, 7, 3, 8, 4, 9, 5, 10, 10, 6, 6, 11, 7, 12, 8, 13, 9, 14, 10, 15
+}
+Here¡¯s what the new sequence of triangles looks like:
+
+¡­
+Triangle 8 = 5, 9, 10
+Triangle 9 (degenerate) = 5, 10, 10
+Triangle 10 (degenerate) = 10, 10, 6
+Triangle 11 (degenerate) = 10, 6, 6
+Triangle 12 (degenerate) = 6, 6, 11
+Triangle 13 = 6, 11, 7
+¡­
+By repeating the last vertex and the first vertex, we created four degenerate triangles that will be skipped, and linked the first row of the height map with the second. We could link an arbitrary number of rows this way and draw the entire heightmap with one call to glDrawElements(). Let¡¯s take a look at this visually:
+
+
+
+The degenerate triangles link each row with the next row.
+
+Android Lesson Eight: An Introduction to Index Buffer Objects (IBOs)
+http://www.learnopengles.com/android-lesson-eight-an-introduction-to-index-buffer-objects-ibos/
