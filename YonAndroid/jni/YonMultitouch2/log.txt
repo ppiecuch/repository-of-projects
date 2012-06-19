@@ -1,0 +1,141 @@
+[2012-06-19 09:13:12.578][DEBG]WM_CREATE
+[2012-06-19 09:13:12.593][DEBG]WM_SIZE
+[2012-06-19 09:13:12.593][WARN]getEngineByHWnd==NULL                                           ¡¾!¡¿
+[2012-06-19 09:13:12.609][INFO]Instance CFileSystem                                            ¡¾¡Ì¡¿
+[2012-06-19 09:13:12.609][INFO]Instance CSceneManager                                          ¡¾¡Ì¡¿
+[2012-06-19 09:13:13.218][INFO]EglDisplay initialized. Egl version 1.3
+[2012-06-19 09:13:13.406][INFO]GL_VERSION:4.1.0(4.10)
+[2012-06-19 09:13:13.406][INFO]GL_EXTENSIONS:
+[2012-06-19 09:13:13.406][INFO]OES_byte_coordinates
+[2012-06-19 09:13:13.406][INFO]OES_compressed_paletted_texture
+[2012-06-19 09:13:13.406][INFO]OES_fixed_point
+[2012-06-19 09:13:13.421][INFO]GL_OES_compressed_ETC1_RGB8_texture
+[2012-06-19 09:13:13.421][INFO]OES_single_precision
+[2012-06-19 09:13:13.437][DEBG]setViewPort(0,0,400,400)
+[2012-06-19 09:13:13.468][DEBG]no FPS limit
+[2012-06-19 09:13:13.484][DEBG]glTexImage2D:1,128,64,mipmap:0,R8G8B8
+[2012-06-19 09:13:13.500][DEBG]Instance COGLES1Texture:1                                       ¡¾¡Ì¡¿
+[2012-06-19 09:13:13.515][DEBG]Extend element->5
+[2012-06-19 09:13:13.515][INFO]Instance COGLES1Driver:1                                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:13.515][DEBG]Extend element->3
+[2012-06-19 09:13:13.515][INFO]Instance CGraphicsAdapter                                       ¡¾¡Ì¡¿
+[2012-06-19 09:13:13.515][DEBG]EngineMap.push_back(ep)
+[2012-06-19 09:13:13.515][INFO]CreateEngine(400,400),version:0.1.0                             ¡¾¡Ì¡¿
+[2012-06-19 09:13:13.515][DEBG]CSceneManager::addCamera size:1
+[2012-06-19 09:13:13.515][DEBG]CSceneManager::addModel size:1
+[2012-06-19 09:13:13.515][DEBG]CSceneManager::addModel size:2
+[2012-06-19 09:13:13.515][DEBG]WM_SIZE
+[2012-06-19 09:13:13.609][DEBG]setViewPort(0,0,400,400)
+[2012-06-19 09:13:13.609][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-06-19 09:13:20.437][DEBG]WM_DESTROY
+[2012-06-19 09:13:20.437][INFO]Release CGraphicsAdapter                                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.437][DEBG]Release CDebugPrinter                                           ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.437][DEBG]Release 0/0 Hardwarebuffer
+[2012-06-19 09:13:20.437][DEBG]Release 1/1 ImageLoader
+[2012-06-19 09:13:20.437][DEBG]Release COGLES1Texture:1                                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.437][DEBG]Release 1/1 Texture
+[2012-06-19 09:13:20.437][DEBG]Release 7/7 MaterialRenderer
+[2012-06-19 09:13:20.437][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.453][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.453][WARN]Release DC                                                      ¡¾!¡¿
+[2012-06-19 09:13:20.453][INFO]Release COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.453][INFO]Release CSceneManager                                           ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.453][INFO]Release CFileSystem                                             ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.453][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.453][INFO]UnregisterClass                                                 ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.453][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-06-19 09:13:20.453][INFO]Release Logger                                                  ¡¾¡Ì¡¿
+[2012-06-19 09:13:38.500][DEBG]WM_CREATE
+[2012-06-19 09:13:38.531][DEBG]WM_SIZE
+[2012-06-19 09:13:38.531][WARN]getEngineByHWnd==NULL                                           ¡¾!¡¿
+[2012-06-19 09:13:38.531][INFO]Instance CFileSystem                                            ¡¾¡Ì¡¿
+[2012-06-19 09:13:38.531][INFO]Instance CSceneManager                                          ¡¾¡Ì¡¿
+[2012-06-19 09:13:38.625][INFO]EglDisplay initialized. Egl version 1.3
+[2012-06-19 09:13:38.750][INFO]GL_VERSION:4.1.0(4.10)
+[2012-06-19 09:13:38.750][INFO]GL_EXTENSIONS:
+[2012-06-19 09:13:38.750][INFO]OES_byte_coordinates
+[2012-06-19 09:13:38.750][INFO]OES_compressed_paletted_texture
+[2012-06-19 09:13:38.750][INFO]OES_fixed_point
+[2012-06-19 09:13:38.750][INFO]GL_OES_compressed_ETC1_RGB8_texture
+[2012-06-19 09:13:38.750][INFO]OES_single_precision
+[2012-06-19 09:13:38.750][DEBG]setViewPort(0,0,400,400)
+[2012-06-19 09:13:38.750][DEBG]no FPS limit
+[2012-06-19 09:13:38.750][DEBG]glTexImage2D:1,128,64,mipmap:0,R8G8B8
+[2012-06-19 09:13:38.750][DEBG]Instance COGLES1Texture:1                                       ¡¾¡Ì¡¿
+[2012-06-19 09:13:38.750][DEBG]Extend element->5
+[2012-06-19 09:13:38.750][INFO]Instance COGLES1Driver:1                                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:38.750][DEBG]Extend element->3
+[2012-06-19 09:13:38.750][INFO]Instance CGraphicsAdapter                                       ¡¾¡Ì¡¿
+[2012-06-19 09:13:38.750][DEBG]EngineMap.push_back(ep)
+[2012-06-19 09:13:38.750][INFO]CreateEngine(400,400),version:0.1.0                             ¡¾¡Ì¡¿
+[2012-06-19 09:13:38.750][DEBG]CSceneManager::addCamera size:1
+[2012-06-19 09:13:38.750][DEBG]CSceneManager::addModel size:1
+[2012-06-19 09:13:38.765][DEBG]CSceneManager::addModel size:2
+[2012-06-19 09:13:38.765][DEBG]WM_SIZE
+[2012-06-19 09:13:38.765][DEBG]setViewPort(0,0,400,400)
+[2012-06-19 09:13:38.765][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-06-19 09:13:42.890][DEBG]WM_DESTROY
+[2012-06-19 09:13:42.890][INFO]Release CGraphicsAdapter                                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][DEBG]Release CDebugPrinter                                           ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][DEBG]Release 0/0 Hardwarebuffer
+[2012-06-19 09:13:42.890][DEBG]Release 1/1 ImageLoader
+[2012-06-19 09:13:42.890][DEBG]Release COGLES1Texture:1                                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][DEBG]Release 1/1 Texture
+[2012-06-19 09:13:42.890][DEBG]Release 7/7 MaterialRenderer
+[2012-06-19 09:13:42.890][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][WARN]Release DC                                                      ¡¾!¡¿
+[2012-06-19 09:13:42.890][INFO]Release COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][INFO]Release CSceneManager                                           ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][INFO]Release CFileSystem                                             ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][INFO]UnregisterClass                                                 ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-06-19 09:13:42.890][INFO]Release Logger                                                  ¡¾¡Ì¡¿
+[2012-06-19 09:13:49.578][DEBG]WM_CREATE
+[2012-06-19 09:13:49.578][DEBG]WM_SIZE
+[2012-06-19 09:13:49.593][WARN]getEngineByHWnd==NULL                                           ¡¾!¡¿
+[2012-06-19 09:13:49.593][INFO]Instance CFileSystem                                            ¡¾¡Ì¡¿
+[2012-06-19 09:13:49.593][INFO]Instance CSceneManager                                          ¡¾¡Ì¡¿
+[2012-06-19 09:13:49.703][INFO]EglDisplay initialized. Egl version 1.3
+[2012-06-19 09:13:49.828][INFO]GL_VERSION:4.1.0(4.10)
+[2012-06-19 09:13:49.828][INFO]GL_EXTENSIONS:
+[2012-06-19 09:13:49.828][INFO]OES_byte_coordinates
+[2012-06-19 09:13:49.828][INFO]OES_compressed_paletted_texture
+[2012-06-19 09:13:49.828][INFO]OES_fixed_point
+[2012-06-19 09:13:49.828][INFO]GL_OES_compressed_ETC1_RGB8_texture
+[2012-06-19 09:13:49.828][INFO]OES_single_precision
+[2012-06-19 09:13:49.828][DEBG]setViewPort(0,0,400,400)
+[2012-06-19 09:13:49.828][DEBG]no FPS limit
+[2012-06-19 09:13:49.828][DEBG]glTexImage2D:1,128,64,mipmap:0,R8G8B8
+[2012-06-19 09:13:49.828][DEBG]Instance COGLES1Texture:1                                       ¡¾¡Ì¡¿
+[2012-06-19 09:13:49.828][DEBG]Extend element->5
+[2012-06-19 09:13:49.828][INFO]Instance COGLES1Driver:1                                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:49.828][DEBG]Extend element->3
+[2012-06-19 09:13:49.828][INFO]Instance CGraphicsAdapter                                       ¡¾¡Ì¡¿
+[2012-06-19 09:13:49.828][DEBG]EngineMap.push_back(ep)
+[2012-06-19 09:13:49.828][INFO]CreateEngine(400,400),version:0.1.0                             ¡¾¡Ì¡¿
+[2012-06-19 09:13:49.828][DEBG]CSceneManager::addCamera size:1
+[2012-06-19 09:13:49.828][DEBG]CSceneManager::addModel size:1
+[2012-06-19 09:13:49.828][DEBG]CSceneManager::addModel size:2
+[2012-06-19 09:13:49.828][DEBG]WM_SIZE
+[2012-06-19 09:13:49.828][DEBG]setViewPort(0,0,400,400)
+[2012-06-19 09:13:49.828][DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[2012-06-19 09:13:58.703][DEBG]WM_DESTROY
+[2012-06-19 09:13:58.703][INFO]Release CGraphicsAdapter                                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][DEBG]Release CDebugPrinter                                           ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][DEBG]Release 0/0 Hardwarebuffer
+[2012-06-19 09:13:58.703][DEBG]Release 1/1 ImageLoader
+[2012-06-19 09:13:58.703][DEBG]Release COGLES1Texture:1                                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][DEBG]Release 1/1 Texture
+[2012-06-19 09:13:58.703][DEBG]Release 7/7 MaterialRenderer
+[2012-06-19 09:13:58.703][INFO]Unbind GL contexts and surface                                  ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][INFO]Release all resources in EGL and display                        ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][WARN]Release DC                                                      ¡¾!¡¿
+[2012-06-19 09:13:58.703][INFO]Release COGLES1Driver                                           ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][INFO]Release CSceneManager                                           ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][INFO]Release CFileSystem                                             ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][INFO]Destroy Window                                                  ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][INFO]UnregisterClass                                                 ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][INFO]Destroy CYonEngineWin32                                         ¡¾¡Ì¡¿
+[2012-06-19 09:13:58.703][INFO]Release Logger                                                  ¡¾¡Ì¡¿

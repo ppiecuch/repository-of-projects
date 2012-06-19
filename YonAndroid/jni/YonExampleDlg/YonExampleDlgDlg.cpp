@@ -296,3 +296,9 @@ void CYonExampleDlgDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 	CDialog::OnTimer(nIDEvent);
 }
+BOOL CYonExampleDlgDlg::PreCreateWindow(CREATESTRUCT& cs)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+
+	return CDialog::PreCreateWindow(cs);
+}

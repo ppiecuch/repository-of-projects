@@ -58,4 +58,6 @@ public:
 	afx_msg void OnDestroy();
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+protected:
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 };

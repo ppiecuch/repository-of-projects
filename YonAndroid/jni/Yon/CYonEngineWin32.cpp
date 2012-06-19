@@ -137,32 +137,35 @@ namespace platform{
 
 	bool CYonEngineWin32::run(){
 		m_pTimer->tick();
-		MSG msg;
-		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		if(!m_bExternalWindow)
 		{
-			/*if(msg.message == WM_QUIT)
+			MSG msg;
+			while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
+				/*if(msg.message == WM_QUIT)
+				{
 				m_bClose=true;
-			}
-			else 
-			{
+				}
+				else 
+				{
 				//TranslateMessage(&msg);
 				DispatchMessage(&msg);
-			}*/
-				
-			/*if(msg.message==WM_DESTROY){
-				Logger->debug("PeekMessage WM_DESTROY\n");
-			}else if(msg.message==WM_QUIT){
-				Logger->debug("PeekMessage WM_QUIT\n");
-			}*/
-			if (m_bExternalWindow && msg.hwnd == m_hWnd)
-				WndProc(m_hWnd, msg.message, msg.wParam, msg.lParam);
-			else
-				DispatchMessage(&msg);
+				}*/
 
-			if(msg.message == WM_QUIT)
-			{
-				m_bClose=true;
+				/*if(msg.message==WM_DESTROY){
+				Logger->debug("PeekMessage WM_DESTROY\n");
+				}else if(msg.message==WM_QUIT){
+				Logger->debug("PeekMessage WM_QUIT\n");
+				}*/
+				if (m_bExternalWindow && msg.hwnd == m_hWnd)
+					WndProc(m_hWnd, msg.message, msg.wParam, msg.lParam);
+				else
+					DispatchMessage(&msg);
+
+				if(msg.message == WM_QUIT)
+				{
+					m_bClose=true;
+				}
 			}
 		}
 		if(!m_bClose)

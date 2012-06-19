@@ -1,9 +1,9 @@
-// YonMultiwindowDlg.cpp : 实现文件
+// YonDoublewindowDlg.cpp : 实现文件
 //
 
 #include "stdafx.h"
-#include "YonMultiwindow.h"
-#include "YonMultiwindowDlg.h"
+#include "YonDoublewindow.h"
+#include "YonDoublewindowDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,36 +41,37 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CYonMultiwindowDlg 对话框
+// CYonDoublewindowDlg 对话框
 
 
 
 
-CYonMultiwindowDlg::CYonMultiwindowDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CYonMultiwindowDlg::IDD, pParent)
+CYonDoublewindowDlg::CYonDoublewindowDlg(CWnd* pParent /*=NULL*/)
+	: CDialog(CYonDoublewindowDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CYonMultiwindowDlg::DoDataExchange(CDataExchange* pDX)
+void CYonDoublewindowDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_STATIC1, m_static1);
+	DDX_Control(pDX, IDC_STATIC2, m_static2);
 }
 
-BEGIN_MESSAGE_MAP(CYonMultiwindowDlg, CDialog)
+BEGIN_MESSAGE_MAP(CYonDoublewindowDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
 	ON_WM_TIMER()
-	ON_WM_CREATE()
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
-// CYonMultiwindowDlg 消息处理程序
+// CYonDoublewindowDlg 消息处理程序
 
-BOOL CYonMultiwindowDlg::OnInitDialog()
+BOOL CYonDoublewindowDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -98,37 +99,12 @@ BOOL CYonMultiwindowDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	CRect renderRect1;
-	GetDlgItem(IDC_STATIC1)->GetWindowRect(&renderRect1);
-	m_dlg1.setHWND(GetDlgItem(IDC_STATIC1)->GetSafeHwnd());
-	TRACE("%d,%d,%d,%d\r\n",renderRect1.top,renderRect1.bottom,renderRect1.left,renderRect1.right);
-	ScreenToClient(&renderRect1);
-	m_dlg1.Create(IDD_DIALOG1,this);
-	m_dlg1.MoveWindow(renderRect1);
-	m_dlg1.ShowWindow(SW_SHOW);
-
-	CRect renderRect2;
-	GetDlgItem(IDC_STATIC2)->GetWindowRect(&renderRect2);
-	m_dlg2.setHWND(GetDlgItem(IDC_STATIC2)->GetSafeHwnd());
-	TRACE("%d,%d,%d,%d\r\n",renderRect2.top,renderRect2.bottom,renderRect2.left,renderRect2.right);
-	ScreenToClient(&renderRect2);
-	m_dlg2.Create(IDD_DIALOG2,this);
-	m_dlg2.MoveWindow(renderRect2);
-	m_dlg2.ShowWindow(SW_SHOW);
-
-	CRect renderRect3;
-	GetDlgItem(IDC_STATIC3)->GetWindowRect(&renderRect3);
-	m_dlg3.setHWND(GetDlgItem(IDC_STATIC3)->GetSafeHwnd());
-	TRACE("%d,%d,%d,%d\r\n",renderRect3.top,renderRect3.bottom,renderRect3.left,renderRect3.right);
-	ScreenToClient(&renderRect3);
-	m_dlg3.Create(IDD_DIALOG3,this);
-	m_dlg3.MoveWindow(renderRect3);
-	m_dlg3.ShowWindow(SW_SHOW);
+	SetTimer(WM_RENDER_FRAME,RENDER_INTERVAL,NULL);// n 替换为你需要定时的周期，单位毫秒。
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
-void CYonMultiwindowDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void CYonDoublewindowDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
@@ -145,7 +121,7 @@ void CYonMultiwindowDlg::OnSysCommand(UINT nID, LPARAM lParam)
 //  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
 
-void CYonMultiwindowDlg::OnPaint()
+void CYonDoublewindowDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -172,48 +148,25 @@ void CYonMultiwindowDlg::OnPaint()
 
 //当用户拖动最小化窗口时系统调用此函数取得光标
 //显示。
-HCURSOR CYonMultiwindowDlg::OnQueryDragIcon()
+HCURSOR CYonDoublewindowDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
 
-void CYonMultiwindowDlg::OnTimer(UINT_PTR nIDEvent)
+void CYonDoublewindowDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	if(nIDEvent==WM_RENDER_FRAME)
 	{
-		//更新窗口整个客户区域，同时重画时不擦除背景。
-		/*++counter;
-		if(counter%3==0)
-			m_dlg1.InvalidateRect(NULL,FALSE);
-		else if(counter%3==1)
-			m_dlg2.InvalidateRect(NULL,FALSE);
-		else
-			m_dlg3.InvalidateRect(NULL,FALSE);*/
-		m_dlg1.InvalidateRect(NULL,FALSE);
-		m_dlg2.InvalidateRect(NULL,FALSE);
-		m_dlg3.InvalidateRect(NULL,FALSE);
-		//GetDlgItem(IDC_STATIC1)->InvalidateRect(NULL,FALSE);
-		//GetDlgItem(IDC_STATIC2)->InvalidateRect(NULL,FALSE);
+		m_static1.InvalidateRect(NULL,FALSE);
+		m_static2.InvalidateRect(NULL,FALSE);
 	}
 
 	CDialog::OnTimer(nIDEvent);
 }
 
-int CYonMultiwindowDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (CDialog::OnCreate(lpCreateStruct) == -1)
-		return -1;
-
-	// TODO:  在此添加您专用的创建代码
-	counter=0;
-	SetTimer(WM_RENDER_FRAME,RENDER_INTERVAL,NULL);// n 替换为你需要定时的周期，单位毫秒。
-
-	return 0;
-}
-
-void CYonMultiwindowDlg::OnDestroy()
+void CYonDoublewindowDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
 

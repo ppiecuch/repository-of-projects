@@ -54,7 +54,7 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
     "#pragma code_page(936)\r\n"
-    "#include ""res\\YonMultiwindow.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
+    "#include ""res\\YonDoublewindow.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
     "#include ""l.CHS\\afxres.rc""      // 标准组件\r\n"
     "#endif\r\n"
     "\0"
@@ -70,7 +70,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\YonMultiwindow.ico"
+IDR_MAINFRAME           ICON                    "res\\YonDoublewindow.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -79,42 +79,23 @@ IDR_MAINFRAME           ICON                    "res\\YonMultiwindow.ico"
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "关于 YonMultiwindow"
+CAPTION "关于 YonDoublewindow"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
-    LTEXT           "YonMultiwindow，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "YonDoublewindow，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2012",IDC_STATIC,42,26,114,8
     DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
 END
 
-IDD_YONMULTIWINDOW_DIALOG DIALOGEX 0, 0, 320, 200
+IDD_YONDOUBLEWINDOW_DIALOG DIALOGEX 0, 0, 320, 200
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
-CAPTION "YonMultiwindow"
+CAPTION "YonDoublewindow"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    LTEXT           "static1",IDC_STATIC1,7,7,116,88
-    LTEXT           "静态2",IDC_STATIC2,163,7,150,186
-    LTEXT           "静态",IDC_STATIC3,21,119,91,59
-END
-
-IDD_DIALOG1 DIALOGEX 0, 0, 151, 183
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-END
-
-IDD_DIALOG2 DIALOGEX 0, 0, 153, 183
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-END
-
-IDD_DIALOG3 DIALOGEX 0, 0, 131, 138
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
+    LTEXT           "静态",IDC_STATIC1,36,34,49,50,SS_NOTIFY
+    LTEXT           "静态",IDC_STATIC2,131,36,163,120,SS_NOTIFY
 END
 
 
@@ -143,9 +124,9 @@ BEGIN
             VALUE "CompanyName", "TODO: <公司名>"
             VALUE "FileDescription", "TODO: <文件说明>"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "YonMultiwindow.exe"
+            VALUE "InternalName", "YonDoublewindow.exe"
             VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
-            VALUE "OriginalFilename", "YonMultiwindow.exe"
+            VALUE "OriginalFilename", "YonDoublewindow.exe"
             VALUE "ProductName", "TODO: <产品名>"
             VALUE "ProductVersion", "1.0.0.1"
         END
@@ -173,36 +154,12 @@ BEGIN
         BOTTOMMARGIN, 55
     END
 
-    IDD_YONMULTIWINDOW_DIALOG, DIALOG
+    IDD_YONDOUBLEWINDOW_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 313
         TOPMARGIN, 7
         BOTTOMMARGIN, 193
-    END
-
-    IDD_DIALOG1, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 144
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 176
-    END
-
-    IDD_DIALOG2, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 146
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 176
-    END
-
-    IDD_DIALOG3, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 124
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 131
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -215,7 +172,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_ABOUTBOX            "关于 YonMultiwindow(&A)..."
+    IDS_ABOUTBOX            "关于 YonDoublewindow(&A)..."
 END
 
 #endif    // 中文(中华人民共和国) resources
@@ -236,7 +193,7 @@ END
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
 #pragma code_page(936)
-#include "res\YonMultiwindow.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "res\YonDoublewindow.rc2"  // 非 Microsoft Visual C++ 编辑的资源
 #include "l.CHS\afxres.rc"      // 标准组件
 #endif
 
