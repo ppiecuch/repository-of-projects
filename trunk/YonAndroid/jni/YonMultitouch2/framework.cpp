@@ -18,14 +18,8 @@ core::position3df teapotPos1;
 core::position3df teapotPos2;
 
 class MyEventReceiver : public IEventReceiver{
-	/*enum ENUM_SELECT{
-		ENUM_SELECT_NONE = 0,
-		ENUM_SELECT_LEFT,
-		ENUM_SELECT_RIGHT
-	};*/
 
 	struct EventEntry{
-		//ENUM_SELECT mode;
 
 		EventEntry():id(-1),start(core::ORIGIN_POSITION2DI),end(core::ORIGIN_POSITION2DI){}
 
@@ -206,7 +200,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel1=sceneMgr->addModel(entity);
-	teapotPos1.set(100.0f-videoDriver->getCurrentRenderTargetSize().w/2,-videoDriver->getCurrentRenderTargetSize().h/2+200.0f,0);
+	teapotPos1.set(100.0f-videoDriver->getCurrentRenderTargetSize().w/2,-videoDriver->getCurrentRenderTargetSize().h/2+100.0f,0);
 	teapotModel1->setPosition(teapotPos1);
 	shap->drop();
 	unit->drop();

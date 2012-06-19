@@ -18,6 +18,9 @@ class CDialog1 : public CDialog
 {
 	DECLARE_DYNAMIC(CDialog1)
 
+	const static UINT WM_RENDER_FRAME=1;
+	const static UINT RENDER_INTERVAL=10;
+
 public:
 	CDialog1(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CDialog1();
@@ -30,6 +33,13 @@ public:
 	IGeometryFactory* geometryFty;
 	IAnimatorFactory*  animatorFty;
 	ICamera* camera;
+
+	HWND m_hWnd;
+
+	void setHWND(HWND hWnd)
+	{
+		m_hWnd=hWnd;
+	}
 
 // 对话框数据
 	enum { IDD = IDD_DIALOG1 };
@@ -44,4 +54,9 @@ public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+protected:
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+public:
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };

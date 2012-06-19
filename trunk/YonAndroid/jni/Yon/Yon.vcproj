@@ -363,6 +363,10 @@
 				Name="event"
 				>
 				<File
+					RelativePath="..\include\IEventParser.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\IEventReceiver.h"
 					>
 				</File>

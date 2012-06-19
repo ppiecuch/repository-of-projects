@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="YonMultiwindow"
-	ProjectGUID="{77CE8D86-B5EC-40CF-B6B2-2595F90067AF}"
-	RootNamespace="YonMultiwindow"
+	Name="YonDoublewindow"
+	ProjectGUID="{5CDE9067-8158-458C-87D9-C40820F122C5}"
+	RootNamespace="YonDoublewindow"
 	Keyword="MFCProj"
 	TargetFrameworkVersion="196613"
 	>
@@ -187,15 +187,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Dialog1.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Dialog2.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Dialog3.cpp"
+				RelativePath=".\RenderStatic.cpp"
 				>
 			</File>
 			<File
@@ -219,11 +211,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\YonMultiwindow.cpp"
+				RelativePath=".\YonDoublewindow.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\YonMultiwindowDlg.cpp"
+				RelativePath=".\YonDoublewindowDlg.cpp"
 				>
 			</File>
 		</Filter>
@@ -233,15 +225,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Dialog1.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Dialog2.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Dialog3.h"
+				RelativePath=".\RenderStatic.h"
 				>
 			</File>
 			<File
@@ -257,11 +241,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\YonMultiwindow.h"
+				RelativePath=".\YonDoublewindow.h"
 				>
 			</File>
 			<File
-				RelativePath=".\YonMultiwindowDlg.h"
+				RelativePath=".\YonDoublewindowDlg.h"
 				>
 			</File>
 		</Filter>
@@ -271,15 +255,15 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\res\YonMultiwindow.ico"
+				RelativePath=".\res\YonDoublewindow.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\YonMultiwindow.rc"
+				RelativePath=".\YonDoublewindow.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\res\YonMultiwindow.rc2"
+				RelativePath=".\res\YonDoublewindow.rc2"
 				>
 			</File>
 		</Filter>
@@ -291,7 +275,7 @@
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="YonMultiwindow.rc"
+			Value="YonDoublewindow.rc"
 		/>
 	</Globals>
 </VisualStudioProject>

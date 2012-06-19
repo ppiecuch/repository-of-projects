@@ -11,18 +11,21 @@ using namespace yon::scene::animator;
 
 #pragma comment(lib, "yon.lib")
 
-// CDialog2 对话框
+// CDialog3 对话框
 
-class CDialog2 : public CDialog
+class CDialog3 : public CDialog
 {
-	DECLARE_DYNAMIC(CDialog2)
+	DECLARE_DYNAMIC(CDialog3)
 
-	const static UINT WM_RENDER_FRAME=2;
+	const static UINT WM_RENDER_FRAME=3;
 	const static UINT RENDER_INTERVAL=10;
 
 public:
-	CDialog2(CWnd* pParent = NULL);   // 标准构造函数
-	virtual ~CDialog2();
+	CDialog3(CWnd* pParent = NULL);   // 标准构造函数
+	virtual ~CDialog3();
+
+// 对话框数据
+	enum { IDD = IDD_DIALOG3 };
 
 	IYonEngine* engine;
 
@@ -40,9 +43,6 @@ public:
 		m_hWnd=hWnd;
 	}
 
-// 对话框数据
-	enum { IDD = IDD_DIALOG2 };
-
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
@@ -53,9 +53,4 @@ public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
-protected:
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-public:
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };

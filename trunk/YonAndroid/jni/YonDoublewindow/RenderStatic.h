@@ -2,6 +2,7 @@
 #include "yon.h"
 using namespace yon;
 using namespace yon::core;
+using namespace yon::event;
 using namespace yon::debug;
 using namespace yon::io;
 using namespace yon::video;
@@ -11,18 +12,21 @@ using namespace yon::scene::animator;
 
 #pragma comment(lib, "yon.lib")
 
-// CDialog2 对话框
+// CRenderStatic
 
-class CDialog2 : public CDialog
+class CRenderStatic : public CStatic
 {
-	DECLARE_DYNAMIC(CDialog2)
+	DECLARE_DYNAMIC(CRenderStatic)
 
-	const static UINT WM_RENDER_FRAME=2;
-	const static UINT RENDER_INTERVAL=10;
+	const static UINT WM_RENDER_FRAME=1;
+	const static UINT RENDER_INTERVAL=1000;
 
 public:
-	CDialog2(CWnd* pParent = NULL);   // 标准构造函数
-	virtual ~CDialog2();
+	CRenderStatic();
+	virtual ~CRenderStatic();
+
+protected:
+	DECLARE_MESSAGE_MAP()
 
 	IYonEngine* engine;
 
@@ -33,20 +37,9 @@ public:
 	IAnimatorFactory*  animatorFty;
 	ICamera* camera;
 
-	HWND m_hWnd;
-
-	void setHWND(HWND hWnd)
-	{
-		m_hWnd=hWnd;
-	}
-
-// 对话框数据
-	enum { IDD = IDD_DIALOG2 };
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
-
-	DECLARE_MESSAGE_MAP()
+	IModel* planeModel;
+	f32 factor;
+	SYonEngineParameters params;
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnDestroy();
@@ -55,7 +48,13 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 protected:
+	virtual void PreSubclassWindow();
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 public:
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 };
+
+

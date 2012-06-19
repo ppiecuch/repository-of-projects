@@ -33,6 +33,8 @@ BEGIN_MESSAGE_MAP(CDialog1, CDialog)
 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
 	ON_WM_SIZE()
+	ON_WM_TIMER()
+	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -44,7 +46,8 @@ int CDialog1::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  在此添加您专用的创建代码
-	HWND hWnd=this->GetSafeHwnd();
+	//HWND hWnd=this->GetSafeHwnd();
+	HWND hWnd=m_hWnd;
 	if(hWnd==NULL)
 	{
 		AfxMessageBox(TEXT("获取渲染区窗口对象时HWND为空"));
@@ -84,6 +87,9 @@ int CDialog1::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	unit->drop();
 	entity->drop();
 
+	//SetTimer(WM_RENDER_FRAME,RENDER_INTERVAL,NULL);// n 替换为你需要定时的周期，单位毫秒。
+
+
 	return 0;
 }
 
@@ -92,6 +98,7 @@ void CDialog1::OnDestroy()
 	CDialog::OnDestroy();
 
 	// TODO: 在此处添加消息处理程序代码
+	//KillTimer(WM_RENDER_FRAME);
 	engine->drop();
 }
 
@@ -133,4 +140,28 @@ void CDialog1::OnSize(UINT nType, int cx, int cy)
 
 	// TODO: 在此处添加消息处理程序代码
 	engine->onResize(cx,cy);
+}
+
+void CDialog1::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	//InvalidateRect(NULL,FALSE);
+
+	CDialog::OnTimer(nIDEvent);
+}
+
+BOOL CDialog1::PreCreateWindow(CREATESTRUCT& cs)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	cs.style |= (WS_CLIPCHILDREN | WS_CLIPSIBLINGS);//openGL必需的
+
+	return CDialog::PreCreateWindow(cs);
+}
+
+void CDialog1::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	TRACE("LD1\n");
+
+	CDialog::OnLButtonDown(nFlags, point);
 }

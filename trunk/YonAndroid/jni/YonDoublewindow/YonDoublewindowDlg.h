@@ -1,25 +1,23 @@
-// YonMultiwindowDlg.h : 头文件
+// YonDoublewindowDlg.h : 头文件
 //
 
 #pragma once
-#include "Dialog1.h"
-#include "Dialog2.h"
-#include "Dialog3.h"
+#include "afxwin.h"
+#include "RenderStatic.h"
 
 
-// CYonMultiwindowDlg 对话框
-class CYonMultiwindowDlg : public CDialog
+// CYonDoublewindowDlg 对话框
+class CYonDoublewindowDlg : public CDialog
 {
 // 构造
-public:
-	CYonMultiwindowDlg(CWnd* pParent = NULL);	// 标准构造函数
-
 	const static UINT WM_RENDER_FRAME=1;
-	const static UINT RENDER_INTERVAL=10;
-	int counter;
+	const static UINT RENDER_INTERVAL=20;
+
+public:
+	CYonDoublewindowDlg(CWnd* pParent = NULL);	// 标准构造函数
 
 // 对话框数据
-	enum { IDD = IDD_YONMULTIWINDOW_DIALOG };
+	enum { IDD = IDD_YONDOUBLEWINDOW_DIALOG };
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
@@ -36,12 +34,10 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
+	//CStatic m_static1;
+	//CStatic m_static2;
+	CRenderStatic m_static1;
+	CRenderStatic m_static2;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnDestroy();
-
-	CDialog1 m_dlg1;
-	CDialog2 m_dlg2;
-	CDialog3 m_dlg3;
-	
 };
