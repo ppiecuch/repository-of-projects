@@ -18,7 +18,7 @@ public class YonAndroidActivity extends Activity {
 	private final String TAG="YonAndroidActivity";
 	AndroidGLView view;
 	Handler handler;
-	AlertDialog.Builder confirmDialog;
+	ConfirmDialog confirmDialog;
 	
     /** Called when the activity is first created. */
     @Override
@@ -82,23 +82,20 @@ public class YonAndroidActivity extends Activity {
     }
     
     public void initConfirmDialog(){
-    	confirmDialog = new AlertDialog.Builder(YonAndroidActivity.this);
-//    	confirmExit=new Dialog(this,R.style.Dialog_Fullscreen);
-    	
-    	confirmDialog.setTitle("确认提醒");
-    	confirmDialog.setMessage("您确定要退出吗?");
-		confirmDialog.setCancelable(false);//不能通过back键关闭对话框
-		
-		confirmDialog.setPositiveButton("确认",new DialogInterface.OnClickListener(){
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
+    	confirmDialog = new ConfirmDialog(this) {
+			
+			@Override
+			public boolean onClickPositive() {
+				// TODO Auto-generated method stub
+				return false;
 			}
-		});
-		confirmDialog.setNegativeButton("取消",new DialogInterface.OnClickListener(){
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
+			
+			@Override
+			public boolean onClickNegative() {
+				// TODO Auto-generated method stub
+				return false;
 			}
-		});
+		};
     }
     
     @Override

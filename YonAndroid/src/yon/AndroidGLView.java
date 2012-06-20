@@ -9,7 +9,9 @@ import yon.util.Util;
 import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -35,8 +37,15 @@ public class AndroidGLView extends GLSurfaceView{
 	private void callbackDestroy(){
 		activity.finish();
 	}
-	private void callbackShowConfirm(){
-		handler.sendEmptyMessage(Constant.MSG_CONFIRM);
+	private void callbackShowConfirm(String title,String content,String ok,String cancel){
+		Message message = handler.obtainMessage(Constant.MSG_CONFIRM);
+		Bundle bundle=new Bundle();
+		bundle.putString(Constant.MSG_KEY_TITLE, title);
+		bundle.putString(Constant.MSG_KEY_CONTENT, content);
+		bundle.putString(Constant.MSG_KEY_POSITIVE_BUTTON, ok);
+		bundle.putString(Constant.MSG_KEY_NEGATIVE_BUTTON, cancel);
+		message.setData(bundle);
+		handler.sendMessage(message);
 	}
 	
 
