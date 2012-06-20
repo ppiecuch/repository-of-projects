@@ -42,10 +42,10 @@ namespace io{
 	}
 
 	IReadStream* CFileSystem::createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode){
-		return createReadFileStream(getAbsolutePath(filename),mode);
+		return createReadFileStream(getAbsolutePath(filename,true),mode);
 	}
 	IWriteStream* CFileSystem::createAndOpenWriteFileStream(const path& filename, bool append, ENUM_ENDIAN_MODE mode){
-		return createWriteFileStream(getAbsolutePath(filename),append,mode);
+		return createWriteFileStream(getAbsolutePath(filename,true),append,mode);
 	}
 	XMLReader* CFileSystem::createXMLReader(IReadStream* stream){
 		return new CXMLReaderImpl<c8,core::IReferencable>(stream);
@@ -81,6 +81,45 @@ namespace io{
 #elif defined(YON_COMPILE_WITH_ANDROID)
 		core::stringc tmp("/sdcard/%s",filename.c_str());
 		return tmp;
+#endif
+	}
+	io::path CFileSystem::getResourcePath(const io::path& filename) const{
+		io::path result;
+		for(u32 i=0;i<m_workingDirectories.size();++i)
+		{
+			result=io::EMPTY_PATH;
+			result.append(m_workingDirectories[i]);
+			result.append(filename);
+			Logger->debug("test existFile:%s\r\n",result.c_str());
+			if(existFile(result))
+				return result;
+		}
+		Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("Not found resource:%s in working directories!",filename.c_str()).c_str());
+		return io::EMPTY_PATH;
+	}
+	void CFileSystem::addWorkingDirectory(const io::path& newDirectory){
+		//TODOÕýÔò
+		io::path dir=getAbsolutePath2(newDirectory);
+		Logger->debug("addWorkingDirectory:%s\r\n",dir.c_str());
+		m_workingDirectories.push_back(dir);
+	}
+	io::path CFileSystem::getAbsolutePath2(const io::path& filename) const{
+#ifdef YON_COMPILE_WITH_WIN32
+		if(filename.findFirst(':')!=-1)
+			return filename;
+		fschar *p=0;
+		fschar fpath[_MAX_PATH];
+		p = _fullpath(fpath, filename.c_str(), _MAX_PATH);
+		core::stringc tmp(p);
+		tmp.replace('\\', '/');
+		return tmp;
+#elif defined(YON_COMPILE_WITH_ANDROID)
+		if(filename.find("/sdcard/")==0)
+			return filename;
+		io::path tmp("/sdcard/%s",filename.c_str());
+		return tmp;
+#else
+		return io::EMPTY_PATH;
 #endif
 	}
 	void CFileSystem::setWorkingDirectory(const io::path& newDirectory){
@@ -119,5 +158,5 @@ namespace io{
 	{
 		return new CFileSystem();
 	}
-}//io
-}//yon
+}
+}

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="YonIO"
-	ProjectGUID="{7FD5B1B1-D672-48F5-81A4-40DD17871BE7}"
-	RootNamespace="YonIO"
+	Name="YonCallback"
+	ProjectGUID="{2A44DDCE-EA43-460C-A239-FBB4586A2CBF}"
+	RootNamespace="YonCallback"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -167,7 +167,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\AndroidIO.mk"
+			RelativePath="..\AndroidCallback.mk"
 			>
 		</File>
 		<File

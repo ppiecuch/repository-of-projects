@@ -11,11 +11,6 @@ ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 
-IModel* cubeModel=NULL;
-IModel* weedModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
-f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -75,57 +70,6 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("temp/");
 #endif
 
-	//Logger->debug("%s\n",fs->getAbsolutePath(fs->getWorkingDirectory()).c_str());
-
-#if 1
-	Logger->debug("%s\n",fs->getAbsolutePath2("D:/").c_str());
-
-	Logger->debug("%s\n",fs->getAbsolutePath2("../media/").c_str());
-
-	Logger->debug("%s\n",fs->getResourcePath("test.png").c_str());
-	Logger->debug("%s\n",fs->getResourcePath("Android.mk").c_str());
-	Logger->debug("%s\n",fs->getResourcePath("nothing.png").c_str());
-#endif
-	//core::mkdirs(fs->getAbsolutePath(io::path("../media\\test1\\test2")).c_str());
-
-	//Logger->debug("%s\n",core::getParentName(io::path("../media/fdsafs.txt")).c_str());
-
-#if 0
-	IWriteStream* ws=fs->createAndOpenWriteFileStream("d:/test.txt");
-	ws->writeBool(true);
-	ws->writeFloat(2.1f);
-	ws->writeLong(3333);
-	ws->drop();
-
-	IReadStream* rs=fs->createAndOpenReadFileStream("d:/test.txt");
-	Logger->debug("%d\n",rs->readBool());
-	Logger->debug("%.2f\n",rs->readFloat());
-	Logger->debug("%ld\n",rs->readLong());
-	rs->drop();
-#elif 0
-	IWriteStream* ws=fs->createAndOpenWriteFileStream("/tst/tst/tst/test.txt",true,ENUM_ENDIAN_MODE_BIG);
-	ws->writeBool(true);
-	ws->writeFloat(2.1f);
-	ws->writeLong(3333);
-	ws->drop();
-
-	IReadStream* rs=fs->createAndOpenReadFileStream("/tst/tst/tst/test.txt",ENUM_ENDIAN_MODE_BIG);
-	Logger->debug("%d\n",rs->readBool());
-	Logger->debug("%.2f\n",rs->readFloat());
-	Logger->debug("%ld\n",rs->readLong());
-	//Logger->debug("%d\n",rs->readBool());
-	//Logger->debug("%.2f\n",rs->readFloat());
-	//Logger->debug("%ld\n",rs->readLong());
-	rs->drop();
-#elif 0
-	IReadStream* rs=fs->createAndOpenReadFileStream("video_autodetect.xml");
-	XMLReader* reader=fs->createXMLReader(rs);
-	rs->drop();
-
-	while(reader->read());
-	reader->drop();
-#else
-#endif
 
 	return true; 
 }

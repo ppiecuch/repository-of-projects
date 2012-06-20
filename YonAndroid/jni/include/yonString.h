@@ -344,8 +344,8 @@ namespace yon{
 			/** \param character: Character to append. */
 			void append(T character)
 			{
-				if (len+1 > capacity)
-					reallocate(len + 1);
+				if (len+1 >= capacity)
+					reallocate(capacity+1);
 
 				++len;
 
@@ -354,18 +354,16 @@ namespace yon{
 			}
 
 
-			//TODO 待测试
 			//! Appends a string to this string
 			/** \param other: String to append. */
 			void append(const string<T>& other)
 			{
-				--len;
-				u32 olen = other.length()+1;
+				u32 olen = other.length();
 
-				if (len + olen > capacity)
-					reallocate(len + olen);
+				if (len + olen >= capacity)
+					reallocate(len+olen+1);
 
-				for (u32 l=0; l<olen; ++l)
+				for (u32 l=0; l<=olen; ++l)
 					elements[len+l] = other[l];
 
 				len += olen;
@@ -527,7 +525,7 @@ namespace yon{
 
 			//忽略字符串前面N个非数字字符，直到找到数字字符，对之进行atof
 			//如果不存在数字字符，返回0.0f
-			f32 intelatof()
+			f32 superatof()
 			{
 				int index=0;
 				for(int i=0;i<len;++i)
