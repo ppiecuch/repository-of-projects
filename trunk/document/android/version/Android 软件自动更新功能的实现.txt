@@ -1,0 +1,501 @@
+一个好的应用软件都是需要好的维护，从初出版本到最后精品，这个过程需要版本不停的更新，那么如何让用户第一时间获取最新的应用安装包呢？那么就要求我们从第一个版本就要实现升级模块这一功能。
+
+自 动更新功能的实现原理，就是我们事先和后台协商好一个接口，我们在应用的主Activity里，去访问这个接口，如果需要更新，后台会返回一些数据(比 如，提示语；最新版本的url等)。然后我们给出提示框，用户点击开始下载，下载完成开始覆盖安装程序，这样用户的应用就保持最新的拉。
+
+为了让大家容易理解，我像往常一样准备一个小例子，这里为了方便我就省去了和后台交互部分了。步骤分别如下：
+
+第一步：新建一个Android工程命名为:UpdateDemo.代码结构如下图所示：
+
+
+
+第二步：新建一个UpdateManager.java类，负责软件更新功能模块，代码如下：
+
+001
+package com.tutor.update;
+002
+ 
+003
+import java.io.File;
+004
+import java.io.FileOutputStream;
+005
+import java.io.IOException;
+006
+import java.io.InputStream;
+007
+import java.net.HttpURLConnection;
+008
+import java.net.MalformedURLException;
+009
+import java.net.URL;
+010
+ 
+011
+ 
+012
+import android.app.AlertDialog;
+013
+import android.app.Dialog;
+014
+import android.app.AlertDialog.Builder;
+015
+import android.content.Context;
+016
+import android.content.DialogInterface;
+017
+import android.content.Intent;
+018
+import android.content.DialogInterface.OnClickListener;
+019
+import android.net.Uri;
+020
+import android.os.Handler;
+021
+import android.os.Message;
+022
+import android.view.LayoutInflater;
+023
+import android.view.View;
+024
+import android.widget.ProgressBar;
+025
+ 
+026
+public class UpdateManager {
+027
+ 
+028
+    private Context mContext;
+029
+     
+030
+    //提示语
+031
+    private String updateMsg = "有最新的软件包哦，亲快下载吧~";
+032
+     
+033
+    //返回的安装包url
+034
+    private String apkUrl = "http://softfile.3g.qq.com:8080/msoft/179/24659/43549/qq_hd_mini_1.4.apk";
+035
+     
+036
+     
+037
+    private Dialog noticeDialog;
+038
+     
+039
+    private Dialog downloadDialog;
+040
+     /* 下载包安装路径 */
+041
+    private static final String savePath = "/sdcard/updatedemo/";
+042
+     
+043
+    private static final String saveFileName = savePath + "UpdateDemoRelease.apk";
+044
+ 
+045
+    /* 进度条与通知ui刷新的handler和msg常量 */
+046
+    private ProgressBar mProgress;
+047
+ 
+048
+     
+049
+    private static final int DOWN_UPDATE = 1;
+050
+     
+051
+    private static final int DOWN_OVER = 2;
+052
+     
+053
+    private int progress;
+054
+     
+055
+    private Thread downLoadThread;
+056
+     
+057
+    private boolean interceptFlag = false;
+058
+     
+059
+    private Handler mHandler = new Handler(){
+060
+        public void handleMessage(Message msg) {
+061
+            switch (msg.what) {
+062
+            case DOWN_UPDATE:
+063
+                mProgress.setProgress(progress);
+064
+                break;
+065
+            case DOWN_OVER:
+066
+                 
+067
+                installApk();
+068
+                break;
+069
+            default:
+070
+                break;
+071
+            }
+072
+        };
+073
+    };
+074
+     
+075
+    public UpdateManager(Context context) {
+076
+        this.mContext = context;
+077
+    }
+078
+     
+079
+    //外部接口让主Activity调用
+080
+    public void checkUpdateInfo(){
+081
+        showNoticeDialog();
+082
+    }
+083
+     
+084
+     
+085
+    private void showNoticeDialog(){
+086
+        AlertDialog.Builder builder = new Builder(mContext);
+087
+        builder.setTitle("软件版本更新");
+088
+        builder.setMessage(updateMsg);
+089
+        builder.setPositiveButton("下载", new OnClickListener() {        
+090
+            @Override
+091
+            public void onClick(DialogInterface dialog, int which) {
+092
+                dialog.dismiss();
+093
+                showDownloadDialog();          
+094
+            }
+095
+        });
+096
+        builder.setNegativeButton("以后再说", new OnClickListener() {          
+097
+            @Override
+098
+            public void onClick(DialogInterface dialog, int which) {
+099
+                dialog.dismiss();              
+100
+            }
+101
+        });
+102
+        noticeDialog = builder.create();
+103
+        noticeDialog.show();
+104
+    }
+105
+     
+106
+    private void showDownloadDialog(){
+107
+        AlertDialog.Builder builder = new Builder(mContext);
+108
+        builder.setTitle("软件版本更新");
+109
+         
+110
+        final LayoutInflater inflater = LayoutInflater.from(mContext);
+111
+        View v = inflater.inflate(R.layout.progress, null);
+112
+        mProgress = (ProgressBar)v.findViewById(R.id.progress);
+113
+         
+114
+        builder.setView(v);
+115
+        builder.setNegativeButton("取消", new OnClickListener() {
+116
+            @Override
+117
+            public void onClick(DialogInterface dialog, int which) {
+118
+                dialog.dismiss();
+119
+                interceptFlag = true;
+120
+            }
+121
+        });
+122
+        downloadDialog = builder.create();
+123
+        downloadDialog.show();
+124
+         
+125
+        downloadApk();
+126
+    }
+127
+     
+128
+    private Runnable mdownApkRunnable = new Runnable() {   
+129
+        @Override
+130
+        public void run() {
+131
+            try {
+132
+                URL url = new URL(apkUrl);
+133
+             
+134
+                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+135
+                conn.connect();
+136
+                int length = conn.getContentLength();
+137
+                InputStream is = conn.getInputStream();
+138
+                 
+139
+                File file = new File(savePath);
+140
+                if(!file.exists()){
+141
+                    file.mkdir();
+142
+                }
+143
+                String apkFile = saveFileName;
+144
+                File ApkFile = new File(apkFile);
+145
+                FileOutputStream fos = new FileOutputStream(ApkFile);
+146
+                 
+147
+                int count = 0;
+148
+                byte buf[] = new byte[1024];
+149
+                 
+150
+                do{                
+151
+                    int numread = is.read(buf);
+152
+                    count += numread;
+153
+                    progress =(int)(((float)count / length) * 100);
+154
+                    //更新进度
+155
+                    mHandler.sendEmptyMessage(DOWN_UPDATE);
+156
+                    if(numread <= 0){   
+157
+                        //下载完成通知安装
+158
+                        mHandler.sendEmptyMessage(DOWN_OVER);
+159
+                        break;
+160
+                    }
+161
+                    fos.write(buf,0,numread);
+162
+                }while(!interceptFlag);//点击取消就停止下载.
+163
+                 
+164
+                fos.close();
+165
+                is.close();
+166
+            } catch (MalformedURLException e) {
+167
+                e.printStackTrace();
+168
+            } catch(IOException e){
+169
+                e.printStackTrace();
+170
+            }
+171
+             
+172
+        }
+173
+    };
+174
+     
+175
+     /**
+176
+     * 下载apk
+177
+     * @param url
+178
+     */
+179
+     
+180
+    private void downloadApk(){
+181
+        downLoadThread = new Thread(mdownApkRunnable);
+182
+        downLoadThread.start();
+183
+    }
+184
+     /**
+185
+     * 安装apk
+186
+     * @param url
+187
+     */
+188
+    private void installApk(){
+189
+        File apkfile = new File(saveFileName);
+190
+        if (!apkfile.exists()) {
+191
+            return;
+192
+        }   
+193
+        Intent i = new Intent(Intent.ACTION_VIEW);
+194
+        i.setDataAndType(Uri.parse("file://" + apkfile.toString()), "application/vnd.android.package-archive");
+195
+        mContext.startActivity(i);
+196
+     
+197
+    }
+198
+}
+第三步：在MainActivity.java也就是主Activity调用,代码如下:
+01
+package com.tutor.update;
+02
+ 
+03
+import android.app.Activity;
+04
+import android.os.Bundle;
+05
+ 
+06
+public class MainAcitivity extends Activity {
+07
+     
+08
+ 
+09
+    private UpdateManager mUpdateManager;
+10
+    @Override
+11
+    public void onCreate(Bundle savedInstanceState) {
+12
+        super.onCreate(savedInstanceState);
+13
+        setContentView(R.layout.main);
+14
+         
+15
+        //这里来检测版本是否需要更新
+16
+        mUpdateManager = new UpdateManager(this);
+17
+        mUpdateManager.checkUpdateInfo();
+18
+    }    
+19
+}
+第四步：添加程序所用的资源与权限：
+下载的时候用到了ProgressBar,所以事先写了一个progress.xml布局文件，代码如下:
+
+01
+<!--?xml version="1.0" encoding="utf-8"?-->
+02
+ 
+03
+ 
+04
+ 
+05
+<linearlayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="wrap_content">  
+06
+ 
+07
+  
+08
+  
+09
+  
+10
+ <progressbar style="android:attr/progressBarStyleHorizontal;" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/progress">
+11
+  
+12
+  
+13
+  
+14
+ </progressbar>
+15
+ 
+16
+ 
+17
+ 
+18
+</linearlayout>
+下载的时候用到了网络部分，所以要在AndroidManifest.xml中添加网络权限，代码如下:
+1
+<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+第五步:运行查看效果如下:
+     
+
+ 图一:提示有最新包                                                                                   图二：点击开始下载
+
+
+
+图三：下载完开始安装，我这里模拟器空间不足了。
+
+OK~大功告成了，继续看球，阿森纳已经0:1了，希望范大将军救驾！大家晚安~稍后将会为大家分享更多内容，尽请期待！
+
+http://www.open-open.com/lib/view/1322529319718

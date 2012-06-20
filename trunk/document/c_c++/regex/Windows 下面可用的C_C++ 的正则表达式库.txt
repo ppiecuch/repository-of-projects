@@ -1,0 +1,11 @@
+1. 最省事的是 ATL 里面自带的 CAtlRegExp。不过对 POSIX 标准支持很差，而且非常慢。
+2. boost，名气很大，但是过于臃肿，而且速度也不快。
+3. 以前微软研究院有个小组搞过一个greta，号称速度是boost的7倍多，不过03年以后就再也没更新了。在 VC8 以上版本编译需要稍作修改。兼容性不错。
+4. VBScript.RegExp。兼容性和速度都很好，尤其是速度上出人意料地击败了greta，比较复杂的规则比greta快了1倍不止。而且是Windows系统内置，
+不用像其它库还需要链接一个几百KB的lib。
+5. TRE：这个是在搜Google的RE2的时候搜到的。因为RE2 暂时还不能在Windows上编译，所以找来了这个替代品。算法类似Google的RE2，
+不过测试下来感觉还不成熟，匹配有遗漏。实测的速度和greta差不多，比VBScript.RegExp慢。
+6. PCRE：这个才是王道，WebKit的JavaScriptCore就是用得它，测试下来速度太震撼了，先我对VBScript.RegExp的性能已经很满意了，
+结果没想到PCRE的速度还要快10多倍……唯一的缺点是不支持wchar_t，所以wchar_t字符串需要先转换成char。但是还是够快了。
+
+http://blog.csdn.net/quaful/article/details/6460880

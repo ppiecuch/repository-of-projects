@@ -1,0 +1,77 @@
+经常都需要退出一个Android应用程序，如果应用里Activity很多得话，直接用finish()则只能退出当前的Activity，而不能完全退出，网上虽有很多实现方法，我这里也给大家介绍一实现方法。比如现在我有N个Activity，而每一个Activity里面都可以通过菜单键来退出应用程序，该怎么办呢？是不是每一个Activity里面都写下菜单呢？当然不需要，我们可以定义一个通用的BaseActivity，这个Activity当然继承最基本的Activity，而我们在BaseActivity里面实现菜单的功能，实现程序的退出，然后在程序里面其他的Activity来继承至这个BaseActivity。
+
+代码如下:
+
+view plaincopy to clipboardprint?
+package com.apkstory;  
+  
+import java.util.ArrayList;  
+  
+import android.app.Activity;  
+import android.app.AlertDialog;  
+import android.content.DialogInterface;  
+import android.content.DialogInterface.OnClickListener;  
+import android.os.Bundle;  
+import android.util.Log;  
+import android.view.Menu;  
+import android.view.MenuItem;  
+  
+public class BaseActivity extends Activity {  
+  
+public static final String TAG = "BaseActivity" ;  
+public static ArrayList<Activity> activityList = new ArrayList<Activity>();  
+  
+@Override  
+protected void onCreate(Bundle savedInstanceState) {  
+super.onCreate(savedInstanceState);  
+activityList.add(this);  
+Log.i(TAG, activityList.toString()) ;  
+}  
+  
+@Override  
+public boolean onCreateOptionsMenu(Menu menu) {  
+menu.add(0, 0, 0, "退出程序");  
+return super.onCreateOptionsMenu(menu);  
+}  
+  
+@Override  
+public boolean onOptionsItemSelected(MenuItem item) {  
+if (item.getItemId() == 0) {  
+exitApp();  
+}  
+return super.onOptionsItemSelected(item);  
+}  
+  
+@Override  
+protected void onDestroy() {  
+super.onDestroy();  
+activityList.remove(this);  
+Log.i(TAG, activityList.toString()) ;  
+}  
+  
+/** 
+* 完完全全退出应用程序 
+*/  
+public void exitApp() {  
+AlertDialog.Builder builder = new AlertDialog.Builder(this);  
+builder.setTitle("提示");  
+builder.setMessage("您确定要退出程序吗?");  
+builder.setPositiveButton("确定", new OnClickListener() {  
+  
+@Override  
+public void onClick(DialogInterface dialog, int which) {  
+if (activityList.size() > 0) {  
+for (Activity activity : activityList) {  
+activity.finish();  
+}  
+android.os.Process.killProcess(android.os.Process.myPid());  
+}  
+}  
+});  
+builder.setNegativeButton("取消", null);  
+builder.show();  
+}  
+  
+}  
+
+http://www.apkstory.com/development/android-absolutely-exit-app.html
