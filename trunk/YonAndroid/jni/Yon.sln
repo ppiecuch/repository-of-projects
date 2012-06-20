@@ -133,6 +133,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonDoublewindow", "YonDoubl
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonCallback", "YonCallback\YonCallback.vcproj", "{2A44DDCE-EA43-460C-A239-FBB4586A2CBF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -247,6 +252,10 @@ Global
 		{5CDE9067-8158-458C-87D9-C40820F122C5}.Debug|Win32.Build.0 = Debug|Win32
 		{5CDE9067-8158-458C-87D9-C40820F122C5}.Release|Win32.ActiveCfg = Release|Win32
 		{5CDE9067-8158-458C-87D9-C40820F122C5}.Release|Win32.Build.0 = Release|Win32
+		{2A44DDCE-EA43-460C-A239-FBB4586A2CBF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2A44DDCE-EA43-460C-A239-FBB4586A2CBF}.Debug|Win32.Build.0 = Debug|Win32
+		{2A44DDCE-EA43-460C-A239-FBB4586A2CBF}.Release|Win32.ActiveCfg = Release|Win32
+		{2A44DDCE-EA43-460C-A239-FBB4586A2CBF}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -38,7 +38,7 @@ namespace ogles1{
 
 	void COGLES1ExtensionHandler::initExtensionHandler(){
 		m_version=(const c8*)glGetString(GL_VERSION);
-		f32 version=m_version.intelatof();
+		f32 version=m_version.superatof();
 		Logger->info("GL_VERSION:%s(%.2f)\n",m_version.c_str(),version);
 		m_extensions=(const c8*)glGetString(GL_EXTENSIONS);
 		Logger->info("GL_EXTENSIONS:\n");

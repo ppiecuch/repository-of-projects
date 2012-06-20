@@ -45,7 +45,7 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	//This is the class loader the virtual machine creates for applications, 
 	//and is able to locate classes listed in the java.class.path property.
 
-
+#if 0
 	const char* className="yon/AndroidGLView";
 	jclass cls = pEnv->FindClass(className);
 	if (cls == NULL) {
@@ -63,6 +63,24 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	Logger->info("callbackDestroy function\n");
 	destroy();
 	pEnv->CallVoidMethod(obj, callbackDestroy);
+#else
+	const char* className="yon/AndroidGLView";
+	jclass cls = pEnv->FindClass(className);
+	if (cls == NULL) {
+		Logger->warn("can not find %s\n",className);
+		return true;
+	}
+	//再找类中的方法
+	jmethodID callbackShowConfirm = pEnv->GetMethodID(cls, "callbackShowConfirm", "()V");
+	if (destroy == NULL) 
+	{
+		Logger->warn("no callbackDestroy function\n");
+		return true;  
+	}
+	//回调java中的方法
+	Logger->info("callbackShowConfirm function\n");
+	pEnv->CallVoidMethod(obj, callbackShowConfirm);
+#endif
 	return true;
 }
 jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iAction, jint id, jfloat x, jfloat y, jint count){

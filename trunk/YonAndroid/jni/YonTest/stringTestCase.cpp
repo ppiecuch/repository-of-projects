@@ -2,22 +2,35 @@
 #include "stringTestCase.h"
 #include "yonUtil.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
 
 void stringTestCase::setUp()
 {
 }
+void stringTestCase::append()
+{
+	core::stringc str1("OpenGL");
+	str1.append("1234");
+	CPPUNIT_ASSERT( str1=="OpenGL1234" );
+	str1.append("56789");
+	CPPUNIT_ASSERT( str1=="OpenGL123456789" );
+
+	core::stringc str2;
+	str2.append('c');
+	str2.append('h');
+	CPPUNIT_ASSERT( str2=="ch" );
+}
 void stringTestCase::intelatof()
 {
 	core::stringc str1("OpenGL ES-CM 1.1");
-	printf("\n%.2f\n",str1.intelatof());
-	CPPUNIT_ASSERT(core::equals(str1.intelatof(),1.1f));
+	printf("\n%.2f\n",str1.superatof());
+	CPPUNIT_ASSERT(core::equals(str1.superatof(),1.1f));
 
 	core::stringc str2(".1");
-	CPPUNIT_ASSERT(core::equals(str2.intelatof(),0.1f));
+	CPPUNIT_ASSERT(core::equals(str2.superatof(),0.1f));
 
 	core::stringc str3("hello");
-	CPPUNIT_ASSERT(core::equals(str3.intelatof(),0.0f));
+	CPPUNIT_ASSERT(core::equals(str3.superatof(),0.0f));
 }
 void stringTestCase::les()
 {

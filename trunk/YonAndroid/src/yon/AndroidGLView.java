@@ -3,11 +3,13 @@ package yon;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import yon.demo.Constant;
 import yon.util.Util;
 
 import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -17,6 +19,7 @@ public class AndroidGLView extends GLSurfaceView{
 	
 	AndroidGLRender renderer;
 	Activity activity;
+	Handler handler;
 	int screenWidth,screenHeight;
 	MoveEvent currentMoveEvent,lastMoveEvent;
 	
@@ -32,11 +35,15 @@ public class AndroidGLView extends GLSurfaceView{
 	private void callbackDestroy(){
 		activity.finish();
 	}
+	private void callbackShowConfirm(){
+		handler.sendEmptyMessage(Constant.MSG_CONFIRM);
+	}
 	
 
-	public AndroidGLView(Context context) {
+	public AndroidGLView(Context context,Handler handler) {
 		super(context);
 		this.activity=(Activity)context;
+		this.handler=handler;
 		
 		DisplayMetrics dm = new DisplayMetrics();
 		activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
