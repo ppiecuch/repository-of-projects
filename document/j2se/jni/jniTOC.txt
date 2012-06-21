@@ -1,0 +1,264 @@
+
+Contents | Prev | Next | Index	The Java Native Interface
+Programmer's Guide and Specification
+
+Preface
+
+Part One: Introduction and Tutorial
+
+1	 Introduction
+
+1.1	The Java Platform and Host Environment
+
+1.2	 Role of the JNI
+
+1.3	 Implications of Using the JNI
+
+1.4	 When to Use the JNI
+
+1.5	 Evolution of the JNI
+
+1.6	 Example Programs
+
+2	 Getting Started
+
+2.1	 Overview
+
+2.2	 Declare the Native Method
+
+2.3	 Compile the HelloWorld Class
+
+2.4	 Create the Native Method Header File
+
+2.5	 Write the Native Method Implementation
+
+2.6	 Compile the C Source and Create a Native Library
+
+2.7	 Run the Program
+
+Part Two: Programmer's Guide
+
+3	 Basic Types, Strings, and Arrays
+
+3.1	 A Simple Native Method
+
+C Prototype for Implementing the Native Method
+Native Method Arguments
+Mapping of Types
+3.2	 Accessing Strings
+
+Converting to Native Strings
+Freeing Native String Resources
+Constructing New Strings
+Other JNI String Functions
+New JNI String Functions in Java 2 SDK Release 1.2
+Summary of JNI String Functions
+Choosing among the String Functions
+3.3	 Accessing Arrays
+
+Accessing Arrays in C
+Accessing Arrays of Primitive Types
+Summary of JNI Primitvie Array Functions
+Choosing among the Primitive Array Functions
+Acessing Arrays of Objects
+4	 Fields and Methods
+
+4.1	 Accessing Fields
+
+Procedure for Accessing an Instance Field
+Field Descriptors
+Accessing Static Fields
+4.2	 Calling Methods
+
+Calling Instance Methods
+Forming the Method Descriptor
+Calling Static Methods
+Calling Instance Methods of a Superclass
+4.3	 Invoking Constructors
+
+4.4	 Caching Field and Method IDs
+
+Caching at the Point of Use
+Caching in the Defining Class's Initializer
+Comparison between the Two Approaches to Caching IDs
+4.5	 Performance of JNI Field and Method Operations
+
+5	 Local and Global References
+
+5.1	 Local and Global References
+
+Local References
+Global References
+Weak Global References
+Comparing References
+5.2	 Freeing References
+
+Freeing Local References
+Managing Local References in Java 2 SDK Release 1.2
+Freeing Gloabl References
+5.3	 Rules for Managing References
+
+6	 Exceptions
+
+6.1	 Overview
+
+Caching and Throwing Exceptions in Native Code
+A Utility Function
+6.2	 Proper Exception Handling
+
+Checking for Exceptions
+Handling Exceptions
+Exceptions in Utility Functions
+7	 The Invocation Interface
+
+7.1	 Creating the Java Virtual Machine
+
+7.2	 Linking Native Applications with the Java Virtual Machine
+
+Linking with a Known Java Virtual Machine
+Linking with Unknown Java Virtual Machine
+7.3	  Attaching Native Threads
+
+8	 Additional JNI Features
+
+8.1	 JNI and Threads
+
+Contraints
+Monitor Entry and Exit
+Monitor Wait and Notify
+Obtaining a JNIEnv Pointer in Arbitrary Contexts
+Matching the Thread Models
+8.2	 Writing Internationalized Code
+
+Creating jstrings from Native Strings
+Translating jstrings to Native Strings
+8.3	 Registering Native Methods
+
+8.4	 Load and Unload Handlers
+
+The JNI_OnLoad Handler
+The JNI_OnUnload Handler
+8.5	 Reflection Support
+
+8.6	 JNI Programming in C++
+
+9	 Leveraging Existing Native Libraries
+
+9.1	 One-to-One Mapping
+
+9.2	 Shared Stubs
+
+9.3	 One-to-One Mapping versus Shared Stubs
+
+9.4	 Implementation of Shared Stubs
+
+The CPointer Class
+The CMalloc Class
+The CFunction Class
+9.5	 Peer Classes
+
+Peer Classes in the Java Platform
+Freeing Native Data Structures
+Backpointers to Peer Instances
+10	 Traps and Pitfalls
+
+10.1	 Error Checking
+
+10.2	 Passing Invalid Arguments to JNI Functions
+
+10.3	 Confusing jclass with jobject
+
+10.4	 Truncating jboolean Arguments
+
+10.5	 Boundaries between Java Application and Native Code
+
+10.6	 Confusing IDs with References
+
+10.7	 Caching Field and Method IDs
+
+10.8	 Terminating Unicode Strings
+
+10.9	 Violating Access Control Rules
+
+10.10	 Disregarding Internationalization
+
+10.11	 Retaining Virtual Machine Resources
+
+10.12	 Excessive Local Reference Creation
+
+10.13	 Using Invalid Local References
+
+10.14	 Using the JNIEnv across Threads
+
+10.15	 Mismatched Thread Models
+
+Part Three: Specification
+
+11	 Overview of the JNI Design
+
+11.1	 Design Goals
+
+11.2	 Loading Native Libraries
+
+Class Loaders
+Class Loaders and Native Libraries
+Locating Native Libraries
+A Type Safety Restriction
+Unloading Native Libraries
+11.3	 Linking Native Methods
+
+11.4	 Calling Conventions
+
+11.5	 The JNIEnv Interface Pointer
+
+Organization of the JNIEnv Interface Pointer
+Benefits of an Interface Pointer
+11.6	 Passing Data
+
+Global and Local References
+Implementing Local References
+Weak Global References
+11.7	 Accessing Objects
+
+Accessing Primitive Arrays
+Fields and Methods
+11.8	 Errors and Exceptions
+
+No Checking for Programming Errors
+Java Virtual Machine Exceptions
+Asynchronous Exceptions
+12	 JNI Types
+
+12.1	 Primitive and Reference Types
+
+Primitive Types
+Reference Types
+The jvalue Type
+12.2	 Field and Method IDs
+
+12.3	 String Formats
+
+UTF-8 Strings
+Class Descriptors
+Field Descriptors
+Method Descriptors
+12.4	 Constants
+
+13	 JNI Functions
+
+13.1	 Summary of the JNI Functions
+
+Directly-Exported Invocation Interface Functions
+The JavaVM Interface
+Functions Defined in Native Libraries
+The JNIEnv Interface
+13.2	 Specification of JNI Functions
+
+Index
+
+Contents | Prev | Next | Index	The Java Native Interface
+Programmer's Guide and Specification
+Copyright © 2002 Sun Microsystems, Inc. All rights reserved 
+Please send any comments or corrections to jni@java.sun.com
+
+http://java.sun.com/docs/books/jni/html/jniTOC.html

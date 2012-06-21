@@ -1,0 +1,296 @@
+北京理工大学  20981  陈罡
+
+一、写在前面的话
+上回写到了关于如何在c++的代码中嵌入v8引擎，实现javascript脚本中调用c++的函数以及从c++函数中调用javascript脚本中定义的函数（这其实就是设计模式中所谓的reflection，反射机制的具体实现）。通过了了几行代码就可以实现如此复杂的反射机制，由此可见v8引擎带来了很大的便利性。但是上回偶只探索了一下实现c++与javascript脚本之间的函数相互调用，那么如何通过javascript调用c++的对象呢？按理说，javascript与c++的对象一定是应该可以互相调用的，但在实际的应用过程中，偶发现通过c++去调用javascript中定义的对象，似乎用得不那么多（主要是效率问题），而从javascript调用c++中已经定义好的对象，则是非常方便的，可以利用c++实现一些高效率的对象，然后由javascript进行调用，从而兼顾了效率与灵活性两个方面。
+
+对于c++代码中如何为javascript导出一个对象供其调用，偶在网上google了一下这个问题。比较有名的解释就是另外一个叫做cproxyv8的开源项目。该项目通过几个代理类可以很方便地将c++中的类导出到javascript空间中，例如，如果开发者导出了一个叫做CPoint的类，那么在javascript脚本中可以这样去使用：
+var pt=new CPoint();
+看上去貌似非常方便，但是偶查了一下cproxy的known issues，里面明确说明了通过cproxyv8导出的c++类是存在“内部释放”(native disposed)的问题的。
+例如，如果偶这样去编写javascipt脚本：
+r = new Rect() ; 
+pt = r.topleft() ; 
+pt.x = 3 ; 
+pt.y = 4 ; 
+
+// 隔一大段代码。。。
+
+pt.x = 0 ;  // 注意，这里或许就会出问题
+py.y = 10 ; 
+
+这一段脚本，看上去是没有问题的，r是Rect类的对象（Rect类是从c++中通过cproxyv8导出到javascript中的一个类），那么当调用r.topleft()的时候，就会返回一个Point对象，该对象是r对象的组成部分（Rect类是由topleft和rightbottom两个Point对象组合而成的），然后，偶们就可以使用pt对象对topleft的x,y坐标进行操作。
+
+但是现在问题出现了，如果在后续javascript脚本中没有任何代码引用到r对象，那么对于v8引擎来说，这个r对象是可以释放掉的，一旦r被释放掉了，那么其内部的topleft和rightbottom两个Point对象自然也会被释放掉，如此以来，pt变量引用的r.topleft()对象也被释放掉了。此时，如果再对pt进行存取操作，就会引起错误和异常。这也就是所谓的“内部释放”问题了。当然，如果这里的Rect类是在javascript脚本中定义的话，则不会出现这种问题。
+
+偶个人以为，如果真的需要通过javascript操作和使用c++的对象，还是直接使用全局对象比较好。由于全局对象在javascript脚本执行的整个生命周期内都是可以访问的，因此，不会出现上述的内部释放问题。另外，对于cproxyv8，或许是偶钻研得不够深入，在最新版本的v8引擎上似乎不可以工作，还有就是一旦使用过程中出现了问题，编译器会输出让人头昏眼花的错误提示信息，如果不仔细地一条条地追踪，就会变得根本不知所云。因此，偶还是决定直接使用v8引擎中提供的类和函数来导出全局的c++对象，而不是通过代理类来解决问题（当然，不可否认cproxyv8确实提供了极大的便利性！至于用不用这个cproxyv8，那完全是萝卜白菜各有所好了）。
+
+二、v8引擎导出c++类的方法
+1、准备工作
+要想为javascript脚本导出一个全局的c++对象，那至少应该定义一个c++的类吧？！
+下面就是偶作实验的时候声明的一个c++类（偶把它的名字姑且定为CFoo吧，以下是.h文件的定义）：
+#ifndef _FOO_H_
+#define _FOO_H_
+
+#include <v8.h>
+#include "canvas.h"
+
+class CFoo {
+
+ public:
+  CFoo(CCanvas * canv_ptr) ; 
+  ~CFoo() ; 
+
+ private:
+  CCanvas * m_canv_ptr ;  // 这里是保存外部的一个绘图对象的指针，把真正的绘图工作交给它做好了。
+
+ public: // member functions
+  inline void SetColor(int r, int g, int b) {
+    if(m_canv_ptr) {
+      m_canv_ptr->SetDrawColor(r, g, b) ; 
+    }
+  }
+
+  inline void Line(int x1, int y1, int x2, int y2) {
+    if(m_canv_ptr) {
+      m_canv_ptr->DrawLine(x1, y1, x2, y2) ; 
+    }
+  }
+
+  inline void Commit() {
+    if(m_canv_ptr) {
+      m_canv_ptr->Commit() ; 
+    }
+  }
+  
+  
+ public: // 下面这些方法必须定义成static类型的，用于给javascript脚本调用的。
+  static v8::Handle<v8::Value> set_color(const v8::Arguments & args) ; 
+  static v8::Handle<v8::Value> line(const v8::Arguments & args) ; 
+  static v8::Handle<v8::Value> commit(const v8::Arguments & args) ; 
+} ; 
+
+#endif
+
+再往下是具体的实现，里面有一些奇怪的函数，稍后偶再来讲解（以下是.cpp文件）：
+CFoo::CFoo(CCanvas * canv_ptr):m_canv_ptr(canv_ptr) {}
+CFoo::~CFoo() { }
+
+v8::Handle<v8::Value> CFoo::set_color(const v8::Arguments& args) {
+  CFoo * foo_ptr =  util_unwrap_obj<CFoo>(args.Holder()) ; // 这里的util_unwrap_obj稍后再给出其定义
+  if(args.Length() == 3) {
+    foo_ptr->SetColor(args[0]->Int32Value(), 
+                      args[1]->Int32Value(),
+                      args[2]->Int32Value()) ; 
+  }
+
+  return v8::Undefined() ;
+}
+
+v8::Handle<v8::Value> CFoo::line(const v8::Arguments& args) {
+  CFoo * foo_ptr =  util_unwrap_obj<CFoo>(args.Holder()) ; 
+  if(args.Length() == 4) {
+    foo_ptr->Line(args[0]->Int32Value(),
+                  args[1]->Int32Value(),
+                  args[2]->Int32Value(),
+                  args[3]->Int32Value()) ; 
+  }
+  return v8::Undefined() ; 
+}
+
+v8::Handle<v8::Value> CFoo::commit(const v8::Arguments& args) {
+  CFoo * foo_ptr =   util_unwrap_obj<CFoo>(args.Holder()) ; 
+  foo_ptr->Commit() ; 
+  return v8::Undefined() ; 
+}
+
+2、创建一个CFoo全局指针，然后在初始化的时候创建其对象
+static CFoo * g_foo_ptr ; 
+......
+
+int main(int argc, char * argv[]) {
+...
+  try {
+    g_foo_ptr = new CFoo(g_canv_ptr) ; 
+  } catch(...) {
+    LOG("main, new CFoo object failed!") ; 
+    delete g_canv_ptr ; 
+    goto END_MAIN ; 
+  }
+...
+  return 0 ; 
+}
+
+3、初始化javascript执行环境的时候，加入该全局对象（看上去似乎很复杂，但仔细看来，实际上非常简单）：
+static void on_click(const char * js_fname, int x, int y) {
+  const int argc = 2 ; 
+  HandleScope handle_scope ; 
+  Handle<ObjectTemplate> global_templ ; 
+  Handle<ObjectTemplate> foo_templ ; 
+  Handle<External> foo_class_ptr ;
+  Handle<Object> foo_class_obj ; 
+  Handle<Context> exec_context ;
+  Handle<String> js_source ; 
+  Handle<Script> js_compiled ; 
+  Handle<String> js_func_name ; 
+  Handle<Value>  js_func_val ; 
+  Handle<Function> js_func ; 
+  Handle<Value>  argv[argc] ; 
+  Handle<Integer> int_x ; 
+  Handle<Integer> int_y ; 
+
+  // 载入javascript脚本代码，将代码的文本内容保存在js_source对象中。
+  js_source = load_js(js_fname) ; 
+
+  // 创建全局的对象模板（这个模板用于动态创建对象的）
+  global_templ = = ObjectTemplate::New() ;
+
+  // 注册全局函数，这些操作在偶的第一篇文章中已经讲解的非常清晰了。
+  global_templ->Set(String::New("set_draw_color"), 
+                    FunctionTemplate::New(set_draw_color)) ; 
+
+  global_templ->Set(String::New("draw_line"), 
+                    FunctionTemplate::New(draw_line)) ; 
+
+  global_templ->Set(String::New("commit"), 
+                    FunctionTemplate::New(commit)) ; 
+
+  global_templ->Set(String::New("clear"), 
+                    FunctionTemplate::New(clear)) ; 
+
+  global_templ->Set(String::New("draw_bmp"), 
+                    FunctionTemplate::New(draw_bmp)) ; 
+
+  // 创建运行环境，创建的时候要传入global_templ初始化预定义的全局函数环境
+  exec_context = Context::New(NULL, global_templ) ; 
+
+  // 设置运行环境的有效范围，如果context_scope被析构了，那也代表着exec_context也被释放掉了
+  Context::Scope context_scope(exec_context) ; 
+
+  // 注意，从这一行开始，就已经准备往javascript运行环境中建立全局对象了
+  // 这里的ObjectTemplate是用于在运行时创建对象的（runtime object creator）
+  foo_templ = ObjectTemplate::New() ; 
+
+  // 此句是设定使用该模板创建的对象有1个内部的数据区（internal field）
+  foo_templ->SetInternalFieldCount(1) ; 
+
+  // 上面的代码是用于创建一个对象模板的，下面这一行则是使用这个刚刚创建成功的对象模板创建出一个对象
+  foo_class_obj = foo_templ->NewInstance() ; 
+ 
+  // 下面，我们就创建一个外部对象（External），这个对象其实就是在c++对象的外面包上一层皮
+  //（可以把Externl类理解为一层包袱皮，把c++空间中的对象g_foo_ptr包裹在里面）
+  foo_class_ptr = External::New(static_cast<CFoo *>(g_foo_ptr)) ; 
+
+  // 定义模板的时候已经明确定义了由该模板创建出来的每一个对象内部一定有1个数据区（field）
+  // 现在我们就把包裹好的c++对象放到当前对象的内部数据区里面去
+  foo_class_obj->SetInternalField(0, foo_class_ptr) ; 
+
+  // 为当前对象设置其对外函数接口
+  foo_class_obj->Set(String::New("set_draw_color"), 
+                     FunctionTemplate::New(CFoo::set_color)->GetFunction()) ; 
+
+  foo_class_obj->Set(String::New("draw_line"), 
+                     FunctionTemplate::New(CFoo::line)->GetFunction()) ; 
+
+  foo_class_obj->Set(String::New("commit"), 
+                   FunctionTemplate::New(CFoo::commit)->GetFunction()) ; 
+
+  
+  // 这一步是最关键的，从当前的javascript执行环境中获取Global()全局环境对象，然后使用Set函数
+  // 把刚刚初始化完毕的foo_class_obj对象放到javascript的全局执行环境中去
+  exec_context->Global()->Set(String::New("foo"), 
+                              foo_class_obj, 
+                              (PropertyAttribute)(v8::ReadOnly)) ; 
+
+  // 这里就是常规的操作了，首先编译javascript脚本
+  js_compiled = Script::Compile(js_source) ; 
+  if(js_compiled.IsEmpty()) {
+    LOG("run_js, js_compiled is empty!") ; 
+    return ; 
+  }
+  
+  // 运行脚本
+  js_compiled->Run() ; 
+  
+  // 然后下面的代码是调用javascript脚本中定义的OnClick函数，同时将click的按键事件的x, y坐标传入OnClick函数
+  js_func_name = String::New("OnClick") ; 
+  js_func_val = exec_context->Global()->Get(js_func_name) ; 
+  if(!js_func_val->IsFunction()) {
+    LOG("on_click, js_func_val->IsFunction check failed!") ; 
+  } else {
+    js_func = Handle<Function>::Cast(js_func_val) ; 
+    int_x = Integer::New(x) ; 
+    int_y = Integer::New(y) ; 
+    argv[0] = int_x ; 
+    argv[1] = int_y ; 
+    js_func->Call(exec_context->Global(), argc, argv) ; 
+  }
+}
+
+ok，如此一来，在javascript脚本中就可以不需要任何创建或者初始化，直接使用“foo”对象，以及该对象所导出的函数了。
+在javascript脚本中可以这样写：
+
+function OnClick(x, y) { 
+    var rect_len = 50 ; 
+    foo.set_draw_color(0x00, 0xff, 0x00) ; 
+    foo.draw_line(x, y, x+rect_len, y) ; 
+    foo.draw_line(x+rect_len, y, x+rect_len, y+rect_len) ; 
+    foo.draw_line(x+rect_len, y+rect_len, x, y+rect_len) ; 
+    foo.draw_line(x, y+rect_len, x, y) ; 
+    foo.commit() ; 
+}
+
+可能有朋友会问，这样看上去似乎很麻烦，每次都要创建那么多东西，初始化那么多的对象，执行完毕以后，下次执行就又要重新初始化这些东西，效率是不是太低了一点？！其实，偶是为了能够让代码尽可能地清晰起见才这样写的，把所有的初始化以及对象都以Handle<sometype>或Local<sometype>的方式定义的，一旦HandleScope被析构了，这些东西也就消失了。如果在真正的“有用的”代码中，这里的很多初始化只需要一次就足够了，大家可以使用Persistent<sometype>来声明和初始化一些变量（例如：ObjectTemplate和Context），下次重复使用的时候直接拿来用就可以了，不需要反复地初始化。（但是需要注意一点，用Persistent::New()声明的变量，是需要调用Persistent::Dispose()进行释放的，这一点千万不要忘记了。）
+
+4、最后，关于包袱皮的解开问题
+刚刚偶通过External给g_foo_ptr打了一个包袱皮，然后通过
+foo_class_obj->SetInternalField(0, foo_class_ptr) ; 
+把包裹好的c++对象送到了javascript空间里面的对象中去了。那么，偶在javascript回调的时候该如何解开这个包袱皮得到原始的c++对象呢？
+现在该回过头来看看刚刚关于foo.cpp的实现代码中的一个遗留问题了，以下面这个函数为例：
+v8::Handle<v8::Value> CFoo::set_color(const v8::Arguments& args) {
+  CFoo * foo_ptr =  util_unwrap_obj<CFoo>(args.Holder()) ; 
+  if(args.Length() == 3) {
+    foo_ptr->SetColor(args[0]->Int32Value(), 
+                      args[1]->Int32Value(),
+                      args[2]->Int32Value()) ; 
+  }
+
+  return v8::Undefined() ;
+}
+
+这里有一个很有趣的函数：
+util_unwrap_obj<CFoo>(args.Holder())
+这个函数就是用来把包袱皮解开的，其具体定义（参见utils.h文件）如下：
+template<class T> 
+T* util_unwrap_obj(v8::Handle<v8::Object> obj) {
+  v8::Handle<v8::External> field = v8::Handle<v8::External>::Cast(obj->GetInternalField(0)) ;
+  void* raw_obj_ptr = field->Value() ;
+  return static_cast<T*>(raw_obj_ptr);
+}
+
+这个util_unwrap_obj是一个模板函数，就是用于解包袱皮的，这里args.Holder()得到的就是当前函数的所有者（也就是holder），从刚刚的代码大家可以看到，这些函数的都是隶属于foo对象的，因此，这里的args.Holder()函数返回的结果就是foo对象，该对象在定义对象模板的时候已经定义了它将包含一个内部数据区（internal field），而且在该对象初始化的时候，把g_foo_ptr给打上了个包袱皮，塞到了其内部数据区里面。现在就可以反其道而行之：
+v8::Handle<v8::External> field = v8::Handle<v8::External>::Cast(obj->GetInternalField(0)) ;
+这一句，就是把foo对象内部数据区里面的数据给取出来，大家可以看到其返回的值被强制转换成External对象（也就是打好包袱皮的那个对象），然后通过：
+void* raw_obj_ptr = field->Value() ;
+此句就是从包袱皮中把原始数据给取了出来（此时，只是把g_foo_ptr的指针给取出来了，而且是void *类型）。最后，通过强制类型转换，偶就得到了原始的g_foo_ptr指针：
+return static_cast<T *>(raw_obj_ptr)；
+
+因此，偶在实现set_color这类回调函数的时候就可以直接这样用了：
+v8::Handle<v8::Value> CFoo::set_color(const v8::Arguments& args) {
+  // 就是这一句，这个util_unwrap_obj模板函数解决了解包袱皮的任务，而且，有了这个指向CFoo对象的指针以后
+  // 剩下的事情就一切简单了，通过指针调用CFoo对象的成员函数即可。
+  CFoo * foo_ptr =  util_unwrap_obj<CFoo>(args.Holder()) ; 
+  if(args.Length() == 3) {
+    foo_ptr->SetColor(args[0]->Int32Value(), 
+                      args[1]->Int32Value(),
+                      args[2]->Int32Value()) ; 
+  }
+
+  return v8::Undefined() ;
+}
+
+最后，为了方便共同研究和学习，偶把做实验的代码也给一并发上来，文章中存在的任何问题，欢迎各位高手不吝斧正，谢谢！！
+
+PS:
+测试脚本是t1.js，在使用的时候，可以：./test t1.js，然后用鼠标单击屏幕即可看到效果。
+
+
+http://blog.chinaunix.net/space.php?uid=8272118&do=blog&id=2033360

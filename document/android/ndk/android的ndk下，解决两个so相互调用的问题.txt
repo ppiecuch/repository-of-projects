@@ -1,0 +1,110 @@
+转自:http://blog.csdn.net/victoryckl/article/details/6832333
+A、B两个模块，主要都是用C实现的，需要用ndk编译成两个a.so、b.so，但是a.so内调用b.so中的函数，b.so内也调用了a.so中的函数，而且由于某些原因A、B必须分开编译。问题是无论先编译那个模块都会编译不通过，因为它们相互依赖。
+为了编译通过，必须在编译时取消这种依赖关系，下面程序中使用dlopen打开so，dlsym获取函数指针，就避免了这种编译依赖关系。
+a.c
+ 
+[cpp] view plaincopyprint?
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <dlfcn.h>
+#include <jni.h>
+char * GetStringA(void)
+{
+return"i am in a.so";
+}
+jstring Java_com_ckl_SoCallSo_SoCallSoActivity_fucntionInA(JNIEnv* env, jobject thiz)
+{
+return (*env)->NewStringUTF(env, GetStringA());
+}
+jstring Java_com_ckl_SoCallSo_SoCallSoActivity_AcallB(JNIEnv* env, jobject thiz)
+{
+jstring ret;
+//so路径：/data/data/我的程序的包名/lib/我的so文件名
+void * filehandle = dlopen("/data/data/com.ckl.SoCallSo/lib/libb.so", RTLD_LAZY );
+if (filehandle)
+{
+char * ( * funcPtrB)(void) = NULL;
+funcPtrB = dlsym(filehandle, "GetStringB");
+if (funcPtrB)
+{
+ret = (*env)->NewStringUTF(env, funcPtrB());
+}
+else
+{
+ret = (*env)->NewStringUTF(env, "dlsym GetStringB failed!");
+}
+dlclose(filehandle);
+}
+else
+{
+ret = (*env)->NewStringUTF(env, "dlopen failed!");
+}
+return ret;
+}
+
+b.c
+ 
+ 
+[cpp] view plaincopyprint?
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <dlfcn.h>
+#include <jni.h>
+char * GetStringB(void)
+{
+return"i am in b.so";
+}
+jstring Java_com_ckl_SoCallSo_SoCallSoActivity_fucntionInB(JNIEnv* env, jobject thiz)
+{
+return (*env)->NewStringUTF(env, GetStringB());
+}
+jstring Java_com_ckl_SoCallSo_SoCallSoActivity_BcallA(JNIEnv* env, jobject thiz)
+{
+jstring ret;
+//so路径：/data/data/我的程序的包名/lib/我的so文件名
+void * filehandle = dlopen("/data/data/com.ckl.SoCallSo/lib/liba.so", RTLD_LAZY );
+if (filehandle)
+{
+char * ( * funcPtrA)(void) = NULL;
+funcPtrA = dlsym(filehandle, "GetStringA");
+if (funcPtrA)
+{
+ret = (*env)->NewStringUTF(env, funcPtrA());
+}
+else
+{
+ret = (*env)->NewStringUTF(env, "dlsym GetStringA failed!");
+}
+dlclose(filehandle);
+}
+else
+{
+ret = (*env)->NewStringUTF(env, "dlopen failed!");
+}
+return ret;
+}
+
+Android.mk
+ 
+ 
+[cpp] view plaincopyprint?
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+LOCAL_MODULE := a
+LOCAL_SRC_FILES := a.c
+include $(BUILD_SHARED_LIBRARY)
+include $(CLEAR_VARS)
+LOCAL_MODULE := b
+LOCAL_SRC_FILES := b.c
+include $(BUILD_SHARED_LIBRARY)
+ 
+a.c、b.c分别生成liba.so、libb.so，liba.so要调用libb.so中的GetStringB()函数，libb.so要调用liba.so中的GetStringA()函数。
+[cpp] view plaincopyprint?
+ 
+另外，so文件的路径为 /data/data/我的程序的包名/lib/我的so文件名。
+工程源码 SoCallSo.7z
+运行效果如下：
+
+http://www.cnblogs.com/lovelili/archive/2012/03/10/2389165.html

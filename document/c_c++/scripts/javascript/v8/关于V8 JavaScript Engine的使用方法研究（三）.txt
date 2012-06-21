@@ -1,0 +1,264 @@
+北京理工大学  20981  陈罡
+
+一、写在前面的话
+前几篇文章中用于验证目的而编写的代码都是基于linux平台和sdl图形库的，虽然效果很好很强大（偶在mac的环境下也做了类似的实验，确实不错），但是这些实验毕竟是基于pc环境的，没有在真正的手机arm环境下面跑跑总觉得心里没有多大的把握。虽然google io大会上曾经说过，android 2.2浏览器使用的webkit内核就是使用了v8引擎来加速浏览器的运行速度，偶在手机上刷了个2.2的包，测试了一下浏览器，也没有感觉到如何如何地快（偶只是随便按了几下，可能不足以说明问题）。
+
+最后，偶还是决定要动动手，把v8引擎弄到真机上运行一下，中国有句俗话“是骡子是马，牵出来遛遛”。
+本文的以下部分会非常枯燥，主要记录了偶将v8引擎封装成一个jni库的全部过程，然后通过java去调用（推崇java的朋友们不要拍偶，说实话，偶一直把java语言本身当成是脚本的一种）。
+
+二、实验方法记录
+1、把v8引擎单独编译成一个.a或者.so文件
+原本希望能够把v8引擎的源代码直接编译到jni的源代码里面，但是后来发现既然android从2.0开始就有这东西的话，干嘛不拿来直接用呢？简单地搜索了一下android源代码（偶用的是2.1 eclair的源代码环境，但是郁闷的是编译出来的程序不可以在1.5和1.6的环境下工作，具体原因偶还需要查一查），发现在$(ANDROID_SRC_ROOT)/external/webkit/目录下面，有一个叫做V8Binding的目录，这里面就有一个叫做v8的目录，该目录下面就是一个完整的v8引擎了，从其他的诸如binding以及jni的目录来看，android的开发者们也是一直在琢磨着把v8库编译成一个so或者一个.a文件，把接口暴露给上层模块，通过jni的方式去调用。回到上一级目录，打开Android.mk文件，呵呵，原来如此，编译脚本进行编译的时候是需要看到一个叫做JS_ENGINE的环境变量的，如果该变量取值为“v8”，则将v8引擎编译成.a文件，然后链接到webkit里面去，如果JS_ENGINE的取值是“jsc”，那么编译脚本将使用webkit内置的JavaScriptCore中的代码来生成脚本引擎。
+
+通过查看Android.mk文件知道了如何让编译环境生成libv8.a的方法以后，剩下的事情就简单多了。
+$cd ~/android-src
+$export JS_ENGINE=v8
+$make
+然后，就可以出去散散心了，整个编译过程会非常地漫长（大概有45分钟左右吧？！）
+
+散步归来，发现已经make好了。那么就要找一找这个libv8.a或者libv8.so到底放在什么地方了。
+最后，偶找到了这个：
+$(ANDROID_SRC_ROOT)/out/target/product/generic/obj/STATIC_LIBRARIES/libv8_intermediates/libv8.a
+如此说明，v8引擎的静态库已经成功地生成出来了！好，下一步，就要想办法把这个.a文件链接到jni库里面去了。
+
+查了一下ndk的文档，在android-mk.txt文档中找到了这样一个参数：
+LOCAL_STATIC_LIBRARIES
+    The list of static libraries modules (built with BUILD_STATIC_LIBRARY)
+    that should be linked to this module. This only makes sense in
+    shared library modules. 
+看这个帮助的说明，似乎是说这里面的static library是要用BUILD_STATIC_LIBRARY编译成的才行。偶刚刚已经在android的源码编译过程中拿到了libv8.a，那么在这里似乎不能够直接用这个参数。于是，偶决定放弃ndk，既然libv8.a是用android的源代码编译出来的，那么就用源代码中提供的工具链来生成jni吧，android自己的代码生成的.a静态库，用它自己的工具链总可以完成链接吧？！
+
+2、用sdk开始搭建一个简单的android应用程序框架
+jni和java端的调用程序，这两者正常关系是先编写java包装类，然后利用javah生成jni相关定义的头文件。偶在这里也遵循这个顺序来一步一步地走。无论是用eclipse还是用android命令行脚本生成一个项目都可以，既然作实验就要做得像真的一样，偶把测试项目中的普通TextView给换成了SurfaceView（毕竟效率要高一些嘛）。然后，就是编写一个简单的wrapper类，导出了3个native的java函数，这三个函数是需要用jni去实现的。
+
+偶只把java代码贴在这里，不做更多说明：
+public class V8Wrapper {
+    private static final String TAG = "V8Wrapper";
+    protected SurfaceHolder m_surf_holder ;
+    protected byte [] m_js_source ; 
+    
+    V8Wrapper(SurfaceHolder surf_holder)  {
+        m_surf_holder = surf_holder ; 
+        m_js_source = null ; 
+    }
+    
+    public String V8GetVersion() {
+        return v8_get_version() ; 
+    }
+    
+    public boolean V8LoadJS(String js_fname) {
+        FileInputStream fis = null ; 
+        FileChannel fc = null;
+        ByteBuffer bb = null ; 
+        int flen = 0 ; 
+        
+        try {
+            fis = new FileInputStream(js_fname) ;
+        } catch(FileNotFoundException e) {
+            Log.e(TAG, "can't open javascript file : " + js_fname) ; 
+            return false ; 
+        }
+         
+        fc = fis.getChannel() ; 
+        try {
+            flen = (int)(fc.size()); 
+            bb = ByteBuffer.allocate(flen);
+            fc.read(bb);
+        } catch(IOException e) {
+            Log.e(TAG, "ByteBuffer.allocate() or fc.read() failed, fc.size=" + String.valueOf(flen)) ; 
+            return false ; 
+        }
+        
+        bb.flip() ;
+        
+        m_js_source = null ;
+        m_js_source = bb.array() ; 
+
+        return true ; 
+    }
+
+    public boolean V8RunJS() {
+        if(m_js_source == null) {
+            return false ; 
+        }
+        
+        return v8_run_js(m_js_source) ;  
+    }
+    
+    public boolean V8OnTouch(MotionEvent event) {
+        if(m_js_source == null) {
+            return false ; 
+        }
+         
+        return v8_on_touch(m_js_source, (int)(event.getX()), (int)(event.getY())) ;  
+    }
+    
+    private native String  v8_get_version() ; 
+    private native boolean v8_on_touch(byte [] js_source, int x, int y) ; 
+    private native boolean v8_run_js(byte [] js_source) ; 
+    
+    static {
+        System.loadLibrary("v8wrapper") ; 
+    }
+}
+这里的v8_get_version（）函数，只是用来验证能否从jni函数中调用libva.a的函数用的，以后的实现中可以忽略，毕竟知道自己调用的v8引擎的版本号也是好的。
+
+3、开始编写jni模块
+（1）一些准备工作
+$cd $(ANDROID_SRC_ROOT)
+$. build/envsetup.sh
+$mkdir external/myapps/v8wrapper
+$cd external/myapps/v8wrapper
+ok，现在可以开始要做的事情了，第一件事情自然是编写makefile了，创建Android.mk文件，看上去像下面这样：
+ifneq ($(TARGET_SIMULATOR),true)
+LOCAL_PATH:= $(call my-dir)
+include $(CLEAR_VARS)
+LOCAL_SRC_FILES:= v8wrapper.cpp
+LOCAL_C_INCLUDES += $(JNI_H_INCLUDE) \
+    $(LOCAL_PATH)/../../webkit/V8Binding/v8/include \
+    $(LOCAL_PATH)/../../skia/include \
+    $(LOCAL_PATH)/../../skia/include/core \
+    $(LOCAL_PATH)/../../skia/include/images \
+    $(LOCAL_PATH)/../../skia/include/graphics \
+    $(LOCAL_PATH)/../../skia/include/utils
+LOCAL_CFLAGS +=-O0
+LOCAL_MODULE := libv8wrapper
+LOCAL_SHARED_LIBRARIES := libcutils libskia 
+LOCAL_STATIC_LIBRARIES := libv8
+LOCAL_PRELINK_MODULE := false
+include $(BUILD_SHARED_LIBRARY)
+endif  # TARGET_SIMULATOR != true
+
+需要提几句的地方：
+(a) LOCAL_PRELINK_MODULE := false
+这个属性一定要有，因为偶在此做实验的jni是不再“正常”的android系统中的，android系统源代码在编译的过程中会自动忽略此jni。为了告诉android的编译系统此模块不在原先正常的系统中，但是也要编译出来，所以只好把这里写上这么一个属性了。
+
+（b）LOCAL_SHARED_LIBRARIES := libcutils libskia
+链接libcutils.so的目的在于偶要使用android系统的log函数，而链接libskia.so的目的在于，整个android系统的ui框架，其基础都是建立在skia这个图形库的前提之下的，android的framework在绘制ui的过程中大量使用了jni模块去调用skia库的功能，既然偶自己可以通过c\c++代码直接调用skia库，那我干嘛还要java层去做这样的事情呢？脚本引擎的效率肯定要比二进制代码低，因此，偶在jni里面选择了尽量不去麻烦android框架去做一些在jni里面就能够做到的事情（例如，屏幕绘图，图片解码、贴图等操作，本着能省则省的原则来避免不必要的性能浪费）。
+
+在这里插一嘴，在android框架代码的Canvas.h文件中（$(ANDROID_SRC_ROOT)/frameworks/base/graphics/java/android/graphics/Canvas.h），可以看到如下的定义：
+final int mNativeCanvas;
+经过进一步的代码追踪，偶发现这个所谓的mNativeCanvas实际上就是指向skia库中的一个SkCanvas对象的指针。（java里面没有指针数据类型，为了保留这个指针，android框架的设计者不得已在这里使用了int数据类型在java环境中保存c/c++环境的指针，偶不是第一个发现这个小秘密的，已经有台湾的高人发现过了,在此偶只是强调一下）既然知道了这一点，偶在jni的实现中，得到java环境的Canvas对象以后，只需要把Canvas对象的mNativeCanvas属性中的数据进行强制类型转换就可以很方便地得到android系统中指向SkCanvas对象的指针，剩下的所有屏幕操作都可以籍由这个指针，结合skia库来完成，何劳dalvik大驾？！呵呵，根据偶最后在真机上的运行结果来看，上面的一点点小hack确实对jni中提升屏幕绘制效率有很大帮助。（上面这一段文字很不好写，更不好懂，感兴趣的朋友可以多读几遍）
+
+在jni里与此相关的函数如下：
+static SkCanvas * get_skcanvas(JNIEnv * env, const jobject & canvas_obj) {
+  const char * tag = "jni:get_skcanvas, " ; 
+  jclass cls_canvas ; 
+  jfieldID fid_native_canvas ; 
+
+  cls_canvas = env->GetObjectClass(canvas_obj) ;
+  // 大家注意了，这一句就是获取mNativeCanvas属性的存储位置id 
+  fid_native_canvas = env->GetFieldID(cls_canvas, "mNativeCanvas", "I") ; 
+  if(fid_native_canvas == NULL) {
+    log(tag, "lookup mNativeCanvas in Canvas class failed!") ; 
+    return (SkCanvas *)(NULL) ; 
+  }
+  // 这一句就通过GetIntFiled函数把里面的数据取出来，然后强制类型转换即可
+  return (SkCanvas *)(env->GetIntField(canvas_obj, fid_native_canvas)) ; 
+}
+其他的语法都是jni的常规语法，在此偶就不再聒噪了。
+
+(c)LOCAL_STATIC_LIBRARIES := libv8
+这个就不用偶多说了，libv8.a既然生成出来了，就不要浪费，自然需要链接进来。（谁知盘中库，库库皆辛苦。。。）
+
+(d) $(LOCAL_PATH)/../../webkit/V8Binding/v8/include \
+此include路径是v8引擎在android 2.1源代码中的位置，此时，v8引擎是作为webkit的一部分存在的；而在android 2.2源代码以后，v8引擎的位置将独立于webkit，自成一体，这时候的include路径应该改为：
+$(LOCAL_PATH)/../../v8/include \
+也就是说android 2.2源代码编译环境把v8目录从webkit目录内拿出来了。
+
+（2）编写jni模块
+编写过程是一个非常让人郁闷的过程（尤其是偶采用的是android源代码工具链进行编译，而ndk-r4中自带的调试功能不可以使用，但是毕竟android源代码作为编译环境可以调用很多android内部的library，这一点是要比ndk爽很多地。。。）。
+
+在这里需要说明一下SurfaceView中进行屏幕绘制的关键代码（java版本的）：
+try {
+    m_canvas = m_surf_holder.lockCanvas(null) ; 
+        m_canvas.drawBitmap(bmp, x, y, null) ; 
+} finally {
+    if (m_canvas != null) {
+              m_surf_holder.unlockCanvasAndPost(m_canvas);
+         }
+}
+在java代码中，使用SurfaceView进行绘图的时候分为三步：
+（a）m_canvas = m_surf_holder.lockCanvas(null) ; 
+首先是通过一个SurfaceHolder的对象调用lockCanvas()函数，该函数会返回一个Canvas对象（就是这里的m_canvas，至于SurfaceHolder对象的获取，可以通过调用getHolder()取得）。
+
+（b）m_canvas.drawBitmap(bmp, x, y, null) ; 
+这里就是使用m_canvas进行绘图，贴图操作，在这些绘图操作进行的过程中，所有操作都绘制到了一个内存中的屏幕上，并不会立即显示到当前的屏幕上。
+
+（c）m_surf_holder.unlockCanvasAndPost(m_canvas);
+只有调用了unlockCanvaAndPost()函数以后，刚刚绘制在m_canvas上的所有内容才会显示在当前屏幕上。
+
+在偶的jni模块实现中，把上述在java中的三个步骤统统地搬到了jni函数中，用c++去完成。虽然看上去麻烦一些，毕竟省得麻烦dalvik去进行几次jni到java以及java到jni的反射过程，会提升一些执行效率（呵呵，当然了，也可能是偶的心里作用吧，通过这么做可以让偶心里安慰一些？！）。
+
+（3）关于v8引擎的回调
+基本的脚本执行，以及函数回调原理在偶的上两篇文章中已经讲述过了，在此不再聒噪。只是偶在不知道v8的名字空间会引起jni的任何问题之前，还是没有敢直接使用：
+using namespace v8 ; 
+这样的语句。所以很多在前两篇文章中很简单的声明，就要写的很繁琐了（重复地敲这些无用的东西，偶的手指都有些酸了）例如：以前的Handle<String>，现在就要写成v8::Handle<v8::String>。
+在此真机测试中，偶为javascript脚本导出了如下函数：
+(a)set_back_color(r, g, b)：设置背景颜色，RGB格式。
+(b)set_draw_color(r, g, b)：设置画笔颜色，RGB格式。
+(c)set_txt_size(size)：设置显示文字的大小，支持小数点，必须大于0。
+(d)draw_line(x0, y0, x1, y1)：使用画笔颜色画直线。
+(e)clear()：用背景色填充整个屏幕，顾名思义就是清屏。
+(f)draw_img(x, y, fname)：以（x,y）为左上角坐标贴图，fname为图片名称（图片一定要放在v8data目录，图片格式支持bmp, png, jpeg, gif）
+(g)draw_txt(x, y, txt)：使用前请设置画笔颜色和文字大小，在(x, y)为左上角坐标在屏幕上绘制文字。
+
+最后，脚本支持一个OnClick(x, y)的回调函数，当屏幕被点按的时候，v8会自动回调此函数。
+
+所有这些函数在c++的实现中，多亏了SkCanvas提供的强大功能，偶只用了几行代码就解决了战斗，skia确实名不虚传（再次赞扬一下skia的原创人员）。
+
+感兴趣的朋友可以通过改写偶在v8data目录下面提供的t1.js脚本文件来看看不同的运行结果。
+
+(4)编译方法
+$ cd $(ANDROID_SCR_ROOT)/external/myapps/v8wrapper
+$mm 
+注意，一定要在$(ANDROID_SCR_ROOT)目录下运行过“. build/envsetup.sh”脚本后才能够用mm进行编译（这脚本方便，mm命令可以理解为——》“美眉”，让美眉帮偶编译，呵呵，不过这位美眉的脾气不太好，编译脚本稍微写的不对就不给编译。感慨一下，如果美眉能够自动理解这些，偶该多么地幸福啊!~(#@*&$(@#*&$）
+
+编译完成以后，需要手工把如下路径下的文件拷贝到java项目的lib/armeabi目录下：
+$(ANDROID_SRC_out/target/product/generic/system/lib/libv8wrapper.so
+毕竟没有了ndk-build脚本的帮忙，什么事情都要自己动手。
+
+（5）运行方法
+无论大家用ant或者eclipse都可以生成安装包（大概515k左右，懒得编译的朋友，可以下载偶提供的apk包）。
+（a）直接adb install v8test-debug.apk安装到手机上（模拟器上安装必须是2.0或者更高版本的才行）
+（b）通过adb shell在/sdcard下面建立一个目录叫做v8data（注意，全部小写的v8data目录）
+（c）把java代码中的V8Test／v8data目录下的所有文件通过ddms拷贝到手机sdcard上面的v8data目录里面
+（包括若干张png图片，以及一个t1.js脚本）
+（d）打开“V8TestActivity”程序，如果看到黑黑的屏幕，代表一切正常，否则代表有问题。
+（e）按下手机的“menu”按键，选择“load”，然后选择“run”
+（f）在屏幕上单击图标，会看到有一个白色框框跟随走动。
+
+所有这些界面和效果都是用javascript编写的，可以通过打开t1.js文件进行修改，然后覆盖到sdcard上的v8data目录下即可。连程序都不需要退出，只要重新点按一下"load"和"run"即可看到修改后的结果。
+
+是不是很神奇？！通过script+c/c++模块的开发方式可以极大地增加手机应用的灵活性（手机程序最困难的不是开发，而是什么都做好了，如何安装到用户的手机里面去？！以及费尽千辛万苦安装到用户手机上了，如何升级？！一次升级哪怕只是ui改变一点点，也可能流失用户），偶希望通过这三篇文章加上这些测试代码，能够起到抛砖引玉的作用（当然文章中的不足之处引来各位高手的更多的板砖也是十分欢迎的），能够对大家有些许用处。
+
+三、实验结果展示
+到了本文的最后，自然又进入了“有图有真相”时间，偶也可以给大家展示一下实验结果。
+1、在2.0模拟器上面的运行效果
+
+
+2、在偶的nexus one上面的运行效果
+
+
+3、java调用v8wrapper的源代码
+	
+文件:	V8Test.tar.gz
+大小:	547KB
+下载:	下载
+
+4、v8wrapper的源代码
+	
+文件:	v8wrapper.tar.gz
+大小:	3KB
+下载:	下载
+
+5、完成后的apk安装包
+注意：v8data目录下面的数据需要下载上面的"3、java调用v8wrapper的源代码"才能得到。 
+	
+文件:	v8test-signed.tar.gz
+大小:	498KB
+下载:	下载
+
+最后，通过偶的实验，证明v8引擎————是马。
+
+http://blog.chinaunix.net/uid-8272118-id-2033361.html

@@ -1,0 +1,108 @@
+
+	
+ 	共 6 个帖子 - 全部折叠  -  将所有内容翻译成中文（简体）	
+
+	
+Elvis Dowson  	
+查看个人资料   翻译成中文（简体）
+ 更多选项 2009年7月11日, 上午9时35分
+Hi, 
+       Would anyone have a code snippet on how I can obtain a pointer 
+to the android JavaVM, in my jni cpp code? 
+Best regards, 
+Elvis Dowson
+
+
+ 
+ 	
+Anders Hasselqvist  	
+查看个人资料   翻译成中文（简体）
+ 更多选项 2009年7月11日, 上午9时54分
+Hi Elvis, 
+You get it in the JNI_OnLoad() function that your native library 
+provides. You then cache it in your library in some way so you can 
+access it where you need. 
+(Look here http://java.sun.com/docs/books/jni/html/other.html 
+ and here http://java.sun.com/j2se/1.5.0/docs/guide/jni/spec/invocation.html) 
+/Anders 
+2009/7/11 Elvis Dowson <elvis.dow...@gmail.com>: 
+
+- 显示引用的文字 -
+
+ 
+ 	
+Elvis Dowson  	
+查看个人资料   翻译成中文（简体）
+ 更多选项 2009年7月12日, 上午10时19分
+Hi, 
+     Here is a working code snippet. Since all android processes have 
+only 1 jvm, I've just limited to the max number of returned jvms to 1. 
+// Acquire a pointer to the current JavaVM 
+jsize jvmBufferLength = 1;              // At most vmBufLength number of entries 
+will be written for the list of returned JavaVMs 
+jsize jvmTotalNumberFound = 0;          // The total number of JavaVMs found 
+JavaVM jvmBuffer[jvmBufferLength];      // Array of JavaVMs 
+JavaVM * pjvmBuffer = jvmBuffer;        // Pointer to array of JavaVMs 
+jint result     = JNI_GetCreatedJavaVMs( &pjvmBuffer, jvmBufferLength, 
+&jvmTotalNumberFound); // Get all created JavaVMs 
+LOGI("Found %d JavaVM instances\n", jvmTotalNumberFound); 
+# Android.mk for the jni project. 
+# All of the shared libraries we link against. 
+LOCAL_SHARED_LIBRARIES := \ 
+        libandroid_runtime \ 
+        libnativehelper \ 
+        libdvm \ 
+        libcutils \ 
+        libutils 
+Best regards, 
+Elvis 
+
+ 
+ 	
+fadden  	
+查看个人资料   翻译成中文（简体）
+ 更多选项 2009年7月13日, 下午1时55分
+On Jul 12, 7:19 am, Elvis Dowson <elvis.dow...@gmail.com> wrote: 
+> jint result     = JNI_GetCreatedJavaVMs( &pjvmBuffer, jvmBufferLength, 
+> &jvmTotalNumberFound); // Get all created JavaVMs 
+
+That looks correct. 
+It's generally hard to go wrong caching a JavaVM, so long as you don't 
+keep using it after the VM goes away; since the VM doesn't go away 
+until the Android app is killed, you're safe.  Where people often go 
+wrong is caching a JNIEnv and mistakenly using it from multiple 
+threads.  (CheckJNI will catch that.) 
+
+ 
+ 	
+spietari  	
+查看个人资料   翻译成中文（简体）
+ 更多选项 2009年7月14日, 上午5时20分
+Hi, on Windows & cygwin this fails 
+make: *** No rule to make target 'out/apps/test/android-1.5-arm/ 
+libandroid_runtime.so', needed by 'out/apps/test/android-1.5-arm/ 
+libtest.so'. Stop. 
+How can I fix this please? 
+Seppo 
+On Jul 12, 5:19 pm, Elvis Dowson <elvis.dow...@gmail.com> wrote: 
+
+- 显示引用的文字 -
+
+ 
+ 	
+David Turner  	
+查看个人资料   翻译成中文（简体）
+ 更多选项 2009年7月14日, 下午12时09分
+The error message indicates that your libtest.so needs 
+libandroid_runtime.so, 
+but you don't have this library in your modules list (see APP_MODULES in 
+Application.mk). 
+If this is the libandroid_runtime.so that comes with a normal Android system 
+image, 
+linking will not work anyway since this is not distributed with the NDK. 
+On Tue, Jul 14, 2009 at 11:20 AM, spietari <seppo.pietari...@comeks.com>wrote: 
+
+- 显示引用的文字 -
+
+
+http://groups.google.com/group/android-ndk/browse_thread/thread/71ea9e6fa3ce9214/98dfa335a0dfee95
