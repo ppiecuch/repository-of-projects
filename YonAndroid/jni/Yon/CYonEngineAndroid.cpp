@@ -47,7 +47,7 @@ namespace platform{
 	CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params)
 		:m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
 		m_pUserListener(params.pEventReceiver),m_pGraphicsAdapter(NULL),
-		m_pAudioDriver(NULL),m_pRandomizer(NULL),
+		m_pAudioDriver(NULL),m_pRandomizer(NULL),m_pCallback(params.pCallback),
 		m_params(params),m_bClose(false),m_bResized(true)
 	{
 		Logger->debug("start instance CYonEngineAndroid\n");
@@ -129,6 +129,13 @@ namespace platform{
 		m_bResized = false;
 		
 		Logger->debug("CYonEngineAndroid::resizeIfNecessary\n");
+	}
+
+	bool CYonEngineAndroid::callback(const platform::SCallback& cb){
+		bool absorbed = false;
+		if(m_pCallback)
+			absorbed=m_pCallback->callback(cb);
+		return absorbed;
 	}
 
 	bool CYonEngineAndroid::postEventFromUser(const event::SEvent& event){

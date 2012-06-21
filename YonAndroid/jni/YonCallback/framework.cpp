@@ -35,6 +35,16 @@ public:
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
 				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				{
+					SCallback cb;
+					cb.type=platform::ENUM_CALLBACK_TYPE_UI;
+					cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_CONFIRM;
+					cb.ui.title="标题";
+					cb.ui.content="content";
+					cb.ui.positiveButton="ok";
+					cb.ui.negativeButton="cancel";
+					engine->callback(cb);
+				}
 				return true;
 			}
 		}
@@ -42,10 +52,11 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	params.windowSize.w=400;
 	params.windowSize.h=400;
 	params.pJNIEnv=pJNIEnv;
+	params.pCallback=pcb;
 	//params.fpsLimit=10;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);

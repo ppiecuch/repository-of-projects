@@ -44,6 +44,7 @@
 #include "IFileSystem.h" 
 #include "IStream.h"
 
+#include "ICallback.h"
 
 #include "SColor.h"
 #include "SVertex.h" 

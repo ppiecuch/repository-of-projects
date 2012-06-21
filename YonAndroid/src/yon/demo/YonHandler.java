@@ -25,7 +25,7 @@ public abstract class YonHandler extends Handler {
 		case Constant.MSG_TOAST:
 			showToast(msg.getData().getString(Constant.MSG_KEY_CONTENT));
 			break;
-		case Constant.MSG_CONFIRM:
+		case Constant.MSG_SETUP_CONFIRM:
 		{
 			String title=msg.getData().getString(Constant.MSG_KEY_TITLE);
 			String content=msg.getData().getString(Constant.MSG_KEY_CONTENT);

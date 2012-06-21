@@ -7,7 +7,9 @@ public class Constant {
 	public static final int MSG_SETUP_INPUT=2;
 	public static final int MSG_COMPLETE_INPUT=3;
 	public static final int MSG_TOAST=4;
-	public static final int MSG_CONFIRM=5;
+	public static final int MSG_SETUP_CONFIRM=5;
+	public static final int MSG_POSITIVE_CONFIRM=6;
+	public static final int MSG_NEGATIVE_CONFIRM=7;
 	
 	public static final String MSG_KEY_TITLE="title";
 	public static final String MSG_KEY_CONTENT="content";

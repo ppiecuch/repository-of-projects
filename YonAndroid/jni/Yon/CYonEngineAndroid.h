@@ -30,6 +30,7 @@ namespace yon{
 
 			virtual void onResize(u32 w,u32 h);
 
+			virtual bool callback(const platform::SCallback& cb);
 			virtual bool postEventFromUser(const event::SEvent& event);
 
 			virtual ITimer* getTimer(){
@@ -56,6 +57,7 @@ namespace yon{
 			IRandomizer* m_pRandomizer;
 
 			event::IEventReceiver* m_pUserListener;
+			platform::ICallback* m_pCallback;
 
 			bool m_bClose;
 			bool m_bResized;

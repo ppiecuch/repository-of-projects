@@ -58,7 +58,7 @@ JNIEXPORT jboolean JNICALL Java_yon_AndroidGLView_nativeOnBack
 /*
  * Class:     yon_AndroidGLView
  * Method:    nativeOnTouch
- * Signature: (IIFF)Z
+ * Signature: (IIFFI)Z
  */
 JNIEXPORT jboolean JNICALL Java_yon_AndroidGLView_nativeOnTouch
   (JNIEnv *, jobject, jint, jint, jfloat, jfloat, jint);
@@ -70,6 +70,46 @@ JNIEXPORT jboolean JNICALL Java_yon_AndroidGLView_nativeOnTouch
  */
 JNIEXPORT jboolean JNICALL Java_yon_AndroidGLView_nativeOnMove
   (JNIEnv *, jobject, jint, jintArray, jfloatArray, jfloatArray, jint);
+
+/*
+ * Class:     yon_AndroidGLView
+ * Method:    nativeOnUI
+ * Signature: (I[Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_yon_AndroidGLView_nativeOnUI
+  (JNIEnv *, jobject, jint, jobjectArray);
+
+/*
+ * Class:     yon_AndroidGLView
+ * Method:    nativeDebug
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeDebug
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     yon_AndroidGLView
+ * Method:    nativeInfo
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeInfo
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     yon_AndroidGLView
+ * Method:    nativeWarn
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeWarn
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     yon_AndroidGLView
+ * Method:    nativeError
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeError
+  (JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus
 }
