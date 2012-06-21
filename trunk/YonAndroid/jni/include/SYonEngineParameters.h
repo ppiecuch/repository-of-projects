@@ -4,6 +4,7 @@
 #include "dimension2d.h"
 #include "yonString.h"
 #include "IEventReceiver.h"
+#include "ICallback.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <jni.h>
@@ -18,6 +19,7 @@ namespace yon{
 			windowCaption(L"YonApplication"),
 			pJNIEnv(NULL),
 			pEventReceiver(NULL),
+			pCallback(NULL),
 			fpsLimit(0)
 			{}
 		SYonEngineParameters(const SYonEngineParameters& params):
@@ -26,6 +28,7 @@ namespace yon{
 			windowCaption(params.windowCaption),
 			pJNIEnv(params.pJNIEnv),
 			pEventReceiver(params.pEventReceiver),
+			pCallback(params.pCallback),
 			fpsLimit(params.fpsLimit)
 			{}
 
@@ -39,6 +42,8 @@ namespace yon{
 		void *pJNIEnv;
 		//自定义事件监听器
 		event::IEventReceiver* pEventReceiver;
+		//自定义回调
+		platform::ICallback* pCallback;
 		//FPS上限(默认为0表示不作限制)
 		u32 fpsLimit;
 	};

@@ -14,7 +14,7 @@
 #include "IGraphicsAdapter.h"
 #include "IAudioDriver.h"
 #include "IRandomizer.h"
-
+#include "ICallback.h"
 
 namespace yon{
 
@@ -32,6 +32,7 @@ namespace yon{
 		virtual bool run() = 0;
 		virtual void onResize(u32 w,u32 h) = 0;
 
+		virtual bool callback(const platform::SCallback& cb){return false;}
 		//TODO改为继承自IEventSender
 		virtual bool postEventFromUser(const event::SEvent& evt) = 0;
 		//更新

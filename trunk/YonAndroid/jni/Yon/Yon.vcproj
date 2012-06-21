@@ -415,6 +415,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\ICallback.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\SYonPlatformInfo.h"
 					>
 				</File>

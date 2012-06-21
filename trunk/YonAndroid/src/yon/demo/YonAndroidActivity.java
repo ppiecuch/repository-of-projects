@@ -4,8 +4,6 @@ import yon.AndroidGLView;
 import yon.SysApplication;
 import yon.util.Util;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -62,8 +60,11 @@ public class YonAndroidActivity extends Activity {
 			
 			@Override
 			public void showConfirm(String title,String content,String ok,String cancel) {
-				//TODO setTitle....
 				//TODO ÃÌº”lifecycle
+				confirmDialog.setTitle(title);
+				confirmDialog.setMessage(content);
+				confirmDialog.setPositiveString(ok);
+				confirmDialog.setNegativeString(cancel);
 				confirmDialog.show();
 			}
 			
@@ -86,14 +87,13 @@ public class YonAndroidActivity extends Activity {
 			
 			@Override
 			public boolean onClickPositive() {
-				// TODO Auto-generated method stub
-				return false;
+				String[] strs=new String[]{"≤‚ ‘"};
+				return view.nativeOnUI(Constant.MSG_POSITIVE_CONFIRM, strs);
 			}
 			
 			@Override
 			public boolean onClickNegative() {
-				// TODO Auto-generated method stub
-				return false;
+				return view.nativeOnUI(Constant.MSG_NEGATIVE_CONFIRM, null);
 			}
 		};
     }
@@ -113,6 +113,6 @@ public class YonAndroidActivity extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 		SysApplication.getInstance().exit();
-		Log.i("XC2D", "exit");
+		Log.i(TAG, "exit");
 	}
 }

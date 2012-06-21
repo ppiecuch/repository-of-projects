@@ -13,6 +13,24 @@ import android.os.Environment;
 import android.os.StatFs;
 
 public class Util {
+	
+	public static String merge(String[] strs)
+	{
+		if(strs==null)
+			return null;
+		StringBuffer buffer=new StringBuffer();
+		for(String s:strs)
+		{
+			if(buffer.length()==0)
+				buffer.append(s);
+			else
+			{
+				buffer.append(",");
+				buffer.append(s);
+			}
+		}
+		return buffer.toString();
+	}
 
 	public static String getSdCardPath() {
 		return Environment.getExternalStorageDirectory().getAbsolutePath();

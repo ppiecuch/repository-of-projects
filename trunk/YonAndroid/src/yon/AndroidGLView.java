@@ -33,20 +33,49 @@ public class AndroidGLView extends GLSurfaceView{
 	private native boolean nativeOnBack();
 	private native boolean nativeOnTouch(int action,int id,float x,float y,int count);
 	private native boolean nativeOnMove(int action,int ids[],float[] xs,float[] ys,int count);
+	public native boolean nativeOnUI(int msg,String[] args);
+	
+	public native void nativeDebug(String str);
+	public native void nativeInfo(String str);
+	public native void nativeWarn(String str);
+	public native void nativeError(String str);
+	
+	private void nativeCallback(int msg,String[] args){
+		switch(msg)
+		{
+		case Constant.MSG_SETUP_CONFIRM:
+		{
+			if(args==null||args.length<4)
+			{
+				nativeError("cannot show confirm for unexpect args:"+Util.merge(args));
+				return;
+			}
+			String title=args[0];
+			String content=args[1];
+			String ok=args[2];
+			String cancel=args[3];
+			Message message = handler.obtainMessage(Constant.MSG_SETUP_CONFIRM);
+			Bundle bundle=new Bundle();
+			bundle.putString(Constant.MSG_KEY_TITLE, title);
+			bundle.putString(Constant.MSG_KEY_CONTENT, content);
+			bundle.putString(Constant.MSG_KEY_POSITIVE_BUTTON, ok);
+			bundle.putString(Constant.MSG_KEY_NEGATIVE_BUTTON, cancel);
+			message.setData(bundle);
+			handler.sendMessage(message);
+			nativeDebug("receive callback confirm ui\r\n");
+			break;
+		}
+		default:
+			nativeWarn("unexpect native callback!");
+		}
+	}
 	
 	private void callbackDestroy(){
 		activity.finish();
 	}
-	private void callbackShowConfirm(String title,String content,String ok,String cancel){
-		Message message = handler.obtainMessage(Constant.MSG_CONFIRM);
-		Bundle bundle=new Bundle();
-		bundle.putString(Constant.MSG_KEY_TITLE, title);
-		bundle.putString(Constant.MSG_KEY_CONTENT, content);
-		bundle.putString(Constant.MSG_KEY_POSITIVE_BUTTON, ok);
-		bundle.putString(Constant.MSG_KEY_NEGATIVE_BUTTON, cancel);
-		message.setData(bundle);
-		handler.sendMessage(message);
-	}
+//	private void callbackShowConfirm(String title,String content,String ok,String cancel){
+//		
+//	}
 	
 
 	public AndroidGLView(Context context,Handler handler) {

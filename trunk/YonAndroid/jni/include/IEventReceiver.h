@@ -1,13 +1,15 @@
 #ifndef _YON_EVENT_IEVENTRECEIVER_H_
 #define _YON_EVENT_IEVENTRECEIVER_H_
 
+#include "yonTypes.h"
+
 namespace yon{
 	namespace event{
 		enum ENUM_EVENT_TYPE{
 			ENUM_EVENT_TYPE_TOUCH = 0,
 			ENUM_EVENT_TYPE_MOUSE,
 			ENUM_EVENT_TYPE_SYSTEM,
-			ENUM_EVENT_TYPE_GUI,
+			ENUM_EVENT_TYPE_UI,
 			ENUM_EVENT_TYPE_COUNT
 		};
 
@@ -48,6 +50,12 @@ namespace yon{
 			ENUM_SYSTEM_INPUT_TYPE_COUNT
 		};
 
+		enum ENUM_UI_INPUT_TYPE{
+			ENUM_UI_INPUT_TYPE_POSITIVE_CONFIRM = 0,
+			ENUM_UI_INPUT_TYPE_NEGATIVE_CONFIRM,
+			ENUM_UI_INPUT_TYPE_COUNT
+		};
+
 		enum MASK_MOUSE_BUTTON{
 			MASK_MOUSE_BUTTON_LEFT = 0x01,
 			MASK_MOUSE_BUTTON_MIDDLE = 0x02,
@@ -77,6 +85,9 @@ namespace yon{
 			u32 screenWidth;
 			u32 screenHeight;
 		};
+		struct SUIInput{
+			ENUM_UI_INPUT_TYPE type;
+		};
 
 		struct SEvent{
 			ENUM_EVENT_TYPE type;
@@ -84,6 +95,7 @@ namespace yon{
 				STouchInput touchInput;
 				SMouseInput mouseInput;
 				SSystemInput systemInput;
+				SUIInput uiInput;
 			};
 		};
 
