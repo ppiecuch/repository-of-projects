@@ -1,0 +1,356 @@
+We have discussed the JNI features used for writing native methods and embedding a Java virtual machine implementation in a native application. This chapter introduces the remaining JNI features.
+
+8.1 JNI and Threads
+
+The Java virtual machine supports multiple threads of control concurrently executing in the same address space. This concurrency introduces a degree of complexity that you do not have in a single-threaded environment. Multiple threads may access the same objects, the same file descriptors--in short, the same shared resources--at the same time.
+
+To get the most out of this section, you should be familiar with the concepts of multithreaded programming. You should know how to write Java applications that utilize multiple threads and how to synchronize access of shared resources. A good reference on multithreaded programming in the Java programming language is Concurrent Programming in JavaTM, Design Principles and Patterns, by Doug Lea (Addison-Wesley, 1997).
+
+8.1.1 Constraints
+
+There are certain constraints that you must keep in mind when writing native methods that are to run in a multithreaded environment. By understanding and programming within these constraints, your native methods will execute safely no matter how many threads simultaneously execute a given native method. For example:
+
+A JNIEnv pointer is only valid in the thread associated with it. You must not pass this pointer from one thread to another, or cache and use it in multiple threads. The Java virtual machine passes a native method the same JNIEnv pointer in consecutive invocations from the same thread, but passes different JNIEnv pointers when invoking that native method from different threads. Avoid the common mistake of caching the JNIEnv pointer of one thread and using the pointer in another thread.
+Local references are valid only in the thread that created them. You must not pass local references from one thread to another. You should always convert local references to global references whenever there is a possibility that multiple threads may use the same reference.
+8.1.2 Monitor Entry and Exit
+
+Monitors are the primitive synchronization mechanism on the Java platform. Each object can be dynamically associated with a monitor. The JNI allows you to synchronize using these monitors, thus implementing the functionality equivalent to a synchronized block in the Java programming language:
+
+ synchronized (obj) {
+     ...                   // synchronized block
+ }
+The Java virtual machine guarantees that a thread acquires the monitor associated with the object obj before it executes any statements in the block. This ensures that there can be at most one thread that holds the monitor and executes inside the synchronized block at any given time. A thread blocks when it waits for another thread to exit a monitor.
+
+Native code can use JNI functions to perform equivalent synchronization on JNI references. You can use the MonitorEnter function to enter the monitor and the MonitorExit function to exit the monitor:
+
+ if ((*env)->MonitorEnter(env, obj) != JNI_OK) {
+     ... /* error handling */
+ }
+ ...     /* synchronized block */
+ if ((*env)->MonitorExit(env, obj) != JNI_OK) {
+     ... /* error handling */
+ };
+Executing the code above, a thread must first enter the monitor associated with obj before executing any code inside the synchronized block. The Monitor-Enter operation takes a jobject as an argument and blocks if another thread has already entered the monitor associated with the jobject. Calling MonitorExit when the current thread does not own the monitor results in an error and causes an Illegal-MonitorStateException to be raised. The above code contains a matched pair of MonitorEnter and MonitorExit calls, yet we still need to check for possible errors. Monitor operations may fail if, for example, the underlying thread implementation cannot allocate the resources necessary to perform the monitor operation.
+
+MonitorEnter and MonitorExit work on jclass, jstring, and jarray types, which are special kinds of jobject references.
+
+Remember to match a MonitorEnter call with the appropriate number of MonitorExit calls, especially in code that handles errors and exceptions:
+
+ if ((*env)->MonitorEnter(env, obj) != JNI_OK) ...;
+ ...
+ if ((*env)->ExceptionOccurred(env)) {
+     ... /* exception handling */
+     /* remember to call MonitorExit here */
+     if ((*env)->MonitorExit(env, obj) != JNI_OK) ...;
+ }
+ ... /* Normal execution path.
+ if ((*env)->MonitorExit(env, obj) != JNI_OK) ...;
+Failure to call MonitorExit will most likely lead to deadlocks. By comparing the above C code segment with the code segment at the beginning of this section, you can appreciate how much easier it is to program with the Java programming language than with the JNI. Thus, it is preferable to express synchronization constructs in the Java programming language. If, for example, a static native method needs to enter the monitor associated with its defining class, you should define a static synchronized native method as opposed to performing JNI-level monitor synchronization in native code.
+
+8.1.3 Monitor Wait and Notify
+
+The Java API contains several other methods that are useful for thread synchronization. They are Object.wait, Object.notify, and Object.notifyAll. No JNI functions are supplied that correspond directly to these methods because monitor wait and notify operations are not as performance critical as monitor enter and exit operations. Native code may instead use the JNI method call mechanism to invoke the corresponding methods in the Java API:
+
+
+
+
+
+
+
+
+ /* precomputed method IDs */
+ static jmethodID MID_Object_wait;
+ static jmethodID MID_Object_notify;
+ static jmethodID MID_Object_notifyAll;
+ 
+ void
+ JNU_MonitorWait(JNIEnv *env, jobject object, jlong timeout)
+ {
+     (*env)->CallVoidMethod(env, object, MID_Object_wait,
+                            timeout);
+ }
+ 
+ void
+ JNU_MonitorNotify(JNIEnv *env, jobject object)
+ {
+     (*env)->CallVoidMethod(env, object, MID_Object_notify);
+ }
+ 
+ void
+ JNU_MonitorNotifyAll(JNIEnv *env, jobject object)
+ {
+     (*env)->CallVoidMethod(env, object, MID_Object_notifyAll);
+ }
+We assume that the method IDs for Object.wait, Object.notify, and Object.notifyAll have been calculated elsewhere and are cached in the global variables. Like in the Java programming language, you can call the above monitor-related functions only when holding the monitor associated with the jobject argument.
+
+8.1.4 Obtaining a JNIEnv Pointer in Arbitrary Contexts
+
+We explained earlier that a JNIEnv pointer is only valid in its associated thread. This is generally not a problem for native methods because they receive the JNIEnv pointer from the virtual machine as the first argument. Occasionally, however, it may be necessary for a piece of native code not called directly from the virtual machine to obtain the JNIEnv interface pointer that belongs to the current thread. For example, the piece of native code may belong to a "callback" function called by the operating system, in which case the JNIEnv pointer will probably not be available as an argument.
+
+You can obtain the JNIEnv pointer for the current thread by calling the AttachCurrentThread function of the invocation interface:
+
+
+ JavaVM *jvm; /* already set */
+ 
+ f()
+ {
+     JNIEnv *env;
+     (*jvm)->AttachCurrentThread(jvm, (void **)&env, NULL);
+     ... /* use env */
+ }
+When the current thread is already attached to the virtual machine, Attach-Current-Thread returns the JNIEnv interface pointer that belongs to the current thread.
+
+There are many ways to obtain the JavaVM pointer: by recording it when the virtual machine is created, by querying for the created virtual machines using JNI_GetCreatedJavaVMs, by calling the JNI function GetJavaVM inside a regular native method, or by defining a JNI_OnLoad handler. Unlike the JNIEnv pointer, the JavaVM pointer remains valid across multiple threads so it can be cached in a global variable.
+
+Java 2 SDK release 1.2 provides a new invocation interface function GetEnv so that you can check whether the current thread is attached to the virtual machine, and, if so, to return the JNIEnv pointer that belongs to the current thread. GetEnv and AttachCurrentThread are functionally equivalent if the current thread is already attached to the virtual machine.
+
+8.1.5 Matching the Thread Models
+
+Suppose that native code to be run in multiple threads accesses a global resource. Should the native code use JNI functions MonitorEnter and MonitorExit, or use the native thread synchronization primitives in the host environment (such as mutex_lock on Solaris)? Similarly, if the native code needs to create a new thread, should it create a java.lang.Thread object and perform a callback of Thread.start through the JNI, or should it use the native thread creation primitive in the host environment (such as thr_create on Solaris)?
+
+The answer is that all of these approaches work if the Java virtual machine implementation supports a thread model that matches that used by the native code. The thread model dictates how the system implements essential thread operations such as scheduling, context switching, synchronization, and blocking in system calls. In a native thread model the operating system manages all the essential thread operations. In a user thread model, on the other hand, the application code implements the thread operations. For example, the "Green thread" model shipped with JDK and Java 2 SDK releases on Solaris uses the ANSI C functions setjmp and longjmp to implement context switches.
+
+Many modern operating systems (such as Solaris and Win32) support a native thread model. Unfortunately, some operating systems still lack native thread support. Instead, there may be one or many user thread packages on these operating systems.
+
+If you write application strictly in the Java programming language, you need not worry about the underlying thread model of the virtual machine implementation. The Java platform can be ported to any host environment that supports the required set of thread primitives. Most native and user thread packages provide the necessary thread primitives for implementing a Java virtual machine.
+
+JNI programmers, on the other hand, must pay attention to thread models. The application using native code may not function properly if the Java virtual implementation and the native code have a different notion of threading and synchronization. For example, a native method could be blocked in a synchronization operation in its own thread model, but the Java virtual machine, running in a different thread model, may not be aware that the thread executing the native method is blocked. The application deadlocks because no other threads will be scheduled.
+
+The thread models match if the native code uses the same thread model as the Java virtual machine implementation. If the Java virtual machine implementation uses native thread support, the native code can freely invoke thread-related primitives in the host environment. If the Java virtual machine implementation is based on a user thread package, the native code should either link with the same user thread package or rely on no thread operations at all. The latter may be harder to achieve than you think: most C library calls (such as I/O and memory allocation functions) perform thread synchronization underneath. Unless the native code performs pure computation and makes no library calls, it is likely to use thread primitives indirectly.
+
+Most virtual machine implementations support only a particular thread model for JNI native code. Implementations that support native threads are the most flexible, hence native threads, when available, are typically preferred on a given host environment. Virtual machine implementations that rely on a particular user thread package may be severely limited as to the type of native code with which they can operate.
+
+Some virtual machine implementations may support a number of different thread models. A more flexible type of virtual machine implementation may even allow you to provide a custom thread model implementation for virtual machine's internal use, thus ensuring that the virtual machine implementation can work with your native code. Before embarking on a project likely to require native code, you should consult the documentation that comes with your virtual machine implementation for thread model limitations.
+
+8.2 Writing Internationalized Code
+
+Special care must be taken to write code that works well in multiple locales. The JNI gives programmers complete access to the internationalization features of the Java platform. We will use string conversion as an example because file names and messages may contain non-ASCII characters in many locales.
+
+The Java virtual machine represents strings in the Unicode format. Although some native platforms (such as Windows NT) also provide Unicode support, most represent strings in locale-specific encodings.
+
+Do not use GetStringUTFChars and GetStringUTFRegion functions to convert between jstrings and locale-specific strings unless UTF-8 happens to be the native encoding on the platform. UTF-8 strings are useful when representing names and descriptors (such as the arguments to GetMethodID) that are to be passed to JNI functions, but are not appropriate for representing locale-specific strings such as file names.
+
+8.2.1 Creating jstrings from Native Strings
+
+Use the String(byte[] bytes) constructor to convert a native string into a jstring. The following utility function creates a jstring from a locale-specific native C string:
+
+ jstring JNU_NewStringNative(JNIEnv *env, const char *str)
+ {
+     jstring result;
+     jbyteArray bytes = 0;
+     int len;
+     if ((*env)->EnsureLocalCapacity(env, 2) < 0) {
+         return NULL; /* out of memory error */
+     }
+     len = strlen(str);
+     bytes = (*env)->NewByteArray(env, len);
+     if (bytes != NULL) {
+         (*env)->SetByteArrayRegion(env, bytes, 0, len,
+                                    (jbyte *)str);
+         result = (*env)->NewObject(env, Class_java_lang_String,
+                                    MID_String_init, bytes);
+         (*env)->DeleteLocalRef(env, bytes);
+         return result;
+     } /* else fall through */
+     return NULL;
+ }
+The function creates a byte array, copies the native C string into the byte array, and finally invokes the String(byte[] bytes) constructor to create the resulting jstring object. Class_java_lang_String is a global reference to the java.lang.String class, and MID_String_init is the method ID of the string constructor. Because this is a utility function, we make sure to delete the local reference to the byte array created temporarily to store the characters.
+
+Delete the call to EnsureLocalCapacity if you need to use this function with JDK release 1.1.
+
+8.2.2 Translating jstrings to Native Strings
+
+Use the String.getBytes method to convert a jstring to the appropriate native encoding. The following utility function translates a jstring to a locale-specific native C string:
+
+ char *JNU_GetStringNativeChars(JNIEnv *env, jstring jstr)
+ {
+     jbyteArray bytes = 0;
+     jthrowable exc;
+     char *result = 0;
+     if ((*env)->EnsureLocalCapacity(env, 2) < 0) {
+         return 0; /* out of memory error */
+     }
+     bytes = (*env)->CallObjectMethod(env, jstr,
+                                      MID_String_getBytes);
+     exc = (*env)->ExceptionOccurred(env);
+     if (!exc) {
+         jint len = (*env)->GetArrayLength(env, bytes);
+         result = (char *)malloc(len + 1);
+         if (result == 0) {
+             JNU_ThrowByName(env, "java/lang/OutOfMemoryError",
+                             0);
+             (*env)->DeleteLocalRef(env, bytes);
+             return 0;
+         }
+         (*env)->GetByteArrayRegion(env, bytes, 0, len,
+                                    (jbyte *)result);
+         result[len] = 0; /* NULL-terminate */
+     } else {
+         (*env)->DeleteLocalRef(env, exc);
+     }
+     (*env)->DeleteLocalRef(env, bytes);
+     return result;
+ }
+The function passes the java.lang.String reference to the String.getBytes method and then copies the elements of the byte array to a newly allocated C array. MID_String_getBytes is the precomputed method ID of the String.getBytes method. Because this is a utility function, we make sure to delete the local references to the byte array and the exception object. Keep in mind that deleting a JNI reference to the exception object does not clear the pending exception.
+
+Once again, delete the call to EnsureLocalCapacity if you need to use this function with JDK release 1.1.
+
+8.3 Registering Native Methods
+
+Before an application executes a native method it goes through a two-step process to load the native library containing the native method implementation and then link to the native method implementation:
+
+System.loadLibrary locates and loads the named native library. For example, System.loadLibrary("foo") may cause foo.dll to be loaded on Win32.
+The virtual machine locates the native method implementation in one of the loaded native libraries. For example, a Foo.g native method call requires locating and linking the native function Java_Foo_g, which many reside in foo.dll.
+This section will introduce another way to accomplish the second step. Instead of relying on the virtual machine to search for the native method in the already loaded native libraries, the JNI programmer can manually link native methods by registering a function pointer with a class reference, method name, and method descriptor:
+
+ JNINativeMethod nm;
+ nm.name = "g";
+ /* method descriptor assigned to signature field */
+ nm.signature = "()V";
+ nm.fnPtr = g_impl;
+ (*env)->RegisterNatives(env, cls, &nm, 1);
+The above code registers the native function g_impl as the implementation of the Foo.g native method:
+
+ void JNICALL g_impl(JNIEnv *env, jobject self);
+The native function g_impl does not need to follow the JNI naming convention because only function pointers are involved, nor does it need to be exported from the library (thus there is no need to declare the function using JNIEXPORT). The native function g_impl must still, however, follow the JNICALL calling convention.
+
+The RegisterNatives function is useful for a number of purposes:
+
+It is sometimes more convenient and more efficient to register a large number of native method implementations eagerly, as opposed to letting the virtual machine link these entries lazily.
+You may call RegisterNatives multiple times on a method, allowing the native method implementation to be updated at runtime.
+RegisterNatives is particularly useful when a native application embeds a virtual machine implementation and needs to link with a native method implementation defined in the native application. The virtual machine would not be able to find this native method implementation automatically because it only searches in native libraries, not the application itself.
+8.4 Load and Unload Handlers
+
+Load and unload handlers allow the native library to export two functions: one to be called when System.loadLibrary loads the native library, the other to be called when the virtual machine unloads the native library. This feature was added in Java 2 SDK release 1.2.
+
+8.4.1 The JNI_OnLoad Handler
+
+When System.loadLibrary loads a native library, the virtual machine searches for the following exported entry in the native library:
+
+ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved);
+You can invoke any JNI functions in an implementation of JNI_Onload. A typical use of the JNI_OnLoad handler is caching the JavaVM pointer, class references, or method and field IDs, as shown in the following example:
+
+ JavaVM *cached_jvm;
+ jclass Class_C;
+ jmethodID MID_C_g;
+ JNIEXPORT jint JNICALL
+ JNI_OnLoad(JavaVM *jvm, void *reserved)
+ {
+     JNIEnv *env;
+     jclass cls;
+     cached_jvm = jvm;  /* cache the JavaVM pointer */
+ 
+     if ((*jvm)->GetEnv(jvm, (void **)&env, JNI_VERSION_1_2)) {
+         return JNI_ERR; /* JNI version not supported */
+     }
+     cls = (*env)->FindClass(env, "C");
+     if (cls == NULL) {
+         return JNI_ERR;
+     }
+     /* Use weak global ref to allow C class to be unloaded */
+     Class_C = (*env)->NewWeakGlobalRef(env, cls);
+     if (Class_C == NULL) {
+         return JNI_ERR;
+     }
+     /* Compute and cache the method ID */
+     MID_C_g = (*env)->GetMethodID(env, cls, "g", "()V");
+     if (MID_C_g == NULL) {
+         return JNI_ERR;
+     }
+     return JNI_VERSION_1_2;
+ }
+The JNI_OnLoad function first caches the JavaVM pointer in the global variable cached_jvm. It then obtains the JNIEnv pointer by calling GetEnv. It finally loads the C class, caches the class reference, and computes the method ID for C.g. The JNI_OnLoad function returns JNI_ERR (¡ì12.4) on error and otherwise returns the JNIEnv version JNI_VERSION_1_2 needed by the native library.
+
+We will explain in the next section why we cache the C class in a weak global reference instead of a global reference.
+
+Given a cached JavaVM interface pointer it is trivial to implement a utility function that allows the native code to obtain the JNIEnv interface pointer for the current thread (¡ì8.1.4) :
+
+ JNIEnv *JNU_GetEnv()
+ {
+     JNIEnv *env;
+     (*cached_jvm)->GetEnv(cached_jvm,
+                           (void **)&env,
+                           JNI_VERSION_1_2);
+     return env;
+ }
+8.4.2 The JNI_OnUnload Handler
+
+Intuitively, the virtual machine calls the JNI_OnUnload handler when it unloads a JNI native library. This is not precise enough, however. When does the virtual machine determine that it can unload a native library? Which thread runs the JNI_OnUnload handler?
+
+The rules of unloading native libraries are as follows:
+
+The virtual machine associates each native library with the class loader L of the class C that issues the System.loadLibrary call.
+The virtual machine calls the JNI_OnUnload handler and unloads the native library after it determines that the class loader L is no longer a live object. Because a class loader refers to all the classes it defines, this implies that C can be unloaded as well.
+The JNI_OnUnload handler runs in a finalizer, and is either invoked synchroniously by java.lang.System.runFinalization or invoked asynchronously by the virtual machine.
+Here is the definition of a JNI_OnUnload handler that cleans up the resources allocated by the JNI_OnLoad handler in the last section:
+
+ JNIEXPORT void JNICALL 
+ JNI_OnUnload(JavaVM *jvm, void *reserved)
+ {
+     JNIEnv *env;
+     if ((*jvm)->GetEnv(jvm, (void **)&env, JNI_VERSION_1_2)) {
+         return;
+     }
+     (*env)->DeleteWeakGlobalRef(env, Class_C);
+     return;
+ }
+The JNI_OnUnload function deletes the weak global reference to the C class created in the JNI_OnLoad handler. We need not delete the method ID MID_C_g because the virtual machine automatically reclaims the resources needed to represent C's method IDs when unloading its defining class C.
+
+We are now ready to explain why we cache the C class in a weak global reference instead of a global reference. A global reference would keep C alive, which in turn would keep C's class loader alive. Given that the native library is associated with C's class loader L, the native library would not be unloaded and JNI_OnUnload would not be called.
+
+The JNI_OnUnload handler runs in a finalizer. In contrast, the JNI_OnLoad handler runs in the thread that initiates the System.loadLibrary call. Because JNI_OnUnload runs in an unknown thread context, to avoid possible deadlocks, you should avoid complex synchronization and locking operations in JNI_OnUnload. The JNI_OnUnload handler typically carries out simple tasks such as releasing the resources allocated by the native library.
+
+The JNI_OnUnload handler runs when the class loader that loaded the library and all classes defined by that class loader are no longer alive. The JNI_OnUnload handler must not use these classes in any way. In the above JNI_OnUnload definition, you must not perform any operations that assume Class_C still refers to a valid class. The DeleteWeakGlobalRef call in the example frees the memory for the weak global reference itself, but does not manipulate the referred class C in any way.
+
+In summary, you should be careful when writing JNI_OnUnload handlers. Avoid complex locking operations that may introduce deadlocks. Keep in mind that classes have been unloaded when the JNI_OnUnload handler is invoked.
+
+8.5 Reflection Support
+
+Reflection generally refers to manipulating language-level constructs at runtime. For example, reflection allows you to discover at run time the name of arbitrary class objects and the set of fields and methods defined in the class. Reflection support is provided at the Java programming language level through the java.lang.reflect package as well as some methods in the java.lang.Object and java.lang.Class classes. Although you can always call the corresponding Java API to carry out reflective operations, the JNI provides the following functions to make the frequent reflective operations from native code more efficient and convenient:
+
+GetSuperclass returns the superclass of a given class reference.
+IsAssignableFrom checks whether instances of one class can be used when instances of another class are expected.
+GetObjectClass returns the class of a given jobject reference.
+IsInstanceOf checks whether a jobject reference is an instance of a given class.
+FromReflectedField and ToReflectedField allow the native code to convert between field IDs and java.lang.reflect.Field objects. They are new additions in Java 2 SDK release 1.2.
+FromReflectedMethod and ToReflectedMethod allow the native code to convert between method IDs, java.lang.reflect.Method objects and java.lang.reflect.Constructor objects. They are new additions in Java 2 SDK release 1.2.
+8.6 JNI Programming in C++
+
+The JNI presents a slightly simpler interface for C++ programmers. The jni.h file contains a set of definitions so that C++ programmers can write, for example:
+
+ jclass cls = env->FindClass("java/lang/String");
+instead of in C:
+
+ jclass cls = (*env)->FindClass(env, "java/lang/String");
+The extra level of indirection on env and the env argument to FindClass are hidden from the programmer. The C++ compiler inlines the C++ member function calls to their equivalent C counterparts; the resulting code is exactly the same. There is no inherent performance difference between using the JNI in C or C++.
+
+In addition, the jni.h file also defines a set of dummy C++ classes to enforce the subtyping relationships among different jobject subtypes:
+
+      // JNI reference types defined in C++
+      class _jobject {};
+      class _jclass : public _jobject {};
+      class _jstring : public _jobject {};
+      ...
+      typedef _jobject* jobject;
+      typedef _jclass*  jclass;
+      typedef _jstring* jstring;
+      ...
+The C++ compiler is able to detect at compile time if you pass in, for example, a jobject to GetMethodID:
+
+ // ERROR: pass jobject as a jclass:
+ jobject obj = env->NewObject(...);
+ jmethodID mid =  env->GetMethodID(obj, "foo", "()V");
+Because GetMethodID expects a jclass reference, the C++ compiler will give an error message. In the C type definitions for JNI, jclass is the same as jobject:
+
+ typedef jobject jclass;
+Therefore, a C compiler is not able to detect that you have mistakenly passed a jobject instead of jclass.
+
+The added type hierarchy in C++ sometimes necessitates additional casting. In C, you can fetch a string from an array of strings and assign the result to a jstring:
+
+ jstring jstr = (*env)->GetObjectArrayElement(env, arr, i);
+In C++, however, you need to insert an explicit conversion:
+
+ jstring jstr = (jstring)env->GetObjectArrayElement(arr, i);
+ 
+ 
+ http://java.sun.com/docs/books/jni/html/other.html

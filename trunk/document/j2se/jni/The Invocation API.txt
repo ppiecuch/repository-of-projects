@@ -1,0 +1,385 @@
+
+Contents | Previous	Java Native Interface Specification
+The Invocation API
+
+Chapter   5
+
+The Invocation API allows software vendors to load the Java VM into an arbitrary native application. Vendors can deliver Java-enabled applications without having to link with the Java VM source code.
+
+This chapter begins with an overview of the Invocation API. This is followed by reference pages for all Invocation API functions.
+
+To enhance the embeddability of the Java VM, the Invocation API is extended in JDK 1.1.2 in a few minor ways.
+
+Overview
+
+The following code example illustrates how to use functions in the Invocation API. In this example, the C++ code creates a Java VM and invokes a static method, called Main.test. For clarity, we omit error checking.
+
+
+    #include <jni.h>       /* where everything is defined */
+    ...
+    JavaVM *jvm;       /* denotes a Java VM */
+    JNIEnv *env;       /* pointer to native method interface */
+    JDK1_1InitArgs vm_args; /* JDK 1.1 VM initialization arguments */
+    vm_args.version = 0x00010001; /* New in 1.1.2: VM version */
+    /* Get the default initialization arguments and set the class 
+     * path */
+    JNI_GetDefaultJavaVMInitArgs(&vm_args);
+    vm_args.classpath = ...;
+    /* load and initialize a Java VM, return a JNI interface 
+     * pointer in env */
+    JNI_CreateJavaVM(&jvm, &env, &vm_args);
+    /* invoke the Main.test method using the JNI */
+    jclass cls = env->FindClass("Main");
+    jmethodID mid = env->GetStaticMethodID(cls, "test", "(I)V");
+    env->CallStaticVoidMethod(cls, mid, 100);
+    /* We are done. */
+    jvm->DestroyJavaVM();
+
+This example uses three functions in the API. The Invocation API allows a native application to use the JNI interface pointer to access VM features. The design is similar to Netscape’s JRI Embedding Interface.
+
+Creating the VM
+
+The JNI_CreateJavaVM() function loads and initializes a Java VM and returns a pointer to the JNI interface pointer. The thread that called JNI_CreateJavaVM() is considered to be the main thread.
+
+Attaching to the VM
+
+The JNI interface pointer (JNIEnv) is valid only in the current thread. Should another thread need to access the Java VM, it must first call AttachCurrentThread() to attach itself to the VM and obtain a JNI interface pointer. Once attached to the VM, a native thread works just like an ordinary Java thread running inside a native method. The native thread remains attached to the VM until it calls DetachCurrentThread() to detach itself.
+
+The attached thread should have enough stack space to perform a reaonable amount of work. The allocation of stack space per thread is operating system-specific. For example, using pthreads, the stack size can be specified in the pthread_attr_t argument to pthread_create.
+
+Unloading the VM
+
+The main thread cannot detach itself from the VM. Instead, it must call DestroyJavaVM() to unload the entire VM.
+
+The VM waits until the main thread is the only user thread before it actually unloads. User threads include both Java threads and attached native threads. This restriction exists because a Java thread or attached native thread may be holding system resources, such as locks, windows, and so on. The VM cannot automatically free these resources. By restricting the main thread to be the only running thread when the VM is unloaded, the burden of releasing system resources held by arbitrary threads is on the programmer.
+
+Library and Version Management
+
+In JDK 1.1, once a native library is loaded, it is visible from all class loaders. Therefore two classes in different class loaders may link with the same native method. This leads to two problems:
+A class may mistakenly link with native libraries loaded by a class with the same name in a different class loader.
+Native methods can easily mix classes from different class loaders. This breaks the name space separation offered by class loaders, and leads to type safety problems.
+In the JDK, each class loader manages its own set of native libraries. The same JNI native library cannot be loaded into more than one class loader. Doing so causes UnsatisfiedLinkError to be thrown. For example, System.loadLibrary throws an UnsatisfiedLinkError when used to load a native library into two class loaders. The benefits of the new approach are:
+
+Name space separation based on class loaders is preserved in native libraries. A native library cannot easily mix classes from different class loaders.
+In addition, native libraries can be unloaded when their corresponding class loaders are garbage collected.
+To facilitate versioning control and resource management, JNI libraries in the Java 2 Platform may optionally export the following two functions:
+
+JNI_OnLoad
+
+jint JNI_OnLoad(JavaVM *vm, void *reserved);
+
+The VM calls JNI_OnLoad when the native library is loaded (for example, through System.loadLibrary). JNI_OnLoad must return the JNI version needed by the native library.
+In order to use any of the new JNI functions, a native library must export a JNI_OnLoad function that returns JNI_VERSION_1_2. If the native library does not export a JNI_OnLoad function, the VM assumes that the library only requires JNI version JNI_VERSION_1_1. If the VM does not recognize the version number returned by JNI_OnLoad, the native library cannot be loaded.
+
+LINKAGE:
+
+Exported from native libraries that contain native method implementation.
+
+SINCE JDK/JRE 1.4:
+
+In order to use the JNI functions introduced in J2SE release 1.2, in addition to those that were available in JDK 1.1, a native library must export a JNI_OnLoad function that returns JNI_VERSION_1_2.
+
+In order to use the JNI functions introduced in J2SE release 1.4, in addition to those that were available in release 1.2, a native library must export a JNI_OnLoad function that returns JNI_VERSION_1_4.
+
+If the native library does not export a JNI_OnLoad function, the VM assumes that the library only requires JNI version JNI_VERSION_1_1. If the VM does not recognize the version number returned by JNI_OnLoad, the native library cannot be loaded.
+
+JNI_OnUnload
+
+void JNI_OnUnload(JavaVM *vm, void *reserved);
+
+The VM calls JNI_OnUnload when the class loader containing the native library is garbage collected. This function can be used to perform cleanup operations. Because this function is called in an unknown context (such as from a finalizer), the programmer should be conservative on using Java VM services, and refrain from arbitrary Java call-backs.
+Note that JNI_OnLoad and JNI_OnUnload are two functions optionally supplied by JNI libraries, not exported from the VM.
+
+LINKAGE:
+
+Exported from native libraries that contain native method implementation.
+Invocation API Functions
+
+The JavaVM type is a pointer to the Invocation API function table. The following code example shows this function table.
+
+
+typedef const struct JNIInvokeInterface *JavaVM;
+
+
+const struct JNIInvokeInterface ... = { 
+    NULL, 
+    NULL, 
+    NULL, 
+ 
+    DestroyJavaVM, 
+    AttachCurrentThread, 
+    DetachCurrentThread, 
+
+    GetEnv,
+
+    AttachCurrentThreadAsDaemon
+};
+
+
+Note that three Invocation API functions, JNI_GetDefaultJavaVMInitArgs(), JNI_GetCreatedJavaVMs(), and JNI_CreateJavaVM(), are not part of the JavaVM function table. These functions can be used without a preexisting JavaVM structure.
+
+JNI_GetDefaultJavaVMInitArgs
+
+jint JNI_GetDefaultJavaVMInitArgs(void *vm_args);
+
+Returns a default configuration for the Java VM. Before calling this function, native code must1 set the vm_args->version field to the JNI version it expects the VM to support. In JDK 1.1.2, vm_args->version must be set to 0x00010001. After this function returns, vm_args->version will be set to the actual JNI version the VM supports.
+
+
+LINKAGE:
+
+Exported from the native library that implements the Java virtual machine.
+
+PARAMETERS:
+
+vm_args: a pointer to a VM-specific initialization structure in to which the default arguments are filled.
+
+RETURNS:
+
+Returns “0” if the requested version is supported; returns a negative number if the requested version is not supported.
+
+JNI_GetCreatedJavaVMs
+
+jint JNI_GetCreatedJavaVMs(JavaVM **vmBuf, jsize bufLen,
+jsize *nVMs);
+
+Returns all Java VMs that have been created. Pointers to VMs are written in the buffer vmBuf in the order they are created. At most bufLen number of entries will be written. The total number of created VMs is returned in *nVMs.
+
+JDK 1.1.2 does not support creating more than one VM in a single process.
+
+
+LINKAGE:
+
+Exported from the native library that implements the Java virtual machine.
+
+PARAMETERS:
+
+vmBuf: pointer to the buffer where the VM structures will be placed.
+
+bufLen: the length of the buffer.
+
+nVMs: a pointer to an integer.
+
+RETURNS:
+
+Returns “0” on success; returns a negative number on failure.
+
+JNI_CreateJavaVM
+
+jint JNI_CreateJavaVM(JavaVM **p_vm, JNIEnv **p_env, void *vm_args);
+
+Loads and initializes a Java VM. The current thread becomes the main thread. Sets the env argument to the JNI interface pointer of the main thread.
+
+JDK 1.1 does not support creating more than one VM in a single process. The version field in vm_args must2 be set to 0x00010001.
+
+In JDK 1.1, the second argument to JNI_CreateJavaVM is always a pointer to JNIEnv *. The third argument is a pointer to a JDK 1.1 specific structure (JDK1_1InitArgs). The JDK1_1InitArgs structure is clearly not designed to be portable on all VMs.
+
+In the JDK, we introduce a standard VM initialization structure. Backward compatibility is preserved. If the VM initialization argument points to a JDK1_1InitArgs structure, JNI_CreateJavaVM still returns the 1.1 version of JNI interface pointer. The VM returns the 1.2 version of JNI interface pointer if the third argument points to a JavaVMInitArgs structure. Unlike JDK1_1InitArgs, which contains a fixed set of options, JavaVMInitArgs uses option strings to encode arbitrary VM start up options.
+
+typedef struct JavaVMInitArgs {
+    jint version;
+
+    jint nOptions;
+    JavaVMOption *options;
+    jboolean ignoreUnrecognized;
+} JavaVMInitArgs;
+The version field must be set to JNI_VERSION_1_2. (In contrast, the version field in JDK1_1InitArgs must be set to JNI_VERSION_1_1.) The options field is an array of the following type:
+
+typedef struct JavaVMOption {
+    char *optionString;  /* the option as a string in the default platform encoding */
+    void *extraInfo;
+} JavaVMOption;
+The size of the array is denoted by the nOptions field in JavaVMInitArgs. If ignoreUnrecognized is JNI_TRUE, JNI_CreateJavaVM ignore all unrecognized option strings that begin with "-X" or "_". If ignoreUnrecognized is JNI_FALSE, JNI_CreateJavaVM returns JNI_ERR as soon as it encounters any unrecognized option strings. All Java VMs must recognize the following set of standard options:
+
+optionString	 meaning
+-D<name>=<value>	 Set a system property
+-verbose[:class|gc|jni]	 Enable verbose output. The options can be followed by a comma-separated list of names indicating what kind of messages will be printed by the VM. For example, "-verbose:gc,class" instructs the VM to print GC and class loading related messages. Standard names include: gc, class, and jni. All nonstandard (VM-specific) names must begin with "X".
+vfprintf	extraInfo is a pointer to the vfprintf hook.
+exit	extraInfo is a pointer to the exit hook.
+abort	extraInfo is a pointer to the abort hook.
+ 
+
+In addition, each VM implementation may support its own set of non-standard option strings. Non-standard option names must begin with "-X" or an underscore ("_"). For example, the JDK supports -Xms and -Xmx options to allow programmers specify the initial and maximum heap size. Options that begin with "-X" are accessible from the "java" command line.
+
+Here is the example code that creates a Java VM in the JDK:
+
+JavaVMInitArgs vm_args;
+JavaVMOption options[4];
+
+options[0].optionString = "-Djava.compiler=NONE";           /* disable JIT */
+options[1].optionString = "-Djava.class.path=c:\myclasses"; /* user classes */
+options[2].optionString = "-Djava.library.path=c:\mylibs";  /* set native library path */
+options[3].optionString = "-verbose:jni";                   /* print JNI-related messages */
+
+vm_args.version = JNI_VERSION_1_2;
+vm_args.options = options;
+vm_args.nOptions = 4;
+vm_args.ignoreUnrecognized = TRUE;
+
+/* Note that in the JDK, there is no longer any need to call 
+ * JNI_GetDefaultJavaVMInitArgs. 
+ */
+res = JNI_CreateJavaVM(&vm, (void **)&env, &vm_args);
+if (res < 0) ...
+The JDK still supports JDK1_1InitArgs in exactly the same way as JDK 1.1.
+
+LINKAGE:
+
+Exported from the native library that implements the Java virtual machine.
+
+PARAMETERS:
+
+p_vm: pointer to the location where the resulting VM structure will be placed.
+
+p_env: pointer to the location where the JNI interface pointer for the main thread will be placed.
+
+vm_args: Java VM initialization arguments.
+
+RETURNS:
+
+Returns “0” on success; returns a negative number on failure.
+
+DestroyJavaVM
+
+jint DestroyJavaVM(JavaVM *vm);
+
+Unloads a Java VM and reclaims its resources. Only the main thread can unload the VM. The system waits until the main thread is only remaining user thread before it destroys the VM.
+
+The support for DestroyJavaVM was not complete in 1.1. Only the main thread may call DestroyJavaVM. In the JDK, any thread, whether attached or not, can call this function. If the current thread is attached, the VM waits until the current thread is the only user-level Java thread. If the current thread is not attached, the VM attaches the current thread and then waits until the current thread is the only user-level thread. The JDK still does not support VM unloading, however. DestroyJavaVM always returns an error code.
+
+LINKAGE:
+
+Index 3 in the JavaVM interface function table.
+
+PARAMETERS:
+
+vm: the Java VM that will be destroyed.
+
+RETURNS:
+
+Returns “0” on success; returns a negative number on failure.
+
+JDK 1.1.2 does not support unloading the VM.
+
+AttachCurrentThread
+
+jint AttachCurrentThread(JavaVM *vm, JNIEnv **p_env, void *thr_args);
+
+Attaches the current thread to a Java VM. Returns a JNI interface pointer in the JNIEnv argument.
+
+Trying to attach a thread that is already attached is a no-op.
+
+A native thread cannot be attached simultaneously to two Java VMs.
+
+When a thread is attached to the VM, the context class loader is the bootstrap loader.
+
+LINKAGE:
+
+Index 4 in the JavaVM interface function table.
+
+PARAMETERS:
+
+vm: the VM to which the current thread will be attached.
+
+p_env: pointer to the location where the JNI interface pointer of the current thread will be placed.
+
+thr_args: VM-specific thread attachment arguments.
+
+In JDK 1.1, the second argument to AttachCurrentThread is always a pointer to JNIEnv. The third argument to AttachCurrentThread was reserved, and should be set to NULL.
+
+In the JDK, you pass NULL as the third argument for 1.1 behavior, or pass a pointer to the following structure to specify additional information:
+
+typedef struct JavaVMAttachArgs {
+    jint version;  /* must be JNI_VERSION_1_2 */
+    char *name;    /* the name of the thread as a modified UTF-8 string, or NULL */
+    jobject group; /* global ref of a ThreadGroup object, or NULL */
+} JavaVMAttachArgs
+RETURNS:
+
+Returns “0” on success; returns a negative number on failure.
+
+AttachCurrentThreadAsDaemon
+
+jint AttachCurrentThreadAsDaemon(JavaVM* vm, void** penv, void* args);
+
+Same semantics as AttachCurrentThread, but the newly-created java.lang.Thread instance is a daemon.
+
+If the thread has already been attached via either AttachCurrentThread or AttachCurrentThreadAsDaemon, this routine simply sets the value pointed to by penv to the JNIEnv of the current thread. In this case neither AttachCurrentThread nor this routine have any effect on the daemon status of the thread.
+
+LINKAGE:
+
+Index 7 in the JavaVM interface function table.
+
+PARAMETERS:
+
+vm: the virtual machine instance to which the current thread will be attached.
+
+penv: a pointer to the location in which the JNIEnv interface pointer for the current thread will be placed.
+
+args: a pointer to a JavaVMAttachArgs structure.
+
+RETURNS
+
+Returns zero on success; otherwise, returns a negative number.
+
+EXCEPTIONS
+
+None.
+
+SINCE:
+
+JDK/JRE 1.4
+
+DetachCurrentThread
+
+jint DetachCurrentThread(JavaVM *vm);
+
+Detaches the current thread from a Java VM. All Java monitors held by this thread are released. All Java threads waiting for this thread to die are notified.
+
+In JDK 1.1, the main thread cannot be detached from the VM. It must call DestroyJavaVM to unload the entire VM.
+
+In the JDK, the main thread can be detached from the VM.
+
+The main thread, which is the thread that created the Java VM, cannot be detached from the VM. Instead, the main thread must call JNI_DestroyJavaVM() to unload the entire VM.
+
+LINKAGE:
+
+Index 5 in the JavaVM interface function table.
+
+PARAMETERS:
+
+vm: the VM from which the current thread will be detached.
+
+RETURNS:
+
+Returns “0” on success; returns a negative number on failure.
+
+GetEnv
+
+jint GetEnv(JavaVM *vm, void **env, jint version);
+
+LINKAGE:
+
+Index 6 in the JavaVM interface function table.
+
+RETURNS:
+
+If the current thread is not attached to the VM, sets *env to NULL, and returns JNI_EDETACHED. If the specified version is not supported, sets *env to NULL, and returns JNI_EVERSION. Otherwise, sets *env to the appropriate interface, and returns JNI_OK.
+
+SINCE:
+
+JDK/JRE 1.2
+
+ 
+
+_________________________
+
+1. JDK 1.1 did not require the native code to set the version field. For backward compatibility, JDK 1.1.2 assumes that the requested version is 0x00010001 if the version field is not set. Future versions of JDK will require the version field to be set to an appropriate value.
+
+2. See footnote 1.
+
+Contents | Previous	
+ 
+
+Copyright © 2004, 2010 Oracle and/or its affiliates. All rights reserved.
+
+http://docs.oracle.com/javase/1.5.0/docs/guide/jni/spec/invocation.html

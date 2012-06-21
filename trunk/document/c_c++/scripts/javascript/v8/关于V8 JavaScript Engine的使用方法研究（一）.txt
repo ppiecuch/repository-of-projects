@@ -1,0 +1,240 @@
+北京理工大学  20981  陈罡
+
+一、写在前面的话
+随着google io大会上对android 2.2系统展示，一个经过高度优化的android系统（从dalvik虚拟机，到浏览器）呈现在大家面前。开发者们会非常自然地将目光落在dalvik虚拟机方面的改进（包括ndk工具对jni联机单步调试的支持），很多应用接口的调整以及以此为基础的新的应用程序（偶是属于那种喜新不厌旧，找抽性质的人）。对于android 2.2在浏览器方面的优化和改进，在google io大会上只提到了已经全面支持v8 javascript引擎，这种引擎会将浏览器的运行速度提升2－3倍（尽管firefox已经官方发表声明说他们在未来的firefox中会使用一个叫做tracemonkey的javascript引擎，它要比v8更快，但目前来看v8引擎是所有现存javascript引擎中最快的）。
+
+hoho，好东西嘛，自然少不了偶了，下面偶就把自己对v8引擎的一些使用方面的心得体会简单地写一下，希望能够对游戏开发者或者应用程序引擎开发者有一些用处。（稍微表达一下对google的意见，虽然android 2.2已经正式发布了，但source code还没有发布出来，偶等得花儿都谢了。）
+
+二、v8引擎特性简介
+v8引擎的最根本的特性就是运行效率非常高，这得益于v8与众不同的设计。
+从技术角度来看，v8的设计主要有三个比较特别的地方：
+
+（1）快速对象属性存取机制
+javascript这语言很邪门，很不规范，但是动态特性很高，甚至可以在运行时增加或减少对象的属性，传统的javascript引擎对于对象属性存取机制的实现方法是——为运行中的对象建立一个属性字典，然后每次在脚本中存取对象属性的时候，就去查这个字典，查到了就直接存取，查不到就新建一个属性。
+
+如此设计虽然很方便，但是很多时间都浪费到这个“查字典”的工作上了。而v8则采取另外一种方式——hidden class（隐藏类？！偶怕翻译得不贴切因此直接把原文写上来了）链的方式，在脚本中每次为对象添加一个新的属性的时候，就以上一个hidden class为父类，创建一个具有新属性的hidden class的子类，如此往复递归进行，而且上述操作只在该对象第一次创建的时候进行一次，以后再遇到相同对象的时候，直接把最终版本的hidden class子类拿来用就是了，不用维护一个属性字典，也不用重复创建。
+
+这样的设计体现了google里面天才工程师们的才华（当然第一次运行的时候肯定要慢一些，所以google那边强调，v8引擎在多重循环，以及重复操作一些对象的时候速度改善尤为明显，大概这种设计也是其中的一个原因吧，当然最主要的原因还在动态机器码生成机制）
+
+（2）动态机器码生成机制
+这一点可以类比一下java虚拟机里面的jit（just in time）机制，地球人都知道，java的运行效率很低，尤其在使用多重循环（也就是，for循环里面还有个for循环里面还有for循环*^&@*#^$。。。就当此注释是废话好了）的时候，sun为了解决这个问题，在jvm虚拟机里面加入了jit机制，就是在.class运行的时候，把特别耗时的多重循环编译成机器码（也就是跟exe或elf中保存的代码一样的可执行二进制代码），然后当下次再运行的时候，就直接用这些二进制代码跑，如此以来，自然运行效率就提高了。android 2.2在dalvik里面也已经加入了jit技术，所以会有如此大的性能提升，但是对于一个javascript引擎中引入此技术来提高脚本的运行效率，偶还是第一次看到（或许是偶孤陋寡闻了，欢迎对此有研究的朋友不吝斧正）。
+
+这种设计在本文的下半部分，研究如何在c++程序中嵌入v8引擎、执行javascript脚本的时候，会有更加深入的理解，因为每次运行脚本之前，首先要调用compile的函数，需要对脚本进行编译，然后才能够运行，由此可以看到动态代码生成机制的影响深远。
+这种设计的好处在于可以极大限度地加速javascript脚本运行，但是自然也有一些问题，那就是移植的问题，目前从v8的代码上来看，v8已经支持ia32（也就是x86了），arm，x64（64位的，偶现在还没那么幸运能用上64位的机器）,mips（是apple们用的），其他的javascript引擎，只需要把代码重新编译一下，理论上就能够在其他不同的硬件平台上跑了，但是从这个动态机器码生成的机制来看，虽然v8很好，很强大，但是把它弄到其他的平台上似乎工作量不小。
+
+（3）高效的垃圾回收机制
+垃圾回收，从原理上来说就是对象的引用计数，当一个对象不再被脚本中其他的对象使用了，就可以由垃圾回收器（garbage collector）将其释放到系统的堆当中，以便于下一次继续使用。
+v8采用的是stop-the-world（让世界停止？！其实真正的意思就是在v8进行垃圾回收的时候，中断整个脚本的执行，回收完成后再继续执行脚本，如此以来，可以集中全部cpu之力在较短的时间内完成垃圾回收任务，在正常运行过程中坚决不回收垃圾，让全部cpu都用来运行脚本）垃圾回收机制。从偶的英文水平来看，其他的描述，诸如：快速、正确、下一代之类的都是浮云，stop-the-world才是根本。
+
+以上是偶对v8设计要点和特性方面的简单研究，英语好的朋友可以无视偶在上面的聒噪，直接看v8的design elements原文，原文的地址如下：
+http://code.google.com/apis/v8/design.html
+
+三、下载和编译v8的方法
+ok,既然v8引擎这么好，那么现在就开始动手，搞一个出来玩玩。与以往一样，偶的开发环境是slackware13.1。
+关于v8引擎的下载和编译方法，英文好的朋友可以直接看google code上面的介绍，具体的链接地址如下：
+http://code.google.com/apis/v8/build.html
+
+偶在此只是简单地把要点提一下，顺便聊聊注意事项：
+（1）v8可以在winxp, vista， mac os, linux（arm和intel的cpu都行）环境下编译。
+
+（2）基本的系统要求：
+a、svn版本要大于等于1.4
+b、win xp要打sp2补丁（现在最新的补丁应该是sp3了）
+c、python版本要大于等于2.4
+d、scons版本要大于等于1.0.0（google这帮家伙们还真能折腾，用gmake就那么费劲吗？非要弄个怪异的编译工具，这个scons是基于python的自动化编译工具，功能上跟linux下面的Makefile非常类似，不一样的是Makefile的脚本是gmake的语法，而scons的配置脚本的语法则是python，看来v8引擎的开发者们是python的铁杆粉丝，这个scons的安装方法偶就不再聒噪了，python install setup.sh，相信熟悉python的朋友一定非常清楚了。）
+e、gcc编译器的版本要大于4.x.x
+
+（3）v8的下载地址：
+svn checkout http://v8.googlecode.com/svn/trunk/ v8-read-only
+
+（4）基本的编译方法：
+a、查看v8配置脚本中参数的方法：scons --help
+b、查看scons命令本身提供参数的方法：scons -H （这里的“H”一定要大写）
+c、设置环境变量：
+export GCC_VERSION=44（这个一定要设置，否则会导致一大堆错误，天知道google guys们是如何编写scons的配置脚本的，个人感觉他们写这个编译脚本的时候应该是用mac book，在leopard系统上玩的，而偶还在用价廉物美的lenovo，使用slackware。。。）
+d、开始编译，编译的命令很简单：scons mode=release library=shared snapshot=on
+e、经过漫长的编译过程，会看到一个叫做libv8.so的库（当然用library=static可以编译出libv8.a的静态库），把这个so库手工拷贝到/usr/local/lib，然后，ldconfig一下就好了，然乎把v8-read-only/include目录下的几个.h文件拷贝到/usr/local/include目录下。到此为止，v8引擎已经顺利地安装到了机器上。
+f、经过e以后，我们可以简单地测试一下是否能够工作。还需要编译一个可执行程序出来，例如——shell程序。编译的方法非常简单：scons sample=shell，然后就是等待即可。
+
+好了，经过上面的过程，大家应该能够很顺利地生成libv8.so这个库了，下一步偶开始研究如何在自己的c++代码中调用这个库了。
+
+四、v8引擎的调用方法
+1、基本概念
+在使用v8引擎之前，必须知道三个基本概念：句柄（handle），作用域（scope），上下文环境（context，大爷的老外的这个context就是绕口，没法翻译成中文，可以简单地理解为运行环境也可以）
+（1）句柄（Handle）
+从实质上来说，每一个句柄就是一个指向v8对象的指针，所有的v8对象必须使用句柄来操作。这是先决条件，如果一个v8对象没有任何句柄与之相关联，那么这个对象很快就会被垃圾回收器给干掉（句柄跟对象的引用计数有很大关系）。
+
+（2）作用域（Scope）
+从概念上理解，作用域可以看成是一个句柄的容器，在一个作用域里面可以有很多很多个句柄（也就是说，一个scope里面可以包含很多很多个v8引擎相关的对象），句柄指向的对象是可以一个一个单独地释放的，但是很多时候（尤其是写一些“有用”的程序的时候），一个一个地释放句柄过于繁琐，取而代之的是，可以释放一个scope，那么包含在这个scope中的所有handle就都会被统一释放掉了。
+
+（3）上下文环境（Context）
+从概念上讲，这个上下文环境（以前看一些中文的技术资料总出现这个词，天知道当初作者们是如何想的，不过这事情就是约定俗成，大家都这么叫也就习惯了）也可以理解为运行环境。这就好比是linux的环境变量，在执行javascript脚本的时候，总要有一些环境变量或者全局函数（这些就不用偶解释了吧？！就是那些直接拿过来就用，根本不需要关心这些变量或者函数在什么地方定义的）。偶们如果要在自己的c++代码中嵌入v8引擎，自然希望提供一些c++编写的函数或者模块，让其他用户从脚本中直接调用，这样才会体现出javascript的强大。从概念上来讲，java开发中，有些功能jvm不提供，大家可以用c/c++编写jni模块，通过java调用c/c++模块来实现那些功能。而类比到javascript引擎，偶们可以用c++编写全局函数，让其他人通过javascript进行调用，这样，就无形中扩展了javascript的功能。java+jni的开发模式与javascript+c++module是一样的思路，只是java更加复杂，系统库更加丰富；而javascript相对java来说比较简单，系统库比较少。仅此而已。
+
+2、开始在c++代码中嵌入v8引擎
+（1）基本的编译方法
+基本的编译方法很简单，只要上面安装v8引擎的过程中没有什么问题，就可以直接把v8引擎作为一个普通的动态链接库来使用，例如：在编译的时候加入-I/usr/local/include，在链接的时候加入-L/usr/local/lib -lv8就足够了。这里需要提一句，由于v8引擎是完全使用c++编写的（hoho，最近linus在blog上跟人吵架，声称c++是垃圾程序员使用的垃圾语言，闹得沸沸扬扬。偶也十分喜欢c语言，但是在此不对linus的言论做任何评论，好东西嘛能用、会用就是了。）
+
+例如：
+g++ -c test.cpp -I/usr/local/include 
+g++ -o test test.o -L/usr/local/lib -lv8
+
+（2）在使用v8引擎中定义的变量和函数之前，一定不要忘记导入v8的名字空间
+using namespace v8；
+
+（3）在c++程序中简单地执行v8脚本引擎的方法如下：
+// 创建scope对象，该对象销毁后，下面的所有handle就都销毁了
+  HandleScope handle_scope ;  
+
+// 创建ObjectTemplate对象，这个对象可以用来注册c++的全局函数供给javascript调用
+// 在此演示中先可以忽略
+  Handle<ObjectTemplate> global_templ = ObjectTemplate::New() ; 
+
+// 创建运行环境
+  Handle<Context> exec_context ;
+
+// 创建javascript脚本的存储对象，该对象存放从文件中读取的脚本字符串
+  Handle<String> js_source ; 
+
+// 创建用于存放编译后的脚本代码的对想
+  Handle<Script> js_compiled ; 
+
+// 从文件中把javascript脚本读入js_source对象
+  js_source = load_js(js_fname) ; 
+
+// 把c++编写的函数注册到全局的ObjectTemplate对象中，
+// 例如，在偶的代码中，有一个叫做set_draw_color的函数，那么这个函数在javascript脚本
+// 中如果希望调用，应该叫什么名字呢？这一句——String::New("set_draw_color")就用来指定
+// 在脚本中的函数名称，FunctionTemplate用来表示在c++中的函数，利用指向函数的指针把该函数
+// 封装成函数对象。以下的几个Set都是相同的功能，就是用来把c++函数注册到脚本的运行环境中。
+  global_templ->Set(String::New("set_draw_color"), 
+                    FunctionTemplate::New(set_draw_color)) ; 
+
+  global_templ->Set(String::New("draw_line"), 
+                    FunctionTemplate::New(draw_line)) ; 
+
+  global_templ->Set(String::New("commit"), 
+                    FunctionTemplate::New(commit)) ; 
+
+  global_templ->Set(String::New("clear"), 
+                    FunctionTemplate::New(clear)) ; 
+
+  global_templ->Set(String::New("draw_bmp"), 
+                    FunctionTemplate::New(draw_bmp)) ; 
+
+// 新建执行对象，把刚刚注册了c++函数的global_templ关联到脚本的运行环境中去
+  exec_context = Context::New(NULL, global_templ) ; 
+
+// 创建运行环境的作用域，当然，言外之意，v8可以支持多个配置不同的运行环境
+  Context::Scope context_scope(exec_context) ; 
+
+// 注意，这里就是编译javascript脚本的源代码了
+  js_compiled = Script::Compile(js_source) ; 
+  if(js_compiled.IsEmpty()) {
+    LOG("run_js, js_compiled is empty!") ; 
+    return ; 
+  }
+  
+// 最后这一句就是运行，执行刚刚从文件中载入以及编译的javascript脚本了
+  js_compiled->Run() ; 
+
+（4）由javascript调用的c++模块的编写方法
+以刚刚的set_draw_color这个函数为例，在javascript中的调用方法假定为：
+set_draw_color(r, g, b) ; 
+例如：
+// 设置为红色
+set_draw_color(255, 0, 0) ; 
+
+虽然调用此函数看上去非常简单，但在c++中该如何编写这个函数呢？该如何从javascript中得到相应的行参呢？
+参见如下代码：
+static Handle<Value> set_draw_color(const Arguments & args) {
+  int r, g, b ; 
+  if(args.Length() == 3) {
+    r = args[0]->Int32Value() ; 
+    g = args[1]->Int32Value() ; 
+    b = args[2]->Int32Value() ; 
+    g_canv_ptr->SetDrawColor(r, g, b) ; 
+  }
+
+  return Undefined() ; 
+}
+
+这里的const Arguments & args就用来解决从javascript向c++传递参数的问题。args.Length()用来返回在javascript脚本中一共传入了多少个参数，而Arguments类本身是重载了“[]”运算符的，因此，可以使用类似普通数组的下标的方式对参数进行存取。至于Int32Value()这类的函数，是在Handle<Value>类中有定义的，可以通过查看v8.h头文件得到所有的Handle类型对象的定义，例如：Handle<Number>，Handle<Integer>，Handle<String>，Handle<Function>等等，总之，源码之下了无秘密，大家可以查看源代码得到所有问题的解答。
+
+（5）从c++代码中调用javascript脚本中编写的函数的方法
+javascript调用c++函数，只是实现了单方向地调用；那么如何在v8中实现双方向的调用呢？也就是由c++代码去调用javascript中的函数。这一点十分有用，例如，偶可以在c++代码中捕获键盘或鼠标事件，对于这些事件的处理方法（例如：鼠标在屏幕上的坐标，键盘按下的键值），则可以把c++代码中采集到的数据传入脚本中定义的函数，根据脚本上定义的函数去处理，由此可以极大地加强c++代码的灵活性。
+
+例如，偶在javascript中定义了一个OnClick函数，作用是在鼠标点击的地方贴一张图片，那么偶的javascript可以这样写：
+function OnClick(x, y) {
+    draw_bmp(x, y, 4) ; 
+    commit() ; 
+}
+
+先不论具体的实现细节，先看这个函数的参数，x和y，那么偶该如何从c++代码中把鼠标点按的x和y坐标传给OnClick函数呢？毕竟这个函数是在javascript中定义的。
+
+具体的方法其实很简单，前半部分与定义和调用javascript的步骤一致，只不过从js_compiled->Run()，这一句以后，还没有完，还要继续做下面的事情：
+  Handle<String> js_func_name ; 
+  Handle<Value>  js_func_val ; 
+  Handle<Function> js_func ; 
+  Handle<Value>  argv[argc] ; 
+  Handle<Integer> int_x ; 
+  Handle<Integer> int_y ; 
+
+// 这一句是创建函数名对象
+  js_func_name = String::New("OnClick") ; 
+
+// 从全局运行环境中进行查找，看看是否存在一个叫做“OnClick”的函数
+  js_func_val = exec_context->Global()->Get(js_func_name) ; 
+  if(!js_func_val->IsFunction()) {
+    LOG("on_click, js_func_val->IsFunction check failed!") ; 
+  } else {
+
+// 利用handle的强制类型转换，把js_func_val转换成一个函数对象
+    js_func = Handle<Function>::Cast(js_func_val) ;
+
+// 初始化参数，所有数据都要定义成javascript可以识别的数据类型，例如Integer对象
+// javascript中是没有内建数据类型的（int, char, short是c/c++中的用的类型） 
+    int_x = Integer::New(x) ; 
+    int_y = Integer::New(y) ; 
+
+// 把这些对象放到argv数组中去
+    argv[0] = int_x ; 
+    argv[1] = int_y ; 
+
+// 利用函数对象去调用该函数，当然需要传入脚本的运行环境，以及参数个数和参数的值。
+    js_func->Call(exec_context->Global(), argc, argv) ; 
+  }
+
+ok，到此为止，偶已经把c++->javascript以及javascript->c++的双向调用，以及参数传递方法讲完了。
+其他的v8引擎的特性还需要进一步探索和研究。
+
+偶自己写了一个简单的验证程序，该程序使用sdl库来作为c/c++模块的绘图工具，然后向v8导出了若干绘图函数（例如画线，贴图等函数），然后通过javascript在屏幕上可以随心所欲地画图。本程序在linux下面编译和运行通过，此验证效果还不错，包含了v8引擎的c++和javascript代码之间双向调用和通信，现在把代码分享出来供大家研究和参考。
+
+程序运行起来的样子：
+
+
+
+
+使用方法：
+（1）$./test ./t.js [回车]
+（2）在屏幕上单击鼠标，即可看到运行的结果。
+（3）用任意文本编辑器修改t.js脚本，然后再在屏幕上单击鼠标，就可以观察到改变立即生效。
+
+此功能如果放在手机上，会是多么有趣的一件事啊，v8不仅仅是一个javascript引擎，如果把javascript+c模块的开发模式发扬光大，那么这个v8引擎就极有可能发展成为手机上的轻量级的app engine（呵呵，参见java+jni的开发模式）。偶有时间会考虑把v8引擎移植到其他的手机平台上玩玩，虽说目前仅能够拿到android 2.1 eclair的源代码，但是从其的$(ANDROID_SRC)/external/webkit目录下面，可以找到一个叫做V8Binding的目录，另外，在此目录的Android.mk文件中，可以看到其对JS_ENGINE环境变量的检测，如果JS_ENGINE的值是“v8”的话就可以编译一个libv8.a的静态库，并把该库打入libwebkit.so这个动态库中去。
+
+秀一下偶的桌面：
+
+
+
+
+具体的android平台的编译操作，偶如果有时间再在后续文章中再讲吧，偶是在android平台上把v8封装成了一个jni模块，然后通过偶自定义的函数和javascript脚本做实验。
+
+偶的源代码（pc平台的），希望能够对各位有用：
+
+	
+文件:	sdl_t5.tar.gz
+大小:	539KB
+下载:	下载
+
+总之，v8引擎在android平台上的发展空间还有很大（只是目前关注的人不多而已），偶会对其进行进一步的追踪和探索。
+
+http://blog.chinaunix.net/uid-8272118-id-2033359.html
