@@ -6,7 +6,7 @@
 namespace yon{
 namespace platform{
 
-	//平台回调接口，通过SEvent传递参数
+	//平台回调接口
 
 	enum ENUM_CALLBACK_TYPE{
 		ENUM_CALLBACK_TYPE_UI = 0,
@@ -15,6 +15,9 @@ namespace platform{
 
 	enum ENUM_CALLBACK_UI_TYPE{
 		ENUM_CALLBACK_UI_TYPE_CONFIRM = 0,
+		ENUM_CALLBACK_UI_TYPE_TOAST,
+		ENUM_CALLBACK_UI_TYPE_EDITBOX,
+		ENUM_CALLBACK_UI_TYPE_LOADING,
 		ENUM_CALLBACK_UI_TYPE_COUNT
 	};
 
