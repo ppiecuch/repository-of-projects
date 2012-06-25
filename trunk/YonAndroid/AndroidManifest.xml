@@ -12,7 +12,8 @@
         android:label="@string/app_name" >
         <activity
             android:name=".YonAndroidActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation = "landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

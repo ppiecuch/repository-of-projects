@@ -11,7 +11,7 @@ ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 
-
+bool show=false;
 class MyEventReceiver : public IEventReceiver{
 public:
 	virtual bool onEvent(const SEvent& evt){
@@ -38,11 +38,36 @@ public:
 				{
 					SCallback cb;
 					cb.type=platform::ENUM_CALLBACK_TYPE_UI;
+					//confirm
+					/*
 					cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_CONFIRM;
 					cb.ui.title="标题";
 					cb.ui.content="content";
 					cb.ui.positiveButton="ok";
 					cb.ui.negativeButton="cancel";
+					*/
+
+					//toast
+					//cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_TOAST;
+					//cb.ui.content="你好Helloworld";
+
+					//spinner
+					/*
+					if(show==false){
+						cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_LOADING;
+						cb.ui.content="请稍候wating";
+						cb.ui.visible=true;
+						show=true;
+					}else{
+						cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_LOADING;
+						cb.ui.visible=false;
+						show=false;
+					}
+					*/
+
+					//editbox
+					cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_EDITBOX;
+
 					engine->callback(cb);
 				}
 				return true;

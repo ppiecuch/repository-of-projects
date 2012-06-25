@@ -11,8 +11,8 @@ jobject g_obj=NULL;
 ICallback* callback=NULL;
 
 
-const static s32 MSG_WATING_SHOW=0;
-const static s32 MSG_WATING_HIDE=1;
+const static s32 MSG_SHOW_SPINNER=0;
+const static s32 MSG_HIDE_SPINNER=1;
 const static s32 MSG_SETUP_INPUT=2;
 const static s32 MSG_COMPLETE_INPUT=3;
 const static s32 MSG_TOAST=4;
@@ -28,7 +28,6 @@ const static s32 ACTION_POINTER_DOWN = 5;
 const static s32 ACTION_POINTER_UP = 6;
 const static s32 ACTION_POINTER_ID_MASK = 65280;
 const static s32 ACTION_POINTER_ID_SHIFT = 8;
-
 
 class MyCallback : public platform::ICallback{
 public:
@@ -70,6 +69,61 @@ public:
 						
 						g_env->DeleteLocalRef(args);
 						Logger->debug("callback ui confirm\r\n");
+						return true;
+					}
+				case ENUM_CALLBACK_UI_TYPE_TOAST:
+					{
+						jobjectArray args = 0;
+						u32 len=1;
+						args = g_env->NewObjectArray(len,g_env->FindClass("java/lang/String"),0);
+						jstring content=g_env->NewStringUTF(cb.ui.content);
+						g_env->SetObjectArrayElement(args, 0, content);
+
+						g_env->CallVoidMethod(g_obj, callback, MSG_TOAST, args);
+
+						g_env->DeleteLocalRef(args);
+						Logger->debug("callback ui toast\r\n");
+						return true;
+					}
+				case ENUM_CALLBACK_UI_TYPE_LOADING:
+					{
+						if(cb.ui.visible)
+						{
+							jobjectArray args = 0;
+							u32 len=1;
+							args = g_env->NewObjectArray(len,g_env->FindClass("java/lang/String"),0);
+							jstring content=g_env->NewStringUTF(cb.ui.content);
+							g_env->SetObjectArrayElement(args, 0, content);
+
+							g_env->CallVoidMethod(g_obj, callback, MSG_SHOW_SPINNER, args);
+
+							g_env->DeleteLocalRef(args);
+							Logger->debug("callback ui show spinner\r\n");
+							return true;
+						}
+						else
+						{
+							jobjectArray args = 0;
+							u32 len=0;
+							args = g_env->NewObjectArray(len,g_env->FindClass("java/lang/String"),0);
+
+							g_env->CallVoidMethod(g_obj, callback, MSG_HIDE_SPINNER, args);
+
+							g_env->DeleteLocalRef(args);
+							Logger->debug("callback ui hide spinner\r\n");
+							return true;
+						}
+					}
+				case ENUM_CALLBACK_UI_TYPE_EDITBOX:
+					{
+						jobjectArray args = 0;
+						u32 len=0;
+						args = g_env->NewObjectArray(len,g_env->FindClass("java/lang/String"),0);
+
+						g_env->CallVoidMethod(g_obj, callback, MSG_SETUP_INPUT, args);
+
+						g_env->DeleteLocalRef(args);
+						Logger->debug("callback ui setup input\r\n");
 						return true;
 					}
 				default:
@@ -160,7 +214,7 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 }
 jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iAction, jint id, jfloat x, jfloat y, jint count){
 	g_env=pEnv;
-	Logger->debug("jobject:%08X\r\n",obj);
+	//Logger->debug("jobject:%08X\r\n",obj);
 	if(id>=YON_TOUCH_MAX_INPUTS)
 	{
 		Logger->warn("exceed max touch input limit: %d>=%d, ignore it!\n",id,YON_TOUCH_MAX_INPUTS);
@@ -219,14 +273,17 @@ jboolean Java_yon_AndroidGLView_nativeOnMove(JNIEnv *pEnv, jobject obj, jint iAc
 jboolean Java_yon_AndroidGLView_nativeOnUI(JNIEnv *pEnv, jobject obj, jint msg, jobjectArray args){
 	switch(msg)
 	{
-	case MSG_SETUP_CONFIRM:
-		//ignore
-		break;
 	case MSG_POSITIVE_CONFIRM:
 		Logger->debug("MSG_POSITIVE_CONFIRM\r\n");
 		break;
 	case MSG_NEGATIVE_CONFIRM:
 		Logger->debug("MSG_NEGATIVE_CONFIRM\r\n");
+		break;
+	case MSG_COMPLETE_INPUT:
+		//int getArrayLen(JNIEnv * env, jobjectArray jarray): //获取一个Java数组长度，返回为jsize类型
+		jstring str = (jstring)pEnv->GetObjectArrayElement(args, 0);
+		const char *word = pEnv->GetStringUTFChars(str, 0); 
+		Logger->debug("MSG_COMPLETE_INPUT:%s\r\n",word);
 		break;
 	}
 	return true;

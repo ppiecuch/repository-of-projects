@@ -2,8 +2,8 @@ package yon.demo;
 
 public class Constant {
 
-	public static final int MSG_WATING_SHOW=0;
-	public static final int MSG_WATING_HIDE=1;
+	public static final int MSG_SHOW_SPINNER=0;
+	public static final int MSG_HIDE_SPINNER=1;
 	public static final int MSG_SETUP_INPUT=2;
 	public static final int MSG_COMPLETE_INPUT=3;
 	public static final int MSG_TOAST=4;
