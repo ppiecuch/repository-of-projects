@@ -23,6 +23,7 @@ namespace platform{
 
 	struct SCallbackUI{
 		ENUM_CALLBACK_UI_TYPE type;
+		bool visible;
 		c8* title;
 		c8* content;
 		c8* positiveButton;

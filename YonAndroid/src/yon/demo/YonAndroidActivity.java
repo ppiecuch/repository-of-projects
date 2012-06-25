@@ -4,12 +4,16 @@ import yon.AndroidGLView;
 import yon.SysApplication;
 import yon.util.Util;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class YonAndroidActivity extends Activity {
     
@@ -17,6 +21,8 @@ public class YonAndroidActivity extends Activity {
 	AndroidGLView view;
 	Handler handler;
 	ConfirmDialog confirmDialog;
+	ProgressDialog spinnerDialog;
+	SoftInputPanel inputPanel;
 	
     /** Called when the activity is first created. */
     @Override
@@ -25,6 +31,7 @@ public class YonAndroidActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);  
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);  
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,  WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        
         
         initHandler();
         
@@ -38,24 +45,38 @@ public class YonAndroidActivity extends Activity {
         
         if(Util.detectOpenGLES20(this)){
         	Log.i(TAG, "support opengles 2.0");
-        }
-        else{
+        }else{
         	Log.i(TAG, "unsupport opengles 2.0");
         }
+        
+        initSpinner();
+    	initConfirmDialog();
+    	initInputPanel();
         
        
     }
     
     public void initHandler(){
-    	initConfirmDialog();
     	this.handler=new YonHandler() {
 			
 			@Override
-			public void showWating() {
+			public void showWating(String text) {
+				spinnerDialog.setMessage(text);
+				spinnerDialog.show();
+			}
+			
+			@Override
+			public void hideWating() {
+				spinnerDialog.hide();
 			}
 			
 			@Override
 			public void showToast(String text) {
+				Toast toast=new Toast(YonAndroidActivity.this);
+		    	TextView tv=new TextView(YonAndroidActivity.this);
+		    	tv.setText(text);
+		    	toast.setView(tv);
+		    	toast.show();
 			}
 			
 			@Override
@@ -70,16 +91,15 @@ public class YonAndroidActivity extends Activity {
 			
 			@Override
 			public void setupInput() {
-			}
-			
-			@Override
-			public void hideWating() {
-			}
-			
-			@Override
-			public void completeInput(String text) {
+				inputPanel.setVisible(true);
 			}
 		};
+    }
+    
+    public void initSpinner(){
+    	spinnerDialog = new ProgressDialog(this);
+    	spinnerDialog.setIndeterminate(true);
+    	spinnerDialog.setCancelable(true);
     }
     
     public void initConfirmDialog(){
@@ -96,6 +116,20 @@ public class YonAndroidActivity extends Activity {
 				return view.nativeOnUI(Constant.MSG_NEGATIVE_CONFIRM, null);
 			}
 		};
+    }
+    
+    public void initInputPanel(){
+    	ViewGroup.LayoutParams  layoutParams = new ViewGroup.LayoutParams(400, 300);
+    	inputPanel=new SoftInputPanel(this) {
+			
+			@Override
+			public void completeInput(String text) {
+				String[] strs=new String[1];
+				strs[0]=text;
+				view.nativeOnUI(Constant.MSG_COMPLETE_INPUT, strs);
+			}
+		};
+		addContentView(inputPanel.getView(), layoutParams);
     }
     
     @Override
