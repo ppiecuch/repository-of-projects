@@ -114,7 +114,7 @@ namespace ogles1{
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty)
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
-		m_pDebugPrinter(NULL),
+		m_pDebugPrinter(NULL),m_uPrimitiveDrawn(0),
 #ifdef YON_COMPILE_WITH_WIN32
 		m_hDc(NULL),m_hWnd(param.hWnd),
 #endif
@@ -274,6 +274,8 @@ namespace ogles1{
 		m_clearSetting.clearBackBuffer=backBuffer;
 		m_clearSetting.clearZBuffer=zBuffer;
 		m_clearSetting.color=color;
+
+		m_uPrimitiveDrawn=0;
 	}
 	void COGLES1Driver::end()
 	{
@@ -281,7 +283,7 @@ namespace ogles1{
 		eglSwapBuffers(m_eglDisplay, m_eglSurface);
 #endif//YON_COMPILE_WITH_WIN32
 		//Logger->debug("realtime:%d\n",m_pTimer->getRealTime());
-		m_FPSCounter.registerFrame(m_pTimer->getRealTime(),0);
+		m_FPSCounter.registerFrame(m_pTimer->getRealTime(),m_uPrimitiveDrawn);
 
 		if(!m_FPSAssist.limit)
 			return;
@@ -512,6 +514,8 @@ namespace ogles1{
 			}
 			break;
 		}
+
+		m_uPrimitiveDrawn+=vertexCount/3;
 
 		
 		/*glEnableClientState(GL_VERTEX_ARRAY);

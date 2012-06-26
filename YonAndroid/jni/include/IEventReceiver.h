@@ -53,6 +53,7 @@ namespace yon{
 		enum ENUM_UI_INPUT_TYPE{
 			ENUM_UI_INPUT_TYPE_POSITIVE_CONFIRM = 0,
 			ENUM_UI_INPUT_TYPE_NEGATIVE_CONFIRM,
+			ENUM_UI_INPUT_TYPE_EDITTEXT,
 			ENUM_UI_INPUT_TYPE_COUNT
 		};
 
@@ -87,6 +88,7 @@ namespace yon{
 		};
 		struct SUIInput{
 			ENUM_UI_INPUT_TYPE type;
+			c8* str;
 		};
 
 		struct SEvent{

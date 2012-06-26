@@ -31,6 +31,18 @@ public class Util {
 		}
 		return buffer.toString();
 	}
+	
+	public static void terminateProcess()
+	{
+		android.os.Process.killProcess(android.os.Process.myPid());
+	}
+	
+//	public static boolean isMeizuPhone()
+//	{
+//	    if ((instance.mPhoneplatform.equalsIgnoreCase("MEIZU MX")) || (instance.mPhoneplatform.equalsIgnoreCase("M030")) || (instance.mPhoneplatform.equalsIgnoreCase("M8")) || (instance.mPhoneplatform.equalsIgnoreCase("M9")) || (instance.mPhoneplatform.equalsIgnoreCase("meizu_m9")) || (Build.PRODUCT.startsWith("meizu")) || (Build.PRODUCT.startsWith("MEIZU")));
+//	    for (int i = 1; ; i = 0)
+//	      return i;
+//	}
 
 	public static String getSdCardPath() {
 		return Environment.getExternalStorageDirectory().getAbsolutePath();

@@ -295,7 +295,7 @@ void drawFrame(){
 	// p_ParticleSystem->update(25);
 	// p_ParticleSystem->draw();
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 

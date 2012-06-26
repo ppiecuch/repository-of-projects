@@ -1479,6 +1479,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="script"
+				>
+				<Filter
+					Name="lua"
+					>
+				</Filter>
+				<Filter
+					Name="javascript"
+					>
+				</Filter>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\Android.mk"

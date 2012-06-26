@@ -2,16 +2,21 @@ package yon.demo;
 
 import yon.AndroidGLView;
 import yon.SysApplication;
+import yon.input.MyEditText;
+import yon.input.MyEditorActionListener;
 import yon.util.Util;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +29,10 @@ public class YonAndroidActivity extends Activity {
 	ProgressDialog spinnerDialog;
 	SoftInputPanel inputPanel;
 	
+	MyEditText editText;
+	MyEditorActionListener listener;
+	InputMethodManager imm;
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,10 +43,20 @@ public class YonAndroidActivity extends Activity {
         
         
         initHandler();
+       
         
         view=new AndroidGLView(this,handler);
         setContentView(view);
         SysApplication.getInstance().addActivity(this);
+        
+        editText=new MyEditText(this);
+        editText.setFocusableInTouchMode(true);
+        listener=new MyEditorActionListener(editText,handler);
+        editText.setOnEditorActionListener(listener);
+        imm=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        ViewGroup.LayoutParams  layoutParams = new ViewGroup.LayoutParams(-1,-1);
+        addContentView(editText, layoutParams);
+        editText.setVisibility(View.GONE);
         
         Log.i(TAG,Util.getExternalStoragePath());
         Log.i(TAG,Util.getFormatSize(Util.getAvailableStore(Util.getExternalStoragePath())));
@@ -91,7 +110,24 @@ public class YonAndroidActivity extends Activity {
 			
 			@Override
 			public void setupInput() {
-				inputPanel.setVisible(true);
+				//inputPanel.setVisible(true);
+				editText.setVisibility(View.VISIBLE);
+				editText.setFocusable(true);
+				editText.requestFocus();
+				editText.setText("");
+				imm.showSoftInput(editText, InputMethodManager.RESULT_UNCHANGED_SHOWN);
+				//Log.i("handler","setupInput");
+			}
+
+			@Override
+			public void completeInput(String text) {
+				editText.clearFocus();
+				editText.setVisibility(View.GONE);
+				imm.hideSoftInputFromInputMethod(editText.getWindowToken(), InputMethodManager.RESULT_HIDDEN);
+				String[] args=new String[1];
+				args[0]=text;
+				view.nativeOnUI(Constant.MSG_COMPLETE_INPUT,args);
+				//Log.i("handler",text);
 			}
 		};
     }
