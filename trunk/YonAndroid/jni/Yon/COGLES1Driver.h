@@ -101,6 +101,9 @@ namespace ogles1{
 		virtual u32 getFPS() const{
 			return m_FPSCounter.getFPS();
 		}
+		virtual u32 getPrimitiveCountDrawn(bool average) const{
+			return average?m_FPSCounter.getPrimitiveAverage():m_uPrimitiveDrawn;
+		}
 
 		
 	private:
@@ -140,6 +143,7 @@ namespace ogles1{
 
 		CFPSCounter m_FPSCounter;
 		FPSAssist m_FPSAssist;
+		u32 m_uPrimitiveDrawn;
 
 		video::SClearSetting m_clearSetting;
 		core::dimension2di m_windowSize;

@@ -283,7 +283,12 @@ jboolean Java_yon_AndroidGLView_nativeOnUI(JNIEnv *pEnv, jobject obj, jint msg, 
 		//int getArrayLen(JNIEnv * env, jobjectArray jarray): //获取一个Java数组长度，返回为jsize类型
 		jstring str = (jstring)pEnv->GetObjectArrayElement(args, 0);
 		const char *word = pEnv->GetStringUTFChars(str, 0); 
-		Logger->debug("MSG_COMPLETE_INPUT:%s\r\n",word);
+		//Logger->debug("MSG_COMPLETE_INPUT:%s\r\n",word);
+		SEvent evt;
+		evt.type=ENUM_EVENT_TYPE_UI;
+		evt.uiInput.type=ENUM_UI_INPUT_TYPE_EDITTEXT;
+		evt.uiInput.str=const_cast<c8*>(word);
+		getEngine()->postEventFromUser(evt);
 		break;
 	}
 	return true;

@@ -1,4 +1,4 @@
-package yon;
+package yon.deprecated;
 
 import android.util.Log;
 import android.view.View;

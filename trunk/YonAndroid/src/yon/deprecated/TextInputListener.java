@@ -1,4 +1,4 @@
-package yon;
+package yon.deprecated;
 
 /**
  * A listener class for receiving text input.

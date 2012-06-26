@@ -19,6 +19,9 @@ public abstract class YonHandler extends Handler {
 		case Constant.MSG_SETUP_INPUT:
 			setupInput();
 			break;
+		case Constant.MSG_COMPLETE_INPUT:
+			completeInput(msg.getData().getString(Constant.MSG_KEY_CONTENT));
+			break;
 		case Constant.MSG_TOAST:
 			showToast(msg.getData().getString(Constant.MSG_KEY_CONTENT));
 			break;
@@ -37,6 +40,7 @@ public abstract class YonHandler extends Handler {
 	public abstract void showWating(String text);
 	public abstract void hideWating();
 	public abstract void setupInput();
+	public abstract void completeInput(String text);
 	public abstract void showToast(String text);
 	public abstract void showConfirm(String title,String content,String ok,String cancel);
 

@@ -27,6 +27,7 @@ public:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return true;
 			}
+			break;
 		case event::ENUM_EVENT_TYPE_TOUCH:
 			switch(evt.mouseInput.type)
 			{
@@ -70,6 +71,14 @@ public:
 
 					engine->callback(cb);
 				}
+				return true;
+			}
+			break;
+		case ENUM_EVENT_TYPE_UI:
+			switch(evt.uiInput.type)
+			{
+			case ENUM_UI_INPUT_TYPE_EDITTEXT:
+				Logger->debug("edittext:%s\r\n",evt.uiInput.str);
 				return true;
 			}
 		}
@@ -118,7 +127,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }
