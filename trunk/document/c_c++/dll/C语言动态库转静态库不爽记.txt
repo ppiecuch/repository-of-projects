@@ -1,0 +1,23 @@
+最近做一个项目，其中用到封装的一个动态库（lib+dll），其头文件定义导出类型为 : #ifdef NetLink
+#define NETDIR __declspec(dllexport)
+#else
+#define NETDIR __declspec(dllimport)
+#endif
+NETDIR void LinkDir();此动态库编译、使用均没有任何问题。但是，某人突发奇想，能否将动态库转成静态库？
+于是，首先尝试在代码上不加任何修改，只在Visual Studio中将编译选项改成“静态库lib”方式，结果在引用的工程中编译失败，报 error LNK2019: 无法解析的外部符号错误。
+难道是由于之前建立工程时选择的是动态库方式，因此不行？于是尝试重建工程，选择静态库方式，并将代码整体移植。结果报错依旧。
+上网搜索一番，有些思路，再次尝试将头文件定义成如下形式： #ifdef NetLink
+#define NETDIR extern "C" __declspec(dllexport)
+#else
+#define NETDIR extern "C" __declspec(dllimport)
+#endif
+NETDIR void LinkDir();完成后，编译引用工程，错误信息有些变化，之前的很多乱码符号似的信息变成 error LNK2019: 无法解析的外部符号错误 “_imp_LinkDir()”。但还是无法通过编译。
+最终头文件改成
+#define NETDIR extern "C" 
+NETDIR void LinkDir();
+编译通过。
+总结出来：
+静态库方式定义导出函数只需在前面加上extern "C"即可！
+呵呵，小记一篇，高手直接忽略。
+
+http://www.2cto.com/kf/201107/96273.html

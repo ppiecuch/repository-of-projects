@@ -1,0 +1,65 @@
+1，原理
+      由于从光源发出的光线有无穷多条，使得直接从光源出发对光线进行跟踪变得非常困难。实际上，从光源发出的光线只有少数经由场景的反射和透射（折射）后到达观察者的眼中。为此标准光线跟踪算法采用逆向跟踪技术完成整个场景的绘制。
+ 
+      光线跟踪思路：从视点出发，通过图像平面上每个像素中心向场景发出一条光线，光线的起点为视点，方向为像素中心和视点连线单位向量。光线与离视点最近的场景物体表面交点有三种可能：
+当前交点所在的物体表面为理想漫射面，跟踪结束。
+当前交点所在的物体表面为理想镜面，光线沿其镜面发射方向继续跟踪。
+当前交点所在的物体表面为规则透射面，光线沿其规则透射方向继续跟踪。
+
+图-1 三个半透明玻璃球场景跟踪图
+      如图-1中，场景中有三个半透明玻璃球，视点发出光线与场景最近交点为P1，使用任意局部光照模型（opengl使用的是phong模型）可以计算出P1点处的局部光亮度Ilocal，为了计算周围环境在P1点处产生的镜面发射光和规则折射光，光线1在P1点处衍生出两支光线：反射光2和折射光3。P1处的光照由三部分组成：Ilocal + ks * I2 + kt * I3
+I3 为折射光线3的颜色，Kt为折射率
+I2 为反射光线2的颜色，Ks为反射率
+I3  和 I2 的计算需要递归。
+2，伪代码
+[cpp:showcolumns] view plaincopyprint?
+·········10········20········30········40········50········60········70········80········90········100·······110·······120·······130·······140·······150
+void TraceRay(const Vec3& start, const Vec3& direction, int depth, Color& color)  
+{  
+    Vec3 intersectionPoint, reflectedDirection, transmittedDirection;  
+    Color localColor, reflectedColor, transmittedColor;  
+    if (depth >= MAX_DEPTH) {  
+        color = Black;   //#000  
+    }  
+    else {  
+        Ray ray(start, direction);  //取start起点，方向direction为跟踪射线；  
+        if ( !scene->HasIntersection(ray) )  
+            color = BackgroundColor;  
+        else {  
+            计算理起始点start最近的交点intersectionPoint,   
+            记录相交物体intersectionObject,  
+              
+            // #1  
+            Shade(intersectionObject, intersectionPoint, localColor);  
+              
+            // #2  
+            if ( intersectionPoint所在面为镜面 ) {  
+                计算跟踪光想S在intersectionPoint处的反射光线方向reflectedDirection,  
+                TraceRay(intersectionPoint, reflectedDirection, depth+1, reflectedColor);  
+            }  
+            // #3  
+            if ( intersectionPoint所在的表面为透明面 ) {  
+                计算跟踪光线S在intersectionPoint处的规则透射光线方向transmittedDirection,  
+                TraceRay(intersectionPoint, transmittedDirection, depth+1, transmittedColor);  
+            }  
+            // #summarize  
+            color = localColor + Ks * reflectedColor + Kt * transmittedColor;  
+        }// else  
+    } //else  
+}  
+// 局部光照模型计算交点intersectionPoint处的局部光亮度localColor  
+void Shade(const Object& intersectionObj, const Vec3& intersectionPoint, Color& localColor)  
+{  
+    确定intersectionObj在intersectionPoint处的单位法向量N,  
+        漫反射系数Kd,  
+        镜面反射系数Ks,  
+        环境反射系数Ka;  
+    localColor = Ka * Ia;       //Ia为环境光亮度  
+    for ( 每一个点光源PointLight ) {  
+        计算入射光线单位向量L和虚拟镜面法向单位向量H,  
+        // 由Phong模型计算光源PointLight在intersectionPoint处的漫反射和镜面反射光亮度  
+        localColor += ( Ipointlight * ( Kd * (N.dot(L)) + Ks * (N.dot(H))^n ) );  
+    }  
+}  
+
+http://blog.csdn.net/dizuo/article/details/6252776
