@@ -9,6 +9,7 @@ import yon.util.Util;
 import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -307,6 +308,34 @@ public class AndroidGLView extends GLSurfaceView{
 		 */
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 			nativeOnSurfaceCreated(screenWidth,screenHeight,Util.getAPKFilePath(activity),Util.getSdCardPath());
+			
+			nativeInfo(Util.getExternalStoragePath());
+	        nativeInfo(Util.getFormatSize(Util.getAvailableStore(Util.getExternalStoragePath())));
+	        nativeInfo(Util.getLanguage());
+	        
+	        nativeInfo("MODEL:"+Build.MODEL);
+	        nativeInfo("CODENAME:"+Build.VERSION.CODENAME);
+	        nativeInfo("INCREMENTAL:"+Build.VERSION.INCREMENTAL);
+	        nativeInfo("SDK_INT:"+String.valueOf(Build.VERSION.SDK_INT));
+	        nativeInfo("SDK:"+Build.VERSION.SDK);
+	        nativeInfo("RELEASE:"+Build.VERSION.RELEASE);
+	        nativeInfo("PRODUCT:"+Build.PRODUCT);
+	        nativeInfo("RADIO:"+Build.RADIO);
+	        nativeInfo("CPU_ABI:"+Build.CPU_ABI);
+	        nativeInfo("CPU_ABI2:"+Build.CPU_ABI2);
+	        nativeInfo("BOARD:"+Build.BOARD);
+	        nativeInfo("BOOTLOADER:"+Build.BOOTLOADER);
+	        nativeInfo("BRAND:"+Build.BRAND);
+	        nativeInfo("DEVICE:"+Build.DEVICE);
+	        nativeInfo("DISPLAY:"+Build.DISPLAY);
+	        nativeInfo("FINGERPRINT:"+Build.FINGERPRINT);
+	        nativeInfo("HARDWARE:"+Build.HARDWARE);
+	        nativeInfo("HOST:"+Build.HOST);
+	        nativeInfo("ID:"+Build.ID);
+	        nativeInfo("MANUFACTURER:"+Build.MANUFACTURER);
+	        nativeInfo("TAGS:"+Build.TAGS);
+	        nativeInfo("TYPE:"+Build.TYPE);
+	        nativeInfo("USER:"+Build.USER);
 		}
 		
 	}
