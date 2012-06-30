@@ -8,6 +8,7 @@ import yon.util.Util;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -43,7 +44,6 @@ public class YonAndroidActivity extends Activity {
         
         
         initHandler();
-       
         
         view=new AndroidGLView(this,handler);
         setContentView(view);
@@ -58,9 +58,6 @@ public class YonAndroidActivity extends Activity {
         addContentView(editText, layoutParams);
         editText.setVisibility(View.GONE);
         
-        Log.i(TAG,Util.getExternalStoragePath());
-        Log.i(TAG,Util.getFormatSize(Util.getAvailableStore(Util.getExternalStoragePath())));
-        Log.i(TAG,Util.getLanguage());
         
         if(Util.detectOpenGLES20(this)){
         	Log.i(TAG, "support opengles 2.0");
@@ -72,7 +69,7 @@ public class YonAndroidActivity extends Activity {
     	initConfirmDialog();
     	initInputPanel();
         
-       
+    	
     }
     
     public void initHandler(){
