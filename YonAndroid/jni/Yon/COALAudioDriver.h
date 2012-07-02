@@ -12,7 +12,7 @@
 
 #ifdef YON_COMPILE_WITH_WIN32
 //#pragma comment(lib,"freealut.lib")
-#pragma comment(lib,"OpenAL32.lib")
+//#pragma comment(lib,"OpenAL32.lib")
 #endif
 
 namespace yon{
