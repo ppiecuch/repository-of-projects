@@ -16,8 +16,8 @@ namespace video{
 namespace ogles1{
 
 #ifdef YON_COMPILE_WITH_WIN32
-	/*
-	core::map<s32,core::stringc> EGL_NAME_FLAGS;
+	
+	/*core::map<s32,core::stringc> EGL_NAME_FLAGS;
 	//EGL_NAME_FLAGS[(s32)EGL_RED_SIZE]="EGL_RED_SIZE";
 	EGL_NAME_FLAGS.set(EGL_RED_SIZE,"EGL_RED_SIZE");
 	EGL_NAME_FLAGS[EGL_GREEN_SIZE]="EGL_GREEN_SIZE";
@@ -45,10 +45,10 @@ namespace ogles1{
 	EGL_RENDERABLE_FLAGS[EGL_OPENGL_ES_BIT]="EGL_OPENGL_ES_BIT";
 	EGL_RENDERABLE_FLAGS[EGL_OPENVG_BIT]="EGL_OPENVG_BIT";
 	EGL_RENDERABLE_FLAGS[EGL_OPENGL_ES2_BIT]="EGL_OPENGL_ES2_BIT";
-	EGL_RENDERABLE_FLAGS[EGL_OPENGL_BIT]="EGL_OPENGL_BIT";
-	*/
+	EGL_RENDERABLE_FLAGS[EGL_OPENGL_BIT]="EGL_OPENGL_BIT";*/
+	
 
-	/*
+	
 	void COGLES1Driver::printEGLConfig(EGLConfig& config)
 	{
 		EGLint value;
@@ -107,7 +107,7 @@ namespace ogles1{
 			i+=2;
 		}
 	}
-	*/
+	
 #endif
 
 	u32 COGLES1Driver::s_uInstanceCount=0;
@@ -1220,7 +1220,7 @@ namespace ogles1{
 			EGL_BUFFER_SIZE, 32,
 			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
 			EGL_DEPTH_SIZE, 24,
-			EGL_STENCIL_SIZE, false,
+			EGL_STENCIL_SIZE, 16,
 			EGL_SAMPLE_BUFFERS, 0,
 			EGL_SAMPLES, 0,
 #ifdef EGL_VERSION_1_3
@@ -1229,9 +1229,9 @@ namespace ogles1{
 			EGL_NONE, 0
 		};
 #endif
-		/*
-		reference:http://pastebin.com/3dirn3yT
-		EGLConfig* configs = NULL;
+		
+		//reference:http://pastebin.com/3dirn3yT
+		/*EGLConfig* configs = NULL;
 		if (eglGetConfigs(m_eglDisplay, 0, 0, &num_configs) != EGL_TRUE) {
 			Logger->error(YON_LOG_FAILED_FORMAT,"Unable to acquire EGL configurations");
 			return false;
@@ -1292,7 +1292,7 @@ namespace ogles1{
 			return false;
 		}*/
 
-		/*EGLConfig* configs = NULL;
+		EGLConfig* configs = NULL;
 		if (eglGetConfigs(m_eglDisplay, 0, 0, &num_configs) != EGL_TRUE) {
 			Logger->error(YON_LOG_FAILED_FORMAT,"Unable to acquire EGL configurations");
 			return false;
@@ -1312,7 +1312,7 @@ namespace ogles1{
 
 			delete[] configs;
 			configs=NULL;
-		}*/
+		}
 
 		//Third Step: Choose EGLConfig
 		//API: EGLBoolean eglChooseConfig(EGLDisplay dpy,const EGLint *attrib_list,
@@ -1322,14 +1322,14 @@ namespace ogles1{
 		//If more than one matching EGLConfig is found,then a list of EGLConfigs is returned.
 		//In most cases we just want the first config that meets all criteria, so we limit the
 		//number of configs returned to 1.
-		if (!eglChooseConfig(m_eglDisplay, attribs, &config, 1, &num_configs))
+		/*if (!eglChooseConfig(m_eglDisplay, attribs, &config, 1, &num_configs))
 		{
 			//MessageBox(NULL,TEXT("Could not get config for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
 			Logger->error(YON_LOG_FAILED_FORMAT,"Choose EGLConfig");
 			return false;
-		}
+		}*/
 		
-		/*
+		
 		Logger->debug("Try Config:\n");
 		printEGLAttribute(attribs);
 
@@ -1350,19 +1350,22 @@ namespace ogles1{
 					--steps;
 				}
 				break;
-			case 4: // alpha
-				if (attribs[7])
+			case 4: // stencil
+				if (attribs[15]==16)
 				{
-					attribs[7]=0;
-
+					attribs[15]=8;
+				}
+				else if(attribs[15]==8)
+				{
+					attribs[15]=0;
 				}
 				else
 					--steps;
 				break;
-			case 3: // stencil
-				if (attribs[15])
+			case 3: // alpha
+				if (attribs[7])
 				{
-					attribs[15]=0;
+					attribs[7]=0;
 
 				}
 				else
@@ -1392,7 +1395,7 @@ namespace ogles1{
 			Logger->debug("Try Config:\n");
 			printEGLAttribute(attribs);
 		}
-		*/
+		
 
 		//Fourth Step: Create EGLSurface
 		//EGLSurface eglCreateWindowSurface(EGLDisplay dpy,EGLConfig config,

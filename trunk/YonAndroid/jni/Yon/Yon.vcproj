@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;./zlib;./libogg;./libvorbis;./openal/include;./openal/include/AL;./openal/OpenAL32/Include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;YON_EXPORTS;MYGUI_USE_FREETYPE;MYGUI_BUILD;MyGUIEngine_EXPORTS"
+				AdditionalIncludeDirectories="../include;./zlib;./libogg;./libvorbis;./openal/include;./openal/include/AL;./openal/OpenAL32/Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;YON_EXPORTS;MYGUI_USE_FREETYPE;MYGUI_BUILD;MyGUIEngine_EXPORTS;AL_ALEXT_PROTOTYPES;AL_BUILD_LIBRARY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -1280,6 +1280,50 @@
 					<Filter
 						Name="OpenAL32"
 						>
+						<File
+							RelativePath=".\openal\OpenAL32\alAuxEffectSlot.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alBuffer.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alDatabuffer.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alEffect.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alError.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alExtension.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alFilter.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alListener.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alSource.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alState.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\OpenAL32\alThunk.c"
+							>
+						</File>
 						<Filter
 							Name="Include"
 							>
@@ -1336,6 +1380,62 @@
 								>
 							</File>
 						</Filter>
+					</Filter>
+					<Filter
+						Name="Alc"
+						>
+						<File
+							RelativePath=".\openal\Alc\ALc.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\alcConfig.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\alcEcho.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\alcModulator.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\alcReverb.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\alcRing.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\alcThread.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\ALu.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\bs2b.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\dsound.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\null.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\wave.c"
+							>
+						</File>
+						<File
+							RelativePath=".\openal\Alc\winmm.c"
+							>
+						</File>
 					</Filter>
 				</Filter>
 			</Filter>
@@ -1394,7 +1494,6 @@
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
-							ExcludedFromBuild="true"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -1410,7 +1509,6 @@
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
-							ExcludedFromBuild="true"
 							>
 							<Tool
 								Name="VCCLCompilerTool"

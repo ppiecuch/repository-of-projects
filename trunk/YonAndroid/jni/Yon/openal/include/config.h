@@ -4,7 +4,7 @@
 /* Define to the library version */
 #define ALSOFT_VERSION "1.12.854"
 
-#ifdef ANDROID_NDK
+#if defined(ANDROID_NDK)
 /* Define if we have the Android backend */
 #define HAVE_ANDROID 1
 
@@ -100,7 +100,10 @@
 #define HAVE_PTHREAD_SETSCHEDPARAM 1
 
 #elif defined(WIN32)
-
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#define snprintf _snprintf
+#define isnan _isnan
 /* Define if we have the ALSA backend */
 /* #undef HAVE_ALSA */
 
