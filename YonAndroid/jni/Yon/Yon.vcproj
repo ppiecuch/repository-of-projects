@@ -582,6 +582,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="terrain"
+					>
+					<File
+						RelativePath=".\CGeomipmapTerrain.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\ITerrain.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="video"
@@ -1283,46 +1295,134 @@
 						<File
 							RelativePath=".\openal\OpenAL32\alAuxEffectSlot.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alBuffer.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alDatabuffer.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alEffect.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alError.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alExtension.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alFilter.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alListener.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alSource.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alState.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\OpenAL32\alThunk.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<Filter
 							Name="Include"
@@ -1387,54 +1487,158 @@
 						<File
 							RelativePath=".\openal\Alc\ALc.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\alcConfig.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\alcEcho.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\alcModulator.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\alcReverb.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\alcRing.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\alcThread.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\ALu.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\bs2b.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\dsound.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\null.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\wave.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\openal\Alc\winmm.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								ExcludedFromBuild="true"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 					</Filter>
 				</Filter>
@@ -1494,6 +1698,7 @@
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
+							ExcludedFromBuild="true"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -1509,6 +1714,7 @@
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
+							ExcludedFromBuild="true"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
