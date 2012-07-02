@@ -13,17 +13,29 @@ namespace video{
 namespace ogles1{
 
 	class EGLInfo{
+	private:
+		EGLInfo(){}
+		EGLInfo(const EGLInfo& info){}
+		EGLInfo& operator = (const EGLInfo&){}
 	public:
-		static core::map<u16,core::stringc> EGL_NAME_FLAGS;
-		static core::map<u16,core::stringc> EGL_SURFACE_FLAGS;
-		static core::map<u16,core::stringc> EGL_RENDERABLE_FLAGS;
+		core::map<u16,core::stringc> EGL_NAME_FLAGS;
+		core::map<u16,core::stringc> EGL_SURFACE_FLAGS;
+		core::map<u16,core::stringc> EGL_RENDERABLE_FLAGS;
 
-		void static init();
+		static EGLInfo& getInstance(){
+			static EGLInfo info;
+			return info;
+		}
+
+		void init();
+		void destroy();
 	};
 
-	core::map<u16,core::stringc> EGLInfo::EGL_NAME_FLAGS;
-	core::map<u16,core::stringc> EGLInfo::EGL_SURFACE_FLAGS;
-	core::map<u16,core::stringc> EGLInfo::EGL_RENDERABLE_FLAGS;
+	void EGLInfo::destroy(){
+		EGL_NAME_FLAGS.clear();
+		EGL_SURFACE_FLAGS.clear();
+		EGL_RENDERABLE_FLAGS.clear();
+	}
 
 	
 	void EGLInfo::init(){

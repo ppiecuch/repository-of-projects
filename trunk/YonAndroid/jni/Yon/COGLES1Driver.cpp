@@ -52,7 +52,7 @@ namespace ogles1{
 	void COGLES1Driver::printEGLConfig(EGLConfig& config)
 	{
 		EGLint value;
-		core::map<u16,core::stringc>::Iterator it=EGLInfo::EGL_NAME_FLAGS.getIterator();
+		core::map<u16,core::stringc>::Iterator it=EGLInfo::getInstance().EGL_NAME_FLAGS.getIterator();
 		for (;!it.atEnd();++it)
 		{
 			eglGetConfigAttrib(m_eglDisplay, config, it->getKey(), &value);
@@ -61,7 +61,7 @@ namespace ogles1{
 		if(eglGetConfigAttrib(m_eglDisplay, config, EGL_SURFACE_TYPE, &value))
 		{
 			core::stringc result;
-			core::map<u16,core::stringc>::Iterator it=EGLInfo::EGL_SURFACE_FLAGS.getIterator();
+			core::map<u16,core::stringc>::Iterator it=EGLInfo::getInstance().EGL_SURFACE_FLAGS.getIterator();
 			for (;!it.atEnd();++it)
 			{
 				if(it->getKey()&value)
@@ -78,7 +78,7 @@ namespace ogles1{
 		if(eglGetConfigAttrib(m_eglDisplay, config, EGL_RENDERABLE_TYPE, &value))
 		{
 			core::stringc result;
-			core::map<u16,core::stringc>::Iterator it=EGLInfo::EGL_RENDERABLE_FLAGS.getIterator();
+			core::map<u16,core::stringc>::Iterator it=EGLInfo::getInstance().EGL_RENDERABLE_FLAGS.getIterator();
 			for (;!it.atEnd();++it)
 			{
 				if(it->getKey()&value)
@@ -99,11 +99,11 @@ namespace ogles1{
 		while(attribs[i]!=EGL_NONE)
 		{
 			if(attribs[i]==EGL_SURFACE_TYPE)
-				Logger->debug("EGL_SURFACE_TYPE:%s\n",((core::stringc)EGLInfo::EGL_SURFACE_FLAGS[attribs[i+1]]).c_str());
+				Logger->debug("EGL_SURFACE_TYPE:%s\n",((core::stringc)EGLInfo::getInstance().EGL_SURFACE_FLAGS[attribs[i+1]]).c_str());
 			else if(attribs[i]==EGL_RENDERABLE_TYPE)
-				Logger->debug("EGL_RENDERABLE_TYPE:%s\n",((core::stringc)EGLInfo::EGL_RENDERABLE_FLAGS[attribs[i+1]]).c_str());
+				Logger->debug("EGL_RENDERABLE_TYPE:%s\n",((core::stringc)EGLInfo::getInstance().EGL_RENDERABLE_FLAGS[attribs[i+1]]).c_str());
 			else
-				Logger->debug("%s:%d\n",((core::stringc)EGLInfo::EGL_NAME_FLAGS[attribs[i]]).c_str(),attribs[i+1]);
+				Logger->debug("%s:%d\n",((core::stringc)EGLInfo::getInstance().EGL_NAME_FLAGS[attribs[i]]).c_str(),attribs[i+1]);
 			i+=2;
 		}
 	}
@@ -131,7 +131,7 @@ namespace ogles1{
 		m_materialRenderers.push_back(createMaterialRendererMask(this));
 
 #ifdef YON_COMPILE_WITH_WIN32
-		EGLInfo::init();
+		EGLInfo::getInstance().init();
 		initEGL(m_hWnd);
 #endif//YON_COMPILE_WITH_WIN32
 
@@ -237,6 +237,8 @@ namespace ogles1{
 
 		//实例计数器减1-->不减,因为最后一个被释放时,也需要MakeCurrent
 		//--s_uInstanceCount;
+
+		EGLInfo::getInstance().destroy();
 
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
 	}
