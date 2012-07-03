@@ -23,7 +23,6 @@ public class MyEditorActionListener implements OnEditorActionListener {
 	/**
 	 * Called when an action is being performed.
 	 */
-	@Override
 	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		Log.i("EditText","onEditorAction:"+actionId+","+event);
 		if(actionId==EditorInfo.IME_ACTION_NEXT||actionId==EditorInfo.IME_NULL||actionId==EditorInfo.IME_ACTION_DONE)
