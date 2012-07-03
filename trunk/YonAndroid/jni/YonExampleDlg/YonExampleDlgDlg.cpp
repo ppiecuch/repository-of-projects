@@ -47,7 +47,7 @@ END_MESSAGE_MAP()
 
 
 CYonExampleDlgDlg::CYonExampleDlgDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CYonExampleDlgDlg::IDD, pParent)
+	: CDialog(CYonExampleDlgDlg::IDD, pParent),engine(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CYonExampleDlgDlg, CDialog)
 	ON_WM_DESTROY()
 	ON_WM_ERASEBKGND()
 	ON_WM_TIMER()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -301,4 +302,15 @@ BOOL CYonExampleDlgDlg::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: 在此添加专用代码和/或调用基类
 
 	return CDialog::PreCreateWindow(cs);
+}
+
+void CYonExampleDlgDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialog::OnSize(nType, cx, cy);
+
+	// TODO: 在此处添加消息处理程序代码
+	if(engine)
+	{
+		engine->onResize(cx,cy);
+	}
 }

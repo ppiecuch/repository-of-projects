@@ -167,6 +167,14 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\AndroidSound.mk"
+			>
+		</File>
+		<File
+			RelativePath="..\..\ApplicationSound.mk"
+			>
+		</File>
+		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>
@@ -177,6 +185,18 @@
 		<File
 			RelativePath=".\main.cpp"
 			>
+		</File>
+		<File
+			RelativePath=".\yon_AndroidGLView.cpp"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

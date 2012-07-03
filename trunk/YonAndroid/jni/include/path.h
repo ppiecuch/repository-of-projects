@@ -70,8 +70,6 @@ namespace io{
 		path m_path;
 		path m_internalName;
 	};
-
-	YON_API extern const io::path EMPTY_PATH;
 }
 }
 #endif

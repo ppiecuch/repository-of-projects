@@ -87,7 +87,7 @@ namespace io{
 		io::path result;
 		for(u32 i=0;i<m_workingDirectories.size();++i)
 		{
-			result=io::EMPTY_PATH;
+			result=io::path("");
 			result.append(m_workingDirectories[i]);
 			result.append(filename);
 			Logger->debug("test existFile:%s\r\n",result.c_str());
@@ -95,7 +95,7 @@ namespace io{
 				return result;
 		}
 		Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("Not found resource:%s in working directories!",filename.c_str()).c_str());
-		return io::EMPTY_PATH;
+		return io::path("");
 	}
 	void CFileSystem::addWorkingDirectory(const io::path& newDirectory){
 		//TODOÕýÔò
@@ -119,7 +119,7 @@ namespace io{
 		io::path tmp("/sdcard/%s",filename.c_str());
 		return tmp;
 #else
-		return io::EMPTY_PATH;
+		return io::path("");
 #endif
 	}
 	void CFileSystem::setWorkingDirectory(const io::path& newDirectory){

@@ -102,7 +102,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	Logger->debug("%.2f\n",rs->readFloat());
 	Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
-#elif 0
+#elif 1
 	IWriteStream* ws=fs->createAndOpenWriteFileStream("/tst/tst/tst/test.txt",true,ENUM_ENDIAN_MODE_BIG);
 	ws->writeBool(true);
 	ws->writeFloat(2.1f);
