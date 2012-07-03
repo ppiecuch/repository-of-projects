@@ -1173,7 +1173,7 @@ namespace ogles1{
 		if (!eglInitialize( m_eglDisplay, &majorVersion, &minorVersion ) )
 		{
 			//MessageBox(NULL,TEXT("Could not initialize OpenGL-ES1 display."),TEXT("Error"),MB_OK);
-			//Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("Initialize EglDisplay Object:%s",((core::stringc)EGLInfo::getInstance().EGL_ERROR_FLAGS[eglGetError()]).c_str()).c_str());
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("Initialize EglDisplay Object:%s",((core::stringc)EGLInfo::getInstance().EGL_ERROR_FLAGS[eglGetError()]).c_str()).c_str());
 			return false;
 		}
 		else
@@ -1329,7 +1329,7 @@ namespace ogles1{
 		{
 			//MessageBox(NULL,TEXT("Could not get config for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
 			
-			//Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("Choose EGLConfig:%s",((core::stringc)EGLInfo::getInstance().EGL_ERROR_FLAGS[eglGetError()]).c_str()).c_str());
+			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("Choose EGLConfig:%s",((core::stringc)EGLInfo::getInstance().EGL_ERROR_FLAGS[eglGetError()]).c_str()).c_str());
 			return false;
 		}
 		
