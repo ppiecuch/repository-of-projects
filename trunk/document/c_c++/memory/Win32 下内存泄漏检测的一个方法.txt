@@ -1,0 +1,206 @@
+要使用纯Win32下的C++写程序，碰到第二个问题(第一个问题先不说了：）)，如何得知没有内存泄漏呢？
+
+用MFC的话，很简单，有自带的。那Win32的程序呢？
+
+ 
+
+Google了很多，找不到比较爽的
+
+ 
+
+突然间的Idea：MFC不是开源的，何不把它那一套东西挖出来呢？
+
+ 
+
+呵呵，效果还是有的，请大家往下看。
+
+ 
+
+先写个很简单的程序：
+
+[cpp] view plaincopy
+#include "stdafx.h"  
+  
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    int* p = new int[10];  
+  
+    return 0;  
+}  
+
+ 
+
+很显然，结束程序后，不会有任何提示内存问题。
+
+ 
+
+再看下面的：
+
+[cpp] view plaincopy
+#include "stdafx.h"  
+#include <crtdbg.h>  
+  
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    int* p = new int[10];  
+  
+    _CrtSetDbgFlag( _CRTDBG_LEAK_CHECK_DF );  
+    return 0;  
+}  
+
+程序结束后，提示：
+
+Detected memory leaks!
+Dumping objects ->
+{117} normal block at 0x00397988, 40 bytes long.
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+Object dump complete.
+
+ 
+
+ 
+
+大家注意到了 _CrtSetDbgFlag(...) 这个函数了，对的，它的说明如下：
+
+Retrieves or modifies the state of the _crtDbgFlag flag to control the allocation behavior of the debug heap manager (debug version only).
+
+ 
+
+_CRTDBG_LEAK_CHECK_DF 说明如下：
+
+Perform automatic leak checking at program exit through a call to _CrtDumpMemoryLeaks and generate an error report if the application failed to free all the memory it allocated.
+
+
+
+ ：） 具体我就不解释了(因为已经很清楚了啊！)，这个函数是在跟踪MFC的代码后发现的。有兴趣的朋友也可以自己试下
+
+ 
+
+ 
+
+不过，还是不太完美！！！
+
+MFC中的提示可以显示内存泄漏是哪一行等更具体的信息的。现在我们的实现还没有！
+
+ 
+
+:)
+
+原因是：我们提供把具体的内存分配信息给 heap Manager
+
+ 
+
+ 
+
+请看下面的解决方法：
+
+重写new,delete操作符，顺便把分配时的信息提供给heap manager
+
+ 
+
+在 stdafx.h 中加入下面行
+
+[cpp] view plaincopy
+#define DEBUG_NEW new(__FILE__, __LINE__)  
+  
+void * __cdecl operator new[](size_t);  
+void* __cdecl operator new[](size_t nSize, LPCSTR lpszFileName, int nLine);  
+void __cdecl operator delete[](void* p, LPCSTR lpszFileName, int nLine);  
+void __cdecl operator delete[](void *);  
+  
+void * __cdecl operator new(size_t);  
+void* __cdecl operator new(size_t nSize, LPCSTR lpszFileName, int nLine);  
+void __cdecl operator delete(void* p, LPCSTR lpszFileName, int nLine);  
+void __cdecl operator delete(void *);  
+
+在stdafx.cpp 中加入：
+
+[cpp] view plaincopy
+#ifdef _DEBUG       // most of this file is for debugging  
+  
+/* Memory block identification */  
+#define _FREE_BLOCK      0  
+#define _NORMAL_BLOCK    1  
+#define _CRT_BLOCK       2  
+#define _IGNORE_BLOCK    3  
+#define _CLIENT_BLOCK    4  
+#define _MAX_BLOCKS      5  
+  
+void* __cdecl operator new(size_t nSize, int nType, LPCSTR lpszFileName, int nLine);  
+void* __cdecl operator new[](size_t nSize, int nType, LPCSTR lpszFileName, int nLine);  
+  
+  
+#ifndef _AFX_NO_DEBUG_CRT  
+  
+void* __cdecl operator new(size_t nSize, LPCSTR lpszFileName, int nLine)  
+{  
+    return ::operator new(nSize, _NORMAL_BLOCK, lpszFileName, nLine);  
+}  
+  
+void* __cdecl operator new[](size_t nSize, LPCSTR lpszFileName, int nLine)  
+{  
+    return ::operator new[](nSize, _NORMAL_BLOCK, lpszFileName, nLine);  
+}  
+  
+void __cdecl operator delete(void* pData, LPCSTR /* lpszFileName */,  
+                            int /* nLine */)  
+{  
+    ::operator delete(pData);  
+}  
+  
+void __cdecl operator delete[](void* pData, LPCSTR /* lpszFileName */,  
+    int /* nLine */)  
+{  
+    ::operator delete(pData);  
+}  
+  
+  
+void* __cdecl operator new[](size_t nSize, int nType, LPCSTR lpszFileName, int nLine)  
+{  
+    return ::operator new(nSize, nType, lpszFileName, nLine);  
+}  
+  
+#endif // _AFX_NO_DEBUG_CRT  
+#endif // _DEBUG  
+
+ 
+
+ 
+
+最后，我们的文件如下：
+
+[cpp] view plaincopy
+#include "stdafx.h"  
+#include <crtdbg.h>  
+  
+#ifdef _DEBUG  
+#define new DEBUG_NEW  
+#endif  
+  
+int _tmain(int argc, _TCHAR* argv[])  
+{  
+    int* p = new int[10];  
+  
+    _CrtSetDbgFlag( _CRTDBG_LEAK_CHECK_DF );  
+    return 0;  
+}  
+
+ 
+
+ 
+
+运行后，结果如下：
+
+Detected memory leaks!
+Dumping objects ->
+d:/anakin/temp/testmemleak/testmemleak/testmemleak.cpp(14) : {117} normal block at 0x00397988, 40 bytes long.
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+Object dump complete.
+
+ 
+
+ 
+
+:) enjoy!
+
+http://blog.csdn.net/ani/article/details/6118688
