@@ -33,7 +33,6 @@ public abstract class SoftInputPanel {
 
     	ok.setOnClickListener(new OnClickListener() {
     		
-    		@Override
     		public void onClick(View v) {
     			//nativeDoInput(inputText.getText().toString());
     			//closeInput();
@@ -44,7 +43,6 @@ public abstract class SoftInputPanel {
         
         btnCancel.setOnClickListener(new OnClickListener() {
     		
-    		@Override
     		public void onClick(View v) {
     			//closeInput();
     			setVisible(false);
