@@ -1,4 +1,5 @@
 #include "COALSound.h"
+#if defined(YON_AUDIO_MODE_OAL)
 
 namespace yon{
 namespace audio{
@@ -67,3 +68,4 @@ namespace oal{
 }
 }
 }
+#endif

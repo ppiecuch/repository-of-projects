@@ -116,6 +116,7 @@ namespace ogles1{
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
 		m_pDebugPrinter(NULL),m_uPrimitiveDrawn(0),
 #ifdef YON_COMPILE_WITH_WIN32
+		m_eglDisplay(EGL_NO_DISPLAY),
 		m_hDc(NULL),m_hWnd(param.hWnd),
 #endif
 		m_windowSize(core::dimension2di((s32)param.windowSize.w,(s32)param.windowSize.h)),IVideoDriver(fs,timer),COGLES1ExtensionHandler(){
@@ -233,12 +234,12 @@ namespace ogles1{
 
 #ifdef YON_COMPILE_WITH_WIN32
 		destroyEGL();
+		EGLInfo::getInstance().destroy();
 #endif//YON_COMPILE_WITH_WIN32
 
 		//实例计数器减1-->不减,因为最后一个被释放时,也需要MakeCurrent
 		//--s_uInstanceCount;
 
-		EGLInfo::getInstance().destroy();
 
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
 	}
@@ -1172,7 +1173,7 @@ namespace ogles1{
 		if (!eglInitialize( m_eglDisplay, &majorVersion, &minorVersion ) )
 		{
 			//MessageBox(NULL,TEXT("Could not initialize OpenGL-ES1 display."),TEXT("Error"),MB_OK);
-			Logger->error(YON_LOG_FAILED_FORMAT,"Initialize EglDisplay Object");
+			//Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("Initialize EglDisplay Object:%s",((core::stringc)EGLInfo::getInstance().EGL_ERROR_FLAGS[eglGetError()]).c_str()).c_str());
 			return false;
 		}
 		else
@@ -1215,16 +1216,16 @@ namespace ogles1{
 #else
 		EGLint attribs[] =
 		{
-			EGL_RED_SIZE, 8,
-			EGL_GREEN_SIZE, 8,
-			EGL_BLUE_SIZE, 8,
-			EGL_ALPHA_SIZE, 8,
 			EGL_BUFFER_SIZE, 32,
-			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-			EGL_DEPTH_SIZE, 24,
-			EGL_STENCIL_SIZE, 16,
-			EGL_SAMPLE_BUFFERS, 0,
+			EGL_ALPHA_SIZE, 8,
+			EGL_BLUE_SIZE, 8,
+			EGL_GREEN_SIZE, 8,
+			EGL_RED_SIZE, 8,
+			EGL_DEPTH_SIZE, 16,
+			EGL_STENCIL_SIZE, 0,
 			EGL_SAMPLES, 0,
+			EGL_SAMPLE_BUFFERS, 0,
+			EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
 #ifdef EGL_VERSION_1_3
 			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
 #endif
@@ -1324,15 +1325,16 @@ namespace ogles1{
 		//If more than one matching EGLConfig is found,then a list of EGLConfigs is returned.
 		//In most cases we just want the first config that meets all criteria, so we limit the
 		//number of configs returned to 1.
-		/*if (!eglChooseConfig(m_eglDisplay, attribs, &config, 1, &num_configs))
+		if (!eglChooseConfig(m_eglDisplay, attribs, &config, 1, &num_configs))
 		{
 			//MessageBox(NULL,TEXT("Could not get config for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
-			Logger->error(YON_LOG_FAILED_FORMAT,"Choose EGLConfig");
+			
+			//Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("Choose EGLConfig:%s",((core::stringc)EGLInfo::getInstance().EGL_ERROR_FLAGS[eglGetError()]).c_str()).c_str());
 			return false;
-		}*/
+		}
 		
 		
-		Logger->debug("Try Config:\n");
+		/*Logger->debug("Try Config:\n");
 		printEGLAttribute(attribs);
 
 		int steps=5;
@@ -1396,7 +1398,7 @@ namespace ogles1{
 
 			Logger->debug("Try Config:\n");
 			printEGLAttribute(attribs);
-		}
+		}*/
 		
 
 		//Fourth Step: Create EGLSurface

@@ -32,10 +32,6 @@ namespace yon{
 		ILogger* Logger=NULL;
 	}
 
-	namespace io{
-		const path EMPTY_PATH;
-	}
-
 	namespace video{
 		const SColor COLOR_BLACK(0xFF000000);
 		const SColor COLOR_WHITE(0xFFFFFFFF);

@@ -1,8 +1,16 @@
 #include "COALAudioDriver.h"
+
+#if defined(YON_AUDIO_MODE_OAL)
+
 #include "CWaveLoaderWAV.h"
 #include "CWaveLoaderOGG.h"
 #include "COALSound.h"
 #include "yonUtil.h"
+
+#ifdef YON_COMPILE_WITH_WIN32
+#include "alMain.h"
+#include "alThunk.h"
+#endif
 
 #include "ILogger.h"
 
@@ -37,6 +45,11 @@ namespace oal{
 		alcMakeContextCurrent(NULL);
 		alcDestroyContext(m_pContext);
 		alcCloseDevice(m_pDevice);
+#ifdef YON_COMPILE_WITH_WIN32
+		ReleaseALC();
+		FreeALConfig();
+		ALTHUNK_EXIT();
+#endif
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COALAudioDriver");
 	}
 
@@ -161,3 +174,4 @@ namespace oal{
 	}
 }
 }
+#endif

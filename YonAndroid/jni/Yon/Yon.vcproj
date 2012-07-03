@@ -1263,6 +1263,13 @@
 						<File
 							RelativePath=".\openal\include\config.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<Filter
 							Name="AL"
@@ -1270,22 +1277,57 @@
 							<File
 								RelativePath=".\openal\include\AL\al.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\include\AL\alc.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\include\AL\alext.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\include\AL\efx-creative.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\include\AL\efx.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 						</Filter>
 					</Filter>
@@ -1297,7 +1339,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1309,7 +1350,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1321,7 +1361,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1333,7 +1372,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1345,7 +1383,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1357,7 +1394,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1369,7 +1405,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1381,7 +1416,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1393,7 +1427,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1405,7 +1438,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1417,7 +1449,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1430,54 +1461,145 @@
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alAuxEffectSlot.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alBuffer.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alDatabuffer.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alEffect.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alError.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alFilter.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alListener.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alMain.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alSource.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alState.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alThunk.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\alu.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 							<File
 								RelativePath=".\openal\OpenAL32\Include\bs2b.h"
 								>
+								<FileConfiguration
+									Name="Debug|Win32"
+									>
+									<Tool
+										Name="VCCustomBuildTool"
+									/>
+								</FileConfiguration>
 							</File>
 						</Filter>
 					</Filter>
@@ -1489,7 +1611,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1501,7 +1622,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1513,7 +1633,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1525,7 +1644,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1537,7 +1655,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1549,7 +1666,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1561,7 +1677,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1573,7 +1688,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1585,7 +1699,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1597,7 +1710,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1609,7 +1721,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1621,7 +1732,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1633,7 +1743,6 @@
 							>
 							<FileConfiguration
 								Name="Debug|Win32"
-								ExcludedFromBuild="true"
 								>
 								<Tool
 									Name="VCCLCompilerTool"
@@ -1696,14 +1805,6 @@
 					<File
 						RelativePath=".\COALAudioDriver.cpp"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\COALAudioDriver.h"
@@ -1712,14 +1813,6 @@
 					<File
 						RelativePath=".\COALSound.cpp"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\COALSound.h"

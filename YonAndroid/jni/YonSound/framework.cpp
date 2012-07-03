@@ -46,10 +46,11 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
+	params.pCallback=pcb;
 	params.fpsLimit=0;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);

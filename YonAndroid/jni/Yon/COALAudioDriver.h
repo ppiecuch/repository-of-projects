@@ -1,6 +1,9 @@
 #ifndef _YON_AUDIO_OAL_COALAUDIODRIVER_H_
 #define _YON_AUDIO_OAL_COALAUDIODRIVER_H_
 
+#include "yonConfig.h"
+#if defined(YON_AUDIO_MODE_OAL)
+
 #include "IAudioDriver.h"
 #include "yonArray.h"
 #include "IWaveLoader.h"
@@ -45,4 +48,5 @@ namespace oal{
 }
 }
 }
+#endif
 #endif

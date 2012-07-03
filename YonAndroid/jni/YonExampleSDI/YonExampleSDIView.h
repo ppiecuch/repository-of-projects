@@ -3,7 +3,7 @@
 
 
 #pragma once
-
+#include "stdafx.h"
 #include "yon.h"
 using namespace yon;
 using namespace yon::core;
@@ -16,6 +16,9 @@ using namespace yon::scene::animator;
 
 #pragma comment(lib, "yon.lib")
 
+#ifdef _DEBUG  
+#define new DEBUG_NEW  
+#endif  
 
 class CYonExampleSDIView : public CFormView
 {
@@ -66,7 +69,7 @@ public:
 	IModel* cubeModel;
 	IModel* planeModel;
 	IModel* toruseModel;
-	//IModel* sphereModel;
+
 
 	IYonEngine* engine;
 
