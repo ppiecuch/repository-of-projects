@@ -23,9 +23,9 @@ namespace ogles1{
 		bool limit;
 		s32 timeCounter;
 		s32 frameCounter;
-		u32 timeUnit;
-		u32 frameUnit;
-		u32 refreshedTime;
+		s32 timeUnit;
+		s32 frameUnit;
+		s32 refreshedTime;
 	};
 	
 	class COGLES1Driver:public IVideoDriver,COGLES1ExtensionHandler{
@@ -55,8 +55,8 @@ namespace ogles1{
 		}
 		virtual void convertPosCoordinate(const core::position2di& src,core::position2di& dest){
 			const core::dimension2di& size=getCurrentRenderTargetSize();
-			dest.x=src.x-size.w*0.5f;
-			dest.y=size.h*0.5f-src.y;
+			dest.x=src.x-(s32)(size.w*0.5f);
+			dest.y=(s32)(size.h*0.5f)-src.y;
 		}
 		virtual void convertPosCoordinate(const core::position2df& src,core::position2df& dest){
 			const core::dimension2di& size=getCurrentRenderTargetSize();
@@ -65,8 +65,8 @@ namespace ogles1{
 		}
 		virtual void convertPosCoordinate(s32 srcX,s32 srcY,s32& destX,s32& destY){
 			const core::dimension2di& size=getCurrentRenderTargetSize();
-			destX=srcX-(f32)size.w*0.5f;
-			destY=(f32)size.h*0.5f-srcY;
+			destX=srcX-(s32)(size.w*0.5f);
+			destY=(s32)(size.h*0.5f)-srcY;
 		}
 
 		virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name, video::ENUM_COLOR_FORMAT format);

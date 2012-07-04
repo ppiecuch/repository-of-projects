@@ -50,7 +50,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	params.windowSize.w=400;
 	params.windowSize.h=400;
 	params.pJNIEnv=pJNIEnv;
-	params.fpsLimit=10;
+	params.fpsLimit=0;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -100,7 +100,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	cubeModel->setPosition(core::vector3df(100,100,0));
 	//material->setTexture(0,videoDriver->getTexture("png8/120.png"));
 	//material->setTexture(0,videoDriver->getTexture("error.png"));
-	material->setTexture(0,videoDriver->getTexture("aura_rgba.png"));
+	material->setTexture(0,videoDriver->getTexture("test.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();

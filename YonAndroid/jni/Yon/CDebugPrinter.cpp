@@ -15,6 +15,13 @@ namespace debug{
 			//u32 charSize=m_fontSize.w;
 			//u32 charCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 			//u32 rowCount=m_pTexture->getSize().h/m_fontSize.h;
+
+			m_view.makeIdentity();
+			m_view.lookAt(0,0,300,0,0,0,0,1,0);
+
+			m_projection.makeIdentity();
+			m_projection.ortho(-1,1,-1,1,1,3000);
+
 			m_uRowCount=m_pTexture->getSize().h/m_fontSize.h;
 			m_uCharCountPerRow=m_pTexture->getSize().w/m_fontSize.w;
 
@@ -48,6 +55,8 @@ namespace debug{
 			m_pUnit->getMaterial()->setTexture(0,m_pTexture);
 			m_pUnit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_LIGHTEN);
 			m_pUnit->getMaterial()->setFilterMode(0,video::ENUM_FILTER_MODE_NEAREST);
+
+			m_pDriver->registerResizable(this);
 	}
 
 	CDebugPrinter::~CDebugPrinter(){
@@ -64,6 +73,17 @@ namespace debug{
 		delete m_texcoords;
 		m_texcoords=NULL;
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release CDebugPrinter");
+	}
+
+	void CDebugPrinter::onResize(const core::dimension2du& size){
+		f32 right=(f32)(size.w>>1);
+		f32 left=right-size.w;
+		f32 top=(f32)(size.h>>1);
+		f32 bottom=top-size.h;
+		m_projection.makeIdentity();
+		m_projection.ortho(left,right,bottom,top,1,3000);
+
+		Logger->debug("CDebugPrinter::onResize:%d,%d\r\n",size.w,size.h);
 	}
 
 	void CDebugPrinter::drawString(const core::stringc& str,const core::position2di& pos,const video::SColor& color){
@@ -139,12 +159,22 @@ namespace debug{
 // 		unit->getMaterial()->setTexture(0,m_pTexture);
 // 		unit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_LIGHTEN);
 // 		shap->drop();
+		m_oldProjection=m_pDriver->getTransform(video::ENUM_TRANSFORM_PROJECTION);
+		m_oldView=m_pDriver->getTransform(video::ENUM_TRANSFORM_VIEW);
+		m_oldWorld=m_pDriver->getTransform(video::ENUM_TRANSFORM_WORLD);
+
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_projection);
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_VIEW,m_view);
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
 // 		m_pDriver->setMaterial(unit->getMaterial());
 // 		m_pDriver->drawUnit(unit);
 // 		unit->drop();
 		m_pDriver->setMaterial(m_pUnit->getMaterial());
 		m_pDriver->drawUnit(m_pUnit);
+
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_oldProjection);
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_VIEW,m_oldView);
+		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,m_oldWorld);
 	}
 
 	IDebugPrinter* createDebugPrinter(video::IVideoDriver* driver,video::ITexture* texture,scene::IGeometryFactory* geometryFty){

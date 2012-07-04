@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Layout" version="3.2.0">
+    <Widget type="TextBox" skin="TextBox" position_real="0.015625 0.222222 0.96875 0.0972222" layer="Main">
+        <Property key="Caption" value="登录"/>
+        <Property key="TextColour" value="0 0 1"/>
+        <Property key="TextAlign" value="Center"/>
+    </Widget>
+    <Widget type="TextBox" skin="TextBox" position_real="0.265625 0.388889 0.09375 0.0555556" layer="Main">
+        <Property key="TextColour" value="0 0 1"/>
+        <Property key="Caption" value="账号："/>
+    </Widget>
+    <Widget type="TextBox" skin="TextBox" position_real="0.265625 0.5 0.09375 0.0555556" layer="Main">
+        <Property key="Caption" value="密码："/>
+        <Property key="TextColour" value="0 0 1"/>
+    </Widget>
+    <Widget type="EditBox" skin="EditBox" position_real="0.390625 0.388889 0.265625 0.0833333" layer="Main"/>
+    <Widget type="EditBox" skin="EditBox" position_real="0.390625 0.5 0.265625 0.0833333" layer="Main"/>
+    <Widget type="Button" skin="Button" position_real="0.3125 0.694444 0.109375 0.0833333" layer="Main" name="btnLogin">
+        <Property key="Caption" value="登录"/>
+        <Property key="TextColour" value="0 0 0"/>
+        <Property key="OnReleased" value="OnBtnReleased"/>
+    </Widget>
+    <Widget type="Button" skin="Button" position_real="0.53125 0.694444 0.109375 0.0833333" layer="Main" name="btnCancel">
+        <Property key="Caption" value="取消"/>
+        <Property key="TextColour" value="0 0 0"/>
+        <Property key="OnPressed" value="OnPressCancelBtn"/>
+        <Property key="OnReleased" value="OnBtnReleased"/>
+    </Widget>
+</MyGUI>

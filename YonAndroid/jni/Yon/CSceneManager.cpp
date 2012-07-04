@@ -3,6 +3,7 @@
 #include "CModel.h"
 #include "COrthoCamera.h"
 #include "CPerspCamera.h"
+#include "CWindowOrthoCamera.h"
 
 #include "ILogger.h"
 
@@ -45,10 +46,17 @@ namespace scene{
 		const core::vector3df& pos,const core::vector3df& up,
 		const core::vector3df& lookat,bool makeActive){
 			camera::ICamera* camera=NULL;
-			if(cameraType==camera::ENUM_CAMERA_TYPE_ORTHO)
+			switch(cameraType)
+			{
+			case camera::ENUM_CAMERA_TYPE_ORTHO:
 				camera=new camera::COrthoCamera(pos,up,lookat);
-			else
+				break;
+			case camera::ENUM_CAMERA_TYPE_ORTHO_WINDOW:
+				camera=new camera::CWindowOrthoCamera(pos,up,lookat);
+				break;
+			default:
 				camera=new camera::CPerspCamera(pos,up,lookat);
+			}
 			m_cameras.push_back(camera);
 			if(makeActive){
 				setActiveCamera(camera);

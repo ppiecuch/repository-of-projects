@@ -417,8 +417,8 @@ namespace scene{
 			4,  6,  7,
 			8,  9,  10,
 			8,  10, 11, 
-			12, 15, 14,
-			12, 14, 13, 
+			12, 13, 14,
+			12, 14, 15, 
 			16, 17, 18,
 			16, 18, 19, 
 			20, 23, 22,
@@ -460,10 +460,11 @@ namespace scene{
 		shap->m_vertices.push_back(SVertex(phw,phh,mhd,u0,v1,color));
 		shap->m_vertices.push_back(SVertex(phw,mhh,mhd,u0,v0,color));
 
-		shap->m_vertices.push_back(SVertex(mhw,mhh,phd,u0,v1,color));
-		shap->m_vertices.push_back(SVertex(mhw,phh,phd,u0,v0,color));
-		shap->m_vertices.push_back(SVertex(phw,phh,phd,u1,v0,color));
-		shap->m_vertices.push_back(SVertex(phw,mhh,phd,u1,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,mhh,phd,u0,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,mhh,phd,u1,v0,color));
+		shap->m_vertices.push_back(SVertex(phw,phh,phd,u1,v1,color));
+		shap->m_vertices.push_back(SVertex(mhw,phh,phd,u0,v1,color));
+		
 
 		//×ó
 		shap->m_vertices.push_back(SVertex(mhw,mhh,mhd,u0,v0,color));
