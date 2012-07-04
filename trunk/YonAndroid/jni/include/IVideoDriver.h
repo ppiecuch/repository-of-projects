@@ -13,6 +13,8 @@
 #include "SColor.h"
 #include "ITimer.h"
 #include "SVertex.h"
+#include "yonArray.h"
+#include "IResizable.h"
 
 namespace yon{
 
@@ -94,6 +96,7 @@ namespace yon{
 			ENUM_RENDER_MODE m_renderMode;
 			io::IFileSystem* m_pFileSystem;
 			ITimer* m_pTimer;
+			core::array<core::IResizable*> m_resizables;
 			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name,bool mipmap) = 0;
 		public:
 			IVideoDriver(io::IFileSystem* fs,ITimer* timer)
@@ -108,9 +111,14 @@ namespace yon{
 					m_pFileSystem->drop();
 				if(m_pTimer)
 					m_pTimer->drop();
+				m_resizables.clear();
 			};
 			io::IFileSystem* getFileSystem() const{
 				return m_pFileSystem;
+			}
+
+			void registerResizable(core::IResizable* p){
+				m_resizables.push_back(p);
 			}
 
 			virtual const SClearSetting& getClearSetting() const = 0;
@@ -118,7 +126,10 @@ namespace yon{
 			virtual void end() = 0;
 			virtual void setViewPort(const core::recti& r) = 0;
 			virtual const core::dimension2di& getCurrentRenderTargetSize() const = 0;
-			virtual void onResize(const core::dimension2du& size) = 0;
+			virtual void onResize(const core::dimension2du& size){
+				for(u32 i=0;i<m_resizables.size();++i)
+					m_resizables[i]->onResize(size);
+			}
 
 
 			//是否支持feature特性

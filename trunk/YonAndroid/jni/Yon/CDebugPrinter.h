@@ -9,6 +9,8 @@
 #include "SColor.h"
 #include "SVertex.h"
 #include "IUnit.h"
+#include "matrix4.h"
+#include "IResizable.h"
 
 namespace yon{
 namespace debug{
@@ -44,7 +46,7 @@ namespace debug{
 
 	typedef core::CObjectPool<Shap2DRecyclable> Shap2DPool;
 		
-	class CDebugPrinter : public IDebugPrinter{
+	class CDebugPrinter : public IDebugPrinter,public core::IResizable{
 	private:
 		video::IVideoDriver* m_pDriver;
 		video::ITexture* m_pTexture;
@@ -57,6 +59,12 @@ namespace debug{
 		scene::IShap* m_pShap;
 		scene::IUnit* m_pUnit;
 
+		core::matrix4f m_projection;
+		core::matrix4f m_view;
+		core::matrix4f m_oldProjection;
+		core::matrix4f m_oldWorld;
+		core::matrix4f m_oldView;
+
 		u32 m_uRowCount;
 		u32 m_uCharCountPerRow;
 	public:
@@ -66,6 +74,7 @@ namespace debug{
 		virtual video::ITexture* getTexture() const{
 			return m_pTexture;
 		};
+		virtual void onResize(const core::dimension2du& size);
 		virtual void setTexture(video::ITexture* texture){
 			m_pTexture=texture;
 

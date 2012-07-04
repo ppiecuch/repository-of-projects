@@ -323,6 +323,8 @@ namespace ogles1{
 		m_windowSize.w=(s32)size.w;
 		m_windowSize.h=(s32)size.h;
 		setViewPort(core::recti(0,0,size.w,size.h));
+
+		IVideoDriver::onResize(size);
 	}
 	void COGLES1Driver::drawUnit(scene::IUnit* unit){
 		/*if(unit->getDimenMode()==ENUM_DIMEN_MODE_3D)
@@ -1307,7 +1309,7 @@ namespace ogles1{
 			configs = new EGLConfig[num_configs];
 			eglGetConfigs(m_eglDisplay, configs, num_configs, &num_configs);
 
-			for(u32 i=0;i<num_configs;++i)
+			for(s32 i=0;i<num_configs;++i)
 			{
 				Logger->debug("Support Config:\n");
 				printEGLConfig(configs[i]);

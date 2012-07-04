@@ -417,9 +417,44 @@ namespace yon{
 				ort.m[2][2] = (T)-2.0f / deltaZ;
 				ort.m[2][0] = ort.m[2][1] = ort.m[2][3] = (T)0.0f;
 				ort.m[3][0] = (T)-(right + left) / deltaX;
-				//ort.m[3][0] = (T)-2.0f*right / deltaX;
 				ort.m[3][1] = (T)-(top + bottom) / deltaY;
-				//ort.m[3][1] = (T)-2.0f*top / deltaY;
+				ort.m[3][2] = (T)-(nearZ + farZ) / deltaZ;
+				ort.m[3][3] = (T)1.0f;
+
+				*this*=ort;
+
+				m_bIsChanged=true;
+			}
+			//orthogonal projection in 4th quadrant
+			inline void ortho4q(f32 left, f32 right, float bottom, float top, float nearZ, float farZ)
+			{
+				f32 deltaX = right - left;
+				f32 deltaY = top - bottom;
+				f32 deltaZ = farZ - nearZ;
+				matrix4  ort;
+
+				if ( (nearZ <= 0.0f) || (farZ <= 0.0f) ||
+					(deltaX <= 0.0f) || (deltaY <= 0.0f) || (deltaZ <= 0.0f) )
+					return;
+
+				/*ort.m[0][0] = (T)2.0f / deltaX;
+				ort.m[0][1] = ort.m[0][2] = ort.m[0][3] = (T)0.0f;
+				ort.m[1][1] = (T)2.0f / deltaY;
+				ort.m[1][0] = ort.m[1][2] = ort.m[1][3] = (T)0.0f;
+				ort.m[2][2] = (T)-2.0f / deltaZ;
+				ort.m[2][0] = ort.m[2][1] = ort.m[2][3] = (T)0.0f;
+				ort.m[3][0] = (T)-(right+right) / deltaX;
+				ort.m[3][1] = (T)-(top+top) / deltaY;
+				ort.m[3][2] = (T)-(nearZ + farZ) / deltaZ;
+				ort.m[3][3] = (T)1.0f;*/
+				ort.m[0][0] = (T)2.0f / deltaX;
+				ort.m[0][1] = ort.m[0][2] = ort.m[0][3] = (T)0.0f;
+				ort.m[1][1] = (T)-2.0f / deltaY;
+				ort.m[1][0] = ort.m[1][2] = ort.m[1][3] = (T)0.0f;
+				ort.m[2][2] = (T)-2.0f / deltaZ;
+				ort.m[2][0] = ort.m[2][1] = ort.m[2][3] = (T)0.0f;
+				ort.m[3][0] = (T)-(right + left) / deltaX;
+				ort.m[3][1] = (T)(top + bottom) / deltaY;
 				ort.m[3][2] = (T)-(nearZ + farZ) / deltaZ;
 				ort.m[3][3] = (T)1.0f;
 

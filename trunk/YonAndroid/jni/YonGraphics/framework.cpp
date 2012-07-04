@@ -35,10 +35,10 @@ public:
 			switch(evt.mouseInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
-				logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
-				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			}
 		}
