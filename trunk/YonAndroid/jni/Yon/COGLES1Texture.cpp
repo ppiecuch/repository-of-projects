@@ -1,6 +1,9 @@
 #include "COGLES1Texture.h"
 #include "COGLES1Driver.h"
 
+#include "CImage.h"
+#include "CColorConverter.h"
+
 #include "ILogger.h"
 
 namespace yon{
@@ -16,6 +19,39 @@ namespace ogles1{
 		m_textureId(0),m_bIsRenderTarget(false),m_bHasMipMap(mipmap){
 			glGenTextures(1, &m_textureId);
 			m_pImage->grab();
+
+			//ÁÙÊ±
+			/*if(image->getColorFormat()==ENUM_COLOR_FORMAT_R8G8B8A8)
+			{
+				void* data=image->lock();
+				u32 temp;
+				memcpy(&temp,data,4);
+				image->unlock();
+
+				m_pImage=new CImage(ENUM_COLOR_FORMAT_R5G5B5A1,image->getDimension());
+				CColorConverter::convert_A8B8G8R8toR5G5B5A1(image->lock(),image->getImageDataSizeInPixels(),m_pImage->lock());
+				data=m_pImage->lock();
+				u16 temp1;
+				memcpy(&temp1,data,2);
+
+				image->unlock();
+				m_pImage->unlock();
+				Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("convert%08X->%04X",temp,temp1).c_str());
+			}
+			else if(image->getColorFormat()==ENUM_COLOR_FORMAT_R8G8B8)
+			{
+				m_pImage=new CImage(ENUM_COLOR_FORMAT_R5G6B5,image->getDimension());
+				CColorConverter::convert_R8G8B8toR5G6B5(image->lock(),image->getImageDataSizeInPixels(),m_pImage->lock());
+			}
+			else
+			{
+				m_pImage->grab();
+				void* data=m_pImage->lock();
+				u32 temp;
+				memcpy(&temp,data,4);
+				Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("warn%08X",temp).c_str());
+				m_pImage->unlock();
+			}*/
 
 			uploadTexture();
 

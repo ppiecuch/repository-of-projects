@@ -88,6 +88,7 @@ namespace video{
 		
 		virtual u32 getByteCountPerRow() const =0;
 		virtual u32 getByteCountPerPixel() const =0;
+		virtual u32 getImageDataSizeInPixels() const = 0;
 
 		virtual void* lock() = 0;
 
