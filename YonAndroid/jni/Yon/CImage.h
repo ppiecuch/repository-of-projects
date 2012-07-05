@@ -48,6 +48,9 @@ namespace video{
 		virtual u32 getByteCountPerPixel() const{
 			return m_bytesPerPixel;
 		}
+		virtual u32 getImageDataSizeInPixels() const{
+			return m_size.w*m_size.h;
+		}
 
 		virtual SColor getPixel(u32 x, u32 y) const;
 	};

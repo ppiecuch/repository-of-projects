@@ -611,6 +611,14 @@
 				Name="video"
 				>
 				<File
+					RelativePath=".\CColorConverter.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CColorConverter.h"
+					>
+				</File>
+				<File
 					RelativePath=".\CFPSCounter.cpp"
 					>
 				</File>
