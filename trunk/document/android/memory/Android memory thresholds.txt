@@ -1,0 +1,11 @@
+Memory thresholds, what is it ?
+
+It¡¯s the threshold from which the device will kill some process, to free memory.
+
+On Android, there is two memory threshold : system (/sys/module/lowmemorykiller/parameters/minfree) and dalvik (*_MEM properties).
+
+System thresholds looks at unix free memory.
+
+Dalvik thresholds looks at virtual free memory, in dalvik.
+
+http://www.drakaz.com/2010/04/30/android-memory-thresholds/
