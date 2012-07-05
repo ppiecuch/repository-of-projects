@@ -1,0 +1,158 @@
+我们可以通过adb shell "dumpsys meminfo %curProcessName%"命令得到某个进程的内存使用情况。
+getMemoryState.bat主要用于解析该命令返回的内存，得到NativeSize，DalvikSize，NativeAllocated，DalvikAllocated，NativePSS，DalvikPSS等。它把不同时期得到的数据按时间前后为顺序以逗号作为分隔符的排列输出到一个以进程名命名的文本文件，以便在excel中生产图表。
+getMemoryState.bat文件源码
+@echo off
+call config.bat
+set typeNameCol=1
+set nativeValueCol=2
+set dalvikValueCol=3
+set dalvikOtherCol=4
+Setlocal enabledelayedexpansion
+set path=%path%;%cd%\lib
+set /a processNo=0
+for %%i in (%processName%) do (
+set /a processNo+=1
+)
+set /a cnt=0
+set str=
+if "%processShortName%"=="" (
+set /a cnt=0
+for %%i in (%processName%) do (
+set str=%%i
+set str=!str:.= !
+call getSubStr "!str!" -1
+set result=!getSubStr~result!
+if !cnt! EQU 0 (
+set processShortName=!result!
+) else (
+set processShortName=!processShortName!;!result!
+)
+set /a cnt+=1
+)
+) else (
+set /a cnt=0
+for %%i in (%processShortName%) do (
+set /a cnt=!cnt!+1
+)
+if not !cnt! EQU %processNo% (
+echo the number of process Name is %processNo%
+echo the number of process Short Name is !cnt!
+echo they should be equal.Please check again!
+exit 0
+)
+)
+if not exist %rawDatadir% (
+md %rawDatadir%
+)
+if not exist %outRoot% (
+md %outRoot%
+)
+call genSerial
+set serial=!genSerial~result!
+set meminfoFile=%rawDatadir%\meminfo%serial%.txt
+set slipChar=,
+:Loop0Start:
+set /a processTotalNumber=cnt
+set /a processNo=0
+:Loop0Head
+call getSubStr "%processShortName%" %processNo%
+set curProcessShortName=%getSubStr~result%
+call getSubStr "%processName%" %processNo%
+set curProcessName=%getSubStr~result%
+:GetRawMemInfoFile
+set statFile=%outRoot%\%statFilePrefix%_Memory_%curProcessShortName%.txt
+adb shell "dumpsys meminfo %curProcessName%" >%meminfoFile%
+if not exist %statFile% (
+set slipChar=
+goto ReadRawMemInfoFile
+)
+:ReadMemInfoStatisticFile
+set NativeSize=
+set DalvikSize=
+set OtherSize=
+set TotalSize=
+set NativeAllocated=
+set DalvikAllocated=
+set OtherAllocated=
+set TotalAllocated=
+set NativePSS=
+set DalvikPSS=
+set OtherPSS=
+set TotalPSS=
+set NativeFree=
+set DalvikFree=
+set OtherFree=
+set TotalFree=
+set /a cnt=0
+FOR /F "delims=: tokens=2" %%i in (%statFile%) do (
+if !cnt! EQU 0 (
+set NativeSize=%%i
+)
+if !cnt! EQU 1 (
+set DalvikSize=%%i
+) 
+if !cnt! EQU 2 (
+set NativeAllocated=%%i
+) 
+if !cnt! EQU 3 (
+set DalvikAllocated=%%i
+) 
+if !cnt! EQU 4 (
+set NativePSS=%%i
+) 
+if !cnt! EQU 5 (
+set DalvikPSS=%%i
+) 
+
+set /a cnt+=1
+)
+:ReadRawMemInfoFile
+set /a cnt=0
+FOR /F "skip=1 tokens=1,2,3,4,5,6,7,8" %%i in (%meminfoFile%) do (
+if !cnt! EQU 4 (
+set NativeSize=!NativeSize!%slipChar%%%j
+set DalvikSize=!DalvikSize!%slipChar%%%k
+set OtherSize=!OtherSize!%slipChar%%%l
+set TotalSize=!TotalSize!%slipChar%%%m
+) 
+if !cnt! EQU 5 (
+set NativeAllocated=!NativeAllocated!%slipChar%%%j
+set DalvikAllocated=!DalvikAllocated!%slipChar%%%k
+set OtherAllocated=!OtherAllocated!%slipChar%%%l
+set TotalAllocated=!TotalAllocated!%slipChar%%%m
+)
+if !cnt! EQU 6 (
+set NativeFree=!NativeFree!%slipChar%%%j
+set DalvikFree=!DalvikFree!%slipChar%%%k
+set OtherFree=!OtherFree!%slipChar%%%l
+set TotalFree=!TotalFree!%slipChar%%%m
+)
+if !cnt! EQU 7 (
+set NativePSS=!NativePSS!%slipChar%%%k
+set DalvikPSS=!DalvikPSS!%slipChar%%%l
+set OtherPSS=!OtherPSS!%slipChar%%%m
+set TotalPSS=!TotalPSS!%slipChar%%%n
+)
+set /a cnt+=1
+)
+:SaveToMemInfoStatisticFile
+echo NativeSize:%NativeSize%>%statFile%
+echo DalvikSize:%DalvikSize%>>%statFile%
+echo NativeAllocated:%NativeAllocated%>>%statFile%
+echo DalvikAllocated:%DalvikAllocated%>>%statFile%
+echo NativePSS:%NativePSS%>>%statFile%
+echo DalvikPSS:%DalvikPSS%>>%statFile%
+:Loop0Tail
+set /a processNo+=1
+if %processNo% LSS %processTotalNumber% (
+goto Loop0Head
+)
+:Loop0End
+echo success!
+endlocal
+注意：需要把bat库genSerial.bat，getSubStr.bat放在子目录lib中。
+关于它们的更多内容请参考《getSubStr》，《genSerial》
+关于更多的Android内存泄露利器请阅读《Android内存泄露利器（Hprof篇）》，
+《Android内存泄露利器（全自动篇）》
+
+http://blog.csdn.net/hudashi/article/details/7050599

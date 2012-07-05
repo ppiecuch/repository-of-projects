@@ -1,0 +1,205 @@
+文章参照自：http://stackoverflow.com/questions/2298208/how-to-discover-memory-usage-of-my-application-in-android#2299813
+像Linux这种现代操作系统的内存使用是很复杂的，因此很难准确的知道你的应用程序使用了好多内存。
+查看内存使用的方式有很多种，但是各个方式查看到的结果可能会有微略不同。
+方式一，Running services
+通过手机上Running services的Activity查看，可以通过Setting->Applications->Running services进。
+关于Running services的详细内容请参考《Android中使用"running services"查看service进程内存》
+方式二，使用ActivityManager的getMemoryInfo(ActivityManager.MemoryInfo outInfo)
+ActivityManager.getMemoryInfo()主要是用于得到当前系统剩余内存的及判断是否处于低内存运行。
+实例1：
+    private void displayBriefMemory() {    
+        final ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);    
+        ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();   
+        activityManager.getMemoryInfo(info);    
+        Log.i(tag,"系统剩余内存:"+(info.availMem >> 10)+"k");   
+        Log.i(tag,"系统是否处于低内存运行："+info.lowMemory);
+        Log.i(tag,"当系统剩余内存低于"+info.threshold+"时就看成低内存运行");
+    } 
+ActivityManager.getMemoryInfo()是用ActivityManager.MemoryInfo返回结果，而不是Debug.MemoryInfo，他们不一样的。
+ActivityManager.MemoryInfo只有三个Field:
+availMem:表示系统剩余内存
+lowMemory：它是boolean值，表示系统是否处于低内存运行
+hreshold：它表示当系统剩余内存低于好多时就看成低内存运行
+方式三，在代码中使用Debug的getMemoryInfo(Debug.MemoryInfo memoryInfo)或ActivityManager的MemoryInfo[] getProcessMemoryInfo(int[] pids)
+该方式得到的MemoryInfo所描述的内存使用情况比较详细.数据的单位是KＢ.
+MemoryInfo的Field如下
+dalvikPrivateDirty： The private dirty pages used by dalvik。
+dalvikPss ：The proportional set size for dalvik.
+dalvikSharedDirty ：The shared dirty pages used by dalvik.
+nativePrivateDirty ：The private dirty pages used by the native heap.
+nativePss ：The proportional set size for the native heap.
+nativeSharedDirty ：The shared dirty pages used by the native heap.
+otherPrivateDirty ：The private dirty pages used by everything else.
+otherPss ：The proportional set size for everything else.
+otherSharedDirty ：The shared dirty pages used by everything else.
+Android和Linux一样有大量内存在进程之间进程共享。某个进程准确的使用好多内存实际上是很难统计的。
+因为有paging out to disk（换页），所以如果你把所有映射到进程的内存相加，它可能大于你的内存的实际物理大小。
+dalvik：是指dalvik所使用的内存。
+native：是被native堆使用的内存。应该指使用C\C++在堆上分配的内存。
+other:是指除dalvik和native使用的内存。但是具体是指什么呢？至少包括在C\C++分配的非堆内存，比如分配在栈上的内存。puzlle!
+private:是指私有的。非共享的。
+share:是指共享的内存。
+PSS：实际使用的物理内存（比例分配共享库占用的内存）
+Pss：它是把共享内存根据一定比例分摊到共享它的各个进程来计算所得到进程使用内存。网上又说是比例分配共享库占用的内存，那么至于这里的共享是否只是库的共享，还是不清楚。
+ PrivateDirty：它是指非共享的，又不能换页出去（can not be paged to disk ）的内存的大小。比如Linux为了提高分配内存速度而缓冲的小对象，即使你的进程结束，该内存也不会释放掉，它只是又重新回到缓冲中而已。
+SharedDirty:参照PrivateDirty我认为它应该是指共享的，又不能换页出去（can not be paged to disk ）的内存的大小。比如Linux为了提高分配内存速度而缓冲的小对象，即使所有共享它的进程结束，该内存也不会释放掉，它只是又重新回到缓冲中而已。
+具体代码请参考实例1
+注意１：MemoryInfo所描述的内存使用情况都可以通过命令adb shell "dumpsys meminfo %curProcessName%" 得到。
+注意２：如果想在代码中同时得到多个进程的内存使用或非本进程的内存使用情况请使用ActivityManager的MemoryInfo[] getProcessMemoryInfo(int[] pids)，
+否则Debug的getMemoryInfo(Debug.MemoryInfo memoryInfo)就可以了。
+注意３：可以通过ActivityManager的List<ActivityManager.RunningAppProcessInfo> getRunningAppProcesses()得到当前所有运行的进程信息。
+ActivityManager.RunningAppProcessInfo中就有进程的id，名字以及该进程包括的所有apk包名列表等。
+注意4：数据的单位是KB.
+方式4、使用Debug的getNativeHeapSize ()，getNativeHeapAllocatedSize ()，getNativeHeapFreeSize ()方法。
+该方式只能得到Native堆的内存大概情况，数据单位为字节。
+static long getNativeHeapAllocatedSize() 
+Returns the amount of allocated memory in the native heap.
+返回的是当前进程navtive堆中已使用的内存大小
+static long getNativeHeapFreeSize()
+Returns the amount of free memory in the native heap.
+返回的是当前进程navtive堆中已经剩余的内存大小
+static long getNativeHeapSize()
+Returns the size of the native heap.
+返回的是当前进程navtive堆本身总的内存大小
+示例代码：
+          Log.i(tag,"NativeHeapSizeTotal:"+(Debug.getNativeHeapSize()>>10));
+          Log.i(tag,"NativeAllocatedHeapSize:"+(Debug.getNativeHeapAllocatedSize()>>10));
+          Log.i(tag,"NativeAllocatedFree:"+(Debug.getNativeHeapFreeSize()>>10));
+注意：DEBUG中居然没有与上面相对应的关于dalvik的函数。
+方式五、使用dumpsys meminfo命令。
+我们可以在adb shell 中运行dumpsys meminfo命令来得到进程的内存信息。在该命令的后面要加上进程的名字，以确定是哪个进程。
+比如"adb shell dumpsys meminfo com.teleca.robin.test" 将得到com.teleca.robin.test进程使用的内存的信息: 
+Applications Memory Usage (kB):
+Uptime: 12101826 Realtime: 270857936
+
+** MEMINFO in pid 3407 [com.teleca.robin.test] **
+                    native   dalvik    other    total
+            size:     3456     3139      N/A     6595
+       allocated:     3432     2823      N/A     6255
+            free:       23      316      N/A      339
+           (Pss):      724     1101     1070     2895
+  (shared dirty):     1584     4540     1668     7792
+    (priv dirty):      644      608      688     1940
+ 
+ Objects
+           Views:        0        ViewRoots:        0
+     AppContexts:        0       Activities:        0
+          Assets:        3    AssetManagers:        3
+   Local Binders:        5    Proxy Binders:       11
+Death Recipients:        0
+ OpenSSL Sockets:        0
+ 
+ SQL
+            heap:        0       memoryUsed:        0
+pageCacheOverflo:        0  largestMemAlloc:        0
+ 
+ 
+ Asset Allocations
+    zip:/data/app/com.teleca.robin.test-1.apk:/resources.arsc: 1K
+ "size" 表示的是总内存大小（kb）。, "allocated" 表示的是已使用了的内存大小（kb），, "free"表示的是剩余的内存大小（kb）, 更多的可以参照方式三和方式四中的描述
+现在已经有了自动提取汇总dumpsys meminfo信息的工具，具体请参照《Android内存泄露利器（内存统计篇）》及其系列文章。
+方式六、使用 "adb shell procrank"命令
+如果你想查看所有进程的内存使用情况，可以使用"adb shell procrank"命令。命令返回将如下：
+  PID      Vss      Rss      Pss      Uss  cmdline
+  188   75832K   51628K   24824K   19028K  system_server
+  308   50676K   26476K    9839K    6844K  system_server
+ 2834   35896K   31892K    9201K    6740K  com.sec.android.app.twlauncher
+  265   28536K   28532K    7985K    5824K  com.android.phone
+  100   29052K   29048K    7299K    4984K  zygote
+  258   27128K   27124K    7067K    5248K  com.swype.android.inputmethod
+  270   25820K   25816K    6752K    5420K  com.android.kineto
+ 1253   27004K   27000K    6489K    4880K  com.google.android.voicesearch
+ 2898   26620K   26616K    6204K    3408K  com.google.android.apps.maps:FriendService
+  297   26180K   26176K    5886K    4548K  com.google.process.gapps
+ 3157   24140K   24136K    5191K    4272K  android.process.acore
+ 2854   23304K   23300K    4067K    2788K  com.android.vending
+ 3604   22844K   22840K    4036K    3060K  com.wssyncmldm
+  592   23372K   23368K    3987K    2812K  com.google.android.googlequicksearchbox
+ 3000   22768K   22764K    3844K    2724K  com.tmobile.selfhelp
+  101    8128K    8124K    3649K    2996K  /system/bin/mediaserver
+ 3473   21792K   21784K    3103K    2164K  com.android.providers.calendar
+ 3407   22092K   22088K    2982K    1980K  com.teleca.robin.test
+ 2840   21380K   21376K    2953K    1996K  com.sec.android.app.controlpanel
+......................................................................................................................
+关于VSS,RSS,PSS,USS的意义请参考《Android内存之VSS/RSS/PSS/USS》
+注意1：这里的PSS和方式四PSS的total并不一致，有细微的差别。为什么呢？这是因为procrank 命令和meminfo命令使用的内核机制不太一样，所以结果会有细微差别
+注意2：这里的Uss 和方式四的Priv Dirtyd的total几乎相等.他们似乎表示的是同一个意义。但是现在得到的关于它们的意义的解释却不太相同。难道这里Private的都是dirty(这里指不能换页)? Puzzle!
+方式七、使用"adb shell cat /proc/meminfo" 命令。
+该方式只能得出系统整个内存的大概使用情况。
+MemTotal:         395144 kB 
+MemFree:          184936 kB 
+Buffers:             880 kB 
+Cached:            84104 kB 
+SwapCached:            0 kB 
+................................................................................................
+MemTotal ：可供系统和用户使用的总内存大小 (它比实际的物理内存要小，因为还有些内存要用于radio, DMA buffers, 等). 
+MemFree：剩余的可用内存大小。这里该值比较大，实际上一般Android system 的该值通常都很小，因为我们尽量让进程都保持运行，这样会耗掉大量内存。
+Cached: 这个是系统用于文件缓冲等的内存. 通常systems需要20MB 以避免bad paging states;。当内存紧张时，the Android out of memory killer将杀死一些background进程，以避免他们消耗过多的cached RAM ，当然如果下次再用到他们，就需要paging. 那么是说background进程的内存包含在该项中吗？
+方式八，使用“adb shell ps -x”命令
+该方式主要得到的是内存信息是VSIZE 和RSS。
+USER     PID   PPID  VSIZE  RSS     WCHAN    PC         NAME
+.........................省略.................................
+app_70    3407  100   267104 22056 ffffffff afd0eb18 S com.teleca.robin.test (u:55, s:12)
+app_7     3473  100   268780 21784 ffffffff afd0eb18 S com.android.providers.calendar (u:16, s:8)
+radio     3487  100   267980 21140 ffffffff afd0eb18 S com.osp.app.signin (u:11, s:12)
+system    3511  100   273232 22024 ffffffff afd0eb18 S com.android.settings (u:11, s:4)
+app_15    3546  100   267900 20300 ffffffff afd0eb18 S com.sec.android.providers.drm (u:15, s:6)
+app_59    3604  100   272028 22856 ffffffff afd0eb18 S com.wssyncmldm (u:231, s:54)
+root      4528  2     0      0     c0141e4c 00000000 S flush-138:13 (u:0, s:0)
+root      4701  152   676    336   c00a68c8 afd0e7cc S /system/bin/sh (u:0, s:0)
+root      4702  4701  820    340   00000000 afd0d8bc R ps (u:0, s:5)
+VSZIE:意义暂时不明。
+VSS：请参考《Android内存之VSS/RSS/PSS/USS》
+注意1：由于RSS的价值不是很大，所以一般不用。
+注意2：通过该命令提取RSS，已经有了工具，具体参照《Android内存泄露利器（RSS内存统计篇）》及其系列。
+
+
+
+实例1
+
+    int cnt=0;
+    final static int kBufferMinSize=1000;
+    final static int kBufferMaxSize=2000;
+    StringBuffer strBuffer=new StringBuffer(kBufferMinSize);
+    StringBuffer strBuffer2=new StringBuffer(kBufferMinSize);
+    StringBuffer strBuffer3=new StringBuffer(kBufferMinSize);
+    StringBuffer strBufferNativePss=new StringBuffer(kBufferMinSize);
+    StringBuffer strBufferDalvikPss=new StringBuffer(kBufferMinSize);
+    StringBuffer strBufferOtherPss=new StringBuffer(kBufferMinSize);
+    Debug.MemoryInfo memoryInfo=new Debug.MemoryInfo();
+    final static String tag="robin";
+    void printMemory()
+    {
+    
+long totalMemory=Runtime.getRuntime().totalMemory();
+          long freeMemory=Runtime.getRuntime().freeMemory();
+          long usedMemory=(totalMemory-freeMemory)>>10;
+          totalMemory=totalMemory>>10;
+          freeMemory=freeMemory>>10;
+          if(strBuffer.length()>kBufferMaxSize)
+          {
+                strBuffer.delete(0,strBuffer.length());
+                strBuffer2.delete(0,strBuffer2.length());
+                strBuffer3.delete(0,strBuffer3.length());
+                strBufferNativePss.delete(0,strBufferNativePss.length());
+                strBufferDalvikPss.delete(0,strBufferDalvikPss.length());
+          }
+          strBuffer.append(usedMemory+",");
+          strBuffer2.append(totalMemory+",");
+          strBuffer3.append((Debug.getNativeHeapSize()>>10)+",");
+          Debug.getMemoryInfo(memoryInfo);
+          strBufferNativePss.append((memoryInfo.nativePss)+",");
+          strBufferDalvikPss.append((memoryInfo.dalvikPss)+",");
+          if(cnt++%10==0)
+          {
+                Log.i(tag,"usedMemory:"+strBuffer.toString());
+                Log.i(tag,"totalMemory:"+strBuffer2.toString());
+                Log.i(tag,"NativeHeapSize:"+strBuffer3.toString());
+                Log.i(tag,"Native PSS:"+strBufferNativePss.toString());
+                Log.i(tag,"Dalvik PSS:"+strBufferDalvikPss.toString());
+          }    
+    }
+注意，对于输出的内存信息日志，我们稍作编辑就可以用于在excel产中图表，比便更直观的进行分析。
+
+
+http://blog.csdn.net/hudashi/article/details/7050897

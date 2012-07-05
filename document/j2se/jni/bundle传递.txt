@@ -1,0 +1,2 @@
+jclass clsparcel = env->FindClass("com/baidu/BaiduMapApp/ParceItem");
+jmethodID ParcelItem_GetBundleFunc = env->GetMethodID(clsparcel,"getBundle","()Landroid/os/Bundle;");

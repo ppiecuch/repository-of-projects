@@ -1,0 +1,51 @@
+1、首先确定是否有内存泄露及哪个程序造成。
+
+1.1、内存泄露已弹出out of memory对话框的情况。
+
+这种情况很简单，直接看对话框就知道是哪个应用的问题了。然后再分析该应用是否是因为内存泄露造成的out of memory对话框。
+
+1.2、对于有内存泄露，但没造成弹出out of memory对话框的情况
+
+使用《Android中如何查看内存》中介绍的各种方法进行分析，确定是否有内存泄露以及是哪个进程造成的内存泄露。
+
+2、生成hprof文件，用MAT进行分析。
+
+生成hprof文件可以在DDMS选中进程点击窗口左上角的"dump hprof file"按钮来直接生成，也可以通过在程序加代码中来生成
+
+代码2：
+
+    void generateHprof()
+
+    {
+
+            String packageName=getApplicationInfo().packageName;
+
+            String hpFilePath="/data/data/"+packageName+"/input.hprof";
+
+            try {
+
+                  //Debug.dumpHprofData("/sdcard/input.hprof");
+
+                  Debug.dumpHprofData(hpFilePath);
+
+            } catch (IOException e) {
+
+                  // TODO Auto-generated catch block
+
+                  e.printStackTrace();
+
+            }
+
+    }
+
+建议使用代码生成hprof，然后使用《Android内存泄露利器（hprof篇）》中的工具自动提取多个hprof文件，然后用MAT进行比较分析。
+
+在MAT导入.hprof文件以后，MAT会自动解析并生成报告，点击Dominator Tree，并按Package分组，选择自己所定义的Package类,比较各个类在不同时期的Retained Heap,找出可疑类，然后选择该类，点右键，选中show retained Set 项,参看Retained Heap的详细信息，进一步找出嫌疑项。
+
+3、在代码中查找内存泄露。
+
+  根据在MAT找到的内存泄露信息，参照《Android内存泄漏简介》进一步在内存中查找内存泄露的原因并解决。
+
+另外如果代码很简单，可以直接参照《Android内存泄漏简介》在内存中查找内存泄露的原因并解决。
+
+http://blog.csdn.net/hudashi/article/details/7050892
