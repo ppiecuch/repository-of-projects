@@ -13,6 +13,10 @@ namespace MyGUI{
 		m_pGeometryFty(geometryFty),
 		m_pUnit(NULL)
 	{
+
+		m_viewSize.width=driver->getCurrentRenderTargetSize().w;
+		m_viewSize.height=driver->getCurrentRenderTargetSize().h;
+
 		scene::IShap* shap=geometryFty->createShap(scene::ENUM_VERTEX_TYPE_3V1T1C,0,0);
 		m_pUnit=geometryFty->createUnit(shap,video::MYGUI_MATERIAL);
 
