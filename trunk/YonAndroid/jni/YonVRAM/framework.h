@@ -1,8 +1,6 @@
 #ifndef _FRAMEWORK_H_
 #define _FRAMEWORK_H_
 
-#include <MyGUI.h>
-#include "MyGUIAdapter.h"
 #include "yon.h"
 using namespace yon;
 using namespace yon::core;
@@ -18,16 +16,15 @@ using namespace yon::audio;
 
 #ifdef YON_COMPILE_WITH_WIN32
 #pragma comment(lib, "Yon.lib")
-#pragma comment(lib, "freetype.lib")
-#pragma comment(lib, "MyGUIEngine.lib")
-#pragma comment(lib, "MyGUIAdapter.lib")
 #endif
 
 
-bool init(void *pJNIEnv,u32 width,u32 height);
+bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height);
 void resize(u32 width,u32 height);
 void drawFrame();
 void destroy();
 IYonEngine* getEngine();
+void setRAMAvail(const c8* str);
+void setRAMTotal(const c8* str);
 
 #endif

@@ -155,6 +155,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonGUIReal", "YonGUIReal\Yo
 		{BE19D173-580C-47CE-9E4D-5813869689B0} = {BE19D173-580C-47CE-9E4D-5813869689B0}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonVRAM", "YonVRAM\YonVRAM.vcproj", "{BD29ADE6-97AA-41FB-BF74-F2FB12B5871D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -285,6 +290,10 @@ Global
 		{20ABE066-C927-4D1D-87F8-6102ED4267F6}.Debug|Win32.Build.0 = Debug|Win32
 		{20ABE066-C927-4D1D-87F8-6102ED4267F6}.Release|Win32.ActiveCfg = Release|Win32
 		{20ABE066-C927-4D1D-87F8-6102ED4267F6}.Release|Win32.Build.0 = Release|Win32
+		{BD29ADE6-97AA-41FB-BF74-F2FB12B5871D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BD29ADE6-97AA-41FB-BF74-F2FB12B5871D}.Debug|Win32.Build.0 = Debug|Win32
+		{BD29ADE6-97AA-41FB-BF74-F2FB12B5871D}.Release|Win32.ActiveCfg = Release|Win32
+		{BD29ADE6-97AA-41FB-BF74-F2FB12B5871D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

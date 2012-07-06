@@ -1,5 +1,6 @@
 package yon;
 
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -18,11 +19,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import android.view.inputmethod.InputMethodManager;
 
 public class AndroidGLView extends GLSurfaceView{
 	
@@ -123,6 +122,12 @@ public class AndroidGLView extends GLSurfaceView{
 	
 	private void callbackDestroy(){
 		activity.finish();
+	}
+	private String getRAMAvailable(){
+		return Util.getAvailableMemory(activity);
+	}
+	private String getRAMTotal(){
+		return Util.getTotalMemory(activity);
 	}
 	
 
@@ -309,8 +314,10 @@ public class AndroidGLView extends GLSurfaceView{
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 			nativeOnSurfaceCreated(screenWidth,screenHeight,Util.getAPKFilePath(activity),Util.getSdCardPath());
 			
-			nativeInfo(Util.getExternalStoragePath());
-	        nativeInfo(Util.getFormatSize(Util.getAvailableStore(Util.getExternalStoragePath())));
+			nativeInfo("external path:"+Util.getExternalStoragePath());
+	        nativeInfo("rom:"+Util.getAvailableInternalMemory()+"/"+Util.getTotalInternalMemory());
+	        nativeInfo("ram:"+Util.getAvailableMemory(activity)+"/"+Util.getTotalMemory(activity)+"("+Util.getMemoryThreshold(activity)+")");
+	        nativeInfo("sd:"+Util.getAvailableExternal()+"/"+Util.getTotalExternal());
 	        nativeInfo(Util.getLanguage());
 	        
 	        nativeInfo("MODEL:"+Build.MODEL);

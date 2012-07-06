@@ -10,6 +10,7 @@ namespace platform{
 
 	enum ENUM_CALLBACK_TYPE{
 		ENUM_CALLBACK_TYPE_UI = 0,
+		ENUM_CALLBACK_TYPE_HW,
 		ENUM_CALLBACK_TYPE_COUNT
 	};
 
@@ -21,6 +22,12 @@ namespace platform{
 		ENUM_CALLBACK_UI_TYPE_COUNT
 	};
 
+	enum ENUM_CALLBACK_HW_TYPE{
+		ENUM_CALLBACK_HW_TYPE_RAM_AVAIL = 0,
+		ENUM_CALLBACK_HW_TYPE_RAM_TOTAL,
+		ENUM_CALLBACK_HW_TYPE_COUNT
+	};
+
 	struct SCallbackUI{
 		ENUM_CALLBACK_UI_TYPE type;
 		bool visible;
@@ -30,10 +37,15 @@ namespace platform{
 		c8* negativeButton;
 	};
 
+	struct SCallbackHW{
+		ENUM_CALLBACK_HW_TYPE type;
+	};
+
 	struct SCallback{
 		ENUM_CALLBACK_TYPE type;
 		union{
 			SCallbackUI ui;
+			SCallbackHW hw;
 		};
 	};
 

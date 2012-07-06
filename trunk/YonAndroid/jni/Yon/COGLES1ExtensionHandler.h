@@ -18,6 +18,14 @@ typedef char  GLchar;
 #endif//YON_COMPILE_WITH_WIN32
 
 
+/*#ifndef GL_MAX_ELEMENTS_VERTICES
+#define GL_MAX_ELEMENTS_VERTICES 0x80E8
+#endif
+
+#ifndef GL_MAX_ELEMENTS_INDICES
+#define GL_MAX_ELEMENTS_INDICES 0x80E9
+#endif*/
+
 namespace yon{
 namespace video{
 namespace ogles1{
@@ -76,6 +84,11 @@ extern PFNGLGENERATEMIPMAPOESPROC pglGenerateMipmapOES;
 	private:
 		core::stringc m_version;
 		core::stringc m_extensions;
+		s32 m_iMaxTextureUnits;
+		s32 m_iMaxTextureSize;
+		//s32 m_iMaxElementsVertices;
+		//s32 m_iMaxElementsIndices;
+		s32 m_iMaxLights;
 		bool m_featureAvailables[ENUM_VIDEO_FEATURE_COUNT];
 	public:
 		COGLES1ExtensionHandler();
