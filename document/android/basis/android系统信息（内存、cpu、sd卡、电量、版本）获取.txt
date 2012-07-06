@@ -1,0 +1,229 @@
+要转载请注明出处：http://gqdy365.iteye.com/blog/1066113，有很多转载了文章不写出处，还写的是什么小编最近做项目碰到什么问题怎么解决的的然后把文章贴下面，俨然一副他们自己的文章，不知羞耻！ 
+一、内存（ram）： 
+android的总内存大小信息存放在系统的/proc/meminfo文件里面，可以通过读取这个文件来获取这些信息： 
+Java代码  
+public void getTotalMemory() {  
+        String str1 = "/proc/meminfo";  
+        String str2="";  
+        try {  
+            FileReader fr = new FileReader(str1);  
+            BufferedReader localBufferedReader = new BufferedReader(fr, 8192);  
+            while ((str2 = localBufferedReader.readLine()) != null) {  
+                Log.i(TAG, "---" + str2);  
+            }  
+        } catch (IOException e) {  
+        }  
+    }  
+
+
+运行信息如下： 
+Java代码  
+05-30 08:05:14.807: INFO/-SystemInfo-(1519): ---MemTotal:       204876 kB  
+05-30 08:05:14.807: INFO/-SystemInfo-(1519): ---MemFree:          4596 kB  
+05-30 08:05:14.807: INFO/-SystemInfo-(1519): ---Buffers:         16020 kB  
+05-30 08:05:14.807: INFO/-SystemInfo-(1519): ---Cached:          82508 kB  
+05-30 08:05:14.807: INFO/-SystemInfo-(1519): ---SwapCached:         64 kB  
+05-30 08:05:14.807: INFO/-SystemInfo-(1519): ---Active:         137104 kB  
+05-30 08:05:14.807: INFO/-SystemInfo-(1519): ---Inactive:        41056 kB  
+05-30 08:05:14.807: INFO/-SystemInfo-(1519): ---SwapTotal:       65528 kB  
+05-30 08:05:14.817: INFO/-SystemInfo-(1519): ---SwapFree:        65368 kB  
+05-30 08:05:14.817: INFO/-SystemInfo-(1519): ---Dirty:              88 kB  
+05-30 08:05:14.817: INFO/-SystemInfo-(1519): ---Writeback:           0 kB  
+05-30 08:05:14.817: INFO/-SystemInfo-(1519): ---AnonPages:       79672 kB  
+05-30 08:05:14.817: INFO/-SystemInfo-(1519): ---Mapped:          38296 kB  
+05-30 08:05:14.817: INFO/-SystemInfo-(1519): ---Slab:             5768 kB  
+05-30 08:05:14.817: INFO/-SystemInfo-(1519): ---SReclaimable:     1856 kB  
+05-30 08:05:14.827: INFO/-SystemInfo-(1519): ---SUnreclaim:       3912 kB  
+05-30 08:05:14.827: INFO/-SystemInfo-(1519): ---PageTables:       8184 kB  
+05-30 08:05:14.827: INFO/-SystemInfo-(1519): ---NFS_Unstable:        0 kB  
+05-30 08:05:14.827: INFO/-SystemInfo-(1519): ---Bounce:              0 kB  
+05-30 08:05:14.827: INFO/-SystemInfo-(1519): ---CommitLimit:    167964 kB  
+05-30 08:05:14.827: INFO/-SystemInfo-(1519): ---Committed_AS: 11771920 kB  
+05-30 08:05:14.827: INFO/-SystemInfo-(1519): ---VmallocTotal:   761856 kB  
+05-30 08:05:14.827: INFO/-SystemInfo-(1519): ---VmallocUsed:     83656 kB  
+05-30 08:05:14.827: INFO/-SystemInfo-(1519): ---VmallocChunk:   674820 kB  
+
+第一行是总内存大小(即用户可以使用的ram的大小)！其他各项的介绍大家可以看这儿： 
+http://bg135.com/android-phones-to-get-the-total-memory-and-available-memory.html 
+
+获取当前剩余内存(ram)大小的方法： 
+Java代码  
+public long getAvailMemory() {  
+        ActivityManager am = (ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE);  
+        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();  
+        am.getMemoryInfo(mi);  
+        return mi.availMem;  
+    }  
+
+
+二、Rom大小 
+Java代码  
+public long[] getRomMemroy() {  
+        long[] romInfo = new long[2];  
+        //Total rom memory  
+        romInfo[0] = getTotalInternalMemorySize();  
+  
+        //Available rom memory  
+        File path = Environment.getDataDirectory();  
+        StatFs stat = new StatFs(path.getPath());  
+        long blockSize = stat.getBlockSize();  
+        long availableBlocks = stat.getAvailableBlocks();  
+        romInfo[1] = blockSize * availableBlocks;  
+        getVersion();  
+        return romInfo;  
+    }  
+  
+    public long getTotalInternalMemorySize() {  
+        File path = Environment.getDataDirectory();  
+        StatFs stat = new StatFs(path.getPath());  
+        long blockSize = stat.getBlockSize();  
+        long totalBlocks = stat.getBlockCount();  
+        return totalBlocks * blockSize;  
+    }  
+
+注意类型，不然相乘之后会有溢出。可用内部存储的大小不能通过getRootDirectory(); 
+取得，之前网上传的很多都是用getRootDirectory()取得的，我测试之后发现取得的数值不对。要根据getDataDirectory(); 
+取得。 
+
+三、sdCard大小 
+Java代码  
+public long[] getSDCardMemory() {  
+        long[] sdCardInfo=new long[2];  
+        String state = Environment.getExternalStorageState();  
+        if (Environment.MEDIA_MOUNTED.equals(state)) {  
+            File sdcardDir = Environment.getExternalStorageDirectory();  
+            StatFs sf = new StatFs(sdcardDir.getPath());  
+            long bSize = sf.getBlockSize();  
+            long bCount = sf.getBlockCount();  
+            long availBlocks = sf.getAvailableBlocks();  
+  
+            sdCardInfo[0] = bSize * bCount;//总大小  
+            sdCardInfo[1] = bSize * availBlocks;//可用大小  
+        }  
+        return sdCardInfo;  
+    }  
+
+注意类型，不然相乘之后会有溢出。 
+
+四、电池电量 
+Java代码  
+private BroadcastReceiver batteryReceiver=new BroadcastReceiver(){  
+        @Override  
+        public void onReceive(Context context, Intent intent) {  
+            int level = intent.getIntExtra("level", 0);  
+            //  level加%就是当前电量了  
+    }  
+    };  
+
+然后在activity的oncreate()方法中注册 
+Java代码  
+registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));  
+
+
+五、CPU信息 
+Java代码  
+public String[] getCpuInfo() {  
+    String str1 = "/proc/cpuinfo";  
+    String str2="";  
+    String[] cpuInfo={"",""};  
+    String[] arrayOfString;  
+    try {  
+        FileReader fr = new FileReader(str1);  
+        BufferedReader localBufferedReader = new BufferedReader(fr, 8192);  
+        str2 = localBufferedReader.readLine();  
+        arrayOfString = str2.split("\\s+");  
+        for (int i = 2; i < arrayOfString.length; i++) {  
+            cpuInfo[0] = cpuInfo[0] + arrayOfString[i] + " ";  
+        }  
+        str2 = localBufferedReader.readLine();  
+        arrayOfString = str2.split("\\s+");  
+        cpuInfo[1] += arrayOfString[2];  
+        localBufferedReader.close();  
+    } catch (IOException e) {  
+    }  
+    return cpuInfo;  
+}  
+
+/proc/cpuinfo文件中第一行是CPU的型号，第二行是CPU的频率，可以通过读文件，读取这些数据！ 
+
+六、系统的版本信息： 
+Java代码  
+public String[] getVersion(){  
+    String[] version={"null","null","null","null"};  
+    String str1 = "/proc/version";  
+    String str2;  
+    String[] arrayOfString;  
+    try {  
+        FileReader localFileReader = new FileReader(str1);  
+        BufferedReader localBufferedReader = new BufferedReader(  
+                localFileReader, 8192);  
+        str2 = localBufferedReader.readLine();  
+        arrayOfString = str2.split("\\s+");  
+        version[0]=arrayOfString[2];//KernelVersion  
+        localBufferedReader.close();  
+    } catch (IOException e) {  
+    }  
+    version[1] = Build.VERSION.RELEASE;// firmware version  
+    version[2]=Build.MODEL;//model  
+    version[3]=Build.DISPLAY;//system version  
+    return version;  
+}  
+
+版本信息里面还包括型号等信息。 
+
+七、MAC地址和开机时间： 
+Java代码  
+public String[] getOtherInfo(){  
+    String[] other={"null","null"};  
+       WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);  
+       WifiInfo wifiInfo = wifiManager.getConnectionInfo();  
+       if(wifiInfo.getMacAddress()!=null){  
+        other[0]=wifiInfo.getMacAddress();  
+    } else {  
+        other[0] = "Fail";  
+    }  
+    other[1] = getTimes();  
+       return other;  
+}  
+private String getTimes() {  
+    long ut = SystemClock.elapsedRealtime() / 1000;  
+    if (ut == 0) {  
+        ut = 1;  
+    }  
+    int m = (int) ((ut / 60) % 60);  
+    int h = (int) ((ut / 3600));  
+    return h + " " + mContext.getString(R.string.info_times_hour) + m + " "  
+            + mContext.getString(R.string.info_times_minute);  
+}  
+
+
+最后贴一个格式化数据的方法： 
+Java代码  
+public String formatSize(long size) {  
+    String suffix = null;  
+    float fSize=0;  
+  
+    if (size >= 1024) {  
+        suffix = "KB";  
+        fSize=size / 1024;  
+        if (fSize >= 1024) {  
+            suffix = "MB";  
+            fSize /= 1024;  
+        }  
+        if (fSize >= 1024) {  
+            suffix = "GB";  
+            fSize /= 1024;  
+        }  
+    } else {  
+        fSize = size;  
+    }  
+    java.text.DecimalFormat df = new java.text.DecimalFormat("#0.00");  
+    StringBuilder resultBuffer = new StringBuilder(df.format(fSize));  
+    if (suffix != null)  
+        resultBuffer.append(suffix);  
+    return resultBuffer.toString();  
+}  
+
+保留两位小数。
+
+http://gqdy365.iteye.com/blog/1066113
