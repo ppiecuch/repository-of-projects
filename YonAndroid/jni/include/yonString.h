@@ -527,8 +527,8 @@ namespace yon{
 			//如果不存在数字字符，返回0.0f
 			f32 superatof()
 			{
-				int index=0;
-				for(int i=0;i<len;++i)
+				u32 index=0;
+				for(u32 i=0;i<len;++i)
 				{
 					if(elements[i]>='0'&&elements[i]<='9'||elements[i]=='.')
 					{

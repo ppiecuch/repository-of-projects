@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="YonGUIReal"
-	ProjectGUID="{20ABE066-C927-4D1D-87F8-6102ED4267F6}"
-	RootNamespace="YonGUIReal"
+	Name="YonVRAM"
+	ProjectGUID="{BD29ADE6-97AA-41FB-BF74-F2FB12B5871D}"
+	RootNamespace="YonVRAM"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../MyGUIEngine/include;../include;../freetype/include;../MyGUIAdapter"
+				AdditionalIncludeDirectories="../Yon/MyGUIEngine/include;../include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -167,11 +167,11 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\AndroidGUIReal.mk"
+			RelativePath="..\AndroidVRAM.mk"
 			>
 		</File>
 		<File
-			RelativePath="..\..\ApplicationGUIReal.mk"
+			RelativePath="..\..\ApplicationVRAM.mk"
 			>
 		</File>
 		<File

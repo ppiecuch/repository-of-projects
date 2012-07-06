@@ -1,6 +1,7 @@
 package yon.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -50,6 +51,14 @@ public class Util {
 		return Formatter.formatFileSize(context, mi.availMem);// 将获取的内存大小规格化 
 	}
 	
+	//The threshold of availMem at which we consider memory to be low and start killing background services and other non-extraneous processes.
+	public static String getMemoryThreshold(Context context){
+		ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+		MemoryInfo mi = new MemoryInfo();
+		am.getMemoryInfo(mi);
+		return Formatter.formatFileSize(context, mi.threshold);
+	}
+	
 	public static String getTotalMemory(Context context) {
 		String str1 = "/proc/meminfo";// 系统内存信息文件 
 		String str2;
@@ -73,6 +82,26 @@ public class Util {
 //	    for (int i = 1; ; i = 0)
 //	      return i;
 //	}
+	
+	public static String getAvailableInternalMemory(){
+		File path = Environment.getDataDirectory();  
+        return getAvailableStore(path.getPath());
+	}
+  
+	public static String getTotalInternalMemory(){  
+		File path = Environment.getDataDirectory();  
+		return getTotalStore(path.getPath());
+	}
+	
+	public static String getAvailableExternal(){
+		String path=getSdCardPath();
+		return getAvailableStore(path);
+	}
+	
+	public static String getTotalExternal(){
+		String path=getSdCardPath();
+		return getTotalStore(path);
+	}
 
 	public static String getSdCardPath() {
 		return Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -123,18 +152,26 @@ public class Util {
 		return null;
 	}
 
-	public static long getAvailableStore(String filePath) {
+	public static String getAvailableStore(String filePath) {
 		// 取得sdcard文件路径
 		StatFs statFs = new StatFs(filePath);
 		// 获取block的SIZE
 		long blocSize = statFs.getBlockSize();
-		// 获取BLOCK数量
-		// long totalBlocks = statFs.getBlockCount();
 		// 可使用的Block的数量
 		long availaBlock = statFs.getAvailableBlocks();
-		// long total = totalBlocks * blocSize;
 		long availableSpare = availaBlock * blocSize;
-		return availableSpare;
+		return getFormatSize(availableSpare);
+	}
+	
+	public static String getTotalStore(String filePath) {
+		// 取得sdcard文件路径
+		StatFs statFs = new StatFs(filePath);
+		// 获取block的SIZE
+		long blocSize = statFs.getBlockSize();
+		// Block的总量
+		long blockCount = statFs.getBlockCount();
+		long spare = blockCount * blocSize;
+		return getFormatSize(spare);
 	}
 
 	public static String getFormatSize(double size) {
