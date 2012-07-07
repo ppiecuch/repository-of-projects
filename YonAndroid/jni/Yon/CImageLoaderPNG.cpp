@@ -146,7 +146,14 @@ namespace video{
 
 		//灰度色为RGB色
 		if (color_type==PNG_COLOR_TYPE_GRAY || color_type==PNG_COLOR_TYPE_GRAY_ALPHA)
+		{
 			png_set_gray_to_rgb(png_ptr);
+			//修正从GRAYALPHA->RGBA时color_type仍为4的问题
+			if(color_type==PNG_COLOR_TYPE_GRAY)
+				color_type=PNG_COLOR_TYPE_RGB;
+			else
+				color_type=PNG_COLOR_TYPE_RGB_ALPHA;
+		}
 
 #if 0
 		if (color_type==PNG_COLOR_TYPE_RGB_ALPHA)
