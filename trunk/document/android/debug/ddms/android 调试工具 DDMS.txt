@@ -1,0 +1,64 @@
+DDMS全称：Dalvik Debug Monitor 
+一、DDMS的作用：
+　　它提供截屏，查看线程和堆的信息，logcat，进程，广播状态信息，模拟来电呼叫和短信，虚拟地理坐标等等。
+ 
+二、DDMS怎样工作：
+　　1、每一个Android应用都运行在一个Dalvik虚拟机实例里，而每一个虚拟机实例都是一个独立的进程空间。虚拟机的线程机制，内存分配和管理，Mutex等等都是依赖底层操作系统而实现的。所有Android应用的线程都对应一个Linux线程，虚拟机因而可以更多的依赖操作系统的线程调度和管理机制。 
+　　2、DDMS在IDE与设备或模拟器之间的起着中间人的角色。 
+　　3、DDMS启动时会与ADB之间建立一个device monitoring service用于监控设备。当设备断开或链接时，这个service就会通知DDMS。 
+　　4、当一个设备链接上时，DDSM和ADB之间又会建立VM monitoring service用于监控设备上的虚拟机。 
+　　5、通过ADB Deamon与设备上的虚拟机的debugger建立链接，这样DDMS就开始与虚拟机对话了。 
+
+三、端口：
+　　1、对于设备上每个虚拟机的debugger， DDMS都会开启一个监听端口。端口从8600开始。 
+　　2、8700端口 
+
+四、左边面板
+　　1、左边显示了所有当前能找到的所有模拟器或设备列表和每个设备当前正在运行的虚拟机列表。虚拟机是按程序的包命来显示的。 
+　　2、通过这些列表可以找到运行着想调试的activity的虚拟机。每个虚拟机旁边的是“debugger pass-through”端口，链接到其中一个端口就会链接到设备上对应的虚拟机。不管如何，在用DDMS时，只需要链接到8700端口，因为DDSM转发所有的通信到当前选择的虚拟机。这样，就不用在每次切换虚拟机是重新配置debugger端口。 
+　　3、当一个正在运行的程序调用waitForDebugger()函数时，客户端名字旁边会显示一个红色的icon,知道debugger连上对应的虚拟机，这是debugger会变成绿色。 
+　　4、如果看到叉icon，着意味着DDMS用于不能打开虚拟机的端口而不能建立debugger与虚拟机建立连接。如果看到所有的虚拟机是这样，很可能是有另外一个DDSM实例在运行。
+ 
+五、右边面板
+　　1、info 　　　　 这里显示关于选中的VM的一般的信息，包括进程ID，包名，和虚拟机版本。 
+　　2、Threads 　　线程视图列出了此进程的所有线程。 
+ID:虚拟机分配的唯一的线程ID,在Dalvik里，它们是从3开始的奇数。 
+Tid：linux的线程ID,For the main thread in a process, this will match the process ID. 
+Stauts：线程状态， 
+running:正在执行程序代码 
+sleeping：执行了Thread.sleep() 
+monitor：等待接受一个监听锁。 
+wait:Object.wait() 
+native：正在执行native代码 
+vmwait：等待虚拟机 
+zombie：线程在垂死的进程 
+init：线程在初始化（我们不可能看到） 
+starting：线程正在启动（我们不可能看到） 
+utime：执行用户代码的累计时间 
+stime：执行系统代码的累计时间 
+name：线程的名字 
+
+　　3、VM Heap 
+　　展示一些堆的状态，在垃圾回收其间更新。当选定一个虚拟机时， VM Heap视图不能显示数据，可以点击右边面包上的带有绿色的”Show heap updates”按钮，然后在点击”Cause GC “实施垃圾回收更新堆的状态。 
+
+　　4、Allocation Tracker　　在这个视图里，我们可以跟踪每个选中的虚拟机的内存分配情况。点击”Start Tracking”后点击”Get Allocations “就可以看到。 
+　　5、Emulator Control 　　在这里，可以模拟一些设备状态和行为。 
+
+Telephony Status：改变电话语音和数据方案的状态，模拟不同的网络速度。 
+
+TelePhony Actions：发送模拟的电话呼叫和短信到模拟器。 
+Location Controls：发送虚拟的定位数据到模拟器里，我们就可以执行定位之类的操作。可以收工的在Manual里输入经度纬度发送到模拟器，也可以通过GPX和KML文件。 
+六、其他
+　　1、File Explorer 
+　　通过Device > File Explorer 就打开File Explorer。这里可以浏览文件，上传上载删除文件，当然这是有相应权限限制的。 
+　　2、Screen Capture 
+　　通过Device > Screen Capture 就可以截图。 
+　　3、Exploring Processes 
+　　通过Device  > Show process status ，这里的信息是通过shell命令”ps -x”输出的。 
+　　4、Examine Radio State 
+　　通过Device > Dump radio，检测广播状态。 
+　　5、Stop a Virtual Machine 
+　　通过Actions > Halt VM ，停止一个虚拟机。
+
+
+http://www.cnblogs.com/zhengtao/articles/1951214.html
