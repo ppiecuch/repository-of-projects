@@ -85,6 +85,7 @@ namespace video{
 		virtual const core::dimension2du& getDimension() const = 0;
 		virtual ENUM_COLOR_FORMAT getColorFormat() const = 0;
 		virtual SColor getPixel(u32 x, u32 y) const = 0;
+		virtual u32 getValue(u32 x,u32 y) const = 0;
 		
 		virtual u32 getByteCountPerRow() const =0;
 		virtual u32 getByteCountPerPixel() const =0;

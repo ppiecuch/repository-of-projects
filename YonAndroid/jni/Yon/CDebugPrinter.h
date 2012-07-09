@@ -11,6 +11,7 @@
 #include "IUnit.h"
 #include "matrix4.h"
 #include "IResizable.h"
+#include "SDynamicShap.h"
 
 namespace yon{
 namespace debug{
@@ -56,7 +57,8 @@ namespace debug{
 		core::rectf*** m_texcoords;
 		core::dimension2du m_fontStep;
 		Shap2DPool m_pool;
-		scene::IShap* m_pShap;
+		//scene::IShap* m_pShap;
+		scene::SDynamicShap2D* m_pShap;
 		scene::IUnit* m_pUnit;
 
 		core::matrix4f m_projection;

@@ -25,8 +25,6 @@ namespace yon{
 			virtual u32 getVertexSize() const = 0;
 			virtual u32 getIndexSize() const = 0;
 
-			virtual void setSize(u32 size) = 0;
-
 			//当顶点/索引变化时，changedId跟着改变
 			virtual u32 getVerticesChangedId() const = 0;
 			virtual u32 getIndicesChangedId() const = 0;
