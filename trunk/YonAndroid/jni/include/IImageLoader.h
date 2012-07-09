@@ -13,7 +13,7 @@ namespace video{
 	public:
 		virtual bool checkFileExtension(const io::path& filename) const = 0;
 		virtual bool checkFileHeader(io::IReadStream* file) const = 0;
-		virtual video::IImage* loadImage(io::IReadStream* file) const = 0;
+		virtual video::IImage* loadImage(io::IReadStream* file,bool translateIntoGray=false) const = 0;
 	};
 }
 }
