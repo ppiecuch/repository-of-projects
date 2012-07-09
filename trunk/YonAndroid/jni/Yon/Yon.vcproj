@@ -507,6 +507,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\SDynamicShap.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\SShap.h"
 					>
 				</File>
@@ -597,6 +601,10 @@
 				<Filter
 					Name="terrain"
 					>
+					<File
+						RelativePath=".\CGeomipmapTerrain.cpp"
+						>
+					</File>
 					<File
 						RelativePath=".\CGeomipmapTerrain.h"
 						>

@@ -50,7 +50,8 @@ namespace debug{
 				}
 			}
 
-			m_pShap=m_pGeometryFty->createShap(scene::ENUM_VERTEX_TYPE_2V1T1C,0,0);
+			//m_pShap=m_pGeometryFty->createShap(scene::ENUM_VERTEX_TYPE_2V1T1C,0,0);
+			m_pShap=new scene::SDynamicShap2D();
 			m_pUnit=m_pGeometryFty->createUnit(m_pShap);
 			m_pUnit->getMaterial()->setTexture(0,m_pTexture);
 			m_pUnit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_LIGHTEN);
@@ -103,7 +104,9 @@ namespace debug{
 		y1=dest.y;
 		//scene::IShap* shap=NULL;
 		//清空之前的缓存
-		m_pShap->setSize(0);
+		//m_pShap->setSize(0);
+		m_pShap->getIndexArray().set_used(0);
+		m_pShap->getVertexArray().set_used(0);
 		for(u32 i=0;i<str.length();++i){
 			if(str[i]>=32&&str[i]<=128){
 				d=m_uRowCount-1-(str[i]-32)/m_uCharCountPerRow;
