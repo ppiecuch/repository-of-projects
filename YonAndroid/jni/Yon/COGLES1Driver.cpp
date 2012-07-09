@@ -802,15 +802,15 @@ namespace ogles1{
 	//	return false;
 	//}
 
-	IImage* COGLES1Driver::createImageFromFile(const io::path& filename){
+	IImage* COGLES1Driver::createImageFromFile(const io::path& filename,bool translateIntoGray){
 		//io::IReadFile* file = m_pFileSystem->createAndOpenFile(filename);
 		io::IReadStream* file = m_pFileSystem->createAndOpenReadFileStream(filename);
-		IImage* image=createImageFromFile(file);
+		IImage* image=createImageFromFile(file,translateIntoGray);
 		file->drop();
 		return image;
 	}
 
-	IImage* COGLES1Driver::createImageFromFile(io::IReadStream* file){
+	IImage* COGLES1Driver::createImageFromFile(io::IReadStream* file,bool translateIntoGray){
 		if (!file)
 			return NULL;
 
@@ -824,7 +824,7 @@ namespace ogles1{
 			{
 				// reset file position which might have changed due to previous loadImage calls
 				file->seek(0);
-				image = m_imageLoaders[i]->loadImage(file);
+				image = m_imageLoaders[i]->loadImage(file,translateIntoGray);
 				if (image)
 					return image;
 			}
@@ -836,7 +836,7 @@ namespace ogles1{
 			if (m_imageLoaders[i]->checkFileHeader(file))
 			{
 				file->seek(0);
-				image = m_imageLoaders[i]->loadImage(file);
+				image = m_imageLoaders[i]->loadImage(file,translateIntoGray);
 				if (image)
 					return image;
 			}
@@ -920,7 +920,7 @@ namespace ogles1{
 	video::ITexture* COGLES1Driver::loadTextureFromFile(io::IReadStream* file){
 		ITexture* texture = NULL;
 		Logger->debug("start load texture:%s\n",getFileName(file->getPath()).c_str());
-		IImage* image = createImageFromFile(file);
+		IImage* image = createImageFromFile(file,false);
 
 		if (image)
 		{

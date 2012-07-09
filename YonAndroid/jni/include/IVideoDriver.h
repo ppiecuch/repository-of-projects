@@ -150,8 +150,8 @@ namespace yon{
 			//	bool clearBackBuffer=true, bool clearZBuffer=true,video::SColor color=video::COLOR_BLACK) =0;
 
 
-			virtual IImage* createImageFromFile(const io::path& filename) = 0;
-			virtual IImage* createImageFromFile(io::IReadStream* file) =0;
+			virtual IImage* createImageFromFile(const io::path& filename,bool translateIntoGray=false) = 0;
+			virtual IImage* createImageFromFile(io::IReadStream* file,bool translateIntoGray=false) =0;
 
 			virtual ITexture* addTexture(const core::dimension2du& size,
 				const io::path& name, ENUM_COLOR_FORMAT format = ENUM_COLOR_FORMAT_R8G8B8A8,bool mipmap=true) = 0;

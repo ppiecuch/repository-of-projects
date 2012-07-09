@@ -107,6 +107,7 @@ namespace ogles1{
 	void COGLES1Texture::uploadTexture(){
 
 		GLenum format=0;
+		GLenum destFormat=0;
 		GLenum pixelType=0;
 
 		getGLFormat(m_pImage->getColorFormat(),format,pixelType);

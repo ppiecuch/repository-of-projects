@@ -73,8 +73,8 @@ namespace ogles1{
 		//virtual bool setRenderTarget(video::ITexture* texture,bool clearBackBuffer, bool clearZBuffer,video::SColor color);
 
 
-		virtual IImage* createImageFromFile(const io::path& filename);
-		virtual IImage* createImageFromFile(io::IReadStream* file);
+		virtual IImage* createImageFromFile(const io::path& filename,bool translateIntoGray);
+		virtual IImage* createImageFromFile(io::IReadStream* file,bool translateIntoGray);
 
 		virtual ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format,bool mipmap);
 		virtual bool setTexture(u32 stage, const video::ITexture* texture);
