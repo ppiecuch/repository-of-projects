@@ -9,11 +9,22 @@ namespace scene{
 	template<class V,class I,size_t VT>
 	class SDynamicShap : public SShap<V,I,VT>{
 	public:
+		//note:
+		//use
+		//core::array<V>& getVertexArray(){
+		//	return m_vertices;
+		//}
+		//will compile failed.for:error: 'm_vertices' was not declared in this scope
+		//explaination: 
+		//m_vertices and m_indices are not a dependent name, i.e. it doesn't depend on the template arguments explicitly so the compiler tries to look it up early. You must make it a dependent name:
+		//this->....
+		//Now it depends on the type of this and thus on the template arguments. Therefore the compiler will bind it at the time of instantiation.
+		//refer to:http://stackoverflow.com/questions/7076169/not-declared-in-this-scope-error-with-templates-and-inheritance
 		core::array<V>& getVertexArray(){
-			return m_vertices;
+			return this->m_vertices;
 		}
 		core::array<I>& getIndexArray(){
-			return m_indices;
+			return this->m_indices;
 		}
 	};
 

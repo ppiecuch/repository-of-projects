@@ -46,7 +46,7 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
@@ -67,6 +67,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->setWorkingDirectory("media/");
 #endif
+
+	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
 
 	IMaterial* material;
 	IShap *shap,*shap1,*shap2;

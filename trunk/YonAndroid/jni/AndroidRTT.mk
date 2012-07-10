@@ -119,6 +119,7 @@ yon_SOURCES :=   \
 		Yon/CReadMemoryStream.cpp \
 		Yon/COrthoCamera.cpp \
 		Yon/CPerspCamera.cpp \
+		Yon/CWindowOrthoCamera.cpp \
 		Yon/CGeometryFactory.cpp \
 		Yon/CEntity.cpp \
 		Yon/CModel.cpp \
@@ -127,6 +128,7 @@ yon_SOURCES :=   \
 		Yon/CSceneManager.cpp \
 		Yon/CTimerAndroid.cpp \
 		Yon/CFPSCounter.cpp \
+		Yon/CColorConverter.cpp \
 		Yon/COGLES1ExtensionHandler.cpp \
 		Yon/COGLES1Driver.cpp \
 		Yon/COGLES1Texture.cpp \

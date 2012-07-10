@@ -301,6 +301,15 @@ namespace video{
 	//Read data using the library function that handles all transformations including interlacing
 	png_read_image(png_ptr, rowPointers);
 
+	/*u32 index=0;
+	Logger->setFormat(debug::MASK_FORMAT_LOG);
+	for (u32 i=0; i<height; ++i)
+	{
+		for(u32 j=0;j<width;++j)
+			Logger->debug("%d,",data[index++]);
+		Logger->debug("\n");
+	}*/
+
 
 	//Read the end of the PNG file.  Will not read past the end of the
 	//file, will verify the end is accurate, and will read any comments

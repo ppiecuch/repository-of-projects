@@ -94,13 +94,14 @@ namespace yon{
 				ENUM_RENDER_MODE_COUNT
 			};
 			ENUM_RENDER_MODE m_renderMode;
+			u32 m_textureCreationConfig;
 			io::IFileSystem* m_pFileSystem;
 			ITimer* m_pTimer;
 			core::array<core::IResizable*> m_resizables;
-			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name,bool mipmap) = 0;
+			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name) = 0;
 		public:
 			IVideoDriver(io::IFileSystem* fs,ITimer* timer)
-				:m_renderMode(ENUM_RENDER_MODE_NONE),m_pFileSystem(fs),m_pTimer(timer){
+				:m_renderMode(ENUM_RENDER_MODE_NONE),m_textureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_NONE),m_pFileSystem(fs),m_pTimer(timer){
 					if(m_pFileSystem)
 						m_pFileSystem->grab();
 					if(m_pTimer)
@@ -120,6 +121,9 @@ namespace yon{
 			void registerResizable(core::IResizable* p){
 				m_resizables.push_back(p);
 			}
+
+			virtual u32 getVideoMemory() const = 0;
+			virtual c8* getVideoMemoryString() const = 0;
 
 			virtual const SClearSetting& getClearSetting() const = 0;
 			virtual void begin(bool backBuffer=true,bool zBuffer=true,const video::SColor& color=video::SColor(0xFF132E47)) = 0;
@@ -141,6 +145,14 @@ namespace yon{
 			virtual void convertPosCoordinate(const core::position2df& src,core::position2df& dest) = 0;
 			virtual void convertPosCoordinate(s32 srcX,s32 srcY,s32& destX,s32& destY) = 0;
 
+			//纹理创建配置
+			void setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG config,bool on){
+				m_textureCreationConfig = (m_textureCreationConfig & (~config)) |((((u32)!on)-1) & config);
+			}
+			bool getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG config) const{
+				return (m_textureCreationConfig&config)!=0;
+			}
+
 			//添加一张用于渲染缓冲的纹理,size必须是2的N次幂,并且长度都不可超过后缓冲区的大小
 			virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,
 				const io::path& name = "rtt", video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G6B5) =0;
@@ -154,7 +166,7 @@ namespace yon{
 			virtual IImage* createImageFromFile(io::IReadStream* file,bool translateIntoGray=false) =0;
 
 			virtual ITexture* addTexture(const core::dimension2du& size,
-				const io::path& name, ENUM_COLOR_FORMAT format = ENUM_COLOR_FORMAT_R8G8B8A8,bool mipmap=true) = 0;
+				const io::path& name, ENUM_COLOR_FORMAT format = ENUM_COLOR_FORMAT_R8G8B8A8) = 0;
 			virtual bool setTexture(u32 stage, const video::ITexture* texture) = 0;
 			virtual ITexture* getTexture(const io::path& filename) = 0;
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;

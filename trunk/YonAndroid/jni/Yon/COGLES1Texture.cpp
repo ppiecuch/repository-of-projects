@@ -12,55 +12,56 @@ namespace ogles1{
 
 	COGLES1Texture::COGLES1Texture(const core::dimension2du& size,const io::path& name, COGLES1Driver* driver)
 		:ITexture(name),m_pDriver(driver), m_pImage(NULL),
-		m_textureId(0),m_bIsRenderTarget(false),m_textureSize(size),m_bHasMipMap(false){}
+		m_textureId(0),m_bIsRenderTarget(false),m_textureSize(size),m_bHasMipMap(false),m_bReserveImage(false){}
 
-	COGLES1Texture::COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver,bool mipmap)
+	COGLES1Texture::COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver)
 		:ITexture(name), m_pDriver(driver), m_pImage(image),m_textureSize(image->getDimension()),
-		m_textureId(0),m_bIsRenderTarget(false),m_bHasMipMap(mipmap){
+		m_textureId(0),m_bIsRenderTarget(false){
+			m_bHasMipMap=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
+			m_bReserveImage=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE);
+			bool use16Bit=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT);
+
 			glGenTextures(1, &m_textureId);
-			m_pImage->grab();
 
-			//ÁÙÊ±
-			/*if(image->getColorFormat()==ENUM_COLOR_FORMAT_R8G8B8A8)
+			bool converted=false;
+			if(use16Bit)
 			{
-				void* data=image->lock();
-				u32 temp;
-				memcpy(&temp,data,4);
-				image->unlock();
-
-				m_pImage=new CImage(ENUM_COLOR_FORMAT_R5G5B5A1,image->getDimension());
-				CColorConverter::convert_A8B8G8R8toR5G5B5A1(image->lock(),image->getImageDataSizeInPixels(),m_pImage->lock());
-				data=m_pImage->lock();
-				u16 temp1;
-				memcpy(&temp1,data,2);
-
-				image->unlock();
-				m_pImage->unlock();
-				Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("convert%08X->%04X",temp,temp1).c_str());
+				if(image->getColorFormat()==ENUM_COLOR_FORMAT_R8G8B8A8)
+				{
+					m_pImage=new CImage(ENUM_COLOR_FORMAT_R5G5B5A1,image->getDimension());
+					CColorConverter::convert_A8B8G8R8toR5G5B5A1(image->lock(),image->getImageDataSizeInPixels(),m_pImage->lock());
+					image->unlock();
+					m_pImage->unlock();
+					converted=true;
+				}
+				else if(image->getColorFormat()==ENUM_COLOR_FORMAT_R8G8B8)
+				{
+					m_pImage=new CImage(ENUM_COLOR_FORMAT_R5G6B5,image->getDimension());
+					CColorConverter::convert_R8G8B8toR5G6B5(image->lock(),image->getImageDataSizeInPixels(),m_pImage->lock());
+					image->unlock();
+					m_pImage->unlock();
+					converted=true;
+				}
 			}
-			else if(image->getColorFormat()==ENUM_COLOR_FORMAT_R8G8B8)
-			{
-				m_pImage=new CImage(ENUM_COLOR_FORMAT_R5G6B5,image->getDimension());
-				CColorConverter::convert_R8G8B8toR5G6B5(image->lock(),image->getImageDataSizeInPixels(),m_pImage->lock());
-			}
-			else
-			{
+			if(converted==false)
 				m_pImage->grab();
-				void* data=m_pImage->lock();
-				u32 temp;
-				memcpy(&temp,data,4);
-				Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("warn%08X",temp).c_str());
-				m_pImage->unlock();
-			}*/
 
 			uploadTexture();
+
+			driver->incVideoMemory(m_pImage->getByteCountPerPixel()*m_pImage->getImageDataSizeInPixels());
+
+			if(m_bReserveImage==false)
+			{
+				m_pImage->drop();
+				m_pImage=NULL;
+			}
 
 			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Instance COGLES1Texture:%d",m_textureId).c_str());
 	}
 	COGLES1Texture::~COGLES1Texture(){
 		if(m_textureId)
 			glDeleteTextures(1, &m_textureId);
-		if(m_pImage)
+		if(m_bReserveImage&&m_pImage)
 			m_pImage->drop();
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Release COGLES1Texture:%d",m_textureId).c_str());

@@ -74,6 +74,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->setWorkingDirectory("media/png/");
 #endif
+
+	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
 	
 
 	IShap *shap;

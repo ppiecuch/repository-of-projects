@@ -39,13 +39,13 @@ namespace camera{
 		Logger->debug("COrthoCamera::onResize->recalculateProjectionMatrix\n");
 	}
 
-	void COrthoCamera::setNear(f32 near){
-		IOrthoCamera::setNear(near);
+	void COrthoCamera::setNear(f32 nearValue){
+		IOrthoCamera::setNear(nearValue);
 		recalculateProjectionMatrix();
 	}
 
-	void COrthoCamera::setFar(f32 far){
-		IOrthoCamera::setFar(far);
+	void COrthoCamera::setFar(f32 farValue){
+		IOrthoCamera::setFar(farValue);
 		recalculateProjectionMatrix();
 	}
 
