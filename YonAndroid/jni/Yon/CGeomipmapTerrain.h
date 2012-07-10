@@ -27,12 +27,24 @@ namespace terrain{
 		SDynamicShap3D2T m_shap;
 
 		SPatch* m_pPatchs;
+		core::vector3df m_scaleSize;
 		s32 m_iMaxLOD;
 		s32 m_iSizePerSide;
 		s32 m_iPatchSize;
 		s32 m_iPatchCountPerSide;
+		core::array<f64> m_distanceThresholds;
+
+		//calculate or recalculate the distance thresholds
+		void calculateDistanceThresholds();
+		void createPatches();
+		void calculatePatchData();
+
+		void calculateIndices();
 
 	public:
+		CGeomipmapTerrain();
+		~CGeomipmapTerrain();
+
 		virtual void loadHeightMap(video::IImage* image,ENUM_PATCH_SIZE patchSize);
 
 		virtual f32 getHeight(f32 x,f32 z) const{
