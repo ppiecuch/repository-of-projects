@@ -44,13 +44,13 @@ void CPerspCamera::setFovy(f32 fovy){
 	IPerspCamera::setFovy(fovy);
 	recalculateProjectionMatrix();
 }
-void CPerspCamera::setNear(f32 near){
-	IPerspCamera::setNear(near);
+void CPerspCamera::setNear(f32 nearValue){
+	IPerspCamera::setNear(nearValue);
 	recalculateProjectionMatrix();
 }
 
-void CPerspCamera::setFar(f32 far){
-	IPerspCamera::setFar(far);
+void CPerspCamera::setFar(f32 farValue){
+	IPerspCamera::setFar(farValue);
 	recalculateProjectionMatrix();
 }
 

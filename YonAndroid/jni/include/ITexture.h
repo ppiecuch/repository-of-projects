@@ -10,6 +10,13 @@
 namespace yon{
 namespace video{
 
+	enum MASK_TEXTURE_CREATION_CONFIG{
+		MASK_TEXTURE_CREATION_CONFIG_NONE			= 0,
+		MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE	= 0x00000001,
+		MASK_TEXTURE_CREATION_CONFIG_16BIT			= 0x00000002,
+		MASK_TEXTURE_CREATION_CONFIG_MIPMAPS		= 0x00000004
+	};
+
 	class ITexture : public virtual core::IReferencable{
 	protected:
 		io::SNamedPath m_namePath;

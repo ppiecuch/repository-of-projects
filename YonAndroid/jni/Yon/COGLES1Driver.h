@@ -13,6 +13,7 @@
 #include "IUnit.h"
 #include "IHardwareBuffer.h"
 #include "COGLES1ExtensionHandler.h"
+#include "yonUtil.h"
 
 
 namespace yon{
@@ -33,6 +34,16 @@ namespace ogles1{
 
 		COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty);
 		virtual ~COGLES1Driver();
+
+		virtual u32 getVideoMemory() const{
+			return m_videoMemory;
+		}
+		virtual c8* getVideoMemoryString() const{
+			return core::yonFormatSize(m_videoMemory);
+		}
+		void incVideoMemory(u32 num){
+			m_videoMemory+=num;
+		}
 
 		virtual const SClearSetting& getClearSetting() const{
 			return m_clearSetting;
@@ -76,7 +87,7 @@ namespace ogles1{
 		virtual IImage* createImageFromFile(const io::path& filename,bool translateIntoGray);
 		virtual IImage* createImageFromFile(io::IReadStream* file,bool translateIntoGray);
 
-		virtual ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format,bool mipmap);
+		virtual ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format);
 		virtual bool setTexture(u32 stage, const video::ITexture* texture);
 		virtual ITexture* getTexture(const io::path& filename);
 		virtual video::ITexture* findTexture(const io::path& filename);
@@ -111,7 +122,7 @@ namespace ogles1{
 		void checkMaterial();
 		void addTexture(video::ITexture* texture);
 		video::ITexture* loadTextureFromFile(io::IReadStream* file);
-		video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name,bool mipmap);
+		video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
 
 		bool needHardwareBuffer(scene::IUnit* unit){
 			return unit->getHardwareBufferUsageType()!=ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE;
@@ -144,6 +155,7 @@ namespace ogles1{
 		CFPSCounter m_FPSCounter;
 		FPSAssist m_FPSAssist;
 		u32 m_uPrimitiveDrawn;
+		u32 m_videoMemory;
 
 		video::SClearSetting m_clearSetting;
 		core::dimension2di m_windowSize;

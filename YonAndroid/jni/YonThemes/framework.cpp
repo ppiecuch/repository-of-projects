@@ -111,7 +111,7 @@ public:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return MyGUI::InputManager::getInstance().injectMouseRelease(evt.mouseInput.x, evt.mouseInput.y, MyGUI::MouseButton::Left);
 				//return true;
-			case event::ENUM_MOUSE_INPUT_TYPE_MOVED:
+			case event::ENUM_MOUSE_INPUT_TYPE_MOVE:
 				logger->debug("[LM]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return MyGUI::InputManager::getInstance().injectMouseMove(evt.mouseInput.x, evt.mouseInput.y, 0);
 			}
@@ -120,13 +120,13 @@ public:
 			switch(evt.mouseInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
-				logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
-				MyGUI::InputManager::getInstance().injectMouseMove((u32)evt.touchInput.x, (u32)evt.touchInput.y, 0);
-				MyGUI::InputManager::getInstance().injectMousePress((u32)evt.touchInput.x, (u32)evt.touchInput.y, MyGUI::MouseButton::Left);
+				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//MyGUI::InputManager::getInstance().injectMouseMove((u32)evt.touchInput.x, (u32)evt.touchInput.y, 0);
+				//MyGUI::InputManager::getInstance().injectMousePress((u32)evt.touchInput.x, (u32)evt.touchInput.y, MyGUI::MouseButton::Left);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
-				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
-				MyGUI::InputManager::getInstance().injectMouseRelease((u32)evt.touchInput.x, (u32)evt.touchInput.y, MyGUI::MouseButton::Left);
+				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//MyGUI::InputManager::getInstance().injectMouseRelease((u32)evt.touchInput.x, (u32)evt.touchInput.y, MyGUI::MouseButton::Left);
 				return true;
 			}
 			break;
@@ -157,7 +157,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -252,7 +252,7 @@ void drawFrame(){
 
 
 
-	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 

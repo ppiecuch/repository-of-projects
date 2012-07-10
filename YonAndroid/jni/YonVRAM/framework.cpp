@@ -21,6 +21,7 @@ f32 xx0,yy0,xx1,yy1;
 
 core::stringc ramAvail="0";
 core::stringc ramTotal="0";
+core::position2di vrampos=core::position2di(0,36);
 core::position2di rampos=core::position2di(0,24);
 core::position2di texpos=core::position2di(0,12);
 void setRAMAvail(const c8* str)
@@ -46,6 +47,7 @@ public:
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				needAdd=true;
 				return true;
 			}
 			break;
@@ -117,8 +119,8 @@ public:
 };
 
 bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
-	params.windowSize.w=400;
-	params.windowSize.h=400;
+	params.windowSize.w=width;
+	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	params.pCallback=pcb;
 	//params.fpsLimit=10;
@@ -136,9 +138,10 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/");
+	//fs->setWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../Yon/");
+	fs->setWorkingDirectory("../media/vram/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	//fs->setWorkingDirectory("media/");
 	//fs->addWorkingDirectory("media/");
@@ -146,6 +149,8 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	//fs->addWorkingDirectory("temp/");
 	fs->setWorkingDirectory("media/vram/");
 #endif
+
+	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
 
 
 	IMaterial* material;
@@ -164,8 +169,6 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	shap->drop();
 	unit->drop();
 	entity->drop();
-
-
 
 	xx0=-videoDriver->getCurrentRenderTargetSize().w/2;
 	yy0=-videoDriver->getCurrentRenderTargetSize().h/2;
@@ -223,6 +226,7 @@ void drawFrame(){
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 	Logger->drawString(videoDriver,core::stringc("TEX:%d",textureSize),texpos,COLOR_GREEN);
 	Logger->drawString(videoDriver,core::stringc("RAM:%s/%s",ramAvail.c_str(),ramTotal.c_str()),rampos,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("VRAM:%d(%s)",videoDriver->getVideoMemory(),videoDriver->getVideoMemoryString()),vrampos,COLOR_GREEN);
 
 	videoDriver->end();
 }

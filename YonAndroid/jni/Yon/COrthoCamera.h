@@ -21,9 +21,9 @@ namespace camera{
 
 		virtual void onResize(const core::dimension2du& size);
 
-		virtual void setNear(f32 near);
+		virtual void setNear(f32 nearValue);
 
-		virtual void setFar(f32 far);
+		virtual void setFar(f32 farValue);
 		
 		virtual void setPosition(const core::vector3df& pos);
 		virtual void setRotation(const core::vector3df& rot);

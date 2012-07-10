@@ -34,10 +34,10 @@ public:
 			switch(evt.mouseInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
-				logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
-				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			}
 		}
@@ -70,6 +70,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->setWorkingDirectory("media/");
 #endif
 
+	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
+	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,true);
+	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,true);
+
 
 	IMaterial* material;
 	IShap *shap;
@@ -84,7 +88,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
-	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
+	//material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
 	cubeModel->setPosition(core::vector3df(100,-150,-300));
 	//material->setTexture(0,videoDriver->getTexture("shanti2.png"));

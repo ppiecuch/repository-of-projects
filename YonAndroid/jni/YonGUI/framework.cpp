@@ -34,7 +34,7 @@ public:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return MyGUI::InputManager::getInstance().injectMouseRelease(evt.mouseInput.x, evt.mouseInput.y, MyGUI::MouseButton::Left);
 				//return true;
-			case event::ENUM_MOUSE_INPUT_TYPE_MOVED:
+			case event::ENUM_MOUSE_INPUT_TYPE_MOVE:
 				logger->debug("[LM]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return MyGUI::InputManager::getInstance().injectMouseMove(evt.mouseInput.x, evt.mouseInput.y, 0);
 			}

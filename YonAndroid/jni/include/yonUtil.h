@@ -4,13 +4,14 @@
 #include "yonString.h"
 #include "path.h"
 #include "yonMath.h"
-
+#include <memory.h>
 #ifdef YON_COMPILE_WITH_WIN32
 #include <windows.h>
 #include <direct.h>//for mkdir
 #elif defined(YON_COMPILE_WITH_ANDROID)
 #include <unistd.h>
 #include <sys/stat.h>//for mkdir
+#include <string.h>
 #endif
 
 namespace yon{
@@ -102,6 +103,21 @@ namespace core{
 #elif defined(YON_COMPILE_WITH_ANDROID)
 		::usleep((pMilliseconds<<10)-24);
 #endif
+	}
+
+	//size£º×Ö½ÚÊý
+	inline c8* yonFormatSize(f64 size) {
+		static c8 buf[20];
+		memset(buf,0x0,20);
+
+		int i = 0;
+		const c8* units[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
+		while (size > 1024) {
+			size /= 1024;
+			i++;
+		}
+		sprintf(buf, "%.*f%s", i, size, units[i]);
+		return buf;
 	}
 }
 }

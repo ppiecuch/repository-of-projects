@@ -114,7 +114,7 @@ namespace ogles1{
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty)
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
-		m_pDebugPrinter(NULL),m_uPrimitiveDrawn(0),
+		m_pDebugPrinter(NULL),m_uPrimitiveDrawn(0),m_videoMemory(0),
 #ifdef YON_COMPILE_WITH_WIN32
 		m_eglDisplay(EGL_NO_DISPLAY),
 		m_hDc(NULL),m_hWnd(param.hWnd),
@@ -176,7 +176,10 @@ namespace ogles1{
 		DebugFont::getInstance().m_pTexture=tex;
 		DebugFont::getInstance().m_pDriver=this;*/
 		video::IImage* image=debug::createDebugPrinterTextureImage();
-		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"),false);
+		const bool useMipmap = getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, false);
+		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, useMipmap);
 		addTexture(tex);
 		tex->drop();
 		image->drop();
@@ -754,8 +757,8 @@ namespace ogles1{
 
 	ITexture* COGLES1Driver::addRenderTargetTexture(const core::dimension2du& size,const io::path& name, video::ENUM_COLOR_FORMAT format){
 		//disable mip-mapping
-		//const bool generateMipLevels = getTextureCreationFlag(ETCF_CREATE_MIP_MAPS);
-		//setTextureCreationFlag(ETCF_CREATE_MIP_MAPS, false);
+		const bool useMipmap = getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, false);
 
 		video::ITexture* rtt = 0;
 		
@@ -788,13 +791,15 @@ namespace ogles1{
 			//but why?
 			//destSize = destSize.getOptimalSize((size==size.getOptimalSize()), false, false);
 			destSize = destSize.getOptimalSize(true, false, false);
-			rtt = addTexture(destSize, name, format, false);
+			rtt = addTexture(destSize, name, format);
 			if (rtt)
 				static_cast<COGLES1Texture*>(rtt)->setIsRenderTarget(true);
 
 			Logger->debug("addRenderTargetTexture:%s\n",name.c_str());
 		}
 
+		//restore mip-mapping
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, useMipmap);
 		return rtt;
 
 	}
@@ -878,7 +883,7 @@ namespace ogles1{
 		return NULL;
 	}
 
-	ITexture* COGLES1Driver::addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format,bool mipmap){
+	ITexture* COGLES1Driver::addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format){
 		if(IImage::isRenderTargetOnlyFormat(format))
 		{
 			Logger->warn("Could not create ITexture, format only supported for render target textures.\n");
@@ -898,7 +903,7 @@ namespace ogles1{
 		else
 			 image = new CImage(format, size);
 		 */
-		ITexture* t = createDeviceDependentTexture(image, name, mipmap);
+		ITexture* t = createDeviceDependentTexture(image, name);
 		image->drop();
 		addTexture(t);
 
@@ -924,7 +929,7 @@ namespace ogles1{
 
 		if (image)
 		{
-			texture = createDeviceDependentTexture(image, file->getPath(),true);
+			texture = createDeviceDependentTexture(image, file->getPath());
 			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("end load texture:%s",getFileName(file->getPath()).c_str()).c_str());
 			image->drop();
 		}
@@ -932,9 +937,9 @@ namespace ogles1{
 		return texture;
 	}
 
-	video::ITexture* COGLES1Driver::createDeviceDependentTexture(IImage* image, const io::path& name,bool mipmap)
+	video::ITexture* COGLES1Driver::createDeviceDependentTexture(IImage* image, const io::path& name)
 	{
-		return new COGLES1Texture(image, name, this, mipmap);
+		return new COGLES1Texture(image, name, this);
 	}
 
 	ITexture* COGLES1Driver::getTexture(const io::path& filename){
