@@ -1,0 +1,4 @@
+PNG does not support a RGB565 packing. You can always apply a posterize to the image (programatically or with ImageMagick or with any image editor), which amounts to discard the lower significant bits in each channel. When saving to PNG, you will still be saving 8 bits per channel (unless you use a palette), but even then you will get an appreciable reduction in size, because of the PNG compression.
+
+
+http://stackoverflow.com/questions/10118374/how-to-convert-32-bit-png-to-rgb565
