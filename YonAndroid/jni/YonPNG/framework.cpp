@@ -118,6 +118,8 @@ void drawFrame(){
 	gfAdapter->drawImage("rgbapng24.png",0,0,256,256,180,80,true);
 
 	gfAdapter->drawImage("fixerror.png",0,0,32,32,340,10,true);
+
+	gfAdapter->drawImage("interlace.png",0,0,128,128,0,200,true);
 	gfAdapter->render();
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);

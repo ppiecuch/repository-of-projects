@@ -14,16 +14,17 @@ IGeometryFactory* geometryFty=NULL;
 
 bool needAdd=false;
 s32 textureSize=0;
-IModel* planeModel;
+IModel* teapotModel=NULL;
 f32 factor=1.1f;
 
 f32 xx0,yy0,xx1,yy1;
 
 core::stringc ramAvail="0";
 core::stringc ramTotal="0";
-core::position2di vrampos=core::position2di(0,36);
-core::position2di rampos=core::position2di(0,24);
-core::position2di texpos=core::position2di(0,12);
+core::stringc ramThreshold="0";
+core::position2di vrampos=core::position2di(0,48);
+core::position2di rampos=core::position2di(0,32);
+core::position2di texpos=core::position2di(0,16);
 void setRAMAvail(const c8* str)
 {
 	ramAvail=str;
@@ -31,6 +32,10 @@ void setRAMAvail(const c8* str)
 void setRAMTotal(const c8* str)
 {
 	ramTotal=str;
+}
+void setRAMThreshold(const c8* str)
+{
+	ramThreshold=str;
 }
 
 bool show=false;
@@ -123,7 +128,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	params.pCallback=pcb;
-	//params.fpsLimit=10;
+	//params.fpsLimit=43;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -138,10 +143,10 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	//fs->setWorkingDirectory("../media/");
+	fs->setWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../Yon/");
-	fs->setWorkingDirectory("../media/vram/");
+	//fs->setWorkingDirectory("../media/vram/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	//fs->setWorkingDirectory("media/");
 	//fs->addWorkingDirectory("media/");
@@ -152,23 +157,28 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 
 	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
 
+	SCallback cb;
+	cb.type=ENUM_CALLBACK_TYPE_HW;
+	cb.hw.type=ENUM_CALLBACK_HW_TYPE_RAM_THRESHOLD;
+	engine->callback(cb);
 
-	IMaterial* material;
+
 	IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
 
-	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
+	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_REF);
-	planeModel->setPosition(core::vector3df(0,0,0));
-	material->setTexture(0,videoDriver->getTexture("0.png"));
+	teapotModel=sceneMgr->addModel(entity);
+	teapotModel->setPosition(core::vector3df(50,-50,200));
 	shap->drop();
 	unit->drop();
 	entity->drop();
+	teapotModel->grab();
+	sceneMgr->clearModels();
+
+
 
 	xx0=-videoDriver->getCurrentRenderTargetSize().w/2;
 	yy0=-videoDriver->getCurrentRenderTargetSize().h/2;
@@ -197,40 +207,42 @@ void drawFrame(){
 
 		
 
-		shap=geometryFty->createXYRectangle2D(xx0,yy0,xx1,yy1);
-		unit=geometryFty->createUnit(shap);
-		entity=geometryFty->createEntity(unit);
-		planeModel=sceneMgr->addModel(entity);
-		material=planeModel->getMaterial(0);
-		planeModel->setPosition(core::vector3df(0,0,textureSize));
-		material->setTexture(0,videoDriver->getTexture(io::path("%d.png",textureSize)));
-		shap->drop();
-		unit->drop();
-		entity->drop();
+		for(s32 i=0;i<10;++i)
+		{
+			shap=geometryFty->createXYRectangle2D(xx0,yy0,xx1,yy1);
+			unit=geometryFty->createUnit(shap);
+			entity=geometryFty->createEntity(unit);
+			planeModel=sceneMgr->addModel(entity);
+			material=planeModel->getMaterial(0);
+			planeModel->setPosition(core::vector3df(0,0,textureSize));
+			material->setTexture(0,videoDriver->getTexture(io::path("%d.png",textureSize)));
+			shap->drop();
+			unit->drop();
+			entity->drop();
 
-		++textureSize;
+			++textureSize;
 
+		}
 		needAdd=false;
 	}
 
-	const core::vector3df psca=planeModel->getScale();
-	if(psca.x>4)
-		factor= 0.9f;
-	else if(psca.x<2)
-		factor=1.1f;
-	planeModel->setScale(psca*factor);
+	const core::vector3df trot=teapotModel->getRotation();
+	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	sceneMgr->render(videoDriver);
 
+	teapotModel->render(videoDriver);
+
 	//Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
-	Logger->drawString(videoDriver,core::stringc("TEX:%d",textureSize),texpos,COLOR_GREEN);
-	Logger->drawString(videoDriver,core::stringc("RAM:%s/%s",ramAvail.c_str(),ramTotal.c_str()),rampos,COLOR_GREEN);
-	Logger->drawString(videoDriver,core::stringc("VRAM:%d(%s)",videoDriver->getVideoMemory(),videoDriver->getVideoMemoryString()),vrampos,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_RED);
+	Logger->drawString(videoDriver,core::stringc("TEX:%d",textureSize),texpos,COLOR_RED);
+	Logger->drawString(videoDriver,core::stringc("RAM:%s/%s(%s)",ramAvail.c_str(),ramTotal.c_str(),ramThreshold.c_str()),rampos,COLOR_RED);
+	Logger->drawString(videoDriver,core::stringc("VRAM:%d(%s)",videoDriver->getVideoMemory(),videoDriver->getVideoMemoryString()),vrampos,COLOR_RED);
 
 	videoDriver->end();
 }
 void destroy(){
+	teapotModel->drop();
 	engine->drop();
 	delete params.pEventReceiver;
 }

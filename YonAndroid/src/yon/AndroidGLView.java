@@ -129,6 +129,9 @@ public class AndroidGLView extends GLSurfaceView{
 	private String getRAMTotal(){
 		return Util.getTotalMemory(activity);
 	}
+	private String getRAMThreshold(){
+		return Util.getMemoryThreshold(activity);
+	}
 	
 
 	public AndroidGLView(Context context,Handler handler) {
@@ -314,35 +317,35 @@ public class AndroidGLView extends GLSurfaceView{
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 			nativeOnSurfaceCreated(screenWidth,screenHeight,Util.getAPKFilePath(activity),Util.getSdCardPath());
 			
-			nativeInfo("external path:"+Util.getExternalStoragePath());
-	        nativeInfo("rom:"+Util.getAvailableInternalMemory()+"/"+Util.getTotalInternalMemory());
-	        nativeInfo("ram:"+Util.getAvailableMemory(activity)+"/"+Util.getTotalMemory(activity)+"("+Util.getMemoryThreshold(activity)+")");
-	        nativeInfo("sd:"+Util.getAvailableExternal()+"/"+Util.getTotalExternal());
-	        nativeInfo(Util.getLanguage());
+			nativeInfo("external path:"+Util.getExternalStoragePath()+"\r\n");
+	        nativeInfo("rom:"+Util.getAvailableInternalMemory()+"/"+Util.getTotalInternalMemory()+"\r\n");
+	        nativeInfo("ram:"+Util.getAvailableMemory(activity)+"/"+Util.getTotalMemory(activity)+"("+Util.getMemoryThreshold(activity)+")"+"\r\n");
+	        nativeInfo("sd:"+Util.getAvailableExternal()+"/"+Util.getTotalExternal()+"\r\n");
+	        nativeInfo(Util.getLanguage()+"\r\n");
 	        
-	        nativeInfo("MODEL:"+Build.MODEL);
-	        nativeInfo("CODENAME:"+Build.VERSION.CODENAME);
-	        nativeInfo("INCREMENTAL:"+Build.VERSION.INCREMENTAL);
-	        nativeInfo("SDK_INT:"+String.valueOf(Build.VERSION.SDK_INT));
-	        nativeInfo("SDK:"+Build.VERSION.SDK);
-	        nativeInfo("RELEASE:"+Build.VERSION.RELEASE);
-	        nativeInfo("PRODUCT:"+Build.PRODUCT);
-	        nativeInfo("RADIO:"+Build.RADIO);
-	        nativeInfo("CPU_ABI:"+Build.CPU_ABI);
-	        nativeInfo("CPU_ABI2:"+Build.CPU_ABI2);
-	        nativeInfo("BOARD:"+Build.BOARD);
-	        nativeInfo("BOOTLOADER:"+Build.BOOTLOADER);
-	        nativeInfo("BRAND:"+Build.BRAND);
-	        nativeInfo("DEVICE:"+Build.DEVICE);
-	        nativeInfo("DISPLAY:"+Build.DISPLAY);
-	        nativeInfo("FINGERPRINT:"+Build.FINGERPRINT);
-	        nativeInfo("HARDWARE:"+Build.HARDWARE);
-	        nativeInfo("HOST:"+Build.HOST);
-	        nativeInfo("ID:"+Build.ID);
-	        nativeInfo("MANUFACTURER:"+Build.MANUFACTURER);
-	        nativeInfo("TAGS:"+Build.TAGS);
-	        nativeInfo("TYPE:"+Build.TYPE);
-	        nativeInfo("USER:"+Build.USER);
+	        nativeInfo("MODEL:"+Build.MODEL+"\r\n");
+	        nativeInfo("CODENAME:"+Build.VERSION.CODENAME+"\r\n");
+	        nativeInfo("INCREMENTAL:"+Build.VERSION.INCREMENTAL+"\r\n");
+	        nativeInfo("SDK_INT:"+String.valueOf(Build.VERSION.SDK_INT+"\r\n"));
+	        nativeInfo("SDK:"+Build.VERSION.SDK+"\r\n");
+	        nativeInfo("RELEASE:"+Build.VERSION.RELEASE+"\r\n");
+	        nativeInfo("PRODUCT:"+Build.PRODUCT+"\r\n");
+	        nativeInfo("RADIO:"+Build.RADIO+"\r\n");
+	        nativeInfo("CPU_ABI:"+Build.CPU_ABI+"\r\n");
+	        nativeInfo("CPU_ABI2:"+Build.CPU_ABI2+"\r\n");
+	        nativeInfo("BOARD:"+Build.BOARD+"\r\n");
+	        nativeInfo("BOOTLOADER:"+Build.BOOTLOADER+"\r\n");
+	        nativeInfo("BRAND:"+Build.BRAND+"\r\n");
+	        nativeInfo("DEVICE:"+Build.DEVICE+"\r\n");
+	        nativeInfo("DISPLAY:"+Build.DISPLAY+"\r\n");
+	        nativeInfo("FINGERPRINT:"+Build.FINGERPRINT+"\r\n");
+	        nativeInfo("HARDWARE:"+Build.HARDWARE+"\r\n");
+	        nativeInfo("HOST:"+Build.HOST+"\r\n");
+	        nativeInfo("ID:"+Build.ID+"\r\n");
+	        nativeInfo("MANUFACTURER:"+Build.MANUFACTURER+"\r\n");
+	        nativeInfo("TAGS:"+Build.TAGS+"\r\n");
+	        nativeInfo("TYPE:"+Build.TYPE+"\r\n");
+	        nativeInfo("USER:"+Build.USER+"\r\n");
 		}
 		
 	}

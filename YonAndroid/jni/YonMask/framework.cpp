@@ -35,10 +35,10 @@ public:
 			switch(evt.mouseInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
-				logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
-				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			}
 		}
@@ -60,7 +60,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
@@ -90,7 +90,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//sound=audioDriver->getSound("helloworld.wav");
 	//sound->play();*/
 
-	shap=geometryFty->createCube(50,50,50);
+	/*shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
@@ -103,7 +103,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material->setTexture(0,videoDriver->getTexture("120.png"));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
 	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
@@ -157,8 +157,8 @@ void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
-	const core::vector3df crot=cubeModel->getRotation();
-	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
+	//const core::vector3df crot=cubeModel->getRotation();
+	//cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 	const core::vector3df trot=teapotModel->getRotation();
 	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
@@ -172,7 +172,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }

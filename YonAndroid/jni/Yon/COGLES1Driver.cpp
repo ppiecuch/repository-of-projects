@@ -297,12 +297,12 @@ namespace ogles1{
 		
 		if(m_pTimer->getRealTime()-m_FPSAssist.refreshedTime>m_FPSAssist.timeUnit){
 			//Logger->debug("frameCounter:%d,frameUnit:%d\n",m_FPSAssist.frameCounter,m_FPSAssist.frameUnit);
-			if(m_FPSAssist.frameCounter<=m_FPSAssist.frameUnit){
+			if(m_FPSAssist.frameCounter>m_FPSAssist.frameUnit){
+				++m_FPSAssist.timeCounter;
+			}else if(m_FPSAssist.frameCounter<m_FPSAssist.frameUnit||m_FPSAssist.frameUnit==1){
 				--m_FPSAssist.timeCounter;
 				if(m_FPSAssist.timeCounter<0)
 					m_FPSAssist.timeCounter=0;
-			}else if(m_FPSAssist.frameCounter>m_FPSAssist.frameUnit){
-				++m_FPSAssist.timeCounter;
 			}
 			m_FPSAssist.frameCounter=0;
 			m_FPSAssist.refreshedTime=m_pTimer->getRealTime();
@@ -926,6 +926,20 @@ namespace ogles1{
 		ITexture* texture = NULL;
 		Logger->debug("start load texture:%s\n",getFileName(file->getPath()).c_str());
 		IImage* image = createImageFromFile(file,false);
+
+		/*u32 index=0;
+		u8* data=(u8*)image->lock();
+		Logger->setFormat(debug::MASK_FORMAT_LOG);
+		for (u32 i=0; i<image->getDimension().h; ++i)
+		{
+			for(u32 j=0;j<image->getByteCountPerRow();++j)
+			{
+				Logger->debug("%d,",data[index]);
+				index++;
+			}
+			Logger->debug("\n");
+		}
+		image->unlock();*/
 
 		if (image)
 		{

@@ -174,6 +174,22 @@ public:
 						return true;
 					}
 					break;
+				case ENUM_CALLBACK_HW_TYPE_RAM_THRESHOLD:
+					{
+						jmethodID callback = g_env->GetMethodID(cls, "getRAMThreshold", "()Ljava/lang/String;");
+						if (callback == NULL) 
+						{
+							Logger->warn("no callback function\n");
+							return false;  
+						}
+						jstring str = (jstring)g_env->CallObjectMethod(g_obj, callback);
+						const char* text= g_env->GetStringUTFChars(str, 0);
+						//Logger->info(text);
+						setRAMThreshold(text);
+						g_env->ReleaseStringUTFChars(str, text);
+						return true;
+					}
+					break;
 				default:
 					Logger->warn("unexpect callback hw type\r\n");
 				}
@@ -195,7 +211,7 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, ji
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	Logger->debug("nativeOnSurfaceChanged->w:%d,h:%d\n",w,h);
-	getEngine()->onResize(w,h);
+	resize(w,h);
 }
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	getEngine()->run();
