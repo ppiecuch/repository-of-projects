@@ -233,7 +233,7 @@ void InitGL(int width,int height)
 	sphere=new Sphere(8.0f,24,12);
 	sphere->toString();
 
-	pTexture=new CTexture("D:\\Development\\Workspace\\VS2008\\OpenGLES\\06ES1Texture\\test-png8.png");
+	pTexture=new CTexture("D:\\Development\\Workspace\\VS2008\\OpenGLES\\06ES1Texture\\error.png");
 
 	glEnable(GL_DEPTH_TEST);
 

@@ -40,6 +40,11 @@ public:
 
 	HDC m_hDc;
 	HWND m_hWnd;
+
+	void setHWND(HWND hWnd)
+	{
+		m_hWnd=hWnd;
+	}
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 };
