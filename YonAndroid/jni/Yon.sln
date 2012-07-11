@@ -164,6 +164,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonPNG", "YonPNG\YonPNG.vcp
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonTerrain", "YonTerrain\YonTerrain.vcproj", "{2C125EE0-B7CE-48A1-9697-03FDCCDFE7C7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -302,6 +307,10 @@ Global
 		{F4C1609D-7B26-4990-AEFA-981A99CF659C}.Debug|Win32.Build.0 = Debug|Win32
 		{F4C1609D-7B26-4990-AEFA-981A99CF659C}.Release|Win32.ActiveCfg = Release|Win32
 		{F4C1609D-7B26-4990-AEFA-981A99CF659C}.Release|Win32.Build.0 = Release|Win32
+		{2C125EE0-B7CE-48A1-9697-03FDCCDFE7C7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2C125EE0-B7CE-48A1-9697-03FDCCDFE7C7}.Debug|Win32.Build.0 = Debug|Win32
+		{2C125EE0-B7CE-48A1-9697-03FDCCDFE7C7}.Release|Win32.ActiveCfg = Release|Win32
+		{2C125EE0-B7CE-48A1-9697-03FDCCDFE7C7}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -610,7 +610,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\include\ITerrain.h"
+						RelativePath="..\include\ITerrainModel.h"
 						>
 					</File>
 				</Filter>

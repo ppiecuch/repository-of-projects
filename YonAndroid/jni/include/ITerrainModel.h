@@ -1,7 +1,7 @@
-#ifndef _YON_SCENE_TERRAIN_ITERRAIN_H_
-#define _YON_SCENE_TERRAIN_ITERRAIN_H_
+#ifndef _YON_SCENE_TERRAIN_ITERRAINMODEL_H_
+#define _YON_SCENE_TERRAIN_ITERRAINMODEL_H_
 
-#include "IEntity.h"
+#include "IModel.h"
 
 namespace yon{
 	namespace video{
@@ -23,10 +23,15 @@ namespace terrain{
 		ENUM_PATCH_SIZE_129 = 129
 	};
 
-	class ITerrain : public IEntity{
+	class ITerrainModel : public IModel{
 	public:
+		ITerrainModel(IModel* parent,const core::vector3df& pos=core::vector3df(0,0,0),
+			const core::vector3df& rot=core::vector3df(0,0,0),
+			const core::vector3df& scale=core::vector3df(1,1,1))
+			:IModel(parent,pos,rot,scale){}
 		virtual f32 getHeight(f32 x,f32 z) const = 0;
-		virtual void loadHeightMap(video::IImage* image,ENUM_PATCH_SIZE patchSize) = 0;
+		//TODO ¸Ä³Éio::path
+		virtual void loadHeightMap(video::IImage* image,ENUM_PATCH_SIZE patchSize=ENUM_PATCH_SIZE_17) = 0;
 	};
 }
 }

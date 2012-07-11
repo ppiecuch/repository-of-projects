@@ -57,6 +57,7 @@
 #include "IEntity.h" 
 #include "IGeometryFactory.h" 
 #include "IModel.h" 
+#include "ITerrainModel.h"
 #include "ICamera.h"
 #include "ISceneManager.h" 
 #include "ITimer.h" 

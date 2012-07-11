@@ -4,6 +4,7 @@
 #include "COrthoCamera.h"
 #include "CPerspCamera.h"
 #include "CWindowOrthoCamera.h"
+#include "CGeomipmapTerrain.h"
 
 #include "ILogger.h"
 
@@ -40,6 +41,15 @@ namespace scene{
 
 		Logger->debug("CSceneManager::addModel size:%d\n",m_children.size());
 		return model;
+	}
+
+	terrain::ITerrainModel* CSceneManager::addTerrainModel(IModel* parent,const core::vector3df& pos,
+		const core::vector3df& rot,const core::vector3df& scale){
+			if(parent==NULL)
+				parent=this;
+			terrain::ITerrainModel* model=new terrain::CGeomipmapTerrain(parent,pos,rot,scale);
+			model->drop();
+			return model;
 	}
 
 	camera::ICamera* CSceneManager::addCamera(camera::ENUM_CAMERA_TYPE cameraType,
@@ -143,6 +153,7 @@ namespace scene{
 			core::list<IModel*>::Iterator it = m_children.begin();
 			for (; it != m_children.end(); ++it)
 				(*it)->onRegisterForRender(manager);
+			//Logger->debug("CSceneManager::onRegisterForRender:%d\r\n",m_children.size());
 		}
 	}
 
