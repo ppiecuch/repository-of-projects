@@ -35,6 +35,9 @@ namespace scene{
 	};
 
 	class IModel;
+	namespace terrain{
+		class ITerrainModel;
+	}
 
 	class ISceneManager : public virtual core::IRenderable{
 	public:
@@ -72,6 +75,10 @@ namespace scene{
 			//TODO ¡Ÿ ±
 			return false;
 		}
+
+		virtual terrain::ITerrainModel* addTerrainModel(IModel* parent=NULL,const core::vector3df& pos=core::vector3df(0,0,0),
+			const core::vector3df& rot=core::vector3df(0,0,0),
+			const core::vector3df& scale=core::vector3df(1,1,1)) = 0;
 	};
 
 }

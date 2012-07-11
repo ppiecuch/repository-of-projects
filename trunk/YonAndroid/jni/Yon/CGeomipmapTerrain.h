@@ -1,15 +1,15 @@
 #ifndef _YON_SCENE_TERRAIN_CGEOMIPMAPTERRAIN_H_
 #define _YON_SCENE_TERRAIN_CGEOMIPMAPTERRAIN_H_
 
-#include "ITerrain.h"
-#include "SUnit.h"
+#include "ITerrainModel.h"
+#include "IUnit.h"
 #include "SDynamicShap.h"
 
 namespace yon{
 namespace scene{
 namespace terrain{
 
-	class CGeomipmapTerrain : public ITerrain{
+	class CGeomipmapTerrain : public ITerrainModel{
 	private:
 		struct SPatch{
 			SPatch():m_iLOD(-1),top(NULL),bottom(NULL),left(NULL),right(NULL)
@@ -23,7 +23,7 @@ namespace terrain{
 			SPatch* right;
 		};
 
-		Unit3D m_unit;
+		IUnit* m_pUnit;
 		SDynamicShap3D2T m_shap;
 
 		SPatch* m_pPatchs;
@@ -40,16 +40,29 @@ namespace terrain{
 		void calculatePatchData();
 
 		void calculateIndices();
-
+		u32 getIndex(const s32 PatchX, const s32 PatchZ,const s32 PatchIndex, u32 vX, u32 vZ) const;
 	public:
-		CGeomipmapTerrain();
+		CGeomipmapTerrain(IModel* parent,const core::vector3df& pos,
+			const core::vector3df& rot,const core::vector3df& scale);
 		~CGeomipmapTerrain();
 
 		virtual void loadHeightMap(video::IImage* image,ENUM_PATCH_SIZE patchSize);
 
+		virtual void render(video::IVideoDriver* driver);
+
 		virtual f32 getHeight(f32 x,f32 z) const{
 			//TODO
 			return 0;
+		}
+
+		virtual u32 getMaterialCount() const{
+			return 1;
+		}
+
+		virtual video::IMaterial* getMaterial(u32 num) const{
+			if(num>=getMaterialCount())
+				return NULL;
+			return m_pUnit->getMaterial();
 		}
 	};
 }

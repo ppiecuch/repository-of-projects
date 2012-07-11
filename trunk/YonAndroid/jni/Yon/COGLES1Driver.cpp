@@ -295,7 +295,7 @@ namespace ogles1{
 			return;
 		++m_FPSAssist.frameCounter;
 		
-		if(m_pTimer->getRealTime()-m_FPSAssist.refreshedTime>m_FPSAssist.timeUnit){
+		if((s32)m_pTimer->getRealTime()-m_FPSAssist.refreshedTime>m_FPSAssist.timeUnit){
 			//Logger->debug("frameCounter:%d,frameUnit:%d\n",m_FPSAssist.frameCounter,m_FPSAssist.frameUnit);
 			if(m_FPSAssist.frameCounter>m_FPSAssist.frameUnit){
 				++m_FPSAssist.timeCounter;

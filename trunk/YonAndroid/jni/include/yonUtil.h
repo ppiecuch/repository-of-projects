@@ -116,7 +116,7 @@ namespace core{
 			size /= 1024;
 			i++;
 		}
-		sprintf(buf, "%.*f%s", i, size, units[i]);
+		sprintf_s(buf,20,"%.*f%s", i, size, units[i]);
 		return buf;
 	}
 }

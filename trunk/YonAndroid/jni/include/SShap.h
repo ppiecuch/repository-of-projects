@@ -14,7 +14,7 @@ namespace scene{
 	template<class V,class I,size_t VT>
 	class SShap : public IShap{
 	protected:
-		static u64 s_lCounter;
+		static u32 s_lCounter;
 
 		core::array<V> m_vertices;
 		core::array<I> m_indices;
@@ -149,7 +149,7 @@ namespace scene{
 	typedef SShap<S2DVertex,u16,ENUM_VERTEX_TYPE_2V1T1C> Shap2D;
 
 	template<class V,class I,size_t VT>
-	u64 SShap<V,I,VT>::s_lCounter=1;
+	u32 SShap<V,I,VT>::s_lCounter=1;
 } 
 }
 #endif

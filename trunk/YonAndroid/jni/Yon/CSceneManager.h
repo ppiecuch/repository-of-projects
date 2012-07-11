@@ -73,6 +73,10 @@ namespace yon{
 			virtual void clearModels(){
 				clearChildren();
 			}
+
+			virtual terrain::ITerrainModel* addTerrainModel(IModel* parent,const core::vector3df& pos,
+				const core::vector3df& rot,const core::vector3df& scale);
+
 			virtual camera::ICamera* addCamera(camera::ENUM_CAMERA_TYPE cameraType,
 				const core::vector3df& pos,const core::vector3df& up,
 				const core::vector3df& lookat,bool makeActive);
