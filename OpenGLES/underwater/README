@@ -1,0 +1,33 @@
+
+This OpenGL program demonstrates the simulation of underwater caustics.
+Underwater caustics are the patterns of light that occur when light is
+refracted by the surface of water such that the light focuses (brightens)
+and unfocuses (dims) on underwater surfaces.
+
+If you swim underwater in a swimming pool, you know the sort of caustic
+patterns that I am describing.
+
+Correct physical simulation of underwater caustics is very involved.
+See the discussion in Watt & Watt's book "Advanced Animation and Rendering
+Techniques" (Section 10.1.5).  The demo program in this directory is a
+hack that creates the illusion of underwater caustics using a sequence
+of texture images.
+
+The program uses a sequence of 32 texture images that repeat in
+both spatially (ie, a single image will tile) and temporally (ie,
+the sequence of images progresses naturally and the final image loops
+back to the beginning).  The texture images were created by Jos Stam
+(jstam@aw.sgi.com) using Fourier synthesis.
+
+Angus Dorbie's IRIS Performer underwater demo inspired this simple
+example.  Thanks, Jos and Angus for the textures and inspiration.
+
+The caust*.bw images are in the SGI image file format.
+
+When available, the program uses the ARB_multitexture extension (supported
+by the NVIDIA Riva TNT) to render the underwater floor surface with the
+caustic effect modulated in with a single rendering pass.
+
+- Mark Kilgard
+  NVIDIA Corporation
+  August 17, 1999

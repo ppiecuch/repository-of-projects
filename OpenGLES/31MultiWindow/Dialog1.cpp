@@ -59,6 +59,9 @@ void CDialog1::DrawFrame()
 	if(eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext)==EGL_FALSE){
 		TRACE("Could not Bind Contexts and Drawables for OpenGL-ES1 display.");
 	}
+
+	//TRACE( "(error %s)\n", getEGLError(eglGetError()) );
+
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_TEXTURE_2D);
 	pTexture->bind();
@@ -81,7 +84,7 @@ int CDialog1::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  在此添加您专用的创建代码
-	m_hWnd=this->GetSafeHwnd();
+	//m_hWnd=this->GetSafeHwnd();
 	if(m_hWnd==NULL)
 	{
 		AfxMessageBox(TEXT("获取渲染区窗口对象时HWND为空"));
@@ -91,8 +94,8 @@ int CDialog1::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_hDc = ::GetDC(m_hWnd);
 	m_eglDisplay = eglGetDisplay(m_hDc);
 	//m_eglDisplay = eglGetDisplay((NativeDisplayType) EGL_DEFAULT_DISPLAY);
-	//eglBindAPI(EGL_OPENGL_ES_API); 
-	if(eglGetError() != EGL_SUCCESS){
+	eglBindAPI(EGL_OPENGL_ES_API); 
+	if(m_eglDisplay == EGL_NO_DISPLAY || eglGetError() != EGL_SUCCESS){
 		TRACE("EGL_ERROR\n");
 	}
 	EGLint majorVersion, minorVersion;

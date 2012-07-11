@@ -1,9 +1,9 @@
-// 31MultiWindowDlg.cpp : 实现文件
+// 33OneWindowDlg.cpp : 实现文件
 //
 
 #include "stdafx.h"
-#include "31MultiWindow.h"
-#include "31MultiWindowDlg.h"
+#include "33OneWindow.h"
+#include "33OneWindowDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,23 +41,23 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CMy31MultiWindowDlg 对话框
+// CMy33OneWindowDlg 对话框
 
 
 
 
-CMy31MultiWindowDlg::CMy31MultiWindowDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CMy31MultiWindowDlg::IDD, pParent)
+CMy33OneWindowDlg::CMy33OneWindowDlg(CWnd* pParent /*=NULL*/)
+	: CDialog(CMy33OneWindowDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CMy31MultiWindowDlg::DoDataExchange(CDataExchange* pDX)
+void CMy33OneWindowDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CMy31MultiWindowDlg, CDialog)
+BEGIN_MESSAGE_MAP(CMy33OneWindowDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
@@ -65,9 +65,9 @@ BEGIN_MESSAGE_MAP(CMy31MultiWindowDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CMy31MultiWindowDlg 消息处理程序
+// CMy33OneWindowDlg 消息处理程序
 
-BOOL CMy31MultiWindowDlg::OnInitDialog()
+BOOL CMy33OneWindowDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -95,6 +95,7 @@ BOOL CMy31MultiWindowDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+
 	CRect renderRect1;
 	GetDlgItem(IDC_STATIC1)->GetWindowRect(&renderRect1);
 	m_dlg1.setHWND(GetDlgItem(IDC_STATIC1)->GetSafeHwnd());
@@ -104,20 +105,10 @@ BOOL CMy31MultiWindowDlg::OnInitDialog()
 	m_dlg1.MoveWindow(renderRect1);
 	m_dlg1.ShowWindow(SW_SHOW);
 
-	CRect renderRect2;
-	GetDlgItem(IDC_STATIC2)->GetWindowRect(&renderRect2);
-	m_dlg2.setHWND(GetDlgItem(IDC_STATIC2)->GetSafeHwnd());
-	TRACE("%d,%d,%d,%d\r\n",renderRect2.top,renderRect2.bottom,renderRect2.left,renderRect2.right);
-	ScreenToClient(&renderRect2);
-	m_dlg2.Create(IDD_DIALOG2,this);
-	m_dlg2.MoveWindow(renderRect2);
-	m_dlg2.ShowWindow(SW_SHOW);
-
-
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
-void CMy31MultiWindowDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void CMy33OneWindowDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
@@ -134,7 +125,7 @@ void CMy31MultiWindowDlg::OnSysCommand(UINT nID, LPARAM lParam)
 //  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
 
-void CMy31MultiWindowDlg::OnPaint()
+void CMy33OneWindowDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -161,7 +152,7 @@ void CMy31MultiWindowDlg::OnPaint()
 
 //当用户拖动最小化窗口时系统调用此函数取得光标
 //显示。
-HCURSOR CMy31MultiWindowDlg::OnQueryDragIcon()
+HCURSOR CMy33OneWindowDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
