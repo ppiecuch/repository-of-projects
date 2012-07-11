@@ -72,6 +72,7 @@ namespace video{
 			png_set_strip_16(png_ptr);
 		}
 
+		png_set_interlace_handling(png_ptr);
 		png_read_update_info(png_ptr, info_ptr);
 		color_type = png_get_color_type(png_ptr, info_ptr);
 
@@ -81,6 +82,7 @@ namespace video{
 			png_set_gray_to_rgb(png_ptr);
 		}
 
+		png_set_interlace_handling(png_ptr);
 		png_read_update_info(png_ptr, info_ptr);
 		color_type = png_get_color_type(png_ptr, info_ptr);
 
@@ -123,6 +125,7 @@ namespace video{
 			png_set_strip_16(png_ptr);
 		}
 
+		png_set_interlace_handling(png_ptr);
 		png_read_update_info(png_ptr, info_ptr);
 		//width = png_get_image_width(png_ptr, info_ptr);
 		//height = png_get_image_height(png_ptr, info_ptr);
@@ -170,6 +173,7 @@ namespace video{
 			png_set_rgb_to_gray(png_ptr,1,-1,-1);
 		}
 
+		png_set_interlace_handling(png_ptr);
 		png_read_update_info(png_ptr, info_ptr);
 		color_type = png_get_color_type(png_ptr, info_ptr);
 
@@ -300,15 +304,6 @@ namespace video{
 
 	//Read data using the library function that handles all transformations including interlacing
 	png_read_image(png_ptr, rowPointers);
-
-	/*u32 index=0;
-	Logger->setFormat(debug::MASK_FORMAT_LOG);
-	for (u32 i=0; i<height; ++i)
-	{
-		for(u32 j=0;j<width;++j)
-			Logger->debug("%d,",data[index++]);
-		Logger->debug("\n");
-	}*/
 
 
 	//Read the end of the PNG file.  Will not read past the end of the

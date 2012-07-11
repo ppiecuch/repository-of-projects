@@ -26,5 +26,5 @@ void destroy();
 IYonEngine* getEngine();
 void setRAMAvail(const c8* str);
 void setRAMTotal(const c8* str);
-
+void setRAMThreshold(const c8* str);
 #endif
