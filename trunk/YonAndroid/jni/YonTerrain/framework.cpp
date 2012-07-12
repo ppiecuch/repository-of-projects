@@ -84,7 +84,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	for(s32 i=-100;i<100;i+=30)
+	/*for(s32 i=-100;i<100;i+=30)
 	{
 		for(s32 j=-100;j<100;j+=30)
 		{
@@ -99,12 +99,12 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 			unit->drop();
 			entity->drop();
 		}
-	}
+	}*/
 
-	/*terrainModel=sceneMgr->addTerrainModel();
+	terrainModel=sceneMgr->addTerrainModel();
 	IImage* image=videoDriver->createImageFromFile("heightmap.png",true);
 	terrainModel->loadHeightMap(image);
-	image->drop();*/
+	image->drop();
 
 	return true;
 }
