@@ -50,6 +50,8 @@ namespace terrain{
 
 		virtual void render(video::IVideoDriver* driver);
 
+		virtual void onRegisterForRender(ISceneManager* manager);
+
 		virtual f32 getHeight(f32 x,f32 z) const{
 			//TODO
 			return 0;

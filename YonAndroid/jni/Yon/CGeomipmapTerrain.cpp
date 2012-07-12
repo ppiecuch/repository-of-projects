@@ -258,6 +258,12 @@ namespace terrain{
 		driver->setMaterial(getMaterial(0));
 		driver->drawUnit(m_pUnit);
 	}
+
+	void CGeomipmapTerrain::onRegisterForRender(ISceneManager* manager)
+	{
+		calculateIndices();
+		ITerrainModel::onRegisterForRender(manager);
+	}
 }
 }
 }

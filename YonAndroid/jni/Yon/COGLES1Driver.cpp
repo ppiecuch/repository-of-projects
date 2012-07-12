@@ -523,7 +523,7 @@ namespace ogles1{
 			break;
 		}
 
-		m_uPrimitiveDrawn+=vertexCount/3;
+		m_uPrimitiveDrawn+=indexCount/3;
 
 		
 		/*glEnableClientState(GL_VERTEX_ARRAY);
