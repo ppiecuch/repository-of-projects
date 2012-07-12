@@ -19,9 +19,9 @@ namespace io{
 		virtual IReadStream* createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode);
 		virtual IWriteStream* createAndOpenWriteFileStream(const path& filename, bool append, ENUM_ENDIAN_MODE mode);
 		virtual XMLReader* createXMLReader(IReadStream* stream);
-		virtual io::path getAbsolutePath(const io::path& filename,bool inWorkingDirectory) const;
-		virtual void setWorkingDirectory(const io::path& newDirectory);
-		virtual const io::path& getWorkingDirectory();
+		//virtual io::path getAbsolutePath(const io::path& filename,bool inWorkingDirectory) const;
+		//virtual void setWorkingDirectory(const io::path& newDirectory);
+		//virtual const io::path& getWorkingDirectory();
 
 		virtual void addWorkingDirectory(const io::path& newDirectory);
 		virtual s32 getWorkingDirectoryCount(){
@@ -31,7 +31,7 @@ namespace io{
 			YON_DEBUG_BREAK_IF(index>=m_workingDirectories.size());
 			return m_workingDirectories[index];
 		}
-		virtual io::path getAbsolutePath2(const io::path& filename) const;
+		virtual io::path getAbsolutePath(const io::path& filename) const;
 		virtual io::path getResourcePath(const io::path& filename) const;
 	};
 }

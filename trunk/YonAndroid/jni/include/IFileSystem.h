@@ -21,13 +21,13 @@ namespace io{
 
 		//获取绝对路径
 		//参数inWorkingDirectory，是否按工作空间路径获取
-		virtual YON_DEPRECATED io::path getAbsolutePath(const io::path& filename,bool inWorkingDirectory=true) const = 0;
+		//virtual YON_DEPRECATED io::path getAbsolutePath(const io::path& filename,bool inWorkingDirectory=true) const = 0;
 
 		//设置当前工作空间路径
 		//参数 newDirectory: 新工作空间的路径(前面没有斜杠，后面带斜杠)
 		//格式如下： "<drive>:/<directory>/<sudirectory>/<..>". 如 "C:/Windows/","/sdcard/","../media/"
-		virtual YON_DEPRECATED void setWorkingDirectory(const io::path& newDirectory) =0;
-		virtual YON_DEPRECATED const io::path& getWorkingDirectory() = 0;
+		//virtual YON_DEPRECATED void setWorkingDirectory(const io::path& newDirectory) =0;
+		//virtual YON_DEPRECATED const io::path& getWorkingDirectory() = 0;
 
 		//支持多个工作目录
 		//参数 newDirectory: 新工作空间的路径(前面没有斜杠，后面带斜杠)
@@ -36,9 +36,9 @@ namespace io{
 		virtual s32 getWorkingDirectoryCount(){return 0;}
 		virtual const io::path& getWorkingDirectory(s32 index) = 0;
 		//获取绝对路径
-		virtual io::path getAbsolutePath2(const io::path& filename) const = 0;
+		virtual io::path getAbsolutePath(const io::path& filename) const = 0;
 		//获取资源绝对路径
-		//遍历工作目录，如果存在匹配的资源，返回路径，否则返回EMPTY_PATH
+		//遍历工作目录，如果存在匹配的资源，返回路径，否则返回""
 		virtual io::path getResourcePath(const io::path& filename) const = 0;
 	};
 

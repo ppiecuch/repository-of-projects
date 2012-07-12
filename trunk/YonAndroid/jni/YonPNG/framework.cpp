@@ -70,7 +70,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/png/");
+	fs->addWorkingDirectory("../media/png/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->setWorkingDirectory("media/png/");
 #endif

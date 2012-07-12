@@ -382,6 +382,10 @@
 					RelativePath="..\include\keycodes.h"
 					>
 				</File>
+				<File
+					RelativePath="..\include\SKeyMap.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="platform"
@@ -468,14 +472,6 @@
 				</File>
 				<File
 					RelativePath=".\CSceneManager.h"
-					>
-				</File>
-				<File
-					RelativePath=".\CUnit.h"
-					>
-				</File>
-				<File
-					RelativePath=".\CUnit2D.h"
 					>
 				</File>
 				<File
@@ -574,6 +570,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\CAnimatorCameraFPS.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CAnimatorCameraFPS.h"
+						>
+					</File>
+					<File
 						RelativePath=".\CAnimatorFactory.cpp"
 						>
 					</File>
@@ -591,6 +595,10 @@
 					</File>
 					<File
 						RelativePath="..\include\IAnimator.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\IAnimatorCameraFPS.h"
 						>
 					</File>
 					<File

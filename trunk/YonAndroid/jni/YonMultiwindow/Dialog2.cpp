@@ -69,7 +69,7 @@ int CDialog2::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	camera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
 	animatorFty=sceneMgr->getAnimatorFactory();
 
-	fs->setWorkingDirectory("../media/");
+	fs->addWorkingDirectory("../media/");
 
 	IMaterial* material;
 	IShap *shap;
