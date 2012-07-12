@@ -12,14 +12,22 @@ namespace animator{
 		ENUM_ANIMATOR_TYPE_UV = 0,
 		ENUM_ANIMATOR_TYPE_SURROUND,
 		ENUM_ANIMATOR_TYPE_ALPHA,
+		ENUM_ANIMATOR_TYPE_FPSCAMERA,
 		ENUM_ANIMATOR_TYPE_COUNT
 	};
 
 	struct SAnimatorParam{
 
 		struct SAnimatorUV{
+			//SAnimatorUV():unitIndex(0),stage(0){}
 			u32 unitIndex;
 			u32 stage;
+			//core::vector3df translate;
+			struct{
+				f32 u;
+				f32 v;
+				f32 w;
+			}translate;
 		};
 
 		struct SAnimatorSurround{

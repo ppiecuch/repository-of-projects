@@ -330,7 +330,7 @@ namespace ogles1{
 		virtual void onSetMaterial(const IMaterial* current,const IMaterial* last)
 		{
 			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 			m_pDriver->setTexture(0, current->getTexture(0));
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
@@ -338,7 +338,7 @@ namespace ogles1{
 			//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 			//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
-			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			
 
 			m_pDriver->setTexture(1, current->getTexture(1));
@@ -347,7 +347,7 @@ namespace ogles1{
 			//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 			//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
-			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 			setBasicRenderStates(current,last);
 
@@ -358,7 +358,7 @@ namespace ogles1{
 			m_pDriver->setTexture(1, NULL);
 			m_pDriver->setTexture(0, NULL);
 			glDisable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 	};
 }//ogles1

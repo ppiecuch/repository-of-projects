@@ -42,17 +42,19 @@ namespace io{
 	}
 
 	IReadStream* CFileSystem::createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode){
-		return createReadFileStream(getAbsolutePath(filename,true),mode);
+		//return createReadFileStream(getAbsolutePath(filename,true),mode);
+		return createReadFileStream(getResourcePath(filename),mode);
 	}
 	IWriteStream* CFileSystem::createAndOpenWriteFileStream(const path& filename, bool append, ENUM_ENDIAN_MODE mode){
-		return createWriteFileStream(getAbsolutePath(filename,true),append,mode);
+		//return createWriteFileStream(getAbsolutePath(filename,true),append,mode);
+		return createWriteFileStream(getResourcePath(filename),append,mode);
 	}
 	XMLReader* CFileSystem::createXMLReader(IReadStream* stream){
 		return new CXMLReaderImpl<c8,core::IReferencable>(stream);
 		//return NULL;
 	}
 
-	io::path CFileSystem::getAbsolutePath(const io::path& filename,bool inWorkingDirectory) const{
+	/*io::path CFileSystem::getAbsolutePath(const io::path& filename,bool inWorkingDirectory) const{
 		//如果是绝对路径
 		if(filename.findFirst(':')!=-1)
 			return filename;
@@ -82,7 +84,7 @@ namespace io{
 		core::stringc tmp("/sdcard/%s",filename.c_str());
 		return tmp;
 #endif
-	}
+	}*/
 	io::path CFileSystem::getResourcePath(const io::path& filename) const{
 		io::path result;
 		for(u32 i=0;i<m_workingDirectories.size();++i)
@@ -90,7 +92,7 @@ namespace io{
 			result=io::path("");
 			result.append(m_workingDirectories[i]);
 			result.append(filename);
-			Logger->debug("test existFile:%s\r\n",result.c_str());
+			//Logger->debug("test existFile:%s\r\n",result.c_str());
 			if(existFile(result))
 				return result;
 		}
@@ -99,11 +101,11 @@ namespace io{
 	}
 	void CFileSystem::addWorkingDirectory(const io::path& newDirectory){
 		//TODO正则
-		io::path dir=getAbsolutePath2(newDirectory);
+		io::path dir=getAbsolutePath(newDirectory);
 		Logger->debug("addWorkingDirectory:%s\r\n",dir.c_str());
 		m_workingDirectories.push_back(dir);
 	}
-	io::path CFileSystem::getAbsolutePath2(const io::path& filename) const{
+	io::path CFileSystem::getAbsolutePath(const io::path& filename) const{
 #ifdef YON_COMPILE_WITH_WIN32
 		if(filename.findFirst(':')!=-1)
 			return filename;
@@ -122,7 +124,7 @@ namespace io{
 		return io::path("");
 #endif
 	}
-	void CFileSystem::setWorkingDirectory(const io::path& newDirectory){
+	/*void CFileSystem::setWorkingDirectory(const io::path& newDirectory){
 		m_workingDirectory=newDirectory;
 		m_workingDirectory.replace('\\', '/');
 	}
@@ -151,7 +153,7 @@ namespace io{
 			Logger->debug("workingDirection:%s\n",m_workingDirectory.c_str());
 		}
 		return m_workingDirectory;
-	}
+	}*/
 
 
 	IFileSystem* createFileSystem()

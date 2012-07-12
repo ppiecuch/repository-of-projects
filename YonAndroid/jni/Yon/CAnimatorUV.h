@@ -13,14 +13,14 @@ namespace animator{
 	private:
 		u32 m_uUnitIndex;
 		u32 m_uStage;
+		core::vector3df m_translate;
 	public:
-		CAnimatorUV(u32 unitIndex,u32 stage):m_uUnitIndex(unitIndex),m_uStage(stage){}
+		CAnimatorUV(u32 unitIndex,u32 stage,const core::vector3df& translate):m_uUnitIndex(unitIndex),m_uStage(stage),m_translate(translate){}
 
 		virtual void animateNode(IModel* model, u32 timeMs){
 			video::IMaterial* material=model->getMaterial(m_uUnitIndex);
 			core::matrix4f& mat=material->getTextureMatrix(m_uStage);
-			//TODO
-			mat.translate(0,0.01f,0);
+			mat.translate(m_translate.x,m_translate.y,m_translate.z);
 		}
 		virtual ENUM_ANIMATOR_TYPE getType() const{
 			return ENUM_ANIMATOR_TYPE_UV;

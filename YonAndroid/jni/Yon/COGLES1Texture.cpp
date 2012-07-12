@@ -21,6 +21,9 @@ namespace ogles1{
 			m_bReserveImage=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE);
 			bool use16Bit=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT);
 
+			if(core::isPowerOf2(image->getDimension().w)==false||core::isPowerOf2(image->getDimension().h)==false)
+				Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s is no a power of 2 image!",name.c_str()).c_str());
+
 			glGenTextures(1, &m_textureId);
 
 			bool converted=false;
