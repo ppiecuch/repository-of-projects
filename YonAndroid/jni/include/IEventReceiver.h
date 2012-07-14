@@ -2,12 +2,14 @@
 #define _YON_EVENT_IEVENTRECEIVER_H_
 
 #include "yonTypes.h"
+#include "keycodes.h"
 
 namespace yon{
 	namespace event{
 		enum ENUM_EVENT_TYPE{
 			ENUM_EVENT_TYPE_TOUCH = 0,
 			ENUM_EVENT_TYPE_MOUSE,
+			ENUM_EVENT_TYPE_KEY,
 			ENUM_EVENT_TYPE_SYSTEM,
 			ENUM_EVENT_TYPE_UI,
 			ENUM_EVENT_TYPE_COUNT
@@ -81,6 +83,14 @@ namespace yon{
 			bool isMiddlePressed() const { return 0 != ( buttonMasks & MASK_MOUSE_BUTTON_MIDDLE ); }
 			bool isRightPressed() const { return 0 != ( buttonMasks & MASK_MOUSE_BUTTON_RIGHT ); }
 		};
+		struct SKeyInput{
+			wchar_t character;
+			ENUM_KEY key;
+			bool pressDown:1;
+			bool shiftPressed:1;
+			bool controlPressed:1;
+			bool alternatePressed:1;
+		};
 		struct SSystemInput{
 			ENUM_SYSTEM_INPUT_TYPE type;
 			u32 screenWidth;
@@ -96,6 +106,7 @@ namespace yon{
 			union{
 				STouchInput touchInput;
 				SMouseInput mouseInput;
+				SKeyInput keyInput;
 				SSystemInput systemInput;
 				SUIInput uiInput;
 			};

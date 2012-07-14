@@ -5,21 +5,43 @@ namespace yon{
 namespace event{
 
 	enum ENUM_KEY{
+		ENUM_KEY_LBUTTON        = 0x01,  // Left mouse button
+		ENUM_KEY_RBUTTON        = 0x02,  // Right mouse button
+		ENUM_KEY_CANCEL         = 0x03,  // Control-break processing
+		ENUM_KEY_MBUTTON        = 0x04,  // Middle mouse button (three-button mouse)
+		ENUM_KEY_XBUTTON1       = 0x05,  // Windows 2000/XP: X1 mouse button
+		ENUM_KEY_XBUTTON2       = 0x06,  // Windows 2000/XP: X2 mouse button
+		ENUM_KEY_BACK           = 0x08,  // BACKSPACE key
+
 		ENUM_KEY_TAB			= 0x09,  // TAB key
+		ENUM_KEY_CLEAR          = 0x0C,  // CLEAR key
 		ENUM_KEY_RETURN         = 0x0D,  // ENTER key
 		ENUM_KEY_PAUSE          = 0x13,  // PAUSE key
 		ENUM_KEY_CAPITAL        = 0x14,  // CAPS LOCK key
+		ENUM_KEY_KANA           = 0x15,  // IME Kana mode
+		ENUM_KEY_HANGUEL        = 0x15,  // IME Hanguel mode (maintained for compatibility use KEY_HANGUL)
+		ENUM_KEY_HANGUL         = 0x15,  // IME Hangul mode
+		ENUM_KEY_JUNJA          = 0x17,  // IME Junja mode
+		ENUM_KEY_FINAL          = 0x18,  // IME final mode
+		ENUM_KEY_HANJA          = 0x19,  // IME Hanja mode
+		ENUM_KEY_KANJI          = 0x19,  // IME Kanji mode
 		ENUM_KEY_ESCAPE         = 0x1B,  // ESC key
+		ENUM_KEY_CONVERT        = 0x1C,  // IME convert
+		ENUM_KEY_NONCONVERT     = 0x1D,  // IME nonconvert
+		ENUM_KEY_ACCEPT         = 0x1E,  // IME accept
+		ENUM_KEY_MODECHANGE     = 0x1F,  // IME mode change request
 		ENUM_KEY_SPACE          = 0x20,  // SPACEBAR
 		ENUM_KEY_PRIOR          = 0x21,  // PAGE UP key
 		ENUM_KEY_NEXT           = 0x22,  // PAGE DOWN key
 		ENUM_KEY_END            = 0x23,  // END key
 		ENUM_KEY_HOME           = 0x24,  // HOME key
+		ENUM_KEY_SELECT         = 0x29,  // SELECT key
 		ENUM_KEY_PRINT          = 0x2A,  // PRINT key
+		ENUM_KEY_EXECUT         = 0x2B,  // EXECUTE key
 		ENUM_KEY_SNAPSHOT       = 0x2C,  // PRINT SCREEN key
 		ENUM_KEY_INSERT         = 0x2D,  // INS key
 		ENUM_KEY_DELETE         = 0x2E,  // DEL key
-		ENUM_KEY_LWIN           = 0x5B,  // Left Windows key (Microsoft?Natural?keyboard)
+		ENUM_KEY_HELP           = 0x2F,  // HELP key
 		ENUM_KEY_NUMLOCK        = 0x90,  // NUM LOCK key
 		ENUM_KEY_SCROLL         = 0x91,  // SCROLL LOCK key
 
@@ -31,6 +53,10 @@ namespace event{
 		ENUM_KEY_SHIFT          = 0x10,  // SHIFT key
 		ENUM_KEY_CONTROL        = 0x11,  // CTRL key
 		ENUM_KEY_MENU           = 0x12,  // ALT key
+		ENUM_KEY_LWIN           = 0x5B,  // Left Windows key (Microsoft?Natural?keyboard)
+		ENUM_KEY_RWIN           = 0x5C,  // Right Windows key (Natural keyboard)
+		ENUM_KEY_APPS           = 0x5D,  // Applications key (Natural keyboard)
+		ENUM_KEY_SLEEP          = 0x5F,  // Computer Sleep key
 		ENUM_KEY_LSHIFT         = 0xA0,  // Left SHIFT key
 		ENUM_KEY_RSHIFT         = 0xA1,  // Right SHIFT key
 		ENUM_KEY_LCONTROL       = 0xA2,  // Left CONTROL key
@@ -98,6 +124,15 @@ namespace event{
 		ENUM_KEY_MINUS          = 0xBD,  // Minus Key  (-)
 		ENUM_KEY_PERIOD         = 0xBE,  // Period Key (.)
 
+		ENUM_KEY_ATTN           = 0xF6,  // Attn key
+		ENUM_KEY_CRSEL          = 0xF7,  // CrSel key
+		ENUM_KEY_EXSEL          = 0xF8,  // ExSel key
+		ENUM_KEY_EREOF          = 0xF9,  // Erase EOF key
+		ENUM_KEY_PLAY           = 0xFA,  // Play key
+		ENUM_KEY_ZOOM           = 0xFB,  // Zoom key
+		ENUM_KEY_PA1            = 0xFD,  // PA1 key
+		ENUM_KEY_OEM_CLEAR      = 0xFE,   // Clear key
+
 		ENUM_KEY_F1             = 0x70,  // F1 key
 		ENUM_KEY_F2             = 0x71,  // F2 key
 		ENUM_KEY_F3             = 0x72,  // F3 key
@@ -110,7 +145,8 @@ namespace event{
 		ENUM_KEY_F10            = 0x79,  // F10 key
 		ENUM_KEY_F11            = 0x7A,  // F11 key
 		ENUM_KEY_F12            = 0x7B,  // F12 key
-		ENUM_KEY_COUNT			= 0x62   // this is not a key, but the amount of keycodes there are.
+
+		ENUM_KEY_COUNT			= 0xFF   // this is not a key, but the amount of keycodes there are.
 	};
 }
 }
