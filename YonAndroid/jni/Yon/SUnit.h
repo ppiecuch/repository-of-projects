@@ -32,9 +32,9 @@ namespace scene{
 		virtual video::IMaterial* getMaterial(){
 			return m_pMaterial;
 		}
-		//virtual const video::IMaterial* getMaterial() const{
-		//	return m_pMaterial;
-		//}
+		virtual const video::IMaterial* getMaterial() const{
+			return m_pMaterial;
+		}
 
 		virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getHardwareBufferUsageType() const{
 			return m_usageType;

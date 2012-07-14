@@ -25,7 +25,7 @@ namespace animator{
 			for(u32 i=0;i<unit->getShap()->getVertexCount();++i)
 			{
 				color=*(pointer+offset+size*i);
-				if(color<m_uMaxValue)
+				if(color+m_uIncrement<=m_uMaxValue)
 				{
 					color+=m_uIncrement;
 					color=core::clamp(color,m_uMinValue,m_uMaxValue);

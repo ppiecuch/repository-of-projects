@@ -3,7 +3,6 @@
 #include "lpng/png.h"
 
 #include "CImage.h"
-#include "CReadFileStream.h"
 
 #include "yonUtil.h"
 

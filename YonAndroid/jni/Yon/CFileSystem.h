@@ -17,6 +17,7 @@ namespace io{
 		virtual ~CFileSystem();
 		virtual bool existFile(const path& filename) const;
 		virtual IReadStream* createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode);
+		virtual IReadStream* createAndOpenReadMemoryStream(const io::path& name,void* data, long size,bool deleteMemoryWhenDropped,ENUM_ENDIAN_MODE mode);
 		virtual IWriteStream* createAndOpenWriteFileStream(const path& filename, bool append, ENUM_ENDIAN_MODE mode);
 		virtual XMLReader* createXMLReader(IReadStream* stream);
 		//virtual io::path getAbsolutePath(const io::path& filename,bool inWorkingDirectory) const;

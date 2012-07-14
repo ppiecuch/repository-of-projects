@@ -11,12 +11,8 @@
 #include <al.h>
 #include <alc.h>
 #include <alu.h>
-//#include <alut.h>
 
-#ifdef YON_COMPILE_WITH_WIN32
-//#pragma comment(lib,"freealut.lib")
-//#pragma comment(lib,"OpenAL32.lib")
-#endif
+
 
 namespace yon{
 namespace audio{

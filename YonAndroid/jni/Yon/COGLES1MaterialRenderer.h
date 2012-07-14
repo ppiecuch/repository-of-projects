@@ -386,6 +386,6 @@ namespace ogles1{
 	IMaterialRenderer* createMaterialRendererMask(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererMask((ogles1::COGLES1Driver*)driver);
 	}
-}//video
-}//yon
+}
+}
 #endif

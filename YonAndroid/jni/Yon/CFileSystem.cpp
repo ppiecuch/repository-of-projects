@@ -1,5 +1,6 @@
 #include "CFileSystem.h"
 #include "CReadFileStream.h"
+#include "CReadMemoryStream.h"
 #include "CWriteFileStream.h"
 #include "CXMLReaderImpl.h"
 
@@ -44,6 +45,9 @@ namespace io{
 	IReadStream* CFileSystem::createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode){
 		//return createReadFileStream(getAbsolutePath(filename,true),mode);
 		return createReadFileStream(getResourcePath(filename),mode);
+	}
+	IReadStream* CFileSystem::createAndOpenReadMemoryStream(const io::path& name,void* data, long size,bool deleteMemoryWhenDropped,ENUM_ENDIAN_MODE mode){
+		return createReadMemoryStream(name,data,size,deleteMemoryWhenDropped,mode);
 	}
 	IWriteStream* CFileSystem::createAndOpenWriteFileStream(const path& filename, bool append, ENUM_ENDIAN_MODE mode){
 		//return createWriteFileStream(getAbsolutePath(filename,true),append,mode);

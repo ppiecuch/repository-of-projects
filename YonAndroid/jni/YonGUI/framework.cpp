@@ -81,9 +81,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/");
+	fs->addWorkingDirectory("../media/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->setWorkingDirectory("media/");
+	fs->addWorkingDirectory("media/");
 #endif
 
 	guiAdapter=MyGUI::createMyGUIAdapter(fs,videoDriver,engine->getTimer(),geometryFty);

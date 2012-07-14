@@ -425,8 +425,8 @@ namespace yon{
 
 				m_bIsChanged=true;
 			}
-			//orthogonal projection in 4th quadrant
-			inline void ortho4q(f32 left, f32 right, float bottom, float top, float nearZ, float farZ)
+			//orthogonal projection in 1th quadrant
+			inline void ortho1q(f32 left, f32 right, float bottom, float top, float nearZ, float farZ)
 			{
 				f32 deltaX = right - left;
 				f32 deltaY = top - bottom;

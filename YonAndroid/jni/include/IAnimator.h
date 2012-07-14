@@ -39,7 +39,7 @@ namespace animator{
 			u32 unitIndex;
 			u8 minValue;
 			u8 maxValue;
-			u8 increment;
+			s8 increment;
 		};
 
 		ENUM_ANIMATOR_TYPE type;

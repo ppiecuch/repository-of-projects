@@ -116,6 +116,17 @@ namespace yon{
 				return dimension2d<T>(getWidth(), getHeight());
 			}
 
+			//! Returns if a 2d point is within this rectangle.
+			/** \param pos Position to test if it lies within this rectangle.
+			\return True if the position is within the rectangle, false if not. */
+			bool isPointInside(const position2d<T>& pos) const
+			{
+				return (topLeft.x <= pos.x &&
+					topLeft.y <= pos.y &&
+					bottomRight.x >= pos.x &&
+					bottomRight.y >= pos.y);
+			}
+
 			position2d<T> topLeft;
 			position2d<T> bottomRight;
 

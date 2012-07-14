@@ -22,7 +22,7 @@ namespace MyGUI{
 	}
 
 	MyGUI::IDataStream* MyGUIDataManager::getData(const std::string& _name){
-		io::path fullpath=m_pFileSystem->getAbsolutePath(io::path(_name.c_str()));
+		io::path fullpath=m_pFileSystem->getResourcePath(io::path(_name.c_str()));
 
 		Logger->debug("start getData:%s\n",_name.c_str());
 

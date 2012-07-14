@@ -9,7 +9,6 @@ namespace video{
 	struct SMaterialLayer{
 		ITexture* texture;
 		core::matrix4f textureMatrix;
-		//bool bilinearFilter;
 		ENUM_FILTER_MODE filter;
 		ENUM_WRAP_MODE wrapU,wrapV;
 
@@ -17,7 +16,6 @@ namespace video{
 			:texture(NULL),
 			wrapU(ENUM_WRAP_MODE_REPEAT),
 			wrapV(ENUM_WRAP_MODE_REPEAT),
-			//bilinearFilter(true),
 			filter(ENUM_FILTER_MODE_BILINEAR),
 			textureMatrix(true)
 		{}
@@ -34,7 +32,6 @@ namespace video{
 			texture = other.texture;
 			wrapU = other.wrapU;
 			wrapV = other.wrapV;
-			//bilinearFilter = other.bilinearFilter;
 			filter = other.filter;
 			return *this;
 		}
@@ -44,7 +41,6 @@ namespace video{
 				texture != other.texture ||
 				wrapU != other.wrapU ||
 				wrapV != other.wrapV ||
-				//bilinearFilter != other.bilinearFilter;
 				filter != other.filter;
 			if (different)
 				return true;

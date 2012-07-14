@@ -45,7 +45,7 @@ namespace ogles1{
 		core::array<core::stringc> arr;
 		m_extensions.split(arr," ");
 		for(u32 i=0;i<arr.size();++i)
-			Logger->info("%s\n",arr[i].c_str());
+			Logger->info("%s\r\n",arr[i].c_str());
 
 		glGetIntegerv(GL_MAX_TEXTURE_UNITS,&m_iMaxTextureUnits);
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE,&m_iMaxTextureSize);

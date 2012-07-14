@@ -2,7 +2,7 @@
 #include "SVertex.h"
 #include "COGLES1Texture.h"
 #include "COGLES1MaterialRenderer.h"
-#include "ILogger.h"
+#include "CLogger.h"
 #include "CDebugPrinter.h"
 #include "yonUtil.h"
 #include "COGLES1HardwareBuffer.h"
@@ -184,7 +184,7 @@ namespace ogles1{
 		tex->drop();
 		image->drop();
 		m_pDebugPrinter=debug::createDebugPrinter(this,tex,geometryFty);
-		Logger->setDebugPrinter(this,m_pDebugPrinter);
+		((CLogger*)Logger)->setDebugPrinter(this,m_pDebugPrinter);
 
 		//实例计数器加1
 		++s_uInstanceCount;
@@ -200,6 +200,7 @@ namespace ogles1{
 		}
 #endif
 
+		//TODO 灵异事件，如果将YON_MATERIAL_MAX_TEXTURES设为1，此m_pDebugPrinter会变成NULL
 		if(m_pDebugPrinter)
 			m_pDebugPrinter->drop();
 
@@ -397,6 +398,9 @@ namespace ogles1{
 				m_pHardwareBuffers[m_pHardwareBuffers.size()-1]->buffer=buffer;
 			}
 			buffer->draw(mode);
+
+			u32 indexCount=unit->getShap()->getIndexCount();
+			m_uPrimitiveDrawn+=indexCount/3;
 		}else{
 			const void* vertice=unit->getShap()->getVertices();
 			const void* indice=unit->getShap()->getIndices();
@@ -407,44 +411,6 @@ namespace ogles1{
 			drawVertex(vertice,vertexCount,indice,indexCount,mode,unit->getVertexType());
 		}
 
-		
-#if 0
-		if(unit->getDimenMode()==ENUM_DIMEN_MODE_3D)
-		{
-			/*glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_COLOR_ARRAY);
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glVertexPointer(unit->getDimenMode(), GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].pos);
-			glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].color);
-			glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getVertices())[0].texcoords);
-			glDrawElements(GL_TRIANGLES, unit->getIndexCount(), GL_UNSIGNED_SHORT,unit->getIndices());
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			glDisableClientState(GL_COLOR_ARRAY);
-			glDisableClientState(GL_VERTEX_ARRAY);*/
-
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_COLOR_ARRAY);
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glVertexPointer(unit->getDimenMode(), GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getShap()->getVertices())[0].pos);
-			glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::SVertex),&((scene::SVertex*)unit->getShap()->getVertices())[0].color);
-			glTexCoordPointer(2, GL_FLOAT, sizeof(scene::SVertex),&((scene::SVertex*)unit->getShap()->getVertices())[0].texcoords);
-			glDrawElements(mode, unit->getShap()->getIndexCount(), GL_UNSIGNED_SHORT,unit->getShap()->getIndices());
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			glDisableClientState(GL_COLOR_ARRAY);
-			glDisableClientState(GL_VERTEX_ARRAY);
-		}else{
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_COLOR_ARRAY);
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-			glVertexPointer(unit->getDimenMode(), GL_FLOAT, sizeof(scene::S2DVertex),&((scene::S2DVertex*)unit->getShap()->getVertices())[0].pos);
-			glColorPointer(4,GL_UNSIGNED_BYTE, sizeof(scene::S2DVertex),&((scene::S2DVertex*)unit->getShap()->getVertices())[0].color);
-			glTexCoordPointer(2, GL_FLOAT, sizeof(scene::S2DVertex),&((scene::S2DVertex*)unit->getShap()->getVertices())[0].texcoords);
-			glDrawElements(mode, unit->getShap()->getIndexCount(), GL_UNSIGNED_SHORT,unit->getShap()->getIndices());
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			glDisableClientState(GL_COLOR_ARRAY);
-			glDisableClientState(GL_VERTEX_ARRAY);
-		}
-#endif
 		//Logger->debug("drawUnit:%08x\n",unit);
 	}
 

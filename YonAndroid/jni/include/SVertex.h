@@ -97,6 +97,6 @@ namespace scene{
 			return (u8*)0+12+4;
 		}
 	}
-}//scene
-}//yon
+}
+}
 #endif
