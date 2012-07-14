@@ -17,6 +17,8 @@ namespace platform{
 		CYonEngineWin32* engine;
 	};
 	core::list<SEnginePair> EngineMap;
+	HKL KEYBOARD_INPUT_HKL=0;
+	unsigned int KEYBOARD_INPUT_CODEPAGE = 1252;
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
@@ -315,18 +317,90 @@ namespace platform{
 			return 0;
 		case WM_ACTIVATE:
 			return 0;
-		case WM_SYSKEYDOWN:
+		/*case WM_SYSKEYDOWN:
 			Logger->debug("WM_SYSKEYDOWN:%c\n",wParam);
 			return 0;
 		case WM_SYSKEYUP:
 			Logger->debug("WM_SYSKEYUP:%c\n",wParam);
 			return 0;
 		case WM_KEYDOWN:
-			Logger->debug("WM_KEYDOWN:%c\n",wParam);
+			Logger->debug("WM_KEYDOWN:%c(%d)\n",wParam,wParam);
 			return 0;
 		case WM_KEYUP:
-			Logger->debug("WM_KEYUP:%c\n",wParam);
-			return 0;
+			Logger->debug("WM_KEYUP:%c(%d)\n",wParam,wParam);
+			return 0;*/
+		case WM_SYSKEYDOWN:
+		case WM_SYSKEYUP:
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+			{
+				BYTE allKeys[256];
+				evt.type=event::ENUM_EVENT_TYPE_KEY;
+				evt.keyInput.key=(event::ENUM_KEY)wParam;
+				evt.keyInput.pressDown = (uiMsg==WM_KEYDOWN || uiMsg == WM_SYSKEYDOWN);
+
+				const UINT MY_MAPVK_VSC_TO_VK_EX = 3; // MAPVK_VSC_TO_VK_EX should be in SDK according to MSDN, but isn't in mine.
+				if(evt.keyInput.key==event::ENUM_KEY_SHIFT)
+				{
+					// this will fail on systems before windows NT/2000/XP, not sure _what_ will return there instead.
+					evt.keyInput.key = (event::ENUM_KEY)MapVirtualKey( ((lParam>>16) & 255), MY_MAPVK_VSC_TO_VK_EX );
+					//lshift==>160 rshift==>161
+				}
+				if(evt.keyInput.key==event::ENUM_KEY_CONTROL)
+				{
+					evt.keyInput.key = (event::ENUM_KEY)MapVirtualKey( ((lParam>>16) & 255), MY_MAPVK_VSC_TO_VK_EX );
+					// some keyboards will just return LEFT for both - left and right keys. So also check extend bit.
+					if (lParam & 0x1000000)
+						evt.keyInput.key = event::ENUM_KEY_RCONTROL;
+					//lcontrol==>162 rcontrol==>163
+				}
+				if (evt.keyInput.key==event::ENUM_KEY_MENU)
+				{
+					evt.keyInput.key = (event::ENUM_KEY)MapVirtualKey( ((lParam>>16) & 255), MY_MAPVK_VSC_TO_VK_EX );
+					if (lParam & 0x1000000)
+						evt.keyInput.key = event::ENUM_KEY_RMENU;
+					//lalt==>164 ralt==>165
+					//Logger->debug("%d\n",evt.keyInput.key);
+				}
+
+				GetKeyboardState(allKeys);
+
+				evt.keyInput.shiftPressed = ((allKeys[VK_SHIFT] & 0x80)!=0);
+				evt.keyInput.controlPressed = ((allKeys[VK_CONTROL] & 0x80)!=0);
+				evt.keyInput.alternatePressed = ((allKeys[VK_MENU] & 0x80)!=0);
+
+				Logger->debug("s:%d,c:%d,a:%d  %d\n",evt.keyInput.shiftPressed,evt.keyInput.controlPressed,evt.keyInput.alternatePressed,evt.keyInput.key);
+
+				// Handle unicode and deadkeys in a way that works since Windows 95 and nt4.0
+				// Using ToUnicode instead would be shorter, but would to my knowledge not run on 95 and 98.
+				WORD keyChars[2];
+				UINT scanCode = HIWORD(lParam);
+				int conversionResult = ToAsciiEx(wParam,scanCode,allKeys,keyChars,0,KEYBOARD_INPUT_HKL);
+				if (conversionResult == 1)
+				{
+					WORD unicodeChar;
+					MultiByteToWideChar(
+						KEYBOARD_INPUT_CODEPAGE,
+						MB_PRECOMPOSED, // default
+						(LPCSTR)keyChars,
+						sizeof(keyChars),
+						(WCHAR*)&unicodeChar,
+						1 );
+					evt.keyInput.character = unicodeChar;
+				}
+				else
+					evt.keyInput.character = 0;
+
+				IYonEngine* engine = getEngineByHWnd(hWnd);
+				if (engine)
+					engine->postEventFromUser(evt);
+
+				if (uiMsg == WM_SYSKEYDOWN || uiMsg == WM_SYSKEYUP)
+					return DefWindowProc(hWnd, uiMsg, wParam, lParam);
+				else
+					return 0;
+				return 0;
+			}
 		case WM_SIZE:
 			Logger->debug("WM_SIZE\n");
 			engine=getEngineByHWnd(hWnd);
