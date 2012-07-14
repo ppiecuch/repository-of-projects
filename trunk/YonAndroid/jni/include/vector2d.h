@@ -127,11 +127,10 @@ namespace yon{
 				return vector2d<T>(x - other.x, y - other.y).getLengthSQ();
 			}
 
-			vector2d<T>& rotateBy(f32 degrees, const vector2d<T>& center=vector2d<T>())
+			vector2d<T>& rotateBy(f32 radian, const vector2d<T>& center=vector2d<T>())
 			{
-				degrees *= DEGTORAD;
-				const f32 cs = cos(degrees);
-				const f32 sn = sin(degrees);
+				const f32 cs = cos(radian);
+				const f32 sn = sin(radian);
 
 				x -= center.x;
 				y -= center.y;
@@ -143,6 +142,12 @@ namespace yon{
 				return *this;
 			}
 
+			vector2d<T>& rotateByDegree(f32 degrees, const vector2d<T>& center=vector2d<T>())
+			{
+				degrees *= DEGTORAD;
+				return rotateBy(degrees);
+			}
+
 			vector2d<T>& normalize()
 			{
 				f32 length = (f32)(x*x + y*y);
@@ -152,6 +157,31 @@ namespace yon{
 				x = (T)(x * length);
 				y = (T)(y * length);
 				return *this;
+			}
+
+			//计算向量在屏幕坐标系中的角度
+			//! Calculates the angle of this vector in degrees in the trigonometric sense.
+			/** 0 is to the right (3 o'clock), values increase counter-clockwise.
+			This method has been suggested by Pr3t3nd3r.
+			\return Returns a value between 0 and 360. */
+			f64 getAngleTrig() const
+			{
+				if (y == 0)
+					return x < 0 ? 180 : 0;
+				else
+					if (x == 0)
+						return y < 0 ? 270 : 90;
+
+				if ( y > 0)
+					if (x > 0)
+						return atan((f64)y/(f64)x) * RADTODEG64;
+					else
+						return 180.0-atan((f64)y/-(f64)x) * RADTODEG64;
+				else
+					if (x > 0)
+						return 360.0-atan(-(f64)y/(f64)x) * RADTODEG64;
+					else
+						return 180.0+atan(-(f64)y/-(f64)x) * RADTODEG64;
 			}
 
 			//! Returns if this vector interpreted as a point is on a line between two other points.
@@ -186,28 +216,38 @@ namespace yon{
 			//|
 			//|
 			//y
-			//范围：[0,360)
+			//范围：[0,2PI)
 			inline f32 getAngle() const
 			{
 				if (y == 0) // corrected thanks to a suggestion by Jox
-					return x < 0 ? 180 : 0;
+					return x < 0 ? xc::core::PI : 0;
 				else if (x == 0)
-					return y < 0 ? 270 : 90;
+					return y < 0 ? (xc::core::PI + xc::core::PI / 2) : (xc::core::PI / 2);
 
 				// don't use getLength here to avoid precision loss with s32 vectors
 				f32 tmp = y / sqrt((f32)(x*x + y*y));
-				tmp = atan( core::squareroot(1 - tmp*tmp) / tmp) * RADTODEG;
+				tmp = atan( core::squareroot(1 - tmp*tmp) / tmp);
 
 				if (x>0 && y>0)
-					return 90-tmp;
+					return xc::core::PI / 2 - tmp;
 				else if (x>0 && y<0)
-					return 270 - tmp;
+					return (xc::core::PI + xc::core::PI / 2) - tmp;
 				else if (x<0 && y<0)
-					return 270 + tmp;
+					return (xc::core::PI + xc::core::PI / 2) + tmp;
 				else if (x<0 && y>0)
-					return 90 + tmp;
+					return xc::core::PI / 2 + tmp;
 
 				return tmp;
+			}
+
+			//----->x
+			//|
+			//|
+			//y
+			//范围：[0,360)
+			inline f32 getAngleDegree() const
+			{
+				return getAngle() * RADTODEG;
 			}
 
 		};

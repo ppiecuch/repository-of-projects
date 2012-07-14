@@ -161,6 +161,6 @@ namespace video{
 			return m_textureLayers[index].textureMatrix;
 		}
 	};
-}//video
-}//yon
+}
+}
 #endif

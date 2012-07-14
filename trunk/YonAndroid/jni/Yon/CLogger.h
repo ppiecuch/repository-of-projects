@@ -14,6 +14,8 @@
 namespace yon{
 	namespace debug{
 
+		class IDebugPrinter;
+
 		class CLogger : public ILogger{
 		private:
 		//ª•≥‚±‰¡ø
@@ -73,6 +75,6 @@ namespace yon{
 			virtual void drawString(const video::IVideoDriver* driver,const core::stringc& str,const core::position2di& pos,const video::SColor& color);
 			virtual void render(const video::IVideoDriver* driver);
 		};
-	}//debug
-}//yon
+	}
+}
 #endif

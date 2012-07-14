@@ -22,7 +22,7 @@ namespace yon{
 			virtual ~IUnit(){}
 
 			virtual video::IMaterial* getMaterial() = 0;
-			//virtual const video::IMaterial* getMaterial() const = 0;
+			virtual const video::IMaterial* getMaterial() const = 0;
 
 			/*virtual const void* getVertices() const = 0;
 			virtual void* getVertices() = 0;

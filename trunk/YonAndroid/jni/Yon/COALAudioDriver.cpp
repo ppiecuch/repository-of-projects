@@ -20,7 +20,15 @@ namespace oal{
 
 	COALAudioDriver::COALAudioDriver(io::IFileSystem* fs)
 		:m_pDevice(NULL),m_pContext(NULL),IAudioDriver(fs){
-			m_pDevice=alcOpenDevice(NULL);
+			const ALCchar *default_device;
+			default_device = alcGetString(NULL,ALC_DEFAULT_DEVICE_SPECIFIER);
+			Logger->info("using default device: %s\r\n", default_device);
+			m_pDevice=alcOpenDevice(default_device);
+			if(m_pDevice==NULL)
+			{
+				Logger->warn(YON_LOG_WARN_FORMAT,"failed to open sound device!");
+				return;
+			}
 			m_pContext=alcCreateContext(m_pDevice, NULL);
 			alcMakeContextCurrent(m_pContext);
 			

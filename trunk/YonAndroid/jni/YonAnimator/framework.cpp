@@ -11,7 +11,7 @@ ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 
-bool show=false;
+
 class MyEventReceiver : public IEventReceiver{
 public:
 	virtual bool onEvent(const SEvent& evt){
@@ -27,7 +27,6 @@ public:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return true;
 			}
-			break;
 		case event::ENUM_EVENT_TYPE_TOUCH:
 			switch(evt.mouseInput.type)
 			{
@@ -36,49 +35,6 @@ public:
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
 				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
-				{
-					SCallback cb;
-					cb.type=platform::ENUM_CALLBACK_TYPE_UI;
-					//confirm
-					/*
-					cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_CONFIRM;
-					cb.ui.title="标题";
-					cb.ui.content="content";
-					cb.ui.positiveButton="ok";
-					cb.ui.negativeButton="cancel";
-					*/
-
-					//toast
-					//cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_TOAST;
-					//cb.ui.content="你好Helloworld";
-
-					//spinner
-					/*
-					if(show==false){
-						cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_LOADING;
-						cb.ui.content="请稍候wating";
-						cb.ui.visible=true;
-						show=true;
-					}else{
-						cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_LOADING;
-						cb.ui.visible=false;
-						show=false;
-					}
-					*/
-
-					//editbox
-					cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_EDITBOX;
-
-					engine->callback(cb);
-				}
-				return true;
-			}
-			break;
-		case ENUM_EVENT_TYPE_UI:
-			switch(evt.uiInput.type)
-			{
-			case ENUM_UI_INPUT_TYPE_EDITTEXT:
-				Logger->debug("edittext:%s\r\n",evt.uiInput.str);
 				return true;
 			}
 		}
@@ -86,11 +42,10 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
+bool init(void *pJNIEnv,u32 width,u32 height){
 	params.windowSize.w=400;
 	params.windowSize.h=400;
 	params.pJNIEnv=pJNIEnv;
-	params.pCallback=pcb;
 	//params.fpsLimit=10;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
@@ -107,14 +62,62 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
-	fs->addWorkingDirectory("../Yon/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/");
-	fs->addWorkingDirectory("temp/");
 #endif
 
+	IMaterial* material;
+	IShap *shap;
+	IUnit* unit;
+	IEntity* entity;
 
-	return true; 
+	shap=geometryFty->createCube(50,50,50);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	IModel* cubeModel=sceneMgr->addModel(entity);
+	material=cubeModel->getMaterial(0);
+	//cubeModel->setPosition(core::vector3df(50,100,120));
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
+	material->setTexture(0,videoDriver->getTexture("wood.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+	SAnimatorParam alphaAnimatorParam;
+	alphaAnimatorParam.type=ENUM_ANIMATOR_TYPE_ALPHA;
+	alphaAnimatorParam.animatorAlpha.unitIndex=0;
+	alphaAnimatorParam.animatorAlpha.minValue=0;
+	alphaAnimatorParam.animatorAlpha.maxValue=255;
+	alphaAnimatorParam.animatorAlpha.increment=1;
+	IAnimator* alphaAnimator=animatorFty->createAnimator(alphaAnimatorParam);
+	cubeModel->addAnimator(alphaAnimator);
+	alphaAnimator->drop();
+
+
+	shap=geometryFty->createXYRectangle2D2T(-75,-150,75,150,0,0,1,0.1f);
+	unit=geometryFty->createUnit(shap);
+	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	entity=geometryFty->createEntity(unit);
+	IModel* waterfallModel=sceneMgr->addModel(entity);
+	material=waterfallModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_MASK);
+	waterfallModel->setPosition(core::vector3df(50,100,120));
+	material->setTexture(0,videoDriver->getTexture("waterfall.png"));
+	material->setTexture(1,videoDriver->getTexture("maskalpha.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+	SAnimatorParam aniParam;
+	aniParam.type=ENUM_ANIMATOR_TYPE_UV;
+	aniParam.animatorUV.unitIndex=0;
+	aniParam.animatorUV.stage=0;
+	aniParam.animatorUV.translate.u=0;
+	aniParam.animatorUV.translate.w=0;
+	aniParam.animatorUV.translate.v=0.002f;
+	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
+	waterfallModel->addAnimator(uvAnimator);
+	uvAnimator->drop();
+
+	return true;
 }
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
@@ -125,7 +128,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }

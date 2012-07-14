@@ -29,8 +29,10 @@
 //DLL导入导出
 #ifdef YON_EXPORTS
 #define YON_API __declspec(dllexport)
+//#define YON_API extern "C"
 #else
 #define YON_API __declspec(dllimport)
+//#define YON_API extern "C"
 #endif
 
 //日志格式

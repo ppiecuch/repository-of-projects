@@ -3,7 +3,6 @@
 
 #include "IRenderable.h"
 #include "IGeometryFactory.h"
-//#include "IModel.h"
 #include "dimension2d.h"
 #include "ICamera.h"
 #include "IEventReceiver.h"

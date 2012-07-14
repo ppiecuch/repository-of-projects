@@ -23,6 +23,7 @@ namespace io{
 		if (m_path.length() == 0)
 		{
 			m_pFile = NULL;
+			Logger->warn(YON_LOG_WARN_FORMAT,"path is empty,ignore!");
 			return;
 		}
 
