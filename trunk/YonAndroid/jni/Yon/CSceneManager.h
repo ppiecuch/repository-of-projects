@@ -5,12 +5,14 @@
 #include "IModel.h"
 #include "IGeometryFactory.h"
 #include "yonArray.h"
+#include "ITimer.h"
 
 namespace yon{
 	namespace scene{
 
 		class IVideoDriver;
 		class CSceneManager : public ISceneManager, public IModel{
+		//class CSceneManager : public ISceneManager{
 		protected:
 
 			struct DefaultModelEntry
@@ -61,8 +63,10 @@ namespace yon{
 			core::array<DefaultModelEntry> m_solids;
 			core::array<TransparentModelEntry> m_transparents;
 			core::array<TransparentModelEntry> m_effects;
+
+			ITimer* m_pTimer;
 		public:
-			CSceneManager();
+			CSceneManager(ITimer* timer);
 			virtual ~CSceneManager();
 
 			virtual IModel* addModel(IEntity* entity);
@@ -77,14 +81,16 @@ namespace yon{
 			virtual terrain::ITerrainModel* addTerrainModel(IModel* parent,const core::vector3df& pos,
 				const core::vector3df& rot,const core::vector3df& scale);
 
-			virtual camera::ICamera* addCamera(camera::ENUM_CAMERA_TYPE cameraType,
+			virtual camera::ICamera* addCamera(camera::ENUM_CAMERA_TYPE cameraType,IModel* parent,
+				const core::vector3df& pos,const core::vector3df& up,
+				const core::vector3df& lookat,bool makeActive);
+			virtual camera::ICamera* addCameraFPS(IModel* parent, f32 moveSpeed, event::SKeyMap* keyMapArray,s32 keyMapSize,
 				const core::vector3df& pos,const core::vector3df& up,
 				const core::vector3df& lookat,bool makeActive);
 			virtual void setActiveCamera(camera::ICamera* camera);
+			virtual camera::ICamera* getActiveCamera() const{return m_activeCamera;}
 
 			virtual bool registerForRender(IModel* model,ENUM_SCENE_PASS pass);
-
-			virtual void onRegisterForRender(ISceneManager* manager);
 
 			virtual void render(video::IVideoDriver* driver);
 

@@ -255,10 +255,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\IRenderable.h"
-					>
-				</File>
-				<File
 					RelativePath="..\include\IResizable.h"
 					>
 				</File>
@@ -488,6 +484,10 @@
 				</File>
 				<File
 					RelativePath="..\include\IModel.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\IRenderable.h"
 					>
 				</File>
 				<File

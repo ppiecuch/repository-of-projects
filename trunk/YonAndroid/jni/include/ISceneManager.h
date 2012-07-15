@@ -7,6 +7,7 @@
 #include "ICamera.h"
 #include "IEventReceiver.h"
 #include "IAnimatorFactory.h"
+#include "SKeyMap.h"
 
 namespace yon{
 namespace scene{
@@ -14,10 +15,11 @@ namespace scene{
 	//! Enumeration for render passes.
 	enum ENUM_SCENE_PASS
 	{
-		//! Camera pass. The active view is set up here. The very first pass.
-		//ENUM_SCENE_PASS_CAMERA =0,
 		//! No pass currently active
 		ENUM_SCENE_PASS_NONE = 0,
+
+		//! Camera pass. The active view is set up here. The very first pass.
+		ENUM_SCENE_PASS_CAMERA,
 
 		//! Solid scene models
 		ENUM_SCENE_PASS_SOLID,
@@ -38,7 +40,8 @@ namespace scene{
 		class ITerrainModel;
 	}
 
-	class ISceneManager : public virtual core::IRenderable{
+	//class ISceneManager : public virtual core::IRenderable{
+	class ISceneManager : public virtual core::IReferencable,public virtual IRenderable{
 	public:
 		virtual ~ISceneManager() {}
 
@@ -46,11 +49,17 @@ namespace scene{
 		virtual IModel* getRootModel() = 0;
 
 		virtual void clearModels() = 0;
-		virtual camera::ICamera* addCamera(camera::ENUM_CAMERA_TYPE cameraType=camera::ENUM_CAMERA_TYPE_ORTHO,
+		virtual camera::ICamera* addCamera(camera::ENUM_CAMERA_TYPE cameraType=camera::ENUM_CAMERA_TYPE_ORTHO,IModel* parent=NULL,
 			const core::vector3df& pos = core::vector3df(0,-1,0),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,100),bool makeActive=true) = 0;
+		virtual camera::ICamera* addCameraFPS(IModel* parent=NULL,f32 moveSpeed=0.1f, event::SKeyMap* keyMapArray=0,s32 keyMapSize=0, 
+			const core::vector3df& pos = core::vector3df(0,-1,0),
+			const core::vector3df& up=core::vector3df(0,1,0),
+			const core::vector3df& lookat = core::vector3df(0,0,100),
+			bool makeActive=true) = 0;
 		virtual void setActiveCamera(camera::ICamera* camera) = 0;
+		virtual camera::ICamera* getActiveCamera() const = 0;
 			
 		virtual IGeometryFactory* getGeometryFactory() const = 0;
 

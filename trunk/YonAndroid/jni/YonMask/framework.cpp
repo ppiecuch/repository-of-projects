@@ -60,7 +60,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 

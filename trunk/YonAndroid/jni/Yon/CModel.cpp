@@ -19,9 +19,9 @@ namespace yon{
 			if(m_bVisible==false)
 				return;
 
-			core::list<animator::IAnimator*>::Iterator it = m_animators.begin();
-			for (; it != m_animators.end(); ++it)
-				(*it)->animateNode(this,0);
+			//core::list<animator::IAnimator*>::Iterator it = m_animators.begin();
+			//for (; it != m_animators.end(); ++it)
+			//	(*it)->animateNode(this,0);
 
 			driver->setTransform(video::ENUM_TRANSFORM_WORLD, getAbsoluteTransformation());
 			for(u32 i=0;i<m_entity->getUnitCount();++i){

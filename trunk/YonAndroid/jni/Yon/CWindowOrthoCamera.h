@@ -14,7 +14,7 @@ namespace camera{
 		//偏移向量，将原点从世界原点偏移到视口第一象限中心
 		core::position3df m_originalPos;
 	public:
-		CWindowOrthoCamera(
+		CWindowOrthoCamera(IModel* parent=NULL,
 			const core::vector3df& pos=core::vector3df(0,0,1),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,-1));

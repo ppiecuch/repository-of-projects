@@ -18,7 +18,7 @@ namespace platform{
 	};
 	core::list<SEnginePair> EngineMap;
 	HKL KEYBOARD_INPUT_HKL=0;
-	unsigned int KEYBOARD_INPUT_CODEPAGE = 1252;
+	u32 KEYBOARD_INPUT_CODEPAGE = 1252;
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
@@ -80,7 +80,7 @@ namespace platform{
 		m_pFileSystem=io::createFileSystem();
 
 		//初始化场景管理器
-		m_pSceneManager=scene::createSceneManager();
+		m_pSceneManager=scene::createSceneManager(m_pTimer);
 
 		//初始化视频驱动器
 		createDriver();
@@ -369,7 +369,7 @@ namespace platform{
 				evt.keyInput.controlPressed = ((allKeys[VK_CONTROL] & 0x80)!=0);
 				evt.keyInput.alternatePressed = ((allKeys[VK_MENU] & 0x80)!=0);
 
-				Logger->debug("s:%d,c:%d,a:%d  %d\n",evt.keyInput.shiftPressed,evt.keyInput.controlPressed,evt.keyInput.alternatePressed,evt.keyInput.key);
+				//Logger->debug("s:%d,c:%d,a:%d  %d\n",evt.keyInput.shiftPressed,evt.keyInput.controlPressed,evt.keyInput.alternatePressed,evt.keyInput.key);
 
 				// Handle unicode and deadkeys in a way that works since Windows 95 and nt4.0
 				// Using ToUnicode instead would be shorter, but would to my knowledge not run on 95 and 98.

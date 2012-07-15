@@ -21,7 +21,7 @@ namespace yon{
 	namespace scene{
 		class IUnit;
 		class ISceneManager;
-		ISceneManager* createSceneManager();
+		ISceneManager* createSceneManager(ITimer* timer);
 	}
 
 	namespace video{

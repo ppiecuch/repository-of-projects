@@ -58,7 +58,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_PERSP,core::vector3df(0,50,300));
+	//pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_PERSP,core::vector3df(0,50,300));
+	pCamera=sceneMgr->addCameraFPS();
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
