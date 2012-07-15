@@ -3,6 +3,7 @@
 
 #include "IModel.h"
 #include "IEntity.h"
+#include "ISceneManager.h"
 
 namespace yon{
 	namespace scene{
@@ -20,6 +21,16 @@ namespace yon{
 
 			virtual IEntity* getEntity(){
 				return m_entity;
+			}
+
+			virtual void onRegisterForRender(ISceneManager* manager)
+			{
+				if(m_bVisible)
+				{
+					manager->registerForRender(this);
+
+					IModel::onRegisterForRender(manager);
+				}
 			}
 
 			virtual video::IMaterial* getMaterial(u32 i) const{

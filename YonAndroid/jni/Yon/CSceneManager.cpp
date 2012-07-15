@@ -5,21 +5,26 @@
 #include "CPerspCamera.h"
 #include "CWindowOrthoCamera.h"
 #include "CGeomipmapTerrain.h"
+#include "CAnimatorCameraFPS.h"
 
 #include "ILogger.h"
 
 namespace yon{
 namespace scene{
 
-	CSceneManager::CSceneManager()
+	CSceneManager::CSceneManager(ITimer* timer)
 		:m_geometryFactory(new CGeometryFactory()),
 		m_pAnimatorFactory(animator::createAnimatorFactory()),
 		m_activeCamera(NULL),m_renderingPass(ENUM_SCENE_PASS_NONE),m_cameraPosition(core::ORIGIN_VECTOR3DF),
-		IModel(NULL){
-			Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance CSceneManager");
+		IModel(NULL),m_pTimer(timer)
+	{
+		if(m_pTimer)
+			m_pTimer->grab();
+		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance CSceneManager");
 	}
 
 	CSceneManager::~CSceneManager(){
+		m_pTimer->drop();
 		m_geometryFactory->drop();
 		m_pAnimatorFactory->drop();
 
@@ -52,20 +57,23 @@ namespace scene{
 			return model;
 	}
 
-	camera::ICamera* CSceneManager::addCamera(camera::ENUM_CAMERA_TYPE cameraType,
+	camera::ICamera* CSceneManager::addCamera(camera::ENUM_CAMERA_TYPE cameraType,IModel* parent,
 		const core::vector3df& pos,const core::vector3df& up,
 		const core::vector3df& lookat,bool makeActive){
+			if(parent==NULL)
+				parent=this;
+
 			camera::ICamera* camera=NULL;
 			switch(cameraType)
 			{
 			case camera::ENUM_CAMERA_TYPE_ORTHO:
-				camera=new camera::COrthoCamera(pos,up,lookat);
+				camera=new camera::COrthoCamera(parent,pos,up,lookat);
 				break;
 			case camera::ENUM_CAMERA_TYPE_ORTHO_WINDOW:
-				camera=new camera::CWindowOrthoCamera(pos,up,lookat);
+				camera=new camera::CWindowOrthoCamera(parent,pos,up,lookat);
 				break;
 			default:
-				camera=new camera::CPerspCamera(pos,up,lookat);
+				camera=new camera::CPerspCamera(parent,pos,up,lookat);
 			}
 			m_cameras.push_back(camera);
 			if(makeActive){
@@ -73,6 +81,14 @@ namespace scene{
 			}
 			Logger->debug("CSceneManager::addCamera size:%d\n",m_cameras.size());
 			return camera;
+	}
+	camera::ICamera* CSceneManager::addCameraFPS(IModel* parent, f32 moveSpeed, event::SKeyMap* keyMapArray,s32 keyMapSize,const core::vector3df& pos,const core::vector3df& up,const core::vector3df& lookat,bool makeActive)
+	{
+		camera::ICamera* camera=addCamera(camera::ENUM_CAMERA_TYPE_PERSP,parent,pos,up,lookat,makeActive);
+		animator::IAnimator* anim=new animator::CAnimatorCameraFPS(moveSpeed,keyMapArray,keyMapSize);
+		camera->addAnimator(anim);
+		anim->drop();
+		return camera;
 	}
 	void CSceneManager::setActiveCamera(camera::ICamera* camera){
 		if(camera){
@@ -147,21 +163,12 @@ namespace scene{
 		return false;
 	}
 
-	void CSceneManager::onRegisterForRender(ISceneManager* manager){
-		if (m_bVisible)
-		{
-			core::list<IModel*>::Iterator it = m_children.begin();
-			for (; it != m_children.end(); ++it)
-				(*it)->onRegisterForRender(manager);
-			//Logger->debug("CSceneManager::onRegisterForRender:%d\r\n",m_children.size());
-		}
-	}
-
 	void CSceneManager::render(video::IVideoDriver* driver){
 		YON_DEBUG_BREAK_IF(m_activeCamera==NULL);
 
 		// do animations and other stuff.
-		//onAnimate(time);
+		onAnimate(m_pTimer->getTime());
+
 		u32 i;
 
 		m_activeCamera->render(driver);
@@ -236,11 +243,13 @@ namespace scene{
 	bool CSceneManager::postEventFromUser(const event::SEvent& evt){
 		//TODO
 		//Logger->debug("%d,%d,%d,%d\n",evt.type,evt.mouseInput.type,evt.mouseInput.x,evt.mouseInput.y);
+		if(m_activeCamera)
+			return m_activeCamera->onEvent(evt);
 		return false;
 	}
 
-	ISceneManager* createSceneManager(){
-		return new CSceneManager();
+	ISceneManager* createSceneManager(ITimer* timer){
+		return new CSceneManager(timer);
 	}
 }//scene
 }//yon

@@ -11,11 +11,11 @@ namespace camera{
 	protected:
 		f32 m_fLeft,m_fRight,m_fTop,m_fBottom;
 	public:
-		IOrthoCamera(
+		IOrthoCamera(IModel* parent=NULL,
 			const core::vector3df& pos = core::vector3df(0,0,-1),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,100)):
-			ICamera(pos,up,lookat),
+			ICamera(parent,pos,up,lookat),
 			m_fLeft(-1),m_fRight(1),m_fTop(1),m_fBottom(-1)
 			{}
 		//virtual void setLeft(f32 left) = 0;

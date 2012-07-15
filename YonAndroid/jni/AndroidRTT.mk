@@ -123,6 +123,7 @@ yon_SOURCES :=   \
 		Yon/CGeometryFactory.cpp \
 		Yon/CEntity.cpp \
 		Yon/CModel.cpp \
+		Yon/CGeomipmapTerrain.cpp \
 		Yon/CAnimatorFactory.cpp \
 		Yon/CGraphicsAdapter.cpp \
 		Yon/CSceneManager.cpp \

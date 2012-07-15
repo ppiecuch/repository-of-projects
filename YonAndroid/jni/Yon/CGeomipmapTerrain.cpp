@@ -1,6 +1,7 @@
 #include "CGeomipmapTerrain.h"
 #include "CImage.h"
 #include "SUnit.h"
+#include "ISceneManager.h"
 
 #include "ILogger.h"
 
@@ -261,8 +262,15 @@ namespace terrain{
 
 	void CGeomipmapTerrain::onRegisterForRender(ISceneManager* manager)
 	{
-		calculateIndices();
-		ITerrainModel::onRegisterForRender(manager);
+		//ITerrainModel::onRegisterForRender(manager);
+		if(m_bVisible)
+		{
+			calculateIndices();
+
+			manager->registerForRender(this);
+
+			ITerrainModel::onRegisterForRender(manager);
+		}
 	}
 }
 }

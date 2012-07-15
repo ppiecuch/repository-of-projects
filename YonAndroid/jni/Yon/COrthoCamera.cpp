@@ -1,13 +1,19 @@
 #include "COrthoCamera.h"
+#include "ISceneManager.h"
 #include "ILogger.h"
 
 namespace yon{
 namespace scene{
 namespace camera{
-	COrthoCamera::COrthoCamera(const core::vector3df& pos,const core::vector3df& up,const core::vector3df& lookat):
-		IOrthoCamera(pos,up,lookat){
+	COrthoCamera::COrthoCamera(IModel* parent,const core::vector3df& pos,const core::vector3df& up,const core::vector3df& lookat):
+		IOrthoCamera(parent,pos,up,lookat){
 			recalculateProjectionMatrix();
 			recalculateViewMatrix();
+	}
+	void COrthoCamera::onRegisterForRender(ISceneManager* manager){
+		if(manager->getActiveCamera()==this)
+			manager->registerForRender(this,ENUM_SCENE_PASS_CAMERA);
+		IOrthoCamera::onRegisterForRender(manager);
 	}
 	void COrthoCamera::recalculateProjectionMatrix(){
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].makeIdentity();

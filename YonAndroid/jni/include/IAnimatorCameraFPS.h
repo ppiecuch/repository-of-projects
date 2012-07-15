@@ -20,11 +20,13 @@ namespace animator{
 		//! Sets the keyboard mapping for this animator
 		/** \param map Array of keyboard mappings, see event::SKeyMap
 		\param count Size of the keyboard map array. */
-		virtual void setKeyMap(event::SKeyMap *map, u32 count) = 0;
+		virtual void setKeyMap(event::SKeyMap *map, s32 count) = 0;
 
 		virtual ENUM_ANIMATOR_TYPE getType() const{
 			return ENUM_ANIMATOR_TYPE_FPSCAMERA;
 		}
+
+		virtual bool isEventReceivable() const{return true;}
 	};
 }
 }

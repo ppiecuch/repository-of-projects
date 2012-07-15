@@ -11,7 +11,7 @@ namespace camera{
 		virtual void recalculateProjectionMatrix();
 		virtual void recalculateViewMatrix();
 	public:
-		CPerspCamera(
+		CPerspCamera(IModel* parent=NULL,
 			const core::vector3df& pos=core::vector3df(0,0,1),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,-1));
@@ -20,6 +20,7 @@ namespace camera{
 		virtual void setFovy(f32 fovy);
 
 		virtual void render(video::IVideoDriver* driver);
+		virtual void onRegisterForRender(ISceneManager* manager);
 
 		virtual void onResize(const core::dimension2du& size);
 

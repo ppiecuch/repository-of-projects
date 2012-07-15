@@ -5,8 +5,8 @@ namespace yon{
 namespace scene{
 namespace camera{
 
-	CWindowOrthoCamera::CWindowOrthoCamera(const core::vector3df& pos,const core::vector3df& up,const core::vector3df& lookat):
-		COrthoCamera(pos,up,lookat),m_originalPos(core::ORIGIN_POSITION3DF){
+	CWindowOrthoCamera::CWindowOrthoCamera(IModel* parent,const core::vector3df& pos,const core::vector3df& up,const core::vector3df& lookat):
+		COrthoCamera(parent,pos,up,lookat),m_originalPos(core::ORIGIN_POSITION3DF){
 	}
 
 	void CWindowOrthoCamera::recalculateViewMatrix(){

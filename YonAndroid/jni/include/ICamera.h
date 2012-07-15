@@ -1,10 +1,11 @@
 #ifndef _YON_SCENE_CAMERA_ICAMERA_H_
 #define _YON_SCENE_CAMERA_ICAMERA_H_
 
-#include "IRenderable.h"
+#include "IModel.h"
 #include "plane.h"
 #include "matrix4.h"
 #include "dimension2d.h"
+#include "IEventReceiver.h"
 
 namespace yon{
 	namespace scene{
@@ -27,7 +28,7 @@ namespace yon{
 				ENUM_FRUSTUM_PLANE_COUNT
 			};
 		
-			class ICamera : public core::IRenderable{
+			class ICamera : public scene::IModel, public event::IEventReceiver{
 			protected:
 				enum ENUM_FRUSTUM_TRANSFORM{
 					ENUM_FRUSTUM_TRANSFORM_VIEW = 0,		// ”Õºø’º‰æÿ’Û
@@ -43,11 +44,16 @@ namespace yon{
 				f32 m_fNear;
 				f32 m_fFar;
 				bool m_bNeedUpload;
+				bool m_bDirectionNeedUpdate;
+				void updateDirection(){
+					m_direction=m_target-m_position;
+					m_bDirectionNeedUpdate=false;
+				}
 			public:
-				ICamera(const core::vector3df& pos=core::vector3df(0,0,1),
+				ICamera(IModel* parent=NULL,const core::vector3df& pos=core::vector3df(0,0,1),
 					const core::vector3df& up=core::vector3df(0,1,0),
 					const core::vector3df& lookat = core::vector3df(0,0,-1),bool visible=false):
-					IRenderable(pos),m_up(up),m_target(lookat),m_direction(lookat-pos),m_bVisible(visible),m_fNear(1),m_fFar(3000.0f),m_bNeedUpload(true){
+					IModel(parent,pos),m_up(up),m_target(lookat),m_direction(lookat-pos),m_bVisible(visible),m_fNear(1),m_fFar(3000.0f),m_bNeedUpload(true),m_bDirectionNeedUpdate(true){
 						m_up.normalize();
 						m_direction.normalize();
 						//for(u32 i=0;i<ENUM_FRUSTUM_TRANSFORM_COUNT;++i)
@@ -56,6 +62,16 @@ namespace yon{
 
 				void setNeedUpload(){
 					m_bNeedUpload=true;
+				}
+
+				virtual bool onEvent(const event::SEvent& evt){
+
+					core::list<animator::IAnimator*>::Iterator ait = m_animators.begin();
+					for (; ait != m_animators.end(); ++ait)
+						if ((*ait)->isEventReceivable()&&(*ait)->onEvent(evt))
+							return true;
+
+					return false;
 				}
 
 				virtual void onResize(const core::dimension2du& size) = 0;
@@ -89,13 +105,25 @@ namespace yon{
 				}
 
 				virtual void setPosition(const core::vector3df& pos){
-					IRenderable::setPosition(pos);
-					m_direction=m_target-pos;
-					m_direction.normalize();
+					IModel::setPosition(pos);
+					if(pos!=m_position)
+						m_bDirectionNeedUpdate=true;
+				}
+
+				virtual const core::vector3df& getTarget() const{
+					return m_target;
+				}
+
+				virtual void setTarget(const core::vector3df& target){
+					m_target=target;
+					if(target!=m_target)
+						m_bDirectionNeedUpdate=true;
 				}
 
 				//TODO setDirection
-				inline const core::vector3df& getDirection() const{
+				inline const core::vector3df& getDirection(){
+					if(m_bDirectionNeedUpdate)
+						updateDirection();
 					return m_direction;
 				}
 

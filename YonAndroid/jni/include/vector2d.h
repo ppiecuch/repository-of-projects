@@ -220,22 +220,22 @@ namespace yon{
 			inline f32 getAngle() const
 			{
 				if (y == 0) // corrected thanks to a suggestion by Jox
-					return x < 0 ? xc::core::PI : 0;
+					return x < 0 ? core::PI : 0;
 				else if (x == 0)
-					return y < 0 ? (xc::core::PI + xc::core::PI / 2) : (xc::core::PI / 2);
+					return y < 0 ? (core::PI + core::PI / 2) : (core::PI / 2);
 
 				// don't use getLength here to avoid precision loss with s32 vectors
 				f32 tmp = y / sqrt((f32)(x*x + y*y));
 				tmp = atan( core::squareroot(1 - tmp*tmp) / tmp);
 
 				if (x>0 && y>0)
-					return xc::core::PI / 2 - tmp;
+					return core::PI / 2 - tmp;
 				else if (x>0 && y<0)
-					return (xc::core::PI + xc::core::PI / 2) - tmp;
+					return (core::PI + core::PI / 2) - tmp;
 				else if (x<0 && y<0)
-					return (xc::core::PI + xc::core::PI / 2) + tmp;
+					return (core::PI + core::PI / 2) + tmp;
 				else if (x<0 && y>0)
-					return xc::core::PI / 2 + tmp;
+					return core::PI / 2 + tmp;
 
 				return tmp;
 			}

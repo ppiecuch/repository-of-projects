@@ -16,7 +16,10 @@ namespace animator{
 			}
 			break;
 		case ENUM_ANIMATOR_TYPE_ALPHA:
-			return new CAnimatorAlpha(param.animatorAlpha.unitIndex,param.animatorAlpha.minValue,param.animatorAlpha.maxValue,param.animatorAlpha.increment);
+			{
+				return new CAnimatorAlpha(param.animatorAlpha.unitIndex,param.animatorAlpha.minValue,param.animatorAlpha.maxValue,param.animatorAlpha.increment);
+			}
+			break;
 		}
 		return NULL;
 	}
