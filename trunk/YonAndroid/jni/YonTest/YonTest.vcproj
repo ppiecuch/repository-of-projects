@@ -243,6 +243,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\vector3dTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\vector3dTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\yonArrayTestCase.cpp"
 			>
 		</File>

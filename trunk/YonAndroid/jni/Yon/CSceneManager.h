@@ -6,6 +6,7 @@
 #include "IGeometryFactory.h"
 #include "yonArray.h"
 #include "ITimer.h"
+#include "ICursorControl.h"
 
 namespace yon{
 	namespace scene{
@@ -65,8 +66,9 @@ namespace yon{
 			core::array<TransparentModelEntry> m_effects;
 
 			ITimer* m_pTimer;
+			platform::ICursorControl* m_pCursorControl;
 		public:
-			CSceneManager(ITimer* timer);
+			CSceneManager(ITimer* timer,platform::ICursorControl* cursorControl);
 			virtual ~CSceneManager();
 
 			virtual IModel* addModel(IEntity* entity);
@@ -84,7 +86,7 @@ namespace yon{
 			virtual camera::ICamera* addCamera(camera::ENUM_CAMERA_TYPE cameraType,IModel* parent,
 				const core::vector3df& pos,const core::vector3df& up,
 				const core::vector3df& lookat,bool makeActive);
-			virtual camera::ICamera* addCameraFPS(IModel* parent, f32 moveSpeed, event::SKeyMap* keyMapArray,s32 keyMapSize,
+			virtual camera::ICamera* addCameraFPS(IModel* parent, f32 moveSpeed,f32 rotateSpeed, event::SKeyMap* keyMapArray,s32 keyMapSize,
 				const core::vector3df& pos,const core::vector3df& up,
 				const core::vector3df& lookat,bool makeActive);
 			virtual void setActiveCamera(camera::ICamera* camera);

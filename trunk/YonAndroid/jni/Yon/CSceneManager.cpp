@@ -12,19 +12,24 @@
 namespace yon{
 namespace scene{
 
-	CSceneManager::CSceneManager(ITimer* timer)
+	CSceneManager::CSceneManager(ITimer* timer,platform::ICursorControl* cursorControl)
 		:m_geometryFactory(new CGeometryFactory()),
 		m_pAnimatorFactory(animator::createAnimatorFactory()),
 		m_activeCamera(NULL),m_renderingPass(ENUM_SCENE_PASS_NONE),m_cameraPosition(core::ORIGIN_VECTOR3DF),
-		IModel(NULL),m_pTimer(timer)
+		IModel(NULL),m_pTimer(timer),m_pCursorControl(cursorControl)
 	{
+		if(m_pCursorControl)
+			m_pCursorControl->grab();
 		if(m_pTimer)
 			m_pTimer->grab();
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance CSceneManager");
 	}
 
 	CSceneManager::~CSceneManager(){
-		m_pTimer->drop();
+		if(m_pTimer)
+			m_pTimer->drop();
+		if(m_pCursorControl)
+			m_pCursorControl->drop();
 		m_geometryFactory->drop();
 		m_pAnimatorFactory->drop();
 
@@ -82,10 +87,10 @@ namespace scene{
 			Logger->debug("CSceneManager::addCamera size:%d\n",m_cameras.size());
 			return camera;
 	}
-	camera::ICamera* CSceneManager::addCameraFPS(IModel* parent, f32 moveSpeed, event::SKeyMap* keyMapArray,s32 keyMapSize,const core::vector3df& pos,const core::vector3df& up,const core::vector3df& lookat,bool makeActive)
+	camera::ICamera* CSceneManager::addCameraFPS(IModel* parent, f32 moveSpeed,f32 rotateSpeed, event::SKeyMap* keyMapArray,s32 keyMapSize,const core::vector3df& pos,const core::vector3df& up,const core::vector3df& lookat,bool makeActive)
 	{
 		camera::ICamera* camera=addCamera(camera::ENUM_CAMERA_TYPE_PERSP,parent,pos,up,lookat,makeActive);
-		animator::IAnimator* anim=new animator::CAnimatorCameraFPS(moveSpeed,keyMapArray,keyMapSize);
+		animator::IAnimator* anim=new animator::CAnimatorCameraFPS(m_pCursorControl,moveSpeed,rotateSpeed,keyMapArray,keyMapSize);
 		camera->addAnimator(anim);
 		anim->drop();
 		return camera;
@@ -248,8 +253,8 @@ namespace scene{
 		return false;
 	}
 
-	ISceneManager* createSceneManager(ITimer* timer){
-		return new CSceneManager(timer);
+	ISceneManager* createSceneManager(ITimer* timer,platform::ICursorControl* cursorControl){
+		return new CSceneManager(timer,cursorControl);
 	}
 }//scene
 }//yon

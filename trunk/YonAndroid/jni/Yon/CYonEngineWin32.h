@@ -13,6 +13,7 @@
 #include "COGLES1Driver.h"
 #include "ISceneManager.h"
 #include "IFileSystem.h"
+#include "ICursorControl.h"
 
 namespace yon{
 	namespace platform{
@@ -65,6 +66,7 @@ namespace yon{
 			audio::IAudioDriver* m_pAudioDriver;
 			ITimer* m_pTimer;
 			IRandomizer* m_pRandomizer;
+			ICursorControl* m_pCursorControl;
 
 			//TODO是否有存在必要，改名？
 			event::IEventReceiver* m_pUserListener;

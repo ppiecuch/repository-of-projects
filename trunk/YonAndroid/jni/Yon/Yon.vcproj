@@ -387,6 +387,10 @@
 				Name="platform"
 				>
 				<File
+					RelativePath=".\CCursorControlWin32.h"
+					>
+				</File>
+				<File
 					RelativePath=".\CTimerAndroid.cpp"
 					>
 				</File>
@@ -420,6 +424,10 @@
 				</File>
 				<File
 					RelativePath="..\include\ICallback.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\ICursorControl.h"
 					>
 				</File>
 				<File
