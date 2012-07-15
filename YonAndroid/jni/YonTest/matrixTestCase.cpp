@@ -1,9 +1,25 @@
 #include "matrixTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
 
 void matrixTestCase::setUp()
 {
+}
+void matrixTestCase::transformVect(){
+	matrix4f m1(true);
+	m1.setRotationDegrees(core::vector3df(0,90,0));
+	core::vector3df v1(1,0,1);
+	m1.transformVect(v1);
+	printf("\n");
+	printf("%.2f,%.2f,%.2f\n",v1.x,v1.y,v1.z);
+	CPPUNIT_ASSERT(v1==core::vector3df(1,0,-1));
+
+	matrix4f m2(true);
+	m2.setRotationDegrees(core::vector3df(0,-90,0));
+	core::vector3df v2(0,0,1);
+	m2.transformVect(v2);
+	printf("%.2f,%.2f,%.2f\n",v2.x,v2.y,v2.z);
+	CPPUNIT_ASSERT(v2==core::vector3df(-1,0,0));
 }
 void matrixTestCase::isIdentity(){
 	matrix4f m1;

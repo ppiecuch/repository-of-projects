@@ -15,13 +15,14 @@
 #include "SVertex.h"
 #include "yonArray.h"
 #include "IResizable.h"
+#include "ICursorControl.h"
 
 namespace yon{
 
 	namespace scene{
 		class IUnit;
 		class ISceneManager;
-		ISceneManager* createSceneManager(ITimer* timer);
+		ISceneManager* createSceneManager(ITimer* timer,platform::ICursorControl* cursorControl);
 	}
 
 	namespace video{

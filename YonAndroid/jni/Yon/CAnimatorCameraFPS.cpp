@@ -6,9 +6,12 @@ namespace yon{
 namespace scene{
 namespace animator{
 
-	CAnimatorCameraFPS::CAnimatorCameraFPS(f32 moveSpeed,event::SKeyMap* keyMapArray,s32 keyMapSize):
-		m_fMoveSpeed(moveSpeed),m_uLastTime(0),m_bFirstUpdated(true)
+	CAnimatorCameraFPS::CAnimatorCameraFPS(platform::ICursorControl* cursorControl,f32 moveSpeed,f32 rotateSpeed,event::SKeyMap* keyMapArray,s32 keyMapSize)
+		:m_pCursorControl(cursorControl),m_fMoveSpeed(moveSpeed),m_fRotateSpeed(rotateSpeed),m_uLastTime(0),m_bFirstUpdated(true)
 	{
+		if(m_pCursorControl)
+			m_pCursorControl->grab();
+
 		allKeysUp();
 
 		if(!keyMapArray||keyMapSize==0)
@@ -24,6 +27,12 @@ namespace animator{
 		}
 	}
 
+	CAnimatorCameraFPS::~CAnimatorCameraFPS()
+	{
+		if(m_pCursorControl)
+			m_pCursorControl->drop();
+	}
+
 	void CAnimatorCameraFPS::animateNode(IModel* model, u32 timeMs)
 	{
 		//TODO check model type
@@ -32,15 +41,39 @@ namespace animator{
 
 		if(m_bFirstUpdated)
 		{
+			if (m_pCursorControl)
+			{
+				m_pCursorControl->setPosition(0.5f, 0.5f);
+				m_cursorPos = m_centerCursor = m_pCursorControl->getRelativePosition();
+			}
 			m_uLastTime=timeMs;
 			m_bFirstUpdated=false;
 		}
 		f32 timeDiff = (f32)(timeMs-m_uLastTime);
 		m_uLastTime=timeMs;
 
+		
 		core::vector3df pos = camera->getPosition();
 		core::vector3df target = camera->getTarget();
 		core::vector3df direction = camera->getDirection();
+
+		if(m_pCursorControl)
+		{
+			core::vector3df relativeRotation = direction.getHorizontalAngle();
+			if(m_cursorPos!=m_centerCursor)
+			{
+				relativeRotation.y += (m_cursorPos.x-0.5f) * m_fRotateSpeed;
+				relativeRotation.x += (m_cursorPos.y-0.5f) * m_fRotateSpeed;
+
+				m_pCursorControl->setPosition(0.5f, 0.5f);
+				m_cursorPos = m_centerCursor = m_pCursorControl->getRelativePosition();
+
+				core::matrix4f mat(true);
+				mat.setRotationDegrees(relativeRotation);
+				mat.transformVect(direction);
+			}
+		}
+
 
 		direction.normalize();
 
@@ -60,7 +93,7 @@ namespace animator{
 
 		right.normalize();
 
-		if (m_keyStates[event::ENUM_KEY_ACTION_MOVE_LEFTWARD])
+		if (m_keyStates[event::ENUM_K	EY_ACTION_MOVE_LEFTWARD])
 			offset -= right;
 
 		if (m_keyStates[event::ENUM_KEY_ACTION_MOVE_RIGHTWARD])
@@ -126,7 +159,12 @@ namespace animator{
 				}
 			}
 			break;
-
+		case event::ENUM_EVENT_TYPE_MOUSE:
+			if(evt.mouseInput.type==event::ENUM_MOUSE_INPUT_TYPE_MOVE)
+			{
+				m_cursorPos=m_pCursorControl->getRelativePosition();
+				return true;
+			}
 		default:
 			break;
 		}

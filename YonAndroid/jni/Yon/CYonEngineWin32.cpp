@@ -3,6 +3,7 @@
 #ifdef YON_COMPILE_WITH_WIN32
 
 #include "CYonEngineWin32.h"
+#include "CCursorControlWin32.h"
 #include "CGraphicsAdapter.h"
 #include "CRandomizer.h"
 #include "yonList.h"
@@ -52,7 +53,7 @@ namespace platform{
 		m_pAudioDriver(NULL),m_pRandomizer(NULL),
 		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),
 		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),
-		m_params(params),m_bClose(false),m_bResized(false)
+		m_params(params),m_bClose(false),m_bResized(false),m_pCursorControl(NULL)
 	{
 		if(params.windowId==NULL)
 		{
@@ -70,6 +71,9 @@ namespace platform{
 			m_bExternalWindow = true;
 		}
 
+		//初始化鼠标控制器
+		m_pCursorControl=new CCursorControlWin32(m_params.windowSize,m_hWnd,false);
+
 		//初始化随机生成器
 		m_pRandomizer=createRandomizer();
 
@@ -80,7 +84,7 @@ namespace platform{
 		m_pFileSystem=io::createFileSystem();
 
 		//初始化场景管理器
-		m_pSceneManager=scene::createSceneManager(m_pTimer);
+		m_pSceneManager=scene::createSceneManager(m_pTimer,m_pCursorControl);
 
 		//初始化视频驱动器
 		createDriver();
@@ -114,6 +118,7 @@ namespace platform{
 		m_pFileSystem->drop();
 		m_pTimer->drop();
 		m_pRandomizer->drop();
+		m_pCursorControl->drop();
 		if(m_bExternalWindow==false){
 			DestroyWindow(m_hWnd);
 			Logger->info(YON_LOG_SUCCEED_FORMAT,"Destroy Window");
@@ -184,16 +189,23 @@ namespace platform{
 		RECT r;
 		GetClientRect(m_hWnd, &r);
 
-		core::dimension2du newsize((u32)r.right, (u32)r.bottom);
-		m_pVideoDriver->onResize(newsize);
-		m_pSceneManager->onResize(newsize);
+		if (r.right < 2 || r.bottom < 2)
+		{
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("Ignoring resize operation to (%ld %ld)", r.right, r.bottom).c_str());
+		}
+		else
+		{
+			core::dimension2du newsize((u32)r.right, (u32)r.bottom);
+			m_pVideoDriver->onResize(newsize);
+			m_pSceneManager->onResize(newsize);
 
-		event::SEvent evt;
-		evt.type=event::ENUM_EVENT_TYPE_SYSTEM;
-		evt.systemInput.type=event::ENUM_SYSTEM_INPUT_TYPE_RESIZE;
-		evt.systemInput.screenWidth=newsize.w;
-		evt.systemInput.screenHeight=newsize.h;
-		postEventFromUser(evt);
+			event::SEvent evt;
+			evt.type=event::ENUM_EVENT_TYPE_SYSTEM;
+			evt.systemInput.type=event::ENUM_SYSTEM_INPUT_TYPE_RESIZE;
+			evt.systemInput.screenWidth=newsize.w;
+			evt.systemInput.screenHeight=newsize.h;
+			postEventFromUser(evt);
+		}
 		m_bResized = false;
 	}
 
