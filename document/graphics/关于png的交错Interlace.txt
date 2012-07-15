@@ -1,0 +1,62 @@
+先来说一下交错：
+
+交错:Interlace
+
+
+就是指浏览器下载它的时候隔行下载,这样下载一张图只用一半的时间就可以看到它的样子,只不过只是隔行的图,然后它再下载另一般,这样可以减少你等待看它的时间.
+在存GIF和JPG时也有这个优化.(fireworks中) ______http://zhidao.baidu.com/question/5269019.html
+
+网经:
+
+交错技术
+
+ 
+
+有很多用户上网的速度很慢，有时候显示一张图片时，等很久都不能显示图，如果，没用交错技术的话。那么用户要等图全下载完了才能看见。有交错技术那么图可以一部分一部分的显示出来。让用户可以提前知道内容。
+
+ 
+
+图像隔行扫描:电视是隔行扫描，而电脑屏幕是逐行扫描，De-Interlace（隔行扫描）就是用来模拟电视屏幕的显示方式的。包括隔行GIF和逐级JPG方式。
+
+ 
+
+1,交错图:如果图像是一幅交错图，则它在页面上逐步出现的时候，会以类似百叶窗的效果显示。
+
+ 
+
+注意：一般默认情况下，图是以50%为单位显示。
+
+ 
+
+PNG图像和GIF图像都支持这种交错格式。
+
+ 
+
+隔行GIF是指图像文件是按照隔行的方式来显示的，比如先出奇数行，再出偶数行，造成图像是逐渐变清楚的。将图像文件保存成隔行GIF格式的方法是，在 Photoshop中进行保存时，选择“Interlaced”（不要选择“Normal”），在Paint Shop Pro中进行保存时，点击“Option…”按钮，选择“Interlaced”（不要选择“Non Interlaced”）。
+
+ 
+
+ 
+
+2,渐进图:如果图像是一幅渐进图，则它在页面上逐步出现的时候，会首先显示较模糊的整幅图像，然后逐渐变得清晰。这样，浏览者可以在下载过程中尽早了解图像的大致轮廓。
+
+ 
+
+JPG/JPEG图像支持这种渐进格式。
+
+ 
+
+逐级JPG文件可以让图像先以比较模糊的形式显示，随着图像文件数据不断从网上传过来，图像会逐渐变清晰。这样做的好处是图像可以尽快地显示出来，虽然图像不很完美，但是却让浏览者看到了希望，并且图像在不断地变好。将图像文件保存成逐级JPG格式的方法是，在Photoshop中进行保存时，选择“Progressive”，在Paint Shop Pro中进行保存时，点击“Option…”按钮，选择“Progressive encoding”。
+
+www.libpng.org/pub/png/pngintro.html
+
+Interlacing
+
+Interlacing--or, more generally, progressive display--has been around a long time.GIF has supported it since 1989, TIFF since around the same time (though not in any standardized way), and JPEG since the early 1990s (though it wasn't widely implemented until 1996).PNG's method is conceptually similar to GIF interlacing and visually similar to progressive JPEG (i.e., two-dimensional).
+
+Png Features
+
+Kerry Watson has created a wonderfully easy-to-read, multi-page intro covering compression, transparency, interlacing, a selection of Windows software , and comparisons to other formats as part of his Web Colors site.
+
+
+http://blog.csdn.net/greenerycn/article/details/1458231

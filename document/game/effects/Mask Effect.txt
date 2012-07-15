@@ -1,0 +1,68 @@
+Drawing a texture with separate alpha mask.
+What I have:
+
+- Alpha mask data, with alpha components that I want to use for a texture.
+- Image data that frequently changes, that does not have any alpha components.
+- A texture that I frequently update with the image data, using glTexSubImage2D; drawn onto a single, simple quad.
+
+What I want to do:
+
+- Draw the texture using the colors from the image data, with a transparency mask from the original alpha mask.
+
+The image data is updated frequently (in this application, it's frames from a video stream, and the alpha mask is sort of an overlay mask, except I'm drawing the textured quad in aribitrary orientations in 3D space, and it may even be obscured by other things, so I can't just use simple overlays), and performance is important so I don't want to have to manually interleave the image data and alpha mask before calling glTextSubImage2D. The alpha mask is constant the entire time.
+
+Is there something I can do, to combine the alpha components from the alpha mask and the color components from the image? Is there some kind of texture layering or something that helps me with this?
+
+Hopefully I explained that clearly;
+Thanks,
+Jason
+
+P.S. Some of the parts of the image I want to mask out are not black; so I can't use simple masking tricks that expect the image to have a black background.
+Reply With Quote
+04-06-2008, 11:37 AM #2
+Seth Hoffert  
+Junior Member
+Regular Contributor
+Join Date
+Aug 2007
+Location
+USA
+Posts
+244
+Re: Drawing a texture with separate alpha mask.
+If I understand your situation correctly, you could simply use a shader with both textures bound at once, and simply combine them in the shader.
+Reply With Quote
+04-06-2008, 11:57 AM #3
+JCipriani2  
+Intern
+Newbie
+Join Date
+Mar 2008
+Posts
+34
+Re: Drawing a texture with separate alpha mask.
+Thanks for your reply.
+
+I don't know anything about shaders (which I guess is the missing piece in my puzzle) and, unfortunately, I don't want to take too much time to learn about them right now because a deadline is fast approaching... is there a simpler way? Was it possible to do this before shaders came out?
+Reply With Quote
+04-06-2008, 02:04 PM #4
+ZbuffeR  
+Super Moderator
+OpenGL Lord
+Join Date
+Dec 2003
+Location
+Grenoble - France
+Posts
+5,639
+Re: Drawing a texture with separate alpha mask.
+Old style multitexture should do the trick.
+I do not know the implentation details, but this should work :
+tex0 = dynamic RGB texture, from video stream
+tex1 = static RGBA mask, RGB as white and A as your alpha
+Then using ( tex0 blend tex1 ) with classic blending should give the result you want. I think the default operator of the multitexture setup is blending so it should be fine.
+
+Maybe this oldish sample can help you : 
+http://www.opengl.org/resources/feat...underwater.zip
+
+http://www.opengl.org/discussion_boards/showthread.php/164407-Drawing-a-texture-with-separate-alpha-mask
