@@ -1,6 +1,7 @@
 #include "CAnimatorFactory.h"
 #include "CAnimatorUV.h"
 #include "CAnimatorAlpha.h"
+#include "CAnimatorRotate.h"
 
 namespace yon{
 namespace scene{
@@ -20,7 +21,13 @@ namespace animator{
 				return new CAnimatorAlpha(param.animatorAlpha.unitIndex,param.animatorAlpha.minValue,param.animatorAlpha.maxValue,param.animatorAlpha.increment);
 			}
 			break;
+		case ENUM_ANIMATOR_TYPE_ROTATE:
+			{
+				return new CAnimatorRotate(param.animatorRotate.rotateSpeed);
+			}
+			break;
 		}
+		
 		return NULL;
 	}
 

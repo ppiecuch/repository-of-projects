@@ -105,9 +105,11 @@ namespace yon{
 				}
 
 				virtual void setPosition(const core::vector3df& pos){
-					IModel::setPosition(pos);
 					if(pos!=m_position)
+					{
+						IModel::setPosition(pos);
 						m_bDirectionNeedUpdate=true;
+					}
 				}
 
 				virtual const core::vector3df& getTarget() const{
@@ -115,9 +117,11 @@ namespace yon{
 				}
 
 				virtual void setTarget(const core::vector3df& target){
-					m_target=target;
 					if(target!=m_target)
+					{
+						m_target=target;
 						m_bDirectionNeedUpdate=true;
+					}
 				}
 
 				//TODO setDirection

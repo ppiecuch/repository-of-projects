@@ -57,6 +57,14 @@ namespace animator{
 		core::vector3df target = camera->getTarget();
 		core::vector3df direction = camera->getDirection();
 
+		//temp
+		/*core::matrix4f m(true);
+		m.setRotation(timeDiff/100.f,0,1,0);
+		m.transformVect(direction);
+		target=pos+direction;
+		camera->setTarget(target);
+		return;*/
+
 		if(m_pCursorControl)
 		{
 			core::vector3df relativeRotation = direction.getHorizontalAngle();

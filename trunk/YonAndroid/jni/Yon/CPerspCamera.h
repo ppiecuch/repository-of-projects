@@ -30,6 +30,7 @@ namespace camera{
 
 		virtual void setPosition(const core::vector3df& pos);
 		virtual void setRotation(const core::vector3df& rot);
+		virtual void setTarget(const core::vector3df& target);
 	};
 }
 }

@@ -598,6 +598,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\CAnimatorRotate.h"
+						>
+					</File>
+					<File
 						RelativePath=".\CAnimatorSurround.h"
 						>
 					</File>

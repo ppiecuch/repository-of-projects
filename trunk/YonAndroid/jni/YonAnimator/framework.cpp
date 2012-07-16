@@ -56,7 +56,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
@@ -70,6 +70,23 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
+
+	shap=geometryFty->createSphere(40);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	IModel* sphereModel=sceneMgr->addModel(entity);
+	sphereModel->setPosition(core::vector3df(60,0,0));
+	material=sphereModel->getMaterial(0);
+	material->setTexture(0,videoDriver->getTexture("earth.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+	SAnimatorParam rotateAnimatorParam;
+	rotateAnimatorParam.type=ENUM_ANIMATOR_TYPE_ROTATE;
+	rotateAnimatorParam.animatorRotate.rotateSpeed=0.1f;
+	IAnimator* rotateAnimator=animatorFty->createAnimator(rotateAnimatorParam);
+	sphereModel->addAnimator(rotateAnimator);
+	rotateAnimator->drop();
 
 	shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
