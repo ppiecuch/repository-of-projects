@@ -138,12 +138,11 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../Yon/");
 	//fs->setWorkingDirectory("../media/vram/");
@@ -152,7 +151,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	//fs->addWorkingDirectory("media/");
 	//fs->addWorkingDirectory("media/vram/");
 	//fs->addWorkingDirectory("temp/");
-	fs->setWorkingDirectory("media/vram/");
+	fs->addWorkingDirectory("media/vram/");
 #endif
 
 	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
