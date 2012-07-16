@@ -74,7 +74,7 @@ namespace animator{
 			}
 		}
 
-
+		core::vector3df tmp=direction;
 		direction.normalize();
 
 		core::vector3df offset=core::ORIGIN_VECTOR3DF;
@@ -85,7 +85,7 @@ namespace animator{
 		if (m_keyStates[event::ENUM_KEY_ACTION_MOVE_BACKWARD])
 			offset -= direction;
 
-		core::vector3df right = camera->getDirection();
+		core::vector3df right = tmp;
 		right = right.crossProduct(camera->getUpVector());
 
 		//if (NoVerticalMovement)
@@ -93,7 +93,7 @@ namespace animator{
 
 		right.normalize();
 
-		if (m_keyStates[event::ENUM_K	EY_ACTION_MOVE_LEFTWARD])
+		if (m_keyStates[event::ENUM_KEY_ACTION_MOVE_LEFTWARD])
 			offset -= right;
 
 		if (m_keyStates[event::ENUM_KEY_ACTION_MOVE_RIGHTWARD])
@@ -105,7 +105,7 @@ namespace animator{
 
 
 		camera->setPosition(pos);
-		target = camera->getDirection()+pos;
+		target = tmp+pos;
 		camera->setTarget(target);
 	}
 
