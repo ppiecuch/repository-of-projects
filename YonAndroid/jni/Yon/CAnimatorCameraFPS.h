@@ -26,7 +26,7 @@ namespace animator{
 
 		void allKeysUp();
 	public:
-		CAnimatorCameraFPS(platform::ICursorControl* cursorControl,f32 moveSpeed=0.5f,f32 rotateSpeed=100.f,event::SKeyMap* keyMapArray=0,s32 keyMapSize=0);
+		CAnimatorCameraFPS(platform::ICursorControl* cursorControl,f32 moveSpeed=0.5f,f32 rotateSpeed=1.f,event::SKeyMap* keyMapArray=0,s32 keyMapSize=0);
 		~CAnimatorCameraFPS();
 
 		virtual f32 getMoveSpeed() const{return m_fMoveSpeed;}

@@ -62,11 +62,21 @@ namespace camera{
 
 	void CPerspCamera::setPosition(const core::vector3df& pos){
 		IPerspCamera::setPosition(pos);
-		recalculateViewMatrix();
+		if(m_bDirectionNeedUpdate)
+		{
+			recalculateViewMatrix();
+		}
 	}
 	void CPerspCamera::setRotation(const core::vector3df& rot){
 		IPerspCamera::setRotation(rot);
 		recalculateViewMatrix();
+	}
+	void CPerspCamera::setTarget(const core::vector3df& target){
+		IPerspCamera::setTarget(target);
+		if(m_bDirectionNeedUpdate)
+		{
+			recalculateViewMatrix();
+		}
 	}
 }//camera
 }//scene

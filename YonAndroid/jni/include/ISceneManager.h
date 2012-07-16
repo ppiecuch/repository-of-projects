@@ -53,7 +53,7 @@ namespace scene{
 			const core::vector3df& pos = core::vector3df(0,-1,0),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,100),bool makeActive=true) = 0;
-		virtual camera::ICamera* addCameraFPS(IModel* parent=NULL,f32 moveSpeed=0.1f,f32 rotateSpeed=100.f, event::SKeyMap* keyMapArray=0,s32 keyMapSize=0, 
+		virtual camera::ICamera* addCameraFPS(IModel* parent=NULL,f32 moveSpeed=0.1f,f32 rotateSpeed=0.1f, event::SKeyMap* keyMapArray=0,s32 keyMapSize=0, 
 			const core::vector3df& pos = core::vector3df(0,-1,0),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,100),

@@ -11,6 +11,7 @@ namespace animator{
 
 	enum ENUM_ANIMATOR_TYPE{
 		ENUM_ANIMATOR_TYPE_UV = 0,
+		ENUM_ANIMATOR_TYPE_ROTATE,
 		ENUM_ANIMATOR_TYPE_SURROUND,
 		ENUM_ANIMATOR_TYPE_ALPHA,
 		ENUM_ANIMATOR_TYPE_FPSCAMERA,
@@ -31,6 +32,10 @@ namespace animator{
 			}translate;
 		};
 
+		struct SAnimatorRotate{
+			f32 rotateSpeed;
+		};
+
 		struct SAnimatorSurround{
 			//TODO
 			f32 x,y,z;
@@ -46,6 +51,7 @@ namespace animator{
 		ENUM_ANIMATOR_TYPE type;
 		union{
 			struct SAnimatorUV animatorUV;
+			struct SAnimatorRotate animatorRotate;
 			struct SAnimatorSurround animatorSurround;
 			struct SAnimatorAlpha animatorAlpha;
 		};
