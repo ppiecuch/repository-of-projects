@@ -169,6 +169,14 @@
 			RelativePath=".\main.cpp"
 			>
 		</File>
+		<File
+			RelativePath=".\resource.h"
+			>
+		</File>
+		<File
+			RelativePath=".\SubWindow.rc"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

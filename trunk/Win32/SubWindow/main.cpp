@@ -7,8 +7,9 @@ inline void EnableMemLeakCheck()
 }
 
 #include <windows.h>
-LRESULT CALLBACK  WndProc(HWND, UINT, WPARAM, LPARAM);
-
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK DlgWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+#include "resource.h"
 struct 
 {
 	int iStyle;
@@ -104,6 +105,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if(wNotifyCode==BN_CLICKED)
 			{
 				printf("click\n");
+				DialogBox(NULL,MAKEINTRESOURCE(IDD_DIALOG1),hWnd,DlgWndProc);
 				return 0;
 			}
 		}
@@ -112,6 +114,38 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 
+}
+INT_PTR CALLBACK DlgWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch(message)
+	{
+	case WM_INITDIALOG:
+		{
+			SetDlgItemText(hWnd, IDC_EDIT1, L"Please enter the txt");
+			// Set focus back to the edit control
+			//SendDlgItemMessage(hWnd, IDC_EDIT1, WM_SETFOCUS, 0, 0);
+			return TRUE;
+		}
+		break;
+	case WM_COMMAND:
+		switch(wParam)
+		{
+		case IDOK:
+			int len = GetWindowTextLengthA(GetDlgItem(hWnd,IDC_EDIT1));
+			if(len > 0){
+				char *buff = new char[len+1];
+				GetDlgItemTextA(hWnd, IDC_EDIT1, buff, len+1);
+				printf("%s\n",buff);
+				MessageBoxA(NULL,buff,"Error message",MB_OK);
+				delete buff;
+			}
+			EndDialog(hWnd, 0);
+			return TRUE;
+		}
+		break;
+	}
+
+	return FALSE;
 }  
 
 /*LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
