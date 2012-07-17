@@ -25,6 +25,12 @@ public:
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+
+				//editbox
+				SCallback cb;
+				cb.type=platform::ENUM_CALLBACK_TYPE_UI;
+				cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_EDITBOX;
+				engine->callback(cb);
 				return true;
 			}
 			break;
@@ -101,7 +107,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 

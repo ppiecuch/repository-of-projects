@@ -18,9 +18,12 @@
 
 namespace yon{
 
+	class SYonEngineParameters;
+
 	class IYonEngine:public virtual core::IReferencable{
 	public:
 		virtual ~IYonEngine(){};
+		virtual const SYonEngineParameters& getCreateParameters()=0;
 		virtual video::IVideoDriver* getVideoDriver() const= 0;
 		virtual scene::ISceneManager* getSceneManager() const = 0;
 		//virtual gui::IGUIEnvirenment* getGUIEnvirentment() const = 0;

@@ -34,6 +34,7 @@ namespace yon{
 
 			virtual void onResize(u32 w,u32 h);
 
+			virtual bool callback(const platform::SCallback& cb);
 			virtual bool postEventFromUser(const event::SEvent& event);
 
 			virtual ITimer* getTimer(){
@@ -42,6 +43,10 @@ namespace yon{
 
 			const HWND& getHWND() const{
 				return m_hWnd;
+			}
+
+			virtual const SYonEngineParameters& getCreateParameters(){
+				return m_params;
 			}
 		protected:
 			virtual void createDriver();
@@ -70,6 +75,7 @@ namespace yon{
 
 			//TODO是否有存在必要，改名？
 			event::IEventReceiver* m_pUserListener;
+			platform::ICallback* m_pCallback;
 
 			bool m_bClose;
 			bool m_bResized;
