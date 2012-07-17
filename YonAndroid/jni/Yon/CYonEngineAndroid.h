@@ -36,7 +36,9 @@ namespace yon{
 			virtual ITimer* getTimer(){
 				return m_pTimer;
 			}
-
+			virtual const SYonEngineParameters& getCreateParameters(){
+				return m_params;
+			}
 		protected:
 			virtual void createDriver();
 			void checkJNIVersion();

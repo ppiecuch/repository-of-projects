@@ -52,13 +52,14 @@ namespace platform{
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),
 		m_pAudioDriver(NULL),m_pRandomizer(NULL),
 		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),
-		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),
+		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),m_pCallback(params.pCallback),
 		m_params(params),m_bClose(false),m_bResized(false),m_pCursorControl(NULL)
 	{
 		if(params.windowId==NULL)
 		{
 			//´´½¨´°¿Ú
 			initWindow(params);
+			m_params.windowId=m_hWnd;
 		}
 		else
 		{
@@ -207,6 +208,13 @@ namespace platform{
 			postEventFromUser(evt);
 		}
 		m_bResized = false;
+	}
+
+	bool CYonEngineWin32::callback(const platform::SCallback& cb){
+		bool absorbed = false;
+		if(m_pCallback)
+			absorbed=m_pCallback->callback(cb);
+		return absorbed;
 	}
 
 	bool CYonEngineWin32::postEventFromUser(const event::SEvent& event){

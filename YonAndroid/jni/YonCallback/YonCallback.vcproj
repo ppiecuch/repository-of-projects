@@ -183,6 +183,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\resource.h"
+			>
+		</File>
+		<File
 			RelativePath=".\yon_AndroidGLView.cpp"
 			>
 			<FileConfiguration
@@ -193,6 +197,10 @@
 					Name="VCCLCompilerTool"
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\YonCallback.rc"
+			>
 		</File>
 	</Files>
 	<Globals>

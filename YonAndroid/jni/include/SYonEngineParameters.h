@@ -35,7 +35,7 @@ namespace yon{
 		//窗口尺寸
 		core::dimension2du windowSize;
 		//窗口指针
-		void* windowId;
+		mutable void* windowId;
 		//窗口标题
 		core::stringw windowCaption;
 		//JNIEnv接口

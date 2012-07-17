@@ -179,6 +179,8 @@ namespace terrain{
 						const s32 index12 = getIndex(j, i, index, x, z + step);
 						const s32 index22 = getIndex(j, i, index, x + step, z + step);
 
+						//Logger->debug("%d,%d,%d,%d\n",index11,index21,index12,index22);
+
 						indices.push_back(index12);
 						indices.push_back(index11);
 						indices.push_back(index22);
