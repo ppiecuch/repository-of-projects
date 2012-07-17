@@ -73,7 +73,7 @@ namespace animator{
 			core::stringc str("relativeRotation:%.2f,%.2f,%.2f->",relativeRotation.x,relativeRotation.y,relativeRotation.z);
 			if(m_cursorPos!=m_centerCursor)
 			{
-				relativeRotation.y += (m_cursorPos.x-0.5f) * m_fRotateSpeed;
+				relativeRotation.y -= (m_cursorPos.x-0.5f) * m_fRotateSpeed;
 				relativeRotation.x += (m_cursorPos.y-0.5f) * m_fRotateSpeed;
 
 				m_pCursorControl->setPosition(0.5f, 0.5f);
@@ -81,6 +81,7 @@ namespace animator{
 
 				core::matrix4f mat(true);
 				mat.setRotationDegrees(relativeRotation);
+				//TODO”≈ªØ
 				f32 len=direction.getLength();
 				direction.set(1,0,0);
 				direction*=len;

@@ -11,6 +11,7 @@ namespace video{
 	{
 		ENUM_COLOR_FORMAT_R5G5B5A1 = 0,
 		ENUM_COLOR_FORMAT_R5G6B5,
+		ENUM_COLOR_FORMAT_R4G4B4A4,
 		ENUM_COLOR_FORMAT_R8G8B8,
 		ENUM_COLOR_FORMAT_R8G8B8A8,
 		ENUM_COLOR_FORMAT_A8,
@@ -22,6 +23,7 @@ namespace video{
 	{
 		"R5G5B5A1",
 		"R5G6B5",
+		"R4G4B4A4",
 		"R8G8B8",
 		"R8G8B8A8",
 		"A8",
@@ -35,6 +37,8 @@ namespace video{
 		case ENUM_COLOR_FORMAT_R5G5B5A1:
 			return 16;
 		case ENUM_COLOR_FORMAT_R5G6B5:
+			return 16;
+		case ENUM_COLOR_FORMAT_R4G4B4A4:
 			return 16;
 		case ENUM_COLOR_FORMAT_R8G8B8:
 			return 24;
@@ -56,6 +60,7 @@ namespace video{
 		switch(format)
 		{
 		case ENUM_COLOR_FORMAT_R5G5B5A1:
+		case ENUM_COLOR_FORMAT_R4G4B4A4:
 		case ENUM_COLOR_FORMAT_R8G8B8A8:
 		case ENUM_COLOR_FORMAT_A8:
 		case ENUM_COLOR_FORMAT_L8A8:
@@ -69,6 +74,8 @@ namespace video{
 		switch(format)
 		{
 		case ENUM_COLOR_FORMAT_R5G5B5A1:
+			return ENUM_COLOR_FORMAT_R5G6B5;
+		case ENUM_COLOR_FORMAT_R4G4B4A4:
 			return ENUM_COLOR_FORMAT_R5G6B5;
 		case ENUM_COLOR_FORMAT_R8G8B8A8:
 			return ENUM_COLOR_FORMAT_R8G8B8;
@@ -107,6 +114,8 @@ namespace video{
 			{
 			case ENUM_COLOR_FORMAT_R5G5B5A1:
 			case ENUM_COLOR_FORMAT_R5G6B5:
+			//TODO 不知是否支持
+			//case ENUM_COLOR_FORMAT_R4G4B4A4:
 			case ENUM_COLOR_FORMAT_R8G8B8:
 			case ENUM_COLOR_FORMAT_R8G8B8A8:
 			case ENUM_COLOR_FORMAT_A8:

@@ -52,7 +52,7 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	params.windowSize.w=400;
 	params.windowSize.h=400;
 	params.pJNIEnv=pJNIEnv;
@@ -65,31 +65,34 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/png/");
+	fs->addWorkingDirectory("../media/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->setWorkingDirectory("media/png/");
+	fs->addWorkingDirectory("media/png/");
+	fs->addWorkingDirectory("media/");
 #endif
 
-	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
+	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA,true);
+	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,true);
 	
 
 	IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
 
-	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	/*shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
 	teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
 	return true;
 }
@@ -100,8 +103,8 @@ void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
-	const core::vector3df trot=teapotModel->getRotation();
-	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
+	//const core::vector3df trot=teapotModel->getRotation();
+	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	sceneMgr->render(videoDriver);
 
@@ -120,6 +123,8 @@ void drawFrame(){
 	gfAdapter->drawImage("fixerror.png",0,0,32,32,340,10,true);
 
 	gfAdapter->drawImage("interlace.png",0,0,128,128,0,200,true);
+
+	gfAdapter->drawImage("3.png",0,0,512,512,0,200,true);
 	gfAdapter->render();
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
