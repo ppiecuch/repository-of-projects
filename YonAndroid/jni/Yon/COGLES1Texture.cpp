@@ -19,7 +19,8 @@ namespace ogles1{
 		m_textureId(0),m_bIsRenderTarget(false){
 			m_bHasMipMap=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
 			m_bReserveImage=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE);
-			bool use16Bit=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT);
+			bool use16Bit1Alpha=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA);
+			bool use16Bit4Alpha=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA);
 
 			if(core::isPowerOf2(image->getDimension().w)==false||core::isPowerOf2(image->getDimension().h)==false)
 				Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s is no a power of 2 image!",name.c_str()).c_str());
@@ -27,15 +28,27 @@ namespace ogles1{
 			glGenTextures(1, &m_textureId);
 
 			bool converted=false;
-			if(use16Bit)
+			if(use16Bit1Alpha||use16Bit4Alpha)
 			{
 				if(image->getColorFormat()==ENUM_COLOR_FORMAT_R8G8B8A8)
 				{
-					m_pImage=new CImage(ENUM_COLOR_FORMAT_R5G5B5A1,image->getDimension());
-					CColorConverter::convert_A8B8G8R8toR5G5B5A1(image->lock(),image->getImageDataSizeInPixels(),m_pImage->lock());
-					image->unlock();
-					m_pImage->unlock();
-					converted=true;
+					
+					if(use16Bit1Alpha)
+					{
+						m_pImage=new CImage(ENUM_COLOR_FORMAT_R5G5B5A1,image->getDimension());
+						CColorConverter::convert_A8B8G8R8toR5G5B5A1(image->lock(),image->getImageDataSizeInPixels(),m_pImage->lock());
+						image->unlock();
+						m_pImage->unlock();
+						converted=true;
+					}
+					else
+					{
+						m_pImage=new CImage(ENUM_COLOR_FORMAT_R4G4B4A4,image->getDimension());
+						CColorConverter::convert_A8B8G8R8toR4G4B4A4(image->lock(),image->getImageDataSizeInPixels(),m_pImage->lock());
+						image->unlock();
+						m_pImage->unlock();
+						converted=true;
+					}
 				}
 				else if(image->getColorFormat()==ENUM_COLOR_FORMAT_R8G8B8)
 				{
@@ -76,6 +89,10 @@ namespace ogles1{
 		case ENUM_COLOR_FORMAT_R5G5B5A1:
 			format=GL_RGBA;
 			pixelType=GL_UNSIGNED_SHORT_5_5_5_1;
+			break;
+		case ENUM_COLOR_FORMAT_R4G4B4A4:
+			format=GL_RGBA;
+			pixelType=GL_UNSIGNED_SHORT_4_4_4_4;
 			break;
 		case ENUM_COLOR_FORMAT_R5G6B5:
 			format=GL_RGB;
