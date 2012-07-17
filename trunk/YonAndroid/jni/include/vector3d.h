@@ -131,7 +131,7 @@ namespace core{
 		{
 			vector3d<T> angle;
 
-			const f64 tmp = (atan2((f64)x, (f64)z) * RADTODEG64);
+			const f64 tmp = (atan2((f64)x, (f64)z) * RADTODEG64-90);
 			angle.y = (T)tmp;
 
 			if (angle.y < 0)
