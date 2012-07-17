@@ -126,12 +126,12 @@ namespace core{
 	
 		/*return A rotation vector containing the X (pitch) and Y (raw) rotations (in degrees) that when applied to a
 		+Z (e.g. 0, 0, 1) direction vector would make it point in the same direction as this vector. The Z (roll) rotation
-		is always 0, since two Euler rotations are sufficient to point in any given direction. [0,360)*/
+		is always 0, since two Euler rotations are sufficient to point in any given direction. [0,360),0,360)*/
 		vector3d<T> getHorizontalAngle() const
 		{
 			vector3d<T> angle;
 
-			const f64 tmp = (atan2((f64)x, (f64)z) * RADTODEG64-90);
+			const f64 tmp = (atan2((f64)x, (f64)z) * RADTODEG64);
 			angle.y = (T)tmp;
 
 			if (angle.y < 0)
@@ -141,12 +141,12 @@ namespace core{
 
 			const f64 z1 = core::squareroot(x*x + z*z);
 
-			angle.x = (T)(90-atan2((f64)z1, (f64)y) * RADTODEG64);
+			angle.x = (T)(-atan2((f64)y, (f64)z1) * RADTODEG64);
 
-			/*if (angle.x < 0)
-				angle.x += 90;
-			if (angle.x >= 90)
-				angle.x -= 90;*/
+			if (angle.x < 0)
+				angle.x += 360;
+			if (angle.x >= 360)
+				angle.x -= 360;
 
 			return angle;
 		}

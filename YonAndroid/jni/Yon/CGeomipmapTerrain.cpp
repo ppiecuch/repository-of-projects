@@ -69,9 +69,9 @@ namespace terrain{
 			for(s32 z = 0; z<m_iSizePerSide; ++z)
 			{
 				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
-				v.pos.x=fx;
+				v.pos.x=fx*10;
 				v.pos.y=image->getValue(x,z);
-				v.pos.z=fz;
+				v.pos.z=fz*10;
 
 				++fz;
 			}

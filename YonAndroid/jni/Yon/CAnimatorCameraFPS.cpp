@@ -58,19 +58,12 @@ namespace animator{
 		core::vector3df pos = camera->getPosition();
 		core::vector3df target = camera->getTarget();
 		core::vector3df direction = camera->getDirection();
-
-		//temp
-		/*core::matrix4f m(true);
-		m.setRotation(timeDiff/100.f,0,1,0);
-		m.transformVect(direction);
-		target=pos+direction;
-		camera->setTarget(target);
-		return;*/
+		core::vector3df up = camera->getUpVector();
 
 		if(m_pCursorControl)
 		{
 			core::vector3df relativeRotation = direction.getHorizontalAngle();
-			core::stringc str("relativeRotation:%.2f,%.2f,%.2f->",relativeRotation.x,relativeRotation.y,relativeRotation.z);
+			//core::stringc str("relativeRotation:%.2f,%.2f,%.2f->",relativeRotation.x,relativeRotation.y,relativeRotation.z);
 			if(m_cursorPos!=m_centerCursor)
 			{
 				relativeRotation.y -= (m_cursorPos.x-0.5f) * m_fRotateSpeed;
@@ -83,13 +76,14 @@ namespace animator{
 				mat.setRotationDegrees(relativeRotation);
 				//TODOÓÅ»¯
 				f32 len=direction.getLength();
-				direction.set(1,0,0);
+				direction.set(0,0,1);
 				direction*=len;
 				mat.transformVect(direction);
+				mat.transformVect(up);
 			}
 			//temp
-			relativeRotation = direction.getHorizontalAngle();
-			Logger->debug("%s%.2f,%.2f,%.2f\r\n",str.c_str(),relativeRotation.x,relativeRotation.y,relativeRotation.z);
+			//relativeRotation = direction.getHorizontalAngle();
+			//Logger->debug("%s%.2f,%.2f,%.2f\r\n",str.c_str(),relativeRotation.x,relativeRotation.y,relativeRotation.z);
 		}
 
 		core::vector3df tmp=direction;
@@ -104,10 +98,10 @@ namespace animator{
 			offset -= direction;
 
 		core::vector3df right = tmp;
-		right = right.crossProduct(camera->getUpVector());
+		right = right.crossProduct(up);
 
 		//if (NoVerticalMovement)
-		right.y = 0.0f;
+		//right.y = 0.0f;
 
 		right.normalize();
 
