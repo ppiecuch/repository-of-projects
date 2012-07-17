@@ -3,6 +3,10 @@
 
 using namespace std;
 
+//member template为什么不能为virtual?
+//为了不让C++太复杂，不让C++的编译器太难做，C++就这么规定了。
+//template是静态（编译时），virtual是动态的(运行时),两者不可得兼
+
 class A{
 public:
 	template<typename T> void test(){

@@ -130,20 +130,31 @@ int main(int argc, char* argv[])
 		powOf2<<=1;
 	}
 
+	int size=sizeof(Material);
+
 	struct _timeb start;
 	_ftime64_s( &start ); 
 	
-	for(long i=0;i<9000000;++i)
+
+	//第三种比第二种快10倍，第二种比第一种快10倍
+	for(long i=0;i<900000000;++i)
 	{
-		m1.states==m2.states;
-		/*m1.states.counterClockWise==m2.states.counterClockWise&&
-			m1.states.light==m1.states.light&&
-		m1.states.fog==m1.states.fog&&
-		m1.states.cullingBack==m1.states.cullingBack&&
-		m1.states.cullingFront==m1.states.cullingFront&&
-		m1.states.depthTest==m1.states.depthTest&&
-		m1.states.depthWritable==m1.states.depthWritable&&
-		m1.states.alphaTest==m1.states.alphaTest;*/
+		//m1.states==m2.states;
+		//memcmp(&m1,&m2,size);
+		/*m1.states.AlphaTest==m2.states.AlphaTest&&
+			m1.states.Blend==m1.states.Blend&&
+		m1.states.ColorMaterial==m1.states.ColorMaterial&&
+		m1.states.CullFace==m1.states.CullFace&&
+		m1.states.DepthTest==m1.states.DepthTest&&
+		m1.states.Dither==m1.states.Dither&&
+		m1.states.Fog==m1.states.Fog&&
+		m1.states.Lighting==m1.states.Lighting&&
+		m1.states.LineSmooth==m1.states.LineSmooth&&
+		m1.states.Normalize==m1.states.Normalize&&
+		m1.states.RescaleNormal==m1.states.RescaleNormal&&
+		m1.states.ScissorTest==m1.states.ScissorTest&&
+		m1.states.StencilTest==m1.states.StencilTest;*/
+		
 	}
 
 	struct _timeb end;
