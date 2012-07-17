@@ -14,14 +14,18 @@ using namespace yon::core;
 class vector3dTestCase : public CPPUNIT_NS::TestFixture
 {
 	CPPUNIT_TEST_SUITE( vector3dTestCase );
-	CPPUNIT_TEST( getHorizontalAngle );
+	CPPUNIT_TEST( getHorizontalAngle1 );
+	CPPUNIT_TEST( getHorizontalAngle2 );
+	CPPUNIT_TEST( getHorizontalAngle3 );
 	CPPUNIT_TEST_SUITE_END();
 
 public:
 	void setUp();
 
 protected:
-	void getHorizontalAngle();
+	void getHorizontalAngle1();
+	void getHorizontalAngle2();
+	void getHorizontalAngle3();
 };
 
 #endif

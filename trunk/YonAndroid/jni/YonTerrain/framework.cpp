@@ -86,7 +86,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	for(s32 i=-100;i<100;i+=30)
+	/*for(s32 i=-100;i<100;i+=30)
 	{
 		for(s32 j=-100;j<100;j+=30)
 		{
@@ -95,18 +95,18 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 			unit=geometryFty->createUnit(shap);
 			entity=geometryFty->createEntity(unit);
 			cube=sceneMgr->addModel(entity);
-			cube->getMaterial(0)->setTexture(0,videoDriver->getTexture("wood.png"));
+			cube->getMaterial(0)->setTexture(0,videoDriver->getTexture("test.png"));
 			cube->setPosition(core::position3df(i,0,100+j));
 			shap->drop();
 			unit->drop();
 			entity->drop();
 		}
-	}
+	}*/
 
-	/*terrainModel=sceneMgr->addTerrainModel();
-	IImage* image=videoDriver->createImageFromFile("heightmap.png",true);
+	terrainModel=sceneMgr->addTerrainModel();
+	IImage* image=videoDriver->createImageFromFile("heightmap32.png",true);
 	terrainModel->loadHeightMap(image);
-	image->drop();*/
+	image->drop();
 
 	return true;
 }
