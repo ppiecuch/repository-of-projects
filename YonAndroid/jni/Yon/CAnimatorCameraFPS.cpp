@@ -2,6 +2,8 @@
 #include "CAnimatorCameraFPS.h"
 #include "ICamera.h"
 
+#include "ILogger.h"
+
 namespace yon{
 namespace scene{
 namespace animator{
@@ -68,6 +70,7 @@ namespace animator{
 		if(m_pCursorControl)
 		{
 			core::vector3df relativeRotation = direction.getHorizontalAngle();
+			core::stringc str("relativeRotation:%.2f,%.2f,%.2f->",relativeRotation.x,relativeRotation.y,relativeRotation.z);
 			if(m_cursorPos!=m_centerCursor)
 			{
 				relativeRotation.y += (m_cursorPos.x-0.5f) * m_fRotateSpeed;
@@ -78,8 +81,14 @@ namespace animator{
 
 				core::matrix4f mat(true);
 				mat.setRotationDegrees(relativeRotation);
+				f32 len=direction.getLength();
+				direction.set(1,0,0);
+				direction*=len;
 				mat.transformVect(direction);
 			}
+			//temp
+			relativeRotation = direction.getHorizontalAngle();
+			Logger->debug("%s%.2f,%.2f,%.2f\r\n",str.c_str(),relativeRotation.x,relativeRotation.y,relativeRotation.z);
 		}
 
 		core::vector3df tmp=direction;
