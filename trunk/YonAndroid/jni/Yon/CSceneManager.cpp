@@ -18,6 +18,8 @@ namespace scene{
 		m_activeCamera(NULL),m_renderingPass(ENUM_SCENE_PASS_NONE),m_cameraPosition(core::ORIGIN_VECTOR3DF),
 		IModel(NULL),m_pTimer(timer),m_pCursorControl(cursorControl)
 	{
+		m_pSceneManager=this;
+
 		if(m_pCursorControl)
 			m_pCursorControl->grab();
 		if(m_pTimer)

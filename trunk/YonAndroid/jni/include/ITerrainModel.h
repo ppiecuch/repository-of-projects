@@ -11,7 +11,6 @@ namespace scene{
 namespace terrain{
 
 	enum ENUM_PATCH_SIZE{
-		ENUM_PATCH_SIZE_1 = 1,
 		ENUM_PATCH_SIZE_3 = 3,
 		ENUM_PATCH_SIZE_5 = 5,
 		//! patch size of 9, at most, use 4 levels of detail with this patch size.

@@ -19,6 +19,7 @@ namespace scene{
 
 	class IModel : public virtual core::IReferencable, public virtual IRenderable{
 	protected:
+		ISceneManager* m_pSceneManager;
 		IModel* m_parent;
 		core::list<IModel*> m_children;
 		core::list<animator::IAnimator*> m_animators;
@@ -35,17 +36,28 @@ namespace scene{
 		IModel(IModel* parent,const core::vector3df& pos=core::vector3df(0,0,0),
 			const core::vector3df& rot=core::vector3df(0,0,0),
 			const core::vector3df& scale=core::vector3df(1,1,1)):
-			m_parent(parent),m_position(pos),m_rotation(rot),m_scale(scale),
+			m_pSceneManager(NULL),m_parent(parent),m_position(pos),m_rotation(rot),m_scale(scale),
 			m_bTransformationChanged(true),m_bVisible(true)
 		{
 			if(parent!=NULL){
 				m_parent->addChild(this);
 			}
 		}
+		void setSceneManager(ISceneManager* newManager)
+		{
+			m_pSceneManager=newManager;
+			core::list<IModel*>::Iterator it = m_children.begin();
+			for (; it != m_children.end(); ++it){
+				(*it)->setSceneManager(newManager);
+			}
+		}
 		virtual void addChild(IModel* child)
 		{
 			if (child && (child != this))
 			{
+				if (m_pSceneManager != child->m_pSceneManager)
+					child->setSceneManager(m_pSceneManager);
+
 				child->grab();
 				child->removeFromParent();
 				m_children.push_back(child);

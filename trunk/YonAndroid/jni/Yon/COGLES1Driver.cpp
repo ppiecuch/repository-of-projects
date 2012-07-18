@@ -426,8 +426,6 @@ namespace ogles1{
 	}
 
 	void COGLES1Driver::drawVertex(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,ENUM_PRIMITIVE_TYPE pType,scene::ENUM_VERTEX_TYPE vType){
-		//if(m_pCurrentMaterial->getPolygonMode()==ENUM_POLYGON_MODE_LINE)
-		//	pType=ENUM_PRIMITIVE_TYPE_LINES;
 
 		switch(vType){
 		case scene::ENUM_VERTEX_TYPE_2V1T1C:
