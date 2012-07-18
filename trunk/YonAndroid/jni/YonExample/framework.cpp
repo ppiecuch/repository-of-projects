@@ -59,7 +59,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
@@ -96,6 +96,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material=cubeModel->getMaterial(0);
 	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
+	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
 	cubeModel->setPosition(core::vector3df(100,100,0));
 	//material->setTexture(0,videoDriver->getTexture("png8/120.png"));

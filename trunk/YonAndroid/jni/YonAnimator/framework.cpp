@@ -77,6 +77,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IModel* sphereModel=sceneMgr->addModel(entity);
 	sphereModel->setPosition(core::vector3df(60,0,0));
 	material=sphereModel->getMaterial(0);
+	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
 	material->setTexture(0,videoDriver->getTexture("earth.png"));
 	shap->drop();
 	unit->drop();

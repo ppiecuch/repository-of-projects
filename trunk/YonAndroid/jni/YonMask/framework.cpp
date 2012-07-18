@@ -109,6 +109,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
+	material=teapotModel->getMaterial(0);
+	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
 	teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
@@ -120,6 +122,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	planeModel=sceneMgr->addModel(entity);
 	material=planeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
 	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
 	planeModel->setPosition(core::vector3df(0,0,0));
 	material->setTexture(0,videoDriver->getTexture("aura.png"));

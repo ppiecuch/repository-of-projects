@@ -77,14 +77,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	/*shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
 	teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
 	/*for(s32 i=-100;i<100;i+=30)
 	{
@@ -104,8 +104,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	}*/
 
 	terrainModel=sceneMgr->addTerrainModel();
-	IImage* image=videoDriver->createImageFromFile("heightmap32.png",true);
-	terrainModel->loadHeightMap(image);
+	IImage* image=videoDriver->createImageFromFile("heightmap128.png",true);
+	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_3);
 	image->drop();
 
 	return true;
@@ -117,8 +117,8 @@ void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
-	const core::vector3df trot=teapotModel->getRotation();
-	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
+	//const core::vector3df trot=teapotModel->getRotation();
+	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	sceneMgr->render(videoDriver);
 
