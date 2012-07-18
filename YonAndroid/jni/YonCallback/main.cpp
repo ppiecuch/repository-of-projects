@@ -35,13 +35,18 @@ INT_PTR CALLBACK DlgWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		switch(wParam)
 		{
 		case IDOK:
-			int len = GetWindowTextLengthA(GetDlgItem(hWnd,IDC_EDIT1));
-			if(len > 0){
-				char *buff = new char[len+1];
-				GetDlgItemTextA(hWnd, IDC_EDIT1, buff, len+1);
-				Logger->debug("%s\n",buff);
-				delete buff;
+			{
+				int len = GetWindowTextLengthA(GetDlgItem(hWnd,IDC_EDIT1));
+				if(len > 0){
+					char *buff = new char[len+1];
+					GetDlgItemTextA(hWnd, IDC_EDIT1, buff, len+1);
+					Logger->debug("%s\n",buff);
+					delete buff;
+				}
+				EndDialog(hWnd, 0);
 			}
+			return TRUE;
+		case IDCANCEL:
 			EndDialog(hWnd, 0);
 			return TRUE;
 		}

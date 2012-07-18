@@ -18,7 +18,7 @@
 
 namespace yon{
 
-	class SYonEngineParameters;
+	struct SYonEngineParameters;
 
 	class IYonEngine:public virtual core::IReferencable{
 	public:

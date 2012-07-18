@@ -14,7 +14,7 @@ namespace terrain{
 		:ITerrainModel(parent,pos,rot,scale),m_pPatchs(NULL),m_pUnit(NULL){
 			m_pUnit=new Unit3D2T();
 			//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
-			m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
+			//m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
 			m_pUnit->setShap(&m_shap);
 	}
 
@@ -31,12 +31,19 @@ namespace terrain{
 			return;
 		YON_DEBUG_BREAK_IF(image->getDimension().w!=image->getDimension().h);
 
-		m_iSizePerSide=image->getDimension().w;
+		//m_iSizePerSide=image->getDimension().w;
+		m_iSizePerSide=65;
 		m_iPatchSize=patchSize-1;
 		m_iPatchCountPerSide=m_iSizePerSide/m_iPatchSize;
 
 		switch(patchSize)
 		{
+		case ENUM_PATCH_SIZE_3:
+			m_iMaxLOD=1;
+			break;
+		case ENUM_PATCH_SIZE_5:
+			m_iMaxLOD=2;
+			break;
 		case ENUM_PATCH_SIZE_9:
 			m_iMaxLOD=3;
 			break;
@@ -53,7 +60,7 @@ namespace terrain{
 			m_iMaxLOD=7;
 			break;
 		default:
-			m_iMaxLOD=3;
+			m_iMaxLOD=0;
 		}
 
 		const u32 numVertices=m_iSizePerSide*m_iSizePerSide;
@@ -62,10 +69,10 @@ namespace terrain{
 		//TODO texcoords
 		const f32 texcoordDelta = 1.0f/(f32)(m_iSizePerSide-1);
 		s32 index=0;
-		float fx=0.f;
+		f32 fx=0.f;
 		for(s32 x = 0; x<m_iSizePerSide; ++x)
 		{
-			float fz=0.f;
+			f32 fz=0.f;
 			for(s32 z = 0; z<m_iSizePerSide; ++z)
 			{
 				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
@@ -82,6 +89,8 @@ namespace terrain{
 		calculateDistanceThresholds();
 		createPatches();
 		calculatePatchData();
+
+		calculateIndices();
 	}
 
 	void CGeomipmapTerrain::calculateDistanceThresholds()
@@ -171,6 +180,7 @@ namespace terrain{
 					s32 z=0;
 					// calculate the step we take this patch, based on the patches current LOD
 					step = 1<<m_pPatchs[index].m_iLOD;
+					Logger->debug("i:%d,j:%d,m_pPatchs[%d].m_iLOD:%d,step:%d\n",i,j,index,m_pPatchs[index].m_iLOD,step);
 					// Loop through patch and generate indices
 					while (z<m_iPatchSize)
 					{
@@ -179,7 +189,7 @@ namespace terrain{
 						const s32 index12 = getIndex(j, i, index, x, z + step);
 						const s32 index22 = getIndex(j, i, index, x + step, z + step);
 
-						//Logger->debug("%d,%d,%d,%d\n",index11,index21,index12,index22);
+						Logger->debug("x:%d,z:%d---->%d,%d,%d,%d\n",x,z,index11,index21,index12,index22);
 
 						indices.push_back(index12);
 						indices.push_back(index11);
@@ -267,7 +277,7 @@ namespace terrain{
 		//ITerrainModel::onRegisterForRender(manager);
 		if(m_bVisible)
 		{
-			calculateIndices();
+			//calculateIndices();
 
 			manager->registerForRender(this);
 
