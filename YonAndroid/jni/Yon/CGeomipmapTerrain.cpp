@@ -14,7 +14,7 @@ namespace terrain{
 		:ITerrainModel(parent,pos,rot,scale),m_pPatchs(NULL),m_pUnit(NULL){
 			m_pUnit=new Unit3D2T();
 			//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
-			//m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
+			m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
 			m_pUnit->setShap(&m_shap);
 	}
 
@@ -31,10 +31,9 @@ namespace terrain{
 			return;
 		YON_DEBUG_BREAK_IF(image->getDimension().w!=image->getDimension().h);
 
-		//m_iSizePerSide=image->getDimension().w;
-		m_iSizePerSide=65;
+		m_iSizePerSide=image->getDimension().w;
 		m_iPatchSize=patchSize-1;
-		m_iPatchCountPerSide=m_iSizePerSide/m_iPatchSize;
+		m_iPatchCountPerSide=(m_iSizePerSide-1)/m_iPatchSize;
 
 		switch(patchSize)
 		{
@@ -76,9 +75,9 @@ namespace terrain{
 			for(s32 z = 0; z<m_iSizePerSide; ++z)
 			{
 				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
-				v.pos.x=fx*10;
+				v.pos.x=fx;
 				v.pos.y=image->getValue(x,z);
-				v.pos.z=fz*10;
+				v.pos.z=fz;
 
 				++fz;
 			}
@@ -89,17 +88,17 @@ namespace terrain{
 		calculateDistanceThresholds();
 		createPatches();
 		calculatePatchData();
-
-		calculateIndices();
 	}
 
 	void CGeomipmapTerrain::calculateDistanceThresholds()
 	{
-		m_distanceThresholds.set_used(m_iMaxLOD);
-		const f64 size = m_iPatchSize*m_iPatchSize*m_scaleSize.x*m_scaleSize.z;
+		m_distanceThresholds.set_used(0);
+		m_distanceThresholds.reallocate(m_iMaxLOD);
+		const f64 size = m_iPatchSize*m_iPatchSize*m_scale.x*m_scale.z;
 		for(s32 i=0;i<m_iMaxLOD;++i)
 		{
 			m_distanceThresholds.push_back(size*((i+1+i/2)*(i+1+i/2)));//but why i+1+i/2?
+			Logger->debug("m_distanceThresholds[%d]:%.2f\r\n",m_distanceThresholds.size()-1,m_distanceThresholds.getLast());
 		}
 	}
 
@@ -113,12 +112,25 @@ namespace terrain{
 	void CGeomipmapTerrain::calculatePatchData()
 	{
 		s32 index=0;
+		s32 count;
 		for(s32 x=0;x<m_iPatchCountPerSide;++x)
 		{
 			for(s32 z=0;z<m_iPatchCountPerSide;++z)
 			{
 				index=x*m_iPatchCountPerSide+z;
 				m_pPatchs[index].m_iLOD=0;
+				m_pPatchs[index].m_centerPos=core::ORIGIN_VECTOR3DF;
+
+				count=0;
+				for (s32 xx = x*m_iPatchSize; xx <= (x + 1) * m_iPatchSize; ++xx)
+				{
+					for (s32 zz = z*m_iPatchSize; zz <= (z + 1) * m_iPatchSize; ++zz)
+					{
+						m_pPatchs[index].m_centerPos+=m_shap.getVertexArray()[xx*m_iSizePerSide+zz].pos;
+						++count;
+					}
+				}
+				m_pPatchs[index].m_centerPos/=count;
 
 				//assign neighbours
 				/*if(x>0)
@@ -163,10 +175,46 @@ namespace terrain{
 		}
 	}
 
-	void CGeomipmapTerrain::calculateIndices()
+	void CGeomipmapTerrain::preRenderLODCalculations()
+	{
+		camera::ICamera* camera=m_pSceneManager->getActiveCamera();
+		if(camera==NULL)
+			return;
+
+		// Determine the camera rotation, based on the camera direction.
+		core::vector3df cameraPosition = camera->getAbsolutePosition();
+
+		// Determine each patches LOD based on distance from camera (and whether or not they are in
+		// the view frustum).
+		const s32 count = m_iPatchCountPerSide*m_iPatchCountPerSide;
+		f32 distance;
+		for (s32 j = 0; j < count; ++j)
+		{
+			//TODO check frustum
+			for (s32 i = m_iMaxLOD - 1; i >= 0; --i)
+			{
+				distance = cameraPosition.getDistanceFromSQ(m_pPatchs[j].m_centerPos);
+				if (distance >= m_distanceThresholds[i])
+				{
+					m_pPatchs[j].m_iLOD = i;
+					break;
+				}
+				//else if (i == 0)
+				{
+					// If we've turned off a patch from viewing, because of the frustum, and now we turn around and it's
+					// too close, we need to turn it back on, at the highest LOD. The if above doesn't catch this.
+					m_pPatchs[j].m_iLOD = 0;
+				}
+			}
+		}
+	}
+
+	void CGeomipmapTerrain::preRenderIndicesCalculations()
 	{
 		core::array<u16>& indices=m_shap.getIndexArray();
 		indices.set_used(0);
+
+		//Logger->debug("m_iPatchCountPerSide:%d\n",m_iPatchCountPerSide);
 
 		s32 index=0;
 		s32 step=0;
@@ -180,7 +228,7 @@ namespace terrain{
 					s32 z=0;
 					// calculate the step we take this patch, based on the patches current LOD
 					step = 1<<m_pPatchs[index].m_iLOD;
-					Logger->debug("i:%d,j:%d,m_pPatchs[%d].m_iLOD:%d,step:%d\n",i,j,index,m_pPatchs[index].m_iLOD,step);
+					//Logger->debug("i:%d,j:%d,m_pPatchs[%d].m_iLOD:%d,step:%d\n",i,j,index,m_pPatchs[index].m_iLOD,step);
 					// Loop through patch and generate indices
 					while (z<m_iPatchSize)
 					{
@@ -189,7 +237,7 @@ namespace terrain{
 						const s32 index12 = getIndex(j, i, index, x, z + step);
 						const s32 index22 = getIndex(j, i, index, x + step, z + step);
 
-						Logger->debug("x:%d,z:%d---->%d,%d,%d,%d\n",x,z,index11,index21,index12,index22);
+						//Logger->debug("x:%d,z:%d---->%d,%d,%d,%d\n",x,z,index11,index21,index12,index22);
 
 						indices.push_back(index12);
 						indices.push_back(index11);
@@ -274,12 +322,12 @@ namespace terrain{
 
 	void CGeomipmapTerrain::onRegisterForRender(ISceneManager* manager)
 	{
-		//ITerrainModel::onRegisterForRender(manager);
 		if(m_bVisible)
 		{
-			//calculateIndices();
-
 			manager->registerForRender(this);
+
+			preRenderLODCalculations();
+			preRenderIndicesCalculations();
 
 			ITerrainModel::onRegisterForRender(manager);
 		}

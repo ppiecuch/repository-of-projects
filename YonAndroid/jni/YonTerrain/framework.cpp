@@ -103,9 +103,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 		}
 	}*/
 
-	terrainModel=sceneMgr->addTerrainModel();
-	IImage* image=videoDriver->createImageFromFile("heightmap128.png",true);
+	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(10,1,10));
+	IImage* image=videoDriver->createImageFromFile("heightmap8.png",true);
 	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_3);
+	//terrainModel->loadHeightMap(image);
 	image->drop();
 
 	return true;
@@ -122,7 +123,8 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	core::vector3df pos = pCamera->getAbsolutePosition();
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,cam(%.2f,%.2f,%.2f)",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),pos.x,pos.y,pos.z),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }

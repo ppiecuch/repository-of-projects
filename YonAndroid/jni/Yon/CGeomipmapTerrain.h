@@ -14,7 +14,7 @@ namespace terrain{
 		struct SPatch{
 			SPatch():m_iLOD(-1),top(NULL),bottom(NULL),left(NULL),right(NULL)
 			{}
-			f32 m_fDistance;
+			core::vector3df m_centerPos;
 			s16 m_iLOD;
 
 			SPatch* top;
@@ -27,7 +27,6 @@ namespace terrain{
 		SDynamicShap3D2T m_shap;
 
 		SPatch* m_pPatchs;
-		core::vector3df m_scaleSize;
 		s32 m_iMaxLOD;
 		s32 m_iSizePerSide;
 		s32 m_iPatchSize;
@@ -39,7 +38,8 @@ namespace terrain{
 		void createPatches();
 		void calculatePatchData();
 
-		void calculateIndices();
+		void preRenderLODCalculations();
+		void preRenderIndicesCalculations();
 		u32 getIndex(const s32 PatchX, const s32 PatchZ,const s32 PatchIndex, u32 vX, u32 vZ) const;
 	public:
 		CGeomipmapTerrain(IModel* parent,const core::vector3df& pos,
