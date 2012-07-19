@@ -77,14 +77,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	/*shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
-	teapotModel->setPosition(core::vector3df(50,-50,0));
+	//teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();*/
+	entity->drop();
 
 	/*for(s32 i=-100;i<100;i+=30)
 	{
@@ -104,8 +104,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	}*/
 
 	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(10,1,10));
-	IImage* image=videoDriver->createImageFromFile("heightmap8.png",true);
-	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_3);
+	IImage* image=videoDriver->createImageFromFile("heightmap16.png",true);
+	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_5);
 	//terrainModel->loadHeightMap(image);
 	image->drop();
 
