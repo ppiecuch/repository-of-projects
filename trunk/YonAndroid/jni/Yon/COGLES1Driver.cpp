@@ -10,6 +10,7 @@
 #include "COGLES1FBOTexture.h"
 #include "EGLInfo.h"
 #include "CMaterial.h"
+#include "SDummyTexture.h"
 
 namespace yon{
 namespace video{
@@ -217,6 +218,7 @@ namespace ogles1{
 		for(i=0;i<m_pHardwareBuffers.size();++i){
 			delete m_pHardwareBuffers[i];
 		}
+		m_pHardwareBuffers.clear();
 		Logger->debug("Release %d/%d Hardwarebuffer\n",i,size);
 
 		
@@ -224,11 +226,13 @@ namespace ogles1{
 		size=m_imageLoaders.size();
 		for(i=0;i<m_imageLoaders.size();++i)
 			m_imageLoaders[i]->drop();
+		m_imageLoaders.clear();
 		Logger->debug("Release %d/%d ImageLoader\n",i,size);
 
 		size=m_textures.size();
 		for(i=0;i<m_textures.size();++i)
-			m_textures[i]->drop();
+			m_textures[i].texture->drop();
+		m_textures.clear();
 		Logger->debug("Release %d/%d Texture\n",i,size);
 
 		size=m_materialRenderers.size();
@@ -821,17 +825,31 @@ namespace ogles1{
 		if (!texture)
 			return;
 
+		/*
 		for (u32 i=0; i<m_textures.size(); ++i)
 		{
-			if (m_textures[i] == texture)
+			if (m_textures[i].texture == texture)
 			{
 				texture->drop();
 				m_textures.erase(i);
 			}
+		}*/
+		SSurface s;
+		s.texture = texture;
+
+		s32 index = m_textures.binary_search(s);
+		if (index != -1)
+		{
+			texture->drop();
+			m_textures.erase(index);
+			return;
 		}
+		else
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("texture:%s removing is ignored for not exist in driver",texture->getName()).c_str());
 	}
 
 	video::ITexture* COGLES1Driver::findTexture(const io::path& filename){
+#if 0
 		//TODO ”≈ªØ
 		for(u32 i=0;i<m_textures.size();++i){
 			//Logger->debug("check %s==%s\n",m_textures[i]->getPath().c_str(),absolutePath.c_str());
@@ -848,6 +866,24 @@ namespace ogles1{
 				return m_textures[i];
 			}
 		}
+#else
+		SSurface s;
+		SDummyTexture dummy(filename);
+		s.texture = &dummy;
+
+		s32 index = m_textures.binary_search(s);
+		if (index != -1)
+			return m_textures[index].texture;
+
+		const io::path absolutePath = m_pFileSystem->getResourcePath(filename);
+		if(absolutePath!="")
+		{
+			dummy.setName(absolutePath);
+			index = m_textures.binary_search(s);
+			if (index != -1)
+				return m_textures[index].texture;
+		}
+#endif
 		return NULL;
 	}
 
@@ -885,8 +921,10 @@ namespace ogles1{
 	{
 		if (texture)
 		{
+			SSurface s;
+			s.texture = texture;
 			texture->grab();
-			m_textures.push_back(texture);
+			m_textures.push_back(s);
 		}
 	}
 

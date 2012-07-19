@@ -138,7 +138,17 @@ namespace ogles1{
 		debug::IDebugPrinter* m_pDebugPrinter;
 
 		//TODO map(irrlicht÷– π”√SSurface)
-		core::array<video::ITexture*> m_textures;
+		struct SSurface
+		{
+			video::ITexture* texture;
+
+			bool operator < (const SSurface& other) const
+			{
+				return texture->getName() < other.texture->getName();
+			}
+		};
+		
+		core::array<SSurface> m_textures;
 		core::array<video::IImageLoader*> m_imageLoaders;
 		core::array<video::IMaterialRenderer*> m_materialRenderers;
 		//TODO map

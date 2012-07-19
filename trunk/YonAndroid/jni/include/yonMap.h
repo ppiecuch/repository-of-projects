@@ -6,6 +6,12 @@
 namespace yon{
 namespace core{
 
+	//			Average		Worst case
+	//Space		O(n)		O(n)
+	//Search	O(log n)	O(log n)
+	//Insert	O(log n)	O(log n)
+	//Delete	O(log n)	O(log n)
+
 	//使用注意：K需要提供“<”、“==”操作符运算
 	template<class K,class V>
 	class map{

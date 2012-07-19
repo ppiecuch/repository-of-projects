@@ -99,10 +99,22 @@ namespace core{
 			return vector3d<T>(y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x);
 		}
 
+		//! Returns if this vector interpreted as a point is on a line between two other points.
+		/** It is assumed that the point is on the line.
+		\param begin Beginning vector to compare between.
+		\param end Ending vector to compare between.
+		\return True if this vector is between begin and end, false if not. */
 		bool isBetweenPoints(const vector3d<T>& begin, const vector3d<T>& end) const
 		{
-			const T f = (end - begin).getLengthSQ();
-			return getDistanceFromSQ(begin) <= f && getDistanceFromSQ(end) <= f;
+			//const T f = (end - begin).getLengthSQ();
+			//return getDistanceFromSQ(begin) <= f && getDistanceFromSQ(end) <= f;
+			const T ix=core::min_(begin.x,end.x);
+			const T iy=core::min_(begin.y,end.y);
+			const T iz=core::min_(begin.z,end.z);
+			const T ax=core::max_(begin.x,end.x);
+			const T ay=core::max_(begin.y,end.y);
+			const T az=core::max_(begin.z,end.z);
+			return x>=ix&&x<=ax&&y>=iy&&y<=ay&&z>=iz&&z<=az;
 		}
 
 		vector3d<T>& normalize(){

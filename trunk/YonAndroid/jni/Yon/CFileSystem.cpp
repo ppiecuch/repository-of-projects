@@ -3,6 +3,7 @@
 #include "CReadMemoryStream.h"
 #include "CWriteFileStream.h"
 #include "CXMLReaderImpl.h"
+#include "yonUtil.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include <io.h> // for _access
@@ -106,6 +107,7 @@ namespace io{
 	void CFileSystem::addWorkingDirectory(const io::path& newDirectory){
 		//TODOÕýÔò
 		io::path dir=getAbsolutePath(newDirectory);
+		core::regularize(dir);
 		Logger->debug("addWorkingDirectory:%s\r\n",dir.c_str());
 		m_workingDirectories.push_back(dir);
 	}

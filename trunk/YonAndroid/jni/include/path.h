@@ -18,6 +18,9 @@ namespace io{
 		{
 		}
 
+		bool operator==(const fschar* other) const { return m_path==other;}
+		bool operator!=(const fschar* other) const { return !(*this==other);}
+
 		//! Set the path.
 		void setPath(const path& p)
 		{

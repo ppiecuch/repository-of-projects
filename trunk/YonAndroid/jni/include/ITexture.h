@@ -24,8 +24,9 @@ namespace video{
 	public:
 		ITexture(const io::path& p) : m_namePath(p)
 		{}
+		const io::path& getName() const { return m_namePath.getInternalName(); }
+
 		virtual const core::dimension2du& getSize() const = 0;
-		const io::path& getPath() const { return m_namePath.getPath(); }
 
 		virtual bool hasMipMap() const = 0;
 

@@ -223,6 +223,10 @@
 				Name="core"
 				>
 				<File
+					RelativePath="..\include\aabbox3d.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\bstree.h"
 					>
 				</File>
@@ -263,6 +267,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\line3d.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\matrix4.h"
 					>
 				</File>
@@ -271,7 +279,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\plane.h"
+					RelativePath="..\include\plane3d.h"
 					>
 				</File>
 				<File
@@ -708,6 +716,10 @@
 				</File>
 				<File
 					RelativePath="..\include\SColor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SDummyTexture.h"
 					>
 				</File>
 				<File

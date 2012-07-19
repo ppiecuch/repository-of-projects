@@ -211,6 +211,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\pathTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\pathTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\rbtreeTestCase.cpp"
 			>
 		</File>
