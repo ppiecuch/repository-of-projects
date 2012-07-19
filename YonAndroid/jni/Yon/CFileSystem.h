@@ -28,7 +28,7 @@ namespace io{
 		virtual s32 getWorkingDirectoryCount(){
 			return m_workingDirectories.size();
 		}
-		virtual const io::path& getWorkingDirectory(s32 index){
+		virtual const io::path& getWorkingDirectory(u32 index){
 			YON_DEBUG_BREAK_IF(index>=m_workingDirectories.size());
 			return m_workingDirectories[index];
 		}

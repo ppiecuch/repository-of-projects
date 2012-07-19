@@ -175,11 +175,13 @@ namespace terrain{
 		}
 	}
 
-	void CGeomipmapTerrain::preRenderLODCalculations()
+	bool CGeomipmapTerrain::preRenderLODCalculations()
 	{
+		bool change=false;
+
 		camera::ICamera* camera=m_pSceneManager->getActiveCamera();
 		if(camera==NULL)
-			return;
+			return change;
 
 		// Determine the camera rotation, based on the camera direction.
 		core::vector3df cameraPosition = camera->getAbsolutePosition();
@@ -196,17 +198,23 @@ namespace terrain{
 				distance = cameraPosition.getDistanceFromSQ(m_pPatchs[j].m_centerPos);
 				if (distance >= m_distanceThresholds[i])
 				{
+					if(m_pPatchs[j].m_iLOD!=i)
+						change=true;
 					m_pPatchs[j].m_iLOD = i;
 					break;
 				}
 				//else if (i == 0)
 				{
+					if(m_pPatchs[j].m_iLOD!=0)
+						change=true;
 					// If we've turned off a patch from viewing, because of the frustum, and now we turn around and it's
 					// too close, we need to turn it back on, at the highest LOD. The if above doesn't catch this.
 					m_pPatchs[j].m_iLOD = 0;
 				}
 			}
 		}
+
+		return change;
 	}
 
 	void CGeomipmapTerrain::preRenderIndicesCalculations()
@@ -214,7 +222,9 @@ namespace terrain{
 		core::array<u16>& indices=m_shap.getIndexArray();
 		indices.set_used(0);
 
-		//Logger->debug("m_iPatchCountPerSide:%d\n",m_iPatchCountPerSide);
+		bool wireframe=m_pUnit->getMaterial()->getPolygonMode()==video::ENUM_POLYGON_MODE_LINE;
+
+		Logger->debug("m_iPatchCountPerSide:%d\n",m_iPatchCountPerSide);
 
 		s32 index=0;
 		s32 step=0;
@@ -228,7 +238,7 @@ namespace terrain{
 					s32 z=0;
 					// calculate the step we take this patch, based on the patches current LOD
 					step = 1<<m_pPatchs[index].m_iLOD;
-					//Logger->debug("i:%d,j:%d,m_pPatchs[%d].m_iLOD:%d,step:%d\n",i,j,index,m_pPatchs[index].m_iLOD,step);
+					Logger->debug("i:%d,j:%d,m_pPatchs[%d].m_iLOD:%d,step:%d\n",i,j,index,m_pPatchs[index].m_iLOD,step);
 					// Loop through patch and generate indices
 					while (z<m_iPatchSize)
 					{
@@ -237,14 +247,30 @@ namespace terrain{
 						const s32 index12 = getIndex(j, i, index, x, z + step);
 						const s32 index22 = getIndex(j, i, index, x + step, z + step);
 
-						//Logger->debug("x:%d,z:%d---->%d,%d,%d,%d\n",x,z,index11,index21,index12,index22);
+						Logger->debug("x:%d,z:%d---->%d,%d,%d,%d\n",x,z,index11,index21,index12,index22);
 
-						indices.push_back(index12);
-						indices.push_back(index11);
-						indices.push_back(index22);
-						indices.push_back(index22);
-						indices.push_back(index11);
-						indices.push_back(index21);
+						if(wireframe)
+						{
+							indices.push_back(index12);
+							indices.push_back(index11);
+							indices.push_back(index11);
+							indices.push_back(index22);
+							indices.push_back(index22);
+							indices.push_back(index12);
+							indices.push_back(index21);
+							indices.push_back(index22);
+							indices.push_back(index11);
+							indices.push_back(index21);
+						}
+						else
+						{
+							indices.push_back(index12);
+							indices.push_back(index11);
+							indices.push_back(index22);
+							indices.push_back(index22);
+							indices.push_back(index11);
+							indices.push_back(index21);
+						}
 						//IndicesToRender+=6;
 
 						// increment index position horizontally
@@ -326,8 +352,8 @@ namespace terrain{
 		{
 			manager->registerForRender(this);
 
-			preRenderLODCalculations();
-			preRenderIndicesCalculations();
+			if(preRenderLODCalculations())
+				preRenderIndicesCalculations();
 
 			ITerrainModel::onRegisterForRender(manager);
 		}

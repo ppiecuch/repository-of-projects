@@ -38,7 +38,7 @@ namespace terrain{
 		void createPatches();
 		void calculatePatchData();
 
-		void preRenderLODCalculations();
+		bool preRenderLODCalculations();
 		void preRenderIndicesCalculations();
 		u32 getIndex(const s32 PatchX, const s32 PatchZ,const s32 PatchIndex, u32 vX, u32 vZ) const;
 	public:
