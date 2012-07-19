@@ -141,8 +141,43 @@ namespace core{
 			sort();
 			return binary_search(element, 0, used-1);
 		}
+		//! Performs a binary search for an element, returns -1 if not found.
+		/** \param element: Element to search for.
+		\param left First left index
+		\param right Last right index.
+		\return Position of the searched element if it was found, otherwise -1
+		is returned. */
+		s32 binary_search(const T& element, s32 left, s32 right) const
+		{
+			if (!used)
+				return -1;
+
+			s32 m;
+
+			do
+			{
+				m = (left+right)>>1;
+
+				if (element < data[m])
+					right = m - 1;
+				else
+					left = m + 1;
+
+			} while((element < data[m] || data[m] < element) && left<=right);
+			// this last line equals to:
+			// " while((element != array[m]) && left<=right);"
+			// but we only want to use the '<' operator.
+			// the same in next line, it is "(element == array[m])"
+
+
+			if (!(element < data[m]) && !(data[m] < element))
+				return m;
+
+			return -1;
+		}
 
 		//由小到大进行排序
+		//可能存在BUG：sort();array[X]=XXXX;此时仍被标为有序
 		void sort()
 		{
 			if (!is_sorted && used>1)

@@ -87,6 +87,15 @@ namespace core{
 		return _mkdirs(const_cast<c8*>(temp.c_str()));
 	}
 
+	//regularize the path, using slash to end it if there is no slash at the end.
+	//additionally, this function will replace all backslash with slash
+	inline void regularize(io::path& pathname){
+		pathname.replace('\\','/');
+		s32 index = pathname.findLast('/');
+		if(index!=pathname.length()-1)
+			pathname.append('/');
+	}
+
 	template <class T1, class T2>
 	inline void swap(T1& a, T2& b)
 	{

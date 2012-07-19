@@ -27,28 +27,34 @@ namespace MyGUI{
 			return;
 		}
 		const bool useMipmap=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
-		const bool use16bit=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT);
+		const bool use16bit1Alpha=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA);
+		const bool use16bit4Alpha=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA);
 		const bool reserveImage=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,false);
-		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT,false);
+		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA,false);
+		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,false);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,true);
 		m_pTexture = static_cast<video::ITexture*>(m_pDriver->addTexture(core::dimension2du(_width,_height),io::path(m_name.c_str()),format));
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,useMipmap);
-		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT,use16bit);
+		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA,use16bit1Alpha);
+		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,use16bit4Alpha);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,reserveImage);
 	}
 
 	void  MyGUITexture::loadFromFile(const std::string& _filename){
 		destroy();
 		const bool useMipmap=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
-		const bool use16bit=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT);
+		const bool use16bit1Alpha=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA);
+		const bool use16bit4Alpha=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA);
 		const bool reserveImage=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,false);
-		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT,false);
+		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA,false);
+		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,false);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,true);
 		m_pTexture=m_pDriver->getTexture(io::path(_filename.c_str()));
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,useMipmap);
-		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT,use16bit);
+		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA,use16bit1Alpha);
+		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,use16bit4Alpha);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,reserveImage);
 		m_pTexture->upsidedown();
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("loadFromFile:%s",_filename.c_str()).c_str());
