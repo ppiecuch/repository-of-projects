@@ -73,7 +73,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
 	
 
-	IShap *shap;
+	/*IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
 
@@ -84,7 +84,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
 	/*for(s32 i=-100;i<100;i+=30)
 	{
@@ -103,7 +103,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 		}
 	}*/
 
-	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(10,1,10));
+	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(20,1,20));
 	IImage* image=videoDriver->createImageFromFile("heightmap16.png",true);
 	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_5);
 	//terrainModel->loadHeightMap(image);
@@ -125,6 +125,13 @@ void drawFrame(){
 
 	core::vector3df pos = pCamera->getAbsolutePosition();
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,cam(%.2f,%.2f,%.2f)",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),pos.x,pos.y,pos.z),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+
+	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
+	videoDriver->setTransform(ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
+	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
+	videoDriver->draw3DLine(core::vector3df(0,100,0),core::IDENTITY_VECTOR3DF,video::COLOR_GREEN);
+	videoDriver->draw3DLine(core::vector3df(0,0,100),core::IDENTITY_VECTOR3DF,video::COLOR_BLUE);
+
 
 	videoDriver->end();
 }

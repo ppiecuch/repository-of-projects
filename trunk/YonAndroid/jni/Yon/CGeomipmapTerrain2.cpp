@@ -1,4 +1,4 @@
-#include "CGeomipmapTerrain.h"
+#include "CGeomipmapTerrain2.h"
 #include "CImage.h"
 #include "SUnit.h"
 #include "ISceneManager.h"
@@ -9,7 +9,7 @@ namespace yon{
 namespace scene{
 namespace terrain{
 
-	CGeomipmapTerrain::CGeomipmapTerrain(IModel* parent,const core::vector3df& pos,
+	CGeomipmapTerrain2::CGeomipmapTerrain2(IModel* parent,const core::vector3df& pos,
 		const core::vector3df& rot,const core::vector3df& scale)
 		:ITerrainModel(parent,pos,rot,scale),m_pPatchs(NULL),m_pUnit(NULL){
 			m_pUnit=new Unit3D2T();
@@ -18,14 +18,14 @@ namespace terrain{
 			m_pUnit->setShap(&m_shap);
 	}
 
-	CGeomipmapTerrain::~CGeomipmapTerrain()
+	CGeomipmapTerrain2::~CGeomipmapTerrain2()
 	{
 		m_pUnit->drop();
 		if(m_pPatchs)
 			delete[] m_pPatchs;
 	}
 
-	void CGeomipmapTerrain::loadHeightMap(video::IImage* image,ENUM_PATCH_SIZE patchSize)
+	void CGeomipmapTerrain2::loadHeightMap(video::IImage* image,ENUM_PATCH_SIZE patchSize)
 	{
 		if(image==NULL)
 			return;
@@ -74,20 +74,20 @@ namespace terrain{
 		//TODO texcoords
 		const f32 texcoordDelta = 1.0f/(f32)(m_iSizePerSide-1);
 		s32 index=0;
-		f32 fx=0.f;
-		for(s32 x = 0; x<m_iSizePerSide; ++x)
+		f32 fz=0.f;
+		for(s32 z = 0; z<m_iSizePerSide; ++z)
 		{
-			f32 fz=0.f;
-			for(s32 z = 0; z<m_iSizePerSide; ++z)
+			f32 fx=0.f;
+			for(s32 x = 0; x<m_iSizePerSide; ++x)
 			{
 				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
 				v.pos.x=fx;
 				v.pos.y=image->getValue(x,z);
 				v.pos.z=fz;
 
-				++fz;
+				++fx;
 			}
-			++fx;
+			++fz;
 		}
 
 		//calculate all the necessary data for the patches and the terrain
@@ -96,7 +96,7 @@ namespace terrain{
 		calculatePatchData();
 	}
 
-	void CGeomipmapTerrain::calculateDistanceThresholds()
+	void CGeomipmapTerrain2::calculateDistanceThresholds()
 	{
 		m_distanceThresholds.set_used(0);
 		m_distanceThresholds.reallocate(m_iMaxLOD);
@@ -108,57 +108,58 @@ namespace terrain{
 		}
 	}
 
-	void CGeomipmapTerrain::createPatches()
+	void CGeomipmapTerrain2::createPatches()
 	{
 		if(m_pPatchs)
 			delete[] m_pPatchs;
 		m_pPatchs=new SPatch[m_iPatchCountPerSide*m_iPatchCountPerSide];
 	}
 
-	void CGeomipmapTerrain::calculatePatchData()
+	void CGeomipmapTerrain2::calculatePatchData()
 	{
 		s32 index=0;
 		s32 count;
-		for(s32 x=0;x<m_iPatchCountPerSide;++x)
+		for(s32 z=0;z<m_iPatchCountPerSide;++z)
 		{
-			for(s32 z=0;z<m_iPatchCountPerSide;++z)
+			for(s32 x=0;x<m_iPatchCountPerSide;++x)
 			{
-				index=x*m_iPatchCountPerSide+z;
+				index=z*m_iPatchCountPerSide+x;
+
 				m_pPatchs[index].m_iLOD=0;
 				m_pPatchs[index].m_centerPos=core::ORIGIN_VECTOR3DF;
 
 				count=0;
-				for (s32 xx = x*m_iPatchSize; xx <= (x + 1) * m_iPatchSize; ++xx)
+				for (s32 zz = z*m_iPatchSize; zz <= (z + 1) * m_iPatchSize; ++zz)
 				{
-					for (s32 zz = z*m_iPatchSize; zz <= (z + 1) * m_iPatchSize; ++zz)
+					for (s32 xx = x*m_iPatchSize; xx <= (x + 1) * m_iPatchSize; ++xx)
 					{
-						m_pPatchs[index].m_centerPos+=m_shap.getVertexArray()[xx*m_iSizePerSide+zz].pos;
+						m_pPatchs[index].m_centerPos+=m_shap.getVertexArray()[zz*m_iSizePerSide+xx].pos;
 						++count;
 					}
 				}
 				m_pPatchs[index].m_centerPos/=count;
 
 				//assign neighbours
-				/*if(x>0)
-					m_pPatchs[index].left=&m_pPatchs[index-m_iPatchCountPerSide];
+				if(x<m_iPatchCountPerSide-1)
+					m_pPatchs[index].left=&m_pPatchs[index+1];
 				else
 					m_pPatchs[index].left=NULL;
 
-				if(x<m_iPatchCountPerSide-1)
-					m_pPatchs[index].right=&m_pPatchs[index+m_iPatchCountPerSide];
+				if(x>0)
+					m_pPatchs[index].right=&m_pPatchs[index-1];
 				else
 					m_pPatchs[index].right=NULL;
 
 				if(z>0)
-					m_pPatchs[index].bottom=&m_pPatchs[index-1];
+					m_pPatchs[index].bottom=&m_pPatchs[index-m_iPatchCountPerSide];
 				else
 					m_pPatchs[index].bottom=NULL;
 
 				if(z<m_iPatchCountPerSide-1)
-					m_pPatchs[index].top=&m_pPatchs[index+1];
+					m_pPatchs[index].top=&m_pPatchs[index+m_iPatchCountPerSide];
 				else
-					m_pPatchs[index].top=NULL;*/
-				if(x>0)
+					m_pPatchs[index].top=NULL;
+				/*if(x>0)
 					m_pPatchs[index].top=&m_pPatchs[index-m_iPatchCountPerSide];
 				else
 					m_pPatchs[index].top=NULL;
@@ -176,12 +177,12 @@ namespace terrain{
 				if(z<m_iPatchCountPerSide-1)
 					m_pPatchs[index].right=&m_pPatchs[index+1];
 				else
-					m_pPatchs[index].right=NULL;
+					m_pPatchs[index].right=NULL;*/
 			}
 		}
 	}
 
-	bool CGeomipmapTerrain::preRenderLODCalculations()
+	bool CGeomipmapTerrain2::preRenderLODCalculations()
 	{
 		bool change=false;
 
@@ -223,7 +224,7 @@ namespace terrain{
 		return change;
 	}
 
-	void CGeomipmapTerrain::preRenderIndicesCalculations()
+	void CGeomipmapTerrain2::preRenderIndicesCalculations()
 	{
 		core::array<u16>& indices=m_shap.getIndexArray();
 		indices.set_used(0);
@@ -234,54 +235,60 @@ namespace terrain{
 
 		s32 index=0;
 		s32 step=0;
-		for(s32 i=0;i<m_iPatchCountPerSide;++i)
+		for(s32 pz=0;pz<m_iPatchCountPerSide;++pz)
 		{
-			for(s32 j=0;j<m_iPatchCountPerSide;++j)
+			for(s32 px=0;px<m_iPatchCountPerSide;++px)
 			{
 				if(m_pPatchs[index].m_iLOD>=0)
 				{
-					s32 x=0;
-					s32 z=0;
+					//s32 x=0;
+					//s32 z=0;
 					// calculate the step we take this patch, based on the patches current LOD
 					step = 1<<m_pPatchs[index].m_iLOD;
-					SPatch* top=m_pPatchs[index].top;
-					SPatch* bottom=m_pPatchs[index].bottom;
-					SPatch* left=m_pPatchs[index].left;
-					SPatch* right=m_pPatchs[index].right;
+					//SPatch* top=m_pPatchs[index].top;
+					//SPatch* bottom=m_pPatchs[index].bottom;
+					//SPatch* left=m_pPatchs[index].left;
+					//SPatch* right=m_pPatchs[index].right;
 					//Logger->debug("i:%d,j:%d,m_pPatchs[%d].m_iLOD:%d,top:%d,botton:%d,left:%d,right:%d,step:%d\n",i,j,index,m_pPatchs[index].m_iLOD,top?top->m_iLOD:-1,bottom?bottom->m_iLOD:-1,left?left->m_iLOD:-1,right?right->m_iLOD:-1,step);
 					// Loop through patch and generate indices
-					while (z<m_iPatchSize)
+					for(s32 z=0;z<m_iPatchSize;z+=step)
 					{
-						const s32 index11 = getIndex(j, i, index, x, z);
-						const s32 index21 = getIndex(j, i, index, x + step, z);
-						const s32 index12 = getIndex(j, i, index, x, z + step);
-						const s32 index22 = getIndex(j, i, index, x + step, z + step);
-
-						//Logger->debug("x:%d,z:%d---->%d,%d,%d,%d->(%d,%d,%d),(%d,%d,%d)\n",x,z,index11,index21,index12,index22,index12,index11,index22,index22,index11,index21);
-
-						if(wireframe)
+						for(s32 x=0;x<m_iPatchSize;x+=step)
 						{
-							indices.push_back(index12);
-							indices.push_back(index11);
-							indices.push_back(index11);
-							indices.push_back(index22);
-							indices.push_back(index22);
-							indices.push_back(index12);
-							indices.push_back(index21);
-							indices.push_back(index22);
-							indices.push_back(index11);
-							indices.push_back(index21);
+							const s32 index11 = getIndex(px, pz, index, x, z);
+							const s32 index21 = getIndex(px, pz, index, x + step, z);
+							const s32 index12 = getIndex(px, pz, index, x, z + step);
+							const s32 index22 = getIndex(px, pz, index, x + step, z + step);
+
+							//Logger->debug("x:%d,z:%d---->%d,%d,%d,%d->(%d,%d,%d),(%d,%d,%d)\n",x,z,index11,index21,index12,index22,index12,index11,index22,index22,index11,index21);
+
+							if(wireframe)
+							{
+								indices.push_back(index12);
+								indices.push_back(index11);
+								indices.push_back(index11);
+								indices.push_back(index22);
+								indices.push_back(index22);
+								indices.push_back(index12);
+								indices.push_back(index21);
+								indices.push_back(index22);
+								indices.push_back(index11);
+								indices.push_back(index21);
+							}
+							else
+							{
+								indices.push_back(index12);
+								indices.push_back(index11);
+								indices.push_back(index22);
+								indices.push_back(index22);
+								indices.push_back(index11);
+								indices.push_back(index21);
+							}
 						}
-						else
-						{
-							indices.push_back(index12);
-							indices.push_back(index11);
-							indices.push_back(index22);
-							indices.push_back(index22);
-							indices.push_back(index11);
-							indices.push_back(index21);
-						}
-						//IndicesToRender+=6;
+					}
+					/*while (z<m_iPatchSize)
+					{
+						
 
 						// increment index position horizontally
 						x += step;
@@ -292,14 +299,14 @@ namespace terrain{
 							x = 0;
 							z += step;
 						}
-					}
+					}*/
 				}
 				++index;
 			}
 		}
 	}
 
-	u32 CGeomipmapTerrain::getIndex(const s32 PatchX, const s32 PatchZ,const s32 PatchIndex, u32 vX, u32 vZ) const
+	u32 CGeomipmapTerrain2::getIndex(const s32 PatchX, const s32 PatchZ,const s32 PatchIndex, u32 vX, u32 vZ) const
 	{
 		// top border
 		if (vZ == 0)
@@ -346,7 +353,7 @@ namespace terrain{
 		return (vZ + ((m_iPatchSize) * PatchZ)) * m_iSizePerSide + (vX + ((m_iPatchSize) * PatchX));
 	}
 
-	void CGeomipmapTerrain::render(video::IVideoDriver* driver)
+	void CGeomipmapTerrain2::render(video::IVideoDriver* driver)
 	{
 		if(m_bVisible==false)
 			return;
@@ -356,7 +363,7 @@ namespace terrain{
 		driver->drawUnit(m_pUnit);
 	}
 
-	void CGeomipmapTerrain::onRegisterForRender(ISceneManager* manager)
+	void CGeomipmapTerrain2::onRegisterForRender(ISceneManager* manager)
 	{
 		if(m_bVisible)
 		{
