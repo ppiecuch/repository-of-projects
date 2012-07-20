@@ -642,6 +642,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\CGeomipmapTerrain2.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CGeomipmapTerrain2.h"
+						>
+					</File>
+					<File
 						RelativePath="..\include\ITerrainModel.h"
 						>
 					</File>

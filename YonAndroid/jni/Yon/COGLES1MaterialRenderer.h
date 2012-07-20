@@ -283,6 +283,56 @@ namespace ogles1{
 		}
 	};
 
+	class COGLES1MaterialRendererCompositePass1 : public COGLES1MaterialRenderer
+	{
+	public: 
+
+		COGLES1MaterialRendererCompositePass1(COGLES1Driver* driver)
+			: COGLES1MaterialRenderer(driver) {}
+
+		virtual void onSetMaterial(const IMaterial* current,const IMaterial* last)
+		{
+			m_pDriver->setTexture(0, current->getTexture(0));
+			setBasicRenderStates(current,last);
+
+
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			
+			glEnable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_EQUAL, 1.0f);
+		}
+
+		virtual void onUnsetMaterial(){
+			glDisable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_GREATER, 0.0f);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		}
+	};
+
+	class COGLES1MaterialRendererCompositePass2 : public COGLES1MaterialRenderer
+	{
+	public: 
+
+		COGLES1MaterialRendererCompositePass2(COGLES1Driver* driver)
+			: COGLES1MaterialRenderer(driver) {}
+
+		virtual void onSetMaterial(const IMaterial* current,const IMaterial* last)
+		{
+			m_pDriver->setTexture(0, current->getTexture(0));
+			setBasicRenderStates(current,last);
+
+			glEnable(GL_BLEND);
+			glEnable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_LESS, 1.0f);
+		}
+
+		virtual void onUnsetMaterial(){
+			glDisable(GL_BLEND);
+			glDisable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_GREATER, 0.0f);
+		}
+	};
+
 	class COGLES1MaterialRendererTransparentBlendColor : public COGLES1MaterialRenderer
 	{
 	public: 
@@ -385,6 +435,12 @@ namespace ogles1{
 	}
 	IMaterialRenderer* createMaterialRendererMask(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererMask((ogles1::COGLES1Driver*)driver);
+	}
+	IMaterialRenderer* createMaterialRendererCompositePass1(IVideoDriver* driver){
+		return new ogles1::COGLES1MaterialRendererCompositePass1((ogles1::COGLES1Driver*)driver);
+	}
+	IMaterialRenderer* createMaterialRendererCompositePass2(IVideoDriver* driver){
+		return new ogles1::COGLES1MaterialRendererCompositePass2((ogles1::COGLES1Driver*)driver);
 	}
 }
 }

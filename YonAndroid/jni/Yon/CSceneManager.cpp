@@ -5,6 +5,7 @@
 #include "CPerspCamera.h"
 #include "CWindowOrthoCamera.h"
 #include "CGeomipmapTerrain.h"
+#include "CGeomipmapTerrain2.h"
 #include "CAnimatorCameraFPS.h"
 
 #include "ILogger.h"
@@ -59,7 +60,8 @@ namespace scene{
 		const core::vector3df& rot,const core::vector3df& scale){
 			if(parent==NULL)
 				parent=this;
-			terrain::ITerrainModel* model=new terrain::CGeomipmapTerrain(parent,pos,rot,scale);
+			//terrain::ITerrainModel* model=new terrain::CGeomipmapTerrain(parent,pos,rot,scale);
+			terrain::ITerrainModel* model=new terrain::CGeomipmapTerrain2(parent,pos,rot,scale);
 			model->drop();
 			return model;
 	}
