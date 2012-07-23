@@ -2,6 +2,7 @@
 #define _YON_SCENE_CAMERA_CPERSPCAMERA_H_
 
 #include "IPerspCamera.h"
+#include "CViewFrustum.h"
 
 namespace yon{
 namespace scene{
@@ -10,6 +11,8 @@ namespace camera{
 	protected:
 		virtual void recalculateProjectionMatrix();
 		virtual void recalculateViewMatrix();
+
+		CViewFrustum m_frustum;
 	public:
 		CPerspCamera(IModel* parent=NULL,
 			const core::vector3df& pos=core::vector3df(0,0,1),
@@ -31,6 +34,8 @@ namespace camera{
 		virtual void setPosition(const core::vector3df& pos);
 		virtual void setRotation(const core::vector3df& rot);
 		virtual void setTarget(const core::vector3df& target);
+
+		virtual IViewFrustum* getViewFrustum(){return &m_frustum;}
 	};
 }
 }

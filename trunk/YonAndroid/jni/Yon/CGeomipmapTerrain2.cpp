@@ -260,7 +260,7 @@ namespace terrain{
 
 		bool wireframe=m_pUnit->getMaterial()->getPolygonMode()==video::ENUM_POLYGON_MODE_LINE;
 
-		Logger->debug("\nm_iPatchCountPerSide:%d\n",m_iPatchCountPerSide);
+		//Logger->debug("\nm_iPatchCountPerSide:%d\n",m_iPatchCountPerSide);
 
 		s32 index=0;
 		s32 step=0;
@@ -276,7 +276,7 @@ namespace terrain{
 					SPatch* bottom=m_pPatchs[index].bottom;
 					SPatch* left=m_pPatchs[index].left;
 					SPatch* right=m_pPatchs[index].right;
-					Logger->debug("px:%d,pz:%d,m_pPatchs[%d].m_iLOD:%d,top:%d,bottom:%d,left:%d,right:%d,step:%d\n",px,pz,index,m_pPatchs[index].m_iLOD,top?top->m_iLOD:-1,bottom?bottom->m_iLOD:-1,left?left->m_iLOD:-1,right?right->m_iLOD:-1,step);
+					//Logger->debug("px:%d,pz:%d,m_pPatchs[%d].m_iLOD:%d,top:%d,bottom:%d,left:%d,right:%d,step:%d\n",px,pz,index,m_pPatchs[index].m_iLOD,top?top->m_iLOD:-1,bottom?bottom->m_iLOD:-1,left?left->m_iLOD:-1,right?right->m_iLOD:-1,step);
 					// Loop through patch and generate indices
 					for(s32 x=0;x<m_iPatchSize;x+=step)
 					{
@@ -287,7 +287,7 @@ namespace terrain{
 							const s32 index12 = getIndex(px, pz, index, x, z + step);
 							const s32 index22 = getIndex(px, pz, index, x + step, z + step);
 
-							Logger->debug("x:%d,z:%d---->%d,%d,%d,%d->(%d,%d,%d),(%d,%d,%d)\n",x,z,index11,index21,index12,index22,index12,index11,index22,index22,index11,index21);
+							//Logger->debug("x:%d,z:%d---->%d,%d,%d,%d->(%d,%d,%d),(%d,%d,%d)\n",x,z,index11,index21,index12,index22,index12,index11,index22,index22,index11,index21);
 
 							if(wireframe)
 							{
