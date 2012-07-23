@@ -31,7 +31,8 @@ namespace scene{
 		m_pTransparentRefMaterial=driver->createMaterial();
 		m_pTransparentMaterial=driver->createMaterial();
 		m_pTransparentRefMaterial->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_REF);
-		m_pTransparentMaterial->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
+		//m_pTransparentMaterial->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
+		m_pTransparentMaterial->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT);
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance CGraphicsAdapter");
 	}
 	CGraphicsAdapter::~CGraphicsAdapter(){

@@ -54,7 +54,8 @@ namespace debug{
 			m_pShap=new scene::SDynamicShap2D();
 			m_pUnit=m_pGeometryFty->createUnit(m_pShap);
 			m_pUnit->getMaterial()->setTexture(0,m_pTexture);
-			m_pUnit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
+			//m_pUnit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
+			m_pUnit->getMaterial()->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_REF);
 			//m_pUnit->getMaterial()->setBlendSrcFactor(video::ENUM_BLEND_FACTOR_SRC_COLOR);
 			//m_pUnit->getMaterial()->setBlendDstFactor(video::ENUM_BLEND_FACTOR_ONE);
 			//m_pUnit->getMaterial()->setAlphaSource(video::ENUM_ALPHA_SOURCE_TEXTURE);

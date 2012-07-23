@@ -64,15 +64,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 	timer=engine->getTimer();
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/");
+	fs->addWorkingDirectory("../media/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->setWorkingDirectory("media/");
+	fs->addWorkingDirectory("media/");
 #endif
 
   
@@ -280,7 +280,7 @@ void drawFrame(){
 	}
 	else
 		lastTime=timer->getRealTime();
-
+	gfAdapter->drawRegion("3.png",r,250,120,512,512,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),false);
 	gfAdapter->drawRegion("test.png",r,200,120,128,64,ENUM_TRANS_ROT90);
 	gfAdapter->drawRegion("shadow.png",r,50,170,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
 	gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);

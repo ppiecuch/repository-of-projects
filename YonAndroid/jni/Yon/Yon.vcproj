@@ -577,6 +577,10 @@
 						RelativePath="..\include\IPerspCamera.h"
 						>
 					</File>
+					<File
+						RelativePath=".\SViewFrustum.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="animator"

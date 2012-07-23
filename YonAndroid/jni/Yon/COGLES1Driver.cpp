@@ -129,7 +129,7 @@ namespace ogles1{
 		m_materialRenderers.push_back(createMaterialRendererLighten(this));
 		m_materialRenderers.push_back(createMaterialRendererTransparent(this));
 		m_materialRenderers.push_back(createMaterialRendererTransparentRef(this));
-		m_materialRenderers.push_back(createMaterialRendererTransparentBlendColor(this));
+		//m_materialRenderers.push_back(createMaterialRendererTransparentBlendColor(this));
 		m_materialRenderers.push_back(createMaterialRendererMask(this));
 		m_materialRenderers.push_back(createMaterialRendererCompositePass1(this));
 		m_materialRenderers.push_back(createMaterialRendererCompositePass2(this));

@@ -69,6 +69,16 @@ namespace animator{
 				relativeRotation.y -= (m_cursorPos.x-0.5f) * m_fRotateSpeed;
 				relativeRotation.x += (m_cursorPos.y-0.5f) * m_fRotateSpeed;
 
+				const f32 maxAngle=85.0f;
+				if(relativeRotation.x>maxAngle&&relativeRotation.x<=90.0f)
+					relativeRotation.x=maxAngle;
+				else if(relativeRotation.x<180.0f-maxAngle&&relativeRotation.x>=90.0f)
+					relativeRotation.x=180.0f-maxAngle;
+				else if(relativeRotation.x<(360.0f-maxAngle)&&relativeRotation.x>=270.0f)
+					relativeRotation.x=360.0f-maxAngle;
+				else if(relativeRotation.x>(180.0f+maxAngle)&&relativeRotation.x<=270.0f)
+					relativeRotation.x=180.0f+maxAngle;
+
 				m_pCursorControl->setPosition(0.5f, 0.5f);
 				m_cursorPos = m_centerCursor = m_pCursorControl->getRelativePosition();
 

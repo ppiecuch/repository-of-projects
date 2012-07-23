@@ -4,6 +4,7 @@
 #include "ITerrainModel.h"
 #include "IUnit.h"
 #include "SDynamicShap.h"
+#include "aabbox3d.h"
 
 namespace yon{
 namespace scene{
@@ -12,16 +13,29 @@ namespace terrain{
 	class CGeomipmapTerrain2 : public ITerrainModel{
 	private:
 
-		//             z
-		//             ¡ü
-		//     top     ¨O
-		//  left©àright¨O
-		//    bottom   ¨O
+		//3d coordinate:
+		//             z index
+		//             ¡ü ¡ü
+		//    right    ¨O ¨O
+		//  top©àbottom¨O ¨O
+		//    left     ¨O ¨O
 		//x¡û©¤©¤©¤©¤©¤©¼
+		//
+		//image coordinate:
+		// z           
+		// ¡ü
+		// ¨O
+		// ¨O
+		// ¨O
+		// ©¸©¤©¤©¤©¤©¤¡úx
+		//the axis z in 3d corresponds to the axis x in image coordinate, that is, 
+		//rotate the image coordinate 90 degree in CCW will make the twos coordinates be coincident.
 		struct SPatch{
-			SPatch():m_iLOD(-1),top(NULL),bottom(NULL),left(NULL),right(NULL)
+			SPatch():m_iLOD(-1),top(NULL),bottom(NULL),left(NULL),right(NULL),
+				m_boundingBox(core::aabbox3df(true))
 			{}
 			core::vector3df m_centerPos;
+			core::aabbox3df	m_boundingBox;
 			s16 m_iLOD;
 
 			SPatch* top;
@@ -39,6 +53,7 @@ namespace terrain{
 		s32 m_iPatchSize;
 		s32 m_iPatchCountPerSide;
 		core::array<f64> m_distanceThresholds;
+		core::aabbox3df	m_boundingBox;
 
 		//calculate or recalculate the distance thresholds
 		void calculateDistanceThresholds();
