@@ -1,0 +1,427 @@
+From: <ÓÉ Windows Internet Explorer 7 ±£´æ>
+Subject: Optimizing Trig Calculations - by Don Cross <dcross@intersrv.com>
+Date: Tue, 17 Jul 2012 15:34:48 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CD6431.B3097910"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.3664
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0000_01CD6431.B3097910
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://groovit.disjunkt.com/analog/time-domain/fasttrig.html
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>Optimizing Trig Calculations - by Don Cross =
+<dcross@intersrv.com></TITLE>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dutf-8">
+<META content=3D"MSHTML 6.00.6000.16587" name=3DGENERATOR></HEAD>
+<BODY>
+<H1 align=3Dcenter>Optimizing Trig Calculations</H1>
+<H3 align=3Dcenter>by <A=20
+href=3D"http://groovit.disjunkt.com/analog/time-domain/index.html">Don =
+Cross</A> -=20
+<A href=3D"mailto:dcross@intersrv.com">dcross@intersrv.com</A></H3>
+<P align=3Dcenter><I>Last update to this page:</I> 14 January 1998</P>
+<HR>
+
+<H3>1. Introduction</H3>This discussion shows how to efficiently perform =
+a=20
+series of sine and/or cosine calculations of an angle which is =
+repeatedly=20
+increasing (or decreasing) by a fixed amount. This can be useful for <A=20
+href=3D"http://groovit.disjunkt.com/analog/time-domain/audio.html">digita=
+l audio=20
+applications</A>, <A=20
+href=3D"http://groovit.disjunkt.com/analog/time-domain/programs.html#rota=
+te">graphics</A>,=20
+or any situation where lots of trig function calls would be undesirably =
+slow.=20
+<P>If you need to calculate both the sine and cosine of a steadily =
+increasing=20
+angle, see the next two sections.=20
+<P>If you need only sines or cosines, but not both, you should see <A=20
+href=3D"http://groovit.disjunkt.com/analog/time-domain/fasttrig.html#sect=
+ion4">Section=20
+4</A>.=20
+<H3>2. Sines and Cosines: The Easy Way</H3>This method is based on a =
+geometric=20
+interpretation of complex numbers. A complex number can be thought of as =
+a=20
+two-dimensional vector possessing a magnitude (length) and an angle =
+measured=20
+counterclockwise from the positive real axis. In the diagram below, the =
+complex=20
+number <I>c</I> =3D <I>ab</I>. The magnitude of <I>c</I> is the =
+magnitude of=20
+<I>a</I> times the magnitude of <I>b</I>, and the angle of <I>c</I> is =
+the angle=20
+of <I>a</I> plus the angle of <I>b</I>. These magnitude and angle =
+relationships=20
+work for any pair of complex numbers being multiplied together.=20
+<P>
+<CENTER><IMG height=3D204=20
+src=3D"http://groovit.disjunkt.com/analog/time-domain/cplxmult.gif"=20
+width=3D204></CENTER>
+<P>The geometric interpretation of complex number multiplication allows =
+us to=20
+see how to rotate a complex number about the origin by merely =
+multiplying it by=20
+another complex number. The payoff comes by calculating the product =
+using the=20
+usual algebraic interpretation of complex number multiplication: <PRE>   =
+      Re{c} =3D Re{a}Re{b} - Im{a}Im{b}
+         Im{c} =3D Re{a}Im{b} + Im{a}Re{b}
+</PRE>
+<P>If we multiply two unit-length complex numbers together, the result =
+will also=20
+have a magnitude of 1, but will have its angle shifted. We can do this=20
+repeatedly. We need to call trig functions for the starting angle and =
+the=20
+increment angle to get things started. After that, we can just use =
+floating=20
+point multiplication, addition, and subtraction. The real component of =
+the=20
+complex number is the cosine of its angle, and the imaginary component =
+is the=20
+sine. Note that both the sine and cosine are available on each =
+iteration,=20
+whether or not you need both of them. Even if you need only one of them, =
+this=20
+method is still dramatically faster than the equivalent trig functions =
+calls.=20
+<P>Here's a little C program to illustrate this technique. This program =
+prompts=20
+the user for both a starting angle <I>a0</I> and an increment angle =
+<I>da</I>.=20
+It then prints out a table of the sines and cosines of the first 20 =
+angles=20
+<I>a</I> =3D <I>a0</I> + <I>k</I>*<I>da</I>, where <I>k</I> =3D 0, 1, 2, =
+..., 19.=20
+<P>
+<CENTER>
+<TABLE border=3D1>
+  <TBODY>
+  <TR>
+    <TD><PRE>
+    /*   trig1.c  -  Example program by Don Cross =
+&lt;dcross@intersrv.com&gt;   */
+    /*               http://www.intersrv.com/~dcross/fasttrig.html       =
+ */
+
+    #include &lt;stdio.h&gt;
+    #include &lt;math.h&gt;
+
+    #define  PI  (3.14159265358979323846)
+
+    int main (void)
+    {
+        double a, da, a0_rad, da_rad;
+        double a_sin, a_cos, da_sin, da_cos;
+        double temp;
+        int k;
+
+        printf ( "Enter starting angle in degrees: " );
+        scanf ( "%lf", &amp;a );
+        a0_rad =3D a * PI / 180.0;    /* convert to radians */
+
+        printf ( "Enter increment angle in degrees: " );
+        scanf ( "%lf", &amp;da );
+        da_rad =3D da * PI / 180.0;   /* convert to radians */
+
+        a_cos =3D cos(a0_rad);
+        a_sin =3D sin(a0_rad);
+
+        da_cos =3D cos(da_rad);
+        da_sin =3D sin(da_rad);
+
+        printf ( "\n%15s  %15s  %15s\n", "angle", "cosine", "sine" );
+        printf ( "---------------  ---------------  ---------------\n" =
+);
+
+        for ( k=3D0; k&lt;20; k++ )
+        {
+            printf ( "%15.5lf  %15.7lf  %15.7lf\n", a, a_cos, a_sin );
+  =20
+            /* Here's the code that updates the trig values... */
+
+            temp  =3D a_cos*da_cos - a_sin*da_sin;
+            a_sin =3D a_cos*da_sin + a_sin*da_cos;
+            a_cos =3D temp;
+
+            /* Update the angle for display purposes. */
+            /* Note that this step is not needed to update the trig =
+values. */     =20
+
+            a +=3D da;
+        }
+
+        return 0;
+    }
+
+    /*---  end of file trig1.c  ---*/
+
+</PRE></TD></TR></TBODY></TABLE></CENTER>
+<H3>3. Sines and Cosines: The High-Precision Way</H3>Here's a refinement =
+of the=20
+above technique that I got from the book <B>Numerical Recipes in =
+Fortran</B> by=20
+Press, Teukolsky, Vetterling, and Flannery, published by Cambridge =
+University=20
+Press. It is a bit more complicated, but for some reason (which I don't =
+really=20
+understand), it results in much less cumulative floating point error =
+when you=20
+are doing a lot of iterations. On my computer, floating point error (of =
+the=20
+vector's radius) with the first method is on the order of 1.0e-10 (one =
+part in=20
+ten billion) after about 1000 iterations, while this method results in =
+an error=20
+of about 1.0e-14 (one part in a hundred trillion). Most of the time, I =
+find that=20
+it really doesn't matter, so I use the first method because it is easier =
+for me=20
+to remember without having to look anything up. But if precision is =
+absolutely=20
+critical, use this approach.=20
+<P>
+<CENTER>
+<TABLE border=3D1>
+  <TBODY>
+  <TR>
+    <TD><PRE>
+    /*   trig2.c  -  Example program by Don Cross =
+&lt;dcross@intersrv.com&gt;   */
+    /*               http://www.intersrv.com/~dcross/fasttrig.html       =
+ */
+
+    #include &lt;stdio.h&gt;
+    #include &lt;math.h&gt;
+
+    #define  PI  (3.14159265358979323846)
+
+    int main (void)
+    {
+        double a, da, a0_rad, da_rad;
+        double a_sin, a_cos, alpha, beta;
+        double temp;
+        int k;
+
+        printf ( "Enter starting angle in degrees: " );
+        scanf ( "%lf", &amp;a );
+        a0_rad =3D a * PI / 180.0;    /* convert to radians */
+
+        printf ( "Enter increment angle in degrees: " );
+        scanf ( "%lf", &amp;da );
+        da_rad =3D da * PI / 180.0;   /* convert to radians */
+
+        a_cos =3D cos(a0_rad);
+        a_sin =3D sin(a0_rad);
+
+        alpha =3D sin(0.5 * da_rad);
+        alpha =3D 2.0 * alpha * alpha;
+
+        beta =3D sin(da_rad);
+
+        printf ( "\n%15s  %15s  %15s\n", "angle", "cosine", "sine" );
+        printf ( "---------------  ---------------  ---------------\n" =
+);
+
+        for ( k=3D0; k&lt;20; k++ )
+        {
+            printf ( "%15.5lf  %15.7lf  %15.7lf\n", a, a_cos, a_sin );
+
+            /* Here's the code that updates the trig values... */
+
+            temp  =3D a_cos - (alpha*a_cos + beta*a_sin);
+            a_sin =3D a_sin - (alpha*a_sin - beta*a_cos);
+            a_cos =3D temp;
+
+            /* Update the angle for display purposes. */
+            /* Note that this step is not needed to update the trig =
+values. */
+
+            a +=3D da;
+        }
+
+        return 0;
+    }
+
+    /*---  end of file trig2.c  ---*/
+
+</PRE></TD></TR></TBODY></TABLE></CENTER>
+<P><A name=3Dsection4>
+<H3>4. Simple Harmonic Oscillators</H3>[Thanks to Petr Vicherek for =
+telling me=20
+about this method. <I>- Don</I>]=20
+<P>The following formula is the fastest and most precise I have seen for =
+
+calculating a single sinusoid. It requires only one multiply and one =
+subtraction=20
+per iteration. To calculate <I>y<SUB>n</SUB></I> =3D sin(<I>nW</I> + =
+<I>B</I>),=20
+use the following formula:=20
+<P>
+<CENTER><IMG height=3D93=20
+src=3D"http://groovit.disjunkt.com/analog/time-domain/osc1.gif"=20
+width=3D508></CENTER>
+<P>Note that you must calculate two seed values for =
+<I>y</I><SUB>-2</SUB> and=20
+<I>y</I><SUB>-1</SUB> to get things started. Here is a little sample =
+program in=20
+C++.=20
+<P>
+<CENTER>
+<TABLE border=3D1>
+  <TBODY>
+  <TR>
+    <TD><PRE>
+    #include &lt;iomanip.h&gt;
+    #include &lt;math.h&gt;
+
+    const double PI =3D 3.14159265358979323846;
+
+    int main()
+    {
+        cout &lt;&lt; "Enter W in degrees: " &lt;&lt; flush;             =
+            =20
+        double w;
+        cin &gt;&gt; w;
+        w *=3D PI / 180.0;  // convert to radians
+   =20
+        cout &lt;&lt; "Enter B in degrees: " &lt;&lt; flush;
+        double b;
+        cin &gt;&gt; b;
+        b *=3D PI / 180.0;   // convert to radians
+
+        double y[3];
+        y[0] =3D sin(-2*w + b);
+        y[1] =3D sin(-w + b);
+        const double p =3D 2.0 * cos(w);
+   =20
+        for ( int i=3D0; i&lt;40; i++ )
+        {
+            y[2] =3D p*y[1] - y[0];
+            y[0] =3D y[1];
+            y[1] =3D y[2];
+   =20
+            cout &lt;&lt; setprecision(10) &lt;&lt; y[2] &lt;&lt; endl;
+        }
+
+        return 0;
+    }
+
+</PRE></TD></TR></TBODY></TABLE></CENTER></A>
+<HR>
+
+<P align=3Dcenter><A=20
+href=3D"http://groovit.disjunkt.com/analog/time-domain/index.html">[Back =
+to Don=20
+Cross home page]</A><BR><A=20
+href=3D"http://groovit.disjunkt.com/analog/time-domain/audio.html">[Go =
+to Digital=20
+Audio page]</A> </P></BODY></HTML>
+
+------=_NextPart_000_0000_01CD6431.B3097910
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://groovit.disjunkt.com/analog/time-domain/cplxmult.gif
+
+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
+ivaFoRbNqEY3ytGOevSjIA2pSEe60YAAADs=
+
+------=_NextPart_000_0000_01CD6431.B3097910
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://groovit.disjunkt.com/analog/time-domain/osc1.gif
+
+R0lGODlh/AFdAPcOAAAAAICAgIAAAICAAACAAACAgAAAgIAAgICAQABAQACA/wBAgEAA/4BAAP//
+/8DAwP8AAP//AAD/AAD//wAA//8A////gAD/gID//4CA//8AgP+AQMDcwKbK8Miss7qgp7OIjEKa
+py9+iBpfZwA3PAAAMwAAZgAAmQAAzAAzAAAzMwAzZgAzmQAzzAAz/wBmAABmMwBmZgBmmQBmzABm
+/wCZAACZMwCZZgCZmQCZzACZ/wDMAADMMwDMZgDMmQDMzADM/wD/MwD/ZgD/mQD/zDMAADMAMzMA
+ZjMAmTMAzDMA/zMzADMzMzMzZjMzmTMzzDMz/zNmADNmMzNmZjNmmTNmzDNm/zOZADOZMzOZZjOZ
+mTOZzDOZ/zPMADPMMzPMZjPMmTPMzDPM/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYA
+zGYA/2YzAGYzM2YzZmYzmWYzzGYz/2ZmAGZmM2ZmZmZmmWZmzGZm/2aZAGaZM2aZZmaZmWaZzGaZ
+/2bMAGbMM2bMZmbMmWbMzGbM/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kAZpkAmZkAzJkA/5kz
+AJkzM5kzZpkzmZkzzJkz/5lmAJlmM5lmZplmmZlmzJlm/5mZAJmZM5mZZpmZmZmZzJmZ/5nMAJnM
+M5nMZpnMmZnMzJnM/5n/AJn/M5n/Zpn/mZn/zJn//8wAAMwAM8wAZswAmcwAzMwA/8wzAMwzM8wz
+ZswzmcwzzMwz/8xmAMxmM8xmZsxmmcxmzMxm/8yZAMyZM8yZZsyZmcyZzMyZ/8zMAMzMM8zMZszM
+mczMzMzM/8z/AMz/M8z/Zsz/mcz/zMz///8AM/8AZv8Amf8AzP8zAP8zM/8zZv8zmf8zzP8z//9m
+AP9mM/9mZv9mmf9mzP9m//+ZAP+ZM/+ZZv+Zmf+ZzP+Z///MAP/MM//MZv/Mmf/MzP/M////M///
+Zv//mf//zIAgYP//wKDg4GAAgP+AgACAwMDA/wDP/2n////78KCgpCH5BAEAAA4ALAAAAAD8AV0A
+QAj/AB0IHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIENGBECSIkkAIlOqXMmypcuX
+MGPKnHnwpEKbDlAWLLlTZ06eBHEmFCqQ6M+dR5FOBDrSZ0+nQZm2NGo06smrWKWC1DqVK82vYENW
+NYjV6tOzRb0O5Kq1akmoJuEyVJsU4ViRbOWGTbv37t6/gOPq7Rr4r9rBhRPnVMy4MU2/jiNLnky5
+suWoZC1m3Qy57uXPoEOLHp2SLtjOpFOrXs1atVPTW2GTRZzWb1a7PF8fhoqybUPbUmUHpkq7MvHB
+nDkPzVscLUbhrTXLnp63Nm64ZX8idtt76W6fzRUL/w0/uXppudDXpu8Z3SVqyeu9/17YfXHt7Hzd
+07cPfvPsm+1VRF5mGg0Y4IEIJqjgggx6Z2CDEEYo4YRdPdhRfLjVhN5Lu7FH4UgaYpjRex+udhdR
+vAWnYn/FveWhemvBWBREyflHn16mkciRi5iJVSN+Ggr441U3iVjiZycCtaJz1qmHY1vEBblRetzB
+Nh6RH1Vp4Xk1WmWkQzoeOVqYYpZp5plcLjnTl2i26eabF+VWGJtw1mnnnS2CF5NtIW4ZW4b/ESjl
+nYTKaCiN66FH5pFh0mVefrPphKKTRcYIqYHACZrmkL9hZ2J9h3o0FpmLBlqoWdclt9xtT/XnHFNJ
+Dv8qUWelVsohnZZC6iSuIUbqZ1Ohavddq4p2uSt2UCL7q3i8Ukjia/bNtay04UHbnI2nZqvtttx2
+6+234IYr7kO1jmvuud+WW26P0inb60pVsnuqqntiiW5i68Y5rbyL+Tarn16Nui+CyDXb1MD3ihqw
+bscemxuKecqoYlC6/oqhsTfWKzHCeHH8r8cJF/hdvKhS2uRy0eqaH8Mpx/Wvrdfd2rKjQ+a732kG
+hywyjqZqx6TPwfKrMtAlP4dpwbTlLK2sw/EMk806X6g0uVOzFnC4IEcdGdRGo7kwuFVr3RjXYpdt
+Nr4105z12Wy3vbSmGrst99wdQ9vX2nTnzTaPTYf/rfffCbfI39Nqszqnuz+f7BngnwZ946L0rvks
+xYQ7/S7OMM/ob+aMg/Yo1QMirS2p26WYIpOwsgzojJ6FXnriW5vumquLS13swSPifaCOET8e832p
+v56ynLj/zvplk84+c+lpr3o5mGzqniCtlnspr8C5Gjos7NBnzLHfGX5P9ss9d/wiohZePS/4Ko2f
+8c2APit9TbaSDuCZAE8Jp/uS/znU8fcD4PvwIkC7UA5MKDOTiHjFvtnNr3MQjKAEJ0jBClrwgm7j
+HwY3yMHzdfCDINTXA0NIQsDVimwAu41ygCc9Th2QW0DqXwmL95h9fe6F7XuSB+20ohF6qYEmBOLq
+/7oGuwcZqUM7dJPo6uVDvWmwe1PizeK2tMCCDTF2zcthE4s2w05ZkWjCsp7hhvbDhvGrN1J0mXy4
+pzh42SuGjBFipLqIvivKjotX6p2STnc8WElnjVx8Hkse5rim1XCLdEuSIn+WR+/xUWI9OloWOWcy
+4w0SjUlkIcZ85UIDCmmSgqRjkZh3HEbuMWlQ+s/pbGhE4VnSjchyDCJfKUrn0a9opSwZZLjjq1aJ
+DFi2pGXdymfIu81SbrG6npoqCcYk8q2Z0BQSMOc4wGhGMUjHpGTF2PdECZ7oPj98C6sM9zVq4jB7
+t/oRFIHnPzZKTp1mVBi2ahlK92QTPsjBGj2Nif+5Nh1Gn/vkZ18UGNCCjtKgCOWgHBPKUBjes6EQ
+PWQmoQdKYkb0ogpaZtwwytEFbe6dHQ3p7vzYrpr5TqQo/ZSeDLPQlLo0S6ACTDdfStNhMuuhNc0p
+uerXUtTAcU4OQyM5s4PTiNoLkAdr6XwAJCkmJnBXh2MaGVs2VZ2qsZB9SpTpHtrUuZwTlp6sp0yQ
+GEiqCs2qH3OnMP+3VrAuVXOVS2tYaIaU4HSqpmnbnlrNKcLRxYeubbxUlMAI2BjZ1YtZ3StLcyka
+/Pw0irerY+62Zb+nKo45oWIRzGhXwINesbOy3FBqCFnV3EUWdJOlLJWquVacwHGXXV2ZXKU6wrzq
+XstTo8XkWTUZOb4yE7Fx8tbkqOXJRTrst+xZpYOCaVZ82i23sbSpYsu603RZqVpugaqp7gicHgqm
+fmOKLXQtKs/pUvdt1nWlM3vbzNS9yLjnRW/4dobIZwY3mjOtzvwm5k6SSXWbp0XuTOOa1RWuipT+
+OupUq0c+beqLcD7iZDvjK88naYmoChZWb1+bLN+Gt6gPdqNX9yNeB4vFqyUeMVsJahL9vWnAlzSf
+ip9KHjn2rrkrviWLl+LiOsF4KqJ6XLW++lnbDRmdAcQxWo0D4ozullggVt0oM7zk0Py4yljOspa3
+zOUuJyQgADs=
+
+------=_NextPart_000_0000_01CD6431.B3097910--
