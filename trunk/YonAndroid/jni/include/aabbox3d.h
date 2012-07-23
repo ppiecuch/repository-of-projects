@@ -19,7 +19,13 @@ namespace core{
 	public:
 
 		//! Default Constructor.
-		aabbox3d(): minEdge(-1,-1,-1), maxEdge(1,1,1) {}
+		aabbox3d(bool intangible=false): minEdge(-1,-1,-1), maxEdge(1,1,1) {
+			if(intangible)
+			{
+				minEdge.set(99999.9f, 99999.9f, 99999.9f);
+				maxEdge.set(-99999.9f, -99999.9f, -99999.9f);
+			}
+		}
 		//! Constructor with min edge and max edge.
 		aabbox3d(const vector3d<T>& min, const vector3d<T>& max): minEdge(min), maxEdge(max) {}
 		//! Constructor with only one point.
@@ -59,7 +65,7 @@ namespace core{
 		\param p: Point to add into the box. */
 		void addInternalPoint(const vector3d<T>& p)
 		{
-			addInternalPoint(p.X, p.Y, p.Z);
+			addInternalPoint(p.x, p.y, p.z);
 		}
 		//! Adds another bounding box
 		/** The box grows bigger, if the new box was outside of the box.
@@ -76,13 +82,13 @@ namespace core{
 		\param z Z coordinate of the point to add to this box. */
 		void addInternalPoint(T x, T y, T z)
 		{
-			if (x>maxEdge.X) maxEdge.X = x;
-			if (y>maxEdge.Y) maxEdge.Y = y;
-			if (z>maxEdge.Z) maxEdge.Z = z;
+			if (x>maxEdge.x) maxEdge.x = x;
+			if (y>maxEdge.y) maxEdge.y = y;
+			if (z>maxEdge.z) maxEdge.z = z;
 
-			if (x<minEdge.X) minEdge.X = x;
-			if (y<minEdge.Y) minEdge.Y = y;
-			if (z<minEdge.Z) minEdge.Z = z;
+			if (x<minEdge.x) minEdge.x = x;
+			if (y<minEdge.y) minEdge.y = y;
+			if (z<minEdge.z) minEdge.z = z;
 		}
 
 		//! Get center of the bounding box
@@ -108,13 +114,13 @@ namespace core{
 		T getVolume() const
 		{
 			const vector3d<T> e = getExtent();
-			return e.X * e.Y * e.Z;
+			return e.x * e.y * e.z;
 		}
 		//! Get the surface area of the box in squared units
 		T getArea() const
 		{
 			const vector3d<T> e = getExtent();
-			return 2*(e.X*e.Y + e.X*e.Z + e.Y*e.Z);
+			return 2*(e.x*e.y + e.x*e.z + e.y*e.z);
 		}
 
 		//! Stores all 8 corners of the box into an array

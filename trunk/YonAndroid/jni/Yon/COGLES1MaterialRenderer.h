@@ -232,7 +232,7 @@ namespace ogles1{
 			//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 			//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
-			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 			glEnable(GL_BLEND);
 			glEnable(GL_ALPHA_TEST);
@@ -243,7 +243,7 @@ namespace ogles1{
 			glDisable(GL_BLEND);
 			glDisable(GL_ALPHA_TEST);
 
-			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		}
 	};
 
@@ -267,13 +267,13 @@ namespace ogles1{
 			//glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
 			//glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_RGB, GL_PRIMARY_COLOR);
 
-			glEnable(GL_BLEND);
+			//glEnable(GL_BLEND);
 			glEnable(GL_ALPHA_TEST);
 			glAlphaFunc(GL_GREATER, 0.5f);
 		}
 
 		virtual void onUnsetMaterial(){
-			glDisable(GL_BLEND);
+			//glDisable(GL_BLEND);
 			glDisable(GL_ALPHA_TEST);
 			glAlphaFunc(GL_GREATER, 0.0f);
 			//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -333,6 +333,7 @@ namespace ogles1{
 		}
 	};
 
+	/*
 	class COGLES1MaterialRendererTransparentBlendColor : public COGLES1MaterialRenderer
 	{
 	public: 
@@ -351,13 +352,6 @@ namespace ogles1{
 			//glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
 			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			/*glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-			glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
-			glTexEnvf(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_TEXTURE);
-			glTexEnvf(GL_TEXTURE_ENV, GL_SRC1_RGB, GL_PREVIOUS);
-
-			glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
-			glTexEnvf(GL_TEXTURE_ENV, GL_SRC0_ALPHA, GL_TEXTURE);*/
 
 			glEnable(GL_BLEND);
 			glEnable(GL_ALPHA_TEST);
@@ -369,6 +363,7 @@ namespace ogles1{
 			glDisable(GL_ALPHA_TEST);
 		}
 	};
+	*/
 
 	class COGLES1MaterialRendererMask : public COGLES1MaterialRenderer
 	{
@@ -430,9 +425,9 @@ namespace ogles1{
 	IMaterialRenderer* createMaterialRendererTransparentRef(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererTransparentRef((ogles1::COGLES1Driver*)driver);
 	}
-	IMaterialRenderer* createMaterialRendererTransparentBlendColor(IVideoDriver* driver){
-		return new ogles1::COGLES1MaterialRendererTransparentBlendColor((ogles1::COGLES1Driver*)driver);
-	}
+	//IMaterialRenderer* createMaterialRendererTransparentBlendColor(IVideoDriver* driver){
+	//	return new ogles1::COGLES1MaterialRendererTransparentBlendColor((ogles1::COGLES1Driver*)driver);
+	//}
 	IMaterialRenderer* createMaterialRendererMask(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererMask((ogles1::COGLES1Driver*)driver);
 	}

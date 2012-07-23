@@ -74,20 +74,23 @@ namespace terrain{
 		//TODO texcoords
 		const f32 texcoordDelta = 1.0f/(f32)(m_iSizePerSide-1);
 		s32 index=0;
-		f32 fz=0.f;
-		for(s32 z = 0; z<m_iSizePerSide; ++z)
+		f32 fx=0.f;
+		for(s32 x = 0; x<m_iSizePerSide; ++x)
 		{
-			f32 fx=0.f;
-			for(s32 x = 0; x<m_iSizePerSide; ++x)
+			f32 fz=0.f;
+			for(s32 z = 0; z<m_iSizePerSide; ++z)
 			{
 				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
-				v.pos.x=fx;
-				v.pos.y=image->getValue(x,z);
-				v.pos.z=fz;
+				v.pos.x=fx*m_scale.x;
+				v.pos.y=(f32)image->getValue(z,x)*m_scale.y;
+				v.pos.z=fz*m_scale.z;
+				//v.pos.x=fx;
+				//v.pos.y=(f32)image->getValue(z,x);
+				//v.pos.z=fz;
 
-				++fx;
+				++fz;
 			}
-			++fz;
+			++fx;
 		}
 
 		//calculate all the necessary data for the patches and the terrain
@@ -103,7 +106,8 @@ namespace terrain{
 		const f64 size = m_iPatchSize*m_iPatchSize*m_scale.x*m_scale.z;
 		for(s32 i=0;i<m_iMaxLOD;++i)
 		{
-			m_distanceThresholds.push_back(size*((i+1+i/2)*(i+1+i/2)));//but why i+1+i/2?
+			//m_distanceThresholds.push_back(size*((i+1+i/2)*(i+1+i/2)));//but why i+1+i/2?
+			m_distanceThresholds.push_back(size*2);//but why i+1+i/2?
 			Logger->debug("m_distanceThresholds[%d]:%.2f\r\n",m_distanceThresholds.size()-1,m_distanceThresholds.getLast());
 		}
 	}
@@ -117,30 +121,36 @@ namespace terrain{
 
 	void CGeomipmapTerrain2::calculatePatchData()
 	{
+		// Reset the Terrains Bounding Box for re-calculation
+		m_boundingBox = core::aabbox3df(true);
+
 		s32 index=0;
-		s32 count;
-		for(s32 z=0;z<m_iPatchCountPerSide;++z)
+		for(s32 x=0;x<m_iPatchCountPerSide;++x)
 		{
-			for(s32 x=0;x<m_iPatchCountPerSide;++x)
+			for(s32 z=0;z<m_iPatchCountPerSide;++z)
 			{
-				index=z*m_iPatchCountPerSide+x;
+				index=x*m_iPatchCountPerSide+z;
 
 				m_pPatchs[index].m_iLOD=0;
 				m_pPatchs[index].m_centerPos=core::ORIGIN_VECTOR3DF;
+				m_pPatchs[index].m_boundingBox=core::aabbox3df(true);
 
-				count=0;
-				for (s32 zz = z*m_iPatchSize; zz <= (z + 1) * m_iPatchSize; ++zz)
+				for (s32 xx = x*m_iPatchSize; xx <= (x + 1) * m_iPatchSize; ++xx)
 				{
-					for (s32 xx = x*m_iPatchSize; xx <= (x + 1) * m_iPatchSize; ++xx)
+					for (s32 zz = z*m_iPatchSize; zz <= (z + 1) * m_iPatchSize; ++zz)
 					{
-						m_pPatchs[index].m_centerPos+=m_shap.getVertexArray()[zz*m_iSizePerSide+xx].pos;
-						++count;
+						m_pPatchs[index].m_boundingBox.addInternalPoint(m_shap.getVertexArray()[xx*m_iSizePerSide+zz].pos);
 					}
 				}
-				m_pPatchs[index].m_centerPos/=count;
+				m_pPatchs[index].m_centerPos=m_pPatchs[index].m_boundingBox.getCenter();
+				Logger->debug("center[%d]:%.2f,%.2f,%.2f\r\n",index,m_pPatchs[index].m_centerPos.x,m_pPatchs[index].m_centerPos.y,m_pPatchs[index].m_centerPos.z);
+
+				// Reconfigure the bounding box of the terrain as a whole
+				m_boundingBox.addInternalBox(m_pPatchs[index].m_boundingBox);
+				
 
 				//assign neighbours
-				if(x<m_iPatchCountPerSide-1)
+				/*if(x<m_iPatchCountPerSide-1)
 					m_pPatchs[index].left=&m_pPatchs[index+1];
 				else
 					m_pPatchs[index].left=NULL;
@@ -158,7 +168,26 @@ namespace terrain{
 				if(z<m_iPatchCountPerSide-1)
 					m_pPatchs[index].top=&m_pPatchs[index+m_iPatchCountPerSide];
 				else
+					m_pPatchs[index].top=NULL;*/
+				if(x>0)
+					m_pPatchs[index].bottom=&m_pPatchs[index-m_iPatchCountPerSide];
+				else
+					m_pPatchs[index].bottom=NULL;
+
+				if(x<m_iPatchCountPerSide-1)
+					m_pPatchs[index].top=&m_pPatchs[index+m_iPatchCountPerSide];
+				else
 					m_pPatchs[index].top=NULL;
+
+				if(z>0)
+					m_pPatchs[index].left=&m_pPatchs[index-1];
+				else
+					m_pPatchs[index].left=NULL;
+
+				if(z<m_iPatchCountPerSide-1)
+					m_pPatchs[index].right=&m_pPatchs[index+1];
+				else
+					m_pPatchs[index].right=NULL;
 				/*if(x>0)
 					m_pPatchs[index].top=&m_pPatchs[index-m_iPatchCountPerSide];
 				else
@@ -231,36 +260,34 @@ namespace terrain{
 
 		bool wireframe=m_pUnit->getMaterial()->getPolygonMode()==video::ENUM_POLYGON_MODE_LINE;
 
-		//Logger->debug("\nm_iPatchCountPerSide:%d\n",m_iPatchCountPerSide);
+		Logger->debug("\nm_iPatchCountPerSide:%d\n",m_iPatchCountPerSide);
 
 		s32 index=0;
 		s32 step=0;
-		for(s32 pz=0;pz<m_iPatchCountPerSide;++pz)
+		for(s32 px=0;px<m_iPatchCountPerSide;++px)
 		{
-			for(s32 px=0;px<m_iPatchCountPerSide;++px)
+			for(s32 pz=0;pz<m_iPatchCountPerSide;++pz)
 			{
 				if(m_pPatchs[index].m_iLOD>=0)
 				{
-					//s32 x=0;
-					//s32 z=0;
 					// calculate the step we take this patch, based on the patches current LOD
 					step = 1<<m_pPatchs[index].m_iLOD;
-					//SPatch* top=m_pPatchs[index].top;
-					//SPatch* bottom=m_pPatchs[index].bottom;
-					//SPatch* left=m_pPatchs[index].left;
-					//SPatch* right=m_pPatchs[index].right;
-					//Logger->debug("i:%d,j:%d,m_pPatchs[%d].m_iLOD:%d,top:%d,botton:%d,left:%d,right:%d,step:%d\n",i,j,index,m_pPatchs[index].m_iLOD,top?top->m_iLOD:-1,bottom?bottom->m_iLOD:-1,left?left->m_iLOD:-1,right?right->m_iLOD:-1,step);
+					SPatch* top=m_pPatchs[index].top;
+					SPatch* bottom=m_pPatchs[index].bottom;
+					SPatch* left=m_pPatchs[index].left;
+					SPatch* right=m_pPatchs[index].right;
+					Logger->debug("px:%d,pz:%d,m_pPatchs[%d].m_iLOD:%d,top:%d,bottom:%d,left:%d,right:%d,step:%d\n",px,pz,index,m_pPatchs[index].m_iLOD,top?top->m_iLOD:-1,bottom?bottom->m_iLOD:-1,left?left->m_iLOD:-1,right?right->m_iLOD:-1,step);
 					// Loop through patch and generate indices
-					for(s32 z=0;z<m_iPatchSize;z+=step)
+					for(s32 x=0;x<m_iPatchSize;x+=step)
 					{
-						for(s32 x=0;x<m_iPatchSize;x+=step)
+						for(s32 z=0;z<m_iPatchSize;z+=step)
 						{
 							const s32 index11 = getIndex(px, pz, index, x, z);
 							const s32 index21 = getIndex(px, pz, index, x + step, z);
 							const s32 index12 = getIndex(px, pz, index, x, z + step);
 							const s32 index22 = getIndex(px, pz, index, x + step, z + step);
 
-							//Logger->debug("x:%d,z:%d---->%d,%d,%d,%d->(%d,%d,%d),(%d,%d,%d)\n",x,z,index11,index21,index12,index22,index12,index11,index22,index22,index11,index21);
+							Logger->debug("x:%d,z:%d---->%d,%d,%d,%d->(%d,%d,%d),(%d,%d,%d)\n",x,z,index11,index21,index12,index22,index12,index11,index22,index22,index11,index21);
 
 							if(wireframe)
 							{
@@ -308,6 +335,52 @@ namespace terrain{
 
 	u32 CGeomipmapTerrain2::getIndex(const s32 PatchX, const s32 PatchZ,const s32 PatchIndex, u32 vX, u32 vZ) const
 	{
+		// left border
+		if (vZ == 0)
+		{
+			if (m_pPatchs[PatchIndex].left &&m_pPatchs[PatchIndex].m_iLOD < m_pPatchs[PatchIndex].left->m_iLOD &&
+				(vX % (1 <<m_pPatchs[PatchIndex].left->m_iLOD)) != 0 )
+			{
+				vX -= vX % (1 <<m_pPatchs[PatchIndex].left->m_iLOD);
+			}
+		}
+		 // right border
+		else if (vZ == (u32)m_iPatchSize)
+		{
+			if (m_pPatchs[PatchIndex].right &&m_pPatchs[PatchIndex].m_iLOD < m_pPatchs[PatchIndex].right->m_iLOD &&
+				(vX % (1 << m_pPatchs[PatchIndex].right->m_iLOD)) != 0)
+			{
+				vX -= vX % (1 <<m_pPatchs[PatchIndex].right->m_iLOD);
+			}
+		}
+
+		// bottom border
+		if (vX == 0)
+		{
+			if (m_pPatchs[PatchIndex].bottom &&m_pPatchs[PatchIndex].m_iLOD <m_pPatchs[PatchIndex].bottom->m_iLOD &&
+				(vZ % (1 <<m_pPatchs[PatchIndex].bottom->m_iLOD)) != 0)
+			{
+				vZ -= vZ % (1 << m_pPatchs[PatchIndex].bottom->m_iLOD);
+			}
+		}
+		// top border
+		else if (vX == (u32)m_iPatchSize) 
+		{
+			if (m_pPatchs[PatchIndex].top &&m_pPatchs[PatchIndex].m_iLOD <m_pPatchs[PatchIndex].top->m_iLOD &&
+				(vZ % (1 <<m_pPatchs[PatchIndex].top->m_iLOD)) != 0)
+			{
+				vZ -= vZ % (1 <<m_pPatchs[PatchIndex].top->m_iLOD);
+			}
+		}
+
+		if (vZ >= (u32)m_iPatchSize+1)
+			vZ = m_iPatchSize;
+
+		if (vX >= (u32)m_iPatchSize+1)
+			vX = m_iPatchSize;
+
+		return (vX + ((m_iPatchSize) * PatchX)) * m_iSizePerSide + (vZ + ((m_iPatchSize) * PatchZ));
+		/*
 		// top border
 		if (vZ == 0)
 		{
@@ -351,6 +424,7 @@ namespace terrain{
 			vX = m_iPatchSize;
 
 		return (vZ + ((m_iPatchSize) * PatchZ)) * m_iSizePerSide + (vX + ((m_iPatchSize) * PatchX));
+		*/
 	}
 
 	void CGeomipmapTerrain2::render(video::IVideoDriver* driver)

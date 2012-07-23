@@ -103,7 +103,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 		}
 	}*/
 
-	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(20,1,20));
+	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(2,1,2));
 	IImage* image=videoDriver->createImageFromFile("heightmap16.png",true);
 	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_5);
 	//terrainModel->loadHeightMap(image);

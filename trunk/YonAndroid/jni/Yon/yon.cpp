@@ -62,7 +62,8 @@ namespace yon{
 
 		if(video::MYGUI_MATERIAL==NULL){
 			video::MYGUI_MATERIAL=new video::CMaterial();
-			video::MYGUI_MATERIAL->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
+			//video::MYGUI_MATERIAL->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
+			video::MYGUI_MATERIAL->setMaterialType(video::ENUM_MATERIAL_TYPE_TRANSPARENT);
 			video::MYGUI_MATERIAL->setFrontFace(video::ENUM_FRONT_FACE_CW);
 			//TODO由于MyGUI引擎的freetype字体顶点序列是CCW的，而其UI界面顶点序列则是CW的，临时解决办法是关闭CullFace
 			video::MYGUI_MATERIAL->setState(video::ENUM_MATERIAL_STATE_CULL_FACE,false);
