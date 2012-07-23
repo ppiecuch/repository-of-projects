@@ -18,6 +18,9 @@ namespace camera{
 	void CPerspCamera::recalculateProjectionMatrix(){
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].makeIdentity();
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].perspective(m_fFovy,m_fAspectRatio,m_fNear,m_fFar);
+
+		m_frustum.setFrom(m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION]*m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW]);
+
 		m_bNeedUpload=true;
 	}
 	//TODO³éÏóµ½ICameraÖÐ
@@ -25,6 +28,9 @@ namespace camera{
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW].makeIdentity();
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW].lookAt(m_position.x,m_position.y,m_position.z,m_target.x,m_target.y,m_target.z,m_up.x,m_up.y,m_up.z);
 		//Logger->debug("CPerspCamera.pos:%.2f,%.2f,%.2f\n",m_position.x,m_position.y,m_position.z);
+
+		m_frustum.setFrom(m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION]*m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW]);
+
 		m_bNeedUpload=true;
 	}
 
@@ -33,6 +39,7 @@ namespace camera{
 			return;
 		driver->setTransform(video::ENUM_TRANSFORM_VIEW,m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW]);
 		driver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION]);
+
 		m_bNeedUpload=false;
 	}
 

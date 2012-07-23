@@ -6,6 +6,7 @@
 #include "matrix4.h"
 #include "dimension2d.h"
 #include "IEventReceiver.h"
+#include "IViewFrustum.h"
 
 namespace yon{
 namespace scene{
@@ -18,16 +19,6 @@ namespace camera{
 		ENUM_CAMERA_TYPE_COUNT
 	};
 
-	enum ENUM_FRUSTUM_PLANE{
-		ENUM_FRUSTUM_PLANE_FAR = 0,
-		ENUM_FRUSTUM_PLANE_NEAR,
-		ENUM_FRUSTUM_PLANE_LEFT,
-		ENUM_FRUSTUM_PLANE_RIGHT,
-		ENUM_FRUSTUM_PLANE_TOP,
-		ENUM_FRUSTUM_PLANE_BOTTOM,
-		ENUM_FRUSTUM_PLANE_COUNT
-	};
-
 	class ICamera : public scene::IModel, public event::IEventReceiver{
 	protected:
 		enum ENUM_FRUSTUM_TRANSFORM{
@@ -35,7 +26,6 @@ namespace camera{
 			ENUM_FRUSTUM_TRANSFORM_PROJECTION,		//Õ∂”∞ø’º‰æÿ’Û
 			ENUM_FRUSTUM_TRANSFORM_COUNT
 		};
-		core::plane3df m_planes[ENUM_FRUSTUM_PLANE_COUNT];
 		bool m_bVisible;
 		core::matrix4f m_matrixs[ENUM_FRUSTUM_TRANSFORM_COUNT];
 		core::vector3df m_target;
@@ -131,9 +121,9 @@ namespace camera{
 			return m_direction;
 		}
 
-		inline const core::plane3df& getPlane(ENUM_FRUSTUM_PLANE which) const{
-			return m_planes[which];
-		}
+		//inline const core::plane3df& getPlane(ENUM_FRUSTUM_PLANE which) const{
+		//	return m_planes[which];
+		//}
 		inline const core::matrix4f& getViewTransform() const{
 			return m_matrixs[ENUM_FRUSTUM_TRANSFORM_VIEW];
 		}
@@ -142,6 +132,8 @@ namespace camera{
 		}
 
 		virtual ENUM_CAMERA_TYPE getType() const = 0;
+
+		virtual IViewFrustum* getViewFrustum(){return NULL;}
 	};
 }
 }

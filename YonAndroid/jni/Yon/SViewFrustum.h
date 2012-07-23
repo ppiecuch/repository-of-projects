@@ -1,6 +1,6 @@
 #ifndef _YON_SCENE_CAMERA_SVIEWFRUSTUM_H_
 #define _YON_SCENE_CAMERA_SVIEWFRUSTUM_H_
-
+#if 0
 #include "plane3d.h"
 #include "vector3d.h"
 #include "line3d.h"
@@ -40,14 +40,15 @@ namespace camera{
 		//! This constructor creates a view frustum based on a projection and/or view matrix.
 		inline void setFrom(const core::matrix4f& mat);
 
-		//! returns the point which is on the far left upper corner inside the the view frustum.
+		//! returns the point which is on the specific corner inside the the view frustum.
 		core::vector3df getFarLeftTop() const;
-		//! returns the point which is on the far left bottom corner inside the the view frustum.
 		core::vector3df getFarLeftBottom() const;
-		//! returns the point which is on the far right top corner inside the the view frustum.
 		core::vector3df getFarRightTop() const;
-		//! returns the point which is on the far right bottom corner inside the the view frustum.
 		core::vector3df getFarRightBottom() const;
+		core::vector3df getNearLeftTop() const;
+		core::vector3df getNearLeftBottom() const;
+		core::vector3df getNearRightTop() const;
+		core::vector3df getNearRightBottom() const;
 
 		//! recalculates the bounding box member based on the planes
 		inline void recalculateBoundingBox();
@@ -91,6 +92,46 @@ namespace camera{
 	{
 		core::vector3df p;
 		planes[ENUM_FRUSTUM_PLANE_FAR].getIntersectionWithPlanes(
+			planes[ENUM_FRUSTUM_PLANE_BOTTOM],
+			planes[ENUM_FRUSTUM_PLANE_RIGHT], p);
+
+		return p;
+	}
+
+	inline core::vector3df SViewFrustum::getNearLeftTop() const
+	{
+		core::vector3df p;
+		planes[ENUM_FRUSTUM_PLANE_NEAR].getIntersectionWithPlanes(
+			planes[ENUM_FRUSTUM_PLANE_TOP],
+			planes[ENUM_FRUSTUM_PLANE_LEFT], p);
+
+		return p;
+	}
+
+	inline core::vector3df SViewFrustum::getNearLeftBottom() const
+	{
+		core::vector3df p;
+		planes[ENUM_FRUSTUM_PLANE_NEAR].getIntersectionWithPlanes(
+			planes[ENUM_FRUSTUM_PLANE_BOTTOM],
+			planes[ENUM_FRUSTUM_PLANE_LEFT], p);
+
+		return p;
+	}
+
+	inline core::vector3df SViewFrustum::getNearRightTop() const
+	{
+		core::vector3df p;
+		planes[ENUM_FRUSTUM_PLANE_NEAR].getIntersectionWithPlanes(
+			planes[ENUM_FRUSTUM_PLANE_TOP],
+			planes[ENUM_FRUSTUM_PLANE_RIGHT], p);
+
+		return p;
+	}
+
+	inline core::vector3df SViewFrustum::getNearRightBottom() const
+	{
+		core::vector3df p;
+		planes[ENUM_FRUSTUM_PLANE_NEAR].getIntersectionWithPlanes(
 			planes[ENUM_FRUSTUM_PLANE_BOTTOM],
 			planes[ENUM_FRUSTUM_PLANE_RIGHT], p);
 
@@ -165,11 +206,37 @@ namespace camera{
 		recalculateBoundingBox();
 	}
 
-	void SViewFrustum::render(video::IVideoDriver* driver)
+	inline void SViewFrustum::render(video::IVideoDriver* driver)
 	{
-		//TODO
+		driver->setMaterial(video::DEFAULT_MATERIAL);
+		driver->setTransform(video::ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
+		core::vector3df flt,frt,flb,frb,nlt,nrt,nlb,nrb;
+		flt=getFarLeftTop();
+		frt=getFarRightTop();
+		flb=getFarLeftBottom();
+		frb=getFarRightBottom();
+		nlt=getNearLeftTop();
+		nrt=getNearRightTop();
+		nlb=getNearLeftBottom();
+		nrb=getNearRightBottom();
+
+		driver->draw3DLine(nlt,nrt);
+		driver->draw3DLine(nlb,nrb);
+		driver->draw3DLine(nlt,nlb);
+		driver->draw3DLine(nrt,nrb);
+
+		driver->draw3DLine(nlt,flt);
+		driver->draw3DLine(nlb,flb);
+		driver->draw3DLine(nrt,frt);
+		driver->draw3DLine(nrb,frb);
+
+		driver->draw3DLine(flt,frt);
+		driver->draw3DLine(flb,frb);
+		driver->draw3DLine(flt,flb);
+		driver->draw3DLine(frt,frb);
 	}
 }
 }
 }
+#endif
 #endif

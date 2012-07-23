@@ -558,6 +558,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\CViewFrustum.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CViewFrustum.h"
+						>
+					</File>
+					<File
 						RelativePath=".\CWindowOrthoCamera.cpp"
 						>
 					</File>
@@ -575,6 +583,10 @@
 					</File>
 					<File
 						RelativePath="..\include\IPerspCamera.h"
+						>
+					</File>
+					<File
+						RelativePath="..\include\IViewFrustum.h"
 						>
 					</File>
 					<File
