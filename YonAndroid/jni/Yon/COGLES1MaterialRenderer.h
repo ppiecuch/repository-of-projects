@@ -406,6 +406,34 @@ namespace ogles1{
 			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 	};
+
+	class COGLES1MaterialRendererDetailMap : public COGLES1MaterialRenderer
+	{
+	public: 
+
+		COGLES1MaterialRendererDetailMap(COGLES1Driver* driver)
+			: COGLES1MaterialRenderer(driver) {}
+
+		virtual void onSetMaterial(const IMaterial* current,const IMaterial* last)
+		{
+			m_pDriver->setTexture(0, current->getTexture(0));
+			m_pDriver->setTexture(1, current->getTexture(1));
+
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD_SIGNED);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC0_RGB, GL_PREVIOUS);
+			glTexEnvi(GL_TEXTURE_ENV, GL_SRC1_RGB, GL_TEXTURE);
+
+			setBasicRenderStates(current,last);
+		}
+
+		virtual void onUnsetMaterial(){
+			m_pDriver->setTexture(1, NULL);
+			m_pDriver->setTexture(0, NULL);
+
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		}
+	};
 }//ogles1
 // 	IMaterialRenderer* createMaterialRendererNone(IVideoDriver* driver){
 // 		return new ogles1::COGLES1MaterialRenderer((ogles1::COGLES1Driver*)driver);
@@ -430,6 +458,9 @@ namespace ogles1{
 	//}
 	IMaterialRenderer* createMaterialRendererMask(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererMask((ogles1::COGLES1Driver*)driver);
+	}
+	IMaterialRenderer* createMaterialRendererDetailMap(IVideoDriver* driver){
+		return new ogles1::COGLES1MaterialRendererDetailMap((ogles1::COGLES1Driver*)driver);
 	}
 	IMaterialRenderer* createMaterialRendererCompositePass1(IVideoDriver* driver){
 		return new ogles1::COGLES1MaterialRendererCompositePass1((ogles1::COGLES1Driver*)driver);

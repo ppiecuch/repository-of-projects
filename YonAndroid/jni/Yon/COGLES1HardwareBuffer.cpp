@@ -59,13 +59,13 @@ namespace ogles1{
 			glBufferData(GL_ARRAY_BUFFER,vertexBufferSize,m_pUnit->getShap()->getVertices(),vertexUsage);
 			m_uVertexBufferSize=vertexBufferSize;
 
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"rebuild COGLES1HardwareBuffer.vertices");
+			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"rebuild COGLES1HardwareBuffer.vertices");
 		}
 		else
 		{
 			glBufferSubData(GL_ARRAY_BUFFER,0,vertexBufferSize,m_pUnit->getShap()->getVertices());
 
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"update COGLES1HardwareBuffer.vertices");
+			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"update COGLES1HardwareBuffer.vertices");
 		}
 		//COGLES1Driver::checkError(__FILE__,__LINE__);
 		glBindBuffer(GL_ARRAY_BUFFER,0);
@@ -81,13 +81,13 @@ namespace ogles1{
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER,indexBufferSize,m_pUnit->getShap()->getIndices(),indexUsage);
 			m_uIndexBufferSize=indexBufferSize;
 
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"rebuild COGLES1HardwareBuffer.indices");
+			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"rebuild COGLES1HardwareBuffer.indices");
 		}
 		else
 		{
 			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,0,indexBufferSize,m_pUnit->getShap()->getIndices());
 
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,"update COGLES1HardwareBuffer.indices");
+			//Logger->debug(YON_LOG_SUCCEED_FORMAT,"update COGLES1HardwareBuffer.indices");
 		}
 		//COGLES1Driver::checkError(__FILE__,__LINE__);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);

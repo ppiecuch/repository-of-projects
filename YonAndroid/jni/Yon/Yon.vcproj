@@ -666,6 +666,14 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="sky"
+					>
+					<File
+						RelativePath=".\CSkyBoxModel.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="video"
