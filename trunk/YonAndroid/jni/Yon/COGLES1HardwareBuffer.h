@@ -20,6 +20,9 @@ namespace ogles1{
 		u32 m_uVerticesChangedId;
 		u32 m_uIndicesChangedId;
 
+		u32 m_uVertexBufferSize;
+		u32 m_uIndexBufferSize;
+
 		GLuint m_vboIds[2];
 
 		u8* m_vertexPosOffset;

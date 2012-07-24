@@ -37,8 +37,12 @@ namespace yon{
 			virtual void append(const IUnit* const other) = 0;*/
 
 			//硬件缓冲区使用类型
-			virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getHardwareBufferUsageType() const = 0;
-			virtual void setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;
+			//virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getHardwareBufferUsageType() const = 0;
+			//virtual void setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;
+			virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getVertexHardwareBufferUsageType() const = 0;
+			virtual void setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;
+			virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getIndexHardwareBufferUsageType() const = 0;
+			virtual void setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;
 
 			virtual IShap* getShap() const = 0;
 			virtual void setShap(IShap* shap) = 0;

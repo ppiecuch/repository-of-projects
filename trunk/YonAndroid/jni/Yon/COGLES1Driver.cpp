@@ -216,11 +216,19 @@ namespace ogles1{
 		u32 size=0;
 
 		//TODO map.drop
-		size=m_pHardwareBuffers.size();
-		for(i=0;i<m_pHardwareBuffers.size();++i){
-			delete m_pHardwareBuffers[i];
+		//size=m_pHardwareBuffers.size();
+		//for(i=0;i<m_pHardwareBuffers.size();++i){
+		//	delete m_pHardwareBuffers[i];
+		//}
+		//m_pHardwareBuffers.clear();
+		size=m_hardwardBuffers.size();
+		core::map<const scene::IUnit*,video::IHardwareBuffer*>::Iterator it=m_hardwardBuffers.getIterator();
+		for (i=0;!it.atEnd();++it,++i)
+		{
+			IHardwareBuffer* buffer=it->getValue();
+			buffer->drop();
 		}
-		m_pHardwareBuffers.clear();
+		m_hardwardBuffers.clear();
 		Logger->debug("Release %d/%d Hardwarebuffer\n",i,size);
 
 		
@@ -391,6 +399,15 @@ namespace ogles1{
 		if(needHardwareBuffer(unit)){
 			//TODO map.find
 			IHardwareBuffer* buffer=NULL;
+			core::map<const scene::IUnit*,IHardwareBuffer*>::Node* node = m_hardwardBuffers.find(unit);
+			if (node)
+			{
+				buffer=node->getValue();
+			}else{
+				buffer=createHardwareBuffer(unit);
+				m_hardwardBuffers[unit]=buffer;
+			}
+			/*IHardwareBuffer* buffer=NULL;
 			for(u32 i=0;i<m_pHardwareBuffers.size();++i){
 				if(m_pHardwareBuffers[i]->unit==unit){
 					buffer=m_pHardwareBuffers[i]->buffer;
@@ -402,7 +419,7 @@ namespace ogles1{
 				m_pHardwareBuffers.push_back(new SHardwareBufferPair());
 				m_pHardwareBuffers[m_pHardwareBuffers.size()-1]->unit=unit;
 				m_pHardwareBuffers[m_pHardwareBuffers.size()-1]->buffer=buffer;
-			}
+			}*/
 			buffer->draw(mode);
 
 			u32 indexCount=unit->getShap()->getIndexCount();

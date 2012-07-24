@@ -37,6 +37,8 @@ namespace camera{
 		virtual core::vector3df getNearRightTop() const=0;
 		virtual core::vector3df getNearRightBottom() const=0;
 
+		virtual void setCameraPosition(const core::vector3df& pos) = 0;
+
 		//! recalculates the bounding box member based on the planes
 		virtual  void recalculateBoundingBox() = 0;
 		//! returns a bounding box enclosing the whole view frustum

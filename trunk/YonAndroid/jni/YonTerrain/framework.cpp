@@ -63,11 +63,13 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pOverlookCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_PERSP,NULL,core::vector3df(0,2000,0),core::vector3df(0,0,1),core::ORIGIN_VECTOR3DF,false);
+	pOverlookCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_PERSP,NULL,core::vector3df(0,10000,0),core::vector3df(0,0,1),core::ORIGIN_VECTOR3DF,false);
+	pOverlookCamera->setNear(1000);
+	pOverlookCamera->setFar(30000);
 	pOrthoCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	pCamera=sceneMgr->addCameraFPS();
 	pCamera->setFar(1000);
-	pCamera->setNear(100);
+	//pCamera->setNear(100);
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
@@ -125,9 +127,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	entity->drop();
 	
 
-	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(2,1,2));
-	IImage* image=videoDriver->createImageFromFile("heightmap16.png",true);
-	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_5);
+	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(10,1,10));
+	IImage* image=videoDriver->createImageFromFile("heightmap512.png",true);
+	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_17);
 	//terrainModel->loadHeightMap(image);
 	image->drop();
 
@@ -144,6 +146,23 @@ void drawFrame(){
 	sceneMgr->setActiveCamera(pOverlookCamera);
 	sceneMgr->render(videoDriver);
 	pCamera->getViewFrustum()->render(videoDriver);
+	const core::aabbox3df& aabb=pCamera->getViewFrustum()->getBoundingBox();
+	videoDriver->setTransform(ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
+	videoDriver->setMaterial(DEFAULT_MATERIAL);
+	vector3df corners[8];
+	aabb.getCorners(corners);
+	videoDriver->draw3DLine(corners[0],corners[1],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[0],corners[2],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[0],corners[4],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[1],corners[3],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[1],corners[5],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[2],corners[3],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[2],corners[6],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[3],corners[7],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[4],corners[5],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[4],corners[6],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[5],corners[7],COLOR_GREEN);
+	videoDriver->draw3DLine(corners[6],corners[7],COLOR_GREEN);
 	rtt->endRTT(true);
 
 	sceneMgr->setActiveCamera(pCamera);

@@ -7,22 +7,32 @@ namespace yon{
 namespace video{
 namespace ogles1{
 	COGLES1HardwareBuffer::COGLES1HardwareBuffer(scene::IUnit* unit)
-		:m_pUnit(unit),m_uVerticesChangedId(unit->getShap()->getVerticesChangedId()),m_uIndicesChangedId(unit->getShap()->getIndicesChangedId()){
+		:m_pUnit(unit),m_uVertexBufferSize(0),m_uIndexBufferSize(0),m_uVerticesChangedId(0),m_uIndicesChangedId(0)
+		//m_uVerticesChangedId(unit->getShap()->getVerticesChangedId()),m_uIndicesChangedId(unit->getShap()->getIndicesChangedId())
+	{
 			m_pUnit->grab();
 
-			u32 vertexBufferSize=m_pUnit->getShap()->getVertexSize()*m_pUnit->getShap()->getVertexCount();
-			u32 indexBufferSize=m_pUnit->getShap()->getIndexSize()*m_pUnit->getShap()->getIndexCount();
-			GLenum usage=m_pUnit->getHardwareBufferUsageType()==ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC?GL_STATIC_DRAW:GL_DYNAMIC_DRAW;
+			//u32 vertexBufferSize=m_pUnit->getShap()->getVertexSize()*m_pUnit->getShap()->getVertexCount();
+			//u32 indexBufferSize=m_pUnit->getShap()->getIndexSize()*m_pUnit->getShap()->getIndexCount();
+			//GLenum usage=m_pUnit->getHardwareBufferUsageType()==ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC?GL_STATIC_DRAW:GL_DYNAMIC_DRAW;
+
+			m_uVertexBufferSize=m_pUnit->getShap()->getVertexSize()*m_pUnit->getShap()->getVertexCount();
+			m_uIndexBufferSize=m_pUnit->getShap()->getIndexSize()*m_pUnit->getShap()->getIndexCount();
+			
+			//GLenum vertexUsage=m_pUnit->getVertexHardwareBufferUsageType()==ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC?GL_STATIC_DRAW:GL_DYNAMIC_DRAW;
+			//GLenum indexUsage=m_pUnit->getIndexHardwareBufferUsageType()==ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC?GL_STATIC_DRAW:GL_DYNAMIC_DRAW;
 
 			glGenBuffers(2,m_vboIds);
 
-			glBindBuffer(GL_ARRAY_BUFFER,m_vboIds[0]);
-			glBufferData(GL_ARRAY_BUFFER,vertexBufferSize,m_pUnit->getShap()->getVertices(),usage);
+			/*glBindBuffer(GL_ARRAY_BUFFER,m_vboIds[0]);
+			glBufferData(GL_ARRAY_BUFFER,vertexBufferSize,m_pUnit->getShap()->getVertices(),vertexUsage);
 			glBindBuffer(GL_ARRAY_BUFFER,0);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_vboIds[1]);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER,indexBufferSize,m_pUnit->getShap()->getIndices(),usage);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER,indexBufferSize,m_pUnit->getShap()->getIndices(),indexUsage);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);*/
+
+			update();
 
 			//¼ÆËãÆ«ÒÆÁ¿
 			m_vertexPosOffset=getVertexPosOffset(m_pUnit->getVertexType());
@@ -43,24 +53,46 @@ namespace ogles1{
 	void COGLES1HardwareBuffer::updateVertices(){
 		u32 vertexBufferSize=m_pUnit->getShap()->getVertexSize()*m_pUnit->getShap()->getVertexCount();
 		glBindBuffer(GL_ARRAY_BUFFER,m_vboIds[0]);
-		glBufferSubData(GL_ARRAY_BUFFER,0,vertexBufferSize,m_pUnit->getShap()->getVertices());
+		if(m_uVertexBufferSize<vertexBufferSize||m_uVerticesChangedId==0)
+		{
+			GLenum vertexUsage=m_pUnit->getVertexHardwareBufferUsageType()==ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC?GL_STATIC_DRAW:GL_DYNAMIC_DRAW;
+			glBufferData(GL_ARRAY_BUFFER,vertexBufferSize,m_pUnit->getShap()->getVertices(),vertexUsage);
+			m_uVertexBufferSize=vertexBufferSize;
+
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,"rebuild COGLES1HardwareBuffer.vertices");
+		}
+		else
+		{
+			glBufferSubData(GL_ARRAY_BUFFER,0,vertexBufferSize,m_pUnit->getShap()->getVertices());
+
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,"update COGLES1HardwareBuffer.vertices");
+		}
 		//COGLES1Driver::checkError(__FILE__,__LINE__);
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 	
 		m_uVerticesChangedId=m_pUnit->getShap()->getVerticesChangedId();
-
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,"update COGLES1HardwareBuffer.vertices");
 	}
 	void COGLES1HardwareBuffer::updateIndices(){
 		u32 indexBufferSize=m_pUnit->getShap()->getIndexSize()*m_pUnit->getShap()->getIndexCount();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_vboIds[1]);
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,0,indexBufferSize,m_pUnit->getShap()->getIndices());
+		if(m_uIndexBufferSize<indexBufferSize||m_uIndicesChangedId==0)
+		{
+			GLenum indexUsage=m_pUnit->getIndexHardwareBufferUsageType()==ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC?GL_STATIC_DRAW:GL_DYNAMIC_DRAW;
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER,indexBufferSize,m_pUnit->getShap()->getIndices(),indexUsage);
+			m_uIndexBufferSize=indexBufferSize;
+
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,"rebuild COGLES1HardwareBuffer.indices");
+		}
+		else
+		{
+			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,0,indexBufferSize,m_pUnit->getShap()->getIndices());
+
+			Logger->debug(YON_LOG_SUCCEED_FORMAT,"update COGLES1HardwareBuffer.indices");
+		}
 		//COGLES1Driver::checkError(__FILE__,__LINE__);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
 		m_uIndicesChangedId=m_pUnit->getShap()->getIndicesChangedId();
-
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,"update COGLES1HardwareBuffer.indices");
 	}
 	void COGLES1HardwareBuffer::update(){
 		if(m_uVerticesChangedId!=m_pUnit->getShap()->getVerticesChangedId())

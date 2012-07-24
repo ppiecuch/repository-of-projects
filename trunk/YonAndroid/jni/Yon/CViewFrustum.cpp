@@ -5,46 +5,6 @@ namespace yon{
 namespace scene{
 namespace camera{
 
-	core::vector3df CViewFrustum::getFarLeftTop() const
-	{
-		core::vector3df p;
-		m_planes[ENUM_FRUSTUM_PLANE_FAR].getIntersectionWithPlanes(
-			m_planes[ENUM_FRUSTUM_PLANE_TOP],
-			m_planes[ENUM_FRUSTUM_PLANE_LEFT], p);
-
-		return p;
-	}
-
-	core::vector3df CViewFrustum::getFarLeftBottom() const
-	{
-		core::vector3df p;
-		m_planes[ENUM_FRUSTUM_PLANE_FAR].getIntersectionWithPlanes(
-			m_planes[ENUM_FRUSTUM_PLANE_BOTTOM],
-			m_planes[ENUM_FRUSTUM_PLANE_LEFT], p);
-
-		return p;
-	}
-
-	core::vector3df CViewFrustum::getFarRightTop() const
-	{
-		core::vector3df p;
-		m_planes[ENUM_FRUSTUM_PLANE_FAR].getIntersectionWithPlanes(
-			m_planes[ENUM_FRUSTUM_PLANE_TOP],
-			m_planes[ENUM_FRUSTUM_PLANE_RIGHT], p);
-
-		return p;
-	}
-
-	core::vector3df CViewFrustum::getFarRightBottom() const
-	{
-		core::vector3df p;
-		m_planes[ENUM_FRUSTUM_PLANE_FAR].getIntersectionWithPlanes(
-			m_planes[ENUM_FRUSTUM_PLANE_BOTTOM],
-			m_planes[ENUM_FRUSTUM_PLANE_RIGHT], p);
-
-		return p;
-	}
-
 	core::vector3df CViewFrustum::getNearLeftTop() const
 	{
 		core::vector3df p;
@@ -146,6 +106,11 @@ namespace camera{
 			m_planes[i].normal *= len;
 			m_planes[i].d *= len;
 		}
+
+		m_planes[ENUM_FRUSTUM_PLANE_FAR].getIntersectionWithPlanes(m_planes[ENUM_FRUSTUM_PLANE_TOP],m_planes[ENUM_FRUSTUM_PLANE_LEFT], m_farLeftTop);
+		m_planes[ENUM_FRUSTUM_PLANE_FAR].getIntersectionWithPlanes(m_planes[ENUM_FRUSTUM_PLANE_BOTTOM],m_planes[ENUM_FRUSTUM_PLANE_LEFT], m_farLeftBottom);
+		m_planes[ENUM_FRUSTUM_PLANE_FAR].getIntersectionWithPlanes(m_planes[ENUM_FRUSTUM_PLANE_TOP],m_planes[ENUM_FRUSTUM_PLANE_RIGHT], m_farRightTop);
+		m_planes[ENUM_FRUSTUM_PLANE_FAR].getIntersectionWithPlanes(m_planes[ENUM_FRUSTUM_PLANE_BOTTOM],m_planes[ENUM_FRUSTUM_PLANE_RIGHT], m_farRightBottom);
 
 		// make bounding box
 		recalculateBoundingBox();
