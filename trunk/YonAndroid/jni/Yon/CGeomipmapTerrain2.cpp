@@ -13,10 +13,10 @@ namespace terrain{
 		const core::vector3df& rot,const core::vector3df& scale)
 		:ITerrainModel(parent,pos,rot,scale),m_pPatchs(NULL),m_pUnit(NULL){
 			m_pUnit=new Unit3D2T();
-			//m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
-			//m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
-			//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
-			m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
+			m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+			m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+			m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
+			//m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
 			m_pUnit->setShap(&m_shap);
 	}
 
@@ -75,11 +75,16 @@ namespace terrain{
 
 		//TODO texcoords
 		const f32 texcoordDelta = 1.0f/(f32)(m_iSizePerSide-1);
+		const f32 texcoordDelta2 = m_iPatchCountPerSide/(f32)(m_iSizePerSide-1);
 		s32 index=0;
 		f32 fx=0.f;
+		f32 fu=0.f;
+		f32 fu2=0.f;
 		for(s32 x = 0; x<m_iSizePerSide; ++x)
 		{
 			f32 fz=0.f;
+			f32 fv=0.f;
+			f32 fv2=0.f;
 			for(s32 z = 0; z<m_iSizePerSide; ++z)
 			{
 				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
@@ -89,12 +94,21 @@ namespace terrain{
 				//v.pos.x=fx;
 				//v.pos.y=(f32)image->getValue(z,x);
 				//v.pos.z=fz;
+				v.texcoords0.x=1.0f-fu;
+				v.texcoords0.y=fv;
+
+				v.texcoords1.x=1.0f-fu2;
+				v.texcoords1.y=fv2;
 
 				//Logger->debug("vertex[%d]:%.2f,%.2f,%.2f\r\n",index-1,v.pos.x,v.pos.y,v.pos.z);
 
 				++fz;
+				fv+=texcoordDelta;
+				fv2+=texcoordDelta2;
 			}
 			++fx;
+			fu+=texcoordDelta;
+			fu2+=texcoordDelta2;
 		}
 
 		//calculate all the necessary data for the patches and the terrain
@@ -239,7 +253,7 @@ namespace terrain{
 
 	void CGeomipmapTerrain2::preRenderIndicesCalculations()
 	{
-		core::array<u32>& indices=m_shap.getIndexArray();
+		core::array<u16>& indices=m_shap.getIndexArray();
 		indices.set_used(0);
 
 		bool wireframe=m_pUnit->getMaterial()->getPolygonMode()==video::ENUM_POLYGON_MODE_LINE;
