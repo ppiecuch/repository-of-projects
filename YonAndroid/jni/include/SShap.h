@@ -129,6 +129,13 @@ namespace scene{
 			append(other->getVertices(),other->getVertexCount(),other->getIndices(),other->getIndexCount());
 		}
 
+		virtual void setVerticesDirty(){
+			++m_uVerticesChangedId;
+		}
+		virtual void setIndicesDirty(){
+			++m_uIndicesChangedId;
+		}
+
 		/*virtual ENUM_DIMEN_MODE getDimenMode() const{
 			return static_cast<const ENUM_DIMEN_MODE>(M);
 		}*/

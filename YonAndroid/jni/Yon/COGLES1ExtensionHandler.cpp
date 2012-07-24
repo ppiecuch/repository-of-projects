@@ -27,7 +27,8 @@ namespace ogles1{
 #endif
 
 	static const c8* const OGLESFeatureStrings[] ={
-		"GL_OES_framebuffer_object"
+		"GL_OES_framebuffer_object",
+		"GL_OES_element_index_uint"
 	};
 
 	COGLES1ExtensionHandler::COGLES1ExtensionHandler(){

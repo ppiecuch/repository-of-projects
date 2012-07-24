@@ -45,7 +45,8 @@ namespace terrain{
 		};
 
 		IUnit* m_pUnit;
-		SDynamicShap3D2T m_shap;
+		typedef SDynamicShap<SVertex2TCoords,u32,ENUM_VERTEX_TYPE_3V2T1C> SDynamicShap3D2T32;
+		SDynamicShap3D2T32 m_shap;
 
 		SPatch* m_pPatchs;
 		s32 m_iMaxLOD;

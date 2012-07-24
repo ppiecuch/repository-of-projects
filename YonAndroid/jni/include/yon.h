@@ -59,6 +59,7 @@
 #include "IGeometryFactory.h" 
 #include "IModel.h" 
 #include "ITerrainModel.h"
+#include "IViewFrustum.h"
 #include "ICamera.h"
 #include "ISceneManager.h" 
 #include "ITimer.h" 

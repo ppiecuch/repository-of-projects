@@ -28,6 +28,9 @@ namespace yon{
 			//当顶点/索引变化时，changedId跟着改变
 			virtual u32 getVerticesChangedId() const = 0;
 			virtual u32 getIndicesChangedId() const = 0;
+
+			virtual void setVerticesDirty() = 0;
+			virtual void setIndicesDirty() = 0;
 		};
 	} 
 }

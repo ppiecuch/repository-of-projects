@@ -4,6 +4,7 @@
 #include "IVideoDriver.h"
 #include "SOGLES1Parameters.h"
 #include "yonArray.h"
+#include "yonMap.h"
 #include "ITexture.h"
 #include "IMaterial.h"
 #include "IMaterialRenderer.h"
@@ -125,7 +126,7 @@ namespace ogles1{
 		video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name);
 
 		bool needHardwareBuffer(scene::IUnit* unit){
-			return unit->getHardwareBufferUsageType()!=ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE;
+			return unit->getVertexHardwareBufferUsageType()!=ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE&&unit->getIndexHardwareBufferUsageType()!=ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE;
 		}
 
 		core::matrix4f m_matrix[ENUM_TRANSFORM_COUNT];
@@ -151,8 +152,10 @@ namespace ogles1{
 		core::array<SSurface> m_textures;
 		core::array<video::IImageLoader*> m_imageLoaders;
 		core::array<video::IMaterialRenderer*> m_materialRenderers;
+
+		core::map<const scene::IUnit*,video::IHardwareBuffer*> m_hardwardBuffers;
 		//TODO map
-		struct SHardwareBufferPair{
+		/*struct SHardwareBufferPair{
 			scene::IUnit* unit;
 			video::IHardwareBuffer* buffer;
 
@@ -160,7 +163,7 @@ namespace ogles1{
 				buffer->drop();
 			}
 		};
-		core::array<SHardwareBufferPair*> m_pHardwareBuffers;
+		core::array<SHardwareBufferPair*> m_pHardwareBuffers;*/
 
 		CFPSCounter m_FPSCounter;
 		FPSAssist m_FPSAssist;

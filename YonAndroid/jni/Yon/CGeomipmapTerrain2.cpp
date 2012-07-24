@@ -13,6 +13,8 @@ namespace terrain{
 		const core::vector3df& rot,const core::vector3df& scale)
 		:ITerrainModel(parent,pos,rot,scale),m_pPatchs(NULL),m_pUnit(NULL){
 			m_pUnit=new Unit3D2T();
+			//m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+			//m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 			//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
 			m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
 			m_pUnit->setShap(&m_shap);
@@ -88,6 +90,8 @@ namespace terrain{
 				//v.pos.y=(f32)image->getValue(z,x);
 				//v.pos.z=fz;
 
+				//Logger->debug("vertex[%d]:%.2f,%.2f,%.2f\r\n",index-1,v.pos.x,v.pos.y,v.pos.z);
+
 				++fz;
 			}
 			++fx;
@@ -106,8 +110,8 @@ namespace terrain{
 		const f64 size = m_iPatchSize*m_iPatchSize*m_scale.x*m_scale.z;
 		for(s32 i=0;i<m_iMaxLOD;++i)
 		{
-			//m_distanceThresholds.push_back(size*((i+1+i/2)*(i+1+i/2)));//but why i+1+i/2?
-			m_distanceThresholds.push_back(size*2);//but why i+1+i/2?
+			m_distanceThresholds.push_back(size*((i+1+i/2)*(i+1+i/2)));//but why i+1+i/2?
+			//m_distanceThresholds.push_back(size*size*(i+1+i/2)*(i+1+i/2)/4);//but why i+1+i/2?
 			Logger->debug("m_distanceThresholds[%d]:%.2f\r\n",m_distanceThresholds.size()-1,m_distanceThresholds.getLast());
 		}
 	}
@@ -143,32 +147,13 @@ namespace terrain{
 					}
 				}
 				m_pPatchs[index].m_centerPos=m_pPatchs[index].m_boundingBox.getCenter();
-				Logger->debug("center[%d]:%.2f,%.2f,%.2f\r\n",index,m_pPatchs[index].m_centerPos.x,m_pPatchs[index].m_centerPos.y,m_pPatchs[index].m_centerPos.z);
+				//Logger->debug("center[%d]:%.2f,%.2f,%.2f\r\n",index,m_pPatchs[index].m_centerPos.x,m_pPatchs[index].m_centerPos.y,m_pPatchs[index].m_centerPos.z);
 
 				// Reconfigure the bounding box of the terrain as a whole
 				m_boundingBox.addInternalBox(m_pPatchs[index].m_boundingBox);
 				
 
 				//assign neighbours
-				/*if(x<m_iPatchCountPerSide-1)
-					m_pPatchs[index].left=&m_pPatchs[index+1];
-				else
-					m_pPatchs[index].left=NULL;
-
-				if(x>0)
-					m_pPatchs[index].right=&m_pPatchs[index-1];
-				else
-					m_pPatchs[index].right=NULL;
-
-				if(z>0)
-					m_pPatchs[index].bottom=&m_pPatchs[index-m_iPatchCountPerSide];
-				else
-					m_pPatchs[index].bottom=NULL;
-
-				if(z<m_iPatchCountPerSide-1)
-					m_pPatchs[index].top=&m_pPatchs[index+m_iPatchCountPerSide];
-				else
-					m_pPatchs[index].top=NULL;*/
 				if(x>0)
 					m_pPatchs[index].bottom=&m_pPatchs[index-m_iPatchCountPerSide];
 				else
@@ -188,25 +173,6 @@ namespace terrain{
 					m_pPatchs[index].right=&m_pPatchs[index+1];
 				else
 					m_pPatchs[index].right=NULL;
-				/*if(x>0)
-					m_pPatchs[index].top=&m_pPatchs[index-m_iPatchCountPerSide];
-				else
-					m_pPatchs[index].top=NULL;
-
-				if(x<m_iPatchCountPerSide-1)
-					m_pPatchs[index].bottom=&m_pPatchs[index+m_iPatchCountPerSide];
-				else
-					m_pPatchs[index].bottom=NULL;
-
-				if(z>0)
-					m_pPatchs[index].left=&m_pPatchs[index-1];
-				else
-					m_pPatchs[index].left=NULL;
-
-				if(z<m_iPatchCountPerSide-1)
-					m_pPatchs[index].right=&m_pPatchs[index+1];
-				else
-					m_pPatchs[index].right=NULL;*/
 			}
 		}
 	}
@@ -219,35 +185,53 @@ namespace terrain{
 		if(camera==NULL)
 			return change;
 
+		if(m_shap.getIndexCount()==0)
+			change=true;
+
 		// Determine the camera rotation, based on the camera direction.
 		core::vector3df cameraPosition = camera->getAbsolutePosition();
+
+		const camera::IViewFrustum* frustum = m_pSceneManager->getActiveCamera()->getViewFrustum();
 
 		// Determine each patches LOD based on distance from camera (and whether or not they are in
 		// the view frustum).
 		const s32 count = m_iPatchCountPerSide*m_iPatchCountPerSide;
 		f32 distance;
+		core::vector3df center;
 		for (s32 j = 0; j < count; ++j)
 		{
+			center.set(m_pPatchs[j].m_centerPos.x,m_pPatchs[j].m_centerPos.y,m_pPatchs[j].m_centerPos.z);
+			distance = cameraPosition.getDistanceFromSQ(center);
+			
 			//TODO check frustum
 			for (s32 i = m_iMaxLOD - 1; i >= 0; --i)
 			{
-				distance = cameraPosition.getDistanceFromSQ(m_pPatchs[j].m_centerPos);
-				if (distance >= m_distanceThresholds[i])
+				if(frustum->getBoundingBox().intersectsWithBox(m_pPatchs[j].m_boundingBox))
 				{
-					if(m_pPatchs[j].m_iLOD!=i)
-						change=true;
-					m_pPatchs[j].m_iLOD = i;
-					break;
+					if (distance >= m_distanceThresholds[i])
+					{
+						if(m_pPatchs[j].m_iLOD!=i)
+							change=true;
+						m_pPatchs[j].m_iLOD = i;
+						break;
+					}
+					else if (i == 0)
+					{
+						if(m_pPatchs[j].m_iLOD!=0)
+							change=true;
+						// If we've turned off a patch from viewing, because of the frustum, and now we turn around and it's
+						// too close, we need to turn it back on, at the highest LOD. The if above doesn't catch this.
+						m_pPatchs[j].m_iLOD = 0;
+					}
 				}
-				//else if (i == 0)
+				else
 				{
-					if(m_pPatchs[j].m_iLOD!=0)
+					if(m_pPatchs[j].m_iLOD!=-1)
 						change=true;
-					// If we've turned off a patch from viewing, because of the frustum, and now we turn around and it's
-					// too close, we need to turn it back on, at the highest LOD. The if above doesn't catch this.
-					m_pPatchs[j].m_iLOD = 0;
+					m_pPatchs[j].m_iLOD = -1;
 				}
 			}
+			//Logger->debug("cam:%.2f,%.2f,%.2f,center:%.2f,%.2f,%.2f,distance[%d]:%.2f-->lod:%d\r\n",cameraPosition.x,cameraPosition.y,cameraPosition.z,center.x,center.y,center.z,j,distance,m_pPatchs[j].m_iLOD);
 		}
 
 		return change;
@@ -255,7 +239,7 @@ namespace terrain{
 
 	void CGeomipmapTerrain2::preRenderIndicesCalculations()
 	{
-		core::array<u16>& indices=m_shap.getIndexArray();
+		core::array<u32>& indices=m_shap.getIndexArray();
 		indices.set_used(0);
 
 		bool wireframe=m_pUnit->getMaterial()->getPolygonMode()==video::ENUM_POLYGON_MODE_LINE;
@@ -313,24 +297,12 @@ namespace terrain{
 							}
 						}
 					}
-					/*while (z<m_iPatchSize)
-					{
-						
-
-						// increment index position horizontally
-						x += step;
-
-						// we've hit an edge
-						if (x>=m_iPatchSize)
-						{
-							x = 0;
-							z += step;
-						}
-					}*/
 				}
 				++index;
 			}
 		}
+
+		m_shap.setIndicesDirty();
 	}
 
 	u32 CGeomipmapTerrain2::getIndex(const s32 PatchX, const s32 PatchZ,const s32 PatchIndex, u32 vX, u32 vZ) const
@@ -380,51 +352,6 @@ namespace terrain{
 			vX = m_iPatchSize;
 
 		return (vX + ((m_iPatchSize) * PatchX)) * m_iSizePerSide + (vZ + ((m_iPatchSize) * PatchZ));
-		/*
-		// top border
-		if (vZ == 0)
-		{
-			if (m_pPatchs[PatchIndex].top &&m_pPatchs[PatchIndex].m_iLOD < m_pPatchs[PatchIndex].top->m_iLOD &&
-				(vX % (1 <<m_pPatchs[PatchIndex].top->m_iLOD)) != 0 )
-			{
-				vX -= vX % (1 <<m_pPatchs[PatchIndex].top->m_iLOD);
-			}
-		}
-		else if (vZ == (u32)m_iPatchSize) // bottom border
-		{
-			if (m_pPatchs[PatchIndex].bottom &&m_pPatchs[PatchIndex].m_iLOD < m_pPatchs[PatchIndex].bottom->m_iLOD &&
-				(vX % (1 << m_pPatchs[PatchIndex].bottom->m_iLOD)) != 0)
-			{
-				vX -= vX % (1 <<m_pPatchs[PatchIndex].bottom->m_iLOD);
-			}
-		}
-
-		// left border
-		if (vX == 0)
-		{
-			if (m_pPatchs[PatchIndex].left &&m_pPatchs[PatchIndex].m_iLOD <m_pPatchs[PatchIndex].left->m_iLOD &&
-				(vZ % (1 <<m_pPatchs[PatchIndex].left->m_iLOD)) != 0)
-			{
-				vZ -= vZ % (1 << m_pPatchs[PatchIndex].left->m_iLOD);
-			}
-		}
-		else if (vX == (u32)m_iPatchSize) // right border
-		{
-			if (m_pPatchs[PatchIndex].right &&m_pPatchs[PatchIndex].m_iLOD <m_pPatchs[PatchIndex].right->m_iLOD &&
-				(vZ % (1 <<m_pPatchs[PatchIndex].right->m_iLOD)) != 0)
-			{
-				vZ -= vZ % (1 <<m_pPatchs[PatchIndex].right->m_iLOD);
-			}
-		}
-
-		if (vZ >= (u32)m_iPatchSize+1)
-			vZ = m_iPatchSize;
-
-		if (vX >= (u32)m_iPatchSize+1)
-			vX = m_iPatchSize;
-
-		return (vZ + ((m_iPatchSize) * PatchZ)) * m_iSizePerSide + (vX + ((m_iPatchSize) * PatchX));
-		*/
 	}
 
 	void CGeomipmapTerrain2::render(video::IVideoDriver* driver)
@@ -432,7 +359,9 @@ namespace terrain{
 		if(m_bVisible==false)
 			return;
 
-		driver->setTransform(video::ENUM_TRANSFORM_WORLD, getAbsoluteTransformation());
+		//scale分量会影响到这里，最终导致preRenderLODCalculations计算错误
+		//driver->setTransform(video::ENUM_TRANSFORM_WORLD, getAbsoluteTransformation());
+		driver->setTransform(video::ENUM_TRANSFORM_WORLD, core::IDENTITY_MATRIX);
 		driver->setMaterial(getMaterial(0));
 		driver->drawUnit(m_pUnit);
 	}
