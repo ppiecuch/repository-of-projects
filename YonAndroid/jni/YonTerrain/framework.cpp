@@ -77,7 +77,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
 	fs->addWorkingDirectory("../media\\skybox\\4");
-	fs->addWorkingDirectory("../media/terrain/2");
+	fs->addWorkingDirectory("../media/terrain/1");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/png/");
 #endif
@@ -137,7 +137,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material=terrainModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_DETAIL_MAP);
 	material->setTexture(0,videoDriver->getTexture("terrain-texture.png"));
-	material->setTexture(1,videoDriver->getTexture("detailmap2.png"));
+	material->setTexture(1,videoDriver->getTexture("rock2.png"));
 	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
 	material->setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);
 	//terrainModel->loadHeightMap(image);

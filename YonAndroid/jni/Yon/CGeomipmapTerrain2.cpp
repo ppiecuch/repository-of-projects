@@ -393,6 +393,11 @@ namespace terrain{
 			ITerrainModel::onRegisterForRender();
 		}
 	}
+
+	f32 CGeomipmapTerrain2::getHeight(f32 x,f32 z) const{
+		//TODO
+		return 0;
+	}
 }
 }
 }

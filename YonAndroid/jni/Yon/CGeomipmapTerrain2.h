@@ -75,10 +75,7 @@ namespace terrain{
 
 		virtual void onRegisterForRender();
 
-		virtual f32 getHeight(f32 x,f32 z) const{
-			//TODO
-			return 0;
-		}
+		virtual f32 getHeight(f32 x,f32 z) const;
 
 		virtual u32 getMaterialCount() const{
 			return 1;
