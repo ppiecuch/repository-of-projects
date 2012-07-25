@@ -179,12 +179,12 @@ namespace scene{
 		}
 
 		//! This method is called just before the rendering process of the whole scene.
-		virtual void onRegisterForRender(ISceneManager* manager){
+		virtual void onRegisterForRender(){
 			if(m_bVisible)
 			{
 				core::list<IModel*>::Iterator it = m_children.begin();
 				for (; it != m_children.end(); ++it)
-					(*it)->onRegisterForRender(manager);
+					(*it)->onRegisterForRender();
 			}
 		}
 

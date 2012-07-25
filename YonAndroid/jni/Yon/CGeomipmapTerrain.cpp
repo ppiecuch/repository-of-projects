@@ -356,16 +356,16 @@ namespace terrain{
 		driver->drawUnit(m_pUnit);
 	}
 
-	void CGeomipmapTerrain::onRegisterForRender(ISceneManager* manager)
+	void CGeomipmapTerrain::onRegisterForRender()
 	{
 		if(m_bVisible)
 		{
-			manager->registerForRender(this);
+			m_pSceneManager->registerForRender(this);
 
 			if(preRenderLODCalculations())
 				preRenderIndicesCalculations();
 
-			ITerrainModel::onRegisterForRender(manager);
+			ITerrainModel::onRegisterForRender();
 		}
 	}
 }

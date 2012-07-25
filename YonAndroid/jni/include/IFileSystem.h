@@ -35,12 +35,13 @@ namespace io{
 		//格式如下： "<drive>:/<directory>/<sudirectory>/<..>". 如 "C:/Windows/","/sdcard/","../media/"
 		virtual void addWorkingDirectory(const io::path& newDirectory) = 0;
 		virtual s32 getWorkingDirectoryCount(){return 0;}
-		virtual const io::path& getWorkingDirectory(u32 index) = 0;
+		virtual const io::path& getWorkingDirectory(s32 index) = 0;
 		//获取绝对路径
 		virtual io::path getAbsolutePath(const io::path& filename) const = 0;
 		//获取资源绝对路径
-		//遍历工作目录，如果存在匹配的资源，返回路径，否则返回""
-		virtual io::path getResourcePath(const io::path& filename) const = 0;
+		//参数noEmpty，如果为true,指示如果不存在匹配资源，则返回使用第一个资源目录拼接的路径（用于createStream），否则返回""
+		//遍历工作目录，如果存在匹配的资源，返回路径，否则根据noEmpty指示返回
+		virtual io::path getResourcePath(const io::path& filename,bool noEmpty=false) const = 0;
 	};
 
 	IFileSystem* createFileSystem();

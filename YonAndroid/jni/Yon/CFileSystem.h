@@ -28,12 +28,12 @@ namespace io{
 		virtual s32 getWorkingDirectoryCount(){
 			return m_workingDirectories.size();
 		}
-		virtual const io::path& getWorkingDirectory(u32 index){
+		virtual const io::path& getWorkingDirectory(s32 index){
 			YON_DEBUG_BREAK_IF(index>=m_workingDirectories.size());
 			return m_workingDirectories[index];
 		}
 		virtual io::path getAbsolutePath(const io::path& filename) const;
-		virtual io::path getResourcePath(const io::path& filename) const;
+		virtual io::path getResourcePath(const io::path& filename,bool noEmpty) const;
 	};
 }
 }

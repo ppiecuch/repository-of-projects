@@ -130,16 +130,20 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	shap=geometryFty->createXYRectangle2D2T(-75,-150,75,150,0,0,1,0.1f);
+	//shap=geometryFty->createXYRectangle2D2T(-75,-150,75,150,0,0,1,0.1f);
+	shap=geometryFty->createXYRectangle2D2T(-256,-128,256,128,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	//unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	entity=geometryFty->createEntity(unit);
 	IModel* waterfallModel=sceneMgr->addModel(entity);
 	material=waterfallModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_MASK);
 	waterfallModel->setPosition(core::vector3df(50,100,120));
-	material->setTexture(0,videoDriver->getTexture("waterfall.png"));
-	material->setTexture(1,videoDriver->getTexture("maskalpha.png"));
+	//material->setTexture(0,videoDriver->getTexture("waterfall.png"));
+	//material->setTexture(1,videoDriver->getTexture("maskalpha.png"));
+
+	material->setTexture(0,videoDriver->getTexture("fire.png"));
+	material->setTexture(1,videoDriver->getTexture("xyj.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -149,7 +153,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	aniParam.animatorUV.stage=0;
 	aniParam.animatorUV.translate.u=0;
 	aniParam.animatorUV.translate.w=0;
-	aniParam.animatorUV.translate.v=0.002f;
+	aniParam.animatorUV.translate.v=-0.005f;
 	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
 	waterfallModel->addAnimator(uvAnimator);
 	uvAnimator->drop();
