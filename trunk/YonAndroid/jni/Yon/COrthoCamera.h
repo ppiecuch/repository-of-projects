@@ -18,7 +18,7 @@ namespace camera{
 			const core::vector3df& lookat = core::vector3df(0,0,-1));
 
 		virtual void render(video::IVideoDriver* driver);
-		virtual void onRegisterForRender(ISceneManager* manager);
+		virtual void onRegisterForRender();
 
 		virtual void onResize(const core::dimension2du& size);
 

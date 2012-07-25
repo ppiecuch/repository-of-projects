@@ -6,13 +6,8 @@
 #include "yonUtil.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
-#include <io.h> // for _access
 #include <stdlib.h> //for _MAX_PATH
 #include <direct.h> //for _getcwd
-#define F_OK 00 //Existence only
-#define W_OK 02 //Write-only
-#define R_OK 04 //Read-only
-#define X_OK 06 //Read and write
 #elif defined(YON_COMPILE_WITH_ANDROID)
 #include <unistd.h>
 #endif
@@ -32,27 +27,19 @@ namespace io{
 	}
 
 	bool CFileSystem::existFile(const path& filename) const{
-#ifdef YON_COMPILE_WITH_WIN32
-#if defined(YON_WCHAR_FILESYSTEM)
-		return (_waccess(filename.c_str(), F_OK) != -1);
-#else
-		return (_access(filename.c_str(), F_OK) != -1);
-#endif
-#elif defined(YON_COMPILE_WITH_ANDROID)
-		return (access(filename.c_str(), F_OK) != -1);
-#endif
+		return core::yonAccess(filename.c_str());
 	}
 
 	IReadStream* CFileSystem::createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode){
 		//return createReadFileStream(getAbsolutePath(filename,true),mode);
-		return createReadFileStream(getResourcePath(filename),mode);
+		return createReadFileStream(getResourcePath(filename,true),mode);
 	}
 	IReadStream* CFileSystem::createAndOpenReadMemoryStream(const io::path& name,void* data, long size,bool deleteMemoryWhenDropped,ENUM_ENDIAN_MODE mode){
 		return createReadMemoryStream(name,data,size,deleteMemoryWhenDropped,mode);
 	}
 	IWriteStream* CFileSystem::createAndOpenWriteFileStream(const path& filename, bool append, ENUM_ENDIAN_MODE mode){
 		//return createWriteFileStream(getAbsolutePath(filename,true),append,mode);
-		return createWriteFileStream(getResourcePath(filename),append,mode);
+		return createWriteFileStream(getResourcePath(filename,true),append,mode);
 	}
 	XMLReader* CFileSystem::createXMLReader(IReadStream* stream){
 		return new CXMLReaderImpl<c8,core::IReferencable>(stream);
@@ -90,7 +77,11 @@ namespace io{
 		return tmp;
 #endif
 	}*/
-	io::path CFileSystem::getResourcePath(const io::path& filename) const{
+	io::path CFileSystem::getResourcePath(const io::path& filename,bool noEmpty) const{
+		//如果是绝对路径
+		if(filename.findFirst(':')!=-1)
+			return filename;
+
 		io::path result;
 		for(u32 i=0;i<m_workingDirectories.size();++i)
 		{
@@ -100,6 +91,14 @@ namespace io{
 			//Logger->debug("test existFile:%s\r\n",result.c_str());
 			if(existFile(result))
 				return result;
+		}
+		if(noEmpty)
+		{
+			result=io::path("");
+			result.append(m_workingDirectories[0]);
+			result.append(filename);
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("Not found resource:%s in working directories,will use first working directories:%s",filename.c_str(),result.c_str()).c_str());
+			return result;
 		}
 		Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("Not found resource:%s in working directories!",filename.c_str()).c_str());
 		return io::path("");

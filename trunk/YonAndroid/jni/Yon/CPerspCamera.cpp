@@ -10,10 +10,10 @@ namespace camera{
 		recalculateProjectionMatrix();
 		recalculateViewMatrix();
 	}
-	void CPerspCamera::onRegisterForRender(ISceneManager* manager){
-		if(manager->getActiveCamera()==this)
-			manager->registerForRender(this,ENUM_SCENE_PASS_CAMERA);
-		IPerspCamera::onRegisterForRender(manager);
+	void CPerspCamera::onRegisterForRender(){
+		if(m_pSceneManager->getActiveCamera()==this)
+			m_pSceneManager->registerForRender(this,ENUM_SCENE_PASS_CAMERA);
+		IPerspCamera::onRegisterForRender();
 	}
 	void CPerspCamera::recalculateProjectionMatrix(){
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].makeIdentity();

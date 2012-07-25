@@ -120,6 +120,29 @@ jboolean Java_yon_AndroidGLView_nativeOnMove(JNIEnv *pEnv, jobject obj, jint iAc
 	getEngine()->postEventFromUser(evt);
 	return true;
 }
+jboolean Java_yon_AndroidGLView_nativeOnUI(JNIEnv *pEnv, jobject obj, jint msg, jobjectArray args){
+	return true;
+}
+void Java_yon_AndroidGLView_nativeDebug(JNIEnv *pEnv, jobject obj, jstring str){
+	const char* text= pEnv->GetStringUTFChars(str, 0);
+	Logger->debug(text);
+	pEnv->ReleaseStringUTFChars(str, text);
+}
+void Java_yon_AndroidGLView_nativeInfo(JNIEnv *pEnv, jobject obj, jstring str){
+	const char* text= pEnv->GetStringUTFChars(str, 0);
+	Logger->info(text);
+	pEnv->ReleaseStringUTFChars(str, text);
+}
+void Java_yon_AndroidGLView_nativeWarn(JNIEnv *pEnv, jobject obj, jstring str){
+	const char* text= pEnv->GetStringUTFChars(str, 0);
+	Logger->warn(YON_LOG_WARN_FORMAT,text);
+	pEnv->ReleaseStringUTFChars(str, text);
+}
+void Java_yon_AndroidGLView_nativeError(JNIEnv *pEnv, jobject obj, jstring str){
+	const char* text= pEnv->GetStringUTFChars(str, 0);
+	Logger->error(YON_LOG_FAILED_FORMAT,text);
+	pEnv->ReleaseStringUTFChars(str, text);
+}
 void Java_yon_AndroidGLView_nativeOnSurfaceDestroy(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnSurfaceDestroy\n");
 }

@@ -23,13 +23,13 @@ namespace yon{
 				return m_entity;
 			}
 
-			virtual void onRegisterForRender(ISceneManager* manager)
+			virtual void onRegisterForRender()
 			{
 				if(m_bVisible)
 				{
-					manager->registerForRender(this);
+					m_pSceneManager->registerForRender(this);
 
-					IModel::onRegisterForRender(manager);
+					IModel::onRegisterForRender();
 				}
 			}
 

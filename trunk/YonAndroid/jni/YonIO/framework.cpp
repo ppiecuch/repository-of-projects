@@ -61,16 +61,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../Yon/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->setWorkingDirectory("media/");
 	fs->addWorkingDirectory("media/");
 	fs->addWorkingDirectory("temp/");
 #endif
@@ -78,13 +76,18 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//Logger->debug("%s\n",fs->getAbsolutePath(fs->getWorkingDirectory()).c_str());
 
 #if 1
-	Logger->debug("%s\n",fs->getAbsolutePath2("D:/").c_str());
-
-	Logger->debug("%s\n",fs->getAbsolutePath2("../media/").c_str());
-
 	Logger->debug("%s\n",fs->getResourcePath("test.png").c_str());
 	Logger->debug("%s\n",fs->getResourcePath("Android.mk").c_str());
 	Logger->debug("%s\n",fs->getResourcePath("nothing.png").c_str());
+	Logger->debug("%s\n",fs->getResourcePath("D:\\Development\\Software\\android-ndk-r7\\samples\\Irrlicht\\Examples\\nothing.png").c_str());
+
+	Logger->debug("%s\n",fs->getAbsolutePath("test.png").c_str());
+	Logger->debug("%s\n",fs->getAbsolutePath("D:\\Development\\Software\\android-ndk-r7\\samples\\Irrlicht\\Examples\\nothing.png").c_str());
+
+	Logger->debug("%s\n",core::getParentName(fs->getResourcePath("tst/tst/tst/test.txt",true)).c_str());
+	//Logger->debug("%d\n",_mkdir("d:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/media/tst/tst/tst/"));
+	//core::mkdirs(io::path("d:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/media/tst/tst/tst/"));
+	Logger->debug("success\n");
 #endif
 	//core::mkdirs(fs->getAbsolutePath(io::path("../media\\test1\\test2")).c_str());
 
@@ -103,13 +106,13 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
 #elif 1
-	IWriteStream* ws=fs->createAndOpenWriteFileStream("/tst/tst/tst/test.txt",true,ENUM_ENDIAN_MODE_BIG);
+	IWriteStream* ws=fs->createAndOpenWriteFileStream("tst/tst/tst/test.txt",true,ENUM_ENDIAN_MODE_BIG);
 	ws->writeBool(true);
 	ws->writeFloat(2.1f);
 	ws->writeLong(3333);
 	ws->drop();
 
-	IReadStream* rs=fs->createAndOpenReadFileStream("/tst/tst/tst/test.txt",ENUM_ENDIAN_MODE_BIG);
+	IReadStream* rs=fs->createAndOpenReadFileStream("tst/tst/tst/test.txt",ENUM_ENDIAN_MODE_BIG);
 	Logger->debug("%d\n",rs->readBool());
 	Logger->debug("%.2f\n",rs->readFloat());
 	Logger->debug("%ld\n",rs->readLong());

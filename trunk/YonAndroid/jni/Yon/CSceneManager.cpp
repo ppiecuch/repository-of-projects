@@ -7,6 +7,7 @@
 #include "CGeomipmapTerrain.h"
 #include "CGeomipmapTerrain2.h"
 #include "CAnimatorCameraFPS.h"
+#include "CSkyBox.h"
 
 #include "ILogger.h"
 
@@ -64,6 +65,15 @@ namespace scene{
 			terrain::ITerrainModel* model=new terrain::CGeomipmapTerrain2(parent,pos,rot,scale);
 			model->drop();
 			return model;
+	}
+
+	IModel* CSceneManager::addSkyBoxModel(video::ITexture* front, video::ITexture* back, video::ITexture* left,
+		video::ITexture* right, video::ITexture* top, video::ITexture* bottom,IModel* parent){
+		if(parent==NULL)
+			parent=this;
+		sky::CSkyBox* model=new sky::CSkyBox(parent,front,back,left,right,top,bottom);
+		model->drop();
+		return model;
 	}
 
 	camera::ICamera* CSceneManager::addCamera(camera::ENUM_CAMERA_TYPE cameraType,IModel* parent,
@@ -166,7 +176,12 @@ namespace scene{
 				return true;
 			}
 			break;
+		case ENUM_SCENE_PASS_SKYBOX:
+			m_skyboxs.push_back(model);
+			return true;
+			break;
 		case ENUM_SCENE_PASS_NONE: //ignore
+			Logger->warn(YON_LOG_WARN_FORMAT,"register model with pass_none,is it all right?");
 			break;
 		}
 		return false;
@@ -190,7 +205,15 @@ namespace scene{
 		//}
 
 		// let all nodes register themselves
-		onRegisterForRender(this);
+		onRegisterForRender();
+
+		//render skyboxs
+		{
+			m_renderingPass=ENUM_SCENE_PASS_SKYBOX;
+			for (i=0; i<m_skyboxs.size(); ++i)
+				m_skyboxs[i]->render(driver);
+			m_skyboxs.set_used(0);
+		}
 
 
 		// render default objects

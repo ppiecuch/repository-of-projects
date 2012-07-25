@@ -6,8 +6,13 @@
 #include "yonMath.h"
 #include <memory.h>
 #ifdef YON_COMPILE_WITH_WIN32
+#include <io.h> // for _access
 #include <windows.h>
 #include <direct.h>//for mkdir
+#define F_OK 00 //Existence only
+#define W_OK 02 //Write-only
+#define R_OK 04 //Read-only
+#define X_OK 06 //Read and write
 #elif defined(YON_COMPILE_WITH_ANDROID)
 #include <unistd.h>
 #include <sys/stat.h>//for mkdir
@@ -52,7 +57,25 @@ namespace core{
 		s32 index = max_(index1,index2);
 		if(index<0)
 			return pathname;
-		return pathname.subString(0,index);
+		return pathname.subString(0,index+1);
+	}
+
+	//TODO not support on linux
+	/*
+	inline bool yonAccess(const wchar_t* path){
+#ifdef YON_COMPILE_WITH_WIN32
+		return (_waccess(path, F_OK) != -1);
+#elif defined(YON_COMPILE_WITH_ANDROID)
+		return (access(path, F_OK) != -1);
+#endif
+	}*/
+
+	inline bool yonAccess(const c8* path){
+#ifdef YON_COMPILE_WITH_WIN32
+		return (_access(path, F_OK) != -1);
+#elif defined(YON_COMPILE_WITH_ANDROID)
+		return (access(path, F_OK) != -1);
+#endif
 	}
 
 	inline s32 _mkdirs(c8* path)
@@ -60,9 +83,9 @@ namespace core{
 		s32 retval;
 
 #ifdef YON_COMPILE_WITH_WIN32
-		while (0 != (retval = _mkdir(path)))
+		while (0 != (retval = _mkdir(path))&&yonAccess(path)==false)
 #elif defined(YON_COMPILE_WITH_ANDROID)
-		while (0 != (retval = mkdir(path,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)))
+		while (0 != (retval = mkdir(path,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH))&&yonAccess(path)==false)
 #endif
 		{
 			c8 subpath[512] = "";
@@ -130,4 +153,10 @@ namespace core{
 	}
 }
 }
+#ifdef YON_COMPILE_WITH_WIN32
+#undef F_OK
+#undef W_OK
+#undef R_OK
+#undef X_OK
+#endif
 #endif

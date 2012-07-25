@@ -865,7 +865,7 @@ namespace ogles1{
 			return;
 		}
 		else
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("texture:%s removing is ignored for not exist in driver",texture->getName()).c_str());
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("texture:%s removing is ignored for not exist in driver",texture->getName().c_str()).c_str());
 	}
 
 	video::ITexture* COGLES1Driver::findTexture(const io::path& filename){

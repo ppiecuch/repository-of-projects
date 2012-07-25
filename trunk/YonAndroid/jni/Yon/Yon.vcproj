@@ -670,7 +670,11 @@
 					Name="sky"
 					>
 					<File
-						RelativePath=".\CSkyBoxModel.h"
+						RelativePath=".\CSkyBox.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CSkyBox.h"
 						>
 					</File>
 				</Filter>

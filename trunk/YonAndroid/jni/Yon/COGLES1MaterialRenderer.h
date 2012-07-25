@@ -429,9 +429,8 @@ namespace ogles1{
 
 		virtual void onUnsetMaterial(){
 			m_pDriver->setTexture(1, NULL);
-			m_pDriver->setTexture(0, NULL);
-
 			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			m_pDriver->setTexture(0, NULL);
 		}
 	};
 }//ogles1

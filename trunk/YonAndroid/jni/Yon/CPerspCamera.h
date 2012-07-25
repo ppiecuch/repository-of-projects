@@ -23,7 +23,7 @@ namespace camera{
 		virtual void setFovy(f32 fovy);
 
 		virtual void render(video::IVideoDriver* driver);
-		virtual void onRegisterForRender(ISceneManager* manager);
+		virtual void onRegisterForRender();
 
 		virtual void onResize(const core::dimension2du& size);
 

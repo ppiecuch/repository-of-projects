@@ -10,10 +10,10 @@ namespace camera{
 			recalculateProjectionMatrix();
 			recalculateViewMatrix();
 	}
-	void COrthoCamera::onRegisterForRender(ISceneManager* manager){
-		if(manager->getActiveCamera()==this)
-			manager->registerForRender(this,ENUM_SCENE_PASS_CAMERA);
-		IOrthoCamera::onRegisterForRender(manager);
+	void COrthoCamera::onRegisterForRender(){
+		if(m_pSceneManager->getActiveCamera()==this)
+			m_pSceneManager->registerForRender(this,ENUM_SCENE_PASS_CAMERA);
+		IOrthoCamera::onRegisterForRender();
 	}
 	void COrthoCamera::recalculateProjectionMatrix(){
 		m_matrixs[ENUM_FRUSTUM_TRANSFORM_PROJECTION].makeIdentity();

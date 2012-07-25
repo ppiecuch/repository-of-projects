@@ -16,6 +16,7 @@ IRandomizer* randomizer=NULL;
 IModel* planeModel=NULL;
 IModel* teapotModel=NULL;
 ITerrainModel* terrainModel=NULL;
+IModel* skyboxModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
@@ -75,6 +76,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
+	fs->addWorkingDirectory("../media\\skybox\\4");
+	fs->addWorkingDirectory("../media/terrain/2");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/png/");
 #endif
@@ -129,7 +132,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,true);
 
 	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(10,1,10));
-	IImage* image=videoDriver->createImageFromFile("heightmap128.png",true);
+	IImage* image=videoDriver->createImageFromFile("heightmap.png",true);
 	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_17);
 	material=terrainModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_DETAIL_MAP);
@@ -139,6 +142,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material->setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);
 	//terrainModel->loadHeightMap(image);
 	image->drop();
+
+	ITexture* front=videoDriver->getTexture("front.png");
+	ITexture* back=videoDriver->getTexture("back.png");
+	ITexture* left=videoDriver->getTexture("left.png");
+	ITexture* right=videoDriver->getTexture("right.png");
+	ITexture* top=videoDriver->getTexture("top.png");
+	ITexture* bottom=videoDriver->getTexture("bottom.png");
+	skyboxModel=sceneMgr->addSkyBoxModel(front,back,left,right,top,bottom);
 
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,false);
 
@@ -152,6 +163,7 @@ void drawFrame(){
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
 	rtt->beginRTT(true,true,video::SColor(0xFF133E67));
+	skyboxModel->setVisible(false);
 	sceneMgr->setActiveCamera(pOverlookCamera);
 	sceneMgr->render(videoDriver);
 	pCamera->getViewFrustum()->render(videoDriver);
@@ -175,6 +187,7 @@ void drawFrame(){
 	rtt->endRTT(true);
 
 	sceneMgr->setActiveCamera(pCamera);
+	skyboxModel->setVisible(true);
 	planeModel->setVisible(false);
 
 	//const core::vector3df trot=teapotModel->getRotation();
@@ -192,12 +205,14 @@ void drawFrame(){
 	videoDriver->draw3DLine(core::vector3df(0,0,100),core::IDENTITY_VECTOR3DF,video::COLOR_BLUE);
 
 	sceneMgr->setActiveCamera(pOrthoCamera);
+	skyboxModel->setVisible(false);
 	planeModel->setVisible(true);
 	terrainModel->setVisible(false);
 	sceneMgr->render(videoDriver);
 	videoDriver->end();
 
 	terrainModel->setVisible(true);
+	skyboxModel->setVisible(true);
 	sceneMgr->setActiveCamera(pCamera);
 }
 void destroy(){

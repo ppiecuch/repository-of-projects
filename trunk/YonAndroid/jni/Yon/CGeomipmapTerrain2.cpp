@@ -15,7 +15,7 @@ namespace terrain{
 			m_pUnit=new Unit3D2T();
 			m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 			m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
-			m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
+			//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
 			//m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
 			m_pUnit->setShap(&m_shap);
 	}
@@ -78,13 +78,13 @@ namespace terrain{
 		const f32 texcoordDelta2 = m_iPatchCountPerSide/(f32)(m_iSizePerSide-1);
 		s32 index=0;
 		f32 fx=0.f;
-		f32 fu=0.f;
-		f32 fu2=0.f;
+		f32 fv=0.f;
+		f32 fv2=0.f;
 		for(s32 x = 0; x<m_iSizePerSide; ++x)
 		{
 			f32 fz=0.f;
-			f32 fv=0.f;
-			f32 fv2=0.f;
+			f32 fu=0.f;
+			f32 fu2=0.f;
 			for(s32 z = 0; z<m_iSizePerSide; ++z)
 			{
 				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
@@ -94,21 +94,21 @@ namespace terrain{
 				//v.pos.x=fx;
 				//v.pos.y=(f32)image->getValue(z,x);
 				//v.pos.z=fz;
-				v.texcoords0.x=1.0f-fu;
+				v.texcoords0.x=fu;
 				v.texcoords0.y=fv;
 
-				v.texcoords1.x=1.0f-fu2;
+				v.texcoords1.x=fu2;
 				v.texcoords1.y=fv2;
 
 				//Logger->debug("vertex[%d]:%.2f,%.2f,%.2f\r\n",index-1,v.pos.x,v.pos.y,v.pos.z);
 
 				++fz;
-				fv+=texcoordDelta;
-				fv2+=texcoordDelta2;
+				fu+=texcoordDelta;
+				fu2+=texcoordDelta2;
 			}
 			++fx;
-			fu+=texcoordDelta;
-			fu2+=texcoordDelta2;
+			fv+=texcoordDelta;
+			fv2+=texcoordDelta2;
 		}
 
 		//calculate all the necessary data for the patches and the terrain
@@ -302,12 +302,13 @@ namespace terrain{
 							}
 							else
 							{
+								indices.push_back(index22);
+								indices.push_back(index11);
 								indices.push_back(index12);
-								indices.push_back(index11);
-								indices.push_back(index22);
-								indices.push_back(index22);
-								indices.push_back(index11);
+								
 								indices.push_back(index21);
+								indices.push_back(index11);
+								indices.push_back(index22);
 							}
 						}
 					}
@@ -380,16 +381,16 @@ namespace terrain{
 		driver->drawUnit(m_pUnit);
 	}
 
-	void CGeomipmapTerrain2::onRegisterForRender(ISceneManager* manager)
+	void CGeomipmapTerrain2::onRegisterForRender()
 	{
 		if(m_bVisible)
 		{
-			manager->registerForRender(this);
+			m_pSceneManager->registerForRender(this);
 
 			if(preRenderLODCalculations())
 				preRenderIndicesCalculations();
 
-			ITerrainModel::onRegisterForRender(manager);
+			ITerrainModel::onRegisterForRender();
 		}
 	}
 }

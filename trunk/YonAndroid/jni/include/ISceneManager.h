@@ -21,6 +21,9 @@ namespace scene{
 		//! Camera pass. The active view is set up here. The very first pass.
 		ENUM_SCENE_PASS_CAMERA,
 
+		//! Sky box pass.
+		ENUM_SCENE_PASS_SKYBOX,
+
 		//! Solid scene models
 		ENUM_SCENE_PASS_SOLID,
 
@@ -87,6 +90,9 @@ namespace scene{
 		virtual terrain::ITerrainModel* addTerrainModel(IModel* parent=NULL,const core::vector3df& pos=core::vector3df(0,0,0),
 			const core::vector3df& rot=core::vector3df(0,0,0),
 			const core::vector3df& scale=core::vector3df(1,1,1)) = 0;
+
+		virtual IModel* addSkyBoxModel(video::ITexture* front, video::ITexture* back, video::ITexture* left,
+			video::ITexture* right, video::ITexture* top, video::ITexture* bottom,IModel* parent=NULL) = 0;
 	};
 
 }

@@ -61,6 +61,7 @@ namespace yon{
 
 			//! render pass lists
 			core::array<camera::ICamera*> m_cameras;
+			core::array<IModel*> m_skyboxs;
 			core::array<DefaultModelEntry> m_solids;
 			core::array<TransparentModelEntry> m_transparents;
 			core::array<TransparentModelEntry> m_effects;
@@ -82,6 +83,9 @@ namespace yon{
 
 			virtual terrain::ITerrainModel* addTerrainModel(IModel* parent,const core::vector3df& pos,
 				const core::vector3df& rot,const core::vector3df& scale);
+
+			virtual IModel* addSkyBoxModel(video::ITexture* front, video::ITexture* back, video::ITexture* left,
+				video::ITexture* right, video::ITexture* top, video::ITexture* bottom,IModel* parent);
 
 			virtual camera::ICamera* addCamera(camera::ENUM_CAMERA_TYPE cameraType,IModel* parent,
 				const core::vector3df& pos,const core::vector3df& up,
