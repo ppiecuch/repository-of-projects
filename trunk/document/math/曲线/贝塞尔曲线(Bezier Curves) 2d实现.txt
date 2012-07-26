@@ -1,0 +1,62 @@
+如有转载,请注明:
+http://www.azure.com.cn/
+
+回忆下绘制直线的过程, 它是个从起点运动到终点的过程,
+这里我们就需要用到线性插值算法.
+
+
+
+
+线性插值的伪代码如下:
+Linear Interpolation 
+
+procedure draw_line(point1, point2)
+
+loop t from 0 to 1 in steps of .01
+
+a = t
+b = 1 - t
+
+point = (point1 * b) + (point2 * a)
+
+drawpixel (point)
+
+end of loop
+
+end of draw_line
+为了绘制曲线,我们需要替换掉线性插值,改用立方(Cubic)插值.
+
+
+
+
+我们选择两个终点, A 和 D ,
+我们在选择为两个终点选择两个方向 v1 和 v2.
+在这些方向的终点, 我们定义两个新的点 B 和 C.
+
+B = A +v1
+C = D + v2
+
+有了这四个定义的点, 我们可以使用一个立方插值函数来绘制曲线.
+伪代码如下:
+Cubic Interpolation 
+
+procedure draw_bezier(A, v1, v2, D)
+
+B = A + v1
+C = D + v2
+
+loop t from 0 to 1 in steps of .01
+
+a = t
+b = 1 - t
+
+point = A*b3 + 3*B*b2*a + 3C*b*a2 + D*a3 
+
+drawpixel (point)
+
+end of loop
+
+end of draw_bezier
+
+
+http://www.game798.com/html/2007-04/3374.htm

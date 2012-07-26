@@ -1,0 +1,26 @@
+求立方根的牛顿法基于如下事实，如果y是x的立方根的一个近似值，那么下式将给出一个更好的近似值：
+(x/y2+2y)/3
+请利用这一公式实现一个类似平方根过程的求立方根的过程。
+
+关键是要猜想出一个立方根的近似值. 
+
+代码:
+#include<iostream>
+#include <math>
+using namespace std;
+float fun(float guess,float x)
+{
+ if(abs(guess*guess*guess-x)<0.0000001) return guess;
+ else
+ return fun((x/guess/guess+2*guess)/3,x);
+}
+
+int main()
+{
+float a,b;
+while(cin>>a>>b)
+cout<<fun(a,b)<<endl;
+return 0;
+}
+
+http://www.game798.com/html/2007-04/3428.htm
