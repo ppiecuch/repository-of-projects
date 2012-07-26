@@ -1,0 +1,34 @@
+第一个是使用了乘法的版本
+u32 approx_distance( s32 dx, s32 dy )
+{
+ u32 min, max, approx; if ( dx < 0 ) dx = -dx;
+ if ( dy < 0 ) dy = -dy; if ( dx < dy )
+ {
+ min = dx;
+ max = dy;
+ } else {
+ min = dy;
+ max = dx;
+ } approx = ( max * 1007 ) + ( min * 441 );
+ if ( max < ( min << 4 ))
+ approx -= ( max * 40 ); // add 512 for proper rounding
+ return (( approx + 512 ) >> 10 );
+}
+
+第二个是免去乘法，只使用位移的版本
+u32 approx_distance( s32 dx, s32 dy )
+{
+ u32 min, max; if ( dx < 0 ) dx = -dx;
+ if ( dy < 0 ) dy = -dy; if ( dx < dy )
+ {
+ min = dx;
+ max = dy;
+ } else {
+ min = dy;
+ max = dx;
+ } // coefficients equivalent to ( 123/128 * max ) and ( 51/128 * min )
+ return ((( max << 8 ) + ( max << 3 ) - ( max << 4 ) - ( max << 1 ) +
+ ( min << 7 ) - ( min << 5 ) + ( min << 3 ) - ( min << 1 )) >> 8 );
+}
+
+http://www.game798.com/html/2007-04/3378.htm
