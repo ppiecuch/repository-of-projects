@@ -73,7 +73,7 @@ namespace video{
 		case ENUM_COLOR_FORMAT_R8G8B8:
 			{
 				u8* p = m_pData+(y*3)*m_size.w + (x*3);
-				return SColor(255,p[0],p[1],p[2]);
+				return SColor((u32)255,p[0],p[1],p[2]);
 			}
 		}
 

@@ -17,6 +17,7 @@ IModel* planeModel=NULL;
 IModel* teapotModel=NULL;
 ITerrainModel* terrainModel=NULL;
 IModel* skyboxModel=NULL;
+IWaterModel* waterModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
@@ -78,6 +79,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("..\\media");
 	fs->addWorkingDirectory("../media\\skybox\\4");
 	fs->addWorkingDirectory("../media/terrain/1");
+	fs->addWorkingDirectory("../media/water/2");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/png/");
 #endif
@@ -140,8 +142,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material->setTexture(1,videoDriver->getTexture("rock2.png"));
 	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
 	material->setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);
-	//terrainModel->loadHeightMap(image);
 	image->drop();
+
+	waterModel=sceneMgr->addWaterModel(20,20);
+	waterModel->setScale(core::vector3df(100,1,100));
+	waterModel->setPosition(core::vector3df(0,20,0));
+	material=waterModel->getMaterial(0);
+	material->setTexture(0,videoDriver->getTexture("caustic.png"));
+	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
 
 	ITexture* front=videoDriver->getTexture("front.png");
 	ITexture* back=videoDriver->getTexture("back.png");
@@ -164,6 +173,7 @@ void drawFrame(){
 
 	rtt->beginRTT(true,true,video::SColor(0xFF133E67));
 	skyboxModel->setVisible(false);
+	waterModel->setVisible(false);
 	sceneMgr->setActiveCamera(pOverlookCamera);
 	sceneMgr->render(videoDriver);
 	pCamera->getViewFrustum()->render(videoDriver);
@@ -188,7 +198,9 @@ void drawFrame(){
 
 	sceneMgr->setActiveCamera(pCamera);
 	skyboxModel->setVisible(true);
+	waterModel->setVisible(true);
 	planeModel->setVisible(false);
+	
 
 	//const core::vector3df trot=teapotModel->getRotation();
 	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
@@ -206,12 +218,14 @@ void drawFrame(){
 
 	sceneMgr->setActiveCamera(pOrthoCamera);
 	skyboxModel->setVisible(false);
+	waterModel->setVisible(false);
 	planeModel->setVisible(true);
 	terrainModel->setVisible(false);
 	sceneMgr->render(videoDriver);
 	videoDriver->end();
 
 	terrainModel->setVisible(true);
+	waterModel->setVisible(true);
 	skyboxModel->setVisible(true);
 	sceneMgr->setActiveCamera(pCamera);
 }

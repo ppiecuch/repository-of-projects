@@ -42,6 +42,9 @@ namespace scene{
 	namespace terrain{
 		class ITerrainModel;
 	}
+	namespace water{
+		class IWaterModel;
+	}
 
 	//class ISceneManager : public virtual core::IRenderable{
 	class ISceneManager : public virtual core::IReferencable,public virtual IRenderable{
@@ -88,6 +91,10 @@ namespace scene{
 		}
 
 		virtual terrain::ITerrainModel* addTerrainModel(IModel* parent=NULL,const core::vector3df& pos=core::vector3df(0,0,0),
+			const core::vector3df& rot=core::vector3df(0,0,0),
+			const core::vector3df& scale=core::vector3df(1,1,1)) = 0;
+
+		virtual water::IWaterModel* addWaterModel(s32 xsize,s32 zsize, IModel* parent=NULL,const core::vector3df& pos=core::vector3df(0,0,0),
 			const core::vector3df& rot=core::vector3df(0,0,0),
 			const core::vector3df& scale=core::vector3df(1,1,1)) = 0;
 

@@ -13,9 +13,9 @@ inline void EnableMemLeakCheck()
 
 #include <locale.h>
 
-#ifdef YON_HIDE_CONSOLE
-#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
-#endif//YON_HIDE_CONSOLE
+//#ifdef YON_HIDE_CONSOLE
+//#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
+//#endif//YON_HIDE_CONSOLE
 
 #include "framework.h"
 

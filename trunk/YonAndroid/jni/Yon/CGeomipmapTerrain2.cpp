@@ -371,9 +371,6 @@ namespace terrain{
 
 	void CGeomipmapTerrain2::render(video::IVideoDriver* driver)
 	{
-		if(m_bVisible==false)
-			return;
-
 		//scale分量会影响到这里，最终导致preRenderLODCalculations计算错误
 		//driver->setTransform(video::ENUM_TRANSFORM_WORLD, getAbsoluteTransformation());
 		driver->setTransform(video::ENUM_TRANSFORM_WORLD, core::IDENTITY_MATRIX);

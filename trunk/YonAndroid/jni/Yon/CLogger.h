@@ -21,6 +21,7 @@ namespace yon{
 		//互斥变量
 		#ifdef YON_COMPILE_WITH_WIN32
 			CRITICAL_SECTION	m_mutex;
+			HANDLE m_consolehwnd; //控制台句柄
 		#else
 			pthread_mutex_t		m_mutex;
 		#endif

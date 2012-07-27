@@ -682,6 +682,14 @@
 					Name="water"
 					>
 					<File
+						RelativePath=".\CWaterModel.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\CWaterModel.h"
+						>
+					</File>
+					<File
 						RelativePath="..\include\IWaterModel.h"
 						>
 					</File>
