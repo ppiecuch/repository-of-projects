@@ -5,7 +5,10 @@
 #include <sys/timeb.h>
 #include "IDebugPrinter.h"
 
-#ifdef YON_COMPILE_WITH_ANDROID
+#ifdef YON_COMPILE_WITH_WIN32
+#define FOREGROUND_WHITE FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE
+#define FOREGROUND_YELLOW FOREGROUND_RED|FOREGROUND_GREEN
+#elif defined(YON_COMPILE_WITH_ANDROID)
 #include <android/log.h>
 #endif
 
@@ -38,6 +41,7 @@ namespace yon{
 #endif
 		{
 #ifdef YON_COMPILE_WITH_WIN32
+				m_consolehwnd = GetStdHandle(STD_OUTPUT_HANDLE); //实例化句柄
 				InitializeCriticalSection(&m_mutex);
 #else
 				pthread_mutex_init(&m_mutex,NULL);
@@ -241,6 +245,21 @@ namespace yon{
 			}
 			if(m_appender&MASK_APPENDER_CONSOLE){
 #ifdef YON_COMPILE_WITH_WIN32
+				switch(level)
+				{
+				case ENUM_LOG_LEVEL_DEBUG:
+					SetConsoleTextAttribute(m_consolehwnd, FOREGROUND_WHITE);//设置字体颜色
+					break;
+				case ENUM_LOG_LEVEL_INFO:
+					SetConsoleTextAttribute(m_consolehwnd, FOREGROUND_GREEN);//设置字体颜色
+					break;
+				case ENUM_LOG_LEVEL_WARN:
+					SetConsoleTextAttribute(m_consolehwnd, FOREGROUND_YELLOW);//设置字体颜色
+					break;
+				case ENUM_LOG_LEVEL_ERROR:
+					SetConsoleTextAttribute(m_consolehwnd, FOREGROUND_RED);//设置字体颜色
+					break;
+				}
 				printf("%s",m_buffer);
 #elif defined(YON_COMPILE_WITH_ANDROID)
 				switch(level)
@@ -290,3 +309,8 @@ namespace yon{
 		}
 	}//debug
 }//yon
+
+#ifdef YON_COMPILE_WITH_WIN32
+#undef FOREGROUND_WHITE
+#undef FOREGROUND_YELLOW
+#endif

@@ -7,7 +7,9 @@
 #include "CGeomipmapTerrain.h"
 #include "CGeomipmapTerrain2.h"
 #include "CAnimatorCameraFPS.h"
+#include "CAnimatorUV.h"
 #include "CSkyBox.h"
+#include "CWaterModel.h"
 
 #include "ILogger.h"
 
@@ -64,6 +66,19 @@ namespace scene{
 			//terrain::ITerrainModel* model=new terrain::CGeomipmapTerrain(parent,pos,rot,scale);
 			terrain::ITerrainModel* model=new terrain::CGeomipmapTerrain2(parent,pos,rot,scale);
 			model->drop();
+			return model;
+	}
+
+	water::IWaterModel* CSceneManager::addWaterModel(s32 xsize,s32 zsize, IModel* parent,const core::vector3df& pos,
+		const core::vector3df& rot,const core::vector3df& scale){
+			if(parent==NULL)
+				parent=this;
+			water::IWaterModel* model=new water::CWaterModel(parent,xsize,zsize,pos,rot,scale);
+			model->drop();
+
+			animator::IAnimator* anim=new animator::CAnimatorUV(0,0,core::vector3df(0.1f,0.0f,0.1f));
+			model->addAnimator(anim);
+			anim->drop();
 			return model;
 	}
 

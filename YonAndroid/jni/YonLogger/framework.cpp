@@ -57,18 +57,21 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300)); 
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300)); 
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/");
+	fs->addWorkingDirectory("../media/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->setWorkingDirectory("media/");
+	fs->addWorkingDirectory("media/");
 #endif
 
-	
+	Logger->debug("debug\r\n");
+	Logger->info("info\r\n");
+	Logger->warn("warn\r\n");
+	Logger->error("error\r\n");
 
 	return true;
 }

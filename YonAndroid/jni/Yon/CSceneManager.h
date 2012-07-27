@@ -84,6 +84,9 @@ namespace yon{
 			virtual terrain::ITerrainModel* addTerrainModel(IModel* parent,const core::vector3df& pos,
 				const core::vector3df& rot,const core::vector3df& scale);
 
+			virtual water::IWaterModel* addWaterModel(s32 xsize,s32 zsize, IModel* parent,const core::vector3df& pos,
+				const core::vector3df& rot,const core::vector3df& scale);
+
 			virtual IModel* addSkyBoxModel(video::ITexture* front, video::ITexture* back, video::ITexture* left,
 				video::ITexture* right, video::ITexture* top, video::ITexture* bottom,IModel* parent);
 

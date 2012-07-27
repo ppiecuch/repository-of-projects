@@ -11,6 +11,7 @@ using namespace yon::video;
 using namespace yon::scene;
 using namespace yon::scene::camera;
 using namespace yon::scene::terrain;
+using namespace yon::scene::water;
 using namespace yon::scene::animator;
 using namespace yon::audio;
 

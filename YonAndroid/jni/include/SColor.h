@@ -79,8 +79,17 @@ namespace video{
 			:color(0){}
 
 		//[0,255]
-		SColor (u32 a, u32 r, u32 g, u32 b)
+		explicit SColor (u32 a, u32 r, u32 g, u32 b)
 			:color(((a & 0xff)<<24) | ((r & 0xff)<<16) | ((g & 0xff)<<8) | (b & 0xff)) {}
+
+		explicit SColor(f32 a, f32 r, f32 g, f32 b)
+		{
+				u32 aa=(u32)core::clamp((s32)a*255,0,255);
+				u32 rr=(u32)core::clamp((s32)r*255,0,255);
+				u32 gg=(u32)core::clamp((s32)g*255,0,255);
+				u32 bb=(u32)core::clamp((s32)b*255,0,255);
+				color=((aa & 0xff)<<24) | ((rr & 0xff)<<16) | ((gg & 0xff)<<8) | (bb & 0xff);
+		}
 
 		SColor(u32 clr)
 			: color(clr) {}
