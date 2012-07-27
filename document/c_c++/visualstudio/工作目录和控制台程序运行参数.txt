@@ -1,0 +1,24 @@
+VC6.0中： 
+
+“Project Setting→Debug→Working directory”处填写exe程序的工作目录。 
+
+在“Project Setting→Debug→Program argument”处填写main运行参数。 
+
+VC2005中： 
+
+在“项目属性→配置属性→调试→工作目录”处填写exe程序的工作目录。 
+
+在“项目属性→配置属性→调试→命令参数”处填写main运行参数。 
+
+
+
+默认的工作目录为ProjectDir，即*.dsp/*.vcproj所在目录。 
+
+通过编译器启动（Ctrl + F5）应用程序时，可以将所依赖的lib和dll库文件所在目录设为工作目录。应用程序执行期间，文件操作的默认路径为工作目录。 
+
+工作目录是指当前目录，GetCurrentDirectory()得到的路径；SetCurrentDirectory来改变。 
+
+运行目录是指exe所在路径，可通过GetModuleFileName()得到。
+
+
+http://liulinqi206.blog.163.com/blog/static/13460476620122231373674/
