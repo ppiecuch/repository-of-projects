@@ -59,6 +59,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SubWindow", "SubWindow\SubW
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noise", "Noise\Noise.vcproj", "{E43CBF2D-D582-475C-9D5B-B160CDC54934}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugColor", "DebugColor\DebugColor.vcproj", "{41FEC276-73E7-465E-97E7-56A5C58D1C2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -181,6 +183,10 @@ Global
 		{E43CBF2D-D582-475C-9D5B-B160CDC54934}.Debug|Win32.Build.0 = Debug|Win32
 		{E43CBF2D-D582-475C-9D5B-B160CDC54934}.Release|Win32.ActiveCfg = Release|Win32
 		{E43CBF2D-D582-475C-9D5B-B160CDC54934}.Release|Win32.Build.0 = Release|Win32
+		{41FEC276-73E7-465E-97E7-56A5C58D1C2B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{41FEC276-73E7-465E-97E7-56A5C58D1C2B}.Debug|Win32.Build.0 = Debug|Win32
+		{41FEC276-73E7-465E-97E7-56A5C58D1C2B}.Release|Win32.ActiveCfg = Release|Win32
+		{41FEC276-73E7-465E-97E7-56A5C58D1C2B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

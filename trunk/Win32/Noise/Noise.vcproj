@@ -177,6 +177,14 @@
 			RelativePath=".\noise.h"
 			>
 		</File>
+		<File
+			RelativePath=".\PerlinNoise.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\PerlinNoise.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
