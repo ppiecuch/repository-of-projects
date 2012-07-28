@@ -1,0 +1,33 @@
+1、 什么是Tangent space?
+
+Tangent space和world space，view space其实是同样的概念，均是代表三维坐标系。在这个坐标系中， X轴对应纹理坐标的U方向，沿着该轴纹理坐标U线性增大。Y轴对应纹理坐标的V方向，沿着该轴纹理坐标V线性增大。Z轴则是UXV，垂直于纹理平面。
+
+2、 为什么需要tangent space？
+
+在normal map等技术中，存储在texture中的值是基于tangent space的法线。因此，当我们sample这些texure中的法线进行光照计算时，必须要统一到同一坐标系下结果才正确，这时候就需要切线空间（就像是所有的local space都要统一到world space一个道理。
+
+那么为什么normal map里面存的法线信息是基于tangent space而不是基于local sapce呢？基于local space理论上是可以的，但是这样的normal map只能用于这一个模型，不同把这个normal map用于其他模型。比如说建模了一个人，并且生成了该模型基于local space的normal map，如果我们建模同样一个人，但是放的位置和角度和之前的不一样，那么之前的normal map就不可用了，因为local space并不一样。但如果我们normal map里存的是tangent space的normal的话，就不存在这个问题，因为办要模型一样，模型上每个点的tangent space就是一样的，所谓是以不变应万变。
+
+3、 怎样计算tangent space?
+
+假设三角形三个坐标点为P1(u1,v1)、P2(u2,v2)、P3(u3,v3)，假设切线空间的三个基为T，B,N(T为切线方向，也就是u方向,B为负法线方向,也就是v方向),其实T和B均在三角形所在的平面上。
+
+ P1*T =u1,P2*T=u2,P3*T=u3
+
+ P1*B=v1,P2*B=v2,P3*B=v3
+
+因为P1(u1,v1)、P2(u2,v2)、P3(u3,v3)均是已知的，因此可以解出T和B向量，由于N=TXB，因此便得到了该三角形的切线空间。
+
+ 
+
+在实际编程中，可以直接调D3D的函数由Mesh来生成切线空间，但是知其然，必尽更好些。
+
+（发现要通俗易懂地讲清楚一件事情好难，不仅要耐心，而且还要水平）
+
+ 
+
+大家可以参考” Iterative Parallax Mapping with Slope Information”这篇文章，讲得非常清楚，但它的TBN和我求的TBN有些区别，我的是local space到切线空间的TBN,
+
+ 
+
+http://www.cnblogs.com/cxrs/archive/2009/10/25/1589515.html

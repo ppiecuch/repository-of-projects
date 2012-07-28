@@ -1,0 +1,123 @@
+1、什么是Shadow Maping?
+      Shadow Mapping是由Lance Williams于1978年在一篇名为"Casting curved shadows on curved surfaces"的文章中提出的，这篇文章是ShadowMap技术之根源。其实原理很简单，如果光源和目标点之间的连线没有任何物体阻挡的话，则目标点没有在阴影中;如果有物体遮挡，则目标点处在阴影中。而ShadowMap，就是一张记录了每个象素处用于比较遮挡关系信息的Texture. 
+      产生这个ShadowTexture的方法很简单，以SpotLight为例，把3D Camera放到光源的位置，把DepthTest打开，渲染场景，在PixShader中把每个象素的深度信息或者光源和此象素的距离信息写到RenderTarget上,由于DepthTest是打开的，保证了最终写到RenderTarget上的均是物体上未处在阴影中的点的深度值，实质完全可以等效为最终的DepthBuffer。
+     得到这个ShowMap之后，如何最终生成阴影呢？在PixShader对每个pixel进行处理时，算出当前象素与灯当的距离Dc，与存在ShdowMap中的引像素的值Dz进行比较，如果Dc > Dz,则在阴影中，反之则被灯光照亮。
+2、Shadowmap之HLSL的实现
+    在Direct SDk中有ShadowMap的Sample，下面的Shader和Sample里面空全一样，只是加了一些注释便于理解。
+    (1)生成ShadowMap的VS和PS
+
+//-----------------------------------------------------------------------------
+// Vertex Shader: VertShadow
+void VertShadow( float4 Pos : POSITION,
+                 float3 Normal : NORMAL,
+                 out float4 oPos : POSITION,
+                 out float2 Depth : TEXCOORD0 )
+{
+    //从模型坐标系变换到观察坐标系
+    oPos = mul( Pos, g_mWorldView );
+   //进行投影变换
+   oPos = mul( oPos, g_mProj );
+   //把投影坐标系的ZW值赋给Depth，作为PixelShader中的输出，这里的Z还是齐次坐标，这里不直接输出Z/W，我的理解是让Z和W都在Rasterizer中进行线性插
+  //值，这样可以增加最终生成的ShadowMap的精度。
+    Depth.xy = oPos.zw;
+}
+//-----------------------------------------------------------------------------
+// Pixel Shader: PixShadow
+void PixShadow( float2 Depth : TEXCOORD0,
+                out float4 Color : COLOR )
+{
+    // 把 z / w的值作为Color值输出，写到RenderTarget上，此时的RT formate是D3DFMT_R32F
+   //把Z/W目的是把齐次坐标Z变换到三维空间的非齐次坐标，范围则是[-1,1]
+    Color = Depth.x / Depth.y;
+}
+
+(2)用ShadowMap生成Shadow
+
+//-----------------------------------------------------------------------------
+// Vertex Shader: VertScene
+// Desc: Process vertex for scene
+//-----------------------------------------------------------------------------
+void VertScene( float4 iPos : POSITION,
+                float3 iNormal : NORMAL,
+                float2 iTex : TEXCOORD0,
+                out float4 oPos : POSITION,
+                out float2 Tex : TEXCOORD0,
+                out float4 vPos : TEXCOORD1,
+                out float3 vNormal : TEXCOORD2,
+                out float4 vPosLight : TEXCOORD3 )
+{
+    vPos = mul( iPos, g_mWorldView );
+    oPos = mul( vPos, g_mProj );
+    vNormal = mul( iNormal, (float3x3)g_mWorldView );
+    Tex = iTex;
+    //把当前顶点位置变换到以光源为Camera的投影空间，
+    vPosLight = mul( vPos, g_mViewToLightProj );
+}
+
+ 
+
+
+//-----------------------------------------------------------------------------
+// Pixel Shader: PixScene
+// Desc: Process pixel (do per-pixel lighting) for enabled scene
+//-----------------------------------------------------------------------------
+float4 PixScene( float2 Tex : TEXCOORD0,
+                 float4 vPos : TEXCOORD1,
+                 float3 vNormal : TEXCOORD2,
+                 float4 vPosLight : TEXCOORD3 ) : COLOR
+{
+    float4 Diffuse;
+
+    // 计算光源到当前象素方向向量并单位化
+    float3 vLight = normalize( float3( vPos - g_vLightPos ) );
+
+    //  dot( vLight, g_vLightDir )为光源到当前象素方向向量和光的方向向量之间的夹角余旋值，由于是spotlight，因此必须要在spotlight可照射的范围内。因为角 
+    //度越小余旋值越大，因此这里是大于
+    if( dot( vLight, g_vLightDir ) > g_fCosTheta ) 
+    {
+        // Pixel is in lit area. Find out if it's
+        // in shadow using 2x2 percentage closest filtering
+
+        //从投影空间坐标转化为纹理空间坐标，也就是找到投影空间中的点和纹理空间中的点的对应关系
+       //除以w,xy坐标便处在(-1,1)的范围内，乘0.5加0.5，则变换到了(0,1)的范围，因texture space的u,v坐标是(0,1)的
+        float2 ShadowTexC = 0.5 * vPosLight.xy / vPosLight.w + float2( 0.5, 0.5 );
+       //在投影坐标系中，Y轴是向上的，而在纹理空间中Y轴向下，因此要作以下处理
+        ShadowTexC.y = 1.0f - ShadowTexC.y;
+
+        // 在texel space中对应的象素坐标
+        float2 texelpos = SMAP_SIZE * ShadowTexC;
+        
+        // 取得小数部分         
+        float2 lerps = frac( texelpos );
+
+        //这里使用的是2x2 percentage closest filtering,因此是采的邻近的四个点，判断它们是否在阴影中，
+        float sourcevals[4];
+        sourcevals[0] = (tex2D( g_samShadow, ShadowTexC ) + SHADOW_EPSILON < vPosLight.z / vPosLight.w)? 0.0f: 1.0f;  
+        sourcevals[1] = (tex2D( g_samShadow, ShadowTexC + float2(1.0/SMAP_SIZE, 0) ) + SHADOW_EPSILON < vPosLight.z / vPosLight.w)? 0.0f: 1.0f;  
+        sourcevals[2] = (tex2D( g_samShadow, ShadowTexC + float2(0, 1.0/SMAP_SIZE) ) + SHADOW_EPSILON < vPosLight.z / vPosLight.w)? 0.0f: 1.0f;  
+        sourcevals[3] = (tex2D( g_samShadow, ShadowTexC + float2(1.0/SMAP_SIZE, 1.0/SMAP_SIZE) ) + SHADOW_EPSILON < vPosLight.z / vPosLight.w)? 0.0f: 1.0f;  
+        
+        // 用lerps 
+        float LightAmount = lerp( lerp( sourcevals[0], sourcevals[1], lerps.x ),
+                                  lerp( sourcevals[2], sourcevals[3], lerps.x ),
+                                  lerps.y );
+        // 计算光照，如果完全在阴影中，则LightAmount为0，这里只计算了Diffuse color，没有高光
+        Diffuse = ( saturate( dot( -vLight, normalize( vNormal ) ) ) * LightAmount * ( 1 - g_vLightAmbient ) + g_vLightAmbient )
+                  * g_vMaterial;
+    } else
+    {
+        Diffuse = g_vLightAmbient * g_vMaterial;
+    }
+
+    return tex2D( g_samScene, Tex ) * Diffuse;
+}
+
+
+3、ShdowMap的优缺点
+    优点：简单，不需要知道场景中Object的Geometry,不需要Stencil Buffer，每个灯光只需多渲染一个Pass。
+    缺点：当ShadowMap分辨率不够高时，或灯光与物体隔得很近时，在边缘处会产生Aliasing，锯齿，因此，很多改进shadowMap的算法都围绕着如何消除锯齿作文章。
+4、ShadowMap的改进
+    关于ShadowMap的改进，又出了很多的paper和技术，比如：Percentage Shadow map,  使用bloom filter对ShadowMap进行模糊处理.以及siggraph 2002 中Marc Stamminger和 George Drettakis提出的Perspective Shadow map.以及Adaptive Shadow Map等等。
+
+    
+    http://www.cnblogs.com/cxrs/archive/2009/10/17/1585038.html
