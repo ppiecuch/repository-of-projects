@@ -36,6 +36,8 @@ namespace water{
 				v.texcoords.x=fu;
 				v.texcoords.y=fv;
 
+				v.color=color;
+
 				++fz;
 
 				fu+=1.0f;

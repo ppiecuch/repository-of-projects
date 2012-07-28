@@ -84,10 +84,10 @@ namespace video{
 
 		explicit SColor(f32 a, f32 r, f32 g, f32 b)
 		{
-				u32 aa=(u32)core::clamp((s32)a*255,0,255);
-				u32 rr=(u32)core::clamp((s32)r*255,0,255);
-				u32 gg=(u32)core::clamp((s32)g*255,0,255);
-				u32 bb=(u32)core::clamp((s32)b*255,0,255);
+				u32 aa=(u32)core::clamp((s32)(a*255),0,255);
+				u32 rr=(u32)core::clamp((s32)(r*255),0,255);
+				u32 gg=(u32)core::clamp((s32)(g*255),0,255);
+				u32 bb=(u32)core::clamp((s32)(b*255),0,255);
 				color=((aa & 0xff)<<24) | ((rr & 0xff)<<16) | ((gg & 0xff)<<8) | (bb & 0xff);
 		}
 
