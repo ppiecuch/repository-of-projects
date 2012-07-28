@@ -57,9 +57,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tri", "Tri\Tri.vcproj", "{8
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SubWindow", "SubWindow\SubWindow.vcproj", "{26F81683-A618-4934-A5D1-4E7A2CC32A20}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugColor", "DebugColor\DebugColor.vcproj", "{41FEC276-73E7-465E-97E7-56A5C58D1C2B}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noise", "Noise\Noise.vcproj", "{AA80BD2C-A4BB-404A-91A7-DE2B595927D9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noise", "Noise\Noise.vcproj", "{E43CBF2D-D582-475C-9D5B-B160CDC54934}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -179,14 +177,10 @@ Global
 		{26F81683-A618-4934-A5D1-4E7A2CC32A20}.Debug|Win32.Build.0 = Debug|Win32
 		{26F81683-A618-4934-A5D1-4E7A2CC32A20}.Release|Win32.ActiveCfg = Release|Win32
 		{26F81683-A618-4934-A5D1-4E7A2CC32A20}.Release|Win32.Build.0 = Release|Win32
-		{41FEC276-73E7-465E-97E7-56A5C58D1C2B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{41FEC276-73E7-465E-97E7-56A5C58D1C2B}.Debug|Win32.Build.0 = Debug|Win32
-		{41FEC276-73E7-465E-97E7-56A5C58D1C2B}.Release|Win32.ActiveCfg = Release|Win32
-		{41FEC276-73E7-465E-97E7-56A5C58D1C2B}.Release|Win32.Build.0 = Release|Win32
-		{AA80BD2C-A4BB-404A-91A7-DE2B595927D9}.Debug|Win32.ActiveCfg = Debug|Win32
-		{AA80BD2C-A4BB-404A-91A7-DE2B595927D9}.Debug|Win32.Build.0 = Debug|Win32
-		{AA80BD2C-A4BB-404A-91A7-DE2B595927D9}.Release|Win32.ActiveCfg = Release|Win32
-		{AA80BD2C-A4BB-404A-91A7-DE2B595927D9}.Release|Win32.Build.0 = Release|Win32
+		{E43CBF2D-D582-475C-9D5B-B160CDC54934}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E43CBF2D-D582-475C-9D5B-B160CDC54934}.Debug|Win32.Build.0 = Debug|Win32
+		{E43CBF2D-D582-475C-9D5B-B160CDC54934}.Release|Win32.ActiveCfg = Release|Win32
+		{E43CBF2D-D582-475C-9D5B-B160CDC54934}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
