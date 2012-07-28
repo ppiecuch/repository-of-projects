@@ -35,6 +35,10 @@ int main(int argc, char* argv[])
 {
 	EnableMemLeakCheck();
 
+	int i=1;
+	float a=0.5f*(i+1+i/2);
+	printf("%.2f\n",a);
+
 
 	char* str="OpenGL ES-CM 1.1";
 	printf("%.2f\n",superAtof(str,strlen(str)));
