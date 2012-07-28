@@ -76,7 +76,7 @@ namespace scene{
 			water::IWaterModel* model=new water::CWaterModel(parent,xsize,zsize,pos,rot,scale);
 			model->drop();
 
-			animator::IAnimator* anim=new animator::CAnimatorUV(0,0,core::vector3df(0.1f,0.0f,0.1f));
+			animator::IAnimator* anim=new animator::CAnimatorUV(0,0,core::vector3df(0.02f,0.0f,0.02f));
 			model->addAnimator(anim);
 			anim->drop();
 			return model;
