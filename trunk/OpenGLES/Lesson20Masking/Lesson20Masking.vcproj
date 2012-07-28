@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="GLSLShadowMapping"
-	ProjectGUID="{C484CA0F-B271-42F0-9806-A5CD3511F991}"
-	RootNamespace="GLSLShadowMapping"
+	Name="Lesson20Masking"
+	ProjectGUID="{8A7F1957-AD8E-47F5-917D-B79716307F50}"
+	RootNamespace="Lesson20Masking"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -21,7 +21,7 @@
 			OutputDirectory="$(SolutionDir)bin"
 			IntermediateDirectory="$(SolutionDir)obj\$(ProjectName)"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -62,7 +62,7 @@
 				Name="VCLinkerTool"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -166,15 +166,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\FragmentShader.frag"
-			>
-		</File>
-		<File
-			RelativePath=".\main.c"
-			>
-		</File>
-		<File
-			RelativePath=".\VertexShader.vert"
+			RelativePath=".\Lesson20.cpp"
 			>
 		</File>
 	</Files>

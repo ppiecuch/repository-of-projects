@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="GLSLShadowMapping"
-	ProjectGUID="{C484CA0F-B271-42F0-9806-A5CD3511F991}"
-	RootNamespace="GLSLShadowMapping"
+	Name="35Water2"
+	ProjectGUID="{4E4F27DC-A4AD-4952-A16C-225740BCF659}"
+	RootNamespace="My35Water2"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../JPEGLIB"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -166,7 +167,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\FragmentShader.frag"
+			RelativePath=".\alpha.jpg"
 			>
 		</File>
 		<File
@@ -174,7 +175,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\VertexShader.vert"
+			RelativePath=".\noise.c"
+			>
+		</File>
+		<File
+			RelativePath=".\noise.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Project1_private.h"
+			>
+		</File>
+		<File
+			RelativePath=".\reflection.jpg"
 			>
 		</File>
 	</Files>
