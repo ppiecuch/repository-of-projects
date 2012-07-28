@@ -1,0 +1,134 @@
+通用折射模拟(Generic Refraction Simulation)
+
+作者：Tiago Sousa
+本文版权归原作者所有，仅供个人学习使用，请勿转载，勿用于任何商业用途。
+由于本人水平有限，难免出错，不清楚的地方请大家以原著为准。欢迎大家和我多多交流。
+翻译：clayman
+Blog：http://blog.csdn.net/soilwork
+clayman_joe@yahoo.com.cn  
+          折射，当光线从一种介质传播到另一种介质时发生的光学现象，是事实计算机图形渲染中的挑战之一。虽然有很多实现反射的模拟的技术（比如平面反射贴图，立方反射贴图），而且这些技术在大多数情况下都工作的很好。但是，对于折射来说，就没有那么多比较好的技术来解决这个问题。本文介绍了一种把场景中非折射物体渲染为一张纹理，并且通过扰动纹理坐标来实现折射的技术。这个方法非常的高效，并且在大多数情况下都工作的很好。这里所介绍的技术就是Far Cry中，用来渲染水面，水蒸汽，瞄准镜等效果的方法。
+
+有几种模拟折射的方法：有些机遇预先渲染好的环境贴图，有些基于在运行时渲染的环境贴图。这些方法的缺点是需要额外的纹理储存空间，以及性能上的损失，特别是当环境中有多个折射平面，每个都需要不同环境贴图的情况。
+此外，当前渲染水面折射技术的问题之一就是需要使用两个pass：一个用来生成水面下几何体的反射贴图，一个用来渲染水面。这个方法效率很低，特别是在场景比较复杂的情况下。
+本文描述了用于解决这些问题的方法。我们先介绍基本的技术――使用当前的后备缓冲作为折射贴图，接下来添加纹理坐标扰动，从而模拟折射。这个方法可能会出现一些问题，因此，我们接下来讨论了如何对折射贴图中的物体进行遮罩（mask）。最后，我们演示了如何使用折射技术来模拟真实的水面，以及玻璃。
+ 
+19.1基本技术
+基本折射技术的第一步，就是跳过场景中所有会发生折射的物体，把场景渲染为一张纹理。我们将使用这张纹理来判断折射体之后的那些物体是可见的，并且在之后的pass中使用它。我们把这张纹理标记为S。
+第二步就是渲染折射体，对纹理坐标进行扰动，对纹理S进行查找，模拟折射。可以使用一张法线图N来实现扰动，其中，N中的红色和蓝色（XY）元素，被用于为纹理坐标添加微小位移。这个方法在shader中很容易实现：（1）对纹理N进行采样，（2）对XY元素进行微小的缩放（比如0.05），（3）把偏移量加到S的纹理坐标上。下面的shader展示了这个方法：
+half4 main(float2 bumpUV : TEXCOORD0,
+     float4 screenPos   : TEXCOORD1,
+     uniform sampler2D tex0,
+     uniform sampler2D tex1,
+     uniform float4 vScale) : COLOR
+{
+     //fetch bump texture, unpack from [0..1]to[-1,1]
+     half bumTex = 2.0 * tex2D(tex0, bumpUV.xy) - 1.0;
+     //displace texture coordinates
+     half2 newUV = (screenPos.xy/screenPos.w) + bumpTex.xy * vScale.xy;
+     //fetch refraction map
+     return tex2D(tex1, newUV);
+}
+ 
+19.2 折射遮罩（Refraction Mask）
+前面描述的基本技术在大多数情况下都工作的很好，但当有物体位于折射对象前方，并且凹凸扰动的尺寸很大时，可能会出现一些问题。位于折射对象之前的物体，也可能产生折射。
+产生这种效果的原因是场景中除了折射对象之外的所有物体，包括那些位于折射体前面的对象，都被渲染到了纹理S中，并且我们不加选择的就对其中所有像素都进行了扰动。这就导致我们的折射产生了“泄漏”。一种直接的解决方案就是减小扰动的数量，让这种效果变的不太明显。但是，很难为所有环境下选取一个合适的缩放值，同时，这种方案也限制了表面折射可能的凹凸程度。
+较好的解决方案是保证不对不正确的像素进行扰动。因此，我们在纹理S的alpha通道中，为所有折射体添加了一个遮罩，以保证所有纹理坐标扰动，只在屏幕上，折射体所覆盖的区域起作用。
+为了实现这个方法，需要对渲染进行一些修改：首先，确保纹理S的alpha通道已经被清除为白色，接下来，把用黑色把折射体渲染到alpha通道中。当渲染折射体时，使用储存在S alpha通道中的额外信息，来分辨哪些像素将会被处理。检查alpha是否为白色，如果是，我们就不对这个区域进行扰动。只有当alpha值为黑色时，才进行扰动。虽然获得的结果是不精确的——折射有可能让那些并不是刚好在折射体之后的物体变的可见――但在实践中，这个方法非常的高效。下面的代码实现了这个方法：
+half4 main( float2 bumpUV : TEXCOORD0,
+     float4 screenPos   : TEXCOORD1,
+     uniform sampler2D tex0,
+     uniform sampler2D tex1,
+     uniform float4 vScale) : COLOR
+{
+     //fetch bump texture
+     half4 bumpTex = 2.0 * tex2D(tex0, bumpUV.xy) - 1.0;
+     //compute projected texture coordinates
+     half2 vProj = (screenPos.xy / screenPos.w);
+     //fetch refraction map
+     half4 vRefrA = tex2D(tex1, vProj.xy + bumpTex.xy * vScale.xy);
+     half4 vrefrB = tex2d(tex1,vProj.xy);
+     return vRefrB * vRefra.w + vrefrA * (1-vRefrA.w);
+}
+这个方法解决了之前可能出现的问题，在大多数情况下都能很好的模拟折射。
+ 
+19.3 示例
+使用前面阐述的技术，可以实现很多有趣的效果。比如：使用法线图来动画纹理，或者改变纹理坐标。这一部分，我们将讨论一些具体的例子
+19.3.1水面模拟
+         使用这里介绍的技术模拟水面折射是想当高效的，因为当前的方法都需要使用额外的pass，把水下的物体再渲染一次，来产生折射贴图。这里，我们用一个pass就能渲染水面，因为额外需要的工作，就是把水平面渲染到纹理S的alpha通道中，作为折射遮罩/
+         在Far Cry里，我们使用了一张动画的凹凸纹理，效果相当好。在之后的实验中，我们使用了多个凹凸贴图层来模拟水面，并且根据菲涅耳对反射和折射进行混合，获得了更好的结果。
+         为了渲染水面，先用如前所述的方法渲染场景，并把水面渲染到后背缓冲中的alpha通道作为折射遮罩。接下来，把水面之上的物体翻转到水面下，生成水面的反射贴图。最后，没有必要再用一个pass生成一张折射贴图。
+         主要的纹理创建了之后，就可以渲染水面了。这里，我们使用了4个凹凸层。每层的的纹理坐标都在vertex shader中进行缩放，并且依次增加缩放值，这样才能生成低频到高频的水面波纹。为了模拟波纹的运动，我们还对纹理坐标进行了变换。下面的代码实现了这个方法：
+Fresnel Approximation Computaton for Water Rendering
+half Fresnel(half NdotL, half fresnelBias, half fresnelPow)
+{
+     half facing = (1.0 - NdotL);
+     return max(fresnelBias + (1.0 - fresnelBias) * pow(facing,fresnelPow), 0.0;
+}
+The Fragment Program for Refraction/Reflection water
+half4 main(float3 Eye: TEXCOORD0,
+     float4 Wave0 : TEXCOORD1,
+     float2 Wave1 : TEXCOORD2,
+     float2 Wave2 : TEXCOORD3,
+     float2 Wave3 : TEXCOORD4,
+     float4 ScreenPos: TEXCOORD5,
+     uniform sampler2D tex0,
+     uniform sampler2D tex1,
+     uniform sampler2D tex2) : COLOR
+{
+     half3 vEye = normalize(Eye);
+     //get bump layer
+     half3 vBumpTexA = tex2D(tex0, Wave0.xy).xyz;
+     half3 vBumpTexB = tex2D(tex0, Wave1.xy).xyz;
+     half3 vBumpTexC = tex2D(tex0, Wave2.xy).xyz;
+     half3 vBumpTexD = tex2D(tex0, Wave3.xy)xyz;
+    
+     //average bump layer
+     half3 vBumpTex = normalize(2.0 * (vBumpTexA.xyz + vBumpTexB.xyz+
+                                           vBumpTexC.xyz + vBumpTexD.xyz) - 4.0);
+     //apply individual bump scale for refraction and reflection
+     half3 vRefrBump = vBumpTex.xyz * half3(0.075,0.075,1.0);
+     half3 vReflBump = vBumptex.xyz * half3(0.02,0.02,1.0);
+    
+     //compute projected coordinates
+     half2 vProj = (ScreenPos.xy/ScreenPos.w);
+     half4 vReflection = tex2D(tex2, vProj.xy + vReflBump.xy);
+     half4 vRefrA = tex2D(tex1, vProj.xy + vRefrBump.xy);
+     half4 vRefrB = tex2D(tex1, vProj.xy);
+    
+     //Mask occluders from refracion map
+     half4 vRefraction = vRefrB * vRefrA.w + vRefrA * (1-vRefrA.w);
+    
+     //compute fresnel term
+     half NdotL = max(dot(vEye, vReflBump),0);
+     half facing = (1.0 - NdotL);
+     half fresnel = Fresnel(NdotL, 0.2, 5.0);
+    
+     //use distance to lerp between refraction and deep water color
+     half fDistScale = saturate(10.0/Wave0,w);
+     half3 WaterDeepColor = (vRefraction.xyz * fDistScale +
+                               (1 - fDistScale) * half3(0,0.15,0.115);
+    
+     //lerp between water color and deep water color
+     half3 WaterColor = half3(0, 0.15,0.115);
+     half3 waterColor = (WaterColor * facing + WaterDeepColor * ( 1.0 - facing);
+     half3 cReflect = fresnel * vReflection;
+    
+     //final water = reflection_color * fresnel + water_color
+     return half4(cReflect + waterColor, 1);
+}
+ 
+
+
+点击这里下载完整代码
+
+
+=======================================邪恶的分割线＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+
+       本来还有一小节关于玻璃模拟的例子，因为原理和模拟水面差不多，就没有再翻了,呵呵。
+       最近变懒了，每天下班，吃了饭，打阵wow就睡，导致Direct3D后面的部分一直没有弄出来。成都好热啊，唉，想回家了～～～
+        哈哈，买了《ShaderX 4》和《The COMPLETE Effect and HLSL Guide》，不过可能要下个月才能寄过来，保佑这次邮递员能看懂e文，不要又弄错了-_-#
+       最近MDX方面好像都没什么动静，8月的DX SDK出来了，依然没有多大变化，期待XNA Framwork的出现。
+       在学OpenGL，习惯了对象技术，一下子看这种全部以函数形式组织的API，感觉好混乱。而且OpenGL1.1以上的函数还不能直接调用，实在是麻烦。
+       
+       
+       http://blog.csdn.net/soilwork/article/details/1046095
