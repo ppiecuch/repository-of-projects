@@ -1,0 +1,37 @@
+ Nvidia和ATI都有相应的工具把Heightmap转成NormalMap,有了NormalMap，我们就可以用NormalMapping技术进行Per Pixel Lighting计算了。那么HeightMap是怎么转化成NormalMap的呢？ 
+      其实并不难，在《3D游戏与计算机图形学方法》中，提供了一种由高度图生成法向图的方法。其思想是根据高度图中的象素与其周围象素的高度差，在切空间构造S向量和T向量，由SXT得到法线向量。 
+设H(i,j)表示在height map上(i,j)象素点的高度值，则在切线空间S和T方向的切向量可以表示成：
+S(i,j) = (1,0,H(i+1,j) - H(i-1,j) ) 
+T(i,j) = (0,1,H(i,j+1) - H(i,j-1) ) 
+Normal(i,j) = S(i,j) X T(i,j) 
+H(i+1,j) – H(i-1,j)为沿S方向的高度差，也就是S方向的坡度，H(i,j+1) - H(i,j-1)为沿T方向的高度差，也就是T方向的坡度。当相邻象素高度差为0时，则算出的Normal(i,j) = (0,0,1)，表示法线垂直于平面，当有高度差时，法线就会分别朝S方向或T方向偏移。
+ 
+   用shader来实现也很简单，VS和PS代码如下，上边左图为HeightMap，右图为由下面shader生成的NormalMap,这个方法生成的NormalMap并不够好，在RenderMonkey中有一个叫NormalmapFilter的Sample，会生成更高质理的NormalMap，有兴趣的朋友可以参考。 
+VS_OUTPUT main(float4 Pos: POSITION){ 
+   VS_OUTPUT Out; 
+   // Clean up inaccuracies 
+   Pos.xy = sign(Pos.xy); 
+   Out.Pos = float4(Pos.xy, 0, 1); 
+   // Image-space 
+   Out.texCoord.x = 0.5 * (1 + Pos.x); 
+   Out.texCoord.y = 0.5 * (1 - Pos.y); 
+   return Out; 
+} 
+  
+float4 main(float2 texCoord: TEXCOORD) : COLOR { 
+   float2 off = 1.0 / HeightMapSize; 
+   float Scale = 1; 
+   // Sample teh neighbor 
+   float s0 = tex2D(Heightmap, texCoord + float2(-off.x,0)).r; 
+   float s1 = tex2D(Heightmap, texCoord + float2( off.x,0)).r; 
+   float s2 = tex2D(Heightmap, texCoord + float2( 0,-off.y)).r; 
+   float s3 = tex2D(Heightmap, texCoord + float2(0,off.y)).r; 
+   float3 U = float3(1,0,s1 - s0); 
+   float3 V = float3(0,1,s3 - s2); 
+   float3 normal = normalize(Scale * cross(U,V)); 
+   // Pack [-1, 1] into [0, 1] 
+   return float4(normal * 0.5 + 0.5,1); 
+} 
+  
+  
+  http://www.cnblogs.com/cxrs/archive/2009/11/01/1594155.html

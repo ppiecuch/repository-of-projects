@@ -1,0 +1,148 @@
+法线，切线和副法线构成了所谓的切线空间（tangnet space），在Bump Mapping中，法线纹理中存储的法线值就是在切线空间内的。
+
+从网上找了一段求切线和副法线的代码.
+根据三个顶点的位置坐标和纹理坐标求面的副法线和正切
+ 1//let P = v1 - v0
+ 2D3DXVECTOR3 P = v1.pos - v0.pos;
+ 3//let Q = v2 - v0
+ 4D3DXVECTOR3 Q = v2.pos - v0.pos;
+ 5float s1 = v1.s - v0.s;
+ 6float t1 = v1.t - v0.t;
+ 7float s2 = v2.s - v0.s;
+ 8float t2 = v2.t - v0.t; 
+ 9
+10//we need to solve the equation
+11// P = s1*T + t1*B
+12// Q = s2*T + t2*B
+13// for T and B
+14
+15
+16//this is a linear system with six unknowns and six equatinos, for TxTyTz BxByBz
+17//[px,py,pz] = [s1,t1] * [Tx,Ty,Tz]
+18// qx,qy,qz     s2,t2     Bx,By,Bz
+19
+20//multiplying both sides by the inverse of the s,t matrix gives
+21//[Tx,Ty,Tz] = 1/(s1t2-s2t1) *  [t2,-t1] * [px,py,pz]
+22// Bx,By,Bz                      -s2,s1     qx,qy,qz  
+23
+24//solve this for the unormalized T and B to get from tangent to object space
+25
+26
+27float tmp = 0.0f;
+28if(fabsf(s1*t2 - s2*t1) <= 0.0001f)
+29{
+30    tmp = 1.0f;
+31}
+32else
+33{
+34    tmp = 1.0f/(s1*t2 - s2*t1 );
+35}
+36
+37tangent.x = (t2*P.x - t1*Q.x);
+38tangent.y = (t2*P.y - t1*Q.y);
+39tangent.z  = (t2*P.z - t1*Q.z);
+40
+41tangent = tmp * tangent;
+42
+43binormal.x = (s1*Q.x - s2*P.x);
+44binormal.y = (s1*Q.y - s2*P.y);
+45binormal.z = (s1*Q.z - s2*P.z);
+46
+47binormal = tmp * binormal;
+根据Maya里面的资料写了一个求取tangent的函数，输入为3个顶点的位置，法线和纹理坐标，输出是切线值，副法线可以由切线和法线叉乘得到。
+inline bool floatEqual(float a, float b)
+{
+    return abs(a-b) < 0.00001f;
+}
+
+HRESULT ComputerTangent(D3DXVECTOR3 position[3], D3DXVECTOR3 normal[3], D3DXVECTOR2 texcoord[3],D3DXVECTOR3 oTangent[3])
+{
+    D3DXVECTOR3 edge1;
+    D3DXVECTOR3 edge2;
+    D3DXVECTOR3 crossP;
+
+     //==============================================
+    // x, s, t
+    // S & T vectors get used several times in this vector,
+    // but are only computed once.
+    //==============================================
+    edge1.x = position[1].x - position[0].x;
+    edge1.y = texcoord[1].x - texcoord[0].x;// s-vector - don't need to compute this multiple times
+    edge1.z = texcoord[1].y - texcoord[0].y;// t-vector
+
+    edge2.x = position[2].x - position[0].x;
+    edge2.y = texcoord[2].x - texcoord[0].x;// another s-vector
+    edge2.z = texcoord[2].y - texcoord[0].y;// another t-vector
+
+    D3DXVec3Cross(&crossP,&edge1,&edge2);
+    D3DXVec3Normalize(&crossP,&crossP);
+
+    bool degnerateUVTangentPlane = floatEqual(crossP.x, 0.0f);
+    if(degnerateUVTangentPlane)
+        crossP.x = 1.0f;
+
+    float tanX = -crossP.y / crossP.x;
+
+    oTangent[0].x = tanX;
+    oTangent[1].x = tanX;
+    oTangent[2].x = tanX;
+
+    //--------------------------------------------------------
+    // y, s, t
+    //--------------------------------------------------------
+    edge1.x = position[1].y - position[0].y;
+
+    edge2.x = position[2].y - position[0].y;
+    edge2.y = texcoord[2].x - texcoord[0].x;// another s-vector
+    edge2.z = texcoord[2].y - texcoord[0].y;// another t-vector
+
+    D3DXVec3Cross(&crossP,&edge1,&edge2);
+    D3DXVec3Normalize(&crossP,&crossP);
+
+    degnerateUVTangentPlane = floatEqual(crossP.x, 0.0f);
+    if(degnerateUVTangentPlane)
+        crossP.x = 1.0f;
+
+    float tanY = -crossP.y / crossP.x;
+
+    oTangent[0].y = tanY;
+    oTangent[1].y = tanY;
+    oTangent[2].y = tanY;
+
+     //------------------------------------------------------
+    // z, s, t
+    //------------------------------------------------------
+    edge1.x = position[1].z - position[0].z;
+
+    edge2.x = position[2].z - position[0].z;
+    edge2.y = texcoord[2].x - texcoord[0].x;// another s-vector
+    edge2.z = texcoord[2].y - texcoord[0].y;// another t-vector
+
+    D3DXVec3Cross(&crossP,&edge1,&edge2);
+    D3DXVec3Normalize(&crossP,&crossP);
+
+    degnerateUVTangentPlane = floatEqual(crossP.x, 0.0f);
+    if(degnerateUVTangentPlane)
+        crossP.x = 1.0f;
+
+    float tanZ = -crossP.y / crossP.x;
+
+    oTangent[0].z = tanZ;
+    oTangent[1].z = tanZ;
+    oTangent[2].z = tanZ;
+
+    //------------------------------------------------------
+    for( int i = 0; i < 3; i++)
+    {
+        // Ortho-normalize to normal
+        float dot = D3DXVec3Dot(&oTangent[i],&normal[i]);
+        oTangent[i] -= normal[i] * dot;
+
+        // Normalize tangents
+        D3DXVec3Normalize(&oTangent[i],&oTangent[i]);
+    }
+
+    return S_OK;
+}
+
+http://www.cppblog.com/lucky420/archive/2007/06/11/18184.html

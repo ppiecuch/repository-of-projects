@@ -1,0 +1,64 @@
+#include <memory>
+#include <iostream>
+
+using namespace std;
+
+template <class T>
+
+class Singleton
+{
+public:
+     static inline T* instance()
+    {
+        if( 0== _instance.get())
+       {
+           _instance.reset ( new T);
+       }
+       return _instance.get();
+ };
+private:
+     Singleton(void){};
+     ~Singleton(void){};
+     Singleton(const Singleton&){};
+     Singleton & operator= (const Singleton &){};
+     static auto_ptr<T> _instance;
+};
+
+#define DECLARE_SINGLETON_CLASS(type) \
+friend class auto_ptr<type>;\
+friend class Singleton<type>;
+
+#define IMPLEMENT_SINGLETON_CLASS(type)\
+auto_ptr<type> Singleton<type>::_instance;
+
+
+class TestSingleton
+{
+public:
+     void Run()
+     {
+      //do some thing
+     }
+private:
+     TestSingleton(void){}
+     virtual ~TestSingleton(void){}
+     DECLARE_SINGLETON_CLASS(TestSingleton);
+};
+IMPLEMENT_SINGLETON_CLASS(TestSingleton);
+
+ 
+
+ 
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+     Singleton<TestSingleton>::instance()->Run();
+     return 0;
+}
+
+ 
+
+
+
+http://www.cnblogs.com/cxrs/archive/2009/11/17/1604906.html
