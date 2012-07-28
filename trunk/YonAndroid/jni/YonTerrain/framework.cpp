@@ -77,7 +77,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
-	fs->addWorkingDirectory("../media\\skybox\\4");
+	fs->addWorkingDirectory("../media\\skybox\\5");
 	fs->addWorkingDirectory("../media/terrain/1");
 	fs->addWorkingDirectory("../media/water/2");
 #elif defined(YON_COMPILE_WITH_ANDROID)
