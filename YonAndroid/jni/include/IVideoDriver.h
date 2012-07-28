@@ -119,6 +119,9 @@ namespace yon{
 			io::IFileSystem* getFileSystem() const{
 				return m_pFileSystem;
 			}
+			ITimer* getTimer() const{
+				return m_pTimer;
+			}
 
 			void registerResizable(core::IResizable* p){
 				m_resizables.push_back(p);

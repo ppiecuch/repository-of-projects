@@ -77,7 +77,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
-	fs->addWorkingDirectory("../media\\skybox\\5");
+	fs->addWorkingDirectory("../media\\skybox\\6");
 	fs->addWorkingDirectory("../media/terrain/1");
 	fs->addWorkingDirectory("../media/water/2");
 #elif defined(YON_COMPILE_WITH_ANDROID)
@@ -145,7 +145,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	image->drop();
 
 	waterModel=sceneMgr->addWaterModel(20,20);
-	waterModel->setScale(core::vector3df(100,1,100));
+	waterModel->setScale(core::vector3df(80,3,80));
 	waterModel->setPosition(core::vector3df(0,20,0));
 	material=waterModel->getMaterial(0);
 	material->setTexture(0,videoDriver->getTexture("caustic.png"));
