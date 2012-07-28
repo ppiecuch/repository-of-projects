@@ -144,9 +144,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material->setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);
 	image->drop();
 
-	waterModel=sceneMgr->addWaterModel(20,20);
-	waterModel->setScale(core::vector3df(80,3,80));
-	waterModel->setPosition(core::vector3df(0,20,0));
+	waterModel=sceneMgr->addWaterModel(60,70);
+	waterModel->setScale(core::vector3df(8,1,8));
+	waterModel->setPosition(core::vector3df(80,20,50));
 	material=waterModel->getMaterial(0);
 	material->setTexture(0,videoDriver->getTexture("caustic.png"));
 	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
