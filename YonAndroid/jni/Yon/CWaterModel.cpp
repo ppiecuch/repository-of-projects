@@ -420,7 +420,8 @@ namespace water{
 			for(s32 z = 0; z<=m_iWidth; ++z)
 			{
 				SVertex& v=m_shap.getVertexArray()[index++];
-				f32 ctime=driver->getTimer()->getTime()/1300.f;
+				
+				f32 ctime=driver->getTimer()->getTime()/1000.f;
 				//f32 ctime=driver->getTimer()->getTime()/1000.f;
 				//ctime=ctime-lasttime;
 #ifdef MOD
@@ -428,9 +429,10 @@ namespace water{
 #else
 				//v.pos.y=PerlinNoise_2D(fx+ctime,fz+ctime)/10.f+sinf(ctime+fx+fz)/2.f;
 				f32 f1=noise(sqrt((float)(x*x+z*z))/5.f+ctime,0,0);
-				f32 f2=noise(0,sqrt((float)((m_iHeight-x)*(m_iHeight-x)+(m_iWidth-z)*(m_iWidth-z)))/7.f+ctime,0);
-				f32 f3=noise(0,0,sqrt((float)((m_iHeight-x)*(m_iHeight-x)+z*z))/3.f+ctime);
+				f32 f2=noise(sqrt((float)((m_iHeight-x)*(m_iHeight-x)+(m_iWidth-z)*(m_iWidth-z)))/7.f+ctime,0,0);
+				f32 f3=noise(sqrt((float)((m_iHeight-x)*(m_iHeight-x)+z*z))/3.f+ctime,0,0);
 				v.pos.y=(f1+f2+f3)*3;
+				//v.pos.y=noise(sqrt((float)(x*x+z*z))/5.f+ctime,sqrt((float)((m_iHeight-x)*(m_iHeight-x)+(m_iWidth-z)*(m_iWidth-z)))/7.f+ctime,sqrt((float)((m_iHeight-x)*(m_iHeight-x)+z*z))/3.f+ctime)*3;
 #endif
 				//Logger->debug("%.2f,%.2f\r\n",ctime,v.pos.y);
 			}
