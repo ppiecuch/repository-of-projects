@@ -11,7 +11,8 @@ namespace camera{
 		recalculateViewMatrix();
 	}
 	void CPerspCamera::onRegisterForRender(){
-		if(m_pSceneManager->getActiveCamera()==this)
+		//if(m_pSceneManager->getActiveCamera()==this)
+		if(m_pSceneManager->getViewingCamera()==this)
 			m_pSceneManager->registerForRender(this,ENUM_SCENE_PASS_CAMERA);
 		IPerspCamera::onRegisterForRender();
 	}

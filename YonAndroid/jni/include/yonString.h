@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include "yonMath.h"
 #include "fastatof.h"
+#include "yonAllocator.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <wchar.h>
@@ -28,15 +29,16 @@ namespace yon{
 			return x >= 'a' && x <= 'z' ? x + ( 'A' - 'a' ) : x;
 		}
 		//capacity包含'\0',len不包含'\0'
-		template<class T>
+		template<class T, typename TAlloc = yonAllocator<T>>
 		class string{
 		public:
 			string():elements(NULL),capacity(1),len(0){
-				elements=new T[capacity];
+				//elements=new T[capacity];
+				elements=allocator.allocate(capacity);
 				//0x0对应的字符是'\0'；空格对应'\x20'；0x30对应数字0
 				elements[0]=0x0;
 			}
-			string(const string<T>& other):elements(NULL),capacity(0),len(0){
+			string(const string<T,TAlloc>& other):elements(NULL),capacity(0),len(0){
 				*this=other;
 			}
 
@@ -96,7 +98,8 @@ namespace yon{
 			}*/
 
 			~string(){
-				delete[] elements;
+				//delete[] elements;
+				allocator.deallocate(elements);
 			}
 
 			T& operator[](u32 i){
@@ -108,14 +111,15 @@ namespace yon{
 			}
 
 			template <class B>
-			string<T>& operator=(const B* const str)
+			string<T,TAlloc>& operator=(const B* const str)
 			{
 				if (!str)
 				{
 					if (!elements)
 					{
 						capacity = 1;
-						elements = new T[capacity];
+						//elements = new T[capacity];
+						elements=allocator.allocate(capacity);
 					}
 					len = 0;
 					elements[0] = 0x0;
@@ -138,27 +142,31 @@ namespace yon{
 				if (len>=capacity)
 				{
 					capacity = len+1;
-					elements = new T[capacity];
+					//elements = new T[capacity];
+					elements=allocator.allocate(capacity);
 				}
 
 				for (u32 i = 0; i<len; ++i)
 					elements[i] = (T)str[i];
 
 				if (oldArray != elements)
-					delete[] oldArray;
+					//delete[] oldArray;
+					allocator.deallocate(oldArray);
 
 				return *this;
 			}
 
-			string<T>& operator=(const string<T>& other){
+			string<T,TAlloc>& operator=(const string<T,TAlloc>& other){
 				if(this==&other)
 					return *this;
 
 				len=other.len;
 				if(len>=capacity){
-					delete[] elements;
+					//delete[] elements;
+					allocator.deallocate(elements);
 					capacity=len+1;
-					elements=new T[capacity];
+					//elements=new T[capacity];
+					elements=allocator.allocate(capacity);
 				}
 
 				for(u32 i=0;i<len;++i)
@@ -167,11 +175,12 @@ namespace yon{
 				return *this;
 			}
 
-			string<T>& operator=(const T* const other){
+			string<T,TAlloc>& operator=(const T* const other){
 				if(elements==NULL){
 					capacity=1;
 					len=0;
-					elements=new T[capacity];
+					//elements=new T[capacity];
+					elements=allocator.allocate(capacity);
 					elements[0]=0x0;
 				}
 				if(other==NULL){
@@ -207,7 +216,7 @@ namespace yon{
 			void operator+=(const double num){
 				*this+=core::string<T>(num);
 			}*/
-			void operator+=(const string<T>& other) {
+			void operator+=(const string<T,TAlloc>& other) {
 				u32 size=other.len+1;
 				if(len+size>capacity)
 					reallocate(len+size);
@@ -256,13 +265,13 @@ namespace yon{
 				str+=num;
 				return str;
 			}*/
-			string<T> operator+(const string<T>& other) const{
-				string<T> str(*this);
+			string<T,TAlloc> operator+(const string<T,TAlloc>& other) const{
+				string<T,TAlloc> str(*this);
 				str+=other;
 				return str;
 			}
-			string<T> operator+(const T* const other) const{
-				string<T> str(*this);
+			string<T,TAlloc> operator+(const T* const other) const{
+				string<T,TAlloc> str(*this);
 				str+=other;
 				return str;
 			}
@@ -271,7 +280,7 @@ namespace yon{
 				return !(*this == str);
 			}
 
-			bool operator !=(const string<T>& other) const
+			bool operator !=(const string<T,TAlloc>& other) const
 			{
 				return !(*this == other);
 			}
@@ -289,7 +298,7 @@ namespace yon{
 			}
 
 
-			bool operator ==(const string<T>& other) const
+			bool operator ==(const string<T,TAlloc>& other) const
 			{
 				for(u32 i=0; elements[i] && other.elements[i]; ++i)
 					if (elements[i] != other.elements[i])
@@ -299,7 +308,7 @@ namespace yon{
 			}
 
 			//! Is smaller comparator
-			bool operator <(const string<T>& other) const
+			bool operator <(const string<T,TAlloc>& other) const
 			{
 				for(u32 i=0; elements[i] && other.elements[i]; ++i)
 				{
@@ -318,7 +327,8 @@ namespace yon{
 			{
 				if(capacity>0)
 				{
-					delete[] elements;
+					//delete[] elements;
+					allocator.deallocate(elements);
 					capacity=len=0;
 				}
 
@@ -331,7 +341,8 @@ namespace yon{
 
 				len=length;
 				capacity = length+1;
-				elements = new T[capacity];
+				//elements = new T[capacity];
+				elements=allocator.allocate(capacity);
 
 				for (u32 l = 0; l<len; ++l)
 					elements[l] = (T)c[l];
@@ -356,7 +367,7 @@ namespace yon{
 
 			//! Appends a string to this string
 			/** \param other: String to append. */
-			void append(const string<T>& other)
+			void append(const string<T,TAlloc>& other)
 			{
 				u32 olen = other.length();
 
@@ -438,7 +449,7 @@ namespace yon{
 					if (elements[i] == toReplace)
 						elements[i] = replaceWith;
 			}
-			bool equalsSubstringIgnoreCase(const string<T>&other, const s32 fromIndex = 0 ) const
+			bool equalsSubstringIgnoreCase(const string<T,TAlloc>&other, const s32 fromIndex = 0 ) const
 			{
 				if ((u32)fromIndex>len)
 					return false;
@@ -449,15 +460,15 @@ namespace yon{
 						return false;
 				return elements[fromIndex + i] == 0 && other[i] == 0;
 			}
-			string<T> subString(u32 begin, s32 size) const
+			string<T,TAlloc> subString(u32 begin, s32 size) const
 			{
 				if ((size <= 0) || (begin>=length()))
-					return string<T>("");
+					return string<T,TAlloc>("");
 				// clamp length to maximal value
 				if ((size+begin) > length())
 					size = length()-begin;
 
-				string<T> o;
+				string<T,TAlloc> o;
 				o.reallocate(size);
 
 				for (s32 i=0; i<size; ++i)
@@ -468,10 +479,10 @@ namespace yon{
 
 				return o;
 			}
-			string<T> subString(u32 begin) const
+			string<T,TAlloc> subString(u32 begin) const
 			{
 				if (begin>=length())
-					return string<T>("");
+					return string<T,TAlloc>("");
 
 				u32 size=length()-begin;
 
@@ -550,17 +561,20 @@ namespace yon{
 			{
 				T* temp = elements;
 				capacity = length+1;
-				elements = new T[capacity];
+				//elements = new T[capacity];
+				elements=allocator.allocate(capacity);
 				u32 amount = len<length ? len+1 :length+1;
 				for (u32 i=0; i<amount; ++i)
 					elements[i] = temp[i];
 				if (length < len)
 					len = length;
-				delete[] temp;
+				//delete[] temp;
+				allocator.deallocate(temp);
 			}
 			T* elements;
 			u32 capacity;
 			u32 len;
+			TAlloc allocator;
 		};
 		typedef string<c8> stringc;
 		typedef string<wchar_t> stringw;

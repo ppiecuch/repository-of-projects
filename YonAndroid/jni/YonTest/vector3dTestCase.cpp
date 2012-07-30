@@ -4,7 +4,7 @@
 #include <sys/timeb.h>
 #include <time.h>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( vector3dTestCase );
+// /CPPUNIT_TEST_SUITE_REGISTRATION( vector3dTestCase );
 
 bool _isBetweenPoints(const vector3df& point,const vector3df& begin, const vector3df& end)
 {

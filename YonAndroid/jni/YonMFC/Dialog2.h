@@ -46,6 +46,13 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	HWND m_hWnd;
+
+	void setHWND(HWND hWnd)
+	{
+		m_hWnd=hWnd;
+	}
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 };

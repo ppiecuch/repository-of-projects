@@ -19,7 +19,9 @@ namespace scene{
 	CSceneManager::CSceneManager(ITimer* timer,platform::ICursorControl* cursorControl)
 		:m_geometryFactory(new CGeometryFactory()),
 		m_pAnimatorFactory(animator::createAnimatorFactory()),
-		m_activeCamera(NULL),m_renderingPass(ENUM_SCENE_PASS_NONE),m_cameraPosition(core::ORIGIN_VECTOR3DF),
+		//m_activeCamera(NULL),
+		m_pViewingCamera(NULL),m_pLogisticCamera(NULL),
+		m_renderingPass(ENUM_SCENE_PASS_NONE),m_cameraPosition(core::ORIGIN_VECTOR3DF),
 		IModel(NULL),m_pTimer(timer),m_pCursorControl(cursorControl)
 	{
 		m_pSceneManager=this;
@@ -43,9 +45,15 @@ namespace scene{
 			m_cameras[i]->drop();
 		}
 
-		if (m_activeCamera)
-			m_activeCamera->drop();
-		m_activeCamera = NULL;
+		//if (m_activeCamera)
+		//	m_activeCamera->drop();
+		//m_activeCamera = NULL;
+		if(m_pViewingCamera)
+			m_pViewingCamera->drop();
+		m_pViewingCamera=NULL;
+		if(m_pLogisticCamera)
+			m_pLogisticCamera->drop();
+		m_pLogisticCamera=NULL;
 
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release CSceneManager");
 	}
@@ -111,7 +119,8 @@ namespace scene{
 			}
 			m_cameras.push_back(camera);
 			if(makeActive){
-				setActiveCamera(camera);
+				//setActiveCamera(camera);
+				setViewingCamera(camera);
 			}
 			Logger->debug("CSceneManager::addCamera size:%d\n",m_cameras.size());
 			return camera;
@@ -124,7 +133,7 @@ namespace scene{
 		anim->drop();
 		return camera;
 	}
-	void CSceneManager::setActiveCamera(camera::ICamera* camera){
+	/*void CSceneManager::setActiveCamera(camera::ICamera* camera){
 		if(camera){
 			camera->grab();
 			camera->setNeedUpload();
@@ -133,6 +142,25 @@ namespace scene{
 			m_activeCamera->drop();
 		}
 		m_activeCamera=camera;
+	}*/
+	void CSceneManager::setViewingCamera(camera::ICamera* camera){
+		if(camera){
+			camera->grab();
+			camera->setNeedUpload();
+		}
+		if(m_pViewingCamera){
+			m_pViewingCamera->drop();
+		}
+		m_pViewingCamera=camera;
+	}
+	void CSceneManager::setLogisticCamera(camera::ICamera* camera){
+		if(camera){
+			camera->grab();
+		}
+		if(m_pLogisticCamera){
+			m_pLogisticCamera->drop();
+		}
+		m_pLogisticCamera=camera;
 	}
 
 	bool CSceneManager::registerForRender(IModel* model,ENUM_SCENE_PASS pass){
@@ -203,15 +231,18 @@ namespace scene{
 	}
 
 	void CSceneManager::render(video::IVideoDriver* driver){
-		YON_DEBUG_BREAK_IF(m_activeCamera==NULL);
+		//YON_DEBUG_BREAK_IF(m_activeCamera==NULL);
+		YON_DEBUG_BREAK_IF(m_pViewingCamera==NULL);
 
 		// do animations and other stuff.
 		onAnimate(m_pTimer->getTime());
 
 		u32 i;
 
-		m_activeCamera->render(driver);
-		m_cameraPosition=m_activeCamera->getAbsolutePosition();
+		//m_activeCamera->render(driver);
+		//m_cameraPosition=m_activeCamera->getAbsolutePosition();
+		m_pViewingCamera->render(driver);
+		m_cameraPosition=m_pViewingCamera->getAbsolutePosition();
 
 		//core::list<IModel*>::Iterator it = m_children.begin();
 		//for (; it != m_children.end(); ++it)
@@ -290,8 +321,11 @@ namespace scene{
 	bool CSceneManager::postEventFromUser(const event::SEvent& evt){
 		//TODO
 		//Logger->debug("%d,%d,%d,%d\n",evt.type,evt.mouseInput.type,evt.mouseInput.x,evt.mouseInput.y);
-		if(m_activeCamera)
-			return m_activeCamera->onEvent(evt);
+		//if(m_activeCamera)
+		//	return m_activeCamera->onEvent(evt);
+		//TODO是使用ViewCamera正确还是使用LogisticCamera正确有待进一步探查
+		if(m_pViewingCamera)
+			return m_pViewingCamera->onEvent(evt);
 		return false;
 	}
 

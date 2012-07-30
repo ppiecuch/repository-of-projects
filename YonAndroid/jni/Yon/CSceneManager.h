@@ -57,7 +57,9 @@ namespace yon{
 
 			ENUM_SCENE_PASS m_renderingPass;
 			core::vector3df m_cameraPosition;
-			camera::ICamera* m_activeCamera;
+			//camera::ICamera* m_activeCamera;
+			camera::ICamera* m_pViewingCamera;
+			camera::ICamera* m_pLogisticCamera;
 
 			//! render pass lists
 			core::array<camera::ICamera*> m_cameras;
@@ -68,6 +70,8 @@ namespace yon{
 
 			ITimer* m_pTimer;
 			platform::ICursorControl* m_pCursorControl;
+			IGeometryFactory* m_geometryFactory;
+			animator::IAnimatorFactory* m_pAnimatorFactory;
 		public:
 			CSceneManager(ITimer* timer,platform::ICursorControl* cursorControl);
 			virtual ~CSceneManager();
@@ -96,8 +100,13 @@ namespace yon{
 			virtual camera::ICamera* addCameraFPS(IModel* parent, f32 moveSpeed,f32 rotateSpeed, event::SKeyMap* keyMapArray,s32 keyMapSize,
 				const core::vector3df& pos,const core::vector3df& up,
 				const core::vector3df& lookat,bool makeActive);
-			virtual void setActiveCamera(camera::ICamera* camera);
-			virtual camera::ICamera* getActiveCamera() const{return m_activeCamera;}
+			//virtual void setActiveCamera(camera::ICamera* camera);
+			//virtual camera::ICamera* getActiveCamera() const{return m_activeCamera;}
+			virtual void setViewingCamera(camera::ICamera* camera);
+			virtual camera::ICamera* getViewingCamera() const{return m_pViewingCamera;}
+
+			virtual void setLogisticCamera(camera::ICamera* camera);
+			virtual camera::ICamera* getLogisticCamera() const{return m_pLogisticCamera;}
 
 			virtual bool registerForRender(IModel* model,ENUM_SCENE_PASS pass);
 
@@ -114,9 +123,6 @@ namespace yon{
 			virtual void onResize(const core::dimension2du& size);
 
 			virtual bool postEventFromUser(const event::SEvent& evt);
-		private:
-			IGeometryFactory* m_geometryFactory;
-			animator::IAnimatorFactory* m_pAnimatorFactory;
 		};
 	}
 }

@@ -11,6 +11,13 @@ namespace yon
 namespace core
 {
 
+#ifdef YON_CHECK_MEMORY
+#ifdef new
+#undef new
+#endif
+#define new YON_ORIGIN_NEW
+#endif
+
 //! Very simple allocator implementation, containers using it can be used across dll boundaries
 template<typename T>
 class yonAllocator
@@ -101,7 +108,12 @@ enum eAllocStrategy
 	ALLOC_STRATEGY_SQRT    = 2
 };
 
-
+#ifdef YON_CHECK_MEMORY
+#ifdef new
+#undef new
+#endif
+#define new YON_DEBUG_NEW
+#endif
 } // end namespace core
 } // end namespace yon
 
