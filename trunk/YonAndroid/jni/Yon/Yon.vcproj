@@ -519,6 +519,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\quadtree.h"
+					>
+				</File>
+				<File
 					RelativePath="..\include\SDynamicShap.h"
 					>
 				</File>

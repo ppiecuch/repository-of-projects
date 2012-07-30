@@ -195,7 +195,10 @@ namespace terrain{
 	{
 		bool change=false;
 
-		camera::ICamera* camera=m_pSceneManager->getActiveCamera();
+		//camera::ICamera* camera=m_pSceneManager->getActiveCamera();
+		camera::ICamera* camera=m_pSceneManager->getLogisticCamera();
+		if(camera==NULL)
+			camera=m_pSceneManager->getViewingCamera();
 		if(camera==NULL)
 			return change;
 
@@ -205,7 +208,7 @@ namespace terrain{
 		// Determine the camera rotation, based on the camera direction.
 		core::vector3df cameraPosition = camera->getAbsolutePosition();
 
-		const camera::IViewFrustum* frustum = m_pSceneManager->getActiveCamera()->getViewFrustum();
+		const camera::IViewFrustum* frustum = camera->getViewFrustum();
 
 		// Determine each patches LOD based on distance from camera (and whether or not they are in
 		// the view frustum).
@@ -393,6 +396,26 @@ namespace terrain{
 
 	f32 CGeomipmapTerrain2::getHeight(f32 x,f32 z) const{
 		//TODO
+		/*
+		//偏移系数[0-1]
+		const f32 dx = (x-m_vertices[0].Pos.X)/s_width;
+		const f32 dz = (z-m_vertices[0].Pos.Z)/s_height;
+
+		f32 height;
+		//TRACE("y[0-3]:%.2f,%.2f,%.2f,%.2f\r\n\r\n",m_vertices[0].Pos.Y,m_vertices[1].Pos.Y,m_vertices[2].Pos.Y,m_vertices[3].Pos.Y);
+		//如果点在右上角
+		if (dx > dz)
+		{
+			height = m_vertices[0].Pos.Y + (m_vertices[2].Pos.Y - m_vertices[1].Pos.Y)*dz + (m_vertices[1].Pos.Y - m_vertices[0].Pos.Y)*dx;
+			//TRACE("dx>dz==>>x:%.2f,z:%.2f,dx:%.2f,dz:%.2f->height:%.2f\r\n\r\n",x,z,dx,dz,height);
+		}
+		else
+		{
+			height = m_vertices[0].Pos.Y + (m_vertices[2].Pos.Y - m_vertices[3].Pos.Y)*dx + (m_vertices[3].Pos.Y - m_vertices[0].Pos.Y)*dz;
+			//TRACE("dx<=dz==>>x:%.2f,z:%.2f,dx:%.2f,dz:%.2f->height:%.2f\r\n\r\n",x,z,dx,dz,height);
+		}
+		return height;
+		*/
 		return 0;
 	}
 }

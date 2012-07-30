@@ -5,10 +5,9 @@
 #include "YonMFC.h"
 #include "YonMFCDlg.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
+//#ifdef _DEBUG
+//#define new DEBUG_NEW
+//#endif
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -100,6 +99,7 @@ BOOL CYonMFCDlg::OnInitDialog()
 	GetDlgItem(IDC_STATIC1)->GetWindowRect(&renderRect1);
 	TRACE("%d,%d,%d,%d\r\n",renderRect1.top,renderRect1.bottom,renderRect1.left,renderRect1.right);
 	ScreenToClient(&renderRect1);
+	m_dlg1.setHWND(GetDlgItem(IDC_STATIC1)->GetSafeHwnd());
 	m_dlg1.Create(IDD_DIALOG1,this);
 	m_dlg1.MoveWindow(renderRect1);
 	m_dlg1.ShowWindow(SW_SHOW);
@@ -108,6 +108,7 @@ BOOL CYonMFCDlg::OnInitDialog()
 	GetDlgItem(IDC_STATIC2)->GetWindowRect(&renderRect2);
 	TRACE("%d,%d,%d,%d\r\n",renderRect2.top,renderRect2.bottom,renderRect2.left,renderRect2.right);
 	ScreenToClient(&renderRect2);
+	m_dlg2.setHWND(GetDlgItem(IDC_STATIC2)->GetSafeHwnd());
 	m_dlg2.Create(IDD_DIALOG2,this);
 	m_dlg2.MoveWindow(renderRect2);
 	m_dlg2.ShowWindow(SW_SHOW);

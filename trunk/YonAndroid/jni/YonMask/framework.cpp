@@ -153,7 +153,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	aniParam.animatorUV.stage=0;
 	aniParam.animatorUV.translate.u=0;
 	aniParam.animatorUV.translate.w=0;
-	aniParam.animatorUV.translate.v=-0.005f;
+	aniParam.animatorUV.translate.v=-0.05f;
 	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
 	waterfallModel->addAnimator(uvAnimator);
 	uvAnimator->drop();

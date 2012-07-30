@@ -1,7 +1,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "yonListTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( yonListTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( yonListTestCase );
 
 void yonListTestCase::setUp()
 {

@@ -185,7 +185,10 @@ namespace terrain{
 	{
 		bool change=false;
 
-		camera::ICamera* camera=m_pSceneManager->getActiveCamera();
+		//camera::ICamera* camera=m_pSceneManager->getActiveCamera();
+		camera::ICamera* camera=m_pSceneManager->getLogisticCamera();
+		if(camera==NULL)
+			camera=m_pSceneManager->getViewingCamera();
 		if(camera==NULL)
 			return change;
 

@@ -52,6 +52,14 @@
 //class YON_DEPRECATED object{...}
 #define YON_DEPRECATED __declspec(deprecated)
 
+//内存泄漏检测
+#if defined(YON_COMPILE_WITH_WIN32)&&defined(_DEBUG)&&!defined(_AFX)||defined(ENFORCE_CHECK_MEMORY)
+#include <crtdbg.h>
+#define YON_CHECK_MEMORY
+#define YON_ORIGIN_NEW new
+#define YON_DEBUG_NEW new(_CLIENT_BLOCK, __FILE__, __LINE__)
+#endif
+
 //材质（目前只支持一层）
 #define YON_MATERIAL_MAX_TEXTURES 2
 

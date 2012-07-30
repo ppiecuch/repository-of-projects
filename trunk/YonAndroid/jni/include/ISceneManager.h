@@ -64,8 +64,13 @@ namespace scene{
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,100),
 			bool makeActive=true) = 0;
-		virtual void setActiveCamera(camera::ICamera* camera) = 0;
-		virtual camera::ICamera* getActiveCamera() const = 0;
+		//virtual void setActiveCamera(camera::ICamera* camera) = 0;
+		//virtual camera::ICamera* getActiveCamera() const = 0;
+		virtual void setViewingCamera(camera::ICamera* camera) = 0;
+		virtual camera::ICamera* getViewingCamera() const = 0;
+
+		virtual void setLogisticCamera(camera::ICamera* camera) = 0;
+		virtual camera::ICamera* getLogisticCamera() const = 0;
 			
 		virtual IGeometryFactory* getGeometryFactory() const = 0;
 

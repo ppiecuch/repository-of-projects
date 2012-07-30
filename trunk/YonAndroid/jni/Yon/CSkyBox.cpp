@@ -115,7 +115,10 @@ namespace sky{
 	}
 
 	void CSkyBox::render(video::IVideoDriver* driver){
-		camera::ICamera* camera=m_pSceneManager->getActiveCamera();
+		//camera::ICamera* camera=m_pSceneManager->getActiveCamera();
+		camera::ICamera* camera=m_pSceneManager->getLogisticCamera();
+		if(camera==NULL)
+			camera=m_pSceneManager->getViewingCamera();
 
 		core::matrix4f trans(getAbsoluteTransformation());
 		trans.setTranslation(camera->getAbsolutePosition());

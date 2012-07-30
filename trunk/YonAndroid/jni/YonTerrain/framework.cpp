@@ -161,7 +161,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	skyboxModel=sceneMgr->addSkyBoxModel(front,back,left,right,top,bottom);
 
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,false);
-
+	
+	sceneMgr->setLogisticCamera(pCamera);
 	return true;
 }
 void resize(u32 width,u32 height){
@@ -174,7 +175,7 @@ void drawFrame(){
 	rtt->beginRTT(true,true,video::SColor(0xFF133E67));
 	skyboxModel->setVisible(false);
 	waterModel->setVisible(false);
-	sceneMgr->setActiveCamera(pOverlookCamera);
+	sceneMgr->setViewingCamera(pOverlookCamera);
 	sceneMgr->render(videoDriver);
 	pCamera->getViewFrustum()->render(videoDriver);
 	const core::aabbox3df& aabb=pCamera->getViewFrustum()->getBoundingBox();
@@ -196,7 +197,7 @@ void drawFrame(){
 	videoDriver->draw3DLine(corners[6],corners[7],COLOR_GREEN);
 	rtt->endRTT(true);
 
-	sceneMgr->setActiveCamera(pCamera);
+	sceneMgr->setViewingCamera(pCamera);
 	skyboxModel->setVisible(true);
 	waterModel->setVisible(true);
 	planeModel->setVisible(false);
@@ -216,7 +217,7 @@ void drawFrame(){
 	videoDriver->draw3DLine(core::vector3df(0,100,0),core::IDENTITY_VECTOR3DF,video::COLOR_GREEN);
 	videoDriver->draw3DLine(core::vector3df(0,0,100),core::IDENTITY_VECTOR3DF,video::COLOR_BLUE);
 
-	sceneMgr->setActiveCamera(pOrthoCamera);
+	sceneMgr->setViewingCamera(pOrthoCamera);
 	skyboxModel->setVisible(false);
 	waterModel->setVisible(false);
 	planeModel->setVisible(true);
@@ -227,7 +228,7 @@ void drawFrame(){
 	terrainModel->setVisible(true);
 	waterModel->setVisible(true);
 	skyboxModel->setVisible(true);
-	sceneMgr->setActiveCamera(pCamera);
+	sceneMgr->setViewingCamera(pCamera);
 }
 void destroy(){
 	engine->drop();
