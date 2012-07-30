@@ -1,0 +1,25 @@
+面试官的本意是考你保护模式下进程的内存空间是分离的，所以进程分配的堆只能进程内访问，答出这一点足够了
+不过16位实模式下（纯DOS），全局只有一个地址空间，进程之间可以相互窃取对方信息
+
+看MSDN的一段
+The global and local functions are supported for porting from 16-bit code, or for maintaining source code compatibility with 16-bit Windows. Starting with 32-bit Windows, the global and local functions are implemented as wrapper functions that call the corresponding heap functions using a handle to the process's default heap. Therefore, the global and local functions have greater overhead than other memory management functions.  
+就是说保护模式下，Globalloc和LocalAlloc都分配的进程堆，因为多一层调用，开销更大而已
+你那个例子我看了，我的理解是这样，真正起到进程间通信作用的是
+
+SetClipboardData函数
+
+GlobalAlloc():
+  The GlobalAlloc function allocates the specified number of bytes from the heap. Windows memory management does not provide a separate local heap and global heap
+Note The global functions are slower than other memory management functions and do not provide as many features. Therefore, new applications should use the heap functions. However, the global functions are still used with DDE, the clipboard functions, and OLE data objects.
+GlobalAlloc 及其它
+从用户的角度来看，WIN32的内存管理是非常简单和明了的。每一个应用程序都有自己独立的4G地址空间，这种内存模式叫做“平坦”型地址模式，所有的段寄存器或描述符都指向同样的起始地址，所有的地址偏移都是32位的长度，这样一个应用程序无须变换选择符就可以存取自己的多达4G的地址空间。这种内存管理模式是非常简洁而便于管理的，而且我们再不用和那些令人讨厌的“near”和“far”指针打交道了。在W16下有两种主要类型的API：全局和局部。“全局”的API 分配在其他的段中，这样从内存角度来看他们是一些“far”（远）函数或者叫远过程调用，“局部”API只要和进程的堆打交道，所以把它们叫做“near”（近）函数或者近过程调用。而在WIN32中，这两种内存模式是相同的，无论您调用GlobalAlloc还是LocalAlloc，结果都是一样。  
+
+至于分配和使用内存的过程都是一样的：  
+
+  调用GlobalAlloc函数分配一块内存，该函数会返回分配的内存句柄。  
+  调用GlobalLock函数锁定内存块，该函数接受一个内存句柄作为参数，然后返回一个指向被锁定的内存块的指针。  
+  您可以用该指针来读写内存。  
+  调用GlobalUnlock函数来解锁先前被锁定的内存，该函数使得指向内存块的指针无效。  
+  调用GlobalFree函数来释放内存块。您必须传给该函数一个内存句柄。  
+  在WIN32中您也可以用“Local”替代内存分配API函数带有“Global”字样的函数中的“Global”，也即用LocalAlloc、LocalLock等。
+  在调用函数GlobalAlloc时使用GMEM_FIXED标志位可以更进一步简化操作。使用了该标志后，Global/LocalAlloc返回的是指向已分配内存的指针而不是句柄，这样也就不用调用Global/LocalLock来锁定内存了，释放内存时只要直接调用Global/LocalFree就可以了
