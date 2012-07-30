@@ -1,0 +1,86 @@
+VC项目属性→配置属性→C/C++→代码生成→运行时库可以采用的方式有：多线程(/MT)、多线程调试(/MTd)、多线程DLL(/MD)、多线程调试DLL(/MDd)、单线程(/ML)、单线程调试(/MLd)。
+
+
+
+Reusable Library Switch Library Macro(s) Defined Single Threaded /ML LIBC (none) Static MultiThread /MT LIBCMT _MT Dynamic Link (DLL) /MD MSVCRT _MT and _DLL Debug Single Threaded /MLd LIBCD _DEBUG Debug Static MultiThread /MTd LIBCMTD _DEBUG and _MT Debug Dynamic Link (DLL) /MDd MSVCRTD _DEBUG, _MT, and _DLL 
+
+
+其中以小写“d”结尾的选项表示的DEBUG版本的，没有“d”的为RELEASE版本。大型项目中必须要求所有组件和第三方库的运行时库是统一的，否则将会出现LNK2005井喷。
+
+单线程运行时库选项/ML和/MLd在VS2005以后就被废了。
+
+/MT和/MTd表示采用多线程CRT库的静态lib版本。该选项会在编译时将运行时库以静态lib的形式完全嵌入。该选项生成的可执行文件运行时不需要运行时库dll的参加，会获得轻微的性能提升，但最终生成的二进制代码因链入庞大的运行时库实现而变得非常臃肿。当某项目以静态链接库的形式嵌入到多个项目，则可能造成运行时库的内存管理有多份，最终将导致致命的“Invalid Address specified to RtlValidateHeap”问题。另外托管C++和CLI中不再支持/MT和/MTd选项。
+
+/MD和/MDd表示采用多线程CRT库的动态dll版本，会使应用程序使用运行时库特定版本的多线程DLL。链接时将按照传统VC链接dll的方式将运行时库MSVCRxx.DLL的导入库MSVCRT.lib链接，在运行时要求安装了相应版本的VC运行时库可再发行组件包（当然把这些运行时库dll放在应用程序目录下也是可以的）。 因/MD和/MDd方式不会将运行时库链接到可执行文件内部，可有效减少可执行文件尺寸。当多项目以MD方式运作时，其内部会采用同一个堆，内存管理将被简化，跨模块内存管理问题也能得到缓解。
+
+结论：/MD和/MDd将是潮流所趋，/ML和/MLd方式请及时放弃，/MT和/MTd在非必要时最好也不要采用了。
+
+http://blog.163.com/dearymz/blog/static/205657420096675044722/
+
+
+/MD[d] /MT[d] /LD[d] 备注 选项 说明 
+/MD
+
+使应用程序使用运行时库的多线程并特定于 DLL 的版本。定义 _MT 和 _DLL，并使编译器将库名 MSVCRT.lib 放入 .obj 文件中。
+
+用此选项编译的应用程序静态链接到 MSVCRT.lib。该库提供允许链接器解析外部引用的代码层。实际工作代码包含在 MSVCR80.DLL 中，该库必须在运行时对于与 MSVCRT.lib 链接的应用程序可用。
+
+当在定义了 _STATIC_CPPLIB (/D_STATIC_CPPLIB) 的情况下使用 /MD 时，它将导致应用程序与静态多线程标准 C++ 库 (libcpmt.lib) 而非动态版本 (msvcprt.lib) 链接，同时仍通过 msvcrt.lib 动态链接到主 CRT。
+
+
+/MDd
+
+定义 _DEBUG、_MT 和 _DLL，并使应用程序使用运行时库的调试多线程并特定于 DLL 的版本。它还使编译器将库名 MSVCRTD.lib 放入 .obj 文件中。
+
+
+/MT
+
+使应用程序使用运行时库的多线程静态版本。定义 _MT 并使编译器将库名 LIBCMT.lib 放入 .obj 文件中，以便链接器使用 LIBCMT.lib 解析外部符号。
+
+
+/MTd
+
+定义 _DEBUG 和 _MT。此选项还使编译器将库名 LIBCMTD.lib 放入 .obj 文件中，以便链接器使用 LIBCMTD.lib 解析外部符号。
+
+
+/LD
+
+创建 DLL。
+
+将 /DLL 选项传递到链接器。链接器查找 DllMain 函数，但并不需要该函数。如果没有编写 DllMain 函数，链接器将插入返回 TRUE 的 DllMain 函数。
+
+链接 DLL 启动代码。
+
+如果命令行上未指定导出 (.exp) 文件，则创建导入库 (.lib)；将导入库链接到调用您的 DLL 的应用程序。
+
+将 /Fe（命名 EXE 文件）解释为命名 DLL 而不是 .exe 文件；默认程序名成为 basename.dll 而不是 basename.exe。
+
+除非显式指定 /MD，否则将暗指 /MT。
+
+
+/LDd
+
+创建调试 DLL。定义 _MT 和 _DEBUG。
+
+有关 C 运行时库以及使用 /clr（公共语言运行库编译）进行编译时要使用哪些库的更多信息，请参见 C Run-Time Libraries。
+
+传递给链接器的给定调用的所有模块都必须使用相同的运行时库编译器选项（/MD、/MT、/LD）进行编译。
+
+有关使用运行时库的调试版本的更多信息，请参见 Run-Time Library Reference。
+
+知识库文章 Q140584 也讨论如何选择适当的 C 运行时库。
+
+有关 DLL 的进一步讨论，请参见 DLL。
+
+在 Visual Studio 开发环境中设置此编译器选项
+打开该项目的“属性页”对话框。有关详细信息，请参见 如何：打开项目属性页。
+
+单击“C/C++”文件夹。
+
+单击“代码生成”属性页。
+
+修改“运行时库”属性。
+
+以编程方式设置此编译器选项 
+
+http://hi.baidu.com/nzwblog2012/item/b84ca6ecfa338f08570f1d0b
