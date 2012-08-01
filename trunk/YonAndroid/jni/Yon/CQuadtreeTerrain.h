@@ -3,7 +3,7 @@
 
 #include "ITerrainModel.h"
 #include "IUnit.h"
-#include "SDynamicShap.h"
+#include "yonArray.h"
 #include "aabbox3d.h"
 
 namespace yon{
@@ -44,7 +44,7 @@ namespace terrain{
 	//
 	//A revised version of the subdivision criterion which includes the d2-vales for handling surface roughness 
 	//can now be given in terms of a decision variable f:
-	//f=1/(d*C*max(c*d2,1)),subdivide if f<1  (3)
+	//f=l/(d*C*max(c*d2,1)),subdivide if f<1  (3)
 	//The constant C again determines the minimum global resolution, whereas the newly introduced constant c
 	//specifies the desired global resolution. The latter constant directly influences the number of polygons to 
 	//be rendered per frame. Thus, by adjusting c to the current system load, a constant frame rate can be 
@@ -69,11 +69,24 @@ namespace terrain{
 	//up the tree. The d2-value of each block is the maximum of the local value and K times the previously calculated
 	//values of the adjacent blocks at the next lower level.
 	class CQuadtreeTerrain : public ITerrainModel{
+		//TODO
+		//x*m_iSizePerSide+z-->Bit computing
 	private:
 
-		IUnit* m_pUnit;
-		SDynamicShap3D2T m_shap;
+		s32 m_iSizePerSide;
 
+		bool* m_pMatrix;
+
+		f32 m_fDesiredResolution;
+		f32 m_fMinResolution;
+
+		IUnit* m_pUnit;
+		//SDynamicShap3D2T m_shap;
+		core::array<SVertex2TCoords> m_vertices;
+
+		core::aabbox3df	m_boundingBox;
+
+		f32 calculateF(const f32 d,)
 		f32 calculateL1Norm(const core::vector3df& a,const core::vector3df& b);
 
 		//We can't really call it "updating" because we start from scratch every frame
@@ -91,10 +104,14 @@ namespace terrain{
 		//After you calculate the value for it, you have one simple thing to test for:
 		//If f<1 then subdivide node
 		//You then would store true in the quadtree matrix for the current node and continue to refine the node's children.
-		void refine();
+		//
+		//Build the mesh through top-down quadtree traversal
+		//@param x, z: center of current node
+		void refine(s32 x,s32 z,f32 edgeLength,core::vector3df& cameraPos);
 	public:
 		CQuadtreeTerrain(IModel* parent,const core::vector3df& pos,
-			const core::vector3df& rot,const core::vector3df& scale);
+			const core::vector3df& rot,const core::vector3df& scale,
+			f32 desiredResolution=50.f,f32 minResolution=10.f);
 		~CQuadtreeTerrain();
 
 		virtual f32 getHeight(f32 x,f32 z) const{
@@ -115,6 +132,20 @@ namespace terrain{
 			if(num>=getMaterialCount())
 				return NULL;
 			return m_pUnit->getMaterial();
+		}
+
+		f32 getDesiredResolution() const{
+			return m_fDesiredResolution;
+		}
+		void setDesiredResolution(f32 res){
+			m_fDesiredResolution=res;
+		}
+
+		f32 getMinimumResolution() const{
+			return m_fMinResolution;
+		}
+		void setMinimumResolution(f32 res){
+			m_fMinResolution=res;
 		}
 	};
 }

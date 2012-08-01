@@ -32,6 +32,12 @@ const f32 DEGTORAD = PI / 180.0f;
 const f32 RADTODEG   = 180.0f / PI;
 const f64 RADTODEG64 = 180.0 / PI64;
 
+//! returns abs of two values. Own implementation to get rid of STL (VS6 problems)
+template<class T>
+inline T abs_(const T& a)
+{
+	return a <(T)0? -a : a;
+}
 //! returns minimum of two values. Own implementation to get rid of the STL (VS6 problems)
 template<class T>
 inline const T& min_(const T& a, const T& b)
@@ -146,6 +152,11 @@ inline s32 reciprocal_squareroot(const s32 x)
 inline bool isPowerOf2(const u32 a)
 {
 	return a&&!(a&(a-1));
+}
+
+inline f32 fract(const f32 x )
+{
+	return x - floorf (x);
 }
 
 //获取n二进制表示中1的个数
