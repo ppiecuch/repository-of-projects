@@ -111,6 +111,8 @@ JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeWarn
 JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeError
   (JNIEnv *, jobject, jstring);
 
+//JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved);
+
 #ifdef __cplusplus
 }
 #endif

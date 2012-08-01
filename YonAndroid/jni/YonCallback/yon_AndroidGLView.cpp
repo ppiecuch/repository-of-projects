@@ -316,13 +316,29 @@ void Java_yon_AndroidGLView_nativeError(JNIEnv *pEnv, jobject obj, jstring str){
 void Java_yon_AndroidGLView_nativeOnSurfaceDestroy(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnSurfaceDestroy\n");
 }
+/*
+jint JNI_OnLoad(JavaVM *vm, void *reserved){
+	JNIEnv *env=NULL;
+	jint result=-1;
+	if(vm->GetEnv((void **)&env, JNI_VERSION_1_4)!=JNI_OK){
+		LOGD(LOG_TAG,"JNI_OnUnload");
+		goto bail;
+	}
+	//if(!registerNativeMethods(env)){
+	//	goto bail;
+	//}
+	//(*env)->DeleteWeakGlobalRef(env, Class_C);
+	LOGD(LOG_TAG,"JNI_OnUnload");
+	//success return valid version number
+	result=JNI_VERSION_1_4;
+bail:
+	return result;
+	//return;
+}*/
 
 //很遗憾，测试发现此方法没有调用到
 void JNI_OnUnload(JavaVM *jvm, void *reserved){
-	//JNIEnv *env;
-	//if(jvm->GetEnv(jvm,(void **)&env, JNI_VERSION_1_4)){
-	//	return;
-	//}
+	//JNIEnv *env=NULL;
 	//(*env)->DeleteWeakGlobalRef(env, Class_C);
 	LOGD(LOG_TAG,"JNI_OnUnload");
 }
