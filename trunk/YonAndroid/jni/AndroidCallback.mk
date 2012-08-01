@@ -117,16 +117,24 @@ yon_SOURCES :=   \
 		Yon/CReadFileStream.cpp \
 		Yon/CWriteFileStream.cpp \
 		Yon/CReadMemoryStream.cpp \
+		Yon/CViewFrustum.cpp \
 		Yon/COrthoCamera.cpp \
 		Yon/CPerspCamera.cpp \
+		Yon/CWindowOrthoCamera.cpp \
 		Yon/CGeometryFactory.cpp \
 		Yon/CEntity.cpp \
 		Yon/CModel.cpp \
+		Yon/CGeomipmapTerrain.cpp \
+		Yon/CGeomipmapTerrain2.cpp \
+		Yon/CSkyBox.cpp \
+		Yon/CWaterModel.cpp \
 		Yon/CAnimatorFactory.cpp \
+		Yon/CAnimatorCameraFPS.cpp \
 		Yon/CGraphicsAdapter.cpp \
 		Yon/CSceneManager.cpp \
 		Yon/CTimerAndroid.cpp \
 		Yon/CFPSCounter.cpp \
+		Yon/CColorConverter.cpp \
 		Yon/COGLES1ExtensionHandler.cpp \
 		Yon/COGLES1Driver.cpp \
 		Yon/COGLES1Texture.cpp \
