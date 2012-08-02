@@ -91,10 +91,10 @@ namespace terrain{
 			return m_pMatrix[x*m_iSizePerSide+z];
 		}
 		u16 getIndex(s32 x,s32 z){
-			return 0;
+			return x*m_iSizePerSide+z;
 		}
-		f32 calculateD2(s32 index,const f32 d);
-		f32 calculateF(const f32 l,const f32 d,const f32 d2);
+		f32 calculateD2(s32 index,s32 d);
+		f32 calculateF(const f32 l,const s32 d,const f32 d2);
 		f32 calculateL1Norm(const core::vector3df& a,const core::vector3df& b);
 
 		//We can't really call it "updating" because we start from scratch every frame
