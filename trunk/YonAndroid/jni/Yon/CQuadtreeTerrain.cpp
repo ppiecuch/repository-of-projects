@@ -93,12 +93,11 @@ namespace terrain{
 	void CQuadtreeTerrain::refine(s32 x,s32 z,f32 edgeLength,core::vector3df& cameraPos){
 		//calculate the distance between current node and camera
 		s32 index=x*m_iSizePerSide+z;
-		SVertex2TCoords& v=m_vertices[index];
-		f32 distance=calculateL1Norm(v.pos,cameraPos);
+		f32 distance=calculateL1Norm(m_vertices[index].pos,cameraPos);
 
 		//compute the 'f' value (as stated in Roettger's whitepaper of this algorithm)
-		//TODO need d2 value?
-		f32 f=distance/(edgeLength*m_fMinResolution*core::max_(m_fDesiredResolution,1.0f));
+		f32 d2=calculateD2(index,edgeLength);
+		f32 f=calculateF(distance,edgeLength,d2);
 
 		bool subdivide;
 		if( f<1.0f )
@@ -111,8 +110,104 @@ namespace terrain{
 
 		if(subdivide)
 		{
+			if(edgeLength<=3)
+			{
+				s32 childOffset=(edgeLength-1)>>2;
+				s32 childEdgeLength=(edgeLength+1)>>1;
 
+				//refine the children nodes
+				refine(x-childOffset,z-childOffset,childEdgeLength,cameraPos);
+				refine(x-childOffset,z+childOffset,childEdgeLength,cameraPos);
+				refine(x+childOffset,z-childOffset,childEdgeLength,cameraPos);
+				refine(x+childOffset,z+childOffset,childEdgeLength,cameraPos);
+			}
 		}
+	}
+
+	void CQuadtreeTerrain::render(video::IVideoDriver* driver)
+	{
+
+	}
+
+	void CQuadtreeTerrain::renderNode(s32 x,s32 z,s32 edgeLength,video::IVideoDriver* driver)
+	{
+		s32 index=x*m_iSizePerSide+z;
+		bool subdivide=m_pMatrix[index];
+
+		s32 offset=(edgeLength-1)>>1;
+		s32 neighbourOffset=edgeLength-1;
+
+		m_indices.set_used(0);
+
+		if(subdivide)
+		{
+			if(edgeLength<=3)
+			{
+				m_indices.push_back(getIndex(x,z));
+				m_indices.push_back(getIndex(x-offset,z-offset));
+				if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true)
+					m_indices.push_back(getIndex(x-neighbourOffset,z));
+				m_indices.push_back(getIndex(x-offset,z+offset));
+				if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true)
+					m_indices.push_back(getIndex(x,z+neighbourOffset));
+				m_indices.push_back(getIndex(x+offset,z+offset));
+				if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true)
+					m_indices.push_back(getIndex(x+neighbourOffset,z));
+				m_indices.push_back(getIndex(x+offset,z-offset));
+				if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true)
+					m_indices.push_back(getIndex(x,z-neighbourOffset));
+				driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+			}
+			else
+			{
+				s32 childOffset=(edgeLength-1)>>2;
+				s32 childEdgeLength=(edgeLength+1)>>1;
+
+				//calculate the mask code, which specifies which fans need to be rendered.
+				s32 mask=0;
+				mask|=m_pMatrix[(x+childOffset)*m_iSizePerSide+z+childOffset]?0x8:0;//TR
+				mask|=m_pMatrix[(x+childOffset)*m_iSizePerSide+z-childOffset]?0x4:0;//TL
+				mask|=m_pMatrix[(x-childOffset)*m_iSizePerSide+z-childOffset]?0x2:0;//BR
+				mask|=m_pMatrix[(x-childOffset)*m_iSizePerSide+z+childOffset]?0x1:0;//BL
+
+				switch(mask)
+				{
+				case 15://no fans
+					{
+						renderNode(x-childOffset,z-childOffset,childEdgeLength,driver);
+						renderNode(x-childOffset,z+childOffset,childEdgeLength,driver);
+						renderNode(x+childOffset,z-childOffset,childEdgeLength,driver);
+						renderNode(x+childOffset,z+childOffset,childEdgeLength,driver);
+						break;
+					}
+				case 10://tr,bl
+					{
+						renderNode(x-childOffset,z+childOffset,childEdgeLength,driver);
+						renderNode(x+childOffset,z-childOffset,childEdgeLength,driver);
+					}
+				case 5:	//tl,br
+				case 3:
+				case 2:
+				case 1:
+				case 0:
+				}
+			}
+		}
+	}
+
+	void CQuadtreeTerrain::onRegisterForRender()
+	{
+
+	}
+
+	f32 CQuadtreeTerrain::calculateD2(s32 index,const f32 d){
+		//TODO
+		return 1/d;
+		//return 1/(d*maxValue);
+	}
+
+	f32 CQuadtreeTerrain::calculateF(const f32 l,const f32 d,const f32 d2){
+		return l/(d*m_fMinResolution*core::max_(m_fDesiredResolution*d2,1.0f));
 	}
 
 	f32 CQuadtreeTerrain::calculateL1Norm(const core::vector3df& a,const core::vector3df& b){
