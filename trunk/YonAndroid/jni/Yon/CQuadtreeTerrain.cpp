@@ -4,9 +4,15 @@
 #include "ISceneManager.h"
 #include "yonMath.h"
 
+#include "ILogger.h"
+
 namespace yon{
 namespace scene{
 namespace terrain{
+
+	//fan iFanCode table
+	c8 g_cQTFanCode[] = { 10, 8, 8, 12, 8, 0, 12, 14, 8, 12, 0, 14, 12, 14, 14, 0 };
+	c8 g_cQTFanStart[]= { 3,  3, 0,  3, 1, 0,  0,  3, 2,  2, 0,  2,  1,  1,  0, 0 };
 
 	CQuadtreeTerrain::CQuadtreeTerrain(IModel* parent,const core::vector3df& pos,
 		const core::vector3df& rot,const core::vector3df& scale,
@@ -19,8 +25,8 @@ namespace terrain{
 		//m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 		//m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 		//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
-		//m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
-		m_pUnit->setShap(&m_shap);
+		m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
+		//m_pUnit->setShap(&m_shap);
 	}
 	CQuadtreeTerrain::~CQuadtreeTerrain(){
 		m_pUnit->drop();
@@ -40,7 +46,7 @@ namespace terrain{
 		m_iSizePerSide=image->getDimension().w;
 
 		//initialize the quadtree matrix to 'true' (for all possible nodes)
-		m_pMatrix=new bool[m_iSizePerSide];
+		m_pMatrix=new bool[m_iSizePerSide*m_iSizePerSide];
 		for(s32 x=0;x<m_iSizePerSide;++x)
 		{
 			for(s32 z=0;z<m_iSizePerSide;++z)
@@ -90,7 +96,7 @@ namespace terrain{
 		}
 	}
 
-	void CQuadtreeTerrain::refine(s32 x,s32 z,f32 edgeLength,core::vector3df& cameraPos){
+	void CQuadtreeTerrain::refine(s32 x,s32 z,s32 edgeLength,core::vector3df& cameraPos){
 		//calculate the distance between current node and camera
 		s32 index=x*m_iSizePerSide+z;
 		f32 distance=calculateL1Norm(m_vertices[index].pos,cameraPos);
@@ -126,7 +132,10 @@ namespace terrain{
 
 	void CQuadtreeTerrain::render(video::IVideoDriver* driver)
 	{
-
+		driver->setTransform(video::ENUM_TRANSFORM_WORLD, core::IDENTITY_MATRIX);
+		driver->setMaterial(getMaterial(0));
+		s32 center=(m_iSizePerSide-1)>>1;
+		renderNode(center,center,m_iSizePerSide,driver);
 	}
 
 	void CQuadtreeTerrain::renderNode(s32 x,s32 z,s32 edgeLength,video::IVideoDriver* driver)
@@ -137,12 +146,11 @@ namespace terrain{
 		s32 offset=(edgeLength-1)>>1;
 		s32 neighbourOffset=edgeLength-1;
 
-		m_indices.set_used(0);
-
 		if(subdivide)
 		{
 			if(edgeLength<=3)
 			{
+				m_indices.set_used(0);
 				m_indices.push_back(getIndex(x,z));
 				m_indices.push_back(getIndex(x-offset,z-offset));
 				if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true)
@@ -178,35 +186,180 @@ namespace terrain{
 						renderNode(x-childOffset,z+childOffset,childEdgeLength,driver);
 						renderNode(x+childOffset,z-childOffset,childEdgeLength,driver);
 						renderNode(x+childOffset,z+childOffset,childEdgeLength,driver);
-						break;
 					}
+					return;
 				case 10://tr,bl
 					{
-						renderNode(x-childOffset,z+childOffset,childEdgeLength,driver);
-						renderNode(x+childOffset,z-childOffset,childEdgeLength,driver);
+						renderNode(x+childOffset,z+childOffset,childEdgeLength,driver);
+						renderNode(x-childOffset,z-childOffset,childEdgeLength,driver);
+
+						m_indices.set_used(0);
+						m_indices.push_back(getIndex(x,z));
+						m_indices.push_back(getIndex(x+offset,z));
+						m_indices.push_back(getIndex(x+offset,z-offset));
+						m_indices.push_back(getIndex(x,z-offset));
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+
+						m_indices.set_used(0);
+						m_indices.push_back(getIndex(x,z));
+						m_indices.push_back(getIndex(x-offset,z));
+						m_indices.push_back(getIndex(x-offset,z+offset));
+						m_indices.push_back(getIndex(x,z+offset));
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
 					}
+					return;
 				case 5:	//tl,br
-				case 3:
-				case 2:
-				case 1:
+					{
+						renderNode(x+childOffset,z-childOffset,childEdgeLength,driver);
+						renderNode(x-childOffset,z+childOffset,childEdgeLength,driver);
+
+						m_indices.set_used(0);
+						m_indices.push_back(getIndex(x,z));
+						m_indices.push_back(getIndex(x,z+offset));
+						m_indices.push_back(getIndex(x+offset,z+offset));
+						m_indices.push_back(getIndex(x+offset,z));
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+
+						m_indices.set_used(0);
+						m_indices.push_back(getIndex(x,z));
+						m_indices.push_back(getIndex(x,z-offset));
+						m_indices.push_back(getIndex(x-offset,z-offset));
+						m_indices.push_back(getIndex(x-offset,z));
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+					}
+					return;
 				case 0:
+					{
+						m_indices.set_used(0);
+						m_indices.push_back(getIndex(x,z));
+						m_indices.push_back(getIndex(x-offset,z-offset));
+						if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true)
+							m_indices.push_back(getIndex(x-offset,z));
+						m_indices.push_back(getIndex(x-offset,z+offset));
+						if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true)
+							m_indices.push_back(getIndex(x,z+offset));
+						m_indices.push_back(getIndex(x+offset,z+offset));
+						if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true)
+							m_indices.push_back(getIndex(x+offset,z));
+						m_indices.push_back(getIndex(x+offset,z-offset));
+						if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true)
+							m_indices.push_back(getIndex(x,z-offset));
+						m_indices.push_back(getIndex(x-offset,z-offset));
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+					}
+					return;
+				default:
+					Logger->warn(YON_LOG_WARN_FORMAT,"error case!");
 				}
+
+				//the remaining cases are only partial fans, so we need to figure out what to render
+				//(thanks to Chris Cookson for this idea)
+				s32 iFanCode=mask;
+				s32 iStart= g_cQTFanStart[iFanCode];
+				s32 iFanLength= 0;
+				//calculate the fan length by computing the index of the first non-zero bit in g_cQTFanCode
+				while( !( ( ( long )g_cQTFanCode[iFanCode] )&( 1<<iFanLength ) ) && iFanLength<8 )
+					iFanLength++;
+
+				m_indices.set_used(0);
+				m_indices.push_back(getIndex(x,z));
+				//render a triangle fan
+				for(s32 iFanPosition=iFanLength; iFanPosition>0; iFanPosition-- )
+				{
+					switch( iStart )
+					{
+					case 0:
+						if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true||iFanPosition==iFanLength)
+							m_indices.push_back(getIndex(x-offset,z));
+						m_indices.push_back(getIndex(x-offset,z+offset));
+						if( iFanPosition==1 )
+							m_indices.push_back(getIndex(x,z+offset));
+						break;
+					case 1:
+						if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true||iFanPosition==iFanLength)
+							m_indices.push_back(getIndex(x,z-offset));
+						m_indices.push_back(getIndex(x-offset,z-offset));
+						if( iFanPosition==1 )
+							m_indices.push_back(getIndex(x-offset,z));
+						break;
+					case 2:
+						if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true||iFanPosition==iFanLength)
+							m_indices.push_back(getIndex(x+offset,z));
+						m_indices.push_back(getIndex(x+offset,z-offset));
+						if( iFanPosition==1 )
+							m_indices.push_back(getIndex(x,z-offset));
+						break;
+					case 3:
+						if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true||iFanPosition==iFanLength)
+							m_indices.push_back(getIndex(x,z+offset));
+						m_indices.push_back(getIndex(x+offset,z+offset));
+						if( iFanPosition==1 )
+							m_indices.push_back(getIndex(x+offset,z));
+						break;
+					}
+
+					iStart--;
+					iStart&= 3;
+				}
+				driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+
+				//now, recurse down to children (special cases that weren't handled earlier)
+				for(s32 iFanPosition=( 4-iFanLength ); iFanPosition>0; iFanPosition-- )
+				{
+					switch( iStart )
+					{
+						//lower right node
+					case 0:
+						renderNode(x-childOffset,z+childOffset,childEdgeLength,driver);
+						break;
+						//lower left node
+					case 1:
+						renderNode(x-childOffset,z-childOffset,childEdgeLength,driver);
+						break;
+						//upper left node
+					case 2:
+						renderNode(x+childOffset,z-childOffset,childEdgeLength,driver);
+						break;
+						//upper right node
+					case 3:
+						renderNode(x+childOffset,z+childOffset,childEdgeLength,driver);
+						break;
+					}
+
+					iStart--;
+					iStart&= 3;
+				}
+
+				return;
 			}
 		}
 	}
 
 	void CQuadtreeTerrain::onRegisterForRender()
 	{
+		if(m_bVisible)
+		{
+			m_pSceneManager->registerForRender(this);
 
+			camera::ICamera* camera=m_pSceneManager->getLogisticCamera();
+			if(camera==NULL)
+				camera=m_pSceneManager->getViewingCamera();
+			core::vector3df cameraPosition = camera->getAbsolutePosition();
+
+			s32 center=(m_iSizePerSide-1)>>1;
+			refine(center,center,m_iSizePerSide,cameraPosition);
+
+			ITerrainModel::onRegisterForRender();
+		}
 	}
 
-	f32 CQuadtreeTerrain::calculateD2(s32 index,const f32 d){
+	f32 CQuadtreeTerrain::calculateD2(s32 index,s32 d){
 		//TODO
-		return 1/d;
+		return 1.0f/d;
 		//return 1/(d*maxValue);
 	}
 
-	f32 CQuadtreeTerrain::calculateF(const f32 l,const f32 d,const f32 d2){
+	f32 CQuadtreeTerrain::calculateF(const f32 l,const s32 d,const f32 d2){
 		return l/(d*m_fMinResolution*core::max_(m_fDesiredResolution*d2,1.0f));
 	}
 
