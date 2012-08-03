@@ -73,6 +73,9 @@ namespace terrain{
 		//x*m_iSizePerSide+z-->Bit computing
 	private:
 
+		bool m_bDrawLine;
+
+		s32 m_iImageSizePerSide;
 		s32 m_iSizePerSide;
 
 		bool* m_pMatrix;
@@ -93,6 +96,9 @@ namespace terrain{
 		u16 getIndex(s32 x,s32 z){
 			return x*m_iSizePerSide+z;
 		}
+		void _pre();
+		void _post();
+		void printIndices(const char* name);
 		f32 calculateD2(s32 index,s32 d);
 		f32 calculateF(const f32 l,const s32 d,const f32 d2);
 		f32 calculateL1Norm(const core::vector3df& a,const core::vector3df& b);
@@ -115,7 +121,7 @@ namespace terrain{
 		//
 		//Build the mesh through top-down quadtree traversal
 		//@param x, z: center of current node
-		void refine(s32 x,s32 z,s32 edgeLength,core::vector3df& cameraPos);
+		void refine(s32 x,s32 z,s32 edgeLength,bool center,core::vector3df& cameraPos);
 
 		//Do a bit of extra work on general tessellation, for add more detail to our mesh in areas that require it.
 		//We are going to be preprocessing a value called d2 for every node, that is, calculating five d2 values for every 
