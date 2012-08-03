@@ -241,8 +241,8 @@ namespace terrain{
 				s32 mask=0;
 				mask|=m_pMatrix[(x+childOffset)*m_iSizePerSide+z+childOffset]?0x8:0;//TR
 				mask|=m_pMatrix[(x+childOffset)*m_iSizePerSide+z-childOffset]?0x4:0;//TL
-				mask|=m_pMatrix[(x-childOffset)*m_iSizePerSide+z-childOffset]?0x2:0;//BR
-				mask|=m_pMatrix[(x-childOffset)*m_iSizePerSide+z+childOffset]?0x1:0;//BL
+				mask|=m_pMatrix[(x-childOffset)*m_iSizePerSide+z-childOffset]?0x2:0;//BL
+				mask|=m_pMatrix[(x-childOffset)*m_iSizePerSide+z+childOffset]?0x1:0;//BR
 
 				Logger->debug("mask:%d,childOffset:%d,childEdgeLength:%d\r\n",mask,childOffset,childEdgeLength);
 
@@ -501,6 +501,16 @@ namespace terrain{
 
 			s32 center=(m_iSizePerSide-1)>>1;
 			refine(center,center,m_iSizePerSide,true,cameraPosition);
+
+			for(s32 x=m_iSizePerSide-1;x>=0;--x)
+			{
+				core::stringc str;
+				for(s32 z=0;z<m_iSizePerSide;++z)
+				{
+					str.append(core::stringc("%d,",m_pMatrix[x*m_iSizePerSide+z]));
+				}
+				Logger->debug("%s\r\n",str.c_str());
+			}
 
 			m_bDrawLine=getMaterial(0)->getPolygonMode()==video::ENUM_POLYGON_MODE_LINE;
 
