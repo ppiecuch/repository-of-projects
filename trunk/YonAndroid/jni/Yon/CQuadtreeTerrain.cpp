@@ -18,7 +18,7 @@ namespace terrain{
 		const core::vector3df& rot,const core::vector3df& scale,
 		f32 desiredResolution,f32 minResolution)
 		:ITerrainModel(parent,pos,rot,scale),m_pMatrix(NULL),m_pUnit(NULL),
-		m_iSizePerSide(0),
+		m_iSizePerSide(0),m_iImageSizePerSide(0),m_bDrawLine(false),
 		m_fDesiredResolution(desiredResolution),m_fMinResolution(minResolution)
 	{
 		m_pUnit=new Unit3D2T();
@@ -43,7 +43,10 @@ namespace terrain{
 		//TODO release old data
 		//TODO use temp buffer to load, for swapping heightmap
 
-		m_iSizePerSide=image->getDimension().w;
+		m_iImageSizePerSide=image->getDimension().w;
+		m_iSizePerSide=(core::nearestPowerOf2(m_iImageSizePerSide)>>1)+1;
+
+		Logger->debug("image.w:%d,sizePerSide:%d\r\n",m_iImageSizePerSide,m_iSizePerSide);
 
 		//initialize the quadtree matrix to 'true' (for all possible nodes)
 		m_pMatrix=new bool[m_iSizePerSide*m_iSizePerSide];
@@ -96,36 +99,44 @@ namespace terrain{
 		}
 	}
 
-	void CQuadtreeTerrain::refine(s32 x,s32 z,s32 edgeLength,core::vector3df& cameraPos){
+	void CQuadtreeTerrain::refine(s32 x,s32 z,s32 edgeLength,bool center,core::vector3df& cameraPos){
 		//calculate the distance between current node and camera
 		s32 index=x*m_iSizePerSide+z;
 		f32 distance=calculateL1Norm(m_vertices[index].pos,cameraPos);
 
+		bool subdivide;
+		
 		//compute the 'f' value (as stated in Roettger's whitepaper of this algorithm)
 		f32 d2=calculateD2(index,edgeLength);
 		f32 f=calculateF(distance,edgeLength,d2);
 
-		bool subdivide;
 		if( f<1.0f )
 			subdivide= true;		
 		else
 			subdivide= false;
 
+		if(center)
+		{
+			subdivide=true;
+		}
+
 		//store whether or not the current node gets subdivided
 		m_pMatrix[index]=subdivide;
 
+		Logger->debug("refine|x:%d,z:%d,edgeLength:%d,index:%d,distance:%.2f,d2:%.2f,f:%.2f,subdivide:%s\r\n",x,z,edgeLength,index,distance,d2,f,subdivide?"true":"false");
+
 		if(subdivide)
 		{
-			if(edgeLength<=3)
+			if(edgeLength>3)
 			{
 				s32 childOffset=(edgeLength-1)>>2;
 				s32 childEdgeLength=(edgeLength+1)>>1;
 
 				//refine the children nodes
-				refine(x-childOffset,z-childOffset,childEdgeLength,cameraPos);
-				refine(x-childOffset,z+childOffset,childEdgeLength,cameraPos);
-				refine(x+childOffset,z-childOffset,childEdgeLength,cameraPos);
-				refine(x+childOffset,z+childOffset,childEdgeLength,cameraPos);
+				refine(x-childOffset,z-childOffset,childEdgeLength,false,cameraPos);
+				refine(x-childOffset,z+childOffset,childEdgeLength,false,cameraPos);
+				refine(x+childOffset,z-childOffset,childEdgeLength,false,cameraPos);
+				refine(x+childOffset,z+childOffset,childEdgeLength,false,cameraPos);
 			}
 		}
 	}
@@ -137,7 +148,33 @@ namespace terrain{
 		s32 center=(m_iSizePerSide-1)>>1;
 		renderNode(center,center,m_iSizePerSide,driver);
 	}
-
+	void CQuadtreeTerrain::_pre(){
+		if(m_indices.size()>=2){
+			if(m_bDrawLine)
+				m_indices.push_back(m_indices[m_indices.size()-1]);
+		}
+	}
+	void CQuadtreeTerrain::_post(){
+		if(m_indices.size()>=3){
+			if(m_bDrawLine)
+			{
+				m_indices.push_back(m_indices[0]);
+				m_indices.push_back(m_indices[m_indices.size()-2]);
+			}
+		}
+	}
+#define _QUADTREE_PRE_PUSH_ \
+	_pre();
+#define _QUADTREE_POST_PUSH_ \
+	_post();
+	void CQuadtreeTerrain::printIndices(const char* name)
+	{
+		core::stringc str;
+		for(u32 i=0;i<m_indices.size();++i)
+			str.append(core::stringc("%d,",m_indices[i]));
+		Logger->debug("%s:%s\r\n",name,str.c_str());
+	}
+	
 	void CQuadtreeTerrain::renderNode(s32 x,s32 z,s32 edgeLength,video::IVideoDriver* driver)
 	{
 		s32 index=x*m_iSizePerSide+z;
@@ -146,25 +183,54 @@ namespace terrain{
 		s32 offset=(edgeLength-1)>>1;
 		s32 neighbourOffset=edgeLength-1;
 
+		Logger->debug("render|x:%d,z:%d,edgeLength:%d,index:%d,subdivide:%s,offset:%d,neighbourOffset:%d\r\n",x,z,edgeLength,index,subdivide?"true":"false",offset,neighbourOffset);
+
 		if(subdivide)
 		{
+			//is this the smallest node?
 			if(edgeLength<=3)
 			{
 				m_indices.set_used(0);
 				m_indices.push_back(getIndex(x,z));
 				m_indices.push_back(getIndex(x-offset,z-offset));
 				if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true)
-					m_indices.push_back(getIndex(x-neighbourOffset,z));
+				{
+					_QUADTREE_PRE_PUSH_
+					m_indices.push_back(getIndex(x-offset,z));
+					_QUADTREE_POST_PUSH_
+				}
+				_QUADTREE_PRE_PUSH_
 				m_indices.push_back(getIndex(x-offset,z+offset));
+				_QUADTREE_POST_PUSH_
 				if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true)
-					m_indices.push_back(getIndex(x,z+neighbourOffset));
+				{
+					_QUADTREE_PRE_PUSH_
+					m_indices.push_back(getIndex(x,z+offset));
+					_QUADTREE_POST_PUSH_
+				}
+				_QUADTREE_PRE_PUSH_
 				m_indices.push_back(getIndex(x+offset,z+offset));
+				_QUADTREE_POST_PUSH_
 				if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true)
-					m_indices.push_back(getIndex(x+neighbourOffset,z));
+				{
+					_QUADTREE_PRE_PUSH_
+					m_indices.push_back(getIndex(x+offset,z));
+					_QUADTREE_POST_PUSH_
+				}
+				_QUADTREE_PRE_PUSH_
 				m_indices.push_back(getIndex(x+offset,z-offset));
+				_QUADTREE_POST_PUSH_
 				if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true)
-					m_indices.push_back(getIndex(x,z-neighbourOffset));
-				driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+				{
+					_QUADTREE_PRE_PUSH_
+					m_indices.push_back(getIndex(x,z-offset));
+					_QUADTREE_POST_PUSH_
+				}
+				_QUADTREE_PRE_PUSH_
+				m_indices.push_back(getIndex(x-offset,z-offset));
+				_QUADTREE_POST_PUSH_
+				printIndices("BASE");
+				driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),m_bDrawLine?video::ENUM_PRIMITIVE_TYPE_LINES:video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN,m_pUnit->getVertexType());
 			}
 			else
 			{
@@ -177,6 +243,8 @@ namespace terrain{
 				mask|=m_pMatrix[(x+childOffset)*m_iSizePerSide+z-childOffset]?0x4:0;//TL
 				mask|=m_pMatrix[(x-childOffset)*m_iSizePerSide+z-childOffset]?0x2:0;//BR
 				mask|=m_pMatrix[(x-childOffset)*m_iSizePerSide+z+childOffset]?0x1:0;//BL
+
+				Logger->debug("mask:%d,childOffset:%d,childEdgeLength:%d\r\n",mask,childOffset,childEdgeLength);
 
 				switch(mask)
 				{
@@ -196,16 +264,25 @@ namespace terrain{
 						m_indices.set_used(0);
 						m_indices.push_back(getIndex(x,z));
 						m_indices.push_back(getIndex(x+offset,z));
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x+offset,z-offset));
+						_QUADTREE_POST_PUSH_
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x,z-offset));
-						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+						_QUADTREE_POST_PUSH_
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),m_bDrawLine?video::ENUM_PRIMITIVE_TYPE_LINES:video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN,m_pUnit->getVertexType());
 
 						m_indices.set_used(0);
 						m_indices.push_back(getIndex(x,z));
 						m_indices.push_back(getIndex(x-offset,z));
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x-offset,z+offset));
+						_QUADTREE_POST_PUSH_
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x,z+offset));
-						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+						_QUADTREE_POST_PUSH_
+						printIndices("TR-BL");
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),m_bDrawLine?video::ENUM_PRIMITIVE_TYPE_LINES:video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN,m_pUnit->getVertexType());
 					}
 					return;
 				case 5:	//tl,br
@@ -216,16 +293,25 @@ namespace terrain{
 						m_indices.set_used(0);
 						m_indices.push_back(getIndex(x,z));
 						m_indices.push_back(getIndex(x,z+offset));
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x+offset,z+offset));
+						_QUADTREE_POST_PUSH_
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x+offset,z));
-						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+						_QUADTREE_POST_PUSH_
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),m_bDrawLine?video::ENUM_PRIMITIVE_TYPE_LINES:video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN,m_pUnit->getVertexType());
 
 						m_indices.set_used(0);
 						m_indices.push_back(getIndex(x,z));
 						m_indices.push_back(getIndex(x,z-offset));
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x-offset,z-offset));
+						_QUADTREE_POST_PUSH_
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x-offset,z));
-						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+						_QUADTREE_POST_PUSH_
+						printIndices("TL-BR");
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),m_bDrawLine?video::ENUM_PRIMITIVE_TYPE_LINES:video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN,m_pUnit->getVertexType());
 					}
 					return;
 				case 0:
@@ -234,22 +320,47 @@ namespace terrain{
 						m_indices.push_back(getIndex(x,z));
 						m_indices.push_back(getIndex(x-offset,z-offset));
 						if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true)
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x-offset,z));
+							_QUADTREE_POST_PUSH_
+						}
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x-offset,z+offset));
+						_QUADTREE_POST_PUSH_
 						if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true)
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z+offset));
+							_QUADTREE_POST_PUSH_
+						}
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x+offset,z+offset));
+						_QUADTREE_POST_PUSH_
 						if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true)
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x+offset,z));
+							_QUADTREE_POST_PUSH_
+						}
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x+offset,z-offset));
+						_QUADTREE_POST_PUSH_
 						if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true)
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z-offset));
+							_QUADTREE_POST_PUSH_
+						}
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x-offset,z-offset));
-						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+						_QUADTREE_POST_PUSH_
+						printIndices("ALL");
+						driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),m_bDrawLine?video::ENUM_PRIMITIVE_TYPE_LINES:video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN,m_pUnit->getVertexType());
 					}
 					return;
 				default:
-					Logger->warn(YON_LOG_WARN_FORMAT,"error case!");
+					Logger->warn(YON_LOG_WARN_FORMAT,"other case!");
 				}
 
 				//the remaining cases are only partial fans, so we need to figure out what to render
@@ -270,38 +381,79 @@ namespace terrain{
 					{
 					case 0:
 						if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true||iFanPosition==iFanLength)
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x-offset,z));
+							_QUADTREE_POST_PUSH_
+						}
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x-offset,z+offset));
+						_QUADTREE_POST_PUSH_
 						if( iFanPosition==1 )
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z+offset));
+							_QUADTREE_POST_PUSH_
+						}
 						break;
 					case 1:
 						if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true||iFanPosition==iFanLength)
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z-offset));
+							_QUADTREE_POST_PUSH_
+						}
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x-offset,z-offset));
+						_QUADTREE_POST_PUSH_
 						if( iFanPosition==1 )
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x-offset,z));
+							_QUADTREE_POST_PUSH_
+						}
 						break;
 					case 2:
 						if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true||iFanPosition==iFanLength)
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x+offset,z));
+							_QUADTREE_POST_PUSH_
+						}
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x+offset,z-offset));
+						_QUADTREE_POST_PUSH_
 						if( iFanPosition==1 )
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z-offset));
+							_QUADTREE_POST_PUSH_
+						}
 						break;
 					case 3:
 						if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true||iFanPosition==iFanLength)
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z+offset));
+							_QUADTREE_POST_PUSH_
+						}
+						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x+offset,z+offset));
+						_QUADTREE_POST_PUSH_
 						if( iFanPosition==1 )
+						{
+							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x+offset,z));
+							_QUADTREE_POST_PUSH_
+						}
 						break;
 					}
 
 					iStart--;
 					iStart&= 3;
 				}
-				driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN);
+				printIndices("ONE");
+				driver->drawVertexPrimitiveList(m_vertices.const_pointer(),m_vertices.size(),m_indices.const_pointer(),m_indices.size(),m_bDrawLine?video::ENUM_PRIMITIVE_TYPE_LINES:video::ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN,m_pUnit->getVertexType());
 
 				//now, recurse down to children (special cases that weren't handled earlier)
 				for(s32 iFanPosition=( 4-iFanLength ); iFanPosition>0; iFanPosition-- )
@@ -334,7 +486,8 @@ namespace terrain{
 			}
 		}
 	}
-
+#undef _QUADTREE_PRE_PUSH_
+#undef _QUADTREE_POST_PUSH_
 	void CQuadtreeTerrain::onRegisterForRender()
 	{
 		if(m_bVisible)
@@ -347,7 +500,9 @@ namespace terrain{
 			core::vector3df cameraPosition = camera->getAbsolutePosition();
 
 			s32 center=(m_iSizePerSide-1)>>1;
-			refine(center,center,m_iSizePerSide,cameraPosition);
+			refine(center,center,m_iSizePerSide,true,cameraPosition);
+
+			m_bDrawLine=getMaterial(0)->getPolygonMode()==video::ENUM_POLYGON_MODE_LINE;
 
 			ITerrainModel::onRegisterForRender();
 		}
