@@ -78,10 +78,12 @@ namespace terrain{
 		s32 m_iImageSizePerSide;
 		s32 m_iSizePerSide;
 
-		bool* m_pMatrix;
+		//bool* m_pMatrix;
+		u8* m_pMatrix;
 
 		f32 m_fDesiredResolution;
 		f32 m_fMinResolution;
+		f32 m_fFactor;
 
 		IUnit* m_pUnit;
 		//SDynamicShap3D2T m_shap;
@@ -134,7 +136,7 @@ namespace terrain{
 		//simply to conform to the lower detailed node.
 		//Note:the d2 propagation values should be scaled to a range of [0,1] and then set to a more byte-friendly range of 
 		//[0,255]
-		void propagation(){}
+		void propagateRoughness();
 
 		void renderNode(s32 x,s32 z,s32 edgeLength,video::IVideoDriver* driver);
 	public:

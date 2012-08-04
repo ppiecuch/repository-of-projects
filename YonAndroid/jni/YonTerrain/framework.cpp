@@ -70,8 +70,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	pOverlookCamera->setFar(30000);
 	pOrthoCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	pCamera=sceneMgr->addCameraFPS();
-	pCamera->setFar(3000);
-	pCamera->setNear(10);
+	pCamera->setFar(10000);
+	pCamera->setNear(30);
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
@@ -135,7 +135,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,true);
 
 	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(10,1,10));
-	IImage* image=videoDriver->createImageFromFile("heightmap16.png",true);
+	IImage* image=videoDriver->createImageFromFile("heightmap32.png",true);
 	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_17);
 	image->drop();
 	/*material=terrainModel->getMaterial(0);
