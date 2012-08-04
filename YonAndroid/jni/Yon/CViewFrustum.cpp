@@ -60,6 +60,50 @@ namespace camera{
 		m_boundingBox.addInternalPoint(getFarRightBottom());
 	}
 
+	bool CViewFrustum::intersectWithBox(const core::vector3df& pos, f32 size)
+	{
+		f32 x=pos.x;
+		f32 y=pos.y;
+		f32 z=pos.z;
+		for(s32 i=0;i<ENUM_FRUSTUM_PLANE_COUNT;++i)
+		{
+			if( m_planes[i].normal.x * ( x-size )+
+				m_planes[i].normal.y * ( y-size )+
+				m_planes[i].normal.z * ( z-size )+m_planes[i].d < 0 )
+				continue;
+			if( m_planes[i].normal.x * ( x+size )+
+				m_planes[i].normal.y * ( y-size )+
+				m_planes[i].normal.z * ( z-size )+m_planes[i].d < 0 )
+				continue;
+			if( m_planes[i].normal.x * ( x-size )+
+				m_planes[i].normal.y * ( y+size )+
+				m_planes[i].normal.z * ( z-size )+m_planes[i].d < 0 )
+				continue;
+			if( m_planes[i].normal.x * ( x+size )+
+				m_planes[i].normal.y * ( y+size )+
+				m_planes[i].normal.z * ( z-size )+m_planes[i].d < 0 )
+				continue;
+			if( m_planes[i].normal.x * ( x-size )+
+				m_planes[i].normal.y * ( y-size )+
+				m_planes[i].normal.z * ( z+size )+m_planes[i].d < 0 )
+				continue;
+			if( m_planes[i].normal.x * ( x+size )+
+				m_planes[i].normal.y * ( y-size )+
+				m_planes[i].normal.z * ( z+size )+m_planes[i].d < 0 )
+				continue;
+			if( m_planes[i].normal.x * ( x-size )+
+				m_planes[i].normal.y * ( y+size )+
+				m_planes[i].normal.z * ( z+size )+m_planes[i].d < 0 )
+				continue;
+			if( m_planes[i].normal.x * ( x+size )+
+				m_planes[i].normal.y * ( y+size )+
+				m_planes[i].normal.z * ( z+size )+m_planes[i].d < 0 )
+				continue;
+			return false;
+		}
+		return true;
+	}
+
 	void CViewFrustum::setFrom(const core::matrix4f& mat)
 	{
 		// left clipping plane

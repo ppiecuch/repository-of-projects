@@ -5,6 +5,7 @@
 #include "IUnit.h"
 #include "yonArray.h"
 #include "aabbox3d.h"
+#include "IViewFrustum.h"
 
 namespace yon{
 namespace scene{
@@ -92,17 +93,12 @@ namespace terrain{
 
 		core::aabbox3df	m_boundingBox;
 
-		inline bool getMatrixData(s32 x,s32 z){
-			return m_pMatrix[x*m_iSizePerSide+z];
-		}
 		u16 getIndex(s32 x,s32 z){
 			return x*m_iSizePerSide+z;
 		}
 		void _pre();
 		void _post();
 		void printIndices(const char* name);
-		f32 calculateD2(s32 index,s32 d);
-		f32 calculateF(const f32 l,const s32 d,const f32 d2);
 		f32 calculateL1Norm(const core::vector3df& a,const core::vector3df& b);
 
 		//We can't really call it "updating" because we start from scratch every frame
@@ -123,7 +119,7 @@ namespace terrain{
 		//
 		//Build the mesh through top-down quadtree traversal
 		//@param x, z: center of current node
-		void refine(s32 x,s32 z,s32 edgeLength,bool center,core::vector3df& cameraPos);
+		void refine(s32 x,s32 z,s32 edgeLength,bool center,core::vector3df& cameraPos,camera::IViewFrustum* viewFrustum);
 
 		//Do a bit of extra work on general tessellation, for add more detail to our mesh in areas that require it.
 		//We are going to be preprocessing a value called d2 for every node, that is, calculating five d2 values for every 
@@ -137,6 +133,8 @@ namespace terrain{
 		//Note:the d2 propagation values should be scaled to a range of [0,1] and then set to a more byte-friendly range of 
 		//[0,255]
 		void propagateRoughness();
+
+		void fillData();
 
 		void renderNode(s32 x,s32 z,s32 edgeLength,video::IVideoDriver* driver);
 	public:
