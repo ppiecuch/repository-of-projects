@@ -27,8 +27,6 @@ namespace terrain{
 		//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
 		m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
 		//m_pUnit->setShap(&m_shap);
-
-		m_fFactor=m_fMinResolution*m_fDesiredResolution/3;
 	}
 	CQuadtreeTerrain::~CQuadtreeTerrain(){
 		m_pUnit->drop();
@@ -66,8 +64,7 @@ namespace terrain{
 		//m_shap.getVertexArray().set_used(numVertices);
 		m_vertices.set_used(numVertices);
 
-
-		const f32 texcoordDelta = 1.0f/(f32)(m_iSizePerSide-1);
+		const f32 texcoordDelta = 1.0f/(f32)(m_iImageSizePerSide-1);
 		const f32 texcoordDelta2 = 1.0f/(f32)(patchSize-1);
 		s32 index=0;
 		f32 fx=0.f;
@@ -103,13 +100,35 @@ namespace terrain{
 		}
 
 		propagateRoughness();
+
+		/*for(s32 x=m_iSizePerSide-1;x>=0;--x)
+		{
+			core::stringc str;
+			for(s32 z=0;z<m_iSizePerSide;++z)
+			{
+				str.append(core::stringc("%d,",m_pMatrix[x*m_iSizePerSide+z]));
+			}
+			Logger->debug("%s\r\n",str.c_str());
+		}*/
 	}
 
-	void CQuadtreeTerrain::refine(s32 x,s32 z,s32 edgeLength,bool center,core::vector3df& cameraPos){
+	void CQuadtreeTerrain::fillData(){
+		// Reset the Terrains Bounding Box for re-calculation
+		m_boundingBox = core::aabbox3df(true);
+	}
+
+	void CQuadtreeTerrain::refine(s32 x,s32 z,s32 edgeLength,bool center,core::vector3df& cameraPos,camera::IViewFrustum* viewFrustum){
 		//calculate the distance between current node and camera
 		s32 index=x*m_iSizePerSide+z;
 
-		//TODO test the node's bounding box against the view frustm
+		//test the node's bounding box against the view frustm
+		if(viewFrustum->intersectWithBox(m_vertices[index].pos,edgeLength*m_scale.x)==false)
+		{
+			//disable this node, and return (since the parent node is disabled, we don't need
+			//to waste any CPU cycles by traversing down the tree even farther
+			m_pMatrix[index]= 0;
+			return;
+		}
 
 		f32 distance=calculateL1Norm(m_vertices[index].pos,cameraPos);
 
@@ -119,11 +138,13 @@ namespace terrain{
 		//compute the 'f' value (as stated in Roettger's whitepaper of this algorithm)
 		//f32 d2=calculateD2(index,edgeLength);
 		//f32 f=calculateF(distance,edgeLength,d2);
+
 		//why should "index-1" or "index+1" but can not be "index"?
 		//f32 d2=m_fDesiredResolution*m_pMatrix[index]/3;
+		//f32 f=distance/(edgeLength*m_fMinResolution*core::max_(d2,1.0f));
+
 		f32 d2=m_fDesiredResolution*(f32)m_pMatrix[index-1]/12;
 		f32 f=distance/(edgeLength*m_fMinResolution*core::max_(d2,1.0f));
-		//f32 f=distance/(edgeLength*m_fFactor);
 
 		//if( f<1.0f )
 		//	subdivide= true;		
@@ -160,10 +181,10 @@ namespace terrain{
 				s32 childEdgeLength=(edgeLength+1)>>1;
 
 				//refine the children nodes
-				refine(x-childOffset,z-childOffset,childEdgeLength,false,cameraPos);
-				refine(x-childOffset,z+childOffset,childEdgeLength,false,cameraPos);
-				refine(x+childOffset,z-childOffset,childEdgeLength,false,cameraPos);
-				refine(x+childOffset,z+childOffset,childEdgeLength,false,cameraPos);
+				refine(x-childOffset,z-childOffset,childEdgeLength,false,cameraPos,viewFrustum);
+				refine(x-childOffset,z+childOffset,childEdgeLength,false,cameraPos,viewFrustum);
+				refine(x+childOffset,z-childOffset,childEdgeLength,false,cameraPos,viewFrustum);
+				refine(x+childOffset,z+childOffset,childEdgeLength,false,cameraPos,viewFrustum);
 			}
 		}
 	}
@@ -205,14 +226,16 @@ namespace terrain{
 	void CQuadtreeTerrain::renderNode(s32 x,s32 z,s32 edgeLength,video::IVideoDriver* driver)
 	{
 		s32 index=x*m_iSizePerSide+z;
-		bool subdivide=m_pMatrix[index];
+		//bool subdivide=m_pMatrix[index];
+		u8 blend=m_pMatrix[index];
 
 		s32 offset=(edgeLength-1)>>1;
 		s32 neighbourOffset=edgeLength-1;
 
 		//Logger->debug("render|x:%d,z:%d,edgeLength:%d,index:%d,subdivide:%s,offset:%d,neighbourOffset:%d\r\n",x,z,edgeLength,index,subdivide?"true":"false",offset,neighbourOffset);
 
-		if(subdivide)
+		//if(subdivide)
+		if(blend!=0)
 		{
 			//is this the smallest node?
 			if(edgeLength<=3)
@@ -220,7 +243,8 @@ namespace terrain{
 				m_indices.set_used(0);
 				m_indices.push_back(getIndex(x,z));
 				m_indices.push_back(getIndex(x-offset,z-offset));
-				if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true)
+				//if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true)
+				if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]!=0)
 				{
 					_QUADTREE_PRE_PUSH_
 					m_indices.push_back(getIndex(x-offset,z));
@@ -229,7 +253,8 @@ namespace terrain{
 				_QUADTREE_PRE_PUSH_
 				m_indices.push_back(getIndex(x-offset,z+offset));
 				_QUADTREE_POST_PUSH_
-				if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true)
+				//if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true)
+				if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]!=0)
 				{
 					_QUADTREE_PRE_PUSH_
 					m_indices.push_back(getIndex(x,z+offset));
@@ -238,7 +263,8 @@ namespace terrain{
 				_QUADTREE_PRE_PUSH_
 				m_indices.push_back(getIndex(x+offset,z+offset));
 				_QUADTREE_POST_PUSH_
-				if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true)
+				//if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true)
+				if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]!=0)
 				{
 					_QUADTREE_PRE_PUSH_
 					m_indices.push_back(getIndex(x+offset,z));
@@ -247,7 +273,8 @@ namespace terrain{
 				_QUADTREE_PRE_PUSH_
 				m_indices.push_back(getIndex(x+offset,z-offset));
 				_QUADTREE_POST_PUSH_
-				if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true)
+				//if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true)
+				if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]!=0)
 				{
 					_QUADTREE_PRE_PUSH_
 					m_indices.push_back(getIndex(x,z-offset));
@@ -346,7 +373,8 @@ namespace terrain{
 						m_indices.set_used(0);
 						m_indices.push_back(getIndex(x,z));
 						m_indices.push_back(getIndex(x-offset,z-offset));
-						if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true)
+						//if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true)
+						if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]!=0)
 						{
 							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x-offset,z));
@@ -355,7 +383,8 @@ namespace terrain{
 						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x-offset,z+offset));
 						_QUADTREE_POST_PUSH_
-						if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true)
+						//if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true)
+						if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]!=0)
 						{
 							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z+offset));
@@ -364,7 +393,8 @@ namespace terrain{
 						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x+offset,z+offset));
 						_QUADTREE_POST_PUSH_
-						if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true)
+						//if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true)
+						if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]!=0)
 						{
 							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x+offset,z));
@@ -373,7 +403,8 @@ namespace terrain{
 						_QUADTREE_PRE_PUSH_
 						m_indices.push_back(getIndex(x+offset,z-offset));
 						_QUADTREE_POST_PUSH_
-						if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true)
+						//if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true)
+						if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]!=0)
 						{
 							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z-offset));
@@ -407,7 +438,8 @@ namespace terrain{
 					switch( iStart )
 					{
 					case 0:
-						if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true||iFanPosition==iFanLength)
+						//if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]==true||iFanPosition==iFanLength)
+						if((x-neighbourOffset)<0||m_pMatrix[(x-neighbourOffset)*m_iSizePerSide+z]!=0||iFanPosition==iFanLength)
 						{
 							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x-offset,z));
@@ -424,7 +456,8 @@ namespace terrain{
 						}
 						break;
 					case 1:
-						if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true||iFanPosition==iFanLength)
+						//if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]==true||iFanPosition==iFanLength)
+						if((z-neighbourOffset)<0||m_pMatrix[x*m_iSizePerSide+z-neighbourOffset]!=0||iFanPosition==iFanLength)
 						{
 							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z-offset));
@@ -441,7 +474,8 @@ namespace terrain{
 						}
 						break;
 					case 2:
-						if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true||iFanPosition==iFanLength)
+						//if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]==true||iFanPosition==iFanLength)
+						if((x+neighbourOffset)>=m_iSizePerSide||m_pMatrix[(x+neighbourOffset)*m_iSizePerSide+z]!=0||iFanPosition==iFanLength)
 						{
 							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x+offset,z));
@@ -458,7 +492,8 @@ namespace terrain{
 						}
 						break;
 					case 3:
-						if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true||iFanPosition==iFanLength)
+						//if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]==true||iFanPosition==iFanLength)
+						if((z+neighbourOffset)>=m_iSizePerSide||m_pMatrix[x*m_iSizePerSide+z+neighbourOffset]!=0||iFanPosition==iFanLength)
 						{
 							_QUADTREE_PRE_PUSH_
 							m_indices.push_back(getIndex(x,z+offset));
@@ -525,33 +560,10 @@ namespace terrain{
 			if(camera==NULL)
 				camera=m_pSceneManager->getViewingCamera();
 			core::vector3df cameraPosition = camera->getAbsolutePosition();
+			camera::IViewFrustum* viewFrustum=camera->getViewFrustum();
 
 			s32 center=(m_iSizePerSide-1)>>1;
-			refine(center,center,m_iSizePerSide,true,cameraPosition);
-
-			//pass
-			//?..
-			//? 1 ? 1 ? 0 ? 1 ?
-			//? ? 1 ? ? ? 1 ? ?
-			//? 0 ? 0 ? 0 ? 0 ?
-			//? ? ? ? 1 ? ? ? ?
-			//?...
-			//? ? 0 ? ? ? 0 ? ?
-			//?...
-			//?...
-			//m_pMatrix[64]=1;
-			//m_pMatrix[66]=1;
-			//m_pMatrix[68]=0;
-			//m_pMatrix[70]=1;
-			//m_pMatrix[56]=1;
-			//m_pMatrix[60]=1;
-			//m_pMatrix[46]=0;
-			//m_pMatrix[48]=0;
-			//m_pMatrix[50]=0;
-			//m_pMatrix[52]=0;
-			//m_pMatrix[40]=1;
-			//m_pMatrix[20]=0;
-			//m_pMatrix[24]=0;
+			refine(center,center,m_iSizePerSide,true,cameraPosition,viewFrustum);
 
 			/*
 			bool temp[]={
@@ -614,48 +626,25 @@ namespace terrain{
 				{
 					//compute "iLocalD2" values for this node
 					//upper-mid
-					//iLocalD2= core::ceil32( core::abs_(( ( GetTrueHeightAtPoint( x-iEdgeOffset, z+iEdgeOffset )+
-					//	GetTrueHeightAtPoint( x+iEdgeOffset, z+iEdgeOffset ) )/2 )-
-					//	GetTrueHeightAtPoint( x,			z+iEdgeOffset ) ) );
 					iLocalD2= core::ceil32(core::abs_(((m_vertices[(x+iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset].pos.y+m_vertices[(x+iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset].pos.y)/2)-m_vertices[(x+iEdgeOffset)*m_iSizePerSide+z].pos.y));
 
 					//right-mid
-					//iDH= ( int )ceil( abs( ( ( GetTrueHeightAtPoint( x+iEdgeOffset, z+iEdgeOffset )+
-					//	GetTrueHeightAtPoint( x+iEdgeOffset, z-iEdgeOffset ) )/2 )-
-					//	GetTrueHeightAtPoint( x+iEdgeOffset, z ) ) );
-					//iLocalD2= MAX( iLocalD2, iDH );
 					iDH= core::ceil32(core::abs_(((m_vertices[(x+iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset].pos.y+m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset].pos.y)/2)-m_vertices[x*m_iSizePerSide+z+iEdgeOffset].pos.y));
 					iLocalD2= core::max_( iLocalD2, iDH );
 
 					//bottom-mid
-					//iDH= ( int )ceil( abs( ( ( GetTrueHeightAtPoint( x-iEdgeOffset, z-iEdgeOffset )+
-					//	GetTrueHeightAtPoint( x+iEdgeOffset, z-iEdgeOffset ) )/2 )-
-					//	GetTrueHeightAtPoint( x,		   z-iEdgeOffset ) ) );
-					//iLocalD2= MAX( iLocalD2, iDH );
 					iDH= core::ceil32(core::abs_(((m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset].pos.y+m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset].pos.y)/2)-m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z].pos.y));
 					iLocalD2= core::max_( iLocalD2, iDH );
 
 					//left-mid
-					//iDH= ( int )ceil( abs( ( ( GetTrueHeightAtPoint( x-iEdgeOffset, z+iEdgeOffset )+
-					//	GetTrueHeightAtPoint( x-iEdgeOffset, z-iEdgeOffset ) )/2 )-
-					//	GetTrueHeightAtPoint( x-iEdgeOffset, z ) ) );
-					//iLocalD2= MAX( iLocalD2, iDH );
 					iDH= core::ceil32(core::abs_(((m_vertices[(x+iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset].pos.y+m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset].pos.y)/2)-m_vertices[x*m_iSizePerSide+z-iEdgeOffset].pos.y));
 					iLocalD2= core::max_( iLocalD2, iDH );
 
 					//bottom-left to top-right diagonal
-					//iDH= ( int )ceil( abs( ( ( GetTrueHeightAtPoint( x-iEdgeOffset, z-iEdgeOffset )+
-					//	GetTrueHeightAtPoint( x+iEdgeOffset, z+iEdgeOffset ) )/2 )-
-					//	GetTrueHeightAtPoint( x,		   z ) ) );
-					//iLocalD2= MAX( iLocalD2, iDH );
 					iDH= core::ceil32(core::abs_(((m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset].pos.y+m_vertices[(x+iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset].pos.y)/2)-m_vertices[x*m_iSizePerSide+z].pos.y));
 					iLocalD2= core::max_( iLocalD2, iDH );
 
 					//bottom-right to top-left diagonal
-					//iDH= ( int )ceil( abs( ( ( GetTrueHeightAtPoint( x+iEdgeOffset, z-iEdgeOffset )+
-					//	GetTrueHeightAtPoint( x-iEdgeOffset, z+iEdgeOffset ) )/2 )-
-					//	GetTrueHeightAtPoint( x, z ) ) );
-					//iLocalD2= MAX( iLocalD2, iDH );
 					iDH= core::ceil32(core::abs_(((m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset].pos.y+m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset].pos.y)/2)-m_vertices[x*m_iSizePerSide+z].pos.y));
 					iLocalD2= core::max_( iLocalD2, iDH );
 
@@ -665,7 +654,6 @@ namespace terrain{
 					// 	Upper bound: 255 / 3 = 85
 					//	Lower bound: 0
 					//	Extra precision if iD2 multiplied by 3.
-					//iLocalD2= ( int )ceil( ( iLocalD2*3.0f )/iEdgeLength );
 					iLocalD2= core::ceil32((iLocalD2*3.0f )/iEdgeLength);
 
 					//test minimally sized block
@@ -675,43 +663,33 @@ namespace terrain{
 
 						//compute the "iLocalH" value
 						//upper right
-						//iLocalH= GetTrueHeightAtPoint( x+iEdgeOffset, z+iEdgeOffset );
 						iLocalH= m_vertices[(x+iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset].pos.y;
 
 						//right mid
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x+iEdgeOffset, z ) );
 						iLocalH= core::max_(iLocalH, m_vertices[x*m_iSizePerSide+z+iEdgeOffset].pos.y);
 
 						//lower right
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x+iEdgeOffset, z-iEdgeOffset ) );
 						iLocalH= core::max_(iLocalH, m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset].pos.y);
 
 						//bottom mid
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x,		  z-iEdgeOffset ) );
 						iLocalH= core::max_(iLocalH, m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z].pos.y);
 
 						//lower left
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x-iEdgeOffset, z-iEdgeOffset ) );
 						iLocalH= core::max_(iLocalH, m_vertices[(x-iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset].pos.y);
 
 						//left mid
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x-iEdgeOffset, z ) );
 						iLocalH= core::max_(iLocalH, m_vertices[x*m_iSizePerSide+z-iEdgeOffset].pos.y);
 
 						//upper left
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x-iEdgeOffset, z+iEdgeOffset ) );
 						iLocalH= core::max_(iLocalH, m_vertices[(x+iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset].pos.y);
 
 						//upper mid
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x,		  z+iEdgeOffset ) );
 						iLocalH= core::max_(iLocalH, m_vertices[(x+iEdgeOffset)*m_iSizePerSide+z].pos.y);
 
 						//center
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x,		  z ) );
 						iLocalH= core::max_(iLocalH, m_vertices[x*m_iSizePerSide+z].pos.y);
 
 						//store the maximum iLocalH value in the matrix
-						//m_ucpQuadMtrx[GetMatrixIndex( x+1, z )]= iLocalH;
 						m_pMatrix[x*m_iSizePerSide+z+1]=(u8)(iLocalH/m_scale.y);
 					}
 					else
@@ -719,11 +697,6 @@ namespace terrain{
 						fKUpperBound= 1.0f*m_fMinResolution/( 2.0f*( m_fMinResolution-1.0f ) );
 
 						//use d2 values from farther up on the quadtree
-						//iD2= ( int )ceil( MAX( fKUpperBound*( float )GetQuadMatrixData( x,		   z ),			( float )iLocalD2 ) );
-						//iD2= ( int )ceil( MAX( fKUpperBound*( float )GetQuadMatrixData( x-iEdgeOffset, z ),			( float )iD2 ) );
-						//iD2= ( int )ceil( MAX( fKUpperBound*( float )GetQuadMatrixData( x+iEdgeOffset, z ),			( float )iD2 ) );
-						//iD2= ( int )ceil( MAX( fKUpperBound*( float )GetQuadMatrixData( x,		   z+iEdgeOffset ), ( float )iD2 ) );
-						//iD2= ( int )ceil( MAX( fKUpperBound*( float )GetQuadMatrixData( x,		   z-iEdgeOffset ), ( float )iD2 ) );
 						iD2=(u8)core::ceil32(core::max_(fKUpperBound*(f32)m_pMatrix[x*m_iSizePerSide+z],(f32)iLocalD2));
 						iD2=(u8)core::ceil32(core::max_(fKUpperBound*(f32)m_pMatrix[x*m_iSizePerSide+z-iEdgeOffset],(f32)iD2));
 						iD2=(u8)core::ceil32(core::max_(fKUpperBound*(f32)m_pMatrix[x*m_iSizePerSide+z+iEdgeOffset],(f32)iD2));
@@ -731,31 +704,20 @@ namespace terrain{
 						iD2=(u8)core::ceil32(core::max_(fKUpperBound*(f32)m_pMatrix[(x-iEdgeOffset)*m_iSizePerSide+z],(f32)iD2));
 
 						//get the max local height values of the 4 nodes (LL, LR, UL, UR)
-						//iLocalH= GetTrueHeightAtPoint( x+iChildOffset, z+iChildOffset );
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x+iChildOffset, z-iChildOffset ) );
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x-iChildOffset, z-iChildOffset ) );
-						//iLocalH= MAX( iLocalH, GetTrueHeightAtPoint( x-iChildOffset, z+iChildOffset ) );
 						iLocalH=m_vertices[(x+iChildOffset)*m_iSizePerSide+z+iChildOffset].pos.y;
 						iLocalH=core::max_(iLocalH,m_vertices[(x-iChildOffset)*m_iSizePerSide+z+iChildOffset].pos.y);
 						iLocalH=core::max_(iLocalH,m_vertices[(x-iChildOffset)*m_iSizePerSide+z-iChildOffset].pos.y);
 						iLocalH=core::max_(iLocalH,m_vertices[(x+iChildOffset)*m_iSizePerSide+z-iChildOffset].pos.y);
 
 						//store the max value in the quadtree matrix
-						//m_ucpQuadMtrx[GetMatrixIndex( x+1, z )]= iLocalH;
 						m_pMatrix[x*m_iSizePerSide+z+1]=(u8)(iLocalH/m_scale.y);
 					}
 
 					//store the values we calculated for iD2 into the quadtree matrix
-					//m_ucpQuadMtrx[GetMatrixIndex( x, z )]  = iD2;
-					//m_ucpQuadMtrx[GetMatrixIndex( x-1, z )]= iD2;
 					m_pMatrix[x*m_iSizePerSide+z-1]=iD2;
 					m_pMatrix[x*m_iSizePerSide+z+1]=iD2;
 
 					//propogate the value up the quadtree
-					//m_ucpQuadMtrx[GetMatrixIndex( x-iEdgeOffset, z-iEdgeOffset )]= MAX( GetQuadMatrixData( x-iEdgeOffset, z-iEdgeOffset ), iD2 );
-					//m_ucpQuadMtrx[GetMatrixIndex( x-iEdgeOffset, z+iEdgeOffset )]= MAX( GetQuadMatrixData( x-iEdgeOffset, z+iEdgeOffset ), iD2 );
-					//m_ucpQuadMtrx[GetMatrixIndex( x+iEdgeOffset, z+iEdgeOffset )]= MAX( GetQuadMatrixData( x+iEdgeOffset, z+iEdgeOffset ), iD2 );
-					//m_ucpQuadMtrx[GetMatrixIndex( x+iEdgeOffset, z-iEdgeOffset )]= MAX( GetQuadMatrixData( x+iEdgeOffset, z-iEdgeOffset ), iD2 );
 					m_pMatrix[(x-iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset]=core::max_(m_pMatrix[(x-iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset],iD2);
 					m_pMatrix[(x-iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset]=core::max_(m_pMatrix[(x-iEdgeOffset)*m_iSizePerSide+z+iEdgeOffset],iD2);
 					m_pMatrix[(x+iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset]=core::max_(m_pMatrix[(x+iEdgeOffset)*m_iSizePerSide+z-iEdgeOffset],iD2);
@@ -766,16 +728,6 @@ namespace terrain{
 			//move up to the next quadtree level (lower level of detail)
 			iEdgeLength= ( iEdgeLength<<1 )-1;
 		}
-	}
-
-	f32 CQuadtreeTerrain::calculateD2(s32 index,s32 d){
-		//TODO
-		return 1.0f/d;
-		//return 1/(d*maxValue);
-	}
-
-	f32 CQuadtreeTerrain::calculateF(const f32 l,const s32 d,const f32 d2){
-		return l/(d*m_fMinResolution*core::max_(m_fDesiredResolution*d2,1.0f));
 	}
 
 	f32 CQuadtreeTerrain::calculateL1Norm(const core::vector3df& a,const core::vector3df& b){

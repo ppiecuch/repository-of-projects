@@ -674,6 +674,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\CROAMTerrain.h"
+						>
+					</File>
+					<File
 						RelativePath="..\include\ITerrainModel.h"
 						>
 					</File>

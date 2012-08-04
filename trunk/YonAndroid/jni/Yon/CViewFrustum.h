@@ -41,6 +41,8 @@ namespace camera{
 			m_cameraPosition=pos;
 		};
 
+		virtual bool intersectWithBox(const core::vector3df& pos, f32 size);
+
 		virtual  void recalculateBoundingBox();
 		virtual const core::aabbox3df &getBoundingBox() const;
 

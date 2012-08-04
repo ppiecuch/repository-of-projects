@@ -55,7 +55,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
-	params.fpsLimit=5;
+	params.fpsLimit=0;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -70,7 +70,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	pOverlookCamera->setFar(30000);
 	pOrthoCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	pCamera=sceneMgr->addCameraFPS();
-	pCamera->setFar(10000);
+	pCamera->setFar(5000);
 	pCamera->setNear(30);
 	logger=Logger;
 	randomizer=engine->getRandomizer();
@@ -78,7 +78,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
 	fs->addWorkingDirectory("../media\\skybox\\6");
-	fs->addWorkingDirectory("../media/terrain/1");
+	fs->addWorkingDirectory("../media/terrain/4");
 	fs->addWorkingDirectory("../media/water/2");
 	fs->addWorkingDirectory("../media/terrain/heightmap/plain");
 #elif defined(YON_COMPILE_WITH_ANDROID)
@@ -134,8 +134,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,true);
 
-	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(10,1,10));
-	IImage* image=videoDriver->createImageFromFile("heightmap32.png",true);
+	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(20,1,20));
+	IImage* image=videoDriver->createImageFromFile("heightmap.png",true);
 	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_17);
 	image->drop();
 	/*material=terrainModel->getMaterial(0);
@@ -143,17 +143,17 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material->setTexture(0,videoDriver->getTexture("terrain-texture.png"));
 	material->setTexture(1,videoDriver->getTexture("rock2.png"));
 	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
-	material->setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);
+	material->setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);*/
 	
 
 	
-	waterModel=sceneMgr->addWaterModel(60,70);
+	/*waterModel=sceneMgr->addWaterModel(60,70);
 	waterModel->setScale(core::vector3df(8,1,8));
 	waterModel->setPosition(core::vector3df(80,20,50));
 	material=waterModel->getMaterial(0);
 	material->setTexture(0,videoDriver->getTexture("caustic.png"));
 	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);*/
 
 	ITexture* front=videoDriver->getTexture("front.png");
 	ITexture* back=videoDriver->getTexture("back.png");
@@ -161,7 +161,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	ITexture* right=videoDriver->getTexture("right.png");
 	ITexture* top=videoDriver->getTexture("top.png");
 	ITexture* bottom=videoDriver->getTexture("bottom.png");
-	skyboxModel=sceneMgr->addSkyBoxModel(front,back,left,right,top,bottom);*/
+	skyboxModel=sceneMgr->addSkyBoxModel(front,back,left,right,top,bottom);
 
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,false);
 	
@@ -176,8 +176,9 @@ void drawFrame(){
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
 	rtt->beginRTT(true,true,video::SColor(0xFF133E67));
-	//skyboxModel->setVisible(false);
-	//waterModel->setVisible(false);
+	skyboxModel->setVisible(false);
+	if(waterModel)
+		waterModel->setVisible(false);
 	sceneMgr->setViewingCamera(pOverlookCamera);
 	sceneMgr->render(videoDriver);
 	pCamera->getViewFrustum()->render(videoDriver);
@@ -201,8 +202,9 @@ void drawFrame(){
 	rtt->endRTT(true);
 
 	sceneMgr->setViewingCamera(pCamera);
-	//skyboxModel->setVisible(true);
-	//waterModel->setVisible(true);
+	skyboxModel->setVisible(true);
+	if(waterModel)
+		waterModel->setVisible(true);
 	planeModel->setVisible(false);
 	
 
@@ -221,16 +223,18 @@ void drawFrame(){
 	videoDriver->draw3DLine(core::vector3df(0,0,100),core::IDENTITY_VECTOR3DF,video::COLOR_BLUE);
 
 	sceneMgr->setViewingCamera(pOrthoCamera);
-	//skyboxModel->setVisible(false);
-	//waterModel->setVisible(false);
+	skyboxModel->setVisible(false);
+	if(waterModel)
+		waterModel->setVisible(false);
 	planeModel->setVisible(true);
 	terrainModel->setVisible(false);
 	sceneMgr->render(videoDriver);
 	videoDriver->end();
 
 	terrainModel->setVisible(true);
-	//waterModel->setVisible(true);
-	//skyboxModel->setVisible(true);
+	if(waterModel)
+		waterModel->setVisible(true);
+	skyboxModel->setVisible(true);
 	sceneMgr->setViewingCamera(pCamera);
 }
 void destroy(){

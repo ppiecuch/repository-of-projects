@@ -39,6 +39,8 @@ namespace camera{
 
 		virtual void setCameraPosition(const core::vector3df& pos) = 0;
 
+		virtual bool intersectWithBox(const core::vector3df& pos, f32 size) = 0;
+
 		//! recalculates the bounding box member based on the planes
 		virtual  void recalculateBoundingBox() = 0;
 		//! returns a bounding box enclosing the whole view frustum
