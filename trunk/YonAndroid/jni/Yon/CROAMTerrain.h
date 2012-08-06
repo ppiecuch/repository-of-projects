@@ -16,6 +16,19 @@ namespace terrain{
 	//The ROAM algorithm uses a unique called a binary triangle tree to store polygonal information. This tree starts off with a coarse
 	//root triangle.
 	//
+	//Out method, dubbed Real-time Optimally Adapting Meshes(ROAM), uses two priority queues to drive split and merge operations that
+	//maintain continuous triangulations built from preprocessed bintree triangles. We introduce two additional performance
+	//optimizations: incremental triangle stripping and priority-computation deferral lists.ROAM execution time is proportionate to
+	//the number of triangle changes per frame, which is typically a few percent of the output mesh size, hence ROAM performance is 
+	//insensitive to resolution and extent of the input terrain. Dynamic terrain and simple vertex morphing are supported.
+	//
+	//ROAM consists of a preprocessing component and serveral runtim components. The preprocessing component produces nested, view-
+	//dependent error bounds bottom-up for a triangle bintree. At runtime, four phases of computation are performed per frame:
+	//1.recursive, incremental update to view-frustum culling
+	//2.priority update only for output triangles that can potentially be split/merged in phase 3
+	//3.triangulation update using greedy split and merge steps driven by two priority queues(for splits and merges,respectively)
+	//4.as-needed updates for triangle strips affected by the culling changes from phase 1 and the splits/merges from phase 3
+	//
 	//Splitting and Merging, the ROAM paper suggests that instead of starting from scratch every frame, we can base the current frame
 	//mesh off of the mesh from the previous frame and add/subtract detail where it is needed.
 	//To accomplish this task, we need to split the triangle tree nodes into two priority queues: a split queue and a merge queue. These
@@ -23,7 +36,7 @@ namespace terrain{
 	//force split, or merge, the triangle with the highest priority. It is also important to maintain the requirement that a child node
 	//never have a higher priority than its parent.
 	//This is the basic and bare-bones explanation of priority queues because I don't want to spend too much time discussing them at
-	//this moment.Just know that priority queues exist and know what basic pourpose they serve.
+	//this moment.Just know that priority queues exist and know what basic pourpose they serve. 
 	//
 	//Seamus's changes
 	//Seamus McNally made several highly notable changes to the ROAM algorithm:
