@@ -43,8 +43,20 @@ namespace terrain{
 	//1.No data stored for drawn triangles
 	//2.A simpler error metric
 	//3.No frame-to-frame coherence
+	//
+	//The base "unit" for the ROAM2.0 implementation is called a diamond. Each diamond in the tree consist of two right isosceles triangles
+	//joined on a common base edge.
 	class CROAMTerrain : public ITerrainModel{
 	private:
+
+		//the function needs to take four arguments, three of which are vertex information and the fourth of which is the current level that is
+		//being rendered.(We need the level information so that we can dig into the midpoint displacement table we created earlier.) At the start of
+		// the function, we can store the maximum midpoint displacement value for the current level int a local variable, fMD, to make things easier.
+		//Then we can calculate the new vertex that was formed when we split the parent triangle.
+		//We must meet two requirements to subdivide the node. First, we need to find out if subdividing to another node requires going over the maximum
+		//detail level. If it does, then we can't subdivide; we just have to render the current triangle. Second, we need to see if the viewer is close
+		//enough to bother with a subdivision. If both of these requirements are met, we can recurse down to the current triangle's two children.
+		void renderChild();
 	public:
 		CROAMTerrain(IModel* parent,const core::vector3df& pos,
 			const core::vector3df& rot,const core::vector3df& scale);

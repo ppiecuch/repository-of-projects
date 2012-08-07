@@ -140,6 +140,12 @@ namespace ogles1{
 		initEGL(m_hWnd);
 #endif//YON_COMPILE_WITH_WIN32
 
+		//GLint temp1,temp2;
+		//glGetTexEnviv(GL_TEXTURE_ENV,GL_SRC0_ALPHA,&temp1);
+		//glGetTexEnviv(GL_TEXTURE_ENV,GL_SRC1_ALPHA,&temp2);
+		
+
+
 		initExtensionHandler();
 
 		u32 i;
@@ -189,6 +195,9 @@ namespace ogles1{
 		image->drop();
 		m_pDebugPrinter=debug::createDebugPrinter(this,tex,geometryFty);
 		((CLogger*)Logger)->setDebugPrinter(this,m_pDebugPrinter);
+
+		//Logger->debug("temp1:%08x\r\n",temp1);
+		//Logger->debug("temp2:%08x\r\n",temp2);
 
 		//实例计数器加1
 		++s_uInstanceCount;
