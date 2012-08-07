@@ -49,6 +49,9 @@ namespace terrain{
 	class CROAMTerrain : public ITerrainModel{
 	private:
 
+		f32* m_fpLevelMDSize;				//max midpoint displacement per level
+		s32 m_iMaxLevel;
+
 		//the function needs to take four arguments, three of which are vertex information and the fourth of which is the current level that is
 		//being rendered.(We need the level information so that we can dig into the midpoint displacement table we created earlier.) At the start of
 		// the function, we can store the maximum midpoint displacement value for the current level int a local variable, fMD, to make things easier.
