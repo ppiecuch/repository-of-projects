@@ -1,0 +1,38 @@
+图像使用2次方是很讨厌的问题,不在技术难度上,而在技术妥协上.实际上要求美工作出2次方纹理,并且整张图的空间利用率要高,是很难的.
+当有些策划丢过来奇奇怪怪的尺寸的图像,我都要吐血,当知道2n次方限制后,他们把图像尺寸扩大一下,再丢给我空余大量空白的2n次方纹理,再吐血.
+
+玻璃渣资源里标准的2n次方人物纹理,图像挤的满满的,每个身体部位纹理还是一个矩形,利用率之高不得不令人佩服,然而这对美工要求是极高的.
+1024*768的图像是要拆成4*3的256*256图像的,而不是一整大张纹理,因为768不是2的n次方,更不要扩大为1024*1024,加大25%的内存.
+还有Wow里Loading界面的图像都压成512*512,因为Loading图像模糊一点不要紧,很简单却都是很重要的细节.
+所以当Wow运行在我Geforce2的显卡上时,我觉的很cool.
+
+Nvidia的驱动程序也很讨厌,实际Geforce6显卡才支持non power of two texture,Geforce 5200级的显卡,在硬件能力上不足以支持NPOT,但是最新的驱动程序使用了软件模式进行模拟支持,而软件模拟根本毫无实用价值,渲染变得超级缓慢,因为驱动程序每次纹理渲染都会很聪明地把非2次方尺寸图像自动Scale到2次方尺寸,对于一个800*600的图像,驱动程序在这个步骤就吃光了CPU.
+所以总有些人喊着为什么OpenGL没有软件渲染支持,DX很体贴都有(实际上DX也没有,比如那个所谓的8层纹理),而我认为如果软件渲染能解决问题,那要硬件作什么!不能解决问题的方案我们支持它作什么!
+
+// OpenGL动态执行2n次方图像限制
+inline int next_p2(int a)
+{
+ int rval=1;
+ while(rval<a) rval<<=1;
+ return rval;
+}
+
+int nWidthPowerOfTwo = next_p2(tex.nWidth);
+int nHeightPowerOfTwo = next_p2(tex.nHeight);
+
+if(tex.nWidth == nWidthPowerOfTwo  &&  tex.nHeight == nHeightPowerOfTwo)
+{ 
+ glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nWidthPowerOfTwo, nHeightPowerOfTwo, 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
+ tex.fScaleX = tex.fScaleY = 1.0f;
+} 
+else
+{ 
+ glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nWidthPowerOfTwo, nHeightPowerOfTwo, 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, NULL);
+ glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.nWidth, tex.nHeight, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
+ tex.fScaleX = (float)tex.nWidth / (float)nWidthPowerOfTwo;
+ tex.fScaleY = (float)tex.nHeight/ (float)nHeightPowerOfTwo;
+}
+
+然而对这个问题,正确的解决方案是事先规划,强制执行,be clever.
+
+http://www.cppblog.com/mybios/archive/2006/11/19/15417.html
