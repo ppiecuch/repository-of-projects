@@ -10,6 +10,25 @@ namespace yon{
 namespace scene{
 namespace terrain{
 
+	//基本思想是:在对地形进行渲染时,根据视点位置和视线方向来计算视点距离地形表面的三角片元的距离,
+	//再根据目标格网的空间粗糙程序来判断是否对地形表面的三角片元进行一系列基于三角型二叉分割的分解和合并,
+	//最终生成逼近真实地形的无缝无重叠的简化三角化地形表面.
+
+	//分裂操作和合并操作是ROAM算法的基本操作。
+	//通过对从较低细节层次的地形网格进行分裂操作可以获得较高细节层次的地形网格；
+	//反之，使用合并操作可以将较高层次分明的地形网格恢复到较低层次的地形网格。
+	//这种自底向上逐步细化互为可逆的算法非常容易通过递归调用来实现。
+
+	//分裂与合并
+	//为了避免在分裂和合并过程中产生裂缝，ROAM算法定义了三角形3种邻接关系：Tb表示与等腰直角三角形T共享斜边的底邻居；
+	//Tl表示与等腰直角三角形T共享左直角边的左邻居；Tr表示与等腰直角三角形T共享右直角边的右邻居。
+	//Tb与T处在三角二叉树的同一层次形成的三角形对，称之为钻石型（Diamond）。
+	//如果T被分裂，为了避免产生地形裂缝和阴影不连续现象，Tb也需要被分裂。在二叉树结构中当Tb比T低一个层次时，
+	//分裂Tb会引起其他邻居被分裂，最终会导致一系列递归分裂。这样的递归分裂称之为强制分裂（forced split）。
+	//因此只有当三角形对形成钻研型结构才能够被执行分裂操作，否则就会引起强制分裂操作。
+	//T与Tb在二叉对中同处一个层次并且都被分裂过一次，称之为可合并钻石型（Mergeable Diamond）。
+	//只有当三角形对形成可合并钻研型结构的时候才能被执行合并操作。
+
 	//The ROAM algorithm, full name is Real-Time Optimally Adapting Mesh,developed by Mark Duchaineau
 	//ROAM has been synonymous with terrain for the past few years, but it recently came under fire because it was widely considered
 	//"too slow" for modern hardware.
@@ -46,8 +65,84 @@ namespace terrain{
 	//
 	//The base "unit" for the ROAM2.0 implementation is called a diamond. Each diamond in the tree consist of two right isosceles triangles
 	//joined on a common base edge.
+
+	// Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
+#define VARIANCE_DEPTH (9)
+
 	class CROAMTerrain : public ITerrainModel{
 	private:
+
+		struct TriTreeNode {
+			TriTreeNode *leftChild;
+			TriTreeNode *rightChild;
+			TriTreeNode *baseNeighbor; 
+			TriTreeNode *leftNeighbor;   
+			TriTreeNode *rightNeighbor;
+		};
+
+		class Patch
+		{
+		protected:
+			u8 *m_HeightMap;								// Pointer to height map to use
+			s32 m_WorldX, m_WorldY;							// World coordinate offset of this patch.
+
+			u8 m_VarianceLeft[ 1<<(VARIANCE_DEPTH)];		// Left variance tree
+			u8 m_VarianceRight[1<<(VARIANCE_DEPTH)];		// Right variance tree
+
+			u8 *m_CurrentVariance;							// Which varience we are currently using. [Only valid during the Tessellate and ComputeVariance passes]
+			u8 m_VarianceDirty;								// Does the Varience Tree need to be recalculated for this Patch?
+			bool m_isVisible;								// Is this patch visible in the current frame?
+
+			TriTreeNode m_BaseLeft;							// Left base triangle tree node
+			TriTreeNode m_BaseRight;						// Right base triangle tree node
+
+		public:
+			// Some encapsulation functions & extras
+			TriTreeNode *getBaseLeft(){ return &m_BaseLeft; }
+			TriTreeNode *getBaseRight(){ return &m_BaseRight; }
+			u8 isDirty(){ return m_VarianceDirty; }
+			bool isVisibile(){ return m_isVisible; }
+			void setVisibility(s32 eyeX, s32 eyeY, s32 leftX, s32 leftY, s32 rightX, s32 rightY);
+
+			// The static half of the Patch Class
+			virtual void init(s32 heightX, s32 heightY, s32 worldX, s32 worldY, u8 *hMap);
+			virtual void reset();
+			virtual void tessellate();
+			virtual void render();
+			virtual void computeVariance();
+
+			// The recursive half of the Patch Class
+			virtual void split(TriTreeNode *tri);
+			virtual void recursTessellate( TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY, s32 node);
+			virtual void recursRender(TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY);
+			virtual u8 recursComputeVariance(s32 leftX,s32 leftY,u8 leftZ, s32 rightX, s32 rightY, u8 rightZ, s32 apexX,  s32 apexY, u8 apexZ, s32 node);
+		};
+
+
+		class Landscape {
+		public:
+			// Initialize the whole process
+			void init(u8 *hMap);
+			// Reset for a new frame
+			void reset();
+			// Create mesh approximation
+			void tessellate();
+			// Render current mesh static
+			void render();
+			// Allocate a new node for the mesh
+			TriTreeNode *allocateTri();
+			
+		protected:
+			// Index to the next free TriTreeNode
+			static int m_NextTriNode;
+			// Pool of nodes for tessellation
+			static TriTreeNode m_TriPool[];
+			// Array of patches to be rendered
+			Patch m_aPatches[][];
+			// Pointer to Height Field data
+			u8 *m_HeightMap;
+			
+		};
 
 		f32* m_fpLevelMDSize;				//max midpoint displacement per level
 		s32 m_iMaxLevel;
@@ -68,4 +163,7 @@ namespace terrain{
 }
 }
 }
+
+#undef VARIANCE_DEPTH
+
 #endif

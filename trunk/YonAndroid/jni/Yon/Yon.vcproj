@@ -674,6 +674,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\CROAMTerrain.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\CROAMTerrain.h"
 						>
 					</File>
