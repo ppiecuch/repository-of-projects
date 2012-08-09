@@ -75,7 +75,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	IModel* sphereModel=sceneMgr->addModel(entity);
-	sphereModel->setPosition(core::vector3df(60,0,0));
+	sphereModel->setPosition(core::vector3df(40,0,0));
 	material=sphereModel->getMaterial(0);
 	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
 	material->setTexture(0,videoDriver->getTexture("earth.png"));
@@ -95,8 +95,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IModel* cubeModel=sceneMgr->addModel(entity);
 	material=cubeModel->getMaterial(0);
 	//cubeModel->setPosition(core::vector3df(50,100,120));
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
-	material->setTexture(0,videoDriver->getTexture("wood.png"));
+	material->setMaterialType(ENUM_MATERIAL_TYPE_BLEND);
+	//material->setAlphaSource(ENUM_ALPHA_SOURCE_VERTEX);
+	material->setTexture(0,videoDriver->getTexture("test-png24.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -113,7 +114,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	shap=geometryFty->createXYRectangle2D2T(-75,-150,75,150,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	//unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	entity=geometryFty->createEntity(unit);
 	IModel* waterfallModel=sceneMgr->addModel(entity);
 	material=waterfallModel->getMaterial(0);
@@ -130,7 +131,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	aniParam.animatorUV.stage=0;
 	aniParam.animatorUV.translate.u=0;
 	aniParam.animatorUV.translate.w=0;
-	aniParam.animatorUV.translate.v=0.002f;
+	aniParam.animatorUV.translate.v=0.02f;
 	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
 	waterfallModel->addAnimator(uvAnimator);
 	uvAnimator->drop();
