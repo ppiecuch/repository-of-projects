@@ -10,6 +10,9 @@ namespace yon{
 namespace scene{
 namespace terrain{
 
+	//1 ROAM cannot eliminate sudden movement of vertices as tesselation level changes
+	//2 ROAM cannot take advantage of some features that are very common on modern graphics accelerators such as programmable pipeline
+
 	//基本思想是:在对地形进行渲染时,根据视点位置和视线方向来计算视点距离地形表面的三角片元的距离,
 	//再根据目标格网的空间粗糙程序来判断是否对地形表面的三角片元进行一系列基于三角型二叉分割的分解和合并,
 	//最终生成逼近真实地形的无缝无重叠的简化三角化地形表面.
@@ -28,6 +31,16 @@ namespace terrain{
 	//因此只有当三角形对形成钻研型结构才能够被执行分裂操作，否则就会引起强制分裂操作。
 	//T与Tb在二叉对中同处一个层次并且都被分裂过一次，称之为可合并钻石型（Mergeable Diamond）。
 	//只有当三角形对形成可合并钻研型结构的时候才能被执行合并操作。
+
+	//帧的一致性
+	//帧的一致性是ROAM中的高级优化技术，对于这项技术来说，最后一帧建立的网格可以被再次使用。
+	//这个特性也可以用来进行动态帧定时，允许你连续的改进当前帧的网格直到这帧结束。
+	//在一个高速动作游戏中，这意味着你不必花费时间进行地形分块，相反可以先处理其他最重要的快速动作部件，而在帧时间静止时进行地形分块，而在结束时进行渲染。
+	//如果一个玩家在进行交火时，地形将用一个低级细节来动态渲染以保存时间。用本文的空间来解释帧的一致性是远远不够的，但是对于他有一些小的标题步骤：
+	//增加一个父节点指针到TriTreeNode中，建立一个不做Split()操作的Merge()函数，使用一个优先队列或其他优先结构来保存整个MESH中的叶节点。
+	//在分块过程中，随着分割这一帧中非常粗糙的节点的操作，合并所有本帧中足够DETAIL的节点（或直到时间结束）。
+
+
 
 	//The ROAM algorithm, full name is Real-Time Optimally Adapting Mesh,developed by Mark Duchaineau
 	//ROAM has been synonymous with terrain for the past few years, but it recently came under fire because it was widely considered
@@ -86,7 +99,7 @@ namespace terrain{
 			u8 *m_HeightMap;								// Pointer to height map to use
 			s32 m_WorldX, m_WorldY;							// World coordinate offset of this patch.
 
-			u8 m_VarianceLeft[ 1<<(VARIANCE_DEPTH)];		// Left variance tree
+			u8 m_VarianceLeft[1<<(VARIANCE_DEPTH)];			// Left variance tree
 			u8 m_VarianceRight[1<<(VARIANCE_DEPTH)];		// Right variance tree
 
 			u8 *m_CurrentVariance;							// Which varience we are currently using. [Only valid during the Tessellate and ComputeVariance passes]
