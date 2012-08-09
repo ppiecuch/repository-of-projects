@@ -1,4 +1,8 @@
 #include "CROAMTerrain.h"
+#include "CImage.h"
+#include "SUnit.h"
+#include "ISceneManager.h"
+#include "yonMath.h"
 
 #include "ILogger.h"
 
@@ -121,6 +125,35 @@ namespace terrain{
 			tri->leftChild->rightNeighbor = NULL;
 			tri->rightChild->leftNeighbor = NULL;
 		}
+	}
+
+	//TODO 替换为vector2d.crossProduct
+	// Taken from "Programming Principles in Computer Graphics", L. Ammeraal (Wiley)
+	inline s32 orientation(s32 pX,s32 pY,s32 qX,s32 qY,s32 rX,s32 rY)
+	{
+		s32 aX, aY, bX, bY;
+		f32 d;
+
+		aX = qX - pX;
+		aY = qY - pY;
+
+		bX = rX - pX;
+		bY = rY - pY;
+
+		d = (f32)aX * (f32)bY - (f32)aY * (f32)bX;
+		return (d < 0) ? (-1) : (d > 0);
+	}
+
+	// Set patch's visibility flag.
+	void Patch::setVisibility(s32 eyeX,s32 eyeY,s32 leftX,s32 leftY,s32 rightX,s32 rightY)
+	{
+		// Get patch's center point
+		s32 patchCenterX = m_WorldX + PATCH_SIZE / 2;
+		s32 patchCenterY = m_WorldY + PATCH_SIZE / 2;
+
+		// Set visibility flag (orientation of both triangles must be counter clockwise)
+		m_isVisible = (orientation(eyeX,eyeY,rightX,rightY,patchCenterX,patchCenterY ) < 0) &&
+			(orientation(leftX,leftY,eyeX,eyeY,patchCenterX,patchCenterY ) < 0);
 	}
 
 	//完成LOD功能。在计算完到CAMERA的距离后，它调整当前节点的Variance值，以便于适应距离的变化。
@@ -313,6 +346,103 @@ namespace terrain{
 		glPopMatrix();
 	}
 
+	// Definition of the static member variables
+	int         Landscape::m_NextTriNode;
+	TriTreeNode Landscape::m_TriPool[POOL_SIZE];
+
+	// Initialize all patches
+	void Landscape::init(unsigned char *hMap)
+	{
+		Patch *patch;
+		s32 X, Y;
+
+		// Store the Height Field array
+		m_HeightMap = hMap;
+
+		// Initialize all terrain patches
+		for ( Y=0; Y < NUM_PATCHES_PER_SIDE; Y++)
+			for ( X=0; X < NUM_PATCHES_PER_SIDE; X++ )
+			{
+				patch = &(m_Patches[Y][X]);
+				patch->init( X*PATCH_SIZE, Y*PATCH_SIZE, X*PATCH_SIZE, Y*PATCH_SIZE, hMap );
+				patch->computeVariance();
+			}
+	}
+
+	// Reset all patches, recompute variance if needed
+	void Landscape::reset()
+	{
+		//
+		// Perform simple visibility culling on entire patches.
+		//   - Define a triangle set back from the camera by one patch size, following
+		//     the angle of the frustum.
+		//   - A patch is visible if it's center point is included in the angle: Left,Eye,Right
+		//   - This visibility test is only accurate if the camera cannot look up or down significantly.
+		//
+		const float PI_DIV_180 = M_PI / 180.0f;
+		const float FOV_DIV_2 = gFovX/2;
+
+		int eyeX = (int)(gViewPosition[0] - PATCH_SIZE * sinf( gClipAngle * PI_DIV_180 ));
+		int eyeY = (int)(gViewPosition[2] + PATCH_SIZE * cosf( gClipAngle * PI_DIV_180 ));
+
+		int leftX  = (int)(eyeX + 100.0f * sinf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+		int leftY  = (int)(eyeY - 100.0f * cosf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+
+		int rightX = (int)(eyeX + 100.0f * sinf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+		int rightY = (int)(eyeY - 100.0f * cosf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+
+		int X, Y;
+		Patch *patch;
+
+		// Set the next free triangle pointer back to the beginning
+		SetNextTriNode(0);
+
+		// Reset rendered triangle count.
+		gNumTrisRendered = 0;
+
+		// Go through the patches performing resets, compute variances, and linking.
+		for ( Y=0; Y < NUM_PATCHES_PER_SIDE; Y++ )
+			for ( X=0; X < NUM_PATCHES_PER_SIDE; X++)
+			{
+				patch = &(m_Patches[Y][X]);
+
+				// Reset the patch
+				patch->Reset();
+				patch->SetVisibility( eyeX, eyeY, leftX, leftY, rightX, rightY );
+
+				// Check to see if this patch has been deformed since last frame.
+				// If so, recompute the varience tree for it.
+				if ( patch->isDirty() )
+					patch->ComputeVariance();
+
+				if ( patch->isVisibile() )
+				{
+					// Link all the patches together.
+					if ( X > 0 )
+						patch->GetBaseLeft()->LeftNeighbor = m_Patches[Y][X-1].GetBaseRight();
+					else
+						patch->GetBaseLeft()->LeftNeighbor = NULL;		// Link to bordering Landscape here..
+
+					if ( X < (NUM_PATCHES_PER_SIDE-1) )
+						patch->GetBaseRight()->LeftNeighbor = m_Patches[Y][X+1].GetBaseLeft();
+					else
+						patch->GetBaseRight()->LeftNeighbor = NULL;		// Link to bordering Landscape here..
+
+					if ( Y > 0 )
+						patch->GetBaseLeft()->RightNeighbor = m_Patches[Y-1][X].GetBaseRight();
+					else
+						patch->GetBaseLeft()->RightNeighbor = NULL;		// Link to bordering Landscape here..
+
+					if ( Y < (NUM_PATCHES_PER_SIDE-1) )
+						patch->GetBaseRight()->RightNeighbor = m_Patches[Y+1][X].GetBaseLeft();
+					else
+						patch->GetBaseRight()->RightNeighbor = NULL;	// Link to bordering Landscape here..
+				}
+			}
+
+	}
+
+
 	// Create an approximate mesh of the landscape.
 	void Landscape::tessellate()
 	{
@@ -326,8 +456,22 @@ namespace terrain{
 		}
 	}
 
+	// Allocate a TriTreeNode from the pool.
+	TriTreeNode *Landscape::allocateTri()
+	{
+		TriTreeNode *pTri;
+
+		// IF we've run out of TriTreeNodes, just return NULL (this is handled gracefully)
+		if ( m_NextTriNode >= POOL_SIZE )
+			return NULL;
+
+		pTri = &(m_TriPool[m_NextTriNode++]);
+		pTri->leftChild = pTri->rightChild = NULL;
+
+		return pTri;
+	}
+
 	// Render each patch of the landscape & adjust the frame variance.
-	//
 	void Landscape::Render()
 	{
 		int nCount;
@@ -350,6 +494,73 @@ namespace terrain{
 		// Bounds checking.
 		if (gFrameVariance < 0)
 			gFrameVariance = 0;
+	}
+
+	CROAMTerrain::CROAMTerrain(IModel* parent,const core::vector3df& pos,
+		const core::vector3df& rot,const core::vector3df& scale)
+		:ITerrainModel(parent,pos,rot,scale),m_iSizePerSide(0),m_iImageSizePerSide(0)
+	{
+		m_pUnit=new Unit3D2T();
+		//m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+		//m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+		//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
+		m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
+		m_pUnit->setShap(&m_shap);
+	}
+
+	CROAMTerrain::~CROAMTerrain(){
+		m_pUnit->drop();
+	}
+
+
+	void CROAMTerrain::loadHeightMap(video::IImage* image,ENUM_PATCH_SIZE patchSize)
+	{
+		if(image==NULL)
+			return;
+		YON_DEBUG_BREAK_IF(image->getDimension().w!=image->getDimension().h);
+
+		m_iImageSizePerSide=image->getDimension().w;
+		m_iSizePerSide=(core::nearestPowerOf2(m_iImageSizePerSide)>>1)+1;
+
+		Logger->debug("image.w:%d,sizePerSide:%d\r\n",m_iImageSizePerSide,m_iSizePerSide);
+
+		const u32 numVertices=m_iSizePerSide*m_iSizePerSide;
+		m_shap.getVertexArray().set_used(numVertices);
+
+		const f32 texcoordDelta = 1.0f/(f32)(m_iImageSizePerSide-1);
+		const f32 texcoordDelta2 = 1.0f/(f32)(patchSize-1);
+		s32 index=0;
+		f32 fx=0.f;
+		f32 fv=0.f;
+		f32 fv2=0.f;
+		for(s32 x = 0; x<m_iSizePerSide; ++x)
+		{
+			f32 fz=0.f;
+			f32 fu=0.f;
+			f32 fu2=0.f;
+			for(s32 z = 0; z<m_iSizePerSide; ++z)
+			{
+				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
+				v.pos.x=fx*m_scale.x;
+				v.pos.y=(f32)image->getValue(z,x)*m_scale.y;
+				v.pos.z=fz*m_scale.z;
+
+				v.texcoords0.x=fu;
+				v.texcoords0.y=fv;
+
+				v.texcoords1.x=fu2;
+				v.texcoords1.y=fv2;
+
+				//Logger->debug("vertex[%d]:%.2f,%.2f,%.2f\r\n",index-1,v.pos.x,v.pos.y,v.pos.z);
+
+				++fz;
+				fu+=texcoordDelta;
+				fu2+=texcoordDelta2;
+			}
+			++fx;
+			fv+=texcoordDelta;
+			fv2+=texcoordDelta2;
+		}
 	}
 }
 }
