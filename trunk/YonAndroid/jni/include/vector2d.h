@@ -109,6 +109,14 @@ namespace yon{
 				return x*other.x + y*other.y;
 			}
 
+			//! Get the cross product of this vector with another.
+			// If the result is minus then the orientation from this vector to the other vector is in clockwise,
+			// while the result is plus then the orientation is in counterclockwise.
+			T crossProduct(const vector2d<T>& other) const
+			{
+				return x*other.y-y*other.x;
+			}
+
 			//! Gets distance from another point.
 			/** Here, the vector is interpreted as a point in 2-dimensional space.
 			\param other Other vector to measure from.
