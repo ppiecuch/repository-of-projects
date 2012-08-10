@@ -54,9 +54,9 @@ namespace video{
 
 		virtual SColor getPixel(u32 x, u32 y) const;
 
-		virtual u32 getValue(u32 x,u32 y) const{
+		virtual u8 getValue(u32 x,u32 y) const{
 			if (x >= m_size.w || y >= m_size.h)
-				return -1;
+				return 0;
 			return m_pData[y*m_size.w + x];
 		}
 	};
