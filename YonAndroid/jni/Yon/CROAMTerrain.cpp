@@ -10,7 +10,14 @@ namespace yon{
 namespace scene{
 namespace terrain{
 
+	const s32 Patch::VARIANCE_DEPTH=9;
+
+	const s32 CROAMTerrain::POOL_SIZE=25000;
+	int  CROAMTerrain::m_NextTriNode;
+	TriTreeNode CROAMTerrain::m_TriPool[POOL_SIZE];
+
 	// Initialize a patch.
+	/*
 	void Patch::init(s32 heightX,s32 heightY,s32 worldX,s32 worldY,u8 *hMap)
 	{
 		// Clear all the relationships
@@ -26,12 +33,12 @@ namespace terrain{
 		m_WorldY = worldY;
 
 		// Store pointer to first byte of the height data for this patch.
-		m_HeightMap = &hMap[heightY * MAP_SIZE + heightX];
+		m_HeightMap = &hMap[heightY * m_iMapSize + heightX];
 
 		// Initialize flags
 		m_VarianceDirty = 1;
 		m_isVisible = false;
-	}
+	}*/
 
 	// Reset the patch.
 	void Patch::reset()
@@ -148,8 +155,8 @@ namespace terrain{
 	void Patch::setVisibility(s32 eyeX,s32 eyeY,s32 leftX,s32 leftY,s32 rightX,s32 rightY)
 	{
 		// Get patch's center point
-		s32 patchCenterX = m_WorldX + PATCH_SIZE / 2;
-		s32 patchCenterY = m_WorldY + PATCH_SIZE / 2;
+		s32 patchCenterX = m_WorldX + m_iPatchSize / 2;
+		s32 patchCenterY = m_WorldY + m_iPatchSize / 2;
 
 		// Set visibility flag (orientation of both triangles must be counter clockwise)
 		m_isVisible = (orientation(eyeX,eyeY,rightX,rightY,patchCenterX,patchCenterY ) < 0) &&
@@ -200,10 +207,10 @@ namespace terrain{
 	{
 		// Split each of the base triangles
 		m_CurrentVariance = m_VarianceLeft;
-		recursTessellate (&m_BaseLeft,m_WorldX,m_WorldY+PATCH_SIZE,m_WorldX+PATCH_SIZE,m_WorldY,m_WorldX,m_WorldY,1);
+		recursTessellate (&m_BaseLeft,m_WorldX,m_WorldY+m_iPatchSize,m_WorldX+m_iPatchSize,m_WorldY,m_WorldX,m_WorldY,1);
 
 		m_CurrentVariance = m_VarianceRight;
-		recursTessellate(&m_BaseRight,m_WorldX+PATCH_SIZE,m_WorldY,m_WorldX,m_WorldY+PATCH_SIZE,m_WorldX+PATCH_SIZE,m_WorldY+PATCH_SIZE,1);
+		recursTessellate(&m_BaseRight,m_WorldX+m_iPatchSize,m_WorldY,m_WorldX,m_WorldY+m_iPatchSize,m_WorldX+m_iPatchSize,m_WorldY+m_iPatchSize,1);
 	}
 
 	//用于获得当前三角形的所有坐标设置和我们保存在栈内的一部分扩展信息。三角的Variance值是和它的子三角一起合并计算的。
@@ -222,7 +229,7 @@ namespace terrain{
 		u8 myVariance;
 
 		// Get the height value at the middle of the Hypotenuse
-		u8 centerZ  = m_HeightMap[(centerY * MAP_SIZE) + centerX];
+		u8 centerZ  = m_HeightMap[(centerY * m_iMapSize) + centerX];
 
 		// Variance of this triangle is the actual height at it's hypotenuse midpoint minus the interpolated height.
 		// Use values passed on the stack instead of re-accessing the Height Field.
@@ -242,6 +249,20 @@ namespace terrain{
 			m_CurrentVariance[node] = 1 + myVariance;
 
 		return myVariance;
+	}
+
+	// Compute the variance tree for each of the Binary Triangles in this patch.
+	void Patch::computeVariance()
+	{
+		// Compute variance on each of the base triangles...
+		m_CurrentVariance = m_VarianceLeft;
+		recursComputeVariance(0,m_iPatchSize,m_HeightMap[m_iPatchSize * m_iMapSize],m_iPatchSize,0,m_HeightMap[m_iPatchSize],0,0,m_HeightMap[0],1);
+
+		m_CurrentVariance = m_VarianceRight;
+		recursComputeVariance(m_iPatchSize,0,m_HeightMap[m_iPatchSize],0,m_iPatchSize,m_HeightMap[m_iPatchSize * m_iMapSize],m_iPatchSize, m_iPatchSize,m_HeightMap[(m_iPatchSize * m_iMapSize) + m_iPatchSize],1);
+
+		// Clear the dirty flag for this patch
+		m_VarianceDirty = 0;
 	}
 
 	//这个函数非常的简单，但是你必须看一下在下面高级话题中的三角形排列优化技术。
@@ -338,8 +359,8 @@ namespace terrain{
 		glTranslatef( (GLfloat)m_WorldX, 0, (GLfloat)m_WorldY );
 		glBegin(GL_TRIANGLES);
 
-		recursRender(&m_BaseLeft,0,PATCH_SIZE,PATCH_SIZE,0,0,0);
-		recursRender(&m_BaseRight,PATCH_SIZE,0,0,PATCH_SIZE,PATCH_SIZE,PATCH_SIZE);
+		recursRender(&m_BaseLeft,0,m_iPatchSize,m_iPatchSize,0,0,0);
+		recursRender(&m_BaseRight,m_iPatchSize,0,0,m_iPatchSize,m_iPatchSize,m_iPatchSize);
 
 		glEnd();
 		// Restore the matrix
@@ -347,10 +368,12 @@ namespace terrain{
 	}
 
 	// Definition of the static member variables
-	int         Landscape::m_NextTriNode;
-	TriTreeNode Landscape::m_TriPool[POOL_SIZE];
+	//int         Landscape::m_NextTriNode;
+	//TriTreeNode Landscape::m_TriPool[POOL_SIZE];
+	
 
 	// Initialize all patches
+	/*
 	void Landscape::init(unsigned char *hMap)
 	{
 		Patch *patch;
@@ -367,7 +390,7 @@ namespace terrain{
 				patch->init( X*PATCH_SIZE, Y*PATCH_SIZE, X*PATCH_SIZE, Y*PATCH_SIZE, hMap );
 				patch->computeVariance();
 			}
-	}
+	}*/
 
 	// Reset all patches, recompute variance if needed
 	void Landscape::reset()
@@ -496,9 +519,87 @@ namespace terrain{
 			gFrameVariance = 0;
 	}
 
+	const s32 CPatch::VARIANCE_DEPTH=9;
+
+	void CPatch::init(u16 index,u8* heightMap)
+	{
+		// Clear all the relationships
+		m_baseLeft.rightNeighbor = m_baseLeft.leftNeighbor = m_baseRight.rightNeighbor = m_baseRight.leftNeighbor =
+			m_baseLeft.leftChild = m_baseLeft.rightChild = m_baseRight.leftChild = m_baseLeft.leftChild = NULL;
+
+		// Attach the two m_Base triangles together
+		m_baseLeft.baseNeighbor = &m_baseRight;
+		m_baseRight.baseNeighbor = &m_baseLeft;
+
+		// Store Patch offsets for the patch
+		m_uIndex=index;
+		m_pHeightMap=heightMap;
+
+		// Initialize flags
+		m_varianceDirty = true;
+		m_visible = false;
+	}
+
+	void CPatch::reset()
+	{
+		// Assume patch is not visible.
+		m_visible = false;
+
+		// Reset the important relationships
+		m_baseLeft.leftChild = m_baseLeft.rightChild = m_baseRight.leftChild = m_baseLeft.leftChild = NULL;
+
+		// Attach the two m_Base triangles together
+		m_baseLeft.baseNeighbor = &m_baseRight;
+		m_baseRight.baseNeighbor = &m_baseLeft;
+
+		// Clear the other relationships.
+		m_baseLeft.rightNeighbor = m_baseLeft.leftNeighbor = m_baseRight.rightNeighbor = m_baseRight.leftNeighbor = NULL;
+	}
+
+	u8 CPatch::recursComputeVariance(s32 leftIndex,u8 leftHeight, s32 rightIndex,u8 rightHeight,s32 apexIndex,u8 apexHeight, s32 nodeIndex)
+	{
+		s32 centerIndex=(leftIndex+rightIndex)>>1;
+		u8 maxVariance;
+
+		// Get the height value at the middle of the Hypotenuse
+		u8 centerHeight=m_pHeightMap[centerIndex];
+
+		// Variance of this triangle is the actual height at it's hypotenuse midpoint minus the interpolated height.
+		// Use values passed on the stack instead of re-accessing the Height Field.
+		maxVariance = (u8)core::abs_((s32)centerHeight - (((s32)leftHeight + (s32)rightHeight)>>1));
+
+		// Since we're after speed and not perfect representations, only calculate variance down to an 8x8 block
+		if ((core::abs_(leftX - rightX) >= 8)||(core::abs_(leftY - rightY) >= 8) )
+		{
+			// Final Variance for this node is the max of it's own variance and that of it's children.
+			maxVariance = core::max_( maxVariance, recursComputeVariance(apexIndex,apexHeight,leftIndex,leftHeight,centerIndex,centerHeight,nodeIndex<<1));
+			maxVariance = core::max_( maxVariance, recursComputeVariance(rightIndex,rightHeight,apexIndex,apexHeight,centerIndex,centerHeight,1+(nodeIndex<<1)));
+		}
+
+		// Store the final variance for this node.  Note Variance is never zero.
+		if (nodeIndex<(1<<VARIANCE_DEPTH))
+			m_pCurrentVariance[nodeIndex] = 1 + maxVariance;
+
+		return maxVariance;
+	}
+
+	void CPatch::computeVariance()
+	{
+		// Compute variance on each of the base triangles...
+		m_pCurrentVariance = m_varianceLeft;
+		recursComputeVariance(0,m_iPatchSize,m_HeightMap[m_iPatchSize * m_iMapSize],m_iPatchSize,0,m_HeightMap[m_iPatchSize],0,0,m_HeightMap[0],1);
+
+		m_pCurrentVariance = m_varianceRight;
+		recursComputeVariance(m_iPatchSize,0,m_HeightMap[m_iPatchSize],0,m_iPatchSize,m_HeightMap[m_iPatchSize * m_iMapSize],m_iPatchSize, m_iPatchSize,m_HeightMap[(m_iPatchSize * m_iMapSize) + m_iPatchSize],1);
+
+		// Clear the dirty flag for this patch
+		m_varianceDirty = false;
+	}
+
 	CROAMTerrain::CROAMTerrain(IModel* parent,const core::vector3df& pos,
 		const core::vector3df& rot,const core::vector3df& scale)
-		:ITerrainModel(parent,pos,rot,scale),m_iSizePerSide(0),m_iImageSizePerSide(0)
+		:ITerrainModel(parent,pos,rot,scale),m_iMapSize(0),m_iImageSizePerSide(0),
+		m_iNumPatchPerSide(0),m_iPatchSize(0),m_aPatches(NULL)
 	{
 		m_pUnit=new Unit3D2T();
 		//m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
@@ -510,6 +611,15 @@ namespace terrain{
 
 	CROAMTerrain::~CROAMTerrain(){
 		m_pUnit->drop();
+		if(m_aPatches!=NULL)
+		{
+			for(s32 x=0;x<m_iNumPatchPerSide;++x)
+			{
+				delete[] m_aPatches[x];
+			}
+			delete[] m_aPatches;
+			m_aPatches=NULL;
+		}
 	}
 
 
@@ -520,25 +630,27 @@ namespace terrain{
 		YON_DEBUG_BREAK_IF(image->getDimension().w!=image->getDimension().h);
 
 		m_iImageSizePerSide=image->getDimension().w;
-		m_iSizePerSide=(core::nearestPowerOf2(m_iImageSizePerSide)>>1)+1;
+		m_iMapSize=(core::nearestPowerOf2(m_iImageSizePerSide)>>1)+1;
+		m_iPatchSize=patchSize-1;
+		m_iNumPatchPerSide=m_iMapSize/m_iPatchSize;
 
-		Logger->debug("image.w:%d,sizePerSide:%d\r\n",m_iImageSizePerSide,m_iSizePerSide);
+		Logger->debug("image.w:%d,mapSize:%d,patchSize:%d\r\n",m_iImageSizePerSide,m_iMapSize,m_iPatchSize);
 
-		const u32 numVertices=m_iSizePerSide*m_iSizePerSide;
+		const u32 numVertices=m_iMapSize*m_iMapSize;
 		m_shap.getVertexArray().set_used(numVertices);
 
 		const f32 texcoordDelta = 1.0f/(f32)(m_iImageSizePerSide-1);
-		const f32 texcoordDelta2 = 1.0f/(f32)(patchSize-1);
+		const f32 texcoordDelta2 = 1.0f/(f32)(m_iPatchSize);
 		s32 index=0;
 		f32 fx=0.f;
 		f32 fv=0.f;
 		f32 fv2=0.f;
-		for(s32 x = 0; x<m_iSizePerSide; ++x)
+		for(s32 x = 0; x<m_iMapSize; ++x)
 		{
 			f32 fz=0.f;
 			f32 fu=0.f;
 			f32 fu2=0.f;
-			for(s32 z = 0; z<m_iSizePerSide; ++z)
+			for(s32 z = 0; z<m_iMapSize; ++z)
 			{
 				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
 				v.pos.x=fx*m_scale.x;
@@ -560,6 +672,20 @@ namespace terrain{
 			++fx;
 			fv+=texcoordDelta;
 			fv2+=texcoordDelta2;
+		}
+
+		m_aPatches=(Patch***)new Patch**[m_iNumPatchPerSide];
+		index=0;
+		for(s32 x=0;x<m_iNumPatchPerSide;++x)
+		{
+			m_aPatches[x]=(Patch**)new Patch*[m_iNumPatchPerSide];
+			for(s32 z=0;z<m_iNumPatchPerSide;++z)
+			{
+				m_aPatches[x][z]=new Patch();
+				//m_aPatches[x][z]->init(x*m_iPatchSize,z*m_iPatchSize,x*m_iPatchSize,z*m_iPatchSize, hMap );
+				m_aPatches[x][z]->init(index++);
+				m_aPatches[x][z]->computeVariance();
+			}
 		}
 	}
 }

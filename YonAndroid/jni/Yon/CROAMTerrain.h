@@ -13,6 +13,22 @@ namespace terrain{
 	//1 ROAM cannot eliminate sudden movement of vertices as tesselation level changes
 	//2 ROAM cannot take advantage of some features that are very common on modern graphics accelerators such as programmable pipeline
 
+	//3d coordinate:
+	//             z index
+	//             ↑ ↑
+	//    right    ∣ ∣
+	//  top┼bottom∣ ∣
+	//    left     ∣ ∣
+	//x←─────┘
+	//
+	//image coordinate:
+	// z           
+	// ↑
+	// ∣
+	// ∣
+	// ∣
+	// └─────→x
+
 	//基本思想是:在对地形进行渲染时,根据视点位置和视线方向来计算视点距离地形表面的三角片元的距离,
 	//再根据目标格网的空间粗糙程序来判断是否对地形表面的三角片元进行一系列基于三角型二叉分割的分解和合并,
 	//最终生成逼近真实地形的无缝无重叠的简化三角化地形表面.
@@ -78,10 +94,6 @@ namespace terrain{
 	//
 	//The base "unit" for the ROAM2.0 implementation is called a diamond. Each diamond in the tree consist of two right isosceles triangles
 	//joined on a common base edge.
-
-	// Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
-#define VARIANCE_DEPTH (9)
-
 	class CROAMTerrain : public ITerrainModel{
 	private:
 
@@ -93,11 +105,42 @@ namespace terrain{
 			TriTreeNode *rightNeighbor;
 		};
 
+		class CPatch
+		{
+			//TODO 改为非static
+			// Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
+			const static s32 VARIANCE_DEPTH;
+
+			u8 *m_pHeightMap;			// Pointer to height map to use
+			u16 m_uIndex;
+
+			TriTreeNode m_baseLeft;		// Left base triangle tree node
+			TriTreeNode m_baseRight;	// Right base triangle tree node
+
+			u8 *m_pCurrentVariance;		// Which varience we are currently using. [Only valid during the Tessellate and ComputeVariance passes]
+			bool m_varianceDirty;		// Does the Varience Tree need to be recalculated for this Patch?
+			bool m_visible;				// Is this patch visible in the current frame?
+
+			u8 m_varianceLeft[1<<(VARIANCE_DEPTH)];			// Left variance tree
+			u8 m_varianceRight[1<<(VARIANCE_DEPTH)];		// Right variance tree
+
+			// Computes Variance over the entire tree, and return the max variance among them.  Does not examine node relationships.
+			u8 recursComputeVariance(s32 leftIndex,u8 leftHeight, s32 rightIndex,u8 rightHeight,s32 apexIndex,u8 apexHeight, s32 nodeIndex);
+		public:
+			void init(u16 index,u8* heightMap);		// Initialize a patch.
+			void reset();							// Reset the patch.
+			void computeVariance();					// Compute the variance tree for each of the Binary Triangles in this patch.
+		};
+
 		class Patch
 		{
+			//TODO 改为非static
+			// Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
+			const static s32 VARIANCE_DEPTH;
 		protected:
-			u8 *m_HeightMap;								// Pointer to height map to use
-			s32 m_WorldX, m_WorldY;							// World coordinate offset of this patch.
+			//u8 *m_HeightMap;								// Pointer to height map to use
+			//s32 m_WorldX, m_WorldY;							// World coordinate offset of this patch.
+			u16 m_uIndex;
 
 			u8 m_VarianceLeft[1<<(VARIANCE_DEPTH)];			// Left variance tree
 			u8 m_VarianceRight[1<<(VARIANCE_DEPTH)];		// Right variance tree
@@ -118,17 +161,18 @@ namespace terrain{
 			void setVisibility(s32 eyeX, s32 eyeY, s32 leftX, s32 leftY, s32 rightX, s32 rightY);
 
 			// The static half of the Patch Class
-			virtual void init(s32 heightX, s32 heightY, s32 worldX, s32 worldY, u8 *hMap);
-			virtual void reset();
-			virtual void tessellate();
-			virtual void render();
-			virtual void computeVariance();
+			//virtual void init(s32 heightX, s32 heightY, s32 worldX, s32 worldY, u8 *hMap);
+			void init(u16 index);
+			void reset();
+			void tessellate();
+			void render();
+			void computeVariance();
 
 			// The recursive half of the Patch Class
-			virtual void split(TriTreeNode *tri);
-			virtual void recursTessellate( TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY, s32 node);
-			virtual void recursRender(TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY);
-			virtual u8 recursComputeVariance(s32 leftX,s32 leftY,u8 leftZ, s32 rightX, s32 rightY, u8 rightZ, s32 apexX,  s32 apexY, u8 apexZ, s32 node);
+			void split(TriTreeNode *tri);
+			void recursTessellate( TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY, s32 node);
+			void recursRender(TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY);
+			u8 recursComputeVariance(s32 leftX,s32 leftY,u8 leftZ, s32 rightX, s32 rightY, u8 rightZ, s32 apexX,  s32 apexY, u8 apexZ, s32 node);
 		};
 
 
@@ -169,11 +213,28 @@ namespace terrain{
 		//enough to bother with a subdivision. If both of these requirements are met, we can recurse down to the current triangle's two children.
 		//void renderChild();
 
+		//TODO use objectpool
+		// How many TriTreeNodes should be allocated?
+		const static s32 POOL_SIZE;
+
+		// Index to the next free TriTreeNode
+		static int m_NextTriNode;
+		// Pool of nodes for tessellation
+		static TriTreeNode m_TriPool[POOL_SIZE];
+		// Array of patches to be rendered
+		Patch*** m_aPatches;
+		// Pointer to Height Field data
+		//u8 *m_HeightMap;
+
 		s32 m_iImageSizePerSide;
-		s32 m_iSizePerSide;
+		s32 m_iMapSize;
+		s32 m_iNumPatchPerSide;
+		s32 m_iPatchSize;
 
 		IUnit* m_pUnit;
 		SDynamicShap3D2T m_shap;
+
+		friend class CPatch;
 
 	public:
 		CROAMTerrain(IModel* parent,const core::vector3df& pos,
@@ -185,7 +246,5 @@ namespace terrain{
 }
 }
 }
-
-#undef VARIANCE_DEPTH
 
 #endif

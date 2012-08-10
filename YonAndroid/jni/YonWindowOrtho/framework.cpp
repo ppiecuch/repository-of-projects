@@ -60,7 +60,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,core::vector3df(0,0,-300),core::vector3df(0,-1,0));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0));
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
