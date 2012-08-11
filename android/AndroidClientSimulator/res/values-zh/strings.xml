@@ -1,0 +1,18 @@
+<resources>
+
+<string name="confirm_dialog_positive">确认</string>
+<string name="confirm_dialog_negetive">退出游戏</string>
+
+<string name="confirm_dialog_title_network">检测网络连接</string>
+<string name="confirm_dialog_content_network">当前不存在可用的网络连接，是否现在进行设置？</string>
+
+<string name="confirm_dialog_title_sd">检测SD卡</string>
+<string name="confirm_dialog_content_sd">当前不存在可用的SD卡，请先安装SD卡再进行游戏！</string>
+
+<string name="confirm_dialog_title_timeout">检测版本</string>
+<string name="confirm_dialog_content_timeout">尝试连接服务器超时，请检测网络连接是否正常！</string>
+
+<string name="confirm_dialog_title_failed">检测版本</string>
+<string name="confirm_dialog_content_failed">连接意外断开，请检测网络连接是否正常！</string>
+
+</resources>
