@@ -10,56 +10,136 @@ namespace yon{
 namespace scene{
 namespace terrain{
 
-	const s32 Patch::VARIANCE_DEPTH=9;
+	//const s32 CROAMTerrain::POOL_SIZE=25000;
+	s32  CROAMTerrain::m_NextTriNode;
+	//TriTreeNode CROAMTerrain::m_TriPool[POOL_SIZE];
 
-	const s32 CROAMTerrain::POOL_SIZE=25000;
-	int  CROAMTerrain::m_NextTriNode;
-	TriTreeNode CROAMTerrain::m_TriPool[POOL_SIZE];
+	// Beginning frame varience (should be high, it will adjust automatically)
+	float gFrameVariance = 50;
 
-	// Initialize a patch.
-	/*
-	void Patch::init(s32 heightX,s32 heightY,s32 worldX,s32 worldY,u8 *hMap)
+	//TODO 替换为vector2d.crossProduct
+	// Taken from "Programming Principles in Computer Graphics", L. Ammeraal (Wiley)
+	inline s32 orientation(s32 pX,s32 pY,s32 qX,s32 qY,s32 rX,s32 rY)
 	{
-		// Clear all the relationships
-		m_BaseLeft.rightNeighbor = m_BaseLeft.leftNeighbor = m_BaseRight.rightNeighbor = m_BaseRight.leftNeighbor =
-			m_BaseLeft.leftChild = m_BaseLeft.rightChild = m_BaseRight.leftChild = m_BaseLeft.leftChild = NULL;
+		s32 aX, aY, bX, bY;
+		f32 d;
 
-		// Attach the two m_Base triangles together
-		m_BaseLeft.baseNeighbor = &m_BaseRight;
-		m_BaseRight.baseNeighbor = &m_BaseLeft;
+		aX = qX - pX;
+		aY = qY - pY;
 
-		// Store Patch offsets for the world and heightmap.
-		m_WorldX = worldX;
-		m_WorldY = worldY;
+		bX = rX - pX;
+		bY = rY - pY;
 
-		// Store pointer to first byte of the height data for this patch.
-		m_HeightMap = &hMap[heightY * m_iMapSize + heightX];
+		d = (f32)aX * (f32)bY - (f32)aY * (f32)bX;
+		return (d < 0) ? (-1) : (d > 0);
+	}
+	
 
-		// Initialize flags
-		m_VarianceDirty = 1;
-		m_isVisible = false;
-	}*/
-
-	// Reset the patch.
-	void Patch::reset()
+	CROAMTerrain::CROAMTerrain(IModel* parent,const core::vector3df& pos,
+		const core::vector3df& rot,const core::vector3df& scale)
+		:ITerrainModel(parent,pos,rot,scale),m_iMapSize(0),m_iImageSizePerSide(0),
+		m_iNumPatchPerSide(0),m_iPatchSize(0),m_aPatches(NULL),m_iVarianceDepth(9)
 	{
-		// Assume patch is not visible.
-		m_isVisible = false;
+		m_pUnit=new Unit3D2T();
+		//m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+		//m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+		//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
+		m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
+		m_pUnit->setShap(&m_shap);
+	}
 
-		// Reset the important relationships
-		m_BaseLeft.leftChild = m_BaseLeft.rightChild = m_BaseRight.leftChild = m_BaseLeft.leftChild = NULL;
+	CROAMTerrain::~CROAMTerrain(){
+		m_pUnit->drop();
+		if(m_aPatches!=NULL)
+		{
+			for(s32 x=0;x<m_iNumPatchPerSide;++x)
+			{
+				for(s32 z=0;z<m_iNumPatchPerSide;++z)
+					delete m_aPatches[x][z];
+				delete[] m_aPatches[x];
+			}
+			delete[] m_aPatches;
+			m_aPatches=NULL;
+		}
+	}
 
-		// Attach the two m_Base triangles together
-		m_BaseLeft.baseNeighbor = &m_BaseRight;
-		m_BaseRight.baseNeighbor = &m_BaseLeft;
+	void CROAMTerrain::reset()
+	{
+		//
+		// Perform simple visibility culling on entire patches.
+		//   - Define a triangle set back from the camera by one patch size, following
+		//     the angle of the frustum.
+		//   - A patch is visible if it's center point is included in the angle: Left,Eye,Right
+		//   - This visibility test is only accurate if the camera cannot look up or down significantly.
+		//
+		const float PI_DIV_180 = M_PI / 180.0f;
+		const float FOV_DIV_2 = gFovX/2;
 
-		// Clear the other relationships.
-		m_BaseLeft.rightNeighbor = m_BaseLeft.leftNeighbor = m_BaseRight.rightNeighbor = m_BaseRight.leftNeighbor = NULL;
+		int eyeX = (int)(gViewPosition[0] - PATCH_SIZE * sinf( gClipAngle * PI_DIV_180 ));
+		int eyeY = (int)(gViewPosition[2] + PATCH_SIZE * cosf( gClipAngle * PI_DIV_180 ));
+
+		int leftX  = (int)(eyeX + 100.0f * sinf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+		int leftY  = (int)(eyeY - 100.0f * cosf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
+
+		int rightX = (int)(eyeX + 100.0f * sinf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+		int rightY = (int)(eyeY - 100.0f * cosf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
+
+		int X, Y;
+		Patch *patch;
+
+		// Set the next free triangle pointer back to the beginning
+		//SetNextTriNode(0);
+		m_NextTriNode=0;
+
+		// Reset rendered triangle count.
+		gNumTrisRendered = 0;
+
+		// Go through the patches performing resets, compute variances, and linking.
+		for ( Y=0; Y < m_iNumPatchPerSide; Y++ )
+		{
+			for ( X=0; X < m_iNumPatchPerSide; X++)
+			{
+				patch = &(m_aPatches[Y][X]);
+
+				// Reset the patch
+				patch->Reset();
+				patch->SetVisibility( eyeX, eyeY, leftX, leftY, rightX, rightY );
+
+				// Check to see if this patch has been deformed since last frame.
+				// If so, recompute the varience tree for it.
+				if ( patch->isDirty() )
+					patch->computeVariance();
+
+				if ( patch->isVisibile() )
+				{
+					// Link all the patches together.
+					if ( X > 0 )
+						patch->m_baseLeft->leftNeighbor = m_aPatches[Y][X-1].m_baseRight;
+					else
+						patch->m_baseLeft->leftNeighbor = NULL;		// Link to bordering Landscape here..
+
+					if ( X < (m_iNumPatchPerSide-1) )
+						patch->m_BaseRight->leftNeighbor = m_aPatches[Y][X+1].m_baseLeft;
+					else
+						patch->m_BaseRight->leftNeighbor = NULL;		// Link to bordering Landscape here..
+
+					if ( Y > 0 )
+						patch->m_baseLeft->rightNeighbor = m_aPatches[Y-1][X].m_baseRight;
+					else
+						patch->m_baseLeft->rightNeighbor = NULL;		// Link to bordering Landscape here..
+
+					if ( Y < (m_iNumPatchPerSide-1) )
+						patch->m_BaseRight->rightNeighbor = m_aPatches[Y+1][X].m_baseLeft;
+					else
+						patch->m_BaseRight->rightNeighbor = NULL;	// Link to bordering Landscape here..
+				}
+			}
+		}
 	}
 
 	// Split a single Triangle and link it into the mesh.
 	// Will correctly force-split diamonds.
-	void Patch::split(TriTreeNode *tri)
+	void CROAMTerrain::split(TriTreeNode *tri)
 	{
 		// We are already split, no need to do it again.
 		if (tri->leftChild)
@@ -70,13 +150,13 @@ namespace terrain{
 			split(tri->baseNeighbor);
 
 		// Create children and link into mesh
-		tri->leftChild  = Landscape::allocateTri();
-		tri->rightChild = Landscape::allocateTri();
+		tri->leftChild  = allocateTri();
+		tri->rightChild = allocateTri();
 
 		// If creation failed, just exit.
 		if ( !tri->leftChild )
 		{
-			Logger->error(YON_LOG_FAILED_FORMAT,"Landscape::allocateTri");
+			Logger->error(YON_LOG_FAILED_FORMAT,"allocateTri");
 			return;
 		}
 
@@ -134,430 +214,84 @@ namespace terrain{
 		}
 	}
 
-	//TODO 替换为vector2d.crossProduct
-	// Taken from "Programming Principles in Computer Graphics", L. Ammeraal (Wiley)
-	inline s32 orientation(s32 pX,s32 pY,s32 qX,s32 qY,s32 rX,s32 rY)
-	{
-		s32 aX, aY, bX, bY;
-		f32 d;
-
-		aX = qX - pX;
-		aY = qY - pY;
-
-		bX = rX - pX;
-		bY = rY - pY;
-
-		d = (f32)aX * (f32)bY - (f32)aY * (f32)bX;
-		return (d < 0) ? (-1) : (d > 0);
-	}
-
-	// Set patch's visibility flag.
-	void Patch::setVisibility(s32 eyeX,s32 eyeY,s32 leftX,s32 leftY,s32 rightX,s32 rightY)
-	{
-		// Get patch's center point
-		s32 patchCenterX = m_WorldX + m_iPatchSize / 2;
-		s32 patchCenterY = m_WorldY + m_iPatchSize / 2;
-
-		// Set visibility flag (orientation of both triangles must be counter clockwise)
-		m_isVisible = (orientation(eyeX,eyeY,rightX,rightY,patchCenterX,patchCenterY ) < 0) &&
-			(orientation(leftX,leftY,eyeX,eyeY,patchCenterX,patchCenterY ) < 0);
-	}
-
 	//完成LOD功能。在计算完到CAMERA的距离后，它调整当前节点的Variance值，以便于适应距离的变化。
 	//它也可以让一个闭合的节点有一个比较大的Variance值。调整后的MESH将在近处使用比较多的三角形而在远处使用较少的三角形。
 	//距离的计算使用了一个简单的平方根计算（他比较慢，我将用一个较快的方法来替换它）。
 	// Tessellate a Patch.
 	// Will continue to split until the variance metric is met.
-	void Patch::recursTessellate(TriTreeNode *tri,s32 leftX,s32 leftY,s32 rightX,s32 rightY,s32 apexX,s32 apexY,s32 node)
+	void CROAMTerrain::recursTessellate(SPatch* patch,TriTreeNode *tri,s32 leftX,s32 leftY,s32 rightX,s32 rightY,s32 apexX,s32 apexY,s32 node)
 	{
 		f32 TriVariance;
 		s32 centerX = (leftX + rightX)>>1; // Compute X coordinate of center of Hypotenuse
 		s32 centerY = (leftY + rightY)>>1; // Compute Y coord...
 
-		if(node<(1<<VARIANCE_DEPTH))
+		if(node<(1<<m_iVarianceDepth))
 		{
+			//TODO 优化
+
 			// Extremely slow distance metric (sqrt is used).
 			// Replace this with a faster one!
-			float distance = 1.0f + sqrtf( SQR((float)centerX - gViewPosition[0]) +SQR((float)centerY - gViewPosition[2]) );
+			f32 distance = 1.0f + core::squareroot(core::square(centerX - m_currentCameraPos.x)+core::square(m_currentCameraPos.y)+core::square(centerY - m_currentCameraPos.z));
 
 			// Egads!  A division too?  What's this world coming to!
 			// This should also be replaced with a faster operation.
-			TriVariance = ((float)m_CurrentVariance[node] * MAP_SIZE * 2)/distance;	// Take both distance and variance into consideration
+			TriVariance = ((f32)patch->m_pCurrentVariance[node] * m_iMapSize * 2)/distance;	// Take both distance and variance into consideration
 		}
+
+		//TODO why?
 
 		// IF we do not have variance info for this node, then we must have gotten here by splitting, so continue down to the lowest level.
 		// OR if we are not below the variance tree, test for variance.
-		if ( (node >= (1<<VARIANCE_DEPTH))||(TriVariance > gFrameVariance))	
+		if ( (node >= (1<<m_iVarianceDepth))||(TriVariance > gFrameVariance))
 		{
 			// Split this triangle.
 			split(tri);
+
+			//TODO why 3?
 
 			// If this triangle was split, try to split it's children as well.
 			// Tessellate all the way down to one vertex per height field entry
 			if (tri->leftChild &&((core::abs_(leftX-rightX) >= 3) || (core::abs_(leftY-rightY) >= 3)))	
 			{
-				recursTessellate( tri->leftChild,   apexX,  apexY, leftX, leftY, centerX, centerY,    node<<1  );
-				recursTessellate( tri->rightChild, rightX, rightY, apexX, apexY, centerX, centerY, 1+(node<<1) );
+				recursTessellate(patch, tri->leftChild,   apexX,  apexY, leftX, leftY, centerX, centerY,    node<<1  );
+				recursTessellate(patch, tri->rightChild, rightX, rightY, apexX, apexY, centerX, centerY, 1+(node<<1) );
 			}
 		}
 	}
 
 	// Create an approximate mesh.
-	void Patch::tessellate()
+	void CROAMTerrain::tessellatePatch(SPatch* patch)
 	{
 		// Split each of the base triangles
-		m_CurrentVariance = m_VarianceLeft;
-		recursTessellate (&m_BaseLeft,m_WorldX,m_WorldY+m_iPatchSize,m_WorldX+m_iPatchSize,m_WorldY,m_WorldX,m_WorldY,1);
+		//∣
+		//└--
+		patch->m_pCurrentVariance = patch->m_pVarianceLeft;
+		recursTessellate(patch,&patch->m_baseLeft,patch->m_uIndexX,patch->m_uIndexZ+m_iPatchSize,patch->m_uIndexX+m_iPatchSize,patch->m_uIndexZ,patch->m_uIndexX,patch->m_uIndexZ,1);
 
-		m_CurrentVariance = m_VarianceRight;
-		recursTessellate(&m_BaseRight,m_WorldX+m_iPatchSize,m_WorldY,m_WorldX,m_WorldY+m_iPatchSize,m_WorldX+m_iPatchSize,m_WorldY+m_iPatchSize,1);
+		//--┐
+		//  ∣
+		patch->m_pCurrentVariance = patch->m_pVarianceRight;
+		recursTessellate(patch,&patch->m_baseRight,patch->m_uIndexX+m_iPatchSize,patch->m_uIndexZ,patch->m_uIndexX,patch->m_uIndexZ+m_iPatchSize,patch->m_uIndexX+m_iPatchSize,patch->m_uIndexZ+m_iPatchSize,1);
 	}
 
-	//用于获得当前三角形的所有坐标设置和我们保存在栈内的一部分扩展信息。三角的Variance值是和它的子三角一起合并计算的。
-	//我选择通过传送每一个点的X和Y坐标而不是每点的高度值来减少在高度图数据数组的内存采样。
-	// Computes Variance over the entire tree.  Does not examine node relationships.
-	u8 Patch::recursComputeVariance(s32 leftX,s32 leftY,u8 leftZ,s32 rightX,s32 rightY,u8 rightZ,s32 apexX,s32 apexY,u8 apexZ,s32 node)
-	{
-		//        /|\
-		//      /  |  \
-		//    /    |    \
-		//  /      |      \
-		//  ~~~~~~~*~~~~~~~  <-- Compute the X and Y coordinates of '*'
-		//
-		s32 centerX = (leftX + rightX) >>1;		// Compute X coordinate of center of Hypotenuse
-		s32 centerY = (leftY + rightY) >>1;		// Compute Y coord...
-		u8 myVariance;
-
-		// Get the height value at the middle of the Hypotenuse
-		u8 centerZ  = m_HeightMap[(centerY * m_iMapSize) + centerX];
-
-		// Variance of this triangle is the actual height at it's hypotenuse midpoint minus the interpolated height.
-		// Use values passed on the stack instead of re-accessing the Height Field.
-		myVariance = core::abs_((s32)centerZ - (((s32)leftZ + (s32)rightZ)>>1));
-
-		// Since we're after speed and not perfect representations,
-		//    only calculate variance down to an 8x8 block
-		if ((core::abs_(leftX - rightX) >= 8)||(core::abs_(leftY - rightY) >= 8) )
-		{
-			// Final Variance for this node is the max of it's own variance and that of it's children.
-			myVariance = core::max_( myVariance, recursComputeVariance( apexX,   apexY,  apexZ, leftX, leftY, leftZ, centerX, centerY, centerZ,    node<<1 ) );
-			myVariance = core::max_( myVariance, recursComputeVariance( rightX, rightY, rightZ, apexX, apexY, apexZ, centerX, centerY, centerZ, 1+(node<<1)) );
-		}
-
-		// Store the final variance for this node.  Note Variance is never zero.
-		if (node < (1<<VARIANCE_DEPTH))
-			m_CurrentVariance[node] = 1 + myVariance;
-
-		return myVariance;
-	}
-
-	// Compute the variance tree for each of the Binary Triangles in this patch.
-	void Patch::computeVariance()
-	{
-		// Compute variance on each of the base triangles...
-		m_CurrentVariance = m_VarianceLeft;
-		recursComputeVariance(0,m_iPatchSize,m_HeightMap[m_iPatchSize * m_iMapSize],m_iPatchSize,0,m_HeightMap[m_iPatchSize],0,0,m_HeightMap[0],1);
-
-		m_CurrentVariance = m_VarianceRight;
-		recursComputeVariance(m_iPatchSize,0,m_HeightMap[m_iPatchSize],0,m_iPatchSize,m_HeightMap[m_iPatchSize * m_iMapSize],m_iPatchSize, m_iPatchSize,m_HeightMap[(m_iPatchSize * m_iMapSize) + m_iPatchSize],1);
-
-		// Clear the dirty flag for this patch
-		m_VarianceDirty = 0;
-	}
-
-	//这个函数非常的简单，但是你必须看一下在下面高级话题中的三角形排列优化技术。
-	//简单的说来就是如果当前的三角形不是一个叶节点那么就把它重新并入到子节点中。
-	//另外输出一个三角形使用了OPENGL，注意OPENGL渲染并没有被优化，这是为了使代码容易阅读。
-	// Render the tree.  Simple no-fan method.
-	void Patch::recursRender(TriTreeNode *tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY)
-	{
-		//All non-leaf nodes have both children, so just check for one
-		if (tri->leftChild)
-		{
-			int centerX = (leftX + rightX)>>1;	//Compute X coordinate of center of Hypotenuse
-			int centerY = (leftY + rightY)>>1;	//Compute Y coord...
-
-			recursRender(tri->leftChild,  apexX,   apexY, leftX, leftY, centerX, centerY);
-			recursRender(tri->rightChild, rightX, rightY, apexX, apexY, centerX, centerY);
-		}
-		//A leaf node!  Output a triangle to be rendered.
-		else
-		{
-			//Actual number of rendered triangles...
-			gNumTrisRendered++;
-
-			f32 leftZ  = m_HeightMap[(leftY *MAP_SIZE)+leftX ];
-			f32 rightZ = m_HeightMap[(rightY*MAP_SIZE)+rightX];
-			f32 apexZ  = m_HeightMap[(apexY *MAP_SIZE)+apexX ];
-
-			// Perform lighting calculations if requested.
-			/*if (gDrawMode == DRAW_USE_LIGHTING)
-			{
-				float v[3][3];
-				float out[3];
-
-				// Create a vertex normal for this triangle.
-				// NOTE: This is an extremely slow operation for illustration purposes only.
-				//       You should use a texture map with the lighting pre-applied to the texture.
-				v[0][0] = (GLfloat) leftX;
-				v[0][1] = (GLfloat) leftZ;
-				v[0][2] = (GLfloat) leftY;
-
-				v[1][0] = (GLfloat) rightX;
-				v[1][1] = (GLfloat) rightZ ;
-				v[1][2] = (GLfloat) rightY;
-
-				v[2][0] = (GLfloat) apexX;
-				v[2][1] = (GLfloat) apexZ ;
-				v[2][2] = (GLfloat) apexY;
-
-				calcNormal( v, out );
-				glNormal3fv( out );
-			}*/
-
-			// Perform polygon coloring based on a height sample
-			float fColor = (60.0f + leftZ) / 256.0f;
-			if ( fColor > 1.0f )  fColor = 1.0f;
-			glColor3f( fColor, fColor, fColor );
-
-			// Output the LEFT VERTEX for the triangle
-			glVertex3f(		(GLfloat) leftX,
-				(GLfloat) leftZ,
-				(GLfloat) leftY );
-
-			// Gaurad shading based on height samples instead of light normal
-			if (gDrawMode == DRAW_USE_TEXTURE||gDrawMode == DRAW_USE_FILL_ONLY)
-			{
-				float fColor = (60.0f + rightZ) / 256.0f;
-				if ( fColor > 1.0f )  fColor = 1.0f;
-				glColor3f( fColor, fColor, fColor );
-			}
-
-			// Output the RIGHT VERTEX for the triangle
-			glVertex3f((GLfloat) rightX,(GLfloat) rightZ,(GLfloat) rightY );
-
-			// Gaurad shading based on height samples instead of light normal
-			if (gDrawMode == DRAW_USE_TEXTURE||gDrawMode == DRAW_USE_FILL_ONLY )
-			{
-				float fColor = (60.0f + apexZ) / 256.0f;
-				if ( fColor > 1.0f )  fColor = 1.0f;
-				glColor3f( fColor, fColor, fColor );
-			}
-
-			// Output the APEX VERTEX for the triangle
-			glVertex3f((GLfloat) apexX,(GLfloat) apexZ,(GLfloat) apexY );
-		}
-	}
-
-	// Render the mesh.
-	void Patch::render()
-	{
-		// Store old matrix
-		glPushMatrix();
-
-		// Translate the patch to the proper world coordinates
-		glTranslatef( (GLfloat)m_WorldX, 0, (GLfloat)m_WorldY );
-		glBegin(GL_TRIANGLES);
-
-		recursRender(&m_BaseLeft,0,m_iPatchSize,m_iPatchSize,0,0,0);
-		recursRender(&m_BaseRight,m_iPatchSize,0,0,m_iPatchSize,m_iPatchSize,m_iPatchSize);
-
-		glEnd();
-		// Restore the matrix
-		glPopMatrix();
-	}
-
-	// Definition of the static member variables
-	//int         Landscape::m_NextTriNode;
-	//TriTreeNode Landscape::m_TriPool[POOL_SIZE];
-	
-
-	// Initialize all patches
-	/*
-	void Landscape::init(unsigned char *hMap)
-	{
-		Patch *patch;
-		s32 X, Y;
-
-		// Store the Height Field array
-		m_HeightMap = hMap;
-
-		// Initialize all terrain patches
-		for ( Y=0; Y < NUM_PATCHES_PER_SIDE; Y++)
-			for ( X=0; X < NUM_PATCHES_PER_SIDE; X++ )
-			{
-				patch = &(m_Patches[Y][X]);
-				patch->init( X*PATCH_SIZE, Y*PATCH_SIZE, X*PATCH_SIZE, Y*PATCH_SIZE, hMap );
-				patch->computeVariance();
-			}
-	}*/
-
-	// Reset all patches, recompute variance if needed
-	void Landscape::reset()
-	{
-		//
-		// Perform simple visibility culling on entire patches.
-		//   - Define a triangle set back from the camera by one patch size, following
-		//     the angle of the frustum.
-		//   - A patch is visible if it's center point is included in the angle: Left,Eye,Right
-		//   - This visibility test is only accurate if the camera cannot look up or down significantly.
-		//
-		const float PI_DIV_180 = M_PI / 180.0f;
-		const float FOV_DIV_2 = gFovX/2;
-
-		int eyeX = (int)(gViewPosition[0] - PATCH_SIZE * sinf( gClipAngle * PI_DIV_180 ));
-		int eyeY = (int)(gViewPosition[2] + PATCH_SIZE * cosf( gClipAngle * PI_DIV_180 ));
-
-		int leftX  = (int)(eyeX + 100.0f * sinf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
-		int leftY  = (int)(eyeY - 100.0f * cosf( (gClipAngle-FOV_DIV_2) * PI_DIV_180 ));
-
-		int rightX = (int)(eyeX + 100.0f * sinf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
-		int rightY = (int)(eyeY - 100.0f * cosf( (gClipAngle+FOV_DIV_2) * PI_DIV_180 ));
-
-		int X, Y;
-		Patch *patch;
-
-		// Set the next free triangle pointer back to the beginning
-		SetNextTriNode(0);
-
-		// Reset rendered triangle count.
-		gNumTrisRendered = 0;
-
-		// Go through the patches performing resets, compute variances, and linking.
-		for ( Y=0; Y < NUM_PATCHES_PER_SIDE; Y++ )
-			for ( X=0; X < NUM_PATCHES_PER_SIDE; X++)
-			{
-				patch = &(m_Patches[Y][X]);
-
-				// Reset the patch
-				patch->Reset();
-				patch->SetVisibility( eyeX, eyeY, leftX, leftY, rightX, rightY );
-
-				// Check to see if this patch has been deformed since last frame.
-				// If so, recompute the varience tree for it.
-				if ( patch->isDirty() )
-					patch->ComputeVariance();
-
-				if ( patch->isVisibile() )
-				{
-					// Link all the patches together.
-					if ( X > 0 )
-						patch->GetBaseLeft()->LeftNeighbor = m_Patches[Y][X-1].GetBaseRight();
-					else
-						patch->GetBaseLeft()->LeftNeighbor = NULL;		// Link to bordering Landscape here..
-
-					if ( X < (NUM_PATCHES_PER_SIDE-1) )
-						patch->GetBaseRight()->LeftNeighbor = m_Patches[Y][X+1].GetBaseLeft();
-					else
-						patch->GetBaseRight()->LeftNeighbor = NULL;		// Link to bordering Landscape here..
-
-					if ( Y > 0 )
-						patch->GetBaseLeft()->RightNeighbor = m_Patches[Y-1][X].GetBaseRight();
-					else
-						patch->GetBaseLeft()->RightNeighbor = NULL;		// Link to bordering Landscape here..
-
-					if ( Y < (NUM_PATCHES_PER_SIDE-1) )
-						patch->GetBaseRight()->RightNeighbor = m_Patches[Y+1][X].GetBaseLeft();
-					else
-						patch->GetBaseRight()->RightNeighbor = NULL;	// Link to bordering Landscape here..
-				}
-			}
-
-	}
-
-
-	// Create an approximate mesh of the landscape.
-	void Landscape::tessellate()
+	void CROAMTerrain::tessellate()
 	{
 		// Perform Tessellation
-		int nCount;
-		Patch *patch = &(m_Patches[0][0]);
-		for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; nCount++, patch++ )
+		s32 index=0;
+		for(s32 x=0;x<m_iNumPatchPerSide;++x)
 		{
-			if (patch->isVisibile())
-				patch->tessellate( );
+			for(s32 z=0;z<m_iNumPatchPerSide;++z)
+			{
+				if(m_aPatches[x][z]->isVisibile())
+					m_aPatches[x][z]->tessellate();
+			}
 		}
 	}
 
-	// Allocate a TriTreeNode from the pool.
-	TriTreeNode *Landscape::allocateTri()
+	//u8 CROAMTerrain::recursComputeVariance(s32 leftIndex,u8 leftHeight, s32 rightIndex,u8 rightHeight,s32 apexIndex,u8 apexHeight, s32 nodeIndex)
+	u8 CROAMTerrain::recursComputeVariance(SPatch* patch,s32 leftX,s32 leftZ,u8 leftY,s32 rightX,s32 rightZ,u8 rightY,s32 apexX,s32 apexZ,u8 apexY,s32 node)
 	{
-		TriTreeNode *pTri;
-
-		// IF we've run out of TriTreeNodes, just return NULL (this is handled gracefully)
-		if ( m_NextTriNode >= POOL_SIZE )
-			return NULL;
-
-		pTri = &(m_TriPool[m_NextTriNode++]);
-		pTri->leftChild = pTri->rightChild = NULL;
-
-		return pTri;
-	}
-
-	// Render each patch of the landscape & adjust the frame variance.
-	void Landscape::Render()
-	{
-		int nCount;
-		Patch *patch = &(m_Patches[0][0]);
-
-		// Scale the terrain by the terrain scale specified at compile time.
-		glScalef( 1.0f, MULT_SCALE, 1.0f );
-
-		for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; nCount++, patch++ )
-		{
-			if (patch->isVisibile())
-				patch->Render();
-		}
-
-		// Check to see if we got close to the desired number of triangles.
-		// Adjust the frame variance to a better value.
-		if (GetNextTriNode() != gDesiredTris)
-			gFrameVariance += ((float)GetNextTriNode() - (float)gDesiredTris) / (float)gDesiredTris;
-
-		// Bounds checking.
-		if (gFrameVariance < 0)
-			gFrameVariance = 0;
-	}
-
-	const s32 CPatch::VARIANCE_DEPTH=9;
-
-	void CPatch::init(u16 index,u8* heightMap)
-	{
-		// Clear all the relationships
-		m_baseLeft.rightNeighbor = m_baseLeft.leftNeighbor = m_baseRight.rightNeighbor = m_baseRight.leftNeighbor =
-			m_baseLeft.leftChild = m_baseLeft.rightChild = m_baseRight.leftChild = m_baseLeft.leftChild = NULL;
-
-		// Attach the two m_Base triangles together
-		m_baseLeft.baseNeighbor = &m_baseRight;
-		m_baseRight.baseNeighbor = &m_baseLeft;
-
-		// Store Patch offsets for the patch
-		m_uIndex=index;
-		m_pHeightMap=heightMap;
-
-		// Initialize flags
-		m_varianceDirty = true;
-		m_visible = false;
-	}
-
-	void CPatch::reset()
-	{
-		// Assume patch is not visible.
-		m_visible = false;
-
-		// Reset the important relationships
-		m_baseLeft.leftChild = m_baseLeft.rightChild = m_baseRight.leftChild = m_baseLeft.leftChild = NULL;
-
-		// Attach the two m_Base triangles together
-		m_baseLeft.baseNeighbor = &m_baseRight;
-		m_baseRight.baseNeighbor = &m_baseLeft;
-
-		// Clear the other relationships.
-		m_baseLeft.rightNeighbor = m_baseLeft.leftNeighbor = m_baseRight.rightNeighbor = m_baseRight.leftNeighbor = NULL;
-	}
-
-	u8 CPatch::recursComputeVariance(s32 leftIndex,u8 leftHeight, s32 rightIndex,u8 rightHeight,s32 apexIndex,u8 apexHeight, s32 nodeIndex)
-	{
+		/*
 		s32 centerIndex=(leftIndex+rightIndex)>>1;
 		u8 maxVariance;
 
@@ -581,45 +315,68 @@ namespace terrain{
 			m_pCurrentVariance[nodeIndex] = 1 + maxVariance;
 
 		return maxVariance;
+		*/
+
+		//        /|\
+		//      /  |  \
+		//    /    |    \
+		//  /      |      \
+		//  ~~~~~~~*~~~~~~~  <-- Compute the X and Y coordinates of '*'
+		//
+		s32 centerX = (leftX + rightX) >>1;		// Compute X coordinate of center of Hypotenuse
+		s32 centerZ = (leftZ + rightZ) >>1;		// Compute Y coord...
+		u8 myVariance;
+
+		// Get the height value at the middle of the Hypotenuse
+		u8 centerY  = m_heightMap[(centerX*m_iMapSize)+centerZ+patch->m_uOffset];
+
+		// Variance of this triangle is the actual height at it's hypotenuse midpoint minus the interpolated height.
+		// Use values passed on the stack instead of re-accessing the Height Field.
+		myVariance = core::abs_((s32)centerY - (((s32)leftY + (s32)rightY)>>1));
+
+		//不能使用Mahattan距离，因为LODmax与LOD(max-1)两者的Mahattan距离都是2
+		// Since we're after speed and not perfect representations,
+		//    only calculate variance down to an 8x8 block
+		//if (core::abs_(leftX - rightX)+core::abs_(leftZ - rightZ) > 2 )
+		if ((core::abs_(leftX - rightX) >= 2)||(core::abs_(leftZ - rightZ) >= 2) )
+		{
+			Logger->debug("node:%d,%d,%d,{%d,%d,%d}\r\n",node,node<<1,1+(node<<1),getIndex(patch,leftX,leftZ),getIndex(patch,rightX,rightZ),getIndex(patch,apexX,apexZ));
+			// Final Variance for this node is the max of it's own variance and that of it's children.
+			myVariance = core::max_(myVariance, recursComputeVariance(patch, apexX,   apexZ,  apexY, leftX, leftZ, leftY, centerX, centerZ, centerY,    node<<1 ));
+			myVariance = core::max_(myVariance, recursComputeVariance(patch, rightX, rightZ, rightY, apexX, apexZ, apexY, centerX, centerZ, centerY, 1+(node<<1)));
+		}
+
+		//TODO 冗余了吧，如果只在node<(1<<m_iVarianceDepth)时才记录，那么应该将myVariance的计算部分也包进去才是最优
+		// Store the final variance for this node.  Note Variance is never zero.
+		if (node<(1<<m_iVarianceDepth))
+		{
+			patch->m_pCurrentVariance[node] = 1 + myVariance;
+
+			if(patch->m_pCurrentVariance==patch->m_pVarianceLeft)
+				Logger->debug("Patch[%d]:LeftVariance[%d]=%d{%d,%d,%d}\r\n",patch->m_uIndex,node,patch->m_pCurrentVariance[node],getIndex(patch,leftX,leftZ),getIndex(patch,rightX,rightZ),getIndex(patch,apexX,apexZ));
+			else
+				Logger->debug("Patch[%d]:RightVariance[%d]=%d{%d,%d,%d}\r\n",patch->m_uIndex,node,patch->m_pCurrentVariance[node],getIndex(patch,leftX,leftZ),getIndex(patch,rightX,rightZ),getIndex(patch,apexX,apexZ));
+		}
+
+		return myVariance;
 	}
 
-	void CPatch::computeVariance()
+	void CROAMTerrain::computeVariance(SPatch* patch)
 	{
 		// Compute variance on each of the base triangles...
-		m_pCurrentVariance = m_varianceLeft;
-		recursComputeVariance(0,m_iPatchSize,m_HeightMap[m_iPatchSize * m_iMapSize],m_iPatchSize,0,m_HeightMap[m_iPatchSize],0,0,m_HeightMap[0],1);
+		//∣
+		//└--
+		//why node index start from 1,answer: for detail refer to "Tree Traversal Function"
+		patch->m_pCurrentVariance = patch->m_pVarianceLeft;
+		recursComputeVariance(patch,0,m_iPatchSize,m_heightMap[m_iPatchSize*m_iMapSize+patch->m_uOffset],m_iPatchSize,0,m_heightMap[m_iPatchSize+patch->m_uOffset],0,0,m_heightMap[0+patch->m_uOffset],1);
 
-		m_pCurrentVariance = m_varianceRight;
-		recursComputeVariance(m_iPatchSize,0,m_HeightMap[m_iPatchSize],0,m_iPatchSize,m_HeightMap[m_iPatchSize * m_iMapSize],m_iPatchSize, m_iPatchSize,m_HeightMap[(m_iPatchSize * m_iMapSize) + m_iPatchSize],1);
+		//--┐
+		//  ∣
+		patch->m_pCurrentVariance = patch->m_pVarianceRight;
+		recursComputeVariance(patch,m_iPatchSize,0,m_heightMap[m_iPatchSize+patch->m_uOffset],0,m_iPatchSize,m_heightMap[m_iPatchSize*m_iMapSize+patch->m_uOffset],m_iPatchSize, m_iPatchSize,m_heightMap[(m_iPatchSize * m_iMapSize)+m_iPatchSize+patch->m_uOffset],1);
 
 		// Clear the dirty flag for this patch
-		m_varianceDirty = false;
-	}
-
-	CROAMTerrain::CROAMTerrain(IModel* parent,const core::vector3df& pos,
-		const core::vector3df& rot,const core::vector3df& scale)
-		:ITerrainModel(parent,pos,rot,scale),m_iMapSize(0),m_iImageSizePerSide(0),
-		m_iNumPatchPerSide(0),m_iPatchSize(0),m_aPatches(NULL)
-	{
-		m_pUnit=new Unit3D2T();
-		//m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
-		//m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
-		//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
-		m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
-		m_pUnit->setShap(&m_shap);
-	}
-
-	CROAMTerrain::~CROAMTerrain(){
-		m_pUnit->drop();
-		if(m_aPatches!=NULL)
-		{
-			for(s32 x=0;x<m_iNumPatchPerSide;++x)
-			{
-				delete[] m_aPatches[x];
-			}
-			delete[] m_aPatches;
-			m_aPatches=NULL;
-		}
+		patch->m_varianceDirty = false;
 	}
 
 
@@ -634,10 +391,11 @@ namespace terrain{
 		m_iPatchSize=patchSize-1;
 		m_iNumPatchPerSide=m_iMapSize/m_iPatchSize;
 
-		Logger->debug("image.w:%d,mapSize:%d,patchSize:%d\r\n",m_iImageSizePerSide,m_iMapSize,m_iPatchSize);
+		Logger->debug("image.w:%d,mapSize:%d,patchSize:%d,patchNumPerSide:%d\r\n",m_iImageSizePerSide,m_iMapSize,m_iPatchSize,m_iNumPatchPerSide);
 
 		const u32 numVertices=m_iMapSize*m_iMapSize;
 		m_shap.getVertexArray().set_used(numVertices);
+		m_heightMap.set_used(numVertices);
 
 		const f32 texcoordDelta = 1.0f/(f32)(m_iImageSizePerSide-1);
 		const f32 texcoordDelta2 = 1.0f/(f32)(m_iPatchSize);
@@ -652,9 +410,12 @@ namespace terrain{
 			f32 fu2=0.f;
 			for(s32 z = 0; z<m_iMapSize; ++z)
 			{
+				u8 height=image->getValue(z,x);
+				m_heightMap[index]=height;
+
 				SVertex2TCoords& v=m_shap.getVertexArray()[index++];
 				v.pos.x=fx*m_scale.x;
-				v.pos.y=(f32)image->getValue(z,x)*m_scale.y;
+				v.pos.y=(f32)height*m_scale.y;
 				v.pos.z=fz*m_scale.z;
 
 				v.texcoords0.x=fu;
@@ -674,20 +435,39 @@ namespace terrain{
 			fv2+=texcoordDelta2;
 		}
 
-		m_aPatches=(Patch***)new Patch**[m_iNumPatchPerSide];
+		m_aPatches=(SPatch***)new SPatch**[m_iNumPatchPerSide];
 		index=0;
 		for(s32 x=0;x<m_iNumPatchPerSide;++x)
 		{
-			m_aPatches[x]=(Patch**)new Patch*[m_iNumPatchPerSide];
+			m_aPatches[x]=(SPatch**)new SPatch*[m_iNumPatchPerSide];
 			for(s32 z=0;z<m_iNumPatchPerSide;++z)
 			{
-				m_aPatches[x][z]=new Patch();
+				m_aPatches[x][z]=new SPatch(m_iVarianceDepth);
 				//m_aPatches[x][z]->init(x*m_iPatchSize,z*m_iPatchSize,x*m_iPatchSize,z*m_iPatchSize, hMap );
-				m_aPatches[x][z]->init(index++);
-				m_aPatches[x][z]->computeVariance();
+				m_aPatches[x][z]->init(x,z,index++,x*m_iPatchSize*m_iMapSize+z*m_iPatchSize);
+				computeVariance(m_aPatches[x][z]);
 			}
 		}
 	}
+
+	void CROAMTerrain::render(video::IVideoDriver* driver)
+	{
+		//driver->setTransform(video::ENUM_TRANSFORM_WORLD, getAbsoluteTransformation());
+		//driver->setTransform(video::ENUM_TRANSFORM_WORLD, core::IDENTITY_MATRIX);
+		//driver->setMaterial(getMaterial(0));
+		//driver->drawUnit(m_pUnit);
+	}
+
+	void CROAMTerrain::onRegisterForRender()
+	{
+		if(m_bVisible)
+		{
+			m_pSceneManager->registerForRender(this);
+
+			ITerrainModel::onRegisterForRender();
+		}
+	}
+
 }
 }
 }
