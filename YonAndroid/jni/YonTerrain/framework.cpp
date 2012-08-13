@@ -80,7 +80,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("../media\\skybox\\6");
 	fs->addWorkingDirectory("../media/terrain/4");
 	fs->addWorkingDirectory("../media/water/2");
-	fs->addWorkingDirectory("../media/terrain/heightmap/plain");
+	//fs->addWorkingDirectory("../media/terrain/heightmap/plain");
+	fs->addWorkingDirectory("../media/terrain/heightmap/rough");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/png/");
 #endif
@@ -135,8 +136,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,true);
 
 	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(20,1,20));
-	IImage* image=videoDriver->createImageFromFile("heightmap.png",true);
-	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_17);
+	IImage* image=videoDriver->createImageFromFile("heightmap4.png",true);
+	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_3);
 	image->drop();
 	/*material=terrainModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_DETAIL_MAP);

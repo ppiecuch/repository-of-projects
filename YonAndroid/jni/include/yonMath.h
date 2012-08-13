@@ -126,6 +126,12 @@ inline bool iszero(const u32 a, const u32 tolerance = 0)
 	return a <= tolerance;
 }
 
+template<class T>
+inline const T square(const T& a)
+{
+	return a*a;
+}
+
 inline f32 squareroot(const f32 f)
 {
 	return sqrtf(f);

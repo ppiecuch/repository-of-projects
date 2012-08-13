@@ -105,14 +105,22 @@ namespace terrain{
 			TriTreeNode *rightNeighbor;
 		};
 
-		class CPatch
+		struct SPatch
 		{
-			//TODO 改为非static
-			// Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
-			const static s32 VARIANCE_DEPTH;
-
-			u8 *m_pHeightMap;			// Pointer to height map to use
+			SPatch(s32 varianceDepth)
+			{
+				m_pVarianceLeft=new u8[1<<(varianceDepth)];
+				m_pVarianceRight=new u8[1<<(varianceDepth)];
+			}
+			~SPatch()
+			{
+				delete[] m_pVarianceLeft;
+				delete[] m_pVarianceRight;
+			}
+			u16 m_uOffset;				//Offset of the heightmap from 0
 			u16 m_uIndex;
+			u16 m_uIndexX;
+			u16 m_uIndexZ;
 
 			TriTreeNode m_baseLeft;		// Left base triangle tree node
 			TriTreeNode m_baseRight;	// Right base triangle tree node
@@ -121,85 +129,47 @@ namespace terrain{
 			bool m_varianceDirty;		// Does the Varience Tree need to be recalculated for this Patch?
 			bool m_visible;				// Is this patch visible in the current frame?
 
-			u8 m_varianceLeft[1<<(VARIANCE_DEPTH)];			// Left variance tree
-			u8 m_varianceRight[1<<(VARIANCE_DEPTH)];		// Right variance tree
+			u8* m_pVarianceLeft;				// Left variance tree
+			u8* m_pVarianceRight;				// Right variance tree
 
-			// Computes Variance over the entire tree, and return the max variance among them.  Does not examine node relationships.
-			u8 recursComputeVariance(s32 leftIndex,u8 leftHeight, s32 rightIndex,u8 rightHeight,s32 apexIndex,u8 apexHeight, s32 nodeIndex);
-		public:
-			void init(u16 index,u8* heightMap);		// Initialize a patch.
-			void reset();							// Reset the patch.
-			void computeVariance();					// Compute the variance tree for each of the Binary Triangles in this patch.
+			void init(u16 x,u16 z,u16 index,u16 offset)		// Initialize a patch.
+			{
+				// Clear all the relationships
+				m_baseLeft.rightNeighbor = m_baseLeft.leftNeighbor = m_baseRight.rightNeighbor = m_baseRight.leftNeighbor =
+					m_baseLeft.leftChild = m_baseLeft.rightChild = m_baseRight.leftChild = m_baseLeft.leftChild = NULL;
+
+				// Attach the two m_Base triangles together
+				m_baseLeft.baseNeighbor = &m_baseRight;
+				m_baseRight.baseNeighbor = &m_baseLeft;
+
+				// Store Patch offsets for the patch
+				m_uIndex=index;
+				m_uIndexX=x;
+				m_uIndexZ=z;
+				m_uOffset=offset;
+
+				// Initialize flags
+				m_varianceDirty = true;
+				m_visible = false;
+			}
+			void reset()						// Reset the patch.
+			{
+				// Assume patch is not visible.
+				m_visible = false;
+
+				// Reset the important relationships
+				m_baseLeft.leftChild = m_baseLeft.rightChild = m_baseRight.leftChild = m_baseLeft.leftChild = NULL;
+
+				// Attach the two m_Base triangles together
+				m_baseLeft.baseNeighbor = &m_baseRight;
+				m_baseRight.baseNeighbor = &m_baseLeft;
+
+				// Clear the other relationships.
+				m_baseLeft.rightNeighbor = m_baseLeft.leftNeighbor = m_baseRight.rightNeighbor = m_baseRight.leftNeighbor = NULL;
+			}
 		};
 
-		class Patch
-		{
-			//TODO 改为非static
-			// Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
-			const static s32 VARIANCE_DEPTH;
-		protected:
-			//u8 *m_HeightMap;								// Pointer to height map to use
-			//s32 m_WorldX, m_WorldY;							// World coordinate offset of this patch.
-			u16 m_uIndex;
-
-			u8 m_VarianceLeft[1<<(VARIANCE_DEPTH)];			// Left variance tree
-			u8 m_VarianceRight[1<<(VARIANCE_DEPTH)];		// Right variance tree
-
-			u8 *m_CurrentVariance;							// Which varience we are currently using. [Only valid during the Tessellate and ComputeVariance passes]
-			u8 m_VarianceDirty;								// Does the Varience Tree need to be recalculated for this Patch?
-			bool m_isVisible;								// Is this patch visible in the current frame?
-
-			TriTreeNode m_BaseLeft;							// Left base triangle tree node
-			TriTreeNode m_BaseRight;						// Right base triangle tree node
-
-		public:
-			// Some encapsulation functions & extras
-			TriTreeNode *getBaseLeft(){ return &m_BaseLeft; }
-			TriTreeNode *getBaseRight(){ return &m_BaseRight; }
-			u8 isDirty(){ return m_VarianceDirty; }
-			bool isVisibile(){ return m_isVisible; }
-			void setVisibility(s32 eyeX, s32 eyeY, s32 leftX, s32 leftY, s32 rightX, s32 rightY);
-
-			// The static half of the Patch Class
-			//virtual void init(s32 heightX, s32 heightY, s32 worldX, s32 worldY, u8 *hMap);
-			void init(u16 index);
-			void reset();
-			void tessellate();
-			void render();
-			void computeVariance();
-
-			// The recursive half of the Patch Class
-			void split(TriTreeNode *tri);
-			void recursTessellate( TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY, s32 node);
-			void recursRender(TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY);
-			u8 recursComputeVariance(s32 leftX,s32 leftY,u8 leftZ, s32 rightX, s32 rightY, u8 rightZ, s32 apexX,  s32 apexY, u8 apexZ, s32 node);
-		};
-
-
-		class Landscape {
-		public:
-			// Initialize the whole process
-			void init(u8 *hMap);
-			// Reset for a new frame
-			void reset();
-			// Create mesh approximation
-			void tessellate();
-			// Render current mesh static
-			void render();
-			// Allocate a new node for the mesh
-			TriTreeNode *allocateTri();
-			
-		protected:
-			// Index to the next free TriTreeNode
-			static int m_NextTriNode;
-			// Pool of nodes for tessellation
-			static TriTreeNode m_TriPool[];
-			// Array of patches to be rendered
-			Patch m_aPatches[][];
-			// Pointer to Height Field data
-			u8 *m_HeightMap;
-			
-		};
+		
 
 		//f32* m_fpLevelMDSize;				//max midpoint displacement per level
 		//s32 m_iMaxLevel;
@@ -215,14 +185,17 @@ namespace terrain{
 
 		//TODO use objectpool
 		// How many TriTreeNodes should be allocated?
-		const static s32 POOL_SIZE;
+		const static s32 POOL_SIZE=25000;
+
+		// Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
+		const s32 m_iVarianceDepth;
 
 		// Index to the next free TriTreeNode
 		static int m_NextTriNode;
 		// Pool of nodes for tessellation
 		static TriTreeNode m_TriPool[POOL_SIZE];
 		// Array of patches to be rendered
-		Patch*** m_aPatches;
+		SPatch*** m_aPatches;
 		// Pointer to Height Field data
 		//u8 *m_HeightMap;
 
@@ -233,15 +206,70 @@ namespace terrain{
 
 		IUnit* m_pUnit;
 		SDynamicShap3D2T m_shap;
+		core::array<u8> m_heightMap;
+		core::position3df m_currentCameraPos;
 
-		friend class CPatch;
+		friend struct SPatch;
+
+		u16 getIndex(SPatch* patch,s32 x,s32 z)
+		{
+			return x*m_iMapSize+z+patch->m_uOffset;
+		}
+
+		// Allocate a new node for the mesh
+		TriTreeNode *allocateTri()
+		{
+			TriTreeNode *pTri;
+
+			// IF we've run out of TriTreeNodes, just return NULL (this is handled gracefully)
+			if ( m_NextTriNode >= POOL_SIZE )
+				return NULL;
+
+			pTri = &(m_TriPool[m_NextTriNode++]);
+			pTri->leftChild = pTri->rightChild = NULL;
+
+			return pTri;
+		}
+
+		// Reset all patches, recompute variance if needed
+		void reset();
+
+		void split(TriTreeNode *tri);
+		void recursTessellate(SPatch* patch,TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY, s32 node);
+		void tessellatePatch(SPatch* patch);
+		void tessellate();
+		//TODO 优化，添加参数patchIndex
+		// Computes Variance over the entire tree, and return the max variance among them.  Does not examine node relationships.
+		//u8 recursComputeVariance(SPatch* patch,s32 leftIndex,u8 leftHeight, s32 rightIndex,u8 rightHeight,s32 apexIndex,u8 apexHeight, s32 nodeIndex);
+		u8 recursComputeVariance(SPatch* patch,s32 leftX,s32 leftZ,u8 leftY,s32 rightX,s32 rightZ,u8 rightY,s32 apexX,s32 apexZ,u8 apexY,s32 node);
+		// Compute the variance tree for each of the Binary Triangles in this patch.
+		void computeVariance(SPatch* patch);
 
 	public:
 		CROAMTerrain(IModel* parent,const core::vector3df& pos,
 			const core::vector3df& rot,const core::vector3df& scale);
 		~CROAMTerrain();
 
-		virtual void loadHeightMap(video::IImage* image,ENUM_PATCH_SIZE patchSize=ENUM_PATCH_SIZE_17) = 0;
+		virtual f32 getHeight(f32 x,f32 z) const{
+			//TODO
+			return 0;
+		}
+
+		virtual void loadHeightMap(video::IImage* image,ENUM_PATCH_SIZE patchSize);
+
+		virtual void render(video::IVideoDriver* driver);
+
+		virtual void onRegisterForRender();
+
+		virtual u32 getMaterialCount() const{
+			return 1;
+		}
+
+		virtual video::IMaterial* getMaterial(u32 num) const{
+			if(num>=getMaterialCount())
+				return NULL;
+			return m_pUnit->getMaterial();
+		}
 	};
 }
 }
