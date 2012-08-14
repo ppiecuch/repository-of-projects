@@ -5,6 +5,7 @@
 #include "IUnit.h"
 #include "SDynamicShap.h"
 #include "aabbox3d.h"
+#include "objectpool.h"
 
 namespace yon{
 namespace scene{
@@ -28,6 +29,13 @@ namespace terrain{
 	// ∣
 	// ∣
 	// └─────→x
+
+	//		 apex
+	//        /|\
+	//      /  |  \
+	//    /    |    \
+	//  /      |      \
+	// left -center--right 
 
 	//基本思想是:在对地形进行渲染时,根据视点位置和视线方向来计算视点距离地形表面的三角片元的距离,
 	//再根据目标格网的空间粗糙程序来判断是否对地形表面的三角片元进行一系列基于三角型二叉分割的分解和合并,
@@ -105,6 +113,25 @@ namespace terrain{
 			TriTreeNode *rightNeighbor;
 		};
 
+		/*struct TriTreeNode : public core::IRecyclable{
+		public:
+			TriTreeNode *leftChild;
+			TriTreeNode *rightChild;
+			TriTreeNode *baseNeighbor; 
+			TriTreeNode *leftNeighbor;   
+			TriTreeNode *rightNeighbor;
+
+			virtual void reset(){
+				leftChild=NULL;
+				rightChild=NULL;
+				baseNeighbor=NULL;
+				leftNeighbor=NULL;
+				rightNeighbor=NULL;
+			}
+		};
+
+		typedef core::CObjectPool<TriTreeNode> TriTreeNodePool;*/
+
 		struct SPatch
 		{
 			SPatch(s32 varianceDepth)
@@ -131,6 +158,11 @@ namespace terrain{
 
 			u8* m_pVarianceLeft;				// Left variance tree
 			u8* m_pVarianceRight;				// Right variance tree
+
+			bool isDirty(){return m_varianceDirty;}
+
+			void setVisible(bool on){m_visible=on;}
+			bool isVisible(){return m_visible;}
 
 			void init(u16 x,u16 z,u16 index,u16 offset)		// Initialize a patch.
 			{
@@ -185,15 +217,16 @@ namespace terrain{
 
 		//TODO use objectpool
 		// How many TriTreeNodes should be allocated?
-		const static s32 POOL_SIZE=25000;
+		const static s32 POOL_SIZE;
 
 		// Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
 		const s32 m_iVarianceDepth;
 
 		// Index to the next free TriTreeNode
-		static int m_NextTriNode;
+		static s32 m_NextTriNode;
 		// Pool of nodes for tessellation
-		static TriTreeNode m_TriPool[POOL_SIZE];
+		static TriTreeNode m_TriPool[];
+		//TriTreeNodePool m_triTreeNodePool;
 		// Array of patches to be rendered
 		SPatch*** m_aPatches;
 		// Pointer to Height Field data
@@ -231,11 +264,13 @@ namespace terrain{
 			return pTri;
 		}
 
+		f32 calculateL1Norm(const core::vector3df& a,const core::vector3df& b);
+
 		// Reset all patches, recompute variance if needed
 		void reset();
 
 		void split(TriTreeNode *tri);
-		void recursTessellate(SPatch* patch,TriTreeNode *tri, s32 leftX, s32 leftY, s32 rightX, s32 rightY, s32 apexX, s32 apexY, s32 node);
+		void recursTessellate(SPatch* patch,TriTreeNode *tri,s32 leftX,s32 leftZ,s32 rightX,s32 rightZ,s32 apexX,s32 apexZ,s32 node);
 		void tessellatePatch(SPatch* patch);
 		void tessellate();
 		//TODO 优化，添加参数patchIndex
@@ -244,6 +279,10 @@ namespace terrain{
 		u8 recursComputeVariance(SPatch* patch,s32 leftX,s32 leftZ,u8 leftY,s32 rightX,s32 rightZ,u8 rightY,s32 apexX,s32 apexZ,u8 apexY,s32 node);
 		// Compute the variance tree for each of the Binary Triangles in this patch.
 		void computeVariance(SPatch* patch);
+
+		void recursRender(SPatch* patch,TriTreeNode *tri, s32 leftX, s32 leftZ, s32 rightX, s32 rightZ, s32 apexX, s32 apexZ);
+		void renderPatch(SPatch* patch);
+		void preRender();
 
 	public:
 		CROAMTerrain(IModel* parent,const core::vector3df& pos,
