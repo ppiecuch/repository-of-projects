@@ -66,8 +66,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
 	pOverlookCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_PERSP,NULL,core::vector3df(0,10000,0),core::vector3df(0,0,1),core::ORIGIN_VECTOR3DF,false);
-	pOverlookCamera->setNear(1000);
-	pOverlookCamera->setFar(30000);
+	pOverlookCamera->setNear(1);
+	pOverlookCamera->setFar(10000);
 	pOrthoCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	pCamera=sceneMgr->addCameraFPS();
 	pCamera->setFar(5000);
@@ -78,8 +78,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
 	fs->addWorkingDirectory("../media\\skybox\\6");
-	fs->addWorkingDirectory("../media/terrain/4");
-	fs->addWorkingDirectory("../media/water/2");
+	fs->addWorkingDirectory("../media/terrain/2");
+	fs->addWorkingDirectory("../media/water/1");
 	//fs->addWorkingDirectory("../media/terrain/heightmap/plain");
 	fs->addWorkingDirectory("../media/terrain/heightmap/rough");
 #elif defined(YON_COMPILE_WITH_ANDROID)
@@ -136,8 +136,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,true);
 
 	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(20,1,20));
-	IImage* image=videoDriver->createImageFromFile("heightmap4.png",true);
-	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_3);
+	IImage* image=videoDriver->createImageFromFile("heightmap256.png",true);
+	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_17);
 	image->drop();
 	/*material=terrainModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_DETAIL_MAP);
