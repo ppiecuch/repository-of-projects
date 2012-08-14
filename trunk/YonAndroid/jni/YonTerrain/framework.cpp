@@ -136,7 +136,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,true);
 
 	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(20,1,20));
-	IImage* image=videoDriver->createImageFromFile("heightmap256.png",true);
+	IImage* image=videoDriver->createImageFromFile("heightmap64.png",true);
 	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_17);
 	image->drop();
 	/*material=terrainModel->getMaterial(0);
