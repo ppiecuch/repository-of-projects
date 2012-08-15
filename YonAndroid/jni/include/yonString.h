@@ -364,6 +364,33 @@ namespace yon{
 				elements[len] = 0;
 			}
 
+			//TODO ´ý²âÊÔ
+			//! Appends a char string to this string
+			/** \param other: Char string to append. */
+			void append(const T* const other)
+			{
+				if (!other)
+					return;
+
+				u32 olen = 0;
+				const T* p = other;
+				while(*p)
+				{
+					++olen;
+					++p;
+				}
+
+				++olen;
+
+				if (len + olen > capacity)
+					reallocate(len + olen);
+
+				for (u32 l=0; l<olen; ++l)
+					elements[l+len] = *(other+l);
+
+				len += olen-1;
+			}
+
 
 			//! Appends a string to this string
 			/** \param other: String to append. */

@@ -17,7 +17,7 @@ namespace terrain{
 	// Beginning frame varience (should be high, it will adjust automatically)
 	f32 gFrameVariance = 50.f;
 
-	//TODO 不使用期望值，这会导致闪烁的问题
+	// 不使用期望值，这会导致闪烁的问题
 	// Desired number of Binary Triangle tessellations per frame.
 	// This is not the desired number of triangles rendered!
 	// There are usually twice as many Binary Triangle structures as there are rendered triangles.
@@ -53,10 +53,10 @@ namespace terrain{
 		//,m_triTreeNodePool(TriTreeNodePool(10))
 	{
 		m_pUnit=new Unit3D2T();
-		//m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
-		//m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+		m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+		m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 		//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
-		m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
+		//m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
 		m_pUnit->setShap(&m_shap);
 	}
 
@@ -153,6 +153,7 @@ namespace terrain{
 		m_NextTriNode=0;
 		m_shap.getIndexArray().reallocate(0);
 
+		//TODO 不用使用除法
 		camera::ICamera* camera=m_pSceneManager->getLogisticCamera();
 		if(camera==NULL)
 			camera=m_pSceneManager->getViewingCamera();
@@ -175,6 +176,7 @@ namespace terrain{
 				if(patch->isDirty())
 					computeVariance(patch);
 
+				//TODO 添加无限地形支持
 				if(patch->isVisible())
 				{
 					// Link all the patches together.
@@ -200,6 +202,7 @@ namespace terrain{
 				}
 			}
 		}
+		m_shap.setIndicesDirty();
 	}
 
 	// Split a single Triangle and link it into the mesh.
@@ -214,6 +217,7 @@ namespace terrain{
 		if ( tri->baseNeighbor && (tri->baseNeighbor->baseNeighbor != tri) )
 			split(tri->baseNeighbor);
 
+		//TODO 不使用静态分配
 		// Create children and link into mesh
 		tri->leftChild  = allocateTri();
 		tri->rightChild = allocateTri();
@@ -287,10 +291,20 @@ namespace terrain{
 	// Tessellate a Patch.
 	// Will continue to split until the variance metric is met.
 	void CROAMTerrain::recursTessellate(SPatch* patch,TriTreeNode *tri,s32 leftX,s32 leftZ,s32 rightX,s32 rightZ,s32 apexX,s32 apexZ,s32 node)
+	//void CROAMTerrain::recursTessellate(SPatch* patch,TriTreeNode *tri,s32 leftX,s32 leftZ,s32 rightX,s32 rightZ,s32 apexX,s32 apexZ,s32 node,bool left)
 	{
 		f32 TriVariance;
 		s32 centerX = (leftX + rightX)>>1; // Compute X coordinate of center of Hypotenuse
 		s32 centerZ = (leftZ + rightZ)>>1; // Compute Y coord...
+
+		/*core::stringc str;
+		if(patch->m_uIndex==0)
+		{
+			if(left)
+				str.append("LEFT");
+			else
+				str.append("RIGHT");
+		}*/
 
 		//core::position3df& pos=m_shap.getVertexArray()[centerX*m_iPatchSize+centerY+patch->m_uOffset].pos;
 
@@ -308,8 +322,11 @@ namespace terrain{
 			// This should also be replaced with a faster operation.
 			TriVariance = ((f32)patch->m_pCurrentVariance[node] * m_iMapSize * 2)/distance;	// Take both distance and variance into consideration
 
+			//Logger->debug("center:%d,%d,distance:%.2f,camPos:%.2f,%.2f,%.2f,TriVariance:%.2f\r\n",centerX,centerZ,distance,m_currentCameraPos.x,m_currentCameraPos.y,m_currentCameraPos.z,TriVariance);
 			//if(patch->m_uIndex==0)
-			//	Logger->debug("center:%d,%d,distance:%.2f,camPos:%.2f,%.2f,%.2f,TriVariance:%.2f\r\n",centerX,centerZ,distance,m_currentCameraPos.x,m_currentCameraPos.y,m_currentCameraPos.z,TriVariance);
+			//{
+			//	str.append(core::stringc(",center:%d,%d,distance:%.2f,camPos:%.2f,%.2f,%.2f,patch->m_pCurrentVariance[%d]:%d,TriVariance:%.2f",centerX,centerZ,distance,m_currentCameraPos.x,m_currentCameraPos.y,m_currentCameraPos.z,node,patch->m_pCurrentVariance[node],TriVariance));
+			//}
 		}
 
 		//why?
@@ -320,6 +337,11 @@ namespace terrain{
 		//if ( (node >= (1<<m_iVarianceDepth))||(TriVariance > gFrameVariance))
 		if (TriVariance > gFrameVariance)
 		{
+			//if(patch->m_uIndex==0)
+			//{
+			//	str.append(",split");
+			//}
+
 			// Split this triangle.
 			split(tri);
 
@@ -330,10 +352,28 @@ namespace terrain{
 			// Tessellate all the way down to one vertex per height field entry
 			if (tri->leftChild &&((core::abs_(leftX-rightX) >= 3) || (core::abs_(leftZ-rightZ) >= 3)))	
 			{
-				recursTessellate(patch, tri->leftChild,   apexX,  apexZ, leftX, leftZ, centerX, centerZ,    node<<1  );
-				recursTessellate(patch, tri->rightChild, rightX, rightZ, apexX, apexZ, centerX, centerZ, 1+(node<<1) );
+				//if(patch->m_uIndex==0)
+				//{
+				//	str.append(",split children");
+				//}
+
+				recursTessellate(patch, tri->leftChild,   apexX,  apexZ, leftX, leftZ, centerX, centerZ,    node<<1 );
+				recursTessellate(patch, tri->rightChild, rightX, rightZ, apexX, apexZ, centerX, centerZ, 1+(node<<1));
 			}
 		}
+		/*else
+		{
+			if(patch->m_uIndex==0)
+			{
+				str.append(",TriVariance <= gFrameVariance,do nothing");
+			}
+		}
+
+		if(patch->m_uIndex==0)
+		{
+			str.append("\r\n");
+			Logger->debug("%s",str.c_str());
+		}*/
 	}
 
 	// Create an approximate mesh.
@@ -355,6 +395,7 @@ namespace terrain{
 
 	void CROAMTerrain::tessellate()
 	{
+		//Logger->debug("--start tessellate--\r\n");
 		// Perform Tessellation
 		s32 index=0;
 		for(s32 x=0;x<m_iNumPatchPerSide;++x)
@@ -451,12 +492,12 @@ namespace terrain{
 		//└--
 		//why node index start from 1,answer: for detail refer to "Tree Traversal Function"
 		patch->m_pCurrentVariance = patch->m_pVarianceLeft;
-		recursComputeVariance(patch,0,m_iPatchSize,m_heightMap[m_iPatchSize*m_iMapSize+patch->m_uOffset],m_iPatchSize,0,m_heightMap[m_iPatchSize+patch->m_uOffset],0,0,m_heightMap[0+patch->m_uOffset],1);
+		recursComputeVariance(patch,0,m_iPatchSize,m_heightMap[m_iPatchSize+patch->m_uOffset],m_iPatchSize,0,m_heightMap[m_iPatchSize*m_iMapSize+patch->m_uOffset],0,0,m_heightMap[0+patch->m_uOffset],1);
 
 		//--┐
 		//  ∣
 		patch->m_pCurrentVariance = patch->m_pVarianceRight;
-		recursComputeVariance(patch,m_iPatchSize,0,m_heightMap[m_iPatchSize+patch->m_uOffset],0,m_iPatchSize,m_heightMap[m_iPatchSize*m_iMapSize+patch->m_uOffset],m_iPatchSize, m_iPatchSize,m_heightMap[(m_iPatchSize * m_iMapSize)+m_iPatchSize+patch->m_uOffset],1);
+		recursComputeVariance(patch,m_iPatchSize,0,m_heightMap[m_iPatchSize*m_iMapSize+patch->m_uOffset],0,m_iPatchSize,m_heightMap[m_iPatchSize+patch->m_uOffset],m_iPatchSize, m_iPatchSize,m_heightMap[(m_iPatchSize * m_iMapSize)+m_iPatchSize+patch->m_uOffset],1);
 
 		// Clear the dirty flag for this patch
 		patch->m_varianceDirty = false;
@@ -604,6 +645,7 @@ namespace terrain{
 		recursRender(patch,&patch->m_baseLeft,0,m_iPatchSize,m_iPatchSize,0,0,0);
 		recursRender(patch,&patch->m_baseRight,m_iPatchSize,0,0,m_iPatchSize,m_iPatchSize,m_iPatchSize);
 
+		//使用gDesiredTris会导致每帧绘制的三角形数无限趋近于gDesiredTris，在临界点时会出现正负变换的情况，导致渲染出现闪烁问题，因此这里我们不采用
 		// Check to see if we got close to the desired number of triangles.
 		// Adjust the frame variance to a better value.
 		//if ( m_NextTriNode != gDesiredTris )
@@ -674,12 +716,12 @@ namespace terrain{
 				v.pos.y=(f32)height*m_scale.y;
 				v.pos.z=fz*m_scale.z;
 
-				if(((x/m_iPatchSize)+(z/m_iPatchSize))%3==0)
+				/*if(((x/m_iPatchSize)+(z/m_iPatchSize))%3==0)
 					v.color=red;
 				else if(((x/m_iPatchSize)+(z/m_iPatchSize))%3==1)
 					v.color=green;
 				else
-					v.color=blue;
+					v.color=blue;*/
 
 				v.texcoords0.x=fu;
 				v.texcoords0.y=fv;
