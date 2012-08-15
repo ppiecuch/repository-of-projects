@@ -75,8 +75,8 @@ namespace scene{
 				parent=this;
 			//terrain::ITerrainModel* model=new terrain::CGeomipmapTerrain(parent,pos,rot,scale);
 			//terrain::ITerrainModel* model=new terrain::CGeomipmapTerrain2(parent,pos,rot,scale);
-			//terrain::ITerrainModel* model=new terrain::CQuadtreeTerrain(parent,pos,rot,scale);
-			terrain::ITerrainModel* model=new terrain::CROAMTerrain(parent,pos,rot,scale);
+			terrain::ITerrainModel* model=new terrain::CQuadtreeTerrain(parent,pos,rot,scale);
+			//terrain::ITerrainModel* model=new terrain::CROAMTerrain(parent,pos,rot,scale);
 			model->drop();
 			return model;
 	}

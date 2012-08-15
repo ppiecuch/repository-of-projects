@@ -19,6 +19,13 @@ void stringTestCase::append()
 	str2.append('c');
 	str2.append('h');
 	CPPUNIT_ASSERT( str2=="ch" );
+
+	core::stringc str3;
+	str3.append("china");
+	CPPUNIT_ASSERT( str3=="china" );
+	str3.append("me");
+	CPPUNIT_ASSERT( str3=="chiname" );
+	printf("\n%s\n",str3.c_str());
 }
 void stringTestCase::intelatof()
 {

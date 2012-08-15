@@ -25,7 +25,7 @@ namespace terrain{
 		//m_pUnit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 		//m_pUnit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 		//m_pUnit->getMaterial()->setFrontFace(video::ENUM_FRONT_FACE_CW);
-		m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
+		//m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
 		//m_pUnit->setShap(&m_shap);
 	}
 	CQuadtreeTerrain::~CQuadtreeTerrain(){

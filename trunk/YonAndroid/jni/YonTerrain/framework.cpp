@@ -136,15 +136,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,true);
 
 	terrainModel=sceneMgr->addTerrainModel(NULL,ORIGIN_VECTOR3DF,ORIGIN_VECTOR3DF,core::vector3df(20,1,20));
-	IImage* image=videoDriver->createImageFromFile("heightmap64.png",true);
+	IImage* image=videoDriver->createImageFromFile("heightmap.png",true);
 	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_17);
 	image->drop();
-	/*material=terrainModel->getMaterial(0);
+	material=terrainModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_DETAIL_MAP);
 	material->setTexture(0,videoDriver->getTexture("terrain-texture.png"));
 	material->setTexture(1,videoDriver->getTexture("rock2.png"));
 	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
-	material->setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);*/
+	material->setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);
 	
 
 	
