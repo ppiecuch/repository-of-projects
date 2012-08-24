@@ -56,8 +56,8 @@ namespace camera{
 		recalculateProjectionMatrix();
 	}
 
-	void COrthoCamera::setPosition(const core::vector3df& pos){
-		IOrthoCamera::setPosition(pos);
+	void COrthoCamera::setPosition(const core::vector3df& pos,bool symport){
+		IOrthoCamera::setPosition(pos,symport);
 		recalculateViewMatrix();
 	}
 	void COrthoCamera::setRotation(const core::vector3df& rot){

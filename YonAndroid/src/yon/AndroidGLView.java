@@ -31,11 +31,12 @@ public class AndroidGLView extends GLSurfaceView{
 	int screenWidth,screenHeight;
 	MoveEvent currentMoveEvent,lastMoveEvent;
 	
-	private native void nativeOnSurfaceCreated(int width,int height,String apkFilePath,String sdcardPath);
+	private native void nativeOnSurfaceCreated(boolean first,int width,int height,String apkFilePath,String sdcardPath);
 	private native void nativeOnSurfaceChanged(int width, int height);
 	private native void nativeOnDrawFrame();
 	private native void nativeOnPause();
 	private native void nativeOnResume();
+	private native void nativeOnDestroy();
 	private native boolean nativeOnBack();
 	private native boolean nativeOnTouch(int action,int id,float x,float y,int count);
 	private native boolean nativeOnMove(int action,int ids[],float[] xs,float[] ys,int count);
@@ -149,6 +150,8 @@ public class AndroidGLView extends GLSurfaceView{
 		
 		renderer=new AndroidGLRender();
 		setRenderer(renderer);
+		
+		Log.d("AndroidGLView","construct AndroidGLView");
 	}
 	
 	@Override
@@ -168,8 +171,23 @@ public class AndroidGLView extends GLSurfaceView{
 	
 	@Override
 	public void onPause() {
-		//Log.d("AndroidGLView","onPause");
+		Log.d("AndroidGLView","nativeOnPause();");
+		nativeOnPause();
 		super.onPause();
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if(renderer.isReady()==false)
+			return;
+		Log.d("AndroidGLView","nativeOnResume();");
+		nativeOnResume();
+	}
+	
+	public void onDestroy() {
+		Log.d("AndroidGLView","nativeOnDestroy();");
+		nativeOnDestroy();
 	}
 	
 	@Override
@@ -297,6 +315,17 @@ public class AndroidGLView extends GLSurfaceView{
 	 *  The onSurfaceCreated(GL10, EGLConfig) method is a convenient place to do this.
 	 */
 	class AndroidGLRender implements GLSurfaceView.Renderer{
+		
+		private boolean first=true;
+		private boolean ready=false;
+		
+		public AndroidGLRender() {
+			Log.d("AndroidGLView","construct AndroidGLRender");
+		}
+		
+		public boolean isReady() {
+			return ready;
+		}
 
 		public void onDrawFrame(GL10 gl) {
 			nativeOnDrawFrame();
@@ -315,37 +344,42 @@ public class AndroidGLView extends GLSurfaceView{
 		 * 当窗口创建的时候需要调用onSurfaceCreated，所以我们可以在里面对OpenGL做一些初始化的工作 
 		 */
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-			nativeOnSurfaceCreated(screenWidth,screenHeight,Util.getAPKFilePath(activity),Util.getSdCardPath());
-			
-			nativeInfo("external path:"+Util.getExternalStoragePath()+"\r\n");
-	        nativeInfo("rom:"+Util.getAvailableInternalMemory()+"/"+Util.getTotalInternalMemory()+"\r\n");
-	        nativeInfo("ram:"+Util.getAvailableMemory(activity)+"/"+Util.getTotalMemory(activity)+"("+Util.getMemoryThreshold(activity)+")"+"\r\n");
-	        nativeInfo("sd:"+Util.getAvailableExternal()+"/"+Util.getTotalExternal()+"\r\n");
-	        nativeInfo(Util.getLanguage()+"\r\n");
-	        
-	        nativeInfo("MODEL:"+Build.MODEL+"\r\n");
-	        nativeInfo("CODENAME:"+Build.VERSION.CODENAME+"\r\n");
-	        nativeInfo("INCREMENTAL:"+Build.VERSION.INCREMENTAL+"\r\n");
-	        nativeInfo("SDK_INT:"+String.valueOf(Build.VERSION.SDK_INT+"\r\n"));
-	        nativeInfo("SDK:"+Build.VERSION.SDK+"\r\n");
-	        nativeInfo("RELEASE:"+Build.VERSION.RELEASE+"\r\n");
-	        nativeInfo("PRODUCT:"+Build.PRODUCT+"\r\n");
-	        nativeInfo("RADIO:"+Build.RADIO+"\r\n");
-	        nativeInfo("CPU_ABI:"+Build.CPU_ABI+"\r\n");
-	        nativeInfo("CPU_ABI2:"+Build.CPU_ABI2+"\r\n");
-	        nativeInfo("BOARD:"+Build.BOARD+"\r\n");
-	        nativeInfo("BOOTLOADER:"+Build.BOOTLOADER+"\r\n");
-	        nativeInfo("BRAND:"+Build.BRAND+"\r\n");
-	        nativeInfo("DEVICE:"+Build.DEVICE+"\r\n");
-	        nativeInfo("DISPLAY:"+Build.DISPLAY+"\r\n");
-	        nativeInfo("FINGERPRINT:"+Build.FINGERPRINT+"\r\n");
-	        nativeInfo("HARDWARE:"+Build.HARDWARE+"\r\n");
-	        nativeInfo("HOST:"+Build.HOST+"\r\n");
-	        nativeInfo("ID:"+Build.ID+"\r\n");
-	        nativeInfo("MANUFACTURER:"+Build.MANUFACTURER+"\r\n");
-	        nativeInfo("TAGS:"+Build.TAGS+"\r\n");
-	        nativeInfo("TYPE:"+Build.TYPE+"\r\n");
-	        nativeInfo("USER:"+Build.USER+"\r\n");
+			Log.d("AndroidGLView","onSurfaceCreated");
+			nativeOnSurfaceCreated(first,screenWidth,screenHeight,Util.getAPKFilePath(activity),Util.getSdCardPath());
+			if(first)
+			{
+				nativeInfo("external path:"+Util.getExternalStoragePath()+"\r\n");
+		        nativeInfo("rom:"+Util.getAvailableInternalMemory()+"/"+Util.getTotalInternalMemory()+"\r\n");
+		        nativeInfo("ram:"+Util.getAvailableMemory(activity)+"/"+Util.getTotalMemory(activity)+"("+Util.getMemoryThreshold(activity)+")"+"\r\n");
+		        nativeInfo("sd:"+Util.getAvailableExternal()+"/"+Util.getTotalExternal()+"\r\n");
+		        nativeInfo(Util.getLanguage()+"\r\n");
+		        
+		        nativeInfo("MODEL:"+Build.MODEL+"\r\n");
+		        nativeInfo("CODENAME:"+Build.VERSION.CODENAME+"\r\n");
+		        nativeInfo("INCREMENTAL:"+Build.VERSION.INCREMENTAL+"\r\n");
+		        nativeInfo("SDK_INT:"+String.valueOf(Build.VERSION.SDK_INT+"\r\n"));
+		        nativeInfo("SDK:"+Build.VERSION.SDK+"\r\n");
+		        nativeInfo("RELEASE:"+Build.VERSION.RELEASE+"\r\n");
+		        nativeInfo("PRODUCT:"+Build.PRODUCT+"\r\n");
+		        nativeInfo("RADIO:"+Build.RADIO+"\r\n");
+		        nativeInfo("CPU_ABI:"+Build.CPU_ABI+"\r\n");
+		        nativeInfo("CPU_ABI2:"+Build.CPU_ABI2+"\r\n");
+		        nativeInfo("BOARD:"+Build.BOARD+"\r\n");
+		        nativeInfo("BOOTLOADER:"+Build.BOOTLOADER+"\r\n");
+		        nativeInfo("BRAND:"+Build.BRAND+"\r\n");
+		        nativeInfo("DEVICE:"+Build.DEVICE+"\r\n");
+		        nativeInfo("DISPLAY:"+Build.DISPLAY+"\r\n");
+		        nativeInfo("FINGERPRINT:"+Build.FINGERPRINT+"\r\n");
+		        nativeInfo("HARDWARE:"+Build.HARDWARE+"\r\n");
+		        nativeInfo("HOST:"+Build.HOST+"\r\n");
+		        nativeInfo("ID:"+Build.ID+"\r\n");
+		        nativeInfo("MANUFACTURER:"+Build.MANUFACTURER+"\r\n");
+		        nativeInfo("TAGS:"+Build.TAGS+"\r\n");
+		        nativeInfo("TYPE:"+Build.TYPE+"\r\n");
+		        nativeInfo("USER:"+Build.USER+"\r\n");
+			}
+			first=false;
+			ready=true;
 		}
 		
 	}

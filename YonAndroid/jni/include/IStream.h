@@ -3,7 +3,9 @@
 
 #include "IReferencable.h"
 #include "path.h"
-
+#ifdef YON_COMPILE_WITH_ANDROID
+#include <string.h>
+#endif
 namespace yon{
 namespace io{
 
@@ -43,7 +45,7 @@ namespace io{
 		virtual bool seek(long offset, bool relative = false) = 0;
 
 		//返回写入的字节数
-		virtual s32 write(u8* buffer, u32 sizeToWrite) = 0;
+		virtual s32 write(const u8* buffer, u32 sizeToWrite) = 0;
 
 		//当前位置，以字节为单位
 		virtual u32 getPos() const = 0;
@@ -63,6 +65,24 @@ namespace io{
 		inline void writeUnsignedLong(u64 value){ write<u64>(value);}
 		inline void writeFloat(f32 value){ write<f32>(value);}
 		inline void writeDouble(f64 value){ write<f64>(value);}
+		inline void writeString(const core::stringc& str)
+		{
+			writeUnsignedInt(str.length());
+			write((const u8*)(str.c_str()),str.length());
+		}
+		inline void writeString(const c8* str)
+		{
+			//core::stringc text(str);//直接创建会有“%”的问题
+			core::stringc text;
+			u32 size = 0;
+			const c8* p = str;
+			do
+			{
+				++size;
+			} while(*p++);
+			text.build(str,size);
+			writeString(text);
+		}
 	};
 
 		
@@ -118,6 +138,16 @@ namespace io{
 		inline u64 readUnsignedLong(){return read<u64>();}
 		inline f32 readFloat(){return read<f32>();}
 		inline f64 readDouble(){return read<f64>();}
+		inline core::stringc readString()
+		{
+			static u8 buffer[65535];
+			memset(buffer,0x0,65535);
+			u32 len=readUnsignedInt();
+			read(buffer,len);
+			core::stringc str;
+			str.build(buffer,len);
+			return str;
+		}
 
 	};
 }

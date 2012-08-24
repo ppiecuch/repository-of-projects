@@ -15,6 +15,8 @@ namespace video{
 		virtual void* lock(){return NULL;}
 		virtual void unlock(){}
 		virtual void upsidedown(){}
+		virtual void logon(){}
+		virtual void logoff(){}
 		virtual bool isRenderTarget() const{return false;}
 		virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color){}
 		virtual void endRTT(bool willRenderFrameBuffer){}

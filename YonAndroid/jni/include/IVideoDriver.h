@@ -16,6 +16,7 @@
 #include "yonArray.h"
 #include "IResizable.h"
 #include "ICursorControl.h"
+#include "IEventReceiver.h"
 
 namespace yon{
 
@@ -78,6 +79,25 @@ namespace yon{
 			ENUM_VIDEO_FEATURE_COUNT
 		};
 
+		enum ENUM_DRIVER_STATE{
+			ENUM_DRIVER_STATE_NONE= 0,
+			ENUM_DRIVER_STATE_RUN,
+			ENUM_DRIVER_STATE_TO_SLEEP,
+			ENUM_DRIVER_STATE_SLEEP,
+			ENUM_DRIVER_STATE_TO_RUN,
+
+			ENUM_DRIVER_STATE_COUNT
+		};
+
+		const static c8* DRIVER_STATE_NAME[]=
+		{
+			"NONE",
+			"RUN",
+			"TOSLEEP",
+			"SLEEP",
+			"TORUN"
+		};
+
 		struct SClearSetting{
 			bool clearBackBuffer;
 			bool clearZBuffer;
@@ -88,7 +108,7 @@ namespace yon{
 		};
 
 		//视频驱动器接口
-		class IVideoDriver:public virtual core::IReferencable{
+		class IVideoDriver:public virtual core::IReferencable,public event::IEventReceiver{
 		protected:
 			enum ENUM_RENDER_MODE{
 				ENUM_RENDER_MODE_NONE = 0,

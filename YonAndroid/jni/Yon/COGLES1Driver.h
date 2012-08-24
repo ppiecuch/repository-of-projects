@@ -117,8 +117,13 @@ namespace ogles1{
 			return average?m_FPSCounter.getPrimitiveAverage():m_uPrimitiveDrawn;
 		}
 
+		virtual bool onEvent(const event::SEvent& event);
 		
 	private:
+		void doze();
+		void wake();
+		void setState(ENUM_DRIVER_STATE state);
+
 		virtual void drawVertex(const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,ENUM_PRIMITIVE_TYPE pType,scene::ENUM_VERTEX_TYPE vType);
 		void checkMaterial();
 		void addTexture(video::ITexture* texture);
@@ -174,6 +179,8 @@ namespace ogles1{
 		core::dimension2di m_windowSize;
 
 		static u32 s_uInstanceCount;
+
+		ENUM_DRIVER_STATE m_state;
 
 #ifdef YON_COMPILE_WITH_WIN32
 		bool initEGL(const HWND& hwnd);

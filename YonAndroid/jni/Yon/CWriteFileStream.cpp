@@ -63,7 +63,7 @@ namespace io{
 		}
 	}
 
-	s32 CWriteFileStream::write(u8* buffer,u32 sizeToWrite){
+	s32 CWriteFileStream::write(const u8* buffer,u32 sizeToWrite){
 		if (m_pFile==NULL){
 			Logger->warn(YON_LOG_WARN_FORMAT,"No file is opened!");
 			return 0;

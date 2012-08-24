@@ -44,7 +44,7 @@ namespace io{
 		virtual io::path getResourcePath(const io::path& filename,bool noEmpty=false) const = 0;
 	};
 
-	IFileSystem* createFileSystem();
+	extern "C" YON_API IFileSystem* createFileSystem();
 }
 }
 #endif

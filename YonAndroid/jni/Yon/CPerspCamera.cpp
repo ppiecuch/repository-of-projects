@@ -70,12 +70,13 @@ namespace camera{
 		recalculateProjectionMatrix();
 	}
 
-	void CPerspCamera::setPosition(const core::vector3df& pos){
-		IPerspCamera::setPosition(pos);
-		if(m_bDirectionNeedUpdate)
-		{
-			recalculateViewMatrix();
-		}
+	void CPerspCamera::setPosition(const core::vector3df& pos,bool symport){
+		IPerspCamera::setPosition(pos,symport);
+		//if(m_bDirectionNeedUpdate)
+		//{
+		//	recalculateViewMatrix();
+		//}
+		recalculateViewMatrix();
 	}
 	void CPerspCamera::setRotation(const core::vector3df& rot){
 		IPerspCamera::setRotation(rot);

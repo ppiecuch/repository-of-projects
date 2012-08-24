@@ -94,11 +94,19 @@ namespace camera{
 			return m_bVisible;
 		}
 
-		virtual void setPosition(const core::vector3df& pos){
+		virtual void setPosition(const core::vector3df& pos,bool symport=false){
 			if(pos!=m_position)
 			{
-				IModel::setPosition(pos);
-				m_bDirectionNeedUpdate=true;
+				if(symport)
+				{
+					m_target=pos+getDirection();
+					IModel::setPosition(pos);
+				}
+				else
+				{
+					IModel::setPosition(pos);
+					m_bDirectionNeedUpdate=true;
+				}
 			}
 		}
 
