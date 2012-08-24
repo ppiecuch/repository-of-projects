@@ -17,7 +17,7 @@ namespace io{
 		virtual ~CWriteFileStream();
 		virtual bool seek(long offset, bool relative);
 		virtual u32 getPos() const;
-		virtual s32 write(u8* buffer, u32 sizeToWrite);
+		virtual s32 write(const u8* buffer, u32 sizeToWrite);
 		virtual void* pointer() const{return m_pFile;}
 	};
 

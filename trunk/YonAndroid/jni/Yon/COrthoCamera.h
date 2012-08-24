@@ -26,7 +26,7 @@ namespace camera{
 
 		virtual void setFar(f32 farValue);
 		
-		virtual void setPosition(const core::vector3df& pos);
+		virtual void setPosition(const core::vector3df& pos,bool symport);
 		virtual void setRotation(const core::vector3df& rot);
 	};
 }//camera

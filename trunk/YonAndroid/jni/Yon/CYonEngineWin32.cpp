@@ -219,8 +219,10 @@ namespace platform{
 
 	bool CYonEngineWin32::postEventFromUser(const event::SEvent& event){
 		bool absorbed = false;
+	
+		absorbed = m_pVideoDriver->onEvent(event);
 
-		if (m_pUserListener)
+		if (!absorbed&&m_pUserListener)
 			absorbed = m_pUserListener->onEvent(event);
 
 		//TODO GUI

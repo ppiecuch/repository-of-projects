@@ -126,6 +126,7 @@ yon_SOURCES :=   \
 		Yon/CModel.cpp \
 		Yon/CGeomipmapTerrain.cpp \
 		Yon/CGeomipmapTerrain2.cpp \
+		Yon/CQuadtreeTerrain.cpp \
 		Yon/CSkyBox.cpp \
 		Yon/CWaterModel.cpp \
 		Yon/CAnimatorFactory.cpp \

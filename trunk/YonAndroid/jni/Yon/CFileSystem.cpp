@@ -4,6 +4,7 @@
 #include "CWriteFileStream.h"
 #include "CXMLReaderImpl.h"
 #include "yonUtil.h"
+#include "CLogger.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include <stdlib.h> //for _MAX_PATH
@@ -19,11 +20,17 @@ namespace io{
 
 	CFileSystem::CFileSystem()
 	{
+		if(Logger==NULL){
+			Logger=new debug::CLogger();
+		}else{
+			Logger->grab();
+		}
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance CFileSystem");
 	}
 
 	CFileSystem::~CFileSystem(){
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release CFileSystem");
+		Logger->drop();
 	}
 
 	bool CFileSystem::existFile(const path& filename) const{
@@ -161,7 +168,7 @@ namespace io{
 	}*/
 
 
-	IFileSystem* createFileSystem()
+	YON_API IFileSystem* createFileSystem()
 	{
 		return new CFileSystem();
 	}

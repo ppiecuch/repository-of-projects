@@ -141,7 +141,9 @@ namespace platform{
 	bool CYonEngineAndroid::postEventFromUser(const event::SEvent& event){
 		bool absorbed = false;
 
-		if (m_pUserListener)
+		absorbed = m_pVideoDriver->onEvent(event);
+
+		if (!absorbed&&m_pUserListener)
 			absorbed = m_pUserListener->onEvent(event);
 
 		//TODO GUI

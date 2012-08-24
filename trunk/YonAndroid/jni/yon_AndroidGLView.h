@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     yon_AndroidGLView
  * Method:    nativeOnSurfaceCreated
- * Signature: (IILjava/lang/String;Ljava/lang/String;)V
+ * Signature: (ZIILjava/lang/String;Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeOnSurfaceCreated
-  (JNIEnv *, jobject, jint, jint, jstring, jstring);
+  (JNIEnv *, jobject, jboolean, jint, jint, jstring, jstring);
 
 /*
  * Class:     yon_AndroidGLView
@@ -45,6 +45,14 @@ JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeOnPause
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeOnResume
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     yon_AndroidGLView
+ * Method:    nativeOnDestroy
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeOnDestroy
   (JNIEnv *, jobject);
 
 /*
@@ -110,8 +118,6 @@ JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeWarn
  */
 JNIEXPORT void JNICALL Java_yon_AndroidGLView_nativeError
   (JNIEnv *, jobject, jstring);
-
-//JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved);
 
 #ifdef __cplusplus
 }

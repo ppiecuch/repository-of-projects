@@ -110,12 +110,16 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	ws->writeBool(true);
 	ws->writeFloat(2.1f);
 	ws->writeLong(3333);
+	ws->writeString("helloworld");
+	ws->writeString(core::stringc("helloChina"));
 	ws->drop();
 
 	IReadStream* rs=fs->createAndOpenReadFileStream("tst/tst/tst/test.txt",ENUM_ENDIAN_MODE_BIG);
 	Logger->debug("%d\n",rs->readBool());
 	Logger->debug("%.2f\n",rs->readFloat());
 	Logger->debug("%ld\n",rs->readLong());
+	Logger->debug("%s\r\n",rs->readString().c_str());
+	Logger->debug("%s\r\n",rs->readString().c_str());
 	//Logger->debug("%d\n",rs->readBool());
 	//Logger->debug("%.2f\n",rs->readFloat());
 	//Logger->debug("%ld\n",rs->readLong());

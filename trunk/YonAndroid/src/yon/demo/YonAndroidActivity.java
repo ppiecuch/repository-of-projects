@@ -172,12 +172,19 @@ public class YonAndroidActivity extends Activity {
     
     @Override
     protected void onPause() {
-    	super.onPause();
     	view.onPause();
+    	super.onPause();
+    }
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	view.onResume();
     }
     
     @Override
 	protected void onDestroy() {
+    	view.onDestroy();
 		super.onDestroy();
 		SysApplication.getInstance().exit();
 		Log.i(TAG, "exit");

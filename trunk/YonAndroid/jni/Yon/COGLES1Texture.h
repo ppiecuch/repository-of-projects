@@ -49,6 +49,9 @@ namespace ogles1{
 		virtual void unlock();
 		virtual void upsidedown();
 
+		virtual void logon();
+		virtual void logoff();
+
 		virtual bool isRenderTarget() const{return m_bIsRenderTarget;}
 		virtual void setIsRenderTarget(bool on){m_bIsRenderTarget=on;}
 		virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color);

@@ -120,6 +120,7 @@ namespace ogles1{
 		m_eglDisplay(EGL_NO_DISPLAY),
 		m_hDc(NULL),m_hWnd(param.hWnd),
 #endif
+		m_state(ENUM_DRIVER_STATE_NONE),
 		m_windowSize(core::dimension2di((s32)param.windowSize.w,(s32)param.windowSize.h)),IVideoDriver(fs,timer),COGLES1ExtensionHandler(){
 
 		m_imageLoaders.push_back(createImageLoaderPNG());
@@ -187,9 +188,12 @@ namespace ogles1{
 		DebugFont::getInstance().m_pDriver=this;*/
 		video::IImage* image=debug::createDebugPrinterTextureImage();
 		const bool useMipmap = getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
+		const bool reserved = getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE);
 		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, false);
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, true);
 		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
 		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, useMipmap);
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, reserved);
 		addTexture(tex);
 		tex->drop();
 		image->drop();
@@ -201,6 +205,8 @@ namespace ogles1{
 
 		//实例计数器加1
 		++s_uInstanceCount;
+
+		setState(ENUM_DRIVER_STATE_RUN);
 
 		Logger->info(YON_LOG_SUCCEED_FORMAT,core::stringc("Instance COGLES1Driver:%d",s_uInstanceCount).c_str());
 	}
@@ -272,6 +278,60 @@ namespace ogles1{
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
 	}
 
+	void COGLES1Driver::setState(ENUM_DRIVER_STATE state)
+	{
+		Logger->debug("COGLES1Driver:%s state->%s state\r\n",DRIVER_STATE_NAME[m_state],DRIVER_STATE_NAME[state]);
+		m_state=state;
+	}
+
+	bool COGLES1Driver::onEvent(const event::SEvent& event)
+	{
+		switch(event.type)
+		{
+		case event::ENUM_EVENT_TYPE_SYSTEM:
+			switch(event.systemInput.type)
+			{
+			case event::ENUM_SYSTEM_INPUT_TYPE_DOZE:
+				setState(ENUM_DRIVER_STATE_TO_SLEEP);
+				break;
+			case event::ENUM_SYSTEM_INPUT_TYPE_WAKE:
+				setState(ENUM_DRIVER_STATE_TO_RUN);
+				break;
+			}
+			break;
+		}
+		return false;
+	}
+
+	void COGLES1Driver::doze()
+	{
+		//for(s32 i=0;i<m_textures.size();++i)
+		//	m_textures[i].texture->logoff();
+		
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Doze COGLES1Driver");
+	}
+	void COGLES1Driver::wake()
+	{
+		//for(s32 i=0;i<m_textures.size();++i)
+		//	m_textures[i].texture->logon();
+		//m_textures.sort();
+		for(s32 i=0;i<m_textures.size();++i)
+			m_textures[i].texture->drop();
+		m_textures.clear();
+		video::IImage* image=debug::createDebugPrinterTextureImage();
+		const bool useMipmap = getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
+		const bool reserved = getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE);
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, false);
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, true);
+		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, useMipmap);
+		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, reserved);
+		addTexture(tex);
+		tex->drop();
+		image->drop();
+		m_pDebugPrinter->setTexture(tex);
+	}
+
 	void COGLES1Driver::clearView(const bool& backBuffer,const bool& zBuffer,const video::SColor& color) const{
 		GLbitfield mask = 0;
 
@@ -300,6 +360,19 @@ namespace ogles1{
 			Logger->debug("Could not Bind Contexts and Drawables for OpenGL-ES1 display.\n");
 		}
 #endif
+
+		if(m_state==ENUM_DRIVER_STATE_TO_SLEEP)
+		{
+			doze();
+			setState(ENUM_DRIVER_STATE_SLEEP);
+		}
+		else if(m_state==ENUM_DRIVER_STATE_TO_RUN)
+		{
+			doze();
+			wake();
+			setState(ENUM_DRIVER_STATE_RUN);
+		}
+
 		clearView(backBuffer,zBuffer,color);
 
 		m_clearSetting.clearBackBuffer=backBuffer;

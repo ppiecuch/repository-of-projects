@@ -59,15 +59,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300)); 
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300)); 
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/");
+	fs->addWorkingDirectory("../media/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->setWorkingDirectory("media/");
+	fs->addWorkingDirectory("media/");
 #endif
 
 	IMaterial* material;
@@ -95,14 +95,19 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
+float x=0;
 void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
-	//sceneMgr->render(videoDriver);
-	pCamera->render(videoDriver);
+	pCamera->setPosition(core::vector3df(x,x,300),true);
 
-	gfAdapter->clearZ(-1000);
+	x+=0.1f;
+
+	sceneMgr->render(videoDriver);
+	//pCamera->render(videoDriver);
+
+	/*gfAdapter->clearZ(-1000);
 
 	core::rectf r(0,0,1,1);
 	//for(u32 i=0;i<100;++i){
@@ -126,7 +131,7 @@ void drawFrame(){
 			planeModel->getEntity()->getUnit(0)->getShap()->getVertexType());
 	
 
-	gfAdapter->render();
+	gfAdapter->render();*/
 
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);

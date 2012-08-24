@@ -25,7 +25,7 @@ namespace ogles1{
 			if(core::isPowerOf2(image->getDimension().w)==false||core::isPowerOf2(image->getDimension().h)==false)
 				Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("%s is no a power of 2 image!",name.c_str()).c_str());
 
-			glGenTextures(1, &m_textureId);
+			//glGenTextures(1, &m_textureId);
 
 			bool converted=false;
 			if(use16Bit1Alpha||use16Bit4Alpha)
@@ -62,25 +62,40 @@ namespace ogles1{
 			if(converted==false)
 				m_pImage->grab();
 
-			uploadTexture();
+			//uploadTexture();
+			logon();
 
 			driver->incVideoMemory(m_pImage->getByteCountPerPixel()*m_pImage->getImageDataSizeInPixels());
 
 			if(m_bReserveImage==false)
 			{
 				m_pImage->drop();
+				Logger->debug("drop image\r\n");
 				m_pImage=NULL;
 			}
 
 			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Instance COGLES1Texture:%d",m_textureId).c_str());
 	}
 	COGLES1Texture::~COGLES1Texture(){
-		if(m_textureId)
-			glDeleteTextures(1, &m_textureId);
+		logoff();
 		if(m_bReserveImage&&m_pImage)
 			m_pImage->drop();
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("Release COGLES1Texture:%d",m_textureId).c_str());
+	}
+
+	void COGLES1Texture::logon(){
+		if(!m_textureId)
+			glGenTextures(1, &m_textureId);
+		uploadTexture();
+	}
+
+	void COGLES1Texture::logoff(){
+		if(m_textureId)
+		{
+			glDeleteTextures(1, &m_textureId);
+			m_textureId=0;
+		}
 	}
 
 	void getGLFormat(ENUM_COLOR_FORMAT colorFormat,GLenum& format,GLenum& pixelType){
@@ -190,7 +205,7 @@ namespace ogles1{
 		glTexImage2D(GL_TEXTURE_2D, 0, format, m_pImage->getDimension().w,m_pImage->getDimension().h, 0, format, pixelType, source);
 		m_pImage->unlock();
 
-		//m_pDriver->checkGLError(__FILE__,__LINE__);
+		m_pDriver->checkGLError(__FILE__,__LINE__);
 
 		glBindTexture(GL_TEXTURE_2D, tmpTexture);
 
