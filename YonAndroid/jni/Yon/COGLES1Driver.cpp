@@ -305,17 +305,17 @@ namespace ogles1{
 
 	void COGLES1Driver::doze()
 	{
-		//for(s32 i=0;i<m_textures.size();++i)
-		//	m_textures[i].texture->logoff();
+		for(s32 i=0;i<m_textures.size();++i)
+			m_textures[i].texture->logoff();
 		
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Doze COGLES1Driver");
 	}
 	void COGLES1Driver::wake()
 	{
-		//for(s32 i=0;i<m_textures.size();++i)
-		//	m_textures[i].texture->logon();
-		//m_textures.sort();
 		for(s32 i=0;i<m_textures.size();++i)
+			m_textures[i].texture->logon();
+		m_textures.sort();
+		/*for(s32 i=0;i<m_textures.size();++i)
 			m_textures[i].texture->drop();
 		m_textures.clear();
 		video::IImage* image=debug::createDebugPrinterTextureImage();
@@ -329,7 +329,9 @@ namespace ogles1{
 		addTexture(tex);
 		tex->drop();
 		image->drop();
-		m_pDebugPrinter->setTexture(tex);
+		m_pDebugPrinter->setTexture(tex);*/
+
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Wake COGLES1Driver");
 	}
 
 	void COGLES1Driver::clearView(const bool& backBuffer,const bool& zBuffer,const video::SColor& color) const{

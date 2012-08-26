@@ -93,8 +93,8 @@ namespace ogles1{
 	void COGLES1Texture::logoff(){
 		if(m_textureId)
 		{
-			glDeleteTextures(1, &m_textureId);
-			m_textureId=0;
+			//glDeleteTextures(1, &m_textureId);
+			//m_textureId=0;
 		}
 	}
 

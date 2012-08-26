@@ -84,12 +84,38 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
+	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, true);
+
+	IMaterial* material;
+	IShap *shap,*shap1,*shap2;
+	IUnit* unit;
+	IEntity* entity;
+
+	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	planeModel=sceneMgr->addModel(entity);
+	planeModel->setPosition(core::vector3df(0,0,0));
+	material=planeModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	material->setTexture(0,videoDriver->getTexture("aura.png"));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
 	return true; 
 }
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
 void drawFrame(){
+
+	const core::vector3df psca=planeModel->getScale();
+	if(psca.x>4)
+		factor= 0.9f;
+	else if(psca.x<2)
+		factor=1.1f;
+	planeModel->setScale(psca*factor);
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
