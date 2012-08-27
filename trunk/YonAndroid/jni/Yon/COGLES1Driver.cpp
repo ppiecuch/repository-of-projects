@@ -120,7 +120,7 @@ namespace ogles1{
 		m_eglDisplay(EGL_NO_DISPLAY),
 		m_hDc(NULL),m_hWnd(param.hWnd),
 #endif
-		m_state(ENUM_DRIVER_STATE_NONE),
+		m_lastState(ENUM_DRIVER_STATE_NONE),m_currState(ENUM_DRIVER_STATE_NONE),
 		m_windowSize(core::dimension2di((s32)param.windowSize.w,(s32)param.windowSize.h)),IVideoDriver(fs,timer),COGLES1ExtensionHandler(){
 
 		m_imageLoaders.push_back(createImageLoaderPNG());
@@ -280,8 +280,9 @@ namespace ogles1{
 
 	void COGLES1Driver::setState(ENUM_DRIVER_STATE state)
 	{
-		Logger->debug("COGLES1Driver:%s state->%s state\r\n",DRIVER_STATE_NAME[m_state],DRIVER_STATE_NAME[state]);
-		m_state=state;
+		Logger->debug("COGLES1Driver:%s state->%s state\r\n",DRIVER_STATE_NAME[m_currState],DRIVER_STATE_NAME[state]);
+		m_lastState=m_currState;
+		m_currState=state;
 	}
 
 	bool COGLES1Driver::onEvent(const event::SEvent& event)
@@ -307,6 +308,18 @@ namespace ogles1{
 	{
 		for(s32 i=0;i<m_textures.size();++i)
 			m_textures[i].texture->logoff();
+
+		core::map<const scene::IUnit*,video::IHardwareBuffer*>::Iterator it=m_hardwardBuffers.getIterator();
+		for (;!it.atEnd();++it)
+		{
+			video::IHardwareBuffer* hb=it->getValue();
+			hb->logoff();
+		}
+
+		for(s32 i=0;i<MATERIAL_MAX_TEXTURES;++i)
+			setTexture(0, NULL);
+		//make current material having changed flag
+		m_pCurrentMaterial->setMaterialType(m_pCurrentMaterial->getMaterialType());
 		
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Doze COGLES1Driver");
 	}
@@ -315,21 +328,13 @@ namespace ogles1{
 		for(s32 i=0;i<m_textures.size();++i)
 			m_textures[i].texture->logon();
 		m_textures.sort();
-		/*for(s32 i=0;i<m_textures.size();++i)
-			m_textures[i].texture->drop();
-		m_textures.clear();
-		video::IImage* image=debug::createDebugPrinterTextureImage();
-		const bool useMipmap = getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
-		const bool reserved = getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE);
-		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, false);
-		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, true);
-		ITexture* tex=createDeviceDependentTexture(image,io::path("_yon_debug_font_"));
-		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS, useMipmap);
-		setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, reserved);
-		addTexture(tex);
-		tex->drop();
-		image->drop();
-		m_pDebugPrinter->setTexture(tex);*/
+
+		core::map<const scene::IUnit*,video::IHardwareBuffer*>::Iterator it=m_hardwardBuffers.getIterator();
+		for (;!it.atEnd();++it)
+		{
+			video::IHardwareBuffer* hb=it->getValue();
+			hb->logon();
+		}
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Wake COGLES1Driver");
 	}
@@ -363,14 +368,15 @@ namespace ogles1{
 		}
 #endif
 
-		if(m_state==ENUM_DRIVER_STATE_TO_SLEEP)
+		if(m_currState==ENUM_DRIVER_STATE_TO_SLEEP)
 		{
 			doze();
 			setState(ENUM_DRIVER_STATE_SLEEP);
 		}
-		else if(m_state==ENUM_DRIVER_STATE_TO_RUN)
+		else if(m_currState==ENUM_DRIVER_STATE_TO_RUN)
 		{
-			doze();
+			if(m_lastState==ENUM_DRIVER_STATE_TO_SLEEP)
+				doze();
 			wake();
 			setState(ENUM_DRIVER_STATE_RUN);
 		}
@@ -1102,7 +1108,7 @@ namespace ogles1{
 	void  COGLES1Driver::setMaterial(IMaterial* material){
 		if(material==NULL||m_pCurrentMaterial==material)
 			return;
-		//Logger->debug("setMaterial:%08X\n",material);
+		Logger->debug("setMaterial:%08X\n",material);
 		material->grab();
 		if(m_pCurrentMaterial)
 			m_pCurrentMaterial->drop();

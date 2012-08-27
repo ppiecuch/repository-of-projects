@@ -16,9 +16,6 @@ namespace yon{
 
 
 		void CModel::render(video::IVideoDriver* driver){
-			if(m_bVisible==false)
-				return;
-
 			//core::list<animator::IAnimator*>::Iterator it = m_animators.begin();
 			//for (; it != m_animators.end(); ++it)
 			//	(*it)->animateNode(this,0);
@@ -28,6 +25,7 @@ namespace yon{
 				driver->setMaterial(m_entity->getUnit(i)->getMaterial());
 				driver->drawUnit(m_entity->getUnit(i));
 			}
+			Logger->debug("render:%s\r\n",debugName.c_str());
 		}
 
 		void CModel::setEntity(IEntity* entity){

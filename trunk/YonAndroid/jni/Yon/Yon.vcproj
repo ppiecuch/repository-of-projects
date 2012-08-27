@@ -676,13 +676,6 @@
 					<File
 						RelativePath=".\CROAMTerrain.cpp"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\CROAMTerrain.h"
@@ -1823,6 +1816,10 @@
 					</File>
 					<File
 						RelativePath=".\COALSound.h"
+						>
+					</File>
+					<File
+						RelativePath=".\SDummySound.h"
 						>
 					</File>
 				</Filter>

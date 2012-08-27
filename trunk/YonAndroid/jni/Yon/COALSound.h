@@ -16,6 +16,7 @@ namespace oal{
 	protected:
 		ALuint m_source;
 		ALuint m_buffer;
+		f32 m_secOffset;
 
 		ALint getState();
 	public:
@@ -53,6 +54,9 @@ namespace oal{
 		virtual void setMaxDistance(f32 d){}
 		virtual f32 getMinDistance(){return 0;}
 		virtual f32 getMaxDistance(){return 0;}
+
+		virtual f32 getSecondOffset();
+		virtual void setSecondOffset(const f32 offset);
 
 		virtual void setPosition(const core::position3df& p){}
 		virtual const core::position3df getPosition(){

@@ -97,6 +97,9 @@ namespace scene{
 			m_animators.clear();
 		}
 	public:
+		//debug
+		core::stringc debugName;
+
 		virtual ~IModel()
 		{
 			// delete all children

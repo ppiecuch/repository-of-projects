@@ -6,6 +6,7 @@
 #include "CWaveLoaderOGG.h"
 #include "COALSound.h"
 #include "yonUtil.h"
+#include "SDummySound.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include "alMain.h"
@@ -47,7 +48,7 @@ namespace oal{
 
 		size=m_sounds.size();
 		for(i=0;i<m_sounds.size();++i)
-			m_sounds[i]->drop();
+			m_sounds[i].sound->drop();
 		Logger->info("Release %d/%d Sound\n",i,size);
 
 		alcMakeContextCurrent(NULL);
@@ -59,6 +60,39 @@ namespace oal{
 		ALTHUNK_EXIT();
 #endif
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COALAudioDriver");
+	}
+
+	void COALAudioDriver::doze(){
+		for(s32 i=0;i<m_sounds.size();++i){
+			m_sounds[i].playing=m_sounds[i].sound->isPlaying();
+			if(m_sounds[i].playing)
+				m_sounds[i].sound->pause();
+		}
+	}
+	void COALAudioDriver::wake(){
+		for(s32 i=0;i<m_sounds.size();++i){
+			if(m_sounds[i].playing)
+				m_sounds[i].sound->play();
+		}
+	}
+
+	bool COALAudioDriver::onEvent(const event::SEvent& event)
+	{
+		switch(event.type)
+		{
+		case event::ENUM_EVENT_TYPE_SYSTEM:
+			switch(event.systemInput.type)
+			{
+			case event::ENUM_SYSTEM_INPUT_TYPE_DOZE:
+				doze();
+				break;
+			case event::ENUM_SYSTEM_INPUT_TYPE_WAKE:
+				wake();
+				break;
+			}
+			break;
+		}
+		return false;
 	}
 
 	ISound* COALAudioDriver::getSound(const io::path& filename){
@@ -89,14 +123,30 @@ namespace oal{
 		return sound;
 	}
 
-	ISound* COALAudioDriver::findSound(const io::path& filename) const{
-		//TODO ÓÅ»¯
-		const io::path absolutePath = m_pFileSystem->getAbsolutePath(filename);
+	ISound* COALAudioDriver::findSound(const io::path& filename){
+		/*const io::path absolutePath = m_pFileSystem->getResourcePath(filename);
 		for(u32 i=0;i<m_sounds.size();++i){
 			//Logger->debug("check %s==%s\n",m_sounds[i]->getPath().c_str(),absolutePath.c_str());
-			if(m_sounds[i]->getPath()==absolutePath){
-				return m_sounds[i];
+			if(m_sounds[i].sound->getPath()==absolutePath){
+				return m_sounds[i].sound;
 			}
+		}*/
+		SWave wave;
+		SDummySound dummy(filename);
+		wave.sound = &dummy;
+		wave.playing=false;
+
+		s32 index = m_sounds.binary_search(wave);
+		if (index != -1)
+			return m_sounds[index].sound;
+
+		const io::path absolutePath = m_pFileSystem->getResourcePath(filename);
+		if(absolutePath!="")
+		{
+			dummy.setPath(absolutePath);
+			index = m_sounds.binary_search(wave);
+			if (index != -1)
+				return m_sounds[index].sound;
 		}
 		return NULL;
 	}
@@ -164,7 +214,10 @@ namespace oal{
 		if (sound)
 		{
 			sound->grab();
-			m_sounds.push_back(sound);
+			SWave wave;
+			wave.sound=sound;
+			wave.playing=false;
+			m_sounds.push_back(wave);
 		}
 	}
 

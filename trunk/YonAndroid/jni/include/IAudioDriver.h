@@ -4,6 +4,7 @@
 #include "IReferencable.h"
 #include "path.h"
 #include "IFileSystem.h"
+#include "IEventReceiver.h"
 
 namespace yon{
 namespace audio{
@@ -12,7 +13,7 @@ namespace audio{
 	class IListener;
 	class IWave;
 
-	class IAudioDriver : public virtual core::IReferencable{
+	class IAudioDriver : public virtual core::IReferencable,public event::IEventReceiver{
 	protected:
 		io::IFileSystem* m_pFileSystem;
 	public:
@@ -26,7 +27,7 @@ namespace audio{
 				m_pFileSystem->drop();
 		}
 		virtual ISound* getSound(const io::path& filename) = 0;
-		virtual ISound* findSound(const io::path& filename) const = 0;
+		virtual ISound* findSound(const io::path& filename) = 0;
 
 		virtual IWave* createWaveFromFile(const io::path& filename) = 0;
 		virtual IWave* createWaveFromFile(io::IReadStream* file) =0;
