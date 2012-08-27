@@ -17,6 +17,10 @@ namespace video{
 	public:
 		virtual ~IHardwareBuffer(){}
 
+		//释放GPU上的纹理对象
+		virtual void logon() = 0;
+		virtual void logoff() = 0;
+
 		virtual void draw(video::ENUM_PRIMITIVE_TYPE pType) = 0;
 	};
 }

@@ -143,7 +143,6 @@ namespace ogles1{
 
 		debug::IDebugPrinter* m_pDebugPrinter;
 
-		//TODO map(irrlicht÷– π”√SSurface)
 		struct SSurface
 		{
 			video::ITexture* texture;
@@ -180,7 +179,8 @@ namespace ogles1{
 
 		static u32 s_uInstanceCount;
 
-		ENUM_DRIVER_STATE m_state;
+		ENUM_DRIVER_STATE m_lastState;
+		ENUM_DRIVER_STATE m_currState;
 
 #ifdef YON_COMPILE_WITH_WIN32
 		bool initEGL(const HWND& hwnd);

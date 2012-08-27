@@ -12,6 +12,9 @@ namespace ogles1{
 		GLuint m_rboId;
 		ENUM_COLOR_FORMAT m_format;
 		bool checkFBOError();
+
+		virtual void uploadTexture();
+
 	public:
 		COGLES1FBOTexture(const core::dimension2du& size,
 			const io::path& name,COGLES1Driver* driver, const ENUM_COLOR_FORMAT format);
@@ -20,6 +23,9 @@ namespace ogles1{
 		virtual ENUM_COLOR_FORMAT getColorFormat() const{
 			return m_format;
 		}
+
+		virtual void logon();
+		virtual void logoff();
 
 		virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color);
 		virtual void endRTT(bool willRenderFrameBuffer);

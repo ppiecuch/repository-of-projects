@@ -7,6 +7,7 @@
 #include "IAudioDriver.h"
 #include "yonArray.h"
 #include "IWaveLoader.h"
+#include "ISound.h"
 
 #include <al.h>
 #include <alc.h>
@@ -23,23 +24,39 @@ namespace oal{
 		ALCdevice *m_pDevice;
 		ALCcontext *m_pContext;
 
-		core::array<audio::ISound*> m_sounds;
+		struct SWave{
+			audio::ISound* sound;
+			bool playing;
+
+			bool operator < (const SWave& other) const
+			{
+				return sound->getPath() < other.sound->getPath();
+			}
+		};
+
+		//core::array<audio::ISound*> m_sounds;
+		core::array<SWave> m_sounds;
 		core::array<audio::IWaveLoader*> m_waveLoaders;
 
 		void addSound(audio::ISound* sound);
 		audio::ISound* loadSoundFromFile(io::IReadStream* file);
+
+		void doze();
+		void wake();
 	public:
 		COALAudioDriver(io::IFileSystem* fs);
 		virtual ~COALAudioDriver();
 
 		virtual ISound* getSound(const io::path& filename);
-		virtual ISound* findSound(const io::path& filename) const;
+		virtual ISound* findSound(const io::path& filename);
 
 		virtual IWave* createWaveFromFile(const io::path& filename);
 		virtual IWave* createWaveFromFile(io::IReadStream* file);
 
 		virtual IListener* getListener();
 		virtual bool checkError(const c8* file,s32 line);
+
+		virtual bool onEvent(const event::SEvent& event);
 	};
 }
 }

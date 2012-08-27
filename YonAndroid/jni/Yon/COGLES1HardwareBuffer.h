@@ -33,6 +33,9 @@ namespace ogles1{
 		COGLES1HardwareBuffer(scene::IUnit* unit);
 		virtual ~COGLES1HardwareBuffer();
 
+		virtual void logon();
+		virtual void logoff();
+
 		virtual void draw(ENUM_PRIMITIVE_TYPE pType);
 	};
 }

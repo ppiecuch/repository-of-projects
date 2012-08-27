@@ -6,7 +6,7 @@ namespace audio{
 namespace oal{
 
 	COALSound::COALSound(IWave* wave,const io::path& p)
-		:ISound(p),m_source(0),m_buffer(0){
+		:ISound(p),m_source(0),m_buffer(0),m_secOffset(0){
 		alGenSources(1, &m_source);
 		alGenBuffers(1, &m_buffer);
 
@@ -19,16 +19,20 @@ namespace oal{
 	}
 
 	void COALSound::play(){
+		//setSecondOffset(m_secOffset);
 		alSourcePlay(m_source);
 	}
 	void COALSound::pause(){
+		//getSecondOffset();
 		alSourcePause(m_source);
 	}
 	void COALSound::stop(){
 		alSourceStop(m_source);
+		m_secOffset=0;
 	}
 	void COALSound::rewind(){
 		alSourceRewind(m_source);
+		m_secOffset=0;
 	}
 
 	ALint COALSound::getState(){
@@ -63,6 +67,14 @@ namespace oal{
 		static float gain;
 		alGetSourcef(m_source, AL_GAIN, &gain);
 		return gain;
+	}
+
+	f32 COALSound::getSecondOffset(){
+		alGetSourcef(m_source, AL_SEC_OFFSET, &m_secOffset);
+		return m_secOffset;
+	}
+	void COALSound::setSecondOffset(const f32 offset){
+		alSourcef(m_source, AL_SEC_OFFSET, offset);
 	}
 
 }

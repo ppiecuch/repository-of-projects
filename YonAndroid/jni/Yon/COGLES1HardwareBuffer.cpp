@@ -32,7 +32,8 @@ namespace ogles1{
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER,indexBufferSize,m_pUnit->getShap()->getIndices(),indexUsage);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);*/
 
-			update();
+			logon();
+			
 
 			//¼ÆËãÆ«ÒÆÁ¿
 			m_vertexPosOffset=getVertexPosOffset(m_pUnit->getVertexType());
@@ -48,6 +49,17 @@ namespace ogles1{
 		m_pUnit->drop();
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release COGLES1HardwareBuffer");
+	}
+
+	void COGLES1HardwareBuffer::logon()
+	{
+		m_uVerticesChangedId=0;
+		m_uIndicesChangedId=0;
+		update();
+	}
+	void COGLES1HardwareBuffer::logoff()
+	{
+		
 	}
 
 	void COGLES1HardwareBuffer::updateVertices(){

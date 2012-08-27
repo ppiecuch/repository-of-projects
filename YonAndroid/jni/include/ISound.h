@@ -53,6 +53,9 @@ namespace audio{
 		virtual f32 getMinDistance() = 0;
 		virtual f32 getMaxDistance() = 0;
 
+		virtual f32 getSecondOffset() = 0;
+		virtual void setSecondOffset(const f32 offset) = 0;
+
 		virtual void setPosition(const core::position3df& p) = 0;
 		virtual const core::position3df getPosition() = 0;
 

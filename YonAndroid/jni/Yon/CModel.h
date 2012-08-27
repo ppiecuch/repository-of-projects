@@ -4,6 +4,7 @@
 #include "IModel.h"
 #include "IEntity.h"
 #include "ISceneManager.h"
+#include "ILogger.h"
 
 namespace yon{
 	namespace scene{
@@ -28,8 +29,9 @@ namespace yon{
 				if(m_bVisible)
 				{
 					m_pSceneManager->registerForRender(this);
-
 					IModel::onRegisterForRender();
+
+					Logger->debug("%s,onRegisterForRender\r\n",debugName.c_str());
 				}
 			}
 

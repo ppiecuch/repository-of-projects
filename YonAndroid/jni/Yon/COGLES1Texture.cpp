@@ -91,11 +91,11 @@ namespace ogles1{
 	}
 
 	void COGLES1Texture::logoff(){
-		if(m_textureId)
-		{
+		//if(m_textureId)
+		//{
 			//glDeleteTextures(1, &m_textureId);
 			//m_textureId=0;
-		}
+		//}
 	}
 
 	void getGLFormat(ENUM_COLOR_FORMAT colorFormat,GLenum& format,GLenum& pixelType){
