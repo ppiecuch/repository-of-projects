@@ -68,6 +68,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../Yon/");
+	fs->addWorkingDirectory("D:/Development/Tools/xls2xlbV2.0/output");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/");
 	fs->addWorkingDirectory("temp/");
@@ -75,7 +76,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	//Logger->debug("%s\n",fs->getAbsolutePath(fs->getWorkingDirectory()).c_str());
 
-#if 1
+#if 0
 	Logger->debug("%s\n",fs->getResourcePath("test.png").c_str());
 	Logger->debug("%s\n",fs->getResourcePath("Android.mk").c_str());
 	Logger->debug("%s\n",fs->getResourcePath("nothing.png").c_str());
@@ -105,7 +106,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	Logger->debug("%.2f\n",rs->readFloat());
 	Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
-#elif 1
+#elif 0
 	IWriteStream* ws=fs->createAndOpenWriteFileStream("tst/tst/tst/test.txt",true,ENUM_ENDIAN_MODE_BIG);
 	ws->writeBool(true);
 	ws->writeFloat(2.1f);
@@ -132,6 +133,22 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	while(reader->read());
 	reader->drop();
 #else
+	IReadStream* stream=fs->createAndOpenReadFileStream("consume.xlb",io::ENUM_ENDIAN_MODE_BIG);
+	core::stringc header=stream->readString();
+	s32 versionCode=stream->readInt();
+	core::stringc versionName=stream->readString();
+	Logger->debug("header:%s,versionCode:%d,versionName:%s\r\n",header.c_str(),versionCode,versionName.c_str());
+
+	s32 rowCount=stream->readInt();
+
+	Logger->debug("rowCount:%d\r\n",rowCount);
+
+	Logger->debug("%d\r\n",stream->readInt());
+	//Logger->debug("%s\r\n",UTF8ToGB18030(stream->readString().c_str()).c_str());
+	Logger->debug("%s\r\n",EncodeConvertor::getInstance().GB18030ToUTF8(stream->readString().c_str()).c_str());
+	//Logger->debug("%s\r\n",stream->readString().c_str());
+
+	stream->drop();
 #endif
 
 	return true; 

@@ -137,6 +137,7 @@ namespace yon{
 					m_pTimer->drop();
 				m_resizables.clear();
 			};
+			virtual ENUM_DRIVER_STATE getState() const = 0;
 			io::IFileSystem* getFileSystem() const{
 				return m_pFileSystem;
 			}

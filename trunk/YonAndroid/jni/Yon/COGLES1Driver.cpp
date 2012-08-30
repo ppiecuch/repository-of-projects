@@ -56,8 +56,10 @@ namespace ogles1{
 		core::map<u16,core::stringc>::Iterator it=EGLInfo::getInstance().EGL_NAME_FLAGS.getIterator();
 		for (;!it.atEnd();++it)
 		{
-			eglGetConfigAttrib(m_eglDisplay, config, it->getKey(), &value);
-			Logger->debug("%s:%d\n",it->getValue().c_str(),value);
+			if(eglGetConfigAttrib(m_eglDisplay, config, it->getKey(), &value))
+				Logger->debug("%s:%d\n",it->getValue().c_str(),value);
+			else
+				Logger->debug("%s:null\n",it->getValue().c_str());
 		}
 		if(eglGetConfigAttrib(m_eglDisplay, config, EGL_SURFACE_TYPE, &value))
 		{
@@ -138,7 +140,11 @@ namespace ogles1{
 
 #ifdef YON_COMPILE_WITH_WIN32
 		EGLInfo::getInstance().init();
-		initEGL(m_hWnd);
+		if(initEGL(m_hWnd)==false)
+		{
+			MessageBox(NULL,TEXT("Initiate OpenGL-ES1 display failed."),TEXT("Error"),MB_OK);
+			return;
+		}
 #endif//YON_COMPILE_WITH_WIN32
 
 		//GLint temp1,temp2;
@@ -149,19 +155,12 @@ namespace ogles1{
 
 		initExtensionHandler();
 
-		u32 i;
 		onResize(param.windowSize);
 
-		for(i=0; i<ENUM_TRANSFORM_COUNT; ++i)
-			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
-
-		for(i=0;i<YON_MATERIAL_MAX_TEXTURES;++i)
-			m_currentTextures[i]=NULL;
-
 		setRender3DMode();
-
-		glClearColor(0.1f,0.2f,0.3f,1);
-		glColor4f(1, 1, 1, 1);
+		resetGLStates();
+		for(u32 i=0; i<ENUM_TRANSFORM_COUNT; ++i)
+			setTransform(static_cast<ENUM_TRANSFORM>(i), core::IDENTITY_MATRIX);
 
 		//FPSøÿ÷∆º∆À„
 		if(param.fpsLimit==0){
@@ -231,12 +230,6 @@ namespace ogles1{
 		u32 i=0;
 		u32 size=0;
 
-		//TODO map.drop
-		//size=m_pHardwareBuffers.size();
-		//for(i=0;i<m_pHardwareBuffers.size();++i){
-		//	delete m_pHardwareBuffers[i];
-		//}
-		//m_pHardwareBuffers.clear();
 		size=m_hardwardBuffers.size();
 		core::map<const scene::IUnit*,video::IHardwareBuffer*>::Iterator it=m_hardwardBuffers.getIterator();
 		for (i=0;!it.atEnd();++it,++i)
@@ -246,8 +239,6 @@ namespace ogles1{
 		}
 		m_hardwardBuffers.clear();
 		Logger->debug("Release %d/%d Hardwarebuffer\n",i,size);
-
-		
 
 		size=m_imageLoaders.size();
 		for(i=0;i<m_imageLoaders.size();++i)
@@ -278,6 +269,15 @@ namespace ogles1{
 		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release COGLES1Driver");
 	}
 
+	void COGLES1Driver::resetGLStates()
+	{
+		for(u32 i=0;i<YON_MATERIAL_MAX_TEXTURES;++i)
+			m_currentTextures[i]=NULL;
+
+		glClearColor(0.1f,0.2f,0.3f,1);
+		glColor4f(1, 1, 1, 1);
+	}
+
 	void COGLES1Driver::setState(ENUM_DRIVER_STATE state)
 	{
 		Logger->debug("COGLES1Driver:%s state->%s state\r\n",DRIVER_STATE_NAME[m_currState],DRIVER_STATE_NAME[state]);
@@ -287,6 +287,7 @@ namespace ogles1{
 
 	bool COGLES1Driver::onEvent(const event::SEvent& event)
 	{
+		//Logger->debug("onEvent:\r\n");
 		switch(event.type)
 		{
 		case event::ENUM_EVENT_TYPE_SYSTEM:
@@ -306,7 +307,7 @@ namespace ogles1{
 
 	void COGLES1Driver::doze()
 	{
-		for(s32 i=0;i<m_textures.size();++i)
+		for(u32 i=0;i<m_textures.size();++i)
 			m_textures[i].texture->logoff();
 
 		core::map<const scene::IUnit*,video::IHardwareBuffer*>::Iterator it=m_hardwardBuffers.getIterator();
@@ -316,16 +317,16 @@ namespace ogles1{
 			hb->logoff();
 		}
 
-		for(s32 i=0;i<MATERIAL_MAX_TEXTURES;++i)
+		for(u32 i=0;i<MATERIAL_MAX_TEXTURES;++i)
 			setTexture(0, NULL);
 		//make current material having changed flag
-		m_pCurrentMaterial->setMaterialType(m_pCurrentMaterial->getMaterialType());
+		//m_pCurrentMaterial->setMaterialType(m_pCurrentMaterial->getMaterialType());
 		
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Doze COGLES1Driver");
 	}
 	void COGLES1Driver::wake()
 	{
-		for(s32 i=0;i<m_textures.size();++i)
+		for(u32 i=0;i<m_textures.size();++i)
 			m_textures[i].texture->logon();
 		m_textures.sort();
 
@@ -335,6 +336,15 @@ namespace ogles1{
 			video::IHardwareBuffer* hb=it->getValue();
 			hb->logon();
 		}
+
+		//clear multitexture,clear color
+		resetGLStates();
+
+		//resume material states
+		if(m_pCurrentMaterial)
+			m_materialRenderers[m_pCurrentMaterial->getMaterialType()]->onSetMaterial(m_pCurrentMaterial,NULL);
+		else
+			Logger->warn(YON_LOG_WARN_FORMAT,"No current Material,skip resume!");
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Wake COGLES1Driver");
 	}
@@ -1108,7 +1118,7 @@ namespace ogles1{
 	void  COGLES1Driver::setMaterial(IMaterial* material){
 		if(material==NULL||m_pCurrentMaterial==material)
 			return;
-		Logger->debug("setMaterial:%08X\n",material);
+		//Logger->debug("setMaterial:%08X\n",material);
 		material->grab();
 		if(m_pCurrentMaterial)
 			m_pCurrentMaterial->drop();
@@ -1462,16 +1472,15 @@ namespace ogles1{
 		//If more than one matching EGLConfig is found,then a list of EGLConfigs is returned.
 		//In most cases we just want the first config that meets all criteria, so we limit the
 		//number of configs returned to 1.
-		if (!eglChooseConfig(m_eglDisplay, attribs, &config, 1, &num_configs))
+		/*if (!eglChooseConfig(m_eglDisplay, attribs, &config, 1, &num_configs))
 		{
 			//MessageBox(NULL,TEXT("Could not get config for OpenGL-ES1 display."),TEXT("Error"),MB_OK);
 			
 			Logger->error(YON_LOG_FAILED_FORMAT,core::stringc("Choose EGLConfig:%s",((core::stringc)EGLInfo::getInstance().EGL_ERROR_FLAGS[eglGetError()]).c_str()).c_str());
 			return false;
-		}
+		}*/
 		
-		
-		/*Logger->debug("Try Config:\n");
+		Logger->debug("Try Config:\n");
 		printEGLAttribute(attribs);
 
 		int steps=5;
@@ -1535,7 +1544,7 @@ namespace ogles1{
 
 			Logger->debug("Try Config:\n");
 			printEGLAttribute(attribs);
-		}*/
+		}
 		
 
 		//Fourth Step: Create EGLSurface

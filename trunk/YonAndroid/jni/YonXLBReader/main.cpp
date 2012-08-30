@@ -23,6 +23,16 @@ int hex2int(const char* str)
 {
 	return (int)strtol( str, NULL, 16);
 }
+char* createGB(const char* utf8)
+{
+	int buffLen = 0;
+	WCHAR wbuff[5120];
+	MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wbuff, 5120);
+	buffLen = WideCharToMultiByte(CP_ACP, 0, wbuff, -1, NULL, 0, 0, 0);
+	char* m_gb2312 = new char[buffLen+1];
+	WideCharToMultiByte(CP_ACP, 0, wbuff, -1, (LPSTR)m_gb2312, buffLen, 0, 0);
+	return m_gb2312;
+}
 int main(int argc, char* argv[])
 {
 #if 0
@@ -84,7 +94,7 @@ int main(int argc, char* argv[])
 	return 0;
 #else
 	IFileSystem* fs=createFileSystem();
-	fs->addWorkingDirectory("d:/xlb/");
+	fs->addWorkingDirectory("D:/Development/Tools/xls2xlbV2.0/output");
 	IReadStream* stream=fs->createAndOpenReadFileStream("consume.xlb",io::ENUM_ENDIAN_MODE_BIG);
 	core::stringc header=stream->readString();
 	s32 versionCode=stream->readInt();
@@ -100,7 +110,10 @@ int main(int argc, char* argv[])
 	for(s32 r=0;r<rowCount;++r)
 	{
 		Logger->debug("%d\r\n",stream->readInt());
-		Logger->debug("%s\r\n",stream->readString());
+		core::stringc str=stream->readString();
+		//char* temp=createGB(str.c_str());
+		Logger->debug("%s\r\n",UTF8ToGB18030(str.c_str()).c_str());
+		//delete[] temp;
 		Logger->debug("%s\r\n",stream->readString());
 		Logger->debug("%d\r\n",stream->readByte());
 		Logger->debug("%d\r\n",stream->readBool());

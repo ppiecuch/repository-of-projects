@@ -3,6 +3,7 @@
 #include "../log.h"
 
 const char* LOG_TAG = "yon_AndroidGLView";
+//≤‚ ‘pause/resume
 
 typedef int s32;
 typedef unsigned char u8;

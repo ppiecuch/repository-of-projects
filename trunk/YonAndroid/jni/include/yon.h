@@ -45,6 +45,8 @@
 #include "IFileSystem.h" 
 #include "IStream.h"
 
+#include "EncodeConvertor.h"
+
 #include "ICallback.h"
 
 #include "SColor.h"

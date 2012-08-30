@@ -31,7 +31,7 @@ namespace yon{
 					m_pSceneManager->registerForRender(this);
 					IModel::onRegisterForRender();
 
-					Logger->debug("%s,onRegisterForRender\r\n",debugName.c_str());
+					//Logger->debug("%s,onRegisterForRender\r\n",debugName.c_str());
 				}
 			}
 

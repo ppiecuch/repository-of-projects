@@ -25,7 +25,7 @@ namespace yon{
 				driver->setMaterial(m_entity->getUnit(i)->getMaterial());
 				driver->drawUnit(m_entity->getUnit(i));
 			}
-			Logger->debug("render:%s\r\n",debugName.c_str());
+			//Logger->debug("render:%s\r\n",debugName.c_str());
 		}
 
 		void CModel::setEntity(IEntity* entity){

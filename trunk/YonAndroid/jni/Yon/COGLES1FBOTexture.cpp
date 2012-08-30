@@ -41,6 +41,23 @@ namespace ogles1{
 			//glDeleteTextures(1, &m_textureId);
 			//m_textureId=0;
 		//}
+		/*if(m_fboId)
+		{
+			glDeleteFramebuffersOES(1, &m_fboId);
+			m_fboId=0;
+		}
+		if(m_rboId)
+		{
+			glDeleteRenderbuffersOES(1, &m_rboId);
+			m_rboId=0;
+		}
+		if(m_textureId)
+		{
+			glGenTextures(1, &m_textureId);
+			m_textureId=0;
+		}*/
+
+		Logger->debug("COGLES1FBOTexture::logoff\r\n");
 	}
 
 	void COGLES1FBOTexture::uploadTexture(){

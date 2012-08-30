@@ -63,12 +63,14 @@ public:
 };
 
 bool init(void *pJNIEnv,u32 width,u32 height){
-	params.windowSize.w=400;
-	params.windowSize.h=400;
+	params.windowSize.w=width;
+	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	//params.fpsLimit=10;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
+	if(engine->available()==false)
+		return false;
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
@@ -87,6 +89,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
+#if 1
+
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, true);
 
 	IMaterial* material;
@@ -94,26 +98,29 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	shap=geometryFty->createCube(150,150,150,video::COLOR_GREEN);
+	shap=geometryFty->createCube(150,150,150);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
-	cubeModel->debugName="cubeModel";
+	//cubeModel->debugName="cubeModel";
 	material=cubeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
 	cubeModel->setPosition(core::vector3df(100,100,0));
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(256,256), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	material->setTexture(0,rtt);
+	//material->setTexture(0,videoDriver->getTexture("aura_.png"));
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_REF);
 	shap->drop();
 	unit->drop();
 	entity->drop();
 
-	/*shap=geometryFty->createTeapot(7,video::COLOR_BLUE);
+	shap=geometryFty->createTeapot(7,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
 	teapotModel->setPosition(core::vector3df(0,-70,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();*/
+	entity->drop();
 
 	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
@@ -121,7 +128,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->setIndexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	planeModel->debugName="planeModel";
+	//planeModel->debugName="planeModel";
 	planeModel->setPosition(core::vector3df(0,0,0));
 	material=planeModel->getMaterial(0);
 	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
@@ -130,20 +137,18 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(256,256), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
-	cubeModel->setMaterialTexture(0, rtt); 
-	cubeModel->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_REF);
+	
 
 
 	sound=audioDriver->getSound("helloworld.wav");
 	sound->play();
-	/*sound=audioDriver->getSound("bg.ogg");
-	sound->setLooping(true);
-	sound->setGain(0.5f);
-	sound->play();*/
+	//sound=audioDriver->getSound("bg.ogg");
+	//sound->setLooping(true);
+	//sound->setGain(0.5f);
+	//sound->play();
 	
 
-
+#endif
 	return true; 
 }
 void resize(u32 width,u32 height){
@@ -151,30 +156,32 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	Logger->debug("beginDriver\r\n");
+	//Logger->debug("beginDriver\r\n");
 	videoDriver->begin();
-
+#if 1
 	//rtt->beginRTT(true,true,video::SColor(0xFF133E67));
-	Logger->debug("beginRTT\r\n");
+	//Logger->debug("beginRTT\r\n");
 	rtt->beginRTT(true,true,video::SColor(0x00000000));
 
-	//teapotModel->setVisible(true);
+	teapotModel->setVisible(true);
+	planeModel->setVisible(false);
 	cubeModel->setVisible(false);
 
 	sceneMgr->render(videoDriver);
 
-	//teapotModel->setVisible(false);
+	teapotModel->setVisible(false);
 	cubeModel->setVisible(true);
+	planeModel->setVisible(true);
 
 
 	rtt->endRTT(true);
-	Logger->debug("endRTT\r\n");
+	//Logger->debug("endRTT\r\n");
 
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
-	//const core::vector3df trot=teapotModel->getRotation();
-	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
+	const core::vector3df trot=teapotModel->getRotation();
+	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	const core::vector3df psca=planeModel->getScale();
 	if(psca.x>4)
@@ -185,14 +192,19 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,%.2f",videoDriver->getFPS(),sound->getSecondOffset()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
-
 	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
 	videoDriver->setTransform(video::ENUM_TRANSFORM_WORLD,IDENTITY_MATRIX);
 	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
 
+	//Logger->drawString(videoDriver,core::stringc("FPS:%d,%.2f",videoDriver->getFPS(),sound->getSecondOffset()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+
+#endif 
+
+	//*(int*)0 = 1;
+
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 	videoDriver->end();
-	Logger->debug("endDriver\r\n");
+	//Logger->debug("endDriver\r\n");
 }
 void destroy(){
 	engine->drop();

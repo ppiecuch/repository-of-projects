@@ -4,7 +4,7 @@ include $(CLEAR_VARS)
 
 LOCAL_CFLAGS := -DANDROID_NDK \
                 -DDISABLE_IMPORTGL \
-                -O3 \
+                -g \
                 -DAL_BUILD_LIBRARY \
                 -DAL_ALEXT_PROTOTYPES \
                 -DGL_GLEXT_PROTOTYPES
@@ -17,6 +17,7 @@ LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/Yon/openal/OpenAL32/Include \
 		$(LOCAL_PATH)/Yon/libogg \
 		$(LOCAL_PATH)/Yon/libvorbis \
+		$(LOCAL_PATH)/Yon/libiconv \
 		$(LOCAL_PATH)/include/ \
 		$(LOCAL_PATH)/Yon/ \
 		$(LOCAL_PATH)/ 
@@ -117,16 +118,19 @@ yon_SOURCES :=   \
 		Yon/CReadFileStream.cpp \
 		Yon/CWriteFileStream.cpp \
 		Yon/CReadMemoryStream.cpp \
-		Yon/CViewFrustum.cpp \
 		Yon/COrthoCamera.cpp \
 		Yon/CPerspCamera.cpp \
+		Yon/CViewFrustum.cpp \
 		Yon/CWindowOrthoCamera.cpp \
 		Yon/CGeometryFactory.cpp \
 		Yon/CEntity.cpp \
 		Yon/CModel.cpp \
+		Yon/CSkyBox.cpp \
 		Yon/CGeomipmapTerrain.cpp \
 		Yon/CGeomipmapTerrain2.cpp \
-		Yon/CSkyBox.cpp \
+		Yon/CQuadtreeTerrain.cpp \
+		Yon/CROAMTerrain.cpp \
+		Yon/CWaterModel.cpp \
 		Yon/CAnimatorFactory.cpp \
 		Yon/CAnimatorCameraFPS.cpp \
 		Yon/CGraphicsAdapter.cpp \
@@ -156,7 +160,9 @@ LOCAL_SRC_FILES := \
 		$(vorbis_SOURCES) \
 		$(yon_SOURCES)
 		
-		
+LOCAL_LDFLAGS := \
+	../obj/local/armeabi/libiconv.a
+
 LOCAL_ARM_MODE   := arm 
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lstdc++ -Wl
 include $(BUILD_SHARED_LIBRARY)

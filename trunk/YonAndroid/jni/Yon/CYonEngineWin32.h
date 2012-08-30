@@ -30,6 +30,8 @@ namespace yon{
 			virtual audio::IAudioDriver* getAudioDriver() const{return m_pAudioDriver;}
 			virtual IRandomizer* getRandomizer(){return m_pRandomizer;}
 
+			virtual bool available(){return m_bAvailable;}
+
 			virtual bool run();
 
 			virtual void onResize(u32 w,u32 h);
@@ -79,6 +81,7 @@ namespace yon{
 
 			bool m_bClose;
 			bool m_bResized;
+			bool m_bAvailable;
 		};
 	}
 }

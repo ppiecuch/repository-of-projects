@@ -32,6 +32,7 @@ namespace yon{
 		virtual audio::IAudioDriver* getAudioDriver() const = 0;
 		virtual IRandomizer* getRandomizer() = 0;
 
+		virtual bool available(){return true;}
 		virtual bool run() = 0;
 		virtual void onResize(u32 w,u32 h) = 0;
 
