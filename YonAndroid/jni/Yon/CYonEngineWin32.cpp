@@ -8,6 +8,7 @@
 #include "CRandomizer.h"
 #include "yonList.h"
 #include "ILogger.h"
+#include "exception.h"
 
 namespace yon{
 namespace platform{
@@ -22,6 +23,7 @@ namespace platform{
 	u32 KEYBOARD_INPUT_CODEPAGE = 1252;
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
+	long WINAPI onUnhandledException(EXCEPTION_POINTERS* lpExceptionInfo);
 
 	CYonEngineWin32* getEngineByHWnd(HWND hWnd)
 	{
@@ -48,13 +50,15 @@ namespace platform{
 	const wchar_t* szWindowClass=TEXT("CYonPlatformWin32");
 	
 	CYonEngineWin32::CYonEngineWin32(const yon::SYonEngineParameters& params)
-		:m_hWnd(NULL),m_bExternalWindow(false),
+		:m_hWnd(NULL),m_bExternalWindow(false),m_bAvailable(false),
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),
 		m_pAudioDriver(NULL),m_pRandomizer(NULL),
 		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),
 		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),m_pCallback(params.pCallback),
 		m_params(params),m_bClose(false),m_bResized(false),m_pCursorControl(NULL)
 	{
+		SetUnhandledExceptionFilter(onUnhandledException);
+
 		if(params.windowId==NULL)
 		{
 			//创建窗口
@@ -109,6 +113,9 @@ namespace platform{
 
 		//启动计时器
 		m_pTimer->start();
+
+		if(m_pVideoDriver->getState()==video::ENUM_DRIVER_STATE_RUN)
+			m_bAvailable=true;
 	}
 	CYonEngineWin32::~CYonEngineWin32(){
 		eraseEngineByHWnd(m_hWnd);
@@ -217,23 +224,49 @@ namespace platform{
 		return absorbed;
 	}
 
-	bool CYonEngineWin32::postEventFromUser(const event::SEvent& event){
+	bool CYonEngineWin32::postEventFromUser(const event::SEvent& evt){
+
+		//Logger->debug("post\r\n");
+		if(evt.type==event::ENUM_EVENT_TYPE_SYSTEM&&evt.systemInput.type==event::ENUM_SYSTEM_INPUT_TYPE_CRASH)
+		{
+			m_bClose=true;
+			Logger->error(YON_LOG_FAILED_FORMAT,"Encounter unhandled exception,program will exit!");
+			return true;
+		}
+
 		bool absorbed = false;
 	
-		m_pVideoDriver->onEvent(event);
-		m_pAudioDriver->onEvent(event);
+		m_pVideoDriver->onEvent(evt);
+		m_pAudioDriver->onEvent(evt);
 
 		if (m_pUserListener)
-			absorbed = m_pUserListener->onEvent(event);
+			absorbed = m_pUserListener->onEvent(evt);
 
 		//TODO GUI
 		//if (!absorbed && GUIEnvironment)
 		//	absorbed = GUIEnvironment->postEventFromUser(event);
 
 		if (!absorbed && m_pSceneManager)
-			absorbed = m_pSceneManager->postEventFromUser(event);
+			absorbed = m_pSceneManager->postEventFromUser(evt);
 
 		return absorbed;
+	}
+
+	//不能使用成员函数声明：
+	//Obviously SetUnhandledExceptionFilter wait a pointer to ordinar function (exception handler). 
+	//But non-static member function is not an ordinar function and a pointer to it is not a pointer to ordinar function. 
+	//Make it a static mamber (if possible): static member functions treated as ordinar.
+	//http://www.daniweb.com/software-development/cpp/threads/155970/setunhandledexceptionfilter-problem#
+	long WINAPI onUnhandledException(EXCEPTION_POINTERS* lpExceptionInfo){
+		event::SEvent evt;
+		evt.type=event::ENUM_EVENT_TYPE_SYSTEM;
+		evt.systemInput.type=event::ENUM_SYSTEM_INPUT_TYPE_CRASH;
+		core::list<SEnginePair>::Iterator it = EngineMap.begin();
+		for (; it!= EngineMap.end(); ++it)
+			(*it).engine->postEventFromUser(evt);
+		MessageBox(NULL,TEXT("Encounter unhandled exception,program will exit!"),TEXT("Error"),MB_OK);
+		throw core::exception("Encounter unhandled exception,program will exit!)");
+		return EXCEPTION_EXECUTE_HANDLER;
 	}
 	//
 	//函数: WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

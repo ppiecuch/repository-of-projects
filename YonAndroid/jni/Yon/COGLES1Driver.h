@@ -118,8 +118,11 @@ namespace ogles1{
 		}
 
 		virtual bool onEvent(const event::SEvent& event);
+		virtual ENUM_DRIVER_STATE getState() const{return m_currState;}
 		
 	private:
+		//reset color/texture,for init/wake
+		void resetGLStates();
 		void doze();
 		void wake();
 		void setState(ENUM_DRIVER_STATE state);

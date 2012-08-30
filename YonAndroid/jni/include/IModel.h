@@ -98,7 +98,7 @@ namespace scene{
 		}
 	public:
 		//debug
-		core::stringc debugName;
+		//core::stringc debugName;
 
 		virtual ~IModel()
 		{
