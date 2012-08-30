@@ -10,6 +10,7 @@ IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
+II18NManager* i18nManager=NULL;
 
 IModel* cubeModel=NULL;
 IModel* weedModel=NULL;
@@ -58,6 +59,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
 	gfAdapter=engine->getGraphicsAdapter();
+	i18nManager=engine->getI18NManager();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
@@ -132,7 +134,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	while(reader->read());
 	reader->drop();
-#else
+#elif 0
 	IReadStream* stream=fs->createAndOpenReadFileStream("consume.xlb",io::ENUM_ENDIAN_MODE_BIG);
 	core::stringc header=stream->readString();
 	s32 versionCode=stream->readInt();
@@ -145,10 +147,13 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	Logger->debug("%d\r\n",stream->readInt());
 	//Logger->debug("%s\r\n",UTF8ToGB18030(stream->readString().c_str()).c_str());
-	Logger->debug("%s\r\n",EncodeConvertor::getInstance().GB18030ToUTF8(stream->readString().c_str()).c_str());
+	//Logger->debug("%s\r\n",EncodeConvertor::getInstance().GB18030ToUTF8(stream->readString().c_str()).c_str());
 	//Logger->debug("%s\r\n",stream->readString().c_str());
 
 	stream->drop();
+#else
+	Logger->debug("%s\r\n",i18nManager->convert("中华人民共和国",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8).c_str());
+	Logger->debug("%s\r\n",i18nManager->convert("涓崕浜烘皯鍏卞拰鍥",ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
 #endif
 
 	return true; 

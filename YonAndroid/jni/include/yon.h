@@ -45,7 +45,7 @@
 #include "IFileSystem.h" 
 #include "IStream.h"
 
-#include "EncodeConvertor.h"
+#include "II18NManager.h"
 
 #include "ICallback.h"
 
