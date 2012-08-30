@@ -1,0 +1,77 @@
+WAP和NET的区别：
+（1) 为什么会有两个接入点？
+　　在国际上，通常只有一种GPRS接入方式，为什么在中国会有CMWAP和CMNET两兄弟呢？（彩信之所以单独配置接入点是因为彩信服务需要连接专用的服务器，在这里不作探讨。）
+　　其实，CMWAP 和 CMNET 只是中国移动人为划分的两个GPRS接入方式。前者是为手机WAP上网而设立的，后者则主要是为PC、笔记本电脑、PDA等利用GPRS上网服务。它们在 实现方式上并没有任何差别，但因为定位不同，所以和CMNET相比，CMWAP便有了部分限制，资费上也存在差别。
+　　(2) 什么是WAP？
+　　WAP只是一种GPRS应用模式，它与GRPS的接入方式是无关的。WAP应用采用的实现方式是“终端＋WAP网关＋WAP服务器”的模式，不同于一 般Internet的“终端＋服务器”的工作模式。主要的目的是通过WAP网关完成WAP-WEB的协议转换以达到节省网络流量和兼容现有WEB应用的目 的。
+　　WAP网关从技术的角度讲，只是一个提供DaiLi服务的主机，它不一定由网络运营商提供。但据我所知，中国移动GPRS网络目前只有唯一的一个 WAP网关：10.0.0.172，有中国移动提供，用于WAP浏览（HTTP）服务。有一点需要注意，WAP网关和一般意义上的局域网网关是有差别的， 标准的WAP网关仅仅实现了HTTPDaiLi的功能，并未完成路由、NAT等局域网网关的功能。这就决定了它在应用上所受到的限制。
+　　(3) 中国移动对CMWAP的限制
+　　为了从应用中区别两者的定位，中国移动对CMWAP作了一定的限制，主要表现在CMWAP接入时只能访问GPRS网络内的IP（10.*.*.*）， 而无法通过路由访问Internet。（少数地区的移动网络可能不存在这一限制。）我们用CMWAP浏览Internet上的网页就是通过WAP网关协议 或它提供的HTTPDaiLi服务实现的。
+　　说到这里，就让我自然而然的联想到公司的网络，相信不少工作的朋友都有类似的体会。公司的网络在网关上不提供路由和NAT，仅仅提供一个可以访问外网 的HTTPDaiLi。这样，我们就无法直接使用QQ、MSN等非HTTP协议的应用软件了（好在它们还提供的有HTTPDaiLi的连接方式）。 CMWAP也正是如此。
+　　(4) 适用范围
+　　适用范围才是大家最关心的问题。CMNET拥有完全的Internet访问权，这里就不多说了，主要让我们来看看CMWAP。因为有了上面提到的限 制，CMWAP的适用范围就要看WAP网关所提供的支持了。目前，中国移动的WAP网关对外只提供HTTPDaiLi协议（80和8080端口）和WAP 网关协议（9201端口）。
+　　因此，只有满足以下两个条件的应用才能在中国移动的CMWAP接入方式下正常工作：
+　　1. 应用程序的网络请求基于HTTP协议。
+　　2. 应用程序支持HTTPDaiLi协议或WAP网关协议。
+　　如何辨别一个应用程序的网络请求是否基于HTTP协议？
+　　这个问题还真不好回答，要完全做到这一点需要通过拦截应用程序的通信数据包进行分析。这里提供几个简单的方法给广大菜鸟朋友：从表现上看，如果它的网 络请求是网址（URL）的形式，那么通常是基于HTTP协议的，如Web浏览器；如果它连接的服务器端口是80，那么它可能是基于HTTP协议的。如果确 实无法准确判断，那么请直接看下一个条件。（满足第二个条件的应用一定是基于HTTP协议的）
+　　如何区别一个应用程序支持HTTPDaiLi协议还是WAP网关协议呢？
+　　首先看它的设置中有没有DaiLi服务器的选项（通常在S60上未特别说明的DaiLi都是特指HTTPDaiLi），如果有则表示它支持HTTPDaiLi协议。如果没有，则需要按照以下步骤测试：
+　　在GPRS接入点设置的高级设置里去掉DaiLi服务器的设置项：Server Address 和 Server Port，如果应用程序可以正常工作，那么它是基于WAP网关协议，如Java程序、S60内置的浏览器。如果在此状态下不能正常工作，而恢复GPRS接 入点高级设置中的DaiLi服务器设置后能够正常工作，则应用程序支持HTTPDaiLi协议（DaiLi设置从系统中读取）。如果仍不能正常工作，那么 这个应用程序一般来说是不支持HTTPDaiLi协议或WAP网关协议的。
+
+ 
+
+ 
+
+package com.aoran.util;
+
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.URL;
+
+/**
+ *  下载器
+ */
+public class DownloadUtil {
+ private static final String TAG = "Downloader";
+
+ /**
+  * @return InputStream 下载
+  */
+ public static HttpURLConnection download(String url) {
+  HttpURLConnection conn = null;
+  try {
+   String proxyHost = android.net.Proxy.getDefaultHost();
+   if (proxyHost != null) {//如果是wap方式，要加网关
+    java.net.Proxy p = new java.net.Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(
+      android.net.Proxy.getDefaultHost(), android.net.Proxy.getDefaultPort()));
+    conn = (HttpURLConnection) new URL(url).openConnection(p);
+   } else {
+    conn = (HttpURLConnection) new URL(url).openConnection();
+   }
+   // conn.setReadTimeout(5000);
+   conn.setConnectTimeout(10000);
+   conn.setRequestMethod("GET");
+   conn.setRequestProperty(
+     "Accept",
+     "image/gif, image/jpeg, image/pjpeg, image/pjpeg, application/x-shockwave-flash, application/xaml+xml, application/vnd.ms-xpsdocument, application/x-ms-xbap, application/x-ms-application, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*");
+   conn.setRequestProperty("Accept-Language", "zh-CN");
+   conn.setRequestProperty("Referer", url);
+   conn.setRequestProperty("Charset", "UTF-8");
+   conn.setRequestProperty(
+     "User-Agent",
+     "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)");
+   conn.setRequestProperty("Connection", "Keep-Alive");
+   conn.connect();
+   if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+    return conn;
+   }
+  } catch (Exception e) {
+   e.printStackTrace();
+  }
+  return null;
+ }
+
+}
+
+http://www.cnblogs.com/-OYK/archive/2012/03/17/2403241.html

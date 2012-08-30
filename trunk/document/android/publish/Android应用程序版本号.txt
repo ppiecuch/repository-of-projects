@@ -1,0 +1,38 @@
+在应用程序的 升级/维护 策略中, 版本是一个关键的组成部分. 
+
+用户需要了解在他们的设备上所安装的应用程序的版本的特定信息, 以及已安装程序的升级版本可用的情况.
+
+
+其他应用程序 - 作为同一个套件中发布的其他应用程序 - 需要从系统中查询你的应用程序的版本号, 来确认兼容性和识别依赖情况.
+
+
+发布应用所依存的服务平台(如Android Market)也可能需要查询你的应用程序的版本号, 然后可以向用户显示版本号. 它们也可能需要通过检查应用的版本号来确认兼容性, 并建立升级/降级的关系.
+Android系统本身并不检查应用程序版本信息, 比如在升级,兼容性等等上, 不作强制限制. 取而代之的是, 仅由用户或应用程序自身负责对版本做任何的强制限制.Android系统根据其manifest文件中minSdkVersion属性进行版本兼容性检查. 这允许一个应用程序指定兼容的最小系统API版本.
+
+ 
+
+设置应用程序版本号
+android:versionCode — 整型, 相对于其他种类的版本号而言, 表示应用程序代码的版本. 其值是个整型,因此其他应用程序可以在程序编码中判断它, 例如检查升级或降级关系. 可以对其设置任何值, 然而应当确保每一个后续发布的应用程序使用更大的值. 尽管系统并不强制执行这种规则, 但是每个后续版本使用增加的数字值是标准作法. 典型做法是, 你发布的第一个版本的versionCode为1, 然后以后的每个发布版本单调递增, 而不管这个发布版本是否是一个主要或者次要的发布版本. 这表示 android:versionCode 值没有必要与用户可见的应用程序发布版本号有特别的相似之处. 同时,应用程序和发布平台不应将此版本值呈现给用户.
+
+
+android:versionName --- 字符串值,向用户显示的应用程序代码的发布版本号.  此值是一个字符串, 因此可以用<major>.<minor>.<point>的形式描述应用程序版本, 或者以任何其他类型的绝对或相对版本号标识的形式. 相对于 android:versionCode, 除了让应用程序向用户显示它以外, 系统不打算将这个值用于任何内部使用目的. 应用发布平台可能会将 android:versionName 值解析出来显示给用户. 在manifest文件的<manifest>元素中同时定义这些个版本相关属性.
+示例：
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="jinlai.meifa.activity"
+      android:versionCode="2"
+      android:versionName="1.1">
+
+</manifest>
+
+在例子中, 注意 android:versionCode 值显示当前的.apk包含了应用程序代码的第二个发布, android:versionName字符串表现的是一个小的后继发布版本. Android 提供了一个API以让应用程序向系统查询版本信息. 使用 PackageManager 的 getPackageInfo(java.lang.String, int)方法.例如：
+
+PackageManager manager = this.getPackageManager();
+try {
+        PackageInfo info = manager.getPackageInfo(this.getPackageName(), 0);
+        appVersion = info.versionName; // 版本名，versionCode同理
+} catch (NameNotFoundException e) {
+        e.printStackTrace();
+}
+
+http://hi.baidu.com/1018834925/item/bf22bc2e92a2c5de0e37f940

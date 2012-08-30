@@ -1,0 +1,159 @@
+Socket通常也称做”套接字“，用于描述IP地址和端口，废话不多说，它就是网络通信过程中端点的抽象表示。值得一提的是，Java在包java.net中提供了两个类Socket和ServerSocket，分别用来表示双向连接的客户端和服务端。这是两个封装得非常好的类，使用起来很方便！
+    下面将首先创建一个SocketServer的类作为服务端如下，该服务端实现了多线程机制，可以在特定端口处监听多个客户请求，一旦有客户请求，Server总是会创建一个服务纯种来服务新来的客户，而自己继续监听。程序中accept()是一个阻塞函数，所谓阻塞性方法就是说该方法被调用后将等待客户的请求，直到有一个客户启动并请求连接到相同的端口，然后accept()返回一个对应于客户的Socket。这时，客户方和服务方都建立了用于通信的Socket，接下来就是由各个Socket分别打开各自的输入、输出流。
+SocketServer类，服务器实现：
+
+ 1 package HA.Socket;
+ 2 
+ 3 import java.io.*;
+ 4 import java.net.*;
+ 5 
+ 6  public class SocketServer {
+ 7     
+ 8     ServerSocket sever;
+ 9     
+10     public SocketServer(int port){
+11         try{
+12             sever = new ServerSocket(port);
+13         }catch(IOException e){
+14             e.printStackTrace();
+15         }
+16     }
+17     
+18     public void beginListen(){
+19         while(true){
+20             try{
+21                 final Socket socket = sever.accept();
+22                 
+23                 new Thread(new Runnable(){
+24                     public void run(){
+25                         BufferedReader in;
+26                         try{
+27                             in = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
+28                             PrintWriter out = new PrintWriter(socket.getOutputStream());
+29                             while (!socket.isClosed()){
+30                                 String str;
+31                                 str = in.readLine();
+32                                 out.println("Hello!world!! " + str);
+33                                 out.flush();
+34                                 if (str == null || str.equals("end"))
+35                                     break;
+36                                 System.out.println(str);
+37                             }
+38                             socket.close();
+39                         }catch(IOException e){
+40                             e.printStackTrace();
+41                         }
+42                     }
+43                 }).start();
+44             }catch(IOException e){
+45                 e.printStackTrace();
+46             }
+47         }
+48     }
+49 }
+
+SocketClient类，客户端实现：
+
+ 1 package HA.Socket;
+ 2 
+ 3 import java.io.*;
+ 4 import java.net.*;
+ 5 
+ 6  public class SocketClient {
+ 7     static Socket client;
+ 8     
+ 9     public SocketClient(String site, int port){
+10         try{
+11             client = new Socket(site,port);
+12             System.out.println("Client is created! site:"+site+" port:"+port);
+13         }catch (UnknownHostException e){
+14             e.printStackTrace();
+15         }catch (IOException e){
+16             e.printStackTrace();
+17         }
+18     }
+19     
+20     public String sendMsg(String msg){
+21         try{
+22             BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+23             PrintWriter out = new PrintWriter(client.getOutputStream());
+24             out.println(msg);
+25             out.flush();
+26             return in.readLine();
+27         }catch(IOException e){
+28             e.printStackTrace();
+29         }
+30         return "";
+31     }
+32     public void closeSocket(){
+33         try{
+34             client.close();
+35         }catch(IOException e){
+36             e.printStackTrace();
+37         }
+38     }
+39     public static void main(String[] args) throws Exception{
+40         
+41     }
+42 
+43 }
+
+    接下来就是来测试Socket通信了！
+   先运行TestSocketServer类，打开服务端，在12345端口处监听！
+
+1 package HA.Socket;
+2 
+3  public class TestSocketServer {
+4     
+5     public static void main(String[] argvs){
+6         SocketServer server = new SocketServer(12345);
+7         server.beginListen();
+8     }
+9 }
+
+   再运行TestSocketClient类：
+
+ 1 package HA.Socket;
+ 2 
+ 3  public class TestSocketClient {
+ 4 
+ 5     public static void main(String[] args){
+ 6         
+ 7         SocketClient client = new SocketClient("127.0.0.1",12345);
+ 8         System.out.println(client.sendMsg("nimei1"));
+ 9         client.closeSocket();
+10         
+11         SocketClient client1 = new SocketClient("127.0.0.1",12345);
+12         System.out.println(client1.sendMsg("nimei1111"));
+13         client1.closeSocket();
+14         
+15         SocketClient client11 = new SocketClient("127.0.0.1",12345);
+16         System.out.println(client11.sendMsg("nimei11111111"));
+17         client11.closeSocket();
+18         
+19         SocketClient client111 = new SocketClient("127.0.0.1",12345);
+20         System.out.println(client111.sendMsg("nimei11111111111111111"));
+21         client111.closeSocket();
+22         
+23     }
+24 }
+
+ 输出结果如下：
+服务端：
+
+Client is created! site:127.0.0.1 port:12345
+Hello!world!! nimei1
+Client is created! site:127.0.0.1 port:12345
+Hello!world!! nimei1111
+Client is created! site:127.0.0.1 port:12345
+Hello!world!! nimei11111111
+Client is created! site:127.0.0.1 port:12345
+Hello!world!! nimei11111111111111111
+
+客户端：
+nimei1
+nimei1111
+nimei11111111
+nimei11111111111111111
+
+http://www.cnblogs.com/harrisonpc/archive/2011/03/31/2001565.html

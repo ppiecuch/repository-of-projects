@@ -1,0 +1,17 @@
+
+
+腐行者 2012-8-9 10:07:32
+请问怎么取得手机的唯一标识？
+感觉上应该用手机序列号，我在2.2下能以下代码取得手机序列号:
+    		Class<?> c = Class.forName("android.os.SystemProperties");
+    		Method get = c.getMethod("get", String.class);
+    		String serial = (String)get.invoke(c, "ro.serialno");
+在一部分手机上是有效的，但个别手机上取不到，比如魅族手机。
+有什么更好的办法没？
+
+微笑刺客  11:13:54
+可以试试手机设备的唯一码IMIE
+腐行者  11:13:54
+[自动回复]您好，我现在有事不在，一会再和您联系。 不再提醒
+腐行者  11:22:15
+好的，谢谢

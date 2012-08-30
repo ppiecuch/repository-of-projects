@@ -1,3 +1,9 @@
+国际移动用户识别码（IMSI：International Mobile SubscriberIdentification Number）是区别移动用户的标志，储存在SIM卡中，可用于区别移动用户的有效信息。其总长度不超过15位，同样使用0～9的数字。其中MCC是移动用户所属国家代号，占3位数字，中国的MCC规定为460；MNC是移动网号码，最多由两位数字组成，用于识别移动用户所归属的移动通信网；MSIN是移动用户识别码，用以识别某一移动通信网中的移动用户。
+imei就是手机的身份证号码
+IMEI(International Mobile Equipment Identity)是国际移动设备身份码的缩写，国际移动装备辨识码，是由15位数字组成的"电子串号"，它与每台手机一一对应，而且该码是全世界唯一的。每一只手机在组装完成后都将被赋予一个全球唯一的一组号码，这个号码从生产到交付使用都将被制造生产的厂商所记录。
+
+根据Android的安全机制，在使用TelephonyManager时，必须在AndroidManifest.xml中添加<uses-permission android:name="READ_PHONE_STATE" /> 否则无法获得系统的许可。
+
 public void fetch_status(){  
     TelephonyManager tm = (TelephonyManager) this  
     .getSystemService(Context.TELEPHONY_SERVICE);//      

@@ -1,0 +1,136 @@
+在android下，如果我们写jni程序，可能经常会出现类似下面的crash log：
+
+10-11 20:47:24.527: INFO/DEBUG(61): *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+10-11 20:47:24.527: INFO/DEBUG(61): Build fingerprint: 'rockchip/rk29sdk/rk29sdk:2.3.1/GINGERBREAD/eng.root.20110711.153921:eng/test-keys'
+10-11 20:47:24.527: INFO/DEBUG(61): pid: 669, tid: 681  >>> com.xxx.Camera <<<
+10-11 20:47:24.527: INFO/DEBUG(61): signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0000000c
+10-11 20:47:24.527: INFO/DEBUG(61):  r0 00000000  r1 45a7d95c  r2 00000001  r3 00002328
+10-11 20:47:24.527: INFO/DEBUG(61):  r4 00000000  r5 00002328  r6 00002328  r7 00000000
+10-11 20:47:24.527: INFO/DEBUG(61):  r8 45a7db30  r9 45a7d95c  10 45043fac  fp 81fa5368
+10-11 20:47:24.527: INFO/DEBUG(61):  ip 8320a1e4  sp 45a7d928  lr afd1921b  pc afd18f60  cpsr 20000030
+10-11 20:47:24.527: INFO/DEBUG(61):  d0  67706a2e34343237  d1  3333383133317473
+10-11 20:47:24.527: INFO/DEBUG(61):  d2  0000000000000069  d3  000000000000006c
+10-11 20:47:24.527: INFO/DEBUG(61):  d4  9fd151719e4be940  d5  66a628fea8a196ce
+10-11 20:47:24.527: INFO/DEBUG(61):  d6  eb3850c7184a1f94  d7  00000000000000a7
+10-11 20:47:24.527: INFO/DEBUG(61):  d8  0000000000000000  d9  0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d10 0000000000000000  d11 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d12 0000000000000000  d13 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d14 0000000000000000  d15 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d16 4051bdc000000027  d17 bff0000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d18 3ff0000000000000  d19 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d20 0000000000000000  d21 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d22 3ff0000000000000  d23 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d24 3ff0000000000000  d25 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d26 0000000000000000  d27 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d28 0000000000000000  d29 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  d30 0000000000000000  d31 0000000000000000
+10-11 20:47:24.527: INFO/DEBUG(61):  scr 20000012
+10-11 20:47:24.577: INFO/DEBUG(61):          #00  pc 00018f60  /system/lib/libc.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #01  pc 00019216  /system/lib/libc.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #02  pc 000029fe  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #03  pc 00002bd4  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #04  pc 00002f72  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #05  pc 00002fd6  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #06  pc 00003018  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #07  pc 00017df4  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #08  pc 000495c4  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #09  pc 00042178  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #10  pc 0004ed9a  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #11  pc 0001cff4  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #12  pc 000220a4  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #13  pc 00020f9c  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #14  pc 0005fafc  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #15  pc 0005fd10  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #16  pc 000540e2  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #17  pc 000118e4  /system/lib/libc.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #18  pc 000114b0  /system/lib/libc.so
+10-11 20:47:24.577: INFO/DEBUG(61): code around pc:
+10-11 20:47:24.577: INFO/DEBUG(61): afd18f40 624561c4 f8c062c6 62018028 81f0e8bd 
+10-11 20:47:24.577: INFO/DEBUG(61): afd18f50 e92d688b 46044ff7 2b004689 8128f000 
+10-11 20:47:24.577: INFO/DEBUG(61): afd18f60 07028980 6921d501 4620b941 fc54f003 
+10-11 20:47:24.577: INFO/DEBUG(61): afd18f70 f7f8b120 2209ff87 e1166002 7000f8d9 
+10-11 20:47:24.577: INFO/DEBUG(61): afd18f80 683e89a3 3708687d 0a02f013 e017d103 
+10-11 20:47:24.577: INFO/DEBUG(61): code around lr:
+10-11 20:47:24.577: INFO/DEBUG(61): afd191f8 b086b570 f602fb01 9004460c a804a901 
+10-11 20:47:24.577: INFO/DEBUG(61): afd19208 46189001 22014615 96059202 f7ff9603 
+10-11 20:47:24.577: INFO/DEBUG(61): afd19218 b128fe9b 1a709903 f7f34621 4605eeee 
+10-11 20:47:24.577: INFO/DEBUG(61): afd19228 b0064628 bf00bd70 46036841 1e4ab510 
+10-11 20:47:24.577: INFO/DEBUG(61): afd19238 60422a00 6802bfa2 0b01f812 da02601a 
+10-11 20:47:24.577: INFO/DEBUG(61): stack:
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d8e8  00000000  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d8ec  00000000  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d8f0  00000000  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d8f4  00000000  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d8f8  ffffdee8  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d8fc  45a7d9a4  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d900  ffffdefc  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d904  45a7db30  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d908  45043fc4  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d90c  45043fac  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d910  81fa5368  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d914  afd19b4b  /system/lib/libc.so
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d918  00000000  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d91c  45a7d9bd  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d920  00000000  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d924  7fffffe6  
+10-11 20:47:24.577: INFO/DEBUG(61): #00 45a7d928  00000000  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d92c  45a7d95c  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d930  00000001  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d934  00000001  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d938  00002328  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d93c  00002328  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d940  00000000  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d944  45a7db30  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d948  45043fc4  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d94c  45043fac  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d950  81fa5368  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d954  afd1921b  /system/lib/libc.so
+10-11 20:47:24.577: INFO/DEBUG(61): #01 45a7d958  afd46784  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d95c  45a7d968  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d960  00000001  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d964  00002328  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d968  0020d530  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d96c  00002328  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d970  00000000  
+10-11 20:47:24.577: INFO/DEBUG(61):     45a7d974  00002328  
+10-11 20:47:24.597: INFO/DEBUG(61):     45a7d978  0020d530  
+10-11 20:47:24.597: INFO/DEBUG(61):     45a7d97c  83202a03  /system/lib/libxxxCamera.so
+10-11 20:47:25.317: INFO/BootReceiver(95): Copying /data/tombstones/tombstone_08 to DropBox (SYSTEM_TOMBSTONE)
+
+
+
+
+
+我们可以使用gdb来调试，但andorid下gdb不好用，而且不太稳定。其实可以直接通过上面的crash log知道调用堆栈的。
+
+与调用堆栈相关的是类似下面的信息：
+
+
+10-11 20:47:24.577: INFO/DEBUG(61):          #00  pc 00018f60  /system/lib/libc.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #01  pc 00019216  /system/lib/libc.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #02  pc 000029fe  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #03  pc 00002bd4  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #04  pc 00002f72  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #05  pc 00002fd6  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #06  pc 00003018  /system/lib/libxxxCamera.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #07  pc 00017df4  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #08  pc 000495c4  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #09  pc 00042178  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #10  pc 0004ed9a  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #11  pc 0001cff4  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #12  pc 000220a4  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #13  pc 00020f9c  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #14  pc 0005fafc  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #15  pc 0005fd10  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #16  pc 000540e2  /system/lib/libdvm.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #17  pc 000118e4  /system/lib/libc.so
+10-11 20:47:24.577: INFO/DEBUG(61):          #18  pc 000114b0  /system/lib/libc.so
+
+通过类似下面的命令就可以知道对应堆栈的源码信息了： 
+/home/xufan/android/android-1.5/prebuilt/linux-x86/toolchain/arm-eabi-4.2.1/bin/arm-eabi-addr2line -e /home/xufan/android/android-1.5/out/target/product/generic/symbols/system/lib/libxxxCamera.so 
+
+000029fe  
+
+红色部分需要按照crash log做修改。/home/xufan/android/android-1.5/为androoid代码的位置。
+
+http://blog.csdn.net/chief1985/article/details/6870499

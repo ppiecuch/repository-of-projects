@@ -1,0 +1,57 @@
+接收广播的mReceiver：
+
+[java] view plaincopyprint?
+private final BroadcastReceiver mReceiver = new BroadcastReceiver() {  
+    @Override  
+    public void onReceive(Context context, Intent intent) {  
+  
+        String action = intent.getAction();  
+        if (action.equals(Intent.ACTION_MEDIA_MOUNTED)  
+                || action.equals(Intent.ACTION_MEDIA_REMOVED)  
+                || action.equals(Intent.ACTION_MEDIA_BAD_REMOVAL)  
+                || action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {  
+            // do something   
+        }  
+    }  
+};  
+
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			String action = intent.getAction();
+			if (action.equals(Intent.ACTION_MEDIA_MOUNTED)
+					|| action.equals(Intent.ACTION_MEDIA_REMOVED)
+					|| action.equals(Intent.ACTION_MEDIA_BAD_REMOVAL)
+					|| action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+				// do something
+			}
+		}
+	};
+广播的注册：
+
+[java] view plaincopyprint?
+IntentFilter intentFilter = new IntentFilter();  
+intentFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);  
+intentFilter.addAction(Intent.ACTION_MEDIA_REMOVED);  
+intentFilter.addAction(Intent.ACTION_MEDIA_BAD_REMOVAL);  
+intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);  
+//下面这行代码至关重要，否则注册的广播接收不到sdcard的插拔事件   
+intentFilter.addDataScheme("file");  
+mActivity.registerReceiver(mReceiver, intentFilter);  
+
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+		intentFilter.addAction(Intent.ACTION_MEDIA_REMOVED);
+		intentFilter.addAction(Intent.ACTION_MEDIA_BAD_REMOVAL);
+		intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+		//下面这行代码至关重要，否则注册的广播接收不到sdcard的插拔事件
+		intentFilter.addDataScheme("file");
+		mActivity.registerReceiver(mReceiver, intentFilter);
+取消广播的注册：
+
+[java] view plaincopyprint?
+mActivity.unregisterReceiver(mReceiver);  
+
+
+http://blog.csdn.net/ygc87/article/details/7493901

@@ -1,0 +1,43 @@
+在程序开发时，有时候需要屏幕保持点亮/常亮及解锁状态。比方说，闹钟响起时需要点亮和解锁屏幕或者实现一个一键实现屏幕锁屏（锁定）效果。具体代码如下：
+1、Android屏幕常亮/点亮
+1
+2
+3
+4
+5
+6
+7
+8
+9
+//保持屏幕常亮
+PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+mWakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, LOCK_TAG);  
+mWakeLock.acquire();
+
+//释放屏幕常亮锁
+if(null != mWakeLock) {
+    mWakeLock.release();
+}
+2、Android屏幕解锁和锁定
+1
+2
+3
+4
+5
+6
+7
+//屏幕解锁
+KeyguardManager keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
+KeyguardLock keyguardLock = keyguardManager.newKeyguardLock(LOCK_TAG);
+keyguardLock.disableKeyguard();
+
+//屏幕锁定
+keyguardLock.reenableKeyguard();
+3、相关权限
+1
+2
+<uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+
+
+http://orgcent.com/android-screen-wakelock-keyguard/

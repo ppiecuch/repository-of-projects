@@ -1,0 +1,498 @@
+之前一直在用HTML5开发移动本地应用，后来发现，实际上HTML5开发的本地应用，开发效率高，而且跨平台，但是体验，相应无法和原生应用，还有一定差距。
+
+开发HTML5和远程交互，采用JSONP，是异步方式。Android的异步方式不太一样，采用的是多线程和Handler的方式处理。
+
+1 首先是HttpConnection，方法包括HttPost, HttpGet
+
+001
+package com.juupoo.common;
+002
+ 
+003
+import java.util.ArrayList;
+004
+import java.util.List;
+005
+ 
+006
+import org.apache.http.HttpResponse;
+007
+import org.apache.http.NameValuePair;
+008
+import org.apache.http.client.HttpClient;
+009
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+010
+import org.apache.http.client.methods.HttpGet;
+011
+import org.apache.http.client.methods.HttpPost;
+012
+import org.apache.http.impl.client.DefaultHttpClient;
+013
+import org.apache.http.message.BasicNameValuePair;
+014
+import org.apache.http.params.BasicHttpParams;
+015
+import org.apache.http.params.HttpConnectionParams;
+016
+import org.apache.http.params.HttpParams;
+017
+import org.apache.http.util.EntityUtils;
+018
+ 
+019
+import android.os.Bundle;
+020
+import android.os.Handler;
+021
+import android.os.Message;
+022
+ 
+023
+/**
+024
+ * Asynchronous HTTP connections
+025
+ *
+026
+ * @author Greg Zavitz & Joseph Roth
+027
+ */
+028
+public class HttpConnection implements Runnable {
+029
+ 
+030
+    public static final int DID_START = 0;
+031
+    public static final int DID_ERROR = 1;
+032
+    public static final int DID_SUCCEED = 2;
+033
+ 
+034
+    private static final int GET = 0;
+035
+    private static final int POST = 1;
+036
+    private static final int PUT = 2;
+037
+    private static final int DELETE = 3;
+038
+    private static final int BITMAP = 4;
+039
+ 
+040
+    private String url;
+041
+    private int method;
+042
+    private String data;
+043
+    private CallbackListener listener;
+044
+ 
+045
+    private HttpClient httpClient;
+046
+ 
+047
+    // public HttpConnection() {
+048
+    // this(new Handler());
+049
+    // }
+050
+ 
+051
+    public void create(int method, String url, String data, CallbackListener listener) {
+052
+        this.method = method;
+053
+        this.url = url;
+054
+        this.data = data;
+055
+        this.listener = listener;
+056
+        ConnectionManager.getInstance().push(this);
+057
+    }
+058
+ 
+059
+    public void get(String url) {
+060
+        create(GET, url, null, listener);
+061
+    }
+062
+ 
+063
+    public void post(String url, String data, CallbackListener listener) {
+064
+        create(POST, url, data, listener);
+065
+    }
+066
+ 
+067
+    public void put(String url, String data) {
+068
+        create(PUT, url, data, listener);
+069
+    }
+070
+ 
+071
+    public void delete(String url) {
+072
+        create(DELETE, url, null, listener);
+073
+    }
+074
+ 
+075
+    public void bitmap(String url) {
+076
+        create(BITMAP, url, null, listener);
+077
+    }
+078
+ 
+079
+    public interface CallbackListener {
+080
+        public void callBack(String result);
+081
+    }
+082
+ 
+083
+    private static final Handler handler = new Handler() {
+084
+        @Override
+085
+        public void handleMessage(Message message) {
+086
+            switch (message.what) {
+087
+                case HttpConnection.DID_START: {
+088
+                    break;
+089
+                }
+090
+                case HttpConnection.DID_SUCCEED: {
+091
+                    CallbackListener listener = (CallbackListener) message.obj;
+092
+                    Object data = message.getData();
+093
+                    if (listener != null) {
+094
+                        if(data != null) {
+095
+                            Bundle bundle = (Bundle)data;
+096
+                            String result = bundle.getString("callbackkey");
+097
+                            listener.callBack(result);
+098
+                        }
+099
+                    }
+100
+                    break;
+101
+                }
+102
+                case HttpConnection.DID_ERROR: {
+103
+                    break;
+104
+                }
+105
+            }
+106
+        }
+107
+    };
+108
+ 
+109
+    public void run() {
+110
+//      handler.sendMessage(Message.obtain(handler, HttpConnection.DID_START));
+111
+        httpClient = getHttpClient();
+112
+        try {
+113
+            HttpResponse httpResponse = null;
+114
+            switch (method) {
+115
+            case GET:
+116
+                httpResponse = httpClient.execute(new HttpGet(
+117
+                        StaticInfos.Server_URL + url));
+118
+                break;
+119
+            case POST:
+120
+                HttpPost httpPost = new HttpPost(StaticInfos.Server_URL
+121
+                        + url);
+122
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+123
+                BasicNameValuePair valuesPair = new BasicNameValuePair("args",
+124
+                        data);
+125
+                params.add(valuesPair);
+126
+                httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+127
+                httpResponse = httpClient.execute(httpPost);
+128
+                if (isHttpSuccessExecuted(httpResponse)) {
+129
+                    String result = EntityUtils.toString(httpResponse
+130
+                            .getEntity());
+131
+                    this.sendMessage(result);
+132
+                } else {
+133
+                    this.sendMessage("fail");
+134
+                }
+135
+                break;
+136
+            }
+137
+        } catch (Exception e) {
+138
+            this.sendMessage("fail");
+139
+        }
+140
+        ConnectionManager.getInstance().didComplete(this);
+141
+    }
+142
+ 
+143
+    // private void processBitmapEntity(HttpEntity entity) throws IOException {
+144
+    // BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+145
+    // Bitmap bm = BitmapFactory.decodeStream(bufHttpEntity.getContent());
+146
+    // handler.sendMessage(Message.obtain(handler, DID_SUCCEED, bm));
+147
+    // }
+148
+ 
+149
+    private void sendMessage(String result) {
+150
+        Message message = Message.obtain(handler, DID_SUCCEED,
+151
+                listener);
+152
+        Bundle data = new Bundle();
+153
+        data.putString("callbackkey", result);
+154
+        message.setData(data);
+155
+        handler.sendMessage(message);
+156
+         
+157
+    }
+158
+ 
+159
+    public static DefaultHttpClient getHttpClient() {
+160
+        HttpParams httpParams = new BasicHttpParams();
+161
+        HttpConnectionParams.setConnectionTimeout(httpParams, 20000);
+162
+        HttpConnectionParams.setSoTimeout(httpParams, 20000);
+163
+        // HttpConnectionParams.setSocketBufferSize(httpParams, 8192);
+164
+ 
+165
+        DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
+166
+        return httpClient;
+167
+    }
+168
+ 
+169
+    public static boolean isHttpSuccessExecuted(HttpResponse response) {
+170
+        int statusCode = response.getStatusLine().getStatusCode();
+171
+        return (statusCode > 199) && (statusCode < 400);
+172
+    }
+173
+ 
+174
+}
+2  ConnectionManager类，将线程添加到队列中
+01
+package com.juupoo.common;
+02
+ 
+03
+ 
+04
+import java.util.ArrayList;
+05
+ 
+06
+/**
+07
+ * Simple connection manager to throttle connections
+08
+ *
+09
+ * @author Greg Zavitz
+10
+ */
+11
+public class ConnectionManager {
+12
+     
+13
+    public static final int MAX_CONNECTIONS = 5;
+14
+ 
+15
+    private ArrayList<Runnable> active = new ArrayList<Runnable>();
+16
+    private ArrayList<Runnable> queue = new ArrayList<Runnable>();
+17
+ 
+18
+    private static ConnectionManager instance;
+19
+ 
+20
+    public static ConnectionManager getInstance() {
+21
+        if (instance == null)
+22
+            instance = new ConnectionManager();
+23
+        return instance;
+24
+    }
+25
+ 
+26
+    public void push(Runnable runnable) {
+27
+        queue.add(runnable);
+28
+        if (active.size() < MAX_CONNECTIONS)
+29
+            startNext();
+30
+    }
+31
+ 
+32
+    private void startNext() {
+33
+        if (!queue.isEmpty()) {
+34
+            Runnable next = queue.get(0);
+35
+            queue.remove(0);
+36
+            active.add(next);
+37
+ 
+38
+            Thread thread = new Thread(next);
+39
+            thread.start();
+40
+        }
+41
+    }
+42
+ 
+43
+    public void didComplete(Runnable runnable) {
+44
+        active.remove(runnable);
+45
+        startNext();
+46
+    }
+47
+ 
+48
+}
+3 调用：
+01
+new HttpConnection().post("user.login", args, callbackListener);
+02
+ 
+03
+private CallbackListener callbackListener = new HttpConnection.CallbackListener() {
+04
+        @Override
+05
+        public void callBack(String v) {
+06
+            if(v != "fail") {
+07
+                if("false".equals(v)) {
+08
+                    LoginActivity.this.showInfo(R.string.username_or_pass_error);
+09
+                } else {
+10
+                    // 登录
+11
+                    Intent intent = new Intent();
+12
+                    intent.setClass(LoginActivity.this, MainActivity.class);
+13
+                    LoginActivity.this.startActivity(intent);
+14
+                }
+15
+            } else {
+16
+                LoginActivity.this.showInfo(R.string.network_transfer_error);
+17
+            }
+18
+            progressDialog.dismiss();
+19
+        }
+20
+    };
+可参考本文。
+http://masl.cis.gvsu.edu/2010/04/05/android-code-sample-asynchronous-http-connections/
+
+文章出处：http://blog.csdn.net/jkguang/article/details/7028565
+
+http://www.oschina.net/question/54100_33230

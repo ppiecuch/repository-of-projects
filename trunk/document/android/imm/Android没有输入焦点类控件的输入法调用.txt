@@ -1,0 +1,37 @@
+在Android系统上，切换到有输入焦点的控件时会自动弹出键盘，如TextView，TextField等。
+而那些没有输入焦点的控件则不会，所以没法输入。
+ s
+本文将以ImageView为例，介绍如何在没有输入焦点的控件上弹出键盘，并且截获输入的字符。
+ 
+1）弹出键盘
+增加一个按钮，或者在控件的点击事件中加入以下代码：
+InputMethodManager input = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);//得到InputMethodManager。
+
+
+
+input.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS); 
+2）扩展BaseInputConnection类，并通过ImageView的onCreateInputConnection()接口进行加载：
+
+public class XXXXInputConnection extends BaseInputConnection{
+
+  public boolean commitText(CharSequence text, int newCursorPosition) { 
+      //提交字符到需要输入的控件，可在此次监听输入的字符值
+
+  } 
+} 
+ 
+
+public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+
+
+/*在此处可设置outAttrs定制键盘的类型*/ 
+
+        return new XXXXInputConnection(this, false); 
+    } 
+3) 为了让系统能调用到ImageView的onCreateInputConnection()接口，必须把ImageView对象的属性设置如下：
+
+setFocusable(true);
+
+setFocusableInTouchMode(true); 
+
+http://blog.csdn.net/veyan1314/article/details/6399485

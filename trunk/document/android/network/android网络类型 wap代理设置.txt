@@ -1,0 +1,172 @@
+1、很多人都知道移动提供的两个不同的接入点，即：CMWAP 和 CMNET ，前者是为手机WAP上网而设立的，后者则主要是为PC、笔记本电脑、PDA等利用GPRS上网服务的。它们在实现方式上并没有任何差别，但因为定位不同，所以和CMNET相比，CMWAP便有了部分限制，资费上也存在差别。我们常说的手机包月上网，就是指的的包月的wap。为了从应用中区别两者的定位，移动对CMWAP作了一定的限制，主要表现在CMWAP接入时只能访问GPRS网络内的IP（10.*.*.*），而无法通过路由访问Internet。我们用CMWAP浏览Internet上的网页就是通过WAP网关协议或它提供的HTTP代理服务实现的。也就是需要通过移动GPRS网络唯一的一个WAP网关：10.0.0.172。CMNET拥有完全的Internet访问权，这里就不多说了，主要让我们来看看CMWAP。因为有了上面提到的限制，CMWAP的适用范围就要看WAP网关所提供的支持了。目前，移动的WAP网关对外只提供HTTP代理协议（80和8080端口）和WAP网关协议（9201端口）。
+
+ 
+
+    因此，只有满足以下两个条件的应用才能在移动的CMWAP接入方式下正常工作：1. 应用程序的网络请求基于HTTP协议。2. 应用程序支持HTTP代理协议或WAP网关协议。而cmnet则不受任何的限制。其实就是说，通过cmwap的方式访问，需要走移动的网关通过http协议去连接，这样的后果就是速度会变慢，而通过cmnet来连接的，就是直接连接到Internet上的服务器，速度会比cmwap的快一些。呵呵！相信已经使用过的朋友，都会感受过两者的区别。
+
+ 
+
+ 
+
+使用cmwap需要设置代理，而使用wifi和cmnet则不需要，设置后反而读不到数据，方法如下：
+
+在Android中，有两种不同的HttpClient类，
+
+一个是Java.net包中的：HttpURLConnection，它设置代理代码如下： Proxy proxy=new Proxy(java.net.Proxy.Type.HTTP,new InetSocketAddress(“10.0.0.172″,80));
+
+HttpURLConnection connection=(HttpURLConnection) url.openConnection(proxy); 还有一个是Apache的HttpClient： DefaultHttpClient httpclient = new DefaultHttpClient(); HttpHost proxy = new HttpHost(“10.0.0.172″, 80); httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+
+Android 中如何使用 CMWAP 联网
+
+访问中国移动的Wap网络需要设置代理： Host:”10.0.0.172″ Port：80 在Android中，有两种不同的HttpClient类，一个是Java.net包中的：HttpURLConnection，它设置代理代码如下： Proxy proxy=new Proxy(java.net.Proxy.Type.HTTP,new InetSocketAddress(“10.0.0.172″,80)); HttpURLConnection connection=(HttpURLConnection) url.openConnection(proxy); 还有一个是Apache的HttpClient： DefaultHttpClient httpclient = new DefaultHttpClient(); HttpHost proxy = new HttpHost(“10.0.0.172″, 80); httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+
+ 
+
+获取网络类型和消息，查看网络连接是wifi还是GPRS中的cmnet或是cmwap
+
+private boolean getNetType(){
+
+     ConnectivityManager conn = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+     
+
+     if(conn==null) return false;     
+
+     NetworkInfo info = conn.getActiveNetworkInfo();
+
+     if(info==null) return false;
+
+     String type =info.getTypeName();//MOBILE（GPRS）;WIFI
+
+     Log.v("tag", "NetworkType="+type);
+
+     
+
+     if(type.equals("WIFI")){
+
+     return true;
+
+     }else if(type.equals("MOBILE")){
+
+     String apn = getAPN(this);
+
+            Log.v("tag", "APN="+apn);
+
+     if(apn!=null&&apn.equals("cmwap")){
+
+     return false;
+
+     }else{
+
+     return true;
+
+     }
+
+     }
+
+     
+
+return false;
+
+    }
+
+ 
+
+2、检测网络连接是否存在
+
+public static boolean isNetworkAvailable( Activity mActivity ) {
+
+ 
+
+Context context = mActivity.getApplicationContext();
+
+ 
+
+ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+ 
+
+if (connectivity == null) {
+
+ 
+
+return false;
+
+ 
+
+} else {
+
+ 
+
+NetworkInfo[] info = connectivity.getAllNetworkInfo();
+
+ 
+
+if (info != null) {
+
+ 
+
+for (int i = 0; i &lt; info.length; i++) {
+
+ 
+
+if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+
+ 
+
+return true;
+
+ 
+
+}
+
+ 
+
+}
+
+ 
+
+}
+
+ 
+
+}
+
+ 
+
+return false;
+
+ 
+
+}
+
+3、android接入点添加APN问题（暂时不明白这个是干什么用的）
+
+ 
+
+在android开发中，使用如下代码设置APN：
+
+1、第一步，创建activity，使用如下代码设置APN：
+
+ContentValues values = new ContentValues();
+
+values.put(“NAME”, “CMCC”);
+
+values.put(“APN”, “CMCC”);
+
+values.put(“PROXY”, “192.168.0.171″);
+
+values.put(“PORT”, “80″);
+
+values.put(“USER”, “”);
+
+values.put(“PASSWORD”, “”);
+
+this.getContentResolver().insert(Uri.parse(“content://telephony/carriers”), values);
+
+2、在AndroidManifest.xml中添加如下内容：
+
+<uses-permission android:name=”android.permission.WRITE_APN_SETTINGS” />
+
+
+http://blog.csdn.net/dropWater_yjqbll/article/details/6079531

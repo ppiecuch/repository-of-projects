@@ -1,0 +1,65 @@
+Android项目源码混淆问题解决方法
+考虑到代码安全，不让自己的劳动成功那么容易被别人盗取，今天忽然有了兴致对Android代码混淆做了浅浅的学习。在此记录下来，也希望能够对学习android的朋友们有所帮助，免得以后多走弯路。
+由于我的Android项目版本是1.6，谷歌对2.2以上才加入了代码混淆支持。不过低版本也可以进行代码混淆，只是需要自己手工配置。
+也挺简单的。不过在我配置过程中却遇到了很多问题。从网上找了很多资料也没有解决我的问题。通过不断摸索还是从国外网站上找到了解决办法。
+解决方法也很简单，以下是我的解决方案。
+1、SDK2.2以上的直接在default.properties文件中加上proguard.config=proguard.cfg即可
+2、SDK2.2以下除了上面的设置外还需要做以下配置：
+ 首先从其他SDK2.2以上项目中拷出proguard.cfg文件到项目中；
+ 其次如果项目中没有其他 外部jar包引用的话只需在加一行-dontwarn去掉警告即可；
+ 如果有外部jar包引用需要加上两行
+-dontwarn
+-dontskipnonpubliclibraryclassmembers
+3、如果还是报错不能导出的话a、检查SDK路径时候包含空格；b、把-dontpreverify改为-dontoptimize
+
+ 
+
+ 
+
+-------------------------------------------------------------以下为proguard.cfg文件内容-----------------------
+-optimizationpasses 5
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-dontpreverify
+-verbose
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+-dontwarn
+-dontskipnonpubliclibraryclassmembers
+
+
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.app.backup.BackupAgentHelper
+-keep public class * extends android.preference.Preference
+-keep public class com.android.vending.licensing.ILicensingService
+
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+-keepclasseswithmembers class * {
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+
+-keepclasseswithmembers class * {
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+
+-keepclassmembers class * extends android.app.Activity {
+   public void *(android.view.View);
+}
+
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+
+http://hi.baidu.com/manyi880806/item/27fac1092513a73ca3332aa7

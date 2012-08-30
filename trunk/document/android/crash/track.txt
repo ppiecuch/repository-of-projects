@@ -1,0 +1,9 @@
+
+addr2line -C -f -e libc.so 0001173c
+
+
+>libs/armebi/
+objdump -S -D -mi386 libyon.so >disassmble.txt
+
+
+²Î¿¼£ºhttp://www.usertrack.org/?p=36
