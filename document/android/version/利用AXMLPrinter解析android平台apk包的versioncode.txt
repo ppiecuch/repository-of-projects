@@ -1,0 +1,78 @@
+本人的思路：先从apk中提取AndroidManifest.xml，再利用AXMLPrinter(下载地址：http://code.google.com/p/android4me/downloads/list)解析出versionCode。
+
+第一步：提取AndroidManifest.xml
+
+apk包实际上就是一个zip文件，用java中的gzip就可以解压出AndroidManifest.xml，相关代码如下：
+
+package test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+public class ExtractAndroidManifest {
+
+    public static File zip2file() {
+        try {
+            ZipInputStream in = new ZipInputStream(new FileInputStream(
+                    "E:\\android\\04Code\\trunk\\bin\\test.apk"));
+            ZipEntry z = null;
+            while ((z = in.getNextEntry()) != null) {
+                if (!z.isDirectory()
+                        && z.getName().equals("AndroidManifest.xml")) {
+                    File f = new File("E:\\android\\temp\\" + z.getName());
+                    OutputStream out = new FileOutputStream(f);
+                    int b;
+                    while ((b = in.read()) != -1) {
+                        out.write(b);
+                    }
+                    out.close();
+                    return f;
+                }
+            }
+            in.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+}
+第二步，利用AXMLPrinter解析上述的AndroidManifest.xml文件解析出versionCode
+
+apk中提取的AndroidManifest.xml是经过压缩的，无法直接用XmlPullParser解析。幸亏AXMLPrinter已经帮我们做好了解压缩和解析xml的算法，从googlecode下载下来的源码稍微改动下就可以应用到服务器端的项目了。相应的代码：
+
+public static String getVersionCode() {
+        try {
+            File androidManifest = ExtractAndroidManifest.zip2file();
+            AXmlResourceParser parser = new AXmlResourceParser();
+            parser.open(new FileInputStream(androidManifest));
+            while (true) {
+                int type = parser.next();
+                if (type == XmlPullParser.END_DOCUMENT) {
+                    break;
+                }
+                switch (type) {
+                case XmlPullParser.START_TAG:
+                    for (int i = 0; i != parser.getAttributeCount(); ++i) {
+                        if (parser.getAttributeName(i).equals("versionCode")) {
+                            return getAttributeValue(parser, i);
+                        }
+                    }
+                    break;
+                }
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+ 
+
+如果需要的话，同理可以提取versionName等等。

@@ -1,0 +1,7 @@
+1.strings.xml
+　　定义如下参数userName
+　　<string name="userName">当前用户为 %s</string>
+2.使用getString 取得userName值
+　　getString(R.string.userName,"admin")
+　　输出结果：当前用户为 admin
+在国际化时，很方便。

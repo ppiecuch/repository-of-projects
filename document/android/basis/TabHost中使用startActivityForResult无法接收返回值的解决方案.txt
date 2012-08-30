@@ -1,0 +1,41 @@
+在TabHost的子Activity中startActivityForResult调用其他Activity时候遭遇到onActivityResult方法不响应的问题.
+
+ 
+
+解决办法如下:
+
+1.通过父Activity启动其他Activity;
+
+2.实现父Activity的onActivityResult方法,将该处接收到的请求转发给当前活动的子Activity;
+
+3.自定义一个转发接口用来实现第2步中的转发功能;
+
+4.子Activity中实现第3步接口中的方法用来接收返回信息;
+
+ 
+
+代码如下:
+
+1.通过父Activity启动其他Activity
+
+1 getParent().startActivityForResult(new Intent(...), REQUEST_CODE); 
+2.实现父Activity的onActivityResult方法
+
+
+ 1 @Override 2     protected void onActivityResult(int requestCode, int resultCode, Intent data) { 3         // 获取当前活动的Activity实例 4         Activity subActivity = getLocalActivityManager().getCurrentActivity(); 5         //判断是否实现返回值接口 6         if (subActivity instanceof OnTabActivityResultListener) { 7             //获取返回值接口实例 8             OnTabActivityResultListener listener = (OnTabActivityResultListener) subActivity; 9             //转发请求到子Activity10             listener.onTabActivityResult(requestCode, resultCode, data);11         }12         super.onActivityResult(requestCode, resultCode, data);13     }
+
+3.自定义接口
+
+
+/** * 解决子Activity无法接收Activity回调的问题 * @author Administrator * */public interface OnTabActivityResultListener {    public void onTabActivityResult(int requestCode, int resultCode, Intent data);}
+
+4.子Activity需要实现onTabActivityResult方法
+
+
+@Override    public void onTabActivityResult(int requestCode, int resultCode, Intent data) {        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {            //实现该处逻辑
+　　　　　　　　...        }    }
+
+转载于:http://www.cnblogs.com/relinson/archive/2012/03/25/startActivityForResult.html
+
+
+http://www.cnblogs.com/relinson/archive/2012/03/25/startActivityForResult.html

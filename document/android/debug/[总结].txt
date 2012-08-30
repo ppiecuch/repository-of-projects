@@ -1,0 +1,10 @@
+ <application
+        ....
+        android:debuggable="true" >
+ 
+ $NDK_ROOT/ndk-gdb --start --verbose
+ 
+ 
+ 
+ ERROR: Could not extract package's data directory. Are you sure that your installed application is debuggable?
+ 

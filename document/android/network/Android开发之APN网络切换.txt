@@ -1,0 +1,591 @@
+本文介绍Android平台中关于APN网络切换的相关知识以及如何实现APN切换。
+ 
+
+　　由于最近的项目中用到APN切换的功能，所以就借着这个机会介绍一下APN的相关知识及如何在Android实现切换过程。关于APN的基本知识我会在下面给大家介绍。
+
+　　在这个示例中，我使用圆角ListView显示效果，关于Android实现ListView圆角效果，大家可以查看我以前的一篇博文：http://www.cnblogs.com/hanyonglu/archive/2012/03/18/2404820.html
+
+ 
+
+　　下面先来看下本示例实现的效果图：
+
+ 
+
+   
+
+ 
+
+　　在我们点击左图中"设置APN选项"时出现右边的图示效果，可以选我们项目用到的APN选项。
+
+ 
+
+   
+
+ 
+
+　　当我们点击"编辑APN内容"时出现右边的图示效果，我们可以对APN的内容进行编辑，这是在我们的"河南移动专网"APN选项已经存在时显示如右边的图示效果。如果"河南移动专网"APN选项不存在，那么第一次点击"编辑APN内容"时会出现如左边下方显示的Toast提示，需要再次点击"编辑APN内容"才可以进行编辑。
+
+ 
+
+　　下面来看下关于APN的基础知识：
+
+　　APN(Access Point Name)，即“接入点名称”，用来标识GPRS的业务种类，目前分为两大类：CMWAP(通过GPRS访问WAP业务)、CMNET（除了WAP以外的服务目前都用CMNET,比如连接因特网等）。
+
+ 
+　　APN的英文全称是Access Point Name，中文全称叫接入点，是您在通过手机上网时必须配置的一个参数，它决定了您的手机通过哪种接入方式来访问网络。 
+
+ 
+　　移动手机的默认上网配置有两种：CMWAP和CMNET。一些使用移动办公的大客户，通常会使用专用APN，其接入点随意定义，只要和该省运营商其他APN不冲突即可。
+
+   
+　　CMWAP也叫移动梦网，通过该接入点可接入一个比较大的移动私网，网内有大量的手机应用下载及资源访问。因为CMWAP不接入互联网，只接入移动运营商的私网，所以流量费用比较低廉。
+
+   
+　　CMNET也叫GPRS连接互联网，通常每个省的运营商会提供若干个Internet出口以供CMNET拨号用户使用。其流量费用较CMWAP要高一些。
+
+   
+　　目前国内销售的手机，如果是非智能机，通常已配置好CMWAP连接，智能机通常会配置CMWAP和CMNET连接。如需手动添加这些配置，请参考手机说明书。
+
+   
+　　专有APN在功能上可以和Internet的VPN做类比，实际上他就是基于GPRS的VPN网络。
+
+ 
+　　专有APN常见组网方式
+
+　　1，运营商部署一条专线接入到企业的网络中，局端和企业端路由器之间采用私有IP进行连接。
+ 
+
+　　2，局端互连路由器与GGSN采用GRE隧道连接。
+ 
+
+　　专有APN的几个重要特点：
+　　1，除非运营商分配一个Internet IP地址，否则计算机没有任何办法通过Internet访问该APN中的主机。
+ 
+
+　　2，只有手机卡号在APN中的白名单之列，该手机才可以接入该APN。
+ 
+
+　　3，企业客户可以建立一套RADIUS和DHCP服务器，GGSN向RADIUS服务器提供用户主叫号码，采用主叫号码和用户账号相结合的认证方式；用户通过认证后由DHCP服务器分配企业内部的静态IP地址。补充：该认证方式不一定适合于每个省的运营商，这取决于该省运营商的APN管理平台。
+
+ 
+
+　　GPRS专网系统终端上网登录服务器平台的流程为：
+　　1）用户发出GPRS登录请求，请求中包括由运营商为GPRS专网系统专门分配的专网APN；
+ 
+
+　　2）根据请求中的APN，SGSN向DNS服务器发出查询请求，找到与企业服务器平台连接的GGSN，并将用户请求通过GTP隧道封装送给GGSN；
+ 
+
+　　3）GGSN将用户认证信息（包括手机号码、用户账号、密码等）通过专线送至Radius进行认证；
+ 
+
+　　4）Radius认证服务器看到手机号等认证信息，确认是合法用户发来的请求，向DHCP服务器请求分配用户地址；
+ 
+
+　　5）Radius认证通过后，由Radius向GGSN发送携带用户地址的确认信息；
+ 
+
+　　6）用户得到了IP地址，就可以携带数据包，对GPRS专网系统信息查询和业务处理平台进行访问。
+ 
+
+　　以上是关于APN的一些基础知识。接下来，我们开始着手实现本示例的代码，先来看下示例程序结构图，如下所示：
+
+ 
+
+  
+
+ 
+
+　　MainActivity.java文件中主要是显示APN设置，并以圆角ListView圆角呈现，实现显示核心代码如下：
+
+
+    private CornerListView cornerListView = null;
+    private ArrayList<HashMap<String, String>> mapList = null;
+    private SimpleAdapter simpleAdapter = null;
+    private ApnUtility apnutility = null;
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+        // 设置窗口特征
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.setting_apn);
+        
+        apnutility = new ApnUtility(this);
+        
+        simpleAdapter = new SimpleAdapter(
+                this, 
+                getDataSource(),
+                R.layout.simple_list_item_1, 
+                new String[] { "item_title","item_value" }, 
+                new int[] { R.id.item_title});
+        
+        cornerListView = (CornerListView) findViewById(R.id.apn_list);
+        cornerListView.setAdapter(simpleAdapter);
+        cornerListView.setOnItemClickListener(new OnItemListSelectedListener());
+    }
+    
+    // 设置列表数据
+    public ArrayList<HashMap<String, String>> getDataSource() {
+        mapList = new ArrayList<HashMap<String, String>>();
+        HashMap<String, String> map1 = new HashMap<String, String>();
+        map1.put("item_title", "设置APN选项");
+        HashMap<String, String> map2 = new HashMap<String, String>();
+        map2.put("item_title", "编辑APN内容");
+        mapList.add(map1);
+        mapList.add(map2);
+        
+        return mapList;
+    }
+ 
+
+　　在这个ListView中一共有两项：设置APN选项和编辑APN内容，为这两项设置事件：
+
+
+   // ListView事件监听器
+    class OnItemListSelectedListener implements OnItemClickListener{
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
+            // TODO Auto-generated method stub
+            switch(position){
+            case 0:
+                openApnActivity();
+                break;
+            case 1:
+                editMobileApn();
+                break;
+            }
+        }
+    }
+ 
+
+　　设置APN选项主要是显示本机的所有的APN列表：
+
+    // 设置APN选项
+    private void openApnActivity(){
+        Intent intent = new Intent(Settings.ACTION_APN_SETTINGS);
+        startActivity(intent);
+    }
+ 
+
+　　编辑APN内容主要是编辑当前使用的APN内容，如果是本机设置了该项APN，则直接进入编辑界面；如果本机尚未设置该项APN，那么在第一次点击时会提示信息，第二次点击时才能够编辑：
+
+
+    // 编辑APN内容
+    private void editMobileApn(){
+        int id = -1;
+        Uri uri = Uri.parse("content://telephony/carriers");
+        ContentResolver resolver = getContentResolver();
+        Cursor c = resolver.query(uri, new String[] { "_id", "name",
+                "apn" }, "apn like '%hnydz.ha%'", null, null);
+        // 该项APN存在
+        if (c != null && c.moveToNext()) {
+            id = c.getShort(c.getColumnIndex("_id"));
+            String name = c.getString(c.getColumnIndex("name"));
+            String apn = c.getString(c.getColumnIndex("apn"));
+
+            Log.v("APN", id + name + apn);
+
+            Uri uri1 = Uri.parse("content://telephony/carriers/" + id);
+
+            Intent intent = new Intent(Intent.ACTION_EDIT, uri1);
+            startActivity(intent);
+            apnutility.setDefaultApn(id);
+        }else{
+            // 如果不存在该项APN则进行添加
+            apnutility.setDefaultApn(apnutility.AddYidongApn());
+            Toast.makeText(getApplicationContext(), 
+                    "再次点击APN内容即可编辑！", Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
+ 
+
+　　在编辑APN内容时，需要用ContentResolver查询查询Uri"content://telephony/carriers"：
+
+Cursor c = resolver.query(uri, new String[] { "_id", "name", "apn" }, "apn like '%hnydz.ha%'", null, null);
+ 
+
+　　这里是查询apn的关键字，当然大家也可以查询name的关键字，不过最好是查询apn的关键字，因为name是随意命名的。
+
+ 
+
+　　ApnUtility.java文件中是封装关于Apn操作的常用方法一个类，下面看下其核心代码实现。
+
+　　下面是将一个新的APN进行添加：
+
+
+    /**
+     * 利用ContentProvider将添加的APN数据添加进入数据库
+     * @return
+     */
+    public int AddYidongApn() {
+        int apnId = -1;
+        GetNumeric();
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+
+        values.put("name", EM_APN[0]);
+        values.put("apn", EM_APN[1]);
+        values.put("type", EM_APN[4]);
+        values.put("numeric", NUMERIC);
+        values.put("mcc", NUMERIC.substring(0, 3));
+        Log.i("mcc", NUMERIC.substring(0, 3));
+        values.put("mnc", NUMERIC.substring(3, NUMERIC.length()));
+        Log.i("mnc", NUMERIC.substring(3, NUMERIC.length()));
+        values.put("proxy", "");
+        values.put("port", "");
+        values.put("mmsproxy", "");
+        values.put("mmsport", "");
+        values.put("user", "");
+        values.put("server", "");
+        values.put("password", "");
+        values.put("mmsc", "");
+
+        Cursor c = null;
+        
+        try {
+            Uri newRow = resolver.insert(APN_LIST_URI, values);
+            if (newRow != null) {
+                c = resolver.query(newRow, null, null, null, null);
+                int idindex = c.getColumnIndex("_id");
+                c.moveToFirst();
+                apnId = c.getShort(idindex);
+                Log.d("Robert", "New ID: " + apnId
+                        + ": Inserting new APN succeeded!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (c != null)
+            c.close();
+
+        return apnId;
+
+    }
+ 
+
+　　该方法会返回一个apnId，代表新添加的APN的Id，用以标识该APN。
+
+　　NUMERIC是MCC和MNC的组合，一般是46002或46000。
+
+ 
+
+　　要根据apnId将设置的APN选中，如下代码：
+
+
+    /**
+     * 根据apnId将设置的APN选中
+     * @param apnId
+     * @return
+     */
+    public boolean setDefaultApn(int apnId) {
+        boolean res = false;
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put("apn_id", apnId);
+
+        try {
+            resolver.update(PREFERRED_APN_URI, values, null, null);
+            Cursor c = resolver.query(PREFERRED_APN_URI, new String[] { "name",
+                    "apn" }, "_id=" + apnId, null, null);
+            if (c != null) {
+                res = true;
+                c.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return res;
+    }
+ 
+
+　　在设置前要判断要设置的APN是否存在，因为如果存在就不用添加，如果不存在，则需要添加：
+
+
+    /**
+     * 判断要设置的APN是否存在
+     * @param apnNode
+     * @return
+     */
+    public int IsYidongApnExisted(ApnNode apnNode) {
+        int apnId = -1;
+        Cursor mCursor = context.getContentResolver().query(APN_LIST_URI, null,
+                "apn like '%hnydz.ha%'", null, null);
+        
+        while (mCursor != null && mCursor.moveToNext()) {
+            apnId = mCursor.getShort(mCursor.getColumnIndex("_id"));
+            String name = mCursor.getString(mCursor.getColumnIndex("name"));
+            String apn = mCursor.getString(mCursor.getColumnIndex("apn"));
+            String proxy = mCursor.getString(mCursor.getColumnIndex("proxy"));
+            String type = mCursor.getString(mCursor.getColumnIndex("type"));
+            
+            if (apnNode.getName().equals(name)
+                    && (apnNode.getApn().equals(apn))
+                    && (apnNode.getName().equals(name))
+                    && (apnNode.getType().equals(type))) {
+                return apnId;
+            } else {
+                apnId = -1;
+            }
+        }
+        
+        return apnId;
+    }
+ 
+
+　　一般在程序中，我们最好设置成自动切换APN，只需要调用如下方法即可：
+
+
+    /**
+     * 转换APN状态
+     * 将CMNET切换为要设置的APN
+     */
+    public void SwitchApn() {    
+        // 判断网络类型
+        switch (GetCurrentNetType()) {
+        case NET_3G:
+            // 如果3G网络则切换APN网络类型
+            if (!IsCurrentYidongApn()) {
+                EM_APN_ID = IsYidongApnExisted(YIDONG_APN);
+                
+                if (EM_APN_ID == -1) {
+                    setDefaultApn(AddYidongApn());
+                } else {
+                    setDefaultApn(EM_APN_ID);
+                }
+            }
+            break;
+        case NET_WIFI:
+            // 如果是无线网络则转换为3G网络
+            closeWifiNetwork();
+            break;
+        case NET_OTHER:
+            // 如果是其他网络则转化为3G网络
+            break;
+        default:
+            break;
+        }
+    }
+ 
+
+　　上例代码中GetCurrentNetType()是判断当前网络的类型：
+
+
+    /**
+     * 获取当前网络类型
+     * @return
+     */
+    public int GetCurrentNetType() {
+        int net_type = getNetWorkType();
+        
+        if (net_type == ConnectivityManager.TYPE_MOBILE) {
+            return NET_3G;
+        } else if (net_type == ConnectivityManager.TYPE_WIFI) {
+            return NET_WIFI;
+        }
+        
+        return NET_OTHER;
+    }
+ 
+
+　　closeWifiNetwork()是关闭Wifi网络，如果Wifi是打开着的话。
+
+ 
+
+　　IsCurrentYidongApn()是要设置的APN是否与当前使用APN一致：
+
+
+    /**
+     * 要设置的APN是否与当前使用APN一致
+     * @return
+     */
+    public boolean IsCurrentYidongApn() {
+        // 初始化移动APN选项信息
+        InitYidongApn();
+        YIDONG_OLD_APN = getDefaultAPN();
+        
+        if ((YIDONG_APN.getName().equals(YIDONG_OLD_APN.getName()))
+                && (YIDONG_APN.getApn().equals(YIDONG_OLD_APN.getApn()))
+                && (YIDONG_APN.getType().equals(YIDONG_OLD_APN.getType()))) {
+            return true;
+        }
+        
+        return false;
+    }
+ 
+
+　　InitYidongApn()是初始化要设置的APN信息参数：
+
+
+    /**
+     * 初始化移动APN信息参数
+     */
+    protected void InitYidongApn() {
+        YIDONG_APN = new ApnNode();
+        YIDONG_APN.setName(EM_APN[0]);
+        YIDONG_APN.setApn(EM_APN[1]);
+        YIDONG_APN.setType(EM_APN[4]);
+    }
+ 
+
+　　getDefaultAPN()是获取当前使用的APN信息:
+
+
+    /**
+     * 获取当前使用的APN信息
+     * @return
+     */
+    public ApnNode getDefaultAPN() {
+        String id = "";
+        String apn = "";
+        String name = "";
+        String type = "";
+        ApnNode apnNode = new ApnNode();
+        Cursor mCursor = context.getContentResolver().query(PREFERRED_APN_URI,
+                null, null, null, null);
+        
+        if (mCursor == null) {
+            return null;
+        }
+        
+        while (mCursor != null && mCursor.moveToNext()) {
+            id = mCursor.getString(mCursor.getColumnIndex("_id"));
+            name = mCursor.getString(mCursor.getColumnIndex("name"));
+            apn = mCursor.getString(mCursor.getColumnIndex("apn"))
+                    .toLowerCase();
+            type = mCursor.getString(mCursor.getColumnIndex("type"))
+                    .toLowerCase();
+        }
+        
+        try {
+            OLD_APN_ID = Integer.valueOf(id);
+        } catch (Exception e) {
+            // TODO: handle exception
+            Toast.makeText(context, "请配置好APN列表！", Toast.LENGTH_LONG).show();
+        }
+        
+        apnNode.setName(name);
+        apnNode.setApn(apn);
+        apnNode.setType(type);
+        
+        return apnNode;
+    }
+ 
+
+　　在我们结束程序时或是退出时需要将APN设置成默认的CMNET，否则影响正常上网功能：
+
+
+    /**
+     * 关闭APN，并设置成CMNET
+     */
+    public void StopYidongApn() {
+        if (IsCurrentYidongApn()) {
+            // 初始化CMNET 
+            InitCMApn();
+            int i = IsCMApnExisted(CHINAMOBILE_APN);
+            
+            if (i != -1) {
+                setDefaultApn(i);
+            }
+        }
+    }
+ 
+
+　　InitCMApn()是初始化CMNET参数信息：
+
+
+    /**
+     * 初始化默认的CMNET参数
+     */
+    protected void InitCMApn() {
+        GetNumeric();
+        
+        CHINAMOBILE_APN = new ApnNode();
+        CHINAMOBILE_APN.setName(CM_APN[0]);
+        CHINAMOBILE_APN.setApn(CM_APN[1]);
+        CHINAMOBILE_APN.setType(CM_APN[4]);
+        CHINAMOBILE_APN.setMcc(NUMERIC.substring(0, 3));
+        CHINAMOBILE_APN.setMnc(NUMERIC.substring(3, NUMERIC.length()));
+    }
+ 
+
+　　IsCMApnExisted()是判断CMNET是否存在并返回CMNET的apnId：
+
+
+    /**
+     * 判断CMNET是否存在
+     * @param apnNode
+     * @return
+     */
+    public int IsCMApnExisted(ApnNode apnNode) {
+        int apnId = -1;
+        Cursor mCursor = context.getContentResolver().query(APN_LIST_URI, null,
+                "apn like '%cmnet%' or apn like '%CMNET%'", null, null);
+        
+        // 如果不存在CMNET，则添加。
+        if(mCursor == null){
+            addCmnetApn();
+        }
+        
+        while (mCursor != null && mCursor.moveToNext()) {
+            apnId = mCursor.getShort(mCursor.getColumnIndex("_id"));
+            String name = mCursor.getString(mCursor.getColumnIndex("name"));
+            String apn = mCursor.getString(mCursor.getColumnIndex("apn"));
+            String proxy = mCursor.getString(mCursor.getColumnIndex("proxy"));
+            String type = mCursor.getString(mCursor.getColumnIndex("type"));
+            
+            if ((apnNode.getApn().equals(apn)) && (apnNode.getType().indexOf(type) != -1)) {
+                return apnId;
+            } else {
+                apnId = -1;
+            }
+        }
+        
+        return apnId;
+    }
+ 
+
+　　一般情况下，CMNET是默认存在的，如果CMNET不存在，则可以将CMNET添加进去，具体添加代码可参照上面的示例，不再详述。
+
+ 
+
+　　ApnNode是一个关于APN的实体类，具体可以查看示例代码。
+
+ 
+
+　　CornerListView.java是关于圆角ListView的类，继承自ListView，具体可以查看我的另一篇文章：Android实现ListView圆角效果--http://www.cnblogs.com/hanyonglu/archive/2012/03/18/2404820.html
+
+　　
+
+　　在设置APN过程时，需要在配置文件中设置权限，如下代码：
+
+<!-- 开关APN的权限 --> 
+<uses-permission android:name="android.permission.WRITE_APN_SETTINGS" />
+    
+
+　　对于Android APN接入点相关的开发，有一个不错的开源项目APNDroid的源代码本地下载，里面包含了一个不错的Widget框架，大家可以通过APNDroid源码学习到有关接入点的相关问题，可以解决GPRS，尤其是国内的CMNET、CMWAP的切换和管理。工程API Level为3，可以运行在Android 1.5或更高的版本上。
+
+　　
+
+　　下载地址：点击下载 
+
+ 
+
+　　以上就是关于Android中APN切换网络的相关知识及使用过程。
+
+ 
+
+　　本示例下载地址：点击下载
+
+ 
+
+　　最后，希望转载的朋友能够尊重作者的劳动成果，加上转载地址：http://www.cnblogs.com/hanyonglu/archive/2012/03/29/2423298.html  谢谢。
+ 
+
+　　完毕。^_^ 
+
+http://www.cnblogs.com/hanyonglu/archive/2012/03/29/2423298.html

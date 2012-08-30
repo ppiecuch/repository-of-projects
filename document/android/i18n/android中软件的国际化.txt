@@ -1,0 +1,137 @@
+软件的国际化就是，当程序运行在中文环境下显示的就是中文，当软件运行在英文环境下显示的就是英文
+
+实现软件的国际化和javaee几乎相同，就是提供两个文件文件名为values-zh、values-en放在res文件夹下
+
+如果操作系统是英文的就加载values-en文件夹下的内容、如果是中文的就加载中文文件夹下的内容。如果既不是中文也不是英文就会按照values文件夹里面的文件加载
+
+事例 创建一个android项目
+
+1.在main.xml文件中进行配置
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/name"
+         />
+
+     <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
+       <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add"
+        />
+</LinearLayout>
+
+2.在res文件夹下创建values-zh和values-en文件夹
+
+values-zh中的内容是
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">国际化</string>
+    <string name="app_name">国际化</string>
+   <string name="name">姓名</string>
+   <string name="add">添加</string>
+</resources>
+
+values-en中的内容是
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">i18n</string>
+    <string name="app_name">i18n</string>
+   <string name="name">name</string>
+   <string name="add">add</string>
+</resources>
+
+下面可以直接运行
+
+在英文环境下结果
+
+
+
+中文环境下
+
+
+
+还有因为使用英文的国家很多，所以如何对一个国家实现国际化呢？
+
+下面以英语为例子。有英式英语和美式英语
+
+下面以美式英语
+
+在res文件夹中创建values-en-rUS文件
+
+内容是
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">i18n(us)</string>
+    <string name="app_name">i18n(us)</string>
+   <string name="name">name(us)</string>
+   <string name="add">add(us)</string>
+</resources>
+
+结果
+
+
+
+
+上面是文字的国际化下面是图片的国际化
+
+做法和文字的相同
+
+提供两个文件
+
+drawable-en和drawable-zh里面放入中英文图片
+
+在main.xml中布局
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/name"
+         />
+
+     <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        />
+       <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add"
+        />
+       <ImageView 
+           android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/exit"
+           />
+</LinearLayout>
+
+在英文环境下运行结果
+
+
+
+在中文环境下运行
+
+
+http://hi.baidu.com/vip_qining/item/4b2c6bdaaf0655f355347f26
