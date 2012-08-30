@@ -6,9 +6,9 @@
 namespace yon{
 namespace i18n{
 
-	extern "C" YON_API class EncodeConvertor{
+	class EncodeConvertor{
 	private:
-		EncodeConvertor();
+		EncodeConvertor(){}
 		EncodeConvertor(const EncodeConvertor&);
 		EncodeConvertor& operator = (const EncodeConvertor&);
 	public:

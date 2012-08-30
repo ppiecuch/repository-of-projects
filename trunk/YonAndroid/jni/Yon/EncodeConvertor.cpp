@@ -1,12 +1,9 @@
 #include "EncodeConvertor.h"
 
-#if 0
 #ifdef YON_COMPILE_WITH_WIN32
 #include <windows.h>
-#elif defined(YON_COMPILE_WITH_ANDROID)
 #include "iconv.h"
-#endif
-#else
+#elif defined(YON_COMPILE_WITH_ANDROID)
 #include "iconv.h"
 #endif
 
@@ -21,7 +18,7 @@ namespace i18n{
 	}
 
 	core::stringc EncodeConvertor::UTF8ToGB18030(const c8* str){
-/*#ifdef YON_COMPILE_WITH_WIN32
+#ifdef YON_COMPILE_WITH_WIN32
 		//utf8->unicode
 		s32 u16len = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
 		WCHAR* pUnicode = new WCHAR[u16len+1]; 
@@ -35,14 +32,14 @@ namespace i18n{
 		core::stringc result(pGb);
 		delete[] pGb;
 		return result;
-#elif defined(YON_COMPILE_WITH_ANDROID)*/
+#elif defined(YON_COMPILE_WITH_ANDROID)
 		core::stringc result;
 		return result;
-//#endif
+#endif
 	}
 
 	core::stringc EncodeConvertor::GB18030ToUTF8(const c8* str){
-/*#ifdef YON_COMPILE_WITH_WIN32
+#ifdef YON_COMPILE_WITH_WIN32
 		//gb->unicode
 		s32 u16len = MultiByteToWideChar(CP_ACP, 0, str, -1, NULL, 0);
 		WCHAR* pUnicode = new WCHAR[u16len+1]; 
@@ -56,7 +53,7 @@ namespace i18n{
 		core::stringc result(pUtf8);
 		delete[] pUtf8;
 		return result;
-#elif defined(YON_COMPILE_WITH_ANDROID)*/
+#elif defined(YON_COMPILE_WITH_ANDROID)
 		u32 size = 0;
 		const c8* p = str;
 		do
@@ -82,7 +79,7 @@ namespace i18n{
 		delete[] outbuf;
 		iconv_close(cd);
 		return result;
-//#endif
+#endif
 	}
 }
 }

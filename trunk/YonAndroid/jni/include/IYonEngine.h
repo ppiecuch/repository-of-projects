@@ -15,6 +15,7 @@
 #include "IAudioDriver.h"
 #include "IRandomizer.h"
 #include "ICallback.h"
+#include "II18NManager.h"
 
 namespace yon{
 
@@ -31,6 +32,7 @@ namespace yon{
 		virtual io::IFileSystem* getFileSystem() const = 0;
 		virtual audio::IAudioDriver* getAudioDriver() const = 0;
 		virtual IRandomizer* getRandomizer() = 0;
+		virtual i18n::II18NManager* getI18NManager() = 0;
 
 		virtual bool available(){return true;}
 		virtual bool run() = 0;
