@@ -1,0 +1,41 @@
+软件总存在这样或者那样的bug。
+虽然测试员已经在很努力的寻找问题，程序员也在汗流浃背的除虫，但是总会有一些情况被遗漏或者不可预测，比如用户的硬件环境、网络状况、操作系统差异等等，不一而足。而导致的结果则是弹出下面这样一个让用户摸不着头脑又恼火的提示，然后崩溃掉，令程序员尴尬不已。
+ 
+而在一些成熟的软件产品中，程序崩溃时我们看到的却是另外一番画面，比如QQ：
+ 
+又比如迅雷：
+
+你也想让你的程序拥有友好的崩溃界面，降低用户生气的能量，并且收集一些必要的信息进行调试，来完善你的程序吗？如果你是MFC程序猿，请继续围观，其他猿类请自行无视，并寻找适合你的猿粪。
+其实MFC框架已经为我们考虑到这个问题，只是默认生成的应用程序框架没有包含进去而已。实现这个功能的核心是函数：SetUnhandledExceptionFilter，想要了解这个函数的同学请查阅MSDN，这里就不再赘述他的用法。本着复用主意的精神，本文介绍的内容来自于大家所熟悉的电驴（emule）的源代码，电驴实现了上面那样的功能，我只是把代码从电驴里拿出来加到自己的程序里然后到这里分享给你。
+毫无疑问，电驴是一款优秀的软件，并且在它华丽的外表下还有一副强壮的身体。它的代码有非常优秀。它是基于MFC开发的开源程序，需要源代码的同学请猛击这里下载。
+
+上面这幅图就是电驴的源代码包，我们要用到的就是那个被我选中的“CrashReporter”，它是一个独立的工程，我们只需要根据需要做一些修改然后直接编译即可。
+另外我们还需要位于srcWorkLayer目录下的mdump.h和mdump.cpp，把这两个文件拷贝并加到你的工程里，然后把mdump.cpp里的下面这行去掉：
+#include “CheckConflict.h”    //ADDED by fengwen on 2006/12/25    : 检测已知的第三方软件冲突。
+这个是用于检测已知的会和电驴冲突的软件，不再本文讨论之列，有兴趣的同学请自行研究。另外把TopLevelFilter函数里的下面几行也删掉：
+try 
+{ 
+    //ADDED by fengwen on 2006/12/25    <begin> :    检测第三方软件冲突。 
+    CCheckConflict    cc; 
+    if (cc.CheckConflict(pExceptionInfo)) 
+    { 
+        ExitProcess(1); 
+    } 
+    //ADDED by fengwen on 2006/12/25    <end> :    检测第三方软件冲突。 
+} 
+catch(…) 
+{ 
+}
+最后一步，在主程序框架类里添加：
+#include “mdump.h”
+再到InitInstance函数里添加下面的代码：
+theCrashDumper.Enable(_T(“YourApp 1.0″), false);
+好了，大功告成，现在编译你的程序，在合适的地方增加测试代码就可以实验效果了。比如下面这两行代码会让你的程序立即崩溃：
+int n = 0; 
+int m = 10/n;
+怎么样，效果还不错吧？这个程序除了拦截进程异常，还能够将异常的相关信息生成文件，然后上传到你指定的服务器，供你分析调试。当然你需要修改CrashReporter工程HttpUploadFileProc.cpp文件HttpUploadFile函数里相关变量的值，否则就上传到到电驴的服务器了。另外你还需要在你服务器的WEB server上提供一个接收文件上传的程序，用来保存用户上传的错误文件。
+最后再修改一下CrashReporter工程CrashReporter.cpp文件InitInstance函数里的下面这行代码：
+ShellExecute(NULL, “open”, “eMule.exe”, NULL, NULL, SW_SHOW);
+把eMule.exe改为你程序的文件名，要不然用户的程序崩溃后在屏幕上看到的是一只可爱的驴子，大概整个人也要被你搞崩溃了……
+
+http://blog.meiweier.com/2010/03/19/mfc-application-crash.html

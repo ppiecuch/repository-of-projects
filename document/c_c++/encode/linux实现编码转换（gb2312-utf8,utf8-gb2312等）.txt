@@ -1,0 +1,33 @@
+int code_convert(char *from_charset, char *to_charset, char *inbuf, int inlen,
+                char *outbuf, int outlen)
+{
+        iconv_t cd;
+        char **pin = &inbuf;
+        char **pout = &outbuf;
+
+        cd = iconv_open(to_charset, from_charset);
+        if (cd == 0)
+                return -1;
+        memset(outbuf, 0, outlen);
+        int rc = iconv(cd, pin, (size_t *) &inlen, pout, (size_t *) &outlen);
+        if (rc == -1)
+                return -1;
+        iconv_close(cd);
+        return outlen;
+}
+
+//UNICODE码转为gb18030码
+int u2g(char *inbuf, int inlen, char *outbuf, int outlen)
+{
+        return outlen - code_convert((char *) "utf-8", (char *) "gb18030", inbuf,
+                        inlen, outbuf, outlen);
+}
+//gb18030码转为UNICODE码
+int g2u(char *inbuf, int inlen, char *outbuf, int outlen)
+{
+        return outlen - code_convert((char *) "gb18030", (char *) "utf-8", inbuf,
+                        inlen, outbuf, outlen);
+}
+
+
+http://bbs.embedsky.net/forum.php?mod=viewthread&tid=11624&page=1

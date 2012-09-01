@@ -1,0 +1,41 @@
+libiconv在NDK中未开放，因此在代码中无法直接引用iconv.h头文件，会报错no such file ordirectory。这时需要将libiconv的源码利用NDK重新交叉编译。
+
+1.下载libiconv的源码：https://github.com/pierrezurek/iconv
+
+2.在源码的根目录下./configure，这样才能生成iconv.h和config.h
+
+3.在android.mk文件中添加
+
+LOCAL_PATH:= $(call my-dir)
+
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := iconv
+LOCAL_CFLAGS := \
+  -Wno-multichar \
+  -D_ANDROID \
+  -DLIBDIR="c" \
+  -DBUILDING_LIBICONV \
+  -DIN_LIBRARY
+
+
+LOCAL_C_INCLUDES := \
+$(LOCAL_PATH)/libiconv-1.13.1 \
+  $(LOCAL_PATH)/libiconv-1.13.1/include \
+  $(LOCAL_PATH)/libiconv-1.13.1/lib \
+  $(LOCAL_PATH)/libiconv-1.13.1/libcharset/include
+    
+LOCAL_SRC_FILES := \
+  libiconv-1.13.1/libcharset/lib/localcharset.c \
+  libiconv-1.13.1/lib/iconv.c \
+  libiconv-1.13.1/lib/relocatable.c
+include $(BUILD_STATIC_LIBRARY)
+
+
+后面再加上一个动态库的编译即可。
+
+4.利用如上的makefile直接对源码编译会出现找不到langinfo的错误，注释掉config.h里面的langifo定义行，问题解决。之后还会报c undeclaired错误，localcharset.c文件中的int c；语句放到该函数的开头，问题解决。
+
+5.至此，libiconv可以成功编译生成.a文件。
+
+http://blog.csdn.net/dreameronair/article/details/6801957

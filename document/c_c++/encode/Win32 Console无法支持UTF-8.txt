@@ -1,0 +1,22 @@
+看了cmd.exe的选项 
+
+cmd.exe /A　输入输出ANSI 
+cmd.exe /U　输入输出UTF-16LE 
+
+测试几句维吾尔文，确认cmd.exe /U正常工作。 
+
+但我要用的程序暂时只支持UTF-8，没发现有UTF-8选项存在啊？ 
+
+搜索一通，微软ANSI代码页中UTF-8为65001 
+http://www.google.com/search?as_q=CP_UTF-8+site%3Amicrosoft.com%2Fen-us%2Flibrary%2F 
+结果试了chcp 65001后发现只能显示ASCII了…… 
+
+现在的办法是改注册表 
+[HKEY_CURRENT_USER\Console] 
+"CodePage"=dword:0000fde9 
+"FaceName"="Fixedsys" 
+"FontFamily"=dword:00000036 
+基本正常，但汉字均被当作半角显示了。看来还得想其他办法……
+
+
+http://tieba.baidu.com/f?kz=486870101

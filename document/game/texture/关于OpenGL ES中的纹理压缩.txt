@@ -1,0 +1,35 @@
+基于OpenGL ES的压缩纹理有常见的如下几种实现：
+1. ETC1（Ericcson texture compression)
+2. PVRTC(PowerVR texture compression)
+3. ATITC(ATI texture compression)
+对于使用NVIDIA Tegra2芯片的手机如Motorola XOOM，ATRIX和DRIOID BIONIC则支持如下的纹理压缩
+4. S3TC(S3 texture compression)
+
+ETC1:
+ETC1格式是OpenGL ES图形标准的一部分，并且被所有的Android设备所支持。扩展名为: GL_OES_compressed_ETC1_RGB8_texture，不自持透明通道，所以仅能用于不透明纹理。
+
+PVRTC:
+被用在Motorola的一些机器上，比如DROID系列。GPU为Imagination Technologies的PowerVR SGX 530。OpenGL ES的扩展名为: GL_IMG_texture_compression_pvrtc，支持预处理压缩。当加载压缩纹理时，<internal format>参数支持如下几种格式：
+COMPRESSED_RGB_PVRTC_4BPPV1_IMG (RGB 4 bit per pixel)
+COMPRESSED_RGB_PVRTC_2BPPV1_IMG (RGB 2 bit per pixel)
+COMPRESSED_RGBA_PVRTC_4BPPV1_IMG (RGB 4 bit per pixel with alpha channel)
+COMPRESSED_RGBA_PVRTC_2BPPV1_IMG (RGB 2 bit per pixel with alpha channel)
+
+ATITC:
+当前使用该种纹理压缩的机器有Nexus One。支持的OpenGL ES扩展名为: GL_ATI_texture_compression_atitc。当加载压缩纹理时，<internal format>参数支持如下类型的纹理：
+ATC_RGB_AMD (RGB textures)
+ATC_RGBA_EXPLICIT_ALPHA_AMD (RGB textures using explicit alpha encoding)
+ATC_RGBA_INTERPOLATED_ALPHA_AMD (RGBA textures using interpolated alpha encoding)
+
+S3TC
+也被称为DXTC，在PC上广泛被使用，但是在移动设备上还是属于新鲜事物。在使用NVIDA芯片的手机上被使用。OpenGL ES扩展名为: GL_EXT_texture_compression_dxt1和GL_EXT_texture_compression_s3tc。当加载压缩纹理时，<internal format>的参数有如下几种格式：
+GL_COMPRESSED_RGB_S3TC_DXT1 (RGB data is compressed, alpha is always 1.0)
+GL_COMPRESSED_RGBA_S3TC_DXT1 (RGB data is compressed, alpha is either 1.0 or 0.0)
+GL_COMPRESSED_RGBA_S3TC_DXT3 (RGB data is compressed, alpha is stored as 4 bits)
+GL_COMPRESSED_RGBA_S3TC_DXT5 (RGB data is compressed, alpha is a weighted average of 8-bit values)
+
+在程序在开始检测这些可用的扩展很重要。对于ETC1压缩来说，使用ETC1Util.isETC1Supported()即可。可以使用android.openGL.getString(GL10.GL_EXTENSIONS)解析字符串获取更多的可用扩展。
+
+参考：http://developer.motorola.com/docstools/library/understanding-texture-compression/ 
+
+http://www.cppblog.com/kongque/archive/2011/03/31/143062.html

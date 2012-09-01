@@ -1,0 +1,39 @@
+CrtDbgReport: String too long or IO Error
+
+ 
+
+wprintf_s不能正常输出中文的解决办法
+
+使用如下方法调用wprintf_s输出中文时往往出现带?的乱码:
+
+wprintf_s(L"%s",(LPCWSTR)cmdLineArr[1]);
+
+ 解决方案:包含头文件locale.h,并在程序开始调用setlocale(LC_ALL, "chs");
+
+这样wprintf_s便能正常打印出中文字符串了:
+
+ //指定当前程序的编码为简体中文，这样才能用wprintf正确输出中文
+
+#include <locale.h>
+setlocale(LC_ALL, "chs");
+
+同样对于TRACE(_T("第一个：%s,第二个：%s"),str1,str2);，如果运行输出信息：“_CrtDbgReport: String too long or IO Error”。亦可用上述方法解决。
+
+ 
+
+TRACE在定义时就已考虑了unicode，所以不需要加_T
+
+可以采用OutputDebugString()来代替TRACE，它自动采用UNICODE和非UNICODE
+
+ 
+
+Microsoft Visual Studio Feedback上的反馈
+
+http://connect.microsoft.com/VisualStudio/feedback/details/425215/bug-with-trace-and-crtdbgreport
+
+There is a bug with TRACE and _CrtDbgReport when working with the wide string.
+_CrtDbgReport can't handle the wide string correctly when the wide string contains non-ascii characters. 
+
+貌似在Beta 2 of Visual Studio 2010.修正了该bug
+
+http://www.cnblogs.com/BeyondTechnology/archive/2011/01/09/1931533.html
