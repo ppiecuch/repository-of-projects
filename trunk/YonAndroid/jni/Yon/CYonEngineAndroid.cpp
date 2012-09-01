@@ -6,6 +6,7 @@
 #include "CSceneManager.h"
 #include "CGraphicsAdapter.h"
 #include "CRandomizer.h"
+#include "CI18NManager.h"
 
 #include "ILogger.h"
 
@@ -47,6 +48,7 @@ namespace platform{
 	CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params)
 		:m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
 		m_pUserListener(params.pEventReceiver),m_pGraphicsAdapter(NULL),
+		m_pI18nManager(NULL),
 		m_pAudioDriver(NULL),m_pRandomizer(NULL),m_pCallback(params.pCallback),
 		m_params(params),m_bClose(false),m_bResized(true)
 	{
@@ -63,6 +65,9 @@ namespace platform{
 
 		//初始化文件系统
 		m_pFileSystem=io::createFileSystem();
+
+		//初始化国际化模块
+		m_pI18nManager=i18n::createI18NManager();
 
 		//初始化场景管理器
 		m_pSceneManager=scene::createSceneManager(m_pTimer,NULL);
@@ -84,6 +89,7 @@ namespace platform{
 		m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();
+		m_pI18nManager->drop();
 		m_pFileSystem->drop();
 		m_pTimer->drop();
 		m_pRandomizer->drop();

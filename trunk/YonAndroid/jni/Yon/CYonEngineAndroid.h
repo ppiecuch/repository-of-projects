@@ -25,6 +25,7 @@ namespace yon{
 			virtual io::IFileSystem* getFileSystem() const{return m_pFileSystem;}
 			virtual audio::IAudioDriver* getAudioDriver() const{return m_pAudioDriver;}
 			virtual IRandomizer* getRandomizer(){return m_pRandomizer;}
+			virtual i18n::II18NManager* getI18NManager(){return m_pI18nManager;}
 
 			virtual bool run();
 
@@ -57,6 +58,7 @@ namespace yon{
 			audio::IAudioDriver* m_pAudioDriver;
 			ITimer* m_pTimer;
 			IRandomizer* m_pRandomizer;
+			i18n::II18NManager* m_pI18nManager;
 
 			event::IEventReceiver* m_pUserListener;
 			platform::ICallback* m_pCallback;

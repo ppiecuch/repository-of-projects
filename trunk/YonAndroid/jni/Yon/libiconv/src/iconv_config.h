@@ -17,7 +17,6 @@
    If not, write to the Free Software Foundation, Inc., 51 Franklin Street,
    Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-
 /* Define to 1 to enable a few rarely used encodings. */
 /* #undef ENABLE_EXTRA */
 

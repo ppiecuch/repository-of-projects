@@ -63,6 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
+				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -1768,794 +1769,2180 @@
 						<File
 							RelativePath=".\libiconv\src\aliases.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\aliases2.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\aliases_aix.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\aliases_dos.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\aliases_extra.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\aliases_osf1.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\armscii_8.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ascii.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\atarist.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\big5.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\big5_2003.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\big5hkscs1999.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\big5hkscs2001.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\big5hkscs2004.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\c99.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\canonical.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\canonical_aix.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\canonical_dos.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\canonical_extra.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\canonical_local.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\canonical_osf1.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ces_big5.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ces_gbk.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cjk_variants.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_1.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_15.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_2.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_3.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_4.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_4a.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_4b.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_5.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_6.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_7.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cns11643_inv.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\converters.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1046.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1124.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1125.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1129.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1133.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1161.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1162.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1163.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1250.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1251.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1252.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1253.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1254.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1255.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1256.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1257.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp1258.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp437.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp737.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp775.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp850.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp852.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp853.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp855.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp856.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp857.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp858.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp860.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp861.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp862.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp863.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp864.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp865.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp866.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp869.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp874.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp922.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp932.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp932ext.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp936.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp936ext.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp943.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp949.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp950.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\cp950ext.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\dec_hanyu.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\dec_kanji.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\euc_cn.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\euc_jisx0213.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\euc_jp.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\euc_kr.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\euc_tw.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\flags.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\flushwc.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gb12345.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gb12345ext.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gb18030.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gb18030ext.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gb18030uni.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gb2312.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gbk.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gbkext1.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gbkext2.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\gbkext_inv.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\georgian_academy.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\georgian_ps.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\hkscs1999.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\hkscs2001.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\hkscs2004.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\hp_roman8.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\hz.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iconv.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iconv_config.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso2022_cn.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso2022_cnext.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso2022_jp.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso2022_jp1.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso2022_jp2.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso2022_jp3.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso2022_kr.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso646_cn.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso646_jp.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_1.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_10.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_11.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_13.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_14.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_15.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_16.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_2.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_3.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_4.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_5.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_6.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_7.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_8.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iso8859_9.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\isoir165.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\isoir165ext.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\java.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\jisx0201.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\jisx0208.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\jisx0212.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\jisx0213.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\johab.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\johab_hangul.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\koi8_r.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\koi8_ru.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\koi8_t.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\koi8_u.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ksc5601.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\localcharset.c"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\localcharset.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\loop_unicode.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\loop_wchar.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\loops.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_arabic.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_centraleurope.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_croatian.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_cyrillic.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_greek.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_hebrew.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_iceland.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_roman.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_romania.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_thai.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_turkish.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mac_ukraine.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\mulelao.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\nextstep.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\pt154.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\relocatable.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\riscos1.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\shift_jisx0213.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\sjis.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\tcvn.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\tds565.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\tis620.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\translit.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs2.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs2be.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs2internal.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs2le.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs2swapped.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs4.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs4be.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs4internal.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs4le.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\ucs4swapped.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\uhc_1.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\uhc_2.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\utf16.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\utf16be.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\utf16le.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\utf32.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\utf32be.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\utf32le.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\utf7.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\utf8.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\vietcomb.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\viscii.h"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCustomBuildTool"
+								/>
+							</FileConfiguration>
 						</File>
 					</Filter>
 					<Filter

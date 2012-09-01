@@ -4,7 +4,7 @@ include $(CLEAR_VARS)
 
 LOCAL_CFLAGS := -DANDROID_NDK \
                 -DDISABLE_IMPORTGL \
-                -g \
+                -O3 \
                 -DAL_BUILD_LIBRARY \
                 -DAL_ALEXT_PROTOTYPES \
                 -DGL_GLEXT_PROTOTYPES
@@ -17,10 +17,16 @@ LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/Yon/openal/OpenAL32/Include \
 		$(LOCAL_PATH)/Yon/libogg \
 		$(LOCAL_PATH)/Yon/libvorbis \
-		$(LOCAL_PATH)/Yon/libiconv \
+		$(LOCAL_PATH)/Yon/libiconv/include \
+		$(LOCAL_PATH)/Yon/libiconv/src \
 		$(LOCAL_PATH)/include/ \
 		$(LOCAL_PATH)/Yon/ \
 		$(LOCAL_PATH)/ 
+		
+iconv_SOURCES := \
+		Yon/libiconv/src/iconv.c \
+		Yon/libiconv/src/relocatable.c \
+		Yon/libiconv/src/localcharset.c
 		
 lpng_SOURCES := \
 		Yon/lpng/png.c \
@@ -118,6 +124,8 @@ yon_SOURCES :=   \
 		Yon/CReadFileStream.cpp \
 		Yon/CWriteFileStream.cpp \
 		Yon/CReadMemoryStream.cpp \
+		Yon/EncodeConvertor.cpp \
+		Yon/CI18NManager.cpp \
 		Yon/COrthoCamera.cpp \
 		Yon/CPerspCamera.cpp \
 		Yon/CViewFrustum.cpp \
@@ -153,15 +161,13 @@ yon_SOURCES :=   \
 LOCAL_MODULE    := yon
 		
 LOCAL_SRC_FILES := \
+		$(iconv_SOURCES) \
 		$(zlib_SOURCES) \
 		$(lpng_SOURCES) \
 		$(openal_SOURCES) \
 		$(ogg_SOURCES) \
 		$(vorbis_SOURCES) \
 		$(yon_SOURCES)
-		
-LOCAL_LDFLAGS := \
-	../obj/local/armeabi/libiconv.a
 
 LOCAL_ARM_MODE   := arm 
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lstdc++ -Wl
