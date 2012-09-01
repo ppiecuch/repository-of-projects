@@ -2,6 +2,8 @@
 #include "EncodeConvertor.h"
 #include "ILogger.h"
 
+//#pragma comment(lib, "libiconv/IconvLib-1.11.1.lib")
+
 namespace yon{
 namespace i18n{
 

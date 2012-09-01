@@ -20,7 +20,7 @@
 /* Written by Bruno Haible <bruno@clisp.org>.  */
 
 #ifdef ICONV_HAVE_CONFIG_H
-# include <iconv_config.h>
+# include "iconv_config.h"
 #endif
 
 /* Specification.  */
@@ -117,7 +117,8 @@ get_charset_aliases (void)
   cp = charset_aliases;
   if (cp == NULL)
     {
-#if !(defined VMS || defined WIN32_NATIVE || defined __CYGWIN__)
+//#if !(defined VMS || defined WIN32_NATIVE || defined __CYGWIN__ ||defined YON_COMPILE_WITH_ANDROID)
+#if 0
       FILE *fp;
       const char *dir;
       const char *base = "charset.alias";

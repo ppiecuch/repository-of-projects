@@ -1,4 +1,4 @@
-#include "framework.h"
+﻿#include "framework.h"
 
 SYonEngineParameters params;
 IYonEngine* engine=NULL;
@@ -134,7 +134,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	while(reader->read());
 	reader->drop();
-#elif 0
+#elif 1
 	IReadStream* stream=fs->createAndOpenReadFileStream("consume.xlb",io::ENUM_ENDIAN_MODE_BIG);
 	core::stringc header=stream->readString();
 	s32 versionCode=stream->readInt();
@@ -148,12 +148,32 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	Logger->debug("%d\r\n",stream->readInt());
 	//Logger->debug("%s\r\n",UTF8ToGB18030(stream->readString().c_str()).c_str());
 	//Logger->debug("%s\r\n",EncodeConvertor::getInstance().GB18030ToUTF8(stream->readString().c_str()).c_str());
+#ifdef YON_COMPILE_WITH_WIN32
+	Logger->debug("%s\r\n",i18nManager->convert(stream->readString().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+	Logger->debug("%s\r\n",i18nManager->convert(stream->readString().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+	core::stringc test=i18nManager->convert("中华人民共和国",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	Logger->debug("%s\r\n",i18nManager->convert(test.c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+#elif defined(YON_COMPILE_WITH_ANDROID)
+	Logger->debug("%s\r\n",stream->readString().c_str());
+	Logger->debug("%s\r\n",stream->readString().c_str());
+	core::stringc test2=i18nManager->convert("中华人民共和国",ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030);
+	Logger->debug("%s\r\n",i18nManager->convert(test2.c_str(),ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8).c_str());
+#endif
 	//Logger->debug("%s\r\n",stream->readString().c_str());
 
 	stream->drop();
 #else
-	Logger->debug("%s\r\n",i18nManager->convert("�л����񹲺͹�",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8).c_str());
-	Logger->debug("%s\r\n",i18nManager->convert("中华人民共和�",ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+	c8 in_utf8[] = 
+	{0x20,0xe8,0xbf,0x99,0xe6,0x98,0xaf,0xe4,0xb8,0x80,0xe4,0xb8,0xaa,0x69,0x63,0x6f,
+	0x6e,0x76,0xe7,0x9a,0x84,0xe6,0xb5,0x8b,0xe8,0xaf,0x95,0xe4,0xbe,0x8b,0xe7,0xa8,
+	0x8b,0xef,0xbc,0x9a,0x0a,0xe2,0x80,0x9c,0xe7,0xba,0xb5,0xe6,0xb5,0xb7,0xe6,0x9d,
+	0xaf,0xe2,0x80,0x9d,0xe4,0xb8,0x9c,0xe5,0x8d,0x97,0xe5,0xa4,0xa7,0xe5,0xad,0xa6,
+	0xe7,0xac,0xac,0xe4,0xb8,0x89,0xe5,0xb1,0x8a,0xe5,0xb5,0x8c,0xe5,0x85,0xa5,0xe5,
+	0xbc,0x8f,0xe7,0xb3,0xbb,0xe7,0xbb,0x9f,0xe8,0xae,0xbe,0xe8,0xae,0xa1,0xe9,0x82,
+	0x80,0xe8,0xaf,0xb7,0xe8,0xb5,0x9b,0x00};    //UTF-8编码
+	//Logger->debug("%s\r\n",i18nManager->convert("中华人民共和国",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8).c_str());
+	//Logger->debug("%s\r\n",i18nManager->convert("涓崕浜烘皯鍏卞拰鍥",ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+	Logger->debug("%s\r\n",i18nManager->convert(in_utf8,ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
 #endif
 
 	return true; 

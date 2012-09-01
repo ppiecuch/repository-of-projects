@@ -11,6 +11,8 @@ namespace i18n{
 		EncodeConvertor(){}
 		EncodeConvertor(const EncodeConvertor&);
 		EncodeConvertor& operator = (const EncodeConvertor&);
+
+		bool code_convert(const char *from_charset,const char *to_charset,const char *inbuf,int inlen,char *outbuf,int outlen);
 	public:
 		static EncodeConvertor& getInstance();
 
