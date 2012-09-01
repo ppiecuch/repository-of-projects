@@ -1,0 +1,188 @@
+VC中使用字符串资源默认只能使用Gb2312对于Java的客户端相关的软件开发有些不便
+曾经做过多种方便的Utf8和Gb2312转换的小函数或者叫小方案吧。觉得这次做的更加好，嘿嘿...
+
+使用演示：
+
+char* xp = U"中国";                     // 正确 （"中国"是静态的）
+printf("%s\n", U"你好中国!");       // 正确   （"中国"是静态的且临时变量使用时没有释放）
+
+printf("%s\n", xp);                         // 正确 （"中国"是静态的）
+
+char* w7 = W xp;                        // 错误，xp存在被改写的坑能，w7对应的临时变量可能被释放
+printf("%s\n", W xp);                  // 正确，printf调用退出前都可以访问W xp的临时变量
+
+w7[1] = 'A';                                  // 错误，改写一个已经释放的临时变量
+
+printf("%s\n", w7);                      // 错误，xp存在被改写的可能，w7对应的临时变量可能被释放
+
+使用注意：
+              U或W宏转换的费静态字符串生命周期为表达式内部
+[Code]
+#include <iostream>
+
+using namespace std;
+
+#include <Windows.h>
+
+#include <time.h>
+
+#include <map>
+
+// 是否启用map转换，建议启用
+// 使用map转换的话，同一个常量字符串不会做两次转换
+#define TEST_TYPE_MAP
+
+typedef map<const char*, const char*> strmap;
+
+class CUtf8String
+{
+public:
+inline CUtf8String(const char* gb2312)
+{
+   m_bIsConst = true;
+#ifdef TEST_TYPE_MAP
+   if (m[gb2312])
+   {
+    m_utf8 = m[gb2312];
+    return ;
+   }
+#endif
+   int buffLen = 0;
+   WCHAR wbuff[5120];
+   MultiByteToWideChar(CP_ACP, 0, gb2312, -1, wbuff, 5120);
+   buffLen = WideCharToMultiByte(CP_UTF8, 0, wbuff, -1, NULL, 0, 0, 0);
+   m_utf8 = new char[buffLen+1];
+   WideCharToMultiByte(CP_UTF8, 0, wbuff, -1, (LPSTR)m_utf8, buffLen, 0, 0);
+#ifdef TEST_TYPE_MAP
+   m[gb2312] = m_utf8;
+#endif
+}
+
+inline CUtf8String(char* gb2312)
+{
+   m_bIsConst = false;
+   int buffLen = 0;
+   WCHAR wbuff[5120];
+   MultiByteToWideChar(CP_ACP, 0, gb2312, -1, wbuff, 5120);
+   buffLen = WideCharToMultiByte(CP_UTF8, 0, wbuff, -1, NULL, 0, 0, 0);
+   m_utf8 = new char[buffLen+1];
+   WideCharToMultiByte(CP_UTF8, 0, wbuff, -1, (LPSTR)m_utf8, buffLen, 0, 0);
+}
+
+inline ~CUtf8String()
+{
+#ifndef TEST_TYPE_MAP
+   if (m_utf8)
+   {
+    delete m_utf8;
+    m_utf8 = 0;
+   }
+#else
+   if (!m_bIsConst)
+   {
+    if (m_utf8)
+    {
+     delete m_utf8;
+     m_utf8 = 0;
+    }
+   }
+#endif
+}
+
+inline operator char*()
+{
+   return (char*)m_utf8;
+}
+private:
+const char* m_utf8;
+bool m_bIsConst;
+#ifdef TEST_TYPE_MAP
+static strmap m;
+#endif 
+};
+
+class CGb2312String
+{
+public:
+inline CGb2312String(const char* utf8)
+{
+#ifdef TEST_TYPE_MAP
+   if (m[utf8])
+   {
+    m_gb2312 = 0;
+    m_gb2312 = m[utf8];
+   }
+#endif
+   int buffLen = 0;
+   WCHAR wbuff[5120];
+   MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wbuff, 5120);
+   buffLen = WideCharToMultiByte(CP_ACP, 0, wbuff, -1, NULL, 0, 0, 0);
+   m_gb2312 = new char[buffLen+1];
+   WideCharToMultiByte(CP_ACP, 0, wbuff, -1, (LPSTR)m_gb2312, buffLen, 0, 0);
+#ifdef TEST_TYPE_MAP
+   m[utf8] = m_gb2312;
+#endif
+}
+
+inline CGb2312String(char* utf8)
+{
+#ifdef TEST_TYPE_MAP
+   if (m[utf8])
+   {
+    m_gb2312 = 0;
+    m_gb2312 = m[utf8];
+   }
+#endif
+   int buffLen = 0;
+   WCHAR wbuff[5120];
+   MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wbuff, 5120);
+   buffLen = WideCharToMultiByte(CP_ACP, 0, wbuff, -1, NULL, 0, 0, 0);
+   m_gb2312 = new char[buffLen+1];
+   WideCharToMultiByte(CP_ACP, 0, wbuff, -1, (LPSTR)m_gb2312, buffLen, 0, 0);
+#ifdef TEST_TYPE_MAP
+   m[utf8] = m_gb2312;
+#endif
+}
+
+inline ~CGb2312String()
+{
+#ifndef TEST_TYPE_MAP
+   if (m_gb2312)
+   {
+    delete m_gb2312;
+    m_gb2312 = 0;
+   }
+#endif
+}
+
+inline operator char*()
+{
+   return (char*)m_gb2312;
+}
+private:
+const char* m_gb2312;
+#ifdef TEST_TYPE_MAP
+static strmap m;
+#endif
+};
+
+#ifdef TEST_TYPE_MAP
+strmap CUtf8String::m;
+strmap CGb2312String::m;
+#endif
+
+#define U   (CUtf8String)
+
+#define W   (CGb2312String)
+
+// 使用方法
+
+int main(int argc, char* argv[])
+{
+    // 打印出乱码即为UTF8的编码，方便吧。C++还是确实很强悍的
+    printf("%s", U"你好中国!");
+}
+
+
+
+http://hi.baidu.com/_sivis_/blog/item/51104e1e230ff068f624e40e.html

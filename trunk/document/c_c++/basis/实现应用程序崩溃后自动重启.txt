@@ -1,0 +1,100 @@
+题记：对于崩溃，当然正确的态度应该在开发的时候就把好关，应该写好代码，写高质量的代码，有崩溃还是应该从程序中找原因。但实现程序崩溃后自动重启，对于服务端程序还是有必要的，防止崩溃了没人管。
+
+相关aip：
+SetErrorMode(1|2); 
+在程序里加上该代码后，程序崩溃时自动从内存中消失而不会弹出像“xxx内存不能为read”之类的消息框，让你点确定。
+SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
+设置自定义的异常处理函数，程序崩溃时系统会调用自定义的MyUnhandledExceptionFilter,可以在这个函数中做相应的处理如调用WinExc重启。在使用守护进程和wathdog技术处理时也可以利用这个api来区分是异常退出还是人为关闭的。
+调用示例：
+
+#include <dbghelp.h>
+#include <shellapi.h>
+#include <shlobj.h>
+
+
+// 自定义的exectpion filter
+LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionPointers)
+{
+
+    SetErrorMode( SEM_NOGPFAULTERRORBOX );
+
+    //收集信息
+     CStringW strBuild;
+    strBuild.Format(L"Build: %s %s", __DATE__, __TIME__);
+    CStringW strError;
+    HMODULE hModule;
+    WCHAR szModuleName[MAX_PATH] = L"";
+    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCWSTR)pExceptionPointers->ExceptionRecord->ExceptionAddress, &hModule);
+    GetModuleFileName(hModule, szModuleName, ARRAYSIZE(szModuleName));
+    strError.AppenedFormat(L"%s %d , %d ,%d.", szModuleName,pExceptionPointers->ExceptionRecord->ExceptionCode, pExceptionPointers->ExceptionRecord->ExceptionFlags, pExceptionPointers->ExceptionRecord->ExceptionAddress);
+
+    //生成 mini crash dump
+    BOOL bMiniDumpSuccessful;
+    WCHAR szPath[MAX_PATH]; 
+    WCHAR szFileName[MAX_PATH]; 
+    WCHAR* szAppName = L"AppName";
+    WCHAR* szVersion = L"v1.0";
+    DWORD dwBufferSize = MAX_PATH;
+    HANDLE hDumpFile;
+    SYSTEMTIME stLocalTime;
+    MINIDUMP_EXCEPTION_INFORMATION ExpParam;
+    GetLocalTime( &stLocalTime );
+    GetTempPath( dwBufferSize, szPath );
+    StringCchPrintf( szFileName, MAX_PATH, L"%s%s", szPath, szAppName );
+    CreateDirectory( szFileName, NULL );
+    StringCchPrintf( szFileName, MAX_PATH, L"%s%s//%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp", 
+               szPath, szAppName, szVersion, 
+               stLocalTime.wYear, stLocalTime.wMonth, stLocalTime.wDay, 
+               stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond, 
+               GetCurrentProcessId(), GetCurrentThreadId());
+    hDumpFile = CreateFile(szFileName, GENERIC_READ|GENERIC_WRITE, 
+                FILE_SHARE_WRITE|FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
+
+    MINIDUMP_USER_STREAM UserStream[2];
+    MINIDUMP_USER_STREAM_INFORMATION UserInfo;
+    UserInfo.UserStreamCount = 1;
+    UserInfo.UserStreamArray = UserStream;
+    UserStream[0].Type = CommentStreamW;
+    UserStream[0].BufferSize = strBuild.GetLength()*sizeof(WCHAR);
+    UserStream[0].Buffer = strBuild.GetBuffer();
+    UserStream[1].Type = CommentStreamW;
+    UserStream[1].BufferSize = strError.GetLength()*sizeof(WCHAR);
+    UserStream[1].Buffer = strError.GetBuffer();
+
+    ExpParam.ThreadId = GetCurrentThreadId();
+    ExpParam.ExceptionPointers = pExceptionPointers;
+    ExpParam.ClientPointers = TRUE;
+    
+    MINIDUMP_TYPE MiniDumpWithDataSegs = MiniDumpNormal 
+            | MiniDumpWithHandleData 
+            | MiniDumpWithUnloadedModules 
+            | MiniDumpWithIndirectlyReferencedMemory 
+            | MiniDumpScanMemory 
+            | MiniDumpWithProcessThreadData 
+            | MiniDumpWithThreadInfo;
+    bMiniDumpSuccessful = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), 
+                    hDumpFile, MiniDumpWithDataSegs, &ExpParam, NULL, NULL);
+  // 上传mini dump 到自己服务器（略）
+  
+
+  return EXCEPTION_CONTINUE_SEARCH; //或者 EXCEPTION_EXECUTE_HANDLER 关闭程序
+}
+ 
+int _tmain()
+{
+  // 设置 execption filter
+  SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
+  .
+  return 0;
+}
+
+在windows系统中有类型为服务的程序可以在服务属性里设置为失败重启即可，可以用代码实现
+
+ChangeServiceConfig2(, SERVICE_CONFIG_FAILURE_ACTIONS )
+
+SC_ACTION_RESTART
+网上也有一些异常捕获库如CrashRpt，可以方便是处理异常。
+http://www.codeproject.com/KB/debug/crash_report.aspx
+
+
+http://www.cppblog.com/programmer/articles/159029.html

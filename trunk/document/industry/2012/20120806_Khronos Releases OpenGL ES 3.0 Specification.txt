@@ -1,0 +1,36 @@
+August 6th, 2012 – Los Angeles, SIGGRAPH 2012 – The Khronos™ Group today announced the immediate release of the OpenGL® ES 3.0 specification, bringing significant functionality and portability enhancements to the industry-leading, royalty-free 3D graphics API (application programming interface) that is used on the majority of the world’s smartphones and tablets. OpenGL ES 3.0 provides access to state-of-the-art graphics processing unit (GPU) functionality with portability across diverse mobile and embedded operating systems and platforms. OpenGL ES 3.0 is backwards compatible with OpenGL ES 2.0, enabling applications to incrementally add new visual features to applications. The full specification and reference materials are available for immediate download at http://www.khronos.org/registry/gles/.
+
+“OpenGL ES 3.0 draws on proven functionality from OpenGL 3.3 and 4.2 and carefully balances the introduction of leading-edge technology with addressing the real-world needs of developers,” said Tom Olson, chairman of the OpenGL ES Working Group and director of graphics research at ARM.
+
+New functionality in the OpenGL ES 3.0 specification includes:
+
+
+multiple enhancements to the rendering pipeline to enable acceleration of advanced visual effects including: occlusion queries, transform feedback, instanced rendering and support for four or more rendering targets;
+
+high quality ETC2 / EAC texture compression as a standard feature, eliminating the need for a different set of textures for each platform;
+
+a new version of the GLSL ES shading language with full support for integer and 32-bit floating point operations;
+
+greatly enhanced texturing functionality including guaranteed support for floating point textures, 3D textures, depth textures, vertex textures, NPOT textures, R/RG textures, immutable textures, 2D array textures, swizzles, LOD and mip level clamps, seamless cube maps and sampler objects;
+
+an extensive set of required, explicitly sized texture and render-buffer formats, reducing implementation variability and making it much ea sier to write portable applications.
+
+The OpenGL ES working group at Khronos expects to update the OpenGL ES Adopter’s Program to provide extensive conformance tests for OpenGL ES 3.0 within six months, enabling implementers of the specification to gain access to source code for Conformance Tests and to use the OpenGL ES trademark on products that pass the defined testing procedure. This ensures that conformant OpenGL ES implementations provide a reliable, cross-platform graphics programming platform.
+
+“ARM has led the way in the implementation of OpenGL ES 2.0, enabling better graphics capabilities across a wide range of consumer devices. We know this will help developers design better user experiences,” said Kevin Smith, Vice President of Strategic Marketing, Media Processing Division, ARM. “OpenGL ES 3.0 enables more efficient solutions, utilizing the most advanced rendering techniques that will provide new levels of graphics excellence for mobile devices. ARM has committed to this standard with support that includes the availability, at launch, of the OpenGL ES 3.0 emulation texture compression tool and an SDK to enable developers to get started immediately.”
+
+“DMP is pleased to support the announcement of the latest OpenGL ES 3.0 standard that will be a dominant embedded graphics API for mobile, tablet, and consumer electronics industries, developers and end-users,” said Tatsuo Yamamoto, CEO of DMP Inc. “In addition to being one of the leading contributors for OpenGL ES working group, DMP SMAPH-S GPU IP family will provide the most scalable and efficient platform to take full advantage of the new features of OpenGL ES3.0 in next generation consumer and mobile devices.” 
+
+“As a member of the Khronos group, we’re thrilled to see the industry getting the new OpenGL ES 3.0 specification. As high-resolution screens get more ubiquitous around the world, high quality and high performance 3D graphics are demanded everywhere,” said Hirotaka Suzuki senior vice president of HI Corporation. “OpenGL ES 3.0 will enable us to create UI and User Experiences with super rich 3D graphics for various mobile devices without hassle. It will not only bring us performance and quality but also save our time and make developers’ lives easier. We can’t wait to bring our UI and User Experience solutions to OpenGL ES 3.0 powered hardware.”
+
+“The advanced features of Khronos’ OpenGL ES 3.0 constitute another significant step forward for mobile and embedded graphics, further blurring the boundaries between mobile and traditional high end graphics platforms and ushering in the next wave of feature-rich high performance GPUs for low power mobile and embedded markets,” says Tony King-Smith, vice president marketing, Imagination. “Thanks to our close involvement throughout the development of the standard, all our PowerVR Series6 ‘Rogue’ GPU cores have been designed to support fully all features of OpenGL ES 3.0, and we look forward to playing a significant role in deployment of this exciting new level of mobile GPU capability through our many PowerVR Series6 licensees.”
+
+“The careful evolution of this new 3D API will enable developers to create enhanced user experiences with increased portability and reduced costs,” said Neil Trevett, vice president of mobile content at NVIDIA and president of Khronos. “NVIDIA is committed to ensuring Tegra processors provide the best platform for mobile developers, and we welcome the release of OpenGL ES 3.0.”
+
+“The new features in OpenGL ES 3.0 that minimize power consumption while improving image quality and performance will help Qualcomm provide even better visual experiences with our Adreno™ GPUs integrated in our Snapdragon™ processors,” said Tim Leland, director of product management at Qualcomm.
+
+“As a founding member of Khronos and originator of the OpenGL ES initiative we are delighted to see the API evolve and remain at the forefront of today’s embedded graphics industry,” said Tim Lewis, director of marketing, ZiiLABS. “From its inception OpenGL ES has offered developers a state-of-the-art API to harness the capabilities of next-generation embedded GPUs, and this latest release keeps the API as relevant now as it was back in 2003. We can now look forward to working through the conformance process with our latest StemCell media processors.”
+
+About The Khronos Group
+
+The Khronos Group is an industry consortium creating open standards to enable the authoring and acceleration of parallel computing, graphics and dynamic media on a wide variety of platforms and devices. Khronos standards include OpenGL®, OpenGL® ES, WebGL™, WebCL™, OpenCL™, OpenMAX™, OpenVG™, OpenSL ES™, OpenVL™, StreamInput™ and COLLADA™. All Khronos members are able to contribute to the development of Khronos specifications, are empowered to vote at various stages before public deployment, and are able to accelerate the delivery of their cutting-edge media platforms and applications through early access to specification drafts and conformance tests. More information is available at www.khronos.org.
