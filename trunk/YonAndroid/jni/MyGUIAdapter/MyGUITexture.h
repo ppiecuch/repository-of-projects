@@ -12,12 +12,16 @@ using namespace yon;
 
 namespace MyGUI{
 
+	class MyGUIRTTexture;
+
 	class MyGUITexture : public MyGUI::ITexture{
 	private:
 		std::string m_name;
 		bool m_bLock;
 		MyGUI::TextureUsage m_usage;
 		size_t m_numElemBytes;
+
+		MyGUI::MyGUIRTTexture* m_pRenderTarget;
 
 		video::IVideoDriver* m_pDriver;
 		video::ITexture* m_pTexture;

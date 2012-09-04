@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="MyGUIAdapter"
-	ProjectGUID="{67F25469-DDEB-43DD-947B-D79DB7092AAF}"
-	RootNamespace="MyGUIAdapter"
+	Name="YonGUIRTT"
+	ProjectGUID="{A4859462-1072-4FC8-9E6E-FD53FBE13AD0}"
+	RootNamespace="YonGUIRTT"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -20,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)bin"
 			IntermediateDirectory="$(SolutionDir)obj\$(ProjectName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,15 +41,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../MyGUIEngine/include;../include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;MYGUI_ADAPTER_EXPORTS;MYGUI_USE_FREETYPE;"
+				AdditionalIncludeDirectories="../MyGUIEngine/include;../include;../freetype/include;../MyGUIAdapter"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4006"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,6 +61,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -89,7 +92,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -112,7 +115,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -129,10 +132,19 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
+				Name="VCLinkerTool"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -144,6 +156,9 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -151,61 +166,29 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="MyGUI"
-			>
-			<File
-				RelativePath=".\MyGUIAdapter.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUIAdapter.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUIDataManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUIDataManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUIRenderManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUIRenderManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUIRTTexture.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUIRTTexture.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUITexture.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUITexture.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUIVertexBuffer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MyGUIVertexBuffer.h"
-				>
-			</File>
-		</Filter>
 		<File
-			RelativePath=".\Android.mk"
+			RelativePath=".\framework.cpp"
 			>
+		</File>
+		<File
+			RelativePath=".\framework.h"
+			>
+		</File>
+		<File
+			RelativePath=".\main.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\yon_AndroidGLView.cpp"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

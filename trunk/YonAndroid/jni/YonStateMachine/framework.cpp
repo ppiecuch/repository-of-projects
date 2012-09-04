@@ -89,7 +89,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
-#if 1
+#if 0
 
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, true);
 
@@ -158,7 +158,7 @@ void drawFrame(){
 
 	//Logger->debug("beginDriver\r\n");
 	videoDriver->begin();
-#if 1
+#if 0
 	//rtt->beginRTT(true,true,video::SColor(0xFF133E67));
 	//Logger->debug("beginRTT\r\n");
 	rtt->beginRTT(true,true,video::SColor(0x00000000));

@@ -191,6 +191,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonStateMachine", "YonState
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Primeval", "Primeval\Primeval.vcproj", "{8062E966-5115-4FC0-ACDC-0CE1BD1B0AA5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonGUIRTT", "YonGUIRTT\YonGUIRTT.vcproj", "{A4859462-1072-4FC8-9E6E-FD53FBE13AD0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -353,6 +355,10 @@ Global
 		{8062E966-5115-4FC0-ACDC-0CE1BD1B0AA5}.Debug|Win32.Build.0 = Debug|Win32
 		{8062E966-5115-4FC0-ACDC-0CE1BD1B0AA5}.Release|Win32.ActiveCfg = Release|Win32
 		{8062E966-5115-4FC0-ACDC-0CE1BD1B0AA5}.Release|Win32.Build.0 = Release|Win32
+		{A4859462-1072-4FC8-9E6E-FD53FBE13AD0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A4859462-1072-4FC8-9E6E-FD53FBE13AD0}.Debug|Win32.Build.0 = Debug|Win32
+		{A4859462-1072-4FC8-9E6E-FD53FBE13AD0}.Release|Win32.ActiveCfg = Release|Win32
+		{A4859462-1072-4FC8-9E6E-FD53FBE13AD0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
