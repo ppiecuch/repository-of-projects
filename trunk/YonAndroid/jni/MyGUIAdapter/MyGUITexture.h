@@ -13,6 +13,7 @@ using namespace yon;
 namespace MyGUI{
 
 	class MyGUIRTTexture;
+	class MyGUIRenderManager;
 
 	class MyGUITexture : public MyGUI::ITexture{
 	private:
@@ -21,12 +22,13 @@ namespace MyGUI{
 		MyGUI::TextureUsage m_usage;
 		size_t m_numElemBytes;
 
+		const MyGUI::MyGUIRenderManager* m_pRenderManager;
 		MyGUI::MyGUIRTTexture* m_pRenderTarget;
 
 		video::IVideoDriver* m_pDriver;
 		video::ITexture* m_pTexture;
 	public:
-		MyGUITexture(const std::string& name,video::IVideoDriver* driver);
+		MyGUITexture(const std::string& name,video::IVideoDriver* driver,const MyGUI::MyGUIRenderManager* renderManager);
 		~MyGUITexture();
 
 		virtual const std::string& getName() const{

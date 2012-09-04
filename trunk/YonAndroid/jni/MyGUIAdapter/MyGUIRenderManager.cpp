@@ -51,7 +51,7 @@ namespace MyGUI{
 
 		YON_DEBUG_BREAK_IF(item!=m_textures.end());
 
-		MyGUITexture* texture = new MyGUITexture(_name,m_pDriver);
+		MyGUITexture* texture = new MyGUITexture(_name,m_pDriver,this);
 		m_textures[_name] = texture;
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("MyGUIRenderManager.createTexture:%s",_name.c_str()).c_str());

@@ -5,8 +5,8 @@
 
 namespace MyGUI{
 
-	MyGUITexture::MyGUITexture(const std::string& name,video::IVideoDriver* driver)
-		:m_name(name),m_bLock(false),m_pDriver(driver),m_pTexture(NULL),m_pRenderTarget(NULL),
+	MyGUITexture::MyGUITexture(const std::string& name,video::IVideoDriver* driver,const MyGUI::MyGUIRenderManager* renderManager)
+		:m_name(name),m_bLock(false),m_pDriver(driver),m_pTexture(NULL),m_pRenderTarget(NULL),m_pRenderManager(renderManager),
 		m_usage(MyGUI::TextureUsage::Default),m_numElemBytes(0){
 	}
 	MyGUITexture::~MyGUITexture(){
@@ -35,8 +35,10 @@ namespace MyGUI{
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA,false);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,false);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,true);
-		//TODO MyGUI::TextureUsage::RenderTarget
-		m_pTexture = static_cast<video::ITexture*>(m_pDriver->addTexture(core::dimension2du(_width,_height),io::path(m_name.c_str()),format));
+		if(_usage==MyGUI::TextureUsage::RenderTarget)
+			m_pTexture=static_cast<video::ITexture*>(m_pDriver->addRenderTargetTexture(core::dimension2du(_width,_height),io::path(m_name.c_str()),format));
+		else
+			m_pTexture = static_cast<video::ITexture*>(m_pDriver->addTexture(core::dimension2du(_width,_height),io::path(m_name.c_str()),format));
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,useMipmap);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA,use16bit1Alpha);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,use16bit4Alpha);
@@ -85,7 +87,7 @@ namespace MyGUI{
 		//Logger->warn(YON_LOG_WARN_FORMAT,"getRenderTarget not support");
 		//return NULL;
 		if(m_pRenderTarget==NULL)
-			m_pRenderTarget=new MyGUI::MyGUIRTTexture();
+			m_pRenderTarget=new MyGUI::MyGUIRTTexture(m_pTexture,m_pRenderManager);
 		return m_pRenderTarget;
 	}
 

@@ -6,6 +6,8 @@
 #include "MyGUI_RenderFormat.h"
 #include "MyGUI_IRenderTarget.h"
 
+#include "ITexture.h"
+
 namespace MyGUI{
 
 class MyGUIRTTexture : public MyGUI::IRenderTarget{
@@ -13,8 +15,11 @@ private:
 	RenderTargetInfo m_renderTargetInfo;
 	int m_iWidth;
 	int m_iHeight;
+
+	const MyGUI::MyGUIRenderManager* m_pRenderManager;
+	video::ITexture* m_pTexture;
 public:
-	MyGUIRTTexture(unsigned int _texture);
+	MyGUIRTTexture(video::ITexture* texture,const MyGUI::MyGUIRenderManager* renderManager);
 	virtual ~MyGUIRTTexture();
 
 	virtual void begin();
