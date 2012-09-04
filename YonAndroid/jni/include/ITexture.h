@@ -42,7 +42,7 @@ namespace video{
 
 		//RTT相关
 		virtual bool isRenderTarget() const = 0;
-		virtual void beginRTT(bool clearBackBuffer=true, bool clearZBuffer=true,video::SColor color=video::COLOR_BLACK) = 0;
+		virtual void beginRTT(bool clearBackBuffer=true, bool clearZBuffer=true,video::SColor color=video::COLOR_ZERO) = 0;
 		//参数renderFrameBuffer：是否接下来的操作重新指向帧缓冲
 		virtual void endRTT(bool willRenderFrameBuffer) = 0;
 	};

@@ -137,6 +137,7 @@ namespace video{
 	YON_API extern const SColor COLOR_RED;
 	YON_API extern const SColor COLOR_GREEN;
 	YON_API extern const SColor COLOR_BLUE;
+	YON_API extern const SColor COLOR_ZERO;
 
 	class SColorf
 	{
