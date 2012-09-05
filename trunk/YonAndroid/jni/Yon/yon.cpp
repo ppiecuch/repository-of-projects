@@ -39,6 +39,7 @@ namespace yon{
 		const SColor COLOR_GREEN(0xFF00FF00);
 		const SColor COLOR_BLUE(0xFFFF0000);
 		const SColor COLOR_ZERO(0x00000000);
+		const SColor COLOR_DEFAULT(0xFF132E47);
 
 		IMaterial* DEFAULT_MATERIAL=NULL;
 

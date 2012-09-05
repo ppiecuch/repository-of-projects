@@ -371,6 +371,13 @@ namespace core{
 			return *this;
 		}
 
+		/*inline void upsidedown(){
+			//m[1][0]=-m[1][0];
+			m[1][1]=-m[1][1];
+			//m[1][2]=-m[1][2];
+			//m[1][3]=-m[1][3];
+		}*/
+
 		inline void frustum(f32 left, f32 right, f32 bottom, f32 top, f32 nearZ, f32 farZ){
 			f32	deltaX = right - left;
 			f32	deltaY = top - bottom;

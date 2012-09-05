@@ -21,6 +21,8 @@ namespace ogles1{
 		bool m_bHasMipMap;
 		bool m_bReserveImage;
 
+		core::recti m_viewport;
+
 		virtual void uploadTexture();
 
 		//用于子类构造
@@ -54,8 +56,11 @@ namespace ogles1{
 
 		virtual bool isRenderTarget() const{return m_bIsRenderTarget;}
 		virtual void setIsRenderTarget(bool on){m_bIsRenderTarget=on;}
-		virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color);
-		virtual void endRTT(bool willRenderFrameBuffer);
+		//deprecated
+		//virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color);
+		//virtual void endRTT(bool willRenderFrameBuffer);
+		virtual void beginRTT();
+		virtual void endRTT();
 	};
 }//ogles1
 }//video

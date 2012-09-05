@@ -24,11 +24,15 @@ namespace ogles1{
 			return m_format;
 		}
 
+		virtual void upsidedown();
 		virtual void logon();
 		virtual void logoff();
 
-		virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color);
-		virtual void endRTT(bool willRenderFrameBuffer);
+		//deprecated
+		//virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color);
+		//virtual void endRTT(bool willRenderFrameBuffer);
+		virtual void beginRTT();
+		virtual void endRTT();
 	};
 }
 }

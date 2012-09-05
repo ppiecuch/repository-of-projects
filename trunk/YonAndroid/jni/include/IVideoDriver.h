@@ -79,6 +79,13 @@ namespace yon{
 			ENUM_VIDEO_FEATURE_COUNT
 		};
 
+		enum ENUM_RENDER_TARGET{
+			ENUM_RENDER_TARGET_FRAME_BUFFER = 0,
+			ENUM_RENDER_TARGET_RENDER_TEXTURE,
+
+			ENUM_RENDER_TARGET_COUNT
+		};
+
 		enum ENUM_DRIVER_STATE{
 			ENUM_DRIVER_STATE_NONE= 0,
 			ENUM_DRIVER_STATE_RUN,
@@ -153,7 +160,7 @@ namespace yon{
 			virtual c8* getVideoMemoryString() const = 0;
 
 			virtual const SClearSetting& getClearSetting() const = 0;
-			virtual void begin(bool backBuffer=true,bool zBuffer=true,const video::SColor& color=video::SColor(0xFF132E47)) = 0;
+			virtual void begin(bool backBuffer=true,bool zBuffer=true,const video::SColor& color=video::COLOR_DEFAULT) = 0;
 			virtual void end() = 0;
 			virtual void setViewPort(const core::recti& r) = 0;
 			virtual const core::dimension2di& getCurrentRenderTargetSize() const = 0;
@@ -161,6 +168,10 @@ namespace yon{
 				for(u32 i=0;i<m_resizables.size();++i)
 					m_resizables[i]->onResize(size);
 			}
+
+
+			//virtual bool setRenderTarget(ENUM_RENDER_TARGET target, bool clearTarget=true, bool clearZBuffer=true, video::SColor color=video::COLOR_ZERO) =0;
+			virtual void setRenderTarget(video::ITexture* texture,bool backBuffer=true, bool zBuffer=true, video::SColor color=video::COLOR_ZERO) =0;
 
 
 			//是否支持feature特性

@@ -29,6 +29,8 @@ namespace ogles1{
 		s32 frameUnit;
 		s32 refreshedTime;
 	};
+
+	class COGLES1Texture;
 	
 	class COGLES1Driver:public IVideoDriver,COGLES1ExtensionHandler{
 	public:
@@ -83,6 +85,7 @@ namespace ogles1{
 
 		virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name, video::ENUM_COLOR_FORMAT format);
 		//virtual bool setRenderTarget(video::ITexture* texture,bool clearBackBuffer, bool clearZBuffer,video::SColor color);
+		void setRenderTarget(video::ITexture* texture,bool backBuffer, bool zBuffer, video::SColor color);
 
 
 		virtual IImage* createImageFromFile(const io::path& filename,bool translateIntoGray);
@@ -156,6 +159,7 @@ namespace ogles1{
 			}
 		};
 		
+		COGLES1Texture* m_pRenderTarget;
 		core::array<SSurface> m_textures;
 		core::array<video::IImageLoader*> m_imageLoaders;
 		core::array<video::IMaterialRenderer*> m_materialRenderers;
@@ -179,6 +183,7 @@ namespace ogles1{
 
 		video::SClearSetting m_clearSetting;
 		core::dimension2di m_windowSize;
+		core::dimension2di m_renderTargetSize;
 
 		static u32 s_uInstanceCount;
 

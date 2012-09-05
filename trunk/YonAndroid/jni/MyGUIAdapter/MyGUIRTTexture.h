@@ -8,24 +8,32 @@
 
 #include "ITexture.h"
 
+using namespace yon;
+
 namespace MyGUI{
+
+	class MyGUIRenderManager;
 
 class MyGUIRTTexture : public MyGUI::IRenderTarget{
 private:
 	RenderTargetInfo m_renderTargetInfo;
-	int m_iWidth;
-	int m_iHeight;
-
-	const MyGUI::MyGUIRenderManager* m_pRenderManager;
+	MyGUI::MyGUIRenderManager* m_pRenderManager;
 	video::ITexture* m_pTexture;
+	video::IVideoDriver* m_pDriver;
+	core::matrix4f m_projection,m_oldProjection;
 public:
-	MyGUIRTTexture(video::ITexture* texture,const MyGUI::MyGUIRenderManager* renderManager);
+	MyGUIRTTexture(video::ITexture* texture,video::IVideoDriver* driver,MyGUI::MyGUIRenderManager* renderManager);
+	//MyGUIRTTexture(video::ITexture* texture);
 	virtual ~MyGUIRTTexture();
 
 	virtual void begin();
 	virtual void end();
 
 	virtual void doRender(IVertexBuffer* _buffer, ITexture* _texture, size_t _count);
+
+	video::ITexture* getTexture(){
+		return m_pTexture;
+	}
 
 	virtual const RenderTargetInfo& getInfo()
 	{

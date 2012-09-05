@@ -12,11 +12,12 @@ namespace ogles1{
 
 	COGLES1Texture::COGLES1Texture(const core::dimension2du& size,const io::path& name, COGLES1Driver* driver)
 		:ITexture(name),m_pDriver(driver), m_pImage(NULL),
-		m_textureId(0),m_bIsRenderTarget(false),m_textureSize(size),m_bHasMipMap(false),m_bReserveImage(false){}
+		m_textureId(0),m_bIsRenderTarget(false),m_textureSize(size),m_bHasMipMap(false),
+		m_bReserveImage(false),m_viewport(0,0,m_textureSize.w,m_textureSize.h){}
 
 	COGLES1Texture::COGLES1Texture(video::IImage* image,const io::path& name,COGLES1Driver* driver)
 		:ITexture(name), m_pDriver(driver), m_pImage(image),m_textureSize(image->getDimension()),
-		m_textureId(0),m_bIsRenderTarget(false){
+		m_textureId(0),m_bIsRenderTarget(false),m_viewport(0,0,m_textureSize.w,m_textureSize.h){
 			m_bHasMipMap=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
 			m_bReserveImage=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE);
 			bool use16Bit1Alpha=driver->getTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA);
@@ -237,30 +238,36 @@ namespace ogles1{
 		unlock();
 	}
 
-	void COGLES1Texture::beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color)
+	void COGLES1Texture::beginRTT()
 	{
-		glViewport(0, 0, m_textureSize.w,m_textureSize.h);
-		m_pDriver->clearView(clearBackBuffer,clearZBuffer,color);
+		//glViewport(0, 0, m_textureSize.w,m_textureSize.h);
+		//core::recti r(0, 0, m_textureSize.w,m_textureSize.h);
+		m_pDriver->setViewPort(m_viewport);
+		//m_pDriver->clearView(clearBackBuffer,clearZBuffer,color);
 	}
-	void COGLES1Texture::endRTT(bool willRenderFrameBuffer)
+	void COGLES1Texture::endRTT()
 	{
 		//因为Driver的currentTexture记录的还是之前的textureId，所以这里要做一下恢复
-		GLint tmpTexture;
-		glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmpTexture);
+		//GLint tmpTexture;
+		//glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmpTexture);
 
 		glBindTexture(GL_TEXTURE_2D, m_textureId);
+		//Logger->debug("glCopyTexSubImage2D:%d,%d\r\n",m_textureSize.w,m_textureSize.h);
 		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, m_textureSize.w,m_textureSize.h);
 		//glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGB,0,0,m_textureSize.w,m_textureSize.h,0);
 
 
 		//m_pDriver->checkGLError(__FILE__,__LINE__);
 
-		if(willRenderFrameBuffer){
+		//deprecated
+		/*if(willRenderFrameBuffer){
 			const video::SClearSetting& setting=m_pDriver->getClearSetting();
-			glViewport(0,0,m_pDriver->getCurrentRenderTargetSize().w,m_pDriver->getCurrentRenderTargetSize().h);
+			//glViewport(0,0,m_pDriver->getCurrentRenderTargetSize().w,m_pDriver->getCurrentRenderTargetSize().h);
+			core::recti r(0,0,m_pDriver->getCurrentRenderTargetSize().w,m_pDriver->getCurrentRenderTargetSize().h);
+			m_pDriver->setViewPort(r);
 			m_pDriver->clearView(setting.clearBackBuffer,setting.clearZBuffer,setting.color);
 			glBindTexture(GL_TEXTURE_2D, tmpTexture);
-		}
+		}*/
 	}
 }//ogles1
 }//video

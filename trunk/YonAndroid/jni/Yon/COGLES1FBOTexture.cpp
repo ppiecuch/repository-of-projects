@@ -93,19 +93,27 @@ namespace ogles1{
 		checkFBOError();
 	}
 
-	void COGLES1FBOTexture::beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color){
-		glViewport(0, 0, m_textureSize.w,m_textureSize.h);
-		glBindFramebufferOES(GL_FRAMEBUFFER_OES,m_fboId);
-		m_pDriver->clearView(clearBackBuffer,clearZBuffer,color);
+	void COGLES1FBOTexture::upsidedown(){
+		Logger->warn(YON_LOG_WARN_FORMAT,"can not upside down a fbo texture, do nothing!");
 	}
-	void COGLES1FBOTexture::endRTT(bool willRenderFrameBuffer){
+
+	void COGLES1FBOTexture::beginRTT(){
+		//glViewport(0, 0, m_textureSize.w,m_textureSize.h);
+		//core::recti r(0, 0, m_textureSize.w,m_textureSize.h);
+		m_pDriver->setViewPort(m_viewport);
+		glBindFramebufferOES(GL_FRAMEBUFFER_OES,m_fboId);
+		//m_pDriver->clearView(clearBackBuffer,clearZBuffer,color);
+	}
+	void COGLES1FBOTexture::endRTT(){
 		glBindFramebufferOES(GL_FRAMEBUFFER_OES,0);
 
-		if(willRenderFrameBuffer){
+		/*if(willRenderFrameBuffer){
 			const video::SClearSetting& setting=m_pDriver->getClearSetting();
-			glViewport(0,0,m_pDriver->getCurrentRenderTargetSize().w,m_pDriver->getCurrentRenderTargetSize().h);
+			//glViewport(0,0,m_pDriver->getCurrentRenderTargetSize().w,m_pDriver->getCurrentRenderTargetSize().h);
+			//core::recti r(0,0,m_pDriver->getCurrentRenderTargetSize().w,m_pDriver->getCurrentRenderTargetSize().h);
+			m_pDriver->setViewPort(m_viewport);
 			m_pDriver->clearView(setting.clearBackBuffer,setting.clearZBuffer,setting.color);
-		}
+		}*/
 	}
 
 	bool COGLES1FBOTexture::checkFBOError(){
