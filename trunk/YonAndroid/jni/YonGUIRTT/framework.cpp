@@ -20,6 +20,10 @@ IModel* planeModel=NULL;
 IModel* teapotModel=NULL;
 f32 factor=1.1f;
 
+core::matrix4f projection;
+core::matrix4f oldProjection;
+core::dimension2di canvasDim;
+
 //ITexture* rtt=NULL;
 MyGUI::Canvas* canvas=NULL;
 MyGUI::IRenderTarget* rt=NULL;
@@ -77,6 +81,13 @@ void requestUpdateCanvas(MyGUI::Canvas* _canvas, MyGUI::Canvas::Event _event)
 {
 	Logger->debug("requestUpdateCanvas:%d,%d\r\n",_canvas->getWidth(),_canvas->getHeight());
 	//MyGUI::IRenderTarget* rt=_canvas->getTexture()->getRenderTarget();
+	f32 hh=_canvas->getHeight()/2;
+	f32 hw=_canvas->getWidth()/2;
+	projection.makeIdentity();
+	projection.ortho(-hw,hw,-hh,hh,1,3000);
+
+	canvasDim.w=_canvas->getWidth();
+	canvasDim.h=_canvas->getHeight();
 }
 void frameEntered(float _time)
 {
@@ -118,7 +129,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	canvas->createTexture(MyGUI::Canvas::TRM_PT_VIEW_ALL, MyGUI::TextureUsage::RenderTarget);
 	canvas->eventPreTextureChanges += MyGUI::newDelegate(eventPreTextureChanges);
 	canvas->requestUpdateCanvas = MyGUI::newDelegate(requestUpdateCanvas);
-	//canvas->updateTexture();
+	canvas->updateTexture();
 
 	//MyGUI::Gui::getInstance().eventFrameStart += MyGUI::newDelegate(frameEntered);
 	//MyGUI::MyGUIRTTexture* rt=static_cast<MyGUI::MyGUIRTTexture*>(canvas->getTexture()->getRenderTarget());
@@ -131,7 +142,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//canvas->getWidth();
 	//canvas->getHeight();
 	//pCamera2=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
-	//pCamera2->set
+	//sceneMgr->setViewingCamera(pCamera);
 
 	IShap *shap;
 	IUnit* unit;
@@ -164,6 +175,8 @@ void drawFrame(){
 
 	rt=canvas->getTexture()->getRenderTarget();
 
+	oldProjection=videoDriver->getTransform(ENUM_TRANSFORM_PROJECTION);
+	videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,projection);
 	rt->begin();
 	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
 	//teapotModel->setVisible(true);
@@ -171,11 +184,11 @@ void drawFrame(){
 	//teapotModel->setVisible(false);
 	gfAdapter->clearZ(-1000);
 	
-	gfAdapter->drawRegion("trans.png",r,0,0,512,256,ENUM_TRANS_NONE);
+	gfAdapter->drawRegion("trans.png",canvasDim,r,0,0,128,64,ENUM_TRANS_NONE);
 	gfAdapter->render();
 
 	rt->end();
-
+	videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,oldProjection);
 	//sceneMgr->render(videoDriver);
 
 	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
