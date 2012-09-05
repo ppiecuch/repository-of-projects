@@ -52,6 +52,7 @@ namespace MyGUI{
 		YON_DEBUG_BREAK_IF(item!=m_textures.end());
 
 		MyGUITexture* texture = new MyGUITexture(_name,m_pDriver,this);
+		//MyGUITexture* texture = new MyGUITexture(_name,m_pDriver);
 		m_textures[_name] = texture;
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("MyGUIRenderManager.createTexture:%s",_name.c_str()).c_str());
@@ -68,6 +69,8 @@ namespace MyGUI{
 		YON_DEBUG_BREAK_IF(item==m_textures.end());
 
 		m_textures.erase(item);
+
+		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("MyGUIRenderManager.destroyTexture:%s",_texture->getName().c_str()).c_str());
 		delete _texture;
 	}
 	MyGUI::ITexture* MyGUIRenderManager::getTexture(const std::string& _name){
@@ -117,7 +120,7 @@ namespace MyGUI{
 		m_pUnit->setShap(shap);
 		m_pDriver->drawUnit(m_pUnit);
 		//Logger->debug("doRender:%08X(v:%d,i:%d)\n",shap,shap->getVertexCount(),shap->getIndexCount());
-		printf("doRender:%08X(v:%d,i:%d),_count:%d\n",shap,shap->getVertexCount(),shap->getIndexCount(),_count);
+		//printf("doRender:%08X(v:%d,i:%d),_count:%d\n",shap,shap->getVertexCount(),shap->getIndexCount(),_count);
 	}
 
 	void MyGUIRenderManager::drawOneFrame(){

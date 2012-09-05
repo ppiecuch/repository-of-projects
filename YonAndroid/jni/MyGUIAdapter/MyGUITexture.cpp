@@ -1,12 +1,17 @@
+#include "MyGUIRenderManager.h"
 #include "MyGUITexture.h"
 #include "MyGUIRTTexture.h"
+
 
 #include "ILogger.h"
 
 namespace MyGUI{
 
 	MyGUITexture::MyGUITexture(const std::string& name,video::IVideoDriver* driver,const MyGUI::MyGUIRenderManager* renderManager)
-		:m_name(name),m_bLock(false),m_pDriver(driver),m_pTexture(NULL),m_pRenderTarget(NULL),m_pRenderManager(renderManager),
+	//MyGUITexture::MyGUITexture(const std::string& name,video::IVideoDriver* driver)
+		:m_name(name),m_bLock(false),m_pDriver(driver),m_pTexture(NULL),
+		m_pRenderTarget(NULL),
+		m_pRenderManager(renderManager),
 		m_usage(MyGUI::TextureUsage::Default),m_numElemBytes(0){
 	}
 	MyGUITexture::~MyGUITexture(){
@@ -36,7 +41,10 @@ namespace MyGUI{
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,false);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,true);
 		if(_usage==MyGUI::TextureUsage::RenderTarget)
+		{
+			Logger->debug("create mygui-rtt:%d,%d\r\n",_width,_height);
 			m_pTexture=static_cast<video::ITexture*>(m_pDriver->addRenderTargetTexture(core::dimension2du(_width,_height),io::path(m_name.c_str()),format));
+		}
 		else
 			m_pTexture = static_cast<video::ITexture*>(m_pDriver->addTexture(core::dimension2du(_width,_height),io::path(m_name.c_str()),format));
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_MIPMAPS,useMipmap);
@@ -76,6 +84,11 @@ namespace MyGUI{
 		m_pTexture->unlock();
 	}
 	void MyGUITexture::destroy(){
+		if(m_pRenderTarget)
+		{
+			delete m_pRenderTarget;
+			m_pRenderTarget=NULL;
+		}
 		m_pDriver->removeTexture(m_pTexture);
 
 		m_bLock = false;
@@ -87,7 +100,7 @@ namespace MyGUI{
 		//Logger->warn(YON_LOG_WARN_FORMAT,"getRenderTarget not support");
 		//return NULL;
 		if(m_pRenderTarget==NULL)
-			m_pRenderTarget=new MyGUI::MyGUIRTTexture(m_pTexture,m_pRenderManager);
+			m_pRenderTarget=new MyGUI::MyGUIRTTexture(m_pTexture,m_pDriver,const_cast<MyGUI::MyGUIRenderManager*>(m_pRenderManager));
 		return m_pRenderTarget;
 	}
 

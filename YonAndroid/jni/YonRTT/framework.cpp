@@ -59,7 +59,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -80,7 +80,8 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
 	material=cubeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_REF);
 	cubeModel->setPosition(core::vector3df(100,100,0));
 	shap->drop();
 	unit->drop();
@@ -107,7 +108,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(256,256), "RTT");
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(256,256), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
 	cubeModel->setMaterialTexture(0, rtt); 
 
 	return true;
@@ -119,7 +120,8 @@ void drawFrame(){
 
 	videoDriver->begin();
 
-	rtt->beginRTT(true,true,video::SColor(0xFF133E67));
+	//rtt->beginRTT(true,true,video::SColor(0xFF133E67));
+	videoDriver->setRenderTarget(rtt);
 
 	teapotModel->setVisible(true);
 	cubeModel->setVisible(false);
@@ -132,7 +134,8 @@ void drawFrame(){
 	//planeModel->setVisible(true);
 
 
-	rtt->endRTT(true);
+	//rtt->endRTT(true);
+	videoDriver->setRenderTarget(NULL,true,true,video::COLOR_DEFAULT);
 
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));

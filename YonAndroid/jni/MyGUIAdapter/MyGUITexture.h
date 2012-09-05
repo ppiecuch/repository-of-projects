@@ -29,6 +29,7 @@ namespace MyGUI{
 		video::ITexture* m_pTexture;
 	public:
 		MyGUITexture(const std::string& name,video::IVideoDriver* driver,const MyGUI::MyGUIRenderManager* renderManager);
+		//MyGUITexture(const std::string& name,video::IVideoDriver* driver);
 		~MyGUITexture();
 
 		virtual const std::string& getName() const{

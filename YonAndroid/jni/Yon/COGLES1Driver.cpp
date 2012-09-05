@@ -117,7 +117,7 @@ namespace ogles1{
 
 	COGLES1Driver::COGLES1Driver(const SOGLES1Parameters& param,io::IFileSystem* fs,ITimer* timer,scene::IGeometryFactory* geometryFty)
 		:m_bRenderModeChange(true),m_pLastMaterial(NULL),m_pCurrentMaterial(NULL),
-		m_pDebugPrinter(NULL),m_uPrimitiveDrawn(0),m_videoMemory(0),
+		m_pDebugPrinter(NULL),m_uPrimitiveDrawn(0),m_videoMemory(0),m_renderTargetSize(0,0),m_pRenderTarget(NULL),
 #ifdef YON_COMPILE_WITH_WIN32
 		m_eglDisplay(EGL_NO_DISPLAY),
 		m_hDc(NULL),m_hWnd(param.hWnd),
@@ -393,9 +393,10 @@ namespace ogles1{
 
 		clearView(backBuffer,zBuffer,color);
 
-		m_clearSetting.clearBackBuffer=backBuffer;
-		m_clearSetting.clearZBuffer=zBuffer;
-		m_clearSetting.color=color;
+		//deprecated
+		//m_clearSetting.clearBackBuffer=backBuffer;
+		//m_clearSetting.clearZBuffer=zBuffer;
+		//m_clearSetting.color=color;
 
 		m_uPrimitiveDrawn=0;
 	}
@@ -433,10 +434,32 @@ namespace ogles1{
 		}
 #endif
 		glViewport(0, 0, r.getWidth(), r.getHeight());
-		Logger->debug("setViewPort(0,0,%d,%d)\n",r.getWidth(), r.getHeight());
+		//Logger->debug("setViewPort(0,0,%d,%d)\n",r.getWidth(), r.getHeight());
 	}
 	const core::dimension2di& COGLES1Driver::getCurrentRenderTargetSize() const{
-		return m_windowSize;
+		if(m_pRenderTarget)
+			return m_renderTargetSize;
+		else
+			return m_windowSize;
+	}
+	void COGLES1Driver::setRenderTarget(video::ITexture* texture,bool backBuffer, bool zBuffer, video::SColor color){
+		setTexture(0,NULL);
+		if(m_pRenderTarget!=NULL)
+		{
+			m_pRenderTarget->endRTT();
+		}
+		if(texture)
+		{
+			m_pRenderTarget = static_cast<COGLES1Texture*>(texture);
+			m_pRenderTarget->beginRTT();
+			m_renderTargetSize = texture->getSize();
+		}
+		else
+		{
+			m_pRenderTarget=NULL;
+			setViewPort(core::recti(0,0,m_windowSize.w,m_windowSize.h));
+		}
+		clearView(backBuffer,zBuffer,color);
 	}
 	void COGLES1Driver::onResize(const core::dimension2du& size){
 		m_windowSize.w=(s32)size.w;
@@ -498,7 +521,6 @@ namespace ogles1{
 		}
 
 		if(needHardwareBuffer(unit)){
-			//TODO map.find
 			IHardwareBuffer* buffer=NULL;
 			core::map<const scene::IUnit*,IHardwareBuffer*>::Node* node = m_hardwardBuffers.find(unit);
 			if (node)
