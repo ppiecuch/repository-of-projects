@@ -31,12 +31,14 @@ namespace MyGUI{
 	}
 
 	void MyGUIRTTexture::begin(){
+		//Logger->debug("beginRTT\r\n");
 		m_pDriver->setRenderTarget(m_pTexture);
-		m_oldProjection=m_pDriver->getTransform(video::ENUM_TRANSFORM_PROJECTION);
-		m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_projection);
+		//m_oldProjection=m_pDriver->getTransform(video::ENUM_TRANSFORM_PROJECTION);
+		//m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_projection);
 	}
 	void MyGUIRTTexture::end(){
-		m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_oldProjection);
+		//Logger->debug("endRTT\r\n");
+		//m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_oldProjection);
 		m_pDriver->setRenderTarget(NULL,true,true,video::COLOR_DEFAULT);
 	}
 

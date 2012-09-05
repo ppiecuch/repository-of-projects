@@ -264,6 +264,115 @@ namespace scene{
 		return true;
 	}*/
 
+
+	bool CGraphicsAdapter::drawRegion(const c8* imageName, const core::dimension2di& dim, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform, MASK_ACTHOR anchor,bool useAlpha, u32 color){
+		video::ITexture* texture=m_pDriver->getTexture(imageName);
+		if(texture==NULL)
+			return false;
+
+		f32 u0,u1,u2,u3,v0,v1,v2,v3;
+		//如果是转置变换
+		if(transform>=ENUM_TRANS_MIRROR_ROT270){
+			swap(destW, destH);
+
+			switch(transform){
+			case ENUM_TRANS_ROT90:
+				u1=u0=uv.bottomRight.x;
+				u3=u2=uv.topLeft.x;
+				v3=v0=uv.bottomRight.y;
+				v2=v1=uv.topLeft.y;
+				break;
+			case ENUM_TRANS_MIRROR_ROT90:
+				u1=u0=uv.topLeft.x;
+				u3=u2=uv.bottomRight.x;
+				v3=v0=uv.bottomRight.y;
+				v2=v1=uv.topLeft.y;
+				break;
+			case ENUM_TRANS_ROT270:
+				u1=u0=uv.topLeft.x;
+				u3=u2=uv.bottomRight.x;
+				v3=v0=uv.topLeft.y;
+				v2=v1=uv.bottomRight.y;
+				break;
+			case ENUM_TRANS_MIRROR_ROT270:
+				u1=u0=uv.bottomRight.x;
+				u3=u2=uv.topLeft.x;
+				v3=v0=uv.topLeft.y;
+				v2=v1=uv.bottomRight.y;
+			}
+		}else if(transform>ENUM_TRANS_NONE){
+			switch(transform){
+				case ENUM_TRANS_ROT180:
+					u3=u0=uv.bottomRight.x;
+					u2=u1=uv.topLeft.x;
+					v1=v0=uv.topLeft.y;
+					v3=v2=uv.bottomRight.y;
+					break;
+				case ENUM_TRANS_MIRROR:
+					u3=u0=uv.bottomRight.x;
+					u2=u1=uv.topLeft.x;
+					v1=v0=uv.bottomRight.y;
+					v3=v2=uv.topLeft.y;
+					break;
+				case ENUM_TRANS_MIRROR_ROT180:
+					u3=u0=uv.topLeft.x;
+					u2=u1=uv.bottomRight.x;
+					v1=v0=uv.topLeft.y;
+					v3=v2=uv.bottomRight.y;
+			}
+		}else{
+			u3=u0=uv.topLeft.x;
+			u2=u1=uv.bottomRight.x;
+			v1=v0=uv.bottomRight.y;
+			v3=v2=uv.topLeft.y;
+		}
+		//根据锚点计算新位置
+		f32 x = x_dest;
+		f32 y = y_dest;
+		if(anchor&MASK_ACTHOR_HCENTER)
+			x -= destW * 0.5f;
+		else if(anchor&MASK_ACTHOR_RIGHT)
+			x -= destW;
+		if(anchor&MASK_ACTHOR_VCENTER)
+			y -= destH * 0.5f;
+		else if(anchor&MASK_ACTHOR_BOTTOM)
+			y -= destH;
+		//计算位置坐标(左上角)
+		core::position2di spos(x,y);
+		core::position2di rpos;
+		//m_pDriver->convertPosCoordinate(spos,rpos);
+		rpos.x=spos.x-(s32)(dim.w*0.5f);
+		rpos.y=(s32)(dim.h*0.5f)-spos.y;
+		//Logger->debug("convertPosCoordinate:%d,%d->%.2f,%.2f\n",spos.x,spos.y,rpos.x,rpos.y);
+		//创建形态
+		//IShap* shap=m_pSceneMgr->getGeometryFactory()->createXYRectangle3D(rpos.x,rpos.y-destH,rpos.x+destW,rpos.y,calcZ(),u0,v0,u1,v1,u2,v2,u3,v3);
+		//m_layers[m_uCurrentLayerIndex]->entity->add(texture,materialType,shap);
+		//shap->drop();
+		f32 x0,y0,x1,y1,z;
+		x0=rpos.x;
+		y0=rpos.y-destH;
+		x1=rpos.x+destW;
+		y1=rpos.y;
+		z=calcZ();
+		video::SColor c(color);
+		DefaultUnit* unit=m_defaultPool.get();
+		unit->m_vertices.push_back(SVertex(x0,y0,z,u0,v0,c));
+		unit->m_vertices.push_back(SVertex(x1,y0,z,u1,v1,c));
+		unit->m_vertices.push_back(SVertex(x1,y1,z,u2,v2,c));
+		unit->m_vertices.push_back(SVertex(x0,y1,z,u3,v3,c));
+		unit->m_pTexture=texture;
+		if(useAlpha)
+		{
+			TransparentEntry entry(unit,z);
+			m_transparents.push_back(entry);
+		}
+		else
+		{
+			SolidEntry entry(unit);
+			m_solids.push_back(entry);
+		}
+		return true;
+	}
 	
 
 	bool CGraphicsAdapter::drawRegion(const c8* imageName, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform, MASK_ACTHOR anchor,bool useAlpha, u32 color){
