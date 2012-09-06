@@ -17,9 +17,16 @@ LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/Yon/openal/OpenAL32/Include \
 		$(LOCAL_PATH)/Yon/libogg \
 		$(LOCAL_PATH)/Yon/libvorbis \
+		$(LOCAL_PATH)/Yon/libiconv/include \
+		$(LOCAL_PATH)/Yon/libiconv/src \
 		$(LOCAL_PATH)/include/ \
 		$(LOCAL_PATH)/Yon/ \
 		$(LOCAL_PATH)/ 
+		
+iconv_SOURCES := \
+		Yon/libiconv/src/iconv.c \
+		Yon/libiconv/src/relocatable.c \
+		Yon/libiconv/src/localcharset.c
 		
 lpng_SOURCES := \
 		Yon/lpng/png.c \
@@ -117,15 +124,25 @@ yon_SOURCES :=   \
 		Yon/CReadFileStream.cpp \
 		Yon/CWriteFileStream.cpp \
 		Yon/CReadMemoryStream.cpp \
+		Yon/CI18NManager.cpp \
+		Yon/EncodeConvertor.cpp \
 		Yon/COrthoCamera.cpp \
 		Yon/CPerspCamera.cpp \
+		Yon/CViewFrustum.cpp \
 		Yon/CWindowOrthoCamera.cpp \
 		Yon/CGeometryFactory.cpp \
 		Yon/CEntity.cpp \
 		Yon/CModel.cpp \
+		Yon/CSkyBox.cpp \
 		Yon/CGeomipmapTerrain.cpp \
+		Yon/CGeomipmapTerrain2.cpp \
+		Yon/CQuadtreeTerrain.cpp \
+		Yon/CROAMTerrain.cpp \
+		Yon/CWaterModel.cpp \
 		Yon/CAnimatorFactory.cpp \
+		Yon/CAnimatorCameraFPS.cpp \
 		Yon/CGraphicsAdapter.cpp \
+		Yon/CGraphicsAdapterWindow.cpp \
 		Yon/CSceneManager.cpp \
 		Yon/CTimerAndroid.cpp \
 		Yon/CFPSCounter.cpp \
@@ -145,6 +162,7 @@ yon_SOURCES :=   \
 LOCAL_MODULE    := yon
 		
 LOCAL_SRC_FILES := \
+		$(iconv_SOURCES) \
 		$(zlib_SOURCES) \
 		$(lpng_SOURCES) \
 		$(openal_SOURCES) \

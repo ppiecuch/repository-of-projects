@@ -29,6 +29,7 @@ namespace yon{
 		virtual scene::ISceneManager* getSceneManager() const = 0;
 		//virtual gui::IGUIEnvirenment* getGUIEnvirentment() const = 0;
 		virtual scene::IGraphicsAdapter* getGraphicsAdapter() const = 0;
+		virtual scene::IGraphicsAdapter* getGraphicsAdapterWindow() const = 0;
 		virtual io::IFileSystem* getFileSystem() const = 0;
 		virtual audio::IAudioDriver* getAudioDriver() const = 0;
 		virtual IRandomizer* getRandomizer() = 0;

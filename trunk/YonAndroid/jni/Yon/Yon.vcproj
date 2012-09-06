@@ -472,6 +472,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\CGraphicsAdapterWindow.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CGraphicsAdapterWindow.h"
+					>
+				</File>
+				<File
 					RelativePath=".\CModel.cpp"
 					>
 				</File>
@@ -2957,13 +2965,6 @@
 						<File
 							RelativePath=".\libiconv\src\iconv.c"
 							>
-							<FileConfiguration
-								Name="Debug|Win32"
-								>
-								<Tool
-									Name="VCCLCompilerTool"
-								/>
-							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\iconv_config.h"
@@ -3397,13 +3398,6 @@
 						<File
 							RelativePath=".\libiconv\src\localcharset.c"
 							>
-							<FileConfiguration
-								Name="Debug|Win32"
-								>
-								<Tool
-									Name="VCCLCompilerTool"
-								/>
-							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\libiconv\src\localcharset.h"

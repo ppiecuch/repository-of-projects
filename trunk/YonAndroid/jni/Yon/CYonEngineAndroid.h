@@ -22,6 +22,7 @@ namespace yon{
 			virtual video::IVideoDriver* getVideoDriver() const{return  m_pVideoDriver;}
 			virtual scene::ISceneManager* getSceneManager() const{return m_pSceneManager;}
 			virtual scene::IGraphicsAdapter* getGraphicsAdapter() const{return m_pGraphicsAdapter;}
+			virtual scene::IGraphicsAdapter* getGraphicsAdapterWindow() const{return m_pGraphicsAdapterWindow;}
 			virtual io::IFileSystem* getFileSystem() const{return m_pFileSystem;}
 			virtual audio::IAudioDriver* getAudioDriver() const{return m_pAudioDriver;}
 			virtual IRandomizer* getRandomizer(){return m_pRandomizer;}
@@ -54,6 +55,7 @@ namespace yon{
 			video::IVideoDriver* m_pVideoDriver;
 			scene::ISceneManager* m_pSceneManager;
 			scene::IGraphicsAdapter* m_pGraphicsAdapter;
+			scene::IGraphicsAdapter* m_pGraphicsAdapterWindow;
 			io::IFileSystem* m_pFileSystem;
 			audio::IAudioDriver* m_pAudioDriver;
 			ITimer* m_pTimer;

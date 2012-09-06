@@ -36,9 +36,15 @@
 #endif
 
 //日志格式
+#ifdef YON_COMPILE_WITH_WIN32
 #define YON_LOG_SUCCEED_FORMAT "%-64s【√】\r\n"
 #define YON_LOG_FAILED_FORMAT "%-64s【╳】\r\n"
 #define YON_LOG_WARN_FORMAT "%-64s【!】\r\n"
+#else
+#define YON_LOG_SUCCEED_FORMAT "%-64s\u3010\u221A\u3011\r\n"
+#define YON_LOG_FAILED_FORMAT "%-64s\u3010\u2573\u3011\r\n"
+#define YON_LOG_WARN_FORMAT "%-64s\u3010!\u3011\r\n"
+#endif
 
 //路径使用宽字节
 //#define YON_WCHAR_FILESYSTEM
