@@ -32,8 +32,9 @@ namespace io{
 
 		//支持多个工作目录
 		//参数 newDirectory: 新工作空间的路径(前面没有斜杠，后面带斜杠)
+		//参数 recurse: 是否递归添加所有子目录(默认不添加)
 		//格式如下： "<drive>:/<directory>/<sudirectory>/<..>". 如 "C:/Windows/","/sdcard/","../media/"
-		virtual void addWorkingDirectory(const io::path& newDirectory) = 0;
+		virtual void addWorkingDirectory(const io::path& newDirectory, bool recurse=false) = 0;
 		virtual s32 getWorkingDirectoryCount(){return 0;}
 		virtual const io::path& getWorkingDirectory(s32 index) = 0;
 		//获取绝对路径

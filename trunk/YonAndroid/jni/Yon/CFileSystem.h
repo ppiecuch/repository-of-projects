@@ -12,6 +12,8 @@ namespace io{
 	protected:
 		io::path m_workingDirectory;
 		core::array<io::path> m_workingDirectories;
+
+		void recurseAddSubDirectory(io::path& dir);
 	public:
 		CFileSystem();
 		virtual ~CFileSystem();
@@ -24,7 +26,7 @@ namespace io{
 		//virtual void setWorkingDirectory(const io::path& newDirectory);
 		//virtual const io::path& getWorkingDirectory();
 
-		virtual void addWorkingDirectory(const io::path& newDirectory);
+		virtual void addWorkingDirectory(const io::path& newDirectory, bool recurse);
 		virtual s32 getWorkingDirectoryCount(){
 			return m_workingDirectories.size();
 		}

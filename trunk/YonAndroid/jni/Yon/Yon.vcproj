@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;./libiconv/include;./libiconv/std_h;./libiconv/src;./zlib;./libogg;./libvorbis;./openal/include;./openal/include/AL;./openal/OpenAL32/Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include"
+				AdditionalIncludeDirectories="../include;./dirent;./libiconv/include;./libiconv/std_h;./libiconv/src;./zlib;./libogg;./libvorbis;./openal/include;./openal/include/AL;./openal/OpenAL32/Include;C:\Program Files\Microsoft DirectX SDK (June 2010)\Include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;YON_EXPORTS;MYGUI_USE_FREETYPE;MYGUI_BUILD;MyGUIEngine_EXPORTS;AL_ALEXT_PROTOTYPES;AL_BUILD_LIBRARY;ICONV_HAVE_CONFIG_H"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -3955,6 +3955,14 @@
 							>
 						</File>
 					</Filter>
+				</Filter>
+				<Filter
+					Name="dirent"
+					>
+					<File
+						RelativePath=".\dirent\dirent.h"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
