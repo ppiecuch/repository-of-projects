@@ -5,6 +5,7 @@
 #include "CYonEngineAndroid.h"
 #include "CSceneManager.h"
 #include "CGraphicsAdapter.h"
+#include "CGraphicsAdapterWindow.h"
 #include "CRandomizer.h"
 #include "CI18NManager.h"
 
@@ -47,7 +48,7 @@ namespace platform{
 
 	CYonEngineAndroid::CYonEngineAndroid(const yon::SYonEngineParameters& params)
 		:m_pVideoDriver(NULL),m_pSceneManager(NULL),m_pFileSystem(NULL),
-		m_pUserListener(params.pEventReceiver),m_pGraphicsAdapter(NULL),
+		m_pUserListener(params.pEventReceiver),m_pGraphicsAdapter(NULL),m_pGraphicsAdapterWindow(NULL),
 		m_pI18nManager(NULL),
 		m_pAudioDriver(NULL),m_pRandomizer(NULL),m_pCallback(params.pCallback),
 		m_params(params),m_bClose(false),m_bResized(true)
@@ -77,6 +78,7 @@ namespace platform{
 
 		//³õÊ¼»¯GraphicsÊÊÅäÆ÷
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
+		m_pGraphicsAdapterWindow=scene::createGraphicsAdapterWindow(m_pVideoDriver,m_pSceneManager);
 
 		//³õÊ¼»¯ÉùÒôÇý¶¯Æ÷
 		m_pAudioDriver=audio::createAudioDriver(m_pFileSystem);
@@ -86,6 +88,7 @@ namespace platform{
 	}
 	CYonEngineAndroid::~CYonEngineAndroid(){
 		m_pAudioDriver->drop();
+		m_pGraphicsAdapterWindow->drop();
 		m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();

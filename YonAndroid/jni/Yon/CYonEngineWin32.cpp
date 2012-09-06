@@ -5,6 +5,7 @@
 #include "CYonEngineWin32.h"
 #include "CCursorControlWin32.h"
 #include "CGraphicsAdapter.h"
+#include "CGraphicsAdapterWindow.h"
 #include "CRandomizer.h"
 #include "yonList.h"
 #include "ILogger.h"
@@ -54,7 +55,7 @@ namespace platform{
 		:m_hWnd(NULL),m_bExternalWindow(false),m_bAvailable(false),
 		m_pVideoDriver(NULL),m_pSceneManager(NULL),
 		m_pAudioDriver(NULL),m_pRandomizer(NULL),
-		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),m_pI18nManager(NULL),
+		m_pGraphicsAdapter(NULL),m_pFileSystem(NULL),m_pI18nManager(NULL),m_pGraphicsAdapterWindow(NULL),
 		m_pUserListener(params.pEventReceiver),m_pTimer(NULL),m_pCallback(params.pCallback),
 		m_params(params),m_bClose(false),m_bResized(false),m_pCursorControl(NULL)
 	{
@@ -100,6 +101,7 @@ namespace platform{
 
 		//³õÊ¼»¯GraphicsÊÊÅäÆ÷
 		m_pGraphicsAdapter=scene::createGraphicsAdapter(m_pVideoDriver,m_pSceneManager);
+		m_pGraphicsAdapterWindow=scene::createGraphicsAdapterWindow(m_pVideoDriver,m_pSceneManager);
 
 		//³õÊ¼»¯ÉùÒôÇý¶¯Æ÷
 		m_pAudioDriver=audio::createAudioDriver(m_pFileSystem);
@@ -124,6 +126,7 @@ namespace platform{
 	CYonEngineWin32::~CYonEngineWin32(){
 		eraseEngineByHWnd(m_hWnd);
 		m_pAudioDriver->drop();
+		m_pGraphicsAdapterWindow->drop();
 		m_pGraphicsAdapter->drop();
 		m_pVideoDriver->drop();
 		m_pSceneManager->drop();

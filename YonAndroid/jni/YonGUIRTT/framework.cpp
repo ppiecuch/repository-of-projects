@@ -47,6 +47,24 @@ public:
 			case event::ENUM_MOUSE_INPUT_TYPE_MOVE:
 				//logger->debug("[LM]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return MyGUI::InputManager::getInstance().injectMouseMove(evt.mouseInput.x, evt.mouseInput.y, 0);
+			case event::ENUM_MOUSE_INPUT_TYPE_MDOWN:
+				logger->debug("[MP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				{
+					SEvent evt;
+					evt.type=ENUM_EVENT_TYPE_SYSTEM;
+					evt.systemInput.type=ENUM_SYSTEM_INPUT_TYPE_DOZE;
+					getEngine()->postEventFromUser(evt);
+				}
+				return true;
+			case event::ENUM_MOUSE_INPUT_TYPE_MUP:
+				logger->debug("[MR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				{
+					SEvent evt;
+					evt.type=ENUM_EVENT_TYPE_SYSTEM;
+					evt.systemInput.type=ENUM_SYSTEM_INPUT_TYPE_WAKE;
+					getEngine()->postEventFromUser(evt);
+				}
+				return true;
 			}
 			break;
 		case event::ENUM_EVENT_TYPE_TOUCH:
@@ -73,6 +91,7 @@ public:
 	}
 };
 
+//canvas调整大小时，尺寸超过贴图尺寸会触发重建纹理流程，重建前会调用此函数
 void eventPreTextureChanges(MyGUI::Canvas* _canvas)
 {
 	Logger->debug("eventPreTextureChanges\r\n");
@@ -88,6 +107,8 @@ void requestUpdateCanvas(MyGUI::Canvas* _canvas, MyGUI::Canvas::Event _event)
 
 	canvasDim.w=_canvas->getWidth();
 	canvasDim.h=_canvas->getHeight();
+
+	pCamera2->onResize(core::dimension2du(_canvas->getWidth(),_canvas->getHeight()));
 }
 void frameEntered(float _time)
 {
@@ -104,10 +125,12 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
-	gfAdapter=engine->getGraphicsAdapter();
+	gfAdapter=engine->getGraphicsAdapterWindow();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
+	//pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
+	pCamera2=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -126,7 +149,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	canvas = window->createWidget<MyGUI::Canvas>("Canvas", MyGUI::IntCoord(0, 0, window->getClientCoord().width, window->getClientCoord().height), MyGUI::Align::Stretch);
 
 	//创建RTT纹理
-	canvas->createTexture(MyGUI::Canvas::TRM_PT_VIEW_ALL, MyGUI::TextureUsage::RenderTarget);
+	//TODO,使用TRM_PT_VIEW_ALL在resize时会有边缘错乱的情况
+	canvas->createTexture(MyGUI::Canvas::TRM_PT_CONST_SIZE, MyGUI::TextureUsage::RenderTarget);
 	canvas->eventPreTextureChanges += MyGUI::newDelegate(eventPreTextureChanges);
 	canvas->requestUpdateCanvas = MyGUI::newDelegate(requestUpdateCanvas);
 	canvas->updateTexture();
@@ -147,12 +171,26 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
+	IMaterial* material;
+
+	/*shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	planeModel=sceneMgr->addModel(entity);
+	material=planeModel->getMaterial(0);
+	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	planeModel->setPosition(core::vector3df(0,0,0));
+	MyGUI::MyGUIRTTexture* rt=static_cast<MyGUI::MyGUIRTTexture*>(canvas->getTexture()->getRenderTarget());
+	material->setTexture(0,rt->getTexture());
+	shap->drop();
+	unit->drop();
+	entity->drop();*/
 
 	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
-	teapotModel->setPosition(core::vector3df(50,-50,0));
+	teapotModel->setPosition(core::vector3df(50,50,0));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -171,32 +209,36 @@ void drawFrame(){
 
 	core::rectf r(0,1,1,0);
 
-	pCamera->render(videoDriver);
-
 	rt=canvas->getTexture()->getRenderTarget();
 
-	oldProjection=videoDriver->getTransform(ENUM_TRANSFORM_PROJECTION);
-	videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,projection);
+	//oldProjection=videoDriver->getTransform(ENUM_TRANSFORM_PROJECTION);
+	//videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,projection);
+	pCamera2->setNeedUpload();
+	pCamera2->render(videoDriver);
 	rt->begin();
 	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
 	//teapotModel->setVisible(true);
 	//sceneMgr->render(videoDriver);
 	//teapotModel->setVisible(false);
-	gfAdapter->clearZ(-1000);
+	gfAdapter->clearZ(1000);
 	
-	gfAdapter->drawRegion("trans.png",canvasDim,r,0,0,128,64,ENUM_TRANS_NONE);
+	gfAdapter->drawRegion("trans.png",r,0,0,128,64,ENUM_TRANS_NONE);
+	gfAdapter->drawRegion("test-png8.png",r,128,64,64,64,ENUM_TRANS_MIRROR);
 	gfAdapter->render();
 
 	rt->end();
-	videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,oldProjection);
+	//videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,oldProjection);
+
 	//sceneMgr->render(videoDriver);
+	pCamera->setNeedUpload();
+	pCamera->render(videoDriver);
 
 	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
-	gfAdapter->clearZ(-1000);
-	gfAdapter->drawRegion("trans.png",r,0,0,800,480,ENUM_TRANS_NONE);
+	gfAdapter->clearZ(1000);
+	gfAdapter->drawRegion("trans.png",r,0,0,128,64,ENUM_TRANS_NONE);
 	gfAdapter->render();
 
-	//pCamera->render(videoDriver);
+	
 	guiAdapter->render();
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);

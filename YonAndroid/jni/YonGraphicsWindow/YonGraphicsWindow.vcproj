@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="YonGUIRTT"
-	ProjectGUID="{A4859462-1072-4FC8-9E6E-FD53FBE13AD0}"
-	RootNamespace="YonGUIRTT"
+	Name="YonGraphicsWindow"
+	ProjectGUID="{BED7FD02-E98C-4B1C-8B41-C0FD4006E4C9}"
+	RootNamespace="YonGraphicsWindow"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../MyGUIEngine/include;../include;../freetype/include;../MyGUIAdapter"
+				AdditionalIncludeDirectories="../include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -167,10 +167,6 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\AndroidGUIRTT.mk"
-			>
-		</File>
-		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>
@@ -181,18 +177,6 @@
 		<File
 			RelativePath=".\main.cpp"
 			>
-		</File>
-		<File
-			RelativePath=".\yon_AndroidGLView.cpp"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				ExcludedFromBuild="true"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-				/>
-			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

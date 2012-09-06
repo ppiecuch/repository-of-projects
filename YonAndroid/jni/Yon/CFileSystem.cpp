@@ -89,6 +89,11 @@ namespace io{
 		if(filename.findFirst(':')!=-1)
 			return filename;
 
+#ifdef YON_COMPILE_WITH_ANDROID
+		if(filename.find("/sdcard/")==0)
+			return filename;
+#endif
+
 		io::path result;
 		for(u32 i=0;i<m_workingDirectories.size();++i)
 		{

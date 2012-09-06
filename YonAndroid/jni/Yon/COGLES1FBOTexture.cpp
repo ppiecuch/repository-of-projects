@@ -12,7 +12,9 @@ namespace ogles1{
 
 		m_bIsRenderTarget=true;
 
-		logon();
+		glGenFramebuffersOES(1, &m_fboId);
+		glGenRenderbuffersOES(1, &m_rboId);
+		uploadTexture();
 
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance COGLES1FBOTexture");
 	}
@@ -26,12 +28,12 @@ namespace ogles1{
 	}
 
 	void COGLES1FBOTexture::logon(){
-		if(!m_fboId)
-			glGenFramebuffersOES(1, &m_fboId);
-		if(!m_rboId)
-			glGenRenderbuffersOES(1, &m_rboId);
-		if(!m_textureId)
-			glGenTextures(1, &m_textureId);
+		//if(!m_fboId)
+		//	glGenFramebuffersOES(1, &m_fboId);
+		//if(!m_rboId)
+		//	glGenRenderbuffersOES(1, &m_rboId);
+		//if(!m_textureId)
+		//	glGenTextures(1, &m_textureId);
 		uploadTexture();
 	}
 

@@ -458,6 +458,9 @@ namespace ogles1{
 		{
 			m_pRenderTarget=NULL;
 			setViewPort(core::recti(0,0,m_windowSize.w,m_windowSize.h));
+
+			if(m_pCurrentMaterial)
+				m_materialRenderers[m_pCurrentMaterial->getMaterialType()]->onSetMaterial(m_pCurrentMaterial,NULL);
 		}
 		clearView(backBuffer,zBuffer,color);
 	}
@@ -876,7 +879,7 @@ namespace ogles1{
 		video::ITexture* rtt = 0;
 		
 
-		if(queryFeature(ENUM_VIDEO_FEATURE_FBO))
+		if(queryFeature(ENUM_VIDEO_FEATURE_FBO)&&false)
 		{
 			Logger->debug(YON_LOG_SUCCEED_FORMAT,"use fast RTT for supporting FBO!");
 

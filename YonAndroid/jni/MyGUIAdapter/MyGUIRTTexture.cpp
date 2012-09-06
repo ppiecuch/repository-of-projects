@@ -19,13 +19,13 @@ namespace MyGUI{
 		m_renderTargetInfo.pixScaleX = 1.0f / width;
 		m_renderTargetInfo.pixScaleY = 1.0f / height;
 
-		f32 hh=height/2;
-		f32 hw=width/2;
+		//f32 hh=height/2;
+		//f32 hw=width/2;
 
-		Logger->debug("half:%.2f,%.2f\r\n",hw,hh);
+		//Logger->debug("half:%.2f,%.2f\r\n",hw,hh);
 
-		m_projection.makeIdentity();
-		m_projection.ortho(-hw,hw,-hh,hh,1,3000);
+		//m_projection.makeIdentity();
+		//m_projection.ortho(-hw,hw,-hh,hh,1,3000);
 	}
 	MyGUIRTTexture::~MyGUIRTTexture(){
 	}

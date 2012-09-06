@@ -20,7 +20,7 @@ private:
 	MyGUI::MyGUIRenderManager* m_pRenderManager;
 	video::ITexture* m_pTexture;
 	video::IVideoDriver* m_pDriver;
-	core::matrix4f m_projection,m_oldProjection;
+	//core::matrix4f m_projection,m_oldProjection;
 public:
 	MyGUIRTTexture(video::ITexture* texture,video::IVideoDriver* driver,MyGUI::MyGUIRenderManager* renderManager);
 	//MyGUIRTTexture(video::ITexture* texture);

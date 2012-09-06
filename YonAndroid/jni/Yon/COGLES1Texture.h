@@ -20,9 +20,15 @@ namespace ogles1{
 		bool m_bIsRenderTarget;
 		bool m_bHasMipMap;
 		bool m_bReserveImage;
+		bool m_bUse16Bit1Alpha;
+		bool m_bUse16Bit4Alpha;
 
 		core::recti m_viewport;
 
+		//返回图像信息是否正常
+		bool checkImageInfo(video::IImage* image);
+		//返回是否执行转换处理
+		bool convertImageFormat(video::IImage* image);
 		virtual void uploadTexture();
 
 		//用于子类构造
