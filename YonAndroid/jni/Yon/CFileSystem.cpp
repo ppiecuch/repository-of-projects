@@ -9,8 +9,10 @@
 #ifdef YON_COMPILE_WITH_WIN32
 #include <stdlib.h> //for _MAX_PATH
 #include <direct.h> //for _getcwd
+#include "dirent.h"
 #elif defined(YON_COMPILE_WITH_ANDROID)
 #include <unistd.h>
+#include <dirent.h>
 #endif
 
 #include "ILogger.h"
@@ -115,12 +117,55 @@ namespace io{
 		Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("Not found resource:%s in working directories!",filename.c_str()).c_str());
 		return io::path("");
 	}
-	void CFileSystem::addWorkingDirectory(const io::path& newDirectory){
+
+	void CFileSystem::recurseAddSubDirectory(io::path& dir){
+		static io::path current=io::path(".");
+		static io::path parent=io::path("..");
+		static io::path svn=io::path(".svn");
+
+		struct dirent *entry;
+		DIR *dp = opendir(dir.c_str());
+		if (dp == NULL) 
+			return;
+		while((entry = readdir(dp)))
+		{
+			if(current==entry->d_name)
+				continue;
+			if(parent==entry->d_name)
+				continue;
+			if(svn==entry->d_name)
+				continue;
+			if(entry->d_type==DT_DIR)
+			{
+				io::path sub=io::path("%s%s",dir.c_str(),entry->d_name);
+				core::regularize(sub);
+				Logger->debug("addWorkingDirectory:%s\r\n",sub.c_str());
+				m_workingDirectories.push_back(sub);
+				recurseAddSubDirectory(sub);
+			}
+		}
+		closedir(dp);
+	}
+	void CFileSystem::addWorkingDirectory(const io::path& newDirectory, bool recurse){
 		//TODOÕýÔò
 		io::path dir=getAbsolutePath(newDirectory);
 		core::regularize(dir);
+
+		struct dirent *entry;
+		DIR *dp = opendir(dir.c_str());
+		if (dp == NULL) {
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("addWorkingDirectory:%s failed,for dir not exist or can't access!",dir.c_str()).c_str());
+			return;
+		}
+
 		Logger->debug("addWorkingDirectory:%s\r\n",dir.c_str());
 		m_workingDirectories.push_back(dir);
+
+		if(recurse)
+		{
+			recurseAddSubDirectory(dir);
+		}
+		closedir(dp);
 	}
 	io::path CFileSystem::getAbsolutePath(const io::path& filename) const{
 #ifdef YON_COMPILE_WITH_WIN32

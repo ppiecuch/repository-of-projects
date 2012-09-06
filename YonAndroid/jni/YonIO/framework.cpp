@@ -68,7 +68,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->addWorkingDirectory("../media/");
+	fs->addWorkingDirectory("../media/",true);
 	fs->addWorkingDirectory("../Yon/");
 	fs->addWorkingDirectory("D:/Development/Tools/xls2xlbV2.0/output");
 #elif defined(YON_COMPILE_WITH_ANDROID)
@@ -134,7 +134,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	while(reader->read());
 	reader->drop();
-#elif 1
+#elif 0
 	IReadStream* stream=fs->createAndOpenReadFileStream("consume.xlb",io::ENUM_ENDIAN_MODE_BIG);
 	core::stringc header=stream->readString();
 	s32 versionCode=stream->readInt();
@@ -173,7 +173,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	0x80,0xe8,0xaf,0xb7,0xe8,0xb5,0x9b,0x00};    //UTF-8编码
 	//Logger->debug("%s\r\n",i18nManager->convert("中华人民共和国",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8).c_str());
 	//Logger->debug("%s\r\n",i18nManager->convert("涓崕浜烘皯鍏卞拰鍥",ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
-	Logger->debug("%s\r\n",i18nManager->convert(in_utf8,ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+	//Logger->debug("%s\r\n",i18nManager->convert(in_utf8,ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
 #endif
 
 	return true; 
