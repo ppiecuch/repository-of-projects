@@ -1,6 +1,8 @@
 
 #include "CWindowOrthoCamera.h"
 
+#include "ILogger.h"
+
 namespace yon{
 namespace scene{
 namespace camera{
@@ -19,6 +21,7 @@ namespace camera{
 		m_originalPos.x=size.w>>1;
 		m_originalPos.y=size.h>>1;
 		COrthoCamera::onResize(size);
+		Logger->debug("CWindowOrthoCamera.onResize:%08X,%d,%d\r\n",this,size.w,size.h);
 	}
 }
 }

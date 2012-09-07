@@ -124,8 +124,8 @@ yon_SOURCES :=   \
 		Yon/CReadFileStream.cpp \
 		Yon/CWriteFileStream.cpp \
 		Yon/CReadMemoryStream.cpp \
-		Yon/EncodeConvertor.cpp \
 		Yon/CI18NManager.cpp \
+		Yon/EncodeConvertor.cpp \
 		Yon/COrthoCamera.cpp \
 		Yon/CPerspCamera.cpp \
 		Yon/CViewFrustum.cpp \
@@ -142,6 +142,7 @@ yon_SOURCES :=   \
 		Yon/CAnimatorFactory.cpp \
 		Yon/CAnimatorCameraFPS.cpp \
 		Yon/CGraphicsAdapter.cpp \
+		Yon/CGraphicsAdapterWindow.cpp \
 		Yon/CSceneManager.cpp \
 		Yon/CTimerAndroid.cpp \
 		Yon/CFPSCounter.cpp \
@@ -168,7 +169,8 @@ LOCAL_SRC_FILES := \
 		$(ogg_SOURCES) \
 		$(vorbis_SOURCES) \
 		$(yon_SOURCES)
-
+		
+		
 LOCAL_ARM_MODE   := arm 
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lstdc++ -Wl
 include $(BUILD_SHARED_LIBRARY)

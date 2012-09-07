@@ -212,8 +212,8 @@ namespace platform{
 		else
 		{
 			core::dimension2du newsize((u32)r.right, (u32)r.bottom);
-			m_pVideoDriver->onResize(newsize);
-			m_pSceneManager->onResize(newsize);
+			//m_pVideoDriver->onResize(newsize);
+			//m_pSceneManager->onResize(newsize);
 
 			event::SEvent evt;
 			evt.type=event::ENUM_EVENT_TYPE_SYSTEM;
@@ -243,7 +243,32 @@ namespace platform{
 		}
 
 		bool absorbed = false;
+		bool penetrability=evt.type==event::ENUM_EVENT_TYPE_SYSTEM;
+
+		if(penetrability)
+		{
+			absorbed=m_pVideoDriver->onEvent(evt)||absorbed;
+			absorbed=m_pAudioDriver->onEvent(evt)||absorbed;
+			absorbed=m_pUserListener->onEvent(evt)||absorbed;
+			absorbed=m_pSceneManager->onEvent(evt)||absorbed;
+		}
+		else
+		{
+			absorbed=m_pVideoDriver->onEvent(evt);
+			if(absorbed)
+				return absorbed;
+			absorbed=m_pAudioDriver->onEvent(evt);
+			if(absorbed)
+				return absorbed;
+			if (m_pUserListener)
+				absorbed = m_pUserListener->onEvent(evt);
+			if(absorbed)
+				return absorbed;
+			absorbed = m_pSceneManager->onEvent(evt);
+		}
 	
+		//deprecated
+		/*
 		m_pVideoDriver->onEvent(evt);
 		m_pAudioDriver->onEvent(evt);
 
@@ -256,6 +281,7 @@ namespace platform{
 
 		if (!absorbed && m_pSceneManager)
 			absorbed = m_pSceneManager->postEventFromUser(evt);
+		*/
 
 		return absorbed;
 	}

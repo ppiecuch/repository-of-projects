@@ -84,6 +84,11 @@ public:
 			case event::ENUM_SYSTEM_INPUT_TYPE_RESIZE:
 				guiAdapter->onResize(core::dimension2du(evt.systemInput.screenWidth,evt.systemInput.screenHeight));
 				return true;
+			case event::ENUM_SYSTEM_INPUT_TYPE_WAKE:
+				{
+					//有了setEventReceivable,不再需要调用updateTexture
+					//canvas->updateTexture();
+				}
 			}
 			break;
 		}
@@ -130,6 +135,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs=engine->getFileSystem();
 	//pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	pCamera2=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
+	pCamera2->setEventReceivable(false);
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	logger=Logger;
 
@@ -150,6 +156,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	//创建RTT纹理
 	//TODO,使用TRM_PT_VIEW_ALL在resize时会有边缘错乱的情况
+	//canvas->createTexture(MyGUI::Canvas::TRM_PT_VIEW_ALL, MyGUI::TextureUsage::RenderTarget);
 	canvas->createTexture(MyGUI::Canvas::TRM_PT_CONST_SIZE, MyGUI::TextureUsage::RenderTarget);
 	canvas->eventPreTextureChanges += MyGUI::newDelegate(eventPreTextureChanges);
 	canvas->requestUpdateCanvas = MyGUI::newDelegate(requestUpdateCanvas);
@@ -235,7 +242,7 @@ void drawFrame(){
 
 	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
 	gfAdapter->clearZ(1000);
-	gfAdapter->drawRegion("trans.png",r,0,0,128,64,ENUM_TRANS_NONE);
+	gfAdapter->drawRegion("trans.png",r,180,200,128,64,ENUM_TRANS_NONE);
 	gfAdapter->render();
 
 	

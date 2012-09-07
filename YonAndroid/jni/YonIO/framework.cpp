@@ -49,8 +49,8 @@ public:
 };
 
 bool init(void *pJNIEnv,u32 width,u32 height){
-	params.windowSize.w=400;
-	params.windowSize.h=400;
+	params.windowSize.w=width;
+	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	//params.fpsLimit=10;
 	params.pEventReceiver=new MyEventReceiver();
@@ -72,7 +72,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("../Yon/");
 	fs->addWorkingDirectory("D:/Development/Tools/xls2xlbV2.0/output");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->addWorkingDirectory("media/");
+	fs->addWorkingDirectory("media/",true);
 	fs->addWorkingDirectory("temp/");
 #endif
 

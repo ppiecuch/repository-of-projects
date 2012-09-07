@@ -308,9 +308,10 @@ namespace scene{
 
 	}
 
-	void CSceneManager::onResize(const core::dimension2du& size){
+	void CSceneManager::onResize(u32 width,u32 height){
 		for(u32 i=0;i<m_cameras.size();++i){
-			m_cameras[i]->onResize(size);
+			if(m_cameras[i]->isEventReceivable())
+				m_cameras[i]->onResize(core::dimension2du(width,height));
 		}
 	}
 
@@ -322,14 +323,20 @@ namespace scene{
 		return m_pAnimatorFactory;
 	}
 
-	bool CSceneManager::postEventFromUser(const event::SEvent& evt){
+	bool CSceneManager::onEvent(const event::SEvent& evt){
 		//TODO
 		//Logger->debug("%d,%d,%d,%d\n",evt.type,evt.mouseInput.type,evt.mouseInput.x,evt.mouseInput.y);
 		//if(m_activeCamera)
 		//	return m_activeCamera->onEvent(evt);
+		//TODO系统事件与输入事件传递是否使用不同策略
 		//TODO是使用ViewCamera正确还是使用LogisticCamera正确有待进一步探查
-		if(m_pViewingCamera)
-			return m_pViewingCamera->onEvent(evt);
+		if(evt.type==event::ENUM_EVENT_TYPE_SYSTEM&&evt.systemInput.type==event::ENUM_SYSTEM_INPUT_TYPE_RESIZE)
+			onResize(evt.systemInput.screenWidth,evt.systemInput.screenHeight);
+		else
+		{
+			if(m_pViewingCamera)
+				return m_pViewingCamera->onEvent(evt);
+		}
 		return false;
 	}
 

@@ -69,6 +69,7 @@ namespace yon{
 			video::MYGUI_MATERIAL->setFrontFace(video::ENUM_FRONT_FACE_CW);
 			//TODO由于MyGUI引擎的freetype字体顶点序列是CCW的，而其UI界面顶点序列则是CW的，临时解决办法是关闭CullFace
 			video::MYGUI_MATERIAL->setState(video::ENUM_MATERIAL_STATE_CULL_FACE,false);
+			video::MYGUI_MATERIAL->setFilterMode(0,video::ENUM_FILTER_MODE_NEAREST);
 		}else{
 			video::MYGUI_MATERIAL->grab();
 		}

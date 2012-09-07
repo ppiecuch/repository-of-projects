@@ -293,6 +293,9 @@ namespace ogles1{
 		case event::ENUM_EVENT_TYPE_SYSTEM:
 			switch(event.systemInput.type)
 			{
+			case event::ENUM_SYSTEM_INPUT_TYPE_RESIZE:
+				onResize(core::dimension2du(event.systemInput.screenWidth,event.systemInput.screenHeight));
+				break;
 			case event::ENUM_SYSTEM_INPUT_TYPE_DOZE:
 				setState(ENUM_DRIVER_STATE_TO_SLEEP);
 				break;
@@ -468,7 +471,8 @@ namespace ogles1{
 		m_windowSize.w=(s32)size.w;
 		m_windowSize.h=(s32)size.h;
 		setViewPort(core::recti(0,0,size.w,size.h));
-
+		//if(m_pDebugPrinter)
+		//	m_pDebugPrinter->onResize(size);
 		IVideoDriver::onResize(size);
 	}
 	void COGLES1Driver::drawUnit(scene::IUnit* unit){
@@ -879,7 +883,7 @@ namespace ogles1{
 		video::ITexture* rtt = 0;
 		
 
-		if(queryFeature(ENUM_VIDEO_FEATURE_FBO)&&false)
+		if(queryFeature(ENUM_VIDEO_FEATURE_FBO))
 		{
 			Logger->debug(YON_LOG_SUCCEED_FORMAT,"use fast RTT for supporting FBO!");
 

@@ -60,7 +60,9 @@ namespace debug{
 			//m_pUnit->getMaterial()->setBlendDstFactor(video::ENUM_BLEND_FACTOR_ONE);
 			//m_pUnit->getMaterial()->setAlphaSource(video::ENUM_ALPHA_SOURCE_TEXTURE);
 			m_pUnit->getMaterial()->setFilterMode(0,video::ENUM_FILTER_MODE_NEAREST);
+			//m_pUnit->getMaterial()->setPolygonMode(video::ENUM_POLYGON_MODE_LINE);
 
+			//ÏòVideoDriver×¢²áResizable
 			m_pDriver->registerResizable(this);
 	}
 

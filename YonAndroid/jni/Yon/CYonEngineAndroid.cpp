@@ -126,8 +126,9 @@ namespace platform{
 		if (!m_bResized)
 			return;
 
-		m_pVideoDriver->onResize(m_params.windowSize);
-		m_pSceneManager->onResize(m_params.windowSize);
+		//deprecated
+		//m_pVideoDriver->onResize(m_params.windowSize);
+		//m_pSceneManager->onResize(m_params.windowSize);
 
 		event::SEvent evt;
 		evt.type=event::ENUM_EVENT_TYPE_SYSTEM;
@@ -147,10 +148,34 @@ namespace platform{
 		return absorbed;
 	}
 
-	bool CYonEngineAndroid::postEventFromUser(const event::SEvent& event){
+	bool CYonEngineAndroid::postEventFromUser(const event::SEvent& evt){
 		bool absorbed = false;
 
-		m_pVideoDriver->onEvent(event);
+		bool penetrability=evt.type==event::ENUM_EVENT_TYPE_SYSTEM;
+
+		if(penetrability)
+		{
+			absorbed=m_pVideoDriver->onEvent(evt)||absorbed;
+			absorbed=m_pAudioDriver->onEvent(evt)||absorbed;
+			absorbed=m_pUserListener->onEvent(evt)||absorbed;
+			absorbed=m_pSceneManager->onEvent(evt)||absorbed;
+		}
+		else
+		{
+			absorbed=m_pVideoDriver->onEvent(evt);
+			if(absorbed)
+				return absorbed;
+			absorbed=m_pAudioDriver->onEvent(evt);
+			if(absorbed)
+				return absorbed;
+			if (m_pUserListener)
+				absorbed = m_pUserListener->onEvent(evt);
+			if(absorbed)
+				return absorbed;
+			absorbed = m_pSceneManager->onEvent(evt);
+		}
+
+		/*m_pVideoDriver->onEvent(event);
 		m_pAudioDriver->onEvent(event);
 
 		if (m_pUserListener)
@@ -162,6 +187,7 @@ namespace platform{
 
 		if (!absorbed && m_pSceneManager)
 			absorbed = m_pSceneManager->postEventFromUser(event);
+		*/
 
 		return absorbed;
 	}
