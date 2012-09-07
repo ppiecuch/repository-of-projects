@@ -1,0 +1,81 @@
+俗话说，“工欲善其事，必先利其器”，所以学习Objective-C的第一件事就是配置Objective-C下面的开发环境。有苹果机的幸福在 于，可以很方便的在XCode下面写Objective-C的程序。可惜的是不能整天带着我的大熊猫到处跑，所以也有必要在windows系统下面配置一 个环境方便学习。我们都是被IDE惯坏的孩子，本以为可以很方便做的事情（我是说配置环境），没想到居然花了两天时间来琢磨怎么搞这个事情那个，顺便又复 习了一C语言的编译过程。
+安装
+在windows下面想要安装一个GNUstep的环境其实是很简单的一件事情。不过说实话，GNUstep.org上面的文档还真的是很乱。我为此还安装了Cygwin和MinGW。事实上这些都不用安装，只需要在这里 找到windows installer 就 可以了。下载下来的文件有两个，一个是GNUstep System，其实就是MinGW和MSYS，一个是GNUstep Core，这才是我们需要GNUstep相关的东西。安装很简单，就是windows下面的标准安装程序。装完后，在开始菜单里面，有一个GNUstep 的菜单，点击shell就可以进入MSYS交互环境了。
+第一个程序
+先让我们来点有成就感的事情。新建一个文件main.m
+> vim main.m
+(在你的GNUstep安装目录下面的home\<username>文件夹里面，比如我的是C:\GNUstep\home\stelee\ 就会生成一个main.m文件)
+添加如下内容
+Objective-c代码  
+#import <stdio.h>  
+    int main(int argc,const char *argv[]){  
+    printf(”hello world\n”);  
+    return 0;  
+}  
+ 
+ 
+然后运行gcc main.m
+你就会发现在同一个目录下面有一个a.exe
+在shell环境下执行 ./a.exe就可以看到正确的输出了。是不是很简单？基本上来说，这个第一个文件虽然是以m结尾的，但是确是一个标准的C语言程序，所以我们可以没有任何障碍的编译执行。那么一个“真正”意义上的objective-c程序呢？
+
+给你一点挫折
+我们修改一下main.m程序
+Objective-c代码  
+#import <Foundation/Foundation.h>  
+  
+int main(int argc, char**argv)  
+  
+{  
+  
+NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];  
+  
+NSLog(@”headfile dir is ok\n”);  
+  
+[pool release];  
+  
+return 0;  
+  
+}  
+ 
+这个程序我们使用了Objective-C的Foundation库。再执行
+gcc main.m
+main.m:1:34: Foundation/Foundation.h: No such file or directory
+main.m: In function `main’:
+main.m:7: error: `NSAutoreleasePool’ undeclared (first use in this function)
+main.m:7: error: (Each undeclared identifier is reported only once
+main.m:7: error: for each function it appears in.)
+main.m:7: error: `pool’ undeclared (first use in this function)
+main.m:11: error: cannot find interface declaration for `NXConstantString’
+Step by step慢慢解决
+好像是库文件找不到。这个没问题，我们添加一个库文件，同时我们分开执行编译和链接，看看都发生了什么事情
+gcc -c main.m -I /GNUstep/System/Library/Headers
+main.m:11: error: cannot find interface declaration for `NXConstantString’
+在代码中，我们使用了@”headfile dir is ok\n”，看来需要为编译器制定默认的Constant String类型，别忘了，这是C语言嘛
+Shell代码  
+gcc -fconstant-string-class=NSConstantString -c main.m -I /GNUstep/System/Library/Headers  
+ 
+ 
+好像编译成功了，我们的目录下面有一个main.o文件。
+下面链接这个文件
+gcc -o main main.o
+main.o:main.m:(.text+0×33): undefined reference to `objc_get_class’
+main.o:main.m:(.text+0×45): undefined reference to `objc_msg_lookup’
+main.o:main.m:(.text+0×64): undefined reference to `objc_msg_lookup’
+main.o:main.m:(.text+0×80): undefined reference to `NSLog’
+main.o:main.m:(.text+0×93): undefined reference to `objc_msg_lookup’
+main.o:main.m:(.text+0xbc): undefined reference to `__objc_exec_class’
+main.o:main.m:(.data+0×74): undefined reference to `__objc_class_name_NSAutorele
+asePool’
+main.o:main.m:(.data+0×78): undefined reference to `__objc_class_name_NSConstant
+String’
+collect2: ld returned 1 exit status
+光有头文件，没有执行的链接库怎么行呢，于是我们得到了最终的命令：
+Shell代码  
+gcc -o main main.o -L /GNUstep/System/Library/Libraries/ -lobjc -lgnustep-base  
+ 
+最终得到了我们想要的main.exe
+赶紧执行一下./main.exe看看效果吧
+在后续的文章中我将介绍怎么写makefile和怎么使用ruby来构建自动化编译过程。不过现在我可以快速的开始我的objective-c的学习了！
+
+
+http://elton.iteye.com/blog/344899
