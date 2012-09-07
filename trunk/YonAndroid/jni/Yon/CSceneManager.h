@@ -72,6 +72,8 @@ namespace yon{
 			platform::ICursorControl* m_pCursorControl;
 			IGeometryFactory* m_geometryFactory;
 			animator::IAnimatorFactory* m_pAnimatorFactory;
+
+			void onResize(u32 width,u32 height);
 		public:
 			CSceneManager(ITimer* timer,platform::ICursorControl* cursorControl);
 			virtual ~CSceneManager();
@@ -120,9 +122,7 @@ namespace yon{
 
 			virtual animator::IAnimatorFactory* getAnimatorFactory() const;
 
-			virtual void onResize(const core::dimension2du& size);
-
-			virtual bool postEventFromUser(const event::SEvent& evt);
+			virtual bool onEvent(const event::SEvent& evt);
 		};
 	}
 }

@@ -84,9 +84,10 @@ namespace scene{
 		virtual ENUM_SCENE_PASS getRenderingPass() const = 0;
 
 		//TODO protected
-		virtual void onResize(const core::dimension2du& size) = 0;
+		//virtual void onResize(const core::dimension2du& size) = 0;
 
-		virtual bool postEventFromUser(const event::SEvent& evt) = 0;
+		//virtual bool postEventFromUser(const event::SEvent& evt) = 0;
+		virtual bool onEvent(const event::SEvent& evt) = 0;
 
 		//! Check if node is culled in current view frustum
 		// return True if node is not visible in the current scene, else false.

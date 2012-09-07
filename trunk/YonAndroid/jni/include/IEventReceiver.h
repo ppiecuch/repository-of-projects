@@ -120,6 +120,7 @@ namespace yon{
 			virtual ~IEventReceiver(){}
 			//如果消化了事件，return true
 			virtual bool onEvent(const SEvent& event) = 0;
+			virtual bool isEventReceivable() const{return true;}
 		};
 	}
 }

@@ -27,6 +27,7 @@ namespace camera{
 			ENUM_FRUSTUM_TRANSFORM_COUNT
 		};
 		bool m_bVisible;
+		bool m_bEventReceivable;
 		core::matrix4f m_matrixs[ENUM_FRUSTUM_TRANSFORM_COUNT];
 		core::vector3df m_target;
 		core::vector3df m_up;		//保持归一化
@@ -43,7 +44,9 @@ namespace camera{
 		ICamera(IModel* parent=NULL,const core::vector3df& pos=core::vector3df(0,0,1),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,-1),bool visible=false):
-			IModel(parent,pos),m_up(up),m_target(lookat),m_direction(lookat-pos),m_bVisible(visible),m_fNear(1),m_fFar(3000.0f),m_bNeedUpload(true),m_bDirectionNeedUpdate(true){
+			IModel(parent,pos),m_up(up),m_target(lookat),m_direction(lookat-pos),
+				m_bVisible(visible),m_fNear(1),m_fFar(3000.0f),m_bNeedUpload(true),
+				m_bDirectionNeedUpdate(true),m_bEventReceivable(true){
 				m_up.normalize();
 				m_direction.normalize();
 				//for(u32 i=0;i<ENUM_FRUSTUM_TRANSFORM_COUNT;++i)
@@ -53,6 +56,9 @@ namespace camera{
 		void setNeedUpload(){
 			m_bNeedUpload=true;
 		}
+
+		virtual bool isEventReceivable() const{return m_bEventReceivable;}
+		virtual void setEventReceivable(bool on){m_bEventReceivable=on;}
 
 		virtual bool onEvent(const event::SEvent& evt){
 
