@@ -51,7 +51,7 @@ namespace yon{
 		
 	}
 
-	ITimer* createTimer(){
+	YON_API ITimer* createTimer(){
 		return new platform::CTimerAndroid();
 	}
 }

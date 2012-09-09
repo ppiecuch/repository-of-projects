@@ -47,6 +47,7 @@ namespace video{
 		return 0;
 	}
 
+	//! Converts a 32bit (A8B8G8R8) color to a 16bit A1B5G5R5 color
 	inline u16 A8B8G8R8toR5G5B5A1(u32 color)
 	{
 		return (u16)(( color & 0x80000000) >> 31|

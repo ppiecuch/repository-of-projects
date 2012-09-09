@@ -61,10 +61,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
-	gfAdapter=engine->getGraphicsAdapter();
+	gfAdapter=engine->getGraphicsAdapterWindow();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0));
 	logger=Logger;
 	timer=engine->getTimer();
 	randomizer=engine->getRandomizer();
@@ -195,7 +195,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
    p_SpeEffectSet->load(p_FileReader);
    p_FileReader->drop();
    
-   p_SpeEffectSet->setPos(position2di(0,0));
+   p_SpeEffectSet->setPos(position2di(200,250));
 
    IMaterial* material;
    IShap *shap;
@@ -246,7 +246,7 @@ void drawFrame(){
 	//p_BillboardAmt->draw();
    
 
-	gfAdapter->clearZ(-1000);
+	gfAdapter->clearZ(1000);
 
 	core::rectf r(0,0,1,1);
 	//for(u32 i=0;i<100;++i){
@@ -280,12 +280,12 @@ void drawFrame(){
 	}
 	else
 		lastTime=timer->getRealTime();
-	gfAdapter->drawRegion("3.png",r,250,120,512,512,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),false);
-	gfAdapter->drawRegion("test.png",r,200,120,128,64,ENUM_TRANS_ROT90);
-	gfAdapter->drawRegion("shadow.png",r,50,170,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
-	gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);
-	gfAdapter->drawRegion("trans.png",r,200,320,128,64,ENUM_TRANS_MIRROR_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
-	gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
+	//gfAdapter->drawRegion("3.png",r,250,120,512,512,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),false);
+	//gfAdapter->drawRegion("test.png",r,200,120,128,64,ENUM_TRANS_ROT90);
+	//gfAdapter->drawRegion("shadow.png",r,50,170,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
+	//gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);
+	gfAdapter->drawRegion("de.png",r,200,320,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
+	//gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
 
 	gfAdapter->drawImage("shadow.png",0,0,64,32,50,50,true,0xAA000000);
 

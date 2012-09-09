@@ -513,6 +513,7 @@ void CParticleSystem::draw()
 		p_material->setBlendSrcFactor(src_fator);
 		p_material->setBlendDstFactor(dst_fator);
 		p_material->setAlphaSource((ENUM_ALPHA_SOURCE)alphasource);
+		p_material->setFrontFace(ENUM_FRONT_FACE_CW);
 		//p_material->states.CullFace=false;
 		p_material->setModulate(modufun);
 	}

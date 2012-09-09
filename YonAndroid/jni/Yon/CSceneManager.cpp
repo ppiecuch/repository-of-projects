@@ -334,7 +334,7 @@ namespace scene{
 			onResize(evt.systemInput.screenWidth,evt.systemInput.screenHeight);
 		else
 		{
-			if(m_pViewingCamera)
+			if(m_pViewingCamera&&m_pViewingCamera->isEventReceivable())
 				return m_pViewingCamera->onEvent(evt);
 		}
 		return false;

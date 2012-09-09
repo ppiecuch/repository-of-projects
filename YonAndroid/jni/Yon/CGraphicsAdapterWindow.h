@@ -73,6 +73,29 @@ namespace yon{
 				scene::ENUM_VERTEX_TYPE m_vertexType;
 			};
 
+			struct ComprehensiveEntry{
+				ComprehensiveEntry(video::IMaterial* material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType,f32 z)
+					:m_pMaterial(material),m_pVertices(vertices),m_uVertexCount(vertexCount),m_pIndices(indice),m_uIndexCount(indexCount),m_vertexType(vType),m_fZ(z),m_pUnit(NULL)
+				{}
+
+				ComprehensiveEntry(DefaultUnit* unit,f32 z):m_pUnit(unit),m_fZ(z){}
+
+				bool operator < (const ComprehensiveEntry& other) const
+				{
+					return m_fZ>other.m_fZ;
+				}
+
+				f32 m_fZ;
+				DefaultUnit* m_pUnit;
+
+				video::IMaterial* m_pMaterial;
+				const void* m_pVertices;
+				u32 m_uVertexCount;
+				const void* m_pIndices;
+				u32 m_uIndexCount;
+				scene::ENUM_VERTEX_TYPE m_vertexType;
+			};
+
 			//typedef core::CObjectPoolNill<DefaultUnit> DefaultUnitPool;
 			typedef core::CObjectPool<DefaultUnit> DefaultUnitPool;
 			DefaultUnitPool m_defaultPool;
@@ -80,6 +103,7 @@ namespace yon{
 			core::array<SolidEntry> m_solids;
 			core::array<TransparentEntry> m_transparents;
 			core::array<EffectEntry> m_effects;
+			core::array<ComprehensiveEntry> m_comprehensives;
 
 			//video::IMaterial* m_pSolidMaterial;
 			video::IMaterial* m_pTransparentRefMaterial;

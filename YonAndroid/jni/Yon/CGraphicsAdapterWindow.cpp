@@ -88,8 +88,10 @@ namespace scene{
 		unit->m_pTexture=texture;
 		if(useAlpha)
 		{
-			TransparentEntry entry(unit,z);
-			m_transparents.push_back(entry);
+			//TransparentEntry entry(unit,z);
+			//m_transparents.push_back(entry);
+			ComprehensiveEntry entry(unit,z);
+			m_comprehensives.push_back(entry);
 		}
 		else
 		{
@@ -132,8 +134,10 @@ namespace scene{
 		unit->m_pTexture=texture;
 		if(useAlpha)
 		{
-			TransparentEntry entry(unit,z);
-			m_transparents.push_back(entry);
+			//TransparentEntry entry(unit,z);
+			//m_transparents.push_back(entry);
+			ComprehensiveEntry entry(unit,z);
+			m_comprehensives.push_back(entry);
 		}
 		else
 		{
@@ -246,8 +250,10 @@ namespace scene{
 		unit->m_pTexture=texture;
 		if(useAlpha)
 		{
-			TransparentEntry entry(unit,z);
-			m_transparents.push_back(entry);
+			//TransparentEntry entry(unit,z);
+			//m_transparents.push_back(entry);
+			ComprehensiveEntry entry(unit,z);
+			m_comprehensives.push_back(entry);
 		}
 		else
 		{
@@ -350,8 +356,10 @@ namespace scene{
 		unit->m_pTexture=texture;
 		if(useAlpha)
 		{
-			TransparentEntry entry(unit,z);
-			m_transparents.push_back(entry);
+			//TransparentEntry entry(unit,z);
+			//m_transparents.push_back(entry);
+			ComprehensiveEntry entry(unit,z);
+			m_comprehensives.push_back(entry);
 		}
 		else
 		{
@@ -440,8 +448,10 @@ namespace scene{
 		unit->m_pTexture=texture;
 		if(useAlpha)
 		{
-			TransparentEntry entry(unit,z);
-			m_transparents.push_back(entry);
+			//TransparentEntry entry(unit,z);
+			//m_transparents.push_back(entry);
+			ComprehensiveEntry entry(unit,z);
+			m_comprehensives.push_back(entry);
 		}
 		else
 		{
@@ -456,8 +466,10 @@ namespace scene{
 		u32 size=getSizeByVertexType(vType);
 		for(u32 i=0;i<vertexCount;++i)
 			memcpy((u8*)vertices+offset+size*i,&z,4);
-		EffectEntry entry(material,vertices,vertexCount,indices,indexCount,vType,z);
-		m_effects.push_back(entry);
+		//EffectEntry entry(material,vertices,vertexCount,indices,indexCount,vType,z);
+		//m_effects.push_back(entry);
+		ComprehensiveEntry entry(material,vertices,vertexCount,indices,indexCount,vType,z);
+		m_comprehensives.push_back(entry);
 	}
 
 	void CGraphicsAdapterWindow::render(){
@@ -477,7 +489,7 @@ namespace scene{
 		}
 		m_solids.set_used(0);
 
-		m_pDriver->setMaterial(m_pTransparentMaterial);
+		/*m_pDriver->setMaterial(m_pTransparentMaterial);
 		m_transparents.sort();
 		for (i=0; i<m_transparents.size(); ++i)
 		{
@@ -495,7 +507,26 @@ namespace scene{
 			m_pDriver->setMaterial(m_effects[i].m_pMaterial);
 			m_pDriver->drawVertexPrimitiveList(m_effects[i].m_pVertices,m_effects[i].m_uVertexCount,m_effects[i].m_pIndices,m_effects[i].m_uIndexCount,video::ENUM_PRIMITIVE_TYPE_TRIANGLES,m_effects[i].m_vertexType);
 		}
-		m_effects.set_used(0);
+		m_effects.set_used(0);*/
+
+		m_comprehensives.sort();
+		for (i=0; i<m_comprehensives.size(); ++i)
+		{
+			if(m_comprehensives[i].m_pUnit)
+			{
+				m_pDriver->setMaterial(m_pTransparentMaterial);
+				m_pTransparentMaterial->setTexture(0,m_comprehensives[i].m_pUnit->m_pTexture);
+				// /Logger->debug("draw:%d,%d\n",m_comprehensives[i].m_pUnit->m_pTexture,m_comprehensives[i].m_pUnit->m_vertices.size());
+				m_pDriver->drawVertexPrimitiveList(m_comprehensives[i].m_pUnit->m_vertices.const_pointer(),m_comprehensives[i].m_pUnit->m_vertices.size(),CGraphicsAdapterWindow::INDICES,6);
+				m_defaultPool.recycle(m_comprehensives[i].m_pUnit);
+			}
+			else
+			{
+				m_pDriver->setMaterial(m_comprehensives[i].m_pMaterial);
+				m_pDriver->drawVertexPrimitiveList(m_comprehensives[i].m_pVertices,m_comprehensives[i].m_uVertexCount,m_comprehensives[i].m_pIndices,m_comprehensives[i].m_uIndexCount,video::ENUM_PRIMITIVE_TYPE_TRIANGLES,m_comprehensives[i].m_vertexType);
+			}
+		}
+		m_comprehensives.set_used(0);
 
 	}
 

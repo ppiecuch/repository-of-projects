@@ -36,7 +36,6 @@ namespace video{
 		virtual void unlock() = 0;
 		virtual void upsidedown() = 0;
 
-		//释放GPU上的纹理对象
 		virtual void logon() = 0;
 		virtual void logoff() = 0;
 

@@ -18,6 +18,6 @@ namespace yon{
 		virtual void tick() = 0;
 	};
 
-	ITimer* createTimer();
+	extern "C" YON_API ITimer* createTimer();
 }
 #endif

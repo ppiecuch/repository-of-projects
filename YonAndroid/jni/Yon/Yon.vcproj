@@ -4121,7 +4121,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\EncodeConvertor.h"
+					RelativePath=".\EncodeConvertor.h"
 					>
 				</File>
 				<File
