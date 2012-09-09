@@ -100,14 +100,14 @@ void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
-	pCamera->setPosition(core::vector3df(x,x,300),true);
+	//pCamera->setPosition(core::vector3df(x,x,300),true);
 
-	x+=0.1f;
+	//x+=0.1f;
 
 	sceneMgr->render(videoDriver);
 	//pCamera->render(videoDriver);
 
-	/*gfAdapter->clearZ(-1000);
+	gfAdapter->clearZ(-1000);
 
 	core::rectf r(0,0,1,1);
 	//for(u32 i=0;i<100;++i){
@@ -131,7 +131,7 @@ void drawFrame(){
 			planeModel->getEntity()->getUnit(0)->getShap()->getVertexType());
 	
 
-	gfAdapter->render();*/
+	gfAdapter->render();
 
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);

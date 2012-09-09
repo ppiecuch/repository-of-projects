@@ -64,7 +64,7 @@ void CBillBoard::init()
 	 //  TRACE(L"org_angle %f0.2\n",org_angle);
 
 
-	   col=SColor(255,255,255,255);
+	   col=video::COLOR_WHITE;
 
 
 	   mix_type=ENUM_MATERIAL_TYPE_BLEND;
@@ -674,8 +674,7 @@ void CBillBoard::load( IReadStream  * FileReader )
 
 	org_angle=0.5*PI-atan(ratio);
 
-	col=SColor(255,255,255,255);
-
+	col=video::COLOR_WHITE;
 	mix_type=ENUM_MATERIAL_TYPE_BLEND;
 
 

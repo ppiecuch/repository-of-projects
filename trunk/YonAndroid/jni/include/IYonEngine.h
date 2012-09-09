@@ -35,6 +35,7 @@ namespace yon{
 		virtual IRandomizer* getRandomizer() = 0;
 		virtual i18n::II18NManager* getI18NManager() = 0;
 
+		//当引擎初始化过程中失败后，available会返回false(用于crash流程)
 		virtual bool available(){return true;}
 		virtual bool run() = 0;
 		virtual void onResize(u32 w,u32 h) = 0;

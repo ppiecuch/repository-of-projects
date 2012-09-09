@@ -8,6 +8,7 @@ IAudioDriver* audioDriver=NULL;
 ISceneManager* sceneMgr=NULL;
 //IGUIEnvirenment* guiEnv=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
+IGraphicsAdapter* gfAdapterWindow=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ICamera* pCamera2=NULL;
@@ -131,6 +132,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
 	gfAdapter=engine->getGraphicsAdapterWindow();
+	gfAdapterWindow=engine->getGraphicsAdapterWindow();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
 	//pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
@@ -241,9 +243,9 @@ void drawFrame(){
 	pCamera->render(videoDriver);
 
 	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
-	gfAdapter->clearZ(1000);
-	gfAdapter->drawRegion("trans.png",r,180,200,128,64,ENUM_TRANS_NONE);
-	gfAdapter->render();
+	gfAdapterWindow->clearZ(1000);
+	gfAdapterWindow->drawRegion("trans.png",r,180,200,128,64,ENUM_TRANS_NONE);
+	gfAdapterWindow->render();
 
 	
 	guiAdapter->render();

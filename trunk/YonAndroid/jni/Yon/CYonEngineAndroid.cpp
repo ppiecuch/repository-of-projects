@@ -157,7 +157,8 @@ namespace platform{
 		{
 			absorbed=m_pVideoDriver->onEvent(evt)||absorbed;
 			absorbed=m_pAudioDriver->onEvent(evt)||absorbed;
-			absorbed=m_pUserListener->onEvent(evt)||absorbed;
+			if(m_pUserListener)
+				absorbed=m_pUserListener->onEvent(evt)||absorbed;
 			absorbed=m_pSceneManager->onEvent(evt)||absorbed;
 		}
 		else

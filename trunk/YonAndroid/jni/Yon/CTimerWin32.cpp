@@ -67,7 +67,7 @@ namespace platform{
 	}
 }
 
-	ITimer* createTimer(){
+	YON_API ITimer* createTimer(){
 		return new platform::CTimerWin32();
 	}
 }

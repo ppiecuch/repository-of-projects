@@ -18,8 +18,6 @@ namespace video{
 		virtual void logon(){}
 		virtual void logoff(){}
 		virtual bool isRenderTarget() const{return false;}
-		virtual void beginRTT(bool clearBackBuffer, bool clearZBuffer,video::SColor color){}
-		virtual void endRTT(bool willRenderFrameBuffer){}
 		core::dimension2du m_size;
 	};
 }
