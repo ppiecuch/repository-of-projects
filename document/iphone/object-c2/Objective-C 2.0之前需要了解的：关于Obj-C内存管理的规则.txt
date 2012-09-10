@@ -1,0 +1,212 @@
+Objective-C 2.0增加了一些新的东西，包括属性和垃圾回收。那么，我们在学习Objective-C 2.0之前，最好应该先了解，从前是什么样的，为什么Objective-C 2.0要增加这些支持。
+这一切都跟Cocoa内存的管理规则有关系，我们知道，Objective-C中所有变量都定义为指针。指针是一个特殊的变量，它里面存储的数值被 解释成为内存里的一个地址，如果使用不当，就会出错或者造成内存的泄露。要了解这些，就需要看看其内存管理的规则到底是什么样的。
+这篇文章也应该做为苹果开发工具中提供的性能调试工具Instruments使用前必读知识进行阅读。Cocoa China将在稍后提供Instruments工具的使用方法，以及Objective-C 2.0的详细介绍。
+要知道，如果你使用Objective-C 2.0，那么本文描述的大部分工作你都不需要自己去处理了。但是这并不意味着你可以不了解它，相反，只有你对内存管理规则更加了解，你才能更好地使用Objective-C 2.0带来的便利。
+ 
+本文原文作者是Mmalcolm Crawford，原文地址  这篇文章翻译起来比较晦涩，希望您能看得懂。
+ 
+当Cocoa新手在进行内存管理时，他们看上去总是把事情变得更为复杂。遵循几个简单的规则就可以把生活变得更简单。而不遵循这些规则，他们几乎一定会造成诸如内存泄露或者将消息发送给释放掉的对象而出现的的运行错误。
+ 
+Cocoa不使用垃圾回收（当然，Objective-C 2.0之后开始就使用了），你必须通过计算reference的数量进行自己的内存管理，使用-retain , -release 和-autorelease 。
+ 
+方法描述
+-retain
+
+将一个对象的reference数量增加1。
+
+-release
+
+将一个对象的reference数量减少1。
+
+-autorelease
+
+在未来某些时候将reference数量减少1.
+
+-alloc
+
+为一个对象分配内存，并设置保留值数量(retain count)为1。
+
+-copy
+
+复制一个对象，并将其做为返回值。同时设置保留值数量(retain count)为1。
+
+保留值数量规则
+1 在一定的代码段中，使用-copy ，-alloc 和-retain 的次数应该和-release ，-autorelease 保持一致。
+
+2 使用便利构造方法创建的对象（比如NSString 的stringWithString ）可以被认为会被自动释放。（autoreleased）
+
+3 在使用你自己的参数实例时，需要实现-dealloc 方法来释放。
+
+例子
+-alloc / -release
+ 
+ 
+- (void )printHello 
+{
+	 NSString *string;
+	 string = [[ NSString alloc] initWithString: @"Hello" ];
+	 NSLog (string);
+	 // 我们用 alloc 创建了 NSString，那么需要释放它
+	 [string release ];
+}
+ 
+便利构造方法
+ 
+ 
+- (void )printHello 
+{
+	 NSString *string;
+	 string = [ NSString stringWithFormat: @"Hello" ];
+	 NSLog (string);
+	 // 我们用便利构造方法创建的 NSString
+	 // 我们可以认为它会被自动释放
+}
+ 
+永远使用存取方法
+虽然有时候你可能会认为这很麻烦，但是如果你始终使用了存取方法，造成内存管理问题的麻烦将会降低很多。
+
+如果你在代码实例的参数中频繁使用-retain 和-release ，几乎可以肯定你做了错误的事情。
+
+例子
+假设我们希望设置一个Counter对象的数量值。
+
+ 
+@interface Counter : NSObject
+{
+	 NSNumber *count;
+}
+ 
+
+为了获取和设置count值，我们定义两个存取方法：
+
+ 
+- (NSNumber *)count 
+{
+	 return count;
+	 // 无需 retain或者 release，
+	 // 仅仅传递数值
+}
+ 
+ 
+- (void )setCount:(NSNumber *)newCount 
+{
+	
+	 // newCount值会被自动释放，那么我们希望保留这个 newCount
+	 // 所以需要在这里 retain。
+	 [newCount retain ];
+	
+	 // 由于我们在这个方法中仅仅改变了计算数量的对象，我们可以在这里先释放它。因为[nil release] 在objective-c 中也是允许的，所以即使count 值没有被指定，也可以这样调用。
+	 // 我们必须在[newCount retain] 之后再释放count ，因为有可能这两个对象的指针是同一个。我们不希望不小心释放它。
+	 [count release ];
+	
+	 // 重新指定
+	 count = newCount;
+}
+ 
+命名约定
+注意存取方法的命名约定遵循一个模式： -参数名 和 -set参数名 。
+
+遵循这一约定，会使你的代码可读性更强，而且，更重要地是你可以在后面使用key-value编码。（参阅NSKeyValueCoding协议）。
+
+由于我们有一个对象实例参数，我们必须实现一个释放方法：
+
+ 
+- (void )dealloc 
+{
+	 [ self setCount: nil];
+	 [ super dealloc];
+}
+ 
+
+假设我们希望实现一个方法重置计数器，我们会有很多选择。在最开始，我们使用了一个 便利构造方法，所以我们假设新的数值是自动释放的。我们不需要发送任何retain 或者release 消息。
+
+ 
+- (void )reset 
+{
+	 NSNumber *zero = [ NSNumber numberWithInt: 0 ];
+	 [ self setCount:zero];
+}
+ 
+然而，如果我们使用-alloc 方法建立的NSNumber 实例，那我们必须同时使用一个-release 。
+
+ 
+ 
+- (void )reset 
+{
+	 NSNumber *zero = [[ NSNumber alloc] initWithInt: 0 ];
+	 [ self setCount:zero];
+	 [zero release ];
+}
+常见错误
+在简单的情况下，以下代码几乎一定可以正常运行，但是由于可能没有使用存取方法，下面的代码在某些情况下几乎一定会出问题。
+ 
+
+错误-没有使用存取方法
+
+ 
+- (void )reset 
+{
+	 NSNumber *zero = [[ NSNumber alloc] initWithInt: 0 ];
+	 [count release ]
+	 count = zero;
+}
+ 
+错误-实例泄露
+ 
+ 
+- (void )reset 
+{
+	 NSNumber *zero = [[ NSNumber alloc] initWithInt: 0 ];
+	 [ self setCount:zero];
+}
+ 
+新建的NSNumber 数值数量是1（通过alloc ），而我们在这个方法里没有发出-release 消息。那么这个NSNumber 就永远不会被释放了，这样就会造成内存泄露。
+
+错误-对已经释放的实例发送-release 消息
+ 
+ 
+- (void )reset 
+{
+	 NSNumber *zero = [ NSNumber numberWithInt: 0 ];
+	 [ self setCount:zero];
+	 [zero release ];
+}
+ 
+你随后在存取count的时候在这里就会出错。这个简便构造方法会返回一个自动释放的对象，你无需发送其他释放消息。
+
+这样写代码意味着，由于对象已经被自动释放，那么当你释放时，retain count将被减至0，对象已经不存在了。当你下次希望获取count值时，你的消息会发到一个不存在的对象（通常这样你会得到一个SIGBUS 10的错误提示）。
+
+经常造成混淆的情况
+数组和其他集合类
+当对象被加入到数组、字典或者集合中，集合类会将其保留。当集合被释放的同时，对象也会收到一个释放消息。如果你希望写一个建立数字数组的例子，你可能会这么写：
+
+ 
+NSMutableArray *array;
+int i;
+// …
+for (i = 0 ; i < 10 ; i++) 
+{
+	 NSNumber *n = [ NSNumber numberWithInt: i];
+	 [array addObject : n];
+}
+ 
+在这个例子里，你无需保留新建的数值，因为数组会帮你保留。
+
+ 
+NSMutableArray *array;
+int i;
+// …
+for (i = 0 ; i < 10 ; i++) 
+{
+	 NSNumber *n = [[ NSNumber alloc] initWithInt: i];
+	 [array addObject : n];
+	 [n release];
+}
+
+
+本例中，在for 循环里你需要给n发送一个-release 消息，因为你需要始终在-alloc 之后将n的数量保持为1。这么做的原因是当其通过-addObject: 方法被添加至数组中时，数组已经将其保存起来。即使你释放了n，但是这个数字由于已经保存在数组里，所以不会被释放。
+
+为了了解这些，假设你自己就是编写数组类的人。你不希望接收的对象未经你同意就消失，所以你会在对象传递进来时，对其发送一个-retain 消息。如果他们被删除，你同时也要对应地发送一个-release 消息。在你自己-dealloc 时，你也要给你收到的所有对象发送一个-release 。
+
+
+http://elton.iteye.com/blog/349195
