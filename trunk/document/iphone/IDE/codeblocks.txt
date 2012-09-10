@@ -1,0 +1,24 @@
+
+Other Options 分页，录入：
+-fconstant-string-class=NSConstantString -std=c99
+
+连接器设置 Linker stettings
+在连接库（Link Libraries）中添加两个文件。
+它们在C:\GNUstep\GNUstep\System\Library\Libraries下面：
+libgnustep-base.dll.a
+libobjc.dll.a
+
+指定搜索目录Search directories（需要预先安装好GNUstep）
+Compiler（编译器）设置为D:\GNUstep\GNUstep\System\Library\Headers；
+Linker（连接器）设置为C:\GNUstep\GNUstep\System\Library\Libraries；
+
+Settings->Environment...，选择 Files extension handling 添加*.m
+
+keyword:
+@interface @implementation @end @class @selector @protocol @public @protected @private id BOOL YES NO SEL nil NULL self
+
+
+编译出现“build target has no object files to link”
+解决：右击main.m，选择build，将compile/link勾上
+
+参考：http://kingj.iteye.com/blog/1558869

@@ -1,0 +1,57 @@
+默认安装就行：
+(1)、gnustep-msys-system-XXXX-setup.exe
+(2)、gnustep-core-XXXX-setup.exe
+(3)、gnustep-devel-XXXX-setup.exe（可选）
+(4)、gnustep-cairo-XXXX-setup.exe（可选）
+
+
+启动程序：
+在开始->程序-菜单里的GNUstep程序选项里单击Shell
+
+第一示例
+> vim helloworld.m
+#import <stdio.h>
+int main(int argc,const char *argv[]){
+    printf("hello world\n");
+    return 0;
+}
+> gcc main.m 生成一个a.exe
+> ./a.exe(打印helloworld)
+
+
+第二示例
+> vim helloobjectc.m
+
+#import <Foundation/Foundation.h>  
+int main(int argc, char**argv)  {  
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];  
+  NSLog(@"hello objectc\n");  
+  [pool release];    
+  return 0;    
+}
+
+编译
+> gcc -fconstant-string-class=NSConstantString -c helloobjectc.m -I /GNUstep/System/Library/Headers
+链接
+> gcc -o helloobjectc helloobjectc.o -L /GNUstep/System/Library/Libraries/ -lobjc -lgnustep-base
+生成一个helloobjectc.exe
+
+
+第三示例（基于第二示例）
+> vim GNUmakefile
+
+include $(GNUSTEP_MAKEFILES)/common.make
+TOOL_NAME=helloobjectc
+helloobjectc_OBJC_FILES=helloobjectc.m
+include $(GNUSTEP_MAKEFILES)/tool.make
+
+> make 会在obj生成一个helloobjectc.exe
+
+第四示例（基于第一示例）
+> vim helloworld.h
+#!/bin/sh
+
+
+参考：
+http://elton.iteye.com/blog/344899
+http://blog.csdn.net/i2c_rs485/article/details/7167535
