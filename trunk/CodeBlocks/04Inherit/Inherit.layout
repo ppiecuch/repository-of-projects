@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="Child.h" open="1" top="0" tabpos="1">
+		<Cursor position="244" topLine="0" />
+	</File>
+	<File name="Child.m" open="1" top="0" tabpos="3">
+		<Cursor position="226" topLine="0" />
+	</File>
+	<File name="Parent.h" open="1" top="0" tabpos="2">
+		<Cursor position="394" topLine="0" />
+	</File>
+	<File name="Parent.m" open="1" top="0" tabpos="4">
+		<Cursor position="142" topLine="0" />
+	</File>
+	<File name="main.m" open="1" top="0" tabpos="5">
+		<Cursor position="144" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>
