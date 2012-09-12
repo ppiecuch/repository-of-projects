@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="01HelloObjectC/HelloObjectC.cbp" />
+		<Project filename="02BOOL/BOOL.cbp" />
+		<Project filename="03Class/Class.cbp" />
+		<Project filename="04Inherit/Inherit.cbp" />
+		<Project filename="05FoundationKit-NSRange/FoundationKit-NSRange.cbp" />
+		<Project filename="06FoundationKit-NSString/FoundationKit-NSString.cbp" />
+		<Project filename="07FoundationKit-NSArray/FoundationKit-NSArray.cbp" />
+		<Project filename="08FoundationKit-NSDictionary/FoundationKit-NSDictionary.cbp" />
+		<Project filename="09FoundationKit-NSEnumerator/FoundationKit-NSEnumerator.cbp" />
+		<Project filename="10FoundationKit-NSNumber/FoundationKit-NSNumber.cbp" />
+		<Project filename="11FoundationKit-NSNull/FoundationKit-NSNull.cbp" />
+		<Project filename="12FoundationKit-IO/FoundationKit-IO.cbp" />
+		<Project filename="13MemoryManage/MemoryManage.cbp" />
+		<Project filename="14Init/Init.cbp" />
+		<Project filename="15Property/Property.cbp" />
+		<Project filename="16Category/Category.cbp" />
+		<Project filename="17Protocol/Protocol.cbp" active="1" />
+	</Workspace>
+</CodeBlocks_workspace_file>

@@ -15,7 +15,12 @@ Objective-C有一种名为中缀符（infix notation）的语法技术。方法�
 setter方法根据它所更改的属性的名称来命名，并加上前缀“set”
 getter方法则仅仅根据其返回的属性的名称来命名。不要将get用作getter方法的前缀。
 说明：get这个词在Cocoa中有着特殊的含义。如果get出现在Cocoa的方法名称中，就意味着这个方法的参数是一些指针，经过处理后再将结果返回。如：
+
 NSData的getBytes、NSBezierPath的getLineDash:count:phase
+
+
+NSObject提供了一个名为respondsToSelector:的方法，该方法询问对象以确定其是否能够响应某个特定的消息。
+if([car respondsToSelector:@selector(setEngine:)])....
 */
 
 #ifndef _SHAPE_H_
