@@ -8,6 +8,7 @@ using namespace yon::core;
 using namespace yon::event;
 using namespace yon::debug;
 using namespace yon::io;
+using namespace yon::i18n;
 using namespace yon::video;
 using namespace yon::scene;
 using namespace yon::scene::camera;
@@ -92,7 +93,8 @@ int main(int argc, char* argv[])
 
 	fs->drop();
 	return 0;
-#else
+#elif 0
+	//V2.0
 	IFileSystem* fs=createFileSystem();
 	fs->addWorkingDirectory("D:/Development/Tools/xls2xlbV2.0/output");
 	IReadStream* stream=fs->createAndOpenReadFileStream("consume.xlb",io::ENUM_ENDIAN_MODE_BIG);
@@ -105,7 +107,7 @@ int main(int argc, char* argv[])
 
 	Logger->debug("rowCount:%d\r\n",rowCount);
 
-	
+
 	//consume
 	for(s32 r=0;r<rowCount;++r)
 	{
@@ -148,15 +150,54 @@ int main(int argc, char* argv[])
 		Logger->debug("%d\r\n",stream->readInt());
 		Logger->debug("%d\r\n",stream->readInt());
 	}
-	
+
 	/*for(s32 r=0;r<rowCount;++r)
 	{
-		Logger->debug("%d\r\n",stream->readInt());
-		Logger->debug("%s\r\n",stream->readString());
-		Logger->debug("%d\r\n",stream->readBool());
+	Logger->debug("%d\r\n",stream->readInt());
+	Logger->debug("%s\r\n",stream->readString());
+	Logger->debug("%d\r\n",stream->readBool());
 	}*/
 	stream->drop();
 
+	fs->drop();
+	return 0;
+#else
+	//V2.1
+	IFileSystem* fs=createFileSystem();
+	II18NManager* i18nMgr=createI18NManager();
+	fs->addWorkingDirectory("D:/xlb");
+	IReadStream* stream=fs->createAndOpenReadFileStream("composite.xlb",io::ENUM_ENDIAN_MODE_BIG);
+	core::stringc header=stream->readString();
+	s32 versionCode=stream->readInt();
+	core::stringc versionName=stream->readString();
+	Logger->debug("header:%s,versionCode:%d,versionName:%s\r\n",header.c_str(),versionCode,versionName.c_str());
+
+	s32 rowCount=stream->readInt();
+
+	Logger->debug("rowCount:%d\r\n",rowCount);
+
+
+	for(s32 r=0;r<rowCount;++r)
+	{
+		Logger->debug("%s\r\n",i18nMgr->convert(stream->readString().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+		Logger->debug("%s\r\n",i18nMgr->convert(stream->readString().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+		Logger->debug("%d\r\n",stream->readBool());
+		Logger->debug("%d\r\n",stream->readShort());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%d\r\n",stream->readShort());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%d\r\n",stream->readBool());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%d\r\n",stream->readInt());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%d\r\n",stream->readInt());
+	}
+
+
+	stream->drop();
+	i18nMgr->drop();
 	fs->drop();
 	return 0;
 #endif
