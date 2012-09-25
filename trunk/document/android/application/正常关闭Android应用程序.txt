@@ -1,0 +1,48 @@
+当应用不再使用时，通常需要关闭应用，可以使用以下三种方法关闭Android应用：
+
+第一种方法：首先获取当前进程的id，然后杀死该进程。 
+Android.os.Process.killProcess(android.os.Process.myPid())
+通过这种方式不能将应用程序完全杀死，并且他不会把当前应用应用的Activity的task任务栈清空
+
+
+
+第二种方法：终止当前正在运行的Java虚拟机，导致程序终止
+System.exit(0);
+不会把自己的应用程序杀死
+
+第三种方法：强制关闭与该包有关联的一切执行
+ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);    
+manager.restartPackage(getPackageName());
+<uses-permission Android:name="android.permission.RESTART_PACKAGES" />
+
+只能杀死别人，不能杀死自己
+
+
+企业中做法:
+创建类app 继承Application
+
+AndroidMainfest -->name -->app //声明该类为整个应用程序全局的实例
+
+创建整个应用程序全局的实例
+App.class:
+ArrayList<Activity> activities;
+
+其他的Activity中:
+public void onCreate(Bundle savedInstanceState) {
+        App app = (App) getApplication();//获取应用程序全局的实例引用
+        app.activities.add(this);    //把当前Activity放入集合中
+}
+
+public void onDestory(){
+        App app = (App) getApplication();//获取应用程序全局的实例引用
+        app.activities.remove(this); //把当前Activity从集合中移除
+}
+
+
+安全退出：
+在菜单退出按钮的事件中定义如下代码:
+App app = (App) getApplication();
+List<Activity> activities = app.activities;
+for(Activity act:activities){
+  act.finish();//显式结束
+}

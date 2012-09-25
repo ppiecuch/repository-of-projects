@@ -1,0 +1,100 @@
+这是一篇介绍插件化 的好文，技术很实用。 
+
+
+
+
+本文讨论一种简单却有效的插件体系结构，它使用 C++, 动态链接库，基于面向对象编程的思想。 
+首先来看一下使用插件机制能给我们带来哪些方面的好处，从而在适当时候合理的选择使用。 
+1 ， 增强代码的透明度与一致性 ：因为插件通常会封装第三方类库或是其他人编写的代码，需要清晰地定义出接口，用清晰一致的接口来面对所有事情。你的代码也不会被转换程序或是库的特殊定制需求弄得乱七糟。 
+2 ， 改善工程的模块化 ：你的代码被清析地分成多个独立的模块，可以把它们安置在子工程中的文件组中。这种解耦处理使得创建出的组件更加容易重用。 
+3 ， 更短的编译时间 ：如果仅仅是为了解释某些类的声明，而这些类内部使用了外部库，编译器不再需要解析外部库的头文件了，因为具体实现是以私有的形式完成。 
+4 ， 更换与增加组件 ：假如你需要向用户发布补丁，那么更新单独的插件而不是替代每一个安装了的文件更为有效。当使用新的渲染器或是新的单元类型来扩展你的游戏时，能过向引擎提供一组插件，可以很容易的实现。 
+5 ， 在关闭源代码的工程中使用 GPL 代码 ：一般，假如你使用了 GPL 发布的代码，那么你也需要开放你的源代码。然而，如果把 GPL 组件封装在插件中，你就不必发布插件的源码。 
+
+介绍 
+先简单解释一下什么是插件系统以及它如何工作：在普通的程序中，假如你需要代码执行一项特殊的任务，你有两种选择：要么你自己编写，要么你寻找一个已经存在的满足你需要的库。现在，你的要求变了，那你只好重写代码或是寻找另一个不同的库。无论是哪种方式，都会导致你框架代码中的那些依赖外部库的代码重写。 
+现在，我们可以有另外一种选择：在插件系统中，工程中的任何组件不再束缚于一种特定的实现（像渲染器既可以基于 OpenGL, 也可以选择 Direct3D ） , 它们会从框架代码中剥离出来，通过特定的方法被放入动态链接库之中。 
+所谓的特定方法包括在框架代码中创建接口，这些接口使得框架与动态库解耦。插件提供接口的实现。我们把插件与普通的动态链接库区分开来是因为它们的加载方式不同：程序不会直接链接插件，而可能是在某些目录下查找，如果发现便进行加载。所有插件都可以使用一种共同的方法与应用进行联结。 
+
+常见的错误 
+一些程序员，当进行插件系统的设计时，可能会给每一个作为插件使用的动态库添加一个如下函数类似的函数： PluginClass *createInstance(const char*);
+然后它们让插件去提供一些类的实现。引擎用期望的对象名对加载的插件逐个进行查询，直到某个插件返回，这是典型的设计模式中 “ 职责链 ” 模式的做法。一些更聪明的程序员会做出新的设计，使插件在引擎中注册自己，或是用定制的实现替代引擎内部缺省实现： 
+Void dllStartPlugin(PluginManager &pm);
+Void dllStopPlugin(PluginManager &pm);
+第一种设计的主要问题是：插件工厂创建的对象需要使用 reinterpret_cast<> 来进行转换。通常，插件从共同基类（这里指 PluginClass ）派生，会引用一些不安全的感觉。实际上，这样做也是没意义的，插件应该 “ 默默 ” 地响应输入设备的请求，然后提交结果给输出设备。 
+在这种结构下，为了提供相同接口的多个不同实现，需要的工作变得异常复杂，如果插件可以用不同名字注册自己（如 Direct3DRenderer and OpenGLRenderer ） , 但是引擎不知道哪个具体实现对用户的选择是有效的。假如把所有可能的实现列表硬编码到程序中，那么使用插件结构的目的也没有意义了。 
+假如插件系统通过一个框架或是库 ( 如游戏引擎 ) 实现，架构师也肯定会把功能暴露给应用程序使用。这样，会带来一些问题像如何在应用程序中使用插件，插件作者如何引擎的头文件等，这包含了潜在的三者之间版本冲突的可能性。 
+单独的工厂 
+接口，是被引擎清楚定义的，而不是插件。引擎通过定义接口来指导插件做什么工作，插件具体实现功能。我们让插件注册自己的引擎接口的特殊实现。当然直接创建插件实现类的实例并注册是比较笨的做法。这样使得同一时刻所有可能的实现同时存在，占用内存与 CPU 资源。解决的办法是工厂类，它唯一的目的是在请求时创建另外类的实例。如果引擎定义了接口与插件通信，那么也应该为工厂类定义接口： 
+template < typename Interface>
+class Factory {
+  virtual Interface *create() = 0;
+};
+  
+class Renderer {
+  virtual void beginScene() = 0;
+  virtual void endScene() = 0;
+};
+typedef Factory<Renderer> RendererFactory;
+
+选择 1: 插件管理器 
+接下来应该考虑插件如何在引擎中注册它们的工厂，引擎又如何实际地使用这些注册的插件。一种选择是与存在的代码很好的接合，这通过写插件管理器来完成。这使得我们可以控制哪些组件允许被扩展。 
+class PluginManager {
+  void registerRenderer(std::auto_ptr<RendererFactory> RF);
+  void registerSceneManager(std::auto_ptr<SceneManagerFactory> SMF);
+};
+当引擎需要一个渲染器时，它会访问插件管理器，看哪些渲染器已经通过插件注册了。然后要求插件管理器创建期望的渲染器，插件管理器于是使用工厂类来生成渲染器，插件管理器甚至不需要知道实现细节。 
+插件由动态库组成，后者导出一个可以被插件管理器调用的函数，用以注册自己： 
+void registerPlugin(PluginManager &PM);
+插件管理器简单地在特定目录下加载所有 dll 文件，检查它们是否有一个名为 registerPlugin() 的导出函数。当然也可用 xml 文档来指定哪些插件要被加载。　 
+
+选择 2: 完整地集成 Fully Integrated 
+除了使用插件管理器，也可以从头设计代码框架以支持插件。最好的方法是把引擎分成几个子系统，构建一个系统核心来管理这些子系统。可能像下面这样： 
+
+class Kernel {
+  StorageServer &getStorageServer() const;
+  GraphicsServer &getGraphicsServer() const;
+};
+  
+class StorageServer {
+  // 提供给插件使用，注册新的读档器 
+  void addArchiveReader(std::auto_ptr<ArchiveReader> AL);
+  // 查询所有注册的读档器，直到找到可以打开指定格式的读档器 
+  std::auto_ptr<Archive> openArchive(const std::string &sFilename);
+};
+  
+class GraphicsServer {
+  // 供插件使用，用来添加驱动 
+  void addGraphicsDriver(std::auto_ptr<GraphicsDriver> AF);
+  
+  // 获取有效图形驱动的数目 
+  size_t getDriverCount() const;
+  // 返回驱动 
+  GraphicsDriver &getDriver(size_t Index);
+};
+这里有两个子系统，它们使用 ” Server” 作为后缀。第一个 Server 内部维护一个有效图像加载器的列表，每次当用户希望加载一幅图片时，图像加载器被一一查询，直到发现一个特定的实现可以处理特定格式的图片。另一个子系统有一个 GraphicsDrivers 的列表，它们作为 Renderers 的工厂来使用。可以是 Direct3DgraphicsDriver 或是 OpenGLGraphicsDrivers, 它们分别负责 Direct3Drenderer 与 OpenGLRenderer 的创建。引擎提供有效的驱动列表供用户选择使用，通过安装一个新的插件，新的驱动也可以被加入。 
+
+版本 
+在上面两个可选择的方法中，不强制要求你把特定的实现放到插件中。假如你的引擎提供一个读档器的默认实现，以支持自定义文件包格式。你可以把它放到引擎本身，当 StorageServer 启动时自动进行注册。 
+现在还有一个问题没有讨论：假如你不小心的话，与引擎不匹配（例如，已经过时的）插件会被加载。子系统类的一些变化或是插件管理器的改变足以导致内存布局的改变，当不匹配的插件试图注册时可能发生冲突甚至崩溃。比较讨厌的是，这些在调试时难与发现。 幸运的是，辨认过时或不正确的插件非常容易。最可靠的是方法是在你的核心系统中放置一个预处理常量。任何插件都有一个函数，它可以返回这个常量给引擎： 
+// Somewhere in your core system
+#define MyEngineVersion 1;
+  
+// The plugin 
+extern int getExpectedEngineVersion() {
+  return MyEngineVersion;
+}
+在这个常量被编译到插件后，当引擎中的常量改变时，任何没有进行重新编译的插件它的　 getExpectedEngineVersion () 方法会返回以前的那个值。引擎可以根据这个值，拒绝加载不匹配的插件。为了使插件可以重新工作，必须重新编译它。当然，最大的危险是你忘记了更新常量值。无论如何，你应该有个自动版本管理工具帮助你。 
+
+ 翻译作者地址（用C++实现的一种插件体系结构-----概述）： 
+
+http://www.cppblog.com/yuanyajie/archive/2007/04/17/22134.aspx 
+
+  英文原文地址（Building a Better Plugin Architecture (C++)）： 
+
+http://www.nuclex.org/articles/building-a-better-plugin-architecture 
+  有示例代码下载。 
+
+http://www.cppblog.com/yuanyajie/archive/2007/04/17/22134.html 
+
+http://blog.csdn.net/yuanwenmao/article/details/6528425

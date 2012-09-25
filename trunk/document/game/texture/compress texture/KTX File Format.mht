@@ -1,0 +1,3007 @@
+From: <ÓÉ Windows Internet Explorer 7 ±£´æ>
+Subject: KTX File Format
+Date: Fri, 21 Sep 2012 10:44:17 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CD97E6.0CC6F490"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.3664
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0000_01CD97E6.0CC6F490
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" =
+"http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML lang=3Den=20
+xmlns=3D"http://www.w3.org/1999/xhtml"><HEAD><TITLE>KTX File =
+Format</TITLE>
+<META http-equiv=3Dcontent-type content=3D"text/html; =
+charset=3Dutf-8"><LINK=20
+href=3D"http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/Kh=
+ronos-App.css"=20
+type=3Dtext/css rel=3Dstylesheet><LINK=20
+href=3D"http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/de=
+fault.css"=20
+type=3Dtext/css rel=3Dstylesheet>
+<SCRIPT=20
+src=3D"http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/jqu=
+ery-1.3.2.min.js"=20
+type=3Dtext/javascript></SCRIPT>
+
+<SCRIPT=20
+src=3D"http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/gen=
+erateTOC.js"=20
+type=3Dtext/javascript></SCRIPT>
+
+<META content=3D"MSHTML 6.00.6000.16587" name=3DGENERATOR></HEAD>
+<BODY =
+onload=3D"generateTOC(document.getElementById('toc'))"><!--begin-logo-->
+<DIV class=3Dhead>
+<P><A href=3D"http://www.khronos.org/"><IMG height=3D60 alt=3DKhronos=20
+src=3D"http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/Khr=
+onosGroup-3D.png"=20
+width=3D220> </A></P></DIV>
+<DIV class=3Dhead></DIV><!--end-logo-->
+<H1>KTX File Format Specification</H1>
+<H2 class=3Dno-toc>20 December 2010</H2>
+<DL>
+  <DT>Editors:=20
+  <DD>Mark Callow (<A href=3D"http://www.hicorp.co.jp/">HI Corp</A>), =
+Georg=20
+  Kolling (<A=20
+  =
+href=3D"http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/ww=
+w.imgtec.com">Imagination=20
+  Technologies</A>), and Jacob Str=C3=B6m (<A=20
+  href=3D"http://www.ericsson.com/">Ericsson AB</A>) </DD></DL>
+<P class=3Dcopyright>=C2=A9 2010 The Khronos Group Inc. All Rights =
+Reserved. See <A=20
+href=3D"http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/#l=
+icense">license</A>.</P>
+<HR>
+
+<H2 class=3Dno-toc>Abstract</H2>
+<P>KTX is a format for storing textures for OpenGL and OpenGL ES =
+applications.=20
+It is distinguished by the simplicity of the loader required to =
+instantiate a GL=20
+texture object from the file contents.</P>
+<H2 class=3Dno-toc>Status of this document</H2><!--begin-status-->
+<P>This is the approved final specification.</P><!--end-status-->
+<H2 class=3Dno-toc>Table of contents</H2>
+<DIV id=3Dtoc></DIV>
+<H2>File Structure</H2><PRE class=3Dpseudo-code>Byte[12] identifier
+UInt32 endianness
+UInt32 glType
+UInt32 glTypeSize
+UInt32 glFormat
+Uint32 glInternalFormat
+Uint32 glBaseInternalFormat
+UInt32 pixelWidth
+UInt32 pixelHeight
+UInt32 pixelDepth
+UInt32 numberOfArrayElements
+UInt32 numberOfFaces
+UInt32 numberOfMipmapLevels
+UInt32 bytesOfKeyValueData
+ =20
+for each keyValuePair that fits in bytesOfKeyValueData
+    UInt32   keyAndValueByteSize
+    Byte     keyAndValue[keyAndValueByteSize]
+    Byte     valuePadding[3 - ((keyAndValueByteSize + 3) % 4)]
+end
+ =20
+for each mipmap_level in numberOfMipmapLevels<SUP>*</SUP>
+    UInt32 imageSize;=20
+    for each array_element in numberOfArrayElements<SUP>*</SUP>
+       for each face in numberOfFaces
+           for each z_slice in pixelDepth<SUP>*</SUP>
+               for each row or row_of_blocks in pixelHeight<SUP>*</SUP>
+                   for each pixel or block_of_pixels in pixelWidth
+                       Byte =
+data[format-specific-number-of-bytes]<SUP>**</SUP>
+                   end
+               end
+           end
+           Byte cubePadding[0-3]
+       end
+    end
+    Byte mipPadding[3 - ((imageSize + 3) % 4)]
+end</PRE>
+<P>* Replace with 1 if this field is 0. </P>
+<P>** Uncompressed texture data matches a GL_UNPACK_ALIGNMENT of 4.</P>
+<H2>Field Descriptions</H2>
+<H3>identifier</H3>
+<P>The file identifier is a unique set of bytes that will differentiate =
+the file=20
+from other types of files. It consists of 12 bytes, as follows: </P>
+<BLOCKQUOTE><PRE>Byte[12] FileIdentifier =3D {
+   0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, =
+0x0A
+}</PRE></BLOCKQUOTE>
+<P>This can also be expressed using C-style character definitions as: =
+</P>
+<BLOCKQUOTE><PRE>Byte[12] FileIdentifier =3D {
+    '=C2=AB', 'K', 'T', 'X', ' ', '1', '1', '=C2=BB', '\r', '\n', =
+'\x1A', '\n'
+}</PRE></BLOCKQUOTE>
+<P>The rationale behind the choice values in the identifier is based on =
+the=20
+rationale for the identifier in the PNG specification. This identifier =
+both=20
+identifies the file as a KTX file and provides for immediate detection =
+of common=20
+file-transfer problems. </P>
+<UL>
+  <LI>Byte [0] is chosen as a non-ASCII value to reduce the probability =
+that a=20
+  text file may be misrecognized as a KTX file.=20
+  <LI>Byte [0] also catches bad file transfers that clear bit 7.=20
+  <LI>Bytes [1..6] identify the format, and are the ascii values for the =
+string=20
+  "KTX 11".=20
+  <LI>Byte [7] is for aesthetic balance with byte 1 (they are a matching =
+pair of=20
+  double-angle quotation marks).=20
+  <LI>Bytes [8..9] form a CR-LF sequence which catches bad file =
+transfers that=20
+  alter newline sequences.=20
+  <LI>Byte [10] is a control-Z character, which stops file display under =
+MS-DOS,=20
+  and further reduces the chance that a text file will be falsely =
+recognised.=20
+  <LI>Byte [11] is a final line feed, which checks for the inverse of =
+the CR-LF=20
+  translation problem. </LI></UL>
+<H3>endianness</H3>
+<P>endianness contains the number 0x04030201 written as a 32 bit =
+integer. If the=20
+file is little endian then this is represented as the bytes 0x01 0x02 =
+0x03 0x04.=20
+If the file is big endian then this is represented as the bytes 0x04 =
+0x03 0x02=20
+0x01. When reading endianness as a 32 bit integer produces the value =
+0x04030201=20
+then the endianness of the file matches the the endianness of the =
+program that=20
+is reading the file and no conversion is necessary. When reading =
+endianness as a=20
+32 bit integer produces the value 0x01020304 then the endianness of the =
+file is=20
+opposite the endianness of the program that is reading the file, and in =
+that=20
+case the program reading the file must endian convert all header bytes =
+to the=20
+endianness of the program (i.e. a little endian program must convert =
+from big=20
+endian, and a big endian program must convert to little endian).</P>
+<H3>glType</H3>
+<P>For compressed textures, glType must equal 0. For non-compressed =
+textures,=20
+glType specifies the type argument passed to glTexImage*D, usually one =
+of the=20
+values from table 3.2 of the OpenGL 4.0 specification (UNSIGNED_BYTE,=20
+UNSIGNED_SHORT_5_6_5, etc.)</P>
+<H3>glTypeSize</H3>
+<P>glTypeSize specifies the data type size that should be used when =
+endianness=20
+conversion is required for the texture data stored in the file. If =
+glType is not=20
+0, this should be the size in bytes corresponding to glType. For texture =
+data=20
+which does not depend on platform endianness, including compressed =
+texture data,=20
+glTypeSize must equal 1.</P>
+<H3>glFormat</H3>
+<P>For compressed textures, glFormat must equal 0. For non-compressed =
+textures,=20
+glFormat specifies the format argument passed to glTexImage*D, usually =
+one of=20
+the values from table 3.3 of the OpenGL 4.0 specification (RGB, RGBA, =
+BGRA,=20
+etc.)</P>
+<H3>glInternalFormat</H3>
+<P>For compressed textures, glInternalFormat must equal the compressed=20
+internalformat, usually one of the values from table 3.14 of the OpenGL =
+4.0=20
+specification. For non-compressed textures, glInternalFormat specifies =
+the=20
+internalformat argument passed to glTexImage*D, usually one of the sized =
+
+internalformats from tables 3.12-3.13 of the OpenGL 4.0 specification. =
+The sized=20
+format should be chosen to match the bit depth of the data provided. The =
+
+glInternalFormat is used for loading uncompressed textures in OpenGL and =
+for=20
+loading compressed textures in OpenGL and OpenGL ES. It is not usually =
+used for=20
+loading uncompressed textures in OpenGL ES as OpenGL ES requires that =
+the=20
+internal format be the same value as the format.</P>
+<H3>glBaseInternalFormat</H3>
+<P>For both compressed and non-compressed textures, glBaseInternalFormat =
+
+specifies the base internalformat of the texture, usually one of the =
+values from=20
+table 3.11 of the OpenGL 4.0 specification (RGB, RGBA, ALPHA, etc.). For =
+
+non-compressed textures, this value will be the same as glFormat and is =
+used as=20
+the internalformat when loading into OpenGL ES.</P>
+<H3>pixelWidth, pixelHeight, pixelDepth</H3>
+<P>The size of the texture image for level 0, in pixels. No rounding to =
+block=20
+sizes should be applied for block compressed textures.</P>
+<P>For 1D textures pixelHeight and pixelDepth must be 0. For 2D and cube =
+
+textures pixelDepth must be 0.</P>
+<H3>numberOfArrayElements</H3>
+<P>numberOfArrayElements specifies the number of array elements. If the =
+texture=20
+is not an array texture, numberOfArrayElements must equal 0.</P>
+<H3>numberOfFaces</H3>
+<P>numberOfFaces specifies the number of cubemap faces. For cubemaps and =
+cubemap=20
+arrays this should be 6. For non cubemaps this should be 1. Cube map =
+faces are=20
+stored in the order: +X, -X, +Y, -Y, +Z, -Z.</P>
+<H3>numberOfMipmapLevels</H3>
+<P>numberOfMipmapLevels must equal 1 for non-mipmapped textures. For =
+mipmapped=20
+textures, it equals the number of mipmaps. Mipmaps are stored in order =
+from=20
+largest size to smallest size. The first mipmap level is always level 0. =
+A KTX=20
+file does not need to contain a complete mipmap pyramid. If =
+numberOfMipmapLevels=20
+equals 0, it indicates that a full mipmap pyramid should be generated =
+from level=20
+0 at load time (this is usually not allowed for compressed formats).</P>
+<H3>bytesOfKeyValueData</H3>
+<P>An arbitrary number of key/value pairs may follow the header. This =
+can be=20
+used to encode any arbitrary data. The bytesOfKeyValueData field =
+indicates the=20
+total number of bytes of key/value data including all =
+keyAndValueByteSize=20
+fields, all keyAndValue fields, and all valuePadding fields. The file =
+offset of=20
+the first imageSize field is located at the file offset of the=20
+bytesOfKeyValueData field plus the value of the bytesOfKeyValueData =
+field plus=20
+4.</P>
+<H3>keyAndValueByteSize</H3>
+<P>keyAndValueByteSize is the number of bytes of combined key and value =
+data in=20
+one key/value pair following the header. This includes the size of the =
+key, the=20
+NUL byte terminating the key, and all the bytes of data in the value. If =
+the=20
+value is a UTF-8 string it should be NUL terminated and the =
+keyAndValueByteSize=20
+should include the NUL character (but code that reads KTX files must not =
+assume=20
+that value fields are NUL terminated). keyAndValueByteSize does not =
+include the=20
+bytes in valuePadding.</P>
+<H3>keyAndValue</H3>
+<P>keyAndValue contains 2 separate sections. First it contains a key =
+encoded in=20
+UTF-8. The key must be terminated by a NUL character (a single 0x00 =
+byte). Keys=20
+that begin with the 3 ascii characters 'KTX' or 'ktx' are reserved and =
+must not=20
+be used except as described by this spec (this version of the KTX spec =
+defines a=20
+<A=20
+href=3D"http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/#k=
+ey">single=20
+key</A>). Immediately following the NUL character that terminates the =
+key is the=20
+Value data.</P>
+<P>The Value data may consist of any arbitrary data bytes. Any byte =
+value is=20
+allowed. It is encouraged that the value be a NUL terminated UTF-8 =
+string, but=20
+this is not required. If the Value data is binary, it is a sequence of =
+bytes=20
+rather than of words. It is up to the vendor defining the key to specify =
+how=20
+those bytes are to be interpreted (including the endianness of any =
+encoded=20
+numbers). If the Value data is a string of bytes then the NUL =
+termination should=20
+be included in the keyAndValueByteSize byte count (but programs that =
+read KTX=20
+files must not rely on this).</P>
+<H3>valuePadding</H3>
+<P>valuePadding contains between 0 and 3 bytes to ensure that the byte =
+following=20
+the last byte in valuePadding is at a file offset that is a multiple of =
+4. This=20
+ensures that every keyAndValueByteSize field, and the first imageSize =
+field, is=20
+4 byte aligned. This padding is included in the bytesOfKeyValueData =
+field but=20
+not the individual keyAndValueByteSize fields.</P>
+<H3>imageSize</H3>
+<P>For most textures imageSize is the number of bytes of pixel data in =
+the=20
+current LOD level. This includes all z slices, all faces, all rows (or =
+rows of=20
+blocks) and all pixels (or blocks) in each row for the mipmap level. It =
+does not=20
+include any bytes in mipPadding.</P>
+<P>The exception is non-array cubemap textures (any texture where =
+numberOfFaces=20
+is 6 and numberOfArrayElements is 0). For these textures imageSize is =
+the number=20
+of bytes in each face of the texture for the current LOD level, not =
+including=20
+bytes in cubePadding or mipPadding.</P>
+<H3>cubePadding</H3>
+<P>For non-array cubemap textures (any texture where numberOfFaces is 6 =
+and=20
+numberOfArrayElements is 0) cubePadding contains between 0 and 3 bytes =
+to ensure=20
+that the data in each face begins at a file offset that is a multiple of =
+4. In=20
+all other cases cubePadding is empty (0 bytes long).</P>
+<H3>mipPadding</H3>
+<P>Between 0 and 3 bytes to make sure that all imageSize fields are at a =
+file=20
+offset that is a multiple of 4.</P>
+<H2>General comments</H2>
+<P>The unpack alignment is 4. I.e. uncompressed pixel data is packed =
+according=20
+to the rules described in the OpenGL 1.5 specification for a=20
+GL_UNPACK_ALIGNMENTs of 4.</P>
+<P>Values listed in tables referred to in the OpenGL 4.0 specification =
+may be=20
+supplemented by extensions. The references are given as examples and do =
+not=20
+imply that all of those texture types can be loaded in OpenGL ES or =
+earlier=20
+versions of OpenGL.</P>
+<P>Texture data in a KTX file are arranged so that the first pixel in =
+the data=20
+stream for each face and/or array element is closest to the origin of =
+the=20
+texture coordinate system. In OpenGL that origin is conventionally =
+described as=20
+being at the lower left, but this convention is not shared by all image =
+file=20
+formats and content creation tools, so there is abundant room for =
+confusion.</P>
+<P>The desired texture axis orientation is often predetermined by, e.g. =
+a=20
+content creation tool's or existing application's use of the image. =
+Therefore it=20
+is strongly recommended that tools for generating KTX files clearly =
+describe=20
+their behaviour, and provide an option to specify the texture axis =
+origin and=20
+orientation relative to the logical orientation of the source image. At =
+minimum=20
+they should provide a choice between top-left and bottom-left as origin =
+for 2D=20
+source images, with the positive S axis pointing right. Where possible, =
+the=20
+preferred default is to use the logical upper-left corner of the image =
+as the=20
+texture origin. Note that this is contrary to the standard =
+interpretation of GL=20
+texture coordinates. However, the majority of texture compression tools =
+use this=20
+convention.</P>
+<P>As an aid to writing image manipulation tools and viewers, the =
+logical=20
+orientation of the data in a KTX file may be indicated in the file's =
+key/value=20
+metadata. Note that this metadata affects only the logical =
+interpretation of the=20
+data, has no effect on the mapping from pixels in the file byte stream =
+to=20
+texture coordinates. The recommended key to use is:</P>
+<UL><A id=3Dkeys name=3Dkeys></A>
+  <LI>KTXorientation </LI></UL>
+<P>It is recommended that viewing and editing tools support at least the =
+
+following values:</P>
+<UL>
+  <LI>S=3Dr,T=3Dd=20
+  <LI>S=3Dr,T=3Du=20
+  <LI>S=3Dr,T=3Dd,R=3Di=20
+  <LI>S=3Dr,T=3Du,R=3Do </LI></UL>
+<P>where</P>
+<UL>
+  <LI>S indicates the direction of increasing S values=20
+  <LI>T indicates the direction of increasing T values=20
+  <LI>R indicates the direction of increasing R values=20
+  <LI>r indicates increasing to the right=20
+  <LI>l indicates increasing to the left=20
+  <LI>d indicates increasing downwards=20
+  <LI>u indicates increasing upwards=20
+  <LI>o indicates increasing out from the screen (moving towards viewer) =
+
+  <LI>i indicates increasing in towards the screen (moving away from =
+viewer)=20
+  </LI></UL>
+<P>Although other orientations can be represented, it is recommended =
+that tools=20
+that create KTX files use only the values listed above as other values =
+may not=20
+be widely supported by other tools.</P>
+<H2>An example KTX file:</H2><PRE class=3Dexample>// HEADER
+0xAB, 0x4B, 0x54, 0x58, // first four bytes of Byte[12] identifier
+0x20, 0x31, 0x31, 0xBB, // next four bytes of Byte[12] identifier
+0x0D, 0x0A, 0x1A, 0x0A. // final four bytes of Byte[12] identifier
+0x04, 0x03, 0x02, 0x01, // Byte[4] endianess (Big endian in this case)
+0x00, 0x00, 0x00, 0x00, // UInt32 glType =3D 0
+0x00, 0x00, 0x00, 0x01, // UInt32 glTypeSize =3D 1
+0x00, 0x00, 0x00, 0x00, // UInt32 glFormat =3D 0
+0x00, 0x00, 0x8D, 0x64, // UInt32 glInternalFormat =3D GL_ETC1_RGB8_OES
+0x00, 0x00, 0x19, 0x07, // UInt32 glBaseInternalFormat =3D GL_RGB
+0x00, 0x00, 0x00, 0x20, // UInt32 pixelWidth =3D 32
+0x00, 0x00, 0x00, 0x20, // UInt32 pixelHeight =3D 32
+0x00, 0x00, 0x00, 0x00, // UInt32 pixelDepth =3D 0
+0x00, 0x00, 0x00, 0x00, // UInt32 numberOfArrayElements =3D 0
+0x00, 0x00, 0x00, 0x01, // UInt32 numberOfFaces =3D 1
+0x00, 0x00, 0x00, 0x01, // UInt32 numberOfMipmapLevels =3D 1
+0x00, 0x00, 0x00, 0x10, // UInt32 bytesOfKeyValueData =3D 16
+// METADATA
+0x00, 0x00, 0x00, 0x0A, // UInt32 keyAndValueByteSize =3D 10
+0x61, 0x70, 0x69, 0x00, // UTF8 key:   'api\0'
+0x6A, 0x6F, 0x6B, 0x65, // UTF8 v: 'gles2\0'
+0x32, 0x00, 0x00, 0x00, // Byte[2] valuePadding (2 bytes)
+// TEXTURE DATA
+0x00, 0x00, 0x02, 0x00, // UInt32 imageSize =3D 512 bytes
+0xD8, 0xD8, 0xD8, 0xDA, // Byte[512] ETC compressed texture data...
+...</PRE><A id=3Dmimeregistration name=3Dmimeregistration></A>
+<H2>IANA Mime-Type Registration Information</H2>
+<P class=3Dcopyright><EM>Permission is expressly granted to IANA to copy =
+this=20
+section as necessary for managing the MIME types registry.</EM></P>
+<P>Type name: Image</P>
+<P>Subtype name: ktx</P>
+<P>Required parameters: none</P>
+<P>Optional parameters: none</P>
+<P>Encoding considerations: binary</P>
+<P>Security considerations:</P>
+<BLOCKQUOTE>
+  <P>The ktx type is a binary data stream which contains no executable =
+code that=20
+  could disrupt a client processor. There is no provision in the type=20
+  specification that would allow authors to insert executable code that =
+would=20
+  present any security risk to a client machine.</P>
+  <P>Because every item's length is available at its beginning, there is =
+robust=20
+  defense against corrupted or fraudulent data that might overflow a =
+decoder's=20
+  buffer. Also the signature bytes provide early detection of common =
+file=20
+  transmission errors.</P>
+  <P>The ktx type may contain texture data compressed using OpenGL =
+standard or=20
+  vendor-specific schemes. These compression schemes are designed so =
+small=20
+  blocks of data (typically around 64 bits) can be decompressed in real =
+time=20
+  into a small block of pixels (typically 4x4) during texel fetch. In =
+such=20
+  schemes it is not possible for a small amount of data to expand =
+enormously=20
+  because the level of compression is limited; the compressed size is =
+related=20
+  directly to the number of pixels in the uncompressed image and not to =
+the=20
+  content of the data.</P>
+  <P>The ktx type does not provide encryption of the data payload. Users =
+or=20
+  applications wishing or needing to keep their images confidential must =
+overlay=20
+  their own encryption on the ktx data during =
+transmission.</P></BLOCKQUOTE>
+<P>Interoperability considerations:</P>
+<BLOCKQUOTE>
+  <P>The ktx type includes a field identifying the endianness of the =
+machine=20
+  which created the data. Applications reading the data are expected to =
+check=20
+  this field and convert the endianness, if necessary. The texture data =
+payload=20
+  may be compressed using an OpenGL-vendor-specific scheme. In this =
+case, only=20
+  devices or applications having a matching decompressor will be able to =
+display=20
+  the data. The compression scheme is identified in the ktx data so =
+applications=20
+  can quickly reject data using unsupported schemes.</P></BLOCKQUOTE>
+<P>Published specification:</P>
+<BLOCKQUOTE>
+  <P>The KTX file format specification can be found at <A=20
+  =
+href=3D"http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/">=
+http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/</A>.</P><=
+/BLOCKQUOTE>
+<P>Applications that use this media type :</P>
+<BLOCKQUOTE>
+  <P>Currently only <A =
+href=3D"http://devtools.ericsson.com/etc">etcpack</A>. It=20
+  is anticipated it will be widely used by applications built on top of =
+the=20
+  OpenGL family of standards, OpenGL, OpenGL ES and WebGL, as the means =
+of=20
+  delivering texture data.</P></BLOCKQUOTE>
+<P>Additional information:</P>
+<BLOCKQUOTE>
+  <P>Magic number(s): 12 octets - { 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, =
+0x31,=20
+  0xBB, 0x0D, 0x0A, 0x1A, 0x0A }<BR>File extension(s): .ktx<BR>Macintosh =
+file=20
+  type code(s):</P></BLOCKQUOTE>
+<P>Person &amp; email address to contact for further information: Mark =
+Callow=20
+(callow_mark at hicorp.co.jp)</P>
+<P>Intended usage: COMMON</P>
+<P>Restrictions on usage: none</P>
+<P>Authors: Mark Callow, Georg Kolling, Jacob Str=C3=B6m</P>
+<P>Change controller: <A href=3D"http://www.khronos.org/">The Khronos =
+Group</A>,=20
+the industry consortium responsible for standards such as OpenGL, OpenGL =
+ES,=20
+WebGL and OpenCL.</P>
+<H2>Acknowledgements</H2>
+<P>This specification was produced by the Khronos =
+OpenGL<SUP>=C2=AE</SUP> ES Working=20
+Group.</P>
+<P>Special thanks to: Acorn Pooley (NVIDIA), Bruce Merry (ARM).</P>
+<P>&nbsp;</P>
+<HR>
+
+<H3 class=3Dno-toc><A id=3Dlicense name=3Dlicense>License</H3>
+<P class=3Dcopyright>This specification is protected by copyright laws =
+and=20
+contains material proprietary to the Khronos Group, Inc. It or any =
+components=20
+may not be reproduced, republished, distributed, transmitted, displayed, =
+
+broadcast or otherwise exploited in any manner without the express prior =
+written=20
+permission of Khronos Group. You may use this specification for =
+implementing the=20
+functionality therein, without altering or removing any trademark, =
+copyright or=20
+other notice from the specification, but the receipt or possession of =
+this=20
+specification does not convey any rights to reproduce, disclose, or =
+distribute=20
+its contents, or to manufacture, use, or sell anything that it may =
+describe, in=20
+whole or in part.</P>
+<P class=3Dcopyright>Khronos Group grants express permission to any =
+current=20
+Promoter, Contributor or Adopter member of Khronos to copy and =
+redistribute=20
+UNMODIFIED versions of this specification in any fashion, provided that =
+NO=20
+CHARGE is made for the specification and the latest available update of =
+the=20
+specification for any version of the API is used whenever possible. Such =
+
+distributed specification may be re-formatted AS LONG AS the contents of =
+the=20
+specification are not changed in any way. The specification may be =
+incorporated=20
+into a product that is sold as long as such product includes significant =
+
+independent work developed by the seller. A link to the current version =
+of this=20
+specification on the Khronos Group web-site should be included whenever =
+possible=20
+with specification distributions.</P>
+<P class=3Dcopyright>Khronos Group also grants express permission to the =
+Internet=20
+Assigned Numbers Authority (IANA) to make archival copies of this =
+specification,=20
+and to redistribute such a copy in the event that the link to the =
+specification=20
+on the Khronos Group web-site becomes inoperative and it is determined =
+that it=20
+will not be repaired. Outside of this exceptional circumstance, IANA =
+should=20
+refer to the specification by providing a link to the current version on =
+the=20
+Khronos Group web-site.</P>
+<P class=3Dcopyright>Khronos Group makes no, and expressly disclaims =
+any,=20
+representations or warranties, express or implied, regarding this =
+specification,=20
+including, without limitation, any implied warranties of merchantability =
+or=20
+fitness for a particular purpose or non-infringement of any intellectual =
+
+property. Khronos Group makes no, and expressly disclaims any, =
+warranties,=20
+express or implied, regarding the correctness, accuracy, completeness,=20
+timeliness, and reliability of the specification. Under no circumstances =
+will=20
+the Khronos Group, or any of its Promoters, Contributors or Members or =
+their=20
+respective partners, officers, directors, employees, agents or =
+representatives=20
+be liable for any damages, whether direct, indirect, special or =
+consequential=20
+damages for lost revenues, lost profits, or otherwise, arising from or =
+in=20
+connection with these materials.</P>
+<P class=3Dcopyright>Khronos, OpenKODE, OpenKOGS, OpenVG, OpenMAX, =
+OpenSL ES and=20
+OpenWF are trademarks of the Khronos Group Inc. COLLADA is a trademark =
+of Sony=20
+Computer Entertainment Inc. used by permission by Khronos. OpenGL and =
+OpenML are=20
+registered trademarks and the OpenGL ES logo is a trademark of Silicon =
+Graphics=20
+Inc. used by permission by Khronos. All other product names, trademarks, =
+and/or=20
+company names are used solely for identification and belong to their =
+respective=20
+owners. </P></A></BODY></HTML>
+
+------=_NextPart_000_0000_01CD97E6.0CC6F490
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/KhronosGroup-3D.png
+
+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
+i9NaJOpy7wAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CD97E6.0CC6F490
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/Khronos-App.css
+
+BODY {
+	PADDING-RIGHT: 1em; PADDING-LEFT: 70px; BACKGROUND: white fixed =
+no-repeat left top; MAX-WIDTH: 50em; PADDING-BOTTOM: 2em; MARGIN: 0px; =
+COLOR: black; PADDING-TOP: 2em; FONT-FAMILY: sans-serif
+}
+:link {
+	BACKGROUND: none transparent scroll repeat 0% 0%; COLOR: #00c
+}
+:visited {
+	BACKGROUND: none transparent scroll repeat 0% 0%; COLOR: #609
+}
+A:active {
+	BACKGROUND: none transparent scroll repeat 0% 0%; COLOR: #c00
+}
+A:link IMG {
+	BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: =
+none; BORDER-BOTTOM-STYLE: none
+}
+A:visited IMG {
+	BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: =
+none; BORDER-BOTTOM-STYLE: none
+}
+A IMG {
+	COLOR: white
+}
+
+@media All   =20
+{
+A IMG {
+=09
+}
+    }
+TABLE {
+	BORDER-RIGHT: 1px solid; BORDER-TOP: 1px solid; BORDER-LEFT: 1px solid; =
+BORDER-BOTTOM: 1px solid; BORDER-COLLAPSE: collapse; border-spacing: 2px
+}
+TH {
+	BORDER-RIGHT: 1px solid; PADDING-RIGHT: 4px; BORDER-TOP: 1px solid; =
+PADDING-LEFT: 4px; PADDING-BOTTOM: 4px; BORDER-LEFT: 1px solid; =
+PADDING-TOP: 4px; BORDER-BOTTOM: 1px solid; FONT-FAMILY: sans-serif; =
+TEXT-ALIGN: left
+}
+TD {
+	BORDER-RIGHT: 1px solid; PADDING-RIGHT: 4px; BORDER-TOP: 1px solid; =
+PADDING-LEFT: 4px; PADDING-BOTTOM: 4px; BORDER-LEFT: 1px solid; =
+PADDING-TOP: 4px; BORDER-BOTTOM: 1px solid; FONT-FAMILY: sans-serif; =
+TEXT-ALIGN: left
+}
+TH {
+	COLOR: #115511; BORDER-BOTTOM: 3px solid; BACKGROUND-COLOR: #cceecc
+}
+H1 {
+	TEXT-ALIGN: left
+}
+H2 {
+	TEXT-ALIGN: left
+}
+H3 {
+	TEXT-ALIGN: left
+}
+H4 {
+	TEXT-ALIGN: left
+}
+H5 {
+	TEXT-ALIGN: left
+}
+H6 {
+	TEXT-ALIGN: left
+}
+H1 {
+	BACKGROUND: white; COLOR: #005a9c
+}
+H2 {
+	BACKGROUND: white; COLOR: #005a9c
+}
+H3 {
+	BACKGROUND: white; COLOR: #005a9c
+}
+H1 {
+	FONT: 170% sans-serif
+}
+H2 {
+	FONT: 140% sans-serif
+}
+H3 {
+	FONT: 120% sans-serif
+}
+H4 {
+	FONT: bold 100% sans-serif
+}
+H5 {
+	FONT: italic 100% sans-serif
+}
+H6 {
+	FONT: small-caps 100% sans-serif
+}
+.hide {
+	DISPLAY: none
+}
+DIV.head {
+	MARGIN-BOTTOM: 1em
+}
+DIV.head H1 {
+	CLEAR: both; MARGIN-TOP: 2em
+}
+DIV.head TABLE {
+	MARGIN-TOP: 2em; MARGIN-LEFT: 2em
+}
+P.copyright {
+	FONT-SIZE: small; COLOR: #666666
+}
+P.copyright SMALL {
+	FONT-SIZE: small; COLOR: #666666
+}
+
+@media Screen   =20
+{
+A[href]:hover {
+	BACKGROUND: #ffa
+}
+    }
+PRE {
+	MARGIN-LEFT: 0em
+}
+DT {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px
+}
+DD {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px
+}
+DT {
+	FONT-WEIGHT: bold
+}
+PRE {
+	FONT-SIZE: 1.2em; FONT-FAMILY: monospace
+}
+CODE {
+	FONT-SIZE: 1.2em; FONT-FAMILY: monospace
+}
+PRE.pseudo-code {
+	BORDER-RIGHT: thin solid; PADDING-RIGHT: 1em; BORDER-TOP: thin solid; =
+MIN-WIDTH: 45em; PADDING-LEFT: 1em; BACKGROUND: #eeeeee; PADDING-BOTTOM: =
+0.5em; BORDER-LEFT: thin solid; COLOR: black; PADDING-TOP: 0.5em; =
+BORDER-BOTTOM: thin solid
+}
+PRE.pseudo-code {
+	BORDER-RIGHT: thin solid; PADDING-RIGHT: 1em; BORDER-TOP: thin solid; =
+MIN-WIDTH: 45em; PADDING-LEFT: 1em; BACKGROUND: #eeeeee; PADDING-BOTTOM: =
+0.5em; BORDER-LEFT: thin solid; COLOR: black; PADDING-TOP: 0.5em; =
+BORDER-BOTTOM: thin solid
+}
+PRE.pseudo-code :link {
+	BACKGROUND: none transparent scroll repeat 0% 0%
+}
+PRE.idl :visited {
+	BACKGROUND: none transparent scroll repeat 0% 0%
+}
+DL.methods {
+	PADDING-RIGHT: 1em; PADDING-LEFT: 1em; BACKGROUND: #eeffee; =
+PADDING-BOTTOM: 0.5em; MARGIN: 2em 0px 2em 2em; COLOR: green; =
+BORDER-TOP-STYLE: none; PADDING-TOP: 0.5em; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+.idl-code {
+	FONT-SIZE: 125%; MARGIN-LEFT: 1.5em; COLOR: black; TEXT-INDENT: -1.5em; =
+FONT-FAMILY: monospace
+}
+P.idl-code {
+	MARGIN-TOP: 0em; MARGIN-BOTTOM: 0em
+}
+A.gl-spec:link {
+	FONT-WEIGHT: normal; FONT-SIZE: 60%; COLOR: green; FONT-STYLE: italic; =
+FONT-FAMILY: sans-serif
+}
+A.gl-spec:visited {
+	FONT-WEIGHT: normal; FONT-SIZE: 60%; COLOR: green; FONT-STYLE: italic; =
+FONT-FAMILY: sans-serif
+}
+UL.toc {
+	LIST-STYLE-TYPE: none
+}
+OL.toc {
+	LIST-STYLE-TYPE: none
+}
+
+@media Aural   =20
+{
+H1 {
+	stress: 20; richness: 90
+}
+H2 {
+	stress: 20; richness: 90
+}
+H3 {
+	stress: 20; richness: 90
+}
+.hide {
+	speak: none
+}
+P.copyright {
+	volume: x-soft; speech-rate: x-fast
+}
+DT {
+	pause-before: 20%
+}
+PRE {
+	speak-punctuation: code
+}
+    }
+BODY {
+	BACKGROUND-IMAGE: url(logo-spec.png)
+}
+.diff-new {
+	BACKGROUND-COLOR: yellow
+}
+.diff-chg {
+	BACKGROUND-COLOR: lime
+}
+.diff-new:unknown {
+	content: "=A1=FC"
+}
+.diff-new:unknown {
+	content: "=A1=FC"
+}
+.diff-chg:unknown {
+	content: "?"
+}
+.diff-chg:unknown {
+	content: "?"
+}
+.diff-old {
+	BACKGROUND-COLOR: #fbb; TEXT-DECORATION: line-through
+}
+.diff-old:unknown {
+	content: "=A1=FD"
+}
+.diff-old:unknown {
+	content: "=A1=FD"
+}
+
+------=_NextPart_000_0000_01CD97E6.0CC6F490
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/default.css
+
+@page  {margin: 1.5cm 1.1cm; }
+
+@media Print   =20
+{
+.dlink {
+	DISPLAY: none
+}
+DIV.navbar {
+	DISPLAY: none
+}
+HTML {
+	MARGIN: 0px
+}
+BODY {
+	FONT-FAMILY: serif
+}
+TH {
+	FONT-FAMILY: inherit
+}
+TD {
+	FONT-FAMILY: inherit
+}
+A {
+=09
+}
+DIV.example:unknown {
+	FONT-FAMILY: serif! important
+}
+PRE.example:unknown {
+	FONT-FAMILY: serif! important
+}
+A:link {
+	TEXT-DECORATION: none! important
+}
+A:visited {
+	TEXT-DECORATION: none! important
+}
+A:link:unknown {
+=09
+}
+A:visited:unknown {
+=09
+}
+    }
+BODY {
+	counter-reset: exampleno figure
+}
+H2 {
+	MARGIN-TOP: 2em
+}
+H3 {
+	MARGIN-TOP: 2em
+}
+H5 {
+	MARGIN-TOP: 2em
+}
+H6 {
+	MARGIN-TOP: 2em
+}
+H1 {
+	FONT-FAMILY: inherit
+}
+H2 {
+	FONT-FAMILY: inherit
+}
+H3 {
+	FONT-FAMILY: inherit
+}
+H4 {
+	FONT-FAMILY: inherit
+}
+H5 {
+	FONT-FAMILY: inherit
+}
+H6 {
+	FONT-FAMILY: inherit
+}
+DIV.figure {
+	page-break-inside: avoid
+}
+DIV.sidefigure {
+	page-break-inside: avoid
+}
+PRE {
+	page-break-inside: avoid
+}
+TABLE.propdef {
+	page-break-inside: avoid
+}
+TABLE.propdef-extra {
+	page-break-inside: avoid
+}
+DIV.example {
+	page-break-inside: avoid
+}
+DT {
+=09
+}
+SPAN.id {
+	FONT-WEIGHT: bold; FLOAT: right
+}
+P {
+	MARGIN-TOP: 0.8em; MARGIN-BOTTOM: 0.8em; TEXT-INDENT: 0px
+}
+P.testlink + P {
+	MARGIN-TOP: 0.8em; MARGIN-BOTTOM: 0.8em; TEXT-INDENT: 0px
+}
+P.mtb {
+	MARGIN-TOP: 0.8em; MARGIN-BOTTOM: 0.8em; TEXT-INDENT: 0px
+}
+P + P {
+	MARGIN-TOP: 0.8em; TEXT-INDENT: 0em
+}
+P + DIV.sidefigure + P {
+	MARGIN-TOP: 0.8em; TEXT-INDENT: 0em
+}
+DD > P:first-child {
+	MARGIN-TOP: 0px
+}
+LI > P:first-child {
+	MARGIN-TOP: 0px
+}
+H1 + H2 {
+	MARGIN-TOP: 0px
+}
+PRE {
+	MARGIN-TOP: 1em; MARGIN-BOTTOM: 1em; TEXT-INDENT: 0px; TEXT-ALIGN: left
+}
+IMG {
+	COLOR: white; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+.toc {
+	TEXT-INDENT: 0px
+}
+
+@media All   =20
+{
+BODY {
+	LINE-HEIGHT: 1.3; -webkit-text-size-adjust: none
+}
+A:link {
+	TEXT-DECORATION: underline
+}
+A:visited {
+	TEXT-DECORATION: underline
+}
+A.logo:link {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; =
+BORDER-TOP-STYLE: none; PADDING-TOP: 0px; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+A.logo:visited {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; =
+BORDER-TOP-STYLE: none; PADDING-TOP: 0px; BORDER-RIGHT-STYLE: none; =
+BORDER-LEFT-STYLE: none; BORDER-BOTTOM-STYLE: none
+}
+DT {
+	MARGIN-LEFT: 0px
+}
+DD {
+	MARGIN-LEFT: 2em
+}
+DL {
+	PADDING-LEFT: 0px; MARGIN-LEFT: 0px
+}
+UL {
+	PADDING-LEFT: 0px; MARGIN-LEFT: 0px
+}
+OL {
+	PADDING-LEFT: 0px; MARGIN-LEFT: 0px
+}
+LI {
+	PADDING-LEFT: 0px; MARGIN-LEFT: 2em
+}
+    }
+UL.indexlist {
+	MARGIN-LEFT: 0px
+}
+UL.indexlist LI {
+	MARGIN-LEFT: 0px; LIST-STYLE-TYPE: none
+}
+UL.indexlist LI LI {
+	MARGIN-LEFT: 1em
+}
+.example {
+	counter-increment: exampleno
+}
+DIV.example:unknown {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.1em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.1em; BACKGROUND: #600; LEFT: -2.5em; =
+PADDING-BOTTOM: 0.1em; FONT: bold small/1em sans-serif; BORDER-LEFT: =
+#999 thin solid; WIDTH: 7.5em; COLOR: #fff8dd; PADDING-TOP: 0.1em; =
+BORDER-BOTTOM: #999 thin solid; POSITION: absolute; TOP: -0.6em; =
+TEXT-ALIGN: center; content: "Example " counter(exampleno, upper-roman)
+}
+PRE.example:unknown {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.1em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.1em; BACKGROUND: #600; LEFT: -2.5em; =
+PADDING-BOTTOM: 0.1em; FONT: bold small/1em sans-serif; BORDER-LEFT: =
+#999 thin solid; WIDTH: 7.5em; COLOR: #fff8dd; PADDING-TOP: 0.1em; =
+BORDER-BOTTOM: #999 thin solid; POSITION: absolute; TOP: -0.6em; =
+TEXT-ALIGN: center; content: "Example " counter(exampleno, upper-roman)
+}
+DIV.example {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+DIV.illegal-example {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+DIV.html {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+DIV.illegal-html {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+DIV.xml {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+DIV.illegal-xml {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+PRE.example {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+PRE.illegal-example {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+PRE.html {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+PRE.illegal-html {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+PRE.xml {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+PRE.illegal-xml {
+	BORDER-RIGHT: #999 thin solid; PADDING-RIGHT: 0.5em; BORDER-TOP: #999 =
+thin solid; PADDING-LEFT: 0.5em; BACKGROUND: #fff8dd; PADDING-BOTTOM: =
+0.5em; MARGIN: 1em 0px; BORDER-LEFT: #999 thin solid; PADDING-TOP: =
+0.5em; BORDER-BOTTOM: #999 thin solid; POSITION: relative
+}
+PRE.example {
+	PADDING-TOP: 1.5em
+}
+PRE.illegal-example {
+	PADDING-TOP: 1.5em
+}
+PRE.html {
+	PADDING-TOP: 1.5em
+}
+PRE.illegal-html {
+	PADDING-TOP: 1.5em
+}
+PRE.xml {
+	PADDING-TOP: 1.5em
+}
+PRE.illegal-xml {
+	PADDING-TOP: 1.5em
+}
+DIV.example {
+	COLOR: #600
+}
+PRE.example {
+	COLOR: #600
+}
+PRE.illegal-example {
+	COLOR: red
+}
+DIV.illegal-example {
+	COLOR: red
+}
+DIV.illegal-example P {
+	COLOR: black
+}
+DIV.html {
+	COLOR: #600
+}
+PRE.html {
+	COLOR: #600
+}
+PRE.illegal-html {
+	COLOR: red
+}
+DIV.illegal-html {
+	COLOR: red
+}
+DIV.illegal-html P {
+	COLOR: black
+}
+PRE.deprecated-html {
+	COLOR: red
+}
+DIV.deprecated-html {
+	COLOR: red
+}
+DIV.deprecated-html P {
+	COLOR: black
+}
+DIV.xml {
+	COLOR: #600
+}
+PRE.xml {
+	COLOR: #600
+}
+PRE.illegal-xml {
+	COLOR: red
+}
+DIV.illegal-xml {
+	COLOR: red
+}
+DIV.illegal-xml P {
+	COLOR: black
+}
+.css {
+	COLOR: #800
+}
+CODE.css {
+	FONT-SIZE: 100%; FONT-FAMILY: inherit
+}
+CODE.html {
+	COLOR: #600
+}
+CODE.xml {
+	COLOR: #600
+}
+.property {
+=09
+}
+.descriptor {
+=09
+}
+.issue {
+	COLOR: #c00
+}
+.type {
+	FONT-STYLE: italic
+}
+DFN {
+	FONT-WEIGHT: bolder
+}
+.note {
+	COLOR: green
+}
+P.note {
+=09
+}
+DIV.note {
+=09
+}
+P.note:unknown {
+	content: "?" " "
+}
+SPAN.note:unknown {
+	content: "?" " "
+}
+DIV.note > P:first-child:unknown {
+	content: "?" " "
+}
+.normref {
+	COLOR: red
+}
+.informref {
+	COLOR: green
+}
+UNKNOWN {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-WEIGHT: bold; =
+PADDING-BOTTOM: 0px; MARGIN: 1em 0px; PADDING-TOP: 0px
+}
+UNKNOWN {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-WEIGHT: normal; =
+PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-TOP: 0px
+}
+UNKNOWN {
+	MARGIN: 0px; FONT-STYLE: italic
+}
+UNKNOWN {
+	MARGIN: 0px
+}
+UNKNOWN {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+0.6em 0px; PADDING-TOP: 0px
+}
+UNKNOWN {
+	MARGIN: 0px
+}
+.toc-h2 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-WEIGHT: bold; =
+PADDING-BOTTOM: 0px; MARGIN: 0.5em 0px; PADDING-TOP: 0px; FONT-STYLE: =
+normal
+}
+.toc-h3 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-WEIGHT: normal; =
+PADDING-BOTTOM: 0px; MARGIN: 0.2em 0.5em; PADDING-TOP: 0px; FONT-STYLE: =
+normal
+}
+.toc-h4 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-WEIGHT: normal; =
+PADDING-BOTTOM: 0px; MARGIN: 0.2em 1em; PADDING-TOP: 0px; FONT-STYLE: =
+italic
+}
+.toc-h5 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-WEIGHT: normal; FONT-SIZE: =
+0.9em; PADDING-BOTTOM: 0px; MARGIN: 0.2em 1.5em; PADDING-TOP: 0px; =
+FONT-STYLE: italic
+}
+
+@media All   =20
+{
+UL.toc SPAN.secno {
+	MARGIN-RIGHT: 1em
+}
+UL.toc SPAN.secno {
+	FLOAT: left; MARGIN-LEFT: -5em; WIDTH: 4em
+}
+UL.toc LI {
+	CLEAR: both
+}
+UL.toc {
+	MARGIN-LEFT: 5em
+}
+    }
+UL.index {
+	LIST-STYLE-TYPE: none
+}
+S {
+	COLOR: red; TEXT-DECORATION: line-through
+}
+DEL {
+	COLOR: red; TEXT-DECORATION: line-through
+}
+U {
+	BACKGROUND: #bfa; TEXT-DECORATION: underline
+}
+INS {
+	BACKGROUND: #bfa; TEXT-DECORATION: underline
+}
+DIV.figure {
+	MARGIN: 2.5em 0px; TEXT-ALIGN: center
+}
+DIV.sidefigure {
+	MARGIN: 2.5em 0px; TEXT-ALIGN: center
+}
+DIV.sidefigure {
+	FLOAT: right; MARGIN: 0px 0px 0.5em 0.5em; WIDTH: 50%
+}
+DIV.figure IMG {
+	DISPLAY: block; MAX-WIDTH: 100%; MARGIN: auto
+}
+DIV.sidefigure IMG {
+	DISPLAY: block; MAX-WIDTH: 100%; MARGIN: auto
+}
+P.caption {
+	FONT-SIZE: 90%; MARGIN: 1.5em 2em; TEXT-INDENT: 0px; FONT-STYLE: =
+italic; TEXT-ALIGN: center
+}
+CAPTION {
+	FONT-SIZE: 90%; MARGIN: 1.5em 2em; TEXT-INDENT: 0px; FONT-STYLE: =
+italic; TEXT-ALIGN: center
+}
+P.caption:unknown {
+	FONT-WEIGHT: bold; content: "Figure " counter(figure) ". "
+}
+P.caption {
+	counter-increment: figure
+}
+DD {
+	MARGIN-LEFT: 2em
+}
+DD DIV.figure {
+	MARGIN-LEFT: -2em
+}
+SUP {
+	FONT-SIZE: 80%; VERTICAL-ALIGN: super
+}
+BLOCKQUOTE {
+	MARGIN: 0.5em 4em 0.5em 2em; TEXT-INDENT: 0px
+}
+.eqno {
+	FONT-WEIGHT: bold; FLOAT: right; MARGIN: 0px -4em 0px 0px; WIDTH: 3em; =
+TEXT-ALIGN: right
+}
+TABLE.equiv-table {
+	MARGIN: 0.5em 0px; border-spacing: 0
+}
+TABLE.equiv-table TH {
+	PADDING-RIGHT: 0.3em; PADDING-LEFT: 0.3em; PADDING-BOTTOM: 0.3em; =
+PADDING-TOP: 0.3em
+}
+TABLE.equiv-table TD {
+	PADDING-RIGHT: 0.3em; PADDING-LEFT: 0.3em; PADDING-BOTTOM: 0.3em; =
+PADDING-TOP: 0.3em
+}
+TABLE.equiv-table TH {
+	TEXT-ALIGN: left
+}
+TABLE.equiv-table TD {
+	BORDER-BOTTOM: #666 thin solid
+}
+TABLE.equiv-table TH {
+	BORDER-BOTTOM: #666 thin solid
+}
+TABLE.equiv-table {
+=09
+}
+TABLE.equiv-table {
+	empty-cells: show
+}
+TABLE.equiv-table CAPTION {
+	MARGIN: 0.5em 0px 0px
+}
+TABLE.proptable {
+	FONT-SIZE: small; MARGIN: 1em 0px; BORDER-COLLAPSE: collapse; =
+TEXT-ALIGN: left; border-spacing: 0
+}
+TABLE.proptable TD {
+	BORDER-RIGHT: red thin; PADDING-RIGHT: 0.4em; BORDER-TOP: red thin =
+solid; PADDING-LEFT: 0.4em; PADDING-BOTTOM: 0.4em; BORDER-LEFT: red thin =
+dotted; PADDING-TOP: 0.4em; BORDER-BOTTOM: red thin
+}
+TABLE.proptable TH {
+	BORDER-RIGHT: red thin; PADDING-RIGHT: 0.4em; BORDER-TOP: red thin =
+solid; PADDING-LEFT: 0.4em; PADDING-BOTTOM: 0.4em; BORDER-LEFT: red thin =
+dotted; PADDING-TOP: 0.4em; BORDER-BOTTOM: red thin
+}
+TABLE.proptable TH:first-child {
+	BORDER-LEFT-STYLE: none
+}
+TABLE.proptable TD:first-child {
+	BORDER-LEFT-STYLE: none
+}
+TABLE.propdef {
+	TABLE-LAYOUT: fixed; MARGIN-TOP: 1.2em; BACKGROUND: #def; =
+MARGIN-BOTTOM: 1.2em; WIDTH: 100%; BORDER-COLLAPSE: collapse; =
+border-spacing: 0
+}
+TABLE.propdef-extra {
+	TABLE-LAYOUT: fixed; MARGIN-TOP: 1.2em; BACKGROUND: #def; =
+MARGIN-BOTTOM: 1.2em; WIDTH: 100%; BORDER-COLLAPSE: collapse; =
+border-spacing: 0
+}
+TABLE.descdef {
+	TABLE-LAYOUT: fixed; MARGIN-TOP: 1.2em; BACKGROUND: #def; =
+MARGIN-BOTTOM: 1.2em; WIDTH: 100%; BORDER-COLLAPSE: collapse; =
+border-spacing: 0
+}
+TABLE.propdef TD {
+	PADDING-RIGHT: 0.3em; PADDING-LEFT: 0.3em; PADDING-BOTTOM: 0px; =
+VERTICAL-ALIGN: baseline; PADDING-TOP: 0px
+}
+TABLE.propdef-extra TD {
+	PADDING-RIGHT: 0.3em; PADDING-LEFT: 0.3em; PADDING-BOTTOM: 0px; =
+VERTICAL-ALIGN: baseline; PADDING-TOP: 0px
+}
+TABLE.descdef TD {
+	PADDING-RIGHT: 0.3em; PADDING-LEFT: 0.3em; PADDING-BOTTOM: 0px; =
+VERTICAL-ALIGN: baseline; PADDING-TOP: 0px
+}
+TABLE.propdef TH {
+	PADDING-RIGHT: 0.3em; PADDING-LEFT: 0.3em; PADDING-BOTTOM: 0px; =
+VERTICAL-ALIGN: baseline; PADDING-TOP: 0px
+}
+TABLE.propdef-extra TH {
+	PADDING-RIGHT: 0.3em; PADDING-LEFT: 0.3em; PADDING-BOTTOM: 0px; =
+VERTICAL-ALIGN: baseline; PADDING-TOP: 0px
+}
+TABLE.descdef TH {
+	PADDING-RIGHT: 0.3em; PADDING-LEFT: 0.3em; PADDING-BOTTOM: 0px; =
+VERTICAL-ALIGN: baseline; PADDING-TOP: 0px
+}
+TABLE.propdef TD:first-child {
+	FONT-WEIGHT: normal; WIDTH: 8.3em; FONT-STYLE: italic; TEXT-ALIGN: left
+}
+TABLE.propdef-extra TD:first-child {
+	FONT-WEIGHT: normal; WIDTH: 8.3em; FONT-STYLE: italic; TEXT-ALIGN: left
+}
+TABLE.descdef TD:first-child {
+	FONT-WEIGHT: normal; WIDTH: 8.3em; FONT-STYLE: italic; TEXT-ALIGN: left
+}
+TABLE.propdef TH:first-child {
+	FONT-WEIGHT: normal; WIDTH: 8.3em; FONT-STYLE: italic; TEXT-ALIGN: left
+}
+TABLE.propdef-extra TH:first-child {
+	FONT-WEIGHT: normal; WIDTH: 8.3em; FONT-STYLE: italic; TEXT-ALIGN: left
+}
+TABLE.descdef TH:first-child {
+	FONT-WEIGHT: normal; WIDTH: 8.3em; FONT-STYLE: italic; TEXT-ALIGN: left
+}
+TABLE.propdef TD[colspan]:first-child {
+=09
+}
+TABLE.propdef-extra TD[colspan]:first-child {
+=09
+}
+TABLE.descdef TD[colspan]:first-child {
+=09
+}
+TABLE.propdef TH[colspan]:first-child {
+=09
+}
+TABLE.propdef-extra TH[colspan]:first-child {
+=09
+}
+TABLE.descdef TH[colspan]:first-child {
+=09
+}
+TABLE.propdef TR:first-child {
+	BACKGROUND: #005a9c; COLOR: white
+}
+TABLE.propdef-extra TR:first-child {
+	BACKGROUND: #005a9c; COLOR: white
+}
+TABLE.descdef TR:first-child {
+	BACKGROUND: #005a9c; COLOR: white
+}
+EM.rfc2119 {
+	TEXT-TRANSFORM: lowercase; FONT-STYLE: normal; FONT-VARIANT: small-caps
+}
+TABLE.features TH {
+	PADDING-RIGHT: 0.2em; PADDING-LEFT: 0.5em; BACKGROUND: #00589f; =
+PADDING-BOTTOM: 0.2em; COLOR: #fff; PADDING-TOP: 0.2em; TEXT-ALIGN: left
+}
+TABLE.features TD {
+	PADDING-RIGHT: 0.3em; PADDING-LEFT: 0.7em; PADDING-BOTTOM: 0.3em; =
+VERTICAL-ALIGN: top; PADDING-TOP: 0.3em; BORDER-BOTTOM: #ccc 1px solid
+}
+.data {
+	BORDER-LEFT-COLOR: #005a9b; BORDER-BOTTOM-COLOR: #005a9b; MARGIN: 1em =
+auto; BORDER-TOP-STYLE: solid; BORDER-TOP-COLOR: #005a9b; =
+BORDER-RIGHT-STYLE: solid; BORDER-LEFT-STYLE: solid; BORDER-COLLAPSE: =
+collapse; BORDER-RIGHT-COLOR: #005a9b; BORDER-BOTTOM-STYLE: solid
+}
+.proptable {
+	BORDER-LEFT-COLOR: #005a9b; BORDER-BOTTOM-COLOR: #005a9b; MARGIN: 1em =
+auto; BORDER-TOP-STYLE: solid; BORDER-TOP-COLOR: #005a9b; =
+BORDER-RIGHT-STYLE: solid; BORDER-LEFT-STYLE: solid; BORDER-COLLAPSE: =
+collapse; BORDER-RIGHT-COLOR: #005a9b; BORDER-BOTTOM-STYLE: solid
+}
+.data CAPTION {
+	WIDTH: 100%; TEXT-ALIGN: center
+}
+.data TD {
+	BORDER-RIGHT: thin solid; PADDING-RIGHT: 0.2em; BORDER-TOP: thin solid; =
+PADDING-LEFT: 0.2em; PADDING-BOTTOM: 0.2em; BORDER-LEFT: thin solid; =
+PADDING-TOP: 0.2em; BORDER-BOTTOM: thin solid; TEXT-ALIGN: center
+}
+.data TH {
+	BORDER-RIGHT: thin solid; PADDING-RIGHT: 0.2em; BORDER-TOP: thin solid; =
+PADDING-LEFT: 0.2em; PADDING-BOTTOM: 0.2em; BORDER-LEFT: thin solid; =
+PADDING-TOP: 0.2em; BORDER-BOTTOM: thin solid; TEXT-ALIGN: center
+}
+.proptable TD {
+	BORDER-RIGHT: thin solid; PADDING-RIGHT: 0.2em; BORDER-TOP: thin solid; =
+PADDING-LEFT: 0.2em; PADDING-BOTTOM: 0.2em; BORDER-LEFT: thin solid; =
+PADDING-TOP: 0.2em; BORDER-BOTTOM: thin solid; TEXT-ALIGN: center
+}
+.proptable TH {
+	BORDER-RIGHT: thin solid; PADDING-RIGHT: 0.2em; BORDER-TOP: thin solid; =
+PADDING-LEFT: 0.2em; PADDING-BOTTOM: 0.2em; BORDER-LEFT: thin solid; =
+PADDING-TOP: 0.2em; BORDER-BOTTOM: thin solid; TEXT-ALIGN: center
+}
+.data THEAD TH[scope=3D'row'] {
+	BACKGROUND: #a4c8e2; TEXT-ALIGN: right
+}
+.proptable THEAD TH[scope=3D'row'] {
+	BACKGROUND: #a4c8e2; TEXT-ALIGN: right
+}
+.data THEAD {
+	BACKGROUND: #eeeeee
+}
+.proptable THEAD {
+	BACKGROUND: #eeeeee
+}
+.data TBODY TH:first-child {
+	BACKGROUND: #eeeeee; TEXT-ALIGN: right
+}
+.proptable TBODY TH:first-child {
+	BACKGROUND: #eeeeee; TEXT-ALIGN: right
+}
+.data THEAD {
+	BORDER-TOP-STYLE: solid; BORDER-RIGHT-STYLE: solid; BORDER-LEFT-STYLE: =
+solid; BORDER-BOTTOM-STYLE: solid
+}
+.data TBODY {
+	BORDER-TOP-STYLE: solid; BORDER-RIGHT-STYLE: solid; BORDER-LEFT-STYLE: =
+solid; BORDER-BOTTOM-STYLE: solid
+}
+.data TFOOT {
+	BORDER-TOP-STYLE: solid; BORDER-RIGHT-STYLE: solid; BORDER-LEFT-STYLE: =
+solid; BORDER-BOTTOM-STYLE: solid
+}
+.data COLGROUP {
+	BORDER-TOP-STYLE: solid; BORDER-RIGHT-STYLE: solid; BORDER-LEFT-STYLE: =
+solid; BORDER-BOTTOM-STYLE: solid
+}
+.data IMG {
+	VERTICAL-ALIGN: middle
+}
+TABLE.propdef {
+	TABLE-LAYOUT: auto
+}
+.propdef TH {
+	FONT-WEIGHT: normal; WIDTH: 3em; FONT-STYLE: italic; TEXT-ALIGN: left
+}
+DT DFN CODE {
+=09
+}
+DL OL {
+	PADDING-RIGHT: 0px; DISPLAY: inline; PADDING-LEFT: 0px; PADDING-BOTTOM: =
+0px; MARGIN: 0px; PADDING-TOP: 0px
+}
+DL LI {
+	PADDING-RIGHT: 0px; DISPLAY: inline; PADDING-LEFT: 0px; PADDING-BOTTOM: =
+0px; MARGIN: 0px; PADDING-TOP: 0px
+}
+DL OL {
+	counter-reset: list-item
+}
+DL LI {
+	counter-increment: list-item
+}
+DL LI:unknown {
+	FONT-WEIGHT: bold; content: "(" counter(list-item) ") "
+}
+
+------=_NextPart_000_0000_01CD97E6.0CC6F490
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/jquery-1.3.2.min.js
+
+/*=0A=
+ * jQuery JavaScript Library v1.3.2=0A=
+ * http://jquery.com/=0A=
+ *=0A=
+ * Copyright (c) 2009 John Resig=0A=
+ * Dual licensed under the MIT and GPL licenses.=0A=
+ * http://docs.jquery.com/License=0A=
+ *=0A=
+ * Date: 2009-02-19 17:34:21 -0500 (Thu, 19 Feb 2009)=0A=
+ * Revision: 6246=0A=
+ */=0A=
+(function(){var =
+l=3Dthis,g,y=3Dl.jQuery,p=3Dl.$,o=3Dl.jQuery=3Dl.$=3Dfunction(E,F){return=
+ new =
+o.fn.init(E,F)},D=3D/^[^<]*(<(.|\s)+>)[^>]*$|^#([\w-]+)$/,f=3D/^.[^:#\[\.=
+,]*$/;o.fn=3Do.prototype=3D{init:function(E,H){E=3DE||document;if(E.nodeT=
+ype){this[0]=3DE;this.length=3D1;this.context=3DE;return this}if(typeof =
+E=3D=3D=3D"string"){var =
+G=3DD.exec(E);if(G&&(G[1]||!H)){if(G[1]){E=3Do.clean([G[1]],H)}else{var =
+I=3Ddocument.getElementById(G[3]);if(I&&I.id!=3DG[3]){return =
+o().find(E)}var F=3Do(I||[]);F.context=3Ddocument;F.selector=3DE;return =
+F}}else{return o(H).find(E)}}else{if(o.isFunction(E)){return =
+o(document).ready(E)}}if(E.selector&&E.context){this.selector=3DE.selecto=
+r;this.context=3DE.context}return =
+this.setArray(o.isArray(E)?E:o.makeArray(E))},selector:"",jquery:"1.3.2",=
+size:function(){return this.length},get:function(E){return =
+E=3D=3D=3Dg?Array.prototype.slice.call(this):this[E]},pushStack:function(=
+F,H,E){var =
+G=3Do(F);G.prevObject=3Dthis;G.context=3Dthis.context;if(H=3D=3D=3D"find"=
+){G.selector=3Dthis.selector+(this.selector?" =
+":"")+E}else{if(H){G.selector=3Dthis.selector+"."+H+"("+E+")"}}return =
+G},setArray:function(E){this.length=3D0;Array.prototype.push.apply(this,E=
+);return this},each:function(F,E){return =
+o.each(this,F,E)},index:function(E){return =
+o.inArray(E&&E.jquery?E[0]:E,this)},attr:function(F,H,G){var =
+E=3DF;if(typeof F=3D=3D=3D"string"){if(H=3D=3D=3Dg){return =
+this[0]&&o[G||"attr"](this[0],F)}else{E=3D{};E[F]=3DH}}return =
+this.each(function(I){for(F in =
+E){o.attr(G?this.style:this,F,o.prop(this,E[F],G,I,F))}})},css:function(E=
+,F){if((E=3D=3D"width"||E=3D=3D"height")&&parseFloat(F)<0){F=3Dg}return =
+this.attr(E,F,"curCSS")},text:function(F){if(typeof =
+F!=3D=3D"object"&&F!=3Dnull){return =
+this.empty().append((this[0]&&this[0].ownerDocument||document).createText=
+Node(F))}var =
+E=3D"";o.each(F||this,function(){o.each(this.childNodes,function(){if(thi=
+s.nodeType!=3D8){E+=3Dthis.nodeType!=3D1?this.nodeValue:o.fn.text([this])=
+}})});return E},wrapAll:function(E){if(this[0]){var =
+F=3Do(E,this[0].ownerDocument).clone();if(this[0].parentNode){F.insertBef=
+ore(this[0])}F.map(function(){var =
+G=3Dthis;while(G.firstChild){G=3DG.firstChild}return =
+G}).append(this)}return this},wrapInner:function(E){return =
+this.each(function(){o(this).contents().wrapAll(E)})},wrap:function(E){re=
+turn this.each(function(){o(this).wrapAll(E)})},append:function(){return =
+this.domManip(arguments,true,function(E){if(this.nodeType=3D=3D1){this.ap=
+pendChild(E)}})},prepend:function(){return =
+this.domManip(arguments,true,function(E){if(this.nodeType=3D=3D1){this.in=
+sertBefore(E,this.firstChild)}})},before:function(){return =
+this.domManip(arguments,false,function(E){this.parentNode.insertBefore(E,=
+this)})},after:function(){return =
+this.domManip(arguments,false,function(E){this.parentNode.insertBefore(E,=
+this.nextSibling)})},end:function(){return =
+this.prevObject||o([])},push:[].push,sort:[].sort,splice:[].splice,find:f=
+unction(E){if(this.length=3D=3D=3D1){var =
+F=3Dthis.pushStack([],"find",E);F.length=3D0;o.find(E,this[0],F);return =
+F}else{return this.pushStack(o.unique(o.map(this,function(G){return =
+o.find(E,G)})),"find",E)}},clone:function(G){var =
+E=3Dthis.map(function(){if(!o.support.noCloneEvent&&!o.isXMLDoc(this)){va=
+r I=3Dthis.outerHTML;if(!I){var =
+J=3Dthis.ownerDocument.createElement("div");J.appendChild(this.cloneNode(=
+true));I=3DJ.innerHTML}return o.clean([I.replace(/ =
+jQuery\d+=3D"(?:\d+|null)"/g,"").replace(/^\s*/,"")])[0]}else{return =
+this.cloneNode(true)}});if(G=3D=3D=3Dtrue){var =
+H=3Dthis.find("*").andSelf(),F=3D0;E.find("*").andSelf().each(function(){=
+if(this.nodeName!=3D=3DH[F].nodeName){return}var =
+I=3Do.data(H[F],"events");for(var K in I){for(var J in =
+I[K]){o.event.add(this,K,I[K][J],I[K][J].data)}}F++})}return =
+E},filter:function(E){return =
+this.pushStack(o.isFunction(E)&&o.grep(this,function(G,F){return =
+E.call(G,F)})||o.multiFilter(E,o.grep(this,function(F){return =
+F.nodeType=3D=3D=3D1})),"filter",E)},closest:function(E){var =
+G=3Do.expr.match.POS.test(E)?o(E):null,F=3D0;return =
+this.map(function(){var =
+H=3Dthis;while(H&&H.ownerDocument){if(G?G.index(H)>-1:o(H).is(E)){o.data(=
+H,"closest",F);return =
+H}H=3DH.parentNode;F++}})},not:function(E){if(typeof =
+E=3D=3D=3D"string"){if(f.test(E)){return =
+this.pushStack(o.multiFilter(E,this,true),"not",E)}else{E=3Do.multiFilter=
+(E,this)}}var F=3DE.length&&E[E.length-1]!=3D=3Dg&&!E.nodeType;return =
+this.filter(function(){return =
+F?o.inArray(this,E)<0:this!=3DE})},add:function(E){return =
+this.pushStack(o.unique(o.merge(this.get(),typeof =
+E=3D=3D=3D"string"?o(E):o.makeArray(E))))},is:function(E){return =
+!!E&&o.multiFilter(E,this).length>0},hasClass:function(E){return =
+!!E&&this.is("."+E)},val:function(K){if(K=3D=3D=3Dg){var =
+E=3Dthis[0];if(E){if(o.nodeName(E,"option")){return(E.attributes.value||{=
+}).specified?E.value:E.text}if(o.nodeName(E,"select")){var =
+I=3DE.selectedIndex,L=3D[],M=3DE.options,H=3DE.type=3D=3D"select-one";if(=
+I<0){return null}for(var F=3DH?I:0,J=3DH?I+1:M.length;F<J;F++){var =
+G=3DM[F];if(G.selected){K=3Do(G).val();if(H){return K}L.push(K)}}return =
+L}return(E.value||"").replace(/\r/g,"")}return g}if(typeof =
+K=3D=3D=3D"number"){K+=3D""}return =
+this.each(function(){if(this.nodeType!=3D1){return}if(o.isArray(K)&&/radi=
+o|checkbox/.test(this.type)){this.checked=3D(o.inArray(this.value,K)>=3D0=
+||o.inArray(this.name,K)>=3D0)}else{if(o.nodeName(this,"select")){var =
+N=3Do.makeArray(K);o("option",this).each(function(){this.selected=3D(o.in=
+Array(this.value,N)>=3D0||o.inArray(this.text,N)>=3D0)});if(!N.length){th=
+is.selectedIndex=3D-1}}else{this.value=3DK}}})},html:function(E){return =
+E=3D=3D=3Dg?(this[0]?this[0].innerHTML.replace(/ =
+jQuery\d+=3D"(?:\d+|null)"/g,""):null):this.empty().append(E)},replaceWit=
+h:function(E){return this.after(E).remove()},eq:function(E){return =
+this.slice(E,+E+1)},slice:function(){return =
+this.pushStack(Array.prototype.slice.apply(this,arguments),"slice",Array.=
+prototype.slice.call(arguments).join(","))},map:function(E){return =
+this.pushStack(o.map(this,function(G,F){return =
+E.call(G,F,G)}))},andSelf:function(){return =
+this.add(this.prevObject)},domManip:function(J,M,L){if(this[0]){var =
+I=3D(this[0].ownerDocument||this[0]).createDocumentFragment(),F=3Do.clean=
+(J,(this[0].ownerDocument||this[0]),I),H=3DI.firstChild;if(H){for(var =
+G=3D0,E=3Dthis.length;G<E;G++){L.call(K(this[G],H),this.length>1||G>0?I.c=
+loneNode(true):I)}}if(F){o.each(F,z)}}return this;function K(N,O){return =
+M&&o.nodeName(N,"table")&&o.nodeName(O,"tr")?(N.getElementsByTagName("tbo=
+dy")[0]||N.appendChild(N.ownerDocument.createElement("tbody"))):N}}};o.fn=
+.init.prototype=3Do.fn;function =
+z(E,F){if(F.src){o.ajax({url:F.src,async:false,dataType:"script"})}else{o=
+.globalEval(F.text||F.textContent||F.innerHTML||"")}if(F.parentNode){F.pa=
+rentNode.removeChild(F)}}function e(){return +new =
+Date}o.extend=3Do.fn.extend=3Dfunction(){var =
+J=3Darguments[0]||{},H=3D1,I=3Darguments.length,E=3Dfalse,G;if(typeof =
+J=3D=3D=3D"boolean"){E=3DJ;J=3Darguments[1]||{};H=3D2}if(typeof =
+J!=3D=3D"object"&&!o.isFunction(J)){J=3D{}}if(I=3D=3DH){J=3Dthis;--H}for(=
+;H<I;H++){if((G=3Darguments[H])!=3Dnull){for(var F in G){var =
+K=3DJ[F],L=3DG[F];if(J=3D=3D=3DL){continue}if(E&&L&&typeof =
+L=3D=3D=3D"object"&&!L.nodeType){J[F]=3Do.extend(E,K||(L.length!=3Dnull?[=
+]:{}),L)}else{if(L!=3D=3Dg){J[F]=3DL}}}}}return J};var =
+b=3D/z-?index|font-?weight|opacity|zoom|line-?height/i,q=3Ddocument.defau=
+ltView||{},s=3DObject.prototype.toString;o.extend({noConflict:function(E)=
+{l.$=3Dp;if(E){l.jQuery=3Dy}return o},isFunction:function(E){return =
+s.call(E)=3D=3D=3D"[object Function]"},isArray:function(E){return =
+s.call(E)=3D=3D=3D"[object Array]"},isXMLDoc:function(E){return =
+E.nodeType=3D=3D=3D9&&E.documentElement.nodeName!=3D=3D"HTML"||!!E.ownerD=
+ocument&&o.isXMLDoc(E.ownerDocument)},globalEval:function(G){if(G&&/\S/.t=
+est(G)){var =
+F=3Ddocument.getElementsByTagName("head")[0]||document.documentElement,E=3D=
+document.createElement("script");E.type=3D"text/javascript";if(o.support.=
+scriptEval){E.appendChild(document.createTextNode(G))}else{E.text=3DG}F.i=
+nsertBefore(E,F.firstChild);F.removeChild(E)}},nodeName:function(F,E){ret=
+urn =
+F.nodeName&&F.nodeName.toUpperCase()=3D=3DE.toUpperCase()},each:function(=
+G,K,F){var E,H=3D0,I=3DG.length;if(F){if(I=3D=3D=3Dg){for(E in =
+G){if(K.apply(G[E],F)=3D=3D=3Dfalse){break}}}else{for(;H<I;){if(K.apply(G=
+[H++],F)=3D=3D=3Dfalse){break}}}}else{if(I=3D=3D=3Dg){for(E in =
+G){if(K.call(G[E],E,G[E])=3D=3D=3Dfalse){break}}}else{for(var =
+J=3DG[0];H<I&&K.call(J,H,J)!=3D=3Dfalse;J=3DG[++H]){}}}return =
+G},prop:function(H,I,G,F,E){if(o.isFunction(I)){I=3DI.call(H,F)}return =
+typeof =
+I=3D=3D=3D"number"&&G=3D=3D"curCSS"&&!b.test(E)?I+"px":I},className:{add:=
+function(E,F){o.each((F||"").split(/\s+/),function(G,H){if(E.nodeType=3D=3D=
+1&&!o.className.has(E.className,H)){E.className+=3D(E.className?" =
+":"")+H}})},remove:function(E,F){if(E.nodeType=3D=3D1){E.className=3DF!=3D=
+=3Dg?o.grep(E.className.split(/\s+/),function(G){return =
+!o.className.has(F,G)}).join(" "):""}},has:function(F,E){return =
+F&&o.inArray(E,(F.className||F).toString().split(/\s+/))>-1}},swap:functi=
+on(H,G,I){var E=3D{};for(var F in =
+G){E[F]=3DH.style[F];H.style[F]=3DG[F]}I.call(H);for(var F in =
+G){H.style[F]=3DE[F]}},css:function(H,F,J,E){if(F=3D=3D"width"||F=3D=3D"h=
+eight"){var =
+L,G=3D{position:"absolute",visibility:"hidden",display:"block"},K=3DF=3D=3D=
+"width"?["Left","Right"]:["Top","Bottom"];function =
+I(){L=3DF=3D=3D"width"?H.offsetWidth:H.offsetHeight;if(E=3D=3D=3D"border"=
+){return}o.each(K,function(){if(!E){L-=3DparseFloat(o.curCSS(H,"padding"+=
+this,true))||0}if(E=3D=3D=3D"margin"){L+=3DparseFloat(o.curCSS(H,"margin"=
++this,true))||0}else{L-=3DparseFloat(o.curCSS(H,"border"+this+"Width",tru=
+e))||0}})}if(H.offsetWidth!=3D=3D0){I()}else{o.swap(H,G,I)}return =
+Math.max(0,Math.round(L))}return =
+o.curCSS(H,F,J)},curCSS:function(I,F,G){var =
+L,E=3DI.style;if(F=3D=3D"opacity"&&!o.support.opacity){L=3Do.attr(E,"opac=
+ity");return =
+L=3D=3D""?"1":L}if(F.match(/float/i)){F=3Dw}if(!G&&E&&E[F]){L=3DE[F]}else=
+{if(q.getComputedStyle){if(F.match(/float/i)){F=3D"float"}F=3DF.replace(/=
+([A-Z])/g,"-$1").toLowerCase();var =
+M=3Dq.getComputedStyle(I,null);if(M){L=3DM.getPropertyValue(F)}if(F=3D=3D=
+"opacity"&&L=3D=3D""){L=3D"1"}}else{if(I.currentStyle){var =
+J=3DF.replace(/\-(\w)/g,function(N,O){return =
+O.toUpperCase()});L=3DI.currentStyle[F]||I.currentStyle[J];if(!/^\d+(px)?=
+$/i.test(L)&&/^\d/.test(L)){var =
+H=3DE.left,K=3DI.runtimeStyle.left;I.runtimeStyle.left=3DI.currentStyle.l=
+eft;E.left=3DL||0;L=3DE.pixelLeft+"px";E.left=3DH;I.runtimeStyle.left=3DK=
+}}}}return L},clean:function(F,K,I){K=3DK||document;if(typeof =
+K.createElement=3D=3D=3D"undefined"){K=3DK.ownerDocument||K[0]&&K[0].owne=
+rDocument||document}if(!I&&F.length=3D=3D=3D1&&typeof =
+F[0]=3D=3D=3D"string"){var =
+H=3D/^<(\w+)\s*\/?>$/.exec(F[0]);if(H){return[K.createElement(H[1])]}}var=
+ =
+G=3D[],E=3D[],L=3DK.createElement("div");o.each(F,function(P,S){if(typeof=
+ S=3D=3D=3D"number"){S+=3D""}if(!S){return}if(typeof =
+S=3D=3D=3D"string"){S=3DS.replace(/(<(\w+)[^>]*?)\/>/g,function(U,V,T){re=
+turn =
+T.match(/^(abbr|br|col|img|input|link|meta|param|hr|area|embed)$/i)?U:V+"=
+></"+T+">"});var =
+O=3DS.replace(/^\s+/,"").substring(0,10).toLowerCase();var =
+Q=3D!O.indexOf("<opt")&&[1,"<select =
+multiple=3D'multiple'>","</select>"]||!O.indexOf("<leg")&&[1,"<fieldset>"=
+,"</fieldset>"]||O.match(/^<(thead|tbody|tfoot|colg|cap)/)&&[1,"<table>",=
+"</table>"]||!O.indexOf("<tr")&&[2,"<table><tbody>","</tbody></table>"]||=
+(!O.indexOf("<td")||!O.indexOf("<th"))&&[3,"<table><tbody><tr>","</tr></t=
+body></table>"]||!O.indexOf("<col")&&[2,"<table><tbody></tbody><colgroup>=
+","</colgroup></table>"]||!o.support.htmlSerialize&&[1,"div<div>","</div>=
+"]||[0,"",""];L.innerHTML=3DQ[1]+S+Q[2];while(Q[0]--){L=3DL.lastChild}if(=
+!o.support.tbody){var =
+R=3D/<tbody/i.test(S),N=3D!O.indexOf("<table")&&!R?L.firstChild&&L.firstC=
+hild.childNodes:Q[1]=3D=3D"<table>"&&!R?L.childNodes:[];for(var =
+M=3DN.length-1;M>=3D0;--M){if(o.nodeName(N[M],"tbody")&&!N[M].childNodes.=
+length){N[M].parentNode.removeChild(N[M])}}}if(!o.support.leadingWhitespa=
+ce&&/^\s/.test(S)){L.insertBefore(K.createTextNode(S.match(/^\s*/)[0]),L.=
+firstChild)}S=3Do.makeArray(L.childNodes)}if(S.nodeType){G.push(S)}else{G=
+=3Do.merge(G,S)}});if(I){for(var =
+J=3D0;G[J];J++){if(o.nodeName(G[J],"script")&&(!G[J].type||G[J].type.toLo=
+werCase()=3D=3D=3D"text/javascript")){E.push(G[J].parentNode?G[J].parentN=
+ode.removeChild(G[J]):G[J])}else{if(G[J].nodeType=3D=3D=3D1){G.splice.app=
+ly(G,[J+1,0].concat(o.makeArray(G[J].getElementsByTagName("script"))))}I.=
+appendChild(G[J])}}return E}return =
+G},attr:function(J,G,K){if(!J||J.nodeType=3D=3D3||J.nodeType=3D=3D8){retu=
+rn g}var =
+H=3D!o.isXMLDoc(J),L=3DK!=3D=3Dg;G=3DH&&o.props[G]||G;if(J.tagName){var =
+F=3D/href|src|style/.test(G);if(G=3D=3D"selected"&&J.parentNode){J.parent=
+Node.selectedIndex}if(G in =
+J&&H&&!F){if(L){if(G=3D=3D"type"&&o.nodeName(J,"input")&&J.parentNode){th=
+row"type property can't be =
+changed"}J[G]=3DK}if(o.nodeName(J,"form")&&J.getAttributeNode(G)){return =
+J.getAttributeNode(G).nodeValue}if(G=3D=3D"tabIndex"){var =
+I=3DJ.getAttributeNode("tabIndex");return =
+I&&I.specified?I.value:J.nodeName.match(/(button|input|object|select|text=
+area)/i)?0:J.nodeName.match(/^(a|area)$/i)&&J.href?0:g}return =
+J[G]}if(!o.support.style&&H&&G=3D=3D"style"){return =
+o.attr(J.style,"cssText",K)}if(L){J.setAttribute(G,""+K)}var =
+E=3D!o.support.hrefNormalized&&H&&F?J.getAttribute(G,2):J.getAttribute(G)=
+;return =
+E=3D=3D=3Dnull?g:E}if(!o.support.opacity&&G=3D=3D"opacity"){if(L){J.zoom=3D=
+1;J.filter=3D(J.filter||"").replace(/alpha\([^)]*\)/,"")+(parseInt(K)+""=3D=
+=3D"NaN"?"":"alpha(opacity=3D"+K*100+")")}return =
+J.filter&&J.filter.indexOf("opacity=3D")>=3D0?(parseFloat(J.filter.match(=
+/opacity=3D([^)]*)/)[1])/100)+"":""}G=3DG.replace(/-([a-z])/ig,function(M=
+,N){return N.toUpperCase()});if(L){J[G]=3DK}return =
+J[G]},trim:function(E){return(E||"").replace(/^\s+|\s+$/g,"")},makeArray:=
+function(G){var E=3D[];if(G!=3Dnull){var =
+F=3DG.length;if(F=3D=3Dnull||typeof =
+G=3D=3D=3D"string"||o.isFunction(G)||G.setInterval){E[0]=3DG}else{while(F=
+){E[--F]=3DG[F]}}}return E},inArray:function(G,H){for(var =
+E=3D0,F=3DH.length;E<F;E++){if(H[E]=3D=3D=3DG){return E}}return =
+-1},merge:function(H,E){var =
+F=3D0,G,I=3DH.length;if(!o.support.getAll){while((G=3DE[F++])!=3Dnull){if=
+(G.nodeType!=3D8){H[I++]=3DG}}}else{while((G=3DE[F++])!=3Dnull){H[I++]=3D=
+G}}return H},unique:function(K){var F=3D[],E=3D{};try{for(var =
+G=3D0,H=3DK.length;G<H;G++){var =
+J=3Do.data(K[G]);if(!E[J]){E[J]=3Dtrue;F.push(K[G])}}}catch(I){F=3DK}retu=
+rn F},grep:function(F,J,E){var G=3D[];for(var =
+H=3D0,I=3DF.length;H<I;H++){if(!E!=3D!J(F[H],H)){G.push(F[H])}}return =
+G},map:function(E,J){var F=3D[];for(var G=3D0,H=3DE.length;G<H;G++){var =
+I=3DJ(E[G],G);if(I!=3Dnull){F[F.length]=3DI}}return =
+F.concat.apply([],F)}});var =
+C=3Dnavigator.userAgent.toLowerCase();o.browser=3D{version:(C.match(/.+(?=
+:rv|it|ra|ie)[\/: =
+]([\d.]+)/)||[0,"0"])[1],safari:/webkit/.test(C),opera:/opera/.test(C),ms=
+ie:/msie/.test(C)&&!/opera/.test(C),mozilla:/mozilla/.test(C)&&!/(compati=
+ble|webkit)/.test(C)};o.each({parent:function(E){return =
+E.parentNode},parents:function(E){return =
+o.dir(E,"parentNode")},next:function(E){return =
+o.nth(E,2,"nextSibling")},prev:function(E){return =
+o.nth(E,2,"previousSibling")},nextAll:function(E){return =
+o.dir(E,"nextSibling")},prevAll:function(E){return =
+o.dir(E,"previousSibling")},siblings:function(E){return =
+o.sibling(E.parentNode.firstChild,E)},children:function(E){return =
+o.sibling(E.firstChild)},contents:function(E){return =
+o.nodeName(E,"iframe")?E.contentDocument||E.contentWindow.document:o.make=
+Array(E.childNodes)}},function(E,F){o.fn[E]=3Dfunction(G){var =
+H=3Do.map(this,F);if(G&&typeof =
+G=3D=3D"string"){H=3Do.multiFilter(G,H)}return =
+this.pushStack(o.unique(H),E,G)}});o.each({appendTo:"append",prependTo:"p=
+repend",insertBefore:"before",insertAfter:"after",replaceAll:"replaceWith=
+"},function(E,F){o.fn[E]=3Dfunction(G){var J=3D[],L=3Do(G);for(var =
+K=3D0,H=3DL.length;K<H;K++){var =
+I=3D(K>0?this.clone(true):this).get();o.fn[F].apply(o(L[K]),I);J=3DJ.conc=
+at(I)}return =
+this.pushStack(J,E,G)}});o.each({removeAttr:function(E){o.attr(this,E,"")=
+;if(this.nodeType=3D=3D1){this.removeAttribute(E)}},addClass:function(E){=
+o.className.add(this,E)},removeClass:function(E){o.className.remove(this,=
+E)},toggleClass:function(F,E){if(typeof =
+E!=3D=3D"boolean"){E=3D!o.className.has(this,F)}o.className[E?"add":"remo=
+ve"](this,F)},remove:function(E){if(!E||o.filter(E,[this]).length){o("*",=
+this).add([this]).each(function(){o.event.remove(this);o.removeData(this)=
+});if(this.parentNode){this.parentNode.removeChild(this)}}},empty:functio=
+n(){o(this).children().remove();while(this.firstChild){this.removeChild(t=
+his.firstChild)}}},function(E,F){o.fn[E]=3Dfunction(){return =
+this.each(F,arguments)}});function j(E,F){return =
+E[0]&&parseInt(o.curCSS(E[0],F,true),10)||0}var =
+h=3D"jQuery"+e(),v=3D0,A=3D{};o.extend({cache:{},data:function(F,E,G){F=3D=
+F=3D=3Dl?A:F;var =
+H=3DF[h];if(!H){H=3DF[h]=3D++v}if(E&&!o.cache[H]){o.cache[H]=3D{}}if(G!=3D=
+=3Dg){o.cache[H][E]=3DG}return =
+E?o.cache[H][E]:H},removeData:function(F,E){F=3DF=3D=3Dl?A:F;var =
+H=3DF[h];if(E){if(o.cache[H]){delete o.cache[H][E];E=3D"";for(E in =
+o.cache[H]){break}if(!E){o.removeData(F)}}}else{try{delete =
+F[h]}catch(G){if(F.removeAttribute){F.removeAttribute(h)}}delete =
+o.cache[H]}},queue:function(F,E,H){if(F){E=3D(E||"fx")+"queue";var =
+G=3Do.data(F,E);if(!G||o.isArray(H)){G=3Do.data(F,E,o.makeArray(H))}else{=
+if(H){G.push(H)}}}return G},dequeue:function(H,G){var =
+E=3Do.queue(H,G),F=3DE.shift();if(!G||G=3D=3D=3D"fx"){F=3DE[0]}if(F!=3D=3D=
+g){F.call(H)}}});o.fn.extend({data:function(E,G){var =
+H=3DE.split(".");H[1]=3DH[1]?"."+H[1]:"";if(G=3D=3D=3Dg){var =
+F=3Dthis.triggerHandler("getData"+H[1]+"!",[H[0]]);if(F=3D=3D=3Dg&&this.l=
+ength){F=3Do.data(this[0],E)}return =
+F=3D=3D=3Dg&&H[1]?this.data(H[0]):F}else{return =
+this.trigger("setData"+H[1]+"!",[H[0],G]).each(function(){o.data(this,E,G=
+)})}},removeData:function(E){return =
+this.each(function(){o.removeData(this,E)})},queue:function(E,F){if(typeo=
+f E!=3D=3D"string"){F=3DE;E=3D"fx"}if(F=3D=3D=3Dg){return =
+o.queue(this[0],E)}return this.each(function(){var =
+G=3Do.queue(this,E,F);if(E=3D=3D"fx"&&G.length=3D=3D1){G[0].call(this)}})=
+},dequeue:function(E){return this.each(function(){o.dequeue(this,E)})}});=0A=
+/*=0A=
+ * Sizzle CSS Selector Engine - v0.9.3=0A=
+ *  Copyright 2009, The Dojo Foundation=0A=
+ *  Released under the MIT, BSD, and GPL Licenses.=0A=
+ *  More information: http://sizzlejs.com/=0A=
+ */=0A=
+(function(){var =
+R=3D/((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^[\]]*\]|['"][^'"]*['"]|[^[\]=
+'"]+)+\]|\\.|[^ =
+>+~,(\[\\]+)+|[>+~])(\s*,\s*)?/g,L=3D0,H=3DObject.prototype.toString;var =
+F=3Dfunction(Y,U,ab,ac){ab=3Dab||[];U=3DU||document;if(U.nodeType!=3D=3D1=
+&&U.nodeType!=3D=3D9){return[]}if(!Y||typeof Y!=3D=3D"string"){return =
+ab}var =
+Z=3D[],W,af,ai,T,ad,V,X=3Dtrue;R.lastIndex=3D0;while((W=3DR.exec(Y))!=3D=3D=
+null){Z.push(W[1]);if(W[2]){V=3DRegExp.rightContext;break}}if(Z.length>1&=
+&M.exec(Y)){if(Z.length=3D=3D=3D2&&I.relative[Z[0]]){af=3DJ(Z[0]+Z[1],U)}=
+else{af=3DI.relative[Z[0]]?[U]:F(Z.shift(),U);while(Z.length){Y=3DZ.shift=
+();if(I.relative[Y]){Y+=3DZ.shift()}af=3DJ(Y,af)}}}else{var =
+ae=3Dac?{expr:Z.pop(),set:E(ac)}:F.find(Z.pop(),Z.length=3D=3D=3D1&&U.par=
+entNode?U.parentNode:U,Q(U));af=3DF.filter(ae.expr,ae.set);if(Z.length>0)=
+{ai=3DE(af)}else{X=3Dfalse}while(Z.length){var =
+ah=3DZ.pop(),ag=3Dah;if(!I.relative[ah]){ah=3D""}else{ag=3DZ.pop()}if(ag=3D=
+=3Dnull){ag=3DU}I.relative[ah](ai,ag,Q(U))}}if(!ai){ai=3Daf}if(!ai){throw=
+"Syntax error, unrecognized expression: =
+"+(ah||Y)}if(H.call(ai)=3D=3D=3D"[object =
+Array]"){if(!X){ab.push.apply(ab,ai)}else{if(U.nodeType=3D=3D=3D1){for(va=
+r =
+aa=3D0;ai[aa]!=3Dnull;aa++){if(ai[aa]&&(ai[aa]=3D=3D=3Dtrue||ai[aa].nodeT=
+ype=3D=3D=3D1&&K(U,ai[aa]))){ab.push(af[aa])}}}else{for(var =
+aa=3D0;ai[aa]!=3Dnull;aa++){if(ai[aa]&&ai[aa].nodeType=3D=3D=3D1){ab.push=
+(af[aa])}}}}}else{E(ai,ab)}if(V){F(V,U,ab,ac);if(G){hasDuplicate=3Dfalse;=
+ab.sort(G);if(hasDuplicate){for(var =
+aa=3D1;aa<ab.length;aa++){if(ab[aa]=3D=3D=3Dab[aa-1]){ab.splice(aa--,1)}}=
+}}}return ab};F.matches=3Dfunction(T,U){return =
+F(T,null,null,U)};F.find=3Dfunction(aa,T,ab){var =
+Z,X;if(!aa){return[]}for(var W=3D0,V=3DI.order.length;W<V;W++){var =
+Y=3DI.order[W],X;if((X=3DI.match[Y].exec(aa))){var =
+U=3DRegExp.leftContext;if(U.substr(U.length-1)!=3D=3D"\\"){X[1]=3D(X[1]||=
+"").replace(/\\/g,"");Z=3DI.find[Y](X,T,ab);if(Z!=3Dnull){aa=3Daa.replace=
+(I.match[Y],"");break}}}}if(!Z){Z=3DT.getElementsByTagName("*")}return{se=
+t:Z,expr:aa}};F.filter=3Dfunction(ad,ac,ag,W){var =
+V=3Dad,ai=3D[],aa=3Dac,Y,T,Z=3Dac&&ac[0]&&Q(ac[0]);while(ad&&ac.length){f=
+or(var ab in I.filter){if((Y=3DI.match[ab].exec(ad))!=3Dnull){var =
+U=3DI.filter[ab],ah,af;T=3Dfalse;if(aa=3D=3Dai){ai=3D[]}if(I.preFilter[ab=
+]){Y=3DI.preFilter[ab](Y,aa,ag,ai,W,Z);if(!Y){T=3Dah=3Dtrue}else{if(Y=3D=3D=
+=3Dtrue){continue}}}if(Y){for(var =
+X=3D0;(af=3Daa[X])!=3Dnull;X++){if(af){ah=3DU(af,Y,X,aa);var =
+ae=3DW^!!ah;if(ag&&ah!=3Dnull){if(ae){T=3Dtrue}else{aa[X]=3Dfalse}}else{i=
+f(ae){ai.push(af);T=3Dtrue}}}}}if(ah!=3D=3Dg){if(!ag){aa=3Dai}ad=3Dad.rep=
+lace(I.match[ab],"");if(!T){return[]}break}}}if(ad=3D=3DV){if(T=3D=3Dnull=
+){throw"Syntax error, unrecognized expression: =
+"+ad}else{break}}V=3Dad}return aa};var =
+I=3DF.selectors=3D{order:["ID","NAME","TAG"],match:{ID:/#((?:[\w\u00c0-\u=
+FFFF_-]|\\.)+)/,CLASS:/\.((?:[\w\u00c0-\uFFFF_-]|\\.)+)/,NAME:/\[name=3D[=
+'"]*((?:[\w\u00c0-\uFFFF_-]|\\.)+)['"]*\]/,ATTR:/\[\s*((?:[\w\u00c0-\uFFF=
+F_-]|\\.)+)\s*(?:(\S?=3D)\s*(['"]*)(.*?)\3|)\s*\]/,TAG:/^((?:[\w\u00c0-\u=
+FFFF\*_-]|\\.)+)/,CHILD:/:(only|nth|last|first)-child(?:\((even|odd|[\dn+=
+-]*)\))?/,POS:/:(nth|eq|gt|lt|first|last|even|odd)(?:\((\d*)\))?(?=3D[^-]=
+|$)/,PSEUDO:/:((?:[\w\u00c0-\uFFFF_-]|\\.)+)(?:\((['"]*)((?:\([^\)]+\)|[^=
+\2\(\)]*)+)\2\))?/},attrMap:{"class":"className","for":"htmlFor"},attrHan=
+dle:{href:function(T){return =
+T.getAttribute("href")}},relative:{"+":function(aa,T,Z){var X=3Dtypeof =
+T=3D=3D=3D"string",ab=3DX&&!/\W/.test(T),Y=3DX&&!ab;if(ab&&!Z){T=3DT.toUp=
+perCase()}for(var =
+W=3D0,V=3Daa.length,U;W<V;W++){if((U=3Daa[W])){while((U=3DU.previousSibli=
+ng)&&U.nodeType!=3D=3D1){}aa[W]=3DY||U&&U.nodeName=3D=3D=3DT?U||false:U=3D=
+=3D=3DT}}if(Y){F.filter(T,aa,true)}},">":function(Z,U,aa){var X=3Dtypeof =
+U=3D=3D=3D"string";if(X&&!/\W/.test(U)){U=3Daa?U:U.toUpperCase();for(var =
+V=3D0,T=3DZ.length;V<T;V++){var Y=3DZ[V];if(Y){var =
+W=3DY.parentNode;Z[V]=3DW.nodeName=3D=3D=3DU?W:false}}}else{for(var =
+V=3D0,T=3DZ.length;V<T;V++){var =
+Y=3DZ[V];if(Y){Z[V]=3DX?Y.parentNode:Y.parentNode=3D=3D=3DU}}if(X){F.filt=
+er(U,Z,true)}}},"":function(W,U,Y){var =
+V=3DL++,T=3DS;if(!U.match(/\W/)){var =
+X=3DU=3DY?U:U.toUpperCase();T=3DP}T("parentNode",U,V,W,X,Y)},"~":function=
+(W,U,Y){var V=3DL++,T=3DS;if(typeof =
+U=3D=3D=3D"string"&&!U.match(/\W/)){var =
+X=3DU=3DY?U:U.toUpperCase();T=3DP}T("previousSibling",U,V,W,X,Y)}},find:{=
+ID:function(U,V,W){if(typeof V.getElementById!=3D=3D"undefined"&&!W){var =
+T=3DV.getElementById(U[1]);return =
+T?[T]:[]}},NAME:function(V,Y,Z){if(typeof =
+Y.getElementsByName!=3D=3D"undefined"){var =
+U=3D[],X=3DY.getElementsByName(V[1]);for(var =
+W=3D0,T=3DX.length;W<T;W++){if(X[W].getAttribute("name")=3D=3D=3DV[1]){U.=
+push(X[W])}}return U.length=3D=3D=3D0?null:U}},TAG:function(T,U){return =
+U.getElementsByTagName(T[1])}},preFilter:{CLASS:function(W,U,V,T,Z,aa){W=3D=
+" "+W[1].replace(/\\/g,"")+" ";if(aa){return W}for(var =
+X=3D0,Y;(Y=3DU[X])!=3Dnull;X++){if(Y){if(Z^(Y.className&&(" =
+"+Y.className+" =
+").indexOf(W)>=3D0)){if(!V){T.push(Y)}}else{if(V){U[X]=3Dfalse}}}}return =
+false},ID:function(T){return =
+T[1].replace(/\\/g,"")},TAG:function(U,T){for(var =
+V=3D0;T[V]=3D=3D=3Dfalse;V++){}return =
+T[V]&&Q(T[V])?U[1]:U[1].toUpperCase()},CHILD:function(T){if(T[1]=3D=3D"nt=
+h"){var =
+U=3D/(-?)(\d*)n((?:\+|-)?\d*)/.exec(T[2]=3D=3D"even"&&"2n"||T[2]=3D=3D"od=
+d"&&"2n+1"||!/\D/.test(T[2])&&"0n+"+T[2]||T[2]);T[2]=3D(U[1]+(U[2]||1))-0=
+;T[3]=3DU[3]-0}T[0]=3DL++;return T},ATTR:function(X,U,V,T,Y,Z){var =
+W=3DX[1].replace(/\\/g,"");if(!Z&&I.attrMap[W]){X[1]=3DI.attrMap[W]}if(X[=
+2]=3D=3D=3D"~=3D"){X[4]=3D" "+X[4]+" "}return =
+X},PSEUDO:function(X,U,V,T,Y){if(X[1]=3D=3D=3D"not"){if(X[3].match(R).len=
+gth>1||/^\w/.test(X[3])){X[3]=3DF(X[3],null,null,U)}else{var =
+W=3DF.filter(X[3],U,V,true^Y);if(!V){T.push.apply(T,W)}return =
+false}}else{if(I.match.POS.test(X[0])||I.match.CHILD.test(X[0])){return =
+true}}return X},POS:function(T){T.unshift(true);return =
+T}},filters:{enabled:function(T){return =
+T.disabled=3D=3D=3Dfalse&&T.type!=3D=3D"hidden"},disabled:function(T){ret=
+urn T.disabled=3D=3D=3Dtrue},checked:function(T){return =
+T.checked=3D=3D=3Dtrue},selected:function(T){T.parentNode.selectedIndex;r=
+eturn T.selected=3D=3D=3Dtrue},parent:function(T){return =
+!!T.firstChild},empty:function(T){return =
+!T.firstChild},has:function(V,U,T){return =
+!!F(T[3],V).length},header:function(T){return/h\d/i.test(T.nodeName)},tex=
+t:function(T){return"text"=3D=3D=3DT.type},radio:function(T){return"radio=
+"=3D=3D=3DT.type},checkbox:function(T){return"checkbox"=3D=3D=3DT.type},f=
+ile:function(T){return"file"=3D=3D=3DT.type},password:function(T){return"=
+password"=3D=3D=3DT.type},submit:function(T){return"submit"=3D=3D=3DT.typ=
+e},image:function(T){return"image"=3D=3D=3DT.type},reset:function(T){retu=
+rn"reset"=3D=3D=3DT.type},button:function(T){return"button"=3D=3D=3DT.typ=
+e||T.nodeName.toUpperCase()=3D=3D=3D"BUTTON"},input:function(T){return/in=
+put|select|textarea|button/i.test(T.nodeName)}},setFilters:{first:functio=
+n(U,T){return T=3D=3D=3D0},last:function(V,U,T,W){return =
+U=3D=3D=3DW.length-1},even:function(U,T){return =
+T%2=3D=3D=3D0},odd:function(U,T){return =
+T%2=3D=3D=3D1},lt:function(V,U,T){return =
+U<T[3]-0},gt:function(V,U,T){return U>T[3]-0},nth:function(V,U,T){return =
+T[3]-0=3D=3DU},eq:function(V,U,T){return =
+T[3]-0=3D=3DU}},filter:{PSEUDO:function(Z,V,W,aa){var =
+U=3DV[1],X=3DI.filters[U];if(X){return =
+X(Z,W,V,aa)}else{if(U=3D=3D=3D"contains"){return(Z.textContent||Z.innerTe=
+xt||"").indexOf(V[3])>=3D0}else{if(U=3D=3D=3D"not"){var Y=3DV[3];for(var =
+W=3D0,T=3DY.length;W<T;W++){if(Y[W]=3D=3D=3DZ){return false}}return =
+true}}}},CHILD:function(T,W){var =
+Z=3DW[1],U=3DT;switch(Z){case"only":case"first":while(U=3DU.previousSibli=
+ng){if(U.nodeType=3D=3D=3D1){return false}}if(Z=3D=3D"first"){return =
+true}U=3DT;case"last":while(U=3DU.nextSibling){if(U.nodeType=3D=3D=3D1){r=
+eturn false}}return true;case"nth":var =
+V=3DW[2],ac=3DW[3];if(V=3D=3D1&&ac=3D=3D0){return true}var =
+Y=3DW[0],ab=3DT.parentNode;if(ab&&(ab.sizcache!=3D=3DY||!T.nodeIndex)){va=
+r =
+X=3D0;for(U=3Dab.firstChild;U;U=3DU.nextSibling){if(U.nodeType=3D=3D=3D1)=
+{U.nodeIndex=3D++X}}ab.sizcache=3DY}var =
+aa=3DT.nodeIndex-ac;if(V=3D=3D0){return =
+aa=3D=3D0}else{return(aa%V=3D=3D0&&aa/V>=3D0)}}},ID:function(U,T){return =
+U.nodeType=3D=3D=3D1&&U.getAttribute("id")=3D=3D=3DT},TAG:function(U,T){r=
+eturn(T=3D=3D=3D"*"&&U.nodeType=3D=3D=3D1)||U.nodeName=3D=3D=3DT},CLASS:f=
+unction(U,T){return(" "+(U.className||U.getAttribute("class"))+" =
+").indexOf(T)>-1},ATTR:function(Y,W){var =
+V=3DW[1],T=3DI.attrHandle[V]?I.attrHandle[V](Y):Y[V]!=3Dnull?Y[V]:Y.getAt=
+tribute(V),Z=3DT+"",X=3DW[2],U=3DW[4];return =
+T=3D=3Dnull?X=3D=3D=3D"!=3D":X=3D=3D=3D"=3D"?Z=3D=3D=3DU:X=3D=3D=3D"*=3D"=
+?Z.indexOf(U)>=3D0:X=3D=3D=3D"~=3D"?(" "+Z+" =
+").indexOf(U)>=3D0:!U?Z&&T!=3D=3Dfalse:X=3D=3D=3D"!=3D"?Z!=3DU:X=3D=3D=3D=
+"^=3D"?Z.indexOf(U)=3D=3D=3D0:X=3D=3D=3D"$=3D"?Z.substr(Z.length-U.length=
+)=3D=3D=3DU:X=3D=3D=3D"|=3D"?Z=3D=3D=3DU||Z.substr(0,U.length+1)=3D=3D=3D=
+U+"-":false},POS:function(X,U,V,Y){var =
+T=3DU[2],W=3DI.setFilters[T];if(W){return W(X,V,U,Y)}}}};var =
+M=3DI.match.POS;for(var O in =
+I.match){I.match[O]=3DRegExp(I.match[O].source+/(?![^\[]*\])(?![^\(]*\))/=
+.source)}var =
+E=3Dfunction(U,T){U=3DArray.prototype.slice.call(U);if(T){T.push.apply(T,=
+U);return T}return =
+U};try{Array.prototype.slice.call(document.documentElement.childNodes)}ca=
+tch(N){E=3Dfunction(X,W){var U=3DW||[];if(H.call(X)=3D=3D=3D"[object =
+Array]"){Array.prototype.push.apply(U,X)}else{if(typeof =
+X.length=3D=3D=3D"number"){for(var =
+V=3D0,T=3DX.length;V<T;V++){U.push(X[V])}}else{for(var =
+V=3D0;X[V];V++){U.push(X[V])}}}return U}}var =
+G;if(document.documentElement.compareDocumentPosition){G=3Dfunction(U,T){=
+var =
+V=3DU.compareDocumentPosition(T)&4?-1:U=3D=3D=3DT?0:1;if(V=3D=3D=3D0){has=
+Duplicate=3Dtrue}return V}}else{if("sourceIndex" in =
+document.documentElement){G=3Dfunction(U,T){var =
+V=3DU.sourceIndex-T.sourceIndex;if(V=3D=3D=3D0){hasDuplicate=3Dtrue}retur=
+n V}}else{if(document.createRange){G=3Dfunction(W,U){var =
+V=3DW.ownerDocument.createRange(),T=3DU.ownerDocument.createRange();V.sel=
+ectNode(W);V.collapse(true);T.selectNode(U);T.collapse(true);var =
+X=3DV.compareBoundaryPoints(Range.START_TO_END,T);if(X=3D=3D=3D0){hasDupl=
+icate=3Dtrue}return X}}}}(function(){var =
+U=3Ddocument.createElement("form"),V=3D"script"+(new =
+Date).getTime();U.innerHTML=3D"<input name=3D'"+V+"'/>";var =
+T=3Ddocument.documentElement;T.insertBefore(U,T.firstChild);if(!!document=
+.getElementById(V)){I.find.ID=3Dfunction(X,Y,Z){if(typeof =
+Y.getElementById!=3D=3D"undefined"&&!Z){var =
+W=3DY.getElementById(X[1]);return W?W.id=3D=3D=3DX[1]||typeof =
+W.getAttributeNode!=3D=3D"undefined"&&W.getAttributeNode("id").nodeValue=3D=
+=3D=3DX[1]?[W]:g:[]}};I.filter.ID=3Dfunction(Y,W){var X=3Dtypeof =
+Y.getAttributeNode!=3D=3D"undefined"&&Y.getAttributeNode("id");return =
+Y.nodeType=3D=3D=3D1&&X&&X.nodeValue=3D=3D=3DW}}T.removeChild(U)})();(fun=
+ction(){var =
+T=3Ddocument.createElement("div");T.appendChild(document.createComment(""=
+));if(T.getElementsByTagName("*").length>0){I.find.TAG=3Dfunction(U,Y){va=
+r X=3DY.getElementsByTagName(U[1]);if(U[1]=3D=3D=3D"*"){var =
+W=3D[];for(var =
+V=3D0;X[V];V++){if(X[V].nodeType=3D=3D=3D1){W.push(X[V])}}X=3DW}return =
+X}}T.innerHTML=3D"<a href=3D'#'></a>";if(T.firstChild&&typeof =
+T.firstChild.getAttribute!=3D=3D"undefined"&&T.firstChild.getAttribute("h=
+ref")!=3D=3D"#"){I.attrHandle.href=3Dfunction(U){return =
+U.getAttribute("href",2)}}})();if(document.querySelectorAll){(function(){=
+var T=3DF,U=3Ddocument.createElement("div");U.innerHTML=3D"<p =
+class=3D'TEST'></p>";if(U.querySelectorAll&&U.querySelectorAll(".TEST").l=
+ength=3D=3D=3D0){return}F=3Dfunction(Y,X,V,W){X=3DX||document;if(!W&&X.no=
+deType=3D=3D=3D9&&!Q(X)){try{return =
+E(X.querySelectorAll(Y),V)}catch(Z){}}return =
+T(Y,X,V,W)};F.find=3DT.find;F.filter=3DT.filter;F.selectors=3DT.selectors=
+;F.matches=3DT.matches})()}if(document.getElementsByClassName&&document.d=
+ocumentElement.getElementsByClassName){(function(){var =
+T=3Ddocument.createElement("div");T.innerHTML=3D"<div class=3D'test =
+e'></div><div =
+class=3D'test'></div>";if(T.getElementsByClassName("e").length=3D=3D=3D0)=
+{return}T.lastChild.className=3D"e";if(T.getElementsByClassName("e").leng=
+th=3D=3D=3D1){return}I.order.splice(1,0,"CLASS");I.find.CLASS=3Dfunction(=
+U,V,W){if(typeof V.getElementsByClassName!=3D=3D"undefined"&&!W){return =
+V.getElementsByClassName(U[1])}}})()}function P(U,Z,Y,ad,aa,ac){var =
+ab=3DU=3D=3D"previousSibling"&&!ac;for(var =
+W=3D0,V=3Dad.length;W<V;W++){var =
+T=3Dad[W];if(T){if(ab&&T.nodeType=3D=3D=3D1){T.sizcache=3DY;T.sizset=3DW}=
+T=3DT[U];var =
+X=3Dfalse;while(T){if(T.sizcache=3D=3D=3DY){X=3Dad[T.sizset];break}if(T.n=
+odeType=3D=3D=3D1&&!ac){T.sizcache=3DY;T.sizset=3DW}if(T.nodeName=3D=3D=3D=
+Z){X=3DT;break}T=3DT[U]}ad[W]=3DX}}}function S(U,Z,Y,ad,aa,ac){var =
+ab=3DU=3D=3D"previousSibling"&&!ac;for(var =
+W=3D0,V=3Dad.length;W<V;W++){var =
+T=3Dad[W];if(T){if(ab&&T.nodeType=3D=3D=3D1){T.sizcache=3DY;T.sizset=3DW}=
+T=3DT[U];var =
+X=3Dfalse;while(T){if(T.sizcache=3D=3D=3DY){X=3Dad[T.sizset];break}if(T.n=
+odeType=3D=3D=3D1){if(!ac){T.sizcache=3DY;T.sizset=3DW}if(typeof =
+Z!=3D=3D"string"){if(T=3D=3D=3DZ){X=3Dtrue;break}}else{if(F.filter(Z,[T])=
+.length>0){X=3DT;break}}}T=3DT[U]}ad[W]=3DX}}}var =
+K=3Ddocument.compareDocumentPosition?function(U,T){return =
+U.compareDocumentPosition(T)&16}:function(U,T){return =
+U!=3D=3DT&&(U.contains?U.contains(T):true)};var Q=3Dfunction(T){return =
+T.nodeType=3D=3D=3D9&&T.documentElement.nodeName!=3D=3D"HTML"||!!T.ownerD=
+ocument&&Q(T.ownerDocument)};var J=3Dfunction(T,aa){var =
+W=3D[],X=3D"",Y,V=3Daa.nodeType?[aa]:aa;while((Y=3DI.match.PSEUDO.exec(T)=
+)){X+=3DY[0];T=3DT.replace(I.match.PSEUDO,"")}T=3DI.relative[T]?T+"*":T;f=
+or(var Z=3D0,U=3DV.length;Z<U;Z++){F(T,V[Z],W)}return =
+F.filter(X,W)};o.find=3DF;o.filter=3DF.filter;o.expr=3DF.selectors;o.expr=
+[":"]=3Do.expr.filters;F.selectors.filters.hidden=3Dfunction(T){return =
+T.offsetWidth=3D=3D=3D0||T.offsetHeight=3D=3D=3D0};F.selectors.filters.vi=
+sible=3Dfunction(T){return =
+T.offsetWidth>0||T.offsetHeight>0};F.selectors.filters.animated=3Dfunctio=
+n(T){return o.grep(o.timers,function(U){return =
+T=3D=3D=3DU.elem}).length};o.multiFilter=3Dfunction(V,T,U){if(U){V=3D":no=
+t("+V+")"}return F.matches(V,T)};o.dir=3Dfunction(V,U){var =
+T=3D[],W=3DV[U];while(W&&W!=3Ddocument){if(W.nodeType=3D=3D1){T.push(W)}W=
+=3DW[U]}return T};o.nth=3Dfunction(X,T,V,W){T=3DT||1;var =
+U=3D0;for(;X;X=3DX[V]){if(X.nodeType=3D=3D1&&++U=3D=3DT){break}}return =
+X};o.sibling=3Dfunction(V,U){var =
+T=3D[];for(;V;V=3DV.nextSibling){if(V.nodeType=3D=3D1&&V!=3DU){T.push(V)}=
+}return =
+T};return;l.Sizzle=3DF})();o.event=3D{add:function(I,F,H,K){if(I.nodeType=
+=3D=3D3||I.nodeType=3D=3D8){return}if(I.setInterval&&I!=3Dl){I=3Dl}if(!H.=
+guid){H.guid=3Dthis.guid++}if(K!=3D=3Dg){var =
+G=3DH;H=3Dthis.proxy(G);H.data=3DK}var =
+E=3Do.data(I,"events")||o.data(I,"events",{}),J=3Do.data(I,"handle")||o.d=
+ata(I,"handle",function(){return typeof =
+o!=3D=3D"undefined"&&!o.event.triggered?o.event.handle.apply(arguments.ca=
+llee.elem,arguments):g});J.elem=3DI;o.each(F.split(/\s+/),function(M,N){v=
+ar =
+O=3DN.split(".");N=3DO.shift();H.type=3DO.slice().sort().join(".");var =
+L=3DE[N];if(o.event.specialAll[N]){o.event.specialAll[N].setup.call(I,K,O=
+)}if(!L){L=3DE[N]=3D{};if(!o.event.special[N]||o.event.special[N].setup.c=
+all(I,K,O)=3D=3D=3Dfalse){if(I.addEventListener){I.addEventListener(N,J,f=
+alse)}else{if(I.attachEvent){I.attachEvent("on"+N,J)}}}}L[H.guid]=3DH;o.e=
+vent.global[N]=3Dtrue});I=3Dnull},guid:1,global:{},remove:function(K,H,J)=
+{if(K.nodeType=3D=3D3||K.nodeType=3D=3D8){return}var =
+G=3Do.data(K,"events"),F,E;if(G){if(H=3D=3D=3Dg||(typeof =
+H=3D=3D=3D"string"&&H.charAt(0)=3D=3D".")){for(var I in =
+G){this.remove(K,I+(H||""))}}else{if(H.type){J=3DH.handler;H=3DH.type}o.e=
+ach(H.split(/\s+/),function(M,O){var Q=3DO.split(".");O=3DQ.shift();var =
+N=3DRegExp("(^|\\.)"+Q.slice().sort().join(".*\\.")+"(\\.|$)");if(G[O]){i=
+f(J){delete G[O][J.guid]}else{for(var P in =
+G[O]){if(N.test(G[O][P].type)){delete =
+G[O][P]}}}if(o.event.specialAll[O]){o.event.specialAll[O].teardown.call(K=
+,Q)}for(F in =
+G[O]){break}if(!F){if(!o.event.special[O]||o.event.special[O].teardown.ca=
+ll(K,Q)=3D=3D=3Dfalse){if(K.removeEventListener){K.removeEventListener(O,=
+o.data(K,"handle"),false)}else{if(K.detachEvent){K.detachEvent("on"+O,o.d=
+ata(K,"handle"))}}}F=3Dnull;delete G[O]}}})}for(F in G){break}if(!F){var =
+L=3Do.data(K,"handle");if(L){L.elem=3Dnull}o.removeData(K,"events");o.rem=
+oveData(K,"handle")}}},trigger:function(I,K,H,E){var =
+G=3DI.type||I;if(!E){I=3Dtypeof =
+I=3D=3D=3D"object"?I[h]?I:o.extend(o.Event(G),I):o.Event(G);if(G.indexOf(=
+"!")>=3D0){I.type=3DG=3DG.slice(0,-1);I.exclusive=3Dtrue}if(!H){I.stopPro=
+pagation();if(this.global[G]){o.each(o.cache,function(){if(this.events&&t=
+his.events[G]){o.event.trigger(I,K,this.handle.elem)}})}}if(!H||H.nodeTyp=
+e=3D=3D3||H.nodeType=3D=3D8){return =
+g}I.result=3Dg;I.target=3DH;K=3Do.makeArray(K);K.unshift(I)}I.currentTarg=
+et=3DH;var =
+J=3Do.data(H,"handle");if(J){J.apply(H,K)}if((!H[G]||(o.nodeName(H,"a")&&=
+G=3D=3D"click"))&&H["on"+G]&&H["on"+G].apply(H,K)=3D=3D=3Dfalse){I.result=
+=3Dfalse}if(!E&&H[G]&&!I.isDefaultPrevented()&&!(o.nodeName(H,"a")&&G=3D=3D=
+"click")){this.triggered=3Dtrue;try{H[G]()}catch(L){}}this.triggered=3Dfa=
+lse;if(!I.isPropagationStopped()){var =
+F=3DH.parentNode||H.ownerDocument;if(F){o.event.trigger(I,K,F,true)}}},ha=
+ndle:function(K){var =
+J,E;K=3Darguments[0]=3Do.event.fix(K||l.event);K.currentTarget=3Dthis;var=
+ =
+L=3DK.type.split(".");K.type=3DL.shift();J=3D!L.length&&!K.exclusive;var =
+I=3DRegExp("(^|\\.)"+L.slice().sort().join(".*\\.")+"(\\.|$)");E=3D(o.dat=
+a(this,"events")||{})[K.type];for(var G in E){var =
+H=3DE[G];if(J||I.test(H.type)){K.handler=3DH;K.data=3DH.data;var =
+F=3DH.apply(this,arguments);if(F!=3D=3Dg){K.result=3DF;if(F=3D=3D=3Dfalse=
+){K.preventDefault();K.stopPropagation()}}if(K.isImmediatePropagationStop=
+ped()){break}}}},props:"altKey attrChange attrName bubbles button =
+cancelable charCode clientX clientY ctrlKey currentTarget data detail =
+eventPhase fromElement handler keyCode metaKey newValue originalTarget =
+pageX pageY prevValue relatedNode relatedTarget screenX screenY shiftKey =
+srcElement target toElement view wheelDelta which".split(" =
+"),fix:function(H){if(H[h]){return H}var F=3DH;H=3Do.Event(F);for(var =
+G=3Dthis.props.length,J;G;){J=3Dthis.props[--G];H[J]=3DF[J]}if(!H.target)=
+{H.target=3DH.srcElement||document}if(H.target.nodeType=3D=3D3){H.target=3D=
+H.target.parentNode}if(!H.relatedTarget&&H.fromElement){H.relatedTarget=3D=
+H.fromElement=3D=3DH.target?H.toElement:H.fromElement}if(H.pageX=3D=3Dnul=
+l&&H.clientX!=3Dnull){var =
+I=3Ddocument.documentElement,E=3Ddocument.body;H.pageX=3DH.clientX+(I&&I.=
+scrollLeft||E&&E.scrollLeft||0)-(I.clientLeft||0);H.pageY=3DH.clientY+(I&=
+&I.scrollTop||E&&E.scrollTop||0)-(I.clientTop||0)}if(!H.which&&((H.charCo=
+de||H.charCode=3D=3D=3D0)?H.charCode:H.keyCode)){H.which=3DH.charCode||H.=
+keyCode}if(!H.metaKey&&H.ctrlKey){H.metaKey=3DH.ctrlKey}if(!H.which&&H.bu=
+tton){H.which=3D(H.button&1?1:(H.button&2?3:(H.button&4?2:0)))}return =
+H},proxy:function(F,E){E=3DE||function(){return =
+F.apply(this,arguments)};E.guid=3DF.guid=3DF.guid||E.guid||this.guid++;re=
+turn =
+E},special:{ready:{setup:B,teardown:function(){}}},specialAll:{live:{setu=
+p:function(E,F){o.event.add(this,F[0],c)},teardown:function(G){if(G.lengt=
+h){var =
+E=3D0,F=3DRegExp("(^|\\.)"+G[0]+"(\\.|$)");o.each((o.data(this,"events").=
+live||{}),function(){if(F.test(this.type)){E++}});if(E<1){o.event.remove(=
+this,G[0],c)}}}}}};o.Event=3Dfunction(E){if(!this.preventDefault){return =
+new =
+o.Event(E)}if(E&&E.type){this.originalEvent=3DE;this.type=3DE.type}else{t=
+his.type=3DE}this.timeStamp=3De();this[h]=3Dtrue};function k(){return =
+false}function u(){return =
+true}o.Event.prototype=3D{preventDefault:function(){this.isDefaultPrevent=
+ed=3Du;var =
+E=3Dthis.originalEvent;if(!E){return}if(E.preventDefault){E.preventDefaul=
+t()}E.returnValue=3Dfalse},stopPropagation:function(){this.isPropagationS=
+topped=3Du;var =
+E=3Dthis.originalEvent;if(!E){return}if(E.stopPropagation){E.stopPropagat=
+ion()}E.cancelBubble=3Dtrue},stopImmediatePropagation:function(){this.isI=
+mmediatePropagationStopped=3Du;this.stopPropagation()},isDefaultPrevented=
+:k,isPropagationStopped:k,isImmediatePropagationStopped:k};var =
+a=3Dfunction(F){var =
+E=3DF.relatedTarget;while(E&&E!=3Dthis){try{E=3DE.parentNode}catch(G){E=3D=
+this}}if(E!=3Dthis){F.type=3DF.data;o.event.handle.apply(this,arguments)}=
+};o.each({mouseover:"mouseenter",mouseout:"mouseleave"},function(F,E){o.e=
+vent.special[E]=3D{setup:function(){o.event.add(this,F,a,E)},teardown:fun=
+ction(){o.event.remove(this,F,a)}}});o.fn.extend({bind:function(F,G,E){re=
+turn =
+F=3D=3D"unload"?this.one(F,G,E):this.each(function(){o.event.add(this,F,E=
+||G,E&&G)})},one:function(G,H,F){var =
+E=3Do.event.proxy(F||H,function(I){o(this).unbind(I,E);return(F||H).apply=
+(this,arguments)});return =
+this.each(function(){o.event.add(this,G,E,F&&H)})},unbind:function(F,E){r=
+eturn =
+this.each(function(){o.event.remove(this,F,E)})},trigger:function(E,F){re=
+turn =
+this.each(function(){o.event.trigger(E,F,this)})},triggerHandler:function=
+(E,G){if(this[0]){var =
+F=3Do.Event(E);F.preventDefault();F.stopPropagation();o.event.trigger(F,G=
+,this[0]);return F.result}},toggle:function(G){var =
+E=3Darguments,F=3D1;while(F<E.length){o.event.proxy(G,E[F++])}return =
+this.click(o.event.proxy(G,function(H){this.lastToggle=3D(this.lastToggle=
+||0)%F;H.preventDefault();return =
+E[this.lastToggle++].apply(this,arguments)||false}))},hover:function(E,F)=
+{return =
+this.mouseenter(E).mouseleave(F)},ready:function(E){B();if(o.isReady){E.c=
+all(document,o)}else{o.readyList.push(E)}return =
+this},live:function(G,F){var =
+E=3Do.event.proxy(F);E.guid+=3Dthis.selector+G;o(document).bind(i(G,this.=
+selector),this.selector,E);return =
+this},die:function(F,E){o(document).unbind(i(F,this.selector),E?{guid:E.g=
+uid+this.selector+F}:null);return this}});function c(H){var =
+E=3DRegExp("(^|\\.)"+H.type+"(\\.|$)"),G=3Dtrue,F=3D[];o.each(o.data(this=
+,"events").live||[],function(I,J){if(E.test(J.type)){var =
+K=3Do(H.target).closest(J.data)[0];if(K){F.push({elem:K,fn:J})}}});F.sort=
+(function(J,I){return =
+o.data(J.elem,"closest")-o.data(I.elem,"closest")});o.each(F,function(){i=
+f(this.fn.call(this.elem,H,this.fn.data)=3D=3D=3Dfalse){return(G=3Dfalse)=
+}});return G}function =
+i(F,E){return["live",F,E.replace(/\./g,"`").replace(/ =
+/g,"|")].join(".")}o.extend({isReady:false,readyList:[],ready:function(){=
+if(!o.isReady){o.isReady=3Dtrue;if(o.readyList){o.each(o.readyList,functi=
+on(){this.call(document,o)});o.readyList=3Dnull}o(document).triggerHandle=
+r("ready")}}});var x=3Dfalse;function =
+B(){if(x){return}x=3Dtrue;if(document.addEventListener){document.addEvent=
+Listener("DOMContentLoaded",function(){document.removeEventListener("DOMC=
+ontentLoaded",arguments.callee,false);o.ready()},false)}else{if(document.=
+attachEvent){document.attachEvent("onreadystatechange",function(){if(docu=
+ment.readyState=3D=3D=3D"complete"){document.detachEvent("onreadystatecha=
+nge",arguments.callee);o.ready()}});if(document.documentElement.doScroll&=
+&l=3D=3Dl.top){(function(){if(o.isReady){return}try{document.documentElem=
+ent.doScroll("left")}catch(E){setTimeout(arguments.callee,0);return}o.rea=
+dy()})()}}}o.event.add(l,"load",o.ready)}o.each(("blur,focus,load,resize,=
+scroll,unload,click,dblclick,mousedown,mouseup,mousemove,mouseover,mouseo=
+ut,mouseenter,mouseleave,change,select,submit,keydown,keypress,keyup,erro=
+r").split(","),function(F,E){o.fn[E]=3Dfunction(G){return =
+G?this.bind(E,G):this.trigger(E)}});o(l).bind("unload",function(){for(var=
+ E in =
+o.cache){if(E!=3D1&&o.cache[E].handle){o.event.remove(o.cache[E].handle.e=
+lem)}}});(function(){o.support=3D{};var =
+F=3Ddocument.documentElement,G=3Ddocument.createElement("script"),K=3Ddoc=
+ument.createElement("div"),J=3D"script"+(new =
+Date).getTime();K.style.display=3D"none";K.innerHTML=3D'   =
+<link/><table></table><a href=3D"/a" =
+style=3D"color:red;float:left;opacity:.5;">a</a><select><option>text</opt=
+ion></select><object><param/></object>';var =
+H=3DK.getElementsByTagName("*"),E=3DK.getElementsByTagName("a")[0];if(!H|=
+|!H.length||!E){return}o.support=3D{leadingWhitespace:K.firstChild.nodeTy=
+pe=3D=3D3,tbody:!K.getElementsByTagName("tbody").length,objectAll:!!K.get=
+ElementsByTagName("object")[0].getElementsByTagName("*").length,htmlSeria=
+lize:!!K.getElementsByTagName("link").length,style:/red/.test(E.getAttrib=
+ute("style")),hrefNormalized:E.getAttribute("href")=3D=3D=3D"/a",opacity:=
+E.style.opacity=3D=3D=3D"0.5",cssFloat:!!E.style.cssFloat,scriptEval:fals=
+e,noCloneEvent:true,boxModel:null};G.type=3D"text/javascript";try{G.appen=
+dChild(document.createTextNode("window."+J+"=3D1;"))}catch(I){}F.insertBe=
+fore(G,F.firstChild);if(l[J]){o.support.scriptEval=3Dtrue;delete =
+l[J]}F.removeChild(G);if(K.attachEvent&&K.fireEvent){K.attachEvent("oncli=
+ck",function(){o.support.noCloneEvent=3Dfalse;K.detachEvent("onclick",arg=
+uments.callee)});K.cloneNode(true).fireEvent("onclick")}o(function(){var =
+L=3Ddocument.createElement("div");L.style.width=3DL.style.paddingLeft=3D"=
+1px";document.body.appendChild(L);o.boxModel=3Do.support.boxModel=3DL.off=
+setWidth=3D=3D=3D2;document.body.removeChild(L).style.display=3D"none"})}=
+)();var =
+w=3Do.support.cssFloat?"cssFloat":"styleFloat";o.props=3D{"for":"htmlFor"=
+,"class":"className","float":w,cssFloat:w,styleFloat:w,readonly:"readOnly=
+",maxlength:"maxLength",cellspacing:"cellSpacing",rowspan:"rowSpan",tabin=
+dex:"tabIndex"};o.fn.extend({_load:o.fn.load,load:function(G,J,K){if(type=
+of G!=3D=3D"string"){return this._load(G)}var I=3DG.indexOf(" =
+");if(I>=3D0){var E=3DG.slice(I,G.length);G=3DG.slice(0,I)}var =
+H=3D"GET";if(J){if(o.isFunction(J)){K=3DJ;J=3Dnull}else{if(typeof =
+J=3D=3D=3D"object"){J=3Do.param(J);H=3D"POST"}}}var =
+F=3Dthis;o.ajax({url:G,type:H,dataType:"html",data:J,complete:function(M,=
+L){if(L=3D=3D"success"||L=3D=3D"notmodified"){F.html(E?o("<div/>").append=
+(M.responseText.replace(/<script(.|\s)*?\/script>/g,"")).find(E):M.respon=
+seText)}if(K){F.each(K,[M.responseText,L,M])}}});return =
+this},serialize:function(){return =
+o.param(this.serializeArray())},serializeArray:function(){return =
+this.map(function(){return =
+this.elements?o.makeArray(this.elements):this}).filter(function(){return =
+this.name&&!this.disabled&&(this.checked||/select|textarea/i.test(this.no=
+deName)||/text|hidden|password|search/i.test(this.type))}).map(function(E=
+,F){var G=3Do(this).val();return =
+G=3D=3Dnull?null:o.isArray(G)?o.map(G,function(I,H){return{name:F.name,va=
+lue:I}}):{name:F.name,value:G}}).get()}});o.each("ajaxStart,ajaxStop,ajax=
+Complete,ajaxError,ajaxSuccess,ajaxSend".split(","),function(E,F){o.fn[F]=
+=3Dfunction(G){return this.bind(F,G)}});var =
+r=3De();o.extend({get:function(E,G,H,F){if(o.isFunction(G)){H=3DG;G=3Dnul=
+l}return =
+o.ajax({type:"GET",url:E,data:G,success:H,dataType:F})},getScript:functio=
+n(E,F){return o.get(E,null,F,"script")},getJSON:function(E,F,G){return =
+o.get(E,F,G,"json")},post:function(E,G,H,F){if(o.isFunction(G)){H=3DG;G=3D=
+{}}return =
+o.ajax({type:"POST",url:E,data:G,success:H,dataType:F})},ajaxSetup:functi=
+on(E){o.extend(o.ajaxSettings,E)},ajaxSettings:{url:location.href,global:=
+true,type:"GET",contentType:"application/x-www-form-urlencoded",processDa=
+ta:true,async:true,xhr:function(){return l.ActiveXObject?new =
+ActiveXObject("Microsoft.XMLHTTP"):new =
+XMLHttpRequest()},accepts:{xml:"application/xml, =
+text/xml",html:"text/html",script:"text/javascript, =
+application/javascript",json:"application/json, =
+text/javascript",text:"text/plain",_default:"*/*"}},lastModified:{},ajax:=
+function(M){M=3Do.extend(true,M,o.extend(true,{},o.ajaxSettings,M));var =
+W,F=3D/=3D\?(&|$)/g,R,V,G=3DM.type.toUpperCase();if(M.data&&M.processData=
+&&typeof =
+M.data!=3D=3D"string"){M.data=3Do.param(M.data)}if(M.dataType=3D=3D"jsonp=
+"){if(G=3D=3D"GET"){if(!M.url.match(F)){M.url+=3D(M.url.match(/\?/)?"&":"=
+?")+(M.jsonp||"callback")+"=3D?"}}else{if(!M.data||!M.data.match(F)){M.da=
+ta=3D(M.data?M.data+"&":"")+(M.jsonp||"callback")+"=3D?"}}M.dataType=3D"j=
+son"}if(M.dataType=3D=3D"json"&&(M.data&&M.data.match(F)||M.url.match(F))=
+){W=3D"jsonp"+r++;if(M.data){M.data=3D(M.data+"").replace(F,"=3D"+W+"$1")=
+}M.url=3DM.url.replace(F,"=3D"+W+"$1");M.dataType=3D"script";l[W]=3Dfunct=
+ion(X){V=3DX;I();L();l[W]=3Dg;try{delete =
+l[W]}catch(Y){}if(H){H.removeChild(T)}}}if(M.dataType=3D=3D"script"&&M.ca=
+che=3D=3Dnull){M.cache=3Dfalse}if(M.cache=3D=3D=3Dfalse&&G=3D=3D"GET"){va=
+r E=3De();var =
+U=3DM.url.replace(/(\?|&)_=3D.*?(&|$)/,"$1_=3D"+E+"$2");M.url=3DU+((U=3D=3D=
+M.url)?(M.url.match(/\?/)?"&":"?")+"_=3D"+E:"")}if(M.data&&G=3D=3D"GET"){=
+M.url+=3D(M.url.match(/\?/)?"&":"?")+M.data;M.data=3Dnull}if(M.global&&!o=
+.active++){o.event.trigger("ajaxStart")}var =
+Q=3D/^(\w+:)?\/\/([^\/?#]+)/.exec(M.url);if(M.dataType=3D=3D"script"&&G=3D=
+=3D"GET"&&Q&&(Q[1]&&Q[1]!=3Dlocation.protocol||Q[2]!=3Dlocation.host)){va=
+r H=3Ddocument.getElementsByTagName("head")[0];var =
+T=3Ddocument.createElement("script");T.src=3DM.url;if(M.scriptCharset){T.=
+charset=3DM.scriptCharset}if(!W){var =
+O=3Dfalse;T.onload=3DT.onreadystatechange=3Dfunction(){if(!O&&(!this.read=
+yState||this.readyState=3D=3D"loaded"||this.readyState=3D=3D"complete")){=
+O=3Dtrue;I();L();T.onload=3DT.onreadystatechange=3Dnull;H.removeChild(T)}=
+}}H.appendChild(T);return g}var K=3Dfalse;var =
+J=3DM.xhr();if(M.username){J.open(G,M.url,M.async,M.username,M.password)}=
+else{J.open(G,M.url,M.async)}try{if(M.data){J.setRequestHeader("Content-T=
+ype",M.contentType)}if(M.ifModified){J.setRequestHeader("If-Modified-Sinc=
+e",o.lastModified[M.url]||"Thu, 01 Jan 1970 00:00:00 =
+GMT")}J.setRequestHeader("X-Requested-With","XMLHttpRequest");J.setReques=
+tHeader("Accept",M.dataType&&M.accepts[M.dataType]?M.accepts[M.dataType]+=
+", =
+*/*":M.accepts._default)}catch(S){}if(M.beforeSend&&M.beforeSend(J,M)=3D=3D=
+=3Dfalse){if(M.global&&!--o.active){o.event.trigger("ajaxStop")}J.abort()=
+;return false}if(M.global){o.event.trigger("ajaxSend",[J,M])}var =
+N=3Dfunction(X){if(J.readyState=3D=3D0){if(P){clearInterval(P);P=3Dnull;i=
+f(M.global&&!--o.active){o.event.trigger("ajaxStop")}}}else{if(!K&&J&&(J.=
+readyState=3D=3D4||X=3D=3D"timeout")){K=3Dtrue;if(P){clearInterval(P);P=3D=
+null}R=3DX=3D=3D"timeout"?"timeout":!o.httpSuccess(J)?"error":M.ifModifie=
+d&&o.httpNotModified(J,M.url)?"notmodified":"success";if(R=3D=3D"success"=
+){try{V=3Do.httpData(J,M.dataType,M)}catch(Z){R=3D"parsererror"}}if(R=3D=3D=
+"success"){var =
+Y;try{Y=3DJ.getResponseHeader("Last-Modified")}catch(Z){}if(M.ifModified&=
+&Y){o.lastModified[M.url]=3DY}if(!W){I()}}else{o.handleError(M,J,R)}L();i=
+f(X){J.abort()}if(M.async){J=3Dnull}}}};if(M.async){var =
+P=3DsetInterval(N,13);if(M.timeout>0){setTimeout(function(){if(J&&!K){N("=
+timeout")}},M.timeout)}}try{J.send(M.data)}catch(S){o.handleError(M,J,nul=
+l,S)}if(!M.async){N()}function =
+I(){if(M.success){M.success(V,R)}if(M.global){o.event.trigger("ajaxSucces=
+s",[J,M])}}function =
+L(){if(M.complete){M.complete(J,R)}if(M.global){o.event.trigger("ajaxComp=
+lete",[J,M])}if(M.global&&!--o.active){o.event.trigger("ajaxStop")}}retur=
+n =
+J},handleError:function(F,H,E,G){if(F.error){F.error(H,E,G)}if(F.global){=
+o.event.trigger("ajaxError",[H,F,G])}},active:0,httpSuccess:function(F){t=
+ry{return =
+!F.status&&location.protocol=3D=3D"file:"||(F.status>=3D200&&F.status<300=
+)||F.status=3D=3D304||F.status=3D=3D1223}catch(E){}return =
+false},httpNotModified:function(G,E){try{var =
+H=3DG.getResponseHeader("Last-Modified");return =
+G.status=3D=3D304||H=3D=3Do.lastModified[E]}catch(F){}return =
+false},httpData:function(J,H,G){var =
+F=3DJ.getResponseHeader("content-type"),E=3DH=3D=3D"xml"||!H&&F&&F.indexO=
+f("xml")>=3D0,I=3DE?J.responseXML:J.responseText;if(E&&I.documentElement.=
+tagName=3D=3D"parsererror"){throw"parsererror"}if(G&&G.dataFilter){I=3DG.=
+dataFilter(I,H)}if(typeof =
+I=3D=3D=3D"string"){if(H=3D=3D"script"){o.globalEval(I)}if(H=3D=3D"json")=
+{I=3Dl["eval"]("("+I+")")}}return I},param:function(E){var =
+G=3D[];function =
+H(I,J){G[G.length]=3DencodeURIComponent(I)+"=3D"+encodeURIComponent(J)}if=
+(o.isArray(E)||E.jquery){o.each(E,function(){H(this.name,this.value)})}el=
+se{for(var F in =
+E){if(o.isArray(E[F])){o.each(E[F],function(){H(F,this)})}else{H(F,o.isFu=
+nction(E[F])?E[F]():E[F])}}}return =
+G.join("&").replace(/%20/g,"+")}});var =
+m=3D{},n,d=3D[["height","marginTop","marginBottom","paddingTop","paddingB=
+ottom"],["width","marginLeft","marginRight","paddingLeft","paddingRight"]=
+,["opacity"]];function t(F,E){var =
+G=3D{};o.each(d.concat.apply([],d.slice(0,E)),function(){G[this]=3DF});re=
+turn G}o.fn.extend({show:function(J,L){if(J){return =
+this.animate(t("show",3),J,L)}else{for(var =
+H=3D0,F=3Dthis.length;H<F;H++){var =
+E=3Do.data(this[H],"olddisplay");this[H].style.display=3DE||"";if(o.css(t=
+his[H],"display")=3D=3D=3D"none"){var =
+G=3Dthis[H].tagName,K;if(m[G]){K=3Dm[G]}else{var I=3Do("<"+G+" =
+/>").appendTo("body");K=3DI.css("display");if(K=3D=3D=3D"none"){K=3D"bloc=
+k"}I.remove();m[G]=3DK}o.data(this[H],"olddisplay",K)}}for(var =
+H=3D0,F=3Dthis.length;H<F;H++){this[H].style.display=3Do.data(this[H],"ol=
+ddisplay")||""}return this}},hide:function(H,I){if(H){return =
+this.animate(t("hide",3),H,I)}else{for(var =
+G=3D0,F=3Dthis.length;G<F;G++){var =
+E=3Do.data(this[G],"olddisplay");if(!E&&E!=3D=3D"none"){o.data(this[G],"o=
+lddisplay",o.css(this[G],"display"))}}for(var =
+G=3D0,F=3Dthis.length;G<F;G++){this[G].style.display=3D"none"}return =
+this}},_toggle:o.fn.toggle,toggle:function(G,F){var E=3Dtypeof =
+G=3D=3D=3D"boolean";return =
+o.isFunction(G)&&o.isFunction(F)?this._toggle.apply(this,arguments):G=3D=3D=
+null||E?this.each(function(){var =
+H=3DE?G:o(this).is(":hidden");o(this)[H?"show":"hide"]()}):this.animate(t=
+("toggle",3),G,F)},fadeTo:function(E,G,F){return =
+this.animate({opacity:G},E,F)},animate:function(I,F,H,G){var =
+E=3Do.speed(F,H,G);return =
+this[E.queue=3D=3D=3Dfalse?"each":"queue"](function(){var =
+K=3Do.extend({},E),M,L=3Dthis.nodeType=3D=3D1&&o(this).is(":hidden"),J=3D=
+this;for(M in I){if(I[M]=3D=3D"hide"&&L||I[M]=3D=3D"show"&&!L){return =
+K.complete.call(this)}if((M=3D=3D"height"||M=3D=3D"width")&&this.style){K=
+.display=3Do.css(this,"display");K.overflow=3Dthis.style.overflow}}if(K.o=
+verflow!=3Dnull){this.style.overflow=3D"hidden"}K.curAnim=3Do.extend({},I=
+);o.each(I,function(O,S){var R=3Dnew =
+o.fx(J,K,O);if(/toggle|show|hide/.test(S)){R[S=3D=3D"toggle"?L?"show":"hi=
+de":S](I)}else{var =
+Q=3DS.toString().match(/^([+-]=3D)?([\d+-.]+)(.*)$/),T=3DR.cur(true)||0;i=
+f(Q){var =
+N=3DparseFloat(Q[2]),P=3DQ[3]||"px";if(P!=3D"px"){J.style[O]=3D(N||1)+P;T=
+=3D((N||1)/R.cur(true))*T;J.style[O]=3DT+P}if(Q[1]){N=3D((Q[1]=3D=3D"-=3D=
+"?-1:1)*N)+T}R.custom(T,N,P)}else{R.custom(T,S,"")}}});return =
+true})},stop:function(F,E){var =
+G=3Do.timers;if(F){this.queue([])}this.each(function(){for(var =
+H=3DG.length-1;H>=3D0;H--){if(G[H].elem=3D=3Dthis){if(E){G[H](true)}G.spl=
+ice(H,1)}}});if(!E){this.dequeue()}return =
+this}});o.each({slideDown:t("show",1),slideUp:t("hide",1),slideToggle:t("=
+toggle",1),fadeIn:{opacity:"show"},fadeOut:{opacity:"hide"}},function(E,F=
+){o.fn[E]=3Dfunction(G,H){return =
+this.animate(F,G,H)}});o.extend({speed:function(G,H,F){var E=3Dtypeof =
+G=3D=3D=3D"object"?G:{complete:F||!F&&H||o.isFunction(G)&&G,duration:G,ea=
+sing:F&&H||H&&!o.isFunction(H)&&H};E.duration=3Do.fx.off?0:typeof =
+E.duration=3D=3D=3D"number"?E.duration:o.fx.speeds[E.duration]||o.fx.spee=
+ds._default;E.old=3DE.complete;E.complete=3Dfunction(){if(E.queue!=3D=3Df=
+alse){o(this).dequeue()}if(o.isFunction(E.old)){E.old.call(this)}};return=
+ E},easing:{linear:function(G,H,E,F){return =
+E+F*G},swing:function(G,H,E,F){return((-Math.cos(G*Math.PI)/2)+0.5)*F+E}}=
+,timers:[],fx:function(F,E,G){this.options=3DE;this.elem=3DF;this.prop=3D=
+G;if(!E.orig){E.orig=3D{}}}});o.fx.prototype=3D{update:function(){if(this=
+.options.step){this.options.step.call(this.elem,this.now,this)}(o.fx.step=
+[this.prop]||o.fx.step._default)(this);if((this.prop=3D=3D"height"||this.=
+prop=3D=3D"width")&&this.elem.style){this.elem.style.display=3D"block"}},=
+cur:function(F){if(this.elem[this.prop]!=3Dnull&&(!this.elem.style||this.=
+elem.style[this.prop]=3D=3Dnull)){return this.elem[this.prop]}var =
+E=3DparseFloat(o.css(this.elem,this.prop,F));return =
+E&&E>-10000?E:parseFloat(o.curCSS(this.elem,this.prop))||0},custom:functi=
+on(I,H,G){this.startTime=3De();this.start=3DI;this.end=3DH;this.unit=3DG|=
+|this.unit||"px";this.now=3Dthis.start;this.pos=3Dthis.state=3D0;var =
+E=3Dthis;function F(J){return =
+E.step(J)}F.elem=3Dthis.elem;if(F()&&o.timers.push(F)&&!n){n=3DsetInterva=
+l(function(){var K=3Do.timers;for(var =
+J=3D0;J<K.length;J++){if(!K[J]()){K.splice(J--,1)}}if(!K.length){clearInt=
+erval(n);n=3Dg}},13)}},show:function(){this.options.orig[this.prop]=3Do.a=
+ttr(this.elem.style,this.prop);this.options.show=3Dtrue;this.custom(this.=
+prop=3D=3D"width"||this.prop=3D=3D"height"?1:0,this.cur());o(this.elem).s=
+how()},hide:function(){this.options.orig[this.prop]=3Do.attr(this.elem.st=
+yle,this.prop);this.options.hide=3Dtrue;this.custom(this.cur(),0)},step:f=
+unction(H){var =
+G=3De();if(H||G>=3Dthis.options.duration+this.startTime){this.now=3Dthis.=
+end;this.pos=3Dthis.state=3D1;this.update();this.options.curAnim[this.pro=
+p]=3Dtrue;var E=3Dtrue;for(var F in =
+this.options.curAnim){if(this.options.curAnim[F]!=3D=3Dtrue){E=3Dfalse}}i=
+f(E){if(this.options.display!=3Dnull){this.elem.style.overflow=3Dthis.opt=
+ions.overflow;this.elem.style.display=3Dthis.options.display;if(o.css(thi=
+s.elem,"display")=3D=3D"none"){this.elem.style.display=3D"block"}}if(this=
+.options.hide){o(this.elem).hide()}if(this.options.hide||this.options.sho=
+w){for(var I in =
+this.options.curAnim){o.attr(this.elem.style,I,this.options.orig[I])}}thi=
+s.options.complete.call(this.elem)}return false}else{var =
+J=3DG-this.startTime;this.state=3DJ/this.options.duration;this.pos=3Do.ea=
+sing[this.options.easing||(o.easing.swing?"swing":"linear")](this.state,J=
+,0,1,this.options.duration);this.now=3Dthis.start+((this.end-this.start)*=
+this.pos);this.update()}return =
+true}};o.extend(o.fx,{speeds:{slow:600,fast:200,_default:400},step:{opaci=
+ty:function(E){o.attr(E.elem.style,"opacity",E.now)},_default:function(E)=
+{if(E.elem.style&&E.elem.style[E.prop]!=3Dnull){E.elem.style[E.prop]=3DE.=
+now+E.unit}else{E.elem[E.prop]=3DE.now}}}});if(document.documentElement.g=
+etBoundingClientRect){o.fn.offset=3Dfunction(){if(!this[0]){return{top:0,=
+left:0}}if(this[0]=3D=3D=3Dthis[0].ownerDocument.body){return =
+o.offset.bodyOffset(this[0])}var =
+G=3Dthis[0].getBoundingClientRect(),J=3Dthis[0].ownerDocument,F=3DJ.body,=
+E=3DJ.documentElement,L=3DE.clientTop||F.clientTop||0,K=3DE.clientLeft||F=
+.clientLeft||0,I=3DG.top+(self.pageYOffset||o.boxModel&&E.scrollTop||F.sc=
+rollTop)-L,H=3DG.left+(self.pageXOffset||o.boxModel&&E.scrollLeft||F.scro=
+llLeft)-K;return{top:I,left:H}}}else{o.fn.offset=3Dfunction(){if(!this[0]=
+){return{top:0,left:0}}if(this[0]=3D=3D=3Dthis[0].ownerDocument.body){ret=
+urn =
+o.offset.bodyOffset(this[0])}o.offset.initialized||o.offset.initialize();=
+var =
+J=3Dthis[0],G=3DJ.offsetParent,F=3DJ,O=3DJ.ownerDocument,M,H=3DO.document=
+Element,K=3DO.body,L=3DO.defaultView,E=3DL.getComputedStyle(J,null),N=3DJ=
+.offsetTop,I=3DJ.offsetLeft;while((J=3DJ.parentNode)&&J!=3D=3DK&&J!=3D=3D=
+H){M=3DL.getComputedStyle(J,null);N-=3DJ.scrollTop,I-=3DJ.scrollLeft;if(J=
+=3D=3D=3DG){N+=3DJ.offsetTop,I+=3DJ.offsetLeft;if(o.offset.doesNotAddBord=
+er&&!(o.offset.doesAddBorderForTableAndCells&&/^t(able|d|h)$/i.test(J.tag=
+Name))){N+=3DparseInt(M.borderTopWidth,10)||0,I+=3DparseInt(M.borderLeftW=
+idth,10)||0}F=3DG,G=3DJ.offsetParent}if(o.offset.subtractsBorderForOverfl=
+owNotVisible&&M.overflow!=3D=3D"visible"){N+=3DparseInt(M.borderTopWidth,=
+10)||0,I+=3DparseInt(M.borderLeftWidth,10)||0}E=3DM}if(E.position=3D=3D=3D=
+"relative"||E.position=3D=3D=3D"static"){N+=3DK.offsetTop,I+=3DK.offsetLe=
+ft}if(E.position=3D=3D=3D"fixed"){N+=3DMath.max(H.scrollTop,K.scrollTop),=
+I+=3DMath.max(H.scrollLeft,K.scrollLeft)}return{top:N,left:I}}}o.offset=3D=
+{initialize:function(){if(this.initialized){return}var =
+L=3Ddocument.body,F=3Ddocument.createElement("div"),H,G,N,I,M,E,J=3DL.sty=
+le.marginTop,K=3D'<div =
+style=3D"position:absolute;top:0;left:0;margin:0;border:5px solid =
+#000;padding:0;width:1px;height:1px;"><div></div></div><table =
+style=3D"position:absolute;top:0;left:0;margin:0;border:5px solid =
+#000;padding:0;width:1px;height:1px;" cellpadding=3D"0" =
+cellspacing=3D"0"><tr><td></td></tr></table>';M=3D{position:"absolute",to=
+p:0,left:0,margin:0,border:0,width:"1px",height:"1px",visibility:"hidden"=
+};for(E in =
+M){F.style[E]=3DM[E]}F.innerHTML=3DK;L.insertBefore(F,L.firstChild);H=3DF=
+.firstChild,G=3DH.firstChild,I=3DH.nextSibling.firstChild.firstChild;this=
+.doesNotAddBorder=3D(G.offsetTop!=3D=3D5);this.doesAddBorderForTableAndCe=
+lls=3D(I.offsetTop=3D=3D=3D5);H.style.overflow=3D"hidden",H.style.positio=
+n=3D"relative";this.subtractsBorderForOverflowNotVisible=3D(G.offsetTop=3D=
+=3D=3D-5);L.style.marginTop=3D"1px";this.doesNotIncludeMarginInBodyOffset=
+=3D(L.offsetTop=3D=3D=3D0);L.style.marginTop=3DJ;L.removeChild(F);this.in=
+itialized=3Dtrue},bodyOffset:function(E){o.offset.initialized||o.offset.i=
+nitialize();var =
+G=3DE.offsetTop,F=3DE.offsetLeft;if(o.offset.doesNotIncludeMarginInBodyOf=
+fset){G+=3DparseInt(o.curCSS(E,"marginTop",true),10)||0,F+=3DparseInt(o.c=
+urCSS(E,"marginLeft",true),10)||0}return{top:G,left:F}}};o.fn.extend({pos=
+ition:function(){var I=3D0,H=3D0,F;if(this[0]){var =
+G=3Dthis.offsetParent(),J=3Dthis.offset(),E=3D/^body|html$/i.test(G[0].ta=
+gName)?{top:0,left:0}:G.offset();J.top-=3Dj(this,"marginTop");J.left-=3Dj=
+(this,"marginLeft");E.top+=3Dj(G,"borderTopWidth");E.left+=3Dj(G,"borderL=
+eftWidth");F=3D{top:J.top-E.top,left:J.left-E.left}}return =
+F},offsetParent:function(){var =
+E=3Dthis[0].offsetParent||document.body;while(E&&(!/^body|html$/i.test(E.=
+tagName)&&o.css(E,"position")=3D=3D"static")){E=3DE.offsetParent}return =
+o(E)}});o.each(["Left","Top"],function(F,E){var =
+G=3D"scroll"+E;o.fn[G]=3Dfunction(H){if(!this[0]){return null}return =
+H!=3D=3Dg?this.each(function(){this=3D=3Dl||this=3D=3Ddocument?l.scrollTo=
+(!F?H:o(l).scrollLeft(),F?H:o(l).scrollTop()):this[G]=3DH}):this[0]=3D=3D=
+l||this[0]=3D=3Ddocument?self[F?"pageYOffset":"pageXOffset"]||o.boxModel&=
+&document.documentElement[G]||document.body[G]:this[0][G]}});o.each(["Hei=
+ght","Width"],function(I,G){var =
+E=3DI?"Left":"Top",H=3DI?"Right":"Bottom",F=3DG.toLowerCase();o.fn["inner=
+"+G]=3Dfunction(){return =
+this[0]?o.css(this[0],F,false,"padding"):null};o.fn["outer"+G]=3Dfunction=
+(K){return this[0]?o.css(this[0],F,false,K?"margin":"border"):null};var =
+J=3DG.toLowerCase();o.fn[J]=3Dfunction(K){return =
+this[0]=3D=3Dl?document.compatMode=3D=3D"CSS1Compat"&&document.documentEl=
+ement["client"+G]||document.body["client"+G]:this[0]=3D=3Ddocument?Math.m=
+ax(document.documentElement["client"+G],document.body["scroll"+G],documen=
+t.documentElement["scroll"+G],document.body["offset"+G],document.document=
+Element["offset"+G]):K=3D=3D=3Dg?(this.length?o.css(this[0],J):null):this=
+.css(J,typeof K=3D=3D=3D"string"?K:K+"px")}})})();
+------=_NextPart_000_0000_01CD97E6.0CC6F490
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/generateTOC.js
+
+function nextLevel(nodeList, startIndex, hlevel, prefix, tocString)=0A=
+{=0A=
+    var hIndex =3D 1;=0A=
+    var i =3D startIndex;=0A=
+    =0A=
+    while (i < nodeList.length) {=0A=
+        var currentNode =3D nodeList[i];=0A=
+        =0A=
+        if (currentNode.tagName !=3D "H"+hlevel)=0A=
+            break;=0A=
+        =0A=
+        if (currentNode.className =3D=3D "no-toc") {=0A=
+            ++i;=0A=
+            continue;=0A=
+        }=0A=
+            =0A=
+        var sectionString =3D prefix+hIndex;=0A=
+        =0A=
+        // Update the TOC=0A=
+        var text =3D currentNode.innerHTML;=0A=
+        // Strip off names specified via <a name=3D"..."></a>=0A=
+        var tocText =3D text.replace(/<a =
+name=3D[\'\"][^\'\"]*[\'\"]>([^<]*)<\/a>/g, "$1");=0A=
+        tocString.s +=3D "<li class=3D'toc-h"+hlevel+"'><a =
+href=3D'#"+sectionString+"'><span =
+class=3D'secno'>"+sectionString+"</span>"+tocText+"</a></li>\n";=0A=
+        =0A=
+        // Modify the header=0A=
+        currentNode.innerHTML =3D "<span =
+class=3Dsecno>"+sectionString+"</span> "+text;=0A=
+        currentNode.id =3D sectionString;=0A=
+        =0A=
+        // traverse children=0A=
+        i =3D nextLevel(nodeList, i+1, hlevel+1, sectionString+".", =
+tocString);=0A=
+        hIndex++;=0A=
+    }=0A=
+    =0A=
+    return i;=0A=
+}=0A=
+=0A=
+function generateTOC(toc)=0A=
+{=0A=
+    var nodeList =3D $("h2,h3,h4,h5,h6");=0A=
+    var tocString =3D { s:"<ul class=3D'toc'>\n" };=0A=
+    nextLevel(nodeList, 0, 2, "", tocString);=0A=
+    toc.innerHTML =3D tocString.s;=0A=
+}=0A=
+
+------=_NextPart_000_0000_01CD97E6.0CC6F490--

@@ -1,9 +1,28 @@
+adb logcat *:D > log.txt
 
-addr2line -C -f -e libc.so 0001173c
+addr2line -help(查看参数)
+
+
+addr2line -C -f -e ../libs/armeabi/libyon.so 0001173c
+
+需要
+#ifeq ($(APP_OPTIM),debug)
+LOCAL_CFLAGS += -D_DEBUG_
+LOCAL_CFLAGS += -O1
+LOCAL_CFLAGS += -g
+LOCAL_CFLAGS += -ggdb
+#else
+LOCAL_CFLAGS += -O3
+#endif
+
+ndk-build -j3 APP_OPTIM=debug编译
+
+
 
 
 >libs/armebi/
-objdump -S -D -mi386 libyon.so >disassmble.txt
+objdump -S -D -mi386 ../libs/armeabi/libyon.so >disassmble.txt
+objdump -S -D -mi686 ../libs/armeabi/libyon.so >disassmble.txt
 
 
 参考：http://www.usertrack.org/?p=36
