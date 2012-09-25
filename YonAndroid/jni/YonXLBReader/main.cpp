@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
 
 	fs->drop();
 	return 0;
-#else
+#elif 0
 	//V2.1
 	IFileSystem* fs=createFileSystem();
 	II18NManager* i18nMgr=createI18NManager();
@@ -193,6 +193,54 @@ int main(int argc, char* argv[])
 		Logger->debug("%d\r\n",stream->readInt());
 		Logger->debug("%d\r\n",stream->readByte());
 		Logger->debug("%d\r\n",stream->readInt());
+	}
+
+
+	stream->drop();
+	i18nMgr->drop();
+	fs->drop();
+#else
+	//V2.1
+	IFileSystem* fs=createFileSystem();
+	II18NManager* i18nMgr=createI18NManager();
+	fs->addWorkingDirectory("D:/Development/Tools/[Java]XLS转换工具/excel/xml");
+	fs->addWorkingDirectory("D:/Development/Tools/[Java]XLS转换工具/excel");
+	fs->addWorkingDirectory("D:/Development/Tools/xls2xlbV2.1/output");
+	IReadStream* stream=fs->createAndOpenReadFileStream("skill(1).xc",io::ENUM_ENDIAN_MODE_BIG);
+
+	/*core::stringc header=stream->readString();
+	s32 versionCode=stream->readInt();
+	core::stringc versionName=stream->readString();
+	Logger->debug("header:%s,versionCode:%d,versionName:%s\r\n",header.c_str(),versionCode,versionName.c_str());
+
+	s32 rowCount=stream->readInt();*/
+	s32 rowCount=stream->readShort();
+
+	Logger->debug("rowCount:%d\r\n",rowCount);
+
+
+	for(s32 r=0;r<rowCount;++r)
+	{
+		//Logger->debug("%d\r\n",stream->readInt());
+		Logger->debug("%d\r\n",stream->readShort());
+		Logger->debug("%s\r\n",i18nMgr->convert(stream->readString().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+		Logger->debug("%s\r\n",i18nMgr->convert(stream->readString().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+		//Logger->debug("%s\r\n",stream->readString().c_str());
+		//Logger->debug("%s\r\n",stream->readString().c_str());
+		Logger->debug("%d\r\n",stream->readShort());
+		Logger->debug("%d\r\n",stream->readBool());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%d\r\n",stream->readBool());
+		Logger->debug("%d\r\n",stream->readByte());
+
+		Logger->debug("%d\r\n",stream->readBool());
+		Logger->debug("%d\r\n",stream->readBool());
+		Logger->debug("%d\r\n",stream->readBool());
+		Logger->debug("%s\r\n",i18nMgr->convert(stream->readString().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%d\r\n",stream->readShort());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%d\r\n",stream->readBool());
 	}
 
 
