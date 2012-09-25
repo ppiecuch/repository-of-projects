@@ -204,6 +204,26 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonGraphicsWindow", "YonGra
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonCompressDDS", "YonCompressDDS\YonCompressDDS.vcproj", "{61008592-E0EA-4075-A1DB-57FA2EF2AD07}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonCompressPKM", "YonCompressPKM\YonCompressPKM.vcproj", "{C089EF1A-D8DC-4F11-8B34-DAAD1E1ABB13}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonCompressKTX", "YonCompressKTX\YonCompressKTX.vcproj", "{5B891D11-9A56-435E-B25D-0719BB3B0376}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonCompressPVR", "YonCompressPVR\YonCompressPVR.vcproj", "{C839D9B7-3B26-4282-8D51-C461D72AE382}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -374,6 +394,22 @@ Global
 		{BED7FD02-E98C-4B1C-8B41-C0FD4006E4C9}.Debug|Win32.Build.0 = Debug|Win32
 		{BED7FD02-E98C-4B1C-8B41-C0FD4006E4C9}.Release|Win32.ActiveCfg = Release|Win32
 		{BED7FD02-E98C-4B1C-8B41-C0FD4006E4C9}.Release|Win32.Build.0 = Release|Win32
+		{61008592-E0EA-4075-A1DB-57FA2EF2AD07}.Debug|Win32.ActiveCfg = Debug|Win32
+		{61008592-E0EA-4075-A1DB-57FA2EF2AD07}.Debug|Win32.Build.0 = Debug|Win32
+		{61008592-E0EA-4075-A1DB-57FA2EF2AD07}.Release|Win32.ActiveCfg = Release|Win32
+		{61008592-E0EA-4075-A1DB-57FA2EF2AD07}.Release|Win32.Build.0 = Release|Win32
+		{C089EF1A-D8DC-4F11-8B34-DAAD1E1ABB13}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C089EF1A-D8DC-4F11-8B34-DAAD1E1ABB13}.Debug|Win32.Build.0 = Debug|Win32
+		{C089EF1A-D8DC-4F11-8B34-DAAD1E1ABB13}.Release|Win32.ActiveCfg = Release|Win32
+		{C089EF1A-D8DC-4F11-8B34-DAAD1E1ABB13}.Release|Win32.Build.0 = Release|Win32
+		{5B891D11-9A56-435E-B25D-0719BB3B0376}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5B891D11-9A56-435E-B25D-0719BB3B0376}.Debug|Win32.Build.0 = Debug|Win32
+		{5B891D11-9A56-435E-B25D-0719BB3B0376}.Release|Win32.ActiveCfg = Release|Win32
+		{5B891D11-9A56-435E-B25D-0719BB3B0376}.Release|Win32.Build.0 = Release|Win32
+		{C839D9B7-3B26-4282-8D51-C461D72AE382}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C839D9B7-3B26-4282-8D51-C461D72AE382}.Debug|Win32.Build.0 = Debug|Win32
+		{C839D9B7-3B26-4282-8D51-C461D72AE382}.Release|Win32.ActiveCfg = Release|Win32
+		{C839D9B7-3B26-4282-8D51-C461D72AE382}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

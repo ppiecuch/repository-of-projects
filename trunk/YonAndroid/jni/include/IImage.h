@@ -7,6 +7,13 @@
 
 namespace yon{
 namespace video{
+	enum ENUM_IMAGE_TYPE
+	{
+		ENUM_IMAGE_TYPE_2D = 0,
+		ENUM_IMAGE_TYPE_3D,
+		ENUM_IMAGE_TYPE_CUBEMAP,
+		ENUM_IMAGE_TYPE_COUNT
+	};
 	enum ENUM_COLOR_FORMAT
 	{
 		ENUM_COLOR_FORMAT_R5G5B5A1 = 0,
@@ -17,6 +24,18 @@ namespace video{
 		ENUM_COLOR_FORMAT_A8,
 		ENUM_COLOR_FORMAT_L8,
 		ENUM_COLOR_FORMAT_L8A8,
+		//items below should be compression format,for creating texture flag
+		ENUM_COLOR_FORMAT_DXT1,
+		ENUM_COLOR_FORMAT_DXT3,
+		ENUM_COLOR_FORMAT_DXT5,
+		ENUM_COLOR_FORMAT_ETC1,
+		ENUM_COLOR_FORMAT_ATC_RGB,
+		ENUM_COLOR_FORMAT_ATC_RGBA_EXPLICIT,
+		ENUM_COLOR_FORMAT_ATC_RGBA_INTERPOLATED,
+		ENUM_COLOR_FORMAT_PVRTC_RGB_2BPP,
+		ENUM_COLOR_FORMAT_PVRTC_RGB_4BPP,
+		ENUM_COLOR_FORMAT_PVRTC_RGBA_2BPP,
+		ENUM_COLOR_FORMAT_PVRTC_RGBA_4BPP,
 		ENUM_COLOR_FORMAT_COUNT
 	};
 	const static c8* COLOR_FORMAT_NAME[]=
@@ -28,7 +47,18 @@ namespace video{
 		"R8G8B8A8",
 		"A8",
 		"L8",
-		"L8A8"
+		"L8A8",
+		"DXT1",
+		"DXT3",
+		"DXT5",
+		"ETC1",
+		"ATC_RGB",
+		"ATC_Explicit",
+		"ATC_Interpolated",
+		"PVRTC_RGB_2BPP",
+		"PVRTC_RGB_4BPP",
+		"PVRTC_RGBA_2BPP",
+		"PVRTC_RGBA_4BPP"
 	};
 	static u32 getPixelBitsByFormat(const ENUM_COLOR_FORMAT format)
 	{
@@ -96,6 +126,7 @@ namespace video{
 		
 		virtual u32 getByteCountPerRow() const =0;
 		virtual u32 getByteCountPerPixel() const =0;
+		virtual u32 getImageDataSizeInBytes() const = 0;
 		virtual u32 getImageDataSizeInPixels() const = 0;
 
 		virtual void* lock() = 0;
@@ -126,6 +157,8 @@ namespace video{
 				return true;
 			}
 		}
+
+		//TODO mipmap,http://ezgame.googlecode.com/svn/EzGame-1.0.0/CoreLibs/EzRenderer/EzImage.cpp
 	};
 }//video
 }//yon

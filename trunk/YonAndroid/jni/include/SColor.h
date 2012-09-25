@@ -95,6 +95,8 @@ namespace video{
 		SColor(u32 clr)
 			: color(clr) {}
 
+		u32 toA8R8G8B8() const { return color; }
+
 		u32 getAlpha() const { return color>>24; }
 		u32 getRed() const { return (color>>16) & 0xff; }
 		u32 getGreen() const { return (color>>8) & 0xff; }

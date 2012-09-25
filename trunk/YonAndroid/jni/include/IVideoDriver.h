@@ -29,6 +29,10 @@ namespace yon{
 	namespace video{
 
 		IImageLoader* createImageLoaderPNG();
+		IImageLoader* createImageLoaderDDS();
+		IImageLoader* createImageLoaderPKM();
+		IImageLoader* createImageLoaderKTX();
+		IImageLoader* createImageLoaderPVR();
 
 		enum ENUM_TRANSFORM{
 			ENUM_TRANSFORM_VIEW = 0,		// ”Õºø’º‰æÿ’Û
@@ -74,6 +78,10 @@ namespace yon{
 		enum ENUM_VIDEO_FEATURE{
 			ENUM_VIDEO_FEATURE_FBO = 0,
 			ENUM_VIDEO_FEATURE_ELEMENT_INDEX_UNSIGNED_INT,
+			ENUM_VIDEO_FEATURE_TEXTURE_COMPRESSION_DXT1,
+			ENUM_VIDEO_FEATURE_TEXTURE_COMPRESSION_ETC1,
+			ENUM_VIDEO_FEATURE_TEXTURE_COMPRESSION_ATITC,
+			ENUM_VIDEO_FEATURE_TEXTURE_COMPRESSION_PVRTC,
 			//items below are not in GL_EXTENSIONS list,need be processed separately
 			ENUM_VIDEO_FEATURE_GENERATE_MIPMAP,
 			ENUM_VIDEO_FEATURE_COUNT

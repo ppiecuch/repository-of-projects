@@ -37,6 +37,7 @@ namespace io{
 		IWriteStream(const io::path& name,ENUM_STREAM_TYPE type,ENUM_ENDIAN_MODE mode=ENUM_ENDIAN_MODE_LITTLE): m_path(name),m_streamType(type),m_endianMode(mode){}
 		virtual ~IWriteStream(){}
 		ENUM_STREAM_TYPE getType() const{return m_streamType;}
+		void setEndianMode(ENUM_ENDIAN_MODE mode){m_endianMode=mode;}
 		ENUM_ENDIAN_MODE getEndianMode() const{return m_endianMode;}
 		virtual const io::path& getPath() const{return m_path;}
 
@@ -104,6 +105,7 @@ namespace io{
 		IReadStream(const io::path& name,ENUM_STREAM_TYPE type,ENUM_ENDIAN_MODE mode=ENUM_ENDIAN_MODE_LITTLE): m_path(name),m_streamType(type),m_endianMode(mode){}
 		virtual ~IReadStream(){}
 		ENUM_STREAM_TYPE getType() const{return m_streamType;}
+		void setEndianMode(ENUM_ENDIAN_MODE mode){m_endianMode=mode;}
 		ENUM_ENDIAN_MODE getEndianMode() const{return m_endianMode;}
 		virtual const io::path& getPath() const{return m_path;}
 
