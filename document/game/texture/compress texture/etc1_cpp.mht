@@ -1,0 +1,2868 @@
+From: <ÓÉ Windows Internet Explorer 7 ±£´æ>
+Subject: 
+Date: Wed, 19 Sep 2012 15:44:13 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CD967D.9E699390"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.3664
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0000_01CD967D.9E699390
+Content-Type: text/html;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://source-android.frandroid.com/frameworks/base/opengl/libs/ETC1/etc1.cpp
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dgb2312"><LINK=20
+media=3Dscreen href=3D"http://source-android.frandroid.com/style.css" =
+type=3Dtext/css=20
+rel=3Dstylesheet>
+<STYLE>HTML {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+0px; PADDING-TOP: 0px
+}
+BODY {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+0px; PADDING-TOP: 0px
+}
+.header {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; BACKGROUND: #000; =
+PADDING-BOTTOM: 10px; COLOR: #fff; PADDING-TOP: 10px
+}
+.header A {
+	COLOR: #ccc
+}
+.code {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; PADDING-BOTTOM: 10px; =
+PADDING-TOP: 10px
+}
+.hll {
+	BACKGROUND-COLOR: #ffffcc
+}
+.c {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.err {
+	BORDER-RIGHT: #ff0000 1px solid; BORDER-TOP: #ff0000 1px solid; =
+BORDER-LEFT: #ff0000 1px solid; BORDER-BOTTOM: #ff0000 1px solid
+}
+.k {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.o {
+	COLOR: #666666
+}
+.cm {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.cp {
+	COLOR: #bc7a00
+}
+.c1 {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.cs {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.gd {
+	COLOR: #a00000
+}
+.ge {
+	FONT-STYLE: italic
+}
+.gr {
+	COLOR: #ff0000
+}
+.gh {
+	FONT-WEIGHT: bold; COLOR: #000080
+}
+.gi {
+	COLOR: #00a000
+}
+.go {
+	COLOR: #808080
+}
+.gp {
+	FONT-WEIGHT: bold; COLOR: #000080
+}
+.gs {
+	FONT-WEIGHT: bold
+}
+.gu {
+	FONT-WEIGHT: bold; COLOR: #800080
+}
+.gt {
+	COLOR: #0040d0
+}
+.kc {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kd {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kn {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kp {
+	COLOR: #008000
+}
+.kr {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kt {
+	COLOR: #b00040
+}
+.m {
+	COLOR: #666666
+}
+.s {
+	COLOR: #ba2121
+}
+.na {
+	COLOR: #7d9029
+}
+.nb {
+	COLOR: #008000
+}
+.nc {
+	FONT-WEIGHT: bold; COLOR: #0000ff
+}
+.no {
+	COLOR: #880000
+}
+.nd {
+	COLOR: #aa22ff
+}
+.ni {
+	FONT-WEIGHT: bold; COLOR: #999999
+}
+.ne {
+	FONT-WEIGHT: bold; COLOR: #d2413a
+}
+.nf {
+	COLOR: #0000ff
+}
+.nl {
+	COLOR: #a0a000
+}
+.nn {
+	FONT-WEIGHT: bold; COLOR: #0000ff
+}
+.nt {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.nv {
+	COLOR: #19177c
+}
+.ow {
+	FONT-WEIGHT: bold; COLOR: #aa22ff
+}
+.w {
+	COLOR: #bbbbbb
+}
+.mf {
+	COLOR: #666666
+}
+.mh {
+	COLOR: #666666
+}
+.mi {
+	COLOR: #666666
+}
+.mo {
+	COLOR: #666666
+}
+.sb {
+	COLOR: #ba2121
+}
+.sc {
+	COLOR: #ba2121
+}
+.sd {
+	COLOR: #ba2121; FONT-STYLE: italic
+}
+.s2 {
+	COLOR: #ba2121
+}
+.se {
+	FONT-WEIGHT: bold; COLOR: #bb6622
+}
+.sh {
+	COLOR: #ba2121
+}
+.si {
+	FONT-WEIGHT: bold; COLOR: #bb6688
+}
+.sx {
+	COLOR: #008000
+}
+.sr {
+	COLOR: #bb6688
+}
+.s1 {
+	COLOR: #ba2121
+}
+.ss {
+	COLOR: #19177c
+}
+.bp {
+	COLOR: #008000
+}
+.vc {
+	COLOR: #19177c
+}
+.vg {
+	COLOR: #19177c
+}
+.vi {
+	COLOR: #19177c
+}
+.il {
+	COLOR: #666666
+}
+</STYLE>
+
+<META content=3D"MSHTML 6.00.6000.16587" name=3DGENERATOR></HEAD>
+<BODY>
+<DIV class=3Dheader><B>Android source code : version at =
+22/02/2011</B><BR>Hosted=20
+by <A href=3D"http://www.frandroid.com/">FrAndroid</A>, french Android =
+and mobile=20
+blog<BR><A href=3D"http://source-android.frandroid.com/">[Index]</A> <A=20
+href=3D"http://developer.android.com/">[android.com]</A> </DIV>
+<DIV class=3Dcode>
+<H1>/frameworks/base/opengl/libs/ETC1/etc1.cpp</H1><A=20
+href=3D"http://source-android.frandroid.com/frameworks/base/opengl/libs/E=
+TC1/">[Parent]</A>
+<DIV class=3Dhighlight><PRE><SPAN class=3Dcp>// Copyright 2009 Google =
+Inc.</SPAN>
+<SPAN class=3Dcp>//</SPAN>
+<SPAN class=3Dcp>// Licensed under the Apache License, Version 2.0 (the =
+"License");</SPAN>
+<SPAN class=3Dcp>// you may not use this file except in compliance with =
+the License.</SPAN>
+<SPAN class=3Dcp>// You may obtain a copy of the License at</SPAN>
+<SPAN class=3Dcp>//</SPAN>
+<SPAN class=3Dcp>//     =
+http://www.apache.org/licenses/LICENSE-2.0</SPAN>
+<SPAN class=3Dcp>//</SPAN>
+<SPAN class=3Dcp>// Unless required by applicable law or agreed to in =
+writing, software</SPAN>
+<SPAN class=3Dcp>// distributed under the License is distributed on an =
+"AS IS" BASIS,</SPAN>
+<SPAN class=3Dcp>// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either =
+express or implied.</SPAN>
+<SPAN class=3Dcp>// See the License for the specific language governing =
+permissions and</SPAN>
+<SPAN class=3Dcp>// limitations under the License.</SPAN>
+
+<SPAN class=3Dcp>#include &lt;ETC1/etc1.h&gt;</SPAN>
+
+<SPAN class=3Dcp>#include &lt;string.h&gt;</SPAN>
+
+<SPAN class=3Dcm>/* From =
+http://www.khronos.org/registry/gles/extensions/OES/OES_compressed_ETC1_R=
+GB8_texture.txt</SPAN>
+
+<SPAN class=3Dcm> The number of bits that represent a 4x4 texel block is =
+64 bits if</SPAN>
+<SPAN class=3Dcm> &lt;internalformat&gt; is given by =
+ETC1_RGB8_OES.</SPAN>
+
+<SPAN class=3Dcm> The data for a block is a number of bytes,</SPAN>
+
+<SPAN class=3Dcm> {q0, q1, q2, q3, q4, q5, q6, q7}</SPAN>
+
+<SPAN class=3Dcm> where byte q0 is located at the lowest memory address =
+and q7 at</SPAN>
+<SPAN class=3Dcm> the highest. The 64 bits specifying the block is then =
+represented</SPAN>
+<SPAN class=3Dcm> by the following 64 bit integer:</SPAN>
+
+<SPAN class=3Dcm> int64bit =3D =
+256*(256*(256*(256*(256*(256*(256*q0+q1)+q2)+q3)+q4)+q5)+q6)+q7;</SPAN>
+
+<SPAN class=3Dcm> ETC1_RGB8_OES:</SPAN>
+
+<SPAN class=3Dcm> a) bit layout in bits 63 through 32 if diffbit =3D =
+0</SPAN>
+
+<SPAN class=3Dcm> 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48</SPAN>
+<SPAN class=3Dcm> -----------------------------------------------</SPAN>
+<SPAN class=3Dcm> | base col1 | base col2 | base col1 | base col2 =
+|</SPAN>
+<SPAN class=3Dcm> | R1 (4bits)| R2 (4bits)| G1 (4bits)| G2 =
+(4bits)|</SPAN>
+<SPAN class=3Dcm> -----------------------------------------------</SPAN>
+
+<SPAN class=3Dcm> 47 46 45 44 43 42 41 40 39 38 37 36 35 34  33  =
+32</SPAN>
+<SPAN class=3Dcm> =
+---------------------------------------------------</SPAN>
+<SPAN class=3Dcm> | base col1 | base col2 | table  | table  =
+|diff|flip|</SPAN>
+<SPAN class=3Dcm> | B1 (4bits)| B2 (4bits)| cw 1   | cw 2   |bit |bit =
+|</SPAN>
+<SPAN class=3Dcm> =
+---------------------------------------------------</SPAN>
+
+
+<SPAN class=3Dcm> b) bit layout in bits 63 through 32 if diffbit =3D =
+1</SPAN>
+
+<SPAN class=3Dcm> 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48</SPAN>
+<SPAN class=3Dcm> -----------------------------------------------</SPAN>
+<SPAN class=3Dcm> | base col1    | dcol 2 | base col1    | dcol 2 =
+|</SPAN>
+<SPAN class=3Dcm> | R1' (5 bits) | dR2    | G1' (5 bits) | dG2    =
+|</SPAN>
+<SPAN class=3Dcm> -----------------------------------------------</SPAN>
+
+<SPAN class=3Dcm> 47 46 45 44 43 42 41 40 39 38 37 36 35 34  33  =
+32</SPAN>
+<SPAN class=3Dcm> =
+---------------------------------------------------</SPAN>
+<SPAN class=3Dcm> | base col 1   | dcol 2 | table  | table  =
+|diff|flip|</SPAN>
+<SPAN class=3Dcm> | B1' (5 bits) | dB2    | cw 1   | cw 2   |bit |bit =
+|</SPAN>
+<SPAN class=3Dcm> =
+---------------------------------------------------</SPAN>
+
+
+<SPAN class=3Dcm> c) bit layout in bits 31 through 0 (in both =
+cases)</SPAN>
+
+<SPAN class=3Dcm> 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16</SPAN>
+<SPAN class=3Dcm> -----------------------------------------------</SPAN>
+<SPAN class=3Dcm> |       most significant pixel index bits       =
+|</SPAN>
+<SPAN class=3Dcm> | p| o| n| m| l| k| j| i| h| g| f| e| d| c| b| =
+a|</SPAN>
+<SPAN class=3Dcm> -----------------------------------------------</SPAN>
+
+<SPAN class=3Dcm> 15 14 13 12 11 10  9  8  7  6  5  4  3   2   1  =
+0</SPAN>
+<SPAN class=3Dcm> =
+--------------------------------------------------</SPAN>
+<SPAN class=3Dcm> |         least significant pixel index bits       =
+|</SPAN>
+<SPAN class=3Dcm> | p| o| n| m| l| k| j| i| h| g| f| e| d| c | b | a =
+|</SPAN>
+<SPAN class=3Dcm> =
+--------------------------------------------------</SPAN>
+
+
+<SPAN class=3Dcm> Add table 3.17.2: Intensity modifier sets for ETC1 =
+compressed textures:</SPAN>
+
+<SPAN class=3Dcm> table codeword                modifier table</SPAN>
+<SPAN class=3Dcm> ------------------        =
+----------------------</SPAN>
+<SPAN class=3Dcm> 0                     -8  -2  2   8</SPAN>
+<SPAN class=3Dcm> 1                    -17  -5  5  17</SPAN>
+<SPAN class=3Dcm> 2                    -29  -9  9  29</SPAN>
+<SPAN class=3Dcm> 3                    -42 -13 13  42</SPAN>
+<SPAN class=3Dcm> 4                    -60 -18 18  60</SPAN>
+<SPAN class=3Dcm> 5                    -80 -24 24  80</SPAN>
+<SPAN class=3Dcm> 6                   -106 -33 33 106</SPAN>
+<SPAN class=3Dcm> 7                   -183 -47 47 183</SPAN>
+
+
+<SPAN class=3Dcm> Add table 3.17.3 Mapping from pixel index values to =
+modifier values for</SPAN>
+<SPAN class=3Dcm> ETC1 compressed textures:</SPAN>
+
+<SPAN class=3Dcm> pixel index value</SPAN>
+<SPAN class=3Dcm> ---------------</SPAN>
+<SPAN class=3Dcm> msb     lsb           resulting modifier value</SPAN>
+<SPAN class=3Dcm> -----   -----          =
+-------------------------</SPAN>
+<SPAN class=3Dcm> 1       1            -b (large negative value)</SPAN>
+<SPAN class=3Dcm> 1       0            -a (small negative value)</SPAN>
+<SPAN class=3Dcm> 0       0             a (small positive value)</SPAN>
+<SPAN class=3Dcm> 0       1             b (large positive value)</SPAN>
+
+
+<SPAN class=3Dcm> */</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>kModifierTable</SPAN><SPAN =
+class=3Dp>[]</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN class=3Dp>{</SPAN>
+<SPAN class=3Dcm>/* 0 */</SPAN><SPAN class=3Dmi>2</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>-</SPAN><SPAN class=3Dmi>2</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>8</SPAN><SPAN class=3Dp>,</SPAN>
+<SPAN class=3Dcm>/* 1 */</SPAN><SPAN class=3Dmi>5</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dmi>17</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>-</SPAN><SPAN class=3Dmi>5</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>17</SPAN><SPAN class=3Dp>,</SPAN>
+<SPAN class=3Dcm>/* 2 */</SPAN><SPAN class=3Dmi>9</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dmi>29</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>-</SPAN><SPAN class=3Dmi>9</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>29</SPAN><SPAN class=3Dp>,</SPAN>
+<SPAN class=3Dcm>/* 3 */</SPAN><SPAN class=3Dmi>13</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dmi>42</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>-</SPAN><SPAN class=3Dmi>13</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>42</SPAN><SPAN class=3Dp>,</SPAN>
+<SPAN class=3Dcm>/* 4 */</SPAN><SPAN class=3Dmi>18</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dmi>60</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>-</SPAN><SPAN class=3Dmi>18</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>60</SPAN><SPAN class=3Dp>,</SPAN>
+<SPAN class=3Dcm>/* 5 */</SPAN><SPAN class=3Dmi>24</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dmi>80</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>-</SPAN><SPAN class=3Dmi>24</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>80</SPAN><SPAN class=3Dp>,</SPAN>
+<SPAN class=3Dcm>/* 6 */</SPAN><SPAN class=3Dmi>33</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dmi>106</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>-</SPAN><SPAN class=3Dmi>33</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>106</SPAN><SPAN class=3Dp>,</SPAN>
+<SPAN class=3Dcm>/* 7 */</SPAN><SPAN class=3Dmi>47</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dmi>183</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>-</SPAN><SPAN class=3Dmi>47</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>-</SPAN><SPAN class=3Dmi>183</SPAN> =
+<SPAN class=3Dp>};</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>kLookup</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>8</SPAN><SPAN class=3Dp>]</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dp>{</SPAN> <SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Do>-</SPAN><SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>-</SPAN><SPAN class=3Dmi>3</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Do>-</SPAN><SPAN class=3Dmi>1</SPAN> <SPAN class=3Dp>};</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dkr>inline</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN> <SPAN class=3Dn>clamp</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>x</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>&gt;=3D</SPAN> <SPAN class=3Dmi>0</SPAN> <SPAN =
+class=3Do>?</SPAN> <SPAN class=3Dp>(</SPAN><SPAN class=3Dn>x</SPAN> =
+<SPAN class=3Do>&lt;</SPAN> <SPAN class=3Dmi>255</SPAN> <SPAN =
+class=3Do>?</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN class=3Do>:</SPAN> =
+<SPAN class=3Dmi>255</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>:</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkr>inline</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>b</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>c</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>b</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dmh>0xf</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>c</SPAN> <SPAN class=3Do>&lt;&lt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> =
+<SPAN class=3Dn>c</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkr>inline</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>b</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>c</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>b</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dmh>0x1f</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>c</SPAN> <SPAN class=3Do>&lt;&lt;</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>c</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>2</SPAN><SPAN =
+class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkr>inline</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>convert6To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>b</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>c</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>b</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dmh>0x3f</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>c</SPAN> <SPAN class=3Do>&lt;&lt;</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>c</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>4</SPAN><SPAN =
+class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkr>inline</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>divideBy255</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>d</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>d</SPAN> <SPAN class=3Do>+</SPAN> <SPAN class=3Dmi>128</SPAN> =
+<SPAN class=3Do>+</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>d</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>8</SPAN><SPAN class=3Dp>))</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkr>inline</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>convert8To4</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>b</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>c</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>b</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dmh>0xff</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN =
+class=3Dn>divideBy255</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>b</SPAN> <SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dmi>15</SPAN><SPAN class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkr>inline</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>convert8To5</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>b</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>c</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>b</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dmh>0xff</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN =
+class=3Dn>divideBy255</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>b</SPAN> <SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dmi>31</SPAN><SPAN class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkr>inline</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>convertDiff</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>base</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>diff</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>((</SPAN><SPAN =
+class=3Dmh>0x1f</SPAN> <SPAN class=3Do>&amp;</SPAN> <SPAN =
+class=3Dn>base</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>kLookup</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmh>0x7</SPAN> <SPAN class=3Do>&amp;</SPAN> <SPAN =
+class=3Dn>diff</SPAN><SPAN class=3Dp>]);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkt>void</SPAN> <SPAN class=3Dn>decode_subblock</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pOut</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>r</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>g</SPAN><SPAN class=3Dp>,</SPAN> <SPAN class=3Dkt>int</SPAN> =
+<SPAN class=3Dn>b</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dkt>int</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>table</SPAN><SPAN class=3Dp>,</SPAN>
+        <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>low</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkt>bool</SPAN> <SPAN class=3Dn>second</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dkt>bool</SPAN> <SPAN =
+class=3Dn>flipped</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>baseX</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>baseY</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>second</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>flipped</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+            <SPAN class=3Dn>baseY</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN> <SPAN class=3Dk>else</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+            <SPAN class=3Dn>baseX</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>i</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>8</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>i</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>x</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>y</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>flipped</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+            <SPAN class=3Dn>x</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>baseX</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>1</SPAN><SPAN =
+class=3Dp>);</SPAN>
+            <SPAN class=3Dn>y</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>baseY</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>i</SPAN> <SPAN class=3Do>&amp;</SPAN> =
+<SPAN class=3Dmi>1</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dp>}</SPAN> <SPAN class=3Dk>else</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+            <SPAN class=3Dn>x</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>baseX</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>2</SPAN><SPAN =
+class=3Dp>);</SPAN>
+            <SPAN class=3Dn>y</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>baseY</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>i</SPAN> <SPAN class=3Do>&amp;</SPAN> =
+<SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>k</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>y</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>offset</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dp>((</SPAN><SPAN class=3Dn>low</SPAN> =
+<SPAN class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dn>k</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>&amp;</SPAN> <SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> =
+<SPAN class=3Dp>((</SPAN><SPAN class=3Dn>low</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>k</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dmi>15</SPAN><SPAN class=3Dp>))</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dmi>2</SPAN><SPAN =
+class=3Dp>);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>delta</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>table</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dn>offset</SPAN><SPAN class=3Dp>];</SPAN>
+        <SPAN class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>q</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>pOut</SPAN> <SPAN class=3Do>+</SPAN> <SPAN class=3Dmi>3</SPAN> =
+<SPAN class=3Do>*</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>x</SPAN> <SPAN class=3Do>+</SPAN> <SPAN class=3Dmi>4</SPAN> =
+<SPAN class=3Do>*</SPAN> <SPAN class=3Dn>y</SPAN><SPAN =
+class=3Dp>);</SPAN>
+        <SPAN class=3Do>*</SPAN><SPAN class=3Dn>q</SPAN><SPAN =
+class=3Do>++</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>clamp</SPAN><SPAN class=3Dp>(</SPAN><SPAN class=3Dn>r</SPAN> =
+<SPAN class=3Do>+</SPAN> <SPAN class=3Dn>delta</SPAN><SPAN =
+class=3Dp>);</SPAN>
+        <SPAN class=3Do>*</SPAN><SPAN class=3Dn>q</SPAN><SPAN =
+class=3Do>++</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>clamp</SPAN><SPAN class=3Dp>(</SPAN><SPAN class=3Dn>g</SPAN> =
+<SPAN class=3Do>+</SPAN> <SPAN class=3Dn>delta</SPAN><SPAN =
+class=3Dp>);</SPAN>
+        <SPAN class=3Do>*</SPAN><SPAN class=3Dn>q</SPAN><SPAN =
+class=3Do>++</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>clamp</SPAN><SPAN class=3Dp>(</SPAN><SPAN class=3Dn>b</SPAN> =
+<SPAN class=3Do>+</SPAN> <SPAN class=3Dn>delta</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dc1>// Input is an ETC1 compressed version of the =
+data.</SPAN>
+<SPAN class=3Dc1>// Output is a 4 x 4 square of 3-byte pixels in form R, =
+G, B</SPAN>
+
+<SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>etc1_decode_block</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pOut</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>high</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pIn</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>]</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>24</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>1</SPAN><SPAN class=3Dp>]</SPAN> =
+<SPAN class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>16</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>2</SPAN><SPAN class=3Dp>]</SPAN> =
+<SPAN class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dn>pIn</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>low</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pIn</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>]</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>24</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>5</SPAN><SPAN class=3Dp>]</SPAN> =
+<SPAN class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>16</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>6</SPAN><SPAN class=3Dp>]</SPAN> =
+<SPAN class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dn>pIn</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>7</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>r1</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>r2</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>g1</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>g2</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>b1</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>b2</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&amp;</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dc1>// differential</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>rBase</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>high</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>27</SPAN><SPAN =
+class=3Dp>;</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>gBase</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>high</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>19</SPAN><SPAN =
+class=3Dp>;</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>bBase</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>high</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>11</SPAN><SPAN =
+class=3Dp>;</SPAN>
+        <SPAN class=3Dn>r1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>rBase</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>r2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convertDiff</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>rBase</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>24</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>g1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>gBase</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>g2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convertDiff</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>gBase</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>16</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>b1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>bBase</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>b2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convertDiff</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>bBase</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>8</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dp>}</SPAN> <SPAN class=3Dk>else</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+        <SPAN class=3Dc1>// not differential</SPAN>
+        <SPAN class=3Dn>r1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>28</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>r2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>24</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>g1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>20</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>g2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>16</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>b1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>12</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>b2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>8</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>tableIndexA</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>7</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>5</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>tableIndexB</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>7</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dk>const</SPAN> <SPAN class=3Dkt>int</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>tableA</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>kModifierTable</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dn>tableIndexA</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dk>const</SPAN> <SPAN class=3Dkt>int</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>tableB</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>kModifierTable</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dn>tableIndexB</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dkt>bool</SPAN> <SPAN class=3Dn>flipped</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dp>(</SPAN><SPAN class=3Dn>high</SPAN> =
+<SPAN class=3Do>&amp;</SPAN> <SPAN class=3Dmi>1</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>!=3D</SPAN> <SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>decode_subblock</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pOut</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>r1</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>g1</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>b1</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>tableA</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>low</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>false</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>flipped</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>decode_subblock</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pOut</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>r2</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>g2</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>b2</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>tableB</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>low</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>true</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>flipped</SPAN><SPAN class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>typedef</SPAN> <SPAN class=3Dk>struct</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>high</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>low</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>score</SPAN><SPAN =
+class=3Dp>;</SPAN> <SPAN class=3Dc1>// Lower is more accurate</SPAN>
+<SPAN class=3Dp>}</SPAN> <SPAN class=3Dn>etc_compressed</SPAN><SPAN =
+class=3Dp>;</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkr>inline</SPAN> <SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>take_best</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc_compressed</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>a</SPAN><SPAN class=3Dp>,</SPAN> <SPAN class=3Dk>const</SPAN> =
+<SPAN class=3Dn>etc_compressed</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>b</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>a</SPAN><SPAN class=3Do>-&gt;</SPAN><SPAN =
+class=3Dn>score</SPAN> <SPAN class=3Do>&gt;</SPAN> <SPAN =
+class=3Dn>b</SPAN><SPAN class=3Do>-&gt;</SPAN><SPAN =
+class=3Dn>score</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Do>*</SPAN><SPAN class=3Dn>a</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Do>*</SPAN><SPAN =
+class=3Dn>b</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>etc_average_colors_subblock</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>inMask</SPAN><SPAN =
+class=3Dp>,</SPAN>
+        <SPAN class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pColors</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkt>bool</SPAN> <SPAN class=3Dn>flipped</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dkt>bool</SPAN> <SPAN =
+class=3Dn>second</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>r</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>g</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>b</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+
+    <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>flipped</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>by</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>second</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dn>by</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>y</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>y</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>y</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>yy</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>by</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>y</SPAN><SPAN class=3Dp>;</SPAN>
+            <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>x</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>x</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+                <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>i</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dmi>4</SPAN> <SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dn>yy</SPAN><SPAN class=3Dp>;</SPAN>
+                <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>inMask</SPAN> <SPAN class=3Do>&amp;</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dmi>1</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dn>i</SPAN><SPAN =
+class=3Dp>))</SPAN> <SPAN class=3Dp>{</SPAN>
+                    <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>p</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>pIn</SPAN> =
+<SPAN class=3Do>+</SPAN> <SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+                    <SPAN class=3Dn>r</SPAN> <SPAN class=3Do>+=3D</SPAN> =
+<SPAN class=3Do>*</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>p</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>);</SPAN>
+                    <SPAN class=3Dn>g</SPAN> <SPAN class=3Do>+=3D</SPAN> =
+<SPAN class=3Do>*</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>p</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>);</SPAN>
+                    <SPAN class=3Dn>b</SPAN> <SPAN class=3Do>+=3D</SPAN> =
+<SPAN class=3Do>*</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>p</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>);</SPAN>
+                <SPAN class=3Dp>}</SPAN>
+            <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN> <SPAN class=3Dk>else</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>bx</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>second</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dn>bx</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>y</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>y</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>y</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>x</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>x</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+                <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>xx</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>bx</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dn>x</SPAN><SPAN class=3Dp>;</SPAN>
+                <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>i</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>xx</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dmi>4</SPAN> <SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dn>y</SPAN><SPAN class=3Dp>;</SPAN>
+                <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>inMask</SPAN> <SPAN class=3Do>&amp;</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dmi>1</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dn>i</SPAN><SPAN =
+class=3Dp>))</SPAN> <SPAN class=3Dp>{</SPAN>
+                    <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>p</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>pIn</SPAN> =
+<SPAN class=3Do>+</SPAN> <SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+                    <SPAN class=3Dn>r</SPAN> <SPAN class=3Do>+=3D</SPAN> =
+<SPAN class=3Do>*</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>p</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>);</SPAN>
+                    <SPAN class=3Dn>g</SPAN> <SPAN class=3Do>+=3D</SPAN> =
+<SPAN class=3Do>*</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>p</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>);</SPAN>
+                    <SPAN class=3Dn>b</SPAN> <SPAN class=3Do>+=3D</SPAN> =
+<SPAN class=3Do>*</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>p</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>);</SPAN>
+                <SPAN class=3Dp>}</SPAN>
+            <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dn>pColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)((</SPAN><SPAN class=3Dn>r</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dn>pColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)((</SPAN><SPAN class=3Dn>g</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dn>pColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)((</SPAN><SPAN class=3Dn>b</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN =
+class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkr>inline</SPAN> <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>square</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>x</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>x</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>chooseModifier</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pBaseColors</SPAN><SPAN =
+class=3Dp>,</SPAN>
+        <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Do>*</SPAN><SPAN =
+class=3Dn>pLow</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>bitIndex</SPAN><SPAN =
+class=3Dp>,</SPAN>
+        <SPAN class=3Dk>const</SPAN> <SPAN class=3Dkt>int</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pModifierTable</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>bestScore</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Do>~</SPAN><SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>bestIndex</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>pixelR</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>pixelG</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>1</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>pixelB</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>2</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>r</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>pBaseColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>g</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>pBaseColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>1</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>b</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>pBaseColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>2</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>i</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>i</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>modifier</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>pModifierTable</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dn>i</SPAN><SPAN class=3Dp>];</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>decodedG</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>clamp</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>g</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>modifier</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>score</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_uint32</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dmi>6</SPAN> <SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dn>square</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>decodedG</SPAN> <SPAN class=3Do>-</SPAN> <SPAN =
+class=3Dn>pixelG</SPAN><SPAN class=3Dp>));</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>score</SPAN> <SPAN class=3Do>&gt;=3D</SPAN> <SPAN =
+class=3Dn>bestScore</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+            <SPAN class=3Dk>continue</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>decodedR</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>clamp</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>r</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>modifier</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>score</SPAN> <SPAN class=3Do>+=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>etc1_uint32</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>(</SPAN><SPAN class=3Dmi>3</SPAN> =
+<SPAN class=3Do>*</SPAN> <SPAN class=3Dn>square</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>decodedR</SPAN> <SPAN =
+class=3Do>-</SPAN> <SPAN class=3Dn>pixelR</SPAN><SPAN =
+class=3Dp>));</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>score</SPAN> <SPAN class=3Do>&gt;=3D</SPAN> <SPAN =
+class=3Dn>bestScore</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+            <SPAN class=3Dk>continue</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>decodedB</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>clamp</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>b</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>modifier</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>score</SPAN> <SPAN class=3Do>+=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>etc1_uint32</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dn>square</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>decodedB</SPAN> <SPAN =
+class=3Do>-</SPAN> <SPAN class=3Dn>pixelB</SPAN><SPAN =
+class=3Dp>);</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>score</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dn>bestScore</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+            <SPAN class=3Dn>bestScore</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>score</SPAN><SPAN class=3Dp>;</SPAN>
+            <SPAN class=3Dn>bestIndex</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>i</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>lowMask</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dp>(((</SPAN><SPAN =
+class=3Dn>bestIndex</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>16</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>bestIndex</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dmi>1</SPAN><SPAN =
+class=3Dp>))</SPAN>
+            <SPAN class=3Do>&lt;&lt;</SPAN> <SPAN =
+class=3Dn>bitIndex</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Do>*</SPAN><SPAN class=3Dn>pLow</SPAN> <SPAN =
+class=3Do>|=3D</SPAN> <SPAN class=3Dn>lowMask</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dn>bestScore</SPAN><SPAN =
+class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>etc_encode_subblock_helper</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>inMask</SPAN><SPAN =
+class=3Dp>,</SPAN>
+        <SPAN class=3Dn>etc_compressed</SPAN><SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dn>pCompressed</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkt>bool</SPAN> <SPAN class=3Dn>flipped</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dkt>bool</SPAN> <SPAN =
+class=3Dn>second</SPAN><SPAN class=3Dp>,</SPAN>
+        <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pBaseColors</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dkt>int</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pModifierTable</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>score</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>pCompressed</SPAN><SPAN =
+class=3Do>-&gt;</SPAN><SPAN class=3Dn>score</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>flipped</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>by</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>second</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dn>by</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>y</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>y</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>y</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>yy</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>by</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>y</SPAN><SPAN class=3Dp>;</SPAN>
+            <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>x</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>x</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+                <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>i</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dmi>4</SPAN> <SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dn>yy</SPAN><SPAN class=3Dp>;</SPAN>
+                <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>inMask</SPAN> <SPAN class=3Do>&amp;</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dmi>1</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dn>i</SPAN><SPAN =
+class=3Dp>))</SPAN> <SPAN class=3Dp>{</SPAN>
+                    <SPAN class=3Dn>score</SPAN> <SPAN =
+class=3Do>+=3D</SPAN> <SPAN class=3Dn>chooseModifier</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pBaseColors</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>pIn</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>i</SPAN> <SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>,</SPAN>
+                            <SPAN class=3Do>&amp;</SPAN><SPAN =
+class=3Dn>pCompressed</SPAN><SPAN class=3Do>-&gt;</SPAN><SPAN =
+class=3Dn>low</SPAN><SPAN class=3Dp>,</SPAN> <SPAN class=3Dn>yy</SPAN> =
+<SPAN class=3Do>+</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>pModifierTable</SPAN><SPAN class=3Dp>);</SPAN>
+                <SPAN class=3Dp>}</SPAN>
+            <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN> <SPAN class=3Dk>else</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>bx</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>second</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dn>bx</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>y</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>y</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>y</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>x</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>x</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+                <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>xx</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>bx</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dn>x</SPAN><SPAN class=3Dp>;</SPAN>
+                <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>i</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>xx</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dmi>4</SPAN> <SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dn>y</SPAN><SPAN class=3Dp>;</SPAN>
+                <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>inMask</SPAN> <SPAN class=3Do>&amp;</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dmi>1</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dn>i</SPAN><SPAN =
+class=3Dp>))</SPAN> <SPAN class=3Dp>{</SPAN>
+                    <SPAN class=3Dn>score</SPAN> <SPAN =
+class=3Do>+=3D</SPAN> <SPAN class=3Dn>chooseModifier</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pBaseColors</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>pIn</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>i</SPAN> <SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>,</SPAN>
+                            <SPAN class=3Do>&amp;</SPAN><SPAN =
+class=3Dn>pCompressed</SPAN><SPAN class=3Do>-&gt;</SPAN><SPAN =
+class=3Dn>low</SPAN><SPAN class=3Dp>,</SPAN> <SPAN class=3Dn>y</SPAN> =
+<SPAN class=3Do>+</SPAN> <SPAN class=3Dn>xx</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>pModifierTable</SPAN><SPAN class=3Dp>);</SPAN>
+                <SPAN class=3Dp>}</SPAN>
+            <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dn>pCompressed</SPAN><SPAN class=3Do>-&gt;</SPAN><SPAN =
+class=3Dn>score</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>score</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dkt>bool</SPAN> <SPAN =
+class=3Dn>inRange4bitSigned</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>color</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dn>color</SPAN> <SPAN =
+class=3Do>&gt;=3D</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>4</SPAN> <SPAN class=3Do>&amp;&amp;</SPAN> <SPAN =
+class=3Dn>color</SPAN> <SPAN class=3Do>&lt;=3D</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>etc_encodeBaseColors</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pBaseColors</SPAN><SPAN class=3Dp>,</SPAN>
+        <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pColors</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc_compressed</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pCompressed</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>r1</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>g1</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>b1</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>r2</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>g2</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>b2</SPAN><SPAN class=3Dp>;</SPAN> <SPAN class=3Dc1>// 8 bit =
+base colors for sub-blocks</SPAN>
+    <SPAN class=3Dkt>bool</SPAN> <SPAN =
+class=3Dn>differential</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>r51</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To5</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>g51</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To5</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>1</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>b51</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To5</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>2</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>r52</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To5</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>g52</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To5</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>b52</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To5</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>5</SPAN><SPAN class=3Dp>]);</SPAN>
+
+        <SPAN class=3Dn>r1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>r51</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>g1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>g51</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>b1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>b51</SPAN><SPAN class=3Dp>);</SPAN>
+
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>dr</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>r52</SPAN> <SPAN class=3Do>-</SPAN> =
+<SPAN class=3Dn>r51</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>dg</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>g52</SPAN> <SPAN class=3Do>-</SPAN> =
+<SPAN class=3Dn>g51</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>db</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>b52</SPAN> <SPAN class=3Do>-</SPAN> =
+<SPAN class=3Dn>b51</SPAN><SPAN class=3Dp>;</SPAN>
+
+        <SPAN class=3Dn>differential</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>inRange4bitSigned</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>dr</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&amp;&amp;</SPAN> <SPAN =
+class=3Dn>inRange4bitSigned</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>dg</SPAN><SPAN class=3Dp>)</SPAN>
+                <SPAN class=3Do>&amp;&amp;</SPAN> <SPAN =
+class=3Dn>inRange4bitSigned</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>db</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>differential</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+            <SPAN class=3Dn>r2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>r51</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>dr</SPAN><SPAN class=3Dp>);</SPAN>
+            <SPAN class=3Dn>g2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>g51</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>dg</SPAN><SPAN class=3Dp>);</SPAN>
+            <SPAN class=3Dn>b2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>b51</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>db</SPAN><SPAN class=3Dp>);</SPAN>
+            <SPAN class=3Dn>pCompressed</SPAN><SPAN =
+class=3Do>-&gt;</SPAN><SPAN class=3Dn>high</SPAN> <SPAN =
+class=3Do>|=3D</SPAN> <SPAN class=3Dp>(</SPAN><SPAN class=3Dn>r51</SPAN> =
+<SPAN class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>27</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>((</SPAN><SPAN class=3Dmi>7</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dn>dr</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>24</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>g51</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>19</SPAN><SPAN =
+class=3Dp>)</SPAN>
+                    <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>((</SPAN><SPAN class=3Dmi>7</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dn>dg</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>16</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>b51</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>11</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>((</SPAN><SPAN class=3Dmi>7</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dn>db</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+
+    <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Do>!</SPAN><SPAN class=3Dn>differential</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>r41</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To4</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>g41</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To4</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>1</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>b41</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To4</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>2</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>r42</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To4</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>g42</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To4</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>b42</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>convert8To4</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>5</SPAN><SPAN class=3Dp>]);</SPAN>
+        <SPAN class=3Dn>r1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>r41</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>g1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>g41</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>b1</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>b41</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>r2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>r42</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>g2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>g42</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>b2</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>convert4To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>b42</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dn>pCompressed</SPAN><SPAN =
+class=3Do>-&gt;</SPAN><SPAN class=3Dn>high</SPAN> <SPAN =
+class=3Do>|=3D</SPAN> <SPAN class=3Dp>(</SPAN><SPAN class=3Dn>r41</SPAN> =
+<SPAN class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>28</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>r42</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>24</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>g41</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>20</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>g42</SPAN>
+                <SPAN class=3Do>&lt;&lt;</SPAN> <SPAN =
+class=3Dmi>16</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>b41</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>12</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>b42</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dn>pBaseColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>r1</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>pBaseColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>g1</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>pBaseColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>b1</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>pBaseColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>r2</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>pBaseColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>g2</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>pBaseColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>5</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>b2</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN>
+<SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>etc_encode_block_helper</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>inMask</SPAN><SPAN =
+class=3Dp>,</SPAN>
+        <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pColors</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc_compressed</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pCompressed</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkt>bool</SPAN> <SPAN class=3Dn>flipped</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dn>pCompressed</SPAN><SPAN class=3Do>-&gt;</SPAN><SPAN =
+class=3Dn>score</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Do>~</SPAN><SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>pCompressed</SPAN><SPAN class=3Do>-&gt;</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>flipped</SPAN> <SPAN =
+class=3Do>?</SPAN> <SPAN class=3Dmi>1</SPAN> <SPAN class=3Do>:</SPAN> =
+<SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>pCompressed</SPAN><SPAN class=3Do>-&gt;</SPAN><SPAN =
+class=3Dn>low</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+
+    <SPAN class=3Dn>etc1_byte</SPAN> <SPAN =
+class=3Dn>pBaseColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>6</SPAN><SPAN class=3Dp>];</SPAN>
+
+    <SPAN class=3Dn>etc_encodeBaseColors</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pBaseColors</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>pColors</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>pCompressed</SPAN><SPAN =
+class=3Dp>);</SPAN>
+
+    <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>originalHigh</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>pCompressed</SPAN><SPAN =
+class=3Do>-&gt;</SPAN><SPAN class=3Dn>high</SPAN><SPAN =
+class=3Dp>;</SPAN>
+
+    <SPAN class=3Dk>const</SPAN> <SPAN class=3Dkt>int</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pModifierTable</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>kModifierTable</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>i</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>8</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>i</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>pModifierTable</SPAN> <SPAN class=3Do>+=3D</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dn>etc_compressed</SPAN> <SPAN =
+class=3Dn>temp</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dn>temp</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>score</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dn>temp</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>originalHigh</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>5</SPAN><SPAN =
+class=3Dp>);</SPAN>
+        <SPAN class=3Dn>temp</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>low</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dn>etc_encode_subblock_helper</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>inMask</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Do>&amp;</SPAN><SPAN class=3Dn>temp</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>flipped</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dkc>false</SPAN><SPAN class=3Dp>,</SPAN>
+                <SPAN class=3Dn>pBaseColors</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>pModifierTable</SPAN><SPAN =
+class=3Dp>);</SPAN>
+        <SPAN class=3Dn>take_best</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pCompressed</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Do>&amp;</SPAN><SPAN class=3Dn>temp</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dn>pModifierTable</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>kModifierTable</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>etc_compressed</SPAN> <SPAN =
+class=3Dn>firstHalf</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Do>*</SPAN><SPAN class=3Dn>pCompressed</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dkt>int</SPAN> <SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>i</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>8</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>i</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>pModifierTable</SPAN> <SPAN class=3Do>+=3D</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dn>etc_compressed</SPAN> <SPAN =
+class=3Dn>temp</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dn>temp</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>score</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>firstHalf</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>score</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dn>temp</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>firstHalf</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>high</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>i</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>2</SPAN><SPAN =
+class=3Dp>);</SPAN>
+        <SPAN class=3Dn>temp</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>low</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>firstHalf</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>low</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dn>etc_encode_subblock_helper</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>inMask</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Do>&amp;</SPAN><SPAN class=3Dn>temp</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>flipped</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dkc>true</SPAN><SPAN class=3Dp>,</SPAN>
+                <SPAN class=3Dn>pBaseColors</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>pModifierTable</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>i</SPAN> <SPAN class=3Do>=3D=3D</SPAN> <SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Do>*</SPAN><SPAN class=3Dn>pCompressed</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>temp</SPAN><SPAN =
+class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN> <SPAN class=3Dk>else</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+            <SPAN class=3Dn>take_best</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pCompressed</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Do>&amp;</SPAN><SPAN =
+class=3Dn>temp</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>writeBigEndian</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pOut</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>d</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dn>pOut</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)(</SPAN><SPAN class=3Dn>d</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>24</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dn>pOut</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)(</SPAN><SPAN class=3Dn>d</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>16</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dn>pOut</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>2</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)(</SPAN><SPAN class=3Dn>d</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dn>pOut</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dn>d</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dc1>// Input is a 4 x 4 square of 3-byte pixels in form R, =
+G, B</SPAN>
+<SPAN class=3Dc1>// inmask is a 16-bit mask where bit (1 &lt;&lt; (x + y =
+* 4)) tells whether the corresponding (x,y)</SPAN>
+<SPAN class=3Dc1>// pixel is valid or not. Invalid pixel color values =
+are ignored when compressing.</SPAN>
+<SPAN class=3Dc1>// Output is an ETC1 compressed version of the =
+data.</SPAN>
+
+<SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>etc1_encode_block</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>inMask</SPAN><SPAN =
+class=3Dp>,</SPAN>
+        <SPAN class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pOut</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dn>etc1_byte</SPAN> <SPAN class=3Dn>colors</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dmi>6</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dn>etc1_byte</SPAN> <SPAN =
+class=3Dn>flippedColors</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>6</SPAN><SPAN class=3Dp>];</SPAN>
+    <SPAN class=3Dn>etc_average_colors_subblock</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>inMask</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>colors</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>false</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>false</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>etc_average_colors_subblock</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>inMask</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>colors</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>false</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>true</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>etc_average_colors_subblock</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>inMask</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>flippedColors</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>true</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>false</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>etc_average_colors_subblock</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>inMask</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>flippedColors</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>true</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dkc>true</SPAN><SPAN class=3Dp>);</SPAN>
+
+    <SPAN class=3Dn>etc_compressed</SPAN> <SPAN class=3Dn>a</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>b</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>etc_encode_block_helper</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>inMask</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>colors</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Do>&amp;</SPAN><SPAN class=3Dn>a</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dkc>false</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>etc_encode_block_helper</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>inMask</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>flippedColors</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Do>&amp;</SPAN><SPAN class=3Dn>b</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dkc>true</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>take_best</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Do>&amp;</SPAN><SPAN class=3Dn>a</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Do>&amp;</SPAN><SPAN class=3Dn>b</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dn>writeBigEndian</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pOut</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>a</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>high</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>writeBigEndian</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pOut</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>a</SPAN><SPAN class=3Dp>.</SPAN><SPAN =
+class=3Dn>low</SPAN><SPAN class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dc1>// Return the size of the encoded image data (does not =
+include size of PKM header).</SPAN>
+
+<SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>etc1_get_encoded_data_size</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>width</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>height</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dp>(((</SPAN><SPAN =
+class=3Dn>width</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Do>&amp;</SPAN> =
+<SPAN class=3Do>~</SPAN><SPAN class=3Dmi>3</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dp>((</SPAN><SPAN class=3Dn>height</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Do>&amp;</SPAN> <SPAN class=3Do>~</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>))</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>1</SPAN><SPAN =
+class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dc1>// Encode an entire image.</SPAN>
+<SPAN class=3Dc1>// pIn - pointer to the image data. Formatted such that =
+the Red component of</SPAN>
+<SPAN class=3Dc1>//       pixel (x,y) is at pIn + pixelSize * x + stride =
+* y + redOffset;</SPAN>
+<SPAN class=3Dc1>// pOut - pointer to encoded data. Must be large enough =
+to store entire encoded image.</SPAN>
+
+<SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>etc1_encode_image</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>width</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>height</SPAN><SPAN class=3Dp>,</SPAN>
+        <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>pixelSize</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>stride</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pOut</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pixelSize</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>2</SPAN> <SPAN class=3Do>||</SPAN> <SPAN =
+class=3Dn>pixelSize</SPAN> <SPAN class=3Do>&gt;</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dk>return</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dkt>unsigned</SPAN> <SPAN class=3Dkt>short</SPAN> <SPAN =
+class=3Dn>kYMask</SPAN><SPAN class=3Dp>[]</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dp>{</SPAN> <SPAN =
+class=3Dmh>0x0</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmh>0xf</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmh>0xff</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmh>0xfff</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmh>0xffff</SPAN> <SPAN class=3Dp>};</SPAN>
+    <SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dkt>unsigned</SPAN> <SPAN class=3Dkt>short</SPAN> <SPAN =
+class=3Dn>kXMask</SPAN><SPAN class=3Dp>[]</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dp>{</SPAN> <SPAN =
+class=3Dmh>0x0</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmh>0x1111</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmh>0x3333</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dmh>0x7777</SPAN><SPAN class=3Dp>,</SPAN>
+            <SPAN class=3Dmh>0xffff</SPAN> <SPAN class=3Dp>};</SPAN>
+    <SPAN class=3Dn>etc1_byte</SPAN> <SPAN class=3Dn>block</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dn>ETC1_DECODED_BLOCK_SIZE</SPAN><SPAN =
+class=3Dp>];</SPAN>
+    <SPAN class=3Dn>etc1_byte</SPAN> <SPAN class=3Dn>encoded</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dn>ETC1_ENCODED_BLOCK_SIZE</SPAN><SPAN =
+class=3Dp>];</SPAN>
+
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>encodedWidth</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>width</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Do>~</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>encodedHeight</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>height</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Do>~</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+
+    <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>y</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>y</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dn>encodedHeight</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>y</SPAN> <SPAN class=3Do>+=3D</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>yEnd</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>height</SPAN> <SPAN =
+class=3Do>-</SPAN> <SPAN class=3Dn>y</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>yEnd</SPAN> <SPAN class=3Do>&gt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dn>yEnd</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>ymask</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dn>kYMask</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dn>yEnd</SPAN><SPAN class=3Dp>];</SPAN>
+        <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>x</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dn>encodedWidth</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>x</SPAN> <SPAN class=3Do>+=3D</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>xEnd</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>width</SPAN> <SPAN class=3Do>-</SPAN> <SPAN =
+class=3Dn>x</SPAN><SPAN class=3Dp>;</SPAN>
+            <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>xEnd</SPAN> <SPAN class=3Do>&gt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+                <SPAN class=3Dn>xEnd</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN>
+            <SPAN class=3Dp>}</SPAN>
+            <SPAN class=3Dkt>int</SPAN> <SPAN class=3Dn>mask</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>ymask</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Dn>kXMask</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dn>xEnd</SPAN><SPAN class=3Dp>];</SPAN>
+            <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>cy</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>cy</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dn>yEnd</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>cy</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+                <SPAN class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dn>q</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>block</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>cy</SPAN> <SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+                <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>p</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>pIn</SPAN> =
+<SPAN class=3Do>+</SPAN> <SPAN class=3Dn>pixelSize</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>stride</SPAN> <SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>y</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>cy</SPAN><SPAN class=3Dp>);</SPAN>
+                <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pixelSize</SPAN> <SPAN class=3Do>=3D=3D</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+                    <SPAN class=3Dn>memcpy</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>q</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>p</SPAN><SPAN class=3Dp>,</SPAN> <SPAN class=3Dn>xEnd</SPAN> =
+<SPAN class=3Do>*</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN =
+class=3Dp>);</SPAN>
+                <SPAN class=3Dp>}</SPAN> <SPAN class=3Dk>else</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+                    <SPAN class=3Dk>for</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>cx</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> <SPAN class=3Dn>cx</SPAN> =
+<SPAN class=3Do>&lt;</SPAN> <SPAN class=3Dn>xEnd</SPAN><SPAN =
+class=3Dp>;</SPAN> <SPAN class=3Dn>cx</SPAN><SPAN =
+class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+                        <SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>pixel</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>p</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>]</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dn>p</SPAN><SPAN class=3Dp>[</SPAN><SPAN class=3Dmi>0</SPAN><SPAN =
+class=3Dp>];</SPAN>
+                        <SPAN class=3Do>*</SPAN><SPAN =
+class=3Dn>q</SPAN><SPAN class=3Do>++</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pixel</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>11</SPAN><SPAN class=3Dp>);</SPAN>
+                        <SPAN class=3Do>*</SPAN><SPAN =
+class=3Dn>q</SPAN><SPAN class=3Do>++</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>convert6To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pixel</SPAN> <SPAN class=3Do>&gt;&gt;</SPAN> <SPAN =
+class=3Dmi>5</SPAN><SPAN class=3Dp>);</SPAN>
+                        <SPAN class=3Do>*</SPAN><SPAN =
+class=3Dn>q</SPAN><SPAN class=3Do>++</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dn>convert5To8</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pixel</SPAN><SPAN class=3Dp>);</SPAN>
+                        <SPAN class=3Dn>p</SPAN> <SPAN =
+class=3Do>+=3D</SPAN> <SPAN class=3Dn>pixelSize</SPAN><SPAN =
+class=3Dp>;</SPAN>
+                    <SPAN class=3Dp>}</SPAN>
+                <SPAN class=3Dp>}</SPAN>
+            <SPAN class=3Dp>}</SPAN>
+            <SPAN class=3Dn>etc1_encode_block</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>block</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>mask</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>encoded</SPAN><SPAN class=3Dp>);</SPAN>
+            <SPAN class=3Dn>memcpy</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pOut</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>encoded</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dk>sizeof</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>encoded</SPAN><SPAN class=3Dp>));</SPAN>
+            <SPAN class=3Dn>pOut</SPAN> <SPAN class=3Do>+=3D</SPAN> =
+<SPAN class=3Dk>sizeof</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>encoded</SPAN><SPAN class=3Dp>);</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN =
+class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dc1>// Decode an entire image.</SPAN>
+<SPAN class=3Dc1>// pIn - pointer to encoded data.</SPAN>
+<SPAN class=3Dc1>// pOut - pointer to the image data. Will be written =
+such that the Red component of</SPAN>
+<SPAN class=3Dc1>//       pixel (x,y) is at pIn + pixelSize * x + stride =
+* y + redOffset. Must be</SPAN>
+<SPAN class=3Dc1>//        large enough to store entire image.</SPAN>
+
+
+<SPAN class=3Dkt>int</SPAN> <SPAN =
+class=3Dn>etc1_decode_image</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pOut</SPAN><SPAN class=3Dp>,</SPAN>
+        <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>width</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>height</SPAN><SPAN =
+class=3Dp>,</SPAN>
+        <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>pixelSize</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>stride</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pixelSize</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dmi>2</SPAN> <SPAN class=3Do>||</SPAN> <SPAN =
+class=3Dn>pixelSize</SPAN> <SPAN class=3Do>&gt;</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dk>return</SPAN> <SPAN class=3Do>-</SPAN><SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dn>etc1_byte</SPAN> <SPAN class=3Dn>block</SPAN><SPAN =
+class=3Dp>[</SPAN><SPAN class=3Dn>ETC1_DECODED_BLOCK_SIZE</SPAN><SPAN =
+class=3Dp>];</SPAN>
+
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>encodedWidth</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>width</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Do>~</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>encodedHeight</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>height</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Do>~</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+
+    <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>y</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>y</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dn>encodedHeight</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>y</SPAN> <SPAN class=3Do>+=3D</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+        <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>yEnd</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>height</SPAN> <SPAN =
+class=3Do>-</SPAN> <SPAN class=3Dn>y</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>yEnd</SPAN> <SPAN class=3Do>&gt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dn>yEnd</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>x</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>x</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dn>encodedWidth</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>x</SPAN> <SPAN class=3Do>+=3D</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+            <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>xEnd</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>width</SPAN> <SPAN class=3Do>-</SPAN> <SPAN =
+class=3Dn>x</SPAN><SPAN class=3Dp>;</SPAN>
+            <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>xEnd</SPAN> <SPAN class=3Do>&gt;</SPAN> <SPAN =
+class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+                <SPAN class=3Dn>xEnd</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN>
+            <SPAN class=3Dp>}</SPAN>
+            <SPAN class=3Dn>etc1_decode_block</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>block</SPAN><SPAN class=3Dp>);</SPAN>
+            <SPAN class=3Dn>pIn</SPAN> <SPAN class=3Do>+=3D</SPAN> <SPAN =
+class=3Dn>ETC1_ENCODED_BLOCK_SIZE</SPAN><SPAN class=3Dp>;</SPAN>
+            <SPAN class=3Dk>for</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>cy</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> =
+<SPAN class=3Dn>cy</SPAN> <SPAN class=3Do>&lt;</SPAN> <SPAN =
+class=3Dn>yEnd</SPAN><SPAN class=3Dp>;</SPAN> <SPAN =
+class=3Dn>cy</SPAN><SPAN class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+                <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>q</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>block</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>cy</SPAN> <SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+                <SPAN class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> =
+<SPAN class=3Dn>p</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>pOut</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>pixelSize</SPAN> <SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>x</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>stride</SPAN> <SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>y</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dn>cy</SPAN><SPAN class=3Dp>);</SPAN>
+                <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pixelSize</SPAN> <SPAN class=3Do>=3D=3D</SPAN> <SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+                    <SPAN class=3Dn>memcpy</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>p</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>q</SPAN><SPAN class=3Dp>,</SPAN> <SPAN class=3Dn>xEnd</SPAN> =
+<SPAN class=3Do>*</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN =
+class=3Dp>);</SPAN>
+                <SPAN class=3Dp>}</SPAN> <SPAN class=3Dk>else</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+                    <SPAN class=3Dk>for</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>cx</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>;</SPAN> <SPAN class=3Dn>cx</SPAN> =
+<SPAN class=3Do>&lt;</SPAN> <SPAN class=3Dn>xEnd</SPAN><SPAN =
+class=3Dp>;</SPAN> <SPAN class=3Dn>cx</SPAN><SPAN =
+class=3Do>++</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+                        <SPAN class=3Dn>etc1_byte</SPAN> <SPAN =
+class=3Dn>r</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Do>*</SPAN><SPAN class=3Dn>q</SPAN><SPAN class=3Do>++</SPAN><SPAN =
+class=3Dp>;</SPAN>
+                        <SPAN class=3Dn>etc1_byte</SPAN> <SPAN =
+class=3Dn>g</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Do>*</SPAN><SPAN class=3Dn>q</SPAN><SPAN class=3Do>++</SPAN><SPAN =
+class=3Dp>;</SPAN>
+                        <SPAN class=3Dn>etc1_byte</SPAN> <SPAN =
+class=3Dn>b</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Do>*</SPAN><SPAN class=3Dn>q</SPAN><SPAN class=3Do>++</SPAN><SPAN =
+class=3Dp>;</SPAN>
+                        <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>pixel</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dp>((</SPAN><SPAN class=3Dn>r</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>&lt;&lt;</SPAN> <SPAN =
+class=3Dmi>11</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> =
+<SPAN class=3Dp>((</SPAN><SPAN class=3Dn>g</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>2</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>&lt;&lt;</SPAN> <SPAN =
+class=3Dmi>5</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>b</SPAN> <SPAN =
+class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>3</SPAN><SPAN =
+class=3Dp>);</SPAN>
+                        <SPAN class=3Do>*</SPAN><SPAN =
+class=3Dn>p</SPAN><SPAN class=3Do>++</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dn>pixel</SPAN><SPAN class=3Dp>;</SPAN>
+                        <SPAN class=3Do>*</SPAN><SPAN =
+class=3Dn>p</SPAN><SPAN class=3Do>++</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>(</SPAN><SPAN class=3Dn>pixel</SPAN> =
+<SPAN class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>);</SPAN>
+                    <SPAN class=3Dp>}</SPAN>
+                <SPAN class=3Dp>}</SPAN>
+            <SPAN class=3Dp>}</SPAN>
+        <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN =
+class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dkt>char</SPAN> <SPAN class=3Dn>kMagic</SPAN><SPAN =
+class=3Dp>[]</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN class=3Dp>{</SPAN> =
+<SPAN class=3Dsc>'P'</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dsc>'K'</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dsc>'M'</SPAN><SPAN class=3Dp>,</SPAN> <SPAN class=3Dsc>' =
+'</SPAN><SPAN class=3Dp>,</SPAN> <SPAN class=3Dsc>'1'</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dsc>'0'</SPAN> <SPAN class=3Dp>};</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_FORMAT_OFFSET</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>6</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_ENCODED_WIDTH_OFFSET</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_ENCODED_HEIGHT_OFFSET</SPAN> <SPAN =
+class=3Do>=3D</SPAN> <SPAN class=3Dmi>10</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_WIDTH_OFFSET</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>12</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_HEIGHT_OFFSET</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dmi>14</SPAN><SPAN class=3Dp>;</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dk>const</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>ETC1_RGB_NO_MIPMAPS</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dmi>0</SPAN><SPAN =
+class=3Dp>;</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>writeBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pOut</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>data</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dn>pOut</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>(</SPAN><SPAN class=3Dn>data</SPAN> =
+<SPAN class=3Do>&gt;&gt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dn>pOut</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>]</SPAN> <SPAN class=3Do>=3D</SPAN> =
+<SPAN class=3Dp>(</SPAN><SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dn>data</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dk>static</SPAN> <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>readBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pIn</SPAN><SPAN class=3Dp>)</SPAN> =
+<SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pIn</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>0</SPAN><SPAN class=3Dp>]</SPAN> <SPAN =
+class=3Do>&lt;&lt;</SPAN> <SPAN class=3Dmi>8</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Do>|</SPAN> <SPAN =
+class=3Dn>pIn</SPAN><SPAN class=3Dp>[</SPAN><SPAN =
+class=3Dmi>1</SPAN><SPAN class=3Dp>];</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dc1>// Format a PKM header</SPAN>
+
+<SPAN class=3Dkt>void</SPAN> <SPAN =
+class=3Dn>etc1_pkm_format_header</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>etc1_byte</SPAN><SPAN class=3Do>*</SPAN> <SPAN =
+class=3Dn>pHeader</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>width</SPAN><SPAN =
+class=3Dp>,</SPAN> <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>height</SPAN><SPAN class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dn>memcpy</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>kMagic</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dk>sizeof</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>kMagic</SPAN><SPAN class=3Dp>));</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>encodedWidth</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>width</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Do>~</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>encodedHeight</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>height</SPAN> <SPAN class=3Do>+</SPAN> =
+<SPAN class=3Dmi>3</SPAN><SPAN class=3Dp>)</SPAN> <SPAN =
+class=3Do>&amp;</SPAN> <SPAN class=3Do>~</SPAN><SPAN =
+class=3Dmi>3</SPAN><SPAN class=3Dp>;</SPAN>
+    <SPAN class=3Dn>writeBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_FORMAT_OFFSET</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>ETC1_RGB_NO_MIPMAPS</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>writeBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_ENCODED_WIDTH_OFFSET</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>encodedWidth</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>writeBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_ENCODED_HEIGHT_OFFSET</SPAN><SPAN class=3Dp>,</SPAN> =
+<SPAN class=3Dn>encodedHeight</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>writeBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_WIDTH_OFFSET</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>width</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>writeBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_HEIGHT_OFFSET</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>height</SPAN><SPAN class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dc1>// Check if a PKM header is correctly formatted.</SPAN>
+
+<SPAN class=3Dn>etc1_bool</SPAN> <SPAN =
+class=3Dn>etc1_pkm_is_valid</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pHeader</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>if</SPAN> <SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>memcmp</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dn>kMagic</SPAN><SPAN class=3Dp>,</SPAN> <SPAN =
+class=3Dk>sizeof</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>kMagic</SPAN><SPAN class=3Dp>)))</SPAN> <SPAN =
+class=3Dp>{</SPAN>
+        <SPAN class=3Dk>return</SPAN> <SPAN class=3Dkc>false</SPAN><SPAN =
+class=3Dp>;</SPAN>
+    <SPAN class=3Dp>}</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>format</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>readBEUint16</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pHeader</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dn>ETC1_PKM_FORMAT_OFFSET</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>encodedWidth</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>readBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_ENCODED_WIDTH_OFFSET</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>encodedHeight</SPAN> <SPAN class=3Do>=3D</SPAN> <SPAN =
+class=3Dn>readBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_ENCODED_HEIGHT_OFFSET</SPAN><SPAN class=3Dp>);</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>width</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>readBEUint16</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pHeader</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dn>ETC1_PKM_WIDTH_OFFSET</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dn>etc1_uint32</SPAN> <SPAN class=3Dn>height</SPAN> =
+<SPAN class=3Do>=3D</SPAN> <SPAN class=3Dn>readBEUint16</SPAN><SPAN =
+class=3Dp>(</SPAN><SPAN class=3Dn>pHeader</SPAN> <SPAN =
+class=3Do>+</SPAN> <SPAN class=3Dn>ETC1_PKM_HEIGHT_OFFSET</SPAN><SPAN =
+class=3Dp>);</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN class=3Dn>format</SPAN> <SPAN =
+class=3Do>=3D=3D</SPAN> <SPAN class=3Dn>ETC1_RGB_NO_MIPMAPS</SPAN> <SPAN =
+class=3Do>&amp;&amp;</SPAN>
+            <SPAN class=3Dn>encodedWidth</SPAN> <SPAN =
+class=3Do>&gt;=3D</SPAN> <SPAN class=3Dn>width</SPAN> <SPAN =
+class=3Do>&amp;&amp;</SPAN> <SPAN class=3Dn>encodedWidth</SPAN> <SPAN =
+class=3Do>-</SPAN> <SPAN class=3Dn>width</SPAN> <SPAN =
+class=3Do>&lt;</SPAN> <SPAN class=3Dmi>4</SPAN> <SPAN =
+class=3Do>&amp;&amp;</SPAN>
+            <SPAN class=3Dn>encodedHeight</SPAN> <SPAN =
+class=3Do>&gt;=3D</SPAN> <SPAN class=3Dn>height</SPAN> <SPAN =
+class=3Do>&amp;&amp;</SPAN> <SPAN class=3Dn>encodedHeight</SPAN> <SPAN =
+class=3Do>-</SPAN> <SPAN class=3Dn>height</SPAN> <SPAN =
+class=3Do>&lt;</SPAN> <SPAN class=3Dmi>4</SPAN><SPAN class=3Dp>;</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dc1>// Read the image width from a PKM header</SPAN>
+
+<SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>etc1_pkm_get_width</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pHeader</SPAN><SPAN =
+class=3Dp>)</SPAN> <SPAN class=3Dp>{</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN =
+class=3Dn>readBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_WIDTH_OFFSET</SPAN><SPAN class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+
+<SPAN class=3Dc1>// Read the image height from a PKM header</SPAN>
+
+<SPAN class=3Dn>etc1_uint32</SPAN> <SPAN =
+class=3Dn>etc1_pkm_get_height</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dk>const</SPAN> <SPAN class=3Dn>etc1_byte</SPAN><SPAN =
+class=3Do>*</SPAN> <SPAN class=3Dn>pHeader</SPAN><SPAN =
+class=3Dp>){</SPAN>
+    <SPAN class=3Dk>return</SPAN> <SPAN =
+class=3Dn>readBEUint16</SPAN><SPAN class=3Dp>(</SPAN><SPAN =
+class=3Dn>pHeader</SPAN> <SPAN class=3Do>+</SPAN> <SPAN =
+class=3Dn>ETC1_PKM_HEIGHT_OFFSET</SPAN><SPAN class=3Dp>);</SPAN>
+<SPAN class=3Dp>}</SPAN>
+</PRE></DIV><PRE></PRE></DIV>
+<DIV style=3D"MARGIN: 10px; TEXT-ALIGN: center">
+<FORM id=3Dcse-search-box action=3Dhttp://www.google.com/cse>
+<DIV>
+<CENTER><INPUT type=3Dhidden value=3D012324609772651831024:a0t4fswrhoy =
+name=3Dcx>=20
+<INPUT type=3Dhidden value=3DUTF-8 name=3Die> <INPUT size=3D21 name=3Dq> =
+<INPUT type=3Dsubmit value=3DRechercher name=3Dsa> =
+</CENTER></DIV></FORM>
+<SCRIPT =
+src=3D"http://www.google.com/cse/brand?form=3Dcse-search-box&amp;lang=3Df=
+r"=20
+type=3Dtext/javascript></SCRIPT>
+</DIV>
+<SCRIPT type=3Dtext/javascript>=0A=
+=0A=
+  var _gaq =3D _gaq || [];=0A=
+  _gaq.push(['_setAccount', 'UA-5414263-6']);=0A=
+  _gaq.push(['_trackPageview']);=0A=
+=0A=
+  (function() {=0A=
+    var ga =3D document.createElement('script'); ga.type =3D =
+'text/javascript'; ga.async =3D true;=0A=
+    ga.src =3D ('https:' =3D=3D document.location.protocol ? =
+'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';=0A=
+    var s =3D document.getElementsByTagName('script')[0]; =
+s.parentNode.insertBefore(ga, s);=0A=
+  })();=0A=
+=0A=
+</SCRIPT>
+
+<DIV></DIV></BODY></HTML>
+
+------=_NextPart_000_0000_01CD967D.9E699390
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://source-android.frandroid.com/style.css
+
+UNKNOWN {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+0px; PADDING-TOP: 0px
+}
+.header {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; BACKGROUND: #000; =
+PADDING-BOTTOM: 10px; COLOR: #fff; PADDING-TOP: 10px
+}
+.header A {
+	COLOR: #ccc
+}
+.code {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; PADDING-BOTTOM: 10px; =
+PADDING-TOP: 10px
+}
+.hll {
+	BACKGROUND-COLOR: #ffffcc
+}
+.c {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.err {
+	BORDER-RIGHT: #ff0000 1px solid; BORDER-TOP: #ff0000 1px solid; =
+BORDER-LEFT: #ff0000 1px solid; BORDER-BOTTOM: #ff0000 1px solid
+}
+.k {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.o {
+	COLOR: #666666
+}
+.cm {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.cp {
+	COLOR: #bc7a00
+}
+.c1 {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.cs {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.gd {
+	COLOR: #a00000
+}
+.ge {
+	FONT-STYLE: italic
+}
+.gr {
+	COLOR: #ff0000
+}
+.gh {
+	FONT-WEIGHT: bold; COLOR: #000080
+}
+.gi {
+	COLOR: #00a000
+}
+.go {
+	COLOR: #808080
+}
+.gp {
+	FONT-WEIGHT: bold; COLOR: #000080
+}
+.gs {
+	FONT-WEIGHT: bold
+}
+.gu {
+	FONT-WEIGHT: bold; COLOR: #800080
+}
+.gt {
+	COLOR: #0040d0
+}
+.kc {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kd {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kn {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kp {
+	COLOR: #008000
+}
+.kr {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kt {
+	COLOR: #b00040
+}
+.m {
+	COLOR: #666666
+}
+.s {
+	COLOR: #ba2121
+}
+.na {
+	COLOR: #7d9029
+}
+.nb {
+	COLOR: #008000
+}
+.nc {
+	FONT-WEIGHT: bold; COLOR: #0000ff
+}
+.no {
+	COLOR: #880000
+}
+.nd {
+	COLOR: #aa22ff
+}
+.ni {
+	FONT-WEIGHT: bold; COLOR: #999999
+}
+.ne {
+	FONT-WEIGHT: bold; COLOR: #d2413a
+}
+.nf {
+	COLOR: #0000ff
+}
+.nl {
+	COLOR: #a0a000
+}
+.nn {
+	FONT-WEIGHT: bold; COLOR: #0000ff
+}
+.nt {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.nv {
+	COLOR: #19177c
+}
+.ow {
+	FONT-WEIGHT: bold; COLOR: #aa22ff
+}
+.w {
+	COLOR: #bbbbbb
+}
+.mf {
+	COLOR: #666666
+}
+.mh {
+	COLOR: #666666
+}
+.mi {
+	COLOR: #666666
+}
+.mo {
+	COLOR: #666666
+}
+.sb {
+	COLOR: #ba2121
+}
+.sc {
+	COLOR: #ba2121
+}
+.sd {
+	COLOR: #ba2121; FONT-STYLE: italic
+}
+.s2 {
+	COLOR: #ba2121
+}
+.se {
+	FONT-WEIGHT: bold; COLOR: #bb6622
+}
+.sh {
+	COLOR: #ba2121
+}
+.si {
+	FONT-WEIGHT: bold; COLOR: #bb6688
+}
+.sx {
+	COLOR: #008000
+}
+.sr {
+	COLOR: #bb6688
+}
+.s1 {
+	COLOR: #ba2121
+}
+.ss {
+	COLOR: #19177c
+}
+.bp {
+	COLOR: #008000
+}
+.vc {
+	COLOR: #19177c
+}
+.vg {
+	COLOR: #19177c
+}
+.vi {
+	COLOR: #19177c
+}
+.il {
+	COLOR: #666666
+}
+UNKNOWN {
+	BACKGROUND-COLOR: #ffffcc
+}
+.c {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.err {
+	BORDER-RIGHT: #ff0000 1px solid; BORDER-TOP: #ff0000 1px solid; =
+BORDER-LEFT: #ff0000 1px solid; BORDER-BOTTOM: #ff0000 1px solid
+}
+.k {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.o {
+	COLOR: #666666
+}
+.cm {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.cp {
+	COLOR: #bc7a00
+}
+.c1 {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.cs {
+	COLOR: #408080; FONT-STYLE: italic
+}
+.gd {
+	COLOR: #a00000
+}
+.ge {
+	FONT-STYLE: italic
+}
+.gr {
+	COLOR: #ff0000
+}
+.gh {
+	FONT-WEIGHT: bold; COLOR: #000080
+}
+.gi {
+	COLOR: #00a000
+}
+.go {
+	COLOR: #808080
+}
+.gp {
+	FONT-WEIGHT: bold; COLOR: #000080
+}
+.gs {
+	FONT-WEIGHT: bold
+}
+.gu {
+	FONT-WEIGHT: bold; COLOR: #800080
+}
+.gt {
+	COLOR: #0040d0
+}
+.kc {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kd {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kn {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kp {
+	COLOR: #008000
+}
+.kr {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.kt {
+	COLOR: #b00040
+}
+.m {
+	COLOR: #666666
+}
+.s {
+	COLOR: #ba2121
+}
+.na {
+	COLOR: #7d9029
+}
+.nb {
+	COLOR: #008000
+}
+.nc {
+	FONT-WEIGHT: bold; COLOR: #0000ff
+}
+.no {
+	COLOR: #880000
+}
+.nd {
+	COLOR: #aa22ff
+}
+.ni {
+	FONT-WEIGHT: bold; COLOR: #999999
+}
+.ne {
+	FONT-WEIGHT: bold; COLOR: #d2413a
+}
+.nf {
+	COLOR: #0000ff
+}
+.nl {
+	COLOR: #a0a000
+}
+.nn {
+	FONT-WEIGHT: bold; COLOR: #0000ff
+}
+.nt {
+	FONT-WEIGHT: bold; COLOR: #008000
+}
+.nv {
+	COLOR: #19177c
+}
+.ow {
+	FONT-WEIGHT: bold; COLOR: #aa22ff
+}
+.w {
+	COLOR: #bbbbbb
+}
+.mf {
+	COLOR: #666666
+}
+.mh {
+	COLOR: #666666
+}
+.mi {
+	COLOR: #666666
+}
+.mo {
+	COLOR: #666666
+}
+.sb {
+	COLOR: #ba2121
+}
+.sc {
+	COLOR: #ba2121
+}
+.sd {
+	COLOR: #ba2121; FONT-STYLE: italic
+}
+.s2 {
+	COLOR: #ba2121
+}
+.se {
+	FONT-WEIGHT: bold; COLOR: #bb6622
+}
+.sh {
+	COLOR: #ba2121
+}
+.si {
+	FONT-WEIGHT: bold; COLOR: #bb6688
+}
+.sx {
+	COLOR: #008000
+}
+.sr {
+	COLOR: #bb6688
+}
+.s1 {
+	COLOR: #ba2121
+}
+.ss {
+	COLOR: #19177c
+}
+.bp {
+	COLOR: #008000
+}
+.vc {
+	COLOR: #19177c
+}
+.vg {
+	COLOR: #19177c
+}
+.vi {
+	COLOR: #19177c
+}
+.il {
+	COLOR: #666666
+}
+UNKNOWN {
+	var: document.getElementsByTagName('script')[0]; ga: ('https:' =3D=3D =
+document.location.protocol ? 'https://ssl' : 'http://www') + =
+'.google-analytics.com/ga.js'; s:=20
+}
+
+------=_NextPart_000_0000_01CD967D.9E699390
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.google.com/cse/brand?form=cse-search-box&lang=fr
+
+=0A=
+(function() {=0A=
+var f =3D document.getElementById('cse-search-box');=0A=
+if (!f) {=0A=
+f =3D document.getElementById('searchbox_demo');=0A=
+}=0A=
+if (f && f['q']) {=0A=
+var q =3D f['q'];=0A=
+var n =3D navigator;=0A=
+var l =3D location;=0A=
+var du =3D function(n, v) {=0A=
+var u =3D document.createElement('input');=0A=
+u.name =3D n;=0A=
+u.value =3D v;=0A=
+u.type =3D 'hidden';=0A=
+f.appendChild(u);=0A=
+return u;=0A=
+};=0A=
+var su =3D function (n, t, v, l) {=0A=
+if (!encodeURIComponent || !decodeURIComponent) {=0A=
+return;=0A=
+}=0A=
+var regexp =3D new RegExp('(?:[?&]' + n + '=3D)([^&#]*)');=0A=
+var existing =3D regexp.exec(t);=0A=
+if (existing) {=0A=
+v =3D decodeURIComponent(existing[1]);=0A=
+}=0A=
+var delimIndex =3D v.indexOf('://');=0A=
+if (delimIndex >=3D 0) {=0A=
+v =3D v.substring(delimIndex + '://'.length, v.length);=0A=
+}=0A=
+var v_sub =3D v.substring(0, l);=0A=
+while (encodeURIComponent(v_sub).length > l) {=0A=
+v_sub =3D v_sub.substring(0, v_sub.length - 1);=0A=
+}=0A=
+du(n, v_sub);=0A=
+};=0A=
+var pl =3D function(he) {=0A=
+var ti =3D 0, tsi =3D 0, tk =3D 0, pt;=0A=
+return function() {=0A=
+var ct =3D (new Date).getTime();=0A=
+if (pt) {=0A=
+var i =3D ct - pt;=0A=
+ti +=3D i;=0A=
+tsi +=3D i*i;=0A=
+}=0A=
+tk++;=0A=
+pt =3D ct;=0A=
+he.value =3D [ti, tsi, tk].join('j');=0A=
+};=0A=
+};=0A=
+var append =3D false;=0A=
+if (n.appName =3D=3D 'Microsoft Internet Explorer') {=0A=
+var s =3D f.parentNode.childNodes;=0A=
+for (var i =3D 0; i < s.length; i++) {=0A=
+        if (s[i].nodeName =3D=3D 'SCRIPT' &&=0A=
+            s[i].attributes['src'] &&=0A=
+            s[i].attributes['src'].nodeValue =3D=3D =
+unescape('http:\x2F\x2Fwww.google.com\x2Fcse\x2Fbrand?form=3Dcse-search-b=
+ox\x26lang=3Dfr')) {=0A=
+          append =3D true;=0A=
+          break;=0A=
+        }=0A=
+      }=0A=
+    } else {=0A=
+      append =3D true;=0A=
+    }=0A=
+    if (append) {=0A=
+      =0A=
+      var loc =3D document.location.toString(); var ref =3D =
+document.referrer;=0A=
+      su('siteurl', loc, loc, 250);=0A=
+      su('ref', loc, ref, 750);=0A=
+=0A=
+      =0A=
+      =0A=
+      if (q.addEventListener) {=0A=
+        q.addEventListener('keyup', pl(du('ss', '')), false);=0A=
+      } else if (q.attachEvent) {=0A=
+        q.attachEvent('onkeyup', pl(du('ss', '')));=0A=
+      }=0A=
+    }=0A=
+=0A=
+    =0A=
+    if (n.platform =3D=3D 'Win32') {=0A=
+      q.style.cssText =3D 'border: 1px solid #7e9db9; padding: 2px;';=0A=
+    }=0A=
+=0A=
+    =0A=
+    if (window.history.navigationMode) {=0A=
+      window.history.navigationMode =3D 'compatible';=0A=
+    }=0A=
+=0A=
+    var b =3D function() {=0A=
+      if (q.value =3D=3D '') {=0A=
+        q.style.background =3D '#FFFFFF =
+url(http:\x2F\x2Fwww.google.com\x2Fcse\x2Fintl\x2Ffr\x2Fimages\x2Fgoogle_=
+custom_search_watermark.gif) left no-repeat';=0A=
+      }=0A=
+    };=0A=
+=0A=
+    var f =3D function() {=0A=
+      q.style.background =3D '#ffffff';=0A=
+    };=0A=
+=0A=
+    q.onfocus =3D f;=0A=
+    q.onblur =3D b;=0A=
+=0A=
+    =0A=
+    if (!/[&?]q=3D[^&]/.test(l.search)) {=0A=
+      b();=0A=
+    }=0A=
+  }=0A=
+})();=0A=
+
+------=_NextPart_000_0000_01CD967D.9E699390--

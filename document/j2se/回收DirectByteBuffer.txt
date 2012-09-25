@@ -1,0 +1,44 @@
+为避免GC的负效应, 使用DirectByteBuffer管理原始(Raw)数据会为高负载的系统带来性能的提升. 
+DirectByteBuffer默认是由GC来回收的, 这通常能够满足需求, 若要想自己控制回收的时机, 可以使用这段代码.
+ 
+Java代码  
+import java.lang.reflect.Method;  
+import java.nio.ByteBuffer;  
+import java.security.AccessController;  
+import java.security.PrivilegedAction;  
+  
+/** 
+ * {@link DirectByteBufferCleaner} 
+ * 
+ * @author <a href=mailto:zhong.lunfu@gmail.com>zhongl</a> 
+ * @created 2011-1-14 
+ */  
+public final class DirectByteBufferCleaner {  
+  private DirectByteBufferCleaner() {}  
+  
+  public static void clean(final ByteBuffer byteBuffer) {  
+    if (!byteBuffer.isDirect()) return;  
+    try {  
+      Object cleaner = invoke(byteBuffer, "cleaner");  
+      invoke(cleaner, "clean");  
+    } catch (Exception e) { /* ignore */ }  
+  }  
+  
+  private static Object invoke(final Object target, String methodName) throws Exception {  
+    final Method method = target.getClass().getMethod(methodName);  
+    return AccessController.doPrivileged(new PrivilegedAction<Object>() {  
+      @Override  
+      public Object run() {  
+        try {  
+          return method.invoke(target);  
+        } catch (Exception e) {  
+          throw new RuntimeException(e);  
+        }  
+      }  
+    });  
+  }  
+  
+}  
+
+
+http://zhongl.iteye.com/blog/939210
