@@ -63,6 +63,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	params.pJNIEnv=pJNIEnv;
 	//params.fpsLimit=10;
 	params.pEventReceiver=new MyEventReceiver();
+	params.loggerAppender=debug::MASK_APPENDER_VS;
 	engine=CreateEngine(params);
 	if(engine->available()==false)
 		return false;

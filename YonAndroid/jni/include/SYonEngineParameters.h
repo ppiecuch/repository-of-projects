@@ -5,6 +5,7 @@
 #include "yonString.h"
 #include "IEventReceiver.h"
 #include "ICallback.h"
+#include "ILogger.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <jni.h>
@@ -20,7 +21,12 @@ namespace yon{
 			pJNIEnv(NULL),
 			pEventReceiver(NULL),
 			pCallback(NULL),
-			fpsLimit(0)
+			fpsLimit(0),
+#ifdef YON_COMPILE_WITH_WIN32
+			loggerAppender((MASK_APPENDER)(MASK_APPENDER_FILE|MASK_APPENDER_VS))
+#elif defined(YON_COMPILE_WITH_ANDROID)
+			loggerAppender((MASK_APPENDER)(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE))
+#endif
 			{}
 		SYonEngineParameters(const SYonEngineParameters& params):
 			windowSize(params.windowSize),
@@ -29,7 +35,8 @@ namespace yon{
 			pJNIEnv(params.pJNIEnv),
 			pEventReceiver(params.pEventReceiver),
 			pCallback(params.pCallback),
-			fpsLimit(params.fpsLimit)
+			fpsLimit(params.fpsLimit),
+			loggerAppender(params.loggerAppender)
 			{}
 
 		//窗口尺寸
@@ -46,6 +53,8 @@ namespace yon{
 		platform::ICallback* pCallback;
 		//FPS上限(默认为0表示不作限制)
 		u32 fpsLimit;
+		//Logger的输出管道
+		debug::MASK_APPENDER loggerAppender;
 	};
 }
 #endif
