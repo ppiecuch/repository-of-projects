@@ -21,6 +21,13 @@ namespace core{
 		quaternion() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) {}
 		quaternion(f32 x, f32 y, f32 z, f32 w) : x(x), y(y), z(z), w(w) {}
 
+		//! Constructor which converts euler angles (radians) to a quaternion
+		quaternion(f32 x, f32 y, f32 z);
+
+		//! Constructor which converts euler angles (radians) to a quaternion
+		quaternion(const vector3df& vec);
+
+
 		//! Equalilty operator
 		bool operator==(const quaternion& other) const;
 
@@ -63,6 +70,12 @@ namespace core{
 		//! Sets new quaternion from other quaternion
 		inline quaternion& set(const core::quaternion& quat);
 
+		//! Sets new quaternion based on euler angles (radians)
+		inline quaternion& set(const core::vector3df& vec);
+
+		//! Sets new quaternion based on euler angles (radians)
+		inline quaternion& set(const core::vector3df& vec);
+
 		//! Set quaternion to identity
 		quaternion& makeIdentity();
 
@@ -82,6 +95,16 @@ namespace core{
 		//! Fills an angle (radians) around an axis (unit vector)
 		void toAngleAxis (f32 &angle, core::vector3df& axis) const;
 	};
+
+	inline quaternion::quaternion(f32 x, f32 y, f32 z)
+	{
+		set(x,y,z);
+	}
+
+	inline quaternion::quaternion(const vector3df& vec)
+	{
+		set(vec.x,vec.y,vec.z);
+	}
 
 	inline bool quaternion::operator==(const quaternion& other) const
 	{
@@ -177,6 +200,64 @@ namespace core{
 	inline quaternion& quaternion::set(const core::quaternion& quat)
 	{
 		return (*this=quat);
+	}
+
+	inline quaternion& quaternion::set(f32 x, f32 y, f32 z)
+	{
+		f64 angle;
+
+		//zyx
+		/*
+		angle = x * 0.5;
+		const f64 sr = sin(angle);
+		const f64 cr = cos(angle);
+
+		angle = y * 0.5;
+		const f64 sp = sin(angle);
+		const f64 cp = cos(angle);
+
+		angle = z * 0.5;
+		const f64 sy = sin(angle);
+		const f64 cy = cos(angle);
+
+		const f64 cpcy = cp * cy;
+		const f64 spcy = sp * cy;
+		const f64 cpsy = cp * sy;
+		const f64 spsy = sp * sy;
+
+		X = (f32)(sr * cpcy - cr * spsy);
+		Y = (f32)(cr * spcy + sr * cpsy);
+		Z = (f32)(cr * cpsy - sr * spcy);
+		W = (f32)(cr * cpcy + sr * spsy);
+		*/
+		angle = x * 0.5;
+		const f64 sp = sin(angle);
+		const f64 cp = cos(angle);
+
+		angle = y * 0.5;
+		const f64 sy = sin(angle);
+		const f64 cy = cos(angle);
+
+		angle = z * 0.5;
+		const f64 sr = sin(angle);
+		const f64 cr = cos(angle);
+
+		const f64 cpcr = cp * cr;
+		const f64 spcr = sp * cr;
+		const f64 cpsr = cp * sr;
+		const f64 spsr = sp * sr;
+
+		this->x = (f32)(cy * spcr + sy * cpsr);
+		this->y = (f32)(sy * cpcr - cy * spsr);
+		this->z = (f32)(cy * cpsr - sy * spcr);
+		this->w = (f32)(cy * cpcr + sy * spsr);
+
+		return normalize();
+	}
+
+	inline quaternion& quaternion::set(const core::vector3df& vec)
+	{
+		return set(vec.x, vec.y, vec.z);
 	}
 
 	inline quaternion& quaternion::makeIdentity()
