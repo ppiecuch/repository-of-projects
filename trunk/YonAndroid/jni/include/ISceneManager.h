@@ -8,6 +8,7 @@
 #include "IEventReceiver.h"
 #include "IAnimatorFactory.h"
 #include "SKeyMap.h"
+#include "IStream.h"
 
 namespace yon{
 namespace scene{
@@ -45,6 +46,8 @@ namespace scene{
 	namespace water{
 		class IWaterModel;
 	}
+
+	class IAnimatedEntity;
 
 	//class ISceneManager : public virtual core::IRenderable{
 	class ISceneManager : public virtual core::IReferencable,public virtual IRenderable{
@@ -106,6 +109,9 @@ namespace scene{
 
 		virtual IModel* addSkyBoxModel(video::ITexture* front, video::ITexture* back, video::ITexture* left,
 			video::ITexture* right, video::ITexture* top, video::ITexture* bottom,IModel* parent=NULL) = 0;
+
+		virtual IAnimatedEntity* createEntityFromFile(const io::path& filename) = 0;
+		virtual IAnimatedEntity* createEntityFromFile(const io::IReadStream* file) = 0;
 	};
 
 }
