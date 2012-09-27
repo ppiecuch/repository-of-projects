@@ -1,0 +1,2497 @@
+From: =?gb2312?B?08kgV2luZG93cyBJbnRlcm5ldCBFeHBsb3JlciA5ILGjtOY=?=
+Subject: Maths - Conversion Quaternion to Matrix - Martin Baker
+Date: Thu, 27 Sep 2012 21:10:57 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CD9CF4.964B1A30"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7600.16807
+
+这是 MIME 格式的多方邮件。
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/jay.htm
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML xmlns=3D"http://www.w3.org/1999/xhtml"><HEAD><TITLE>Maths - =
+Conversion Quaternion to Matrix - Martin Baker</TITLE><!-- InstanceBegin =
+template=3D"/Templates/mathsGeometry.dwt" =
+codeOutsideHTMLIsLocked=3D"false" --><!-- #BeginEditable "doctitle" =
+--><!-- #EndEditable -->
+<META content=3D"text/html; charset=3DUTF-8" =
+http-equiv=3DContent-Type><!-- #BeginEditable "keywords" -->
+<META name=3DKeywords content=3D"maths math quaternion matrix rotation =
+conversion"><!-- #EndEditable --><LINK=20
+rel=3Dstylesheet type=3Dtext/css=20
+href=3D"http://www.euclideanspace.com/navigation.css"><!-- InstanceParam =
+name=3D"books" type=3D"boolean" value=3D"true" -->
+<META name=3DGENERATOR content=3D"MSHTML 9.00.8112.16450"></HEAD>
+<BODY><!-- google_ad_section_start(weight=3Dignore) -->
+<TABLE id=3Dtop border=3D0 width=3D640>
+  <TBODY>
+  <TR>
+    <TD id=3Dtop><A title=3Dlogo =
+href=3D"http://www.euclideanspace.com/index.html"=20
+      target=3D_top><IMG id=3Dnav alt=3Dlogo=20
+      src=3D"http://www.euclideanspace.com/euclideanspace.gif" =
+width=3D123=20
+      height=3D33></A></TD>
+    <TD id=3Dtop><!-- InstanceBeginEditable name=3D"back" --><A =
+title=3Dback=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/matrixToQuaternion/index.htm"=20
+      target=3D_top><IMG id=3DmathNav alt=3Dback=20
+      src=3D"http://www.euclideanspace.com/back.gif" width=3D28 =
+height=3D16></A><!-- InstanceEndEditable --></TD>
+    <TD id=3Dtop><!-- InstanceBeginEditable name=3D"up" --><A title=3Dup =
+
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/"=20
+      target=3D_top><IMG id=3DmathNav alt=3Dup=20
+      src=3D"http://www.euclideanspace.com/up.gif" width=3D28 =
+height=3D13></A><!-- InstanceEndEditable --></TD>
+    <TD id=3Dtop><A title=3Dhome =
+href=3D"http://www.euclideanspace.com/index.html"=20
+      target=3D_top><IMG id=3Dnav alt=3Dhome=20
+      src=3D"http://www.euclideanspace.com/home.gif" width=3D29 =
+height=3D26></A></TD>
+    <TD id=3Dtop><!-- InstanceBeginEditable name=3D"next" --><A =
+title=3Dnext=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/eulerToAngle/index.htm"=20
+      target=3D_top><IMG id=3DmathNav alt=3Dforward=20
+      src=3D"http://www.euclideanspace.com/forward.gif" width=3D28 =
+height=3D16></A><!-- InstanceEndEditable --></TD>
+    <TD id=3Dtop>&nbsp;</TD>
+    <TD id=3Dtop><!-- InstanceBeginEditable name=3D"read" --><A=20
+      title=3D"further reading"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/quaternionToMatrix/books.htm"=20
+      target=3D_top>further reading</A><!-- InstanceEndEditable --></TD>
+    <TD id=3Dtop><A title=3D"more topics"=20
+      href=3D"http://www.euclideanspace.com/more.htm" target=3D_top>more =
+topics=20
+    =C2=BB</A></TD></TR></TBODY></TABLE>
+<TABLE id=3Dnav border=3D0 cellSpacing=3D0 width=3D644>
+  <TBODY>
+  <TR id=3Dnav>
+    <TD id=3DmjbNav><A title=3D"mjbWorld program"=20
+      href=3D"http://www.euclideanspace.com/prog/index.htm"=20
+      target=3D_top>programs</A></TD>
+    <TD id=3DtheoryNav><A title=3D"3D theory"=20
+      href=3D"http://www.euclideanspace.com/threed/index.htm" =
+target=3D_top>3D=20
+      theory</A></TD>
+    <TD id=3DphysicsNav><A title=3D"3D physics"=20
+      href=3D"http://www.euclideanspace.com/physics/index.htm"=20
+      target=3D_top>physics</A></TD>
+    <TD id=3DmathNavx><A title=3D"3D maths"=20
+      href=3D"http://www.euclideanspace.com/maths/index.htm"=20
+    target=3D_top>maths</A></TD>
+    <TD id=3DsoftwareNav><A title=3D"3D software"=20
+      href=3D"http://www.euclideanspace.com/software/index.htm"=20
+      target=3D_top>software</A></TD>
+    <TD id=3DtechNav><A title=3Dtechnology=20
+      href=3D"http://www.euclideanspace.com/tech/index.htm"=20
+      target=3D_top>technology</A></TD>
+    <TD id=3DcopyrightNav><A title=3D"about site"=20
+      href=3D"http://www.euclideanspace.com/site/index.htm" =
+target=3D_top>about=20
+      site</A></TD>
+    <TD id=3DsitemapNav><A title=3D"sitemap and A to Z index"=20
+      href=3D"http://www.euclideanspace.com/atoz/index.htm"=20
+    target=3D_top>sitemap</A></TD></TR></TBODY></TABLE><PRE =
+id=3Dnav><IMG id=3Dnav =
+src=3D"http://www.euclideanspace.com/b/banner43.gif"></PRE>
+<TABLE id=3Dnav border=3D0 cellSpacing=3D0 cellPadding=3D0 width=3D644>
+  <TBODY>
+  <TR id=3Dnav>
+    <TD id=3DmathNav><A title=3Dindex=20
+      href=3D"http://www.euclideanspace.com/maths/index.htm"=20
+    target=3D_top>index</A></TD>
+    <TD id=3DmathNav><A title=3Dalgbra=20
+      href=3D"http://www.euclideanspace.com/maths/algebra/index.htm"=20
+      target=3D_top>algebra</A></TD>
+    <TD id=3DmathNavx><A title=3Dgeometry=20
+      href=3D"http://www.euclideanspace.com/maths/geometry/index.htm"=20
+      target=3D_top>geometry</A></TD>
+    <TD id=3DmathNav><A title=3Dcalculus=20
+      =
+href=3D"http://www.euclideanspace.com/maths/differential/index.htm"=20
+      target=3D_top>calculus</A></TD>
+    <TD id=3DmathNav><A title=3D"discrete mathematics"=20
+      href=3D"http://www.euclideanspace.com/maths/discrete/index.htm"=20
+      target=3D_top>discrete</A></TD>
+    <TD id=3DmathNav><A title=3Dstatistics=20
+      href=3D"http://www.euclideanspace.com/maths/statistics/index.htm"=20
+      target=3D_top>statistics</A></TD>
+    <TD id=3DmathNave>&nbsp;</TD>
+    <TD id=3DmathNav><A title=3Dstandards=20
+      href=3D"http://www.euclideanspace.com/maths/standards/index.htm"=20
+      target=3D_top>standards</A></TD></TR></TBODY></TABLE><!-- =
+#BeginEditable "banner" --><PRE id=3Dnav><IMG id=3Dnav =
+src=3D"http://www.euclideanspace.com/b/banner35.gif"></PRE>
+<TABLE id=3Dnav border=3D0 cellSpacing=3D0 cellPadding=3D0 width=3D644>
+  <TBODY>
+  <TR id=3Dnav>
+    <TD id=3DmathNav rowSpan=3D2><A title=3Dindex=20
+      href=3D"http://www.euclideanspace.com/maths/geometry/index.htm"=20
+      target=3D_top><BR>index</A></TD>
+    <TD id=3DmathNav rowSpan=3D2><A title=3Dspaces=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/space/index.htm"=20
+      target=3D_top><BR>space</A></TD>
+    <TD id=3DmathNav rowSpan=3D2><A title=3D"elements of geometry"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/elements/index.htm" =
+
+      target=3D_top><BR>elements</A></TD>
+    <TD id=3DmathNav rowSpan=3D2><A title=3D"geometry of surfaces"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/surfaces/index.htm" =
+
+      target=3D_top><BR>surface</A></TD>
+    <TD id=3DmathNav colSpan=3D3><A=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/transform/index.htm"=
+>transformations</A></TD>
+    <TD id=3DmathNav rowSpan=3D2><A title=3Dtrigonometry=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/trig/index.htm"=20
+      target=3D_top><BR>trigonometry</A></TD></TR>
+  <TR id=3Dnav>
+    <TD id=3DmathNavx><A title=3D"rotation transforms"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/index.htm"=
+=20
+      target=3D_top>rotation</A></TD>
+    <TD id=3DmathNav><A title=3D"affine transforms"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/affine/index.htm"=20
+      target=3D_top>affine</A></TD>
+    <TD id=3DmathNav><A title=3D"theory of transforms"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/transform/index.htm"=
+=20
+      target=3D_top>theory</A></TD></TR></TBODY></TABLE><PRE =
+id=3Dnav><IMG id=3Dnav =
+src=3D"http://www.euclideanspace.com/b/banner56.gif"></PRE>
+<TABLE id=3Dnav border=3D0 cellSpacing=3D0 cellPadding=3D0 width=3D644>
+  <TBODY>
+  <TR id=3Dnav>
+    <TD id=3DmathNav><A title=3Dindex=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/index.htm"=
+=20
+      target=3D_top><BR>index</A></TD>
+    <TD id=3DmathNav><A title=3Dangles=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/angles/ind=
+ex.htm"=20
+      target=3D_top><BR>angles</A></TD>
+    <TD id=3DmathNav><A title=3Deuler=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/euler/inde=
+x.htm"=20
+      target=3D_top><BR>euler</A></TD>
+    <TD id=3DmathNav><A title=3D"axis angle"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/axisAngle/=
+index.htm"=20
+      target=3D_top><BR>axis angle</A></TD>
+    <TD id=3DmathNav><A title=3D"direction cosines"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/directionC=
+osines/index.htm"=20
+      target=3D_top>direction cosines</A></TD>
+    <TD id=3DmathNavx><A title=3Dconvertions=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/index.htm"=20
+      target=3D_top><BR>convertions</A></TD>
+    <TD id=3DmathNav><A title=3Dframe-of-reference=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/for/index.=
+htm"=20
+      target=3D_top>frame-of-<BR>reference</A></TD>
+    <TD id=3DmathNav><A title=3Dtheory=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/theory/ind=
+ex.htm"=20
+      target=3D_top>theory</A></TD></TR></TBODY></TABLE><PRE =
+id=3Dnav><IMG id=3Dnav =
+src=3D"http://www.euclideanspace.com/b/banner66.gif"></PRE>
+<TABLE id=3Dnav border=3D0 cellSpacing=3D0 cellPadding=3D0 width=3D644>
+  <TBODY>
+  <TR id=3Dnav>
+    <TD id=3DmathNav><A title=3Dindex=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/index.htm"=20
+      target=3D_top><BR>index</A></TD>
+    <TD id=3DmathNav><A title=3D"axis angle to matrix"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/angleToMatrix/index.htm"=20
+      target=3D_top>axis angle to matrix</A></TD>
+    <TD id=3DmathNav><A title=3D"axis angle to quaternion"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/angleToQuaternion/index.htm"=20
+      target=3D_top>axis angle to quaternion</A></TD>
+    <TD id=3DmathNav><A title=3D"euler to matrix"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/eulerToMatrix/index.htm"=20
+      target=3D_top>euler to matrix</A></TD>
+    <TD id=3DmathNav><A title=3D"euler to quaternion"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/eulerToQuaternion/index.htm"=20
+      target=3D_top>euler to quaternion</A></TD>
+    <TD id=3DmathNav><A title=3D"matrix to quaternion"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/matrixToQuaternion/index.htm"=20
+      target=3D_top>matrix to quaternion</A></TD>
+    <TD id=3DmathNav><A title=3D"euler to axis angle"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/eulerToAngle/index.htm"=20
+      target=3D_top>euler to axis angle</A></TD>
+    <TD id=3DmathNave>&nbsp;</TD></TR>
+  <TR id=3Dnav>
+    <TD id=3DmathNave>&nbsp;</TD>
+    <TD id=3DmathNav><A title=3D"matrix to axis angle"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/matrixToAngle/index.htm"=20
+      target=3D_top>matrix to axis angle</A></TD>
+    <TD id=3DmathNav><A title=3D"quaternion to axis angle"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/quaternionToAngle/index.htm"=20
+      target=3D_top>quaternion to axis angle</A></TD>
+    <TD id=3DmathNav><A title=3D"matrix to euler"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/matrixToEuler/index.htm"=20
+      target=3D_top>matrix to euler</A></TD>
+    <TD id=3DmathNav><A title=3D"quaternion to euler"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/quaternionToEuler/index.htm"=20
+      target=3D_top>quaternion to euler</A></TD>
+    <TD id=3DmathNavx><A title=3D"quaternion to matrix"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/quaternionToMatrix/index.htm"=20
+      target=3D_top>quaternion to matrix</A></TD>
+    <TD id=3DmathNav><A title=3D"axis angle to euler"=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/angleToEuler/index.htm"=20
+      target=3D_top>axis angle to euler</A></TD>
+    <TD id=3DmathNave>&nbsp;</TD></TR></TBODY></TABLE><!-- #EndEditable =
+--><!-- google_ad_section_end -->
+<H1><!-- #BeginEditable "title" -->Maths - Conversion Quaternion to =
+Matrix - re:=20
+interesting method from Jay Ryness <!-- #EndEditable --></H1>
+<DIV id=3DtopContent><!-- #BeginEditable "contents" -->
+<DIV id=3Dmain>
+<TABLE border=3D0>
+  <TBODY>
+  <TR>
+    <TD bgColor=3D#dddddd noWrap>
+      <DIV class=3Dforum>
+      <DIV><B><A=20
+      =
+href=3D"http://sourceforge.net/forum/message.php?msg_id=3D4712347">Quater=
+nion=20
+      to Matrix -- the sexy way</A></B></DIV>By: thejaybird (<A=20
+      href=3D"http://sourceforge.net/users/thejaybird/">thejaybird</A>) =
+-=20
+      2008-01-09 11:33</DIV></TD></TR>
+  <TR>
+    <TD>I've been using this method for many years but have never seen =
+it=20
+      published anywhere. It's not necessarily the fastest method, but =
+is the=20
+      most elegant IMO. On modern platforms with SIMD and shuffling, =
+it's very=20
+      fast.&nbsp;<BR>&nbsp;<BR>Matrix44 CreateRotation(const =
+Quaternion&amp;=20
+      quat)&nbsp;<BR>{&nbsp;<BR>Matrix44 m1(&nbsp;<BR>quat.w, quat.z, =
+-quat.y,=20
+      quat.x,&nbsp;<BR>-quat.z, quat.w, quat.x, quat.y,&nbsp;<BR>quat.y, =
+
+      -quat.x, quat.w, quat.z,&nbsp;<BR>-quat.x, -quat.y, -quat.z, =
+quat.w=20
+      );&nbsp;<BR>&nbsp;<BR>Matrix44 m2(&nbsp;<BR>quat.w, quat.z, =
+-quat.y,=20
+      -quat.x,&nbsp;<BR>-quat.z, quat.w, quat.x, =
+-quat.y,&nbsp;<BR>quat.y,=20
+      -quat.x, quat.w, -quat.z,&nbsp;<BR>quat.x, quat.y, quat.z, quat.w=20
+      );&nbsp;<BR>&nbsp;<BR>return m1 * =
+m2;&nbsp;<BR>}&nbsp;<BR>&nbsp;<BR>It=20
+      calculates the product of two simple matrices. The matrices have =
+some very=20
+      interesting features. Notice that they are identical and =
+symmetric, except=20
+      for the distribution of negations. The upper 3x3 is the same for =
+both=20
+      matrices, whereas the 4th row and column are transposed. I've put =
+quite a=20
+      bit of effort into finding ways to exploit that last bit of =
+apparent=20
+      symmetry/similarity, but haven't been able to simplify it any =
+further. If=20
+      anyone has any insight into this, I would be very keen to hear=20
+      it.&nbsp;<BR>&nbsp;<BR>Note that it's assumed the quaternion is =
+unit=20
+      length. Otherwise, the resulting matrix will be=20
+scaled.<BR></TD></TR></TBODY></TABLE>
+<TABLE border=3D0>
+  <TBODY>
+  <TR>
+    <TD bgColor=3D#dddddd noWrap>
+      <DIV class=3Dforum>
+      <DIV><B><A=20
+      =
+href=3D"http://sourceforge.net/forum/message.php?msg_id=3D4713588">RE:=20
+      Quaternion to Matrix -- the sexy way</A></B> (New)</DIV>By: Martin =
+Baker=20
+      (<A =
+href=3D"http://sourceforge.net/users/martinbaker/">martinbaker</A><A=20
+      =
+href=3D"http://sourceforge.net/help/icon_legend.php?context=3Dgroup_admin=
+&amp;uname=3Dmartinbaker&amp;this_group=3D39341&amp;return_to=3D%2F"><IMG=
+=20
+      alt=3D"Project Admin" =
+src=3D"http://www.euclideanspace.com/maths/spanner.gif"=20
+      width=3D16 height=3D16></A>) - 2008-01-10 01:48 </DIV></TD></TR>
+  <TR>
+    <TD>This is very interesting, I don't know why this works, My first =
+guess=20
+      is that it might be related to either:&nbsp;<BR>&nbsp;<BR>* =
+constructing a=20
+      rotation from two reflections?&nbsp;<BR>* Pauli=20
+      matricies?&nbsp;<BR>&nbsp;<BR>but I can't make either work at the =
+moment,=20
+      perhaps someone else can help?&nbsp;<BR>&nbsp;<BR>I would like to =
+put this=20
+      on the web page, It this alright with you? If so how would you =
+like to be=20
+      named:=20
+      =
+thejaybird?&nbsp;<BR>&nbsp;<BR>Thanks,&nbsp;<BR>&nbsp;<BR>Martin&nbsp;<BR=
+>&nbsp;<BR>&nbsp;<BR>2=20
+      reflections&nbsp;<BR>-------------&nbsp;<BR>A single reflection in =
+a line=20
+      Px,Py,Pz is given by the symmetrical(including signs)=20
+      matrix:&nbsp;<BR>&nbsp;<BR>-Px=C2=B2 + Pz=C2=B2+ Py=C2=B2 - 2 * Px =
+* Py - 2 * Px *=20
+      Pz&nbsp;<BR>- 2 * Py * Px -Py=C2=B2 + Px=C2=B2 + Pz=C2=B2 - 2 * Py =
+* Pz&nbsp;<BR>- 2 * Pz=20
+      * Px -2 * Pz * Py -Pz=C2=B2 + Py=C2=B2 + =
+Px=C2=B2&nbsp;<BR>&nbsp;<BR>So could each of the=20
+      4x4 matricies be related to a reflection? I can't make this=20
+      work.&nbsp;<BR>&nbsp;<BR>&nbsp;<BR>Pauli=20
+      matricies&nbsp;<BR>---------------&nbsp;<BR>The Pauli matricies =
+usually=20
+      represent i,j,k as:&nbsp;<BR>&nbsp;<BR>0 -i&nbsp;<BR>i=20
+      0&nbsp;<BR>&nbsp;<BR>0 1&nbsp;<BR>1 0&nbsp;<BR>&nbsp;<BR>1 =
+0&nbsp;<BR>0=20
+      -1&nbsp;<BR>&nbsp;<BR>but we can also expand this out to a 4x4 =
+version=20
+      (I'm not sure I've got the signs correct):&nbsp;<BR>&nbsp;<BR>0 0 =
++1 0 | 0=20
+      0 0 1 | 0 +1 0 0&nbsp;<BR>0 0 0 -1 | 0 0 1 0 | +1 0 0 =
+0&nbsp;<BR>-1 0 0 0=20
+      | 0 1 0 0 | 0 0 0 -1&nbsp;<BR>0 +1 0 0 | 1 0 0 0 | 0 0 -1=20
+      0&nbsp;<BR>&nbsp;<BR>We can take a linear combination of these =
+(with the=20
+      identity matrix) to give somthing like:&nbsp;<BR>&nbsp;<BR>+w x +y =
+
+      +z&nbsp;<BR>+x w +z -y&nbsp;<BR>-y z +w -x&nbsp;<BR>+z y -x=20
+      +w&nbsp;<BR>&nbsp;<BR>So we can transform points by using the =
+'sandwich=20
+      product' like:&nbsp;<BR>p' =3D [M][p][M]^t&nbsp;<BR>&nbsp;<BR>I =
+was=20
+      wondering if there is some rule we could use to reverse the order =
+to give=20
+      some variation of:&nbsp;<BR>[M][M]^t =
+<BR><BR></TD></TR></TBODY></TABLE>
+<TABLE border=3D0>
+  <TBODY>
+  <TR>
+    <TD bgColor=3D#dddddd noWrap>
+      <DIV class=3Dforum>
+      <DIV><B><A=20
+      =
+href=3D"http://sourceforge.net/forum/message.php?msg_id=3D4715038">RE:=20
+      Quaternion to Matrix -- the sexy way</A></B> (New)</DIV>By: =
+thejaybird (<A=20
+      href=3D"http://sourceforge.net/users/thejaybird/">thejaybird</A>) =
+-=20
+      2008-01-10 16:09 </DIV></TD></TR>
+  <TR>
+    <TD>Yes, please go ahead and put it up on the website, by all means. =
+You=20
+      can use my real name, Jay Ryness.&nbsp;<BR>&nbsp;<BR>I don't have =
+much to=20
+      add, but I am reminded of some work I was doing years ago with =
+geometric=20
+      algebra. In GA, the product of two multivectors can be implemented =
+as a=20
+      4x4 matrix multiplication, where the operands look basically like =
+the=20
+      multivector was scrambled into a 4x4 matrix not too unlike the =
+operands in=20
+      the quaternion product above, except that a multivector in GA has =
+8 scalar=20
+      components rather than 4, and I think some of the expressions in =
+the=20
+      matrix may have been slightly more involved than a simple =
+negation, but=20
+      not much. Anyway, rotors (which are a specialized form of =
+multivectors,=20
+      where 4 of the 8 scalar components happen to be zero--I'm sure =
+know all=20
+      this stuff much better than I) are, IIRC, isomorphic to =
+quaternions, or=20
+      close enough. I haven't verified it, but I would venture to guess =
+that if=20
+      one were to write out the GA product of two rotors as a 4x4 matrix =
+
+      multiplication, it would simplify to something very similar if not =
+
+      identical to the quaternion product implementation=20
+      above.&nbsp;<BR>&nbsp;<BR>It's also worth noting that rotors are =
+logically=20
+      constructed as the composition of two reflections, and all of this =
+is=20
+      tightly coupled with complex numbers, quaternions, Pauli matrices =
+and the=20
+      like. So, I think you're definitely on a good track with your=20
+      approach.&nbsp;<BR>&nbsp;<BR>I should point out that I'm not a=20
+      mathematician and it's been years since I delved into this stuff, =
+and=20
+      furthermore I'm shooting from the hip, so take my abstract =
+mathematical=20
+      observations for what they're worth.&nbsp;<BR>&nbsp;<BR>Anyway, =
+thanks for=20
+      taking an interest. I'll be keeping an eye out for=20
+      developments.&nbsp;<BR>&nbsp;<BR>-Jay =
+<BR></TD></TR></TBODY></TABLE>
+<H2>Follow up message </H2>
+<P>Following this thread Tim Meehan has kindly sent me a message telling =
+me that=20
+this article on <A =
+href=3D"http://en.wikipedia.org/wiki/SO(4)">Wikipedia</A> has a=20
+section on isoclinic decomposition about how a quaternion can be =
+converted to a=20
+4x4 matrix by performing matrix multiplication on two simpler 4x4 =
+matricies.</P>
+<P>I think this sheds light on the subject and my intuition tells me =
+this is=20
+important, I'll have to give this some thought. </P>
+<H2>Another Follow Up Message</H2>
+<P>From: Corey Powell<BR>Date: 23/4/2009 21:03:34<BR><BR>I'm examining =
+matrix=20
+math on the net and I ran across some things you<BR>published. =
+quaternions to=20
+matrix 'the sexy way'. I saw it mentioned that you<BR>nor the other guy =
+knew=20
+exactly why multiplying the 2 matrixes created by<BR>quaternions came =
+out as a=20
+rotation matrix. I wasn't sure if you or he had<BR>figured it out.</P>
+<P style=3D"MARGIN-BOTTOM: 0cm">Reorder the matrix so that instead of =
+coming out=20
+X,Y,Z,W order, it comes out W,X,Y,Z order (like a quaternion is done in =
+the=20
+documentation). It seems that was the only source of confusion. If you =
+take the=20
+following and break it down into two matrixes, one where Q1 is broken =
+down into=20
+colums, the other where Q2 is broken down, they're the same as the =
+matrixes you=20
+posted in your 'the sexy way' article that I saw. The only difference is =
+that=20
+matrixes are popularly ordered like 3x3 with 4th elements on the side =
+and=20
+bottom, and quaternions are W oriented. I think the 2nd matrix was the =
+1/Q=20
+matrix.</P>
+<TABLE style=3D"MARGIN-BOTTOM: 0cm" border=3D1>
+  <TBODY>
+  <TR>
+    <TD colSpan=3D2>
+      <TABLE>
+        <TBODY>
+        <TR>
+          <TD>(Q1*Q2).w=3D(</TD>
+          <TD><FONT color=3D#0000ff>+w1w2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-x1x2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-y1y2</FONT> </TD>
+          <TD><FONT color=3D#ff0000>-z1z2</FONT> </TD>
+          <TD>)</TD></TR>
+        <TR>
+          <TD>(Q1*Q2).x=3D( </TD>
+          <TD><FONT color=3D#0000ff>+w1x2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+x1w2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+y1z2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-z1y2</FONT></TD>
+          <TD>)</TD></TR>
+        <TR>
+          <TD>(Q1*Q2).y=3D(</TD>
+          <TD><FONT color=3D#0000ff>+w1y2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-x1z2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+y1w2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+z1x2</FONT></TD>
+          <TD>)</TD></TR>
+        <TR>
+          <TD>(Q1*Q2).z=3D(</TD>
+          <TD><FONT color=3D#0000ff>+w1z2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+x1y2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-y1x2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+z1w2</FONT></TD>
+          <TD>)</TD></TR></TBODY></TABLE></TD></TR>
+  <TR>
+    <TD>
+      <TABLE>
+        <TBODY>
+        <TR>
+          <TD colSpan=3D5>
+            <P align=3Dcenter>Q1*Q2 (plug in Q2) </P></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>W2</B>=20
+            </P></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>X2</B>=20
+            </P></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>Y2</B>=20
+            </P></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>Z2=20
+            </B></P></TD>
+          <TD vAlign=3Dtop></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+W1</FONT></TD>
+          <TD><FONT color=3D#ff0000>-X1</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Y1</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Z1 </FONT></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>W3</B>=20
+            </P></TD>
+          <TD></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+X1</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W1</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Z1</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Y1 </FONT></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>X3</B>=20
+            </P></TD>
+          <TD></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+Y1</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Z1</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W1</FONT></TD>
+          <TD><FONT color=3D#ff0000>-X1 </FONT></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>Y3</B>=20
+            </P></TD>
+          <TD></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+Z1</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Y1</FONT></TD>
+          <TD><FONT color=3D#0000ff>+X1</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W1 </FONT></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>Z3</B>=20
+            </P></TD>
+          <TD></TD></TR></TBODY></TABLE></TD>
+    <TD>
+      <TABLE>
+        <TBODY>
+        <TR>
+          <TD colSpan=3D5>
+            <P align=3Dcenter>Q1*Q2 (plug in Q1) </P></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>W1</B>=20
+            </P></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>X1</B>=20
+            </P></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>Y1</B>=20
+            </P></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>Z1=20
+            </B></P></TD>
+          <TD vAlign=3Dtop></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+W2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-X2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Y2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Z2 </FONT></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>W3</B>=20
+            </P></TD>
+          <TD></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+X2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Z2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Y2 </FONT></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>X3</B>=20
+            </P></TD>
+          <TD></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+Y2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Z2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+X2 </FONT></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>Y3</B>=20
+            </P></TD>
+          <TD></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+Z2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Y2</FONT></TD>
+          <TD><FONT color=3D#ff0000>-X2</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W2 </FONT></TD>
+          <TD>
+            <P=20
+            style=3D"BORDER-BOTTOM: #0000ff 1px solid; BORDER-LEFT: =
+#0000ff 1px solid; BORDER-TOP: #0000ff 1px solid; BORDER-RIGHT: #0000ff =
+1px solid"><B>Z3</B>=20
+            </P></TD>
+          <TD></TD></TR></TBODY></TABLE></TD></TR>
+  <TR>
+    <TD colSpan=3D2>Here are the 2 matrixes from the original post =
+converted to=20
+      W,X,Y,Z order </TD></TR>
+  <TR>
+    <TD>
+      <CENTER>
+      <TABLE>
+        <TBODY>
+        <TR>
+          <TD colSpan=3D5>
+            <P align=3Dcenter>Q </P></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+W</FONT></TD>
+          <TD><FONT color=3D#ff0000>-X</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Y</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Z </FONT></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+X</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Z</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Y </FONT></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+Y</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Z</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W</FONT></TD>
+          <TD><FONT color=3D#ff0000>-X </FONT></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+Z</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Y</FONT></TD>
+          <TD><FONT color=3D#0000ff>+X</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W </FONT></TD>
+          <TD vAlign=3Dtop></TD></TR></TBODY></TABLE></CENTER></TD>
+    <TD>
+      <TABLE>
+        <TBODY>
+        <TR>
+          <TD colSpan=3D5>
+            <P align=3Dcenter>Inverted Conj (Q) </P></TD></TR>
+        <TR>
+          <TD><FONT color=3D#0000ff>+W</FONT></TD>
+          <TD><FONT color=3D#0000ff>+X</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Y</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Z </FONT></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD><FONT color=3D#ff0000>-X</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Z</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Y </FONT></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD><FONT color=3D#ff0000>-Y</FONT></TD>
+          <TD><FONT color=3D#0000ff>+Z</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W</FONT></TD>
+          <TD><FONT color=3D#ff0000>-X </FONT></TD>
+          <TD vAlign=3Dtop></TD></TR>
+        <TR>
+          <TD><FONT color=3D#ff0000>-Z</FONT></TD>
+          <TD><FONT color=3D#ff0000>-Y</FONT></TD>
+          <TD><FONT color=3D#0000ff>+X</FONT></TD>
+          <TD><FONT color=3D#0000ff>+W </FONT></TD>
+          <TD =
+vAlign=3Dtop></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<P>Your post shows the matrixes as:</P>
+<P>q.w q.z -q.y q.x -q.z q.w q.x q.y q.y -q.x q.w q.z -q.x -q.y -q.z =
+q.w<BR></P>
+<P>q.w q.z -q.y -q.x -q.z q.w q.x -q.y q.y -q.x q.w -q.z q.x q.y q.z =
+q.w<BR>In a=20
+traditional rotation matrix, a value in the y/x slot represents<BR>data=20
+subtracted from the x axis and added into the y axis. The mere =
+presence<BR>of a=20
+number though in a matrix row or column represents a presence =
+between<BR>axises.=20
+Negative numbers still have presence, just in the opposite<BR>direction; =
+they're=20
+still a gain. Your quaternion matrix posted above, which<BR>you could =
+consider=20
+as a 'quaternion matrix', denotes an absence of<BR>relationship to an =
+axis. In=20
+other words, a value like qz above in the y/x<BR>field indicates that =
+the=20
+relationship to x and y is actually lost from the z<BR>axis. Quaternions =
+work in=20
+a "don't ask don't tell" relationship, where<BR>instead of axises we're =
+dealing=20
+with imaginary dimensions. The presence of w<BR>denotes real presence, =
+but the=20
+other variables sort of imply a lack of<BR>presence.</P>
+<P>Another thing to try to imagine here is that the q.z field in your =
+matrix=20
+is<BR>a rotation on the z axis. Of course a rotation on the z axis =
+creates=20
+a<BR>relationship between x and y. So you will see q.z present in the x =
+and y=20
+row<BR>and column. The only reason q.z appears in the z row or column is =
+when=20
+it's<BR>paired with w and z, because you can move rotation from w to z =
+and=20
+it<BR>doesn't change the z axis. That is the opposite of what I was =
+saying in=20
+the<BR>previous paragraph, but it still implies that transparency=20
+between<BR>dimensions that I'm trying to relate here.</P>
+<P>Martin I think your site is excellent. I've been to it a few times=20
+through<BR>the years.</P>
+<TABLE border=3D0>
+  <TBODY>
+  <TR>
+    <TD bgColor=3D#dddddd noWrap>
+      <DIV class=3Dforum>
+      <DIV><B><A=20
+      =
+href=3D"http://sourceforge.net/projects/mjbworld/forums/forum/122133/topi=
+c/1909907">RE:=20
+      Quaternion to Matrix -- the sexy way</A></B> (New)</DIV>By: =
+thejaybird (<A=20
+      href=3D"http://sourceforge.net/users/thejaybird/">thejaybird</A>) =
+-=20
+      2010-08-08 21:51:47 UTC </DIV></TD></TR>
+  <TR>
+    <TD><A class=3Dauthor-name title=3Dthejaybird=20
+      href=3D"http://sourceforge.net//users/thejaybird/"></A>
+      <P>Here's my derivation of the 2-matrix product =
+quaternion-to-matrix=20
+      conversion. Sorry for the delay, I've been meaning to post this =
+for a long=20
+      time.</P>
+      <P>Remember the standard formula for vector rotation by a =
+quaternion:</P>
+      <P>q v ~q</P>
+      <P>The trick is to represent each product above as a matrix =
+transform and=20
+      then concatenate the results.</P>
+      <P>I'll represent the quaternion as a rotor in geometric algebra =
+since=20
+      that is more comfortable for me, but you can get exactly the same =
+result=20
+      using the standard formula for quaternion product.</P>
+      <P>Our rotor 'q' in expressed in a bivector basis: q1 e2e3 + q2 =
+e3e1 + q3=20
+      e1e2 + q4</P>
+      <P>(e2e3, e3e1, and e1e2 may correspond to the yz, zx, and xy =
+planes)</P>
+      <P>We want to calculate q v ~q so first we will find a matrix to =
+represent=20
+      multiplication by a rotor on the left.</P><PRE>let I =3D e1e2e3
+
+(q1 e2e3 + q2 e3e1 + q3 e1e2 + q4) e1      q1 I  +  q2 e3 + -q3 e2 + q4 =
+e1
+                                   e2  =3D  -q1 e3 +  q2 I  +  q3 e1 + =
+q4 e2
+                                   e3      q1 e2 + -q2 e1 +  q3 I  + q4 =
+e3
+                                   I      -q1 e1 + -q2 e2 + -q3 e3 + q4 =
+I
+
+which is the matrix
+
+| q4 -q3  q2  q1|
+| q3  q4 -q1  q2|
+|-q2  q1  q4  q3|
+|-q1 -q2 -q3  q4|</PRE>
+      <P>Now if we follow exactly the same process for =
+right-multiplication by=20
+      the rotor's inverse (-q1 e2e3 + -q2 e3e1 + -q3 e1e2 + q4) we will =
+get the=20
+      matrix:</P><PRE>e1 (-q1 e2e3 + -q2 e3e1 + -q3 e1e2 + q4)     -q1 I =
+ +  q2 e3 + -q3 e2 + q4 e1
+e2                                        =3D  -q1 e3 + -q2 I  +  q3 e1 =
++ q4 e2
+e3                                            q1 e2 + -q2 e1 + -q3 I  + =
+q4 e3=20
+I                                             q1 e1 +  q2 e2 +  q3 e3 + =
+q4 I
+
+which is obviously
+
+| q4 -q3  q2 -q1| =20
+| q3  q4 -q1 -q2|
+|-q2  q1  q4 -q3|
+| q1  q2  q3  q4|</PRE>
+      <P>Now we have a matrix for left multiplication (q v) and for =
+right=20
+      multiplication by the conjugate (v ~q) which we wish to apply=20
+      sequentially, so we just concatenate them</P><PRE>                 =
+           | q4 -q3  q2  q1|   | q4 -q3  q2 -q1|
+q v ~q =3D   | v1 v2 v3 0 | * | q3  q4 -q1  q2| * | q3  q4 -q1 -q2|
+                            |-q2  q1  q4  q3|   |-q2  q1  q4 -q3|
+                            |-q1 -q2 -q3  q4|   | q1  q2  q3  q4|</PRE>
+      <P>I notice that it isn't identical to the original factorization, =
+but it=20
+      does produce the same result.</P>
+      <P>-Jay</P></TD></TR></TBODY></TABLE></DIV><!-- #EndEditable =
+--><!-- #BeginEditable "sidebar" -->
+<DIV id=3Dsidebar>
+<P><A=20
+href=3D"http://www.euclideanspace.com/maths/discrete/groups/lie/spinor/in=
+dex.htm"><IMG=20
+border=3D0=20
+src=3D"http://www.euclideanspace.com/maths/discrete/groups/lie/spinor/log=
+o150.jpg"=20
+width=3D216 height=3D150></A></P><!-- #BeginLibraryItem =
+"/Library/bobMatrixVsQuaternion.lbi" -->
+<H2 class=3DbobMathHeader>Matrix vs. Quaternion</H2>
+<DIV class=3DsidebarBlock>
+<P>If you need to work with rotations in your program is it best to use =
+maricies=20
+or quaternions? </P>
+<H3>Some advantages of quaternions are:</H3>
+<UL>
+  <LI>Each quaternion only requires 4 scalars whereas a matrix requires =
+9=20
+  scalars.=20
+  <LI>It is easier to interpolate between quaternions using SLERP as =
+explained=20
+  on <A=20
+  =
+href=3D"http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/qua=
+ternions/slerp/index.htm">this=20
+  page</A>.=20
+  <LI>Quaternions are easier to normalise than matrices (to cancel out a =
+build=20
+  up of small rounding errors). </LI></UL>
+<H3>Some advantages of matrices are:</H3>
+<UL>
+  <LI>Transforming a point seems simpler by multiplying a vector by a =
+matrix=20
+  rather than the sandwich form required for quaternions.=20
+  <LI>People often find matrices easier to understand than quaternions.=20
+  <LI>There are more ready built matrix libraries than quaternion =
+libraries.=20
+  </LI></UL>
+<H3>Isometries and Physics</H3>
+<P>If we want to model isometries, such as the movement of solid bodies, =
+
+combining rotation and translation, in one single operation, we need to =
+expand=20
+the above algebras to model translations as well as rotations.</P>
+<P>To model isometries we could either:</P>
+<UL>
+  <LI>Expand matrices to 4x4 as described on <A=20
+  =
+href=3D"http://www.euclideanspace.com/maths/geometry/affine/matrix4x4/ind=
+ex.htm">this=20
+  page</A>.=20
+  <LI>Expand quaternions to dual quaternions as described on <A=20
+  =
+href=3D"http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/oth=
+er/dualQuaternion/index.htm">this=20
+  page</A>. </LI></UL>
+<P>To investigate these issues further see <A=20
+href=3D"http://www.euclideanspace.com/maths/discrete/groups/index.htm">Th=
+is=20
+page</A>. </P></DIV><!-- #EndLibraryItem -->
+<P> </P></DIV><!-- #EndEditable --></DIV><!-- =
+google_ad_section_start(weight=3Dignore) -->
+<HR>
+
+<TABLE border=3D0 width=3D"100%">
+  <TBODY>
+  <TR bgColor=3D#ffcc00>
+    <TD colSpan=3D2>
+      <DIV align=3Dcenter><B>metadata block</B></DIV></TD></TR>
+  <TR borderColor=3D#ff0000 bgColor=3D#ffcc00>
+    <TD colSpan=3D2>
+      <SCRIPT type=3Dtext/javascript><!--=0A=
+google_ad_client =3D "pub-1034088308314105";=0A=
+/* math_footer */=0A=
+google_ad_slot =3D "6759783759";=0A=
+google_ad_width =3D 728;=0A=
+google_ad_height =3D 90;=0A=
+//-->=0A=
+</SCRIPT>
+
+      <SCRIPT type=3Dtext/javascript=20
+      src=3D"http://pagead2.googlesyndication.com/pagead/show_ads.js">=0A=
+</SCRIPT>
+    </TD></TR>
+  <TR borderColor=3D#ff0000 bgColor=3D#ffcc00>
+    <TD><B>see also:</B></TD>
+    <TD><!-- #BeginEditable "also" -->
+      <UL>
+        <LI></LI></UL>
+      <P>&nbsp;</P><!-- #EndEditable --></TD></TR>
+  <TR borderColor=3D#ff0000 bgColor=3D#ffcc00>
+    <TD><B>Correspondence about this page</B></TD>
+    <TD><!-- #BeginEditable "corr" -->
+      <UL>
+        <LI><A=20
+        =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/quaternionToMatrix/hamourus.htm"></A></LI></UL><!-- #EndEditable =
+--></TD></TR>
+  <TR borderColor=3D#ff0000 bgColor=3D#ffcc00>
+    <TD>
+      <P><B>Book Shop - <!-- #BeginEditable "fread" --><A=20
+      =
+href=3D"http://www.euclideanspace.com/maths/geometry/rotations/conversion=
+s/quaternionToMatrix/books.htm"=20
+      target=3D_top>Further reading</A><!-- #EndEditable -->.</B></P>
+      <P>Where I can, I have put links to Amazon for books that are =
+relevant to=20
+      the subject, click on the appropriate country flag to get more =
+details of=20
+      the book or to buy it from them.</P></TD>
+    <TD><!-- #BeginEditable "books" --><!-- #BeginLibraryItem =
+"/Library/matrixcomputations.lbi" -->
+      <P><A =
+href=3D"http://www.amazon.com/exec/obidos/ASIN/0801854148/martinb-20"=20
+      target=3D_top><IMG border=3D0 hspace=3D3 alt=3Dcover vspace=3D3=20
+      =
+src=3D"http://www.euclideanspace.com/Library/0801854148.01.TZZZZZZZ.jpg" =
+
+      width=3D60 height=3D90></A> <A=20
+      =
+href=3D"http://www.amazon.com/exec/obidos/ASIN/0801854148/martinb-20"=20
+      target=3D_top><IMG border=3D0 alt=3Dus=20
+      src=3D"http://www.euclideanspace.com/Library/us50.gif" width=3D30=20
+      height=3D19></A> <A=20
+      =
+href=3D"http://www.amazon.co.uk/exec/obidos/ASIN/0801854148/martinb-21"=20
+      target=3D_top><IMG border=3D0 alt=3Duk=20
+      =
+src=3D"http://www.euclideanspace.com/Library/amazon-uk-flag-small.gif"=20
+      width=3D30 height=3D19></A> <A=20
+      =
+href=3D"http://www.amazon.de/exec/obidos/ASIN/0801854148/martinb0b-21"=20
+      target=3D_top><IMG border=3D0 alt=3Dde=20
+      =
+src=3D"http://www.euclideanspace.com/Library/amazon-de-flag-small.gif"=20
+      width=3D30 height=3D19></A> <A=20
+      =
+href=3D"http://www.amazon.co.jp/exec/obidos/ASIN/0801854148/martinb-22"=20
+      target=3D_top><IMG border=3D0 alt=3Djp=20
+      =
+src=3D"http://www.euclideanspace.com/Library/amazon-jp-flag-small.gif"=20
+      width=3D30 height=3D19></A> <A=20
+      =
+href=3D"http://www.amazon.fr/exec/obidos/ASIN/0801854148/martinb06-21"=20
+      target=3D_top><IMG border=3D0 alt=3Dfr=20
+      =
+src=3D"http://www.euclideanspace.com/Library/amazon-fr-flag-small.gif"=20
+      width=3D30 height=3D19></A> <A=20
+      =
+href=3D"http://www.amazon.ca/exec/obidos/ASIN/0801854148/martinb0e-20"><I=
+MG=20
+      border=3D0 alt=3Dca =
+src=3D"http://www.euclideanspace.com/Library/ca-flag.gif"=20
+      width=3D30 height=3D19></A> Matrix Computations</P><!-- =
+#EndLibraryItem --><!-- #EndEditable --></TD></TR>
+  <TR borderColor=3D#ff0000 bgColor=3D#ffcc00>
+    <TD>
+      <P><B>Commercial Software Shop</B></P>
+      <P>Where I can, I have put links to Amazon for commercial =
+software, not=20
+      directly related to the software project, but related to the =
+subject being=20
+      discussed, click on the appropriate country flag to get more =
+details of=20
+      the software or to buy it from them.</P></TD>
+    <TD><!-- #BeginEditable "software" -->
+      <P>&nbsp;</P><!-- #BeginLibraryItem "/Library/darkbasic.lbi" -->
+      <TABLE border=3D1 width=3D"100%">
+        <TBODY>
+        <TR>
+          <TD><A=20
+            =
+href=3D"http://www.amazon.com/exec/obidos/ASIN/B0000C7FOD/martinb-20"=20
+            target=3D_top><IMG border=3D0 hspace=3D3 alt=3Dcover =
+vspace=3D3=20
+            =
+src=3D"http://www.euclideanspace.com/Library/B00006G8H1.02.TZZZZZZZ.jpg">=
+</A>=20
+            <A=20
+            =
+href=3D"http://www.amazon.com/exec/obidos/ASIN/B0000C7FOD/martinb-20"=20
+            target=3D_top><IMG border=3D0=20
+            src=3D"http://www.euclideanspace.com/Library/us50.gif" =
+width=3D30=20
+            height=3D19></A> <A=20
+            =
+href=3D"http://www.amazon.co.uk/exec/obidos/ASIN/B00006G8H1/martinb-21"=20
+            target=3D_top><IMG border=3D0=20
+            =
+src=3D"http://www.euclideanspace.com/Library/amazon-uk-flag-small.gif"=20
+            width=3D30 height=3D19></A> Dark Basic Professional Edition =
+- It is=20
+            better to get this professional edition=20
+            <P><A=20
+            =
+href=3D"http://www.amazon.com/exec/obidos/ASIN/B00005V57T/martinb-20"=20
+            target=3D_top><IMG border=3D0 hspace=3D3 alt=3Dcover =
+vspace=3D3=20
+            =
+src=3D"http://www.euclideanspace.com/Library/B00005ABYV.02.TZZZZZZZ.jpg" =
+
+            width=3D72 height=3D90></A> <A=20
+            =
+href=3D"http://www.amazon.com/exec/obidos/ASIN/B00005V57T/martinb-20"=20
+            target=3D_top><IMG border=3D0=20
+            src=3D"http://www.euclideanspace.com/Library/us50.gif" =
+width=3D30=20
+            height=3D19></A> <A=20
+            =
+href=3D"http://www.amazon.co.uk/exec/obidos/ASIN/B00005ABYV/martinb-21"=20
+            target=3D_top><IMG border=3D0=20
+            =
+src=3D"http://www.euclideanspace.com/Library/amazon-uk-flag-small.gif"=20
+            width=3D30 height=3D19></A> <A=20
+            =
+href=3D"http://www.amazon.de/exec/obidos/ASIN/3929418398/martinb0b-21"=20
+            target=3D_top><IMG border=3D0=20
+            =
+src=3D"http://www.euclideanspace.com/Library/amazon-de-flag-small.gif"=20
+            width=3D30 height=3D19></A> This is a version of basic =
+designed for=20
+            building games, for example to rotate a cube you might do =
+the=20
+            following:<BR>make object cube 1,100<BR>for x=3D1 to =
+360<BR>rotate=20
+            object 1,x,x,0<BR>next x</P>
+            <P><A=20
+            =
+href=3D"http://www.amazon.com/exec/obidos/ASIN/1592000096/martinb-20"><IM=
+G=20
+            border=3D0 hspace=3D3 alt=3Dcover vspace=3D3=20
+            =
+src=3D"http://www.euclideanspace.com/Library/1592000096.01.TZZZZZZZ.jpg" =
+
+            width=3D73 height=3D90></A> <A=20
+            =
+href=3D"http://www.amazon.com/exec/obidos/ASIN/1592000096/martinb-20"=20
+            target=3D_top><IMG border=3D0=20
+            src=3D"http://www.euclideanspace.com/Library/us50.gif" =
+width=3D30=20
+            height=3D19></A> <A=20
+            =
+href=3D"http://www.amazon.co.uk/exec/obidos/ASIN/1592000096/martinb-21"=20
+            target=3D_top><IMG border=3D0=20
+            =
+src=3D"http://www.euclideanspace.com/Library/amazon-uk-flag-small.gif"=20
+            width=3D30 height=3D19></A> <A=20
+            =
+href=3D"http://www.amazon.de/exec/obidos/ASIN/1592000096/martinb0b-21"=20
+            target=3D_top><IMG border=3D0=20
+            =
+src=3D"http://www.euclideanspace.com/Library/amazon-de-flag-small.gif"=20
+            width=3D30 height=3D19></A> <A=20
+            =
+href=3D"http://www.amazon.co.jp/exec/obidos/ASIN/1592000096/martinb-22"=20
+            target=3D_top><IMG border=3D0=20
+            =
+src=3D"http://www.euclideanspace.com/Library/amazon-jp-flag-small.gif"=20
+            width=3D30 height=3D19></A> <A=20
+            =
+href=3D"http://www.amazon.fr/exec/obidos/ASIN/1592000096/martinb06-21"=20
+            target=3D_top><IMG border=3D0=20
+            =
+src=3D"http://www.euclideanspace.com/Library/amazon-fr-flag-small.gif"=20
+            width=3D30 height=3D19></A> <A=20
+            =
+href=3D"http://www.amazon.ca/exec/obidos/ASIN/1592000096/martinb0e-20"><I=
+MG=20
+            border=3D0 =
+src=3D"http://www.euclideanspace.com/Library/ca-flag.gif"=20
+            width=3D30 height=3D19></A> Game Programming with Darkbasic =
+- book for=20
+            above software</P>
+            <UL>
+              <LI><A=20
+              =
+href=3D"http://www.euclideanspace.com/software/games/giles.htm">Discussio=
+n=20
+              about using Darkbasic for physics simulation</A>=20
+        </LI></UL></TD></TR></TBODY></TABLE><!-- #EndLibraryItem --><!-- =
+#EndEditable --></TD></TR></TBODY></TABLE>
+<P>This site may have errors. Don't use for critical systems.</P>
+<P>Copyright (c) 1998-2012 Martin John Baker - All rights reserved - <A=20
+href=3D"http://www.euclideanspace.com/site/privacy/index.htm">privacy=20
+policy</A>.</P>
+<DIV id=3DtopAd>
+<SCRIPT type=3Dtext/javascript><!--=0A=
+google_ad_client =3D "pub-1034088308314105";=0A=
+/* math_top */=0A=
+google_ad_slot =3D "6190416267";=0A=
+google_ad_width =3D 180;=0A=
+google_ad_height =3D 90;=0A=
+//-->=0A=
+</SCRIPT>
+
+<SCRIPT type=3Dtext/javascript=20
+src=3D"http://pagead2.googlesyndication.com/pagead/show_ads.js">=0A=
+</SCRIPT>
+</DIV><!-- google_ad_section_end -->
+<SCRIPT type=3Dtext/javascript>=0A=
+var gaJsHost =3D (("https:" =3D=3D document.location.protocol) ? =
+"https://ssl." : "http://www.");=0A=
+document.write(unescape("%3Cscript src=3D'" + gaJsHost + =
+"google-analytics.com/ga.js' type=3D'text/javascript'%3E%3C/script%3E"));=0A=
+</SCRIPT>
+
+<SCRIPT type=3Dtext/javascript>=0A=
+var pageTracker =3D _gat._getTracker("UA-983407-1");=0A=
+pageTracker._trackPageview();=0A=
+</SCRIPT>
+<!-- InstanceEnd --></BODY></HTML>
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/euclideanspace.gif
+
+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
+BTjJzXKaU5uAhIAqZ3hMcp5TCEEAADs=
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/back.gif
+
+R0lGODlhHAAQAJEAAP////8AAAAAAAAAACH5BAUUAAAALAAAAAAcABAAAAI7hI+pKL2/mhQQzksr
+wyJ4p3He+GURRqYBeHCdqoIuTK9ijbsNTrM6P2JtZj3TQ/cKGjWAn5A5vEBDkgIAOw==
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/up.gif
+
+R0lGODlhHAANAJEAAP////8AAAAAAAAAACH5BAUUAAAALAAAAAAcAA0AAAIyhI8oku2+1pspWkpt
+CBHDtYWdd0TheWHaiY7PyrJuBcY2Jynmfbswb+tYhsSi8YgsFgAAOw==
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/home.gif
+
+R0lGODlhHQAaAJEAAP////8AAAAAAAAAACH5BAUUAAAALAAAAAAdABoAAAJShI8oku2+4pstWopj
+2Bcnu4WdB4DhKWXayQbpY7bs+y3y7dIx3nY7L5PYgESLgIj8IYOrJU7pRDWjvSlVOrzOrNpctsvh
+aqFXMtWITqvX7LalAAA7
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/forward.gif
+
+R0lGODlhHAAQAJEAAP////8AAAAAAAAAACH5BAUUAAAALAAAAAAcABAAAAI7lIGpy2ovmmywxilN
+2PZgJ2wiZ32ANqbdhKZudyWtS8PITOcBrOsw7rPdQrlfDKT6fTRKk2zlZECimAIAOw==
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/b/banner43.gif
+
+R0lGODlhgAIKAJEAAP///8zMzLu7uwAAACH5BAUUAAAALAAAAACAAgoAAAL/hI+py+0Po5y02ouz
+3kaMIXDiSJbmiabqyrbuC8fy3Hggjef6zvf+DwwKhbbQ8IhMKpdAgfMJjUqn1Kr1is1qt9yu9wsO
+SwM2sviMTqvX7Lb7DQczLQKzuf686/N8597fhwc4KFj4Zxh4qJjISLjo2Gj4MUlZaXmJmam5yUkJ
++YkI+hhKOmoaeSqKuqraWsr66poaSztrC7s4N4HLK9tb+3vrO/zaaXyMnHwpDEzM/Bwc7SzdXA09
+jW1NfWik+yB4rZ0dTr4d/CGeXj5uzu6u3g7/vi5fT3/fF+ANAbj/jefPQZGANQASXNDvoIKEChEw
+bNjBIMQOZiYeEGSxA7qMIQCgcMSYEaRFkRM9Zrzz8cnHjSclllQZEuZImRPJkHlRAAA7
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/b/banner35.gif
+
+R0lGODlhgAIKAJEAAP///8zMzLu7uwAAACH5BAUUAAAALAAAAACAAgoAAAL/hI+py+0Po5y02svE
+GAL7D4biSJbmiabqyrbuC8eKxsn2jef6zvf+DwyKaB2h8YhMKpfMiuAJjUqn1Kr1is1qt9yuNxqg
+hb/ksvmMTqvX7Lb7DY+fm87xWHDPQ/VPPn4P2Bf4J1hIeOiXOKhoyIi4CNkItUFZaXmJmam5ydnp
++QkaKqr552ga+Sipmsp6uuraigo7K1v7ahsrSSeBS3v7mxvsK9xbfDuKnKy8zNwMCmZMDDxMHV09
+bZ2NvS39tAtBeN0tTq49bl7OnX6uju7euMEuv07/Pm9f374d8P0g2O/gH8AMfwYSDGNwAZGEMwoy
+RCDwoYGIEglJPGDxIoCMIxejaNwY7yPHimNEQvl4x6Q3jR41hkHIMiTLkzNXXnxZpEUBADs=
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/b/banner56.gif
+
+R0lGODlhgAIKAJEAAP///8zMzLu7uwAAACH5BAUUAAAALAAAAACAAgoAAAL/hI+py+0Po5y02ouz
+3rz7JQyD8JXmiabqyrbuC8fyTMvhWOf6zvf+DwwKh7MbiYhMKpcfgfMJjUqn1Kr1is1qt9yu9wsO
+i8fkbuB2LqvX7Lb7Da8yLYJ0uv686/N8597fhwc4KFj4Zxh4qJjISLjo2IgIOSlZ+WgZeamZyUm5
+6RkoIjpKWmp6ipqqujqK94kJGgs7+1rbSXu7NzeR2ytr++uLG0w8bAx8LIy8rNwMyAodLT1tCsVc
+fJ2M7aw9e7T7IJg9zk2+fd5tnl7Ojq7+3r7uKSJfD+8efx8ADgHIH47nnwN/AhkQLKjgIEIERhYm
+DOiQIcSIBgRRPGDxIoCMIhc5UvQYsaFGkA6haARw56TJkU9UtmTpRCU9lzE1njnzogAAOw==
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/b/banner66.gif
+
+R0lGODlhgAIKAJEAAP///8zMzLu7uwAAACH5BAUUAAAALAAAAACAAgoAAAL/hI+py+0Po5y02ouz
+3rz7D4aHMAyCiKbqyrbuC8fyTNd2S5r3zvf+DwwKh8SiJXcyKpdLgfMJjUqn1Kr1is1qt9yu9wsO
+i8fksvn8DeTU6Lb7DZ8yj2y2wI5/5p37u/7PB+gXSDho2IcomFi4eKj4yAjpGEk5admIKZlZuXmp
++ckJ6hlKOmpZUtqpKrqayvrq6jo3AWvaalt7q5vLG4vruwvc+0scXDxsrFaSjNws/HwMbZc0+zDI
+LO0cvY3Nrd0N/i2eTe4NjBpenm7OHhxQDREIb+037yBvz4Cfr7DPj4DkX796AgESLGhgEMIRbBYm
+bOhQYUSICwNOdOIQAJSMFXYyboz4xGNIkBgjohJZcqEaNS8KAAA7
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/maths/spanner.gif
+
+R0lGODlhEAAQAHcAACH/C0dBTU1BTk9XMS4wBDrGAgAAIf4aU29mdHdhcmU6IEFkb2JlIEltYWdl
+UmVhZHkAIf8LTVNPRkZJQ0U5LjAYAAAADG1zT1BNU09GRklDRTkuMBVySjFRACH5BAEAABQALAAA
+AAAQABAAhN7e3nl5eezs7CgoKC4uLtra2uXl5To6OhQUFNHR0e7u7szMzLi4uOPj41lZWZKSkujo
+6GhoaEVFRdDQ0P///wECAwECAwECAwECAwECAwECAwECAwECAwECAwECAwECAwU6ICWOZGme6Kkk
+KSksRysayyCLhTOuacGIAkAk1ZgUIIBA7BQMSAgEBKppa1FlV2uymsqmDNvbIyoLAQA7
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/jpeg
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/maths/discrete/groups/lie/spinor/logo150.jpg
+
+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
+AB//2Q==
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/jpeg
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/0801854148.01.TZZZZZZZ.jpg
+
+/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEP
+ERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4e
+Hh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABaADwDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6ovri
+5jvraxtbrTIpp0YxRXJbfJtHzbQDyBlSf/r1Lpk99dmYwXelXAh3wyiEsdk6sflJz2GAR1zn6Vyf
+xOvbC3vtMkbV7TTdUsla5s3uNxXcWjBDBeSrIJFP1qv4P8XeFdA03V4V1y0kklvZbi3DM2ZQVUAs
+QvBJBJPvmszu9lJ0+ZL8DsreTXJkkKXujN5MmyQxq7BSMblIzwcZ78cVENWub/Ung0m901wmVaOS
+OTcrFdygnoOCGx3B/GuM8I+J/Deg6/fE+KLW50+/hjnmd1KuLsfK7bQOjqFJPqvua0NB8Z+E7PxD
+4hvp9fsxDf3MUkONxO1YI4znjjlT+FApUZJv3fTQ6K11W6fVotNn1PSFuBIY5IlV9zuEDlFzgbgp
+3Y5OCDjHNWZrjURqFtpqX+nreNb+dJG0DkkKcOykEDGWUc9M9686j8QeHovGk2ur4ispYDqZnFtL
+I4QI1tHEZVwv+tBVwAeCrHoea3JvGfhNvHFtrI8Q2X2WLTZrVx8+7e0kbA429MIfzFA5UZJqy6du
+pu3mpXZ1G5tItS05DbuiSo0MjSJ5hIi44znjnpwfQmvEP2lfN/4Tqy2b8f2ZH0z/AM9Za9A17xX4
+dn8V2XiCx17TluLRxCIijkXFuQd5dghKspYleww3PznGb8YtKs9R8S2083mEiyRRtbHG9z/Wmjow
+y9lUi2uhjftEzOniWziXGHsFye/Dv/jXng1e6EkThYgY4jEBtzwRg9fb04HbFegftGj/AIqvT/8A
+rwX/ANDevMD1FNHoYVJ0Ylp9WuPMVflBe7+0KoXOXOP09veq51P9zMgfbHKFDABsfL0/pUZAbqAe
+fT6UojjBJCKDj0oOlRRPNrAdpiXRfNhWJgikDC4x074AH51ZfUbplnXcAJVAYY4wFA/lVIqMngdK
+X1oDlRcl1K5lmEjlCwh8np1Xtn1x2znGB6CvonxXo/8AaF5bzfZvMxbKud+O7H196+a/4hX1rPHu
+WE70X92OCcetJnm498ji15/oeK/tHZPivT/+wev/AKG9eXkcivUf2jT/AMVVYf8AYPX/ANDevLyf
+m6U1sdWE/gxEA6896dzz9KQYOeO9O9fpQdIHv9KCeDSN3+lDH730oAcD8wr692q0URZVJ8sdRXyB
+/EOK+u5ZJEjhChMeWOppM8rM/s/P9DxT9o0f8VXYc/8AMPX/ANDavL+9eoftHf8AI12A/wCoev8A
+6G9eXn734U0dmE/gxDpnHrSnv9KTv+NKTy30oOkGHB+lI3RsUhOc/SkY8MPagBw+8PpX2CI1aGEl
+VP7sdRXx30YV9kQ7TbxbuuwUmeVmf2fn+h4Z+0gpHiTTnyObLHT/AGj3/GvK+/4V6v8AtJceIdMH
+/Tmf/QjXlB6imtjqwj/cxE9frSsSc/Sk9frQe/0oOkDxnntQx6/SkJ6/SkJ60DFzzX2VAB9mi4/g
+FfGYPNfZdmweygdCSrRgg0meVmf2fn+h5n8ZvA/iDxRq9lc6RBDJFFbmNi8oTBznvXBn4QeN85+x
+Wv8A4FLX0lB/qxT2+7SuccMdVpxUVbQ+al+D3jdic2tmo463K/0qX/hTPjTnjTv/AAI/+tX0Zk+t
+GT6mi5f9o1vI+cj8GPGh7ad/4Ef/AFqQ/Bfxpjgadn/r4/8ArV9Jfw/hS0XD+0a3kfNo+DHjT007
+/wACP/rV9C2UMtvY28D43RxKpx0yBV2o3+9QYVsVOvbm6H//2Q==
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/us50.gif
+
+R0lGODlhHgATALMAABAhe1pjzrW9//8AAP//////////////////////////////////////////
+/////ywAAAAAHgATAAAERhDISeW4OGssCfDg9xFkaZ6kGIYj6padKm+0Jq/dq8c4qL83GaBGHPCC
+P2BP1EqaKtBhkeasWq+oqZaK7Xpf2zDmSy6LxREAOw==
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/amazon-uk-flag-small.gif
+
+R0lGODlhHgATAMQAAAAOWVpklKpbbxUscMMGC/Xv8cwzM/bNzO2TksmwvZabuggYYaayzWtMdcc+
+RuRvb5k5UO+vsNa7xSk2daEXKV48aN5QUcdZY6V6kL/K3XOAqUBNhcCUo9xfYdDc6jdBfCH5BAAA
+AAAALAAAAAAeABMAAAX/oIAUzAQsaDolBoEEaTw0TpdoV3cUAeD/A5ar9/NNIIaR4jMRWJSDYrD1
+klYcloOntzk1Lg8tETAdApEjRnTR9X0EnUhBsSALq4sKJcv7saVfDwUZH2UveUkkJn4bA46PGxhh
+cxJUCgIOOwqPnAoJn6AJEgcROxEtYaUFB6GglwawsbKxBASzt7AQELW8vb6/wAQUAri3tQYdycrL
+yQKerQk7pKQtHaMRCBEc29wcGI2cAxoFEQ4CGpUEDxoMBQgdGBMxCwNtPgPtCAYNjkIPMOMOWBDw
+oY6PPz4CeBDooEGdMv+MZCjw4AK/g10GKHBnAMIHIP7GLBgXoYOADSg+MChkWCEKSFRjfGzIcKBi
+AI3kOsorYgcmTzIbEQxkIAACv3koNEIYhhLpggAZEkAIAQA7
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/amazon-de-flag-small.gif
+
+R0lGODlhHgATALMAAAAAAOMIFv/yAMrACPB5C9MIFbMPGbZBRzw8PMfAPLlAR6OcEEJCQqymQr9k
+EcB9QSH5BAAAAAAALAAAAAAeABMAAARWkIFJq70YoMz73F5ogWJJluGJdkfhvnAsz4YS3Hiu73zN
+/8CcL0jcDYvIwDFJNDwI0Kh0Sq06EoKsdsvtegdYr3isBZPP3zB6LTCz14PGYE6v2+/4RQQAOw==
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/amazon-jp-flag-small.gif
+
+R0lGODlhHgATAKIAAP///98HE8zMzMZXXsqOktApM6ioqOLs6yH5BAAAAAAALAAAAAAeABMAAANe
+KLDc/lAoSCuTNseZz9EAZhlDUQzEV4kUEbzwoG6VAd/BsHJPgcMFXoPlEPh+LwKFODwidbSI86eM
+QgbIQHApbD53FsI0Z2E+BISB2pAxg8BvkDt+Nkju+Lx+LzAkAAA7
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/amazon-fr-flag-small.gif
+
+R0lGODlhHgATAKIAAAEyduIMGSpNgP///9XW1dHa5vrT1ce4vyH5BAAAAAAALAAAAAAeABMAAANe
+KLC8ciTKeIK9WDUmyvjgZ2BkoG1AF4ZjeZ2buoruizrePLQ13MgznsvHyQVrFiJOt0OabinjSlhS
+RplUkhU4dW6lLC+UG0Z+seIbGZTNjMHsNGpNM7/RdjVkIqkgEwA7
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/ca-flag.gif
+
+R0lGODlhHgATAJEAAP////8AAAAAAAAAACwAAAAAHgATAAACQowfoMuND5tksJqZpK040/1ohwMi
+4vWVaMKOLKCOMKjE6GzVtk7bHo1TpUI84fAWLJFMC9/k6XyejNIjsNrcYbOQAgA7
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/jpeg
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/B00006G8H1.02.TZZZZZZZ.jpg
+
+/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEP
+ERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4e
+Hh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABaAEcDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwC18dP2
+vtT0LxLrHhPwV4bhiudMvJrKbUNSbfl43ZGKRKQMZUkFmOe6jpXkHw5+NXiDWfF1/e/EPxjrk63E
+GImTWbjT4IMcnatrjDH5QAAAec+/nHxx/wCS1+Ov+xj1D/0pkp3w+8GeINduFki0jVl0yQfPfwWR
+dU9ACSqnJIyN2cZODtoA9E8UfHvW7DWbiXwZ4w8aSW5I8mO+1N5IIwFAIxIXkfJycl169Kzbb9qD
+44wHCeNiyZztk061f8MmMn9a+v8A9k/wfo8/wC0O28SeF9Lmv4ZryOdLqzjlYEXUuMkg54wQehBB
+HGK9BufhP8LrkkzfDjwi7Hq39jW4P57M0AfDmn/tffGO1x591ol9j/nvpwGf++CtegQ/tbePYLry
+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
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/jpeg
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/B00005ABYV.02.TZZZZZZZ.jpg
+
+/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEP
+ERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4e
+Hh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABaAEgDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD1f4i/
+F3xOmoS6X4SsNJtFjvZrOW7vJjNMDG5RikK4QHIyCzng8qCNp8y1bxJ4mv8AxHZy6r4m1O+ZYpkl
+W01eWxjjLbMMfI25bAbCqOD35wdHxdpf23xlqpiu7KFZddmtVkvJ1hSOV5pMrxl34AOACAW/PiNU
+ltrO7uUe32TKAoVD8qEMytnHB+6T+PavYoYWi4um37z/AA6ni4jF1oyVW3ur8ehr3us+If7dDaL8
+TPGNjZwwASxSahJKGcE5fdcF26YG3aOhrWsfi18Q9Le7txr8t/HCu4NdQxbwvY8oCevI9q4ZpLNZ
+JYolN0oIMQkyGIzkgevQH8Kq2rR7nL2sszZJDAFeMEqM7c8s7DJ/lU1aLwrtGkprzbvpvooNLy11
+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
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: image/jpeg
+Content-Transfer-Encoding: base64
+Content-Location: http://www.euclideanspace.com/Library/1592000096.01.TZZZZZZZ.jpg
+
+/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEP
+ERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4e
+Hh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABaAEkDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDT0TVf
+BF1YI9x4j0rzC+xv9KBK4ycAKTk4HSrsWtfDaRGVPFOiyzIgJijvR1wd3fgDj8+1fDd0MTy4IGZG
+79s1ExVmOTzXz8OH6MUldP1X/BPdnn1WTvZr5/8AAPuOHXPh6lsPtviPR4LoqGWFr9QzEsRgfN6Y
+OfekutR8DxxvNJ4t0q3+YhVkukVVO0kKST16A+ma+HgEVlzkjPPHNNxhgO+DmpfDtBpJvbytf7mU
+s/rJtpb+d/zR9yQah4EeGORvGumjeoJ8t1cDgbjlewJwScU2PVPh/Im+Hxvpk+0jeEkQlc5x/F16
+DHrntzXw9g7j2yeKlF1KpYLK+G4weePxNT/q1h/6v/mV/rFX/q3+R9py634KW/iso/FukySs5STF
+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
+eWL+8//Z
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.euclideanspace.com/navigation.css
+
+TABLE#top {
+	PADDING-BOTTOM: 0px; BORDER-RIGHT-WIDTH: 0px; MARGIN: 0px; =
+PADDING-LEFT: 0px; PADDING-RIGHT: 0px; BORDER-TOP-WIDTH: 0px; =
+BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; PADDING-TOP: 0px
+}
+TABLE#top A {
+	MARGIN: 0px; DISPLAY: block; TEXT-DECORATION: none
+}
+TABLE#nav A {
+	TEXT-DECORATION: none
+}
+TABLE#nav A {
+	MARGIN: 0px; DISPLAY: block
+}
+TR#nav {
+	PADDING-BOTTOM: 0px; BORDER-RIGHT-WIDTH: 0px; MARGIN: 0px; =
+PADDING-LEFT: 0px; WIDTH: 644px; PADDING-RIGHT: 0px; BORDER-TOP-WIDTH: =
+0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; PADDING-TOP: 0px
+}
+TD#mjbNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#mjbNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #cccccc; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#mjbNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#mjbNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#mjbNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#theoryNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#theoryNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #99ffff; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#theoryNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#theoryNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#theoryNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#physicsNav A:hover {
+	BACKGROUND-COLOR: #00ffff
+}
+TD#physicsNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #ffff00; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#physicsNavx A:hover {
+	BACKGROUND-COLOR: #00ffff
+}
+TD#physicsNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#physicsNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#mathNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#mathNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #ffcc00; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#mathNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#mathNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#mathNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#progNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#progNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #ff9966; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#progNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#progNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#progNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#softwareNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#softwareNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #ff9966; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#softwareNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#softwareNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#softwareNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#newNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#newNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #ff6699; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#newNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#newNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#newNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#copyrightNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#copyrightNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #ff66ff; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#copyrightNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#copyrightNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#copyrightNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#sitemapNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#sitemapNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #00ff00; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#sitemapNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#sitemapNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#sitemapNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#artNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#artNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #cc99ff; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#artNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#artNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#artNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#telecomsNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#telecomsNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #99cc99; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#telecomsNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#telecomsNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#telecomsNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#travelNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#travelNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #6699ff; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#travelNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#travelNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#travelNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#thinkNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#thinkNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #6699ff; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#thinkNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#thinkNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#thinkNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#techNav A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#techNav {
+	BORDER-BOTTOM-STYLE: outset; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+BACKGROUND-COLOR: #99ff99; MARGIN: 0px; BORDER-LEFT-STYLE: outset; =
+PADDING-LEFT: 0px; WIDTH: 80px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: =
+outset; BORDER-RIGHT-STYLE: outset; FONT-SIZE: 8pt; FONT-WEIGHT: bold; =
+PADDING-TOP: 0px
+}
+TD#techNavx A:hover {
+	BACKGROUND-COLOR: #ffff00
+}
+TD#techNavx {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#techNave {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; PADDING-BOTTOM: 0px; =
+MARGIN: 0px; BORDER-LEFT-STYLE: none; PADDING-LEFT: 0px; WIDTH: 80px; =
+PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; =
+FONT-SIZE: 8pt; FONT-WEIGHT: bold; PADDING-TOP: 0px
+}
+TD#top A:hover {
+	BORDER-BOTTOM-STYLE: outset; BACKGROUND-COLOR: #ffff00; =
+BORDER-LEFT-STYLE: outset; PADDING-LEFT: 4px; PADDING-RIGHT: 4px; =
+BORDER-TOP-STYLE: outset; BORDER-RIGHT-STYLE: outset; PADDING-TOP: 2px
+}
+TD#top {
+	BORDER-BOTTOM-STYLE: none; TEXT-ALIGN: center; BORDER-LEFT-STYLE: none; =
+BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; FONT-SIZE: 8pt; =
+FONT-WEIGHT: bold
+}
+P#mathNav {
+	PADDING-BOTTOM: 0px; BORDER-RIGHT-WIDTH: 0px; MARGIN: 0px; =
+PADDING-LEFT: 0px; PADDING-RIGHT: 0px; BORDER-TOP-WIDTH: 0px; =
+BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; PADDING-TOP: 0px
+}
+IMG#mathNav {
+	PADDING-BOTTOM: 0px; BORDER-RIGHT-WIDTH: 0px; MARGIN: 0px; =
+PADDING-LEFT: 0px; PADDING-RIGHT: 0px; BORDER-TOP-WIDTH: 0px; =
+BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; PADDING-TOP: 0px
+}
+IMG#nav {
+	PADDING-BOTTOM: 0px; BORDER-RIGHT-WIDTH: 0px; MARGIN: 0px; =
+PADDING-LEFT: 0px; PADDING-RIGHT: 0px; BORDER-TOP-WIDTH: 0px; =
+BORDER-BOTTOM-WIDTH: 0px; VERTICAL-ALIGN: top; BORDER-LEFT-WIDTH: 0px; =
+PADDING-TOP: 0px
+}
+PRE#nav {
+	PADDING-BOTTOM: 0px; BORDER-RIGHT-WIDTH: 0px; MARGIN: 0px; =
+PADDING-LEFT: 0px; PADDING-RIGHT: 0px; BORDER-TOP-WIDTH: 0px; =
+BORDER-BOTTOM-WIDTH: 0px; HEIGHT: 10px; OVERFLOW: hidden; =
+BORDER-LEFT-WIDTH: 0px; PADDING-TOP: 0px
+}
+A#ext {
+	BORDER-BOTTOM: #ff0000 1px solid; BORDER-LEFT: #ff0000 1px solid; =
+PADDING-LEFT: 16pt; BACKGROUND: url(ext.gif) #ffff00 no-repeat left top; =
+BORDER-TOP: #ff0000 1px solid; BORDER-RIGHT: #ff0000 1px solid
+}
+#topContent {
+	POSITION: relative; TOP: 0px; LEFT: 0px
+}
+#main {
+	POSITION: relative; WIDTH: 600px; MAX-WIDTH: 600px; MARGIN-BOTTOM: =
+40px; TOP: 0px
+}
+#sidebar {
+	POSITION: absolute; BORDER-RIGHT-WIDTH: 0px; MARGIN: 0px; =
+BORDER-SPACING: 0px; WIDTH: 300px; BORDER-TOP-WIDTH: 0px; =
+BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; TOP: 0px; LEFT: 620px
+}
+#topAd {
+	POSITION: absolute; TOP: 50px; LEFT: 700px
+}
+.sidebarBlock {
+	PADDING-BOTTOM: 10px; PADDING-LEFT: 10px; PADDING-RIGHT: 10px; =
+MARGIN-BOTTOM: 20px; BACKGROUND: #b4b4b4; PADDING-TOP: 10px
+}
+#sidebar H2 {
+	PADDING-BOTTOM: 6px; MARGIN: 0px; PADDING-LEFT: 10px; PADDING-RIGHT: =
+10px; BACKGROUND: #0000ff; COLOR: #ffffff; PADDING-TOP: 8px
+}
+#sidebar H2.bobMJBWorldHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #8080ff
+}
+#sidebar H2.bobTheoryHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #8080ff
+}
+#sidebar H2.bobPhysicsHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #f08040
+}
+#sidebar H2.bobMathHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #a08040
+}
+#sidebar H2.bobSoftwareHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #f0f040
+}
+#sidebar H2.bobNewHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #ff6699
+}
+#sidebar H2.bobCopyrightHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #f080f0
+}
+#sidebar H2.bobSitemapHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #40f040
+}
+#sidebar H2.bobArtHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #f040f0
+}
+#sidebar H2.bobTelecomHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #40f040
+}
+#sidebar H2.bobTechHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #4040f0
+}
+#sidebar H2.bobThinkHeader {
+	BORDER-BOTTOM: #ffffff 1px solid; BACKGROUND: #4040f0
+}
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://pagead2.googlesyndication.com/pagead/show_ads.js
+
+(function(){var g=3D!0,h=3Dnull,i=3D!1,aa=3Dfunction(a,b,c){return =
+a.call.apply(a.bind,arguments)},ba=3Dfunction(a,b,c){if(!a)throw =
+Error();if(2<arguments.length){var =
+e=3DArray.prototype.slice.call(arguments,2);return function(){var =
+c=3DArray.prototype.slice.call(arguments);Array.prototype.unshift.apply(c=
+,e);return a.apply(b,c)}}return function(){return =
+a.apply(b,arguments)}},j=3Dfunction(a,b,c){j=3DFunction.prototype.bind&&-=
+1!=3DFunction.prototype.bind.toString().indexOf("native =
+code")?aa:ba;return j.apply(h,arguments)};var k=3D(new =
+Date).getTime();var =
+ca=3D/&/g,da=3D/</g,ea=3D/>/g,fa=3D/\"/g,l=3D{"\x00":"\\0","\b":"\\b","\f=
+":"\\f","\n":"\\n","\r":"\\r","\t":"\\t","\x0B":"\\x0B",'"':'\\"',"\\":"\=
+\\\"},r=3D{"'":"\\'"};var =
+u=3Dwindow,x,ga=3Dh,y=3Ddocument.getElementsByTagName("script");y&&y.leng=
+th&&(ga=3Dy[y.length-1].parentNode);x=3Dga;var =
+z=3Dfunction(a){a=3DparseFloat(a);return =
+isNaN(a)||1<a||0>a?0:a},ia=3D/^([\w-]+\.)*([\w-]{2,})(\:[0-9]+)?$/,ja=3Df=
+unction(a){return!a?"pagead2.googlesyndication.com":(a=3Da.match(ia))?a[0=
+]:"pagead2.googlesyndication.com"};var A=3Dfunction(){return =
+ja("")};A();var B=3Dfunction(a){return!!a&&"function"=3D=3Dtypeof =
+a&&!!a.call},ka=3Dfunction(a,b){if(!(2>arguments.length))for(var =
+c=3D1,e=3Darguments.length;c<e;++c)a.push(arguments[c])};function =
+C(a){return"function"=3D=3Dtypeof =
+encodeURIComponent?encodeURIComponent(a):escape(a)}var =
+D=3Dfunction(a,b){if(!(1E-4>Math.random())){var =
+c=3DMath.random();if(c<b)return a[Math.floor(c/b*a.length)]}return =
+h},la=3Dfunction(a){try{return!!a.location.href||""=3D=3D=3Da.location.hr=
+ef}catch(b){return i}};var ma=3Dh,na=3Dfunction(){if(!ma){for(var =
+a=3Dwindow,b=3Da,c=3D0;a!=3Da.parent;)if(a=3Da.parent,c++,la(a))b=3Da;els=
+e break;ma=3Db}return ma};var =
+E,H=3Dfunction(a){this.c=3D[];this.a=3Da||window;this.b=3D0;this.d=3Dh},o=
+a=3Dfunction(a,b){this.m=3Da;this.j=3Db};H.prototype.p=3Dfunction(a,b){0=3D=
+=3Dthis.b&&0=3D=3Dthis.c.length&&(!b||b=3D=3Dwindow)?(this.b=3D2,this.g(n=
+ew =
+oa(a,window))):this.i(a,b)};H.prototype.i=3Dfunction(a,b){this.c.push(new=
+ =
+oa(a,b||this.a));pa(this)};H.prototype.q=3Dfunction(a){this.b=3D1;a&&(thi=
+s.d=3Dthis.a.setTimeout(j(this.f,this),a))};H.prototype.f=3Dfunction(){1=3D=
+=3Dthis.b&&(this.d!=3Dh&&(this.a.clearTimeout(this.d),this.d=3Dh),this.b=3D=
+0);pa(this)};H.prototype.r=3Dfunction(){return g};=0A=
+H.prototype.nq=3DH.prototype.p;H.prototype.nqa=3DH.prototype.i;H.prototyp=
+e.al=3DH.prototype.q;H.prototype.rl=3DH.prototype.f;H.prototype.sz=3DH.pr=
+ototype.r;var =
+pa=3Dfunction(a){a.a.setTimeout(j(a.n,a),0)};H.prototype.n=3Dfunction(){i=
+f(0=3D=3Dthis.b&&this.c.length){var =
+a=3Dthis.c.shift();this.b=3D2;a.j.setTimeout(j(this.g,this,a),0);pa(this)=
+}};H.prototype.g=3Dfunction(a){this.b=3D0;a.m()};=0A=
+var qa=3Dfunction(a){try{return a.sz()}catch(b){return =
+i}},ra=3Dfunction(a){return!!a&&("object"=3D=3Dtypeof =
+a||"function"=3D=3Dtypeof =
+a)&&qa(a)&&B(a.nq)&&B(a.nqa)&&B(a.al)&&B(a.rl)},sa=3Dfunction(){if(E&&qa(=
+E))return E;var a=3Dna(),b=3Da.google_jobrunner;return =
+ra(b)?E=3Db:a.google_jobrunner=3DE=3Dnew =
+H(a)},ta=3Dfunction(a,b){sa().nq(a,b)},ua=3Dfunction(a,b){sa().nqa(a,b)};=
+var va=3D/MSIE =
+[2-7]|PlayStation|Gecko\/20090226/i,wa=3D/Android|Opera/,xa=3Dfunction(){=
+var =
+a=3DI,b=3DJ.google_ad_width,c=3DJ.google_ad_height,e=3D["<iframe"],d;for(=
+d in =
+a)a.hasOwnProperty(d)&&ka(e,d+"=3D"+a[d]);e.push('style=3D"left:0;positio=
+n:absolute;top:0;"');e.push("></iframe>");b=3D"border:none;height:"+c+"px=
+;margin:0;padding:0;position:relative;visibility:visible;width:"+b+"px";r=
+eturn['<ins style=3D"display:inline-table;',b,'"><ins =
+id=3D"',a.id+"_anchor",'" style=3D"display:block;',b,'">',e.join(" =
+"),"</ins></ins>"].join("")};var ya=3D/^true$/.test("false")?g:i;var =
+za=3Dfunction(a,b,c){c||(c=3Dya?"https":"http");return[c,"://",a,b].join(=
+"")};var Aa=3Dfunction(){},Ca=3Dfunction(a,b,c){switch(typeof b){case =
+"string":Ba(b,c);break;case =
+"number":c.push(isFinite(b)&&!isNaN(b)?b:"null");break;case =
+"boolean":c.push(b);break;case "undefined":c.push("null");break;case =
+"object":if(b=3D=3Dh){c.push("null");break}if(b instanceof Array){var =
+e=3Db.length;c.push("[");for(var =
+d=3D"",f=3D0;f<e;f++)c.push(d),Ca(a,b[f],c),d=3D",";c.push("]");break}c.p=
+ush("{");e=3D"";for(d in =
+b)b.hasOwnProperty(d)&&(f=3Db[d],"function"!=3Dtypeof =
+f&&(c.push(e),Ba(d,c),c.push(":"),Ca(a,f,c),e=3D=0A=
+","));c.push("}");break;case "function":break;default:throw =
+Error("Unknown type: "+typeof =
+b);}},Da=3D{'"':'\\"',"\\":"\\\\","/":"\\/","\b":"\\b","\f":"\\f","\n":"\=
+\n","\r":"\\r","\t":"\\t","\x0B":"\\u000b"},Ea=3D/\uffff/.test("\uffff")?=
+/[\\\"\x00-\x1f\x7f-\uffff]/g:/[\\\"\x00-\x1f\x7f-\xff]/g,Ba=3Dfunction(a=
+,b){b.push('"');b.push(a.replace(Ea,function(a){if(a in Da)return =
+Da[a];var =
+b=3Da.charCodeAt(0),d=3D"\\u";16>b?d+=3D"000":256>b?d+=3D"00":4096>b&&(d+=
+=3D"0");return Da[a]=3Dd+b.toString(16)}));b.push('"')};var =
+K=3D"google_ad_block google_ad_channel google_ad_client google_ad_format =
+google_ad_height google_ad_host google_ad_host_channel =
+google_ad_host_tier_id google_ad_output google_ad_override =
+google_ad_region google_ad_section google_ad_slot google_ad_type =
+google_ad_width google_adtest google_allow_expandable_ads =
+google_alternate_ad_url google_alternate_color =
+google_analytics_domain_name google_analytics_uacct google_bid =
+google_city google_color_bg google_color_border google_color_line =
+google_color_link google_color_text google_color_url google_container_id =
+google_contents google_country google_cpm google_ctr_threshold =
+google_cust_age google_cust_ch google_cust_gender google_cust_id =
+google_cust_interests google_cust_job google_cust_l google_cust_lh =
+google_cust_u_url google_disable_video_autoplay google_ed google_eids =
+google_enable_ose google_encoding google_font_face google_font_size =
+google_frame_id google_gl google_hints google_image_size google_kw =
+google_kw_type google_language google_loeid google_max_num_ads =
+google_max_radlink_len google_mtl google_num_radlinks =
+google_num_radlinks_per_unit google_num_slots_to_rotate =
+google_only_ads_with_video google_only_pyv_ads =
+google_only_userchoice_ads google_override_format google_page_url =
+google_previous_watch google_previous_searches google_referrer_url =
+google_region google_reuse_colors google_rl_dest_url google_rl_filtering =
+google_rl_mode google_rt google_safe google_scs google_skip =
+google_tag_info google_targeting google_tdsma google_tfs google_tl =
+google_ui_features google_ui_version google_video_doc_id =
+google_video_product_type google_with_pyv_ads google_yt_pt =
+google_yt_up".split(" ");var =
+L=3Dfunction(a){this.a=3Da;a.google_iframe_oncopy||(a.google_iframe_oncop=
+y=3D{handlers:{},log:[],shouldLog:0.01>Math.random()?g:i});this.e=3Da.goo=
+gle_iframe_oncopy;a.setTimeout(j(this.l,this),3E4)},Fa;var M=3D"var =
+i=3Dthis.id,s=3Dwindow.google_iframe_oncopy,H=3Ds&&s.handlers,h=3DH&&H[i]=
+,w=3Dthis.contentWindow,d;try{d=3Dw.document}catch(e){}if(h&&d&&(!d.body|=
+|!d.body.firstChild)){if(h.call){i+=3D'.call';setTimeout(h,0)}else =
+if(h.match){i+=3D'.nav';w.location.replace(h)}s.log&&s.log.push(i)}";=0A=
+/[&<>\"]/.test(M)&&(-1!=3DM.indexOf("&")&&(M=3DM.replace(ca,"&amp;")),-1!=
+=3DM.indexOf("<")&&(M=3DM.replace(da,"&lt;")),-1!=3DM.indexOf(">")&&(M=3D=
+M.replace(ea,"&gt;")),-1!=3DM.indexOf('"')&&(M=3DM.replace(fa,"&quot;")))=
+;Fa=3DM;L.prototype.set=3Dfunction(a,b){this.e.handlers[a]=3Db;this.a.add=
+EventListener&&this.a.addEventListener("load",j(this.k,this,a),i)};L.prot=
+otype.k=3Dfunction(a){var =
+a=3Dthis.a.document.getElementById(a),b=3Da.contentWindow.document;if(a.o=
+nload&&b&&(!b.body||!b.body.firstChild))a.onload()};=0A=
+L.prototype.l=3Dfunction(){if(this.e.shouldLog){var =
+a=3Dthis.e.log,b=3Dthis.a.document;if(a.length){b=3D["/pagead/gen_204?id=3D=
+iframecopy&log=3D",C(a.join("-")),"&url=3D",C(b.URL.substring(0,512)),"&r=
+ef=3D",C(b.referrer.substring(0,512))].join("");a.length=3D0;a=3Dthis.a;b=
+=3Dza(ja(""),b);a.google_image_requests||(a.google_image_requests=3D[]);v=
+ar =
+c=3Da.document.createElement("img");c.src=3Db;a.google_image_requests.pus=
+h(c)}}};var Ga=3Dfunction(){var a=3D"script";return["<",a,' =
+src=3D"',za(A(),"/pagead/js/r20120919/r20120730/show_ads_impl.js",""),'">=
+</',a,">"].join("")},Ha=3Dfunction(){var a=3D"script";return["<",a,' =
+src=3D"',za(A(),"/pagead/expansion_embed.js"),'"></',a,">"].join("")},Ia=3D=
+function(a){var b;if(!(b=3D"expt"!=3Da.google_expand_experiment))a:{var =
+c=3Da.document;try{var e;if(!(e=3D=0A=
+a.google_allow_expandable_ads=3D=3D=3Di)){var d;if(!(d=3D!c.body)){var =
+f;if(!(f=3Da.google_ad_output&&"html"!=3Da.google_ad_output)){var =
+m;if(!(m=3DisNaN(a.google_ad_height))){var =
+s;if(!(s=3DisNaN(a.google_ad_width))){var =
+v;if(!(v=3Dc.domain!=3Da.location.hostname)){var t;b:{var =
+a=3Dnavigator,n=3Da.userAgent,F=3Da.platform;if(/Win|Mac|Linux/.test(F)&&=
+!/^Opera/.test(n)){var =
+R=3D(/WebKit\/(\d+)/.exec(n)||[0,0])[1],ha=3D(/rv\:(\d+\.\d+)/.exec(n)||[=
+0,0])[1];if(/Win/.test(F)&&/MSIE.*Trident/.test(n)||!R&&"Gecko"=3D=3Da.pr=
+oduct&&1.7<ha&&=0A=
+!/rv\:1\.8([^.]|\.0)/.test(n)||524<R){t=3Dg;break =
+b}}t=3Di}v=3D!t}s=3Dv}m=3Ds}f=3Dm}d=3Df}e=3Dd}if(e){b=3Dg;break =
+a}}catch(S){b=3Dg;break a}b=3Di}return =
+b?i:g},Ka=3Dfunction(a,b,c,e){return function(){var =
+d=3Di;e&&sa().al(3E4);try{if(la(a.document.getElementById(b).contentWindo=
+w)){var =
+f=3Da.document.getElementById(b).contentWindow,m=3Df.document;if(!m.body|=
+|!m.body.firstChild)m.open(),f.google_async_iframe_close=3Dg,m.write(c)}e=
+lse{var =
+s=3Da.document.getElementById(b).contentWindow,v;f=3Dc;f=3DString(f);if(f=
+.quote)v=3Df.quote();else{for(var m=3D=0A=
+['"'],t=3D0;t<f.length;t++){var =
+n=3Df.charAt(t),F=3Dn.charCodeAt(0),R=3Dm,ha=3Dt+1,S;if(!(S=3Dl[n])){var =
+G;if(31<F&&127>F)G=3Dn;else{var q=3Dn;if(q in r)G=3Dr[q];else if(q in =
+l)G=3Dr[q]=3Dl[q];else{var =
+p=3Dq,w=3Dq.charCodeAt(0);if(31<w&&127>w)p=3Dq;else{if(256>w){if(p=3D"\\x=
+",16>w||256<w)p+=3D"0"}else =
+p=3D"\\u",4096>w&&(p+=3D"0");p+=3Dw.toString(16).toUpperCase()}G=3Dr[q]=3D=
+p}}S=3DG}R[ha]=3DS}m.push('"');v=3Dm.join("")}s.location.replace("javascr=
+ipt:"+v)}var =
+Ja=3Da.google_enclosing_element||{};Ja[b]=3Dx;a.google_enclosing_element=3D=
+Ja;d=3Dg}catch(Bb){s=3D=0A=
+na().google_jobrunner,ra(s)&&s.rl()}d&&(new =
+L(a)).set(b,Ka(a,b,c,i))}},La=3DMath.floor(1E6*Math.random()),Ma=3Dfuncti=
+on(a){for(var a=3Da.data.split("\n"),b=3D{},c=3D0;c<a.length;c++){var =
+e=3Da[c].indexOf("=3D");-1!=3De&&(b[a[c].substr(0,e)]=3Da[c].substr(e+1))=
+}b[1]=3D=3DLa&&(window.google_top_url=3Db[3])};var =
+Na=3Dz("0.001"),Oa=3Dz("0.001"),Pa=3Dz("0.001");window.google_loader_used=
+=3Dg;var N=3Dwindow;if(!("google_onload_fired"in =
+N)){N.google_onload_fired=3Di;var =
+Qa=3Dfunction(){N.google_onload_fired=3Dg};N.addEventListener?N.addEventL=
+istener("load",Qa,i):N.attachEvent&&N.attachEvent("onload",Qa)}var =
+Ra=3Dwindow,Sa=3D2;try{Ra.top.document=3D=3DRa.document?Sa=3D0:la(Ra.top)=
+&&(Sa=3D1)}catch(Ta){}=0A=
+if(2=3D=3D=3DSa&&top.postMessage&&!window.google_top_experiment&&(window.=
+google_top_experiment=3DD(["jp_e","jp_c"],Pa),"jp_e"=3D=3D=3Dwindow.googl=
+e_top_experiment)){var =
+O=3Dwindow;O.addEventListener?O.addEventListener("message",Ma,i):O.attach=
+Event&&O.attachEvent("onmessage",Ma);var =
+Ua=3D{"0":"google_loc_request",1:La},Va=3D[],Wa;for(Wa in =
+Ua)Va.push(Wa+"=3D"+Ua[Wa]);top.postMessage(Va.join("\n"),"*")}window.goo=
+gle_adk_experiment||(window.google_adk_experiment=3DD(["expt","control"],=
+Na)||"none");=0A=
+window.google_expand_experiment||(window.google_expand_experiment=3DD(["e=
+xpt","control"],Oa)||"none");var =
+Xa;if(window.google_enable_async=3D=3D=3Di)Xa=3D0;else{var =
+Ya=3Dnavigator.userAgent;Xa=3D(va.test(Ya)||wa.test(Ya)?i:g)&&!window.goo=
+gle_container_id&&(!window.google_ad_output||"html"=3D=3Dwindow.google_ad=
+_output)}=0A=
+if(Xa){var =
+Za=3Dwindow;Za.google_unique_id?++Za.google_unique_id:Za.google_unique_id=
+=3D1;for(var =
+J=3Dwindow,_script$$inline_95=3D"script",P,I=3D{allowtransparency:'"true"=
+',frameborder:'"0"',height:'"'+J.google_ad_height+'"',hspace:'"0"',margin=
+width:'"0"',marginheight:'"0"',onload:'"'+Fa+'"',scrolling:'"no"',vspace:=
+'"0"',width:'"'+J.google_ad_width+'"'},$a=3DJ.document,Q=3DI.id,ab=3D0;!Q=
+||J.document.getElementById(Q);)Q=3D"aswift_"+ab++;I.id=3DQ;I.name=3DQ;$a=
+.write(xa());P=3DQ;var bb;J.google_page_url&&(J.google_page_url=3D=0A=
+String(J.google_page_url));for(var =
+cb=3D[],db=3D0,eb=3DK.length;db<eb;db++){var =
+fb=3DK[db];if(J[fb]!=3Dh){var gb;try{var hb=3D[];Ca(new =
+Aa,J[fb],hb);gb=3Dhb.join("")}catch(ib){}gb&&ka(cb,fb,"=3D",gb,";")}}bb=3D=
+cb.join("");var =
+T=3Dwindow,jb=3DT.google_ad_output,U=3DT.google_ad_format;if(!U&&("html"=3D=
+=3Djb||jb=3D=3Dh))U=3DT.google_ad_width+"x"+T.google_ad_height;U=3DU&&(!T=
+.google_ad_slot||T.google_override_format)?U.toLowerCase():"";T.google_ad=
+_format=3DU;a:{var =
+V=3Dwindow,W=3DV.google_async_slots;W||(W=3DV.google_async_slots=3D{});va=
+r kb=3DV.google_unique_id,=0A=
+X=3DString("number"=3D=3Dtypeof kb?kb:0);if(X in W&&(X+=3D"b",X in =
+W))break =
+a;W[X]=3D{sent:i,w:V.google_ad_width||"",h:V.google_ad_height||"",adk:"-1=
+",type:V.google_ad_type||"",slot:V.google_ad_slot||"",fmt:V.google_ad_for=
+mat||"",cli:V.google_ad_client||"",saw:[]}}var =
+lb,mb=3DJ.google_adk_experiment,nb;if("control"=3D=3Dmb)nb=3D"control";el=
+se{var ob;if("expt"=3D=3Dmb){var =
+pb=3D[u.google_ad_slot,u.google_ad_format,u.google_ad_type,u.google_ad_wi=
+dth,u.google_ad_height];if(x){var Y;if(x){for(var =
+qb=3D[],rb=3D0,Z=3Dx;Z&&25>rb;Z=3DZ.parentNode,=0A=
+++rb)qb.push(9!=3DZ.nodeType&&Z.id||"");Y=3Dqb.join()}else =
+Y=3D"";Y&&pb.push(Y)}var sb=3D0;if(pb){var =
+tb=3Dpb.join(":"),ub=3Dtb.length;if(0=3D=3Dub)sb=3D0;else{for(var =
+$=3D305419896,vb=3D0;vb<ub;vb++)$^=3D($<<5)+($>>2)+tb.charCodeAt(vb)&4294=
+967295;sb=3D0<$?$:4294967296+$}}ob=3Dsb.toString()}else =
+ob=3Dh;nb=3Dob}lb=3Dnb;for(var =
+wb=3D0,xb=3DK.length;wb<xb;wb++)J[K[wb]]=3Dh;var yb=3D(new =
+Date).getTime(),zb=3DJ.google_top_experiment,Ab=3DJ.google_expand_experim=
+ent,Cb=3D"";Ia(J)&&(Cb=3DHa());var Db=3D["<!doctype =
+html><html><body><",_script$$inline_95,">",=0A=
+bb,"google_show_ads_impl=3Dtrue;google_unique_id=3D",J.google_unique_id,'=
+;google_async_iframe_id=3D"',P,'";google_start_time=3D',k,";",zb?'google_=
+top_experiment=3D"'+zb+'";':"",lb?'google_adk_sa=3D"'+lb+'";':"",Ab?'goog=
+le_expand_experiment=3D"'+Ab+'";':"","google_bpp=3D",yb>k?yb-k:1,";</",_s=
+cript$$inline_95,">",Cb,Ga(),"</body></html>"].join("");(J.document.getEl=
+ementById(P)?ta:ua)(Ka(J,P,Db,g))}else =
+window.s=3Dk,!("object"=3D=3Dtypeof window.o&&"function"=3D=3Dtypeof =
+window.o.createIframe)&&Ia(window)&&document.write(Ha()),=0A=
+document.write(Ga());})();=0A=
+
+------=_NextPart_000_0000_01CD9CF4.964B1A30--
