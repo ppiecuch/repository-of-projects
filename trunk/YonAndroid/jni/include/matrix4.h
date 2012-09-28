@@ -278,7 +278,6 @@ namespace core{
 		}
 
 		//TODO ´ýÍÆµ¼
-		//TODO ´ý²âÊÔ
 		inline vector3d<T> getScale() const
 		{
 			// Deal with the 0 rotation case first
@@ -387,10 +386,47 @@ namespace core{
 			return *this;
 		}
 
-		inline vector3d<T> getRotationRadians() const
+		//! Returns a rotation that is equivalent to that set by setRotationDegrees().
+		/**  Note that it does not necessarily return the *same* Euler angles as those set by setRotationDegrees(),
+		but the rotation will be equivalent, i.e. will have the same result when used to rotate a vector or node. */
+		inline vector3d<T> getRotationDegrees() const
 		{
 			const core::vector3d<T> scale = getScale();
 			const core::vector3d<f64> invScale(core::reciprocal(scale.x),core::reciprocal(scale.y),core::reciprocal(scale.z));
+
+			//fix bug:1.#QNAN of X exceed 1/-1
+			f64 temp=core::clamp(m[2][1]*invScale.z,-1.0,1.0);
+			f64 X = -asin(temp);
+			const f64 C = cos(X);
+			X *= RADTODEG64;
+
+			f64 a, b, Y, Z;
+			if (!core::iszero(C))
+			{
+				const f64 invC = core::reciprocal(C);
+				b = m[2][2] * invC * invScale.z;
+				a = m[2][0] * invC * invScale.z;
+				Y = atan2( a, b ) * RADTODEG64;
+				a = m[0][1] * invC * invScale.x;
+				b = m[1][1] * invC * invScale.y;
+				Z = atan2( a, b ) * RADTODEG64;
+			}
+			else
+			{
+				Y = 0.0;
+				a = -m[1][0] * invScale.y;
+				b = m[0][0] * invScale.x;
+				Z = atan2( a, b ) * RADTODEG64;
+			}
+
+			// fix values that get below zero
+			// before it would set (!) values to 360
+			// that were above 360:
+			if (X < 0.0) X += 360.0;
+			if (Y < 0.0) Y += 360.0;
+			if (Z < 0.0) Z += 360.0;
+
+			return vector3d<T>((T)X,(T)Y,(T)Z);
 		}
 
 		/*inline void upsidedown(){

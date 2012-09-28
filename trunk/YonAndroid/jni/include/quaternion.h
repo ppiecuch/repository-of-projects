@@ -103,6 +103,9 @@ namespace core{
 
 		//! Fills an angle (radians) around an axis (unit vector)
 		void toAngleAxis (f32 &angle, core::vector3df& axis) const;
+
+		//! Output this quaternion to an euler angle (radians)
+		void toEuler(vector3df& euler) const;
 	};
 
 	inline quaternion::quaternion(f32 x, f32 y, f32 z)
@@ -422,6 +425,24 @@ namespace core{
 			axis.y = y * invscale;
 			axis.z = z * invscale;
 		}
+	}
+
+	inline void quaternion::toEuler(vector3df& euler) const
+	{
+		const f64 sqw = w*w;
+		const f64 sqx = x*x;
+		const f64 sqy = y*y;
+		const f64 sqz = z*z;
+
+		// attitude = rotation about y-axis
+		euler.y = (f32) (atan2(2.0 * (x*y +w*z),(sqw - sqx + sqy - sqz)));
+
+		// bank = rotation about x-axis
+		euler.x = (f32) (atan2(2.0 * (x*z +w*y),(sqw - sqx - sqy + sqz)));
+
+		// heading = rotation about z-axis
+		euler.z = asinf( clamp(-2.0f * (y*z - w*x), -1.0f, 1.0f) );
+		
 	}
 }
 }

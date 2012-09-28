@@ -106,6 +106,11 @@ inline f32 reciprocal(const f32 f)
 	return 1.f/f;
 }
 
+inline f64 reciprocal ( const f64 f )
+{
+	return 1.0 / f;
+}
+
 inline bool iszero(const f64 a, const f64 tolerance = ROUNDING_ERROR_f64)
 {
 	return fabs(a) <= tolerance;
