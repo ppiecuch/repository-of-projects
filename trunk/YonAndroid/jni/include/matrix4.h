@@ -277,6 +277,22 @@ namespace core{
 			m_bIsChanged=true;
 		}
 
+		//TODO ´ýÍÆµ¼
+		//TODO ´ý²âÊÔ
+		inline vector3d<T> getScale() const
+		{
+			// Deal with the 0 rotation case first
+			if(core::iszero(m[0][1]) && core::iszero(m[0][2]) &&
+				core::iszero(m[1][0]) && core::iszero(m[1][2]) &&
+				core::iszero(m[2][0]) && core::iszero(m[2][1]))
+				return vector3d<T>(m[0][0], m[1][1], m[2][2]);
+
+			// We have to do the full calculation.
+			return vector3d<T>(sqrtf(m[0][0] * m[0][0] + m[0][1] * m[0][1] + m[0][2] * m[0][2]),
+				sqrtf(m[1][0] * m[1][0] + m[1][1] * m[1][1] + m[1][2] * m[1][2]),
+				sqrtf(m[2][0] * m[2][0] + m[2][1] * m[2][1] + m[2][2] * m[2][2]));
+		}
+
 
 		inline matrix4<T> operator*(const matrix4<T>& other) const{
 			 matrix4<T> r;
@@ -369,6 +385,12 @@ namespace core{
 
 
 			return *this;
+		}
+
+		inline vector3d<T> getRotationRadians() const
+		{
+			const core::vector3d<T> scale = getScale();
+			const core::vector3d<f64> invScale(core::reciprocal(scale.x),core::reciprocal(scale.y),core::reciprocal(scale.z));
 		}
 
 		/*inline void upsidedown(){

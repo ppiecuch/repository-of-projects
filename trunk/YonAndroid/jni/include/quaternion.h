@@ -27,6 +27,9 @@ namespace core{
 		//! Constructor which converts euler angles (radians) to a quaternion
 		quaternion(const vector3df& vec);
 
+		//! Constructor which converts a matrix to a quaternion
+		quaternion(const matrix4& mat);
+
 
 		//! Equalilty operator
 		bool operator==(const quaternion& other) const;
@@ -39,6 +42,9 @@ namespace core{
 
 		//! Assignment operator
 		inline quaternion& operator=(const quaternion& other);
+
+		//! Matrix assignment operator
+		inline quaternion& operator=(const matrix4f& other);
 
 		//! Add operator
 		quaternion operator+(const quaternion& other) const;
@@ -82,6 +88,9 @@ namespace core{
 		//! Normalizes the quaternion
 		inline quaternion& normalize();
 
+		//! Creates a matrix from this quaternion
+		matrix4f getMatrix() const;
+
 		//Axis must be unit length.==> make sure the quaternion to be a identity quaternion
 
 		//! Create quaternion from rotation angle and rotation axis.
@@ -104,6 +113,11 @@ namespace core{
 	inline quaternion::quaternion(const vector3df& vec)
 	{
 		set(vec.x,vec.y,vec.z);
+	}
+
+	inline quaternion::quaternion(const matrix4& mat)
+	{
+		(*this) = mat;
 	}
 
 	inline bool quaternion::operator==(const quaternion& other) const
@@ -134,6 +148,69 @@ namespace core{
 		z = other.z;
 		w = other.w;
 		return *this;
+	}
+
+	inline quaternion& quaternion::operator=(const matrix4f& m)
+	{
+		//TODO 优化
+		//scale=reciprocal(scale)
+
+		const f32 diag = m.m[0][0] + m.m[1][1] + m.m[2][2] + 1;
+
+		if( diag > 0.0f )
+		{
+			const f32 scale = sqrtf(diag) * 2.0f; // get scale from diagonal
+
+			// TODO: speed this up
+			x = ( m.m[1][2] - m.m[2][1]) / scale;
+			y = ( m.m[2][0] - m.m[0][2]) / scale;
+			z = ( m.m[0][1] - m.m[1][0]) / scale;
+			w = 0.25f * scale;
+		}
+		else
+		{
+			if ( m.m[0][0]> m.m[1][1] && m.m[0][0] > m.m[2][2])
+			{
+				// 1st element of diag is greatest value
+				// find scale according to 1st element, and double it
+				//x=sqrt(m11-m22-m33+1)/2
+				const f32 scale = sqrtf( 1.0f + m.m[0][0] - m.m[1][1] - m.m[2][2]) * 2.0f;
+
+				// TODO: speed this up
+				x = 0.25f * scale;
+				y = (m.m[1][0] + m.m[0][1]) / scale;
+				z = (m.m[0][2] + m.m[2][0]) / scale;
+				w = (m.m[1][2] - m.m[2][1]) / scale;
+			}
+			else if ( m.m[1][1] > m.m[2][2])
+			{
+				// 2nd element of diag is greatest value
+				// find scale according to 2nd element, and double it
+				//y=sqrt(-m11+m22-m33+1)/2
+				const f32 scale = sqrtf( 1.0f + m.m[1][1] - m.m[0][0] - m.m[2][2]) * 2.0f;
+
+				// TODO: speed this up
+				x = (m.m[1][0] + m.m[0][1] ) / scale;
+				y = 0.25f * scale;
+				z = (m.m[2][1] + m.m[1][2] ) / scale;
+				w = (m.m[2][0] - m.m[0][2] ) / scale;
+			}
+			else
+			{
+				// 3rd element of diag is greatest value
+				// find scale according to 3rd element, and double it
+				//z=sqrt(-m11-m22+m33+1)/2
+				const f32 scale = sqrtf( 1.0f + m(2,2) - m(0,0) - m(1,1)) * 2.0f;
+
+				// TODO: speed this up
+				x = (m.m[2][0] + m.m[0][2]) / scale;
+				y = (m.m[2][1] + m.m[1][2]) / scale;
+				z = 0.25f * scale;
+				w = (m.m[0][1] - m.m[1][0]) / scale;
+			}
+		}
+
+		return normalize();
 	}
 
 	inline quaternion quaternion::operator+(const quaternion& b) const
@@ -278,6 +355,36 @@ namespace core{
 
 		//n = 1.0f / sqrtf(n);
 		return (*this *= reciprocal_squareroot ( n ));
+	}
+
+	//TODO 测试
+	inline matrix4f quaternion::getMatrix() const
+	{
+		//TODO 优化
+		//const f32 xx2=x*x*2.0f;
+		//const f32 xy2=x*y*2.0f;
+		//....
+
+		matrix4f dest;
+		dest[0][0] = 1.0f - 2.0f*y*y - 2.0f*z*z;
+		dest[0][1] = 2.0f*x*y + 2.0f*z*w;
+		dest[0][2] = 2.0f*x*z - 2.0f*y*w;
+		dest[0][3] = 0.0f;
+
+		dest[1][0] = 2.0f*x*y - 2.0f*z*w;
+		dest[1][1] = 1.0f - 2.0f*x*x - 2.0f*z*z;
+		dest[1][2] = 2.0f*z*y + 2.0f*x*w;
+		dest[1][3] = 0.0f;
+
+		dest[2][0] = 2.0f*x*z + 2.0f*y*w;
+		dest[2][1] = 2.0f*z*y - 2.0f*x*w;
+		dest[2][2] = 1.0f - 2.0f*x*x - 2.0f*y*y;
+		dest[2][3] = 0.0f;
+
+		dest[3][0] = 0.f;
+		dest[3][1] = 0.f;
+		dest[3][2] = 0.f;
+		dest[3][3] = 1.f;
 	}
 
 	inline quaternion& quaternion::fromAngleAxis(f32 angle, const vector3df& axis)
