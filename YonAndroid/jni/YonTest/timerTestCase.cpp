@@ -1,6 +1,6 @@
 #include "timerTestCase.h"
 #include <Windows.h>
-#include "CTimerWin32.cpp"
+//#include "CTimerWin32.cpp"
 
 //CPPUNIT_TEST_SUITE_REGISTRATION( timerTestCase );
 

@@ -1,9 +1,52 @@
 #include "matrixTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
 
 void matrixTestCase::setUp()
 {
+}
+void matrixTestCase::getRotationDegrees(){
+	matrix4f m1(true);
+	core::vector3df r=core::vector3df(30.f,270.f,120.f);
+	m1.setRotationDegrees(r);
+	m1.translate(11.f,12.f,33.f);
+	m1.scale(core::vector3df(2.f,3.f,4.f));
+	
+	core::vector3df v=m1.getRotationDegrees();
+	printf("\n");
+	m1.print();
+	printf("%.2f,%.2f,%.2f\n",v.x,v.y,v.z);
+	
+
+	matrix4f m2(true);
+	m2.setRotationDegrees(v);
+	m2.translate(11.f,12.f,33.f);
+	m2.scale(core::vector3df(2.f,3.f,4.f));
+	
+	m2.print();
+
+	CPPUNIT_ASSERT(v.equals(r,0.0001f));
+}
+void matrixTestCase::getScale() {
+	matrix4f m1(true);
+	core::vector3df v=core::vector3df(1.5f,2.5f,3.5f);
+	m1.translate(20,30,40);
+	m1.setRotationDegrees(core::vector3df(0,90,0));
+	m1.setRotationDegrees(core::vector3df(90,0,0));
+	m1.translate(20,30,40);
+	m1.setRotationDegrees(core::vector3df(0,0,90));
+	m1.scale(v);
+	printf("\n");
+	core::vector3df s=m1.getScale();
+	printf("%.2f,%.2f,%.2f\n",s.x,s.y,s.z);
+	CPPUNIT_ASSERT(v==s);
+
+	core::vector3df w=core::vector3df(3.5f,3.5f,3.5f);
+	m1.scale(w);
+	s=m1.getScale();
+	printf("%.2f,%.2f,%.2f\n",s.x,s.y,s.z);
+	w*=v;
+	CPPUNIT_ASSERT(w==s);
 }
 void matrixTestCase::transformVect(){
 	matrix4f m1(true);
