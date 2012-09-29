@@ -1,6 +1,6 @@
 #include "matrixTestCase.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
 
 void matrixTestCase::setUp()
 {

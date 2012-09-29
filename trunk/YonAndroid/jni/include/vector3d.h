@@ -71,6 +71,13 @@ namespace core{
 				core::equals(z, other.z, tolerance);
 		}
 
+		bool isNormalized() const
+		{
+			core::vector3d<T> temp(*this);
+			temp.normalize();
+			return temp==*this;
+		}
+
 
 		vector3d<T>& set(const T nx, const T ny, const T nz) {x=nx; y=ny; z=nz; return *this;}
 		vector3d<T>& set(const vector3d<T>& p) {x=p.x; y=p.y; z=p.z;return *this;}
