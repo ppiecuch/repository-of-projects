@@ -219,6 +219,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\quaternionTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\quaternionTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\rbtreeTestCase.cpp"
 			>
 		</File>

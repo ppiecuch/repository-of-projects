@@ -36,7 +36,7 @@ namespace io{
 		//格式如下： "<drive>:/<directory>/<sudirectory>/<..>". 如 "C:/Windows/","/sdcard/","../media/"
 		virtual void addWorkingDirectory(const io::path& newDirectory, bool recurse=false) = 0;
 		virtual s32 getWorkingDirectoryCount(){return 0;}
-		virtual const io::path& getWorkingDirectory(s32 index) = 0;
+		virtual const io::path& getWorkingDirectory(u32 index) = 0;
 		//获取绝对路径
 		virtual io::path getAbsolutePath(const io::path& filename) const = 0;
 		//获取资源绝对路径
