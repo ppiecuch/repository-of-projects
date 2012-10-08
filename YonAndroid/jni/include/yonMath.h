@@ -38,6 +38,14 @@ inline T abs_(const T& a)
 {
 	return a <(T)0? -a : a;
 }
+//! returns linear interpolation of a and b with ratio t
+//! \return: a if t==0, b if t==1, and the linear interpolation else
+template<class T>
+inline T lerp(const T& a, const T& b, const f32 t)
+{
+	return (T)(a*(1.f-t)) + (b*t);
+}
+
 //! returns minimum of two values. Own implementation to get rid of the STL (VS6 problems)
 template<class T>
 inline const T& min_(const T& a, const T& b)
