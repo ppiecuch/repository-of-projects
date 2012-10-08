@@ -173,6 +173,20 @@ namespace scene{
 		virtual void setVisible(bool on){
 			m_bVisible=on;
 		}
+		
+		//! Changes the parent of the scene node.
+		virtual void setParent(IModel* newParent)
+		{
+			grab();
+			removeFromParent();
+
+			m_parent = newParent;
+
+			if (m_parent)
+				m_parent->addChild(this);
+
+			drop();
+		}
 
 		virtual bool removeFromParent(){
 			if(m_parent){
@@ -227,6 +241,12 @@ namespace scene{
 			}
 		}
 
+    //! OnAnimate() is called just before rendering the whole scene.
+		/** Nodes may calculate or store animations here, and may do other useful things,
+		depending on what they are. Also, OnAnimate() should be called for all
+		child scene nodes here. This method will be called once per frame, independent
+		of whether the scene node is visible or not.
+		\param timeMs Current time in milliseconds. */
 		virtual void onAnimate(u32 timeMs)
 		{
 			if(m_bVisible)
@@ -234,6 +254,9 @@ namespace scene{
 				core::list<animator::IAnimator*>::Iterator ait=m_animators.begin();
 				for (; ait != m_animators.end(); ++ait)
 					(*ait)->animateNode(this,timeMs);
+					
+				// update absolute position
+				//updateAbsolutePosition();
 
 				core::list<IModel*>::Iterator mit = m_children.begin();
 				for (; mit != m_children.end(); ++mit)

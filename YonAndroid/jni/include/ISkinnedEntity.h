@@ -56,7 +56,7 @@ namespace scene{
 		struct SJoint
 		{
 			SJoint() : UseAnimationFrom(0), LocalAnimatedMatrix_Animated(false), GlobalSkinningSpace(false),
-				positionHint(-1),scaleHint(-1),rotationHint(-1)
+				positionHint(-1),scaleHint(-1),rotationHint(-1),GlobalInversedMatrix(true),LocalMatrix(true)
 			{
 			}
 
@@ -95,8 +95,8 @@ namespace scene{
 			core::matrix4 GlobalInversedMatrix; //the x format pre-calculates this
 
 		private:
-			//! Internal members used by CSkinnedMesh
-			friend class CSkinnedMesh;
+			//! Internal members used by CSkinnedEntity
+			friend class CSkinnedEntity;
 
 			SJoint *UseAnimationFrom;
 			bool LocalAnimatedMatrix_Animated;
@@ -122,8 +122,9 @@ namespace scene{
 		//! Preforms a software skin on this mesh based of joint positions
 		virtual void skinEntity() = 0;
 
-		//! exposed for loaders: to add mesh buffers
-		virtual core::array<SSkinMeshBuffer*>& getMeshBuffers() = 0;
+		//! exposed for loaders: to add units
+		//virtual core::array<SSkinMeshBuffer*>& getMeshBuffers() = 0;
+		virtual core::array<Unit3D*>& getUnits() = 0;
 
 		//! exposed for loaders: joints list
 		virtual core::array<SJoint*>& getAllJoints() = 0;
@@ -134,8 +135,9 @@ namespace scene{
 		//! loaders should call this after populating the mesh
 		virtual void finalize() = 0;
 
-		//! Adds a new meshbuffer to the mesh, access it as last one
-		virtual SSkinMeshBuffer* addMeshBuffer() = 0;
+		//! Adds a new unit to the entity, access it as last one
+		//virtual SSkinMeshBuffer* addMeshBuffer() = 0;
+		virtual Unit3D* addUnit() = 0;
 
 		//! Adds a new joint to the mesh, access it as last one
 		virtual SJoint* addJoint(SJoint *parent=0) = 0;

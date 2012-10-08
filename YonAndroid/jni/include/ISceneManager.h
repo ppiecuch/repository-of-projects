@@ -9,6 +9,7 @@
 #include "IAnimatorFactory.h"
 #include "SKeyMap.h"
 #include "IStream.h"
+#include "ISkinnedEntity.h"
 
 namespace yon{
 namespace scene{
@@ -112,6 +113,9 @@ namespace scene{
 
 		virtual IAnimatedEntity* createEntityFromFile(const io::path& filename) = 0;
 		virtual IAnimatedEntity* createEntityFromFile(const io::IReadStream* file) = 0;
+			
+		//! Get a skinned entity, which is not available as header-only code
+		virtual ISkinnedEntity* createSkinnedEntity() = 0;
 	};
 
 }
