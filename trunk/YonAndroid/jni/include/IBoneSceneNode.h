@@ -21,7 +21,7 @@ namespace scene{
 		virtual void render() {}
 
 		//! Updates the absolute position based on the relative and the parents position
-		virtual void updateAbsolutePositionOfAllChildren()=0;
+		//virtual void updateAbsolutePositionOfAllChildren()=0;
 
 		//! Get the axis aligned bounding box of this node
 		//virtual const core::aabbox3d<f32>& getBoundingBox() const = 0;
