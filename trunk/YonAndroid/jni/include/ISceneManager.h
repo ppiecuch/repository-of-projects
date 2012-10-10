@@ -111,11 +111,11 @@ namespace scene{
 		virtual IModel* addSkyBoxModel(video::ITexture* front, video::ITexture* back, video::ITexture* left,
 			video::ITexture* right, video::ITexture* top, video::ITexture* bottom,IModel* parent=NULL) = 0;
 
-		virtual IAnimatedEntity* createEntityFromFile(const io::path& filename) = 0;
-		virtual IAnimatedEntity* createEntityFromFile(const io::IReadStream* file) = 0;
+		virtual IAnimatedEntity* getEntity(const io::path& filename) = 0;
+		virtual IAnimatedEntity* getEntity(io::IReadStream* file) = 0;
 			
 		//! Get a skinned entity, which is not available as header-only code
-		virtual ISkinnedEntity* createSkinnedEntity() = 0;
+		//virtual ISkinnedEntity* createSkinnedEntity() = 0;
 	};
 
 }

@@ -15,6 +15,17 @@
 namespace yon{
 namespace scene{
 
+	enum MASK_RENDER_DEBUG_CONFIG{
+		MASK_RENDER_DEBUG_CONFIG_OFF = 0,					//! No Debug Data ( Default )
+		MASK_RENDER_DEBUG_CONFIG_BBOX = 1,					//! Show Bounding Boxes of SceneNode
+		MASK_RENDER_DEBUG_CONFIG_NORMAL = 2,				//! Show Vertex Normals
+		MASK_RENDER_DEBUG_CONFIG_SKELETON = 4,				//! Shows Skeleton/Tags
+		MASK_RENDER_DEBUG_CONFIG_WIREFRAME = 8,				//! Overlays Mesh Wireframe
+		MASK_RENDER_DEBUG_CONFIG_HALF_TRANSPARENCY = 16,	//! Temporary use transparency Material Type
+		MASK_RENDER_DEBUG_CONFIG_BBOX_UNITS = 32,			//! Show Bounding Boxes of all MeshBuffers
+		MASK_RENDER_DEBUG_CONFIG_FULL = 0xFFFFFFFF
+	};
+
 	class ISceneManager;
 
 	class IModel : public virtual core::IReferencable, public virtual IRenderable{
@@ -30,6 +41,8 @@ namespace scene{
 		core::vector3df m_rotation;
 		core::vector3df m_scale;
 		bool m_bVisible;
+
+		u32 m_renderDebugConfig;
 
 		
 		
@@ -106,6 +119,10 @@ namespace scene{
 			clearChildren();
 			//Logger->debug("clearChildren\n");
 			clearAnimators();
+		}
+
+		void setRenderDebugConfig(MASK_RENDER_DEBUG_CONFIG config,bool on){
+			m_renderDebugConfig = (m_renderDebugConfig & (~config)) |((((u32)!on)-1) & config);
 		}
 
 		virtual void setPosition(const core::vector3df& pos){
@@ -241,7 +258,7 @@ namespace scene{
 			}
 		}
 
-    //! OnAnimate() is called just before rendering the whole scene.
+		//! OnAnimate() is called just before rendering the whole scene.
 		/** Nodes may calculate or store animations here, and may do other useful things,
 		depending on what they are. Also, OnAnimate() should be called for all
 		child scene nodes here. This method will be called once per frame, independent

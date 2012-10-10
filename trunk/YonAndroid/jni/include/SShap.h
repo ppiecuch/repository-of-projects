@@ -10,6 +10,7 @@ namespace yon{
 namespace scene{
 
 	class CGeometryFactory;
+	struct SSkinnedUnit;
 
 	template<class V,class I,size_t VT>
 	class SShap : public IShap{
@@ -23,6 +24,7 @@ namespace scene{
 		u32 m_uIndicesChangedId;
 
 		friend class CGeometryFactory;
+		friend struct SSkinnedUnit;
 	public:
 		SShap()
 			:m_uVerticesChangedId((s_lCounter<<16)+1),m_uIndicesChangedId((s_lCounter<<16)+1){

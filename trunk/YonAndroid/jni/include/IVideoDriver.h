@@ -23,7 +23,7 @@ namespace yon{
 	namespace scene{
 		class IUnit;
 		class ISceneManager;
-		ISceneManager* createSceneManager(ITimer* timer,platform::ICursorControl* cursorControl);
+		ISceneManager* createSceneManager(ITimer* timer,io::IFileSystem* fileSystem,platform::ICursorControl* cursorControl);
 	}
 
 	namespace video{

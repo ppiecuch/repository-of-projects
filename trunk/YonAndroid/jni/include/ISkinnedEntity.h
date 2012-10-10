@@ -4,6 +4,8 @@
 #include "yonArray.h"
 #include "IBoneSceneNode.h"
 #include "IAnimatedEntity.h"
+#include "SSkinnedUnit.h"
+#include "quaternion.h"
 
 namespace yon{
 namespace scene{
@@ -64,13 +66,13 @@ namespace scene{
 			core::stringc Name;
 
 			//! Local matrix of this joint
-			core::matrix4 LocalMatrix;
+			core::matrix4f LocalMatrix;
 
 			//! List of child joints
 			core::array<SJoint*> Children;
 
-			//! List of attached meshes
-			core::array<u32> AttachedMeshes;
+			//! List of attached units
+			core::array<u32> AttachedUnits;
 
 			//! Animation keys causing translation change
 			core::array<SPositionKey> PositionKeys;
@@ -92,7 +94,7 @@ namespace scene{
 			core::vector3df Animatedscale;
 			core::quaternion Animatedrotation;
 
-			core::matrix4 GlobalInversedMatrix; //the x format pre-calculates this
+			core::matrix4f GlobalInversedMatrix; //the x format pre-calculates this
 
 		private:
 			//! Internal members used by CSkinnedEntity
@@ -117,14 +119,14 @@ namespace scene{
 		virtual u32 getJointCount() const = 0;
 
 		//! Animates this mesh's joints based on frame input
-		virtual void animateMesh(f32 frame, f32 blend)=0;
+		virtual void animateEntity(f32 frame, f32 blend)=0;
 
 		//! Preforms a software skin on this mesh based of joint positions
 		virtual void skinEntity() = 0;
 
 		//! exposed for loaders: to add units
 		//virtual core::array<SSkinMeshBuffer*>& getMeshBuffers() = 0;
-		virtual core::array<Unit3D*>& getUnits() = 0;
+		virtual core::array<SSkinnedUnit*>& getUnits() = 0;
 
 		//! exposed for loaders: joints list
 		virtual core::array<SJoint*>& getAllJoints() = 0;
@@ -137,7 +139,7 @@ namespace scene{
 
 		//! Adds a new unit to the entity, access it as last one
 		//virtual SSkinMeshBuffer* addMeshBuffer() = 0;
-		virtual Unit3D* addUnit() = 0;
+		virtual SSkinnedUnit* addUnit() = 0;
 
 		//! Adds a new joint to the mesh, access it as last one
 		virtual SJoint* addJoint(SJoint *parent=0) = 0;
