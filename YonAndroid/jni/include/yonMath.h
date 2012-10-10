@@ -139,6 +139,23 @@ inline bool iszero(const u32 a, const u32 tolerance = 0)
 	return a <= tolerance;
 }
 
+inline s32 s32_min(s32 a, s32 b)
+{
+	const s32 mask = (a - b) >> 31;
+	return (a & mask) | (b & ~mask);
+}
+
+inline s32 s32_max(s32 a, s32 b)
+{
+	const s32 mask = (a - b) >> 31;
+	return (b & mask) | (a & ~mask);
+}
+
+inline s32 s32_clamp (s32 value, s32 low, s32 high)
+{
+	return s32_min(s32_max(value,low), high);
+}
+
 template<class T>
 inline const T square(const T& a)
 {

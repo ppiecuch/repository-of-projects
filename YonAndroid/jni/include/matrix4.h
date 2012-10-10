@@ -268,6 +268,9 @@ namespace core{
 		inline void scale(const vector3d<T>& v){
 			scale(v.x,v.y,v.z);
 		}
+		inline void setScale(const vector3df& v){
+			setScale(v.x,v.y,v.z);
+		}
 		inline void setScale(f32 x,f32 y,f32 z){
 			m[0][0] = (T)x;
 			m[1][1] = (T)y;
@@ -624,6 +627,13 @@ namespace core{
 			vect.x = vector[0];
 			vect.y = vector[1];
 			vect.z = vector[2];
+		}
+
+		inline void transformVect( vector3df& out, const vector3df& in) const
+		{
+			out.x = in.x*m[0][0] + in.y*m[1][0] + in.z*m[2][0] + m[3][0];
+			out.y = in.x*m[0][1] + in.y*m[1][1] + in.z*m[2][1] + m[3][1];
+			out.z = in.x*m[0][2] + in.y*m[1][2] + in.z*m[2][2] + m[3][2];
 		}
 	};
 

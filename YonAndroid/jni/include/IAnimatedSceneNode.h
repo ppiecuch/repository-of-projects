@@ -7,6 +7,9 @@
 namespace yon{
 namespace scene{
 
+	class IAnimatedEntity;
+	class IBoneSceneNode;
+
 	class IAnimatedSceneNode : public IModel{
 	public:
 		IAnimatedSceneNode(IModel* parent,const core::vector3df& pos=core::vector3df(0,0,0),
@@ -40,9 +43,6 @@ namespace scene{
 
 		virtual void setCurrentFrame(f32 frame) = 0;
 		virtual f32 getCurrentFrame() = 0;
-		virtual bool setFrameLoop(s32 begin, s32 end) = 0;
-		virtual void setAnimationSpeed(f32 framesPerSecond) = 0;
-		virtual f32 getAnimationSpeed() const =0;
 
 		//! animates the joints in the mesh based on the current frame.
 		/** Also takes in to account transitions. */
@@ -63,7 +63,7 @@ namespace scene{
 		\return Pointer to the scene node which represents the joint
 		with the specified name. Returns 0 if the contained mesh is not
 		an skinned mesh or the name of the joint could not be found. */
-		virtual IBoneSceneNode* getJointNode(const c8* jointName)=0;
+		//virtual IBoneSceneNode* getJointNode(const c8* jointName) = 0 ;
 
 		//! same as getJointNode(const c8* jointName), but based on id
 		//virtual IBoneSceneNode* getJointNode(u32 jointID) = 0;
