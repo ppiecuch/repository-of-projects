@@ -115,7 +115,7 @@ namespace scene{
 		virtual IAnimatedEntity* getEntity(io::IReadStream* file) = 0;
 			
 		//! Get a skinned entity, which is not available as header-only code
-		//virtual ISkinnedEntity* createSkinnedEntity() = 0;
+		virtual ISkinnedEntity* createSkinnedEntity() = 0;
 	};
 
 }

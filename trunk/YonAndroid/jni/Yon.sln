@@ -224,6 +224,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonCompressPVR", "YonCompre
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonXC3D", "YonXC3D\YonXC3D.vcproj", "{30A0D811-B39B-46C3-A7C5-914372F4887C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -410,6 +415,10 @@ Global
 		{C839D9B7-3B26-4282-8D51-C461D72AE382}.Debug|Win32.Build.0 = Debug|Win32
 		{C839D9B7-3B26-4282-8D51-C461D72AE382}.Release|Win32.ActiveCfg = Release|Win32
 		{C839D9B7-3B26-4282-8D51-C461D72AE382}.Release|Win32.Build.0 = Release|Win32
+		{30A0D811-B39B-46C3-A7C5-914372F4887C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{30A0D811-B39B-46C3-A7C5-914372F4887C}.Debug|Win32.Build.0 = Debug|Win32
+		{30A0D811-B39B-46C3-A7C5-914372F4887C}.Release|Win32.ActiveCfg = Release|Win32
+		{30A0D811-B39B-46C3-A7C5-914372F4887C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
