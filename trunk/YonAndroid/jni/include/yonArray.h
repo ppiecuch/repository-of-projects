@@ -261,7 +261,7 @@ namespace core{
 				reallocate(newCapacity);
 			}
 
-			s32 i;
+			u32 i;
 			if(index==used){
 				for(i=0;i<count;++i)
 					//new (&data[used+i]) T(arr[i]);

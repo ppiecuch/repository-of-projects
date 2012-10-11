@@ -1,9 +1,35 @@
 #include "matrixTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( matrixTestCase );
 
 void matrixTestCase::setUp()
 {
+}
+void matrixTestCase::transformVect2(){
+	matrix4f m1(true);
+	m1.setRotationDegrees(core::vector3df(0,90,0));
+	core::vector3df v1(1,0,1);
+	core::vector3df v2;
+	m1.transformVect(v2,v1);
+	printf("\n");
+	printf("%.2f,%.2f,%.2f\n",v2.x,v2.y,v2.z);
+	CPPUNIT_ASSERT(v2==core::vector3df(1,0,-1));
+
+	matrix4f m2(true);
+	m2.setRotationDegrees(core::vector3df(0,-90,0));
+	core::vector3df v3(0,0,1);
+	core::vector3df v4;
+	m2.transformVect(v4,v3);
+	printf("%.2f,%.2f,%.2f\n",v4.x,v4.y,v4.z);
+	CPPUNIT_ASSERT(v4==core::vector3df(-1,0,0));
+
+	matrix4f m3(true);
+	m3.setScale(2,2,2);
+	core::vector3df v5(1,0,1);
+	core::vector3df v6;
+	m3.transformVect(v6,v5);
+	printf("%.2f,%.2f,%.2f\n",v6.x,v6.y,v6.z);
+	CPPUNIT_ASSERT(v6==core::vector3df(2,0,2));
 }
 void matrixTestCase::getRotationDegrees(){
 	matrix4f m1(true);
