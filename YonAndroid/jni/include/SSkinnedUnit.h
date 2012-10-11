@@ -10,6 +10,9 @@ namespace scene{
 
 	struct SSkinnedUnit : public Unit3D{
 	public:
+		SSkinnedUnit():Unit3D(){
+			this->m_pShap=new Shap3D();
+		}
 		SVertex* getVertex(u32 index){
 			if(m_pShap)
 			{
@@ -20,12 +23,12 @@ namespace scene{
 		}
 
 		core::array<SVertex>& getVertexArray(){
-			YON_DEBUG_BREAK_IF(this->m_pShap);
+			YON_DEBUG_BREAK_IF(this->m_pShap==NULL);
 			Shap3D* shap=reinterpret_cast<Shap3D*>(this->m_pShap);
 			return shap->m_vertices;
 		}
 		core::array<u16>& getIndexArray(){
-			YON_DEBUG_BREAK_IF(this->m_pShap);
+			YON_DEBUG_BREAK_IF(this->m_pShap==NULL);
 			Shap3D* shap=reinterpret_cast<Shap3D*>(this->m_pShap);
 			return shap->m_indices;
 		}

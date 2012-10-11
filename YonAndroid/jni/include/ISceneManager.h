@@ -49,13 +49,18 @@ namespace scene{
 	}
 
 	class IAnimatedEntity;
+	class IAnimatedSceneNode;
 
 	//class ISceneManager : public virtual core::IRenderable{
 	class ISceneManager : public virtual core::IReferencable,public virtual IRenderable{
 	public:
 		virtual ~ISceneManager() {}
 
+		//TODO Ìí¼Óparent,pos,rotation,scale
 		virtual IModel* addModel(IEntity* entity) = 0;
+		//TODO Ìí¼Óparent,pos,rotation,scale
+		virtual IAnimatedSceneNode* addAnimatedSceneNode(IAnimatedEntity* entity) = 0;
+
 		virtual IModel* getRootModel() = 0;
 
 		virtual void clearModels() = 0;

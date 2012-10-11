@@ -15,10 +15,6 @@ IRandomizer* randomizer=NULL;
 
 IModel* planeModel=NULL;
 IModel* teapotModel=NULL;
-ITerrainModel* terrainModel=NULL;
-IModel* skyboxModel=NULL;
-IWaterModel* waterModel=NULL;
-video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -51,7 +47,7 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
@@ -73,14 +69,17 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
-	fs->addWorkingDirectory("../media\\skybox\\6");
-	fs->addWorkingDirectory("../media/terrain/2");
-	fs->addWorkingDirectory("../media/water/1");
+	fs->addWorkingDirectory("../media/xc3d",true);
 	//fs->addWorkingDirectory("../media/terrain/heightmap/plain");
 	fs->addWorkingDirectory("../media/terrain/heightmap/rough");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/png/");
 #endif
+
+	IAnimatedEntity* entity=sceneMgr->getEntity("miner.xc3d");
+	IAnimatedSceneNode* node=sceneMgr->addAnimatedSceneNode(entity);
+	//临时需要drop，添加EntityCache后就不用了
+	entity->drop();
 
 	
 	return true;
@@ -94,7 +93,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,cam(%.2f,%.2f,%.2f)",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),pos.x,pos.y,pos.z),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
 	videoDriver->setTransform(ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
