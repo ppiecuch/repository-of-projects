@@ -229,6 +229,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonXC3D", "YonXC3D\YonXC3D.
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dae2y3d", "dae2y3d\dae2y3d.vcproj", "{33348559-ABE5-4586-AA15-DA920A7829BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -419,6 +421,10 @@ Global
 		{30A0D811-B39B-46C3-A7C5-914372F4887C}.Debug|Win32.Build.0 = Debug|Win32
 		{30A0D811-B39B-46C3-A7C5-914372F4887C}.Release|Win32.ActiveCfg = Release|Win32
 		{30A0D811-B39B-46C3-A7C5-914372F4887C}.Release|Win32.Build.0 = Release|Win32
+		{33348559-ABE5-4586-AA15-DA920A7829BA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{33348559-ABE5-4586-AA15-DA920A7829BA}.Debug|Win32.Build.0 = Debug|Win32
+		{33348559-ABE5-4586-AA15-DA920A7829BA}.Release|Win32.ActiveCfg = Release|Win32
+		{33348559-ABE5-4586-AA15-DA920A7829BA}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
