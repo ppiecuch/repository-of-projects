@@ -4,14 +4,9 @@
 #include "yonConfig.h"
 #include "IReferencable.h"
 #include "yonString.h"
-#include "position2d.h"
-#include "SColor.h"
 
 
 namespace yon{
-	namespace video{
-		class IVideoDriver;
-	}
 namespace debug{
 
 	enum MASK_FORMAT{
@@ -56,15 +51,10 @@ namespace debug{
 		virtual void warn(const c8* pFmt, ...) = 0;
 		virtual void error(const c8* pFmt, ...) = 0;
 
-		//virtual void setDebugPrinter(const video::IVideoDriver* driver,IDebugPrinter* printer) = 0;
-		//virtual IDebugPrinter* getDebugPrinter() const = 0;
-		//virtual IDebugPrinter* getDebugPrinter(const video::IVideoDriver* driver) const = 0;
-		virtual void drawString(const video::IVideoDriver* driver,const core::stringc& str,const core::position2di& pos=core::position2di(0,0),const video::SColor& color=video::COLOR_WHITE) = 0;
-		virtual void render(const video::IVideoDriver* driver) = 0;
 
 	};
 	//日志对象,供多方共享
-	YON_API extern ILogger* Logger;
+	extern ILogger* Logger;
 }//debug
 	using namespace debug;
 }//yon

@@ -70,7 +70,7 @@ namespace core{
 			*this=other;
 		}
 
-		inline void print(){
+		inline void print() const{
 			if(Logger){
 				for(u32 i=0;i<4;++i)
 					Logger->debug("%.3f,%.3f,%.3f,%.3f\n",m[0][i],m[1][i],m[2][i],m[3][i]);
@@ -111,6 +111,11 @@ namespace core{
 			}
 			//不用调整，转置行为不影响是否单位变化
 			//m_bIsChanged = true;
+		}
+		inline matrix4<T> getTransposed() const{
+			matrix4<T> t(*this);
+			t.makeTranspose();
+			return t;
 		}
 		//不存在逆矩阵则返回false
 		inline bool makeInverse(){

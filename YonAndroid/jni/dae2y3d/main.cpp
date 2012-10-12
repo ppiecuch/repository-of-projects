@@ -1,14 +1,28 @@
 #include "stdio.h"
 #include <iostream>
+#include "CXMLReaderImpl.h"
+#include "CReadFileStream.h"
+#include "CWriteFileStream.h"
+#include "CLogger.h"
 using namespace std;
 
+using namespace yon;
+using namespace yon::io;
+
+
+
+namespace yon{
+	namespace debug{
+		ILogger* Logger=NULL;
+	}
+}
 
 int main(int argc, char* argv[])
 {
 	if(argc<3)
 	{
 		cout<<"No param!Please execute command as:"<<endl;
-		cout<<"dae2y3d [inputfile] [outputfile]"<<endl;
+		cout<<"dae2y3d [inputfile] [outputfile] [loglevel]"<<endl;
 		return 0;
 	}
 
@@ -29,4 +43,16 @@ int main(int argc, char* argv[])
 		fclose(file);
 		return 0;
 	}
+
+	Logger=new debug::CLogger();
+
+	IReadStream* in= new CReadFileStream(io::path(input),io::ENUM_ENDIAN_MODE_LITTLE);
+	IWriteStream* out= new CWriteFileStream(io::path(output),false,io::ENUM_ENDIAN_MODE_LITTLE);
+	XMLReader* reader=new CXMLReaderImpl<c8,core::IReferencable>(in);
+	dae2y3d(reader,out);
+	reader->drop();
+	in->drop();
+	out->drop();
+
+	Logger->drop();
 }
