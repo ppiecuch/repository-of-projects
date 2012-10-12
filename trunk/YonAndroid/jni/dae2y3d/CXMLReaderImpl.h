@@ -41,7 +41,7 @@ namespace io{
 		core::array<core::string<char_type> > m_specialCharacters;	// see createSpecialCharacterList()
 		core::array<SAttribute> m_attributes;						// attributes of current element
 
-		//bool IsEmptyElement;       // is the currently parsed node empty?
+		bool m_bIsEmptyElement;       // is the currently parsed node empty?
 
 		// finds a current attribute by name, returns 0 if not found
 		const SAttribute* getAttributeByName(const char_type* name) const
@@ -241,7 +241,7 @@ namespace io{
 		void parseClosingXMLElement()
 		{
 			m_currentNodeType = ENUM_XML_NODE_ELEMENT_END;
-			//IsEmptyElement = false;
+			m_bIsEmptyElement = false;
 			m_attributes.clear();
 
 			u32 nameStart=m_pStream->getPos();
@@ -260,6 +260,7 @@ namespace io{
 		void parseOpeningXMLElement()
 		{
 			m_currentNodeType = ENUM_XML_NODE_ELEMENT;
+			m_bIsEmptyElement=false;
 			m_attributes.clear();
 
 			// find name
@@ -332,7 +333,7 @@ namespace io{
 					{
 						// tag is closed directly
 						//++P;
-						// IsEmptyElement = true;
+						m_bIsEmptyElement = true;
 						break;
 					}
 					c=readNext();
@@ -343,7 +344,7 @@ namespace io{
 			if (nameEnd > nameStart && lastc == L'/')
 			{
 				// directly closing tag
-				//IsEmptyElement = true;
+				m_bIsEmptyElement = true;
 				//endName--;
 				--nameEnd;
 			}
@@ -583,10 +584,10 @@ namespace io{
 		}
 
 		//! Returns if an element is an empty element, like <foo />
-// 		virtual bool isEmptyElement() const
-// 		{
-// 			return IsEmptyElement;
-// 		}
+ 		virtual bool isEmptyElement() const
+ 		{
+ 			return m_bIsEmptyElement;
+ 		}
 
 		virtual ENUM_ENCODING getEncoding() const
 		{

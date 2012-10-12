@@ -3,7 +3,6 @@
 #include <memory.h>
 #include <time.h>
 #include <sys/timeb.h>
-#include "IDebugPrinter.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 #define FOREGROUND_WHITE FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE
@@ -29,7 +28,6 @@ namespace yon{
 		CLogger::CLogger():
 			m_name("log.txt"),m_pFile(NULL),
 			m_level(ENUM_LOG_LEVEL_DEBUG),
-			//m_pPrinter(NULL),
 #ifdef YON_COMPILE_WITH_WIN32
 			m_path(""),
 			m_format(MASK_FORMAT_DATE|MASK_FORMAT_TIME|MASK_FORMAT_MSEC|MASK_FORMAT_LEVEL|MASK_FORMAT_LOG),
@@ -56,41 +54,6 @@ namespace yon{
 			#else
 			pthread_mutex_destroy(&m_mutex);
 			#endif
-		}
-
-		void CLogger::drawString(const video::IVideoDriver* driver,const core::stringc& str,const core::position2di& pos,const video::SColor& color){
-			//if(m_pPrinter)
-			//	m_pPrinter->drawString(str,pos,color);
-			core::map<const video::IVideoDriver*,IDebugPrinter*>::Node* n=m_printerMap.find(driver);
-			if(n)
-				n->getValue()->drawString(str,pos,color);
-		}
-		void CLogger::render(const video::IVideoDriver* driver){
-			//if(m_pPrinter==NULL)
-			//	return;
-			core::map<const video::IVideoDriver*,IDebugPrinter*>::Node* n=m_printerMap.find(driver);
-			if(n==NULL)
-				return;
-				
-			core::position2di pos(0,0);
-			static core::dimension2du step(getDebugPrinterFontStep());
-			u32 count,i;
-			core::stringc str;
-			lock();
-			core::list<core::stringc>::Iterator it=queue.begin(); 
-			count=queue.size();
-			for(i=0;it!=queue.end();++it,++i){
-				pos.y=(count-i)*step.h;
-				n->getValue()->drawString(*it,pos,video::COLOR_GREEN);
-				
-				//str+=core::stringc("%s%c",it->c_str(),0x1);
-			}
-			unlock();
-			//m_pPrinter->drawString(str,pos,video::COLOR_GREEN);
-		}
-		void CLogger::setDebugPrinter(const video::IVideoDriver* driver,IDebugPrinter* printer){
-			//m_pPrinter=printer;
-			m_printerMap.set(driver,printer);
 		}
 
 		void CLogger::setPath(const core::stringc& path){
@@ -195,7 +158,7 @@ namespace yon{
 				return;
 			if(m_pFile==NULL&&(m_appender&MASK_APPENDER_FILE)){
 #ifdef YON_COMPILE_WITH_WIN32
-				errno_t result=fopen_s(&m_pFile,(m_path+m_name).c_str(),"a+");
+				errno_t result=fopen_s(&m_pFile,(m_path+m_name).c_str(),"w+");
 				if(result)
 				{
 					core::stringc msg("open log file:");
@@ -233,13 +196,6 @@ namespace yon{
 				sprintf_s(m_buffer+index,2,"\n");
 			}
 			unlock();
-			if(m_appender&MASK_APPENDER_SCREEN){
-				lock();
-				queue.push_back(core::stringc(m_buffer));
-				if(queue.size()>20)
-					queue.erase(queue.begin());
-				unlock();
-			}
 			if(m_appender&MASK_APPENDER_FILE){
 				fprintf(m_pFile,"%s",m_buffer);
 			}

@@ -2,8 +2,6 @@
 #define _YON_DEBUG_CLOGGER_H_
 
 #include "ILogger.h"
-#include "yonList.h"
-#include "yonMap.h"
 
 #ifdef YON_COMPILE_WITH_WIN32
 #include <windows.h>
@@ -41,12 +39,7 @@ namespace yon{
 			const static u32 BUFFER_SIZE=1024;
 			c8 m_buffer[BUFFER_SIZE];
 		//日志级别名称
-			//const static core::stringc LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];
 			const static c8* LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];
-		//文件打印机
-			//IDebugPrinter* m_pPrinter;
-			core::map<const video::IVideoDriver*,IDebugPrinter*> m_printerMap;
-			core::list<core::stringc> queue;
 		protected:
 			virtual void lock();
 			virtual void unlock();
@@ -67,14 +60,6 @@ namespace yon{
 			virtual void info(const c8* pFmt, ...);
 			virtual void warn(const c8* pFmt, ...);
 			virtual void error(const c8* pFmt, ...);
-
-			virtual void setDebugPrinter(const video::IVideoDriver* driver,IDebugPrinter* printer);
-			virtual IDebugPrinter* getDebugPrinter(const video::IVideoDriver* driver) const{
-				core::map<const video::IVideoDriver*,IDebugPrinter*>::Node* n=m_printerMap.find(driver);
-				return n?n->getValue():NULL;
-			}
-			virtual void drawString(const video::IVideoDriver* driver,const core::stringc& str,const core::position2di& pos,const video::SColor& color);
-			virtual void render(const video::IVideoDriver* driver);
 		};
 	}
 }
