@@ -351,6 +351,21 @@ namespace yon{
 			}
 
 			//TODO ´ý²âÊÔ
+			//! Erases a character from the string.
+			/** May be slow, because all elements
+			following after the erased element have to be copied.
+			\param index: Index of element to be erased. */
+			void erase(u32 index)
+			{
+				YON_DEBUG_BREAK_IF(index>=len) // access violation
+
+				for (u32 i=index+1; i<len; ++i)
+					elements[i-1] = elements[i];
+
+				--len;
+			}
+
+			//TODO ´ý²âÊÔ
 			//! Appends a character to this string
 			/** \param character: Character to append. */
 			void append(T character)
@@ -576,6 +591,73 @@ namespace yon{
 				}
 				return fastatof(&elements[index]);
 			}
+
+			//TODO ´ý²âÊÔ
+			//! Finds first position of a character not in a given list.
+			/** \param c: List of characters not to find. For example if the method
+			should find the first occurrence of a character not 'a' or 'b', this parameter should be "ab".
+			\param count: Amount of characters in the list. Usually,
+			this should be strlen(c)
+			\return Position where the character has been found,
+			or -1 if not found. */
+			template <class B>
+			s32 findFirstCharNotInList(const B* const c, u32 count) const
+			{
+				for (u32 i=0; i<len-1; ++i)
+				{
+					u32 j;
+					for (j=0; j<count; ++j)
+						if (elements[i] == c[j])
+							break;
+
+					if (j==count)
+						return i;
+				}
+
+				return -1;
+			}
+
+			//TODO ´ý²âÊÔ
+			//! Finds last position of a character not in a given list.
+			/** \param c: List of characters not to find. For example if the method
+			should find the first occurrence of a character not 'a' or 'b', this parameter should be "ab".
+			\param count: Amount of characters in the list. Usually,
+			this should be strlen(c)
+			\return Position where the character has been found,
+			or -1 if not found. */
+			template <class B>
+			s32 findLastCharNotInList(const B* const c, u32 count) const
+			{
+				for (s32 i=(s32)(len-2); i>=0; --i)
+				{
+					u32 j;
+					for (j=0; j<count; ++j)
+						if (elements[i] == c[j])
+							break;
+
+					if (j==count)
+						return i;
+				}
+
+				return -1;
+			}
+
+			//TODO ´ý²âÊÔ
+			//! Trims the string.
+			/** Removes the specified characters (by default, Latin-1 whitespace)
+			from the begining and the end of the string. */
+			string<T,TAlloc>& trim(const string<T,TAlloc> & whitespace = " \t\n\r")
+			{
+				// find start and end of the substring without the specified characters
+				const s32 begin = findFirstCharNotInList(whitespace.c_str(), whitespace.len);
+				if (begin == -1)
+					return (*this="");
+
+				const s32 end = findLastCharNotInList(whitespace.c_str(), whitespace.len);
+
+				return (*this = subString(begin, (end +1) - begin));
+			}
+
 			const T* c_str() const
 			{
 				return elements;

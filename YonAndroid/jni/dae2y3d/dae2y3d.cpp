@@ -1,4 +1,5 @@
 #include "dae2y3d.h"
+#include <string.h>
 
 class DAE2Y3DConvert{
 private:
@@ -524,10 +525,12 @@ protected:
 				}
 				else if(ELEM_MATRIX==nodeName)
 				{
-					core::matrix4 temp=readMatrixNode(xml);
+					core::matrix4f temp=readMatrixNode(xml);
 					node.Matrix=temp*node.Matrix;
-					core::matrix4& m=node.Matrix;
-					Logger->debug("\tNode matrix：\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n",m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+					core::matrix4f& m=node.Matrix;
+					//Logger->debug("\tNode matrix：\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n",m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+					Logger->debug("\tNode matrix：\r\n");
+					m.print();
 				}
 				else if(ELEM_NODE==nodeName)
 				{
@@ -605,8 +608,10 @@ protected:
 					}
 					printMatrix("AbsoluteTransform",node->AbsoluteTransform);
 
-					core::matrix4& m=node->Transform;
-					Logger->debug("\tJoint Transform：\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n",m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+					core::matrix4f& m=node->Transform;
+					//Logger->debug("\tJoint Transform：\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n",m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+					Logger->debug("\tJoint Transform：\r\n");
+					m.print();
 				}
 				else if(ELEM_NODE==nodeName)
 				{
@@ -1089,8 +1094,10 @@ protected:
 				{
 					skin.BindShapeMatrix=readMatrixNode(xml);
 
-					core::matrix4& m=skin.BindShapeMatrix;
-					Logger->debug("\tBindShapeMatrix：\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n",m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+					core::matrix4f& m=skin.BindShapeMatrix;
+					//Logger->debug("\tBindShapeMatrix：\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n",m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+					Logger->debug("\tBindShapeMatrix：\r\n");
+					m.print();
 				}
 				else if(ELEM_SOURCE==nodeName)
 				{
@@ -1135,10 +1142,13 @@ protected:
 						u32 index=0;
 						for(u32 i=0;i<count;i++)
 						{
-							skin.InverseBindMatrixs.push_back(core::matrix4());
-							core::matrix4& m=skin.InverseBindMatrixs.getLast();
-							for(u32 j=0;j<16;j++)
-								m[j]=source.FloatArray[index++];
+							skin.InverseBindMatrixs.push_back(core::matrix4f(true));
+							core::matrix4f& m=skin.InverseBindMatrixs.getLast();
+							//for(u32 j=0;j<16;j++)
+							//	m[j]=source.FloatArray[index++];
+							for(u32 j=0;j<4;++j)
+								for(u32 k=0;k<4;++k)
+									m.m[j][k]=source.FloatArray[index++];
 
 							printMatrix("m",m);
 						}
@@ -1242,7 +1252,7 @@ protected:
 					readIntsInsideElement(xml,vertexWeights.V);
 					core::stringc str("\tV:");
 					for(u32 i=0;i<vertexWeights.V.size();i++)
-						str.append("%d,",vertexWeights.V[i]);
+						str.append(core::stringc("%d,",vertexWeights.V[i]));
 					str.append("\r\n");
 					Logger->debug("%s",str.c_str());
 				}
@@ -1599,7 +1609,7 @@ protected:
 	core::stringc getId(XMLReader* xml)
 	{
 		core::stringc id = xml->getAttributeValue("id");
-		if (id.size()==0)
+		if (id.length()==0)
 			id = xml->getAttributeValue("name");
 		return id;
 	}
@@ -1619,10 +1629,10 @@ protected:
 		u32 index=path.findLast('/');
 		if(index==-1)
 			index=path.findLast('\\');
-		Logger->debug("index:%d,size:%d\r\n",index,path.size());
+		Logger->debug("index:%d,size:%d\r\n",index,path.length());
 		//注意不能path=path.subString(index+1,path.size());否则，打包成DLL会出错（直接运行不会）
 		//==>subString(i,length)中的length是指substring的length不是path的length
-		core::stringc npath=path.subString(index+1,path.size()-index);
+		core::stringc npath=path.subString(index+1,path.length()-index);
 		Logger->debug("npath:%s\r\n",npath.c_str());
 		return npath;
 	}
@@ -1670,7 +1680,7 @@ protected:
 	{
 		// currently, we only remove the # from the begin if there
 		// because we simply don't support referencing other files.
-		if (!str.size())
+		if (!str.length())
 			return;
 
 		if (str[0] == '#')
@@ -1767,7 +1777,7 @@ protected:
 					sscanf_s(p, "%s", buffer,128);
 					core::stringc str(buffer);
 					str.trim();
-					p+=str.size();
+					p+=str.length();
 					array.push_back(str);
 				}
 			}
@@ -1832,7 +1842,7 @@ protected:
 				char *r=NULL;
 				r = strtok_s(p,split,&pOut);
 				while(r!=NULL) {
-					const irr::c8* temp=r;
+					const c8* temp=r;
 					ints.push_back(readInt(&temp));
 
 					r = strtok_s(NULL,split,&pOut);
@@ -1877,9 +1887,9 @@ protected:
 	{
 		return (s32)readFloat(p);
 	}
-	core::matrix4 readMatrixNode(io::XMLReader* xml)
+	core::matrix4f readMatrixNode(io::XMLReader* xml)
 	{
-		core::matrix4 mat;
+		core::matrix4f mat;
 		if (xml->isEmptyElement())
 			return mat;
 
@@ -1952,12 +1962,13 @@ protected:
 	void printMatrix(const char* title,core::matrix4f& m)
 	{
 		Logger->debug("%s\r\n",title);
-		for(int j=0;j<16;++j)
+		/*for(int j=0;j<16;++j)
 		{
 #define M(i,j) fabs(m.m[i][j])<0.0001?0:m.m[i][j]
 			Logger->debug("%g,%g,%g,%g\r\n",M(0,j),M(1,j),M(2,j),M(3,j));
 #undef M(i,j)
-		}
+		}*/
+		m.print();
 	}
 
 #if 0
@@ -2486,7 +2497,7 @@ protected:
 			}
 
 			Logger->debug("name:%s,nodeName:%s\r\n",geometry->Name.c_str(),node.Name);
-			writer->writeString(node.Name.c_str(),';');
+			writer->writeString(node.Name.c_str());
 			
 			writer->writeInt(node.MaterialTargets.size());
 
@@ -2497,8 +2508,9 @@ protected:
 			{
 				core::matrix4f bsm=controller->Skin.BindShapeMatrix.getTransposed();
 				core::matrix4f rsm=bsm;
-				rsm[12]=rsm[13]=rsm[14]=0;
-				core::array<core::matrix4>& ibms=controller->Skin.InverseBindMatrixs;
+				//rsm[12]=rsm[13]=rsm[14]=0;
+				rsm.m[3][0]=rsm.m[3][1]=rsm.m[3][2]=0;
+				core::array<core::matrix4f>& ibms=controller->Skin.InverseBindMatrixs;
 				DAESource* joint=controller->Skin.getJointsSource();
 				DAESource position=geometry->Mesh.Position;
 				DAESource normal=geometry->Mesh.Normal;
@@ -2556,7 +2568,7 @@ protected:
 				u32 poseCount=ibms.size();
 				for(u32 j=0;j<poseCount;j++)
 				{
-					ibmJm.push_back(core::matrix4());
+					ibmJm.push_back(core::matrix4f(true));
 
 
 					DAEJointNode* node=getJointNodeBySid(joint->NameArray[j].c_str(),libraryVisualScenes.VisualScene.RootJoint);
@@ -2732,10 +2744,10 @@ protected:
 						Logger->debug("vertices[%d]:{%g,%g,%g}-->",j/3,p.x,p.y,p.z);
 						bsm.transformVect(p);
 
-						writer.writeFloat((float)p.x);
-						writer.writeFloat((float)p.z);
-						writer.writeFloat((float)p.y);
-						writer.writeInt(0);
+						writer->writeFloat((float)p.x);
+						writer->writeFloat((float)p.z);
+						writer->writeFloat((float)p.y);
+						writer->writeInt(0);
 						Logger->debug("{%g,%g,%g}\r\n",p.x,p.z,p.y);
 					}
 				}
@@ -2744,9 +2756,12 @@ protected:
 				writer->writeInt((int)geometry->Mesh.Normal.Count);
 				Logger->debug("normal count:%d\r\n",geometry->Mesh.Normal.Count);
 				core::matrix4f rsm=bsm;
-				rsm[12]=0;
-				rsm[13]=0;
-				rsm[14]=0;
+				//rsm[12]=0;
+				//rsm[13]=0;
+				//rsm[14]=0;
+				rsm.m[3][0]=0;
+				rsm.m[3][1]=0;
+				rsm.m[3][2]=0;
 				
 				core::vector3df n;
 				for(u32 j=0;j<geometry->Mesh.Normal.Count;j++)
@@ -2801,34 +2816,46 @@ protected:
 				//索引数据
 				writer->writeInt((int)geometry->Mesh.Triangles[j].Vertexs.size());
 				Logger->debug("triangle indices count:%d\r\n",geometry->Mesh.Triangles[j].Vertexs.size());
+				core::stringc str;
 				for(u32 k=0;k<geometry->Mesh.Triangles[j].Vertexs.size();k++)
 				{
 					writer->writeInt((int)geometry->Mesh.Triangles[j].Vertexs[k].Index);
 					writer->writeInt((int)geometry->Mesh.Triangles[j].Vertexs[k].NormalIndex);
 					writer->writeInt((int)geometry->Mesh.Triangles[j].Vertexs[k].TexCoordIndex);
+
+					str.append(core::stringc("<%d,%d,%d>,",(int)geometry->Mesh.Triangles[j].Vertexs[k].Index,(int)geometry->Mesh.Triangles[j].Vertexs[k].NormalIndex,(int)geometry->Mesh.Triangles[j].Vertexs[k].TexCoordIndex));
 					//TODO str
-					Trace("<%d,%d,%d>,",(int)geometry->Mesh.Triangles[j].Vertexs[k].Index,(int)geometry->Mesh.Triangles[j].Vertexs[k].NormalIndex,(int)geometry->Mesh.Triangles[j].Vertexs[k].TexCoordIndex);
+					//Trace("<%d,%d,%d>,",(int)geometry->Mesh.Triangles[j].Vertexs[k].Index,(int)geometry->Mesh.Triangles[j].Vertexs[k].NormalIndex,(int)geometry->Mesh.Triangles[j].Vertexs[k].TexCoordIndex);
 					if(k%3==2)
 					{
-						Trace("\r\n");
+						//Trace("\r\n");
+						str.append("\r\n");
+						Logger->debug("%s",str.c_str());
+
+						str="";
 					}
 				}
 			}
-			Trace("\r\n");
+			//Trace("\r\n");
+			Logger->debug("\r\n");
 
 		}
 	}
 
 
 public:
-	DAE2XC3DConvert(){
+	DAE2Y3DConvert(){
 		DAEJointNode::Counter=0;
 
-		for(int i=0;i<16;i++)
-			invert[i]=0;
-		invert[0]=invert[6]=invert[9]=invert[15]=1;
+		//for(int i=0;i<16;i++)
+		//	invert[i]=0;
+		//invert[0]=invert[6]=invert[9]=invert[15]=1;
+		for(u32 i=0;i<4;++i)
+			for(u32 j=0;j<4;++j)
+				invert.m[i][j]=0;
+		invert.m[0][0]=invert.m[1][2]=invert.m[2][1]=invert.m[3][3]=1;
 	}
-	void openDAE(const char* filePath)
+	/*void openDAE(const char* filePath)
 	{
 		IrrXMLReader* xml=NULL;
 		try
@@ -2864,7 +2891,7 @@ public:
 			delete xml;
 	}
 
-	/*void exportXC3D(const char* filePath)
+	void exportXC3D(const char* filePath)
 	{
 		CFileWriter writer(filePath);
 
