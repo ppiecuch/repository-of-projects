@@ -4,6 +4,7 @@
 #include "CReadFileStream.h"
 #include "CWriteFileStream.h"
 #include "CLogger.h"
+#include "dae2y3d.h"
 using namespace std;
 
 using namespace yon;

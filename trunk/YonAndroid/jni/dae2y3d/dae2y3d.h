@@ -4,7 +4,7 @@
 #include "vector3d.h"
 #include "matrix4.h"
 #include "quaternion.h"
-#include "fast_atof.h"
+#include "fastatof.h"
 
 #include "CXMLReaderImpl.h"
 #include "CReadFileStream.h"
@@ -89,7 +89,8 @@ struct DAEEffect{
 
 	DAENewParam* getSurfaceNewParam(){
 		for(u32 i=0;i<NewParams.size();i++)
-			if(strstr(NewParams[i].Sid.c_str(),"surface")!=NULL)
+			//if(strstr(NewParams[i].Sid.c_str(),"surface")!=NULL)
+			if(NewParams[i].Sid.find("surface")!=-1)
 				return &NewParams[i];
 		return NULL;
 	}
@@ -225,7 +226,7 @@ struct DAESkin{
 	//TODO
 
 	//加工数据
-	core::array<core::matrix4> InverseBindMatrixs;
+	core::array<core::matrix4f> InverseBindMatrixs;
 
 	DAESource* getJointsSource(){
 		for(u32 i=0;i<Sources.size();i++)
@@ -291,14 +292,14 @@ struct DAEJointNode{
 	core::stringc Id;
 	core::stringc Name;
 	core::stringc Sid;
-	core::matrix4 Transform;
+	core::matrix4f Transform;
 	core::array<DAEJointNode> Children;
 	DAEJointNode* Parent;
 
 	DAEJointNode():Parent(NULL){}
 
 	//加工数据
-	core::matrix4 AbsoluteTransform;
+	core::matrix4f AbsoluteTransform;
 	static u32 Counter;
 	u32 AbsoluteIndex;
 };
@@ -389,8 +390,8 @@ const core::stringc ELEM_CHANNEL = "channel";
 
 const core::stringc ELEM_SCENE = "scene";
 
-const core::stringc inputSemanticNames[] = {"POSITION", "VERTEX", "NORMAL", "TEXCOORD", "UV", "TANGENT", "IMAGE", "TEXTURE","JOINT","INV_BIND_MATRIX","WEIGHT", 0};
+//const core::stringc inputSemanticNames[] = {"POSITION", "VERTEX", "NORMAL", "TEXCOORD", "UV", "TANGENT", "IMAGE", "TEXTURE","JOINT","INV_BIND_MATRIX","WEIGHT", 0};
 const core::stringc NODE_TYPE_JOINT= "JOINT";
-const core::stringc PARAM_NAMES[] = {"TIME", "TRANSFORM", "INTERPOLATION", "JOINT","WEIGHT", "null",0};
-const core::stringc PARAM_TYPES[] = {"float", "float2", "float3", "float4", "float4x4", "name", "null",0};
+//const core::stringc PARAM_NAMES[] = {"TIME", "TRANSFORM", "INTERPOLATION", "JOINT","WEIGHT", "null",0};
+//const core::stringc PARAM_TYPES[] = {"float", "float2", "float3", "float4", "float4x4", "name", "null",0};
 #endif
