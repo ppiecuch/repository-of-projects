@@ -1,10 +1,20 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "yonArrayTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( yonArrayTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( yonArrayTestCase );
 
 void yonArrayTestCase::setUp()
 {
+}
+void yonArrayTestCase::assign()
+{
+	//TODO ³ö´í
+	strArray.set_used(2);
+	strArray[0]="fdsafdsa";
+	strArray[1]="";
+
+	CPPUNIT_ASSERT( strArray[0]=="fdsafdsa" );
+	CPPUNIT_ASSERT( strArray[1]=="" );
 }
 void yonArrayTestCase::pushString()
 {
@@ -61,6 +71,7 @@ void yonArrayTestCase::insert2()
 	buffer.push_back(3);
 	buffer.push_back(4);
 	s32 temp[3]={5,6,7};
+	//TODO ³ö´í
 	buffer.insert(2,temp,3);
 	buffer.print();
 	CPPUNIT_ASSERT( buffer.size()==8);

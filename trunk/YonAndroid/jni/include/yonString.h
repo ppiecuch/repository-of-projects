@@ -8,7 +8,7 @@
 #include "fastatof.h"
 #include "yonAllocator.h"
 
-#ifdef YON_COMPILE_WITH_ANDROID
+#if defined (YON_COMPILE_WITH_ANDROID) || defined (YON_COMPILE_WITH_MACOSX)
 #include <wchar.h>
 #endif
 
@@ -468,10 +468,10 @@ namespace yon{
 					while (str[index])
 						++index;
 
-					if (index > len-1)
+					if (index > len)
 						return -1;
 
-					for (u32 i=start; i<len-index; ++i)
+					for (u32 i=start; i<=len-index; ++i)
 					{
 						u32 j=0;
 

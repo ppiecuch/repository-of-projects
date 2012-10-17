@@ -15,8 +15,18 @@
 #ifndef __CYGWIN__
 #define __CYGWIN__
 #endif
+#elif defined(__GNUC__) && (defined(__APPLE_CPP__) || defined(__APPLE_CC__) || defined(__MACOS_CLASSIC__))
+#if defined(__ppc__)
+#elif defined(__ppc64__)
+#elif defined(__i386__)
+#elif defined(__x86_64__)
+#elif defined(__arm__)
 #else
+#error unrecognized GNU C compiler
+#endif
 #define YON_COMPILE_WITH_MACOSX
+#else
+#error unrecognized compile platform
 #endif // WIN32
 
 //视频模式(OpenGLES1/OpenGLES2)
@@ -74,7 +84,8 @@
 
 //宏修正
 #ifdef YON_COMPILE_WITH_WIN32
-#elif defined(YON_COMPILE_WITH_ANDROID)
+//#elif defined(YON_COMPILE_WITH_ANDROID)
+#else
 //Unix和Linux系统不支持unicode.没有任何unicode版库函数.
 #undef YON_WCHAR_FILESYSTEM
 #undef YON_DEPRECATED

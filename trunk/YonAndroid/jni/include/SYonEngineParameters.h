@@ -15,6 +15,8 @@ namespace yon{
 	struct SYonEngineParameters{
 
 		SYonEngineParameters():
+            appPath("."),
+            resourcesPath("."),
 			windowSize(core::dimension2du(800,600)),
 			windowId(NULL),
 			windowCaption(L"YonApplication"),
@@ -24,11 +26,13 @@ namespace yon{
 			fpsLimit(0),
 #ifdef YON_COMPILE_WITH_WIN32
 			loggerAppender((MASK_APPENDER)(MASK_APPENDER_FILE|MASK_APPENDER_VS))
-#elif defined(YON_COMPILE_WITH_ANDROID)
+#elif defined(YON_COMPILE_WITH_ANDROID) || defined((YON_COMPILE_WITH_MACOSX))
 			loggerAppender((MASK_APPENDER)(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE))
 #endif
 			{}
 		SYonEngineParameters(const SYonEngineParameters& params):
+			appPath(params.appPath),
+            resourcesPath(params.resourcesPath),
 			windowSize(params.windowSize),
 			windowId(params.windowId),
 			windowCaption(params.windowCaption),
@@ -39,6 +43,9 @@ namespace yon{
 			loggerAppender(params.loggerAppender)
 			{}
 
+        //app路径与资源路径(只用于IOS平台)
+        io::path appPath;
+        io::path resourcesPath;
 		//窗口尺寸
 		core::dimension2du windowSize;
 		//窗口指针

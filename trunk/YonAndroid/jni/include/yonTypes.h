@@ -85,7 +85,7 @@ typedef char fschar;
 #endif
 
 //º¯Êýºê¶¨Òå
-#ifdef YON_COMPILE_WITH_ANDROID
+#if defined (YON_COMPILE_WITH_ANDROID) || defined (YON_COMPILE_WITH_MACOSX)
 #define sprintf_s(buffer,size,args...) sprintf(buffer,args)
 #define vsprintf_s(buffer,size,fmt,args...) vsprintf(buffer,fmt,args)
 #define vswprintf_s(buffer,size,fmt,args...)  swprintf(buffer,size,fmt,args)
