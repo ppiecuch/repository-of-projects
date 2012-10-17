@@ -5,12 +5,21 @@
 #include "test.h"
 #pragma comment( lib, "DLLDemo.lib" )
 
+#include <crtdbg.h>
+inline void EnableMemLeakCheck()
+{
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+}
+
 
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	EnableMemLeakCheck();
 	testexam(NULL);
+	int* p=testnew();
+	delete p;
 	getchar();
 	return 0;
 }
