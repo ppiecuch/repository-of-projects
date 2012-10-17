@@ -48,6 +48,8 @@
 
 #include "II18NManager.h"
 
+#include "INetManager.h"
+
 #include "ICallback.h"
 
 #include "SColor.h"

@@ -10,7 +10,10 @@ namespace net{
 
 	class INetManager : public virtual core::IReferencable{
 	public:
+		virtual ISocket* createSocket(ENUM_SOCKET_PROTOCOL protocol) = 0;
 	};
+
+	INetManager* createNetManager();
 }
 }
 #endif
