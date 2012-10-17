@@ -6,7 +6,7 @@ using namespace std;
 //member template为什么不能为virtual?
 //为了不让C++太复杂，不让C++的编译器太难做，C++就这么规定了。
 //template是静态（编译时），virtual是动态的(运行时),两者不可得兼
-
+#if 0
 class A{
 public:
 	template<typename T> void test(){
@@ -26,7 +26,7 @@ void A::test<char>(){
 class B : public A{
 };
 
-#if 0
+#elif 0
 template<typename T>
 class class1
 {
@@ -50,16 +50,62 @@ public:
 		return class1<T>::getVal();
 	}
 };
-#endif
 
+#elif 0
+template<class T>
+class C{
+public:
+	virtual void test(){printf("testC\r\n");}
+};
+
+class D : public C<int>{
+public:
+	virtual void test(){
+		C<int>::test();
+		printf("testD\r\n");
+	}
+};
+
+#else
+//菱形继承
+class a{
+public:
+	virtual void demo() = 0;
+};
+class A : public virtual a{
+public:
+	virtual void test()= 0;
+};
+
+class b : public a{
+public:
+	virtual void demo(){printf("demob\r\n");}
+};
+
+class B : public A,b{
+public:
+	virtual void test(){printf("testB\r\n");}
+	virtual void demo(){b::demo();printf("demoB\r\n");}
+};
+
+#endif
 int main(int argc, char* argv[])
 {
+#if 0
 	B b;
 	b.test<bool>();
 	b<<true;
-#if 0
+#elif 0
 	derived2<char> d('a');
 	d.getVal();
+#elif 0
+	D d;
+	d.test();
+#else
+	A* t=new B();
+	t->demo();
+	t->test();
+	delete t;
 #endif
 	getchar();
 	return 0;

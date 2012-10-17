@@ -7,3 +7,7 @@ void testexam(char *input)
 {
 	std::cout<<"test"<<std::endl;
 }
+int* testnew()
+{
+	return new int;
+}

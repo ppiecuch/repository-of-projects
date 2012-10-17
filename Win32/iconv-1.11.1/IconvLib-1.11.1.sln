@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IconvLib-1.11.1", "IconvLib-1.11.1.vcproj", "{C6ECB691-7330-4C31-A9AD-E7C9459EAEF0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcproj", "{E72A9C86-0178-4FB9-A751-03862628B6E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C6ECB691-7330-4C31-A9AD-E7C9459EAEF0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C6ECB691-7330-4C31-A9AD-E7C9459EAEF0}.Release|Win32.ActiveCfg = Release|Win32
+		{E72A9C86-0178-4FB9-A751-03862628B6E4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E72A9C86-0178-4FB9-A751-03862628B6E4}.Debug|Win32.Build.0 = Debug|Win32
+		{E72A9C86-0178-4FB9-A751-03862628B6E4}.Release|Win32.ActiveCfg = Release|Win32
+		{E72A9C86-0178-4FB9-A751-03862628B6E4}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
