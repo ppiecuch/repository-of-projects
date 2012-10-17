@@ -13,7 +13,7 @@
 #define W_OK 02 //Write-only
 #define R_OK 04 //Read-only
 #define X_OK 06 //Read and write
-#elif defined(YON_COMPILE_WITH_ANDROID)
+#elif defined(YON_COMPILE_WITH_ANDROID) || defined (YON_COMPILE_WITH_MACOSX)
 #include <unistd.h>
 #include <sys/stat.h>//for mkdir
 #include <string.h>
@@ -73,7 +73,7 @@ namespace core{
 	inline bool yonAccess(const c8* path){
 #ifdef YON_COMPILE_WITH_WIN32
 		return (_access(path, F_OK) != -1);
-#elif defined(YON_COMPILE_WITH_ANDROID)
+#elif defined(YON_COMPILE_WITH_ANDROID) || defined (YON_COMPILE_WITH_MACOSX)
 		return (access(path, F_OK) != -1);
 #endif
 	}
@@ -84,7 +84,7 @@ namespace core{
 
 #ifdef YON_COMPILE_WITH_WIN32
 		while (0 != (retval = _mkdir(path))&&yonAccess(path)==false)
-#elif defined(YON_COMPILE_WITH_ANDROID)
+#elif defined(YON_COMPILE_WITH_ANDROID) || defined (YON_COMPILE_WITH_MACOSX)
 		while (0 != (retval = mkdir(path,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH))&&yonAccess(path)==false)
 #endif
 		{
@@ -96,7 +96,7 @@ namespace core{
 
 #ifdef YON_COMPILE_WITH_WIN32
 			strncat_s(subpath, path, delim - path);
-#elif defined(YON_COMPILE_WITH_ANDROID)
+#elif defined(YON_COMPILE_WITH_ANDROID) || defined (YON_COMPILE_WITH_MACOSX)
 			strncat(subpath, path, delim - path);
 #endif
 			_mkdirs(subpath);
@@ -132,7 +132,7 @@ namespace core{
 		if(pMilliseconds<=0)return;
 #ifdef YON_COMPILE_WITH_WIN32
 		Sleep(pMilliseconds);
-#elif defined(YON_COMPILE_WITH_ANDROID)
+#elif defined(YON_COMPILE_WITH_ANDROID) || defined (YON_COMPILE_WITH_MACOSX)
 		::usleep((pMilliseconds<<10)-24);
 #endif
 	}
