@@ -16,6 +16,7 @@
 #include "IRandomizer.h"
 #include "ICallback.h"
 #include "II18NManager.h"
+#include "INetManager.h"
 
 namespace yon{
 
@@ -34,6 +35,7 @@ namespace yon{
 		virtual audio::IAudioDriver* getAudioDriver() const = 0;
 		virtual IRandomizer* getRandomizer() = 0;
 		virtual i18n::II18NManager* getI18NManager() = 0;
+		virtual net::INetManager* getNetManager() = 0;
 
 		//当引擎初始化过程中失败后，available会返回false(用于crash流程)
 		virtual bool available(){return true;}

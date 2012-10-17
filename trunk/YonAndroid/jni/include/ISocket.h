@@ -36,7 +36,7 @@ namespace net{
 		// @return number of bytes actually sent.
 		// @return of zero means the connection has been shutdown on the other side.
 		// @return of -1 means that an error has occurred.
-		virtual s32 send(const u8* buf, size_t bytesToSend) = 0;
+		virtual s32 sendData(const c8* buf, size_t bytesToSend) = 0;
 
 		// Flush the socket descriptor owned by the object.
 		// @return true data was successfully sent, else return false;
