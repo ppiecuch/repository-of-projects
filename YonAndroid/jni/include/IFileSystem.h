@@ -14,7 +14,7 @@ namespace io{
 		virtual bool existFile(const path& filename) const =0;
 		//使用完后记得drop
 		virtual IReadStream* createAndOpenReadFileStream(const io::path& filename,ENUM_ENDIAN_MODE mode=ENUM_ENDIAN_MODE_LITTLE) = 0;
-		virtual IReadStream* createAndOpenReadMemoryStream(const io::path& name,void* data, long size,bool deleteMemoryWhenDropped,ENUM_ENDIAN_MODE mode=ENUM_ENDIAN_MODE_LITTLE) = 0;
+		virtual IReadStream* createAndOpenReadMemoryStream(const io::path& name,void* data, u32 size,bool deleteMemoryWhenDropped,ENUM_ENDIAN_MODE mode=ENUM_ENDIAN_MODE_LITTLE) = 0;
 		//打开文件，如果路径不存在，将递归创建父目录
 		virtual IWriteStream* createAndOpenWriteFileStream(const path& filename, bool append=false, ENUM_ENDIAN_MODE mode=ENUM_ENDIAN_MODE_LITTLE) =0;
 

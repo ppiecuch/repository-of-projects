@@ -12,6 +12,7 @@ ICamera* pOrthoCamera=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
+II18NManager* i18nManager=NULL;
 INetManager* netMgr=NULL;
 
 IModel* planeModel=NULL;
@@ -58,6 +59,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
+	i18nManager=engine->getI18NManager();
 	netMgr=engine->getNetManager();
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
@@ -73,12 +75,87 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/png/");
 #endif
 
-	ISocket* socket=netMgr->createSocket(ENUM_SOCKET_PROTOCOL_TCP);
-	socket->init();
-	socket->connect("127.0.0.1",8080);
-	socket->sendData("helloworld",10);
-	socket->close();
-	socket->drop();
+#if 0
+	//Client use UTF8 encode in sync mode
+	ISocket* client=netMgr->createSocket(ENUM_SOCKET_PROTOCOL_TCP);
+	client->init();
+	client->open("192.168.23.100",8081);
+	core::stringc str="helloÄãºÃ";
+	str=i18nManager->convert(str.c_str(),ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	for(s32 i=0;i<20;++i)
+		client->sendData(str.c_str(),str.length());
+	Logger->debug("send str len:%d\r\n",str.length());
+	client->close();
+	client->drop();
+#elif 0
+	//Server use UTF8 encode in sync mode
+	ISocket* server=netMgr->createSocket(ENUM_SOCKET_PROTOCOL_TCP);
+	server->init();
+	server->bindOn("192.168.23.100",8081);
+	server->monitor();
+	ISocket* client=server->acceptSocket();
+	c8* buffer;
+	s32 num=client->receiveData(buffer,20);
+	core::stringc str;
+	str.build(buffer,num);
+	str=i18nManager->convert(str.c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030);
+	Logger->debug("receive str:%s len:%d\r\n",str.c_str(),str.length());
+	client->close();
+	client->drop();
+	server->close();
+	server->drop();
+#elif 0
+	//Client use UTF8 encode in async mode
+	ISocket* client=netMgr->createSocket(ENUM_SOCKET_PROTOCOL_TCP);
+	client->init();
+	//client->bindOn("192.168.23.100",8081);
+	client->open("192.168.23.100",8081);
+	client->setNonblocking(true);
+	core::stringc str="helloÄãºÃ";
+	str=i18nManager->convert(str.c_str(),ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	for(s32 i=0;i<20;++i)
+		client->sendData(str.c_str(),str.length());
+	Logger->debug("send str len:%d\r\n",str.length());
+	client->close();
+	client->drop();
+#elif 1
+	//Server use UTF8 encode in async mode
+	ISocket* server=netMgr->createSocket(ENUM_SOCKET_PROTOCOL_TCP);
+	server->init();
+	server->bindOn("192.168.23.100",8081);
+	server->setNonblocking(true);
+	server->monitor();
+	ISocket* client=server->acceptSocket();
+	while(client==NULL)
+	{
+		core::yonSleep(200);
+		Logger->debug("retry\n");
+		client=server->acceptSocket();
+		if(client)
+		{
+			c8* buffer;
+			for(s32 i=0;i<21;++i)
+			{
+				s32 num=client->receiveData(buffer,11);
+				if(num>0)
+				{
+					core::stringc str;
+					str.build(buffer,num);
+					str=i18nManager->convert(str.c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030);
+					Logger->debug("receive str:%s len:%d\r\n",str.c_str(),str.length());
+				}
+				else
+					Logger->debug("skip receive for block!\n");
+			}
+			client->close();
+			client->drop();
+
+			break;
+		}
+	}
+	server->close();
+	server->drop();
+#endif
 	
 	return true;
 }
