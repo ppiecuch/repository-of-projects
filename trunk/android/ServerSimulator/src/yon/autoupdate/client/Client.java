@@ -28,7 +28,7 @@ public class Client extends JFrame {
 	private JTextField getIpTextField() {
 		if (ipTextField == null) {
 			ipTextField = new JTextField();
-			ipTextField.setText("192.168.1.245");
+			ipTextField.setText("192.168.23.100");
 		}
 		return ipTextField;
 	}
@@ -47,7 +47,7 @@ public class Client extends JFrame {
 					if(setupToggleButton.isSelected())
 					{
 						String ip=ipTextField.getText();
-						Delegate.getInstance().connect(ip, 8080,new Callback() {
+						Delegate.getInstance().connect(ip, 8081,new Callback() {
 							
 							@Override
 							public void doFinish() {

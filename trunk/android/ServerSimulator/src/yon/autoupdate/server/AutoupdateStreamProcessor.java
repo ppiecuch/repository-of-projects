@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import yon.autoupdate.net.BaseStreamProcessor;
 
 public class AutoupdateStreamProcessor extends BaseStreamProcessor {
+	
+	public static final int NEED_UPDATE_APK=1;
 
 	@Override
 	public void process(InputStream is, OutputStream os) {
@@ -16,11 +18,25 @@ public class AutoupdateStreamProcessor extends BaseStreamProcessor {
 		DataOutputStream dos=new DataOutputStream(os);
 		try {
 			int intValue=dis.readInt();
-			logger.debug("receive "+intValue+" int!\r\n");
+			switch(intValue)
+			{
+			case NEED_UPDATE_APK:
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				int versionCode=dis.readInt();
+				int currentVersion=ExtractAndroidManifest.getVersionCode();
+				boolean needUpdate=versionCode<currentVersion;
+				dos.writeBoolean(needUpdate);
+				logger.info("NEED_UPDATE_APK(version:"+versionCode+"):"+needUpdate+"\r\n");
+				break;
+			}
 			dos.close();
 			dis.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 	}
