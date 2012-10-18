@@ -93,6 +93,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "goto", "goto\goto.vcproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Socket", "Socket\Socket.vcproj", "{367BACDE-DECE-479A-B51F-4265B443A012}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CircleArray", "CircleArray\CircleArray.vcproj", "{67516264-BAC9-404A-ABAC-22F37C1EA895}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -271,6 +273,10 @@ Global
 		{367BACDE-DECE-479A-B51F-4265B443A012}.Debug|Win32.Build.0 = Debug|Win32
 		{367BACDE-DECE-479A-B51F-4265B443A012}.Release|Win32.ActiveCfg = Release|Win32
 		{367BACDE-DECE-479A-B51F-4265B443A012}.Release|Win32.Build.0 = Release|Win32
+		{67516264-BAC9-404A-ABAC-22F37C1EA895}.Debug|Win32.ActiveCfg = Debug|Win32
+		{67516264-BAC9-404A-ABAC-22F37C1EA895}.Debug|Win32.Build.0 = Debug|Win32
+		{67516264-BAC9-404A-ABAC-22F37C1EA895}.Release|Win32.ActiveCfg = Release|Win32
+		{67516264-BAC9-404A-ABAC-22F37C1EA895}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
