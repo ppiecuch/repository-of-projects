@@ -31,15 +31,19 @@ public class ConnectionManager {
 			Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
 			while (netInterfaces.hasMoreElements()) {
 				NetworkInterface ni = (NetworkInterface) netInterfaces.nextElement();
-				InetAddress ip = (InetAddress) ni.getInetAddresses().nextElement();
-				if (!ip.isSiteLocalAddress() && !ip.isLoopbackAddress()
-						&& ip.getHostAddress().indexOf(":") == -1) {
-					System.out.println("Interface " + ni.getName()
-							+ " seems to be InternetInterface. I'll take it...");
-				} else {
-					if(ip.getHostAddress().equals("127.0.0.1")==false)
-					{
-						return ip.getHostAddress();
+				Enumeration<InetAddress> inetAddresses=ni.getInetAddresses();
+				if(inetAddresses.hasMoreElements())
+				{
+					InetAddress ip = (InetAddress) ni.getInetAddresses().nextElement();
+					if (!ip.isSiteLocalAddress() && !ip.isLoopbackAddress()
+							&& ip.getHostAddress().indexOf(":") == -1) {
+						System.out.println("Interface " + ni.getName()
+								+ " seems to be InternetInterface. I'll take it...");
+					} else {
+						if(ip.getHostAddress().equals("127.0.0.1")==false)
+						{
+							return ip.getHostAddress();
+						}
 					}
 				}
 			}

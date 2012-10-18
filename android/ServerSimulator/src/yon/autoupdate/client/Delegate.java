@@ -21,7 +21,8 @@ public class Delegate {
 	}
 	
 	public void connect(String ip,int port,Callback callback){
-		AutoupdateStreamProcessor processor=new AutoupdateStreamProcessor();
+		//AutoupdateStreamProcessor processor=new AutoupdateStreamProcessor();
+		TestStreamProcessor processor=new TestStreamProcessor();
 		processor.setLogger(logger);
 		ConnectionManager.getTCPServer().connect(ip, port, processor,callback);
 	}

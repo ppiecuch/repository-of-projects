@@ -5,6 +5,7 @@ import javax.swing.JTextArea;
 import yon.autoupdate.core.BaseState;
 import yon.autoupdate.core.StateManager;
 import yon.autoupdate.debug.TextAreaLogger;
+import yon.autoupdate.net.BaseStreamProcessor;
 import yon.autoupdate.net.Callback;
 import yon.autoupdate.net.ConnectionManager;
 
@@ -13,7 +14,7 @@ public class Delegate {
 	private final BaseState OPEN;
 	private final BaseState CLOSE;
 	private final TextAreaLogger logger;
-	private final AutoupdateStreamProcessor processor;
+	private final BaseStreamProcessor processor;
 	
 	public Delegate(){
 		this.OPEN=new OpenState();
@@ -23,7 +24,8 @@ public class Delegate {
 		this.OPEN.setLogger(this.logger);
 		this.CLOSE.setLogger(this.logger);
 		
-		this.processor=new AutoupdateStreamProcessor();
+		//this.processor=new AutoupdateStreamProcessor();
+		this.processor=new TestStreamProcessor();
 		
 		
 	}
@@ -37,7 +39,7 @@ public class Delegate {
 	
 	public void setup(Callback callback){
 		ConnectionManager.getTCPServer().setProcessor(processor);
-		ConnectionManager.getTCPServer().monitorOnce(8080,callback);
+		ConnectionManager.getTCPServer().monitorOnce(8081,callback);
 		StateManager.getInstance().setState(OPEN);
 	}
 	
