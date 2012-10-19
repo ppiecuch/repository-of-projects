@@ -1,0 +1,407 @@
+非阻塞模式WinSock编程入门
+
+ 
+
+介绍
+
+WinSock是Windows提供的包含了一系列网络编程接口的套接字程序库。在这篇文章中，我们将介绍如何把它的非阻塞模式引入到应用程序中。文章中所讨论的通信均为面向连接的通信（TCP），为清晰起见，文章对代码中的一些细枝末节进行了删减，大家可以依照文末的链接下载完整的工程源码来获取这部分内容。
+
+ 
+
+阻塞模式WinSock
+
+         下述伪代码给出了阻塞模式下WinSock的使用方式。
+
+
+view plaincopy to clipboardprint?
+//---------------------------------------   
+// 服务器   
+//----------------------------------------   
+// WinSock初始化   
+WSAStartup();   
+  
+// 创建服务器套接字   
+SOCKET server = socket();   
+  
+// 绑定到本机端口   
+bind(server);    
+  
+// 开始监听   
+listen(server);    
+  
+// 接收到客户端连接，分配一个客户端套接字   
+SOCKET client = accept(server);    
+  
+// 使用新分配的客户端套接字进行消息收发   
+send(client);    
+recv(client);   
+  
+// 关闭客户端套接字   
+closesocket(client);    
+  
+// 关闭服务器套接字   
+closesocket(server);   
+  
+// 卸载WinSock   
+WSACleanup();  
+//---------------------------------------
+// 服务器
+//----------------------------------------
+// WinSock初始化
+WSAStartup();
+
+// 创建服务器套接字
+SOCKET server = socket();
+
+// 绑定到本机端口
+bind(server); 
+
+// 开始监听
+listen(server); 
+
+// 接收到客户端连接，分配一个客户端套接字
+SOCKET client = accept(server); 
+
+// 使用新分配的客户端套接字进行消息收发
+send(client); 
+recv(client);
+
+// 关闭客户端套接字
+closesocket(client); 
+
+// 关闭服务器套接字
+closesocket(server);
+
+// 卸载WinSock
+WSACleanup();   
+ 
+
+
+view plaincopy to clipboardprint?
+//---------------------------------------   
+// 客户端   
+//---------------------------------------   
+WSAStartup();   
+  
+// 创建客户端套接字   
+SOCKET client = socket();   
+  
+// 绑定本机端口   
+bind(client);   
+  
+// 连接到服务器   
+ServerAddress server;   
+connect(client, server);   
+  
+// 确立连接后收发消息   
+recv(client);   
+send(client);   
+  
+// 关闭客户端套接字   
+closesocket(client);   
+  
+WSACleanup();  
+//---------------------------------------
+// 客户端
+//---------------------------------------
+WSAStartup();
+
+// 创建客户端套接字
+SOCKET client = socket();
+
+// 绑定本机端口
+bind(client);
+
+// 连接到服务器
+ServerAddress server;
+connect(client, server);
+
+// 确立连接后收发消息
+recv(client);
+send(client);
+
+// 关闭客户端套接字
+closesocket(client);
+
+WSACleanup();   
+ 
+
+         代码中，服务器端的accept()，客户端的connect()，以及服务器和客户端中共同的recv()、send()函数均会产生阻塞。
+
+服务器在调用accept()后不会返回，直到接收到客户端的连接请求；
+
+客户端在调用connect()后不会返回，直到对服务器连接成功或者失败；
+
+服务器和客户端在调用recv()后不会返回，直到接收到并读取完一条消息；
+
+服务器和客户端在调用send()后不会返回，直到发送完待发送的消息。
+
+如果这两段代码被放在Windows程序的主线程中，你会发现消息循环被阻塞，程序不再响应用户输入及重绘请求。为了解决这个问题，你可能会想到开辟另外一个线程来运行这些代码。这是可行的，但是考虑到每个SOCKET都不应该被其他SOCKET的操作所阻塞，是不是需要为每个SOCKET开辟一个线程？再考虑到同一SOCKET的一个读写操作也不应该被另外一个读写操作所阻塞，是不是应该再为每个SOCKET的读和写分别开辟一个线程？一般来说，这种自实现的多线程解决方案带来的诸多线程管理方面的问题，是你绝对不会想要遇到的。
+
+ 
+
+非阻塞模式WinSock
+
+         所幸的是，WinSock同时提供了非阻塞模式，并提出了几种I/O模型。最常见的I/O模型有select模型、WSAAsyncSelect模型及WSAEventSelect模型，下面选择其中的WSAAsyncSelect模型进行介绍。
+
+         使用WSAAsyncSelect模型将非阻塞模式引入到应用程序中的过程看起来很简单，事实上你只需要多添加一个函数就够了。
+
+int WSAAsyncSelect(SOCKET s, HWND hWnd, unsigned int wMsg, long lEvent);
+
+该函数会自动将套接字设置为非阻塞模式，并且把发生在该套接字上且是你所感兴趣的事件，以Windows消息的形式发送到指定的窗口，你需要做的就是在传统的消息处理函数中处理这些事件。参数hWnd表示指定接受消息的窗口句柄；参数wMsg表示消息码值（这意味着你需要自定义一个Windows消息码）；参数IEvent表示你希望接受的网络事件的集合，它可以是如下值的任意组合：
+
+FD_READ, FD_WRITE, FD_OOB, FD_ACCEPT, FD_CONNECT, FD_CLOSE
+
+         之后，就可以在我们熟知的Windows消息处理函数中处理这些事件。如果在某一套接字s上发生了一个已命名的网络事件，应用程序窗口hWnd会接收到消息wMsg。参数wParam即为该事件相关的套接字s；参数lParam的低字段指明了发生的网络事件，lParam的高字段则含有一个错误码，事件和错误码可以通过下面的宏从lParam中取出：
+
+#define WSAGETSELECTEVENT(lParam) LOWORD(lParam)
+
+#define WSAGETSELECTERROR(lParam) HIWORD(lParam)
+
+ 
+
+下面继续使用伪代码来帮助阐述如何将上一节的阻塞模式WinSock应用升级到非阻塞模式。
+
+首先自定义一个Windows消息码，用于标识我们的网络消息。
+
+
+view plaincopy to clipboardprint?
+#define WM_CUSTOM_NETWORK_MSG (WM_USER + 100)  
+ 
+
+ 
+
+服务器端，在监听之前，将监听套接字置为非阻塞模式，并且标明其感兴趣的事件为FD_ACCEPT。
+
+
+view plaincopy to clipboardprint?
+…   
+WSAAsyncSelect(server, wnd, WM_CUSTOM_NETWORK_MSG, FD_ACCEPT);   
+  
+// 开始监听   
+listen(server);  
+…
+WSAAsyncSelect(server, wnd, WM_CUSTOM_NETWORK_MSG, FD_ACCEPT);
+
+// 开始监听
+listen(server);   
+ 
+
+客户端，在连接之前，将套接字置为非阻塞模式，并标明其感兴趣的事件为FD_CONNECT。
+
+
+view plaincopy to clipboardprint?
+…   
+WSAAsyncSelect(client, wnd, WM_CUSTOM_NETWORK_MSG, FD_CONNECT);   
+  
+// 连接到服务器   
+ServerAddress server;   
+connect(client, server);  
+…
+WSAAsyncSelect(client, wnd, WM_CUSTOM_NETWORK_MSG, FD_CONNECT);
+
+// 连接到服务器
+ServerAddress server;
+connect(client, server);   
+ 
+
+接着，在Windows消息处理函数中，我们将处理监听事件、连接事件、及读写事件，方便起见，这里将服务器和客户端的处理代码放在了一起。
+
+
+view plaincopy to clipboardprint?
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)   
+{   
+    switch (message)   
+    {   
+    …   
+    case WM_CUSTOM_NETWORK_MSG: // 自定义的网络消息码   
+        {   
+            SOCKET socket = (SOCKET)wParam; // 发生网络事件的套接字   
+            long event = WSAGETSELECTEVENT(lParam); // 事件   
+            int error = WSAGETSELECTERROR(lParam); // 错误码   
+  
+            switch (event)   
+            {   
+            case FD_ACCEPT: // 服务器收到新客户端的连接请求   
+                {   
+                    // 接收到客户端连接，分配一个客户端套接字   
+                    SOCKET client = accept(socket);    
+                    // 将新分配的客户端套接字置为非阻塞模式，并标明其感兴趣的事件为读、写及关闭   
+                    WSAAsyncSelect(client, hWnd, message, FD_READ | FD_WRITE | FD_CLOSE);   
+                }   
+                break;   
+            case FD_CONNECT: // 客户端连接到服务器的操作返回结果   
+                {   
+                    // 成功连接到服务器，将客户端套接字置为非阻塞模式，并标明其感兴趣的事件为读、写及关闭   
+                    WSAAsyncSelect(socket, hWnd, message, FD_READ | FD_WRITE | FD_CLOSE);   
+                }   
+                break;   
+            case FD_READ: // 收到网络包，需要读取   
+                {   
+                    // 使用套接字读取网络包   
+                    recv(socket);   
+                }   
+                break;   
+            case FD_WRITE:   
+                {   
+                    // FD_WRITE的处理后面会具体讨论   
+                }   
+                break;   
+            case FD_CLOSE: // 套接字的连接方(而非本地socket)关闭消息   
+                {   
+                }   
+                break;   
+            default:   
+                break;   
+            }   
+        }   
+        break;   
+    …   
+    }   
+    …   
+}  
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	…
+	case WM_CUSTOM_NETWORK_MSG: // 自定义的网络消息码
+		{
+			SOCKET socket = (SOCKET)wParam; // 发生网络事件的套接字
+			long event = WSAGETSELECTEVENT(lParam); // 事件
+			int error = WSAGETSELECTERROR(lParam); // 错误码
+
+			switch (event)
+			{
+			case FD_ACCEPT: // 服务器收到新客户端的连接请求
+				{
+					// 接收到客户端连接，分配一个客户端套接字
+					SOCKET client = accept(socket); 
+					// 将新分配的客户端套接字置为非阻塞模式，并标明其感兴趣的事件为读、写及关闭
+					WSAAsyncSelect(client, hWnd, message, FD_READ | FD_WRITE | FD_CLOSE);
+				}
+				break;
+			case FD_CONNECT: // 客户端连接到服务器的操作返回结果
+				{
+					// 成功连接到服务器，将客户端套接字置为非阻塞模式，并标明其感兴趣的事件为读、写及关闭
+					WSAAsyncSelect(socket, hWnd, message, FD_READ | FD_WRITE | FD_CLOSE);
+				}
+				break;
+			case FD_READ: // 收到网络包，需要读取
+				{
+					// 使用套接字读取网络包
+					recv(socket);
+				}
+				break;
+			case FD_WRITE:
+				{
+					// FD_WRITE的处理后面会具体讨论
+				}
+				break;
+			case FD_CLOSE: // 套接字的连接方(而非本地socket)关闭消息
+				{
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		break;
+	…
+	}
+	…
+}   
+ 
+
+以上就是非阻塞模式WinSock的应用框架，WSAAsyncSelect模型将套接字和Windows消息机制很好地粘合在一起，为用户异步SOCKET应用提供了一种较优雅的解决方案。
+
+ 
+
+扩展讨论
+
+         WinSock在系统底层为套接字收发网络数据各提供一个缓冲区，接收到的网络数据会缓存在这里等待应用程序读取，待发送的网络数据也会先写进这里之后通过网络发送。
+
+相关的，针对FD_READ和FD_WRITE事件的读写处理，因涉及的内容稍微复杂而容易使人困惑，这里需要特别进行讨论。
+
+         在FD_READ事件中，使用recv()函数读取网络包数据时，由于事先并不知道完整网络包的大小，所以需要多次读取直到读完整个缓冲区。这就需要类似如下代码的调用：
+
+
+view plaincopy to clipboardprint?
+void* buf = 0;   
+int size = 0;   
+while (true)   
+{   
+    char tmp[128];   
+    int bytes = recv(socket, tmp, 128, 0);   
+    if (bytes <= 0)   
+        break;   
+    else  
+    {   
+        int new_size = size + bytes;   
+        buf = realloc(buf, new_size);   
+        memcpy((void*)(((char*)buf) + size), tmp, bytes);   
+        size = new_size;   
+    }   
+}   
+// 此时数据已经从缓冲区全部拷贝到buf中，你可以在这里对buf做一些操作   
+…   
+free(buf);  
+void* buf = 0;
+int size = 0;
+while (true)
+{
+	char tmp[128];
+	int bytes = recv(socket, tmp, 128, 0);
+	if (bytes <= 0)
+		break;
+	else
+	{
+		int new_size = size + bytes;
+		buf = realloc(buf, new_size);
+		memcpy((void*)(((char*)buf) + size), tmp, bytes);
+		size = new_size;
+	}
+}
+// 此时数据已经从缓冲区全部拷贝到buf中，你可以在这里对buf做一些操作
+…
+free(buf);
+   
+ 
+
+         这一切看起来都没有什么问题，但是如果程序运行起来，你会收到比预期多出许多的FD_READ事件。如MSDN所述，正常的情况下，应用程序应当为每一个FD_READ消息仅调用一次recv()函数。如果一个应用程序需要在一个FD_READ事件处理中调用多次recv()，那么它将会收到多个FD_READ消息，因为每次未读完缓冲区的recv()调用，都会重新触发一个FD_READ消息。针对这种情况，我们需要在读取网络包前关闭掉FD_READ消息通知，读取完这后再进行恢复，关闭FD_READ消息的方法很简单，只需要调用WSAAsyncSelect时参数lEvent中FD_READ字段不予设置即可。
+
+
+view plaincopy to clipboardprint?
+// 关闭FD_READ事件通知   
+WSAAsyncSelect(socket, hWnd, message, FD_WRITE | FD_CLOSE);   
+// 读取网络包   
+…   
+// 再次打开FD_READ事件通知   
+WSAAsyncSelect(socket, hWnd, message, FD_WRITE | FD_CLOSE | FD_READ);  
+// 关闭FD_READ事件通知
+WSAAsyncSelect(socket, hWnd, message, FD_WRITE | FD_CLOSE);
+// 读取网络包
+…
+// 再次打开FD_READ事件通知
+WSAAsyncSelect(socket, hWnd, message, FD_WRITE | FD_CLOSE | FD_READ);   
+ 
+
+         第二个需要讨论的是FD_WRITE事件。这个事件指明缓冲区已经准备就绪，有了多出的空位可以让应用程序写入数据以供发送。该事件仅在两种情况下被触发：
+
+1. 套接字刚建立连接时，表明准备就绪可以立即发送数据。
+
+2. 一次失败的send()调用后缓冲区再次可用时。如果系统缓冲区已经被填满，那么此时调用send()发送数据，将返回SOCKET_ERROR，使用WSAGetLastError()会得到错误码WSAEWOULDBLOCK表明被阻塞。这种情况下当缓冲区重新整理出可用空间后，会向应用程序发送FD_WRITE消息，示意其可以继续发送数据了。
+
+所以说收到FD_WRITE消息并不单纯地等同于这是使用send()的唯一时机。一般来说，如果需要发送消息，直接调用send()发送即可。如果该次调用返回值为SOCKET_ERROR且WSAGetLastError()得到错误码WSAEWOULDBLOCK，这意味着缓冲区已满暂时无法发送，此刻我们需要将待发数据保存起来，等到系统发出FD_WRITE消息后尝试重新发送。也就是说，你需要针对FD_WRITE构建一套数据重发的机制，文末的工程源码里包含有这套机制以供大家参考，这里不再赘述。
+
+ 
+
+结语
+
+         至此，如何在非阻塞模式下使用WinSock进行编程介绍完毕，这个框架可以满足大多数网络游戏客户端及部分服务器的通信需求。更多应用层面上的问题（如TCP粘包等）这里没有讨论，或许会在以后的文章中给出。
+
+         文章相关工程源码请移步此处下载http://download.csdn.net/source/2852485。该源码展示了采用非阻塞模式编程的服务器和客户端，建立连接后，在服务器窗口输入空格会向所有客户端发送一条字符串消息。源码中对网络通信部分做了简单封装，所以代码结构会和文中的伪代码稍有不同。
+
+谢谢您的阅读！
+
+http://www.cnblogs.com/lancidie/archive/2011/05/14/2046022.html
