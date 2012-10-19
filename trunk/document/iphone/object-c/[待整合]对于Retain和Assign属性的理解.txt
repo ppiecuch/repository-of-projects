@@ -1,0 +1,46 @@
+在写程序时，对于要定义的变量进了习惯于加上retain属性，但对其到底起到什么作用却一直不是很明白，今天做了一个demo，终于弄清了他们的意思。
+比如我要定义一下字符串var：
+NSString *var;
+声明Property时，@property（nonamtic，assign）NSString *var;
+将属性声明为Assign,当使用@Synthsize生成Getter和Setter方法后，我们就可以用“.”操作符来为var赋值，
+将属性声明为Assign时，Setter方法的实现是这样的：
+-（void）setter:(NSString*)str
+{
+　　　var=str;
+}
+var=[[NSString alloc]initWithString:@"aaa"];
+当我们这样用时，没有调用Setter方法，只是将var指向目标地址，这时
+NSLog（@“%d”，[var retainCount]）;的值会是1。
+如果我们这样写：self.var=[[NSString alloc]initWithString:@"aaa"];
+这时会调用setter方法，但是NSLog（@“%d”，[var retainCount]）;的值仍然是1。
+如果我们在设置属性时这样来设置：
+@property（nonamtic，retain）NSString *var;
+这时，自动生成的Setter方法是这样的：
+-（void）Setter：（NSString*）str
+｛
+　　[str retain];
+　　[var release];
+　　var=str;
+｝
+这样就一目了然了，也就是被设置为retain属性的方法，在生成Setter方法时，先将要赋的值的引用计数加1，然后将var指向的对象release。再后才是将str赋值给var。这时下面的代码的输出结果会是2，因为，在Setteryyif中[[NSString alloc]initWithString:@"aaa"]所指的内存区域的retain被加了1，然后var又指向这个区域，所以var的retainCount自然就为2了：
+self.var=[[NSString alloc]initWithString:@"aaa"];
+NSLog（@“%d”，[var retainCount]）;
+这样做是为了防止内存被过渡释放，比如，[[NSString alloc]initWithString:@"aaa"]这个内存区域不光有var指向，还有另外一个变量var2也指向这个区域，如果我们不设置成retain属性，在执行var=[[NSString alloc]initWithString:@"aaa"];后，var和var1都指向一个共同的内存区域，但这个内存区域的retainCount为1。如果在另一个地方执行了[var2 release];这样[[NSString alloc]initWithString:@"aaa"]所指的内存区域的retainCount为0，所以这个内存区域就被释放了，var也就成了野指针，这时再引用var将会出现内存错误。
+但是，需要特别注意的是，即使我们设置var的属性为retain，如果我们在为var赋值时，使用的是如下形式：
+var=[[NSString alloc]initWithString:@"aaa"];
+而不是：
+self.var=[[NSString alloc]initWithString:@"aaa"];
+这样retain属性是不起作用的，前面不加self.，相当于我们定义的属性还是assign。retainCount不会加1的。
+我个人对这个的理解是，如果不显示的使用"."操作符，Setter方法是不调用的，仅仅是指针的传递。
+今天又有了点新的想法，补充一下：
+"."操作符在OBJC中是方法的调用，比如：self.str和[self str]是一样的。如果我在.h文件中声明了一个方法：
+-(void)method;
+那么，我调用这个方法可以用两种方式：[self method]或self.method。
+这样说的话，我们为什么可以用诸如self.str这样的形式来表示一个变量呢，原因就在于OBJC中变量属性的机制。
+我们前面说过，定义一个变量str，加个assign或retain之类的属性后，再用@synthesize就可以生成相应的setter和getter方法了。这样，对于一个变量，就有了相应的赋值方法，于是，对于self.str这样的写法，实际上就是调用了str对应的setter或getter方法。换句话说，也是把setter或getter消息发送给和str。str这时就是一个方法名，而不仅仅是变量名了。
+所以如果我们没有对一个变量声明属性，也没有@synthesize来生成setter和getter方法，那么我们就不能用self.str这种形式，而只能用str=@"aaa",或者str1=str这样的形式来使用变量。
+于是也就有了我们前面的结论：用self.str这种形式，相当于调用setter或getter方法。也就会执行retain的操作。不用这种形式，就没用调用setter或getter方法，retain的操作也就无从谈起。
+ 
+转一个另一篇文章，讲的比较好：
+最近有人问我关于什么时候用self.赋值的问题, 我总结了一下, 发出来给大家参考. 有什么问题请大家斧正.
+    关于什么时间用self. , 其实是和Obj-c的存取方法有关, 不过网上很多人也都这么解答的, 那它为什么和存取方法有关? 怎么有关的? 并没有多少人回答出来. 同时关于内存管理的内容, 请大家看旺财勇士的Objective-C内存管理总结～CC专版 , 有些东西我就不多解释了.

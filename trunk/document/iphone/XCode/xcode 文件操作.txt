@@ -1,0 +1,55 @@
+对文件的操作是一项很基本的人际交互过程，这里简单总结一下常用的文件操作内容
+1.沙盒的概念
+沙盒是iPhone开发中的一个特有的概念，指的是程序运行时的存储空间范围。
+出于对安全的考虑，苹果把iPhone中运行的程序限定在一个文件夹内，用户的任何操作都只能在这个文件夹内完成，绝不允许用户访问这个文件夹外的任何文件夹，这个限定文件夹就是“沙盒”。
+可以这样理解，你的程序就像被关在一个装满沙子的盒子里面，无论你的程序怎么折腾，也不过是在沙子上留下点痕迹而已，就算出了再大的问题，用手一抹就恢复原状了。
+
+2.获取路径
+沙盒中默认有三个目录Documents、Library和tmp。而我们通常把文件存储在Documents中。获取其路径的方法如下：
+//获取Document文件夹路径
+NSArray*path=NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+NSString *pathDocuments=[path objectAtIndex:0];
+可以看到，第一次获取的地址其实是一个数组，我们取出其中的第一项才是我们想要获取的路径。那么当然可以这样：
+NSString *pathDocuments=[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+
+3.创建文件与将内容写入文件
+我们之前获取的路径是目录的路径，所以我们需要手动为其补全为文件路径
+NSString *createFileName=@"new.txt";//文件名
+NSString *createPath=[NSString stringWithFormat:@"%@/%@",pathDocuments,createFileName];//用文件名补全路径
+if ([[NSFileManager defaultManager] fileExistsAtPath:createPath])//判断文件是否已存在
+{
+NSLog(@"文件已存在！");
+}
+else
+{
+NSData *data = [@"这里是新文件的内容" dataUsingEncoding:NSUTF8StringEncoding];//新文件的初始数据
+[[NSFileManager defaultManager] createFileAtPath:createPath contents:data attributes:nil];//创建文件
+}
+多种对象类型都有直接写入文件的方法
+例：[userInfoDict writeToFile:filePath atomically:YES];
+
+4.删除文件
+NSString *deletePath=[NSString stringWithFormat:@"%@/%@",pathDocuments,fileName];//补全文件名
+NSLog(@"%@",deletePath);
+NSError *error;
+[fileManager removeItemAtPath:deletePath error:&error];
+5.读取文件
+多种类型的对象创建时都可以直接从文件获取数据，但是切记要用完整路径
+ 
+ 
+ 
+ 
+ 
+NSArray *readArray=[NSArray arrayWithContentsOfFile:filePath];
+NSDictionary *readDict=[NSDictionary dictionaryWithContentsOfFile:filePath];
+UIImage *readImage=[UIImage imageWithContentsOfFile:filePath];
+6.获取文件信息
+获取文件信息是fileManager的一个方法，信息包括文件的创建时间，修改时间，是否隐藏扩展名，以及文件大小等属性。
+使用方法如下
+ 
+NSFileManager *fileMng=[[NSFileManager alloc] init];
+NSDictionary *attrDict=[fileMng attributesOfItemAtPath:filePath error:NULL];
+ 
+文件信息保存在attrDict中
+
+http://blog.sina.com.cn/s/blog_6308b98c01016n6m.html

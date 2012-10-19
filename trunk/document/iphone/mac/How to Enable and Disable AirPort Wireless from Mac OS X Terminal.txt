@@ -1,0 +1,29 @@
+STEP 1. First you have to open the Terminal of Mac OS X, then enter the following command in order to turn Airport on:
+
+networksetup -setairportpower airport on
+
+STEP 2. Now simply enter the following command in the terminal to turn Airport off:
+
+networksetup -setairportpower airport off
+
+That¡¯s it. In this way you can enable and disable AirPort wireless from the command line of Mac OS X. If you found any difficulty in following the above steps then feel free to ask in the comment section below. [Via]
+
+http://www.techcular.com/enable-disable-airport-wireless-mac-os-x-command-line/
+
+Óöµ½permission denied
+
+sudo networksetup -setairportpower airport on
+
+Óöµ½You cannot set AirPort power because all AirPort network services are disabled.
+
+networksetup -listpppoeservices
+networksetup -listallnetworkservices
+
+--
+-- Toggle Airport Power On and Off
+--
+if (offset of "On" in (do shell script "networksetup -getairportpower en1")) > 0 then
+	do shell script "networksetup -setairportpower en1 off"
+else
+	do shell script "networksetup -setairportpower en1 on"
+end if

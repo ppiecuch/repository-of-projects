@@ -1,0 +1,22 @@
+环境变量
+ 描述
+ 
+SRCROOT
+ 项目源文件的起点位置。
+ 
+BUILD_DIR
+ 项目的联编目录。
+ 
+TEMP_DIR
+ 目标中间结果文件的起点位置
+ 
+DERIVED_FILE_DIR
+ 保存由源文件联编阶段生成的中间结果源文件的目录。
+ 
+PROJECT_DERIVED_FILE_DIR
+ 产品生成的、并可在其目标之间共享的中间结果源文件所在的位置。
+ 
+INSTALL_DIR
+ 安装产品的位置。
+ 
+http://www.apple.com.cn/developer/mac/library/documentation/DeveloperTools/Conceptual/Build_System/Build_Phases/Build_Phases.html
