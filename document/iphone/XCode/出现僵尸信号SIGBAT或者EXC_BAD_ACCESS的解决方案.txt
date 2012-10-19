@@ -1,0 +1,19 @@
+很多童鞋都对出现SIGBAT或者EXC_BAD_ACCESS的问题，编译是对的，运行时做了某些操作，就跳到main函数里面了， 然后出现SIGBAT或者EXC_BAD_ACCESS的提示， 提示的信息无法正确判断出错原因。 
+下面给大家提供一个方法，会在控制台中输出出现SIGBAT或者EXC_BAD_ACCESS的原因， 基本90％能解决你的问题。第一步：在Xcode的菜单栏选择“Product”，然后选择“EditScheme”；
+第二步：在弹出的对话框中选择“Arguments”；第三步：在“EnvironmentVaribles”中添加“NSZombieEnabled”，值是“YES”
+ 。
+这样就大功告成了。
+?123456789 第一步：在Xcode的菜单栏选择“Product”，然后选择“Edit
+
+Scheme”； 第二步：在弹出的对话框中选择“Arguments”； 第三步：在“Environment
+
+Varibles”中添加“NSZombieEnabled”，值是“YES”
+ 。这样就大功告成了。 
+ 
+第一步：在Xcode的菜单栏选择“Product”，然后选择“EditScheme”； 
+第二步：在弹出的对话框中选择“Arguments”； 
+第三步：在“Environment
+
+Varibles”中添加“NSZombieEnabled”，值是“YES”
+ 。这样就大功告成了。 这时候，如果你的程序在运行过程中还出现SIGBAT或者EXC_BAD_ACCESS错误，控制台输出的信息可以帮你准确定位到错误的原因。
+http://blog.csdn.net/kuqideyupian/article/details/7864763

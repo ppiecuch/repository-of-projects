@@ -55,3 +55,18 @@ include $(GNUSTEP_MAKEFILES)/tool.make
 ²Î¿¼£º
 http://elton.iteye.com/blog/344899
 http://blog.csdn.net/i2c_rs485/article/details/7167535
+
+
+
+ºÏ²¢¿â
+lipo -create ./Debug-iphoneos/libxc.a  ./Debug-iphonesimulator/libxc.a -output libxc.a
+
+$(SRCROOT)/../../../include
+$(SRCROOT)/../../../project/ios/xc/build
+const c8* appPath,const c8* resPath,
+
+params.appPath=appPath;
+params.resourcesPath=resPath;
+
+#elif defined (XC_COMPILE_WITH_MACOSX)
+    fs->addWorkingDirectory(resPath);

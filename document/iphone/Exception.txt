@@ -1,3 +1,10 @@
+异常：
+symbol(s) not found for architexture i386 
+解决：
+extern ....
+项目文件不能变更路径
+i386对应iponesimulator
+
 异常:
 undefined reference to `__objc_class_name_xxxxxxx'
 解决:

@@ -1,0 +1,859 @@
+From: <ÓÉ Windows Internet Explorer 7 ±£´æ>
+Subject: How to use iPhone with File I/O Functions
+Date: Mon, 15 Oct 2012 11:41:39 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CDAACA.0A735A20"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.3664
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0000_01CDAACA.0A735A20
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://servin.com/iphone/iPhone-File-IO.html
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" =
+"http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML><HEAD><TITLE>How to use iPhone with File I/O Functions</TITLE>
+<META=20
+content=3D"width=3Ddevice-width; initial-scale=3D1.0; =
+maximum-scale=3D1.0; user-scalable=3D0;"=20
+name=3Dviewport>
+<META http-equiv=3Dcontent-type content=3D"text/html; charset=3Dutf-8">
+<META=20
+content=3D"A mini-course showing step-by-step how to write an iPhone =
+App&#10;using the iPhone SDK."=20
+name=3Ddescription><LINK href=3D"http://servin.com/servin.css" =
+type=3Dtext/css=20
+rel=3Dstylesheet>
+<META content=3D"MSHTML 6.00.6000.16587" name=3DGENERATOR></HEAD>
+<BODY>
+<P><STRONG><A href=3D"http://servin.com/">Servin Mobile =
+Software</A></STRONG></P>
+<HR>
+
+<H1>How to use iPhone with File I/O Functions: A Tutorial for Software=20
+Developers</H1>
+<HR>
+
+<P><A href=3D"http://servin.com/contact.php?fn=3Dcontact">Norman =
+McEntire</A></P>
+<P>Version 1.4 Sep 1. Thank you Freedy.</P>
+<P>Version 1.3 Aug 6. Thank you Chris B.</P>
+<P>Version 1.2 May 1. Thank you Pierre M.</P>
+<P>Version 1.1 January 20</P>
+<P>Copyright =C2=A9 2009 Servin Corporation. <A=20
+href=3D"http://servin.com/">http://servin.com/</A></P>
+<HR>
+
+<H2>Introduction</H2>
+<P>The iPhone OS, like Mac OS X, provides both Apple specific file I/O=20
+functions, and Unix-type file I/O functions. </P>
+<P>For example, you can use Apple specific functions to find the paths =
+related=20
+to your application. You can also use Apple specific Object-C classes to =
+
+read/write files. </P>
+<P>An alternative is to use Unix-specific functions to read/write files. =
+In=20
+addition to the standard open/close/read/write, you can do memory =
+mapping, where=20
+the file is mapped directly into your address space.=20
+<P>In this Servin Mini-Course, you will learn how to use Apple-specific=20
+functions and class methods to perform file I/O.=20
+<HR>
+
+<H2>iPhone Software Skills You Will Learn</H2>
+<UL>
+  <LI>How to use Xcode to create a Window-Based App.=20
+  <LI>How to display text output in a UITextView control.=20
+  <LI>How to use <STRONG>NSBundle</STRONG> to find the resource path.=20
+  <LI>How to use <STRONG>NSString</STRONG> to read a file.=20
+  <LI>How to use <STRONG>NSSearchPathForDirectoriesInDomains()</STRONG> =
+to find=20
+  common search paths. </LI></UL>
+<HR>
+
+<H2>Prerequisites</H2>
+<UL>
+  <LI>You should have already setup your iPhone software development=20
+  environment. If this is not the case, then refer to the <A=20
+  =
+href=3D"http://servin.com/iphone/iPhone-Flashlight-Mini-Course.html">iPho=
+ne=20
+  Flashlight App: Hands-On for Software Developers</A> </LI></UL>
+<HR>
+
+<H2>Startup Xcode</H2>
+<P>If Xcode is not already running, start it up: </P>
+<OL>
+  <LI>On the Mac Desktop, double-click on the Finder icon (the icon with =
+the=20
+  face on it).=20
+  <LI>On the left-side of the Finder window, click on <STRONG>Macintosh=20
+  HD</STRONG>.=20
+  <LI>On the right-side of the Finder window, click on the=20
+  <STRONG>Developer</STRONG> folder.=20
+  <LI>Click on the <STRONG>Applications</STRONG> folder.=20
+  <LI>Double-click on the <STRONG>Xcode</STRONG> icon. </LI></OL>
+<P>At this point, you should see the <STRONG>Xcode</STRONG> menu at the =
+top of=20
+your desktop.</P>
+<HR>
+
+<H2>Create New Xcode Project</H2>
+<P>With <STRONG>Xcode</STRONG> running, create a new Xcode project: </P>
+<OL>
+  <LI><STRONG>File &gt; New Project</STRONG>.=20
+  <LI>On the left-side of the New Project window, select=20
+  <STRONG>Application</STRONG> under <STRONG>iPhone OS</STRONG>.=20
+  <LI>On the right-side of the New Project window, select =
+<STRONG>Window-Based=20
+  Application</STRONG>.=20
+  <LI>Click on the <STRONG>Choose</STRONG> button.=20
+  <LI>Enter <STRONG>FileIo</STRONG> for the project name.=20
+  <LI>Click on <STRONG>Save</STRONG> button. </LI></OL>
+<P>At this point, you should see Xcode open a new window that shows a =
+number of=20
+files. </P>
+<HR>
+
+<H2>Build Default App</H2>
+<P>Go ahead and build the default application: </P>
+<OL>
+  <LI>Click on the <STRONG>Build and Go</STRONG> button.=20
+  <LI>After a brief moment, you should see the code running in the=20
+  <STRONG>iPhone Simulator</STRONG>.=20
+  <LI>Observe the status bar at the top of the window, and a white =
+window=20
+  everywhere else.=20
+  <LI>In the iPhone Simulator, press the <STRONG>Home</STRONG> button to =
+stop=20
+  the application. </LI></OL>
+<HR>
+
+<H2>Edit FileIoAppDelegate to Add UITextView as Subview to UIWindow</H2>
+<P>In this exercise, you will edit <STRONG>FileIoAppDelegate.h</STRONG> =
+and=20
+<STRONG>FileIoAppDelegate.m</STRONG> to add a =
+<STRONG>UITextView</STRONG> as a=20
+subview to the <STRONG>UIWindow</STRONG>. </P>
+<OL>
+  <LI>In Xcode, in the <STRONG>Groups &amp; Files</STRONG> window on the =
+
+  left-side, click on the <STRONG>Classes</STRONG> folder.=20
+  <LI>You should see the following files on the right-side of the =
+window: <PRE>FileIoAppDelegate.h
+FileIoAppDelegate.m
+</PRE>
+  <LI>Select <STRONG>FileIoAppDelegate.h</STRONG> so that it appears in =
+the=20
+  <STRONG>Xcode</STRONG> editor window.=20
+  <LI>Edit the code to match the following: <PRE>#import =
+&lt;UIKit/UIKit.h&gt;
+
+@interface FileIoAppDelegate : NSObject &lt;UIApplicationDelegate&gt; {
+	UIWindow *window;
+<FONT color=3Dred>
+	UITextView *textView;
+</FONT>
+}
+@property (nonatomic, retain) IBOutlet UIWindow *window;
+<FONT color=3Dred>
+@property (nonatomic, retain) UITextView *textView;
+</FONT>
+@end
+</PRE>
+  <LI>The above code adds a member variable named =
+<STRONG>textView</STRONG>,=20
+  which is a pointer to an object of type <STRONG>UITextView</STRONG>. =
+Our goal=20
+  is to use the <STRONG>UITextView</STRONG> control to display the =
+output.=20
+  <LI>We will not use <STRONG>Interface Builder</STRONG> for this demo, =
+so we=20
+  did not add the <STRONG>IBOutlet</STRONG> to the code that we entered. =
+
+  <LI>Select <STRONG>FileIoAppDelegate.m</STRONG> into the=20
+  <STRONG>Xcode</STRONG> editor window.=20
+  <LI>Edit the code to match the following: <PRE>#import =
+&lt;FileIoAppDelegate.h&gt;
+
+@implementation FileIoAppDelegate
+
+@synthesize window;
+<FONT color=3Dred>
+@synthesize textView;
+</FONT>
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+<FONT color=3Dred>
+	// Create instance of UITextView
+	self.textView =3D [[UITextView alloc]=20
+			 initWithFrame:[[UIScreen mainScreen] applicationFrame]];
+
+	// Add text
+	self.textView.text =3D @"Output will go here...";
+
+	// Make non-editable
+	self.textView.editable =3D NO;
+
+	// Add as subview to window
+	[window addSubview:self.textView];
+
+	// Decrement our usage count
+	[self.textView release];
+</FONT>
+	[window makeKeyAndVisible];
+}
+</PRE>
+  <LI><STRONG>Build and Go</STRONG>.=20
+  <LI>You should see your app running, with the text "Output will go =
+here..."=20
+  displayed in the window.=20
+  <LI>Press <STRONG>Home</STRONG> in iPhone Simulator to stop the =
+application.=20
+  </LI></OL>
+<P>As a review, in this exercise you added code to the=20
+<STRONG>FileIoAppDelegate</STRONG> class to create a=20
+<STRONG>UITextView</STRONG>, setting it so that it cannot be edited. You =
+also=20
+added text to the UITextView, and then added the UITextView to the =
+subview of=20
+the window. </P>
+<HR>
+
+<H2>Create MyFile.txt</H2>
+<P>In this exercise, you will create a file named =
+<STRONG>MyFile.txt</STRONG> as=20
+a sample text file that you will later read and display in the iPhone =
+window.=20
+</P>
+<OL>
+  <LI>In Xcode, in the <STRONG>Groups &amp; Files</STRONG> window on the =
+
+  left-side, click on the <STRONG>Resources</STRONG> folder.=20
+  <LI>You should see the following frameworks: <PRE>- Info.plist
+- MainWindow.xib
+</PRE>
+  <LI><STRONG>Control+click</STRONG> on the <STRONG>Resources</STRONG> =
+folder.=20
+  <LI>Select <STRONG>Add</STRONG> from the popup menu.=20
+  <LI>Select <STRONG>New File</STRONG>.=20
+  <LI>In the New File window, on the left-side of the window, under the =
+category=20
+  <STRONG>Mac OS X</STRONG>, click on <STRONG>Other</STRONG>.=20
+  <LI>In the New File window, on the right-side of the window, click on=20
+  <STRONG>Empty File</STRONG>.=20
+  <LI>Click on <STRONG>Next</STRONG>.=20
+  <LI>Name the file <STRONG>MyFile.txt</STRONG>.=20
+  <LI>Click on <STRONG>Finish</STRONG>.=20
+  <LI>Under the <STRONG>Resources</STRONG> folder, you should now have =
+three=20
+  files: <PRE>- MainWindow.xib
+- Info.plist
+- MyFile.txt
+</PRE>
+  <LI>Click on <STRONG>MyFile.txt</STRONG> to select it into the=20
+  <STRONG>Xcode</STRONG> editor.=20
+  <LI>Enter the following into the file: <PRE>This is a text file.
+The file will be displayed on the iPhone.
+That is all for now.
+</PRE></LI></OL>
+<P>As a review, you created a text file named =
+<STRONG>MyFile.txt</STRONG> in the=20
+<STRONG>Resources</STRONG> directory of your project. </P>
+<HR>
+
+<H2>NSHomeDirectory()</H2>
+<P>In this exercise, you will use the <STRONG>NSHomeDirectory()</STRONG> =
+
+function to retrieve the path to the home directory of your application: =
+<PRE>NSString *NSHomeDirectory(void);
+</PRE>
+<P></P>
+<P>An important point: the location of your home directory is different=20
+depending on whether you are running on the iPhone Simulator or on an =
+actual=20
+device (iPhone or iPod Touch). </P>
+<OL>
+  <LI>In Xcode, in the <STRONG>Groups &amp; Files</STRONG> window on the =
+
+  left-side, click on the <STRONG>Classes</STRONG> folder.=20
+  <LI>You should see the following files: <PRE>- FileIoAppDelegate.h
+- FileIoAppDelegate.m
+</PRE>
+  <LI>Click on <STRONG>FileIoAppDelegate.m</STRONG> to select it into =
+the=20
+  <STRONG>Xcode</STRONG> editor.=20
+  <LI>Edit the code to match the following: <PRE>#import =
+&lt;FileIoAppDelegate.h&gt;
+
+@implementation FileIoAppDelegate
+
+@synthesize window;
+@synthesize textView;
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+
+	// Create instance of UITextView
+	self.textView =3D [[UITextView alloc]=20
+			 initWithFrame:[[UIScreen mainScreen] applicationFrame]];
+<FONT color=3Dred>
+	NSString *homeDir =3D NSHomeDirectory();
+
+	// Add text
+	self.textView.text =3D homeDir;
+</FONT>
+
+	// Make non-editable
+	self.textView.editable =3D NO;
+
+	// Add as subview to window
+	[window addSubview:self.textView];
+
+	// Decrement our usage count
+	[self.textView release];
+
+	[window makeKeyAndVisible];
+}
+</PRE>
+  <LI><STRONG>Build and Go</STRONG>.=20
+  <LI>When your application runs, you should see a path similar to the =
+following=20
+  displayed on the screen (the value will change based on whether you =
+are on the=20
+  iPhone Simulator or the iPhone device): =
+<PRE>/Users/student/Library/Application =
+Support/iPhone/Simulator/User/Applications/...
+
+- OR (on an actual device) -
+
+/var/mobile/Applications/...
+</PRE></LI></OL>
+<P>As a review, in this exercise you used the =
+<STRONG>NSHomeDirectory()</STRONG>=20
+function to find the pathname of your applications home directory. </P>
+<HR>
+
+<H2>NSTemporaryDirectory()</H2>
+<P>In this exercise, you will use the =
+<STRONG>NSTemporaryDirectory()</STRONG>=20
+function to retrieve the path to the temporary directory for use by your =
+
+application. <PRE>NSString *NSTemporaryDirectory(void);
+</PRE>
+<P></P>
+<P>An important point: the location of your temporary directory is =
+different=20
+depending on whether you are running on the iPhone Simulator or on an =
+actual=20
+device (iPhone or iPod Touch). </P>
+<OL>
+  <LI>In Xcode, click on <STRONG>FileIoAppDelegate.m</STRONG> to select =
+it into=20
+  the <STRONG>Xcode</STRONG> editor.=20
+  <LI>Edit the code to match the following: <PRE>#import =
+&lt;FileIoAppDelegate.h&gt;
+
+@implementation FileIoAppDelegate
+
+@synthesize window;
+@synthesize textView;
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+
+	// Create instance of UITextView
+	self.textView =3D [[UITextView alloc]=20
+			 initWithFrame:[[UIScreen mainScreen] applicationFrame]];
+
+	// Get home directory
+	NSString *homeDir =3D NSHomeDirectory();
+
+<FONT color=3Dred>
+	// Get temporary directory
+	NSString *tempDir =3D NSTemporaryDirectory();
+
+	// Format output
+	NSString *s =3D=20
+		[NSString stringWithFormat:@"homeDir:\n"
+						 @"%@\n"
+						 @"tempDir:\n"
+						 @"%@\n",
+						homeDir,
+						tempDir];	=09
+	// Add text
+	self.textView.text =3D s;
+</FONT>
+
+	// Make non-editable
+	self.textView.editable =3D NO;
+
+	// Add as subview to window
+	[window addSubview:self.textView];
+
+	// Decrement our usage count
+	[self.textView release];
+
+	[window makeKeyAndVisible];
+}
+</PRE>
+  <LI><STRONG>Build and Go</STRONG>.=20
+  <LI>When your application runs, you should see output similar to the =
+following=20
+  (the values will change based on whether you are on the iPhone =
+Simulator or=20
+  the iPhone device): <PRE>homeDir:
+/Users/student/Library/Application =
+Support/iPhone/Simulator/User/Applications/...
+tempDir:
+/var/folders/7m/....
+
+- OR (on an actual device)
+/private/var/mobile/Applications/.../tmp
+</PRE></LI></OL>
+<P>As a review, in this exercise you used the=20
+<STRONG>NSTemporaryDirectory()</STRONG> function. </P>
+<HR>
+
+<H2>NSSearchPathForDirectoriesInDomains()</H2>
+<P>In this exercise, you will use the=20
+<STRONG>NSSearchPathForDirectoriesInDomains()</STRONG> function to =
+retrieve=20
+various paths: <PRE>NSArray *
+NSSearchPathForDirectoriesInDomains(
+	NSSearchPathDirectory directory, //NSDocumentDirectory or =
+NSCachesDirectory
+	NSSearchpathDomainMask domainMask, //NSUserDomainMask
+	BOOL exppandTilde); // YES
+</PRE>
+<P></P>
+<P>An important point: Although a NSArray object is returned, you will =
+only use=20
+the first array entry (index 0), which will contain an NSString. </P>
+<OL>
+  <LI>In Xcode, click on <STRONG>FileIoAppDelegate.m</STRONG> to select =
+it into=20
+  the <STRONG>Xcode</STRONG> editor.=20
+  <LI>Edit the code to match the following: <PRE>#import =
+&lt;FileIoAppDelegate.h&gt;
+
+@implementation FileIoAppDelegate
+
+@synthesize window;
+@synthesize textView;
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+
+	// Create instance of UITextView
+	self.textView =3D [[UITextView alloc]=20
+			 initWithFrame:[[UIScreen mainScreen] applicationFrame]];
+
+	// Get home directory
+	NSString *homeDir =3D NSHomeDirectory();
+
+	// Get temporary directory
+	NSString *tempDir =3D NSTemporaryDirectory();
+
+<FONT color=3Dred>
+	// Get documents directory
+	NSArray *arrayPaths =3D=20
+		NSSearchPathForDirectoriesInDomains(
+			NSDocumentDirectory,
+			NSUserDomainMask,
+			YES);
+
+	NSString *docDir =3D [arrayPaths objectAtIndex:0];
+
+	// Format output
+	NSString *s =3D=20
+		[NSString stringWithFormat:@"homeDir:\n"
+						 @"%@\n"
+						 @"tempDir:\n"
+						 @"%@\n"
+						 @"docDir:\n"
+						 @"%@\n",
+						homeDir,
+						tempDir,
+						docDir];	=09
+</FONT>
+	// Add text
+	self.textView.text =3D s;
+
+	// Make non-editable
+	self.textView.editable =3D NO;
+
+	// Add as subview to window
+	[window addSubview:self.textView];
+
+	// Decrement our usage count
+	[self.textView release];
+
+	[window makeKeyAndVisible];
+}
+</PRE>
+  <LI><STRONG>Build and Go</STRONG>.=20
+  <LI>When your application runs, you should see output similar to the=20
+  following: <PRE>homeDir:
+/Users/student/Library/Application =
+Support/iPhone/Simulator/User/Applications/...
+tempDir:
+/var/folder/7m/....
+docDir:
+/Users/student/Library/Application Support/.../Documents
+</PRE></LI></OL>
+<P>As a review, in this exercise you used the=20
+<STRONG>NSSearchPathForDirectoriesInDomain()</STRONG> function. </P>
+<HR>
+
+<H2>Using NSBundle and pathForResource:ofType:</H2>
+<P>In this exercise, you will use the <STRONG>NSBundle</STRONG> class to =
+report=20
+the path to the applications resources. The applications resources are =
+stored in=20
+the application bundle, and the path to this bundle can be found with =
+the method=20
+<STRONG>pathForRecoure:ofType:</STRONG>. </P>
+<OL>
+  <LI>In Xcode, click on <STRONG>FileIoAppDelegate.m</STRONG> to select =
+it into=20
+  the <STRONG>Xcode</STRONG> editor.=20
+  <LI>Edit the code to match the following: <PRE>#import =
+&lt;FileIoAppDelegate.h&gt;
+
+@implementation FileIoAppDelegate
+
+@synthesize window;
+@synthesize textView;
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+
+	// Create instance of UITextView
+	self.textView =3D [[UITextView alloc]=20
+			 initWithFrame:[[UIScreen mainScreen] applicationFrame]];
+
+	// Get home directory
+	NSString *homeDir =3D NSHomeDirectory();
+
+	// Get temporary directory
+	NSString *tempDir =3D NSTemporaryDirectory();
+
+	// Get documents directory
+	NSArray *arrayPaths =3D=20
+		NSSearchPathForDirectoriesInDomains(
+			NSDocumentDirectory,
+			NSUserDomainMask,
+			YES);
+
+	NSString *docDir =3D [arrayPaths objectAtIndex:0];
+
+<FONT color=3Dred>
+	NSString *myFilePath =3D [[NSBundle mainBundle]
+				pathForResource:@"MyFile"
+				ofType:@"txt"];
+
+	// Format output
+	NSString *s =3D=20
+		[NSString stringWithFormat:@"homeDir:\n"
+						 @"%@\n"
+						 @"tempDir:\n"
+						 @"%@\n"
+						 @"docDir:\n"
+						 @"%@\n"
+						 @"myFilePath:\n"
+						 @"%@\n",
+						homeDir,
+						tempDir,
+						docDir,
+						myFilePath];	=09
+</FONT>
+	// Add text
+	self.textView.text =3D s;
+
+	// Make non-editable
+	self.textView.editable =3D NO;
+
+	// Add as subview to window
+	[window addSubview:self.textView];
+
+	// Decrement our usage count
+	[self.textView release];
+
+	[window makeKeyAndVisible];
+}
+</PRE>
+  <LI><STRONG>Build and Go</STRONG>.=20
+  <LI>When your application runs, you should see output similar to the=20
+  following: <PRE>homeDir:
+/Users/student/Library/Application =
+Support/iPhone/Simulator/User/Applications/...
+tempDir:
+/var/folder/7m/....
+docDir:
+/Users/student/Library/Application Support.../Documents
+myFilePath:
+/Users/student/Library/Application Support/.../FileIo.App/MyFile.txt
+</PRE></LI></OL>
+<P>As a review, in this exercise you used the <STRONG>NSBundle</STRONG> =
+class to=20
+determine the path to the <STRONG>MyFile.txt</STRONG>, which is stored =
+as part=20
+of the resource bundle. </P>
+<HR>
+
+<H2>Using NSString and stringWithContentsOfFile:encoding:error:</H2>
+<P>In this exercise, you will use the <STRONG>NSString</STRONG> class to =
+read=20
+the <STRONG>MyText.txt</STRONG> file. </P>
+<OL>
+  <LI>In Xcode, click on <STRONG>FileIoAppDelegate.m</STRONG> to select =
+it into=20
+  the <STRONG>Xcode</STRONG> editor.=20
+  <LI>Edit the code to match the following: <PRE>#import =
+&lt;FileIoAppDelegate.h&gt;
+
+@implementation FileIoAppDelegate
+
+@synthesize window;
+@synthesize textView;
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+
+	// Create instance of UITextView
+	self.textView =3D [[UITextView alloc]=20
+			 initWithFrame:[[UIScreen mainScreen] applicationFrame]];
+
+	// Get home directory
+	NSString *homeDir =3D NSHomeDirectory();
+
+	// Get temporary directory
+	NSString *tempDir =3D NSTemporaryDirectory();
+
+	// Get documents directory
+	NSArray *arrayPaths =3D=20
+		NSSearchPathForDirectoriesInDomains(
+			NSDocumentDirectory,
+			NSUserDomainMask,
+			YES);
+
+	NSString docDir =3D [arrayPaths objectAtIndex:0];
+
+	NSString *myFilePath =3D [[NSBundle mainBundle]
+				pathForResource:@"MyFile"
+				ofType:@"txt"];
+
+<FONT color=3Dred>
+	NSString *myFileContents =3D [NSString =
+stringWithContentsOfFile:myFilePath
+					     encoding:NSUTF8StringEncoding
+					     error:nil];
+
+	// Format output
+	NSString *s =3D=20
+		[NSString stringWithFormat:@"homeDir:\n"
+						 @"%@\n"
+						 @"tempDir:\n"
+						 @"%@\n"
+						 @"docDir:\n"
+						 @"%@\n"
+						 @"myFilePath:\n"
+						 @"%@\n"
+						 @"Contents of file:\n"
+						 @"%@\n",
+						homeDir,
+						tempDir,
+						docDir,
+						myFilePath,
+						myFileContents];	=09
+</FONT>
+	// Add text
+	self.textView.text =3D s;
+
+	// Make non-editable
+	self.textView.editable =3D NO;
+
+	// Add as subview to window
+	[window addSubview:self.textView];
+
+	// Decrement our usage count
+	[self.textView release];
+
+	[window makeKeyAndVisible];
+}
+</PRE>
+  <LI><STRONG>Build and Go</STRONG>.=20
+  <LI>When your application runs, you should see output similar to the=20
+  following: <PRE>homeDir:
+/Users/student/Library/Application =
+Support/iPhone/Simulator/User/Applications/...
+tempDir:
+/var/folder/7m/....
+docDir:
+/Users/student/Library/Application Support/.../Documents
+myFilePath:
+/Users/student/Library/Application Support/.../FileIo.App/MyFile.txt
+Contents of file:
+This is a text file.
+This file will be displayed on the iPhone.
+That is all for now.
+</PRE></LI></OL>
+<P>As a review, in this exercise you used the <STRONG>NSString</STRONG> =
+class to=20
+read the contents of <STRONG>MyFile.txt</STRONG>. </P>
+<HR>
+
+<H2>Using NSString and writeFileTo:atomically:encoding:</H2>
+<P>In this exercise, you will use the <STRONG>NSString</STRONG> class to =
+write a=20
+new file named <STRONG>NewText.txt</STRONG>. </P>
+<OL>
+  <LI>In Xcode, click on <STRONG>FileIoAppDelegate.m</STRONG> to select =
+it into=20
+  the <STRONG>Xcode</STRONG> editor.=20
+  <LI>Edit the code to match the following: <PRE>#import =
+&lt;FileIoAppDelegate.h&gt;
+
+@implementation FileIoAppDelegate
+
+@synthesize window;
+@synthesize textView;
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+
+	// Create instance of UITextView
+	self.textView =3D [[UITextView alloc]=20
+			 initWithFrame:[[UIScreen mainScreen] applicationFrame]];
+
+	// Get home directory
+	NSString *homeDir =3D NSHomeDirectory();
+
+	// Get temporary directory
+	NSString *tempDir =3D NSTemporaryDirectory();
+
+	// Get documents directory
+	NSArray *arrayPaths =3D=20
+		NSSearchPathForDirectoriesInDomains(
+			NSDocumentDirectory,
+			NSUserDomainMask,
+			YES);
+
+	NSString docDir =3D [arrayPaths objectAtIndex:0];
+
+	NSString *myFilePath =3D [[NSBundle mainBundle]
+				pathForResource:@"MyFile"
+				ofType:@"txt"];
+
+	NSString *myFileContents =3D [NSString =
+stringWithContentsOfFile:myFilePath
+					     encoding:NSUTF8StringEncoding
+					     error:nil];
+
+	// Format output
+	NSString *s =3D=20
+		[NSString stringWithFormat:@"homeDir:\n"
+						 @"%@\n"
+						 @"tempDir:\n"
+						 @"%@\n"
+						 @"docDir:\n"
+						 @"%@\n"
+						 @"myFilePath:\n"
+						 @"%@\n"
+						 @"Contents of file:\n"
+						 @"%@\n",
+						homeDir,
+						tempDir,
+						docDir,
+						myFilePath,
+						myFileContents];	=09
+<FONT color=3Dred>
+	// Create pathname to Documents directory
+	NSString *newFilePath =3D [docDir =
+stringByAppendingString:@"/NewFile.txt"];
+
+	// Write string to file
+	[s writeToFile:newFilePath
+	   atomically:YES
+	   encoding:NSUTF8StringEncoding
+	   error:nil];
+</FONT>
+	// Add text
+	self.textView.text =3D s;
+
+	// Make non-editable
+	self.textView.editable =3D NO;
+
+	// Add as subview to window
+	[window addSubview:self.textView];
+
+	// Decrement our usage count
+	[self.textView release];
+
+	[window makeKeyAndVisible];
+}
+</PRE>
+  <LI><STRONG>Build and Go</STRONG>.=20
+  <LI>When your application runs, it displays output on the iPhone =
+screen, and=20
+  also writes the output to the <STRONG>NewFile.txt</STRONG> file.=20
+  <LI>While the iPhone Simulator is still running, open up a terminal =
+window,=20
+  and <STRONG>cat</STRONG> (concatenate) out the contents of the file: =
+<PRE>$ cat /Users/student/Library/Application =
+Support/.../Documents/NewFile.txt
+...
+</PRE></LI></OL>
+<P>As a review, in this exercise you used the <STRONG>NSString</STRONG> =
+class to=20
+write the contents of a NSString <STRONG>MyFile.txt</STRONG>. </P>
+<HR>
+
+<H2>Skills Review</H2>
+<UL>
+  <LI>Xcode=20
+  <LI>Window-Based Application=20
+  <LI>UITextView=20
+  <LI>NSHomeDirectory()=20
+  <LI>NSTemporaryDirectory()=20
+  <LI>NSSearchPathForDirectoriesInDomains()=20
+  <LI>NSBundle=20
+  <LI>mainBundle=20
+  <LI>pathForResource:ofType:=20
+  <LI>NSString=20
+  <LI>stringWithContentsOfFile:encoding:error:=20
+  <LI>writeToFile:atomically:encoding:error: </LI></UL>
+<HR>
+
+<H2>How To Contact Author</H2>
+<P>Feel free to <A=20
+href=3D"http://servin.com/contact.php?fn=3Dcontact&amp;sub=3Djan20">conta=
+ct the=20
+author</A> for any of the following: </P>
+<UL>
+  <LI>You have a question or comment about this mini-course.=20
+  <LI>You need to hire Servin to help with your software development =
+project.=20
+  <LI>You need to hire Servin to give an on-site training course for =
+your=20
+  software development team. </LI></UL>
+<HR>
+
+<P><SMALL>Updated 2009 Sep 1<BR>Content viewable on all web browsers, =
+including=20
+smart mobile phone devices.<BR>Copyright =C2=A9 1995-2009 Servin =
+Corporation. All=20
+rights reserved. </SMALL></P></BODY></HTML>
+
+------=_NextPart_000_0000_01CDAACA.0A735A20
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: 7bit
+Content-Location: http://servin.com/servin.css
+
+BODY {
+	FONT-FAMILY: Verdana,Arial,sans-serif
+}
+
+------=_NextPart_000_0000_01CDAACA.0A735A20--

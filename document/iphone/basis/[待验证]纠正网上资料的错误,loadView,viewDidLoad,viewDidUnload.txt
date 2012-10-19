@@ -1,0 +1,48 @@
+loadView,viewDidLoad,viewDidUnload，这三个函数到底应该怎么用？
+
+谷歌一下，全是转载，大概内容是这样：
+
+loadView 手动加载view
+viewDidLoad用于nib文件加载后，进一步处理
+viewDidUnload是viewDidLoad的镜像
+参考官方文档，我给出纠正：
+
+一、loadView
+永远不要主动调用这个函数。view controller会在view的property被请求并且当前view值为nil时调用这个函数。如果你手动创建view，你应该重载这个函数。如果你用IB创建view并初始化view controller，那就意味着你使用initWithNibName:bundle:方法，这时，你不应该重载loadView函数。
+
+这个方法的默认实现是这样：先寻找有关可用的nib文件的信息，根据这个信息来加载nib文件，如果没有有关nib文件的信息，默认实现会创建一个空白的UIView对象，然后让这个对象成为controller的主view。
+
+所以，重载这个函数时，你也应该这么做。并把子类的view赋给view属性(property)（你create的view必须是唯一的实例，并且不被其他任何controller共享），而且你重载的这个函数不应该调用super。
+
+如果你要进行进一步初始化你的views，你应该在viewDidLoad函数中去做。在iOS 3.0以及更高版本中，你应该重载viewDidUnload函数来释放任何对view的引用或者它里面的内容（子view等等）。
+
+这个网上的资料都说的很不全面，尤其是蓝色字部分。
+
+二、viewDidLoad
+这个函数在controller加载了相关的views后被调用，而不论这些views存储在nib文件里还是在loadView函数中生成。而多数情况下是做nib文件的后续工作。
+
+网上资料对这个函数的描述则完全不对。
+
+三、viewDidUnload
+这个函数是viewDidLoad的对立函数。在程序内存欠缺时，这个函数被controller调用（）。由于controller通常保存着与view（这里黑体的view指controller的view属性）相关的对象（一般是view的子view）或者其他运行时创建的对象的引用，所以你必须使用这个函数来放弃这些对象的所有权以便内存回收。但不要释放那些难以重建的数据（不要在这个函数中释放view）。
+
+通常controller会保存nib文件建立的views的引用，但是也可能会保存着loadView函数创建的对象的引用。最完美的方法是使用合成器方法：
+
+1 self.myCertainView = nil; 
+
+这样合成器会release这个view，如果你没有使用property，那么你得自己显式释放这个view。
+
+网上对这个函数的描述含含糊糊，看了等于没看。
+
+另外：如果controller存储了其他object和view的引用，你还得在dealloc方法中释放这些内存。对于iOS2.x，你还必须在调用super dealloc方法前将这些引用置为nil。
+
+四、结论
+所以流程应该是这样：
+
+(loadView/nib文件)来加载view到内存 ——>viewDidLoad函数进一步初始化这些view ——>内存不足时，调用viewDidUnload函数释放views
+
+—->当需要使用view时有回到第一步
+
+如此循环
+
+http://blog.csdn.net/kuqideyupian/article/details/7410120

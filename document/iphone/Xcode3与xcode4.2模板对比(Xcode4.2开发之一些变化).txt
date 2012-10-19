@@ -1,0 +1,146 @@
+Xcode3中IOS下的Application的模板如下:
+
+Navigation_Based Application
+
+OpenGL ES Application
+
+Tab Bar Application
+
+Utility Application
+
+Window-Based Application
+
+ 
+
+ 
+
+Xcode4.2IOS下的Application的模板如下:
+
+Master-Detail Application
+
+OpenGL Game
+
+Page-Based Application
+
+Single View Application
+
+Tabbed Application
+
+Utility Application
+
+Empty Application
+
+ 
+
+1. 工程项目模板类型的更改
+
+          Xcode4时代                                           Xcode4.2新模板
+Navigation-based Application  ------->Master-Detail Application => iphone
+
+Splite View-based Application ------->Master-Detail Application => ipad
+
+OpenGL ES Application --------------->OpenGL Game
+
+Tab Bar Application      --------------->Tabbed Application
+
+Utility Application         --------------->Utility Application
+
+View-based Application --------------->Single View Application
+
+Window-based Application------------>Empty Application
+
+
+2.  新增一编译级特性——Automatic Reference Counting 
+这似乎是Xcode4.2也增加了类似其他面向对象语言的GC（垃圾回收器）的概念。不知道我的理解是否正确？但在实践中若是iphone应用编程或导入以前的工程项目最好还是禁用ARC， （我们自己勤快点养成释放清理对象的习惯。）方法为：Project Info -> Apple LLVM compiler 3.0 - Language -> Objective-C Automatic Referencing Counting， 设置为NO即可。
+
+
+
+否则会对release，retainCount，retain等内存相关操作在编译时出现红色警告：
+
+
+
+ 
+
+ 
+
+ 
+
+在Xcode4.2中新建一个工程，有三个大类可选：
+
+1.Application:
+
+在这个类别下面，你可以看到下面8种可选类型
+
+
+
+下面对这些工程一一说明：
+
+1.Document-Based Application:
+
+工程缺省说明如下：
+
+This template provides a starting point for a document-based application. It provides an interface to store documents locally or in iCloud.
+
+这个就是iOS新增的一个重要功能－－云计算的一个体现，你可以创建一个基于Master-Detail Application类型的工程，不过加入了一个文档的概念，而且这些文档可以无缝保存到云端。
+
+我的试验的结果是在当前情况下，在虚拟机上运行程序还不能保存到云端。
+
+2.Master-Detail Application：
+
+工程缺省说明如下：
+
+This template provides a starting point for a master-detail application. It provides a user interface configured with a navigation controller to display a list of items and also a split view on iPad.
+
+很多有过一些开发经验的程序员会发现现在为iPhone的Navigation（导航模式）和为iPad的Split（分割模式）的工程模板没有 了，其实这个地方就是这两种工程的入口，如果你选择是iPhone版的Master-Detail Application，其实际生成的就是Navigation（导航模式），如果选择iPad，则为Split（分割模式）
+
+3.OpenGL Game
+
+工程缺省说明如下：
+
+This template provides a starting point for an OpenGL ES-based game. It provides a view into which you render your OpenGL ES scene, and a timer to allow you to animate the view.
+
+这个是生成一个基于OpenGL的工程，值得说明的是，iOS已全面支持OpenGLES 2.0,并且使用shader编程实现其中的功能。
+
+4.Page-Based Application:
+
+工程缺省说明如下：
+
+This template provides a starting point for a page-based application that uses a page view controller. 
+
+这个是iOS5引入的一个新的类，page view controller,其翻页效果是基于OpenGLES实现的。
+
+5.Single View Application:
+
+工程缺省说明如下：
+
+This template provides a starting point for an application that uses a single view. It provides a view controller to manage the view, and a storyboard or nib file that contains the view.
+
+这个就是大家很熟悉的View－Based Application,没啥好说的。
+
+6.Tabbed Application:
+
+工程缺省说明如下：
+
+This template provides a starting point for an application that uses a tab bar. It provides a user interface configured with a tab bar controller, and view controllers for the tab bar items.
+
+这个就是大家熟悉的Tab Bar Application,值得一提的就是，现在控制Tab bar内容及其相关View controller都是使用代码来实现的。Tab bar从一开始就可以使用代码控制，不过大部分时候可以通过IB来定义，在XCode4.0之前和4.0中，IB在这个地方的使用方式不同。现在终于要放 弃使用IB编辑了。
+
+7.Utility Application:
+
+工程缺省说明如下：
+
+This template provides a starting point for a utility application that has a main view and an alternate view. For iPhone, it sets up an Info button to flip the main view to the alternate view. For iPad, it sets up an Info bar button that shows the alternate view in a popover.
+
+这个唯一新增的就是支持iPad了，而且很少用到这个模板。
+
+8.Empty Application:
+
+工程缺省说明如下：
+
+This template provides a starting point for any application. It provides just an application delegate and a window.
+
+这个就是原来的Window-Based Application.
+
+
+
+在另外两个里面，一个是建一个静态类库的工程，一个创建一个完全空的工程。因此在此不再描述。

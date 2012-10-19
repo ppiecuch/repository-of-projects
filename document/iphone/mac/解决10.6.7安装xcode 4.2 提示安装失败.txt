@@ -1,0 +1,20 @@
+之前是装得了的,一切正常的,后来重装了之后就发生这样的错误了.我以为我重装不正确,又重装过两次系统...还是没有解决...
+
+安装的是:xcode_4.2_and_ios_5_sdk_for_snow_leopard.dmg 这个文件...
+
+安装 时输入密码后,一秒钟就提示安装失败了.提示信息是: 发生未知的安装错误     安装器遇到一个错误,导致安装失败.请联系软件制造商以获得帮助.
+
+安装器的日志是:
+
+Mar 27 11:28:07 yematoMac Installer[314]: IFJS: *** exception: ReferenceError: Can't find variable: SDKPresent
+Mar 27 11:28:07 yematoMac Installer[314]: IFJS: *** exception: ReferenceError: Can't find variable: SDKPresent
+Mar 27 11:28:07 yematoMac Installer[314]: IFJS: *** exception: ReferenceError: Can't find variable: SDKPresent
+Mar 27 11:28:43 yematoMac Installer[314]: Failed install preflight: Error Domain=PKInstallErrorDomain Code=102 UserInfo=0x100278b20 "软件包“OpenGLApps.pkg”不可信任。" Underlying Error=(Error Domain=NSOSStatusErrorDomain Code=-2147409654 UserInfo=0x100292500 "未能完成该操作。CSSMERR_TP_CERT_EXPIRED")
+Mar 27 11:28:43 yematoMac Installer[314]: Install failed: 安装器遇到了一个错误，导致安装失败。请联系软件制造商以获得帮助。
+Mar 27 11:28:43 yematoMac Installer[314]: Displaying 'Install Failed' UI.
+Mar 27 11:28:43 yematoMac Installer[314]: 'Install Failed' UI displayed message:'发生未知的安装错误。\n\n安装器遇到了一个错误，导致安装失败。请联系软件制造商以获得帮助。'.
+
+ 
+把日期设置为2012年1月1日就ok了!!! 因为它的证书是3月到期的
+
+http://blog.sina.com.cn/s/blog_63c2e91b01012ckg.html
