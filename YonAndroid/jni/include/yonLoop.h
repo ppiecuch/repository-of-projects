@@ -6,42 +6,48 @@
 namespace yon{
 namespace core{
 
-	//0 1 2 3 4
-	template< class T, typename TAlloc = yonAllocator<T> >
+	template<class T, typename TAlloc = yonAllocator<T> >
 	class loop{
 	private:
+		TAlloc allocator;
+
 		s32 front;
 		s32 rear;
-		s32 current;
 
-		s32 total;
-		s32 diff;
-
-		TAlloc allocator;
 		T* elements;
+		s32 diff;
+		s32 total;
 
 		inline void lock(){}
 		inline void unlock(){}
 		inline void update(){
 			diff=rear-front;
-			if(rear<0)
-				rear+=total;
+			if(diff<0)
+				diff+=total;
 		}
 	public:
 		loop(s32 capacity=1024)
-			:front(0),rear(0),current(0),total(0),diff(0),elements(NULL){
-				elements=allocator.allocate(capacity);
-				total=capacity;
-		}
-		~loop(){
-			if(elements)
-				allocator.deallocate(elements);
+			:total(0),elements(NULL),front(0),rear(0),diff(0)
+		{
+			elements=allocator.allocate(capacity);
+			total=capacity;
 		}
 
-		inline s32 capacity(){return total;}
-		inline s32 size(){return diff;}
-		inline s32 available(){return total-diff-1;}
-		inline s32 increasable(){
+		~loop(){
+			allocator.deallocate(elements);
+			elements=NULL;
+			total=front=rear=diff=0;
+		}
+
+		inline s32 capacity() const {return total;}
+
+		inline s32 size() const{return diff;}
+
+		inline s32 available() const{return total-diff-1;}
+
+		// Return the max num for using pointer incrementment
+		inline s32 nextable() const{
+			lock();
 			if(rear>=front)
 			{
 				if(front>0)
@@ -49,7 +55,37 @@ namespace core{
 				else
 					return total-rear-1;
 			}
-			return front-rear-1;
+			s32 result=front-rear-1;
+			unlock();
+			return result;
+		}
+
+		T* consume_pointer(){return elements+front;}
+		T* supply_pointer(){return elements+rear;}
+
+		void consume(s32 len){
+			lock();
+			YON_DEBUG_BREAK_IF(len<0||len>size())
+				front+=len;
+			if(front>=total)
+				front-=total;
+			update();
+			unlock();
+		}
+
+		void supply(s32 len){
+			lock();
+			YON_DEBUG_BREAK_IF(len<0||len>available())
+				rear+=len;
+			if(rear>=total)
+				rear-=total;
+			update();
+			unlock();
+		}
+
+		void clear(){
+			memset(elements,0x0,capacity);
+			front=rear=diff=0;
 		}
 	};
 }
