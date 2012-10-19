@@ -1,0 +1,82 @@
+在Linux操作系统中，本地POSIX线程库（NPTL）是一种软件特性，它可让Linux的内核，高效地运行那些使用POSIX风格的线程所编写的程序。
+
+测试中，NPTL在一个IA-32处理器上，成功地同时跑了10万个线程，启动这些线程只用了不到2秒。比较起来，在不支持NPTL的内核上，这个测试花费了大约15分钟。
+
+以前（也就是在2.6内核以前），Linux把进程当作其调度实体，内核并不真正支持线程。可是，它提供了一个clone()系统调用——创建一个调用进程的拷贝，这个拷贝与调用者共享地址空间。LinuxThreads项目就是利用这个系统调用，完全在用户级模拟了线程；不幸的是，它与真正的POSIX标准在一致性上面存在大量的问题，在信号处理，任务调度，以及进程间同步原语方面尤为突出。
+
+要改进LinuxThreads，显然需要一些内核方面的支持，并从写线程库。针对于这一需求的两个竞争项目启动了——NGPT，或称下一代POSIX线程，由包括来自IBM的开发者在内的一个团队进行开发；NPTL是由Red Hat的开发者来开发的，两者同时进行。但是，NGPT已在2003年年中就被放弃了。
+
+NPTL的使用与LinuxThreads极为相似，这是由于，其主要的抽象依然被内核认为是一个进程，而且新线程的创建，使用的还是clone()系统调用(来自NPTL的调用)。可是，NPTL需要专有的内核支持来实现在竞争情况下可使线程睡眠或被再唤醒的同步原语。用在这儿的原语，被认为是一个Futex。
+
+NPTL号称是1x1的线程库，这是由于用户所创建的线程（通过pthread_create()库函数）与内核的调度实体（在Linux内是进程）1-1对应。这是最简单的合理线程实现了。一个备选方案是m x n的，就是说用户级线程要多于调度实体，如果以这种方式实现的话，由线程库负责在可用的调度实体上调度用户线程。这会使得线程上下文切换非常的快，因为它避免了系统调用，但是它也增加了复杂性和优先级反转的可能性。
+
+NPTL的第一版发布在Red Hat 9.0中。老式的POSIX线程库众所周知的问题是有些时候线程会拒绝向系统让出控制权，因为这种事情发生时，它得不到让出控制权的机会。还有些事情Windows会做得更好。Red Hat在Java的站点上的一篇关于Java在Red Hat 9上的文章中声称NPTL已经解决了这些问题。
+
+自从Red Hat Enterprise Linux第3版开始，NPTL就已经成为它的一部分,现在它已经完全的集成到Glibc中了。
+
+NPTL vs LinuxThreads
+
+NPTL introduction
+ 
+1. glossary
+NPTL=Native Posix Thread Library
+LinuxThreads=old Linux Posix Thread Library
+ 
+2. requirement
+kernel version at least 2.5, 2.6 best(as4)
+ 
+3. advantages
+LinuxThreads:light-process, slow,不可抢占,different pid
+NPTL:faster,可抢占,same pid
+ 
+4.use
+glibc > 2.3.3
+ 
+check thread library version
+# getconf GNU_LIBPTHREAD_VERSION
+nptl-0.60
+ 
+附：从redhat网站抄来的一段话
+ (http://www.redhat.com/docs/manuals/enterprise/RHEL-4-Manual/zh_cn/release-notes/as-zseries/)
+#
+
+红帽企业 Linux 3 包括 Native POSIX Thread Library (NPTL)，它是 Linux 的 POSIX 线程的新实现。与以前使用的 LinuxThreads 实现相比较，它大大提高了性能并增加了可缩放性。
+
+虽然多数的线程应用程序不会受到 NPTL 的影响，但是那些倚赖 LinuxThreads 语意 (semantics) 而不是 POSIX 技术规范的应用程序可能不会正常运行。因此 Red Hat 推荐您把这些程序升级使它们遵循 POSIX 的技术规范（从而可以使用 NPTL）。
+
+虽然 红帽企业 Linux 4 仍然提供对 LinuxThreads 的支持，但是 红帽企业 Linux 5 将不再包括对 LinuxThreads 的支持。因此，那些需要 LinuxThreads 支持的应用程序应该被升级，从而可以使它们在将来的 红帽企业 Linux 5 系统上运行。
+备注
+
+一些方法可以使需要使用 LinuxThreads 的应用程序仍然可以在 红帽企业 Linux 3 和 4 上运行。这些方法包括：
+
+    *
+
+      使用 LD_ASSUME_KERNEL 环境变量来在运行时选择 LinuxThreads 而不是选择 NPTL
+    *
+
+      在运行时，使用一个指向 /lib/i686/ 或 /lib/的 rpath 来选择 LinuxThreads 而不是选择 NPTL。
+    *
+
+      使用静态方法来链接应用程序，使它使用 LinuxThreads 来代替 NPTL（不建议这么使用）
+
+为了决定一个应用程序是使用 NPTL 还是使用 LinuxThreads，在应用程序的环境中加入如下两个环境变量：
+
+LD_DEBUG=libs
+
+LD_DEBUG_OUTPUT=<filename>
+
+（这里的 <filename> 是提供给每个纠错输出记录文件的名字。如果一个程序产生了多个进程，多个文件就可能被产生；所有的纠错输出记录文件名都包括产生这个文件的进程的进程 ID （PID））
+
+然后启动这个程序，和通常的情况下一样使用它。
+
+如果没有纠错输出记录文件被产生，这个应用程序就被静态地链接。这个应用程序将不会受到丢失的 LinuxThreads DSO 的影响。但是，象所有静态链接的程序一样，它们不能保证程序在动态加载任何代码的时候（直接通过 dlopen() 或间接通过 NSS）都可以正常工作。
+
+如果一个或多个纠错输出记录文件被产生，检查每一个 libpthread 相关的文件 — 特别是包括 "calling init" 的行。grep 可以帮助来做这项工作：
+
+grep "calling init.*libpthread" <filename>.*
+
+（这里的 <filename> 是在 LD_DEBUG_OUTPUT 环境变量中使用的名字。）
+
+如果 libpthread 前面的路径是 /lib/tls/，这个应用程序使用 NPTL，并且不需做任何事情。其它任何的路径都说明 LinuxThreads 在被使用，这个应用程序必须被升级并重新构建来支持 NPTL。
+
+http://hoho-zhao.blog.sohu.com/57011428.html
