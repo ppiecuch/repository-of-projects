@@ -191,6 +191,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\loopTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\loopTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\main.cpp"
 			>
 		</File>
