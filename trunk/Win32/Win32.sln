@@ -95,6 +95,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Socket", "Socket\Socket.vcp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CircleArray", "CircleArray\CircleArray.vcproj", "{67516264-BAC9-404A-ABAC-22F37C1EA895}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boostbind", "boostbind\boostbind.vcproj", "{CAE48FF2-6163-4FF5-A87C-9D36B4E1A4A5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "operator", "operator\operator.vcproj", "{26222266-7254-4B03-BC7C-A40A848F18E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -277,6 +281,14 @@ Global
 		{67516264-BAC9-404A-ABAC-22F37C1EA895}.Debug|Win32.Build.0 = Debug|Win32
 		{67516264-BAC9-404A-ABAC-22F37C1EA895}.Release|Win32.ActiveCfg = Release|Win32
 		{67516264-BAC9-404A-ABAC-22F37C1EA895}.Release|Win32.Build.0 = Release|Win32
+		{CAE48FF2-6163-4FF5-A87C-9D36B4E1A4A5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CAE48FF2-6163-4FF5-A87C-9D36B4E1A4A5}.Debug|Win32.Build.0 = Debug|Win32
+		{CAE48FF2-6163-4FF5-A87C-9D36B4E1A4A5}.Release|Win32.ActiveCfg = Release|Win32
+		{CAE48FF2-6163-4FF5-A87C-9D36B4E1A4A5}.Release|Win32.Build.0 = Release|Win32
+		{26222266-7254-4B03-BC7C-A40A848F18E7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{26222266-7254-4B03-BC7C-A40A848F18E7}.Debug|Win32.Build.0 = Debug|Win32
+		{26222266-7254-4B03-BC7C-A40A848F18E7}.Release|Win32.ActiveCfg = Release|Win32
+		{26222266-7254-4B03-BC7C-A40A848F18E7}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
