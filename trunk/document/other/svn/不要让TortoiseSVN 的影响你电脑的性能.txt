@@ -1,0 +1,54 @@
+今天发现我的机器明显变慢了. 
+
+资源管理器打开,慢!
+
+浏览器打开,慢!
+
+ 
+
+从任务管理器中看到TSVNCache.exe 占用了150M内存,而且CPU也经常占用超过30%.
+
+ 
+
+TSVNCache.exe是TortoiseSVN的驻留程序,这个程序会监控所有SVN的目录,如果发现文件改变,就会更新文件及文件夹的状态.
+
+ 
+
+大概是我的SVN目录有2G多,数十万文件导致TSVNCache.exe 占用资源比较多吧.
+
+ 
+
+ 以下是TortoiseSVN文档中对TSVNCache.exe的描述:
+
+ 
+
+Default
+Caches all status information in a separate process (TSVNCache.exe). That process watches all drives for changes and fetches the status again if files inside a working copy get modified. The process runs with the least possible priority so other programs don't get hogged because of it. That also means that the status information is not real time but it can take a few seconds for the overlays to change. 
+
+Advantage: the overlays show the status recursively, i.e. if a file deep inside a working copy is modified, all folders up to the working copy root will also show the modified overlay. And since the process can send notifications to the shell, the overlays on the left tree view usually change too. 
+
+Disadvantage: the process runs constantly, even if you're not working on your projects. It also uses around 10-50 MB of RAM depending on number and size of your working copies. 
+
+Shell
+Caching is done directly inside the shell extension dll, but only for the currently visible folder. Each time you navigate to another folder, the status information is fetched again. 
+
+Advantage: needs only very little memory (around 1 MB of RAM) and can show the status in real time. 
+
+Disadvantage: Since only one folder is cached, the overlays don't show the status recursively. For big working copies, it can take more time to show a folder in explorer than with the default cache. Also the mime-type column is not available. 
+
+None
+With this setting, the TortoiseSVN does not fetch the status at all in Explorer. Because of that, files don't get an overlay and folders only get a 'normal' overlay if they're versioned. No other overlays are shown, and no extra columns are available either. 
+
+Advantage: uses absolutely no additional memory and does not slow down the Explorer at all while browsing. 
+
+Disadvantage: Status information of files and folders is not shown in Explorer. To see if your working copies are modified, you have to use the “Check for modifications” dialog. 
+
+ 
+
+
+
+ 
+
+我选择把Status Cache设置为None,TSVNCache.exe从任务管理器的进程中消失了,电脑的速度正常了. 
+
+http://blog.csdn.net/hjue/article/details/4417511
