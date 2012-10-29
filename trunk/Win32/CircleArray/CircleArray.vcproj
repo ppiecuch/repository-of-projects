@@ -166,6 +166,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\fastatof.h"
+			>
+		</File>
+		<File
 			RelativePath=".\main.cpp"
 			>
 		</File>
@@ -179,6 +183,14 @@
 		</File>
 		<File
 			RelativePath=".\yonConfig.h"
+			>
+		</File>
+		<File
+			RelativePath=".\yonMath.h"
+			>
+		</File>
+		<File
+			RelativePath=".\yonString.h"
 			>
 		</File>
 		<File
