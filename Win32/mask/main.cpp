@@ -137,11 +137,11 @@ int main(int argc, char* argv[])
 	
 
 	//第三种比第二种快10倍，第二种比第一种快10倍
-	for(long i=0;i<900000000;++i)
+	for(long i=0;i<90000000;++i)
 	{
 		//m1.states==m2.states;
 		//memcmp(&m1,&m2,size);
-		/*m1.states.AlphaTest==m2.states.AlphaTest&&
+		m1.states.AlphaTest==m2.states.AlphaTest&&
 			m1.states.Blend==m1.states.Blend&&
 		m1.states.ColorMaterial==m1.states.ColorMaterial&&
 		m1.states.CullFace==m1.states.CullFace&&
@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
 		m1.states.Normalize==m1.states.Normalize&&
 		m1.states.RescaleNormal==m1.states.RescaleNormal&&
 		m1.states.ScissorTest==m1.states.ScissorTest&&
-		m1.states.StencilTest==m1.states.StencilTest;*/
+		m1.states.StencilTest==m1.states.StencilTest;
 		
 	}
 
