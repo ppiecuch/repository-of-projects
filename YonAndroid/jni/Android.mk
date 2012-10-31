@@ -17,9 +17,17 @@ LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/Yon/openal/OpenAL32/Include \
 		$(LOCAL_PATH)/Yon/libogg \
 		$(LOCAL_PATH)/Yon/libvorbis \
+		$(LOCAL_PATH)/Yon/libiconv/include \
+		$(LOCAL_PATH)/Yon/libiconv/src \
 		$(LOCAL_PATH)/include/ \
 		$(LOCAL_PATH)/Yon/ \
 		$(LOCAL_PATH)/ 
+		
+		
+iconv_SOURCES := \
+		Yon/libiconv/src/iconv.c \
+		Yon/libiconv/src/relocatable.c \
+		Yon/libiconv/src/localcharset.c
 		
 lpng_SOURCES := \
 		Yon/lpng/png.c \
@@ -105,41 +113,68 @@ vorbis_SOURCES :=\
 		Yon/libvorbis/window.c 
 
 yon_SOURCES :=   \
-		Yon/CWave.cpp \
-		Yon/CWaveLoaderWAV.cpp \
-		Yon/CWaveLoaderOGG.cpp \
-		Yon/COALSound.cpp \
-		Yon/COALAudioDriver.cpp \
-		Yon/CDebugPrinter.cpp \
-		Yon/CLogger.cpp \
-		Yon/CFileSystem.cpp \
-		Yon/CReadFile.cpp \
-		Yon/CReadFileStream.cpp \
-		Yon/CReadMemoryStream.cpp \
-		Yon/COrthoCamera.cpp \
-		Yon/CGeometryFactory.cpp \
-		Yon/CEntity.cpp \
-		Yon/CModel.cpp \
-		Yon/CAnimatorFactory.cpp \
-		Yon/CGraphicsAdapter.cpp \
-		Yon/CSceneManager.cpp \
-		Yon/CTimerAndroid.cpp \
-		Yon/CFPSCounter.cpp \
-		Yon/COGLES1ExtensionHandler.cpp \
-		Yon/COGLES1Driver.cpp \
-		Yon/COGLES1Texture.cpp \
-		Yon/COGLES1FBOTexture.cpp \
-		Yon/COGLES1HardwareBuffer.cpp \
-		Yon/CYonEngineAndroid.cpp \
-		Yon/CImage.cpp \
-		Yon/CImageLoaderPNG.cpp \
-		Yon/yon.cpp \
-		YonExample/framework.cpp \
-		yon_AndroidGLView.cpp
+	$(addprefix Yon/, \
+		CRandomizer.cpp \
+		CWave.cpp \
+		CWaveLoaderWAV.cpp \
+		CWaveLoaderOGG.cpp \
+		COALSound.cpp \
+		COALAudioDriver.cpp \
+		CDebugPrinter.cpp \
+		CLogger.cpp \
+		CFileSystem.cpp \
+		CReadFileStream.cpp \
+		CWriteFileStream.cpp \
+		CReadMemoryStream.cpp \
+		CI18NManager.cpp \
+		CNetManager.cpp \
+		CSocket.cpp \
+		NetCode.cpp \
+		CAnimatedSceneNode.cpp \
+		CBoneSceneNode.cpp \
+		CEntityLoaderXC3D.cpp \
+		CSkinnedEntity.cpp \
+		EncodeConvertor.cpp \
+		COrthoCamera.cpp \
+		CPerspCamera.cpp \
+		CViewFrustum.cpp \
+		CWindowOrthoCamera.cpp \
+		CGeometryFactory.cpp \
+		CEntity.cpp \
+		CModel.cpp \
+		CSkyBox.cpp \
+		CGeomipmapTerrain.cpp \
+		CGeomipmapTerrain2.cpp \
+		CQuadtreeTerrain.cpp \
+		CROAMTerrain.cpp \
+		CWaterModel.cpp \
+		CAnimatorFactory.cpp \
+		CAnimatorCameraFPS.cpp \
+		CGraphicsAdapter.cpp \
+		CGraphicsAdapterWindow.cpp \
+		CSceneManager.cpp \
+		CTimerUnix.cpp \
+		CFPSCounter.cpp \
+		CColorConverter.cpp \
+		COGLES1ExtensionHandler.cpp \
+		COGLES1Driver.cpp \
+		COGLES1Texture.cpp \
+		COGLES1FBOTexture.cpp \
+		COGLES1HardwareBuffer.cpp \
+		CYonEngineAndroid.cpp \
+		CImage.cpp \
+		CImageLoaderPNG.cpp \
+		CImageLoaderDDS.cpp \
+		CImageLoaderPKM.cpp \
+		CImageLoaderKTX.cpp \
+		CImageLoaderPVR.cpp \
+		yon.cpp \
+)
 		
-LOCAL_MODULE    := yon
+LOCAL_MODULE    := engine
 		
 LOCAL_SRC_FILES := \
+		$(iconv_SOURCES) \
 		$(zlib_SOURCES) \
 		$(lpng_SOURCES) \
 		$(openal_SOURCES) \
@@ -149,6 +184,6 @@ LOCAL_SRC_FILES := \
 		
 		
 LOCAL_ARM_MODE   := arm 
-LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lstdc++ -Wl
-include $(BUILD_SHARED_LIBRARY)
+LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog
+include $(BUILD_STATIC_LIBRARY)
 
