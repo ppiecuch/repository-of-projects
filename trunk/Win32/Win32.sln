@@ -99,6 +99,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boostbind", "boostbind\boos
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "operator", "operator\operator.vcproj", "{26222266-7254-4B03-BC7C-A40A848F18E7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "md5", "md5\md5.vcproj", "{038E1860-8C0B-4845-BCA4-6DC2D8016847}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -289,6 +291,10 @@ Global
 		{26222266-7254-4B03-BC7C-A40A848F18E7}.Debug|Win32.Build.0 = Debug|Win32
 		{26222266-7254-4B03-BC7C-A40A848F18E7}.Release|Win32.ActiveCfg = Release|Win32
 		{26222266-7254-4B03-BC7C-A40A848F18E7}.Release|Win32.Build.0 = Release|Win32
+		{038E1860-8C0B-4845-BCA4-6DC2D8016847}.Debug|Win32.ActiveCfg = Debug|Win32
+		{038E1860-8C0B-4845-BCA4-6DC2D8016847}.Debug|Win32.Build.0 = Debug|Win32
+		{038E1860-8C0B-4845-BCA4-6DC2D8016847}.Release|Win32.ActiveCfg = Release|Win32
+		{038E1860-8C0B-4845-BCA4-6DC2D8016847}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
