@@ -30,11 +30,12 @@ const static s32 ACTION_POINTER_ID_MASK = 65280;
 const static s32 ACTION_POINTER_ID_SHIFT = 8;
 
 
-void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jint width, jint height, jstring apkFilePath, jstring sdcardPath){
-	LOGD(LOG_TAG,"screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",width,height,pEnv);
+void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jboolean first,jint width, jint height, jstring apkFilePath, jstring sdcardPath){
+	LOGD(LOG_TAG,"first:%s,screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",first?"true":"false",width,height,pEnv);
 	g_env=pEnv;
 	g_obj=obj;
-	init(pEnv,NULL,width,height);
+	if(first)
+		init(pEnv,NULL,width,height);
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	Logger->debug("nativeOnSurfaceChanged->w:%d,h:%d\n",w,h);

@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
 	stream->drop();
 	i18nMgr->drop();
 	fs->drop();
-#else
+#elif 0
 	//V2.1
 	IFileSystem* fs=createFileSystem();
 	II18NManager* i18nMgr=createI18NManager();
@@ -247,6 +247,23 @@ int main(int argc, char* argv[])
 	stream->drop();
 	i18nMgr->drop();
 	fs->drop();
+
+#else
+
+	IFileSystem* fs=createFileSystem("");
+	II18NManager* i18nMgr=createI18NManager();
+	fs->addWorkingDirectory("..\\media");
+	IReadStream* stream=fs->createAndOpenReadFileStream("item.xc",io::ENUM_ENDIAN_MODE_BIG);
+
+	s32 rowCount=stream->readShort();
+
+	for(s32 r=0;r<rowCount;++r)
+	{
+		Logger->debug("%d\r\n",stream->readInt());
+		Logger->debug("%s\r\n",i18nMgr->convert(stream->readString().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+		Logger->debug("%d\r\n",stream->readByte());
+		Logger->debug("%s\r\n",i18nMgr->convert(stream->readString().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+	}
 	return 0;
 #endif
 }

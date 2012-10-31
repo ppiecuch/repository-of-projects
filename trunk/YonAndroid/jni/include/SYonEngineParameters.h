@@ -26,7 +26,7 @@ namespace yon{
 			fpsLimit(0),
 #ifdef YON_COMPILE_WITH_WIN32
 			loggerAppender((MASK_APPENDER)(MASK_APPENDER_FILE|MASK_APPENDER_VS))
-#elif defined(YON_COMPILE_WITH_ANDROID) || defined((YON_COMPILE_WITH_MACOSX))
+#elif (defined(YON_COMPILE_WITH_ANDROID) || defined(YON_COMPILE_WITH_MACOSX))
 			loggerAppender((MASK_APPENDER)(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE))
 #endif
 			{}
