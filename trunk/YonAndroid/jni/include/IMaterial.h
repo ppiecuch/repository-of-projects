@@ -160,8 +160,8 @@ namespace video{
 			State():
 				//AlphaTest(false),
 				//Blend(false),
-				ColorMaterial(false),
-				CullFace(false),
+		ColorMaterial(false),
+			CullFace(false),
 				//DepthTest(false),
 				Dither(true),
 				Fog(false),
