@@ -10,11 +10,18 @@ inline unsigned long long GetNTime()
 	__asm _emit 0x31
 }
 
+struct Inner{
+	int a;
+	int b;
+	short c;
+	char d[5];
+};
+
 struct A{
-	int* tmp;
+	Inner* tmp;
 public:
 	A():tmp(NULL){
-		tmp=new int;
+		tmp=new Inner;
 	}
 	~A(){
 		delete tmp;
@@ -22,7 +29,7 @@ public:
 };
 
 struct B{
-	int tmp;
+	Inner tmp;
 };
 
 int main(int argc,char ** argv)
@@ -31,8 +38,9 @@ int main(int argc,char ** argv)
 	long long start = GetNTime();
 	
 
-	for(long i=0;i<90000;++i){
-		A a;
+	//使用B比使用A快1000倍
+	for(long i=0;i<900000000;++i){
+		B a;
 	}
 
 	long long end = GetNTime();
