@@ -81,11 +81,11 @@ char* PrintMD5(uchar md5Digest[16])
    
     for (nCount = 0; nCount < 16; nCount++)   
     {   
-        sprintf(chEach, "%02x", md5Digest[nCount]);   
-        strncat(chBuffer, chEach, sizeof(chEach));   
+        sprintf_s(chEach, "%02x", md5Digest[nCount]);   
+        strncat_s(chBuffer, chEach, sizeof(chEach));   
     }   
    
-    return strdup(chBuffer);   
+    return _strdup(chBuffer);   
 }   
    
 // MD5String: Performs the MD5 algorithm on a char* string, returning   
@@ -115,7 +115,7 @@ char* MD5File(char* szFilename)
     {   
         memset(chBuffer, 0, 1024);   
    
-        if ((file = fopen (szFilename, "rb")) != NULL)   
+        if (fopen_s(&file,szFilename, "rb")!=NULL)   
         {   
             while (nLen = fread (chBuffer, 1, 1024, file))   
                 alg.Update(chBuffer, nLen);   
