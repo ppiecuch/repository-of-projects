@@ -3,3 +3,10 @@ public String getUserAgent()
            String user_agent = ProductProperties.get(ProductProperties.USER_AGENT_KEY, null); 
             return user_agent; 
     }
+
+    
+    请问，手机终端通过 在类似 http://www.useragentstring.com/ 的网站上，获取UA信息。
+  
+     类似 本人的三星I9250 手机 获取的返回的 Useragent信息为  ：
+  
+     Mozilla/5.0 (Linux;U;Android4.1.1;zh-cn;Galaxy Nexus Build /JR003C) AppleWebkit/543.30(KHTML,like Gecko) Version/4.0 Mobile Safari/534.30 

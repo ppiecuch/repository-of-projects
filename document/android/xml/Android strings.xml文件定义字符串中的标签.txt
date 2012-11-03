@@ -1,0 +1,21 @@
+在strings.xml中定义字符串时，可能会需要用到HTML标签，
+
+支持的HTML标签类型有:
+
+<b> 粗体.
+<i> 斜体.
+<u> 下划线.
+但是在使用这些标签的时候要注册将“<”改成HTML转义符&lt;，如下：
+
+<resources>  
+  <string name="welcome_messages">Hello, %1$s! You have &lt;b>%2$d new messages&lt;/b>.</string>  
+</resources>  
+在代码中调用字符串时，用
+Resources res = getResources();  
+String text = String.format(res.getString(R.string.welcome_messages), username, mailCount);  
+CharSequence styledText = Html.fromHtml(text);  
+如果需要加入其它的HTML标签，可将带HTML标答的字符串内容放在<![CDATA[和]]>里面，如下：
+<string name="htmlsource"><![CDATA[<p>段落1</p><p>段落2<h1>标题1</h1> 正文1 (<i>斜体</i>) 正文2 (<i>斜体</i>) 正文3 <b>加粗</b> 正文4 \"引号\". 正文5</p><p>段落3</p>]]></string>   
+
+
+http://www.linuxidc.com/Linux/2012-08/68506.htm

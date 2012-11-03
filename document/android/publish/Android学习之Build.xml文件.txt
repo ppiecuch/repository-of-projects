@@ -1,0 +1,390 @@
+近日升级Android SDK至3.2版本，发现ant工具编译失败，仔细检查Build.xml后进行了重新编写，内容修正如下，希望对大家学习Ant有帮助。具体Build.xml内容如下：
+
+具体演示工程参见：点击打开链接，注意积分有点高哦，嘿嘿。。。
+
+
+
+
+
+
+
+
+[html] view plaincopy <?xml version="1.0" encoding="UTF-8"?>  
+<!--  
+    参考文章：  
+    http://www.cnblogs.com/zuolongsnail/archive/2011/05/25/2058210.html  
+    http://haya.iteye.com/?show_full=true  
+    http://jojol-zhou.iteye.com/blog/729271  
+    http://jojol-zhou.iteye.com/blog/729254  
+    http://www.cnblogs.com/Pickuper/archive/2011/6/14.html  
+    http://www.51testing.com/?uid-213912-action-viewspace-itemid-235086  
+    http://jimmy-duan.iteye.com/blog/1057967  
+    命名原则：  
+    (1)使用"."替代local.properties文件中的"-"作为文件分隔符  
+    (2)前缀：  
+                    使用"jar"表示包  
+                    使用"tools"表示工具  
+                    使用"in"表示输入  
+                    使用"out"表示输出  
+                    使用"release"表示产品  
+    (3)后缀：使用"dir"表示目录,"file"表示文件  
+    (3)使用"absolute"表示绝对路径,未使用"absolute"的表示相对路径,所有路径实际使用前转换为绝对路径再使用  
+    文件及变量使用：  
+    (1)使用到了系统自带的proguard.cfg文件，用于配置混淆设置  
+    (2)使用到了系统自带的local.properties文件，用于定义用户设置的本地变量，典型的文件中包含：  
+        #SDK路径  
+        sdk-dir=D:\\Android\\android-sdk-windows  
+        #混淆路径  
+        proguard=D:\\Android\\proguard\\lib\\proguard.jar  
+        #jarsiger路径  
+        jarsigner=D:\\Java\\jdk1.6.0_25\\bin\\jarsigner.exe  
+        #签名文件  
+        keystore=D:\\Android\\xxxx.keystore  
+        keyalias=xxxxx  
+        password=xxxxxx  
+        #moto SecondaryTelephonyManager jar包  
+        secondary-apis-moto-xt882-zip=secondary-apis-moto_xt882.zip  
+        secondary-apis-moto-xt800plus-zip=secondary-apis-moto_xt800plus.zip  
+        #QAS SDK包  
+        appstat-jar=appstat_A1.0.0.7_20110726.jar  
+        #资源路径  
+        res-dir=res480x320  
+        #Manifest文件  
+        manifest-file=manifest/AndroidManifest.xml  
+        #UA  
+        UA=SamsungI569  
+        #assets路径  
+        assets-dir=assets${UA}  
+        #输出路径  
+        out-release-dir=E:\\tmp  
+        #版本号  
+        TYSX_VER=2.1.11.2  
+        #android版本  
+        android_ver=AD23  
+        #文件名  
+        #TYSX-机型型号（UA）-版本号-厂商缩写-操作系统缩写  
+        release-apk-file=XXXX-${UA}-${TYSX_VER}-MH-${android_ver}.apk     
+-->  
+  
+<!--  
+    <project>标签  
+    每个构建文件对应一个项目。<project>标签时构建文件的根标签。它可以有多个内在属性，  
+    就如代码中所示，其各个属性的含义分别如下。  
+    (1) default表示默认的运行目标，这个属性是必须的。  
+    (2) basedir表示项目的基准目录。  
+    (3) name表示项目名。  
+    (4) description表示项目的描述。  
+    每个构建文件都对应于一个项目，但是大型项目经常包含大量的子项目，每一个子项目都可以有  
+    自己的构建文件。   
+-->  
+<project name="AntTest" default="release">  
+    <!--     指定配置文件      -->  
+    <property file="default.properties" />  
+    <property file="local.properties" />  
+  
+    <!--     定义工具目录      -->  
+    <property name="sdk.dir" value="${sdk-dir}" />  
+    <property name="android.tools.dir" value="${sdk.dir}/tools" />  
+    <property name="android.platformtools.dir" value="${sdk.dir}/platform-tools" />  
+    <property name="android.platforms.dir" value="${sdk.dir}/platforms/${target}" />  
+  
+    <property name="android.tools.absolute.dir" location="${android.tools.dir}" />  
+    <property name="android.platformtools.absolute.dir" location="${android.platformtools.dir}" />  
+    <property name="android.platforms.absolute.dir" location="${android.platforms.dir}" />  
+  
+    <!--     定义工具          
+    <property name="verbose" value="false" />-->  
+    <condition property="exe" value=".exe" else="">  
+        <os family="windows" />  
+    </condition>  
+    <property name="jar.proguard" value="${proguard-jar}" />  
+    <property name="jar.android" value="${android.platforms.absolute.dir}/android.jar" />  
+    <property name="tools.dx" value="${android.platformtools.absolute.dir}/dx.bat" />  
+    <property name="tools.apkbuilder" value="${android.tools.absolute.dir}/apkbuilder.bat" />  
+    <property name="tools.adb" value="${android.tools.absolute.dir}/adb${exe}" />  
+    <property name="tools.zipalign" value="${android.tools.absolute.dir}/zipalign${exe}" />  
+    <property name="tools.aapt" value="${android.platformtools.absolute.dir}/aapt${exe}" />  
+    <property name="tools.aidl" value="${android.platformtools.absolute.dir}/aidl${exe}" />  
+    <property name="tools.jarsigner" value="${JAVA_HOME}/bin/jarsigner${exe}" />  
+      
+    <!--     定义引入工具库           
+    <path id="android.antlibs">  
+        <pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />  
+        <pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />  
+        <pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />  
+        <pathelement path="${sdk.dir}/tools/lib/apkbuilder.jar" />  
+        <pathelement path="${sdk.dir}/tools/lib/jarutils.jar" />  
+    </path>  
+            定义任务          
+    <taskdef name="aaptexec" classname="com.android.ant.AaptExecLoopTask" classpathref="android.antlibs" />  
+    <taskdef name="apkbuilder" classname="com.android.ant.ApkBuilderTask" classpathref="android.antlibs" />  
+    <taskdef name="xpath" classname="com.android.ant.XPathTask" classpathref="android.antlibs" />  
+    -->  
+  
+    <!--     定义源代码及资源等输入目录       -->  
+    <property name="in.source.dir" value="src" />  
+    <property name="in.resource.dir" value="${res-dir}" />  
+    <property name="in.asset.dir" value="${assets-dir}" />  
+  
+    <property name="in.source.absolute.dir" location="${in.source.dir}" />  
+    <property name="in.resource.absolute.dir" location="${in.resource.dir}" />  
+    <property name="in.asset.absolute.dir" location="${in.asset.dir}" />  
+  
+    <!--     定义本地库/第三方工具库文件目录        -->  
+    <property name="in.external.libs.dir" value="libs" />  
+    <property name="in.native.libs.dir" value="libs" />  
+  
+    <property name="in.external.libs.absolute.dir" location="${in.external.libs.dir}" />  
+    <property name="in.native.libs.absolute.dir" location="${in.native.libs.dir}" />  
+  
+    <!--     定义输入文件      -->  
+    <property name="in.manifest.file" value="${manifest-file}" />  
+    <property name="in.android.aidl.file" value="${android.platforms.dir}/framework.aidl" />  
+  
+    <property name="in.manifest.absolute.file" location="${in.manifest.file}" />  
+    <property name="in.android.aidl.absolute.file" location="${in.android.aidl.file}" />  
+  
+    <!--     定义输出文件目录    -->  
+    <property name="out.gen.dir" value="gen" />  
+    <property name="out.dir" value="bin" />  
+    <property name="out.classes.dir" value="${out.dir}/classes" />  
+  
+    <property name="out.gen.absolute.dir" location="${out.gen.dir}" />  
+    <property name="out.absolute.dir" location="${out.dir}" />  
+    <property name="out.classes.absolute.dir" location="${out.classes.dir}" />  
+    <property name="release.absolute.dir" location="${release-dir}" />  
+  
+    <!--     定义输出文件          -->  
+    <property name="out.dex.file" value="${ant.project.name}-classes.dex" />  
+    <property name="out.resource.package.file" value="${ant.project.name}-resource.apk" />  
+    <property name="out.unsigned.package.file" value="${ant.project.name}-unsigned.apk" />  
+    <property name="out.signed.package.file" value="${ant.project.name}-signed.apk" />  
+    <property name="out.aligned.package.file" value="${ant.project.name}-aligned.apk" />  
+    <property name="release.package.file" value="${release-apk-file}" />  
+  
+    <property name="out.dex.absolute.file" location="${out.dir}/${out.dex.file}" />  
+    <property name="out.resource.package.absolute.file" location="${out.dir}/${out.resource.package.file}" />  
+    <property name="out.unsigned.package.absolute.file" location="${out.dir}/${out.unsigned.package.file}" />  
+    <property name="out.signed.package.absolute.file" location="${out.dir}/${out.signed.package.file}" />  
+    <property name="out.aligned.package.absolute.file" location="${out.dir}/${out.aligned.package.file}" />  
+    <property name="release.package.absolute.file" location="${release.absolute.dir}/${release.package.file}" />  
+  
+  
+    <!--  
+        <target>标签  
+        一个项目标签下可以有一个或多个target标签。一个target标签可以依赖其他的target标签。例  
+        如，有一个target用于编译程序，另一个target用于声称可执行文件。在生成可执行文件之前必  
+        须先编译该文件，因策可执行文件的target依赖于编译程序的target。Target的所有属性如下。  
+            (1)name表示标明，这个属性是必须的。  
+            (2)depends表示依赖的目标。  
+            (3)if表示仅当属性设置时才执行。  
+            (4)unless表示当属性没有设置时才执行。  
+            (5)description表示项目的描述。  
+        Ant的depends属性指定了target的执行顺序。Ant会依照depends属性中target出现顺序依次执行  
+        每个target。在执行之前，首先需要执行它所依赖的target。程序中的名为run的target的  
+        depends属性compile，而名为compile的target的depends属性是prepare，所以这几个target执  
+        行的顺序是prepare->compile->run。  
+        一个target只能被执行一次，即使有多个target依赖于它。如果没有if或unless属性，target总  
+        会被执行。     
+-->  
+    <target name="-clean">  
+        <echo>Creating output directories if needed...</echo>  
+        <delete dir="${out.absolute.dir}" />  
+        <delete dir="${out.gen.absolute.dir}" />  
+    </target>  
+  
+    <target name="-dirs" depends="-clean">  
+        <echo>Creating output directories if needed...</echo>  
+        <mkdir dir="${in.resource.absolute.dir}" />  
+        <mkdir dir="${in.external.libs.absolute.dir}" />  
+        <mkdir dir="${out.gen.absolute.dir}" />  
+        <mkdir dir="${out.absolute.dir}" />  
+        <mkdir dir="${out.classes.absolute.dir}" />  
+    </target>  
+  
+    <!--  
+        第一步 生成R.java类文件：  
+        Eclipse中会自动生成R.java，ant和命令行使用android SDK提供的aapt.ext程序生成R.java。  
+    -->  
+    <target name="-resource-src" depends="-dirs">  
+        <echo>Generating R.java / Manifest.java from the resources...</echo>  
+        <exec executable="${tools.aapt}" failonerror="true">  
+            <arg value="package" />  
+            <arg value="-m" />  
+            <arg value="-J" />  
+            <arg path="${out.gen.absolute.dir}" />  
+            <arg value="-M" />  
+            <arg path="${in.manifest.absolute.file}" />  
+            <arg value="-S" />  
+            <arg path="${in.resource.absolute.dir}" />  
+            <arg value="-I" />  
+            <arg path="${jar.android}" />  
+        </exec>  
+    </target>  
+  
+    <!--  
+        第二步 将.aidl文件生成.java类文件：  
+        Eclipse中自动生成，ant和命令行使用android SDK提供的aidl.exe生成.java文件。   
+    -->  
+    <!-- Generates java classes from .aidl files. -->  
+    <target name="-aidl" depends="-dirs">  
+        <echo>Compiling aidl files into Java classes...</echo>  
+        <apply executable="${tools.aidl}" failonerror="true">  
+            <arg value="-p${in.android.aidl.file}" />  
+            <arg value="-I${in.source.absolute.dir}" />  
+            <arg value="-o${out.gen.absolute.dir}" />  
+            <fileset dir="${in.source.absolute.dir}">  
+                <include name="**/*.aidl" />  
+            </fileset>  
+        </apply>  
+    </target>  
+  
+    <!--  
+        第三步 编译.java类文件生成class文件：  
+        Eclipse中自动生成，ant和命令行使用jdk的javac编译java类文件生成class文件。   
+         -->  
+    <!-- Compiles this project's .java files into .class files. -->  
+    <target name="compile" depends="-resource-src, -aidl" >  
+        <echo>Compiles project's .java files into .class files</echo>  
+        <javac encoding="utf-8" target="1.5" debug="true" extdirs="" srcdir="."   
+            destdir="${out.classes.absolute.dir}" bootclasspath="${jar.android}">  
+            <classpath>  
+                <fileset dir="${in.external.libs.absolute.dir}" includes="*.jar" />  
+                <fileset dir="${in.external.libs.absolute.dir}" includes="*.zip" />  
+            </classpath>  
+        </javac>  
+    </target>  
+  
+    <!--Execute proguard class flies-->  
+    <target name="optimize" depends="compile">  
+        <echo>optimize classes are put to "${out.absolute.dir}"   .</echo>  
+        <jar basedir="${out.classes.absolute.dir}" destfile="${out.absolute.dir}/temp.jar"/>  
+        <taskdef resource="proguard/ant/task.properties"  classpath="${jar.proguard}" />  
+        <proguard>    
+            -injars                 ${out.absolute.dir}/temp.jar     
+            -outjars                    ${out.absolute.dir}/optimized.jar  
+            -libraryjars                ${jar.android}     
+            -optimizationpasses 5  
+            -dontusemixedcaseclassnames  
+            -dontskipnonpubliclibraryclasses  
+            -dontpreverify  
+            -verbose  
+            -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  
+            -include proguard.cfg             
+          </proguard>  
+        <delete file="${out.absolute.dir}/temp.jar"/>  
+        <delete dir="${out.classes.dir}" failonerror="false" />  
+        <mkdir dir="${out.classes.dir}"/>  
+        <unzip src="${out.absolute.dir}/optimized.jar" dest="${out.classes.absolute.dir}"/>  
+        <delete file="${out.absolute.dir}/optimized.jar"/>  
+    </target>  
+  
+    <!--  
+        第四步 将class文件打包生成classes.dex文件：  
+        Eclipse中自动生成,ant和命令行使用android SDK提供的dx.bat命令行脚本生成classes.dex文件。   
+    -->  
+    <target name="dex" depends="optimize">  
+        <echo>Converting compiled files and external libraries into ${out.absolute.dir}/${out.dex.file}    ...</echo>  
+        <apply executable="${tools.dx}" failonerror="true" parallel="true">  
+            <arg value="--dex" />  
+            <arg value="--output=${out.dex.absolute.file}" />  
+            <arg path="${out.classes.absolute.dir}" />  
+            <fileset dir="${in.external.libs.absolute.dir}" includes="*.jar"/>  
+        </apply>  
+        <delete dir="${out.classes.absolute.dir}"/>  
+    </target>  
+  
+    <!--  
+        第五步 打包资源文件（包括res、assets、androidmanifest.xml等）：  
+        Eclipse中自动生成,ant和命令行使用Android SDK提供的aapt.exe生成资源包文件。   
+    -->  
+    <target name="package-resource">  
+        <echo>Packaging resources and assets ${out.resource.package.absolute.file}    ...</echo>  
+        <exec executable="${tools.aapt}" failonerror="true">  
+            <arg value="package" />  
+            <arg value="-f" />  
+            <arg value="-M" />  
+            <arg value="${in.manifest.file}" />  
+            <arg value="-S" />  
+            <arg value="${in.resource.absolute.dir}" />  
+            <arg value="-A" />  
+            <arg value="${in.asset.absolute.dir}" />  
+            <arg value="-I" />  
+            <arg value="${jar.android}" />  
+            <arg value="-F" />  
+            <arg value="${out.resource.package.absolute.file}" />  
+        </exec>  
+    </target>  
+  
+    <!--  
+        第六步 生成未签名的apk安装文件：  
+        Eclipse中自动生成debug签名文件存放在bin目录中，ant和命令行使用android SDK提供的apkbuilder.bat命令脚本生成未签名的apk安装文件。   
+    -->  
+    <!-- Package the application without signing it.  This allows for the application to be signed later with an official publishing key. -->  
+    <target name="package" depends="dex, package-resource">  
+        <echo>Packaging ${out.unsigned.package.absolute.file} for release...</echo>  
+        <exec executable="${tools.apkbuilder}" failonerror="true">  
+            <arg value="${out.unsigned.package.absolute.file}" />  
+            <arg value="-u" />  
+            <arg value="-z" />  
+            <arg value="${out.resource.package.absolute.file}" />  
+            <arg value="-f" />  
+            <arg value="${out.dex.absolute.file}" />  
+            <arg value="-rf" />  
+            <arg value="${in.source.absolute.dir}" />  
+            <arg value="-rj" />  
+            <arg value="${in.external.libs.absolute.dir}" />  
+        </exec>  
+        <echo>It will need to be signed with jarsigner before being published.</echo>  
+        <delete file="${out.resource.package.absolute.file}" />         
+        <delete file="${out.dex.absolute.file}" />          
+    </target>  
+  
+    <!-- 
+        第七步 对未签名的apk进行签名生成签名后的android文件： 
+    -->  
+    <!-- Package the application without signing it.  This allows for the application to be signed later with an official publishing key. -->  
+    <target name="jarsigner" depends="package">  
+        <echo>Packaging ${out.unsigned.package.absolute.file} for release...</echo>  
+        <exec executable="${tools.jarsigner}" failonerror="true">  
+            <arg value="-keystore" />  
+            <arg value="${keystore}" />  
+            <arg value="-storepass" />  
+            <arg value="${password}" />  
+            <arg value="-keypass" />  
+            <arg value="${password}" />  
+            <arg value="-signedjar" />  
+            <arg value="${out.signed.package.absolute.file}" />  
+            <arg value="${out.unsigned.package.absolute.file}" />  
+            <arg value="${keyalias}" />  
+        </exec>  
+        <delete file="${out.unsigned.package.absolute.file}" />  
+    </target>  
+  
+    <!-- 
+        第七步 签名的文件进行字节对齐； 
+    -->  
+    <target name="zipalign" depends="jarsigner">  
+        <echo>Zipalign ${out.aligned.package.absolute.file} for release...</echo>  
+        <exec executable="${tools.zipalign}">  
+            <arg value="-f" />  
+            <arg value="-v" />  
+            <arg value="4" />  
+            <arg value="${out.signed.package.absolute.file}" />  
+            <arg value="${out.aligned.package.absolute.file}" />  
+        </exec>  
+        <delete file="${out.signed.package.absolute.file}" />  
+    </target>  
+  
+    <!-- 
+        第八步 签名的文件进行字节对齐； 
+    -->  
+    <target name="release" depends="zipalign">  
+        <copy tofile="${release.package.absolute.file}">  
+            <fileset dir="${out.absolute.dir}" includes="${out.aligned.package.file}"/>  
+        </copy>  
+        <delete file="${out.aligned.package.absolute.file}" />  
+    </target>  
+  
+  
+http://blog.csdn.net/tanghaibo001/article/details/7776383
