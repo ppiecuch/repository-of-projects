@@ -1,0 +1,13 @@
+On terminal,
+
+$defaults write com.apple.dt.XCode IDEIndexDisable 1
+
+You'll lose some features (autocomplete, jump to definition, some of the assistants won't work right). But you'll gain back ram and cpu.
+
+For my project Xcode went from using 2 Gigs to a few hundred MB. (which I sorely needed to compile with ;)
+
+If you want to enable it again:
+
+$defaults delete com.apple.dt.XCode IDEIndexDisable
+
+http://blog.sina.com.cn/s/blog_8c87ba3b01011uvj.html

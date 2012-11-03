@@ -59,6 +59,7 @@ http://blog.csdn.net/i2c_rs485/article/details/7167535
 
 
 ºÏ²¢¿â
+lipo -info ./Debug-iphoneos/libxc.acd
 lipo -create ./Debug-iphoneos/libxc.a  ./Debug-iphonesimulator/libxc.a -output libxc.a
 
 $(SRCROOT)/../../../include

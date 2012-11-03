@@ -1,0 +1,39 @@
+Tuesday, July 12 2011 @ 05:50 PM CEST
+
+Contributed by: Admin
+Yes, we know, "you can't" Apple says¡­
+
+Ok, submitting an application to the AppStore using dlopen() to load you own plug-ins will likely result into rejection, 
+you may still do it for the fun, on a j******d iOS device, on your own developer device, for in-house app¡­ 
+
+But how ? 
+
+Dynamic linking for iOS is not supported by Xcode templates and if there is a way to patch the Xcode templates 
+(see here), the main drawback is that you have to patch files supplied with Xcode that may likely be overwritten at next iOS SDK update. 
+
+Another method, more in the Xcode way of doing things, is to go the bundle way.
+You know a bundle is just a wrapper around a dynamic library but what you may not know (since there is no template to create bundle in the iOS section of the "New project" window), is that in fact the iOS build system allows for the creation of bundles. 
+
+So start with the bundle Cocoa template and then switch the SDK for the iOS one, and change the other settings you may need to.
+You then will be able to compile a bundle that you will be able to include in your main application. You may of course build both device and simulator versions. 
+
+The best way then to use it in your application project is to add your "bundle" project as a subproject of your application one.
+And add the product of this project (the wanted bundle) to a Copy Resource phase.
+By doing so, the biggest advantage will be to benefit of the automatic selection of the right version to copy in the application bundle when you run for the Simulator or on the iOS device. 
+Calling you code is then just a matter of using CFBundle resource in case your plug-in is just made of pure C functions
+
+
+	CFBundleRef mainBundle = CFBundleGetMainBundle() ;
+	CFURLRef bundleURL = CFBundleCopyResourceURL ( mainBundle, CFSTR("MY_BUNDLE_NAME"), CFSTR("bundle"), NULL) ;
+	CFBundleRef pluginBndlRef = CFBundleCreate(kCFAllocatorDefault, bundleURL) ;
+	if (pluginBndlRef) {
+		MyEntryPointFuncPtrType funcPtr  =  CFBundleGetFunctionPointerForName(pluginBndlRef, CFSTR("MY_ENTRY_POINT_NAME")) ;
+		if (funcPtr) {
+
+	        }
+	}
+
+or you may use NSBundle if your plug-in is made of Objective-C classes.
+0 comments
+
+http://www.macosxguru.net/article.php?story=20110712175443515&mode=print

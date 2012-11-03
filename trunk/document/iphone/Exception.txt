@@ -1,4 +1,54 @@
 异常：
+error: unable to open executable ''
+解决：
+项目路径太长
+
+异常：
+ld: can't open output file for writing: /Users/Xia/Documents/works/ios/helloworld.m.out, errno=13 for architecture x86_64
+collect2: ld returned 1 exit status
+解决：
+文件夹写入权限问题
+
+
+异常：
+Code Sign error: a valid provisioning profile matching the application's Identifier 'com.3guu.Effect' could not be found
+解决：
+项目-》Info-》Bundle Identifier 改为com.3guu.syjt
+
+异常：
+iPhone: libpng error: CgBI: unknown critical chunk
+解决：
+If you get this error when trying your app on the device, you have PNG compression on in Xcode, 
+in Xcode 4 goto “Build Settings” search for PNG in the search box and turn off PNG compression…
+
+异常：
+No provisioned iOS devices are available with a compatible iOS version. 
+Connect an iOS device with a recent enough version of iOS to run your application or choose an iOS simulator as the destination.
+解决：
+在build setting 的列表里面,找到,IPHONE_DEPLOYMENT-TARGET这个选项,然后选择3.2,因为你的真机的操作系统可能没有升级倒最新版本,所以,选择3.2应该可以,现在你再试试
+
+异常：
+Code Sign error: Provisioning profile '866EBCB4-186C-4121-BC25-CB9421878424' can't be found
+解决：
+1.关闭你的项目，找到项目文件XXXX.xcodeproj，在文件上点击右键，选择“显示包内容”（Show Package Contents）。会新打开一个Finder。注：其实XXXX.xcodeproj就是一个文件夹，这里新打开的一个Finder里面的三个文件就是该XXXX.xcodeproj文件夹里面的文件。
+2.在新打开的Finder中找到project.pbxproj，并且打开。在这之中找到你之前的证书的编码信息。我之前报的错误信息是
+ Code Sign error: Provisioning profile '37D44E7F-0339-4277-9A82-C146A944CD46'，所以我用查找的方式找到了所有包括37D44E7F-0339-4277-9A82-C146A944CD46的行，并且删除。
+3.保存，重新启动你的项目，再编译。就OK了
+
+异常：
+xcode的device的自动授权
+xcode真坑爹，升级很快，很多功能都挪到了邮件菜单中，不知道的怎么找都找不到。
+为了避免每次给新iphone装正在开发的程序都要到apple网站去添加设备号，就学习一下使用xcode自动授权。
+研究了半天发现xcode的自动授权放在了右键菜单中。
+organizer－device－右键：add device to provisioning portal
+弹出apple id登陆对话框。
+
+解决：
+又遇到一个问题，提示：The indicated user is not on any iPhone Development Teams
+研究了半天iPhone Development Teams，没什么结果，经过同事提醒，可能apple id错了，才发现使用了私人的apple id，而不是购买证书的公司appple id
+改成公司apple id，一切就ok了。
+
+异常：
 symbol(s) not found for architexture i386 
 解决：
 extern ....
