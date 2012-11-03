@@ -31,7 +31,7 @@ Activity之间的跳转，或者说加载一个新的Activity，一般对于开发者来说，都不是一个太
 
 　　2.是否允许多个实例的区别：
 　　standard”和”singleTop”可以允许有多个实例，并且可以位于不同的Task中；
-　　singleTop要求如果Activity Stack顶部已经有目标Activity实例，则直接讲Intent发送给该实例，而不创建新实例。如Activity Stack没有该实例，则创建新实例；
+　　singleTop要求如果Activity Stack顶部已经有目标Activity实例，则直接将Intent发送给该实例，而不创建新实例。如Activity Stack没有该实例，则创建新实例；
 　　　“singleTask”和”singleInstance”则只产生一个实例，并且是Task的根元素。“standard”和”singleTop”可以被实例化多次，并且是可以存在于不同的task中；这种实例化时一个task可以包括一个activity的多个实例；“singleTask”和”singleInstance”则限制只生成一个实例，并且是task的根元素。
 
 　　3.是否允许其他Activity存在于本Task内的区别：

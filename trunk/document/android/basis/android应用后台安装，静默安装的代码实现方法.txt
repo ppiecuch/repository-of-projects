@@ -1,0 +1,130 @@
+ http://hi.baidu.com/6936995/blog/item/eca4436387a80d7b0d33fa31.html
+
+首先，你要有linux环境或其他可以mmm交叉编译的环境，因为这个用到的是隐藏api，SDK中没有的，ecilipse里面会提示包不存在，但交叉编译可以，如果你不知道mmm编译，请return。
+
+代码如下：
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.IPackageInstallObserver;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+public class InstallActivity extends Activity {
+    /** Called when the activity is first created. */
+    private Button btn2=null;
+    private final int INSTALL_COMPLETE = 1;
+    final static int SUCCEEDED = 1;
+    final static int FAILED = 0;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        btn=(Button) findViewById(R.id.btn2);
+
+        btn2.setOnClickListener(listener2);
+
+}
+
+ private OnClickListener listener2=new  OnClickListener(){
+        public void onClick(View v) {
+            String fileName = Environment.getExternalStorageDirectory() +  "/baidu/"+"UC.apk"; 
+            Uri uri = Uri.fromFile(new File(fileName));
+
+            int installFlags = 0;
+            PackageManager pm = getPackageManager();
+            try {
+                PackageInfo pi = pm.getPackageInfo("com.uc.browser", 
+                        PackageManager.GET_UNINSTALLED_PACKAGES);
+                if(pi != null) {
+                    installFlags |= PackageManager.INSTALL_REPLACE_EXISTING;
+                }
+            } catch (NameNotFoundException e) {
+            }
+
+
+//            String installerPackageName = getIntent().getStringExtra(
+//                    Intent.EXTRA_INSTALLER_PACKAGE_NAME);
+            
+            PackageInstallObserver observer = new PackageInstallObserver();
+            pm.installPackage(uri, observer, installFlags, "com.uc.browser");
+ 
+
+        }
+    };
+    
+    class PackageInstallObserver extends IPackageInstallObserver.Stub {
+        public void packageInstalled(String packageName, int returnCode) {
+            Message msg = mHandler.obtainMessage(INSTALL_COMPLETE);
+            msg.arg1 = returnCode;
+            mHandler.sendMessage(msg);
+        }
+    };
+    
+    private Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case INSTALL_COMPLETE:
+                    // Update the status text
+                    // Show the ok button
+                    int centerTextLabel;
+                    Drawable centerTextDrawable = null;
+                    if(msg.arg1 == SUCCEEDED) {
+                        
+                    } else {}
+                    if (centerTextDrawable != null) {}
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+   
+}
+
+ 
+
+重点是要实现一个这个类PackageInstallObserver，另外要注意import android.content.pm.……的那些包一定要导入。android.mk文件如下
+
+LOCAL_PATH:= $(call my-dir)
+include $(CLEAR_VARS)
+
+LOCAL_MODULE_TAGS := user
+
+LOCAL_SRC_FILES := $(call all-subdir-java-files)
+
+LOCAL_PACKAGE_NAME := InstallActivity
+LOCAL_CERTIFICATE := platform
+
+include $(BUILD_PACKAGE)
+
+重点是LOCAL_CERTIFICATE := platform要对
+
+ 
+
+另外编译的时候有可能会报R.java类重复错误，把你工程下gen文件夹删除即可，不会影响编译，传说中会在别的地方自动生成^……
+
+ 
+
+作为一个新手，研究了四天无果，网上苦苦追寻无果，最后还是再前辈的带领下看系统安装源代码得来。看来要学好android还是要会看源代码。卷毛大帝。
+
+这个在2.1上编译通过可以用，后台安装可以实现，后台卸载也可以实现，可以和安卓市场一样了。希望大家不要用这个功能搞图谋不轨的事情。
+
+ 
+
+现在把工程和apk传上来大家看看，这种方法看来也不是适用于每一个系统，android系统太不统一了，只能这样了。
+http://hi.baidu.com/w22ee/item/f995a28bc6858b56e73d1978

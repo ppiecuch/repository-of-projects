@@ -1,0 +1,547 @@
+   android中launcherMode有4中属性：standard(默认)， singleTop，singleTask和 singleInstance；网上有好多例子讲解这四种关系的：下面我列举几个链接： 
+       大明原创---->转载请标明出处：http://blog.csdn.net/wdaming1986/article/details/7304191
+
+        http://www.cnblogs.com/xiaoQLu/archive/2011/09/29/2195742.html
+
+        http://marshal.easymorse.com/archives/2950
+
+        http://blog.csdn.net/infsafe/article/details/5666964
+
+        http://www.j2megame.com/html/xwzx/ty/2027.html
+
+        等等。我不一一列举；
+
+       下面是我对singleTask的一点拙见，希望分享一下给大家：
+
+        最近研究android浏览器browser，这个BrowserActivity的launcherMode="singleTask"，因为browser不断地启动自己，所以要求这个栈中保持只能有一个自己的实例，就像别人总结的这样“注意：singleTask模式的Activity不管是位于栈顶还是栈底，再次运行这个Activity时，都会destory掉它上面的Activity来保证整个栈中只有一个自己，切记切记”这点是毋庸置疑的。
+
+       问题：browser的launcherMode=“singleTask”，browser上网的时候，遇到播放视频的链接，就会通过隐式intent方式跳转找Gallery3D中的MovieView这个类来播放视频，这时候如果你点击home键，再点击browser，你会发现MovieView这个类已经销毁不存在了，而不会像保存这个MovieView的类对象，给客户带来的用户体验特别的不好。用户还得从新下载刚才的视频。不支持断点播放。为了验证这一问题，我专门写了个小例子来说明activity之间的生命周期：
+
+       （1）先建一个App1的工程。包名为：com.cn.daming.app1，包里面有一个类：App1Activity。里面的代码如下：
+
+[java] view plaincopyprint?
+package com.cn.daming.app1;  
+  
+import android.app.Activity;  
+import android.content.Intent;  
+import android.os.Bundle;  
+import android.util.Log;  
+import android.view.View;  
+import android.view.View.OnClickListener;  
+import android.widget.Button;  
+  
+public class App1Activity extends Activity {  
+  
+    private Button mButton = null;  
+      
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        setContentView(R.layout.main);  
+        Log.v("daming", "App1Activity--11-->onCreate()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+        mButton = (Button)findViewById(R.id.button1);  
+        mButton.setOnClickListener(new OnClickListener(){  
+  
+            public void onClick(View arg0) {  
+                Intent intent = new Intent();  
+                intent.setClassName("com.cn.daing.app2", "com.cn.daing.app2.App2Activity");  
+                startActivity(intent);  
+            }  
+        });  
+    }  
+  
+    @Override  
+    protected void onDestroy() {  
+        super.onDestroy();  
+        Log.v("daming", "App1Activity--11-->onDestroy()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onPause() {  
+        super.onPause();  
+        Log.v("daming", "App1Activity--11-->onPause()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onRestart() {  
+        super.onRestart();  
+        Log.v("daming", "App1Activity--11-->onRestart()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onResume() {  
+        super.onResume();  
+        Log.v("daming", "App1Activity--11-->onResume()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onStart() {  
+        super.onStart();  
+        Log.v("daming", "App1Activity--11-->onStart()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onStop() {  
+        super.onStop();  
+        Log.v("daming", "App1Activity--11-->onStop()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onNewIntent(Intent intent) {  
+        super.onNewIntent(intent);  
+        Log.v("daming", "App1Activity--11-->onNewIntent()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onSaveInstanceState(Bundle outState) {  
+        super.onSaveInstanceState(outState);  
+        Log.v("daming", "App1Activity--11-->onSaveInstanceState()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+}  
+
+package com.cn.daming.app1;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+
+public class App1Activity extends Activity {
+
+	private Button mButton = null;
+	
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        Log.v("daming", "App1Activity--11-->onCreate()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+        mButton = (Button)findViewById(R.id.button1);
+        mButton.setOnClickListener(new OnClickListener(){
+
+			public void onClick(View arg0) {
+				Intent intent = new Intent();
+				intent.setClassName("com.cn.daing.app2", "com.cn.daing.app2.App2Activity");
+				startActivity(intent);
+			}
+        });
+    }
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		Log.v("daming", "App1Activity--11-->onDestroy()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		Log.v("daming", "App1Activity--11-->onPause()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		Log.v("daming", "App1Activity--11-->onRestart()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Log.v("daming", "App1Activity--11-->onResume()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		Log.v("daming", "App1Activity--11-->onStart()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		Log.v("daming", "App1Activity--11-->onStop()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		Log.v("daming", "App1Activity--11-->onNewIntent()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		Log.v("daming", "App1Activity--11-->onSaveInstanceState()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+}       manifest的属性为：android:launchMode="singleTask"     android:alwaysRetainTaskState="true"
+
+ 
+
+      （2）在建一个App2的工程，包名：com.cn.daing.app2  ；类名为：App2Activity；代码为：
+
+[java] view plaincopyprint?
+package com.cn.daing.app2;  
+  
+import android.app.Activity;  
+import android.content.Intent;  
+import android.os.Bundle;  
+import android.util.Log;  
+import android.view.View;  
+import android.view.View.OnClickListener;  
+import android.widget.Button;  
+  
+public class App2Activity extends Activity {  
+      
+    private Button mButton = null;  
+      
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        setContentView(R.layout.main);  
+        Log.v("daming", "App2Activity--22-->onCreate()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+        mButton = (Button)findViewById(R.id.button1);  
+        mButton.setOnClickListener(new OnClickListener(){  
+  
+            public void onClick(View arg0) {  
+                Intent intent = new Intent();  
+                intent.setClassName("com.cn.daming.app1", "com.cn.daming.app1.App1Activity");  
+                startActivity(intent);  
+            }  
+        });  
+    }  
+  
+    @Override  
+    protected void onDestroy() {  
+        super.onDestroy();  
+        Log.v("daming", "App2Activity--22-->onDestroy()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onNewIntent(Intent intent) {  
+        super.onNewIntent(intent);  
+        Log.v("daming", "App2Activity--22-->onNewIntent()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onPause() {  
+        super.onPause();  
+        Log.v("daming", "App2Activity--22-->onPause()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onRestart() {  
+        super.onRestart();  
+        Log.v("daming", "App2Activity--22-->onRestart()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onResume() {  
+        super.onResume();  
+        Log.v("daming", "App2Activity--22-->onResume()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onSaveInstanceState(Bundle outState) {  
+        super.onSaveInstanceState(outState);  
+        Log.v("daming", "App2Activity--22-->onSaveInstanceState()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onStart() {  
+        super.onStart();  
+        Log.v("daming", "App2Activity--22-->onStart()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+  
+    @Override  
+    protected void onStop() {  
+        super.onStop();  
+        Log.v("daming", "App2Activity--22-->onStop()...."+" /n getTaskId() == "+  
+                getTaskId()+"   isTaskRoot() == "+isTaskRoot());  
+    }  
+      
+}  
+
+package com.cn.daing.app2;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+
+public class App2Activity extends Activity {
+	
+	private Button mButton = null;
+	
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        Log.v("daming", "App2Activity--22-->onCreate()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+        mButton = (Button)findViewById(R.id.button1);
+        mButton.setOnClickListener(new OnClickListener(){
+
+			public void onClick(View arg0) {
+				Intent intent = new Intent();
+				intent.setClassName("com.cn.daming.app1", "com.cn.daming.app1.App1Activity");
+				startActivity(intent);
+			}
+        });
+    }
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		Log.v("daming", "App2Activity--22-->onDestroy()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		Log.v("daming", "App2Activity--22-->onNewIntent()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		Log.v("daming", "App2Activity--22-->onPause()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		Log.v("daming", "App2Activity--22-->onRestart()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Log.v("daming", "App2Activity--22-->onResume()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		Log.v("daming", "App2Activity--22-->onSaveInstanceState()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		Log.v("daming", "App2Activity--22-->onStart()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		Log.v("daming", "App2Activity--22-->onStop()...."+" /n getTaskId() == "+
+        		getTaskId()+"   isTaskRoot() == "+isTaskRoot());
+	}
+    
+}     manifest的属性为默认值；
+
+
+     （3）然后启动App1---->点击调用第二个App2button按钮的log： 
+
+                       
+
+      从log中可以看出：从App1到App2是在一个task栈中，值都是33，并且App1Activity是位于栈底。根节点的。点击按钮的时候，调用App1Activity的onSaveInstanceState()----->onPause()----->App2Activity的onCreate()----->onStart()---->onResume()---->App1Activity的onStop()方法。
+
+ 
+
+     （4）点击调用第一个App1---->button按钮；
+
+               
+
+   
+
+        看一下log：
+
+
+
+ 还在一个栈中，数字变了因为我退出后从新操作的，把以前的log清空了，这时候发现了一个奇怪的现象，启动第一个App1的时候，App2从onStop()---->onDestroy()了，彻底销毁了；这个对象就不存在了。这也就验证了browser点击视频播放，点击home键，再点击browser，视频播放停止的现象的，android的singleTask就是这个设计的。挺独特的。
+
+      （5） 要想解决这一个问题，也是有办法的，我经过两天的钻研，终于找到了方法，现分享给大家：就是在App1中启动一个activity，这个activity的launcherMode=“standard”，然后由它来启动App1Activity，这样就避免了这一现象;
+
+      启动一个默认的activity：LoginApp1Activity代码：
+
+[java] view plaincopyprint?
+package com.cn.daming.app1;  
+  
+import android.app.Activity;  
+import android.content.Intent;  
+import android.os.Bundle;  
+  
+public class LoginApp1Activity extends Activity{  
+  
+    @Override  
+    protected void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        Intent intent = (Intent)getIntent().clone();  
+        intent.setClass(LoginApp1Activity.this, App1Activity.class);  
+        startActivity(intent);  
+        finish();  
+    }  
+}  
+
+package com.cn.daming.app1;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+
+public class LoginApp1Activity extends Activity{
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Intent intent = (Intent)getIntent().clone();
+		intent.setClass(LoginApp1Activity.this, App1Activity.class);
+		startActivity(intent);
+		finish();
+	}
+}      
+
+         manifest.xml中的代码：
+
+[html] view plaincopyprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"  
+    package="com.cn.daming.app1"  
+    android:versionCode="1"  
+    android:versionName="1.0" >  
+  
+    <uses-sdk android:minSdkVersion="8" />  
+  
+    <application  
+        android:icon="@drawable/ic_launcher"  
+        android:label="@string/app_name" >  
+        <activity  
+            android:launchMode="standard"  
+            android:alwaysRetainTaskState="true"  
+            android:name=".LoginApp1Activity"   
+            >  
+            <intent-filter >  
+                <action android:name="android.intent.action.MAIN" />  
+                <category android:name="android.intent.category.LAUNCHER" />  
+            </intent-filter>  
+        </activity>  
+        <activity  
+            android:label="@string/app_name"  
+            android:launchMode="singleTask"  
+            android:alwaysRetainTaskState="true"  
+            android:name=".App1Activity" >  
+            <intent-filter >  
+                <action android:name="android.intent.action.MAIN" />  
+                <action android:name="android.intent.action.DELETE"/>  
+            </intent-filter>  
+        </activity>  
+    </application>  
+  
+</manifest>  
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.cn.daming.app1"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="8" />
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" >
+        <activity
+            android:launchMode="standard"
+            android:alwaysRetainTaskState="true"
+            android:name=".LoginApp1Activity" 
+            >
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:alwaysRetainTaskState="true"
+            android:name=".App1Activity" >
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.DELETE"/>
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>      
+
+ 
+
+      （6）从启动App1---->点击按钮启动App2---->点击home键---->在点击App1---->进入App2界面的log如下：
+
+
+       说明：从mainmenu见面点击App1的时候，调用的是App2Activiy的onRestart()方法---->onStart()---->onResume()方法，而不是调用的onDestroy()方法。
+
+ 
+
+        原因梳理：
+
+ 在Task范围内只产生一个实例。且这个实例启动完成后是在栈顶。
+
+如果在一个apk应用里，singleTask的A启动了一个B，B中启动了A，这样的情况怎么办呢？如果A是在原Task中启  动，系统会将B结束，然后保持原A在栈顶。
+
+设置了"singleTask"启动模式的Activity的特点：
+
+1. 设置了"singleTask"启动模式的Activity，它在启动的时候，会先在系统中查找属性值affinity等于它的属性值taskAffinity的任务存在；如果存在这样的任务，它就会在这个任务中启动（此后在根据第2条检查），否则就会在新任务中启动。因此，如果我们想要设置了"singleTask"启动模式的Activity在新的任务中启动，就要为它设置一个独立的taskAffinity属性值。
+
+2. 如果设置了"singleTask"启动模式的Activity不是在新的任务中启动时，它会在已有的任务中查看是否已经存在相应的Activity实例，如果存在，就会把位于这个Activity实例上面的Activity全部结束掉，即最终这个Activity实例会位于任务的Stack顶端中（官方文档说同时也在root of Stack，Stack底端，存疑1）。
+
+   真正的原因是：singleTask的模式有个FLAG_ACTIVITY_BROUGHT_TO_FRONT，它才是最后的罪魁祸首！
+
+
+   官方文档上的解释如下：
+
+    If, when starting the activity, there is already a task running that starts with this activity, then instead of starting a new instance the current task is brought to the front. The existing instance will receive a call to Activity.onNewIntent() with the new Intent that is being started, and with the Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT flag set. This is a superset of the singleTop mode, where if there is already an instance of the activity being started at the top of the stack, it will receive the Intent as described there (without the FLAG_ACTIVITY_BROUGHT_TO_FRONT flag set). See the Tasks and Back Stack document for more details about tasks.
+
+    大致意思为：当启动一个activity的时候，如果这个task中有这个activity的实例，这个实例就会被放到当前的task的前面，这个存在的实例是通过onNewIntent（）调用实现的。伴随着这个activity的flag---->(FLAG_ACTIVITY_BROUGHT_TO_FRONT )会被设置，这是singleTop模式的超集，如果当这儿已经有个实例的activity在这个栈的顶部，这时候它不会设置这个flag（FLAG_ACTIVITY_BROUGHT_TO_FRONT ）的值，详解看tasks和栈说明，更清楚的了解这方面的知识！
+
+http://blog.csdn.net/wdaming1986/article/details/7304191

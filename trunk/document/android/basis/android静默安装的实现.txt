@@ -1,0 +1,93 @@
+有时候我们需要软件实现静默安装，但是Android并未提供相应的API，然而我们知道命令行安装android的时候是不会提示用户的，所有要实现这个功能，我们就可以从执行命令行的方式实现。android提供的安装命令是
+pm install package 
+ps : pm install /sdcard/android.apk 
+?
+ 
+
+但是执行这个命令需要前提条件，需要是系统级应用或者具有ROOT权限。我们先介绍通过ROOT权限的方式执行。
+
+1,通过获取ROOT权限静默安装APK
+看代码：
+
+new Thread() { 
+    public void run() { 
+    Process process = null; 
+    OutputStream out = null; 
+    InputStream in = null; 
+    try { 
+    // 请求root 
+    process = Runtime.getRuntime().exec("su");  
+    out = process.getOutputStream(); 
+    // 调用安装 
+    out.write(("pm install -r " + currentTempFilePath + "\n").getBytes()); 
+    in = process.getInputStream(); 
+    int len = 0; 
+    byte[] bs = new byte[256]; 
+    while (-1 != (len = in.read(bs))) { 
+    String state = new String(bs, 0, len); 
+    if (state.equals("Success\n")) { 
+       //安装成功后的操作 
+         } 
+       } 
+    } catch (IOException e) { 
+        e.printStackTrace(); 
+    } catch (Exception e) { 
+        e.printStackTrace(); 
+    } finally { 
+        try { 
+            if (out != null) { 
+                out.flush(); 
+                out.close(); 
+            } 
+            if (in != null) { 
+                in.close(); 
+            } 
+        } catch (IOException e) { 
+            e.printStackTrace(); 
+        } 
+    } 
+  } 
+}.start(); 
+ 
+当然也可以通过NDK实现，代码就不放了。
+
+第二种方式，同样是通过pm命令实现，不用请求ROOT，但是需要系统的签名。这里附上模拟器的的签名，用这个签名的APK安装在模拟器上可以实现不请求ROOT而静默安装的效果。
+
+?
+//首先在manifest标签加入属性 
+android:sharedUserId="android.uid.system" 
+ 
+new Thread() { 
+    public void run() { 
+    Process process = null; 
+    InputStream in = null; 
+    try { 
+    // 请求root 
+    process = Runtime.getRuntime().
+                        exec("pm install -r " + currentTempFilePath + "\n");  
+    in = process.getInputStream(); 
+    int len = 0; 
+    byte[] bs = new byte[256]; 
+    while (-1 != (len = in.read(bs))) { 
+    String state = new String(bs, 0, len); 
+    if (state.equals("Success\n")) { 
+       //安装成功后的操作 
+         } 
+       } 
+    } catch (IOException e) { 
+        e.printStackTrace(); 
+    } catch (Exception e) { 
+        e.printStackTrace(); 
+    } finally { 
+        try { 
+            if (in != null) { 
+                in.close(); 
+            } 
+        } catch (IOException e) { 
+            e.printStackTrace(); 
+        } 
+    } 
+  } 
+}.start(); 
+ 
+文章更新请关注个人博客：http://www.blogchen.com/ 

@@ -1,0 +1,411 @@
+-------------------------------------------------------他山之石-----------------------------------------------
+
+在Android项目中用到JNI，当用了proguard后，发现native方法找不到很多变量，原来是被produard优化掉了。所以，在JNI应用中该慎用progurad啊。 
+
+解决办法： 
+1、在Android.mk中加入一行： 
+LOCAL_PROGUARD_FLAGS := -include $(LOCAL_PATH)/proguard.flags 
+2、创建proguard.flag文件，里面写入不需要proguard优化的类和方法。例如： 
+
+-keep class oms.miracle.mobiletv.broadcast.ServiceContext { 
+*; 
+} 
+
+我的这个类是和JNI相关的，不想让proguard去优化而引起错误，向上面写就能实现。 
+
+----------下面是网上找到的一些proguard的资料，贴出来分享： 
+ProGuard是一个免费的java类文件压缩,优化,混淆器.它探测并删除没有使用的类,字段,方法和属性.它删除没有用的说明并使用字节码得到最大优化.它使用无意义的名字来重命名类,字段和方法. 
+
+ProGuard的使用是为了: 
+
+1.创建紧凑的代码文档是为了更快的网络传输,快速装载和更小的内存占用. 
+2.创建的程序和程序库很难使用反向工程. 
+3.所以它能删除来自源文件中的没有调用的代码 
+4.充分利用java6的快速加载的优点来提前检测和返回java6中存在的类文件. 
+
+参数： 
+
+-include {filename}    从给定的文件中读取配置参数 
+
+-basedirectory {directoryname}    指定基础目录为以后相对的档案名称 
+
+-injars {class_path}    指定要处理的应用程序jar,war,ear和目录 
+
+-outjars {class_path}    指定处理完后要输出的jar,war,ear和目录的名称 
+
+-libraryjars {classpath}    指定要处理的应用程序jar,war,ear和目录所需要的程序库文件 
+
+-dontskipnonpubliclibraryclasses    指定不去忽略非公共的库类。 
+
+-dontskipnonpubliclibraryclassmembers    指定不去忽略包可见的库类的成员。 
+
+
+保留选项 
+-keep {Modifier} {class_specification}    保护指定的类文件和类的成员 
+
+-keepclassmembers {modifier} {class_specification}    保护指定类的成员，如果此类受到保护他们会保护的更好 
+
+-keepclasseswithmembers {class_specification}    保护指定的类和类的成员，但条件是所有指定的类和类成员是要存在。 
+
+-keepnames {class_specification}    保护指定的类和类的成员的名称（如果他们不会压缩步骤中删除） 
+
+-keepclassmembernames {class_specification}    保护指定的类的成员的名称（如果他们不会压缩步骤中删除） 
+
+-keepclasseswithmembernames {class_specification}    保护指定的类和类的成员的名称，如果所有指定的类成员出席（在压缩步骤之后） 
+
+-printseeds {filename}    列出类和类的成员-keep选项的清单，标准输出到给定的文件 
+
+压缩 
+-dontshrink    不压缩输入的类文件 
+
+-printusage {filename} 
+
+-whyareyoukeeping {class_specification}     
+
+优化 
+-dontoptimize    不优化输入的类文件 
+
+-assumenosideeffects {class_specification}    优化时假设指定的方法，没有任何副作用 
+
+-allowaccessmodification    优化时允许访问并修改有修饰符的类和类的成员 
+
+混淆 
+-dontobfuscate    不混淆输入的类文件 
+
+-printmapping {filename} 
+
+-applymapping {filename}    重用映射增加混淆 
+
+-obfuscationdictionary {filename}    使用给定文件中的关键字作为要混淆方法的名称 
+
+-overloadaggressively    混淆时应用侵入式重载 
+
+-useuniqueclassmembernames    确定统一的混淆类的成员名称来增加混淆 
+
+-flattenpackagehierarchy {package_name}    重新包装所有重命名的包并放在给定的单一包中 
+
+-repackageclass {package_name}    重新包装所有重命名的类文件中放在给定的单一包中 
+
+-dontusemixedcaseclassnames    混淆时不会产生形形色色的类名 
+
+-keepattributes {attribute_name,...}    保护给定的可选属性，例如LineNumberTable, LocalVariableTable, SourceFile, Deprecated, Synthetic, Signature, and InnerClasses. 
+
+-renamesourcefileattribute {string}    设置源文件中给定的字符串常量 
+
+
+因为我们开发的是webwork+spring+hibernate的架构的项目，所有需要很详细的配置。（经过n次失败后总结） 
+
+Example: 
+    -injars <project>.jar 
+    -outjars <project>_out.jar 
+
+    -libraryjars <java.home>/lib/rt.jar 
+    -libraryjars <project.home>/webroot/WEB-INF/lib/webwork.jar 
+    ....... 
+
+    # 保留实现Action接口类中的公有的，友好的，私有的属性 和 公有的，友好的方法。其它的全部压缩，优化，混淆。 
+    # 因为配置文件中的类名是一个完整的类名，如果经过处理后就有可能找不到这个类。 
+    # 属性是jsp页面所需要的，如果经过处理jsp页面就无法得到action中的数据。 
+    -keep public class * implements com.opensymphony.xwork.Action{ 
+        public protected private <fields>; 
+        public protected <methods>; 
+    } 
+
+    # 保留实现了Serializable接口类中的公有的，友好的，私有的成员（属性和方法） 
+    # 这个配置主要是对应实体类的配置。 
+    -keep public class * implements java.io.Serializable{ 
+        public protected private *; 
+    } 
+
+    ...... 
+
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 
+
+
+我们做java开发的一般都会遇到如何保护我们开发的代码问题。java语言由于是基于jvm上面，所以反编译class 文件很很容易。假如我们做了一个web程序，并把这个web程序发布给客户。实际上，客户是很容易反编译出我们的源代码出来，包括所有的src文件和 jsp文件等等。 
+
+那么，如何保护我们的源代码，实际上，应该有几种方法可以使用：1、使用代码混淆器 2、重载应用服务器的classloader 
+
+对于第一种方法来说，现在外面有很多开源工具可以使用，个人认为最好用的当属proguard莫属。proguard主要是易用易学。而且提供的功能也挺多。下面是个人一点使用心得 
+
+（1）、从网上download proguard工具，proguard工具主要包含是几个jar文件和一些example，下载地址http://proguard.sourceforge.net/ 
+
+（2）、将里面的几个jar文件添加到类路径下面。当然，也可以不添加，但是下面在做混淆的时候，必须指定classpath，使在做混淆的过程中，能否访问该类 
+
+（3）、编写一个配置文件，主要是混淆器的一些参数。比如，下面是一个例子 
+-injars platform.jar 
+-outjars platform_out.jar 
+-libraryjars <java.home>/lib/rt.jar 
+-libraryjars ibatis-common-2.jar 
+-libraryjars ibatis-dao-2.jar 
+-libraryjars ibatis-sqlmap-2.jar 
+-libraryjars junit-3.8.1.jar 
+-libraryjars d:/j2ee.jar 
+-libraryjars struts.jar 
+-libraryjars commons-lang.jar 
+-libraryjars D:/0working/coreproject/byislib/jasperreports-0.6.1.jar 
+-libraryjars commons-beanutils.jar 
+
+-printmapping proguard.map 
+-overloadaggressively 
+-defaultpackage '' 
+-allowaccessmodification 
+-dontoptimize 
+-keep public class * 
+{ 
+public protected *; 
+} 
+-keep public class org.** 
+-keep public class it.** 
+
+各个参数的含义参考proguard文档，该文档非常详细，上手很容易 
+
+OK，到此就完成了代码混淆，打开产生的jar包可以看到，多了好多a、b、c之类的类文件。说明混淆结果已经成功。将原jar删除、运行产生的混淆jar包，一切正常！ 
+
+常见问题：使用过程中个人遇到了几个问题，开始也是找了很久才解决 
+a. 内存溢出异常： 主要是proguard在做混淆的时候，吃了很多内存，因此，在运行混淆器的时候，可以增加内存，比如 java -mx512m ..... 
+b.栈溢出异常： 主要是proguard在做混淆的时候，会对一些代码进行优化，若遇到一些相对复杂的方法时，可能会抛出此异常。对付的办法是增加配置参数-dontoptimize，如上面的配置例子所示 
+
+对于第二种方法，重载服务器的classloader的原理是这样。 首先我们通过一定算法把class文件加密； 然后写我们自己的classloader，替换服务器的classloader。 这样，我们可以读取class文件，通过我们自己的算法反加密成正确的class，然后再次进行load。这个方式还没应用起来，这几天个人正在研究，有什么新成果会在此做一些总结。 
+
+
+ProGuard是一个开源的项目，主页：http://proguard.sourceforge.net/，目前最新的版本是3.3.2.。加载混淆器是非常简单的，只需要解压缩 proguard3.3.2.zip，然后在 J2ME->Packing->Obfuscation 标签中选择 Proguard 的安装目录。如下图所示，在这里可以对需要在混淆过程中保留的类名进行配置，MIDlet 类的名称必须保留，以便设备的 Java 运行时环境（JRE）能够找到执行的入口点。 
+http://images.csdn.net/20050726/image027.jpg，It’s about the above pic. 
+
+
+
+另一篇文档 
+ProGuard 是一款免费的Java类文件压缩器、优化器和混淆器。它能发现并删除无用类、字段（field）、方法和属性值（attribute）。它也能优化字节码并删除无用的指令。最后，它使用简单无意义的名字来重命名你的类名、字段名和方法名。经过以上操作的jar文件会变得更小，并很难进行逆向工程。这里提到了ProGuard的主要功能是压缩、优化和混淆，下面我就先介绍一下这些概念，然后再介绍ProGuard的基本使用方法。 
+
+l 什么是压缩： 
+
+Java 源代码（.java文件）通常被编译为字节码（.class文件）。而完整的程序或程序库通常被压缩和发布成Java文档（.jar文件）。字节码比 Java源文件更简洁，但是它仍然包含大量的无用代码，尤其它是一个程序库的时候。ProGuard的压缩程序操作能分析字节码，并删除无用的类、字段和方法。程序只保留功能上的等价，包括异常堆栈描述所需要的信息。 
+
+l 什么是混淆： 
+
+通常情况下，编译后的字节码仍然包含了大量的调试信息：源文件名，行号，字段名，方法名，参数名，变量名等等。这些信息使得它很容易被反编译和通过逆向工程获得完整的程序。有时，这是令人厌恶的。例如像ProGuard这样的混淆器就能删除这些调试信息，并用无意义的字符序列来替换所有名字，使得它很难进行逆向工程，它进一步免费的精简代码。除了异常堆栈信息所需要的类名，方法名和行号外，程序只会保留功能上的等价。通过以上的了解，你应该明白为什么需要混淆了。 
+
+l ProGuard支持那些种类的优化： 
+
+除了在压缩操作删除的无用类，字段和方法外，ProGuard也能在字节码级提供性能优化，内部方法有： 
+
+² 常量表达式求值 
+
+² 删除不必要的字段存取 
+
+² 删除不必要的方法调用 
+
+² 删除不必要的分支 
+
+² 删除不必要的比较和instanceof验证 
+
+² 删除未使用的代码 
+
+² 删除只写字段 
+
+² 删除未使用的方法参数 
+
+² 像push/pop简化一样的各种各样的peephole优化 
+
+² 在可能的情况下为类添加static和final修饰符 
+
+² 在可能的情况下为方法添加private, static和final修饰符 
+
+² 在可能的情况下使get/set方法成为内联的 
+
+² 当接口只有一个实现类的时候，就取代它 
+
+² 选择性的删除日志代码 
+
+实际的优化效果是依赖于你的代码和执行代码的虚拟机的。简单的虚拟机比有复杂JIT编译器的高级虚拟机更有效。无论如何，你的字节码会变得更小。 
+
+仍有一些明显需要优化的技术不被支持： 
+
+² 使非final的常量字段成为内联 
+
+² 像get/set方法一样使其他方法成为内联 
+
+² 将常量表达式移到循环之外 
+
+² Optimizations that require escape analysis 
+
+
+
+ProGuard 是一个命令行工具，并提供了图形化用户界面，它也可以结合Ant或J2ME Wireless Toolkit使用。通过ProGuard得到的更精简的jar文件意味着只需要更小的存储空间；网络传输更省时；装载速度更快和占用更小的内存空间。另外，ProGuard非常快速和高效，它仅仅只花费几秒钟和几兆的内存在处理程序。它处理的顺序是先压缩，然后优化，最后才进行混淆。The results section presents actual figures for a number of applications.与其他Java混淆器相比，ProGuard的主要优势可能是它的基于模版文件的简单配置。一些直观的命令行选项或一个简单的配置文件已经足够了。例如，下面的配置选项保护了jar文件里的所有applets： 
+
+-keep public class * extends java.applet.Applet 
+
+用户指南里说明了所有可用的选项，并以大量的例子为你演示这些功能强大的配置选项。 
+
+
+
+上面谈到了ProGuard的很多好处，现在我们就来看看如何在程序中使用ProGuard吧，之前也提到了ProGuard可以用命令行、图形界面、Ant等来执行和处理程序，同时也提到了配置文件，下面我们一起来看如何使用： 
+
+用命令行执行ProGuard的命令如下： 
+
+java –jar proguard.jar options…… 
+
+具体的选项可以参考ProGuard的用户指南，你也可以把这些属性写在配置文件里；运行时，我们只需要指定这个配置文件就行了，例如： 
+
+java –jar proguard.jar @config.pro 
+
+而配置文件的格式也是要按照ProGuard提供的格式来写的，这个可以参考ProGuard例子里的配置文件来配置适合你的应用系统的ProGuard配置文件。ProGuard提供了图形界面的配置和运行程序，你可以在界面上配置你想要的参数，然后运行即可。前面提到的要手动写的配置文件也可以用图形界面来配置和生成。 
+
+如果你要在Ant里运行ProGuard，只需要添加一一个如下的target即可： 
+
+<target name="proguard" depends="init"> 
+
+<taskdef resource="proguard/ant/task.properties" classpath="${lib.dir}/proguard/proguard.jar" /> 
+
+<proguard configuration="${src.dir}/config.pro" /> 
+
+</target> 
+
+你只需要制定lib.dir和src.dir属性就行了，同样的，这里也用了proguard配置文件，跟上面提到的是一样的。建议大家把ProGuardGUI当成一个生成配置文件的向导来使用，这样我们只需要修改配置文件而不用重新写一个配置文件。 
+
+如果你觉得ProGuard还不错，那就快把它加入你的项目里吧。 
+
+
+
+
+
+第三文档 
+这是一个不应该在开源社区出现的东西，但它的的确确是一个开源的项目，正像它的名字一样，Proguard，即Program Guard（程序卫士），它代表了开源的相对面－－代码保护。 
+　　作为JAVA这样的高级语言，编译的产物只是相对源代码的一个概念而已，字节码虽然不像源代码那样易懂，但绝不是不可能进行反编译的，针对JAVA的反编译产品很多，如CAVAJ,JAD等等。面对反编译产品的不断出现，将代码视为财富的那些开发者，又何去何从。 
+　　混淆器正是在这种背景下应运而生，既然不可能完全地将拒绝反编译，那就让他们去反编译吧，只要反编译的结果别人不能直接使用不就行了吗？只要将代码搞混，让别人拿到了反编译的结果也看不懂，甚至不能编译。 
+　　混淆的方法有很多，主要是以下几方面。 
+更名，将私有类，私有的成员，方法体内部的变量名改名，改成a,b,c等等，甚至1,2,3(代码中不允许不等于成果物中不允许） 
+改变逻辑的流向，如将if条件取反，if/else对换 
+等价代码，如将循环改成GOTO 
+无效代码，插入不可及的无用代码 
+　　Proguard是一个非常优秀的开源的JAVA混淆器,可以在http://proguard.sourceforge.net/下载到，现在就让我一起来看一下Proguard. 
+　　以3.2版为例，释放压缩包，我们看到，作为开源项目就有docs，lib,src,sample文件夹，在此就不一一介绍了。 
+　　进入lib目录，内有proguard.jar，如果要自己有混淆器的外壳，或作ANT插件的话，会用到它，详细情况可以参考Proguard的文档。 
+　　我们要看的是proguardgui.jar，这是Proguard的图形界面，我们使用JDK打开，注意是JDK，不是JRE。 
+
+点选Input/Output标签，选择要混淆的JAR包（注意是JAR包），输出JAR包，以及用到的所有类库。 
+点选Obfuscation标签，选中不需要混淆的类（要被反射的类绝对不能被混淆） 
+点选Process标签，Process按钮，等着看结果吧。 
+Proguard中还包括了代码优化和代码整理的功能，不是本文讨论范围，有兴趣的就自己研究吧） 
+只混淆方面的选项 
+
+
+
+使用此种方式，如果a-z使用过，会转向aa.class,如下图配置界面 
+1,4,6,9,10,11,12 
+
+源代码 
+package org.zwm.pub; 
+
+public class Bru { 
+
+/** 
+* @param args 
+*/ 
+
+public static void main(String[] args) { 
+// TODO Auto-generated method stub 
+System.out.println(showMsg()); 
+} 
+public static String showMsg() { 
+return "You are my sun"; 
+} 
+} 
+反编译后的代码 
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov. 
+// Jad home page: http://www.kpdus.com/jad.html 
+// Decompiler options: packimports(3) 
+
+package org.zwm.pub; 
+
+import java.io.PrintStream; 
+
+public class Bru 
+{ 
+
+public Bru() 
+{ 
+} 
+
+public static void main(String args[]) 
+{ 
+System.out.println(PK0304140008000800fZ()); 
+} 
+
+public static String PK0304140008000800fZ() 
+{ 
+return "You are my sun"; 
+} 
+} 
+
+
+
+
+类名不变化，方法名混淆。 
+
+
+
+另一个例子，希望对大家有帮助： 
+
+命令行下，运行ProGuard指令： java -jar proguard.jar @proguard.pro   其中proguard.pro文件中是指定的混淆信息。 
+
+例：一个swing应用： 
+
+-injars       gimt.jar 
+-outjars      gimt_out.jar 
+-libraryjars lib/rt.jar 
+-libraryjars lib/antlr/antlr-2.7.5H3.jar 
+-libraryjars lib/cglib/cglib-full-2.0.2.jar 
+-libraryjars lib/db2-connector/db2jcc_license_cu.jar 
+-libraryjars lib/dom4j/dom4j-1.5.2.jar 
+-libraryjars lib/encache/ehcache-1.1.jar 
+-libraryjars lib/hibernate/hibernate3.jar 
+-libraryjars lib/jakarta-common/commons-beanutils.jar 
+-libraryjars lib/log4j/log4j-1.2.9.jar 
+-libraryjars lib/mysql-connector/mysql-connector-java-3.0.17-ga-bin.jar 
+-libraryjars lib/spring/spring.jar 
+-libraryjars lib/db2-connector/db2jcc.jar 
+-libraryjars lib/jakarta-common/commons-collections-2.1.1.jar 
+-libraryjars lib/jakarta-common/commons-dbcp-1.2.1.jar 
+-libraryjars lib/jakarta-common/commons-lang-2.0.jar 
+-libraryjars lib/jakarta-common/commons-logging-1.0.4.jar 
+-libraryjars lib/jakarta-common/commons-pool-1.2.jar 
+-libraryjars lib/spring/spring-mock.jar 
+-libraryjars lib/j2ee/jta.jar 
+-libraryjars lib/db2-connector/db2java.zip 
+
+-printmapping proguard.map 
+-overloadaggressively 
+-defaultpackage '' 
+-allowaccessmodification 
+-dontoptimize 
+
+-keep public class com.wisdom.tool.MainFrame { 
+    public static void main(java.lang.String[]); 
+} 
+
+-keep class * extends javax.swing.plaf.ComponentUI { 
+    public static javax.swing.plaf.ComponentUI createUI(javax.swing.JComponent); 
+} 
+
+-keep public class com.wisdom.model.user.* { 
+    *; 
+} 
+
+-keep public class com.wisdom.service.* { 
+    *; 
+} 
+
+-keep public class com.wisdom.service.impl.MenuServiceImpl 
+
+一点说明： 
+1. 开始没有加-dontoptimize选项，有时可能会出问题，上面已经提到。 
+2. 列出了所有依赖的.jar包。 
+3. keep选项告诉proguard，那些不必混淆。 
+    a. 对于swing应用，整个程序的入口，不能混淆。 
+    b. 对于继承自ComponentUI的类，createUI不能混淆。 
+    c. 利用hibernate的领域对象 spring的服务对象，由于用到了反射机制。 A 
+http://blog.csdn.net/yuleslie/article/details/6869066
