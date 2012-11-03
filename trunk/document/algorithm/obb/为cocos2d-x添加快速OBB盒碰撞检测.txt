@@ -1,0 +1,89 @@
+原理：
+
+       根据 Stefan Gottschalk的理论(Collision Queries using Oriented Bounding Boxes, Ph.D. Thesis, Department of Computer Science, University of North Carolina at Chapel Hill, 1999) ，若两个obb盒有交集，则必然存在一些坐标轴，使这两个obb在此坐标轴上的投影有重合部分。
+
+       在3d情况下，满足此条件的坐标轴必然存在于obb的边对应的六条轴（每个obb三条），或是同时垂直于obb A的一条边轴与obb B的一条边轴的九条坐标轴，共十五条坐标轴之中。
+
+       而在2d情况下，满足此条件的坐标轴必然存在于两个obb的4条边对应的轴之中。
+
+       所以对于cocos2d来说，判断两个obb是否有交集，只需判断这两个obb在这四条有效轴上的投影是否有重合。或者以一种更高效的方法来说：取一个obb的边作为轴，判断另一个obb的是否有满足条件的顶点，对这条轴的投影点在这条边之内。循环判断四条边。只有当此四条边均有定点满足条件时，这两个obb是有交集的。
+
+
+代码：
+     引用于 http://www.flipcode.com/archives/2D_OBB_Intersection.shtml
+     我使用了引文中判断obb相交的代码。但是在此之前需将cocos2d-x中的节点信息转化为判断代码使用的数据。
+
+
+//OBB结构
+struct OrientedBoundingBox {
+  void Init(cocos2d::CCNode* node);//CCNode转化为OBB
+  bool IsOverlapsTo(const OrientedBoundingBox& other);//引文中的判断函数
+
+
+  Vector2d vertex[4];//四个顶点，0 is lower left
+  Vector2d axis[2];// 0点延伸的两个坐标轴向量（简化运算）,长度为对应边的长度分之一
+  float    origin[2];/** origin[a] = vertes[0].dot(axis[a]); */
+};
+
+
+//转化函数
+void OrientedBoundingBox::Init( cocos2d::CCNode* node ) {
+  // 需要先取得尺寸和锚点
+  CCSize size = node->getContentSize();
+  CCPoint anchor = node->getAnchorPoint();
+
+
+  // 转化为世界坐标
+  vertex[0] = Vector2df(node->convertToWorldSpaceAR(ccp(-anchor.x*size.width, -anchor.y*size.height ) ) );
+  vertex[1] = Vector2df(node->convertToWorldSpaceAR(ccp((1-anchor.x)*size.width, -anchor.y*size.height ) ) );
+  vertex[2] = Vector2df(node->convertToWorldSpaceAR(ccp((1-anchor.x)*size.width,(1-anchor.y)*size.height ) ));
+  vertex[3] = Vector2df(node->convertToWorldSpaceAR(ccp(-anchor.x*size.width, (1-anchor.y)*size.height ) ) );
+
+
+  // 设置轴的长度为 1/边长，则其点乘的结构必然在【0，1】之间
+  axis[0] = vertex[1] - vertex[0];
+  axis[0] = axis[0] / axis[0].getLengthSQ();
+  axis[1] = vertex[3] - vertex[0];
+  axis[1] = axis[1] / axis[1].getLengthSQ();
+
+
+  origin[0] = vertex[0].dotProduct(axis[0]);
+  origin[1] = vertex[0].dotProduct(axis[1]);
+}
+
+
+//OBB other是否有顶点落在OBB this的axis上
+bool OrientedBoundingBox::IsOverlapsTo( const OrientedBoundingBox& other ) {
+  for (int i=0; i < 2; ++i) {
+    // 查询other的顶点在axis上的最大最小值  
+    double t = other.vertex[0].dotProduct(axis[i]);
+    double tMin = t;
+    double tMax = t;
+    for (int j = 1; j < 4; ++j) {
+      t = other.vertex[j].dotProduct(axis[i]);
+      if (t < tMin) {
+        tMin = t;
+      } else if (t > tMax) {
+        tMax = t;
+      }
+    }
+    // 最大最小值是否在this的这条边内 
+    if ((tMin > 1 + origin[i]) || (tMax < origin[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+//判断
+bool InterSection::IsNodeOverlapsToNode( cocos2d::CCNode* nodeA, cocos2d::CCNode* nodeB ) {
+   OrientedBoundingBox boxA,boxB;
+   boxA.Init(nodeA);
+   boxB.Init(nodeB);
+   // 四条轴必须均满足此条件才有交集 
+   return (boxA.IsOverlapsTo(boxB) && boxB.IsOverlapsTo(boxA) );
+}
+
+
+http://blog.csdn.net/hortor_iphone/article/details/6653403
