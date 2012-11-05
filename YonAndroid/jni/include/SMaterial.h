@@ -4,9 +4,138 @@
 namespace yon{
 namespace video{
 
+	enum ENUM_BLEND_FACTOR{
+		ENUM_BLEND_FACTOR_ZERO	= 0,				//!< src & dest	(0, 0, 0, 0)
+		ENUM_BLEND_FACTOR_ONE,						//!< src & dest	(1, 1, 1, 1)
+		ENUM_BLEND_FACTOR_DST_COLOR, 				//!< src (destR, destG, destB, destA)
+		ENUM_BLEND_FACTOR_ONE_MINUS_DST_COLOR, 		//!< src (1-destR, 1-destG, 1-destB, 1-destA)
+		ENUM_BLEND_FACTOR_SRC_COLOR,				//!< dest (srcR, srcG, srcB, srcA)
+		ENUM_BLEND_FACTOR_ONE_MINUS_SRC_COLOR, 		//!< dest (1-srcR, 1-srcG, 1-srcB, 1-srcA)
+		ENUM_BLEND_FACTOR_SRC_ALPHA,				//!< src & dest	(srcA, srcA, srcA, srcA)
+		ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,		//!< src & dest	(1-srcA, 1-srcA, 1-srcA, 1-srcA)
+		ENUM_BLEND_FACTOR_DST_ALPHA,				//!< src & dest	(destA, destA, destA, destA)
+		ENUM_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,		//!< src & dest	(1-destA, 1-destA, 1-destA, 1-destA)
+		ENUM_BLEND_FACTOR_SRC_ALPHA_SATURATE,		//!< src (min(srcA, 1-destA), idem, ...)
+		ENUM_BLEND_FACTOR_COUNT
+	};
+
+	enum ENUM_MODULATE
+	{
+		ENUM_MODULATE_1X	= 1,
+		ENUM_MODULATE_2X	= 2,
+		ENUM_MODULATE_4X	= 4
+	};
+
+	enum ENUM_ALPHA_SOURCE
+	{
+		ENUM_ALPHA_SOURCE_NONE = 0,
+		ENUM_ALPHA_SOURCE_VERTEX,
+		ENUM_ALPHA_SOURCE_TEXTURE
+	};
+
+	enum ENUM_MATERIAL_TYPE{
+		ENUM_MATERIAL_TYPE_SOLID = 0,
+		ENUM_MATERIAL_TYPE_BLEND,
+		ENUM_MATERIAL_TYPE_LIGHTEN,
+		ENUM_MATERIAL_TYPE_TRANSPARENT,
+		ENUM_MATERIAL_TYPE_TRANSPARENT_REF,
+		//ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR,
+		ENUM_MATERIAL_TYPE_MASK,
+		ENUM_MATERIAL_TYPE_DETAIL_MAP,
+		ENUM_MATERIAL_TYPE_COMPOSITE1,
+		ENUM_MATERIAL_TYPE_COMPOSITE2,
+		ENUM_MATERIAL_TYPE_COUNT
+	};
+
+	enum ENUM_POLYGON_MODE{
+		ENUM_POLYGON_MODE_FILL = 0,
+		ENUM_POLYGON_MODE_LINE,
+		ENUM_POLYGON_MODE_POINT,
+		ENUM_POLYGON_MODE_COUNT
+	};
+
+	enum ENUM_WRAP_MODE
+	{
+		ENUM_WRAP_MODE_REPEAT = 0x2901,
+		ENUM_WRAP_MODE_CLAMP_TO_EDGE = 0x812F
+	};
+
+	//或者放到Engine层面更合适（变更是否需要重新生成纹理？）
+	enum ENUM_FILTER_MODE
+	{
+		ENUM_FILTER_MODE_NEAREST = 0,	//最近点采样
+		ENUM_FILTER_MODE_BILINEAR,		//双线性过滤
+		ENUM_FILTER_MODE_TRILINEAR,		//三线性过滤
+		ENUM_FILTER_MODE_ANISOTROPIC	//各向异性过滤
+	};
+
+	enum ENUM_CULLING_MODE
+	{
+		ENUM_CULLING_MODE_NONE =  0,
+		ENUM_CULLING_MODE_FRONT =  0x0404,
+		ENUM_CULLING_MODE_BACK =  0x0405,
+		ENUM_CULLING_MODE_ALL =  0x0408
+	};
+
+	enum ENUM_FRONT_FACE
+	{
+		ENUM_FRONT_FACE_CW = 0x0900,
+		ENUM_FRONT_FACE_CCW = 0x0901,
+	};
+
+	const static c8* MATERIAL_STATE_NAMES[]=
+	{
+		//"AlphaTest",
+		//"Blend",
+		"ColorMaterial",
+		//"CullFace",
+		//"DepthTest",
+		"Dither",
+		"Fog",
+		"Lighting",
+		"LineSmooth",
+		"Normalize",
+		//"RescaleNormal",
+		"ScissorTest",
+		"StencilTest"
+	};
+
+	const static u32 MATERIAL_MAX_TEXTURES = YON_MATERIAL_MAX_TEXTURES;
+
+	inline bool blendFactorHasAlpha(const ENUM_BLEND_FACTOR factor)
+	{
+		switch (factor)
+		{
+		case ENUM_BLEND_FACTOR_SRC_ALPHA:
+		case ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA:
+		case ENUM_BLEND_FACTOR_DST_ALPHA:
+		case ENUM_BLEND_FACTOR_ONE_MINUS_DST_ALPHA:
+		case ENUM_BLEND_FACTOR_SRC_ALPHA_SATURATE:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	inline bool isTransparent(ENUM_MATERIAL_TYPE type)
+	{
+		switch(type)
+		{
+		case ENUM_MATERIAL_TYPE_BLEND:
+		case ENUM_MATERIAL_TYPE_TRANSPARENT:
+			//case ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR:
+		case ENUM_MATERIAL_TYPE_MASK:
+		case ENUM_MATERIAL_TYPE_COMPOSITE2:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+
 	struct SMaterial{
 		bool ColorMaterial:1;
-		bool CullFace:1;
+		//bool CullFace:1;
 		//bool DepthTest:1;
 		bool Dither:1;
 		bool Fog:1;
@@ -16,6 +145,7 @@ namespace video{
 		bool RescaleNormal:1;
 		bool ScissorTest:1;
 		bool StencilTest:1;
+		bool GouraudShading:1;
 
 		ENUM_MATERIAL_TYPE MaterialType;
 		ENUM_POLYGON_MODE PolygonMode;
@@ -32,16 +162,17 @@ namespace video{
 			BlendSrc(ENUM_BLEND_FACTOR_SRC_ALPHA),BlendDst(ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA),
 			Modulate(ENUM_MODULATE_1X),AlphaSource(ENUM_ALPHA_SOURCE_NONE),
 			ColorMaterial(false),
-			CullFace(true),
+			//CullFace(true),
 			//DepthTest(false),
 			Dither(true),
 			Fog(false),
 			Lighting(false),
 			LineSmooth(false),
 			Normalize(false),
-			RescaleNormal(false),
+			//RescaleNormal(false),
 			ScissorTest(false),
-			StencilTest(false){
+			StencilTest(false),
+			GouraudShading(true){
 		}
 
 		SMaterial(ENUM_MATERIAL_TYPE materialType)
@@ -50,16 +181,17 @@ namespace video{
 			BlendSrc(ENUM_BLEND_FACTOR_SRC_ALPHA),BlendDst(ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA),
 			Modulate(ENUM_MODULATE_1X),AlphaSource(ENUM_ALPHA_SOURCE_NONE),
 			ColorMaterial(false),
-			CullFace(true),
+			//CullFace(true),
 			//DepthTest(false),
 			Dither(true),
 			Fog(false),
 			Lighting(false),
 			LineSmooth(false),
 			Normalize(false),
-			RescaleNormal(false),
+			//RescaleNormal(false),
 			ScissorTest(false),
-			StencilTest(false){
+			StencilTest(false),
+			GouraudShading(true){
 		}
 
 		void setTexture(u32 index, ITexture* tex)
@@ -72,7 +204,23 @@ namespace video{
 		{
 			return index < MATERIAL_MAX_TEXTURES ? TextureLayers[index].texture : 0;
 		}
-
+		core::matrix4f& getTextureMatrix(u32 index)
+		{
+			return TextureLayers[index].getTextureMatrix();
+		}
+		const core::matrix4f& getTextureMatrix(u32 index) const
+		{
+			if (index<MATERIAL_MAX_TEXTURES)
+				return TextureLayers[index].getTextureMatrix();
+			else
+				return core::IDENTITY_MATRIX;
+		}
+		void setTextureMatrix(u32 index, const core::matrix4f& mat)
+		{
+			if (index>=MATERIAL_MAX_TEXTURES)
+				return;
+			TextureLayers[index].setTextureMatrix(mat);
+		}
 		ENUM_WRAP_MODE getWrapModeU(u32 index) const{
 			return TextureLayers[index].wrapU;
 		}
@@ -105,15 +253,14 @@ namespace video{
 				Modulate != b.Modulate ||
 				AlphaSource != b.AlphaSource ||
 				ColorMaterial != b.ColorMaterial ||
-				CullFace != b.CullFace ||
 				Dither != b.Dither ||
 				Fog != b.Fog ||
 				Lighting != b.Lighting ||
 				LineSmooth != b.LineSmooth ||
 				Normalize != b.Normalize ||
-				RescaleNormal != b.RescaleNormal ||
 				ScissorTest != b.ScissorTest ||
-				StencilTest != b.StencilTest;
+				StencilTest != b.StencilTest ||
+				GouraudShading != b.GouraudShading;
 			for (u32 i=0; (i<MATERIAL_MAX_TEXTURES) && !different; ++i)
 			{
 				different |= (TextureLayers[i] != b.TextureLayers[i]);
@@ -143,15 +290,14 @@ namespace video{
 				TextureLayers[i] = other.TextureLayers[i];
 			}
 			ColorMaterial = other.ColorMaterial;
-			CullFace = other.CullFace;
 			Dither = other.Dither;
 			Fog = other.Fog;
 			Lighting = other.Lighting;
 			LineSmooth = other.LineSmooth;
 			Normalize = other.Normalize;
-			RescaleNormal = other.RescaleNormal;
 			ScissorTest = other.ScissorTest;
 			StencilTest = other.StencilTest;
+			GouraudShading = other.GouraudShading;
 			return *this;
 		}
 
