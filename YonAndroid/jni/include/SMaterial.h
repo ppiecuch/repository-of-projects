@@ -83,6 +83,20 @@ namespace video{
 		ENUM_FRONT_FACE_CCW = 0x0901,
 	};
 
+	enum ENUM_CMP_FUNC
+	{
+		//! Test never succeeds, this equals disable
+		ENUM_CMP_FUNC_NEVER=0,
+		ENUM_CMP_FUNC_LT,
+		ENUM_CMP_FUNC_LE,
+		ENUM_CMP_FUNC_EQ,
+		ENUM_CMP_FUNC_NE,
+		ENUM_CMP_FUNC_GE,
+		ENUM_CMP_FUNC_GT,
+		ENUM_CMP_FUNC_ALWAYS
+	};
+
+
 	const static c8* MATERIAL_STATE_NAMES[]=
 	{
 		//"AlphaTest",
@@ -132,8 +146,14 @@ namespace video{
 		}
 	}
 
-
 	struct SMaterial{
+
+		typedef struct{
+			bool Enable;
+			f32 Value;
+			ENUM_CMP_FUNC Func;
+		}TestEntity;
+
 		bool ColorMaterial:1;
 		//bool CullFace:1;
 		//bool DepthTest:1;
@@ -148,6 +168,9 @@ namespace video{
 		bool GouraudShading:1;
 
 		ENUM_MATERIAL_TYPE MaterialType;
+		//ENUM_CMP_FUNC ZBuffer;
+		TestEntity DepthTest;
+		TestEntity AlphaTest;
 		ENUM_POLYGON_MODE PolygonMode;
 		ENUM_CULLING_MODE CullingMode;
 		ENUM_FRONT_FACE FrontFace;
@@ -173,6 +196,13 @@ namespace video{
 			ScissorTest(false),
 			StencilTest(false),
 			GouraudShading(true){
+				DepthTest.Enable=false;
+				DepthTest.Value=1.f;
+				DepthTest.Func=ENUM_CMP_FUNC_LT;
+
+				AlphaTest.Enable=false;
+				AlphaTest.Value=0.f;
+				AlphaTest.Func=ENUM_CMP_FUNC_ALWAYS;
 		}
 
 		SMaterial(ENUM_MATERIAL_TYPE materialType)
@@ -192,6 +222,13 @@ namespace video{
 			ScissorTest(false),
 			StencilTest(false),
 			GouraudShading(true){
+				DepthTest.Enable=false;
+				DepthTest.Value=1.f;
+				DepthTest.Func=ENUM_CMP_FUNC_LT;
+
+				AlphaTest.Enable=false;
+				AlphaTest.Value=0.f;
+				AlphaTest.Func=ENUM_CMP_FUNC_ALWAYS;
 		}
 
 		void setTexture(u32 index, ITexture* tex)
@@ -245,6 +282,7 @@ namespace video{
 		{
 			bool different =
 				MaterialType != b.MaterialType ||
+				ZBuffer != b.ZBuffer ||
 				PolygonMode != b.PolygonMode ||
 				CullingMode != b.CullingMode ||
 				FrontFace != b.FrontFace ||
@@ -278,6 +316,7 @@ namespace video{
 				return *this;
 
 			MaterialType = other.MaterialType;
+			ZBuffer = other.ZBuffer;
 			PolygonMode = other.PolygonMode;
 			CullingMode = other.CullingMode;
 			FrontFace = other.FrontFace;

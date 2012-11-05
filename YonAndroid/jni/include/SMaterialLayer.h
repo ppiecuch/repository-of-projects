@@ -1,15 +1,17 @@
 #ifndef _YON_VIDEO_SMATERIALLAYER_H_
 #define _YON_VIDEO_SMATERIALLAYER_H_
 
-#include "IMaterial.h"
+//#include "IMaterial.h"
 #include "yonAllocator.h"
 
 namespace yon{
 namespace video{
 
+	struct SMaterial;
+
 	struct SMaterialLayer{
 	private:
-		friend class SMaterial;
+		friend struct SMaterial;
 		core::yonAllocator<core::matrix4f> MatrixAllocator;
 		core::matrix4f* pTextureMatrix;
 	public:
