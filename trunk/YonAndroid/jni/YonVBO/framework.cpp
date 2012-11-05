@@ -13,7 +13,8 @@ IRandomizer* randomizer=NULL;
 
 IModel* cubeModel=NULL;
 IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+IModel* teapotModel1=NULL;
+IModel* teapotModel2=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -80,10 +81,19 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	teapotModel=sceneMgr->addModel(entity);
-	teapotModel->setPosition(core::vector3df(50,-50,0));
+	teapotModel1=sceneMgr->addModel(entity);
+	teapotModel1->setPosition(core::vector3df(-50,-50,0));
 	unit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	unit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
+	shap=geometryFty->createTeapot(2,video::COLOR_RED);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	teapotModel2=sceneMgr->addModel(entity);
+	teapotModel2->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -97,8 +107,8 @@ void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
-	const core::vector3df trot=teapotModel->getRotation();
-	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
+	//const core::vector3df trot=teapotModel->getRotation();
+	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	sceneMgr->render(videoDriver);
 

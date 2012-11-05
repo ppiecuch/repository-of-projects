@@ -60,21 +60,21 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/");
+	fs->addWorkingDirectory("../media/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->setWorkingDirectory("media/");
+	fs->addWorkingDirectory("media/");
 #endif
 
-	ISound* sound=audioDriver->getSound("bg.ogg");
+	ISound* sound=audioDriver->getSound("bg.wav");
 	sound->setLooping(true);
 	sound->setGain(0.5f);
 	sound->play();
-	sound=audioDriver->getSound("helloworld.wav");
-	sound->play();
+	//sound=audioDriver->getSound("helloworld.wav");
+	//sound->play();
 
 	return true;
 }
