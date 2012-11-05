@@ -27,6 +27,7 @@
 			'NULL '
 			;
 		var functions =
+			'glAlphaFunc ' +
 			'glActiveTexture ' +
 			'glBindBuffer ' +
 			'glBufferData ' +
@@ -51,6 +52,8 @@
 			;
 		var constants =	
 			'GL_ALPHA ' +
+			'GL_ALPHA_TEST ' +
+			'GL_ALWAYS ' +
 			'GL_ARRAY_BUFFER ' +
 			'GL_ARRAY_BUFFER_BINDING ' +
 			'GL_CLAMP_TO_EDGE ' +
@@ -58,8 +61,13 @@
 			'GL_DST_COLOR ' +
 			'GL_DYNAMIC_DRAW ' +
 			'GL_ELEMENT_ARRAY_BUFFER ' +
+			'GL_EQUAL ' +
 			'GL_GENERATE_MIPMAP ' +
+			'GL_GEQUAL ' +
+			'GL_GREATER ' +
 			'GL_INVALID_OPERATION ' +
+			'GL_LEQUAL ' +
+			'GL_LESS ' +
 			'GL_LINEAR ' +
 			'GL_LINEAR_MIPMAP_LINEAR ' +
 			'GL_LINEAR_MIPMAP_NEAREST ' +
@@ -69,7 +77,9 @@
 			'GL_NEAREST ' +
 			'GL_NEAREST_MIPMAP_LINEAR ' +
 			'GL_NEAREST_MIPMAP_NEAREST ' +
+			'GL_NEVER ' +
 			'GL_NORMAL_ARRAY_BUFFER_BINDING ' +
+			'GL_NOTEQUAL ' +
 			'GL_ONE ' +
 			'GL_ONE_MINUS_DST_ALPHA ' +
 			'GL_ONE_MINUS_DST_COLOR ' +
