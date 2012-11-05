@@ -81,6 +81,74 @@ http://www.khronos.org/opengles/sdk/1.1/docs/man/
 				</td>
 			</tr>
 			<tr>
+				<td>void glAlphaFunc(GLenum func,GLclampf ref)<br>
+				void glAlphaFuncx(	GLenum func,GLclampx ref)
+				</td>
+				<td>支持</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+				<div class="arrow">
+					&nbsp;
+				</div></td>
+			</tr>
+			<tr>
+				<td colspan="5" >
+<pre class="brush: gl;auto-links:true;">
+【功能描述】
+The alpha test discards fragments depending on the outcome of a comparison between an incoming fragment's alpha value and a constant reference value. 
+glAlphaFunc specifies the reference value and the comparison function. The comparison is performed only if alpha testing is enabled. 
+To enable and disable alpha testing, call glEnable and glDisable with argument GL_ALPHA_TEST. Alpha testing is initially disabled. 
+When disabled, it is as if the comparison always passes.
+
+func and ref specify the conditions under which the pixel is drawn. The incoming alpha value is compared to ref using the function specified by func. 
+If the value passes the comparison, the incoming fragment is drawn if it also passes subsequent stencil and depth buffer tests. 
+If the value fails the comparison, no change is made to the frame buffer at that pixel location. The comparison functions are as follows:
+
+GL_NEVER
+Never passes.
+
+GL_LESS
+Passes if the incoming alpha value is less than the reference value.
+
+GL_EQUAL
+Passes if the incoming alpha value is equal to the reference value.
+
+GL_LEQUAL
+Passes if the incoming alpha value is less than or equal to the reference value.
+
+GL_GREATER
+Passes if the incoming alpha value is greater than the reference value.
+
+GL_NOTEQUAL
+Passes if the incoming alpha value is not equal to the reference value.
+
+GL_GEQUAL
+Passes if the incoming alpha value is greater than or equal to the reference value.
+
+GL_ALWAYS
+Always passes (initial value).
+
+glAlphaFunc operates on all pixel write operations, including those resulting from the scan conversion of points, lines, and polygons. 
+glAlphaFunc does not affect glClear.
+【参数】
+func
+Specifies the alpha comparison function. Symbolic constants GL_NEVER, GL_LESS, GL_EQUAL, GL_LEQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL, 
+and GL_ALWAYS are accepted. The initial value is GL_ALWAYS.
+
+ref
+Specifies the reference value that incoming alpha values are compared to. This value is clamped to the range [0, 1], where 0 represents the 
+lowest possible alpha value and 1 the highest possible value. The initial reference value is 0.
+【返回值】
+【备注】
+</pre>
+<pre>
+参考文档：
+http://www.khronos.org/opengles/sdk/1.1/docs/man/
+</pre>
+				</td>
+			</tr>
+			<tr>
 				<td>void glBindBuffer(GLenum target,GLuint buffer)</td>
 				<td>支持</td>
 				<td>&nbsp;</td>
