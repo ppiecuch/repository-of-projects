@@ -232,6 +232,7 @@ namespace yon{
 				const void* indice, u32 indexCount,
 				ENUM_PRIMITIVE_TYPE pType=ENUM_PRIMITIVE_TYPE_TRIANGLES,
 				scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) =0;
+			virtual void draw2DLine(const core::position2di& start,const core::position2di& end,video::SColor color=video::COLOR_WHITE) =0;
 			virtual void draw3DLine(const core::vector3df& start,const core::vector3df& end, video::SColor color=video::COLOR_WHITE) =0;
 			virtual u32 getFPS() const = 0;
 			virtual u32 getPrimitiveCountDrawn(bool average=false) const = 0;

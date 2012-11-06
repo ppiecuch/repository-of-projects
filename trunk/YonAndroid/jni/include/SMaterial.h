@@ -1,6 +1,8 @@
 #ifndef _YON_VIDEO_SMATERIAL_H_
 #define _YON_VIDEO_SMATERIAL_H_
 
+#include "SMaterialLayer.h"
+
 namespace yon{
 namespace video{
 
@@ -36,7 +38,7 @@ namespace video{
 	enum ENUM_MATERIAL_TYPE{
 		ENUM_MATERIAL_TYPE_SOLID = 0,
 		ENUM_MATERIAL_TYPE_BLEND,
-		ENUM_MATERIAL_TYPE_LIGHTEN,
+		//ENUM_MATERIAL_TYPE_LIGHTEN,
 		ENUM_MATERIAL_TYPE_TRANSPARENT,
 		ENUM_MATERIAL_TYPE_TRANSPARENT_REF,
 		//ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR,
@@ -83,21 +85,19 @@ namespace video{
 		ENUM_FRONT_FACE_CCW = 0x0901,
 	};
 
-	enum ENUM_CMP_FUNC
+	enum ENUM_COLOR_MASK
 	{
-		//! Test never succeeds, this equals disable
-		ENUM_CMP_FUNC_NEVER=0,
-		ENUM_CMP_FUNC_LT,
-		ENUM_CMP_FUNC_LE,
-		ENUM_CMP_FUNC_EQ,
-		ENUM_CMP_FUNC_NE,
-		ENUM_CMP_FUNC_GE,
-		ENUM_CMP_FUNC_GT,
-		ENUM_CMP_FUNC_ALWAYS
+		ENUM_COLOR_MASK_NONE=0,
+		ENUM_COLOR_MASK_RED=1,
+		ENUM_COLOR_MASK_GREEN=2,
+		ENUM_COLOR_MASK_BLUE=4,
+		ENUM_COLOR_MASK_ALPHA=8,
+		ENUM_COLOR_MASK_RGB=7,
+		ENUM_COLOR_MASK_RGBA=15
 	};
 
 
-	const static c8* MATERIAL_STATE_NAMES[]=
+	/*const static c8* MATERIAL_STATE_NAMES[]=
 	{
 		//"AlphaTest",
 		//"Blend",
@@ -112,7 +112,7 @@ namespace video{
 		//"RescaleNormal",
 		"ScissorTest",
 		"StencilTest"
-	};
+	};*/
 
 	const static u32 MATERIAL_MAX_TEXTURES = YON_MATERIAL_MAX_TEXTURES;
 
@@ -148,12 +148,6 @@ namespace video{
 
 	struct SMaterial{
 
-		typedef struct{
-			bool Enable;
-			f32 Value;
-			ENUM_CMP_FUNC Func;
-		}TestEntity;
-
 		bool ColorMaterial:1;
 		//bool CullFace:1;
 		//bool DepthTest:1;
@@ -169,21 +163,20 @@ namespace video{
 
 		ENUM_MATERIAL_TYPE MaterialType;
 		//ENUM_CMP_FUNC ZBuffer;
-		TestEntity DepthTest;
-		TestEntity AlphaTest;
 		ENUM_POLYGON_MODE PolygonMode;
 		ENUM_CULLING_MODE CullingMode;
 		ENUM_FRONT_FACE FrontFace;
 		ENUM_BLEND_FACTOR BlendSrc,BlendDst;
 		ENUM_MODULATE Modulate;
 		ENUM_ALPHA_SOURCE AlphaSource;
+		ENUM_COLOR_MASK ColorMask;
 		SMaterialLayer TextureLayers[MATERIAL_MAX_TEXTURES];
 
 		SMaterial()
 			:MaterialType(ENUM_MATERIAL_TYPE_SOLID),PolygonMode(ENUM_POLYGON_MODE_FILL),
 			CullingMode(ENUM_CULLING_MODE_BACK),FrontFace(ENUM_FRONT_FACE_CCW),
 			BlendSrc(ENUM_BLEND_FACTOR_SRC_ALPHA),BlendDst(ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA),
-			Modulate(ENUM_MODULATE_1X),AlphaSource(ENUM_ALPHA_SOURCE_NONE),
+			Modulate(ENUM_MODULATE_1X),AlphaSource(ENUM_ALPHA_SOURCE_NONE),ColorMask(ENUM_COLOR_MASK_RGBA),
 			ColorMaterial(false),
 			//CullFace(true),
 			//DepthTest(false),
@@ -196,20 +189,13 @@ namespace video{
 			ScissorTest(false),
 			StencilTest(false),
 			GouraudShading(true){
-				DepthTest.Enable=false;
-				DepthTest.Value=1.f;
-				DepthTest.Func=ENUM_CMP_FUNC_LT;
-
-				AlphaTest.Enable=false;
-				AlphaTest.Value=0.f;
-				AlphaTest.Func=ENUM_CMP_FUNC_ALWAYS;
 		}
 
 		SMaterial(ENUM_MATERIAL_TYPE materialType)
 			:MaterialType(materialType),PolygonMode(ENUM_POLYGON_MODE_FILL),
 			CullingMode(ENUM_CULLING_MODE_BACK),FrontFace(ENUM_FRONT_FACE_CCW),
 			BlendSrc(ENUM_BLEND_FACTOR_SRC_ALPHA),BlendDst(ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA),
-			Modulate(ENUM_MODULATE_1X),AlphaSource(ENUM_ALPHA_SOURCE_NONE),
+			Modulate(ENUM_MODULATE_1X),AlphaSource(ENUM_ALPHA_SOURCE_NONE),ColorMask(ENUM_COLOR_MASK_RGBA),
 			ColorMaterial(false),
 			//CullFace(true),
 			//DepthTest(false),
@@ -222,13 +208,6 @@ namespace video{
 			ScissorTest(false),
 			StencilTest(false),
 			GouraudShading(true){
-				DepthTest.Enable=false;
-				DepthTest.Value=1.f;
-				DepthTest.Func=ENUM_CMP_FUNC_LT;
-
-				AlphaTest.Enable=false;
-				AlphaTest.Value=0.f;
-				AlphaTest.Func=ENUM_CMP_FUNC_ALWAYS;
 		}
 
 		void setTexture(u32 index, ITexture* tex)
@@ -282,7 +261,6 @@ namespace video{
 		{
 			bool different =
 				MaterialType != b.MaterialType ||
-				ZBuffer != b.ZBuffer ||
 				PolygonMode != b.PolygonMode ||
 				CullingMode != b.CullingMode ||
 				FrontFace != b.FrontFace ||
@@ -298,6 +276,7 @@ namespace video{
 				Normalize != b.Normalize ||
 				ScissorTest != b.ScissorTest ||
 				StencilTest != b.StencilTest ||
+				ColorMask != b.ColorMask ||
 				GouraudShading != b.GouraudShading;
 			for (u32 i=0; (i<MATERIAL_MAX_TEXTURES) && !different; ++i)
 			{
@@ -316,7 +295,6 @@ namespace video{
 				return *this;
 
 			MaterialType = other.MaterialType;
-			ZBuffer = other.ZBuffer;
 			PolygonMode = other.PolygonMode;
 			CullingMode = other.CullingMode;
 			FrontFace = other.FrontFace;
@@ -336,10 +314,10 @@ namespace video{
 			Normalize = other.Normalize;
 			ScissorTest = other.ScissorTest;
 			StencilTest = other.StencilTest;
+			ColorMask = other.ColorMask;
 			GouraudShading = other.GouraudShading;
 			return *this;
 		}
-
 	};
 
 	YON_API extern SMaterial DEFAULT_MATERIAL;
