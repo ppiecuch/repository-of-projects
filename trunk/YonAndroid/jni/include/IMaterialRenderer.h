@@ -12,7 +12,7 @@ namespace yon{
 		class IMaterialRenderer : public virtual core::IReferencable{
 		public:
 			//virtual void onSetMaterial(const IMaterial* current,const IMaterial* last) {}
-			virtual void onSetMaterial(const SInnerMaterial& current,const SInnerMaterial& last) {}
+			virtual void onSetMaterial(const SInnerMaterial& current,SInnerMaterial& last) {}
 			virtual void onUnsetMaterial() {}
 		};
 	}
