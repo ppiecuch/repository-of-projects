@@ -8,10 +8,11 @@
 namespace yon{
 	namespace video{
 
+		struct SInnerMaterial;
 		class IMaterialRenderer : public virtual core::IReferencable{
 		public:
 			//virtual void onSetMaterial(const IMaterial* current,const IMaterial* last) {}
-			virtual void onSetMaterial(const SMaterial& current,const SMaterial& last) {}
+			virtual void onSetMaterial(const SInnerMaterial& current,const SInnerMaterial& last) {}
 			virtual void onUnsetMaterial() {}
 		};
 	}
