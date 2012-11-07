@@ -4,7 +4,8 @@
 #include "IReferencable.h"
 #include "yonTypes.h"
 #include "SVertex.h"
-#include "IMaterial.h"
+//#include "IMaterial.h"
+#include "SMaterial.h"
 #include "IShap.h"
 #include "IHardwareBuffer.h"
 
@@ -21,8 +22,11 @@ namespace yon{
 		public:
 			virtual ~IUnit(){}
 
-			virtual video::IMaterial* getMaterial() = 0;
-			virtual const video::IMaterial* getMaterial() const = 0;
+			//virtual video::IMaterial* getMaterial() = 0;
+			//virtual const video::IMaterial* getMaterial() const = 0;
+
+			virtual video::SMaterial& getMaterial() = 0;
+			virtual const video::SMaterial& getMaterial() const = 0;
 
 			/*virtual const void* getVertices() const = 0;
 			virtual void* getVertices() = 0;

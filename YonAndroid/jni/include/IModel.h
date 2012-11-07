@@ -5,7 +5,8 @@
 #include "IReferencable.h"
 #include "yonList.h"
 #include "ITexture.h"
-#include "IMaterial.h"
+//#include "IMaterial.h"
+#include "SMaterial.h"
 #include "IAnimator.h"
 #include "IEntity.h"
 //#include "ISceneManager.h"
@@ -222,12 +223,15 @@ namespace scene{
 			}
 		}
 
-		virtual void setMaterialTexture(u32 textureLayer, video::ITexture* texture) const{
+		virtual void setMaterialTexture(u32 textureLayer, video::ITexture* texture){
 			if (textureLayer>=video::MATERIAL_MAX_TEXTURES)
 				return;
 
 			for (u32 i=0; i<getMaterialCount(); ++i)
-				getMaterial(i)->setTexture(textureLayer, texture);
+			{
+				YON_DEBUG_BREAK_IF(&getMaterial(i)==&video::DEFAULT_MATERIAL);
+				getMaterial(i).setTexture(textureLayer, texture);
+			}
 		}
 
 		virtual u32 getMaterialCount() const
@@ -235,8 +239,11 @@ namespace scene{
 			return 0;
 		}
 
-		virtual video::IMaterial* getMaterial(u32 num) const{
-			return NULL;
+		//virtual video::IMaterial* getMaterial(u32 num) const{
+		//	return NULL;
+		//}
+		virtual video::SMaterial& getMaterial(u32 num){
+			return video::DEFAULT_MATERIAL;
 		}
 
 		virtual IEntity* getEntity(){
@@ -246,7 +253,10 @@ namespace scene{
 		void setMaterialType(video::ENUM_MATERIAL_TYPE newType)
 		{
 			for (u32 i=0; i<getMaterialCount(); ++i)
-				getMaterial(i)->setMaterialType(newType);
+			{
+				YON_DEBUG_BREAK_IF(&getMaterial(i)==&video::DEFAULT_MATERIAL);
+				getMaterial(i).MaterialType=newType;
+			}
 		}
 
 		virtual void addAnimator(animator::IAnimator* animator)
