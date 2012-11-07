@@ -48,6 +48,15 @@ namespace video{
 		ENUM_MATERIAL_TYPE_COUNT
 	};
 
+	const static c8* MATERIAL_TYPE_NAMES[]=
+	{
+		"Solid",
+		"Blend",
+		"Transparent",
+		"TransparentRef",
+		"Mask"
+	};
+
 	enum ENUM_POLYGON_MODE{
 		ENUM_POLYGON_MODE_FILL = 0,
 		ENUM_POLYGON_MODE_LINE,

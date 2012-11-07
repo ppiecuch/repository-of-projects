@@ -73,7 +73,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	
 
 	//IMaterial* material;
-	/*IShap *shap,*shap1,*shap2;
+	IShap *shap,*shap1,*shap2;
 	IUnit* unit;
 	IEntity* entity;
 
@@ -96,7 +96,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	teapotModel2->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();*/
+	entity->drop();
 
 	return true;
 }
