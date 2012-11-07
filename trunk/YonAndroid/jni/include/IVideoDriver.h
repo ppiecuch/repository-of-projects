@@ -44,6 +44,14 @@ namespace yon{
 			ENUM_TRANSFORM_COUNT
 		};
 
+		const static c8* TRANSFORM_NAMES[]={
+			"View",
+			"World",
+			"Projection",
+			"Texture0",
+			"Texture1"
+		};
+
 		/*
 		#define GL_POINTS                         0x0000
 		#define GL_LINES                          0x0001

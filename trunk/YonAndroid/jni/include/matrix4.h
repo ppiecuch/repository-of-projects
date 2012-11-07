@@ -317,7 +317,7 @@ namespace core{
 		}
 		inline bool operator==(const matrix4<T> &other) const
 		{
-			if(m_bIsIdentity&&other.isIdentity())
+			if(isIdentity()&&other.isIdentity())
 				return true;
 			for (u32 i = 0; i < 4; ++i)
 				for (u32 j = 0; j < 4; ++j)
