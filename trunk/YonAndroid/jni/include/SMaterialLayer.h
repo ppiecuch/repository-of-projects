@@ -2,11 +2,28 @@
 #define _YON_VIDEO_SMATERIALLAYER_H_
 
 //#include "IMaterial.h"
+#include "matrix4.h"
 #include "yonAllocator.h"
 
 namespace yon{
 namespace video{
 
+	enum ENUM_WRAP_MODE
+	{
+		ENUM_WRAP_MODE_REPEAT = 0x2901,
+		ENUM_WRAP_MODE_CLAMP_TO_EDGE = 0x812F
+	};
+
+	//或者放到Engine层面更合适（变更是否需要重新生成纹理？）
+	enum ENUM_FILTER_MODE
+	{
+		ENUM_FILTER_MODE_NEAREST = 0,	//最近点采样
+		ENUM_FILTER_MODE_BILINEAR,		//双线性过滤
+		ENUM_FILTER_MODE_TRILINEAR,		//三线性过滤
+		ENUM_FILTER_MODE_ANISOTROPIC	//各向异性过滤
+	};
+
+	class ITexture;
 	struct SMaterial;
 
 	struct SMaterialLayer{

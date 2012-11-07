@@ -7,7 +7,7 @@
 #include "dimension2d.h"
 #include "SShap.h"
 #include "IUnit.h"
-#include "IMaterial.h"
+//#include "IMaterial.h"
 
 namespace yon{
 	namespace scene{
@@ -49,7 +49,8 @@ namespace yon{
 			//对shap的indices进行0,1,2,.....填充，结果indices数量为count
 			virtual void fillShapIndices(IShap* shap,u32 count) const = 0;
 
-			virtual IUnit* createUnit(IShap* shap,video::IMaterial* material=NULL) const = 0;
+			//virtual IUnit* createUnit(IShap* shap,video::IMaterial* material=NULL) const = 0;
+			virtual IUnit* createUnit(IShap* shap,const video::SMaterial& material=video::DEFAULT_MATERIAL) const = 0;
 			virtual IEntity* createEntity(IUnit* unit) const = 0;
 		};
 

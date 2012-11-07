@@ -9,7 +9,8 @@
 #include "IFileSystem.h"
 #include "ITexture.h"
 #include "IImageLoader.h"
-#include "IMaterial.h"
+//#include "IMaterial.h"
+#include "SMaterial.h"
 #include "SColor.h"
 #include "ITimer.h"
 #include "SVertex.h"
@@ -221,8 +222,9 @@ namespace yon{
 			virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat) =0;
 			virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const =0;
 
-			virtual void setMaterial(IMaterial* material) = 0;
-			virtual IMaterial* createMaterial() = 0;
+			virtual void setMaterial(const SMaterial& material) = 0;
+			//virtual void setMaterial(IMaterial* material) = 0;
+			//virtual IMaterial* createMaterial() = 0;
 
 			virtual void drawUnit(scene::IUnit* unit) = 0;
 			virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,

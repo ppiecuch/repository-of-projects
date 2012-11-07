@@ -3,7 +3,6 @@
 
 #include "IUnit.h"
 #include "yonArray.h"
-#include "CMaterial.h"
 
 namespace yon{
 namespace scene{
@@ -12,30 +11,35 @@ namespace scene{
 	struct SUnit : public virtual IUnit{
 	protected:
 		IShap* m_pShap;
-		video::IMaterial* m_pMaterial;
+		video::SMaterial m_material;
 		video::ENUM_HARDWARDBUFFER_USAGE_TYPE m_vertexUsageType,m_indexUsageType;
 	public:
 		SUnit()
-			:m_pMaterial(new video::CMaterial()),m_pShap(NULL),
+			:m_material(video::DEFAULT_MATERIAL),m_pShap(NULL),
 			m_vertexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE),m_indexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE){
 		}
-		SUnit(video::IMaterial* material)
-			:m_pMaterial(material),m_pShap(NULL),
+		SUnit(const video::SMaterial& material)
+			:m_material(material),m_pShap(NULL),
 			m_vertexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE),m_indexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE){
-				m_pMaterial->grab();
 		}
 
 		virtual ~SUnit(){
-			m_pMaterial->drop();
 			if(m_pShap)
 				m_pShap->drop();
 		}
 
-		virtual video::IMaterial* getMaterial(){
-			return m_pMaterial;
+		//virtual video::IMaterial* getMaterial(){
+		//	return m_pMaterial;
+		//}
+		//virtual const video::IMaterial* getMaterial() const{
+		//	return m_pMaterial;
+		//}
+
+		virtual video::SMaterial& getMaterial(){
+			return m_material;
 		}
-		virtual const video::IMaterial* getMaterial() const{
-			return m_pMaterial;
+		virtual const video::SMaterial& getMaterial() const{
+			return m_material;
 		}
 
 		//virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getHardwareBufferUsageType() const{

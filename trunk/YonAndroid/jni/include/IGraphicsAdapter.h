@@ -8,7 +8,7 @@
 
 namespace yon{
 	namespace video{
-		class IMaterial;
+		struct SMaterial;
 	}
 namespace scene{
 
@@ -64,7 +64,8 @@ namespace scene{
 		virtual bool drawRegion(const c8* imageName, const core::dimension2di& dim, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform=ENUM_TRANS_NONE, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
 		virtual bool drawRegion(const c8* imageName, const core::rectf& uv, const core::position2di poss[4], ENUM_TRANS transform=ENUM_TRANS_NONE, bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
 		//特效专用接口
-		virtual void drawVertexPrimitiveList(video::IMaterial* material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) =0;
+		//virtual void drawVertexPrimitiveList(video::IMaterial* material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) =0;
+		virtual void drawVertexPrimitiveList(const video::SMaterial& material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) = 0;
 		virtual void render() = 0;
 	};
 }

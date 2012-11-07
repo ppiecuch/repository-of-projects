@@ -325,6 +325,7 @@ namespace core{
 						return false;
 			return true;
 		}
+		inline bool operator!=(const matrix4<T> &other) const{return !(*this==other);}
 		/*const T& operator[](u32 index) const{
 			u32 quotient=index>>2;
 			u32 remainder=index-quotient;
