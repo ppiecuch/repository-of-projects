@@ -95,6 +95,12 @@ namespace video{
 		SColor(u32 clr)
 			: color(clr) {}
 
+		inline bool operator!=(const SColor& other) const{
+			return color!=other.color;
+		}
+
+		inline bool operator==(const SColor& other) const{return !(*this!=other);}
+
 		u32 toA8R8G8B8() const { return color; }
 
 		u32 getAlpha() const { return color>>24; }

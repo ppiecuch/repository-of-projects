@@ -36,10 +36,10 @@ public:
 			switch(evt.mouseInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
-				logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
-				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			}
 		}
@@ -61,14 +61,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->setWorkingDirectory("../media/");
+	fs->addWorkingDirectory("../media/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->setWorkingDirectory("media/");
+	fs->addWorkingDirectory("media/");
 #endif
 
 	/*
@@ -79,7 +79,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	*/
 
 
-	IMaterial* material;
+	//IMaterial* material;
 	IShap *shap,*shap1,*shap2;
 	IUnit* unit;
 	IEntity* entity;
@@ -95,13 +95,12 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
-	material=cubeModel->getMaterial(0);
-	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
-	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+	{
+		SMaterial& material=cubeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT;
+		material.setTexture(0,videoDriver->getTexture("120.png"));
+	}
 	cubeModel->setPosition(core::vector3df(100,100,0));
-	//material->setTexture(0,videoDriver->getTexture("png8/120.png"));
-	material->setTexture(0,videoDriver->getTexture("120.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -110,12 +109,13 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	weedModel=sceneMgr->addModel(entity);
-	material=weedModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
-	material->states.CullFace=false;
-	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+	{
+		SMaterial& material=weedModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT;
+		material.CullingMode=ENUM_CULLING_MODE_NONE;
+		material.setTexture(0,videoDriver->getTexture("plant00.png"));
+	}
 	weedModel->setPosition(core::vector3df(20,100,0));
-	material->setTexture(0,videoDriver->getTexture("plant00.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -133,13 +133,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_BLEND);
-	material->setBlendSrcFactor(ENUM_BLEND_FACTOR_SRC_ALPHA);
-	material->setBlendDstFactor(ENUM_BLEND_FACTOR_ONE);
-	//material->setAlphaSource(ENUM_ALPHA_SOURCE_TEXTURE);
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,videoDriver->getTexture("aura.png"));
+	}
 	planeModel->setPosition(core::vector3df(0,0,0));
-	material->setTexture(0,videoDriver->getTexture("aura.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -155,14 +156,17 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	unit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	unit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	entity=geometryFty->createEntity(unit);
 	IModel* waterfallModel=sceneMgr->addModel(entity);
-	material=waterfallModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_MASK);
 	waterfallModel->setPosition(core::vector3df(90,100,120));
-	material->setTexture(0,videoDriver->getTexture("waterfall.png"));
-	material->setTexture(1,videoDriver->getTexture("mask.png"));
+	{
+		SMaterial& material=waterfallModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_MASK;
+		material.setTexture(0,videoDriver->getTexture("waterfall.png"));
+		material.setTexture(1,videoDriver->getTexture("mask.png"));
+	}
 	shap->drop();
 	unit->drop();
 	entity->drop();

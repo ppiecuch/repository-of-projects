@@ -12,8 +12,8 @@ endif
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
 
 LOCAL_SRC_FILES := \
-		YonPNG/framework.cpp \
-		YonPNG/yon_AndroidGLView.cpp
+		YonGraphicsWindow/framework.cpp \
+		YonGraphicsWindow/yon_AndroidGLView.cpp
 		
 LOCAL_MODULE    := yon
 LOCAL_STATIC_LIBRARIES := engine

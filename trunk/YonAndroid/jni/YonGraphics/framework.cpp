@@ -70,7 +70,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
-	IMaterial* material;
+	//IMaterial* material;
 	IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
@@ -79,13 +79,12 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_BLEND);
-	material->setBlendSrcFactor(ENUM_BLEND_FACTOR_SRC_ALPHA);
-	material->setBlendDstFactor(ENUM_BLEND_FACTOR_ONE);
-	//material->setAlphaSource(ENUM_ALPHA_SOURCE_TEXTURE);
+	SMaterial& material=planeModel->getMaterial(0);
+	material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+	material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+	material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+	material.setTexture(0,videoDriver->getTexture("aura.png"));
 	planeModel->setPosition(core::vector3df(0,0,0));
-	material->setTexture(0,videoDriver->getTexture("aura.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -98,6 +97,7 @@ void resize(u32 width,u32 height){
 float x=0;
 void drawFrame(){
 
+	u32 start=timer->getRealTime();
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
 
 	//pCamera->setPosition(core::vector3df(x,x,300),true);
@@ -110,31 +110,31 @@ void drawFrame(){
 	gfAdapter->clearZ(-1000);
 
 	core::rectf r(0,0,1,1);
-	//for(u32 i=0;i<100;++i){
-		gfAdapter->drawRegion("shadow.png",r,250,120,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
-		gfAdapter->drawRegion("trans.png",r,0,120,128,64,ENUM_TRANS_NONE);
-		gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
-		gfAdapter->drawRegion("trans.png",r,200,120,128,64,ENUM_TRANS_MIRROR);
+	for(u32 i=0;i<1000;++i){
+		gfAdapter->drawRegion("shadow.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
+		gfAdapter->drawRegion("trans.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE);
+		//gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
+		//gfAdapter->drawRegion("test.png",r,0,320,128,64,ENUM_TRANS_ROT90);
+		/*gfAdapter->drawRegion("trans.png",r,200,120,128,64,ENUM_TRANS_MIRROR);
 		gfAdapter->drawRegion("trans.png",r,300,120,128,64,ENUM_TRANS_MIRROR_ROT180);
-		gfAdapter->drawRegion("test.png",r,0,320,128,64,ENUM_TRANS_ROT90);
 		gfAdapter->drawRegion("shadow.png",r,50,170,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
 		gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);
 		gfAdapter->drawRegion("trans.png",r,200,320,128,64,ENUM_TRANS_MIRROR_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
-		gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
-	//}
+		gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));*/
+	}
 
-		gfAdapter->drawVertexPrimitiveList(planeModel->getMaterial(0),
+		/*gfAdapter->drawVertexPrimitiveList(planeModel->getMaterial(0),
 			planeModel->getEntity()->getUnit(0)->getShap()->getVertices(),
 			planeModel->getEntity()->getUnit(0)->getShap()->getVertexCount(),
 			planeModel->getEntity()->getUnit(0)->getShap()->getIndices(),
 			planeModel->getEntity()->getUnit(0)->getShap()->getIndexCount(),
-			planeModel->getEntity()->getUnit(0)->getShap()->getVertexType());
+			planeModel->getEntity()->getUnit(0)->getShap()->getVertexType());*/
 	
 
-	gfAdapter->render();
+	gfAdapter->render(); 
+	u32 end=timer->getRealTime();
 
-
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,use:%d",videoDriver->getFPS(),end-start),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }

@@ -17,8 +17,14 @@ namespace scene{
 
 	struct SVertex{
 		SVertex(){}
-		SVertex(f32 x,f32 y,f32 z,f32 tu, f32 tv,video::SColor c):pos(x,y,z),texcoords(tu,tv),color(c){}
+		SVertex(f32 x,f32 y,f32 z,f32 tu, f32 tv,const video::SColor& c):pos(x,y,z),texcoords(tu,tv),color(c){}
 		//SVertex(f32 x,f32 y,f32 z,f32 tu, f32 tv):pos(x,y,z),texcoords(tu,tv){}
+
+		void set(f32 x,f32 y,f32 z,f32 tu, f32 tv,const video::SColor& c){
+			pos.set(x,y,z);
+			texcoords.set(tu,tv);
+			color=c;
+		}
 
 		core::vector3df pos;
 		video::SColor color;
