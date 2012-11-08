@@ -109,7 +109,15 @@ namespace scene{
 			const u32 vertexCount = getVertexCount();
 			u32 i;
 
-			m_vertices.reallocate(vertexCount+numVertices);
+			for (i=0; i<numVertices; ++i){
+				m_vertices.push_back(((V*)vertices)[i]);
+			}
+			for (i=0; i<numIndices; ++i){
+				m_indices.push_back(((I*)indices)[i]+vertexCount);
+			}
+
+			//BUG fix:每一次都要reallocate，这不要命嘛
+			/*m_vertices.reallocate(vertexCount+numVertices);
 			for (i=0; i<numVertices; ++i){
 				m_vertices.push_back(((V*)vertices)[i]);
 			}
@@ -117,7 +125,7 @@ namespace scene{
 			m_indices.reallocate(getIndexCount()+numIndices);
 			for (i=0; i<numIndices; ++i){
 				m_indices.push_back(((I*)indices)[i]+vertexCount);
-			}
+			}*/
 
 			++m_uVerticesChangedId;
 			++m_uIndicesChangedId;

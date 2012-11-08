@@ -49,7 +49,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	params.fpsLimit=0;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
-	Logger->setAppender(MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_SCREEN);
+	Logger->setAppender(MASK_APPENDER_VS|MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_SCREEN);
 	//Logger->setFormat(MASK_FORMAT_LOG);
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
@@ -68,10 +68,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
-	Logger->debug("debug\r\n");
+	/*Logger->debug("debug\r\n");
 	Logger->info("info\r\n");
 	Logger->warn("warn\r\n");
-	Logger->error("error\r\n");
+	Logger->error("error\r\n");*/
 
 	return true;
 }
@@ -85,14 +85,14 @@ void drawFrame(){
 	sceneMgr->render(videoDriver);
 
 	
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 	//Logger->drawString(videoDriver,core::stringc("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),core::position2di(0,20),COLOR_GREEN);
 	//Logger->drawString(videoDriver,core::stringc("abcdefghijklmnopqrstuvwxyz"),core::position2di(0,40),COLOR_GREEN);
 	//Logger->drawString(videoDriver,core::stringc("0123456789+-*/\,./?<>|="),core::position2di(0,60),COLOR_GREEN);
 	u32 start=timer->getRealTime();
 	Logger->render(videoDriver);
 	u32 end=timer->getRealTime();
-	Logger->drawString(videoDriver,core::stringc("use time:%d",end-start),core::position2di(0,200),COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("use time:%d",end-start),core::position2di(200,0),COLOR_GREEN);
 
 	videoDriver->end();
 }

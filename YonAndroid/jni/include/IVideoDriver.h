@@ -234,14 +234,15 @@ namespace yon{
 			//virtual void setMaterial(IMaterial* material) = 0;
 			//virtual IMaterial* createMaterial() = 0;
 
-			virtual void drawUnit(scene::IUnit* unit) = 0;
+			virtual void drawUnit(scene::IUnit* unit,bool force2D=false) = 0;
 			virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,
 				const core::recti& sourceRect, const core::recti* clipRect =NULL,
 				video::SColor color=video::COLOR_WHITE, bool useAlphaChannelOfTexture=false) =0;
 			virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,
 				const void* indice, u32 indexCount,
 				ENUM_PRIMITIVE_TYPE pType=ENUM_PRIMITIVE_TYPE_TRIANGLES,
-				scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) =0;
+				scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C,
+				bool force2D=false) =0;
 			virtual void draw2DLine(const core::position2di& start,const core::position2di& end,video::SColor color=video::COLOR_WHITE) =0;
 			virtual void draw3DLine(const core::vector3df& start,const core::vector3df& end, video::SColor color=video::COLOR_WHITE) =0;
 			virtual u32 getFPS() const = 0;
