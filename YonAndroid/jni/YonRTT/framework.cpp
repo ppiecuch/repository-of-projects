@@ -50,7 +50,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
-	params.fpsLimit=0;
+	params.fpsLimit=60;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -70,7 +70,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 
 	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
 
-	IMaterial* material;
+	//IMaterial* material;
 	IShap *shap,*shap1,*shap2;
 	IUnit* unit;
 	IEntity* entity;
@@ -79,9 +79,11 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
-	material=cubeModel->getMaterial(0);
-	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_REF);
+	{
+		SMaterial& material=cubeModel->getMaterial(0);
+		//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT_REF;
+	}
 	cubeModel->setPosition(core::vector3df(100,100,0));
 	shap->drop();
 	unit->drop();
@@ -100,15 +102,19 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,videoDriver->getTexture("aura.png"));
+	}
 	planeModel->setPosition(core::vector3df(0,0,0));
-	material->setTexture(0,videoDriver->getTexture("aura.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
 
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(256,256), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(512,256), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
 	cubeModel->setMaterialTexture(0, rtt); 
 
 	return true;

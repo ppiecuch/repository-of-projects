@@ -6,7 +6,7 @@ CBillBoard::CBillBoard(void)
 {
 
    driver=NULL;
-   p_material=NULL;
+   //p_material=NULL;
    p_texture=NULL;
    p_texture_alpha=NULL;
 
@@ -17,8 +17,8 @@ CBillBoard::CBillBoard(void)
 
 CBillBoard::~CBillBoard(void)
 {
-	if(p_material)
-		p_material->drop();
+	//if(p_material)
+	//	p_material->drop();
 }
 
 void CBillBoard::init()
@@ -200,7 +200,7 @@ void CBillBoard::render()
 	driver->drawVertexPrimitiveList(vec,4,indices,6,ENUM_PRIMITIVE_TYPE_TRIANGLES,ENUM_VERTEX_TYPE_3V1T1C);
 
 #else
-	if(p_material)
+	/*if(p_material)
 	{
 		if(p_texture)
 			p_material->setTexture(0,p_texture);
@@ -211,9 +211,17 @@ void CBillBoard::render()
 		p_material->setAlphaSource((ENUM_ALPHA_SOURCE)alphasource);
 		//p_material->states.CullFace=false;
 		p_material->setModulate(modufun);
-	}
+	}*/
+	material.MaterialType=mix_type;
+	material.BlendSrc=src_blend;
+	material.BlendDst=dst_blend;
+	material.AlphaSource=(ENUM_ALPHA_SOURCE)alphasource;
+	material.FrontFace=ENUM_FRONT_FACE_CW;
+	if(p_texture)
+		material.setTexture(0,p_texture);
+	material.Modulate=modufun;
 
-	gfAdapter->drawVertexPrimitiveList(p_material,vec,4,indices,6,ENUM_VERTEX_TYPE_3V1T1C);
+	gfAdapter->drawVertexPrimitiveList(material,vec,4,indices,6,ENUM_VERTEX_TYPE_3V1T1C);
 
 #endif
   
@@ -225,8 +233,8 @@ void CBillBoard::SetDriver( IVideoDriver * drv )
 {
     driver=drv;
 
-	if(driver)
-		p_material=driver->createMaterial();
+	//if(driver)
+	//	p_material=driver->createMaterial();
 
 }
 

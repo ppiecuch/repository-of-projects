@@ -92,7 +92,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
-	IMaterial* material;
+	//IMaterial* material;
 
 	/*shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
@@ -126,9 +126,11 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.setTexture(0,rtt);
+	}
 	planeModel->setPosition(core::vector3df(0,0,0));
-	material->setTexture(0,rtt);
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -139,12 +141,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IImage* image=videoDriver->createImageFromFile("heightmap.png",true);
 	terrainModel->loadHeightMap(image,ENUM_PATCH_SIZE_17);
 	image->drop();
-	material=terrainModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_DETAIL_MAP);
-	material->setTexture(0,videoDriver->getTexture("terrain-texture.png"));
-	material->setTexture(1,videoDriver->getTexture("rock2.png"));
-	material->setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
-	material->setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);
+	{
+		SMaterial& material=terrainModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_DETAIL_MAP;
+		material.setTexture(0,videoDriver->getTexture("terrain-texture.png"));
+		material.setTexture(1,videoDriver->getTexture("rock2.png"));
+		material.setFilterMode(0,ENUM_FILTER_MODE_TRILINEAR);
+		material.setFilterMode(1,ENUM_FILTER_MODE_TRILINEAR);
+	}
 	
 
 	

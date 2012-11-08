@@ -197,7 +197,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
    
    p_SpeEffectSet->setPos(position2di(200,250));
 
-   IMaterial* material;
+  /* IMaterial* material;
    IShap *shap;
    IUnit* unit;
    IEntity* entity;
@@ -215,7 +215,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
    material->setTexture(0,videoDriver->getTexture("test.png"));
    shap->drop();
    unit->drop();
-   entity->drop();
+   entity->drop();*/
  
 	return true;
 
@@ -236,8 +236,8 @@ void drawFrame(){
 
 	videoDriver->begin();
 
-	const core::vector3df crot=cubeModel->getRotation();
-	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
+	//const core::vector3df crot=cubeModel->getRotation();
+	//cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 	sceneMgr->render(videoDriver);
   

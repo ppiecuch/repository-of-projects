@@ -12,7 +12,7 @@ CParticleSystem::CParticleSystem(void)
 	alphasource=1;
 	modufun=ENUM_MODULATE_1X;
 	timeToLive=-1000;
-	p_material=NULL;
+	//p_material=NULL;
 	
 	m_emiter_type=0;
 	
@@ -24,7 +24,7 @@ CParticleSystem::CParticleSystem(void)
 
 CParticleSystem::~CParticleSystem(void)
 {
-	if(p_material)p_material->drop();
+	//if(p_material)p_material->drop();
 
 	if(emiter)
 	{
@@ -56,8 +56,8 @@ void CParticleSystem::setDriver( IVideoDriver * driver_ )
 {
 	driver=driver_;
 		
-	if(driver)
-			p_material=driver->createMaterial();
+	//if(driver)
+	//		p_material=driver->createMaterial();
 
  
 }
@@ -67,7 +67,8 @@ void CParticleSystem::setTexture( c8 * path_ )
 
 	if(driver==NULL)return;
  
-    p_material->setTexture(0,driver->getTexture(path_));
+    //p_material->setTexture(0,driver->getTexture(path_));
+	material.setTexture(0,driver->getTexture(path_));
 
 
 
@@ -507,7 +508,7 @@ void CParticleSystem::draw()
 
 	driver->drawVertexPrimitiveList(&draw_buffer_v[0],Particles.size()*4,&draw_buffer_i[0],Particles.size()*6,ENUM_PRIMITIVE_TYPE_TRIANGLES,ENUM_VERTEX_TYPE_3V1T1C);
 #else
-	if(p_material)
+	/*if(p_material)
 	{
 		p_material->setMaterialType(ENUM_MATERIAL_TYPE_BLEND);
 		p_material->setBlendSrcFactor(src_fator);
@@ -516,8 +517,14 @@ void CParticleSystem::draw()
 		p_material->setFrontFace(ENUM_FRONT_FACE_CW);
 		//p_material->states.CullFace=false;
 		p_material->setModulate(modufun);
-	}
-	gfAdapter->drawVertexPrimitiveList(p_material,&draw_buffer_v[0],Particles.size()*4,&draw_buffer_i[0],Particles.size()*6,ENUM_VERTEX_TYPE_3V1T1C);
+	}*/
+	material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+	material.BlendSrc=src_fator;
+	material.BlendDst=dst_fator;
+	material.AlphaSource=(ENUM_ALPHA_SOURCE)alphasource;
+	material.FrontFace=ENUM_FRONT_FACE_CW;
+	material.Modulate=modufun;
+	gfAdapter->drawVertexPrimitiveList(material,&draw_buffer_v[0],Particles.size()*4,&draw_buffer_i[0],Particles.size()*6,ENUM_VERTEX_TYPE_3V1T1C);
 
 #endif
 	
@@ -670,8 +677,10 @@ void CParticleSystem::load( IReadStream *FileReader )
         
 		//setTexture(filePath.c_str());
 
-		if(driver&&p_material)
-             p_material->setTexture(0,driver->getTexture(filePath));
+		//if(driver&&p_material)
+        //     p_material->setTexture(0,driver->getTexture(filePath));
+		if(driver)
+			material.setTexture(0,driver->getTexture(filePath));
 
 
         delete  []chs;

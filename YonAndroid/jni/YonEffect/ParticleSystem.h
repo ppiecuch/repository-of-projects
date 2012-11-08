@@ -27,7 +27,8 @@ private:
      CParticleEmiter * emiter;
 	 core::array<CSparticle>Particles;        //粒子集
 	 int lastEmitTime;                             //上次发射的时间
-	 IMaterial * p_material;                           //材质 
+	 //IMaterial * p_material;                           //材质 
+	 SMaterial material;
      ENUM_BLEND_FACTOR src_fator;                     //源系数 
 	 ENUM_BLEND_FACTOR dst_fator;                     //目标系数
 	 u32               alphasource;                   //alpha来源

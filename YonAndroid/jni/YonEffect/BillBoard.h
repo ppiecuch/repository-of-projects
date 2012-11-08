@@ -55,7 +55,8 @@ class CBillBoard
 public:
 
 	
-	IMaterial *           p_material;
+	//IMaterial *           p_material;
+	SMaterial material;
 
 	ENUM_MATERIAL_TYPE   mix_type;                                                    //»ìºÏ·½Ê½
 	
