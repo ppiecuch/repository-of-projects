@@ -89,11 +89,11 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
-#if 0
+#if 1
 
 	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE, true);
 
-	IMaterial* material;
+	//IMaterial* material;
 	IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
@@ -103,12 +103,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
 	//cubeModel->debugName="cubeModel";
-	material=cubeModel->getMaterial(0);
+	{
+		SMaterial& material=cubeModel->getMaterial(0);
+		rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(256,256), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+		material.setTexture(0,rtt);
+		//material->setTexture(0,videoDriver->getTexture("aura_.png"));
+		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT_REF;
+	}
 	cubeModel->setPosition(core::vector3df(100,100,0));
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(256,256), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
-	material->setTexture(0,rtt);
-	//material->setTexture(0,videoDriver->getTexture("aura_.png"));
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_REF);
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -128,11 +130,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->setIndexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	//planeModel->debugName="planeModel";
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,videoDriver->getTexture("aura.png"));
+	}
 	planeModel->setPosition(core::vector3df(0,0,0));
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
-	material->setTexture(0,videoDriver->getTexture("aura.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -142,10 +147,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	sound=audioDriver->getSound("helloworld.wav");
 	sound->play();
-	//sound=audioDriver->getSound("bg.ogg");
-	//sound->setLooping(true);
-	//sound->setGain(0.5f);
-	//sound->play();
+	sound=audioDriver->getSound("bg.ogg");
+	sound->setLooping(true);
+	sound->setGain(0.5f);
+	sound->play();
 	
 
 #endif
@@ -157,11 +162,12 @@ void resize(u32 width,u32 height){
 void drawFrame(){
 
 	//Logger->debug("beginDriver\r\n");
-	videoDriver->begin();
-#if 0
+	videoDriver->begin(true,true,COLOR_DEFAULT);
+#if 1
 	//rtt->beginRTT(true,true,video::SColor(0xFF133E67));
 	//Logger->debug("beginRTT\r\n");
-	rtt->beginRTT(true,true,video::SColor(0x00000000));
+	//rtt->beginRTT(true,true,video::SColor(0x00000000));
+	videoDriver->setRenderTarget(rtt);
 
 	teapotModel->setVisible(true);
 	planeModel->setVisible(false);
@@ -174,8 +180,9 @@ void drawFrame(){
 	planeModel->setVisible(true);
 
 
-	rtt->endRTT(true);
+	//rtt->endRTT(true);
 	//Logger->debug("endRTT\r\n");
+	videoDriver->setRenderTarget(NULL,true,true,COLOR_DEFAULT);
 
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
@@ -192,7 +199,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
+	//videoDriver->setMaterial(video::DEFAULT_MATERIAL);
 	videoDriver->setTransform(video::ENUM_TRANSFORM_WORLD,IDENTITY_MATRIX);
 	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
 

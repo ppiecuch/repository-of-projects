@@ -98,7 +98,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	mEdit->setTextAlign(MyGUI::Align::Center);
 	mEdit->setEditMultiLine(true);
 
-	IMaterial* material;
+	//IMaterial* material;
 	IShap *shap,*shap1,*shap2;
 	IUnit* unit;
 	IEntity* entity;
@@ -114,10 +114,11 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
-	material=cubeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
+	{
+		SMaterial& material=cubeModel->getMaterial(0);
+		material.setTexture(0,videoDriver->getTexture("test.png"));
+	}
 	cubeModel->setPosition(core::vector3df(100,100,0)); 
-	material->setTexture(0,videoDriver->getTexture("test.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -135,10 +136,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,videoDriver->getTexture("aura.png"));
+	}
 	planeModel->setPosition(core::vector3df(0,0,0));
-	material->setTexture(0,videoDriver->getTexture("aura.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();

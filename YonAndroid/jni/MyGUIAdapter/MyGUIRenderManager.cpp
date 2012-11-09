@@ -110,15 +110,16 @@ namespace MyGUI{
 		if (_texture)
 		{
 			MyGUITexture* texture = static_cast<MyGUITexture*>(_texture);
-			m_pDriver->setTexture(0,texture->getTexture());
-			m_pUnit->getMaterial()->setTexture(0,texture->getTexture());
+			//m_pDriver->setTexture(0,texture->getTexture());
+			m_pUnit->getMaterial().setTexture(0,texture->getTexture());
+			m_pDriver->setMaterial(m_pUnit->getMaterial());
 			//Logger->debug("setTexture:%s\n",texture->getTexture()->getPath());
 
 		}
 		buffer->fillShapIndices(_count);
 		scene::IShap* shap=buffer->getShap();
 		m_pUnit->setShap(shap);
-		m_pDriver->drawUnit(m_pUnit);
+		m_pDriver->drawUnit(m_pUnit,true);
 		//Logger->debug("doRender:%08X(v:%d,i:%d)\n",shap,shap->getVertexCount(),shap->getIndexCount());
 		//printf("doRender:%08X(v:%d,i:%d),_count:%d\n",shap,shap->getVertexCount(),shap->getIndexCount(),_count);
 	}
