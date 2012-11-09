@@ -1,3 +1,4 @@
+
 #include "framework.h"
 #include "MyGUIRTTexture.h"
 
@@ -97,6 +98,7 @@ public:
 	}
 };
 
+
 //canvas调整大小时，尺寸超过贴图尺寸会触发重建纹理流程，重建前会调用此函数
 void eventPreTextureChanges(MyGUI::Canvas* _canvas)
 {
@@ -121,6 +123,7 @@ void frameEntered(float _time)
 	Logger->debug("frameEntered\r\n");
 }
 
+
 bool init(void *pJNIEnv,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
@@ -135,10 +138,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	gfAdapterWindow=engine->getGraphicsAdapterWindow();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	//pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	pCamera2=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	pCamera2->setEventReceivable(false);
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0));
+	//pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -149,8 +152,12 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	guiAdapter=MyGUI::createMyGUIAdapter(fs,videoDriver,engine->getTimer(),geometryFty);
 
+	const MyGUI::VectorWidgetPtr& root = MyGUI::LayoutManager::getInstance().loadLayout("HelpPanel.layout");
+	root.at(0)->findWidget("Text")->castType<MyGUI::TextBox>()->setCaption("Sample colour picker implementation. Select text in EditBox and then select colour to colour selected part of text.");
+
 	const MyGUI::IntSize& size = MyGUI::RenderManager::getInstance().getViewSize();
 
+	
 	MyGUI::Window* window = MyGUI::Gui::getInstance().createWidget<MyGUI::Window>("WindowCS", MyGUI::IntCoord(10, size.height - 10 - 230, 300, 230), MyGUI::Align::Default, "Overlapped");
 	window->setCaption("Camera view");
 	window->setMinSize(MyGUI::IntSize(100, 100));
@@ -163,6 +170,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	canvas->eventPreTextureChanges += MyGUI::newDelegate(eventPreTextureChanges);
 	canvas->requestUpdateCanvas = MyGUI::newDelegate(requestUpdateCanvas);
 	canvas->updateTexture();
+	
 
 	//MyGUI::Gui::getInstance().eventFrameStart += MyGUI::newDelegate(frameEntered);
 	//MyGUI::MyGUIRTTexture* rt=static_cast<MyGUI::MyGUIRTTexture*>(canvas->getTexture()->getRenderTarget());
@@ -195,14 +203,48 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();*/
 
-	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	teapotModel=sceneMgr->addModel(entity);
-	teapotModel->setPosition(core::vector3df(50,50,0));
+	cubeModel=sceneMgr->addModel(entity);
+	{
+		SMaterial& material=cubeModel->getMaterial(0);
+#if 0
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+#endif
+		material.setTexture(0,videoDriver->getTexture("test.png"));
+	}
+	cubeModel->setPosition(core::vector3df(100,100,0)); 
 	shap->drop();
 	unit->drop();
 	entity->drop();
+
+	/*shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	teapotModel=sceneMgr->addModel(entity);
+	teapotModel->setPosition(core::vector3df(50,-50,0));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
+	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	planeModel=sceneMgr->addModel(entity);
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,videoDriver->getTexture("aura.png"));
+	}
+	planeModel->setPosition(core::vector3df(0,0,0));
+	shap->drop();
+	unit->drop();
+	entity->drop();*/
 
 	return true;
 }
@@ -213,11 +255,11 @@ void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
  
-	const core::vector3df trot=teapotModel->getRotation();
-	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
+	//const core::vector3df trot=teapotModel->getRotation();
+	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	core::rectf r(0,1,1,0);
-	/*rt=canvas->getTexture()->getRenderTarget();
+	rt=canvas->getTexture()->getRenderTarget();
 
 	//oldProjection=videoDriver->getTransform(ENUM_TRANSFORM_PROJECTION);
 	//videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,projection);
@@ -234,7 +276,7 @@ void drawFrame(){
 	gfAdapter->drawRegion("test-png8.png",r,128,64,64,64,ENUM_TRANS_MIRROR);
 	gfAdapter->render();
 
-	rt->end();*/
+	rt->end();
 	//videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,oldProjection);
 
 	sceneMgr->render(videoDriver);
