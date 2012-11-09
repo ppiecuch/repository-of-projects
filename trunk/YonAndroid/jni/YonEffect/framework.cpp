@@ -197,8 +197,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
    
    p_SpeEffectSet->setPos(position2di(200,250));
 
-  /* IMaterial* material;
-   IShap *shap;
+  //IMaterial* material;
+  /* IShap *shap;
    IUnit* unit;
    IEntity* entity;
 
@@ -206,13 +206,13 @@ bool init(void *pJNIEnv,u32 width,u32 height){
    unit=geometryFty->createUnit(shap);
    entity=geometryFty->createEntity(unit);
    cubeModel=sceneMgr->addModel(entity);
-   material=cubeModel->getMaterial(0);
-   material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
-  // material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
-   //material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+   {
+	   SMaterial& material=cubeModel->getMaterial(0);
+	   material.MaterialType=ENUM_MATERIAL_TYPE_SOLID;
+	   //material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+	   material.setTexture(0,videoDriver->getTexture("test.png"));
+   }
    cubeModel->setPosition(core::vector3df(100,100,0));
-   //material->setTexture(0,videoDriver->getTexture("png8/120.png"));
-   material->setTexture(0,videoDriver->getTexture("test.png"));
    shap->drop();
    unit->drop();
    entity->drop();*/
@@ -240,11 +240,11 @@ void drawFrame(){
 	//cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 	sceneMgr->render(videoDriver);
-  
-   // p_BillboardAmt->update(100);
+
+	// p_BillboardAmt->update(100);
 
 	//p_BillboardAmt->draw();
-   
+
 
 	gfAdapter->clearZ(1000);
 
@@ -255,38 +255,37 @@ void drawFrame(){
 	gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
 	gfAdapter->drawRegion("trans.png",r,200,120,128,64,ENUM_TRANS_MIRROR);
 	gfAdapter->drawRegion("trans.png",r,300,120,128,64,ENUM_TRANS_MIRROR_ROT180);
-	
+
 
 	if(lastTime!=0)
 	{
-		
-	   int now=timer->getRealTime();
 
-      // p_ParticleSystem->update((now-lastTime));
+		int now=timer->getRealTime();
 
-	//   p_BillboardAmt->update(now-lastTime);
-	  
-	  p_SpeEffectSet->update(now-lastTime);
+		// p_ParticleSystem->update((now-lastTime));
 
-	   lastTime=now;
-	
-	 //  p_ParticleSystem->draw();
+		//   p_BillboardAmt->update(now-lastTime);
 
-	   //p_BillboardAmt->draw();
+		p_SpeEffectSet->update(now-lastTime);
 
-	    p_SpeEffectSet->draw();
+		lastTime=now;
+
+		//  p_ParticleSystem->draw();
+
+		//p_BillboardAmt->draw();
+
+		p_SpeEffectSet->draw();
 
 
 	}
 	else
 		lastTime=timer->getRealTime();
-	//gfAdapter->drawRegion("3.png",r,250,120,512,512,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),false);
-	//gfAdapter->drawRegion("test.png",r,200,120,128,64,ENUM_TRANS_ROT90);
-	//gfAdapter->drawRegion("shadow.png",r,50,170,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
-	//gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);
-	gfAdapter->drawRegion("de.png",r,200,320,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
-	//gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
 
+	gfAdapter->drawRegion("test.png",r,200,120,128,64,ENUM_TRANS_ROT90);
+	gfAdapter->drawRegion("shadow.png",r,50,170,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
+	gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);
+	gfAdapter->drawRegion("trans.png",r,200,320,128,64,ENUM_TRANS_MIRROR_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
+	gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
 	gfAdapter->drawImage("shadow.png",0,0,64,32,50,50,true,0xAA000000);
 
 

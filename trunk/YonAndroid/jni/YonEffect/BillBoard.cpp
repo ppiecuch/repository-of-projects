@@ -213,8 +213,8 @@ void CBillBoard::render()
 		p_material->setModulate(modufun);
 	}*/
 	material.MaterialType=mix_type;
-	material.BlendSrc=src_blend;
-	material.BlendDst=dst_blend;
+	material.BlendSrc=MATERIAL_BLEND_FACTORS[src_blend];
+	material.BlendDst=MATERIAL_BLEND_FACTORS[dst_blend];
 	material.AlphaSource=(ENUM_ALPHA_SOURCE)alphasource;
 	material.FrontFace=ENUM_FRONT_FACE_CW;
 	if(p_texture)

@@ -172,10 +172,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\ApplicationStateMachine.mk"
-			>
-		</File>
-		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>

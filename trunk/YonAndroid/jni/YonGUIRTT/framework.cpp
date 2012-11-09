@@ -180,7 +180,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
-	IMaterial* material;
+	//IMaterial* material;
 
 	/*shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
@@ -217,8 +217,7 @@ void drawFrame(){
 	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	core::rectf r(0,1,1,0);
-
-	rt=canvas->getTexture()->getRenderTarget();
+	/*rt=canvas->getTexture()->getRenderTarget();
 
 	//oldProjection=videoDriver->getTransform(ENUM_TRANSFORM_PROJECTION);
 	//videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,projection);
@@ -235,12 +234,12 @@ void drawFrame(){
 	gfAdapter->drawRegion("test-png8.png",r,128,64,64,64,ENUM_TRANS_MIRROR);
 	gfAdapter->render();
 
-	rt->end();
+	rt->end();*/
 	//videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,oldProjection);
 
-	//sceneMgr->render(videoDriver);
-	pCamera->setNeedUpload();
-	pCamera->render(videoDriver);
+	sceneMgr->render(videoDriver);
+	//pCamera->setNeedUpload();
+	//pCamera->render(videoDriver);
 
 	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
 	gfAdapterWindow->clearZ(1000);

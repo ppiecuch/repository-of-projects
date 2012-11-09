@@ -519,8 +519,8 @@ void CParticleSystem::draw()
 		p_material->setModulate(modufun);
 	}*/
 	material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
-	material.BlendSrc=src_fator;
-	material.BlendDst=dst_fator;
+	material.BlendSrc=MATERIAL_BLEND_FACTORS[src_fator];
+	material.BlendDst=MATERIAL_BLEND_FACTORS[dst_fator];
 	material.AlphaSource=(ENUM_ALPHA_SOURCE)alphasource;
 	material.FrontFace=ENUM_FRONT_FACE_CW;
 	material.Modulate=modufun;
