@@ -1,0 +1,50 @@
+GZIP的接口比较简单，因此如果你只需对一个流进行压缩的话，可以使用它。当然它可以压缩字符流，与可以压缩字节流，下面是一个对GBK编码格式的文本文件进行压缩的。
+
+
+
+　　压缩类的用法非常简单;只要用GZIPOutputStream 或ZipOutputStream把输出流包起来，再用GZIPInputStream 或ZipInputStream把输入流包起来就行了。剩下的都是些普通的I/O操作。
+　　Java代码
+
+View Code 
+
+ View Code 
+ import java.io.BufferedOutputStream;
+ import java.io.BufferedReader;
+ import java.io.FileInputStream;
+ import java.io.FileOutputStream;
+ import java.io.IOException;
+ import java.io.InputStreamReader;
+ import java.util.zip.GZIPInputStream;
+ import java.util.zip.GZIPOutputStream;
+ public class GZIPcompress {
+   public static void main(String[] args) throws IOException {
+     //做准备压缩一个字符文件，注，这里的字符文件要是GBK编码方式的
+     BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream("e:/tmp/source.txt"), "GBK"));
+ 　　//使用GZIPOutputStream包装OutputStream流，使其具体压缩特性，最后会生成test.txt.gz压缩包
+ 　　//并且里面有一个名为test.txt的文件
+ 　　BufferedOutputStream out = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream("test.txt.gz")));
+ 　　System.out.println("开始写压缩文件...");
+ 　　int c;
+ 　　while ((c = in.read()) != -1) {
+ 　　/*
+ 　　* 注，这里是压缩一个字符文件，前面是以字符流来读的，不能直接存入c，因为c已是Unicode
+ 　　* 码，这样会丢掉信息的(当然本身编码格式就不对)，所以这里要以GBK来解后再存入。
+ 　　*/
+ 　　  out.write(String.valueOf((char) c).getBytes("GBK"));
+ 　　}
+ 　　in.close();
+ 　　out.close();
+ 　　System.out.println("开始读压缩文件...");
+ 　　//使用GZIPInputStream包装InputStream流，使其具有解压特性
+ 　　BufferedReader in2 = new BufferedReader(new InputStreamReader(
+ 　　new GZIPInputStream(new FileInputStream("test.txt.gz")), "GBK"));
+ 　　String s;
+ 　　//读取压缩文件里的内容
+ 　　while ((s = in2.readLine()) != null) {
+ 　　  System.out.println(s);
+ 　　  }
+ 　　    in2.close();
+ 　　  }
+   }
+ 
+ http://www.cnblogs.com/tnxk/archive/2011/09/22/2185248.html

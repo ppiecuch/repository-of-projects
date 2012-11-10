@@ -1,0 +1,4 @@
+balloon.ApplyImpulse(new b2Vec2(0, -1000), balloon.GetCenterPosition());
+
+
+http://www.box2d.org/forum/viewtopic.php?f=8&t=521

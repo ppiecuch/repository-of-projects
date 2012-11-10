@@ -1,5 +1,6 @@
 强制终止进程:
 taskkill /im Demo.exe /f
+ntsd -t -q -p {PID}
 
 net use y: \\192.168.1.201\MooseFS
 用这个命令挂在分布式文件系统
