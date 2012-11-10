@@ -114,8 +114,8 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(512,256), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
-	cubeModel->setMaterialTexture(0, rtt); 
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(128,128), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	//cubeModel->setMaterialTexture(0, rtt); 
 
 	return true;
 }
@@ -127,16 +127,21 @@ void drawFrame(){
 	videoDriver->begin();
 
 	//rtt->beginRTT(true,true,video::SColor(0xFF133E67));
-	videoDriver->setRenderTarget(rtt);
+	videoDriver->setRenderTarget(rtt,true,true,COLOR_WHITE);
 
-	teapotModel->setVisible(true);
-	cubeModel->setVisible(false);
+	//teapotModel->setVisible(true);
+	//cubeModel->setVisible(false);
 	//planeModel->setVisible(false);
 
-	sceneMgr->render(videoDriver);
+	static core::rectf r(0,0,1,1);
+	gfAdapter->clearZ(-1000);
+	gfAdapter->drawRegion("aura.png",r,0,0,128,128,ENUM_TRANS_NONE);
+	gfAdapter->render(); 
 
-	teapotModel->setVisible(false);
-	cubeModel->setVisible(true);
+	//sceneMgr->render(videoDriver);
+
+	//teapotModel->setVisible(false);
+	//cubeModel->setVisible(true);
 	//planeModel->setVisible(true);
 
 
@@ -163,23 +168,10 @@ void drawFrame(){
 	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
 	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
 
-	/*gfAdapter->beginBatch(0);
-	gfAdapter->drawImage("nav.png",0,0,128,128,0,0,true);
-	//gfAdapter->drawImage("nav.png",0,0,128,128,100,0,true);
-	
-	//gfAdapter->drawImage("test.png",100,100,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
-	//gfAdapter->drawImage("firework.png",100,100);
-	//gfAdapter->drawImage("test.png",100,100,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
-
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_NONE,0,120);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT180,100,120);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR,200,120);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT180,300,120);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT90,0,320);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT90,100,320);
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_MIRROR_ROT270,200,320,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
-	gfAdapter->drawRegion("trans.png",0,0,128,64,ENUM_TRANS_ROT270,300,320,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
-	gfAdapter->endBatch();*/
+	gfAdapter->clearZ(-1000);
+	gfAdapter->drawImage(rtt->getName().c_str(),0,0,128,128,10,10);
+	//gfAdapter->drawImage("test.png",0,0,32,32,10,10);
+	gfAdapter->render();
 
 	videoDriver->end();
 }
