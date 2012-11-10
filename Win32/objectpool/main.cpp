@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <list>
+#include "objectpool.h"
 using namespace std;
 
 #include <crtdbg.h>
@@ -162,11 +163,17 @@ public:
 };
 */
 class CRecyclableObject;
+namespace yon{
+	namespace core{
+		class CRecyclableObject;
+	}
+}
 class CObject{
 	int a;
 	float b;
 	int c[100000];//测试发现随着对象占用的内存空间的扩大，使用new动态生成的方式表现出的效率越差，而对象池则基本保持不变
 	friend class CRecyclableObject;
+	friend class yon::core::CRecyclableObject;
 public:
 	CObject():a(0),b(0.0f){}
 };
@@ -176,6 +183,17 @@ class CRecyclableObject:public IRecyclable{
 public:
 	virtual void reset(){obj.a=0;obj.b=0.0f;}
 };
+
+namespace yon{
+	namespace core{
+
+		class CRecyclableObject:public yon::core::IRecyclable{
+			CObject obj;
+		public:
+			virtual void reset(){obj.a=0;obj.b=0.0f;}
+		};
+	}
+}
 
 int main(int argc, char* argv[])
 {
@@ -226,36 +244,69 @@ int main(int argc, char* argv[])
 #else
 
 #define COUNT 100000
-	struct _timeb start1;
-	_ftime64_s( &start1 ); 
+	struct _timeb start;
+	struct _timeb end;
+	long long s;
+	int ms;
+
+	//12.***ms
+	_ftime64_s( &start ); 
 	CObjectPoolNill<CRecyclableObject>* pool1=new CObjectPoolNill<CRecyclableObject>();
 	for(int i=0;i<COUNT;++i){
 		CRecyclableObject* obj=pool1->get();
 		pool1->recycle(obj);
 	}
 	delete pool1;
-	struct _timeb end1;
-	_ftime64_s( &end1 );
-	printf("%d.%d\n",start1.time,start1.millitm);
-	printf("%d.%d\n",end1.time,end1.millitm);
+	_ftime64_s( &end );
+
+	s=end.time-start.time;
+	ms=end.millitm-start.millitm;
+	if(ms<0){
+		ms+=1000;
+		--s;
+	}
+	printf("%d.",s);
+	printf("%d\n",ms);
 
 
-	struct _timeb start2;
-	_ftime64_s( &start2 ); 
-
+	//0.672ms
+	_ftime64_s( &start ); 
 	CObjectPool<CRecyclableObject>* pool2=new CObjectPool<CRecyclableObject>(5);
 	for(int i=0;i<COUNT;++i){
 		CRecyclableObject* obj=pool2->get();
 		pool2->recycle(obj);
 	}
 	delete pool2;
+	_ftime64_s( &end ); 
 
-	struct _timeb end2;
-	_ftime64_s( &end2 ); 
+	s=end.time-start.time;
+	ms=end.millitm-start.millitm;
+	if(ms<0){
+		ms+=1000;
+		--s;
+	}
+	printf("%d.",s);
+	printf("%d\n",ms);
 
-	printf("%d.%d\n",start2.time,start2.millitm);
-	printf("%d.%d\n",end2.time,end2.millitm);
+	//0.172ms
+	_ftime64_s( &start ); 
+	yon::core::CObjectPool<yon::core::CRecyclableObject>* pool3=new yon::core::CObjectPool<yon::core::CRecyclableObject>(5);
+	for(int i=0;i<COUNT;++i){
+		yon::core::CRecyclableObject* obj=pool3->get();
+		pool3->recycle(obj);
+	}
+	delete pool3;
+	_ftime64_s( &end ); 
+
+	s=end.time-start.time;
+	ms=end.millitm-start.millitm;
+	if(ms<0){
+		ms+=1000;
+		--s;
+	}
+	printf("%d.",s);
+	printf("%d\n",ms);
 #endif
-	getchar();
+	system("pause");
 	return 0;
 }

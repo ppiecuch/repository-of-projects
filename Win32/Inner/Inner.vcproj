@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="objectpool"
-	ProjectGUID="{431168B4-7B4C-448D-8AB0-4E5135EA189C}"
-	RootNamespace="objectpool"
+	Name="Inner"
+	ProjectGUID="{0F142CAA-0B15-4CA3-88C3-C67871DD1A26}"
+	RootNamespace="Inner"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -167,26 +167,6 @@
 	<Files>
 		<File
 			RelativePath=".\main.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\objectpool.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonAllocator.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonConfig.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonList.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonTypes.h"
 			>
 		</File>
 	</Files>
