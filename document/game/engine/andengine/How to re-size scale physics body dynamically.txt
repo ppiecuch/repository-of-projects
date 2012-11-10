@@ -1,0 +1,102 @@
+kolslorr 
+  
+Posts: 16
+Joined: Thu Dec 30, 2010 5:35 pm 
+Website Top
+--------------------------------------------------------------------------------
+
+Re: How to re-size / scale physics body dynamically?
+by vroom  Fri Mar 11, 2011 11:57 am 
+
+*bump*
+
+I run into the same problem. any advice? 
+
+I could recycle the sprite/body and remake it with the new scaled size, but there has to be a better solution.vroom 
+  
+Posts: 74
+Joined: Mon Dec 06, 2010 3:33 pm Top
+--------------------------------------------------------------------------------
+
+Re: How to re-size / scale physics body dynamically?
+by trjp  Fri Mar 11, 2011 12:32 pm 
+
+I raised this a while ago and got no responses.
+
+post6371.html#p6371
+
+End of the day, I just resorted to destroying and re-creating the physics bodies after rescaling the entity they're based-on - see the example in that thread.
+
+I tried a number of ways of rescaling the physics fixtures etc. but whilst it sort-of-worked, collision detection etc. was never quite right.Tasty Android Snacks - http://www.somewhatdog.comtrjp 
+  
+Posts: 79
+Joined: Sun Dec 12, 2010 2:45 pm
+Location: Northumberland, UK 
+Website Top
+--------------------------------------------------------------------------------
+
+Re: How to re-size / scale physics body dynamically?
+by mkrl  Fri Mar 11, 2011 12:40 pm 
+
+I'm looking into this myself, I am getting somewhere, but I'm getting some strange behaviour. Also by digging into the code, I can see that calling Fixture.getShape() may cause the GC to start kicking in.
+
+Constantly destroying and re-adding the bodies is not really a viable solution for me, box2d crashes pretty fast in my case (too many bodies) and also creating objects in the update loop is a sure fire way to lose FPS smoothness as the GC keeps kicking in?Getting and updating AndEngine's Source: http://wiki.andengine.org/Getting_And_Updating_AndEnginemkrl 
+  
+Posts: 9
+Joined: Tue Feb 22, 2011 4:28 pm 
+Website Top
+--------------------------------------------------------------------------------
+
+Re: How to re-size / scale physics body dynamically?
+by trjp  Fri Mar 11, 2011 1:03 pm 
+
+I never got to the stage with that code that I'd have noticed a performance issue - I moved onto something else.
+
+Certainly all attempts at modifying the radius of a circular physics body resulted in 'whacky' collision detection.
+
+I had circles expanding and where some would collide perfectly, others would overlap by miles before they triggered the collision - in the end I just gave-up on the idea entirely.Tasty Android Snacks - http://www.somewhatdog.comtrjp 
+  
+Posts: 79
+Joined: Sun Dec 12, 2010 2:45 pm
+Location: Northumberland, UK 
+Website Top
+--------------------------------------------------------------------------------
+
+Re: How to re-size / scale physics body dynamically?
+by mkrl  Sun Mar 13, 2011 6:19 pm 
+
+OK I have this working now (sorry for the delay I've only been getting a few minutes here and there, but hopefully now I can be full-time on my game).
+
+So some background info, I have a pool of 10 Bubbles sprites, their physics Bodies are all circles of course. Each Bubble stores a reference to its PhysicsConnector. So this means I'm re-using Bubbles from this pool of Sprites and therefore a pool of PhysicsConnectors/Bodies. As you press a bubble is made/re-used and holding your finger increases the bubble size up to a limit, the bubble also moves with your finger.
+
+Anyway, in my update loop I have this (currently un-optimised code):
+
+
+Syntax: [ Download ] [ Hide ]
+Syntax: [ Download ] [ Show ]
+Using java Syntax Highlighting
+final Body body = mCurrentBubble.physicsConnector.getBody();
+ 
+if(mCurrentBubbleScale < MAX_BUBBLE_SCALE) {
+        mCurrentBubbleScale = mCurrentBubbleScale + mSecondsElapsed*3;
+        mCurrentBubble.setScaleCenter(mCurrentBubble.getWidth()/2, mCurrentBubble.getHeight()/2);
+        mCurrentBubble.setScale(mCurrentBubbleScale);
+                                
+        // TODO: we could hardcode a shorter path to the circle shape if need be
+        ArrayList<Fixture> fixtureList = body.getFixtureList();         
+        fixtureList.get(0).getShape().setRadius((mCurrentBubble.getWidthScaled()/2) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
+                                
+} 
+                        
+// move bubble's body to touch position
+body.setTransform(new Vector2((float)(mTouchX)/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, 
+                                                        (float)(mTouchY)/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT), 0);
+}
+Parsed in 0.033 seconds, using GeSHi 1.0.8.4
+
+
+The key thing is to respect the pixel-to-physics scale, so if you've modified that it'll be different of course.
+
+I need to now run some tests because looking at the code I can see getShape() could be a cause of allocation and therefore a GC run. I'm testing on a Nexus S which has concurrent GC through Gingerbread, so I'm gonna switch back to a Nexus One running 2.2 which doesn't (something to bear in mind).Getting and updating AndEngine's Source: http://wiki.andengine.org/Getting_And_Updating_AndEngine
+
+http://www.andengine.org/forums/post12263.html#p12263

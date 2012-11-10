@@ -1,0 +1,30 @@
+VS2008 Team Suite 简体中文正式版 [2009-4-6 22:29:23]
+引用地址：http://398588com.398588.com/Article/T7/63.aspx
+Microsoft Visual Studio 2008 MSDN下载地址: 
+http://download.microsoft.com/download/b/c/7/bc73449c-17e2-4097-ba4b-0095e52f5489/VS2008MSDNLibraryCHSX1433063.iso 
+Microsoft Visual Studio 2008下载地址:
+http://download.microsoft.com/download/0/8/3/0839ce16-0523-4407-9432-01958ee61aff/VS2008TeamSuite90DayTrialCHSX1429243.part1.exe
+http://download.microsoft.com/download/0/8/3/0839ce16-0523-4407-9432-01958ee61aff/VS2008TeamSuite90DayTrialCHSX1429243.part2.rar
+.................
+http://download.microsoft.com/download/0/8/3/0839ce16-0523-4407-9432-01958ee61aff/VS2008TeamSuite90DayTrialCHSX1429243.part7.rar
+ 
+下面是一些相关序列号：
+1.Visual Studio 2008 Professional Edition: XMQ2Y-4T3V6-XJ48Y-D3K2V-6C4WT
+2.Visual Studio 2008 Team Test Load Agent: WPX3J-BXC3W-BPYWP-PJ8CM-F7M8T
+3.Visual Studio 2008 Team System: PYHYP-WXB3B-B2CCM-V9DX9-VDY8T
+4.Visual Studio 2008 Team Foundation Server: WPDW8-M962C-VJX9M-HQB4Q-JVTDM
+ 
+如何把90天试用版改为正式版，下面有两种方法:
+第一种是先在Setup文件夹内找到Setup.sdb，然后在打开方式中选择记事本打开，找到 [Product Key] 这一项下面的一行就是他的序列号了，我们把中划线去掉复制到这里保存就可以享用正试版了，应该是很简单的。
+例如：
+　  　　[Product Key]
+　  　　T2CRQGDKBVW7KJR8C6CKXMW3D
+　 　　改为
+　  　　[Product Key]
+　  　　PYHYPWXB3BB2CCMV9DX9VDY8T
+ 
+第二种是先安装完成，然后在“控制面板”中启动“添加删除程序”，选中 VS2008 点击“更改或删除”我们在把正确的序列号输入即可。
+ 
+以上这两种方式都不是很复杂，只要几步就可以享受不花的正版Microsoft Visual Studio 2008开发工具了。
+
+http://www.398588.com/Article/T7/63.aspx

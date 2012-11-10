@@ -1,0 +1,48 @@
+Radzell 
+  
+Posts: 443
+Joined: Sun Jul 04, 2010 8:52 am Top
+--------------------------------------------------------------------------------
+
+Re: Different gravity
+by Nicolas Gramlich  Fri Jul 30, 2010 3:52 pm 
+
+Hi,
+
+if I remember correctly you can call sth like setAutoClearForces(false) to the (Physics)World. Having done that try to "applyForce" a force into the opposite direction of the gravity.
+
+Maybe a density of 0 might have the same effect, as no mass cannot be attracted by gravity :/ Depends on what you want to use this for.
+
+Best Regards,
+NicolasNicolas Gramlich 
+Site Admin 
+  
+Posts: 1231
+Joined: Mon Jun 07, 2010 6:20 pm
+Location: Schriesheim, Germany 
+WebsiteICQ Top
+--------------------------------------------------------------------------------
+
+Re: Different gravity
+by Radzell  Fri Jul 30, 2010 11:40 pm 
+
+I figured it out BodyTypes kinetic can move but aren't effected by gravity.Radzell 
+  
+Posts: 443
+Joined: Sun Jul 04, 2010 8:52 am Top
+--------------------------------------------------------------------------------
+
+Re: Different gravity
+by Nicolas Gramlich  Sat Jul 31, 2010 2:03 am 
+
+Oh nice to now 
+
+Box2D always has something to reveal Nicolas Gramlich 
+Site Admin 
+  
+Posts: 1231
+Joined: Mon Jun 07, 2010 6:20 pm
+Location: Schriesheim, Germany 
+WebsiteICQ 
+
+http://www.andengine.org/forums/physics-box2d-extension/different-gravity-t233.html
