@@ -20,6 +20,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	testexam(NULL);
 	int* p=testnew();
 	delete p;
+	Test t;
+	t.test();
 	getchar();
 	return 0;
 }

@@ -134,27 +134,44 @@ int main(int argc, char* argv[])
 
 	struct _timeb start;
 	_ftime64_s( &start ); 
+
+	int tmp=0;
 	
 
-	//第三种比第二种快10倍，第二种比第一种快10倍
-	for(long i=0;i<90000000;++i)
+	//第四种比第二、三种快10倍，第二、三种比第一种快10倍
+	for(long i=0;i<900000000;++i)
 	{
 		//m1.states==m2.states;
 		//memcmp(&m1,&m2,size);
-		m1.states.AlphaTest==m2.states.AlphaTest&&
+
+		/*if(m1.states.AlphaTest==m2.states.AlphaTest)++tmp;
+		if(m1.states.Blend==m1.states.Blend)++tmp;
+		if(m1.states.ColorMaterial==m1.states.ColorMaterial)++tmp;
+		if(m1.states.CullFace==m1.states.CullFace)++tmp;
+		if(m1.states.DepthTest==m1.states.DepthTest)++tmp;
+		if(m1.states.Dither==m1.states.Dither)++tmp;
+		if(m1.states.Fog==m1.states.Fog)++tmp;
+		if(m1.states.Lighting==m1.states.Lighting)++tmp;
+		if(m1.states.LineSmooth==m1.states.LineSmooth)++tmp;
+		if(m1.states.Normalize==m1.states.Normalize)++tmp;
+		if(m1.states.RescaleNormal==m1.states.RescaleNormal)++tmp;
+		if(m1.states.ScissorTest==m1.states.ScissorTest)++tmp;
+		if(m1.states.StencilTest==m1.states.StencilTest)++tmp;
+		*/
+		if(m1.states.AlphaTest==m2.states.AlphaTest&&
 			m1.states.Blend==m1.states.Blend&&
-		m1.states.ColorMaterial==m1.states.ColorMaterial&&
-		m1.states.CullFace==m1.states.CullFace&&
-		m1.states.DepthTest==m1.states.DepthTest&&
-		m1.states.Dither==m1.states.Dither&&
-		m1.states.Fog==m1.states.Fog&&
-		m1.states.Lighting==m1.states.Lighting&&
-		m1.states.LineSmooth==m1.states.LineSmooth&&
-		m1.states.Normalize==m1.states.Normalize&&
-		m1.states.RescaleNormal==m1.states.RescaleNormal&&
-		m1.states.ScissorTest==m1.states.ScissorTest&&
-		m1.states.StencilTest==m1.states.StencilTest;
-		
+			m1.states.ColorMaterial==m1.states.ColorMaterial&&
+			m1.states.CullFace==m1.states.CullFace&&
+			m1.states.DepthTest==m1.states.DepthTest&&
+			m1.states.Dither==m1.states.Dither&&
+			m1.states.Fog==m1.states.Fog&&
+			m1.states.Lighting==m1.states.Lighting&&
+			m1.states.LineSmooth==m1.states.LineSmooth&&
+			m1.states.Normalize==m1.states.Normalize&&
+			m1.states.RescaleNormal==m1.states.RescaleNormal&&
+			m1.states.ScissorTest==m1.states.ScissorTest&&
+			m1.states.StencilTest==m1.states.StencilTest)
+			++tmp;
 	}
 
 	struct _timeb end;
@@ -169,10 +186,16 @@ int main(int argc, char* argv[])
 	printf("%s\n",(LPTSTR)(LPCTSTR)strTime);*/
 
 
-	printf("%d.%d\n",start.time,start.millitm);
-	printf("%d.%d",end.time,end.millitm);
+	long long s=end.time-start.time;
+	int ms=end.millitm-start.millitm;
+	if(ms<0){
+		ms+=1000;
+		--s;
+	}
+	printf("%d.",s);
+	printf("%d\n",ms);
 
-	getchar();
+	system("pause");
 
 	return 0;
 }
