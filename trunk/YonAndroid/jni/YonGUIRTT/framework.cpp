@@ -211,6 +211,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 		SMaterial& material=cubeModel->getMaterial(0);
 #if 0
 		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		//material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT;
 		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
 		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
 #endif
@@ -284,11 +285,10 @@ void drawFrame(){
 	//pCamera->render(videoDriver);
 
 	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
-	gfAdapterWindow->clearZ(1000);
-	gfAdapterWindow->drawRegion("trans.png",r,180,200,128,64,ENUM_TRANS_NONE);
-	gfAdapterWindow->render();
+	//gfAdapterWindow->clearZ(1000);
+	//gfAdapterWindow->drawRegion("trans.png",r,180,200,128,64,ENUM_TRANS_NONE);
+	//gfAdapterWindow->render();
 
-	
 	guiAdapter->render();
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);

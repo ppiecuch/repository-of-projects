@@ -17,6 +17,7 @@ IModel* planeModel=NULL;
 f32 factor=1.1f;
 
 core::array<core::stringc> images;
+core::array<ITexture*> textures;
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -78,7 +79,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	shap=geometryFty->createXYRectangle2D(-125,-125,125,125);
+	/*shap=geometryFty->createXYRectangle2D(-125,-125,125,125);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
@@ -90,10 +91,11 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	planeModel->setPosition(core::vector3df(0,0,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
 	for(u32 i=1;i<=30;++i){
 		images.push_back(core::stringc("%d.png",i));
+		textures.push_back(videoDriver->getTexture(images[i-1]));
 	}
 
 	return true;
@@ -114,9 +116,10 @@ void drawFrame(){
 	gfAdapter->clearZ(1000);
 
 	static core::rectf r(0,0,1,1);
-	for(u32 i=0;i<500;++i){
+	for(u32 i=0;i<10000;++i){
 		//gfAdapter->drawRegion("shadow.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
-		gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w),randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h),128,64,ENUM_TRANS_NONE);
+		//gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w),randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h),128,64,ENUM_TRANS_NONE);
+		gfAdapter->drawRegion(textures[randomizer->rand(0,textures.size()-1)],r,randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w),randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h),128,64,ENUM_TRANS_NONE);
 		//gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE);
 		//gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
 		//gfAdapter->drawRegion("test.png",r,randomizer->rand(0,400),randomizer->rand(0,400),64,64,ENUM_TRANS_ROT90);

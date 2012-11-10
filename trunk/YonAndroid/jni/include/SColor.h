@@ -67,7 +67,7 @@ namespace video{
 	
 
 	//改为RGBA-->错了,OpenGL中顶点颜色使用的就是ABGR
-	//TODO改为ABGR
+	//使用ABGR
 	class SColor
 	{
 	public:
@@ -81,7 +81,7 @@ namespace video{
 
 		//[0,255]
 		explicit SColor (u32 a, u32 r, u32 g, u32 b)
-			:color(((a & 0xff)<<24) | ((r & 0xff)<<16) | ((g & 0xff)<<8) | (b & 0xff)) {}
+			:color(((a & 0xff)<<24) | ((b & 0xff)<<16) | ((g & 0xff)<<8) | (r & 0xff)) {}
 
 		explicit SColor(f32 a, f32 r, f32 g, f32 b)
 		{
@@ -89,7 +89,7 @@ namespace video{
 				u32 rr=(u32)core::clamp((s32)(r*255),0,255);
 				u32 gg=(u32)core::clamp((s32)(g*255),0,255);
 				u32 bb=(u32)core::clamp((s32)(b*255),0,255);
-				color=((aa & 0xff)<<24) | ((rr & 0xff)<<16) | ((gg & 0xff)<<8) | (bb & 0xff);
+				color=((aa & 0xff)<<24) | ((bb & 0xff)<<16) | ((gg & 0xff)<<8) | (rr & 0xff);
 		}
 
 		SColor(u32 clr)
@@ -104,14 +104,14 @@ namespace video{
 		u32 toA8R8G8B8() const { return color; }
 
 		u32 getAlpha() const { return color>>24; }
-		u32 getRed() const { return (color>>16) & 0xff; }
+		u32 getBlue() const { return (color>>16) & 0xff; }
 		u32 getGreen() const { return (color>>8) & 0xff; }
-		u32 getBlue() const { return color & 0xff; }
+		u32 getRed() const { return color & 0xff; }
 
 		void setAlpha(u32 a) { color = ((a & 0xff)<<24) | (color & 0x00ffffff); }
-		void setRed(u32 r) { color = ((r & 0xff)<<16) | (color & 0xff00ffff); }
+		void setBlue(u32 r) { color = ((r & 0xff)<<16) | (color & 0xff00ffff); }
 		void setGreen(u32 g) { color = ((g & 0xff)<<8) | (color & 0xffff00ff); }
-		void setBlue(u32 b) { color = (b & 0xff) | (color & 0xffffff00); }
+		void setRed(u32 b) { color = (b & 0xff) | (color & 0xffffff00); }
 
 		//[0,255]
 		f32 getLightness() const
@@ -132,7 +132,7 @@ namespace video{
 
 		void set(u32 a, u32 r, u32 g, u32 b)
 		{
-			color = (((a & 0xff)<<24) | ((r & 0xff)<<16) | ((g & 0xff)<<8) | (b & 0xff));
+			color = (((a & 0xff)<<24) | ((b & 0xff)<<16) | ((g & 0xff)<<8) | (r & 0xff));
 		}
 		void set(u32 col) { color = col; }
 
