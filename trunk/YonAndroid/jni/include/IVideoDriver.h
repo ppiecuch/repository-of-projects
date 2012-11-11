@@ -22,7 +22,7 @@
 namespace yon{
 
 	namespace scene{
-		class IUnit;
+		class IShap;
 		class ISceneManager;
 		ISceneManager* createSceneManager(ITimer* timer,io::IFileSystem* fileSystem,platform::ICursorControl* cursorControl);
 	}
@@ -234,7 +234,8 @@ namespace yon{
 			//virtual void setMaterial(IMaterial* material) = 0;
 			//virtual IMaterial* createMaterial() = 0;
 
-			virtual void drawUnit(scene::IUnit* unit,bool force2D=false) = 0;
+			//virtual void drawUnit(scene::IUnit* unit,bool force2D=false) = 0;
+			virtual void drawShap(scene::IShap* shap,bool force2D=false) = 0;
 			virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,
 				const core::recti& sourceRect, const core::recti* clipRect =NULL,
 				video::SColor color=video::COLOR_WHITE, bool useAlphaChannelOfTexture=false) =0;

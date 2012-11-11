@@ -23,11 +23,14 @@ namespace scene{
 		u32 m_uVerticesChangedId;
 		u32 m_uIndicesChangedId;
 
+		video::ENUM_HARDWARDBUFFER_USAGE_TYPE m_vertexUsageType,m_indexUsageType;
+
 		friend class CGeometryFactory;
 		friend struct SSkinnedUnit;
 	public:
 		SShap()
-			:m_uVerticesChangedId((s_lCounter<<16)+1),m_uIndicesChangedId((s_lCounter<<16)+1){
+			:m_uVerticesChangedId((s_lCounter<<16)+1),m_uIndicesChangedId((s_lCounter<<16)+1)
+		,m_vertexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE),m_indexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE){
 				++s_lCounter;
 		}
 		/*virtual const V* getVertices() const{
@@ -100,6 +103,19 @@ namespace scene{
 		}
 		virtual u32 getIndexCount() const{
 			return m_indices.size();
+		}
+
+		virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getVertexHardwareBufferUsageType() const{
+			return m_vertexUsageType;
+		}
+		virtual void setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type){
+			m_vertexUsageType=type;
+		}
+		virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getIndexHardwareBufferUsageType() const{
+			return m_indexUsageType;
+		}
+		virtual void setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type){
+			m_indexUsageType=type;
 		}
 
 		virtual void append(const  void* const vertices, u32 numVertices, const void* const indices, u32 numIndices){

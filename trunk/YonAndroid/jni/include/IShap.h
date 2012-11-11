@@ -3,6 +3,7 @@
 
 #include "IReferencable.h"
 #include "SVertex.h"
+#include "IHardwareBuffer.h"
 
 namespace yon{
 	namespace scene{
@@ -28,6 +29,12 @@ namespace yon{
 			//当顶点/索引变化时，changedId跟着改变
 			virtual u32 getVerticesChangedId() const = 0;
 			virtual u32 getIndicesChangedId() const = 0;
+
+			//硬件缓冲区使用类型
+			virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getVertexHardwareBufferUsageType() const = 0;
+			virtual void setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;
+			virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getIndexHardwareBufferUsageType() const = 0;
+			virtual void setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;
 
 			virtual void setVerticesDirty() = 0;
 			virtual void setIndicesDirty() = 0;
