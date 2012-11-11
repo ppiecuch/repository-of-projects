@@ -9,6 +9,7 @@ namespace core{
 
 	class IRecyclable{
 	public:
+		virtual ~IRecyclable(){}
 		virtual void reset() = 0;
 	};
 
@@ -37,64 +38,112 @@ namespace core{
 	template<class Element>
 	class CObjectPoolFast : public IObjectPool<Element>{
 
-		struct Chunk
+		struct Link
 		{
-			enum { SIZE = 8 * 1024 - 16 };
-			char storage_[SIZE];
-			Chunk *next;
+			Element* ele;
+			Link* next;
+
+			Link():ele(NULL),next(NULL){}
 		};
 
-		Element* m_pNext;
-		Chunk* m_pChunk;
 
-		void extend(){
-			Chunk *p = new Chunk;
-			p->next = m_pChunk;
-			m_pChunk = p;
+		Link m_link;
+		Element m_ele;
+		Link* m_pFree;
+		Link* m_pUsed;
+		u32 m_uIncrement;
+		u32 m_uSize;
+		u32 m_uCapacity;
+		yonAllocator<Link> linkAllocator;
+		yonAllocator<Element> elementAllocator;
 
-			const size_t elem = Chunk::SIZE / size_;
-			char *start = p->storage_;
-			char *last = &start[(elem - 1) * size_];
+		void extend(u32 num){
+			//Link* ns=linkAllocator.allocate(num);
+			//Element* es=elementAllocator.allocate(num);
+#if 0
+			Link* ns=new Link[num];
+			Element* es=new Element[num];
+			m_pFree=ns;
 
-			for(char *p = start; p < last; p += size_)
-				reinterpret_cast<Element*>(p)->next = reinterpret_cast<Element*>(p + size_);
+			Link* tmpL=ns;
+			Element* tmpE=es;
+			for(u32 i=0;i<num;++i)
+			{
+				//linkAllocator.construct(tmpL,m_link);
+				//elementAllocator.construct(tmpE,m_ele);
+				tmpL->ele=&es[i];
+				if(i<num-1)
+					tmpL->next=&ns[i+1];
+				else
+					tmpL->next=NULL;
+				tmpL=tmpL->next;
+			}
+#else
+			Link* tmpL=new Link;
+			for(u32 i=0;i<num;++i)
+			{
+				Element* tmpE=new Element;
+				tmpL->ele=tmpE;
 
-			reinterpret_cast<Element*>(last)->next = 0;
-			head_ = reinterpret_cast<Element*>(start);
+				if(i==0)
+					m_pFree=tmpL;
+				if(i<num-1)
+					tmpL->next=new Link;
+				else
+					tmpL->next=NULL;
+				tmpL=tmpL->next;
+			}
+#endif
+			m_uCapacity+=num;
+			m_uSize+=num;
 		}
 	public:
-		CObjectPoolFast(u32 increment=5)
-			:m_uIncrement(increment),m_uCapacity(0){
+		CObjectPoolFast(u32 increment=16)
+			:m_uIncrement(increment),m_uSize(0),m_uCapacity(0),m_pFree(NULL),m_pUsed(NULL){
 				extend(increment);
 		}
 		virtual ~CObjectPoolFast(){
 			clear();
 		}
-		virtual u32 getSize() const {return m_pool.size();}
+		virtual u32 getSize() const {return m_uSize;}
 		virtual u32 getCapacity() const {return m_uCapacity;}
 		virtual void clear(){
-			Chunk *cur = m_pChunk;
-			while(cur)
+			if(m_uSize!=m_uCapacity)
+				printf("Not all elements cleared!\n");
+			while(m_pFree)
 			{
-				Chunk *p = cur;
-				cur = cur->next;
-
-				delete p;
+				Link* tmp=m_pFree->next;
+				//elementAllocator.destruct(m_pFree->ele);
+				//linkAllocator.destruct(m_pFree);
+				//elementAllocator.deallocate(m_pFree->ele);
+				//linkAllocator.deallocate(m_pFree);
+				delete m_pFree->ele;
+				delete m_pFree;
+				m_pFree=tmp;
+				--m_uCapacity;
+				--m_uSize;
 			}
 		}
 		virtual Element* get(){
 			if(getSize()==0)
 				extend(m_uIncrement);
-			Element* ele=*(m_pool.begin());
-			//m_pool.pop_front();
-			m_pool.erase(m_pool.begin());
-			return ele;
+			Link* tmp=m_pFree;
+			m_pFree=m_pFree->next;
+			tmp->next=m_pUsed;
+			m_pUsed=tmp;
+			--m_uSize;
+			return tmp->ele;
 		}
 		virtual void recycle(Element* ele){
 			IRecyclable* r=dynamic_cast<IRecyclable*>(ele);
 			if(r){
 				r->reset();
-				m_pool.push_back(ele);
+				Link* tmp=m_pUsed;
+				m_pUsed=m_pUsed->next;
+				tmp->next=m_pFree;
+				tmp->ele=ele;
+				m_pFree=tmp;
+				++m_uSize;
 			}else{
 				printf("Recycle no recyclable class,do nothing!\n");
 			}
