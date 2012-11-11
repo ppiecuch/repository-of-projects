@@ -7,7 +7,6 @@
 //#include "IMaterial.h"
 #include "SMaterial.h"
 #include "IShap.h"
-#include "IHardwareBuffer.h"
 
 namespace yon{
 	namespace scene{
@@ -43,10 +42,11 @@ namespace yon{
 			//硬件缓冲区使用类型
 			//virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getHardwareBufferUsageType() const = 0;
 			//virtual void setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;
+			/*
 			virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getVertexHardwareBufferUsageType() const = 0;
 			virtual void setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;
 			virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getIndexHardwareBufferUsageType() const = 0;
-			virtual void setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;
+			virtual void setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type) = 0;*/
 
 			virtual IShap* getShap() const = 0;
 			virtual void setShap(IShap* shap) = 0;

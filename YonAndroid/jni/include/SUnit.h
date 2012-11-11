@@ -12,15 +12,17 @@ namespace scene{
 	protected:
 		IShap* m_pShap;
 		video::SMaterial m_material;
-		video::ENUM_HARDWARDBUFFER_USAGE_TYPE m_vertexUsageType,m_indexUsageType;
+		//video::ENUM_HARDWARDBUFFER_USAGE_TYPE m_vertexUsageType,m_indexUsageType;
 	public:
 		SUnit()
-			:m_material(video::DEFAULT_MATERIAL),m_pShap(NULL),
-			m_vertexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE),m_indexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE){
+			:m_material(video::DEFAULT_MATERIAL),m_pShap(NULL)
+			//,m_vertexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE),m_indexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE)
+		{
 		}
 		SUnit(const video::SMaterial& material)
-			:m_material(material),m_pShap(NULL),
-			m_vertexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE),m_indexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE){
+			:m_material(material),m_pShap(NULL)
+			//,m_vertexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE),m_indexUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_NONE)
+		{
 		}
 
 		virtual ~SUnit(){
@@ -48,7 +50,7 @@ namespace scene{
 		//virtual void setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type){
 		//	m_usageType=type;
 		//}
-		virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getVertexHardwareBufferUsageType() const{
+		/*virtual video::ENUM_HARDWARDBUFFER_USAGE_TYPE getVertexHardwareBufferUsageType() const{
 			return m_vertexUsageType;
 		}
 		virtual void setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type){
@@ -59,7 +61,7 @@ namespace scene{
 		}
 		virtual void setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE type){
 			m_indexUsageType=type;
-		}
+		}*/
 
 		virtual IShap* getShap()const {
 			return m_pShap;

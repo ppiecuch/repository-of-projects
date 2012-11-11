@@ -80,7 +80,7 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
 
