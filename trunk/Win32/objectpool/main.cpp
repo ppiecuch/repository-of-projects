@@ -3,6 +3,21 @@
 #include "objectpool.h"
 using namespace std;
 
+#include <stdio.h>
+#include <wtypes.h>
+#include <stdarg.h>
+#include <tchar.h>
+
+inline void TRACE(const char * pszFormat, ...)
+{
+	va_list pArgs;
+	char szMessageBuffer[16380]={0};
+	va_start( pArgs, pszFormat );
+	vsnprintf_s( szMessageBuffer, 16380,16380-1,pszFormat, pArgs );
+	va_end( pArgs );   
+	OutputDebugStringA(szMessageBuffer);   
+}
+
 #include <crtdbg.h>
 inline void EnableMemLeakCheck()
 {
@@ -190,6 +205,9 @@ namespace yon{
 		class CRecyclableObject:public yon::core::IRecyclable{
 			CObject obj;
 		public:
+			//virtual ~CRecyclableObject(){
+				//TRACE("destruct 0x%08X \n",this);
+			//}
 			virtual void reset(){obj.a=0;obj.b=0.0f;}
 		};
 	}
@@ -249,7 +267,7 @@ int main(int argc, char* argv[])
 	long long s;
 	int ms;
 
-	//12.***ms
+	/*//12.***ms
 	_ftime64_s( &start ); 
 	CObjectPoolNill<CRecyclableObject>* pool1=new CObjectPoolNill<CRecyclableObject>();
 	for(int i=0;i<COUNT;++i){
@@ -266,7 +284,7 @@ int main(int argc, char* argv[])
 		--s;
 	}
 	printf("%d.",s);
-	printf("%d\n",ms);
+	printf("%03d\n",ms);
 
 
 	//0.672ms
@@ -286,7 +304,7 @@ int main(int argc, char* argv[])
 		--s;
 	}
 	printf("%d.",s);
-	printf("%d\n",ms);
+	printf("%03d\n",ms);
 
 	//0.172ms
 	_ftime64_s( &start ); 
@@ -305,7 +323,27 @@ int main(int argc, char* argv[])
 		--s;
 	}
 	printf("%d.",s);
-	printf("%d\n",ms);
+	printf("%03d\n",ms);*/
+
+	//0.015ms
+	_ftime64_s( &start ); 
+	yon::core::CObjectPoolFast<yon::core::CRecyclableObject>* pool4=new yon::core::CObjectPoolFast<yon::core::CRecyclableObject>(10);
+	for(int i=0;i<COUNT;++i){
+		yon::core::CRecyclableObject* obj=pool4->get();
+		pool4->recycle(obj);
+	}
+	pool4->clear();
+	delete pool4;
+	_ftime64_s( &end ); 
+
+	s=end.time-start.time;
+	ms=end.millitm-start.millitm;
+	if(ms<0){
+		ms+=1000;
+		--s;
+	}
+	printf("%d.",s);
+	printf("%03d\n",ms);
 #endif
 	system("pause");
 	return 0;
