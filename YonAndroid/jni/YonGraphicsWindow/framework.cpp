@@ -106,7 +106,7 @@ void resize(u32 width,u32 height){
 void drawFrame(){
 
 	u32 start=timer->getRealTime();
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,COLOR_DEFAULT);
 
 	//pCamera->setPosition(core::vector3df(x,x,300),true);
 
@@ -119,7 +119,10 @@ void drawFrame(){
 	for(u32 i=0;i<10000;++i){
 		//gfAdapter->drawRegion("shadow.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
 		//gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w),randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h),128,64,ENUM_TRANS_NONE);
-		gfAdapter->drawRegion(textures[randomizer->rand(0,textures.size()-1)],r,randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w),randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h),128,64,ENUM_TRANS_NONE);
+		ITexture* texture=textures[randomizer->rand(0,textures.size()-1)];
+		s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
+		s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
+		gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
 		//gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE);
 		//gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
 		//gfAdapter->drawRegion("test.png",r,randomizer->rand(0,400),randomizer->rand(0,400),64,64,ENUM_TRANS_ROT90);
@@ -140,11 +143,15 @@ void drawFrame(){
 
 
 	gfAdapter->render();
-	u32 end=timer->getRealTime();
+	static u32 end,diff;
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),end-start),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),diff),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
+
+	
+	end=timer->getRealTime();
+	diff=end-start;
 }
 void destroy(){
 	engine->drop();
