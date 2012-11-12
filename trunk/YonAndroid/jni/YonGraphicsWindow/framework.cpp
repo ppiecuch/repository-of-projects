@@ -93,7 +93,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	unit->drop();
 	entity->drop();*/
 
-	for(u32 i=1;i<=30;++i){
+	for(u32 i=1;i<=50;++i){
 		images.push_back(core::stringc("%d.png",i));
 		textures.push_back(videoDriver->getTexture(images[i-1]));
 	}

@@ -380,11 +380,13 @@ namespace core{
 				insert(k,v);
 		}
 		//如果存在k对应的节点，删除之，返回true，否则返回false
-		bool remove(const K& k){
+		bool remove(const K& k,V* vp=NULL){
 			Node* n = find(k);
 			if (n == NULL)
 				return false;
 
+			if(vp!=NULL)
+				*vp=n->getValue();
 			Node* tmp=n;
 			if(tmp->getLeftChild()&&tmp->getRightChild()){
 				tmp=tmp->getRightChild();
