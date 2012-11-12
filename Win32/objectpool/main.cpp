@@ -208,7 +208,8 @@ namespace yon{
 			//virtual ~CRecyclableObject(){
 				//TRACE("destruct 0x%08X \n",this);
 			//}
-			virtual void reset(){obj.a=0;obj.b=0.0f;}
+			//virtual void reset(){obj.a=0;obj.b=0.0f;}
+			virtual void reset(){}
 		};
 	}
 }
@@ -329,8 +330,9 @@ int main(int argc, char* argv[])
 	_ftime64_s( &start ); 
 	yon::core::CObjectPoolFast<yon::core::CRecyclableObject>* pool4=new yon::core::CObjectPoolFast<yon::core::CRecyclableObject>(10);
 	for(int i=0;i<COUNT;++i){
-		yon::core::CRecyclableObject* obj=pool4->get();
-		pool4->recycle(obj);
+		//yon::core::CRecyclableObject* obj=pool4->get();
+		//pool4->recycle(obj);
+		yon::core::CRecyclableObject obj;
 	}
 	pool4->clear();
 	delete pool4;
