@@ -169,6 +169,10 @@
 			RelativePath=".\main.cpp"
 			>
 		</File>
+		<File
+			RelativePath=".\todo.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

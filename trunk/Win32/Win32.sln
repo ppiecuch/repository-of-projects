@@ -113,6 +113,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Allocator", "Allocator\Allo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sort", "Sort\Sort.vcproj", "{5CADD695-A7A5-4C7E-B9AD-FE015A999CFC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Comparator", "Comparator\Comparator.vcproj", "{2A3779B4-5B86-493A-B99E-5D23E739F61D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -331,6 +333,10 @@ Global
 		{5CADD695-A7A5-4C7E-B9AD-FE015A999CFC}.Debug|Win32.Build.0 = Debug|Win32
 		{5CADD695-A7A5-4C7E-B9AD-FE015A999CFC}.Release|Win32.ActiveCfg = Release|Win32
 		{5CADD695-A7A5-4C7E-B9AD-FE015A999CFC}.Release|Win32.Build.0 = Release|Win32
+		{2A3779B4-5B86-493A-B99E-5D23E739F61D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2A3779B4-5B86-493A-B99E-5D23E739F61D}.Debug|Win32.Build.0 = Debug|Win32
+		{2A3779B4-5B86-493A-B99E-5D23E739F61D}.Release|Win32.ActiveCfg = Release|Win32
+		{2A3779B4-5B86-493A-B99E-5D23E739F61D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

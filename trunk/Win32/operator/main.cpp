@@ -27,6 +27,14 @@ public:
 	}
 };
 
+class SubOperator{
+public:
+	SubOperator operator-(const SubOperator& s) const{
+		printf("this-s\n");
+		return *this;
+	}
+};
+
 int main(int argc,char ** argv)
 {
 #if 0
@@ -35,10 +43,14 @@ int main(int argc,char ** argv)
 	a();
 	a.operator()(1,2);
 	a(1,2);
-#elif 1
+#elif 0
 	IncDecOperator a;
 	a++;
 	++a;
+#elif 1
+	SubOperator a;
+	SubOperator b;
+	a-b;
 #endif;
 	system("pause");
 	return 0;
