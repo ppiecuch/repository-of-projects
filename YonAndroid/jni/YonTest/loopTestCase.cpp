@@ -1,6 +1,6 @@
 #include "loopTestCase.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( loopTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( loopTestCase );
 
 void loopTestCase::setUp()
 {

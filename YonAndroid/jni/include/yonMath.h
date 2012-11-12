@@ -92,6 +92,11 @@ inline bool equals(const f32 a, const f32 b, const f32 tolerance = ROUNDING_ERRO
 	return (a + tolerance >= b) && (a - tolerance <= b);
 }
 
+inline bool equals(const u32 a, const u32 b)
+{
+	return a==b;
+}
+
 inline s32 floor32(f32 x)
 {
 	return (s32) floorf ( x );

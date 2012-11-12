@@ -17,10 +17,10 @@ class yonMapTestCase : public CPPUNIT_NS::TestFixture
 	//CPPUNIT_TEST( size );
 	//CPPUNIT_TEST( find );
 	//CPPUNIT_TEST( insert );
-	//CPPUNIT_TEST( remove );
+	CPPUNIT_TEST( remove );
 	//CPPUNIT_TEST( insertAndRemove );
 	//CPPUNIT_TEST( access );
-	CPPUNIT_TEST( stringMap );
+	//CPPUNIT_TEST( stringMap );
 	CPPUNIT_TEST_SUITE_END();
 protected:
 	map<s32,c8> m;

@@ -8,6 +8,7 @@ ISceneManager* sceneMgr=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
+ICamera* pCamera2=NULL;
 ILogger* logger=NULL;
 
 IModel* cubeModel=NULL;
@@ -59,6 +60,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
+	pCamera2=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
 
@@ -75,7 +77,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-	shap=geometryFty->createCube(150,150,150);
+	/*shap=geometryFty->createCube(150,150,150);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
@@ -112,9 +114,12 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	planeModel->setPosition(core::vector3df(0,0,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(128,128), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	
+	pCamera2->setEventReceivable(false);
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(1024,512), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	pCamera2->onResize(rtt->getSize());
 	//cubeModel->setMaterialTexture(0, rtt); 
 
 	return true;
@@ -127,6 +132,8 @@ void drawFrame(){
 	videoDriver->begin();
 
 	//rtt->beginRTT(true,true,video::SColor(0xFF133E67));
+	pCamera2->setNeedUpload();
+	pCamera2->render(videoDriver);
 	videoDriver->setRenderTarget(rtt,true,true,COLOR_WHITE);
 
 	//teapotModel->setVisible(true);
@@ -148,7 +155,7 @@ void drawFrame(){
 	//rtt->endRTT(true);
 	videoDriver->setRenderTarget(NULL,true,true,video::COLOR_DEFAULT);
 
-	const core::vector3df crot=cubeModel->getRotation();
+	/*const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
 	const core::vector3df trot=teapotModel->getRotation();
@@ -159,8 +166,9 @@ void drawFrame(){
 		factor= 0.9f;
 	else if(psca.x<2)
 		factor=1.1f;
-	planeModel->setScale(psca*factor);
+	planeModel->setScale(psca*factor);*/
 
+	pCamera->setNeedUpload();
 	sceneMgr->render(videoDriver);
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);

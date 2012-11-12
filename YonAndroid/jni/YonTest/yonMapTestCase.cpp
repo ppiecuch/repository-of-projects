@@ -1,6 +1,6 @@
 #include "yonMapTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( yonMapTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( yonMapTestCase );
 
 void yonMapTestCase::setUp()
 {
@@ -84,19 +84,22 @@ void yonMapTestCase::remove(){
 	m.insert(6,'6');
 	m.insert(9,'9');
 	m.insert(8,'8');
-	m.insert(11,'11');
-	m.insert(12,'12');
-	m.insert(14,'14');
+	m.insert(11,'B');
+	m.insert(12,'C');
+	m.insert(14,'E');
 	m.insert(1,'1');
 	m.insert(3,'3');
 	m.insert(7,'7');
 	m.insert(5,'5');
 	m.insert(2,'2');
-	m.insert(10,'10');
-	m.insert(13,'13');
+	m.insert(10,'A');
+	m.insert(13,'D');
+
+	c8 c;
 
 	m.preorderTraversal(m.getRoot());
-	m.remove(6);
+	m.remove(6,&c);
+	printf("%c\n",c);
 	m.preorderTraversal(m.getRoot());
 	m.remove(5);
 	m.preorderTraversal(m.getRoot());
@@ -108,7 +111,8 @@ void yonMapTestCase::remove(){
 	m.preorderTraversal(m.getRoot());
 	m.remove(9);
 	m.preorderTraversal(m.getRoot());
-	m.remove(3);
+	m.remove(3,&c);
+	printf("%c\n",c);
 	m.preorderTraversal(m.getRoot());
 	m.remove(10);
 	m.preorderTraversal(m.getRoot());
@@ -118,9 +122,11 @@ void yonMapTestCase::remove(){
 	m.preorderTraversal(m.getRoot());
 	m.remove(2);
 	m.preorderTraversal(m.getRoot());
-	m.remove(14);
+	m.remove(14,&c);
+	printf("%c\n",c);
 	m.preorderTraversal(m.getRoot());
-	m.remove(13);
+	m.remove(13,&c);
+	printf("%c\n",c);
 	m.preorderTraversal(m.getRoot());
 	m.remove(1);
 
