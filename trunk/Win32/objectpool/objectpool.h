@@ -79,16 +79,24 @@ namespace core{
 				tmpL=tmpL->next;
 			}
 #else
-			Link* tmpL=new Link;
+			Link* tmpL=linkAllocator.allocate(1);
+			linkAllocator.construct(tmpL,m_link);
+			//Link* tmpL=new Link;
 			for(u32 i=0;i<num;++i)
 			{
-				Element* tmpE=new Element;
+				Element* tmpE=elementAllocator.allocate(1);
+				elementAllocator.construct(tmpE,m_ele);
+				//Element* tmpE=new Element;
 				tmpL->ele=tmpE;
 
 				if(i==0)
 					m_pFree=tmpL;
 				if(i<num-1)
-					tmpL->next=new Link;
+					//tmpL->next=new Link;
+				{
+					tmpL->next=linkAllocator.allocate(1);
+					linkAllocator.construct(tmpL->next,m_link);
+				}
 				else
 					tmpL->next=NULL;
 				tmpL=tmpL->next;
@@ -113,12 +121,12 @@ namespace core{
 			while(m_pFree)
 			{
 				Link* tmp=m_pFree->next;
-				//elementAllocator.destruct(m_pFree->ele);
-				//linkAllocator.destruct(m_pFree);
-				//elementAllocator.deallocate(m_pFree->ele);
-				//linkAllocator.deallocate(m_pFree);
-				delete m_pFree->ele;
-				delete m_pFree;
+				elementAllocator.destruct(m_pFree->ele);
+				linkAllocator.destruct(m_pFree);
+				elementAllocator.deallocate(m_pFree->ele);
+				linkAllocator.deallocate(m_pFree);
+				//delete m_pFree->ele;
+				//delete m_pFree;
 				m_pFree=tmp;
 				--m_uCapacity;
 				--m_uSize;
