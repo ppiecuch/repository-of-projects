@@ -16,8 +16,12 @@ IModel* cubeModel=NULL;
 IModel* planeModel=NULL;
 f32 factor=1.1f;
 
+#include "SDynamicShap.h"
+
 core::array<core::stringc> images;
 core::array<ITexture*> textures;
+scene::SDynamicShap3D shaps[29];
+SMaterial material;
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -93,10 +97,40 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	unit->drop();
 	entity->drop();*/
 
-	for(u32 i=1;i<=50;++i){
+	for(u32 i=1;i<=7;++i){
 		images.push_back(core::stringc("%d.png",i));
 		textures.push_back(videoDriver->getTexture(images[i-1]));
 	}
+
+	s32 z=900;
+	u16 index=0;
+	for(u32 i=0;i<29;++i){
+		shaps[i].getVertexArray().set_used(0);
+		shaps[i].getIndexArray().set_used(0);
+		shaps[i].setIndexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+		shaps[i].setVertexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+		for(u32 j=0;j<35;++j)
+		{
+			s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
+			s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
+			shaps[i].getVertexArray().push_back(SVertex(x,y,z,0,0,COLOR_WHITE));
+			shaps[i].getVertexArray().push_back(SVertex(x+64,y,z,1,0,COLOR_WHITE));
+			shaps[i].getVertexArray().push_back(SVertex(x+64,y+32,z,1,1,COLOR_WHITE));
+			shaps[i].getVertexArray().push_back(SVertex(x,y+32,z,0,1,COLOR_WHITE));
+			shaps[i].getIndexArray().push_back(0+index);
+			shaps[i].getIndexArray().push_back(1+index);
+			shaps[i].getIndexArray().push_back(3+index);
+			shaps[i].getIndexArray().push_back(3+index);
+			shaps[i].getIndexArray().push_back(1+index);
+			shaps[i].getIndexArray().push_back(2+index);
+			index+=4;
+		}
+		--z;
+		index=0;
+	}
+
+	
+	material.FrontFace=ENUM_FRONT_FACE_CW;
 
 	return true;
 }
@@ -105,7 +139,6 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	u32 start=timer->getRealTime();
 	videoDriver->begin(true,true,COLOR_DEFAULT);
 
 	//pCamera->setPosition(core::vector3df(x,x,300),true);
@@ -116,13 +149,23 @@ void drawFrame(){
 	gfAdapter->clearZ(1000);
 
 	static core::rectf r(0,0,1,1);
-	for(u32 i=0;i<10000;++i){
+	
+	for(u32 i=0;i<29;++i){
 		//gfAdapter->drawRegion("shadow.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
 		//gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w),randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h),128,64,ENUM_TRANS_NONE);
+
 		ITexture* texture=textures[randomizer->rand(0,textures.size()-1)];
+#if 0
 		s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
 		s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
 		gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
+#else
+		//Logger->debug("i:%d--0x%08X\r\n",i,&shaps[i]);
+		material.setTexture(0,texture);
+		videoDriver->setMaterial(material);
+		videoDriver->drawShap(&shaps[i]);
+#endif
+
 		//gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE);
 		//gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
 		//gfAdapter->drawRegion("test.png",r,randomizer->rand(0,400),randomizer->rand(0,400),64,64,ENUM_TRANS_ROT90);
@@ -143,15 +186,15 @@ void drawFrame(){
 
 
 	gfAdapter->render();
-	static u32 end,diff;
+	static u32 start,end,diff;
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),diff),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	//Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),diff),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,DCL:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall(),diff),core::position2di(0,10),COLOR_GREEN);
 
 	videoDriver->end();
-
-	
 	end=timer->getRealTime();
 	diff=end-start;
+	start=timer->getRealTime();
 }
 void destroy(){
 	engine->drop();
