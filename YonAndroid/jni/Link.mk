@@ -10,6 +10,10 @@ subdirs += $(LOCAL_PATH)/AndroidGraphicsWindow.mk
 else
 ifeq ($(APP),StateMachine)
 subdirs += $(LOCAL_PATH)/AndroidStateMachine.mk
+else
+ifeq ($(APP),RTT)
+subdirs += $(LOCAL_PATH)/AndroidRTT.mk
+endif
 endif
 endif
 endif

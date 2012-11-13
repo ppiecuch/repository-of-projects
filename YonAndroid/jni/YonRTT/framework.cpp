@@ -118,7 +118,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 
 	
 	pCamera2->setEventReceivable(false);
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(1024,512), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(512,512), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
 	pCamera2->onResize(rtt->getSize());
 	//cubeModel->setMaterialTexture(0, rtt); 
 
@@ -127,6 +127,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
+s32 temp=0;
 void drawFrame(){
 
 	videoDriver->begin();
@@ -134,7 +135,7 @@ void drawFrame(){
 	//rtt->beginRTT(true,true,video::SColor(0xFF133E67));
 	pCamera2->setNeedUpload();
 	pCamera2->render(videoDriver);
-	videoDriver->setRenderTarget(rtt,true,true,COLOR_WHITE);
+	videoDriver->setRenderTarget(rtt,true,true,COLOR_BLUE);
 
 	//teapotModel->setVisible(true);
 	//cubeModel->setVisible(false);
@@ -142,7 +143,7 @@ void drawFrame(){
 
 	static core::rectf r(0,0,1,1);
 	gfAdapter->clearZ(-1000);
-	gfAdapter->drawRegion("aura.png",r,0,0,128,128,ENUM_TRANS_NONE);
+	gfAdapter->drawRegion("aura.png",r,temp++,0,128,128,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),true);
 	gfAdapter->render(); 
 
 	//sceneMgr->render(videoDriver);
@@ -153,7 +154,8 @@ void drawFrame(){
 
 
 	//rtt->endRTT(true);
-	videoDriver->setRenderTarget(NULL,true,true,video::COLOR_DEFAULT);
+	videoDriver->setRenderTarget(NULL,true,true,COLOR_WHITE);
+	//videoDriver->setViewPort(core::recti(0,0,videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h));
 
 	/*const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
@@ -177,7 +179,7 @@ void drawFrame(){
 	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
 
 	gfAdapter->clearZ(-1000);
-	gfAdapter->drawImage(rtt->getName().c_str(),0,0,128,128,10,10);
+	gfAdapter->drawImage(rtt->getName().c_str(),300,150,256,256,10,10);
 	//gfAdapter->drawImage("test.png",0,0,32,32,10,10);
 	gfAdapter->render();
 

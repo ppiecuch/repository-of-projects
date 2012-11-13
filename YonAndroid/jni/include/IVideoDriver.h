@@ -248,6 +248,7 @@ namespace yon{
 			virtual void draw3DLine(const core::vector3df& start,const core::vector3df& end, video::SColor color=video::COLOR_WHITE) =0;
 			virtual u32 getFPS() const = 0;
 			virtual u32 getPrimitiveCountDrawn(bool average=false) const = 0;
+			virtual u32 getDrawCall() const = 0;
 		};
 	}
 }
