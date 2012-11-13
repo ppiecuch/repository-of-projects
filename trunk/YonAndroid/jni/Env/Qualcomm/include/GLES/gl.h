@@ -3,7 +3,7 @@
 
 /* $Revision: #4 $ on $Date: 2012/07/17 $ */
 
-#include <GLES11/glplatform.h>
+#include <GLES/glplatform.h>
 
 #ifdef __cplusplus
 extern "C" {
