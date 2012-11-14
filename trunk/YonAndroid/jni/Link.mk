@@ -13,6 +13,10 @@ subdirs += $(LOCAL_PATH)/AndroidStateMachine.mk
 else
 ifeq ($(APP),RTT)
 subdirs += $(LOCAL_PATH)/AndroidRTT.mk
+else
+ifeq ($(APP),Callback)
+subdirs += $(LOCAL_PATH)/AndroidCallback.mk
+endif
 endif
 endif
 endif

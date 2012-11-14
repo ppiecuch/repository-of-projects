@@ -107,8 +107,8 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	for(u32 i=0;i<29;++i){
 		shaps[i].getVertexArray().set_used(0);
 		shaps[i].getIndexArray().set_used(0);
-		shaps[i].setIndexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
-		shaps[i].setVertexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+		//shaps[i].setIndexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+		//shaps[i].setVertexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 		for(u32 j=0;j<35;++j)
 		{
 			s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
@@ -129,6 +129,9 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 		index=0;
 	}
 
+	ITexture* texture=textures[0];
+	material.setTexture(0,texture);
+
 	
 	material.FrontFace=ENUM_FRONT_FACE_CW;
 
@@ -137,6 +140,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
+#define BATCH
 void drawFrame(){
 
 	videoDriver->begin(true,true,COLOR_DEFAULT);
@@ -146,23 +150,33 @@ void drawFrame(){
 	sceneMgr->render(videoDriver);
 	//pCamera->render(videoDriver);
 
+#ifndef BATCH
 	gfAdapter->clearZ(1000);
+#endif
+	
 
 	static core::rectf r(0,0,1,1);
-	
+	videoDriver->setMaterial(material);
+
+	//LG990
+	//1000-adapter-drawRegion-不开启VBO-使用batch=250ms
+	//1000-adapter-drawRegion-不开启VBO-不使用batch=270ms
+	//29-driver-drawShap-开启VBO=140ms
+	//29-driver-drawShap-不开启VBO=120ms
+	//29-driver-drawShap-不开启VBO-不切换纹理=120ms
 	for(u32 i=0;i<29;++i){
 		//gfAdapter->drawRegion("shadow.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
 		//gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w),randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h),128,64,ENUM_TRANS_NONE);
 
-		ITexture* texture=textures[randomizer->rand(0,textures.size()-1)];
-#if 0
+		//ITexture* texture=textures[randomizer->rand(0,textures.size()-1)];
+#ifndef BATCH
 		s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
 		s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
 		gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
 #else
 		//Logger->debug("i:%d--0x%08X\r\n",i,&shaps[i]);
-		material.setTexture(0,texture);
-		videoDriver->setMaterial(material);
+		//material.setTexture(0,texture);
+		//videoDriver->setMaterial(material);
 		videoDriver->drawShap(&shaps[i]);
 #endif
 
@@ -184,8 +198,9 @@ void drawFrame(){
 	planeModel->getEntity()->getUnit(0)->getShap()->getIndexCount(),
 	planeModel->getEntity()->getUnit(0)->getShap()->getVertexType());*/
 
-
+#ifndef BATCH
 	gfAdapter->render();
+#endif
 	static u32 start,end,diff;
 
 	//Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),diff),core::ORIGIN_POSITION2DI,COLOR_GREEN);

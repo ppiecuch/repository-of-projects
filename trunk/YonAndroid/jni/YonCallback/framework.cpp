@@ -93,8 +93,8 @@ public:
 };
 
 bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
-	params.windowSize.w=400;
-	params.windowSize.h=400;
+	params.windowSize.w=width;
+	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	params.pCallback=pcb;
 	//params.fpsLimit=10;
@@ -127,11 +127,11 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,DCL:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }

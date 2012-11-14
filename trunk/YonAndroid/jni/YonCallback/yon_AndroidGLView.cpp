@@ -6,6 +6,7 @@
 const char* LOG_TAG = "yon_AndroidGLView";
 const char* className="yon/AndroidGLView";
 
+JavaVM *g_jvm=NULL;
 JNIEnv *g_env=NULL;
 jobject g_obj=NULL;
 ICallback* callback=NULL;
@@ -138,12 +139,19 @@ public:
 	}
 };
 
-void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jint width, jint height, jstring apkFilePath, jstring sdcardPath){
+void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jboolean first,jint width, jint height, jstring apkFilePath, jstring sdcardPath){
 	LOGD(LOG_TAG,"screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",width,height,pEnv);
+	pEnv->GetJavaVM(&g_jvm);
+	if(g_obj!=NULL)
+	{
+		pEnv->DeleteGlobalRef(g_obj);
+		g_obj=NULL;
+	}
+	g_obj = pEnv->NewGlobalRef(obj);
 	g_env=pEnv;
-	g_obj=obj;
 	callback=new MyCallback();
-	init(pEnv,callback,width,height);
+	if(first)
+		init(pEnv,callback,width,height);
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	Logger->debug("nativeOnSurfaceChanged->w:%d,h:%d\n",w,h);
@@ -191,6 +199,7 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	Logger->info("callbackDestroy function\n");
 	destroy();
 	delete callback;
+	pEnv->DeleteGlobalRef(g_obj);
 	pEnv->CallVoidMethod(obj, callbackDestroy);
 #else
 	const char* className="yon/AndroidGLView";
@@ -313,7 +322,7 @@ void Java_yon_AndroidGLView_nativeError(JNIEnv *pEnv, jobject obj, jstring str){
 	Logger->error(YON_LOG_FAILED_FORMAT,text);
 	pEnv->ReleaseStringUTFChars(str, text);
 }
-void Java_yon_AndroidGLView_nativeOnSurfaceDestroy(JNIEnv *pEnv, jobject obj){
+void Java_yon_AndroidGLView_nativeOnDestroy(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnSurfaceDestroy\n");
 }
 /*
