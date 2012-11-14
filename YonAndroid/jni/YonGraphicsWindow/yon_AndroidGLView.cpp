@@ -204,7 +204,7 @@ void Java_yon_AndroidGLView_nativeError(JNIEnv *pEnv, jobject obj, jstring str){
 	Logger->error(YON_LOG_FAILED_FORMAT,text);
 	pEnv->ReleaseStringUTFChars(str, text);
 }
-void Java_yon_AndroidGLView_nativeOnSurfaceDestroy(JNIEnv *pEnv, jobject obj){
+void Java_yon_AndroidGLView_nativeOnDestroy(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnSurfaceDestroy\n");
 }
 

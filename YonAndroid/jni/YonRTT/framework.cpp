@@ -61,7 +61,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
 	pCamera2=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0));
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300)),core::vector3df(0,-1,0);
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -118,7 +118,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 
 	
 	pCamera2->setEventReceivable(false);
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(128,128), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(1024,1024), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
 	pCamera2->onResize(rtt->getSize());
 	cubeModel->setMaterialTexture(0, rtt); 
 
@@ -138,7 +138,7 @@ void drawFrame(){
 	pCamera2->setNeedUpload();
 	pCamera2->render(videoDriver);
 #endif
-	videoDriver->setRenderTarget(rtt);
+	videoDriver->setRenderTarget(rtt,true,true,COLOR_BLUE);
 
 #ifdef USE_SCENE_MGR
 	teapotModel->setVisible(true);
@@ -147,10 +147,12 @@ void drawFrame(){
 
 #else
 
-	static core::rectf r(0,0,1,1);
+	static core::rectf r(0,1,1,0);
 	gfAdapter->clearZ(1000);
 	gfAdapter->drawRegion("aura.png",r,0,0,128,128);
 	gfAdapter->render(); 
+
+	videoDriver->draw2DLine(core::ORIGIN_POSITION2DI,core::position2di(100,100));
 #endif
 
 #ifdef USE_SCENE_MGR
