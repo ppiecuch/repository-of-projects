@@ -5,6 +5,7 @@
 #include "SColor.h"
 #include "SVertex.h"
 #include "rect.h"
+#include "yonArray.h"
 
 namespace yon{
 	namespace video{
@@ -91,6 +92,7 @@ namespace scene{
 		virtual bool eraseElement(s32 id) = 0;
 		virtual void setDrawElements(const core::array<s32>& ids) = 0;
 		virtual void endElement() = 0;
+		virtual void renderLayer(s32 id) = 0;
 		//特效专用接口
 		//virtual void drawVertexPrimitiveList(video::IMaterial* material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) =0;
 		virtual void drawVertexPrimitiveList(const video::SMaterial& material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) = 0;
