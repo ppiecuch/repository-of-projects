@@ -67,9 +67,30 @@ namespace scene{
 
 		virtual bool drawRegion(video::ITexture* texture, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform=ENUM_TRANS_NONE, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),bool useAlpha=false, const video::SColor& color=video::COLOR_WHITE) = 0;
 
-		virtual void beginResident(s32 id) = 0;
-		virtual bool eraseResident(s32 id) = 0;
-		virtual void endResident() = 0;
+		//virtual void beginResident(s32 id) = 0;
+		//virtual bool eraseResident(s32 id) = 0;
+		//virtual void endResident() = 0;
+		//使用方法：
+		//添加对象时：
+		//beginLayer(XXX);
+		//beginElement(YYY);
+		//drawRegion(...);
+		//drawRegion(...);
+		//......
+		//endElement();
+		//endLayer();
+		//
+		//定制绘制时：
+		//beginLayer(XXX);
+		//setDrawElements(...);
+		//endLayer();
+		virtual void beginLayer(s32 id) = 0;
+		virtual bool eraseLayer(s32 id) = 0;
+		virtual void endLayer() = 0;
+		virtual void beginElement(s32 id) = 0;
+		virtual bool eraseElement(s32 id) = 0;
+		virtual void setDrawElements(const core::array<s32>& ids) = 0;
+		virtual void endElement() = 0;
 		//特效专用接口
 		//virtual void drawVertexPrimitiveList(video::IMaterial* material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) =0;
 		virtual void drawVertexPrimitiveList(const video::SMaterial& material,const void* vertices, u32 vertexCount,const void* indice, u32 indexCount,scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C) = 0;

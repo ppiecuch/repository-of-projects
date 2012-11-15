@@ -176,6 +176,10 @@ namespace core{
 			return -1;
 		}
 
+		bool isSorted() const{
+			return used==0||is_sorted;
+		}
+
 		//由小到大进行排序
 		//可能存在BUG：sort();array[X]=XXXX;此时仍被标为有序
 		void sort()
