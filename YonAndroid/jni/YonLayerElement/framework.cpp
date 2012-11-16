@@ -16,8 +16,8 @@ f32 factor=1.1f;
 ITexture* texture=NULL;
 const static s32 LAYER_ID1=1;
 const static s32 LAYER_ID2=2;
-const static s32 ELEMENT1_COUNT=1000;
-const static s32 ELEMENT2_COUNT=5000;
+const static s32 ELEMENT1_COUNT=10;
+const static s32 ELEMENT2_COUNT=500;
 core::array<s32> ids;
 
 #include "SDynamicShap.h"
@@ -98,15 +98,42 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 		core::rectf r1(0,1,320.f/512.f,(256.f-243.f)/256.f);
 		gfAdapter->drawRegion(texture,r1,x-57,y+19,320,243);
 		core::rectf r2(319.f/512.f,1,332.f/512.f,(256.f-20.f)/256.f);
-		gfAdapter->drawRegion(texture,r2,x,y,13,20);
+		gfAdapter->drawRegion(texture,r2,x,y,13,20,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_TOP|MASK_ACTHOR_LEFT),false);
 		gfAdapter->endElement();
-
-		if(i%2==0)
-		ids.push_back(i);
 	}
+	gfAdapter->eraseElement(1);
+	for(s32 i=2;i<ELEMENT1_COUNT;++i)
+		ids.push_back(i);
 	ids.sort();
 	gfAdapter->setDrawElements(ids);
 	gfAdapter->endLayer();
+
+	gfAdapter->eraseLayer(LAYER_ID1);
+	ids.set_used(0);
+
+	gfAdapter->beginLayer(LAYER_ID2);
+	for(s32 i=0;i<ELEMENT2_COUNT;++i)
+	{
+		s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
+		s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
+		texture=textures[randomizer->rand(0,textures.size()-1)];
+		gfAdapter->beginElement(i);
+		core::rectf r1(0,1,320.f/512.f,(256.f-243.f)/256.f);
+		gfAdapter->drawRegion(texture,r1,x-57,y+19,320,243);
+		core::rectf r2(319.f/512.f,1,332.f/512.f,(256.f-20.f)/256.f);
+		gfAdapter->drawRegion(texture,r2,x,y,13,20,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_TOP|MASK_ACTHOR_LEFT),false);
+		//core::rectf r(0,1,1,0);
+		//gfAdapter->drawRegion("1.png",r,x,y,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_TOP|MASK_ACTHOR_LEFT),true);
+		//gfAdapter->drawRegion("2.png",r,x+10,y+10,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_TOP|MASK_ACTHOR_LEFT),true);
+		gfAdapter->endElement();
+	}
+	gfAdapter->eraseElement(0);
+	for(s32 i=1;i<ELEMENT2_COUNT;++i)
+		ids.push_back(i);
+	ids.sort();
+	gfAdapter->setDrawElements(ids);
+	gfAdapter->endLayer();
+
 
 	return true;
 }
@@ -120,7 +147,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	gfAdapter->renderLayer(LAYER_ID1);
+	gfAdapter->renderLayer(LAYER_ID2);
 	
 	static u32 start,end,diff;
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,DCL:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall(),diff),core::position2di(0,10),COLOR_GREEN);

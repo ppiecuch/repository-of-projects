@@ -167,6 +167,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\AndroidLayerElement.mk"
+			>
+		</File>
+		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>

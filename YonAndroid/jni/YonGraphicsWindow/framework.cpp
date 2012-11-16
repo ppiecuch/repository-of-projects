@@ -140,7 +140,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
-#define BATCH
+//#define BATCH
 void drawFrame(){
 
 	videoDriver->begin(true,true,COLOR_DEFAULT);
@@ -164,12 +164,12 @@ void drawFrame(){
 	//29-driver-drawShap-开启VBO=140ms
 	//29-driver-drawShap-不开启VBO=120ms
 	//29-driver-drawShap-不开启VBO-不切换纹理=120ms
-	for(u32 i=0;i<29;++i){
+	for(u32 i=0;i<1000;++i){
 		//gfAdapter->drawRegion("shadow.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
 		//gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w),randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h),128,64,ENUM_TRANS_NONE);
 
-		//ITexture* texture=textures[randomizer->rand(0,textures.size()-1)];
 #ifndef BATCH
+		ITexture* texture=textures[randomizer->rand(0,textures.size()-1)];
 		s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
 		s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
 		gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
