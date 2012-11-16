@@ -21,6 +21,7 @@ namespace debug{
 
 	void CProfile::reset(){
 		m_bNeedUpdate=true;
+		m_bCalling=false;
 		m_uStartTime=0;
 		m_uEndTime=0;
 		m_uAllCallConsume=0;
@@ -50,7 +51,7 @@ namespace debug{
 			for(;!it.atEnd();++it)
 			{
 				SProfileReport::SAPIReport* report=it->getValue();
-				report->CallCountAvg=report->CallCount/m_report.FrameCount;
+				report->CallCountAvg=(f32)report->CallCount/(f32)m_report.FrameCount;
 				report->TimeConsumeAvg=report->TimeConsume/report->CallCount;
 				report->TimeConsumePct=(f32)((f64)report->TimeConsume*100.f/(f64)m_uAllCallConsume);
 			}
@@ -79,6 +80,7 @@ namespace debug{
 			report->TimeConsumeMax=diff;
 	}
 	void CProfile::startCall(void* fun,const char* name){
+		YON_DEBUG_BREAK_IF(m_bCalling);
 		APIMap& apiMap=m_report.ApiInfos;
 		APIMap::Node* node=apiMap.find(fun);
 		if(node==NULL)
@@ -95,14 +97,17 @@ namespace debug{
 			updateCallStart(report);
 		}
 		m_bNeedUpdate=true;
+		m_bCalling=true;
 	}
 	void CProfile::endCall(void* fun){
+		YON_DEBUG_BREAK_IF(!m_bCalling);
 		APIMap& apiMap=m_report.ApiInfos;
 		APIMap::Node* node=apiMap.find(fun);
 		YON_DEBUG_BREAK_IF(node==NULL);
 		SProfileReport::SAPIReport* report=node->getValue();
 		updateCallEnd(report);
 		m_bNeedUpdate=true;
+		m_bCalling=false;
 	}
 
 	void CProfile::report(){
@@ -111,11 +116,11 @@ namespace debug{
 		printf("All info of apis:\r\n");
 		APIMap& apiMap=m_report.ApiInfos;
 		APIMap::Iterator it=apiMap.getIterator();
-		printf("CallCount\tCallCountAvg\tTimeConsume\tTimeConsumeMin\tTimeConsumeMax\tTimeConsumeAvg\tTimeConsumePct\r\n");
+		printf("Name\t\tCallCount\tCallCountAvg\tTimeConsume\tTimeConsumeMin\tTimeConsumeMax\tTimeConsumeAvg\tTimeConsumePct\r\n");
 		for(;!it.atEnd();++it)
 		{
 			SProfileReport::SAPIReport* report=it->getValue();
-			printf("%u\t\t%u\t\t%llu\t%llu\t%llu\t%llu\t%.2f%%\r\n",report->CallCount,report->CallCountAvg,report->TimeConsume,report->TimeConsumeMin,report->TimeConsumeMax,report->TimeConsumeAvg,report->TimeConsumePct);
+			printf("%-15.15s\t%u\t\t%.2f\t\t%llu\t%llu\t%llu\t%llu\t%.2f%%\r\n",report->Name.c_str(),report->CallCount,report->CallCountAvg,report->TimeConsume,report->TimeConsumeMin,report->TimeConsumeMax,report->TimeConsumeAvg,report->TimeConsumePct);
 		}
 	}
 

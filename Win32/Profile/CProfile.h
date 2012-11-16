@@ -13,6 +13,8 @@ namespace debug{
 		u64 m_uEndTime;
 		u64 m_uAllCallConsume;
 		SProfileReport m_report;
+
+		bool m_bCalling;
 		void reset();
 		void update();
 		void reset(SProfileReport::SAPIReport* report);
