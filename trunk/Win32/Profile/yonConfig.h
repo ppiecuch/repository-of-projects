@@ -56,6 +56,9 @@
 #define YON_LOG_WARN_FORMAT "%-64s\u3010!\u3011\r\n"
 #endif
 
+//Profile设置
+//#define YON_USE_PROFILE
+
 //路径使用宽字节
 //#define YON_WCHAR_FILESYSTEM
 

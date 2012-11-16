@@ -12,7 +12,7 @@ namespace debug{
 		struct SAPIReport{
 			core::stringc Name;
 			u32 CallCount;
-			u32 CallCountAvg;
+			f32 CallCountAvg;
 			u64 TimeConsume;
 			u64 TimeConsumeMin;
 			u64 TimeConsumeMax;
@@ -37,11 +37,18 @@ namespace debug{
 	extern IProfile* Profile;
 }
 }
-
+#ifdef YON_USE_PROFILE
 #define PROFILE_REGISTER_FRAME() yon::debug::Profile->registerFrame()
 #define PROFILE_START_CALL(fun) \
 	do{yon::c8* n=YON_STR(fun);yon::debug::Profile->startCall(fun,n);}while(0)
 #define PROFILE_END_CALL(fun) yon::debug::Profile->endCall(fun)
 #define PROFILE_GET_REPORT() yon::debug::Profile->getReport()
 #define PROFILE_REPORT() yon::debug::Profile->report()
+#else
+#define PROFILE_REGISTER_FRAME() 
+#define PROFILE_START_CALL(fun) 
+#define PROFILE_END_CALL(fun) 
+#define PROFILE_GET_REPORT() 
+#define PROFILE_REPORT() 
+#endif
 #endif

@@ -14,6 +14,9 @@ namespace debug{
 void test(){
 	yon::core::yonSleep(10);
 }
+void abcdefghijklmn(){
+	yon::core::yonSleep(10);
+}
 
 int main(int argc, char* argv[])
 {
@@ -21,9 +24,9 @@ int main(int argc, char* argv[])
 	PROFILE_START_CALL(test);
 	test();
 	PROFILE_END_CALL(test);
-	PROFILE_START_CALL(test);
+	PROFILE_START_CALL(abcdefghijklmn);
 	test();
-	PROFILE_END_CALL(test);
+	PROFILE_END_CALL(abcdefghijklmn);
 	PROFILE_REGISTER_FRAME();
 
 	PROFILE_REPORT();
