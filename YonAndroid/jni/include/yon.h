@@ -17,6 +17,7 @@
 #include "IListener.h"
 
 #include "ILogger.h" 
+#include "IProfile.h"
 
 #include "dimension2d.h" 
 #include "dimension3d.h" 

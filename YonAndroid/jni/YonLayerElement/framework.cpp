@@ -141,23 +141,38 @@ void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
 #define BATCH
+void beginDriver(){}
+void endDriver(){}
+void renderScene(){}
+void renderGraphics(){}
 void drawFrame(){
 
+	PROFILE_REGISTER_FRAME();
+	PROFILE_START_CALL(beginDriver);
 	videoDriver->begin(true,true,COLOR_DEFAULT);
+	PROFILE_END_CALL(beginDriver);
 
+	PROFILE_START_CALL(renderScene);
 	sceneMgr->render(videoDriver);
+	PROFILE_END_CALL(renderScene);
 
+	//PROFILE_START_CALL(renderGraphics);
 	gfAdapter->renderLayer(LAYER_ID2);
+	//PROFILE_END_CALL(renderGraphics);
 	
 	static u32 start,end,diff;
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,DCL:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall(),diff),core::position2di(0,10),COLOR_GREEN);
 
+	PROFILE_START_CALL(endDriver);
 	videoDriver->end();
+	PROFILE_END_CALL(endDriver);
+
 	end=timer->getRealTime();
 	diff=end-start;
 	start=timer->getRealTime();
 }
 void destroy(){
+	PROFILE_REPORT();
 	engine->drop();
 	delete params.pEventReceiver;
 }
