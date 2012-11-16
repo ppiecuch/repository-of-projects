@@ -16,6 +16,10 @@ subdirs += $(LOCAL_PATH)/AndroidRTT.mk
 else
 ifeq ($(APP),Callback)
 subdirs += $(LOCAL_PATH)/AndroidCallback.mk
+else
+ifeq ($(APP),LayerElement)
+subdirs += $(LOCAL_PATH)/AndroidLayerElement.mk
+endif
 endif
 endif
 endif
