@@ -19,6 +19,9 @@
 	#define YON_DEBUG_BREAK_IF( _CONDITION_ )
 #endif
 
+#define _YON_STR(p) #p
+#define YON_STR(p) _YON_STR(p)
+
 namespace yon{
 
 #ifdef _MSC_VER
