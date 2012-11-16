@@ -115,6 +115,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sort", "Sort\Sort.vcproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Comparator", "Comparator\Comparator.vcproj", "{2A3779B4-5B86-493A-B99E-5D23E739F61D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PoundSign", "PoundSign\PoundSign.vcproj", "{D8B964AF-70D2-4635-8E79-246F3EB39529}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Profile", "Profile\Profile.vcproj", "{D1FA75E8-D578-4416-8F53-557AA578AA4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -337,6 +341,14 @@ Global
 		{2A3779B4-5B86-493A-B99E-5D23E739F61D}.Debug|Win32.Build.0 = Debug|Win32
 		{2A3779B4-5B86-493A-B99E-5D23E739F61D}.Release|Win32.ActiveCfg = Release|Win32
 		{2A3779B4-5B86-493A-B99E-5D23E739F61D}.Release|Win32.Build.0 = Release|Win32
+		{D8B964AF-70D2-4635-8E79-246F3EB39529}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D8B964AF-70D2-4635-8E79-246F3EB39529}.Debug|Win32.Build.0 = Debug|Win32
+		{D8B964AF-70D2-4635-8E79-246F3EB39529}.Release|Win32.ActiveCfg = Release|Win32
+		{D8B964AF-70D2-4635-8E79-246F3EB39529}.Release|Win32.Build.0 = Release|Win32
+		{D1FA75E8-D578-4416-8F53-557AA578AA4E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D1FA75E8-D578-4416-8F53-557AA578AA4E}.Debug|Win32.Build.0 = Debug|Win32
+		{D1FA75E8-D578-4416-8F53-557AA578AA4E}.Release|Win32.ActiveCfg = Release|Win32
+		{D1FA75E8-D578-4416-8F53-557AA578AA4E}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
