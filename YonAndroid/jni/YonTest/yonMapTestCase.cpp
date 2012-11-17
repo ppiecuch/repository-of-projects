@@ -1,6 +1,6 @@
 #include "yonMapTestCase.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( yonMapTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( yonMapTestCase );
 
 void yonMapTestCase::setUp()
 {

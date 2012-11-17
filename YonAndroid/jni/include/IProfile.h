@@ -13,16 +13,15 @@ namespace debug{
 			core::stringc Name;
 			u32 CallCount;
 			f32 CallCountAvg;
-			u64 TimeConsume;
-			u64 CycleConsumeMin;
-			u64 CycleConsumeMax;
-			u64 CycleConsumeAvg;
-			f32 CycleConsumePct;
+			u64 NTimeConsumeSum;
+			u64 NTimeConsumeMin;
+			u64 NTimeConsumeMax;
+			u64 NTimeConsumeAvg;
+			f32 NTimeConsumePct;
 			u64 _calltime;
 		};
 		u32 FrameCount;
 		u64 TimeDiff;
-		u64 CycleDiff;
 		f32 FPS;
 		core::map<u32,SAPIReport*> ApiInfos;
 	};
@@ -46,7 +45,7 @@ namespace debug{
 //	do{yon::c8* n=YON_STR(fun);yon::debug::Profile->startCall(reinterpret_cast<void*>((size_t)fun),n);}while(0)
 //#define PROFILE_END_CALL(fun) yon::debug::Profile->endCall(fun)
 #define PROFILE_START_CALL(id,fun) \
-	do{yon::c8* n=YON_STR(fun);yon::debug::Profile->startCall(id,n);}while(0)
+	do{const yon::c8* n=YON_STR(fun);yon::debug::Profile->startCall(id,n);}while(0)
 #define PROFILE_END_CALL(id) yon::debug::Profile->endCall(id)
 #define PROFILE_GET_REPORT() yon::debug::Profile->getReport()
 #define PROFILE_REPORT() yon::debug::Profile->report()

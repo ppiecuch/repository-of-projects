@@ -22,8 +22,9 @@ class stringTestCase : public CPPUNIT_NS::TestFixture
 	CPPUNIT_TEST( find );
 	CPPUNIT_TEST( splits);
 	CPPUNIT_TEST(les);
-	CPPUNIT_TEST(intelatof);*/
-	CPPUNIT_TEST(append);
+	CPPUNIT_TEST(intelatof);
+	CPPUNIT_TEST(append);*/
+	CPPUNIT_TEST(formatWithComma);
 	CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -40,6 +41,7 @@ protected:
 	void intelatof();
 	void append();
 	void splits();
+	void formatWithComma();
 };
 
 #endif

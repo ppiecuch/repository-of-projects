@@ -57,8 +57,9 @@
 #endif
 
 //Profile设置
-#if defined(_DEBUG)
 #define YON_USE_PROFILE
+#ifdef DISABLE_PROFILE
+#undef YON_USE_PROFILE
 #endif
 
 //路径使用宽字节

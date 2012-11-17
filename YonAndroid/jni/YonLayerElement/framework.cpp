@@ -158,11 +158,13 @@ void drawFrame(){
 	PROFILE_END_CALL(PROFILE_ID_3);
 	
 	static u32 start,end,diff;
+	PROFILE_START_CALL(PROFILE_ID_4,Logger->drawString);
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,DCL:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall(),diff),core::position2di(0,10),COLOR_GREEN);
-
-	PROFILE_START_CALL(PROFILE_ID_4,Driver->end);
-	videoDriver->end();
 	PROFILE_END_CALL(PROFILE_ID_4);
+
+	PROFILE_START_CALL(PROFILE_ID_5,Driver->end);
+	videoDriver->end();
+	PROFILE_END_CALL(PROFILE_ID_5);
 
 	end=timer->getRealTime();
 	diff=end-start;
