@@ -2,10 +2,24 @@
 #include "stringTestCase.h"
 #include "yonUtil.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
 
 void stringTestCase::setUp()
 {
+}
+void stringTestCase::formatWithComma(){
+	core::stringc str1("%d",123456789);
+	CPPUNIT_ASSERT( str1.formatWithComma()=="123,456,789" );
+	printf("%s\n",str1.formatWithComma().c_str());
+	core::stringc str2("%d",12345678);
+	CPPUNIT_ASSERT( str2.formatWithComma()=="12,345,678" );
+	core::stringc str3("%d",1234567);
+	CPPUNIT_ASSERT( str3.formatWithComma()=="1,234,567" );
+	printf("%s\n",str3.formatWithComma().c_str());
+	core::stringc str4("%d",1234);
+	CPPUNIT_ASSERT( str4.formatWithComma()=="1,234" );
+	core::stringc str5("%d",123);
+	CPPUNIT_ASSERT( str5.formatWithComma()=="123" );
 }
 void stringTestCase::append()
 {

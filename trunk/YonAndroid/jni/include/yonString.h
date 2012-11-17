@@ -592,6 +592,28 @@ namespace yon{
 				return fastatof(&elements[index]);
 			}
 
+			//暂时只支持整型
+			//TODO 改为realloc
+			string<T,TAlloc> formatWithComma() const{
+				if(len==0)
+					return *this;
+				s32 commaNum=(len-1)/3;
+				if(commaNum==0)
+					return *this;
+				s32 index=len-commaNum*3;
+				u32 i,j;
+				string<T,TAlloc> str;
+				u32 r=index&3;
+				for(i=0,j=0;j<len;++i)
+				{
+					if((i&3)==r)
+						str.append(',');
+					else
+						str.append(elements[j++]);
+				}
+				return str;
+			}
+
 			//TODO 待测试
 			//! Finds first position of a character not in a given list.
 			/** \param c: List of characters not to find. For example if the method
