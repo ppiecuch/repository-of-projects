@@ -3,6 +3,9 @@
 #include <stdarg.h>
 #include <tchar.h>
 
+#include <sys/timeb.h>
+#include <time.h>
+
 inline void TRACE(const char * pszFormat, ...)
 {
 	va_list pArgs;
@@ -19,6 +22,10 @@ void test(){}
 class Test{
 public:
 	static void test(){}
+
+	static int demo(int a,char* b){return 0;}
+
+	void abcd(char c){}
 };
 
 #define __FUNC_NAME(p) #p
@@ -33,6 +40,8 @@ int main(int argc, char* argv[])
 {
 	_REGISTER_FUNC(test);
 	_REGISTER_FUNC(Test::test);
+	_REGISTER_FUNC(Test::demo);
+	_REGISTER_FUNC(&Test::abcd);
 	_REGISTER_FUNC(_TEST);
 
 #if 0
@@ -50,7 +59,32 @@ int main(int argc, char* argv[])
 	//这一行则是：
 	//printf("%s\n", int(AeA));
 
-#else
+#elif 0
+
+#define COUNT 100000000
+	struct _timeb start;
+	struct _timeb end;
+	long long s;
+	int ms;
+
+	_ftime64_s( &start ); 
+	//_FUNC_NAME 0.218ms,string 0.234ms
+	for(int i=0;i<COUNT;++i){
+		//_FUNC_NAME(test);
+		char* c="test";
+	}
+	_ftime64_s( &end ); 
+
+	s=end.time-start.time;
+	ms=end.millitm-start.millitm;
+	if(ms<0){
+		ms+=1000;
+		--s;
+	}
+	printf("%d.",s);
+	printf("%03d\n",ms);
+
+#elif 0
 	//INT_MAX和A都不会再被展开, 然而解决这个问题的方法很简单. 加多一层中间转换宏.
 	//加这层宏的用意是把所有宏的参数在这层里全部展开, 那么在转换宏里的那一个宏(_STR)就能得到正确的宏参数.
 #define A 2

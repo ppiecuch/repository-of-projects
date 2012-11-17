@@ -119,6 +119,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PoundSign", "PoundSign\Poun
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Profile", "Profile\Profile.vcproj", "{D1FA75E8-D578-4416-8F53-557AA578AA4E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPU", "CPU\CPU.vcproj", "{82BFBB31-43FE-49CD-98C2-7C92E1DB06F0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Time", "Time\Time.vcproj", "{5DFA50AA-6D23-4F69-9FEB-E37AD614F37F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -349,6 +353,14 @@ Global
 		{D1FA75E8-D578-4416-8F53-557AA578AA4E}.Debug|Win32.Build.0 = Debug|Win32
 		{D1FA75E8-D578-4416-8F53-557AA578AA4E}.Release|Win32.ActiveCfg = Release|Win32
 		{D1FA75E8-D578-4416-8F53-557AA578AA4E}.Release|Win32.Build.0 = Release|Win32
+		{82BFBB31-43FE-49CD-98C2-7C92E1DB06F0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{82BFBB31-43FE-49CD-98C2-7C92E1DB06F0}.Debug|Win32.Build.0 = Debug|Win32
+		{82BFBB31-43FE-49CD-98C2-7C92E1DB06F0}.Release|Win32.ActiveCfg = Release|Win32
+		{82BFBB31-43FE-49CD-98C2-7C92E1DB06F0}.Release|Win32.Build.0 = Release|Win32
+		{5DFA50AA-6D23-4F69-9FEB-E37AD614F37F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5DFA50AA-6D23-4F69-9FEB-E37AD614F37F}.Debug|Win32.Build.0 = Debug|Win32
+		{5DFA50AA-6D23-4F69-9FEB-E37AD614F37F}.Release|Win32.ActiveCfg = Release|Win32
+		{5DFA50AA-6D23-4F69-9FEB-E37AD614F37F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

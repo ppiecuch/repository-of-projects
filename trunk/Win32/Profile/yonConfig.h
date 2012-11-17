@@ -57,7 +57,7 @@
 #endif
 
 //Profile设置
-//#define YON_USE_PROFILE
+#define YON_USE_PROFILE
 
 //路径使用宽字节
 //#define YON_WCHAR_FILESYSTEM
