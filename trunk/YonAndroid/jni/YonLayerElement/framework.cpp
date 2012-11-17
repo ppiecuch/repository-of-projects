@@ -141,35 +141,33 @@ void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
 #define BATCH
-void beginDriver(){}
-void endDriver(){}
-void renderScene(){}
-void renderGraphics(){}
 void drawFrame(){
 
 	PROFILE_REGISTER_FRAME();
-	PROFILE_START_CALL(beginDriver);
+	//PROFILE_START_CALL(PROFILE_ID_1,Body);
+	PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
 	videoDriver->begin(true,true,COLOR_DEFAULT);
-	PROFILE_END_CALL(beginDriver);
+	PROFILE_END_CALL(PROFILE_ID_1);
 
-	PROFILE_START_CALL(renderScene);
+	PROFILE_START_CALL(PROFILE_ID_2,sceneMgr->render);
 	sceneMgr->render(videoDriver);
-	PROFILE_END_CALL(renderScene);
+	PROFILE_END_CALL(PROFILE_ID_2);
 
-	//PROFILE_START_CALL(renderGraphics);
+	PROFILE_START_CALL(PROFILE_ID_3,gfAdapter->renderLayer);
 	gfAdapter->renderLayer(LAYER_ID2);
-	//PROFILE_END_CALL(renderGraphics);
+	PROFILE_END_CALL(PROFILE_ID_3);
 	
 	static u32 start,end,diff;
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,DCL:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall(),diff),core::position2di(0,10),COLOR_GREEN);
 
-	PROFILE_START_CALL(endDriver);
+	PROFILE_START_CALL(PROFILE_ID_4,Driver->end);
 	videoDriver->end();
-	PROFILE_END_CALL(endDriver);
+	PROFILE_END_CALL(PROFILE_ID_4);
 
 	end=timer->getRealTime();
 	diff=end-start;
 	start=timer->getRealTime();
+	//PROFILE_END_CALL(PROFILE_ID_1);
 }
 void destroy(){
 	PROFILE_REPORT();
