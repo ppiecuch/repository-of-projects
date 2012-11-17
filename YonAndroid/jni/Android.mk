@@ -2,7 +2,8 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS := -DANDROID_NDK \
+LOCAL_CFLAGS := -D_DEBUG \
+				-DANDROID_NDK \
                 -DDISABLE_IMPORTGL \
                 -O3 \
                 -DAL_BUILD_LIBRARY \
@@ -122,6 +123,7 @@ yon_SOURCES :=   \
 		COALAudioDriver.cpp \
 		CDebugPrinter.cpp \
 		CLogger.cpp \
+		CProfile.cpp \
 		CFileSystem.cpp \
 		CReadFileStream.cpp \
 		CWriteFileStream.cpp \
