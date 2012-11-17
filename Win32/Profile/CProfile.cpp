@@ -22,8 +22,12 @@ namespace debug{
 	void CProfile::reset(){
 		m_bNeedUpdate=true;
 		m_bCalling=false;
-		m_uStartTime=0;
-		m_uEndTime=0;
+		m_between.StartCycle=0;
+		m_between.EndCycle=0;
+		m_between.StartTime.time=0;
+		m_between.StartTime.millitm=0;
+		m_between.EndTime.time=0;
+		m_between.EndTime.millitm=0;
 		m_uAllCallConsume=0;
 		m_report.FrameCount=0;
 		m_report.TimeDiff=0;
@@ -45,24 +49,33 @@ namespace debug{
 	void CProfile::update(){
 		if(m_bNeedUpdate)
 		{
-			m_report.TimeDiff=m_uEndTime-m_uStartTime;
+			u64 cyclediff=getCycleDiff();
+			m_report.TimeDiff=getTimeDiff();
+			u64 CPUFreq=cyclediff*1000/m_report.TimeDiff;
 			APIMap& apiMap=m_report.ApiInfos;
 			APIMap::Iterator it=apiMap.getIterator();
 			for(;!it.atEnd();++it)
 			{
 				SProfileReport::SAPIReport* report=it->getValue();
 				report->CallCountAvg=(f32)report->CallCount/(f32)m_report.FrameCount;
-				report->TimeConsumeAvg=report->TimeConsume/report->CallCount;
 				report->TimeConsumePct=(f32)((f64)report->TimeConsume*100.f/(f64)m_uAllCallConsume);
+				report->TimeConsume=report->TimeConsume*1000/CPUFreq;
+				report->TimeConsumeMin=report->TimeConsumeMin*1000/CPUFreq;
+				report->TimeConsumeMax=report->TimeConsumeMax*1000/CPUFreq;
+				report->TimeConsumeAvg=report->TimeConsume/report->CallCount;
 			}
 		}
 		m_bNeedUpdate=false;
 	}
 
 	void CProfile::registerFrame(){
-		if(m_uStartTime==0)
-			m_uStartTime=getNanoSecond();
-		m_uEndTime=getNanoSecond();
+		if(m_between.StartCycle==0)
+		{
+			m_between.StartCycle=getNanoSecond();
+			updateTime(m_between.StartTime);
+		}
+		m_between.EndCycle=getNanoSecond();
+		updateTime(m_between.EndTime);
 		++m_report.FrameCount;
 		m_bNeedUpdate=true;
 	}
@@ -79,16 +92,16 @@ namespace debug{
 		if(report->TimeConsumeMax<diff)
 			report->TimeConsumeMax=diff;
 	}
-	void CProfile::startCall(void* fun,const char* name){
+	void CProfile::startCall(u32 id,const char* name){
 		YON_DEBUG_BREAK_IF(m_bCalling);
 		APIMap& apiMap=m_report.ApiInfos;
-		APIMap::Node* node=apiMap.find(fun);
+		APIMap::Node* node=apiMap.find(id);
 		if(node==NULL)
 		{
 			SProfileReport::SAPIReport* report=new SProfileReport::SAPIReport();
 			reset(report);
 			report->Name=name;
-			apiMap[fun]=report;
+			apiMap[id]=report;
 			updateCallStart(report);
 		}
 		else
@@ -99,10 +112,10 @@ namespace debug{
 		m_bNeedUpdate=true;
 		m_bCalling=true;
 	}
-	void CProfile::endCall(void* fun){
+	void CProfile::endCall(u32 id){
 		YON_DEBUG_BREAK_IF(!m_bCalling);
 		APIMap& apiMap=m_report.ApiInfos;
-		APIMap::Node* node=apiMap.find(fun);
+		APIMap::Node* node=apiMap.find(id);
 		YON_DEBUG_BREAK_IF(node==NULL);
 		SProfileReport::SAPIReport* report=node->getValue();
 		updateCallEnd(report);

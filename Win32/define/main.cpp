@@ -20,12 +20,16 @@ void test(int a)
 	printf("test %d\n",a);
 }
 
+#define _TEST(a) printf("%d\n",a)
+#define _TEST(a,b) printf("%d,%d\n",a,b)
+
 int a;
 int b;
 
 int main(int argc,char ** argv)
 {
 
+	_TEST(1);
 	_EXECUTE_AS_NEEDED_(test,a,1);
 	_EXECUTE_AS_NEEDED_(test,a,1);
 	printf("-------------\r\n");
