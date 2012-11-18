@@ -84,6 +84,8 @@
 
 //材质（目前只支持一层）
 #define YON_MATERIAL_MAX_TEXTURES 2
+//只用于2D游戏
+#define YON_ONLY_2D_GAME
 
 //触控
 #define YON_TOUCH_MAX_INPUTS 8
