@@ -1,0 +1,320 @@
+小编注: 本文全面讲述C++成员函数指针与高性能的C++委托是学习C++成员函数指针和C++函数指针不可多得的好资料
+ 
+委托（delegate）
+
+
+和成员函数指针不同，你不难发现委托的用处。最重要的，使用委托可以很容易地实现一个Subject/Observer设计模式的改进版[GoF, p. 293]。Observer（观察者）模式显然在GUI中有很多的应用，但我发现它对应用程序核心的设计也有很大的作用。委托也可用来实现策略（Strategy）[GoF, p. 315]和状态（State）[GoF, p. 305]模式。
+
+
+现在，我来说明一个事实，委托和成员函数指针相比并不仅仅是好用，而且比成员函数指针简单得多！既然所有的.NET语言都实现了委托，你可能会猜想如此高层的概念在汇编代码中并不好实现。但事实并不是这样：委托的实现确实是一个底层的概念，而且就像普通的函数调用一样简单（并且很高效）。一个C++委托只需要包含一个this指针和一个简单的函数指针就够了。当你建立一个委托时，你提供这个委托一个this指针，并向它指明需要调用哪一个函数。编译器可以在建立委托时计算出调整this指针需要的偏移量。这样在使用委托的时候，编译器就什么事情都不用做了。这一点更好的是，编译器可以在编译时就可以完成全部这些工作，这样的话，委托的处理对编译器来说可以说是微不足道的工作了。在x86系统下将委托处理成的汇编代码就应该是这么简单：
+
+
+mov ecx, [this]
+
+call [pfunc]
+
+
+但是，在标准C++中却不能生成如此高效的代码。 Borland为了解决委托的问题在它的C++编译器中加入了一个新的关键字（__closure）,用来通过简洁的语法生成优化的代码。GNU编译器也对语言进行了扩展，但和Borland的编译器不兼容。如果你使用了这两种语言扩展中的一种，你就会限制自己只使用一个厂家的编译器。而如果你仍然遵循标准C++的规则，你仍然可以实现委托，但实现的委托就不会是那么高效了。
+
+
+有趣的是，在C#和其他.NET语言中，执行一个委托的时间要比一个函数调用慢8倍（参见http://msdn.microsoft.com/library/en-us/dndotnet/html/fastmanagedcode.asp）。我猜测这可能是垃圾收集和.NET安全检查的需要。最近，微软将"统一事件模型（unified event model）"加入到Visual C++中，随着这个模型的加入，增加了__event、 __raise、__hook、__unhook、event_source和event_receiver等一些关键字。坦白地说，我对加入的这些特性很反感，因为这是完全不符合标准的，这些语法是丑陋的，因为它们使这种C++不像C++，并且会生成一堆执行效率极低的代码。
+
+
+解决这个问题的推动力：对高效委托（fast delegate）的迫切需求
+
+
+使用标准C++实现委托有一个过度臃肿的症状。大多数的实现方法使用的是同一种思路。这些方法的基本观点是将成员函数指针看成委托&#0;&#0;但这样的指针只能被一个单独的类使用。为了避免这种局限，你需要间接地使用另一种思路：你可以使用模版为每一个类建立一个"成员函数调用器（member function invoker）"。委托包含了this指针和一个指向调用器（invoker）的指针，并且需要在堆上为成员函数调用器分配空间。
+
+
+对于这种方案已经有很多种实现，包括在CodeProject上的实现方案。各种实现在复杂性上、语法（比如，有的和C#的语法很接近）上、一般性上有所不同。最具权威的一个实现是boost::function。最近，它已经被采用作为下一个发布的C++标准版本中的一部分[Sutter1]。希望它能够被广泛地使用。
+
+
+就像传统的委托实现方法一样，我同样发觉这种方法并不十分另人满意。虽然它提供了大家所期望的功能，但是会混淆一个潜在的问题：人们缺乏对一个语言的底层的构造。 "成员函数调用器"的代码对几乎所有的类都是一样的，在所有平台上都出现这种情况是令人沮丧的。毕竟，堆被用上了。但在一些应用场合下，这种新的方法仍然无法被接受。
+
+
+我做的一个项目是离散事件模拟器，它的核心是一个事件调度程序，用来调用被模拟的对象的成员函数。大多数成员函数非常简单：它们只改变对象的内部状态，有时在事件队列（event queue）中添加将来要发生的事件，在这种情况下最适合使用委托。但是，每一个委托只被调用（invoked）一次。一开始，我使用了boost::function，但我发现程序运行时，给委托所分配的内存空间占用了整个程序空间的三分之一还要多！"我要真正的委托！"我在内心呼喊着，"真正的委托只需要仅仅两行汇编指令啊！"
+
+
+我并不能总是能够得到我想要的，但后来我很幸运。我在这儿展示的代码（代码下载链接见译者注）几乎在所有编译环境中都产生了优化的汇编代码。最重要的是，调用一个含有单个目标的委托（single-target delegate）的速度几乎同调用一个普通函数一样快。实现这样的代码并没有用到什么高深的东西，唯一的遗憾就是，为了实现目标，我的代码和标准C++的规则有些偏离。我使用了一些有关成员函数指针的未公开知识才使它能够这样工作。如果你很细心，而且不在意在少数情况下的一些编译器相关（compiler-specific）的代码，那么高性能的委托机制在任何C++编译器下都是可行的。
+
+
+诀窍：将任何类型的成员函数指针转化为一个标准的形式
+
+
+我的代码的核心是一个能够将任何类的指针和任何成员函数指针分别转换为一个通用类的指针和一个通用成员函数的指针的类。由于C++没有"通用成员函数（generic member function）"的类型，所以我把所有类型的成员函数都转化为一个在代码中未定义的CGenericClass类的成员函数。
+
+
+大多数编译器对所有的成员函数指针平等地对待，不管他们属于哪个类。所以对这些编译器来说，可以使用reinterpret_cast将一个特定的成员函数指针转化为一个通用成员函数指针。事实上，假如编译器不可以，那么这个编译器是不符合标准的。对于一些接近标准（almost-compliant）的编译器，比如Digital Mars，成员函数指针的reinterpret_cast转换一般会涉及到一些额外的特殊代码，当进行转化的成员函数的类之间没有任何关联时，编译器会出错。对这些编译器，我们使用一个名为horrible_cast的内联函数（在函数中使用了一个union来避免C++的类型检查）。使用这种方法看来是不可避免的&#0;&#0;boost::function也用到了这种方法。
+
+
+对于其他的一些编译器（如Visual C++, Intel C++和Borland C++），我们必须将多重（multiple-）继承和虚拟（virtual-）继承类的成员函数指针转化为单一（single-）继承类的函数指针。为了实现这个目的，我巧妙地使用了模板并利用了一个奇妙的戏法。注意，这个戏法的使用是因为这些编译器并不是完全符合标准的，但是使用这个戏法得到了回报：它使这些编译器产生了优化的代码。
+
+
+既然我们知道编译器是怎样在内部存储成员函数指针的，并且我们知道在问题中应该怎样为成员函数指针调整this指针，我们的代码在设置委托时可以自己调整this指针。对单一继承类的函数指针，则不需要进行调整；对多重继承，则只需要一次加法就可完成调整；对虚拟继承...就有些麻烦了。但是这样做是管用的，并且在大多数情况下，所有的工作都在编译时完成！
+
+
+这是最后一个诀窍。我们怎样区分不同的继承类型？并没有官方的方法来让我们区分一个类是多重继承的还是其他类型的继承。但是有一种巧妙的方法，你可以查看我在前面给出了一个列表（见中篇）——对MSVC，每种继承方式产生的成员函数指针的大小是不同的。所以，我们可以基于成员函数指针的大小使用模版！比如对多重继承类型来说，这只是个简单的计算。而在确定unknown_inheritance（16字节）类型的时候，也会采用类似的计算方法。
+
+
+对于微软和英特尔的编译器中采用不标准12字节的虚拟继承类型的指针的情况，我引发了一个编译时错误（compile-time error），因为需要一个特定的运行环境（workaround）。如果你在MSVC中使用虚拟继承，要在声明类之前使用FASTDELEGATEDECLARE宏。而这个类必须使用unknown_inheritance（未知继承类型）指针（这相当于一个假定的__unknown_inheritance关键字）。例如：
+
+
+FASTDELEGATEDECLARE(CDerivedClass)
+
+class CDerivedClass : virtual public CBaseClass1, virtual public CBaseClass2 {
+
+// : (etc)
+
+};
+
+
+这个宏和一些常数的声明是在一个隐藏的命名空间中实现的，这样在其他编译器中使用时也是安全的。MSVC（7.0或更新版本）的另一种方法是在工程中使用/vmg编译器选项。而Inter的编译器对/vmg编译器选项不起作用，所以你必须在虚拟继承类中使用宏。我的这个代码是因为编译器的bug才可以正确运行，你可以查看代码来了解更多细节。而在遵从标准的编译器中不需要注意这么多，况且在任何情况下都不会妨碍FASTDELEGATEDECLARE宏的使用。
+
+
+一旦你将类的对象指针和成员函数指针转化为标准形式，实现单一目标的委托（single-target delegate）就比较容易了（虽然做起来感觉冗长乏味）。你只要为每一种具有不同参数的函数制作相应的模板类就行了。实现其他类型的委托的代码也大都与此相似，只是对参数稍做修改罢了。
+
+
+这种用非标准方式转换实现的委托还有一个好处，就是委托对象之间可以用等式比较。目前实现的大多数委托无法做到这一点，这使这些委托不能胜任一些特定的任务，比如实现多播委托（multi-cast delegates） [Sutter3]。
+
+
+静态函数作为委托目标（delegate target）
+
+
+理论上，一个简单的非成员函数（non-member function），或者一个静态成员函数（static member function）可以被作为委托目标（delegate target）。这可以通过将静态函数转换为一个成员函数来实现。我有两种方法实现这一点，两种方法都是通过使委托指向调用这个静态函数的"调用器（invoker）"的成员函数的方法来实现的。
+
+
+第一种方法使用了一个邪恶的方法（evil method）。你可以存储函数指针而不是this指针，这样当调用"调用器"的函数时，它将this指针转化为一个静态函数指针，并调用这个静态函数。问题是这只是一个戏法，它需要在代码指针和数据指针之间进行转换。在一个系统中代码指针的大小比数据指针大时（比如DOS下的编译器使用medium内存模式时），这个方法就不管用了。它在目前我知道的所有32位和64位处理器上是管用的。但是因为这种方法还是不太好，所以仍需要改进。
+
+
+另一种是一个比较安全的方法（safe method），它是将函数指针作为委托的一个附加成员。委托指向自己的成员函数。当委托被复制的时候，这些自引用（self-reference）必须被转换，而且使"="和"=="运算符的操作变得复杂。这使委托的大小增至4个字节，并增加了代码的复杂性，但这并不影响委托的调用速度。
+
+
+我已经实现了上述两种方法，两者都有各自的优点：安全的方法保证了运行的可靠性，而邪恶的方法在支持委托的编译器下也可能会产生与此相同的汇编代码。此外，安全的方法可避免我以前讨论的在MSVC中使用多重继承和虚拟继承时所出现的问题。我在代码中给出的是"安全的方法"的代码，但是在我给出的代码中"邪恶的方法"会通过下面的代码生效：
+
+#define (FASTDELEGATE_USESTATICFUNCTIONHACK)
+
+
+多目标委托（multiple-target delegate）及其扩展
+
+
+使用委托的人可能会想使委托调用多个目标函数，这就是多目标委托（multiple-target delegate），也称作多播委托（multi-cast delegate）。实现这种委托不会降低单一目标委托（single-target delegate）的调用效率，这在现实中是可行的。你只需要为一个委托的第二个目标和后来的更多目标在堆上分配空间就可以了，这意味着需要在委托类中添加一个数据指针，用来指向由该委托的目标函数组成的单链表的头部节点。如果委托只有一个目标函数，将这个目标像以前介绍的方法一样保存在委托中就行了。如果一个委托有多个目标函数，那么这些目标都保存在空间动态分配的链表中，如果要调用函数，委托使用一个指针指向一个链表中的目标（成员函数指针）。这样的话，如果委托中只有一个目标，函数调用存储单元的个数为1；如果有n（n>0）个目标，则函数调用存储单元的个数为n+1（因为这时函数指针保存在链表中，会多出一个链表头，所以要再加一——译者注），我认为这样做最合理。
+
+
+由多播委托引出了一些问题。怎样处理返回值？（是将所有返回值类型捆绑在一起，还是忽略一部分？）如果把同一个目标在一个委托中添加了两次那会发生什么？（是调用同一个目标两次，还是只调用一次，还是作为一个错误处理？）如果你想在委托中删除一个不在其中的目标应该怎么办？（是不管它，还是抛出一个异常？）
+
+
+最重要的问题是在使用委托时会出现无限循环的情况，比如，A委托调用一段代码，而在这段代码中调用B委托，而在B委托调用的一段代码中又会调用A委托。很多事件（event）和信号跟踪（signal-slot）系统会有一定的方案来处理这种问题。
+
+
+为了结束我的这篇文章，我的多播委托的实现方案就需要大家等待了。这可以借鉴其他实现中的方法——允许非空返回类型，允许类型的隐式转换，并使用更简捷的语法结构。如果我有足够的兴趣我会把代码写出来。如果能把我实现的委托和目前流行的某一个事件处理系统结合起来那会是最好不过的事情了（有自愿者吗？）。
+
+
+本文代码的使用
+
+
+原代码包括了FastDelegate的实现（FastDelegate.h）和一个demo .cpp的文件用来展示使用FastDelegate的语法。对于使用MSVC的读者，你可以建立一个空的控制台应用程序(Console Application)的工程，再把这两个文件添加进去就好了，对于GNU的使用者，在命令行输入"gcc demo.cpp"就可以了。
+
+
+FastDelegate可以在任何参数组合下运行，我建议你在尽可能多的编译器下尝试，你在声明委托的时候必须指明参数的个数。在这个程序中最多可以使用8个参数，若想进行扩充也是很容易的。代码使用了fastdelegate命名空间，在fastdelegate命名空间中有一个名为detail的内部命名空间。
+
+
+Fastdelegate使用构造函数或bind()可以绑定一个成员函数或一个静态（全局）函数，在默认情况下，绑定的值为0（空函数）。可以使用"！"操作符判定它是一个空值。
+
+
+不像用其他方法实现的委托，这个委托支持等式运算符（==, !=）。
+
+
+下面是FastDelegateDemo.cpp的节选，它展示了大多数允许的操作。CBaseClass是CDerivedClass的虚基类。你可以根据这个代码写出更精彩的代码，下面的代码只是说明使用FastDelegate的语法：
+
+
+using namespace fastdelegate;
+
+
+int main(void)
+
+{
+
+printf("-- FastDelegate demo --\nA no-parameter 
+
+delegate is declared using FastDelegate0\n\n");
+
+FastDelegate0 noparameterdelegate(&SimpleVoidFunction);
+
+
+noparameterdelegate(); 
+
+//调用委托，这一句调用SimpleVoidFunction()
+
+
+printf("\n-- Examples using two-parameter delegates (int, char *) --\n\n");
+
+
+typedef FastDelegate2 MyDelegate;
+
+
+MyDelegate funclist[12]; // 委托初始化，其目标为空
+
+CBaseClass a("Base A");
+
+CBaseClass b("Base B");
+
+CDerivedClass d;
+
+CDerivedClass c;
+
+
+// 绑定一个成员函数
+
+funclist[0].bind(&a, &CBaseClass::SimpleMemberFunction);
+
+//你也可以绑定一个静态（全局）函数
+
+funclist[1].bind(&SimpleStaticFunction);
+
+//绑定静态成员函数
+
+funclist[2].bind(&CBaseClass::StaticMemberFunction);
+
+// 绑定const型的成员函数
+
+funclist[3].bind(&a, &CBaseClass::ConstMemberFunction);
+
+// 绑定虚拟成员函数
+
+funclist[4].bind(&b, &CBaseClass::SimpleVirtualFunction);
+
+
+// 你可以使用"="来赋值
+
+funclist[5] = MyDelegate(&CBaseClass::StaticMemberFunction);
+
+
+funclist[6].bind(&d, &CBaseClass::SimpleVirtualFunction);
+
+
+//最麻烦的情况是绑定一个抽象虚拟函数（abstract virtual function）
+
+funclist[7].bind(&c, &CDerivedClass::SimpleDerivedFunction);
+
+funclist[8].bind(&c, &COtherClass::TrickyVirtualFunction);
+
+
+funclist[9] = MakeDelegate(&c, &CDerivedClass::SimpleDerivedFunction);
+
+
+// 你也可以使用构造函数来绑定
+
+MyDelegate dg(&b, &CBaseClass::SimpleVirtualFunction);
+
+
+char *msg = "Looking for equal delegate";
+
+for (int i=0; i<12; i++) {
+
+printf("%d :", i);
+
+// 可以使用"=="
+
+if (funclist[i]==dg) { msg = "Found equal delegate"; };
+
+//可以使用"!"来判应一个空委托
+
+if (!funclist[i]) {
+
+printf("Delegate is empty\n");
+
+} else {
+
+// 调用生成的经过优化的汇编代码
+
+funclist[i](i, msg);
+
+};
+
+}
+
+};
+
+
+因为我的代码利用了C++标准中没有定义的行为，所以我很小心地在很多编译器中做了测试。具有讽刺意味的是，它比许多所谓标准的代码更具有可移植性，因为几乎所有的编译器都不是完全符合标准的。目前，核心代码已成功通过了下列编译器的测试：
+
+
+
+Microsoft Visual C++ 6.0, 7.0 (.NET) and 7.1 (.NET 2003) (including /clr 'managed C++'), 
+
+
+GNU G++ 3.2 (MingW binaries), 
+
+
+Borland C++ Builder 5.5.1, 
+
+
+Digital Mars C++ 8.38 (x86, both 32-bit and 16-bit), 
+
+
+Intel C++ for Windows 8.0, 
+
+
+Metroworks CodeWarrior for Windows 9.1 (in both C++ and EC++ modes) 
+
+
+对于Comeau C++ 4.3 (x86, SPARC, Alpha, Macintosh)，能够成功通过编译，但不能链接和运行。对于Intel C++ 8.0 for Itanium能够成功通过编译和链接，但不能运行。
+
+
+此外，我已对代码在MSVC 1.5 和4.0，Open Watcom WCL 1.2上的运行情况进行了测试，由于这些编译器不支持成员函数模版，所以对这些编译器，代码不能编译成功。对于嵌入式系统不支持模版的限制，需要对代码进行大范围的修改。（这一段是在刚刚更新的原文中添加的——译者注）
+
+
+而最终的FastDelegate并没有进行全面地测试，一个原因是，我有一些使用的编译器的评估版过期了，另一个原因是——我的女儿出生了！如果有足够的兴趣，我会让代码在更多编译器中通过测试。(这一段在刚刚更新的原文中被删去了，因为作者目前几乎完成了全部测试。——译者注)
+
+
+总结
+
+
+为了解释一小段代码，我就得为这个语言中具有争议的一部分写这么一篇长长的指南。为了两行汇编代码，就要做如此麻烦的工作。唉~！
+
+
+我希望我已经澄清了有关成员函数指针和委托的误解。我们可以看到为了实现成员函数指针，各种编译器有着千差万别的方法。我们还可以看到，与流行的观点不同，委托并不复杂，并不是高层结构，事实上它很简单。我希望它能够成为这个语言（标准C++）中的一部分，而且我们有理由相信目前已被一些编译器支持的委托，在不久的将来会加入到标准C++的新的版本中（去游说标准委员会！）。
+
+
+据我所知，以前实现的委托都没有像我在这里为大家展示的FastDelegate一样有如此高的性能。我希望我的代码能对你有帮助。如果我有足够的兴趣，我会对代码进行扩展，从而支持多播委托（multi-cast delegate）以及更多类型的委托。我在CodeProject上学到了很多，并且这是我第一次为之做出的贡献。
+
+
+参考文献
+
+
+[GoF] "Design Patterns: Elements of Reusable Object-Oriented Software", E. Gamma, R. Helm, R. Johnson, and J. Vlissides. 
+
+I've looked at dozens of websites while researching this article. Here are a few of the most interesting ones:
+
+我在写这篇文章时查看了很多站点，下面只是最有趣的一些站点：
+
+
+[Boost] Delegates can be implemented with a combination of boost::function and boost::bind. Boost::signals is one of the most sophisticated event/messaging system available. Most of the boost libraries require a highly standards-conforming compiler. （http://www.boost.org/）
+
+[Loki] Loki provides 'functors' which are delegates with bindable parameters. They are very similar to boost::function. It's likely that Loki will eventually merge with boost. （http://sourceforge.net/projects/loki-lib）
+
+[Qt] The Qt library includes a Signal/Slot mechanism (i.e., delegates). For this to work, you have to run a special preprocessor on your code before compiling. Performance is very poor, but it works on compilers with very poor template support. （http://doc.trolltech.com/3.0/signalsandslots.html）
+
+[Libsigc++] An event system based on Qt's. It avoids the Qt's special preprocessor, but requires that every target be derived from a base object class (using virtual inheritance - yuck!). （http://libsigc.sourceforge.net/）
+
+[Hickey]. An old (1994) delegate implementation that avoids memory allocations. Assumes that all pointer-to-member functions are the same size, so it doesn't work on MSVC. There's a helpful discussion of the code here. （http://www.tutok.sk/fastgl/callback.html）
+
+[Haendal]. A website dedicated to function pointers?! Not much detail about member function pointers though. （http://www.function-pointer.org/）
+
+[Sutter1] Generalized function pointers: a discussion of how boost::function has been accepted into the new C++ standard. （http://www.cuj.com/documents/s=8464/cujcexp0308sutter/）
+
+[Sutter2] Generalizing the Observer pattern (essentially, multicast delegates) using std::tr1::function. Discusses the limitations of the failure of boost::function to provide operator ==. 
+
+（http://www.cuj.com/documents/s=8840/cujexp0309sutter）
+
+[Sutter3] Herb Sutter's Guru of the Week article on generic callbacks. （http://www.gotw.ca/gotw/083.htm）
+
+
+关于作者Don Clugston
+
+我在澳大利亚的high-tech startup工作，是一个物理学家兼软件工程师。目前从事将太阳航空舱的硅质晶体玻璃（CSG）薄膜向市场推广的工作。我从事有关太阳的（solar）研究，平时喜欢做一些软件（用作数学模型、设备控制、离散事件触发器和图象处理等），我最近喜欢使用STL和WTL写代码。我非常怀念过去的光荣岁月：）而最重要的，我有一个非常可爱的儿子（2002年5月出生）和一个非常年轻的小姐（2004年5月出生）。
+
+"黑暗不会战胜阳光，阳光终究会照亮黑暗。"
+
+
+http://www.yitsoft.com/chap_study/ch_00022/ch_00022.asp
