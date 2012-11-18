@@ -145,14 +145,16 @@ namespace video{
 		//bool CullFace:1;
 		//bool DepthTest:1;
 		bool Dither:1;
+		bool LineSmooth:1;
+#ifndef YON_ONLY_2D_GAME
 		bool Fog:1;
 		bool Lighting:1;
-		bool LineSmooth:1;
 		bool Normalize:1;
+		bool GouraudShading:1;
+		bool StencilTest:1;
+#endif
 		//bool RescaleNormal:1;
 		bool ScissorTest:1;
-		bool StencilTest:1;
-		bool GouraudShading:1;
 
 		ENUM_MATERIAL_TYPE MaterialType;
 		//ENUM_CMP_FUNC ZBuffer;
@@ -174,14 +176,16 @@ namespace video{
 			//CullFace(true),
 			//DepthTest(false),
 			Dither(true),
+			LineSmooth(false),
+#ifndef YON_ONLY_2D_GAME
 			Fog(false),
 			Lighting(false),
-			LineSmooth(false),
 			Normalize(false),
-			//RescaleNormal(false),
-			ScissorTest(false),
+			GouraudShading(true),
 			StencilTest(false),
-			GouraudShading(true){
+#endif
+			//RescaleNormal(false),
+			ScissorTest(false){
 		}
 
 		SMaterial(ENUM_MATERIAL_TYPE materialType)
@@ -193,14 +197,17 @@ namespace video{
 			//CullFace(true),
 			//DepthTest(false),
 			Dither(true),
+			LineSmooth(false),
+#ifndef YON_ONLY_2D_GAME
 			Fog(false),
 			Lighting(false),
-			LineSmooth(false),
 			Normalize(false),
-			//RescaleNormal(false),
-			ScissorTest(false),
+			GouraudShading(true),
 			StencilTest(false),
-			GouraudShading(true){
+#endif
+			//RescaleNormal(false),
+			ScissorTest(false)
+			{
 		}
 
 		SMaterial(const SMaterial& other)
@@ -271,14 +278,16 @@ namespace video{
 				AlphaSource != b.AlphaSource ||
 				ColorMaterial != b.ColorMaterial ||
 				Dither != b.Dither ||
+				LineSmooth != b.LineSmooth ||
+#ifndef YON_ONLY_2D_GAME
 				Fog != b.Fog ||
 				Lighting != b.Lighting ||
-				LineSmooth != b.LineSmooth ||
 				Normalize != b.Normalize ||
-				ScissorTest != b.ScissorTest ||
+				GouraudShading != b.GouraudShading ||
 				StencilTest != b.StencilTest ||
-				ColorMask != b.ColorMask ||
-				GouraudShading != b.GouraudShading;
+#endif
+				ScissorTest != b.ScissorTest ||
+				ColorMask != b.ColorMask ;
 			for (u32 i=0; (i<MATERIAL_MAX_TEXTURES) && !different; ++i)
 			{
 				different |= (TextureLayers[i] != b.TextureLayers[i]);
@@ -309,14 +318,16 @@ namespace video{
 			}
 			ColorMaterial = other.ColorMaterial;
 			Dither = other.Dither;
+			LineSmooth = other.LineSmooth;
+#ifndef YON_ONLY_2D_GAME
 			Fog = other.Fog;
 			Lighting = other.Lighting;
-			LineSmooth = other.LineSmooth;
 			Normalize = other.Normalize;
-			ScissorTest = other.ScissorTest;
-			StencilTest = other.StencilTest;
-			ColorMask = other.ColorMask;
 			GouraudShading = other.GouraudShading;
+			StencilTest = other.StencilTest;
+#endif
+			ScissorTest = other.ScissorTest;
+			ColorMask = other.ColorMask;
 			return *this;
 		}
 	};
