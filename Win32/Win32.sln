@@ -123,6 +123,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPU", "CPU\CPU.vcproj", "{8
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Time", "Time\Time.vcproj", "{5DFA50AA-6D23-4F69-9FEB-E37AD614F37F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Destruct", "Destruct\Destruct.vcproj", "{44356DDB-625A-408E-B3B7-66BD13170573}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -361,6 +363,10 @@ Global
 		{5DFA50AA-6D23-4F69-9FEB-E37AD614F37F}.Debug|Win32.Build.0 = Debug|Win32
 		{5DFA50AA-6D23-4F69-9FEB-E37AD614F37F}.Release|Win32.ActiveCfg = Release|Win32
 		{5DFA50AA-6D23-4F69-9FEB-E37AD614F37F}.Release|Win32.Build.0 = Release|Win32
+		{44356DDB-625A-408E-B3B7-66BD13170573}.Debug|Win32.ActiveCfg = Debug|Win32
+		{44356DDB-625A-408E-B3B7-66BD13170573}.Debug|Win32.Build.0 = Debug|Win32
+		{44356DDB-625A-408E-B3B7-66BD13170573}.Release|Win32.ActiveCfg = Release|Win32
+		{44356DDB-625A-408E-B3B7-66BD13170573}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

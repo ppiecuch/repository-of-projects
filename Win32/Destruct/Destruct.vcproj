@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Allocator"
-	ProjectGUID="{53D5AB9D-7619-4953-AD69-44732E2257BA}"
-	RootNamespace="Allocator"
+	Name="Destruct"
+	ProjectGUID="{44356DDB-625A-408E-B3B7-66BD13170573}"
+	RootNamespace="Destruct"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -166,35 +166,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\heapsort.h"
-			>
-		</File>
-		<File
 			RelativePath=".\main.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\todo.txt"
-			>
-		</File>
-		<File
-			RelativePath=".\yonAllocator.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonArray.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonConfig.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonMath.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonTypes.h"
 			>
 		</File>
 	</Files>
