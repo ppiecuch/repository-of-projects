@@ -1,0 +1,1884 @@
+From: <ÓÉ Windows Internet Explorer 7 ±£´æ>
+Subject: Are we out of memory?
+Date: Mon, 19 Nov 2012 19:58:54 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CDC690.4DB3ED40"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.3664
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.swedishcoding.com/2008/08/31/are-we-out-of-memory/
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" =
+"http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML xmlns=3D"http://www.w3.org/1999/xhtml"><HEAD=20
+profile=3Dhttp://gmpg.org/xfn/11><TITLE>Are we out of memory?</TITLE>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3DUTF-8">
+<META content=3D"MSHTML 6.00.6000.16587" name=3DGENERATOR><!-- leave =
+this for stats --><LINK media=3Dscreen=20
+href=3D"http://www.swedishcoding.com/wp-content/themes/cutline-3-column-s=
+plit-11/style.css"=20
+type=3Dtext/css rel=3Dstylesheet><LINK media=3Dscreen=20
+href=3D"http://www.swedishcoding.com/wp-content/themes/cutline-3-column-s=
+plit-11/custom.css"=20
+type=3Dtext/css rel=3Dstylesheet><!--[if lte IE 7]><LINK media=3Dscreen=20
+href=3D"http://www.swedishcoding.com/wp-content/themes/cutline-3-column-s=
+plit-11/ie7.css"=20
+type=3Dtext/css rel=3Dstylesheet><![endif]--><!--[if lte IE 6]>
+	<link rel=3D"stylesheet" type=3D"text/css" =
+href=3D"http://www.swedishcoding.com/wp-content/themes/cutline-3-column-s=
+plit-11/ie6.css" media=3D"screen" />
+	<![endif]--><LINK title=3D"SwedishCoding.com RSS Feed"=20
+href=3D"http://www.swedishcoding.com/feed/" type=3Dapplication/rss+xml=20
+rel=3Dalternate><LINK href=3D"http://www.swedishcoding.com/xmlrpc.php"=20
+rel=3Dpingback><LINK =
+href=3D"http://www.swedishcoding.com/images/favicon.ico"=20
+type=3Dimage/x-icon rel=3D"SHORTCUT ICON">
+<META content=3Dnoindex,nofollow name=3Drobots><LINK=20
+title=3D"SwedishCoding.com =C2=BB Are we out of memory? Comments Feed"=20
+href=3D"http://www.swedishcoding.com/2008/08/31/are-we-out-of-memory/feed=
+/"=20
+type=3Dapplication/rss+xml rel=3Dalternate><LINK title=3DRSD=20
+href=3D"http://www.swedishcoding.com/xmlrpc.php?rsd" =
+type=3Dapplication/rsd+xml=20
+rel=3DEditURI><LINK=20
+href=3D"http://www.swedishcoding.com/wp-includes/wlwmanifest.xml"=20
+type=3Dapplication/wlwmanifest+xml rel=3Dwlwmanifest><LINK =
+title=3DSwedishCoding.com=20
+href=3D"http://www.swedishcoding.com" rel=3Dindex><LINK=20
+title=3D"The History of =E2=80=98TheSE=E2=80=99 =E2=80=93 The Super Nes =
+Emulator"=20
+href=3D"http://www.swedishcoding.com/2007/11/26/the-history-of-these-the-=
+super-nes-emulator/"=20
+rel=3Dstart><LINK=20
+title=3D"GDC Presentation =E2=80=93 Creating a Character in =
+Drake=E2=80=99s Fortune"=20
+href=3D"http://www.swedishcoding.com/2008/02/29/gdc-presentation-creating=
+-a-character-in-drakes-fortune/"=20
+rel=3Dprev><LINK title=3D"Book Review: Game Engine Architecture"=20
+href=3D"http://www.swedishcoding.com/2009/12/21/book-review-game-engine-a=
+rchitecture/"=20
+rel=3Dnext>
+<META content=3D"WordPress 2.9.2" name=3Dgenerator><LINK=20
+href=3D"http://www.swedishcoding.com/2008/08/31/are-we-out-of-memory/"=20
+rel=3Dcanonical></HEAD>
+<BODY class=3Dcustom>
+<DIV id=3Dcontainer>
+<DIV id=3Dheader_img><A href=3D"http://www.swedishcoding.com/"><IMG =
+height=3D90=20
+alt=3DSwedishCoding.com=20
+src=3D"http://www.swedishcoding.com/wp-content/themes/cutline-3-column-sp=
+lit-11/images/banner-thin.jpg"=20
+width=3D970> </A></DIV>
+<UL id=3Dnav>
+  <LI class=3Drss><A href=3D"http://www.swedishcoding.com/feed/">RSS</A> =
+</LI></UL>
+<DIV id=3Dcontent_box><!--		<div id=3D"l_sidebar">
+	<ul class=3D"sidebar_list">
+				<li class=3D"widget">
+			<h2>Admin</h2>
+			<ul>
+								<li><a href=3D"http://www.swedishcoding.com/wp-login.php">Log =
+in</a></li>
+				<li><a href=3D"http://www.wordpress.org/">WordPress</a></li>
+								<li><a =
+href=3D"http://validator.w3.org/check?uri=3Dreferer">XHTML</a></li>
+			</ul>
+		</li>
+			</ul>
+</div> -->
+<DIV class=3Dposts id=3Dcontent><!--		=0A=
+<div class=3D"navigation">=0A=
+	<span class=3D"previous">&larr; <a =
+href=3D"http://www.swedishcoding.com/2008/02/29/gdc-presentation-creating=
+-a-character-in-drakes-fortune/" rel=3D"prev">GDC Presentation &#8211; =
+Creating a Character in Drake&#8217;s Fortune</a></span>=0A=
+	<span class=3D"next"><a =
+href=3D"http://www.swedishcoding.com/2009/12/21/book-review-game-engine-a=
+rchitecture/" rel=3D"next">Book Review: Game Engine Architecture</a> =
+&rarr;</span>=0A=
+</div>=0A=
+<div class=3D"clear whitespace"></div>=0A=
+=0A=
+ -->
+<H2>Are we out of memory?</H2>
+<H4>August 31st, 2008 by Christian Gyrling =E2=80=94 <A=20
+title=3D"View all posts in Game Coding"=20
+href=3D"http://www.swedishcoding.com/category/game-coding/"=20
+rel=3D"category tag">Game Coding</A> =E2=80=94 <A title=3D"Comment on =
+Are we out of memory?"=20
+href=3D"http://www.swedishcoding.com/2008/08/31/are-we-out-of-memory/#com=
+ments">8=20
+Comments</A> </H4>
+<DIV class=3Dentry>
+<P>If I had a dollar every time I heard the question =E2=80=9CDo we not =
+have any more=20
+memory?=E2=80=9D<BR>When I ask the question =E2=80=9CHow much memory are =
+you using for subsystem=20
+X?=E2=80=9D, very few developers know the answer. It is usually a =
+smaller or bigger=20
+ballpark but no definite answer.<BR>Memory for any application is a =
+crucial=20
+resource. No matter what type of application you are creating you will =
+benefit=20
+from having good memory management. With some basic memory management in =
+place=20
+you can know your memory distribution between systems, finding memory =
+leaks much=20
+easier, simplify memory alignment requirements=E2=80=A6 These are just a =
+few of the=20
+areas where you will benefit greatly with good memory management.</P>
+<P><SPAN id=3Dmore-42></SPAN></P>
+<H2>Getting the chaos under control</H2>
+<P>The first thing you need to do, unless you have already done it, is =
+to=20
+override the global new and delete functions. Doing this gives you a =
+starting=20
+point for all your memory management. All calls to new and delete will =
+be=20
+handled by your custom functions. The very first step is to just =
+intercept the=20
+allocation request and carry it out like it normal.</P><PRE =
+style=3D"PADDING-LEFT: 30px"><STRONG>void* operator new(size_t size)
+{
+    return malloc(size, sizeof(char));
+}
+</STRONG><STRONG><STRONG>
+void delete (void* mem)
+{
+    free(mem);
+}
+</STRONG></STRONG>
+<STRONG><SPAN style=3D"COLOR: #339966">// Don=E2=80=99t forget the array =
+version of new/delete
+</SPAN>void* operator new[](size_t size)
+{
+    return malloc(size, sizeof(char));
+}
+
+void delete[](void* mem)
+{
+    free(mem);
+}</STRONG></PRE>
+<P>I=E2=80=99m not going to go into any detail about intercepting calls =
+to malloc or the=20
+like. All I will say is that you will do best in staying away from using =
+alloc,=20
+malloc, calloc, realloc and free (and all other permutations that I have =
+
+forgotten). In most cases it can be tricky to intercept those calls. I =
+would say=20
+that you should only use malloc once and that is to allocate all the =
+needed=20
+memory for your application=E2=80=A6 but more about that later.</P>
+<H2>Custom versions of new and delete</H2>
+<P>You will quickly find that when you get an allocation request in you =
+=E2=80=98new=E2=80=99=20
+handler it would be very handy to know who made that allocation. From =
+the code=20
+doing the allocation it would sometimes be very nice to be able to also =
+specify=20
+extra information such as the alignment needed for the memory block. =
+Aligned=20
+memory in particular is a pain to work with unless it is supported by =
+the memory=20
+allocator. If you have a class that has members that need to be 16-byte =
+aligned=20
+(SSE for example) it will be messy.</P><PRE style=3D"PADDING-LEFT: =
+30px"><STRONG><SPAN style=3D"COLOR: #339966">// Allocate memory with the =
+needed padding to ensure that you
+// can properly align it to the required boundary. Then you need
+// to placement construct the new object in that memory.
+</SPAN>char* pInstanceMem =3D new char[sizeof(MyClass) + 0x0F];
+char* pAlignedMem =3D pInstanceMem &amp; (~0x0F);
+MyClass* pMyClassInst =3D new (pAlignedMem) MyClass();
+
+<SPAN style=3D"COLOR: #339966">// The allocation of the object it not =
+terribly ugly but it is
+// a pain to work with=E2=80=A6 but not as much of a pain as it is to
+// delete the instance. The code below will crash or just leak.
+// The destructor will be properly called but the memory address
+// pointed to by pMyClassInst was never returned from a call
+// to =E2=80=98new=E2=80=99. The memory address actually returned by the =
+call
+// to 'new' used for this object is really unknown at this point.
+// What to do!?!?!?
+</SPAN>delete pMyClassInst
+</STRONG></PRE>
+<H4>Wouldn=E2=80=99t it be much nicer if you could allocate your MyClass =
+instance like=20
+this=E2=80=A6</H4><PRE style=3D"PADDING-LEFT: 30px"><STRONG><SPAN =
+style=3D"COLOR: #339966">// Just allocate with an extra argument to =
+=E2=80=98new=E2=80=99
+</SPAN>MyClass* pMyClassInst =3D new (Align(16)) MyClass();
+MyClass* pMyClassInst =3D new (Align(16)) MyClass();
+
+<SPAN style=3D"COLOR: #339966">// and deletion will be straight =
+forward=E2=80=A6 The pointer passed to
+// =E2=80=98delete=E2=80=99 is the same pointer returned from the call =
+to =E2=80=98new=E2=80=99.
+</SPAN>delete pMyClassInst.
+
+</STRONG></PRE>
+<H4>This is where overloaded versions of new and delete comes to the=20
+rescue.</H4><PRE style=3D"PADDING-LEFT: 30px"><STRONG><STRONG><SPAN =
+style=3D"COLOR: #339966">// We use a class to represent the alignment to =
+avoid any code
+// situations where 'new =
+(</SPAN></STRONG></STRONG><STRONG><STRONG><SPAN><STRONG><STRONG><SPAN =
+style=3D"COLOR: =
+#339966">0x12345678</SPAN></STRONG></STRONG></SPAN></STRONG></STRONG><STR=
+ONG><STRONG><SPAN style=3D"COLOR: #339966">) MyClass()' and
+// 'new ((void*)0x12345678) Myclass()' might cause a placement
+// construction instead of construction on an aligned memory
+// address.
+</SPAN></STRONG></STRONG><STRONG>class Align
+{
+public:
+    explicit Align(int value) : m_value(value)
+    {
+    }
+    int GetValue() const
+    {
+       return m_value;
+    }
+private:
+    int m_value;
+};
+
+<SPAN style=3D"COLOR: #339966">// Overridden 'normal' new/delete
+</SPAN>void* operator new (size_t size);
+void* operator new[] (size_t size);
+void operator delete( void* mem );
+void operator delete[]( void* mem );
+
+<SPAN style=3D"COLOR: #339966">// Aligned versions of new/delete
+</SPAN>void* operator new[] (size_t size, Align alignment);
+void* operator new (size_t size, Align alignment);
+void operator delete (void* mem, Align alignment);
+void operator delete[] (void* mem, Align alignment);
+
+</STRONG></PRE>
+<H2>Allocate all memory up front</H2>
+<P>Now when you have ways to allocate memory and pass arbitrary =
+parameters to=20
+the allocator you can start organizing your memory.<BR>If you need to =
+ship an=20
+application that can only use 256 MB of RAM I would suggest that you =
+allocate=20
+256 MB of system memory up front and call that =E2=80=98retail =
+memory=E2=80=99. Most of the time=20
+you need more memory during development of various systems and for this =
+I would=20
+allocate another clump of memory=E2=80=A6 and call this memory =
+=E2=80=98development memory=E2=80=99. You=20
+now have two huge buffers to use for your application and you should not =
+
+allocate any more system memory. When you receive a call to =
+=E2=80=98new=E2=80=99 you could=20
+check a variable whether to allocate the memory from the retail or the=20
+development memory pool.<BR>By clearly separating the two memory pools =
+you make=20
+sure that debug-only allocations end up in the debug pool and =
+allocations needed=20
+to ship the game are taken from the retail pool. This way it is very =
+clear from=20
+which pool you allocate memory and it is easy to keep track of the=20
+allocated/available memory. You could even use another custom overloaded =
+
+new/delete that pass in whether the allocation should be from retail or=20
+development memory.</P>
+<H2>Divide and specialize</H2>
+<P>Now when you have your chunks of memory it might be a good idea to =
+split it=20
+up based on the needs of your application. After all it=E2=80=99s =
+terribly impractical=20
+to have only one huge buffer for an application. I am very much against =
+dynamic=20
+allocations at run time of an application in general but some =
+allocations have=20
+to happen and what is the best way of handling it?</P>
+<P>A good way to organize the memory is to split the memory chunks into =
+smaller=20
+blocks managed by different allocators using various allocation =
+algorithms. This=20
+will not just help to be more efficient about the memory usage but will =
+also=20
+serve as a way to clearly assign the memory to the various systems.</P>
+<P>Not all allocations are the same. Here are a just few common =
+allocations that=20
+came to mind.</P>
+<H3>Persistent Allocations</H3>
+<P>Allocated once at startup/creation of a system (pools, ring buffers, =
+arrays).=20
+It will never be deleted and therefore we don=E2=80=99t need any =
+complicated algorithms=20
+to allocate persistent memory. Linear allocations work great it this =
+scenario.=20
+All it takes for an allocator like this is a pointer to the buffer, the =
+size of=20
+the buffer and the current offset into the buffer (allocated =
+space).</P><PRE style=3D"PADDING-LEFT: 30px"><STRONG><STRONG><SPAN =
+style=3D"COLOR: #339966">// Simple class to handle linear allocations
+</SPAN></STRONG></STRONG><STRONG>class LinearAllocator
+{
+public:
+    =
+</STRONG><STRONG><STRONG>LinearAllocator</STRONG></STRONG><STRONG>(char* =
+pBuffer, int bufferSize) :
+        m_pBuffer(pBuffer),
+        m_buffersize(bufferSize),
+        m_currentOffset(0)
+    {
+    }
+    void* Alloc(size_t size)
+    {
+       void* pMemToReturn =3D m_pBuffer + m_currentOffset;
+       </STRONG><STRONG><STRONG>pMemToReturn +=3D =
+size;</STRONG></STRONG><STRONG>
+       return pMemToReturn;
+    }
+    void Free(void* pMem)
+    {
+<SPAN style=3D"COLOR: #339966">       // We can't easily free memory in =
+this type of allocator.
+       // Therefore we just ignore this... or you could assert.
+</SPAN>    }
+private:
+    char* m_pBuffer;
+    int m_bufferSize;
+    int m_currentOffset;
+};</STRONG></PRE>
+<H3>Dynamic Allocations</H3>
+<P>This memory is allocated and freed at random points throughout the =
+lifetime=20
+of the application. Sometimes you just need memory to create an instance =
+of some=20
+object and you can=E2=80=99t predict when that will happen. This is when =
+you can use a=20
+dynamic memory allocator. This allocator will have some type of =
+algorithm to=20
+remember what memory blocks are free and which ones are allocated. It =
+will=20
+handle consolidation of neighboring free blocks. It will however suffer =
+from=20
+fragmentation which can greatly reduce the amount of memory available to =
+you.=20
+There are tons of dynamic allocation algorithms out there, all with =
+different=20
+characteristics; speed, overhead and more. Pick a simple one to start =
+with=E2=80=A6 you=20
+can always change later.</P>
+<H3>One-Frame Allocations</H3>
+<P>These allocations happen for example when one system creates data and =
+another=20
+consumes it later in that same frame. It could be variable sized arrays =
+used for=20
+rendering, animation or just debug text created by some system earlier =
+in the=20
+frame. This allocator handles this by resetting itself at the beginning =
+(or end)=20
+of every frame, hence freeing all memory automatically. By doing this we =
+also=20
+avoid fragmentation of the memory. The above LinearAllocator can be used =
+here as=20
+well with the addition of a simple =
+<STRONG>=E2=80=98Reset()=E2=80=99</STRONG> function.</P>
+<DL class=3D"wp-caption aligncenter" id=3Dattachment_56 style=3D"WIDTH: =
+310px">
+  <DT class=3Dwp-caption-dt><A=20
+  =
+href=3D"http://www.swedishcoding.com/wp-content/uploads/2008/08/memory-ma=
+p.jpg"><IMG=20
+  class=3D"size-medium wp-image-56" title=3Dmemory-map height=3D300 =
+alt=3D"Memory Map"=20
+  =
+src=3D"http://www.swedishcoding.com/wp-content/uploads/2008/08/memory-map=
+.jpg"=20
+  width=3D300></A> </DT></DL>
+<H2>Conclusion</H2>
+<P>Well=E2=80=A6 I hope this is useful for someone out there. This type =
+of information=20
+has helped me when I have worked on my personal or professional =
+projects.</P>
+<P>Another thing I did not talk much about is memory tracking. I guess =
+all I=20
+will say about that for now is=E2=80=A6 Do it! Spend the time to =
+implement something=20
+quick and easy to help you track down memory leaks and where in your =
+code are=20
+you using up all the memory. This is a large topic by itself and =
+therefore I=20
+will not write about it in this post. Make use of the overloading of the =
+
+new/delete operators to allow you to pass __FILE__ and __LINE__ for each =
+
+allocation. Use macros or other things to make the code prettier.</P>
+<P>Until next time=E2=80=A6</P>
+<P class=3DMsoNormal=20
+style=3D"PADDING-LEFT: 30px; MARGIN-BOTTOM: 0pt; LINE-HEIGHT: =
+normal"><SPAN=20
+style=3D"FONT-SIZE: 10pt"></SPAN></P>
+<P class=3DMsoNormal=20
+style=3D"PADDING-LEFT: 30px; MARGIN-BOTTOM: 0pt; LINE-HEIGHT: =
+normal"><SPAN=20
+style=3D"FONT-SIZE: 10pt"></SPAN></P>
+<P class=3DMsoNormal=20
+style=3D"PADDING-LEFT: 30px; MARGIN-BOTTOM: 0pt; LINE-HEIGHT: =
+normal"><SPAN=20
+style=3D"FONT-SIZE: 10pt"></SPAN></P>
+<P class=3DMsoNormal=20
+style=3D"PADDING-LEFT: 30px; MARGIN-BOTTOM: 0pt; LINE-HEIGHT: =
+normal"><SPAN=20
+style=3D"FONT-SIZE: 10pt"></SPAN></P>
+<P class=3DMsoNormal=20
+style=3D"PADDING-LEFT: 90px; MARGIN-BOTTOM: 0pt; LINE-HEIGHT: =
+normal"><SPAN=20
+style=3D"FONT-SIZE: 10pt"></SPAN></P><!--				 --></DIV><!-- 			<p =
+class=3D"tagged"><strong>Tags:</strong> <a =
+href=3D"http://www.swedishcoding.com/category/game-coding/" =
+title=3D"View all posts in Game Coding" rel=3D"category tag">Game =
+Coding</a></p> -->
+<DIV class=3Dclear></DIV><!-- You can start editing here. -->
+<DIV id=3Dcomments>
+<H3 class=3Dcomments_headers>8 responses</H3>
+<UL id=3Dcomment_list>
+  <LI class=3D"comment " id=3Dcomment-29>
+  <P class=3Dcomment_meta><!--				<span class=3D"comment_num"><a =
+href=3D"#comment-29" title=3D"Permalink to this comment">1</a></span> =
+--><STRONG><A=20
+  class=3Durl href=3D"http://www.powerof2games.com/" rel=3D"external =
+nofollow">Noel=20
+  Llopis</A> </STRONG><SPAN class=3Dcomment_time>// Sep 2, 2008 at 5:51 =
+am</SPAN>=20
+  </P>
+  <DIV class=3Dentry>
+  <P>Very nice article, Christian. It=E2=80=99s very much how I like to =
+deal with memory=20
+  these days as well. I=E2=80=99m getting ready to write about memory =
+allocation=20
+  patterns for my column and this will definitely come in =
+handy.</P></DIV></LI>
+  <LI class=3D"comment trackback" id=3Dcomment-30>
+  <P class=3Dcomment_meta><!--				<span class=3D"comment_num"><a =
+href=3D"#comment-30" title=3D"Permalink to this comment">2</a></span> =
+--><STRONG><A=20
+  class=3Durl =
+href=3D"http://realtimecollisiondetection.net/blog/?p=3D80"=20
+  rel=3D"external nofollow">realtimecollisiondetection.net - the blog =
+=C2=BB Posts and=20
+  links you should have read</A> </STRONG><SPAN class=3Dcomment_time>// =
+Sep 2,=20
+  2008 at 7:34 am</SPAN> </P>
+  <DIV class=3Dentry>
+  <P>[...] a PC game developer). Learn the how=E2=80=99s and =
+why=E2=80=99s by reading Christian=20
+  Gyrling=E2=80=99s Are we out of memory? and Jesus de Santos =
+Garcia=E2=80=99s post about=20
+  Practical Efficient Memory Management (though the [...]</P></DIV></LI>
+  <LI class=3D"comment " id=3Dcomment-31>
+  <P class=3Dcomment_meta><!--				<span class=3D"comment_num"><a =
+href=3D"#comment-31" title=3D"Permalink to this comment">3</a></span> =
+--><STRONG><A=20
+  class=3Durl href=3D"http://systematicgaming.wordpress.com/"=20
+  rel=3D"external nofollow">systematicgaming</A> </STRONG><SPAN=20
+  class=3Dcomment_time>// Sep 3, 2008 at 10:54 pm</SPAN> </P>
+  <DIV class=3Dentry>
+  <P>This is a lot like my recent series on memory management =E2=80=93 =
+very similar=20
+  ideas and implementations. That=E2=80=99s to be expected I suppose for =
+similar=20
+  applications (games) operating in similar environments.</P></DIV></LI>
+  <LI class=3D"comment " id=3Dcomment-40>
+  <P class=3Dcomment_meta><!--				<span class=3D"comment_num"><a =
+href=3D"#comment-40" title=3D"Permalink to this comment">4</a></span> =
+--><STRONG>James=20
+  Bird </STRONG><SPAN class=3Dcomment_time>// Sep 16, 2008 at 12:27 =
+am</SPAN> </P>
+  <DIV class=3Dentry>
+  <P>I think there might be a bug in your alignment code.</P>
+  <P>Assume that pInstanceMem =3D 3<BR>Then this would cause: =
+pAlignedMem =3D 0</P>
+  <P>Which is before the first byte of your allocated chunk of =
+memory.</P>
+  <P>I think what you meant to do was round up to the nearest multiple =
+of 16,=20
+  instead of down:</P>
+  <P>pAlignedMem =3D (pInstanceMem + 0=C3=970F) &amp; =
+~(0=C3=970F);</P></DIV></LI>
+  <LI class=3D"comment " id=3Dcomment-41>
+  <P class=3Dcomment_meta><!--				<span class=3D"comment_num"><a =
+href=3D"#comment-41" title=3D"Permalink to this comment">5</a></span> =
+--><STRONG>Christian=20
+  Gyrling </STRONG><SPAN class=3Dcomment_time>// Sep 16, 2008 at 9:46 =
+am</SPAN>=20
+  </P>
+  <DIV class=3Dentry>
+  <P>James=E2=80=A6 you=E2=80=99re right. Good catch. I did miss out on =
+that when I wrote that=20
+  example.<BR>I guess that will teach me to publish a post after =
+midnight. <IMG=20
+  class=3Dwp-smiley alt=3D:-)=20
+  =
+src=3D"http://www.swedishcoding.com/wp-includes/images/smilies/icon_smile=
+.gif">=20
+  </P></DIV></LI>
+  <LI class=3D"comment " id=3Dcomment-51>
+  <P class=3Dcomment_meta><!--				<span class=3D"comment_num"><a =
+href=3D"#comment-51" title=3D"Permalink to this comment">6</a></span> =
+--><STRONG><A=20
+  class=3Durl href=3D"http://zeuxcg.blogspot.com/" rel=3D"external =
+nofollow">Arseny=20
+  Kapoulkine</A> </STRONG><SPAN class=3Dcomment_time>// Jan 3, 2009 at =
+2:23=20
+  am</SPAN> </P>
+  <DIV class=3Dentry>
+  <P>There is one minor problem with the code above =E2=80=93 unless the =
+code for=20
+  delete(void*) and delete(void*, Align) is the same, it won=E2=80=99t =
+work. delete ptr;=20
+  always calls delete(void*), in fact the only case when delete(void*, =
+Align)=20
+  will be called is if ctor of the constructed class throws an=20
+  exception.</P></DIV></LI>
+  <LI class=3D"comment " id=3Dcomment-52>
+  <P class=3Dcomment_meta><!--				<span class=3D"comment_num"><a =
+href=3D"#comment-52" title=3D"Permalink to this comment">7</a></span> =
+--><STRONG>Charles=20
+  Nicholson </STRONG><SPAN class=3Dcomment_time>// Jan 25, 2009 at 7:35 =
+pm</SPAN>=20
+  </P>
+  <DIV class=3Dentry>
+  <P>Hey Christian, Your =E2=80=9Caligned delete=E2=80=9D operator will =
+only ever get called if=20
+  the object being constructed throws when allocated with your =
+=E2=80=9Caligned new=E2=80=9D=20
+  operator.</P>
+  <P>When you simply invoke =E2=80=98delete=E2=80=99 on a pointer that =
+was allocated with your=20
+  overloaded =E2=80=9Caligned new=E2=80=9D, your overloaded unaligned =
+global operator delete=20
+  will be called, not your =E2=80=9Caligned delete=E2=80=9D operator. =
+See 5.3.4/17 and 5.3.4/19=20
+  for details.</P>
+  <P>Or, run this code and see the compiler in action:</P>
+  <P>#include<BR>#include </P>
+  <P>enum MyToken<BR>{<BR>Charles<BR>};</P>
+  <P>void* operator new(size_t size, MyToken =
+token)<BR>{<BR>std::printf(=E2=80=9CMyToken=20
+  new\n=E2=80=9D);<BR>return ::operator new(size);<BR>}</P>
+  <P>void operator delete(void* p, MyToken =
+token)<BR>{<BR>std::printf(=E2=80=9CMyToken=20
+  delete\n=E2=80=9D);<BR>return ::operator delete(p);<BR>}</P>
+  <P>struct Type<BR>{<BR>explicit Type(bool=20
+  shouldThrow)<BR>{<BR>std::printf(=E2=80=9CType ctor\n=E2=80=9D);<BR>if =
+(shouldThrow)<BR>throw=20
+  std::exception();<BR>}</P>
+  <P>~Type()<BR>{<BR>std::printf(=E2=80=9CType =
+dtor\n=E2=80=9D);<BR>}</P>
+  <P>char c[256];<BR>};</P>
+  <P>int main()<BR>{<BR>std::printf(=E2=80=9C=E2=80=94New/delete without =
+
+  ctor-throw:\n=E2=80=9D);<BR>delete new (Charles) Type(false);</P>
+  <P>std::printf(=E2=80=9C=E2=80=94New with =
+ctor-throw:\n=E2=80=9D);<BR>try<BR>{<BR>new (Charles)=20
+  Type(true);<BR>}<BR>catch(const std::exception&amp;)<BR>{<BR>}</P>
+  <P>return 0;<BR>}</P></DIV></LI>
+  <LI class=3D"comment " id=3Dcomment-180>
+  <P class=3Dcomment_meta><!--				<span class=3D"comment_num"><a =
+href=3D"#comment-180" title=3D"Permalink to this comment">8</a></span> =
+--><STRONG><A=20
+  class=3Durl href=3D"http://n/a" rel=3D"external nofollow">Jon B</A> =
+</STRONG><SPAN=20
+  class=3Dcomment_time>// Apr 14, 2010 at 7:18 am</SPAN> </P>
+  <DIV class=3Dentry>
+  <P>I think there may be a bug with your linear allocator=E2=80=A6</P>
+  <P>void* Alloc(size_t size)<BR>{<BR>void* pMemToReturn =3D m_pBuffer + =
+
+  m_currentOffset;<BR>pMemToReturn +=3D size; // Oops..<BR>return=20
+  pMemToReturn;<BR>}</P>
+  <P>Should perhaps be=E2=80=A6</P>
+  <P>void* Alloc(size_t size)<BR>{<BR>void* pMemToReturn =3D m_pBuffer + =
+
+  m_currentOffset;<BR>m_currentOffset +=3D size; // Thats =
+better..<BR>return=20
+  pMemToReturn;<BR>}</P></DIV></LI></UL><!-- Comment Form -->
+<H3 class=3Dcomments_headers id=3Drespond>Leave a Comment</H3>
+<FORM id=3Dcomment_form =
+action=3Dhttp://www.swedishcoding.com/wp-comments-post.php=20
+method=3Dpost>
+<P><INPUT class=3Dtext_input id=3Dauthor tabIndex=3D1 =
+name=3Dauthor><LABEL=20
+for=3Dauthor><STRONG>Name</STRONG></LABEL></P>
+<P><INPUT class=3Dtext_input id=3Demail tabIndex=3D2 name=3Demail><LABEL =
+
+for=3Demail><STRONG>Mail</STRONG></LABEL></P>
+<P><INPUT class=3Dtext_input id=3Durl tabIndex=3D3 name=3Durl><LABEL=20
+for=3Durl><STRONG>Website</STRONG></LABEL></P><!--<p><small><strong>XHTML=
+:</strong> You can use these tags: &lt;a href=3D&quot;&quot; =
+title=3D&quot;&quot;&gt; &lt;abbr title=3D&quot;&quot;&gt; &lt;acronym =
+title=3D&quot;&quot;&gt; &lt;b&gt; &lt;blockquote =
+cite=3D&quot;&quot;&gt; &lt;cite&gt; &lt;code&gt; &lt;del =
+datetime=3D&quot;&quot;&gt; &lt;em&gt; &lt;i&gt; &lt;q =
+cite=3D&quot;&quot;&gt; &lt;strike&gt; &lt;strong&gt; </small></p>-->
+<P><TEXTAREA class=3D"text_input text_area" id=3Dcomment tabIndex=3D4 =
+name=3Dcomment rows=3D7></TEXTAREA></P>
+<P><INPUT class=3Dform_submit id=3Dsubmit tabIndex=3D5 type=3Dsubmit =
+src=3D"" value=3DSubmit name=3Dsubmit>=20
+<INPUT type=3Dhidden value=3D42 name=3Dcomment_post_ID> =
+</P></FORM></DIV><!-- Close #comments container -->
+<DIV class=3D"clear flat"></DIV></DIV>
+<DIV id=3Dsidebar>
+<UL class=3Dsidebar_list>
+  <LI class=3Dwidget>
+  <H2>Recent Entries</H2>
+  <UL>
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2011/04/16/perforce-server-tips-and-=
+tricks/">Perforce=20
+    Server Tips and Tricks</A><SPAN class=3Drecent_date>4.16</SPAN>=20
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2009/12/21/book-review-game-engine-a=
+rchitecture/">Book=20
+    Review: Game Engine Architecture</A><SPAN =
+class=3Drecent_date>12.21</SPAN>=20
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2008/08/31/are-we-out-of-memory/">Ar=
+e we=20
+    out of memory?</A><SPAN class=3Drecent_date>8.31</SPAN>=20
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2008/02/29/gdc-presentation-creating=
+-a-character-in-drakes-fortune/">GDC=20
+    Presentation =E2=80=93 Creating a Character in Drake=E2=80=99s =
+Fortune</A><SPAN=20
+    class=3Drecent_date>2.29</SPAN>=20
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2008/02/29/gdc-2008-fridays-impressi=
+ons/">GDC=20
+    2008 =E2=80=93 Fridays Impressions</A><SPAN =
+class=3Drecent_date>2.29</SPAN>=20
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2008/02/29/gdc-2008-thursdays-impres=
+sions/">GDC=20
+    2008 =E2=80=93 Thursdays Impressions</A><SPAN =
+class=3Drecent_date>2.29</SPAN>=20
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2008/02/29/gdc-2008-wednesdays-impre=
+ssions/">GDC=20
+    2008 =E2=80=93 Wednesdays Impressions</A><SPAN =
+class=3Drecent_date>2.29</SPAN>=20
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2008/01/02/preparing-for-gdc-2008-an=
+imation-talk/">Preparing=20
+    for GDC 2008 =E2=80=93 Animation Talk</A><SPAN =
+class=3Drecent_date>1.2</SPAN>=20
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2008/01/02/review-zelda-and-the-stup=
+id-hourglass-ds/">Review:=20
+    Zelda and The Stupid Hourglass [DS]</A><SPAN =
+class=3Drecent_date>1.2</SPAN>=20
+    <LI><A=20
+    =
+href=3D"http://www.swedishcoding.com/2007/12/16/uncharted-drakes-fortune-=
+in-sweden/">Uncharted=20
+    =E2=80=93 Drake=E2=80=99s Fortune in Sweden</A><SPAN =
+class=3Drecent_date>12.16</SPAN>=20
+  </LI></UL></LI>
+  <LI class=3Dwidget>
+  <H2>Categories</H2>
+  <UL>
+    <LI class=3D"cat-item cat-item-7"><A=20
+    title=3D"View all posts filed under Conferences &amp; Events"=20
+    =
+href=3D"http://www.swedishcoding.com/category/conferences-events/">Confer=
+ences=20
+    &amp; Events</A>=20
+    <LI class=3D"cat-item cat-item-3"><A=20
+    title=3D"View all posts filed under Emulation"=20
+    =
+href=3D"http://www.swedishcoding.com/category/emulation/">Emulation</A>=20
+    <LI class=3D"cat-item cat-item-8"><A=20
+    title=3D"View all posts filed under Game Coding"=20
+    href=3D"http://www.swedishcoding.com/category/game-coding/">Game =
+Coding</A>=20
+    <LI class=3D"cat-item cat-item-6"><A title=3D"View all posts filed =
+under Games"=20
+    href=3D"http://www.swedishcoding.com/category/games/">Games</A>=20
+    <LI class=3D"cat-item cat-item-9"><A=20
+    title=3D"View all posts filed under Reviews"=20
+    href=3D"http://www.swedishcoding.com/category/reviews/">Reviews</A>=20
+  </LI></UL></LI>
+  <LI class=3Dwidget>
+  <H2>Swedish Coding Blogs</H2>
+  <UL>
+    <LI><A href=3D"http://www.tilander.org/aurora">Aurora <BR>[Jim =
+Tilander]</A>=20
+    <LI><A =
+href=3D"http://www.realtimecollisiondetection.net/blog">Realtime=20
+    Collision Detection <BR>[Christer Ericson]</A>=20
+    <LI><A href=3D"http://www.swedishcoding.com/">Swedish Coding =
+<BR>[Christian=20
+    Gyrling]</A>=20
+    <LI><A href=3D"http://blog.illuminatelabs.com/">Illuminate Labs Blog =
+
+    <BR>[David Larsson]</A> </LI></UL></LI>
+  <LI class=3Dlinkcat id=3Dlinkcat-4>
+  <H2>Other Blogs</H2>
+  <UL>
+    <LI><A href=3D"http://www.cellperformance.com/">Cell Performance</A> =
+
+    <LI><A title=3D"Rendering blog"=20
+    href=3D"http://www.rorydriscoll.com/">CodeItNow</A>=20
+    <LI><A title=3D"John Hable=E2=80=99s Blog" =
+href=3D"http://filmicgames.com/">Filmic=20
+    Games</A>=20
+    <LI><A href=3D"http://www.gamesfromwithin.com/">Games From =
+Within</A>=20
+    <LI><A =
+href=3D"http://home.comcast.net/~tom_forsyth/blog.wiki.html">Tom=20
+    Forsyth=E2=80=99s Blog</A> </LI></UL></LI>
+  <LI class=3Dwidget>
+  <H2>Search Articles</H2>
+  <FORM id=3Dsearch_form action=3Dhttp://www.swedishcoding.com/ =
+method=3Dget><INPUT=20
+  class=3Dsearch_input id=3Ds=20
+  onblur=3D"if (this.value =3D=3D '') {this.value =3D 'To search, type =
+and hit enter';}"=20
+  onfocus=3D"if (this.value =3D=3D 'To search, type and hit enter') =
+{this.value =3D '';}"=20
+  value=3D"To search, type and hit enter" name=3Ds> <INPUT =
+id=3Dsearchsubmit=20
+  type=3Dhidden value=3DSearch> </FORM></LI>
+  <LI class=3Dwidget>
+  <H2>Misc</H2>
+  <UL>
+    <LI><A href=3D"http://www.swedishcoding.com/about/">About Me</A>=20
+    <LI><A href=3D"http://www.swedishcoding.com/archives/">Archives</A>=20
+  </LI></UL></LI>
+  <LI class=3Dwidget>
+  <UL><A href=3D"http://www.linkedin.com/in/cgyrling"><IMG height=3D15=20
+    alt=3DlinkedIN =
+src=3D"http://www.swedishcoding.com/images/linkedin.png" width=3D80=20
+    border=3D0> </A><BR><A =
+href=3D"http://www.swedishcoding.com/feed/"><IMG=20
+    height=3D15 alt=3DRSS2 =
+src=3D"http://www.swedishcoding.com/images/rss2.png"=20
+    width=3D80 border=3D0> </A><BR><A=20
+    =
+href=3D"http://feedvalidator.org/check.cgi?url=3Dhttp://www.swedishcoding=
+.com/feed/"><IMG=20
+    height=3D15 alt=3DRSS2 =
+src=3D"http://www.swedishcoding.com/images/valid_rss.png"=20
+    width=3D80 border=3D0> </A><BR><A =
+href=3D"http://www.mozilla.com/firefox/"><IMG=20
+    height=3D15 alt=3D"Get FireFox"=20
+    src=3D"http://www.swedishcoding.com/images/firefox.png" width=3D80 =
+border=3D0>=20
+    </A><BR><A href=3D"http://www.sweden.se/"><IMG height=3D15 =
+alt=3DSweden=20
+    src=3D"http://www.swedishcoding.com/images/sweden.png" width=3D80 =
+border=3D0>=20
+    </A><BR></UL></LI></UL></DIV></DIV>
+<DIV id=3Dfooter>
+<P>=C2=A9 2007 =E2=80=94 SwedishCoding.com =E2=80=94 Christian Gyrling =
+</P></DIV></DIV>
+<SCRIPT type=3Dtext/javascript>
+var gaJsHost =3D (("https:" =3D=3D document.location.protocol) ? =
+"https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src=3D'" + gaJsHost + =
+"google-analytics.com/ga.js' =
+type=3D'text/javascript'%3E%3C/script%3E"));
+</SCRIPT>
+
+<SCRIPT type=3Dtext/javascript>
+var pageTracker =3D _gat._getTracker("UA-3386536-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</SCRIPT>
+</BODY></HTML>
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: image/jpeg
+Content-Transfer-Encoding: base64
+Content-Location: http://www.swedishcoding.com/wp-content/themes/cutline-3-column-split-11/images/banner-thin.jpg
+
+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
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: image/jpeg
+Content-Transfer-Encoding: base64
+Content-Location: http://www.swedishcoding.com/wp-content/uploads/2008/08/memory-map.jpg
+
+/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEP
+ERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4e
+Hh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAEsASwDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDzL9nH
+4KeFfiR4HvNc1zUNat7mDUntFWzmiRCixROCQ0bHOXPf04r0z/hlT4ef9BnxT/4Ewf8Axmj9hv8A
+5JNqn/Ydm/8ARFvXvdUke/hsNSlSi3HU8E/4ZU+Hn/QZ8U/+BMH/AMZo/wCGVPh5/wBBnxT/AOBM
+H/xmve6Kdjf6pQ/lPBP+GVPh5/0GfFP/AIEwf/GaP+GVPh5/0GfFP/gTB/8AGa97oosH1Sh/KeCf
+8MqfDz/oM+Kf/AmD/wCM0f8ADKnw8/6DPin/AMCYP/jNe90UWD6pQ/lPBP8AhlT4ef8AQZ8U/wDg
+TB/8Zo/4ZU+Hn/QZ8U/+BMH/AMZr3uiiwfVKH8p4J/wyp8PP+gz4p/8AAmD/AOM0f8MqfDz/AKDP
+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
+GdvLZ/DfwxaXAImh0e0jkB6hlhQH9RXGWvwL8JxPbwT6v4nvtItpRLDo91qZexQg5A8vGcfj9a9T
+HAwKDWCk5c0lbQ8U+IGhJ4n+O2s6A4Um++HUkSE9Fc3vyN+DYP4VU8H69J8Q/Enw1tJiz/2Ppcur
+6orf8/MZNqmfRhIJGx1xXrP/AAi2n/8ACwf+E2866/tH+yv7K8rcvk+V5vm7sbd27dxnOMdu9Z3g
+f4eaB4P1/Xtb0k3bXOtz+dOszqyRfM7bYwFBVcueCT0HpRYz9jLnv0b1/NHh/wDzYX/n/oKV6Lq3
+wSTUNOns5Pib8RZUlQqUutY86I5/vJsG4e2a3v8AhVnh/wD4VJ/wrL7Zqn9j/wDPbzY/tH/Hx5/3
+tm373H3envzWW3wbhkBS5+JXxKuYWGHil17KOPQjZ0pWIVBq1430S37XLvwB1efUfBNxplzBZo+g
+alPo3mWceyGcQbQJEXsCGH4gmqf7O37vR/F1lH/x6Wfi7UYLQDoIgykY9ss1bOry6B8J/hnIuj2K
+xW9onl2NopLPc3LnCJ/eZmc89TjJ6Cp/g94Zn8J+ANP0y+fzNSk3XV+/XdcSsXfnvgnbn/ZpmsIt
+SjF9EdfRRRTOgKKKKACiiigAr84fi9/yVnxh/wBh29/9HvX6PV+cPxe/5Kz4w/7Dt7/6Pekzy80+
+CJ9R/sN/8km1T/sOzf8Aoi3r3uvBP2G/+STap/2HZv8A0Rb173TR2YT+BH0Ciiig6AooooAKKKKA
+CiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAK
+/OH4vf8AJWfGH/Ydvf8A0e9fo9X5w/F7/krPjD/sO3v/AKPekzy80+CJ9CfsfeHbDV/hpqNzdXWt
+ROusyoBZ6zd2iYEMJyUhkVSeepGegzwK9n/4QjR/+gh4p/8ACo1H/wCP15f+xJ/ySrU/+w5L/wCi
+IK92r5nF16sa0kpO3qehgqUHQi2lscz/AMIRo/8A0EPFP/hUaj/8fo/4QjR/+gh4p/8ACo1H/wCP
+101Fc31mt/O/vZ1exp/yr7jmf+EI0f8A6CHin/wqNR/+P0f8IRo//QQ8U/8AhUaj/wDH66aij6zW
+/nf3sPY0/wCVfccz/wAIRo//AEEPFP8A4VGo/wDx+j/hCNH/AOgh4p/8KjUf/j9dNRR9Zrfzv72H
+saf8q+45n/hCNH/6CHin/wAKjUf/AI/R/wAIRo//AEEPFP8A4VGo/wDx+umoo+s1v5397D2NP+Vf
+ccz/AMIRo/8A0EPFP/hUaj/8fo/4QjR/+gh4p/8ACo1H/wCP101FH1mt/O/vYexp/wAq+45n/hCN
+H/6CHin/AMKjUf8A4/R/whGj/wDQQ8U/+FRqP/x+umoo+s1v5397D2NP+Vfccz/whGj/APQQ8U/+
+FRqP/wAfo/4QjR/+gh4p/wDCo1H/AOP101FH1mt/O/vYexp/yr7jmf8AhCNH/wCgh4p/8KjUf/j9
+H/CEaP8A9BDxT/4VGo//AB+umoo+s1v5397D2NP+Vfccz/whGj/9BDxT/wCFRqP/AMfo/wCEI0f/
+AKCHin/wqNR/+P101FH1mt/O/vYexp/yr7jmf+EI0f8A6CHin/wqNR/+P0f8IRo//QQ8U/8AhUaj
+/wDH66aij6zW/nf3sPY0/wCVfccz/wAIRo//AEEPFP8A4VGo/wDx+j/hCNH/AOgh4p/8KjUf/j9d
+NRR9Zrfzv72Hsaf8q+45n/hCNH/6CHin/wAKjUf/AI/R/wAIRo//AEEPFP8A4VGo/wDx+umoo+s1
+v5397D2NP+Vfccz/AMIRo/8A0EPFP/hUaj/8fo/4QjR/+gh4p/8ACo1H/wCP101FH1mt/O/vYexp
+/wAq+45n/hCNH/6CHin/AMKjUf8A4/R/whGj/wDQQ8U/+FRqP/x+umoo+s1v5397D2NP+Vfccz/w
+hGj/APQQ8U/+FRqP/wAfo/4QjR/+gh4p/wDCo1H/AOP101FH1mt/O/vYexp/yr7jmf8AhCNH/wCg
+h4p/8KjUf/j9H/CEaP8A9BDxT/4VGo//AB+umoo+s1v5397D2NP+Vfccz/whGj/9BDxT/wCFRqP/
+AMfo/wCEI0f/AKCHin/wqNR/+P101FH1mt/O/vYexp/yr7jmf+EI0f8A6CHin/wqNR/+P18HfFCB
+LX4l+KbaNpWSLWbtFMsrSOQJnALOxLMfUkknqSa/Revzs+Lf/JVfF3/Ycvf/AEe9epllWc5y5pNn
+kZvCMYRsran07+xJ/wAkq1P/ALDkv/oiCvdq8J/Yk/5JVqf/AGHJf/REFe7V52N/jy9T0cD/ALvD
+0CiiiuY6gooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooo
+oAKKKKACiiigAooooAK/Oz4t/wDJVfF3/Ycvf/R71+idfnZ8W/8Akqvi7/sOXv8A6PevWyn45eh4
+2cfBH1Pp39iT/klWp/8AYcl/9EQV7tXhP7En/JKtT/7Dkv8A6Igr3auLG/x5ep34H/d4egUUUVzH
+UFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQA
+UUUUAFFFFABX52fFv/kqvi7/ALDl7/6Pev0Tr87Pi3/yVXxd/wBhy9/9HvXrZT8cvQ8bOPgj6n07
++xJ/ySrU/wDsOS/+iIK92rwn9iT/AJJVqf8A2HJf/REFe7VxY3+PL1O/A/7vD0CiiiuY6gooooAK
+KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoo
+ooAK/Oz4t/8AJVfF3/Ycvf8A0e9fonX52fFv/kqvi7/sOXv/AKPevWyn45eh42cfBH1Pp39iT/kl
+Wp/9hyX/ANEQV7tXhP7En/JKtT/7Dkv/AKIgr3auLG/x5ep34H/d4egUUUVzHUFFFFABRRRQAUUU
+UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABX52f
+Fv8A5Kr4u/7Dl7/6Pev0Tr87Pi3/AMlV8Xf9hy9/9HvXrZT8cvQ8bOPgj6n07+xJ/wAkq1P/ALDk
+v/oiCvdq8J/Yk/5JVqf/AGHJf/REFe7VxY3+PL1O/A/7vD0CiiiuY6gooooAKKK8D+DXgrUPGfw2
+0rxLqnxJ+IcN3eed5iW2uMsY2TOgwGUnoo79c1rCmpRcm7W/4P8AkY1KjjJRirt3/C3+Z75RXl3w
+/udb8PfFTU/AN/4hvPEGnrpKapa3N6we4t/3nlmJ3GN2fvDPbFS3nxr8KQXErw6b4ivdJgkMc2s2
+umtJYoQcH95nJA9QD7ZpuhO9o6iWIha8tD0yiuT8Z/EDw74V8P6Vr9/LNcabql1DbQXFqodR5is6
+yHkfJtUkkZPoDWdcfFPRLTw7b6tqGj+IrGa7umtrPTZ9PIvbllAJKRAnK4I5JH8qlUptXSKdamnZ
+s72iuK8G/EnRfEmttoT6dreh6t5RmSy1iyNvLJGOrKMkEfjn8jWXofjfwzoWieKtXutV1+e3tfEt
+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
+O6TbbO/AYCWFk23e5//Z
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://www.swedishcoding.com/wp-includes/images/smilies/icon_smile.gif
+
+R0lGODlhDwAPALMOAP/qAEVFRQAAAP/OAP/JAP+0AP6dAP/+k//9E///////xzMzM///6//lAAAA
+AAAAACH5BAEAAA4ALAAAAAAPAA8AAARb0EkZap3YVabOGRcWcAgCnIMRTEEnCCfwpqt2mHEOagoO
+nz+CKnADxoKFyiHHBBCSAdOiCVg8KwPZa7sVrgJZQWI8FhB2msGgwTXTWGqCXP4WBQr4wjDDstQm
+EQA7
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://www.swedishcoding.com/images/linkedin.png
+
+iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAIAAAD8q9/YAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
+WXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1QUfERABbpwEBQAAAT5JREFUSMdjTEtLYxhJgIWBgWHm
+zJkjxLfp6eksEBZHzlJpWQmCGu7du/t/ZprJrLPYpf8PtIcY8UmeSTNmYGBgYhhhAOHh379//f79
+6265891yZwgbExE07ky6MUERXIIUmklCHoZ5+DcDA4Nk/SbqhqjJzLNUjyVKzET38Ju2YAYGBpGq
+tW/agnfefOmuLg7hkm3BmXRjk5ln4XGC5laILHK8ISvAFZP4zSQqSf/8/fX3798QP8M9D/EtJBSQ
+ZcmOFmRXYvoWTQFchCQzSYjhP3/+YLKVO/feLXdGk6UKoG7OJMfD3759g7P//oYW8E8fv0AToWI+
+RPMhLXI7Pg8jg5+/v+JikBR1BBMkPFVj5klS0yqxVXVaWtrMmTMZ02cRqWFINzzS09NHXMODBR5v
+JJQ3acZD18OMI623BAAavsvitenm/gAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://www.swedishcoding.com/images/rss2.png
+
+iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPAgMAAAAOp6AcAAAADFBMVEVmZmb/ZgD///+JjnlbTUWm
+AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1QEaEDUUKC4MzAAAAFxJREFUGNNjYMAGtFZh
+gBUMqqEgkP8fCfwgRTArdGXU1Pxf+//tRxJMnRaaClT5/vd7FJVLo0Lz/+1HEUwLjQydmv/7P4pg
+6rSlWaH5v9ahmEmZO7VWYYAVDNgAAIqGwSYOs72wAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://www.swedishcoding.com/images/valid_rss.png
+
+iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPAgMAAAAOp6AcAAAADFBMVEVmZmb/ZgD///+JjnlbTUWm
+AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1QEaECQVDPAfSgAAAGVJREFUGNNjYMAGtFZh
+gBUMqqEgkP8fCfwgRTArdGXU1Pz371///vdrP0wwdVpoaihQcN/vf7/fI1QujQrN/71/FbJgWmhk
+6FSgIIrK1GlLs0Lz//3f92sfwkzK3Km1CgOsYMAGAL3/v7890krWAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://www.swedishcoding.com/images/firefox.png
+
+iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAIAAAD8q9/YAAAABGdBTUEAALGOfPtRkwAAACBjSFJN
+AAB6JQAAgIMAAPn/AACA6AAAdTAAAOpgAAA6lwAAF2+XqZnUAAADsklEQVR4nGJMS0tjGEkAIIAY
+gB7+Tz1AXdOoDoDOAwggFjxhcfHSk4PnHp9+/vnlz38QEXF2JmkuNkdtEWMDBRERHvpECXUBQABh
+9/DOPVemrL+w8+MfVikhBlFhASVxRh6u/1++nXv76d+vX7MOP+ZedyVGQaw4yWzIeRsggJgg1JdP
+HyCMhw/fhWcs9Ghat/X5+z+M/35++M70/jPQt+x83GxCAiAVn76aSP2zNWNgZF/ft7Ryw9qdA+V0
+8gBAAEFj+OrsbPPipcCI9S9aAuILcP3/+oPhN7ui6N+v37/8fvuJhYudgYURGL2/f/zee/EH86+/
+Wr+ZN/psllA7+nrNhleKcdrGlpimMzIyQhjA/IOLjakSwoUz0MRxGQLhomlHYwMBQABBY9jo+54Z
+nR0+sZP+vn4HROwfvvGx/FuewNqmfPX7n49/uTn+fPv55d1nkIlfvjH++cP37b0H71+eL1JsD4VE
+jT9oPa89uXsTpm/hpQXcZRA2MgkHyCoxxZG9h2kg3C64tyEMNN8CAUAAQWP468f/qg9m+KhZquuK
+yAuxP3z3NVDxseHr71JbJT+ZSwsyMPx4+OL71+9Mv34BkzebpsjbJ3zTL3y98vlvjeU3C5nHjPba
+Sju3MzD4YToXLeAx/YlVJR5xIg2E+BlTCiCAoB5+dPGnjiTbOo8HjDxvf7HysHI+/3Pv/oRH4m/1
+w1gVZb59/8bEwvSfh/0vL9DvDH/+/WOQEv50hmnPeb4d+97Vhf6pK9op6u6O1RtYEzAulQRNQFOG
+x0CIbzH9DBBAUA+L8P9h+P/h1fUP/3/+ZGRhZmBmEeLlUXhwR1/oxGU13d/MbKwcwJqJ5e/v////
+/Pr/6zdIj57mL+77/9mU6q9+fNN3elLsJgbDSVgdijVySALITsdqCJpdcMWYfgYIIKiHGUU5//34
+yfD9FwMTEyQw33z/KsX+o/rc7Afv9i/5r3DFLu+/oBDEq0xfP//7ycDAx/lfU4Xh118mIeHJVxmC
+Njx3MMTiUKxs4rloDCINxKMMIICgHv7Bxsr2+Ru0BGOGCgpIcQMrolBXcenPfNmPH3wCav4JEv/3
+4xfDmSuMYsL/JcSYvv5k/vQ5lO8Yul8HKwAIIKjfOIBRx8oMREw/f0NlONgllPn+Wbu3PRTvO/L6
+gyobA9C3V+8yvP/IIMjP8P37/4dPmDm5gQp/f/zF8u+pg/qfgfIDSQAggKAelpz2BpeKKiAqhvOc
+cagaMj0QgABiHGm9JYAAAwBRnvugw/L2tQAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://www.swedishcoding.com/images/sweden.png
+
+iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAIAAAD8q9/YAAAABGdBTUEAANbY1E9YMgAAABl0RVh0
+U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAEHSURBVHjaYkxLS2MYSQAggBiAHv5PPUBd
+06gOgM4DCCAWiLeDo7chh8LaGm+oeMtW4sNu7VKvwR/BAAHExDDCAEAAjTgPAwQQbT3MCANwLpAE
+5iUIG5KvMNUgc3EZgskmEgAEEAtapkXPljjEcYD/aL6F+A09jJmY0MT//fuHYgpSiCCLEDSZGAAQ
+QDSMYXjsEXYEGBBMKWgmk+cqgABioWmSxowrrAAthnGZgxmaZDgJIIBYsFY/5FZL6NGC5lygx4CC
+cBI5hpGVIWd1XCJk+xkggFhoHb1Y8x6yFKY38JuDRy8xACCARly1BBBAI87DAAHEgqNV+B9rthwG
+ACCAGEdabwkgwACKZWMEG3It+QAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://www.swedishcoding.com/wp-content/themes/cutline-3-column-split-11/style.css
+
+BODY {
+	BACKGROUND: #fff; FONT: 62.5% Georgia, "Times New Roman", Times, serif; =
+COLOR: #333; TEXT-ALIGN: center
+}
+* {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: =
+0px; PADDING-TOP: 0px
+}
+.green {
+	COLOR: #090
+}
+A {
+	COLOR: #0060ff; TEXT-DECORATION: none
+}
+A:visited {
+	COLOR: #0060ff; TEXT-DECORATION: none
+}
+A:hover {
+	COLOR: #df0000; TEXT-DECORATION: underline
+}
+A IMG {
+	BORDER-TOP-STYLE: none; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: =
+none; BORDER-BOTTOM-STYLE: none
+}
+BLOCKQUOTE {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 10px; PADDING-BOTTOM: 0px; MARGIN: =
+0px 30px 1.5em; BORDER-LEFT: #aaa 1px solid; COLOR: #555; PADDING-TOP: =
+0px; FONT-STYLE: italic; FONT-FAMILY: Georgia, "Times New Roman", Times, =
+serif
+}
+ABBR {
+	TEXT-TRANSFORM: uppercase; CURSOR: help; BORDER-BOTTOM: #aaa 1px dotted
+}
+ACRONYM {
+	TEXT-TRANSFORM: uppercase; CURSOR: help; BORDER-BOTTOM: #aaa 1px dotted
+}
+CODE {
+	COLOR: #090; FONT-FAMILY: Courier, monospace
+}
+PRE {
+	CLEAR: both; FONT-SIZE: 1.3em; MARGIN: 0px 0px 1.5em; OVERFLOW: auto
+}
+P.center {
+	TEXT-ALIGN: center! important
+}
+P.bottom {
+	MARGIN: 0px
+}
+P.unstyled {
+	FONT-SIZE: 1.4em
+}
+.flickr_blue {
+	TEXT-TRANSFORM: lowercase; COLOR: #007ae4
+}
+.flickr_pink {
+	TEXT-TRANSFORM: lowercase; COLOR: #ff2a96
+}
+.green {
+	COLOR: #090
+}
+.red {
+	COLOR: #f00
+}
+.orange {
+	COLOR: #f40
+}
+.purple {
+	COLOR: #909
+}
+H1 {
+	FONT-WEIGHT: bold; COLOR: #000; FONT-FAMILY: Helvetica, Arial, =
+sans-serif
+}
+H2 {
+	FONT-WEIGHT: bold; COLOR: #000; FONT-FAMILY: Helvetica, Arial, =
+sans-serif
+}
+H3 {
+	FONT-WEIGHT: bold; COLOR: #000; FONT-FAMILY: Helvetica, Arial, =
+sans-serif
+}
+H1 {
+	FONT-SIZE: 3.6em; LETTER-SPACING: -0.03em
+}
+#masthead H1 {
+	CLEAR: both; PADDING-RIGHT: 0px; BORDER-TOP: #ccc 1px solid; =
+PADDING-LEFT: 0px; PADDING-BOTTOM: 0.2em; PADDING-TOP: 0.4em; =
+TEXT-ALIGN: center
+}
+H2 {
+	FONT-SIZE: 2em
+}
+.posts H2 {
+	MARGIN: 0px 0px 0.1em; LINE-HEIGHT: 1.2em
+}
+.pages H2 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND: =
+url(images/hr_title_sep.gif) no-repeat 0px 100%; PADDING-BOTTOM: 0.6em; =
+MARGIN: 0px 0px 0.75em; PADDING-TOP: 0px
+}
+H2.page_header {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND: =
+url(images/hr_title_sep.gif) no-repeat 0px 100%; PADDING-BOTTOM: 0.6em; =
+MARGIN: 0px 0px 0.75em; PADDING-TOP: 0px
+}
+H2.archive_head {
+	PADDING-RIGHT: 2px! important; BORDER-TOP: #000 3px solid; =
+PADDING-LEFT: 2px! important; FONT-WEIGHT: bold! important; FONT-SIZE: =
+1.4em! important; BACKGROUND: url(images/hr_dot_black.gif) repeat-x 0px =
+100%; PADDING-BOTTOM: 0.4em! important; MARGIN: 0px 0px 1.8em; =
+TEXT-TRANSFORM: uppercase! important; PADDING-TOP: 0.4em! important; =
+LETTER-SPACING: normal! important
+}
+H3 {
+	FONT-SIZE: 1em; TEXT-TRANSFORM: uppercase
+}
+#masthead H3 {
+	FONT-WEIGHT: normal; FONT-SIZE: 1.8em; MARGIN: 0px 0px 0.75em; =
+TEXT-TRANSFORM: none; COLOR: #888; TEXT-ALIGN: center
+}
+.entry H3 {
+	MARGIN: 2.5em 0px 0.5em
+}
+.entry H3.top {
+	MARGIN: 1.5em 0px 0.5em
+}
+H3.comments_headers {
+	FONT-SIZE: 1.4em
+}
+H4 {
+	FONT: italic 1.2em Georgia, "Times New Roman", Times, serif; COLOR: =
+#888
+}
+.posts H4 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND: =
+url(images/hr_title_sep.gif) no-repeat 0px 100%; PADDING-BOTTOM: 1em; =
+MARGIN: 0px 0px 1.25em; PADDING-TOP: 0px
+}
+#container {
+	MARGIN: 15px auto 0px; WIDTH: 970px
+}
+#content_box {
+	CLEAR: both; FLOAT: left; WIDTH: 970px; TEXT-ALIGN: left
+}
+#content {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 5px; FLOAT: left; PADDING-BOTTOM: =
+0px; WIDTH: 710px; PADDING-TOP: 0px
+}
+#sidebar {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 15px; FLOAT: right; PADDING-BOTTOM: =
+0px; WIDTH: 210px; PADDING-TOP: 0px
+}
+#l_sidebar {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 15px; FLOAT: left; PADDING-BOTTOM: =
+0px; WIDTH: 210px; PADDING-TOP: 0px
+}
+#footer {
+	CLEAR: both; PADDING-RIGHT: 0px; BORDER-TOP: #ccc 2px solid; =
+PADDING-LEFT: 0px; FLOAT: left; PADDING-BOTTOM: 0px; WIDTH: 970px; =
+PADDING-TOP: 1.2em
+}
+#masthead {
+	WIDTH: 970px; HEIGHT: 100px
+}
+UL#nav {
+	CLEAR: both; PADDING-RIGHT: 10px; PADDING-LEFT: 10px; BACKGROUND: =
+url(images/hr_dot_black.gif) repeat-x; PADDING-BOTTOM: 0px; WIDTH: =
+950px; PADDING-TOP: 0px; LIST-STYLE-TYPE: none
+}
+UL#nav LI {
+	PADDING-RIGHT: 40px; PADDING-LEFT: 0px; FLOAT: right; PADDING-BOTTOM: =
+0.7em; FONT: bold 1.4em Helvetica, Arial, sans-serif; TEXT-TRANSFORM: =
+uppercase; PADDING-TOP: 0.85em
+}
+UL#nav LI.rss {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FLOAT: right; PADDING-BOTTOM: =
+0.7em; PADDING-TOP: 0.85em
+}
+UL#nav LI.rss A {
+	PADDING-RIGHT: 18px; PADDING-LEFT: 0px; BACKGROUND: =
+url(images/icon_rss.gif) no-repeat 100% 50%; PADDING-BOTTOM: 0px; =
+PADDING-TOP: 0px
+}
+UL#nav LI.rss A:hover {
+	PADDING-RIGHT: 18px; PADDING-LEFT: 0px; BACKGROUND: =
+url(images/icon_rss.gif) no-repeat 100% 50%; PADDING-BOTTOM: 0px; =
+PADDING-TOP: 0px
+}
+#header_img {
+	CLEAR: both; FLOAT: left; MARGIN: 0px 0px 1em; BORDER-BOTTOM: #000 1px =
+solid; POSITION: relative
+}
+#header_img IMG {
+	DISPLAY: block
+}
+.entry {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 20px; FONT-SIZE: 1.4em; =
+PADDING-BOTTOM: 0px; LINE-HEIGHT: 1.65em; PADDING-TOP: 0px
+}
+.entry BLOCKQUOTE {
+	FONT-SIZE: 1em
+}
+.entry BLOCKQUOTE.right {
+	BORDER-RIGHT: #aaa 0px double; PADDING-RIGHT: 0px! important; =
+BORDER-TOP: #aaa 3px double; PADDING-LEFT: 0px! important; FONT-SIZE: =
+1.3em! important; FLOAT: right; PADDING-BOTTOM: 0.3em! important; =
+MARGIN: 0.3em 0px 0.3em 15px; BORDER-LEFT: #aaa 0px double; WIDTH: =
+200px; PADDING-TOP: 0.3em! important; BORDER-BOTTOM: #aaa 3px double; =
+FONT-STYLE: normal! important; TEXT-ALIGN: center
+}
+.entry BLOCKQUOTE.left {
+	BORDER-RIGHT: #aaa 0px double; PADDING-RIGHT: 0px! important; =
+BORDER-TOP: #aaa 3px double; PADDING-LEFT: 0px! important; FONT-SIZE: =
+1.3em! important; FLOAT: left; PADDING-BOTTOM: 0.3em! important; MARGIN: =
+0.3em 15px 0.3em 0px; BORDER-LEFT: #aaa 0px double; WIDTH: 200px; =
+PADDING-TOP: 0.3em! important; BORDER-BOTTOM: #aaa 3px double; =
+FONT-STYLE: normal! important; TEXT-ALIGN: center
+}
+.entry BLOCKQUOTE.right P {
+	MARGIN: 0px; LINE-HEIGHT: 1.4em! important
+}
+.entry BLOCKQUOTE.left P {
+	MARGIN: 0px; LINE-HEIGHT: 1.4em! important
+}
+.entry P {
+	MARGIN: 0px 0px 1.5em
+}
+.entry UL {
+	MARGIN: 0px 0px 1.5em 40px
+}
+.entry OL {
+	MARGIN: 0px 0px 1.5em 40px
+}
+.entry UL {
+	LIST-STYLE-TYPE: square
+}
+.entry LI {
+	MARGIN: 0px 0px 0.5em
+}
+.entry UL LI UL {
+	MARGIN: 0.5em 0px 0.5em 30px
+}
+.entry UL LI OL {
+	MARGIN: 0.5em 0px 0.5em 30px
+}
+.entry OL LI UL {
+	MARGIN: 0.5em 0px 0.5em 30px
+}
+.entry OL LI OL {
+	MARGIN: 0.5em 0px 0.5em 30px
+}
+.entry DL {
+	MARGIN: 0px 0px 1.5em
+}
+.entry DT {
+	FONT-WEIGHT: bold; MARGIN: 0px 0px 0.5em
+}
+.entry DD {
+	MARGIN: 0px 0px 1.5em 20px
+}
+.entry .ad {
+	FLOAT: right; MARGIN: 0px 0px 0.5em 15px
+}
+.entry .ad_left {
+	FLOAT: left; MARGIN: 0px 15px 0.5em 0px
+}
+.entry IMG {
+=09
+}
+.entry IMG.left {
+	CLEAR: left; BORDER-RIGHT: #bbb 3px double; PADDING-RIGHT: 3px; =
+BORDER-TOP: #bbb 3px double; PADDING-LEFT: 3px; FLOAT: left; =
+PADDING-BOTTOM: 3px; MARGIN: 0.5em 15px 0.5em 0px; BORDER-LEFT: #bbb 3px =
+double; PADDING-TOP: 3px; BORDER-BOTTOM: #bbb 3px double
+}
+.entry IMG.right {
+	CLEAR: right; BORDER-RIGHT: #bbb 3px double; PADDING-RIGHT: 3px; =
+BORDER-TOP: #bbb 3px double; PADDING-LEFT: 3px; FLOAT: right; =
+PADDING-BOTTOM: 3px; MARGIN: 0.5em 0px 0.5em 15px; BORDER-LEFT: #bbb 3px =
+double; PADDING-TOP: 3px; BORDER-BOTTOM: #bbb 3px double
+}
+.entry IMG.center {
+	CLEAR: both; BORDER-RIGHT: #bbb 3px double; PADDING-RIGHT: 3px; =
+BORDER-TOP: #bbb 3px double; DISPLAY: block; PADDING-LEFT: 3px; FLOAT: =
+none; PADDING-BOTTOM: 3px; MARGIN: 0px auto 1.5em; BORDER-LEFT: #bbb 3px =
+double; PADDING-TOP: 3px; BORDER-BOTTOM: #bbb 3px double
+}
+.entry IMG.off {
+	PADDING-RIGHT: 0px! important; PADDING-LEFT: 0px! important; =
+PADDING-BOTTOM: 0px! important; BORDER-TOP-STYLE: none! important; =
+PADDING-TOP: 0px! important; BORDER-RIGHT-STYLE: none! important; =
+BORDER-LEFT-STYLE: none! important; BORDER-BOTTOM-STYLE: none! important
+}
+.entry IMG.stack {
+	CLEAR: none! important
+}
+.tagged {
+	CLEAR: both; PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-SIZE: 1.2em; =
+BACKGROUND: url(images/hr_tag_sep.gif) no-repeat; PADDING-BOTTOM: 0px; =
+COLOR: #888; LINE-HEIGHT: 1.6em; PADDING-TOP: 0.4em
+}
+.tagged A {
+	PADDING-RIGHT: 0.25em; PADDING-LEFT: 0.25em; PADDING-BOTTOM: 0.25em; =
+PADDING-TOP: 0.25em
+}
+.tagged A:visited {
+	PADDING-RIGHT: 0.25em; PADDING-LEFT: 0.25em; PADDING-BOTTOM: 0.25em; =
+PADDING-TOP: 0.25em
+}
+.add_comment {
+	PADDING-RIGHT: 0px; DISPLAY: block; PADDING-LEFT: 20px; FONT-WEIGHT: =
+bold; FLOAT: right; PADDING-BOTTOM: 0px; PADDING-TOP: 0px
+}
+.navigation {
+	FONT-SIZE: 1.4em; FLOAT: left; WIDTH: 500px
+}
+.previous {
+	PADDING-RIGHT: 20px; PADDING-LEFT: 0px; FLOAT: left; PADDING-BOTTOM: =
+0px; PADDING-TOP: 0px
+}
+.next {
+	FLOAT: right
+}
+.clear {
+	CLEAR: both; MARGIN: 0px 0px 3em; WIDTH: 500px; HEIGHT: 1px
+}
+.rule {
+	BACKGROUND: url(images/hr_tag_sep.gif) no-repeat
+}
+.flat {
+	MARGIN: 0px 0px 2em
+}
+.whitespace {
+	MARGIN: 0px 0px 3.5em
+}
+UL.sidebar_list {
+	LIST-STYLE-TYPE: none
+}
+UL.sidebar_list LI.widget {
+	FONT-SIZE: 1.3em; FLOAT: left; MARGIN: 0px 0px 2.5em; WIDTH: 210px; =
+LINE-HEIGHT: 1.4em
+}
+UL.sidebar_list LI.linkcat {
+	FONT-SIZE: 1.3em; FLOAT: left; MARGIN: 0px 0px 2.5em; WIDTH: 210px; =
+LINE-HEIGHT: 1.4em
+}
+LI.widget H2 {
+	PADDING-RIGHT: 2px; BORDER-TOP: #000 3px solid; PADDING-LEFT: 2px; =
+FONT-WEIGHT: bold; FONT-SIZE: 1.07em; BACKGROUND: =
+url(images/hr_dot_black.gif) repeat-x 0px 100%; PADDING-BOTTOM: 0.4em; =
+MARGIN: 0px 0px 0.8em; TEXT-TRANSFORM: uppercase; PADDING-TOP: 0.4em; =
+LETTER-SPACING: normal
+}
+LI.linkcat H2 {
+	PADDING-RIGHT: 2px; BORDER-TOP: #000 3px solid; PADDING-LEFT: 2px; =
+FONT-WEIGHT: bold; FONT-SIZE: 1.07em; BACKGROUND: =
+url(images/hr_dot_black.gif) repeat-x 0px 100%; PADDING-BOTTOM: 0.4em; =
+MARGIN: 0px 0px 0.8em; TEXT-TRANSFORM: uppercase; PADDING-TOP: 0.4em; =
+LETTER-SPACING: normal
+}
+LI.widget P {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; PADDING-BOTTOM: 0px; MARGIN: =
+0px 0px 1.5em; PADDING-TOP: 0px
+}
+LI.widget UL {
+	MARGIN: 0px 0px 0.5em 20px; LIST-STYLE-TYPE: square
+}
+LI.linkcat UL {
+	MARGIN: 0px 0px 0.5em 20px; LIST-STYLE-TYPE: square
+}
+LI.widget OL {
+	MARGIN: 0px 0px 0.5em 20px
+}
+LI.linkcat OL {
+	MARGIN: 0px 0px 0.5em 20px
+}
+LI.widget LI {
+	MARGIN: 0px 0px 0.7em
+}
+LI.linkcat LI {
+	MARGIN: 0px 0px 0.7em
+}
+LI.widget LI .recent_date {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 8px; FONT-WEIGHT: bold; =
+PADDING-BOTTOM: 0px; PADDING-TOP: 0px
+}
+LI.widget UL.flickr_stream {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; PADDING-BOTTOM: 0px; MARGIN: =
+0px; PADDING-TOP: 0px; LIST-STYLE-TYPE: none
+}
+LI.widget UL.flickr_stream LI {
+	PADDING-RIGHT: 5px; DISPLAY: inline; PADDING-LEFT: 0px; PADDING-BOTTOM: =
+5px; MARGIN: 0px; PADDING-TOP: 0px
+}
+LI.widget UL.flickr_stream LI A IMG {
+	PADDING-RIGHT: 3px; PADDING-LEFT: 3px; PADDING-BOTTOM: 3px; =
+PADDING-TOP: 3px
+}
+LI.widget UL.flickr_stream LI A:hover IMG {
+	BACKGROUND: #ff2a96
+}
+LI.widget_flickrrss {
+=09
+}
+LI.widget_flickrrss A IMG {
+	PADDING-RIGHT: 3px; PADDING-LEFT: 3px; PADDING-BOTTOM: 3px; MARGIN: 0px =
+5px 5px 0px; PADDING-TOP: 3px
+}
+LI.widget_flickrrss A:hover IMG {
+	BACKGROUND: #ff2a96
+}
+#calendar_wrap {
+	FONT-SIZE: 1.3em
+}
+#footer P {
+	FONT-SIZE: 1.3em; MARGIN: 0px 0px 0.92em; COLOR: #888; TEXT-ALIGN: left
+}
+#comments {
+	CLEAR: both; FLOAT: left; WIDTH: 500px
+}
+UL#comment_list {
+	BORDER-TOP: #bbb 1px solid; FLOAT: left; MARGIN: 0px 0px 4em; =
+LIST-STYLE-TYPE: none
+}
+UL#comment_list LI.comment {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FLOAT: left; PADDING-BOTTOM: =
+0px; WIDTH: 500px; PADDING-TOP: 1.2em; BORDER-BOTTOM: #bbb 1px dotted
+}
+UL#comment_list LI.trackback {
+	PADDING-RIGHT: 15px; PADDING-LEFT: 15px; BACKGROUND: =
+url(images/trackback_bg.gif); PADDING-BOTTOM: 0px; WIDTH: 470px; =
+PADDING-TOP: 1.2em
+}
+.comment_meta {
+	MARGIN: 0px 0px 1.2em
+}
+.comment_num {
+	PADDING-RIGHT: 15px; PADDING-LEFT: 20px; FONT-WEIGHT: bold; FONT-SIZE: =
+1.4em; FLOAT: right; PADDING-BOTTOM: 0px; PADDING-TOP: 0px
+}
+.trackback .comment_num {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 20px; PADDING-BOTTOM: 0px; =
+PADDING-TOP: 0px
+}
+.comment_meta STRONG {
+	FONT-SIZE: 1.6em
+}
+.comment_time {
+	FONT: 1.1em Verdana, Helvetica, Arial, sans-serif; COLOR: #888
+}
+.comment .entry {
+	PADDING-RIGHT: 15px; PADDING-LEFT: 15px; PADDING-BOTTOM: 0px; =
+PADDING-TOP: 0px
+}
+.comment .entry P {
+	MARGIN: 0px 0px 1em
+}
+#comment_form {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FLOAT: left; PADDING-BOTTOM: =
+0px; WIDTH: 500px; PADDING-TOP: 1em
+}
+#comment_form P {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0.6em; =
+PADDING-TOP: 0.6em
+}
+#comment_form LABEL {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 10px; FONT-SIZE: 1.2em; =
+PADDING-BOTTOM: 0px; PADDING-TOP: 0px
+}
+#comment_form .text_input {
+	BORDER-RIGHT: #fff 1px solid; PADDING-RIGHT: 3px; BORDER-TOP: #999 2px =
+solid; PADDING-LEFT: 3px; PADDING-BOTTOM: 3px; FONT: 1.4em Georgia, =
+"Times New Roman", Times, serif; BORDER-LEFT: #999 2px solid; WIDTH: =
+191px; COLOR: #444; PADDING-TOP: 3px; BORDER-BOTTOM: #fff 1px solid
+}
+#comment_form .text_area {
+	WIDTH: 321px! important
+}
+#comment_form .text_input:focus {
+	BORDER-RIGHT: #ddd 1px solid; BORDER-TOP: #666 2px solid; BORDER-LEFT: =
+#666 2px solid; BORDER-BOTTOM: #ddd 1px solid
+}
+#comment_form .form_submit {
+	BORDER-RIGHT: #999 3px double; PADDING-RIGHT: 4px; BORDER-TOP: #ccc 3px =
+double; PADDING-LEFT: 4px; BACKGROUND: url(images/submit_bg.gif); =
+PADDING-BOTTOM: 0.4em; FONT: bold 1.4em Georgia, "Times New Roman", =
+Times, serif; BORDER-LEFT: #ccc 3px double; CURSOR: pointer; =
+PADDING-TOP: 0.4em; BORDER-BOTTOM: #999 3px double
+}
+#comment_form P.subscribe-to-comments {
+	FONT-SIZE: 1.4em
+}
+#comment_form P.subscribe-to-comments LABEL {
+	FONT-SIZE: 1em
+}
+#search_form {
+=09
+}
+#search_form .search_input {
+	BORDER-RIGHT: #f5f5f5 1px solid; PADDING-RIGHT: 3px; BORDER-TOP: #999 =
+1px solid; PADDING-LEFT: 3px; PADDING-BOTTOM: 3px; FONT: 1em Georgia, =
+"Times New Roman", Times, serif; BORDER-LEFT: #999 1px solid; WIDTH: =
+201px; COLOR: #090; PADDING-TOP: 3px; BORDER-BOTTOM: #f5f5f5 1px solid
+}
+LI.widget .search_input {
+	FONT-SIZE: 1.1em! important
+}
+#search_form .search_input:focus {
+	BORDER-RIGHT: #ddd 1px solid; BORDER-TOP: #666 1px solid; BORDER-LEFT: =
+#666 1px solid; BORDER-BOTTOM: #ddd 1px solid
+}
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: 7bit
+Content-Location: http://www.swedishcoding.com/wp-content/themes/cutline-3-column-split-11/ie7.css
+
+PRE {
+	FONT-SIZE: 1em
+}
+H1 {
+	LETTER-SPACING: -0.1em
+}
+
+------=_NextPart_000_0000_01CDC690.4DB3ED40--

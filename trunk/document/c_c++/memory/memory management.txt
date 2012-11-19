@@ -1,0 +1,11 @@
+Memory affects performance in two ways:
+1¡¢Dynamic memory allocation via malloc() or C++'s global operator new is a very slow operation.
+We can improve the performance of our code by either avoiding dynamic allocation altogether or 
+by making use of custom memory allocators that greatly reduce allocation costs.
+2¡¢On modern CPUs, the performance of a piece of software is often dominated by its memory access
+patterns. As we'll see, data that is located in small, contiguous blocks of memory can be operated
+on much more efficiently by the CPU than if that same data were to be spread out across a wide 
+range of memory addresses. Even the most efficient algorithm, coded with the utmost care, can be 
+brought to its knees if the data upon which it operates is not laid out efficiently in memory.
+
+¡¶Game engine architecture¡·
