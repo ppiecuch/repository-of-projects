@@ -1,0 +1,29 @@
+在某些特定的场合下,cpu需要分配的内存地址,自动对齐在N(2的若干次方)边界，因此需要内存分配函数具有自动调整边界能力。
+
+void * malloc_align(int req_size, int algn_len)
+
+{
+
+    int *p1 = (int *)malloc(req_size + algn_len + sizeof(int));
+
+    int *p2 = (int *)(((int)p1 + algn_len + sizeof(int)) & ~(algn_len -1)); //p2 为p1 调整在algn_len 边界后的位置；
+
+    *(p2 -1) = (int)p1; //保存原始的内存分配后的原始位置，以便对齐归还；
+
+    return p2;
+
+}
+
+ 
+
+void free_align(void *p)
+
+{
+
+    free((int *)(*(p -1))); //p -1 得到存放的原始指针；
+
+}
+
+指针对齐在内存分配的时候会导致存在少量内存浪费。
+
+http://blog.csdn.net/kuangsong/article/details/7901324

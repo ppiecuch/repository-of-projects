@@ -1,0 +1,77 @@
+Q: What is structure alignment?
+
+A: All modern CPUs expect that fundamental types like ints, longs and floats will be stored in memory at addresses 
+that are multiples of their length.
+
+CPUs are optimized for accessing memory aligned in this way.
+
+Some CPUs:
+
+allow unaligned access but at a performance penalty;
+
+trap unaligned accesses to the operating system where they can either be ignored, simulated or reported as errors;
+
+use unaligned addresses as a means of doing special operations during the load or store.
+
+When a C compiler processes a structure declaration, it can:
+
+add extra bytes between the fields to ensure that all fields requiring alignment are properly aligned;
+
+ensure that instances of the structure as a whole are properly aligned. Malloc always returns memory pointers that are 
+aligned for the strictest, fundamental machine type.
+
+The specifications for C/C++ state that the existence and nature of these padding bytes are implementation defined. 
+This means that each CPU/OS/Compiler combination is free to use whatever alignment and padding rules are best for 
+their purposes. Programmers however are not supposed to assume that specific padding and alignment rules will be followed. 
+There are no controls defined within the language for indicating special handling of alignment and padding although many 
+compilers like gcc have non-standard extensions to permit this.
+
+Summary
+
+Structure Alignment
+Structure alignment may be defined as the choice of rules which determine when and where padding is inserted together with 
+the optimizations which the compiler is able to effect in generated code.
+
+Q: Why is this an issue for ARM systems?
+
+A:
+
+The early ARM processors had limited abilities to access memory that was not aligned on a word (four byte) boundary.
+
+Current ARM processors (as opposed to the StrongARM) have less support for accessing halfword (short int) values.
+
+The first compilers were designed for embedded system applications.
+
+The compiler writers chose to allow the declaration of types shorter than a word (chars and shorts) but aligned all structures 
+to a word boundary to increase performance when accessing these items.
+
+These rules are acceptable to the C/C++ language specifications but they are different from the rules that are used by 
+virtually all 32 and 64 bit microprocessors. Linux and its applications have never been ported to a platform with these 
+alignment rules before so there are latent defects in the code where programmers have incorrectly assumed certain alignment 
+rules. Moreover, these defects appear when applications are ported to the ARM platform.
+
+The Linux kernel itself contains these types of assumptions.
+
+These latent defects can consequently lead to:
+
+decreased performance;
+
+corrupted data;
+
+program crashes.
+
+The exact effect depends on how the compiler and OS are configured as well as the nature of the defective code.
+
+These defects may be fixed by:
+
+changing the compiler's alignment rules to match those of other Linux platforms;
+
+using an alignment trap to fix incorrectly aligned memory references;
+
+finding and fixing all latent defects on a case-by-case basis.
+
+The three alternatives are, to some extent, mutually exclusive. All of them have advantages and disadvantages and have 
+been applied in the past so there is some experience with each although the correct solution depends on your goals 
+(see below).
+
+http://blog.21ic.com/user1/1066/archives/2006/8270.html

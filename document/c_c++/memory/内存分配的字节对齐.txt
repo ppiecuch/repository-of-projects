@@ -1,0 +1,25 @@
+内存对齐：
+1.内存为了提高访问效率，规定以结构体中最大的基本单位长度为对齐标准。即实际分配的内存大小是对齐标准的整数倍。
+
+例一、
+
+
+1 struct student2  {3       char name[20];4       int age;5       char sex;6       char phone[15];7  };8  struct student  stu;
+那么：sizeof（stu）的大小为20+4+1+15=40byte。如果phone[16]/[17]/[18], 结果则是44byte。因为上面的结构体中，最大的基本类型是int，所以实际大小为4的整数倍。但是为什么不以name[20]作为对齐标准呢》这里清注意是基本类型。name[20]是一个字符串数组，数组属于复合的数据类型，复合型的数据类型还有结构体，共用体。基本的数据类型是整型、字符型、和浮点型。
+
+例二、
+
+1 union data2  {3      int i;4      char c;5      char str[9];6  };
+ sizeof（data）= 12byte。这是为什么呢？这是因为共用体的存储大小是由最大的成员来决定的，即char  str[9],但是考虑到内存对齐，它以sizeof（int）= 4byte来对齐，所以实际内存分配大小是12byte。
+
+例三、
+
+1 struct data2  {3      char c;4      double d;5      char ch;6  }；
+这里的sizeof（data）= ？？呢，也许你会认为是16，但是答案确实24，因为结构体变量是连续分配内存空间的，double d；毫无疑问分配各8byte，而char c；按照字节对齐标准分配8byte，而后面的char  ch；同理也分配8byte，所以结果是24.
+
+例四、
+
+1 struct data2  {3      double d;4      char c;5      char ch;6  }
+这个和上面的不同是，c和ch可以连续的放在一个8byte中，所以sizeof（data） = 16byte。
+
+http://www.cnblogs.com/zhou2011/archive/2012/03/08/2384633.html
