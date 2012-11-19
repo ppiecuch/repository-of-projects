@@ -1,0 +1,734 @@
+From: =?gb2312?B?08kgV2luZG93cyBJbnRlcm5ldCBFeHBsb3JlciA4ILGjtOY=?=
+Subject: A Memory Allocator
+Date: Sun, 18 Nov 2012 18:12:14 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CDC5B8.3CDCCC90"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7600.16807
+
+这是 MIME 格式的多方邮件。
+
+------=_NextPart_000_0000_01CDC5B8.3CDCCC90
+Content-Type: text/html;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://gee.cs.oswego.edu/dl/html/malloc.html
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>A Memory Allocator</TITLE>
+<META content=3D"text/html; charset=3Dgb2312" http-equiv=3DContent-Type>
+<META name=3DGENERATOR content=3D"MSHTML 8.00.7600.17115"></HEAD>
+<BODY link=3D#cc0000 bgColor=3D#ffffee vLink=3D#0000aa>
+<H1>A Memory Allocator</H1>
+<P>by <A href=3D"http://g.oswego.edu/">Doug Lea</A>=20
+<P>[A German adaptation and translation of this article appears in=20
+<B>unix/mail</B> December, 1996. This article is now out of date, and =
+doesn't=20
+reflect details of current version of malloc.]=20
+<H2>Introduction</H2>
+<P>Memory allocators form interesting case studies in the engineering of =
+
+infrastructure software. I started writing one in 1987, and have =
+maintained and=20
+evolved it (with the help of many volunteer contributors) ever since. =
+This=20
+allocator provides implementations of the the standard C routines=20
+<CODE>malloc()</CODE>, <CODE>free()</CODE>, and <CODE>realloc()</CODE>, =
+as well=20
+as a few auxiliary utility routines. The allocator has never been given =
+a=20
+specific name. Most people just call it <EM>Doug Lea's Malloc</EM>, or=20
+<EM>dlmalloc</EM> for short.=20
+<P>The code for this allocator has been placed in the public domain =
+(available=20
+from <A=20
+href=3D"ftp://g.oswego.edu/pub/misc/malloc.c">ftp://g.oswego.edu/pub/misc=
+/malloc.c</A>),=20
+and is apparently widely used: It serves as the default native version =
+of malloc=20
+in some versions of Linux; it is compiled into several commonly =
+available=20
+software packages (overriding the native malloc), and has been used in =
+various=20
+PC environments as well as in embedded systems, and surely many other =
+places I=20
+don't even know about.=20
+<P>I wrote the first version of the allocator after writing some C++ =
+programs=20
+that almost exclusively relied on allocating dynamic memory. I found =
+that they=20
+ran much more slowly and/or with much more total memory consumption than =
+I=20
+expected them to. This was due to characteristics of the memory =
+allocators on=20
+the systems I was running on (mainly the then-current versions of SunOs =
+and BSD=20
+). To counter this, at first I wrote a number of special-purpose =
+allocators in=20
+C++, normally by overloading <CODE>operator new</CODE> for various =
+classes. Some=20
+of these are described in a paper on C++ allocation techniques that was =
+adapted=20
+into the 1989 <EM>C++ Report</EM> article <A=20
+href=3D"ftp://g.oswego.edu/pub/papers/C++Report89.txt"><EM>Some storage =
+allocation=20
+techniques for container classes</EM></A>.=20
+<P>However, I soon realized that building a special allocator for each =
+new class=20
+that tended to be dynamically allocated and heavily used was not a good =
+strategy=20
+when building kinds of general-purpose programming support classes I was =
+writing=20
+at the time. (From 1986 to 1991, I was the the primary author of <A=20
+href=3D"http://g.oswego.edu/dl/libg++paper/libg++/libg++.html">libg++ =
+</A>, the=20
+GNU C++ library.) A broader solution was needed -- to write an allocator =
+that=20
+was good enough under normal C++ and C loads so that programmers would =
+not be=20
+tempted to write special-purpose allocators except under very special=20
+conditions.=20
+<P>This article presents a description of some of the main design goals, =
+
+algorithms, and implementation considerations for this allocator. More =
+detailed=20
+documentation can be found with the code distribution.=20
+<H2>Goals</H2>A good memory allocator needs to balance a number of =
+goals:=20
+<DL>
+  <DT>Maximizing Compatibility=20
+  <DD>An allocator should be plug-compatible with others; in particular =
+it=20
+  should obey ANSI/POSIX conventions.=20
+  <DT>Maximizing Portability=20
+  <DD>Reliance on as few system-dependent features (such as system =
+calls) as=20
+  possible, while still providing optional support for other useful =
+features=20
+  found only on some systems; conformance to all known system =
+constraints on=20
+  alignment and addressing rules.=20
+  <DT>Minimizing Space=20
+  <DD>The allocator should not waste space: It should obtain as little =
+memory=20
+  from the system as possible, and should maintain memory in ways that =
+minimize=20
+  <EM>fragmentation</EM> -- ``holes''in contiguous chunks of memory that =
+are not=20
+  used by the program.=20
+  <DT>Minimizing Time=20
+  <DD>The <CODE>malloc()</CODE>, <CODE>free()</CODE> and =
+<CODE>realloc</CODE>=20
+  routines should be as fast as possible in the average case.=20
+  <DT>Maximizing Tunability=20
+  <DD>Optional features and behavior should be controllable by users =
+either=20
+  statically (via <CODE>#define</CODE> and the like) or dynamically (via =
+control=20
+  commands such as <CODE>mallopt</CODE>).=20
+  <DT>Maximizing Locality=20
+  <DD>Allocating chunks of memory that are typically used together near =
+each=20
+  other. This helps minimize page and cache misses during program =
+execution.=20
+  <DT>Maximizing Error Detection=20
+  <DD>It does not seem possible for a general-purpose allocator to also =
+serve as=20
+  general-purpose memory error testing tool such as <EM>Purify</EM>. =
+However,=20
+  allocators should provide some means for detecting corruption due to=20
+  overwriting memory, multiple frees, and so on.=20
+  <DT>Minimizing Anomalies=20
+  <DD>An allocator configured using default settings should perform well =
+across=20
+  a wide range of real loads that depend heavily on dynamic allocation =
+--=20
+  windowing toolkits, GUI applications, compilers, interpretors, =
+development=20
+  tools, network (packet)-intensive programs, graphics-intensive =
+packages, web=20
+  browsers, string-processing applications, and so on. </DD></DL>
+<P>Paul Wilson and colleagues have written an excellent survey paper on=20
+allocation techniques that discusses some of these goals in more detail. =
+See=20
+Paul R. Wilson, Mark S. Johnstone, Michael Neely, and David Boles, =
+``Dynamic=20
+Storage Allocation: A Survey and Critical Review'' in <EM>International =
+Workshop=20
+on Memory Management</EM>, September 1995 (also available via <A=20
+href=3D"ftp://ftp.cs.utexas.edu/pub/garbage/allocsrv.ps">ftp</A>). (Note =
+that the=20
+version of my allocator they describe is <EM>not</EM> the most current =
+one=20
+however.)=20
+<P>As they discuss, minimizing space by minimizing wastage (generally =
+due to=20
+fragmentation) must be the primary goal in any allocator.=20
+<P>For an extreme example, among the fastest possible versions of=20
+<CODE>malloc()</CODE> is one that always allocates the next sequential =
+memory=20
+location available on the system, and the corresponding fastest version =
+of=20
+<CODE>free()</CODE> is a no-op. However, such an implementation is =
+hardly ever=20
+acceptable: it will cause a program to run out of memory quickly since =
+it never=20
+reclaims unused space. Wastages seen in some allocators used in practice =
+can be=20
+almost this extreme under some loads. As Wilson also notes, wastage can =
+be=20
+measured monetarily: Considered globally, poor allocation schemes cost =
+people=20
+perhaps even billions of dollars in memory chips.=20
+<P>While time-space issues dominate, the set of trade-offs and =
+compromises is=20
+nearly endless. Here are just a few of the many examples:=20
+<UL>
+  <LI>Accommodating worst-case alignment requirements increases wastage =
+by=20
+  forcing the allocator to skip over bytes in order to align chunks.=20
+  <LI>Most provisions for dynamic tunability (such as setting a =
+<EM>debug</EM>=20
+  mode) can seriously impact time efficiency by adding levels of =
+indirection and=20
+  increasing numbers of branches.=20
+  <LI>Some provisions designed to catch errors limit range of =
+applicability. For=20
+  example, previously to version 2.6.6, regardless of platform, malloc=20
+  internally handled allocation size arguments as if they were signed =
+32-bit=20
+  integers, and treats nonpositive arguments as if they were requests =
+for a size=20
+  of zero. (However, as of V2.6.6, negative arguments result in null =
+failure=20
+  returns, to comply to POSIX standards.)=20
+  <LI>Accommodating the oddities of other allocators to remain =
+plug-compatible=20
+  with them can reduce flexibility and performance. For the oddest =
+example, some=20
+  early versions of Unix allocators allowed programmers to =
+<CODE>realloc</CODE>=20
+  memory that had already been <CODE>freed</CODE>. Until 1993, I allowed =
+this=20
+  for the sake of compatibility. (However, no one at all complained when =
+this=20
+  ``feature'' was dropped.)=20
+  <LI>Some (but by no means all) heuristics that improve time and/or =
+space for=20
+  small programs cause unacceptably worse time and/or space =
+characteristics for=20
+  larger programs that dominate the load on typical systems these days. =
+</LI></UL>
+<P>No set of compromises along these lines can be perfect. However, over =
+the=20
+years, the allocator has evolved to make trade-offs that the majority of =
+users=20
+find to be acceptable. The driving forces that continue to impact the =
+evolution=20
+of this malloc include:=20
+<OL>
+  <LI>Empirical studies of malloc performance by others (including the=20
+  above-mentioned paper by Wilson et al, as well as others that it in =
+turn=20
+  cites). These papers find that versions of this malloc increasingly =
+rank as=20
+  simultaneously among the most time- and space-efficient memory =
+allocators=20
+  available. However, each reveals weaknesses or opportunities for =
+further=20
+  improvements.=20
+  <LI>Changes in target workloads. The nature of the kinds of programs =
+that are=20
+  most sensitive to malloc implementations continually change. For =
+perhaps the=20
+  primary example, the memory characteristics of <EM>X</EM> and other =
+windowing=20
+  systems increasingly dominate.=20
+  <LI>Changes in systems and processors. Implementation details and =
+fine-tunings=20
+  that try to make code readily optimizable for typical processors =
+change across=20
+  time. Additionally, operating systems (including Linux and Solaris) =
+have=20
+  themselves evolved, for example to make memory mapping an =
+occasionally-wise=20
+  choice for system-level allocation.=20
+  <LI>Suggestions, experience reports, and code from users and =
+contributors. The=20
+  code has evolved with the help of several regular volunteer =
+contributors. The=20
+  majority of recent changes were instigated by people using the version =
+
+  supplied in Linux, and were implemented in large part by Wolfram =
+Gloger for=20
+  the Linux version and then integrated by me. </LI></OL>
+<H2>Algorithms</H2>The two core elements of the malloc algorithm have =
+remained=20
+unchanged since the earliest versions:=20
+<P>
+<DL>
+  <DT>Boundary Tags=20
+  <DD>Chunks of memory carry around with them size information fields =
+both=20
+  before and after the chunk. This allows for two important =
+capabilities:=20
+  <UL>
+    <LI>Two bordering unused chunks can be coalesced into one larger =
+chunk. This=20
+    minimizes the number of unusable small chunks.=20
+    <LI>All chunks can be traversed starting from any known chunk in =
+either a=20
+    forward or backward direction. </LI></UL>
+  <P><IMG src=3D"http://gee.cs.oswego.edu/dl/html/malloc1.gif">=20
+  <P>The original versions implemented boundary tags exactly in this =
+fashion.=20
+  More recent versions omit trailer fields on chunks that are in use by =
+the=20
+  program. This is itself a minor trade-off: The fields are not ever =
+used while=20
+  chunks are active so need not be present. Eliminating them decreases =
+overhead=20
+  and wastage. However, lack of these fields weakens error detection a =
+bit by=20
+  making it impossible to check if users mistakenly overwrite fields =
+that should=20
+  have known values. </P>
+  <DT>Binning=20
+  <DD>Available chunks are maintained in bins, grouped by size. There =
+are a=20
+  surprisingly large number (128) of fixed-width bins, approximately=20
+  logarithmically spaced in size. Bins for sizes less than 512 bytes =
+each hold=20
+  only exactly one size (spaced 8 bytes apart, simplifying enforcement =
+of 8-byte=20
+  alignment). Searches for available chunks are processed in =
+smallest-first,=20
+  <EM>best-fit</EM> order. As shown by Wilson et al, best-fit schemes =
+(of=20
+  various kinds and approximations) tend to produce the least =
+fragmentation on=20
+  real loads compared to other general approaches such as first-fit.=20
+  <P><IMG src=3D"http://gee.cs.oswego.edu/dl/html/malloc2.gif">=20
+  <P>Until the versions released in 1995, chunks were left unsorted =
+within bins,=20
+  so that the best-fit strategy was only approximate. More recent =
+versions=20
+  instead sort chunks by size within bins, with ties broken by an =
+oldest-first=20
+  rule. (This was done after finding that the minor time investment was =
+worth it=20
+  to avoid observed bad cases.) </P></DD></DL>
+<P>Thus, the general categorization of this algorithm is <EM>best-first =
+with=20
+coalescing</EM>: Freed chunks are coalesced with neighboring ones, and =
+held in=20
+bins that are searched in size order.=20
+<P>This approach leads to fixed bookkeeping overhead per chunk. Because =
+both=20
+size information and bin links must be held in each available chunk, the =
+
+smallest allocatable chunk is 16 bytes in systems with 32-bit pointers =
+and 24=20
+bytes in systems with 64-bit pointers. These minimum sizes are larger =
+than most=20
+people would like to see -- they can lead to significant wastage for =
+example in=20
+applications allocating many tiny linked-list nodes. However, the 16 =
+bytes=20
+minimum at least is characteristic of <EM>any</EM> system requiring =
+8-byte=20
+alignment in which there is <EM>any</EM> malloc bookkeeping overhead.=20
+<P>This basic algorithm can be made to be very fast. Even though it =
+rests upon a=20
+search mechanism to find best fits, the use of indexing techniques, =
+exploitation=20
+of special cases, and careful coding lead to average cases requiring =
+only a few=20
+dozen instructions, depending of course on the machine and the =
+allocation=20
+pattern.=20
+<P>While coalescing via boundary tags and best-fit via binning represent =
+the=20
+main ideas of the algorithm, further considerations lead to a number of=20
+heuristic improvements. They include locality preservation, wilderness=20
+preservation, memory mapping, and caching.=20
+<H3>Locality preservation</H3>Chunks allocated at about the same time by =
+a=20
+program tend to have similar reference patterns and coexistent =
+lifetimes.=20
+Maintaining locality minimizes page faults and cache misses, which can =
+have a=20
+dramatic effect on performance on modern processors. If locality were =
+the=20
+<EM>only</EM> goal, an allocator might always allocate each successive =
+chunk as=20
+close to the previous one as possible. However, this =
+<EM>nearest-fit</EM> (often=20
+approximated by <EM>next-fit</EM>) strategy can lead to very bad =
+fragmentation.=20
+In the current version of malloc, a version of next-fit is used only in =
+a=20
+restricted context that maintains locality in those cases where it =
+conflicts the=20
+least with other goals: If a chunk of the exact desired size is not =
+available,=20
+the most recently split-off space is used (and resplit) if it is big =
+enough;=20
+otherwise best-fit is used. This restricted use eliminates cases where a =
+
+perfectly usable existing chunk fails to be allocated; thus eliminating =
+at least=20
+this form of fragmentation. And, because this form of next-fit is faster =
+than=20
+best-fit bin-search, it speeds up the average <CODE>malloc</CODE>.=20
+<H3>Wilderness Preservation</H3>The ``wilderness'' (so named by =
+Kiem-Phong Vo)=20
+chunk represents the space bordering the topmost address allocated from =
+the=20
+system. Because it is at the border, it is the only chunk that can be=20
+arbitrarily extended (via <CODE>sbrk</CODE> in Unix) to be bigger than =
+it is=20
+(unless of course <CODE>sbrk</CODE> fails because all memory has been=20
+exhausted).=20
+<P>One way to deal with the wilderness chunk is to handle it about the =
+same way=20
+as any other chunk. (This technique was used in most versions of this =
+malloc=20
+until 1994). While this simplifies and speeds up implementation, without =
+care it=20
+can lead to some very bad worst-case space characteristics: Among other=20
+problems, if the wilderness chunk is used when another available chunk =
+exists,=20
+you increase the chances that a later request will cause an otherwise=20
+preventable <CODE>sbrk</CODE>.=20
+<P>A better strategy is currently used: treat the wilderness chunk as =
+``bigger''=20
+than all others, since it can be made so (up to system limitations) and =
+use it=20
+as such in a best-first scan. This results in the wilderness chunk =
+always being=20
+used only if no other chunk exists, further avoiding preventable =
+fragmentation.=20
+<H3>Memory Mapping</H3>
+<P>In addition to extending general-purpose allocation regions via=20
+<CODE>sbrk</CODE>, most versions of Unix support system calls such as=20
+<CODE>mmap</CODE> that allocate a separate non-contiguous region of =
+memory for=20
+use by a program. This provides a second option within =
+<CODE>malloc</CODE> for=20
+satisfying a memory request. Requesting and returning a =
+<CODE>mmap</CODE>ed=20
+chunk can further reduce downstream fragmentation, since a released =
+memory map=20
+does not create a ``hole'' that would need to be managed. However, =
+because of=20
+built-in limitations and overheads associated with <CODE>mmap</CODE>, it =
+is only=20
+worth doing this in very restricted situations. For example, in all =
+current=20
+systems, mapped regions must be page-aligned. Also, invoking =
+<CODE>mmap</CODE>=20
+and <CODE>mfree</CODE> is much slower than carving out an existing chunk =
+of=20
+memory. For these reasons, the current version of malloc relies on=20
+<CODE>mmap</CODE> only if (1) the request is greater than a (dynamically =
+
+adjustable) threshold size (currently by default 1MB) and (2) the space=20
+requested is not already available in the existing arena so would have =
+to be=20
+obtained via <CODE>sbrk</CODE>.=20
+<P>In part because <CODE>mmap</CODE> is not always applicable in most =
+programs,=20
+the current version of malloc also supports <EM>trimming</EM> of the =
+main arena,=20
+which achieves one of the effects of memory mapping -- releasing unused =
+space=20
+back to the system. When long-lived programs contain brief peaks where =
+they=20
+allocate large amounts of memory, followed by longer valleys where the =
+have more=20
+modest requirements, system performance as a whole can be improved by =
+releasing=20
+unused parts of the <EM>wilderness</EM> chunk back to the system. (In =
+nearly all=20
+versions of Unix, <CODE>sbrk</CODE> can be used with negative arguments =
+to=20
+achieve this effect.) Releasing space allows the underlying operating =
+system to=20
+cut down on swap space requirements and reuse memory mapping tables. =
+However, as=20
+with <CODE>mmap</CODE>, the call itself can be expensive, so is only =
+attempted=20
+if trailing unused memory exceeds a tunable threshold.=20
+<H3>Caching</H3>
+<P>In the most straightforward version of the basic algorithm, each =
+freed chunk=20
+is immediately coalesced with neighbors to form the largest possible =
+unused=20
+chunk. Similarly, chunks are created (by splitting larger chunks) only =
+when=20
+explicitly requested.=20
+<P>Operations to split and to coalesce chunks take time. This time =
+overhead can=20
+sometimes be avoided by using either of both of two <EM>caching</EM> =
+strategies:=20
+
+<DL>
+  <DT>Deferred Coalescing=20
+  <DD>Rather than coalescing freed chunks, leave them at their current =
+sizes in=20
+  hopes that another request for the same size will come along soon. =
+This saves=20
+  a coalesce, a later split, and the time it would take to find a=20
+  non-exactly-matching chunk to split.=20
+  <DT>Preallocation=20
+  <DD>Rather than splitting out new chunks one-by one, pre-split many at =
+once.=20
+  This is normally faster than doing it one-at-a-time. </DD></DL>Because =
+the basic=20
+data structures in the allocator permit coalescing at any time, in any =
+of=20
+<CODE>malloc</CODE>, <CODE>free</CODE>, or <CODE>realloc</CODE>, =
+corresponding=20
+caching heuristics are easy to apply.=20
+<P>The effectiveness of caching obviously depends on the costs of =
+splitting,=20
+coalescing, and searching relative to the work needed to track cached =
+chunks.=20
+Additionally, effectiveness less obviously depends on the policy used in =
+
+deciding when to cache versus coalesce them. .=20
+<P>Caching can be a good idea in programs that continuously allocate and =
+release=20
+chunks of only a few sizes. For example, if you write a program that =
+allocates=20
+and frees many tree nodes, you might decide that is worth it to cache =
+some=20
+nodes, assuming you know of a fast way to do this. However, without =
+knowledge of=20
+the program, <CODE>malloc</CODE> cannot know whether it would be a good =
+idea to=20
+coalesce cached small chunks in order to satisfy a larger request, or =
+whether=20
+that larger request should be taken from somewhere else. And it is =
+difficult for=20
+the allocator to make more informed guesses about this matter. For =
+example, it=20
+is just as costly for an allocator to determine how much total =
+contiguous space=20
+would be gained by coalescing chunks as it would be to just coalesce =
+them and=20
+then resplit them.=20
+<P>Previous versions of the allocator used a few search-ordering =
+heuristics that=20
+made adequate guesses about caching, although with occasionally bad =
+worst-case=20
+results. But across time, these heuristics appear to be decreasingly =
+effective=20
+under real loads. This is probably because actual programs that rely =
+heavily on=20
+malloc increasingly tend to use a larger variety of chunk sizes. For =
+example, in=20
+C++ programs, this probably corresponds to a trend for programs to use =
+an=20
+increasing number of classes. Different classes tend to have different =
+sizes.=20
+<P>[Note: More recent versions of malloc DO cache, but only small =
+chunks.]=20
+<H3>Lookasides</H3>
+<P>There remains one kind of caching that is highly desirable in some=20
+applications but not implemented in this allocator -- lookasides for =
+very small=20
+chunks. As mentioned above, the basic algorithm imposes a minimum chunk =
+size=20
+that can be very wasteful for very small requests. For example, a linked =
+list on=20
+a system with 4-byte pointers might allocate nodes holding only, say, =
+two=20
+pointers, requiring only 8 bytes. Since the minimum chunk size is 16 =
+bytes, user=20
+programs allocating only list nodes suffer 100% overhead.=20
+<P>Eliminating this problem while still maintaining portable alignment =
+would=20
+require that the allocator not impose <EM>any</EM> overhead. Techniques =
+for=20
+carrying this out exist. For example, chunks could be checked to see if =
+they=20
+belong to a larger aggregated space via address comparisons. However, =
+doing so=20
+can impose significant costs; in fact the cost would be unacceptable in =
+this=20
+allocator. Chunks are not otherwise tracked by address, so unless =
+arbitrarily=20
+limited, checking might lead to random searches through memory. =
+Additionally,=20
+support requires the adoption of one or more policies controlling =
+whether and=20
+how to ever coalesce small chunks.=20
+<P>Such issues and limitations lead to one of the very few kinds of =
+situations=20
+in which programmers should routinely write their own special purpose =
+memory=20
+management routines (by, for example in C++ overloading <CODE>operator=20
+new()</CODE>). Programs relying on large but approximately known numbers =
+of very=20
+small chunks may find it profitable to build very simple allocators. For =
+
+example, chunks can be allocated out of a fixed array with an embedded =
+freelist,=20
+along with a provision to rely on <CODE>malloc</CODE> as a backup if the =
+array=20
+becomes exhausted. Somewhat more flexibly, these can be based on the C =
+or C++=20
+versions of <EM>obstack</EM> available with GNU gcc and libg++.=20
+<HR>
+
+<ADDRESS><A href=3D"mailto:dl@gee.cs.oswego.edu">Doug =
+Lea</A></ADDRESS><!-- Created: Fri Oct 25 19:07:46 EDT 1996 --><!-- =
+hhmts start -->Last=20
+modified: Tue Apr 4 06:57:17 EDT 2000 <!-- hhmts end --></BODY></HTML>
+
+------=_NextPart_000_0000_01CDC5B8.3CDCCC90
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://gee.cs.oswego.edu/dl/html/malloc1.gif
+
+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
+wFJbAAA7
+
+------=_NextPart_000_0000_01CDC5B8.3CDCCC90
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Location: http://gee.cs.oswego.edu/dl/html/malloc2.gif
+
+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
+aZElUAAAOw==
+
+------=_NextPart_000_0000_01CDC5B8.3CDCCC90--
