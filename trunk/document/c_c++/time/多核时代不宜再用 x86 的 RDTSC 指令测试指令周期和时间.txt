@@ -1,0 +1,40 @@
+自从 Intel Pentium 加入 RDTSC 指令以来，这条指令是 micro-benchmarking 的利器，可以以极小的代价获得高精度的 CPU 时钟周期数（Time Stamp Counter），不少介绍优化的文章[1]和书籍用它来比较两段代码的快慢。甚至有的代码用 RDTSC 指令来计时，以替换 gettimeofday() 之类的系统调用。在多核时代，RDTSC 指令的准确度大大削弱了，原因有三：
+
+ 
+
+不能保证同一块主板上每个核的 TSC 是同步的；
+CPU 的时钟频率可能变化，例如笔记本电脑的节能功能；
+乱序执行导致 RDTSC 测得的周期数不准，这个问题从 Pentium Pro 时代就存在。
+ 
+
+这些都影响了 RDTSC 的两大用途，micro-benchmarking 和计时。
+
+ 
+
+RDTSC 一般的用法是，先后执行两次，记下两个 64-bit 整数 start 和 end，那么 end-start 代表了这期间 CPU 的时钟周期数。
+
+ 
+
+在多核下，这两次执行可能会在两个 CPU 上发生，而这两个 CPU 的计数器的初值不一定相同（由于完成上电复位的准确时机不同），（有办法同步，见[3]），那么就导致 micro-benchmarking 的结果包含了这个误差，这个误差可正可负，取决于先执行的那块 CPU 的时钟计数器是超前还是落后。
+
+ 
+
+另外，对于计时这个用途，时间 = 周期数 / 频率，由于频率可能会变（比如我的笔记本的 CPU 通常半速运行在 800MHz，繁忙的时候全速运行在 1.6GHz），那么测得的时间也就不准确了。有的新 CPU 的 RDTSC 计数频率是恒定的，那么时钟是准了，那又会导致 micro-benchmarking 的结果不准，见 [2]。还有一个可能是掉电之后恢复（比如休眠），那么 TSC 会清零。 总之，用 RDTSC 来计时是不灵的。
+
+ 
+
+乱序执行这个问题比较简单 [1]，但意义深远：在现代 CPU 的复杂架构下，测量几条或几十条指令的耗时是无意义的，因为观测本身会干扰 CPU 的执行（cache, 流水线, 多发射，乱序, 猜测)，这听上去有点像量子力学系统了。要么我们以更宏观的指标来标示性能，把"花 xxx 个时钟周期"替换"每秒处理 yyy 条消息"或"消息处理的延时为 zzz 毫秒"；要么用专门的 profiler 来减小对观测结果的影响（无论是 callgrind 这种虚拟 CPU，还是 OProfile 这种采样器）。
+
+ 
+
+虽然 RDTSC 废掉了，性能测试用的高精度计时还是有办法的 [2]，在 Windows 用 QueryPerformanceCounter 和 QueryPerformanceFrequency，Linux 下用 POSIX 的 clock_gettime 函数，以 CLOCK_MONOTONIC 参数调用。或者按文献 [3] 的办法，先同步 TSC， 再使用它。（我不知道现在最新的 Linux 官方内核是不是内置了这个同步算法。也不清楚校准后的两个 CPU 的“钟”会不会再次失步。）
+
+ 
+
+[1] http://www.ccsl.carleton.ca/~jamuir/rdtscpm1.pdf
+[2] http://en.wikipedia.org/wiki/Time_Stamp_Counter
+
+[3] x86: unify/rewrite SMP TSC sync code http://lwn.net/Articles/211051/
+
+
+http://blog.csdn.net/aindk/article/details/6953993
