@@ -1,0 +1,309 @@
+Ogre引擎中与内存管理相关的文件大致有以下几个（只列出头文件）
+OgreAlignedAllocator.h
+OgreMemoryAllocatedObject.h
+OgreMemoryAllocatorConfig.h
+OgreMemoryNedAlloc.h
+OgreMemoryNedPooling.h
+OgreMemoryStdAlloc.h
+OgreMemorySTLAllocator.h
+OgreMemoryTracker.h
+ 
+ 
+Ogre引擎的内存分配方式主要有三种：NEDPOOLING、NED、STD，通过定义宏OGRE_MEMORY_ALLOCATOR来进行选择，默认情况下使用的是NEDPOOLING。
+Ogre中所有的分配方式都分为对齐分配内存与不对齐两种class，取名方式是XXAlignedPolicy与XXAllocPolicy，并且所有的内存函数都是静态（static）的。真正做分配功能的函数名字固定为以下四个：
+view plaincopy to clipboard
+static void* allocBytes(size_t count,   
+            const char* file, int line, const char* func);  
+          
+static void deallocBytes(void* ptr);  
+          
+static void* allocBytesAligned(size_t align, size_t count,   
+            const char* file, int line, const char* func);  
+          
+static void deallocBytesAligned(size_t align, void* ptr);  
+[cpp] view plaincopy
+static void* allocBytes(size_t count,   
+            const char* file, int line, const char* func);  
+          
+static void deallocBytes(void* ptr);  
+          
+static void* allocBytesAligned(size_t align, size_t count,   
+            const char* file, int line, const char* func);  
+          
+static void deallocBytesAligned(size_t align, void* ptr);  
+ 
+实质上每种分配方式最主要的功能就是实现这四个函数，至于为什么要统一固定这四个函数的名字，看到最后就会明白~
+ 
+（1）STD，对应头文件OgreMemoryStdAlloc.h / OgreAlignedAllocator.h
+对齐分配类名：template <size_t Alignment = 0> class StdAlignedAllocPolicy
+不考虑对齐类名：class StdAllocPolicy
+ 
+这类方式顾名思义，也就是使用最直接的malloc/free方式进行内存分配和释放。这里可以关注下的是StdAlignedAllocPolicy模板类。
+StdAlignedAllocPolicy模板类使用Alignment作为模板参数，该参数的意思是内存对齐的字节数，默认参数为0。当使用默认参数0时，Ogre会自动使用OGRE_SIMD_ALIGNMENT宏来进行对齐，该宏默认值是16。
+在这个类中，还应用一种元模板技术，代码片段如下：
+view plaincopy to clipboard
+template <size_t Alignment = 0>  
+class StdAlignedAllocPolicy  
+{  
+public:  
+    // compile-time check alignment is available.   
+    typedef int IsValidAlignment  
+    [Alignment <= 128 && ((Alignment & (Alignment-1)) == 0) ? +1 : -1];  
+    ...  
+};  
+[cpp] view plaincopy
+template <size_t Alignment = 0>  
+class StdAlignedAllocPolicy  
+{  
+public:  
+    // compile-time check alignment is available.  
+    typedef int IsValidAlignment  
+    [Alignment <= 128 && ((Alignment & (Alignment-1)) == 0) ? +1 : -1];  
+    ...  
+};  
+ 
+其实这并不神秘，如上代码中使用到的元模板技术可以简单地理解为是一种在编译时做模板参数的正确性检查的方法。
+就这段代码而言，这里typedef定义IsValidAlignment数组的作用，是利用数组长度不能为负的编译报错形式，检查Alignment参数的有效性。如果Alignment满足小于等于128并且是2的次方数，数组长度为1，编译正确；反之编译时报错。这样就在编译时规定了Alignment参数的数字形式，不会将问题留到运行时。
+ 
+还有一个值得说的就是对齐分配的算法。
+在StdAlignedAllocPolicy模板类中是调用了另一个类AlignedMemory的静态函数来完成这一功能的。下面就来看下AlignedMemory类的分配和释放函数的原貌吧。
+（i）分配函数
+view plaincopy to clipboard
+void* AlignedMemory::allocate(size_t size, size_t alignment)  
+{  
+    assert(0 < alignment && alignment <= 128 && Bitwise::isPO2(alignment));  
+    unsigned char* p = new unsigned char[size + alignment];  
+    size_t offset = alignment - (size_t(p) & (alignment-1));  
+    unsigned char* result = p + offset;  
+    result[-1] = (unsigned char)offset;  
+    return result;  
+}  
+[cpp] view plaincopy
+void* AlignedMemory::allocate(size_t size, size_t alignment)  
+{  
+    assert(0 < alignment && alignment <= 128 && Bitwise::isPO2(alignment));  
+    unsigned char* p = new unsigned char[size + alignment];  
+    size_t offset = alignment - (size_t(p) & (alignment-1));  
+    unsigned char* result = p + offset;  
+    result[-1] = (unsigned char)offset;  
+    return result;  
+}  
+ 
+乍一看没明白？没关系，先给出Ogre代码中的注释
+view plaincopy to clipboard
+/** 
+* 
+* |___2___|3|_________5__________|__6__| 
+* ^         ^ 
+* 1         4 
+* 
+* 1 -> Pointer to start of the block allocated by new. 
+* 2 -> Gap used to get 4 aligned on given alignment 
+* 3 -> Byte offset between 1 and 4 
+* 4 -> Pointer to the start of data block. 
+* 5 -> Data block. 
+* 6 -> Wasted memory at rear of data block. 
+*/  
+[cpp] view plaincopy
+/** 
+* 
+* |___2___|3|_________5__________|__6__| 
+* ^         ^ 
+* 1         4 
+* 
+* 1 -> Pointer to start of the block allocated by new. 
+* 2 -> Gap used to get 4 aligned on given alignment 
+* 3 -> Byte offset between 1 and 4 
+* 4 -> Pointer to the start of data block. 
+* 5 -> Data block. 
+* 6 -> Wasted memory at rear of data block. 
+*/  
+ 
+图中1所指向的就是new出的内存首地址，就是分配函数中p指针的指向之地。
+图中2与3是一段内存，名为offset，是通过计算得到的，计算的算式就是
+view plaincopy to clipboard
+size_t offset = alignment - (size_t(p) & (alignment-1));  
+[cpp] view plaincopy
+size_t offset = alignment - (size_t(p) & (alignment-1));  
+ 
+假设alignment是4，size_t(p)是将p的地址转换为无符号的十进制数，然后位操作是取这个十进制数的二进制形式的最后4位。
+这里应该是个数学问题，如果是4的话，这样位操作的结果是余数，至于其他2的次方数不知道是不是也是这样。最后相减后的offset值就是本次内存分配需要调整的字节长度。
+通过p+offset的操作得到最后的真正存放数据的地址，就是注释图中4的位置。
+最后的一行代码将result[-1]存放offset值的作用，是为了在释放时正确算回p的位置，一会儿就能在代码中看到。
+ 
+（ii）释放函数
+view plaincopy to clipboard
+void AlignedMemory::deallocate(void* p)  
+{  
+   if (p)  
+   {  
+       unsigned char* mem = (unsigned char*)p;  
+       mem = mem - mem[-1];  
+       delete [] mem;  
+   }  
+}  
+[cpp] view plaincopy
+void AlignedMemory::deallocate(void* p)  
+{  
+   if (p)  
+   {  
+       unsigned char* mem = (unsigned char*)p;  
+       mem = mem - mem[-1];  
+       delete [] mem;  
+   }  
+}  
+ 
+有了分配函数中的解释，再看这个函数是不是就很简单了。
+ 
+（2）NED，对应头文件OgreMemoryNedAlloc.h
+nedmalloc 是一个可选的malloc内存分配的实现，主要是适应多线程无锁操作。主页是http://www.nedprod.com/index.html
+了解了STD的操作方式后，再来看NED就简单很多了，类的结构也基本一致。
+ 
+对齐分配类名：template <size_t Alignment = 0> class NedAlignedAllocPolicy
+不考虑对齐类名：class NedAllocPolicy
+NedAllocImpl类封装了所有内存分配函数，相当于STD中AlignedMemory的地位，这种调用方式有点类似设计模式中的Bridge，将抽象与实现部分进行了分离。
+由于Nedmalloc中都已经有相应的对齐分配的api，所以在这种分配方式下直接调用就可以了。
+ 
+ 
+(3) NEDPOOLING， 对应头文件OgreMemoryNedPooling.h
+Ogre默认的分配方式，拥有与NED基本一致的类结构
+ 
+对齐分配类名：template <size_t Alignment = 0> class NedPoolingAlignedPolicy
+不考虑对齐类名：class NedPoolingPolicy
+实现类名：class NedPoolingImpl
+顾名思义，这种分配方式就是ned基础上使用内存池技术，ned自带有内存池的api，所以代码部分看起来也不会太难。
+ 
+这里可以关注的是NedPoolingImpl中的函数，这些函数都是在_NedPoolingIntern namespace中的全局函数，也就是说_NedPoolingIntern 命名空间中的函数才是真正调用ned的代码。
+view plaincopy to clipboard
+namespace _NedPoolingIntern  
+{  
+    const size_t s_poolCount = 14; // Needs to be greater than 4   
+    void* s_poolFootprint = reinterpret_cast<void*>(0xBB1AA45A);  
+    nedalloc::nedpool* s_pools[s_poolCount + 1] = { 0 };  
+    nedalloc::nedpool* s_poolsAligned[s_poolCount + 1] = { 0 };  
+    size_t poolIDFromSize(size_t a_reqSize);  
+      
+    ...  
+}  
+[cpp] view plaincopy
+namespace _NedPoolingIntern  
+{  
+    const size_t s_poolCount = 14; // Needs to be greater than 4  
+    void* s_poolFootprint = reinterpret_cast<void*>(0xBB1AA45A);  
+    nedalloc::nedpool* s_pools[s_poolCount + 1] = { 0 };  
+    nedalloc::nedpool* s_poolsAligned[s_poolCount + 1] = { 0 };  
+    size_t poolIDFromSize(size_t a_reqSize);  
+      
+    ...  
+}  
+ 
+命名空间_NedPoolingIntern中定义了内存池的大小，默认为14，还保存了pool的数组以及初始化内存池时用到的footprint。
+关于这个footprint的代码如下：
+view plaincopy to clipboard
+if (s_pools[poolID] == 0)  
+{  
+    // Init pool if first use   
+    s_pools[poolID] = nedalloc::nedcreatepool(0, 8);  
+    nedalloc::nedpsetvalue(s_pools[poolID], s_poolFootprint); // All pools are stamped with a footprint   
+    ...  
+}  
+[cpp] view plaincopy
+if (s_pools[poolID] == 0)  
+{  
+    // Init pool if first use  
+    s_pools[poolID] = nedalloc::nedcreatepool(0, 8);  
+    nedalloc::nedpsetvalue(s_pools[poolID], s_poolFootprint); // All pools are stamped with a footprint  
+    ...  
+}  
+ 
+这个是初始化新pool的代码片段，将s_pools[poolID]设置为s_poolFootprint后，就表示该pool被初始化过了。
+ 
+Ogre的内存有如上三种内存分配方式，那接下来的问题就是如何才能通过一个宏定义，简单地在进行不同方式的切换呢？
+这就涉及到另一对class的继承：
+view plaincopy to clipboard
+template <MemoryCategory Cat> class CategorisedAllocPolicy : public XX{};  
+template <MemoryCategory Cat, size_t align = 0> class CategorisedAlignAllocPolicy : public XX<align>{};   
+[cpp] view plaincopy
+template <MemoryCategory Cat> class CategorisedAllocPolicy : public XX{};  
+template <MemoryCategory Cat, size_t align = 0> class CategorisedAlignAllocPolicy : public XX<align>{};   
+ 
+代码中的XX就是上述三种方式相应的class。然后在不同的宏定义下，定义三组不同的CategorisedAllocPolicy / CategorisedAlignAllocPolicy 就可以很简单地进行区别了。
+这样做一层抽象的目的就是为了让调用内存分配的class在继承这些接口的时候看起来是完全不用理会底层用的是什么分配方式。
+有了这样一个class还不够，可以看到这个class并没有任何成员，也就是说它不负责调用，这时候就需要真正的主角登场了。
+ 
+ 
+template <class Alloc> class AllocatedObject 对应头文件OgreMemoryAllocatedObject.h
+这个class的实现是设计模式中的Strategy，只是将Strategy作为了模板参数。可以先看下AllocatedObject 的调用函数代码例子：
+view plaincopy to clipboard
+//分配   
+Alloc::allocateBytes(sz);  
+//释放   
+Alloc::deallocateBytes(ptr);  
+[cpp] view plaincopy
+//分配  
+Alloc::allocateBytes(sz);  
+//释放  
+Alloc::deallocateBytes(ptr);  
+ 
+上面的代码是AllocatedObject的真实写照，所有的函数调用都用到了该形式，看到Alloc了么？这个Alloc就是CategorisedAllocPolicy / CategorisedAlignAllocPolicy。
+还记得开篇所提到的四个固定的函数声明么？三种分配方式使用完全相同的函数声明，一旦固定了相同的接口，就可以很方便地实现Strategy模式。
+ 
+这个过程形成后就简单了，对需要建立在堆上的数据结构只要继承这个AllocatedObject就可以很轻松的完成内存分配的管理了。
+Ogre中需要进行内存分配的类型在OgreMemoryAllocatorConfig.h中枚举了出来
+view plaincopy to clipboard
+enum MemoryCategory  
+{  
+    /// General purpose   
+    MEMCATEGORY_GENERAL = 0,  
+    /// Geometry held in main memory   
+    MEMCATEGORY_GEOMETRY = 1,   
+    /// Animation data like tracks, bone matrices   
+    MEMCATEGORY_ANIMATION = 2,   
+    /// Nodes, control data   
+    MEMCATEGORY_SCENE_CONTROL = 3,  
+    /// Scene object instances   
+    MEMCATEGORY_SCENE_OBJECTS = 4,  
+    /// Other resources   
+    MEMCATEGORY_RESOURCE = 5,  
+    /// Scripting   
+    MEMCATEGORY_SCRIPTING = 6,  
+    /// Rendersystem structures   
+    MEMCATEGORY_RENDERSYS = 7,  
+      
+    // sentinel value, do not use    
+    MEMCATEGORY_COUNT = 8  
+};  
+[cpp] view plaincopy
+enum MemoryCategory  
+{  
+    /// General purpose  
+    MEMCATEGORY_GENERAL = 0,  
+    /// Geometry held in main memory  
+    MEMCATEGORY_GEOMETRY = 1,   
+    /// Animation data like tracks, bone matrices  
+    MEMCATEGORY_ANIMATION = 2,   
+    /// Nodes, control data  
+    MEMCATEGORY_SCENE_CONTROL = 3,  
+    /// Scene object instances  
+    MEMCATEGORY_SCENE_OBJECTS = 4,  
+    /// Other resources  
+    MEMCATEGORY_RESOURCE = 5,  
+    /// Scripting  
+    MEMCATEGORY_SCRIPTING = 6,  
+    /// Rendersystem structures  
+    MEMCATEGORY_RENDERSYS = 7,  
+      
+    // sentinel value, do not use   
+    MEMCATEGORY_COUNT = 8  
+};  
+ 
+还记得CategorisedAllocPolicy / CategorisedAlignAllocPolicy中没有解释的MemoryCategory Cat吗？就是用来标示当前分配内存的数据类型的。
+ 
+还剩两个头文件
+ 
+OgreMemorySTLAllocator.h
+OgreMemoryTracker.h
+没有讨论，留作以后再看吧。
+
+
+http://blog.csdn.net/pizi0475/article/details/7095648
