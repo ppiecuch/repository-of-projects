@@ -1,0 +1,102 @@
+动态内存分配速度很慢。影响因素有二：
+
+1、堆分配需要处理任何大小的分配，所以管理支出较大；
+
+2、大多数OS中调用malloc()和free()必须首先从用户模式切换到内核模式，处理完后再切换回来。
+
+ 
+
+所以需要自己定制的内存分配器！
+
+ 
+
+一、Stack-Based Allocators
+
+1、分配大段连续的内存块(malloc() or new or array)
+
+2、维护一个指向栈顶的指针。初始化指针指向内存最低地址处。运行过程中，内存地址低于栈顶的都是正在使用的内存块，内存地址高于栈顶的都是未被使用的内存块。
+
+3、每次分配只需要将指针往内存高地址处移动；每次施放内存只需要将指针往内存低地址处移动。
+
+4、需要一个标记(marker)，标志着当前的栈顶，以备分配在此发生时记录分配开始的位置。
+
+ 
+
+stack-based allocator 
+
+ 1 class StackAllocator 2 { 3 public: 4      //stack marker:Represents the current top of the stack. 5 //You can only roll back to a marker,not to arbitrary locations 6 //within the stack. 7      typedef U32 Marker; 8       9      //Constructs a stack allocator with the given total size10      explicit StackAllocator(U32 stackSize_bytes);11 12      //Allocates a new block of the given size from stack top.13      void* alloc(U32 size_bytes);14    15      //Returns a marker to the current stack top16      Marker getMarker();17 18      //Rolls the stack back to a previous marker19      void freeToMarker(Marker marker);20 21      //Clears the entire stack22      void clear();23 private:24 };
+ 变种：Double-Ended Stack Allocators
+
+ 
+
+二、Pool Allocators
+
+目的：分配大量小块的、相同大小的内存块。
+
+1、预分配一个大内存块，其大小为每个小内存块(又叫元素)的整数倍。
+
+2、每个元素会加到空闲元素链表中，初始化所有的元素都在空闲元素链表中。
+
+3、每次进行内存分配时，从空闲元素链表中摘下即可；每次进行内存释放时，都将其再次加入空闲元素链表中。
+
+ 
+
+三、Aligned Allocators
+
+1、将对齐值减一得到mask值。例如，要求16bytes对齐，则mask=16-1=15=0x0000000F
+
+2、将未对齐的地址和mask做位与，得到未对齐的量。例如，未对齐地址为0x50341233 AND 0X0000000F=0x00000003
+
+3、将对齐值减掉未对齐的量，再加到未对齐的地址上去，就得到对齐的地址。
+
+aligned allocators 
+
+ 1 //Aligned allocation function.IMPORTANT:'alignment' must be a power of 2(typically 4 or 16 bytes) 2 void* allocateAligned(U32 size_bytes,U32 alignment) 3 { 4     //Determine total amount of memory to allocate 5     U32 expandedSize_bytes=size_bytes+alignment; 6     //Allocate an unaligned block and convert address to a U32 7     U32 rawAddress=(U32)allocateUnaligned(expandedSize_bytes); 8      9     U32 mask=alignment-1;10     U32 misalignment=mask&rawAddress;11     U32 adjustment=alignment-misalignment;12 13     U32 alignedAddress=rawAddress+adjustment;14 15     return (void*)alignedAddress;    16 }
+ 为了释放掉分配的内存块，我们需要将调整后的地址变回到原始的未调整的地址。
+
+下面的改进后的代码。
+
+ 
+
+new solution 
+
+ 1 //Aligned allocation function.IMPORTANT:'alignment' must be a power of 2(typically 4 or 16 bytes) 2 void* allocateAligned(U32 size_bytes,U32 alignment) 3 { 4     //Clients must call allocateUnaligned() and freeUnaligned() if alignment==1 5     ASSERT(alignment>1); 6  7     //Determine total amount of memory to allocate 8     U32 expandedSize_bytes=size_bytes+alignment; 9     //Allocate an unaligned block and convert address to a U3210     U32 rawAddress=(U32)allocateUnaligned(expandedSize_bytes);11     12     U32 mask=alignment-1;13     U32 misalignment=mask&rawAddress;14     U32 adjustment=alignment-misalignment;15 16     U32 alignedAddress=rawAddress+adjustment;17 18     //Store the adjustment in the four bytes immediately preceding the adjusted address that we're returning19     U32* pAdjustment=(U32*)(alignedAddress-4);20     *pAdjustment=adjustment;21 22     return (void*)alignedAddress;    23 }
+ 释放代码：
+
+free 
+
+1 void freeAligned(void* p)2 {3     U32 alignedAddress=(U32)p;4     U8* pAdjustment=(U8*)(alignedAddress-4);5     U32 adjustment=(U32)*pAdjustment;6     U32 rawAddress=alignedAddress-adjustment;7     freeUnaligned((void*)rawAddress);8 }
+ 
+
+四、Single-Frame and Double-Buffered Memory Allocators
+
+1、Single-Frame Allocators
+
+实现：保留一个内存块，使用简单的Stack Allocator管理。每一帧开始时，将栈顶指针清理到内存底部，用于每一帧过程中的分配过程。
+
+single frame 
+
+ 1 StackAllocator g_singleFrameAllocator; 2  3 //Main Game Loop 4 while(true) 5 { 6     //Clear the single-frame allocator's buffer every frame. 7     g_singleFrameAllocator.clear(); 8      9     //...10 11 //Allocate from the single-frame buffer.We never need to free this data!Just be sure to use it only this frame12     void* p=g_singleFrameAllocator.alloc(nBytes);13     14     //...15 }
+ 2、Double-Buffered Allocators
+
+特性：允许在帧i上分配内存块，帧i+1上使用。
+
+实现：创建同样大小的两个single-frame stack allocator，每帧轮流使用它们中得一个来绘制
+
+double buffer 
+
+ 1 class DoubleBufferedAllocator 2 { 3     U32 m_curStack; 4     StackAllocator m_stack[2]; 5  6 public: 7     void swapBuffers() 8     { 9         m_curStack=(U32)!m_curStack;10     }11 12     void clearCurrentBuffer()13     {14         m_stack[m_curStack].clear();15     }16 17     void* alloc(U32 nBytes)18     {19         return m_stack[m_curStack].alloc(nBytes);20     }21     //...22 };main loop 
+
+ 1 DoubleBufferedAllocator g_doubleBufAllocator; 2  3 //Main Game Loop 4 while(true) 5 { 6     //clear the single-frame allocator every frame as before 7     g_singleFrameAllocator.clear(); 8  9     //Swap the active and inactive buffers of the double buffered allocator10     g_doubleBufAllocator.swapBuffers();11 12     //Now clear the newly active buffer,leaving last frame's buffer intact.13     g_doubleBufAllocator.clearCurrentBuffer();14 15     //...16 17 //Allocate out of the current buffer, without disturbing last frame's data.Only use this data this frame or next frame.18 //Again,this memory never needs to be freed.19     void* p=g_doubleBufAllocator.alloc(nBytes);20 21     //...22 }
+
+避免内存碎片化
+
+如果OS没有虚拟内存机制
+
+1、stack allocator没有内存碎片的问题，因为分配都是连续的，而且释放是按照分配顺序的反序进行。
+
+2、pool allocator同样没有内存碎片的问题。
+
+3、其他情况下，需要周期性去碎片过程。将已分配的内存块从内存高地址处移到内存低地址处。
+
+http://www.cnblogs.com/daniagger/archive/2012/02/28/2372106.html

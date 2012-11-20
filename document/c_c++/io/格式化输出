@@ -17,3 +17,5 @@
 
 printf("%s%0*d\r\n","hello",5,0); //右补零,hello00000
 输出百分号 printf( "%%\n" );
+
+输出printf("");,long long使用%lld输出，__int64使用%I64d，无符号使用u替代d即可。

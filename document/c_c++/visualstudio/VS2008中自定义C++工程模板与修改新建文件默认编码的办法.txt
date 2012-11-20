@@ -1,0 +1,255 @@
+VS2008中自定义C++工程模板与修改新建文件默认编码的办法
+
+write by 九天雁翎(JTianLing) -- blog.csdn.net/vagrxie
+一、   需求
+
+网上讲VS（以下VS均特指VS2008）自定义模板的不少，不过大部分都是讲C#或者Web开发的，什么export template的，都不适合C++工程，由于MS的确是减弱了对C++的支持，（这点没有人否认吧？）所以在VS中C++总是被遗忘在那个没有人理睬的角落，所以现在很多人宁愿还用着C++与MFC最辉煌的版本VC6.0，哪怕那个版本的C++这么不符合标准。。。。。既然MS不关心C++使用者，那就只有自己奋发图强罗，还好再怎么样，没有了VS，我们总还是有VIM+G+++GDB/Emacs的，没有了MFC我们还有Qt，GTK+的，何况个人用Eclipse在Linux下做Qt程序的感觉也不错，闲话不说了，看看正题。
+
+自定义工程模板是用途很大的，当你有一个简单的模板用于开发的时候，没有VS内部的支持时，你有两种办法，其一你将原有整个工程拷贝一份，然后改工程名（在我以前的公司就是这样干的），改名不说，要进VSS，还得改工程的GUID（不懂的就算了），其二是新建一个工程，然后一个一个添加文件，假如有自己的目录结构的时候，还得重新控制目录结构，工程大时也是异常麻烦，其实这些用上了VS自定义模板，一切都可以很简单，就像你进行Win32 SDK，MFC开发MS给你的模板一样。
+
+修改VS中新建文件的默认编码嘛，纯Windows人士请忽略，我是因为需要在Linux下编辑和查看这些文件才有此需求。事实上，即使想要在Linux下查看或者编辑这些代码也可以不做改变，但是我就是想将其全部改成UTF8，不喜欢将Linux下设置一大堆东西，gcc需要加gb2312的选项，vim需要加配置，Eclipse也需要改配置，其他文本编辑工具也需要选定编码，全部是因为VS在中文Windows下的默认编码是gb2312（我用的是英文VS2008，这个可能是跟着操作系统环境走的），虽然也不怪MS。。。。既然VS也支持UTF8，就让Windows迁就Linux了。。。。还需要迁就的是Linux下的换行与Windows不同，顺面一起解决了，虽然大部分时候，在公司，都是用Linux的东西来迁就Windows。修改默认编码的办法我在网上找了很久也没有找到，大部分人都说是直接用Advanced Save Option来选择保存，那样多麻烦啊，或者先建立工程以后用find批量改，那样也不见的简单啊。。。。。。。。看下面的解决办法。
+
+ 
+二、   解决办法
+1.      新建文件
+
+奥秘在Microsoft Visual Studio 9.0\VC\vcprojectitems中（Microsoft Visual Studio 9.0根据你安装目录而定）
+
+新建的C++文件，主要是newc++file.cpp这个文件，目前是空的，你将其改成什么样，那就是什么样，比如，我需要在每个文件的头部添加一大串的GPL说明，（不是我想，这是FSF规定的），那么就直接在此文件添加我的文件头即可，以后用add->add new item->C++ files时，就都会自动带着文件头出来了。。。更好用的是，我现在将此文件转为UTF8+Unix换行格式，那么以后新建的文件都是如此了。。。呵呵，此谓之一劳永逸。
+
+新建的头文件是hfile.h这个文件，如上更改，一劳永逸。事实上，我将上面的文件复制一份，重命名为hfile.h^^
+
+普通文本文件由于常做Readme用，也改了。是text.txt这个文件。
+
+ 
+2.      授人以鱼不如授人以渔
+
+我当然不是一个一个文件试出来的，也不是猜出来的，授人以鱼不如授人以渔，这里告诉大家怎么去自己摸索。上述三个文件有个共同特点，那就是可以通过右键add->new item，那么我首先查看的就是new item了，这里，我的Visual C++下的下面有UI，Code，Data，Resource，Web，Utility，Property Sheets7个选项，与Microsoft Visual Studio 9.0\VC\vcprojectitems下面的7个目录及目录名一一对应，很明显了，这些选项由此7个目录中的内容控制的，首先看Code目录，一个code.vsdir的文件，打开一看
+
+ ..\NewC++File.cpp|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|#1075|10|#1076|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|9031|4096|#1077
+
+..\HFile.h|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|#1078|15|#1079|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|9030|4096|#1080
+
+..\IDLFile.idl|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|#1084|20|#1085|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|9035|4096|#1086
+
+..\DEFFile.vsz|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|#1087|35|#1088|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|9036|4096|#1089
+
+..\addmc++componentclass.vsz|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|#1236|85|#1237|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|9563|4096|#1238
+
+..\installer.vsz|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|#1245|85|#1246|{1B027A40-8F43-11D0-8D11-00A0C91BC942}|9564|4096|#1247
+
+咋一看，乱码？2进制文件？的确像，再仔细看看，前面的一部分，那不就是菜单中有的Items项？一一对应的。再仔细看，发现其实前面的字符串都是一个目录，指向父目录下的各个文件，其中前面两个就是.. \NewC++File.cpp，.. \HFile.h两个文件，那就是上一节中我发现的两个文件，对应新添加的C++文件和头文件。vsdir后面的东西是更详细的说明，长串的{}是GUID，#xxx是通过ID来表示资源。但是这里我们不去详细了解了，想要详细了解的参看MSDN这里，同理，文本文件在Utility目录下的VCUtilityItems.vsdir制定的，我就不多说了。
+3.      自定义工程模板
+
+新建工程中有个Custom Wizard选项，我将其命名为Win32OpenGLWizard。建立以后是一个完整的Wizard工程，天哪，一看，真复杂，我仅仅想建立一个简单的C++工程嘛，至于这样复杂吗？很显然，MS设计VS的自定义模板的时候就是给其他软件开发商用的，根本没有考虑过个人使用-_-!因为其中包含了HTML,CSS,JS….并不是每个人都是做网页的**。。。。作为用C++的我们，就知道想办法摸索摸索罗，符合我们的要求就好。要将引导框设计的多么完美我个人是没有什么希望了。所以建立Win32OpenGLWizard工程时，用户的UI选择就不需要了吧，直接通过名字就好。
+
+首先利用刚才新建的Wizard去建立一个工程，（会出现在New Project的Wizard下，实际的文件放在 我的文档\Visual Studio 2008\Wizards中）发现我们主要关注的是Template Files下的两个文件，那就是生成后工程会包含的文件。尝试一下。
+
+在template Files下添加main.cpp,修改Readme.txt，删除sample.txt，实际操作时请将文件添加到\Templates\1033目录下面去，并且手动修改Templates.inf添加进main.cpp。新建工程后果然可行。
+
+ 
+4.      修改自定义工程模板
+
+有个问题是Readme.txt在Source File目录下，而main.cpp跑到Source Files外面去了。作为半个完美主义者，虽然工程已经能编译通过，但是还是有点不爽，我希望进一步改进，那么下一步看看Source Files是哪里规定的罗，在default.js中可以看到
+
+function AddFilters(proj)
+
+{
+
+       try
+
+       {
+
+              // Add the folders to your project
+
+              var strSrcFilter = wizard.FindSymbol('SOURCE_FILTER');
+
+              var group = proj.Object.AddFilter('Source Files');
+
+              group.Filter = strSrcFilter;
+
+       }
+
+       catch(e)
+
+       {
+
+              throw e;
+
+       }
+
+}
+
+此函数，已经明白一半了，此函数不就是寻找匹配的过滤文字，然后将其加入Source Files中去嘛。^^就看SOURCE_FILTER是什么symbo了
+
+这里分两种情况：
+无wizard UI
+
+假如没有添加Wizards UI可以在添加的wizard工程下看到一个vsz文件，我这里如下：
+
+VSWIZARD 7.0
+
+Wizard=VsWizard.VsWizardEngine.9.0
+
+ 
+
+Param="WIZARD_NAME = Win32OpenGL"
+
+Param="ABSOLUTE_PATH = D:\MyDocument\Visual Studio 2008\WizardTemplate\Win32OpenGL\Win32OpenGL"
+
+Param="FALLBACK_LCID = 1033"
+
+Param="WIZARD_UI = FALSE"
+
+Param="SOURCE_FILTER = txt"
+
+ 
+
+这就是一个简单的类INI文件，详细信息可以参考MSDN这里。我们关心的自然是SOURCE_FILTER参数，改成cpp，竟然没有效果，不知道其他人怎么样，我这里没有效果的原因不明。但是虽然不知道此js 的wizard.FindSymbol的实现方法，但是我们还是可以用暴力解决！呵呵，将上述js函数改成如下形式：
+
+ function AddFilters(proj)
+
+{
+
+       try
+
+       {
+
+              // Add the folders to your project
+
+              //var strSrcFilter = wizard.FindSymbol('SOURCE_FILTER');
+
+              var strSrcFilter = 'cpp';
+
+              var group = proj.Object.AddFilter('Source Files');
+
+              group.Filter = strSrcFilter;
+
+       }
+
+       catch(e)
+
+       {
+
+              throw e;
+
+       }
+
+}
+
+就好了。我得意的笑啊，我得意的笑^^对于MS奇怪的失灵，有的时候暴力也是必须的。
+
+ 
+有wizard UI
+
+假如添加了UI，MS就要考虑你在wizard UI中改变此Symbo的可能了，会在HTML\1033\default.htm这个UI管理文件下看到
+
+<SYMBOL NAME='SOURCE_FILTER' TYPE=text VALUE='txt'></SYMBOL>
+
+改之
+
+<SYMBOL NAME='SOURCE_FILTER' TYPE=cpp VALUE='cpp'></SYMBOL>
+
+有效。
+
+再次创建工程，cpp文件已经在Source Files中了，ReadMe.txt也死出去了，以后再需要头文件什么的也一样处理就好了。
+
+ 
+5.      接近完美
+
+好了吗？已经很好了，但是作为3/4个完美主义者，我还有有点想改的地方，那就是我平时建工程，很简单的工程主文件与工程名一直，这样万一哪天想全部拷贝到一起管理也方便，但是按上述方式文件将全部是main.cpp，解决之，电脑上没有咋程序员解决不了的事情。
+
+看上述js脚本，如下函数：
+
+function GetTargetName(strName, strProjectName)
+
+{
+
+       try
+
+       {
+
+              // TODO: set the name of the rendered file based on the template filename
+
+              var strTarget = strName;
+
+ 
+
+              if (strName == 'readme.txt')
+
+                     strTarget = 'ReadMe.txt';
+
+ 
+
+              if (strName == 'sample.txt')
+
+                     strTarget = 'Sample.txt';
+
+ 
+
+              return strTarget;
+
+       }
+
+       catch(e)
+
+       {
+
+              throw e;
+
+       }
+
+}
+
+ 
+
+再看看它的使用，就知道此处就是我们需要修改的地方，实际上MS已经考虑了这样的情况了，我们不需要暴力^^改成如下内容：
+
+function GetTargetName(strName, strProjectName)
+
+{
+
+       try
+
+       {
+
+              // TODO: set the name of the rendered file based on the template filename
+
+              var strTarget = strName;
+
+ 
+
+              if (strName == 'readme.txt')
+
+                     strTarget = 'ReadMe.txt';
+
+ 
+
+              if (strName == 'main.cpp')
+
+                     strTarget = strProjectName + ".cpp";
+
+ 
+
+              return strTarget;
+
+       }
+
+       catch(e)
+
+       {
+
+              throw e;
+
+       }
+
+}
+
+测试，OK！
+三、   后记
+
+所有的说明，版权信息都在，文件内容，编码，换行符都搞定了，文件名也符合我的要求了，接近完美，鉴定完毕！
+
+此过程发狂的得不到MSDN满篇.Net的帮助，又难领悟广大C#网民的旁敲侧击，独自在VS的漆黑中摸索，逢JS大山则开路，逢HTML大石则劈之，屡次撞壁，失败数回，叹MS之弃cpper至此，捶胸顿足，奋发自强，吐血三升，乃作此文，以兹纪念。
+
+http://greyforest.blog.sohu.com/151918445.html
