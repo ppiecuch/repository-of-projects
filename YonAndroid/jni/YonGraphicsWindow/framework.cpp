@@ -72,8 +72,8 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	timer=engine->getTimer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	//fs->addWorkingDirectory("../media/");
-	fs->addWorkingDirectory("../media/batch");
+	fs->addWorkingDirectory("../media/");
+	//fs->addWorkingDirectory("../media/batch");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	//fs->addWorkingDirectory("media/");
 	fs->addWorkingDirectory("media/batch");
@@ -155,7 +155,7 @@ void drawFrame(){
 #endif
 	
 
-	static core::rectf r(0,0,1,1);
+	static core::rectf r(0,1,1,0);
 	videoDriver->setMaterial(material);
 
 	//LG990
@@ -164,15 +164,18 @@ void drawFrame(){
 	//29-driver-drawShap-开启VBO=140ms
 	//29-driver-drawShap-不开启VBO=120ms
 	//29-driver-drawShap-不开启VBO-不切换纹理=120ms
-	for(u32 i=0;i<1000;++i){
+	for(u32 i=0;i<1;++i){
 		//gfAdapter->drawRegion("shadow.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
 		//gfAdapter->drawRegion(images[randomizer->rand(1,images.size()-1)].c_str(),r,randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w),randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h),128,64,ENUM_TRANS_NONE);
 
 #ifndef BATCH
-		ITexture* texture=textures[randomizer->rand(0,textures.size()-1)];
-		s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
-		s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
-		gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
+		//ITexture* texture=textures[randomizer->rand(0,textures.size()-1)];
+		//s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
+		//s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
+		//gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
+		ITexture* texture=videoDriver->getTexture("de.png");
+		gfAdapter->drawRegion(texture,r,0,0,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),false,0xFF0000FF);
+		gfAdapter->drawRegion(texture,r,0,0,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),true);
 #else
 		//Logger->debug("i:%d--0x%08X\r\n",i,&shaps[i]);
 		//material.setTexture(0,texture);
