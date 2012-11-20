@@ -5,6 +5,7 @@
 #include "yonTypes.h"
 #include <new>
 #include <memory.h>
+#include "memorypool.h"
 
 namespace yon
 {
@@ -64,6 +65,47 @@ protected:
 	}
 
 };
+
+template<typename T,size_t S=sizeof(T)>
+class yonAllocatorMemoryPool
+{
+	static memorypool<S> pool;
+public:
+	yonAllocatorMemoryPool(){}
+
+	//! Destructor
+	virtual ~yonAllocatorMemoryPool() {}
+
+	//! Allocate memory for an array of objects
+	T* allocate(size_t cnt)
+	{
+		return (T*)pool.allocate(sizeof(T),cnt);
+	}
+
+	//! Deallocate memory for an array of objects
+	void deallocate(T* ptr)
+	{
+		if(ptr==NULL)
+			return;
+		pool.deallocate(ptr);
+	}
+
+	//! Construct an element
+	void construct(T* ptr, const T&e)
+	{
+		new ((void*)ptr) T(e);
+	}
+
+	//! Destruct an element
+	void destruct(T* ptr)
+	{
+		ptr->~T();
+	}
+
+};
+
+template<typename T,size_t S> 
+memorypool<S> yonAllocatorMemoryPool<T,S>::pool;
 
 template<typename T>
 class yonAllocatorMalloc

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef unsigned char u8;
@@ -53,6 +54,16 @@ struct S64{
 	u32 d;
 };
 
+struct S5A{
+	u16 a;
+	u8 b;
+	u16 c;
+};
+struct S5B{
+	u32 a;
+	u8 b;
+};
+
 struct S16{
 	u16 a;
 	u8 b;
@@ -74,12 +85,18 @@ int main(int argc, char* argv[])
 
 	printf("-------------------\r\n");
 
+	//复合数据类型，如union，struct，class的对齐方式为成员中对齐方式最大的成员的对齐方式。
+
+	typedef long DWORD;
+	printf("%d\r\n",sizeof(DWORD));
+	printf("%d\r\n",sizeof(S5A)); //6，2+1+2=5，最长为2，按2的倍数对齐，结果为6
+	printf("%d\r\n",sizeof(S5B)); //8，4+1=5，最长为4，按4的倍数对齐，结果为8
 	printf("%d\r\n",sizeof(S16)); //4，以u16进行了对齐
 	printf("%d\r\n",sizeof(S32));
-	printf("%d\r\n",sizeof(S64)); //24，以u64进行了对齐 
+	printf("%d\r\n",sizeof(S64)); //24，8+4+4+4=20，最长为8，按8的倍数对齐，结果为24
 	printf("%d\r\n",sizeof(PVRTextureHeader3));
 	printf("%d\r\n",sizeof(PVRTextureHeader));
 
-	getchar();
+	system("pause");
 	return 0;
 }

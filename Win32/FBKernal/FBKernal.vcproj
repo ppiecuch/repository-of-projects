@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Allocator"
-	ProjectGUID="{53D5AB9D-7619-4953-AD69-44732E2257BA}"
-	RootNamespace="Allocator"
+	Name="FBKernal"
+	ProjectGUID="{3CC1C692-5290-40D9-A542-08BB7F9311B7}"
+	RootNamespace="FBKernal"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -166,47 +166,15 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\alignof.h"
+			RelativePath=".\FBKernal_Pool.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\heapsort.h"
+			RelativePath=".\FBKernal_Pool.h"
 			>
 		</File>
 		<File
 			RelativePath=".\main.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\memorypool.h"
-			>
-		</File>
-		<File
-			RelativePath=".\todo.txt"
-			>
-		</File>
-		<File
-			RelativePath=".\yonAllocator.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonArray.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonConfig.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonList.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonMath.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonTypes.h"
 			>
 		</File>
 	</Files>
