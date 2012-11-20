@@ -1,0 +1,60 @@
+大家可能会遇到一些Ogre中的内存分配的方面问题，我对这个总结了一下内存分配的方面资料。
+Ogre在1.7版本后，统一了内存分配策略，提供了内存是否泄漏的跟踪和内存池等比较方便开发的一些策略，目前提供了四种内存分配
+OGRE_MEMORY_ALLOCATOR 方式：
+ 
+#define OGRE_MEMORY_ALLOCATOR_STD 1            
+#define OGRE_MEMORY_ALLOCATOR_NED 2
+#define OGRE_MEMORY_ALLOCATOR_USER 3
+#define OGRE_MEMORY_ALLOCATOR_NEDPOOLING 4
+ 
+大家从字面意思上应该能知道这四种内存分配方是的1、标准内存分配(主要是使用系统提供的缺省内存分配方法）；2、Ned方式内存分配；3、用户自定义的内存分配方法（主要是针对stl容器）；4、Ned内存池分配方法。
+NedPooling的实现在Ogre源代码中可以找到，如果你们感兴趣可以去研究一下内存分配方法。
+不管是用哪种分配模式，如果开启了OGRE_MEMORY_TRACKER_DEBUG_MODE /OGRE_MEMORY_TRACKER_RELEASE_MODE ，那么都可以对内存泄漏进行跟踪，系统有无内存泄漏，泄漏了多少内存，如果我们在debug模式下编译运行，有些可以跟踪到哪行代码会发生内存泄漏。
+ 
+下面我给出一个示例，具体说明一下各种情况下的内存分配怎么用：
+ 
+1、stl标准模板库中的容器，不要直接使用std::map,std::vector,std::list,std::queue等容器；改用 Ogre::map::type,Ogre::vector::type,Ogre::list::type等容器。使用后面的容器将会采用编译时指定的内存分配方式做内存分配，主要的优点是可以对容器中的内存是否泄漏进行跟踪。
+eg:
+Ogre::vector<Ogre::MeshPtr>::type meshList;
+最好不要使用std::vector，因为直接使用std::vector不具有内存跟踪功能。
+ 
+根据Ogre的编程风格，建议按照如下方式声明变量：
+typedef Ogre::vector<Ogre::MeshPtr>::type MeshList;
+typedef MeshList::iterator MeshListIterator;
+MeshList mMeshList;
+ 
+2、如果你的对象需要内存跟踪和采用Ogre的内存分配方式，那么你的类需要继承自Ogre::GeometryAllocatedObject ，如果你的对象是频繁的内存申请释放建议你最好继承这个类。
+eg:
+ 
+class MyObject: public Ogre::GeometryAllocatedObject
+{
+.......
+}
+ 
+MyObject* myObject=OGRE_NEW MyObject();
+OGRE_DELETE myObject;
+myObject=0;
+ 
+当然直接使用new,delete也可以，因为GeometryAllocatedObject这个基类重载了new,delete操作符，使用OGRE_NEW,OGRE_DELETE只是为了方便开发人员指导这个类是采用了内存池的方式。
+ 
+ 
+3、如果你的对象没有继承自Ogre::GeometryAllocatedObject ，但是你又像使用Ogre提供的内存池和内存泄漏跟踪功能，那么你可以采用如下的方式：
+eg:
+class MyObject
+{...}
+ 
+MyObject* myObject=OGRE_NEW_T(MyObject,Ogre::MEMCATEGORY_GENERAL)();
+OGRE_DELETE_T(myObject,Ogre::MEMCATEGORY_GENERAL);
+myObject=0;
+ 
+4、对于一些简单类型的变量，如果要使用Ogre提供的内存池和内存跟踪，分配内存块通常用的是
+eg:
+size_t count=1000;
+char* chunk=OGRE_ALLOC_T(char,count,Ogre::MEMCATEGORY_GENERAL);
+OGRE_FREE(chunk,Ogre::MEMCATEGORY_GENERAL);
+chunk=0;
+ 
+ 
+以上就是我们常用的Ogre内存分配方式，掌握他们，就基本上能解决我们
+
+http://blog.sina.com.cn/s/blog_53859e630100vhh9.html
