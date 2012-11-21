@@ -166,6 +166,22 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\FBKernal_Assert.h"
+			>
+		</File>
+		<File
+			RelativePath=".\FBKernal_Link.h"
+			>
+		</File>
+		<File
+			RelativePath=".\FBKernal_Memory.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\FBKernal_Memory.h"
+			>
+		</File>
+		<File
 			RelativePath=".\FBKernal_Pool.cpp"
 			>
 		</File>

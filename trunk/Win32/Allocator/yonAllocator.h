@@ -107,6 +107,40 @@ public:
 template<typename T,size_t S> 
 memorypool<S> yonAllocatorMemoryPool<T,S>::pool;
 
+template<typename T,size_t Align>
+class yonAllocatorAlign
+{
+public:
+
+	//! Destructor
+	virtual ~yonAllocatorAlign() {}
+
+	//! Allocate memory for an array of objects
+	T* allocate(size_t cnt)
+	{
+		//return (T*)internal_new(cnt* sizeof(T));
+		return NULL;
+	}
+
+	//! Deallocate memory for an array of objects
+	void deallocate(T* ptr)
+	{
+		//internal_delete(ptr);
+	}
+
+	//! Construct an element
+	void construct(T* ptr, const T&e)
+	{
+		new ((void*)ptr) T(e);
+	}
+
+	//! Destruct an element
+	void destruct(T* ptr)
+	{
+		ptr->~T();
+	}
+};
+
 template<typename T>
 class yonAllocatorMalloc
 {
