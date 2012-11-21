@@ -1,0 +1,20 @@
+北京时间11月21日消息，Imagination Technologies今天发布了新一代移动图形处理器PowerVR G6630，拥有多达六个流处理器执行阵列(shader execution cluster)，其性能可达前代5系列产品的60倍。 
+
+
+
+PowerVR G6630移动GPU发布（图片来自互联网）
+
+PowerVR G6630的目标是为最广泛的移动应用带来最好的图形性能，同时将功耗和发热控制在理想范围内。核心规模增大之后，它还加入了先进的功耗扩展技术，可以根据应用负载成对地开关流处理器阵列，支持X2、X4、X6等三种模式，进一步提高能效。
+
+API方面，PowerVR G6630支持DirectX 10，部分型号可支持最新的DirectX 11.1，还支持OpenGL 3.x/4.x、OpenGL ES 3.0，以及通用计算领域的OpenCL 1.x、Renderscript Compute。
+
+根据配置的不同，PowerVR 6系列GPU的浮点性能在100Gflops到最高1Tflops之间，可带来最多60倍于5系列的图形和计算性能提升。
+
+据悉，PowerVR 6系列GPU的授权合作伙伴有海思（HiSilicon）、意法爱立信、德州仪器、瑞萨电子、联发科等，其出货日期尚无时间表。原文地址:http://news.zol.com.cn/335/3359348.html
+
+
+
+FLOP：
+　　(Floating Point Operations Per Second，浮点操作/秒)计算CPU浮点能力的一个单位。PS3的运算速度突破了1万亿次浮点/秒，而IBM超级计算机BlueGene/L运算速度达到创纪录的207.3万亿次浮点/秒。 
+
+http://news.zol.com.cn/335/3359348.html

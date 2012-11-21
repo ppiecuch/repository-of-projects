@@ -1,0 +1,59 @@
+After upgrading my phone to android 4.03 ics my game dosent open anymore ,it just closes without any error messege on deviCe and with this on eclipse
+
+04-02 16:55:27.672: E/dalvikvm(26884): JNI ERROR (app bug): attempt to use stale local reference 0x1
+04-02 16:55:27.672: E/dalvikvm(26884): VM abortingMy game is mainly writen in java but some parts are in c and thats were i think the problem is (not very hard to figure out since its saying JNI ERROR :) ) 
+
+Of course i dont know where the problem is so i dont give any code
+
+I didnt had this problem on android 2.3 
+
+I dont know if it helps but i get this error too sometimes
+
+04-02 16:55:26.061: E/Adreno200-ES11(26884): <qglDrvAPI_glTexImage2D:1913>: GL_STACK_UNDERFLOW
+android opengl-es android-ndk jni 
+share|improve this question asked Apr 2 at 14:09 
+SteveL
+49613 
+
+88% accept rate 
+ 
+   
+
+feedback  
+2 Answers active oldest votes  up vote 
+4
+ down vote accepted  The "stale local reference" error means that you're saving a local reference to some Java object between JNI calls; you need to convert that reference to a global reference using the NewGlobalRef method before doing anything that would cause the reference to persist outside the scope of the one JNI call.
+
+Although strictly this was always necessary -- it's in the JNI spec -- it's only since Ice Cream Sandwich that this actually causes problems on the Android platform.
+share|improve this answer edited Apr 2 at 14:21 
+
+ answered Apr 2 at 14:15 
+Ernest Friedman-Hill
+44.4k23665  
+ 
+ 3     
+ Finally! . The reference's didnt seem to be the problem , actually the real problem was quite silly .In my c code a had a void function but in java i was declaring it as native float[]... Thank you for you help ¨C SteveL Apr 2 at 15:33 
+1     
+ @SteveL Thank you! I did the exact same thing (an early version of my native code returned a long, but I changed it to void in .c file and forgot to update in the .java. ¨C Matt Apr 11 at 13:54 
+ Thanks! I'm formatting this as an answer. ¨C Ilya Oct 10 at 16:49 
+
+feedback  
+
+No problem. We won't show you that ad again. Why didn't you like it?Uninteresting
+Misleading
+Offensive
+Repetitive
+Oops! I didn't mean to do this. up vote 
+1
+ down vote  While Ernest's answer is technically correct, a stale local reference to something like 0x1 should hint you that the Java VM is trying to use something that's not a Java object as a Java object.
+
+For example, let's assume your JNI function is:
+
+JNI_EXPORT jboolean foo(JNIEnv *env, jobject) {
+  ...
+  return JNI_TRUE;
+}but you erroneously declare the Java counterpart as public native Boolean foo() instead of public native boolean foo().
+
+Upon return from foo, the Java VM will treat the JNI_TRUE value (0x1) as if it referred to a java.lang.Boolean object, and will emit this fatal error.
+ 
+http://stackoverflow.com/questions/9978011/android-ics-jni-error-attempt-to-use-stale-local-reference-0x1
