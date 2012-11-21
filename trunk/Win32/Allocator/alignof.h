@@ -1,6 +1,8 @@
 #ifndef _YON_CORE_ALIGNOF_H_
 #define _YON_CORE_ALIGNOF_H_
 
+#include "yonTypes.h"
+
 namespace yon{
 namespace core{
 

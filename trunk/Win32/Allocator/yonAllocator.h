@@ -6,6 +6,7 @@
 #include <new>
 #include <memory.h>
 #include "memorypool.h"
+#include "alignof.h"
 
 namespace yon
 {
@@ -107,7 +108,7 @@ public:
 template<typename T,size_t S> 
 memorypool<S> yonAllocatorMemoryPool<T,S>::pool;
 
-template<typename T,size_t Align>
+template<typename T,size_t Align=core::AlignOf<T>::ALIGNMENT>
 class yonAllocatorAlign
 {
 public:
