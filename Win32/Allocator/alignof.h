@@ -42,7 +42,7 @@ namespace core{
 	///  class besides some cosmetic cleanliness.  Example usage:
 	///  alignOf<int>() returns the alignment of an int.
 	template<typename T>
-	inline unsigned alignOf() { return AlignOf<T>::ALIGNMENT; }
+	inline u32 alignOf() { return AlignOf<T>::ALIGNMENT; }
 }
 }
 #endif
