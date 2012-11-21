@@ -166,6 +166,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\alignment.h"
+			>
+		</File>
+		<File
 			RelativePath=".\alignof.h"
 			>
 		</File>

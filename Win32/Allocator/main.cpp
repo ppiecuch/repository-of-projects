@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "alignof.h"
+
 #include <sys/timeb.h>
 #include <time.h>
 
@@ -33,6 +35,32 @@ int main(int argc, char* argv[]){
 	struct _timeb end;
 	long long s;
 	int ms;
+
+	/*u32 align=core::alignOf<u64>();
+	printf("align:%u\n",align);
+	for(u32 addr=0;addr<15;++addr)
+	{
+		u32 offset=(addr+align-1)&~(align-1);
+		printf("%u,%u\n",addr,offset);
+	}*/
+
+	/*
+	#ifndef INTERNAL_SIZE_T  
+	#define INTERNAL_SIZE_T size_t  
+	#endif  
+	#define SIZE_SZ                (sizeof(INTERNAL_SIZE_T))  
+	#ifndef MALLOC_ALIGNMENT  
+	#define MALLOC_ALIGNMENT       (2 * SIZE_SZ)  
+	#endif  
+	*/
+	//refer to:http://www.cnblogs.com/Creator/archive/2012/04/05/2433386.html
+	//根据宏定义可推算在32位系统中malloc的MINSIZE为16字节，在64位系统中MINSIZE一般为32字节。
+	void* p1=malloc(1);
+	void* p2=malloc(8);
+	printf("%08X,%08X\n",p1,p2);
+	free(p1);
+	free(p2);
+
 
 	//for(size_t i=0;i<8;++i)
 	//	printf("%d\n",_S_round_up(i));
