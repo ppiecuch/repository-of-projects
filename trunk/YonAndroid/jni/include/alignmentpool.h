@@ -56,7 +56,7 @@ namespace core{
 
 	template<size_t ChunkSize,size_t ChunkCountPerBlock,size_t Align>
 	alignmentpool<ChunkSize,ChunkCountPerBlock,Align>::~alignmentpool(){
-		printf("release:%08X,test:%u,Alloc:%u,Delloc:%u\n",this,test,m_uAlloc,m_uDelloc);
+		//printf("release:%08X,test:%u,Alloc:%u,Delloc:%u\n",this,test,m_uAlloc,m_uDelloc);
 		block* bp=m_pBlockHead;
 		while(bp){
 			block* tmp=bp;
@@ -64,7 +64,7 @@ namespace core{
 
 			free(tmp->Data);
 			delete[] tmp->Chunks;
-			printf("release block:%08X\n",tmp);
+			//printf("release block:%08X\n",tmp);
 			delete tmp;
 		}
 		m_pBlockHead=NULL;
@@ -81,7 +81,7 @@ namespace core{
 			u32 addr=reinterpret_cast<u32>(p);
 			u32 alignAddr=(addr+Align-1)&~(Align-1);
 			m_noCaches[alignAddr]=p;
-			printf("WARN,no cache:%08X,%08X\n",addr,alignAddr);
+			//printf("WARN,no cache:%08X,%08X\n",addr,alignAddr);
 			++m_uAlloc;
 			return (void*)(p+(alignAddr-addr));
 		}
@@ -90,7 +90,7 @@ namespace core{
 		if(m_pFreeHead==NULL)
 		{
 			block* pb=new block;
-			printf("extend block:%08X\n",pb);
+			//printf("extend block:%08X\n",pb);
 			pb->Data=(u8*)malloc(m_uRealChunkSize*ChunkCountPerBlock);
 
 			pb->Chunks=new chunk[ChunkCountPerBlock];
@@ -129,7 +129,7 @@ namespace core{
 		void* realPointer;
 		if(m_noCaches.remove(reinterpret_cast<u32>(p),&realPointer))
 		{
-			printf("noCaches remove:%08X->%08X\n",p,realPointer);
+			//printf("noCaches remove:%08X->%08X\n",p,realPointer);
 			free(realPointer);
 			++m_uDelloc;
 			return;
