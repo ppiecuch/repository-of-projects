@@ -29,7 +29,7 @@ namespace yon{
 			return x >= 'a' && x <= 'z' ? x + ( 'A' - 'a' ) : x;
 		}
 		//capacity°üº¬'\0',len²»°üº¬'\0'
-		template<class T, typename TAlloc = yonAllocator<T> >
+		template<class T, typename TAlloc = yonAllocatorAlign<T> >
 		class string{
 		public:
 			string():elements(NULL),capacity(1),len(0){
@@ -706,7 +706,7 @@ namespace yon{
 			T* elements;
 			u32 capacity;
 			u32 len;
-			TAlloc allocator;
+			YON_API static TAlloc allocator;
 		};
 		typedef string<c8> stringc;
 		typedef string<wchar_t> stringw;
