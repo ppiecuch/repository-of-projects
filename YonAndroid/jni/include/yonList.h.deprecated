@@ -6,36 +6,22 @@
 
 namespace yon{
 namespace core{
-
-	template<class T>
-	struct YonListNode
-	{
-		YonListNode* next;
-		YonListNode* prev;
-		T element;
-	private:
-		YonListNode(const T& e) : next(NULL), prev(NULL), element(e) {}
-
-		template<class TT, typename TAlloc> friend class list;
-	};
 	
-	template<class T, typename TAlloc = yonAllocatorMemoryPool<YonListNode<T> > >
+	template<class T>
 	class list{
 	private:
-		/*struct YonListNode
+		struct YonListNode
 		{
 			YonListNode(const T& e) : next(NULL), prev(NULL), element(e) {}
 
 			YonListNode* next;
 			YonListNode* prev;
 			T element;
-		};*/
+		};
 
-		//yonAllocatorMemoryPool<YonListNode> allocator;
-		TAlloc allocator;
-		//YON_API static TAlloc allocator;
-		YonListNode<T>* first;
-		YonListNode<T>* last;
+		yonAllocator<YonListNode> allocator;
+		YonListNode* first;
+		YonListNode* last;
 		u32 len;
 	public:
 		class ConstIterator;
@@ -81,11 +67,11 @@ namespace core{
 			T * operator ->() { return &current->element; }
 
 		private:
-			explicit Iterator(YonListNode<T>* begin) : current(begin) {}
+			explicit Iterator(YonListNode* begin) : current(begin) {}
 
-			YonListNode<T>* current;
+			YonListNode* current;
 
-			friend class list<T,TAlloc>;
+			friend class list<T>;
 			friend class ConstIterator;
 		};
 
@@ -130,17 +116,17 @@ namespace core{
 			ConstIterator & operator =(const Iterator & iterator) { current = iterator.current; return *this; }
 
 		private:
-			explicit ConstIterator(YonListNode<T>* begin) : current(begin) {}
+			explicit ConstIterator(YonListNode* begin) : current(begin) {}
 
-			YonListNode<T>* current;
+			YonListNode* current;
 
 			friend class Iterator;
-			friend class list<T,TAlloc>;
+			friend class list<T>;
 		};
 
 		list(): first(NULL), last(NULL), len(0) {}
 
-		list(const list<T,TAlloc>& other) : first(0), last(0), len(0){
+		list(const list<T>& other) : first(0), last(0), len(0){
 			*this = other;
 		}
 
@@ -165,7 +151,7 @@ namespace core{
 		{
 			//YonListNode* node = (YonListNode*)operator new(sizeof(YonListNode));
 			//new (node) YonListNode(element);
-			YonListNode<T>* node=allocator.allocate(1);
+			YonListNode* node=allocator.allocate(1);
 			allocator.construct(node,element);
 
 			node->next = it.current->next;
@@ -191,7 +177,7 @@ namespace core{
 		{
 			//YonListNode* node = (YonListNode*)operator new(sizeof(YonListNode));
 			//new (node) YonListNode(element);
-			YonListNode<T>* node=allocator.allocate(1);
+			YonListNode* node=allocator.allocate(1);
 			allocator.construct(node,element);
 
 			node->prev = it.current->prev;
@@ -210,7 +196,7 @@ namespace core{
 		void push_back(const T& element){
 			//YonListNode* node=(YonListNode*)operator new(sizeof(YonListNode));
 			//new (node) YonListNode(element);
-			YonListNode<T>* node=allocator.allocate(1);
+			YonListNode* node=allocator.allocate(1);
 			allocator.construct(node,element);
 			++len;
 
@@ -229,7 +215,7 @@ namespace core{
 		{
 			//YonListNode* node =(YonListNode*)operator new(sizeof(YonListNode));
 			//new (node) YonListNode(element);
-			YonListNode<T>* node=allocator.allocate(1);
+			YonListNode* node=allocator.allocate(1);
 			allocator.construct(node,element);
 			++len;
 
@@ -250,7 +236,7 @@ namespace core{
 		{
 			while(first!=NULL)
 			{
-				YonListNode<T> * next = first->next;
+				YonListNode * next = first->next;
 				//first->~YonListNode();
 				//operator delete(first);
 				allocator.destruct(first);
@@ -262,7 +248,7 @@ namespace core{
 			len = 0;
 		}
 
-		void operator=(const list<T,TAlloc>& other)
+		void operator=(const list<T>& other)
 		{
 			if(&other == this)
 			{
@@ -271,7 +257,7 @@ namespace core{
 
 			clear();
 
-			YonListNode<T>* node = other.first;
+			YonListNode* node = other.first;
 			while(node)
 			{
 				push_back(node->element);

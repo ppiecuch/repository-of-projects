@@ -23,6 +23,7 @@ core::array<s32> ids;
 #include "SDynamicShap.h"
 
 core::array<core::stringc> images;
+core::list<core::stringc> testlist;
 core::array<ITexture*> textures;
 
 class MyEventReceiver : public IEventReceiver{
@@ -81,9 +82,11 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/batch");
 #endif
 
+	testlist.push_back(core::stringc("fdsafdsa"));
 	for(u32 i=1;i<=50;++i){
 		images.push_back(core::stringc("%d.png",i));
-		textures.push_back(videoDriver->getTexture(images[i-1]));
+		//textures.push_back(videoDriver->getTexture(images[i-1]));
+		textures.push_back(videoDriver->getTexture(io::path("%d.png",i)));
 	}
 
 	//texture=videoDriver->getTexture("de.png");
