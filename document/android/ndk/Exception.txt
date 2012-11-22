@@ -1,4 +1,9 @@
 [异常]
+there are no arguments to 'malloc' that depend on a template parameter, so a declaration of 'malloc' must be available 
+[解决]
+<stdlib.h>
+
+[异常]
 erver didn't ACK
 adb]* failed to start daemon *
 DeviceMonitor]adb restart attempts: 29
