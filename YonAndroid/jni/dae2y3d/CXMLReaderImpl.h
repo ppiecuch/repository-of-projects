@@ -83,8 +83,8 @@ namespace io{
 		{
 			u32 temp=m_pStream->getPos();
 			m_pStream->seek(start);
-			YON_DEBUG_BREAK_IF(end-start>1024);
-			static u8 buffer[1024];
+			YON_DEBUG_BREAK_IF(end-start>65535);
+			static u8 buffer[65535];
 			m_pStream->read(buffer,end-start-1);
 			str.build(buffer,end-start-1);
 			m_pStream->seek(temp);
