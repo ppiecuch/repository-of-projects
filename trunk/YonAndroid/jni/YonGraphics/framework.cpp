@@ -11,6 +11,7 @@ ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
+core::position2di ps[4];
 
 IModel* cubeModel=NULL;
 IModel* planeModel=NULL;
@@ -56,10 +57,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
-	gfAdapter=engine->getGraphicsAdapter();
+	gfAdapter=engine->getGraphicsAdapterWindow();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300)); 
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
@@ -83,6 +84,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
 	material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
 	material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+	material.FrontFace=ENUM_FRONT_FACE_CW;
 	material.setTexture(0,videoDriver->getTexture("aura.png"));
 	planeModel->setPosition(core::vector3df(0,0,0));
 	shap->drop();
@@ -98,7 +100,7 @@ float x=0;
 void drawFrame(){
 
 	u32 start=timer->getRealTime();
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
 	//pCamera->setPosition(core::vector3df(x,x,300),true);
 
@@ -107,20 +109,39 @@ void drawFrame(){
 	sceneMgr->render(videoDriver);
 	//pCamera->render(videoDriver);
 
-	gfAdapter->clearZ(-1000);
+	gfAdapter->clearZ(1000);
 
-	core::rectf r(0,0,1,1);
-	for(u32 i=0;i<1000;++i){
-		gfAdapter->drawRegion("shadow.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
-		gfAdapter->drawRegion("trans.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE);
-		//gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
-		//gfAdapter->drawRegion("test.png",r,0,320,128,64,ENUM_TRANS_ROT90);
-		/*gfAdapter->drawRegion("trans.png",r,200,120,128,64,ENUM_TRANS_MIRROR);
-		gfAdapter->drawRegion("trans.png",r,300,120,128,64,ENUM_TRANS_MIRROR_ROT180);
-		gfAdapter->drawRegion("shadow.png",r,50,170,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
-		gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);
-		gfAdapter->drawRegion("trans.png",r,200,320,128,64,ENUM_TRANS_MIRROR_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
-		gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));*/
+#define TO_PS(x,y,w,h) \
+	ps[0].set(x,y+h); \
+	ps[1].set(x,y); \
+	ps[2].set(x+w,y); \
+	ps[3].set(x+w,y+h);
+
+	core::rectf r(0,1,1,0);
+	for(u32 i=0;i<1;++i){
+		//gfAdapter->drawRegion("shadow.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
+		//gfAdapter->drawRegion("trans.png",r,randomizer->rand(0,400),randomizer->rand(0,400),128,64,ENUM_TRANS_NONE);
+		
+		TO_PS(250,120,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("shadow.png"),r,ps,ENUM_TRANS_NONE,true,0xFF0000FF);
+		TO_PS(0,120,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_NONE);
+		TO_PS(100,120,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_ROT180);
+		TO_PS(200,120,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_MIRROR);
+		TO_PS(300,120,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_MIRROR_ROT180);
+		TO_PS(0,320,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("test.png"),r,ps,ENUM_TRANS_ROT90);
+		TO_PS(50,170,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("shadow.png"),r,ps,ENUM_TRANS_NONE,true);
+		TO_PS(100,30,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_MIRROR_ROT90);
+		TO_PS(200,320,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_MIRROR_ROT270);
+		TO_PS(300,320,128,64)
+		gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_ROT270);
 	}
 
 		/*gfAdapter->drawVertexPrimitiveList(planeModel->getMaterial(0),

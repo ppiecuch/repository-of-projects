@@ -75,7 +75,7 @@ void CRenderStatic::OnPaint()
 	// 不为绘图消息调用 CStatic::OnPaint()
 	if(engine->run())
 	{
-		driver->begin(true,true,video::SColor(0xFF132E47));
+		driver->begin(true,true,video::COLOR_DEFAULT);
 
 		const core::vector3df psca=planeModel->getScale();
 		if(psca.x>4)
@@ -155,12 +155,12 @@ void CRenderStatic::PreSubclassWindow()
 
 	geometryFty=sceneMgr->getGeometryFactory();
 
-	camera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	camera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	animatorFty=sceneMgr->getAnimatorFactory();
 
 	fs->addWorkingDirectory("../media/");
 
-	IMaterial* material;
+	//IMaterial* material;
 	IShap *shap;
 	IUnit* unit;
 	scene::IEntity* entity;
@@ -169,10 +169,14 @@ void CRenderStatic::PreSubclassWindow()
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
-	planeModel->setPosition(core::vector3df(0,0,0));
-	material->setTexture(0,driver->getTexture("aura.png"));
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,driver->getTexture("aura.png"));
+	}
+	planeModel->setPosition(core::vector3df(0,0,120));
 	shap->drop();
 	unit->drop();
 	entity->drop();

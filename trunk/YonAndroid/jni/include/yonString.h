@@ -29,7 +29,7 @@ namespace yon{
 			return x >= 'a' && x <= 'z' ? x + ( 'A' - 'a' ) : x;
 		}
 		//capacity°üº¬'\0',len²»°üº¬'\0'
-		template<class T, typename TAlloc = yonAllocatorAlign<T> >
+		template<class T, typename TAlloc = yonAllocatorAlign<T > >
 		class string{
 		public:
 			string():elements(NULL),capacity(1),len(0){

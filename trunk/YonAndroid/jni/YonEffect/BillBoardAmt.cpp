@@ -47,6 +47,7 @@ void CBillBoardAmt::update( int time )
 	int r=(0x00ff0000&col)>>16;
 	int b=(0x000000ff&col)<<16;
     u32 col2=(col&0x0000ff00)|r|b;
+
 	//billboard.setColor(0xff000000|col);
 
 

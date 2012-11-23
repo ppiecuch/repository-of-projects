@@ -14,6 +14,30 @@ namespace yon{
 	}
 namespace scene{
 
+	/*
+	------------->x
+	|
+	|
+	|
+	|
+	y
+
+	vertex:
+	0---------3
+	|         |
+	|         |
+	1---------2
+	uv:
+
+	topLeft-----
+	|           |
+	--------bottomRight
+
+	u0,v1------u1,v1
+	 |          |
+	u0,v0------u0,v1
+	*/
+
 	//锚点对齐方式（掩码，与javax.microedition.lcdui.Graphics常量保持一致）
 	//三个水平定位和四个垂直定位，其中BASELINE用于文字定位（可能没用，暂留）。
 	//在指定绘制时，定位点是成对使用的，所以必须选择一个水平和一个垂直点。
@@ -62,11 +86,12 @@ namespace scene{
 
 
 		virtual void clearZ(s32 z) = 0;
-		virtual bool drawRegion(const c8* imageName, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform=ENUM_TRANS_NONE, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
-		virtual bool drawRegion(const c8* imageName, const core::dimension2di& dim, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform=ENUM_TRANS_NONE, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
-		virtual bool drawRegion(const c8* imageName, const core::rectf& uv, const core::position2di poss[4], ENUM_TRANS transform=ENUM_TRANS_NONE, bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
+		//virtual bool drawRegion(const c8* imageName, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform=ENUM_TRANS_NONE, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
+		//virtual bool drawRegion(const c8* imageName, const core::dimension2di& dim, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform=ENUM_TRANS_NONE, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
+		virtual bool drawRegion(video::ITexture* texture, const core::rectf& uv, const core::position2di poss[4], ENUM_TRANS transform=ENUM_TRANS_NONE, bool useAlpha=false, u32 color=0xFFFFFFFF) = 0;
+		virtual bool drawFill(video::ITexture* texture, const core::rectf& uv, const core::position2di poss[4], ENUM_TRANS transform=ENUM_TRANS_NONE, u32 color=0xFFFFFFFF) = 0;
 
-		virtual bool drawRegion(video::ITexture* texture, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform=ENUM_TRANS_NONE, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),bool useAlpha=false, const video::SColor& color=video::COLOR_WHITE) = 0;
+		//virtual bool drawRegion(video::ITexture* texture, const core::rectf& uv, s32 x_dest, s32 y_dest, s32 destW, s32 destH, ENUM_TRANS transform=ENUM_TRANS_NONE, MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),bool useAlpha=false, const video::SColor& color=video::COLOR_WHITE) = 0;
 
 		//virtual void beginResident(s32 id) = 0;
 		//virtual bool eraseResident(s32 id) = 0;
