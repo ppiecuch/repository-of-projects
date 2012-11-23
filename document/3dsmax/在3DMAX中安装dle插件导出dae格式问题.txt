@@ -1,0 +1,10 @@
+这两天学习PV3D，导入外部3D文件时遇到了些问题，这主要是在3D制作软件身上，我们在PV3D中经常要用dae格式的文件，所以这就需要3D软件直接导出.dae格式文件，但是3DMAX中不能直接导出.dae格式文件，这就需要安装一个能导出.dle格式的插件。   
+     首先我们要下载ColladaMaya_FREE_3.05C.exe这个安装包，这个网上随便都能找到，下面有链接http://sourceforge.net/projects/colladamaya/files/，下载下来后我们安装时就会出现些问题，点击安装时显示Windows System no found：32bit，这个问我跳过没去管它，安装后也会显示ColladaMax.dle 这个插件加载不成功的问题。下就主要说如何解决这个问题的：这个问题解决了就可以在3DMAX中导出.dae格式了。
+      解决方法：
+             Win＋R运行，输入regedit，出现注册表。找到这个键值 ：
+             HKEY_LOCAL_MACHINE\SOFTWARE\Autodesk\3dsmax\9.0\MAX-1:804 
+重命名 MAX-1:804 ，把804改成408，OK。
+              再次安装ColladaMax，成功了。
+在路径Autodesk\3ds Max 9\plugins\下多了一个文件ColladaMax.dle
+经过这样的修改我成功了。
+参考网站：http://leenmax.blogbus.com/logs/29677177.html
