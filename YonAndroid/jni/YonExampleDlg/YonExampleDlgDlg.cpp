@@ -115,12 +115,14 @@ BOOL CYonExampleDlgDlg::OnInitDialog()
 	sceneMgr=engine->getSceneManager();
 	fs=engine->getFileSystem();
 
+	fs->addWorkingDirectory("../media/");
+
 	geometryFty=sceneMgr->getGeometryFactory();
 
-	camera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	camera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	animatorFty=sceneMgr->getAnimatorFactory();
 
-	IMaterial* material;
+	//IMaterial* material;
 	IShap *shap,*shap1,*shap2;
 	IUnit* unit;
 	scene::IEntity* entity;
@@ -129,10 +131,12 @@ BOOL CYonExampleDlgDlg::OnInitDialog()
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	cubeModel=sceneMgr->addModel(entity);
-	material=cubeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
+	{
+		SMaterial& material=cubeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT;
+		material.setTexture(0,driver->getTexture("test.png"));
+	}
 	cubeModel->setPosition(core::vector3df(50,50,200));
-	material->setTexture(0,driver->getTexture("../media/test.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -140,41 +144,51 @@ BOOL CYonExampleDlgDlg::OnInitDialog()
 
 	shap=geometryFty->createTorus(10,30,16,16,COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+	shap->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+	shap->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	entity=geometryFty->createEntity(unit);
 	toruseModel=sceneMgr->addModel(entity);
-	material=toruseModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT_BLEND_COLOR);
-	material->setPolygonMode(ENUM_POLYGON_MODE_FILL);
+	{
+		SMaterial& material=toruseModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT;
+		material.setTexture(0,driver->getTexture("gunny.png"));
+	}
 	toruseModel->setPosition(core::vector3df(130,130,100));
-	material->setTexture(0,driver->getTexture("../media/gunny.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
 
 	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
-	planeModel->setPosition(core::vector3df(150,120,0));
-	material->setTexture(0,driver->getTexture("../media/aura.png"));
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,driver->getTexture("aura.png"));
+	}
+	planeModel->setPosition(core::vector3df(150,200,120));
 	shap->drop();
 	unit->drop();
 	entity->drop();
 
 	shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
-	unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	shap->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	shap->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	entity=geometryFty->createEntity(unit);
 	IModel* waterfallModel=sceneMgr->addModel(entity);
-	material=waterfallModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_MASK);
+	{
+		SMaterial& material=waterfallModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_MASK;
+		//material.BlendSrc=ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		//material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,driver->getTexture("waterfall.png"));
+		material.setTexture(1,driver->getTexture("maskalpha.png"));
+	}
 	waterfallModel->setPosition(core::vector3df(90,100,120));
-	material->setTexture(0,driver->getTexture("../media/waterfall.png"));
-	material->setTexture(1,driver->getTexture("../media/mask.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -183,6 +197,9 @@ BOOL CYonExampleDlgDlg::OnInitDialog()
 	aniParam.type=ENUM_ANIMATOR_TYPE_UV;
 	aniParam.animatorUV.unitIndex=0;
 	aniParam.animatorUV.stage=0;
+	aniParam.animatorUV.translate.u=0;
+	aniParam.animatorUV.translate.v=0.1f;
+	aniParam.animatorUV.translate.w=0;
 	IAnimator* uvAnimator=animatorFty->createAnimator(aniParam);
 	waterfallModel->addAnimator(uvAnimator);
 	uvAnimator->drop();
@@ -250,7 +267,7 @@ void CYonExampleDlgDlg::OnPaint()
 			const core::vector3df trot=toruseModel->getRotation();
 			toruseModel->setRotation(core::vector3df(trot.x+1.0f,trot.y,trot.z));
 
-			driver->begin(true,true,COLOR_BLACK);
+			driver->begin(true,true,COLOR_DEFAULT);
 
 			sceneMgr->render(driver);
 

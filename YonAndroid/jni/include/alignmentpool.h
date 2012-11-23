@@ -6,6 +6,13 @@
 namespace yon{
 namespace core{
 
+#ifdef YON_CHECK_MEMORY
+#ifdef new
+#undef new
+#endif
+#define new YON_ORIGIN_NEW
+#endif
+
 	template<size_t ChunkSize,size_t ChunkCountPerBlock,size_t Align>
 	class alignmentpool{
 
@@ -49,25 +56,35 @@ namespace core{
 		//当count>1时，只保证首地址进行字节对齐
 		void* allocate(u32 size,u32 count);
 		void deallocate(void* p);
+
+		void clear();
 	};
 
 	template<size_t ChunkSize,size_t ChunkCountPerBlock,size_t Align>
 	const u32 alignmentpool<ChunkSize,ChunkCountPerBlock,Align>::m_uRealChunkSize=ChunkSize+Align;
 
 	template<size_t ChunkSize,size_t ChunkCountPerBlock,size_t Align>
-	alignmentpool<ChunkSize,ChunkCountPerBlock,Align>::~alignmentpool(){
+	void alignmentpool<ChunkSize,ChunkCountPerBlock,Align>::clear(){
 		//printf("release:%08X,test:%u,Alloc:%u,Delloc:%u\n",this,test,m_uAlloc,m_uDelloc);
 		block* bp=m_pBlockHead;
 		while(bp){
 			block* tmp=bp;
 			bp=bp->Next;
 
-			free(tmp->Data);
+			//free(tmp->Data);
+			operator delete(tmp->Data);
 			delete[] tmp->Chunks;
 			//printf("release block:%08X\n",tmp);
 			delete tmp;
 		}
 		m_pBlockHead=NULL;
+		m_pFreeHead=NULL;
+		m_pUsedHead=NULL;
+	}
+
+	template<size_t ChunkSize,size_t ChunkCountPerBlock,size_t Align>
+	alignmentpool<ChunkSize,ChunkCountPerBlock,Align>::~alignmentpool(){
+		clear();
 	}
 
 	template<size_t ChunkSize,size_t ChunkCountPerBlock,size_t Align>
@@ -77,7 +94,8 @@ namespace core{
 		//printf("size:%u,count:%u\n",size,count);
 		if(total>m_uRealChunkSize)
 		{
-			u8* p=(u8*)malloc(total);
+			//u8* p=(u8*)malloc(total);
+			u8* p=(u8*)operator new(total);
 			u32 addr=reinterpret_cast<u32>(p);
 			u32 alignAddr=(addr+Align-1)&~(Align-1);
 			m_noCaches[alignAddr]=p;
@@ -91,7 +109,8 @@ namespace core{
 		{
 			block* pb=new block;
 			//printf("extend block:%08X\n",pb);
-			pb->Data=(u8*)malloc(m_uRealChunkSize*ChunkCountPerBlock);
+			//pb->Data=(u8*)malloc(m_uRealChunkSize*ChunkCountPerBlock);
+			pb->Data=(u8*)operator new(m_uRealChunkSize*ChunkCountPerBlock);
 
 			pb->Chunks=new chunk[ChunkCountPerBlock];
 			for(u32 i=0;i<ChunkCountPerBlock;++i)
@@ -130,7 +149,8 @@ namespace core{
 		if(m_noCaches.remove(reinterpret_cast<u32>(p),&realPointer))
 		{
 			//printf("noCaches remove:%08X->%08X\n",p,realPointer);
-			free(realPointer);
+			//free(realPointer);
+			operator delete(realPointer);
 			++m_uDelloc;
 			return;
 		}
@@ -147,4 +167,12 @@ namespace core{
 	}
 }
 }
+
+#ifdef YON_CHECK_MEMORY
+#ifdef new
+#undef new
+#endif
+#define new YON_DEBUG_NEW
+#endif
+
 #endif

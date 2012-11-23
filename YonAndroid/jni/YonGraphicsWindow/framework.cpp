@@ -22,7 +22,7 @@ core::array<core::stringc> images;
 core::array<ITexture*> textures;
 scene::SDynamicShap3D shaps[29];
 SMaterial material;
-
+core::position2di ps[4];
 class MyEventReceiver : public IEventReceiver{
 public:
 	virtual bool onEvent(const SEvent& evt){
@@ -97,9 +97,22 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	unit->drop();
 	entity->drop();*/
 
+#define TO_PS(x,y,w,h) \
+	ps[0].set(x,y+h); \
+	ps[1].set(x,y); \
+	ps[2].set(x+w,y); \
+	ps[3].set(x+w,y+h);
+
+	TO_PS(0,0,512,256)
+
+	//ps[0]=core::position2di(0,0);
+	//ps[1]=core::position2di(0,256);
+	//ps[2]=core::position2di(512,256);
+	//ps[3]=core::position2di(512,0);
+
 	for(u32 i=1;i<=7;++i){
 		images.push_back(core::stringc("%d.png",i));
-		textures.push_back(videoDriver->getTexture(images[i-1]));
+		//textures.push_back(videoDriver->getTexture(images[i-1]));
 	}
 
 	s32 z=900;
@@ -129,11 +142,6 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 		index=0;
 	}
 
-	ITexture* texture=textures[0];
-	material.setTexture(0,texture);
-
-	
-	material.FrontFace=ENUM_FRONT_FACE_CW;
 
 	return true;
 }
@@ -141,6 +149,7 @@ void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
 //#define BATCH
+
 void drawFrame(){
 
 	videoDriver->begin(true,true,COLOR_DEFAULT);
@@ -174,8 +183,8 @@ void drawFrame(){
 		//s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
 		//gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
 		ITexture* texture=videoDriver->getTexture("de.png");
-		gfAdapter->drawRegion(texture,r,0,0,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),false,0xFF0000FF);
-		gfAdapter->drawRegion(texture,r,0,0,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),true);
+		gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
+		gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,false);
 #else
 		//Logger->debug("i:%d--0x%08X\r\n",i,&shaps[i]);
 		//material.setTexture(0,texture);
@@ -210,6 +219,7 @@ void drawFrame(){
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,DCL:%d,use:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall(),diff),core::position2di(0,10),COLOR_GREEN);
 
 	videoDriver->end();
+
 	end=timer->getRealTime();
 	diff=end-start;
 	start=timer->getRealTime();

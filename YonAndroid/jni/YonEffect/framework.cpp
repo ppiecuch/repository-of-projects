@@ -249,12 +249,28 @@ void drawFrame(){
 	gfAdapter->clearZ(1000);
 
 	core::rectf r(0,0,1,1);
+	static core::position2di ps[4];
 	//for(u32 i=0;i<100;++i){
-	gfAdapter->drawRegion("shadow.png",r,250,120,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
-	gfAdapter->drawRegion("trans.png",r,0,120,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),false,0xFF0000FF);
-	gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
-	gfAdapter->drawRegion("trans.png",r,200,120,128,64,ENUM_TRANS_MIRROR);
-	gfAdapter->drawRegion("trans.png",r,300,120,128,64,ENUM_TRANS_MIRROR_ROT180);
+	//gfAdapter->drawRegion("shadow.png",r,250,120,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true,0xFF0000FF);
+	//gfAdapter->drawRegion("trans.png",r,0,120,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP),false,0xFF0000FF);
+	//gfAdapter->drawRegion("trans.png",r,100,120,128,64,ENUM_TRANS_ROT180);
+	//gfAdapter->drawRegion("trans.png",r,200,120,128,64,ENUM_TRANS_MIRROR);
+	//gfAdapter->drawRegion("trans.png",r,300,120,128,64,ENUM_TRANS_MIRROR_ROT180);
+#define TO_PS(x,y,w,h) \
+	ps[0].set(x,y+h); \
+	ps[1].set(x,y); \
+	ps[2].set(x+w,y); \
+	ps[3].set(x+w,y+h);
+	TO_PS(250,120,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("shadow.png"),r,ps,ENUM_TRANS_NONE,true,0xFF0000FF);
+	TO_PS(0,120,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_NONE);
+	TO_PS(100,120,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_ROT180);
+	TO_PS(200,120,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_MIRROR);
+	TO_PS(300,120,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_MIRROR_ROT180);
 
 
 	if(lastTime!=0)
@@ -281,12 +297,23 @@ void drawFrame(){
 	else
 		lastTime=timer->getRealTime();
 
-	gfAdapter->drawRegion("test.png",r,200,120,128,64,ENUM_TRANS_ROT90);
+	TO_PS(0,320,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("test.png"),r,ps,ENUM_TRANS_ROT90);
+	TO_PS(50,170,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("shadow.png"),r,ps,ENUM_TRANS_NONE,true);
+	TO_PS(100,30,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_MIRROR_ROT90);
+	TO_PS(200,320,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_MIRROR_ROT270);
+	TO_PS(300,320,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_ROT270);
+
+	/*gfAdapter->drawRegion("test.png",r,200,120,128,64,ENUM_TRANS_ROT90);
 	gfAdapter->drawRegion("shadow.png",r,50,170,128,64,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER),true);
 	gfAdapter->drawRegion("trans.png",r,100,30,128,64,ENUM_TRANS_MIRROR_ROT90);
 	gfAdapter->drawRegion("trans.png",r,200,320,128,64,ENUM_TRANS_MIRROR_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_HCENTER|MASK_ACTHOR_VCENTER));
 	gfAdapter->drawRegion("trans.png",r,300,320,128,64,ENUM_TRANS_ROT270,(MASK_ACTHOR)(MASK_ACTHOR_RIGHT|MASK_ACTHOR_BOTTOM));
-	gfAdapter->drawImage("shadow.png",0,0,64,32,50,50,true,0xAA000000);
+	gfAdapter->drawImage("shadow.png",0,0,64,32,50,50,true,0xAA000000);*/
 
 
 	gfAdapter->render();

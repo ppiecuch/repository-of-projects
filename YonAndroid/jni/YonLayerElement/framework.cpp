@@ -89,6 +89,13 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 		textures.push_back(videoDriver->getTexture(io::path("%d.png",i)));
 	}
 
+	static core::position2di ps[4];
+#define TO_PS(x,y,w,h) \
+	ps[0].set(x,y+h); \
+	ps[1].set(x,y); \
+	ps[2].set(x+w,y); \
+	ps[3].set(x+w,y+h);
+
 	//texture=videoDriver->getTexture("de.png");
 
 	gfAdapter->beginLayer(LAYER_ID1);
@@ -99,9 +106,11 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 		texture=textures[randomizer->rand(0,textures.size()-1)];
 		gfAdapter->beginElement(i);
 		core::rectf r1(0,1,320.f/512.f,(256.f-243.f)/256.f);
-		gfAdapter->drawRegion(texture,r1,x-57,y+19,320,243);
+		TO_PS(x-57,y+19,320,243)
+		gfAdapter->drawRegion(texture,r1,ps);
 		core::rectf r2(319.f/512.f,1,332.f/512.f,(256.f-20.f)/256.f);
-		gfAdapter->drawRegion(texture,r2,x,y,13,20,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_TOP|MASK_ACTHOR_LEFT),false);
+		TO_PS(x,y,13,20)
+		gfAdapter->drawRegion(texture,r2,ps,ENUM_TRANS_NONE,false);
 		gfAdapter->endElement();
 	}
 	gfAdapter->eraseElement(1);
@@ -122,9 +131,11 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 		texture=textures[randomizer->rand(0,textures.size()-1)];
 		gfAdapter->beginElement(i);
 		core::rectf r1(0,1,320.f/512.f,(256.f-243.f)/256.f);
-		gfAdapter->drawRegion(texture,r1,x-57,y+19,320,243);
+		TO_PS(x-57,y+19,320,243)
+		gfAdapter->drawRegion(texture,r1,ps);
 		core::rectf r2(319.f/512.f,1,332.f/512.f,(256.f-20.f)/256.f);
-		gfAdapter->drawRegion(texture,r2,x,y,13,20,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_TOP|MASK_ACTHOR_LEFT),false);
+		TO_PS(x,y,13,20)
+		gfAdapter->drawRegion(texture,r2,ps,ENUM_TRANS_NONE,false);
 		//core::rectf r(0,1,1,0);
 		//gfAdapter->drawRegion("1.png",r,x,y,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_TOP|MASK_ACTHOR_LEFT),true);
 		//gfAdapter->drawRegion("2.png",r,x+10,y+10,512,256,ENUM_TRANS_NONE,(MASK_ACTHOR)(MASK_ACTHOR_TOP|MASK_ACTHOR_LEFT),true);
