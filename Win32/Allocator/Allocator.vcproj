@@ -166,11 +166,19 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\alignment.h"
+			RelativePath=".\alignmentpool.h"
+			>
+		</File>
+		<File
+			RelativePath=".\alignmentpoolgroup.h"
 			>
 		</File>
 		<File
 			RelativePath=".\alignof.h"
+			>
+		</File>
+		<File
+			RelativePath=".\fastatof.h"
 			>
 		</File>
 		<File
@@ -206,7 +214,15 @@
 			>
 		</File>
 		<File
+			RelativePath=".\yonMap.h"
+			>
+		</File>
+		<File
 			RelativePath=".\yonMath.h"
+			>
+		</File>
+		<File
+			RelativePath=".\yonString.h"
 			>
 		</File>
 		<File
