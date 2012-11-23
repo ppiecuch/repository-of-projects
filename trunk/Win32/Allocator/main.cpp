@@ -2,6 +2,9 @@
 #include <stdlib.h>
 
 #include "alignof.h"
+#include "yonAllocator.h"
+#include "alignmentpool.h"
+#include "yonString.h"
 
 #include <sys/timeb.h>
 #include <time.h>
@@ -36,6 +39,22 @@ int main(int argc, char* argv[]){
 	long long s;
 	int ms;
 
+	core::stringc str("%d",1);
+
+	/*
+	//alignmentpool
+	core::alignmentpool<128,1,64> ali1;
+	c8* p1=(c8*)ali1.allocate(129,1);
+	c8* p2=(c8*)ali1.allocate(1,3);
+	printf("%08X,%08X,%08X\n",p1,p1+1,p1+2);
+	printf("%08X,%08X,%08X\n",p2,p2+1,p2+2);
+	ali1.deallocate(p1);
+	u64* p3=(u64*)ali1.allocate(8,16);
+	printf("%08X,%08X\n",p3,p3+1);
+	ali1.deallocate(p3);
+	ali1.deallocate(p2);
+	*/
+
 	/*u32 align=core::alignOf<u64>();
 	printf("align:%u\n",align);
 	for(u32 addr=0;addr<15;++addr)
@@ -55,13 +74,13 @@ int main(int argc, char* argv[]){
 	*/
 	//refer to:http://www.cnblogs.com/Creator/archive/2012/04/05/2433386.html
 	//根据宏定义可推算在32位系统中malloc的MINSIZE为16字节，在64位系统中MINSIZE一般为32字节。
-	void* p1=malloc(1);
+	/*void* p1=malloc(1);
 	void* p2=malloc(8);
 	printf("%08X,%08X\n",p1,p2);
 	free(p1);
-	free(p2);
+	free(p2);*/
 
-
+#if 0
 	//for(size_t i=0;i<8;++i)
 	//	printf("%d\n",_S_round_up(i));
 	_ftime64_s( &start ); 
@@ -69,15 +88,19 @@ int main(int argc, char* argv[]){
 	//core::array<s32> arr;
 	//core::array<s32,yonAllocatorMalloc<s32> > arr;
 	//core::array<s32,yonAllocatorMemoryPool<s32,100> > arr;
-	//for(int i=0;i<COUNT;++i){
-	//	arr.push_back(i);
-	//}
+	core::array<s32,yonAllocatorAlign<s32> > arr;
+	for(int i=0;i<COUNT;++i){
+		arr.push_back(i);
+	}
+
+	/*
 	//core::list<s32> l;
 	core::list<s32,yonAllocatorMemoryPool<YonListNode<s32> > > l;
 	for(int i=0;i<COUNT;++i){
 		l.push_back(i);
 		l.erase(l.begin());
 	}
+	*/
 	_ftime64_s( &end );
 
 	s=end.time-start.time;
@@ -88,6 +111,7 @@ int main(int argc, char* argv[]){
 	}
 	printf("%d.",s);
 	printf("%03d\n",ms);
+#endif
 
 	system("pause");
 	return 0;

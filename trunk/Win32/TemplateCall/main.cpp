@@ -53,6 +53,12 @@ public:
 	void test(){printf("test\r\n");}
 };
 
+template<size_t Num>
+class Test{
+public:
+	Test(){printf("%d\n",Num);}
+};
+
 template<typename T,typename OT=Obj<T> >
 class Contain{
 	//1、如果不定义OT变量，则应用程序不会创建Obj对象，虽然你在模板参数列表中声明了它
@@ -68,10 +74,14 @@ public:
 template <typename T,typename OT >
 OT& Contain<T,OT>::t=OT::getInstance();
 
+int i;
+
 int main(int argc, char* argv[])
 {
 	EnableMemLeakCheck();
-	{
+	for(i=0;i<3;++i)
+		Test<i>();
+	/*{
 		Contain<int> c1;
 		Contain<double> c2;
 		Contain<int> c3;
@@ -85,7 +95,7 @@ int main(int argc, char* argv[])
 		t.test();
 	}
 	test(1.0f,1);
-	test(1,10);
+	test(1,10);*/
 
 	system("pause");
 	return 0;
