@@ -13,6 +13,10 @@ using namespace yon::scene;
 using namespace yon::scene::camera;
 using namespace yon::scene::animator;
 
+//memory leak?
+//refer to:http://www.vis-sim.com/3dsceneBB/viewtopic.php?t=1027
+//出现msvcrtd.lib(crtexew.obj) : error LNK2001: unresolved external symbol _WinMain@1
+//将程序入口点设置为wWinMainCRTStartup（链接-》高级-》入口点）
 #pragma comment(lib, "yon.lib")
 
 // CYonExampleDlgDlg 对话框
