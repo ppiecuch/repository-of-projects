@@ -162,9 +162,22 @@ void draw()
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
+int a=0;
 void display(void) { 
 	// adjust viewport and projection matrix to texture dimension
-	glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+	//glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+	glEnable(GL_SCISSOR_TEST);
+	if(++a%200==0)
+	{
+		glScissor(TEXTURE_WIDTH/2, TEXTURE_HEIGHT/2, TEXTURE_WIDTH/2, TEXTURE_HEIGHT/2);
+		glViewport(TEXTURE_WIDTH/2, TEXTURE_HEIGHT/2, TEXTURE_WIDTH/2, TEXTURE_HEIGHT/2);
+	}
+	else
+	{
+		glScissor(0,0,TEXTURE_WIDTH/2, TEXTURE_HEIGHT/2);
+		glViewport(0, 0, TEXTURE_WIDTH/2, TEXTURE_HEIGHT/2);
+	}
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(60.0f, (float)(TEXTURE_WIDTH)/TEXTURE_HEIGHT, 1.0f, 100.0f);
@@ -178,7 +191,7 @@ void display(void) {
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
 
 		// clear buffer
-		glClearColor(1, 1, 1, 1);
+		glClearColor(1, 1, 1, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// draw a rotating teapot
@@ -238,6 +251,8 @@ void display(void) {
 	}
 
 	// back to normal viewport and projection matrix
+	//glViewport(-96, -96, SCREEN_WIDTH-96, SCREEN_HEIGHT-96);
+	glDisable(GL_SCISSOR_TEST);
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -307,6 +322,13 @@ void init()
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap generation included in OpenGL v1.4
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	bool ScissorTest=glIsEnabled(GL_SCISSOR_TEST)==GL_TRUE;
+	printf("ScissorTest:%d\n",ScissorTest);
+	glEnable(GL_SCISSOR_TEST);
+	ScissorTest=glIsEnabled(GL_SCISSOR_TEST)==GL_TRUE;
+	printf("ScissorTest:%d\n",ScissorTest);
+	//glScissor(16,16,512,256);
 
 	// get OpenGL info
 	glInfo glInfo;
@@ -494,7 +516,7 @@ void motion(int x, int y)
 void destroy()
 {
 
-	glDeleteTextures(1, &textureId);
+	//glDeleteTextures(1, &textureId);
 
 	// clean up FBO, RBO
 	if(fboSupported)
