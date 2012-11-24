@@ -162,6 +162,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "36PerlinNoise", "36PerlinNo
 		{EB8C1093-ACCD-45E8-BCBD-33BC6EF6A778} = {EB8C1093-ACCD-45E8-BCBD-33BC6EF6A778}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "37DuplicateForBatch", "37DuplicateForBatch\37DuplicateForBatch.vcproj", "{C6B1CDAA-A309-4BDC-9360-907DAF32FBB5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "38CompressTexture-DXTC", "38CompressTexture-DXTC\38CompressTexture-DXTC.vcproj", "{982BAEA0-0A5C-4470-9066-D7023FEAD517}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ATICompress", "ATICompress\ATICompress.vcproj", "{B3864F05-3E70-4C36-A10C-133387E38127}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PNGVeticalFlip", "PNGVeticalFlip\PNGVeticalFlip.vcproj", "{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -364,6 +372,22 @@ Global
 		{AD200078-F12B-4033-BF55-88C1AAB1096F}.Debug|Win32.Build.0 = Debug|Win32
 		{AD200078-F12B-4033-BF55-88C1AAB1096F}.Release|Win32.ActiveCfg = Release|Win32
 		{AD200078-F12B-4033-BF55-88C1AAB1096F}.Release|Win32.Build.0 = Release|Win32
+		{C6B1CDAA-A309-4BDC-9360-907DAF32FBB5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C6B1CDAA-A309-4BDC-9360-907DAF32FBB5}.Debug|Win32.Build.0 = Debug|Win32
+		{C6B1CDAA-A309-4BDC-9360-907DAF32FBB5}.Release|Win32.ActiveCfg = Release|Win32
+		{C6B1CDAA-A309-4BDC-9360-907DAF32FBB5}.Release|Win32.Build.0 = Release|Win32
+		{982BAEA0-0A5C-4470-9066-D7023FEAD517}.Debug|Win32.ActiveCfg = Debug|Win32
+		{982BAEA0-0A5C-4470-9066-D7023FEAD517}.Debug|Win32.Build.0 = Debug|Win32
+		{982BAEA0-0A5C-4470-9066-D7023FEAD517}.Release|Win32.ActiveCfg = Release|Win32
+		{982BAEA0-0A5C-4470-9066-D7023FEAD517}.Release|Win32.Build.0 = Release|Win32
+		{B3864F05-3E70-4C36-A10C-133387E38127}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B3864F05-3E70-4C36-A10C-133387E38127}.Debug|Win32.Build.0 = Debug|Win32
+		{B3864F05-3E70-4C36-A10C-133387E38127}.Release|Win32.ActiveCfg = Release|Win32
+		{B3864F05-3E70-4C36-A10C-133387E38127}.Release|Win32.Build.0 = Release|Win32
+		{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}.Debug|Win32.Build.0 = Debug|Win32
+		{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}.Release|Win32.ActiveCfg = Release|Win32
+		{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

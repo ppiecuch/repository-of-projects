@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="06ES1Texture"
-	ProjectGUID="{FA65DAF3-849C-4ECD-ADF3-A88923983818}"
-	RootNamespace="My06ES1Texture"
+	Name="PNGVeticalFlip"
+	ProjectGUID="{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}"
+	RootNamespace="PNGVeticalFlip"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./lpng156;./zlib-1.2.5"
+				AdditionalIncludeDirectories="./lpng1510;./zlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -65,7 +65,6 @@
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
-				Profile="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -91,8 +90,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin"
+			IntermediateDirectory="$(SolutionDir)obj\$(ProjectName)\Release"
 			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -116,6 +115,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="./lpng1510;./zlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -168,267 +168,218 @@
 	</References>
 	<Files>
 		<Filter
-			Name="zlib-1.2.5"
+			Name="lpng1510"
 			>
 			<File
-				RelativePath=".\zlib-1.2.5\adler32.c"
+				RelativePath=".\lpng1510\png.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\compress.c"
+				RelativePath=".\lpng1510\png.h"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\crc32.c"
+				RelativePath=".\lpng1510\pngconf.h"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\crc32.h"
+				RelativePath=".\lpng1510\pngerror.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\deflate.c"
+				RelativePath=".\lpng1510\pngget.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\deflate.h"
+				RelativePath=".\lpng1510\pngmem.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\gzclose.c"
+				RelativePath=".\lpng1510\pngpread.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\gzguts.h"
+				RelativePath=".\lpng1510\pngread.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\gzlib.c"
+				RelativePath=".\lpng1510\pngrio.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\gzread.c"
+				RelativePath=".\lpng1510\pngrtran.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\gzwrite.c"
+				RelativePath=".\lpng1510\pngrutil.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\infback.c"
+				RelativePath=".\lpng1510\pngset.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\inffast.c"
+				RelativePath=".\lpng1510\pngtrans.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\inffast.h"
+				RelativePath=".\lpng1510\pngwio.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\inffixed.h"
+				RelativePath=".\lpng1510\pngwrite.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\inflate.c"
+				RelativePath=".\lpng1510\pngwtran.c"
 				>
 			</File>
 			<File
-				RelativePath=".\zlib-1.2.5\inflate.h"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\inftrees.c"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\inftrees.h"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\README"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\trees.c"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\trees.h"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\uncompr.c"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\zconf.h"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\zlib.h"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\zutil.c"
-				>
-			</File>
-			<File
-				RelativePath=".\zlib-1.2.5\zutil.h"
+				RelativePath=".\lpng1510\pngwutil.c"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="lpng156"
+			Name="zlib"
 			>
 			<File
-				RelativePath=".\lpng156\png.c"
+				RelativePath=".\zlib\adler32.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\png.h"
+				RelativePath=".\zlib\compress.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngconf.h"
+				RelativePath=".\zlib\crc32.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngdebug.h"
+				RelativePath=".\zlib\crc32.h"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngerror.c"
+				RelativePath=".\zlib\deflate.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngget.c"
+				RelativePath=".\zlib\deflate.h"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pnginfo.h"
+				RelativePath=".\zlib\gzclose.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pnglibconf.h"
+				RelativePath=".\zlib\gzguts.h"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngmem.c"
+				RelativePath=".\zlib\gzlib.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngpread.c"
+				RelativePath=".\zlib\gzread.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngpriv.h"
+				RelativePath=".\zlib\gzwrite.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngread.c"
+				RelativePath=".\zlib\infback.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngrio.c"
+				RelativePath=".\zlib\inffast.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngrtran.c"
+				RelativePath=".\zlib\inffast.h"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngrutil.c"
+				RelativePath=".\zlib\inffixed.h"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngset.c"
+				RelativePath=".\zlib\inflate.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngstruct.h"
+				RelativePath=".\zlib\inflate.h"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngtrans.c"
+				RelativePath=".\zlib\inftrees.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngwio.c"
+				RelativePath=".\zlib\inftrees.h"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngwrite.c"
+				RelativePath=".\zlib\trees.c"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngwtran.c"
+				RelativePath=".\zlib\trees.h"
 				>
 			</File>
 			<File
-				RelativePath=".\lpng156\pngwutil.c"
+				RelativePath=".\zlib\uncompr.c"
+				>
+			</File>
+			<File
+				RelativePath=".\zlib\zconf.h"
+				>
+			</File>
+			<File
+				RelativePath=".\zlib\zlib.h"
+				>
+			</File>
+			<File
+				RelativePath=".\zlib\zutil.c"
+				>
+			</File>
+			<File
+				RelativePath=".\zlib\zutil.h"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\config.h"
-			>
-		</File>
-		<File
 			RelativePath=".\main.cpp"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
-			RelativePath=".\PngFile.cpp"
+			RelativePath=".\pngtest.c"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
-			RelativePath=".\PngFile.h"
-			>
-		</File>
-		<File
-			RelativePath=".\point2f.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\point2f.h"
-			>
-		</File>
-		<File
-			RelativePath=".\point3f.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\point3f.h"
-			>
-		</File>
-		<File
-			RelativePath=".\sphere.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\sphere.h"
-			>
-		</File>
-		<File
-			RelativePath=".\Texture.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Texture.h"
-			>
-		</File>
-		<File
-			RelativePath=".\vector3f.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\vector3f.h"
-			>
-		</File>
-		<File
-			RelativePath=".\wood.png"
+			RelativePath=".\TODO.txt"
 			>
 		</File>
 	</Files>
