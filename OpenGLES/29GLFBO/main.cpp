@@ -207,12 +207,15 @@ void display(void) {
 	else
 	{
 		// clear buffer
-		glClearColor(1, 1, 1, 1);
+		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glPushAttrib(GL_COLOR_BUFFER_BIT | GL_PIXEL_MODE_BIT); // for GL_DRAW_BUFFER and GL_READ_BUFFER
 		glDrawBuffer(GL_BACK);
 		glReadBuffer(GL_BACK);
+
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glEnable(GL_ALPHA_TEST);
 
 		// draw a rotating teapot
 		glPushMatrix();
@@ -228,6 +231,9 @@ void display(void) {
 		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+		glDisable(GL_ALPHA_TEST);
+
 		glPopAttrib(); // GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
 	}
 
@@ -239,7 +245,7 @@ void display(void) {
 	glMatrixMode(GL_MODELVIEW);
 
 	// clear framebuffer
-	glClearColor(0, 0, 0, 0);
+	glClearColor(0.5f,0.5f,0.5f,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	glPushMatrix();
