@@ -241,6 +241,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonLayerElement", "YonLayer
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonRTTPartial", "YonRTTPartial\YonRTTPartial.vcproj", "{857A4717-2930-4DBD-A8C1-5E31D07FE0C5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -443,6 +448,10 @@ Global
 		{56E66D63-723C-4D63-8618-96414BCC9B5C}.Debug|Win32.Build.0 = Debug|Win32
 		{56E66D63-723C-4D63-8618-96414BCC9B5C}.Release|Win32.ActiveCfg = Release|Win32
 		{56E66D63-723C-4D63-8618-96414BCC9B5C}.Release|Win32.Build.0 = Release|Win32
+		{857A4717-2930-4DBD-A8C1-5E31D07FE0C5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{857A4717-2930-4DBD-A8C1-5E31D07FE0C5}.Debug|Win32.Build.0 = Debug|Win32
+		{857A4717-2930-4DBD-A8C1-5E31D07FE0C5}.Release|Win32.ActiveCfg = Release|Win32
+		{857A4717-2930-4DBD-A8C1-5E31D07FE0C5}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
