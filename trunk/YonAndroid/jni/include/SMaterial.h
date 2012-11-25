@@ -155,7 +155,7 @@ namespace video{
 		bool StencilTest:1;
 #endif
 		//bool RescaleNormal:1;
-		bool ScissorTest:1;
+		//bool ScissorTest:1;
 
 		ENUM_MATERIAL_TYPE MaterialType;
 		//ENUM_CMP_FUNC ZBuffer;
@@ -177,16 +177,17 @@ namespace video{
 			//CullFace(true),
 			//DepthTest(false),
 			Dither(true),
-			LineSmooth(false),
+			LineSmooth(false)
 #ifndef YON_ONLY_2D_GAME
 			Fog(false),
 			Lighting(false),
 			Normalize(false),
 			GouraudShading(true),
-			StencilTest(false),
+			StencilTest(false)
 #endif
-			//RescaleNormal(false),
-			ScissorTest(false){
+			//,RescaleNormal(false)
+			//,ScissorTest(false)
+		{
 		}
 
 		SMaterial(ENUM_MATERIAL_TYPE materialType)
@@ -198,16 +199,16 @@ namespace video{
 			//CullFace(true),
 			//DepthTest(false),
 			Dither(true),
-			LineSmooth(false),
+			LineSmooth(false)
 #ifndef YON_ONLY_2D_GAME
 			Fog(false),
 			Lighting(false),
 			Normalize(false),
 			GouraudShading(true),
-			StencilTest(false),
+			StencilTest(false)
 #endif
-			//RescaleNormal(false),
-			ScissorTest(false)
+			//,RescaleNormal(false)
+			//,ScissorTest(false)
 			{
 		}
 
@@ -287,7 +288,7 @@ namespace video{
 				GouraudShading != b.GouraudShading ||
 				StencilTest != b.StencilTest ||
 #endif
-				ScissorTest != b.ScissorTest ||
+				//ScissorTest != b.ScissorTest ||
 				ColorMask != b.ColorMask ;
 			for (u32 i=0; (i<MATERIAL_MAX_TEXTURES) && !different; ++i)
 			{
@@ -327,7 +328,7 @@ namespace video{
 			GouraudShading = other.GouraudShading;
 			StencilTest = other.StencilTest;
 #endif
-			ScissorTest = other.ScissorTest;
+			//ScissorTest = other.ScissorTest;
 			ColorMask = other.ColorMask;
 			return *this;
 		}

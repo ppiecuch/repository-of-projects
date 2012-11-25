@@ -33,6 +33,13 @@ namespace yon{
 			rect(const position2d<T>& pos, const dimension2d<U>& size)
 				: topLeft(pos), bottomRight(pos.x + size.w, pos.y + size.h) {}
 
+			void set(T x, T y, T x2, T y2){
+				topLeft.x=x;
+				topLeft.y=y;
+				bottomRight.x=x2;
+				bottomRight.y=y2;
+			}
+
 			void print() const {
 				Logger->debug("{%.3f,%.3f,%.3f,%.3f}\n",(f32)topLeft.x,(f32)topLeft.y,(f32)bottomRight.x,(f32)bottomRight.y);
 			}
@@ -134,10 +141,10 @@ namespace yon{
 			//position2d<T> topRight;
 		};
 
-
-
 		typedef rect<f32> rectf;
 		typedef rect<s32> recti;
+
+		YON_API extern const recti ZERO_RECTI;
 	}
 }
 #endif

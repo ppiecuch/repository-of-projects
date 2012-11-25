@@ -188,7 +188,7 @@ namespace yon{
 
 
 			//virtual bool setRenderTarget(ENUM_RENDER_TARGET target, bool clearTarget=true, bool clearZBuffer=true, video::SColor color=video::COLOR_ZERO) =0;
-			virtual void setRenderTarget(video::ITexture* texture,bool backBuffer=true, bool zBuffer=true, video::SColor color=video::COLOR_ZERO) =0;
+			virtual void setRenderTarget(video::ITexture* texture,bool backBuffer=true, bool zBuffer=true, const video::SColor& color=video::COLOR_ZERO,bool partial=false,const core::recti& area=core::ZERO_RECTI) =0;
 
 
 			//是否支持feature特性
