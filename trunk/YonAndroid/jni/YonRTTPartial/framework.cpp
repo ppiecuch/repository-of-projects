@@ -87,11 +87,12 @@ void drawFrame(){
 
 	videoDriver->begin();
 
-	//rtt->beginRTT(true,true,video::SColor(0xFF133E67));
+	
 	static core::recti area;
 	static core::position2di ps[4];
 	static core::rectf r(0,1,1,0);
 
+	/*
 	area.set(0,0,128,128);
 	pCamera2->onResize(core::dimension2du(area.getWidth(),area.getHeight()));
 	pCamera2->setNeedUpload();
@@ -108,15 +109,16 @@ void drawFrame(){
 	gfAdapter->clearZ(1000);
 	TO_PS(0,0,128,128)
 	gfAdapter->drawRegion(videoDriver->getTexture("aura.png"),r,ps);
-	gfAdapter->render(); 
+	gfAdapter->render(); */
 
-	area.set(384,384,512,512);
+	
+	area.set(5,5,256,256);
 	pCamera2->onResize(core::dimension2du(area.getWidth(),area.getHeight()));
 	pCamera2->setNeedUpload();
 	pCamera2->render(videoDriver);
 	videoDriver->setRenderTarget(rtt,true,true,COLOR_RED,true,area);
 
-
+	
 #define TO_PS(x,y,w,h) \
 	ps[0].set(x,y+h); \
 	ps[1].set(x,y); \
@@ -138,7 +140,6 @@ void drawFrame(){
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
-	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
 
 	gfAdapter->clearZ(1000);
 	TO_PS(100,100,128,128)
