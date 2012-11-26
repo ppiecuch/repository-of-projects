@@ -69,12 +69,16 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
-	ISound* sound=audioDriver->getSound("bg.wav");
+	PROFILE_REGISTER_FRAME();
+	PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
+	ISound* sound=audioDriver->getSound("bg.ogg");
 	sound->setLooping(true);
 	sound->setGain(0.5f);
 	sound->play();
 	//sound=audioDriver->getSound("helloworld.wav");
 	//sound->play();
+	PROFILE_END_CALL(PROFILE_ID_1);
+	PROFILE_REGISTER_FRAME();
 
 	return true;
 }
@@ -92,6 +96,7 @@ void drawFrame(){
 	videoDriver->end();
 }
 void destroy(){
+	PROFILE_REPORT();
 	engine->drop();
 	delete params.pEventReceiver;
 }
