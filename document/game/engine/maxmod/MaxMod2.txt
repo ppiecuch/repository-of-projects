@@ -1,0 +1,11 @@
+MaxMod2 is a collection of cross platform audio modules for BlitzMax, the audio format modules like DUMB can be used independently with the standard BlitzMax audio drivers or together with a MaxMod2 audio driver (RtAudio) to produce streaming audio.
+
+Module	Description
+MaxMod2.RtAudio	 Provides audio streaming and/or audio driver via the RtAudio library
+MaxMod2.DUMB	 Provides tracker music support for MOD, S3M, XM and IT files
+MaxMod2.Flac	 Provides decoding for Flac files
+MaxMod2.Ogg	 Provides decoding for Ogg Vorbis files
+MaxMod2.Wav	 Provides support for wav files
+Supported formats: wav, ogg, flac, mod, xm, it and s3m.
+
+http://code.google.com/p/maxmod/
