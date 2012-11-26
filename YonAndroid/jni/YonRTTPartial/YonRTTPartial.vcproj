@@ -167,6 +167,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\AndroidRTTPartial.mk"
+			>
+		</File>
+		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>

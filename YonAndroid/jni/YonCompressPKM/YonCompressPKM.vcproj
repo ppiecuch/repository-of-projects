@@ -171,10 +171,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\ApplicationCompressPKM.mk"
-			>
-		</File>
-		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>

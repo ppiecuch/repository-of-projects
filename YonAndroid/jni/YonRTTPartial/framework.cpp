@@ -70,11 +70,9 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
-	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT,true);
-
 	
 	pCamera2->setEventReceivable(false);
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(512,512), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(1024,1024), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
 	pCamera2->onResize(rtt->getSize());
 
 	return true;
@@ -92,7 +90,7 @@ void drawFrame(){
 	static core::position2di ps[4];
 	static core::rectf r(0,1,1,0);
 
-	/*
+	
 	area.set(0,0,128,128);
 	pCamera2->onResize(core::dimension2du(area.getWidth(),area.getHeight()));
 	pCamera2->setNeedUpload();
@@ -109,10 +107,10 @@ void drawFrame(){
 	gfAdapter->clearZ(1000);
 	TO_PS(0,0,128,128)
 	gfAdapter->drawRegion(videoDriver->getTexture("aura.png"),r,ps);
-	gfAdapter->render(); */
+	gfAdapter->render(); 
 
 	
-	area.set(5,5,256,256);
+	area.set(384,384,512,512);
 	pCamera2->onResize(core::dimension2du(area.getWidth(),area.getHeight()));
 	pCamera2->setNeedUpload();
 	pCamera2->render(videoDriver);
@@ -131,9 +129,8 @@ void drawFrame(){
 	gfAdapter->render(); 
 
 
-	//rtt->endRTT(true);
+	//»Ö¸´ÖÁÆÁÄ»»º³åÇø
 	videoDriver->setRenderTarget(NULL,true,true,COLOR_DEFAULT);
-	//videoDriver->setViewPort(core::recti(0,0,videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h));
 
 	pCamera->setNeedUpload();
 	pCamera->render(videoDriver);

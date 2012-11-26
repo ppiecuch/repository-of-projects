@@ -12,8 +12,8 @@ endif
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
 
 LOCAL_SRC_FILES := \
-		YonCompressKTX/framework.cpp \
-		YonCompressKTX/yon_AndroidGLView.cpp
+		YonRTTPartial/framework.cpp \
+		YonRTTPartial/yon_AndroidGLView.cpp
 		
 LOCAL_MODULE    := yon
 LOCAL_STATIC_LIBRARIES := engine
