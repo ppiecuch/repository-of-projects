@@ -42,11 +42,12 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,u32 width,u32 height){
-	params.windowSize.w=400;
-	params.windowSize.h=400;
+bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height){
+	params.windowSize.w=width;
+	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	params.fpsLimit=0;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	Logger->setAppender(MASK_APPENDER_VS|MASK_APPENDER_CONSOLE|MASK_APPENDER_FILE|MASK_APPENDER_SCREEN);

@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 	//setlocale(LC_ALL,"chs");
 	setlocale(LC_CTYPE,"UTF-8");
 
-	init(NULL,800,480);
+	init(NULL,NULL,NULL,800,480);
 	while(getEngine()->run()){
 		drawFrame();
 	}

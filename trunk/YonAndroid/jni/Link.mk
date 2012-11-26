@@ -2,6 +2,9 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 subdirs := $(LOCAL_PATH)/Android.mk
+ifeq ($(APP),Logger)
+subdirs += $(LOCAL_PATH)/AndroidLogger.mk
+else
 ifeq ($(APP),PNG)
 subdirs += $(LOCAL_PATH)/AndroidPNG.mk
 else
@@ -19,6 +22,15 @@ subdirs += $(LOCAL_PATH)/AndroidCallback.mk
 else
 ifeq ($(APP),LayerElement)
 subdirs += $(LOCAL_PATH)/AndroidLayerElement.mk
+else
+ifeq ($(APP),RTTPartial)
+subdirs += $(LOCAL_PATH)/AndroidRTTPartial.mk
+else
+ifeq ($(APP),CompressKTX)
+subdirs += $(LOCAL_PATH)/AndroidCompressKTX.mk
+endif
+endif
+endif
 endif
 endif
 endif
