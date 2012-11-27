@@ -78,39 +78,32 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	*/
 
 
-	IMaterial* material;
 	IShap *shap,*shap1,*shap2;
 	IUnit* unit;
 	IEntity* entity;
 
-	/*ISound* sound=audioDriver->getSound("bg.ogg");
-	sound->setLooping(true);
-	//sound->setGain(0.5f);
-	sound->play();
-	//sound=audioDriver->getSound("helloworld.wav");
-	//sound->play();*/
+#if 0
 
-	/*shap=geometryFty->createCube(50,50,50);
-	unit=geometryFty->createUnit(shap);
-	entity=geometryFty->createEntity(unit);
-	cubeModel=sceneMgr->addModel(entity);
-	material=cubeModel->getMaterial(0);
-	//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_TRANSPARENT);
-	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
-	cubeModel->setPosition(core::vector3df(100,100,0));
-	//material->setTexture(0,videoDriver->getTexture("png8/120.png"));
-	material->setTexture(0,videoDriver->getTexture("120.png"));
-	shap->drop();
-	unit->drop();
-	entity->drop();*/
+	//TODO BUG:Mask模型显示不正常
+	//如果关闭teapot或aura则可正常显示
+	//跟踪发现：
+	//只要把
+	//if(current.EnvSetting.EnvMode!=last.EnvSetting.EnvMode)
+	//{
+	//	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, current.EnvSetting.EnvMode);
+	//}
+	//的if部分去掉就OK了
+	//待分析
 
 	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
-	material=teapotModel->getMaterial(0);
-	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
+	//{
+	//	SMaterial& material=teapotModel->getMaterial(0);
+	//	material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+	//	material.setTexture(0,videoDriver->getTexture("aura.png"));
+	//}
 	teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
@@ -120,12 +113,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	material=planeModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
-	//material->setPolygonMode(ENUM_POLYGON_MODE_LINE);
-	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,videoDriver->getTexture("aura.png"));
+	}
 	planeModel->setPosition(core::vector3df(0,0,0));
-	material->setTexture(0,videoDriver->getTexture("aura.png"));
+	
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -136,14 +132,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//unit->setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	entity=geometryFty->createEntity(unit);
 	IModel* waterfallModel=sceneMgr->addModel(entity);
-	material=waterfallModel->getMaterial(0);
-	material->setMaterialType(ENUM_MATERIAL_TYPE_MASK);
+	{
+		SMaterial& material=waterfallModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_MASK;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		material.setTexture(0,videoDriver->getTexture("fire.png"));
+		material.setTexture(1,videoDriver->getTexture("xyj.png"));
+	}
 	waterfallModel->setPosition(core::vector3df(50,100,120));
-	//material->setTexture(0,videoDriver->getTexture("waterfall.png"));
-	//material->setTexture(1,videoDriver->getTexture("maskalpha.png"));
-
-	material->setTexture(0,videoDriver->getTexture("fire.png"));
-	material->setTexture(1,videoDriver->getTexture("xyj.png"));
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -158,6 +155,43 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	waterfallModel->addAnimator(uvAnimator);
 	uvAnimator->drop();
 
+#else
+
+	shap=geometryFty->createXYRectangle2D(-125,-25,-75,25);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	planeModel=sceneMgr->addModel(entity);
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.setTexture(0,videoDriver->getTexture("skill/skill0.png"));
+	}
+	planeModel->setPosition(core::vector3df(0,0,0));
+
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
+	//shap=geometryFty->createXYRectangle2D2T(-125,-25,-75,25,0,0,1,1,0,0,0.25f,1);
+	//shap=geometryFty->createXYRectangle2D2T(-125,-25,-75,25,0,0,1,1,0.25f,0,0.5f,1);
+	//shap=geometryFty->createXYRectangle2D2T(-125,-25,-75,25,0,0,1,1,0.5f,0,0.75f,1);
+	shap=geometryFty->createXYRectangle2D2T(-125,-25,-75,25,0,0,1,1,0.75f,0,1,1);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	IModel* waterfallModel=sceneMgr->addModel(entity);
+	{
+		SMaterial& material=waterfallModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_MASK;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		material.setTexture(0,videoDriver->getTexture("skill/gray.png"));
+		material.setTexture(1,videoDriver->getTexture("skill/mask.png"));
+	}
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
+#endif
+
 	return true;
 }
 void resize(u32 width,u32 height){
@@ -165,12 +199,12 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
 	//const core::vector3df crot=cubeModel->getRotation();
 	//cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
-	const core::vector3df trot=teapotModel->getRotation();
+	/*const core::vector3df trot=teapotModel->getRotation();
 	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	const core::vector3df psca=planeModel->getScale();
@@ -178,7 +212,7 @@ void drawFrame(){
 		factor= 0.9f;
 	else if(psca.x<2)
 		factor=1.1f;
-	planeModel->setScale(psca*factor);
+	planeModel->setScale(psca*factor);*/
 
 	sceneMgr->render(videoDriver);
 
