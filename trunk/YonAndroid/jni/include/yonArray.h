@@ -275,7 +275,7 @@ namespace core{
 			}
 
 			//剩下的都是index<len
-			s32 tlen=used-index;//需要后移的部分的长度
+			u32 tlen=used-index;//需要后移的部分的长度
 			if(tlen<count){
 				for(i=0;i<tlen;++i)
 					//new (&data[used-1+count-i]) T(data[used-1-i]);

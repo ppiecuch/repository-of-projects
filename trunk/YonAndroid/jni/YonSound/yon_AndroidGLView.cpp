@@ -5,10 +5,10 @@
 
 const char* LOG_TAG = "yon_AndroidGLView";
 const char* className="yon/AndroidGLView";
+const char* utilClassName="yon/util/Util";
 
 JNIEnv *g_env=NULL;
 jobject g_obj=NULL;
-ICallback* callback=NULL;
 
 
 const static s32 MSG_SHOW_SPINNER=0;
@@ -29,125 +29,21 @@ const static s32 ACTION_POINTER_UP = 6;
 const static s32 ACTION_POINTER_ID_MASK = 65280;
 const static s32 ACTION_POINTER_ID_SHIFT = 8;
 
-class MyCallback : public platform::ICallback{
-public:
-	virtual bool callback(const platform::SCallback& cb)
-	{
-		switch(cb.type)
-		{
-		case ENUM_CALLBACK_TYPE_UI:
-			{
-				jclass cls = g_env->FindClass(className);
-				if (cls == NULL) {
-					Logger->warn("can not find %s\n",className);
-					return false;
-				}
-				jmethodID callback = g_env->GetMethodID(cls, "nativeCallback", "(I[Ljava/lang/String;)V");
-				if (callback == NULL) 
-				{
-					Logger->warn("no callback function\n");
-					return false;  
-				}
 
-				switch(cb.ui.type)
-				{
-				case ENUM_CALLBACK_UI_TYPE_CONFIRM:
-					{
-						jobjectArray args = 0;
-						u32 len=4;
-						args = g_env->NewObjectArray(len,g_env->FindClass("java/lang/String"),0);
-						jstring title=g_env->NewStringUTF(cb.ui.title);
-						jstring content=g_env->NewStringUTF(cb.ui.content);
-						jstring ok=g_env->NewStringUTF(cb.ui.positiveButton);
-						jstring cancel=g_env->NewStringUTF(cb.ui.negativeButton);
-						g_env->SetObjectArrayElement(args, 0, title);
-						g_env->SetObjectArrayElement(args, 1, content);
-						g_env->SetObjectArrayElement(args, 2, ok);
-						g_env->SetObjectArrayElement(args, 3, cancel);
-
-						g_env->CallVoidMethod(g_obj, callback, MSG_SETUP_CONFIRM, args);
-						
-						g_env->DeleteLocalRef(args);
-						Logger->debug("callback ui confirm\r\n");
-						return true;
-					}
-				case ENUM_CALLBACK_UI_TYPE_TOAST:
-					{
-						jobjectArray args = 0;
-						u32 len=1;
-						args = g_env->NewObjectArray(len,g_env->FindClass("java/lang/String"),0);
-						jstring content=g_env->NewStringUTF(cb.ui.content);
-						g_env->SetObjectArrayElement(args, 0, content);
-
-						g_env->CallVoidMethod(g_obj, callback, MSG_TOAST, args);
-
-						g_env->DeleteLocalRef(args);
-						Logger->debug("callback ui toast\r\n");
-						return true;
-					}
-				case ENUM_CALLBACK_UI_TYPE_LOADING:
-					{
-						if(cb.ui.visible)
-						{
-							jobjectArray args = 0;
-							u32 len=1;
-							args = g_env->NewObjectArray(len,g_env->FindClass("java/lang/String"),0);
-							jstring content=g_env->NewStringUTF(cb.ui.content);
-							g_env->SetObjectArrayElement(args, 0, content);
-
-							g_env->CallVoidMethod(g_obj, callback, MSG_SHOW_SPINNER, args);
-
-							g_env->DeleteLocalRef(args);
-							Logger->debug("callback ui show spinner\r\n");
-							return true;
-						}
-						else
-						{
-							jobjectArray args = 0;
-							u32 len=0;
-							args = g_env->NewObjectArray(len,g_env->FindClass("java/lang/String"),0);
-
-							g_env->CallVoidMethod(g_obj, callback, MSG_HIDE_SPINNER, args);
-
-							g_env->DeleteLocalRef(args);
-							Logger->debug("callback ui hide spinner\r\n");
-							return true;
-						}
-					}
-				case ENUM_CALLBACK_UI_TYPE_EDITBOX:
-					{
-						jobjectArray args = 0;
-						u32 len=0;
-						args = g_env->NewObjectArray(len,g_env->FindClass("java/lang/String"),0);
-
-						g_env->CallVoidMethod(g_obj, callback, MSG_SETUP_INPUT, args);
-
-						g_env->DeleteLocalRef(args);
-						Logger->debug("callback ui setup input\r\n");
-						return true;
-					}
-				default:
-					Logger->warn("unexpect callback ui type\r\n");
-				}
-				break;
-			}
-		default:
-			Logger->warn("unexpect callback type\r\n");
-		}
-		return false;
-	}
-};
-
-void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jint width, jint height, jstring apkFilePath, jstring sdcardPath){
-	LOGD(LOG_TAG,"screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",width,height,pEnv);
+void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jboolean first,jint width, jint height, jstring apkFilePath, jstring sdcardPath){
+	LOGD(LOG_TAG,"first:%s,screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",first?"true":"false",width,height,pEnv);
 	g_env=pEnv;
 	g_obj=obj;
-	callback=new MyCallback();
-	init(pEnv,callback,width,height);
+	if(first)
+	{
+		const char* root= pEnv->GetStringUTFChars(sdcardPath, 0);
+		init(pEnv,NULL,root,width,height);
+		pEnv->ReleaseStringUTFChars(sdcardPath, root);
+	}
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	Logger->debug("nativeOnSurfaceChanged->w:%d,h:%d\n",w,h);
-	getEngine()->onResize(w,h);
+	resize(w,h);
 }
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	getEngine()->run();
@@ -190,7 +86,6 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	//回调java中的方法
 	Logger->info("callbackDestroy function\n");
 	destroy();
-	delete callback;
 	pEnv->CallVoidMethod(obj, callbackDestroy);
 #else
 	const char* className="yon/AndroidGLView";
