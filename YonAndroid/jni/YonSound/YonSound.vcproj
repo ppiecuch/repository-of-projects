@@ -171,10 +171,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\ApplicationSound.mk"
-			>
-		</File>
-		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>

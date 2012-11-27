@@ -28,6 +28,10 @@ subdirs += $(LOCAL_PATH)/AndroidRTTPartial.mk
 else
 ifeq ($(APP),CompressKTX)
 subdirs += $(LOCAL_PATH)/AndroidCompressKTX.mk
+else
+ifeq ($(APP),Sound)
+subdirs += $(LOCAL_PATH)/AndroidSound.mk
+endif
 endif
 endif
 endif

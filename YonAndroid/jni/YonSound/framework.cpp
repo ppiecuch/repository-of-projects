@@ -46,12 +46,12 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
+bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
-	params.pCallback=pcb;
 	params.fpsLimit=0;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -69,16 +69,16 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
-	PROFILE_REGISTER_FRAME();
-	PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
+	//PROFILE_REGISTER_FRAME();
+	//PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
 	ISound* sound=audioDriver->getSound("bg.ogg");
 	sound->setLooping(true);
 	sound->setGain(0.5f);
 	sound->play();
 	//sound=audioDriver->getSound("helloworld.wav");
 	//sound->play();
-	PROFILE_END_CALL(PROFILE_ID_1);
-	PROFILE_REGISTER_FRAME();
+	//PROFILE_END_CALL(PROFILE_ID_1);
+	//PROFILE_REGISTER_FRAME();
 
 	return true;
 }
