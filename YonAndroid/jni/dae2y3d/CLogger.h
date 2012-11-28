@@ -36,7 +36,7 @@ namespace yon{
 		//日志输出
 			s32 m_appender;
 		//缓冲区
-			const static u32 BUFFER_SIZE=1024;
+			const static u32 BUFFER_SIZE=65535;
 			c8 m_buffer[BUFFER_SIZE];
 		//日志级别名称
 			const static c8* LEVEL_NAME[ENUM_LOG_LEVEL_COUNT];

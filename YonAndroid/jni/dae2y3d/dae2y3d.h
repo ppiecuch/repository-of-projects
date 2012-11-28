@@ -389,6 +389,7 @@ const core::stringc ELEM_ANIMATION = "animation";
 const core::stringc ELEM_CHANNEL = "channel";
 
 const core::stringc ELEM_SCENE = "scene";
+const core::stringc ID_VISUAL_SCENE_NODE="VisualSceneNode";
 
 //const core::stringc inputSemanticNames[] = {"POSITION", "VERTEX", "NORMAL", "TEXCOORD", "UV", "TANGENT", "IMAGE", "TEXTURE","JOINT","INV_BIND_MATRIX","WEIGHT", 0};
 const core::stringc NODE_TYPE_JOINT= "JOINT";
