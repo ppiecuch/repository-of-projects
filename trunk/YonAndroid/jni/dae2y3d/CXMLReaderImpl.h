@@ -146,7 +146,7 @@ namespace io{
 				return false;
 			u32 end=m_pStream->getPos();
 			if(end-start>2&&trim(start,end)){
-				Logger->debug("text:%s\n",m_nodeName.c_str());
+				//Logger->debug("text:%s\n",m_nodeName.c_str());
 				return true;
 			}
 			switch(readNext())

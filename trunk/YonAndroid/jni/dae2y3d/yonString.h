@@ -56,8 +56,8 @@ namespace yon{
 			string(const c8* const pFmt,...):elements(NULL),capacity(0),len(0){
 				va_list args;
 				va_start(args,pFmt);
-				c8 buffer[1024];
-				vsprintf_s(buffer,1024,pFmt,args);
+				c8 buffer[65535];
+				vsprintf_s(buffer,65535,pFmt,args);
 				va_end(args);
 
 				*this=buffer;
@@ -628,7 +628,7 @@ namespace yon{
 			template <class B>
 			s32 findLastCharNotInList(const B* const c, u32 count) const
 			{
-				for (s32 i=(s32)(len-2); i>=0; --i)
+				for (s32 i=(s32)(len-1); i>=0; --i)
 				{
 					u32 j;
 					for (j=0; j<count; ++j)

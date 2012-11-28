@@ -127,8 +127,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//Logger->debug("%.2f\n",rs->readFloat());
 	//Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
-#elif 0
-	IReadStream* rs=fs->createAndOpenReadFileStream("video_autodetect.xml");
+#elif 1
+	IReadStream* rs=fs->createAndOpenReadFileStream("miner_.dae");
 	XMLReader* reader=fs->createXMLReader(rs);
 	rs->drop();
 

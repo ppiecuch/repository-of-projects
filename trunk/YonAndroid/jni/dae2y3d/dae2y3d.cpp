@@ -433,8 +433,15 @@ protected:
 		if(isRoot)
 		{
 			node.Id = getId(xml);
-			node.Name= getName(xml);
-			Logger->debug("\tid：%s,name：%s\r\n",node.Id.c_str(),node.Name.c_str());
+			if(ID_VISUAL_SCENE_NODE==node.Id)
+			{
+				Logger->debug("\tid：%s\r\n",node.Id.c_str());
+			}
+			else
+			{
+				node.Name= getName(xml);
+				Logger->debug("\tid：%s,name：%s\r\n",node.Id.c_str(),node.Name.c_str());
+			}
 		}
 		else
 		{
@@ -2378,6 +2385,108 @@ protected:
 
 #endif
 
+	
+
+
+public:
+	DAE2Y3DConvert(){
+		DAEJointNode::Counter=0;
+
+		//for(int i=0;i<16;i++)
+		//	invert[i]=0;
+		//invert[0]=invert[6]=invert[9]=invert[15]=1;
+		for(u32 i=0;i<4;++i)
+			for(u32 j=0;j<4;++j)
+				invert.m[i][j]=0;
+		invert.m[0][0]=invert.m[1][2]=invert.m[2][1]=invert.m[3][3]=1;
+	}
+	void readColladaSection(XMLReader* xml)
+	{
+		if(xml==NULL||xml->isEmptyElement())
+			return;
+
+		//读取版本号
+		const char* version=xml->getAttributeValue("version");
+		Logger->debug("version：%s\r\n",version);
+
+		while(xml->read())
+		{
+			if (xml->getNodeType() == io::ENUM_XML_NODE_ELEMENT)
+			{
+				const char* nodeName=xml->getNodeName();
+
+				if (ELEM_ASSET==nodeName)
+				{
+					readAssetSection(xml,asset);
+					//skipSection(xml);
+				}
+				else if(ELEM_LIBRARY_IMAGES==nodeName)
+				{
+					readLibraryImagesSection(xml);
+				}
+				else if(ELEM_LIBRARY_EFFECTS==nodeName)
+				{
+					//TODO 出错
+					//readLibraryEffectsSection(xml);
+					skipSection(xml);
+				}
+				else if(ELEM_LIBRARY_MATERIALS==nodeName)
+				{
+					skipSection(xml);
+				}
+				else if (ELEM_LIBRARY_GEOMETRIES==nodeName)
+				{
+					readLibraryGeometriesSection(xml);
+				}
+				else if(ELEM_LIBRARY_CONTROLLERS==nodeName)
+				{
+					readLibraryControllersSection(xml);
+				}
+				else if(ELEM_LIBRARY_ANIMATIONS==nodeName)
+				{
+					readLibraryAnimationsSection(xml);
+				}
+				else if (ELEM_LIBRARY_VISUAL_SCENES==nodeName)
+				{
+					readLibraryVisualScenesSection(xml);
+				}
+				else if(ELEM_SCENE==nodeName)
+				{
+					skipSection(xml);
+				}
+				else
+				{
+					Logger->debug("unsupport tag usage found:%s,skip it\n",xml->getNodeName());
+					skipSection(xml);
+				}
+			}
+			else if(xml->getNodeType()==io::ENUM_XML_NODE_ELEMENT_END)
+			{
+				const char* nodeName=xml->getNodeName();
+			}
+		}
+	}
+	void skipSection(XMLReader* xml)
+	{
+		if(xml==NULL||xml->isEmptyElement())
+			return;
+		const char* nodeName=xml->getNodeName();
+		Logger->debug("(<%s></%s>)\r\n",nodeName,nodeName);
+
+		// read until we've reached the last element in this section
+		int tagCounter = 1;
+
+		while(tagCounter && xml->read())
+		{
+			if (xml->getNodeType() == ENUM_XML_NODE_ELEMENT &&!xml->isEmptyElement())
+			{
+				++tagCounter;
+			}
+			else
+				if (xml->getNodeType() == ENUM_XML_NODE_ELEMENT_END)
+					--tagCounter;
+		}
+	}
 	void exportModel(IWriteStream* writer)
 	{
 		int meshCount=0;
@@ -2414,7 +2523,7 @@ protected:
 
 			Logger->debug("name:%s,nodeName:%s\r\n",geometry->Name.c_str(),node.Name);
 			writer->writeString(node.Name.c_str());
-			
+
 			writer->writeInt(node.MaterialTargets.size());
 
 			DAEController* controller=getControllerBySkinSource(geometry->Id.c_str());
@@ -2526,7 +2635,7 @@ protected:
 					continue;
 				}
 
-				
+
 				for(u32 j=0;j<vertexCount;j++)
 				{
 
@@ -2629,7 +2738,7 @@ protected:
 						writer->writeFloat((float)n.z);
 						writer->writeFloat((float)n.y);
 						Logger->debug("{%g,%g,%g}\r\n",n.x,n.z,n.y);
-						
+
 					}
 				}
 
@@ -2678,7 +2787,7 @@ protected:
 				rsm.m[3][0]=0;
 				rsm.m[3][1]=0;
 				rsm.m[3][2]=0;
-				
+
 				core::vector3df n;
 				for(u32 j=0;j<geometry->Mesh.Normal.Count;j++)
 				{
@@ -2703,7 +2812,7 @@ protected:
 				}
 			}
 
-			
+
 
 			//纹理坐标数据
 			writer->writeInt((int)geometry->Mesh.MapChannel.Count);
@@ -2755,107 +2864,6 @@ protected:
 			//Trace("\r\n");
 			Logger->debug("\r\n");
 
-		}
-	}
-
-
-public:
-	DAE2Y3DConvert(){
-		DAEJointNode::Counter=0;
-
-		//for(int i=0;i<16;i++)
-		//	invert[i]=0;
-		//invert[0]=invert[6]=invert[9]=invert[15]=1;
-		for(u32 i=0;i<4;++i)
-			for(u32 j=0;j<4;++j)
-				invert.m[i][j]=0;
-		invert.m[0][0]=invert.m[1][2]=invert.m[2][1]=invert.m[3][3]=1;
-	}
-	void readColladaSection(XMLReader* xml)
-	{
-		if(xml==NULL||xml->isEmptyElement())
-			return;
-
-		//读取版本号
-		const char* version=xml->getAttributeValue("version");
-		Logger->debug("version：%s\r\n",version);
-
-		while(xml->read())
-		{
-			if (xml->getNodeType() == io::ENUM_XML_NODE_ELEMENT)
-			{
-				const char* nodeName=xml->getNodeName();
-
-				if (ELEM_ASSET==nodeName)
-				{
-					readAssetSection(xml,asset);
-					//skipSection(xml);
-				}
-				else if(ELEM_LIBRARY_IMAGES==nodeName)
-				{
-					readLibraryImagesSection(xml);
-				}
-				else if(ELEM_LIBRARY_EFFECTS==nodeName)
-				{
-					//TODO 出错
-					//readLibraryEffectsSection(xml);
-					skipSection(xml);
-				}
-				else if(ELEM_LIBRARY_MATERIALS==nodeName)
-				{
-					skipSection(xml);
-				}
-				else if (ELEM_LIBRARY_GEOMETRIES==nodeName)
-				{
-					readLibraryGeometriesSection(xml);
-				}
-				else if(ELEM_LIBRARY_CONTROLLERS==nodeName)
-				{
-					readLibraryControllersSection(xml);
-				}
-				else if(ELEM_LIBRARY_ANIMATIONS==nodeName)
-				{
-					readLibraryAnimationsSection(xml);
-				}
-				else if (ELEM_LIBRARY_VISUAL_SCENES==nodeName)
-				{
-					readLibraryVisualScenesSection(xml);
-				}
-				else if(ELEM_SCENE==nodeName)
-				{
-					skipSection(xml);
-				}
-				else
-				{
-					Logger->debug("unsupport tag usage found:%s,skip it\n",xml->getNodeName());
-					skipSection(xml);
-				}
-			}
-			else if(xml->getNodeType()==io::ENUM_XML_NODE_ELEMENT_END)
-			{
-				const char* nodeName=xml->getNodeName();
-			}
-		}
-	}
-	void skipSection(XMLReader* xml)
-	{
-		if(xml==NULL||xml->isEmptyElement())
-			return;
-		const char* nodeName=xml->getNodeName();
-		Logger->debug("(<%s></%s>)\r\n",nodeName,nodeName);
-
-		// read until we've reached the last element in this section
-		int tagCounter = 1;
-
-		while(tagCounter && xml->read())
-		{
-			if (xml->getNodeType() == ENUM_XML_NODE_ELEMENT &&!xml->isEmptyElement())
-			{
-				++tagCounter;
-			}
-			else
-				if (xml->getNodeType() == ENUM_XML_NODE_ELEMENT_END)
-					--tagCounter;
 		}
 	}
 	/*void openDAE(const char* filePath)
@@ -2949,6 +2957,8 @@ void dae2y3d(XMLReader* reader,IWriteStream* stream){
 				convert.skipSection(reader);
 			}
 		}
+
+		convert.exportModel(stream);
 	/*}
 	catch(const runtime_error& e)
 	{
