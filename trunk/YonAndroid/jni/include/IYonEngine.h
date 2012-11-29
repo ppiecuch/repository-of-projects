@@ -51,8 +51,6 @@ namespace yon{
 
 		virtual ITimer* getTimer() = 0;
 		//virtual bool getPlatformInfo(SYonPlatformInfo& info) = 0;
-	protected:
-		virtual void createDriver() = 0;
 	};
 }
 

@@ -21,10 +21,15 @@
 
 namespace yon{
 
+	namespace video{
+		class IVideoDriver;
+	}
+
 	namespace scene{
 		class IShap;
 		class ISceneManager;
-		ISceneManager* createSceneManager(ITimer* timer,io::IFileSystem* fileSystem,platform::ICursorControl* cursorControl);
+		class IGeometryFactory;
+		ISceneManager* createSceneManager(video::IVideoDriver* driver,scene::IGeometryFactory* geometryFactory,ITimer* timer,io::IFileSystem* fileSystem,platform::ICursorControl* cursorControl);
 	}
 
 	namespace video{

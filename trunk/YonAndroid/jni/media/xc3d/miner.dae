@@ -28,7 +28,7 @@
   </library_lights>
   <library_images>
     <image id="miner.png" name="miner_png">
-      <init_from>file:///C:/Documents%20and%20Settings/Administrator/%D7%C0%C3%E6/%B2%E2%CA%D4%D3%C3%B5%D8%D0%CE/%BD%C7%C9%AB/%B2%C9%BF%F3%D5%DF%D0%C2/miner.png</init_from>
+      <init_from>file:C:/miner.png</init_from>
     </image>
   </library_images>
   <library_materials>

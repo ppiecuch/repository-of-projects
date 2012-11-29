@@ -2427,8 +2427,8 @@ public:
 				else if(ELEM_LIBRARY_EFFECTS==nodeName)
 				{
 					//TODO 出错
-					//readLibraryEffectsSection(xml);
-					skipSection(xml);
+					readLibraryEffectsSection(xml);
+					//skipSection(xml);
 				}
 				else if(ELEM_LIBRARY_MATERIALS==nodeName)
 				{
@@ -2486,6 +2486,116 @@ public:
 				if (xml->getNodeType() == ENUM_XML_NODE_ELEMENT_END)
 					--tagCounter;
 		}
+	}
+	void exportJointNode(DAEJointNode* parent,DAEJointNode* node,IWriteStream* writer)
+	{
+		Logger->debug("joint:%s,sid:%s\r\n",node->Name.c_str(),node->Sid.c_str());
+		writer->writeString(node->Name.c_str());
+		if(parent)
+			writer->writeString(parent->Name.c_str());
+		else
+			writer->writeString("");
+
+		//绝对索引
+		node->AbsoluteIndex=DAEJointNode::Counter;
+		DAEJointNode::Counter++;
+		Logger->debug("Counter:%d\r\n",DAEJointNode::Counter);
+		writer.writeInt((int)node->AbsoluteIndex);
+
+
+
+		//将变换转调到转换器中
+		core::matrix4f mm=node->Transform.getTransposed();
+		if(parent==NULL)
+		{
+			mm=invert*mm;
+			mm[10]=-mm[10];
+		}
+		else
+		{
+			mm[2]=-mm[2];
+			mm[6]=-mm[6];
+			mm[14]=-mm[14];
+		}
+		mm[8]=-mm[8];
+		mm[9]=-mm[9];
+		node->Transform=mm;
+		for(u32 i=0;i<16;i++)
+		{
+			writer.writeFloat(node->Transform[i]);
+		}
+		core::matrix4f& m=node->Transform;
+		Logger->debug("\ttransform：\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n",m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+
+
+		//动画数据
+		DAEAnimation* animation=getAnimationByNodeId(node->Id.c_str());
+		writer.writeBool(animation!=NULL);
+		if(animation==NULL)
+		{
+			Logger->debug("No animation\r\n");
+		}
+		else
+		{
+			exportAnimation(parent==NULL,animation,writer);
+		}
+
+		writer.writeInt((int)node->Children.size());
+
+		for(u32 i=0;i<node->Children.size();i++)
+		{
+			exportJointNode(node,&node->Children[i],writer);
+		}
+	}
+
+	void exportAnimation(bool isRoot,DAEAnimation* animation,IWriteStream* writer)
+	{
+		Logger->debug("\tanimation id:%s\r\n",animation->Id);
+		//writer.writeString(animation->Id.c_str(),';');
+
+		if(animation->Input.Count!=animation->Output.Count/16)
+			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("Input not equal to output in animation:%s\r\n",animation->Id.c_str()).c_str());
+		u32 frameCount=animation->Input.Count;
+		writer.writeInt((int)frameCount);
+		core::matrix4f temp;
+		core::stringc str;
+		for(u32 i=0;i<frameCount;i++)
+		{
+			writer.writeFloat((float)animation->Input.FloatArray[i]);
+			str+=core::stringc("%.2f,",(float)animation->Input.FloatArray[i]);
+
+			for(u32 j=0;j<16;j++)
+			{
+				temp[j%16]=animation->Output.FloatArray[i*16+j];
+			}
+
+			core::matrix4f m=temp.getTransposed();
+			if(isRoot)
+			{
+				m=invert*m;
+				m[10]=-m[10];
+			}
+			else
+			{
+				m[2]=-m[2];
+				m[6]=-m[6];
+				m[14]=-m[14];
+			}
+			m[8]=-m[8];
+			m[9]=-m[9];
+
+			core::quaternion q(m);
+			writer.writeFloat(q.x);
+			writer.writeFloat(q.y);
+			writer.writeFloat(q.z);
+			writer.writeFloat(q.w);
+
+			core::vector3df p=m.getTranslation();
+			writer.writeFloat(p.x);
+			writer.writeFloat(p.y);
+			writer.writeFloat(p.z);
+		}
+		Logger->debug("%s\r\n",str.c_str());
 	}
 	void exportModel(IWriteStream* writer)
 	{
@@ -2958,7 +3068,7 @@ void dae2y3d(XMLReader* reader,IWriteStream* stream){
 			}
 		}
 
-		convert.exportModel(stream);
+		convert.exportY3D(stream);
 	/*}
 	catch(const runtime_error& e)
 	{

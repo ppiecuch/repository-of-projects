@@ -29,6 +29,17 @@ namespace scene{
 		core::vector3df pos;
 		video::SColor color;
 		core::vector2df texcoords;
+
+		bool operator==(const SVertex& other) const
+		{
+			return ((pos == other.pos) && //(Normal == other.Normal) &&
+				(color == other.color) && (texcoords == other.texcoords));
+		}
+
+		bool operator!=(const SVertex& other) const
+		{
+			return !(*this==other);
+		}
 		
 		
 		ENUM_VERTEX_TYPE getType() const{
