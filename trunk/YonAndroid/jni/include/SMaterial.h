@@ -335,7 +335,7 @@ namespace video{
 	};
 
 	YON_API extern SMaterial DEFAULT_MATERIAL;
-	YON_API extern SMaterial MYGUI_MATERIAL;
+	//YON_API extern SMaterial MYGUI_MATERIAL;
 }
 }
 #endif

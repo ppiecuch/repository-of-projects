@@ -22,8 +22,8 @@ IModel* planeModel=NULL;
 IModel* teapotModel=NULL;
 f32 factor=1.1f;
 
-core::matrix4f projection;
-core::matrix4f oldProjection;
+//core::matrix4f projection;
+//core::matrix4f oldProjection;
 core::dimension2di canvasDim;
 
 //ITexture* rtt=NULL;
@@ -110,8 +110,8 @@ void requestUpdateCanvas(MyGUI::Canvas* _canvas, MyGUI::Canvas::Event _event)
 	//MyGUI::IRenderTarget* rt=_canvas->getTexture()->getRenderTarget();
 	f32 hh=_canvas->getHeight()/2;
 	f32 hw=_canvas->getWidth()/2;
-	projection.makeIdentity();
-	projection.ortho(-hw,hw,-hh,hh,1,3000);
+	//projection.makeIdentity();
+	//projection.ortho(-hw,hw,-hh,hh,1,3000);
 
 	canvasDim.w=_canvas->getWidth();
 	canvasDim.h=_canvas->getHeight();
@@ -252,6 +252,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
+core::position2di ps[4];
 void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
@@ -259,7 +260,7 @@ void drawFrame(){
 	//const core::vector3df trot=teapotModel->getRotation();
 	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
-	core::rectf r(0,1,1,0);
+	static core::rectf r(0,1,1,0);
 	rt=canvas->getTexture()->getRenderTarget();
 
 	//oldProjection=videoDriver->getTransform(ENUM_TRANSFORM_PROJECTION);
@@ -272,18 +273,27 @@ void drawFrame(){
 	//sceneMgr->render(videoDriver);
 	//teapotModel->setVisible(false);
 	gfAdapter->clearZ(1000);
-	
-	gfAdapter->drawRegion("trans.png",r,0,0,128,64,ENUM_TRANS_NONE);
-	gfAdapter->drawRegion("test-png8.png",r,128,64,64,64,ENUM_TRANS_MIRROR);
+
+#define TO_PS(x,y,w,h) \
+	ps[0].set(x,y+h); \
+	ps[1].set(x,y); \
+	ps[2].set(x+w,y); \
+	ps[3].set(x+w,y+h);
+
+	TO_PS(0,0,128,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_NONE);
+	TO_PS(128,64,64,64)
+	gfAdapter->drawRegion(videoDriver->getTexture("test-png8.png"),r,ps,ENUM_TRANS_MIRROR);
 	gfAdapter->render();
 
 	rt->end();
 	//videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,oldProjection);
 
+	//因为超出sceneMgr管理范围独自调用了camera.render，这里要恢复一下
+	pCamera->setNeedUpload();
+	pCamera->render(videoDriver);
 	sceneMgr->render(videoDriver);
-	//pCamera->setNeedUpload();
-	//pCamera->render(videoDriver);
-
+	
 	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
 	//gfAdapterWindow->clearZ(1000);
 	//gfAdapterWindow->drawRegion("trans.png",r,180,200,128,64,ENUM_TRANS_NONE);
