@@ -82,7 +82,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IUnit* unit;
 	IEntity* entity;
 
-#if 0
+#if 1
 
 	//TODO BUG:Mask模型显示不正常
 	//如果关闭teapot或aura则可正常显示

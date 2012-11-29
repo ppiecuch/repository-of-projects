@@ -9,7 +9,7 @@
 
 #include "IVideoDriver.h"
 #include "IGeometryFactory.h"
-#include "IUnit.h"
+//#include "IUnit.h"
 
 using namespace yon;
 
@@ -30,7 +30,8 @@ namespace MyGUI{
 		core::matrix4f m_oldProjection;
 		core::matrix4f m_oldWorld;
 		core::matrix4f m_oldView;
-		scene::IUnit* m_pUnit;
+		//scene::IUnit* m_pUnit;
+		video::SMaterial m_material;
 
 	public:
 		MyGUIRenderManager(video::IVideoDriver* driver,ITimer* timer,const scene::IGeometryFactory* geometryFty);

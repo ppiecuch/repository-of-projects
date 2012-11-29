@@ -10,20 +10,26 @@ namespace MyGUI{
 		:m_bUpdate(false),
 		m_pDriver(driver),
 		m_pTimer(timer),
-		m_pGeometryFty(geometryFty),
-		m_pUnit(NULL)
+		m_pGeometryFty(geometryFty)
+		//,m_pUnit(NULL)
 	{
 
 		m_viewSize.width=driver->getCurrentRenderTargetSize().w;
 		m_viewSize.height=driver->getCurrentRenderTargetSize().h;
 
 		scene::IShap* shap=geometryFty->createShap(scene::ENUM_VERTEX_TYPE_3V1T1C,0,0);
-		m_pUnit=geometryFty->createUnit(shap,video::MYGUI_MATERIAL);
+		//m_pUnit=geometryFty->createUnit(shap,video::MYGUI_MATERIAL);  
 
 		shap->drop();
 
 		m_projection.makeIdentity();
 		m_projection.ortho(-1, 1, -1, 1, -1, 1);
+
+		m_material.MaterialType=video::ENUM_MATERIAL_TYPE_TRANSPARENT;
+		m_material.FrontFace=video::ENUM_FRONT_FACE_CW;
+		//m_material.setFilterMode(0,video::ENUM_FILTER_MODE_NEAREST);
+		//TODO由于MyGUI引擎的freetype字体顶点序列是CCW的，而其UI界面顶点序列则是CW的，临时解决办法是关闭CullFace
+		m_material.CullingMode=video::ENUM_CULLING_MODE_NONE;
 
 		//出错 TODO
 		//m_unit.setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
@@ -37,7 +43,7 @@ namespace MyGUI{
 			delete item->second;
 		}
 		m_textures.clear();
-		m_pUnit->drop();
+		//m_pUnit->drop();
 		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release MyGUIRenderManager");
 	}
 	MyGUI::IVertexBuffer* MyGUIRenderManager::createVertexBuffer(){
@@ -93,7 +99,7 @@ namespace MyGUI{
 		m_oldView=m_pDriver->getTransform(video::ENUM_TRANSFORM_VIEW);
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_VIEW,core::IDENTITY_MATRIX);
-		m_pDriver->setMaterial(video::MYGUI_MATERIAL);
+		//m_pDriver->setMaterial(video::MYGUI_MATERIAL);
 		//Logger->debug("begin\n");
 	}
 
@@ -110,16 +116,18 @@ namespace MyGUI{
 		if (_texture)
 		{
 			MyGUITexture* texture = static_cast<MyGUITexture*>(_texture);
-			//m_pDriver->setTexture(0,texture->getTexture());
-			m_pUnit->getMaterial().setTexture(0,texture->getTexture());
-			m_pDriver->setMaterial(m_pUnit->getMaterial());
+			//m_pUnit->getMaterial().setTexture(0,texture->getTexture());
+			//m_pDriver->setMaterial(m_pUnit->getMaterial());
+			m_material.setTexture(0,texture->getTexture());
+			m_pDriver->setMaterial(m_material);
 			//Logger->debug("setTexture:%s\n",texture->getTexture()->getPath());
 
 		}
 		buffer->fillShapIndices(_count);
 		scene::IShap* shap=buffer->getShap();
-		m_pUnit->setShap(shap);
-		m_pDriver->drawUnit(m_pUnit,true);
+		//m_pUnit->setShap(shap);
+		//m_pDriver->drawUnit(m_pUnit,true);
+		m_pDriver->drawShap(shap,true);
 		//Logger->debug("doRender:%08X(v:%d,i:%d)\n",shap,shap->getVertexCount(),shap->getIndexCount());
 		//printf("doRender:%08X(v:%d,i:%d),_count:%d\n",shap,shap->getVertexCount(),shap->getIndexCount(),_count);
 	}
