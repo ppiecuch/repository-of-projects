@@ -12,6 +12,9 @@
 #include "ISkinnedEntity.h"
 
 namespace yon{
+	namespace video{
+		class IVideoDriver;
+	}
 namespace scene{
 
 	//! Enumeration for render passes.
@@ -55,6 +58,8 @@ namespace scene{
 	class ISceneManager : public virtual core::IReferencable,public virtual IRenderable{
 	public:
 		virtual ~ISceneManager() {}
+
+		virtual video::IVideoDriver* getVideoDriver() const= 0;
 
 		//TODO Ìí¼Óparent,pos,rotation,scale
 		virtual IModel* addModel(IEntity* entity) = 0;

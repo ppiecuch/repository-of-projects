@@ -468,10 +468,10 @@ namespace yon{
 					while (str[index])
 						++index;
 
-					if (index > len-1)
+					if (index > len)
 						return -1;
 
-					for (u32 i=start; i<len-index; ++i)
+					for (u32 i=start; i<=len-index; ++i)
 					{
 						u32 j=0;
 
