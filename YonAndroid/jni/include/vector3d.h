@@ -21,7 +21,7 @@ namespace core{
 
 		inline void print(){
 			if(Logger){
-				Logger->debug("%.3f,%.3f,%.3f\n",x,y,z);
+				YON_DEBUG("%.3f,%.3f,%.3f\n",x,y,z);
 			}else{
 				printf("%.3f,%.3f,%.3f\n",x,y,z);
 			}

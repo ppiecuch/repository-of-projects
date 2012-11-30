@@ -30,7 +30,7 @@ namespace MyGUI{
 			m_pGeometryFty->fillShapIndices(m_pShap,count);
 			//m_bHasFillIndices=true;
 
-			//Logger->debug("fillShapIndices:%08X(v:%d,i:%d)\n",m_pShap,m_pShap->getVertexCount(),m_pShap->getIndexCount());
+			//YON_DEBUG("fillShapIndices:%08X(v:%d,i:%d)\n",m_pShap,m_pShap->getVertexCount(),m_pShap->getIndexCount());
 		}
 	}
 

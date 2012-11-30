@@ -124,11 +124,12 @@ void frameEntered(float _time)
 }
 
 
-bool init(void *pJNIEnv,u32 width,u32 height){
+bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
-	//params.fpsLimit=10;
+	params.fpsLimit=0;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();

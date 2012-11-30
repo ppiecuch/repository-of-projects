@@ -24,7 +24,7 @@ namespace MyGUI{
 	MyGUI::IDataStream* MyGUIDataManager::getData(const std::string& _name){
 		io::path fullpath=m_pFileSystem->getResourcePath(io::path(_name.c_str()));
 
-		Logger->debug("start getData:%s\n",_name.c_str());
+		YON_DEBUG("start getData:%s\n",_name.c_str());
 
 		std::ifstream* stream = new std::ifstream();
 		stream->open(fullpath.c_str(), std::ios_base::binary);
@@ -32,13 +32,13 @@ namespace MyGUI{
 		if (!stream->is_open())
 		{
 			delete stream;
-			Logger->info(YON_LOG_FAILED_FORMAT,core::stringc("open %s",fullpath.c_str()).c_str());
+			YON_INFO(YON_LOG_FAILED_FORMAT,core::stringc("open %s",fullpath.c_str()).c_str());
 			return nullptr;
 		}
 
 		MyGUI::DataFileStream* data = new MyGUI::DataFileStream(stream);
 
-		Logger->debug("end getData:%s\n",_name.c_str());
+		YON_DEBUG("end getData:%s\n",_name.c_str());
 
 		return data;
 	}

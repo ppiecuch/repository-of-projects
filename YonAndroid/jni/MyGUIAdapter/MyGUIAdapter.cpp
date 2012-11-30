@@ -12,7 +12,7 @@ namespace MyGUI{
 
 			MyGUI::LogManager::getInstance().createDefaultSource("MyGUI.log");
 
-			Logger->info(YON_LOG_SUCCEED_FORMAT,"Instance MyGUIAdapter");
+			YON_INFO(YON_LOG_SUCCEED_FORMAT,"Instance MyGUIAdapter");
 	}
 	MyGUIAdapter::~MyGUIAdapter(){
 		m_pGUI->shutdown();
@@ -26,7 +26,7 @@ namespace MyGUI{
 		m_pDataManager=nullptr;
 		m_pLogManager=nullptr;
 
-		Logger->info(YON_LOG_SUCCEED_FORMAT,"Release MyGUIAdapter");
+		YON_INFO(YON_LOG_SUCCEED_FORMAT,"Release MyGUIAdapter");
 	}
 
 	void MyGUIAdapter::onResize(const core::dimension2du& size){

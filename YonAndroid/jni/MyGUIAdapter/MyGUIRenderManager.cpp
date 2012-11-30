@@ -34,7 +34,7 @@ namespace MyGUI{
 		//³ö´í TODO
 		//m_unit.setHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Instance MyGUIRenderManager");
+		YON_DEBUG(YON_LOG_SUCCEED_FORMAT,"Instance MyGUIRenderManager");
 	}
 
 	MyGUIRenderManager::~MyGUIRenderManager(){
@@ -44,7 +44,7 @@ namespace MyGUI{
 		}
 		m_textures.clear();
 		//m_pUnit->drop();
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,"Release MyGUIRenderManager");
+		YON_DEBUG(YON_LOG_SUCCEED_FORMAT,"Release MyGUIRenderManager");
 	}
 	MyGUI::IVertexBuffer* MyGUIRenderManager::createVertexBuffer(){
 		return new MyGUIVertexBuffer(m_pGeometryFty);
@@ -61,7 +61,7 @@ namespace MyGUI{
 		//MyGUITexture* texture = new MyGUITexture(_name,m_pDriver);
 		m_textures[_name] = texture;
 
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("MyGUIRenderManager.createTexture:%s",_name.c_str()).c_str());
+		YON_DEBUG(YON_LOG_SUCCEED_FORMAT,core::stringc("MyGUIRenderManager.createTexture:%s",_name.c_str()).c_str());
 		return texture;
 	}
 	void MyGUIRenderManager::destroyTexture(MyGUI::ITexture* _texture){
@@ -76,7 +76,7 @@ namespace MyGUI{
 
 		m_textures.erase(item);
 
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("MyGUIRenderManager.destroyTexture:%s",_texture->getName().c_str()).c_str());
+		YON_DEBUG(YON_LOG_SUCCEED_FORMAT,core::stringc("MyGUIRenderManager.destroyTexture:%s",_texture->getName().c_str()).c_str());
 		delete _texture;
 	}
 	MyGUI::ITexture* MyGUIRenderManager::getTexture(const std::string& _name){
@@ -84,10 +84,10 @@ namespace MyGUI{
 			return nullptr;
 		MapTexture::const_iterator item = m_textures.find(_name);
 		if (item == m_textures.end()){
-			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("MyGUIRenderManager.getTexture:%s",_name.c_str()).c_str());
+			YON_WARN(YON_LOG_WARN_FORMAT,core::stringc("MyGUIRenderManager.getTexture:%s",_name.c_str()).c_str());
 			return nullptr;
 		}else{
-			Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("MyGUIRenderManager.getTexture:%s",_name.c_str()).c_str());
+			YON_DEBUG(YON_LOG_SUCCEED_FORMAT,core::stringc("MyGUIRenderManager.getTexture:%s",_name.c_str()).c_str());
 		}
 		return item->second;
 	}
@@ -100,14 +100,14 @@ namespace MyGUI{
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_VIEW,core::IDENTITY_MATRIX);
 		//m_pDriver->setMaterial(video::MYGUI_MATERIAL);
-		//Logger->debug("begin\n");
+		//YON_DEBUG("begin\n");
 	}
 
 	void MyGUIRenderManager::end(){
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_oldProjection);
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_WORLD,m_oldWorld);
 		m_pDriver->setTransform(video::ENUM_TRANSFORM_VIEW,m_oldView);
-		//Logger->debug("end\n");
+		//YON_DEBUG("end\n");
 	}
 
 	void MyGUIRenderManager::doRender(MyGUI::IVertexBuffer* _buffer, MyGUI::ITexture* _texture, size_t _count){
@@ -120,7 +120,7 @@ namespace MyGUI{
 			//m_pDriver->setMaterial(m_pUnit->getMaterial());
 			m_material.setTexture(0,texture->getTexture());
 			m_pDriver->setMaterial(m_material);
-			//Logger->debug("setTexture:%s\n",texture->getTexture()->getPath());
+			//YON_DEBUG("setTexture:%s\n",texture->getTexture()->getPath());
 
 		}
 		buffer->fillShapIndices(_count);
@@ -128,7 +128,7 @@ namespace MyGUI{
 		//m_pUnit->setShap(shap);
 		//m_pDriver->drawUnit(m_pUnit,true);
 		m_pDriver->drawShap(shap,true);
-		//Logger->debug("doRender:%08X(v:%d,i:%d)\n",shap,shap->getVertexCount(),shap->getIndexCount());
+		//YON_DEBUG("doRender:%08X(v:%d,i:%d)\n",shap,shap->getVertexCount(),shap->getIndexCount());
 		//printf("doRender:%08X(v:%d,i:%d),_count:%d\n",shap,shap->getVertexCount(),shap->getIndexCount(),_count);
 	}
 

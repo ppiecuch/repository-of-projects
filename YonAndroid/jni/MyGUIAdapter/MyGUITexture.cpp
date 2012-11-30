@@ -29,7 +29,7 @@ namespace MyGUI{
 		}else if (_format == MyGUI::PixelFormat::R8G8B8A8){
 			format=video::ENUM_COLOR_FORMAT_R8G8B8A8;
 		}else{
-			Logger->warn(YON_LOG_WARN_FORMAT,"do not support PixelFormat currently!");
+			YON_WARN(YON_LOG_WARN_FORMAT,"do not support PixelFormat currently!");
 			return;
 		}
 		const bool useMipmap=m_pDriver->getTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_MIPMAPS);
@@ -42,7 +42,7 @@ namespace MyGUI{
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,true);
 		if(_usage==MyGUI::TextureUsage::RenderTarget)
 		{
-			Logger->debug("create mygui-rtt:%d,%d\r\n",_width,_height);
+			YON_DEBUG("create mygui-rtt:%d,%d\r\n",_width,_height);
 			m_pTexture=static_cast<video::ITexture*>(m_pDriver->addRenderTargetTexture(core::dimension2du(_width,_height),io::path(m_name.c_str()),format));
 		}
 		else
@@ -69,12 +69,12 @@ namespace MyGUI{
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,use16bit4Alpha);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,reserveImage);
 		m_pTexture->upsidedown();
-		Logger->debug(YON_LOG_SUCCEED_FORMAT,core::stringc("loadFromFile:%s",_filename.c_str()).c_str());
+		YON_DEBUG(YON_LOG_SUCCEED_FORMAT,core::stringc("loadFromFile:%s",_filename.c_str()).c_str());
 	}
 
 	void  MyGUITexture::saveToFile(const std::string& _filename){
 		//TODO
-		Logger->warn(YON_LOG_WARN_FORMAT,"saveToFile not support");
+		YON_WARN(YON_LOG_WARN_FORMAT,"saveToFile not support");
 	}
 
 	void* MyGUITexture::lock(MyGUI::TextureUsage _access){
@@ -97,7 +97,7 @@ namespace MyGUI{
 	}
 	MyGUI::IRenderTarget* MyGUITexture::getRenderTarget(){
 		//TODO RTT
-		//Logger->warn(YON_LOG_WARN_FORMAT,"getRenderTarget not support");
+		//YON_WARN(YON_LOG_WARN_FORMAT,"getRenderTarget not support");
 		//return NULL;
 		if(m_pRenderTarget==NULL)
 			m_pRenderTarget=new MyGUI::MyGUIRTTexture(m_pTexture,m_pDriver,const_cast<MyGUI::MyGUIRenderManager*>(m_pRenderManager));

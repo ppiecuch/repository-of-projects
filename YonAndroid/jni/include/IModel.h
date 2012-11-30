@@ -118,7 +118,7 @@ namespace scene{
 		{
 			// delete all children
 			clearChildren();
-			//Logger->debug("clearChildren\n");
+			//YON_DEBUG("clearChildren\n");
 			clearAnimators();
 		}
 

@@ -41,7 +41,7 @@ namespace yon{
 			}
 
 			void print() const {
-				Logger->debug("{%.3f,%.3f,%.3f,%.3f}\n",(f32)topLeft.x,(f32)topLeft.y,(f32)bottomRight.x,(f32)bottomRight.y);
+				YON_DEBUG("{%.3f,%.3f,%.3f,%.3f}\n",(f32)topLeft.x,(f32)topLeft.y,(f32)bottomRight.x,(f32)bottomRight.y);
 			}
 
 			rect<T> operator+(const position2d<T>& pos) const

@@ -73,7 +73,7 @@ namespace core{
 		inline void print() const{
 			if(Logger){
 				for(u32 i=0;i<4;++i)
-					Logger->debug("%.3f,%.3f,%.3f,%.3f\n",m[0][i],m[1][i],m[2][i],m[3][i]);
+					YON_DEBUG("%.3f,%.3f,%.3f,%.3f\n",m[0][i],m[1][i],m[2][i],m[3][i]);
 			}else{
 				for(u32 i=0;i<4;++i)
 					printf("%.3f,%.3f,%.3f,%.3f\n\n",m[0][i],m[1][i],m[2][i],m[3][i]);
