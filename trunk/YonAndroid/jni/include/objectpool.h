@@ -46,7 +46,7 @@ namespace core{
 			for(u32 i=0;i<num;++i)
 				m_pool.push_back(new Element());
 			m_uCapacity+=num;
-			Logger->debug("Extend element->%d\n",m_uCapacity);
+			YON_DEBUG("Extend element->%d\n",m_uCapacity);
 		}
 	public:
 		CObjectPool(u32 increment=5)
@@ -72,7 +72,7 @@ namespace core{
 			m_pool.clear();
 			m_uCapacity-=count;
 			if(m_uCapacity!=0){
-				Logger->warn(YON_LOG_WARN_FORMAT,"Not all elements recycled!");
+				YON_WARN(YON_LOG_WARN_FORMAT,"Not all elements recycled!");
 			}
 		}
 		virtual Element* get(){
@@ -89,7 +89,7 @@ namespace core{
 				r->reset();
 				m_pool.push_back(ele);
 			}else{
-				Logger->warn(YON_LOG_WARN_FORMAT,"Recycle no recyclable class,do nothing!");
+				YON_WARN(YON_LOG_WARN_FORMAT,"Recycle no recyclable class,do nothing!");
 			}
 		}
 	};
@@ -135,7 +135,7 @@ namespace core{
 			}
 			m_uCapacity+=num;
 			m_uSize+=num;
-			Logger->debug("Extend element->%d\n",m_uCapacity);
+			YON_DEBUG("Extend element->%d\n",m_uCapacity);
 		}
 	public:
 		CObjectPoolFast(u32 increment=16)
@@ -149,7 +149,7 @@ namespace core{
 		virtual u32 getCapacity() const {return m_uCapacity;}
 		virtual void clear(){
 			if(m_uSize!=m_uCapacity)
-				Logger->warn(YON_LOG_WARN_FORMAT,"Not all elements cleared!");
+				YON_WARN(YON_LOG_WARN_FORMAT,"Not all elements cleared!");
 			while(m_pFree)
 			{
 				Link* tmp=m_pFree->next;
@@ -185,7 +185,7 @@ namespace core{
 				m_pFree=tmp;
 				++m_uSize;
 			}else{
-				Logger->warn(YON_LOG_WARN_FORMAT,"Recycle no recyclable class,do nothing!");
+				YON_WARN(YON_LOG_WARN_FORMAT,"Recycle no recyclable class,do nothing!");
 			}
 		}
 	};

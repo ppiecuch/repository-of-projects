@@ -24,7 +24,7 @@ using namespace yon::audio;
 #endif
 
 
-bool init(void *pJNIEnv,u32 width,u32 height);
+bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height);
 void resize(u32 width,u32 height);
 void drawFrame();
 void destroy();

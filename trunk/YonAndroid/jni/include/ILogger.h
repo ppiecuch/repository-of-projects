@@ -65,7 +65,19 @@ namespace debug{
 	};
 	//日志对象,供多方共享
 	YON_API extern ILogger* Logger;
-}//debug
+}
 	using namespace debug;
-}//yon
+}
+#ifdef YON_USE_LOGGER
+#define YON_DEBUG(format, ...) yon::debug::Logger->debug(format,##__VA_ARGS__)
+#define YON_INFO(format, ...) yon::debug::Logger->info(format,##__VA_ARGS__)
+#define YON_WARN(format, ...) yon::debug::Logger->warn(format,##__VA_ARGS__)
+#define YON_ERROR(format, ...) yon::debug::Logger->error(format,##__VA_ARGS__)
+#else
+#define YON_DEBUG(format, ...)
+#define YON_INFO(format, ...)
+#define YON_WARN(format, ...)
+#define YON_ERROR(format, ...)
+#endif
+
 #endif

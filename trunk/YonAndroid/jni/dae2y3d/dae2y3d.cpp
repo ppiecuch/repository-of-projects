@@ -2500,7 +2500,7 @@ public:
 		node->AbsoluteIndex=DAEJointNode::Counter;
 		DAEJointNode::Counter++;
 		Logger->debug("Counter:%d\r\n",DAEJointNode::Counter);
-		writer.writeInt((int)node->AbsoluteIndex);
+		writer->writeInt((int)node->AbsoluteIndex);
 
 
 
@@ -2508,29 +2508,40 @@ public:
 		core::matrix4f mm=node->Transform.getTransposed();
 		if(parent==NULL)
 		{
+			//mm=invert*mm;
+			//mm[10]=-mm[10];
 			mm=invert*mm;
-			mm[10]=-mm[10];
+			mm.m[2][2]=-mm.m[2][2];
 		}
 		else
 		{
-			mm[2]=-mm[2];
-			mm[6]=-mm[6];
-			mm[14]=-mm[14];
+			//mm[2]=-mm[2];
+			//mm[6]=-mm[6];
+			//mm[14]=-mm[14];
+			mm.m[0][2]=-mm.m[0][2];
+			mm.m[1][2]=-mm.m[1][2];
+			mm.m[3][2]=-mm.m[3][2];
 		}
-		mm[8]=-mm[8];
-		mm[9]=-mm[9];
+		//mm[8]=-mm[8];
+		//mm[9]=-mm[9];
+		mm.m[2][0]=-mm.m[2][0];
+		mm.m[2][1]=-mm.m[2][1];
 		node->Transform=mm;
-		for(u32 i=0;i<16;i++)
-		{
-			writer.writeFloat(node->Transform[i]);
-		}
+		//for(u32 i=0;i<16;i++)
+		//{
+		//	writer.writeFloat(node->Transform[i]);
+		//}
+		for(u32 i=0;i<4;++i)
+			for(u32 j=0;j<4;++j)
+				writer->writeFloat(node->Transform.m[i][j]);
 		core::matrix4f& m=node->Transform;
-		Logger->debug("\ttransform：\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n",m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+		//Logger->debug("\ttransform：\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n\t%.2f,%.2f,%.2f,%.2f\r\n",m[0],m[1],m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9],m[10],m[11],m[12],m[13],m[14],m[15]);
+		m.print();
 
 
 		//动画数据
 		DAEAnimation* animation=getAnimationByNodeId(node->Id.c_str());
-		writer.writeBool(animation!=NULL);
+		writer->writeBool(animation!=NULL);
 		if(animation==NULL)
 		{
 			Logger->debug("No animation\r\n");
@@ -2540,7 +2551,7 @@ public:
 			exportAnimation(parent==NULL,animation,writer);
 		}
 
-		writer.writeInt((int)node->Children.size());
+		writer->writeInt((int)node->Children.size());
 
 		for(u32 i=0;i<node->Children.size();i++)
 		{
@@ -2556,44 +2567,58 @@ public:
 		if(animation->Input.Count!=animation->Output.Count/16)
 			Logger->warn(YON_LOG_WARN_FORMAT,core::stringc("Input not equal to output in animation:%s\r\n",animation->Id.c_str()).c_str());
 		u32 frameCount=animation->Input.Count;
-		writer.writeInt((int)frameCount);
+		writer->writeInt((int)frameCount);
 		core::matrix4f temp;
 		core::stringc str;
 		for(u32 i=0;i<frameCount;i++)
 		{
-			writer.writeFloat((float)animation->Input.FloatArray[i]);
+			writer->writeFloat((float)animation->Input.FloatArray[i]);
 			str+=core::stringc("%.2f,",(float)animation->Input.FloatArray[i]);
 
-			for(u32 j=0;j<16;j++)
+			//for(u32 j=0;j<16;j++)
+			//{
+			//	temp[j%16]=animation->Output.FloatArray[i*16+j];
+			//}
+			for(u32 j=0;j<4;++j)
 			{
-				temp[j%16]=animation->Output.FloatArray[i*16+j];
+				for(u32 k=0;k<4;++k)
+				{
+					temp.m[j][k]=animation->Output.FloatArray[i*16+j];
+				}
 			}
 
 			core::matrix4f m=temp.getTransposed();
 			if(isRoot)
 			{
+				//m=invert*m;
+				//m[10]=-m[10];
 				m=invert*m;
-				m[10]=-m[10];
+				m.m[2][2]=-m.m[2][2];
 			}
 			else
 			{
-				m[2]=-m[2];
-				m[6]=-m[6];
-				m[14]=-m[14];
+				//m[2]=-m[2];
+				//m[6]=-m[6];
+				//m[14]=-m[14];
+				m.m[0][2]=-m.m[0][2];
+				m.m[1][2]=-m.m[1][2];
+				m.m[3][2]=-m.m[3][2];
 			}
-			m[8]=-m[8];
-			m[9]=-m[9];
+			//m[8]=-m[8];
+			//m[9]=-m[9];
+			m.m[2][0]=-m.m[2][0];
+			m.m[2][1]=-m.m[2][1];
 
 			core::quaternion q(m);
-			writer.writeFloat(q.x);
-			writer.writeFloat(q.y);
-			writer.writeFloat(q.z);
-			writer.writeFloat(q.w);
+			writer->writeFloat(q.x);
+			writer->writeFloat(q.y);
+			writer->writeFloat(q.z);
+			writer->writeFloat(q.w);
 
 			core::vector3df p=m.getTranslation();
-			writer.writeFloat(p.x);
-			writer.writeFloat(p.y);
-			writer.writeFloat(p.z);
+			writer->writeFloat(p.x);
+			writer->writeFloat(p.y);
+			writer->writeFloat(p.z);
 		}
 		Logger->debug("%s\r\n",str.c_str());
 	}
@@ -2809,7 +2834,7 @@ public:
 						DAEJointNode* joint=getJointNodeBySid(boneName.c_str(),libraryVisualScenes.VisualScene.RootJoint);
 						boneIndex=joint->AbsoluteIndex;
 						writer->writeInt((int)boneIndex);
-						//writer.writeInt((int)w.WeightComponents[k].WeightIndex);
+						//writer->writeInt((int)w.WeightComponents[k].WeightIndex);
 						writer->writeFloat((float)controller->Skin.getWeightsSource()->FloatArray[w.WeightComponents[k].WeightIndex]);
 
 						//Trace("{%d(%s),%g},",boneIndex,boneName.c_str(),controller->Skin.getWeightsSource()->FloatArray[w.WeightComponents[k].WeightIndex]);
@@ -3018,11 +3043,11 @@ public:
 
 		//导出骨骼
 		Trace("\r\n--------Skeleton Data------\r\n");
-		writer.writeBool(libraryVisualScenes.VisualScene.RootJoint!=NULL);
+		writer->writeBool(libraryVisualScenes.VisualScene.RootJoint!=NULL);
 		if(libraryVisualScenes.VisualScene.RootJoint)
 		{
 			//导出播放速率
-			writer.writeInt((int)libraryVisualScenes.VisualScene.FrameRate);
+			writer->writeInt((int)libraryVisualScenes.VisualScene.FrameRate);
 
 			DAEJointNode::Counter=0;
 			exportJointNode(NULL,libraryVisualScenes.VisualScene.RootJoint,writer);
@@ -3031,12 +3056,24 @@ public:
 		//导出模型
 		exportModel(writer);
 
-		writer.close();
+		writer->close();
 	}*/
 
 	void exportY3D(IWriteStream* stream)
 	{
-		//TODO joint
+		//导出骨骼
+		Logger->debug("\r\n--------Skeleton Data------\r\n");
+		stream->writeBool(libraryVisualScenes.VisualScene.RootJoint!=NULL);
+		if(libraryVisualScenes.VisualScene.RootJoint)
+		{
+			//导出播放速率
+			stream->writeInt((int)libraryVisualScenes.VisualScene.FrameRate);
+
+			DAEJointNode::Counter=0;
+			exportJointNode(NULL,libraryVisualScenes.VisualScene.RootJoint,stream);
+		}
+
+		//导出模型
 		exportModel(stream);
 	}
 

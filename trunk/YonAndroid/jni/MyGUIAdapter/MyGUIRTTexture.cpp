@@ -22,7 +22,7 @@ namespace MyGUI{
 		//f32 hh=height/2;
 		//f32 hw=width/2;
 
-		//Logger->debug("half:%.2f,%.2f\r\n",hw,hh);
+		//YON_DEBUG("half:%.2f,%.2f\r\n",hw,hh);
 
 		//m_projection.makeIdentity();
 		//m_projection.ortho(-hw,hw,-hh,hh,1,3000);
@@ -31,13 +31,13 @@ namespace MyGUI{
 	}
 
 	void MyGUIRTTexture::begin(){
-		//Logger->debug("beginRTT\r\n");
+		//YON_DEBUG("beginRTT\r\n");
 		m_pDriver->setRenderTarget(m_pTexture);
 		//m_oldProjection=m_pDriver->getTransform(video::ENUM_TRANSFORM_PROJECTION);
 		//m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_projection);
 	}
 	void MyGUIRTTexture::end(){
-		//Logger->debug("endRTT\r\n");
+		//YON_DEBUG("endRTT\r\n");
 		//m_pDriver->setTransform(video::ENUM_TRANSFORM_PROJECTION,m_oldProjection);
 		m_pDriver->setRenderTarget(NULL,true,true,video::COLOR_DEFAULT);
 	}
