@@ -1448,7 +1448,7 @@ protected:
 				{
 					source.Count=xml->getAttributeValueAsInt("count");
 					readFloatsInsideElement(xml,source.FloatArray,source.Count);
-					Logger->debug("\tfloat array count:%d\r\n",source.Count);
+					Logger->debug("\tfloat array count:%d,first:%.2f,end:%.2f\r\n",source.Count,source.FloatArray[0],source.FloatArray[source.FloatArray.size()-1]);
 				}
 				else if(ELEM_PARAM==nodeName)
 				{
@@ -1489,7 +1489,7 @@ protected:
 				{
 					source.Count=xml->getAttributeValueAsInt("count");
 					readFloatsInsideElement(xml,source.FloatArray,source.Count);
-					Logger->debug("\tfloat array count:%d\r\n",source.Count);
+					Logger->debug("\tfloat array count:%d,first:%.2f,end:%.2f\r\n",source.Count,source.FloatArray[0],source.FloatArray[source.FloatArray.size()-1]);
 				}
 				else if(ELEM_PARAM==nodeName)
 				{
