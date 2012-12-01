@@ -96,6 +96,31 @@ namespace io{
 			return m_pStream->getPos()==m_pStream->getSize();
 		}
 
+		inline u32 trim(u32 start,u32 end)
+		{
+			YON_DEBUG_BREAK_IF(end<=start);
+			u32 origin=m_pStream->getPos();
+			m_pStream->seek(start);
+			core::string<char_type> s;
+			readString(s,start,end);
+			u32 oldLen=s.length();
+			s=s.trim();
+			u32 newLen=s.length();
+			if(newLen>0)
+			{
+				// set current text to the parsed text, and replace xml special characters
+				m_nodeName = replaceSpecialCharacters(s);
+				// current XML node type is text
+				m_currentNodeType=ENUM_XML_NODE_TEXT;
+				m_pStream->seek(end-1);
+				return newLen;
+			}
+			if(origin>0)
+				m_pStream->seek(origin-1);
+			return newLen;
+		}
+
+		/*
 		//trim the stream from start to end,if the result is not null return true,or return false
 		inline bool trim(u32 start,u32 end)
 		{
@@ -119,6 +144,7 @@ namespace io{
 			m_pStream->seek(origin-1);
 			return true;
 		}
+		*/
 
 		//! ignores an xml definition like <?xml something />
 		void ignoreDefinition()
@@ -145,11 +171,26 @@ namespace io{
 			if(!c)
 				return false;
 			u32 end=m_pStream->getPos();
-			if(end-start>=2&&trim(start,end)){
-				//Logger->debug("text:%s\n",m_nodeName.c_str());
+			//因为每次读都包含有"<"符号，所以用2
+			//“..><...”这样的排列不进行trim
+			if(end-start>=2&&trim(start,end)>0)
+			{
+				Logger->debug("text:%s\n",m_nodeName.c_str());
 				return true;
 			}
-			switch(readNext())
+			/*
+			if(end-start>=2&&trim(start,end)){
+				Logger->debug("text:%s\n",m_nodeName.c_str());
+				return true;
+			}*/
+			c=readNext();
+			//对于Close元素需要读取多一个符号
+			char_type tmp=readNext();
+			if(tmp==L'/')
+				c=tmp;
+			else
+				m_pStream->seek(-1,true);
+			switch(c)
 			{
 			case L'/':
 				parseClosingXMLElement();
@@ -170,13 +211,6 @@ namespace io{
 			default:
 				{
 					parseOpeningXMLElement();
-					core::string<char_type> str;
-					for(u32 i=0;i<m_attributes.size();++i)
-						if(i<m_attributes.size()-1)
-							str+=core::string<char_type>("%s:%s,",m_attributes[i].Name.c_str(),m_attributes[i].Value.c_str());
-						else
-							str+=core::string<char_type>("%s:%s",m_attributes[i].Name.c_str(),m_attributes[i].Value.c_str());
-					Logger->debug("<%s>(%d):%s\n",m_nodeName.c_str(),m_attributes.size(),str.c_str());
 					break;
 				}
 			}
@@ -264,7 +298,7 @@ namespace io{
 			m_attributes.clear();
 
 			// find name
-			u32 nameStart = m_pStream->getPos()-1;
+			u32 nameStart = m_pStream->getPos();
 
 			// find end of element
 			char_type c=0;
@@ -334,6 +368,7 @@ namespace io{
 						// tag is closed directly
 						//++P;
 						m_bIsEmptyElement = true;
+						readNext();
 						break;
 					}
 					c=readNext();
@@ -351,8 +386,19 @@ namespace io{
 
 			//NodeName = core::string<char_type>(startName, (int)(endName - startName));
 			//++P;
-			readNext();
+			//readNext();
 			readString(m_nodeName,nameStart,nameEnd);
+
+			core::string<char_type> str;
+			for(u32 i=0;i<m_attributes.size();++i)
+				if(i<m_attributes.size()-1)
+					str+=core::string<char_type>("%s:%s,",m_attributes[i].Name.c_str(),m_attributes[i].Value.c_str());
+				else
+					str+=core::string<char_type>("%s:%s",m_attributes[i].Name.c_str(),m_attributes[i].Value.c_str());
+			if(c==L'/')
+				Logger->debug("<%s/>(%d):%s\n",m_nodeName.c_str(),m_attributes.size(),str.c_str());
+			else
+				Logger->debug("<%s>(%d):%s\n",m_nodeName.c_str(),m_attributes.size(),str.c_str());
 		}
 
 		// replaces xml special characters in a string and creates a new one

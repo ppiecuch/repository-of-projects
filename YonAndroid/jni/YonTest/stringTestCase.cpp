@@ -7,6 +7,19 @@ CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
 void stringTestCase::setUp()
 {
 }
+void stringTestCase::trim(){
+	core::stringc str1("test");
+	CPPUNIT_ASSERT( str1.trim()=="test" );
+	printf("%s\n",str1.trim().c_str());
+	core::stringc str2("");
+	CPPUNIT_ASSERT( str2.trim()=="" );
+	core::stringc str3("	");
+	CPPUNIT_ASSERT( str3.trim()=="" );
+	printf("%s\n",str3.trim().c_str());
+	core::stringc str4("		hello	 ");
+	printf("%s(%d)\n",str4.trim().c_str(),str4.trim().length());
+	CPPUNIT_ASSERT( str4.trim()=="hello" );
+}
 void stringTestCase::formatWithComma(){
 	core::stringc str1("%d",123456789);
 	CPPUNIT_ASSERT( str1.formatWithComma()=="123,456,789" );
