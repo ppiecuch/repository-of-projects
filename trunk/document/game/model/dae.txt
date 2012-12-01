@@ -23,3 +23,21 @@ COLLADA的教程(英文)：http：//collada.org/mediawiki/index.php/Getting一started_wi
 COLLADA的维客 (英文)：http：//collada.org/mediawil(i/index.phpiMain-Page。
 
 本文转载自：http://www.cnblogs.com/mazhenyu/archive/2011/01/13/1934249.html
+
+
+The skinning calculation for each vertex v in a bind shape is
+
+for i to n
+
+v += {[(v * BSM) * IBMi * JMi] * JW}
+
+n: The number of joints that influence vertex v
+
+BSM: Bind-shape matrix
+
+IBMi: Inverse bind-pose matrix of joint i
+
+JMi: Transformation matrix of joint i
+
+JW: Weight of the influence of joint i on vertex v
+
