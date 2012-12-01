@@ -614,7 +614,6 @@ namespace yon{
 				return str;
 			}
 
-			//TODO ´ý²âÊÔ
 			//! Finds first position of a character not in a given list.
 			/** \param c: List of characters not to find. For example if the method
 			should find the first occurrence of a character not 'a' or 'b', this parameter should be "ab".
@@ -625,7 +624,7 @@ namespace yon{
 			template <class B>
 			s32 findFirstCharNotInList(const B* const c, u32 count) const
 			{
-				for (u32 i=0; i<len-1; ++i)
+				for (u32 i=0; i<len; ++i)
 				{
 					u32 j;
 					for (j=0; j<count; ++j)
@@ -639,7 +638,6 @@ namespace yon{
 				return -1;
 			}
 
-			//TODO ´ý²âÊÔ
 			//! Finds last position of a character not in a given list.
 			/** \param c: List of characters not to find. For example if the method
 			should find the first occurrence of a character not 'a' or 'b', this parameter should be "ab".
@@ -664,20 +662,20 @@ namespace yon{
 				return -1;
 			}
 
-			//TODO ´ý²âÊÔ
 			//! Trims the string.
 			/** Removes the specified characters (by default, Latin-1 whitespace)
 			from the begining and the end of the string. */
-			string<T,TAlloc>& trim(const string<T,TAlloc> & whitespace = " \t\n\r")
+			string<T,TAlloc> trim(const string<T,TAlloc> & whitespace = " \t\n\r")
 			{
 				// find start and end of the substring without the specified characters
 				const s32 begin = findFirstCharNotInList(whitespace.c_str(), whitespace.len);
-				if (begin == -1)
-					return (*this="");
-
 				const s32 end = findLastCharNotInList(whitespace.c_str(), whitespace.len);
-
-				return (*this = subString(begin, (end +1) - begin));
+				if (begin == -1&&end==-1)
+				{
+					string<T,TAlloc> empty="";
+					return empty;
+				}
+				return subString(begin, (end +1) - begin);
 			}
 
 
@@ -687,6 +685,9 @@ namespace yon{
 			}
 			u32 length() const{
 				return len;
+			}
+			bool isEmpty() const{
+				return *this==""||*this=="\0";
 			}
 		private:
 			void reallocate(u32 length)

@@ -1543,7 +1543,7 @@ protected:
 	}
 	core::stringc getName(XMLReader* xml)
 	{
-		core::stringc name = xml->getAttributeValue("name");
+		core::stringc name = xml->getAttributeValueSafe("name");
 		return name;
 	}
 	core::stringc getImageName(XMLReader* xml)

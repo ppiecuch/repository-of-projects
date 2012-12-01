@@ -128,7 +128,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	//Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
 #elif 1
-	IReadStream* rs=fs->createAndOpenReadFileStream("miner_.dae");
+	IReadStream* rs=fs->createAndOpenReadFileStream("rotate_x_.dae");
 	XMLReader* reader=fs->createXMLReader(rs);
 	rs->drop();
 
