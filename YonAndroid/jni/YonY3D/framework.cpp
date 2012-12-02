@@ -76,7 +76,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/png/");
 #endif
 
-	IAnimatedEntity* entity=sceneMgr->getEntity("miner.y3d");
+	IAnimatedEntity* entity=sceneMgr->getEntity("beetle.xc3d");
 	IAnimatedSceneNode* node=sceneMgr->addAnimatedSceneNode(entity);
 	node->setFrameLoop(0,0);
 	//临时需要drop，添加EntityCache后就不用了

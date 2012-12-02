@@ -4,14 +4,52 @@
     <contributor>
       <author>Micheal</author>
       <authoring_tool>3dsMax 9 - Feeling ColladaMax v3.05B.</authoring_tool>
-      <comments>ColladaMax Export Options: ExportNormals=1;ExportEPolyAsTriangles=1;ExportXRefs=0;ExportSelected=0;ExportTangents=0;ExportAnimations=0;SampleAnim=0;ExportAnimClip=0;BakeMatrices=1;ExportRelativePaths=1;AnimStart=0;AnimEnd=0.966667;</comments>
+      <comments>ColladaMax Export Options: ExportNormals=1;ExportEPolyAsTriangles=1;ExportXRefs=0;ExportSelected=0;ExportTangents=0;ExportAnimations=1;SampleAnim=1;ExportAnimClip=0;BakeMatrices=1;ExportRelativePaths=1;AnimStart=0;AnimEnd=0.966667;</comments>
       <source_data>file:///D:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/xc3d/box.max</source_data>
     </contributor>
-    <created>2012-12-02T01:12:27Z</created>
-    <modified>2012-12-02T01:12:27Z</modified>
+    <created>2012-12-02T15:17:50Z</created>
+    <modified>2012-12-02T15:17:53Z</modified>
     <unit meter="0.0254" name="inch"/>
     <up_axis>Z_UP</up_axis>
   </asset>
+  <library_animations>
+    <animation id="Bone01-node-transform">
+      <source id="Bone01-node-transform_Bone01-node_transform-input">
+        <float_array id="Bone01-node-transform_Bone01-node_transform-input-array" count="30">0 0.033333 0.066666 0.1 0.133333 0.166667 0.2 0.233333 0.266667 0.3 0.333333 0.366667 0.4 0.433333 0.466667 0.5 0.533333 0.566667 0.6 0.633333 0.666667 0.7 0.733333 0.766667 0.8 0.833333 0.866667 0.9 0.933333 0.966667</float_array>
+        <technique_common>
+          <accessor source="#Bone01-node-transform_Bone01-node_transform-input-array" count="30" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="MAYA">
+          <pre_infinity>CONSTANT</pre_infinity>
+          <post_infinity>CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="Bone01-node-transform_Bone01-node_transform-output">
+        <float_array id="Bone01-node-transform_Bone01-node_transform-output-array" count="480">1 0 0 0 0 0 -1 0 0 1 0 0 0 0 0 1 0.996134 0.087851 0 0 0 0 -1 0 -0.087851 0.996134 0 0 0 0 0 1 0.947098 0.320944 0 0 0 0 -1 0 -0.320944 0.947098 0 0 0 0 0 1 0.778462 0.627691 0 0 0 0 -1 0 -0.627691 0.778462 0 0 0 0 0 1 0.448383 0.893841 0 0 0 0 -1 0 -0.893841 0.448383 0 0 0 0 0 1 0 1 0 0 0 0 -1 0 -1 0 0 0 0 0 0 1 -0.448383 0.893841 0 0 0 0 -1 0 -0.893841 -0.448383 0 0 0 0 0 1 -0.778462 0.627691 0 0 0 0 -1 0 -0.627691 -0.778462 0 0 0 0 0 1 -0.947098 0.320944 0 0 0 0 -1 0 -0.320944 -0.947098 0 0 0 0 0 1 -0.996134 0.087851 0 0 0 0 -1 0 -0.087851 -0.996134 0 0 0 0 0 1 -1 0.000000 0 0 0 0 -1 0 -0.000000 -1 0 0 0 0 0 1 -1 0.000000 0 0 0 0.087851 -0.996134 0 -0.000000 -0.996134 -0.087851 0 0 0 0 1 -1 0.000000 0 0 0 0.320943 -0.947098 0 -0.000000 -0.947098 -0.320943 0 0 0 0 1 -1 0 0 0 0 0.627691 -0.778462 0 -0.000000 -0.778462 -0.627691 0 0 0 0 1 -1 0 0.000000 0 0 0.893841 -0.448383 0 -0.000000 -0.448383 -0.893841 0 0 0 0 1 -1 0 0.000000 0 0 1 -0.000000 0 -0.000000 -0.000000 -1 0 0 0 0 1 -1 0 0.000000 0 0 0.893842 0.448383 0 -0.000000 0.448383 -0.893842 0 0 0 0 1 -1 0 0 0 0 0.627692 0.778462 0 -0.000000 0.778462 -0.627692 0 0 0 0 1 -1 -0.000000 0 0 0 0.320944 0.947098 0 -0.000000 0.947098 -0.320944 0 0 0 0 1 -1 -0.000000 0 0 0 0.087851 0.996134 0 -0.000000 0.996134 -0.087851 0 0 0 0 1 -1 -0.000000 0 0 0 0.000000 1 0 -0.000000 1 -0.000000 0 0 0 0 1 -0.994202 -0.000000 0.107528 0 0.107528 0.000000 0.994202 0 -0.000000 1 -0.000000 0 0 0 0 1 -0.92243 0 0.386164 0 0.386164 0.000000 0.92243 0 -0.000000 1 -0.000000 0 0 0 0 1 -0.686242 0 0.727374 0 0.727374 0.000000 0.686242 0 -0.000000 1 -0.000000 0 0 0 0 1 -0.257778 0.000000 0.966204 0 0.966204 0.000000 0.257778 0 -0.000000 1 -0.000000 0 0 0 0 1 0.257778 0.000000 0.966204 0 0.966204 0 -0.257778 0 -0.000000 1 -0.000000 0 0 0 0 1 0.686242 0.000000 0.727374 0 0.727374 0 -0.686242 0 -0.000000 1 -0.000000 0 0 0 0 1 0.92243 0.000000 0.386165 0 0.386165 -0.000000 -0.92243 0 -0.000000 1 -0.000000 0 0 0 0 1 0.994202 0.000000 0.107528 0 0.107528 -0.000000 -0.994202 0 -0.000000 1 -0.000000 0 0 0 0 1 1 0.000000 0.000000 0 0.000000 -0.000000 -1 0 -0.000000 1 -0.000000 0 0 0 0 1</float_array>
+        <technique_common>
+          <accessor source="#Bone01-node-transform_Bone01-node_transform-output-array" count="30" stride="16">
+            <param name="TRANSFORM" type="float4x4"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="Bone01-node-transform_Bone01-node_transform-interpolations">
+        <Name_array id="Bone01-node-transform_Bone01-node_transform-interpolations-array" count="30">LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR</Name_array>
+        <technique_common>
+          <accessor source="#Bone01-node-transform_Bone01-node_transform-interpolations-array" count="30" stride="1">
+            <param name="INTERPOLATION" type="Name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="Bone01-node-transform_Bone01-node_transform-sampler">
+        <input semantic="INPUT" source="#Bone01-node-transform_Bone01-node_transform-input"/>
+        <input semantic="OUTPUT" source="#Bone01-node-transform_Bone01-node_transform-output"/>
+        <input semantic="INTERPOLATION" source="#Bone01-node-transform_Bone01-node_transform-interpolations"/>
+      </sampler>
+      <channel source="#Bone01-node-transform_Bone01-node_transform-sampler" target="Bone01-node/transform"/>
+    </animation>
+  </library_animations>
   <library_images>
     <image id="wood.png" name="wood_png">
       <init_from>../wood.png</init_from>
@@ -219,7 +257,7 @@
         </instance_controller>
       </node>
       <node id="Bone01-node" name="Bone01" sid="Bone1" type="JOINT">
-        <matrix>1 0 0 0 0 0 -1 0 0 1 0 20 0 0 0 1</matrix>
+        <matrix sid="transform">1 0 0 0 0 0 -1 0 0 1 0 0 0 0 0 1</matrix>
       </node>
       <extra>
         <technique profile="FCOLLADA">
