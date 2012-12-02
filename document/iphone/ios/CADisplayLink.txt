@@ -1,0 +1,43 @@
+用CADisplayLink可以实现不停重绘。
+例子：
+
+CADisplayLink* gameTimer;
+gameTimer = [CADisplayLink displayLinkWithTarget:self
+                                            selector:@selector(updateDisplay:)];
+[gameTimer addToRunLoop:[NSRunLoop currentRunLoop]
+                    forMode:NSDefaucltRunLoopMode];
+                    
+                    
+    if (mDisplayLinkSupported)
+    {
+      // CADisplayLink is API new to iPhone SDK 3.1. Compiling against earlier versions will result in a warning, but can be dismissed
+      // if the system version runtime check for CADisplayLink exists in -initWithCoder:. The runtime check ensures this code will
+      // not be called in system versions earlier than 3.1.
+      mDate = [ init];
+      mLastFrameTime = -;
+      
+      mDisplayLink = ;
+      ;
+       forMode:NSDefaultRunLoopMode];
+    }可以看到此处是通过iPhone的CADisplayLink类来完成刷新及帧率控制的，（前面还特意检查了版本，以判断当前iPhone版本是否支持此特性，3.1以后才有的东西）而renderOneFrame里面的内容很简单，这里就不讲了。看看CADisplayLink吧，在apple的文档中，有如下描述：A CADisplayLink object is a timer object that allows your application to synchronize its drawing to the refresh rate of the display.很明显，这个iPhone平台特定的东西估计要比Ogre跨平台的FrameListener要好用一些，所以此基础框架程序中使用了这个iPhone原生的东西。不过这个代码有个问题：      mDate = [ init];
+      mLastFrameTime = -;
+      ;此时mLastFrameTime一般是个远小于1的变量，而在apple的文档中有如下描述：frameInterval
+The number of frames that must pass before the display link notifies the target again.
+
+@property(nonatomic) NSInteger frameInterval
+Discussion
+The default value is 1, which results in your application being notified at the refresh rate of the display. If the value is set to a value larger than 1, the display link notifies your application at a fraction of the native refresh rate. For example, setting the interval to 2 causes the display link to fire every other frame, providing half the frame rate.
+
+Setting this value to less than 1 results in undefined behavior and is a programmer error.
+注意最后一句。。。。。。设置成小于1的值会导致未定义行为，并且是一个错误。。。。。既然默认是1，那么其实后面的frameInterval根本不用设置。（原程序能够正常的运行，估计apple还是进行了一定的错误处理，当小于1时还是设置成1了）为了安全起见，这一句还是删掉吧。事实上，删掉后，运行还是正常，此时使用默认值1，也就是每次显示刷新调用一次此函数。
+相对的，看Cocos2D for iPhone的代码，现在默认的director类CCDisplayLinkDirector，对DisplayLink的使用实现代码如下：    int frameInterval = (int) floor(animationInterval_ * 60.0f);
+    
+    CCLOG(@"cocos2d: Frame interval: %d", frameInterval);
+
+    displayLink = ;
+    ;
+    forMode:NSDefaultRunLoopMode];
+注意，这里的animationInterval是秒为单位的表示时间间隔的变量，但是这里没有直接使用此变量来设定frameInterval，而是乘以了60，（Cocos认为iPhone设备的刷新率近似为60）应该来说，这才是正确用法。。。。。。。我看来可以向Ogre的开发组提交个bug 了。。。。。。
+
+
+http://www.bimcad.org/archiver/?tid-5963.html

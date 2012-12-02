@@ -1,0 +1,52 @@
+自從 iOS SDK 3.1 起就增加了 CADisplayLink Class，這個 Class 的功能類似於 Timer。由於能支援每秒高達 60 fps 的畫面同步功能，所以更適合用在製作遊戲動畫上面，相較之下 Timer 較常使用在背景處理層面，其基本使用方式如下。（View-based Template）
+
+第一步要先引入 CADisplayLink 的標頭檔，才能真正使用它。
+
+1
+#import <QuartzCore/CADisplayLink.h>
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+//自行定義的函式，用來設定使用CADisplayLink的相關參數
+-(void)initializeTimer {
+ 
+    //theTimer是CADisplayLink型態的指標，用來存放當前的設定狀態
+    theTimer = [CADisplayLink displayLinkWithTarget:self selector:@selector(countTotalFrames)];
+ 
+    //CADisplayLink內定值就是每秒60張（參數=1），參數=2就是每秒30張，以此類推
+    double fps = 60 / theTimer.frameInterval;
+    fpsLabel.text = [NSString stringWithFormat:@"%0.1f" , fps];
+ 
+    //設定執行狀態並啟動theTimer
+    [theTimer addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
+如同 Timer / 計時器一樣，selector 是設定每次觸發時所需要呼叫的函式，其寫法如下。
+
+1
+2
+3
+4
+-(void)countTotalFrames {
+    frameCount ++;
+    framesLabel.text = [NSString stringWithFormat:@"%d", frameCount];
+}
+
+最後，別忘記將 Quartz Core 的 framework 加入到你的專案內，程式才能正常執行。加入的方法是在 Groups & Files 內的專案名稱上按下右鍵 > Add > Existing Frameworks，之後選擇 QuartzCore.framework 並 Add 即可。
+
+
+CADisplayLink Class Reference:http://developer.apple.com/library/ios/#DOCUMENTATION/QuartzCore/Reference/CADisplayLink_ClassRef/Reference/Reference.html#//apple_ref/doc/uid/TP40009031-CH1-DontLinkElementID_1
+
+
+http://blog.sina.com.cn/s/blog_68237cd10100yptj.html

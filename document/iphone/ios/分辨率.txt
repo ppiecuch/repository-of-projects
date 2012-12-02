@@ -1,0 +1,28 @@
+float scale = [[UIScreen mainScreen] scale] 
+由于iphone 早起的设备都是屏幕分辨率是320*480
+
+后来apple 在iPhone 4中采用了名为Retina的显示技术，iPhone 4采用了960x640像素分辨率的显示屏幕，相当于iPad屏幕78%的像素 。由于屏幕大小没有变化，还是3.5
+
+   
+
+
+Retina display
+
+英寸，分辨率的提升将iPhone 4的显示分辨率提升至iPhone 3GS的四倍。每英寸的面积里有326个像素。通常电脑显示屏幕的分辨率为72ppi，iPhone 4的分辨率为电脑的4倍多，所以显示会非常细腻。
+
+　　另外，iPhone 4的显示屏幕分辨率达到了800:1的高对比度，同时加入了IPS宽可视角度技术，这一技术曾在苹果iPad中采用。（应该已经采用了...）
+ 
+
+float scale = [[UIScreenmainScreen] scale];//得到设备的分辨率
+
+scale = 1; 的时候是代表当前设备是320*480的分辨率（就是iphone4之前的设备）
+
+scale = 2; 的时候是代表分辨率为640*960的分辨率
+
+ 
+
+屏幕仍然是3.5但是其 分辨率提高了 分辨率为电脑的4倍 就是说以前用一个像素显示的图像现在用4个像素点来显示 （这样理解不知道对不？？？知道的朋友 讨论一下）
+
+
+http://www.cnblogs.com/zander/archive/2012/07/24/2606207.html
+

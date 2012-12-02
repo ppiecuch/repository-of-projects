@@ -1,0 +1,53 @@
+1. 在 iOS 中， 只要控件使用 IBOutlet 连接, 则必须释放它, 而不管是否有 @property ( retain ) 属性。
+2. 在 mac OS 中， 使用 IBOutlet 连接， 如果有 @property (retain) 属性，则 dealloc 需要 release,  如果没有 @property (retain) 属性， 则不需要 release .
+原因：
+
+        iOS 默认 retain 属性， mac OS 默认非 retain 属性。
+
+
+
+
+
+
+
+
+
+
+
+       On Mac OS X, IBOutlets are connected like this:
+Look for a method called set<OutletName>:. If it exists call it.
+If no method exists, look for an instance variable named <OutletName>, set it without retaining.
+On iPhone OS, IBOutlets are connected like this:
+
+call [object setValue:outletValue forKey:@"<OutletName>"]
+The behavior of set value for key is to do something like this:
+
+Look for a method called set<OutletName>:. If it exists call it.
+If no method exists, look for an instance variable named , set it and retain it.
+If you use a property, you’ll fall into the “Look for a method called set<OutletName>:…” case on both platforms. If you just use an instance variable, then you’ll have different retain/release behavior on Mac OS X VS iPhone OS. There’s nothing wrong with using an instance variable, you just need to deal with this difference in behavior as you switch between platforms.
+
+It is recommended you declare properties for all of your IBOutlets for clarity and consistency. The details are spelled out in the Memory Management Programming Guide. The basic gist is, when your NIB objects are unarchived, the nib loading code will go through and set all of the IBOutlets using setValue:forKey:. When you declare the memory management behavior on the property, there is no mystery as to what is going on. If the view gets unloaded, but you used a property that was declared as retain, you’ve still got a valid reference to your textfield.
+
+Perhaps a more concrete example would be useful to indicate why you should use a retaining property:
+
+I’m going to make some assumptions about the context in which you’re working–I’ll assume the UITextField above is a subview of another view that is controlled by a UIViewController. I will assume that at some point, the the view is off the screen (perhaps it is used in the context of a UINavigationController), and that at some point your application gets a memory warning.
+
+So lets say your UIViewController subclass needs to access its view to display it on screen. At this point, the nib file will be loaded and each IBOutlet properties will be set by the nib loading code using setValue:forKey:. The important ones to note here are the top level view that will be set to the UIViewController’s view property, (which will retain this top level view) and your UITextField, which will also be retained. If it is simply set, it’ll have a retain put on it by the nib loading code, otherwise the property will have retained it. The UITextField will also be a subview of the top level UIView, so it will have an additional retain on it, being in the subviews array of the top level view, so at this point the text field has been retained twice.
+
+At this point if you wanted to switch out the text field programmatically, you could do so. Using the property makes memory management more clear here; you just set the property with a new autoreleased text field. If you had not used the property, you must remember to release it, and optionally retain the new one. At this point it is somewhat ambiguous as to whom owns this new text field, because the memory management semantics are not contained within the setter.
+
+Now let’s say a different view controller is pushed on the UINavigation Controller’s stack, so that this view is no longer in the foreground. In the case of a memory warning, the view of this offscreen view controller will be unloaded. At this point, the view property of the top level UIView will be nulled out, it will be released and deallocated.
+
+Because the UITextField was set as a property that was retained, the UITextField is not deallocated, as it would have been had its only retain been that of the subviews array of the top level view.
+
+If instead the instance variable for the UITextField not been set via a property, it’d also be around, because the nib loading code had retained it when setting the instance variable.
+
+One interesting point this highlights is that because the UITextField is additionally retained through the property, you’ll likely not want to keep it around in case of a memory warning. For this reason you should nil-out the property in the -[UIViewController viewDidUnload] method. This will get rid of the final release on the UITextField and deallocate it as intended. If using the property, you must remember to release it explicitly. While these two actions are functionally equivalent, the intent is different.
+
+If instead of swapping out the text field, you chose to remove it from the view, you might have already removed it from the view hierarchy and set the property to nil, or released the text field. While it is possible to write a correct program in this case, its easy to make the error of over-releasing the text field in the viewDidUnload method. Over-releasing an object is a crash-inducing error; setting a property that is already nil again to nil is not.
+
+My description may have been overly verbose, but I didn’t want to leave out any details in the scenario. Simply following the guidelines will help avoid problems as you encounter more complex situations.
+
+It is additionally worth noting that the memory management behavior differs on Mac OS X on the desktop. On the desktop, setting an IBOutlet without a setter does not retain the instance variable; but again uses the setter if available
+
+http://blog.163.com/meyers_jiang/blog/static/1886480962011102451046398/
