@@ -117,7 +117,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();*/
 
-	//BUG：cube变透明了
+	//BUG：cube变透明了==>不是BUG，因为aura比cube晚绘制，所以aura的高光部分会与cube部分混合（理由：不叠加部分是正常的）
 	shap=geometryFty->createXYRectangle2D(-125,-125,125,125);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
