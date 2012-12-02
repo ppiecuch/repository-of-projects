@@ -2818,11 +2818,14 @@ public:
 
 
 
-					Logger->debug("[%d]{%g,%g,%g},bind:",j,vertex.x,vertex.z,vertex.y);
+					//Logger->debug("[%d]{%g,%g,%g},bind:",j,vertex.x,vertex.z,vertex.y);
+					Logger->debug("[%d]{%g,%g,%g},bind:",j,vertex.x,vertex.y,vertex.z);
 
 					writer->writeFloat((float)vertex.x);
-					writer->writeFloat((float)vertex.z);
+					//writer->writeFloat((float)vertex.z);
+					//writer->writeFloat((float)vertex.y);
 					writer->writeFloat((float)vertex.y);
+					writer->writeFloat((float)vertex.z);
 
 					//追加绑定骨骼信息
 					EXTRAVertexWeights& w=controller->Skin.VertexWeights.VertexWeights[j];
@@ -2870,9 +2873,12 @@ public:
 						n.normalize();
 
 						writer->writeFloat((float)n.x);
-						writer->writeFloat((float)n.z);
+						//writer->writeFloat((float)n.z);
+						//writer->writeFloat((float)n.y);
+						//Logger->debug("{%g,%g,%g}\r\n",n.x,n.z,n.y);
 						writer->writeFloat((float)n.y);
-						Logger->debug("{%g,%g,%g}\r\n",n.x,n.z,n.y);
+						writer->writeFloat((float)n.z);
+						Logger->debug("{%g,%g,%g}\r\n",n.x,n.y,n.z);
 
 					}
 				}
@@ -2905,10 +2911,14 @@ public:
 						bsm.transformVect(p);
 
 						writer->writeFloat((float)p.x);
-						writer->writeFloat((float)p.z);
+						//writer->writeFloat((float)p.z);
+						//writer->writeFloat((float)p.y);
+						//writer->writeInt(0);
+						//Logger->debug("{%g,%g,%g}\r\n",p.x,p.z,p.y);
 						writer->writeFloat((float)p.y);
+						writer->writeFloat((float)p.z);
 						writer->writeInt(0);
-						Logger->debug("{%g,%g,%g}\r\n",p.x,p.z,p.y);
+						Logger->debug("{%g,%g,%g}\r\n",p.x,p.y,p.z);
 					}
 				}
 
@@ -2940,9 +2950,12 @@ public:
 						Logger->debug("normals[%d]:{%g,%g,%g}-->",j/3,n.x,n.y,n.z);
 						rsm.transformVect(n);
 						writer->writeFloat((float)n.x);
-						writer->writeFloat((float)n.z);
+						//writer->writeFloat((float)n.z);
+						//writer->writeFloat((float)n.y);
+						//Logger->debug("{%g,%g,%g}\r\n",n.x,n.z,n.y);
 						writer->writeFloat((float)n.y);
-						Logger->debug("{%g,%g,%g}\r\n",n.x,n.z,n.y);
+						writer->writeFloat((float)n.z);
+						Logger->debug("{%g,%g,%g}\r\n",n.x,n.y,n.z);
 					}
 				}
 			}

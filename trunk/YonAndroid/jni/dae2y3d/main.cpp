@@ -79,6 +79,5 @@ int main(int argc, char* argv[])
 
 	Logger->drop();
 
-	system("pause");
 	return 0;
 }
