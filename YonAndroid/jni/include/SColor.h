@@ -101,6 +101,7 @@ namespace video{
 
 		inline bool operator==(const SColor& other) const{return !(*this!=other);}
 
+		//TODO调整后再返回
 		u32 toA8R8G8B8() const { return color; }
 
 		u32 getAlpha() const { return color>>24; }

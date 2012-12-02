@@ -241,7 +241,7 @@ inline s32 gcd(s32 a,s32 b){
 	return a*k;  
 }  
 
-}//core
-}//yon
+}
+}
 
 #endif

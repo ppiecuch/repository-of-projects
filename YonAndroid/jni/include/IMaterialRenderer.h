@@ -6,16 +6,16 @@
 #include "SMaterial.h"
 
 namespace yon{
-	namespace video{
+namespace video{
 
-		struct SInnerMaterial;
-		class IMaterialRenderer : public virtual core::IReferencable{
-		public:
-			//virtual void onSetMaterial(const IMaterial* current,const IMaterial* last) {}
-			virtual void preprocess(SInnerMaterial& im){}
-			virtual void onSetMaterial(const SInnerMaterial& current,const SInnerMaterial& last) {}
-			virtual void onUnsetMaterial() {}
-		};
-	}
+	struct SInnerMaterial;
+	class IMaterialRenderer : public virtual core::IReferencable{
+	public:
+		//virtual void onSetMaterial(const IMaterial* current,const IMaterial* last) {}
+		virtual void preprocess(SInnerMaterial& im){}
+		virtual void onSetMaterial(const SInnerMaterial& current,const SInnerMaterial& last) {}
+		virtual void onUnsetMaterial() {}
+	};
+}
 }
 #endif

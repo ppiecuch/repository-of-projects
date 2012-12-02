@@ -19,7 +19,7 @@ namespace yon{
             resourcesPath("."),
 			windowSize(core::dimension2du(800,600)),
 			windowId(NULL),
-			//windowCaption(L"YonApplication"),
+			windowCaption(L"YonApplication"),
 			pJNIEnv(NULL),
 			pEventReceiver(NULL),
 			pCallback(NULL),

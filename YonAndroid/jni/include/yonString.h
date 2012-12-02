@@ -359,8 +359,8 @@ namespace yon{
 			{
 				YON_DEBUG_BREAK_IF(index>=len) // access violation
 
-					for (u32 i=index+1; i<len; ++i)
-						elements[i-1] = elements[i];
+				for (u32 i=index+1; i<len; ++i)
+					elements[i-1] = elements[i];
 
 				--len;
 			}

@@ -29,7 +29,7 @@ namespace video{
 	struct SMaterialLayer{
 	private:
 		friend struct SMaterial;
-		core::yonAllocator<core::matrix4f> MatrixAllocator;
+		core::yonAllocatorMemoryPool<core::matrix4f> MatrixAllocator;
 		core::matrix4f* pTextureMatrix;
 	public:
 		ITexture* texture;
