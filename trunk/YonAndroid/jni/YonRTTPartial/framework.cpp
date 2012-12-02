@@ -125,7 +125,7 @@ void drawFrame(){
 
 	gfAdapter->clearZ(1000);
 	TO_PS(0,0,128,128)
-	gfAdapter->drawRegion(videoDriver->getTexture("test.png"),r,ps);
+	gfAdapter->drawRegion(videoDriver->getTexture("test-png24.png"),r,ps);
 	gfAdapter->render(); 
 
 

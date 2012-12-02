@@ -12,7 +12,9 @@ namespace MyGUI{
 		:m_name(name),m_bLock(false),m_pDriver(driver),m_pTexture(NULL),
 		m_pRenderTarget(NULL),
 		m_pRenderManager(renderManager),
-		m_usage(MyGUI::TextureUsage::Default),m_numElemBytes(0){
+		m_usage(MyGUI::TextureUsage::Default)
+		//,m_numElemBytes(0)
+	{
 	}
 	MyGUITexture::~MyGUITexture(){
 		destroy();
@@ -20,14 +22,19 @@ namespace MyGUI{
 
 	void  MyGUITexture::createManual(int _width, int _height, MyGUI::TextureUsage _usage, MyGUI::PixelFormat _format){
 		video::ENUM_COLOR_FORMAT format;
+		//m_numElemBytes=0;
 		if (_format == MyGUI::PixelFormat::L8){
 			format=video::ENUM_COLOR_FORMAT_L8;
+			//m_numElemBytes=1;
 		}else if (_format == MyGUI::PixelFormat::L8A8){
 			format=video::ENUM_COLOR_FORMAT_L8A8;
+			//m_numElemBytes=2;
 		}else if (_format == MyGUI::PixelFormat::R8G8B8){
 			format=video::ENUM_COLOR_FORMAT_R8G8B8;
+			//m_numElemBytes=3;
 		}else if (_format == MyGUI::PixelFormat::R8G8B8A8){
 			format=video::ENUM_COLOR_FORMAT_R8G8B8A8;
+			//m_numElemBytes=4;
 		}else{
 			YON_WARN(YON_LOG_WARN_FORMAT,"do not support PixelFormat currently!");
 			return;
@@ -92,7 +99,7 @@ namespace MyGUI{
 		m_pDriver->removeTexture(m_pTexture);
 
 		m_bLock = false;
-		m_numElemBytes = 0;
+		//m_numElemBytes = 0;
 		m_usage = MyGUI::TextureUsage::Default;
 	}
 	MyGUI::IRenderTarget* MyGUITexture::getRenderTarget(){

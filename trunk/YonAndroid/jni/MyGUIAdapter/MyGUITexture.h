@@ -20,7 +20,7 @@ namespace MyGUI{
 		std::string m_name;
 		bool m_bLock;
 		MyGUI::TextureUsage m_usage;
-		size_t m_numElemBytes;
+		//size_t m_numElemBytes;
 
 		const MyGUI::MyGUIRenderManager* m_pRenderManager;
 		MyGUI::MyGUIRTTexture* m_pRenderTarget;
@@ -79,7 +79,7 @@ namespace MyGUI{
 			return m_usage;
 		}
 		virtual size_t getNumElemBytes(){
-			return m_numElemBytes;
+			return yon::video::getPixelBitsByFormat(m_pTexture->getColorFormat())>>3;
 		}
 
 		virtual MyGUI::IRenderTarget* getRenderTarget();
