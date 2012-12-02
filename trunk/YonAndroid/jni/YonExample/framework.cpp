@@ -108,32 +108,29 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	/*shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
 	teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
+	//BUG£ºcube±äÍ¸Ã÷ÁË
 	shap=geometryFty->createXYRectangle2D(-125,-125,125,125);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addModel(entity);
-	SMaterial& material=planeModel->getMaterial(0);
-	material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
-	material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
-	material.BlendDst=ENUM_BLEND_FACTOR_ONE;
-	//material->setMaterialType(ENUM_MATERIAL_TYPE_BLEND);
-	//material->setFilterMode(0,ENUM_FILTER_MODE_NEAREST);
-	//material->setWrapModeU(0,ENUM_WRAP_MODE_CLAMP_TO_EDGE);
-	//material->setWrapModeV(0,ENUM_WRAP_MODE_CLAMP_TO_EDGE);
-	//material->setBlendSrcFactor(ENUM_BLEND_FACTOR_SRC_ALPHA);
-	//material->setBlendDstFactor(ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA);
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,videoDriver->getTexture("aura.png"));
+	}
 	planeModel->setPosition(core::vector3df(0,0,0));
-	//material->setTexture(0,videoDriver->getTexture("5.png"));
-	material.setTexture(0,videoDriver->getTexture("aura.png"));
+	
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -150,8 +147,8 @@ void drawFrame(){
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
-	const core::vector3df trot=teapotModel->getRotation();
-	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
+	//const core::vector3df trot=teapotModel->getRotation();
+	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	/*const core::vector3df psca=planeModel->getScale();
 	if(psca.x>4)
