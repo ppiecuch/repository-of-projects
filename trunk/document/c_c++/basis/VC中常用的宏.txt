@@ -1,0 +1,68 @@
+ 我们在VS环境中开发的时候，会遇到很多宏定义，这些宏可以应用到代码中，或用于编译、工程选项等设置，总之是我们开发中必不可少的工具，有必要做一个总结。有些宏是C/C++定义的，有些宏是VC环境预定义的。
+
+    1、C/C++中的宏
+    
+    __cplusplus  如果当前编译器为C++，该值为1。
+    __DATE__  当前源码的编译日期，格式为Mmm dd yyyy。
+    __TIME__  当前源码的编译时间，格式为hh:mm:ss。
+    __TIMESTAMP__  当前源码文件最后被修改的日期和时间，格式为Ddd Mmm Date hh:mm:ss yyyy。
+    __FILE__  当前源码文件名。
+    __LINE__  当前插入点所在源码的行号。
+    __FUNCTION__  当前插入点所在函数名。
+    __STDC__  标识是否严格遵循ANSI C标准，编译器选项/Za被设置时该宏定义为1，表示遵循标准。    
+    __VA_ARGS__  可变参数宏，用来传递可变参数表；该宏并非被所有编译器支持。
+    
+    2、VC中的宏
+    
+    _DEBUG  当我们的工程设置为debug版编译时，编译器会定义该宏；该宏与#ifdef等
+            预编译语句一起进行条件编译，以区分debug和release版本功能。
+    ASSERT  断言，当该宏后面的语句值为0时引起程序中断，只在debug版中有效。
+    VERIFY  与ASSERT功能类似，在debug和release版本中均有效。
+    ASSERT_VALID  检查后面参数指针是否为空，只在debug版中有效。
+    TRACE  格式化输出字符串信息。
+    _ATL_VER  指明ATL的版本。
+    _CLR_VER  指明公共运行时（common language runtime）的版本。
+    _COUNTER_  一个从0开始的全局的计数器，每次用于源文件或在源文件中被引用头文件时，自动加1。
+    _DLL  当工程类型为动态链接库时，该值为1。
+    WINVER  指示Windows版本。
+    _MFC_VER  指示MFC版本。
+    _MSC_VER  指示编译器版本。
+    _WIN32  为Win32和Win64程序定义。
+    
+    3、VC IDE预定义宏
+    
+    这类宏主要应用在工程属性设置中，包括名称、路径、编译等相关字符串。比如解决方案位c:SolnSoln.sln，项目位于c:SolnProjProj.vcproj，中间目录为DebugInt，输出目录为c:MyOutputs，输出名称为Game.exe时，各个宏的值依次如下。
+
+    $(ConfigurationName)  版本名，如debug或release。
+    $(PlatformName)  当前平台名，如Win32。
+    $(IntDir)  中间目录名，即为中间文件指定的相对于项目目录的目录路径，值为DebugInt。
+    $(OutDir)  输出文件目录的路径，值为c:MyOutputs。
+    $(DevEnvDir)  VS的安装目录。
+    $(InputDir)  输入文件目录，值为c:SolnProj。
+    $(InputPath)  输入文件全路径名，值为c:SolnProjProj.vcproj。
+    $(InputName)  输入文件名，值为Proj。
+    $(InputFileName)  输入文件名（带后缀），值为Proj.vcproj。
+    $(InputExt)  输入文件扩展名，值为.vcproj。
+    $(ProjectDir)  项目目录，同$(InputDir)。
+    $(ProjectPath)  项目全路径名，同$(InputPath)。
+    $(ProjectName)  同$(InputName)。
+    $(ProjectFileName)  同$(InputFileName)。
+    $(ProjectExt)  同$(ProjectExt)。
+    $(SolutionDir)  解决方案目录，值为c:Soln。
+    $(SolutionPath)  解决方案路径，值为c:SolnSoln.sln。
+    $(SolutionName)  解决方案名，值为Soln。
+    $(SolutionFileName)  解决方案名（带后缀），值为Soln.sln。
+    $(SolutionExt)  解决方案文件扩展名，值为.sln。
+    $(TargetDir)  输出文件目录，值为c:MyOutputs。
+    $(TargetPath)  输出文件路径名，c:MyOutputsGame.exe。
+    $(TargetName)  输出文件名，值为Game。
+    $(TargetFileName)  输出文件全名，值为Game.exe。
+    $(TargetExt)  输出文件扩展名，值为.exe。
+    $(VSInstallDir)  VS安装目录。
+    $(VCInstallDir)  VC安装目录。
+    $(FrameworkDir)  framework安装目录。
+    $(FrameworkVersion)  framework版本信息。
+    $(FrameworkSDKDir)  framework sdk安装目录。
+    
+    
+    http://blog.sina.com.cn/s/blog_95a18649010158qe.html

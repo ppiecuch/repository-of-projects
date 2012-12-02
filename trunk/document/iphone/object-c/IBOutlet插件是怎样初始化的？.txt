@@ -1,0 +1,5 @@
+Q: Object-C中的类不是通过init或initwith...函数进行初始化的吗，那IBOutlet变量好像怎么都没有执行该函数呢，那如果继承了一个控件类，成员变量的初始化该放在什么地方呢？其没有类似于C++类中的构造函数？ 
+
+A: 所谓nib文件，其实就是表示View中所有控件的snapshot。在程序运行的时候由UIKit框架通过initWithCoder方法来初始化每个IBOutlet修饰的控件对象（前提是你在IB:Interface Bulider里面将他们绑定到nib的控件）. initWithCoder其实就已经初始化好，并且赋值到你的IBOutlet 变量里面了。
+
+http://blog.sina.com.cn/s/blog_59aee7ed01013upr.html

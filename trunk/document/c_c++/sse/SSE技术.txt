@@ -1,0 +1,62 @@
+Streaming SIMD Extension（SSE），这是一种只支持对CPU编程的汇编语言，当然如果CPU不至此SSE,我们还可以通过反馈到C/C++的应用。在数学与物理内核中涉及了许多的浮点数的计算，而这些大量的这些计算是相当耗费CPU性能的，那么SSE就提供一个汇编指令集，我们就通过这个汇编语言解决浮点数计算中效率问题。例如如下例子：
+    在这个例子中，我们需要得到一个向量的长度，程序中提供了两种选择，当CPU支持SSE时，那么我们就使用SSE提供的汇编指令集对sqrt(x*x + y*y + z*z)这个函数用汇编进行计算：
+inline float HSVector::GetLength(void) {
+   float f=0;
+   if (!g_bSSE) {
+      f = (float)sqrt(x*x + y*y + z*z);
+      }
+   else {
+      w = 0.0f;
+      __asm {
+         mov    esi,   this            ; vector u
+         movups xmm0,  [esi]           ; first vector in xmm0
+         mulps  xmm0,  xmm0            ; mul with 2nd vector
+         movaps xmm1,  xmm0            ; copy result
+         shufps xmm1,  xmm1, 4Eh       ; shuffle: f1,f0,f3,f2
+         addps  xmm0,  xmm1            ; add: f3+f1,f2+f0,f1+f3,f0+f2
+         movaps xmm1,  xmm0            ; copy results
+         shufps xmm1,  xmm1, 11h       ; shuffle: f0+f2,f1+f3,f0+f2,f1+f3
+         addps  xmm0,  xmm1            ; add: x,x,f0+f1+f2+f3,f0+f1+f2+f3
+         sqrtss xmm0,  xmm0            ; sqroot from least bit value
+         movss  f, xmm0            ; move result from xmm0 to edi
+         }
+      w = 1.0f;
+      }
+   return f;
+   }
+   
+   inline void HSVector::Cross(const HSVector &v1, const HSVector &v2) {
+   if (!g_bSSE) {
+      x = v1.y * v2.z - v1.z * v2.y;
+      y = v1.z * v2.x - v1.x * v2.z;
+      z = v1.x * v2.y - v1.y * v2.x;
+      w = 1.0f;
+      }
+   else {
+      __asm {
+         mov esi, v1
+         mov edi, v2
+ 
+         movups xmm0, [esi]
+         movups xmm1, [edi]
+         movaps xmm2, xmm0
+         movaps xmm3, xmm1
+ 
+         shufps xmm0, xmm0, 0xC9
+         shufps xmm1, xmm1, 0xD2
+         mulps  xmm0, xmm1
+ 
+         shufps xmm2, xmm2, 0xD2
+         shufps xmm3, xmm3, 0xC9
+         mulps  xmm2, xmm3
+ 
+         subps  xmm0, xmm2
+ 
+         mov    esi, this
+         movups [esi], xmm0
+         }
+      w = 1.0f;
+      }
+   }
+   
+http://blog.sina.com.cn/s/blog_95a18649010158zy.html

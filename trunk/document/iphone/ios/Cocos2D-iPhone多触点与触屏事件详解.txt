@@ -1,0 +1,170 @@
+
+注意：本文经 Himi 论坛ID：xiaominghimi（泰然专家组）授权泰然论坛转载，如需转载请联系Himi本人！！
+原文地址：http://blog.csdn.net/xiaominghimi/article/details/6665887
+-----------------------------------本章补充开始！---------------------------------- 
+          本篇对于多触点和触屏事件已经做了一个详细的说明，但是有一点忽略了，就是开启多触点的支持！步骤如下：
+         首先进入AppDelegate.m 类中， 
+- (void) applicationDidFinishLaunching:(UIApplication*)application{}  
+
+  在上面这个方法中添加如下一句开启多触点支持的代码：
+ //支持多触点  
+    [viewController.view setMultipleTouchEnabled:YES];  
+--------------------------本章补充完毕------------------------------------------------------------------------------
+
+最近几天一直在啃cocos2d，消化了不少东西，基本可以有些把握下手写公司的游戏了；那么今天就把一些重点的拿出来分享下经验，给新童鞋们作为参考；
+这篇就来详细介绍下cocos2d对用户触屏的监听事件进行下分析（cocos2d有很多详细的文章和教程，我这里只是出于自己的理解来说）
+进入正题：从整体cocos2d对触屏的事件监听可以分为两种：
+1.单一监听，所谓单一监听其实是跟cocos2d引擎框架有关，因为在cocos2d中每个游戏界面都可以使用一个CCLayout完成，那么当一个CCLayout在屏幕显示出来后，想要监听用户的按键事件，一般都会使用以下形式来进行监听：（注意：这里是CCLayout类进行监听的方式）
+首先开启监听：
+
+self.isTouchEnabled=YES;  
+然后重写监听函数即可：
+
+//监听首次触发事件  
+- (void)ccTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event  
+{  
+}  
+//触摸事件 - 当手指在屏幕上进行移动  
+- (void)ccTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event  
+{  
+      
+}  
+//触摸事件 - 当手指从屏幕抬起时调用的方法  
+-(void) ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event  
+{  
+          
+}  
+此种监听狠eazy，但是要注意这里是对CCLayout类进行的监听方式；
+
+2.监听分发； 刚才说了，游戏的每个界面可能都是一个CCLayout，但是如果我想让一个CCSprite精灵主角单独进行监听，或者说在CCLayout有很多个精灵我想单独监听其中的一种的时候，这时候就需要使用监听分发的形式了；
+假设我们自定义了一个类XX继承CCSprite，还有一个YY类也继承CCSprite，而且XX类型与YY类的实例都存在于一个Layout上，那么我想对XX与YY类型分别单独监听的话；首先我们先让当前继承的CCSprite类的XX于YY类都使用 协议；
+（CCSprite中没有 self.isTouchEnabled=YES; 这个函数，别直接写这个哦～）
+ 
+代码如下：
+
+@interface XX : CCSprite {  
+  
+}  
+
+然后在当前实现类中重写一个函数如下：
+
+-(void) registerWithTouchDispatcher  
+{  
+    [[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:YES];  
+}  
+
+或者将注册的这句代码，放在重写的onEnter函数中也可；
+
+（此函数是注册监听，如果里面什么都不写，则当前不会相应任何触屏事件；）
+重写触摸的各事件函数，如下：
+
+//监听首次触发事件  
+- (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event  
+{   
+    return NO;  
+}  
+//监听移动事件  
+- (void)ccTouchMoved:(UITouch *)touch withEvent:(UIEvent *)event  
+{     
+}  
+//监听离开事件  
+- (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event  
+{  
+      
+}  
+   
+大家可以看到，此种监听方式除了各种监听函数与第一种类似之外，在 ccTouchBegan的函数有个返回类型－布尔值；那么其作用下面详细介绍；如果XX与YY类都实现了第二种监听方式的话，那么当用户触屏后，（当前用户触发的是XX与YY类实例所在的CCLayout）首先会进入XX或者YY的其中的ccTouchBegan函数中，这里假设首先进入了XX类中，那么XX类中的ccTouchBegan将会被响应，如果return true；表示不再将用户触屏的消息传递给YY类中进行响应，也就是说不再响应YY类中的ccTouchBegan函数，那么如果 return false；则会将当前触屏信息传递给其他注册过的类型中；
+一句话概括：return 的值，如果是真则表明用户触摸事件已经被处理，其他不会再去进行监听；如果为假，则会继续交给其他注册过的类型中进行处理；
+
+那么第二种监听的方式比较常用，这样便于处理，那么至于注册，一般都是放在 onEnter函数中；onEnter函数是每个CCScene之间切换会被响应的函数，相当于是CCScene的生命周期函数，具体调用顺序如下：
+
+//使用[CCDirector replaceScene:XX],替换场景时，会调用以下3个方法  
+//调用顺序依次为：  
+//1.othterScene的+(id)Scene——>  
+//2.otherScene的init——>  
+//3.otherScene的onEnter——>  
+//4.运行过渡效果  
+//5.当前Scene的onExit函数——>  
+//6.otherLayout的onEnterTransitionDidFinish()  
+//7.当前Scene的dealoc函数  
+-(void) onEnter{  
+    //调用其他Scene的init方法以后会调用此方法  
+    //如果使用了CCTransitionScene，本方法将在过渡效果开始后调用  
+    //(如果不调用super onEnter新场景可能对触摸和加速计无发应)  
+    [super onEnter];  
+}  
+-(void) onEnterTransitionDidFinish{  
+    //调用onEnter后会调用此函数  
+    //如果使用了CCTransitionScene，将会在过渡效果完成时调用此方法  
+    [super onEnterTransitionDidFinish];  
+}  
+-(void)onExit{   
+    //在调用dealloc之前会调用此函数；  
+    //如果使用了CCTransitionScene，将会在过渡效果结束以后调用此方法  
+    //(如果不调用super onExit，当前场景可能不会从内存中释放)  
+    [super onExit];  
+}  
+
+那么大概介绍了监听事件后，那么触屏中最关心的就应该是多触点啦；
+
+//-----获取多点触摸  
+NSSet *allTouches = [event allTouches];  
+UITouch *touchOne = [[allTouches allObjects]objectAtIndex:0];  
+UITouch *touchTwo = [[allTouches allObjects]objectAtIndex:1];  
+//...类推  
+
+获取多点狠简单，那么下面再将基本常用到的几个判断写下：
+1－判断用户单击还是双击（针对一个触点）
+if([allTouches count]==1) {   
+    UITouch *touchOne = [[allTouches allObjects]objectAtIndex:0];  
+    switch ([touchOne tapCount]) {  
+        case 1:  
+             //单击  
+            CCLOG(@"%@",@"单击");  
+            break;  
+        case 2:  
+            //双击  
+            CCLOG(@"%@",@"双击");  
+            break;  
+    }  
+}  
+
+1－判断用户两个触点之间是合拢还是分开（针对两个触点）
+
+if([allTouches count]==2) {   
+    //适当修改处理，不能同时取，否则肯定一样的啦（可以一个在began 一个在end）  
+    UITouch *touchOne = [[allTouches allObjects]objectAtIndex:0];  
+    UITouch *touchTwo = [[allTouches allObjects]objectAtIndex:1];  
+    CGFloat *disFirst  =[self distance:[touchOne locationInView:[self view]]   
+                            todistance:[touchTwo locationInView:[self view]]];  
+      
+    UITouch *touchOne = [[allTouches allObjects]objectAtIndex:0];  
+    UITouch *touchTwo = [[allTouches allObjects]objectAtIndex:1];  
+    CGFloat *disFinal  =[self distance:[touchOne locationInView:[self view]]  
+                            todistance:[touchTwo locationInView:[self view]]];  
+    if (disFirst>disFinal) {  
+        CCLOG(@"%@",@"合拢");  
+    }else{  
+        CCLOG(@"%@",@"分开");  
+    }  
+}  
+
+这里我就粗略的写在一起，判定两个触点是否合拢其实就是用户刚触屏时记录两点之间的距离记做disFirst，然后在两个触点离开屏幕（或者移动事件中）的时候计算
+当前的两个触点的距离disFinal，那么最后根据disFirst与disFinal距离关系就能知道是合拢还是分开；
+（CCLOG 是cocos2d封装的打印方法，此种打印在编译发布正式游戏程序的时候是不会编译到程序中的，但是NSLOG会一直存在！要注意！）
+最后给出两个函数，用于计算不同方式监听的函数中获取（转换）坐标的，因为cocos2d是openGL进行搭建的框架，所以需要坐标转换；
+
++(CGPoint) locationFromTouches:(NSSet*)touches  
+{  
+    return [self locationFromTouch:[touches anyObject]];  
+}  
++(CGPoint) locationFromTouch:(UITouch*)touch  
+{  
+    CGPoint touchLocation = [touch locationInView: [touch view]];  
+    return [[CCDirector sharedDirector] convertToGL:touchLocation];  
+}  
+
+两个方法一看就能看出区别，一个是UITouch的，一个是NSSet，一个是单一监听，一个是分发监听；
+ok，本章就到这里～～～（下周进入封闭开发了，吃睡都在公司了，咳咳，带上我的多啦a梦的小裤衩，娃哈哈～）
+
+http://www.ityran.com/article-60-2.html

@@ -1,0 +1,11 @@
+上次看文档的时候，无意中发现了UIKeyInput这个代理，可以响应键盘的一些事件，但是前提是这个类必须基于UIResponder，它提供一下方法（都是@required）：
+
+1、- (void)insertText:(NSString *)text：键盘当前输入的字符。
+
+2、- (BOOL)hasText ： 当前是否包括字符。
+
+3、- (void)deleteBackward： 响应键盘删除事件。
+
+使用的时候只需要添加该代理，然后把这三个函数拷到类内就可以了。 但是，这个代理对于UITextField、UITextView不起作用。
+
+from:http://hi.baidu.com/%CB%E6%B7%E7_1989/blog/item/cdf06973a59a4b0eb151b945.html
