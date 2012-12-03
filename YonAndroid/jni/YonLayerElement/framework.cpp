@@ -158,7 +158,6 @@ void resize(u32 width,u32 height){
 void drawFrame(){
 
 	PROFILE_REGISTER_FRAME();
-	//PROFILE_START_CALL(PROFILE_ID_1,Body);
 	PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
 	videoDriver->begin(true,true,COLOR_DEFAULT);
 	PROFILE_END_CALL(PROFILE_ID_1);
@@ -186,7 +185,6 @@ void drawFrame(){
 	end=timer->getRealTime();
 	diff=end-start;
 	start=timer->getRealTime();
-	//PROFILE_END_CALL(PROFILE_ID_1);
 }
 void destroy(){
 	PROFILE_REPORT();
