@@ -18,6 +18,14 @@ namespace core{
 	template<class T>
 	class matrix4{
 	private:
+		//无论dx还是opengl，所表示的矢量和矩阵都是依据线性代数中的标准定义的：
+		//“矩阵A与B的乘积矩阵C的第i行第j列的元素c(ij)等于A的第i行于B的第j列的对应元素乘积的和。”（实用数学手册，科学出版社，第二版）
+		//a00 a10 a20 a30    b00 b10 b20 b30   c00 c10 c20 c30
+		//a01 a11 a21 a31 \/ b01 b11 b21 b31 _ c01 c11 c21 c31
+		//a02 a12 a22 a32 /\ b02 b12 b22 b32 - c02 c12 c22 c32
+		//a03 a13 a23 a33    b03 b13 b23 b33   c03 c13 c23 c33
+		//如下，取i=0,j=1，则有c10=a的第0行*b的第1列
+		//refer to:http://www.cnblogs.com/cgwolver/archive/2009/07/29/1533570.html
 		//T m[4][4];
 		inline void setByProduct(const matrix4& a,const matrix4& b){
 			//TODO 4阶矩阵快速乘法[[C++]GLDemo04_1]
@@ -643,6 +651,7 @@ namespace core{
 	typedef matrix4<f32> matrix4f;
 
 	YON_API extern const matrix4f IDENTITY_MATRIX;
+	YON_API extern const matrix4f SWAP_MATRIX;
 }
 }
 #endif
