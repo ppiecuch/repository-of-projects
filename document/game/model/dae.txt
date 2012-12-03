@@ -41,3 +41,12 @@ JMi: Transformation matrix of joint i
 
 JW: Weight of the influence of joint i on vertex v
 
+
+If you see the structure of this <node> in COLLADA document you will see most of the nodes
+ have <matrix> as the first child. And this <matrix> contains 16 float values, which makes
+the Joint Matrix of the bone. This is also called the local bone transformation matrix. 
+When we connect all the joints we have to multiply the World Matrix of the parent to the 
+child's Joint Matrix and save it as world bone transformation matrix for the child. 
+For the root Joint, who doesn't have a parent, the Joint Matrix becomes the World 
+transformation matrix.
+http://www.wazim.com/Collada_Tutorial_1.htm
