@@ -63,20 +63,20 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCameraFPS();
 	pCamera->setFar(5000);
-	pCamera->setNear(30);
+	pCamera->setNear(1);
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
 	fs->addWorkingDirectory("../media/xc3d",true);
-	//fs->addWorkingDirectory("../media/terrain/heightmap/plain");
-	fs->addWorkingDirectory("../media/terrain/heightmap/rough");
+	fs->addWorkingDirectory("../media/ms3d",true);
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/png/");
 #endif
 
-	IAnimatedEntity* entity=sceneMgr->getEntity("beetle.xc3d");
+	IAnimatedEntity* entity=sceneMgr->getEntity("ninja_blue.ms3d");
+	//entity->getUnit(0)->getMaterial().PolygonMode=ENUM_POLYGON_MODE_LINE;
 	IAnimatedSceneNode* node=sceneMgr->addAnimatedSceneNode(entity);
 	node->setFrameLoop(0,0);
 	//临时需要drop，添加EntityCache后就不用了

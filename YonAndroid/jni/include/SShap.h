@@ -89,6 +89,10 @@ namespace scene{
 			return m_vertices.const_pointer();
 		}
 		virtual void* getVertices(){
+#if 0
+			for (u32 i=0;i<m_vertices.size();++i)
+				YON_DEBUG("%.2f,%.2f,\r\n",m_vertices[i].pos.x,m_vertices[i].pos.y);
+#endif
 			return m_vertices.pointer();
 		}
 		virtual u32 getVertexCount() const{
@@ -99,6 +103,13 @@ namespace scene{
 			return m_indices.const_pointer();
 		}
 		virtual void* getIndices(){
+#if 0
+			if(VT==ENUM_VERTEX_TYPE_3V1T1C)
+			{
+				for(u32 i=0;i<m_indices.size();i+=3)
+					YON_DEBUG("%u,%u,%u\r\n",m_indices[i],m_indices[i+1],m_indices[i+2]);
+			}
+#endif
 			return m_indices.pointer();
 		}
 		virtual u32 getIndexCount() const{
