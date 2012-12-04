@@ -117,7 +117,9 @@ class yonAllocatorAlign
 {
 	enum{BLOCK_SIZE=1024};
 	enum{CHUNK_COUNT_PER_BLOCK=ChunkSize>BLOCK_SIZE?1:BLOCK_SIZE/ChunkSize};
-	YON_API static alignmentpool<ChunkSize,CHUNK_COUNT_PER_BLOCK,Align> pool;
+	//¼ûyon.cpp
+	//YON_API static alignmentpool<ChunkSize,CHUNK_COUNT_PER_BLOCK,Align> pool;
+	alignmentpool<ChunkSize,CHUNK_COUNT_PER_BLOCK,Align> pool;
 public:
 
 	//! Destructor
