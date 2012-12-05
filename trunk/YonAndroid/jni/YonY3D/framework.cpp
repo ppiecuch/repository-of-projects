@@ -78,7 +78,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	IAnimatedEntity* entity=sceneMgr->getEntity("ninja_blue.ms3d");
 	//entity->getUnit(0)->getMaterial().PolygonMode=ENUM_POLYGON_MODE_LINE;
 	IAnimatedSceneNode* node=sceneMgr->addAnimatedSceneNode(entity);
-	node->setFrameLoop(0,0);
+	//node->setFrameLoop(0,0);
 	//临时需要drop，添加EntityCache后就不用了
 	entity->drop();
 
