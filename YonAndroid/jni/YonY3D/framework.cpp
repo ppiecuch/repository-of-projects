@@ -75,10 +75,11 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/png/");
 #endif
 
-	IAnimatedEntity* entity=sceneMgr->getEntity("ninja_blue.ms3d");
+	IAnimatedEntity* entity=sceneMgr->getEntity("dwarf2.ms3d");
 	//entity->getUnit(0)->getMaterial().PolygonMode=ENUM_POLYGON_MODE_LINE;
 	IAnimatedSceneNode* node=sceneMgr->addAnimatedSceneNode(entity);
 	//node->setFrameLoop(0,0);
+	//node->setAnimationSpeed(1);
 	//临时需要drop，添加EntityCache后就不用了
 	entity->drop();
 
