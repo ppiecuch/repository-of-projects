@@ -58,7 +58,7 @@ namespace scene{
 		struct SJoint
 		{
 			SJoint() : UseAnimationFrom(0), LocalAnimatedMatrix_Animated(false), GlobalSkinningSpace(false),
-				positionHint(-1),scaleHint(-1),rotationHint(-1),GlobalInversedMatrix(true),LocalMatrix(true)
+				positionHint(-1),scaleHint(-1),rotationHint(-1),GlobalMatrix(true),GlobalAnimatedMatrix(true),LocalAnimatedMatrix(true),GlobalInversedMatrix(true),LocalMatrix(true)
 			{
 			}
 
