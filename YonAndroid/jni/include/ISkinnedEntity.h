@@ -103,6 +103,7 @@ namespace scene{
 			SJoint *UseAnimationFrom;
 			bool LocalAnimatedMatrix_Animated;
 
+			//TODO没用到，是否删除
 			bool GlobalSkinningSpace;
 
 			s32 positionHint;
