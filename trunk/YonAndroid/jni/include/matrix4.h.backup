@@ -15,8 +15,6 @@
 namespace yon{
 namespace core{
 
-	class quaternion;
-
 	template<class T>
 	class matrix4{
 	private:
@@ -99,12 +97,10 @@ namespace core{
 		mutable bool m_bIsIdentity : 1;
 		mutable bool m_bIsChanged : 1;
 		T M[16];
-
-		friend class quaternion;
 	public:
 		//T m[4][4];
 		matrix4(bool identity=false)
-			:m_bIsIdentity(identity),m_bIsChanged(!identity){
+			:m_bIsIdentity(false),m_bIsChanged(true){
 			if(identity==true){
 				makeIdentity();
 			}
@@ -123,29 +119,6 @@ namespace core{
 		matrix4(const matrix4<T>& other)
 			:m_bIsIdentity(false),m_bIsChanged(true){
 			*this=other;
-		}
-
-		matrix4(const T n11, const T n12, const T n13, const T n14,
-			const T n21, const T n22, const T n23, const T n24,
-			const T n31, const T n32, const T n33, const T n34,
-			const T n41, const T n42, const T n43, const T n44)
-			:m_bIsIdentity(false),m_bIsChanged(true){
-				M[0] = n11;
-				M[1] = n12;
-				M[2] = n13;
-				M[3] = n14;
-				M[4] = n21;
-				M[5] = n22;
-				M[6] = n23;
-				M[7] = n24;
-				M[8] = n31;
-				M[9] = n32;
-				M[10] = n33;
-				M[11] = n34;
-				M[12] = n41;
-				M[13] = n42;
-				M[14] = n43;
-				M[15] = n44;
 		}
 
 		inline void print() const{
@@ -187,8 +160,8 @@ namespace core{
 			m_bIsIdentity = true;
 		}
 		inline void makeTranspose(){
-			/*T temp;
-			for(int i=0;i<4;++i){
+			T temp;
+			/*for(int i=0;i<4;++i){
 				for(int j=0;j<i;++j){
 					temp=m[i][j];
 					m[i][j]=m[j][i];
@@ -199,15 +172,13 @@ namespace core{
 						M[1], M[5], M[9], M[13],
 						M[2], M[6], M[10], M[14],
 						M[3], M[7], M[11], M[15]);
-			tmp.m_bIsChanged=m_bIsChanged;
-			tmp.m_bIsIdentity=m_bIsIdentity;
 			*this = tmp;
 			//不用调整，转置行为不影响是否单位变化
 			//m_bIsChanged = true;
 		}
 		//不存在逆矩阵则返回false
 		inline bool makeInverse(){
-			
+			/*
 			int i, j, k;
 			T temp;
 			matrix4 tempMatrix(*this);
@@ -219,7 +190,7 @@ namespace core{
 				k = i;
 				for (j=i+1; j<4; j++)
 				{
-					if (fabs(tempMatrix.M[(j<<2)+i]) > fabs(tempMatrix.M[(i<<2)+i]))
+					if (fabs(tempMatrix.m[j][i]) > fabs(tempMatrix.m[i][i]))
 						k = j;
 				}
 				//如果主元所在行不是第i行，进行行交换
@@ -227,34 +198,34 @@ namespace core{
 				{
 					for (j=0; j<4; j++)
 					{
-						temp = tempMatrix.M[(i<<2)+j];
-						tempMatrix.M[(i<<2)+j] = tempMatrix.M[(k<<2)+j];
-						tempMatrix.M[(k<<2)+j] = temp;
+						temp = tempMatrix.m[i][j];
+						tempMatrix.m[i][j] = tempMatrix.m[k][j];
+						tempMatrix.m[k][j] = temp;
 						//result伴随交换
-						temp = result.M[(i<<2)+j];
-						result.M[(i<<2)+j]= result.M[(k<<2)+j];
-						result.M[(k<<2)+j] = temp;
+						temp = result.m[i][j];
+						result.m[i][j]= result.m[k][j];
+						result.m[k][j] = temp;
 					}
 				}
 				//判断主元是否为0, 若是, 则矩阵A不是满秩矩阵,不存在逆矩阵
-				if (tempMatrix.M[(i<<2)+i] == 0)
+				if (tempMatrix.m[i][i] == 0)
 					return false;
 				//消去src的第i列除去i行以外的各行元素
-				temp = tempMatrix.M[(i<<2)+i];
+				temp = tempMatrix.m[i][i];
 				for (j=0; j<4; j++)
 				{
-					tempMatrix.M[(i<<2)+j] /=temp;    //主对角线上的元素变为1
-					result.M[(i<<2)+j] /= temp;       //伴随计算
+					tempMatrix.m[i][j] /=temp;    //主对角线上的元素变为1
+					result.m[i][j] /= temp;       //伴随计算
 				}
 				for (j=0; j<4; j++)	
 				{
 					if (j != i)						//不是第i行
 					{
-						temp = tempMatrix.M[(j<<2)+i];
+						temp = tempMatrix.m[j][i];
 						for (k=0; k<4; k++)        //第j行元素 - i行元素*j列i行元素
 						{
-							tempMatrix.M[(j<<2)+k] -= tempMatrix.M[(i<<2)+k]*temp;
-							result.M[(j<<2)+k] -= result.M[(i<<2)+k]*temp;
+							tempMatrix.m[j][k] -= tempMatrix.m[i][k]*temp;
+							result.m[j][k] -= result.m[i][k]*temp;
 						}
 					}
 				}
@@ -264,10 +235,10 @@ namespace core{
 			//不用调整，取逆行为不影响是否单位变化
 			//m_bIsChanged = true;
 			return true;
-			
+			*/
 
 			//TODO *4改为移位
-			/*matrix4 matA(*this);
+			matrix4 matA(*this);
 			matrix4 matB(true);
 
 			u32 uiRow, uiColumn;
@@ -333,7 +304,7 @@ namespace core{
 			}
 
 			*this = matB;
-			return true;*/
+			return true;
 		}
 		inline void translate(T x,T y,T z){
 			//m[3][0]+=m[0][0]*x+m[1][0]*y+m[2][0]*z;
@@ -378,6 +349,7 @@ namespace core{
 			m_bIsChanged=true;
 		}
 		inline void setRotation(f32 degree,f32 x,f32 y,f32 z){
+			//TODO 未copy ms3d_demo
 			f32 mag=sqrt(x*x+y*y+z*z);
 			f32 sinAngle = sinf (degree * DEGTORAD);
 			f32 cosAngle = cosf (degree * DEGTORAD);
@@ -425,6 +397,7 @@ namespace core{
 
 				m_bIsChanged=true;
 			}
+			
 		}
 		inline void scale(f32 x,f32 y,f32 z){
 			matrix4 temp;
@@ -531,15 +504,15 @@ namespace core{
 			return m[quotient][remainder];
 		}*/
 		inline void rotateVector( vector3df& vect ) const{
-			vector3df tmp = vect;
-			vect.x = tmp.x*M[0] + tmp.y*M[4] + tmp.z*M[8];
-			vect.y = tmp.x*M[1] + tmp.y*M[5] + tmp.z*M[9];
-			vect.z = tmp.x*M[2] + tmp.y*M[6] + tmp.z*M[10];
-			//TODO 与ms3d_demo.InverseRotateVec不一致，使用ms3d_demo (本方法还未有用到)
 			/*vector3df tmp = vect;
+			vect.x = tmp.x*m[0][0] + tmp.y*m[1][0] + tmp.z*m[2][0];
+			vect.y = tmp.x*m[0][1] + tmp.y*m[1][1] + tmp.z*m[2][1];
+			vect.z = tmp.x*m[0][2] + tmp.y*m[1][2] + tmp.z*m[2][2];*/
+			//TODO 与ms3d_demo.InverseRotateVec不一致，使用ms3d_demo (本方法还未有用到)
+			vector3df tmp = vect;
 			vect.x = tmp.x*M[0] + tmp.y*M[1] + tmp.z*M[2];
 			vect.y = tmp.x*M[4] + tmp.y*M[5] + tmp.z*M[6];
-			vect.z = tmp.x*M[8] + tmp.y*M[9] + tmp.z*M[10];*/
+			vect.z = tmp.x*M[8] + tmp.y*M[9] + tmp.z*M[10];
 		}
 
 		inline matrix4<T>& setRotationDegrees( const vector3d<T>& rotation )
@@ -549,49 +522,55 @@ namespace core{
 
 		inline matrix4<T>& setRotationRadians( const vector3d<T>& rotation )
 		{
-			const f64 cr = cos( rotation.x );
+			/*const f64 cr = cos( rotation.x );
 			const f64 sr = sin( rotation.x );
 			const f64 cp = cos( rotation.y );
 			const f64 sp = sin( rotation.y );
 			const f64 cy = cos( rotation.z );
 			const f64 sy = sin( rotation.z );
 
-			//zyx
-			M[0] = (T)( cp*cy );
-			M[1] = (T)( cp*sy );
-			M[2] = (T)( -sp );
-
-			const f64 srsp = sr*sp;
-			const f64 crsp = cr*sp;
-
-			M[4] = (T)( srsp*cy-cr*sy );
-			M[5] = (T)( srsp*sy+cr*cy );
-			M[6] = (T)( sr*cp );
-
-			M[8] = (T)( crsp*cy+sr*sy );
-			M[9] = (T)( crsp*sy-sr*cy );
-			M[10] = (T)( cr*cp );
 			//yxz
 			//cp*cy+sp*sr*sy,	cp*-sy+sp*sr*cy,	sp*cr
 			//cr*sy,			cr*cy,				-sr
 			//-sp*cy+cp*sr*sy,	-sp*-sy+cp*sr*cy,	cp*cr
-			/*const f64 srsp = sr*sp;
+			const f64 srsp = sr*sp;
 			const f64 srcp = sr*cp;
 
-			M[0] = (T)( cp*cy+srsp*sy );
-			M[1] = (T)( cr*sy );
-			M[2] = (T)( -sp*cy+srcp*sy );
+			m[0][0] = (T)( cp*cy+srsp*sy );
+			m[0][1] = (T)( cr*sy );
+			m[0][2] = (T)( -sp*cy+srcp*sy );
 
-			M[4] = (T)( srsp*cy-cp*sy );
-			M[5] = (T)( cr*cy );
-			M[6] = (T)( srcp*cy+sy*sp );
+			m[1][0] = (T)( srsp*cy-cp*sy );
+			m[1][1] = (T)( cr*cy );
+			m[1][2] = (T)( srcp*cy+sy*sp );
 
-			M[8] = (T)( cr*sp );
-			M[9] = (T)( -sr );
-			M[10] = (T)( cr*cp );*/
+			m[2][0] = (T)( cr*sp );
+			m[2][1] = (T)( -sr );
+			m[2][2] = (T)( cr*cp );
 
 			m_bIsChanged=true;
+			return *this;*/
 
+			//TODO 优化
+			const f64 cx = cos( rotation.x );
+			const f64 sx = sin( rotation.x );
+			const f64 cy = cos( rotation.y );
+			const f64 sy = sin( rotation.y );
+			const f64 cz = cos( rotation.z );
+			const f64 sz = sin( rotation.z );
+
+			M[0] = (f32)(cy * cz);
+			M[1] = (f32)(cy * sz);
+			M[2] = (f32)(-sy);
+
+			M[3] = (f32)(sx * sy * cz - cx * sz);
+			M[4] = (f32)(sx * sy * sz + cx * cz);
+			M[5] = (f32)(sx * cy);
+
+			M[6] = (f32)(cx * sy * cz + sx * sz);
+			M[7] = (f32)(cx * sy * sz - sx * cz);
+			M[8] = (f32)(cx * cy);
+			m_bIsChanged=true;
 
 			return *this;
 		}
@@ -605,7 +584,7 @@ namespace core{
 			const core::vector3d<f64> invScale(core::reciprocal(scale.x),core::reciprocal(scale.y),core::reciprocal(scale.z));
 
 			//fix bug:1.#QNAN of X exceed 1/-1
-			f64 temp=core::clamp(M[9]*invScale.z,-1.0,1.0);
+			f64 temp=core::clamp(m[2][1]*invScale.z,-1.0,1.0);
 			f64 X = -asin(temp);
 			const f64 C = cos(X);
 			X *= RADTODEG64;
@@ -614,18 +593,18 @@ namespace core{
 			if (!core::iszero(C))
 			{
 				const f64 invC = core::reciprocal(C);
-				b = M[10] * invC * invScale.z;
-				a = M[8] * invC * invScale.z;
+				b = m[2][2] * invC * invScale.z;
+				a = m[2][0] * invC * invScale.z;
 				Y = atan2( a, b ) * RADTODEG64;
-				a = M[1] * invC * invScale.x;
-				b = M[5] * invC * invScale.y;
+				a = m[0][1] * invC * invScale.x;
+				b = m[1][1] * invC * invScale.y;
 				Z = atan2( a, b ) * RADTODEG64;
 			}
 			else
 			{
 				Y = 0.0;
-				a = -M[4] * invScale.y;
-				b = M[0] * invScale.x;
+				a = -m[1][0] * invScale.y;
+				b = m[0][0] * invScale.x;
 				Z = atan2( a, b ) * RADTODEG64;
 			}
 
@@ -857,9 +836,8 @@ namespace core{
 			//out.y = in.x*m[0][1] + in.y*m[1][1] + in.z*m[2][1] + m[3][1];
 			//out.z = in.x*m[0][2] + in.y*m[1][2] + in.z*m[2][2] + m[3][2];
 
-			out.x = in.x*M[0] + in.y*M[4] + in.z*M[8] + M[12];
-			out.y = in.x*M[1] + in.y*M[5] + in.z*M[9] + M[13];
-			out.z = in.x*M[2] + in.y*M[6] + in.z*M[10] + M[14];
+			out=in;
+			transformVect(out);
 		}
 	};
 

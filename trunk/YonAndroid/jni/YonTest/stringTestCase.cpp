@@ -2,7 +2,7 @@
 #include "stringTestCase.h"
 #include "yonUtil.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( stringTestCase );
 
 void stringTestCase::setUp()
 {
