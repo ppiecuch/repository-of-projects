@@ -108,14 +108,14 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	unit->drop();
 	entity->drop();
 
-	/*shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	teapotModel=sceneMgr->addModel(entity);
 	teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
-	entity->drop();*/
+	entity->drop();
 
 	//BUG：cube变透明了==>不是BUG，因为aura比cube晚绘制，所以aura的高光部分会与cube部分混合（理由：不叠加部分是正常的）
 	shap=geometryFty->createXYRectangle2D(-125,-125,125,125);
@@ -147,8 +147,8 @@ void drawFrame(){
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
 
-	//const core::vector3df trot=teapotModel->getRotation();
-	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
+	const core::vector3df trot=teapotModel->getRotation();
+	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
 	/*const core::vector3df psca=planeModel->getScale();
 	if(psca.x>4)
