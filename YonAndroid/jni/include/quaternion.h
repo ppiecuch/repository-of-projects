@@ -139,10 +139,14 @@ namespace core{
 
 	inline bool quaternion::operator==(const quaternion& other) const
 	{
-		return ((x == other.x) &&
-			(y == other.y) &&
-			(z == other.z) &&
-			(w == other.w));
+		//return ((x == other.x) &&
+		//	(y == other.y) &&
+		//	(z == other.z) &&
+		//	(w == other.w));
+		return core::equals(x,other.x)&&
+			core::equals(y,other.y)&&
+			core::equals(z,other.z)&&
+			core::equals(w,other.w);
 	}
 
 	inline bool quaternion::operator!=(const quaternion& other) const
@@ -169,7 +173,7 @@ namespace core{
 
 	inline quaternion& quaternion::operator=(const matrix4f& rMat)
 	{
-#ifdef _QUATERNION_USE_ORIGION_
+#if 1
 		//TODO 优化
 		//scale=reciprocal(scale)
 
@@ -177,55 +181,55 @@ namespace core{
 
 		if( diag > 0.0f )
 		{
-		const f32 scale = sqrtf(diag) * 2.0f; // get scale from diagonal
+			const f32 scale = sqrtf(diag) * 2.0f; // get scale from diagonal
 
-		// TODO: speed this up
-		x = ( rMat.M[6] - rMat.M[9]) / scale;
-		y = ( rMat.M[8] - rMat.M[2]) / scale;
-		z = ( rMat.M[1] - rMat.M[4]) / scale;
-		w = 0.25f * scale;
+			// TODO: speed this up
+			x = ( rMat.M[6] - rMat.M[9]) / scale;
+			y = ( rMat.M[8] - rMat.M[2]) / scale;
+			z = ( rMat.M[1] - rMat.M[4]) / scale;
+			w = 0.25f * scale;
 		}
 		else
 		{
-		if ( rMat.M[0]> rMat.M[5] && rMat.M[0] > rMat.M[10])
-		{
-		// 1st element of diag is greatest value
-		// find scale according to 1st element, and double it
-		//x=sqrt(m11-m22-m33+1)/2
-		const f32 scale = sqrtf( 1.0f + rMat[0] - rMat[5] - rMat[10]) * 2.0f;
+			if ( rMat.M[0]> rMat.M[5] && rMat.M[0] > rMat.M[10])
+			{
+				// 1st element of diag is greatest value
+				// find scale according to 1st element, and double it
+				//x=sqrt(m11-m22-m33+1)/2
+				const f32 scale = sqrtf( 1.0f + rMat.M[0] - rMat.M[5] - rMat.M[10]) * 2.0f;
 
-		// TODO: speed this up
-		x = 0.25f * scale;
-		y = (rMat.M[4] + rMat.M[1]) / scale;
-		z = (rMat.M[2] + rMat.M[8]) / scale;
-		w = (rMat.M[6] - rMat.M[9]) / scale;
-		}
-		else if ( rMat[5] > rMat[10])
-		{
-		// 2nd element of diag is greatest value
-		// find scale according to 2nd element, and double it
-		//y=sqrt(-m11+m22-m33+1)/2
-		const f32 scale = sqrtf( 1.0f + rMat.M[5] - rMat.M[0] - rMat.M[10]) * 2.0f;
+				// TODO: speed this up
+				x = 0.25f * scale;
+				y = (rMat.M[4] + rMat.M[1]) / scale;
+				z = (rMat.M[2] + rMat.M[8]) / scale;
+				w = (rMat.M[6] - rMat.M[9]) / scale;
+			}
+			else if ( rMat.M[5] > rMat.M[10])
+			{
+				// 2nd element of diag is greatest value
+				// find scale according to 2nd element, and double it
+				//y=sqrt(-m11+m22-m33+1)/2
+				const f32 scale = sqrtf( 1.0f + rMat.M[5] - rMat.M[0] - rMat.M[10]) * 2.0f;
 
-		// TODO: speed this up
-		x = (rMat.M[4] + rMat.M[1] ) / scale;
-		y = 0.25f * scale;
-		z = (rMat.M[9] + rMat.M[6] ) / scale;
-		w = (rMat.M[8] - rMat.M[2] ) / scale;
-		}
-		else
-		{
-		// 3rd element of diag is greatest value
-		// find scale according to 3rd element, and double it
-		//z=sqrt(-m11-m22+m33+1)/2
-		const f32 scale = sqrtf( 1.0f + rMat.M[10] - rMat.M[0] - rMat.M[5]) * 2.0f;
+				// TODO: speed this up
+				x = (rMat.M[4] + rMat.M[1] ) / scale;
+				y = 0.25f * scale;
+				z = (rMat.M[9] + rMat.M[8] ) / scale;
+				w = (rMat.M[8] - rMat.M[2] ) / scale;
+			}
+			else
+			{
+				// 3rd element of diag is greatest value
+				// find scale according to 3rd element, and double it
+				//z=sqrt(-m11-m22+m33+1)/2
+				const f32 scale = sqrtf( 1.0f + rMat.M[10] - rMat.M[0] - rMat.M[5]) * 2.0f;
 
-		// TODO: speed this up
-		x = (rMat.M[8] + rMat.M[2]) / scale;
-		y = (rMat.M[9] + rMat.M[6]) / scale;
-		z = 0.25f * scale;
-		w = (rMat.M[1] - rMat.M[4]) / scale;
-		}
+				// TODO: speed this up
+				x = (rMat.M[8] + rMat.M[2]) / scale;
+				y = (rMat.M[9] + rMat.M[6]) / scale;
+				z = 0.25f * scale;
+				w = (rMat.M[1] - rMat.M[4]) / scale;
+			}
 		}
 
 		return normalize();
@@ -369,29 +373,32 @@ namespace core{
 
 	inline quaternion& quaternion::set(f32 x, f32 y, f32 z)
 	{
+#ifdef _QUATERNION_USE_ORIGION_
 		f64 angle;
 		//zyx
-		//angle = x * 0.5;
-		//const f64 sr = sin(angle);
-		//const f64 cr = cos(angle);
+		angle = x * 0.5;
+		const f64 sr = sin(angle);
+		const f64 cr = cos(angle);
 
-		//angle = y * 0.5;
-		//const f64 sp = sin(angle);
-		//const f64 cp = cos(angle);
+		angle = y * 0.5;
+		const f64 sp = sin(angle);
+		const f64 cp = cos(angle);
 
-		//angle = z * 0.5;
-		//const f64 sy = sin(angle);
-		//const f64 cy = cos(angle);
+		angle = z * 0.5;
+		const f64 sy = sin(angle);
+		const f64 cy = cos(angle);
 
-		//const f64 cpcy = cp * cy;
-		//const f64 spcy = sp * cy;
-		//const f64 cpsy = cp * sy;
-		//const f64 spsy = sp * sy;
+		const f64 cpcy = cp * cy;
+		const f64 spcy = sp * cy;
+		const f64 cpsy = cp * sy;
+		const f64 spsy = sp * sy;
 
-		//X = (f32)(sr * cpcy - cr * spsy);
-		//Y = (f32)(cr * spcy + sr * cpsy);
-		//Z = (f32)(cr * cpsy - sr * spcy);
-		//W = (f32)(cr * cpcy + sr * spsy);
+		this->x = (f32)(sr * cpcy - cr * spsy);
+		this->y = (f32)(cr * spcy + sr * cpsy);
+		this->z = (f32)(cr * cpsy - sr * spcy);
+		this->w = (f32)(cr * cpcy + sr * spsy);
+
+		return normalize();
 		
 		/*angle = x * 0.5;
 		const f64 sp = sin(angle);
@@ -416,7 +423,7 @@ namespace core{
 		this->w = (f32)(cy * cpcr + sy * spsr);
 
 		return normalize();*/
-
+#else
 		//可看出是按zyx处理
 		f64 dSY = sin(z * 0.5f);
 		f64 dSP = sin(y * 0.5f);
@@ -482,6 +489,7 @@ namespace core{
 		this->w = (f32)(cy * cpcr + sy * spsr);
 
 		return normalize();*/
+#endif
 	}
 
 	inline quaternion& quaternion::set(const core::vector3df& vec)
@@ -512,7 +520,30 @@ namespace core{
 	//TODO 测试
 	inline matrix4f quaternion::getMatrix() const
 	{
-		
+#if 0
+		core::matrix4f dest;
+		dest[0] = 1.0f - 2.0f*y*y - 2.0f*z*z;
+		dest[4] = 2.0f*x*x + 2.0f*z*w;
+		dest[8] = 2.0f*x*z - 2.0f*y*w;
+		dest[12] = 0.0f;
+
+		dest[1] = 2.0f*x*y - 2.0f*z*w;
+		dest[5] = 1.0f - 2.0f*x*x - 2.0f*z*z;
+		dest[9] = 2.0f*z*y + 2.0f*x*w;
+		dest[13] = 0.0f;
+
+		dest[2] = 2.0f*x*z + 2.0f*y*w;
+		dest[6] = 2.0f*z*y - 2.0f*x*w;
+		dest[10] = 1.0f - 2.0f*x*x - 2.0f*y*y;
+		dest[14] = 0.0f;
+
+		dest[3] = 0.f;
+		dest[7] = 0.f;
+		dest[11] = 0.f;
+		dest[15] = 1.f;
+
+		return dest;
+#elif 1
 		const f32 xx2=x*x*2.0f;
 		const f32 xy2=x*y*2.0f;
 		const f32 xz2=x*z*2.0f;
@@ -529,37 +560,37 @@ namespace core{
 		//dest.m[0][0] = 1.0f - 2.0f*y*y - 2.0f*z*z;
 		//dest.m[0][1] = 2.0f*x*y + 2.0f*z*w;
 		//dest.m[0][2] = 2.0f*x*z - 2.0f*y*w;
-		dest[0] = 1.0f - yy2 - zz2;
-		dest[1] = xy2 + zw2;
-		dest[2] = xz2 - yw2;
-		dest[3] = 0.0f;
+		dest.M[0] = 1.0f - yy2 - zz2;
+		dest.M[1] = xy2 + zw2;
+		dest.M[2] = xz2 - yw2;
+		dest.M[3] = 0.0f;
 
 		//dest.m[1][0] = 2.0f*x*y - 2.0f*z*w;
 		//dest.m[1][1] = 1.0f - 2.0f*x*x - 2.0f*z*z;
 		//dest.m[1][2] = 2.0f*z*y + 2.0f*x*w;
-		dest[4] = xy2 - zw2;
-		dest[5] = 1.0f - xx2 - zz2;
-		dest[6] = yz2 + xw2;
-		dest[7] = 0.0f;
+		dest.M[4] = xy2 - zw2;
+		dest.M[5] = 1.0f - xx2 - zz2;
+		dest.M[6] = yz2 + xw2;
+		dest.M[7] = 0.0f;
 
 		//dest.m[2][0] = 2.0f*x*z + 2.0f*y*w;
 		//dest.m[2][1] = 2.0f*z*y - 2.0f*x*w;
 		//dest.m[2][2] = 1.0f - 2.0f*x*x - 2.0f*y*y;
-		dest[8] = xz2 + yw2;
-		dest[9] = yz2 - xw2;
-		dest[10] = 1.0f - xx2 - yy2;
-		dest[11] = 0.0f;
+		dest.M[8] = xz2 + yw2;
+		dest.M[9] = yz2 - xw2;
+		dest.M[10] = 1.0f - xx2 - yy2;
+		dest.M[11] = 0.0f;
 
-		dest[12] = 0.f;
-		dest[13] = 0.f;
-		dest[14] = 0.f;
-		dest[15] = 1.f;
+		dest.M[12] = 0.f;
+		dest.M[13] = 0.f;
+		dest.M[14] = 0.f;
+		dest.M[15] = 1.f;
 
 		return dest;
-		
+#else
 		//TODO 优化
 		//可看出与irrlicht的一致
-		/*matrix4f Mat(true);
+		matrix4f Mat(true);
 
 		Mat[0] = 1.0f - 2.0f * (y*y + z*z); 
 		Mat[1] = 2.0f * x * y + 2.0f * z * w;
@@ -575,7 +606,8 @@ namespace core{
 
 		Mat[15] = 1.0f;
 
-		return Mat;*/
+		return Mat;
+#endif
 	}
 
 	inline quaternion& quaternion::fromAngleAxis(f32 angle, const vector3df& axis)
@@ -663,7 +695,22 @@ namespace core{
 
 	inline void quaternion::toEuler(vector3df& euler) const
 	{
+
 		const f64 sqw = w*w;
+		const f64 sqx = x*x;
+		const f64 sqy = y*y;
+		const f64 sqz = z*z;
+
+		// heading = rotation about z-axis
+		euler.z = (f32) (atan2(2.0 * (x*y +z*w),(sqx - sqy - sqz + sqw)));
+
+		// bank = rotation about x-axis
+		euler.x = (f32) (atan2(2.0 * (y*z +x*w),(-sqx - sqy + sqz + sqw)));
+
+		// attitude = rotation about y-axis
+		euler.y = asinf( clamp(-2.0f * (x*z - y*w), -1.0f, 1.0f) );
+
+		/*const f64 sqw = w*w;
 		const f64 sqx = x*x;
 		const f64 sqy = y*y;
 		const f64 sqz = z*z;
@@ -675,7 +722,7 @@ namespace core{
 		euler.y = (f32) (atan2(2.0 * (x*z +w*y),(sqw - sqx - sqy + sqz)));
 
 		// bank = rotation about x-axis
-		euler.x = asinf( clamp(-2.0f * (y*z - w*x), -1.0f, 1.0f) );
+		euler.x = asinf( clamp(-2.0f * (y*z - w*x), -1.0f, 1.0f) );*/
 
 		/*f64 m11 = w*w + x*x - y*y - z*z;
 		f64 m21 = 2 * (x * y + z * w);
@@ -688,7 +735,81 @@ namespace core{
 		euler.z=(f32)atan2(m21, m11);*/
 	}
 
-	/*
+#ifdef _QUATERNION_USE_ORIGION_
+	inline quaternion& quaternion::slerp(quaternion q1, quaternion q2, f32 time)
+	{
+		f32 angle = q1.dotProduct(q2);
+
+		if (angle < 0.0f)
+		{
+			q1 *= -1.0f;
+			angle *= -1.0f;
+		}
+
+		f32 scale;
+		f32 invscale;
+
+		//it is impossible that angle <= -0.95f
+		//if ((angle + 1.0f) > 0.05f)
+		//{
+		if ((1.0f - angle) >= 0.05f) // spherical interpolation
+		{
+			const f32 theta = acosf(angle);
+			const f32 invsintheta = reciprocal(sinf(theta));
+			scale = sinf(theta * (1.0f-time)) * invsintheta;
+			invscale = sinf(theta * time) * invsintheta;
+		}
+		else // linear interploation
+		{
+			scale = 1.0f - time;
+			invscale = time;
+		}
+		//}
+		//else
+		//{
+		//	q2.set(-q1.Y, q1.X, -q1.W, q1.Z);
+		//	scale = sinf(PI * (0.5f - time));
+		//	invscale = sinf(PI * time);
+		//}
+
+		return (*this = (q1*scale) + (q2*invscale));
+
+		/*f32 angle = q1.dotProduct(q2);
+
+		if (angle < 0.0f)
+		{
+		q1 *= -1.0f;
+		angle *= -1.0f;
+		}
+
+		f32 scale;
+		f32 invscale;
+
+		if ((angle + 1.0f) > 0.05f)
+		{
+		if ((1.0f - angle) >= 0.05f) // spherical interpolation
+		{
+		const f32 theta = acosf(angle);
+		const f32 invsintheta = reciprocal(sinf(theta));
+		scale = sinf(theta * (1.0f-time)) * invsintheta;
+		invscale = sinf(theta * time) * invsintheta;
+		}
+		else // linear interploation
+		{
+		scale = 1.0f - time;
+		invscale = time;
+		}
+		}
+		else
+		{
+		q2.set(-q1.y, q1.x, -q1.w, q1.z);
+		scale = sinf(PI * (0.5f - time));
+		invscale = sinf(PI * time);
+		}
+
+		return (*this = (q1*scale) + (q2*invscale));*/
+	}
+#else
 	//- SLERP
 	//- Spherical Linear Interpolation between two Quaternions
 	inline quaternion& quaternion::slerp(quaternion q0, quaternion q1, f32 fInterp)
@@ -712,7 +833,7 @@ namespace core{
 		float fTheta = acosf(fDot);
 
 		*this=(q0 * sinf(fTheta * (1 - fInterp)) + q1 * sinf(fTheta * fInterp))/sinf(fTheta);
-		return *this;
+			return *this;
 	}
 
 	//- LERP
@@ -723,81 +844,8 @@ namespace core{
 		ret.normalize();
 		*this=ret;
 		return *this;
-	}*/
-
-	inline quaternion& quaternion::slerp(quaternion q1, quaternion q2, f32 time)
-	{
-		f32 angle = q1.dotProduct(q2);
-
-		if (angle < 0.0f)
-		{
-			q1 *= -1.0f;
-			angle *= -1.0f;
-		}
-
-		f32 scale;
-		f32 invscale;
-
-		//it is impossible that angle <= -0.95f
-		//if ((angle + 1.0f) > 0.05f)
-		//{
-			if ((1.0f - angle) >= 0.05f) // spherical interpolation
-			{
-				const f32 theta = acosf(angle);
-				const f32 invsintheta = reciprocal(sinf(theta));
-				scale = sinf(theta * (1.0f-time)) * invsintheta;
-				invscale = sinf(theta * time) * invsintheta;
-			}
-			else // linear interploation
-			{
-				scale = 1.0f - time;
-				invscale = time;
-			}
-		//}
-		//else
-		//{
-		//	q2.set(-q1.Y, q1.X, -q1.W, q1.Z);
-		//	scale = sinf(PI * (0.5f - time));
-		//	invscale = sinf(PI * time);
-		//}
-
-		return (*this = (q1*scale) + (q2*invscale));
-
-		/*f32 angle = q1.dotProduct(q2);
-
-		if (angle < 0.0f)
-		{
-			q1 *= -1.0f;
-			angle *= -1.0f;
-		}
-
-		f32 scale;
-		f32 invscale;
-
-		if ((angle + 1.0f) > 0.05f)
-		{
-			if ((1.0f - angle) >= 0.05f) // spherical interpolation
-			{
-				const f32 theta = acosf(angle);
-				const f32 invsintheta = reciprocal(sinf(theta));
-				scale = sinf(theta * (1.0f-time)) * invsintheta;
-				invscale = sinf(theta * time) * invsintheta;
-			}
-			else // linear interploation
-			{
-				scale = 1.0f - time;
-				invscale = time;
-			}
-		}
-		else
-		{
-			q2.set(-q1.y, q1.x, -q1.w, q1.z);
-			scale = sinf(PI * (0.5f - time));
-			invscale = sinf(PI * time);
-		}
-
-		return (*this = (q1*scale) + (q2*invscale));*/
 	}
+#endif
 }
 }
 #endif

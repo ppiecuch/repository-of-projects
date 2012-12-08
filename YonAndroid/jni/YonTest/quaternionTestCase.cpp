@@ -1,6 +1,6 @@
 #include "quaternionTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( quaternionTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( quaternionTestCase );
 
 void quaternionTestCase::setUp()
 {
@@ -108,15 +108,18 @@ void quaternionTestCase::Matrix()
 	m1.setRotationRadians(r1);
 	m1.print();
 
-	quaternion q1(r1);
+	quaternion q1(m1);
+	printf("%.2f,%.2f,%.2f,%.2f\r\n",q1.x,q1.y,q1.z,q1.w);
 	matrix4f m2=q1.getMatrix();
 	m2.print();
+	
+	quaternion q2=m2;
+	printf("%.2f,%.2f,%.2f,%.2f\r\n",q2.x,q2.y,q2.z,q2.w);
 
-	CPPUNIT_ASSERT(m1==m2);
+	CPPUNIT_ASSERT(q2==q1);
 
-	quaternion q2(m1);
-	matrix4f m3=q2.getMatrix();
-	m3.print();
+	quaternion q3(r1);
+	printf("%.2f,%.2f,%.2f,%.2f\r\n",q3.x,q3.y,q3.z,q3.w);
 
-	CPPUNIT_ASSERT(m3==m1);
+	CPPUNIT_ASSERT(q3==q1);
 }

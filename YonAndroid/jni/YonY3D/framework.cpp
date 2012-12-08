@@ -75,18 +75,18 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/png/");
 #endif
 
-	IAnimatedEntity* entity=sceneMgr->getEntity("enemy6.ms3d");
+	IAnimatedEntity* entity=sceneMgr->getEntity("enemy6.xc3d");
 	//entity->getUnit(0)->getMaterial().PolygonMode=ENUM_POLYGON_MODE_LINE;
 	IAnimatedSceneNode* node=sceneMgr->addAnimatedSceneNode(entity);
 	//node->setScale(core::vector3df(0.2f,0.2f,0.2f));
-	//node->setFrameLoop(0,0);
+	//node->setFrameLoop(10,10);
 	//node->setAnimationSpeed(0.3f);
 	//临时需要drop，添加EntityCache后就不用了
 	entity->drop();
 
 	//在世界坐标系下，以下结果表现为先沿Y轴偏移1个单位，再绕X转旋转90度，结果为（0，0，1）
 	//列向量右乘矩阵
-	core::matrix4f m1(true);
+	/*core::matrix4f m1(true);
 	m1.setRotation(90,1,0,0);
 	
 	core::matrix4f m2(true);
@@ -97,7 +97,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 
 	core::vector3df v=core::ORIGIN_VECTOR3DF;
 	mr.transformVect(v);
-	v.print();
+	v.print();*/
 
 	
 	return true;

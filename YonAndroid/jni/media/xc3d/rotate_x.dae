@@ -4,11 +4,11 @@
     <contributor>
       <author>Micheal</author>
       <authoring_tool>3dsMax 9 - Feeling ColladaMax v3.05B.</authoring_tool>
-      <comments>ColladaMax Export Options: ExportNormals=1;ExportEPolyAsTriangles=1;ExportXRefs=1;ExportSelected=0;ExportTangents=0;ExportAnimations=1;SampleAnim=1;ExportAnimClip=0;BakeMatrices=1;ExportRelativePaths=1;AnimStart=0;AnimEnd=0.1;</comments>
-      <source_data>file:///D:/Development/Workspace/3dsmax/scenes/rotate_x.max</source_data>
+      <comments>ColladaMax Export Options: ExportNormals=1;ExportEPolyAsTriangles=1;ExportXRefs=0;ExportSelected=0;ExportTangents=0;ExportAnimations=1;SampleAnim=1;ExportAnimClip=0;BakeMatrices=1;ExportRelativePaths=1;AnimStart=0;AnimEnd=0.1;</comments>
+      <source_data>file:///D:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/xc3d/rotate_x.max</source_data>
     </contributor>
-    <created>2012-12-01T11:58:12Z</created>
-    <modified>2012-12-01T11:58:14Z</modified>
+    <created>2012-12-08T14:09:39Z</created>
+    <modified>2012-12-08T14:09:40Z</modified>
     <unit meter="0.0254" name="inch"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -50,30 +50,76 @@
       <channel source="#Bone01-node-transform_Bone01-node_transform-sampler" target="Bone01-node/transform"/>
     </animation>
   </library_animations>
+  <library_images>
+    <image id="wood.png" name="wood_png">
+      <init_from>../wood.png</init_from>
+    </image>
+  </library_images>
   <library_materials>
-    <material id="ColorMaterial_99E4D600" name="ColorMaterial_99E4D600">
-      <instance_effect url="#ColorMaterial_99E4D600-fx"/>
+    <material id="Material_Skin00" name="Material_Skin00">
+      <instance_effect url="#Material_Skin00-fx"/>
+      <extra>
+        <technique profile="FCOLLADA">
+          <dynamic_attributes>
+            <DirectX_______ sid="DirectX_______">
+              <enabled type="bool">0</enabled>
+              <effect type="int">0</effect>
+              <dxStdMat type="bool">0</dxStdMat>
+            </DirectX_______>
+          </dynamic_attributes>
+        </technique>
+      </extra>
     </material>
   </library_materials>
   <library_effects>
-    <effect id="ColorMaterial_99E4D600-fx">
+    <effect id="Material_Skin00-fx" name="Material_Skin00">
       <profile_COMMON>
+        <newparam sid="wood_png-surface">
+          <surface type="2D">
+            <init_from>wood.png</init_from>
+            <format>A8R8G8B8</format>
+          </surface>
+        </newparam>
+        <newparam sid="wood_png-sampler">
+          <sampler2D>
+            <source>wood_png-surface</source>
+            <wrap_s>WRAP</wrap_s>
+            <wrap_t>WRAP</wrap_t>
+            <minfilter>NONE</minfilter>
+            <magfilter>NONE</magfilter>
+            <mipfilter>NONE</mipfilter>
+          </sampler2D>
+        </newparam>
         <technique sid="common">
-          <phong>
-            <emission>
-              <color>0 0 0 1</color>
-            </emission>
+          <blinn>
             <ambient>
-              <color>0.6 0.894118 0.839216 1</color>
+              <color>0.588235 0.588235 0.588235 1</color>
             </ambient>
             <diffuse>
-              <color>0.6 0.894118 0.839216 1</color>
+              <texture texture="wood_png-sampler" texcoord="CHANNEL1">
+                <extra>
+                  <technique profile="MAYA">
+                    <mirrorU>0</mirrorU>
+                    <mirrorV>0</mirrorV>
+                    <wrapU>1</wrapU>
+                    <wrapV>1</wrapV>
+                    <repeatU>1</repeatU>
+                    <repeatV>1</repeatV>
+                    <offsetU>0</offsetU>
+                    <offsetV>0</offsetV>
+                    <rotateUV>0</rotateUV>
+                  </technique>
+                  <technique profile="MAX3D">
+                    <amount>1</amount>
+                  </technique>
+                </extra>
+              </texture>
             </diffuse>
             <specular>
-              <color>1 1 1 1</color>
+              <color>0.9 0.9 0.9 1</color>
             </specular>
             <shininess>
-              <float>10</float>
+              <float>0.1</float>
             </shininess>
             <reflective>
               <color>0 0 0 1</color>
@@ -87,16 +133,27 @@
             <transparency>
               <float>1</float>
             </transparency>
-          </phong>
+          </blinn>
           <extra>
             <technique profile="FCOLLADA">
               <spec_level>
-                <float>0.2</float>
+                <float>0</float>
               </spec_level>
+              <emission_level>
+                <float>0</float>
+              </emission_level>
             </technique>
           </extra>
         </technique>
       </profile_COMMON>
+      <extra>
+        <technique profile="MAX3D">
+          <faceted>0</faceted>
+          <double_sided>0</double_sided>
+          <wireframe>0</wireframe>
+          <face_map>0</face_map>
+        </technique>
+      </extra>
     </effect>
   </library_effects>
   <library_geometries>
@@ -135,7 +192,7 @@
         <vertices id="Box01-mesh-vertices">
           <input semantic="POSITION" source="#Box01-mesh-positions"/>
         </vertices>
-        <triangles material="ColorMaterial" count="12">
+        <triangles material="Material_Skin00" count="12">
           <input semantic="VERTEX" source="#Box01-mesh-vertices" offset="0"/>
           <input semantic="NORMAL" source="#Box01-mesh-normals" offset="1"/>
           <input semantic="TEXCOORD" source="#Box01-mesh-map-channel1" offset="2" set="1"/>
@@ -192,7 +249,9 @@
           <skeleton>#Bone01-node</skeleton>
           <bind_material>
             <technique_common>
-              <instance_material symbol="ColorMaterial" target="#ColorMaterial_99E4D600"/>
+              <instance_material symbol="Material_Skin00" target="#Material_Skin00">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+              </instance_material>
             </technique_common>
           </bind_material>
         </instance_controller>
