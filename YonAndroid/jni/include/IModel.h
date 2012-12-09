@@ -57,6 +57,7 @@ namespace scene{
 			if(parent!=NULL){
 				m_parent->addChild(this);
 			}
+			//YON_DEBUG("model:%08X,parent:%08X\r\n",this,m_parent);
 		}
 		void setSceneManager(ISceneManager* newManager)
 		{
@@ -153,6 +154,8 @@ namespace scene{
 		virtual void setName(const c8* name)
 		{
 			m_name = name;
+			//if(m_name=="weapon")
+			//	YON_DEBUG("%s\r\n",m_parent->getName());
 		}
 
 
@@ -213,6 +216,8 @@ namespace scene{
 			{
 				mat.scale(m_relativeScale);
 			}
+			//if(m_name=="hp_hero1_attach")
+				//mat.print();
 			//m_bTransformationChanged=false;
 			//}
 			return mat;
@@ -253,6 +258,7 @@ namespace scene{
 			removeFromParent();
 
 			m_parent = newParent;
+			YON_DEBUG("setParent,model:%s,parent:%s\r\n",m_name.c_str(),m_parent->getName());
 
 			if (m_parent)
 				m_parent->addChild(this);
@@ -353,6 +359,11 @@ namespace scene{
 		hierarchy you might want to update the parents first.*/
 		virtual void updateAbsolutePosition()
 		{
+			if(m_name=="weapon")
+			{
+				const core::vector3df& v=m_parent->getAbsoluteTransformation().getTranslation();
+				YON_DEBUG("%s:%.2f,%.2f,%.2f\r\n",m_parent->getName(),v.x,v.y,v.z);
+			}
 			if (m_parent)
 			{
 				m_absoluteTransformation =m_parent->getAbsoluteTransformation() * getRelativeTransformation();

@@ -544,8 +544,8 @@ namespace core{
 
 		inline matrix4<T>& setRotationDegrees( const vector3d<T>& rotation )
 		{
-			if(core::equals(rotation.x,0)&&core::equals(rotation.y,0)&&core::equals(rotation.z,0))
-				return *this;
+			//if(core::equals(rotation.x,0)&&core::equals(rotation.y,0)&&core::equals(rotation.z,0))
+			//	return *this;
 			return setRotationRadians( rotation * core::DEGTORAD );
 		}
 
@@ -605,6 +605,8 @@ namespace core{
 		but the rotation will be equivalent, i.e. will have the same result when used to rotate a vector or node. */
 		inline vector3d<T> getRotationDegrees() const
 		{
+			//yxz
+			/*
 			const core::vector3d<T> scale = getScale();
 			const core::vector3d<f64> invScale(core::reciprocal(scale.x),core::reciprocal(scale.y),core::reciprocal(scale.z));
 
@@ -631,6 +633,47 @@ namespace core{
 				a = -M[4] * invScale.y;
 				b = M[0] * invScale.x;
 				Z = atan2( a, b ) * RADTODEG64;
+			}
+
+			// fix values that get below zero
+			// before it would set (!) values to 360
+			// that were above 360:
+			if (X < 0.0) X += 360.0;
+			if (Y < 0.0) Y += 360.0;
+			if (Z < 0.0) Z += 360.0;
+
+			return vector3d<T>((T)X,(T)Y,(T)Z);
+			*/
+			//zyx
+			const core::vector3d<T> scale = getScale();
+			const core::vector3d<f64> invScale(core::reciprocal(scale.x),core::reciprocal(scale.y),core::reciprocal(scale.z));
+
+			f64 Y = -asin(M[2]*invScale.x);
+			const f64 C = cos(Y);
+			Y *= RADTODEG64;
+
+			f64 rotx, roty, X, Z;
+
+			if (!core::iszero(C))
+			{
+				const f64 invC = core::reciprocal(C);
+				rotx = M[10] * invC * invScale.z;
+				roty = M[6] * invC * invScale.y;
+				X = atan2( roty, rotx ) * RADTODEG64;
+				rotx = M[0] * invC * invScale.x;
+				roty = M[1] * invC * invScale.x;
+				Z = atan2( roty, rotx ) * RADTODEG64;
+			}
+			else
+			{
+				//X = 0.0;
+				//rotx = M[5] * invScale.y;
+				//roty = -M[4] * invScale.y;
+				//Z = atan2( roty, rotx ) * RADTODEG64;
+				Z = 0.0;
+				rotx = M[8] * invScale.z;
+				roty = M[4] * invScale.y;
+				X = atan2(roty , rotx) * RADTODEG64;
 			}
 
 			// fix values that get below zero
