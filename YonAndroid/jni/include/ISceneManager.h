@@ -64,7 +64,7 @@ namespace scene{
 		//TODO Ìí¼Óparent,pos,rotation,scale
 		virtual IModel* addModel(IEntity* entity) = 0;
 		//TODO Ìí¼Óparent,pos,rotation,scale
-		virtual IAnimatedSceneNode* addAnimatedSceneNode(IAnimatedEntity* entity) = 0;
+		virtual IAnimatedSceneNode* addAnimatedSceneNode(IAnimatedEntity* entity,IModel* parent=NULL) = 0;
 
 		virtual IModel* getRootModel() = 0;
 

@@ -3,6 +3,7 @@
 
 #include "IModel.h"
 #include "yonString.h"
+#include "IBoneSceneNode.h"
 
 namespace yon{
 namespace scene{
@@ -46,7 +47,7 @@ namespace scene{
 
 		//! animates the joints in the mesh based on the current frame.
 		/** Also takes in to account transitions. */
-		virtual void animateJoints(bool CalculateAbsolutePositions=true) = 0;
+		//virtual void animateJoints(bool CalculateAbsolutePositions=true) = 0;
 		
 		//! Get a pointer to a joint in the mesh (if the mesh is a bone based mesh).
 		/** With this method it is possible to attach scene nodes to
@@ -63,10 +64,10 @@ namespace scene{
 		\return Pointer to the scene node which represents the joint
 		with the specified name. Returns 0 if the contained mesh is not
 		an skinned mesh or the name of the joint could not be found. */
-		//virtual IBoneSceneNode* getJointNode(const c8* jointName) = 0 ;
+		virtual IBoneSceneNode* getJointNode(const c8* jointName) = 0 ;
 
-		//! same as getJointNode(const c8* jointName), but based on id
-		//virtual IBoneSceneNode* getJointNode(u32 jointID) = 0;
+		//! same as getJointNode(const c8* jointName), but based on index
+		virtual IBoneSceneNode* getJointNode(u32 jointIndex) = 0;
 
 		//virtual bool attachSceneNodeToJoint(const core::stringc id,const IModel* node,const core::stringc jointName) = 0;
 		//virtual bool detachSceneNode(const core::stringc id) = 0;

@@ -64,6 +64,15 @@ namespace video{
 			( color & 0x000000F0) << 8);
 	}
 
+	//! Converts a 32bit (X8R8G8B8) color to a 16bit A1R5G5B5 color
+	inline u16 X8R8G8B8toA1R5G5B5(u32 color)
+	{
+		return (u16)(0x8000 |
+			( color & 0x00F80000) >> 9 |
+			( color & 0x0000F800) >> 6 |
+			( color & 0x000000F8) >> 3);
+	}
+
 	
 
 	//改为RGBA-->错了,OpenGL中顶点颜色使用的就是ABGR

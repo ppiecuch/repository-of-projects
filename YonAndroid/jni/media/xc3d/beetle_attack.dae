@@ -1127,7 +1127,7 @@
           </technique>
         </extra>
       </node>
-      <node id="master-node" name="master" type="NODE">
+      <node id="master-node" name="master" type="JOINT">
         <matrix>0 -1 0 0 0 0 1 0 -1 0 0 0 0 0 0 1</matrix>
         <node id="Bone06-node" name="Bone06" type="JOINT">
           <matrix sid="transform">-0.997308 -0.073331 0.000000 -8.75705 -0.000000 0 -1 -0.000000 0.073331 -0.997308 0 -0.291392 0 0 0 1</matrix>
