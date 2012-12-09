@@ -36,12 +36,13 @@ namespace scene{
 		core::list<IModel*> m_children;
 		core::list<animator::IAnimator*> m_animators;
 
-		bool m_bTransformationChanged;
-		core::matrix4f m_transformation;
-		core::vector3df m_position;
-		core::vector3df m_rotation;
-		core::vector3df m_scale;
+		//bool m_bTransformationChanged;
+		core::matrix4f m_absoluteTransformation;
+		core::vector3df m_relativePosition;
+		core::vector3df m_relativeRotation;
+		core::vector3df m_relativeScale;
 		bool m_bVisible;
+		core::stringc m_name;
 
 		u32 m_renderDebugConfig;
 
@@ -50,8 +51,8 @@ namespace scene{
 		IModel(IModel* parent,const core::vector3df& pos=core::vector3df(0,0,0),
 			const core::vector3df& rot=core::vector3df(0,0,0),
 			const core::vector3df& scale=core::vector3df(1,1,1)):
-			m_pSceneManager(NULL),m_parent(parent),m_position(pos),m_rotation(rot),m_scale(scale),
-			m_bTransformationChanged(true),m_bVisible(true)
+			m_pSceneManager(NULL),m_parent(parent),m_relativePosition(pos),m_relativeRotation(rot),m_relativeScale(scale),m_bVisible(true)
+			//m_bTransformationChanged(true),
 		{
 			if(parent!=NULL){
 				m_parent->addChild(this);
@@ -126,56 +127,109 @@ namespace scene{
 			m_renderDebugConfig = (m_renderDebugConfig & (~config)) |((((u32)!on)-1) & config);
 		}
 
+		//! Returns the parent of this scene node
+		/** \return A pointer to the parent. */
+		scene::IModel* getParent() const
+		{
+			return m_parent;
+		}
+		//! Returns a const reference to the list of all children.
+		/** \return The list of all children of this node. */
+		const core::list<IModel*>& getChildren() const
+		{
+			return m_children;
+		}
+
+
+		//! Returns the name of the node.
+		/** \return Name as character string. */
+		virtual const c8* getName() const
+		{
+			return m_name.c_str();
+		}
+
+		//! Sets the name of the node.
+		/** \param name New name of the scene node. */
+		virtual void setName(const c8* name)
+		{
+			m_name = name;
+		}
+
+
+		//! Sets the name of the node.
+		/** \param name New name of the scene node. */
+		virtual void setName(const core::stringc& name)
+		{
+			m_name = name;
+		}
+
 		virtual void setPosition(const core::vector3df& pos){
-			m_position=pos;
-			m_bTransformationChanged=true;
+			m_relativePosition=pos;
+			//m_bTransformationChanged=true;
 		}
 		virtual const core::vector3df& getPosition() const{
-			return m_position;
+			return m_relativePosition;
 		}
 		//! Gets the absolute position of the node in world coordinates.
+		/** If you want the position of the node relative to its parent,
+		use getPosition() instead.
+		\return The current absolute position of the scene node. */
 		virtual core::vector3df getAbsolutePosition()
 		{
-			//return AbsoluteTransformation.getTranslation();
-			return getAbsoluteTransformation().getTranslation();
+			return m_absoluteTransformation.getTranslation();
+			//return getAbsoluteTransformation().getTranslation();
 		}
 
 		virtual void setRotation(const core::vector3df& rotation){
-			m_rotation=rotation;
-			m_bTransformationChanged=true;
+			m_relativeRotation=rotation;
+			//m_bTransformationChanged=true;
 		}
 		virtual const core::vector3df& getRotation() const{
-			return m_rotation;
+			return m_relativeRotation;
 		}
 
 		virtual void setScale(const core::vector3df& scale){
-			m_scale=scale;
-			m_bTransformationChanged=true;
+			m_relativeScale=scale;
+			//m_bTransformationChanged=true;
 		}
 		virtual const core::vector3df& getScale() const{
-			return m_scale;
+			return m_relativeScale;
 		}
 
+		//! Get the absolute transformation of the node. Is recalculated every OnAnimate()-call.
+		//! \return The absolute transformation matrix.
 		virtual const core::matrix4f& getAbsoluteTransformation()
 		{
-			return getRelativeTransformation();
+			return m_absoluteTransformation;
 		}
 
-		virtual const core::matrix4f& getRelativeTransformation()
+		virtual const core::matrix4f getRelativeTransformation()
 		{
-			if(m_bTransformationChanged){
-				m_transformation.makeIdentity();
-				m_transformation.setRotationDegrees(m_rotation); 
-				m_transformation.setTranslation(m_position);
-				if (m_scale != core::IDENTITY_VECTOR3DF)
-				{
-					m_transformation.scale(m_scale);
-				}
-				m_bTransformationChanged=false;
+			//if(m_bTransformationChanged){
+			core::matrix4f mat(true);
+			mat.setRotationDegrees(m_relativeRotation); 
+			mat.setTranslation(m_relativePosition);
+			if (m_relativeScale != core::IDENTITY_VECTOR3DF)
+			{
+				mat.scale(m_relativeScale);
 			}
-			return m_transformation;
+			//m_bTransformationChanged=false;
+			//}
+			return mat;
+			/*core::matrix4f mat;
+			mat.setRotationDegrees(m_relativeRotation);
+			mat.setTranslation(m_relativePosition);
+
+			if (m_relativeScale != core::IDENTITY_VECTOR3DF)
+			{
+				mat.scale(m_relativeScale);
+			}
+
+			return mat;*/
 		}
 
+		/*
+		//deprecated
 		virtual void setTransformation(const core::matrix4f& m)
 		{
 			m_transformation=m;
@@ -183,7 +237,7 @@ namespace scene{
 			//m_rotation=m.getRotation();
 			m_position=m.getTranslation();
 			//m_scale=m.getScale();
-		}
+		}*/
 
 		virtual bool isVisible() const{
 			return m_bVisible;
@@ -283,7 +337,7 @@ namespace scene{
 					(*ait)->animateNode(this,timeMs);
 					
 				// update absolute position
-				//updateAbsolutePosition();
+				updateAbsolutePosition();
 
 				core::list<IModel*>::Iterator mit = m_children.begin();
 				for (; mit != m_children.end(); ++mit)
@@ -291,6 +345,20 @@ namespace scene{
 					(*mit)->onAnimate(timeMs);
 				}
 			}
+		}
+
+		//TODO ¸ÄÎªupdateAbsolutePositionIfNecessary
+		//! Updates the absolute position based on the relative and the parents position
+		/** Note: This does not recursively update the parents absolute positions, so if you have a deeper
+		hierarchy you might want to update the parents first.*/
+		virtual void updateAbsolutePosition()
+		{
+			if (m_parent)
+			{
+				m_absoluteTransformation =m_parent->getAbsoluteTransformation() * getRelativeTransformation();
+			}
+			else
+				m_absoluteTransformation = getRelativeTransformation();
 		}
 
 	};

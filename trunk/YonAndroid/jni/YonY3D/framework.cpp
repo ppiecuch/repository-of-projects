@@ -47,6 +47,10 @@ public:
 	}
 };
 
+IAnimatedEntity* roleEntity;
+IAnimatedEntity* weaponEntity;
+scene::IBoneSceneNode* dummy;
+
 bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
@@ -75,7 +79,19 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/png/");
 #endif
 
-	IAnimatedEntity* entity=sceneMgr->getEntity("enemy6.xc3d");
+	roleEntity=sceneMgr->getEntity("archer.xc3d");
+	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
+	roleEntity->drop();
+
+	roleNode->setPosition(core::vector3df(20,0,20));
+
+	dummy=roleNode->getJointNode("hp_hero1_attach");
+	weaponEntity=sceneMgr->getEntity("bow.xc3d");
+	
+	scene::IAnimatedSceneNode* weapon =sceneMgr->addAnimatedSceneNode(weaponEntity,dummy);
+	weaponEntity->drop();
+	/*
+	IAnimatedEntity* entity=sceneMgr->getEntity("knight.xc3d");
 	//entity->getUnit(0)->getMaterial().PolygonMode=ENUM_POLYGON_MODE_LINE;
 	IAnimatedSceneNode* node=sceneMgr->addAnimatedSceneNode(entity);
 	//node->setScale(core::vector3df(0.2f,0.2f,0.2f));
@@ -83,6 +99,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	//node->setAnimationSpeed(0.3f);
 	//临时需要drop，添加EntityCache后就不用了
 	entity->drop();
+	*/
 
 	//在世界坐标系下，以下结果表现为先沿Y轴偏移1个单位，再绕X转旋转90度，结果为（0，0，1）
 	//列向量右乘矩阵

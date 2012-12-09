@@ -544,11 +544,15 @@ namespace core{
 
 		inline matrix4<T>& setRotationDegrees( const vector3d<T>& rotation )
 		{
+			if(core::equals(rotation.x,0)&&core::equals(rotation.y,0)&&core::equals(rotation.z,0))
+				return *this;
 			return setRotationRadians( rotation * core::DEGTORAD );
 		}
 
 		inline matrix4<T>& setRotationRadians( const vector3d<T>& rotation )
 		{
+			if(core::equals(rotation.x,0)&&core::equals(rotation.y,0)&&core::equals(rotation.z,0))
+				return *this;
 			const f64 cr = cos( rotation.x );
 			const f64 sr = sin( rotation.x );
 			const f64 cp = cos( rotation.y );

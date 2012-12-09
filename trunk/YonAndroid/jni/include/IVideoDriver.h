@@ -35,6 +35,7 @@ namespace yon{
 	namespace video{
 
 		IImageLoader* createImageLoaderPNG();
+		IImageLoader* createImageLoaderTGA();
 		IImageLoader* createImageLoaderDDS();
 		IImageLoader* createImageLoaderPKM();
 		IImageLoader* createImageLoaderKTX();

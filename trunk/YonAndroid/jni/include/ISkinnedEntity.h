@@ -119,6 +119,16 @@ namespace scene{
 		/** \return Amount of joints in the skeletal animated mesh. */
 		virtual u32 getJointCount() const = 0;
 
+		//! Gets the name of a joint.
+		/** \param index: Zero based index of joint. The last joint has the number getJointCount()-1;
+		\return Name of joint and null if an error happened. */
+		virtual const c8* getJointName(u32 index) const = 0;
+
+		//! Gets a joint index from its name
+		/** \param name: Name of the joint.
+		\return index of the joint or -1 if not found. */
+		virtual s32 getJointIndex(const c8* name) const = 0;
+
 		//! Animates this mesh's joints based on frame input
 		virtual void animateEntity(f32 frame, f32 blend)=0;
 

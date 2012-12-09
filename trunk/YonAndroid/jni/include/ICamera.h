@@ -37,7 +37,7 @@ namespace camera{
 		bool m_bNeedUpload;
 		bool m_bDirectionNeedUpdate;
 		void updateDirection(){
-			m_direction=m_target-m_position;
+			m_direction=m_target-m_relativePosition;
 			m_bDirectionNeedUpdate=false;
 		}
 	public:
@@ -101,7 +101,7 @@ namespace camera{
 		}
 
 		virtual void setPosition(const core::vector3df& pos,bool symport=false){
-			if(pos!=m_position)
+			if(pos!=m_relativePosition)
 			{
 				if(symport)
 				{
