@@ -735,7 +735,7 @@ namespace core{
 		euler.z=(f32)atan2(m21, m11);*/
 	}
 
-#ifdef _QUATERNION_USE_ORIGION_
+#if 0
 	inline quaternion& quaternion::slerp(quaternion q1, quaternion q2, f32 time)
 	{
 		f32 angle = q1.dotProduct(q2);
@@ -750,27 +750,27 @@ namespace core{
 		f32 invscale;
 
 		//it is impossible that angle <= -0.95f
-		//if ((angle + 1.0f) > 0.05f)
-		//{
-		if ((1.0f - angle) >= 0.05f) // spherical interpolation
+		if ((angle + 1.0f) > 0.05f)
 		{
-			const f32 theta = acosf(angle);
-			const f32 invsintheta = reciprocal(sinf(theta));
-			scale = sinf(theta * (1.0f-time)) * invsintheta;
-			invscale = sinf(theta * time) * invsintheta;
+			if ((1.0f - angle) >= 0.05f) // spherical interpolation
+			{
+				const f32 theta = acosf(angle);
+				const f32 invsintheta = reciprocal(sinf(theta));
+				scale = sinf(theta * (1.0f-time)) * invsintheta;
+				invscale = sinf(theta * time) * invsintheta;
+			}
+			else // linear interploation
+			{
+				scale = 1.0f - time;
+				invscale = time;
+			}
 		}
-		else // linear interploation
+		else
 		{
-			scale = 1.0f - time;
-			invscale = time;
+			q2.set(-q1.y, q1.x, -q1.w, q1.z);
+			scale = sinf(PI * (0.5f - time));
+			invscale = sinf(PI * time);
 		}
-		//}
-		//else
-		//{
-		//	q2.set(-q1.Y, q1.X, -q1.W, q1.Z);
-		//	scale = sinf(PI * (0.5f - time));
-		//	invscale = sinf(PI * time);
-		//}
 
 		return (*this = (q1*scale) + (q2*invscale));
 

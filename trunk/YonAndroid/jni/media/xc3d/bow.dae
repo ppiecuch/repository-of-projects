@@ -5,10 +5,10 @@
       <author>Micheal</author>
       <authoring_tool>3dsMax 9 - Feeling ColladaMax v3.05B.</authoring_tool>
       <comments>ColladaMax Export Options: ExportNormals=1;ExportEPolyAsTriangles=1;ExportXRefs=0;ExportSelected=0;ExportTangents=0;ExportAnimations=0;SampleAnim=1;ExportAnimClip=0;BakeMatrices=1;ExportRelativePaths=1;AnimStart=0;AnimEnd=12.7667;</comments>
-      <source_data>file:///D:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/media/xc3d/archer.max</source_data>
+      <source_data>file:///D:/Development/Software/android-ndk-r7-crystax-5.beta2/samples/YonAndroid/jni/media/xc3d/archer.max</source_data>
     </contributor>
-    <created>2012-12-09T09:28:04Z</created>
-    <modified>2012-12-09T09:28:06Z</modified>
+    <created>2012-12-09T15:44:18Z</created>
+    <modified>2012-12-09T15:44:19Z</modified>
     <unit meter="0.0254" name="inch"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -180,7 +180,7 @@
   <library_visual_scenes>
     <visual_scene id="archer.max" name="archer_max">
         <node id="hero0_attach-node" name="hero0_attach" type="NODE">
-          <matrix>1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+          <matrix>1 0 0 0 0 0 -1 0 0 1 0 0 0 0 0 1</matrix>
           <instance_geometry url="#hero0_attach-mesh">
             <bind_material>
               <technique_common>
