@@ -166,10 +166,16 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
+	PROFILE_REGISTER_FRAME();
+	PROFILE_START_CALL(PROFILE_ID_1,begin);
 	videoDriver->begin(true,true,video::COLOR_DEFAULT);
+	PROFILE_END_CALL(PROFILE_ID_1);
 
+	PROFILE_START_CALL(PROFILE_ID_2,render);
 	sceneMgr->render(videoDriver);
+	PROFILE_END_CALL(PROFILE_ID_2);
 
+	PROFILE_START_CALL(PROFILE_ID_3,end);
 	const core::vector3df& cameraPos=pCamera->getPosition();
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,CAM:{%.2f,%.2f,%.2f}",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),cameraPos.x,cameraPos.y,cameraPos.z),core::ORIGIN_POSITION2DI,COLOR_GREEN);
@@ -181,8 +187,10 @@ void drawFrame(){
 	videoDriver->draw3DLine(core::vector3df(0,0,100),core::IDENTITY_VECTOR3DF,video::COLOR_BLUE);
 
 	videoDriver->end();
+	PROFILE_END_CALL(PROFILE_ID_3);
 }
 void destroy(){
+	PROFILE_REPORT();
 	engine->drop();
 	delete params.pEventReceiver;
 }
