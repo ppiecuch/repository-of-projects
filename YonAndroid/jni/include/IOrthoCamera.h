@@ -11,7 +11,7 @@ namespace camera{
 	protected:
 		f32 m_fLeft,m_fRight,m_fTop,m_fBottom;
 	public:
-		IOrthoCamera(IModel* parent=NULL,
+		IOrthoCamera(ISceneNode* parent=NULL,
 			const core::vector3df& pos = core::vector3df(0,0,-1),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,100)):
@@ -40,7 +40,7 @@ namespace camera{
 			return ENUM_CAMERA_TYPE_ORTHO;
 		}
 	};
-}//camera
-}//scene
-}//yon
+}
+}
+}
 #endif

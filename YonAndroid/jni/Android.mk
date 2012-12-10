@@ -281,6 +281,8 @@ yon_SOURCES :=   \
 		CAnimatedSceneNode.cpp \
 		CBoneSceneNode.cpp \
 		CEntityLoaderXC3D.cpp \
+		CEntityLoaderMS3D.cpp \
+		CEntityLoaderY3D.cpp \
 		CSkinnedEntity.cpp \
 		EncodeConvertor.cpp \
 		COrthoCamera.cpp \
@@ -289,7 +291,7 @@ yon_SOURCES :=   \
 		CWindowOrthoCamera.cpp \
 		CGeometryFactory.cpp \
 		CEntity.cpp \
-		CModel.cpp \
+		CSceneNode.cpp \
 		CSkyBox.cpp \
 		CGeomipmapTerrain.cpp \
 		CGeomipmapTerrain2.cpp \

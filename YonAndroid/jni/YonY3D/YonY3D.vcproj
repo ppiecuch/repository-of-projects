@@ -179,6 +179,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\TODO.txt"
+			>
+		</File>
+		<File
 			RelativePath=".\XC3DMeshLoader.cpp"
 			>
 			<FileConfiguration

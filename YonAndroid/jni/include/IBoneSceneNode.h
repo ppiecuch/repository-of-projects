@@ -1,18 +1,18 @@
 #ifndef _YON_SCENE_IBONESCENENODE_H_
 #define _YON_SCENE_IBONESCENENODE_H_
 
-#include "IModel.h"
+#include "ISceneNode.h"
 
 namespace yon{
 namespace scene{
 
 	//! Interface for bones used for skeletal animation.
 	/** Used with ISkinnedEntity and IAnimatedSceneNode. */
-	class IBoneSceneNode : public IModel{
+	class IBoneSceneNode : public ISceneNode{
 	public:
 
-		IBoneSceneNode(IModel* parent) :
-		  IModel(parent),PositionHint(-1),ScaleHint(-1),RotationHint(-1) { }
+		IBoneSceneNode(ISceneNode* parent) :
+		  ISceneNode(parent),PositionHint(-1),ScaleHint(-1),RotationHint(-1) { }
 
 		//! Get the index of the bone
 		virtual u32 getBoneIndex() const = 0;

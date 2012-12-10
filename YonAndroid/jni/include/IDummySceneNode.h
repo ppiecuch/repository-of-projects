@@ -1,7 +1,7 @@
 #ifndef _YON_SCENE_IDUMMYSCENENODE_H_
 #define _YON_SCENE_IDUMMYSCENENODE_H_
 
-#include "IModel.h"
+#include "ISceneNode.h"
 
 namespace yon{
 namespace scene{
@@ -14,7 +14,7 @@ namespace scene{
 	This scene node is for example used by the IAnimatedSceneNode for emulating
 	joint scene nodes when playing skeletal animations.
 	*/
-	class IDummySceneNode : public IModel{
+	class IDummySceneNode : public ISceneNode{
 	public:
 		//! Returns a reference to the current relative transformation matrix.
 		/** This is the matrix, this scene node uses instead of scale, translation

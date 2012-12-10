@@ -1,7 +1,7 @@
 #ifndef _YON_SCENE_IANIMATEDSCENENODE_H_
 #define _YON_SCENE_IANIMATEDSCENENODE_H_
 
-#include "IModel.h"
+#include "ISceneNode.h"
 #include "yonString.h"
 #include "IBoneSceneNode.h"
 
@@ -11,12 +11,12 @@ namespace scene{
 	class IAnimatedEntity;
 	class IBoneSceneNode;
 
-	class IAnimatedSceneNode : public IModel{
+	class IAnimatedSceneNode : public ISceneNode{
 	public:
-		IAnimatedSceneNode(IModel* parent,const core::vector3df& pos=core::vector3df(0,0,0),
+		IAnimatedSceneNode(ISceneNode* parent,const core::vector3df& pos=core::vector3df(0,0,0),
 			const core::vector3df& rot=core::vector3df(0,0,0),
 			const core::vector3df& scale=core::vector3df(1,1,1)):
-		IModel(parent,pos,rot,scale){}
+		ISceneNode(parent,pos,rot,scale){}
 
 		virtual ~IAnimatedSceneNode(){}
 		
@@ -69,7 +69,7 @@ namespace scene{
 		//! same as getJointNode(const c8* jointName), but based on index
 		virtual IBoneSceneNode* getJointNode(u32 jointIndex) = 0;
 
-		//virtual bool attachSceneNodeToJoint(const core::stringc id,const IModel* node,const core::stringc jointName) = 0;
+		//virtual bool attachSceneNodeToJoint(const core::stringc id,const ISceneNode* node,const core::stringc jointName) = 0;
 		//virtual bool detachSceneNode(const core::stringc id) = 0;
 	};
 }

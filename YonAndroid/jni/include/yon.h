@@ -66,7 +66,7 @@
 #include "IEntity.h" 
 #include "IAnimatedEntity.h"
 #include "IGeometryFactory.h" 
-#include "IModel.h" 
+#include "ISceneNode.h" 
 #include "ITerrainModel.h"
 #include "IWaterModel.h"
 #include "IAnimatedSceneNode.h"

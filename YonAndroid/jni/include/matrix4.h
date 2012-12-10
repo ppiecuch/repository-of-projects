@@ -79,6 +79,7 @@ namespace core{
 						return;
 					}
 			*/
+			m_bIsChanged=false;
 			if (!core::equals( M[ 0], (T)1 ) ||
 				!core::equals( M[ 5], (T)1 ) ||
 				!core::equals( M[10], (T)1 ) ||
@@ -437,10 +438,10 @@ namespace core{
 		inline void scale(const vector3d<T>& v){
 			scale(v.x,v.y,v.z);
 		}
-		inline void setScale(const vector3df& v){
+		inline void setScale(const vector3d<T>& v){
 			setScale(v.x,v.y,v.z);
 		}
-		inline void setScale(f32 x,f32 y,f32 z){
+		inline void setScale(T x,T y,T z){
 			//m[0][0] = (T)x;
 			//m[1][1] = (T)y;
 			//m[2][2] = (T)z;
