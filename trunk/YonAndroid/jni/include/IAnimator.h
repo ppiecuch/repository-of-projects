@@ -6,7 +6,7 @@
 
 namespace yon{
 namespace scene{
-	class IModel;
+	class ISceneNode;
 namespace animator{
 
 	enum ENUM_ANIMATOR_TYPE{
@@ -59,7 +59,7 @@ namespace animator{
 
 	class IAnimator : public virtual core::IReferencable, public event::IEventReceiver{
 	public:
-		virtual void animateNode(IModel* model, u32 timeMs) =0;
+		virtual void animateNode(ISceneNode* model, u32 timeMs) =0;
 		virtual ENUM_ANIMATOR_TYPE getType() const = 0;
 		virtual bool onEvent(const event::SEvent& event){return false;}
 		virtual bool isEventReceivable() const{return false;}

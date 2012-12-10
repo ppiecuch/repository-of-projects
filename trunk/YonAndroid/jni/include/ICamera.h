@@ -1,7 +1,7 @@
 #ifndef _YON_SCENE_CAMERA_ICAMERA_H_
 #define _YON_SCENE_CAMERA_ICAMERA_H_
 
-#include "IModel.h"
+#include "ISceneNode.h"
 #include "plane3d.h"
 #include "matrix4.h"
 #include "dimension2d.h"
@@ -19,7 +19,7 @@ namespace camera{
 		ENUM_CAMERA_TYPE_COUNT
 	};
 
-	class ICamera : public scene::IModel, public event::IEventReceiver{
+	class ICamera : public scene::ISceneNode, public event::IEventReceiver{
 	protected:
 		enum ENUM_FRUSTUM_TRANSFORM{
 			ENUM_FRUSTUM_TRANSFORM_VIEW = 0,		// ”Õºø’º‰æÿ’Û
@@ -41,10 +41,10 @@ namespace camera{
 			m_bDirectionNeedUpdate=false;
 		}
 	public:
-		ICamera(IModel* parent=NULL,const core::vector3df& pos=core::vector3df(0,0,1),
+		ICamera(ISceneNode* parent=NULL,const core::vector3df& pos=core::vector3df(0,0,1),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,-1),bool visible=false):
-			IModel(parent,pos),m_up(up),m_target(lookat),m_direction(lookat-pos),
+			ISceneNode(parent,pos),m_up(up),m_target(lookat),m_direction(lookat-pos),
 				m_bVisible(visible),m_fNear(1),m_fFar(3000.0f),m_bNeedUpload(true),
 				m_bDirectionNeedUpdate(true),m_bEventReceivable(true){
 				m_up.normalize();
@@ -106,11 +106,11 @@ namespace camera{
 				if(symport)
 				{
 					m_target=pos+getDirection();
-					IModel::setPosition(pos);
+					ISceneNode::setPosition(pos);
 				}
 				else
 				{
-					IModel::setPosition(pos);
+					ISceneNode::setPosition(pos);
 					m_bDirectionNeedUpdate=true;
 				}
 			}

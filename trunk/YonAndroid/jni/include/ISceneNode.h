@@ -1,5 +1,5 @@
-#ifndef _YON_SCENE_IMODEL_H_
-#define _YON_SCENE_IMODEL_H_
+#ifndef _YON_SCENE_ISCENENODE_H_
+#define _YON_SCENE_ISCENENODE_H_
 
 #include "IRenderable.h"
 #include "IReferencable.h"
@@ -29,11 +29,11 @@ namespace scene{
 
 	class ISceneManager;
 
-	class IModel : public virtual core::IReferencable, public virtual IRenderable{
+	class ISceneNode : public virtual core::IReferencable, public virtual IRenderable{
 	protected:
 		ISceneManager* m_pSceneManager;
-		IModel* m_parent;
-		core::list<IModel*> m_children;
+		ISceneNode* m_parent;
+		core::list<ISceneNode*> m_children;
 		core::list<animator::IAnimator*> m_animators;
 
 		//bool m_bTransformationChanged;
@@ -48,7 +48,7 @@ namespace scene{
 
 		
 		
-		IModel(IModel* parent,const core::vector3df& pos=core::vector3df(0,0,0),
+		ISceneNode(ISceneNode* parent,const core::vector3df& pos=core::vector3df(0,0,0),
 			const core::vector3df& rot=core::vector3df(0,0,0),
 			const core::vector3df& scale=core::vector3df(1,1,1)):
 			m_pSceneManager(NULL),m_parent(parent),m_relativePosition(pos),m_relativeRotation(rot),m_relativeScale(scale),m_bVisible(true),m_absoluteTransformation(true)
@@ -62,12 +62,12 @@ namespace scene{
 		void setSceneManager(ISceneManager* newManager)
 		{
 			m_pSceneManager=newManager;
-			core::list<IModel*>::Iterator it = m_children.begin();
+			core::list<ISceneNode*>::Iterator it = m_children.begin();
 			for (; it != m_children.end(); ++it){
 				(*it)->setSceneManager(newManager);
 			}
 		}
-		virtual void addChild(IModel* child)
+		virtual void addChild(ISceneNode* child)
 		{
 			if (child && (child != this))
 			{
@@ -80,9 +80,9 @@ namespace scene{
 				child->m_parent = this;
 			}
 		}
-		virtual bool removeChild(IModel* child)
+		virtual bool removeChild(ISceneNode* child)
 		{
-			core::list<IModel*>::Iterator it = m_children.begin();
+			core::list<ISceneNode*>::Iterator it = m_children.begin();
 			for (; it != m_children.end(); ++it){
 				if ((*it) == child)
 				{
@@ -96,7 +96,7 @@ namespace scene{
 		}
 		virtual void clearChildren()
 		{
-			core::list<IModel*>::Iterator it = m_children.begin();
+			core::list<ISceneNode*>::Iterator it = m_children.begin();
 			for (; it != m_children.end(); ++it)
 			{
 				(*it)->m_parent = NULL;
@@ -116,7 +116,7 @@ namespace scene{
 		//debug
 		//core::stringc debugName;
 
-		virtual ~IModel()
+		virtual ~ISceneNode()
 		{
 			// delete all children
 			clearChildren();
@@ -130,13 +130,13 @@ namespace scene{
 
 		//! Returns the parent of this scene node
 		/** \return A pointer to the parent. */
-		scene::IModel* getParent() const
+		scene::ISceneNode* getParent() const
 		{
 			return m_parent;
 		}
 		//! Returns a const reference to the list of all children.
 		/** \return The list of all children of this node. */
-		const core::list<IModel*>& getChildren() const
+		const core::list<ISceneNode*>& getChildren() const
 		{
 			return m_children;
 		}
@@ -257,7 +257,7 @@ namespace scene{
 		}
 		
 		//! Changes the parent of the scene node.
-		virtual void setParent(IModel* newParent)
+		virtual void setParent(ISceneNode* newParent)
 		{
 			grab();
 			removeFromParent();
@@ -282,7 +282,7 @@ namespace scene{
 		virtual void onRegisterForRender(){
 			if(m_bVisible)
 			{
-				core::list<IModel*>::Iterator it = m_children.begin();
+				core::list<ISceneNode*>::Iterator it = m_children.begin();
 				for (; it != m_children.end(); ++it)
 					(*it)->onRegisterForRender();
 			}
@@ -350,7 +350,7 @@ namespace scene{
 				// update absolute position
 				updateAbsolutePosition();
 
-				core::list<IModel*>::Iterator mit = m_children.begin();
+				core::list<ISceneNode*>::Iterator mit = m_children.begin();
 				for (; mit != m_children.end(); ++mit)
 				{
 					(*mit)->onAnimate(timeMs);

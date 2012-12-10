@@ -13,7 +13,7 @@ namespace camera{
 		f32 m_fFovy;
 		f32 m_fAspectRatio;
 	public:
-		IPerspCamera(IModel* parent=NULL,
+		IPerspCamera(ISceneNode* parent=NULL,
 			const core::vector3df& pos = core::vector3df(0,0,1),
 			const core::vector3df& up=core::vector3df(0,1,0),
 			const core::vector3df& lookat = core::vector3df(0,0,-1)):
@@ -38,7 +38,7 @@ namespace camera{
 		}
 
 	};
-}//camera
-}//scene
-}//yon
+}
+}
+}
 #endif
