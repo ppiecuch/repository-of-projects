@@ -19,7 +19,7 @@ namespace core{
 		vector3d(T x,T y,T z):x(x),y(y),z(z){}
 		vector3d(const vector3d<T>& other) : x(other.x), y(other.y), z(other.z) {}
 
-		inline void print(){
+		inline void print() const{
 			if(Logger){
 				YON_DEBUG("%.3f,%.3f,%.3f\n",x,y,z);
 			}else{

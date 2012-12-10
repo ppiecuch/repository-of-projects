@@ -648,7 +648,9 @@ namespace core{
 			const core::vector3d<T> scale = getScale();
 			const core::vector3d<f64> invScale(core::reciprocal(scale.x),core::reciprocal(scale.y),core::reciprocal(scale.z));
 
-			f64 Y = -asin(M[2]*invScale.x);
+			//fix bug:1.#QNAN of X exceed 1/-1
+			f64 temp=core::clamp(M[2]*invScale.x,-1.0,1.0);
+			f64 Y = -asin(temp);
 			const f64 C = cos(Y);
 			Y *= RADTODEG64;
 
@@ -666,14 +668,14 @@ namespace core{
 			}
 			else
 			{
-				//X = 0.0;
-				//rotx = M[5] * invScale.y;
-				//roty = -M[4] * invScale.y;
-				//Z = atan2( roty, rotx ) * RADTODEG64;
-				Z = 0.0;
-				rotx = M[8] * invScale.z;
-				roty = M[4] * invScale.y;
-				X = atan2(roty , rotx) * RADTODEG64;
+				X = 0.0;
+				rotx = M[5] * invScale.y;
+				roty = -M[4] * invScale.y;
+				Z = atan2( roty, rotx ) * RADTODEG64;
+				//Z = 0.0;
+				//rotx = M[8] * invScale.z;
+				//roty = M[4] * invScale.y;
+				//X = atan2(roty , rotx) * RADTODEG64;
 			}
 
 			// fix values that get below zero

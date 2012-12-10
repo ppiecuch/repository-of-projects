@@ -49,7 +49,9 @@ public:
 
 IAnimatedEntity* roleEntity;
 IAnimatedEntity* weaponEntity;
-scene::IBoneSceneNode* dummy;
+IAnimatedEntity* rideEntity;
+scene::IBoneSceneNode* ridgeDummy;
+scene::IBoneSceneNode* handDummy;
 
 bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	params.windowSize.w=width;
@@ -79,40 +81,52 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs->addWorkingDirectory("media/png/");
 #endif
 
-#if 0
-	const c8* roleName="box_translate.xc3d";
-	const c8* dummyName="Bone01";
-	const c8* weaponName="bow.xc3d";
-#else
-	const c8* roleName="archer.xc3d";
-	const c8* dummyName="hp_hero1_attach";
-	const c8* weaponName="bow.xc3d";
-#endif
+#if 1
+	const c8* roleName="knight.xc3d";
+	//const c8* dummyName="Bone01";
+	//const c8* weaponName="bow.xc3d";
 
 	roleEntity=sceneMgr->getEntity(roleName);
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
 	roleNode->setName(roleName);
 	roleEntity->drop();
+#else
+	const c8* roleName="archer.xc3d";
+	const c8* ridgeDummyName="hp_horse0_attach";
+	const c8* handDummyName="hp_hero1_attach";
+	const c8* weaponName="bow.xc3d";
+	const c8* rideName="horse.xc3d";
 
-	roleNode->setPosition(core::vector3df(20,0,20));
-	roleNode->setRotation(core::vector3df(0,90,0));
+	rideEntity=sceneMgr->getEntity(rideName);
+	IAnimatedSceneNode* rideNode=sceneMgr->addAnimatedSceneNode(rideEntity);
+	rideNode->setName(rideName);
+	rideEntity->drop();
 
-	dummy=roleNode->getJointNode(dummyName);
-	dummy->setName(dummyName);
-	YON_DEBUG("dummy:%s,%08X\r\n",dummy->getName(),dummy);
+	ridgeDummy=rideNode->getJointNode(ridgeDummyName);
+	ridgeDummy->setName(ridgeDummyName);
+
+	roleEntity=sceneMgr->getEntity(roleName);
+	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity,ridgeDummy);
+	roleNode->setName(roleName);
+	roleEntity->drop();
+
+	//roleNode->setPosition(core::vector3df(20,0,20));
+	roleNode->setRotation(core::vector3df(90,0,0));
+
+	handDummy=roleNode->getJointNode(handDummyName);
+	handDummy->setName(handDummyName);
+	//YON_DEBUG("handDummy:%s,%08X\r\n",handDummy->getName(),handDummy);
 	weaponEntity=sceneMgr->getEntity(weaponName);
 	
-	scene::IAnimatedSceneNode* weapon =sceneMgr->addAnimatedSceneNode(weaponEntity,dummy);
+	scene::IAnimatedSceneNode* weapon =sceneMgr->addAnimatedSceneNode(weaponEntity,handDummy);
 	//weapon->setRotation(core::vector3df(-90,0,0));
 	weapon->setName(weaponName);
 	//weapon->getMaterial(0).PolygonMode=ENUM_POLYGON_MODE_LINE;
-	YON_DEBUG("dummy:%s,weapon:%s,parent:%s\r\n",dummy->getName(),weapon->getName(),weapon->getParent()->getName());
+	YON_DEBUG("handDummy:%s,weapon:%s,parent:%s\r\n",handDummy->getName(),weapon->getName(),weapon->getParent()->getName());
 	weaponEntity->drop();
-
-	roleNode->setFrameLoop(12,13);
-	roleNode->setAnimationSpeed(0.3f);
-
-	Logger->setFormat(MASK_FORMAT_LOG);
+#endif
+	//roleNode->setFrameLoop(12,13);
+	//roleNode->setAnimationSpeed(0.3f);
 	/*
 	IAnimatedEntity* entity=sceneMgr->getEntity("knight.xc3d");
 	//entity->getUnit(0)->getMaterial().PolygonMode=ENUM_POLYGON_MODE_LINE;
@@ -138,6 +152,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	core::vector3df v=core::ORIGIN_VECTOR3DF;
 	mr.transformVect(v);
 	v.print();*/
+
 
 	
 	return true;
