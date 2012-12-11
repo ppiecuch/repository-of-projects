@@ -7,7 +7,7 @@
 #include <memory.h>
 #include "memorypool.h"
 #include "alignof.h"
-#include "alignmentpoolgroup.h"
+#include "alignmentpool.h"
 
 namespace yon
 {
@@ -153,10 +153,12 @@ template<typename T,size_t ChunkSize,size_t Align>
 alignmentpool<ChunkSize,yonAllocatorAlign<T,ChunkSize,Align>::CHUNK_COUNT_PER_BLOCK,Align> yonAllocatorAlign<T,ChunkSize,Align>::pool;
 */
 
-template<typename T,size_t Align=core::AlignOf<T>::ALIGNMENT>
+template<typename T,size_t ChunkSize=256,size_t Align=core::AlignOf<T>::ALIGNMENT>
 class yonAllocatorAlign
 {
-	static alignmentpoolgroup* poolgroup;
+	enum{BLOCK_SIZE=1024};
+	enum{CHUNK_COUNT_PER_BLOCK=ChunkSize>BLOCK_SIZE?1:BLOCK_SIZE/ChunkSize};
+	static alignmentpool<ChunkSize,CHUNK_COUNT_PER_BLOCK,Align> pool;
 public:
 
 	//! Destructor
@@ -166,16 +168,14 @@ public:
 	T* allocate(size_t cnt)
 	{
 		//return (T*)internal_new(cnt* sizeof(T));
-		//return NULL;
-		//return (T*)pool.allocate(sizeof(T),cnt);
-		return (T*)poolgroup->allocate(Align,sizeof(T),cnt);
+		return (T*)pool.allocate(sizeof(T),cnt);
 	}
 
 	//! Deallocate memory for an array of objects
 	void deallocate(T* ptr)
 	{
 		//internal_delete(ptr);
-		poolgroup->deallocate(Align,ptr);
+		pool.deallocate(ptr);
 	}
 
 	//! Construct an element
@@ -191,8 +191,8 @@ public:
 	}
 };
 
-template<typename T,size_t Align>
-alignmentpoolgroup* yonAllocatorAlign<T,Align>::poolgroup=alignmentpoolgroup::GetInstance();
+template<typename T,size_t ChunkSize,size_t Align>
+alignmentpool<ChunkSize,yonAllocatorAlign<T,ChunkSize,Align>::CHUNK_COUNT_PER_BLOCK,Align> yonAllocatorAlign<T,ChunkSize,Align>::pool;
 
 template<typename T>
 class yonAllocatorMalloc

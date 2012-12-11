@@ -39,7 +39,13 @@ int main(int argc, char* argv[]){
 	long long s;
 	int ms;
 
-	core::stringc str("%d",1);
+	//core::stringc str("%d",1);
+	core::stringc str1("");
+	printf("%d\r\n",str1.length());
+	core::stringc str2("		hello \n\t");
+	printf("%d\r\n",str2[0]);
+	printf("%d\r\n",str2.length());
+	printf("%d\r\n",str2.trim().length());
 
 	/*
 	//alignmentpool
