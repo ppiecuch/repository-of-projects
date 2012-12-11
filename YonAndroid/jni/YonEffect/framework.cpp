@@ -16,7 +16,6 @@ ITimer* timer=NULL;
 IRandomizer* randomizer=NULL;
 int     lastTime=0;
 
-IModel* cubeModel=NULL;
 CBillBoardAmt * p_BillboardAmt=NULL;
 CParticleSystem * p_ParticleSystem=NULL;
 CSpeEffectSet  *  p_SpeEffectSet=NULL;
