@@ -20,6 +20,108 @@ namespace core{
 	template<class T>
 	class matrix4{
 	private:
+
+		struct matrix2{
+			T M[4];
+
+			matrix2(){}
+
+			matrix2(const T n1, const T n2, const T n3, const T n4){
+				M[0] = n1;
+				M[1] = n2;
+				M[2] = n3;
+				M[3] = n4;
+			};
+
+			const T& operator[](u32 index) const { return M[index]; }
+
+			T& operator[](u32 index) { return M[index]; }
+
+			inline void setByProduct(const matrix2& a, const matrix2& b)
+			{
+				T x0 = (a[0] + a[3]) * (b[0] + b[3]);
+				T x1 = (a[1] + a[3]) * b[0];
+				T x2 = a[0] * (b[2] - b[3]);
+				T x3 = a[3] * (b[1] - b[0]);
+				T x4 = (a[0] + a[2]) * b[3];
+				T x5 = (a[1] - a[0]) * (b[0] + b[2]);
+				T x6 = (a[2] - a[3]) * (b[1] + b[3]);
+
+				M[0] = x0 + x3 -x4 + x6;
+				M[1] = x1 + x3;
+				M[2] = x2 + x4;
+				M[3] = x0 + x2 - x1 + x5;
+			}
+
+		};
+
+		//1969年斯特拉森利用分治策略并加上一些处理技巧设计出一种矩阵乘法。
+		inline void setByFastProduct(const matrix4& a,const matrix4& b){
+			static matrix2 x[7];
+
+			const T *m = a.M;
+			const T *n = b.M;
+
+			// (M0 + M3) * (N0 + N3)
+			matrix2 m0(m[0]+m[10],m[1]+m[11],m[4]+m[14],m[5]+m[15]);
+			matrix2 n0(n[0]+n[10],n[1]+n[11],n[4]+n[14],n[5]+n[15]);
+			x[0].setByProduct(m0,n0);
+
+			// (M1 + M3) * N0 
+			matrix2 m1(m[2]+m[10],m[3]+m[11],m[6]+m[14],m[7]+m[15]);
+			matrix2 n1(n[0],n[1],n[4],n[5]);
+			x[1].setByProduct(m1,n1);
+
+			// M0 * (N2 - N3) 
+			matrix2 m2(m[0],m[1],m[4],m[5]);
+			matrix2 n2(n[8]-n[10],n[9]-n[11],n[12]-n[14],n[13]-n[15]);
+			x[2].setByProduct(m2,n2);
+
+			// M3 * (N1 - N0)
+			matrix2 m3(m[10],m[11],m[14],m[15]);
+			matrix2 n3(n[2]-n[0],n[3]-n[1],n[6]-n[4],n[7]-n[5]);
+			x[3].setByProduct(m3,n3);
+
+			// (M0 + M2) * N3
+			matrix2 m4(m[0]+m[8],m[1]+m[9],m[4]+m[12],m[5]+m[13]);
+			matrix2 n4(n[10],n[11],n[14],n[15]);
+			x[4].setByProduct(m4,n4);
+
+			// (M1 - M0) * (N0 + N2) 
+			matrix2 m5(m[2]-m[0],m[3]-m[1],m[6]-m[4],m[7]-m[5]);
+			matrix2 n5(n[0]+n[8],n[1]+n[9],n[4]+n[12],n[5]+n[13]);
+			x[5].setByProduct(m5,n5);
+
+			// (M2 - M3) * (N1 + N3) 
+			matrix2 m6(m[8]-m[10],m[9]-m[11],m[12]-m[14],m[13]-m[15]);
+			matrix2 n6(n[2]+n[10],n[3]+n[11],n[6]+n[14],n[7]+n[15]);
+			x[6].setByProduct(m6,n6);
+
+			// X0 + X3 - X4 + X6
+			M[0]=x[0][0]+x[3][0]-x[4][0]+x[6][0];
+			M[1]=x[0][1]+x[3][1]-x[4][1]+x[6][1];
+			M[4]=x[0][2]+x[3][2]-x[4][2]+x[6][2];
+			M[5]=x[0][3]+x[3][3]-x[4][3]+x[6][3];
+
+			// X1 + X3
+			M[2]=x[1][0]+x[3][0];
+			M[3]=x[1][1]+x[3][1];
+			M[6]=x[1][2]+x[3][2];
+			M[7]=x[1][3]+x[3][3];
+
+			// X2 + X4
+			M[8]=x[2][0]+x[4][0];
+			M[9]=x[2][1]+x[4][1];
+			M[12]=x[2][2]+x[4][2];
+			M[13]=x[2][3]+x[4][3];
+
+			// X0 + X2 - X1 + X5
+			M[10]=x[0][0]+x[2][0]-x[1][0]+x[5][0];
+			M[11]=x[0][1]+x[2][1]-x[1][1]+x[5][1];
+			M[14]=x[0][2]+x[2][2]-x[1][2]+x[5][2];
+			M[15]=x[0][3]+x[2][3]-x[1][3]+x[5][3];
+
+		}
 		//无论dx还是opengl，所表示的矢量和矩阵都是依据线性代数中的标准定义的：
 		//“矩阵A与B的乘积矩阵C的第i行第j列的元素c(ij)等于A的第i行于B的第j列的对应元素乘积的和。”（实用数学手册，科学出版社，第二版）
 		//a00 a10 a20 a30    b00 b10 b20 b30   c00 c10 c20 c30
@@ -487,7 +589,8 @@ namespace core{
 
 		inline matrix4<T> operator*(const matrix4<T>& other) const{
 			 matrix4<T> r;
-			 r.setByProduct(*this,other);
+			 //r.setByProduct(*this,other);
+			 r.setByFastProduct(*this,other);
 			 return r;
 		}
 		inline matrix4<T>& operator=(const matrix4<T>& other){

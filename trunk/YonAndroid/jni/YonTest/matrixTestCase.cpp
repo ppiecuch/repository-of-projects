@@ -33,7 +33,7 @@ void matrixTestCase::transformVect2(){
 }
 void matrixTestCase::getRotationDegrees(){
 	matrix4f m1(true);
-	core::vector3df r=core::vector3df(30.f,270.f,120.f);
+	core::vector3df r=core::vector3df(30.f,70.f,120.f);
 	printf("%.2f,%.2f,%.2f\n",r.x,r.y,r.z);
 	m1.setRotationDegrees(r);
 	m1.translate(11.f,12.f,33.f);
