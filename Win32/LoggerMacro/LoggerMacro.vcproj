@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Allocator"
-	ProjectGUID="{53D5AB9D-7619-4953-AD69-44732E2257BA}"
-	RootNamespace="Allocator"
+	Name="LoggerMacro"
+	ProjectGUID="{606EF6E0-D9D9-4754-92F4-CE2E0F8A2D16}"
+	RootNamespace="LoggerMacro"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -166,71 +166,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\alignmentpool.h"
-			>
-		</File>
-		<File
-			RelativePath=".\alignmentpool.h.maybe"
-			>
-		</File>
-		<File
-			RelativePath=".\alignmentpoolgroup.h.maybe"
-			>
-		</File>
-		<File
-			RelativePath=".\alignof.h"
-			>
-		</File>
-		<File
-			RelativePath=".\fastatof.h"
-			>
-		</File>
-		<File
-			RelativePath=".\heapsort.h"
-			>
-		</File>
-		<File
 			RelativePath=".\main.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\memorypool.h"
-			>
-		</File>
-		<File
-			RelativePath=".\todo.txt"
-			>
-		</File>
-		<File
-			RelativePath=".\yonAllocator.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonArray.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonConfig.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonList.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonMap.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonMath.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonString.h"
-			>
-		</File>
-		<File
-			RelativePath=".\yonTypes.h"
 			>
 		</File>
 	</Files>
