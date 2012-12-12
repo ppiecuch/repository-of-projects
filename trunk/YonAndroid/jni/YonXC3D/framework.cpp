@@ -85,7 +85,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 #endif
 #if 1
 
-	const c8* roleName="knight_female_show.xc3d";
+	const c8* roleName="knight_female_stand2.xc3d";
 
 	roleEntity=sceneMgr->getEntity(roleName);
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
