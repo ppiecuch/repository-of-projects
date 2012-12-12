@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 	setlocale(LC_CTYPE,"UTF-8");
 
 	cb=new MyCallback();
-	init(NULL,cb,800,480);
+	init(NULL,cb,NULL,NULL,800,480);
 
 	while(getEngine()->run()){
 		drawFrame();

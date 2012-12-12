@@ -314,6 +314,7 @@ yon_SOURCES :=   \
 		CYonEngineAndroid.cpp \
 		CImage.cpp \
 		CImageLoaderPNG.cpp \
+		CImageLoaderTGA.cpp \
 		CImageLoaderDDS.cpp \
 		CImageLoaderPKM.cpp \
 		CImageLoaderKTX.cpp \

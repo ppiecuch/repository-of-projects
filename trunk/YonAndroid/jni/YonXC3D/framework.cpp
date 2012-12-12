@@ -50,6 +50,7 @@ IAnimatedEntity* weaponEntity;
 IAnimatedEntity* rideEntity;
 scene::IBoneSceneNode* ridgeDummy;
 scene::IBoneSceneNode* handDummy;
+scene::IBoneSceneNode* weaponDummy;
 
 bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
@@ -82,16 +83,54 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs->addWorkingDirectory("media/xc3d",true);
 	fs->addWorkingDirectory("media/ms3d",true);
 #endif
+#if 1
 
-#if 0
-	const c8* roleName="ghost.xc3d";
-	//const c8* dummyName="Bone01";
-	//const c8* weaponName="bow.xc3d";
+	const c8* roleName="knight_female_show.xc3d";
 
 	roleEntity=sceneMgr->getEntity(roleName);
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
 	roleNode->setName(roleName);
 	roleEntity->drop();
+#elif 1
+
+	const c8* roleName="ghost.xc3d";
+	const c8* dummyName="Bone23";
+	const c8* weaponName="bow.xc3d";
+
+	roleEntity=sceneMgr->getEntity(roleName);
+	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
+	roleNode->setName(roleName);
+	roleEntity->drop();
+
+	weaponDummy=roleNode->getJointNode(dummyName);
+	weaponDummy->setName(dummyName);
+
+	weaponEntity=sceneMgr->getEntity(weaponName);
+	scene::IAnimatedSceneNode* weapon =sceneMgr->addAnimatedSceneNode(weaponEntity,weaponDummy);
+	weapon->setName(weaponName);
+	weaponEntity->drop();
+
+
+#elif 1
+	const c8* roleName="knight_dummy.xc3d";
+	const c8* dummyName="Dummy01";
+	const c8* weaponName="bow.xc3d";
+
+	roleEntity=sceneMgr->getEntity(roleName);
+	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
+	roleNode->setName(roleName);
+	roleEntity->drop();
+
+	roleNode->setPosition(core::vector3df(0,0,200));
+
+	weaponDummy=roleNode->getJointNode(dummyName);
+	weaponDummy->setName(dummyName);
+
+	weaponEntity=sceneMgr->getEntity(weaponName);
+	scene::IAnimatedSceneNode* weapon =sceneMgr->addAnimatedSceneNode(weaponEntity,weaponDummy);
+	weapon->setName(weaponName);
+	weaponEntity->drop();
+
 #else
 	const c8* roleName="archer.xc3d";
 	const c8* ridgeDummyName="hp_horse0_attach";
