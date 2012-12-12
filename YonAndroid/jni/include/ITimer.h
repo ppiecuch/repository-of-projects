@@ -16,6 +16,7 @@ namespace yon{
 		virtual u32 getTime() const = 0;
 		virtual u32 getRealTime() = 0;
 		virtual void tick() = 0;
+		virtual void reset() = 0;
 	};
 
 	extern "C" YON_API ITimer* createTimer();

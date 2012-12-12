@@ -4,6 +4,7 @@
 #include "ISceneNode.h"
 #include "yonString.h"
 #include "IBoneSceneNode.h"
+#include "IAnimationEndCallBack.h"
 
 namespace yon{
 namespace scene{
@@ -71,6 +72,12 @@ namespace scene{
 
 		//virtual bool attachSceneNodeToJoint(const core::stringc id,const ISceneNode* node,const core::stringc jointName) = 0;
 		//virtual bool detachSceneNode(const core::stringc id) = 0;
+
+		//! Sets a callback interface which will be called if an animation playback has ended.
+		/** Set this to 0 to disable the callback again.
+		Please note that this will only be called when in non looped
+		mode, see IAnimatedMeshSceneNode::setLoopMode(). */
+		virtual void setAnimationEndCallback(IAnimationEndCallBack* callback=0) = 0;
 	};
 }
 }

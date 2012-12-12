@@ -168,6 +168,14 @@ namespace scene{
 		//! Check if the mesh is non-animated
 		virtual bool isStatic()=0;
 
+		//! Use animation from another entity
+		/** The animation is linked (not copied) based on joint names
+		so make sure they are unique.
+		\return True if all joints in this entity were
+		matched up (empty names will not be matched, and it's case
+		sensitive). Unmatched joints will not be animated. */
+		virtual bool useAnimationFrom(ISkinnedEntity *entity) = 0;
+
 		//TODO
 		//virtual bool attachSkeleton(ISkeleton* skeleton) = 0;
 	};
