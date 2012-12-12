@@ -12,8 +12,17 @@ ICamera* pOrthoCamera=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
-
+ITimer* timer=NULL;
 f32 factor=1.1f;
+
+IAnimatedEntity* roleEntity;
+IAnimatedEntity* weaponEntity;
+IAnimatedEntity* rideEntity;
+ISkinnedEntity* skeletonEntity;
+IAnimatedSceneNode* roleNode;
+scene::IBoneSceneNode* ridgeDummy;
+scene::IBoneSceneNode* handDummy;
+scene::IBoneSceneNode* weaponDummy;
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -25,6 +34,14 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				if(roleNode)
+				{
+					ISkinnedEntity* modelEntity=(ISkinnedEntity*)roleNode->getEntity();
+					modelEntity->useAnimationFrom(modelEntity);
+					roleNode->setFrameLoop(0,modelEntity->getFrameCount());
+
+					roleNode->setLoopMode(false);
+				}
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
@@ -45,12 +62,19 @@ public:
 	}
 };
 
-IAnimatedEntity* roleEntity;
-IAnimatedEntity* weaponEntity;
-IAnimatedEntity* rideEntity;
-scene::IBoneSceneNode* ridgeDummy;
-scene::IBoneSceneNode* handDummy;
-scene::IBoneSceneNode* weaponDummy;
+
+
+class CRoleAnimationEndCallback : public IAnimationEndCallBack{
+public:
+	virtual void onAnimationEnd(IAnimatedSceneNode* node){
+
+		ISkinnedEntity* modelEntity=(ISkinnedEntity*)node->getEntity();
+		modelEntity->useAnimationFrom(skeletonEntity);
+		node->setFrameLoop(0,skeletonEntity->getFrameCount());
+
+		node->setLoopMode(true);
+	}
+};
 
 bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
@@ -68,6 +92,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
+	timer=engine->getTimer();
 	pCamera=sceneMgr->addCameraFPS();
 	pCamera->setFar(5000);
 	pCamera->setNear(1);
@@ -83,7 +108,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs->addWorkingDirectory("media/xc3d",true);
 	fs->addWorkingDirectory("media/ms3d",true);
 #endif
-#if 1
+#if 0
 
 	const c8* roleName="knight_female_stand2.xc3d";
 
@@ -91,6 +116,24 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
 	roleNode->setName(roleName);
 	roleEntity->drop();
+#elif 1
+
+	const c8* roleName="knight_female_show.xc3d";
+	const c8* skeletonName="knight_female_stand2.xc3d";
+
+	skeletonEntity=(ISkinnedEntity*)sceneMgr->getEntity(skeletonName);
+	
+	roleEntity=sceneMgr->getEntity(roleName);
+	roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
+	roleNode->setName(roleName);
+	roleEntity->drop();
+
+	IAnimationEndCallBack* cb=new CRoleAnimationEndCallback();
+	roleNode->setAnimationEndCallback(cb);
+	cb->drop();
+
+	roleNode->setLoopMode(false);
+	//roleNode->setAnimationSpeed(0.1f);	
 #elif 1
 
 	const c8* roleName="ghost.xc3d";
@@ -229,6 +272,8 @@ void drawFrame(){
 	PROFILE_END_CALL(PROFILE_ID_3);
 }
 void destroy(){
+	if(skeletonEntity)
+		skeletonEntity->drop();
 	PROFILE_REPORT();
 	engine->drop();
 	delete params.pEventReceiver;
