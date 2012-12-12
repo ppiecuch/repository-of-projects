@@ -92,12 +92,14 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	params.pCallback=pcb;
 	//params.fpsLimit=10;
+	params.appPath=appPath;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();

@@ -151,7 +151,11 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jb
 	g_env=pEnv;
 	callback=new MyCallback();
 	if(first)
-		init(pEnv,callback,width,height);
+	{
+		const char* root= pEnv->GetStringUTFChars(sdcardPath, 0);
+		init(pEnv,callback,NULL,root,width,height);
+		pEnv->ReleaseStringUTFChars(sdcardPath, root);
+	}
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	Logger->debug("nativeOnSurfaceChanged->w:%d,h:%d\n",w,h);
