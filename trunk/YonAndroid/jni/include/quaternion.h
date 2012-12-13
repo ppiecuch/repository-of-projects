@@ -73,6 +73,16 @@ namespace core{
 		//! Multiplication operator
 		quaternion& operator*=(const quaternion& other);
 
+		inline void print() const{
+			if(Logger){
+				YON_DEBUG("%.3f,%.3f,%.3f,%.3f\r\n",x,y,z,w);
+			}else{
+				//for(u32 i=0;i<4;++i)
+				//	printf("%.3f,%.3f,%.3f,%.3f\n\n",m[0][i],m[1][i],m[2][i],m[3][i]);
+				printf("%.3f,%.3f,%.3f,%.3f\r\n",x,y,z,w);
+			}
+		}
+
 		//! Calculates the dot product
 		f32 dotProduct(const quaternion& q2) const;
 

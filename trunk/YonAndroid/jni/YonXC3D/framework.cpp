@@ -73,6 +73,8 @@ public:
 		node->setFrameLoop(0,skeletonEntity->getFrameCount());
 
 		node->setLoopMode(true);
+		//roleNode->setAnimationSpeed(0.3f);	
+		//roleNode->setFrameLoop(9,9);	
 	}
 };
 
@@ -148,6 +150,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	cb->drop();
 
 	roleNode->setLoopMode(false);
+	//roleNode->setFrameLoop(7,11);
 	//roleNode->setAnimationSpeed(0.1f);	
 #elif 1
 
@@ -275,7 +278,7 @@ void drawFrame(){
 	PROFILE_START_CALL(PROFILE_ID_3,end);
 	const core::vector3df& cameraPos=pCamera->getPosition();
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,CAM:{%.2f,%.2f,%.2f}",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),cameraPos.x,cameraPos.y,cameraPos.z),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,CAM:{%.2f,%.2f,%.2f}:frame:%.2f",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),cameraPos.x,cameraPos.y,cameraPos.z,roleNode->getCurrentFrame()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
 	videoDriver->setTransform(ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);

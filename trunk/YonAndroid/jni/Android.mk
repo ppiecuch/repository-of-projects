@@ -325,6 +325,8 @@ yon_SOURCES :=   \
 LOCAL_MODULE    := engine
 		
 LOCAL_SRC_FILES := \
+		$(MyGUIEngine_SOURCES) \
+		$(MyGUIAdapter_SOURCES) \
 		$(iconv_SOURCES) \
 		$(zlib_SOURCES) \
 		$(lpng_SOURCES) \
@@ -332,12 +334,11 @@ LOCAL_SRC_FILES := \
 		$(ogg_SOURCES) \
 		$(vorbis_SOURCES) \
 		$(freetype_SOURCES) \
-		$(MyGUIEngine_SOURCES) \
-		$(MyGUIAdapter_SOURCES) \
 		$(yon_SOURCES)
 		
 		
 LOCAL_ARM_MODE   := arm 
-LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog
+LOCAL_SHORT_COMMANDS := true
+LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lstdc++
 include $(BUILD_STATIC_LIBRARY)
 
