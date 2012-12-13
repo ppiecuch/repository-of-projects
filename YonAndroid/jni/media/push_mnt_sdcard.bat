@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 set output=/mnt/sdcard/media
 
 cd /d %~dp0
-for /f "delims=" %%a In ('"dir * /a/b/s|findstr /v ".svn" "') do (
+for /f "delims=" %%a In ('"dir * /a/b/s|findstr /v ".svn"|findstr /v ".bat" "') do (
 set name=%%~fa
 set relative=!name:%cd%\=!
 set relative=!relative:\=/!

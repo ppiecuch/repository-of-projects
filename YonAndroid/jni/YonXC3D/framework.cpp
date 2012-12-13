@@ -110,7 +110,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 #endif
 #if 0
 
-	const c8* roleName="knight_female_stand2.xc3d";
+	const c8* roleName="ranger_male_show.xc3d";
 
 	roleEntity=sceneMgr->getEntity(roleName);
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
@@ -118,8 +118,23 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	roleEntity->drop();
 #elif 1
 
-	const c8* roleName="knight_female_show.xc3d";
-	const c8* skeletonName="knight_female_stand2.xc3d";
+	//const c8* roleName="knight_male_show.xc3d";
+	//const c8* skeletonName="knight_male_stand2.xc3d";
+
+	//const c8* roleName="knight_female_show.xc3d";
+	//const c8* skeletonName="knight_female_stand2.xc3d";
+
+	//const c8* roleName="ranger_female_show.xc3d";
+	//const c8* skeletonName="ranger_female_stand2.xc3d";
+
+	//const c8* roleName="magician_female_show.xc3d";
+	//const c8* skeletonName="magician_female_stand2.xc3d";
+
+	const c8* roleName="oracle_female_show.xc3d";
+	const c8* skeletonName="oracle_female_stand1.xc3d";
+
+	//const c8* roleName="magician_male_show.xc3d";
+	//const c8* skeletonName="magician_male_stand2.xc3d";
 
 	skeletonEntity=(ISkinnedEntity*)sceneMgr->getEntity(skeletonName);
 	
