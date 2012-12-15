@@ -11,15 +11,15 @@ ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 
-IModel* planeLPNG8=NULL;
-IModel* planeLPNG24=NULL;
-IModel* planeLAPNG8=NULL;
-IModel* planeLAPNG24=NULL;
-IModel* planeRGBPNG8=NULL;
-IModel* planeRGBPNG24=NULL;
-IModel* planeRGBAPNG8=NULL;
-IModel* planeRGBAPNG24=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* planeLPNG8=NULL;
+ISceneNode* planeLPNG24=NULL;
+ISceneNode* planeLAPNG8=NULL;
+ISceneNode* planeLAPNG24=NULL;
+ISceneNode* planeRGBPNG8=NULL;
+ISceneNode* planeRGBPNG24=NULL;
+ISceneNode* planeRGBAPNG8=NULL;
+ISceneNode* planeRGBAPNG24=NULL;
+ISceneNode* teapotModel=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -78,7 +78,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 #endif
 
 	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA,true);
-	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,true);
+	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,true);
 	
 
 	IShap *shap;
@@ -111,7 +111,7 @@ void drawFrame(){
 	gfAdapter->clearZ(-1000);
 	gfAdapter->drawImage("lpng8.png",0,0,32,32,10,10);
 	gfAdapter->drawImage("lpng24.png",0,0,32,32,50,10);
-	gfAdapter->drawImage("lapng8.png",0,0,64,32,100,10,true);
+	gfAdapter->drawImage("bigfont.png",0,0,64,32,100,10,true);
 	gfAdapter->drawImage("lapng24.png",0,0,64,32,170,10,true);
 
 	gfAdapter->drawImage("rgbpng8.png",0,0,64,64,10,100);
