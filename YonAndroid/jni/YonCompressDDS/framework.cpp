@@ -11,7 +11,7 @@ ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 
-IModel* cubeModel=NULL;
+ISceneNode* cubeModel=NULL;
 f32 factor=1.1f;
 
 
@@ -83,7 +83,6 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/compressTexture",true);
 #endif
 
-	IMaterial* material;
 	IShap *shap;
 	IUnit* unit;
 	IEntity* entity;
@@ -91,11 +90,13 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createCube(150,150,150);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	cubeModel=sceneMgr->addModel(entity);
-	material=cubeModel->getMaterial(0);
+	cubeModel=sceneMgr->addSceneNode(entity);
 	cubeModel->setPosition(core::vector3df(100,100,0));
-	material->setTexture(0,videoDriver->getTexture("effect.dds"));
-	material->setMaterialType(ENUM_MATERIAL_TYPE_LIGHTEN);
+	SMaterial& material=cubeModel->getMaterial(0);
+	material.setTexture(0,videoDriver->getTexture("rgbpng24.dds"));
+	material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT;
+	//material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+	//material.BlendDst=ENUM_BLEND_FACTOR_ONE;
 	shap->drop();
 	unit->drop();
 	entity->drop();
