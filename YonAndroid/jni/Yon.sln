@@ -254,6 +254,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonCore", "YonCore\YonCore.vcproj", "{81AEC631-B144-4B14-9A71-79BB3C271585}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonDAE", "YonDAE\YonDAE.vcproj", "{3269D091-8865-4372-A763-0BCE7E277CB9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

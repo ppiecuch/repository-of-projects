@@ -6,6 +6,7 @@
 #include "CWriteFileStream.h"
 #include "CLogger.h"
 #include "dae2y3d.h"
+#include "Importer.h"
 using namespace std;
 
 using namespace yon;
@@ -31,8 +32,28 @@ io::path getAbsolutePath(const io::path& filename){
 	return tmp;
 }
 
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <limits>
+
+#include "postprocess.h"
+#include "version.h"
+#include "scene.h"
+#include "Importer.hpp"
+#include "DefaultLogger.hpp"
+#include "AssimpPCH.h"
+
+#include <crtdbg.h>
+inline void EnableMemLeakCheck()
+{
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+}
+
 int main(int argc, char* argv[])
 {
+	EnableMemLeakCheck();
+
 	if(argc<3)
 	{
 		cout<<"No param!Please execute command as:"<<endl;
@@ -69,13 +90,17 @@ int main(int argc, char* argv[])
 
 	Logger=new debug::CLogger();
 	Logger->setFormat(debug::MASK_FORMAT_LOG);
-	IReadStream* in= new CReadFileStream(io::path(input),io::ENUM_ENDIAN_MODE_LITTLE);
+	/*IReadStream* in= new CReadFileStream(io::path(input),io::ENUM_ENDIAN_MODE_LITTLE);
 	IWriteStream* out= new CWriteFileStream(io::path(output),false,io::ENUM_ENDIAN_MODE_LITTLE);
 	XMLReader* reader=new CXMLReaderImpl<c8,core::IReferencable>(in);
 	dae2y3d(reader,out);
 	reader->drop();
 	in->drop();
-	out->drop();
+	out->drop();*/
+
+	Importer imp;
+	imp.ReadFile("../media/box_translate.dae",aiProcess_ValidateDataStructure);
+	const aiScene* scene=imp.GetScene();
 
 	Logger->drop();
 

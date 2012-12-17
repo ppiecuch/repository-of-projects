@@ -36,22 +36,6 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				if(roleNode)
-				{
-					ISkinnedEntity* modelEntity=(ISkinnedEntity*)roleNode->getEntity();
-					modelEntity->useAnimationFrom(modelEntity);
-					roleNode->setFrameLoop(0,modelEntity->getFrameCount());
-
-					roleNode->setLoopMode(false);
-				}
-				/*else
-				{
-					const c8* roleName="knight_male_show.xc3d";
-					roleEntity=sceneMgr->getEntity(roleName);
-					roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
-					roleNode->setName(roleName);
-					roleEntity->drop();
-				}*/
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
@@ -62,18 +46,6 @@ public:
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
 				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
-				if(roleNode)
-				{
-					ISkinnedEntity* modelEntity=(ISkinnedEntity*)roleNode->getEntity();
-					modelEntity->useAnimationFrom(modelEntity);
-					roleNode->setFrameLoop(0,modelEntity->getFrameCount());
-
-					roleNode->setLoopMode(false);
-				}
-				else
-				{
-					needLoad=true;
-				}
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
 				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
@@ -133,170 +105,13 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs->addWorkingDirectory("media/xc3d",true);
 	fs->addWorkingDirectory("media/ms3d",true);
 #endif
-#if 1
-	const c8* roleName="knight_male_show.xc3d";
+
+	const c8* roleName="triangle.dae";
 
 	roleEntity=sceneMgr->getEntity(roleName);
-	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
-	roleNode->setName(roleName);
+	//IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
+	//roleNode->setName(roleName);
 	roleEntity->drop();
-#elif 0
-	//测试动态加载
-#elif 1
-
-	//异常：股甲在stand2中有旋转偏移问题(从show切换到stand2才存在此问题，直接stand2不存在此问题)
-	const c8* roleName="knight_male_show.xc3d";
-	const c8* skeletonName="knight_male_stand2.xc3d";
-
-	//正常
-	//const c8* roleName="knight_female_show.xc3d";
-	//const c8* skeletonName="knight_female_stand2.xc3d";
-
-	//异常：切换有帧跳动现象
-	//const c8* roleName="ranger_male_show.xc3d";
-	//const c8* skeletonName="ranger_male_stand2.xc3d";
-
-	//异常：切换有帧跳动现象
-	//const c8* roleName="ranger_female_show.xc3d";
-	//const c8* skeletonName="ranger_female_stand2.xc3d";
-
-	//const c8* roleName="oracle_female_show.xc3d";
-	//const c8* skeletonName="oracle_female_stand1.xc3d";
-
-	//const c8* roleName="magician_male_show.xc3d";
-	//const c8* skeletonName="magician_male_stand2.xc3d";
-
-	//const c8* roleName="magician_female_show.xc3d";
-	//const c8* skeletonName="magician_female_stand2.xc3d";
-
-	PROFILE_REGISTER_FRAME();
-
-	PROFILE_START_CALL(PROFILE_ID_1,load);
-
-	skeletonEntity=(ISkinnedEntity*)sceneMgr->getEntity(skeletonName);
-	
-	roleEntity=sceneMgr->getEntity(roleName);
-	roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
-	roleNode->setName(roleName);
-	roleEntity->drop();
-
-	IAnimationEndCallBack* cb=new CRoleAnimationEndCallback();
-	roleNode->setAnimationEndCallback(cb);
-	cb->drop();
-
-	roleNode->setLoopMode(false);
-	//roleNode->setFrameLoop(7,11);
-	//roleNode->setAnimationSpeed(0.1f);	
-
-	PROFILE_END_CALL(PROFILE_ID_1);
-
-	PROFILE_REGISTER_FRAME();
-#elif 0
-
-	const c8* roleName="ghost.xc3d";
-	const c8* dummyName="Bone23";
-	const c8* weaponName="bow.xc3d";
-
-	roleEntity=sceneMgr->getEntity(roleName);
-	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
-	roleNode->setName(roleName);
-	roleEntity->drop();
-
-	weaponDummy=roleNode->getJointNode(dummyName);
-	weaponDummy->setName(dummyName);
-
-	weaponEntity=sceneMgr->getEntity(weaponName);
-	scene::IAnimatedSceneNode* weapon =sceneMgr->addAnimatedSceneNode(weaponEntity,weaponDummy);
-	weapon->setName(weaponName);
-	weaponEntity->drop();
-
-
-#elif 0
-	const c8* roleName="knight_dummy.xc3d";
-	const c8* dummyName="Dummy01";
-	const c8* weaponName="bow.xc3d";
-
-	roleEntity=sceneMgr->getEntity(roleName);
-	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
-	roleNode->setName(roleName);
-	roleEntity->drop();
-
-	roleNode->setPosition(core::vector3df(0,0,200));
-
-	weaponDummy=roleNode->getJointNode(dummyName);
-	weaponDummy->setName(dummyName);
-
-	weaponEntity=sceneMgr->getEntity(weaponName);
-	scene::IAnimatedSceneNode* weapon =sceneMgr->addAnimatedSceneNode(weaponEntity,weaponDummy);
-	weapon->setName(weaponName);
-	weaponEntity->drop();
-
-#else
-	const c8* roleName="archer.xc3d";
-	const c8* ridgeDummyName="hp_horse0_attach";
-	const c8* handDummyName="hp_hero1_attach";
-	const c8* weaponName="bow.xc3d";
-	const c8* rideName="horse.xc3d";
-
-	rideEntity=sceneMgr->getEntity(rideName);
-	IAnimatedSceneNode* rideNode=sceneMgr->addAnimatedSceneNode(rideEntity);
-	rideNode->setName(rideName);
-	rideEntity->drop();
-
-	rideNode->setPosition(core::vector3df(0,0,200));
-	rideNode->setRotation(core::vector3df(0,90,0));
-
-	ridgeDummy=rideNode->getJointNode(ridgeDummyName);
-	ridgeDummy->setName(ridgeDummyName);
-
-	roleEntity=sceneMgr->getEntity(roleName);
-	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity,ridgeDummy);
-	roleNode->setName(roleName);
-	roleEntity->drop();
-
-	roleNode->setRotation(core::vector3df(90,0,0));
-
-	handDummy=roleNode->getJointNode(handDummyName);
-	handDummy->setName(handDummyName);
-	//YON_DEBUG("handDummy:%s,%08X\r\n",handDummy->getName(),handDummy);
-	weaponEntity=sceneMgr->getEntity(weaponName);
-
-	scene::IAnimatedSceneNode* weapon =sceneMgr->addAnimatedSceneNode(weaponEntity,handDummy);
-	//weapon->setRotation(core::vector3df(-90,0,0));
-	weapon->setName(weaponName);
-	//weapon->getMaterial(0).PolygonMode=ENUM_POLYGON_MODE_LINE;
-	YON_DEBUG("handDummy:%s,weapon:%s,parent:%s\r\n",handDummy->getName(),weapon->getName(),weapon->getParent()->getName());
-	weaponEntity->drop();
-#endif
-	//roleNode->setFrameLoop(12,13);
-	//roleNode->setAnimationSpeed(0.3f);
-	/*
-	IAnimatedEntity* entity=sceneMgr->getEntity("knight.xc3d");
-	//entity->getUnit(0)->getMaterial().PolygonMode=ENUM_POLYGON_MODE_LINE;
-	IAnimatedSceneNode* node=sceneMgr->addAnimatedSceneNode(entity);
-	//node->setScale(core::vector3df(0.2f,0.2f,0.2f));
-	//node->setFrameLoop(10,10);
-	//node->setAnimationSpeed(0.3f);
-	//临时需要drop，添加EntityCache后就不用了
-	entity->drop();
-	*/
-
-	//在世界坐标系下，以下结果表现为先沿Y轴偏移1个单位，再绕X转旋转90度，结果为（0，0，1）
-	//列向量右乘矩阵
-	/*core::matrix4f m1(true);
-	m1.setRotation(90,1,0,0);
-
-	core::matrix4f m2(true);
-	m2.setTranslation(0,1,0);
-
-	core::matrix4f mr=m1*m2;
-	mr.print();
-
-	core::vector3df v=core::ORIGIN_VECTOR3DF;
-	mr.transformVect(v);
-	v.print();*/
-
-
 
 	return true;
 }
@@ -304,15 +119,6 @@ void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
 void drawFrame(){
-
-	if(needLoad&&roleNode==NULL)
-	{
-		const c8* roleName="knight_male_show.xc3d";
-		roleEntity=sceneMgr->getEntity(roleName);
-		roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
-		roleNode->setName(roleName);
-		roleEntity->drop();
-	}
 
 	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
@@ -331,7 +137,6 @@ void drawFrame(){
 	videoDriver->end();
 }
 void destroy(){
-	PROFILE_REPORT();
 	if(skeletonEntity)
 		skeletonEntity->drop();
 	engine->drop();

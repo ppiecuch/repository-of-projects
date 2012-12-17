@@ -123,7 +123,7 @@ namespace io{
 		virtual const char_type* getNodeData() const = 0;
 
 		//! Returns if an element is an empty element, like &lt;foo />
-		//virtual bool isEmptyElement() const = 0;
+		virtual bool isEmptyElement() const = 0;
 
 		//! Returns the encoding of the xml
 		virtual ENUM_ENCODING getEncoding() const = 0;
