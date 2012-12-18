@@ -106,11 +106,11 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs->addWorkingDirectory("media/ms3d",true);
 #endif
 
-	const c8* roleName="triangle.dae";
+	const c8* roleName="box_translate.dae";
 
 	roleEntity=sceneMgr->getEntity(roleName);
-	//IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
-	//roleNode->setName(roleName);
+	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
+	roleNode->setName(roleName);
 	roleEntity->drop();
 
 	return true;

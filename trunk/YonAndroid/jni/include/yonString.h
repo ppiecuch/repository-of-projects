@@ -56,8 +56,8 @@ namespace yon{
 			string(const c8* const pFmt,...):elements(NULL),capacity(0),len(0){
 				va_list args;
 				va_start(args,pFmt);
-				c8 buffer[1024];
-				vsprintf_s(buffer,1024,pFmt,args);
+				c8 buffer[65535];
+				vsprintf_s(buffer,65535,pFmt,args);
 				va_end(args);
 
 				*this=buffer;
