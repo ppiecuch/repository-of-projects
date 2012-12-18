@@ -99,6 +99,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs->addWorkingDirectory("..\\media");
 	fs->addWorkingDirectory("../media/xc3d",true);
 	fs->addWorkingDirectory("../media/ms3d",true);
+	fs->addWorkingDirectory("../media/dae",true);
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/");
 	fs->addWorkingDirectory("media/png/");
@@ -106,7 +107,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs->addWorkingDirectory("media/ms3d",true);
 #endif
 
-	const c8* roleName="box_translate.dae";
+	const c8* roleName="rotate_xyz.dae";
 
 	roleEntity=sceneMgr->getEntity(roleName);
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);

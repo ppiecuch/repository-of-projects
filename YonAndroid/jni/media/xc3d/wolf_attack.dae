@@ -1002,7 +1002,7 @@
   </library_lights>
   <library_images>
     <image id="wolf.png" name="wolf_png">
-      <init_from>file:///C:/Documents%20and%20Settings/Micheal/%D7%C0%C3%E6/wolf.png</init_from>
+      <init_from>file:///C:/wolf.png</init_from>
     </image>
   </library_images>
   <library_materials>
