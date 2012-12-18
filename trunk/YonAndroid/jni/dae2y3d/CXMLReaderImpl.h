@@ -538,7 +538,7 @@ namespace io{
 		virtual const char_type* getAttributeName(int idx) const
 		{
 			if ((u32)idx >= m_attributes.size())
-				return 0;
+				return m_emptyString.c_str();
 
 			return m_attributes[idx].Name.c_str();
 		}
@@ -547,7 +547,7 @@ namespace io{
 		virtual const char_type* getAttributeValue(int idx) const
 		{
 			if ((unsigned int)idx >= m_attributes.size())
-				return 0;
+				return m_emptyString.c_str();
 
 			return m_attributes[idx].Value.c_str();
 		}
@@ -557,7 +557,7 @@ namespace io{
 		{
 			const SAttribute* attr = getAttributeByName(name);
 			if (!attr)
-				return 0;
+				return m_emptyString.c_str();
 
 			return attr->Value.c_str();
 		}
@@ -567,7 +567,10 @@ namespace io{
 		{
 			const SAttribute* attr = getAttributeByName(name);
 			if (!attr)
+			{
+				YON_DEBUG("empty\r\n");
 				return m_emptyString.c_str();
+			}
 
 			return attr->Value.c_str();
 		}
