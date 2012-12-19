@@ -189,7 +189,9 @@ namespace core{
 
 		const f32 diag = rMat.M[0] + rMat.M[5] + rMat.M[10] + 1;
 
-		if( diag > 0.0f )
+		//fix bug:
+		//if( diag > 0)
+		if( diag > 0.0001f )
 		{
 			const f32 scale = sqrtf(diag) * 2.0f; // get scale from diagonal
 
@@ -224,7 +226,7 @@ namespace core{
 				// TODO: speed this up
 				x = (rMat.M[4] + rMat.M[1] ) / scale;
 				y = 0.25f * scale;
-				z = (rMat.M[9] + rMat.M[8] ) / scale;
+				z = (rMat.M[9] + rMat.M[6] ) / scale;
 				w = (rMat.M[8] - rMat.M[2] ) / scale;
 			}
 			else

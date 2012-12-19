@@ -148,7 +148,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 
 	Logger->setAppender(debug::MASK_APPENDER_NONE);
 
-	//异常：股甲在stand2中有旋转偏移问题(从show切换到stand2才存在此问题，直接stand2不存在此问题)
+	//正常
 	//const c8* roleName="knight_male_show.xc3d";
 	//const c8* skeletonName="knight_male_stand2.xc3d";
 
@@ -156,26 +156,30 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//const c8* roleName="knight_female_show.xc3d";
 	//const c8* skeletonName="knight_female_stand2.xc3d";
 
-	//异常：切换有帧跳动现象
+	//正常
 	//const c8* roleName="ranger_male_show.xc3d";
 	//const c8* skeletonName="ranger_male_stand2.xc3d";
 
-	//异常：切换有帧跳动现象
+	//正常
 	//const c8* roleName="ranger_female_show.xc3d";
 	//const c8* skeletonName="ranger_female_stand2.xc3d";
 
+	//正常
 	//const c8* roleName="oracle_male_show.xc3d";
 	//const c8* skeletonName="oracle_male_stand2.xc3d";
 
-	//异常：披风跳动，切换跳帧==》都正常了，但左脚在偏动
+	//披风跳动，切换跳帧(build_LocalAnimatedMatrix中没有使用useAnimationFrom->LocalMatrix)==》都正常了，但左脚在偏动(matrix2quaternion中直接>0判断有问题)==》正常
+	//正常
 	//const c8* roleName="oracle_female_show.xc3d";
 	//const c8* skeletonName="oracle_female_stand2.xc3d";
 
+	//正常
 	//const c8* roleName="magician_male_show.xc3d";
 	//const c8* skeletonName="magician_male_stand2.xc3d";
 
-	//const c8* roleName="magician_female_show.xc3d";
-	//const c8* skeletonName="magician_female_stand2.xc3d";
+	//正常
+	const c8* roleName="magician_female_show.xc3d";
+	const c8* skeletonName="magician_female_stand2.xc3d";
 
 	PROFILE_REGISTER_FRAME();
 
@@ -193,7 +197,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	cb->drop();
 
 	roleNode->setLoopMode(false);
-	//roleNode->setFrameLoop(7,11);
+	//roleNode->setFrameLoop(29,30);
 	//roleNode->setAnimationSpeed(0.1f);	
 
 	PROFILE_END_CALL(PROFILE_ID_1);

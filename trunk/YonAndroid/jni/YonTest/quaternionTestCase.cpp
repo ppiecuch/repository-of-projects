@@ -1,6 +1,6 @@
 #include "quaternionTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( quaternionTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( quaternionTestCase );
 
 void quaternionTestCase::setUp()
 {
@@ -122,4 +122,34 @@ void quaternionTestCase::Matrix()
 	printf("%.2f,%.2f,%.2f,%.2f\r\n",q3.x,q3.y,q3.z,q3.w);
 
 	CPPUNIT_ASSERT(q3==q1);
+
+	core::matrix4f m3(-0.978f,0.203f,0.039f,0,
+		0.203f,0.906f,0.370f,0,
+		0.039f,0.370f,-0.928f,0,
+		0.000f,0.000f,0.000f,1.000f);
+	m3.makeTranspose();
+	quaternion q4(m3);
+	core::matrix4f m4=q4.getMatrix();
+
+	m3.print();
+	printf("-->\r\n");
+	m4.print();
+
+	CPPUNIT_ASSERT(core::equals(m3[0],m4[0],0.001f)&&
+		core::equals(m3[1],m4[1],0.001f)&&
+		core::equals(m3[2],m4[2],0.001f)&&
+		core::equals(m3[3],m4[3],0.001f)&&
+		core::equals(m3[4],m4[4],0.001f)&&
+		core::equals(m3[5],m4[5],0.001f)&&
+		core::equals(m3[6],m4[6],0.001f)&&
+		core::equals(m3[7],m4[7],0.001f)&&
+		core::equals(m3[8],m4[8],0.001f)&&
+		core::equals(m3[9],m4[9],0.001f)&&
+		core::equals(m3[10],m4[10],0.001f)&&
+		core::equals(m3[11],m4[11],0.001f)&&
+		core::equals(m3[12],m4[12],0.001f)&&
+		core::equals(m3[13],m4[13],0.001f)&&
+		core::equals(m3[14],m4[14],0.001f)&&
+		core::equals(m3[15],m4[15],0.001f));
+	
 }
