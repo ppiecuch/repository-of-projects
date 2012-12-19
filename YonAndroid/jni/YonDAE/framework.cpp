@@ -110,13 +110,15 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs->addWorkingDirectory("media/ms3d",true);
 #endif
 
-#if 0
-	const c8* roleName="knight_male_show.dae";
+#if 1
+	const c8* roleName="oracle_female_stand2.dae";
 
 	roleEntity=sceneMgr->getEntity(roleName);
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
 	roleNode->setName(roleName);
 	roleEntity->drop();
+
+	roleNode->setFrameLoop(29,30);
 #elif 1
 	Logger->setAppender(debug::MASK_APPENDER_NONE);
 
