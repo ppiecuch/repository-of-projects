@@ -1,0 +1,392 @@
+#include "androidglview.h"
+#include <GLES/gl.h>
+#include <time.h>
+#include <math.h>
+
+#include "common/log.h"
+#include "math/vector3.h"
+#include "common/glutil.h"
+#include "math/aabb.h"
+#include "math/collision.h"
+#include "math/matrix.h"
+
+/*************************************************************
+射线拾取使用示例
+**************************************************************/
+
+
+static int  sWindowWidth  = 320;
+static int  sWindowHeight = 480;
+
+bool press=false;
+GLfloat projMatrix[16];
+GLfloat modelMatrix[16];
+Matrix<float,4> model,project;
+GLint viewport[4];
+GLfloat ray[6],fRay[6];
+GLfloat winx,winy,winz;
+GLsizei width,height;
+
+static float angle=0;
+float sinx,sinz;
+float radius=3;
+int selected=-1;//选中哪个方体,-1为都未选
+#define HW 1
+#define VERTEX_COUNT_PER_FACE 4
+#define FACE_COUNT 6
+AABB<float> aabb(-HW,-HW,-HW,HW,HW,HW);
+static GLfloat vertexArray[] = {
+// Front face
+-HW, -HW,  HW,
+ HW, -HW,  HW,
+ HW,  HW,  HW,
+-HW,  HW,  HW,
+
+// Back face
+-HW, -HW, -HW,
+-HW,  HW, -HW,
+ HW,  HW, -HW,
+ HW, -HW, -HW,
+
+// Top face
+-HW,  HW, -HW,
+-HW,  HW,  HW,
+ HW,  HW,  HW,
+ HW,  HW, -HW,
+
+// Bottom face
+-HW, -HW, -HW,
+ HW, -HW, -HW,
+ HW, -HW,  HW,
+-HW, -HW,  HW,
+
+// Right face
+ HW, -HW, -HW,
+ HW,  HW, -HW,
+ HW,  HW,  HW,
+ HW, -HW,  HW,
+
+// Left face
+-HW, -HW, -HW,
+-HW, -HW,  HW,
+-HW,  HW,  HW,
+-HW,  HW, -HW
+
+};
+static GLubyte colorArray[] = {
+  255, 0, 0, 255,     // Front face
+  255, 0, 0, 255,
+  255, 0, 0, 255,
+  255, 0, 0, 255,
+  255, 255, 0, 255,     // Back face
+  255, 255, 0, 255,
+  255, 255, 0, 255,
+  255, 255, 0, 255,
+  0, 255, 0, 255,     // Top face
+  0, 255, 0, 255,
+  0, 255, 0, 255,
+  0, 255, 0, 255,
+  255, 128, 128, 255,     // Bottom face
+  255, 128, 128, 255,
+  255, 128, 128, 255,
+  255, 128, 128, 255,
+  255, 0, 255, 255,     // Right face
+  255, 0, 255, 255,
+  255, 0, 255, 255,
+  255, 0, 255, 255,
+  0, 0, 255, 255,     // Left face
+  0, 0, 255, 255,
+  0, 0, 255, 255,
+  0, 0, 255, 255
+};
+
+void next(){
+	angle+=0.1f;
+	sinx=(float)(radius*sin(angle));
+	sinz=(float)(radius*cos(angle));
+}
+
+void appInit( JNIEnv*  env, jobject thiz, jstring apkPath)
+{
+	const GLubyte* name = glGetString(GL_VENDOR); //返回负责当前OpenGL实现厂商的名字
+    const GLubyte* biaoshifu = glGetString(GL_RENDERER); //返回一个渲染器标识符，通常是个硬件平台
+    const GLubyte* OpenGLVersion =glGetString(GL_VERSION); //返回当前OpenGL实现的版本号
+	const GLubyte* extensions =glGetString(GL_EXTENSIONS); //返回当前OpenGL支持的功能
+	LOGI("AndroidGLView","OpenGL vendor:%s\n", name);
+	LOGI("AndroidGLView","OpenGL renderer:%s\n", biaoshifu);
+	LOGI("AndroidGLView","OpenGL version:%s\n",OpenGLVersion );
+	LOGI("AndroidGLView","OpenGL extensions:%s\n",extensions );
+
+
+	LOGI("AndroidGL","apkPath:s%",apkPath);
+	const char* str;
+	jboolean isCopy;
+	str = env->GetStringUTFChars(apkPath, &isCopy);
+	LOGI("AndroidGL","str:s%",*str);
+	
+	delete[] str;
+}
+
+void appResize(int width,int height)
+{
+	/*视口变换*/
+	glViewport(0, 0, width, height);
+	viewport[0]=0;
+	viewport[1]=0;
+	viewport[2]=width;
+	viewport[3]=height;
+	LOGD("AndroidGLView","debug ---->GL_VIEWPORT,{%d,%d,%d,%d}",viewport[0],viewport[1],viewport[2],viewport[3]);
+	/*投影变换*/
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	//gluPerspective(60.0,(float)width/(float)height,0.1f,200);
+	gluPerspective2(50.0f,(float)width/(float)height,1.0f,100.0f,project);
+	//glOrthof(-sWindowWidth/2,sWindowWidth/2,-sWindowHeight/2,sWindowHeight/2,100,-100);
+	/*模型矩阵*/
+	glMatrixMode(GL_MODELVIEW);
+	/*启用剔除功能*/
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	//启用光照
+	//glEnable(GL_LIGHTING);
+	//启用光源
+	//glEnable(GL_LIGHT0);
+	//启用深度测试
+	glEnable(GL_DEPTH_TEST);
+	//启用透视修正
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POINT_SMOOTH);
+	glShadeModel(GL_SMOOTH|GL_FLAT);
+	glClearColor(0.2f, 0.2f, 0.5f, 0.5f);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
+
+	LOGI("AndroidGLView","Resize");
+}
+
+void appRender(long tick, int width, int height)
+{
+	//计算第二方体的下一位置
+	next();
+
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glLoadIdentity();
+	//gluLookAt(0.0, 5.0, 15.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	model.setIdentity();
+	gluLookAt2(0.0, 5.0, 15.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,model);
+
+
+	if(press){
+		clock_t start,finish;
+		start=clock();
+
+		/*LOGD("AndroidGLView","debug ---->model");
+		for(int i=0;i<4;i++)
+			LOGD("AndroidGLView","%.2f,%.2f,%.2f,%.2f",model.m[i][0],model.m[i][1],model.m[i][2],model.m[i][3]);
+
+		LOGD("AndroidGLView","debug ---->project");
+		for(int i=0;i<4;i++)
+			LOGD("AndroidGLView","%.2f,%.2f,%.2f,%.2f",project.m[i][0],project.m[i][1],project.m[i][2],project.m[i][3]);*/
+
+		winy = viewport[3] - (float)winy;
+		winz=0;
+
+		if(gluUnProject(winx,winy,winz,model,project,viewport,&ray[0],&ray[1],&ray[2]))
+			LOGI("AndroidGLView","near:{%.2f,%.2f,%.2f}-->{%.2f,%.2f,%.2f}",winx,winy,winz,ray[0],ray[1],ray[2]);
+		else
+			LOGI("AndroidGLView","get near error");
+		winz=1;
+		if(gluUnProject(winx,winy,winz,model,project,viewport,&ray[3],&ray[4],&ray[5]))
+			LOGI("AndroidGLView","far:{%.2f,%.2f,%.2f}-->{%.2f,%.2f,%.2f}",winx,winy,winz,ray[3],ray[4],ray[5]);
+		else
+			LOGI("AndroidGLView","get far error");
+		press=false;
+		Point3<float> p1((float)ray[0],(float)ray[1],(float)ray[2]);
+		Point3<float> p2((float)ray[3],(float)ray[4],(float)ray[5]);
+		Segment<float> segment(p1,p2);
+		Point3<float> intersect1,intersect2;
+		bool result1=Collision<float,float>::isIntersect(aabb,segment,&intersect1);
+		LOGI("AndroidGLView","center box intersect:%d,{%.2f,%.2f,%.2f}",result1,intersect1.x,intersect1.y,intersect1.z);
+
+		AABB<float> temp(-HW+sinx,-HW,-HW+sinz,HW+sinx,HW,HW+sinz);
+		bool result2=Collision<float,float>::isIntersect(temp,segment,&intersect2);
+		LOGI("AndroidGLView","surround box intersect:%d,{%.2f,%.2f,%.2f}",result2,intersect2.x,intersect2.y,intersect2.z);
+
+
+		if(result1){
+			selected=1;
+			//如果两方体都相交,则以离近截面点p1近者为准
+			if(result2){
+				selected=((intersect1-p1).square()<(intersect2-p1).square())?1:2;
+			}
+		}else if(result2){
+			selected=2;
+		}else{
+			selected=-1;
+		}
+
+		finish=clock();
+		LOGI("AndroidGLView","use %ld milliseconds\n", (finish - start)*1000/CLOCKS_PER_SEC); 
+
+
+	}
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glPushMatrix(); 
+	glVertexPointer(3,GL_FLOAT,0,vertexArray);
+	glColorPointer(4,GL_UNSIGNED_BYTE,0,colorArray);
+	//边会反走样,先绘边
+	if(selected==1){
+		glEnable (GL_LINE_SMOOTH);
+		glHint (GL_LINE_SMOOTH, GL_NICEST);
+		for(int i=0;i<FACE_COUNT;i++)
+			glDrawArrays(GL_LINE_LOOP,i*VERTEX_COUNT_PER_FACE,VERTEX_COUNT_PER_FACE);
+		//填充不会反走样,关闭之
+		glDisable (GL_LINE_SMOOTH);
+		glHint (GL_LINE_SMOOTH, GL_FASTEST);
+	}else{
+		for(int i=0;i<FACE_COUNT;i++)
+			glDrawArrays(GL_TRIANGLE_FAN,i*VERTEX_COUNT_PER_FACE,VERTEX_COUNT_PER_FACE);
+	}
+	
+		glPushMatrix();
+			glTranslatef(sinx,0,sinz);
+			if(selected==2){
+				glEnable (GL_LINE_SMOOTH);
+				glHint (GL_LINE_SMOOTH, GL_NICEST);
+				for(int i=0;i<FACE_COUNT;i++)
+					glDrawArrays(GL_LINE_LOOP,i*VERTEX_COUNT_PER_FACE,VERTEX_COUNT_PER_FACE);
+				//填充不会反走样,关闭之
+				glDisable (GL_LINE_SMOOTH);
+				glHint (GL_LINE_SMOOTH, GL_FASTEST);
+			}else{
+				for(int i=0;i<FACE_COUNT;i++)
+					glDrawArrays(GL_TRIANGLE_FAN,i*VERTEX_COUNT_PER_FACE,VERTEX_COUNT_PER_FACE);
+			}
+		glPopMatrix();
+	glPopMatrix(); 
+
+	/*for(int i=0;i<3;i++)
+		fRay[i]=ray[i];
+	glPushMatrix(); 
+		glColor4f(1.0f,0.0f,0.0f,1.0f);
+		for(int i=3;i<6;i++)
+			fRay[i]=(float)ray[i]+1;
+		glVertexPointer(3,GL_FLOAT,0,fRay);
+		glDrawArrays(GL_LINES,0,2);
+		for(int i=3;i<6;i++)
+			fRay[i]=(float)ray[i]-1;
+		glVertexPointer(3,GL_FLOAT,0,fRay);
+		glDrawArrays(GL_LINES,0,2);
+	glPopMatrix();*/
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+}
+
+
+/* Call to initialize the graphics state */
+void
+Java_org_tinder_studio_AndroidGLView_nativeInit( JNIEnv*  env, jobject thiz, jstring apkPath )
+{
+    appInit(env,thiz,apkPath);
+}
+
+
+/* Call to finalize the graphics state */
+void
+Java_org_tinder_studio_AndroidGLView_nativeDone( JNIEnv*  env, jobject thiz )
+{
+}
+
+/* Call to render the next GL frame */
+void
+Java_org_tinder_studio_AndroidGLView_nativeRender( JNIEnv*  env, jobject thiz )
+{
+    appRender(0, sWindowWidth, sWindowHeight);
+}
+
+void
+Java_org_tinder_studio_AndroidGLView_nativeResize( JNIEnv*  env, jobject  thiz, jint w, jint h )
+{
+    sWindowWidth  = w;
+    sWindowHeight = h;
+    appResize(w,h);
+    LOGI("AndroidGLView", "resize w=%d h=%d", w, h);
+}
+
+void
+Java_org_tinder_studio_AndroidGLView_nativePause(JNIEnv *env, jobject thiz)
+{
+}
+
+jboolean
+Java_org_tinder_studio_AndroidGLView_nativeOnBackDown
+  (JNIEnv *env, jobject thiz)
+{
+	return false;
+}
+
+void
+Java_org_tinder_studio_AndroidGLView_nativePress
+  (JNIEnv *env, jobject thiz, jfloat x, jfloat y)
+{
+	LOGI("AndroidGLView","press:%.2f,%.2f-->",x,y);
+	winx=x;
+	winy=y;
+	press=true;
+}
+
+void 
+Java_org_tinder_studio_AndroidGLView_nativeRelease
+  (JNIEnv *env, jobject thiz, jfloat x, jfloat y)
+{
+}
+
+/*
+* Register several native methods for one class.
+*/
+
+int registerNativeMethods(JNIEnv* env, const char* className,
+    JNINativeMethod* gMethods, int numMethods)
+{
+    jclass clazz;
+    LOGI("AndroidGLView", "RegisterNatives start for '%s'", className);
+    clazz = env->FindClass(className);
+    if (clazz == NULL) {
+        LOGI("AndroidGLView", "Native registration unable to find class '%s'", className);
+        return JNI_FALSE;
+    }
+    if (env->RegisterNatives(clazz, gMethods, numMethods) < 0) {
+        LOGI("AndroidGLView", "RegisterNatives failed for '%s'", className);
+        return JNI_FALSE;
+    }
+    return JNI_TRUE;
+}
+
+static JNINativeMethod methods[] = {
+
+  {"nativeInit", "()", (void*)Java_org_tinder_studio_AndroidGLView_nativeInit },
+  {"nativeDone", "()", (void*)Java_org_tinder_studio_AndroidGLView_nativeDone },
+  {"nativeRender", "()", (void*)Java_org_tinder_studio_AndroidGLView_nativeRender },
+  {"nativeResize", "()", (void*)Java_org_tinder_studio_AndroidGLView_nativeResize },
+  {"nativePress", "()", (void*)Java_org_tinder_studio_AndroidGLView_nativePress }
+
+};
+
+static const char *classPathName = "org/tinder/studio/AndroidGLView";
+
+/*
+ * Register native methods for all classes we know about.
+ *
+ * returns JNI_TRUE on success.
+ */
+static int registerNatives(JNIEnv* env)
+{
+  if (!registerNativeMethods(env, classPathName,
+                 methods, sizeof(methods) / sizeof(methods[0]))) {
+    return JNI_FALSE;
+  }
+  return JNI_TRUE;
+}
