@@ -10,7 +10,8 @@ namespace scene{
 
 	struct SSkinnedUnit : public Unit3D{
 	public:
-		SSkinnedUnit():Unit3D(){
+		SSkinnedUnit():Unit3D()//,BSMTransformation(true)
+		{
 			this->m_pShap=new Shap3D();
 		}
 		SVertex* getVertex(u32 index){
@@ -32,7 +33,9 @@ namespace scene{
 			Shap3D* shap=reinterpret_cast<Shap3D*>(this->m_pShap);
 			return shap->m_indices;
 		}
-		core::matrix4f Transformation;
+		//core::matrix4f Transformation;
+		//@hzb为了满足XC3D的BindShapeMatrix添加此矩阵
+		//core::matrix4f BSMTransformation;
 	};
 }
 }
