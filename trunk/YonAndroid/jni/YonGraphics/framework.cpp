@@ -13,8 +13,8 @@ IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
 core::position2di ps[4];
 
-IModel* cubeModel=NULL;
-IModel* planeModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* planeModel=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{

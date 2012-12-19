@@ -25,6 +25,7 @@ namespace debug{
 	};
 
 	enum MASK_APPENDER{
+		MASK_APPENDER_NONE = 0,
 		MASK_APPENDER_CONSOLE = 0x1,	//控制台
 		MASK_APPENDER_VS = 0x2,			//VS输出窗口
 		MASK_APPENDER_FILE = 0x4,		//单一文件

@@ -61,6 +61,9 @@ public:
 class CRoleAnimationEndCallback : public IAnimationEndCallBack{
 public:
 	virtual void onAnimationEnd(IAnimatedSceneNode* node){
+		Logger->setAppender(debug::MASK_APPENDER_VS);
+		YON_DEBUG("/********************************************/\r\n");
+		YON_DEBUG("/********************************************/\r\n");
 
 		ISkinnedEntity* modelEntity=(ISkinnedEntity*)node->getEntity();
 		modelEntity->useAnimationFrom(skeletonEntity);
@@ -68,7 +71,7 @@ public:
 
 		node->setLoopMode(true);
 		//roleNode->setAnimationSpeed(0.3f);	
-		roleNode->setFrameLoop(0,0);
+		//roleNode->setFrameLoop(0,0);
 	}
 };
 
@@ -107,12 +110,32 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs->addWorkingDirectory("media/ms3d",true);
 #endif
 
-	const c8* roleName="rotate_xyz.dae";
+#if 0
+	const c8* roleName="knight_male_show.dae";
 
 	roleEntity=sceneMgr->getEntity(roleName);
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
 	roleNode->setName(roleName);
 	roleEntity->drop();
+#elif 1
+	Logger->setAppender(debug::MASK_APPENDER_NONE);
+
+	const c8* roleName="knight_male_show.dae";
+	const c8* skeletonName="knight_male_stand2.dae";
+
+	skeletonEntity=(ISkinnedEntity*)sceneMgr->getEntity(skeletonName);
+
+	roleEntity=sceneMgr->getEntity(roleName);
+	roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
+	roleNode->setName(roleName);
+	roleEntity->drop();
+
+	IAnimationEndCallBack* cb=new CRoleAnimationEndCallback();
+	roleNode->setAnimationEndCallback(cb);
+	cb->drop();
+
+	roleNode->setLoopMode(false);
+#endif
 
 	return true;
 }

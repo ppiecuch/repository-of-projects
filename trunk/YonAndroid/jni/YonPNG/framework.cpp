@@ -124,7 +124,7 @@ void drawFrame(){
 
 	gfAdapter->drawImage("interlace.png",0,0,128,128,0,200,true);
 
-	gfAdapter->drawImage("3.png",0,0,512,512,0,200,true);
+	gfAdapter->drawImage("cd.png",0,0,64,64,64,64,true);
 	gfAdapter->render();
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
