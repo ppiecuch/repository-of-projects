@@ -12,8 +12,8 @@ ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
 
-IModel* cubeModel=NULL;
-IModel* planeModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* planeModel=NULL;
 f32 factor=1.1f;
 
 #include "SDynamicShap.h"

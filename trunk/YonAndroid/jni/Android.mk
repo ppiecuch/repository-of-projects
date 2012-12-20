@@ -280,6 +280,7 @@ yon_SOURCES :=   \
 		NetCode.cpp \
 		CAnimatedSceneNode.cpp \
 		CBoneSceneNode.cpp \
+		CEntityLoaderDAE.cpp \
 		CEntityLoaderXC3D.cpp \
 		CEntityLoaderMS3D.cpp \
 		CEntityLoaderY3D.cpp \

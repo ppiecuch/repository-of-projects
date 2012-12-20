@@ -89,12 +89,12 @@ public:
 class CRoleAnimationEndCallback : public IAnimationEndCallBack{
 public:
 	virtual void onAnimationEnd(IAnimatedSceneNode* node){
-		Logger->setAppender(debug::MASK_APPENDER_VS);
-		YON_DEBUG("/********************************************/\r\n");
-		YON_DEBUG("/********************************************/\r\n");
+		//Logger->setAppender(debug::MASK_APPENDER_VS);
+		//YON_DEBUG("/********************************************/\r\n");
+		//YON_DEBUG("/********************************************/\r\n");
 		ISkinnedEntity* modelEntity=(ISkinnedEntity*)node->getEntity();
 		modelEntity->useAnimationFrom(skeletonEntity);
-		node->setFrameLoop(1,skeletonEntity->getFrameCount());
+		node->setFrameLoop(0,skeletonEntity->getFrameCount());
 
 		node->setLoopMode(true);
 		//roleNode->setAnimationSpeed(0.3f);	
@@ -120,6 +120,8 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs=engine->getFileSystem();
 	timer=engine->getTimer();
 	pCamera=sceneMgr->addCameraFPS();
+	pCamera->setPosition(core::position3df(0,0,130),false);
+	pCamera->setTarget(core::position3df(0,0,0));
 	pCamera->setFar(5000);
 	pCamera->setNear(1);
 	logger=Logger;
@@ -145,8 +147,21 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 #elif 0
 	//测试动态加载
 #elif 1
+	//测试模型渲染速度
+	const c8* roles[]={"knight_male_show.xc3d","knight_female_show.xc3d","ranger_male_show.xc3d","ranger_female_show.xc3d",
+		"oracle_male_show.xc3d","oracle_female_show.xc3d","magician_male_show.xc3d","magician_female_show.xc3d"};
 
-	Logger->setAppender(debug::MASK_APPENDER_NONE);
+	for(s32 i=0;i<8;++i)
+	{
+		roleEntity=(ISkinnedEntity*)sceneMgr->getEntity(roles[i]);
+		roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
+		roleNode->setName(roles[i]);
+		roleNode->setPosition(core::vector3df(-100+i*25,0,0));
+		roleEntity->drop();
+	}
+#elif 1
+
+	//Logger->setAppender(debug::MASK_APPENDER_NONE);
 
 	//正常
 	//const c8* roleName="knight_male_show.xc3d";

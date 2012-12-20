@@ -589,8 +589,8 @@ namespace core{
 
 		inline matrix4<T> operator*(const matrix4<T>& other) const{
 			 matrix4<T> r;
-			 //r.setByProduct(*this,other);
-			 r.setByFastProduct(*this,other);
+			 r.setByProduct(*this,other);
+			 //r.setByFastProduct(*this,other);
 			 return r;
 		}
 		inline matrix4<T>& operator=(const matrix4<T>& other){

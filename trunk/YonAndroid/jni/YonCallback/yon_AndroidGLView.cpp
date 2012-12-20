@@ -167,9 +167,17 @@ void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 }
 void Java_yon_AndroidGLView_nativeOnPause(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnPause\n");
+	SEvent evt;
+	evt.type=ENUM_EVENT_TYPE_SYSTEM;
+	evt.systemInput.type=ENUM_SYSTEM_INPUT_TYPE_DOZE;
+	getEngine()->postEventFromUser(evt);
 }
 void Java_yon_AndroidGLView_nativeOnResume(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnResume\n");
+	SEvent evt;
+	evt.type=ENUM_EVENT_TYPE_SYSTEM;
+	evt.systemInput.type=ENUM_SYSTEM_INPUT_TYPE_WAKE;
+	getEngine()->postEventFromUser(evt);
 }
 //TODO¸ÄÎª·¢ËÍEvent
 jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){

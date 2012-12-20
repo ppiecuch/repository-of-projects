@@ -455,10 +455,16 @@ void CParticleSystem::recollabuffer()
 		// fill remaining vertices
 		for (i=oldSize; i<draw_buffer_v.size(); i+=4)
 		{
-		    draw_buffer_v[0+i].texcoords.set(0.0f, 0.0f);
-			draw_buffer_v[1+i].texcoords.set(0.0f, 1.0f);
+			//@hzb-OGL-UV
+		    //draw_buffer_v[0+i].texcoords.set(0.0f, 0.0f);
+			//draw_buffer_v[1+i].texcoords.set(0.0f, 1.0f);
+			//draw_buffer_v[2+i].texcoords.set(1.0f, 1.0f);
+			//draw_buffer_v[3+i].texcoords.set(1.0f, 0.0f);
+			//DX-UV
+			draw_buffer_v[0+i].texcoords.set(0.0f, 0.0f);
+			draw_buffer_v[1+i].texcoords.set(0.0f, 0.0f);
 			draw_buffer_v[2+i].texcoords.set(1.0f, 1.0f);
-			draw_buffer_v[3+i].texcoords.set(1.0f, 0.0f);
+			draw_buffer_v[3+i].texcoords.set(1.0f, 1.0f);
 		}
 
 		// fill remaining indices

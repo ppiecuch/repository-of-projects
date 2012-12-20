@@ -17,9 +17,9 @@ ILogger* logger=NULL;
 
 MyGUI::MyGUIAdapter* guiAdapter;
 
-IModel* cubeModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel=NULL;
 f32 factor=1.1f;
 
 //core::matrix4f projection;
@@ -204,10 +204,10 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	unit->drop();
 	entity->drop();*/
 
-	shap=geometryFty->createCube(50,50,50);
+	/*shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	cubeModel=sceneMgr->addModel(entity);
+	cubeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=cubeModel->getMaterial(0);
 #if 0
@@ -221,7 +221,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	cubeModel->setPosition(core::vector3df(100,100,0)); 
 	shap->drop();
 	unit->drop();
-	entity->drop();
+	entity->drop();*/
 
 	/*shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
@@ -254,6 +254,11 @@ void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
 core::position2di ps[4];
+#define TO_PS(x,y,w,h) \
+	ps[0].set(x,y+h); \
+	ps[1].set(x,y); \
+	ps[2].set(x+w,y); \
+	ps[3].set(x+w,y+h);
 void drawFrame(){
 
 	videoDriver->begin(true,true,video::SColor(0xFF132E47));
@@ -264,45 +269,29 @@ void drawFrame(){
 	static core::rectf r(0,1,1,0);
 	rt=canvas->getTexture()->getRenderTarget();
 
-	//oldProjection=videoDriver->getTransform(ENUM_TRANSFORM_PROJECTION);
-	//videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,projection);
+
 	pCamera2->setNeedUpload();
 	pCamera2->render(videoDriver);
 	rt->begin();
-	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
-	//teapotModel->setVisible(true);
-	//sceneMgr->render(videoDriver);
-	//teapotModel->setVisible(false);
-	gfAdapter->clearZ(1000);
 
-#define TO_PS(x,y,w,h) \
-	ps[0].set(x,y+h); \
-	ps[1].set(x,y); \
-	ps[2].set(x+w,y); \
-	ps[3].set(x+w,y+h);
+	gfAdapter->clearZ(1000);
 
 	TO_PS(0,0,128,64)
 	gfAdapter->drawRegion(videoDriver->getTexture("trans.png"),r,ps,ENUM_TRANS_NONE);
 	TO_PS(128,64,64,64)
-	gfAdapter->drawRegion(videoDriver->getTexture("test-png8.png"),r,ps,ENUM_TRANS_MIRROR);
+	gfAdapter->drawRegion(videoDriver->getTexture("test-png8.png"),r,ps,ENUM_TRANS_NONE);
 	gfAdapter->render();
 
 	rt->end();
-	//videoDriver->setTransform(ENUM_TRANSFORM_PROJECTION,oldProjection);
 
-	//因为超出sceneMgr管理范围独自调用了camera.render，这里要恢复一下
+	//因为超出sceneMgr管理范围地独自调用了camera.render，这里要恢复一下
 	pCamera->setNeedUpload();
 	pCamera->render(videoDriver);
 	sceneMgr->render(videoDriver);
-	
-	//Logger->debug("%d,%d\r\n",videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h);
-	//gfAdapterWindow->clearZ(1000);
-	//gfAdapterWindow->drawRegion("trans.png",r,180,200,128,64,ENUM_TRANS_NONE);
-	//gfAdapterWindow->render();
 
 	guiAdapter->render();
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }

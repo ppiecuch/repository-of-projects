@@ -11,9 +11,9 @@ ICamera* pCamera=NULL;
 ICamera* pCamera2=NULL;
 ILogger* logger=NULL;
 
-IModel* cubeModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
@@ -124,7 +124,7 @@ void drawFrame(){
 	ps[3].set(x+w,y+h);
 
 	gfAdapter->clearZ(1000);
-	TO_PS(0,0,128,128)
+	TO_PS(0,0,128,128);
 	gfAdapter->drawRegion(videoDriver->getTexture("test-png24.png"),r,ps);
 	gfAdapter->render(); 
 
@@ -139,7 +139,7 @@ void drawFrame(){
 	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
 
 	gfAdapter->clearZ(1000);
-	TO_PS(100,100,128,128)
+	TO_PS(100,100,128,128);
 	gfAdapter->drawRegion(rtt,r,ps);
 	gfAdapter->render();
 
