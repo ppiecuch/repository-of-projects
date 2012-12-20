@@ -6,3 +6,6 @@ adb -d shell cat /sdcard/log.txt 查看TXT文件
 adb push luan.jpg /sdcard/sdcard
 adb pull /sdcard/001.jpg .              (下载 /sdcard 目录下的文件)
 adb shell "dumpsys meminfo %curProcessName%"命令得到某个进程的内存使用情况。  
+
+arm-linux-androideabi-addr2line -C -f -e obj/local/armeabi/libnativemaprender.so 0003deb4
+The -C flag is to demangle C++ code
