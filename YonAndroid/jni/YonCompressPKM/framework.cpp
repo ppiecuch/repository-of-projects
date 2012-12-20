@@ -11,7 +11,7 @@ ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 
-IModel* cubeModel=NULL;
+ISceneNode* cubeModel=NULL;
 f32 factor=1.1f;
 core::position2di ps[4];
 

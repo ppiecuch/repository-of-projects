@@ -13,9 +13,9 @@ ILogger* logger=NULL;
 
 MyGUI::MyGUIAdapter* guiAdapter;
 
-IModel* cubeModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -113,7 +113,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	cubeModel=sceneMgr->addModel(entity);
+	cubeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=cubeModel->getMaterial(0);
 		material.setTexture(0,videoDriver->getTexture("test.png"));
@@ -126,7 +126,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	teapotModel=sceneMgr->addModel(entity);
+	teapotModel=sceneMgr->addSceneNode(entity);
 	teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
@@ -135,7 +135,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	planeModel=sceneMgr->addModel(entity);
+	planeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=planeModel->getMaterial(0);
 		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;

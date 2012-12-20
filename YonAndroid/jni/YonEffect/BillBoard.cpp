@@ -331,10 +331,16 @@ void CBillBoard::SetUV( float lt_u,float lt_v,float lb_u,float lb_v,float rt_u,f
 {
   
 
-	 or_tord[0].set(rt_u,rt_v);
-	 or_tord[1].set(lt_u,lt_v);
-	 or_tord[2].set(lb_u,lb_v);
-	 or_tord[3].set(rb_u,rb_v);
+	//@hzb-OGL-UV
+	// or_tord[0].set(rt_u,rt_v);
+	// or_tord[1].set(lt_u,lt_v);
+	// or_tord[2].set(lb_u,lb_v);
+	// or_tord[3].set(rb_u,rb_v);
+	//DX-UV
+	or_tord[0].set(rt_u,rt_v);
+	or_tord[1].set(lt_u,rb_v);
+	or_tord[2].set(lb_u,lb_v);
+	or_tord[3].set(rb_u,lt_v);
 
 
 

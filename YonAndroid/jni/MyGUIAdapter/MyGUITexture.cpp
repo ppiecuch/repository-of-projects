@@ -75,7 +75,7 @@ namespace MyGUI{
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_1ALPHA,use16bit1Alpha);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,use16bit4Alpha);
 		m_pDriver->setTextureCreationConfig(video::MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,reserveImage);
-		m_pTexture->upsidedown();
+		//m_pTexture->upsidedown();
 		YON_DEBUG(YON_LOG_SUCCEED_FORMAT,core::stringc("loadFromFile:%s",_filename.c_str()).c_str());
 	}
 

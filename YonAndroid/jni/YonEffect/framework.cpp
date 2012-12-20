@@ -187,10 +187,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 */	
 	CParticleEmiter::setRandomizer(randomizer);
 
-  p_SpeEffectSet=new CSpeEffectSet();
+   p_SpeEffectSet=new CSpeEffectSet();
    p_SpeEffectSet->setVideoDriver(videoDriver);
    p_SpeEffectSet->setGraphicsAdapter(gfAdapter);
-   IReadStream *p_FileReader=engine->getFileSystem()->createAndOpenReadFileStream("exportSpe/5.EFF");
+   IReadStream *p_FileReader=engine->getFileSystem()->createAndOpenReadFileStream("exportSpe/1.EFF");
    p_SpeEffectSet->load(p_FileReader);
    p_FileReader->drop();
    
