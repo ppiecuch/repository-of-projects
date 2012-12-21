@@ -4,6 +4,7 @@
 #include "vector3d.h"
 #include "line3d.h"
 #include "plane3d.h"
+#include "aabbox3d.h"
 
 namespace yon{
 namespace core{
@@ -52,6 +53,29 @@ namespace core{
 			return (B - A).crossProduct(C - A);
 		}
 
+		//! Determines if the triangle is totally inside a bounding box.
+		/** \param box Box to check.
+		\return True if triangle is within the box, otherwise false. */
+		bool isTotalInsideBox(const aabbox3d<T>& box) const
+		{
+			return (box.isInside(A) &&
+				box.isInside(B) &&
+				box.isInside(C));
+		}
+
+		//! Determines if the triangle is totally outside a bounding box.
+		/** \param box Box to check.
+		\return True if triangle is outside the box, otherwise false. */
+		bool isTotalOutsideBox(const aabbox3d<T>& box) const
+		{
+			return ((A.x > box.maxEdge.x && B.x > box.maxEdge.x && C.x > box.maxEdge.x) ||
+				(A.y > box.maxEdge.y && B.y > box.maxEdge.y && C.y > box.maxEdge.y) ||
+				(A.z > box.maxEdge.z && B.z > box.maxEdge.z && C.z > box.maxEdge.z) ||
+				(A.x < box.minEdge.x && B.x < box.minEdge.x && C.x < box.minEdge.x) ||
+				(A.y < box.minEdge.y && B.y < box.minEdge.y && C.y < box.minEdge.y) ||
+				(A.z < box.minEdge.z && B.z < box.minEdge.z && C.z < box.minEdge.z));
+		}
+
 		//! Test if the triangle would be front or backfacing from any point.
 		/** Thus, this method assumes a camera position from which the
 		triangle is definitely visible when looking at the given direction.
@@ -77,6 +101,28 @@ namespace core{
 				isOnSameSide(p, C, A, B));
 		}
 
+		//原理：分别求出三条边上离点P最近的点（可能在边上），然后对三个结果进行比较取其最优者
+		//注意：显然不支持三角形内部的点
+		//! Get the closest point on a triangle to a point on the same plane.
+		/** \param p Point which must be on the same plane as the triangle.
+		\return The closest point of the triangle */
+		core::vector3d<T> getClosestPoint(const core::vector3d<T>& p) const
+		{
+			const core::vector3d<T> rab = line3d<T>(A, B).getClosestPoint(p);
+			const core::vector3d<T> rbc = line3d<T>(B, C).getClosestPoint(p);
+			const core::vector3d<T> rca = line3d<T>(C, A).getClosestPoint(p);
+
+			const T d1 = rab.getDistanceFrom(p);
+			const T d2 = rbc.getDistanceFrom(p);
+			const T d3 = rca.getDistanceFrom(p);
+
+			if (d1 < d2)
+				return d1 < d3 ? rab : rca;
+
+			return d2 < d3 ? rbc : rca;
+		}
+
+
 
 		//数学依据：AB*AC=|AB||AC|Sin∠BAC=2S三角形BAC
 		//How to determine area? you have two options: 
@@ -96,6 +142,9 @@ namespace core{
 			return plane3d<T>(A, B, C);
 		}
 
+		//TODO
+		//bool isTotalInsideBox(const aabbox3d<T>& box) const
+		//bool isTotalOutsideBox(const aabbox3d<T>& box) const
 	};
 
 	typedef triangle3d<f32> triangle3df;
