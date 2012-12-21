@@ -11,9 +11,9 @@ ICamera* pCamera=NULL;
 ICamera* pCamera2=NULL;
 ILogger* logger=NULL;
 
-IModel* cubeModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
@@ -80,7 +80,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	shap=geometryFty->createCube(150,150,150);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	cubeModel=sceneMgr->addModel(entity);
+	cubeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=cubeModel->getMaterial(0);
 		//material->setMaterialType(ENUM_MATERIAL_TYPE_SOLID);
@@ -94,7 +94,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	shap=geometryFty->createTeapot(7,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	teapotModel=sceneMgr->addModel(entity);
+	teapotModel=sceneMgr->addSceneNode(entity);
 	teapotModel->setPosition(core::vector3df(0,-70,0));
 	shap->drop();
 	unit->drop();
@@ -103,7 +103,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	planeModel=sceneMgr->addModel(entity);
+	planeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=planeModel->getMaterial(0);
 		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
@@ -133,19 +133,11 @@ void drawFrame(){
 
 	videoDriver->begin();
 
-	//rtt->beginRTT(true,true,video::SColor(0xFF133E67));
-#ifndef USE_SCENE_MGR
 	pCamera2->setNeedUpload();
 	pCamera2->render(videoDriver);
-#endif
+
 	videoDriver->setRenderTarget(rtt,true,true,COLOR_BLUE);
 
-#ifdef USE_SCENE_MGR
-	teapotModel->setVisible(true);
-	cubeModel->setVisible(false);
-	planeModel->setVisible(false);
-
-#else
 	static core::position2di ps[4];
 #define TO_PS(x,y,w,h) \
 	ps[0].set(x,y+h); \
@@ -153,55 +145,23 @@ void drawFrame(){
 	ps[2].set(x+w,y); \
 	ps[3].set(x+w,y+h);
 
-	static core::rectf r(0,1,1,0);
+	static core::rectf r(0,0,1,1);
 	gfAdapter->clearZ(1000);
 	TO_PS(0,0,128,128)
 	gfAdapter->drawRegion(videoDriver->getTexture("aura.png"),r,ps);
 	gfAdapter->render(); 
 
-	videoDriver->draw2DLine(core::ORIGIN_POSITION2DI,core::position2di(100,100));
-#endif
 
-#ifdef USE_SCENE_MGR
-	sceneMgr->render(videoDriver);
-	teapotModel->setVisible(false);
-	cubeModel->setVisible(true);
-	planeModel->setVisible(true);
-#endif
-
-	//rtt->endRTT(true);
 	videoDriver->setRenderTarget(NULL,true,true,COLOR_DEFAULT);
-	//videoDriver->setViewPort(core::recti(0,0,videoDriver->getCurrentRenderTargetSize().w,videoDriver->getCurrentRenderTargetSize().h));
-
-#ifdef USE_SCENE_MGR
-	const core::vector3df crot=cubeModel->getRotation();
-	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
-
-	const core::vector3df trot=teapotModel->getRotation();
-	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
-
-	const core::vector3df psca=planeModel->getScale();
-	if(psca.x>4)
-		factor= 0.9f;
-	else if(psca.x<2)
-		factor=1.1f;
-	planeModel->setScale(psca*factor);
-	sceneMgr->render(videoDriver);
-#else
 	pCamera->setNeedUpload();
 	pCamera->render(videoDriver);
-#endif
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
-
-	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
-	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
-
-#ifndef USE_SCENE_MGR
 	gfAdapter->clearZ(1000);
 	TO_PS(100,100,128,128)
 	gfAdapter->drawRegion(rtt,r,ps);
 	gfAdapter->render();
-#endif
+
+	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+
 
 	videoDriver->end();
 }

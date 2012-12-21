@@ -66,6 +66,8 @@ namespace core{
 			return point.isBetweenPoints(start, end);
 		}
 
+		//数学依据：两向量的数量积等于其中一个向量的模和另一个向量在这向量的方向上的投影的乘积。
+		//向量积a*b=|a|*|b|*cos(ab)=|a|*Proj(b->a)=|b|*Proj(a->b)
 		//! Get the closest point on this line to a point
 		/** \param point The point to compare to.
 		\return The nearest point which is part of the line. */

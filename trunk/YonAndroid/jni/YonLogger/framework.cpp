@@ -81,6 +81,7 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
+	PROFILE_REGISTER_FRAME();
 	videoDriver->begin(true,true,COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
@@ -98,6 +99,7 @@ void drawFrame(){
 	videoDriver->end();
 }
 void destroy(){
+	PROFILE_REPORT();
 	engine->drop();
 	delete params.pEventReceiver;
 }
