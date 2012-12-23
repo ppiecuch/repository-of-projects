@@ -110,6 +110,14 @@ namespace scene{
 			return false;
 		}
 
+		//! Creates a simple ITriangleSelector, based on an animated entity scene node.
+		/** Details of the mesh associated with the node will be extracted internally.
+		Call ITriangleSelector::update() to have the triangle selector updated based
+		on the current frame of the animated entity scene node.
+		\param node The animated mesh scene node from which to build the selector
+		*/
+		virtual ITriangleSelector* createTriangleSelector(IAnimatedSceneNode* node) = 0;
+
 		virtual terrain::ITerrainModel* addTerrainModel(ISceneNode* parent=NULL,const core::vector3df& pos=core::vector3df(0,0,0),
 			const core::vector3df& rot=core::vector3df(0,0,0),
 			const core::vector3df& scale=core::vector3df(1,1,1)) = 0;

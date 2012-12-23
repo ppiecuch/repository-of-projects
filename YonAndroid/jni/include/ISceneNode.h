@@ -9,6 +9,7 @@
 #include "SMaterial.h"
 #include "IAnimator.h"
 #include "IEntity.h"
+#include "ITriangleSelector.h"
 //#include "ISceneManager.h"
 
 #include "ILogger.h"
@@ -35,6 +36,7 @@ namespace scene{
 		ISceneNode* m_parent;
 		core::list<ISceneNode*> m_children;
 		core::list<animator::IAnimator*> m_animators;
+		ITriangleSelector* m_pTriangleSelector;
 
 		//bool m_bTransformationChanged;
 		core::matrix4f m_absoluteTransformation;
@@ -51,7 +53,8 @@ namespace scene{
 		ISceneNode(ISceneNode* parent,const core::vector3df& pos=core::vector3df(0,0,0),
 			const core::vector3df& rot=core::vector3df(0,0,0),
 			const core::vector3df& scale=core::vector3df(1,1,1)):
-			m_pSceneManager(NULL),m_parent(parent),m_relativePosition(pos),m_relativeRotation(rot),m_relativeScale(scale),m_bVisible(true),m_absoluteTransformation(true)
+				m_pSceneManager(NULL),m_pTriangleSelector(NULL),m_parent(parent),
+				m_relativePosition(pos),m_relativeRotation(rot),m_relativeScale(scale),m_bVisible(true),m_absoluteTransformation(true)
 			//m_bTransformationChanged(true),
 		{
 			if(parent!=NULL){
@@ -122,6 +125,9 @@ namespace scene{
 			clearChildren();
 			//YON_DEBUG("clearChildren\n");
 			clearAnimators();
+
+			if (m_pTriangleSelector)
+				m_pTriangleSelector->drop();
 		}
 
 		void setRenderDebugConfig(MASK_RENDER_DEBUG_CONFIG config,bool on){
@@ -322,6 +328,40 @@ namespace scene{
 				YON_DEBUG_BREAK_IF(&getMaterial(i)==&video::DEFAULT_MATERIAL);
 				getMaterial(i).MaterialType=newType;
 			}
+		}
+
+		//! Returns the triangle selector attached to this scene node.
+		/** The Selector can be used by the engine for doing collision
+		detection. You can create a TriangleSelector with
+		ISceneManager::createTriangleSelector() or
+		ISceneManager::createOctreeTriangleSelector and set it with
+		ISceneNode::setTriangleSelector(). If a scene node got no triangle
+		selector, but collision tests should be done with it, a triangle
+		selector is created using the bounding box of the scene node.
+		\return A pointer to the TriangleSelector or 0, if there
+		is none. */
+		virtual ITriangleSelector* getTriangleSelector() const
+		{
+			return m_pTriangleSelector;
+		}
+
+
+		//! Sets the triangle selector of the scene node.
+		/** The Selector can be used by the engine for doing collision
+		detection. You can create a TriangleSelector with
+		ISceneManager::createTriangleSelector() or
+		ISceneManager::createOctreeTriangleSelector(). Some nodes may
+		create their own selector by default, so it would be good to
+		check if there is already a selector in this node by calling
+		ISceneNode::getTriangleSelector().
+		\param selector New triangle selector for this scene node. */
+		virtual void setTriangleSelector(ITriangleSelector* selector)
+		{
+			if(selector)
+				selector->grab();
+			if (m_pTriangleSelector)
+				m_pTriangleSelector->drop();
+			m_pTriangleSelector = selector;
 		}
 
 		virtual void addAnimator(animator::IAnimator* animator)
