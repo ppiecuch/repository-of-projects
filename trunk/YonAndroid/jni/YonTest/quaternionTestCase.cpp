@@ -1,6 +1,6 @@
 #include "quaternionTestCase.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( quaternionTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( quaternionTestCase );
 
 void quaternionTestCase::setUp()
 {

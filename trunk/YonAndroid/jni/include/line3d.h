@@ -4,6 +4,10 @@
 #include "yonTypes.h"
 #include "vector3d.h"
 
+//refer to:http://cs.fit.edu/~wds/classes/cse5255/thesis/lineEqn/lineEqn.html
+//refer to:http://blog.codingnow.com/2006/12/eioaeoeiessiecea.html
+//三维空间直线应该是3个二元一次方程组成的方程组，每个二元一次方程表示这条三维直线在三个平面上的映射
+
 namespace yon{
 namespace core{
 	

@@ -172,6 +172,7 @@ namespace core{
 	};
 
 	typedef vector3d<f32> vector3df;
+	typedef vector3d<s32> vector3di;
 
 	YON_API extern const vector3df ORIGIN_VECTOR3DF;
 	YON_API extern const vector3df UP_VECTOR3DF;

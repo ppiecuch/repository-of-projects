@@ -32,6 +32,61 @@ const f32 DEGTORAD = PI / 180.0f;
 const f32 RADTODEG   = 180.0f / PI;
 const f64 RADTODEG64 = 180.0 / PI64;
 
+//refer to:http://bbs.chinaunix.net/thread-3746530-1-1.html
+//ANSI/IEEE Std 754-1985标准
+//IEEE 754是最广泛使用的二进制浮点数算术标准，被许多CPU与浮点运算器所采用。
+//IEEE 754规定了多种表示浮点数值的方式，在本文档里只介绍32bits的float浮点类型。
+//它被分为3个部分，分别是符号位S（sign bit）、指数偏差E（exponent bias）和小数部分F（fraction）。
+//| 1bit |   8bit  |        23bit        |
+//|   S  |    E    |          F          |
+//S位占1bit，为bit31。S位为0代表浮点数是正数，S位为1代表浮点数是负数，
+//比如说0x449A522C的S位为0，表示这是一个正数，0x849A522C的S位为1，表示这是一个负数。
+//E位占8bits，为bit23~bit30。E位代表2的N次方，但需要减去127，
+//比如说E位为87，那么E位的值为2^（87-127）=9.094947017729282379150390625e-13。
+//F位占23bits，为bit0~bit22。F位是小数点后面的位数，其中bit22是2-1=0.5，bit21是2-2=0.25，
+//以此类推，bit0为2-23=0.00000011920928955078125。但F位里隐藏了一个1，
+//也就是说F位所表示的值是1+（F位bit22~bit0所表示的数值），比如说F位是0b10100000000000000000001，
+//只有bit22、bit20和bit0为1，那么F位的值为1+(2-1+2-3+2-23)，为1.62500011920928955078125。
+// 综上所述，从二进制数换算到浮点数的公式为：(-1)S*2^(E-127)*(1+F)。
+//但还有几个特殊的情形：
+//1、若E位为0并且F位也为0时表示浮点数0，此时浮点数受S位影响，表现出+0和-0两种0，但数值是相等的。
+//比如二进制数0x00000000表示+0，二进制数0x80000000表示-0。
+//2、若E位为0并且F位不为0时浮点数为(-1)S×2^(-126)×F，注意，E位的指数是-126，而不是0-127=-127，
+//而且F位是0.xx格式而不是1.xx格式，比如0x00000001的浮点数为2^(-126)*2^(-23)=1.4012984643248170709237295832899e-45。
+//一旦E为不为0，从0变为1，不是增加2倍的关系，因为公式改变了。
+//3、若E位为255并且F位不为0时表示非数值，也就是说是非法数，例如0x7F800001。
+//4、若E位为255并且F位为0时表示无穷大的数，此时浮点数受S位影响，例如0x7F800000表示正无穷大，0xFF800000表示负无穷大。
+//当我们使用1个数除以0时，结果将被记作0x7F800000。
+/*
+float IEEE-754 bit represenation
+
++0      0x00000000
+-0		0x80000000
+1.0    0x3f800000
+0.5    0x3f000000
+3      0x40400000
++inf   0x7f800000
+-inf   0xff800000
++NaN   0x7fc00000 or 0x7ff00000
+in general: number = (sign ? -1:1) * 2^(exponent) * 1.(mantissa bits)
+*/
+typedef union { u32 u; s32 s; f32 f; } _int_float_;
+
+#define F32_AS_S32(f)		(*((s32 *) &(f)))
+#define F32_AS_U32(f)		(*((u32 *) &(f)))
+#define F32_AS_U32_POINTER(f)	( ((u32 *) &(f)))
+
+//! code is taken from IceFPU
+//! Integer representation of a floating-point value.
+#ifdef USE_FAST_MATH
+#define IR(x)                           ((u32&)(x))
+#else
+inline u32 IR(f32 x) {_int_float_ tmp; tmp.f=x; return tmp.u;}
+#endif
+
+//! Absolute integer representation of a floating-point value
+#define AIR(x)				(IR(x)&0x7fffffff)
+
 //! returns abs of two values. Own implementation to get rid of STL (VS6 problems)
 template<class T>
 inline T abs_(const T& a)
