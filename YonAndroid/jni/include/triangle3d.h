@@ -21,6 +21,9 @@ namespace core{
 			vector3d<T> cp2 = bminusa.crossProduct(p2 - a);
 			return (cp1.dotProduct(cp2) >= 0.0f);
 		}
+
+		template <>
+		bool isOnSameSide(const vector3d<s32>& p1, const vector3d<s32>& p2, const vector3d<s32>& a, const vector3d<s32>& b) const;
 	public:
 		vector3d<T> A;
 		vector3d<T> B;
@@ -101,6 +104,66 @@ namespace core{
 				isOnSameSide(p, C, A, B));
 		}
 
+		//TODO：待理解
+		//! Check if a point is inside the triangle.
+		/** This method is an implementation of the example used in a
+		paper by Kasper Fauerby original written by Keidy from
+		Mr-Gamemaker.
+		\param p Point to test. Assumes that this point is already
+		on the plane of the triangle.
+		\return True if point is inside the triangle, otherwise false. */
+		bool isPointInsideFast(const vector3d<T>& p) const
+		{
+#if 1
+			//据说精度有问题
+			const vector3d<T> f = B - A;
+			const vector3d<T> g = C - A;
+
+			const f32 a = (f32)f.dotProduct(f);
+			const f32 b = (f32)f.dotProduct(g);
+			const f32 c = (f32)g.dotProduct(g);
+
+			const vector3d<T> vp = p - A;
+			const f32 d = (f32)vp.dotProduct(f);
+			const f32 e = (f32)vp.dotProduct(g);
+
+			f32 x = (f32)(d*c)-(e*b);
+			f32 y = (f32)(e*a)-(d*b);
+			const f32 ac_bb = (f32)(a*c)-(b*b);
+			f32 z = x+y-ac_bb;
+
+			// return sign(z) && !(sign(x)||sign(y))
+			return (( (IR(z)) & ~((IR(x))|(IR(y))) ) & 0x80000000)!=0;
+#else
+			//测试不通过
+			//refer to:http://irrlicht.sourceforge.net/forum/viewtopic.php?f=7&t=44372&p=254331
+			// The triangle is described by 3 points. (P1,P2,P3). The point to check if is inside is "Point"
+			const vector3d<T> a = C - A;
+			const vector3d<T> b = B - A;
+			const vector3d<T> c = p - A;
+
+			// square lenght of triangle sides
+			const T squareA = a.getLengthSQ();
+			const T squareB = b.getLengthSQ();
+
+			// dot products.
+			const T projAB = a.dotProduct( b);
+			const T projAC = a.dotProduct( c);
+			const T projBC = b.dotProduct( c);
+
+			// get coordinates as X and Y
+			const f32 lenght =  (squareA * squareB - projAB* projAB);  
+			const T X = (squareB * projAC - projAB * projBC );
+			const T Y = (squareA * projBC - projAB * projAC );
+			const f32 check = (X+Y)/(lenght);
+
+			// final checks
+			//!Marshalling bug fix here?
+			return ( check<1 ) && (X>0) && (Y>0);
+#endif
+		}
+
+
 		//原理：分别求出三条边上离点P最近的点（可能在边上），然后对三个结果进行比较取其最优者
 		//注意：显然不支持三角形内部的点
 		//! Get the closest point on a triangle to a point on the same plane.
@@ -124,7 +187,7 @@ namespace core{
 
 
 
-		//数学依据：AB*AC=|AB||AC|Sin∠BAC=2S三角形BAC
+		//数学依据：AB×AC=|AB||AC|Sin∠BAC=2S三角形BAC
 		//How to determine area? you have two options: 
 		//1) Heron's theorem, involves sqrt, slower 
 		//2) the more perferred way is the cross products (or effectively, the half of absolute value of (sum of the down products minus the sum of up products)) 
@@ -146,6 +209,23 @@ namespace core{
 		//bool isTotalInsideBox(const aabbox3d<T>& box) const
 		//bool isTotalOutsideBox(const aabbox3d<T>& box) const
 	};
+
+	//fix bug:http://irrlicht.sourceforge.net/forum/viewtopic.php?f=7&t=44372&p=254331
+	template <>
+	bool triangle3d<s32>::isOnSameSide(const vector3d<s32>& p1, const vector3d<s32>& p2, const vector3d<s32>& a, const vector3d<s32>& b) const
+	{
+		vector3d<s64> bb,aa,pp1,pp2;
+		bb.set(b.x,b.y,b.z);
+		aa.set(a.x,a.y,a.z);
+		pp1.set(p1.x,p1.y,p1.z);
+		pp2.set(p2.x,p2.y,p2.z);
+		vector3d<s64> bminusa = bb - aa;
+		vector3d<s64> ap1=pp1 - aa;
+		vector3d<s64> ap2=pp2 - aa;
+		vector3d<s64> cp1 = bminusa.crossProduct(ap1);
+		vector3d<s64> cp2 = bminusa.crossProduct(ap2);
+		return (cp1.dotProduct(cp2) >= 0.0f);
+	}
 
 	typedef triangle3d<f32> triangle3df;
 	typedef triangle3d<s32> triangle3di;

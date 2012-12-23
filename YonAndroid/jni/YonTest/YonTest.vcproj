@@ -259,6 +259,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\triangle3dTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\triangle3dTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\vector2dTestCase.cpp"
 			>
 		</File>
