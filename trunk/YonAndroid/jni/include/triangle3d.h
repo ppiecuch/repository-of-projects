@@ -163,6 +163,79 @@ namespace core{
 #endif
 		}
 
+		//求三角形与线段的交点
+		//! Get an intersection with a 3d line.
+		/** \param line Line to intersect with.
+		\param outIntersection Place to store the intersection point, if there is one.
+		\return True if there was an intersection, false if not. */
+		bool getIntersectionWithLimitedLine(const line3d<T>& line,
+			vector3d<T>& outIntersection) const
+		{
+			return getIntersectionWithLine(line.start,
+				line.getVector(), outIntersection) &&
+				outIntersection.isBetweenPoints(line.start, line.end);
+		}
+
+		//求三角形与直线的交点
+		//! Get an intersection with a 3d line.
+		/** Please note that also points are returned as intersection which
+		are on the line, but not between the start and end point of the line.
+		If you want the returned point be between start and end
+		use getIntersectionWithLimitedLine().
+		\param linePoint Point of the line to intersect with.
+		\param lineVect Vector of the line to intersect with.
+		\param outIntersection Place to store the intersection point, if there is one.
+		\return True if there was an intersection, false if there was not. */
+		bool getIntersectionWithLine(const vector3d<T>& linePoint,
+			const vector3d<T>& lineVect, vector3d<T>& outIntersection) const
+		{
+			if (getIntersectionOfPlaneWithLine(linePoint, lineVect, outIntersection))
+				return isPointInside(outIntersection);
+
+			return false;
+		}
+
+		//数据依据：a*b=|a||b|cosθ
+		//当向量a与向量b平行时,a*b=0
+		//显然直接的方程是：(P=linePoint,V=lineVect)
+		//x = Px + Vx*s 
+		//y = Py + Vy*s (1)
+		//z = Pz + Vz*s 
+		//假设交点为I=outIntersection，平面法线为N，则平面的方程是：
+		//Nx(x-Dx)+Ny(y-Dy)+Nz(z-Dz)=0 (2)
+		//存在
+		//Ix = Px + Vx*t
+		//Iy = Py + Vy*t
+		//Iz = Pz + Vz*t
+		//Nx(Ix-Dx)+Ny(Iy-Dy)+Nz(Iz-Dz)=0
+		//联立：
+		//Nx(Px+Vx*t-Dx)+Ny(Py+Vy*t-Dy)+Nz(Pz+Vz*t-Dz)=0;==>
+		//t=(NxDx+NyDy+NzDz-NxPx+NyPy+NzPz)/(NxVx+NyVy+NzVz))
+		//=(N*D-N*P)/(N*V)
+		//! Calculates the intersection between a 3d line and the plane the triangle is on.
+		/** \param lineVect Vector of the line to intersect with.
+		\param linePoint Point of the line to intersect with.
+		\param outIntersection Place to store the intersection point, if there is one.
+		\return True if there was an intersection, else false. */
+		bool getIntersectionOfPlaneWithLine(const vector3d<T>& linePoint,
+			const vector3d<T>& lineVect, vector3d<T>& outIntersection) const
+		{
+			const vector3d<T> normal = getNormal().normalize();
+			T t2= normal.dotProduct(lineVect);
+
+			if (core::iszero(t2))
+				return false;
+
+			//如果直线不与平面平行，将存在交点。
+			//平面过点A，有Nx(Ax-Dx)+Ny(Ay-Dy)+Nz(Az-Dz)=0
+			//A*N=NxAx+NyAy+NzAz，则d=NxDx+NyDy+NzDz
+			T d = A.dotProduct(normal);
+			//t=(N*D-N*P)/(N*V)=-(N*P-d)/(N*V)
+			T t = -(normal.dotProduct(linePoint) - d) / t2;
+			outIntersection = linePoint + (lineVect * t);
+			return true;
+		}
+
 
 		//原理：分别求出三条边上离点P最近的点（可能在边上），然后对三个结果进行比较取其最优者
 		//注意：显然不支持三角形内部的点
@@ -214,14 +287,9 @@ namespace core{
 	template <>
 	bool triangle3d<s32>::isOnSameSide(const vector3d<s32>& p1, const vector3d<s32>& p2, const vector3d<s32>& a, const vector3d<s32>& b) const
 	{
-		vector3d<s64> bb,aa,pp1,pp2;
-		bb.set(b.x,b.y,b.z);
-		aa.set(a.x,a.y,a.z);
-		pp1.set(p1.x,p1.y,p1.z);
-		pp2.set(p2.x,p2.y,p2.z);
-		vector3d<s64> bminusa = bb - aa;
-		vector3d<s64> ap1=pp1 - aa;
-		vector3d<s64> ap2=pp2 - aa;
+		vector3d<s64> bminusa(b.x-a.x,b.y-a.y,b.z-a.z);
+		vector3d<s64> ap1(p1.x-a.x,p1.y-a.y,p1.z-a.z);
+		vector3d<s64> ap2(p2.x-a.x,p2.y-a.y,p2.z-a.z);
 		vector3d<s64> cp1 = bminusa.crossProduct(ap1);
 		vector3d<s64> cp2 = bminusa.crossProduct(ap2);
 		return (cp1.dotProduct(cp2) >= 0.0f);
