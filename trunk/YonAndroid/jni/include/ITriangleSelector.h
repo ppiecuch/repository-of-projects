@@ -47,7 +47,7 @@ namespace scene{
 		transformation will be done. */
 		virtual void getTriangles(core::triangle3df* triangles, s32 arraySize,
 			s32& outTriangleCount, const core::line3df& line,
-			const core::matrix4* transform=NULL) const = 0;
+			const core::matrix4f* transform=NULL) const = 0;
 	};
 }
 }

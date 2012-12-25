@@ -304,6 +304,7 @@ yon_SOURCES :=   \
 		CGraphicsAdapter.cpp \
 		CGraphicsAdapterWindow.cpp \
 		CSceneManager.cpp \
+		CTriangleSelector.cpp \
 		CTimerUnix.cpp \
 		CFPSCounter.cpp \
 		CColorConverter.cpp \

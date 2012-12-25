@@ -74,7 +74,7 @@ public:
 
 					//editbox
 					cb.ui.type=platform::ENUM_CALLBACK_UI_TYPE_EDITBOX;
-
+					YON_DEBUG("callback editbox\r\n");
 					engine->callback(cb);
 				}
 				return true;

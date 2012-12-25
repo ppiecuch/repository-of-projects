@@ -13,17 +13,9 @@ namespace core{
 	template <class T>
 	class triangle3d
 	{
-		//p1与p2是否在ab所在直线的同侧
-		bool isOnSameSide(const vector3d<T>& p1, const vector3d<T>& p2, const vector3d<T>& a, const vector3d<T>& b) const
-		{
-			vector3d<T> bminusa = b - a;
-			vector3d<T> cp1 = bminusa.crossProduct(p1 - a);
-			vector3d<T> cp2 = bminusa.crossProduct(p2 - a);
-			return (cp1.dotProduct(cp2) >= 0.0f);
-		}
 
-		template <>
-		bool isOnSameSide(const vector3d<s32>& p1, const vector3d<s32>& p2, const vector3d<s32>& a, const vector3d<s32>& b) const;
+		//p1与p2是否在ab所在直线的同侧
+		bool isOnSameSide(const vector3d<T>& p1, const vector3d<T>& p2, const vector3d<T>& a, const vector3d<T>& b) const;
 	public:
 		vector3d<T> A;
 		vector3d<T> B;
@@ -283,9 +275,25 @@ namespace core{
 		//bool isTotalOutsideBox(const aabbox3d<T>& box) const
 	};
 
+	template <typename T>
+	bool triangle3d<T>::isOnSameSide(const vector3d<T>& p1, const vector3d<T>& p2, const vector3d<T>& a, const vector3d<T>& b) const
+	{
+		vector3d<T> bminusa = b - a;
+		vector3d<T> cp1 = bminusa.crossProduct(p1 - a);
+		vector3d<T> cp2 = bminusa.crossProduct(p2 - a);
+		return (cp1.dotProduct(cp2) >= 0.0f);
+	}
+
+	//直接将特化定义于class内，win32通过，但gcc报：Explicit specialization in non-namespace scope
+	//将特化定义到class外，gcc编译出现：multiple definition of template specialization(给特化加inline解决)
+	//refer to:http://stackoverflow.com/questions/4445654/multiple-definition-of-template-specialization-when-using-different-objects
+	//You've explicitly instantiated a template in your header (void Hello<T>::print_hello(T var)). This will create multiple definitions. You can solve it in two ways:
+	//1) Make your instantiation inline.
+	//2) Declare the instantiation in a header and then implement it in a cpp.
+
 	//fix bug:http://irrlicht.sourceforge.net/forum/viewtopic.php?f=7&t=44372&p=254331
-	template <>
-	bool triangle3d<s32>::isOnSameSide(const vector3d<s32>& p1, const vector3d<s32>& p2, const vector3d<s32>& a, const vector3d<s32>& b) const
+	template<>
+	inline bool triangle3d<s32>::isOnSameSide(const vector3d<s32>& p1, const vector3d<s32>& p2, const vector3d<s32>& a, const vector3d<s32>& b) const
 	{
 		vector3d<s64> bminusa(b.x-a.x,b.y-a.y,b.z-a.z);
 		vector3d<s64> ap1(p1.x-a.x,p1.y-a.y,p1.z-a.z);

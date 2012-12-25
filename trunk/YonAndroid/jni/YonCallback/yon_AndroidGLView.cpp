@@ -38,11 +38,13 @@ public:
 		{
 		case ENUM_CALLBACK_TYPE_UI:
 			{
+				YON_DEBUG("FindClass\r\n");
 				jclass cls = g_env->FindClass(className);
 				if (cls == NULL) {
 					Logger->warn("can not find %s\n",className);
 					return false;
 				}
+				YON_DEBUG("GetMethodID\r\n");
 				jmethodID callback = g_env->GetMethodID(cls, "nativeCallback", "(I[Ljava/lang/String;)V");
 				if (callback == NULL) 
 				{
@@ -234,7 +236,7 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	return true;
 }
 jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iAction, jint id, jfloat x, jfloat y, jint count){
-	g_env=pEnv;
+	//g_env=pEnv;
 	//Logger->debug("jobject:%08X\r\n",obj);
 	if(id>=YON_TOUCH_MAX_INPUTS)
 	{
