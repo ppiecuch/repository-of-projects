@@ -18,13 +18,30 @@ f32 factor=1.1f;
 IAnimatedEntity* roleEntity=NULL;
 IAnimatedEntity* weaponEntity;
 IAnimatedEntity* rideEntity;
-ISkinnedEntity* skeletonEntity;
+ISkinnedEntity* skeletonEntity=NULL;
 IAnimatedSceneNode* roleNode;
 scene::IBoneSceneNode* ridgeDummy;
 scene::IBoneSceneNode* handDummy;
 scene::IBoneSceneNode* weaponDummy;
 
-bool needLoad=false;
+//bool needLoad=false;
+
+class CRoleAnimationEndCallback : public IAnimationEndCallBack{
+public:
+	virtual void onAnimationEnd(IAnimatedSceneNode* node){
+		//Logger->setAppender(debug::MASK_APPENDER_VS);
+		//YON_DEBUG("/********************************************/\r\n");
+		//YON_DEBUG("/********************************************/\r\n");
+		ISkinnedEntity* modelEntity=(ISkinnedEntity*)node->getEntity();
+		modelEntity->useAnimationFrom(skeletonEntity);
+		node->setFrameLoop(0,skeletonEntity->getFrameCount());
+
+		node->setLoopMode(true);
+		//roleNode->setAnimationSpeed(0.3f);	
+		//roleNode->setFrameLoop(1,1);
+	}
+};
+
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -44,14 +61,20 @@ public:
 
 					roleNode->setLoopMode(false);
 				}
-				/*else
+				else
 				{
 					const c8* roleName="knight_male_show.xc3d";
 					roleEntity=sceneMgr->getEntity(roleName);
 					roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
 					roleNode->setName(roleName);
 					roleEntity->drop();
-				}*/
+
+					IAnimationEndCallBack* cb=new CRoleAnimationEndCallback();
+					roleNode->setAnimationEndCallback(cb);
+					cb->drop();
+
+					roleNode->setLoopMode(false);
+				}
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
@@ -72,7 +95,18 @@ public:
 				}
 				else
 				{
-					needLoad=true;
+					//needLoad=true;
+					const c8* roleName="knight_male_show.xc3d";
+					roleEntity=sceneMgr->getEntity(roleName);
+					roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
+					roleNode->setName(roleName);
+					roleEntity->drop();
+
+					IAnimationEndCallBack* cb=new CRoleAnimationEndCallback();
+					roleNode->setAnimationEndCallback(cb);
+					cb->drop();
+
+					roleNode->setLoopMode(false);
 				}
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
@@ -81,24 +115,6 @@ public:
 			}
 		}
 		return false;
-	}
-};
-
-
-
-class CRoleAnimationEndCallback : public IAnimationEndCallBack{
-public:
-	virtual void onAnimationEnd(IAnimatedSceneNode* node){
-		//Logger->setAppender(debug::MASK_APPENDER_VS);
-		//YON_DEBUG("/********************************************/\r\n");
-		//YON_DEBUG("/********************************************/\r\n");
-		ISkinnedEntity* modelEntity=(ISkinnedEntity*)node->getEntity();
-		modelEntity->useAnimationFrom(skeletonEntity);
-		node->setFrameLoop(0,skeletonEntity->getFrameCount());
-
-		node->setLoopMode(true);
-		//roleNode->setAnimationSpeed(0.3f);	
-		//roleNode->setFrameLoop(1,1);
 	}
 };
 
@@ -144,9 +160,11 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
 	roleNode->setName(roleName);
 	roleEntity->drop();
-#elif 0
-	//测试动态加载
 #elif 1
+	//测试动态加载
+	const c8* skeletonName="knight_male_stand2.xc3d";
+	skeletonEntity=(ISkinnedEntity*)sceneMgr->getEntity(skeletonName);
+#elif 0
 	//测试模型渲染速度
 	const c8* roles[]={"knight_male_show.xc3d","knight_female_show.xc3d","ranger_male_show.xc3d","ranger_female_show.xc3d",
 		"oracle_male_show.xc3d","oracle_female_show.xc3d","magician_male_show.xc3d","magician_female_show.xc3d"};
@@ -164,8 +182,8 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//Logger->setAppender(debug::MASK_APPENDER_NONE);
 
 	//正常
-	//const c8* roleName="knight_male_show.xc3d";
-	//const c8* skeletonName="knight_male_stand2.xc3d";
+	const c8* roleName="knight_male_show.xc3d";
+	const c8* skeletonName="knight_male_stand2.xc3d";
 
 	//正常
 	//const c8* roleName="knight_female_show.xc3d";
@@ -193,8 +211,8 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//const c8* skeletonName="magician_male_stand2.xc3d";
 
 	//正常
-	const c8* roleName="magician_female_show.xc3d";
-	const c8* skeletonName="magician_female_stand2.xc3d";
+	//const c8* roleName="magician_female_show.xc3d";
+	//const c8* skeletonName="magician_female_stand2.xc3d";
 
 	PROFILE_REGISTER_FRAME();
 
@@ -332,14 +350,14 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	if(needLoad&&roleNode==NULL)
+	/*if(needLoad&&roleNode==NULL)
 	{
 		const c8* roleName="knight_male_show.xc3d";
 		roleEntity=sceneMgr->getEntity(roleName);
 		roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
 		roleNode->setName(roleName);
 		roleEntity->drop();
-	}
+	}*/
 
 	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
