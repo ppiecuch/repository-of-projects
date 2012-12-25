@@ -99,6 +99,10 @@ namespace scene{
 			return m_vertices.size();
 		}
 
+		//virtual const core::vector3df& getPosition(u16 index) const{
+		//	return m_vertices[index].pos;
+		//}
+
 		virtual const void* getIndices() const{
 			return m_indices.const_pointer();
 		}
