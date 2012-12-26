@@ -13,7 +13,7 @@ namespace yon{
 			virtual const void* getVertices() const = 0;
 			virtual void* getVertices() = 0;
 			virtual u32 getVertexCount() const = 0;
-			//virtual const core::vector3df& getPosition(u16 index) const = 0;
+			virtual const core::vector3df& getPosition(u16 index) const = 0;
 
 			virtual const void* getIndices() const = 0;
 			virtual void* getIndices() = 0;
