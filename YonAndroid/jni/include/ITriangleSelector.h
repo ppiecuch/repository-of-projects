@@ -48,6 +48,24 @@ namespace scene{
 		virtual void getTriangles(core::triangle3df* triangles, s32 arraySize,
 			s32& outTriangleCount, const core::line3df& line,
 			const core::matrix4f* transform=NULL) const = 0;
+
+		//! Gets the triangles for one associated node.
+		/**
+		This returns all triangles for one scene node associated with this
+		selector.  If there is more than one scene node associated (e.g. for
+		an IMetaTriangleSelector) this this function may be called multiple
+		times to retrieve all triangles.
+		\param triangles: Array where the resulting triangles will be
+		written to.
+		\param arraySize: Size of the target array.
+		\param outTriangleCount: Amount of triangles which have been written
+		into the array.
+		\param transform: Pointer to matrix for transforming the triangles
+		before they are returned. Useful for example to scale all triangles
+		down into an ellipsoid space. If this pointer is null, no
+		transformation will be done. */
+		virtual void getTriangles(core::triangle3df* triangles, s32 arraySize,
+			s32& outTriangleCount, const core::matrix4f* transform=NULL) const = 0;
 	};
 }
 }

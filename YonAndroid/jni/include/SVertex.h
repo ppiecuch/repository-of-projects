@@ -50,9 +50,10 @@ namespace scene{
 
 	struct S2DVertex{
 		S2DVertex(){}
-		S2DVertex(f32 x,f32 y,f32 tu, f32 tv,video::SColor c):pos(x,y),texcoords(tu,tv),color(c){}
+		S2DVertex(f32 x,f32 y,f32 tu, f32 tv,video::SColor c):pos(x,y,0),texcoords(tu,tv),color(c){}
 
-		core::vector2df pos;
+		//core::vector2df pos;
+		core::vector3df pos;
 		video::SColor color;
 		core::vector2df texcoords;
 		
@@ -79,8 +80,8 @@ namespace scene{
 
 	inline u32 getSizeByVertexType(ENUM_VERTEX_TYPE type){
 		switch(type){
-		case ENUM_VERTEX_TYPE_2V1T1C:
-			return sizeof(S2DVertex);
+		//case ENUM_VERTEX_TYPE_2V1T1C:
+		//	return sizeof(S2DVertex);
 		case ENUM_VERTEX_TYPE_3V2T1C:
 			return sizeof(SVertex2TCoords);
 		default:
@@ -95,12 +96,14 @@ namespace scene{
 
 	inline u8* getVertexColorOffset(ENUM_VERTEX_TYPE type)
 	{
+		/*
 		switch(type){
 		case ENUM_VERTEX_TYPE_2V1T1C:
 			return (u8*)0+8;
 		default:
 			return (u8*)0+12;
-		}
+		}*/
+		return (u8*)0+12;
 	}
 
 	inline u8* getVertexTexcoordOffset(ENUM_VERTEX_TYPE type,u32 stage)
@@ -108,8 +111,8 @@ namespace scene{
 		switch(type){
 		case ENUM_VERTEX_TYPE_3V2T1C:
 			return (u8*)0+12+4+8*stage;
-		case ENUM_VERTEX_TYPE_2V1T1C:
-			return (u8*)0+8+4;
+		//case ENUM_VERTEX_TYPE_2V1T1C:
+		//	return (u8*)0+8+4;
 		default:
 			return (u8*)0+12+4;
 		}

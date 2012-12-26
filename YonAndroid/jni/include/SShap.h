@@ -99,9 +99,9 @@ namespace scene{
 			return m_vertices.size();
 		}
 
-		//virtual const core::vector3df& getPosition(u16 index) const{
-		//	return m_vertices[index].pos;
-		//}
+		virtual const core::vector3df& getPosition(u16 index) const{
+			return m_vertices[index].pos;
+		}
 
 		virtual const void* getIndices() const{
 			return m_indices.const_pointer();
@@ -176,10 +176,6 @@ namespace scene{
 		virtual void setIndicesDirty(){
 			++m_uIndicesChangedId;
 		}
-
-		/*virtual ENUM_DIMEN_MODE getDimenMode() const{
-			return static_cast<const ENUM_DIMEN_MODE>(M);
-		}*/
 
 		virtual ENUM_VERTEX_TYPE getVertexType() const{
 			return static_cast<const ENUM_VERTEX_TYPE>(VT);
