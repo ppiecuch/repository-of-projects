@@ -93,6 +93,11 @@ inline T abs_(const T& a)
 {
 	return a <(T)0? -a : a;
 }
+template<class T>
+inline bool between(const T& n, const T& a, const T& b)
+{
+	return n>=a&&n<=b;
+}
 //! returns linear interpolation of a and b with ratio t
 //! \return: a if t==0, b if t==1, and the linear interpolation else
 template<class T>
