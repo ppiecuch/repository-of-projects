@@ -17,6 +17,16 @@ public:
 	virtual bool onEvent(const SEvent& evt){
 		switch(evt.type)
 		{
+		case event::ENUM_EVENT_TYPE_SYSTEM:
+			switch(evt.systemInput.type)
+			{
+			case event::ENUM_SYSTEM_INPUT_TYPE_DOZE:
+				logger->debug("DOZE\r\n");
+				break;
+			case event::ENUM_SYSTEM_INPUT_TYPE_WAKE:
+				logger->debug("WAKE\r\n");
+				break;
+			}
 		case event::ENUM_EVENT_TYPE_MOUSE:
 			switch(evt.mouseInput.type)
 			{

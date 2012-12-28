@@ -28,7 +28,8 @@ int main(int argc, char* argv[])
 
 	init(NULL,NULL,NULL,NULL,800,480);
 	while(getEngine()->run()){
-		drawFrame();
+		if(getEngine()->displaying())
+			drawFrame();
 	}
 	destroy();
 }
