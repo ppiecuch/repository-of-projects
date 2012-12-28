@@ -145,7 +145,8 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
-	fs->addWorkingDirectory("../media/xc3d",true);
+	//fs->addWorkingDirectory("../media/xc3d",true);
+	fs->addWorkingDirectory("../media/xc3d/new");
 	fs->addWorkingDirectory("../media/ms3d",true);
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/");
@@ -160,7 +161,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	IAnimatedSceneNode* roleNode=sceneMgr->addAnimatedSceneNode(roleEntity);
 	roleNode->setName(roleName);
 	roleEntity->drop();
-#elif 1
+#elif 0
 	//测试动态加载
 	const c8* skeletonName="knight_male_stand2.xc3d";
 	skeletonEntity=(ISkinnedEntity*)sceneMgr->getEntity(skeletonName);
@@ -182,8 +183,8 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//Logger->setAppender(debug::MASK_APPENDER_NONE);
 
 	//正常
-	const c8* roleName="knight_male_show.xc3d";
-	const c8* skeletonName="knight_male_stand2.xc3d";
+	//const c8* roleName="knight_male_show.xc3d";
+	//const c8* skeletonName="knight_male_stand2.xc3d";
 
 	//正常
 	//const c8* roleName="knight_female_show.xc3d";
@@ -211,8 +212,8 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//const c8* skeletonName="magician_male_stand2.xc3d";
 
 	//正常
-	//const c8* roleName="magician_female_show.xc3d";
-	//const c8* skeletonName="magician_female_stand2.xc3d";
+	const c8* roleName="magician_female_show.xc3d";
+	const c8* skeletonName="magician_female_stand2.xc3d";
 
 	PROFILE_REGISTER_FRAME();
 

@@ -106,7 +106,7 @@ void drawFrame(){
 
 	static core::rectf r(0,1,1,0);
 	gfAdapter->clearZ(1000);
-	ITexture* texture=videoDriver->getTexture("rgbapng8.pvr");
+	ITexture* texture=videoDriver->getTexture("11711.pvr");
 	//gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
 	gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true);
 	gfAdapter->render();
