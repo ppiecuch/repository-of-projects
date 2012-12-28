@@ -39,6 +39,8 @@ namespace yon{
 
 		//当引擎初始化过程中失败后，available会返回false(用于crash流程)
 		virtual bool available(){return true;}
+		//引擎是否显示中，当窗口最小化时，引擎不显示
+		virtual bool displaying(){return true;}
 		virtual bool run() = 0;
 		virtual void onResize(u32 w,u32 h) = 0;
 
