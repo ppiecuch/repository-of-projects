@@ -5,7 +5,7 @@
 #include "YonMultiwindow.h"
 #include "Dialog3.h"
 
-IModel* teapotModel=NULL;
+ISceneNode* teapotModel=NULL;
 
 // CDialog3 ¶Ô»°¿ò
 
@@ -62,12 +62,12 @@ int CDialog3::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	geometryFty=sceneMgr->getGeometryFactory();
 
-	camera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,core::vector3df(0,0,300));
+	camera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	animatorFty=sceneMgr->getAnimatorFactory();
 
 	fs->addWorkingDirectory("../media/");
 
-	IMaterial* material;
+	//IMaterial* material;
 	IShap *shap;
 	IUnit* unit;
 	scene::IEntity* entity;
@@ -75,8 +75,8 @@ int CDialog3::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	teapotModel=sceneMgr->addModel(entity);
-	material=teapotModel->getMaterial(0);
+	teapotModel=sceneMgr->addSceneNode(entity);
+	//material=teapotModel->getMaterial(0);
 	shap->drop();
 	unit->drop();
 	entity->drop();

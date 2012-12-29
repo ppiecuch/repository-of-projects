@@ -21,7 +21,7 @@
 			OutputDirectory="$(SolutionDir)bin"
 			IntermediateDirectory="$(SolutionDir)obj\$(ProjectName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			CharacterSet="1"
 			>
 			<Tool
@@ -46,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../Yon/MyGUIEngine/include;../include"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_AFXDLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -68,9 +68,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="mfc90ud.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				EntryPointSymbol="wWinMainCRTStartup"
 				TargetMachine="1"
 			/>
 			<Tool
