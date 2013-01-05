@@ -84,6 +84,8 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	Logger->warn("warn\r\n");
 	Logger->error("error\r\n");*/
 
+	//YON_FAIL_IF(true);
+
 	return true;
 }
 void resize(u32 width,u32 height){
