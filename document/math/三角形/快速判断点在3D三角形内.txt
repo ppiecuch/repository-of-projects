@@ -1,0 +1,37 @@
+伪代码(Pseudocode) 如下：
+
+比2D的判断稍微复杂一点点。
+bool pointIn3DTri(vec3 p, vec3 a, vec3 b, vec3 c)
+{
+ vec3 v1, v2;
+ float dot[3];
+ bool zeroDot[3];
+ //生成三角形的法线，任意两条边叉积
+ vec3 normal = makenormal(a, b, c); 
+ v1 = b - a;
+ v2 = p - a;
+ dot[0] = dotproduct(crossproduct(v1, v2), normal);
+ zeroDot[0] = realequal(dot[0], 0.0);
+ v1 = c - b;
+ v2 = p - b;
+ dot[1] = dotproduct(crossproduct(v1, v2), normal);
+ zeroDot[1] = realequal(dot[1], 0.0);
+ 
+ if(!zeroDot[0] && !zeroDot[1] &&
+ sign(dot[0] != sign(dot[1]))
+ return false;
+
+ v1 = a - c;
+ v2 = p - c;
+ dot[2] = dotproduct(crossproduct(v1, v2), normal);
+ zeroDot[2] = realequal(dot[2], 0.0);
+ bool ifs1 = !zeroDot[0] && !zeroDot[2] && sign(dot[0]) != sign(dot[2]);
+ bool ifs2 = !zeroDot[1] && !zeroDot[2] && sign(dot[1]) != sign(dot[2]);
+
+ if(ifs1 || ifs2)
+ return false;
+
+ return true;
+
+}
+http://www.game798.com/html/2007-03/3161.htm

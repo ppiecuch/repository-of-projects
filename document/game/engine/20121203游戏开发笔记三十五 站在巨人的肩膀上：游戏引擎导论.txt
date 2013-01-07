@@ -1,0 +1,492 @@
+本系列文章由zhmxy555（毛星云）编写，转载请注明出处。  
+文章链接： http://blog.csdn.net/zhmxy555/article/details/8250057
+作者：毛星云（浅墨）    邮箱： happylifemxy@163.com    
+ 
+ 
+ 
+看到在留言中很多朋友提到不太清楚DirectX与游戏引擎的区别的问题，在这里浅墨就专门把自己对游戏引擎的一些理解写成一篇文章，作为我们《Visual C++游戏开发》专栏的游戏引擎导论，也希望能通过这篇文章，能让大家有所启发，对游戏引擎，对渲染流水线的概念有更深刻的认识。
+文章首先分析了学习游戏引擎的必要性，然后介绍了游戏引擎的概念和相关知识，接着介绍了几款最具人气的开源游戏引擎，然后对市面上存在的所有游戏引擎进行了列举，并为所有列出的游戏引擎都给出了官方网站的链接。文章末尾回归了我们Direct3D的主题，为后续内容的讲解进行了铺垫。
+ 
+ 
+ 
+一、学完DirectX，我们该干什么？
+ 
+ 
+浅墨觉得，历代DirectX龙书的作者Frank Luna在龙书中忽视了非常重要的一方面内容的讲解，那就是就是学完了DirectX我们接着该做什么。
+这大概是很多怀揣游戏开发梦想的热血青年们曾经思考过的问题。
+ 
+浅墨也曾经在这问题上迷茫过，也因为没人指明前路而走了不少弯路。
+不过后来在黑暗中不断地摸索，将荆棘变成坦途之后，终于摸索出了一条正确的道路。
+也就是看完龙书《DIRECTX.9.0.3D游戏开发编程基础》之后，我们需要如何学习，来把学到的知识立体化，最终转化为开发游戏的实际能力。首先我们需要再看一本书，《Real-Time Rendering》，也就是（RTR）实时渲染技术，目前出到第三版了。（这本书并没有中文版，大家如果要走游戏开发的道路，读完龙书之后，剩下基本上都要靠读英文书了。）
+学完龙书，也可以选择自己喜欢的游戏引擎来接触并掌握了。看完龙书后浅墨首推学习Irrlicht，然后进阶推荐Ogre。两者都是开源游戏引擎，都有着源代码提供下载学习，而且网上对这两种引擎的研究热情很高，资料丰富，引擎代码字里行间都是哲思，掌握其中的代码并纳为己用，自己写出像样的游戏demo来是不成任何问题的。
+ 
+ 
+下面，就开始看看我们这篇文章的主角——游戏引擎
+ 
+ 
+ 
+二、站在巨人的肩膀上：游戏引擎导论
+ 
+ 
+1.游戏引擎的起源和意义
+ 
+上帝说，要有光，于是，就有了光。
+曾经有一段时期，游戏开发者关心的只是如何尽量多地开发出新的游戏并把它们推销给玩家。尽管那时的游戏大多简单粗糙，但每款游戏的平均开发周期也要达到8到10个月以上，这一方面是由于技术的原因，另一方面则是因为几乎每款游戏都要从头编写代码，造成了大量的重复劳动。渐渐地，一些有经验的开发者摸索出了一条偷懒的方法，他们借用上一款类似题材的游戏中的部分代码作为新游戏的基本框架，以节省开发时间和开发费用。根据马克思的生产力学说，单位产品的成本因生产力水平的提高而降低，自动化程度较高的手工业者最终将把那些生产力低下的手工业者淘汰出局，引擎的概念就是在这种机器化作业的背景下诞生的。
+ 
+简而言之，因为想用更短的周期开发游戏，省掉重复编写代码的功夫，于是便有了游戏引擎。
+ 
+首款的3D引擎诞生于1992年，3D Realms公司/Apogee公司发布了一款只有2兆多的小游戏——《德军司令部》（Wolfenstein 3D）。之后这款游戏引申为Wolfenstein 3D游戏引擎，这也是史上首款3D引擎，它的作者是大名鼎鼎的约翰·卡马克，这位id Software公司的首席程序师正是凭借这款Wolfenstein 3D引擎在游戏圈里站稳了脚跟。
+在此之后，游戏业界都受此启发，各式各样的游戏引擎层出不穷。而各种游戏引擎的出现，使得游戏开发并不需要从零开始，从而使得开发的周期大大缩短，也使开发成本大大降低。
+ 
+游戏引擎崛起，游戏产业的黎明，就此降临。
+ 
+ 
+ 
+2.什么是游戏引擎
+ 
+游戏引擎好比赛车的引擎，是用于控制所有游戏功能的主程序，从计算碰撞、物理加速系统和物体的相对位置，到接受玩家的输入，以及按照正确的音量输出声音等等。无论是角色扮演游戏、即时策略游戏、冒险解谜游戏或是动作射击游戏，哪怕是一个只有1兆的小游戏，都有这样一段起控制作用的代码。
+这里我们丢出一个概念。游戏引擎是指一些已编译好的可编辑电脑游戏系统或者一些交互式实时图像应用程序的核心组件。这些系统为游戏设计者提供各种编写游戏所需的各种工具，其目的在于让游戏设计者能容易和快速地做出一款游戏作品，而不是从零开始写起，这样大大缩短了开发的效率，开发的时间和开发的成本。
+ 
+可以这样说，游戏引擎让我们站在巨人的肩膀上进行游戏的开发，而不是从零开始。
+ 
+ 
+ 
+3.一款完善的游戏引擎的构成
+ 
+我们很大程度上将游戏引擎都理解为渲染引擎，分为2D图形引擎和3D图形引擎，其实游戏引擎并不单单指渲染引擎。渲染引擎只是一款完善的游戏引擎最重要的组成部分，而一款完善的引擎，还包含物理引擎，碰撞检测引擎，音效引擎，脚本引擎，电脑动画引擎，人工智能引擎，网络引擎，场景管理引擎以及IO管理引擎等等。
+其中，3D引擎的渲染系统通常建立在一套或者多套高级的图形API之上，比如我们熟知的Direct3D与OpenGL。
+ 
+ 
+4.DirectX与游戏引擎的区别
+ 
+很多朋友在评论中提到不清楚DirectX与游戏引擎到底有何区别，在这里我们就来展开讲一下，其实说起来非常简单。
+首先，DirectX是微软旗下的一种应用程序接口（API），它为各种品牌的硬件提供了一个共同的硬件驱动标准，无论你是什么牌子的硬件，只要你遵循DirectX约定的准则，用DirectX这套API开发出来的游戏就可以在你的硬件上很好的运行。DirectX，我们可以理解为他为硬件驱动。而Direct3D，只是DirectX之中负责3D图形渲染的一个组件而已。
+ 
+游戏引擎是为了实现一款游戏雏形而编写的一系列可重用的代码，很多游戏引擎的渲染部分实现了对Direct3D的封装。我们可以理解游戏引擎为一系列的软件代码，而我们利用游戏引擎中已经现存的代码，开发起游戏来就能事半功倍。
+ 
+所以，综合一下。
+DirectX可以理解为硬件的驱动，它为各种品牌的硬件提供了一个共同的硬件驱动标准。
+游戏引擎，是一系列构成一款游戏的可重用的代码，是用于控制所有游戏功能的主程序，游戏引擎的前身可为一款完整的游戏作品。
+ 
+ 
+ 
+5.人气开源游戏引擎介绍
+ 
+想事半功倍地开发出属于自己的游戏，在选择游戏引擎上是必须要下足功夫的。
+多半的游戏引擎都开源且免费授权的，也就是说，如果我们采用某款开源游戏引擎开发出了自己的游戏，无需任何费用，只要在我们的游戏作品中表示，使用了什么引擎来进行游戏开发的就可以了。也就是我们经常在很多游戏片头会看到的logo。Power by XXX，比如Power by Ogre。下面我们就来介绍几款目前比较火热的开源游戏引擎，我们用他们进行游戏开发是完全免费的：
+ 
+Ⅰ.Irrlicht Engine
+Irrlicht Engine（鬼火引擎）始于2003年，次年即被评为最佳开源游戏引擎。它具有高性能的实时3D引擎，用C++编写，也可用于.Net语言。拓展语言绑定包含java,perl,ruby,python.跨平台支持，使用D3D,OpenGL以及自带API. Irrlicht Engine可以在移动平台Android以及iOS上使用。值得一提的是，鬼火引擎有专门的Andorid版。
+其功能特点可以与商业3D引擎相比。优点是容易掌握，好学。新手入门建议学习Irrlicht。
+ 
+Ⅱ.Ogre
+OGRE（面向对象的图形渲染引擎）：OGRE是用C++编写的，以现场为导向，灵活的三维引擎，它主要用于那些利用硬件加速的3D图形应用程序。它的类库提取了所有基础系统库的细节，如Direct3D和OpenGL ，并提供了一个基于世界对象和其他直观类的界面。Ogre支持跨平台，也就是说，Ogre理论上可以在Android以及iOS等移动平台上使用，不过需要进行相关的移植。
+Ogre人如其名，完全采用面向对象的思想来进行设计，整体结构显得非常优雅，宛如一件艺术品。在开源游戏引擎中，Ogre有着最华丽的渲染质量，可以和大多数3D商业引擎的渲染效果一较高下。浅墨非常喜欢这款开源引擎，只可惜它仅仅是图形引擎，而不是功能全面完整的游戏引擎。值得一提的是， 目前非常具人气的ARPG游戏《火炬之光》系列就是采用的Ogre引擎。
+这里我们贴一些2012年9月20日刚上市的《火炬之光2》的游戏美图：
+
+ 
+好了，看完绚丽的游戏截图，下面我们继续来学习。相信总有一天，我们也可以亲手写出这样优秀的游戏作品出来。
+ 
+ Ⅲ.Delta3D
+Delta3D：Delta3D是一个功能齐全的游戏引擎，可用于游戏，模拟或其他图形应用。其模块化设计集成了其他的开源项目，如‘开放场景图’，‘开放动力学引擎’，‘人物动画库’和‘OpenAL’ 。Delta3D把这些开源项目集成到一个易于使用的应用程序编程接口中。
+ 
+ 
+Ⅳ.NeoEngine
+NeoEngine：NeoEngine是一个全功能的用C++编写的开源3D三维游戏引擎。该引擎是多平台的，包括OpenGL和DirectX渲染功能，支持Windows ，Linux和Mac OS X系统，它提供了场景管理，顶点和像素着色，骨骼动画和物理，脚本以及一个完全集成的工具链。
+ 
+
+
+Ⅴ.Bullet
+Bullet：Bullet是三维游戏多重物理库，提供最先进的碰撞检测，柔软身体和刚体动力学。这个游戏引擎被许多AAA级的游戏公司用在PS3 ，Xbox 360 ，任天堂的Wii、以及PC上 。这个库可以免费用于商业用途。
+
+ 
+Ⅵ.Power Render
+Power Render：Power Render是一个为游戏和3D图形准备的软件开发工具包。它为开发者提供了一个API，为美工准备了一些工具，这些工具可以实时预览3ds Max、Maya和Lightwave的模型。新版本还可以预览高动态范围成像并支持OpenEXR文件格式。下载 Power Render 6 （35.1MB exe）。 
+
+ 
+ 
+6.一些思考
+ 
+很多朋友也会想到，既然都有了现成的游戏引擎为我们封装好各类DirectX和OpenGL的库函数，甚至做出了各类可视化的设计工具，让我们无需了解调用的细节就可以用这些工具来制作出自己的游戏，那我们是不是就不用去学习图形API，也就是不用去学习Direct3D（或者OpenGL）了？
+一千个人人眼中有一千个哈姆雷特。
+如果你是本着快速开发一款游戏就完事交差的心态，知其然不知其所以然，DirectX其实并不用去学习，直接去学习一款好的游戏引擎的SDK就可以了。
+如果你是本着学习求知的心态，想要把游戏开发的各方面知识和细节做到心中有数，甚至以后想自己写一款游戏引擎，DirectX（或者OpenGL）是必须要学的。学完DirectX（或者OpenGL）之后，再来接触一款游戏引擎，接触它的源码，我们就有资本看懂这些源码的实现细节，就可以很容易地把这款游戏引擎使用DirectX（或者OpenGL）进行渲染的细节脉络看得清清楚楚。经常我们还涉及到了各种不同版本硬件渲染的支持问题，比如DirectX 8与DirectX9，这时候就会考验我们对图像API的掌握情况。 同样，掌握了DirectX（或者OpenGL）更利于我们对渲染的优化。
+ 
+ 
+ 
+ 
+ 
+7.市面上各类游戏引擎的列举
+ 
+最后，下面我们列举出市面上存在的游戏引擎，点击各个引擎的名字就可以跳到相应的引擎官网地址了。
+需要指出的是，这里的引擎有的只是图形引擎，有的只是物理引擎，也就是说并不都像那些完善的商业引擎，比如虚幻3引擎（Unreal Engine3）一样，具有完善而功能全面的物理引擎，碰撞检测引擎，音效引擎，脚本引擎，电脑动画引擎，人工智能引擎，网络引擎，场景管理引擎以及IO管理引擎等等。
+ 
+ 
+开源2D引擎：
+ 
+cocos2d
+d2d
+ika
+AGen
+gosu
+Mokoi Gaming
+LOVE
+Gosu
+PTK
+Thousand Parsec
+PPTactical Engine
+elf2d
+Daimonin MMORPG
+Blackthorn
+lastexpressengine
+tamy
+stardust
+ruge
+MAGE
+Edge Game Engine
+Orx
+chingu(Ruby)
+HGE
+FlatRedBall
+DxIce
+exgine（dephi）
+Entropia
+OSARE
+ProtoEngine（Javascript）
+mofe
+tonk(Python)
+Bismuth Engine
+retroremakes-framework
+scage（Scala）
+ArcLib
+tIDE
+flamingoengine(Python)
+Ethanon
+angel engine
+FIFE project
+Novashell
+Weaver(Linux)
+verge 3
+GTGE
+ArcEngine
+ 
+ 
+ 
+开源3D游戏引擎
+ 
+Ogre
+Crystal Space
+Delta3D
+Irrlicht Engine
+CHAI 3D
+Cafu Engine
+ZFXCEngine
+Q3Viewer
+Drag[en]gine
+DUMB(Linux)
+DXQuake3
+Brume
+Open Toolkit
+RaydiumEn
+PySoy （Python）
+pygame（Python）
+BlendELF
+Ambrose3D
+AgateLib（.NET）
+D’Enfent Engine
+Asphyre Sphinx(Delphi)
+pyggel（Python）
+NeoEngine
+Horde3D
+ika
+Lightfeather
+syBR Engine
+SoftPixel Engine
+SED
+RomantiqueX(XNA)
+GLOBE_3D
+NeL Engine
+NewWorld3D
+M0TE
+MUD Designer(C#)
+Muli3D
+Linderdaum
+Lilith3D(Geo-Morphing)
+Entropia Engine
+SxDL
+APOCALYX 3D Engine
+Genesis3D
+QuakeForge
+NetGore (C#)
+Stratagus
+SDL
+PLIB
+ClanLib SDK
+GLFW
+Allegro
+3DzzD
+Jad Engine (C#)
+Agar
+6DX 3D Engine
+OSG
+Cube 2: Sauerbraten
+SCEngine
+vbGORE
+TNT Basic
+nebula3
+Sphere RPG engine.
+GhostEngine
+Hazy Mind（XNA）
+nagine3d
+mako engine
+aeon3d
+mcore3d
+tubras
+mgep
+Sylphis3D
+Yage
+XreaL
+Q 2.0
+Quesa
+Reactor3D(XNA)
+Metrolog Xg
+plush
+Lystra Engine
+LightFire(C#)
+LEAF2
+Lightning Engine
+jMeteor
+QBasic
+Lightspeed 3D(MacOS)
+Protea
+Original3D
+Purple#
+Cat Mother
+ExoEngine
+Poly Engine
+XEngine
+Xvizn
+Yake
+OpenSpace3D
+rgdengine
+ezrpg（PHP）
+glueengine(C#)
+G3DRuby
+netgore(C#)
+fosengine
+u-nebula
+renderengine（JavaScript）
+ltegameengine
+axonengine
+jgge
+Espresso3D
+RetinaX
+Reality Factory
+gmogre3d
+prequengine
+Epee Engine
+Axiom 3D Engine
+G3D
+OHRRPGCE
+Open Game Engine
+Baja Engine
+Blender
+Irmo
+Xith3D
+Soya 3D（Python）
+Panda3D
+Quake Engine3
+Quake Engine2
+Amaltheia
+Quake Engine
+ 
+ 
+ 
+商业通用游戏引擎：
+ 
+Unreal ENGINE3
+CryENGINE3
+Gamebryo
+Vision Engine
+unity3d
+Source Engine
+Shiva 3D
+Unigine
+Torque 3D
+C4 Engine
+Truevision3D
+Demoniak3D
+CSP engine license
+Codecreatures
+Buzz 3D
+3DSTATE
+Antiryad Gx
+Glacier
+Esperient Creator
+Lucid
+ludiloom
+Luxinia
+LawMaker
+GameStart
+Glint 3D ScriptENGINE
+Esenthel Engine
+GameCore
+Nowhere Engine
+S2Engine
+Quest3D
+Exocortex
+Frame Simulator
+Codecreatures
+worldaxis3d
+Xors3d
+VRcontext
+CPAL3D
+Ready At Dawn Engine
+Nytro Game Engine
+game start3d
+Visual3D Game Engine
+Vicious Cycle Software
+MetaVR
+Grualia Game Engine
+Gamestudio
+BlitzMax
+Cipher Game Engine
+Visual3D Game Engine
+Wild Pockets
+3DVIA Virtools
+Vicious Engine
+VATAN ENGINE
+Cobra 3D engine(Cobra )
+Qube Software
+FreshEngine（PSP）
+Shark 3D
+eye-sys
+NeoAxis Game Engine
+DX Studio
+3DVIA Virtools
+Agency9
+Abyssal Engine
+ 
+ 
+商业MMO游戏引擎：
+ 
+Hero ENGINE
+Realm Crafter
+Zythum-Project
+Bigworld
+Chaos Game Engine
+Prime Engine
+Multiverse
+ 
+ 
+ 
+Android 2D开源游戏引擎：
+ 
+AGE
+Angle
+cloak
+Cocos2D
+juicygames
+libgdx
+Rokon
+mages
+candroid engine
+andengine
+ 
+Android商业游戏引擎：
+Roar Engine
+ 
+Android 3D开源游戏引擎：
+catcake
+jPCT-AE
+kwaak3
+Gamine
+Alien3D
+forget3d
+Papaya
+ 
+ 
+iPhone商业游戏引擎：
+airplaysdk
+PlaytoTv
+Kanji
+Shiva Ston3d
+iTGE
+Bork 3D
+Unity For iPhone
+GameSalad
+iXors3d
+ 
+ iPhone开源引擎：
+ 
+galaxyengine
+gamekit
+Oolong
+SIO2
+chipmunk-physics
+card-surface
+Tec engine
+ 
+关于游戏引擎的部分就讲解完了，如果上面的列表有疏漏或者不准确的地方，欢迎大家纠错。
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+下面我们来回归到目前的讲解进度中来，关于Direct3D的渲染流水线。
+ 
+ 
+ 
+三， Direct3D渲染流水线的两套体系
+ 
+ 
+在Direct3D中，有两套实现图形渲染的方案，第一套为固定功能渲染流水线（fixed function render pipeline），另一套为可编程渲染流水线（programmable render pipeline）。
+顾名思义，从字面上就可以看出这两套方案的一些端倪出来。下面我们先来分别简单介绍一下Direct3D中两套渲染体系的特点和整体思路，给大家一个大体的概念。在介绍之前，有一个必须事先跟大家说清楚的实事，就是在DirectX 10以及DirectX11中，固定功能渲染流水线已经被移除了，而可编程渲染流水线则得到了重用,这反映了一个明显的趋势。
+目前，我们主要涉及到DirectX的有三个版本，有DirectX 9，DirectX 10以及DirectX 11。下面我们先分别介绍一下。
+DirectX 9，一路走来，追捧者无数，一手遮天，是目前PC游戏界的中流砥柱，占据着DirectX家族的绝大多数市场份额。
+DirectX 10，这个悲剧的孩子由于搭载了坑爹的操作系统Windows Vista，生不逢时，注定了它此生的坎坷和怀才不遇。
+DirectX 11，这位才华横溢的孩子，在合适的时间出现在了合适的操作系统——Windows 7上，会在未来几年内取得不错的成绩。而在国内的话，DirectX 11的普及，估计还得更久。
+ 
+ 
+虽说在DirectX 10以及DirectX11中，固定功能渲染流水线已经被移除了，但是在目前的主流DirectX 9里面，固定功能渲染流水线依然占有着举足轻重的地位，我们只是会在后面的介绍中淡化它，但我们仍然需要掌握它，以备不时之需。
+最后我们来分别介绍一下这两套Direct3D的渲染体系吧:
+ 
+ 
+ 
+Ⅰ.固定功能流水线
+ 
+第一套方案，固定功能渲染流水线（fixed function render pipeline）。
+顾名思义，固定功能渲染流水线（fixed function render pipeline）从某种意义上来讲是固定的（fixed）。它有着自己的一套准则，关于光照，关于矩阵变换。要进行一个完整而全面的渲染操作，基本上都是按以下步骤进行的：填充顶点数据，指定纹理坐标，设置材质，设置光照，设置变换矩阵，设置渲染状态，最终绘制图形。这里先给大家一个步骤上的概念，后续文章中会详细给大家介绍的。很多时候，我们只需要遵守着这套固定的准则一步一步地进行相关代码的书写，就完全可以驾驭这种渲染方法了。我们使用固定功能渲染流水线进行画面的渲染，说穿了就是根据我们的需要，不断地通过Direct3D设备指针调用一些Direct3D中预设的函数，比如用SetRenderState（）设置各式各样的渲染状态，SetSamplerState（）设置各式各样的采样状态等等。至于场景的处理和绘制的内部过程我们无需插手，Direct3D的引擎会根据我们设置的各种渲染状态，自己来完成，非常的人性化。
+由于这种渲染方案在新版的Direct3D中被移除，所以很多时候我们只需稍微了解，在后面，我们会淡化固定功能流水线的使用，而更多地对 “写shader”进行讲解，也就是目前使用广泛的可编程渲染流水线。
+ 
+Ⅱ.可编程渲染流水线
+ 
+最后，下面我们就来大概了解一下目前的渲染技术的趋势——可编程渲染流水线。
+ 
+而可编程渲染流水线（programmable render pipeline）就有着很大的不同了。通常我们说的自己写shader就是指的这套渲染体系，这是目前3D编程的大趋势。从字面意义上来说，它是可编程的，很灵活，而不是固定的。这样我们就可以通过代码的书写，着手去实现那些在固定功能流水线中不太好实现的技术和效果，从而升华了我们的渲染技术。可编程渲染流水线中的核心，是着色器（shader）。而在Direct3D 9中，我们主要关注的是顶点着色器（vertex shader）和像素着色器（pixel shader）。也就是说，我们为着色器编写一些规模较小的代码，然后在GPU上进行编译和运行，这就是所谓的可编程渲染流水线的精髓。关于我们在可编程渲染流水线中使用的编程语言，是一种编译和运行在GPU(Graphic Processing Unit)图形处理器之上的Direct3D中独有的着色器编程语言——HLSL（High Level Shader Language）高级着色器语言。关于这种着色器编程语言，后面我们会详细介绍。
+ 
+ 
+关于后续的讲解思路，我们会先大致了解固定渲染流水线，然后重点学习可编程渲染流水线，再者，就是选择一个3D游戏引擎进行系统学习了。
+ 
+以上就是本节笔记的全部内容，更多精彩内容，且听下回分解。
+ 
+浅墨在这里，希望喜欢游戏开发系列文章的朋友们能留下你们的评论，每次浅墨登陆博客看到大家的留言的时候都会非常开心，感觉自己正在传递一种信仰，一种精神。
+ 
+另外，浅墨刚刚参加了2012年CSDN年度博客之星的评选活动。
+在这里，恳请支持浅墨，喜欢游戏开发系列文章的朋友们去投浅墨一票，有了大家的支持，浅墨会更用心地写出更优秀的博客文章来与大家分享,把技术分享这种信仰传递下去。
+大家的支持就是浅墨继续写下去的动力~~~  
+ 
+ 
+如果文章中有什么疏漏的地方，也请大家指正。
+ 
+ 
+文章最后，依然是【每文一语】栏目，以此共勉： 
+当你打算放弃梦想的时候，告诉自己再多撑一天，一个星期，一个月，再多撑一年吧。等到繁华落尽的时候，你会发现，拒绝退场的结果，是一种怎样的美好。
+ 
+ 
+下周一，让我们离游戏开发的梦想更进一步。
+下周一，游戏开发笔记，我们，不见不散。
+
+http://blog.csdn.net/zhmxy555/article/details/8250057
