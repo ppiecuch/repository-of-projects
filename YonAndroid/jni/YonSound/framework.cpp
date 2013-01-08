@@ -10,9 +10,9 @@ IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 
-IModel* cubeModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
@@ -72,6 +72,8 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	//PROFILE_REGISTER_FRAME();
 	//PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
 	ISound* sound=audioDriver->getSound("bg.ogg");
+	//audioDriver->grabSound(sound);
+	//audioDriver->dropSound(sound);
 	sound->setLooping(true);
 	sound->setGain(0.5f);
 	sound->play();

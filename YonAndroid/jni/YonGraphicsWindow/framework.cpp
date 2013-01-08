@@ -23,6 +23,7 @@ core::array<ITexture*> textures;
 scene::SDynamicShap3D shaps[29];
 SMaterial material;
 core::position2di ps[4];
+bool highlight=false;
 class MyEventReceiver : public IEventReceiver{
 public:
 	virtual bool onEvent(const SEvent& evt){
@@ -33,9 +34,11 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				highlight=true;
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				highlight=false;
 				return true;
 			}
 		case event::ENUM_EVENT_TYPE_TOUCH:
@@ -183,8 +186,8 @@ void drawFrame(){
 		//s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
 		//gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
 		ITexture* texture=videoDriver->getTexture("de.png");
-		gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
-		gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,false);
+		//gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
+		gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,false,highlight?0xFFFFFFFF:0xFFDDDDDD);
 #else
 		//Logger->debug("i:%d--0x%08X\r\n",i,&shaps[i]);
 		//material.setTexture(0,texture);
