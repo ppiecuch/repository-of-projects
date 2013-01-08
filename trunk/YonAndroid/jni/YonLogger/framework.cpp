@@ -85,6 +85,18 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	Logger->error("error\r\n");*/
 
 	//YON_FAIL_IF(true);
+	ITexture* tex=videoDriver->getTexture("test.png");
+	videoDriver->grabTexture(tex);
+	videoDriver->grabTexture(tex);
+
+	videoDriver->dropTexture(tex);
+	videoDriver->dropTexture(tex);
+
+	ITexture* tex2=videoDriver->getTexture("de.png");
+	videoDriver->grabTexture(tex2);
+
+	videoDriver->dropTexture(tex2);
+	//videoDriver->dropTexture(tex2);
 
 	return true;
 }

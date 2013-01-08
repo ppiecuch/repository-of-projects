@@ -232,6 +232,8 @@ namespace yon{
 			virtual ITexture* getTexture(const io::path& filename) = 0;
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;
 			virtual void removeTexture(ITexture* texture) =0;
+			virtual void grabTexture(ITexture* texture) = 0;
+			virtual void dropTexture(ITexture* texture) = 0;
 
 			virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat) =0;
 			virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const =0;

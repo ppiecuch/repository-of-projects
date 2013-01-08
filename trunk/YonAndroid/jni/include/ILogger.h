@@ -83,7 +83,7 @@ namespace debug{
 
 #define YON_FAIL_IF(cond) do { \
 	if(cond){ \
-		YON_ERROR("fail at %s(%d)",__FILE__,__LINE__); \
+		YON_ERROR("fail at %s(%d)\r\n",__FILE__,__LINE__); \
 		exit(0); \
 	} \
 }while(0)
