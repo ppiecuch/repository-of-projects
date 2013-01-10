@@ -118,7 +118,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 
 	
 	pCamera2->setEventReceivable(false);
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(256,256), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(512,512), "RTT",video::ENUM_COLOR_FORMAT_L8A8);
 	pCamera2->onResize(rtt->getSize());
 	cubeModel->setMaterialTexture(0, rtt); 
 
@@ -145,10 +145,10 @@ void drawFrame(){
 	ps[2].set(x+w,y); \
 	ps[3].set(x+w,y+h);
 
-	static core::rectf r(0,0,1,1);
+	static core::rectf r(0,1,1,0);
 	gfAdapter->clearZ(1000);
-	TO_PS(0,0,128,128)
-	gfAdapter->drawRegion(videoDriver->getTexture("aura.png"),r,ps);
+	TO_PS(0,0,512,256)
+	gfAdapter->drawRegion(videoDriver->getTexture("de.png"),r,ps);
 	gfAdapter->render(); 
 
 
@@ -156,7 +156,7 @@ void drawFrame(){
 	pCamera->setNeedUpload();
 	pCamera->render(videoDriver);
 	gfAdapter->clearZ(1000);
-	TO_PS(100,100,128,128)
+	TO_PS(100,100,612,612)
 	gfAdapter->drawRegion(rtt,r,ps);
 	gfAdapter->render();
 
