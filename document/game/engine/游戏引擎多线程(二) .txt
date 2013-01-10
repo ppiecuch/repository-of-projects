@@ -1,0 +1,233 @@
+游戏引擎多线程(一)
+http://bbs.gameres.com/thread_202024_1_1.html
+
+游戏引擎多线程(二)
+http://bbs.gameres.com/thread_202026_1_1.html
+
+游戏引擎多线程(三)
+http://bbs.gameres.com/thread_202027_1_1.html
+  
+
+   实际开发中遇到的问题
+
+     实战，理论归理论，实现归实现，在真正实现中，还是遇到大量的问题
+
+    1.首先有几个大方面的，第一就是自己不是多线编程高手，有时候多线程的并发，会有很多预想不到问题，你自己都想不到，有时候单CPU并行运行 不会有问题，多个CPU并发就会出问题。死锁，饥饿，运行不对等是经常出现的。第二，对于这种自己没有经验的编程挑战，没有可以参考单元测试用例（unreal 那种是大游戏不是demo，所以细节部分有时候很难参考），最好先在小的单元测试上进行，否则直接在当前游戏上进行修改，问题很难跟踪，最后就只能以失败而告终。现在基本考虑了所有情况，在单元测试里面，即便说考虑到所有情况，也是相对的，在游戏里面出现问题还是有可能，但毕竟风险降低到最低了，所以你的测试用例尽量要覆盖所有情况。
+
+
+
+
+        2再说细节的方面，刚写完这个测试的时候就出现死锁，退出的时候游戏退不出去，还好，这个时候只是涉及到线程架构问题，没有涉及到内部render command问题，还比较好查。后来用了一个模型，来测试发现了线程架构的一个不同步问题，就因为一行代码写错位置，导致了这个问题。这种问题一般很难查，要求你对你写代码逻辑十分缜密，那些代码过程另一个线程也是可以在运行的要了如指掌（window 所有 阻塞和唤醒的内核对象，都是可以唤醒多次的，也就是说它里面引用计数是累加的，比如我event 激活它一次，如果你再调用一次激活，实际上你要调用2次reset 才可以，到不激活状态，内部不会判断如果已经是激活状态，让你不激活不作用）。
+
+        3封装render command 问题，大部分封装只要追寻上面的原则是没有问题的，我在封装set render target的时候 出现了一个问题，就是你要先get 当前render target ，然后你再处理其他的，当时写代码的时候 按照单线程处理以为它已经获取到了，实际上只不过是交给了渲染线程队列里面，并没有再这里执行，所以根本就没有获取到。render target D3D debug 调试还给了错误信息，查了出来，depth scitencl buffer 没有给出错误信息，时候来打log比对才发现的。
+
+        还有个问题就是处理和视点有关的更新，本来更新和可见就是一个矛盾体，也就是说，更新了它不可见，则下一帧它就不更新，如果它可见了，就更新。这个时候用high level render command 时候如果考虑不好多线问题 就会出现图像跳变，在单线程可能延后一针没有问题，再多线程下可能就会有问题，例如在做地形LOD的时候，渲染数据可能和要渲染的个数没有匹配上，如果想差特别大，虽然只是一帧，也会有跳变，所以high level render command是给很高的多线程缜密思维的人用的，但它却是对引擎集成降低难度，真是很难取舍的一个东西。
+
+        4最后一个就是创建D3D设备的时候要用多线程标志，这个我刚开始知道有它，但文档上说它有效率损耗，总觉得这个方案的设计可以规避所有多线程问题，所以不使用这个标志也可以。这个在我自己家里的机器上测试没问题，可是公司的机器就是死锁，还有奔溃，而且没有堆栈。只怪自己不了解D3D内部怎么实现的了，只能用这个标志位了。后来发现，问题出现在资源创建和lock的地方，因为资源创建是在主线程创建的，lock是在渲染线程lock，虽然创建和lock不是同一个资源，但发现同时跑D3D会有问题，创建资源是用的D3D device
+
+        接口函数，Lock 资源是用资源的接口函数，本来不应该有什么冲突，可能是D3D里面做什么处理，要访问同一个东西，而导致问题。如果你的资源在渲染线程之前或者同步2个线程的时候都创建好，就不会有这个问题（事先创建好），但如果你做异步加载把创建资源扔到渲染线程，就可能要多考虑些问题了。我建议，游戏中无论怎么加线程，主线程还是作为一个中转站的作用，这样可以减少问题复杂程度。总之开了这个标志位会有性能损耗，但只要你创建资源不是始终都在和渲染线程并排的跑，应该问题不大，即使始终并排跑这种很少性能的减少，却可以规避设计复杂问题，也是值得的。
+
+       5还有一个问题就是一旦主线程资源删除，而渲染线程还在用到这个资源，如果用智能指针去管理，首先智能指针要具备线程安全性，第二，如果渲染线程这个时候ref为1，这个command执行完后，要析构才能让这个资源删除，否则不析构永远无法删除，这里有个潜在问题，如果资源析构的时候调用了主线程的函数（例如资源管理中，析构后要从资源管理中删除等），这个时候线程安全性就无法保证，这里就太多不可确定。
+
+       所以做一个资源GC功能很有必要，从这个资源ref为1（默认资源管理要保留一份，所以没人用的时候ref是1）的时候开始计时，这个时候没有其他在用，所以渲染肯定也不可见的，所以就不会进入渲染线程，到一定时间就可以把他GC掉，如果又有其他重新指向这个资源，那么把计时清0.
+
+       6.最后一个就是分辨率切换，窗口切换，涉及到的设备丢失问题。这个问题处理就是一旦检测到窗口切换和设备丢失（这个检测都是在主线程来响应的），马上就不要跑主线程的添加render command 和渲染线程，而是把2个缓冲buffer全都清空，去处理设备丢失问题。
+
+       代码说明和运行效果
+
+       说了这么多，对程序员来说，看到代码和实现效果比什么都是重要的，上面提到的问题以及方法，都被我实现过了。
+   
+      主多线程渲染架构
+
+//如果设备不丢失，这里检测设备丢失，如果丢失先device lost 处理 然后返回false，下一帧在进这个函数后，再做device reset
+if(VSRenderer::ms_pRenderer->CooperativeLevel())
+{
+VSRenderThreadSys::ms_pRenderTreadSys->Begin();//通知渲染线程启动
+if (VSSceneManager::ms_pSceneManager)
+    {
+       VSSceneManager::ms_pSceneManager->Update(fTime);
+}
+//下面过程是添加render command
+VSRenderer::ms_pRenderer->BeginRendering();
+if (VSSceneManager::ms_pSceneManager)
+    {
+       VSSceneManager::ms_pSceneManager->Draw(fTime);
+}
+VSRenderer::ms_pRenderer->EndRendering();
+
+    if (VSRenderThreadSys::ms_pRenderTreadSys && VSResourceManager::ms_bRenderThread)
+    {
+       VSRenderThreadSys::ms_pRenderTreadSys->ExChange();//同步渲染线程，并交换buffer
+}
+else
+{
+//清空所有渲染render command
+    if (VSRenderThreadSys::ms_pRenderTreadSys)
+    {
+       VSRenderThreadSys::ms_pRenderTreadSys->Clear();
+    }
+}
+//GC功能
+VSResourceManager::GC();
+void VSRenderThreadSys::Begin()
+{
+//设置一个准备填render command buffer
+    m_RenderThread.SetRender(m_RenderBuffer);
+    //启动渲染线程
+    m_RenderThread.Start();
+}
+//渲染线程运行，只要不触发被迫停止，它就会一直运行下去，如果render command buffer的所有数据都处理完毕，马上提醒主线程，不再等待
+void VSRenderThread::Run()
+{
+    while(!IsStopTrigger())
+    {
+       if (m_pRenderBuffer)
+       {
+           m_pRenderBuffer->Excuce();
+           m_pRenderBuffer = NULL;
+           m_Event.Trigger();
+       }  
+    }
+}
+void VSRenderThreadSys::ExChange()
+{
+//主线程等待渲染线程完毕
+    m_RenderThread.m_Event.Wait();
+//挂起渲染线程
+    m_RenderThread.Suspend();
+   
+    m_RenderBuffer->Clear();
+//交换2个buffer
+    Swap(m_UpdateBuffer,m_RenderBuffer);
+    //有些资源有双D3D 资源的 进行多线程的，要交换buffer
+    for (unsignedint i = 0 ; i < VSBind::ms_DynamicTwoBindArray.GetNum() ;i++)
+    {
+       VSBind::ms_DynamicTwoBindArray->ExChange();
+    }
+}
+RenderCommand 说明
+
+
+//这里封装了D3D SetRenderState
+bool VSDX9Renderer::SetRenderState(D3DRENDERSTATETYPEState,DWORDValue)
+{
+    struct VSDx9RenderStatePara
+    {
+       D3DRENDERSTATETYPE State;
+       DWORD Value;
+    };
+    HRESULT hResult = NULL;
+    VSDx9RenderStatePara RenderStatePara;
+    RenderStatePara.State = State;
+    RenderStatePara.Value = Value;
+
+    ENQUEUE_UNIQUE_RENDER_COMMAND_TWOPARAMETER(VSDx9SetRenderStateCommand,
+        VSDx9RenderStatePara,RenderStatePara,RenderStatePara,LPDIRECT3DDEVICE9,m_pDevice,m_pDevice,
+    {
+       HRESULT hResult = NULL;
+       hResult = m_pDevice->SetRenderState(RenderStatePara.State,RenderStatePara.Value);
+       VSMAC_ASSERT(!FAILED(hResult));
+    })
+       hResult = m_pDevice->SetRenderState(RenderStatePara.State,RenderStatePara.Value);  
+    ENQUEUE_UNIQUE_RENDER_COMMAND_END
+    VSMAC_ASSERT(!FAILED(hResult));
+    return !FAILED(hResult);
+}
+这里的宏和unreal内部实现不太一样，我做修改，基本意思就是如果开启了多线程渲染，则把命令提交到buffer中，如果不是则直接运行。
+
+所以你会看到2个hResult = m_pDevice->SetRenderState(RenderStatePara.State,RenderStatePara.Value);
+
+其实第一个构建render command 的类的 里面运行代码，第二是如果没开启多线程的话直接就运行。
+
+再来看这个宏，你要是仔细读前面unreal的，你就知道里面嵌套了一个宏，只有嵌套的不一样
+
+#define ENQUEUE_RENDER_COMMAND(TypeName,Params)\
+    if(VSResourceManager::ms_bRenderThread) \
+    { \
+       TypeName * pCommand = (TypeName*)VSRenderThreadSys::ms_pRenderTreadSys->AssignCommand<TypeName>(); \
+       VS_NEW(pCommand)TypeNameParams; \
+    } \
+    else \
+    {
+如果是多线程的话，就构建实例，加入队列，如果不是，则直接运行代码
+#define ENQUEUE_UNIQUE_RENDER_COMMAND_END}
+再看一个
+bool VSDX9Renderer::SetVertexShaderConstant(unsignedint uiStartRegister,void * pDate,
+                                   unsignedint RegisterNum,unsigned int uiType)
+{
+    struct VSDx9VertexShaderConstantPara
+    {
+       unsigned int uiStartRegister;
+       void * pDate;
+       unsigned int RegisterNum;
+       unsigned int uiType;
+    };
+    HRESULT hResult = NULL;
+    VSDx9VertexShaderConstantPara VertexShaderConstantPara;
+    VertexShaderConstantPara.uiStartRegister = uiStartRegister;
+    VertexShaderConstantPara.RegisterNum = RegisterNum;
+    VertexShaderConstantPara.uiType = uiType;
+    if (VSResourceManager::ms_bRenderThread)
+    {
+       VertexShaderConstantPara.pDate = VSRenderThreadSys::ms_pRenderTreadSys->Assign(uiType,RegisterNum);
+       VSMemcpy(VertexShaderConstantPara.pDate,pDate,RegisterNum* sizeof(VSREAL)* 4);
+    }
+    else
+    {
+       VertexShaderConstantPara.pDate = pDate;
+    }
+   
+
+    ENQUEUE_UNIQUE_RENDER_COMMAND_TWOPARAMETER(VSDx9SetVertexShaderConstantCommand,
+        VSDx9VertexShaderConstantPara,VertexShaderConstantPara,VertexShaderConstantPara,LPDIRECT3DDEVICE9,m_pDevice,m_pDevice,
+    {
+       HRESULT hResult = NULL;
+       if(VertexShaderConstantPara.uiType == VSUserConstant::VT_BOOL)
+       {
+           hResult = m_pDevice->SetVertexShaderConstantB(VertexShaderConstantPara.uiStartRegister,(const BOOL*)VertexShaderConstantPara.pDate,VertexShaderConstantPara.RegisterNum);
+           VSMAC_ASSERT(!FAILED(hResult));
+       }
+       else if(VertexShaderConstantPara.uiType== VSUserConstant::VT_FLOAT)
+       {
+           hResult = m_pDevice->SetVertexShaderConstantF(VertexShaderConstantPara.uiStartRegister,(const float*)VertexShaderConstantPara.pDate,VertexShaderConstantPara.RegisterNum);
+           VSMAC_ASSERT(!FAILED(hResult));
+       }
+       else if(VertexShaderConstantPara.uiType== VSUserConstant::VT_INT)
+       {
+           hResult = m_pDevice->SetVertexShaderConstantI(VertexShaderConstantPara.uiStartRegister,(const int*)VertexShaderConstantPara.pDate,VertexShaderConstantPara.RegisterNum);
+           VSMAC_ASSERT(!FAILED(hResult));
+       }
+       else
+       {
+           VSMAC_ASSERT(0);
+       }
+    })
+       if(VertexShaderConstantPara.uiType == VSUserConstant::VT_BOOL)
+       {
+           hResult = m_pDevice->SetVertexShaderConstantB(VertexShaderConstantPara.uiStartRegister,(const BOOL*)VertexShaderConstantPara.pDate,VertexShaderConstantPara.RegisterNum);
+           VSMAC_ASSERT(!FAILED(hResult));
+       }
+       else if(VertexShaderConstantPara.uiType== VSUserConstant::VT_FLOAT)
+       {
+           hResult = m_pDevice->SetVertexShaderConstantF(VertexShaderConstantPara.uiStartRegister,(const float*)VertexShaderConstantPara.pDate,VertexShaderConstantPara.RegisterNum);
+           VSMAC_ASSERT(!FAILED(hResult));
+       }
+       else if(VertexShaderConstantPara.uiType== VSUserConstant::VT_INT)
+       {
+           hResult = m_pDevice->SetVertexShaderConstantI(VertexShaderConstantPara.uiStartRegister,(const int*)VertexShaderConstantPara.pDate,VertexShaderConstantPara.RegisterNum);
+           VSMAC_ASSERT(!FAILED(hResult));
+       }
+       else
+       {
+           VSMAC_ASSERT(0);
+       }
+    ENQUEUE_UNIQUE_RENDER_COMMAND_END
+       VSMAC_ASSERT(!FAILED(hResult));
+    return !FAILED(hResult);
+
+   
+    return 1;
+}
+        这个封装了D3D 设置vshader的函数，参数也是在buffer里面分配的，这里记录了，分配的地址和长度。
+        
+http://bbs.gameres.com/thread_202026_1_1.html
