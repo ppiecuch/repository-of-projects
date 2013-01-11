@@ -184,7 +184,7 @@ public class YonAndroidActivity extends Activity {
     
     @Override
 	protected void onDestroy() {
-    	view.onDestroy();
+    	//view.onDestroy();
 		super.onDestroy();
 		SysApplication.getInstance().exit();
 		Log.i(TAG, "exit");
