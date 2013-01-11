@@ -1,0 +1,233 @@
+似乎是没得选，目前在windows上就发现了一款粒子编辑器，叫做cocos2d-windows-particle-editor。
+
+
+
+这是一个开源项目，你可以从下面的网址获取。
+http://code.google.com/p/cocos2d-windows-particle-editor/
+
+编辑器属性
+粒子和发射器是粒子系统不可或缺的组成部分。发射器将大量粒子按照一定规律发射出去形成我们希望表现的效果。这个效果受发射方式，粒子属性等的影响。所以，要对它们有一定的了解，使用起来才能得心应手。
+
+下面我们根据实际需要讲解部分属性。
+
+
+
+1.Mode
+
+现有的发射器分为两种，一种是重力(Gravity)发射器，另一种是放射（状）(Radius)发射器。
+
+发射器的种类决定了它的工作方式。不同种类的发射器根据不同的属性来决定由它发射出的粒子如何运动。可以说，Mode是发射器最重要的基础属性之一。
+
+2.TotalParticles
+
+该属性决定了最多同时存活的粒子数量上限。这是一个峰值，主要目的是用来限制内存等资源的消耗。
+
+3.EmissionRate
+
+粒子的发射速率，即每秒发射的粒子数量。
+
+这里有一个问题，不知道算不算是bug，我给大家描述一下：
+
+CCParticleSystem加载.plist文件时并没有读取这个EmissionRate的值。实际上，它是由粒子数量上限除以粒子生命期算出来的。
+
+1 // emission Rate
+2 m_fEmissionRate = m_uTotalParticles / m_fLife;
+有点儿说不通对不对。我为什么要在（第一个）粒子的生命期内把所有的粒子都发出去？
+
+这是CCParticleSystem加载.plist文件的问题，临时的解决办法就是，在加载.plist文件后，再手工调用setEmissionRate设置每秒的发射量。
+
+虽说啰嗦了点儿，但比起纯手动设置粒子系统属性要简单的多。
+
+4.Duration
+
+Duration表示发射器执行的时间，单位是秒。如果设置为-1，那就表示发射器持续发射粒子。零是一个有效值，但是设置为零就没有意义了，不是吗？
+
+5.IsAutoRemoveOnFinish
+
+发射完成后，是否删除粒子系统，默认值为False.
+
+这里存在一个已知的bug:
+
+当IsAutoRemoveOnFinish为True并且Duration不为-1时，待粒子效果播放完毕后，粒子系统会自动删除，导致编辑器不可用。
+
+暂时的解决方法
+
+关闭编辑器，然后重新打开。
+
+
+
+6.PositionType
+
+PositionType有3种取值：
+(1)Free（自由）
+粒子附属于游戏世界，并且不受发射器的位移影响。
+(2)Relative（相对）
+粒子附属于游戏世界，但是要跟随发射器移动。
+(3)Grouped（打组）
+粒子附属于发射器，并且跟随发射器的变化而变化。
+
+7.SourcePositionX, SourcePositionY
+
+这两个值表示发射器的原始坐标。
+
+8.PosVarX, PosVarY
+
+发射器坐标的浮动值。
+
+
+
+9.Angle
+
+粒子的发射角度。
+
+10.AngleVar
+
+粒子发射角度的浮动值。
+
+
+
+11.Speed
+
+粒子（初始）速度。
+
+12.SpeedVar
+
+粒子（初始）速度浮动值。
+
+13.GravityX, GravityY
+
+粒子在X轴和Y轴上的加速度。
+
+14.RadialAccel
+
+粒子的径向加速度。
+
+15.RadialAccelVar
+
+粒子的径向加速度浮动值。
+
+16.TangentialAccel
+
+粒子的切向加速度。
+
+17.TangentialAccelVar
+
+粒子的切向加速度浮动值。
+
+
+
+18.StartRadius
+
+初始半径
+
+19.StartRadiusVar
+
+初始半径浮动值
+
+20.EndRadius
+
+结束半径
+
+21.EndRadiusVar
+
+结束半径浮动值
+
+22.RotatePerSecond
+
+粒子围绕初始点旋转的角速度
+
+23.RotatePerSecondPer
+
+粒子围绕初始点旋转的角速度浮动值
+
+上面讲的都是发射器的属性，下面我们来看看粒子自身的属性。
+
+
+
+24.Life, LifeVar
+
+粒子的生命值及其浮动值。从创建粒子开始计时，一旦超出了生命期，粒子也就消失了。
+
+
+
+25.StartSize
+
+粒子的初始大小
+
+26.StartSizeVar
+
+粒子初始大小的浮动值
+
+27.EndSize
+
+粒子的结束大小。若为-1，则表示结束大小与初始大小一致。
+
+28.EndSizeVar
+
+粒子结束大小的浮动值。
+
+
+
+29.StartColor, EndColor, StartColorVar, EndColorVar这4个属性代表着粒子的初始颜色、结束颜色以及其浮动值。
+
+需要注意的是，在ccColor4F中每个颜色分量以及透明度都是用0.0f到1.0f表示的，而此编辑器使用的是0到255表示的，所以有时可能会产生小小的误差。（笔者以前只学过一点儿OpenGL的皮毛，不太明白OpenGL里那些换算后非整数的颜色分量是如何处理的。）
+
+
+
+30.TexturePath
+
+纹理贴图的路径，引擎会根据.plist文件的路径以及此属性判断要加载的文件。一般来说，这里要填相对路径。
+
+31.SrcBlendFunc, DestBlendFunc
+
+设置纹理融合的方式，选项比较多，鉴于笔者的OpenGL水平，这里不做深入。
+
+对于一般情况，只需要记住：“我们最常使用的CC_BLEND_SRC和CC_BLEND_DST分别对应GL_ONE和GL_ONE_MINUS_SRC_ALPHA”。
+
+32.IsBlendAdditive
+
+暂时请忽略IsBlendAdditive这个属性吧，cocos2d-x引擎里根本就没读取这个值。
+
+
+
+33.StartSpin, EndSpin, StartSpinVar, EndSpinVar
+
+粒子的初始自旋角度、结束自旋角度以及其浮动值。设置了这些值，粒子就开始自转了，当然你需要合适的贴图才能看得清楚。
+
+
+
+34.IsBackgroundMove
+
+设置左侧预览画面的背景是否移动。
+
+35.Scale
+
+设置左侧预览画面的缩放比。左侧的图像实际上是2倍显示的，这里设置成0.5左侧显示的就是原始大小。
+
+注意，上面这两个属性只影响编辑器内的预览效果，不对保存的.plist文件产生影响。
+
+编辑器的使用
+打开编辑器后，先从Sample菜单下选择需要的基本配置，然后设置具体的属性，最后另存为.plist文件以供游戏使用。
+
+在cocos2d-x中加载.plist文件非常简单。假设我们将知易第七章中敌方炮弹的烟雾效果保存在emitter.plist文件内，将玩家炮弹的火焰效果保存在emitter2.plist文件内，那么在游戏中加载的代码如下：
+
+
+ 1 void BulletSprite::bulletInit(void)
+ 2 {
+ 3     emitter = new cocos2d::CCParticleSystemQuad();
+ 4     emitter->initWithFile("emitter.plist");
+ 5     // 为什么要加下面这一句，参见属性介绍第3条
+ 6     emitter->setEmissionRate(75.0f);
+ 7     emitter->stopSystem();
+ 8     addChild(emitter);
+ 9 
+10     emitter2 = new cocos2d::CCParticleSystemQuad();
+11     emitter2->initWithFile("emitter2.plist");
+12     emitter2->setEmissionRate(350.0f);
+13     emitter2->stopSystem();
+14     addChild(emitter2);
+15 }
+
+好了，今天就说到这里，也不是想得那么难，是不是？
+
+http://www.cnblogs.com/cocos2d-x/archive/2012/06/17/2552635.html
