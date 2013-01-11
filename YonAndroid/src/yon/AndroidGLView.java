@@ -30,6 +30,7 @@ public class AndroidGLView extends GLSurfaceView{
 	Handler handler;
 	int screenWidth,screenHeight;
 	MoveEvent currentMoveEvent,lastMoveEvent;
+	boolean exiting;
 	
 	private native void nativeOnSurfaceCreated(boolean first,int width,int height,String apkFilePath,String sdcardPath);
 	private native void nativeOnSurfaceChanged(int width, int height);
@@ -122,6 +123,7 @@ public class AndroidGLView extends GLSurfaceView{
 	}
 	
 	private void callbackDestroy(){
+		exiting=true;
 		activity.finish();
 	}
 	private String getRAMAvailable(){
@@ -171,8 +173,12 @@ public class AndroidGLView extends GLSurfaceView{
 	
 	@Override
 	public void onPause() {
-		Log.d("AndroidGLView","nativeOnPause();");
-		nativeOnPause();
+		if(!exiting)
+		{
+			Log.d("AndroidGLView","nativeOnPause()start;");
+			nativeOnPause();
+			Log.d("AndroidGLView","nativeOnPause()end;");
+		}
 		super.onPause();
 	}
 	
@@ -185,10 +191,10 @@ public class AndroidGLView extends GLSurfaceView{
 		nativeOnResume();
 	}
 	
-	public void onDestroy() {
-		Log.d("AndroidGLView","nativeOnDestroy();");
-		nativeOnDestroy();
-	}
+//	public void onDestroy() {
+//		Log.d("AndroidGLView","nativeOnDestroy();");
+//		nativeOnDestroy();
+//	}
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -345,6 +351,7 @@ public class AndroidGLView extends GLSurfaceView{
 		 */
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 			Log.d("AndroidGLView","onSurfaceCreated");
+			exiting=false;
 			nativeOnSurfaceCreated(first,screenWidth,screenHeight,Util.getAPKFilePath(activity),Util.getSdCardPath());
 			if(first)
 			{

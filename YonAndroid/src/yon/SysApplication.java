@@ -3,8 +3,10 @@ import java.util.LinkedList;
 import java.util.List;
 import android.app.Activity;
 import android.app.Application;
+import android.util.Log;
 
 public class SysApplication extends Application {
+	private static final String TAG="SysApplication";
 	private List<Activity> mList = new LinkedList<Activity>();
 	private static SysApplication instance;
 
@@ -32,7 +34,8 @@ public class SysApplication extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			System.exit(0);
+			Log.d(TAG,"System.exit(0)");
+			//System.exit(0);
 		}
 	}
 

@@ -14,8 +14,12 @@ ILogger* logger=NULL;
 ISceneNode* cubeModel=NULL;
 ISceneNode* planeModel=NULL;
 ISceneNode* teapotModel=NULL;
-video::ITexture* rtt=NULL;
+video::ITexture* colorRTT=NULL;
+video::ITexture* grayRTT=NULL;
 f32 factor=1.1f;
+
+bool needGray=false;
+bool gray=false;
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -27,9 +31,11 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				needGray=true;
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				needGray=false;
 				return true;
 			}
 		case event::ENUM_EVENT_TYPE_TOUCH:
@@ -37,9 +43,11 @@ public:
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
 				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				needGray=true;
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
 				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				needGray=false;
 				return true;
 			}
 		}
@@ -47,11 +55,13 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
-	params.fpsLimit=60;
+	//params.fpsLimit=60;
+	params.appPath=appPath;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -118,9 +128,12 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 
 	
 	pCamera2->setEventReceivable(false);
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(512,512), "RTT",video::ENUM_COLOR_FORMAT_L8A8);
-	pCamera2->onResize(rtt->getSize());
-	cubeModel->setMaterialTexture(0, rtt); 
+	u32 w=256;
+	u32 h=256;
+	colorRTT = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(w,h), "COLOR",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	grayRTT = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(w,h), "GRAY",video::ENUM_COLOR_FORMAT_L8A8,true);
+	pCamera2->onResize(colorRTT->getSize());
+	//cubeModel->setMaterialTexture(0, colorRTT); 
 
 	return true;
 }
@@ -131,12 +144,17 @@ void resize(u32 width,u32 height){
 s32 temp=0;
 void drawFrame(){
 
+	gray=needGray;
+
 	videoDriver->begin();
 
 	pCamera2->setNeedUpload();
 	pCamera2->render(videoDriver);
 
-	videoDriver->setRenderTarget(rtt,true,true,COLOR_BLUE);
+	if(!gray)
+		videoDriver->setRenderTarget(colorRTT,true,true,COLOR_ZERO);
+	else
+		videoDriver->setRenderTarget(grayRTT,true,true,COLOR_ZERO);
 
 	static core::position2di ps[4];
 #define TO_PS(x,y,w,h) \
@@ -145,10 +163,12 @@ void drawFrame(){
 	ps[2].set(x+w,y); \
 	ps[3].set(x+w,y+h);
 
-	static core::rectf r(0,1,1,0);
+	static core::rectf r(0,0,1,1);
 	gfAdapter->clearZ(1000);
-	TO_PS(0,0,512,256)
-	gfAdapter->drawRegion(videoDriver->getTexture("de.png"),r,ps);
+	TO_PS(0,0,128,128)
+	gfAdapter->drawRegion(videoDriver->getTexture("aura.png"),r,ps);
+	TO_PS(128,128,128,128)
+	gfAdapter->drawRegion(videoDriver->getTexture("test.png"),r,ps);
 	gfAdapter->render(); 
 
 
@@ -156,8 +176,11 @@ void drawFrame(){
 	pCamera->setNeedUpload();
 	pCamera->render(videoDriver);
 	gfAdapter->clearZ(1000);
-	TO_PS(100,100,612,612)
-	gfAdapter->drawRegion(rtt,r,ps);
+	TO_PS(100,100,128,128)
+	if(!gray)
+		gfAdapter->drawRegion(colorRTT,r,ps);
+	else
+		gfAdapter->drawRegion(grayRTT,r,ps);
 	gfAdapter->render();
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
