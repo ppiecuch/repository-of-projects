@@ -1,0 +1,172 @@
+#ifndef _YON_SCENE_EFFECT_IEFFECTGROUPSCENENODE_H_
+#define _YON_SCENE_EFFECT_IEFFECTGROUPSCENENODE_H_
+
+namespace yon{
+namespace scene{
+namespace effect{
+	
+	//TODO refer to apark engine::IGroup
+
+	/**
+	* @class IEffectGroupSceneNode
+	* @brief A group of effects
+	*
+	* A Group is the structure the user will interact with the most to build up a full Particle System.<br>
+	* More than only storing many particles, a Group also defines and entire environment for Particle generation and Evolution.<br>
+	* <br>
+	* This struct is the spine of the engine.
+	*/
+	class IEffectGroupSceneNode : public ISceneNode{
+
+		/////////////
+		// Setters //
+		/////////////
+
+		/**
+		* @brief Sets the friction of this Group
+		*
+		* The friction defines the way particles are accelerated or decelerated in their environment.<br>
+		* <ul>
+		* <li>If the friction is 0.0f, particles in the Group are neither accelerated nor decelerated (it is the default setting).</li>
+		* <li>If the friction is positive, particles will be decelerated function of their speed.</li>
+		* <li>If the friction is negative, particles will be accelerated function of their speed.</li>
+		* </ul>
+		* The friction is applied on each Particle as followed :<br>
+		* <i>velocity *= 1 - min(1,friction * deltaTime / weight)</i><br>
+		* <br>
+		* Note that the lighter the Particle, the more effect has the friction on it.
+		*
+		* @param friction the friction of the Group
+		*/
+		void setFriction(float friction);
+
+		/**
+		* @brief Sets the gravity of this Group
+		*
+		* The gravity is a vector which defines an attractive force that will be applied to each Particle in the Group during the update.<br>
+		* By default the gravity is the null vector (i.e. a Vector3D equal to (0,0,0)) which means no gravity is applied.<br>
+		* <br>
+		* The gravity is applied on each Particle as followed :<br>
+		* <i>velocity += gravity * deltaTime</i><br>
+		*
+		* @param gravity : the vector3df that will be used as the gravity for this Group
+		*/
+		void setGravity(const core::vector3df& gravity);
+
+		/**
+		* @brief Enables or disables the sorting of particles
+		*
+		* The sorting is performed from particles further to the camera to particles closer to the camera.<br>
+		* Sorting particles allows to well draw particles with alpha.<br>
+		* <br>
+		* If the sorting is enabled/disabled, the distance computation is enabled/disabled as well.<br>
+		* <br>
+		* Note that sorting a Group is a computationnaly expensive operation that should be avoided when possible.
+		*
+		* @param on : true to enable the sorting of particles, false otherwise
+		*/
+		void setSortingEnabled(bool on);
+
+		/**
+		* @brief Enables or disables the computation of the distance of a Particle from the camera
+		*
+		* The distance computation happens at each call to update(unsigned int).<br>
+		* The distance of a Particle from the camera can be gotten with a call to Particle::getDistanceFromCamera() or Particle::getSqrDistanceFromCamera()<br>
+		* <br>
+		* Note that the distance is defined by the difference vector between the Particle and the the camera set with System::setCameraPosition(Vector3D&).<br>
+		* <br>
+		* If the distance computation is disabled, then the sorting of particles is disabled as well.
+		*
+		* @param on : true to enable the computation of the camera distance, false not to
+		*/
+		void setDistanceComputeEnabled(bool on);
+
+		/////////////
+		// Getters //
+		/////////////
+
+		/**
+		* @brief Gets the number of particles in the Group
+		* @return the number of particles in the Group
+		*/
+		u32 getParticleCount() const;
+
+		/**
+		* @brief Gets the number of emitters in this Group
+		* @return the number of emitters in this Group
+		*/
+		u32 getEmitterCount() const;
+
+		/**
+		* @brief Gets the number of affectors in this Group
+		* @return the number of affectors in this Group
+		*/
+		size_t getAffectorCount() const;
+
+		/**
+		* @brief Gets the friction coefficient of this Group
+		*
+		* For a description of the friction see setFriction(float).
+		*
+		* @return the friction coefficient of this Group
+		*/
+		f32 getFriction() const;
+
+		/**
+		* @brief Gets the gravity Vector3D of this Group
+		*
+		* For a description of the gravity see setGravity(Vector3D&).
+		*
+		* @return the gravity Vector3D of this Group
+		*/
+		const core::vector3df& getGravity() const;
+
+		/**
+		* @brief Tells whether the sorting of particles from back to front is enabled
+		*
+		* For a description of the sorting of particles, see setSortingEnabled(bool).
+		*
+		* @return true if the sorting is enabled, false otherwise
+		*/
+		bool isSortingEnabled() const;
+
+		/**
+		* @brief Tells whether the distance computation between particles and camera is enabled
+		* @return true is the distance computation is enabled, false if not
+		*/
+		bool isDistanceComputeEnabled() const;
+
+		///////////////
+		// Interface //
+		///////////////
+
+		/**
+		* @brief Adds some Particles to this Group
+		*
+		* This method and all the methods of type addParticles will add a given number of Particles at the given position with the given velocity.<br>
+		* Note that even if a Zone and an Emitter is passed, the position and the velocity will be the same for all Particles.<br>
+		* <br>
+		* In case a Zone is passed, Zone::generatePosition(Particle,bool) is used to generate the position.<br>
+		* In case an Emitter is passed, Emitter::generateVelocity(Particle) with a mass of 1 is used to generate the velocity.
+		* The velocity will then be updated with the Particle's mass when the Particle will be generated.<br>
+		* In case a delta time is passed instead of a fixed number, the number will be computed thanks to the flow of the Emitter passed.<br>
+		* <br>
+		* Particles will be added to the Group at the next call to update(unsigned int) or flushAddedParticles().<br>
+		* This is why any Emitter and Zone used to generate particles must be valid at the next call of either update(unsigned int) or flushAddedParticles().<br>
+		* <br>
+		* On some methods addParticles, the full variable is present. This variable defines where to generate positions in a Zone :
+		* <ul>
+		* <li>true to generate position somewhere within the whole Zone.</li>
+		* <li>false to generate position somewhere on the Zone border.</li>
+		* </ul>
+		*
+		* @param count : the number of Particles to add
+		* @param position : the position where the Particles will be added
+		* @param velocity : the velocity of the Particles
+		*/
+		void addParticles(unsigned int count,const core::vector3df& position,const core::vector3df& velocity);
+	};
+}
+}
+}
+#endif
