@@ -76,6 +76,7 @@
 #include "ITimer.h" 
 #include "IUnit.h" 
 #include "SShap.h"
+#include "SDynamicShap.h"
 #include "IVideoDriver.h" 
 #include "IRandomizer.h"
 #include "IYonEngine.h" 
