@@ -57,11 +57,13 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
-	//params.fpsLimit=10;
+	params.fpsLimit=0;
+	params.appPath=appPath;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	if(engine->available()==false)
@@ -78,9 +80,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->addWorkingDirectory("../media/compressTexture",true);
+	fs->addWorkingDirectory("../media/compressTexture/dxtc",true);
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->addWorkingDirectory("media/compressTexture",true);
+	fs->addWorkingDirectory("media/compressTexture/dxtc",true);
 #endif
 
 	/*IShap *shap;
@@ -114,7 +116,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	ps[2].set(x+w,y); \
 	ps[3].set(x+w,y+h);
 
-	TO_PS(0,0,256,256)
+	TO_PS(10,10,512,256)
 
 	return true; 
 }
@@ -126,9 +128,9 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	static core::rectf r(0,1,1,0);
+	static core::rectf r(0,0,1,1);
 	gfAdapter->clearZ(1000);
-	ITexture* texture=videoDriver->getTexture("rgbapng8.dds");
+	ITexture* texture=videoDriver->getTexture("de.dds");
 	//gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
 	gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true);
 	gfAdapter->render();

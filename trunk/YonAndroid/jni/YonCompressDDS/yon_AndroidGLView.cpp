@@ -4,6 +4,8 @@
 #include "../log.h"
 
 const char* LOG_TAG = "yon_AndroidGLView";
+JNIEnv *g_env=NULL;
+jobject g_obj=NULL;
 
 const static s32 ACTION_MASK = 255;
 const static s32 ACTION_DOWN = 0;
@@ -15,14 +17,19 @@ const static s32 ACTION_POINTER_ID_MASK = 65280;
 const static s32 ACTION_POINTER_ID_SHIFT = 8;
 
 void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jboolean first,jint width, jint height, jstring apkFilePath, jstring sdcardPath){
-	LOGD(LOG_TAG,"first:%s,screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",first?"true":"false",width,height,pEnv);
+	LOGD(LOG_TAG,"screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",width,height,pEnv);
+	g_env=pEnv;
+	g_obj=obj;
 	if(first)
-		init(pEnv,width,height);
-
+	{
+		const char* root= pEnv->GetStringUTFChars(sdcardPath, 0);
+		init(pEnv,NULL,NULL,root,width,height);
+		pEnv->ReleaseStringUTFChars(sdcardPath, root);
+	}
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	Logger->debug("nativeOnSurfaceChanged->w:%d,h:%d\n",w,h);
-	getEngine()->onResize(w,h);
+	resize(w,h);
 }
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 	getEngine()->run();
