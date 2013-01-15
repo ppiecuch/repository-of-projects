@@ -251,7 +251,8 @@ namespace YON
 
 	inline void YONSystem::onUnregister()
 	{
-		remove(); // Removes the YONSystem from the Yon scene graph
+		//remove(); // Removes the YONSystem from the Yon scene graph
+		removeFromParent();
 	}
 }}
 

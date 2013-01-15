@@ -55,7 +55,8 @@ namespace YON
 
 	YONBuffer::~YONBuffer()
 	{
-		device->getVideoDriver()->removeHardwareBuffer(&meshBuffer);
+		//TODO
+		//device->getVideoDriver()->removeHardwareBuffer(&meshBuffer);
 	}
 
 	void YONBuffer::initInnerBuffers()
