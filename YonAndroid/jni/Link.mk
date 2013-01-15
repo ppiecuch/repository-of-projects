@@ -37,6 +37,10 @@ subdirs += $(LOCAL_PATH)/AndroidGUIRTT.mk
 else
 ifeq ($(APP),XC3D)
 subdirs += $(LOCAL_PATH)/AndroidXC3D.mk
+else
+ifeq ($(APP),CompressDDS)
+subdirs += $(LOCAL_PATH)/AndroidCompressDDS.mk
+endif
 endif
 endif
 endif
