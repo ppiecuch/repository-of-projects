@@ -89,7 +89,7 @@ namespace YON
 		* @return the inner vertex buffer
 		*/
 		//yon::scene::IVertexBuffer& getVertexBuffer();
-		yon::core::array<yon::core::vector3df>& getVertexBuffer();
+		yon::core::array<yon::scene::SVertex>& getVertexBuffer();
 
 		/**
 		* @brief Gets the inner index buffer
@@ -103,7 +103,7 @@ namespace YON
 		* @return the inner mesh buffer
 		*/
 		//yon::scene::IDynamicMeshBuffer& getMeshBuffer();
-		yon::scene::SDynamicShap3D* getMeshBuffer();
+		yon::scene::SDynamicShap3D& getMeshBuffer();
 
 		/**
 		* @brief Tells whether VBOs are initialized for this buffer
@@ -194,19 +194,21 @@ namespace YON
 
 
 	//inline yon::scene::IVertexBuffer& YONBuffer::getVertexBuffer()
-	inline yon::core::array<yon::core::vector3df>& getVertexBuffer()
+	inline yon::core::array<yon::scene::SVertex>& YONBuffer::getVertexBuffer()
 	{
 		//return meshBuffer.getVertexBuffer();
-		return meshBuffer
+		return meshBuffer.getVertexArray();
 	}
 
 	//inline yon::scene::IIndexBuffer& YONBuffer::getIndexBuffer()
-	inline yon::core::array<yon::u16>& getIndexBuffer()
+	inline yon::core::array<yon::u16>& YONBuffer::getIndexBuffer()
 	{
 		//return meshBuffer.getIndexBuffer();
+		return meshBuffer.getIndexArray();
 	}
 
-	inline yon::scene::IDynamicMeshBuffer& YONBuffer::getMeshBuffer()
+	//inline yon::scene::IDynamicMeshBuffer& YONBuffer::getMeshBuffer()
+	inline yon::scene::SDynamicShap3D& YONBuffer::getMeshBuffer()
 	{
 		return meshBuffer;
 	}
