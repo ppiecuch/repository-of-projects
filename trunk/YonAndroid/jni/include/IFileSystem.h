@@ -43,7 +43,7 @@ namespace io{
 		//获取资源绝对路径
 		//参数noEmpty，如果为true,指示如果不存在匹配资源，则返回使用第一个资源目录拼接的路径（用于createStream），否则返回""
 		//遍历工作目录，如果存在匹配的资源，返回路径，否则根据noEmpty指示返回
-		virtual io::path getResourcePath(const io::path& filename,bool noEmpty=false) const = 0;
+		virtual io::path getResourcePath(const io::path& filename,bool noEmpty=false,bool warning=true) const = 0;
 	};
 
 	extern "C" YON_API IFileSystem* createFileSystem(const io::path& root);

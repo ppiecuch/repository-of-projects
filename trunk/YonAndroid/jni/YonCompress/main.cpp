@@ -26,9 +26,17 @@ int main(int argc, char* argv[])
 	//setlocale(LC_ALL,"chs");
 	setlocale(LC_CTYPE,"UTF-8");
 
-	init(NULL,NULL,NULL,NULL,800,480);
-	while(getEngine()->run()){
-		drawFrame();
+	try{
+		init(NULL,NULL,NULL,NULL,800,480);
+	}catch(...){
+		Logger->error(YON_LOG_FAILED_FORMAT,"init engine failed!");
+	}
+	try{
+		while(getEngine()->run()){
+			drawFrame();
+		}
+	}catch(...){
+		Logger->error(YON_LOG_FAILED_FORMAT,"run/draw engine failed!");
 	}
 	destroy();
 }

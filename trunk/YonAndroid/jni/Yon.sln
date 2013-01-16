@@ -262,6 +262,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Spark", "Spark\project\win3
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SparkAdapter", "Spark\project\win32\SPARK IRR DLL.vcproj", "{8E35334D-25B6-4E98-B825-3EA6B25878FC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonCompress", "YonCompress\YonCompress.vcproj", "{5C3CD167-F93D-4AB1-8540-A82A4E5ED7E1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -488,6 +493,10 @@ Global
 		{8E35334D-25B6-4E98-B825-3EA6B25878FC}.Debug|Win32.Build.0 = Debug|Win32
 		{8E35334D-25B6-4E98-B825-3EA6B25878FC}.Release|Win32.ActiveCfg = Release|Win32
 		{8E35334D-25B6-4E98-B825-3EA6B25878FC}.Release|Win32.Build.0 = Release|Win32
+		{5C3CD167-F93D-4AB1-8540-A82A4E5ED7E1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5C3CD167-F93D-4AB1-8540-A82A4E5ED7E1}.Debug|Win32.Build.0 = Debug|Win32
+		{5C3CD167-F93D-4AB1-8540-A82A4E5ED7E1}.Release|Win32.ActiveCfg = Release|Win32
+		{5C3CD167-F93D-4AB1-8540-A82A4E5ED7E1}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

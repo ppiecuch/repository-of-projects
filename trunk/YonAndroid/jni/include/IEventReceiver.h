@@ -12,6 +12,7 @@ namespace yon{
 			ENUM_EVENT_TYPE_KEY,
 			ENUM_EVENT_TYPE_SYSTEM,
 			ENUM_EVENT_TYPE_UI,
+			ENUM_EVENT_TYPE_CUSTOM,
 			ENUM_EVENT_TYPE_COUNT
 		};
 
@@ -52,6 +53,7 @@ namespace yon{
 			ENUM_SYSTEM_INPUT_TYPE_DOZE,
 			ENUM_SYSTEM_INPUT_TYPE_WAKE,
 			ENUM_SYSTEM_INPUT_TYPE_CRASH,
+			ENUM_SYSTEM_INPUT_TYPE_EXIT,
 			ENUM_SYSTEM_INPUT_TYPE_COUNT
 		};
 
@@ -104,6 +106,10 @@ namespace yon{
 			c8* str;
 		};
 
+		struct SCustomInput{
+			void* pointer;
+		};
+
 		struct SEvent{
 			ENUM_EVENT_TYPE type;
 			union{
@@ -112,6 +118,7 @@ namespace yon{
 				SKeyInput keyInput;
 				SSystemInput systemInput;
 				SUIInput uiInput;
+				SCustomInput customInput;
 			};
 		};
 
