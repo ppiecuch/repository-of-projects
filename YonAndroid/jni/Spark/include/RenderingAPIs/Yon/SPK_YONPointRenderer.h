@@ -72,7 +72,7 @@ namespace YON
 		* @param d : the Yon device
 		* @param size : the size of the points
 		*/
-		YONPointRenderer(yon::YonDevice* d,float size = 1.0f);
+		YONPointRenderer(yon::IYonEngine* d,float size = 1.0f);
 
 		/**
 		* @brief Creates and registers a new YONPointRenderer
@@ -80,7 +80,7 @@ namespace YON
 		* @param size : the size of the points
 		* @return A new registered YONPointRenderer
 		*/
-		static YONPointRenderer* create(yon::YonDevice* d,float size = 1.0f);
+		static YONPointRenderer* create(yon::IYonEngine* d,float size = 1.0f);
 
 		/////////////
 		// Setters //
@@ -142,7 +142,7 @@ namespace YON
 	};
 
 
-	inline YONPointRenderer* YONPointRenderer::create(yon::YonDevice* d,float size)
+	inline YONPointRenderer* YONPointRenderer::create(yon::IYonEngine* d,float size)
 	{
 		YONPointRenderer* obj = new YONPointRenderer(d,size);
 		registerObject(obj);
@@ -151,27 +151,27 @@ namespace YON
 	
 	inline void YONPointRenderer::setTexture(yon::video::ITexture* texture)
 	{
-		material.TextureLayer[0].Texture = texture;
+		material.TextureLayers[0].texture = texture;
 	}
 
 	inline void YONPointRenderer::setSize(float size)
 	{
-		material.Thickness = this->size = size;
+		//material.Thickness = this->size = size;
 	}
 
 	inline yon::video::ITexture* YONPointRenderer::getTexture() const
 	{
-		return material.TextureLayer[0].Texture;
+		return material.TextureLayers[0].texture;
 	}
 
 	inline yon::video::SMaterialLayer& YONPointRenderer::getMaterialLayer()
 	{
-		return material.TextureLayer[0];
+		return material.TextureLayers[0];
 	}
 		
 	inline const yon::video::SMaterialLayer& YONPointRenderer::getMaterialLayer() const
 	{
-		return material.TextureLayer[0];
+		return material.TextureLayers[0];
 	}
 
 	inline const std::string& YONPointRenderer::getBufferName() const

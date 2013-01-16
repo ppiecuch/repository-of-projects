@@ -30,11 +30,11 @@ namespace YON
 {
 	const std::string YONPointRenderer::YON_BUFFER_NAME("SPK_YONPointRenderer_Buffer");
 
-	YONPointRenderer::YONPointRenderer(yon::YonDevice* d,float size) :
+	YONPointRenderer::YONPointRenderer(yon::IYonEngine* d,float size) :
 		YONRenderer(d),
 		PointRendererInterface(POINT_SQUARE,size)
 	{
-		material.Thickness = size;
+		//material.Thickness = size;
 	}
 
 	bool YONPointRenderer::setType(PointType type)

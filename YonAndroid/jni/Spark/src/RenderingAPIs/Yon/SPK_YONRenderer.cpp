@@ -27,18 +27,19 @@ namespace SPK
 {
 namespace YON
 {
-	YONRenderer::YONRenderer(yon::YonDevice* d) :
+	YONRenderer::YONRenderer(yon::IYonEngine* d) :
 		device(d),
 		currentBuffer(NULL)
 	{
-		material.GouraudShading = true;									// fix 1.05.00 for ATI cards
-		material.Lighting = false;										// No lights per default
-		material.BackfaceCulling = false;								// Deactivates backface culling
-		material.MaterialType = yon::video::EMT_ONETEXTURE_BLEND;		// To allow complex blending functions
+		//material.GouraudShading = true;									// fix 1.05.00 for ATI cards
+		//material.Lighting = false;										// No lights per default
+		//material.BackfaceCulling = false;								// Deactivates backface culling
+		material.CullingMode=yon::video::ENUM_CULLING_MODE_NONE;
+		material.MaterialType = yon::video::ENUM_MATERIAL_TYPE_BLEND;	// To allow complex blending functions
 		setBlending(BLENDING_NONE);										// Blending is disabled per default
 	}
 
-	void YONRenderer::setBlending(yon::video::E_BLEND_FACTOR srcFunc,yon::video::E_BLEND_FACTOR destFunc,unsigned int alphaSrc)
+		void YONRenderer::setBlending(yon::video::ENUM_BLEND_FACTOR srcFunc,yon::video::ENUM_BLEND_FACTOR destFunc,yon::video::ENUM_ALPHA_SOURCE alphaSrc)
 	{
 		blendSrcFunc = srcFunc;
 		blendDestFunc = destFunc;
@@ -51,21 +52,23 @@ namespace YON
 		switch(blendMode)
 		{
 		case BLENDING_NONE :
-			blendSrcFunc = yon::video::EBF_ONE;
-			blendDestFunc = yon::video::EBF_ZERO;
-			alphaSource = yon::video::EAS_NONE;
+			blendSrcFunc = yon::video::ENUM_BLEND_FACTOR_ONE;
+			blendDestFunc = yon::video::ENUM_BLEND_FACTOR_ZERO;
+			alphaSource = yon::video::ENUM_ALPHA_SOURCE_NONE;
 			break;
 
 		case BLENDING_ADD :
-			blendSrcFunc = yon::video::EBF_SRC_ALPHA;
-			blendDestFunc = yon::video::EBF_ONE;
-			alphaSource = yon::video::EAS_VERTEX_COLOR | yon::video::EAS_TEXTURE;
+			blendSrcFunc = yon::video::ENUM_BLEND_FACTOR_SRC_ALPHA;
+			blendDestFunc = yon::video::ENUM_BLEND_FACTOR_ONE;
+			//alphaSource = yon::video::ENUM_ALPHA_SOURCE_VERTEX | yon::video::ENUM_ALPHA_SOURCE_TEXTURE;
+			alphaSource = yon::video::ENUM_ALPHA_SOURCE_NONE;
 			break;
 
 		case BLENDING_ALPHA :
-			blendSrcFunc = yon::video::EBF_SRC_ALPHA;
-			blendDestFunc = yon::video::EBF_ONE_MINUS_SRC_ALPHA;
-			alphaSource = yon::video::EAS_VERTEX_COLOR | yon::video::EAS_TEXTURE;
+			blendSrcFunc = yon::video::ENUM_BLEND_FACTOR_SRC_ALPHA;
+			blendDestFunc = yon::video::ENUM_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+			//alphaSource = yon::video::ENUM_ALPHA_SOURCE_VERTEX | yon::video::ENUM_ALPHA_SOURCE_TEXTURE;
+			alphaSource = yon::video::ENUM_ALPHA_SOURCE_NONE;
 			break;
 		}
 		updateMaterialBlendingMode();
@@ -76,11 +79,13 @@ namespace YON
 		switch(renderingHint)
 		{
 		case DEPTH_TEST :
-			material.ZBuffer = (enable ? 1 : 0);
+			//TODO
+			//material.ZBuffer = (enable ? 1 : 0);
 			break;
 
 		case DEPTH_WRITE :
-			material.ZWriteEnable = enable;
+			//TODO
+			//material.ZWriteEnable = enable;
 			break;
 		}
 	}
@@ -90,10 +95,12 @@ namespace YON
 		switch(renderingHint)
 		{
 		case DEPTH_TEST :
-			return material.ZBuffer != 0;
+			//TODO
+			//return material.ZBuffer != 0;
 
 		case DEPTH_WRITE :
-			return material.ZWriteEnable;
+			//TODO
+			//return material.ZWriteEnable;
 
 		case ALPHA_TEST :
 			return true; // always enabled in the yonlicht material
