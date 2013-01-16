@@ -4,21 +4,8 @@
 #include "../log.h"
 
 const char* LOG_TAG = "yon_AndroidGLView";
-const char* className="yon/AndroidGLView";
-
-JavaVM *g_jvm=NULL;
 JNIEnv *g_env=NULL;
 jobject g_obj=NULL;
-ICallback* callback=NULL;
-
-const static s32 MSG_SHOW_SPINNER=0;
-const static s32 MSG_HIDE_SPINNER=1;
-const static s32 MSG_SETUP_INPUT=2;
-const static s32 MSG_COMPLETE_INPUT=3;
-const static s32 MSG_TOAST=4;
-const static s32 MSG_SETUP_CONFIRM=5;
-const static s32 MSG_POSITIVE_CONFIRM=6;
-const static s32 MSG_NEGATIVE_CONFIRM=7;
 
 const static s32 ACTION_MASK = 255;
 const static s32 ACTION_DOWN = 0;
@@ -31,14 +18,8 @@ const static s32 ACTION_POINTER_ID_SHIFT = 8;
 
 void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jboolean first,jint width, jint height, jstring apkFilePath, jstring sdcardPath){
 	LOGD(LOG_TAG,"screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",width,height,pEnv);
-	pEnv->GetJavaVM(&g_jvm);
-	if(g_obj!=NULL)
-	{
-		pEnv->DeleteGlobalRef(g_obj);
-		g_obj=NULL;
-	}
-	g_obj = pEnv->NewGlobalRef(obj);
 	g_env=pEnv;
+	g_obj=obj;
 	if(first)
 	{
 		const char* root= pEnv->GetStringUTFChars(sdcardPath, 0);
@@ -48,39 +29,14 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jb
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	Logger->debug("nativeOnSurfaceChanged->w:%d,h:%d\n",w,h);
-	getEngine()->onResize(w,h);
+	resize(w,h);
 }
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
-	if(getEngine()&&getEngine()->run())
-		drawFrame();
-	else
-	{
-		const char* className="yon/AndroidGLView";
-		jclass cls = pEnv->FindClass(className);
-		if (cls == NULL) {
-			Logger->warn("can not find %s\n",className);
-			return;
-		}
-		//再找类中的方法
-		jmethodID callbackDestroy = pEnv->GetMethodID(cls, "callbackDestroy", "()V");
-		if (destroy == NULL) 
-		{
-			Logger->warn("no callbackDestroy function\n");
-			return;
-		}
-		//回调java中的方法
-		Logger->info("callbackDestroy function\n");
-		destroy();
-		LOGD(LOG_TAG,"delete callback");
-		delete callback;
-		LOGD(LOG_TAG,"pEnv->DeleteGlobalRef(g_obj)");
-		pEnv->DeleteGlobalRef(g_obj);
-		LOGD(LOG_TAG,"pEnv->CallVoidMethod(obj, callbackDestroy)");
-		pEnv->CallVoidMethod(obj, callbackDestroy);
-	}
+	getEngine()->run();
+	drawFrame();
 }
 void Java_yon_AndroidGLView_nativeOnPause(JNIEnv *pEnv, jobject obj){
-	LOGI(LOG_TAG,"nativeOnPause\n");
+	Logger->debug("nativeOnPause\n");
 	SEvent evt;
 	evt.type=ENUM_EVENT_TYPE_SYSTEM;
 	evt.systemInput.type=ENUM_SYSTEM_INPUT_TYPE_DOZE;
@@ -92,6 +48,9 @@ void Java_yon_AndroidGLView_nativeOnResume(JNIEnv *pEnv, jobject obj){
 	evt.type=ENUM_EVENT_TYPE_SYSTEM;
 	evt.systemInput.type=ENUM_SYSTEM_INPUT_TYPE_WAKE;
 	getEngine()->postEventFromUser(evt);
+}
+void Java_yon_AndroidGLView_nativeOnDestroy(JNIEnv *pEnv, jobject obj){
+	Logger->debug("nativeOnDestroy\n");
 }
 jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnBack\n");
@@ -106,21 +65,6 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	//This is the class loader the virtual machine creates for applications, 
 	//and is able to locate classes listed in the java.class.path property.
 
-#if 1
-	char title[]="\u786E\u8BA4\u9000\u51FA?";
-	char content[]="\u786E\u8BA4\u8981\u9000\u51FA\u6E38\u620F\u5417?";
-	char positive[]="\u9000\u51FA";
-	char negative[]="\u53D6\u6D88";
-	SCallback callback;
-	callback.type=platform::ENUM_CALLBACK_TYPE_UI;
-	callback.ui.type=platform::ENUM_CALLBACK_UI_TYPE_CONFIRM;
-	callback.ui.title=title;
-	callback.ui.content=content;
-	callback.ui.positiveButton=positive;
-	callback.ui.negativeButton=negative;
-	getEngine()->callback(callback);
-	return true;
-#else
 	const char* className="yon/AndroidGLView";
 	jclass cls = pEnv->FindClass(className);
 	if (cls == NULL) {
@@ -139,7 +83,6 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 	destroy();
 	pEnv->CallVoidMethod(obj, callbackDestroy);
 	return true;
-#endif
 }
 jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iAction, jint id, jfloat x, jfloat y, jint count){
 	if(id>=YON_TOUCH_MAX_INPUTS)
@@ -197,31 +140,6 @@ jboolean Java_yon_AndroidGLView_nativeOnMove(JNIEnv *pEnv, jobject obj, jint iAc
 	return true;
 }
 jboolean Java_yon_AndroidGLView_nativeOnUI(JNIEnv *pEnv, jobject obj, jint msg, jobjectArray args){
-	switch(msg)
-	{
-	case MSG_POSITIVE_CONFIRM:
-		Logger->debug("MSG_POSITIVE_CONFIRM\r\n");
-		//exiting=true;
-		event::SEvent ev;
-		ev.type=event::ENUM_EVENT_TYPE_SYSTEM;
-		ev.systemInput.type=event::ENUM_SYSTEM_INPUT_TYPE_EXIT;
-		getEngine()->postEventFromUser(ev);
-		break;
-	case MSG_NEGATIVE_CONFIRM:
-		Logger->debug("MSG_NEGATIVE_CONFIRM\r\n");
-		break;
-	case MSG_COMPLETE_INPUT:
-		//int getArrayLen(JNIEnv * env, jobjectArray jarray): //获取一个Java数组长度，返回为jsize类型
-		jstring str = (jstring)pEnv->GetObjectArrayElement(args, 0);
-		const char *word = pEnv->GetStringUTFChars(str, 0); 
-		//Logger->debug("MSG_COMPLETE_INPUT:%s\r\n",word);
-		SEvent evt;
-		evt.type=ENUM_EVENT_TYPE_UI;
-		evt.uiInput.type=ENUM_UI_INPUT_TYPE_EDITTEXT;
-		evt.uiInput.str=const_cast<c8*>(word);
-		getEngine()->postEventFromUser(evt);
-		break;
-	}
 	return true;
 }
 void Java_yon_AndroidGLView_nativeDebug(JNIEnv *pEnv, jobject obj, jstring str){

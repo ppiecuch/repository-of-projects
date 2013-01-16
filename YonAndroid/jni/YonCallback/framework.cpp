@@ -140,6 +140,7 @@ void drawFrame(){
 void destroy(){
 	engine->drop();
 	delete params.pEventReceiver;
+	engine=NULL;
 }
 
 IYonEngine* getEngine(){

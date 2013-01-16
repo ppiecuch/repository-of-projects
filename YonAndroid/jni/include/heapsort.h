@@ -69,7 +69,7 @@ inline void heapsort(T* elements,u32 size){
 	u32 i;
 	T* virtualArray=elements-1;
 	//将elements[0...size-1]建成大顶堆
-	for(i=size/2;i>0;--i)
+	for(i=size<<1;i>0;--i)
 		heaprise(virtualArray,i,size);
 	//抽走堆顶元素，并用未抽过的堆尾元素替换
 	for(i=size;i>1;--i){

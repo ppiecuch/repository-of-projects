@@ -11,6 +11,7 @@ namespace platform{
 	enum ENUM_CALLBACK_TYPE{
 		ENUM_CALLBACK_TYPE_UI = 0,
 		ENUM_CALLBACK_TYPE_HW,
+		ENUM_CALLBACK_TYPE_CUSTOM,
 		ENUM_CALLBACK_TYPE_COUNT
 	};
 
@@ -42,11 +43,16 @@ namespace platform{
 		ENUM_CALLBACK_HW_TYPE type;
 	};
 
+	struct SCallbackCustom{
+		void* pointer;
+	};
+
 	struct SCallback{
 		ENUM_CALLBACK_TYPE type;
 		union{
 			SCallbackUI ui;
 			SCallbackHW hw;
+			SCallbackCustom custom;
 		};
 	};
 

@@ -12,10 +12,10 @@ ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 II18NManager* i18nManager=NULL;
 
-IModel* cubeModel=NULL;
-IModel* weedModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* weedModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -31,6 +31,10 @@ public:
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				event::SEvent ev;
+				ev.type=event::ENUM_EVENT_TYPE_SYSTEM;
+				ev.systemInput.type=event::ENUM_SYSTEM_INPUT_TYPE_EXIT;
+				getEngine()->postEventFromUser(ev);
 				return true;
 			}
 		case event::ENUM_EVENT_TYPE_TOUCH:
@@ -41,6 +45,10 @@ public:
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
 				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+				event::SEvent ev;
+				ev.type=event::ENUM_EVENT_TYPE_SYSTEM;
+				ev.systemInput.type=event::ENUM_SYSTEM_INPUT_TYPE_EXIT;
+				getEngine()->postEventFromUser(ev);
 				return true;
 			}
 		}
@@ -48,11 +56,14 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
+	params.pCallback=pcb;
 	//params.fpsLimit=10;
+	params.appPath=appPath;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -73,7 +84,6 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("D:/Development/Tools/xls2xlbV2.0/output");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/",true);
-	fs->addWorkingDirectory("temp/");
 #endif
 
 	//Logger->debug("%s\n",fs->getAbsolutePath(fs->getWorkingDirectory()).c_str());
@@ -108,7 +118,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	Logger->debug("%.2f\n",rs->readFloat());
 	Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
-#elif 0
+#elif 1
 	IWriteStream* ws=fs->createAndOpenWriteFileStream("tst/tst/tst/test.txt",true,ENUM_ENDIAN_MODE_BIG);
 	ws->writeBool(true);
 	ws->writeFloat(2.1f);
@@ -183,17 +193,18 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }
 void destroy(){
 	engine->drop();
 	delete params.pEventReceiver;
+	engine=NULL;
 }
 
 IYonEngine* getEngine(){
