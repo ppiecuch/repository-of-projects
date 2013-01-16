@@ -57,7 +57,7 @@ namespace YON
 		* @brief Constructor of YONRenderer
 		* @param d : the Yon device
 		*/
-		YONRenderer(yon::YonDevice* d);
+		YONRenderer(yon::IYonEngine* d);
 
 		////////////////
 		// Destructor //
@@ -81,7 +81,7 @@ namespace YON
 		* @param destFunc : the blending destination function
 		* @param alphaSrc : the alpha source
 		*/
-		void setBlending(yon::video::E_BLEND_FACTOR srcFunc,yon::video::E_BLEND_FACTOR destFunc,unsigned int alphaSrc);
+		void setBlending(yon::video::ENUM_BLEND_FACTOR srcFunc,yon::video::ENUM_BLEND_FACTOR destFunc,yon::video::ENUM_ALPHA_SOURCE alphaSrc);
 		virtual void setBlending(BlendingMode blendMode);
 
 		virtual void enableRenderingHint(RenderingHint renderingHint,bool enable);
@@ -95,19 +95,19 @@ namespace YON
 		* @brief Gets the Yon device of this renderer
 		* @return the device of this renderer
 		*/
-        yon::YonDevice* getDevice() const;
+        yon::IYonEngine* getDevice() const;
 
 		/**
 		* @brief Gets the source blending funtion of this renderer
 		* @return the source blending funtion of this renderer
 		*/
-		yon::video::E_BLEND_FACTOR getBlendSrcFunc() const;
+		yon::video::ENUM_BLEND_FACTOR getBlendSrcFunc() const;
 
 		/**
 		* @brief Gets the destination blending funtion of this renderer
 		* @return the destination blending funtion of this renderer
 		*/
-		yon::video::E_BLEND_FACTOR getBlendDestFunc() const;
+		yon::video::ENUM_BLEND_FACTOR getBlendDestFunc() const;
 
 		/**
 		* @brief Gets the alpha source of this renderer
@@ -144,7 +144,7 @@ namespace YON
 
 	protected :
 
-		yon::YonDevice* device;	// the device
+		yon::IYonEngine* device;	// the device
 		yon::video::SMaterial material;	// the material
 
 		mutable YONBuffer* currentBuffer;
@@ -154,9 +154,9 @@ namespace YON
 
 	private :
 
-		yon::video::E_BLEND_FACTOR blendSrcFunc;
-		yon::video::E_BLEND_FACTOR blendDestFunc;
-		unsigned int alphaSource;
+		yon::video::ENUM_BLEND_FACTOR blendSrcFunc;
+		yon::video::ENUM_BLEND_FACTOR blendDestFunc;
+		yon::video::ENUM_ALPHA_SOURCE alphaSource;
 
 		/**
 		* @brief Gets the name of the YONBuffer used by the renderer
@@ -176,17 +176,17 @@ namespace YON
 		Renderer::setAlphaTestThreshold(0.0f); // the alpha threshold of the yonlicht material is always 0
 	}
 	
-	inline yon::YonDevice* YONRenderer::getDevice() const
+	inline yon::IYonEngine* YONRenderer::getDevice() const
 	{
 		return device;
 	}
 
-	inline yon::video::E_BLEND_FACTOR YONRenderer::getBlendSrcFunc() const
+	inline yon::video::ENUM_BLEND_FACTOR YONRenderer::getBlendSrcFunc() const
 	{
 		return blendSrcFunc;
 	}
 
-	inline yon::video::E_BLEND_FACTOR YONRenderer::getBlendDestFunc() const
+	inline yon::video::ENUM_BLEND_FACTOR YONRenderer::getBlendDestFunc() const
 	{
 		return blendDestFunc;
 	}
@@ -219,11 +219,15 @@ namespace YON
 
 	inline void YONRenderer::updateMaterialBlendingMode()
 	{
-		material.MaterialTypeParam = yon::video::pack_texureBlendFunc(
+		/*material.MaterialTypeParam = yon::video::pack_texureBlendFunc(
 			blendSrcFunc,
 			blendDestFunc,
 			yon::video::EMFN_MODULATE_1X,
-			alphaSource);
+			alphaSource);*/
+		material.BlendSrc=blendSrcFunc;
+		material.BlendDst=blendDestFunc;
+		material.Modulate=yon::video::ENUM_MODULATE_1X;
+		material.AlphaSource=alphaSource;
 	}
 }}
 

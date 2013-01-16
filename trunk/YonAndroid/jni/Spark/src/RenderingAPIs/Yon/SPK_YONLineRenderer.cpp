@@ -30,11 +30,11 @@ namespace YON
 {
 	const std::string YONLineRenderer::YON_BUFFER_NAME("SPK_YONLineRenderer_Buffer");
 
-	YONLineRenderer::YONLineRenderer(yon::YonDevice* d,float length,float width) :
+	YONLineRenderer::YONLineRenderer(yon::IYonEngine* d,float length,float width) :
 		YONRenderer(d),
 		LineRendererInterface(length,width)
 	{
-		material.Thickness = width;
+		//material.Thickness = width;
 	}
 
 	void YONLineRenderer::createBuffers(const Group& group)
@@ -48,7 +48,8 @@ namespace YON
 		
 		size_t nbTotalIndices = group.getParticles().getNbReserved() << 1;
 		
-		yon::scene::IIndexBuffer& indexBuffer = currentBuffer->getIndexBuffer();
+		//yon::scene::IIndexBuffer& indexBuffer = currentBuffer->getIndexBuffer();
+		yon::core::array<yon::u16>& indexBuffer = currentBuffer->getIndexBuffer();
 		if (indexBuffer.getType() == yon::video::EIT_32BIT)
         {
             yon::u32* indices = reinterpret_cast<yon::u32*>(indexBuffer.pointer());

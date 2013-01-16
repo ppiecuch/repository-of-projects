@@ -29,7 +29,7 @@ namespace SPK
 namespace YON
 {
     YONSystem::YONSystem(yon::scene::ISceneNode* parent, yon::scene::ISceneManager* mgr,bool worldTransformed,yon::s32 id) :
-		yon::scene::ISceneNode(parent,mgr,id),
+		yon::scene::ISceneNode(parent),
 		System(),
 		worldTransformed(worldTransformed),
 		AutoUpdate(true),
@@ -40,42 +40,44 @@ namespace YON
 
 	YONSystem::YONSystem(const YONSystem& system) :
 		System(system),
-		ISceneNode(system.getParent(),system.getSceneManager()),
+		ISceneNode(system.getParent()),
 		AutoUpdate(system.AutoUpdate),
 		AlwaysUpdate(system.AlwaysUpdate),
 		worldTransformed(system.worldTransformed),
 		finished(system.finished),
 		lastUpdatedTime(0)
 	{
-		cloneMembers(&const_cast<YONSystem&>(system),NULL);
+		//TODO copy
+		//cloneMembers(&const_cast<YONSystem&>(system),NULL);
 		//updateAbsolutePosition();
 	}
 
-    void YONSystem::OnRegisterSceneNode()
+    void YONSystem::onRegisterForRender()
     {
-        if(IsVisible)
-			SceneManager->registerNodeForRendering(this,yon::scene::ESNRP_TRANSPARENT_EFFECT); // Draws in transparent effect pass (may be optimized)
+        if(m_bVisible)
+			m_pSceneManager->registerForRender(this,yon::scene::ENUM_SCENE_PASS_EFFECT); // Draws in transparent effect pass (may be optimized)
 
-        yon::scene::ISceneNode::OnRegisterSceneNode();
+        yon::scene::ISceneNode::onRegisterForRender();
     }
 
     void YONSystem::render() const
     {
         // Sets the transform matrix
-        SceneManager->getVideoDriver()->setTransform(yon::video::ETS_WORLD,AbsoluteTransformation);
+        //SceneManager->getVideoDriver()->setTransform(yon::video::ETS_WORLD,AbsoluteTransformation);
+		m_pSceneManager->getVideoDriver()->setTransform(yon::video::ENUM_TRANSFORM_WORLD,m_absoluteTransformation);
 
         // Renders particles
         SPK::System::render();
     }
 
-    void YONSystem::OnAnimate(yon::u32 timeMs)
+    void YONSystem::onAnimate(yon::u32 timeMs)
     {
-		ISceneNode::OnAnimate(timeMs);
+		ISceneNode::onAnimate(timeMs);
 
 		if (lastUpdatedTime == 0)
 			lastUpdatedTime = timeMs;
 
-        if(AutoUpdate && (AlwaysUpdate || (IsVisible/* && !SceneManager->isCulled(this)*/))) // check culling (disabled atm)
+        if(AutoUpdate && (AlwaysUpdate || (m_bVisible/* && !SceneManager->isCulled(this)*/))) // check culling (disabled atm)
 			update((timeMs - lastUpdatedTime) * 0.001f);
 
         lastUpdatedTime = timeMs;
@@ -87,16 +89,17 @@ namespace YON
 
 		if (worldTransformed)
 		{
-			this->setTransform(AbsoluteTransformation.pointer());
+			this->setTransform(m_absoluteTransformation.pointer());
 			updateTransform();
-			AbsoluteTransformation.makeIdentity();
+			m_absoluteTransformation.makeIdentity();
 		}
 	}
 
     const yon::core::aabbox3d<yon::f32>& YONSystem::getBoundingBox() const
     {
-        BBox.MaxEdge = spk2yon(getAABBMax());
-        BBox.MinEdge = spk2yon(getAABBMin());
+		//TODO
+        //BBox.maxEdge = spk2yon(getAABBMax());
+        //BBox.minEdge = spk2yon(getAABBMin());
         return BBox;
     }
 
@@ -105,11 +108,12 @@ namespace YON
 		for (std::vector<Group*>::const_iterator it = groups.begin(); it != groups.end(); ++it)
 			if ((*it)->isDistanceComputationEnabled())
 			{
-				yon::core::vector3df pos = SceneManager->getActiveCamera()->getAbsolutePosition();
+				yon::core::vector3df pos = m_pSceneManager->getLogisticCamera()->getAbsolutePosition();
 				if (!worldTransformed)
 				{
-					yon::core::matrix4 invTransform;
-					AbsoluteTransformation.getInversePrimitive(invTransform);
+					yon::core::matrix4f invTransform;
+					//TODO
+					//m_absoluteTransformation.getInversePrimitive(invTransform);
 					invTransform.transformVect(pos);
 				}
 				setCameraPosition(yon2spk(pos));

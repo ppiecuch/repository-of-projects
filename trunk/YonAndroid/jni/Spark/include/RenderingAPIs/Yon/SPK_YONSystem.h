@@ -164,8 +164,11 @@ namespace YON
 		*/
         virtual void render() const;
 
+		//TODO
+		virtual void render(yon::video::IVideoDriver* driver){}
+
 		/** @brief This method is called just before the rendering process of the whole scene */
-        virtual void OnRegisterSceneNode();
+        virtual void onRegisterForRender();
 
 		/** 
 		* @brief This method is called just before rendering the whole scene 
@@ -174,7 +177,7 @@ namespace YON
 		*
 		* @param timeMs : Current time in milliseconds
 		**/
-        virtual void OnAnimate(yon::u32 timeMs);
+        virtual void onAnimate(yon::u32 timeMs);
 
 		/** @brief Updates the absolute transformation of this Yon Node */
 		virtual void updateAbsolutePosition();

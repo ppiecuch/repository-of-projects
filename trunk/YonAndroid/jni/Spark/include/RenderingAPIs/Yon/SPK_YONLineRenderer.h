@@ -64,7 +64,7 @@ namespace YON
 		* @param length : the length multiplier of this YONLineRenderer
 		* @param width : the width of this YONLineRenderer in pixels
 		*/
-		YONLineRenderer(yon::YonDevice* d,float length = 1.0f,float width = 1.0f);
+		YONLineRenderer(yon::IYonEngine* d,float length = 1.0f,float width = 1.0f);
 
 		/**
 		* @brief Creates and registers a new YONLineRenderer
@@ -73,7 +73,7 @@ namespace YON
 		* @param width : the width of this YONLineRenderer in pixels
 		* @return A new registered YONLineRenderer
 		*/
-		static YONLineRenderer* create(yon::YonDevice* d,float length = 1.0f,float width = 1.0f);
+		static YONLineRenderer* create(yon::IYonEngine* d,float length = 1.0f,float width = 1.0f);
 
 		/////////////
 		// Setters //
@@ -101,7 +101,7 @@ namespace YON
 	};
 
 
-	inline YONLineRenderer* YONLineRenderer::create(yon::YonDevice* d,float length,float width)
+	inline YONLineRenderer* YONLineRenderer::create(yon::IYonEngine* d,float length,float width)
 	{
 		YONLineRenderer* obj = new YONLineRenderer(d,length,width);
 		registerObject(obj);
@@ -110,7 +110,7 @@ namespace YON
 
 	inline void YONLineRenderer::setWidth(float width)
 	{
-		material.Thickness = this->width = width;
+		//material.Thickness = this->width = width;
 	}
 
 	inline const std::string& YONLineRenderer::getBufferName() const

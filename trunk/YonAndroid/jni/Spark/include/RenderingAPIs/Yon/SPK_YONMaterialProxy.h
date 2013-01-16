@@ -43,17 +43,17 @@ namespace YON
 
 		const yon::video::SMaterial& getMaterial() const { return material; }
 
-		void setAntiAliasing(yon::u8 aa)		{ material.AntiAliasing = aa; }
-		yon::u8 getAntiAliasing() const			{ return material.AntiAliasing; }
+		//void setAntiAliasing(yon::u8 aa)		{ material.AntiAliasing = aa; }
+		//yon::u8 getAntiAliasing() const			{ return material.AntiAliasing; }
 
-		void setFogEnable(bool enable)			{ material.FogEnable = enable; }
-		bool getFogEnable() const				{ return material.FogEnable; }
+		//void setFogEnable(bool enable)			{ material.Fog = enable; }
+		//bool getFogEnable() const				{ return material.Fog; }
 
-		void setPointCloud(bool enable)			{ material.PointCloud = enable; }
-		bool getPointCloud() const				{ return material.PointCloud; }
+		void setPointCloud(bool enable)			{ material.PolygonMode = enable?yon::video::ENUM_POLYGON_MODE_POINT:yon::video::ENUM_POLYGON_MODE_FILL; }
+		bool getPointCloud() const				{ return material.PolygonMode==yon::video::ENUM_POLYGON_MODE_POINT; }
 
-		void setWireframe(bool enable)			{ material.Wireframe = enable; }
-		bool getWireframe() const				{ return material.Wireframe; }
+		void setWireframe(bool enable)			{ material.PolygonMode = enable?yon::video::ENUM_POLYGON_MODE_LINE:yon::video::ENUM_POLYGON_MODE_FILL; }
+		bool getWireframe() const				{ return material.PolygonMode==yon::video::ENUM_POLYGON_MODE_LINE; }
 
 	private :
 
