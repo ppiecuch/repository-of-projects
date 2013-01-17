@@ -308,6 +308,33 @@ namespace core{
 			//不用调整，转置行为不影响是否单位变化
 			//m_bIsChanged = true;
 		}
+		//TODO 待理解
+		//! Inverts a primitive matrix which only contains a translation and a rotation
+		//! \param out: where result matrix is written to.
+		inline bool matrix4<T>::getInversePrimitive ( matrix4<T>& out ) const
+		{
+			out.M[0 ] = M[0];
+			out.M[1 ] = M[4];
+			out.M[2 ] = M[8];
+			out.M[3 ] = 0;
+
+			out.M[4 ] = M[1];
+			out.M[5 ] = M[5];
+			out.M[6 ] = M[9];
+			out.M[7 ] = 0;
+
+			out.M[8 ] = M[2];
+			out.M[9 ] = M[6];
+			out.M[10] = M[10];
+			out.M[11] = 0;
+
+			out.M[12] = (T)-(M[12]*M[0] + M[13]*M[1] + M[14]*M[2]);
+			out.M[13] = (T)-(M[12]*M[4] + M[13]*M[5] + M[14]*M[6]);
+			out.M[14] = (T)-(M[12]*M[8] + M[13]*M[9] + M[14]*M[10]);
+			out.M[15] = 1;
+
+			return true;
+		}
 		//不存在逆矩阵则返回false
 		inline bool makeInverse(){
 			

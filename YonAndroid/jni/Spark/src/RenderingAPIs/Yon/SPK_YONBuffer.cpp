@@ -346,7 +346,7 @@ namespace YON
  //       }
  //   }
 
-	//YONBufferCreator::YONBufferCreator(yon::YonDevice* d,int purpose,E_YONSPK_INDEXMODE im) :
+	//YONBufferCreator::YONBufferCreator(yon::IYonEngine* d,int purpose,E_YONSPK_INDEXMODE im) :
 	//	p(purpose),
 	//	m(im),
 	//	device(d)

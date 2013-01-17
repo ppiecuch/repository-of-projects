@@ -31,7 +31,7 @@ namespace YON
 	const std::string YONQuadRenderer::YON_BUFFER_NAME("SPK_YONQuadRenderer_Buffer");
 	void (YONQuadRenderer::*YONQuadRenderer::renderParticle)(const Particle&) const = NULL;
 
-	YONQuadRenderer::YONQuadRenderer(yon::YonDevice* d,float scaleX,float scaleY) :
+	YONQuadRenderer::YONQuadRenderer(yon::IYonEngine* d,float scaleX,float scaleY) :
 		YONRenderer(d),
 		QuadRendererInterface(scaleX,scaleY),
 		Oriented3DRendererInterface()
@@ -47,8 +47,9 @@ namespace YON
 																	false));
 		size_t nbTotalParticles = group.getParticles().getNbReserved();
 
-		yon::scene::IIndexBuffer& indexBuffer = currentBuffer->getIndexBuffer();
-		if (indexBuffer.getType() == yon::video::EIT_32BIT)
+		//yon::scene::IIndexBuffer& indexBuffer = currentBuffer->getIndexBuffer();
+		yon::core::array<yon::u16>& indexBuffer = currentBuffer->getIndexBuffer();
+		/*if (indexBuffer.getType() == yon::video::EIT_32BIT)
 		{
 			yon::u32* indices = reinterpret_cast<yon::u32*>(indexBuffer.pointer());
 			for (size_t t = 0; t < nbTotalParticles; ++t)
@@ -61,7 +62,7 @@ namespace YON
                 indices[NB_INDICES_PER_QUAD*t+5] = NB_VERTICES_PER_QUAD*t+3;
 			}
 		}
-		else if (indexBuffer.getType() == yon::video::EIT_16BIT)
+		else if (indexBuffer.getType() == yon::video::EIT_16BIT)*/
 		{
 			yon::u16* indices = reinterpret_cast<yon::u16*>(indexBuffer.pointer());
 			for (size_t t = 0; t < nbTotalParticles; ++t)
@@ -75,27 +76,29 @@ namespace YON
 			}	
 		}
 
-		yon::video::S3DVertex* vertices = currentBuffer->getVertexBuffer().pointer();
+		yon::scene::SVertex* vertices = currentBuffer->getVertexBuffer().pointer();
 		for (size_t t = 0; t < nbTotalParticles; t++)
 		{
-			vertices[NB_VERTICES_PER_QUAD*t+0].TCoords = yon::core::vector2df(0.0f,0.0f);
-			vertices[NB_VERTICES_PER_QUAD*t+1].TCoords = yon::core::vector2df(1.0f,0.0f);
-			vertices[NB_VERTICES_PER_QUAD*t+2].TCoords = yon::core::vector2df(1.0f,1.0f);
-			vertices[NB_VERTICES_PER_QUAD*t+3].TCoords = yon::core::vector2df(0.0f,1.0f);
+			vertices[NB_VERTICES_PER_QUAD*t+0].texcoords = yon::core::vector2df(0.0f,0.0f);
+			vertices[NB_VERTICES_PER_QUAD*t+1].texcoords = yon::core::vector2df(1.0f,0.0f);
+			vertices[NB_VERTICES_PER_QUAD*t+2].texcoords = yon::core::vector2df(1.0f,1.0f);
+			vertices[NB_VERTICES_PER_QUAD*t+3].texcoords = yon::core::vector2df(0.0f,1.0f);
 		}
 
 		if (YONBuffer::isVBOHintActivated())
 		{
 			for (size_t t = 0; t < nbTotalParticles * NB_VERTICES_PER_QUAD; t++)
 			{
-				vertices[t].Pos = yon::core::vector3df(0.0f,0.0f,0.0f);
-				vertices[t].Color = yon::video::SColor(0x00000000);
+				vertices[t].pos = yon::core::vector3df(0.0f,0.0f,0.0f);
+				vertices[t].color = yon::video::SColor(0x00000000);
 			}
 		}
 		else
 			currentBuffer->setVBOInitialized(true);
 
-		currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_VERTEX_AND_INDEX);	 
+		//currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_VERTEX_AND_INDEX);	 
+		currentBuffer->getMeshBuffer().setVerticesDirty();
+		currentBuffer->getMeshBuffer().setIndicesDirty();
 	}
 
 	void YONQuadRenderer::render(const Group& group)
@@ -106,17 +109,17 @@ namespace YON
 		yon::video::IVideoDriver* driver = device->getVideoDriver();
 
 		// Computes the inverse model view
-		yon::core::matrix4 invModelView;
+		yon::core::matrix4f invModelView;
 		{
-			yon::core::matrix4 modelView(driver->getTransform(yon::video::ETS_VIEW));
-			modelView *= driver->getTransform(yon::video::ETS_WORLD);
+			yon::core::matrix4f modelView(driver->getTransform(yon::video::ENUM_TRANSFORM_VIEW));
+			modelView *= driver->getTransform(yon::video::ENUM_TRANSFORM_WORLD);
 			modelView.getInversePrimitive(invModelView); // wont work for odd modelview matrices (but should happen in very special cases)
 		}
 
 		// Saves the renderer texture
-		yon::video::ITexture* savedTexture = material.TextureLayer[0].Texture;
+		yon::video::ITexture* savedTexture = material.TextureLayers[0].texture;
 		if (texturingMode == TEXTURE_NONE)
-			material.TextureLayer[0].Texture = NULL;
+			material.TextureLayers[0].texture = NULL;
 
 		if ((texturingMode == TEXTURE_2D)&&(group.getModel()->isEnabled(PARAM_TEXTURE_INDEX)))
 		{
@@ -162,13 +165,14 @@ namespace YON
 				(this->*renderParticle)(particle);
 			}
 		}
-		currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_VERTEX);
+		//currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_VERTEX);
+		currentBuffer->getMeshBuffer().setVerticesDirty();
 
 		driver->setMaterial(material);
-		driver->drawMeshBuffer(&currentBuffer->getMeshBuffer()); // this draw call is used in order to be able to use VBOs
+		driver->drawShap(&currentBuffer->getMeshBuffer()); // this draw call is used in order to be able to use VBOs
 
 		currentBuffer->setVBOInitialized(true);
-		material.TextureLayer[0].Texture = savedTexture; // Restores the texture
+		material.TextureLayers[0].texture = savedTexture; // Restores the texture
 	}
 
 	void YONQuadRenderer::renderBasic(const Particle& particle) const

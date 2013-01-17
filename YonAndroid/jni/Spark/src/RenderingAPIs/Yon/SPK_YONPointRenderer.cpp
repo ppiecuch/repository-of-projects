@@ -57,21 +57,23 @@ namespace YON
 		
 		size_t nbTotalParticles = group.getParticles().getNbReserved();
 		
-		yon::scene::IIndexBuffer& indexBuffer = currentBuffer->getIndexBuffer();
-		if (indexBuffer.getType() == yon::video::EIT_32BIT)
+		//yon::scene::IIndexBuffer& indexBuffer = currentBuffer->getIndexBuffer();
+		yon::core::array<yon::u16>& indexBuffer = currentBuffer->getIndexBuffer();
+		/*if (indexBuffer.getType() == yon::video::EIT_32BIT)
         {
             yon::u32* indices = reinterpret_cast<yon::u32*>(indexBuffer.pointer());
             for (size_t t = 0; t < nbTotalParticles; ++t)
                 indices[t] = t;
         }
-        else
+        else*/
         {
             yon::u16* indices = reinterpret_cast<yon::u16*>(indexBuffer.pointer());
             for (size_t t = 0; t < nbTotalParticles; ++t)
                 indices[t] = t;
         }
 
-		currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_INDEX);
+		//currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_INDEX);
+		currentBuffer->getMeshBuffer().setIndicesDirty();
 		currentBuffer->setVBOInitialized(true);
 	}
 
@@ -83,20 +85,25 @@ namespace YON
 		for (size_t t = 0; t < group.getNbParticles(); ++t)
 		{
 			const Particle& p = group.getParticle(t);
-			currentBuffer->getVertexBuffer()[t].Pos = spk2yon(p.position());
-			currentBuffer->getVertexBuffer()[t].Color = spk2yon(p.getParamCurrentValue(PARAM_ALPHA),p.getR(),p.getG(),p.getB());
+			currentBuffer->getVertexBuffer()[t].pos = spk2yon(p.position());
+			currentBuffer->getVertexBuffer()[t].color = spk2yon(p.getParamCurrentValue(PARAM_ALPHA),p.getR(),p.getG(),p.getB());
 		}
-		currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_VERTEX);
+		//currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_VERTEX);
+		currentBuffer->getMeshBuffer().setVerticesDirty();
 
 		yon::video::IVideoDriver* driver = device->getVideoDriver();
         driver->setMaterial(material);
-        driver->drawVertexPrimitiveList(
+        /*driver->drawVertexPrimitiveList(
 			currentBuffer->getVertexBuffer().pointer(),
 			group.getNbParticles(),
 			currentBuffer->getIndexBuffer().pointer(),
 			group.getNbParticles(),
 			yon::video::EVT_STANDARD,
 			type == POINT_SPRITE ? yon::scene::EPT_POINT_SPRITES : yon::scene::EPT_POINTS,
-			currentBuffer->getIndexBuffer().getType());
+			currentBuffer->getIndexBuffer().getType());*/
+		driver->drawVertexPrimitiveList(currentBuffer->getVertexBuffer().pointer(),
+			group.getNbParticles(),
+			currentBuffer->getIndexBuffer().pointer(),
+			group.getNbParticles(),yon::video::ENUM_PRIMITIVE_TYPE_POINTS);
 	}
 }}
