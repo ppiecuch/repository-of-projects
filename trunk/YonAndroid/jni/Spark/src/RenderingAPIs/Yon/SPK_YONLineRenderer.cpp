@@ -50,20 +50,21 @@ namespace YON
 		
 		//yon::scene::IIndexBuffer& indexBuffer = currentBuffer->getIndexBuffer();
 		yon::core::array<yon::u16>& indexBuffer = currentBuffer->getIndexBuffer();
-		if (indexBuffer.getType() == yon::video::EIT_32BIT)
+		/*if (indexBuffer.getType() == yon::video::EIT_32BIT)
         {
             yon::u32* indices = reinterpret_cast<yon::u32*>(indexBuffer.pointer());
             for (size_t t = 0; t < nbTotalIndices; ++t)
                 indices[t] = t;
         }
-        else
+        else*/
         {
             yon::u16* indices = reinterpret_cast<yon::u16*>(indexBuffer.pointer());
             for (size_t t = 0; t < nbTotalIndices; ++t)
                 indices[t] = t;
         }
 
-		currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_INDEX);
+		//currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_INDEX);
+		currentBuffer->getMeshBuffer().setIndicesDirty();
 		currentBuffer->setVBOInitialized(true);
 	}
 
@@ -82,23 +83,28 @@ namespace YON
 			 particle.getG(),
 			 particle.getB()));
 
-            currentBuffer->getVertexBuffer()[t].Pos = spk2yon(particle.position());
-			currentBuffer->getVertexBuffer()[t].Color = color;
+            currentBuffer->getVertexBuffer()[t].pos = spk2yon(particle.position());
+			currentBuffer->getVertexBuffer()[t].color = color;
             
-			currentBuffer->getVertexBuffer()[t + 1].Pos = spk2yon(particle.position() + particle.velocity() * length);
-			currentBuffer->getVertexBuffer()[t + 1].Color = color;
+			currentBuffer->getVertexBuffer()[t + 1].pos = spk2yon(particle.position() + particle.velocity() * length);
+			currentBuffer->getVertexBuffer()[t + 1].color = color;
 		}
-		currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_VERTEX);
+		//currentBuffer->getMeshBuffer().setDirty(yon::scene::EBT_VERTEX);
+		currentBuffer->getMeshBuffer().setVerticesDirty();
 
 		yon::video::IVideoDriver* driver = device->getVideoDriver();
         driver->setMaterial(material);
-        driver->drawVertexPrimitiveList(
+        /*driver->drawVertexPrimitiveList(
 			currentBuffer->getVertexBuffer().pointer(),
 			group.getNbParticles() * NB_VERTICES_PER_QUAD,
 			currentBuffer->getIndexBuffer().pointer(),
 			group.getNbParticles(),
 			yon::video::EVT_STANDARD,
 			yon::scene::EPT_LINES,
-			currentBuffer->getIndexBuffer().getType());
+			currentBuffer->getIndexBuffer().getType());*/
+		driver->drawVertexPrimitiveList(currentBuffer->getVertexBuffer().pointer(),
+			group.getNbParticles()*NB_VERTICES_PER_QUAD,
+			currentBuffer->getIndexBuffer().pointer(),
+			group.getNbParticles(),yon::video::ENUM_PRIMITIVE_TYPE_LINES);
 	}
 }}

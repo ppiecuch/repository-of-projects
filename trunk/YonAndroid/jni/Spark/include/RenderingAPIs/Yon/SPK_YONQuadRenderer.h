@@ -69,7 +69,7 @@ namespace YON
 		* @param scaleX the scale of the width of the quad
 		* @param scaleY the scale of the height of the quad
 		*/
-		YONQuadRenderer(yon::YonDevice* d,float scaleX = 1.0f,float scaleY = 1.0f);
+		YONQuadRenderer(yon::IYonEngine* d,float scaleX = 1.0f,float scaleY = 1.0f);
 
 		/**
 		* @brief Creates and registers a new YONQuadRenderer
@@ -79,7 +79,7 @@ namespace YON
 		* @return A new registered YONQuadRenderer
 		* @since 1.04.00
 		*/
-		static YONQuadRenderer* create(yon::YonDevice* d,float scaleX = 1.0f,float scaleY = 1.0f);
+		static YONQuadRenderer* create(yon::IYonEngine* d,float scaleX = 1.0f,float scaleY = 1.0f);
 
 		/////////////
 		// Setters //
@@ -162,7 +162,7 @@ namespace YON
 	};
 
 
-	inline YONQuadRenderer* YONQuadRenderer::create(yon::YonDevice* d,float scaleX,float scaleY)
+	inline YONQuadRenderer* YONQuadRenderer::create(yon::IYonEngine* d,float scaleX,float scaleY)
 	{
 		YONQuadRenderer* obj = new YONQuadRenderer(d,scaleX,scaleY);
 		registerObject(obj);
@@ -171,27 +171,27 @@ namespace YON
 
 	inline void YONQuadRenderer::setTexture(yon::video::ITexture* texture)
 	{
-		material.TextureLayer[0].Texture = texture;
+		material.TextureLayers[0].texture = texture;
 	}
 
 	inline void YONQuadRenderer::setAtlasDimensions(yon::core::dimension2du dim)
 	{
-		setAtlasDimensions(dim.Width,dim.Height);
+		setAtlasDimensions(dim.w,dim.h);
 	}
 
 	inline yon::video::ITexture* YONQuadRenderer::getTexture() const
 	{
-		return material.TextureLayer[0].Texture;
+		return material.TextureLayers[0].texture;
 	}
 
 	inline yon::video::SMaterialLayer& YONQuadRenderer::getMaterialLayer()
 	{
-		return material.TextureLayer[0];
+		return material.TextureLayers[0];
 	}
 		
 	inline const yon::video::SMaterialLayer& YONQuadRenderer::getMaterialLayer() const
 	{
-		return material.TextureLayer[0];
+		return material.TextureLayers[0];
 	}
 
 	inline yon::core::dimension2du YONQuadRenderer::getAtlasDimensions() const
@@ -221,42 +221,42 @@ namespace YON
 		// According to Yon coordinates system, quads are drawn in clockwise order
 		// Note that the quad side points towards the left as it is a left handed system
 		// top left vertex
-		currentBuffer->getVertexBuffer()[offset].Pos.set(
+		currentBuffer->getVertexBuffer()[offset].pos.set(
 			x + quadSide().x + quadUp().x,
 			y + quadSide().y + quadUp().y,
 			z + quadSide().z + quadUp().z);
-		currentBuffer->getVertexBuffer()[offset].Color = color;
+		currentBuffer->getVertexBuffer()[offset].color = color;
 
 		// top right vertex
-		currentBuffer->getVertexBuffer()[++offset].Pos.set(
+		currentBuffer->getVertexBuffer()[++offset].pos.set(
 			x - quadSide().x + quadUp().x,
 			y - quadSide().y + quadUp().y,
 			z - quadSide().z + quadUp().z);
-		currentBuffer->getVertexBuffer()[offset].Color = color;
+		currentBuffer->getVertexBuffer()[offset].color = color;
 
 		// bottom right vertex
-		currentBuffer->getVertexBuffer()[++offset].Pos.set(
+		currentBuffer->getVertexBuffer()[++offset].pos.set(
 			x - quadSide().x - quadUp().x,
 			y - quadSide().y - quadUp().y,
 			z - quadSide().z - quadUp().z);
-		currentBuffer->getVertexBuffer()[offset].Color = color;
+		currentBuffer->getVertexBuffer()[offset].color = color;
 
 		// bottom left vertex
-		currentBuffer->getVertexBuffer()[++offset].Pos.set(
+		currentBuffer->getVertexBuffer()[++offset].pos.set(
 			x + quadSide().x - quadUp().x,
 			y + quadSide().y - quadUp().y,
 			z + quadSide().z - quadUp().z);
-		currentBuffer->getVertexBuffer()[offset].Color = color;
+		currentBuffer->getVertexBuffer()[offset].color = color;
 	}
 
 	inline void YONQuadRenderer::FillBufferTextureAtlas(const Particle& particle) const
 	{
 		size_t offset = particle.getIndex() << 2;
 		computeAtlasCoordinates(particle);
-		currentBuffer->getVertexBuffer()[offset].TCoords.set(textureAtlasU0(),textureAtlasV0());
-        currentBuffer->getVertexBuffer()[++offset].TCoords.set(textureAtlasU1(),textureAtlasV0());
-        currentBuffer->getVertexBuffer()[++offset].TCoords.set(textureAtlasU1(),textureAtlasV1());
-        currentBuffer->getVertexBuffer()[++offset].TCoords.set(textureAtlasU0(),textureAtlasV1());
+		currentBuffer->getVertexBuffer()[offset].texcoords.set(textureAtlasU0(),textureAtlasV0());
+        currentBuffer->getVertexBuffer()[++offset].texcoords.set(textureAtlasU1(),textureAtlasV0());
+        currentBuffer->getVertexBuffer()[++offset].texcoords.set(textureAtlasU1(),textureAtlasV1());
+        currentBuffer->getVertexBuffer()[++offset].texcoords.set(textureAtlasU0(),textureAtlasV1());
 	}
 }}
 

@@ -40,6 +40,14 @@
 #define SPK_YON_PREFIX
 #endif
 
+#ifdef YON_COMPILE_WITH_WIN32
+#ifdef _DEBUG
+#pragma comment(lib, "Yon_debug.lib")
+#else
+#pragma comment(lib, "Yon.lib")
+#endif
+#endif
+
 namespace SPK
 {
 /**

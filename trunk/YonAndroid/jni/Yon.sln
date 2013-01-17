@@ -261,10 +261,19 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Spark", "Spark\project\win32\SPARK DLL.vcproj", "{1B841F94-151C-4198-8FC4-27980C8989FE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SparkAdapter", "Spark\project\win32\SPARK IRR DLL.vcproj", "{8E35334D-25B6-4E98-B825-3EA6B25878FC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+		{1B841F94-151C-4198-8FC4-27980C8989FE} = {1B841F94-151C-4198-8FC4-27980C8989FE}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonCompress", "YonCompress\YonCompress.vcproj", "{5C3CD167-F93D-4AB1-8540-A82A4E5ED7E1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SparkBasic", "SparkBasic\SparkBasic.vcproj", "{F1A77B25-885A-4BAB-B8E1-9496FBC597AB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E35334D-25B6-4E98-B825-3EA6B25878FC} = {8E35334D-25B6-4E98-B825-3EA6B25878FC}
 	EndProjectSection
 EndProject
 Global
@@ -497,6 +506,10 @@ Global
 		{5C3CD167-F93D-4AB1-8540-A82A4E5ED7E1}.Debug|Win32.Build.0 = Debug|Win32
 		{5C3CD167-F93D-4AB1-8540-A82A4E5ED7E1}.Release|Win32.ActiveCfg = Release|Win32
 		{5C3CD167-F93D-4AB1-8540-A82A4E5ED7E1}.Release|Win32.Build.0 = Release|Win32
+		{F1A77B25-885A-4BAB-B8E1-9496FBC597AB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F1A77B25-885A-4BAB-B8E1-9496FBC597AB}.Debug|Win32.Build.0 = Debug|Win32
+		{F1A77B25-885A-4BAB-B8E1-9496FBC597AB}.Release|Win32.ActiveCfg = Release|Win32
+		{F1A77B25-885A-4BAB-B8E1-9496FBC597AB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
