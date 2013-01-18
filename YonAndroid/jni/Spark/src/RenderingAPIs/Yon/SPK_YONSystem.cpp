@@ -60,7 +60,7 @@ namespace YON
         yon::scene::ISceneNode::onRegisterForRender();
     }
 
-    void YONSystem::render() const
+	void YONSystem::render() const
     {
         // Sets the transform matrix
         //SceneManager->getVideoDriver()->setTransform(yon::video::ETS_WORLD,AbsoluteTransformation);

@@ -43,6 +43,8 @@ namespace YON
 
 		const yon::video::SMaterial& getMaterial() const { return material; }
 
+		yon::video::SMaterial& getMaterial(){return material;}
+
 		//void setAntiAliasing(yon::u8 aa)		{ material.AntiAliasing = aa; }
 		//yon::u8 getAntiAliasing() const			{ return material.AntiAliasing; }
 
