@@ -165,7 +165,9 @@ namespace YON
         virtual void render() const;
 
 		//TODO
-		virtual void render(yon::video::IVideoDriver* driver){}
+		virtual void render(yon::video::IVideoDriver* driver){
+			render();
+		}
 
 		/** @brief This method is called just before the rendering process of the whole scene */
         virtual void onRegisterForRender();

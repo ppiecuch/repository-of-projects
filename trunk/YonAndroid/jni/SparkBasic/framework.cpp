@@ -49,6 +49,10 @@ public:
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				YON_DEBUG("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				event::SEvent ev;
+				ev.type=event::ENUM_EVENT_TYPE_SYSTEM;
+				ev.systemInput.type=event::ENUM_SYSTEM_INPUT_TYPE_EXIT;
+				getEngine()->postEventFromUser(ev);
 				return true;
 			}
 		case event::ENUM_EVENT_TYPE_TOUCH:
@@ -82,7 +86,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCameraFPS();
+	pCamera=sceneMgr->addCameraFPS(NULL,0.01f);
 	randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
 
@@ -126,11 +130,11 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	particleGroup->setRenderer(particleRenderer);
 	particleGroup->addModifier(obstacle);
 	particleGroup->setGravity(gravity);
-	particleGroup->enableAABBComputing(true);
+	particleGroup->enableAABBComputing(false);
 
 	particleSystem = YONSystem::create(sceneMgr->getRootSceneNode(),sceneMgr);
 	particleSystem->addGroup(particleGroup);
-	particleSystem->enableAABBComputing(true);
+	particleSystem->enableAABBComputing(false);
 
 	// setup some useful variables
 	time=(f32)timer->getTime() / 1000.0f;
@@ -157,16 +161,22 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 	
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,PTL:%d,DWL:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),particleSystem->getNbParticles(),videoDriver->getDrawCall()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+
+	videoDriver->setMaterial(video::DEFAULT_MATERIAL);
+	videoDriver->setTransform(ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
+	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
+	videoDriver->draw3DLine(core::vector3df(0,100,0),core::IDENTITY_VECTOR3DF,video::COLOR_GREEN);
+	videoDriver->draw3DLine(core::vector3df(0,0,100),core::IDENTITY_VECTOR3DF,video::COLOR_BLUE);
 
 	videoDriver->end();
 }
 void destroy(){
-	SPKFactory::getInstance().traceAll();
 	SPKFactory::getInstance().destroyAll();
-	SPKFactory::getInstance().traceAll();
+	SPKFactory::destroyInstance();
 	engine->drop();
 	delete params.pEventReceiver;
+	engine=NULL;
 }
 
 IYonEngine* getEngine(){

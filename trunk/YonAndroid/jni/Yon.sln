@@ -276,6 +276,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SparkBasic", "SparkBasic\Sp
 		{8E35334D-25B6-4E98-B825-3EA6B25878FC} = {8E35334D-25B6-4E98-B825-3EA6B25878FC}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SparkFire", "SparkFire\SparkFire.vcproj", "{4AFC58AE-83CF-4B51-B8F6-392C594234B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E35334D-25B6-4E98-B825-3EA6B25878FC} = {8E35334D-25B6-4E98-B825-3EA6B25878FC}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SparkExplosion", "SparkExplosion\SparkExplosion.vcproj", "{34A617F0-35F6-4773-A391-156BA1963976}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E35334D-25B6-4E98-B825-3EA6B25878FC} = {8E35334D-25B6-4E98-B825-3EA6B25878FC}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -510,6 +520,14 @@ Global
 		{F1A77B25-885A-4BAB-B8E1-9496FBC597AB}.Debug|Win32.Build.0 = Debug|Win32
 		{F1A77B25-885A-4BAB-B8E1-9496FBC597AB}.Release|Win32.ActiveCfg = Release|Win32
 		{F1A77B25-885A-4BAB-B8E1-9496FBC597AB}.Release|Win32.Build.0 = Release|Win32
+		{4AFC58AE-83CF-4B51-B8F6-392C594234B4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4AFC58AE-83CF-4B51-B8F6-392C594234B4}.Debug|Win32.Build.0 = Debug|Win32
+		{4AFC58AE-83CF-4B51-B8F6-392C594234B4}.Release|Win32.ActiveCfg = Release|Win32
+		{4AFC58AE-83CF-4B51-B8F6-392C594234B4}.Release|Win32.Build.0 = Release|Win32
+		{34A617F0-35F6-4773-A391-156BA1963976}.Debug|Win32.ActiveCfg = Debug|Win32
+		{34A617F0-35F6-4773-A391-156BA1963976}.Debug|Win32.Build.0 = Debug|Win32
+		{34A617F0-35F6-4773-A391-156BA1963976}.Release|Win32.ActiveCfg = Release|Win32
+		{34A617F0-35F6-4773-A391-156BA1963976}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
