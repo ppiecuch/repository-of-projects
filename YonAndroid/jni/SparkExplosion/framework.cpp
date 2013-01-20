@@ -417,7 +417,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	System::useAdaptiveStep(0.001f,0.01f);		// use an adaptive step from 1ms to 10ms (1000fps to 100fps)
 
 	// Loads particle texture
-	ITexture* textureExplosion=videoDriver->getTexture("explosion2.png");
+	ITexture* textureExplosion=videoDriver->getTexture("explosion.png");
 
 	ITexture* textureFlash=videoDriver->getTexture("flash.png");
 

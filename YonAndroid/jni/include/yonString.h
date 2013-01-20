@@ -689,6 +689,16 @@ namespace yon{
 			bool isEmpty() const{
 				return *this==""||*this=="\0";
 			}
+			//! Reserves some memory.
+			/** \param count: Amount of characters to reserve. */
+			void reserve(u32 count)
+			{
+				if (count < len)
+					return;
+
+				reallocate(count);
+			}
+
 		private:
 			void reallocate(u32 length)
 			{

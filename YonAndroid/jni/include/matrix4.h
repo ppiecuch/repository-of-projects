@@ -311,7 +311,7 @@ namespace core{
 		//TODO ´ýÀí½â
 		//! Inverts a primitive matrix which only contains a translation and a rotation
 		//! \param out: where result matrix is written to.
-		inline bool matrix4<T>::getInversePrimitive ( matrix4<T>& out ) const
+		inline bool getInversePrimitive ( matrix4<T>& out ) const
 		{
 			out.M[0 ] = M[0];
 			out.M[1 ] = M[4];
