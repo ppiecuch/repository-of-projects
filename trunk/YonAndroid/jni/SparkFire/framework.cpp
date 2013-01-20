@@ -110,7 +110,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	// Renderers
 	YONQuadRenderer* fireRenderer = YONQuadRenderer::create(engine);
 	fireRenderer->setScale(0.3f,0.3f);
-	fireRenderer->setTexture(videoDriver->getTexture("fire2.png"));
+	fireRenderer->setTexture(videoDriver->getTexture("fire.png"));
 	fireRenderer->setTexturingMode(TEXTURE_2D);
 	fireRenderer->setBlending(BLENDING_ADD);
 	fireRenderer->enableRenderingHint(DEPTH_WRITE,false);

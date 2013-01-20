@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef H_SPK_GROUP
-#define H_SPK_GROUP
+#ifndef H_SPK_GROUP_H_
+#define H_SPK_GROUP_H_
 
 #include "Core/SPK_DEF.h"
 #include "Core/SPK_Registerable.h"
@@ -942,7 +942,7 @@ namespace SPK
 		return pool[index];
 	}
 
-	inline size_t Group::getNbParticles() const
+	inline unsigned int Group::getNbParticles() const
 	{
 		return pool.getNbActive();
 	}

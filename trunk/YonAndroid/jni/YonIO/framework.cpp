@@ -106,7 +106,16 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 
 	//Logger->debug("%s\n",core::getParentName(io::path("../media/fdsafs.txt")).c_str());
 
-#if 0
+	core::ustring utf8_1("abcdefg");
+	core::stringc origin_2=i18nManager->convert("你好UTF8",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	core::ustring utf8_2(origin_2.c_str());
+
+	YON_DEBUG("%s(%d)\r\n",utf8_1.toStringc().c_str(),utf8_1.size());
+	YON_DEBUG("%s(%d)\r\n",i18nManager->convert(utf8_2.toStringc().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str(),utf8_2.size());
+
+#if 1
+
+#elif 0
 	IWriteStream* ws=fs->createAndOpenWriteFileStream("d:/test.txt");
 	ws->writeBool(true);
 	ws->writeFloat(2.1f);

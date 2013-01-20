@@ -15,6 +15,7 @@ LOCAL_CFLAGS := -DANDROID_NDK \
 
 LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/freetype/include \
+		$(LOCAL_PATH)/Spark/include \
 		$(LOCAL_PATH)/MyGUIEngine/include \
 		$(LOCAL_PATH)/MyGUIAdapter \
 		$(LOCAL_PATH)/Yon/zlib \
@@ -64,6 +65,10 @@ freetype_SOURCES :=\
 		freetype/src/type1/type1.c \
 		freetype/src/type42/type42.c \
 		freetype/src/winfonts/winfnt.c
+		
+Spark_SOURCES :=\
+		Spark/src/SPK_All.cpp \
+		Spark/src/SPK_YON_ALL.cpp
 		
 MyGUIEngine_SOURCES :=\
 		MyGUIEngine/src/MyGUI_ScrollViewBase.cpp \
@@ -327,6 +332,7 @@ yon_SOURCES :=   \
 LOCAL_MODULE    := engine
 		
 LOCAL_SRC_FILES := \
+		$(Spark_SOURCES) \
 		$(MyGUIEngine_SOURCES) \
 		$(MyGUIAdapter_SOURCES) \
 		$(iconv_SOURCES) \

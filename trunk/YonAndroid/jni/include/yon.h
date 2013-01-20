@@ -39,6 +39,7 @@
 #include "yonMath.h" 
 #include "yonMap.h"
 #include "yonString.h" 
+#include "yonUString.h"
 #include "matrix4.h" 
 #include "rect.h" 
 #include "IReferencable.h" 
