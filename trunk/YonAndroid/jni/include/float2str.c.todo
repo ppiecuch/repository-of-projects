@@ -1,0 +1,61 @@
+
+
+/*************************************************************************/ 
+//功能: 把float 型的data 转换到字符串str_ptr 里,   小数保留d 位 
+//      d=0, 去尾 
+//例如: data=12.3456 ， 小数位数d=3   ->   "12.345" 
+// 
+/*************************************************************************/ 
+#define STR_END  '\0' 
+#define  uchar unsigned char
+#define  uint  unsigned int
+uchar *str_ptr;
+ float data;
+ uchar d;
+uchar *Trans_Data_To_Disp(uchar *str_ptr, float data, uchar d) 
+{ 
+ uint integral_part=0; //整数部分 
+ float decimal_part=0; //小数部分 
+ uint temp; 
+ uchar i,n; 
+ 	    //整数部分 
+ integral_part = (uint)(data); 
+ temp=integral_part; 
+ n=0; 
+ do 
+ { 
+  n++; 
+  temp=(uint)(temp/10); //得到整数部分位数n 
+ }
+ while(temp!=0); 
+ temp=integral_part; 
+ for( i=0; (i<n)&&(i<20); i++) 
+    { 
+      *(str_ptr + n-1-i)=(uchar)(temp%10) +'0'; //从低位(str_ptr + n-1)开始，获取相应位 
+      temp=(uint)(temp/10); 
+    }//补:原先是对应于lcd 20*2的显示的,所以有20个字符的限制,实际上float达不到这个精度  
+ if( (d==0) || (i==20) ) 
+   { 
+     *(str_ptr + i) = STR_END;  //此时 i = n 或20 
+     return str_ptr; 
+   } 
+else 
+   { 
+     *(str_ptr + i) = '.'; //此时 i = n ,且n < 20 
+   } 
+
+ //小数部分 
+ decimal_part = data - integral_part; 
+ for(i=n+1; (i<d+n+1)&&(i<20); i++) 
+    { 
+      decimal_part = decimal_part * 10; 
+      *(str_ptr + i) = (uchar)(decimal_part) +'0'; //从高位(str_ptr + n+1)开始，获取相应位 
+      decimal_part = decimal_part - (uchar)(decimal_part); 
+    } 
+*(str_ptr + i) = STR_END; //此时 i = d+n+1 或20 
+return str_ptr; 
+} 
+
+//调用例子: 
+//uchar tmp_buf[10] = {0}; 
+//Trans_Data_To_Disp(tmp_buf, float_vol, 2);     //float_vol转为字符串保留2位小数,存在tmp_buf[]中. 
