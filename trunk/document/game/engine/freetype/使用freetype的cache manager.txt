@@ -1,0 +1,10 @@
+应用freetype，最后一个需要解决的问题就是使用freetype的缓存系统了。
+关于缓存系统，在freetype的doc里面也没有多大的介绍，但是freetype确实是提供了一套完整的缓存管理系统，我们直接拿过来用就行了，不用自己写那么麻烦。
+关于这个缓存系统，在官方提供的demo也有一些例子，应该起来也比较简单。
+缓存中需要一个key来查询对应的字体face，我觉得直接传进去字体的文件路径作为key就可以了。
+然后通过FTC_Manager_LookupSize得到一个FT_Size结构的指针，通过size->face可以访问字体的face。
+FTC_Manager_New有个默认的最大face数目，默认是2，我觉得不够用，可以根据自己的需要增加这个值。
+在windows下面还要用MultiByteToWideChar这个函数把多字节字符转换成宽字符。
+至此，关于freetype的应用的心得也就写完了。
+
+http://blog.sina.com.cn/s/blog_69a2aeff0100ol7w.html

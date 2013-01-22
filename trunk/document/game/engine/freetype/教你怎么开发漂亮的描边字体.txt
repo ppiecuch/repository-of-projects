@@ -1,0 +1,66 @@
+在天龙八部，聊个斋这些国产的游戏中，都用到了freetype，并使用到freetype提供的描边生成方法。
+关于freetype怎么应用描边，有个sample，链接如下
+ http://www.freetype.org/freetype2/docs/tutorial/example2.cpp
+但是这个sample中的生成描边的方式是低效率的，因为是间接生成的，在描绘函数里面得到span的信息，然后又遍历了span再生成bitmap，最后再输出。
+经过我一个通宵研究，我想出了一个更为直接的描绘方式。
+只要把这个sample中间的一部分替换成如下代码就可以了:
+        FT_Outline *outline = &reinterpret_cast<FT_OutlineGlyph>(glyph)->outline;
+        FT_Glyph_Get_CBox(glyph,
+            FT_GLYPH_BBOX_GRIDFIT,
+            &bbox);
+        int width = (bbox.xMax - bbox.xMin)>>6;
+        int rows = (bbox.yMax - bbox.yMin)>>6;
+        
+        bmp.buffer = new unsigned char[width * rows];
+        memset(bmp.buffer, 0, width * rows);
+        bmp.width = width;
+        bmp.rows = rows;
+        bmp.pitch = width;
+        bmp.pixel_mode = FT_PIXEL_MODE_GRAY;
+        bmp.num_grays = 256;
+        memset(&params, 0, sizeof (params));
+        params.source = outline;
+        params.target = &bmp;
+        params.flags = FT_RASTER_FLAG_AA;
+        FT_Outline_Translate(outline,-bbox.xMin,-bbox.yMin);
+        FT_Outline_Render(library, outline, &params);
+        save_edge_buffer = bmp.buffer;
+        
+        FT_BBox bbox_in;
+        FT_Glyph glyph_fg;
+        FT_Get_Glyph(size->face->glyph, &glyph_fg);
+        FT_Glyph_Get_CBox(glyph_fg,
+              FT_GLYPH_BBOX_GRIDFIT,
+              &bbox_in);
+        bmp.buffer = new unsigned char[width * rows];
+        memset(bmp.buffer, 0, width * rows);
+        bmp.width = width;
+        bmp.rows = rows;
+        bmp.pitch = width;
+        bmp.pixel_mode = FT_PIXEL_MODE_GRAY;
+        bmp.num_grays = 256;
+        outline = &reinterpret_cast<FT_OutlineGlyph>(glyph_fg)->outline;
+        memset(&params, 0, sizeof (params));
+        params.source = outline;
+        params.target = &bmp;
+        params.flags = FT_RASTER_FLAG_AA;
+        FT_Outline_Translate(outline,-bbox.xMin,-bbox.yMin);
+        FT_Outline_Render(library, outline, &params);
+        save_buffer = bmp.buffer;
+        
+        int inner_h = (bbox.yMax-bbox_in.yMax)>>6 ;
+        int w = (bbox_in.xMax-bbox_in.xMin)>>6 ;
+        int left = (bbox.xMin-bbox_in.xMin)>>6 ;
+        width=width;
+        height=rows;
+        pitch = (size->face->glyph->advance.x >> 6)+width-w ;
+        key_x=-(size->face->glyph->metrics.horiBearingX >> 6)-left ;
+        key_y=-_ascent+inner_h+((size->face->glyph->metrics.horiBearingY) >> 6);
+代码我做了删减，稍微修改一下就可以替代里面用到的描绘方式。
+得到bitmap之后，你想怎么画就怎么画。
+其实上是得到两张alpha图，一张是描边信息的alpha图，一张是字体本身的alpha图，剩下的事情，只是在画出来的时候加上你需要的颜色就可以了。
+关于这种方式的描边，其实还有个bug，这个freetype的开发组还没完全解决，这个bug如下
+http://lists.nongnu.org/archive/html/freetype/2011-01/msg00022.html。
+有人说魔兽世界也用到了freetype，但是我仔细观察了魔兽的字体，发现魔兽最大也好像只支持两个像素的描边，而且魔兽的描边方式也和freetype提供的这种使用stokers的描边不一样。
+
+http://blog.sina.com.cn/s/blog_69a2aeff0100ol7e.html
