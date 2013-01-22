@@ -1,0 +1,107 @@
+
+3
+down vote
+favorite
+2
+I am looking to compute a fast correlation using FFTs and the kissfft library, and scaling needs to be precise. What scaling is necessary (forward and backwards) and what value do I use to scale my data?
+
+signal-processing fft correlation kissfft
+share|improve this question
+asked Apr 11 '11 at 22:01
+
+Matt Esch
+4,451719
+91% accept rate
+1	  
+Yes I should have been more specific. I was hoping that someone would save me the trouble of discovering the scaling myself (specific to kissfft), however I did it myself and can tell you that I had to scale the inverse by 1/N. Of course scaling is omitted initially for efficiency purposes, but it's important when you are computing correlations. It doesn't matter so much for autocorrelation as the result is proportional, but what it does matter for is when you compute something like the ASDF that has two precise terms to add on to the end. 每 Matt Esch Apr 12 '11 at 15:49
+2	  
+More detailed info, tested on kiss_fftr (implementation for real FFTs): the forward fttr scales amplitudes by nfft/2, while the inverse fftr scales amplitudes by 2 regardless of nfft. To get the original amplitudes you have to scale by 2/nfft and 1/2 respectively. (This explains why you have to scale by 1/nfft when doing the forward and inverse FFTs in series.) 每 tmandry Jul 16 '11 at 4:14
+feedback
+2 Answers activeoldestvotes
+up vote
+6
+down vote
+accepted
+The 3 most common FFT scaling factors are:
+
+1.0 forward FFT, 1.0/N inverse FFT
+
+1.0/N forward FFT, 1.0 inverse FFT
+
+1.0/sqrt(N) in both directions, FFT & IFFT
+
+Given any possible ambiguity in the documentation, and for whatever scaling the user expects to be "correct" for their purposes, best to just feed a pure sine wave of known (1.0 float or 255 integer) amplitude and exactly periodic in the FFT length to the FFT (and/or IFFT) in question, and see if the scaling matches one of the above, is maybe different from one of the above by 2X or sqrt(2), or the desired scaling is something completely different.
+
+e.g. Write a unit test for kissfft in your environment for your data types.
+
+share|improve this answer
+edited Apr 12 '11 at 0:54
+
+answered Apr 12 '11 at 0:32
+
+hotpaw2
+32.8k31954
+1	  
+This is what I ended up doing, but I was hoping that somebody knew to save me the trouble. This is good advice in general. 每 Matt Esch Apr 12 '11 at 15:54
++1: Yeeees, thank You! 每 Rekin Nov 29 '12 at 22:07
+feedback
+
+up vote
+2
+down vote
+multiply each frequency response by 1/sqrt(N), for an overall scaling of 1/N
+
+In pseudocode:
+
+ifft( fft(x)*conj( fft(y) )/N ) == circular_correlation(x,y)
+
+At least this is true for kisfft with floating point types.
+
+The output of the following c++ example code should be something like
+
+the circular correlation of [1, 3i, 0 0 ....] with itself = (10,0),(1.19796e-10,3),(-4.91499e-08,1.11519e-15),(1.77301e-08,-1.19588e-08) ...
+
+#include <complex>
+#include <iostream>
+#include "kiss_fft.h"
+using namespace std;
+
+int main()
+{
+    const int nfft=256;
+    kiss_fft_cfg fwd = kiss_fft_alloc(nfft,0,NULL,NULL);
+    kiss_fft_cfg inv = kiss_fft_alloc(nfft,1,NULL,NULL);
+
+    std::complex<float> x[nfft];
+    std::complex<float> fx[nfft];
+    memset(x,0,sizeof(x));
+    x[0] = 1;
+    x[1] = std::complex<float>(0,3);
+
+    kiss_fft(fwd,(kiss_fft_cpx*)x,(kiss_fft_cpx*)fx);
+    for (int k=0;k<nfft;++k) {
+        fx[k] = fx[k] * conj(fx[k]);
+        fx[k] *= 1./nfft;
+    }
+    kiss_fft(inv,(kiss_fft_cpx*)fx,(kiss_fft_cpx*)x);
+    cout << "the circular correlation of [1, 3i, 0 0 ....] with itself = ";
+    cout
+        << x[0] << ","
+        << x[1] << ","
+        << x[2] << ","
+        << x[3] << " ... " << endl;
+    kiss_fft_free(fwd);
+    kiss_fft_free(inv);
+    return 0;
+}
+share|improve this answer
+edited Apr 12 '11 at 18:44
+
+answered Apr 12 '11 at 2:57
+
+Mark Borgerding
+1,653821
+The code I am using is: ifft( fft(x)*conj( fft(y) ) )/N == corr With kissfft v1_2_9 每 Matt Esch Apr 12 '11 at 15:52
+Yes. Sorry to steer you wrong initially. I have updated the description to match what my code was actually doing. 每 Mark Borgerding Apr 12 '11 at 18:49
+
+http://stackoverflow.com/questions/5628056/kissfft-scaling

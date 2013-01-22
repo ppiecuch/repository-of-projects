@@ -1,0 +1,130 @@
+关于freetype，是一个相当好用的字体引擎。
+其实windows系统要用到freetype，有几个问题需要解决。
+第一个问题，怎么根据字体名字得到字体的文件路径。
+这个问题在freetype的maillist经常有人讨论，也有人提出过解决方案，但是没有给出完整的解决办法的代码。
+windows是通过EnumFonts或者EnumFontsEx得到字体名字的列表的。对于不同语言的系统，这个字体的名字是不同，所以还要把这个名字转换成英文的名字才能使用，下面我贴出这个转换的完整函数。当然，‘借鉴’了开源的代码。
+  static const char *GetEnglishFontName(const HFONT font,const HDC dc)
+  {
+   static char font_name[MAX_PATH];
+   const char *ret_font_name = NULL;
+   uint pos = 0;
+   BYTE *buf;
+   DWORD dw;
+   uint16 format, count, stringOffset, platformId, encodingId, languageId, nameId, length, offset;
+   dw = GetFontData(dc, 'eman', 0, NULL, 0);
+   if (dw == GDI_ERROR) return NULL;
+   buf = (BYTE*)malloc( dw );
+   dw = GetFontData(dc, 'eman', 0, buf, dw);
+   if (dw == GDI_ERROR){
+    free(buf);
+    return NULL;
+   }
+   format = buf[pos++] << 8;
+   format += buf[pos++];
+   assert(format == 0);
+   count = buf[pos++] << 8;
+   count += buf[pos++];
+   stringOffset = buf[pos++] << 8;
+   stringOffset += buf[pos++];
+   for (uint i = 0; i < count; i++) {
+    platformId = buf[pos++] << 8;
+    platformId += buf[pos++];
+    encodingId = buf[pos++] << 8;
+    encodingId += buf[pos++];
+    languageId = buf[pos++] << 8;
+    languageId += buf[pos++];
+    nameId = buf[pos++] << 8;
+    nameId += buf[pos++];
+    if (nameId != 1) {
+     pos += 4; // skip length and offset
+     continue;
+    }
+    length = buf[pos++] << 8;
+    length += buf[pos++];
+    offset = buf[pos++] << 8;
+    offset += buf[pos++];
+    
+    length = std::min(length, uint16(MAX_PATH - 1));
+    for (uint j = 0; j < length; j++) font_name[j] = buf[stringOffset + offset + j];
+    font_name[length] = '\0';
+    if ((platformId == 1 && languageId == 0) ||      // Macintosh English
+      (platformId == 3 && languageId == 0x0409)) { // Microsoft English (US)
+     ret_font_name = font_name;
+     break;
+    }
+   }
+   free(buf);
+   return ret_font_name;
+  }
+根据这个函数把字体的中文名字转换成英文名字之后，便可以根据这个英文的名字得到字体的路径下，这时候我们又需要下面这个函数。
+  #define FONT_DIR_NT "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts"
+  #define FONT_DIR_9X "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Fonts"
+  static const char* GetFontfileByName(const char *font_name)
+  {
+   FT_Error err = FT_Err_Cannot_Open_Resource;
+   HKEY hKey;
+   LONG ret;
+   static TCHAR vbuffer[MAX_PATH];
+   TCHAR dbuffer[256];
+   TCHAR *font_namep;
+   char *font_path = NULL;
+   uint index;
+   
+   ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T(FONT_DIR_NT), 0, KEY_READ, &hKey);
+   if (ret != ERROR_SUCCESS) ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T(FONT_DIR_9X), 0, KEY_READ, &hKey);
+   if (ret != ERROR_SUCCESS) {
+    DEBUG_MSG("Cannot open registry key HKLM\\SOFTWARE\\Microsoft\\Windows (NT)\\CurrentVersion\\Fonts");
+    return 0;
+   }
+   font_namep = const_cast<char *>(font_name); // only cast because in unicode pointer is not const
+   bool found = false;
+   for (index = 0;; index++) {
+    TCHAR *s;
+    DWORD vbuflen = sizeof(vbuffer)/sizeof(TCHAR);
+    DWORD dbuflen = sizeof(dbuffer)/sizeof(TCHAR);
+    ret = RegEnumValue(hKey, index, vbuffer, &vbuflen, NULL, NULL, (BYTE*)dbuffer, &dbuflen);
+    if (ret != ERROR_SUCCESS) goto registry_no_font_found;
+    
+    s = _tcschr(vbuffer, _T('('));
+    if (s != NULL) s[-1] = '\0';
+    if (_tcschr(vbuffer, _T('&')) == NULL) {
+     if (_tcsicmp(vbuffer, font_namep) == 0)
+     {
+      found = true;
+      break;
+     }
+    } else {
+     if (_tcsstr(vbuffer, font_namep) != NULL)
+     {
+      found = true;
+      break;
+     }
+    }
+   }
+   if (!SUCCEEDED(SHGetFolderPath(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, vbuffer))) {
+    DEBUG_MSG("SHGetFolderPath cannot return fonts directory");
+    goto folder_error;
+   }
+   
+   if (found)
+   {
+    font_path = vbuffer;
+    strcat(font_path, "\\");
+    strcat(font_path, dbuffer);
+   }
+   else
+   {
+    font_path = 0;
+   }
+   
+  // font_path = GetShortPath(font_path);
+
+  folder_error:
+  registry_no_font_found:
+   RegCloseKey(hKey);
+   return font_path;
+  }
+当然，这个函数也是从某些开源的项目里面找到的。
+这样我们就可以根据字体名字，例如“宋体”得到我们的字体路径，这也是freetype所能接收的收入。
+
+http://blog.sina.com.cn/s/blog_69a2aeff0100ol6p.html
