@@ -1,0 +1,559 @@
+作者: peeweek  时间: 2010-05-25
+#ifndef __FREETYPE2_H
+#define __FREETYPE2_H
+#include <ft2build.h>
+#include <ftsynth.h>
+#include <ftsynth.h>
+#include <ftoutln.h>
+#include <ftglyph.h>
+#include <fttrigon.h>
+#include <ftbitmap.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+
+#define FT_FLOOR(X) ((X & -64) / 64)
+#define FT_CEIL(X)  (((X + 63) & -64) / 64)
+ 
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define FT_PIX_FLOOR( x )     ( (x) & ~63 )
+ 
+typedef struct _tagNode{
+ int nLeft;
+ int nTop;
+ int nWid;
+ int nHei;
+ int nPitch;
+ unsigned char *pucData;
+ struct _tagNode *pNext;
+}NODE, *PNODE;
+typedef struct{
+ int nWid;
+ int nHei;
+ 
+ int nMode;
+ int nUnlineY;
+ int nUnlineWid;
+ BOOL bBold;
+ BOOL bItalic;
+ BOOL bUnderline;
+ FT_Library library;
+ FT_Face face;
+ PNODE pHeadNode;
+}FT2FONT, *PFT2FONT;
+BOOL FreeType2_SetCharSize(PFT2FONT pFont, int nWid, int nHei);
+BOOL FreeType2_InitFont(PFT2FONT pFont, char *pszName, int nFontWidth, int nFontHeight, BOOL bBold, BOOL bItalic, BOOL bUnderline);
+BOOL FreeType2_DestroyFont(PFT2FONT pFont);
+BOOL FreeType2_ClearNode(PFT2FONT pFont);
+BOOL FreeType2_GetFontData(PFT2FONT pFont, char *pszText);
+BOOL FreeType2_DrawText(PFT2FONT pFont, HDC hDC, int x, int y, char *pszText);
+#endif
+ 
+ 
+#include "stdafx.h"
+#include <stdio.h>
+#include <math.h>
+#include "gb2312.h"
+#include "freetype2.h"
+static struct{
+ char szFontName[64];
+ char szFontFile[128];
+}FontInfo[] = {
+ { "楷体", "./simkai.ttf"   },
+ { "黑体", "./simhei.ttf"   },
+ { "宋体", "./simsun.ttc"  },
+ { "Uming", "./uming.ttf"  },
+ { "Arial", "./arial.ttf"  }
+};
+static FT_Vector pen;
+static char* GetFontFile(char *pszFontName)
+{
+ int i;
+ int nSize;
+ 
+ if((NULL == pszFontName) || ('\0' == *pszFontName))
+  goto err;
+ 
+ nSize = sizeof(FontInfo) / sizeof(FontInfo[0]);
+ 
+ for(i=0; i<nSize; i++)
+ {
+  if(!strcmp(pszFontName, FontInfo[i].szFontName))
+   return FontInfo[i].szFontFile;
+ }
+ 
+err:
+ return FontInfo[2].szFontFile;
+}
+BOOL FreeType2_SetCharSize(PFT2FONT pFont, int nWid, int nHei)
+{
+ FT_Error nErr;
+ if(NULL == pFont)
+  return FALSE;
+ nErr = FT_Set_Pixel_Sizes(pFont->face, nWid, nHei);
+ if(nErr != FT_Err_Ok)
+ {
+  printf("FreeType_SetCharSize->FT_Set_Pixel_Sizes fail: %d\n", nErr);
+  return FALSE;
+ }
+ return TRUE;
+}
+BOOL FreeType2_InitFont(PFT2FONT pFont, char *pszName, int nFontWidth, int nFontHeight, BOOL bBold, BOOL bItalic, BOOL bUnderline)
+{
+ BOOL bRet;
+ char *pszFontFile;
+ FT_Error nErr;
+ if((NULL == pFont) || (NULL == pszName) || ('\0' == *pszName) || (nFontWidth < 0) || (nFontHeight < 0))
+  return FALSE;
+ memset((void*)pFont, 0, sizeof(FT2FONT));
+ pszFontFile = GetFontFile(pszName);
+ if(NULL == pszFontFile)
+  return FALSE;
+ nErr = FT_Init_FreeType(&pFont->library);
+ if(nErr != FT_Err_Ok)
+ {
+  printf("FreeType2_InitFont->FT_InitFreeType fail: %d\n", nErr);
+  return FALSE;
+ }
+ nErr = FT_New_Face(pFont->library, pszFontFile, 0, &pFont->face);
+ if(nErr != FT_Err_Ok)
+ {
+  printf("FreeType2_InitFont->FT_New_Face fail: %d\n", nErr);
+  goto err1;
+ }
+ 
+ nErr = FT_Select_Charmap(pFont->face, ft_encoding_unicode);
+ if(nErr != FT_Err_Ok)
+ {
+        nErr = FT_Select_Charmap(pFont->face, ft_encoding_latin_1);
+        if(nErr != FT_Err_Ok)
+  {
+   printf("FreeType2_InitFont->FT_Select_Charmap error: %d\n", nErr);
+   goto err0;
+  }
+ }
+ nErr = FT_Set_Char_Size(pFont->face, 16 << 6, 16 << 6, 300, 300);
+ if(nErr != FT_Err_Ok)
+ {
+  printf("FreeType2_InitFont->FT_Set_Char_Size error: %d\n", nErr);
+  goto err0;
+ }
+ 
+ bRet = FreeType2_SetCharSize(pFont, nFontWidth, nFontHeight);
+ if(!bRet)
+  goto err0;
+ pFont->bBold   = bBold;
+ pFont->bItalic    = bItalic;
+ pFont->bUnderline = bUnderline;
+ pFont->nWid = nFontWidth;
+ pFont->nHei = nFontHeight;
+ return TRUE;
+err0:
+ FT_Done_Face(pFont->face);
+err1:
+ FT_Done_FreeType(pFont->library);
+ return FALSE;
+}
+BOOL FreeType2_ClearNode(PFT2FONT pFont)
+{
+ PNODE pNode;
+ PNODE pPrevNode;
+ if(NULL == pFont)
+  return FALSE;
+ for(pNode=pFont->pHeadNode; pNode!=NULL; )
+ {
+  pPrevNode = pNode;
+  pNode = pNode->pNext;
+  if(pPrevNode->pucData != NULL)
+   free(pPrevNode->pucData);
+  free(pPrevNode);
+ }
+ return TRUE;
+}
+BOOL FreeType2_DestroyFont(PFT2FONT pFont)
+{
+ if(NULL == pFont)
+  return FALSE;
+ FT_Done_Face(pFont->face);
+ FT_Done_FreeType(pFont->library);
+ FreeType2_ClearNode(pFont);
+ return TRUE;
+}
+static unsigned short s_font_utf8_to_unicode (const unsigned char *utf8)
+{
+ unsigned short unicode;
+ unicode = utf8[0];
+ if (unicode >= 0xF0) {
+  unicode  =  (unsigned short) (utf8[0] & 0x07) << 18;
+  unicode |=  (unsigned short) (utf8[1] & 0x3F) << 12;
+  unicode |=  (unsigned short) (utf8[2] & 0x3F) << 6;
+  unicode |=  (unsigned short) (utf8[3] & 0x3F);
+ } else if (unicode >= 0xE0) {
+  unicode  =  (unsigned short) (utf8[0] & 0x0F) << 12;
+  unicode |=  (unsigned short) (utf8[1] & 0x3F) << 6;
+  unicode |=  (unsigned short) (utf8[2] & 0x3F);
+ } else if (unicode >= 0xC0) {
+  unicode  =  (unsigned short) (utf8[0] & 0x1F) << 6;
+  unicode |=  (unsigned short) (utf8[1] & 0x3F);
+ }
+ return unicode;
+}
+// 就是FT_Outline_Embolden
+FT_Error Old_FT_Outline_Embolden( FT_Outline*  outline, FT_Pos strength )
+{
+    FT_Vector*    points;
+    FT_Vector    v_prev, v_first, v_next, v_cur;
+    FT_Angle    rotate, angle_in, angle_out;
+    FT_Int        c, n, first;
+    FT_Int        orientation;
+    if ( !outline )
+        return FT_Err_Invalid_Argument;
+    strength /= 2;
+    if ( strength == 0 )
+        return FT_Err_Ok;
+    orientation = FT_Outline_Get_Orientation( outline );
+    if ( orientation == FT_ORIENTATION_NONE )
+    {
+        if ( outline->n_contours )
+            return FT_Err_Invalid_Argument;
+        else
+            return FT_Err_Ok;
+    }
+    if ( orientation == FT_ORIENTATION_TRUETYPE )
+        rotate = -FT_ANGLE_PI2;
+    else
+        rotate = FT_ANGLE_PI2;
+    points = outline->points;
+    first = 0;
+    for ( c = 0; c < outline->n_contours; c++ )
+    {
+        int  last = outline->contours[c];
+        v_first = points[first];
+        v_prev  = points[last];
+        v_cur   = v_first;
+        for ( n = first; n <= last; n++ )
+        {
+            FT_Vector    in, out;
+            FT_Angle    angle_diff;
+            FT_Pos        d;
+            FT_Fixed    scale;
+            if ( n < last )
+                v_next = points[n + 1];
+            else
+                v_next = v_first;
+            /**//* compute the in and out vectors */
+            in.x = v_cur.x - v_prev.x;
+            in.y = v_cur.y - v_prev.y;
+            out.x = v_next.x - v_cur.x;
+            out.y = v_next.y - v_cur.y;
+            angle_in   = FT_Atan2( in.x, in.y );
+            angle_out  = FT_Atan2( out.x, out.y );
+            angle_diff = FT_Angle_Diff( angle_in, angle_out );
+            scale      = FT_Cos( angle_diff / 2 );
+            if ( scale < 0x4000L && scale > -0x4000L )
+                in.x = in.y = 0;
+            else
+            {
+                d = FT_DivFix( strength, scale );
+                FT_Vector_From_Polar( &in, d, angle_in + angle_diff / 2 - rotate );
+            }
+            outline->points[n].x = v_cur.x + strength + in.x;
+            //伀偙傟傪僐儊儞僩傾僂僩偟偨偩偗
+            //outline->points[n].y = v_cur.y + strength + in.y;
+            v_prev = v_cur;
+            v_cur  = v_next;
+        }
+        first = last + 1;
+    }
+    return FT_Err_Ok;
+}
+// 垂直加粗
+FT_Error Vert_FT_Outline_Embolden( FT_Outline*  outline, FT_Pos strength )
+{
+    FT_Vector*    points;
+    FT_Vector    v_prev, v_first, v_next, v_cur;
+    FT_Angle    rotate, angle_in, angle_out;
+    FT_Int        c, n, first;
+    FT_Int        orientation;
+    if ( !outline )
+        return FT_Err_Invalid_Argument;
+    strength /= 2;
+    if ( strength == 0 )
+        return FT_Err_Ok;
+    orientation = FT_Outline_Get_Orientation( outline );
+    if ( orientation == FT_ORIENTATION_NONE )
+    {
+        if ( outline->n_contours )
+            return FT_Err_Invalid_Argument;
+        else
+            return FT_Err_Ok;
+    }
+    if ( orientation == FT_ORIENTATION_TRUETYPE )
+        rotate = -FT_ANGLE_PI2;
+    else
+        rotate = FT_ANGLE_PI2;
+    points = outline->points;
+    first = 0;
+    for ( c = 0; c < outline->n_contours; c++ )
+    {
+        int  last = outline->contours[c];
+        v_first = points[first];
+        v_prev  = points[last];
+        v_cur   = v_first;
+        for ( n = first; n <= last; n++ )
+        {
+            FT_Vector    in, out;
+            FT_Angle    angle_diff;
+            FT_Pos        d;
+            FT_Fixed    scale;
+            if ( n < last )
+                v_next = points[n + 1];
+            else
+                v_next = v_first;
+            /**//* compute the in and out vectors */
+            in.x = v_cur.x - v_prev.x;
+            in.y = v_cur.y - v_prev.y;
+            out.x = v_next.x - v_cur.x;
+            out.y = v_next.y - v_cur.y;
+            angle_in   = FT_Atan2( in.x, in.y );
+            angle_out  = FT_Atan2( out.x, out.y );
+            angle_diff = FT_Angle_Diff( angle_in, angle_out );
+            scale      = FT_Cos( angle_diff / 2 );
+            if ( scale < 0x4000L && scale > -0x4000L )
+                in.x = in.y = 0;
+            else
+            {
+                d = FT_DivFix( strength, scale );
+                FT_Vector_From_Polar( &in, d, angle_in + angle_diff / 2 - rotate );
+            }
+            //outline->points[n].x = v_cur.x + strength + in.x;
+            //仾偙傟傪僐儊儞僩傾僂僩偟偨偩偗
+            outline->points[n].y = v_cur.y + strength + in.y;
+            v_prev = v_cur;
+            v_cur  = v_next;
+        }
+        first = last + 1;
+    }
+    return FT_Err_Ok;
+}
+// 新的加粗函数
+FT_Error New_FT_Outline_Embolden( FT_Outline*  outline, FT_Pos str_h, FT_Pos str_v )
+{
+    if ( !outline ) return FT_Err_Invalid_Argument;
+    int orientation = FT_Outline_Get_Orientation( outline );
+    if ( orientation == FT_ORIENTATION_NONE )
+        if ( outline->n_contours ) return FT_Err_Invalid_Argument;
+    Vert_FT_Outline_Embolden( outline, str_v );
+    Old_FT_Outline_Embolden( outline, str_h );
+    return FT_Err_Ok;
+}
+// 让一个字体槽加粗，并且填充其他的大小属性
+void New_GlyphSlot_Embolden( FT_GlyphSlot  slot , FT_Pos x, FT_Pos y)
+{
+    FT_Library  library = slot->library;
+    FT_Face     face    = slot->face;
+    FT_Error    error;
+    FT_Pos      xstr = x, ystr = y;
+
+    if ( slot->format != FT_GLYPH_FORMAT_OUTLINE &&
+        slot->format != FT_GLYPH_FORMAT_BITMAP )
+        return;
+    if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
+    {
+        FT_BBox oldBox;
+        FT_Outline_Get_CBox(&slot->outline , &oldBox);
+        error = New_FT_Outline_Embolden( &slot->outline, xstr , ystr);
+        if ( error )
+            return;
+        FT_BBox newBox;
+        FT_Outline_Get_CBox(&slot->outline , &newBox);
+        xstr = (newBox.xMax - newBox.xMin) - (oldBox.xMax - oldBox.xMin);
+        ystr = (newBox.yMax - newBox.yMin) - (oldBox.yMax - oldBox.yMin);
+    }
+    else if ( slot->format == FT_GLYPH_FORMAT_BITMAP )
+    {
+        xstr = FT_PIX_FLOOR( xstr );
+        if ( xstr == 0 )
+            xstr = 1 << 6;
+        ystr = FT_PIX_FLOOR( ystr );
+        error = FT_Bitmap_Embolden( library, &slot->bitmap, xstr, ystr );
+        if ( error )
+            return;
+    }
+    if ( slot->advance.x )
+        slot->advance.x += xstr;
+    if ( slot->advance.y )
+        slot->advance.y += ystr;
+    slot->metrics.width        += xstr;
+    slot->metrics.height       += ystr;
+    slot->metrics.horiBearingY += ystr;
+    slot->metrics.horiAdvance  += xstr;
+    slot->metrics.vertBearingX -= xstr / 2;
+    slot->metrics.vertBearingY += ystr;
+    slot->metrics.vertAdvance  += ystr;
+    if ( slot->format == FT_GLYPH_FORMAT_BITMAP )
+        slot->bitmap_top += ystr >> 6;
+}
+
+BOOL FreeType2_GetFontData(PFT2FONT pFont, char *pszText)
+{
+ int i;
+ int x = 0;
+ int yPos;
+ int nSize;
+ int nLen;
+ unsigned short unicode;
+ FT_Error nErr;
+ FT_Matrix matrix;
+ FT_GlyphSlot slot;
+ PNODE pNode;
+ PNODE pTempNode;
+ if((NULL == pFont) || (NULL == pszText) || ('\0' == *pszText))
+  return FALSE;
+ slot = pFont->face->glyph;
+ nLen = strlen(pszText);
+ matrix.xx = 1 << 16;
+ matrix.xy = 0x5800;
+ matrix.yx = 0;
+ matrix.yy = 1 << 16;
+ FreeType2_ClearNode(pFont);
+ pFont->nUnlineY = 0;
+ pFont->nUnlineWid = 0;
+ for(i=0; i<nLen; i++)
+ {
+  
+  if(pFont->bBold)          //粗体
+  {
+   //FT_Pos strength = (1 << 6);
+   
+   //FT_Outline_Embolden(&pFont->face->glyph->outline, strength);
+   FT_Pos nx, ny;
+   nx = 1 << 6;
+   ny = 1 << 6;
+   New_GlyphSlot_Embolden(slot, nx, ny);
+  }
+  if(pFont->bItalic)          //斜体
+   FT_Set_Transform(pFont->face, &matrix, &pen);
+  if(*(pszText+i) & 0x80)         //中文
+  {
+   unicode = gb2312_0_conv_to_uc32((const unsigned char*)(pszText+i));
+   i++;
+  }
+  else             //ascii
+   unicode = s_font_utf8_to_unicode((const unsigned char*)(pszText+i));
+  nErr = FT_Load_Char(pFont->face, unicode, FT_LOAD_RENDER | FT_LOAD_MONOCHROME);
+  if(nErr != FT_Err_Ok)
+   continue;
+  if(pFont->bBold)
+   FT_GlyphSlot_Embolden(slot);
+  pNode = (PNODE)calloc(1, sizeof(NODE));
+  if(NULL == pNode)
+  {
+   printf("FreeType2_DrawText->calloc fail !\n");
+   return FALSE;
+  }
+  pNode->nWid = slot->bitmap.width;
+  pNode->nHei = slot->bitmap.rows;
+  pNode->nPitch = slot->bitmap.pitch;
+  pNode->nLeft = x + slot->bitmap_left;
+  pNode->nTop  = slot->bitmap_top;
+  pNode->pNext = NULL;
+  pFont->nMode = slot->bitmap.pixel_mode;
+  nSize = pNode->nPitch * pNode->nHei;
+  pNode->pucData = (unsigned char*)calloc(nSize, sizeof(unsigned char));
+  if(NULL == pNode->pucData)
+  {
+   printf("FreeType2->DrawText->calloc fail !\n");
+   free(pNode);
+   return FALSE;
+  }
+  memcpy((void*)pNode->pucData, (void*)slot->bitmap.buffer, nSize*sizeof(char));
+  if(NULL == pFont->pHeadNode)
+   pFont->pHeadNode = pNode;
+  else
+   pTempNode->pNext = pNode;
+  
+  pTempNode = pNode;
+  //FreeType2_DrawBitmap(hDC, &slot->bitmap,
+  //   x+slot->bitmap_left, y-slot->bitmap_top);
+  x += slot->advance.x >> 6;
+  yPos = slot->bitmap.rows - slot->bitmap_top;
+  if(pFont->nUnlineY < yPos)
+   pFont->nUnlineY = yPos;
+ }
+ pFont->nUnlineWid = x;
+ return TRUE;
+}
+BOOL FreeType2_DrawText(PFT2FONT pFont, HDC hDC, int x, int y, char *pszText)
+{
+ int i, j;
+ int xPos;
+ int yPos;
+ unsigned char gray;
+ BOOL bRet;
+ PNODE pNode;
+ PNODE pPrevNode;
+ if((NULL == pFont) || (NULL == pszText) || ('\0' == *pszText))
+  return FALSE;
+ bRet = FreeType2_GetFontData(pFont, pszText);
+ if(bRet)
+ {
+  pNode = pFont->pHeadNode;
+  while(pNode != NULL)
+  {
+   pPrevNode = pNode;
+   xPos = x + pNode->nLeft;
+   yPos = y - pNode->nTop;
+   switch(pFont->nMode)
+   {
+    case FT_PIXEL_MODE_GRAY:
+     for(i=0; i<pNode->nHei; i++)
+     {
+      for(j=0; j<pNode->nWid; j++)
+      {
+       gray = pNode->pucData[i*pNode->nPitch + j];
+       if(gray > 0)
+        SetPixel(hDC, xPos+j, yPos+i, RGB(0, 0, 0));
+       else
+        SetPixel(hDC, xPos+j, yPos+i, RGB(255, 255, 255));
+      }
+     }
+     break;
+    case FT_PIXEL_MODE_MONO:
+     for(i=0; i<pNode->nHei; i++)
+     {
+      for(j=0; j<pNode->nWid; j++)
+      {
+       if(pNode->pucData[i*pNode->nPitch + j/8] & (0x80 >> (j & 7)))
+        SetPixel(hDC, xPos+j, yPos+i, RGB(0, 0, 0));
+       else
+        SetPixel(hDC, xPos+j, yPos+i, RGB(255, 255, 255));
+      }
+     }
+     break;
+   }
+   pNode = pNode->pNext;
+   if(pPrevNode->pucData)
+    free(pPrevNode->pucData);
+   free(pPrevNode);
+  }
+  pFont->pHeadNode = NULL;
+  if(pFont->bUnderline)
+  {
+   int nCount;
+   int nStep = 30;
+   if(pFont->bBold)
+    nStep = 20;
+   nCount = (pFont->nHei / nStep) + ((pFont->nHei % nStep) ? 1 : 0);
+   for(i=0; i<nCount; i++)
+   {
+    for(j=0; j<pFont->nUnlineWid; j++)
+     SetPixel(hDC, x+j, y+pFont->nUnlineY+1+i, RGB(0, 0, 0));
+   }
+  }
+ }
+ return FALSE;
+}
+
+
+http://www.phpfans.net/article/htmls/201005/Mjg2MTg2.html
