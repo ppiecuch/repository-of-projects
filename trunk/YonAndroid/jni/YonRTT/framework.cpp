@@ -130,8 +130,11 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	pCamera2->setEventReceivable(false);
 	u32 w=256;
 	u32 h=256;
+	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,false);
 	colorRTT = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(w,h), "COLOR",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_RESERVE_IMAGE,true);
 	grayRTT = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(w,h), "GRAY",video::ENUM_COLOR_FORMAT_L8A8,true);
+	videoDriver->dropReserved(grayRTT);
 	pCamera2->onResize(colorRTT->getSize());
 	//cubeModel->setMaterialTexture(0, colorRTT); 
 

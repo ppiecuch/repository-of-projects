@@ -179,7 +179,7 @@ namespace yon{
 				m_resizables.push_back(p);
 			}
 
-			virtual u32 getVideoMemory() const = 0;
+			virtual s64 getVideoMemory() const = 0;
 			virtual c8* getVideoMemoryString() const = 0;
 
 			virtual const SClearSetting& getClearSetting() const = 0;
@@ -232,7 +232,8 @@ namespace yon{
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;
 			virtual void removeTexture(ITexture* texture) =0;
 			virtual void grabTexture(ITexture* texture) = 0;
-			virtual void dropTexture(ITexture* texture) = 0;
+			virtual bool dropTexture(ITexture* texture) = 0;
+			virtual bool dropReserved(ITexture* texture) = 0;
 
 			virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat) =0;
 			virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const =0;
