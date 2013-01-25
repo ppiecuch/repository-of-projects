@@ -191,8 +191,8 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//const c8* skeletonName="knight_female_stand2.xc3d";
 
 	//正常
-	//const c8* roleName="ranger_male_show.xc3d";
-	//const c8* skeletonName="ranger_male_stand2.xc3d";
+	const c8* roleName="ranger_male_show.xc3d";
+	const c8* skeletonName="ranger_male_stand2.xc3d";
 
 	//正常
 	//const c8* roleName="ranger_female_show.xc3d";
@@ -212,8 +212,8 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//const c8* skeletonName="magician_male_stand2.xc3d";
 
 	//正常
-	const c8* roleName="magician_female_show.xc3d";
-	const c8* skeletonName="magician_female_stand2.xc3d";
+	//const c8* roleName="magician_female_show.xc3d";
+	//const c8* skeletonName="magician_female_stand2.xc3d";
 
 	PROFILE_REGISTER_FRAME();
 
