@@ -1,0 +1,163 @@
+1) 签出源代码
+
+svn checkout http://v8.googlecode.com/svn/trunk/ v8
+
+
+
+
+
+2)在v8根目录下签出gyp
+
+
+svn co http://gyp.googlecode.com/svn/trunk build/gyp
+
+
+3)在v8根目录下签出python和cygwin
+
+
+
+svn co http://src.chromium.org/svn/trunk/tools/third_party/python_26@89111 third_party/python_26svn co http://src.chromium.org/svn/trunk/deps/third_party/cygwin@66844 third_party/cygwin
+
+
+4)添加python和cygwin的路径到环境变量
+
+
+set path="%cd%\third_party\python_26";"%cd%\third_party\cygwin\bin;%path%
+
+
+
+
+5) 生成编译项目文件(gyp是json配置文件和python脚本的工具集，是一个元编译系统，用来生成真正的编译系统，比如常见的Makefile, *.sln, *.vcproj 等）
+
+python build\gyp_v8
+
+
+
+
+6) 打开编译项目编译(在命令行里面用start方式打开sln文件，可以让visual studio编译系统继承环境变量)
+
+start build\all.sln 
+
+
+
+
+7) 编译
+
+在 build/{debug,release}/lib 下得到4个静态库文件(windows上默认也是静态库文件)
+
+preparser_lib.lib
+v8_base.lib
+v8_nosnapshot.lib
+v8_snapshot.lib
+
+
+头文件在v8根目录下的include文件夹里面
+
+
+
+
+8) 测试
+
+testv8.cxx
+
+
+[cpp] view plaincopyprint?// testv8.cpp : Defines the entry point for the console application.   
+//   
+#include <v8.h>   
+  
+using namespace v8;  
+  
+int main(int argc, char* argv[]) {  
+  
+    // Create a stack-allocated handle scope.   
+    HandleScope handle_scope;  
+  
+    // Create a new context.   
+    Persistent<Context> context = Context::New();  
+  
+    // Enter the created context for compiling and   
+    // running the hello world script.    
+    Context::Scope context_scope(context);  
+  
+    // Create a string containing the JavaScript source code.   
+    Handle<String> source = String::New("var x='xyziamheres2///sdfsdf123'; x.match(/\\d{3,3}/);");  
+  
+    // Compile the source code.   
+    Handle<Script> script = Script::Compile(source);  
+  
+    // Run the script to get the result.   
+    Handle<Value> result = script->Run();  
+  
+    // Dispose the persistent context.   
+    context.Dispose();  
+  
+    // Convert the result to an ASCII string and print it.   
+    String::AsciiValue ascii(result);  
+    printf("%s\n", *ascii);  
+    return 0;  
+}  
+
+// testv8.cpp : Defines the entry point for the console application.
+//
+#include <v8.h>
+
+using namespace v8;
+
+int main(int argc, char* argv[]) {
+
+	// Create a stack-allocated handle scope.
+	HandleScope handle_scope;
+
+	// Create a new context.
+	Persistent<Context> context = Context::New();
+
+	// Enter the created context for compiling and
+	// running the hello world script. 
+	Context::Scope context_scope(context);
+
+	// Create a string containing the JavaScript source code.
+	Handle<String> source = String::New("var x='xyziamheres2///sdfsdf123'; x.match(/\\d{3,3}/);");
+
+	// Compile the source code.
+	Handle<Script> script = Script::Compile(source);
+
+	// Run the script to get the result.
+	Handle<Value> result = script->Run();
+
+	// Dispose the persistent context.
+	context.Dispose();
+
+	// Convert the result to an ASCII string and print it.
+	String::AsciiValue ascii(result);
+	printf("%s\n", *ascii);
+	return 0;
+}
+
+在testv8.cxx所在目录下新建文件夹 
+
+v8/inc
+
+v8/lib/debug
+
+v8/lib/release
+
+把生成lib文件和头文件一起复制到相应的目录
+
+
+
+
+9) 编译测试testv8
+
+
+[cpp] view plaincopyprint?cl /Od /I "v8/inc" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /Gm /EHsc /RTC1 /MDd /Fo"Debug\\" /Fd"Debug\vc90.pdb" /W3 /c /ZI /TP ".\testv8.cpp"  
+
+cl /Od /I "v8/inc" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_UNICODE" /D "UNICODE" /Gm /EHsc /RTC1 /MDd /Fo"Debug\\" /Fd"Debug\vc90.pdb" /W3 /c /ZI /TP ".\testv8.cpp"
+[cpp] view plaincopyprint?link "/OUT:C:\Users\Administrator\Documents\Visual Studio 2008\Projects\testv8\Debug\testv8.exe" /INCREMENTAL "/LIBPATH:v8/lib/Debug" /MANIFEST "/MANIFESTFILE:Debug\testv8.exe.intermediate.manifest" "/MANIFESTUAC:level='asInvoker' uiAccess='false'" /DEBUG "/PDB:c:\Users\Administrator\Documents\Visual Studio 2008\Projects\testv8\Debug\testv8.pdb" /SUBSYSTEM:CONSOLE /DYNAMICBASE /NXCOMPAT /MACHINE:X86 v8_snapshot.lib v8_base.lib preparser_lib.lib ws2_32.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib   
+
+link "/OUT:C:\Users\Administrator\Documents\Visual Studio 2008\Projects\testv8\Debug\testv8.exe" /INCREMENTAL "/LIBPATH:v8/lib/Debug" /MANIFEST "/MANIFESTFILE:Debug\testv8.exe.intermediate.manifest" "/MANIFESTUAC:level='asInvoker' uiAccess='false'" /DEBUG "/PDB:c:\Users\Administrator\Documents\Visual Studio 2008\Projects\testv8\Debug\testv8.pdb" /SUBSYSTEM:CONSOLE /DYNAMICBASE /NXCOMPAT /MACHINE:X86 v8_snapshot.lib v8_base.lib preparser_lib.lib ws2_32.lib winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib 
+
+
+
+10) 运行testv8 
+
+http://blog.csdn.net/wuzh1230/article/details/7919932

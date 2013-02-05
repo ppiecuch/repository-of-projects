@@ -1,0 +1,9 @@
+
+其实自己到安装目录看看就知道啦，Library目录下有两个命令行程序的，uninstall-devtools和uninstall- developer-folder，（其中第二条命令就是卸载developer目录的），分别对应下面两条命令，安装在其他目录的xcode只需把路径换了即可：
+
+sudo /Developer/Library/uninstall-devtools --mode=all 
+sudo /Developer/Library/uninstall-developer-folder
+
+
+ERROR: Xcode appears to be running.  You must first quit the following programs before the uninstaller can proceed
+解决：重启机器再来

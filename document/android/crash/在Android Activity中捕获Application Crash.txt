@@ -1,0 +1,77 @@
+由于接触android开发的时间并不久，对于android系统、机制的理解也是一知半解。所以在开发中陆陆续续遇到很多莫名其妙的问题，其中最让人头疼的就是application crash。application的crash可能由于很多的原因所引起的，有可能是因为数据的问题，或者是异步AsyncTask的运用不合理，等等等等，都可能造成application crash。
+也一直在想如何才能知道application crash，想在application crash的时候做点什么，一直也没有找到一个solution。后来在一个偶然的机会用到一个别人的application可以捕获到crash，就想捡到了宝一样。想尽办法去找到这个application的sourcecode，发现原来很简单，几句话就可以做到。
+ 
+1. 在Activity的onCreate方法里面添加这句话：
+Thread.setDefaultUncaughtExceptionHandler(new MyUncaughtExceptionHandler(this));
+ 
+ 
+view plain@Override 
+    public void onCreate(Bundle savedInstanceState) { 
+        super.onCreate(savedInstanceState); 
+         
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(this)); 
+         
+        setContentView(R.layout.main); 
+         
+        click2Crash = (Button)findViewById(R.id.clickToCrash); 
+         
+        click2Crash.setOnClickListener(new Button.OnClickListener(){ 
+            @Override 
+            public void onClick(View v) { 
+                String text = "aaa"; 
+                System.out.print(text.charAt(10)); 
+            }}); 
+    } 
+ 
+ 
+2. 写一个自己的MyUncaughtExceptionHandler implementes UncaughtExceptionHandler，实现方法uncaughtException。在这个方法里面做任何想做的事情，比如说将造成application crash的原因发送给开发人员。
+ 
++ expand sourceview plain
+3. 写一个自己的Activity，告诉用户，你需要这个exception信息，让他Email给开发人员。
+ 
+view plainpublic class BugReportActivity extends Activity { 
+    public static final String exceptionMsg = "exceptionMsg"; 
+     
+    private TextView reportContent; 
+    private Button sendMailBtn; 
+    private Button cancelBtn; 
+     
+    protected void onCreate(Bundle bundle){ 
+        super.onCreate(bundle); 
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(this)); 
+         
+        setContentView(R.layout.bug_report); 
+         
+        reportContent = (TextView)findViewById(R.id.reportContent); 
+        sendMailBtn = (Button)findViewById(R.id.sendMail); 
+        cancelBtn = (Button)findViewById(R.id.cancel); 
+         
+        String sw = getIntent().getStringExtra(exceptionMsg); 
+        reportContent.setText(sw); 
+         
+        initHandler(); 
+    } 
+     
+    private void initHandler(){ 
+        sendMailBtn.setOnClickListener(new Button.OnClickListener(){ 
+            @Override 
+            public void onClick(View v) { 
+                Toast.makeText(v.getContext(), "Email will be sent to our helpdesk.", Toast.LENGTH_LONG).show(); 
+            } 
+        }); 
+        cancelBtn.setOnClickListener(new Button.OnClickListener(){ 
+            @Override 
+            public void onClick(View v) { 
+                finish(); 
+            } 
+        }); 
+    } 
+} 
+ 
+ 
+ 
+一直都是看别人的blog学习东西的，今天第一次发个blog。有什么不好的地方请大家见谅。:-)
+ 
+发现一个GoogleProject专门关注这个Application Crash Report for Android的，简称ACRA.大家可以在下面这个链接上面找到相关内容。
+
+http://www.2cto.com/kf/201108/100990.html

@@ -1,0 +1,137 @@
+将讨论的是8大你不得不知的Android调试工具，这些工具部分属于系统自带，也是一种方式方法，希望对大家有所帮助。 
+
+AD： 
+
+1. 查看当前堆栈 
+
+1) 功能：在程序中加入代码，使可以在logcat中看到打印出的当前函数调用关系 
+
+2) 方法：
+new Exception(“print trace”).printStackTrace(); 
+
+2. MethodTracing 
+
+1) 功能：用于热点分析和性能优化，分析每个函数占用的CPU时间，调用次数，函数调用关系等 
+
+2) 方法： 
+
+a) 在程序代码中加入追踪开关
+
+import android.os.Debug;     ……     android.os.Debug.startMethodTracing(“/data/tmp/test”); // 先建/data/tmp目录     …… // 被追踪的程序段     android.os.Debug.stopMethodTracing();  
+b) 编译，运行后，设备端生成/data/tmp/test.trace文件 
+
+c) 把trace文件复制到PC端
+
+$ adb pull /data/tmp/test.trace ./ 
+d) 使用android自带工具分析trace文件
+
+$ $ANDROID_SRC/out/host/linux-x86/bin/traceview test.trace  
+此时可看到各个函数被调用的次数CPU占用率等信息 
+
+e) 使用android自带工具分析生成调用关系类图
+
+$ apt-get install graphviz # 安装图片相关软件   $ANDROID_SRC/out/host/linux-x86/bin/dmtracedump -g test.png test.trace  
+此时目录下生成类图test.png 
+
+3) 注意
+trace文件生成与libdvm模块DEBUG版本相冲突，所以此方法只适用于对非DEBUG版本模拟器的调试，否则在分析trace文件时会报错 
+
+3. HProf (Heap Profile) 
+
+1) 功能：
+用于java层面的内存分析，显示详细的内存占用信息，指出可疑的内存泄漏对象 
+
+2) 方法： 
+
+a) 在代码中加入dump动作
+
+import android.os.Debug;    import java.io.IOException;     ……      try {    android.os.Debug.dumpHprofData(“/data/tmp/input.hprof”); // 先建/data/tmp目录      } catch (IOException ioe) {      } 
+b) 把hprof文件复制到PC端
+
+$ adb pull /data/tmp/input.hprof ./ 
+c) 使用命令hprof-conv把hprof转成MAT识别的标准的hprof
+
+$ $ANDROID_SRC/out/host/linux-x86/bin/hprof-conv input.hprof output.hprof 
+d) 使用MAT工具看hprof信息 
+
+下载MAT工具：http://www.eclipse.org/mat/downloads.php 
+
+用工具打开output.hprof 
+
+3) 注意：此工具只能显示java层面的，而不能显示Ｃ层的内存占用信息 
+
+4. SamplingProfile (android 2.0上版本使用) 
+
+1) 功能
+每隔Ｎ毫秒对当前正在运行的函数取样，并输出到log中 
+
+2) 在代码中加入取样设定
+
+import dalvik.system.SamplingProfiler     ……    SamplingProfile sp = SamplingProfiler.getInstance();     sp.start(n); // n为设定每秒采样次数    sp.logSnapshot(sp.snapshot());      ……     sp.shutDown(); 
+它会启一个线程监测，在logcat中打印信息 
+
+5. 用发系统信号的方式取当前堆栈情况和内存信息 
+
+1) 原理
+dalvik虚拟机对SIGQUIT和SIGUSR1信号进行处理(dalvik/vm/SignalCatcher.c)，分别完成取当前堆栈和取当前内存情况的功能 
+
+2) 用法 
+
+a) $ chmod 777 /data/anr -R # 把anr目录权限设为可写
+$ rm /data/anr/traces.txt # 删除之前的trace信息
+$ ps # 找到进程号
+$ kill -3 进程号 # 发送SIGQUIT信号给该进程，此时生成trace信息
+$ cat /data/anr/traces.txt
+功能实现：遍历thread list(dalvik/vm/Thread.c:dvmDumpAllThreadEx())，并打印当前函数调用关系(dalvik/vm/interp/Stack.c:dumpFrames()) 
+
+b) $ chmod 777 /data/misc -R
+$ ps # 找到进程号
+$ kill -10 进程号 # 发送SIGQUIT信事信号给该进程，此时生成hprof信息
+$ ls /data/misc/*.hprof
+此时生成hprf文件，如何使用此文件，见第二部分(HProf)
+注意：hprof文件都很大，注意用完马上删除，以免占满存储器 
+
+6. logcat及原理 
+
+1) android.util.Log利用println的标准java输出词句，并加前缀I/V/D…. 
+
+2) dalvik利用管道加线程的方式，先利用dup2把stdout和stderr重定向到管理中(vm/StdioConverter.c:dvmstdioConverterStartup)，然后再启动一个线程从管道另一端读出内容(dalvik/vm/StdioConverter.c:stdioconverterThreadStart())，使用LOG公共工具（system/core/liblog/logd_write.c: __android_log_print()）输出到/dev/log/*中去 
+
+3) logcat通过加不同参数看/dev/log/下的不同输入信息
+
+# logcat -b main 显示主缓冲区中的信息   # logcat -b radio 显示无线缓冲区中的信息   # logcat -b events 显示事件缓冲区中的信息 
+7. jdwp(java debug wire protocol)及原理 
+
+1) 虚拟机（设备端）在启动时加载了Agent JDWP 从而具备了调试功能。在调试器端（PC端）通过JDWP协议与设备连接，通过发送命令来获取的状态和控制Java程序的执行。JDWP 是通过命令（command）和回复（reply）进行通信的。 
+
+2) JDK 中调试工具 jdb 就是一个调试器，DDMS也提供调试器与设备相连。 
+
+3) dalvik为JDWP提供了两种连接方式：tcp方式和adb方式，tcp方式可以手工指定端口，adb方式自动设定为8700端口，通常使用DDMS调试就是通过adb方式 
+
+8. monkey 
+
+1) monkey是一个android自带的命令行工具。它向系统发送伪随机的用户事件流，实现对正在开发的应用程序进行压力测试。 
+
+2) 方法
+在设备端打开setting界面
+$ adb shell
+# monkey -p com.android.settings -v 500
+此时可以看到界面不断被切换 
+
+9. 其它小工具
+具体见android.os.Debug中提供的工具 
+
+1) 取毫微秒级的时间，用于计算时间
+threadCpuTimeNanos() 
+
+2) 统计两点间的内存分配情况
+
+startAllocCounting()   stopAllocCounting()   getGlobalAllocCount()   get….. 
+3) 打印当前已load的class
+getLoadedClassCount()
+printLoadedClasses() 它需要打开NDEBUG功能才能打开system/core/中Log功能 
+
+10. 打印debug信息
+
+$ adb bugreport 
+http://www.cnblogs.com/bigben0123/archive/2012/01/04.html

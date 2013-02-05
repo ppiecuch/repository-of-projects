@@ -1,0 +1,307 @@
+前言
+
+
+--------------------------------------------------------------------------------
+
+ ACRA 是 Application Crash Report for Android 的缩写，看其单词知其意安卓应用程序崩溃报告。 作为安卓应用程序开发者，相信你一定很关注自己的软件在用户实际应用过程中的用户体验、系统稳定性等信息，特别是当系统出现崩溃或者运行不正常的情况下，第一手的崩溃异常信息对提升软件的整体竞争力是相当重要的。而ACRA可以很好的帮助你得到这些宝贵的信息。
+
+项目实践
+
+
+--------------------------------------------------------------------------------
+
+准备：
+
+
+  0.  Android开发环境(Eclipse + ADT + AndroidSDK)
+
+
+  1. 下载最新版本的ACRA包 - v4.3.0
+
+
+  2. 从官网阅读相关文档，设置好相关环境
+
+
+说明：
+
+
+  ACRA 允许你的安卓应用程序通过谷歌电子表格文档（Google Docs spreadsheet），邮件（email），服务端 HTTP POST 脚本(server-side HTTP POST script)等方式来处理崩溃报告。常见的可以使用邮件和服务端 HTTP POST 脚本，以下例子我将首先使用邮件的方式发送崩溃报告，之后大概介绍下如何使用服务端 HTTP POST 脚本的方式发送崩溃报告。
+
+
+使用 Email 的方式发送崩溃报告
+
+--------------------------------------------------------------------------------
+
+项目中使用到的相关文件
+
+
+ACRATest
+
+ |- src
+
+
+   |- com.acra.mobile
+
+
+     |- IOMobile.java
+
+     |- IOReportSender.java 
+
+
+ |- AndroidManifest.xml
+
+ 首先看下IOMobile.java
+
+
+ 1 @ReportsCrashes(
+ 2     formKey = "",
+ 3     mailTo = "reports@yourdomain.com",
+ 4     customReportContent = { 
+ 5         ReportField.APP_VERSION_NAME, ReportField.APP_VERSION_CODE, 
+ 6         ReportField.ANDROID_VERSION, ReportField.PHONE_MODEL, 
+ 7         ReportField.CUSTOM_DATA, ReportField.STACK_TRACE, ReportField.LOGCAT },
+ 8     mode = ReportingInteractionMode.TOAST,
+ 9     forceCloseDialogAfterToast = false,
+10     resToastText = R.string.crash_error_report_toast_text)
+11 public class IOMobile extends Application {
+12 
+13   @Override
+14   public void onCreate() {
+15     ACRA.init(this);
+16     ErrorReporter.getInstance().setReportSender(new IOReportSender(this));
+17     super.onCreate();
+18   }
+19 
+20 }
+
+注意：
+  1. IOMobile 继承 Application
+  2. IOMobile 在 AndroidManifest.xml 文件中的配置要正确
+
+
+  3. 第15行代码 ACRA.init(this)，将ACRA注入到项目中
+
+
+  4. 第16行代码 new IOReportSender(this)，用于定制自己的ReportSender
+
+
+ 再来看看 IOReportSender.java
+
+
+IOReportSender.java 
+
+public class IOReportSender implements ReportSender {
+
+  private static final String TAG = "IOReportSender";
+
+  private Context context = null;
+
+  public IOReportSender(Context context) {
+    this.context = context;
+  }
+
+  @Override
+  public void send(CrashReportData errorContent) throws ReportSenderException {
+
+    sendMailReport(errorContent);
+  }
+
+  private void sendMailReport(CrashReportData errorContent) throws ReportSenderException {
+    new EmailIntentSender(context).send(errorContent);
+  }
+
+}
+
+ 注意：
+
+  1. 你可以在该类中定制异常信息，选择性发送信息。
+
+
+最后来看下AndroidManifest.xml 文件
+
+
+View Code 
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+   ... >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="15" />
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+
+    <application
+        android:name=".IOMobile"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+    ...
+    </application>
+
+</manifest>
+
+使用 server-side HTTP POST script 的方式发送崩溃报告
+
+
+
+--------------------------------------------------------------------------------
+
+这种方式发送崩溃报告，需要服务端有相应的请求响应，重要代码如下
+
+
+IOReportSender 
+
+  1 public class IOReportSender implements ReportSender {
+  2 
+  3   private Context mContext = null;
+  4   private Map<ReportField, String> mMapping = new HashMap<ReportField, String>();
+  5   private String formUri = null;
+  6 
+  7   public IOReportSender(Context ctx) {
+  8     mContext = ctx;
+  9     formUri = ctx.getString(R.string.CrashErrorReport_URL);
+ 10   }
+ 11 
+ 12   @Override
+ 13   public void send(CrashReportData errorContent) throws ReportSenderException {
+ 14     ErrorReporter.getInstance().putCustomData("Cookie", getCookies());
+ 15 
+ 16     if (isNetAvailable(mContext)) {
+ 17       doHttpReport(errorContent);
+ 18     } else {
+ 19       getMailSender().send(errorContent);
+ 20     }
+ 21   }
+ 22 
+ 23   private ReportSender getMailSender() {
+ 24     return new EmailIntentSender(mContext);
+ 25   }
+ 26 
+ 27   private void doHttpReport(CrashReportData errorContent) throws ReportSenderException {
+ 28     try {
+ 29       URL reportUrl;
+ 30       Map<String, String> finalReport = remap(errorContent);
+ 31       URL webViewUrl = new URL(App.getWebViewLoadUrl());
+ 32       String realFormUri = webViewUrl.getProtocol() + "://" + webViewUrl.getHost() + ((webViewUrl.getPort() == -1) ? "" : ":" + webViewUrl.getPort()) + formUri;
+ 33       reportUrl = new URL(realFormUri);
+ 34       doPost(finalReport, reportUrl, ACRA.getConfig().formUriBasicAuthLogin(), ACRA.getConfig().formUriBasicAuthPassword());
+ 35     } catch (Exception e) {
+ 36       throw new ReportSenderException("Error while sending report to Http Post Form.", e);
+ 37     }
+ 38   }
+ 39 
+ 40   private Map<String, String> remap(Map<ReportField, String> report) {
+ 41     Map<String, String> finalReport = new HashMap<String, String>(report.size());
+ 42     ReportField[] fields = ACRA.getConfig().customReportContent();
+ 43     if (fields.length == 0) {
+ 44       fields = ACRA.DEFAULT_REPORT_FIELDS;
+ 45     }
+ 46     for (ReportField field : fields) {
+ 47       if (mMapping == null || mMapping.get(field) == null) {
+ 48         finalReport.put(field.toString(), report.get(field));
+ 49       } else {
+ 50         finalReport.put(mMapping.get(field), report.get(field));
+ 51       }
+ 52     }
+ 53     return finalReport;
+ 54   }
+ 55 
+ 56   public static boolean isNetAvailable(Context mContext) {
+ 57     try {
+ 58       ConnectivityManager nInfo = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+ 59       nInfo.getActiveNetworkInfo().isConnectedOrConnecting();
+ 60 
+ 61       ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+ 62       State mobile = cm.getNetworkInfo(0) != null ? cm.getNetworkInfo(0).getState() : NetworkInfo.State.DISCONNECTED;
+ 63       State wifi = cm.getNetworkInfo(1) != null ? cm.getNetworkInfo(1).getState() : NetworkInfo.State.DISCONNECTED;
+ 64       if (wifi == NetworkInfo.State.CONNECTED || wifi == NetworkInfo.State.CONNECTING) {
+ 65         // wifi
+ 66         return true;
+ 67       } else if (mobile == NetworkInfo.State.CONNECTED || mobile == NetworkInfo.State.CONNECTING) {
+ 68         // mobile
+ 69         return true;
+ 70       }
+ 71 
+ 72       else {
+ 73         return false;
+ 74       }
+ 75     } catch (Exception e) {
+ 76       return false;
+ 77     }
+ 78   }
+ 79 
+ 80   /**
+ 81    * Send an HTTP(s) request with POST parameters.
+ 82    * 
+ 83    * @param parameters
+ 84    *          parameters
+ 85    * @param url
+ 86    *          url
+ 87    * @param login
+ 88    *          login
+ 89    * @param password
+ 90    *          password
+ 91    * @throws IOException
+ 92    *           IOException
+ 93    */
+ 94   private void doPost(Map<?, ?> parameters, URL url, String login, String password) throws IOException {
+ 95 
+ 96     // Construct data
+ 97     StringBuilder dataBfr = new StringBuilder();
+ 98     for (Object key : parameters.keySet()) {
+ 99       if (dataBfr.length() != 0) {
+100         dataBfr.append('&');
+101       }
+102       Object value = parameters.get(key);
+103       if (value == null) {
+104         value = "";
+105       }
+106       dataBfr.append(URLEncoder.encode(key.toString(), "UTF-8")).append('=').append(URLEncoder.encode(value.toString(), "UTF-8"));
+107     }
+108 
+109     LogHttpRequest req = new LogHttpRequest(isNull(login) ? null : login, isNull(password) ? null : password);
+110     String cookie = getCookies();
+111     req.sendPost(url.toString(), dataBfr.toString(), cookie);
+112   }
+113 
+114   private boolean isNull(String aString) {
+115     return aString == null || aString == ACRA.NULL_VALUE;
+116   }
+117 
+118   private String getCookies() {
+119     String cookie = null;
+120     try {
+121       CookieSyncManager.getInstance().sync();
+122       cookie = CookieManager.getInstance().getCookie(App.getWebViewLoadUrl());
+123     } catch (Exception e) {
+124     }
+125     return cookie;
+126   }
+127 }
+
+如果需要帮助，可以联系我进行进一步的探讨。
+
+
+http://www.cnblogs.com/youngC/archive/2012/10/10/2718765.html

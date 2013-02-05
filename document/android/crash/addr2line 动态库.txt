@@ -1,0 +1,31 @@
+addr2line 动态库
+在android开发中，java的异常比较直观，但是动态库异常打印的都是地址，利用下面的方法可以锁定发生故障的函数。
+
+arm-eabi-addr2line  -C -f -s -e 动态库 address可以解析出发生故障的地址信息。
+
+比如：
+
+Arm-eabi-addr2line –C –f –s –e libpcmhost.so 0c480
+
+打印出：
+
+_JNIEnv::CallIntMethod(_jobject*, _jmethodID*,…)
+
+ 
+
+ 
+
+ 
+
+Backtrace中，一般都只有一些地址。但是利用addr2line这个工具，就可以找到对应的代码行。前提条件是可执行程序或者动态链接库编译的时候带-g选项。
+
+具体来说，分两种情况：
+
+1. 如果关注的一行backtrace位于一个可执行文件中，那么直接addr2line -e <executable> <address>
+
+2. 如果关注的backtrace位于一个动态链接库中，那么麻烦一些，因为动态链接库的基地址不是固定的。这个时候，首先要把进程的memory map找来。在Linux下，进程的memory map可以在/proc/<pid>/maps文件中得到。然后在这个文件中找到动态链接库的基地址，然后将backtrace中的地址 - 动态链接库的基地址，得到偏移地址offset address, 最后addr2line -e <shared library> <offset address>。
+
+当然，用GDB也可以找出地址对应的代码行。不过相比addr2line，GDB需要将BUG现象重现一遍，所以对于不好重现的BUG，或是随机重现的BUG来说，使用addr2line就可以直接从backtrace找到对应的代码行，不需要重现现象，比GDB使用起来更简单。
+
+
+http://www.cnblogs.com/cute/archive/2012/07/16/2593208.html

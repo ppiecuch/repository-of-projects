@@ -1,0 +1,38 @@
+让自己的程序支持脚本，尤其是支持JavaScript是件很有意思的事情的，下面是一个简单的Demo，通过google的V8引擎的来实现这个功能。
+
+我们Demo的JavaScript代码如下：
+function draw(dc)
+{
+drawer.drawLine(dc, 0xFF, 5, 100, 100, 200, 200);
+drawer.drawLine(dc, 0xFF0000, 10, 50, 50, 300, 200);
+drawer.drawFrame(dc, 0x00FF00, 2, 350, 200, 500, 400);
+drawer.fillRect(dc, 0xFF00FF, 50, 400, 150, 500);
+}
+
+最终会实现如下的效果：
+
+
+可以看到窗口上画什么东西，完全有脚本来控制。
+
+Chrome V8的编译，设计和使用方法，不具体说了，可以参考：
+https://developers.google.com/v8/build
+https://developers.google.com/v8/design
+https://developers.google.com/v8/embed
+
+具体怎么实现的，可以参考源代码。
+说几点需要注意的
+（1）因为我们在编译V8.dll时用的是Release版DLL方式的C/C++运行库，所以我们的这个应用程序工程也需要这样设置。
+（2）我用Vs2008编译，发现中文路径下文件读取会有问题，
+具体原因可以参考http://blog.csdn.net/lyqchina/article/details/4214205
+（3）一定要调用Script.Run()，这样我们才能在运行环境成功取得脚本里Draw方法。
+
+我们上面的这个例子只是一个简单的Demo, 真正在商业软件中运用V8还有很多问题要考虑。
+比如Demo中的JS代码没有考虑异常，失败等情况。
+另外在C++函数和脚本的绑定方面用的都是V8的原始接口，不是很方便， 如果需要方便的绑定可以参考这个开源项目http://code.google.com/p/cproxyv8/
+如果想用V8给自己的软件提供脚本接口， 有个很好的开源项目可以参考，就是Node.js, 地址http://nodejs.org/，该项目已经成为通过JS开发Web服务程序的平台，本质上是也是通过V8封装C++对象给JS脚本使用。
+
+现在我们已经可以看到V8的强大， 理论上我们可以通过V8 封装任何库给JS使用，未来如果所有平台的API都有库给JS使用的话，我们就也可以用JS开发应用程序了，这时JS就是类似Java的一个平台了。
+
+源代码下载: Source Code
+
+http://www.cppblog.com/weiym/archive/2012/05/19/175374.html

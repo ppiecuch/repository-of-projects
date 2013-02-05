@@ -1,3 +1,14 @@
+异常：关于Undefined symbols for architecture armv7s 
+解决：
+build active architecture only 由yes改为no
+
+异常：
+/Volumes/XC/trunk/examples/ios/XC3D/build/Debug-iphoneos/XC3D.app: Operation not permitted
+Command /usr/bin/codesign failed with exit code 1
+解决：
+Product Name：改为XC3D1（不与项目名同名）
+
+
 异常：
 error: unable to open executable ''
 解决：

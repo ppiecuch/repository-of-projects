@@ -1,0 +1,68 @@
+v8是一个强大的js虚拟机，json是js的内置数据格式。json常用于程序配置和网络信息传输。
+
+
+例子有些杀鸡用牛刀的感觉，大家就当一个体验吧。
+
+
+在win7上编译v8的过程可以参考这个，或者v8的官方doc。
+
+http://blog.csdn.net/wuzh1230/article/details/7919932 
+
+主要步骤：加载json配置（可以从文件读取，utf-8格式），编译，执行，编译配置项表达式，执行，提取配置项的值。
+
+
+#include <v8.h>
+
+using namespace v8;
+
+int main(int argc, char* argv[]) {
+
+	// Create a stack-allocated handle scope.
+	HandleScope handle_scope;
+
+	// Create a new context.
+	Persistent<Context> context = Context::New();
+
+	// Enter the created context for compiling
+	Context::Scope context_scope(context);
+
+	// Create a string containing the JavaScript source code.
+	Handle<String> source = String::New(
+		
+		// 1, 正则表达式测试例子
+		//"var x='xyziamheres2///sdfsdf123'; x.match(/\\d{3,3}/);"
+
+		// 2, json配置测试例子
+		"var config={'Version':'1.0', 'Title':'HelloWorld', 'ThreadNum':'28'};"
+		);
+
+	// Compile the source code.
+	Handle<Script> script = Script::Compile(source);
+
+	// Run the script to get the result.
+	script->Run();
+
+
+	// 读取Version配置
+	Handle<v8::String> src1 = v8::String::New("config.Version;");
+	Handle<Script> script1 = v8::Script::Compile(src1);
+	Handle<Value> val1 = script1->Run();
+	String::AsciiValue ascii1(val1);
+	printf("%s\n", *ascii1);
+
+	// 读取Title配置
+	Handle<v8::String> src2 = v8::String::New("config.Title;");
+	Handle<Script> script2 = v8::Script::Compile(src2);
+	Handle<Value> val2 = script2->Run();
+	String::AsciiValue ascii2(val2);
+	printf("%s\n", *ascii2);
+
+	// Dispose the persistent context.
+	context.Dispose();
+
+	return 0;
+}
+
+结果截图：
+
+http://www.tuicool.com/articles/6vEnQv

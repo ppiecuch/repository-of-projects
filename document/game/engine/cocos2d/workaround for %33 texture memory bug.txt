@@ -1,0 +1,276 @@
+So,
+
+If you didn't know, when you create a texture, iOS will allocate 33% more memory, presumably to have enough room in case mipmaps are needed.
+( http://www.cocos2d-iphone.org/forum/topic/23887#post-129097 )
+
+But it is worth noting that this bug is only present on POT (Power Of Two) textures ( Mipmapping is only supported on POT textures ).
+So, in order to reduce memory, what you have to do is two create NPOT textures.
+
+eg:
+If you are using a 2048x2048 textures, convert it into a 2048x2047 textures (and you will save 33% memory).
+In case you can't make it smaller, then make it bigger. eg:
+If you have a 2048x1024 texture, create a 2048x1025 texture.
+
+If you are using cocos2d v1.0, then you have to edit ccConfig.h with:
+#define CC_TEXTURE_NPOT_SUPPORT 1
+If you are using v1.1 or v2.0, then you are OK, since they already support NPOT textures by default.
+
+Ways to know if you are using POT / NPOT textures:
+A) Parse your PNG, GIF, BMP, JPEG files with file:
+$ find . -name "*.png" -print0 | xargs -0 file
+B) Run this line of code and see your debug console:
+[[CCTextureCache sharedTextureCache] dumpCachedTextureInfo];
+Further info:
+https://devforums.apple.com/thread/113889?start=0&tstart=0
+
+Important: NPOT textures can't have mipmaps, and also they only accept GL_CLAMP_TO_EDGE in GL_TEXTURE_WRAP_{S,T}
+
+Important 2: PVRTC (2bpp and 4bpp) textures can't be converted to NPOT
+
+POSTED 10 MONTHS AGO #
+
+MandarX
+Member
+Thanks!
+
+What about the previous releases?
+
+I know I should upgrade to v1 or v2 but I'm working on 2 projects that use v0.99.5
+
+I will switch to the latest version when I finish!!
+
+MandarX
+
+POSTED 10 MONTHS AGO #
+
+riq
+Key Master
+@MandarX:
+v1.0 and prior versions (0.99.x, 0.8.x, etc) should edit the ccConfig.h file.
+
+POSTED 10 MONTHS AGO #
+
+rickms
+Member
+Thanks for the tip riq! I just enabled CC_TEXTURE_NPOT_SUPPORT and modified my TP script to max size @2047, rebuilt and my average memory usage went from ~63M to ~49M.
+
+POSTED 10 MONTHS AGO #
+
+riq
+Key Master
+@rickms: :-)
+
+POSTED 10 MONTHS AGO #
+
+MandarX
+Member
+thanks Riq
+
+POSTED 10 MONTHS AGO #
+
+leocck
+Member
+Thanks Riq!
+
+POSTED 10 MONTHS AGO #
+
+Ernesto Corvi
+Member
+EDIT: I just followed the link to Apple's forum and it's indeed a bug. Disregard my last suggestion.
+
+POSTED 10 MONTHS AGO #
+
+Birkemose
+Moderator
+Isn't a 2048 *1024 a humongous waste of memory anyways?
+
+POSTED 10 MONTHS AGO #
+
+ayt
+Member
+Can't I just comment out the line that allocates the mipmap's space?
+Where is it?
+
+POSTED 10 MONTHS AGO #
+
+rickms
+Member
+ayt: It's not cocos2d that's doing it, it's the openGL implementation on iOS, so no, you can't.
+
+POSTED 10 MONTHS AGO #
+
+gogokodo
+Member
+In that apple topic one of the guys mentions this "For best use of memory, make sure both the width and the height are a multiple of 32 pixels". Is there anything to that? Would chopping off or adding 32 pixels be even more efficient? For example going from 1024x1024 to 1024x992 or 1024x1056.
+
+POSTED 10 MONTHS AGO #
+
+abitofcode
+Moderator
+Wow! That is nuts. I need mipmaps in Sketchshare but this would have been a lifesaver on a project last year.
+
+Doh!
+
+POSTED 10 MONTHS AGO #
+
+cybergreg
+Member
+"In that apple topic one of the guys mentions this "For best use of memory, make sure both the width and the height are a multiple of 32 pixels". Is there anything to that? Would chopping off or adding 32 pixels be even more efficient? For example going from 1024x1024 to 1024x992 or 1024x1056."
+
+I'm going to take a stab and guess that its because when loading a NPOT texture, it (opengles) will bump up the size to make it a multiple of 32 when allocating memory. So.... if it's going to allocate for a 1024x1056 even if your texture is only 1024x1025; you might as well USE those extra pixels, if you can. So if you do use the "rule-of-32" you will be maximizing all the available texture space vs allocated memory.
+
+POSTED 10 MONTHS AGO #
+
+crmagicxxx
+Member
+There is a handy option in TexturePacker called "Allow free sizes", so why waste anything when you don't have to...
+
+Example with 32 bit (RGBA8888) background image of 640x960 px in PVR format:
+
+- Image itself is 640x960x32 = 2400 KB
+- 1024x1024 texture with that image should use 4096 KB but instruments show 5464 KB (confirms Riq's 33% waste)
+- Same "hand adjusted" texture to 1023x1024 shows exactly 4096 KB (again confirms Riq's no waste)
+- checked "Allow free sizes" makes 640x960 texture which in instruments shows exactly 2400 KB
+
+So, when we already have NPOT support, why even use 1023x1024 when you can use e.g. 640x960 and save some more memory. But, here is some interesting thing, I found while testing, which confirms those 32 pixels people are talking here:
+
+- Use that same 640x960 background in TexturePacker, then for example make "Border padding" of 2 px which makes final texture of 644x964 px. You would expect that instruments show use of 2425 KB but instead Xcode instruments show 2604 KB. So, OpenGL adjusts that 644x964 px to the closest multiple of 32 resolution, which is 672x992 px - exactly 2604 KB...
+
+All in all, if you're using NPOT, don't waste anything. If you use TexturePacker just check "Allow free sizes" and OpenGL will take care about everything else and not wasting any memory. Of course, as Riq already mentioned, some formats can't use NPOT like PVRTC...
+
+POSTED 10 MONTHS AGO #
+
+Andreas Loew
+Member
+Sounds like a good workaround. And it should work on all devices from 3gs and newer, right?
+In the improbable case "allow free sizes" does return a POT texture you can still add border padding to force NPOT.
+
+I currently don't see a need to add something to TexturePacker to improve the situation - do you?
+
+POSTED 10 MONTHS AGO #
+
+cybergreg
+Member
+"I currently don't see a need to add something to TexturePacker to improve the situation - do you?"
+
+@Andreas - NO, Texture Packer works awesome! I (easily) recreated a bunch of my textures to NPOT. Thanks!
+
+POSTED 10 MONTHS AGO #
+
+crmagicxxx
+Member
+@Andreas
+
+I currently don't see a need to add something to TexturePacker to improve the situation - do you?
+
+Maybe just a warning if that improbable case happens and POT texture is created? Though chances are very very low :)
+
+POSTED 10 MONTHS AGO #
+
+devmc
+Member
+I share Andreas's concern about device compatibility. Are NPOT texture constraints OpenGL / iOS / cocos2D (software-related) or something in the graphics chip (hardware-related)?
+
+POSTED 10 MONTHS AGO #
+
+Andreas Loew
+Member
+@devmc It's hardware related. But afaik all devices from 3GS on should be fine.
+
+POSTED 10 MONTHS AGO #
+
+CJ
+Moderator
+@Andreas I'd like to see an option to specify the max width/height manually in case we want to keep inside a 1023x1024 area for example.
+
+POSTED 10 MONTHS AGO #
+
+QcMat
+Member
+I agree with CJ, when I saw "allow free sizes" I thought i'd be able to specify my own min / max. Using the command line though, it works well :)
+
+POSTED 10 MONTHS AGO #
+
+Andreas Loew
+Member
+@CJ: Sounds like a good idea. Right now you can do this only from command line.
+
+POSTED 10 MONTHS AGO #
+
+gogokodo
+Member
+@Andreas Loew The POT creation isn't so improbable. I have a few sheets that I'm generating with smart folders during xcode build that I haven't really taken a closer look at until now. I was basically using the smart folders + build from xcode as a fire and forget sort of thing and didn't notice that a few of my sheets (3 out of 6 currently) actually ended up with POT width and height (double checked that allow-free-sizes is on). It would be great if Texture Packer had an option for forcing NPOT in the future, thanks.
+
+POSTED 10 MONTHS AGO #
+
+Panajev
+Member
+Interesting workaround :).
+
+POSTED 10 MONTHS AGO #
+
+rgaino
+Member
+I just converted all my spritesheets to Allow Free Sizes and my memory usage INCREASED about 70%. The main menu went from 38M to 55MB and the game scene from 74 to 97...
+
+All my textures are RGBA444 pvr.ccz . I'm using cocos2d v1.0.0.
+
+I checked and CC_TEXTURE_NPOT_SUPPORT is 1 on ccConfig.h.
+
+Any idea what might be going on?
+
+POSTED 10 MONTHS AGO #
+
+riq
+Key Master
+@rgaino:
+
+Please, verify that the textures are 16-bit by doing this:
+[[CCTextureCache sharedTextureCache] dumpCachedTextureInfo];
+and compare the output of both versions: POT vs NPOT.
+
+POSTED 10 MONTHS AGO #
+
+rgaino
+Member
+@riq: here's the output for NPOT (Allow Free Sizes)
+
+Feb 14 14:35:36 unknown Abductionary[5722] <Warning>: cocos2d: "mainMenuScreen.pvr.ccz" rc=61 id=3 2043 x 942 @ 16 bpp => 8152 KB
+Feb 14 14:35:36 unknown Abductionary[5722] <Warning>: cocos2d: "Leaderboards.pvr.ccz" rc=32 id=4 2007 x 1024 @ 16 bpp => 7867 KB
+Feb 14 14:35:36 unknown Abductionary[5722] <Warning>: cocos2d: "volumeKnobUpState.png" rc=3 id=6 268 x 274 @ 16 bpp => 140 KB
+Feb 14 14:35:36 unknown Abductionary[5722] <Warning>: cocos2d: "AlienWalking.pvr.ccz" rc=61 id=5 1008 x 1956 @ 16 bpp => 1984 KB
+Feb 14 14:35:36 unknown Abductionary[5722] <Warning>: cocos2d: "fps_images.png" rc=2 id=1 256 x 32 @ 16 bpp => 128 KB
+Feb 14 14:35:36 unknown Abductionary[5722] <Warning>: cocos2d: "mainMenuBackground.pvr.ccz" rc=11 id=2 1792 x 1956 @ 16 bpp => 6272 KB
+Feb 14 14:35:36 unknown Abductionary[5722] <Warning>: cocos2d: CCTextureCache dumpDebugInfo: 6 textures, for 24544 KB (23.97 MB)
+
+and before I allowed free sizes:
+
+Feb 14 14:57:39 unknown Abductionary[139] <Warning>: cocos2d: "mainMenuScreen.pvr.ccz" rc=61 id=3 2048 x 1024 @ 16 bpp => 8192 KB
+Feb 14 14:57:39 unknown Abductionary[139] <Warning>: cocos2d: "Leaderboards.pvr.ccz" rc=32 id=4 2048 x 1024 @ 16 bpp => 8192 KB
+Feb 14 14:57:39 unknown Abductionary[139] <Warning>: cocos2d: "volumeKnobUpState.png" rc=3 id=6 512 x 512 @ 16 bpp => 512 KB
+Feb 14 14:57:39 unknown Abductionary[139] <Warning>: cocos2d: "AlienWalking.pvr.ccz" rc=61 id=5 1024 x 2048 @ 16 bpp => 2048 KB
+Feb 14 14:57:39 unknown Abductionary[139] <Warning>: cocos2d: "fps_images.png" rc=2 id=1 256 x 32 @ 16 bpp => 128 KB
+Feb 14 14:57:39 unknown Abductionary[139] <Warning>: cocos2d: "mainMenuBackground.pvr.ccz" rc=11 id=2 2048 x 2048 @ 16 bpp => 8192 KB
+Feb 14 14:57:39 unknown Abductionary[139] <Warning>: cocos2d: CCTextureCache dumpDebugInfo: 6 textures, for 27264 KB (26.62 MB)
+
+I'm not sure how to read this info but does the 16 bpp means they are 16bit?
+
+thanks!
+
+POSTED 10 MONTHS AGO #
+
+riq
+Key Master
+@rgaino:
+So, yes, they were converted Ok. The memory should be lower now.
+which tool are you using to measure the memory ? and how are you using it ?
+
+Please, make sure to test it on the device, and not on the simulator.
+
+POSTED 10 MONTHS AGO #
+
+rgaino
+Member
+I am testing on the device, iPad 1. I'm using Instruments, with the Activity Monitor template, and I'm looking at the pie chart Real Memory Usage.
+
+http://www.cocos2d-iphone.org/forum/topic/29121

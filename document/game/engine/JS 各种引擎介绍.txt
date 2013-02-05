@@ -1,0 +1,189 @@
+不同浏览器有不同的JS引擎：
+
+WebKit , Safari浏览器          ->SquirrelFish Extreme，
+
+Firefox                                    àTraceMonkey引擎
+
+Google Chrome                     àV8引擎，（C++）
+
+Opera                                   -> Carakan
+
+ Mozilla                          ->SpiderMonkey(C语言)
+
+ Mozilla                                  à Rhino( Java)
+
+Mozilla                          ->JaegerMonkey
+
+ 
+
+SEE (Simple ECMAScript Engine) C语言开发的轻量级的 ECMAScript (JavaScript) 解析器和实时运行环境
+
+ 
+
+ 
+
+ 
+
+(1)javascript 解析引擎 V8（C++）
+
+ http://www.oschina.net/p/v8
+
+ 
+
+V8 是 Google 发布的开源 JavaScript 引擎，采用 C++ 编写，在 Google 的 Chrome 浏览器中被使用。V8 引擎可以独立运行，也可以用来嵌入到 C++ 应用程序中执行。\
+
+ 
+
+ 
+
+ 
+
+(2)javascript 脚本引擎 SpiderMonkey (c语言)
+
+http://www.oschina.net/p/spidermonkey
+
+ 
+
+SpiderMonkey是Mozilla项目的一部分，是一个用C语言实现的JavaScript脚本引擎，另外还有一个叫做Rhino的Java版 本。
+
+为了在SpiderMonkey中运行JavaScript代码，应用程序必须有三个要素：JSRuntime，JSContext和全局对象。
+运行时环境
+
+JSRuntime，为其中的JavaScript变量、对象、脚本和应用程序中使用的上下文分配空间。每个JSContext和脚本中的每个对象都生活在一个 JSRuntime中。他们不能转移到其他运行时上或在与其它运行时共享。一般来说大多数应用程序只需要一个运行时环境。
+上下文
+
+JSContext，就像是一台小机器，它涉及JavaScript代码和对象的很多东西。它可以编译和执行脚本、获取和设置对象属性、调用 JavaScript函数、一种类型转换为另一种JavaScript数据、创建对象，等等。几乎所有JSAPI函数都要一个JSContext*作为其第一个参数，就像<stdio.h>中的大多数函数都需要FILE*一样.
+全局对象
+
+全局对象包含所有可以在JavaScript代码中使用的类、函数和变量。
+
+当JavaScript代码要做一些事时，比如window.open("http://www.mozilla.org/")，实际上它是在访问一个全局属性（全局对象的属性），在这里是window。
+
+脚本能看到的全局属性完全由应用程序控制。应用程序首先创建一个对象并加入JavaScript标准类，如Array和Object。然后加入任何程序想加入的自定义的类、函数和变量（象这里的window）。应用程序每次运行js脚本（例如使用JS_EvaluateScript）时提供了该脚本使用的全局对象。至于脚本，它也可以创建自己全局函数和变量。所有的这些函数、类和变量都作为属性存储在全局对象中。
+
+ 
+
+ 
+
+(3)JS 解析器 rhino(Java)
+
+ 
+
+http://www.oschina.net/p/rhino
+
+ 
+
+ 
+
+Rhino是用纯Java写成的JavaScript的开放源代码实现。它最常被用于嵌入Java应用程序，以便为终端用户提供脚本的能力。
+
+ 
+
+ 
+
+ 
+
+（4）JavaScript 解析引擎 Simple ECMAScript Engine(C语言)
+
+ 
+
+http://www.oschina.net/p/SEE
+
+ 
+
+ 
+
+SEE(Simple ECMAScript Engine) 是一个用C语言开发的轻量级的 ECMAScript (JavaScript) 解析器和实时运行环境。支持ECMAScript Edition 3, JavaScript 1.5 。
+
+ 
+
+ 
+
+ 
+
+(5) JavaScript引擎 SquirrelFish Extreme
+ 
+
+http://www.oschina.net/p/squirrelfish+extreme
+
+ 
+
+几周前 Google Chrome 发布之后，因其创新的 UI 以及出色的 JavaScript 执行效率而备受赞誉。最近，作为 Safari 与 Chrome 浏览器内核的 WebKit 发布了一个新 JavaScript 引擎，SquirrelFish Extreme，经过测试，该引擎的在执行速度上明显超过 Chrome 的 V8。下图是性能的比较
+
+ 
+
+(6) JavaScript引擎 Carakan
+http://www.oschina.net/p/carakan
+
+ 
+
+Opera全新JS引擎Carakan，目前数度是其他已存在JavaScript引擎（基于SunSpider）的2.5倍。其在转化为本地机器代码时专门针对正则表达式做了优化，有意思的是，Chrome浏览器也刚刚宣布了此点。
+
+Carakan引擎的三个显著新特性：
+
+1.基于寄存器的字节码：之前的引擎“ECMAScript”使用的是基于堆栈字节码指令集，这种基于对堆栈存取的方法对于生成字节码是比较简单的。
+
+在新的引擎里，我们采用了基于寄存器的字节码指令集，这种方式采用了固定大小的寄存器，每次操作都可以访问任意的寄存器，更少的指令被执行并且不会拷贝大量的数据。
+
+2.本地代码生成：我们将整个或部分“ECMAScript”引擎编译到本地代码中以达到更快的执行速度。
+
+3.自动对象分类：在新的引擎中每个对象都是被封装成类以存取不同的数据，这些类的划分是与原型保持一致的。
+
+每个浏览器的JS引擎都不一样吗？
+
+现在每个浏览器基本上都有自己的JS引擎（非浏览器引擎）了，如Firefox浏览器的TraceMonkey引擎，Google Chrome浏览器的V8引擎，Safari浏览器有SquirrelFish Extreme，目前又增加了Opera的Carakan。
+
+ 
+
+ 
+
+(7) 新一代JavaScript引擎 TraceMonkey
+http://www.oschina.net/p/tracemonkey
+
+ 
+
+TraceMonkey是套开放源代码、以C++语言所编写的新一代JavaScript引擎，于2008年8月23日正式发布。目前为Mozilla的Firefox网页浏览器3.5、3.6版本所使用。
+
+TraceMonkey采用了尔湾加州大学团队Andreas Gal、Michael Bebenita、Mason Chang和Gregor Wagner所贡献的“Tracing”技术，Andreas Gal目前为TraceMonkey的项目领导人、以及Mozilla和Adobe所合作的Tamarin计划所开发的“Nanojit”技术。
+
+ 
+
+ 
+
+(8) JavaScript引擎 JaegerMonkey
+http://www.oschina.net/p/jaegermonkey
+
+ 
+
+Mozilla预计将在9月1日发布JaegerMonkey引 擎，因此JaegerMonkey将被整合到Firefox 4.0。
+
+V8基准测试显示，JaegerMonkey引擎积分为6829 ms，TraceMonkey引擎积分为6841 ms。Sunspider测试显示，JaegerMonkey引擎仍然要落后于TraceMonkey引擎——754 ms vs. 718 ms，而且JaegerMonkey引擎运行速度仍然落后于Webkit浏览器，Chrome和Safari的积分都要低于400 ms，Chrome浏览器的积分甚至逼近300 ms。Opera的积分也低于300s。
+
+JaegerMonkey引擎在今年初发布是，其目标是突破Sunspider测试的500 ms大关。当然，这已经无法满足一般用户的需求了，毕竟连IE9开发版积分都已经低于500 ms。Mozilla还表示，JaegerMonkey引擎的目标是要超越竞争浏览器，这就意味着Mozilla的目标是300ms以下。
+
+Mozilla称，JaegerMonkey是重新编写的，过去8周的时间JaegerMonkey已经有很大的改进。在下面6周的时 间，Mozilla将完善JaegerMonkey引擎，为9月1日顺利发布做好充分地准备。
+
+Mozilla宣传，JaegerMonkey引擎的运行速度是竞争浏览器10多倍。
+
+ 
+
+ 
+
+(9) Web浏览器引擎 WebKit
+http://www.oschina.net/p/webkit
+
+ 
+
+WebKit是开源的Web浏览器引擎，苹果的Safari、谷歌的Chrome浏览器都是基于这个框架来开发的。WebKit 还支持移动设备和手机，包括iPhone和Android手机都是使用WebKit做为浏览器的核心。
+
+ 
+
+（10）WebKitGTK＋
+
+http://www.oschina.net/p/webkitgtk
+
+WebKitGTK＋是可移植渲染引擎WebKit在GTK+平台下的接口。
+
+
+
+http://www.cnblogs.com/gdutbean/archive/2012/02/21/2362003.html

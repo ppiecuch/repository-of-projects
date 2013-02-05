@@ -1,0 +1,77 @@
+Android的Logcat用于显示系统的调试信息，可在分别以下几个地方查看和调用logcat：
+
+1.eclipse的Debug模式或DDMS模式下的会有一个Logcat窗口，用于显示log日志
+
+只需在eclipse中启动Android模拟器，切换到DDMS或debug模式下，就会有Logcat窗口，窗口右上方有一系列图标，其中V、D、I、W、E五个图标为五个调试信息过滤器：
+V：不过滤输出所有调试信息 包括 VERBOSE、DEBUG、INFO、WARN、ERROR
+D：debug过滤器，输出DEBUG、INFO、WARN、ERROR调试信息
+I：info过滤器，输出INFO、WARN、ERROR调试信息
+W：waring过滤器，输出WARN和ERROR调试信息
+E：error过滤器，只输出ERROR调试信息
+
+2.Android命令模式下，在启动一个模拟器是可以选择是否需要启动logcat：
+
+Android Emulator命令的用法: emulator [options] [-qemu args]
+1.Android Emulator命令的用法: emulator [options] [-qemu args]
+启动模拟器命令：emulator -avd <name> -logcat <tags>;
+name：模拟器名字，tags调试信息过滤器类型
+例如：emulator -avd GPhone -logcat w
+启动GPhone模拟器并运行logcat显示调试信息，调试信息的过滤器是w（可替换为v、d、i、e），代表只显示waring和error两类调试信息。
+2.Android adb 命令：adb logcat [ <filter-spec> ] - View device log
+<filter-spec> == <priority>/<tag>,(pritrity标签，tag为过滤类型)
+例如：2.1、adb logcat 显示所有调试信息
+      2.2、adb logcat *:w 显示waring过滤器过滤后的调试信息
+      2.3、adb logcat Test1:V Test2:D 显示标签为Test1的所有调试信息，以及显示标签为Test2Debug过滤器过滤后的调试信息
+
+3.Android程序中访问调试日志，并显示：
+
+摘自：http://www.iteye.com/topic/477112
+logcat介绍命令选项。
+-s 默认设置过滤器
+-f      输出到日志文件
+-c 清除日志
+-d 获取日志
+-g 获取日志的大小
+-v      格式设置日志（见下面的格式打印格式）
+-v 格式 例
+brief W/tag ( 876): message
+process W( 876) message (tag)
+tag W/tag : message
+thread W( 876:0x37c) message
+raw message
+time 09-08 05:40:26.729 W/tag ( 876): message
+threadtime 09-08 05:40:26.729 876 892 W tag : message
+long [ 09-08 05:40:26.729 876:0x37c W/tag ] message
+代码例子：
+AndroidManifest.xml添加读取权限
+<uses-permission android:name="android.permission.READ_LOGS" /> 
+清除日志
+try {  
+    Runtime.getRuntime().exec("logcat -c");  
+} catch(Exception e) {  
+获取日志
+try {  
+    ArrayList<String> commandLine = new ArrayList<String>();  
+    commandLine.add( "logcat");  
+    commandLine.add( "-d");  
+    commandLine.add( "-v");  
+    commandLine.add( "time");  
+    commandLine.add( "-s");  
+    commandLine.add( "tag:W");  
+    Process process = Runtime.getRuntime().exec( commandLine.toArray( new String[commandLine.size()]));  
+    BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(process.getInputStream()), 1024);  
+    String line = bufferedReader.readLine();  
+    while ( line != null) {  
+        log.append(line);  
+        log.append("\n")  
+    }  
+   } catch ( IOException e) {  
+} 
+结果：
+09-08 09:44:42.267 W/tag     (  754): message1  
+09-08 09:44:42.709 W/tag     (  754): message2  
+09-08 09:44:43.187 W/tag     (  754): message3  
+09-08 09:44:45.295 E/tag     (  754): message8
+
+
+http://www.cnblogs.com/bigben0123/archive/2012/01/04.html

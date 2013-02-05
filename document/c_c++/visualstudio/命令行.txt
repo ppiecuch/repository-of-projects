@@ -1,7 +1,8 @@
 编译命令
 
-
+/MP 多核编译
 链接命令
 
 /verbose：查看链接器引用的文件。
 DUMPBIN 实用工具的 /EXPORT 和 /SYMBOLS 选项还可以帮助您查看 dll 和对象/库文件中定义的符号。 
+

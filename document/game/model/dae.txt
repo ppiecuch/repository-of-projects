@@ -42,6 +42,25 @@ JMi: Transformation matrix of joint i
 JW: Weight of the influence of joint i on vertex v
 
 
+Pivot Points
+
+Pivot points are a fundamental component of an animation system. In the realm of the PolyTrans animation system 'pivot points' define a local 3D coordinate system in space of an object about which the scale, rotation and translation animation function curves will be applied. The pivot point in PolyTrans is defined by a point in space and a local coordinate system defined by 3 orthogonal axes; the pivot point is defined relative to the local coordinate system of the mesh or geometry data.
+The following options specify how the PolyTrans pivot point information is exported to COLLADA:
+
+Embed Pivot in All Geometry Data
+
+The inverse pivot matrix (which defines the location and orientation of the pivot point) is multiplied into the raw mesh vertices. This is only done (and only necessary) when the parent null node is animated. This is the default option since it does not introduce any new anti-pivot nodes into the hierarchy tree.
+If it so happens that a PolyTrans null node (empty instance, empty folder) has animation on it as well as having a valid non-identity pivot matrix, then a child 'anti-pivot' node is added to the tree; the child node is assigned the inverse pivot matrix and the original parent transform node gets the animation data. This properly applies the anti-pivot effect to the subsequent children in the tree.
+
+Output All Anti-Pivot Transform Nodes
+
+A new "anti-pivot" COLLADA dummy node is introduced into the hierarchy tree, between the mesh object and the parent COLLADA Transform node which has animation on it. The inverse of the PolyTrans pivot point matrix is assigned to the transformation matrix of this new anti-pivot node. This new anti-pivot node acts to 'pivot-in' the geometry vertices prior to the animation data being applied to the geometry.
+Don't Output Pivot Points (Ignore All Pivot Point Data)
+
+This option prevents pivot point information from being output to the COLLADA file. Normally you would never want to enable this option.
+
+http://www.okino.com/conv/exp_collada_enables2_panel.htm
+
 If you see the structure of this <node> in COLLADA document you will see most of the nodes
  have <matrix> as the first child. And this <matrix> contains 16 float values, which makes
 the Joint Matrix of the bone. This is also called the local bone transformation matrix. 

@@ -1,0 +1,439 @@
+基于什么原因略！
+
+1. 脚本引擎的基本功能
+
+V8只是一个JS引擎。去除它的特点功能出处，它必须要实现JS引擎的几个基础功能：
+
+脚本执行：
+脚本可能是一个表达式；一段js代码；或者一个文件
+执行表达式返回js表达式对应的值
+C++来取设JS的内容
+获取JS内容的数据(包括基础数据类型、数组、日期等)、对象（类的一个实例）、类或函数
+设置JS内容的数据
+JS来取设C++的内容
+C++为js动态添加类（例如：Date，可以通过new Date()来创建任意多个对象）
+C++为js动态添加全局对象（例如：Math，可以直接调用其全局方法如Math.min）
+我们的目的是先学会怎么用，再去想为什么！
+
+2. V8 脚本引擎基本功能实现
+
+带着这几个目的去使用V8，找遍网上资料，发现很少有覆盖周全的。其实翻来覆去就是那几个资料，理论派居多；最可气的是按照那些例子去跑，怎么都会运行错误；而且在关键的地方全按照google伪代码例子照搬。不过理论派的阐述确实很一本正经；很精辟。也感谢先行者！
+
+2. 1 V8之脚本运行
+2.1.1 获取字符串：
+
+void test_String()
+{
+  Handle<String> source = String::New("'Hello' + ', World!'");
+  Handle<Script> script = Script::Compile(source);
+  Handle<Value> result = script->Run();
+
+  String::AsciiValue ascii(result);
+  printf("%s\n", *ascii);
+}
+>>> Hello，World!
+
+2.1.2 获取数组：
+
+void test_Array()
+{
+  Handle<String> source = String::New("[1, 2, 'hello', 6+5]");
+  Handle<Script> script = Script::Compile(source);
+  Handle<Value> result = script->Run();
+
+  String::AsciiValue ascii(result);
+  printf("%s\n", *ascii);
+}
+>>> 1,2,hello,11
+
+2. 2 V8之C++取设JS
+2.2.1 获取成员之数据
+
+void test_getjs_data(Handle<Context> pContext)
+{
+ Handle<String> source = String::New("var s1 = 8+5;");
+ Handle<Script> script = Script::Compile(source);
+ Handle<Value> result = script->Run();
+ Handle<String> js_data = String::New("s1");
+ Handle<Value> js_data_value = pContext->Global()->Get(js_data);
+
+ String::AsciiValue ascii(js_data_value);
+ printf("%s\n", *ascii);
+}
+>>> 13
+
+2.2.2 获取成员之全局对象
+
+void test_getjs_dataofObject(Handle<Context> pContext)
+{
+ Handle<String> source = String::New("function Point(x,y){this.x=x; this.y=y;} var pt=new Point(10,20);");
+ Handle<Script> script = Script::Compile(source);
+ Handle<Value> result = script->Run();
+
+ Handle<String> js_data = String::New("pt");
+ Handle<Value> js_data_value = pContext->Global()->Get(js_data);
+
+ // Convert the result to an ASCII string and print it.
+ {
+  String::AsciiValue ascii(js_data_value);
+  printf("pt = %s\n", *ascii);
+ }
+ Handle<Object> js_data_object = Handle<Object>::Cast(js_data_value);
+
+ Handle<Value> key = String::New("x");
+ Handle<Value> objX = js_data_object->Get(key);
+ {
+  String::AsciiValue ascii(objX);
+  printf("pt.x = %s\n", *ascii);
+ }
+}
+>>> pt = [object Object]
+    pt.x = 10
+
+2.2.3 获取js 类
+
+void test_getjs_dataofObjectClass(Handle<Context> pContext)
+{
+ Handle<String> source = String::New("function Point(x,y){this.x=x; this.y=y;} Point.prototype.show=function(){return '(x,y) = '+this.x+','+this.y;}");
+ Handle<Script> script = Script::Compile(source);
+ Handle<Value> result = script->Run();
+
+ Handle<String> js_data = String::New("Point");
+ Handle<Value> js_data_value = pContext->Global()->Get(js_data);
+
+ // Convert the result to an ASCII string and print it.
+ {
+  String::AsciiValue ascii(js_data_value);
+  printf("Point = %s\n", *ascii);
+ }
+
+ bool bIsFunction = js_data_value->IsFunction();
+ if(bIsFunction)
+ {
+  printf("Point is function\n");
+ }
+
+ bool bIsObject = js_data_value->IsObject();
+ if(bIsObject)
+ {
+  printf("Point is object\n");
+ }
+
+ Handle<Object> js_data_object = Handle<Object>::Cast(js_data_value);
+ // var newObj = new Point(1,2);
+ Handle<Value>  argv[2] ; 
+ argv[0] = Int32::New(1);
+ argv[1] = Int32::New(2);
+ Handle<Value> newObj = js_data_object->CallAsConstructor(2, argv);
+ {
+  bool bIsFunction = newObj->IsFunction();
+  if(bIsFunction) //-false-
+  {
+   printf("newObj is function\n");
+  }
+
+  bool bIsObject = newObj->IsObject();
+  if(bIsObject) //-true-
+  {
+   printf("newObj is object\n");
+  }
+ }
+
+ // newObj.show();
+ {
+  Handle<Object> obj = Handle<Object>::Cast(newObj);
+  Handle<String> js_func_name = String::New("show");
+  Handle<Value>  js_func_ref = obj->Get(js_func_name);
+
+  Handle<Function> js_func = Handle<Function>::Cast(js_func_ref);
+  js_data_value = js_func->Call(obj, 0, NULL) ; 
+
+  String::AsciiValue ascii(js_data_value);
+  printf("newObj.show() = %s\n", *ascii);
+ }
+}
+>>> Point = function Point(x,y){this.x=x; this.y=y;}
+Point is function
+Point is object
+newObj is object
+newObj.show() = (x,y) = 1,2
+
+2. 3 V8之JS取设C++
+2.3.0 js 和 C++的关联
+
+c++ 和 js对应。特别是为达到能在Js中使用var obj = new CObject()，参照CreateObjectToJs方法
+
+void test_getc_loadObjectTemplate(Handle<ObjectTemplate> pObj)
+{
+ //-load c++'s data-
+ pObj->SetAccessor(String::New("x"), XGetter, XSetter);
+ 
+ //-load c++'s function-
+ pObj->Set(String::New("setColor"),FunctionTemplate::New(set_color));
+
+ //-load c++'s class-
+ CreateObjectToJs(pObj);
+}
+
+
+Point* NewPointFunction(const Arguments & args)
+ {
+  if(args.Length()==2)
+  {
+   Local<Value> v1 = args[0];
+   Local<Value> v2 = args[1];
+
+   return new Point( v1->Int32Value(), v2->Int32Value() );
+  }
+  else
+  return new Point();
+ }
+
+void PointWeakExternalReferenceCallback(Persistent<Value>, void* parameter)
+{
+ if (Point* cpp_object = static_cast<Point*>(parameter))
+  delete cpp_object;
+}
+
+Persistent<External> NewWeakExternalPoint(void* parameter)
+{
+ Persistent<External> ret = Persistent<External>::New(External::New(parameter));
+ ret.MakeWeak(parameter, PointWeakExternalReferenceCallback);
+ return ret;
+}
+
+Handle<Value> PointFunctionInvocationCallback(const Arguments &args)
+ {
+ if (!args.IsConstructCall())
+ return Undefined();
+
+ Point* cpp_object = NewPointFunction(args);
+ if (!cpp_object)
+ return ThrowException(String::New("Can not create Object in C++"));
+
+ args.Holder()->SetInternalField(0, NewWeakExternalPoint(cpp_object));
+ return Undefined();
+ }
+
+
+void CreateObjectToJs(Handle<ObjectTemplate> pObj)
+{ 
+ Point* p = new Point(0, 0);
+ Handle<FunctionTemplate> point_templ = FunctionTemplate::New(&PointFunctionInvocationCallback, External::New(p));
+ point_templ->SetClassName(String::New("Point"));
+ point_templ->InstanceTemplate()->SetInternalFieldCount(1);
+
+ Handle<ObjectTemplate> point_proto = point_templ->PrototypeTemplate();
+ point_proto->SetAccessor(String::New("x"), GetPointX, SetPointX);
+ point_proto->SetAccessor(String::New("y"), GetPointY, SetPointY);
+ point_proto->Set(String::New("show"), FunctionTemplate::New(ShowPoint));
+
+ pObj->Set(String::New("Point"), point_templ);
+}
+
+2.3.1 全局函数
+
+c++: 
+Handle<Value> set_color(const Arguments & args) 
+{
+  Handle<Value>  rtn;
+  if(args.Length() == 3) 
+  {
+ int r = args[0]->Int32Value();
+ int g = args[1]->Int32Value();
+ int b = args[2]->Int32Value();  
+
+ char szTmp[80] = "";
+ _stprintf(szTmp,"RGB%2X%02X%02X", r,g,b);
+ rtn = String::New(szTmp);
+  }
+  else
+   rtn = Undefined();
+  
+  return  rtn;
+}
+
+js:
+void test_getc_function(Handle<Context> pContext, Handle<ObjectTemplate> pObj)
+{
+ Handle<String> source = String::New("var data = setColor(255,128,0);");
+ Handle<Script> script = Script::Compile(source);
+   Handle<Value> result = script->Run();
+
+ Handle<String> js_data = String::New("data");
+ Handle<Value> js_data_value = pContext->Global()->Get(js_data);
+
+ // Convert the result to an ASCII string and print it.
+ String::AsciiValue ascii(js_data_value);
+ printf("%s\n", *ascii);
+}
+>>> RGBFF8000
+
+2.3.2 全局数据
+
+c++:
+
+int x = 0;
+Handle<Value> XGetter(Local<String> key,const AccessorInfo& info) 
+{
+    return Integer::New(x);
+}
+
+ void XSetter(Local<String> key, Local<Value> value,const AccessorInfo& info) 
+{
+    x = value->Int32Value();
+}
+
+js:
+
+void test_getc_data(Handle<Context> pContext, Handle<ObjectTemplate> pObj)
+{
+ Handle<String> source = String::New("var data1 = x; x=200; var data2=x;");
+ Handle<Script> script = Script::Compile(source);
+ Handle<Value> result = script->Run();
+
+ {
+  Handle<String> js_data = String::New("data1");
+  Handle<Value> js_data_value = pContext->Global()->Get(js_data);
+  String::AsciiValue ascii(js_data_value);
+  printf("data1 = %s\n", *ascii); 
+ }
+
+ {
+  Handle<String> js_data = String::New("data2");
+  Handle<Value> js_data_value = pContext->Global()->Get(js_data);
+  String::AsciiValue ascii(js_data_value);
+  printf("data2 = %s\n", *ascii); 
+ }
+}
+>>> data1 = 0
+data2 = 200
+
+2.3.3 类
+
+c++
+
+struct Point
+ {
+    Point() 
+ {
+  x_ = 0;
+  y_ = 0;
+ }
+    Point(int x, int y) 
+ {
+  x_ = x;
+  y_ = y;
+ }
+ 
+    int getX() const { 
+  return x_; 
+ }
+    int getY() const { return y_; }
+    void setX(int value) { x_ = value; }
+    void setY(int value) { y_ = value; }
+    bool isNull() const { return x_ == 0 && y_ == 0; }
+ void show()
+ {
+  char szTmp[80] = "";
+  _stprintf(szTmp, "x,y = %d,%d\n", x_, y_);
+  printf(szTmp);
+ }
+    int x_, y_;
+ };
+
+
+Handle<Value> GetPointX(Local<String> key,const AccessorInfo &info) 
+{
+   Handle<Object> obj = info.This ();
+    //Local<Object> self = info.Holder(); //使用此种方法会死!!!-
+    Point& point = *static_cast<Point*> (Local<External>::Cast(obj->GetInternalField(0))->Value ()); 
+ int value = point.x_;
+    return Integer::New(value);
+}
+
+void SetPointX(Local<String> key, Local<Value> value,const AccessorInfo& info) 
+{
+ Handle<Object> obj = info.This ();
+ Point& point = *static_cast<Point*> (Local<External>::Cast(obj->GetInternalField(0))->Value ()); 
+ point.x_ = value->Int32Value();
+}
+
+Handle<Value> GetPointY(Local<String> key,const AccessorInfo &info) 
+{
+    Local<Object> self = info.Holder();
+    Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+    void* ptr = wrap->Value();
+    int value = static_cast<Point*>(ptr)->y_;
+    return Integer::New(value);
+}
+
+void SetPointY(Local<String> key, Local<Value> value,const AccessorInfo& info) 
+{
+ Local<Object> self = info.Holder();
+ Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+ void* ptr = wrap->Value();
+ static_cast<Point*>(ptr)->y_ = value->Int32Value();
+}
+
+Handle<Value> ShowPoint(const Arguments& args)
+{
+ Local<Object> self = args.Holder();
+ //Local<Object> self = info.Holder();
+ Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
+ void* ptr = wrap->Value();
+ static_cast<Point*>(ptr)->show();
+
+    return Undefined();
+}
+
+js
+
+void test_getc_object(Handle<Context> pContext, Handle<ObjectTemplate> pObj)
+{
+ test_getobject(pContext);return;
+
+ // Create a string containing the JavaScript source code.
+ Handle<String> source = String::New("var pt=new Point(10,20);");
+
+ // Compile the source code.
+ Handle<Script> script = Script::Compile(source);
+  
+ // Run the script to get the result.
+ Handle<Value> result = script->Run();
+
+ Handle<String> js_data = String::New("pt");
+ Handle<Value> js_data_value = pContext->Global()->Get(js_data);
+
+ // Convert the result to an ASCII string and print it.
+ {
+  String::AsciiValue ascii(js_data_value);
+  printf("pt = %s\n", *ascii);
+ }
+
+ Handle<Object> js_data_object = Handle<Object>::Cast(js_data_value);
+
+ Handle<Value> key = String::New("x");
+ Handle<Value> objX = js_data_object->Get(key);
+ {
+  String::AsciiValue ascii(objX);
+  printf("pt.x = %s\n", *ascii);
+ }
+}
+>>> Point = function Point() { [native code] }
+Point is function
+Point is object
+newObj is object
+src obj.x = 3
+last obj.x = 30
+begin newObj.show() : x,y = 30,4
+newObj.show() = undefined
+
+3. 教训
+
+在VS200X C++中，请都使用/MDD 编译选项
+对于类，需要绑定一个构造函数，主要目的是用来生成C++对象。该对象千万不要使用局部变量，而要是指针
+对于C++扩展的类，通过FunctionTemplate来实现；而不要使用ObjectTemplate
+对于JS中的全局对象，可以通过ObjectTemplate来实现。实际上就是绑定全局API和变量
+
+http://iammr.7.blog.163.com/blog/static/49102699201201565822189/
