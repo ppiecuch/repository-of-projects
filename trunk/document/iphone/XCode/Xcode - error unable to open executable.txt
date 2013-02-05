@@ -1,0 +1,7 @@
+Product>Clean and Product>Clean Build Folder (hold down option for it to appear). 
+Quit Xcode and reopen and all should be well. If not, go into the Organizer, choose Projects,
+ find Test and delete its DerivedData folder (IMPORTANT: NOT SNAPSHOTS).
+ 
+ 试验不行
+ 
+ 解决方法：重建项目

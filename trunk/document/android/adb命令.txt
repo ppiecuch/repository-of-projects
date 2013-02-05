@@ -1,11 +1,31 @@
 adb shell pm setInstallLocation 2  设置apk安装在SK中 
 android list targets:   这条命令是列出我们所有的SDK可用版本
 adb devices:  这条命令是列出所有装载的设置
+adb -s <serialNumber> <command> 对某一设备执行命令：
+adb install -r 应用程序.apk
 adb shell mkdir yourfolder 建立目录
+adb shell rm -r <dir> 删除目录及其内容
+adb logcat -s 标签名 在命令行中查看LOG信息
 adb -d shell cat /sdcard/log.txt 查看TXT文件
 adb push luan.jpg /sdcard/sdcard
 adb pull /sdcard/001.jpg .              (下载 /sdcard 目录下的文件)
 adb shell "dumpsys meminfo %curProcessName%"命令得到某个进程的内存使用情况。  
-
-arm-linux-androideabi-addr2line -C -f -e obj/local/armeabi/libnativemaprender.so 0003deb4
+arm-eabi-objdump -S libc.so |less
+arm-eabi-objdump -S -C libsysutils.so |less
+获取设备的ID和序列号： 
+adb get-product 
+adb get-serialno
+arm-linux-androideabi-addr2line -C -f -e obj/local/armeabi/libsyjt.so 0003deb4
 The -C flag is to demangle C++ code
+经常要通过内存的使用量来优化程序。查看应用程序的命令：adb shell procrank
+注：
+VSS - Virtual Set Size 虚拟耗用内存（包含共享库占用的内存）
+RSS - Resident Set Size 实际使用物理内存（包含共享库占用的内存）
+PSS - Proportional Set Size 实际使用的物理内存（比例分配共享库占用的内存）
+USS - Unique Set Size 进程独自占用的物理内存（不包含共享库占用的内存）
+查看单个应用程序内存占用量的命令：
+adb shell dumpsys meminfo $包名 或者 $进程号 //当然你也可以adb shell进去后在输入余下部分。
+其中size是需要的内存，而allocated是分配了的内存，对应的2列分别是native和dalvik，当总数也就是total这一列超过单个程序内存的最大限制时，OOM就很有可能会出现了
+
+adb shell dumpsys wifi
+adb shell dumpsys cpuinfo

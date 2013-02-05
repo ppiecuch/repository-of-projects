@@ -1,0 +1,41 @@
+最近一段时间在学习骨骼动画方面的知识，今天在ljw师兄的帮助下，终于有所成绩，现在将我在骨骼动画中遇到的问题和总结的些许经验，记录下来，跟大家分享一下！
+    我是通过读取.cfg配置文件，获取骨骼动画，并将其绘制在场景中的。在绘制过程中，遇到的首要问题是，opengl中的gltranslate()和 glrotate()这两个函数的顺序不能颠倒。虽然之前在看书时，书中就有指出变换过程中这2个函数顺序的不同，会导致不同的结果，但是，实践出真知，终于明白，一个小小的顺序问题，导致骨骼文件在整个坐标系的位置差距，可是非常之大呢！
+    第二个问题是，我一直是在debug下面做的程序，做完之后，把原来的.lib文件直接拷贝到release下，可是就是无法生成可执行文件。一直搞不懂原因何在。后来才知道，debug和release下要分别编译，将编译得到的.lib，要在工程属性的配置时，用链接器进行不同的链接。同时，.dll文件也要放在不同的的目录文件下。
+    第三，骨骼文件的路径要在纯英文、数字、下划线等的路径下。千万不能包含汉字。否则无法正确读取。同时，导出路径也不能含有汉字。
+    第四，骨骼文件通过计时器控制，计时器的OnTimer（）事件后要记得刷新，否则无法驱动骨骼动起来。嘿嘿！
+    第五，3dmax文件转换为cal3d可用的.cfg文件的方法是下个你的3dmax_sdk，在vs编译时，选用Release方式，将编出的插件cal3d_max_exporter.dle文件放在3dmax的安装目录下的plugins文件中（即Autodesk\3ds Max 9\plugins）。同时要把release下的cal3d.dll一起放到安装目录下（与plugins文件夹所在的同一个文件中），就可以在打开3ds max9时使用插件了~
+   友情链接：max9.0_sdk下载地址：http://download.csdn.net/source/3150114
+第六，3dmax文件导出.cfg，形成骨骼文件的步骤是：
+导出骨骼
+a. 选择骨骼根节点bip01
+b. 打开Figure Mode
+c. File->Export Cal3D Skeleton
+d. 选择所有骨骼，通常默认即可
+导出材质
+a. 所有纹理必须使用tga格式
+b. 选择骨骼根节点bip01
+c. 打开Figure Mode
+d. 打开材质球，将所有材质必须命名为material[0], material[1]这样的名称
+e. File->Export->Cal3d Materials
+f. 选择导出的材质（每一种材质分别需要导出一次）
+导出模型
+a. 打开Figure Mode
+b. 选择需要被导出的模型
+c. File->Export Cal3d Mesh
+导出动作
+a. 关闭Figure Mode
+b. File->Export Cal3D Animation
+c. 选择之前导出的谷歌文件
+d. 选择骨骼，默认即可
+e. 选择导出动作的起始结束帧号，帧速和displacement(不知道有什么用？)
+创建xxx.cfg文件,格式如下：
+  scale=1.0
+  skeleton=skeleton.csf
+  animation=walk.caf
+  mesh=worker.cmf
+  material=mat1.xrf
+注意：在写.cfg文件时，在.xrf文件后要多加个回车，否则，很可能程序中无法读到.tga文件。
+ 
+    再次感谢ljw师兄的帮助，谢谢啦！嘿嘿！~ ~ ~ ~ ~
+    
+http://blog.sina.com.cn/s/blog_69bb21d70100ph4a.html

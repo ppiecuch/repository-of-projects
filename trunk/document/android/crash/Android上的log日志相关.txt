@@ -1,0 +1,44 @@
+摘自：http://blog.csdn.net/metalwood/article/details/5697785
+Android上的bug定位（troubleshooting）
+    如果是用户程序Exception或者Dalvik Error Invoking Runtime都会通过AcitivityMangerService发出SIGQUIT信号给process，再调用SignalCatcher.c再把crashed process信息放在/data/anr/traces.txt里面。
+    如果是SYSTEM process????或者通过Log.e(TAG,str,trowable）会直接报告exception到logcat里面。
+    如果是Dalvik Error, Invoking debuggerd/C code/LibC Error, 会调用Tombstone，然后把信息打印到/data/tombstones目录里面。
+    如果是kernel错误，会直接放到/proc/last_kmsg文件（下次重启后会有）
+    如果是Modem错误，会直接有/proc/last_amass文件出现（高通平台）”
+
+
+
+
+
+
+很多人经常搞不清楚各种日志文件的作用，什么时候抓这些文件，其实如果你分不清楚的话最好一起抓了，至少你要分清楚有哪些日志文件需要抓。
+
+    log文件分为实时打印的，还有状态信息的两种
+
+    实时打印的主要有：logcat main，logcat radio，logcat events，tcpdump，还有高通平台的还会有QXDM日志
+
+    状态信息的有：adb shell dmesg，adb shell dumpstate，adb shell dumpsys，adb bugreport
+
+
+
+    讲解一下各自作用：
+
+    通过DDMS抓的其实跟用dos批处理抓的一样都是logcat的日志文件，ddms抓的通常是main缓存中的，就是应用程序打印的日志文件。不过 ddms好处在于能够实时看到带有颜色的，如果是用dos批处理只能重定向到文件，到抓完之后才能够看到，不是实时的。
+
+    adb logcat -b main -v time>app.log  打印应用程序的log
+
+    adb logcat -b radio -v time> radio.log 打印射频相关的log，SIM STK也会在里面，modem相关的ATcommand等，当然跟QXDM差的很远了。
+
+    adb logcat -b events -v time  打印系统事件的日志，比如触屏事件。。。
+
+    tcpdump 是很有用的，对于TCP/IP协议相关的都可以使用这个来抓，adb shell tcpdump -s 10000 -w /sdcard/capture.pcap，比如抓mms下载的时候的UA profile，browser上网的时候，使用proxy的APN下载，streaming的相关内容包括UA profile等。
+
+    最后是高通平台的QXDM，不管是不是Android，只要使用高通芯片，都会对它很熟悉，当然了，不是高通的芯片就不用提它了。这个不多讲，内容丰富，射频，电话，上网，...凡是高通提供的解决方案，这个都可以抓。
+
+
+
+    状态信息：其实一个就够了，那就是bugreport（命令adb bugreport>bugreport.log)。里面包含有dmesg，dumpstate和dumpsys。dmesg（命令adb shell dmesg > ldmesg_kernel.log）是kernel的log，凡是跟kernel相关的，比如driver出了问题（相机，蓝牙，usb，启动，等等吧）。 dumpstate是系统状态信息，里面比较全，包括手机当前的内存信息、cpu信息、logcat缓存，kernel缓存等等。adb shell dumpsys这个是关于系统service的内容都在这个里面，这个命令还有更详尽的用法，比如db shell dumpsys meminfo system是查看system这个process的内存信息。
+
+还有其他的比如PV的log，一般都是开发人员自己写的，可能让你放到sd卡里面，其他的不足或需要补充的期望您的指导。 
+
+http://wangx04.iteye.com/blog/1290238

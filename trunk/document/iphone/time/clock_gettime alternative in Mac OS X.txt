@@ -1,0 +1,285 @@
+When compiling a program I wrote on Mac OS X after installing the necessary libraries through MacPorts, I get this error:
+
+In function 'nanotime':
+error: 'CLOCK_REALTIME' undeclared (first use in this function)
+error: (Each undeclared identifier is reported only once
+error: for each function it appears in.)It appears that clock_gettime is not implemented in Mac OS X. Is there an alternative means of getting the epoch time in nanoseconds? Unfortunately gettimeofday is in microseconds.
+
+c osx time 
+share|improve this question edited Aug 25 at 9:15 
+
+ asked Mar 2 '11 at 12:12 
+Delan Azabani
+21.5k22873 
+
+100% accept rate 
+ 
+  My documentation says "All implementations support the system-wide real-time clock, which is identified by CLOCK_REALTIME." Did you #include <time.h>? 每 pmg Mar 2 '11 at 12:18 
+ Yes, I have included time.h. Also, man gettimeofday works on OSX, while man clock_gettime does not. 每 Delan Azabani Mar 2 '11 at 12:18 
+ Also try cc -g `pkg-config --cflags libcurl glib-2.0 libpcre libconfuse` -D_POSIX_C_SOURCE=199309L -c getbooru-util.c 每 pmg Mar 2 '11 at 12:21 
+ That didn't help. clock_gettime is not implemented in Mac OS X. 每 Delan Azabani Mar 2 '11 at 12:23 
+1     
+ On my system (Debian), to link I need the librt library. 每 pmg Mar 2 '11 at 12:23 
+show 1 more comment 
+feedback  
+7 Answers active oldest votes  up vote 
+3
+ down vote accepted  In effect, it seems not to be implemented for MacOs. You may want to look at this blog entry, but this doesn't seem to be available anymore. The main idea is in the following code snippet:
+
+#include <mach/mach_time.h>
+#define ORWL_NANO (+1.0E-9)
+#define ORWL_GIGA UINT64_C(1000000000)
+
+static double orwl_timebase = 0.0;
+static uint64_t orwl_timestart = 0;
+
+struct timespec orwl_gettime(void) {
+  // be more careful in a multithreaded environement
+  if (!orwl_timestart) {
+    mach_timebase_info_data_t tb = { 0 };
+    mach_timebase_info(&tb);
+    orwl_timebase = tb.numer;
+    orwl_timebase /= tb.denom;
+    orwl_timestart = mach_absolute_time();
+  }
+  struct timespec t;
+  double diff = (mach_absolute_time() - orwl_timestart) * orwl_timebase;
+  t.tv_sec = diff * ORWL_NANO;
+  t.tv_nsec = diff - (t.tv_sec * ORWL_GIGA);
+  return t;
+}share|improve this answer edited Aug 9 at 14:09 
+
+ answered Mar 2 '11 at 12:33 
+Jens Gustedt
+25.7k21744  
+ 
+  I don't want monotonic time though, I want the real time since the epoch, in nanoseconds. 每 Delan Azabani Mar 2 '11 at 12:35 
+ Apparently MySQL (hmm Oracle) is trying to implement nanoseconds in Mac OS X ( @ bugs.mysql.com/bug.php?id=44000 ) 每 pmg Mar 2 '11 at 12:42 
+ @Delan, I don't see why you would want that, this is useless precission for something counting in the order of magnitude of years. Ususally you need nanoseconds to time a function or so. Then it is sufficient to take the time before and after as it is done in that blog. But you could always simulate that by taking gettimeofday and mach_absolute_time at the beginning of your program and then add things up. 每 Jens Gustedt Mar 2 '11 at 12:58 
+1     
+ Never mix up monotonic and real time. Real time may jump as a NTP daemon corrects the system clock. They are two completely different things, really. 每 mic_e May 3 at 18:08 
+ "blog entry" is now broken :( 每 P Marecki Jul 12 at 15:07 
+show 2 more comments 
+feedback  
+
+No problem. We won't show you that ad again. Why didn't you like it?Uninteresting
+Misleading
+Offensive
+Repetitive
+Oops! I didn't mean to do this. up vote 
+18
+ down vote  After hours of perusing different answers, blogs, and headers, I found a portable way to get the current time:
+
+#include <time.h>
+#include <sys/time.h>
+
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
+
+
+struct timespec ts;
+
+#ifdef __MACH__ // OS X does not have clock_gettime, use clock_get_time
+clock_serv_t cclock;
+mach_timespec_t mts;
+host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+clock_get_time(cclock, &mts);
+mach_port_deallocate(mach_task_self(), cclock);
+ts.tv_sec = mts.tv_sec;
+ts.tv_nsec = mts.tv_nsec;
+
+#else
+clock_gettime(CLOCK_REALTIME, &ts);
+#endifor check out this gist: https://gist.github.com/1087739
+
+Hope this saves someone time. Cheers!
+share|improve this answer edited Feb 1 at 19:12 
+
+ answered Jul 17 '11 at 16:21 
+jbenet
+880315  
+ 
+  is host_get_clock_service expensive? would it pay to cache it for the process ? is it reusable ? thread safe ? Thanks - :) 每 peterk Oct 15 '11 at 1:56 
+ also need includes: #ifdef __MACH__ #include <mach/clock.h> #include <mach/mach.h> #endif 每 Nikolay Vyahhi Jan 31 at 22:24 
+1     
+ @NikolayVyahhi Yes! I have them in the gist. Though since you didn't find them, perhaps it's best to add them to the answer. 每 jbenet Feb 1 at 19:09 
+ Has anybody perhaps timed the above __MACH__ code? Using an independent microsecond-timer (well-tested) I get the impression, that two invocations of the above code cost ~25microseconds. 每 P Marecki Jul 12 at 14:14 
+
+feedback  
+ up vote 
+6
+ down vote  Everything you need is described in Technical Q&A QA1398: Technical Q&A QA1398: Mach Absolute Time Units, basically the function you want is mach_absolute_time.
+
+Here's a slightly earlier version of the sample code from that page that does everything using Mach calls (the current version uses AbsoluteToNanoseconds from CoreServices). In current OS X (i.e., on Snow Leopard on x86_64) the absolute time values are actually in nanoseconds and so don't actually require any conversion at all. So, if you're good and writing portable code, you'll convert, but if you're just doing something quick and dirty for yourself, you needn't bother.
+
+FWIW, mach_absolute_time is really fast.
+
+uint64_t GetPIDTimeInNanoseconds(void)
+{
+    uint64_t        start;
+    uint64_t        end;
+    uint64_t        elapsed;
+    uint64_t        elapsedNano;
+    static mach_timebase_info_data_t    sTimebaseInfo;
+
+    // Start the clock.
+
+    start = mach_absolute_time();
+
+    // Call getpid. This will produce inaccurate results because 
+    // we're only making a single system call. For more accurate 
+    // results you should call getpid multiple times and average 
+    // the results.
+
+    (void) getpid();
+
+    // Stop the clock.
+
+    end = mach_absolute_time();
+
+    // Calculate the duration.
+
+    elapsed = end - start;
+
+    // Convert to nanoseconds.
+
+    // If this is the first time we've run, get the timebase.
+    // We can use denom == 0 to indicate that sTimebaseInfo is 
+    // uninitialised because it makes no sense to have a zero 
+    // denominator is a fraction.
+
+    if ( sTimebaseInfo.denom == 0 ) {
+        (void) mach_timebase_info(&sTimebaseInfo);
+    }
+
+    // Do the maths. We hope that the multiplication doesn't 
+    // overflow; the price you pay for working in fixed point.
+
+    elapsedNano = elapsed * sTimebaseInfo.numer / sTimebaseInfo.denom;
+
+    printf("multiplier %u / %u\n", sTimebaseInfo.numer, sTimebaseInfo.denom);
+    return elapsedNano;
+}share|improve this answer answered Jul 16 '11 at 17:57 
+Maristic
+25625  
+ 
+   
+
+feedback  
+ up vote 
+4
+ down vote  #ifdef __MACH__
+#include <sys/time.h>
+//clock_gettime is not implemented on OSX
+int clock_gettime(int /*clk_id*/, struct timespec* t) {
+    struct timeval now;
+    int rv = gettimeofday(&now, NULL);
+    if (rv) return rv;
+    t->tv_sec  = now.tv_sec;
+    t->tv_nsec = now.tv_usec * 1000;
+    return 0;
+}
+#endifshare|improve this answer answered Mar 20 at 4:16 
+Dmitri Bouianov
+1064  
+ 
+   
+
+feedback  
+ up vote 
+2
+ down vote  I tried the version with clock_get_time, and did cache the host_get_clock_service call. It's way slower than gettimeofday, it takes several microseconds per invocation. And, what's worse, the return value has steps of 1000, i.e. it's still microsecond granularity.
+
+I'd advice to use gettimeofday, and multiply tv_usec by 1000.
+share|improve this answer answered Dec 2 '11 at 21:58 
+Bernd Paysan
+211  
+ 
+   
+
+feedback  
+ up vote 
+0
+ down vote  Looks like your program is written using C.
+
+If you want to know time and date use #include librery.
+
+string nombre;
+time_t fecha;
+struct tm *temp;
+struct tm fecha_tm;
+
+/* obtener fecha (time_t) */
+/* obtener fecha (time_t) */
+if ((fecha = time(NULL)) == (time_t) -1)
+    exit;
+
+/* obtener fecha (struct tm) */
+temp = localtime(&fecha);
+memcpy(&fecha_tm, temp, sizeof fecha_tm);
+
+nombre+=itos(fecha_tm.tm_mday);
+nombre+=itos(fecha_tm.tm_mon+1);
+nombre+=itos(fecha_tm.tm_year + 1900);
+nombre+=".lg";
+
+return  nombre;}
+
+// Saber la hora para escribir en cada mensaje string dar_hora() { string hora; time_t fecha; struct tm *temp; struct tm fecha_tm;
+
+/* obtener fecha (time_t) */
+/* obtener fecha (time_t) */
+if ((fecha = time(NULL)) == (time_t) -1)
+    exit;
+
+/* obtener fecha (struct tm) */
+temp = localtime(&fecha);
+memcpy(&fecha_tm, temp, sizeof fecha_tm);
+
+hora+=itos(fecha_tm.tm_hour);
+hora+=":";
+hora+=itos(fecha_tm.tm_min);
+hora+=":";
+hora+=itos(fecha_tm.tm_sec);
+hora+=" --> ";That's an example to use it.
+share|improve this answer answered Mar 2 '11 at 12:18 
+Jorge Vega S芍nchez
+700320  
+ 
+  I have included time.h. Also, your solution provides second precision; I want nanosecond precision. 每 Delan Azabani Mar 2 '11 at 12:19 
+ Look this link [link] (stackoverflow.com/questions/275004/＃) 每 Jorge Vega S芍nchez Mar 2 '11 at 12:28 
+1     
+ That answer suggests clock_gettime, which is not implemented on Mac OS X. 每 Delan Azabani Mar 2 '11 at 12:31 
+ I have't found any solution for this problem. Sorry. 每 Jorge Vega S芍nchez Mar 2 '11 at 13:34 
+
+feedback  
+ up vote 
+0
+ down vote  Maristic has the best answer here to date. Let me simplify and add a remark. #include and Init():
+
+#include <mach/mach_time.h>
+
+double conversion_factor;
+
+void Init() {
+  mach_timebase_info_data_t timebase;
+  mach_timebase_info(&timebase);
+  conversion_factor = (double)timebase.numer / (double)timebase.denom;
+}Use as:
+
+  uint64_t t1, t2;
+
+  Init();
+
+  t1 = mach_absolute_time();
+  /* profiled code here */
+  t2 = mach_absolute_time();
+
+  double duration_ns = (double)(t2 - t1) * conversion_factor;  Such timer has latency of 65ns +/- 2ns (2GHz CPU). Use this if you need "time evolution" of single execution. Otherwise loop your code 10000 times and profile even with gettimeofday(), which is portable (POSIX), and has the latency of 100ns +/- 0.5ns (though only 1us granularity). 
+ 
+
+ 
+ http://stackoverflow.com/questions/5167269/clock-gettime-alternative-in-mac-os-x

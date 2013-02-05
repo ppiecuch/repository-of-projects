@@ -1,0 +1,2 @@
+reduced instruction set computer
+　　RISC指令集是以后高性能CPU的发展方向。它与传统的CISC(复杂指令集)相对。相比而言，RISC的指令格式统一，种类比较少，寻址方式也比复杂指令集少。目前使用RISC指令集的体系结构主要有英国ARM公司开发的ARM、美国MIPS公司开发的MIPS以及美国IBM公司的PowerPC，其中ARM主要应用于移动微处理器（手机、平板电脑）以及嵌入控制、消费/教育类多媒体、DSP和移动式应用；MIPS在通用方面，MIPS R系列微处理器用于构建SGI的高性能工作站、服务器和超级计算机系统。在嵌入式方面，MIPS K系列微处理器是目前仅次于ARM的用得最多的处理器之一（1999年以前MIPS是世界上用得最多的处理器），其应用领域覆盖游戏机（SONY的Playstation 1、PSP）、路由器、激光打印机、掌上电脑等各个方面；PowerPC 处理器有广泛的实现范围，包括从诸如 Power4 那样的高端服务器CPU 到嵌入式CPU 市场（ 任天堂 Gamecube 使用了 PowerPC）。PowerPC 处理器有非常强的嵌入式表现，因为它具有优异的性能、较低的能量损耗以及较低的散热量。

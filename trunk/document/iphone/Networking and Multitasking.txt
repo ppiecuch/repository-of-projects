@@ -1,0 +1,201 @@
+Networking and Multitasking
+Multitasking was a key feature of iOS 4. Multitasking allows your app to be put into the background and, from there, suspended. This is great for system responsiveness, but can seriously affect your app's ability to work with the network. This technote explains how best to handle multitasking in a network application.
+
+You should read this technote if you're developing an iOS app that uses the network.
+
+Introduction 
+The Basics 
+Listening Socket 
+Data Socket 
+Higher-Level APIs 
+Implementation Details 
+Beware of the Dog! 
+Concurrency 
+Run Loops 
+Testing Socket Reclaim 
+Beyond The Basics 
+Background Tasks 
+Resumable Transfers 
+Multitasking Superpowers 
+Background Execution 
+VoIP Sockets 
+Document Revision History 
+Introduction
+Multitasking, introduced with iOS 4, adds a new level of complexity for network apps. When iOS puts your app into the background, it may shortly thereafter suspend the app. When the app is suspended, no code within the app's process executes. This makes it impossible for the app to handle incoming network data. Furthermore, while the app is suspended the system may choose to reclaim resources out from underneath a network socket used by the app, thereby closing the network connection represented by that socket.
+
+While iOS 4 was carefully constructed to minimize the amount of work needed to make a network app compatible with multitasking, it is still necessary to do some work to maintain basic functionality in your app. Moreover, by going beyond the basics you can significantly improve the network behavior of your app in the presence of multitasking.
+
+This document starts by explaining the basic steps needed to make a network app compatible with multitasking (The Basics), then describes some fiddly implementation details (Implementation Details), and then shows how you can make a network app really shine in a multitasking environment (Beyond The Basics).
+
+Before going any further, you should familiarize yourself with the iOS app lifecycle, as described in the iOS Application Programming Guide. Specifically, this technote uses the terms foreground, background and suspended in the technical sense defined in that document.
+
+Finally, the bulk of this technote is aimed at developers who are creating apps that have no special multitasking capabilities. However, if your app fits into one of the multitasking categories described in the iOS Application Programming Guide, you should make sure to read the information in Multitasking Superpowers.
+
+Back to Top
+The Basics
+All iOS networking APIs are ultimately implemented in terms of the BSD Sockets API which, for the purposes of this discussion, supports two basic types of sockets:
+
+listening sockets ！ A listening socket is used to accept incoming TCP connections.
+
+data sockets ！ A data socket is used to transfer data over the network. Data sockets typically represent a TCP connection or give you access to a UDP port.
+
+The following sections describe how to handle multitasking for each type of socket.
+
+Listening Socket
+Handling a listening socket in a multitasking environment is very simple: your app should close the listening socket when it goes into the background and reopen it when it comes back into the foreground. There are two important reasons for this:
+
+Once your app goes into the background, it may be suspended. Once it is suspended, it's unable to properly process incoming connections on the listening socket. However, the socket is still active as far as the kernel is concerned. If a client connects to the socket, the kernel will accept the connection but your app won't communicate over it. Eventually the client will give up, but that might take a while.
+
+Thus, it's better to close the listening socket when going into the background, which will cause incoming connections to be immediately rejected by the kernel.
+
+If the system suspends your app and then, later on, reclaims the resources from underneath your listening socket, your app will no longer be listening for connections, even after it has been resumed. The app may or may not be notified of this, depending on how it manages the listening socket. It's generally easier to avoid this problem entirely by closing the listening socket when the app is in the background.
+
+Keep in mind that, when your app closes a listening socket, it should also stop any Bonjour registrations for that socket.
+
+Data Socket
+The situation with data sockets is more subtle, and the best approach depends on what your data socket is doing. The decision you must make is whether to close your data socket when your app goes into the background, or whether to leave the data socket open while the app is in the background and, more importantly, while the app is suspended. The key factor in this decision is how easy it is to close and reopen your data socket:
+
+If reopening your data socket is simple, cheap, and has no user visible consequences, the best approach is to close the socket when the app goes into the background, and reopen it when it comes back into the foreground. This makes your life very simple; in fact, if you do this, you can ignore the rest of this section entirely!
+
+If reopening your data socket is slow, expensive, or something that the user might notice, you probably want to keep the socket open when you go into the background. This is to account for the common case where the user switches from your app to some other app, and then quickly switches back again. You don't want to subject the user to unnecessary network delays in that case. However, if you leave your data socket open, you must deal with the consequences of that decision, as described in the rest of this section.
+
+If you do leave your data socket open when going into the background, you must correctly handle errors on that socket. Handling errors is not a new requirement, but it is particularly important in this case because, if your app gets suspended, the socket's resources might get reclaimed by the kernel, after which all networking operations on the socket will fail. The only thing you can do with the socket at this point is to close it.
+
+Note: When your app resumes execution the actual error returned by a socket's whose resources have been reclaimed is purposely not specified here to allow for future refinements. However, in many cases the error will be EBADF, which is probably not what you were expecting! Under normal circumstances EBADF means that the app has passed an invalid file descriptor to a system call. However, in the case of a socket whose resources have been reclaimed, it does not mean that the file descriptor was invalid, just that the socket is no longer usable.
+
+
+Unfortunately it was not possible to use a new and unique error code in this situation because system calls have strict constraints as to what errors they may return.
+
+If the protocol you're speaking over the data socket supports a quiescent mode, you should enable it when going into the background and disable it when moving back to the foreground. For example, IMAP supports an IDLE command that allows clients to be notified asynchronously when a mailbox changes. There's no point having your app receive these notifications while it is suspended, so you definitely want to cancel these IDLE requests when going into the background.
+
+Higher-Level APIs
+The previous section was written in terms of sockets, but the advice applies equally well to higher-level constructs layered on top of sockets. For example:
+
+If you're using an NSStream to manage a TCP connection, that NSStream is toll-free bridged to CFStream (actually a specific flavor of CFStream known as a CFSocketStream) that manages the underlying socket.
+
+If you're using NSURLConnection, it is implemented using a CFStream (a CFHTTPStream) which in turn uses another CFStream (a CFSocketStream this time) which manages the underlying socket.
+
+If the data socket underlying one of these higher-level constructs has its resources reclaimed by the kernel, the higher-level construct will report that as an error. You should detect and process that error as you would for any other network error. For example:
+
+If you're using an NSStream, you will receive an NSStreamEventHasBytesAvailable event. You should respond to this by reading from the stream, at which point -[NSInputStream -read:maxLength:] will return -1, indicating an error. You can then get the actual error by calling -[NSStream streamError].
+
+If you're using NSURLConnection, the connection will call your -connection:didFailWithError: delegate method to signal the error.
+
+Back to Top
+Implementation Details
+This section describes some important things to keep in mind while you're planning your app's response to multitasking transitions.
+
+Beware of the Dog!
+As described in the previous section, your app may end up doing important work as it transitions from the foreground to the background, typically in the -applicationDidEnterBackground: delegate method. It's vital that this work be done quickly. If your app spends too long in -applicationDidEnterBackground:, it will be killed by the watchdog.
+
+Note: To understand more about the watchdog, read Technical Note TN2151, 'Understanding and Analyzing iPhone OS Application Crash Reports' and Technical Q&A QA1693, 'Synchronous Networking On The Main Thread'.
+
+
+In this context any operation that involves waiting for the network is "too long". That's because the network might become unresponsive at exactly the point your app moves to the background. If that happens the app will end up spending too long inside -applicationDidEnterBackground:, and will end up as dog food.
+
+Not all network operations involve waiting. For example, it's perfectly fine to close a listening socket in your -applicationDidEnterBackground: delegate method; closing a listening socket is always fast. It's even possible to transfer data in this situation. For example, if you want to send a command the puts a connection into quiescent mode, that's OK as long as there's space for the command in the kernel's socket buffer (that is, the socket is not in write-side flow control). In that case sending the command just copies the data to the socket buffer, which won't block for any significant amount of time.
+
+Where your app can get into trouble is when it tries to send a command and wait for a response. If the network is unresponsive, the response will be delayed and your app will be killed by the watchdog.
+
+If you must wait for the network in this situation, you should use a background task (created via -[UIApplication beginBackgroundTaskWithExpirationHandler:]) to manage that process. For example, let's say your protocol's quiescent mode is entered by means of a quiesce command whose response you must wait for. In that case your -applicationDidEnterBackground: delegate method should:
+
+start an asynchronous operation to send the quiesce command and wait for the response
+
+begin a background task to request extra time for that operation to complete
+
+return from -applicationDidEnterBackground:
+
+This will give your app extra time to execute the quiesce command without spending too long in -applicationDidEnterBackground:.
+
+Keep in mind that all background tasks must supply an expiration handler which the system calls when it requires the background task to complete immediately. The expiration handler, like the -applicationDidEnterBackground: delegate method, is monitored by the watchdog; if an expiration handler takes too long, the app will be killed. Thus it's only safe to do a network operation from your expiration handler if you can guarantee that it won't wait for the network. This is the point where you might want to unilaterally close a data socket, without attempting to say goodbye to the remote peer.
+
+Concurrency
+If you plan to do any useful networking in an iOS app, it's likely that you'll end up using background tasks to continue your work, even if only temporarily, as your app transitions to the background. When you start a background task you must supply an expiration handler that can cancel the background task. The expiration handler runs on the main thread and it must cancel the background task before it returns (because your app will be suspended or terminated soon after). And, as mentioned in the previous section, the expiration handler must execute quickly because, if it takes too long, your app will be killed by the watchdog.
+
+These requirements place a number of constraints on the design of your app. Most critically, it is hard to meet these requirements if you are using synchronous blocking network APIs on secondary threads. That's because threads make it hard to support cancellation, and a well-implemented expiration handler requires good support for cancellation.
+
+For example, consider the case where a network thread is listening, in a synchronous blocking fashion, for an incoming connection. In that case the thread would typically be blocked in the accept system call. When the user presses the Home button, your app is put in the background, and you want it to close down its listening socket. How do you unblock the thread that's waiting inside accept? The short answer is that there's no good way to do this.
+
+Alternatively, consider the case where your app is doing a large download in the background and the network is really slow, so slow in fact that the app runs out of background task time. At this point the system runs the background task's expiration handler on the main thread, and the app has to close the connection before returning. How do you do that when there's a thread blocked in read waiting for data off the network? Again, the answer is that there's no good way to do this.
+
+The upshot of this is that, in order to support multitasking well, you will probably want to use asynchronous network APIs. iOS provides a wide variety of APIs to do this！from low-level APIs like GCD to high-level APIs like NSURLConnection, with many stops in between！and we encourage you to use them.
+
+Run Loops
+If you use a run loop based networking API, you may find it necessary to run the run loop from within an expiration handler in order to give the run loop based infrastructure the time needed to finish up. If you do this, you must run the run loop in a custom run loop mode; running the run loop in the default run loop mode inside an expiration handler (or, for that matter, within -applicationDidEnterBackground:) is not something that we support. Keep in mind that, if you use this technique, you must schedule all the relevant run loop sources in your custom run loop mode as well as in the default mode.
+
+Testing Socket Reclaim
+If you're going to write code that handles a socket's resources being reclaimed by the kernel, you have to figure out how to test it. The exact circumstances under which the system might reclaim a socket's resources are purposely not documented; this gives us the flexibility to improve things in the future. However, on current systems (iOS 4.0 through iOS 4.3), you can get the system to reclaim resources from the sockets in your app by:
+
+putting your app in the background
+
+ensuring that the app is suspended
+
+locking the screen
+
+When your app resumes execution it will find that it's sockets have been reclaimed.
+
+Back to Top
+Beyond The Basics
+If your app does long-running network transfers, there are two things you can do to improve the user experience:
+
+use a background task to complete the transfer in the background
+
+implement resumable transfers
+
+Background Tasks
+Continuing a network transfer is an obvious application of background tasks. If the user starts a large transfer and then switches out of your app, it can start a background task to continue the transfer. If all goes well the transfer will be finished before the user next brings the app to the front.
+
+When implementing background task support in your app, it's not necessary for you to have separate logic for the "in the background" and "in the foreground" cases. It's perfectly fine for your app to begin a background task every time it starts a long-running operation, even if the app is in the foreground. While the app is in the foreground the background task won't have any effect; however, if the user moves the app to the background, the existence of the background task will automatically keep the app running so that it can complete the operation.
+
+Resumable Transfers
+Even if you use a background task to continue long transfers, it's still important that your app support resumable transfers. There are numerous situations where this might be useful:
+
+if it's running on a device that doesn't support multitasking
+
+if the network connection is interrupted during the transfer
+
+if your app asks to start a background task and the system refuses to do so (that is, if -[UIApplication beginBackgroundTaskWithExpirationHandler:] returns UIBackgroundTaskInvalid)
+
+if system resources get low and thus the system must suspend or terminate your app before its background tasks are complete
+
+if the transfer takes more time than the background task will allow
+
+All of these situations will benefit from you implementing resumable transfers.
+
+Implementing resumable downloads is typically easy. If you're using HTTP, most servers support entity tags and byte ranges, the fundamental building blocks of resumable downloads. Moreover, it's easy to use these features from NSURLConnection. You should read the HTTP protocol specification (RFC 2616) to learn more about these facilities.
+
+Resumable HTTP uploads is a little trickier, and it's also dependent on the server that you're uploading too. It may not be possible to implement resumable uploads without modifying your server to accommodate them.
+
+Implementing resumable FTP downloads is also easy; when resuming the download, you can set the kCFStreamPropertyFTPFileTransferOffset property to instruct CFFTPStream where to start downloading from.
+
+CFFTPStream does not support resumable FTP uploads (r. 4086998) . Then again, given FTP's poor security features (the user name, password and data are all transferred as plaintext) it's hard to imagine any use of FTP uploads that is suitable for the modern Internet.
+
+Back to Top
+Multitasking Superpowers
+Some apps have special powers when running on a multitasking system. For example, an audio player app can play music in the background without ever being suspended. This section explains the relationship between networking and these multitasking 'superpowers'.
+
+There are two types of special powers that relate to networking:
+
+executing code in the background
+
+VoIP sockets
+
+These are discussed in the following sections.
+
+Background Execution
+The most common multitasking special power is the ability to execute code in the background. For example, when a music player app is playing music, it will not be suspended upon moving to the background. The bulk of this document has used the term "moves to the background" as shorthand for "becomes eligible for suspension". That's a good rule of thumb, but it breaks down when dealing with apps that can execute in the background. In these apps the act of moving to the background does not automatically make the app eligible for suspension. Rather, the app becomes eligible for suspension when it stops doing the thing that prevented it from being suspend in the first place. To continue the music player example, the app becomes eligible for suspension when it stops playing music.
+
+Note that background tasks (as discussed in Beware of the Dog! and Beyond The Basics) are a special case of this power. Any app can execute code in the background for a limited amount of time by beginning a background task. Such an app becomes eligible for suspension when its last background task ends.
+
+VoIP Sockets
+A VoIP (Voice over IP) app is expected to run continuously so that it can monitor the VoIP control connection; however, to minimize the memory impact on the system, the app is suspended while it's inactive. To make this work the app must register the data socket for its control connection as a VoIP socket. A socket registered in this way has two special features:
+
+While the app is suspended the system monitors the socket on the app's behalf. If any data arrives on the socket, the system resumes execution of the app (albeit in the background), which can then read the data off the socket and take the appropriate action (for example, notifying the user of an incoming call).
+
+The socket's resources are never reclaimed. Thus, the app can safely be suspended without any fear of its socket going deaf.
+
+For more information about how to create a VoIP app, see the iOS Application Programming Guide.
+
+
+
+https://developer.apple.com/library/ios/#technotes/tn2277/_index.html

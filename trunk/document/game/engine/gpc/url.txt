@@ -1,0 +1,11 @@
+http://www.cs.man.ac.uk/~toby/alan/software/
+
+GPC Features
+Difference, intersection, exclusive-or and union clip operations are supported. 
+Polygons may be comprised of multiple disjoint contours. 
+Contour vertices may be given in any order - clockwise or anticlockwise. 
+Contours may be convex, concave or self-intersecting. 
+Contours may be nested (i.e. polygons may have holes). 
+Output may take the form of either polygon contours or tristrips. 
+Hole and external contours are differentiated in the result. 
+Coincident edges and degenerate regions are handled correctly. 

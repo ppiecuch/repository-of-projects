@@ -1,0 +1,28 @@
+在机缘巧合下，我看到一篇google官方的文章“Using NDK Plugins”
+
+令人兴奋的是，ADTr20已经支持JNI单步调试，再也不需要如上这么麻烦的步骤了
+
+你现在需要做的只需以下2步：
+
+1、使用ndk-build编译时，加上如下参数NDK_DEBUG=1，之后生成so文件之外，还会生成gdbobserver,gdb.setup调式文件
+
+2、在项目的Debug Configuration中选择Android Native Apllication，点击下方Debug
+
+3、Enjoy your Debugging！
+
+ 
+
+如何？是不是超简单，而且调试速度还相当快哦
+
+ 
+
+ADTr20已经比较完美支持NDK开发了。可以集成ndk编译，只需在项目右键Add Native Support，就能自动生成jni文件，并部署编译环境（注意这个过程是不可逆的，手动删除jni文件后，会编译不过）。如果需要生成NDK调试文件，需要右键项目->properties->C/C++ build->Builder Setting 把默认的Build Command : ndk-build 修改成 ndk-build NDK_DEBUG=1
+
+ 
+
+最后推荐一个很有用的android官方网站http://tools.android.com/ 这个网站包含大多数ADT使用方法和新版ADT的介绍，获益匪浅
+
+关于如何使用ADT进行ndk单步调式就在http://tools.android.com/recent/usingthendkplugin
+
+
+只可惜这种方法只能在ndk环境下使用，如果要对framework中的jni进行单步调试，应该就行不通了，推荐的一种方法是把它在NDK中编译调试完毕，然后将生成的so放在system/lib下

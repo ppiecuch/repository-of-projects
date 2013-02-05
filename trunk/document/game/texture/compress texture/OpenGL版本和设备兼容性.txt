@@ -1,0 +1,95 @@
+OpenGLES 1.0 和 1.1API 规范从Android1.0就开始支持．从Android2.2 (API Level 8)开始，框架支持OpenGLES 2.0 API规范．OpenGLES 2.0被大多数Android设备所支持并被推荐在新的基于OpenGL的应用中使用．
+
+纹理压缩的支持
+　　纹理压缩通过减少对内存的使用可以显著提高OpenGL应用的性能．Android框架将支持ETC1压缩格式作为标准特性，包含一个ETC1Util工具类和压缩工具etc1tool(在AndroidSDK中的位置：<sdk>/tools/)．使用纹理压缩的例子，请见示例代码：CompressedTextureActivity．
+
+
+
+
+
+　　检查一个设备上是否支持ETC1格式，调用ETC1Util.isETC1Supported()方法．
+
+
+
+
+
+　　注：ETC1格式不支持带有alpha通道的纹理．如果你的应用需要带有alpha通道的纹理，你就需要调查一下下你设备所支持的其它纹理压缩格式了．
+
+
+
+
+
+　　ETC1格式之外，Android设备还支持其它各种纹理压缩格式，具体的格式与ＧＰＵ芯片和OpenGL的实现有关．你应该调查目标设备上所支持的纹理压缩格式以决定你的应用所使用的格式．为了确定在设备上使用哪种压缩格式，你必须查询设备并检查OpenGL扩展的名字，扩展的名字标识了设备所支持的纹理压缩格式(和其它OpenGL特性)．一些经常被支持的纹理压缩格式所列如下：
+
+ATITC(ATC) - ATI 纹理压缩 (ATITCor ATC)被设备广泛支持，它支持固定帧率的ＲＧＢ纹理压缩，ＲＧＢ纹理有无alpha通道都可以．本格式可能被多种OpenGL扩展名字所表示，比如：
+
+GL_AMD_compressed_ATC_texture
+
+GL_ATI_texture_compression_atitc
+
+PVRTC- PowerVR 纹理压缩texturecompression (PVRTC) 也是被设备广泛支持，它支持2-bit和4-bit带或不带alpha通道的像素纹理．这种格式被下面的OpenGL扩展名字所表示：
+
+GL_IMG_texture_compression_pvrtc
+
+S3TC(DXTn/DXTC) - S3纹理压缩(S3TC)有很多变种格式(DXT1到DXT5)，而且被支持的不够广泛．它支持4-bit或8-bit带alpha通道的RGB纹理．此格式可能被下列扩展名字所表示：
+
+GL_OES_texture_compression_S3TC
+
+GL_EXT_texture_compression_s3tc
+
+GL_EXT_texture_compression_dxt1
+
+GL_EXT_texture_compression_dxt3
+
+GL_EXT_texture_compression_dxt5
+
+3DC- 3DC 纹理压缩(3DC)支持带alpha通道的RGB纹理压缩，但应用不是很广泛．此格式以下OpenGL扩展名字所代表：
+
+GL_AMD_compressed_3DC_texture
+
+　　警告：这些纹理压缩格式不是被所有的设备都支持．对这些格式的支持可能被制造商和设备进行一些变化．
+
+　　注：一旦你决定了你的应用支持什么样的纹理压缩格式，就要确保在你的manifest中使用<supports-gl-texture>声明它们．这样可以使应用市场为不支持所需格式的设备过滤掉你的应用．
+
+
+
+
+
+确定OpenGL扩展名
+　　OpenGL的实现跟据设备上扩展所支持的OpenGLES API不同而不同．这些扩展包括纹理压缩，但是一般还是会包含其它的OpenGL特性集合．
+
+
+
+
+
+　　要确定一个设备上所支持的纹理压缩格式以及其它的OpenGL扩展特性，需在你的目标设备上运行以下代码:
+
+Stringextensions =javax.microedition.khronos.opengles.GL10.glGetString(GL10.GL_EXTENSIONS);
+
+
+
+
+
+　　警告：处调用的结果在不同的设备上可能不一样！你必须在多个目标设备上运行此调用来确定哪种压缩格式是被共同支持的．
+
+查看此方法的输出来确定设备上所支持的OpenGL扩展．
+
+选择一个OpenGLAPI 版本
+　　OpenGLES API v1.0 (和1.1)和v2.0都为创建3D游戏，视觉效果和用户界面提供了高性能的图形接口．OpenGLES 1.0/1.1 API比起ES2.0在图形编程时有很大的不同，所以开发者在使用两种API之一进行开发前应该慬慎考虑以下的各种因素：
+
+性能 -通常，OpenGLES 2.0提供了比ES1.0/1.1 API提供了更高的图形性能．然而，性能在不同的android设备上表现不一样，这取决于OpenGL图形管线的实现．
+
+设备兼容性 -开发者应考虑设备的类型，Android的版本和OpenGLES版本．
+
+Coding方便性- OpenGL ES1.0/1.1 API 提供了一个固定的功能管线和方便的功能，但这些功能在ES2.0 API中不可用．新的OpenGL开发者可能发现用OpenGLES 1.0/1.1写代码更快更方便．
+
+图形控制 -OpenGL ES 2.0API通过使用着色器提供了一个完整的可编程管线从而提供了更高水平的控制能力．通过对图形处理管线的更直接的控制，开发着可以创建对于1.0/1.1API 来说很难做的效果．
+
+
+
+
+　　性能，兼容性，方便性，控制性以及其它因素都可能影响你的决定，你应该跟据如何来建立最好的用户体验来选择一个OpenGLAPI版本．
+
+
+
+http://blog.csdn.net/nkmnkm/article/details/7567087
