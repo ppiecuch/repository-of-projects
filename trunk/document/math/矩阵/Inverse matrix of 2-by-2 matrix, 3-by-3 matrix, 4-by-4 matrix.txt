@@ -1,0 +1,39 @@
+Inverse matrix of 2 $\times$ 2 matrix
+
+
+
+There exists an inverse matrix of A when detA=ad-bc0, and it is
+
+
+
+Inverse matrix of 3 $\times$ 3 matrix
+
+
+
+There exists an inverse matrix of A when
+detA=a11a22a33+a21a32a13+a31a12a23-a11a32a23-a31a22a13-a21a12a33
+0, and it is
+
+
+
+Inverse matrix of 4 $\times$ 4 matrix
+
+
+
+If
+
+
+
+then there exists an inverse matrix of A, and it is
+
+
+
+where
+
+
+
+Inverse matrix of NxN matrix
+
+From the analogy of the above formulae, the computation time of inverse matrix of NxN matrix will be O(N3N!). Computing inverse matrix with Gauss-Jordan method, the method using LU decomposition, and the method using SVD, will take a computation time of O(N3) (not confident). I will recommend not to use the formula for calculating inverse matrix of NxN matrix which N >= 4.
+
+http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
