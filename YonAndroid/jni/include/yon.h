@@ -38,6 +38,7 @@
 #include "yonLoop.h"
 #include "yonMath.h" 
 #include "yonMap.h"
+#include "yonMutex.h"
 #include "yonString.h" 
 #include "yonUString.h"
 #include "matrix4.h" 
