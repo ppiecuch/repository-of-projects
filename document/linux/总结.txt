@@ -3,3 +3,6 @@ export
 
 查看体系架构
 arch
+
+查看配置
+getconf -a
