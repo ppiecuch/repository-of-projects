@@ -21,6 +21,7 @@ inline void EnableMemLeakCheck()
 using namespace yon;
 using namespace yon::core;
 
+
 enum {_ALIGN = 8};//小块区域的上界
 
 //将Byte调到8的倍数
@@ -28,6 +29,17 @@ static size_t
 _S_round_up(size_t __bytes) 
 { return (((__bytes) + (size_t) _ALIGN-1) & ~((size_t) _ALIGN - 1)); }
 
+/*void* operator new( size_t nSize, char* pszFileName, int nLineNum )
+{
+	void *pResult;
+
+	pResult = ::operator new( nSize );
+
+	printf("fdafda\r\n");
+	return pResult;
+}
+
+#define YON_DEBUG_NEW new( __FILE__, __LINE__)*/
 
 int main(int argc, char* argv[]){
 
@@ -46,6 +58,9 @@ int main(int argc, char* argv[]){
 	printf("%d\r\n",str2[0]);
 	printf("%d\r\n",str2.length());
 	printf("%d\r\n",str2.trim().length());
+
+	core::array<int> a;
+	a.push_back(1);
 
 	/*
 	//alignmentpool

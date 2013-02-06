@@ -131,6 +131,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LoggerMacro", "LoggerMacro\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix", "matrix\matrix.vcproj", "{483CCAD7-CCB8-4892-B1B3-CF7F1F07156C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "union", "union\union.vcproj", "{ADC499A5-9D68-4752-A277-A068EE04DC90}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "typename", "typename\typename.vcproj", "{E14E1206-ABD6-4A57-9A80-43DE16AED9CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -385,6 +389,14 @@ Global
 		{483CCAD7-CCB8-4892-B1B3-CF7F1F07156C}.Debug|Win32.Build.0 = Debug|Win32
 		{483CCAD7-CCB8-4892-B1B3-CF7F1F07156C}.Release|Win32.ActiveCfg = Release|Win32
 		{483CCAD7-CCB8-4892-B1B3-CF7F1F07156C}.Release|Win32.Build.0 = Release|Win32
+		{ADC499A5-9D68-4752-A277-A068EE04DC90}.Debug|Win32.ActiveCfg = Debug|Win32
+		{ADC499A5-9D68-4752-A277-A068EE04DC90}.Debug|Win32.Build.0 = Debug|Win32
+		{ADC499A5-9D68-4752-A277-A068EE04DC90}.Release|Win32.ActiveCfg = Release|Win32
+		{ADC499A5-9D68-4752-A277-A068EE04DC90}.Release|Win32.Build.0 = Release|Win32
+		{E14E1206-ABD6-4A57-9A80-43DE16AED9CA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E14E1206-ABD6-4A57-9A80-43DE16AED9CA}.Debug|Win32.Build.0 = Debug|Win32
+		{E14E1206-ABD6-4A57-9A80-43DE16AED9CA}.Release|Win32.ActiveCfg = Release|Win32
+		{E14E1206-ABD6-4A57-9A80-43DE16AED9CA}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
