@@ -33,6 +33,7 @@ public:
 	//! Allocate memory for an array of objects
 	T* allocate(size_t cnt)
 	{
+		printf("allocate %s(%d*%d)\r\n",Typename<T>::get(),sizeof(T),cnt);
 		return (T*)internal_new(cnt* sizeof(T));
 	}
 

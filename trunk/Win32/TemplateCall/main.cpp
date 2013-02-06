@@ -76,11 +76,23 @@ OT& Contain<T,OT>::t=OT::getInstance();
 
 int i;
 
+class NN{};
+template <typename T>
+class MM{
+public:
+	void test(const T& t){
+	}
+};
+
 int main(int argc, char* argv[])
 {
 	EnableMemLeakCheck();
-	for(i=0;i<3;++i)
-		Test<i>();
+	//for(i=0;i<3;++i)
+	//	Test<i>();
+
+	MM<const NN> m;
+	NN n;
+	m.test(n);
 	/*{
 		Contain<int> c1;
 		Contain<double> c2;

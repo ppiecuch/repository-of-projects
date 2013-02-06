@@ -112,6 +112,16 @@ enum ENUM_ENCODING{
 	ENUM_ENCODING_COUNT
 };
 
+template<typename T>
+class Typename{
+public:
+	static const c8* get(){ return T::getTypeName(); }
+};
+
+// add more specialisations for the build-in types
+template<> const c8* Typename<s32>::get() { static const char* p="int"; return p; }
+template<> const c8* Typename<s32*>::get() { static const char* p="int*"; return p; }
+
 }
 
 #endif 

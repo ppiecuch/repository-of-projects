@@ -72,6 +72,16 @@ public:
 	unsigned int color;
 };
 
+class I{
+public:
+	int a;
+	virtual void test(){}
+};
+class J : public I{
+public:
+	int b;
+};
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	/*Trace("%d\r\n",argc);
@@ -82,6 +92,14 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout<<argv[i]<<endl;
 	}*/
 	EnableMemLeakCheck();
+
+	I* i=new I();
+	try{
+		J* j=dynamic_cast<J*>(i);
+		printf("cast:%d\r\n",j);
+	}catch(...){
+		printf("can't cast\r\n");
+	}
 
 	SColor c1(0xFF132E47);
 
