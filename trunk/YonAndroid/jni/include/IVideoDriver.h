@@ -257,6 +257,7 @@ namespace yon{
 			virtual u32 getFPS() const = 0;
 			virtual u32 getPrimitiveCountDrawn(bool average=false) const = 0;
 			virtual u32 getDrawCall() const = 0;
+			virtual u32 getTextureChange() const = 0;
 		};
 	}
 }

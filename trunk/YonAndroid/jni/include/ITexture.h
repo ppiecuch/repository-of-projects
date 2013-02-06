@@ -47,6 +47,9 @@ namespace video{
 		//virtual void beginRTT(bool clearBackBuffer=true, bool clearZBuffer=true,video::SColor color=video::COLOR_ZERO) = 0;
 		//参数renderFrameBuffer：是否接下来的操作重新指向帧缓冲
 		//virtual void endRTT(bool willRenderFrameBuffer) = 0;
+		
+		virtual void grabFromDriver() = 0;
+		virtual bool dropFromDriver() = 0;
 	};
 }
 }

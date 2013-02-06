@@ -417,6 +417,30 @@ namespace scene{
 				m_absoluteTransformation = getRelativeTransformation();
 		}
 
+		virtual void grabAllTextures(){
+			for (u32 i=0; i<getMaterialCount(); ++i)
+			{
+				for(u32 j=0;j<video::MATERIAL_MAX_TEXTURES;++j)
+				{
+					video::ITexture* texture=getMaterial(i).getTexture(j);
+					if(texture)
+						texture->grabFromDriver();
+				}
+			}
+		}
+
+		virtual void dropAllTextures(){
+			for (u32 i=0; i<getMaterialCount(); ++i)
+			{
+				for(u32 j=0;j<video::MATERIAL_MAX_TEXTURES;++j)
+				{
+					video::ITexture* texture=getMaterial(i).getTexture(j);
+					if(texture)
+						texture->dropFromDriver();
+				}
+			}
+		}
+
 	};
 }
 }
