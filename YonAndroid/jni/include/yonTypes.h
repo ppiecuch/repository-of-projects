@@ -67,6 +67,8 @@ typedef unsigned __int64	u64;
 typedef unsigned long long	u64;
 #endif
 
+//因为WIN32/65下LONG都是32位。
+//LINUX32/64下LONG是32/64
 #ifdef _MSC_VER
 typedef __int64				s64;
 #else
