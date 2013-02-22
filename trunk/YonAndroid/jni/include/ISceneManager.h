@@ -55,7 +55,7 @@ namespace scene{
 	class IAnimatedSceneNode;
 
 	//class ISceneManager : public virtual core::IRenderable{
-	class ISceneManager : public virtual core::IReferencable,public virtual IRenderable{
+	class ISceneManager : public virtual core::IReferencable,public virtual core::IRenderable{
 	public:
 		virtual ~ISceneManager() {}
 
