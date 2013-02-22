@@ -108,7 +108,7 @@ namespace core{
 				m_iPid = getpid();
 			}	
 #endif
-			++m_nCount;
+			++m_uCount;
 		}
 		void notify(){
 #ifdef YON_COMPILE_WITH_WIN32
