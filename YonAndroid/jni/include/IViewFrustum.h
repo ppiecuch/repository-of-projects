@@ -22,7 +22,7 @@ namespace camera{
 		ENUM_FRUSTUM_PLANE_COUNT
 	};
 
-	class IViewFrustum : public IRenderable{
+	class IViewFrustum : public core::IRenderable{
 	public:
 		//! This constructor creates a view frustum based on a projection and/or view matrix.
 		virtual void setFrom(const core::matrix4f& mat)= 0;

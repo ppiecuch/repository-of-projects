@@ -30,7 +30,7 @@ namespace scene{
 
 	class ISceneManager;
 
-	class ISceneNode : public virtual core::IReferencable, public virtual IRenderable{
+	class ISceneNode : public virtual core::IReferencable, public virtual core::IRenderable{
 	protected:
 		ISceneManager* m_pSceneManager;
 		ISceneNode* m_parent;
