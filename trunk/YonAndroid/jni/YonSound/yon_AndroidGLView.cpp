@@ -109,7 +109,7 @@ jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
 }
 jboolean Java_yon_AndroidGLView_nativeOnTouch(JNIEnv *pEnv, jobject obj, jint iAction, jint id, jfloat x, jfloat y, jint count){
 	g_env=pEnv;
-	//Logger->debug("jobject:%08X\r\n",obj);
+	//Logger->debug("nativeOnTouch:%.2f,%.2f\r\n",x,y);
 	if(id>=YON_TOUCH_MAX_INPUTS)
 	{
 		Logger->warn("exceed max touch input limit: %d>=%d, ignore it!\n",id,YON_TOUCH_MAX_INPUTS);

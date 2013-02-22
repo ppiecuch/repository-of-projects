@@ -34,7 +34,8 @@
 //#define  YON_VIDEO_MODE_OGLES2
 
 //音频模式(OpenAL)
-#define YON_AUDIO_MODE_OAL
+//#define YON_AUDIO_MODE_OAL
+#define YON_AUDIO_MODE_FMOD
 
 //DLL导入导出
 #ifdef YON_EXPORTS

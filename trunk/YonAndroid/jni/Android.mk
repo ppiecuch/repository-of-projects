@@ -16,6 +16,7 @@ LOCAL_CFLAGS := -DANDROID_NDK \
 LOCAL_C_INCLUDES := \
 		$(LOCAL_PATH)/freetype/include \
 		$(LOCAL_PATH)/Spark/include \
+		$(LOCAL_PATH)/FMOD/include \
 		$(LOCAL_PATH)/MyGUIEngine/include \
 		$(LOCAL_PATH)/MyGUIAdapter \
 		$(LOCAL_PATH)/Yon/zlib \
@@ -272,6 +273,8 @@ yon_SOURCES :=   \
 		CWaveLoaderOGG.cpp \
 		COALSound.cpp \
 		COALAudioDriver.cpp \
+		CFMODSound.cpp \
+		CFMODAudioDriver.cpp \
 		CDebugPrinter.cpp \
 		CLogger.cpp \
 		CProfile.cpp \
