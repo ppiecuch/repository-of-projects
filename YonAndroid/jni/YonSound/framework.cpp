@@ -16,6 +16,8 @@ ISceneNode* teapotModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
+ISound* sound=NULL;
+
 class MyEventReceiver : public IEventReceiver{
 public:
 	virtual bool onEvent(const SEvent& evt){
@@ -26,6 +28,10 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				if(sound->isPaused())
+					sound->play();
+				else
+					sound->pause();
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
@@ -35,6 +41,10 @@ public:
 			switch(evt.touchInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
+				if(sound->isPaused())
+					sound->play();
+				else
+					sound->pause();
 				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
@@ -71,12 +81,12 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 
 	//PROFILE_REGISTER_FRAME();
 	//PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
-	ISound* sound=audioDriver->getSound("bg.ogg");
+	sound=audioDriver->getSound("bg.ogg");
 	//audioDriver->grabSound(sound);
 	//audioDriver->dropSound(sound);
 	sound->setLooping(true);
-	sound->setGain(0.5f);
 	sound->play();
+	sound->setGain(0.5f);
 	//sound=audioDriver->getSound("helloworld.wav");
 	//sound->play();
 	//PROFILE_END_CALL(PROFILE_ID_1);
