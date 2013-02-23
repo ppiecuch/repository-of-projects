@@ -24,7 +24,11 @@ namespace text{
 			return m_text.size();
 		}
 
-		virtual core::ustring getText() const{
+		const core::ustring& getText() const{
+			return m_text;
+		}
+
+		core::ustring getText(){
 			return m_text;
 		}
 
@@ -56,7 +60,11 @@ namespace text{
 			m_identifier.FontStyle=fontStyle;
 		}
 
-		virtual core::position2di getPosition() const{
+		const core::position2di& getPosition() const{
+			return m_pos;
+		}
+
+		core::position2di getPosition(){
 			return m_pos;
 		}
 
@@ -64,7 +72,11 @@ namespace text{
 			m_pos=pos;
 		}
 
-		virtual video::SColor getColor() const{
+		virtual const video::SColor& getColor() const{
+			return m_color;
+		}
+
+		video::SColor getColor(){
 			return m_color;
 		}
 

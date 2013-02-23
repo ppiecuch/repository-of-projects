@@ -22,6 +22,8 @@ namespace text{
 
 		virtual IFontPiece* addText(const core::ustring& text, IFontFamily* fontFamily, const core::position2di& pos, u8 fontSize=12, const video::SColor& color=video::COLOR_BLACK, MASK_FONT_STYLE fontStyle=MASK_FONT_STYLE_NORMAL) = 0;
 
+		virtual bool removeText(IFontPiece* piece) = 0;
+
 	};
 }
 }
