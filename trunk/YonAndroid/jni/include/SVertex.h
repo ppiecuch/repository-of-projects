@@ -52,6 +52,12 @@ namespace scene{
 		S2DVertex(){}
 		S2DVertex(f32 x,f32 y,f32 tu, f32 tv,video::SColor c):pos(x,y,0),texcoords(tu,tv),color(c){}
 
+		void set(f32 x,f32 y,f32 tu, f32 tv,const video::SColor& c){
+			pos.set(x,y,0);
+			texcoords.set(tu,tv);
+			color=c;
+		}
+
 		//core::vector2df pos;
 		core::vector3df pos;
 		video::SColor color;
