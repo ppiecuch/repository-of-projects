@@ -1,0 +1,16 @@
+Here is a step-by-step process for getting FMOD running in an iOS application:
+
+File -> New Project 
+iOS -> Application -> Window based application 
+Choose name and location (I used 'test' and the FMOD examples directory as the location) 
+Assuming you named the app 'test', rename 'testAppDelegate.m' to have the extension '.mm' to allow C++ code. 
+Edit 'testAppDelegate.mm' to have #import "fmod.hpp" at the top. 
+Project -> Edit project settings (ensure Configuration at the top is set to All configurations) 
+Go to "Other linker flags" and type in -lfmodex_$PLATFORM_NAME 
+Go to "Header search paths" and type in ../../api/inc 
+Go to "Library search paths" and type in ../../api/lib (now close settings). 
+Right click on the "Frameworks" group on the left, choose Add -> Existing Frameworks, then choose 'CoreAudio.framework' 
+Repeat step 10 but choose 'AudioToolbox.framework' 
+Add FMOD code to 'testAppDelegate.mm' as needed, see playSound example for reference code. 
+
+http://stackoverflow.com/questions/6066398/cant-include-fmod-on-ios
