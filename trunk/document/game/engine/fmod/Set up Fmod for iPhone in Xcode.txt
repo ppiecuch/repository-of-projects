@@ -1,0 +1,28 @@
+Recently I started using the neat fetures of Fmod for iPhone development. Fmod is an audio library used for most gaming platforms to add sound effects and create a 3D world of sounds. Here follows a step-by-step guide to set up Fmod for iPhone in Xcode. SDK version 4.3.3.
+
+1. Download Fmod Ex Programmers API for iOS.
+
+2. Unzip Fmod Programmers API to your Applications folder.
+
+3. Create a new project in xCode. To enhance the workflow I create my project in the following folder: ¡°/Applications/FMOD Programmers API/examples/¡±.
+
+4. Fmod is using a mix of Objective-C and C++. All .m files in your project needs to be renamed .mm which is the file format for Objective-C++.
+
+5. In ¡°Build Phases¡± link the following frameworks to your project:
+AudioToolbox.framework
+CoreAudio.framework
+
+6. Include these Fmod files in your header file:
+
+#import "fmod.hpp"
+#import "fmod_errors.h"
+7. For your project to find the Fmod files you will include search paths to your ¡°Build settings¡±:
+
+HEADER_SEARCH_PATHS       ../../api/inc
+LIBRARY_SEARCH_PATHS       ../../api/lib
+8. Link the following libraries to your project. In ¡°Build Settings¡± set OTHER_LDFLAGS(Link Flags) to:
+
+Debug     -lfmodexL_$PLATFORM_NAME  // Includes debug logging
+Release   -lfmodex_$PLATFORM_NAME
+
+http://www.sundh.com/blog/2011/08/set-up-fmod-for-iphone-in-xcode/

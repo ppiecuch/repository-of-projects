@@ -1,0 +1,100 @@
+现代游戏已经不能没有声音，所以音频引擎成为游戏引擎中不可缺少的一部分．这是一篇介绍现代音频引擎的文章(http://hard.zol.com.cn/labs/2003/0520/60986.shtml)．FMOD音频引擎(http://www.fmod.org)是一个非常不错的音频引擎，其使用也比较简单，下面做一些简单介绍：
+一、基本准备
+它是免费的，你可以从它们的主站上下载API等文件。之后，你需要添加头文件、库文件以及dll。对于c++调用，一种方法是将api中的inc文件、fmodex_vc.lib、fmodex.dll拷贝到当前工程的目录，用如下程序加载：
+#include "inc/fmod.hpp"
+#pragma comment(lib,"fmodex_vc.lib")
+对于其他编程语言，需使用相应的lib文件。
+二、简单试用
+FMOD::System *system;
+FMOD::Sound *sound;
+FMOD::Channel *channel = 0;
+
+FMOD::System_Create( &system );
+system->init( 10, FMOD_INIT_NORMAL, 0 );
+system->createStream( "music.mp3", FMOD_3D, 0, &sound );
+sound->setMode( FMOD_LOOP_NORMAL );
+system->playSound( FMOD_CHANNEL_FREE, sound, false, &channel );
+channel->setVolume( 0.8 );
+将mp3文件放到工程目录下，使用上述程序就可以播放音乐了。
+
+使用fmod播放音频的主要步骤：
+1. 创建FMOD系统。API：FMOD_RESULT System_Create( FMOD::System ** system);
+    程序中：FMOD::System_Create(&system);
+    参数为指向系统变量指针的指针；如果创建系统变量成功，就返回FMOD_Ok;没有成功就返回FMOD_RESULT中的任意一项。具体看doc说明。
+2. 初始化系统和声音设备。他必须在FMOD::System_Creat之后，所有用户代码之前就要执行。API： 
+    FMOD_RESULT System::init( int maxchannels, FMOD_INITFLAGS flags, void *extradriverdata);
+    程序中：system->init(100, FMOD_INIT_NORMAL, 0);
+    Maxchannels:在FMOD中最大的声道数
+    FMOD_INITFLAGS：
+    FMOD_OUTPUTTYPE：输出查检
+    如果初始化成功，就返回FMOD_Ok;没有成功就返回FMOD_RESULT中的任意一项。具体看doc说明。
+3. 开始创建自己需要的声音。API：
+    FMOD_RESULT System::createSound(const char * name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD::Sound ** sound); 
+    程序中：system->createSound("music.mp3", FMOD_3D, 0, &sound);
+    name_or_data：声音资源文件名或者URL
+    mode：打开声音的模式。
+    FMOD_CREATESOUNDEXINFO：希望用户提供个多信息。一般设为0
+    FMOD::Sound：指向声音资源变量指针的指针
+
+
+其他参数设置
+1. 设置声音可听见的最小和最远距离。API：Sound::set3DMinMaxDistance(float min, float max) 
+    程序中：sound1->set3DMinMaxDistance(2.0f * DISTANCEFACTOR, 10000.0f * DISTANCEFACTOR);
+    min: 最小距离
+    max: 最大距离
+2. 开始播放音乐。API：
+    FMOD_RESULT System::playSound(FMOD_CHANNELINDEX channelid, FMOD::Sound *sound, 
+bool paused, FMOD::Channel **channel); 
+    程序中：system->playSound(FMOD_CHANNEL_FREE, sound1, true, &channel1);
+    FMOD_CHANNELINDEX 得到空闲的声道。
+    FMOD::Sound 之前定义好的声音变量
+    bool paused 事后停止
+    FMOD::Channel 得到的声道的指针
+3. 设置声道的位置以及速度。API：FMOD_RESULT Channel::set3DAttributes(const FMOD_VECTOR * pos, const FMOD_VECTOR * vel); 
+    程序中：channel1->set3DAttributes(&pos, &vel);
+    pos：声道位置
+    vel：声道速度
+4. 得到当前可得到的2d和3d的数目。API：
+    FMOD_RESULT System::getHardwareChannels(int *num2d,int *num3d,int*total); 
+    程序中：system->getHardwareChannels(&num2d, &num3d, 0); 
+    num2d：可以混合3d的数目 
+    num3d：可以混合2d的数目 
+    total：total = num3d + num2d 
+5. 更新3d的位置速度和方向。API：
+    FMOD_RESULT System::set3DListenerAttributes(int listener, const FMOD_VECTOR *pos, 
+const FMOD_VECTOR *vel, const FMOD_VECTOR *forward, const FMOD_VECTOR *up); 
+    程序中：system->set3DListenerAttributes(0, &listenerpos, &vel, &forward, &up);
+    listener：如果环境中只有一个听者，则设置为0
+    pos：听者的位置
+    vel ：从声音的起始位置到达听者耳朵时，每一秒的位移
+    forward ：听者前方的方向
+    up：听者上方的方向
+
+
+    接着就是一个循环更新以及用户自己的键盘响应操作了。该操作是在一个do..while或者while循环中完成的。例如： 
+    do{   //通过函数kbhit()得到键盘响应消息；然后通过getch()得到我们具体要相应的哪个键
+        if (kbhit()){
+            key = getch();
+            if (key == '1'){   //根据得到的键，响应该键的响应函数
+                bool paused;
+                channel1->getPaused(&paused);
+                channel1->setPaused(!paused);
+            }
+      }
+      //更新听者
+      ……..
+     //更新系统
+     system->update();
+     //程序中自规定50ms更新一次，所以要sleep50ms；又因为是从0开始计时的，所以要减去1
+     Sleep(INTERFACE_UPDATETIME - 1);
+   } while (key != 27);
+
+   最后逐一释放之前创建的声音和系统
+   result = sound1->release();//释放声音资源
+   result = system->close();//先将系统关闭
+   result = system->release();//然后释放自己
+
+
+    其实通过这一个例子；就可以总结出，只要是创建任何东西(例如创建系统、声音、更新3d等)、初始化、开始播放、释放自己等API都是系统的接口；而设置声音的属性(位置、速度、是否停止等)是由声道变量提供的API接口的。
+
+http://hi.baidu.com/zhanggmcn/item/d80996cb9389960cad092fe7
