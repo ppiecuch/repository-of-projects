@@ -74,15 +74,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IEntity* entity;
 
 #if 1
-	shap=geometryFty->createXYRectangle2D2T(-25,-25,25,25);
+	shap=geometryFty->createXYRectangle2D2T(-75,-75,75,75);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=planeModel->getMaterial(0);
-		material.MaterialType=ENUM_MATERIAL_TYPE_SOLID_2_LAYER;
+		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT_2_LAYER;
 		material.setTexture(0,videoDriver->getTexture("aura_rgb.png"));
-		material.setTexture(1,videoDriver->getTexture("aura_mask.png"));
+		material.setTexture(1,videoDriver->getTexture("aura_alpha.png"));
 	}
 	planeModel->setPosition(core::vector3df(0,0,0));
 	

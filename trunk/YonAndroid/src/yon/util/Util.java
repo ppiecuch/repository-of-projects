@@ -14,11 +14,15 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.text.format.Formatter;
+import android.util.Log;
 
 public class Util {
+	
+	private static final String TAG=Util.class.getName();
 	
 	public static String merge(String[] strs)
 	{
@@ -58,6 +62,32 @@ public class Util {
 		am.getMemoryInfo(mi);
 		return Formatter.formatFileSize(context, mi.threshold);
 	}
+	
+	public static int getCPUArchitecture(){
+    	StringBuffer sb = new StringBuffer();
+    	int result=-1;
+        sb.append("abi: ").append(Build.CPU_ABI).append("\n");
+        if (new File("/proc/cpuinfo").exists()) {
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(new File("/proc/cpuinfo")));
+                String aLine;
+                String key="CPU architecture:";
+                while ((aLine = br.readLine()) != null) {
+                    if(aLine.startsWith(key))
+                    {
+                    	result=Integer.parseInt(aLine.substring(key.length()).trim());
+                    	break;
+                    }
+                }
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException e) {
+               Log.e(TAG, e.toString());
+            } 
+        }
+        return result;
+    }
 	
 	public static String getTotalMemory(Context context) {
 		String str1 = "/proc/meminfo";// 系统内存信息文件 
