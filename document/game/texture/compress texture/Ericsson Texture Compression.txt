@@ -1,0 +1,29 @@
+Ericsson Texture Compression (ETC) is a texture compression technique developed in collaboration with Ericsson Research in early 2005. It was originally developed under the name iPACKMAN [1] and based on an earlier compression scheme called PACKMAN.[2]
+Contents  [hide] 
+1 ETC1
+2 ETC2 and EAC
+3 External links
+4 References
+[edit]ETC1
+
+The original 'ETC1' compression scheme provides 6x compression of 24-bit RGB data. It does not support the compression of images with Alpha components, although there are work-arounds for this.[3]
+ETC1 takes 4x4 groups of pixel data and compresses each into a single 64-bit word. The 4¡Á4 pixel group is first divided into two 4¡Á2 chunks - either horizontally or vertically. Each half is given a base color - either using 4/4/4 RGB or by giving one of them a 5/5/5 RGB and having the other be a 3/3/3 bit offset from that base. Each 4¡Á2 region also has a 3-bit brightness range selection. Each pixel is then offset from the base color by adding one of four signed values to the base color for its half of the 4¡Á4 group.
+This format is a part of the OpenGL ES graphics standard extensions[4] for embedded devices such as mobile phones and has been approved by the Khronos Group for use in the WebGL graphics standard for browser-side World Wide Web graphics.
+Android version 2.2 (Froyo) includes support for ETC1.[5]
+[edit]ETC2 and EAC
+
+The 'ETC2' scheme expands ETC1 in a backwards-compatible way to provide higher quality RGB compression[6] as well as compression of RGBA data (RGB plus alpha).
+The following ETC2 codecs are mandatory in OpenGL ES 3.0[7] and OpenGL 4.3:[8]
+GL_COMPRESSED_RGB8_ETC2 ¡ª Compresses RGB888 data, the followup of ETC1.
+GL_COMPRESSED_RGBA8_ETC2_EAC ¡ª Compresses RGBA8888 data with full alpha support.
+GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2 ¡ª Compresses RGBA data where pixels are either fully transparent or fully opaque.
+sRGB variants of the above codecs are also available.
+EAC is built on the same principles as ETC1/ETC2 but is used for one- or two-channel data. The following four EAC codecs are included as mandatory in OpenGL ES 3.0 and OpenGL 4.3:
+GL_COMPRESSED_R11_EAC ¡ª one channel unsigned data
+GL_COMPRESSED_SIGNED_R11_EAC ¡ª one channel signed data
+GL_COMPRESSED_RG11_EAC ¡ª two channel unsigned data
+GL_COMPRESSED_SIGNED_RG11_EAC ¡ª two channel signed data
+A software package called etcpack for compression and decompression of ETC1/ETC2 textures is available for free download for usage with Khronos APIs.[9]
+
+
+http://en.wikipedia.org/wiki/Ericsson_Texture_Compression
