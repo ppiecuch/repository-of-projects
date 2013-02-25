@@ -122,6 +122,10 @@ namespace yon{
 		typedef dimension2d<f32> dimension2df;
 		typedef dimension2d<u32> dimension2du;
 		typedef dimension2d<s32> dimension2di;
+
+		YON_API extern const dimension2du ZERO_DIMENSION2DF;
+		YON_API extern const dimension2du ZERO_DIMENSION2DU;
+		YON_API extern const dimension2du ZERO_DIMENSION2DI;
 	}
 }
 #endif
