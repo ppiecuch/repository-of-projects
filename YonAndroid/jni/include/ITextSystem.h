@@ -17,7 +17,7 @@ namespace text{
 
 	class ITextSystem : public virtual core::IReferencable,public virtual core::IResizable,public virtual core::IRenderable{
 	public:
-
+		virtual ~ITextSystem(){}
 		virtual IFontFamily* getFontFamily(const io::path& filename,ENUM_FONT_CACHE_STRATEGY strategy=ENUM_FONT_CACHE_STRATEGY_STATIC) = 0;
 
 		virtual IFontPiece* addText(const core::ustring& text, IFontFamily* fontFamily, const core::position2di& pos, u8 fontSize=12, const video::SColor& color=video::COLOR_BLACK, MASK_FONT_STYLE fontStyle=MASK_FONT_STYLE_NORMAL) = 0;
