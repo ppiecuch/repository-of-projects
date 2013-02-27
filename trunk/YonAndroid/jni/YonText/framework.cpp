@@ -11,6 +11,7 @@ ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
+ITextSystem* textSystem=NULL;
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -72,12 +73,16 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
+	textSystem=engine->getTextSystem();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/");
 #endif
+
+	IFontFamily* family=textSystem->getFontFamily("mingliu.ttc");
+	textSystem->addText(core::ustring(L'жа'),family,core::ORIGIN_POSITION2DI);
 
 	return true;
 }
@@ -89,6 +94,8 @@ void drawFrame(){
 	videoDriver->begin(true,true,COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
+
+	textSystem->render(videoDriver);
 	
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 

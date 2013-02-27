@@ -2,7 +2,8 @@
 #define _YON_TEXT_ITEXTSYSTEM_H_
 
 #include "IReferencable.h"
-#include "IRenderable"
+#include "IRenderable.h"
+#include "IResizable.h"
 #include "yonUString.h"
 #include "IFontPiece.h"
 

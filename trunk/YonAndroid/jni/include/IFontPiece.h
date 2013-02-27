@@ -5,12 +5,13 @@
 #include "position2d.h"
 #include "SColor.h"
 #include "SFontIdentifier.h"
+#include "IReferencable.h"
 
 namespace yon{
 namespace text{
 
 	class IFontFamily;
-	class IFontPiece{
+	class IFontPiece : public virtual core::IReferencable{
 	protected:
 		core::ustring m_text;
 		core::position2di m_pos;
@@ -20,7 +21,7 @@ namespace text{
 		IFontPiece(const core::ustring& text,const SFontIdentifier& identifier,const core::position2di& pos,const video::SColor& color)
 			:m_text(text),m_identifier(identifier),m_pos(pos),m_color(color){}
 
-		void u32 getFontCount() const{
+		u32 getFontCount() const{
 			return m_text.size();
 		}
 
