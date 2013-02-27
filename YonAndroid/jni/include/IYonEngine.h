@@ -17,6 +17,7 @@
 #include "ICallback.h"
 #include "II18NManager.h"
 #include "INetManager.h"
+#include "ITextSystem.h"
 
 namespace yon{
 
@@ -36,6 +37,7 @@ namespace yon{
 		virtual IRandomizer* getRandomizer() = 0;
 		virtual i18n::II18NManager* getI18NManager() = 0;
 		virtual net::INetManager* getNetManager() = 0;
+		virtual text::ITextSystem* getTextSystem() = 0;
 
 		//当引擎初始化过程中失败后，available会返回false(用于crash流程)
 		virtual bool available(){return true;}

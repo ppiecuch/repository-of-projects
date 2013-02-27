@@ -201,7 +201,7 @@ namespace yon{
 			virtual bool queryFeature(ENUM_VIDEO_FEATURE feature) const =0;
 
 			//! Returns the maximum texture size supported.
-			virtual core::dimension2du&getMaxTextureSize() const =0;
+			virtual core::dimension2du getMaxTextureSize() const =0;
 
 			//从2D的XY坐标系（以左上角为原点,，x向右，y向下）转为3DXYY坐标系（以屏幕中心为原点，x向右，y向上）
 			virtual void convertPosCoordinate(const core::position2di& src,core::position2df& dest) = 0;

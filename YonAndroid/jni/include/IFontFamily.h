@@ -1,10 +1,13 @@
 #ifndef _YON_TEXT_IFONTFAMILY_H_
 #define _YON_TEXT_IFONTFAMILY_H_
 
+#include "IReferencable.h"
+#include "path.h"
+
 namespace yon{
 namespace text{
 
-	class IFontFamily{
+	class IFontFamily : public virtual core::IReferencable{
 	protected:
 		const io::SNamedPath m_namePath;
 	public:

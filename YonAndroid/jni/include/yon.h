@@ -56,6 +56,9 @@
 
 #include "ICallback.h"
 
+#include "ITextSystem.h"
+#include "IFontPiece.h"
+
 #include "SColor.h"
 #include "SVertex.h" 
 #include "IImage.h"
