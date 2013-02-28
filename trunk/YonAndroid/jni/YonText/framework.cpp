@@ -81,11 +81,12 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	fs->addWorkingDirectory("media/");
 #endif
 
-	IFontFamily* family=textSystem->getFontFamily("mingliu.ttc");
-	textSystem->addText(core::ustring(L'жа'),family,core::ORIGIN_POSITION2DI);
+	IFontFamily* family=textSystem->getFontFamily("staaiti.ttf");
+	textSystem->addText(core::ustring(L'жа'),family,core::ORIGIN_POSITION2DI,12);
 
 	return true;
 }
+ITexture* texture=NULL;
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
@@ -96,6 +97,10 @@ void drawFrame(){
 	sceneMgr->render(videoDriver);
 
 	textSystem->render(videoDriver);
+
+	gfAdapter->clearZ(-1000);
+	gfAdapter->drawImage("FT2FontPage",100,100);
+	gfAdapter->render();
 	
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 

@@ -218,7 +218,7 @@ namespace yon{
 			}
 
 			//添加一张用于渲染缓冲的纹理,size必须是2的N次幂,并且长度都不可超过后缓冲区的大小
-			virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name = "rtt", video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G6B5, bool offScreen=false) =0;
+			virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name = "rtt", video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G6B5, bool offScreen=false, bool withinWindow=true) =0;
 			//参数texture:必须是由addRenderTargetTexture生成的texture
 			//参数color:render target的背景色
 			//virtual bool setRenderTarget(video::ITexture* texture,
