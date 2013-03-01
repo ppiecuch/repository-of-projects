@@ -81,8 +81,8 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	fs->addWorkingDirectory("media/");
 #endif
 
-	IFontFamily* family=textSystem->getFontFamily("staaiti.ttf");
-	textSystem->addText(core::ustring(L'中'),family,core::ORIGIN_POSITION2DI,12);
+	IFontFamily* family=textSystem->getFontFamily("mingliu.ttc");
+	textSystem->addText(core::ustring(L"天行健，君子以自强不息"),family,core::ORIGIN_POSITION2DI,13,video::COLOR_GREEN);
 
 	return true;
 }
@@ -99,10 +99,10 @@ void drawFrame(){
 	textSystem->render(videoDriver);
 
 	gfAdapter->clearZ(-1000);
-	gfAdapter->drawImage("FT2FontPage",100,100);
+	gfAdapter->drawImage("FT2FontPage",10,10,true);
 	gfAdapter->render();
 	
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,DCL:%d,TCC:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall(),videoDriver->getTextureChange()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }
