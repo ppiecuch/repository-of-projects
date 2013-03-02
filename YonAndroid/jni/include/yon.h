@@ -78,11 +78,13 @@
 #include "IViewFrustum.h"
 #include "ICamera.h"
 #include "ISceneManager.h" 
-#include "ITimer.h" 
 #include "IUnit.h" 
 #include "SShap.h"
 #include "SDynamicShap.h"
 #include "IVideoDriver.h" 
+
+#include "ITimer.h" 
+#include "IThread.h"
 #include "IRandomizer.h"
 #include "IYonEngine.h" 
 
