@@ -21,7 +21,7 @@ namespace text{
 		virtual ~ITextSystem(){}
 		virtual IFontFamily* getFontFamily(const io::path& filename,ENUM_FONT_CACHE_STRATEGY strategy=ENUM_FONT_CACHE_STRATEGY_STATIC) = 0;
 
-		virtual IFontPiece* addText(const core::ustring& text, IFontFamily* fontFamily, const core::position2di& pos, u8 fontSize=12, const video::SColor& color=video::COLOR_BLACK, MASK_FONT_STYLE fontStyle=MASK_FONT_STYLE_NORMAL) = 0;
+		virtual IFontPiece* addText(const core::ustring& text, IFontFamily* fontFamily,const core::position2di& pos, u8 fontSize=12, const video::SColor& color=video::COLOR_BLACK, ENUM_FONT_RENDER_MODE mode=ENUM_FONT_RENDER_MODE_MONO, MASK_FONT_STYLE fontStyle=MASK_FONT_STYLE_NORMAL) = 0;
 
 		virtual bool removeText(IFontPiece* piece) = 0;
 

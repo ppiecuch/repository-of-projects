@@ -75,10 +75,10 @@ namespace debug{
 #define YON_WARN(format, ...) yon::debug::Logger->warn(format,##__VA_ARGS__)
 #define YON_ERROR(format, ...) yon::debug::Logger->error(format,##__VA_ARGS__)
 #else
-#define YON_DEBUG(format, ...)
-#define YON_INFO(format, ...)
-#define YON_WARN(format, ...)
-#define YON_ERROR(format, ...)
+#define YON_DEBUG(format, ...)	do{}while(0)
+#define YON_INFO(format, ...)	do{}while(0)
+#define YON_WARN(format, ...)	do{}while(0)
+#define YON_ERROR(format, ...)	do{}while(0)
 #endif
 
 #define YON_FAIL_IF(cond) do { \

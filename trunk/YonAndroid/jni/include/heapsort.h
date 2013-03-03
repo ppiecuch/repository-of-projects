@@ -32,6 +32,8 @@ inline void heaprise(T* elements,u32 s,u32 e){
 	*/
 	//优化
 	T t=elements[s];
+	//注意：不能如下改，一改就错
+	//T& t=elements[s];
 	for(u32 i=s<<1;i<=e;i<<=1){
 		//比较左右孩子，选择较大的
 		if(i<e&&elements[i]<elements[i+1])
