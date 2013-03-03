@@ -17,14 +17,22 @@ namespace text{
 		MASK_FONT_STYLE_COUNT = 6
 	};
 
+	//字体渲染模式
+	enum ENUM_FONT_RENDER_MODE{
+		ENUM_FONT_RENDER_MODE_MONO,
+		ENUM_FONT_RENDER_MODE_NORMAL,
+		ENUM_FONT_RENDER_MODE_COUNT
+	};
+
 	//字体识别符
 	struct SFontIdentifier{
 		IFontFamily* FontFamily;
 		u8 FontSize;
+		ENUM_FONT_RENDER_MODE RenderMode;
 		MASK_FONT_STYLE FontStyle;
 
-		SFontIdentifier(IFontFamily* fontFamily,u8 fontSize,MASK_FONT_STYLE fontStyle)
-			:FontFamily(fontFamily),FontSize(fontSize),FontStyle(fontStyle){}
+		SFontIdentifier(IFontFamily* fontFamily,u8 fontSize,MASK_FONT_STYLE fontStyle,ENUM_FONT_RENDER_MODE renderMode)
+			:FontFamily(fontFamily),FontSize(fontSize),FontStyle(fontStyle),RenderMode(renderMode){}
 
 		inline bool operator < (const SFontIdentifier& other) const
 		{
@@ -32,14 +40,17 @@ namespace text{
 				return FontFamily<other.FontFamily;
 			else if(FontSize!=other.FontSize)
 				return FontSize<other.FontSize;
-			else
+			else if(FontStyle!=other.FontStyle)
 				return FontStyle<other.FontStyle;
+			else
+				return RenderMode<other.RenderMode;
 		}
 
 		inline bool operator!=(const SFontIdentifier& other) const{
 			return FontFamily!=other.FontFamily ||
 				FontSize!=other.FontSize ||
-				FontStyle!=other.FontStyle;
+				FontStyle!=other.FontStyle ||
+				RenderMode!=other.RenderMode;
 		}
 
 		inline bool operator==(const SFontIdentifier& other) const

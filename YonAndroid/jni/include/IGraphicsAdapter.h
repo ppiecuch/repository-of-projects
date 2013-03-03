@@ -77,7 +77,7 @@ namespace scene{
 		//Draws the specified image by using the anchor point.
 		//anchor默认为TOP|LEFT
 		//绘制成功返回true，否则返回false
-		virtual bool drawImage(const c8* imageName, s32 x, s32 y, bool useAlpha=false,MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP)) = 0;
+		virtual bool drawImage(video::ITexture* texture, s32 x, s32 y, bool useAlpha=false,MASK_ACTHOR anchor=(MASK_ACTHOR)(MASK_ACTHOR_LEFT|MASK_ACTHOR_TOP)) = 0;
 
 		//Copies a region of the specified source image to a location within the destination, possibly transforming (rotating and reflecting) the image data using the chosen transform function.
 		//transform默认为ENUM_TRANS_NONE，anchor默认为TOP|LEFT
