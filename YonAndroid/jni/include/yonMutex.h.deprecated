@@ -49,23 +49,17 @@
 
 //TODO：如何鉴别当前线程是LinuxThread还是NPTL
 
-//TODO
-//refer to:A Fast Mostly User Mode Inter-Process Mutex
-//http://www.codeproject.com/Articles/3271/A-Fast-Mostly-User-Mode-Inter-Process-Mutex
-
-//TODO m_iPid似乎不能用，不用反而是正常的
-
 namespace yon{
 namespace core{
 
-	class mutex{
+	class mutex : public virtual IReferencable{
 
 #ifdef YON_COMPILE_WITH_WIN32
 	typedef CRITICAL_SECTION sem_t;
 #endif
 
 	public:
-		mutex(){
+		mutex():m_uCount(0),m_iPid(0){
 #ifdef YON_COMPILE_WITH_WIN32
 			//每个线程中访问临界资源的那段程序称为临界区（Critical Section）（临界资源是一次仅允许一个线程使用的共享资源）。
 			//每次只准许一个线程进入临界区，进入后不允许其他线程进入。
@@ -95,44 +89,97 @@ namespace core{
 		}
 		void wait(){
 #ifdef YON_COMPILE_WITH_WIN32
-			EnterCriticalSection( &m_semaphore );
+			//获取当前进程一个唯一的标识符
+			if(m_iPid != GetCurrentProcessId())
+			{
+				EnterCriticalSection( &m_semaphore );
+				m_iPid = GetCurrentProcessId();
+			}	
 #else
-			//函数sem_wait( sem_t *sem )被用来阻塞当前线程直到信号量sem的值大于0，解除阻塞后将sem的值减一，表明公共资源经使用后减少。
-			sem_wait( &m_semaphore );
+			//基于NPTL的线程库，多线程应用中的每个线程有自己独特的线程 ID，并共享同一个进程ID。
+			//基于 LinuxThreads 的线程库，多线程应用中的每个线程拥有自己独特的进程 ID，getpid（） 在不同的线程中调用会返回不同的值
+			//NPTL 和 LinuxThreads 的行为方式不同。NPTL 在内核中给每个进程结构体添加了专门的 tid 标识符表示线程 id，同时一个进程中的线程共享一个进程号。
+			//函数说明：getpid函数用来取得目前进程的进程识别码，许多程序利用取到的此值来建立临时文件，以避免临时文件相同带来的问题。
+			//返回值：目前进程的进程识别码
+			if(m_iPid != getpid())
+			{
+				//函数sem_wait( sem_t *sem )被用来阻塞当前线程直到信号量sem的值大于0，解除阻塞后将sem的值减一，表明公共资源经使用后减少。
+				sem_wait( &m_semaphore );
+				m_iPid = getpid();
+			}	
 #endif
+			++m_uCount;
 		}
 		void notify(){
 #ifdef YON_COMPILE_WITH_WIN32
-			LeaveCriticalSection( &m_semaphore );
+			if(m_iPid == GetCurrentProcessId())
 #else
-			//函数sem_post( sem_t *sem )用来增加信号量的值当有线程阻塞在这个信号量上时，调用这个函数会使其中的一个线程不再阻塞，选择机制同样是由线程的调度策略决定的。
-			sem_post( &m_semaphore );
+			if(m_iPid == getpid())
 #endif
+			{
+				if(m_uCount == 1)
+				{
+					m_iPid = 0 ;				
+				}	
+				if(m_uCount > 0)
+				{
+					--m_uCount;
+				}			
+				if(m_uCount == 0)
+#ifdef YON_COMPILE_WITH_WIN32
+					LeaveCriticalSection( &m_semaphore );
+#else
+					//函数sem_post( sem_t *sem )用来增加信号量的值当有线程阻塞在这个信号量上时，调用这个函数会使其中的一个线程不再阻塞，选择机制同样是由线程的调度策略决定的。
+					sem_post( &m_semaphore );
+#endif
+			}	
 		}
 		bool tryWait(){
 #ifdef YON_COMPILE_WITH_WIN32
-			if(TryEnterCriticalSection( &m_semaphore ) != 0) // _WIN32_WINNT >= 0x400
+			if(m_iPid != GetCurrentProcessId())
 			{
-				return true;
+				if(TryEnterCriticalSection( &m_semaphore ) != 0) // _WIN32_WINNT >= 0x400
+				{
+					m_iPid = GetCurrentProcessId();
+					++m_uCount;
+					return true;
+				}	
+				else
+				{
+					return false;	
+				}
 			}	
 			else
 			{
-				return false;	
+				++m_uCount;
+				return true;
 			}
 #else
-			//函数sem_trywait ( sem_t *sem )是函数sem_wait（）的非阻塞版本，它直接将信号量sem的值减一。
-			if(sem_trywait( &m_semaphore )==0)
+			if(m_iPid != getpid())
 			{
-				return true;
+				//函数sem_trywait ( sem_t *sem )是函数sem_wait（）的非阻塞版本，它直接将信号量sem的值减一。
+				if(sem_trywait( &m_semaphore )==0)
+				{
+					m_iPid = getpid();
+					m_uCount++;
+					return true;
+				}	
+				else
+				{
+					return false;	
+				}
 			}	
 			else
 			{
-				return false;	
+				++m_uCount;
+				return true;
 			}
 #endif
 		}
 	private:
 		sem_t m_semaphore;
+		u32 m_uCount;	 
+		s32 m_iPid;
 	};
 }
 }

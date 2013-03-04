@@ -193,6 +193,7 @@ namespace yon{
 			}
 
 
+			//NOTE：在使用RTT的过程中，如果存在需要update的情况，则update必须放在当前帧所有使用此RTT的调用之前进行，否则会出现空白RTT的情况（跟GPU指令缓冲有关）
 			//virtual bool setRenderTarget(ENUM_RENDER_TARGET target, bool clearTarget=true, bool clearZBuffer=true, video::SColor color=video::COLOR_ZERO) =0;
 			virtual void setRenderTarget(video::ITexture* texture,bool backBuffer=true, bool zBuffer=true, const video::SColor& color=video::COLOR_ZERO,bool partial=false,const core::recti& area=core::ZERO_RECTI) =0;
 
@@ -228,8 +229,8 @@ namespace yon{
 			virtual IImage* createImageFromFile(const io::path& filename,bool translateIntoGray=false) = 0;
 			virtual IImage* createImageFromFile(io::IReadStream* file,bool translateIntoGray=false) =0;
 
-			virtual ITexture* addTexture(const core::dimension2du& size,
-				const io::path& name, ENUM_COLOR_FORMAT format = ENUM_COLOR_FORMAT_R8G8B8A8) = 0;
+			//NOTE:RESERVE/MIPMAP需要自己控制
+			virtual ITexture* addTexture(const core::dimension2du& size,const io::path& name, ENUM_COLOR_FORMAT format = ENUM_COLOR_FORMAT_R8G8B8A8) = 0;
 			virtual bool setTexture(u32 stage, const video::ITexture* texture) = 0;
 			virtual ITexture* getTexture(const io::path& filename) = 0;
 			virtual video::ITexture* findTexture(const io::path& filename) = 0;

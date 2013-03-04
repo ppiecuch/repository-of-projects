@@ -12,6 +12,7 @@ ILogger* logger=NULL;
 IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
 ITextSystem* textSystem=NULL;
+II18NManager* i18nMgr=NULL;
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -77,6 +78,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
 	textSystem=engine->getTextSystem();
+	i18nMgr=engine->getI18NManager();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
@@ -85,16 +87,20 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 #endif
 
 	family1=textSystem->getFontFamily("staaiti.ttf");
-	textSystem->addText(core::ustring(L"天行健，君子以自强不息，地势坤，君子以厚德载物"),family1,core::position2di(-200,-50),20,video::COLOR_GREEN, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	core::ustring str1=i18nMgr->convert("天行健，君子以自强不息，地势坤，君子以厚德载物",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	textSystem->addText(str1,family1,core::position2di(-200,-50),20,video::COLOR_GREEN, text::ENUM_FONT_RENDER_MODE_NORMAL);
 
 	family2=textSystem->getFontFamily("mingliu.ttc");
-	textSystem->addText(core::ustring(L"莫为浮云遮望眼，风物长宜放眼量"),family2,core::position2di(-200,-70),11,video::COLOR_RED);
+	core::ustring str2=i18nMgr->convert("莫为浮云遮望眼，风物长宜放眼量",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	textSystem->addText(str2,family2,core::position2di(-200,-70),11,video::COLOR_RED);
 
 	family3=textSystem->getFontFamily("simsun.ttc");
-	textSystem->addText(core::ustring(L"中军账下美人靠，怀拥将军度良宵"),family3,core::position2di(-200,-90),13,video::COLOR_BLUE);
+	core::ustring str3=i18nMgr->convert("中军账下美人靠，怀拥将军度良宵",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	textSystem->addText(str3,family3,core::position2di(-200,-90),13,video::COLOR_BLUE);
 
 	family4=textSystem->getFontFamily("stxingka.ttf");
-	textSystem->addText(core::ustring(L"人生结交在终始，莫为升沉中路分"),family4,core::position2di(-200,-110),18 ,video::COLOR_PURPLE, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	core::ustring str4=i18nMgr->convert("人生结交在终始，莫为升沉中路分",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	textSystem->addText(str4,family4,core::position2di(-200,-110),18 ,video::COLOR_PURPLE, text::ENUM_FONT_RENDER_MODE_NORMAL);
 
 	return true;
 }

@@ -169,6 +169,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\AndroidText.mk"
+			>
+		</File>
+		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>

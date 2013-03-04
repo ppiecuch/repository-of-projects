@@ -46,6 +46,14 @@ subdirs += $(LOCAL_PATH)/AndroidCompressDDS.mk
 else
 ifeq ($(APP),SparkRain)
 subdirs += $(LOCAL_PATH)/AndroidSparkRain.mk
+else
+ifeq ($(APP),Thread)
+subdirs += $(LOCAL_PATH)/AndroidThread.mk
+else
+ifeq ($(APP),Text)
+subdirs += $(LOCAL_PATH)/AndroidText.mk
+endif
+endif
 endif
 endif
 endif
