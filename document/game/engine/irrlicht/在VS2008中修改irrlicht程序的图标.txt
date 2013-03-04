@@ -1,0 +1,13 @@
+因为irrlicht是基于Win32控制台的工程，所以VS2008在EXE生成后，会自动使用默认的DOS程序的统一图标。要修改这个图标很简单：在工程中添加一个图标资源即可。只要VS2008能够帮你自动生成resource.h文件和一个.rc文件，编译后的DOS程序的图标，就是你导入的那个图标。
+    具体操作是：在解决方案的树状视图上，在工程名称上点右键，然后在右键菜单的“添加”子菜单上，选“资源...”，接着就导入你要的图标文件就好。
+    如果是普通DOS程序，做到上面这步就够了。但是irrlicht程序还要再做一步代码的工作。因为irrlicht的程序在运行后会自动去调用irrlicht的logo，并设置为程序的图标，所以前面你设置的程序图标在运行时的标题栏上是不会出现的。
+    为了在程序运行后，仍然使用你的图标，你必须在程序的初始化的某处（例如createDevice成功后的下一行），添加下列代码：
+    //注意第四行那里，因为程序使用OpenGL作为渲染引擎，所以必须获取OpenGL窗口，如果是其他引擎要修改为相应句柄。IDI_ICON1是图标资源ID，图标大小48x48。
+HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
+HICON hSmallIcon = (HICON) LoadImage (hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR);
+SExposedVideoData exposedData = device->getVideoDriver()->getExposedVideoData();
+HWND hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
+SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
+    上面代码原理很简单，其实就是直接发送设置图标的消息给应用程序。所以无论原来的程序图标如何，现在都应该修改为你的代码指定的图标了。 
+    
+    http://home.51.com/?u=luoxuechushi&_sid=24
