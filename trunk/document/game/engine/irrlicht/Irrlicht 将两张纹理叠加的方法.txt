@@ -1,0 +1,22 @@
+Irrlicht 将两张纹理的方法。
+之前我用getTexture 的方法中通过设置第一个参数—层数来叠加，但总是不成功，原因是每次画图的时候总是画第0层的图片。
+后来我想过通过image来叠加的方式。这个方法是用过将生成的两个图片进行混合生成新的图片，然后做成texture
+       video::IImage* p = driver->createImageFromFile("../../media/lightFalloff.png");
+       video::IImage* p2 = driver->createImageFromFile("../../media/opengllogo.png");
+       core::vector2d<s32> vec(0,0);
+       core::rect<s32> rec(0,0,128,64);
+       p->copyToWithAlpha(p2,vec,rec,video::SColor(255,255,255,255));
+       char name[128];
+       int idx = 1;
+       sprintf(name,"chengyutop",idx);
+       irr::video::ITexture* pTexture = driver->addTexture(name,p2);
+ 
+       n->setMaterialTexture(0, pTexture );
+       n->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL  );
+       n->setMaterialFlag(video::EMF_LIGHTING, false);
+       n->setPosition(core::vector3df(0,0,20));
+ 
+注意： 混合的两个图片要位数相同，否则混合失败，jpg无法转换成32位的，所以也就不能用它了，用xnview 通过转换里的add alpha（255）变成png图片，png可以实现32的带alpha通道
+ 注：虽说根本算不了什么，但为了能交到更多的朋友，转载请注明出处http://blog.sina.com.cn/chengyutop2，，
+ 
+ http://blog.sina.com.cn/s/blog_64341a530100volx.html
