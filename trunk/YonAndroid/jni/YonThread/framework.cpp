@@ -23,35 +23,82 @@ core::mutex mt;
 s32 testNum=1;
 struct SMyRunnable1 : public yon::IRunnable{
 	virtual void run(){
-		YON_DEBUG("start SMyRunnable1()\r\n");
+		YON_INFO("start SMyRunnable1()\r\n");
 		for(u32 i=0;i<10;++i)
 		{
-			//mt.wait();
+			mt.wait();
 			++testNum;
-			YON_DEBUG("SMyRunnable1 num:%d\r\n",testNum);
+			YON_DEBUG_BREAK_IF(testNum!=2);
+			core::yonSleep(50);
 			--testNum;
-			YON_DEBUG("SMyRunnable1 num:%d\r\n",testNum);
-			//mt.notify();
+			YON_DEBUG_BREAK_IF(testNum!=1);
+			mt.notify();
 			core::yonSleep(50);
 		}
-		YON_DEBUG("end SMyRunnable1()\r\n");
+		core::yonSleep(50);
+		YON_INFO("end SMyRunnable1():%d\r\n",testNum);
 	}
 };
 
 struct SMyRunnable2 : public yon::IRunnable{
 	virtual void run(){
-		YON_DEBUG("start SMyRunnable2()\r\n");
+		YON_INFO("start SMyRunnable2()\r\n");
 		for(u32 i=0;i<10;++i)
 		{
-			//mt.wait();
-			testNum<<=1;
-			YON_DEBUG("SMyRunnable2 num:%d\r\n",testNum);
-			testNum>>=1;
-			YON_DEBUG("SMyRunnable2 num:%d\r\n",testNum);
-			//mt.notify();
+			mt.wait();
+			testNum<<=2;
+			YON_DEBUG_BREAK_IF(testNum!=4);
+			core::yonSleep(50);
+			testNum>>=2;
+			YON_DEBUG_BREAK_IF(testNum!=1);
+			mt.notify();
 			core::yonSleep(50);
 		}
-		YON_DEBUG("end SMyRunnable2()\r\n");
+		core::yonSleep(50);
+		YON_INFO("end SMyRunnable2():%d\r\n",testNum);
+	}
+};
+
+
+IThread* thread3=NULL;
+IThread* thread4=NULL;
+core::mutex ms;
+s32 testCount=1;
+struct SMyRunnable3 : public yon::IRunnable{
+	virtual void run(){
+		YON_INFO("start SMyRunnable3()\r\n");
+		for(u32 i=0;i<10;++i)
+		{
+			ms.wait();
+			++testCount;
+			YON_DEBUG_BREAK_IF(testCount!=2);
+			core::yonSleep(50);
+			--testCount;
+			YON_DEBUG_BREAK_IF(testCount!=1);
+			ms.notify();
+			core::yonSleep(50);
+		}
+		core::yonSleep(50);
+		YON_INFO("end SMyRunnable3():%d\r\n",testCount);
+	}
+};
+
+struct SMyRunnable4 : public yon::IRunnable{
+	virtual void run(){
+		YON_INFO("start SMyRunnable4()\r\n");
+		for(u32 i=0;i<10;++i)
+		{
+			ms.wait();
+			testCount<<=2;
+			YON_DEBUG_BREAK_IF(testCount!=4);
+			core::yonSleep(50);
+			testCount>>=2;
+			YON_DEBUG_BREAK_IF(testCount!=1);
+			ms.notify();
+			core::yonSleep(50);
+		}
+		core::yonSleep(50);
+		YON_INFO("end SMyRunnable4():%d\r\n",testCount);
 	}
 };
 
@@ -85,11 +132,12 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
+bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	params.fpsLimit=0;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -120,6 +168,15 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	r2->drop();
 	thread1->start();
 	thread2->start();
+
+	SMyRunnable3* r3=new SMyRunnable3();;
+	thread3=createThread(r3);
+	r3->drop();
+	SMyRunnable4* r4=new SMyRunnable4();;
+	thread4=createThread(r4);
+	r4->drop();
+	thread3->start();
+	thread4->start();
 	YON_DEBUG("end thread->start()\r\n");
 	
 	return true;
@@ -129,7 +186,7 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
 
@@ -142,6 +199,11 @@ void destroy(){
 		thread1->drop();
 	if(thread2)
 		thread2->drop();
+
+	if(thread3)
+		thread3->drop();
+	if(thread4)
+		thread4->drop();
 	engine->drop();
 	delete params.pEventReceiver;
 }

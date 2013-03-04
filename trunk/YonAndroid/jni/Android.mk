@@ -313,7 +313,12 @@ yon_SOURCES :=   \
 		CGraphicsAdapterWindow.cpp \
 		CSceneManager.cpp \
 		CTriangleSelector.cpp \
+		CFT2FontCache.cpp \
+		CFT2FontPage.cpp \
+		CFT2Library.cpp \
+		CFT2TextSystem.cpp \
 		CTimerUnix.cpp \
+		CThreadPosix.cpp \
 		CFPSCounter.cpp \
 		CColorConverter.cpp \
 		COGLES1ExtensionHandler.cpp \
