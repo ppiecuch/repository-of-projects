@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <list>
 #include "objectpool.h"
+#include "ObjectCache.h"
 using namespace std;
 
 #include <stdio.h>
@@ -260,7 +261,7 @@ int main(int argc, char* argv[])
 
 	printf("%d.%d\n",start2.time,start2.millitm);
 	printf("%d.%d\n",end2.time,end2.millitm);
-#else
+#elif 1
 
 #define COUNT 100000
 	struct _timeb start;
@@ -330,9 +331,30 @@ int main(int argc, char* argv[])
 	_ftime64_s( &start ); 
 	yon::core::CObjectPoolFast<yon::core::CRecyclableObject>* pool4=new yon::core::CObjectPoolFast<yon::core::CRecyclableObject>(10);
 	for(int i=0;i<COUNT;++i){
-		//yon::core::CRecyclableObject* obj=pool4->get();
-		//pool4->recycle(obj);
-		yon::core::CRecyclableObject obj;
+		yon::core::CRecyclableObject* obj=pool4->get();
+		pool4->recycle(obj);
+		//yon::core::CRecyclableObject obj;
+	}
+	pool4->clear();
+	delete pool4;
+	_ftime64_s( &end ); 
+
+	s=end.time-start.time;
+	ms=end.millitm-start.millitm;
+	if(ms<0){
+		ms+=1000;
+		--s;
+	}
+	printf("%d.",s);
+	printf("%03d\n",ms);
+
+#else
+	//TODO
+	_ftime64_s( &start ); 
+	CObjectCache<yon::core::CRecyclableObject>* pool5=new CObjectCache(10);
+	for(int i=0;i<COUNT;++i){
+		yon::core::CRecyclableObject* obj=pool4->get();
+		pool4->recycle(obj);
 	}
 	pool4->clear();
 	delete pool4;
