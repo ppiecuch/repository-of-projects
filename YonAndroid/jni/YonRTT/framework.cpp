@@ -151,7 +151,7 @@ void drawFrame(){
 
 	videoDriver->begin();
 
-	pCamera2->setNeedUpload();
+	pCamera2->setDirty();
 	pCamera2->render(videoDriver);
 
 	if(!gray)
@@ -176,7 +176,7 @@ void drawFrame(){
 
 
 	videoDriver->setRenderTarget(NULL,true,true,COLOR_DEFAULT);
-	pCamera->setNeedUpload();
+	pCamera->setDirty();
 	pCamera->render(videoDriver);
 	gfAdapter->clearZ(1000);
 	TO_PS(100,100,128,128)
