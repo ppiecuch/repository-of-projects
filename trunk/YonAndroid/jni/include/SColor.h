@@ -89,7 +89,7 @@ namespace video{
 			:color(0){}
 
 		//[0,255]
-		explicit SColor (u32 a, u32 r, u32 g, u32 b)
+		explicit SColor (s32 a, s32 r, s32 g, s32 b)
 			:color(((a & 0xff)<<24) | ((b & 0xff)<<16) | ((g & 0xff)<<8) | (r & 0xff)) {}
 
 		explicit SColor(f32 a, f32 r, f32 g, f32 b)
@@ -196,7 +196,7 @@ namespace video{
 		//! Converts this color to a SColor without floats.
 		SColor toSColor() const
 		{
-			return SColor((u32)core::round32(a*255.0f), (u32)core::round32(r*255.0f), (u32)core::round32(g*255.0f), (u32)core::round32(b*255.0f));
+			return SColor(core::round32(a*255.0f), core::round32(r*255.0f), core::round32(g*255.0f), core::round32(b*255.0f));
 		}
 
 		//! Sets three color components to new values at once.
