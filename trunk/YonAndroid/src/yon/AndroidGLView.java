@@ -9,6 +9,7 @@ import yon.util.Util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
@@ -149,6 +150,13 @@ public class AndroidGLView extends GLSurfaceView{
 		
 		currentMoveEvent=new MoveEvent();
 		lastMoveEvent=new MoveEvent();
+		
+		//setEGLConfigChooser(int, int, int, int, int, int) 指定red ,green, blue, alpha, depth ,stencil 支持的位数，
+		//缺省为RGB_565 ,16 bit depth buffer.
+		setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+		//GLSurfaceView 缺省创建为RGB_565 颜色格式的Surface ,
+		//如果需要支持透明度，可以调用getHolder().setFormat(PixelFormat.TRANSLUCENT).
+		getHolder().setFormat(PixelFormat.TRANSLUCENT);
 		
 		renderer=new AndroidGLRender();
 		setRenderer(renderer);
