@@ -1,0 +1,210 @@
+我最近在实现一个事件处理器，应用到了一种“通用成员函数指针的注册”，先声明，这个名词是我给起的，不过我觉得并不充分恰当，但也想不出什么更好的词，看完下面的介绍，也考考您，看这玩意叫个啥比较合适。
+
+先说需求：这个事件处理器需要在捕获一个事件后，调用已注册的处理函数。看起来很普通，呵呵，不过，这个事件处理函数不一定是哪个类的成员函数（但肯定是成员函数），函数的形式是一定的，即拥有相同的返回类型和参数列表。而这些事件和处理函数，注册在一个全局的结构体中。
+
+问题的提出：同一个结构体的各字段类型是固定的，所以仔细想一下，这个保存着事件和处理函数的结构体应该怎么定义呢？事件的类型是一定的，但是处理函数呢？需求中明确指出，这个处理函数很有可能是不同类中的成员函数，而成员函数指针在定义时，是需要明确类的，比如：
+
+void (MyClass::*func_ptr)(void);
+
+定义了一个指向MyClass类中的无参数、返回类型为void的成员函数指针。这样看来，我没有办法定义一个适用于任何类成员函数的指针呀？
+
+那么，我能不能定义一个基类 HandlerBase，让所有包含事件处理函数的类都继承自HandlerBase呢？这样我可以在定义结构体时，将事件处理函数指针定义为
+void (HandlerBase::*func_ptr)(void);
+
+刚刚有这个想法时，我还禁不住一阵欣喜，但细想才发现，这也是行不通的，因为这样的话，我们必需将所有子类中用到的事件处理函数在HandlerBase中声明为虚函数，这样一来，代码就显得混乱没有章法了，所以，这个方法还是 pass 了吧。
+
+看上去问题可能真的很复杂，那怎么办泥？仔细研究后，感觉只有用模板来解决问题了，具体怎么来设计呢？
+
+（补充：当我写完下面一段话再回读的时候，发现我的表达可能并不是太好懂，那么请您硬着头皮看到最后，我相信您一定能明白我的意思的）
+
+首先，通过上面的分析，看来直接将事件处理函数注册到结构体中是不行的，因为同一个结构体，不可能包含一种以上类型的成员。那么，就让我们把这些类型的成员做个统一处理：让我们声明一个基类（FuncCaller），然后把不同的处理函数注册到它的子类（FuncItem）中去，再通过基类中提供的方法来间接调用处理函数！
+
+不过，我可不想针对每一个可能出现事件处理函数的类，都声明一个对应的 FuncItem（因为他们包含的成员函数指针类型不同），那好，现在到了模板上场的时候了，上代码：
+class FuncCaller
+{
+//
+
+};
+
+template <typename T>
+class FuncItem : public FuncCaller
+{
+//
+
+};
+复制代码
+有了这样的定义，我就可以在FuncItem中添加一个指针类型，并定义一个成员变量：
+typedef void (T::*HandlerPtr)(void* param);
+HandlerPtr handler;
+复制代码
+param是事件到达时，可能传递给处理函数的数据。现在，我们在基类FuncCaller中，定义一个函数，来间接调用事件处理函数：
+
+virtual void func_call(void* obj_ptr, void* param)=0;
+
+之所以为纯虚函数，是因为基类是没有实现它的意义的。另外，形参 obj_ptr 用来传递调用事件处理函数的对象，因为成员函数指针是需要通过类的实例来调用的。
+
+下面来看看FuncItem类对 func_call 的实现：
+void func_call(void* obj_ptr, void* param)
+{
+    if( !obj_ptr )
+        return ;
+
+    (((T*)obj_ptr)->*handler)(param);
+}
+复制代码
+差不多了，来看看现在这两个类长成什么样了：
+1class FuncCaller
+2{
+3public:
+4    virtual void func_call(void* obj_ptr, void* param)=0;
+5
+6};
+7
+8template <typename T>
+9class FuncItem : public FuncCaller
+10{
+11private:
+12    typedef void (T::*HandlerPtr)(void* param);
+13    HandlerPtr handler;
+14
+15public:
+16    void func_call(void* obj_ptr, void* param)
+17    {
+18        if( !obj_ptr )
+19            return ;
+20
+21        (((T*)obj_ptr)->*handler)(param);
+22    }
+23
+24};
+复制代码
+嗯，还不错，基本的形式已经有了，不想写太长，待下一篇，再来看看具体事件处理结构的设计。
+
+http://www.pin5i.com/showtopic-24817.html
+
+上一篇的最后，好像缺了点东西，呵呵，看来我还得给他补上。您有没有发现FuncItem有点问题吗？谁来给成员handler赋值呢？交给构造函数吧，改造后的FuncItem如下：
+template <typename T>
+class FuncItem : public FuncCaller
+{
+private:
+    typedef void (T::*HandlerPtr)(void* param);
+    const HandlerPtr handler;
+
+public:
+    void func_call(void* obj_ptr, void* param)
+    {
+        if( !obj_ptr )
+            return ;
+
+        (((T*)obj_ptr)->*handler)(param);
+    }
+
+    FuncItem(const HandlerPtr ptr):handler(ptr) {}  // 此处为新添加代码
+
+};
+复制代码
+现在我们已经写好了 FuncCaller 和它的子类了，开始定义我们的结构体吧！这个结构体应该包含的信息，应该有事件及对应的处理函数，不过，处理函数我已经可以用 FuncCaller 来代替了，所以，具体定义如下：
+typedef struct _EventRegister
+{
+    EventType event;
+    FuncCaller* func_caller;
+} EventRegister;
+复制代码
+至此，大功告成！为了测试我们的成果，让我们做一些工作吧：
+
+1、写两个包含事件处理函数的类：
+class ClassA
+{
+public:
+    void show_me(void* param)
+    { printf("I'm ClassA, show_me is called! param is 0x%x\n", param); }
+};
+
+class ClassB
+{
+public:
+    void come_on(void* param)
+    { printf("I'm ClassB, come_on is called! param is 0x%x", param); }
+};
+复制代码
+2、类有了，再来声明一个注册事件的结构体：
+EventRegister event_center[] = {
+    { EVENT_TEST_1  , new FuncItem<ClassA>(&ClassA::show_me) },
+    { EVENT_TEST_2  , new FuncItem<ClassB>(&ClassB::come_on) },
+    { EVENT_INVALID , NULL }
+};
+复制代码
+最后一项用来标识事件注册的结束。
+
+
+3、写一个触发事件的函数：
+/**
+* Function:send_event
+* params:
+*        event -> event type
+*        target -> who will process the event
+*/
+void send_event(EventType event, void* target, void* param)
+{
+    if( !target )
+        return ;
+
+    int loop_event = 0;
+    EventType et = event_center[loop_event].event;
+    while( et!=EVENT_INVALID )
+    {
+        if( et==event )
+    {
+        event_center[loop_event].func_caller->func_call(target, param);
+        break;
+    }
+
+    et = event_center[++loop_event].event;
+    }
+}
+复制代码
+现在，来写个main吧！
+void main()
+{
+    ClassA ca;
+    ClassB cb;
+
+    send_event(EVENT_TEST_1, (void*)&ca, (void*)0xff00);
+    send_event(EVENT_TEST_2, (void*)&cb, NULL);
+}
+复制代码
+好，运行之前我还得说一下，估计大家也都看到了，我在结构体中注册的事件处理器，与main中调用 send_event时传入的类实例很可能不属于同一个类，比如我在send_event调用时，将cb的指针传递给了事件EVENT_TEST_1，而不是ca的指针，这样会导致不可预期的运行结果。不过，幸好我们正在写的只是测试用的代码，而实际中应用的事件处理调度程序，要比这复杂得多，而且，具体传递给哪个实例来处理这个事件，是由调度程序来判断的，所以，一个好的调试程序的设计，也是至关重要的。不过，就算有再好的设计，我们也不能忽略代码中存在的风险。其实，我们眼前的这个风险，是有解决办法的，不过，先要行看看正常的运行结果：
+I'm ClassA, show_me is called! param is 0xff00
+I'm ClassB, come_on is called! param is 0x0
+
+相当理想。别闲着，试试我们刚说的那个“风险”存在的真实性吧！
+
+稍稍修改一个我们的ClassA：
+class ClassA
+{
+private:
+    char* name;
+
+public:
+    void show_me(void* param)
+    { printf("I'm ClassA, show_me is called! name is %s\n", name); }
+
+    ClassA():name("ClassA") {}
+
+};
+复制代码
+好，先编译运行一下，看看效果：
+I'm ClassA, show_me is called! name is ClassA
+I'm ClassB, come_on is called! param is 0x0
+
+没问题，现在让我们检验风险的存在，修改 main 中的第一个 send_event：
+
+send_event(EVENT_TEST_1, /*(void*)&ca*/(void*)&cb, (void*)0xff00);  // Note: 'ca' is replaced by 'cb'
+
+再编译运行一下：
+
+
+Segmentation fault
+
+
+哈哈，正是我们预想的，原因说起来又一百字，我就省略了，但是效果是明显的。看来，再写下一篇的理由已经很充分了呀！

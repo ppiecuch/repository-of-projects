@@ -1,3 +1,14 @@
+【异常】
+E/AndroidRuntime(31311):java.lang.RuntimeException:eglSwapBuffersfailed:EGL_BAD_ALLOC
+E/AndroidRuntime(31311):atandroid.opengl.GLSurfaceView$EglHelper.throwEglException(GLSurfaceView.java:1080)
+【解决】
+
+【异常】
+java.lang.IllegalArgumentException:Make sure the SurfaceView or associated SurfaceHolder has a valid Surface
+17:03:07.299E/AndroidRuntime(1840):atcom.google.android.gles_jni.EGLImpl._eglCreateWindowSurface(NativeMethod)
+17:03:07.299E/AndroidRuntime(1840):atcom.google.android.gles_jni.EGLImpl.eglCreateWindowSurface(EGLImpl.java:85)
+【解决】
+
 【异常】OpenGL MFC下屏幕显示的闪烁问题
 【解决】
 The flicker occurs because Windows paints the background first and then OpenGL next. 
