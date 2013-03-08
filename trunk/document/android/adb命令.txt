@@ -29,3 +29,9 @@ adb shell dumpsys meminfo $包名 或者 $进程号 //当然你也可以adb shell进去后在输入
 
 adb shell dumpsys wifi
 adb shell dumpsys cpuinfo
+
+android sdcard read-only file system 的解决办法 
+【解决方法】 
+在cmd窗口一条命令就可以了： 
+adb shell 
+mount -o remount rw / 

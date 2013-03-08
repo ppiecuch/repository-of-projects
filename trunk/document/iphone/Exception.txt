@@ -1,6 +1,13 @@
+异常：
+A system application with the given bundle identifier is already installed on the device and cannot be replaced.
+解决：
+越狱工具安装的
+
 异常：关于Undefined symbols for architecture armv7s 
 解决：
 build active architecture only 由yes改为no
+解决二：
+Linker flag中定义相应定义 
 
 异常：
 /Volumes/XC/trunk/examples/ios/XC3D/build/Debug-iphoneos/XC3D.app: Operation not permitted

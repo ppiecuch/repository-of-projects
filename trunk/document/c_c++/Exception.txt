@@ -1,3 +1,6 @@
+[异常]
+OpenGL eglSwapBuffers failed: EGL_BAD_ALLOC，or EGL_BAD_SURFACE
+
 [链接错误]
 缺少libc.lib
 解决这个问题的方法是去掉链接到libc.lib，具体地点：项目-〉属性-〉配置属性-〉链接器-〉忽略特定库libc.lib

@@ -1,0 +1,348 @@
+记得以前讨论过一个关于reentrant函数与thread safe函数的帖子 
+很多人对于这两种函数不是很了解, 
+尤其是发现malloc等函数是non-reentrant函数时,对多线程编程都产生了"恐惧" 
+这里是我对这两种函数的一些理解,希望和大家探讨一些.欢迎批评指正. 
+
+1. reentrant函数 
+
+一个函数是reentrant的，如果它可以被安全地递归或并行调用。要想成为reentrant式的函数，该函数不能含有(或使用)静态(或全局)数据(来存储函数调用过程中的状态信息),也不能返回指向静态数据的指针,它只能使用由调用者提供的数据,当然也不能调用non-reentrant函数. 
+
+比较典型的non-reentrant函数有getpwnam, strtok, malloc等. 
+
+reentrant和non-reentrant函数的例子 
+
+
+
+
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <signal.h>
+
+#include <string.h>
+
+#include <sys/types.h>
+
+#include <unistd.h>
+
+#include <math.h>
+
+
+
+int* getPower(int i)
+
+{
+
+  static int result;
+
+  result = pow(2, i);
+
+  getchar();
+
+  return &result;
+
+}
+
+
+
+void getPower_r(int i, int* result)
+
+{
+
+  *result = pow(2, i);
+
+}
+
+
+
+void handler (int signal_number)	/*处理SIGALRM信号*/
+
+{
+
+  getPower(3);
+
+}
+
+
+
+int main ()
+
+{
+
+  int *result;
+
+  struct sigaction sa;
+
+  memset(&sa, 0, sizeof(sa));
+
+  sa.sa_handler = &handler;
+
+  sigaction(SIGALRM, &sa, NULL);
+
+  result = getPower(5);
+
+  printf("2^5 = %d\n", *result);
+
+  return 0;
+
+}
+
+
+
+
+
+试验方法: 
+1. 编译 gcc test.c -lpthread 
+在一个终端中运行 ./a.out, 在另一个终端中运行 ps -A|grep a.out可以看到该进程的id 
+2. 用如下方式运行a.out: 
+运行./a.out,在按回车前,在另外一个终端中运行kill -14 pid (这里的pid是运行上面的ps时看到的值) 
+然后,按回车继续运行a.out就会看到2^5 = 8 的错误结论 
+
+
+对于函数int* getPower(int i) 
+
+由于函数getPower会返回一个指向静态数据的指针,在第一次调用getPower的过程中,再次调用getPower,则两次返回的指针都指向同一块内存,第二次的结果将第一次的覆盖了(很多non-reentrant函数的这种用法会导致不确定的后果).所以是non-reentrant的. 
+
+
+对于函数void getPower_r(int i, int* result) 
+
+getPower_r会将所得的信息存储到result所指的内存中,它只是使用了由调用者提供的数据,所以是reentrant.在信号处理函数中可以正常的使用它. 
+
+
+2. thread-safe函数 
+
+Thread safety是多线程编程中的概念,thread safe函数是指那些能够被多个线程同时并发地正确执行的函数. 
+
+thread safe和non thread safe的例子 
+
+
+
+
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <pthread.h>
+
+
+
+pthread_mutex_t sharedMutex=PTHREAD_MUTEX_INITIALIZER;
+
+
+
+int count;	/*共享数据*/
+
+
+
+void* func (void* unused)
+
+{
+
+  if (count == 0)
+
+    count++;
+
+}
+
+
+
+void* func_s (void* unused)
+
+{
+
+  pthread_mutex_lock(&sharedMutex);    /*进入临界区*/
+
+  if (count == 0)
+
+    count++;
+
+  pthread_mutex_unlock(&sharedMutex);  /*离开临界区*/
+
+}
+
+
+
+
+
+int main ()
+
+{
+
+  pthread_t pid1, pid2;
+
+  pthread_create(&pid1, NULL, &func, NULL);
+
+  pthread_create(&pid2, NULL, &func, NULL);
+
+  pthread_join(pid1, NULL);
+
+  pthread_join(pid2, NULL);
+
+  return 0;
+
+}
+
+
+
+
+
+函数func是non thread safe的,这是因为它不能避免对共享数据count的race condition, 
+设想这种情况:一开始count是0,当线程1进入func函数,判断过count == 0后,线程2进入func函数 
+线程2判断count==0,并执行count++,然后线程1开始执行,此时count != 0 了,但是线程1仍然要执行 
+count++,这就产生了错误. 
+
+func_s通过mutex锁将对共享数据的访问锁定,从而避免了上述情况的发生.func_s是thread safe的 
+
+只要通过适当的"锁"机制,thread safe函数还是比较好实现的. 
+
+3. reentrant函数与thread safe函数的区别 
+
+reentrant函数与是不是多线程无关,如果是reentrant函数,那么要求即使是同一个进程(或线程)同时多次进入该函数时,该函数仍能够正确的运作. 
+该要求还蕴含着,如果是在多线程环境中,不同的两个线程同时进入该函数时,该函数也能够正确的运作. 
+
+thread safe函数是与多线程有关的,它只是要求不同的两个线程同时对该函数的调用在逻辑上是正确的. 
+
+从上面的说明可以看出,reentrant的要求比thread safe的要求更加严格.reentrant的函数必是thread safe的,而thread safe的函数 
+未必是reentrant的. 举例说明: 
+
+
+
+
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <pthread.h>
+
+#include <signal.h>
+
+#include <string.h>
+
+#include <sys/types.h>
+
+#include <unistd.h>
+
+
+
+pthread_mutex_t sharedMutex=PTHREAD_MUTEX_INITIALIZER;
+
+
+
+int count;	/*共享数据*/
+
+
+
+void* func_s (void* unused)
+
+{
+
+  pthread_mutex_lock(&sharedMutex);    /*进入临界区*/
+
+  printf("locked by thead %d\n", pthread_self());
+
+  if (count == 0)
+
+    count++;
+
+  getchar();
+
+  pthread_mutex_unlock(&sharedMutex);  /*离开临界区*/
+
+  printf("lock released by thead %d\n", pthread_self());
+
+}
+
+
+
+void handler (int signal_number)	/*处理SIGALRM信号*/
+
+{
+
+  printf("handler running in %d\n", pthread_self());
+
+  func_s(NULL);
+
+}
+
+
+
+
+
+int main ()
+
+{
+
+  pthread_t pid1, pid2;
+
+  struct sigaction sa;
+
+  memset(&sa, 0, sizeof(sa));
+
+  sa.sa_handler = &handler;
+
+  sigaction(SIGALRM, &sa, NULL);
+
+  printf("main thread's pid is: %d\n", pthread_self());
+
+  func_s(NULL);
+
+  pthread_create(&pid1, NULL, &func_s, NULL);
+
+  pthread_create(&pid2, NULL, &func_s, NULL);
+
+  pthread_join(pid1, NULL);
+
+  pthread_join(pid2, NULL);
+
+  func_s(NULL);
+
+  return 0;
+
+}
+
+
+
+
+
+试验方法: 
+1. 编译 gcc test.c -lpthread 
+在一个终端中运行 ./a.out, 在另一个终端中运行 ps -A|grep a.out可以看到该进程的id 
+2. 进行下面4次运行a.out: 
+每次运行分别在第1,2,3,4次回车前,在另外一个终端中运行kill -14 pid (这里的pid是上面ps中看到的值) 
+
+试验结果: 
+1. 该进程中有3个线程:一个主线程,两个子线程 
+2. func_s是thread safe的 
+3. func_s不是reentrant的 
+4. 信号处理程序会中断主线程的执行,不会中断子线程的执行 
+5. 在第1,4次回车前,在另外一个终端中运行kill -14 pid会形成死锁,这是因为 
+主线程先锁住了临界区,主线程被中断后,执行handler(以主线程执行),handler试图锁定临界区时, 
+由于同一个线程锁定两次,所以形成死锁 
+6. 在第2,3次回车前,在另外一个终端中运行kill -14 pid不会形成死锁,这是因为一个子线程先锁住 
+了临界区,主线程被中断后,执行handler(以主线程执行),handler试图锁定临界区时,被挂起,这时,子线程 
+可以被继续执行.当该子线程释放掉锁以后,handler和另外一个子线程可以竞争进入临界区,然后继续执行. 
+所以不会形成死锁. 
+
+结论: 
+1. reentrant是对函数相当严格的要求,绝大部分函数都不是reentrant的(APUE上有一个reentrant函数 
+的列表). 
+什么时候我们需要reentrant函数呢?只有一个函数需要在同一个线程中需要进入两次以上,我们才需要 
+reentrant函数.这些情况主要是异步信号处理,递归函数等等.(non-reentrant的递归函数也不一定会 
+出错,出不出错取决于你怎么定义和使用该函数). 大部分时候,我们并不需要函数是reentrant的. 
+
+2. 在多线程环境当中,只要求多个线程可以同时调用一个函数时,该函数只要是thread safe的就可以了. 
+我们常见的大部分函数都是thread safe的,不确定的话请查阅相关文档. 
+
+3. reentrant和thread safe的本质的区别就在于,reentrant函数要求即使在同一个线程中任意地进入两次以上, 
+也能正确执行. 
+
+大家常用的malloc函数是一个典型的non-reentrant但是是thread safe函数,这就说明,我们可以方便的 
+在多个线程中同时调用malloc,但是,如果将malloc函数放入信号处理函数中去,这是一件很危险的事情. 
+
+4. reentrant函数肯定是thread safe函数,也就是说,non thread safe肯定是non-reentrant函数 
+不能简单的通过加锁,来使得non-reentrant函数变成 reentrant函数 
+这个链接是说明一些non-reentrant ===> reentrant和non thread safe ===>thread safe转换的 
+http://www.unet.univie.ac.at/aix/aixprggd/genprogc/writing_reentrant_thread_safe_code.htm
+
+http://www.chinaunix.net/old_jh/23/971102.html

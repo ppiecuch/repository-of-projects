@@ -32,14 +32,17 @@
 			'glBindBuffer ' +
 			'glBufferData ' +
 			'glBufferSubData ' +
+			'glClientActiveTexture ' +
 			'glCompressedTexImage2D ' +
 			'glCompressedTexSubImage2D ' +
 			'glCopyTexImage2D ' +
 			'glCopyTexSubImage2D ' +
 			'glDeleteBuffers ' +
 			'glDisable ' +
+			'glDisableClientState ' +
 			'glDrawElements ' +
 			'glEnable ' +
+			'glEnableClientState ' +
 			'glGenBuffers ' +
 			'glLoadMatrix ' +
 			'glMatrixMode ' +
@@ -47,8 +50,10 @@
 			'glPixelStorei ' +
 			'glReadPixels ' +
 			'glScissor ' +
+			'glTexCoordPointer ' +
 			'glTexImage2D ' +
 			'glTexSubImage2D '
+			
 			;
 		var constants =	
 			'GL_ALPHA ' +
@@ -73,6 +78,7 @@
 			'GL_LINEAR_MIPMAP_NEAREST ' +
 			'GL_LUMINANCE ' +
 			'GL_LUMINANCE_ALPHA ' +
+			'GL_MAX_TEXTURE_COORDS ' +
 			'GL_MAX_TEXTURE_UNITS ' +
 			'GL_NEAREST ' +
 			'GL_NEAREST_MIPMAP_LINEAR ' +
@@ -99,6 +105,7 @@
 			'GL_TEXTURE0 ' +
 			'GL_TEXTUREi ' +
 			'GL_TEXTURE_2D ' +
+			'GL_TEXTURE_COORD_ARRAY ' +
 			'GL_TEXTURE_MAG_FILTER ' +
 			'GL_TEXTURE_MIN_FILTER ' +
 			'GL_TEXTURE_WRAP_S ' +
