@@ -15,6 +15,8 @@
 namespace yon{
 	namespace core{
 
+		inline s32 fnvhash(const c8* str,s32 length,s32 hval=0);
+
 		//! Returns a character converted to lower case
 		static inline u32 locale_lower ( u32 x )
 		{
@@ -679,6 +681,9 @@ namespace yon{
 				return subString(begin, (end +1) - begin);
 			}
 
+			s32 hash(s32 hval=0) const{
+				return core::fnvhash(elements,len,hval);
+			}
 
 			const T* c_str() const
 			{

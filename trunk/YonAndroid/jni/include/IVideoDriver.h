@@ -146,6 +146,7 @@ namespace yon{
 				ENUM_RENDER_MODE_3D,
 				ENUM_RENDER_MODE_COUNT
 			};
+			core::matrix4f m_orthdowProjMatrix,m_orthdowViewMatrix;
 			ENUM_RENDER_MODE m_renderMode;
 			u32 m_textureCreationConfig;
 			io::IFileSystem* m_pFileSystem;
@@ -154,7 +155,8 @@ namespace yon{
 			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name) = 0;
 		public:
 			IVideoDriver(io::IFileSystem* fs,ITimer* timer)
-				:m_renderMode(ENUM_RENDER_MODE_NONE),m_textureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_NONE),m_pFileSystem(fs),m_pTimer(timer){
+				:m_renderMode(ENUM_RENDER_MODE_NONE),m_textureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_NONE),m_pFileSystem(fs),m_pTimer(timer),
+				m_orthdowProjMatrix(true),m_orthdowViewMatrix(true){
 					if(m_pFileSystem)
 						m_pFileSystem->grab();
 					if(m_pTimer)
@@ -167,6 +169,12 @@ namespace yon{
 					m_pTimer->drop();
 				m_resizables.clear();
 			};
+			const core::matrix4f& getOrthdowProjMatrix() const{
+				return m_orthdowProjMatrix;
+			}
+			const core::matrix4f& getOrthdowViewMatrix() const{
+				return m_orthdowViewMatrix;
+			}
 			virtual ENUM_DRIVER_STATE getState() const = 0;
 			io::IFileSystem* getFileSystem() const{
 				return m_pFileSystem;
