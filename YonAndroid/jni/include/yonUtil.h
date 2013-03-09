@@ -119,6 +119,36 @@ namespace core{
 			pathname.append('/');
 	}
 
+	//perform a 32 bit Fowler/Noll/Vo FNV-1a hash on a string
+	//str	- string to hash
+	//length	- length of buffer in octets
+	//hval	- previous hash value or 0 if first call
+	//returns:
+	//	32 bit hash as a static hash type
+	//refer to:http://www.isthe.com/chongo/tech/comp/fnv/index.html
+	inline s32 fnvhash(const c8* str,s32 length,s32 hval){
+		// FNV-1 hash algorithm
+		u8* bp = (u8*)str;	// start of buffer
+		u8* be = (u8*)str + length;
+
+		// FNV-1 hash each octet in the buffer
+		while (*bp || (length >= 0 && bp < be)) 
+		{
+			// xor the bottom with the current octet
+			hval ^= *bp++;
+
+			/* multiply by the 32 bit FNV magic prime mod 2^32 */
+#if !defined(__GNUC__)		
+			const u32 FNV_32_PRIME = ((u32)16777619);
+			hval *= FNV_32_PRIME;
+#else
+			hval += (hval<<1) + (hval<<4) + (hval<<7) + (hval<<8) + (hval<<24);
+#endif
+		}
+
+		return hval;
+	}
+
 	template <class T1, class T2>
 	inline void swap(T1& a, T2& b)
 	{

@@ -73,7 +73,8 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300)); 
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
+	//pCamera=sceneMgr->addCameraFPS();
 	logger=Logger;
 	randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
@@ -88,19 +89,19 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 
 	family1=textSystem->getFontFamily("staaiti.ttf");
 	core::ustring str1=i18nMgr->convert("天行健，君子以自强不息，地势坤，君子以厚德载物",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str1,family1,core::position2di(-200,-50),20,video::COLOR_GREEN, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	textSystem->addText(str1,family1,core::position2di(0,50),20,video::COLOR_GREEN, text::ENUM_FONT_RENDER_MODE_NORMAL);
 
 	family2=textSystem->getFontFamily("mingliu.ttc");
 	core::ustring str2=i18nMgr->convert("莫为浮云遮望眼，风物长宜放眼量",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str2,family2,core::position2di(-200,-70),11,video::COLOR_RED);
+	textSystem->addText(str2,family2,core::position2di(0,70),11,video::COLOR_RED);
 
 	family3=textSystem->getFontFamily("simsun.ttc");
-	core::ustring str3=i18nMgr->convert("中军账下美人靠，怀拥将军度良宵",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str3,family3,core::position2di(-200,-90),13,video::COLOR_BLUE);
+	core::ustring str3=i18nMgr->convert("中军帐下美人靠，怀拥将军度良宵",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	textSystem->addText(str3,family3,core::position2di(0,90),13,video::COLOR_BLUE);
 
 	family4=textSystem->getFontFamily("stxingka.ttf");
 	core::ustring str4=i18nMgr->convert("人生结交在终始，莫为升沉中路分",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str4,family4,core::position2di(-200,-110),18 ,video::COLOR_PURPLE, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	textSystem->addText(str4,family4,core::position2di(0,110),18 ,video::COLOR_PURPLE, text::ENUM_FONT_RENDER_MODE_NORMAL);
 
 	return true;
 }
@@ -116,6 +117,12 @@ void drawFrame(){
 	videoDriver->begin(true,true,COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
+
+	/*videoDriver->setMaterial(video::DEFAULT_MATERIAL);
+	videoDriver->setTransform(ENUM_TRANSFORM_WORLD,core::IDENTITY_MATRIX);
+	videoDriver->draw3DLine(core::vector3df(100,0,0),core::IDENTITY_VECTOR3DF,video::COLOR_RED);
+	videoDriver->draw3DLine(core::vector3df(0,100,0),core::IDENTITY_VECTOR3DF,video::COLOR_GREEN);
+	videoDriver->draw3DLine(core::vector3df(0,0,100),core::IDENTITY_VECTOR3DF,video::COLOR_BLUE);*/
 
 	textSystem->render(videoDriver);
 
