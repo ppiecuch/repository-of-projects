@@ -5,6 +5,32 @@
 
 //ÖÐ¶Ïºê
 
+/*
+
+// Define for breakpointing.
+#if defined (ROCKET_PLATFORM_WIN32)
+#if defined (__MINGW32__)
+#define ROCKET_BREAK asm("int $0x03")
+#else
+#define ROCKET_BREAK _asm { int 0x03 }
+#endif
+#elif defined (ROCKET_PLATFORM_LINUX)
+#if defined __i386__ || defined __x86_64__
+#define ROCKET_BREAK asm ("int $0x03" )
+#else
+#define ROCKET_BREAK
+#endif
+#elif defined (ROCKET_PLATFORM_MACOSX)
+#include <TargetConditionals.h>
+
+#if TARGET_OS_IPHONE
+#define ROCKET_BREAK
+#else
+#define ROCKET_BREAK {__asm__("int $3\n" : : );}
+#endif
+#endif
+*/
+
 #if defined(_DEBUG)
 #if defined(YON_COMPILE_WITH_WIN32)
 	#define YON_DEBUG_BREAK_IF( _CONDITION_ ) if (_CONDITION_) {_asm int 3}

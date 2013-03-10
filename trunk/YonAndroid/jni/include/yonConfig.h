@@ -29,6 +29,13 @@
 #error unrecognized compile platform
 #endif // WIN32
 
+//CPU通用寄存器位数
+#if defined __x86_64__ || defined _M_X64 || defined __powerpc64__ || defined __alpha__ || defined __ia64__ || defined __s390__ || defined __s390x__
+#define YON_ARCH_BITMODE_64
+#else
+#define YON_ARCH_BITMODE_32
+#endif
+
 //视频模式(OpenGLES1/OpenGLES2)
 #define  YON_VIDEO_MODE_OGLES1
 //#define  YON_VIDEO_MODE_OGLES2
