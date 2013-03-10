@@ -1,7 +1,7 @@
 #include <cppunit/config/SourcePrefix.h>
 #include "yonArrayTestCase.h"
 
-//CPPUNIT_TEST_SUITE_REGISTRATION( yonArrayTestCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( yonArrayTestCase );
 
 void yonArrayTestCase::setUp()
 {
@@ -19,13 +19,22 @@ void yonArrayTestCase::assign()
 void yonArrayTestCase::pushString()
 {
 	//全局变量没问题
-	strArray.push_back(core::stringc("test"));
-	CPPUNIT_ASSERT( strArray.size()==1);
+	//strArray.push_back(core::stringc("test"));
+	//CPPUNIT_ASSERT( strArray.size()==1);
 
 	//局部变量出错
+	//20130310：奇怪，现在用AllocatorAlign/Allocator都没事了
 	core::array<core::stringc> temps;
 	temps.push_back(core::stringc("test"));
 	CPPUNIT_ASSERT( temps.size()==1);
+
+	//bug:20130310A
+	//如此用法是有问题的
+	//问题已修复
+	core::array<core::stringc> temps2;
+	temps2.set_used(1);
+	temps2[0]="test";
+	CPPUNIT_ASSERT( temps2.size()==1);
 }
 void yonArrayTestCase::reallocate()
 {

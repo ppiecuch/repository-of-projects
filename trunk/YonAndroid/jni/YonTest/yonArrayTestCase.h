@@ -3,7 +3,13 @@
 #define _YON_ARRAY_TEST_CASE_
 
 #pragma comment(lib, "cppunitd.lib")
+#ifdef YON_COMPILE_WITH_WIN32
+#ifdef _DEBUG
+#pragma comment(lib, "Yon_debug.lib")
+#else
 #pragma comment(lib, "Yon.lib")
+#endif
+#endif
 
 #include <cppunit/extensions/HelperMacros.h>
 #include "yon.h"
@@ -20,8 +26,8 @@ class yonArrayTestCase : public CPPUNIT_NS::TestFixture
 	//CPPUNIT_TEST( insert2 );
 	//CPPUNIT_TEST( insert3 );
 	//CPPUNIT_TEST( insert4 );
-	//CPPUNIT_TEST( pushString );
-	CPPUNIT_TEST( assign );
+	CPPUNIT_TEST( pushString );
+	//CPPUNIT_TEST( assign );
 	CPPUNIT_TEST_SUITE_END();
 protected:
 	array<vector3df*> arr;

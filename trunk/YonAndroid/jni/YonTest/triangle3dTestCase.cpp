@@ -1,7 +1,7 @@
 #include "triangle3dTestCase.h"
 #include "triangle3d.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( triangle3dTestCase );
+//CPPUNIT_TEST_SUITE_REGISTRATION( triangle3dTestCase );
 
 void triangle3dTestCase::setUp()
 {

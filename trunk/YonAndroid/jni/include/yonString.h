@@ -42,6 +42,7 @@ namespace yon{
 				elements[0]=0x0;
 			}
 			string(const string<T,TAlloc>& other):elements(NULL),capacity(0),len(0){
+				printf("copy construct string:%0x8\r\n",this);
 				*this=other;
 			}
 
@@ -57,6 +58,7 @@ namespace yon{
 			}*/
 			
 			string(const c8* const pFmt,...):elements(NULL),capacity(0),len(0){
+				printf("construct string:%0x8\r\n",this);
 				va_list args;
 				va_start(args,pFmt);
 				c8 buffer[1024];
@@ -102,6 +104,7 @@ namespace yon{
 
 			~string(){
 				//delete[] elements;
+				printf("destruct string:%0x8\r\n",this);
 				allocator.deallocate(elements);
 			}
 
@@ -595,28 +598,6 @@ namespace yon{
 				return fastatof(&elements[index]);
 			}
 
-			//暂时只支持整型
-			//TODO 改为realloc
-			string<T,TAlloc> formatWithComma() const{
-				if(len==0)
-					return *this;
-				s32 commaNum=(len-1)/3;
-				if(commaNum==0)
-					return *this;
-				s32 index=len-commaNum*3;
-				u32 i,j;
-				string<T,TAlloc> str;
-				u32 r=index&3;
-				for(i=0,j=0;j<len;++i)
-				{
-					if((i&3)==r)
-						str.append(',');
-					else
-						str.append(elements[j++]);
-				}
-				return str;
-			}
-
 			//! Finds first position of a character not in a given list.
 			/** \param c: List of characters not to find. For example if the method
 			should find the first occurrence of a character not 'a' or 'b', this parameter should be "ab".
@@ -705,6 +686,56 @@ namespace yon{
 				reallocate(count);
 			}
 
+			//千位逗号分隔
+			//暂时只支持整型
+			//TODO 改为realloc
+			//TODO 改为static
+			string<T,TAlloc> formatDecimal() const{
+				if(len==0)
+					return *this;
+				s32 commaNum=(len-1)/3;
+				if(commaNum==0)
+					return *this;
+				s32 index=len-commaNum*3;
+				u32 i,j;
+				string<T,TAlloc> str;
+				u32 r=index&3;
+				for(i=0,j=0;j<len;++i)
+				{
+					if((i&3)==r)
+						str.append(',');
+					else
+						str.append(elements[j++]);
+				}
+				return str;
+			}
+
+			template<size_t size>
+			void format(const c8* const pFmt,...)
+			{
+				YON_DEBUG_BREAK_IF(countBits(size)!=1);
+				va_list args;
+				va_start(args,pFmt);
+				c8 buffer[size];
+				vsprintf_s(buffer,size,pFmt,args);
+				va_end(args);
+
+				*this=buffer;
+			}
+
+			template<size_t size>
+			static string<T,TAlloc> formatString(const c8* const pFmt,...)
+			{
+				YON_DEBUG_BREAK_IF(countBits(size)!=1);
+				va_list args;
+				va_start(args,pFmt);
+				c8 buffer[size];
+				vsprintf_s(buffer,size,pFmt,args);
+				va_end(args);
+
+				return core::string<T,TAlloc>(buffer);
+			}
+
 		private:
 			void reallocate(u32 length)
 			{
@@ -723,8 +754,8 @@ namespace yon{
 			T* elements;
 			u32 capacity;
 			u32 len;
-			YON_API static TAlloc allocator;
-			//TAlloc allocator;
+			//YON_API static TAlloc allocator;
+			TAlloc allocator;
 		};
 		typedef string<c8> stringc;
 		typedef string<wchar_t> stringw;
