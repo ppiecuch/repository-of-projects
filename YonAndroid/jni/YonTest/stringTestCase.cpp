@@ -7,6 +7,13 @@
 void stringTestCase::setUp()
 {
 }
+void stringTestCase::formatString(){
+	core::stringc str1=core::stringc::formatString<ENUM_SIZE_2>("%c",'a');
+	CPPUNIT_ASSERT( str1.length()==1&&str1=="a" );
+
+	core::stringc str2=core::stringc::formatString<ENUM_SIZE_16>("%s","0123456789abcde");
+	CPPUNIT_ASSERT( str2.length()==15&&str2=="0123456789abcde" );
+}
 void stringTestCase::trim(){
 	core::stringc str1("test");
 	CPPUNIT_ASSERT( str1.trim()=="test" );
@@ -20,19 +27,19 @@ void stringTestCase::trim(){
 	printf("%s(%d)\n",str4.trim().c_str(),str4.trim().length());
 	CPPUNIT_ASSERT( str4.trim()=="hello" );
 }
-void stringTestCase::formatWithComma(){
+void stringTestCase::formatDecimal(){
 	core::stringc str1("%d",123456789);
-	CPPUNIT_ASSERT( str1.formatWithComma()=="123,456,789" );
-	printf("%s\n",str1.formatWithComma().c_str());
+	CPPUNIT_ASSERT( str1.formatDecimal()=="123,456,789" );
+	printf("%s\n",str1.formatDecimal().c_str());
 	core::stringc str2("%d",12345678);
-	CPPUNIT_ASSERT( str2.formatWithComma()=="12,345,678" );
+	CPPUNIT_ASSERT( str2.formatDecimal()=="12,345,678" );
 	core::stringc str3("%d",1234567);
-	CPPUNIT_ASSERT( str3.formatWithComma()=="1,234,567" );
-	printf("%s\n",str3.formatWithComma().c_str());
+	CPPUNIT_ASSERT( str3.formatDecimal()=="1,234,567" );
+	printf("%s\n",str3.formatDecimal().c_str());
 	core::stringc str4("%d",1234);
-	CPPUNIT_ASSERT( str4.formatWithComma()=="1,234" );
+	CPPUNIT_ASSERT( str4.formatDecimal()=="1,234" );
 	core::stringc str5("%d",123);
-	CPPUNIT_ASSERT( str5.formatWithComma()=="123" );
+	CPPUNIT_ASSERT( str5.formatDecimal()=="123" );
 }
 void stringTestCase::append()
 {

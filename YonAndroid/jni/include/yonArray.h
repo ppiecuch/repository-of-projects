@@ -182,6 +182,7 @@ namespace core{
 
 		//由小到大进行排序
 		//可能存在BUG：sort();array[X]=XXXX;此时仍被标为有序
+		//注意，因为使用了堆排序，此排序是“不稳定的”
 		void sort()
 		{
 			if (!is_sorted && used>1)
@@ -342,6 +343,10 @@ namespace core{
 			T* old_data = data;
 
 			data = allocator.allocate(new_size); //new T[new_size];
+			//@hzb fix bug:20130310A
+			//不加此行时，data得到的空间数据是随机的，如果此时用户通过
+			//[]操作符获得T& 对象直接进行操作是很危险的，必崩
+			memset(data,0x0,new_size* sizeof(T));
 			allocated = new_size;
 
 			// copy old data

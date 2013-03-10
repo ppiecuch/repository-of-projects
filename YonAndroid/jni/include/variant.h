@@ -17,6 +17,7 @@ namespace gui{
 	class variant{
 	private:
 
+		//TODO 确认位数
 #ifdef YON_ARCH_BITMODE_64
 		static const s32 LOCAL_DATA_SIZE = 32; // Required for Strings
 #else
@@ -38,7 +39,7 @@ namespace gui{
 			VECTOR2 = '2',
 			COLOURF = 'g',
 			COLOURB = 'h',
-			SCRIPTINTERFACE = 'p',
+			//SCRIPTINTERFACE = 'p',
 			VOIDPTR = '*',			
 		};
 
@@ -102,7 +103,7 @@ namespace gui{
 	void variant::clear()
 	{
 		// Free any allocated types.
-		switch (type) 
+		switch (m_type) 
 		{      
 		case STRING:
 			{
@@ -115,7 +116,7 @@ namespace gui{
 		default:
 			break;
 		}
-		type = NONE;
+		m_type = NONE;
 	}
 
 	variant::Type variant::getType() const
@@ -150,37 +151,37 @@ namespace gui{
 
 	void variant::setValue(const u8 value)
 	{
-		type = BYTE;
+		m_type = BYTE;
 		SET_VARIANT(u8);
 	}
 
 	void variant::setValue(const c8 value)
 	{
-		type = CHAR;
+		m_type = CHAR;
 		SET_VARIANT(c8);
 	}
 
 	void variant::setValue(const f32 value)
 	{
-		type = FLOAT;
+		m_type = FLOAT;
 		SET_VARIANT(f32);
 	}
 
 	void variant::setValue(const s32 value)
 	{
-		type = INT;
+		m_type = INT;
 		SET_VARIANT(s32);
 	}
 
 	void variant::setValue(const core::stringc& value) 
 	{
-		if (type == STRING)
+		if (m_type == STRING)
 		{
 			((core::stringc*)m_data)=value;
 		}
 		else
 		{
-			type = STRING;
+			m_type = STRING;
 			//TODO why not new(m_data) value;
 			new(m_data) core::stringc(value);
 		}
@@ -188,7 +189,7 @@ namespace gui{
 
 	void variant::setValue(const u16 value)
 	{
-		type = WORD;
+		m_type = WORD;
 		SET_VARIANT(u16);  
 	}
 
@@ -199,25 +200,25 @@ namespace gui{
 
 	void variant::setValue(void* voidptr) 
 	{
-		type = VOIDPTR;
+		m_type = VOIDPTR;
 		memcpy(m_data, &voidptr, sizeof(void*));
 	}
 
 	void variant::setValue(const core::vector2df& value)
 	{
-		type = VECTOR2;
+		m_type = VECTOR2;
 		SET_VARIANT(core::vector2df);
 	}
 
 	void variant::setValue(const video::SColorf& value)
 	{
-		type = COLOURF;
+		m_type = COLOURF;
 		SET_VARIANT(video::SColorf);
 	}
 
 	void variant::setValue(const video::SColor& value)
 	{
-		type = COLOURB;
+		m_type = COLOURB;
 		SET_VARIANT(video::SColor);
 	}
 
@@ -244,42 +245,42 @@ namespace gui{
 	template< typename T >
 	bool variant::getValue(T& value) const
 	{	
-		switch (type)
+		switch (m_type)
 		{
 		case BYTE:
-			return TypeConverter< u8, T >::Convert(*(byte*)data, value);
+			return TypeConverter< u8, T >::convert(*(u8*)m_data, value);
 			break;
 
 		case CHAR:
-			return TypeConverter< c8, T >::Convert(*(char*)data, value);
+			return TypeConverter< c8, T >::convert(*(c8*)m_data, value);
 			break;
 
 		case FLOAT:
-			return TypeConverter< f32, T >::Convert(*(float*)data, value);
+			return TypeConverter< f32, T >::convert(*(f32*)m_data, value);
 			break;
 
 		case INT:
-			return TypeConverter< s32, T >::Convert(*(int*)data, value);
+			return TypeConverter< s32, T >::convert(*(s32*)m_data, value);
 			break;
 
 		case STRING:
-			return TypeConverter< core::stringc, T >::Convert(*(String*)data, value);
+			return TypeConverter< core::stringc, T >::convert(*(core::stringc*)m_data, value);
 			break;
 
 		case WORD:
-			return TypeConverter< u16, T >::Convert(*(word*)data, value);
+			return TypeConverter< u16, T >::convert(*(u16*)m_data, value);
 			break;
 
 		case VECTOR2:
-			return TypeConverter< core::vector2df, T >::Convert(*(Vector2f*)data, value);
+			return TypeConverter< core::vector2df, T >::convert(*(core::vector2df*)m_data, value);
 			break;
 
 		case COLOURF:
-			return TypeConverter< video::SColorf, T >::Convert(*(Colourf*)data, value);
+			return TypeConverter< video::SColorf, T >::convert(*(video::SColorf*)m_data, value);
 			break;
 
 		case COLOURB:
-			return TypeConverter< video::SColor, T >::Convert(*(Colourb*)data, value);
+			return TypeConverter< video::SColor, T >::convert(*(video::SColor*)m_data, value);
 			break;
 
 		/*case SCRIPTINTERFACE:
@@ -287,7 +288,7 @@ namespace gui{
 			break;*/
 
 		case VOIDPTR:
-			return TypeConverter< void*, T >::Convert((void*)data, value);
+			return TypeConverter< void*, T >::convert((void*)m_data, value);
 			break;
 
 		case NONE:
