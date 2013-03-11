@@ -346,6 +346,7 @@ namespace core{
 			//@hzb fix bug:20130310A
 			//不加此行时，data得到的空间数据是随机的，如果此时用户通过
 			//[]操作符获得T& 对象直接进行操作是很危险的，必崩
+			//TODO 统一清空并不合适，使用默认构造函数是否更合适？
 			memset(data,0x0,new_size* sizeof(T));
 			allocated = new_size;
 
