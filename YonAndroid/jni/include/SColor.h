@@ -142,6 +142,7 @@ namespace video{
 		}
 
 		core::stringc toHexString(bool withAlpha=true,bool withPound=true) const{
+#if 0
 			static const c8 map[17] = "0123456789ABCDEF";
 			c8 tmp[9] = "12345678";
 			u32 c=color;
@@ -155,6 +156,35 @@ namespace video{
 			if(withPound)
 				result=core::stringc("#")+result;
 			return result;
+#else
+			if(withAlpha)
+			{
+				if(withPound)
+					return core::stringc("#%08X",color);
+				else
+					return core::stringc("%08X",color);
+			}
+			else
+			{
+				if(withPound)
+					return core::stringc("#%06X",color&0x00FFFFFF);
+				else
+					return core::stringc("%06X",color&0x00FFFFFF);
+			}
+			return core::stringc("");
+#endif
+		}
+
+		static SColor fromHexString(const core::stringc& str){
+			SColor c;
+			core::stringc tmp=str;
+			//TODO 验证格式
+			if(tmp.findFirst('#')!=-1)
+				tmp=tmp.subString(1);
+			if(tmp.length()==6)
+				tmp=core::stringc("FF")+tmp;
+			sscanf_s(tmp.c_str(),"%X",&c.color,tmp.length());
+			return c;
 		}
 
 		void set(u32 a, u32 r, u32 g, u32 b)
@@ -201,14 +231,28 @@ namespace video{
 		//! Constructs a color from 32 bit Color.
 		/** \param c: 32 bit color from which this SColorf class is
 		constructed from. */
-		SColorf(SColor c)
+		SColorf(const SColor& c)
 		{
-			const f32 inv = 1.0f / 255.0f;
+			*this=c;
+		}
+
+		SColorf& operator = (const SColor& c){
+			const static f32 inv = 1.0f / 255.0f;
 			r = c.getRed() * inv;
 			g = c.getGreen() * inv;
 			b = c.getBlue() * inv;
 			a = c.getAlpha() * inv;
+			return *this;
 		}
+
+		inline bool operator!=(const SColorf& other) const{
+			return	r != other.r || 
+					g != other.g ||
+					b != other.b ||
+					a != other.a;
+		}
+
+		inline bool operator==(const SColorf& other) const{return !(*this!=other);}
 
 		//! Converts this color to a SColor without floats.
 		SColor toSColor() const

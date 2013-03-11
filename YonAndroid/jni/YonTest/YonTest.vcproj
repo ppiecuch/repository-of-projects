@@ -183,6 +183,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\convertorTestCase.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\convertorTestCase.h"
+			>
+		</File>
+		<File
 			RelativePath=".\heapsortTestCase.cpp"
 			>
 		</File>

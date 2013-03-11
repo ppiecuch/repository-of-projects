@@ -2,6 +2,7 @@
 #define _YON_CORE_CONVERTER_H_
 
 #include "ILogger.h"
+#include "yonArray.h"
 
 namespace yon{
 namespace core{
@@ -54,7 +55,7 @@ namespace core{
 	YON_PASS_THROUGH(bool);
 	YON_PASS_THROUGH(c8);
 	YON_PASS_THROUGH(u16);
-	YON_PASS_THROUGH(core::vector2di);
+	//YON_PASS_THROUGH(core::vector2di);
 	YON_PASS_THROUGH(core::vector2df);
 	YON_PASS_THROUGH(video::SColorf);
 	YON_PASS_THROUGH(video::SColor);
@@ -88,7 +89,7 @@ namespace core{
 
 	/////////////////////////////////////////////////
 	// String To Othre Types Conversion
-	/////////////////////////////////////////////////
+	///////////////////////////////////////////////// 
 
 #define YON_STRING_FLOAT_CONVERTER(type) \
 	template<> \
@@ -157,6 +158,157 @@ namespace core{
 				return true;
 			}
 			return false;
+		}
+	};
+
+	template<>
+	class convertor< core::stringc, core::vector2df >
+	{
+	public:
+		static bool convert(const core::stringc& src, core::vector2df& dest)
+		{
+			core::array<core::stringc> arr;
+			src.split(arr," ");
+			if (arr.size() != 2)
+			{
+				YON_WARN(YON_LOG_WARN_FORMAT,core::stringc("ConverterStringArray:convert %s failed,for no request count:2!",src.c_str()).c_str());
+				return false;
+			}
+			if (!convertor< core::stringc, f32 >::convert(arr[0], dest.x))
+				return false;
+			if (!convertor< core::stringc, f32 >::convert(arr[1], dest.y))
+				return false;
+			return true;
+		}
+	};
+
+	template<>
+	class convertor< core::stringc, video::SColor >
+	{
+	public:
+		static bool convert(const core::stringc& src, video::SColor& dest)
+		{
+			dest=video::SColor::fromHexString(src);
+			return true;
+		}
+	};
+
+	template<>
+	class convertor< core::stringc, video::SColorf >
+	{
+	public:
+		static bool convert(const core::stringc& src, video::SColorf& dest)
+		{
+			dest=video::SColor::fromHexString(src);
+			return true;
+		}
+	};
+
+	/////////////////////////////////////////////////
+	// Others Type To String Conversion
+	/////////////////////////////////////////////////
+#define YON_FLOAT_STRING_CONVERTER(type) \
+	template<> \
+	class convertor< type, core::stringc > \
+	{ \
+	public: \
+		static bool convert(const type& src, core::stringc& dest) \
+		{ \
+			dest.format<ENUM_SIZE_32>("%.4f", src); \
+			return true; \
+		} \
+	}
+	YON_FLOAT_STRING_CONVERTER(f32);
+	YON_FLOAT_STRING_CONVERTER(f64);
+
+#undef YON_FLOAT_STRING_CONVERTER
+
+	template<>
+	class convertor< s32, core::stringc >
+	{
+	public:
+		static bool convert(const s32& src, core::stringc& dest)
+		{
+			dest.format<ENUM_SIZE_16>("%d", src);
+			return true;
+		}
+	};
+
+	template<>
+	class convertor< u32, core::stringc >
+	{
+	public:
+		static bool convert(const u32& src, core::stringc& dest)
+		{
+			dest.format<ENUM_SIZE_16>("%u", src);
+			return true;
+		}
+	};
+
+	template<>
+	class convertor< u8, core::stringc >
+	{
+	public:
+		static bool convert(const u8& src, core::stringc& dest)
+		{
+			dest.format<ENUM_SIZE_8>("%u", src);
+			return true;
+		}
+	};
+
+	template<>
+	class convertor< bool, core::stringc >
+	{
+	public:
+		static bool convert(const bool& src, core::stringc& dest)
+		{
+			dest = src ? "true" : "false";
+			return true;
+		}
+	};
+
+	template<>
+	class convertor< c8*, core::stringc >
+	{
+	public:
+		//TODO 为何是c8* const而不是const c8*
+		static bool convert(c8* const & src, core::stringc& dest)
+		{
+			dest = src;
+			return true;
+		}
+	};
+
+	template<>
+	class convertor< core::vector2df, core::stringc >
+	{
+	public:
+		static bool convert(const core::vector2df& src, core::stringc& dest)
+		{
+			dest.format<ENUM_SIZE_32>("%.4f %.4f",src.x,src.y);
+			return true;
+		}
+	};
+
+	template<>
+	class convertor< video::SColor, core::stringc >
+	{
+	public:
+		static bool convert(const video::SColor& src, core::stringc& dest)
+		{
+			dest=src.toHexString();
+			return true;
+		}
+	};
+
+	template<>
+	class convertor< video::SColorf, core::stringc >
+	{
+	public:
+		static bool convert(const video::SColorf& src, core::stringc& dest)
+		{
+			dest=src.toSColor().toHexString();
+			return true;
 		}
 	};
 }

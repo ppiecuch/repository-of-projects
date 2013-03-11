@@ -115,9 +115,17 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 #endif
 #if 1
 
-	s32 s;
-	core::convertor<core::stringc,s32>::convert(core::stringc("134312"),s);
-	YON_DEBUG("%d\r\n",s);
+	//s32 s;
+	//core::convertor<core::stringc,s32>::convert(core::stringc("134FF2"),s);
+	//YON_DEBUG("%d\r\n",s);
+
+	video::SColor c1(0xFF134ff2);
+	YON_DEBUG("%s\r\n",c1.toHexString(true,false).c_str());
+	//YON_DEBUG("%s\r\n",toHexString(0xFF134ff2,false,false).c_str());
+
+	video::SColor c=video::SColor::fromHexString("#123456FF");
+	YON_DEBUG("%08X\r\n",c.color);
+
 
 #elif 0
 	f32 f;
