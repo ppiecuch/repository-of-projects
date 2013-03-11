@@ -14,7 +14,11 @@ using namespace yon::scene::animator;
 using namespace yon::audio;
 
 #ifdef YON_COMPILE_WITH_WIN32
-#pragma comment(lib, "Yon.lib")
+#ifdef _DEBUG
+#pragma comment(lib, "Yon_debug.lib")
+#else
+#pragma comment(lib, "Yon_release.lib")
+#endif
 #endif
 
 //材质系统由IMaterial调整为SMaterial，所以定义此数组，以适配原特效模块的接入

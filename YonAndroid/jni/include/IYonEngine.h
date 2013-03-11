@@ -13,7 +13,7 @@
 #include "IEventReceiver.h"
 #include "IGraphicsAdapter.h"
 #include "IAudioDriver.h"
-#include "IRandomizer.h"
+//#include "IRandomizer.h"
 #include "ICallback.h"
 #include "II18NManager.h"
 #include "INetManager.h"
@@ -34,7 +34,7 @@ namespace yon{
 		virtual scene::IGraphicsAdapter* getGraphicsAdapterWindow() const = 0;
 		virtual io::IFileSystem* getFileSystem() const = 0;
 		virtual audio::IAudioDriver* getAudioDriver() const = 0;
-		virtual IRandomizer* getRandomizer() = 0;
+		//virtual IRandomizer* getRandomizer() = 0;
 		virtual i18n::II18NManager* getI18NManager() = 0;
 		virtual net::INetManager* getNetManager() = 0;
 		virtual text::ITextSystem* getTextSystem() = 0;

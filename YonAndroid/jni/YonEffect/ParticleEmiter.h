@@ -3,6 +3,7 @@
 
 #include "math.h"
 #include  "Sparticle.h"
+#include "yon.h"
 //#include "FileReader.h"
 
 
@@ -42,10 +43,10 @@ public:
 	
      
 	//@hzb
-	static IRandomizer* randomizer;
-	static void setRandomizer(IRandomizer* randomizer){CParticleEmiter::randomizer=randomizer;}
+	//static IRandomizer* randomizer;
+	//static void setRandomizer(IRandomizer* randomizer){CParticleEmiter::randomizer=randomizer;}
 	inline f32  CCRANDOM_MINUS1_1(){
-		return (2.0f*(f32)randomizer->rand(0,INT_MAX)/INT_MAX)-1.0f;
+		return (2.0f*(f32)randomizer::rand(0,INT_MAX)/INT_MAX)-1.0f;
 	}
 
     //发射位置 对应于点发射器的位置，  方形发射器和圆形发射器的中心

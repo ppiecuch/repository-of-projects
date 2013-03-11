@@ -6,6 +6,8 @@
 namespace yon{
 namespace core{
 
+//TODO==>solved(20130310B)测试YonEffect的时候，此文件报错（T t=elements[s];地址有误）
+
 //最坏的情况下,时间复杂度O(nlogn)
 //堆排序仅需要一个记录大小供交换用的辅助存储空间
 
@@ -71,7 +73,9 @@ inline void heapsort(T* elements,u32 size){
 	u32 i;
 	T* virtualArray=elements-1;
 	//将elements[0...size-1]建成大顶堆
-	for(i=size<<1;i>0;--i)
+	//@hzb fix bug:20130310B
+	//for(i=size<<1;i>0;--i)
+	for(i=size-1;i>0;--i)
 		heaprise(virtualArray,i,size);
 	//抽走堆顶元素，并用未抽过的堆尾元素替换
 	for(i=size;i>1;--i){

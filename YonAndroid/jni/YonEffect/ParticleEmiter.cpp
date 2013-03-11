@@ -1,6 +1,6 @@
 #include "ParticleEmiter.h"
 
-IRandomizer* CParticleEmiter::randomizer;
+//IRandomizer* CParticleEmiter::randomizer;
 
 CParticleEmiter::CParticleEmiter(void)
 {

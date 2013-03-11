@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="$(SolutionDir)bin\freetype.lib"
+				AdditionalDependencies="$(SolutionDir)bin\freetype_debug.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

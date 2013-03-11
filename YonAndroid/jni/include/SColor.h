@@ -2,6 +2,7 @@
 #define _YON_VIDEO_SCOLOR_H_
 
 #include "yonMath.h"
+#include "yonString.h"
 
 namespace yon{
 namespace video{
@@ -138,6 +139,22 @@ namespace video{
 		u32 getAverage() const
 		{
 			return ( getRed() + getGreen() + getBlue() ) / 3;
+		}
+
+		core::stringc toHexString(bool withAlpha=true,bool withPound=true) const{
+			static const c8 map[17] = "0123456789ABCDEF";
+			c8 tmp[9] = "12345678";
+			u32 c=color;
+			for( s32 i=0; i<8; ++i ) {
+				tmp[7-i] = map[c&0xf];
+				c >>= 4;
+			}
+			core::stringc result(tmp);
+			if(withAlpha==false)
+				result=result.subString(2);
+			if(withPound)
+				result=core::stringc("#")+result;
+			return result;
 		}
 
 		void set(u32 a, u32 r, u32 g, u32 b)

@@ -69,9 +69,9 @@ int CBoxEmiter::emit( int now,int timeSinceLastCall,CSparticle*& outArray )
 
 	   //@hzb
 	   if(posVar.x)
-		   temp_pos.x+=-posVar.x+CParticleEmiter::randomizer->rand(0,INT_MAX)%((int)(2*posVar.x));
+		   temp_pos.x+=-posVar.x+randomizer::rand(0,INT_MAX)%((int)(2*posVar.x));
 	   if(posVar.y)
-		   temp_pos.y+=-posVar.y+CParticleEmiter::randomizer->rand(0,INT_MAX)%((int)(2*posVar.y));
+		   temp_pos.y+=-posVar.y+randomizer::rand(0,INT_MAX)%((int)(2*posVar.y));
 
 
       

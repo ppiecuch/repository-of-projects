@@ -9,7 +9,7 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 II18NManager* i18nManager=NULL;
 
 ISceneNode* cubeModel=NULL;
@@ -76,7 +76,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/",true);
@@ -101,7 +101,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//Logger->debug("%d\n",_mkdir("d:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/media/tst/tst/tst/"));
 	//core::mkdirs(io::path("d:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/media/tst/tst/tst/"));
 	Logger->debug("success\n");
-#endif
+
 	//core::mkdirs(fs->getAbsolutePath(io::path("../media\\test1\\test2")).c_str());
 
 	//Logger->debug("%s\n",core::getParentName(io::path("../media/fdsafs.txt")).c_str());
@@ -112,8 +112,21 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 
 	YON_DEBUG("%s(%d)\r\n",utf8_1.toStringc().c_str(),utf8_1.size());
 	YON_DEBUG("%s(%d)\r\n",i18nManager->convert(utf8_2.toStringc().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str(),utf8_2.size());
-
+#endif
 #if 1
+
+	s32 s;
+	core::convertor<core::stringc,s32>::convert(core::stringc("134312"),s);
+	YON_DEBUG("%d\r\n",s);
+
+#elif 0
+	f32 f;
+	core::convertor<s32,f32>::convert(1,f);
+	YON_DEBUG("%.2f\r\n",f);
+
+#elif 0
+	core::stringc& str=video::COLOR_RED.toHexString(true,false);
+	YON_DEBUG("%s\r\n",str.c_str());
 
 #elif 0
 	IWriteStream* ws=fs->createAndOpenWriteFileStream("d:/test.txt");

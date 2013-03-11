@@ -72,7 +72,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 
 	
 	pCamera2->setEventReceivable(false);
-	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(1024,1024), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8);
+	rtt = videoDriver->addRenderTargetTexture(core::dimension2d<u32>(1024,1024), "RTT",video::ENUM_COLOR_FORMAT_R8G8B8A8,true,false);
 	pCamera2->onResize(rtt->getSize());
 
 	return true;
@@ -93,7 +93,7 @@ void drawFrame(){
 	
 	area.set(0,0,128,128);
 	pCamera2->onResize(core::dimension2du(area.getWidth(),area.getHeight()));
-	pCamera2->setNeedUpload();
+	pCamera2->setDirty();
 	pCamera2->render(videoDriver);
 	videoDriver->setRenderTarget(rtt,true,true,COLOR_BLUE,true,area);
 
@@ -112,7 +112,7 @@ void drawFrame(){
 	
 	area.set(384,384,512,512);
 	pCamera2->onResize(core::dimension2du(area.getWidth(),area.getHeight()));
-	pCamera2->setNeedUpload();
+	pCamera2->setDirty();
 	pCamera2->render(videoDriver);
 	videoDriver->setRenderTarget(rtt,true,true,COLOR_RED,true,area);
 
@@ -132,7 +132,7 @@ void drawFrame(){
 	//»Ö¸´ÖÁÆÁÄ»»º³åÇø
 	videoDriver->setRenderTarget(NULL,true,true,COLOR_DEFAULT);
 
-	pCamera->setNeedUpload();
+	pCamera->setDirty();
 	pCamera->render(videoDriver);
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 

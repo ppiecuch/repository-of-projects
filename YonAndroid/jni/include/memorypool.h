@@ -61,13 +61,14 @@ namespace core{
 		YON_DEBUG_BREAK_IF(total>m_uChunkSize);
 		if(total>m_uChunkSize)
 			return NULL;
+		chunk* result=NULL;
 		if(m_pChunkHead!=NULL)
 		{
 			chunk* p=m_pChunkHead;
 			m_pChunkHead=m_pChunkHead->Next;
-			return ++p;
+			result=++p;
 		}
-		if(m_pBlockHead==NULL||m_pBlockHead->Current==m_pBlockHead->First+(CHUNK_SIZE+m_uChunkSize)*m_uChunkCountPerBlock)
+		else if(m_pBlockHead==NULL||m_pBlockHead->Current==m_pBlockHead->First+(CHUNK_SIZE+m_uChunkSize)*m_uChunkCountPerBlock)
 		{
 			m_uChunkCountPerBlock<<=1;
 			block* pBlock=(block*)malloc(BLOCK_SIZE+(CHUNK_SIZE+m_uChunkSize)*m_uChunkCountPerBlock);
@@ -81,13 +82,15 @@ namespace core{
 		{
 			chunk* p=(chunk*)m_pBlockHead->Current;
 			m_pBlockHead->Current+=CHUNK_SIZE+m_uChunkSize;
-			return ++p;
+			result=++p;
 		}
-		return NULL;
+		//printf("memorypool<%d> allocate:%u->%08x\r\n",Size,size,result);
+		return result;
 	}
 
 	template<size_t Size>
 	void memorypool<Size>::deallocate(void* p){
+		//printf("memorypool<%d> deallocate:%08x\r\n",Size,p);
 		chunk* pChunk=(chunk*)((c8*)p-CHUNK_SIZE);
 		pChunk->Next=m_pChunkHead;
 		m_pChunkHead=pChunk;
