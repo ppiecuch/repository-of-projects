@@ -42,7 +42,7 @@ namespace yon{
 				elements[0]=0x0;
 			}
 			string(const string<T,TAlloc>& other):elements(NULL),capacity(0),len(0){
-				printf("copy construct string:%0x8\r\n",this);
+				//printf("copy construct string:%0x8\r\n",this);
 				*this=other;
 			}
 
@@ -58,7 +58,7 @@ namespace yon{
 			}*/
 			
 			string(const c8* const pFmt,...):elements(NULL),capacity(0),len(0){
-				printf("construct string:%0x8\r\n",this);
+				//printf("construct string:%0x8\r\n",this);
 				va_list args;
 				va_start(args,pFmt);
 				c8 buffer[1024];
@@ -104,7 +104,7 @@ namespace yon{
 
 			~string(){
 				//delete[] elements;
-				printf("destruct string:%0x8\r\n",this);
+				//printf("destruct string:%0x8\r\n",this);
 				allocator.deallocate(elements);
 			}
 
@@ -584,7 +584,7 @@ namespace yon{
 
 			//忽略字符串前面N个非数字字符，直到找到数字字符，对之进行atof
 			//如果不存在数字字符，返回0.0f
-			f32 superatof()
+			f32 superatof() const
 			{
 				u32 index=0;
 				for(u32 i=0;i<len;++i)
@@ -754,8 +754,8 @@ namespace yon{
 			T* elements;
 			u32 capacity;
 			u32 len;
-			//YON_API static TAlloc allocator;
-			TAlloc allocator;
+			YON_API static TAlloc allocator;
+			//TAlloc allocator;
 		};
 		typedef string<c8> stringc;
 		typedef string<wchar_t> stringw;

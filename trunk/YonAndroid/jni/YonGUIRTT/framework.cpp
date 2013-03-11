@@ -270,7 +270,7 @@ void drawFrame(){
 	rt=canvas->getTexture()->getRenderTarget();
 
 
-	pCamera2->setNeedUpload();
+	pCamera2->setDirty();
 	pCamera2->render(videoDriver);
 	rt->begin();
 
@@ -285,7 +285,7 @@ void drawFrame(){
 	rt->end();
 
 	//因为超出sceneMgr管理范围地独自调用了camera.render，这里要恢复一下
-	pCamera->setNeedUpload();
+	pCamera->setDirty();
 	pCamera->render(videoDriver);
 	sceneMgr->render(videoDriver);
 

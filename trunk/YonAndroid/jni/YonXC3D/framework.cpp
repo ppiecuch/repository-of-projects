@@ -11,7 +11,7 @@ ICamera* pOverlookCamera=NULL;
 ICamera* pOrthoCamera=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
 f32 factor=1.1f;
 
@@ -141,7 +141,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	pCamera->setFar(5000);
 	pCamera->setNear(1);
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");

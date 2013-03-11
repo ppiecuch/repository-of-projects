@@ -14,8 +14,9 @@ ISceneManager* sceneMgr=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
+
 
 float angleY = 0.0f;
 float angleX = 45.0f;
@@ -401,7 +402,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCameraFPS(NULL,0.01f);
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
 
 #ifdef YON_COMPILE_WITH_WIN32

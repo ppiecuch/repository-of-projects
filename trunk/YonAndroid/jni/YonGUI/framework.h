@@ -16,8 +16,8 @@ using namespace yon::scene::animator;
 using namespace yon::audio;
 
 #ifdef YON_COMPILE_WITH_WIN32
-#pragma comment(lib, "Yon.lib")
-#pragma comment(lib, "freetype.lib")
+#pragma comment(lib, "Yon_debug.lib")
+#pragma comment(lib, "freetype_debug.lib")
 #pragma comment(lib, "MyGUIEngine.lib")
 #pragma comment(lib, "MyGUIAdapter.lib")
 #endif

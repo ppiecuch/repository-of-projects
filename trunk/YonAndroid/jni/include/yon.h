@@ -19,6 +19,7 @@
 #include "ILogger.h" 
 #include "IProfile.h"
 
+#include "converter.h"
 #include "dimension2d.h" 
 #include "dimension3d.h" 
 #include "exception.h" 
@@ -30,6 +31,7 @@
 #include "position2d.h"
 #include "position3d.h"
 #include "quaternion.h"
+#include "randomizer.h"
 #include "vector2d.h" 
 #include "vector3d.h" 
 #include "aabbox3d.h"
@@ -85,7 +87,7 @@
 
 #include "ITimer.h" 
 #include "IThread.h"
-#include "IRandomizer.h"
+//#include "IRandomizer.h"
 #include "IYonEngine.h" 
 
 #include "SVideoDriverInfo.h" 

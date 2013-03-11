@@ -13,7 +13,7 @@ ISceneManager* sceneMgr=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
 
 float angleY = 0.0f;
@@ -125,7 +125,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCameraFPS(NULL,0.01f);
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -230,7 +230,7 @@ void drawFrame(){
 		for (int i = 0; i < NB_POINT_MASS; ++i)
 			massGroup->addParticles(1,
 			Vector3D(2.0f,0.0f,0.0f),
-			Vector3D(randomizer->rand(-100,0)/100.f,randomizer->rand(-50,50)/100.f,randomizer->rand(-50,50)/100.f));
+			Vector3D(randomizer::rand(-100,0)/100.f,randomizer::rand(-50,50)/100.f,randomizer::rand(-50,50)/100.f));
 		massGroup->flushAddedParticles(); // to ensure particles are added
 		first=false;
 	}

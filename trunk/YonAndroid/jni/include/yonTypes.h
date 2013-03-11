@@ -50,6 +50,8 @@
 
 namespace yon{
 
+typedef void*				pvoid;
+
 #ifdef _MSC_VER
 typedef unsigned __int8		u8;
 #else
@@ -108,6 +110,22 @@ typedef unsigned short		c16;
 typedef unsigned long		c32;
 typedef float				f32;
 typedef double				f64;
+
+// define the wchar_t type if not already built in.
+#ifdef _MSC_VER
+#ifndef _WCHAR_T_DEFINED
+//! A 16 bit wide character type.
+/**
+Defines the wchar_t-type.
+In VS6, its not possible to tell
+the standard compiler to treat wchar_t as a built-in type, and
+sometimes we just don't want to include the huge stdlib.h or wchar.h,
+so we'll use this.
+*/
+typedef unsigned short wchar_t;
+#define _WCHAR_T_DEFINED
+#endif // wchar is not defined
+#endif // microsoft compiler
 
 #ifdef YON_WCHAR_FILESYSTEM
 typedef wchar_t fschar;

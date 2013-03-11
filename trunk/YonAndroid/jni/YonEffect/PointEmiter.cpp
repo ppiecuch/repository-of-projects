@@ -1,4 +1,5 @@
 #include "PointEmiter.h"
+#include "yon.h"
 
 
 /*ÑÕÉ«µÄ³Ë»ý */
@@ -75,9 +76,9 @@ int CPointEmiter::emit( int now,int timeSinceLastCall,CSparticle*& outArray )
 	   //temp_pos.y+=-posVar.y+rand()%((int)(2*posVar.y));
 	   //@hzb
 	   if(posVar.x)
-		   temp_pos.x+=-posVar.x+CParticleEmiter::randomizer->rand(0,INT_MAX)%((int)(2*posVar.x));
+		   temp_pos.x+=-posVar.x+randomizer::rand(0,INT_MAX)%((int)(2*posVar.x));
 	   if(posVar.y)
-		   temp_pos.y+=-posVar.y+CParticleEmiter::randomizer->rand(0,INT_MAX)%((int)(2*posVar.y));
+		   temp_pos.y+=-posVar.y+randomizer::rand(0,INT_MAX)%((int)(2*posVar.y));
 
 
       

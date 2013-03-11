@@ -13,7 +13,7 @@ IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 ITimer* timer=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* pRandomizer=NULL;
 int     lastTime=0;
 
 CBillBoardAmt * p_BillboardAmt=NULL;
@@ -66,7 +66,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0));
 	logger=Logger;
 	timer=engine->getTimer();
-	randomizer=engine->getRandomizer();
+	//pRandomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
@@ -185,7 +185,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	p_SpeEffectSet->SpeArray.push_back(p_SpeEffect);
 
 */	
-	CParticleEmiter::setRandomizer(randomizer);
+	//CParticleEmiter::setRandomizer(pRandomizer);
 
    p_SpeEffectSet=new CSpeEffectSet();
    p_SpeEffectSet->setVideoDriver(videoDriver);

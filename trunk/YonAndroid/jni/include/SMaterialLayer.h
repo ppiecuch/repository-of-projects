@@ -29,7 +29,8 @@ namespace video{
 	struct SMaterialLayer{
 	private:
 		friend struct SMaterial;
-		core::yonAllocatorMemoryPool<core::matrix4f> MatrixAllocator;
+		YON_API static core::yonAllocatorMemoryPool<core::matrix4f> MatrixAllocator;
+		//YON_API static core::yonAllocator<core::matrix4f> MatrixAllocator;
 		core::matrix4f* pTextureMatrix;
 	public:
 		ITexture* texture;
@@ -42,14 +43,18 @@ namespace video{
 			wrapV(ENUM_WRAP_MODE_REPEAT),
 			filter(ENUM_FILTER_MODE_BILINEAR),
 			pTextureMatrix(NULL)
-		{}
+		{
+			//printf("construct SMaterialLayer:%08x,matrix:%08x\r\n",this,pTextureMatrix);
+		}
 		SMaterialLayer(const SMaterialLayer& other)
 		{
 			pTextureMatrix=NULL;
 			*this = other;
+			//printf("copy SMaterialLayer:%08x,matrix:%08x\r\n",this,pTextureMatrix);
 		}
 		~SMaterialLayer()
 		{
+			//printf("destruct SMaterialLayer:%08x,matrix:%08x\r\n",this,pTextureMatrix);
 			MatrixAllocator.destruct(pTextureMatrix);
 			MatrixAllocator.deallocate(pTextureMatrix); 
 		}
