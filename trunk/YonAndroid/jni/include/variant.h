@@ -23,11 +23,11 @@ namespace gui{
 #else
 		static const s32 LOCAL_DATA_SIZE = 24;
 #endif
-		Type m_type;
-		c8 m_data[LOCAL_DATA_SIZE];
+		ENUM_TYPE Type;
+		c8 Data[LOCAL_DATA_SIZE];
 	public:
 		/// Type of data stored in the variant.
-		enum Type
+		enum ENUM_TYPE
 		{
 			NONE = '-',
 			BYTE = 'b',
@@ -57,7 +57,7 @@ namespace gui{
 
 		/// Gets the current internal representation type.
 		/// @return The type of data stored in the variant internally.
-		Type getType() const;
+		ENUM_TYPE getType() const;
 
 		/// Shares another variant's data with this variant.
 		/// @param[in] copy Variant to share data.
@@ -82,7 +82,7 @@ namespace gui{
 
 	};
 
-	variant::variant() : m_type(NONE)
+	variant::variant() : Type(NONE)
 	{
 		// Make sure our object size assumptions fit inside the static buffer
 		YON_DEBUG_BREAK_IF(sizeof(video::SColor) <= LOCAL_DATA_SIZE);
@@ -90,7 +90,7 @@ namespace gui{
 		YON_DEBUG_BREAK_IF(sizeof(core::stringc) <= LOCAL_DATA_SIZE);
 	}
 
-	variant::variant( const variant& copy ) : m_type(NONE)
+	variant::variant( const variant& copy ) : Type(NONE)
 	{
 		setValue(copy);
 	}
@@ -103,12 +103,12 @@ namespace gui{
 	void variant::clear()
 	{
 		// Free any allocated types.
-		switch (m_type) 
+		switch (Type) 
 		{      
 		case STRING:
 			{
 				// Clean up the string.
-				core::stringc* str = (core::stringc*)m_data;
+				core::stringc* str = (core::stringc*)Data;
 				str->~stringc();
 			}
 			break;
@@ -116,12 +116,12 @@ namespace gui{
 		default:
 			break;
 		}
-		m_type = NONE;
+		Type = NONE;
 	}
 
-	variant::Type variant::getType() const
+	variant::ENUM_TYPE variant::getType() const
 	{
-		return m_type;
+		return Type;
 	}
 
 	//////////////////////////////////////////////////
@@ -132,64 +132,64 @@ namespace gui{
 
 	void variant::setValue(const variant& copy)
 	{
-		switch (copy.m_type)
+		switch (copy.Type)
 		{
 		case STRING:
 			{
 				// Create the string
-				setValue(*(core::stringc*)copy.m_data);
+				setValue(*(core::stringc*)copy.Data);
 			}
 			break;
 
 		default:
 			clear();
-			memcpy(m_data, copy.m_data, LOCAL_DATA_SIZE);
+			memcpy(Data, copy.Data, LOCAL_DATA_SIZE);
 			break;	
 		}
-		m_type = copy.m_type;
+		Type = copy.Type;
 	}
 
 	void variant::setValue(const u8 value)
 	{
-		m_type = BYTE;
+		Type = BYTE;
 		SET_VARIANT(u8);
 	}
 
 	void variant::setValue(const c8 value)
 	{
-		m_type = CHAR;
+		Type = CHAR;
 		SET_VARIANT(c8);
 	}
 
 	void variant::setValue(const f32 value)
 	{
-		m_type = FLOAT;
+		Type = FLOAT;
 		SET_VARIANT(f32);
 	}
 
 	void variant::setValue(const s32 value)
 	{
-		m_type = INT;
+		Type = INT;
 		SET_VARIANT(s32);
 	}
 
 	void variant::setValue(const core::stringc& value) 
 	{
-		if (m_type == STRING)
+		if (Type == STRING)
 		{
-			((core::stringc*)m_data)=value;
+			((core::stringc*)Data)=value;
 		}
 		else
 		{
-			m_type = STRING;
+			Type = STRING;
 			//TODO why not new(m_data) value;
-			new(m_data) core::stringc(value);
+			new(Data) core::stringc(value);
 		}
 	}
 
 	void variant::setValue(const u16 value)
 	{
-		m_type = WORD;
+		Type = WORD;
 		SET_VARIANT(u16);  
 	}
 
@@ -200,25 +200,25 @@ namespace gui{
 
 	void variant::setValue(void* voidptr) 
 	{
-		m_type = VOIDPTR;
-		memcpy(m_data, &voidptr, sizeof(void*));
+		Type = VOIDPTR;
+		memcpy(Data, &voidptr, sizeof(void*));
 	}
 
 	void variant::setValue(const core::vector2df& value)
 	{
-		m_type = VECTOR2;
+		Type = VECTOR2;
 		SET_VARIANT(core::vector2df);
 	}
 
 	void variant::setValue(const video::SColorf& value)
 	{
-		m_type = COLOURF;
+		Type = COLOURF;
 		SET_VARIANT(video::SColorf);
 	}
 
 	void variant::setValue(const video::SColor& value)
 	{
-		m_type = COLOURB;
+		Type = COLOURB;
 		SET_VARIANT(video::SColor);
 	}
 
@@ -245,42 +245,42 @@ namespace gui{
 	template< typename T >
 	bool variant::getValue(T& value) const
 	{	
-		switch (m_type)
+		switch (Type)
 		{
 		case BYTE:
-			return TypeConverter< u8, T >::convert(*(u8*)m_data, value);
+			return TypeConverter< u8, T >::convert(*(u8*)Data, value);
 			break;
 
 		case CHAR:
-			return TypeConverter< c8, T >::convert(*(c8*)m_data, value);
+			return TypeConverter< c8, T >::convert(*(c8*)Data, value);
 			break;
 
 		case FLOAT:
-			return TypeConverter< f32, T >::convert(*(f32*)m_data, value);
+			return TypeConverter< f32, T >::convert(*(f32*)Data, value);
 			break;
 
 		case INT:
-			return TypeConverter< s32, T >::convert(*(s32*)m_data, value);
+			return TypeConverter< s32, T >::convert(*(s32*)Data, value);
 			break;
 
 		case STRING:
-			return TypeConverter< core::stringc, T >::convert(*(core::stringc*)m_data, value);
+			return TypeConverter< core::stringc, T >::convert(*(core::stringc*)Data, value);
 			break;
 
 		case WORD:
-			return TypeConverter< u16, T >::convert(*(u16*)m_data, value);
+			return TypeConverter< u16, T >::convert(*(u16*)Data, value);
 			break;
 
 		case VECTOR2:
-			return TypeConverter< core::vector2df, T >::convert(*(core::vector2df*)m_data, value);
+			return TypeConverter< core::vector2df, T >::convert(*(core::vector2df*)Data, value);
 			break;
 
 		case COLOURF:
-			return TypeConverter< video::SColorf, T >::convert(*(video::SColorf*)m_data, value);
+			return TypeConverter< video::SColorf, T >::convert(*(video::SColorf*)Data, value);
 			break;
 
 		case COLOURB:
-			return TypeConverter< video::SColor, T >::convert(*(video::SColor*)m_data, value);
+			return TypeConverter< video::SColor, T >::convert(*(video::SColor*)Data, value);
 			break;
 
 		/*case SCRIPTINTERFACE:
@@ -288,7 +288,7 @@ namespace gui{
 			break;*/
 
 		case VOIDPTR:
-			return TypeConverter< void*, T >::convert((void*)m_data, value);
+			return TypeConverter< pvoid, T >::convert((void*)Data, value);
 			break;
 
 		case NONE:
