@@ -8,21 +8,8 @@ namespace gui{
 
 	class symbol{
 	public:
-		enum ENUM_TAG{
-		};
-		enum ENUM_ATTRIBUTE{
-			ID = 0,
-			NAME,
-			CLASS,
-			VALUE,
-			DISABLED,
-			CHECKED,
-			SOURCE,
-			COLS,
-			ROWS,
-			MAX_LENGTH,
-			ATTRIBUTE_COUNT
-		};
+		
+		
 		enum ENUM_PROPERTY{
 			MARGIN_TOP = 0,
 			MARGIN_RIGHT,

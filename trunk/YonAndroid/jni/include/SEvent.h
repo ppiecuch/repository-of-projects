@@ -1,10 +1,16 @@
-#ifndef _YON_GUI_EVENT_H_
-#define _YON_GUI_EVENT_H_
+#ifndef _YON_GUI_SEVENT_H_
+#define _YON_GUI_SEVENT_H_
 
 namespace yon{
 namespace gui{
 
 	//refer to:http://www.w3.org/TR/DOM-Level-3-Events/#event-flow
+
+	/*
+	tabindex, accesskey, onfocus, onblur, onselect, onchange, 
+	onclick, ondblclick, onmousedown, onmouseup, onmouseover, 
+	onmousemove, onmouseout, onkeypress, onkeydown, onkeyup
+	*/
 
 	//Event objects are dispatched to an event target. At the beginning of the dispatch, implementations must first determine the event object's propagation path.
 
@@ -36,7 +42,7 @@ namespace gui{
 	//the event object propagates through the target's ancestors in reverse order, starting with the target's parent and ending with the defaultView.
 	//This phase is also known as the bubbling phase. Event listeners registered for this phase must handle the event after it has reached its target.
 
-	class event{
+	class SEvent{
 	public:
 		enum ENUM_PHASE{
 			CAPTURE = 0,
@@ -45,10 +51,14 @@ namespace gui{
 			PHASE_COUNT
 		};
 
+		enum ENUM_EVENT{
+
+		};
+
 		/// Constructor
-		event();
+		SEvent();
 		/// Destructor
-		virtual ~event();
+		virtual ~SEvent();
 
 		/// Get the current propagation phase.
 		/// @return Current phase the event is in.
