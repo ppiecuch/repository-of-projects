@@ -44,6 +44,8 @@ namespace gui{
 		};
 
 		variant();
+
+		explicit variant(const)
 		/// Templatised constructors don't work for the copy constructor, so we have to define it
 		/// explicitly.
 		variant(const variant&);
@@ -62,6 +64,42 @@ namespace gui{
 		/// Shares another variant's data with this variant.
 		/// @param[in] copy Variant to share data.
 		void setValue(const variant& copy);
+		/// Sets a byte value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const u8 value);
+		/// Sets a signed char value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const c8 value);
+		/// Sets a float value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const f32 value);
+		/// Sets a signed int value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const s32 value);
+		/// Sets a word value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const u16 value);
+		/// Sets a constant C string value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const char* value);
+		/// Sets a generic void* value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(pvoid value);
+		/// Sets an EMP string value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const core::stringc& value);
+		/// Sets a Vector2f value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const core::vector2df& value);
+		/// Sets a Colourf value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const video::SColorf& value);
+		/// Sets a Colourb value on this variant.
+		/// @param[in] value New value to set.
+		void setValue(const video::SColor& value);
+		/// Sets a script object value on this variant.
+		/// @param[in] value New value to set.
+		//void setValue(ScriptInterface* value);
 
 		/// Templatised data accessor. TypeConverters will be used to attempt to convert from the
 		/// internal representation to the requested representation.
@@ -248,39 +286,39 @@ namespace gui{
 		switch (Type)
 		{
 		case BYTE:
-			return TypeConverter< u8, T >::convert(*(u8*)Data, value);
+			return core::convertor< u8, T >::convert(*(u8*)Data, value);
 			break;
 
 		case CHAR:
-			return TypeConverter< c8, T >::convert(*(c8*)Data, value);
+			return core::convertor< c8, T >::convert(*(c8*)Data, value);
 			break;
 
 		case FLOAT:
-			return TypeConverter< f32, T >::convert(*(f32*)Data, value);
+			return core::convertor< f32, T >::convert(*(f32*)Data, value);
 			break;
 
 		case INT:
-			return TypeConverter< s32, T >::convert(*(s32*)Data, value);
+			return core::convertor< s32, T >::convert(*(s32*)Data, value);
 			break;
 
 		case STRING:
-			return TypeConverter< core::stringc, T >::convert(*(core::stringc*)Data, value);
+			return core::convertor< core::stringc, T >::convert(*(core::stringc*)Data, value);
 			break;
 
 		case WORD:
-			return TypeConverter< u16, T >::convert(*(u16*)Data, value);
+			return core::convertor< u16, T >::convert(*(u16*)Data, value);
 			break;
 
 		case VECTOR2:
-			return TypeConverter< core::vector2df, T >::convert(*(core::vector2df*)Data, value);
+			return core::convertor< core::vector2df, T >::convert(*(core::vector2df*)Data, value);
 			break;
 
 		case COLOURF:
-			return TypeConverter< video::SColorf, T >::convert(*(video::SColorf*)Data, value);
+			return core::convertor< video::SColorf, T >::convert(*(video::SColorf*)Data, value);
 			break;
 
 		case COLOURB:
-			return TypeConverter< video::SColor, T >::convert(*(video::SColor*)Data, value);
+			return core::convertor< video::SColor, T >::convert(*(video::SColor*)Data, value);
 			break;
 
 		/*case SCRIPTINTERFACE:
@@ -288,7 +326,7 @@ namespace gui{
 			break;*/
 
 		case VOIDPTR:
-			return TypeConverter< pvoid, T >::convert((void*)Data, value);
+			return core::convertor< pvoid, T >::convert((void*)Data, value);
 			break;
 
 		case NONE:

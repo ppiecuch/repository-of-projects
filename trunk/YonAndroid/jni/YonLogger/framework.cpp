@@ -9,7 +9,7 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
 
 class MyEventReceiver : public IEventReceiver{
@@ -70,7 +70,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300)); 
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -105,7 +105,7 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	PROFILE_REGISTER_FRAME();
+	//PROFILE_REGISTER_FRAME();
 	videoDriver->begin(true,true,COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
@@ -115,15 +115,18 @@ void drawFrame(){
 	//Logger->drawString(videoDriver,core::stringc("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),core::position2di(0,20),COLOR_GREEN);
 	//Logger->drawString(videoDriver,core::stringc("abcdefghijklmnopqrstuvwxyz"),core::position2di(0,40),COLOR_GREEN);
 	//Logger->drawString(videoDriver,core::stringc("0123456789+-*/\,./?<>|="),core::position2di(0,60),COLOR_GREEN);
+	
+	//TODO 此句一开，Android上必崩
+	//Logger->render(videoDriver);
+
 	u32 start=timer->getRealTime();
-	Logger->render(videoDriver);
 	u32 end=timer->getRealTime();
-	Logger->drawString(videoDriver,core::stringc("use time:%d",end-start),core::position2di(200,0),COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("use time:%d",(end-start)),core::position2di(200,0),COLOR_GREEN);
 
 	videoDriver->end();
 }
 void destroy(){
-	PROFILE_REPORT();
+	//PROFILE_REPORT();
 	engine->drop();
 	delete params.pEventReceiver;
 }

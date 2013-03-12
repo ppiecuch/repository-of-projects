@@ -70,9 +70,14 @@ namespace gui{
 
 		/// Has the event been stopped?
 		/// @return True if the event is still propogating
-		bool ssPropagating() const;
+		bool isPropagating() const;
 		/// Stops the propagation of the event wherever it is
 		void stopPropagation();
+
+	private:
+		bool Interruptible;
+		bool Interruped;
+		ENUM_PHASE Phase;
 	};
 }
 }

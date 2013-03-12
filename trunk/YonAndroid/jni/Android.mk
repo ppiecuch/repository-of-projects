@@ -264,10 +264,14 @@ vorbis_SOURCES :=\
 		Yon/libvorbis/vorbisenc.c \
 		Yon/libvorbis/vorbisfile.c \
 		Yon/libvorbis/window.c 
+		
+gui_SOURCES :=\
+	$(addprefix Yon/, \
+		CGUISystem.cpp \
+)
 
 yon_SOURCES :=   \
 	$(addprefix Yon/, \
-		CRandomizer.cpp \
 		CWave.cpp \
 		CWaveLoaderWAV.cpp \
 		CWaveLoaderOGG.cpp \
@@ -350,7 +354,8 @@ LOCAL_SRC_FILES := \
 		$(ogg_SOURCES) \
 		$(vorbis_SOURCES) \
 		$(freetype_SOURCES) \
-		$(yon_SOURCES)
+		$(yon_SOURCES) \
+		$(gui_SOURCES)
 		
 		
 LOCAL_ARM_MODE   := arm 
