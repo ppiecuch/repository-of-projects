@@ -112,7 +112,7 @@ namespace core{
 	public:
 		static bool convert(const core::stringc& src, s32& dest)
 		{
-			return sscanf(src.c_str(), "%d", &dest) == 1;
+			return sscanf_s(src.c_str(), "%d", &dest,src.length()) == 1;
 		}
 	};
 
@@ -122,7 +122,7 @@ namespace core{
 	public:
 		static bool convert(const core::stringc& src, u32& dest)
 		{
-			return sscanf(src.c_str(), "%u", &dest) == 1;
+			return sscanf_s(src.c_str(), "%u", &dest ,src.length()) == 1;
 		}
 	};
 
@@ -133,7 +133,7 @@ namespace core{
 		static bool convert(const core::stringc& src, u8& dest)
 		{
 			s32 value;
-			bool ret = sscanf(src.c_str(), "%d", &value) == 1;
+			bool ret = sscanf_s(src.c_str(), "%d", &value,src.length()) == 1;
 			dest = (u8) value;
 			return ret && (value <= 255);
 		}

@@ -3,6 +3,17 @@
 
 #include "yonMap.h"
 
+#define _yon_core_alignemntpool_h_printf(fmt,...) printf(fmt,##__VA_ARGS__)
+#ifdef YON_COMPILE_WITH_ANDROID
+#include <android/log.h>
+#define printf(fmt,...) __android_log_print(ANDROID_LOG_DEBUG,YON_ENGINE_NAME,fmt,##__VA_ARGS__)
+#endif
+
+#ifdef printf
+#undef  printf
+#endif
+#define printf(fmt,...)
+
 namespace yon{
 namespace core{
 
@@ -90,6 +101,7 @@ namespace core{
 	template<size_t ChunkSize,size_t ChunkCountPerBlock,size_t Align>
 	void* alignmentpool<ChunkSize,ChunkCountPerBlock,Align>::allocate(u32 size,u32 count){
 		//以最坏的情况估计空间（偏移量最多Align-1，外加上一个字节空间的offset）
+		printf("alignmentpool(%08X) start allocate:%u,%u\r\n",this,size,count);
 		u32 total=size*count+Align;
 		//printf("size:%u,count:%u\n",size,count);
 		if(total>m_uRealChunkSize)
@@ -101,6 +113,7 @@ namespace core{
 			m_noCaches[alignAddr]=p;
 			//printf("WARN,no cache:%08X,%08X\n",addr,alignAddr);
 			++m_uAlloc;
+			printf("alignmentpool(%08X) end allocate:%u,%u->%08X\r\n",this,size,count,(p+(alignAddr-addr)));
 			return (void*)(p+(alignAddr-addr));
 		}
 
@@ -137,6 +150,7 @@ namespace core{
 		*((u8*)ptr-1)=offset;
 		test-=1;
 		++m_uAlloc;
+		printf("alignmentpool(%08X) end allocate:%u,%u,%08X\r\n",this,size,count,ptr);
 		return (void*)ptr;
 	}
 
@@ -145,6 +159,7 @@ namespace core{
 		if(p==NULL)
 			return;
 
+		printf("alignmentpool(%08X) start deallocate:%08X\r\n",this,p);
 		void* realPointer;
 		if(m_noCaches.remove(reinterpret_cast<u32>(p),&realPointer))
 		{
@@ -152,6 +167,7 @@ namespace core{
 			//free(realPointer);
 			operator delete(realPointer);
 			++m_uDelloc;
+			printf("alignmentpool(%08X) end deallocate(nocache):%08X\r\n",this,p);
 			return;
 		}
 
@@ -164,6 +180,7 @@ namespace core{
 		tmp->Next=m_pFreeHead;
 		m_pFreeHead=tmp;
 		++m_uDelloc;
+		printf("alignmentpool(%08X) end deallocate(cache):%08X\r\n",this,p);
 	}
 }
 }
@@ -173,6 +190,11 @@ namespace core{
 #undef new
 #endif
 #define new YON_DEBUG_NEW
+#endif
+
+#ifdef YON_COMPILE_WITH_ANDROID
+#undef printf
+#define printf(fmt,...) _yon_core_alignemntpool_h_printf(fmt,##__VA_ARGS__)
 #endif
 
 #endif

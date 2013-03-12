@@ -1,10 +1,13 @@
 #ifndef _YON_GUI_SPROPERTY_H_
 #define _YON_GUI_SPROPERTY_H_
 
+#include "variant.h"
+
 namespace yon{
 namespace gui{
 
 	struct SProperty{
+	public:
 		enum ENUM_UNIT
 		{
 			UNKNOWN = 1 << 0,
@@ -34,6 +37,9 @@ namespace gui{
 			PC = 1 << 12,				// number suffixed by 'pc'; fetch as < float >
 			PPI_UNIT = INCH | CM | MM | PT | PC*/
 		};
+
+		variant Value;
+		ENUM_UNIT Unit;
 	};
 }
 }

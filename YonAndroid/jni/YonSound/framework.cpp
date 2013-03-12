@@ -53,6 +53,7 @@ public:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return true;
 			}
+			break;
 		case event::ENUM_EVENT_TYPE_TOUCH:
 			switch(evt.touchInput.type)
 			{
@@ -64,6 +65,20 @@ public:
 				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			}
+			break;
+		case event::ENUM_EVENT_TYPE_SYSTEM:
+			switch(evt.systemInput.type)
+			{
+			case event::ENUM_SYSTEM_INPUT_TYPE_DOZE:
+				YON_INFO("ENUM_SYSTEM_INPUT_TYPE_DOZE\r\n");
+				return true;
+			case event::ENUM_SYSTEM_INPUT_TYPE_WAKE:
+				YON_INFO("ENUM_SYSTEM_INPUT_TYPE_WAKE\r\n");
+				return true;
+			}
+			break;
+		default:
+			YON_WARN(YON_LOG_WARN_FORMAT,"unexpect event type:%d",evt.type);
 		}
 		return false;
 	}
