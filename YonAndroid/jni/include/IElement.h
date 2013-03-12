@@ -1,23 +1,105 @@
-#ifndef _YON_GUI_SELEMENT_H_
-#define _YON_GUI_SELEMENT_H_
+#ifndef _YON_GUI_IELEMENT_H_
+#define _YON_GUI_IELEMENT_H_
 
 #include "symbol.h"
+#include "yonString.h"
 
 namespace yon{
 namespace gui{
+
+	//refer to:http://www.w3school.com.cn/tags/tag_input.asp
+	/*
+	button
+	checkbox
+	file
+	hidden
+	image
+	password
+	radio
+	reset
+	submit
+	text
+	*/
 
 	/**
 		A generic element in the DOM tree.
 	*/
 
-	struct SElement{
+	class IElement{
 	public:
+
+		enum ENUM_TAG{
+			UNKNOWN = 0,
+			HTML,
+			META,
+			STYLE,
+			HEAD,
+			TITLE,
+			BODY,
+			FRAME,
+			DIV,
+			INPUT,
+			TABLE,
+			THEAD,
+			TBODY,
+			TR,
+			TD,
+			IMG,
+			PRE,
+			P,
+			A,
+			BR,
+			TAG_COUNT
+		};
+
+		enum ENUM_ATTRIBUTE{
+			ID = 0,
+			NAME,
+			CLASS,
+			TYPE,
+			VALUE,
+			READONLY,
+			DISABLED,
+			CHECKED,
+			TARGET,
+			SRC,
+			ALT,
+			COLS,
+			ROWS,
+			MAX_LENGTH,
+			ATTRIBUTE_COUNT
+		};
+
+		enum ENUM_INPUTTYPE{
+			BUTTON = 0,
+			TEXT,
+			PASSWORD,
+			RADIO,
+			CHECKBOX,
+			FILE,
+			INPUTTYPE_COUNT
+		};
+
+		enum ENUM_ANCHOR
+		{
+			TOP = 1 << 0,
+			BOTTOM = 1 << 1,
+			LEFT = 1 << 2,
+			RIGHT = 1 << 3,
+
+			TOP_LEFT = TOP | LEFT,
+			TOP_RIGHT = TOP | RIGHT,
+			BOTTOM_LEFT = BOTTOM | LEFT,
+			BOTTOM_RIGHT = BOTTOM | RIGHT
+		};
+
 		/// Constructs a new DOM element. This should not be called directly; use the Factory
 		/// instead.
 		/// @param[in] tag The tag the element was declared as in XHTML.
 		//TODO 是否使用Element(const ENUM_TAG& tag);更好？
-		SElement(const String& tag);
-		virtual ~SElement();
+		//SElement(const core::stringc& tag);
+		IElement(symbol::ENUM_TAG tag);
+		virtual ~IElement();
 
 		void update();
 		//void render();
@@ -41,7 +123,9 @@ namespace gui{
 
 		/// Gets the outer-most focus element down the tree from this node.
 		/// @return Outer-most focus element.
-		SElement* getFocusElement();
+		IElement* getFocusElement();
+
+		IElement::ENUM_TAG getTag() const;
 
 		/// Gets the name of the element.
 		/// @return The name of the element.
@@ -53,7 +137,7 @@ namespace gui{
 		/// be found that we can inherit the property from, add the property to the element and return it;
 		/// @param[in] name The name of the property to fetch the value for.
 		/// @return The value of this property for this element.
-		SProperty& getProperty(symbol::ENUM_SYMBOL sb){
+		SProperty& getProperty(symbol::ENUM_PROPERTY sb){
 			//TODO
 		}
 
