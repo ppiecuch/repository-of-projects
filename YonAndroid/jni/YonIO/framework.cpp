@@ -11,6 +11,7 @@ ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 //IRandomizer* randomizer=NULL;
 II18NManager* i18nManager=NULL;
+ITimer* timer=NULL;
 
 ISceneNode* cubeModel=NULL;
 ISceneNode* weedModel=NULL;
@@ -76,6 +77,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
+	timer=engine->getTimer();
 	//randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
@@ -114,6 +116,15 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	YON_DEBUG("%s(%d)\r\n",i18nManager->convert(utf8_2.toStringc().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str(),utf8_2.size());
 #endif
 #if 1
+
+	u32 start=timer->getRealTime();
+	for(u32 i=0;i<1000000;++i)
+		YON_DEBUG_BREAK_IF(nearestPowerOf22(i)!=core::nearestPowerOf2(i));
+
+	YON_DEBUG("%u\r\n",(timer->getRealTime()-start));
+
+
+#elif 1
 
 	//s32 s;
 	//core::convertor<core::stringc,s32>::convert(core::stringc("134FF2"),s);
