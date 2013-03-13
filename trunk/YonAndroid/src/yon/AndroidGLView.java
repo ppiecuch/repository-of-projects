@@ -124,6 +124,7 @@ public class AndroidGLView extends GLSurfaceView{
 	}
 	
 	private void callbackDestroy(){
+		nativeDebug("callbackDestroy");
 		exiting=true;
 		activity.finish();
 	}
@@ -181,7 +182,9 @@ public class AndroidGLView extends GLSurfaceView{
 	
 	@Override
 	public void onPause() {
-		if(!exiting)
+		//fix bug:20130312B
+		//if(!exiting)
+		if(renderer.isReady()&&!exiting)
 		{
 			Log.d("AndroidGLView","nativeOnPause()start;");
 			nativeOnPause();
