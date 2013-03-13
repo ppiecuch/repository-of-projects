@@ -28,12 +28,35 @@ public:
 	virtual ~Derived(){delete a;printf("virtual destruct Derived\r\n");}
 };
 
+class mystring{
+public:
+	mystring(){
+		printf("construct\r\n");
+	}
+	~mystring(){
+		printf("destruct\r\n");
+	}
+	int c_str(){
+		printf("c_str\r\n");
+		return 1;
+	}
+};
+
+void test(int num){
+	printf("test num\r\n");
+}
+
 int main(int argc, char* argv[])
 {
 	EnableMemLeakCheck();
 
-	Base* base=new Derived();
-	delete base;
+
+	test(mystring().c_str());
+	int num=mystring().c_str();
+	printf("num\r\n");
+
+	//Base* base=new Derived();
+	//delete base;
 
 	system("pause");
 	return 0;

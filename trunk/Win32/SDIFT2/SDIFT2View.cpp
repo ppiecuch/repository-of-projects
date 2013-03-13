@@ -65,7 +65,7 @@ void CSDIFT2View::OnDraw(CDC* pDC)
 	// TODO: 在此处为本机数据添加绘制代码
 	FT_Glyph	glyph	= NULL;
 	FT_Error	error	= 0;
-	error = FT_Load_Glyph(m_pFTFace, FT_Get_Char_Index(m_pFTFace, 100), FT_LOAD_DEFAULT);
+	error = FT_Load_Glyph(m_pFTFace, FT_Get_Char_Index(m_pFTFace, 21183), FT_LOAD_DEFAULT);
 	if(!error)
 	{
 		error = FT_Get_Glyph(m_pFTFace->glyph, &glyph);
@@ -154,7 +154,7 @@ void CSDIFT2View::OnInitialUpdate()
 		return;
 	}
 
-	error = FT_New_Face(m_pFTLib, "C:\\WINDOWS\\Fonts\\arial.TTF", 0, &m_pFTFace);
+	error = FT_New_Face(m_pFTLib, "C:\\WINDOWS\\Fonts\\STKAITI.TTF", 0, &m_pFTFace);
 	if(error)
 	{
 		m_pFTFace = NULL;
