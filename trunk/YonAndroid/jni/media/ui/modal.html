@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>弹出模态对话框测试[IE6下测试通过]</title>
+
+<style type="text/css">
+    .hideDlg
+    {
+        height:129px;width:368px;
+        display:none;
+    }
+    .showDlg
+    {
+        background-color:#ffffdd;
+        border-width:3px;
+        border-style:solid;
+        height:129px;width:368px;
+        position: absolute; 
+        display:block;
+        z-index:5;
+    }
+    .showDeck {
+        display:block;
+        top:0px;
+        left:0px;
+        margin:0px;
+        padding:0px;
+        width:100%;
+        height:100%;
+        position:absolute;
+        z-index:3;
+        background:#cccccc;
+    }
+    .hideDeck 
+    {
+        display:none;
+    }
+</style>
+
+<script type="text/javascript">
+    function showDlg()
+    {
+        //显示遮盖的层
+        var objDeck = document.getElementById("deck");
+        if(!objDeck)
+        {
+            objDeck = document.createElement("div");
+            objDeck.id="deck";
+            document.body.appendChild(objDeck);
+        }
+        objDeck.className="showDeck";
+        objDeck.style.filter="alpha(opacity=50)";
+        objDeck.style.opacity=40/100;
+        objDeck.style.MozOpacity=40/100;
+        //显示遮盖的层end
+        
+        //禁用select
+        hideOrShowSelect(true);
+        
+        //改变样式
+        document.getElementById('divBox').className='showDlg';
+        
+        //调整位置至居中
+        adjustLocation();
+        
+    }
+    
+    function cancel()
+    {
+        document.getElementById('divBox').className='hideDlg';
+        document.getElementById("deck").className="hideDeck";
+        hideOrShowSelect(false);
+    }
+    
+    function hideOrShowSelect(v)
+    {
+        var allselect = document.getElementsByTagName("select");
+        for (var i=0; i<allselect.length; i++)
+        {
+            //allselect[i].style.visibility = (v==true)?"hidden":"visible";
+            allselect[i].disabled =(v==true)?"disabled":"";
+        }
+    }
+    
+    function adjustLocation()
+    {
+        var obox=document.getElementById('divBox');
+        if (obox !=null && obox.style.display !="none")
+        {
+            var w=368;
+            var h=129;
+            var oLeft,oTop;
+            
+            if (window.innerWidth)
+            {
+                oLeft=window.pageXOffset+(window.innerWidth-w)/2 +"px";
+                oTop=window.pageYOffset+(window.innerHeight-h)/2 +"px";
+            }
+            else
+            {
+                var dde=document.documentElement;
+                oLeft=dde.scrollLeft+(dde.offsetWidth-w)/2 +"px";
+                oTop=dde.scrollTop+(dde.offsetHeight-h)/2 +"px";
+            }
+            
+            obox.style.left=oLeft;
+            obox.style.top=oTop;
+        }
+    }
+    
+</script>
+
+</head>
+
+<body onresize="adjustLocation();">
+    <input type="button" value="click me" onclick="showDlg();" size="10px" /><br/>
+    <input type="text" value="" size="10px" /><a href="http://www.baidu.com" target="_blank">百度</a><br/>
+    <select>
+        <option selected="selected">1</option>
+        <option>2</option>
+    </select><br/>
+    
+    <div id="divBox" class="hideDlg" style="" >
+            <table width="100%" style="height:100%; width: 100%;" id="table1">
+                    <tr>
+                        <td style="height: 20px; text-align: center;" colspan="3">请输入用户名及密码</td>
+                    </tr>
+                    <tr>
+                        <td>用户名</td>
+                        <td>
+                            <input name="TextBox1" type="text" id="TextBox1" />
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>密码</td>
+                        <td>
+                            <input name="TextBox2" type="text" id="TextBox2" /></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type="button" name="Button1" value="Login" id="Button1" size="10" onclick="alert(TextBox1.value)"/>&nbsp;&nbsp;
+                            <input type="button" name="Button2" value="Cancel" id="Button2" size="10" onclick="cancel();" />
+                            </td>
+                        <td>&nbsp;</td>
+                    </tr>
+            </table>
+    </div>
+
+</body>
+</html>

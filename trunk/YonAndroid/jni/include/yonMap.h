@@ -208,7 +208,7 @@ namespace core{
 				Node* node = m_tree.find(m_key);
 
 				// Not found
-				YON_DEBUG_BREAK_IF(node==0) // access violation
+				YON_DEBUG_BREAK_IF(node==0); // access violation
 				return node->getValue();
 			}
 		private:

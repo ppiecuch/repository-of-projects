@@ -149,12 +149,103 @@ namespace core{
 		return hval;
 	}
 
-	template <class T1, class T2>
-	inline void swap(T1& a, T2& b)
+	template <class T>
+	inline void swap(T& a, T& b)
 	{
-		T1 c(a);
+		T c(a);
 		a = b;
 		b = c;
+	}
+
+	/*
+	a与b 同位部分A(无论是0是1，A都为0)（同0或同1）
+	a与b 异位部分B（a为0&&b为1 或者 a为1&&b为0）
+
+	a与b异或结果C为 同位部分A(全0) & 异位部分B（全1）即 B
+
+	a^=b  得到异位部分B
+	b^=a  得到 C^b（对于同位部分A，如果b是0，则得0，如果b是1，则得1；对于异位部分B，如果b是0，则得1，如果b是1，则得0；显然结果是原来的a）
+	a^=b  得到 B^a（对于同位部分A，如果a是0，则得0，如果a是1，则得1；对于异位部分B，如果a是0，则得1，如果a是1，则得0；显然结果是原来的b）
+	如
+	a=0
+	b=1
+	a^=b  a=0^1=1
+	b^=a  b=1^1=0
+	a^=b  a=1^0=1
+	注意：同址问题导致异常
+	refer to:http://blog.chinaunix.net/uid-1844931-id-3034714.html
+	*/
+
+	template <>
+	inline void swap<c8>(c8& a, c8& b)
+	{
+		if(a==b) return;
+		a^=b;
+		b^=a;
+		a^=b;
+	}
+
+	template <>
+	inline void swap<u8>(u8& a, u8& b)
+	{
+		if(a==b) return;
+		a^=b;
+		b^=a;
+		a^=b;
+	}
+
+	template <>
+	inline void swap<s16>(s16& a, s16& b)
+	{
+		if(a==b) return;
+		a^=b;
+		b^=a;
+		a^=b;
+	}
+
+	template <>
+	inline void swap<u16>(u16& a, u16& b)
+	{
+		if(a==b) return;
+		a^=b;
+		b^=a;
+		a^=b;
+	}
+
+	template <>
+	inline void swap<s32>(s32& a, s32& b)
+	{
+		if(a==b) return;
+		a^=b;
+		b^=a;
+		a^=b;
+	}
+
+	template <>
+	inline void swap<u32>(u32& a, u32& b)
+	{
+		if(a==b) return;
+		a^=b;
+		b^=a;
+		a^=b;
+	}
+
+	template <>
+	inline void swap<s64>(s64& a, s64& b)
+	{
+		if(a==b) return;
+		a^=b;
+		b^=a;
+		a^=b;
+	}
+
+	template <>
+	inline void swap<u64>(u64& a, u64& b)
+	{
+		if(a==b) return;
+		a^=b;
+		b^=a;
+		a^=b;
 	}
 
 	inline void yonSleep(s32 pMilliseconds)

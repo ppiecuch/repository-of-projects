@@ -266,9 +266,22 @@ inline u32 nearestPowerOf2(const u32 value)
 	/* Error! */
 	if (value == 0) return 0;
 
+#if 0
 	u32 rval=1;
 	while(rval<value) rval<<=1;
 	return rval;
+#else
+	//¿ìÁËÒ»±¶
+	u32 _value=value;
+	--_value;
+	_value |= _value >> 16;
+	_value |= _value >> 8;
+	_value |= _value >> 4;
+	_value |= _value >> 2;
+	_value |= _value >> 1;
+	++_value;
+	return _value;
+#endif
 
 }
 inline f32 fract(const f32 x )

@@ -363,7 +363,7 @@ namespace yon{
 			\param index: Index of element to be erased. */
 			void erase(u32 index)
 			{
-				YON_DEBUG_BREAK_IF(index>=len) // access violation
+				YON_DEBUG_BREAK_IF(index>=len); // access violation
 
 				for (u32 i=index+1; i<len; ++i)
 					elements[i-1] = elements[i];

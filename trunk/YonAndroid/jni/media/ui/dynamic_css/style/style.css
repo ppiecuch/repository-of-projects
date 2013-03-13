@@ -1,0 +1,10 @@
+*{ margin:0px; padding:0px; font:12px/2 "Courier New", Courier, monospace; color:#CC2A50;}
+.clear{ clear:both;}/*Download by http://www.codefans.net*/
+#select{ text-align:right; margin-left:5px 30px;border:1px solid #666261; background:#e8e8e8;}
+#select p{ float:right; line-height:36px; color:#3a8ecf;}
+#select a{ display:inline;width:12px; height:12px; border:1px solid #666; float:right;margin:10px 10px;}
+#select a.zi{ background:#CC2A50;}
+#select a.lv{ background:#0093bb;}
+#select a.lan{ background:#003278;}
+#select a.f60{background:#f60;}
+#select a.f50{background:#fff500;}

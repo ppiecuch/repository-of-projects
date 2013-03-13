@@ -69,7 +69,7 @@ namespace core{
 
 		T& getLast()
 		{
-			YON_DEBUG_BREAK_IF(!used) // access violation
+			YON_DEBUG_BREAK_IF(!used); // access violation
 
 			return data[used-1];
 		}
@@ -78,21 +78,21 @@ namespace core{
 		//! Gets last element
 		const T& getLast() const
 		{
-			YON_DEBUG_BREAK_IF(!used) // access violation
+			YON_DEBUG_BREAK_IF(!used); // access violation
 
 			return data[used-1];
 		}
 
 		T& operator [](u32 index)
 		{
-			YON_DEBUG_BREAK_IF(index>=used) // access violation
+			YON_DEBUG_BREAK_IF(index>=used); // access violation
 
 			return data[index];
 		}
 
 		const T& operator [](u32 index) const
 		{
-			YON_DEBUG_BREAK_IF(index>=used) // access violation
+			YON_DEBUG_BREAK_IF(index>=used); // access violation
 
 			return data[index];
 		}
@@ -192,7 +192,7 @@ namespace core{
 
 		void insert(const T& element, u32 index=0)
 		{
-			YON_DEBUG_BREAK_IF(index>used) // access violation
+			YON_DEBUG_BREAK_IF(index>used); // access violation
 
 			if (used + 1 > allocated)
 			{
@@ -316,7 +316,7 @@ namespace core{
 
 		void erase(u32 index)
 		{
-			YON_DEBUG_BREAK_IF(index>=used) // access violation
+			YON_DEBUG_BREAK_IF(index>=used); // access violation
 
 			for (u32 i=index+1; i<used; ++i)
 			{

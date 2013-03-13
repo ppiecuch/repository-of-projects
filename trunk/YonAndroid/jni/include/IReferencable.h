@@ -16,7 +16,7 @@ namespace yon{
 
 			inline bool drop() const
 			{
-				YON_DEBUG_BREAK_IF(referenced<=0)
+				YON_DEBUG_BREAK_IF(referenced<=0);
 
 				--referenced;
 				if(referenced==0){

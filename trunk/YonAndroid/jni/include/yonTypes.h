@@ -33,13 +33,13 @@
 
 #if defined(_DEBUG)
 #if defined(YON_COMPILE_WITH_WIN32)
-	#define YON_DEBUG_BREAK_IF( _CONDITION_ ) if (_CONDITION_) {_asm int 3}
+	#define YON_DEBUG_BREAK_IF( _CONDITION_ ) do { if (_CONDITION_) {_asm int 3} }while(0)
 #elif defined(YON_COMPILE_WITH_WIN64)
 	#include <crtdbg.h>
-	#define YON_DEBUG_BREAK_IF( _CONDITION_ ) if (_CONDITION_) {_CrtDbgBreak();}
+	#define YON_DEBUG_BREAK_IF( _CONDITION_ ) do { if (_CONDITION_) {_CrtDbgBreak();} }while(0)
 #else
 	#include "assert.h"
-	#define YON_DEBUG_BREAK_IF( _CONDITION_ ) assert( !(_CONDITION_) );
+	#define YON_DEBUG_BREAK_IF( _CONDITION_ ) do { assert( !(_CONDITION_) ); }while(0)
 #endif
 #else //Not debug
 	#define YON_DEBUG_BREAK_IF( _CONDITION_ )

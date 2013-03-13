@@ -1176,7 +1176,7 @@ namespace core{
 		//! Direct access operator
 		access operator [](const size_t index)
 		{
-			YON_DEBUG_BREAK_IF(index>=size()) // bad index
+			YON_DEBUG_BREAK_IF(index>=size()); // bad index
 				iterator iter(*this, index);
 			return iter.operator*();
 		}
@@ -1185,7 +1185,7 @@ namespace core{
 		//! Direct access operator
 		const access operator [](const size_t index) const
 		{
-			YON_DEBUG_BREAK_IF(index>=size()) // bad index
+			YON_DEBUG_BREAK_IF(index>=size()); // bad index
 				const_iterator iter(*this, index);
 			return iter.operator*();
 		}
