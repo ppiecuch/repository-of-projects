@@ -143,23 +143,6 @@ template<typename R,>
 class function<R()>:public function0<R>
 {};*/
 
-template<typename Signature> 
-class function;
-
-template<typename R,typename T0>
-class function<R(T0)>:public function1<R,T0>
-{
-
-};
-
-template<typename R,typename T0,typename T1>
-class function<R(T0,T1)>:public function2<R,T0,T1>
-{
-
-};
-
-
-
 
 
 namespace  
@@ -170,11 +153,11 @@ namespace
 }  
 
 template <typename R,typename T, typename Arg>  
-class simple_bind_t  
+class simple_bind_t1  
 {  
 public:  
 	typedef R (T::*F)(Arg);
-	simple_bind_t(F f,const T& t):f_(f),t_(t)  
+	simple_bind_t1(F f,const T& t):f_(f),t_(t)  
 	{}  
 	R operator()(Arg a)  
 	{  
@@ -186,13 +169,13 @@ private:
 };
 
 template <typename R, typename T, typename Arg>  
-simple_bind_t<R,T,Arg> mybind(R (T::*fn)(Arg),const T& t,const placeholder&)  
+simple_bind_t1<R,T,Arg> mybind(R (T::*fn)(Arg),const T& t,const placeholder&)  
 {
-	return simple_bind_t<R,T,Arg>(fn,t);
-}  
+	return simple_bind_t1<R,T,Arg>(fn,t);
+}
 
 template <typename R, typename T, typename Arg>
-class simple_bind_t2
+class simple_bind_tp1
 {
 private:
 	typedef R (T::*F)(Arg);
@@ -201,7 +184,7 @@ private:
 	Arg& a_;
 
 public:
-	simple_bind_t2(F f, T* t, Arg &a)
+	simple_bind_tp1(F f, T* t, Arg &a)
 		: f_(f), t_(t), a_(a)
 	{}
 
@@ -213,11 +196,72 @@ public:
 
 
 template <typename R, typename T, typename Arg>
-simple_bind_t2<R, T, Arg> mybind(R (T::*f)(Arg), T* t, Arg& a)
+simple_bind_tp1<R, T, Arg> mybind(R (T::*f)(Arg), T* t, Arg& a)
 {
-	return simple_bind_t2<R, T, Arg>(f, t, a);
+	return simple_bind_tp1<R, T, Arg>(f, t, a);
 }
 
+
+template <typename R,typename T, typename Arg, typename Argo>  
+class simple_bind_t2  
+{  
+public:  
+	typedef R (T::*F)(Arg,Argo);
+	simple_bind_t2(F f,const T& t):f_(f),t_(t)  
+	{}  
+	R operator()(Arg a,Argo o)  
+	{  
+		return (t_.*f_)(a,o);  
+	}  
+private:  
+	F f_;  
+	T t_;  
+};
+
+template <typename R, typename T, typename Arg, typename Argo>  
+simple_bind_t2<R,T,Arg,Argo> mybind(R (T::*fn)(Arg,Argo),const T& t,const placeholder&)  
+{
+	return simple_bind_t2<R,T,Arg,Argo>(fn,t);
+}
+
+template <typename R, typename T, typename Arg, typename Argo>
+class simple_bind_tp2
+{
+private:
+	typedef R (T::*F)(Arg,Argo);
+	F f_;
+	T* t_;
+	Arg& a_;
+	Argo& b_;
+
+public:
+	simple_bind_tp2(F f, T* t, Arg &a, Argo& b)
+		: f_(f), t_(t), a_(a), b_(b)
+	{}
+
+	R operator()()
+	{
+		return (t_->*f_)(a_,b_);
+	}
+};
+
+
+template <typename R, typename T, typename Arg, typename Argo>
+simple_bind_tp2<R, T, Arg,Argo> mybind(R (T::*f)(Arg,Argo), T* t, Arg& a, Argo& b)
+{
+	return simple_bind_tp2<R, T, Arg>(f, t, a, b);
+}
+
+//template<typename Signature> 
+//class func;
+
+//template<typename R,typename T0>
+//class func:public function1<R,T0>
+//{};
+
+//template<typename R,typename T0,typename T1>
+//class func:public function2<R,T0,T1>
+//{};
 
 class Test{
 public:
@@ -228,15 +272,21 @@ public:
 		printf("copy construct:%08X\n",this);
 	}
 
-	void test(int a){
-		printf("Test::test:%08X,%d\n",this,a);
+	void test1(int a){
+		printf("Test::test1:%08X,%d\n",this,a);
+	}
+
+	void test2(int a,float b){
+		printf("Test::test2:%08X,%d,%.2f\n",this,a,b);
 	}
 };
 
-void test(int a){
-	printf("test:%d\n",a);
+void test1(int a){
+	printf("test1:%d\n",a);
 }
-
+void test2(int a,float b){
+	printf("test2:%d,%.2f\n",a,b);
+}
 
 #include <crtdbg.h>
 inline void EnableMemLeakCheck()
@@ -249,10 +299,16 @@ int main(int argc,char ** argv)
 	EnableMemLeakCheck();
 
 	Test t;
-	mybind(&Test::test,t,_1)(10);
+	mybind(&Test::test1,t,_1)(10);
 
-	function1<void,int> f(mybind(&Test::test, t, _1));
-	f(2);
+	mybind(&Test::test2,t,_1)(11,12);
+
+
+	function1<void,int> f1(mybind(&Test::test1, t, _1));
+	f1(2);
+
+	function2<void,int,float> f2(mybind(&Test::test2, t, _1));
+	f2(10,20);
 
 	system("pause");
 	return 0;
