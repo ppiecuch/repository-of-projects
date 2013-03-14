@@ -10,6 +10,8 @@ import yon.util.Util;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,16 +39,33 @@ public class YonAndroidActivity extends Activity {
 	InputMethodManager imm;
 
 	FMODAudioDevice mFMODAudioDevice = new FMODAudioDevice();
+	
+	private void toast(String s) {
+    	Log.d(TAG,s);
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, s, duration);
+        toast.show();
+    }
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		toast("onConfigurationChanged");
+		super.onConfigurationChanged(newConfig);
+	}
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		toast("onCreate");
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
 				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		
+		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
 		initHandler();
 
@@ -176,15 +195,23 @@ public class YonAndroidActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		return view.onKeyDown(keyCode, event);
 	}
+	
+	@Override
+	protected void onRestart() {
+		toast("onRestart");
+		super.onRestart();
+	}
 
 	@Override
 	public void onStart() {
+		toast("onStart");
 		super.onStart();
 		mFMODAudioDevice.start();
 	}
 
 	@Override
 	public void onStop() {
+		toast("onStop");
 		mFMODAudioDevice.stop();
 		super.onStop();
 	}
@@ -195,21 +222,23 @@ public class YonAndroidActivity extends Activity {
 
 	@Override
 	protected void onPause() {
+		toast("onPause");
 		view.onPause();
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
+		toast("onResume");
 		super.onResume();
 		view.onResume();
 	}
 
 	@Override
 	protected void onDestroy() {
+		toast("onDestroy");
 		// view.onDestroy();
 		super.onDestroy();
-		SysApplication.getInstance().exit();
-		Log.i(TAG, "exit");
+		//SysApplication.getInstance().exit();
 	}
 }

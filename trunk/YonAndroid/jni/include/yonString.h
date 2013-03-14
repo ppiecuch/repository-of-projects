@@ -733,7 +733,24 @@ namespace yon{
 				vsprintf_s(buffer,size,pFmt,args);
 				va_end(args);
 
-				return core::string<T,TAlloc>(buffer);
+				//fix bug:20130313B
+				//return core::string<T,TAlloc>(buffer);
+				core::string<T,TAlloc> tmp;
+				u32 size=countLen(buffer);
+				tmp.build(buffer,size);
+				return tmp;
+			}
+
+			static u32 countLen(const c8* str)
+			{
+				u32 size = 0;
+				const c8* p = str;
+				do
+				{
+					++size;
+				} while(*p++);
+
+				return size;
 			}
 
 		private:
