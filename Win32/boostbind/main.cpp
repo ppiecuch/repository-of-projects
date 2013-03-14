@@ -71,6 +71,94 @@ public:
 	  }
 };
 
+template <typename R, typename Arg, typename Argo> class invoker_base2 {
+public:
+	virtual R operator()(Arg arg, Argo argo)=0;
+};
+
+
+template <typename R, typename Arg, typename Argo> class function_ptr_invoker2 
+: public invoker_base2<R,Arg,Argo> {
+	R (*func_)(Arg,Argo);
+public:
+	function_ptr_invoker2(R (*func)(Arg,Argo)):func_(func) {}
+
+	R operator()(Arg arg, Argo argo) {
+		return (func_)(arg,argo);
+	}
+};
+
+
+template <typename R, typename Arg, typename Argo, typename T> 
+class member_ptr_invoker2 : 
+	public invoker_base2<R,Arg,Argo> {
+		R (T::*func_)(Arg,Argo);
+		T* t_;
+public:
+	member_ptr_invoker2(R (T::*func)(Arg,Argo),T* t)
+		:func_(func),t_(t) {}
+
+	R operator()(Arg arg, Argo argo) {
+		return (t_->*func_)(arg,argo);
+	}
+};
+
+
+template <typename R, typename Arg, typename Argo, typename T> 
+class function_object_invoker2 : 
+	public invoker_base2<R,Arg,Argo> {
+		T t_;
+public:
+	function_object_invoker2(T t):t_(t) {}
+
+	R operator()(Arg arg, Argo argo) {
+		return t_(arg,argo);
+	}
+};
+
+template <typename R, typename Arg, typename Argo> class function2 {
+	invoker_base2<R,Arg,Argo>* invoker_;
+public:
+	function2(R (*func)(Arg,Argo)) : 
+	  invoker_(new function_ptr_invoker2<R,Arg,Argo>(func)) {}
+
+	  template <typename T> function2(R (T::*func)(Arg,Argo),T* p) : 
+	  invoker_(new member_ptr_invoker2<R,Arg,Argo,T>(func,p)) {}
+
+	  template <typename T> function2(T t) : 
+	  invoker_(new function_object_invoker2<R,Arg,Argo,T>(t)) {}
+
+	  R operator()(Arg arg,Argo argo) {
+		  return (*invoker_)(arg,argo);
+	  }
+
+	  ~function2() {
+		  delete invoker_;
+	  }
+};
+
+/*
+template<typename R,>
+
+class function<R()>:public function0<R>
+{};*/
+
+template<typename Signature> 
+class function;
+
+template<typename R,typename T0>
+class function<R(T0)>:public function1<R,T0>
+{
+
+};
+
+template<typename R,typename T0,typename T1>
+class function<R(T0,T1)>:public function2<R,T0,T1>
+{
+
+};
+
+
 
 
 
@@ -149,8 +237,17 @@ void test(int a){
 	printf("test:%d\n",a);
 }
 
+
+#include <crtdbg.h>
+inline void EnableMemLeakCheck()
+{
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+}
+
 int main(int argc,char ** argv)
 {
+	EnableMemLeakCheck();
+
 	Test t;
 	mybind(&Test::test,t,_1)(10);
 
