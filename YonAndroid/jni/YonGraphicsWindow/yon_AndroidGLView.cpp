@@ -35,7 +35,11 @@ void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jb
 	g_env=pEnv;
 	g_obj=obj;
 	if(first)
-		init(pEnv,NULL,width,height);
+	{
+		const char* root= pEnv->GetStringUTFChars(sdcardPath, 0);
+		init(pEnv,NULL,root,width,height);
+		pEnv->ReleaseStringUTFChars(sdcardPath, root);
+	}
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
 	Logger->debug("nativeOnSurfaceChanged->w:%d,h:%d\n",w,h);
@@ -47,9 +51,17 @@ void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
 }
 void Java_yon_AndroidGLView_nativeOnPause(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnPause\n");
+	SEvent evt;
+	evt.type=ENUM_EVENT_TYPE_SYSTEM;
+	evt.systemInput.type=ENUM_SYSTEM_INPUT_TYPE_DOZE;
+	getEngine()->postEventFromUser(evt);
 }
 void Java_yon_AndroidGLView_nativeOnResume(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnResume\n");
+	SEvent evt;
+	evt.type=ENUM_EVENT_TYPE_SYSTEM;
+	evt.systemInput.type=ENUM_SYSTEM_INPUT_TYPE_WAKE;
+	getEngine()->postEventFromUser(evt);
 }
 //TODO¸ÄÎª·¢ËÍEvent
 jboolean Java_yon_AndroidGLView_nativeOnBack(JNIEnv *pEnv, jobject obj){
