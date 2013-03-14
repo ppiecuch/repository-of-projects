@@ -79,6 +79,18 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	fs->addWorkingDirectory("media/");
 #endif
 
+	//test percent sign 
+	core::stringc str1("%d%%",100);
+	YON_DEBUG("%s\r\n",str1.c_str());
+	core::stringc str2;
+	str2.build("100%",4);
+	YON_DEBUG("%s\r\n",str2.c_str());
+	const core::stringc& str3=core::stringc::formatString<ENUM_SIZE_16>("%d%%",100);
+	YON_DEBUG("%s\r\n",str3.c_str());
+	core::stringc str4=core::stringc::formatString<ENUM_SIZE_16>("%d%%",100);
+	YON_DEBUG("%s\r\n",str4.c_str());
+	YON_DEBUG("100%%\r\n");
+
 	/*Logger->debug("debug\r\n");
 	Logger->info("info\r\n");
 	Logger->warn("warn\r\n");

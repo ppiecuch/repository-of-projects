@@ -75,12 +75,7 @@ namespace io{
 		{
 			//core::stringc text(str);//直接创建会有“%”的问题
 			core::stringc text;
-			u32 size = 0;
-			const c8* p = str;
-			do
-			{
-				++size;
-			} while(*p++);
+			u32 size = core::stringc::countLen(str);
 			text.build(str,size);
 			writeString(text);
 		}

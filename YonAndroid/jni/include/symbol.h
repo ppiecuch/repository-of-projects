@@ -8,10 +8,62 @@ namespace gui{
 
 	class symbol{
 	public:
+
+		enum ENUM_TAG{
+			UNKNOWN = 0,
+			HTML,
+			META,
+			STYLE,
+			HEAD,
+			TITLE,
+			BODY,
+			FRAME,
+			DIV,
+			INPUT,
+			TABLE,
+			THEAD,
+			TBODY,
+			TR,
+			TD,
+			IMG,
+			PRE,
+			P,
+			A,
+			BR,
+			TAG_COUNT
+		};
+
+		enum ENUM_ATTRIBUTE{
+			ID = TAG_COUNT,
+			NAME,
+			CLASS,
+			TYPE,
+			VALUE,
+			READONLY,
+			DISABLED,
+			CHECKED,
+			TARGET,
+			SRC,
+			ALT,
+			COLS,
+			ROWS,
+			MAX_LENGTH,
+			ATTRIBUTE_COUNT
+		};
+
+		enum ENUM_INPUTTYPE{
+			BUTTON = ATTRIBUTE_COUNT,
+			TEXT,
+			PASSWORD,
+			RADIO,
+			CHECKBOX,
+			FILE,
+			INPUTTYPE_COUNT
+		};
 		
 		
 		enum ENUM_PROPERTY{
-			MARGIN_TOP = 0,
+			MARGIN_TOP = INPUTTYPE_COUNT,
 			MARGIN_RIGHT,
 			MARGIN_BOTTOM,
 			MARGIN_LEFT,

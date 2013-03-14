@@ -28,58 +28,6 @@ namespace gui{
 	class IElement{
 	public:
 
-		enum ENUM_TAG{
-			UNKNOWN = 0,
-			HTML,
-			META,
-			STYLE,
-			HEAD,
-			TITLE,
-			BODY,
-			FRAME,
-			DIV,
-			INPUT,
-			TABLE,
-			THEAD,
-			TBODY,
-			TR,
-			TD,
-			IMG,
-			PRE,
-			P,
-			A,
-			BR,
-			TAG_COUNT
-		};
-
-		enum ENUM_ATTRIBUTE{
-			ID = 0,
-			NAME,
-			CLASS,
-			TYPE,
-			VALUE,
-			READONLY,
-			DISABLED,
-			CHECKED,
-			TARGET,
-			SRC,
-			ALT,
-			COLS,
-			ROWS,
-			MAX_LENGTH,
-			ATTRIBUTE_COUNT
-		};
-
-		enum ENUM_INPUTTYPE{
-			BUTTON = 0,
-			TEXT,
-			PASSWORD,
-			RADIO,
-			CHECKBOX,
-			FILE,
-			INPUTTYPE_COUNT
-		};
-
 		enum ENUM_ANCHOR
 		{
 			TOP = 1 << 0,
