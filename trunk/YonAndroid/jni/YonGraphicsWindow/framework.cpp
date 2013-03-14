@@ -9,7 +9,7 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
 
 ISceneNode* cubeModel=NULL;
@@ -56,11 +56,12 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
+bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
 	params.fpsLimit=0;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	videoDriver=engine->getVideoDriver();
@@ -71,15 +72,15 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
 	//fs->addWorkingDirectory("../media/batch");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	//fs->addWorkingDirectory("media/");
-	fs->addWorkingDirectory("media/batch");
+	fs->addWorkingDirectory("media/");
+	//fs->addWorkingDirectory("media/batch");
 #endif
 
 	IShap *shap;
@@ -106,7 +107,7 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 	ps[2].set(x+w,y); \
 	ps[3].set(x+w,y+h);
 
-	TO_PS(0,0,512,256)
+	TO_PS(0,0,1024,1024)
 
 	//ps[0]=core::position2di(0,0);
 	//ps[1]=core::position2di(0,256);
@@ -127,8 +128,8 @@ bool init(void *pJNIEnv,ICallback* pcb,u32 width,u32 height){
 		//shaps[i].setVertexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 		for(u32 j=0;j<35;++j)
 		{
-			s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
-			s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
+			s32 x=randomizer::rand(0,videoDriver->getCurrentRenderTargetSize().w);
+			s32 y=randomizer::rand(0,videoDriver->getCurrentRenderTargetSize().h);
 			shaps[i].getVertexArray().push_back(SVertex(x,y,z,0,0,COLOR_WHITE));
 			shaps[i].getVertexArray().push_back(SVertex(x+64,y,z,1,0,COLOR_WHITE));
 			shaps[i].getVertexArray().push_back(SVertex(x+64,y+32,z,1,1,COLOR_WHITE));
@@ -185,9 +186,9 @@ void drawFrame(){
 		//s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
 		//s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
 		//gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
-		ITexture* texture=videoDriver->getTexture("de.png");
+		ITexture* texture=videoDriver->getTexture("250.png");
 		//gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
-		gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,false,highlight?0xFFFFFFFF:0xFFDDDDDD);
+		gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true,highlight?0xFFFFFFFF:0xFFDDDDDD);
 #else
 		//Logger->debug("i:%d--0x%08X\r\n",i,&shaps[i]);
 		//material.setTexture(0,texture);

@@ -177,6 +177,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\framework.cpp.gray"
+			>
+		</File>
+		<File
 			RelativePath=".\framework.h"
 			>
 		</File>
