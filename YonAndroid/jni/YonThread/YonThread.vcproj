@@ -168,6 +168,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\AndroidThread.mk"
+			>
+		</File>
+		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>

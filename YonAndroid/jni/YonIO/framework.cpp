@@ -56,7 +56,21 @@ public:
 		return false;
 	}
 };
+class App
+{
+public:
+	typedef CDelegate1<void, const core::stringc&> Callback;
 
+	void debug(const core::stringc& str)
+	{
+		YON_DEBUG("%s\r\n",str.c_str());
+	}
+
+	static void info(const core::stringc& str)
+	{
+		YON_INFO("%s\r\n",str.c_str());
+	}
+};
 bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
@@ -81,9 +95,9 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->addWorkingDirectory("../media/",true);
+	//fs->addWorkingDirectory("../media/",true);
 	fs->addWorkingDirectory("../Yon/");
-	fs->addWorkingDirectory("D:/Development/Tools/xls2xlbV2.0/output");
+	//fs->addWorkingDirectory("D:/Development/Tools/xls2xlbV2.0/output");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/",true);
 #endif
@@ -116,6 +130,31 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	YON_DEBUG("%s(%d)\r\n",i18nManager->convert(utf8_2.toStringc().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str(),utf8_2.size());
 #endif
 #if 1
+	App app;
+
+	//创建委托。
+	App::Callback callback = NULL;
+	if(!callback.empty()) callback("1");
+
+	core::IDelegate1<void, const core::stringc&>* d0=core::createDelegate(&app,&App::debug);
+	core::IDelegate1<void, const core::stringc&>* d1=core::createDelegate(&App::info);
+
+	//d0->drop();
+	//d1->drop();
+
+	callback += d0;
+	if(!callback.empty()) callback("2");
+
+	callback += d1;
+	if(!callback.empty()) callback("3");
+
+	callback -= d0;
+	if(!callback.empty()) callback("4");
+
+	callback -= d1;
+	if(!callback.empty()) callback("5");
+
+#elif 1
 
 	u32 start=timer->getRealTime();
 	for(u32 i=0;i<1000000;++i)

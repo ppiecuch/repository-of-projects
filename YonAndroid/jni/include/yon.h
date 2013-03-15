@@ -20,6 +20,7 @@
 #include "IProfile.h"
 
 #include "converter.h"
+#include "delegate.h"
 #include "dimension2d.h" 
 #include "dimension3d.h" 
 #include "exception.h" 

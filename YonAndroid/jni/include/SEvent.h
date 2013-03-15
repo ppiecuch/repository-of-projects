@@ -11,6 +11,43 @@ namespace gui{
 	onclick, ondblclick, onmousedown, onmouseup, onmouseover, 
 	onmousemove, onmouseout, onkeypress, onkeydown, onkeyup
 	*/
+	/*
+	1.	XHTML 事件属性
+	窗口事件 (Window Events)
+	仅在 body 和 frameset 元素中有效。
+	属性	值	描述
+	onload	脚本	当文档被载入时执行脚本
+	onunload	脚本	当文档被卸下时执行脚本
+	表单元素事件 (Form Element Events)
+	仅在表单元素中有效。
+	属性	值	描述
+	onchange	脚本	当元素改变时执行脚本
+	onsubmit	脚本	当表单被提交时执行脚本
+	onreset	脚本	当表单被重置时执行脚本
+	onselect	脚本	当元素被选取时执行脚本
+	onblur	脚本	当元素失去焦点时执行脚本
+	onfocus	脚本	当元素获得焦点时执行脚本
+	键盘事件 (Keyboard Events)
+	在下列元素中无效：base, bdo, br, frame, frameset, head, html, iframe, meta, param, script, style, 以及 title 元素。
+	属性	值	描述
+	onkeydown	脚本	当键盘被按下时执行脚本
+	onkeypress	脚本	当键盘被按下后又松开时执行脚本
+	onkeyup	脚本	当键盘被松开时执行脚本
+	鼠标事件 (Mouse Events)
+	在下列元素中无效：base, bdo, br, frame, frameset, head, html, iframe, meta, param, script, style, title 元素。
+	属性	值	描述
+	onclick	脚本	当鼠标被单击时执行脚本
+	ondblclick	脚本	当鼠标被双击时执行脚本
+	onmousedown	脚本	当鼠标按钮被按下时执行脚本
+	onmousemove	脚本	当鼠标指针移动时执行脚本
+	onmouseout	脚本	当鼠标指针移出某元素时执行脚本
+	onmouseover	脚本	当鼠标指针悬停于某元素之上时执行脚本
+	onmouseup	脚本	当鼠标按钮被松开时执行脚本
+	*/
+
+	/*
+	HTML 5 中的新事件：onabort, onbeforeunload, oncontextmenu, ondrag, ondragend, ondragenter, ondragleave, ondragover, ondragstart, ondrop, onerror, onmessage, onmousewheel, onresize, onscroll, onunload。
+	*/
 
 	//Event objects are dispatched to an event target. At the beginning of the dispatch, implementations must first determine the event object's propagation path.
 
@@ -51,8 +88,17 @@ namespace gui{
 			PHASE_COUNT
 		};
 
+		//TODO 长按，拖动
 		enum ENUM_EVENT{
+			MOUSEDOWN = 0,
+			MOUSEUP,
+			EVENT_COUNT
+		};
 
+		const static c8* EVENT_NAMES[EVENT_COUNT]=
+		{
+			"onmousedown",
+			"onmouseup"
 		};
 
 		/// Constructor
