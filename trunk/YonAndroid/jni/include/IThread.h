@@ -54,7 +54,7 @@ namespace yon{
 		ENUM_THREAD_STATE getState() const { return m_eState; }
 
 		//virtual bool join(u32 millisec = 0) = 0;
-		//virtual void suspend() = 0;
+		virtual void suspend() = 0;
 		//virtual void resume() = 0;
 		//virtual bool run() = 0;
 		virtual void start() = 0;

@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>居中</title>
+
+<style type="text/css">
+	.container {
+		display: table;
+		height: 80%;
+		position: absolute;
+		overflow: hidden;
+		width: 100%;
+	}
+	.helper {
+	  display: table-cell;
+	  vertical-align: middle;
+  }
+	.content {
+	  border:1px solid #FF00FF;
+	  margin:0 auto;
+	  width:200px;
+	  height:50px;
+	 }
+</style>
+</head>
+
+<body>
+	<!--
+	Centering: Auto-width Margins
+	This box is horizontally centered by setting its right and left margin widths to "auto". 
+	This is the preferred way to accomplish horizontal centering with CSS, and works very well in most browsers with CSS2 support. 
+	-->
+	<!--
+	vertical-align:middle because it's not applicable to block-level elements
+	margin-top:auto and margin-bottom:auto because their used values would compute as zero
+	-->
+	<!--
+	Calculating heights and margins
+
+	For calculating the values of 'top', 'margin-top', 'height', 'margin-bottom', and 'bottom' a distinction must be made between various kinds of boxes:
+
+   1. inline, non-replaced elements
+   2. inline, replaced elements
+   3. block-level, non-replaced elements in normal flow
+   4. block-level, replaced elements in normal flow
+   5. floating, non-replaced elements
+   6. floating, replaced elements
+   7. absolutely positioned, non-replaced elements
+   8. absolutely positioned, replaced elements
+   9. 'inline-block', non-replaced elements in normal flow
+  10. 'inline-block', replaced elements in normal flow
+	
+	refer to:http://www.w3.org/TR/CSS2/visudet.html#Computing_heights_and_margins
+	-->
+	
+	<!--
+	There isn't one easy way to center div vertically which would do the trick in every situation.
+
+	However, there are lots of ways to do it depending on the situation.
+	
+	Here are few of them:
+	
+	    * Set top and bottom padding of the parent element for example padding:20px 0px 20px 0px
+	    * Use table, table cell centers its' content vertically
+	    * Set parent element's position relative and the div's you want to vertically center to absolute and style it as top:50px; bottom:50px; for example
+	
+	You may also google for "css vertical centering"
+
+	-->
+	<div class="container">
+	  <div class="helper">
+	    <div class="content"><!--stuff--></div>
+	  </div>
+	</div>
+
+</body>
+</html>

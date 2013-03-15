@@ -48,6 +48,10 @@
 #define _YON_STR(p) #p
 #define YON_STR(p) _YON_STR(p)
 
+#define _YON_COMBINE(a,b)	a##b
+#define YON_COMBINE(a,b)	_YON_COMBINE(a,b)
+
+
 namespace yon{
 
 typedef void*				pvoid;
