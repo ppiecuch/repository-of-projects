@@ -69,6 +69,7 @@ namespace core{
 #ifdef YON_COMPILE_WITH_WIN32
 			//每个线程中访问临界资源的那段程序称为临界区（Critical Section）（临界资源是一次仅允许一个线程使用的共享资源）。
 			//每次只准许一个线程进入临界区，进入后不允许其他线程进入。
+			//Initializing a critical section that has already been initialized results in undefined behavior.
 			InitializeCriticalSection( &m_semaphore );
 #else
 			//函数sem_init（）用来初始化一个信号量。
