@@ -205,10 +205,11 @@ void ThreadPool<T>::start(){
 template<typename T>
 void ThreadPool<T>::suspend(Td* thread)
 {
-	//TRACE("SuspendThread[%s] success!\r\n",thread->Name.c_str());
 	thread->Waiting=true;
+	TRACE("SuspendThread[%s] success!\r\n",thread->Name.c_str());
 	if(::SuspendThread(thread->Handle)==-1)
 	{
+		thread->Waiting=false;
 		TRACE("SuspendThread[%s] failed,for error:%d!\r\n",thread->Name.c_str(),GetLastError());
 		return;
 	}
@@ -219,7 +220,7 @@ void ThreadPool<T>::add(delegate<T>* work)
 {
 	m_mutex.wait();
 	m_works.push_back(work);
-	TRACE("add work:%08X\r\n",work);
+	//TRACE("add work:%08X\r\n",work);
 	m_mutex.notify();
 	wakeThread();
 }
@@ -265,9 +266,9 @@ int main(int argc, char* argv[])
 	ThreadPool<void> pool(10);
 	pool.start();
 
-	for(int i=0;i<100;++i)
+	for(int i=0;i<10;++i)
 	{
-		//getchar();
+		getchar();
 		pool.add(&d);
 	}
 
