@@ -97,6 +97,9 @@ namespace core{
 #ifdef YON_COMPILE_WITH_WIN32
 			EnterCriticalSection( &m_semaphore );
 #else
+			//sem_wait函数也是一个原子操作，它的作用是从信号量的值减去一个“1”，但它永远会先等待该信号量为一个非零值才开始做减法。
+			//也就是说，如果你对一个值为2的信号量调用sem_wait(),线程将会继续执行，这信号量的值将减到1。
+			//如果对一个值为0的信号量调用sem_wait()，这个函数就 会地等待直到有其它线程增加了这个值使它不再是0为止。
 			//函数sem_wait( sem_t *sem )被用来阻塞当前线程直到信号量sem的值大于0，解除阻塞后将sem的值减一，表明公共资源经使用后减少。
 			sem_wait( &m_semaphore );
 #endif
