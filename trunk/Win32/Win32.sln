@@ -148,6 +148,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Construct", "Construct\Cons
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DelegatesDemo", "DelegatesDemo_vc7\DelegatesDemo.vcproj", "{B46AA223-596C-464C-82FC-76723938F0E5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThreadPool", "ThreadPool\ThreadPool.vcproj", "{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "typeid", "typeid\typeid.vcproj", "{873E733C-501B-4F48-8739-DE2D8F5A6761}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Multithreaded|Win32 = Debug Multithreaded|Win32
@@ -986,6 +990,30 @@ Global
 		{B46AA223-596C-464C-82FC-76723938F0E5}.Release Singlethreaded|Win32.Build.0 = Release|Win32
 		{B46AA223-596C-464C-82FC-76723938F0E5}.Release|Win32.ActiveCfg = Release|Win32
 		{B46AA223-596C-464C-82FC-76723938F0E5}.Release|Win32.Build.0 = Release|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Debug Multithreaded|Win32.ActiveCfg = Debug|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Debug Multithreaded|Win32.Build.0 = Debug|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Debug Singlethreaded|Win32.ActiveCfg = Debug|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Debug Singlethreaded|Win32.Build.0 = Debug|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Debug|Win32.Build.0 = Debug|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Release Multithreaded|Win32.ActiveCfg = Release|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Release Multithreaded|Win32.Build.0 = Release|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Release Singlethreaded|Win32.ActiveCfg = Release|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Release Singlethreaded|Win32.Build.0 = Release|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Release|Win32.ActiveCfg = Release|Win32
+		{E370D516-2ADE-4CFB-97EF-3B84245D3B4C}.Release|Win32.Build.0 = Release|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Debug Multithreaded|Win32.ActiveCfg = Debug|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Debug Multithreaded|Win32.Build.0 = Debug|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Debug Singlethreaded|Win32.ActiveCfg = Debug|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Debug Singlethreaded|Win32.Build.0 = Debug|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Debug|Win32.ActiveCfg = Debug|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Debug|Win32.Build.0 = Debug|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Release Multithreaded|Win32.ActiveCfg = Release|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Release Multithreaded|Win32.Build.0 = Release|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Release Singlethreaded|Win32.ActiveCfg = Release|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Release Singlethreaded|Win32.Build.0 = Release|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Release|Win32.ActiveCfg = Release|Win32
+		{873E733C-501B-4F48-8739-DE2D8F5A6761}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

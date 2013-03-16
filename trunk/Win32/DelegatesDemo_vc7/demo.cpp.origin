@@ -41,28 +41,40 @@ int main()
 
 	//创建委托。
     App::Callback callback = NULL;
-    if(!callback.empty()) callback("1");
+    if(!callback.IsNull()) callback("1");
 
-	IDelegate1<void,string>* d0=createDelegate(App::OutputToFile);
-	printf("OutputToFile d0:%08X\r\n",d0);
-	IDelegate1<void,string>* d1=createDelegate(&app, &App::OutputToConsole);
-	printf("OutputToConsole d1:%08X\r\n",d1);
+	//如此用有内存泄漏
+	/*
+    callback += NewDelegate(App::OutputToFile);
+    if(!callback.IsNull()) callback("2");
 
-	printf("\r\nstart 2\r\n");
+    callback += NewDelegate(&app, &App::OutputToConsole);
+    if(!callback.IsNull()) callback("3");
+
+    callback -= NewDelegate(App::OutputToFile);
+    if(!callback.IsNull()) callback("4");
+
+    callback -= NewDelegate(&app, &App::OutputToConsole);
+    if(!callback.IsNull()) callback("5");
+	*/
+	
+
+	
+	//这样才不会
+	IDelegate1<void,string>* d0=NewDelegate(App::OutputToFile);
+	IDelegate1<void,string>* d1=NewDelegate(&app, &App::OutputToConsole);
+
 	callback += d0;
-	if(!callback.empty()) callback("2");
+	if(!callback.IsNull()) callback("2");
 
-	printf("\r\nstart 3\r\n");
 	callback += d1;
-	if(!callback.empty()) callback("3");
+	if(!callback.IsNull()) callback("3");
 
-	printf("\r\nstart 4\r\n");
 	callback -= d0;
-	if(!callback.empty()) callback("4");
+	if(!callback.IsNull()) callback("4");
 
-	printf("\r\nstart 5\r\n");
 	callback -= d1;
-	if(!callback.empty()) callback("5");
+	if(!callback.IsNull()) callback("5");
 
 	system("pause");
 }

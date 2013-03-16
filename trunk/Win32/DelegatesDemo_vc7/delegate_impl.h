@@ -1,32 +1,32 @@
 #define COMBINE(a,b)           COMBINE1(a,b)
 #define COMBINE1(a,b)          a##b
 
-#define I_DELEGATE             COMBINE(IDelegate, SUFFIX)
-#define C_STATIC_DELEGATE      COMBINE(CStaticDelegate, SUFFIX)
-#define C_METHOD_DELEGATE      COMBINE(CMethodDelegate, SUFFIX)
-#define C_DELEGATE             COMBINE(CDelegate, SUFFIX)
+#define _YON_I_DELEGATE				COMBINE(IDelegate, SUFFIX)
+#define _YON_C_STATIC_DELEGATE      COMBINE(CStaticDelegate, SUFFIX)
+#define _YON_C_METHOD_DELEGATE      COMBINE(CMethodDelegate, SUFFIX)
+#define _YON_C_DELEGATE             COMBINE(CDelegate, SUFFIX)
 
-template<class TRet TEMPLATE_PARAMS>
-class I_DELEGATE
+template<class R TEMPLATE_PARAMS>
+class _YON_I_DELEGATE
 {
 public:
-    virtual ~I_DELEGATE() {}
-    virtual TRet Invoke(PARAMS) = 0;
-    virtual bool Compare(I_DELEGATE<TRet TEMPLATE_ARGS>* pDelegate) = 0;
+    virtual ~_YON_I_DELEGATE() {}
+    virtual R invoke(PARAMS) = 0;
+    virtual bool equal(_YON_I_DELEGATE<R TEMPLATE_ARGS>* pDelegate) = 0;
 };
 
 
-template<class TRet TEMPLATE_PARAMS>
-class C_STATIC_DELEGATE : public I_DELEGATE<TRet TEMPLATE_ARGS>
+template<class R TEMPLATE_PARAMS>
+class _YON_C_STATIC_DELEGATE : public _YON_I_DELEGATE<R TEMPLATE_ARGS>
 {
 public:
-    typedef TRet (*PFunc)(PARAMS);
-    C_STATIC_DELEGATE(PFunc pFunc) { m_pFunc = pFunc; }
-    virtual TRet Invoke(PARAMS) { return m_pFunc(ARGS); }
-    virtual bool Compare(I_DELEGATE<TRet TEMPLATE_ARGS>* pDelegate)
+    typedef R (*PFunc)(PARAMS);
+    _YON_C_STATIC_DELEGATE(PFunc pFunc) { m_pFunc = pFunc; }
+    virtual R invoke(PARAMS) { return m_pFunc(ARGS); }
+    virtual bool equal(_YON_I_DELEGATE<R TEMPLATE_ARGS>* pDelegate)
     {
-        C_STATIC_DELEGATE<TRet TEMPLATE_ARGS>* pStaticDel =
-            dynamic_cast<C_STATIC_DELEGATE<TRet TEMPLATE_ARGS>*>(pDelegate);
+        _YON_C_STATIC_DELEGATE<R TEMPLATE_ARGS>* pStaticDel =
+            dynamic_cast<_YON_C_STATIC_DELEGATE<R TEMPLATE_ARGS>*>(pDelegate);
         if(pStaticDel == NULL || pStaticDel->m_pFunc != m_pFunc)
             return false;
 
@@ -38,21 +38,21 @@ private:
 };
 
 
-template<class TObj, class TRet TEMPLATE_PARAMS>
-class C_METHOD_DELEGATE : public I_DELEGATE<TRet TEMPLATE_ARGS>
+template<class TObj, class R TEMPLATE_PARAMS>
+class _YON_C_METHOD_DELEGATE : public _YON_I_DELEGATE<R TEMPLATE_ARGS>
 {
 public:
-    typedef TRet (TObj::*PMethod)(PARAMS);
-    C_METHOD_DELEGATE(TObj* pObj, PMethod pMethod)
+    typedef R (TObj::*PMethod)(PARAMS);
+    _YON_C_METHOD_DELEGATE(TObj* pObj, PMethod pMethod)
     {
         m_pObj = pObj;
         m_pMethod = pMethod;
     }
-    virtual TRet Invoke(PARAMS) { return (m_pObj->*m_pMethod)(ARGS); }
-    virtual bool Compare(I_DELEGATE<TRet TEMPLATE_ARGS>* pDelegate)
+    virtual R invoke(PARAMS) { return (m_pObj->*m_pMethod)(ARGS); }
+    virtual bool equal(_YON_I_DELEGATE<R TEMPLATE_ARGS>* pDelegate)
     {
-        C_METHOD_DELEGATE<TObj, TRet TEMPLATE_ARGS>* pMethodDel =
-            dynamic_cast<C_METHOD_DELEGATE<TObj, TRet TEMPLATE_ARGS>* >(pDelegate);
+        _YON_C_METHOD_DELEGATE<TObj, R TEMPLATE_ARGS>* pMethodDel =
+            dynamic_cast<_YON_C_METHOD_DELEGATE<TObj, R TEMPLATE_ARGS>* >(pDelegate);
         if
         (
             pMethodDel == NULL ||
@@ -72,67 +72,67 @@ private:
 };
 
 
-template<class TRet TEMPLATE_PARAMS>
-I_DELEGATE<TRet TEMPLATE_ARGS>* NewDelegate(TRet (*pFunc)(PARAMS))
+template<class R TEMPLATE_PARAMS>
+_YON_I_DELEGATE<R TEMPLATE_ARGS>* createDelegate(R (*pFunc)(PARAMS))
 {
-    return new C_STATIC_DELEGATE<TRet TEMPLATE_ARGS>(pFunc);
+    return new _YON_C_STATIC_DELEGATE<R TEMPLATE_ARGS>(pFunc);
 }
 
-template <class TObj, class TRet TEMPLATE_PARAMS>
-I_DELEGATE<TRet TEMPLATE_ARGS>* NewDelegate(TObj* pObj, TRet (TObj::*pMethod)(PARAMS))
+template <class TObj, class R TEMPLATE_PARAMS>
+_YON_I_DELEGATE<R TEMPLATE_ARGS>* createDelegate(TObj* pObj, R (TObj::*pMethod)(PARAMS))
 {
-    return new C_METHOD_DELEGATE<TObj, TRet TEMPLATE_ARGS> (pObj, pMethod);
+    return new _YON_C_METHOD_DELEGATE<TObj, R TEMPLATE_ARGS> (pObj, pMethod);
 }
 
 
-template<class TRet TEMPLATE_PARAMS>
-class C_DELEGATE
+template<class R TEMPLATE_PARAMS>
+class _YON_C_DELEGATE
 {
 public:
-    typedef I_DELEGATE<TRet TEMPLATE_ARGS> IDelegate;
+    typedef _YON_I_DELEGATE<R TEMPLATE_ARGS> IDelegate;
     typedef std::list<IDelegate*> DelegateList;
 
-    C_DELEGATE(IDelegate* pDelegate = NULL) { Add(pDelegate); }
-    ~C_DELEGATE() { RemoveAll(); }
-    bool IsNull() { return (m_DelegateList.empty()); }
+    _YON_C_DELEGATE(IDelegate* pDelegate = NULL) { add(pDelegate); }
+    ~_YON_C_DELEGATE() { removeAll(); }
+    bool empty() { return (m_DelegateList.empty()); }
 
-    C_DELEGATE<TRet TEMPLATE_ARGS>& operator=(IDelegate* pDelegate)
+    _YON_C_DELEGATE<R TEMPLATE_ARGS>& operator=(IDelegate* pDelegate)
     {
-        RemoveAll();
-        Add(pDelegate);
+        removeAll();
+        add(pDelegate);
         return *this;
     }
     
-    C_DELEGATE<TRet TEMPLATE_ARGS>& operator+=(IDelegate* pDelegate)
+    _YON_C_DELEGATE<R TEMPLATE_ARGS>& operator+=(IDelegate* pDelegate)
     {
-        Add(pDelegate);
+        add(pDelegate);
         return *this;
     }
 
-    C_DELEGATE<TRet TEMPLATE_ARGS>& operator-=(IDelegate* pDelegate)
+    _YON_C_DELEGATE<R TEMPLATE_ARGS>& operator-=(IDelegate* pDelegate)
     {
-        Remove(pDelegate);
+        remove(pDelegate);
         return *this;
     }
 
-    TRet operator()(PARAMS)
+    R operator()(PARAMS)
     {
-        return Invoke(ARGS);
+        return invoke(ARGS);
     }
 
 private:
-    void Add(IDelegate* pDelegate)
+    void add(IDelegate* pDelegate)
     {
         if(pDelegate != NULL)
             m_DelegateList.push_back(pDelegate);
     }
 
-    void Remove(IDelegate* pDelegate)
+    void remove(IDelegate* pDelegate)
     {
         DelegateList::iterator it;
         for(it = m_DelegateList.begin(); it != m_DelegateList.end(); ++it)
         {
-            if((*it)->Compare(pDelegate))
+            if((*it)->equal(pDelegate))
             {
                 delete (*it);
                 m_DelegateList.erase(it);
@@ -141,7 +141,7 @@ private:
         }
     }
 
-    void RemoveAll()
+    void removeAll()
     {
         DelegateList::iterator it;
         for(it = m_DelegateList.begin(); it != m_DelegateList.end(); ++it)
@@ -150,13 +150,17 @@ private:
         m_DelegateList.clear();
     }
 
-    TRet Invoke(PARAMS)
+    R invoke(PARAMS)
     {
         DelegateList::const_iterator it;
         for(it = m_DelegateList.begin(); it != --m_DelegateList.end(); ++it)
-            (*it)->Invoke(ARGS);
+		{
+			 (*it)->invoke(ARGS);
+			 printf("%08X,invoke:%08X\r\n",this,*it);
+		}
 
-        return m_DelegateList.back()->Invoke(ARGS);
+		 printf("%08X,invoke:%08X\r\n",this,*it);
+        return m_DelegateList.back()->invoke(ARGS);
     }
 
 private:
@@ -166,7 +170,7 @@ private:
 #undef COMBINE
 #undef COMBINE1
 
-#undef I_DELEGATE
-#undef C_STATIC_DELEGATE
-#undef C_METHOD_DELEGATE
-#undef C_DELEGATE
+#undef _YON_I_DELEGATE
+#undef _YON_C_STATIC_DELEGATE
+#undef _YON_C_METHOD_DELEGATE
+#undef _YON_C_DELEGATE
