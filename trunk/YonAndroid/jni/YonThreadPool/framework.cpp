@@ -68,7 +68,10 @@ public:
 				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
-				logger->debug("[R]%.2f,%.2f\n",evt.touchInput.xs[0],evt.touchInput.ys[0]);
+				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.xs[0],evt.touchInput.ys[0]);
+				s32 num=core::randomizer::rand(1,10);
+				for(s32 i=0;i<num;++i)
+					addWork();
 				return true;
 			}
 		}
@@ -104,7 +107,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 #endif
 	
 	YON_DEBUG("start createThreadPool()\r\n");
-	pool=core::createThreadPool(3);
+	pool=core::createThreadPool(2);
 	pool->run();
 	YON_DEBUG("end createThreadPool()\r\n");
 	
@@ -119,12 +122,15 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,WORK:%u",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),pool->size()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }
 void destroy(){
+	//可以多次调用stop
+	//pool->stop();
 	if(pool)
+		//drop会自动调用stop
 		pool->drop();
 	engine->drop();
 	delete params.pEventReceiver;
