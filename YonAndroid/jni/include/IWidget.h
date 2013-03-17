@@ -3,25 +3,26 @@
 
 #include "IReferencable.h"
 #include "yonString.h"
+#include "IGUISystem.h"
 
 //refer to:http://www.php100.com/manual/css3_0
 
 namespace yon{
 namespace gui{
 
-	class IWidget : public virtual core::IReferencable{
+	class IWidget : public virtual core::IReferencable,public virtual event::IEventReceiver{
 	public:
-		const core::stringc& getTag() const{
+		//const core::stringc& getTag() const{
 			//TODO
-		}
+		//}
 
-		const core::stringc& getId() const{
-			//TODO
-		}
+		//virtual bool isVisible() = 0;
 
-		IWidget* getParent() const{
-			//TODO
-		}
+		virtual const core::stringc& getId() const = 0;
+
+		virtual IWidget* getParent() const = 0;
+
+		virtual IGUISystem* getGUISystem() const = 0;
 	};
 }
 }

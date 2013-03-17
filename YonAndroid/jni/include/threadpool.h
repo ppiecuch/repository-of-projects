@@ -16,6 +16,7 @@ namespace core{
 	public:
 		virtual ~threadpool(){}
 		virtual void push(IWork* work) = 0;
+		virtual u32 size() = 0;
 		virtual void run() = 0;
 		virtual void stop() = 0;
 	};

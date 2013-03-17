@@ -50,11 +50,15 @@ else
 ifeq ($(APP),Thread)
 subdirs += $(LOCAL_PATH)/AndroidThread.mk
 else
+ifeq ($(APP),ThreadPool)
+subdirs += $(LOCAL_PATH)/AndroidThreadPool.mk
+else
 ifeq ($(APP),Text)
 subdirs += $(LOCAL_PATH)/AndroidText.mk
 else
 ifeq ($(APP),Logger)
 subdirs += $(LOCAL_PATH)/AndroidLogger.mk
+endif
 endif
 endif
 endif

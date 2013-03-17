@@ -323,6 +323,7 @@ yon_SOURCES :=   \
 		CFT2TextSystem.cpp \
 		CTimerUnix.cpp \
 		CThreadPosix.cpp \
+		CThreadPoolPosix.cpp \
 		CFPSCounter.cpp \
 		CColorConverter.cpp \
 		COGLES1ExtensionHandler.cpp \
