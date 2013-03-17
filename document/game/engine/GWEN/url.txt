@@ -1,0 +1,17 @@
+https://sites.google.com/a/facepunchstudios.com/gwen/
+
+    Coded in C++
+        Fully namespace'd
+    All standard Windows controls
+        Familiar interactions
+        Plus more
+    Relatively lightweight
+        GWEN doesn't come with any built in XML readers, font renderers etc..
+    Very easy to integrate
+        Implement renderer and input and it works in your application/game
+        Comes with built in renderers 
+            DirectX9
+            GDI
+            OpenGL (could use work.. please?)
+    Skinnable
+        Skins are c++ classes

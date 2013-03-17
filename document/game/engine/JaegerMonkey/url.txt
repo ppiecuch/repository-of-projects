@@ -1,0 +1,6 @@
+http://hg.mozilla.org/projects/jaegermonkey/
+https://wiki.mozilla.org/JaegerMonkey
+
+    This is the coder's badge of glory, That he protect and tend his monkey, Code with honor, as is due, And through the bits to God is true. --damons, IRC 
+
+JaegerMonkey (or JagerMonkey) is a new method JIT for SpiderMonkey. The goal is to get reliable baseline performance on the order of other JS JIT systems. JM will be a baseline whole-method JIT that doesn't necessarily do many traditional compiler optimizations. Instead, it does dynamic-language-JIT-oriented optimizations like PICs and specialization of constant operands.

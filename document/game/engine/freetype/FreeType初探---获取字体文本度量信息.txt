@@ -1,0 +1,86 @@
+FT_Library library;
+     FT_Error error = FT_Init_FreeType( &library ); 
+     if ( error ) 
+     {
+         ;
+     } 
+     FT_Face face; 
+     error = FT_New_Face( library, "C:\\Windows\\Fonts\\simsun.ttc", 0, &face ); 
+     if ( error == FT_Err_Unknown_File_Format) 
+     {
+         ;
+     }
+    //遍历字符集
+     int iCharMapCnt = face->num_charmaps;
+     FT_CharMap* pCharMaps = face->charmaps;
+     for ( int i = 0; i < iCharMapCnt; i ++)
+     {
+         FT_CharMapRec aCharMap = *(pCharMaps[i]);
+         FT_Encoding enconding = aCharMap.encoding;
+         int platform_id = aCharMap.platform_id;
+         int encoding_id = aCharMap.encoding_id;
+     }
+
+     //字体全局的东西、用字体单元来度量的。
+     int iGlyphsCnt = face->num_glyphs;
+     int iFaceNo = face->face_index;
+     int iFace_Flags = face->face_flags;
+     int iUints_Per_EM = face->units_per_EM;
+     int ascender = (face->ascender );
+     int descender = (face->descender);
+     int height = (face->height);
+     int max_advance_width = (face->max_advance_width);
+     int max_advance_height = (face->max_advance_width);
+
+
+     //通过每英寸72个点、使用多少个点来设置字的大小。
+     FT_Set_Char_Size(face,0,16 * 64,720, 720);//每英寸720像素、那么每个点10像素、16点则160像素。
+     FT_Size pSize = face->size;
+     FT_Size_Metrics_ font_Size_Metrics = pSize->metrics;  //整个字体的数据。按字体单元换算而来。
+     int iX_PPEM = font_Size_Metrics.x_ppem;
+     int iY_PPEM = font_Size_Metrics.y_ppem;
+     int iX_Scale = (font_Size_Metrics.x_scale + 63)>>6;
+     int iY_Scale = (font_Size_Metrics.y_scale + 63)>>6;
+     int iAscender = (font_Size_Metrics.ascender + 63)>>6;
+     int iDescender = (font_Size_Metrics.descender + 63)>>6;
+     int iHeight = (font_Size_Metrics.height + 63)>>6;
+     int iMax_advance = (font_Size_Metrics.max_advance + 63)>>6;
+
+
+
+
+     //直接通过像素来设置点的大小
+     FT_Set_Pixel_Sizes(face,160,160);
+     bool bScale = FT_IS_SCALABLE(face);
+     pSize = face->size;
+     font_Size_Metrics = pSize->metrics;
+     iX_PPEM = font_Size_Metrics.x_ppem;
+     iY_PPEM = font_Size_Metrics.y_ppem;
+     iX_Scale = (font_Size_Metrics.x_scale + 63)>>6;
+     iY_Scale = (font_Size_Metrics.y_scale + 63)>>6;
+     iAscender = (font_Size_Metrics.ascender + 63)>>6;
+     iDescender = (font_Size_Metrics.descender + 63)>>6;
+     iHeight = (font_Size_Metrics.height + 63)>>6;
+     iMax_advance = (font_Size_Metrics.max_advance + 63)>>6;
+
+     //轮廓索引
+     int iGlyphIndex = FT_Get_Char_Index(face,'A');
+     FT_Int32 loadflags = FT_LOAD_DEFAULT|FT_LOAD_NO_BITMAP;
+     error = FT_Load_Glyph(face,1105/*iGlyphIndex*/,loadflags);
+     if(error)
+     {
+         ;
+     }
+     //字槽、即对单个字的描述
+     FT_GlyphSlot pGlyphSlot = face->glyph;
+     FT_Glyph_Metrics glphy_Metrics = pGlyphSlot->metrics;//单个字的数据。
+     int iWordW = (glphy_Metrics.width + 63)>>6;
+     int iWordH = (glphy_Metrics.height + 63)>>6;
+     int iWordHBearingX = (glphy_Metrics.horiBearingX + 63)>>6;
+     int iWordHBearingY = (glphy_Metrics.horiBearingY + 63)>>6;
+     int iWordHAdd = (glphy_Metrics.horiAdvance + 63) >> 6;
+     int iWordVBearingX = (glphy_Metrics.vertBearingX + 63)>>6;
+     int iWordVBearingY = (glphy_Metrics.vertBearingY + 63)>>6;
+     int iWordVAdd = (glphy_Metrics.vertAdvance + 63) >> 6;
+     
+     http://blog.csdn.net/wang__sid/article/details/8017031
