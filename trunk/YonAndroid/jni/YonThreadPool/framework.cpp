@@ -21,11 +21,14 @@ class MyWork : public core::IWork{
 public:
 	static core::mutex s_mutex;
 	static s32 counter;
+	const s32 count;
+	MyWork():count(counter++){}
 public:
 	virtual void process(){
 		s_mutex.wait();
-		YON_DEBUG("process mywork:%d\r\n",counter++);
+		YON_DEBUG("process mywork:%d\r\n",count);
 		s_mutex.notify();
+		core::yonSleep(500);
 	}
 };
 core::mutex MyWork::s_mutex;
@@ -53,10 +56,9 @@ public:
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				//logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				addWork();
-				addWork();
-				addWork();
-				addWork();
+				s32 num=core::randomizer::rand(1,10);
+				for(s32 i=0;i<num;++i)
+					addWork();
 				return true;
 			}
 		case event::ENUM_EVENT_TYPE_TOUCH:
@@ -102,7 +104,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 #endif
 	
 	YON_DEBUG("start createThreadPool()\r\n");
-	pool=core::createThreadPool(10);
+	pool=core::createThreadPool(3);
 	pool->run();
 	YON_DEBUG("end createThreadPool()\r\n");
 	
