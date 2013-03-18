@@ -20,6 +20,7 @@ ISound* sound1=NULL;
 ISound* sound2=NULL;
 
 void swap(){
+#if 0
 	if(sound1)
 	{
 		if(sound1->isPaused())
@@ -35,6 +36,13 @@ void swap(){
 		else
 			sound2->pause();
 	}
+#else
+	sound2->isPlaying();
+	sound2->stop();
+	audioDriver->removeSound(sound2);
+	sound2=audioDriver->getSound("xyg.ogg");
+	sound2->play();
+#endif
 }
 
 class MyEventReceiver : public IEventReceiver{
@@ -107,10 +115,13 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	fs->addWorkingDirectory("media/");
 #endif
 
+	YON_DEBUG("maxMixed:%d \r\n",audioDriver->getMaxMixedSound());
+
 	//PROFILE_REGISTER_FRAME();
 	//PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
 	//sound1=audioDriver->getSound("bg.ogg");
-	sound2=audioDriver->getSound("xyg.ogg");
+	sound2=audioDriver->getSound("202.ogg");
+	
 	//sound2=audioDriver->getSound("helloworld.wav");
 	//audioDriver->grabSound(sound);
 	//audioDriver->dropSound(sound);
@@ -119,6 +130,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	//sound1->play();
 	//sound1->setGain(0.2f);
 
+	sound2->setLooping(false);
 	sound2->play();
 	sound2->setGain(0.5f);
 	//sound=audioDriver->getSound("helloworld.wav");
@@ -137,7 +149,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,maxMixed:%d",videoDriver->getFPS(),audioDriver->getMaxMixedSound()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }
