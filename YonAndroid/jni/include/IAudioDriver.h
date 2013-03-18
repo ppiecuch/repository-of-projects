@@ -26,6 +26,7 @@ namespace audio{
 			if(m_pFileSystem)
 				m_pFileSystem->drop();
 		}
+		virtual s32 getMaxMixedSound() = 0;
 		virtual ISound* getSound(const io::path& filename) = 0;
 		virtual ISound* findSound(const io::path& filename) = 0;
 		virtual void removeSound(ISound* sound) = 0;

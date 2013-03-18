@@ -130,6 +130,9 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	YON_DEBUG("%s(%d)\r\n",i18nManager->convert(utf8_2.toStringc().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str(),utf8_2.size());
 #endif
 #if 1
+	u32 test=0xFFFFFFFF;
+	YON_DEBUG("%u,%08X\r\n",test,(s32)test);
+#elif 1
 	App app;
 
 	//创建委托。

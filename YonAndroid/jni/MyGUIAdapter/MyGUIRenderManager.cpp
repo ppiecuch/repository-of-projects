@@ -25,7 +25,15 @@ namespace MyGUI{
 		m_projection.makeIdentity();
 		m_projection.ortho(-1, 1, -1, 1, -1, 1);
 
+		//TODO 当将半透明的元素绘制在GUI的RTT上时，结果不是期望的
+		//因为绘制到RTT上时，进行了一次SrcAlpha,1-SrcAlpha运算，然后从RTT绘制到屏幕上又进行了一次SrcAlpha,1-SrcAlpha，如此会导致颜色的丢失
+#if 0
+		m_material.MaterialType=video::ENUM_MATERIAL_TYPE_BLEND;
+		m_material.BlendSrc=video::ENUM_BLEND_FACTOR_ONE;
+		m_material.BlendDst=video::ENUM_BLEND_FACTOR_ZERO;
+#else
 		m_material.MaterialType=video::ENUM_MATERIAL_TYPE_TRANSPARENT;
+#endif
 		m_material.FrontFace=video::ENUM_FRONT_FACE_CW;
 		//m_material.setFilterMode(0,video::ENUM_FILTER_MODE_NEAREST);
 		//TODO由于MyGUI引擎的freetype字体顶点序列是CCW的，而其UI界面顶点序列则是CW的，临时解决办法是关闭CullFace
