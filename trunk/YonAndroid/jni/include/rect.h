@@ -100,6 +100,25 @@ namespace yon{
 					topLeft.x = bottomRight.x;
 			}
 
+			//! If the lower right corner of the rect is smaller then the upper left, the points are swapped.
+			void repair()
+			{
+				if (bottomRight.x < topLeft.x)
+				{
+					T t = bottomRight.x;
+					bottomRight.x = topLeft.x;
+					topLeft.x = t;
+				}
+
+				if (bottomRight.y < topLeft.y)
+				{
+					T t = bottomRight.y;
+					bottomRight.y = topLeft.y;
+					topLeft.y = t;
+				}
+			}
+
+
 			bool isValid() const
 			{
 				return ((bottomRight.x >= topLeft.x) &&
