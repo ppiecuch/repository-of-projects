@@ -38,6 +38,8 @@ namespace audio{
 
 		virtual IListener* getListener() = 0;
 		virtual bool checkError(const c8* file,s32 line) = 0;
+
+		virtual void update() = 0;
 	};
 
 	//注意:经函数只用于内部使用

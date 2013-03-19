@@ -28,7 +28,9 @@ namespace core{
 
 		//获取随机数，范围为[start,end]
 		static s32 rand(s32 start,s32 end){
-			YON_DEBUG_BREAK_IF(end<=start);
+			if(start==end)
+				return start;
+			YON_DEBUG_BREAK_IF(end<start);
 			return rand()%(end-start+1)+start;
 		}
 	};
