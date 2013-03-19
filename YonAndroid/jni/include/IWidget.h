@@ -18,6 +18,16 @@ namespace gui{
 			ENUM_TYPE_COUNT
 		};
 
+		enum ENUM_STATE{
+			DOWN = 0,
+			UP,
+			OVER,
+			OUT,
+			//TODO 长按
+			//HOLD
+			ENUM_STATE_COUNT
+		};
+
 		//TODO 水平垂直分开
 		enum ENUM_ALIGN{
 			//! Aligned to parent's top or left side (default)
@@ -29,16 +39,23 @@ namespace gui{
 			ENUM_ALIGN_COUNT
 		};
 
-		const c8* const TypeNames[ENUM_TYPE_COUNT] =
+		const static c8* TypeNames[ENUM_TYPE_COUNT] =
 		{
 			"button"
 		};
 
-		const c8* const AlignNames[ENUM_TYPE_COUNT] =
+		const static c8* AlignNames[ENUM_TYPE_COUNT] =
 		{
 			"upperleft",
 			"lowerright",
 			"center"
+		};
+
+		const static c8* StateNames[ENUM_STATE_COUNT]={
+			"down",
+			"up",
+			"over",
+			"out"
 		};
 		//const core::stringc& getTag() const{
 			//TODO
