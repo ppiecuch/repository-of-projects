@@ -16,69 +16,45 @@ ISceneNode* teapotModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
-const c8* names[]={"xyg.ogg","110.ogg","111.ogg","112.ogg","113.ogg","114.ogg","115.ogg","116.ogg","117.ogg","118.ogg","119.ogg"};
-typedef core::map<core::stringc,ISound*> SoundMap;
-SoundMap soundPool;
+ISound* sound1=NULL;
+ISound* sound2=NULL;
 
-#define MAX_IN_POOL 7
-
-void playSound(s32 index)
-{
-	core::stringc name=names[index];
-	SoundMap::Node* node=soundPool.find(name);
-	if(node)
+void swap(){
+#if 0
+	if(sound1)
 	{
-		ISound* sound=node->getValue();
-		//if(sound->isPlaying())
-		//»ò
-		if(sound->isStopped()==false)
-			YON_DEBUG("sound playing:%s\r\n",name.c_str());
+		if(sound1->isPaused())
+			sound1->play();
 		else
-		{
-			//sound->setSecondOffset(0);
-			sound->play();
-			sound->setLooping(false);
-		}
+			sound1->pause();
+	}
+
+	if(sound2)
+	{
+		if(sound2->isPaused())
+			sound2->play();
+		else
+			sound2->pause();
+	}
+#elif 1
+	if(sound2->isLooping())
+	{
+		sound2->setLooping(false);
+		YON_INFO("unlooping\r\n");
 	}
 	else
 	{
-		YON_DEBUG("sound size:%u\r\n",soundPool.size());
-		if(soundPool.size()>=MAX_IN_POOL)
-		{
-			SoundMap::Iterator it=soundPool.getIterator();
-			for(;!it.atEnd();++it)
-			{
-				ISound* sound=it->getValue();
-				if(sound->isStopped())
-				{
-					YON_DEBUG("remove sound:%s\r\n",it->getKey().c_str());
-					soundPool.remove(it->getKey());
-					audioDriver->removeSound(sound);
-					break;
-				}
-				//else
-				//	YON_DEBUG("sound %s not stop\r\n",it->getKey().c_str());
-			}
-		}
-		if(soundPool.size()<=MAX_IN_POOL)
-		{
-			ISound* sound=audioDriver->getSound(name);
-			soundPool.insert(name,sound);
-			sound->play();
-			sound->setLooping(false);
-		}
-		else
-			YON_WARN(YON_LOG_WARN_FORMAT,core::stringc("currently has no free space to play sound:%s,ignore it!",name.c_str()).c_str());
+		sound2->setLooping(true);
+		YON_INFO("looping\r\n");
 	}
+#else
+	sound2->isPlaying();
+	sound2->stop();
+	audioDriver->removeSound(sound2);
+	sound2=audioDriver->getSound("xyg.ogg");
+	sound2->play();
+#endif
 }
-void play(){
-	s32 start=randomizer::rand(0,9);
-	s32 num=randomizer::rand(1,10-start);
-	YON_INFO("play:start:%d,num:%d,from:[%s],to:[%s]\r\n",start,num,names[start],names[start+num-1]);
-	for(s32 i=start;i<start+num;++i)
-		playSound(i);
-}
-
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -90,11 +66,7 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				play();
-				//{
-				//	ISound* sound=(ISound*)soundPool["xyg.ogg"];
-				//	sound->stop();
-				//}
+				swap();
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
@@ -105,7 +77,7 @@ public:
 			switch(evt.touchInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
-				play();
+				swap();
 				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
@@ -158,16 +130,10 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 
 	YON_DEBUG("maxMixed:%d \r\n",audioDriver->getMaxMixedSound());
 
-	ISound* sound=audioDriver->getSound("xyg.ogg");
-	
-	soundPool.insert(names[0],sound);
-	sound->play();
-	sound->setLooping(true);
-
 	//PROFILE_REGISTER_FRAME();
 	//PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
 	//sound1=audioDriver->getSound("bg.ogg");
-	//sound2=audioDriver->getSound("202.ogg");
+	sound2=audioDriver->getSound("112.ogg");
 	
 	//sound2=audioDriver->getSound("helloworld.wav");
 	//audioDriver->grabSound(sound);
@@ -177,9 +143,9 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	//sound1->play();
 	//sound1->setGain(0.2f);
 
-	//sound2->setLooping(false);
-	//sound2->play();
-	//sound2->setGain(0.5f);
+	sound2->play();
+	sound2->setLooping(false);
+	sound2->setGain(0.5f);
 	//sound=audioDriver->getSound("helloworld.wav");
 	//sound->play();
 	//PROFILE_END_CALL(PROFILE_ID_1);
@@ -192,24 +158,16 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	audioDriver->update();
-
 	videoDriver->begin();
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,maxMixed:%d",videoDriver->getFPS(),audioDriver->getMaxMixedSound()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
-
-	SoundMap::Iterator it=soundPool.getIterator();
-	for(s32 index=1;!it.atEnd();++it,++index)
-	{
-		Logger->drawString(videoDriver,core::stringc("sound:%s",it->getKey().c_str()),core::position2di(10,10*index),COLOR_GREEN);
-	}
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,Looping:%d",videoDriver->getFPS(),sound2->isLooping()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }
 void destroy(){
-	//PROFILE_REPORT();
+	PROFILE_REPORT();
 	engine->drop();
 	delete params.pEventReceiver;
 }
