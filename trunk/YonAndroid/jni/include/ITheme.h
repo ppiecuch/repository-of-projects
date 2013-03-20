@@ -7,7 +7,7 @@
 namespace yon{
 namespace gui{
 
-	class ISkin;
+	struct SSkin;
 	
 	/**
 	* Stores collections of Skin objects.
@@ -15,7 +15,8 @@ namespace gui{
 	class ITheme : public virtual core::IReferencable{
 	public:
 		
-		virtual ISkin* getSkin(IWidget::ENUM_TYPE type,IWidget::ENUM_STATE state) = 0;
+		virtual bool addSkin(IWidget::ENUM_TYPE type,IWidget::ENUM_STATE state,s32 index, const SSkin& skin) = 0;
+		virtual const SSkin& getSkin(IWidget::ENUM_TYPE type,IWidget::ENUM_STATE state,s32 index=0) const = 0;
 
 		virtual const core::stringc& getName() const = 0;
 
