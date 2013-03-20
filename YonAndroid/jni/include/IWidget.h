@@ -4,6 +4,7 @@
 #include "IReferencable.h"
 #include "yonString.h"
 #include "IGUISystem.h"
+#include "position2d.h"
 
 //refer to:http://www.php100.com/manual/css3_0
 
@@ -72,6 +73,8 @@ namespace gui{
 		virtual IGUISystem* getGUISystem() const = 0;
 
 		virtual const core::recti& getAbsoluteRectangle() const = 0;
+
+		virtual bool isPointInside(const core::position2di& point) const = 0;
 	};
 }
 }

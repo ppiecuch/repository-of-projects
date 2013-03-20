@@ -9,6 +9,7 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
+ITimer* timer=NULL;
 
 ISceneNode* cubeModel=NULL;
 ISceneNode* planeModel=NULL;
@@ -147,6 +148,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
+	timer=engine->getTimer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
@@ -156,13 +158,14 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	fs->addWorkingDirectory("media/sound");
 #endif
 
-	YON_DEBUG("maxMixed:%d \r\n",audioDriver->getMaxMixedSound());
-
+	//YON_DEBUG("maxMixed:%d \r\n",audioDriver->getMaxMixedSound());
+	u32 start=timer->getRealTime();
 	ISound* sound=audioDriver->getSound("xyg.ogg");
 	
 	soundPool.insert(names[0],sound);
 	sound->play();
 	sound->setLooping(true);
+	YON_DEBUG("use time:%u \r\n",timer->getRealTime()-start);
 
 	//PROFILE_REGISTER_FRAME();
 	//PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
