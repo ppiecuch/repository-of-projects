@@ -4,14 +4,16 @@
 #include "IReferencable.h"
 #include "IRenderable.h"
 #include "IResizable.h"
+#include "IEventReceiver.h"
 #include "path.h"
 
 namespace yon{
 namespace gui{
 
 	class ITheme;
+	class IWidget;
 
-	class IGUISystem : public virtual core::IReferencable,public virtual core::IResizable,public virtual core::IRenderable{
+	class IGUISystem : public virtual core::IReferencable,public core::IResizable,public core::IRenderable,public event::IEventReceiver{
 	public:
 		virtual ~IGUISystem(){}
 
@@ -20,6 +22,8 @@ namespace gui{
 
 		virtual ITheme* getTheme(const io::path& name) = 0;
 		virtual bool removeTheme(ITheme* theme) = 0;
+
+		virtual IWidget* getRootWidget() = 0;
 	};
 }
 }

@@ -10,7 +10,8 @@ namespace yon{
 		class IRenderable{
 		public:
 			//TODO ¸ÄÎª virtual void render()
-			virtual void render(video::IVideoDriver* driver) = 0;
+			virtual void render(video::IVideoDriver* driver){}
+			virtual void render(){}
 		};
 	}
 }
