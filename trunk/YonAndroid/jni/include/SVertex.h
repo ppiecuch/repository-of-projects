@@ -42,9 +42,7 @@ namespace scene{
 		}
 		
 		
-		ENUM_VERTEX_TYPE getType() const{
-			return ENUM_VERTEX_TYPE_3V1T1C;
-		}
+		static ENUM_VERTEX_TYPE getType();
 
 	};
 
@@ -64,10 +62,9 @@ namespace scene{
 		core::vector2df texcoords;
 		
 
-		ENUM_VERTEX_TYPE getType() const{
-			return ENUM_VERTEX_TYPE_2V1T1C;
-		}
+		static ENUM_VERTEX_TYPE getType();
 	};
+
 
 	struct SVertex2TCoords{
 		SVertex2TCoords(){}
@@ -79,9 +76,7 @@ namespace scene{
 		core::vector2df texcoords1;
 		
 
-		ENUM_VERTEX_TYPE getType() const{
-			return ENUM_VERTEX_TYPE_3V2T1C;
-		}
+		static ENUM_VERTEX_TYPE getType();
 	};
 
 	inline u32 getSizeByVertexType(ENUM_VERTEX_TYPE type){

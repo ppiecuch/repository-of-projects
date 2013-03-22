@@ -18,6 +18,7 @@
 #include "IResizable.h"
 #include "ICursorControl.h"
 #include "IEventReceiver.h"
+#include "SRenderUnit.h"
 
 namespace yon{
 
@@ -137,6 +138,7 @@ namespace yon{
 				:clearBackBuffer(backBuffer),clearZBuffer(zBuffer),color(color){}
 		};
 
+		
 		//视频驱动器接口
 		class IVideoDriver:public virtual core::IReferencable,public event::IEventReceiver{
 		protected:
@@ -186,6 +188,9 @@ namespace yon{
 			void registerResizable(core::IResizable* p){
 				m_resizables.push_back(p);
 			}
+
+			SRenderUnit2D* getRenderUnit2D(){return NULL;}
+			void recycleRenderUnit2D(SRenderUnit2D* unit){}
 
 			virtual s64 getVideoMemory() const = 0;
 			virtual c8* getVideoMemoryString() const = 0;
