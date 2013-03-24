@@ -12,6 +12,7 @@ namespace yon{
 			ENUM_EVENT_TYPE_KEY,
 			ENUM_EVENT_TYPE_SYSTEM,
 			ENUM_EVENT_TYPE_UI,
+			ENUM_EVENT_TYPE_GUI,
 			ENUM_EVENT_TYPE_CUSTOM,
 			ENUM_EVENT_TYPE_COUNT
 		};
@@ -64,14 +65,9 @@ namespace yon{
 			ENUM_UI_INPUT_TYPE_COUNT
 		};
 
-		namespace gui{
-			class IWidget;
-
-			enum ENUM_GUI_INPUT_TYPE{
-				//! A button was clicked.
-				ENUM_GUI_INPUT_TYPE_BUTTON_CLICKED = 0,
-			};
-		}
+		//namespace gui{
+		//	class IWidget;
+		//}
 
 		enum MASK_MOUSE_BUTTON{
 			MASK_MOUSE_BUTTON_LEFT = 0x01,
@@ -119,18 +115,18 @@ namespace yon{
 			void* pointer;
 		};
 
-		struct SGUIInput
+		/*struct SGUIInput
 		{
 			//! who called the event
 			gui::IWidget* Caller;
 
 			//! If the event has something to do with another element, it will be held here.
-			gui::IWidget* Element;
+			gui::IWidget* Widget;
 
 			//! Type of GUI Event
 			gui::ENUM_GUI_INPUT_TYPE EventType;
 
-		};
+		};*/
 
 		struct SEvent{
 			ENUM_EVENT_TYPE type;
@@ -140,6 +136,7 @@ namespace yon{
 				SKeyInput keyInput;
 				SSystemInput systemInput;
 				SUIInput uiInput;
+				//SGUIInput guiInput;
 				SCustomInput customInput;
 			};
 		};

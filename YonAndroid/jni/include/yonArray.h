@@ -107,6 +107,11 @@ namespace core{
 			return data;
 		}
 
+		u32 capacity() const
+		{
+			return allocated;
+		}
+
 		u32 size() const
 		{
 			return used;

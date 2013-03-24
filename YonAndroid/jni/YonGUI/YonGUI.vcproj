@@ -175,7 +175,15 @@
 			>
 		</File>
 		<File
+			RelativePath=".\framework.cpp.mygui"
+			>
+		</File>
+		<File
 			RelativePath=".\framework.h"
+			>
+		</File>
+		<File
+			RelativePath=".\framework.h.mygui"
 			>
 		</File>
 		<File

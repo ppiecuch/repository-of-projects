@@ -25,12 +25,12 @@ namespace gui{
 			ENUM_ALIGN_COUNT
 		};
 
-		enum MASK_STATE{
+		enum ENUM_STATE{
 			UNKNOWN	= 0,
 			DOWN	= 0x00000001,
 			UP		= 0x00000002,
-			OVER	= 0x00000004,
-			OUT		= 0x00000008,
+			HOVER	= 0x00000004,
+			LEAVE	= 0x00000008,
 			FOCUS	= 0x00000010,
 			//TODO ³¤°´
 			//HOLD
