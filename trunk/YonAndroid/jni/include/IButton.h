@@ -12,7 +12,7 @@ namespace gui{
 		IButton(widget::ENUM_TYPE type,IGUISystem* system,IWidget* parent,const core::stringc& id,const core::recti& rectangle)
 			:IWidget(type,system,parent,id,rectangle){}
 
-		virtual widget::MASK_STATE getState() const = 0;
+		virtual widget::ENUM_STATE getState() const = 0;
 
 		virtual widget::ENUM_TYPE getType() const{
 			return widget::BUTTON;

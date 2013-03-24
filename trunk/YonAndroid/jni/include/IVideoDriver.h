@@ -157,6 +157,7 @@ namespace yon{
 
 			RenderUnit2DPool m_renderUnit2DPool;
 			RenderUnit2DPool m_renderUnit2DBatchPool;
+			core::array<u16> m_rectangleIndices;
 
 			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name) = 0;
 		public:
@@ -215,6 +216,21 @@ namespace yon{
 					m_renderUnit2DBatchPool.recycle(unit);
 				else
 					m_renderUnit2DPool.recycle(unit);
+			}
+			const core::array<u16>& getRectangleIndices(u32 verticeCount){
+				YON_DEBUG_BREAK_IF(verticeCount%4!=0||verticeCount>=43690);
+				u16 indiceCount=(verticeCount>>1)*3;
+				u32 count=m_rectangleIndices.capacity();
+				if(count<indiceCount)
+				{
+					m_rectangleIndices.set_used(indiceCount);
+					static u16 indices[]={0,1,3,3,1,2};
+					for(u32 i=count;i<indiceCount;++i)
+						m_rectangleIndices[i]=verticeCount+indices[i%6];
+				}
+				else
+					m_rectangleIndices.set_used(indiceCount);
+				return m_rectangleIndices;
 			}
 
 			virtual s64 getVideoMemory() const = 0;
@@ -291,8 +307,8 @@ namespace yon{
 			virtual void draw2DImage(const video::ITexture* texture, const core::position2di& destPos,
 				const core::recti& sourceRect, const core::recti* clipRect =NULL,
 				video::SColor color=video::COLOR_WHITE, bool useAlphaChannelOfTexture=false) =0;
-			virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,
-				const void* indice, u32 indexCount,
+			virtual void drawVertexPrimitiveList(const void* const vertices, u32 vertexCount,
+				const void* const indice, u32 indexCount,
 				ENUM_PRIMITIVE_TYPE pType=ENUM_PRIMITIVE_TYPE_TRIANGLES,
 				scene::ENUM_VERTEX_TYPE vType=scene::ENUM_VERTEX_TYPE_3V1T1C,
 				bool force2D=false) =0;

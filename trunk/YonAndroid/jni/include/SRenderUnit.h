@@ -20,7 +20,7 @@ namespace video{
 	public:
 		video::ITexture* Texture;
 		core::array<V> Vertices;
-		u16 IndexCount;
+		//u16 IndexCount;
 		
 		bool isForBatch() const{
 			return ForBatch;
@@ -29,7 +29,7 @@ namespace video{
 		virtual void reset(){
 			Texture=NULL;
 			Vertices.set_used(0);
-			IndexCount=0;
+			//IndexCount=0;
 		}
 
 		scene::ENUM_VERTEX_TYPE getType() const{
@@ -40,6 +40,8 @@ namespace video{
 	template<class V>
 	struct SRenderEntry{
 		video::SRenderUnit<V>* Unit;
+
+		SRenderEntry(video::SRenderUnit<V>* unit):Unit(unit){}
 
 		inline bool operator < (const SRenderEntry<V>& other) const{
 			return Unit->Texture < other.Unit->Texture;

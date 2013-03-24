@@ -86,6 +86,71 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
+	guiAdapter=MyGUI::createMyGUIAdapter(fs,videoDriver,engine->getTimer(),geometryFty);
+
+	//guiEnv->init();
+	//MyGUI::LayoutManager::getInstance().loadLayout("Wallpaper.layout");
+	const MyGUI::VectorWidgetPtr& root = MyGUI::LayoutManager::getInstance().loadLayout("HelpPanel.layout");
+	root.at(0)->findWidget("Text")->castType<MyGUI::TextBox>()->setCaption("Sample colour picker implementation. Select text in EditBox and then select colour to colour selected part of text.");
+
+	MyGUI::EditBox* mEdit = MyGUI::Gui::getInstance().createWidget<MyGUI::EditBox>("EditBoxStretch", MyGUI::IntCoord(10, 80, 100, 100), MyGUI::Align::Default, "Overlapped");
+	mEdit->setCaption("Hello world");
+	mEdit->setTextAlign(MyGUI::Align::Center);
+	mEdit->setEditMultiLine(true);
+
+	//IMaterial* material;
+	IShap *shap,*shap1,*shap2;
+	IUnit* unit;
+	IEntity* entity;
+
+	/*ISound* sound=audioDriver->getSound("bg.ogg");
+	sound->setLooping(true);
+	//sound->setGain(0.5f);
+	sound->play();
+	//sound=audioDriver->getSound("helloworld.wav");
+	//sound->play();*/
+
+	shap=geometryFty->createCube(50,50,50);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	cubeModel=sceneMgr->addSceneNode(entity);
+	{
+		SMaterial& material=cubeModel->getMaterial(0);
+		material.setTexture(0,videoDriver->getTexture("test.png"));
+	}
+	cubeModel->setPosition(core::vector3df(100,100,0)); 
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
+	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	teapotModel=sceneMgr->addSceneNode(entity);
+	teapotModel->setPosition(core::vector3df(50,-50,0));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
+	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
+	unit=geometryFty->createUnit(shap);
+	entity=geometryFty->createEntity(unit);
+	planeModel=sceneMgr->addSceneNode(entity);
+	{
+		SMaterial& material=planeModel->getMaterial(0);
+		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
+		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
+		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.setTexture(0,videoDriver->getTexture("aura.png"));
+	}
+	planeModel->setPosition(core::vector3df(0,0,0));
+	shap->drop();
+	unit->drop();
+	entity->drop();
+
+	//core::array<core::stringc> arr;
+	//arr.push_back("test");
+
 	return true;
 }
 void resize(u32 width,u32 height){
@@ -93,7 +158,28 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin();
+	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+
+	const core::vector3df crot=cubeModel->getRotation();
+	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));
+
+	const core::vector3df trot=teapotModel->getRotation();
+	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
+
+	const core::vector3df psca=planeModel->getScale();
+	if(psca.x>4)
+		factor= 0.9f;
+	else if(psca.x<2)
+		factor=1.1f;
+	planeModel->setScale(psca*factor);
+
+	sceneMgr->render(videoDriver);
+
+	//pCamera->render(videoDriver);
+	//guiEnv->render();
+	guiAdapter->render();
+
+
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 

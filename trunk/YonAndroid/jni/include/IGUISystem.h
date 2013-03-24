@@ -4,17 +4,24 @@
 #include "IReferencable.h"
 #include "IRenderable.h"
 #include "IResizable.h"
+#include "IEventReceiver.h"
 #include "path.h"
 #include "xmldata.h"
 #include "widget.h"
 
 namespace yon{
+	namespace io{
+		class IFileSystem;
+	}
+	namespace video{
+		class IVideoDriver;
+	}
 namespace gui{
 
 	class ITheme;
 	class IWidget;
 
-	class IGUISystem : public core::IResizable,public core::IRenderable,public core::IReferencable{
+	class IGUISystem : public core::IResizable,public core::IRenderable,public core::IReferencable,public event::IEventReceiver{
 	public:
 		// Define a function pointer to functions that create Primitive instances.
 		typedef IWidget* (*ConstructorWrapper)(core::xmldata*);
@@ -45,6 +52,8 @@ namespace gui{
 		virtual ITheme* getTheme(const io::path& name) = 0;
 		virtual bool removeTheme(ITheme* theme) = 0;
 	};
+
+	IGUISystem* createGUISystem(io::IFileSystem* fileSystem,video::IVideoDriver* videoDriver);
 }
 }
 #endif

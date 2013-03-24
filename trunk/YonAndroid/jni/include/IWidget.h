@@ -2,7 +2,8 @@
 #define _YON_GUI_IWIDGET_H_
 
 #include "IReferencable.h"
-#include "IEventReceiver.h"
+//#include "IEventReceiver.h"
+#include "IHandler.h"
 #include "yonString.h"
 #include "position2d.h"
 #include "rect.h"
@@ -19,7 +20,7 @@ namespace gui{
 
 	class ITheme;
 
-	class IWidget : public virtual core::IReferencable,public virtual event::IEventReceiver{
+	class IWidget : public virtual core::IReferencable,public virtual IHandler{
 	public:
 		//const core::stringc& getTag() const{
 			//TODO
@@ -35,7 +36,7 @@ namespace gui{
 		WidgetList m_children;
 		IWidget* m_parent;
 		bool m_bVisible;
-		bool m_bEventReceiable;
+		bool m_bMessageReceivable;
 
 		//相当于irrlicht中的SubElement
 		//! is a part of a larger whole and should not be serialized?
@@ -57,6 +58,21 @@ namespace gui{
 
 		//! tells the element how to act when its parent is resized
 		widget::ENUM_ALIGN m_alignLeft, m_alignRight, m_alignTop, m_alignBottom;
+
+		core::array<video::RenderEntry2D> m_renderEntries;
+
+		void group(core::array<video::RenderEntry2D>& result)
+		{
+			if(&result!=&m_renderEntries)
+			{
+				u32 len=result.size();
+				for(u32 i=0;i<m_renderEntries.size();++i)
+					result[len+i]=m_renderEntries[i];
+			}
+			WidgetList::Iterator it=m_children.begin();
+			for(;it!=m_children.end();++it)
+				(*it)->group(result);
+		}
 
 
 		void addChildToEnd(IWidget* child)
@@ -200,11 +216,9 @@ namespace gui{
 			}
 		}
 
-		core::array<video::RenderEntry2D> m_renderEntries;
-
 	public:
 		IWidget(widget::ENUM_TYPE type,IGUISystem* guiSystem,IWidget* parent,const core::stringc& id,const core::recti& rectangle)
-			:m_type(type),m_parent(parent),m_id(id),m_bEventReceiable(true),m_bPartial(false),
+			:m_type(type),m_parent(parent),m_id(id),m_bMessageReceivable(true),m_bPartial(false),
 			m_relativeRect(rectangle),m_absoluteRect(rectangle),m_desiredRect(rectangle),m_absoluteClippingRect(rectangle),
 			m_bVisible(true),m_alignLeft(widget::UPPERLEFT), m_alignRight(widget::UPPERLEFT), m_alignTop(widget::UPPERLEFT), m_alignBottom(widget::UPPERLEFT){
 
@@ -244,7 +258,7 @@ namespace gui{
 			return m_type;
 		}
 
-		virtual widget::MASK_STATE getState() const = 0;
+		virtual widget::ENUM_STATE getState() const = 0;
 
 		const core::array<video::RenderEntry2D>& getRenderEntries() const{
 			return m_renderEntries;
@@ -272,8 +286,8 @@ namespace gui{
 			return m_absoluteRect;
 		}
 
-		virtual void setEventReceivable(bool on){m_bEventReceiable=on;}
-		virtual bool isEventReceivable() const{return m_bEventReceiable;}
+		virtual void setMessageReceivable(bool on){m_bMessageReceivable=on;}
+		virtual bool isMessageReceivable() const{return m_bMessageReceivable;}
 
 		/**
 		 * @brief Returns the visible area of the element.
@@ -297,7 +311,11 @@ namespace gui{
 			return m_absoluteClippingRect.isPointInside(point);
 		}
 
-		virtual ITheme* getTheme() const = 0;
+		virtual ITheme* getTheme() const{
+			if(m_pSysem)
+				return m_pSysem->getBindedTheme();
+			return NULL;
+		}
 
 		virtual void addChild(IWidget* child)
 		{
@@ -373,10 +391,10 @@ namespace gui{
 		*
 		* @return the real widget
 		*/
-		IWidget* getRealWidget() const
+		IWidget* getRealWidget()
 		{
 			IWidget* temp = this;
-			while ( temp && temp->isPartial() )
+			while( temp && temp->isPartial() )
 			{
 				temp = temp->getParent();
 			}
@@ -409,7 +427,7 @@ namespace gui{
 			{
 				while(it != m_children.end())
 				{
-					target = (*it)->getElementFromPoint(point);
+					target = (*it)->getWidgetFromPoint(point);
 					if (target)
 						return target;
 
