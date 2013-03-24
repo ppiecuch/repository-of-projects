@@ -69,16 +69,20 @@ namespace debug{
 }
 	using namespace debug;
 }
-#ifdef YON_USE_LOGGER
-#define YON_DEBUG(format, ...) yon::debug::Logger->debug(format,##__VA_ARGS__)
-#define YON_INFO(format, ...) yon::debug::Logger->info(format,##__VA_ARGS__)
-#define YON_WARN(format, ...) yon::debug::Logger->warn(format,##__VA_ARGS__)
-#define YON_ERROR(format, ...) yon::debug::Logger->error(format,##__VA_ARGS__)
-#else
-#define YON_DEBUG(format, ...)	do{}while(0)
+#ifdef DISABLE_LOGGER
 #define YON_INFO(format, ...)	do{}while(0)
 #define YON_WARN(format, ...)	do{}while(0)
 #define YON_ERROR(format, ...)	do{}while(0)
+#else
+#define YON_INFO(format, ...) yon::debug::Logger->info(format,##__VA_ARGS__)
+#define YON_WARN(format, ...) yon::debug::Logger->warn(format,##__VA_ARGS__)
+#define YON_ERROR(format, ...) yon::debug::Logger->error(format,##__VA_ARGS__)
+#endif
+
+#if defined(_DEBUG)||!defined(DISABLE_LOGGER)
+#define YON_DEBUG(format, ...) yon::debug::Logger->debug(format,##__VA_ARGS__)
+#else
+#define YON_DEBUG(format, ...)
 #endif
 
 #define YON_FAIL_IF(cond) do { \

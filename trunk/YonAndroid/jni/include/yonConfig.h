@@ -56,10 +56,10 @@
 #endif
 
 //日志格式
-#define YON_USE_LOGGER
-#ifdef DISABLE_LOGGER
-#undef YON_USE_LOGGER
-#endif
+//#define YON_USE_LOGGER
+//#ifdef DISABLE_LOGGER
+//#undef YON_USE_LOGGER
+//#endif
 #ifdef YON_COMPILE_WITH_WIN32
 #define YON_LOG_SUCCEED_FORMAT "%-64s【√】\r\n"
 #define YON_LOG_FAILED_FORMAT "%-64s【╳】\r\n"

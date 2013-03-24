@@ -20,7 +20,7 @@ namespace core{
 	public:
 		singleton()
 		{
-			assert( !s_pSingleton );
+			YON_DEBUG_BREAK_IF( s_pSingleton!=NULL );
 #if defined( _MSC_VER ) && _MSC_VER < 1200	 
 			s32 offset = (s32)(T*)1 - (s32)(singleton <T>*)(T*)1;
 			s_pSingleton = (T*)((s32)this + offset);
@@ -28,9 +28,9 @@ namespace core{
 			s_pSingleton = static_cast< T* >( this );
 #endif
 		}
-		~singleton() {  assert( s_pSingleton );  s_pSingleton = NULL;  }
+		~singleton() {  YON_DEBUG_BREAK_IF( s_pSingleton==NULL );  s_pSingleton = NULL;  }
 
-		static T& getInstance() {assert( s_pSingleton );  return ( *s_pSingleton ); }
+		static T& getInstance() {YON_DEBUG_BREAK_IF( s_pSingleton==NULL );  return ( *s_pSingleton ); }
 		static T* getInstancePointer() { return s_pSingleton; }
 	};
 }

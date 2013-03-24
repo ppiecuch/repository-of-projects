@@ -154,6 +154,10 @@ namespace yon{
 			io::IFileSystem* m_pFileSystem;
 			ITimer* m_pTimer;
 			core::array<core::IResizable*> m_resizables;
+
+			RenderUnit2DPool m_renderUnit2DPool;
+			RenderUnit2DPool m_renderUnit2DBatchPool;
+
 			virtual video::ITexture* createDeviceDependentTexture(IImage* image, const io::path& name) = 0;
 		public:
 			IVideoDriver(io::IFileSystem* fs,ITimer* timer)
@@ -170,6 +174,8 @@ namespace yon{
 				if(m_pTimer)
 					m_pTimer->drop();
 				m_resizables.clear();
+				m_renderUnit2DPool.clear();
+				m_renderUnit2DBatchPool.clear();
 			};
 			const core::matrix4f& getOrthdowProjMatrix() const{
 				return m_orthdowProjMatrix;
@@ -189,8 +195,27 @@ namespace yon{
 				m_resizables.push_back(p);
 			}
 
-			SRenderUnit2D* getRenderUnit2D(){return NULL;}
-			void recycleRenderUnit2D(SRenderUnit2D* unit){}
+			RenderUnit2D* getRenderUnit2D(bool forBatch=false){
+				RenderUnit2D* unit=NULL;
+				if(forBatch)
+				{
+					unit=m_renderUnit2DBatchPool.get();
+					unit->ForBatch=true;
+					return unit;
+				}
+				else
+				{
+					unit=m_renderUnit2DPool.get();
+					unit->ForBatch=false;
+					return unit;
+				}
+			}
+			void recycleRenderUnit2D(RenderUnit2D* unit){
+				if(unit->isForBatch())
+					m_renderUnit2DBatchPool.recycle(unit);
+				else
+					m_renderUnit2DPool.recycle(unit);
+			}
 
 			virtual s64 getVideoMemory() const = 0;
 			virtual c8* getVideoMemoryString() const = 0;
@@ -231,6 +256,8 @@ namespace yon{
 				return (m_textureCreationConfig&config)!=0;
 			}
 
+			//获取渲染对象，如果是默认颜色缓冲区则为NULL
+			virtual ITexture* getRenderTarget() const = 0;
 			//添加一张用于渲染缓冲的纹理,size必须是2的N次幂,并且长度都不可超过后缓冲区的大小
 			virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name = "rtt", video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G6B5, bool offScreen=false, bool fixSize=true) =0;
 			//参数texture:必须是由addRenderTargetTexture生成的texture

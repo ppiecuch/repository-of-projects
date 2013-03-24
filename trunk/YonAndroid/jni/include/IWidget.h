@@ -8,6 +8,8 @@
 #include "rect.h"
 #include "yonList.h"
 #include "SRenderUnit.h"
+#include "IGUISystem.h"
+#include "IVideoDriver.h"
 
 
 //refer to:http://www.php100.com/manual/css3_0
@@ -16,38 +18,9 @@ namespace yon{
 namespace gui{
 
 	class ITheme;
-	class IGUISystem;
 
 	class IWidget : public virtual core::IReferencable,public virtual event::IEventReceiver{
 	public:
-
-		enum ENUM_TYPE{
-			NONE = -1,
-			BUTTON = 0,
-			ENUM_TYPE_COUNT
-		};
-
-		//TODO 水平垂直分开
-		enum ENUM_ALIGN{
-			//! Aligned to parent's top or left side (default)
-			UPPERLEFT=0,
-			//! Aligned to parent's bottom or right side
-			LOWERRIGHT,
-			//! Aligned to the center of parent
-			CENTER,
-			ENUM_ALIGN_COUNT
-		};
-
-		enum MASK_STATE{
-			DOWN	= 0x00000001,
-			UP		= 0x00000002,
-			OVER	= 0x00000004,
-			OUT		= 0x00000008,
-			//TODO 长按
-			//HOLD
-			ENUM_STATE_COUNT
-		};
-
 		//const core::stringc& getTag() const{
 			//TODO
 		//}
@@ -57,12 +30,16 @@ namespace gui{
 
 		IGUISystem* m_pSysem;
 
-		IWidget::ENUM_TYPE m_type;
+		widget::ENUM_TYPE m_type;
 		core::stringc m_id;
 		WidgetList m_children;
 		IWidget* m_parent;
 		bool m_bVisible;
 		bool m_bEventReceiable;
+
+		//相当于irrlicht中的SubElement
+		//! is a part of a larger whole and should not be serialized?
+		bool m_bPartial;
 
 		bool m_bDirty;
 
@@ -79,7 +56,7 @@ namespace gui{
 		core::recti m_desiredRect;
 
 		//! tells the element how to act when its parent is resized
-		ENUM_ALIGN m_alignLeft, m_alignRight, m_alignTop, m_alignBottom;
+		widget::ENUM_ALIGN m_alignLeft, m_alignRight, m_alignTop, m_alignBottom;
 
 
 		void addChildToEnd(IWidget* child)
@@ -126,12 +103,12 @@ namespace gui{
 
 			switch (m_alignLeft)
 			{
-			case UPPERLEFT:
+			case widget::UPPERLEFT:
 				break;
-			case LOWERRIGHT:
+			case widget::LOWERRIGHT:
 				m_desiredRect.topLeft.x += diffx;
 				break;
-			case CENTER:
+			case widget::CENTER:
 				m_desiredRect.topLeft.x += diffx/2;
 				break;
 				//case EGUIA_SCALE:
@@ -141,12 +118,12 @@ namespace gui{
 
 			switch (m_alignRight)
 			{
-			case UPPERLEFT:
+			case widget::UPPERLEFT:
 				break;
-			case LOWERRIGHT:
+			case widget::LOWERRIGHT:
 				m_desiredRect.bottomRight.x += diffx;
 				break;
-			case CENTER:
+			case widget::CENTER:
 				m_desiredRect.bottomRight.x += diffx/2;
 				break;
 				//case EGUIA_SCALE:
@@ -156,12 +133,12 @@ namespace gui{
 
 			switch (m_alignTop)
 			{
-			case UPPERLEFT:
+			case widget::UPPERLEFT:
 				break;
-			case LOWERRIGHT:
+			case widget::LOWERRIGHT:
 				m_desiredRect.topLeft.y += diffy;
 				break;
-			case CENTER:
+			case widget::CENTER:
 				m_desiredRect.topLeft.y += diffy/2;
 				break;
 				//case EGUIA_SCALE:
@@ -171,12 +148,12 @@ namespace gui{
 
 			switch (m_alignBottom)
 			{
-			case UPPERLEFT:
+			case widget::UPPERLEFT:
 				break;
-			case LOWERRIGHT:
+			case widget::LOWERRIGHT:
 				m_desiredRect.bottomRight.y += diffy;
 				break;
-			case CENTER:
+			case widget::CENTER:
 				m_desiredRect.bottomRight.y += diffy/2;
 				break;
 				//case EGUIA_SCALE:
@@ -223,25 +200,53 @@ namespace gui{
 			}
 		}
 
-		core::array<video::SRenderEntry2D> m_renderEntries;
+		core::array<video::RenderEntry2D> m_renderEntries;
 
 	public:
-		IWidget(IWidget::ENUM_TYPE type,IGUISystem* guiSystem,IWidget* parent,const core::stringc& id,const core::recti& rectangle)
-			:m_type(type),m_parent(parent),m_id(id),m_bEventReceiable(true),
+		IWidget(widget::ENUM_TYPE type,IGUISystem* guiSystem,IWidget* parent,const core::stringc& id,const core::recti& rectangle)
+			:m_type(type),m_parent(parent),m_id(id),m_bEventReceiable(true),m_bPartial(false),
 			m_relativeRect(rectangle),m_absoluteRect(rectangle),m_desiredRect(rectangle),m_absoluteClippingRect(rectangle),
-			m_bVisible(true),m_alignLeft(UPPERLEFT), m_alignRight(UPPERLEFT), m_alignTop(UPPERLEFT), m_alignBottom(UPPERLEFT){
+			m_bVisible(true),m_alignLeft(widget::UPPERLEFT), m_alignRight(widget::UPPERLEFT), m_alignTop(widget::UPPERLEFT), m_alignBottom(widget::UPPERLEFT){
 
 		}
+
+		virtual ~IWidget()
+		{
+			//TODO 是否直接调用VideoDriver？
+			if(m_pSysem)
+			{
+				for(u32 i=0;i<m_renderEntries.size();++i)
+					m_pSysem->getVideoDriver()->recycleRenderUnit2D(m_renderEntries[i].Unit);
+				m_renderEntries.clear();
+			}
+		}
+
+		/**
+		* @brief get the opacity of the widget
+		* 
+		* @return the opacity of the widget's Skin. Traditionally this is 1.0f, fully Opaque.
+		*/
+		//virtual f32 getOpacity() = 0;
+
+		/**
+		* @brief chekc if the widget's transparent area pickable
+		*
+		* @return true if the Widget is not detected by mouse cursor unless the cursor is within the widget's dimensions
+		* and over a non-transparent pixel, false if the Widget is detected simply when the cursor enters widget bounds.
+		*/
+		//virtual bool isTransparencyPickable() = 0;
 
 		IGUISystem* getGUISystem() const{
 			return m_pSysem;
 		}
 
-		virtual IWidget::ENUM_TYPE getType() const{
+		virtual widget::ENUM_TYPE getType() const{
 			return m_type;
 		}
 
-		const core::array<video::SRenderEntry2D>& getRenderEntries() const{
+		virtual widget::MASK_STATE getState() const = 0;
+
+		const core::array<video::RenderEntry2D>& getRenderEntries() const{
 			return m_renderEntries;
 		}
 
@@ -336,24 +341,87 @@ namespace gui{
 				(*it)->updateAbsolutePosition();
 			}
 		}
-	};
 
-	const static c8* WIDGET_TYPE_NAMES[IWidget::ENUM_TYPE_COUNT] =
-	{
-		"button"
-	};
-	const static c8* WIDGET_ALIGN_NAMES[IWidget::ENUM_ALIGN_COUNT] =
-	{
-		"upperleft",
-		"lowerright",
-		"center"
-	};
-	const static c8* WIDGET_STATE_NAMES[IWidget::ENUM_STATE_COUNT]=
-	{
-		"down",
-		"up",
-		"over",
-		"out"
+		//TODO 主要用于ScrollBar
+		// @brief animate the element and its children.
+		virtual void onPostRender(u32 timeMs)
+		{
+			if ( isVisible() )
+			{
+				WidgetList::Iterator it = m_children.begin();
+				for (; it != m_children.end(); ++it)
+					(*it)->onPostRender( timeMs );
+			}
+		}
+
+		void setPartial(bool on)
+		{
+			m_bPartial=on;
+		}
+
+		// @returns true if this element was created as part of its parent control
+		bool isPartial() const
+		{
+			return m_bPartial;
+		}
+
+		/**
+		* @brief get the real widget of the widget
+		*
+		* Because some widget is partial of a widget(real),
+		* if the widget is partial, we will get it's unpartial ancestor
+		*
+		* @return the real widget
+		*/
+		IWidget* getRealWidget() const
+		{
+			IWidget* temp = this;
+			while ( temp && temp->isPartial() )
+			{
+				temp = temp->getParent();
+			}
+			return temp;
+		}
+
+		/** @brief Get the topmost GUI widget at the specific position.
+		*
+		* This will check this GUI widget and all of its descendants, so it
+		* may return this GUI widget.  To check all GUI widgets, call this
+		* function on the root widget of the gui system. Note
+		* that the root widget is the size of the screen, so doing so (with
+		* an on-screen point) will always return the root widget if no other
+		* element is above it at that point.
+		*
+		* @param point: The point at which to find a GUI element.
+		* @return the topmost GUI widget at that point, or NULL if there are
+		* no candidate elements at this point.
+		*/
+		IWidget* getWidgetFromPoint(const core::position2di& point)
+		{
+			IWidget* target = NULL;
+
+			// we have to search from back to front, because later children
+			// might be drawn over the top of earlier ones.
+
+			WidgetList::Iterator it = m_children.getLast();
+
+			if (isVisible())
+			{
+				while(it != m_children.end())
+				{
+					target = (*it)->getElementFromPoint(point);
+					if (target)
+						return target;
+
+					--it;
+				}
+			}
+
+			if (isVisible() && isPointInside(point))
+				target = this;
+
+			return target;
+		}
 	};
 }
 }
