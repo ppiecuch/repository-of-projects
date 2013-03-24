@@ -1,0 +1,1524 @@
+ua是一个嵌入式的脚本语言，它不仅可以单独使用还能与其它语言混合调用。
+Lua与其它脚本语言相比，其突出优势在于：
+
+   1. 可扩展性。Lua的扩展性非常卓越，以至于很多人把Lua用作搭建领域语言的工具（注：比如游戏脚本）。Lua被设计为易于扩展的，可以通过 Lua代码或者 C代码扩展，Lua的很多功能都是通过外部库来扩展的。Lua很容易与C/C++、java、fortran、Smalltalk、Ada，以及其他语言接口。
+   2. 简单。Lua本身简单，小巧；内容少但功能强大，这使得Lua易于学习，很容易实现一些小的应用。他的完全发布版（代码、手册以及某些平台的二进制文件）仅用一张软盘就可以装得下。
+   3. 高效率。Lua有很高的执行效率，统计表明Lua是目前平均效率最高的脚本语言。
+   4. 与平台无关。Lua几乎可以运行在所有我们听说过的系统上，如NextStep、OS/2、PlayStation II (Sony)、Mac OS-9、OS X、BeOS、MS-DOS、IBM mainframes、EPOC、PalmOS、MCF5206eLITE Evaluation Board、RISC OS，及所有的Windows和Unix。Lua不是通过使用条件编译实现平台无关，而是完全使用ANSI (ISO) C，这意味着只要你有ANSI C编译器你就可以编译并使用Lua。
+
+要在C++中使用Lua非常简单，不管是GCC,VC还是C++Builder, 最简单的方法就是把Lua源码中除lua.c，luac.c和print.c以外的所有c文件与你的代码一起编译链接（或加入到工程中）即可。
+当然，为了方便维护，最好还是先把Lua编译成库文件再加入工程。方法如下：
+
+GCC
+    直接在Lua所在目录下make [环境]
+    这里的[环境]可以是：aix ansi bsd freebsd generic linux macosx mingw posix solaris
+    如果你的环境不在这个列表中，你可以试试ansi或posix。
+
+VC
+    在命令行环境下进入Lua所在目录，执行etc/luavs.bat编译。
+
+C++Builder
+    请看我的Blog，如何在C++Builder里编译Lua
+
+ 
+头文件
+    因为Lua是用C语言写的，除非编译lua库时指定编译器强制以C++方式编译，否则在C++工程中应该这样包含lua头文件：
+
+   1. extern "C" {
+   2. #include "lua.h"
+   3. #include "lualib.h"
+   4. #include "lauxlib.h"
+   5. }
+
+
+
+例一，简单运行Lua代码
+
+   1. extern "C" {
+   2. #include "lua.h"
+   3. #include "lualib.h"
+   4. #include "lauxlib.h"
+   5. }
+   6.  
+   7. #include <iostream>
+   8. #include <string>
+   9. using namespace std;
+  10.  
+  11. int main()
+  12. {
+  13.     lua_State *L = lua_open();    //初始化lua
+  14.     luaL_openlibs(L);    //载入所有lua标准库
+  15.  
+  16.     string s;
+  17.     while(getline(cin,s))    //从cin中读入一行到s
+  18.     {
+  19.         //载入s里的lua代码后执行
+  20.         bool err = luaL_loadbuffer(L, s.c_str(), s.length(),
+  21.                     "line") || lua_pcall(L, 0, 0, 0);
+  22.         if(err)
+  23.         {
+  24.             //如果错误，显示
+  25.             cerr << lua_tostring(L, -1);
+  26.             //弹出错误信息所在的最上层栈
+  27.             lua_pop(L, 1);
+  28.         }
+  29.     }
+  30.  
+  31.     lua_close(L);//关闭
+  32.     return 0;
+  33. }
+
+
+    这已经是一个功能完备的交互方式Lua解释器了。
+
+    输入print "hello world"
+    输出hello world
+    输入for i=1,10 do print(i) end
+    输出从1到10
+
+
+    要调用Lua，首先要使用lua_open(对于5.0以后版本的Lua,建议使用luaL_newstate代替)产生一个lua_State，在使用完后调用lua_close关闭。
+    所有Lua与C之间交换的数据都是通过Lua中的栈来中转的。
+    在本例中：
+        luaL_loadbuffer的功能是载入并编译内存中的一段Lua代码，然后作为一个代码块(称为chunk)压入栈中，其中的最后一个参数作为代码块的名称用于调试。和它功能类似的还有luaL_loadfile（载入文件）,luaL_loadstring（载入字符串，本例中也可用它代替luaL_loadbuffer）。它们有一个相同的前缀：luaL_，为了简化编程，Lua C API将库中的核心函数包装后作为辅助函数提供一些常用功能，它们的形式都是luaL_*，如这里的三个luaL_load*都调用了lua_load。
+        lua_pcall从栈顶取得函数并执行，如果出错，则返回一个非0值并把错误信息压入栈顶。关于它的更详细信息会在“例三，在C++中调用Lua子函数”中介绍。
+        如果宿主程序检测到错误，就用lua_tostring从栈顶取得错误信息转成字符串输出，然后弹出这个错误信息。
+    lua_tostring里的第二个参数指定要操作的数据处于栈的哪个位置，因为所有的数据只能通过栈来交换，所以很多Lua的C API都会要求指定栈的位置。1表示在栈中的第一个元素（也就是第一个被压入栈的），下一个索引是2，以此类推。我们也可以用栈顶作为参照来存取元素，使用负数：-1指出栈顶元素（也就是最后被压入的），-2指出它的前一个元素，以此类推。  
+
+ 
+
+例二，与Lua交换数据
+
+   1. extern "C" {
+   2. #include "lua.h"
+   3. #include "lualib.h"
+   4. #include "lauxlib.h"
+   5. }
+   6.  
+   7. #include <iostream>
+   8. #include <string>
+   9. using namespace std;
+  10.     
+  11. int main()
+  12. {
+  13.     //Lua示例代码
+  14.     char *szLua_code =
+  15.         "r = string.gsub(c_Str, c_Mode, c_Tag) --宿主给的变量 "
+  16.         "u = string.upper(r)";
+  17.     //Lua的字符串模式
+  18.     char *szMode = "(%w+)%s*=%s*(%w+)";
+  19.     //要处理的字符串
+  20.     char *szStr = "key1 = value1 key2 = value2";
+  21.     //目标字符串模式
+  22.     char *szTag = "<%1>%2</%1>";
+  23.  
+  24.     lua_State *L = luaL_newstate();
+  25.     luaL_openlibs(L);
+  26.  
+  27.     //把一个数据送给Lua
+  28.     lua_pushstring(L, szMode);
+  29.     lua_setglobal(L, "c_Mode");
+  30.     lua_pushstring(L, szTag);
+  31.     lua_setglobal(L, "c_Tag");
+  32.     lua_pushstring(L, szStr);
+  33.     lua_setglobal(L, "c_Str");
+  34.  
+  35.     //执行
+  36.     bool err = luaL_loadbuffer(L, szLua_code, strlen(szLua_code),
+  37.                 "demo") || lua_pcall(L, 0, 0, 0);
+  38.     if(err)
+  39.     {
+  40.         //如果错误，显示
+  41.         cerr << lua_tostring(L, -1);
+  42.         //弹出栈顶的这个错误信息
+  43.         lua_pop(L, 1);
+  44.     }
+  45.     else
+  46.     {
+  47.         //Lua执行后取得全局变量的值
+  48.         lua_getglobal(L, "r");
+  49.         cout << "r = " << lua_tostring(L,-1) << endl;
+  50.         lua_pop(L, 1);
+  51.         
+  52.         lua_getglobal(L, "u");
+  53.         cout << "u = " << lua_tostring(L,-1) << endl;    
+  54.         lua_pop(L, 1);
+  55.     }
+  56.     lua_close(L);
+  57.     return 0;
+  58. }
+
+
+    这段代码把字符串中的key=value字符串全部转换成XML格式<key>value</key>
+    在这个例子中，C++程序通过调用lua_pushstring把C字符串压入栈顶，lua_setglobal的作用是把栈顶的数据传到Lua环境中作为全局变量。
+    执行代码完成后，使用lua_getglobal从Lua环境中取得全局变量压入栈顶，然后使用lua_tostring把栈顶的数据转成字符串。由于lua_tostring本身没有出栈功能，所以为了平衡（即调用前与调用后栈里的数据量不变），使用lua_pop弹出由lua_setglobal压入的数据。
+    从上面的例子可以看出，C++和Lua之间一直围绕着栈在转，可见栈是极为重要的。有必要列出一些Lua C API中的主要栈操作先，它们的作用直接可以从函数名中看出。
+压入元素到栈里
+
+void lua_pushnil (lua_State *L);    
+void lua_pushboolean (lua_State *L, int bool);
+void lua_pushnumber (lua_State *L, double n);
+void lua_pushlstring (lua_State *L, const char *s, size_t length);
+void lua_pushstring (lua_State *L, const char *s);
+void lua_pushcfunction (lua_State *L, lua_CFunction fn);
+
+
+查询栈里的元素
+
+lua_isnil (lua_State *L, int index);
+lua_isboolean (lua_State *L, int index);
+int lua_isnumber (lua_State *L, int index);
+int lua_isstring (lua_State *L, int index);
+int lua_isfunction (lua_State *L, int index);
+int lua_istable (lua_State *L, int index);
+int lua_isuserdata (lua_State *L, int index);
+lua_islightuserdata (lua_State *L, int index);
+lua_isthread (lua_State *L, int index);
+
+ 
+转换栈里的元素
+
+int                lua_toboolean (lua_State *L, int index);
+double            lua_tonumber (lua_State *L, int index);
+const char *    lua_tostring (lua_State *L, int index);
+const char *    lua_tolstring (lua_State *L, int idx, size_t *len);
+size_t            lua_strlen (lua_State *L, int index);
+lua_CFunction   lua_tocfunction (lua_State *L, int idx);
+void *          lua_touserdata (lua_State *L, int idx);
+lua_State *     lua_tothread (lua_State *L, int idx);
+
+ 
+Lua栈的维护
+
+int  lua_gettop (lua_State *L);
+    取得栈顶元素的索引，即栈中元素的个数
+void lua_settop (lua_State *L, int index);
+    设置栈顶索引，即设置栈中元素的个数，如果index<0，则从栈顶往下数，下同
+void lua_pushvalue (lua_State *L, int index);
+    把栈中指定索引的元素复制一份到栈顶
+void lua_remove (lua_State *L, int index);
+    删除指定索引的元素
+void lua_insert (lua_State *L, int index);
+    移动栈顶元素到指定索引的位置，栈中数目没有改变
+void lua_replace (lua_State *L, int index);
+    从栈顶弹出元素值并将其设置到指定索引位置，栈中的数目减一
+int  lua_checkstack (lua_State *L, int extra);
+    确保堆栈上至少有 extra 个空位。如果不能把堆栈扩展到相应的尺寸，函数返回 false 。这个函数永远不会缩小堆栈。
+int  lua_pop(L,n)
+    从栈顶弹出n个元素，它是一个lua_settop的包装：#define lua_pop(L,n)  lua_settop(L, -(n)-1)
+
+ 
+表的操作
+上面的列表中并没有lua_pushtable和lua_totable，那么怎样取得或设置Lua中的table数据呢？
+在Lua中，table是一个很重要的数据类型，在table中不仅可以象C中的数据一样放一组数据，还可以象map一样以key=value的方式存放数据，如Lua代码中的:
+
+tb = {"abc",12,true,x=10,y=20,z=30}
+    前三个数据可以用tb[1]~tb[3]取得
+    而后三个数据通过tb.x, tb.y, tb.z取得
+尽管看起来很牛叉，不过剥开神奇的外衣，实际上Lua的table中，所有的数据都是以key=value的形式存放的，这句Lua代码也可以写成：
+
+tb = {[1]="abc", [2]=12, [3] = true, ["x"]=10, ["y"]=20, ["z"]=30}
+    它的形式就是[key]=value，所谓的tb.x只是tb["x"]的语法糖而已，如果愿意，也可以用tb["x"]取得这个数据10。
+我们把上面的例子改成使用表的
+
+   1. ...
+   2. int main()
+   3. {
+   4.     //Lua示例代码，使用table
+   5.     char *szLua_code =
+   6.         "x = {} --用于存放结果的table "
+   7.         "x[1],x[2] = string.gsub(c.Str, c.Mode, c.Tag) --x[1]里是结果，x[2]里是替换次数 "
+   8.         "x.u = string.upper(x[1])";
+   9.     //Lua的字符串模式
+  10.     char *szMode = "(%w+)%s*=%s*(%w+)";
+  11.     //要处理的字符串
+  12.     char *szStr = "key1 = value1 key2 = value2";
+  13.     //目标字符串模式
+  14.     char *szTag = "<%1>%2</%1>";
+  15.  
+  16.     lua_State *L = luaL_newstate();
+  17.     luaL_openlibs(L);
+  18.  
+  19.     //把一个tabele送给Lua
+  20.     lua_newtable(L);    //新建一个table并压入栈顶
+  21.     lua_pushstring(L, "Mode");// key
+  22.     lua_pushstring(L, szMode);// value
+  23.     //设置newtable[Mode]=szMode
+  24.     //由于上面两次压栈，现在table元素排在栈顶往下数第三的位置
+  25.     lua_settable(L, -3);
+  26.     //lua_settable会自己弹出上面压入的key和value
+  27.  
+  28.     lua_pushstring(L, "Tag");// key
+  29.     lua_pushstring(L, szTag);// value
+  30.     lua_settable(L, -3);    //设置newtable[Tag]=szTag
+  31.  
+  32.     lua_pushstring(L, "Str");// key
+  33.     lua_pushstring(L, szStr);// value
+  34.     lua_settable(L, -3);    //设置newtable[Str]=szStr
+  35.  
+  36.     lua_setglobal(L,"c"); //将栈顶元素（newtable）置为Lua中的全局变量c
+  37.  
+  38.     //执行
+  39.     bool err = luaL_loadbuffer(L, szLua_code, strlen(szLua_code),
+  40.                 "demo") || lua_pcall(L, 0, 0, 0);
+  41.     if(err)
+  42.     {
+  43.         //如果错误，显示
+  44.         cerr << lua_tostring(L, -1);
+  45.         //弹出栈顶的这个错误信息
+  46.         lua_pop(L, 1);
+  47.     }
+  48.     else
+  49.     {
+  50.         //Lua执行后取得全局变量的值
+  51.         lua_getglobal(L, "x");
+  52.  
+  53.         //这个x应该是个table
+  54.         if(lua_istable(L,-1))
+  55.         {
+  56.             //取得x.u,即x["u"]
+  57.             lua_pushstring(L,"u");    //key
+  58.             //由于这次压栈，x处于栈顶第二位置
+  59.             lua_gettable(L,-2);
+  60.             //lua_gettable会弹出上面压入的key，然后把对应的value压入
+  61.             //取得数据，然后从栈中弹出这个value
+  62.             cout << "x.u = " << lua_tostring(L,-1) << endl;
+  63.             lua_pop(L, 1);
+  64.             
+  65.             //取得x[1]和x[2]
+  66.             for(int i=1; i<=2; i++)
+  67.             {
+  68.                 //除了key是数字外，与上面的没什么区别
+  69.                 lua_pushnumber(L,i);
+  70.                 lua_gettable(L,-2);
+  71.                 cout << "x[" << i <<"] = " << lua_tostring(L,-1) << endl;
+  72.                 lua_pop(L, 1);
+  73.             }
+  74.         }
+  75.  
+  76.         //弹出栈顶的x
+  77.         lua_pop(L, 1);
+  78.     }
+  79.     lua_close(L);
+  80.     return 0;
+  81. }
+
+本例中用到的新Lua C API是：
+
+void lua_newtable (lua_State *L);
+    新建一个空的table并压入栈顶。
+void lua_settable (lua_State *L, int idx);
+    lua_settable以table在栈中的索引作为参数，并将栈顶的key和value出栈，用这两个值修改table。
+void lua_gettable (lua_State *L, int idx);
+    lua_gettable以table在栈中的索引作为参数，弹出栈顶的元素作为key，返回与key对应的value并压入栈顶。
+最后，Lua告别针对table提供了存取函数
+void lua_rawgeti (lua_State *L, int idx, int n)
+    取得table[n]并放到栈顶，上例中69-70行的lua_pushnumber(L,i);lua_gettable(L,-2);可以用lua_rawgeti(L,-1)代替。
+lua_getfield (lua_State *L, int idx, const char *k)
+    取得table.k并放到栈顶，上例中57-59行的lua_pushstring(L,"u");lua_gettable(L,-2);可以替换成lua_getfield(L,-1,"u")。
+void lua_setfield (lua_State *L, int idx, const char *k)
+    把栈顶的数据作为value放入table.k中，上例中的形如lua_pushstring(L, "key");lua_pushstring(L, value);lua_settable(L, -3);可以改成lua_pushstring(L, value);lua_setfield(L,-2,"key");的形式。
+void lua_rawseti (lua_State *L, int idx, int n)
+    把栈顶的数据作为value放入table[n]中
+
+例三，在C++中调用Lua子函数
+    在Lua中，函数和boolean一样也属于基本数据类型，所以同样可以使用lua_getglobal来取得函数，剩下的问题只是怎样执行它（函数元素）的问题了。
+
+   1. ...
+   2. int main()
+   3. {
+   4.     //Lua示例代码，是一个函数
+   5.     char *szLua_code =
+   6.         "function gsub(Str, Mode, Tag)"
+   7.         "    a,b = string.gsub(Str, Mode, Tag) "
+   8.         "    c = string.upper(a) "
+   9.         "    return a,b,c --多个返回值 "
+  10.         "end";
+  11.     //Lua的字符串模式
+  12.     char *szMode = "(%w+)%s*=%s*(%w+)";
+  13.     //要处理的字符串
+  14.     char *szStr = "key1 = value1 key2 = value2";
+  15.     //目标字符串模式
+  16.     char *szTag = "<%1>%2</%1>";
+  17.  
+  18.     lua_State *L = luaL_newstate();
+  19.     luaL_openlibs(L);
+  20.  
+  21.     //执行
+  22.     bool err = luaL_loadbuffer(L, szLua_code, strlen(szLua_code),
+  23.                 "demo") || lua_pcall(L, 0, 0, 0);
+  24.     if(err)
+  25.     {
+  26.         cerr << lua_tostring(L, -1);
+  27.         lua_pop(L, 1);
+  28.     }
+  29.     else
+  30.     {
+  31.         //Lua执行后取得全局变量的值
+  32.         lua_getglobal(L, "gsub");
+  33.         if(lua_isfunction(L,-1))    //确认一下是个函数
+  34.         {
+  35.             //依次放入三个参数
+  36.             lua_pushstring(L,szStr);
+  37.             lua_pushstring(L,szMode);
+  38.             lua_pushstring(L,szTag);
+  39.             //调用,我们有3个参数，要得到2个结果
+  40.             //你可能注意到gsub函数返回了3个，不过我们只要2个，这没有问题
+  41.             //没有使用错误处理回调，所以lua_pcall最后一个参数是0
+  42.             if(0 != lua_pcall(L, 3, 2, 0))
+  43.             {
+  44.                 //如果错误，显示
+  45.                 cerr << lua_tostring(L, -1);
+  46.                 lua_pop(L, 1);                
+  47.             }
+  48.             else
+  49.             {
+  50.                 //正确，得到两个结果，注意在栈里的顺序
+  51.                 cout << "a = " << lua_tostring(L, -2) << endl;
+  52.                 cout << "b = " << lua_tostring(L, -1) << endl;
+  53.                 //弹出这两个结果
+  54.                 lua_pop(L, 2);
+  55.             }
+  56.         }
+  57.         else
+  58.         {
+  59.             lua_pop(L,1);
+  60.         }
+  61.     }
+  62.     lua_close(L);
+  63.     return 0;
+  64. }
+
+
+    调用Lua子函数使用的是lua_pcall函数，我们的所有例子中都有这个函数，它的说明如下:
+
+        lua_pcall (lua_State *L, int nargs, int nresults, int errfunc);
+        作用：以保护模式调用一个函数。 
+        要调用一个函数请遵循以下协议：首先，要调用的函数应该被压入堆栈；接着，把需要传递给这个函数的参数按正序压栈；这是指第一个参数首先压栈。最后调用lua_pcall；
+        nargs 是你压入堆栈的参数个数。当函数调用完毕后，所有的参数以及函数本身都会出栈。而函数的返回值这时则被压入堆栈。返回值的个数将被调整为 nresults 个，除非 nresults 被设置成 LUA_MULTRET。在这种情况下，所有的返回值都被压入堆栈中。 Lua 会保证返回值都放入栈空间中。函数返回值将按正序压栈（第一个返回值首先压栈），因此在调用结束后，最后一个返回值将被放在栈顶。
+        如果有错误发生的话， lua_pcall 会捕获它，然后把单一的值（错误信息）压入堆栈，然后返回错误码。lua_pcall 总是把函数本身和它的参数从栈上移除。 
+        如果 errfunc 是 0 ，返回在栈顶的错误信息就和原始错误信息完全一致。否则，这个函数会被调用而参数就是错误信息。错误处理函数的返回值将被 lua_pcall 作为出错信息返回在堆栈上。 
+
+例四，在Lua代码中调用C++函数
+    能Lua代码中调用C函数对Lua来说至关重要，让Lua能真正站到C这个巨人的肩膀上。
+    要写一个能让Lua调用的C函数，就要符合lua_CFunction定义：typedef int (*lua_CFunction) (lua_State *L);
+    当Lua调用C函数的时候，同样使用栈来交互。C函数从栈中获取她的参数，调用结束后将结果放到栈中，并返回放到栈中的结果个数。
+    这儿有一个重要的概念：用来交互的栈不是全局栈，每一个函数都有他自己的私有栈。当Lua调用C函数的时候，第一个参数总是在这个私有栈的index=1的位置。
+
+   1. ...
+   2. #include <complex> //复数
+   3.  
+   4. //C函数，做复数计算，输入实部，虚部。输出绝对值和角度
+   5. int calcComplex(lua_State *L)
+   6. {
+   7.     //从栈中读入实部，虚部
+   8.     double r = luaL_checknumber(L,1);
+   9.     double i = luaL_checknumber(L,2);
+  10.     complex<double> c(r,i);
+  11.     //存入绝对值
+  12.     lua_pushnumber(L,abs(c));
+  13.     //存入角度
+  14.     lua_pushnumber(L,arg(c)*180.0/3.14159);
+  15.     return 2;//两个结果
+  16. }
+  17.  
+  18. int main()
+  19. {
+  20.     char *szLua_code =
+  21.         "v,a = CalcComplex(3,4) "
+  22.         "print(v,a)";
+  23.  
+  24.     lua_State *L = luaL_newstate();
+  25.     luaL_openlibs(L);
+  26.    
+  27.     //放入C函数
+  28.     lua_pushcfunction(L, calcComplex);
+  29.     lua_setglobal(L, "CalcComplex");
+  30.    
+  31.     //执行
+  32.     bool err = luaL_loadstring(L, szLua_code) || lua_pcall(L, 0, 0, 0);
+  33.     if(err)
+  34.     {
+  35.         cerr << lua_tostring(L, -1);
+  36.         lua_pop(L, 1);
+  37.     }
+  38.  
+  39.     lua_close(L);
+  40.     return 0;
+  41. }
+
+    结果返回5 53.13...，和其它数据一样，给Lua代码提供C函数也是通过栈来操作的，因为lua_pushcfunction和lua_setglobal的 组合很常用，所以Lua提供了一个宏:
+    #define lua_register(L,n,f) (lua_pushcfunction(L, (f)), lua_setglobal(L, (n)))
+    这两句代码也就可写成lua_register(L,"CalcComplex",calcComplex);
+    
+闭包(closure)
+    在编写用于Lua的C函数时，我们可能需要一些类似于面向对象的能力，比如我们想在Lua中使用象这样的一个计数器类:
+
+   1. struct CCounter{
+   2.     CCounter()
+   3.         :m_(0){}
+   4.     int count(){
+   5.         return ++i;
+   6.     }
+   7. private:
+   8.     int m_;
+   9. };
+
+    这里如果我们仅仅使用lua_pushcfunction提供一个count函数已经不能满足要求(使用static? 不行，这样就不能同时使用多个计数器，并且如果程序中有多个Lua环境的话它也不能工作)。
+    这时我们就需要一种机制让数据与某个函数关联，形成一个整体，这就是Lua中的闭包，而闭包里与函数关联的数据称为UpValue。
+    使用Lua闭包的方法是定义一个工厂函数，由它来指定UpValue的初值和对应的函数，如：
+
+   1. ...
+   2. //计算函数
+   3. int count(lua_State *L)
+   4. {
+   5.     //得到UpValue
+   6.     double m_ = lua_tonumber(L, lua_upvalueindex(1));
+   7.     //更改UpValue
+   8.     lua_pushnumber(L, ++m_);
+   9.     lua_replace(L, lua_upvalueindex(1));
+  10.     //返回结果（直接复制一份UpValue作为结果）
+  11.     lua_pushvalue(L, lua_upvalueindex(1));
+  12.     return 1; 
+  13. }
+  14. //工厂函数，把一个数字和count函数关联打包后返回闭包。
+  15. int newCount(lua_State *L)
+  16. {
+  17.     //计数器初值（即UpValue）
+  18.     lua_pushnumber(L,0);
+  19.     //放入计算函数，告诉它与这个函数相关联的数据个数
+  20.     lua_pushcclosure(L, count, 1);
+  21.     return 1;//一个结果,即函数体
+  22. }
+  23.  
+  24. int main()
+  25. {
+  26.     char *szLua_code =
+  27.         "c1 = NewCount() "
+  28.         "c2 = NewCount() "
+  29.         "for i=1,5 do print(c1()) end "
+  30.         "for i=1,5 do print(c2()) end";
+  31.  
+  32.     lua_State *L = luaL_newstate();
+  33.     luaL_openlibs(L);
+  34.    
+  35.     //放入C函数
+  36.     lua_register(L,"NewCount",newCount);
+  37.    
+  38.     //执行
+  39.     bool err = luaL_loadstring(L, szLua_code) || lua_pcall(L, 0, 0, 0);
+  40.     if(err)
+  41.     {
+  42.         cerr << lua_tostring(L, -1);
+  43.         lua_pop(L, 1);
+  44.     }
+  45.  
+  46.     lua_close(L);
+  47.     return 0;
+  48. }
+
+
+    执行结果是：
+
+    1
+    2
+    3
+    4
+    5
+    1
+    2
+    3
+    4
+    5
+
+
+
+    可以发现这两个计算器之间没有干扰，我们成功地在Lua中生成了两个“计数器类”。
+    这里的关键函数是lua_pushcclosure，她的第二个参数是一个基本函数（例子中是count），第三个参数是UpValue的个数（例子中为 1）。在创建新的闭包之前，我们必须将关联数据的初始值入栈，在上面的例子中，我们将数字0作为初始值入栈。如预期的一样， lua_pushcclosure将新的闭包放到栈内，因此闭包作为newCounter的结果被返回。
+    实际上，我们之前使用的lua_pushcfunction只是lua_pushcclosure的一个特例：没有UpValue的闭包。查看它的声明可 以知道它只是一个宏而已：
+        #define lua_pushcfunction(L,f)    lua_pushcclosure(L, (f), 0)
+    在count函数中，通过lua_upvalueindex(i)得到当前闭包的UpValue所在的索引位置，查看它的定义可以发现它只是一个简单的 宏：
+        #define lua_upvalueindex(i)    (LUA_GLOBALSINDEX-(i))
+    宏里的LUA_GLOBALSINDEX是一个伪索引，关于伪索引的知识请看下节
+
+
+伪索引
+
+    伪索引除了它对应的值不在栈中之外，其他都类似于栈中的索引。Lua C API中大部分接受索引作为参数的函数，也都可以接受假索引作为参数。
+    伪索引被用来访问线程的环境，函数的环境，Lua注册表，还有C函数的UpValue。
+
+    * 线程的环境（也就是放全局变量的地方）通常在伪索引 LUA_GLOBALSINDEX 处。
+    * 正在运行的 C 函数的环境则放在伪索引 LUA_ENVIRONINDEX 之处。
+    * LUA_REGISTRYINDEX则存放着Lua注册表。
+    * C函数UpValue的存放位置见上节。
+
+
+    这里要重点讲的是LUA_GLOBALSINDEX和LUA_REGISTRYINDEX，这两个伪索引处的数据是table类型的。
+    LUA_GLOBALSINDEX位置上的table存放着所有的全局变量，比如这句
+    lua_getfield(L, LUA_GLOBALSINDEX, varname);
+    就是取得名为varname的全局变量，我们之前一直使用的lua_getglobal就是这样定义的:#define lua_getglobal(L,s)    lua_getfield(L, LUA_GLOBALSINDEX, (s))
+    下面的代码利用LUA_GLOBALSINDEX得到所有的全局变量
+
+   1. int main()
+   2. {
+   3.     char *szLua_code =
+   4.         "a=10 "
+   5.         "b=/"hello/" "
+   6.         "c=true";
+   7.  
+   8.     lua_State *L = luaL_newstate();
+   9.     luaL_openlibs(L);
+  10.    
+  11.     //执行
+  12.     bool err = luaL_loadstring(L, szLua_code) || lua_pcall(L, 0, 0, 0);
+  13.     if(err)
+  14.     {
+  15.         cerr << lua_tostring(L, -1);
+  16.         lua_pop(L, 1);
+  17.     }
+  18.     else
+  19.     {
+  20.         //遍历LUA_GLOBALSINDEX所在的table得到
+  21.         lua_pushnil(L);
+  22.         while(0 != lua_next(L,LUA_GLOBALSINDEX))
+  23.         {
+  24.             // 'key' （在索引 -2 处） 和 'value' （在索引 -1 处）
+  25.             /*
+  26.             在遍历一张表的时候，不要直接对 key 调用 lua_tolstring ，
+  27.             除非你知道这个 key 一定是一个字符串。
+  28.             调用 lua_tolstring 有可能改变给定索引位置的值；
+  29.             这会对下一次调用 lua_next 造成影响。
+  30.             所以复制一个key到栈顶先
+  31.             */
+  32.             lua_pushvalue(L, -2);
+  33.             printf("%s - %s ",
+  34.                   lua_tostring(L, -1),    //key,刚才复制的
+  35.                   lua_typename(L, lua_type(L,-2))); //value，现在排在-2的位置了
+  36.             // 移除 'value' 和复制的key；保留源 'key' 做下一次叠代
+  37.             lua_pop(L, 2);
+  38.         }
+  39.     }
+  40.     lua_close(L);
+  41.     return 0;
+  42. }
+
+
+
+    LUA_REGISTRYINDEX伪索引处也存放着一个table，它就是Lua注册表(registry)。这个注册表可以用来保存任何C代码想保存 的Lua值。
+    加入到注册表里的数据相当于全局变量，不过只有C代码可以存取而Lua代码不能。因此用它来存储函数库（在下一节介绍）中的一些公共变量再好不过了。
+
+函数库
+    一个Lua库实际上是一个定义了一系列Lua函数的代码块，并将这些函数保存在适当的地方，通常作为table的域来保存。Lua的C库就是这样实现的。
+    作为一个完整的库，我们还需要写一个函数来负责把库中的所有公共函数放到table里，然后注册到Lua全局变量里，就像luaopen_*做的一样。 Lua为这种需求提供了辅助函数luaL_register，它接受一个C函数的列表和他们对应的函数名，并且作为一个库在一个table中注册所有这些 函数。
+下例中注册了一个名为Files的库，定义了三个库函数：FindFirst,FindNext,FindClose。
+
+   1. extern "C" {
+   2. #include "lua.h"
+   3. #include "lualib.h"
+   4. #include "lauxlib.h"
+   5. }
+   6.  
+   7. #include <iostream>
+   8. #include <string>
+   9. #include <windows.h>
+  10. using namespace std;
+  11.  
+  12. //函数库示例，Windows下查找文件功能
+  13. //输入:string路径名
+  14. //输出:userdata存放Handle(如果没找到，则是nil), string文件名
+  15. int findfirst( lua_State *L )
+  16. {
+  17.     WIN32_FIND_DATAA FindFileData;
+  18.     HANDLE hFind = ::FindFirstFileA(luaL_checkstring(L,1), &FindFileData);
+  19.    
+  20.     if(INVALID_HANDLE_VALUE == hFind)
+  21.         lua_pushnil(L);
+  22.     else
+  23.         lua_pushlightuserdata(L, hFind);
+  24.  
+  25.     lua_pushstring(L, FindFileData.cFileName);
+  26.    
+  27.     return 2;
+  28. }
+  29.  
+  30. //输入:userdata:findfirst返回的Handle
+  31. //输出:string：文件名，如果没找到，则返回nil
+  32. int findnext( lua_State *L )
+  33. {
+  34.     WIN32_FIND_DATAA FindFileData;
+  35.     if(::FindNextFileA(lua_touserdata(L,1),&FindFileData))
+  36.         lua_pushstring(L, FindFileData.cFileName);
+  37.     else
+  38.         lua_pushnil(L);
+  39.     return 1;
+  40. }
+  41.  
+  42. //输入:userdata:findfirst返回的Handle
+  43. //没有输出
+  44. int findclose( lua_State *L )
+  45. {
+  46.     ::FindClose(lua_touserdata(L,1));
+  47.     return 0;
+  48. }
+  49.  
+  50. //注册函数库
+  51. static const struct luaL_reg lrFiles [] = {
+  52.     {"FindFirst", findfirst},
+  53.     {"FindNext", findnext},
+  54.     {"FindClose", findclose},
+  55.     {NULL, NULL}    /* sentinel */
+  56. };
+  57. int luaopen_Files (lua_State *L) {
+  58.     luaL_register(L, "Files", lrFiles);
+  59.     return 1;
+  60. }
+  61.  
+  62. int main()
+  63. {
+  64.     char* szLua_code=
+  65.         "hFind,sFile = Files.FindFirst('c:////*.*'); "
+  66.         "if hFind then "
+  67.         "    repeat "
+  68.         "        print(sFile) "
+  69.         "        sFile = Files.FindNext(hFind) "
+  70.         "    until sFile==nil; "
+  71.         "    Files.FindClose(hFind) "
+  72.         "end";
+  73.     lua_State *L = luaL_newstate();
+  74.     luaL_openlibs(L);
+  75.     luaopen_Files(L);
+  76.  
+  77.     bool err = luaL_loadstring(L, szLua_code) || lua_pcall(L, 0, 0, 0);
+  78.     if(err)
+  79.     {
+  80.         cerr << lua_tostring(L, -1);
+  81.         lua_pop(L, 1);
+  82.     }
+  83.     lua_close(L);
+  84.     return 0;
+  85. }
+
+
+    本例运行结果是显示出C盘根目录下所有的文件名。
+    Lua官方建议把函数库写进动态链接库中(windows下.dll文件，linux下.so文件)，这样就可以在Lua代码中使用loadlib函数动 态载入函数库
+例如，我们把上面的例子改成动态链接库版本：
+DLL代码,假定生成的文件名为fileslib.dll：
+
+   1. extern "C" {
+   2. #include "lua.h"
+   3. #include "lualib.h"
+   4. #include "lauxlib.h"
+   5. }
+   6. #include <windows.h>
+   7.  
+   8. BOOL APIENTRY DllMain( HMODULE hModule,
+   9.                        DWORD  ul_reason_for_call,
+  10.                        LPVOID lpReserved
+  11.                      )
+  12. {
+  13.     return TRUE;
+  14. }
+  15.  
+  16. //函数库示例，Windows下查找文件功能
+  17. //输入:string路径名
+  18. //输出:userdata存放Handle(如果没找到，则是nil), string文件名
+  19. int findfirst( lua_State *L )
+  20. {
+  21.     WIN32_FIND_DATAA FindFileData;
+  22.     HANDLE hFind = ::FindFirstFileA(luaL_checkstring(L,1), &FindFileData);
+  23.    
+  24.     if(INVALID_HANDLE_VALUE == hFind)
+  25.         lua_pushnil(L);
+  26.     else
+  27.         lua_pushlightuserdata(L, hFind);
+  28.  
+  29.     lua_pushstring(L, FindFileData.cFileName);
+  30.    
+  31.     return 2;
+  32. }
+  33.  
+  34. //输入:userdata:findfirst返回的Handle
+  35. //输出:string：文件名，如果没找到，则返回nil
+  36. int findnext( lua_State *L )
+  37. {
+  38.     WIN32_FIND_DATAA FindFileData;
+  39.     if(::FindNextFileA(lua_touserdata(L,1),&FindFileData))
+  40.         lua_pushstring(L, FindFileData.cFileName);
+  41.     else
+  42.         lua_pushnil(L);
+  43.     return 1;
+  44. }
+  45.  
+  46. //输入:userdata:findfirst返回的Handle
+  47. //没有输出
+  48. int findclose( lua_State *L )
+  49. {
+  50.     ::FindClose(lua_touserdata(L,1));
+  51.     return 0;
+  52. }
+  53.  
+  54. //注册函数库
+  55. static const struct luaL_reg lrFiles [] = {
+  56.     {"FindFirst", findfirst},
+  57.     {"FindNext", findnext},
+  58.     {"FindClose", findclose},
+  59.     {NULL, NULL}    /* sentinel */
+  60. };
+  61. //导出，注意原型为typedef int (*lua_CFunction) (lua_State *L);
+  62. extern "C"    __declspec(dllexport) int luaopen_Files (lua_State *L) {
+  63.     luaL_register(L, "Files", lrFiles);
+  64.     return 1;
+  65. }
+
+Lua调用代码（或者直接使用Lua.exe调用，dll文件必须处于package.cpath指定的目录中，默认与执行文件在同一目录即可）：
+
+   1. extern "C" {
+   2. #include "lua.h"
+   3. #include "lualib.h"
+   4. #include "lauxlib.h"
+   5. }
+   6.  
+   7. #include <iostream>
+   8. #include <string>
+   9. #include <windows.h>
+  10. using namespace std;
+  11.  
+  12. int main()
+  13. {
+  14.     char* szLua_code=
+  15.         "fileslib = package.loadlib('fileslib.dll', 'luaopen_Files') "
+  16.         "fileslib() "
+  17.         "hFind,sFile = Files.FindFirst('c:////*.*'); "
+  18.         "if hFind then "
+  19.         "    repeat "
+  20.         "        print(sFile) "
+  21.         "        sFile = Files.FindNext(hFind) "
+  22.         "    until sFile==nil; "
+  23.         "    Files.FindClose(hFind) "
+  24.         "end";
+  25.     lua_State *L = luaL_newstate();
+  26.     luaL_openlibs(L);
+  27.  
+  28.     bool err = luaL_loadstring(L, szLua_code) || lua_pcall(L, 0, 0, 0);
+  29.     if(err)
+  30.     {
+  31.         cerr << lua_tostring(L, -1);
+  32.         lua_pop(L, 1);
+  33.     }
+  34.     lua_close(L);
+  35.     return 0;
+  36. }
+
+
+Lua代码里使用package.loadlib得到动态链接库中的luaopen_Files函数，然后调用它注册到Lua中，如果动态链接库中的导出 函数名称满足luaopen_<库名>的话，还可以使用require直接载入。
+比如，如果把本例中的DLL代码里的导出函数名luaopen_Files改成luaopen_fileslib的话,Lua代码便可以改成:
+
+   1. char* szLua_code=
+   2.         "require('fileslib') "
+   3.         "hFind,sFile = Files.FindFirst('c:////*.*'); "
+   4.         ...
+
+例五，与Lua交换自定义数据
+    由于Lua中的数据类型远不能满足C语言的需要，为此Lua提供了userdata，一个userdata提供了一个在Lua中没有预定义操作的raw内 存区域。
+    在例四的函数库代码中我们已经使用过lightuserdata，它是userdata的一个特例：一个表示C指针的值（也就是一个void *类型的值）。
+    下面的例子我们使用userdata来给Lua提供一个窗体类用于建立，显示窗体。为了简化窗体控制代码，在C函数中我们使用了C++Builder的 VCL库，所以下面的代码要在C++Builder下编译才能通过。当然，稍微修改一下也可以使用MFC,QT,wxWidget等来代替。
+
+   1. //---------------------------------------------------------------------------
+   2. #include <vcl.h>
+   3. extern "C" {
+   4. #include "lua.h"
+   5. #include "lualib.h"
+   6. #include "lauxlib.h"
+   7. }
+   8.  
+   9. #include <iostream>
+  10. #pragma hdrstop
+  11. //---------------------------------------------------------------------------
+  12. #pragma argsused
+  13.  
+  14. typedef TWinControl* PWinControl;
+  15. //创建窗体，输入父窗体（或nil），类型，标题
+  16. //输出创建后的窗体
+  17. int newCtrl(lua_State *L)
+  18. {
+  19.     //input:TWinControl *Parent, type(TForm,TButton,TEdit), text(optional)
+  20.     TWinControl *Parent = NULL;
+  21.     //从userdata中取得TWinControl*
+  22.     if(lua_isuserdata(L,1))
+  23.         Parent = *(PWinControl*)lua_touserdata(L,1);
+  24.     String Type = UpperCase(luaL_checkstring(L, 2));
+  25.     String Text = lua_tostring(L, 3);
+  26.  
+  27.     TWinControl *R = NULL;
+  28.  
+  29.     if(Type == "FORM")
+  30.     {
+  31.         R = new TForm(Application);
+  32.     }
+  33.     else if(Type == "BUTTON")
+  34.     {
+  35.         R = new TButton(Application);
+  36.     }
+  37.     else if(Type == "EDIT")
+  38.     {
+  39.         R = new TEdit(Application);
+  40.     }
+  41.     else
+  42.     {
+  43.         luaL_error(L, "unknow type!");
+  44.     }
+  45.  
+  46.     if(Parent)
+  47.         R->Parent = Parent;
+  48.  
+  49.     if(!Text.IsEmpty())
+  50.         ::SetWindowText(R->Handle, Text.c_str());
+  51.  
+  52.     //新建userdata，大小为sizeof(PWinControl)，用于存放上面生成的窗体指针
+  53.     PWinControl* pCtrl = (PWinControl*)lua_newuserdata(L,sizeof(PWinControl));
+  54.     *pCtrl = R;
+  55.     return 1;
+  56. }
+  57.  
+  58. //显示窗体
+  59. int showCtrl(lua_State *L)
+  60. {
+  61.     //input: TWinControl*, for TForm, use ShowModal
+  62.     TWinControl* Ctrl = *(PWinControl*)lua_touserdata(L,1);
+  63.     TForm *fm = dynamic_cast<TForm*>(Ctrl);
+  64.     if(fm)
+  65.         fm->ShowModal();
+  66.     else
+  67.         Ctrl->Show();
+  68.     return 0;
+  69. }
+  70.  
+  71. //定位窗体，输入窗体，左，上，右，下
+  72. int posCtrl(lua_State *L)
+  73. {
+  74.     //input: TWinControl*, Left, Top, Right, Bottom
+  75.     TWinControl* Ctrl = *(PWinControl*)lua_touserdata(L,1);
+  76.     Ctrl->BoundsRect = TRect(
+  77.         luaL_checkint(L, 2),
+  78.         luaL_checkint(L, 3),
+  79.         luaL_checkint(L, 4),
+  80.         luaL_checkint(L, 5));
+  81.  
+  82.     return 0;
+  83. }
+  84.  
+  85. //删除窗体
+  86. int delCtrl(lua_State *L)
+  87. {
+  88.     //input: TWinControl*
+  89.     TWinControl* Ctrl = *(PWinControl*)lua_touserdata(L,1);
+  90.     delete Ctrl;
+  91.     return 0;
+  92. }
+  93.  
+  94. //把这些函数作为VCL函数库提供给Lua
+  95. static const struct luaL_reg lib_VCL [] = {
+  96.     {"new", newCtrl},
+  97.     {"del", delCtrl},
+  98.     {"pos", posCtrl},
+  99.     {"show", showCtrl},
+ 100.     {NULL, NULL}
+ 101. };
+ 102.  
+ 103. int luaopen_VCL (lua_State *L) {
+ 104.     luaL_register(L, "VCL", lib_VCL);
+ 105.     return 1;
+ 106. }
+ 107.  
+ 108. int main(int argc, char* argv[])
+ 109. {
+ 110.     char* szLua_code=
+ 111.         "fm = VCL.new(nil,'Form','Lua Demo'); "    //新建主窗体fm
+ 112.         "VCL.pos(fm, 200, 200, 500, 300); "        //定位
+ 113.         "edt = VCL.new(fm, 'Edit', 'Hello World'); "  //在fm上建立一个编辑框edt
+ 114.         "VCL.pos(edt, 5, 5, 280, 28); "
+ 115.         "btn = VCL.new(fm, 'Button', 'Haha'); "    //在fm上建立一个按钮btn
+ 116.         "VCL.pos(btn, 100, 40, 150, 63); "
+ 117.         "VCL.show(edt); "
+ 118.         "VCL.show(btn); "
+ 119.         "VCL.show(fm); "                       //显示
+ 120.         "VCL.del(fm);";                         //删除
+ 121.  
+ 122.     lua_State *L = luaL_newstate();
+ 123.     luaL_openlibs(L);
+ 124.     luaopen_VCL(L);
+ 125.  
+ 126.     bool err = luaL_loadstring(L, szLua_code) || lua_pcall(L, 0, 0, 0);
+ 127.     if(err)
+ 128.     {
+ 129.         std::cerr << lua_tostring(L, -1);
+ 130.         lua_pop(L, 1);
+ 131.     }   
+ 132.  
+ 133.     lua_close(L);
+ 134.     return 0;
+ 135. }
+ 136. //---------------------------------------------------------------------------
+
+
+使用metatable提供面向对象调用方式
+    上面的VCL代码库为Lua提供了GUI的支持，但是看那些Lua代码，还处于面向过程时期。如何能把VCL.show(edt)之类的代码改成edt: show()这样的形式呢?还是先看代码：
+
+   1. //---------------------------------------------------------------------------
+   2. #include <vcl.h>
+   3. extern "C" {
+   4. #include "lua.h"
+   5. #include "lualib.h"
+   6. #include "lauxlib.h"
+   7. }
+   8.  
+   9. #include <iostream>
+  10. #pragma hdrstop
+  11. //---------------------------------------------------------------------------
+  12. #pragma argsused
+  13.  
+  14. typedef TWinControl* PWinControl;
+  15. //创建窗体，输入父窗体（或nil），类型，标题
+  16. //输出创建后的窗体
+  17. int newCtrl(lua_State *L)
+  18. {
+  19.     //input:TWinControl *Parent, type(TForm,TButton,TEdit), text(optional)
+  20.     TWinControl *Parent = NULL;
+  21.  
+  22.     if(lua_isuserdata(L,1))
+  23.         Parent = *(PWinControl*)luaL_checkudata(L,1,"My_VCL");
+  24.     String Type = UpperCase(luaL_checkstring(L, 2));
+  25.     String Text = lua_tostring(L, 3);
+  26.  
+  27.     TWinControl *R = NULL;
+  28.  
+  29.     if(Type == "FORM")
+  30.         R = new TForm(Application);
+  31.     else if(Type == "BUTTON")
+  32.         R = new TButton(Application);
+  33.     else if(Type == "EDIT")
+  34.         R = new TEdit(Application);
+  35.     else
+  36.         luaL_error(L, "unknow type!");
+  37.  
+  38.     if(Parent)
+  39.         R->Parent = Parent;
+  40.  
+  41.     if(!Text.IsEmpty())
+  42.         ::SetWindowText(R->Handle, Text.c_str());
+  43.  
+  44.     //output TWinControl*
+  45.     PWinControl* pCtrl = (PWinControl*)lua_newuserdata(L,sizeof(PWinControl));
+  46.     *pCtrl = R;
+  47.     //关联metatable
+  48.     luaL_getmetatable(L, "My_VCL");
+  49.     lua_setmetatable(L, -2);
+  50.     return 1;
+  51. }
+  52.  
+  53. //显示窗体
+  54. int showCtrl(lua_State *L)
+  55. {
+  56.     //input: TWinControl*, for TForm, use ShowModal
+  57.     TWinControl* Ctrl = *(PWinControl*)luaL_checkudata(L,1,"My_VCL");
+  58.     TForm *fm = dynamic_cast<TForm*>(Ctrl);
+  59.     if(fm)
+  60.         fm->ShowModal();
+  61.     else
+  62.         Ctrl->Show();
+  63.     return 0;
+  64. }
+  65.  
+  66. //定位窗体，输入窗体，左，上，右，下
+  67. int posCtrl(lua_State *L)
+  68. {
+  69.     //input: TWinControl*, Left, Top, Right, Bottom
+  70.     TWinControl* Ctrl = *(PWinControl*)luaL_checkudata(L,1,"My_VCL");
+  71.     Ctrl->BoundsRect = TRect(
+  72.         luaL_checkint(L, 2),
+  73.         luaL_checkint(L, 3),
+  74.         luaL_checkint(L, 4),
+  75.         luaL_checkint(L, 5));
+  76.  
+  77.     return 0;
+  78. }
+  79.  
+  80. //删除窗体
+  81. int delCtrl(lua_State *L)
+  82. {
+  83.     //input: TWinControl*
+  84.     TWinControl* Ctrl = *(PWinControl*)luaL_checkudata(L,1,"My_VCL");
+  85.     delete Ctrl;
+  86.     return 0;
+  87. }
+  88.  
+  89. //把这些函数作为VCL函数库提供给Lua
+  90. static const struct luaL_reg lib_VCL [] = {
+  91.     {"new", newCtrl},
+  92.     {"del", delCtrl},
+  93.     {"pos", posCtrl},
+  94.     {"show", showCtrl},
+  95.     {NULL, NULL}
+  96. };
+  97.  
+  98. int luaopen_VCL (lua_State *L) {
+  99.     //建立metatable
+ 100.     luaL_newmetatable(L, "My_VCL");
+ 101.  
+ 102.     //查找索引，把它指向metatable自身（因为稍后我们会在metatable里加入一些成员）
+ 103.     lua_pushvalue(L, -1);
+ 104.     lua_setfield(L,-2,"__index");
+ 105.  
+ 106.     //pos方法
+ 107.     lua_pushcfunction(L, posCtrl);
+ 108.     lua_setfield(L,-2,"pos");
+ 109.  
+ 110.     //show方法
+ 111.     lua_pushcfunction(L, showCtrl);
+ 112.     lua_setfield(L,-2,"show");
+ 113.  
+ 114.     //析构，如果表里有__gc,Lua的垃圾回收机制会调用它。
+ 115.     lua_pushcfunction(L, delCtrl);
+ 116.     lua_setfield(L,-2,"__gc");
+ 117.  
+ 118.     luaL_register(L, "VCL", lib_VCL);
+ 119.     return 1;
+ 120. }
+ 121.  
+ 122. int main(int argc, char* argv[])
+ 123. {
+ 124.     char* szLua_code=
+ 125.         "local fm = VCL.new(nil,'Form','Lua Demo'); "    //新建主窗体fm
+ 126.         "fm:pos(200, 200, 500, 300); "        //定位
+ 127.         "local edt = VCL.new(fm, 'Edit', 'Hello World'); "  //在fm上建立一个编辑框edt
+ 128.         "edt:pos(5, 5, 280, 28); "
+ 129.         "local btn = VCL.new(fm, 'Button', 'Haha'); "    //在fm上建立一个按钮btn
+ 130.         "btn:pos(100, 40, 150, 63); "
+ 131.         "edt:show(); "
+ 132.         "btn:show(); "
+ 133.         "fm:show(); ";                       //显示
+ 134.         //"VCL.del(fm);";   //不再需要删除了，Lua的垃圾回收在回收userdata地会调用metatable.__gc。
+ 135.  
+ 136.     lua_State *L = luaL_newstate();
+ 137.     luaL_openlibs(L);
+ 138.     luaopen_VCL(L);
+ 139.  
+ 140.     bool err = luaL_loadstring(L, szLua_code) || lua_pcall(L, 0, 0, 0);
+ 141.     if(err)
+ 142.     {
+ 143.         std::cerr << lua_tostring(L, -1);
+ 144.         lua_pop(L, 1);
+ 145.     }   
+ 146.  
+ 147.     lua_close(L);
+ 148.     return 0;
+ 149. }
+ 150. //---------------------------------------------------------------------------
+
+
+我们这儿用到的辅助函数有：
+
+int   luaL_newmetatable (lua_State *L, const char *tname);
+    创建一个新表（用于metatable），将新表放到栈顶并在注册表中建立一个类型名与之联系。
+void  luaL_getmetatable (lua_State *L, const char *tname);
+    获取注册表中tname对应的metatable。
+int   lua_setmetatable  (lua_State *L, int objindex);
+    把一个table弹出堆栈，并将其设为给定索引处的值的 metatable。
+void *luaL_checkudata (lua_State *L, int index, const char *tname);
+    检查在栈中指定位置的对象是否为带有给定名字的metatable的userdata。
+
+    
+    我们只改动了luaopen_VCL和newCtrl函数。
+    在luaopen_VCL里，我们建立了一个metatable,然后让它的__index成员指向自身，并加入了pos,show函数成员和__gc函 数成员。
+    在newCtrl里，我们把luaopen_VCL里建立的metatable和新建的userdata关联，于是:
+
+    * 对userdata的索引操作就会转向metatable.__index
+    * 因为metatable.__index是metatable自身，所以就在这个metatable里查找
+    * 这样，对userdata的pos、show索引转到metatable里的pos和show上，它们指向的是我们的C函数posCtrl和 posShow。
+    * 最后，当Lua回收这些userdata前，会调用metatable.__gc（如果有的话），我们已经把metatable.__gc指向了C函数 delCtrl。
+
+    加入metatable后，我们还得到了额外的好处：可以区分不同的userdata以保证类型安全，我们把所以的lua_touserdata改成了luaL_checkudata。
+    关于metatable的知识已超出本文讨论范围，请参考Lua官方手册。
+
+ 
+
+例六，使用C++包装类
+    尽管用Lua的C API已经可以方便地写出与Lua交互的程序了，不过对于用惯C++的人来说还是更愿意用C++的方式来解决问题。于是开源社区就出现了不少Lua C API的C++的wrap，比如：LuaBind,LuaPlus,toLua
+    这里介绍的是LuaBind库，下载
+    它在Windows下貌似只能支持MSVC和ICC，好在Lua可以支持动态库的载入，所以用VC+LuaBind写Lua库，再用C++Builder调用也是个好主意。
+    在VC使用LuaBind的方法是把LuaBind的src目录下的cpp文件加入工程（当然也可以先编译成静态库），加入Lua库，设置LuaBind,Lua和Boost的头文件路径。
+
+头文件:
+
+   1. //Lua头文件
+   2. extern "C"
+   3. {
+   4. #include <lua.h>
+   5. #include <lualib.h>
+   6. #include <lauxlib.h>
+   7. }
+   8. //LuaBind头文件
+   9. #include <luabind/luabind.hpp> 
+
+
+
+在C++中调用Lua函数
+    调用Lua函数那是最简单不过的事情了，用LuaBind的call_function()模板函数就可以了： 
+
+   1. int main(
+   2.   // 建立新的Lua环境
+   3.   lua_State *myLuaState = luaL_newstate();
+   4.  
+   5.   // 让LuaBind“认识”这个Lua环境
+   6.   luabind::open(myLuaState);
+   7.  
+   8.   // 定义一个叫add的Lua函数
+   9.   luaL_dostring(
+  10.     myLuaState,
+  11.     "function add(first, second) "
+  12.     "  return first + second "
+  13.     "end "
+  14.   );
+  15.    
+  16.   //调用add函数
+  17.   cout << "Result: "
+  18.        << luabind::call_function<int>(myLuaState, "add", 2, 3)
+  19.        << endl;
+  20.  
+  21.   lua_close(myLuaState);
+  22. }
+
+
+在本例中我们先使用Lua C API产生一个Lua线程环境，然后调用luabind::open()让LuaBind关联这个线程环境，在使用LuaBind之前这步是必须做的，它要在Lua环境中注册一些LuaBind专用的数据。
+在执行完Lua代码之后，我们使用luabind::call_function<int>调用了Lua里的add函数，返回值是int。
+
+在Lua代码中调用C++函数
+    从前面的文章里我们知道在Lua调用C函数需要经常操作栈，而LuaBind帮我们做了这些工作，下面的例子把print_hello函数送给Lua脚本调用：
+
+   1. void print_hello(int number) {
+   2.   cout << "hello world " << number << endl;
+   3. }
+   4.  
+   5. int main(
+   6.   // 建立新的Lua环境
+   7.   lua_State *myLuaState = lua_open();
+   8.  
+   9.   // 让LuaBind“认识”这个Lua环境
+  10.   luabind::open(myLuaState);
+  11.  
+  12.   // 添加print_hello函数到Lua环境中
+  13.   luabind::module(myLuaState) [
+  14.     luabind::def("print_hello", print_hello)
+  15.   ];
+  16.  
+  17.   // 现在Lua中可以调用print_hello了
+  18.   luaL_dostring(
+  19.     myLuaState,
+  20.     "print_hello(123) "
+  21.   );
+  22.  
+  23.   lua_close(myLuaState);
+  24. }
+
+
+    向Lua环境加入函数或其它东东的方法是：
+
+  luabind::module(lua_State* L, char const* name = 0) [
+    ...
+  ];
+
+    其中module函数中的第二个指定要加入的东东所处的名空间（其实就是table），如果为0，则处于全局域之下。
+    在中括号里的luabind::def把print_hello函数提供给Lua环境，第一个参数是Lua中使用的函数名。
+    如果要定义多个函数，可以使用逗号分隔。
+
+在Lua代码中使用C++类
+    如果我们直接使用Lua C API向Lua脚本注册一个C++类，一般是使用userdata+metatable的方法，就象我们在例五中做的一样。这样做尽管难度不大，却非常繁琐而且不方便维护。
+    使用LuaBind我们就可以更方便地向Lua脚本注册C++类了，例： 
+
+   1. class NumberPrinter {
+   2.   public:
+   3.     NumberPrinter(int number) :
+   4.       m_number(number) {}
+   5.  
+   6.     void print() {
+   7.       cout << m_number << endl;
+   8.     }
+   9.  
+  10.   private:
+  11.     int m_number;
+  12. };
+  13.  
+  14. int main() {
+  15.   lua_State *myLuaState = lua_open();
+  16.   luabind::open(myLuaState);
+  17.  
+  18.   // 使用LuaBind导出NumberPrinter类
+  19.   luabind::module(myLuaState) [
+  20.     luabind::class_<NumberPrinter>("NumberPrinter")
+  21.       .def(luabind::constructor<int>())
+  22.       .def("print", &NumberPrinter::print)
+  23.   ];
+  24.  
+  25.   // 现在Lua中可以使用NumberPinter类了
+  26.   luaL_dostring(
+  27.     myLuaState,
+  28.     "Print2000 = NumberPrinter(2000) "
+  29.     "Print2000:print() "
+  30.   );
+  31.  
+  32.   lua_close(myLuaState);
+  33. }
+
+
+为了注册一个类,LuaBind提供了class_类。它有一个重载过的成员函数 def() 。这个函数被用来注册类的成员函数、操作符、构造器、枚举和属性。
+它将返回this指针，这样我们就可以方便地直接注册更多的成员。
+
+属性
+LuaBind 也可以导出类成员变量：
+
+   1. template<typename T>
+   2. struct Point {
+   3.   Point(T X, T Y) :
+   4.     X(X), Y(Y) {}
+   5.  
+   6.   T X, Y;
+   7. };
+   8.  
+   9. template<typename T>
+  10. struct Box {
+  11.   Box(Point<T> UpperLeft, Point<T> LowerRight) :
+  12.     UpperLeft(UpperLeft), LowerRight(LowerRight) {}
+  13.  
+  14.   Point<T> UpperLeft, LowerRight;
+  15. };
+  16.  
+  17. int main() {
+  18.   lua_State *myLuaState = lua_open();
+  19.   luabind::open(myLuaState);
+  20.  
+  21.   // 使用LuaBind导出Point<float>类和Box<float>类
+  22.   luabind::module(myLuaState) [
+  23.     luabind::class_<Point<float> >("Point")
+  24.       .def(luabind::constructor<float, float>())
+  25.       .def_readwrite("X", &Point<float>::X)
+  26.       .def_readwrite("Y", &Point<float>::Y),
+  27.  
+  28.     luabind::class_<Box<float> >("Box")
+  29.       .def(luabind::constructor<Point<float>, Point<float> >())
+  30.       .def_readwrite("UpperLeft", &Box<float>::UpperLeft)
+  31.       .def_readwrite("LowerRight", &Box<float>::LowerRight)
+  32.   ];
+  33.  
+  34.   // 现在Lua中可以使用为些类了
+  35.   luaL_dostring(
+  36.     myLuaState,
+  37.     "MyBox = Box(Point(10, 20), Point(30, 40)) "
+  38.     "MyBox.UpperLeft.X = MyBox.LowerRight.Y "
+  39.   );
+  40.  
+  41.   lua_close(myLuaState);
+  42. }
+
+
+本例中使用def_readwrite定义类成员，我们也可以用def_readonly把类成员定义成只读。
+
+LuaBind还可以把C++类导出成支持getter和setter的属性的Lua类： 
+
+   1. struct ResourceManager {
+   2.   ResourceManager() :
+   3.     m_ResourceCount(0) {}
+   4.  
+   5.   void loadResource(const string &sFilename) {
+   6.     ++m_ResourceCount;
+   7.   }
+   8.   size_t getResourceCount() const {
+   9.     return m_ResourceCount;
+  10.   }
+  11.  
+  12.   size_t m_ResourceCount;
+  13. };
+  14.  
+  15. int main() {
+  16.   lua_State *myLuaState = lua_open();
+  17.   luabind::open(myLuaState);
+  18.  
+  19.   // 导出类，在Lua中调用ResourceCount属性会调用C++中的ResourceManager::getResourceCount
+  20.   // 属性定义有点象C++Builder里的__property定义，呵呵
+  21.   luabind::module(myLuaState) [
+  22.     luabind::class_<ResourceManager>("ResourceManager")
+  23.       .def("loadResource", &ResourceManager::loadResource)
+  24.       .property("ResourceCount", &ResourceManager::getResourceCount)
+  25.   ];
+  26.  
+  27.   try {
+  28.     ResourceManager MyResourceManager;
+  29.  
+  30.     // 把MyResourceManager定义成Lua的全局变量
+  31.     luabind::globals(myLuaState)["MyResourceManager"] = &MyResourceManager;
+  32.  
+  33.     // 调用
+  34.     luaL_dostring(
+  35.       myLuaState,
+  36.       "MyResourceManager:loadResource(/"abc.res/") "
+  37.       "MyResourceManager:loadResource(/"xyz.res/") "
+  38.       " "
+  39.       "ResourceCount = MyResourceManager.ResourceCount "
+  40.     );
+  41.  
+  42.     // 读出全局变量
+  43.     size_t ResourceCount = luabind::object_cast<size_t>(
+  44.       luabind::globals(myLuaState)["ResourceCount"]
+  45.     );
+  46.     cout << ResourceCount << endl;
+  47.   }
+  48.   catch(const std::exception &TheError) {
+  49.     cerr << TheError.what() << endl;
+  50.   }
+  51.  
+  52.   lua_close(myLuaState);
+  53. }
+
+附: Lua语法简介
+1.语法约定
+    Lua语句用分号结尾，不过如果不写分号，Lua也会自己判断如何区分每条语句
+    如:
+        a=1 b=a*2 --这样写没有问题，但不太好看。
+    建议一行里有多个语句时用分号隔开
+
+    变量名、函数名之类的命名规则与C语言一样：由字母，下划线和数字组成，但第一个字符不能是数字。并且不能和Lua的保留字相同。
+    
+    Lua是大小写敏感的
+    
+    使用两个减号--作为单行注释符，多行注释使用--[[...--]]
+    
+2.类型
+    Lua是动态类型语言，变量不要类型定义。Lua中有8个基本类型分别为：nil、boolean、number、string、userdata、function、thread和table。
+    同一变量可以随时改变它的类型，如：
+
+   1. a = 10                  --number
+   2. a = "hello"             --string
+   3. a = false               --boolean
+   4. a = {10,"hello",false}  --table
+   5. a = print               --function
+
+    使用type函数可以得到变量当前的类型，如print(type(a));
+    
+    nil         所有没有被赋值过的变量默认值为nil，给变量赋nil可以收回变量的空间。
+    boolean     取值false和true。但要注意Lua中所有的值都可以作为条件。在控制结构的条件中除了false和nil为假，其他值都为真。所以Lua认为0和空串都是真。（注意，和C不一样哦）
+    number      表示实数，Lua中没有整数。不用担心实数引起的误差，Lua的numbers可以处理任何长整数。
+    string      字符串，Lua中的字符串可以存放任何包括0在内的二进制数据。可以使用单引号或双引号表示字符串，和C一样使用/作为转义符。也可以使用或 [[...]]表示字符串，它可以表示多行，而且不解释转义符(也可以是[=[...]=]、[==[]==]、...用于适应各种类型字符串)。另外要注意的是Lua中字符串是不可以修改的。
+    function    函数，Lua中的函数也可以存储到变量中，可以作为其它函数的参数，可以作为函数的返回值。
+    table       表，表是Lua特有的功能强大的东东，它是Lua中唯一的一种数据结构，它可以用来描述数组，结构，map的功能。
+    userdata    userdata类型用来将任意C语言数据保存在Lua变量中。例如：用标准I/O库来描述文件。
+    thread      线程。由coroutine表创建的一种数据类型，可以实现多线程协同操作。
+    
+3.表达式
+    算术运行符: 加+、减-、乘*、除/、幂^
+    关系运算符：小于<、大于>、小于等于<=、大于等于>=、等于==、不等~=
+    逻辑运算符：与and、或or、非not
+        and和or的运算结果返回值是其中的操作数：
+        a and b        -- 如果a为false，则返回a，否则返回b
+        a or  b        -- 如果a为true，则返回a，否则返回b
+        所以C中的三元运算符a?b:c在Lua中可以这样写:(a and b) or c
+    连接运算符：连续两个小数点..，如：
+        "hello" .. "world"  结果是 "helloworld"
+        0 .. 1              结果是 "01"，当在一个数字后面写..时，必须加上空格以防止被解释错。
+    取长度操作符：一元操作 #
+        字符串的长度是它的字节数，table 的长度被定义成一个整数下标 n，它满足 t[n] 不是 nil 而 t[n+1] 为 nil。
+    
+4.基本语法
+赋值
+    a = a + 1
+    Lua里的赋值还可以同时给多个变量赋值。变量列表和值列表的各个元素用逗号分开，赋值语句右边的值会依次赋给左边的变量。如:
+    a, b = 10, 2*x    --相当于a=10; b=2*x
+    x, y = y, x        --交换x和y
+    如果赋值符左右个数不同时，Lua会自动丢弃多余值或以nil补足
+局部变量
+    local i = 10
+    使用local声明局部变量，局部变量只在所在的代码块内有效。
+    如果不声明，默认为全局变量，这个变量在所有Lua环境中有效。
+    代码块是指一个控制结构内，一个函数体，或者一个chunk（变量被声明的那个文件或者文本串），也可以直接使用do...end（相当于C中的{}）。
+条件
+
+   1. if 条件 then
+   2.     then-part
+   3. elseif 条件n then
+   4.     elseif-part
+   5. ..                --->多个elseif
+   6. else
+   7.     else-part
+   8. end;
+
+循环
+    Lua中的循环有：while循环,repeat-until循环,for循环和for in循环。
+    循环中可以用break跳出，Lua语法要求break和return只能是代码块的最后一句（放心，正常的代码都是满足这个要求的，break和 reuturn后面即使有代码也是执行不到的，再说了，大不了自己加个do...end好了^_^）
+    如：
+
+   1. local i = 1
+   2. while a[i] do
+   3.     if a[i] == v then break end
+   4.     i = i + 1
+   5. end
+
+while循环
+
+   1. while condition do
+   2.     statements;
+   3. end;
+
+repeat-until循环：
+
+   1. repeat
+   2.     statements;
+   3. until conditions;
+
+for循环
+
+   1. for var=exp1,exp2,exp3 do
+   2.     loop-part
+   3. end
+
+    for将用exp3作为step从exp1（初始值）到exp2（终止值），执行loop-part。其中exp3可以省略，默认step=1
+for in循环
+
+   1. for 变量 in 集合 do
+   2.     loop-part
+   3. end
+
+    实际上，
+    for var_1, ..., var_n in explist do block end
+    等价于
+
+   1. do
+   2.     local _f, _s, _var = explist
+   3.     while true do
+   4.         local var_1, ... , var_n = _f(_s, _var)
+   5.         _var = var_1
+   6.         if _var == nil then break end
+   7.         block
+   8.     end
+   9. end
+
+    如：
+
+   1. a = {"windows","macos","linux",n=3}
+   2. for k,v in pairs(a) do print(k,v) end
+
+5.函数
+
+   1. function 函数名 (参数列表)
+   2.     statements-list;
+   3. end;
+
+    函数也可以一次返回多个值，如：
+
+   1. function foo() return 'a','b','c'; end
+   2. a,b,c = foo()
+
+
+    在Lua中还可以直接定义匿名函数，如
+    print((function() return 'a','b','c' end)())
+        
+更详细信息请参考<LUA>/doc/manual.html
+
+http://blog.csdn.net/hamenny/article/details/4420522
