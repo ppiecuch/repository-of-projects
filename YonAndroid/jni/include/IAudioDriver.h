@@ -27,11 +27,11 @@ namespace audio{
 				m_pFileSystem->drop();
 		}
 		virtual s32 getMaxMixedSound() = 0;
-		virtual ISound* getSound(const io::path& filename) = 0;
+		virtual ISound* getSound(const io::path& filename,bool streaming=false) = 0;
 		virtual ISound* findSound(const io::path& filename) = 0;
 		virtual void removeSound(ISound* sound) = 0;
 		virtual void grabSound(ISound* sound) = 0;
-		virtual void dropSound(ISound* sound) = 0;
+		virtual bool dropSound(ISound* sound) = 0;
 
 		virtual IWave* createWaveFromFile(const io::path& filename) = 0;
 		virtual IWave* createWaveFromFile(io::IReadStream* file) =0;

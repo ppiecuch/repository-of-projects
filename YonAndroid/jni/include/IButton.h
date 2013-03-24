@@ -9,13 +9,13 @@ namespace gui{
 	
 	class IButton : public IWidget, public IInputable{
 	public:
-		IButton(IWidget::ENUM_TYPE type,IGUISystem* system,IWidget* parent,const core::stringc& id,const core::recti& rectangle)
+		IButton(widget::ENUM_TYPE type,IGUISystem* system,IWidget* parent,const core::stringc& id,const core::recti& rectangle)
 			:IWidget(type,system,parent,id,rectangle){}
 
-		virtual MASK_STATE getState() const = 0;
+		virtual widget::MASK_STATE getState() const = 0;
 
-		virtual IWidget::ENUM_TYPE getType() const{
-			return IWidget::BUTTON;
+		virtual widget::ENUM_TYPE getType() const{
+			return widget::BUTTON;
 		}
 
 	};

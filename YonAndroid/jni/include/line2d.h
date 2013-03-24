@@ -51,7 +51,7 @@ namespace core{
 		/** \return center of the line. */
 		vector2d<T> getMiddle() const
 		{
-			return (start + end) * (T)0.5;
+			return (start + end) * (T)0.5;//WARNING: T = int, then return 0;
 		}
 
 		//! Get the vector of the line.

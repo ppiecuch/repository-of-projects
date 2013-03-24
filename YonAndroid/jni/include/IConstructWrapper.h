@@ -2,7 +2,6 @@
 #define _YON_GUI_ICONSTRUCTWRAPPER_H_
 
 #include "xmldata.h"
-#include "IWidget.h"
 
 namespace yon{
 namespace gui{
@@ -17,7 +16,7 @@ namespace gui{
 	template <class T>
 	class IConstructWrapper{
 	public:
-		static IWidget* createInstance(IWidget::ENUM_TYPE type,core::xmldata* data) { return new T(type,data); }
+		static IWidget* createInstance(core::xmldata* data) { return new T(data); }
 	};
 }
 }

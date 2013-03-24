@@ -18,6 +18,9 @@ namespace audio{
 
 		const io::path& getPath() const { return m_namePath.getPath(); }
 
+		virtual void logon(){}
+		virtual void logoff(){}
+
 		//²¥·Å¿ØÖÆ
 		virtual void play() = 0;
 		virtual void pause() = 0;
