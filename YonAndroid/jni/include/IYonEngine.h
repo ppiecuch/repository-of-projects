@@ -18,6 +18,7 @@
 #include "II18NManager.h"
 #include "INetManager.h"
 #include "ITextSystem.h"
+#include "IGUISystem.h"
 
 namespace yon{
 
@@ -29,7 +30,7 @@ namespace yon{
 		virtual const SYonEngineParameters& getCreateParameters()=0;
 		virtual video::IVideoDriver* getVideoDriver() const= 0;
 		virtual scene::ISceneManager* getSceneManager() const = 0;
-		//virtual gui::IGUIEnvirenment* getGUIEnvirentment() const = 0;
+		virtual gui::IGUISystem* getGUISystem() const = 0;
 		virtual scene::IGraphicsAdapter* getGraphicsAdapter() const = 0;
 		virtual scene::IGraphicsAdapter* getGraphicsAdapterWindow() const = 0;
 		virtual io::IFileSystem* getFileSystem() const = 0;

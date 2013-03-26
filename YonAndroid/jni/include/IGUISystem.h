@@ -8,6 +8,7 @@
 #include "path.h"
 #include "xmldata.h"
 #include "widget.h"
+#include "rect.h"
 
 namespace yon{
 	namespace io{
@@ -20,6 +21,7 @@ namespace gui{
 
 	class ITheme;
 	class IWidget;
+	class IButton;
 
 	class IGUISystem : public core::IResizable,public core::IRenderable,public core::IReferencable,public event::IEventReceiver{
 	public:
@@ -41,6 +43,8 @@ namespace gui{
 		* The function should create instances of Widget objects with the same type specified.
 		*/
 		virtual void registerWidgetType(widget::ENUM_TYPE type, ConstructorWrapper func) = 0;
+
+		virtual IButton* addButton(IWidget* parent,const core::stringc& id,const core::recti& rectangle) = 0;
 
 		virtual video::IVideoDriver* getVideoDriver() const = 0;
 
