@@ -169,6 +169,10 @@
 			RelativePath=".\main.cpp"
 			>
 		</File>
+		<File
+			RelativePath=".\main.cpp.tutorial"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -1,58 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-template<typename T> struct is_pointer{enum{value=0};};
-template<typename T> struct is_pointer<T*>{enum{value=1};};
-
-template<typename Signature>
-class function{};
-
-union any_pointer
-{
-	//void* obj_ptr;
-	//const void* const_obj_ptr;
-	void (*func_ptr)();
-};
-
-template<typename R>
-class function0
-{
-protected:
-	typedef R return_type;
-	typedef function0 self_type;
-};
-
-template<typename R>
-class function<R> : function0<R>
-{
-	typedef function0<R> base_type;
-	typedef function self_type;
-
-	typedef R(*invoker_type)(any_pointer);
-
-	invoker_type invoker; // 重要成员，负责调用函数！
-
-	//struct clear_type{};
-public:
-	template<typename Functor> 
-	function(Functor f):base_type(f){}
-
-	R operator()() const // 身为仿函数的标志！
-	{
-
-		// 这里进行真正的函数调用，使用invoker，
-		// invoker是functionN的成员变量，在下面的assign_to中被赋值。
-		// functor为实际被调用的函数或仿函数，a0当然是其参数。
-		//R result = invoker(function_base::functor); 
-
-		// 将得到的结果cast至最终返回出去的类型
-		//return static_cast<result_type>(result);
-		return invoker();
-	}
-
-};
-
-
 /*
 
 //refer to:http://wenku.baidu.com/view/99557c6127d3240c8447ef20.html
@@ -230,11 +178,36 @@ void test2(int a,float b){
 }
 */
 
+//refer to:http://www.bccn.net/Article/kfyy/cjj/jszl/200604/3960_6.html
+/*safe_bool惯用手法
+
+如你所知，对于函数指针fptr，我们可以这样测试它：if(fptr) ...，所以function也应该提供这一特性，然而如果直接重载operator 　bool()则会导致下面的代码成为合法的:
+
+
+function＜int(int)＞ f;
+
+bool b=f;
+
+　　这显然不妥，所以function用另一个巧妙的手法替代它，既所谓的safe_bool惯用手法，这在function定义内部的源码如下：
+
+
+struct dummy { void nonnull(){};};
+
+typedef void (dummy::*safe_bool)(); //确保safebool不能转型为任何其它类型！
+
+operator safe_bool () const 
+
+{ return (this-＞empty())? 0 : &dummy::nonnull; }
+*/
+
 #include <crtdbg.h>
 inline void EnableMemLeakCheck()
 {
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
 }
+
+template<typename T> struct is_pointer{enum{value=0};};
+template<typename T> struct is_pointer<T*>{enum{value=1};};
 
 int main(int argc,char ** argv)
 {
