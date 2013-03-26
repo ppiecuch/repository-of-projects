@@ -50,6 +50,10 @@
 #include "IReferencable.h" 
 #include "yonUtil.h"
 
+#include "IGUISystem.h"
+#include "IWidget.h"
+#include "IButton.h"
+
 #include "path.h" 
 #include "IFileSystem.h" 
 #include "IStream.h"

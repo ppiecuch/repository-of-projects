@@ -5,17 +5,15 @@ IYonEngine* engine=NULL;
 IVideoDriver* videoDriver=NULL;
 IAudioDriver* audioDriver=NULL;
 ISceneManager* sceneMgr=NULL;
-//IGUIEnvirenment* guiEnv=NULL;
+IGUISystem* guiSystem=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 
-MyGUI::MyGUIAdapter* guiAdapter;
+IButton* button=NULL;
 
-ISceneNode* cubeModel=NULL;
-ISceneNode* planeModel=NULL;
-ISceneNode* teapotModel=NULL;
+
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -28,15 +26,13 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				return MyGUI::InputManager::getInstance().injectMousePress(evt.mouseInput.x, evt.mouseInput.y, MyGUI::MouseButton::Left);
-				//return true;
+				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				return MyGUI::InputManager::getInstance().injectMouseRelease(evt.mouseInput.x, evt.mouseInput.y, MyGUI::MouseButton::Left);
-				//return true;
+				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_MOVE:
 				logger->debug("[LM]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				return MyGUI::InputManager::getInstance().injectMouseMove(evt.mouseInput.x, evt.mouseInput.y, 0);
+				return true;
 			}
 			break;
 		case event::ENUM_EVENT_TYPE_TOUCH:
@@ -54,7 +50,6 @@ public:
 			switch(evt.systemInput.type)
 			{
 			case event::ENUM_SYSTEM_INPUT_TYPE_RESIZE:
-				guiAdapter->onResize(core::dimension2du(evt.systemInput.screenWidth,evt.systemInput.screenHeight));
 				return true;
 			}
 			break;
@@ -73,7 +68,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	videoDriver=engine->getVideoDriver();
 	audioDriver=engine->getAudioDriver();
 	sceneMgr=engine->getSceneManager();
-	//guiEnv=engine->getGUIEnvirentment();
+	guiSystem=engine->getGUISystem();
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
@@ -86,6 +81,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
+	button=guiSystem->addButton(NULL,"test",core::recti(10,240,110,240+32));
+
 	return true;
 }
 void resize(u32 width,u32 height){
@@ -95,14 +92,16 @@ void drawFrame(){
 
 	videoDriver->begin();
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d",videoDriver->getFPS()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	guiSystem->render();
+
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%u",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 
 	;
 }
 void destroy(){
-	delete guiAdapter;
+	//delete guiAdapter;
 	engine->drop();
 	delete params.pEventReceiver;
 }

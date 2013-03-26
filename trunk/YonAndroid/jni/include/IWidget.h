@@ -220,7 +220,13 @@ namespace gui{
 		IWidget(widget::ENUM_TYPE type,IGUISystem* guiSystem,IWidget* parent,const core::stringc& id,const core::recti& rectangle)
 			:m_type(type),m_parent(parent),m_id(id),m_bMessageReceivable(true),m_bPartial(false),
 			m_relativeRect(rectangle),m_absoluteRect(rectangle),m_desiredRect(rectangle),m_absoluteClippingRect(rectangle),
-			m_bVisible(true),m_alignLeft(widget::UPPERLEFT), m_alignRight(widget::UPPERLEFT), m_alignTop(widget::UPPERLEFT), m_alignBottom(widget::UPPERLEFT){
+			m_bVisible(true),m_alignLeft(widget::UPPERLEFT), m_alignRight(widget::UPPERLEFT), m_alignTop(widget::UPPERLEFT), m_alignBottom(widget::UPPERLEFT)
+		{
+				if (parent)
+				{
+					parent->addChildToEnd(this);
+					recalculateAbsolutePosition(true);
+				}
 
 		}
 
@@ -233,6 +239,11 @@ namespace gui{
 					m_pSysem->getVideoDriver()->recycleRenderUnit2D(m_renderEntries[i].Unit);
 				m_renderEntries.clear();
 			}
+
+			WidgetList::Iterator it=m_children.begin();
+			for(;it!=m_children.end();++it)
+				(*it)->drop();
+			m_children.clear();
 		}
 
 		/**
@@ -267,8 +278,17 @@ namespace gui{
 		void setDirty(bool on)
 		{
 			m_bDirty=on;
-			if(m_bDirty&&m_parent)
-				m_parent->setDirty(on);
+			if(m_bDirty)
+			{
+				if(m_parent)
+					m_parent->setDirty(true);
+			}
+			else
+			{
+				WidgetList::Iterator it=m_children.begin();
+				for(;it!=m_children.end();++it)
+					(*it)->setDirty(false);
+			}
 		}
 
 		bool isDirty() const{return m_bDirty;}
