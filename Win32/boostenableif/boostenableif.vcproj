@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="boostfunction"
-	ProjectGUID="{CE15FD54-3E3F-4DDE-9A16-0AF300B5D67E}"
-	RootNamespace="boostfunction"
+	Name="boostenableif"
+	ProjectGUID="{140AAE2B-1FCF-4579-964A-A61BCA46E0BC}"
+	RootNamespace="boostenableif"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -166,19 +166,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\function0.txt"
-			>
-		</File>
-		<File
-			RelativePath=".\main.cpp.tutorial"
-			>
-		</File>
-		<File
-			RelativePath=".\main.cpp1"
-			>
-		</File>
-		<File
-			RelativePath=".\main2.cpp"
+			RelativePath=".\main.cpp"
 			>
 		</File>
 	</Files>

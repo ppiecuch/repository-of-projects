@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+//refer to:http://blog.chinaunix.net/uid-25959495-id-3132199.html
+
+/*
+函数在调用时，系统会动态分配堆栈。函数堆栈有三个用途：在进入函数前保存环境变量和返回地址，在进入函数时保存实参的拷贝，在函数体内保存局部变量。函数的调用规范决定了函数调用时实参压入堆栈、退出堆栈及堆栈释放的方式。Windows环境下常用的调用规范有：
+(a)_cdecl：这是C++/C函数的默认调用规范，参数从右至左依次传递并压入堆栈，由调用函数负责堆栈的清退，这种方式有利于传递个数可变的参数给被调用函数。
+(b)_stdcall：这是Win API函数使用的调用规范，该规范生成的函数代码比_cdecl更小，但当函数个数可变时会转为_cdecl规范。WINAPI、CALLBACK都定义为_stdcall。
+(c)_thiscall：C++非静态成员函数的默认调用规范，不能使用个数可变的参数，this指针直接保存在ECX寄存器中而非压入函数堆栈。
+(d)_fastcall：该规范所修饰的函数的实参将被直接传递到CPU寄存器而不是内存堆栈中，该规范不能用于成员函数。
+*/
+
+template<typename T> struct is_pointer{enum{value=0};};
+template<typename T> struct is_pointer<T*>{enum{value=1};};
+
+template<typename Signature>
+class function{};
+
+union any_pointer
+{
+	void (*func_ptr)();
+};
+
+template<typename R>
+class function0
+{
+public:
+	typedef R return_type;
+	//typedef function0 self_type;
+
+	typedef R(*invoker_type)(any_pointer);
+
+	invoker_type invoker; // 重要成员，负责调用函数！
+
+	template<typename Functor>
+	function0(Functor const & f)
+		: invoker(0)
+	{
+		printf("function0:%08X\r\n",f);
+	}
+};
+
+template<typename R>
+class function<R(void)> : public function0<R>
+{
+	typedef function0<R> base_type;
+	typedef function self_type;
+
+	//struct clear_type{};
+public:
+	//function(){
+	//	printf("function:default\r\n");
+	//}
+
+	//因为function0没有默认构造函数，这里我们将参数强转为function0<R>类型来构造基类
+	template<typename Functor>
+	function(Functor f): base_type(static_cast<const base_type&>(f)){
+		printf("function:%08X\r\n",f);
+	}
+
+	//function(const self_type& f) : base_type(static_cast<const base_type&>(f)){}
+
+	//function(const base_type& f) : base_type(static_cast<const base_type&>(f)){}
+
+};
+
+void test0()
+{
+	printf("test0\r\n");
+}
+
+#include <crtdbg.h>
+inline void EnableMemLeakCheck()
+{
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+}
+
+int main(int argc,char ** argv)
+{
+	EnableMemLeakCheck();
+
+	//printf("%d\r\n",is_pointer<int>::value);
+	//printf("%d\r\n",is_pointer<int*>::value);
+	//printf("%d\r\n",is_pointer<void(*)(int)>::value);
+
+
+	//TODO
+	//function<void()> f1;
+
+	function<void()> f2(test0);
+	
+	system("pause");
+	return 0;
+}
