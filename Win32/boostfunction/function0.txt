@@ -68,7 +68,7 @@
   BOOST_JOIN(get_member_invoker,0)
 #define BOOST_FUNCTION_GET_INVOKER \
   BOOST_JOIN(get_invoker,0)
-#define BOOST_FUNCTION_VTABLE BOOST_JOIN(basic_vtable,0)
+#define basic_vtable0 BOOST_JOIN(basic_vtable,0)
 
 #ifndef BOOST_NO_VOID_RETURNS
 #  define BOOST_FUNCTION_VOID_RETURN_TYPE void
@@ -473,7 +473,7 @@ namespace boost {
        * destructors, base classes, etc.
        */
       template<typename R  >
-      struct BOOST_FUNCTION_VTABLE
+      struct basic_vtable0
       {
 #ifndef BOOST_NO_VOID_RETURNS
         typedef R         result_type;
@@ -671,7 +671,7 @@ namespace boost {
 #endif // BOOST_NO_VOID_RETURNS
 
   private:
-    typedef boost::detail::function::BOOST_FUNCTION_VTABLE<
+    typedef boost::detail::function::basic_vtable0<
               R  >
       vtable_type;
 
@@ -1154,7 +1154,7 @@ public:
 } // end namespace boost
 
 // Cleanup after ourselves...
-#undef BOOST_FUNCTION_VTABLE
+#undef basic_vtable0
 #undef 
 #undef function0
 #undef function_invoker0
