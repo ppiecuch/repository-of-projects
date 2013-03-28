@@ -121,6 +121,13 @@ protected:
 
 };
 
+  /**
+   * A union of a function pointer and a void pointer. This is necessary
+   * because 5.2.10/6 allows reinterpret_cast<> to safely cast between
+   * function pointer types and 5.2.9/10 allows static_cast<> to safely
+   * cast between a void pointer and an object pointer. But it is not legal
+   * to cast between a function pointer and a void* (in either direction),
+   * so function requires a union of the two. */
 //需要说明的是，对于函数指针，function_base并不知道也不关心它要保存的函数指针是什么确切的类型，
 //只要是函数指针就行，因为它总会把该函数指针f转型为“void (*)()”类型，然后保存在functor成员中，functor成员是一个union类型:
 union any_pointer
@@ -136,6 +143,26 @@ union any_pointer
 
 	char data[1];
 };
+ inline any_pointer make_any_pointer(void* o)
+  {
+    any_pointer p;
+    p.obj_ptr = o;
+    return p;
+  }
+
+  inline any_pointer make_any_pointer(const void* o)
+  {
+    any_pointer p;
+    p.const_obj_ptr = o;
+    return p;
+  }
+
+  inline any_pointer make_any_pointer(void (*f)())
+  {
+    any_pointer p;
+    p.func_ptr = f;
+    return p;
+  }
 //这个any_pointer可以通过安全转型保存所有形式的仿函数和函数指针，承载在底层保存数据的任务
 
 template<typename R>

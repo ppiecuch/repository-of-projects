@@ -192,8 +192,13 @@
 		<File
 			RelativePath=".\main3.cpp"
 			>
+		</File>
+		<File
+			RelativePath=".\main4.cpp"
+			>
 			<FileConfiguration
 				Name="Debug|Win32"
+				ExcludedFromBuild="true"
 				>
 				<Tool
 					Name="VCCLCompilerTool"
