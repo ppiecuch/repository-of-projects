@@ -745,10 +745,14 @@ namespace yon{
 			{
 				u32 size = 0;
 				const c8* p = str;
-				do
-				{
+				//fix bug:20130327A
+				//do
+				//{
+				//	++size;
+				//} while(*p++);
+				while(*p++){
 					++size;
-				} while(*p++);
+				}
 
 				return size;
 			}

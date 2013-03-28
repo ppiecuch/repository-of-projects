@@ -268,6 +268,7 @@ vorbis_SOURCES :=\
 gui_SOURCES :=\
 	$(addprefix Yon/, \
 		CGUISystem.cpp \
+		CButton.cpp \
 )
 
 yon_SOURCES :=   \
