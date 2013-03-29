@@ -1,0 +1,90 @@
+[DEBG]start instance CYonEngineAndroid
+[INFO]JNI Version:1.6
+[INFO]Instance CFileSystem                                            【√】
+[INFO]Instance CNetManager                                            【√】
+[INFO]GL_VERSION:OpenGL ES-CM 1.1(1.10)
+[INFO]GL_EXTENSIONS:
+[INFO]GL_EXT_bgra
+[INFO]GL_EXT_texture_compression_dxt1
+[INFO]GL_EXT_texture_compression_s3tc
+[INFO]GL_EXT_texture_format_BGRA8888
+[INFO]GL_EXT_unpack_subimage
+[INFO]GL_EXT_debug_marker
+[INFO]GL_EXT_debug_label
+[INFO]GL_NV_texture_npot_2D_mipmap
+[INFO]GL_OES_byte_coordinates
+[INFO]GL_OES_compressed_ETC1_RGB8_texture
+[INFO]GL_OES_compressed_paletted_texture
+[INFO]GL_OES_draw_texture
+[INFO]GL_OES_extended_matrix_palette
+[INFO]GL_OES_EGL_image
+[INFO]GL_OES_EGL_image_external
+[INFO]GL_OES_EGL_sync
+[INFO]GL_OES_fbo_render_mipmap
+[INFO]GL_OES_fixed_point
+[INFO]GL_OES_framebuffer_object
+[INFO]GL_OES_matrix_get
+[INFO]GL_OES_matrix_palette
+[INFO]GL_OES_point_size_array
+[INFO]GL_OES_point_sprite
+[INFO]GL_OES_query_matrix
+[INFO]GL_OES_read_format
+[INFO]GL_OES_rgb8_rgba8
+[INFO]GL_OES_single_precision
+[INFO]GL_OES_stencil8
+[INFO]GL_OES_texture_cube_map
+[INFO]GL_OES_vertex_half_float
+[INFO]GL_MAX_TEXTURE_UNITS:2
+[INFO]GL_MAX_TEXTURE_SIZE:2048
+[INFO]GL_MAX_LIGHTS:8
+[DEBG]GL_MAX_VIEWPORT_DIMS:3839,3839
+[DEBG]clearColor:0
+[DEBG]no FPS limit
+[DEBG]glTexImage2D:1,128,64,mipmap:0,L8A8
+[INFO]GL_NO_ERROR at line:408(D:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/Yon/COGLES1Texture.cpp) 【√】
+[DEBG]Instance COGLES1Texture:1                                       【√】
+[DEBG]Extend element->5
+[DEBG]COGLES1Driver:NONE state->RUN state
+[INFO]Instance COGLES1Driver:1                                        【√】
+[INFO]Instance CSceneManager                                          【√】
+[DEBG]Extend element->3
+[INFO]Instance CGraphicsAdapter                                       【√】
+[DEBG]Extend element->10
+[DEBG]Extend element->3
+[DEBG]Extend element->1
+[DEBG]Extend element->5
+[INFO]Instance CGraphicsAdapter                                       【√】
+[INFO]using default device: Android Default
+[INFO]Instance COALAudioDriver                                        【√】
+[INFO]CreateEngine(1280,736),version:0.1.0                            【√】
+[DEBG]CSceneManager::addCamera size:1
+[DEBG]filename:media/
+[DEBG]root:/storage/emulated/0
+[DEBG]addWorkingDirectory:/storage/emulated/0/media/
+[DEBG]filename:media/png/
+[DEBG]root:/storage/emulated/0
+[WARN]addWorkingDirectory:/storage/emulated/0/media/png/ failed,for dir not exist or can't access!【!】
+[DEBG]filename:media/xc3d
+[DEBG]root:/storage/emulated/0
+[WARN]addWorkingDirectory:/storage/emulated/0/media/xc3d/ failed,for dir not exist or can't access!【!】
+[DEBG]filename:media/ms3d
+[DEBG]root:/storage/emulated/0
+[WARN]addWorkingDirectory:/storage/emulated/0/media/ms3d/ failed,for dir not exist or can't access!【!】
+[DEBG]Instance CReadFileStream                                        【√】
+[DEBG]load entity:/storage/emulated/0/media/ranger_female_stand2.xc3d
+[DEBG]xc3d version:0.0.2:20121212
+[DEBG]has animation:true
+[DEBG]Instance CReadFileStream                                        【√】
+[DEBG]start load texture:nvyouxia.png
+[DEBG]glTexImage2D:2,512,512,mipmap:0,R8G8B8
+[INFO]GL_NO_ERROR at line:408(D:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/Yon/COGLES1Texture.cpp) 【√】
+[DEBG]drop image
+[DEBG]Instance COGLES1Texture:2                                       【√】
+[DEBG]end load texture:nvyouxia.png                                   【√】
+[DEBG]Release CReadFileStream                                         【√】
+[DEBG]Instance CReadFileStream                                        【√】
+[DEBG]start load texture:ZJ_nss_lian_1.png
+[DEBG]glTexImage2D:3,512,512,mipmap:0,R8G8B8
+[INFO]GL_NO_ERROR at line:408(D:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/Yon/COGLES1Texture.cpp) 【√】
+[DEBG]drop image
+[DEBG]Instance COGLES1Texture:3                  

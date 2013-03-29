@@ -1,0 +1,1466 @@
+[DEBG]start instance CYonEngineAndroid
+[INFO]JNI Version:1.6
+[INFO]Instance CFileSystem                                            ¡¾¡Ì¡¿
+[INFO]Instance CSceneManager                                          ¡¾¡Ì¡¿
+[INFO]GL_VERSION:OpenGL ES-CM 1.1(1.10)
+[INFO]GL_EXTENSIONS:
+[INFO]GL_OES_byte_coordinates
+[INFO]GL_OES_fixed_point
+[INFO]GL_OES_single_precision
+[INFO]GL_OES_matrix_get
+[INFO]GL_OES_read_format
+[INFO]GL_OES_compressed_paletted_texture
+[INFO]GL_OES_point_sprite
+[INFO]GL_OES_point_size_array
+[INFO]GL_OES_matrix_palette
+[INFO]GL_OES_draw_texture
+[INFO]GL_OES_query_matrix
+[INFO]GL_OES_texture_env_crossbar
+[INFO]GL_OES_texture_mirrored_repeat
+[INFO]GL_OES_texture_cube_map
+[INFO]GL_OES_blend_subtract
+[INFO]GL_OES_blend_func_separate
+[INFO]GL_OES_blend_equation_separate
+[INFO]GL_OES_stencil_wrap
+[INFO]GL_OES_extended_matrix_palette
+[INFO]GL_OES_framebuffer_object
+[INFO]GL_OES_rgb8_rgba8
+[INFO]GL_OES_depth24
+[INFO]GL_OES_stencil8
+[INFO]GL_OES_compressed_ETC1_RGB8_texture
+[INFO]GL_OES_mapbuffer
+[INFO]GL_OES_EGL_image
+[INFO]GL_OES_EGL_image_external
+[INFO]GL_EXT_multi_draw_arrays
+[INFO]GL_OES_required_internalformat
+[INFO]GL_IMG_read_format
+[INFO]GL_IMG_texture_compression_pvrtc
+[INFO]GL_IMG_texture_format_BGRA8888
+[INFO]GL_EXT_texture_format_BGRA8888
+[INFO]GL_OES_egl_sync
+[INFO]GL_IMG_vertex_array_object
+[INFO]GL_MAX_TEXTURE_UNITS:4
+[INFO]GL_MAX_TEXTURE_SIZE:2048
+[INFO]GL_MAX_LIGHTS:8
+[DEBG]setViewPort(0,0,800,480)
+[DEBG]no FPS limit
+[DEBG]glTexImage2D:100271,128,64,mipmap:0,L8A8
+[DEBG]Instance COGLES1Texture:100271                                  ¡¾¡Ì¡¿
+[DEBG]Extend element->5
+[INFO]Instance COGLES1Driver:1                                        ¡¾¡Ì¡¿
+[DEBG]Extend element->3
+[INFO]Instance CGraphicsAdapter                                       ¡¾¡Ì¡¿
+[INFO]Instance COALAudioDriver                                        ¡¾¡Ì¡¿
+[INFO]CreateEngine(800,480),version:0.1.0                             ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addCamera size:1
+[DEBG]CSceneManager::addModel size:1
+[INFO]external path:/mnt/sdcard
+[INFO]rom:598.39MB/1007.90MB
+[INFO]ram:96.08MB/335MB(37.53MB)
+[INFO]sd:12.33GB/13.31GB
+[INFO]zh
+[INFO]MODEL:Nexus S
+[INFO]CODENAME:REL
+[INFO]INCREMENTAL:299849
+[INFO]SDK_INT:15
+[INFO]SDK:15
+[INFO]RELEASE:4.0.4
+[INFO]PRODUCT:sojuk
+[INFO]RADIO:unknown
+[INFO]CPU_ABI:armeabi-v7a
+[INFO]CPU_ABI2:armeabi
+[INFO]BOARD:herring
+[INFO]BOOTLOADER:I9020XXKL1
+[INFO]BRAND:google
+[INFO]DEVICE:crespo
+[INFO]DISPLAY:IMM76D
+[INFO]FINGERPRINT:google/sojuk/crespo:4.0.4/IMM76D/299849:user/release-keys
+[INFO]HARDWARE:herring
+[INFO]HOST:vpba16.mtv.corp.google.com
+[INFO]ID:IMM76D
+[INFO]MANUFACTURER:samsung
+[INFO]TAGS:release-keys
+[INFO]TYPE:user
+[INFO]USER:android-build
+[DEBG]nativeOnSurfaceChanged->w:800,h:480
+[DEBG]CYonEngineAndroid::onResize(800,480)[DEBG]setViewPort(0,0,800,480)
+[DEBG]CDebugPrinter::onResize:800,480
+[DEBG]COrthoCamera::onResize->recalculateProjectionMatrix
+[DEBG]CYonEngineAndroid::resizeIfNecessary
+[DEBG]CSceneManager::addModel size:1
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:0.png
+[DEBG]glTexImage2D:315638026,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:315638026                               ¡¾¡Ì¡¿
+[DEBG]end load texture:0.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:2
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:1.png
+[DEBG]glTexImage2D:534244737,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:534244737                               ¡¾¡Ì¡¿
+[DEBG]end load texture:1.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:3
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:2.png
+[DEBG]glTexImage2D:1505553220,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1505553220                              ¡¾¡Ì¡¿
+[DEBG]end load texture:2.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:4
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:3.png
+[DEBG]glTexImage2D:-1563003837,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1563003837                             ¡¾¡Ì¡¿
+[DEBG]end load texture:3.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:5
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:4.png
+[DEBG]glTexImage2D:-867317458,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-867317458                              ¡¾¡Ì¡¿
+[DEBG]end load texture:4.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:6
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:5.png
+[DEBG]glTexImage2D:-1700480907,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1700480907                             ¡¾¡Ì¡¿
+[DEBG]end load texture:5.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:7
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:6.png
+[DEBG]glTexImage2D:-2028555960,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-2028555960                             ¡¾¡Ì¡¿
+[DEBG]end load texture:6.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:8
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:7.png
+[DEBG]glTexImage2D:1841779351,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1841779351                              ¡¾¡Ì¡¿
+[DEBG]end load texture:7.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:9
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:8.png
+[DEBG]glTexImage2D:-1054071278,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1054071278                             ¡¾¡Ì¡¿
+[DEBG]end load texture:8.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:10
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:9.png
+[DEBG]glTexImage2D:-1422854359,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1422854359                             ¡¾¡Ì¡¿
+[DEBG]end load texture:9.png                                          ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:11
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:10.png
+[DEBG]glTexImage2D:-1408567796,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1408567796                             ¡¾¡Ì¡¿
+[DEBG]end load texture:10.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:12
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:11.png
+[DEBG]glTexImage2D:1363318443,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1363318443                              ¡¾¡Ì¡¿
+[DEBG]end load texture:11.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:13
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:12.png
+[DEBG]glTexImage2D:1671093174,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1671093174                              ¡¾¡Ì¡¿
+[DEBG]end load texture:12.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:14
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:13.png
+[DEBG]glTexImage2D:-553484899,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-553484899                              ¡¾¡Ì¡¿
+[DEBG]end load texture:13.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:15
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:14.png
+[DEBG]glTexImage2D:1286872464,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1286872464                              ¡¾¡Ì¡¿
+[DEBG]end load texture:14.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:16
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:15.png
+[DEBG]glTexImage2D:772961407,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:772961407                               ¡¾¡Ì¡¿
+[DEBG]end load texture:15.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:17
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:16.png
+[DEBG]glTexImage2D:55586330,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:55586330                                ¡¾¡Ì¡¿
+[DEBG]end load texture:16.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:18
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:17.png
+[DEBG]glTexImage2D:229433297,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:229433297                               ¡¾¡Ì¡¿
+[DEBG]end load texture:17.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:19
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:18.png
+[DEBG]glTexImage2D:1984777172,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1984777172                              ¡¾¡Ì¡¿
+[DEBG]end load texture:18.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:20
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:19.png
+[DEBG]glTexImage2D:-760160237,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-760160237                              ¡¾¡Ì¡¿
+[DEBG]end load texture:19.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:21
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:20.png
+[DEBG]glTexImage2D:-1251139266,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1251139266                             ¡¾¡Ì¡¿
+[DEBG]end load texture:20.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:22
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:21.png
+[DEBG]glTexImage2D:-24809019,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-24809019                               ¡¾¡Ì¡¿
+[DEBG]end load texture:21.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:23
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:22.png
+[DEBG]glTexImage2D:1995859160,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1995859160                              ¡¾¡Ì¡¿
+[DEBG]end load texture:22.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:24
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:23.png
+[DEBG]glTexImage2D:-1369731737,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1369731737                             ¡¾¡Ì¡¿
+[DEBG]end load texture:23.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:25
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:24.png
+[DEBG]glTexImage2D:622950690,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:622950690                               ¡¾¡Ì¡¿
+[DEBG]end load texture:24.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:26
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:25.png
+[DEBG]glTexImage2D:639059833,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:639059833                               ¡¾¡Ì¡¿
+[DEBG]end load texture:25.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:27
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:26.png
+[DEBG]glTexImage2D:-2009592676,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-2009592676                             ¡¾¡Ì¡¿
+[DEBG]end load texture:26.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:28
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:27.png
+[DEBG]glTexImage2D:1843916923,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1843916923                              ¡¾¡Ì¡¿
+[DEBG]end load texture:27.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:29
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:28.png
+[DEBG]glTexImage2D:-1861240378,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1861240378                             ¡¾¡Ì¡¿
+[DEBG]end load texture:28.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:30
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:29.png
+[DEBG]glTexImage2D:257373421,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:257373421                               ¡¾¡Ì¡¿
+[DEBG]end load texture:29.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:31
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:30.png
+[DEBG]glTexImage2D:-1874352352,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1874352352                             ¡¾¡Ì¡¿
+[DEBG]end load texture:30.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:32
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:31.png
+[DEBG]glTexImage2D:1985428815,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1985428815                              ¡¾¡Ì¡¿
+[DEBG]end load texture:31.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:33
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:32.png
+[DEBG]glTexImage2D:-110024918,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-110024918                              ¡¾¡Ì¡¿
+[DEBG]end load texture:32.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:34
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:33.png
+[DEBG]glTexImage2D:-996684255,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-996684255                              ¡¾¡Ì¡¿
+[DEBG]end load texture:33.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:35
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:34.png
+[DEBG]glTexImage2D:-569681820,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-569681820                              ¡¾¡Ì¡¿
+[DEBG]end load texture:34.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:36
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:35.png
+[DEBG]glTexImage2D:-248879133,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-248879133                              ¡¾¡Ì¡¿
+[DEBG]end load texture:35.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:37
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:36.png
+[DEBG]glTexImage2D:1123665230,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1123665230                              ¡¾¡Ì¡¿
+[DEBG]end load texture:36.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:38
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:37.png
+[DEBG]glTexImage2D:1279092501,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1279092501                              ¡¾¡Ì¡¿
+[DEBG]end load texture:37.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:39
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:38.png
+[DEBG]glTexImage2D:-2082601880,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-2082601880                             ¡¾¡Ì¡¿
+[DEBG]end load texture:38.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:40
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:39.png
+[DEBG]glTexImage2D:-562682825,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-562682825                              ¡¾¡Ì¡¿
+[DEBG]end load texture:39.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:41
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:40.png
+[DEBG]glTexImage2D:-763602894,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-763602894                              ¡¾¡Ì¡¿
+[DEBG]end load texture:40.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:42
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:41.png
+[DEBG]glTexImage2D:221385673,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:221385673                               ¡¾¡Ì¡¿
+[DEBG]end load texture:41.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:43
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:42.png
+[DEBG]glTexImage2D:-1257025748,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1257025748                             ¡¾¡Ì¡¿
+[DEBG]end load texture:42.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:44
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:43.png
+[DEBG]glTexImage2D:1622599243,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1622599243                              ¡¾¡Ì¡¿
+[DEBG]end load texture:43.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:45
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:44.png
+[DEBG]glTexImage2D:-447847466,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-447847466                              ¡¾¡Ì¡¿
+[DEBG]end load texture:44.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:46
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:45.png
+[DEBG]glTexImage2D:-1357273027,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1357273027                             ¡¾¡Ì¡¿
+[DEBG]end load texture:45.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:47
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:46.png
+[DEBG]glTexImage2D:1245420720,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1245420720                              ¡¾¡Ì¡¿
+[DEBG]end load texture:46.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:48
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:47.png
+[DEBG]glTexImage2D:912581151,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:912581151                               ¡¾¡Ì¡¿
+[DEBG]end load texture:47.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:49
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:48.png
+[DEBG]glTexImage2D:-1435751366,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1435751366                             ¡¾¡Ì¡¿
+[DEBG]end load texture:48.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:50
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:49.png
+[DEBG]glTexImage2D:-901400463,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-901400463                              ¡¾¡Ì¡¿
+[DEBG]end load texture:49.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:51
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:50.png
+[DEBG]glTexImage2D:1344803060,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1344803060                              ¡¾¡Ì¡¿
+[DEBG]end load texture:50.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:52
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:51.png
+[DEBG]glTexImage2D:357043123,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:357043123                               ¡¾¡Ì¡¿
+[DEBG]end load texture:51.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:53
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:52.png
+[DEBG]glTexImage2D:-530795170,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-530795170                              ¡¾¡Ì¡¿
+[DEBG]end load texture:52.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:54
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:53.png
+[DEBG]glTexImage2D:2070517861,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:2070517861                              ¡¾¡Ì¡¿
+[DEBG]end load texture:53.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:55
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:54.png
+[DEBG]glTexImage2D:1169068024,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1169068024                              ¡¾¡Ì¡¿
+[DEBG]end load texture:54.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:56
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:55.png
+[DEBG]glTexImage2D:1535907591,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1535907591                              ¡¾¡Ì¡¿
+[DEBG]end load texture:55.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:57
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:56.png
+[DEBG]glTexImage2D:2077606722,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:2077606722                              ¡¾¡Ì¡¿
+[DEBG]end load texture:56.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:58
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:57.png
+[DEBG]glTexImage2D:-1358013415,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1358013415                             ¡¾¡Ì¡¿
+[DEBG]end load texture:57.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:59
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:58.png
+[DEBG]glTexImage2D:1814937020,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1814937020                              ¡¾¡Ì¡¿
+[DEBG]end load texture:58.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:60
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:59.png
+[DEBG]glTexImage2D:1251244059,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1251244059                              ¡¾¡Ì¡¿
+[DEBG]end load texture:59.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:61
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:60.png
+[DEBG]glTexImage2D:-1692411418,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1692411418                             ¡¾¡Ì¡¿
+[DEBG]end load texture:60.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:62
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:61.png
+[DEBG]glTexImage2D:-1194928243,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1194928243                             ¡¾¡Ì¡¿
+[DEBG]end load texture:61.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:63
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:62.png
+[DEBG]glTexImage2D:1322319424,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1322319424                              ¡¾¡Ì¡¿
+[DEBG]end load texture:62.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:64
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:63.png
+[DEBG]glTexImage2D:-1081056529,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1081056529                             ¡¾¡Ì¡¿
+[DEBG]end load texture:63.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:65
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:64.png
+[DEBG]glTexImage2D:-902152886,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-902152886                              ¡¾¡Ì¡¿
+[DEBG]end load texture:64.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:66
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:65.png
+[DEBG]glTexImage2D:-1977377087,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1977377087                             ¡¾¡Ì¡¿
+[DEBG]end load texture:65.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:67
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:66.png
+[DEBG]glTexImage2D:1687451012,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1687451012                              ¡¾¡Ì¡¿
+[DEBG]end load texture:66.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:68
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:67.png
+[DEBG]glTexImage2D:500091779,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:500091779                               ¡¾¡Ì¡¿
+[DEBG]end load texture:67.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:69
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:68.png
+[DEBG]glTexImage2D:1539240302,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1539240302                              ¡¾¡Ì¡¿
+[DEBG]end load texture:68.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:70
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:69.png
+[DEBG]glTexImage2D:-1654192715,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1654192715                             ¡¾¡Ì¡¿
+[DEBG]end load texture:69.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:71
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:70.png
+[DEBG]glTexImage2D:1896417160,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1896417160                              ¡¾¡Ì¡¿
+[DEBG]end load texture:70.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:72
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:71.png
+[DEBG]glTexImage2D:-556636713,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-556636713                              ¡¾¡Ì¡¿
+[DEBG]end load texture:71.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:73
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:72.png
+[DEBG]glTexImage2D:1518778962,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1518778962                              ¡¾¡Ì¡¿
+[DEBG]end load texture:72.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:74
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:73.png
+[DEBG]glTexImage2D:1744380009,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1744380009                              ¡¾¡Ì¡¿
+[DEBG]end load texture:73.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:75
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:74.png
+[DEBG]glTexImage2D:131618892,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:131618892                               ¡¾¡Ì¡¿
+[DEBG]end load texture:74.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:76
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:75.png
+[DEBG]glTexImage2D:-64641557,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-64641557                               ¡¾¡Ì¡¿
+[DEBG]end load texture:75.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:77
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:76.png
+[DEBG]glTexImage2D:1477254134,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1477254134                              ¡¾¡Ì¡¿
+[DEBG]end load texture:76.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:78
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:77.png
+[DEBG]glTexImage2D:-392445219,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-392445219                              ¡¾¡Ì¡¿
+[DEBG]end load texture:77.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:79
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:78.png
+[DEBG]glTexImage2D:1460194256,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1460194256                              ¡¾¡Ì¡¿
+[DEBG]end load texture:78.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:80
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:79.png
+[DEBG]glTexImage2D:653180863,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:653180863                               ¡¾¡Ì¡¿
+[DEBG]end load texture:79.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:81
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:80.png
+[DEBG]glTexImage2D:462707290,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:462707290                               ¡¾¡Ì¡¿
+[DEBG]end load texture:80.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:82
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:81.png
+[DEBG]glTexImage2D:-1520533231,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1520533231                             ¡¾¡Ì¡¿
+[DEBG]end load texture:81.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:83
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:82.png
+[DEBG]glTexImage2D:469861908,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:469861908                               ¡¾¡Ì¡¿
+[DEBG]end load texture:82.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:84
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:83.png
+[DEBG]glTexImage2D:-2126272685,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-2126272685                             ¡¾¡Ì¡¿
+[DEBG]end load texture:83.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:85
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:84.png
+[DEBG]glTexImage2D:-167151234,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-167151234                              ¡¾¡Ì¡¿
+[DEBG]end load texture:84.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:86
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:85.png
+[DEBG]glTexImage2D:760393477,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:760393477                               ¡¾¡Ì¡¿
+[DEBG]end load texture:85.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:87
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:86.png
+[DEBG]glTexImage2D:1733192472,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1733192472                              ¡¾¡Ì¡¿
+[DEBG]end load texture:86.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:88
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:87.png
+[DEBG]glTexImage2D:1295913127,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1295913127                              ¡¾¡Ì¡¿
+[DEBG]end load texture:87.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:89
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:88.png
+[DEBG]glTexImage2D:1051213154,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1051213154                              ¡¾¡Ì¡¿
+[DEBG]end load texture:88.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:90
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:89.png
+[DEBG]glTexImage2D:-234921799,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-234921799                              ¡¾¡Ì¡¿
+[DEBG]end load texture:89.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:91
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:90.png
+[DEBG]glTexImage2D:-1826349348,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1826349348                             ¡¾¡Ì¡¿
+[DEBG]end load texture:90.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:92
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:91.png
+[DEBG]glTexImage2D:-976261189,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-976261189                              ¡¾¡Ì¡¿
+[DEBG]end load texture:91.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:93
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:92.png
+[DEBG]glTexImage2D:1012869638,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1012869638                              ¡¾¡Ì¡¿
+[DEBG]end load texture:92.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:94
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:93.png
+[DEBG]glTexImage2D:211118637,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:211118637                               ¡¾¡Ì¡¿
+[DEBG]end load texture:93.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:95
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:94.png
+[DEBG]glTexImage2D:-1868298912,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1868298912                             ¡¾¡Ì¡¿
+[DEBG]end load texture:94.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:96
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:95.png
+[DEBG]glTexImage2D:357890191,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:357890191                               ¡¾¡Ì¡¿
+[DEBG]end load texture:95.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:97
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:96.png
+[DEBG]glTexImage2D:2146665322,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:2146665322                              ¡¾¡Ì¡¿
+[DEBG]end load texture:96.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:98
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:97.png
+[DEBG]glTexImage2D:1122197345,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1122197345                              ¡¾¡Ì¡¿
+[DEBG]end load texture:97.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:99
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:98.png
+[DEBG]glTexImage2D:1876968100,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1876968100                              ¡¾¡Ì¡¿
+[DEBG]end load texture:98.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:100
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:99.png
+[DEBG]glTexImage2D:501980963,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:501980963                               ¡¾¡Ì¡¿
+[DEBG]end load texture:99.png                                         ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:101
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:100.png
+[DEBG]glTexImage2D:1927630222,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1927630222                              ¡¾¡Ì¡¿
+[DEBG]end load texture:100.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:102
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:101.png
+[DEBG]glTexImage2D:1611240533,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1611240533                              ¡¾¡Ì¡¿
+[DEBG]end load texture:101.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:103
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:102.png
+[DEBG]glTexImage2D:-962610520,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-962610520                              ¡¾¡Ì¡¿
+[DEBG]end load texture:102.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:104
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:103.png
+[DEBG]glTexImage2D:-2021386377,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-2021386377                             ¡¾¡Ì¡¿
+[DEBG]end load texture:103.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:105
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:104.png
+[DEBG]glTexImage2D:-1626125198,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1626125198                             ¡¾¡Ì¡¿
+[DEBG]end load texture:104.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:106
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:105.png
+[DEBG]glTexImage2D:-1259463415,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1259463415                             ¡¾¡Ì¡¿
+[DEBG]end load texture:105.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:107
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:106.png
+[DEBG]glTexImage2D:1507987820,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1507987820                              ¡¾¡Ì¡¿
+[DEBG]end load texture:106.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:108
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:107.png
+[DEBG]glTexImage2D:1203164555,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1203164555                              ¡¾¡Ì¡¿
+[DEBG]end load texture:107.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:109
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:108.png
+[DEBG]glTexImage2D:-216071146,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-216071146                              ¡¾¡Ì¡¿
+[DEBG]end load texture:108.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:110
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:109.png
+[DEBG]glTexImage2D:1416678781,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1416678781                              ¡¾¡Ì¡¿
+[DEBG]end load texture:109.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:111
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:110.png
+[DEBG]glTexImage2D:774089456,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:774089456                               ¡¾¡Ì¡¿
+[DEBG]end load texture:110.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:112
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:111.png
+[DEBG]glTexImage2D:-1755837089,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1755837089                             ¡¾¡Ì¡¿
+[DEBG]end load texture:111.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:113
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:112.png
+[DEBG]glTexImage2D:126924922,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:126924922                               ¡¾¡Ì¡¿
+[DEBG]end load texture:112.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:114
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:113.png
+[DEBG]glTexImage2D:1600076209,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1600076209                              ¡¾¡Ì¡¿
+[DEBG]end load texture:113.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:115
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:114.png
+[DEBG]glTexImage2D:-496915660,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-496915660                              ¡¾¡Ì¡¿
+[DEBG]end load texture:114.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:116
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:115.png
+[DEBG]glTexImage2D:164344563,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:164344563                               ¡¾¡Ì¡¿
+[DEBG]end load texture:115.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:117
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:116.png
+[DEBG]glTexImage2D:683371934,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:683371934                               ¡¾¡Ì¡¿
+[DEBG]end load texture:116.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:118
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:117.png
+[DEBG]glTexImage2D:1948824997,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1948824997                              ¡¾¡Ì¡¿
+[DEBG]end load texture:117.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:119
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:118.png
+[DEBG]glTexImage2D:-102894024,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-102894024                              ¡¾¡Ì¡¿
+[DEBG]end load texture:118.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:120
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:119.png
+[DEBG]glTexImage2D:974748231,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:974748231                               ¡¾¡Ì¡¿
+[DEBG]end load texture:119.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:121
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:120.png
+[DEBG]glTexImage2D:-1453267070,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1453267070                             ¡¾¡Ì¡¿
+[DEBG]end load texture:120.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:122
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:121.png
+[DEBG]glTexImage2D:374494553,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:374494553                               ¡¾¡Ì¡¿
+[DEBG]end load texture:121.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:123
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:122.png
+[DEBG]glTexImage2D:2023960572,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:2023960572                              ¡¾¡Ì¡¿
+[DEBG]end load texture:122.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:124
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:123.png
+[DEBG]glTexImage2D:1103157083,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1103157083                              ¡¾¡Ì¡¿
+[DEBG]end load texture:123.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:125
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:124.png
+[DEBG]glTexImage2D:-1038767578,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1038767578                             ¡¾¡Ì¡¿
+[DEBG]end load texture:124.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:126
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:125.png
+[DEBG]glTexImage2D:-1582633779,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1582633779                             ¡¾¡Ì¡¿
+[DEBG]end load texture:125.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:127
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:126.png
+[DEBG]glTexImage2D:-154616704,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-154616704                              ¡¾¡Ì¡¿
+[DEBG]end load texture:126.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:128
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:127.png
+[DEBG]glTexImage2D:-313721297,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-313721297                              ¡¾¡Ì¡¿
+[DEBG]end load texture:127.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:129
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:128.png
+[DEBG]glTexImage2D:23394698,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:23394698                                ¡¾¡Ì¡¿
+[DEBG]end load texture:128.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:130
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:129.png
+[DEBG]glTexImage2D:490672129,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:490672129                               ¡¾¡Ì¡¿
+[DEBG]end load texture:129.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:131
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:130.png
+[DEBG]glTexImage2D:242663364,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:242663364                               ¡¾¡Ì¡¿
+[DEBG]end load texture:130.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:132
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:131.png
+[DEBG]glTexImage2D:1655235267,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1655235267                              ¡¾¡Ì¡¿
+[DEBG]end load texture:131.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:133
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:132.png
+[DEBG]glTexImage2D:280287662,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:280287662                               ¡¾¡Ì¡¿
+[DEBG]end load texture:132.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:134
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:133.png
+[DEBG]glTexImage2D:34411253,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:34411253                                ¡¾¡Ì¡¿
+[DEBG]end load texture:133.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:135
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:134.png
+[DEBG]glTexImage2D:-928375352,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-928375352                              ¡¾¡Ì¡¿
+[DEBG]end load texture:134.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:136
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:135.png
+[DEBG]glTexImage2D:-1389151977,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1389151977                             ¡¾¡Ì¡¿
+[DEBG]end load texture:135.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:137
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:136.png
+[DEBG]glTexImage2D:1374293650,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1374293650                              ¡¾¡Ì¡¿
+[DEBG]end load texture:136.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:138
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:137.png
+[DEBG]glTexImage2D:-914814551,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-914814551                              ¡¾¡Ì¡¿
+[DEBG]end load texture:137.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:139
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:138.png
+[DEBG]glTexImage2D:1824029324,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1824029324                              ¡¾¡Ì¡¿
+[DEBG]end load texture:138.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:140
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:139.png
+[DEBG]glTexImage2D:1670542635,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1670542635                              ¡¾¡Ì¡¿
+[DEBG]end load texture:139.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:141
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:140.png
+[DEBG]glTexImage2D:-1714676682,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1714676682                             ¡¾¡Ì¡¿
+[DEBG]end load texture:140.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:142
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:141.png
+[DEBG]glTexImage2D:-679426019,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-679426019                              ¡¾¡Ì¡¿
+[DEBG]end load texture:141.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:143
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:142.png
+[DEBG]glTexImage2D:-694928880,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-694928880                              ¡¾¡Ì¡¿
+[DEBG]end load texture:142.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:144
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:143.png
+[DEBG]glTexImage2D:1531497215,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1531497215                              ¡¾¡Ì¡¿
+[DEBG]end load texture:143.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:145
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:144.png
+[DEBG]glTexImage2D:187254426,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:187254426                               ¡¾¡Ì¡¿
+[DEBG]end load texture:144.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:146
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:145.png
+[DEBG]glTexImage2D:347071057,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:347071057                               ¡¾¡Ì¡¿
+[DEBG]end load texture:145.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:147
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:146.png
+[DEBG]glTexImage2D:936411220,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:936411220                               ¡¾¡Ì¡¿
+[DEBG]end load texture:146.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:148
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:147.png
+[DEBG]glTexImage2D:503852691,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:503852691                               ¡¾¡Ì¡¿
+[DEBG]end load texture:147.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:149
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:148.png
+[DEBG]glTexImage2D:-692416066,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-692416066                              ¡¾¡Ì¡¿
+[DEBG]end load texture:148.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:150
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:149.png
+[DEBG]glTexImage2D:1272163397,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1272163397                              ¡¾¡Ì¡¿
+[DEBG]end load texture:149.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:151
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:150.png
+[DEBG]glTexImage2D:-412798632,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-412798632                              ¡¾¡Ì¡¿
+[DEBG]end load texture:150.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:152
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:151.png
+[DEBG]glTexImage2D:-1798941721,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1798941721                             ¡¾¡Ì¡¿
+[DEBG]end load texture:151.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:153
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:152.png
+[DEBG]glTexImage2D:1674035618,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1674035618                              ¡¾¡Ì¡¿
+[DEBG]end load texture:152.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:154
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:153.png
+[DEBG]glTexImage2D:527383033,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:527383033                               ¡¾¡Ì¡¿
+[DEBG]end load texture:153.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:155
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:154.png
+[DEBG]glTexImage2D:-1540165348,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1540165348                             ¡¾¡Ì¡¿
+[DEBG]end load texture:154.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:156
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:155.png
+[DEBG]glTexImage2D:479244027,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:479244027                               ¡¾¡Ì¡¿
+[DEBG]end load texture:155.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:157
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:156.png
+[DEBG]glTexImage2D:629889606,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:629889606                               ¡¾¡Ì¡¿
+[DEBG]end load texture:156.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:158
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:157.png
+[DEBG]glTexImage2D:720330605,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:720330605                               ¡¾¡Ì¡¿
+[DEBG]end load texture:157.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:159
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:158.png
+[DEBG]glTexImage2D:1850155936,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1850155936                              ¡¾¡Ì¡¿
+[DEBG]end load texture:158.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:160
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:159.png
+[DEBG]glTexImage2D:-115313713,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-115313713                              ¡¾¡Ì¡¿
+[DEBG]end load texture:159.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:161
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:160.png
+[DEBG]glTexImage2D:559325098,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:559325098                               ¡¾¡Ì¡¿
+[DEBG]end load texture:160.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:162
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:161.png
+[DEBG]glTexImage2D:-1549881183,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1549881183                             ¡¾¡Ì¡¿
+[DEBG]end load texture:161.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:163
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:162.png
+[DEBG]glTexImage2D:-622859036,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-622859036                              ¡¾¡Ì¡¿
+[DEBG]end load texture:162.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:164
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:163.png
+[DEBG]glTexImage2D:-651258269,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-651258269                              ¡¾¡Ì¡¿
+[DEBG]end load texture:163.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:165
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:164.png
+[DEBG]glTexImage2D:-378169906,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-378169906                              ¡¾¡Ì¡¿
+[DEBG]end load texture:164.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:166
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:165.png
+[DEBG]glTexImage2D:-1923513963,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1923513963                             ¡¾¡Ì¡¿
+[DEBG]end load texture:165.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:167
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:166.png
+[DEBG]glTexImage2D:-2026884888,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-2026884888                             ¡¾¡Ì¡¿
+[DEBG]end load texture:166.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:168
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:167.png
+[DEBG]glTexImage2D:-527971657,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-527971657                              ¡¾¡Ì¡¿
+[DEBG]end load texture:167.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:169
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:168.png
+[DEBG]glTexImage2D:-1865219918,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:-1865219918                             ¡¾¡Ì¡¿
+[DEBG]end load texture:168.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]CSceneManager::addModel size:170
+[DEBG]Instance CReadFileStream                                        ¡¾¡Ì¡¿
+[DEBG]start load texture:169.png
+[DEBG]glTexImage2D:1459742281,512,512,mipmap:0,R8G8B8A8
+[DEBG]Instance COGLES1Texture:1459742281                              ¡¾¡Ì¡¿
+[DEBG]end load texture:169.png                                        ¡¾¡Ì¡¿
+[DEBG]Release CReadFileStream                                         ¡¾¡Ì¡¿
+[DEBG]nativeOnBack
+[INFO]callbackDestroy function
+[INFO]Release 2/2 WaveLoader
+[INFO]Release 0/0 Sound
+[INFO]Release COALAudioDriver                                         ¡¾¡Ì¡¿
+[INFO]Release CGraphicsAdapter                                        ¡¾¡Ì¡¿
+[DEBG]Release CDebugPrinter                                           ¡¾¡Ì¡¿
+[DEBG]Release 0/0 Hardwarebuffer
+[DEBG]Release 1/1 ImageLoader
+[DEBG]Release COGLES1Texture:100271                                   ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:315638026                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:534244737                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1505553220                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1563003837                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-867317458                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1700480907                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-2028555960                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1841779351                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1054071278                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1422854359                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1408567796                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1363318443                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1671093174                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-553484899                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1286872464                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:772961407                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:55586330                                 ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:229433297                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1984777172                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-760160237                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1251139266                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-24809019                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1995859160                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1369731737                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:622950690                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:639059833                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-2009592676                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1843916923                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1861240378                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:257373421                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1874352352                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1985428815                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-110024918                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-996684255                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-569681820                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-248879133                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1123665230                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1279092501                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-2082601880                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-562682825                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-763602894                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:221385673                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1257025748                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1622599243                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-447847466                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1357273027                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1245420720                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:912581151                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1435751366                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-901400463                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1344803060                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:357043123                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-530795170                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:2070517861                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1169068024                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1535907591                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:2077606722                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1358013415                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1814937020                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1251244059                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1692411418                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1194928243                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1322319424                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1081056529                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-902152886                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1977377087                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1687451012                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:500091779                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1539240302                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1654192715                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1896417160                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-556636713                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1518778962                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1744380009                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:131618892                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-64641557                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1477254134                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-392445219                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1460194256                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:653180863                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:462707290                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1520533231                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:469861908                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-2126272685                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-167151234                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:760393477                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1733192472                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1295913127                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1051213154                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-234921799                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1826349348                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-976261189                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1012869638                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:211118637                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1868298912                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:357890191                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:2146665322                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1122197345                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1876968100                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:501980963                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1927630222                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1611240533                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-962610520                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-2021386377                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1626125198                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1259463415                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1507987820                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1203164555                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-216071146                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1416678781                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:774089456                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1755837089                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:126924922                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1600076209                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-496915660                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:164344563                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:683371934                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1948824997                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-102894024                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:974748231                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1453267070                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:374494553                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:2023960572                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1103157083                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1038767578                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1582633779                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-154616704                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-313721297                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:23394698                                 ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:490672129                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:242663364                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1655235267                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:280287662                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:34411253                                 ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-928375352                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1389151977                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1374293650                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-914814551                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1824029324                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1670542635                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1714676682                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-679426019                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-694928880                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1531497215                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:187254426                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:347071057                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:936411220                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:503852691                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-692416066                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1272163397                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-412798632                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1798941721                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1674035618                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:527383033                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1540165348                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:479244027                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:629889606                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:720330605                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1850155936                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-115313713                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:559325098                                ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1549881183                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-622859036                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-651258269                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-378169906                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1923513963                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-2026884888                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-527971657                               ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:-1865219918                              ¡¾¡Ì¡¿
+[DEBG]Release COGLES1Texture:1459742281                               ¡¾¡Ì¡¿
+[DEBG]Release 171/171 Texture
+[DEBG]Release 7/7 MaterialRenderer
+[INFO]Release COGLES1Driver                                           ¡¾¡Ì¡¿
+[INFO]Release CSceneManager                                           ¡¾¡Ì¡¿
+[INFO]Release CFileSystem                                             ¡¾¡Ì¡¿
+[INFO]Destroy CYonEngineAndroid                                       ¡¾¡Ì¡¿
+[INFO]Release Logger                                                  ¡¾¡Ì¡¿

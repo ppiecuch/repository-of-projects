@@ -1,0 +1,40 @@
+加载一张图片的过程 所发生的函数:
+1.[CCSprite spriteWihtFile:@"xxxx"];  //函数内部用 CCTexureCache  创建一个CTexture2D对象.
+
+2.[CCTexureCache sharedTexure] addImage:@"xxxx"];  //首次创建,则加载图片创建纹理,并缓存.
+UImage* img =  [UImage initWithContentsOfFile:@"xxxx"]; //需要一些内存,这些内存是暂时的.创建纹理后被释放.
+[CCTexure2D initWithImage:img];  
+//这个函数内部会转换图片的像素格式,并向OpenGL分配纹理需要的空间.
+//分配空间大小的规则是: (2^n  x 2 ^n x 4)BYTE ,例如:加载一张128*128的图片 和 加载一张 128 * 100 或 99 * 99 的图片需要的内存大小相同。
+//如果加载一张513*129的图片,就会以1024*512来分配内存。
+//所以这里用ZWoptex来排列所有非规则( 大小不为 2^n  x 2 ^n )小图片是比较省内存的.
+
+3.[CCTexure2D initWithData:(void*) xx]; //这个函数主要是对函数2转换后的位图数据(RGBXXXX),进行纹理加载.
+//这里用到了OpenGL函数的 glGenTexures(产生一个纹理对象) glBindTexture(绑定为OPENGL当前纹理) glTexImage2D(给纹理加载位图数据) 
+//其中glTexImage2D内部会调用 gfxAllocateTextureLevel 函数分配内存.如果是1024*1024则是4M的大小. Instruments可以监控到 内存的分配函数gfxAllocateTextureLevel.
+
+//*********  以上是加载一张纹理的大小 ****************
+
+
+//*********  以下是绘画一张纹理的大小 *****************
+//OpenGL绘画纹理还需要消耗内存.
+在CCSprite 的 draw 函数中:
+glDrawArrays 函数内部调用 gldLoadTextureLevelBuffer . Instruments可以监控到 内存的分配函数 gldLoadTextureLevelBuffer .
+这里需要的内存为:实际绘画纹理大小的规则大小.
+例如:一张大小为800*600的图片 需要 1024*1024*4 = 4M 内存用于纹理加载。
+如果只绘画这张图片的 某个 28*28大小的 区域, 那么还需要一个 32 * 32 *4 = 4K 大小的内存. 共用4.004M内存
+如果需要绘画800*600的全部区域,则需要1024*1024 = 4M内存. 共用8M内存
+
+
+//*********  以下是关于CCTextureCache 的使用建议 *****************
+1.纹理缓存 有个 purgSharedTexureCache可以删除当前纹理缓存,释放当前纹理缓存,但其他CCSprite有对纹理的引用,所以这个函数不会真的释放内存,而且再次加载已经存在的纹理的时候又需要大量内存. 
+不建议使用 purgSharedTexureCache. removeAllTextures也是一样的情况.
+
+2.使用removeUnusedTexutres 来释放已经没有其他对象引用的纹理.
+
+3.非重复性图片不建议使用CCTexureCache来缓存纹理.直接用CCTexture2D创建纹理. 比如,一些内存资源比较紧缺的设备,处理非重复性图片(某些单一对话框背景)不缓存.
+
+
+//**********************   仅供参考  ******************
+
+http://www.cocoachina.com/bbs/simple/?t56479.html
