@@ -7,6 +7,7 @@
 //refer to:https://github.com/mantidproject/3rdpartyincludes/blob/master/boost/ref.hpp
 //refer to:http://songyiwei1984.blog.163.com/blog/static/1121277402011026104031978/
 //refer to:http://blog.csdn.net/demon__hunter/article/details/5450498
+//refer to:http://blog.csdn.net/pongba/article/details/83828
 //refer to:http://www.boost.org/doc/libs/1_34_1/boost/type_traits/is_member_pointer.hpp
 
 inline void current_function_helper()
@@ -306,10 +307,50 @@ struct is_mem_function_pointer
 	static const bool value = is_mem_fun_pointer_impl<T>::value;
 };
 
-template <bool>
-struct is_member_pointer_select
-	: ::boost::type_traits::false_result
+//refer to:type_traits\detail\false_result.hpp
+// Utility class which always "returns" false
+struct false_result
 {
+	template <typename T> struct result_
+	{
+		BOOST_STATIC_CONSTANT(bool, value = false);
+	};
+};
+
+//refer to:type_traits\detail\ice_or.hpp
+//相当于逻辑或
+template <bool b1, bool b2, bool b3 = false, bool b4 = false, bool b5 = false, bool b6 = false, bool b7 = false>
+struct ice_or;
+
+template <bool b1, bool b2, bool b3, bool b4, bool b5, bool b6, bool b7>
+struct ice_or
+{
+	BOOST_STATIC_CONSTANT(bool, value = true);
+};
+
+template <>
+struct ice_or<false, false, false, false, false, false, false>
+{
+	BOOST_STATIC_CONSTANT(bool, value = false);
+};
+
+
+template <bool>
+struct is_member_pointer_select : false_result
+{
+};
+
+//refer to:container\detail\type_traits.hpp
+template<class T>
+struct is_reference
+{
+	enum {  value = false   };
+};
+
+template<class T>
+struct is_reference<T&>
+{
+	enum {  value = true   };
 };
 
 template <>
@@ -320,21 +361,35 @@ struct is_member_pointer_select<false>
 		static T* make_t();
 		BOOST_STATIC_CONSTANT(
 			bool, value =
-			(::boost::type_traits::ice_or<
-			(1 == sizeof(::boost::type_traits::is_mem_fun_pointer_tester(make_t()))),
+			(ice_or<
+			(1 == sizeof(is_mem_fun_pointer_tester(make_t()))),
 			(1 == sizeof(is_member_pointer_tester(make_t())))
 			>::value) );
 	};
 };
 
+// 缺省
+template<typename T>
+struct is_array
+{
+	static const bool value=false;
+};
+
+// 偏特化
+template<typename T,size_t N>
+struct is_array<T[N]>
+{
+	static const bool value=true;
+};
+
 template <typename T>
 struct is_member_pointer_impl
 	: is_member_pointer_select<
-	::boost::type_traits::ice_or<
-	::boost::is_reference<T>::value
-	, ::boost::is_array<T>::value
+	ice_or<
+	is_reference<T>::value
+	, is_array<T>::value
 	>::value
-		>::template result_<T>
+	>::template result_<T>
 {
 };
 //bool_trait_def.hpp
@@ -915,6 +970,131 @@ struct is_member_pointer_impl<const volatile void>
 # define BOOST_PP_FOR_CHECK_BOOST_PP_FOR_255(s, p, o, m) 0
 # define BOOST_PP_FOR_CHECK_BOOST_PP_FOR_256(s, p, o, m) 0
 
+//refer to:\preprocessor\cat.hpp
+#define BOOST_PP_CAT(a, b) BOOST_PP_CAT_I(a, b)
+#define BOOST_PP_CAT_I(a, b) a ## b
+
+
+//refer to:\preprocessor\list\adt.hpp
+#    define BOOST_PP_LIST_IS_CONS(list) BOOST_PP_IS_BINARY(list)
+
+# define BOOST_PP_LIST_REST(list) BOOST_PP_LIST_REST_D(list)
+#    define BOOST_PP_LIST_REST_D(list) BOOST_PP_LIST_REST_I ## list
+# define BOOST_PP_LIST_REST_I(head, tail) tail
+
+# define BOOST_PP_LIST_FIRST(list) BOOST_PP_LIST_FIRST_D(list)
+#    define BOOST_PP_LIST_FIRST_D(list) BOOST_PP_LIST_FIRST_I ## list
+# define BOOST_PP_LIST_FIRST_I(head, tail) head
+
+//refer to:preprocessor\detail\is_binary.hpp
+#    define BOOST_PP_IS_BINARY(x) BOOST_PP_CHECK(x, BOOST_PP_IS_BINARY_CHECK)
+
+//The BOOST_PP_NIL identifier is reserved by the library to indicate a non-macro.
+//This identifier is not defined.  Its purpose is to not be a macro.  It is also used to terminate a list.
+
+# define BOOST_PP_IS_BINARY_CHECK(a, b) 1
+# define BOOST_PP_CHECK_RESULT_BOOST_PP_IS_BINARY_CHECK 0, BOOST_PP_NIL
+
+//refer to:preprocessor\detail\check.hpp
+#    define BOOST_PP_CHECK(x, type) BOOST_PP_CHECK_D(x, type)
+
+# define BOOST_PP_CHECK_RESULT_1 1, BOOST_PP_NIL
+
+#    define BOOST_PP_CHECK_D(x, type) BOOST_PP_CHECK_1(BOOST_PP_CAT(BOOST_PP_CHECK_RESULT_, type x))
+#    define BOOST_PP_CHECK_1(chk) BOOST_PP_CHECK_2(chk)
+#    define BOOST_PP_CHECK_2(res, _) res
+
+//refer to:preprocessor\variadic\size.hpp
+#        define BOOST_PP_VARIADIC_SIZE(...) BOOST_PP_CAT(BOOST_PP_VARIADIC_SIZE_I(__VA_ARGS__, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,),)
+#    define BOOST_PP_VARIADIC_SIZE_I(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, e56, e57, e58, e59, e60, e61, e62, e63, size, ...) size
+
+//refer to:\preprocessor\facilities\overload.hpp
+#    define BOOST_PP_OVERLOAD(prefix, ...) BOOST_PP_CAT(prefix, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__))
+
+
+
+//refer to:preprocessor\tuple\elem.hpp
+#        define BOOST_PP_VARIADIC_ELEM(n, ...) BOOST_PP_VARIADIC_ELEM_I(n,__VA_ARGS__)
+#        define BOOST_PP_VARIADIC_ELEM_I(n, ...) BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_VARIADIC_ELEM_, n)(__VA_ARGS__,),)
+
+#    define BOOST_PP_VARIADIC_ELEM_0(e0, ...) e0
+#    define BOOST_PP_VARIADIC_ELEM_1(e0, e1, ...) e1
+#    define BOOST_PP_VARIADIC_ELEM_2(e0, e1, e2, ...) e2
+#    define BOOST_PP_VARIADIC_ELEM_3(e0, e1, e2, e3, ...) e3
+#    define BOOST_PP_VARIADIC_ELEM_4(e0, e1, e2, e3, e4, ...) e4
+#    define BOOST_PP_VARIADIC_ELEM_5(e0, e1, e2, e3, e4, e5, ...) e5
+#    define BOOST_PP_VARIADIC_ELEM_6(e0, e1, e2, e3, e4, e5, e6, ...) e6
+#    define BOOST_PP_VARIADIC_ELEM_7(e0, e1, e2, e3, e4, e5, e6, e7, ...) e7
+#    define BOOST_PP_VARIADIC_ELEM_8(e0, e1, e2, e3, e4, e5, e6, e7, e8, ...) e8
+#    define BOOST_PP_VARIADIC_ELEM_9(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, ...) e9
+#    define BOOST_PP_VARIADIC_ELEM_10(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, ...) e10
+#    define BOOST_PP_VARIADIC_ELEM_11(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, ...) e11
+#    define BOOST_PP_VARIADIC_ELEM_12(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, ...) e12
+#    define BOOST_PP_VARIADIC_ELEM_13(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, ...) e13
+#    define BOOST_PP_VARIADIC_ELEM_14(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, ...) e14
+#    define BOOST_PP_VARIADIC_ELEM_15(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, ...) e15
+#    define BOOST_PP_VARIADIC_ELEM_16(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, ...) e16
+#    define BOOST_PP_VARIADIC_ELEM_17(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, ...) e17
+#    define BOOST_PP_VARIADIC_ELEM_18(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, ...) e18
+#    define BOOST_PP_VARIADIC_ELEM_19(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, ...) e19
+#    define BOOST_PP_VARIADIC_ELEM_20(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, ...) e20
+#    define BOOST_PP_VARIADIC_ELEM_21(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, ...) e21
+#    define BOOST_PP_VARIADIC_ELEM_22(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, ...) e22
+#    define BOOST_PP_VARIADIC_ELEM_23(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, ...) e23
+#    define BOOST_PP_VARIADIC_ELEM_24(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, ...) e24
+#    define BOOST_PP_VARIADIC_ELEM_25(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, ...) e25
+#    define BOOST_PP_VARIADIC_ELEM_26(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, ...) e26
+#    define BOOST_PP_VARIADIC_ELEM_27(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, ...) e27
+#    define BOOST_PP_VARIADIC_ELEM_28(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, ...) e28
+#    define BOOST_PP_VARIADIC_ELEM_29(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, ...) e29
+#    define BOOST_PP_VARIADIC_ELEM_30(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, ...) e30
+#    define BOOST_PP_VARIADIC_ELEM_31(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, ...) e31
+#    define BOOST_PP_VARIADIC_ELEM_32(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, ...) e32
+#    define BOOST_PP_VARIADIC_ELEM_33(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, ...) e33
+#    define BOOST_PP_VARIADIC_ELEM_34(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, ...) e34
+#    define BOOST_PP_VARIADIC_ELEM_35(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, ...) e35
+#    define BOOST_PP_VARIADIC_ELEM_36(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, ...) e36
+#    define BOOST_PP_VARIADIC_ELEM_37(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, ...) e37
+#    define BOOST_PP_VARIADIC_ELEM_38(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, ...) e38
+#    define BOOST_PP_VARIADIC_ELEM_39(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, ...) e39
+#    define BOOST_PP_VARIADIC_ELEM_40(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, ...) e40
+#    define BOOST_PP_VARIADIC_ELEM_41(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, ...) e41
+#    define BOOST_PP_VARIADIC_ELEM_42(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, ...) e42
+#    define BOOST_PP_VARIADIC_ELEM_43(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, ...) e43
+#    define BOOST_PP_VARIADIC_ELEM_44(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, ...) e44
+#    define BOOST_PP_VARIADIC_ELEM_45(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, ...) e45
+#    define BOOST_PP_VARIADIC_ELEM_46(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, ...) e46
+#    define BOOST_PP_VARIADIC_ELEM_47(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, ...) e47
+#    define BOOST_PP_VARIADIC_ELEM_48(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, ...) e48
+#    define BOOST_PP_VARIADIC_ELEM_49(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, ...) e49
+#    define BOOST_PP_VARIADIC_ELEM_50(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, ...) e50
+#    define BOOST_PP_VARIADIC_ELEM_51(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, ...) e51
+#    define BOOST_PP_VARIADIC_ELEM_52(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, ...) e52
+#    define BOOST_PP_VARIADIC_ELEM_53(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, ...) e53
+#    define BOOST_PP_VARIADIC_ELEM_54(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, ...) e54
+#    define BOOST_PP_VARIADIC_ELEM_55(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, ...) e55
+#    define BOOST_PP_VARIADIC_ELEM_56(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, e56, ...) e56
+#    define BOOST_PP_VARIADIC_ELEM_57(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, e56, e57, ...) e57
+#    define BOOST_PP_VARIADIC_ELEM_58(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, e56, e57, e58, ...) e58
+#    define BOOST_PP_VARIADIC_ELEM_59(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, e56, e57, e58, e59, ...) e59
+#    define BOOST_PP_VARIADIC_ELEM_60(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, e56, e57, e58, e59, e60, ...) e60
+#    define BOOST_PP_VARIADIC_ELEM_61(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, e56, e57, e58, e59, e60, e61, ...) e61
+#    define BOOST_PP_VARIADIC_ELEM_62(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, e56, e57, e58, e59, e60, e61, e62, ...) e62
+#    define BOOST_PP_VARIADIC_ELEM_63(e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14, e15, e16, e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32, e33, e34, e35, e36, e37, e38, e39, e40, e41, e42, e43, e44, e45, e46, e47, e48, e49, e50, e51, e52, e53, e54, e55, e56, e57, e58, e59, e60, e61, e62, e63, ...) e63
+
+//refer to:\preprocessor\tuple\rem.hpp
+# define BOOST_PP_TUPLE_REM_1(e0) e0
+# define BOOST_PP_TUPLE_REM_2(e0, e1) e0, e1
+# define BOOST_PP_TUPLE_REM_3(e0, e1, e2) e0, e1, e2
+# define BOOST_PP_TUPLE_REM_4(e0, e1, e2, e3) e0, e1, e2, e3
+
+#        define BOOST_PP_TUPLE_ELEM(...) BOOST_PP_TUPLE_ELEM_I(BOOST_PP_OVERLOAD(BOOST_PP_TUPLE_ELEM_O_, __VA_ARGS__), (__VA_ARGS__))
+#        define BOOST_PP_TUPLE_ELEM_I(m, args) BOOST_PP_TUPLE_ELEM_II(m, args)
+#        define BOOST_PP_TUPLE_ELEM_II(m, args) BOOST_PP_CAT(m ## args,)
+
+#    define BOOST_PP_TUPLE_ELEM_O_2(n, tuple) BOOST_PP_VARIADIC_ELEM(n, BOOST_PP_REM tuple)
+#    define BOOST_PP_TUPLE_ELEM_O_3(size, n, tuple) BOOST_PP_TUPLE_ELEM_O_2(n, tuple)
+
 //refer to:preprocessor/list/for_each_i.hpp
 #    define BOOST_PP_LIST_FOR_EACH_I(macro, data, list) BOOST_PP_LIST_FOR_EACH_I_I(macro, data, list)
 #    define BOOST_PP_LIST_FOR_EACH_I_I(macro, data, list) BOOST_PP_FOR((macro, data, list, 0), BOOST_PP_LIST_FOR_EACH_I_P, BOOST_PP_LIST_FOR_EACH_I_O, BOOST_PP_LIST_FOR_EACH_I_M)
@@ -930,17 +1110,41 @@ struct is_member_pointer_impl<const volatile void>
 #    define BOOST_PP_LIST_FOR_EACH_I_R(r, macro, data, list) BOOST_PP_LIST_FOR_EACH_I_R_I(r, macro, data, list)
 #    define BOOST_PP_LIST_FOR_EACH_I_R_I(r, macro, data, list) BOOST_PP_FOR_ ## r((macro, data, list, 0), BOOST_PP_LIST_FOR_EACH_I_P, BOOST_PP_LIST_FOR_EACH_I_O, BOOST_PP_LIST_FOR_EACH_I_M)
 
-//refer to:\preprocessor\cat.hpp
-#define BOOST_PP_CAT(a, b) BOOST_PP_CAT_I(a, b)
-#define BOOST_PP_CAT_I(a, b) a ## b
+//refer to:\preprocessor\tuple\to_list.hpp
+#        define BOOST_PP_TUPLE_TO_LIST(...) BOOST_PP_TUPLE_TO_LIST_I(BOOST_PP_OVERLOAD(BOOST_PP_TUPLE_TO_LIST_O_, __VA_ARGS__), (__VA_ARGS__))
+#        define BOOST_PP_TUPLE_TO_LIST_I(m, args) BOOST_PP_TUPLE_TO_LIST_II(m, args)
+#        define BOOST_PP_TUPLE_TO_LIST_II(m, args) BOOST_PP_CAT(m ## args,)
+
+//refer to:mpl\aux_\preprocessor\params.hpp
+#   define BOOST_MPL_PP_PARAMS(n,p) \
+	BOOST_PP_CAT(BOOST_MPL_PP_PARAMS_,n)(p) \
+
+#   define BOOST_MPL_PP_PARAMS_0(p)
+#   define BOOST_MPL_PP_PARAMS_1(p) p##1
+#   define BOOST_MPL_PP_PARAMS_2(p) p##1,p##2
+#   define BOOST_MPL_PP_PARAMS_3(p) p##1,p##2,p##3
+#   define BOOST_MPL_PP_PARAMS_4(p) p##1,p##2,p##3,p##4
+#   define BOOST_MPL_PP_PARAMS_5(p) p##1,p##2,p##3,p##4,p##5
+#   define BOOST_MPL_PP_PARAMS_6(p) p##1,p##2,p##3,p##4,p##5,p##6
+#   define BOOST_MPL_PP_PARAMS_7(p) p##1,p##2,p##3,p##4,p##5,p##6,p##7
+#   define BOOST_MPL_PP_PARAMS_8(p) p##1,p##2,p##3,p##4,p##5,p##6,p##7,p##8
+#   define BOOST_MPL_PP_PARAMS_9(p) p##1,p##2,p##3,p##4,p##5,p##6,p##7,p##8,p##9
 
 //refer to: mpl\aux_\lambda_support.hpp
-#   define BOOST_MPL_AUX_ADL_BARRIER_NAMESPACE mpl_
+
+#   define BOOST_MPL_AUX_LAMBDA_SUPPORT_HAS_REBIND(i, name, params) \
+	template< BOOST_MPL_PP_PARAMS(i,typename T) > \
+	yes_tag operator|( \
+	has_rebind_tag<int> \
+	, has_rebind_tag< name<BOOST_MPL_PP_PARAMS(i,T)> >* \
+	); \
+
+//#   define BOOST_MPL_AUX_ADL_BARRIER_NAMESPACE mpl_
 #   define BOOST_MPL_AUX_LAMBDA_SUPPORT_ARG_TYPEDEF_FUNC(R,typedef_,i,param) \
 	typedef_ param BOOST_PP_CAT(arg,BOOST_PP_INC(i)); \
 
 #define BOOST_MPL_AUX_LAMBDA_SUPPORT_SPEC(i, name, params) \
-	typedef BOOST_MPL_AUX_ADL_BARRIER_NAMESPACE::int_<i> arity; \
+	typedef int_<i> arity; \
 	BOOST_PP_LIST_FOR_EACH_I_R( \
 	1 \
 	, BOOST_MPL_AUX_LAMBDA_SUPPORT_ARG_TYPEDEF_FUNC \
@@ -964,13 +1168,33 @@ public: \
 }; \
 /**/
 
+//refer to:container\detail\mpl.hpp
+template <class T, T val>
+struct integral_constant
+{
+	static const T value = val;
+	typedef integral_constant<T,val> type;
+};
+
 //refer to:type_traits\detail\bool_trait_def.hpp
 #define BOOST_TT_AUX_BOOL_TRAIT_VALUE_DECL(C) \
-	typedef ::boost::integral_constant<bool,C> base_; \
+	typedef integral_constant<bool,C> base_; \
 	using base_::value; \
 	/**/
 
-#define BOOST_TT_AUX_BOOL_C_BASE(C) : public ::boost::integral_constant<bool,C>
+
+//refer to:type_traits\detail\template_arity_spec.hpp
+#   define BOOST_TT_AUX_TEMPLATE_ARITY_SPEC(i, name) \
+	template< BOOST_MPL_PP_PARAMS(i, typename T) > \
+struct template_arity< \
+	name< BOOST_MPL_PP_PARAMS(i, T) > \
+> \
+	: int_<i> \
+{ \
+}; \
+	/**/
+
+#define BOOST_TT_AUX_BOOL_C_BASE(C) : public integral_constant<bool,C>
 
 #define BOOST_TT_AUX_BOOL_TRAIT_DEF1(trait,T,C) \
 template< typename T > struct trait \
@@ -984,7 +1208,7 @@ public:\
 	BOOST_TT_AUX_TEMPLATE_ARITY_SPEC(1,trait) \
 	/**/
 
-BOOST_TT_AUX_BOOL_TRAIT_DEF1(is_member_pointer,T,::boost::detail::is_member_pointer_impl<T>::value)
+BOOST_TT_AUX_BOOL_TRAIT_DEF1(is_member_pointer,T,is_member_pointer_impl<T>::value)
 
 /*
 
