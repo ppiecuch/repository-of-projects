@@ -54,8 +54,33 @@ void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, ji
 	getEngine()->onResize(w,h);
 }
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
-	getEngine()->run();
-	drawFrame();
+	if(getEngine()&&getEngine()->run())
+		drawFrame();
+	else
+	{
+		const char* className="yon/AndroidGLView";
+		jclass cls = pEnv->FindClass(className);
+		if (cls == NULL) {
+			Logger->warn("can not find %s\n",className);
+			return;
+		}
+		//再找类中的方法
+		jmethodID callbackDestroy = pEnv->GetMethodID(cls, "callbackDestroy", "()V");
+		if (destroy == NULL) 
+		{
+			Logger->warn("no callbackDestroy function\n");
+			return;
+		}
+		//回调java中的方法
+		Logger->info("callbackDestroy function\n");
+		destroy();
+		LOGD(LOG_TAG,"delete callback");
+		delete callback;
+		LOGD(LOG_TAG,"pEnv->DeleteGlobalRef(g_obj)");
+		pEnv->DeleteGlobalRef(g_obj);
+		LOGD(LOG_TAG,"pEnv->CallVoidMethod(obj, callbackDestroy)");
+		pEnv->CallVoidMethod(obj, callbackDestroy);
+	}
 }
 void Java_yon_AndroidGLView_nativeOnPause(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnPause\n");
