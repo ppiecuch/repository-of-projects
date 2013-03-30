@@ -275,7 +275,8 @@ namespace yon{
 			//获取渲染对象，如果是默认颜色缓冲区则为NULL
 			virtual ITexture* getRenderTarget() const = 0;
 			//添加一张用于渲染缓冲的纹理,size必须是2的N次幂,并且长度都不可超过后缓冲区的大小
-			virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name = "rtt", video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G6B5, bool offScreen=false, bool fixSize=true) =0;
+			//@param autoOffScreen : true,use off screen render texture if possible; otherwise use on screen one imperatively
+			virtual ITexture* addRenderTargetTexture(const core::dimension2du& size,const io::path& name = "rtt", video::ENUM_COLOR_FORMAT format = video::ENUM_COLOR_FORMAT_R5G6B5, bool autoOffScreen=true, bool fixSize=true) =0;
 			//参数texture:必须是由addRenderTargetTexture生成的texture
 			//参数color:render target的背景色
 			//virtual bool setRenderTarget(video::ITexture* texture,
