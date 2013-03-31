@@ -138,6 +138,18 @@ namespace core{
 	private:
 		sem_t m_semaphore;
 	};
+
+	class ScopeMutex{
+	private:
+		ScopeMutex(const ScopeMutex&);
+		ScopeMutex& operator=(const ScopeMutex&);
+		mutex& m_mutex;
+	public:
+		ScopeMutex(mutex& m):m_mutex(m){
+			m_mutex.wait();
+		}
+		~ScopeMutex(){m_mutex.notify();}
+	};
 }
 }
 #endif

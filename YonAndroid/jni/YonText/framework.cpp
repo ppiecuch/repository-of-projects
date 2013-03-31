@@ -9,7 +9,7 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 ITimer* timer=NULL;
 ITextSystem* textSystem=NULL;
 II18NManager* i18nMgr=NULL;
@@ -76,7 +76,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	//pCamera=sceneMgr->addCameraFPS();
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 	timer=engine->getTimer();
 	textSystem=engine->getTextSystem();
 	i18nMgr=engine->getI18NManager();
