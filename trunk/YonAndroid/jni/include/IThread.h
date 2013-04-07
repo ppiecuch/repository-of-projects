@@ -51,7 +51,7 @@ namespace yon{
 		//virtual void setPriority(ENUM_THRAD_PRIORITY m_ePriority) = 0;
 
 		//ENUM_THRAD_PRIORITY getPriority() const { return m_ePriority; }
-		ENUM_THREAD_STATE getState() const { return m_eState; }
+		virtual ENUM_THREAD_STATE getState() { return m_eState; }
 
 		//virtual bool join(u32 millisec = 0) = 0;
 		virtual void suspend() = 0;

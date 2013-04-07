@@ -65,9 +65,8 @@ namespace gui{
 		{
 			if(&result!=&m_renderEntries)
 			{
-				u32 len=result.size();
 				for(u32 i=0;i<m_renderEntries.size();++i)
-					result[len+i]=m_renderEntries[i];
+					result.push_back(m_renderEntries[i]);
 			}
 			WidgetList::Iterator it=m_children.begin();
 			for(;it!=m_children.end();++it)
@@ -218,7 +217,7 @@ namespace gui{
 
 	public:
 		IWidget(widget::ENUM_TYPE type,IGUISystem* guiSystem,IWidget* parent,const core::stringc& id,const core::recti& rectangle)
-			:m_type(type),m_parent(parent),m_id(id),m_bMessageReceivable(true),m_bPartial(false),
+			:m_type(type),m_parent(parent),m_id(id),m_bMessageReceivable(true),m_bPartial(false),m_pSysem(guiSystem),
 			m_relativeRect(rectangle),m_absoluteRect(rectangle),m_desiredRect(rectangle),m_absoluteClippingRect(rectangle),
 			m_bVisible(true),m_alignLeft(widget::UPPERLEFT), m_alignRight(widget::UPPERLEFT), m_alignTop(widget::UPPERLEFT), m_alignBottom(widget::UPPERLEFT)
 		{

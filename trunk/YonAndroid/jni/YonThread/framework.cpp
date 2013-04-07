@@ -35,7 +35,7 @@ struct SMyRunnable1 : public yon::IRunnable{
 			mt.notify();
 			core::yonSleep(50);
 			YON_DEBUG("SMyRunnable1(%d)\r\n",i);
-			thread1->suspend();
+			//thread1->suspend();
 		}
 		core::yonSleep(50);
 		YON_INFO("end SMyRunnable1():%d\r\n",testNum);
