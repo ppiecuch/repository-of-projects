@@ -20,19 +20,24 @@ core::threadpool* pool=NULL;
 class MyWork : public core::IWork{
 public:
 	static core::mutex s_mutex;
+	//static core::semaphore s_mutex;
 	static s32 counter;
-	const s32 count;
-	MyWork():count(counter++){}
+	s32 count;
+	MyWork():count(0){}
 public:
 	virtual void process(){
 		s_mutex.wait();
+		counter<<=1;
+		counter-=1;
+		count=counter;
 		YON_DEBUG("process mywork:%d\r\n",count);
 		s_mutex.notify();
 		core::yonSleep(500);
 	}
 };
 core::mutex MyWork::s_mutex;
-s32 MyWork::counter=0;
+//core::semaphore MyWork::s_mutex;
+s32 MyWork::counter=1;
 
 void addWork(){
 	if(pool)
@@ -107,7 +112,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 #endif
 	
 	YON_DEBUG("start createThreadPool()\r\n");
-	pool=core::createThreadPool(2);
+	pool=core::createThreadPool(5);
 	pool->run();
 	YON_DEBUG("end createThreadPool()\r\n");
 	

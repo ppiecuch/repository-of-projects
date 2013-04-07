@@ -25,6 +25,8 @@
 #error unrecognized GNU C compiler
 #endif
 #define YON_COMPILE_WITH_MACOSX
+#elif defined(_PS3)
+#define YON_COMPILE_WITH_PS3
 #else
 #error unrecognized compile platform
 #endif // WIN32

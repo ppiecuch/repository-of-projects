@@ -3,7 +3,6 @@
 
 #include "IShap.h"
 #include "yonArray.h"
-#include "SVertex.h"
 
 
 namespace yon{

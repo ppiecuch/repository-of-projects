@@ -31,7 +31,7 @@ public:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_MOVE:
-				logger->debug("[LM]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
+				//logger->debug("[LM]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
 				return true;
 			}
 			break;
@@ -76,12 +76,19 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	logger=Logger;
 
 #ifdef YON_COMPILE_WITH_WIN32
-	fs->addWorkingDirectory("../media/");
+	fs->addWorkingDirectory("../media/ui");
 #elif defined(YON_COMPILE_WITH_ANDROID)
-	fs->addWorkingDirectory("media/");
+	fs->addWorkingDirectory("media/ui");
 #endif
 
-	button=guiSystem->addButton(NULL,"test",core::recti(10,240,110,240+32));
+	ITheme* theme=guiSystem->getBindedTheme();
+	gui::SSkin skin;
+
+	ITexture* texture=videoDriver->getTexture("skin00.png");
+	skin.build(texture,78,629,223-78,682-629);
+	theme->addSkin(widget::BUTTON,widget::LEAVE,widget::CNT,skin);
+
+	button=guiSystem->addButton(NULL,"test",core::recti(10,240,10+223-78,240+682-629));
 
 	return true;
 }

@@ -34,7 +34,20 @@ namespace gui{
 			FOCUS	= 0x00000010,
 			//TODO 长按
 			//HOLD
-			ENUM_STATE_COUNT
+			ENUM_STATE_COUNT = 6
+		};
+
+		enum ENUM_AZIM{
+			CNT = 0,
+			NTH,
+			NE,
+			EST,
+			SE,
+			STH,
+			SW,
+			WST,
+			NW,
+			ENUM_AZIM_COUNT
 		};
 
 		const static c8* TYPE_NAMES[ENUM_TYPE_COUNT] =
@@ -46,6 +59,18 @@ namespace gui{
 			"upperleft",
 			"lowerright",
 			"center"
+		};
+		const static c8* AZIM_NAMES[ENUM_AZIM_COUNT] =
+		{
+			"center",
+			"north",
+			"northeast",
+			"east",
+			"southeast",
+			"south",
+			"southwest",
+			"west",
+			"northwest"
 		};
 
 		//TODO MASK_STATE是非递增枚举

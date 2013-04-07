@@ -43,6 +43,7 @@
 #include "yonMath.h" 
 #include "yonMap.h"
 #include "yonMutex.h"
+#include "yonSemaphore.h"
 #include "yonString.h" 
 #include "yonUString.h"
 #include "matrix4.h" 
@@ -53,6 +54,8 @@
 #include "IGUISystem.h"
 #include "IWidget.h"
 #include "IButton.h"
+#include "ITheme.h"
+#include "SSkin.h"
 
 #include "path.h" 
 #include "IFileSystem.h" 

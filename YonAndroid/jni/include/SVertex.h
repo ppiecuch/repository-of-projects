@@ -10,6 +10,7 @@ namespace yon{
 namespace scene{
 		
 	enum ENUM_VERTEX_TYPE{
+		ENUM_VERTEX_TYPE_UNKNOWN = -1,
 		ENUM_VERTEX_TYPE_3V1T1C = 0,
 		ENUM_VERTEX_TYPE_2V1T1C,
 		ENUM_VERTEX_TYPE_3V2T1C
@@ -78,6 +79,24 @@ namespace scene{
 
 		static ENUM_VERTEX_TYPE getType();
 	};
+
+	template<typename T>
+	struct VertexType{
+		enum{Type = ENUM_VERTEX_TYPE_UNKNOWN};
+	};
+	template<>
+	struct VertexType<SVertex>{
+		enum{Type = ENUM_VERTEX_TYPE_3V1T1C};
+	};
+	template<>
+	struct VertexType<S2DVertex>{
+		enum{Type = ENUM_VERTEX_TYPE_2V1T1C};
+	};
+	template<>
+	struct VertexType<SVertex2TCoords>{
+		enum{Type = ENUM_VERTEX_TYPE_3V2T1C};
+	};
+
 
 	inline u32 getSizeByVertexType(ENUM_VERTEX_TYPE type){
 		switch(type){

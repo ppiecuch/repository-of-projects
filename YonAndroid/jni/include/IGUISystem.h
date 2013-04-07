@@ -54,7 +54,7 @@ namespace gui{
 		virtual ITheme* getBindedTheme() = 0;
 
 		virtual ITheme* getTheme(const io::path& name) = 0;
-		virtual bool removeTheme(ITheme* theme) = 0;
+		virtual bool removeTheme(const io::path& name) = 0;
 	};
 
 	IGUISystem* createGUISystem(io::IFileSystem* fileSystem,video::IVideoDriver* videoDriver);

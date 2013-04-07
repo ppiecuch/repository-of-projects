@@ -35,6 +35,8 @@ namespace yon{
 
 	namespace video{
 
+		static u16 COMMON_INDICES[]={0,1,3,3,1,2};
+
 		IImageLoader* createImageLoaderPNG();
 		IImageLoader* createImageLoaderTGA();
 		IImageLoader* createImageLoaderDDS();
@@ -217,21 +219,23 @@ namespace yon{
 				else
 					m_renderUnit2DPool.recycle(unit);
 			}
-			const core::array<u16>& getRectangleIndices(u32 verticeCount){
+			//deprecated 没多大通用性，所以废弃
+			/*const core::array<u16>& getRectangleIndices(u32 verticeCount){
 				YON_DEBUG_BREAK_IF(verticeCount%4!=0||verticeCount>=43690);
 				u16 indiceCount=(verticeCount>>1)*3;
 				u32 count=m_rectangleIndices.capacity();
+				u32 vc=(count/3)<<1;
 				if(count<indiceCount)
 				{
 					m_rectangleIndices.set_used(indiceCount);
 					static u16 indices[]={0,1,3,3,1,2};
 					for(u32 i=count;i<indiceCount;++i)
-						m_rectangleIndices[i]=verticeCount+indices[i%6];
+						m_rectangleIndices[i]=vc+indices[i%6];
 				}
 				else
 					m_rectangleIndices.set_used(indiceCount);
 				return m_rectangleIndices;
-			}
+			}*/
 
 			virtual s64 getVideoMemory() const = 0;
 			virtual c8* getVideoMemoryString() const = 0;

@@ -3,7 +3,7 @@
 
 #include "objectpool.h"
 #include "yonArray.h"
-#include "SVertex.h"
+#include "SDynamicShap.h"
 
 namespace yon{
 namespace video{
@@ -19,8 +19,7 @@ namespace video{
 		friend class IVideoDriver;
 	public:
 		video::ITexture* Texture;
-		core::array<V> Vertices;
-		//u16 IndexCount;
+		scene::SDynamicShap<V,u16,scene::VertexType<V>::Type> Shap;
 		
 		bool isForBatch() const{
 			return ForBatch;
@@ -28,8 +27,8 @@ namespace video{
 
 		virtual void reset(){
 			Texture=NULL;
-			Vertices.set_used(0);
-			//IndexCount=0;
+			Shap.getVertexArray().set_used(0);
+			Shap.getIndexArray().set_used(0);
 		}
 
 		scene::ENUM_VERTEX_TYPE getType() const{
