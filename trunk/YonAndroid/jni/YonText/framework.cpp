@@ -88,7 +88,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	fs->addWorkingDirectory("media/");
 #endif
 
-	family1=textSystem->getFontFamily("staaiti.ttf");
+	/*family1=textSystem->getFontFamily("staaiti.ttf");
 	core::ustring str1=i18nMgr->convert("天行健，君子以自强不息，地势坤，君子以厚德载物",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
 	textSystem->addText(str1,family1,core::position2di(0,50),20,video::COLOR_GREEN, text::ENUM_FONT_RENDER_MODE_NORMAL);
 
@@ -102,11 +102,11 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 
 	family4=textSystem->getFontFamily("stxingka.ttf");
 	core::ustring str4=i18nMgr->convert("人生结交在终始，莫为升沉中路分",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str4,family4,core::position2di(0,110),18 ,video::COLOR_PURPLE, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	textSystem->addText(str4,family4,core::position2di(0,110),18 ,video::COLOR_PURPLE, text::ENUM_FONT_RENDER_MODE_NORMAL);*/
 
-	family5=textSystem->getFontFamily("wryh.ttf");
+	family5=textSystem->getFontFamily("msyh.ttf");
 	core::ustring str5=i18nMgr->convert("水因地而制流，兵因敌而制胜。故兵无常势，水无常形。能因敌变化而取胜者，谓之神。",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str5,family5,core::position2di(0,130),15 ,video::COLOR_YELLOW, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	textSystem->addText(str5,family5,core::position2di(0,130),12 ,video::COLOR_YELLOW, text::ENUM_FONT_RENDER_MODE_NORMAL);
 
 	return true;
 }
