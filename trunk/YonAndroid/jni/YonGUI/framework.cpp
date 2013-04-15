@@ -86,7 +86,13 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	ITexture* texture=videoDriver->getTexture("skin00.png");
 	skin.build(texture,78,629,223-78,682-629);
+	theme->addSkin(widget::BUTTON,widget::HOVER,widget::CNT,skin);
+	skin.build(texture,78,704,223-78,757-704);
 	theme->addSkin(widget::BUTTON,widget::LEAVE,widget::CNT,skin);
+	//skin.build(texture,78,781,223-78,834-781);
+	//theme->addSkin(widget::BUTTON,widget::DOWN,widget::CNT,skin);
+	skin.build(texture,78,861,223-78,914-861);
+	theme->addSkin(widget::BUTTON,widget::DOWN,widget::CNT,skin);
 
 	button=guiSystem->addButton(NULL,"test",core::recti(10,240,10+223-78,240+682-629));
 
