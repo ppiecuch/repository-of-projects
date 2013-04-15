@@ -32,9 +32,18 @@ namespace gui{
 			HOVER	= 0x00000004,
 			LEAVE	= 0x00000008,
 			FOCUS	= 0x00000010,
+			BLUR	= 0x00000020,
 			//TODO ³¤°´
 			//HOLD
-			ENUM_STATE_COUNT = 6
+			ENUM_STATE_COUNT = 7
+		};
+
+		enum ENUM_SLICE{
+			ONE_REGION = 0,
+			NINE_GRID,
+			HORIZONTAL,
+			VERTICAL,
+			ENUM_SLICE_COUNT
 		};
 
 		enum ENUM_AZIM{

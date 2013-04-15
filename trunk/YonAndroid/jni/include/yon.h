@@ -98,6 +98,7 @@
 #include "IThread.h"
 //#include "IRandomizer.h"
 #include "IYonEngine.h" 
+#include "IHook.h"
 
 #include "SVideoDriverInfo.h" 
 #include "SYonEngineParameters.h" 

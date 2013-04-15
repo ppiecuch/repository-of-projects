@@ -50,11 +50,51 @@ namespace gui{
 
 		virtual const IWidget* getRootWidget() const = 0;
 
+		/** 
+		 * @brief Sets the focus to an element.
+		 *
+		 * Causes a BLUR message followed by a FOCUS message. 
+		 * If someone absorbed either of the messages,
+		 * then the focus will not be changed.
+		 * @param widget Pointer to the element which shall get the focus.
+		 * @return true on success, false on failure
+		 */
+		virtual bool setFocus(IWidget* widget) = 0;
+
+		/** 
+		 * @brief Returns the widget which holds the focus.
+		 *
+		 * @return Pointer to the widget with focus.
+		 */
+		virtual IWidget* getFocus() const = 0;
+
+		/**
+		 * @brief Removes the focus from an element.
+		 *
+		 * Causes a BLUR message. If the event is absorbed
+		 * then the focus will not be changed.
+		 * @param widget Pointer to the element which shall lose the focus.
+		 * @return true on success, false on failure
+		 */
+		virtual bool removeFocus(IWidget* widget) = 0;
+
+		/** 
+		 * @brief Returns whether the widget has focus
+		 *
+		 * @param widget Pointer to the widget which is tested.
+		 * @return True if the element has focus, else false.
+		 */
+		virtual bool hasFocus(IWidget* widget) const = 0;
+
+		virtual IWidget* getHovered() const = 0;
+
 		virtual bool bindTheme(ITheme* theme) = 0;
 		virtual ITheme* getBindedTheme() = 0;
 
 		virtual ITheme* getTheme(const io::path& name) = 0;
 		virtual bool removeTheme(const io::path& name) = 0;
+
+		virtual core::stringc getStateName(widget::ENUM_STATE state) const = 0;
 	};
 
 	IGUISystem* createGUISystem(io::IFileSystem* fileSystem,video::IVideoDriver* videoDriver);

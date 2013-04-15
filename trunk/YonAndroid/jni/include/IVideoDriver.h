@@ -165,7 +165,8 @@ namespace yon{
 		public:
 			IVideoDriver(io::IFileSystem* fs,ITimer* timer)
 				:m_renderMode(ENUM_RENDER_MODE_NONE),m_textureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_NONE),m_pFileSystem(fs),m_pTimer(timer),
-				m_orthdowProjMatrix(true),m_orthdowViewMatrix(true){
+				m_orthdowProjMatrix(true),m_orthdowViewMatrix(true)
+			{
 					if(m_pFileSystem)
 						m_pFileSystem->grab();
 					if(m_pTimer)
@@ -249,6 +250,10 @@ namespace yon{
 				for(u32 i=0;i<m_resizables.size();++i)
 					m_resizables[i]->onResize(size);
 			}
+
+			//! Get the size of the screen or render window.
+			/** \return Size of screen or render window. */
+			virtual const core::dimension2di& getScreenSize() const= 0;
 
 
 			//NOTE：在使用RTT的过程中，如果存在需要update的情况，则update必须放在当前帧所有使用此RTT的调用之前进行，否则会出现空白RTT的情况（跟GPU指令缓冲有关）
