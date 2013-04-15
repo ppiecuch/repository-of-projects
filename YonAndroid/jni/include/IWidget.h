@@ -44,6 +44,9 @@ namespace gui{
 
 		bool m_bDirty;
 
+		//! does this element ignore its parent's clipping rectangle?
+		bool m_bNoClip;
+
 		//! for calculating the difference when resizing parent
 		core::recti m_lastParentRect;
 
@@ -61,7 +64,7 @@ namespace gui{
 
 		core::array<video::RenderEntry2D> m_renderEntries;
 
-		void group(core::array<video::RenderEntry2D>& result)
+		virtual void group(core::array<video::RenderEntry2D>& result)
 		{
 			if(&result!=&m_renderEntries)
 			{
@@ -96,15 +99,15 @@ namespace gui{
 			{
 				parentAbsolute = m_parent->m_absoluteRect;
 
-				/*if (NoClip)
+				if (m_bNoClip)
 				{
-				IGUIElement* p=this;
-				while (p && p->Parent)
-				p = p->Parent;
-				parentAbsoluteClip = p->AbsoluteClippingRect;
+					IWidget* p=this;
+					while (p && p->m_parent)
+						p = p->m_parent;
+					parentAbsoluteClip = p->m_absoluteClippingRect;
 				}
 				else
-				parentAbsoluteClip = Parent->AbsoluteClippingRect;*/
+					parentAbsoluteClip = m_parent->m_absoluteClippingRect;
 			}
 
 			const s32 diffx = parentAbsolute.getWidth() - m_lastParentRect.getWidth();
@@ -217,8 +220,8 @@ namespace gui{
 
 	public:
 		IWidget(widget::ENUM_TYPE type,IGUISystem* guiSystem,IWidget* parent,const core::stringc& id,const core::recti& rectangle)
-			:m_type(type),m_parent(parent),m_id(id),m_bMessageReceivable(true),m_bPartial(false),m_pSysem(guiSystem),
-			m_relativeRect(rectangle),m_absoluteRect(rectangle),m_desiredRect(rectangle),m_absoluteClippingRect(rectangle),
+			:m_type(type),m_parent(parent),m_id(id),m_bMessageReceivable(true),m_bPartial(false),m_pSysem(guiSystem),m_bNoClip(false),
+			m_relativeRect(rectangle),m_absoluteRect(rectangle),m_desiredRect(rectangle),m_absoluteClippingRect(rectangle),m_bDirty(true),
 			m_bVisible(true),m_alignLeft(widget::UPPERLEFT), m_alignRight(widget::UPPERLEFT), m_alignTop(widget::UPPERLEFT), m_alignBottom(widget::UPPERLEFT)
 		{
 				if (parent)
@@ -274,6 +277,11 @@ namespace gui{
 			return m_renderEntries;
 		}
 
+		virtual bool handleMessage(const SMessage& msg)
+		{
+			return m_parent?m_parent->handleMessage(msg):false;
+		}
+
 		void setDirty(bool on)
 		{
 			m_bDirty=on;
@@ -288,6 +296,22 @@ namespace gui{
 				for(;it!=m_children.end();++it)
 					(*it)->setDirty(false);
 			}
+		}
+
+		//! Sets whether the element will ignore its parent's clipping rectangle
+		/** \param noClip If true, the element will not be clipped by its parent's clipping rectangle. */
+		void setNotClipped(bool noClip)
+		{
+			m_bNoClip = noClip;
+			updateAbsolutePosition();
+		}
+
+
+		//! Gets whether the element will ignore its parent's clipping rectangle
+		/** \return true if the element is not clipped by its parent's clipping rectangle. */
+		bool isNotClipped() const
+		{
+			return m_bNoClip;
 		}
 
 		bool isDirty() const{return m_bDirty;}

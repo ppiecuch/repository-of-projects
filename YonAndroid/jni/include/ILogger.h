@@ -60,8 +60,8 @@ namespace debug{
 		//virtual void setDebugPrinter(const video::IVideoDriver* driver,IDebugPrinter* printer) = 0;
 		//virtual IDebugPrinter* getDebugPrinter() const = 0;
 		//virtual IDebugPrinter* getDebugPrinter(const video::IVideoDriver* driver) const = 0;
-		virtual void drawString(const video::IVideoDriver* driver,const core::stringc& str,const core::position2di& pos=core::ORIGIN_VECTOR2DI,const video::SColor& color=video::COLOR_WHITE) = 0;
-		virtual void render(const video::IVideoDriver* driver) = 0;
+		virtual void drawString(const video::IVideoDriver* driver,const core::stringc& str,const core::position2di& pos=core::ORIGIN_VECTOR2DI,const video::SColor& color=video::COLOR_WHITE){}
+		virtual void render(const video::IVideoDriver* driver){}
 
 	};
 	//日志对象,供多方共享
