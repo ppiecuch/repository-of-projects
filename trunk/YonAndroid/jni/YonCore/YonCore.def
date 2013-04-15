@@ -1,0 +1,9 @@
+; YonCore.def : Declares the module parameters for the DLL.
+
+LIBRARY      "YonCore_debug"
+DESCRIPTION  'YonCore Windows Dynamic Link Library'
+
+EXPORTS
+    ; Explicit exports can go here
+SECTIONS
+_yon_hook_ READ WRITE SHARED

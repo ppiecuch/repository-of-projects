@@ -41,7 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;YONCORE_EXPORTS"
+				AdditionalIncludeDirectories="../include;../Yon/dirent;../Yon"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;YONCORE_EXPORTS;YON_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -60,7 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="$(OutDir)\$(ProjectName)_debug.dll"
 				LinkIncremental="2"
+				ModuleDefinitionFile=".\YonCore.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -174,6 +177,74 @@
 			>
 		</File>
 		<File
+			RelativePath="..\Yon\CFileSystem.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CFileSystem.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CHookWin32.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CHookWin32.h"
+			>
+		</File>
+		<File
+			RelativePath=".\CLogger.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\CLogger.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CReadFileStream.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CReadFileStream.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CReadMemoryStream.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CReadMemoryStream.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CThreadPosix.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CThreadPosix.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CThreadWin32.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CThreadWin32.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CWriteFileStream.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CWriteFileStream.h"
+			>
+		</File>
+		<File
+			RelativePath="..\Yon\CXMLReaderImpl.h"
+			>
+		</File>
+		<File
 			RelativePath="..\include\fastatof.h"
 			>
 		</File>
@@ -183,6 +254,10 @@
 		</File>
 		<File
 			RelativePath="..\include\ILogger.h"
+			>
+		</File>
+		<File
+			RelativePath="..\include\IThread.h"
 			>
 		</File>
 		<File
@@ -238,6 +313,18 @@
 			>
 		</File>
 		<File
+			RelativePath=".\yoncore.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\YonCore.def"
+			>
+		</File>
+		<File
+			RelativePath="..\include\yoncore.h"
+			>
+		</File>
+		<File
 			RelativePath="..\include\yonList.h"
 			>
 		</File>
@@ -250,7 +337,15 @@
 			>
 		</File>
 		<File
+			RelativePath="..\include\yonMutex.h"
+			>
+		</File>
+		<File
 			RelativePath="..\include\yonPack.h"
+			>
+		</File>
+		<File
+			RelativePath="..\include\yonSemaphore.h"
 			>
 		</File>
 		<File
