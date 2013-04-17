@@ -39,8 +39,8 @@
 #endif
 
 //视频模式(OpenGLES1/OpenGLES2)
-#define  YON_VIDEO_MODE_OGLES1
-//#define  YON_VIDEO_MODE_OGLES2
+//#define  YON_VIDEO_MODE_OGLES1
+#define  YON_VIDEO_MODE_OGLES2
 
 //音频模式(OpenAL)
 //#define YON_AUDIO_MODE_OAL

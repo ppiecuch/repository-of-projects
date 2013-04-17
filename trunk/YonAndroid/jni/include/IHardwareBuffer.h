@@ -12,7 +12,23 @@ namespace video{
 		ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC		//数据可能不太会变化，使用可以快速读取但不必快速更新的方案
 	};
 
-	enum ENUM_PRIMITIVE_TYPE;
+	/*
+	#define GL_POINTS                         0x0000
+	#define GL_LINES                          0x0001
+	#define GL_LINE_LOOP                      0x0002
+	#define GL_LINE_STRIP                     0x0003
+	#define GL_TRIANGLES                      0x0004
+	#define GL_TRIANGLE_STRIP                 0x0005
+	#define GL_TRIANGLE_FAN                   0x0006
+	*/
+	enum ENUM_PRIMITIVE_TYPE{
+		ENUM_PRIMITIVE_TYPE_POINTS = 0x0000,
+		ENUM_PRIMITIVE_TYPE_LINES = 0x0001,
+		ENUM_PRIMITIVE_TYPE_TRIANGLES = 0x0004,
+		ENUM_PRIMITIVE_TYPE_TRIANGLE_STRIP = 0x0005,
+		ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN =0x0006,
+		ENUM_PRIMITIVE_TYPE_COUNT = 1
+	};
 
 	class IHardwareBuffer : public virtual core::IReferencable{
 	public:

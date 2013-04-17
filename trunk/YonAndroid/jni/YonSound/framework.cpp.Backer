@@ -17,69 +17,94 @@ ISceneNode* teapotModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
-const c8* names[]={"xyg.ogg","110.ogg","111.ogg","112.ogg","113.ogg","114.ogg","115.ogg","116.ogg","117.ogg","118.ogg","119.ogg"};
-typedef core::map<core::stringc,ISound*> SoundMap;
-SoundMap soundPool;
+#include <stdio.h>
+#include <wtypes.h>
+#include <stdarg.h>
+#include <tchar.h>
 
-#define MAX_IN_POOL 7
-
-void playSound(s32 index)
+inline void TRACE(const char * pszFormat, ...)
 {
-	core::stringc name=names[index];
-	SoundMap::Node* node=soundPool.find(name);
-	if(node)
-	{
-		ISound* sound=node->getValue();
-		//if(sound->isPlaying())
-		//»ò
-		if(sound->isStopped()==false)
-			YON_DEBUG("sound playing:%s\r\n",name.c_str());
-		else
-		{
-			//sound->setSecondOffset(0);
-			sound->play();
-			sound->setLooping(false);
-		}
-	}
-	else
-	{
-		YON_DEBUG("sound size:%u\r\n",soundPool.size());
-		if(soundPool.size()>=MAX_IN_POOL)
-		{
-			SoundMap::Iterator it=soundPool.getIterator();
-			for(;!it.atEnd();++it)
-			{
-				ISound* sound=it->getValue();
-				if(sound->isStopped())
-				{
-					YON_DEBUG("remove sound:%s\r\n",it->getKey().c_str());
-					soundPool.remove(it->getKey());
-					audioDriver->removeSound(sound);
-					break;
-				}
-				//else
-				//	YON_DEBUG("sound %s not stop\r\n",it->getKey().c_str());
-			}
-		}
-		if(soundPool.size()<=MAX_IN_POOL)
-		{
-			ISound* sound=audioDriver->getSound(name);
-			soundPool.insert(name,sound);
-			sound->play();
-			sound->setLooping(false);
-		}
-		else
-			YON_WARN(YON_LOG_WARN_FORMAT,core::stringc("currently has no free space to play sound:%s,ignore it!",name.c_str()).c_str());
-	}
-}
-void play(){
-	s32 start=randomizer::rand(0,9);
-	s32 num=randomizer::rand(1,10-start);
-	YON_INFO("play:start:%d,num:%d,from:[%s],to:[%s]\r\n",start,num,names[start],names[start+num-1]);
-	for(s32 i=start;i<start+num;++i)
-		playSound(i);
+	va_list pArgs;
+	char szMessageBuffer[16380]={0};
+	va_start( pArgs, pszFormat );
+	vsnprintf_s( szMessageBuffer, 16380,16380-1,pszFormat, pArgs );
+	va_end( pArgs );   
+	OutputDebugStringA(szMessageBuffer);   
 }
 
+
+class ITask{
+public:
+	virtual void process() = 0;
+};
+
+class MyTask : public ITask{
+public:
+	virtual void process(){
+		yonSleep(500);
+		YON_DEBUG("%08X process\r\n",this);
+		yonSleep(500);
+	}
+};
+
+class Backer{
+public:
+
+	struct SRunnable : public yon::IRunnable{
+		bool m_bRunnable;
+		ITask* m_pTask;
+		core::semaphore m_semaphore;
+
+		SRunnable():m_bRunnable(true),m_pTask(NULL){}
+
+		virtual void run(){
+			while(m_bRunnable)
+			{
+				m_semaphore.wait();
+				if(m_pTask)
+				{
+					m_pTask->process();
+					m_pTask=NULL;
+				}
+			}
+			m_bRunnable=true;
+			YON_DEBUG("SRunnable finished!\r\n");
+		}
+
+		void setTask(ITask* task){
+			YON_DEBUG_BREAK_IF(m_pTask!=NULL);
+			m_pTask=task;
+			m_semaphore.notify();
+			while(m_pTask!=NULL){yonSleep(2);}
+		}
+
+		void close(){
+			m_bRunnable=false;
+			while(m_bRunnable!=true){yonSleep(2);}
+		}
+	};
+
+	IThread* m_pThread;
+	SRunnable m_runnable;
+
+	Backer():m_pThread(NULL){
+		m_pThread=createThread(&m_runnable);
+		m_pThread->start();
+		YON_DEBUG("Instance Backer!\r\n");
+	}
+
+	~Backer(){
+		m_pThread->drop();
+		YON_DEBUG("Release Backer!\r\n");
+	}
+
+	void pushTask(ITask* task){
+		m_runnable.setTask(task);
+		YON_DEBUG("pushTask pass!\r\n");
+	}
+};
+
+Backer* backer;
 
 class MyEventReceiver : public IEventReceiver{
 public:
@@ -91,11 +116,14 @@ public:
 			{
 			case event::ENUM_MOUSE_INPUT_TYPE_LDOWN:
 				logger->debug("[LP]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				play();
 				//{
 				//	ISound* sound=(ISound*)soundPool["xyg.ogg"];
 				//	sound->stop();
 				//}
+				{
+					MyTask task;
+					backer->pushTask(&task);
+				}
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
@@ -106,7 +134,6 @@ public:
 			switch(evt.touchInput.type)
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
-				play();
 				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
@@ -158,14 +185,9 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	fs->addWorkingDirectory("media/sound");
 #endif
 
+	backer=new Backer();
+
 	//YON_DEBUG("maxMixed:%d \r\n",audioDriver->getMaxMixedSound());
-	/*u32 start=timer->getRealTime();
-	ISound* sound=audioDriver->getSound("xyg.ogg",true);
-	
-	soundPool.insert(names[0],sound);
-	sound->play();
-	sound->setLooping(true);
-	YON_DEBUG("use time:%u \r\n",timer->getRealTime()-start);*/
 
 	//PROFILE_REGISTER_FRAME();
 	//PROFILE_START_CALL(PROFILE_ID_1,Driver->begin);
@@ -195,24 +217,19 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	//audioDriver->update();
+	audioDriver->update();
 
 	videoDriver->begin();
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,maxMixed:%d,test,test,test,test,test",videoDriver->getFPS(),audioDriver->getMaxMixedSound()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
-
-	SoundMap::Iterator it=soundPool.getIterator();
-	for(s32 index=1;!it.atEnd();++it,++index)
-	{
-		Logger->drawString(videoDriver,core::stringc("sound:%s",it->getKey().c_str()),core::position2di(10,10*index),COLOR_GREEN);
-	}
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,maxMixed:%d",videoDriver->getFPS(),audioDriver->getMaxMixedSound()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }
 void destroy(){
 	//PROFILE_REPORT();
+	delete backer;
 	engine->drop();
 	delete params.pEventReceiver;
 }

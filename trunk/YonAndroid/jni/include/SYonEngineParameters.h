@@ -6,6 +6,7 @@
 #include "IEventReceiver.h"
 #include "ICallback.h"
 #include "ILogger.h"
+#include "IVideoDriver.h"
 
 #ifdef YON_COMPILE_WITH_ANDROID
 #include <jni.h>
@@ -17,6 +18,7 @@ namespace yon{
 		SYonEngineParameters():
             appPath("."),
             resourcesPath("."),
+			driverType(video::ENUM_DRIVER_TYPE_OGLES1),
 			windowSize(core::dimension2du(800,600)),
 			windowId(NULL),
 			windowCaption(L"YonApplication"),
@@ -33,6 +35,7 @@ namespace yon{
 		SYonEngineParameters(const SYonEngineParameters& params):
 			appPath(params.appPath),
             resourcesPath(params.resourcesPath),
+			driverType(params.driverType),
 			windowSize(params.windowSize),
 			windowId(params.windowId),
 			windowCaption(params.windowCaption),
@@ -46,6 +49,8 @@ namespace yon{
         //app路径与资源路径(只用于IOS平台)
         io::path appPath;
         io::path resourcesPath;
+		//VideoDriver类型
+		video::ENUM_DRIVER_TYPE driverType;
 		//窗口尺寸
 		core::dimension2du windowSize;
 		//窗口指针

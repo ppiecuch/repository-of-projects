@@ -7,6 +7,7 @@ namespace yon{
 namespace gui{
 
 	//TODO 如何使用池机制
+	//TODO 添加模板参数PARAM
 
 	/**
 	* Every concrete Widget class should inherit from this templated class, so they inherit

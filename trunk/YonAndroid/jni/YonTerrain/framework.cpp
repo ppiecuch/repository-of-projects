@@ -11,12 +11,12 @@ ICamera* pOverlookCamera=NULL;
 ICamera* pOrthoCamera=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel=NULL;
 ITerrainModel* terrainModel=NULL;
-IModel* skyboxModel=NULL;
+ISceneNode* skyboxModel=NULL;
 IWaterModel* waterModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
@@ -73,7 +73,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	pCamera->setFar(5000);
 	pCamera->setNear(30);
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("..\\media");
@@ -125,7 +125,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createXYRectangle2D(272,112,400,240);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	planeModel=sceneMgr->addModel(entity);
+	planeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=planeModel->getMaterial(0);
 		material.setTexture(0,rtt);
