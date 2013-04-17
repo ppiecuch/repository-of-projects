@@ -188,10 +188,10 @@ void drawFrame(){
 		//s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
 		//s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
 		//gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
-		//ITexture* texture=videoDriver->getTexture("250.png");
-		ITexture* texture = videoDriver->getTexture("mosaic8.png");
-		gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true);
-		//gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
+		ITexture* texture=videoDriver->getTexture("250.png");
+		//ITexture* texture = videoDriver->getTexture("mosaic8.png");
+		//gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true);
+		gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
 		//gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true,highlight?0xFFFFFFFF:0xFFDDDDDD);
 #else
 		//Logger->debug("i:%d--0x%08X\r\n",i,&shaps[i]);

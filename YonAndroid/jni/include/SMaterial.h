@@ -56,7 +56,12 @@ namespace video{
 		"Blend",
 		"Transparent",
 		"TransparentRef",
-		"Mask"
+		"TransparentFill"
+		"Transparent2Layer"
+		"Mask",
+		"DetailMap",
+		"Composite1",
+		"Composite2",
 	};
 
 	enum ENUM_POLYGON_MODE{
@@ -230,6 +235,13 @@ namespace video{
 		ITexture* getTexture(u32 index) const
 		{
 			return index < MATERIAL_MAX_TEXTURES ? TextureLayers[index].texture : 0;
+		}
+		u32 getTextureCount() const
+		{
+			u32 count=0;
+			for(u32 i=0;i<MATERIAL_MAX_TEXTURES;++i)
+				if(TextureLayers[i].texture)++count;
+			return count;
 		}
 		core::matrix4f& getTextureMatrix(u32 index)
 		{

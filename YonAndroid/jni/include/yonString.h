@@ -108,6 +108,11 @@ namespace yon{
 				allocator.deallocate(elements);
 			}
 
+			T* pointer()
+			{
+				return elements;
+			}
+
 			T& operator[](u32 i){
 				return *(elements+i);
 			}
@@ -684,6 +689,12 @@ namespace yon{
 					return;
 
 				reallocate(count);
+			}
+
+			//对于先reserve，后pointer赋值，需要repair以保证长度正确
+			void repair()
+			{
+				len=countLen(elements);
 			}
 
 			//千位逗号分隔

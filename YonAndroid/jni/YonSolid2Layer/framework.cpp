@@ -9,7 +9,7 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 
 ISceneNode* planeModel=NULL;
 f32 factor=1.1f;
@@ -60,7 +60,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
@@ -74,7 +74,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	IEntity* entity;
 
 #if 1
-	shap=geometryFty->createXYRectangle2D2T(-75,-75,75,75);
+	//shap=geometryFty->createXYRectangle2D2T(-75,-75,75,75);
+	shap=geometryFty->createXYRectangle2D(-75,-75,75,75);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
 	planeModel=sceneMgr->addSceneNode(entity);
@@ -82,7 +83,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 		SMaterial& material=planeModel->getMaterial(0);
 		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT_2_LAYER;
 		material.setTexture(0,videoDriver->getTexture("aura_rgb.png"));
-		material.setTexture(1,videoDriver->getTexture("aura_alpha.png"));
+		material.setTexture(1,videoDriver->getTexture("aura_mask.png"));
 	}
 	planeModel->setPosition(core::vector3df(0,0,0));
 	

@@ -85,7 +85,7 @@ namespace core{
 #endif
 
 	public:
-		semaphore(s32 maxNum=1):m_semaphore(NULL){
+		semaphore(s32 maxNum=1){
 #ifdef YON_COMPILE_WITH_WIN32
 			//HANDLE WINAPI CreateSemaphore(
 			//	_In_opt_  LPSECURITY_ATTRIBUTES lpSemaphoreAttributes,

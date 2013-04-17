@@ -176,6 +176,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\framework.cpp.Backer"
+			>
+		</File>
+		<File
 			RelativePath=".\framework.cpp.loop"
 			>
 		</File>
