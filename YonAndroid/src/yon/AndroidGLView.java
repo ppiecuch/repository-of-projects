@@ -395,6 +395,11 @@ public class AndroidGLView extends GLSurfaceView{
 		        nativeInfo("TAGS:"+Build.TAGS+"\r\n");
 		        nativeInfo("TYPE:"+Build.TYPE+"\r\n");
 		        nativeInfo("USER:"+Build.USER+"\r\n");
+		        if (Util.detectOpenGLES20(activity)) {
+		        	nativeInfo("support opengles 2.0");
+				} else {
+					nativeInfo("unsupport opengles 2.0");
+				}
 			}
 			first=false;
 			ready=true;
