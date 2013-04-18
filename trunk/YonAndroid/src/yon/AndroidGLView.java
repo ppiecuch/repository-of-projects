@@ -152,6 +152,8 @@ public class AndroidGLView extends GLSurfaceView{
 		currentMoveEvent=new MoveEvent();
 		lastMoveEvent=new MoveEvent();
 		
+		setEGLContextClientVersion(2);
+		
 		//setEGLConfigChooser(int, int, int, int, int, int) 指定red ,green, blue, alpha, depth ,stencil 支持的位数，
 		//缺省为RGB_565 ,16 bit depth buffer.
 		setEGLConfigChooser(8, 8, 8, 8, 16, 0);
