@@ -269,6 +269,7 @@ gui_SOURCES :=\
 	$(addprefix Yon/, \
 		CGUISystem.cpp \
 		CButton.cpp \
+		CTheme.cpp \
 )
 
 yon_SOURCES :=   \
@@ -332,6 +333,13 @@ yon_SOURCES :=   \
 		COGLES1Texture.cpp \
 		COGLES1FBOTexture.cpp \
 		COGLES1HardwareBuffer.cpp \
+		COGLES2ExtensionHandler.cpp \
+		COGLES2Driver.cpp \
+		COGLES2Texture.cpp \
+		COGLES2FBOTexture.cpp \
+		COGLES2HardwareBuffer.cpp \
+		COGLES2ShaderRenderer.cpp\
+		COGLES2ShaderRenderer2D.cpp\
 		CYonEngineAndroid.cpp \
 		CImage.cpp \
 		CImageLoaderPNG.cpp \
@@ -362,6 +370,6 @@ LOCAL_SRC_FILES := \
 		
 LOCAL_ARM_MODE   := arm 
 LOCAL_SHORT_COMMANDS := true
-LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lstdc++
+LOCAL_LDLIBS := -lGLESv1_CM -lGLESv2 -ldl -llog -lstdc++
 include $(BUILD_STATIC_LIBRARY)
 

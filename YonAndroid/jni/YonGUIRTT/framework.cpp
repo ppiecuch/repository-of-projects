@@ -261,7 +261,7 @@ core::position2di ps[4];
 	ps[3].set(x+w,y+h);
 void drawFrame(){
 
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,video::COLOR_DEFAULT);
  
 	//const core::vector3df trot=teapotModel->getRotation();
 	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));

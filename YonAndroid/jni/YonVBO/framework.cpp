@@ -9,12 +9,12 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 
-IModel* cubeModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel1=NULL;
-IModel* teapotModel2=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel1=NULL;
+ISceneNode* teapotModel2=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -62,7 +62,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
@@ -70,21 +70,18 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/");
 #endif
 
-	
-
 	//IMaterial* material;
 	IShap *shap,*shap1,*shap2;
 	IUnit* unit;
 	IEntity* entity;
 
-
 	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	teapotModel1=sceneMgr->addModel(entity);
+	teapotModel1=sceneMgr->addSceneNode(entity);
 	teapotModel1->setPosition(core::vector3df(-50,-50,0));
-	unit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
-	unit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
+	//shap->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+	//shap->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	shap->drop();
 	unit->drop();
 	entity->drop();
@@ -92,7 +89,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createTeapot(2,video::COLOR_RED);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	teapotModel2=sceneMgr->addModel(entity);
+	teapotModel2=sceneMgr->addSceneNode(entity);
 	teapotModel2->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
@@ -105,7 +102,7 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
 	//const core::vector3df trot=teapotModel->getRotation();
 	//teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
