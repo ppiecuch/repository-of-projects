@@ -19,11 +19,13 @@
 #include "ICursorControl.h"
 #include "IEventReceiver.h"
 #include "SRenderUnit.h"
+#include "IHardwareBuffer.h"
 
 namespace yon{
 
 	namespace video{
 		class IVideoDriver;
+		class IMaterialRenderer;
 	}
 
 	namespace scene{
@@ -43,6 +45,12 @@ namespace yon{
 		IImageLoader* createImageLoaderPKM();
 		IImageLoader* createImageLoaderKTX();
 		IImageLoader* createImageLoaderPVR();
+
+		enum ENUM_DRIVER_TYPE{
+			ENUM_DRIVER_TYPE_OGLES1 = 0,
+			ENUM_DRIVER_TYPE_OGLES2,
+			ENUM_DRIVER_TYPE_COUNT
+		};
 
 		enum ENUM_TRANSFORM{
 			ENUM_TRANSFORM_VIEW = 0,		//ÊÓÍ¼¿Õ¼ä¾ØÕó
@@ -69,7 +77,7 @@ namespace yon{
 		#define GL_TRIANGLES                      0x0004
 		#define GL_TRIANGLE_STRIP                 0x0005
 		#define GL_TRIANGLE_FAN                   0x0006
-		*/
+		
 		enum ENUM_PRIMITIVE_TYPE{
 			ENUM_PRIMITIVE_TYPE_POINTS = 0x0000,
 			ENUM_PRIMITIVE_TYPE_LINES = 0x0001,
@@ -77,7 +85,7 @@ namespace yon{
 			ENUM_PRIMITIVE_TYPE_TRIANGLE_STRIP = 0x0005,
 			ENUM_PRIMITIVE_TYPE_TRIANGLE_FAN =0x0006,
 			ENUM_PRIMITIVE_TYPE_COUNT = 1
-		};
+		};*/
 
 		/*
 		#define GL_BYTE                           0x1400
@@ -165,8 +173,7 @@ namespace yon{
 		public:
 			IVideoDriver(io::IFileSystem* fs,ITimer* timer)
 				:m_renderMode(ENUM_RENDER_MODE_NONE),m_textureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_NONE),m_pFileSystem(fs),m_pTimer(timer),
-				m_orthdowProjMatrix(true),m_orthdowViewMatrix(true)
-			{
+				m_orthdowProjMatrix(true),m_orthdowViewMatrix(true){
 					if(m_pFileSystem)
 						m_pFileSystem->grab();
 					if(m_pTimer)
@@ -304,6 +311,8 @@ namespace yon{
 			virtual void grabTexture(ITexture* texture) = 0;
 			virtual bool dropTexture(ITexture* texture) = 0;
 			virtual bool dropReserved(ITexture* texture) = 0;
+
+			virtual s32 addMaterialRenderer(IMaterialRenderer* renderer, const c8* name =NULL,bool addReference=true) =0;
 
 			virtual void setTransform(ENUM_TRANSFORM transform, const core::matrix4f& mat) =0;
 			virtual const core::matrix4f& getTransform(ENUM_TRANSFORM transform) const =0;
