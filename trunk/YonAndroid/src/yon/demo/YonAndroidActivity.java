@@ -82,12 +82,6 @@ public class YonAndroidActivity extends Activity {
 		addContentView(editText, layoutParams);
 		editText.setVisibility(View.GONE);
 
-		if (Util.detectOpenGLES20(this)) {
-			Log.i(TAG, "support opengles 2.0");
-		} else {
-			Log.i(TAG, "unsupport opengles 2.0");
-		}
-
 		initSpinner();
 		initConfirmDialog();
 		initInputPanel();
