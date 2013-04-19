@@ -2,6 +2,8 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 subdirs := $(LOCAL_PATH)/Android.mk
+subdirs += $(LOCAL_PATH)/google-breakpad/android/google_breakpad/Android.mk
+
 ifeq ($(APP),Logger)
 subdirs += $(LOCAL_PATH)/AndroidLogger.mk
 else
@@ -58,6 +60,10 @@ subdirs += $(LOCAL_PATH)/AndroidText.mk
 else
 ifeq ($(APP),Logger)
 subdirs += $(LOCAL_PATH)/AndroidLogger.mk
+else
+ifeq ($(APP),Compress)
+subdirs += $(LOCAL_PATH)/AndroidCompress.mk
+endif
 endif
 endif
 endif
