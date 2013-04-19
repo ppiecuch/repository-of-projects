@@ -1,0 +1,35 @@
+在android系统中，设置字体相关的类是android.graphics.Typeface. 使用Typeface可以控制app中字体的显示。
+
+在android.graphics.Typeface的源码中，我们可以看到下面的一些代码：
+
+      public static final Typeface DEFAULT;
+      public static final Typeface DEFAULT_BOLD;
+      public static final Typeface SANS_SERIF;
+      public static final Typeface SERIF;
+      public static final Typeface MONOSPACE;
+
+上面列举了五种类型的字体。
+
+      public static final int NORMAL = 0;
+      public static final int BOLD = 1;
+      public static final int ITALIC = 2;
+      public static final int BOLD_ITALIC = 3;
+
+上面列举了字体的四种风格。
+
+Typeface还提供了两种利用上面提到的类型和风格创建字体的接口：
+
+      public static Typeface create(String familyName, int style)
+      public static Typeface create(Typeface family, int style)
+
+因此，我们可以通过组合它们，得到5*4不同字体。通过TextView.setTypeface(Typeface tf)加载字体。
+
+上面主要是通过使用系统提供的字体和风格来设置文字字体的。另外，Typeface也提供了接口，方便app开发者使用自制的字体。
+
+      public static Typeface createFromAsset(AssetManager mgr, String path)
+      public static Typeface createFromFile(File path)
+      public static Typeface createFromFile(String path)
+
+通过上面三个接口，app开发者可以使用风格各异的字体了。
+
+http://hi.baidu.com/marvinlix/item/ec23015ed43bdd3194eb050f

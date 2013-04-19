@@ -1,0 +1,5 @@
+Vs2008，点击“更改、删除”后，出现"vs_setup.msi 未能打开"的提示，参阅网络文档后，使用Windows Installer CleanUp Utility清除vs2008注册表信息后（不要删除安装目录）重新安装一遍Microsoft Visual Studio Team System 2008，再执行升级正式版过程，问题解决。
+Windows Installer CleanUp Utility下载：
+windowsinstallercleanuputility.zip
+
+http://116833.blog.51cto.com/106833/648072

@@ -15,7 +15,7 @@ arm-eabi-objdump -S -C libsysutils.so |less
 获取设备的ID和序列号： 
 adb get-product 
 adb get-serialno
-arm-linux-androideabi-addr2line -C -f -e obj/local/armeabi/libsyjt.so 0003deb4
+arm-linux-androideabi-addr2line -C -f -e obj/local/armeabi/libsyjt.so 
 The -C flag is to demangle C++ code
 经常要通过内存的使用量来优化程序。查看应用程序的命令：adb shell procrank
 注：
@@ -23,6 +23,12 @@ VSS - Virtual Set Size 虚拟耗用内存（包含共享库占用的内存）
 RSS - Resident Set Size 实际使用物理内存（包含共享库占用的内存）
 PSS - Proportional Set Size 实际使用的物理内存（比例分配共享库占用的内存）
 USS - Unique Set Size 进程独自占用的物理内存（不包含共享库占用的内存）
+一般来说内存占用大小有如下规律：VSS >= RSS >= PSS >= USS
+USS is the total private memory for a process, i.e. that memory that is completely unique to that process.
+USS is an extremely useful number because it indicates the true incremental cost of running a particular process. 
+When a process is killed, the USS is the total memory that is actually returned to the system. 
+USS is the best number to watch when initially suspicious of memory leaks in a process.
+
 查看单个应用程序内存占用量的命令：
 adb shell dumpsys meminfo $包名 或者 $进程号 //当然你也可以adb shell进去后在输入余下部分。
 其中size是需要的内存，而allocated是分配了的内存，对应的2列分别是native和dalvik，当总数也就是total这一列超过单个程序内存的最大限制时，OOM就很有可能会出现了
@@ -35,3 +41,57 @@ android sdcard read-only file system 的解决办法
 在cmd窗口一条命令就可以了： 
 adb shell 
 mount -o remount rw / 
+
+D:\Development\Workspace\VS2008\ZhanGu\trunk\project\android
+addr2line -C -f -e D:/Development/Workspace/VS2008/ZhanGu/trunk/project/android/obj/local/armeabi/libsyjt.so
+
+adb shell df
+
+APP_ABI = armeabi-v7a
+
+ps aux
+
+adb shell ps | grep "proj.syjt"
+adb shell top | grep "proj.syjt"
+adb shell ps proj.syjt
+
+USER     PID   PPID  VSIZE  RSS     WCHAN    PC         NAME
+adb shell cat /proc/<pid>/maps
+adb shell cat /proc/<pid>/status
+VmPeak:     表示进程所占用最大虚拟内存大小
+VmSize:      表示进程当前虚拟内存大小
+VmLck:       表示被锁定的内存大小
+VmHWM:    表示进程所占用物理内存的峰值
+VmRSS:     表示进程当前占用物理内存的大小(与procrank中的RSS)
+VmData:     表示进程数据段的大小
+VmStk:       表示进程堆栈段的大小
+VmExe:      表示进程代码的大小
+VmLib:       表示进程所使用共享库的大小
+VmPTE:      表示进程页表项的大小
+
+
+VSS (reported as VSZ from ps) is the total accessible address space of a process. 
+This size also includes memory that may not be resident in RAM like mallocs that have been allocated but not written to. 
+VSS is of very little use for determing real memory usage of a process.
+
+RSS is the total memory actually held in RAM for a process. RSS can be misleading, 
+because it reports the total all of the shared libraries t	hat the process uses, 
+even though a shared library is only loaded into memory once regardless of how many processes use it. 
+RSS is not an accurate representation of the memory usage for a single process.
+
+PSS differs from RSS in that it reports the proportional size of its shared libraries, 
+i.e. if three processes all use a shared library that has 30 pages, 
+that library will only contribute 10 pages to the PSS that is reported for each of the three processes. 
+PSS is a very useful number because when the PSS for all processes in the system are summed together, 
+that is a good representation for the total memory usage in the system. When a process is killed, 
+the shared libraries that contributed to its PSS will be proportionally distributed to the PSS totals for 
+the remaining processes still using that library. In this way PSS can be slightly misleading, 
+because when a process is killed, PSS does not accurately represent the memory returned to the overall system.
+
+USS is the total private memory for a process, i.e. that memory that is completely unique to that process. 
+USS is an extremely useful number because it indicates the true incremental cost of running a particular process.
+When a process is killed, the USS is the total memory that is actually returned to the system. 
+USS is the best number to watch when initially suspicious of memory leaks in a process.
+
+
+

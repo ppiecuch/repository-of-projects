@@ -1,0 +1,180 @@
+准备上4.0项目，最近接触API 的时候看到了RenderScript 。通过运行google 那几个项目发现这个真是一个非常不错的API，但是google 所提供的文档非常少，有助于了解计算机图形计算，虽然我们做应用编程的不一定要涉及这块，但涉猎一下总是不错的。
+RenderScript 是Android 平台上的一种类C脚本语言。要在我们程序上实现RenderScript 渲染功能，最少需要实现的几个功能如下，以一个Hello Wold 为例：
+1. helloworld.rs 实现RenderScript 的代码
+2. RenderScriptRS.java 一个辅助类，简化操作RenderScript (非必要)
+3. RenderScriptView.java  一个继承于RSSurfaceView的类，用于显示RenderScript 的渲染或者用来处理用户的触摸等视图
+4. RenderScriptHelloWorldActivity.java 这个不用多说，Android 应用程序的界面类
+ 
+当创建一个RenderScript 的项目的时候，必须在包名下创建一个以rs为后缀的文件(位于我们Activity 同包名下)，如本篇文章使用的helloworld.rs文件.
+#pragma version(1)
+#pragma rs java_package_name(com.xuzhi.rs.helloworld)
+
+#include "rs_graphics.rsh"
+
+int gTouchX;
+int gTouchY;
+
+void init(){
+    gTouchX=50.0f;
+    gTouchY=50.0f;
+}
+
+//application main
+int root(void){
+    rsgClearColor(0.0f,1.0f,0.0f,0.0f);//颜色更改为no red,full green,no blue,no opacity ，的RGBA值
+    rsgFontColor(1.0f,0.0f,1.0f,1.0f);//设置字体颜色
+    rsgDrawText("my first renderscript application",gTouchX,gTouchY);//根据应用传上来的x,y 将字画在屏幕对应的坐标上
+    rsDebug("======my renderscript debug========",rsUptimeMillis());//打印日志
+    return 20;
+} 
+
+ 注解：
+#pragma:简单的可以理解告诉或者通知编译器编译这个文件时需要的参数或者指定编译的版本等，跟编译器有关。
+void init():这个函数作一些初始化动作
+int root(viod):程序入口，根据返回值(ms)作刷新。比如上面写的20相当于每20毫秒刷新一次。
+      root 函数下rsgClearColor,rsgFontColor,rsgDrawText都位于rs_graphics.rsh头文件下。
+       rsDebug是打印日志函数，位于rs_core.rsh头文件。
+   在上面的代码中，日志将己每20毫秒打印一次这样的日志：03-01 11:09:18.289: D/RenderScript(1838): ======my renderscript debug======== 600462  0x9298e
+    rsUptimeMillis则定义在rs_time.rsh头文件中。
+目前有关于RenderScript调用的函数位于我们SDK目录下(platforms/android-*[目前11-15]/renderscript/include)目录里面的头文件中。
+ 
+好了，rs文件己经编写完成，接着往下走。
+ 下一步，为了方便调用RenderScript 这里创建了一个辅助类，RenderScriptRS.java。
+ 
+ /**
+ * Render Script help
+ * @author terry
+ *
+ */
+public class RenderScriptRS {
+
+    private RenderScriptGL mRS;
+   
+    private ScriptC_hellowold mScript;
+   
+    public RenderScriptRS(RenderScriptGL rs,Resources resource) {
+        // TODO Auto-generated constructor stub
+        mRS=rs;
+        mScript=new ScriptC_helloworld(mRS, resource, R.raw.hellowold);
+        mRS.bindRootScript(mScript); //绑定脚本
+    }
+   
+    /**
+     * 传入坐标
+     * @param x
+     * @param y
+     */
+    public void onActionDown(int x,int y){
+        mScript.set_gTouchX(x);
+        mScript.set_gTouchY(y);
+    }
+}
+
+目前我们所做的一切都是要使用到的RenderScriptGL(RenderScript 图形的衍生)，实例化RenderScriptGL并绑定脚本。如果你的开发ADT高于或者是1.5的话Eclipse 会根据你的rs文件生成ScriptC_你的rs文件为名的java类。如上面代码的ScriptC_helloworld一样，并且在资源目录res/raw生成一个.bc的文件，在实例化ScriptC_hellowold会需要传进去。
+ 
+ 下一步，创建RenderScriptView.java,让其可以显示在界面上。
+import android.content.Context;
+import android.renderscript.RSSurfaceView;
+import android.renderscript.RenderScriptGL;
+import android.renderscript.RenderScriptGL.SurfaceConfig;
+import android.view.MotionEvent;
+
+public class RenderScriptView extends RSSurfaceView {
+
+    private RenderScriptGL mRS;
+
+    private RenderScriptRS mRender;
+
+    public RenderScriptView(Context context) {
+        super(context);
+        // TODO Auto-generated constructor stub
+        initRenderScript();
+    }
+
+    /**
+     * 初始化RenderScriptRS
+     */
+    private void initRenderScript() {
+        if (mRS == null) {
+            RenderScriptGL.SurfaceConfig config = new SurfaceConfig();
+            mRS = createRenderScriptGL(config);
+
+            mRender = new RenderScriptRS(mRS, getResources());
+
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        // Handle the system event and clean up
+        mRender = null;
+        if (mRS != null) {
+            mRS = null;
+            destroyRenderScriptGL();
+        }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        // TODO Auto-generated method stub
+        super.onAttachedToWindow();
+        initRenderScript();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // TODO Auto-generated method stub
+        /**
+         * 传入点击坐标www.2cto.com
+         */
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            mRender.onActionDown((int) event.getX(), (int) event.getY());
+            return true;
+        }
+
+        return false;
+    }
+} 
+
+ 
+ RSSurfaceView扩展自SurfaceView，用来显示这些需要渲染的图形界面。
+ 上述代码的initRenderScript方法，如果RenderScriptGL 未实例化，就需要创建一个SurfaceConfig(这是用来控制深度的颜色，深度缓冲区等等，这里使用默认)，并且让它实现自身的onTouchEvent事件，传入x,y坐标轴进入RenderScript，改变文本显示的位置(跟随鼠标的点击点变化)。
+最后的界面只需要让它显示出来即可：
+public class RenderScriptHelloWorldActivity extends Activity {
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(new RenderScriptView(this));
+    }
+} 
+
+ 这一系列的步骤可以用一张图来做说明，详细的规划了RenderScript 的图形概述：
+
+ 
+
+ 
+
+ 这是一个简单的DEMO，介绍了RenderScript 使用的一些基本步骤，详细的使用后面会慢慢提到。最后通过上面的代码可以看到的运行效果如下：
+
+ 
+
+
+ 
+
+另外，后文还会提供一些详细的文档和例子。比如：
+
+rs_graphics
+rs_core
+rs_math
+rs_time
+ 上面这四个的头文件的API。
+
+代码可以在Android 4.0中找到，RenderScript->Helloworld。
+注：模拟器无法运行。
+
+ 
+
+摘自 Terry_龙
+
+http://www.2cto.com/kf/201203/121629.html

@@ -1,0 +1,15 @@
+一、Activity和Task(栈)的关系
+　　Task就像一个容器，而Activity就相当与填充这个容器的东西，第一个东西（Activity）则会处于最下面，最后添加的东西（Activity）则会在最低端。从Task中取出东西（Activity）则是从最顶端取出，也就是说最先取出的是最后添加的东西（Activity），一次类推，最后取出的是第一次添加的Activity，而Activity在Task中的顺序是可以控制的，那则在Activity跳转时用到Intent Flag
+　　二、界面跳转和服务的启动都会用到Intent，现在介绍Intent Flag是关于Activity的跳转
+　　Intent intent = new Intent(this,xxx.class);
+　　//如果activity在task存在，拿到最顶端,不会启动新的Activity
+　　intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+　　//如果activity在task存在，将Activity之上的所有Activity结束掉
+　　intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+　　//默认的跳转类型,将Activity放到一个新的Task中
+　　intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+　　//如果Activity已经运行到了Task，再次跳转不会在运行这个Activity
+　　intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+　　Intent Flag有20多种，我用过的就只有4中，后期用到了，知道什么作用，再向大家告知
+
+http://blog.tianya.cn/blogger/post_read.asp?BlogID=3624254&PostID=33571118

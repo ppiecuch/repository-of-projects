@@ -1,0 +1,176 @@
+仿函数(Functor、Function Object)
+
+传递给STL算法的函数型参数(functional arguement)不一定要是函数，可以是行为类似于函数的对象，即Function Object或者Functor。
+
+STL中大量运用了Function Object，也提供了很多预先定义的Function Object。
+
+如果你定义了一个对象，其行为像函数，就可以拿来当函数使用。
+那么什么才算具备函数行为呢？
+函数行为：是指可以使用小括号传递参数，籍以调用某个东西
+如：function(arg1,arg2);
+
+在C++中要实现这个，你只要定义operator(),并给予适当的参数类型
+类似于下面的定义：
+class Functor
+{
+public:
+      return-value operator(arguments) const;
+};
+
+ 则现在我们就可以把这个类型的对象当函数调用了：
+Functor f;
+f(arg1,arg2);  //等价于f.operator(arg1,arg2);
+
+ 
+
+最基本的仿函数举例：
+
+/**
+
+Function Object
+
+*/
+
+class PrintInt
+{
+public:
+    void operator()(int elem) const
+    {
+        std::cout<<elem<<' ';
+    }
+};
+
+void testPrintInt()
+{
+    std::vector<int> intVec;
+    for(int i=1;i<10;++i)
+        intVec.push_back(i);
+    for_each(intVec.begin(),intVec.end(),
+             PrintInt());    ///PrintInt()产生此类型的一个临时对象，当for_each算法的一个参数
+    std::cout<<std::endl;
+}
+
+
+
+STL中for_each()算法大致实现如下：
+template <typename Iterator, typename operation>
+operation for_each(Iterator b,Iterator e,operation op)
+{
+    while(b++ != e)
+    {
+        op(*b);
+    }
+    return op;
+}
+
+在本例中，for_each()调用PrintInt::operator(*b);
+
+仿函数的优点：
+1.仿函数是对象，可以拥有成员函数和成员变量，即仿函数拥有状态(states)
+2.每个仿函数都有自己的类型
+3.仿函数通常比一般函数快（很多信息编译期确定）
+
+
+举例子：现在要实现对集群中每个元素都加上一个固定值
+
+/**
+一般函数
+用户期望在编译期就知道这个数
+*/
+void add10(int& value)
+{
+    value+=10;
+}
+
+/**
+函数模板
+需要数个不同的固定值，而它们在编译期都已确定
+*/
+template<int theValue>
+void addValue(int& value)
+{
+    value+=theValue;
+}
+
+/**
+仿函数
+*/
+class AddValue
+{
+private:
+    int value;
+public:
+    AddValue(int v):value(v){}
+    void operator()(int& elem) const
+    {
+        elem += value;
+    }
+};
+
+void testAddValue()
+{
+    std::list<int> intList;
+    for(int i=1;i<10;++i)
+        intList.push_back(i);
+    std::cout<<"Initialized:\n";
+    copy(intList.begin(),intList.end(),
+         std::ostream_iterator<int>(std::cout," "));
+
+    for_each(intList.begin(),intList.end(),
+             add10);  ///调用函数，编译期确定10
+    std::cout<<"\nAfter add10:\n";
+    copy(intList.begin(),intList.end(),
+         std::ostream_iterator<int>(std::cout," "));
+
+    for_each(intList.begin(),intList.end(),
+             addValue<11>);///调用函数模板，编译期确定11
+
+    std::cout<<"\nAfter addValue:\n";
+    copy(intList.begin(),intList.end(),
+         std::ostream_iterator<int>(std::cout," "));
+
+    //for_each(intList.begin(),intList.end(),
+    //         addValue<*(intList.begin())>);  //error，因为template必须编译期知道模板参数，而这里是运行时才知道的
+    //std::cout<<"\nAfter addValue:\n";
+    //copy(intList.begin(),intList.end(),
+    //     std::ostream_iterator<int>(std::cout," "));
+
+    for_each(intList.begin(),intList.end(),
+             AddValue(15));
+    std::cout<<"\nAfter AddValue 15:\n";
+    copy(intList.begin(),intList.end(),
+         std::ostream_iterator<int>(std::cout," "));
+
+    for_each(intList.begin(),intList.end(),
+             AddValue(*intList.begin()));  ///执行期间，函数模板的优势！！
+    std::cout<<"\nAfter AddValue dynamically:\n";
+    copy(intList.begin(),intList.end(),
+         std::ostream_iterator<int>(std::cout," "));
+}
+
+
+
+STL提供了很多预定义的仿函数，如：
+
+equal_to , not_equal_to , less , greater , less_equal , greater_equal , nagate, multiplies等
+
+下面是几个运行STL预先定义仿函数的例子：
+
+void testPreDefFunctor()
+{
+    std::list<int> intList;
+    std::set<int,std::greater<int> > intSet;
+    for(int i=1;i<10;++i)
+    {
+        intList.push_back(i);
+        intSet.insert(i);
+    }
+    intList.sort(std::greater<int>());  ///从大到小排序
+    transform(intList.begin(),intList.end(),  ///source1
+              intList.begin(),///source2
+              intList.begin(),///dest
+              std::multiplies<int>());///operation
+}
+
+
+http://hi.baidu.com/nicker2010/item/9a8c4d537d3d43d6d58baceb

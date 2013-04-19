@@ -1,0 +1,622 @@
+[DEBG]start instance CYonEngineAndroid
+[INFO]JNI Version:1.6
+[INFO]Instance CFileSystem                                            【√】
+[INFO]Instance CNetManager                                            【√】
+[DEBG]Extend element->16
+[DEBG]Extend element->16
+[INFO]GL_VERSION:OpenGL ES-CM 1.1(1.10)
+[INFO]GL_EXTENSIONS:
+[INFO]GL_AMD_compressed_ATC_texture
+[INFO]GL_AMD_performance_monitor
+[INFO]GL_APPLE_texture_2D_limited_npot
+[INFO]GL_EXT_texture_filter_anisotropic
+[INFO]GL_EXT_texture_format_BGRA8888
+[INFO]GL_EXT_texture_type_2_10_10_10_REV
+[INFO]GL_OES_blend_equation_separate
+[INFO]GL_OES_blend_func_separate
+[INFO]GL_OES_blend_subtract
+[INFO]GL_OES_compressed_ETC1_RGB8_texture
+[INFO]GL_OES_compressed_paletted_texture
+[INFO]GL_OES_depth_texture
+[INFO]GL_OES_draw_texture
+[INFO]GL_OES_EGL_image
+[INFO]GL_OES_EGL_image_external
+[INFO]GL_OES_framebuffer_object
+[INFO]GL_OES_matrix_palette
+[INFO]GL_OES_packed_depth_stencil
+[INFO]GL_OES_point_size_array
+[INFO]GL_OES_point_sprite
+[INFO]GL_OES_read_format
+[INFO]GL_OES_rgb8_rgba8
+[INFO]GL_OES_stencil_wrap
+[INFO]GL_OES_texture_cube_map
+[INFO]GL_OES_texture_env_crossbar
+[INFO]GL_OES_texture_float
+[INFO]GL_OES_texture_half_float
+[INFO]GL_OES_texture_half_float_linear
+[INFO]GL_OES_texture_npot
+[INFO]GL_OES_texture_mirrored_repeat
+[INFO]GL_QCOM_binning_control
+[INFO]GL_QCOM_extended_get
+[INFO]GL_QCOM_tiled_rendering
+[INFO]GL_AMD_compressed_3DC_texture
+[INFO]GL_MAX_TEXTURE_UNITS:2
+[INFO]GL_MAX_TEXTURE_SIZE:4096
+[INFO]GL_MAX_LIGHTS:8
+[DEBG]no FPS limit
+[DEBG]COGLES1Driver:NONE state->RUN state
+[DEBG]glGenTextures:_yon_debug_font_,1
+[DEBG]uploadTexture:_yon_debug_font_
+[DEBG]glTexImage2D:1,128,64,mipmap:0,L8A8
+[INFO]GL_NO_ERROR at line:443(D:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/Yon/COGLES1Texture.cpp) 【√】
+[DEBG]add Texture:_yon_debug_font_
+[DEBG]Extend element->5
+[INFO]Instance COGLES1Driver:1                                        【√】
+[DEBG]Extend element->16
+[INFO]Instance CFT2Library                                            【√】
+[INFO]Instance CFT2TextSystem                                         【√】
+[INFO]Instance CSceneManager                                          【√】
+[DEBG]Extend element->3
+[INFO]Instance CGraphicsAdapter                                       【√】
+[DEBG]Extend element->10
+[DEBG]Extend element->3
+[DEBG]Extend element->1
+[DEBG]Extend element->5
+[INFO]Instance CGraphicsAdapter                                       【√】
+[INFO]Instance CFMODAudioDriver                                       【√】
+[INFO]CreateEngine(1280,720),version:0.1.0                            【√】
+[DEBG]CSceneManager::addCamera size:1
+[DEBG]CSceneManager::addCamera size:2
+[DEBG]filename:media/
+[DEBG]root:/mnt/sdcard
+[DEBG]addWorkingDirectory:/mnt/sdcard/media/
+[DEBG]half cube size:75.00,75.00,75.00,-75.00,-75.00,-75.00
+[DEBG]CSceneManager::addSceneNode size:3
+[DEBG]CSceneManager::addSceneNode size:4
+[DEBG]CSceneManager::addSceneNode size:5
+[DEBG]Instance CReadFileStream                                        【√】
+[DEBG]glGenTextures:/mnt/sdcard/media/aura.png,2
+[DEBG]uploadTexture:/mnt/sdcard/media/aura.png
+[DEBG]glTexImage2D:2,256,256,mipmap:0,R8G8B8
+[INFO]GL_NO_ERROR at line:443(D:/Development/Software/android-ndk-r7/samples/YonAndroid/jni/Yon/COGLES1Texture.cpp) 【√】
+[DEBG]Release CReadFileStream                                         【√】
+[DEBG]add Texture:/mnt/sdcard/media/aura.png
+[DEBG]use fast RTT for supporting FBO!                                【√】
+[DEBG]glGenTextures:COLOR,3
+[DEBG]glGenFramebuffersOES:COLOR,1
+[DEBG]glGenRenderbuffersOES:COLOR,1
+[INFO]check FBO no error                                              【√】
+[DEBG]Instance COGLES1FBOTexture                                      【√】
+[DEBG]add Texture:color
+[DEBG]use fast RTT for supporting FBO!                                【√】
+[DEBG]glGenTextures:GRAY,4
+[DEBG]glGenFramebuffersOES:GRAY,2
+[DEBG]glGenRenderbuffersOES:GRAY,2
+[INFO]check FBO no error                                              【√】
+[DEBG]Instance COGLES1FBOTexture                                      【√】
+[DEBG]add Texture:gray
+[INFO]external path:/mnt/sdcard
+[INFO]rom:956.50MB/1.80GB
+[INFO]ram:255MB/784MB(24.00MB)
+[INFO]sd:11.68GB/14.87GB
+[INFO]zh
+[INFO]MODEL:LG-P936
+[INFO]CODENAME:REL
+[INFO]INCREMENTAL:1c08d33cbb
+[INFO]SDK_INT:10
+[INFO]SDK:10
+[INFO]RELEASE:2.3.6
+[INFO]PRODUCT:iproj_open_hk
+[INFO]RADIO:unknown
+[INFO]CPU_ABI:armeabi-v7a
+[INFO]CPU_ABI2:armeabi
+[INFO]BOARD:I_EU
+[INFO]BOOTLOADER:unknown
+[INFO]BRAND:lge
+[INFO]DEVICE:iproj
+[INFO]DISPLAY:Tomato_HK_ROM_FOR_SU640_FULL
+[INFO]FINGERPRINT:lge/iproj_open_hk/iproj:2.3.6/GRJ90/LG-P936-V10c.1c08d33cbb:user/release-keys
+[INFO]HARDWARE:qcom
+[INFO]HOST:LGEARND2B5
+[INFO]ID:GRJ90
+[INFO]MANUFACTURER:LGE
+[INFO]TAGS:release-keys
+[INFO]TYPE:user
+[INFO]USER:wonyoung.kim
+[DEBG]nativeOnSurfaceChanged->w:1280,h:720
+[DEBG]CYonEngineAndroid::onResize(1280,720)[DEBG]CYonEngineAndroid::resizeIfNecessary
+[DEBG]CDebugPrinter::onResize:1280,720
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[DEBG]Instance COGLES1HardwareBuffer,offset:{0,12,16,16},changedId:{65543,65543},stride:24【√】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[WARN]Not found resource:250.png in working directories!              【!】
+[WARN]Not found resource:250.png in working directories,will use first working directories:/mnt/sdcard/media/250.png【!】
+[WARN]Not found resource:250.png in working directories!              【!】
+[EROR]getTexture(250.png) failed,for file do not exist!               【╳】
+[INFO]callbackDestroy function
+[INFO]Release 0/0 Sound
+[INFO]Release CFMODAudioDriver                                        【√】
+[INFO]Release CGraphicsAdapter                                        【√】
+[INFO]Release CGraphicsAdapter                                        【√】
+[INFO]Release CSceneManager                                           【√】
+[INFO]Release CFT2Library                                             【√】
+[INFO]Release CFT2TextSystem                                          【√】
+[DEBG]Release CDebugPrinter                                           【√】
+[DEBG]Release COGLES1HardwareBuffer                                   【√】
+[DEBG]Release 1/1 Hardwarebuffer
+[DEBG]Release 6/6 ImageLoader
+[DEBG]Release COGLES1FBOTexture                                       【√】
+[DEBG]Release COGLES1FBOTexture                                       【√】
+[DEBG]Release 4/4 Texture
+[DEBG]Release 10/10 MaterialRenderer
+[INFO]Release COGLES1Driver                                           【√】
+[INFO]Release CNetManager                                             【√】
+[INFO]Release CFileSystem                                             【√】
+[INFO]Destroy CYonEngineAndroid                                       【√】
+[INFO]Release Logger                                                  【√】

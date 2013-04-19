@@ -1,0 +1,19 @@
+非类型模板参数格式和声明一个下面的类型是一样的。
+
+整型或枚举 
+指向一个对象或一个函数 
+引用到一个对象或函数 
+指向一个成员 
+把非类型的模板参数声明为一个数组或者函数，将分别被转换到成指针以及指向函数的指针。下面的例子演示这些：
+
+
+1 template<int a[4]> struct A {};2 template<int f(int)> struct B {};3 4 int i;5 int g(int) {return 0;}6 7 A<&i> x;8 B<&g> y;
+类型 &i 推导出来是 int *，而类型&g 推导出来是 int (*)(int) 。
+
+你可以使用 const 或者 volatile 来修饰非类型模板参数。
+
+你不能申明一个非类型模板参数为float 指针，类或者 void 类型。
+
+非类型模板参数不是左值。
+
+http://www.cnblogs.com/BreakMind/archive/2012/03/10/2388521.html

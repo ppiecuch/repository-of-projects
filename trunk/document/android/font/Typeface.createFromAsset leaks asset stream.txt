@@ -1,0 +1,150 @@
+Steps to reproduce:
+
+1. Write an application that calls Typeface.createFromAsset() multiple times.
+2. Make sure that the typeface objects are out of scope and the garbage collector has completed at least one pass.
+3. Run adb shell dumpsys meminfo <your app package>
+
+Observe: There are multiple opened fonts under "Asset Allocations". 
+
+I was able to reproduce this bug on a device with Eclair firmware as well as on a device with Froyo. This is a significant bug as an application with custom fonts can quickly run out of memory.
+
+My first thought of the leak was that the framework may ententionally cache opened asset files. I took a dive into the framework to find out if this was the case. I'm sharing my findings here so it will be easier for the developer fixing the bug to get started.
+
+In the JNI layer, createFromAsset is implemented in Typeface.cpp:
+
+static SkTypeface* Typeface_createFromAsset(JNIEnv* env, jobject,
+                                            jobject jassetMgr,
+                                            jstring jpath) {
+
+    NPE_CHECK_RETURN_ZERO(env, jassetMgr);
+    NPE_CHECK_RETURN_ZERO(env, jpath);
+
+    AssetManager* mgr = assetManagerForJavaObject(env, jassetMgr);
+    if (NULL == mgr) {
+        return NULL;
+    }
+
+    AutoJavaStringToUTF8    str(env, jpath);
+    Asset* asset = mgr->open(str.c_str(), Asset::ACCESS_BUFFER);
+    if (NULL == asset) {
+        return NULL;
+    }
+
+    return SkTypeface::CreateFromStream(new AssetStream(asset, true));
+}
+
+AssetStream is a local class which derives from SkStream. SkStream in turn derives from SkRefCnt, which is ref counted. The initial ref count is set to 1 in the constructor.
+
+The body of SkTypeface::CreateFromStream() invokes SkFontHost::CreateTypefaceFromStream(). The body of that function is located in SkFontHost_android.cpp:
+
+SkTypeface* SkFontHost::CreateTypefaceFromStream(SkStream* stream) {
+    if (NULL == stream || stream->getLength() <= 0) {
+        return NULL;
+    }
+
+    SkString name;
+    SkTypeface::Style style = find_name_and_style(stream, &name);
+
+    return SkNEW_ARGS(StreamTypeface, (style, false, NULL, stream));
+}
+
+Here, the stream is passed in the constructor of a new StreamTypeface object. In the constructor, the StreamTypeface increments the ref count of the stream by 1 to become 2.
+
+The resulting Typeface is returned back to the Java layer. When the typeface gets out of scope, the object is garbage collected and the finalize() method is invoked. This will call the unref function which lowers the ref count:
+
+static void Typeface_unref(JNIEnv* env, jobject obj, SkTypeface* face) {
+    SkSafeUnref(face);
+}
+
+At this point, you would expect the native object to be freed and the asset stream to be closed. However, after lowering the ref count, the value is 1, which is not enough to free the native object.
+
+It seems that the ref count of the Typeface object should be lowered by one in the JNI layer (Typeface_createFromAsset), before returning the object. For reference, another method in the font host does decrement the ref count before returning:
+
+SkTypeface* SkFontHost::CreateTypefaceFromFile(const char path[]) {
+    SkStream* stream = SkNEW_ARGS(SkMMAPStream, (path));
+    SkTypeface* face = SkFontHost::CreateTypefaceFromStream(stream);
+    // since we created the stream, we let go of our ref() here
+    stream->unref();
+    return face;
+}
+
+Thanks!
+Jul 20, 2010 #1 romaingu...@gtempaccount.com Thanks for the report. Your solution looks like the right one.
+
+Status: FutureRelease 
+
+
+Mar 11, 2011 #2 samuh.va...@gmail.com If we have an application that has about 20 activities and we are loading 5-6 fixed fonts per Activity, will this bug be a cause of concern? What can a developer do to guard against this?
+Aug 14, 2011 #3 newb...@gmail.com samuh, i just discovered this issue while tracking down a memory leak in one of my apps ... it's definitely a concern in my case, so i coded this class as a work-around:
+
+public class Typefaces{
+
+private static final Hashtable<String, Typeface> cache = new Hashtable<String, Typeface>();
+
+	public static Typeface get(Context c, String name){
+		synchronized(cache){
+			if(!cache.containsKey(name)){
+				Typeface t = Typeface.createFromAsset(
+						c.getAssets(), 
+						String.format("fonts/%s.ttf", name)
+					);
+				cache.put(name, t);
+			}
+			return cache.get(name);
+		}
+	}
+
+}
+
+when you want to load one of your custom fonts, you'd say something like:
+Typefaces.get("myfont");
+
+basically this class ensures Android only loads each font once per instance of your app. the tradeoff, of course, is that each requested typeface object will remain in memory until your app is totally stopped by the OS (even though a given activity may not require each font).
+
+this works for my app anyway, my memory leak is gone now.
+
+HTH
+Jan 7, 2012 #4 matt.malone1 Any particular reason this went into the ICS branch instead of Gingerbread?
+Feb 21, 2012 #5 i...@obdandroid.com Awesome!
+Feb 28, 2012 #6 Ghais...@gmail.com WOW! that worked perfectly, thanks
+Feb 29, 2012 #7 brian.gi...@gmail.com I altered HTH's workaround so that the method does not assume the font path or format.  The full path of the font asset must be submitted as a parameter.  I also wrapped the call to createFromAsset() in a try-catch block so that the get() method will return null if the asset is not found.
+
+public class Typefaces {
+	private static final String TAG = "Typefaces";
+
+	private static final Hashtable<String, Typeface> cache = new Hashtable<String, Typeface>();
+
+	public static Typeface get(Context c, String assetPath) {
+		synchronized (cache) {
+			if (!cache.containsKey(assetPath)) {
+				try {
+					Typeface t = Typeface.createFromAsset(c.getAssets(),
+							assetPath);
+					cache.put(assetPath, t);
+				} catch (Exception e) {
+					Log.e(TAG, "Could not get typeface '" + assetPath
+							+ "' because " + e.getMessage());
+					return null;
+				}
+			}
+			return cache.get(assetPath);
+		}
+	}
+}
+May 8, 2012 #8 cganapa...@gmail.com Thanks  brian code is working correctly ... helped me ...
+Aug 22, 2012 #9 nitin0...@gmail.com really aussom Brain this work and reduce my memory 70%......THANKS A LOT
+Jan 4, 2013 #10 quasaur To HTH: Could you please give a more detailed example of your implementation of Typefaces in the activity? I'm still having problems (see attached log file).
+
+
+  log.txt 
+3.0 KB   View   Download  
+
+Jan 8, 2013 #11 sanimap@gmail.com One thing I like to mention if you have to add and remove views or you are assigning typeface multiple times to same textview ,then you need to do this
+
+    if(someTextView.getTypeface() !=null && !someTextView.getTypeface().equals(Typefaces.get(somecontext,someassetpath))
+       someTextView.setTypeface(Typefaces.get(somecontext,someassetpath);
+
+Otherwise you will get more and more memory allocated,when you continuously set typeface to same textview
+
+
+http://code.google.com/p/android/issues/detail?id=9904

@@ -1,4 +1,14 @@
 [异常]
+error PRJ0003 生成 cmd.exe 时出错 
+[解决]
+VS里
+tools=> Options => Projects and Solutions -> VC++ Directories page 
+环境变量
+$(SystemRoot)/System32
+$(SystemRoot)
+$(SystemRoot)/System32/wbem 
+
+[异常]
 OpenGL eglSwapBuffers failed: EGL_BAD_ALLOC，or EGL_BAD_SURFACE
 
 [链接错误]

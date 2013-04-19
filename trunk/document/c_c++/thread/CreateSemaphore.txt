@@ -1,0 +1,45 @@
+VC声明
+HANDLE CreateSemaphore(
+LPSECURITY_ATTRIBUTESlpSemaphoreAttributes, // SD
+LONGlInitialCount, // initial count
+LONGlMaximumCount, // maximum count
+LPCTSTRlpName // object name
+);
+作用
+创建一个新的信号量
+返回值
+Long，如执行成功，返回信号量对象的句柄；零表示出错。会设置GetLastError。即使返回一个有效的句柄，但倘若它指出同名的一个信号量已经存在，那么GetLastError也会返回ERROR_ALREADY_EXISTS
+
+
+参数
+
+lpSemaphoreAttributes SECURITY_ATTRIBUTES，指定一个SECURITY_ATTRIBUTES结构，或传递零值（将参数声明为ByVal As Long，并传递零值）——表示采用不允许继承的默认描述符。该参数定义了信号量的安全特性
+lInitialCount Long，设置信号量的初始计数。可设置零到lMaximumCount之间的一个值
+lMaximumCount Long，设置信号量的最大计数
+lpName String，指定信号量对象的名称。用vbNullString可创建一个未命名的信号量对象。如果已经存在拥有这个名字的一个信号量，就直接打开现成的信号量。这个名字可能不与一个现有的互斥体、事件、可等待计时器或文件映射的名称相符
+
+
+一旦不再需要，一定记住用CloseHandle关闭信号量的句柄。它的所有句柄都关闭以后，对象自己也会删除
+一旦值大于零，信号量就会触发（发出信号）。ReleaseSemaphore函数的作用是增加信号量的计数。如果成功，就调用信号量上的一个等待函数来减少它的计数
+
+
+Semaphore是另一个同步问题机制，不论是Event或Mutex，其他Process在执行WaitForSingleObject
+时，就看当时的物件是Signal或UnSignal而决定是否等待，而Semaphore也相同，但是它要变成Signal /UnSignal的状态，却有些不同，它是提供一个计数值，它允许在这个计数值之内，任何执行到WaitForSingleObject的Thread都不会停下来，而且每执行WaitForSingleObject一次，计数值就减一，当计数值变成0时，该Semaphore才会处於UnSignal的状态，而某个Thread ReleaseSemaphore时，便会将计数值增加，以便其他的Thread或本身可得Signal的讯号，而使WaitForSingleObject停止等待。
+例如说，该电脑只有两个 COM PORT，所以只允许两个计数值同时使用COM PORT，因此，
+hSema = CreateSemaphore(ByVal 0&, 2, 2, "MySema")
+第2个叁数表示：刚开始的时候，有多少个COM PORT可使用
+第3个叁数表示：最多有多少个COM PORT可使用
+第4个叁数:Semaphore的名称，只要名称相同，则传回的handle(hSema)会指向相同的
+Semaphore物件。因此，要使用相同的名称来Create Semaphore才能达共用
+一个Semaphore的效果。而使用WaitForSingleObject来Check看看是否还有剩下的COM Port可使用，如果还有剩(计数值 > 0)，则没有等待而可执行下一行指令，同时，计数值减1。若有第三个要求
+COM PORT的使用，那它就得等待，直到有Thread执行ReleaseSemaphore(hSema, 1, count)
+第2个叁数表示：Release多少个COM PORT出来，一般来说都是1，表示一个ReleaseSemaphore
+会将计数器的值加一，但是您也可以指定 > 1的值，代表一口气增加计数器的值( + n , n > 1)。例如，您的程式一口气使用了两个COM PORT，并假设您於程式中有使用WaitForSingleObject两次，程式最後，使用
+ReleaseSemaphore(hSema, 2, count)而不必
+ReleaseSemaphore(hSema, 1, count)执行两次。
+第3个叁数表示：ReleaseSemaphore执行之前计数器原来的值。
+Semaphore和Event有个地方相同，那就是没有Owner的观念，即Thread A 所Create出的
+Semaphore物件，於Thread B中执行ReleaseSemaphore时，依然会增加计数器的值
+
+
+http://baike.baidu.com/view/1285861.htm

@@ -1,4 +1,10 @@
 异常：
+could not change executable permissions on the application.
+解决：
+bundle identifier是可以相同的，但相同的bundle identifier要求有相同的Target Name才可以。
+删除机器上的同identifier应用就可以了
+
+异常：
 A system application with the given bundle identifier is already installed on the device and cannot be replaced.
 解决：
 越狱工具安装的

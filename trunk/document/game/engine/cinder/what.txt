@@ -1,0 +1,7 @@
+CINDER PROVIDES A POWERFUL, INTUITIVE TOOLBOX for programming graphics, audio, video, networking, image processing and computational geometry. Cinder is cross-platform, and in general the exact same code works under Mac OS X, Windows and a growing list of other platforms ¡ª most recently the iPhone and iPad.
+
+Cinder is designed to take advantage of platforms¡¯ native capabilities whenever it¡¯s possible, and relies on a minimum of 3rd party libraries. This makes for much lighter, faster applications, and means Cinder apps get free performance, security and capability upgrades whenever the operating system does.
+
+We also have worked hard to create a library that feels familiar and intuitive to C++ programmers, building on the idioms and techniques the C++ community has developed over its long history. Cinder¡¯s modern internal memory management virtually eliminates leaks, not only of memory but also of resources like OpenGL textures. We make use of the exceptional Boost libraries to fill in any gaps, and always favor techniques built on features which are currently or soon will be standard C++ (such as std::thread or std::shared_ptr).
+
+We are proud of Cinder, and while we think you¡¯ll be hard-pressed to find a more powerful environment for creative coding, we¡¯re just getting started. We hope you¡¯ll take the time to experiment with Cinder yourself, and if you like what you see, come join our community.

@@ -1,4 +1,4 @@
-#Thu Mar 07 08:59:51 CST 2013
+#Thu Apr 11 14:02:13 CST 2013
 eclipse.preferences.version=1
 encoding//3dsmax/3dsmax\u63D2\u4EF6.txt=UTF-8
 encoding//algorithm/image\ process/gauss\ blur/Four\ Tricks\ for\ Fast\ Blurring\ in\ Software\ and\ Hardware.txt=UTF-8
@@ -8,6 +8,7 @@ encoding//android/proguard/Android\ \u4E2D\ Proguard\ \u548CJNI\ \u76F8\u5173.tx
 encoding//android/sound/OpenAL\ on\ Android.txt=UTF-8
 encoding//c_c++/C++/C++11/C++11\ \u6A19\u6E96\u6B63\u5F0F\u767C\u5E03.txt=UTF-8
 encoding//c_c++/basis/C++\u5B57\u7B26\u4E32\u5206\u8BCD.txt=UTF-8
+encoding//c_c++/thread/\u4FE1\u53F7\u91CF\u4E0E\u4E92\u65A5\u9501.txt=UTF-8
 encoding//c_c++/thread/\u5728C++\u4E2D\u5B9E\u73B0\u540C\u6B65\u9501,\u7C7B\u4F3CSynchronize\uFF08object\uFF09.txt=UTF-8
 encoding//game/effects/\u8BF7\u6559ogre\u4E2D\u5982\u4F55\u5B9E\u73B0war3\u4E2D\u95EA\u7535\u94FE\u6548\u679C.txt=UTF-8
 encoding//game/emulator/OpenGL\ ES\ Emulator\u6A2A\u5411\u6BD4\u8F83.txt=UTF-8
@@ -21,6 +22,7 @@ encoding//game/texture/\u4E8C\u7EF4\u7EB9\u7406\ Texture\ 2D.txt=UTF-8
 encoding//industry/2012/20120806_Khronos\ Releases\ OpenGL\ ES\ 3.0\ Specification.txt=UTF-8
 encoding//industry/2013/20130126\u6B27\u6D32\u79D1\u5B66\u5BB6\u6210\u529F\u5B9E\u73B0DNA\u5B58\u50A8\u6570\u636E\ \u53EF\u5B58\u50A8\u6570\u4E07\u5E74.txt=UTF-8
 encoding//industry/2013/20130204\ 2\u6708\u4E2D\u56FD\u64CD\u4F5C\u7CFB\u7EDF\u62A5\u544A\uFF1AXP\u536067%\uFF0CWin7\u670927.5%.txt=UTF-8
+encoding//industry/2013/\u5218\u97E7\uFF1A\u5173\u4E8E\u53F2\u7389\u67F1\u7684\u4E5D\u4E2A\u6545\u4E8B.txt=UTF-8
 encoding//j2se/jni/The\ Invocation\ API.txt=UTF-8
 encoding//j2se/jni/jniTOC.txt=UTF-8
 encoding//job/candidate/jobs20120226.html=UTF-8

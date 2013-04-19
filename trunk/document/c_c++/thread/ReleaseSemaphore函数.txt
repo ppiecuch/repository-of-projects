@@ -1,0 +1,16 @@
+ReleaseSemaphore函数 
+
+作用：ReleaseSemaphore函数用于对指定的信号量增加指定的值；
+
+原型：
+
+BOOL ReleaseSemaphore(
+  HANDLE hSemaphore,
+  LONG lReleaseCount,
+  LPLONG lpPreviousCount
+);
+参数：hSemaphore [输入参数]所要操作的信号量对象的句柄，这个句柄是CreateSemaphore或者OpenSemaphore函数的返回值。这个句柄必须有SEMAPHORE_MODIFY_STATE 的权限。lReleaseCount 【输入参数】这个信号量对象在当前基础上所要增加的值，这个值必须大于0，如果信号量加上这个值会导致信号量的当前值大于信号量创建时指定的最大值，那么这个信号量的当前值不变，同时这个函数返回FALSE;lpPreviousCount [输出参数]指向返回信号量上次值的变量的指针，如果不需要信号量上次的值，那么这个参数可以设置为NULL;返回值：如果
+
+成功返回TRUE,如果失败返回FALSE,可以调用GetLastError函数得到详细出错信息；
+
+http://blog.csdn.net/houpk345/article/details/5373586

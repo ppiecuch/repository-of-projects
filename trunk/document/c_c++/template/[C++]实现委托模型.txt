@@ -1,0 +1,497 @@
+我对.Net的委托模型印象很深刻，使用委托，可以快速实现观察者模式，免去写很多繁杂重复的代码。遗憾的是，C++并没有提供这样的模型，为了达到相似的目的，需要继承一个类并重写virtual方法，这种做法需要写很多代码，效率比较低下（使用过MFC的应该都能体会到）。然而，在强大的C++面前，没有什么是不可能的，已经有很多人针对这个问题进行过研究，并且实现了各种委托模型，其中最著名的就是FastDelegate，这个模型在《Member Function Pointers and the Fastest Possible C++ Delegates》中提出（原文地址：http://www.codeproject.com/KB/cpp/FastDelegate.aspx）。这个模型的特点就是“Fast”，因此不可避免地要依赖编译器的具体实现，虽然文章的最后说明该模型已在大部分的编译器上通过了测试，我仍然对此不太放心，要是哪个编译器升级后改变了实现方式，这个模型就不适合使用了。而且，由于自身水平有限以及懒惰的心理，我也不想去深究每种编译器的具体实现方式。我想要的是符合C++标准，与编译器无关的模型，而不管它是否“Fast”。经过不断的摸索，终于写出了这样的一个委托模型，下面与大家分享一下该模型的实现原理。（当然，如果你认为FastDelegate已经满足需求，而且不担心它依赖于编译器，那么完全可以忽略本文）
+
+ 
+
+成员函数指针的操作
+
+在开始之前首先介绍一下成员函数指针，它与非成员函数指针的操作方式有很大的不同。有这么一个类：
+
+?1
+2
+3
+4 class A { 
+public: 
+    void Func(int) { … } 
+}; 
+
+要取得Func函数的指针，必须这么做：
+
+?1 void (A::*pFunc)(int) = &A::Func; 
+
+::*是一个特殊的操作符，表示pFunc是一个指针，指向A的成员函数。获取成员函数的地址不能通过类对象来获取，必须像上面的那样，通过类名获取，而且要加上取地址操作符（&）。
+
+ 
+
+那么如何通过成员函数指针来调用该函数呢？成员函数都有一个隐含的this参数，表示函数要操作的对象，现在我们只获取到了函数的指针，还缺少一个对象作为this参数。为了达到这个目的，需要先创建一个对象，然后通过该对象来调用成员函数指针：
+
+?1
+2
+3
+4
+5 A a; 
+(a.*pFunc)(10); 
+  
+A* pa = &a; 
+(pa->*pFunc)(11); 
+
+第一种方式是通过对象本身来调用，第二种方式是通过对象指针来调用，两种方式的效果都是一样的。.*和->*都是特殊的操作符，不必纠结于它们奇怪的样子，只要知道它们只用于调用成员函数指针就行了。
+
+ 
+
+第一步：使用类模板
+
+通过上面的介绍，我们知道了要调用一个成员函数，仅仅有成员函数指针是不够的，还需要一个对象指针，所以要用一个类将两者绑到一起。由于对象的类型是无穷多的，所以这里必须使用类模板：
+
+?1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15 template<typename T> 
+class DelegateHandler { 
+  
+public: 
+    DelegateHandler(T* pT, void (T::*pFunc)(int)) 
+        : m_pT(pT), m_pFunc(pFunc) { } 
+  
+    void Invoke(int value) { 
+        (m_pT->*m_pFunc)(value); 
+    } 
+  
+private: 
+    T* m_pT; 
+    void (T::*m_pFunc)(int); 
+}; 
+
+可以像下面那样使用该模板：
+
+?1
+2
+3
+4
+5
+6
+7 A a; 
+DelegateHandler<A> ah(&a, &A::Func); 
+ah.Invoke(3); 
+  
+B b; 
+DelegateHandler<B> bh(&b, &B::Method);  //B::Method的声明与A::Func一致 
+bh.Invoke(4); 
+
+ 
+
+到这里产生了一个问题：如果希望调用的目标是非成员函数，怎么办？上面的类模板无法调用非成员函数，不过使用模板偏特化就可以解决这个问题：
+
+?1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14 template<> 
+class DelegateHandler<void> { 
+  
+public: 
+    DelegateHandler(void (*pFunc)(int))  
+        : m_pFunc(pFunc) { } 
+  
+    void Invoke(int value) { 
+        (*m_pFunc)(value); 
+    } 
+  
+private: 
+    void (*m_pFunc)(int); 
+}; 
+
+使用方法也是一样的：
+
+?1
+2 DelegateHandler<void> h(NonmemberFunc); // void NonmemberFunc(int); 
+h.Invoke(5); 
+
+ 
+
+也许你会有疑问：非成员函数不需要将函数指针和对象指针绑到一起，为什么这里还要用一个类来包装函数指针？看了下面的内容自然会明白了。
+
+ 
+
+第二步：使用多态
+
+对于单目标的委托来说，使用上面的代码或许就已经足够了。但是我的目的当然不止于此，我想要的是多目标的委托。多目标委托其实就是一个容器，在这个容器里可以存放多个对象，当调用委托的时候依次调用每个对象。容器里的对象应该都是相同的类型，这样才能够放到强类型的容器中；而且委托调用方不应该知道具体的调用目标是什么，所以这些对象也应该要隐藏具体的细节。遗憾的是，上一步中实现的类模板都不具备这些能力，DelegateHandler<A>和DelegateHandler<B>是不同的类型，不能放到同一个容器中，调用方要调用它们也必须知道调用的目标是什么类型。
+
+ 
+
+解决这个问题的方法就是使用多态，令所有的委托目标类都继承一个公共的接口，调用方只通过这个接口来进行调用，这样就不必知道每个目标具体的类型。下面就是该接口的定义：
+
+?1
+2
+3
+4
+5
+6 class IDelegateHandler { 
+  
+public: 
+    virtual ~IDelegateHandler() { } 
+    virtual void Invoke(int) = 0; 
+}; 
+
+然后令DelegateHandler继承该接口：
+
+?1
+2
+3
+4
+5
+6
+7
+8
+9 template<typename T> 
+class DelegateHandler : public IDelegateHandler { 
+    … 
+} 
+  
+template<> 
+class DelegateHandler<void> : public IdelegateHandler { 
+    … 
+} 
+
+现在可以将各种类型的DelegateHandler放到同一个容器中，并使用同样的方式来调用了：
+
+?1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15 A a; 
+B b; 
+  
+DelegateHandler<A> ah(&a, &A::Func); 
+DelegateHandler<B> bh(&b, &B::Method); 
+DelegateHandler<void> vh(NonmemberFunc); 
+  
+std::vector<IDelegateHandler*> handlers; 
+handlers.push_back(&ah); 
+handlers.push_back(&bh); 
+handlers.push_back(&vh); 
+      
+for (auto it = handlers.cbegin(); it != handlers.cend(); ++it) { 
+    (*it)->Invoke(7); 
+} 
+
+ 
+
+第三步：使用宏
+
+不知道你注意到没有，上面写了那么多代码，只是为了实现一个返回值为void，有一个int参数的委托！如果要实现更多类型的委托，上面的代码就要重复很多次了。幸好，C++有宏这个东西，使用它可以帮助我们快速生成大量代码。然而这个宏的定义可不是那么简单，为了它我费了好大周折。下面开始讲述这个探索的过程，如果不想看我啰嗦，可以直接跳到后面看现成的代码。
+
+ 
+
+我们都知道，函数参数的声明可以只有类型而没有名称，但是为了在函数内使用参数，该参数必须有名称。例如：
+
+?1
+2
+3
+4
+5
+6 void Invoke(int) { 
+    //不能使用参数 
+} 
+void Invoke(int value) { 
+    //可以通过value这个名称来使用参数 
+} 
+
+另外，调用函数的时候只能使用名称，不能带有类型：
+
+?1
+2 int value = 10; 
+Invoke(value); 
+
+ 
+
+这些问题似乎都显而易见，根本不值一提，但这些就是定义宏的关键。一开始我想象宏的使用应该是这样的：
+
+?1 DELEGATE(void, DelegateHandler, int, int); 
+
+毫无疑问，在它的定义中，从第三个参数开始应该使用可变参数，像这样（只截取了定义的一部分）：
+
+?1
+2
+3
+4
+5
+6 #define DELEGATE(retType, name, …)  \ 
+    … 
+    retType Invoke(__VA_ARGS__) {          \ 
+        return (*m_pFunc)(__VA_ARGS__);    \ 
+    }    \ 
+    … 
+
+展开后的代码是这样的：
+
+?1
+2
+3
+4
+5 … 
+void Invoke(int, int) { 
+    return (*m_pFunc)(int, int); 
+} 
+… 
+
+ 
+
+这样很明显是错误的，即使在定义委托的时候加上参数名称也不行。问题的原因是函数参数的声明方式与调用方式不同，而且我们不能将__VA_ARGS__拆开来处理，我们没办法为参数添加名称，也不能去掉参数的名称。
+
+ 
+
+既然如此，我们就使用两个__VA_ARGS__，一个用于函数参数的声明，一个用于调用。以上面的为例，第一个__VA_ARGS__应该是这样子：
+
+?1 int a, int b 
+
+第二个__VA_ARGS__应该是这样子：
+
+?1 a, b 
+
+宏展开之后应该是这样子：
+
+?1
+2
+3
+4
+5 … 
+void Invoke(int a, int b) { 
+    return (*m_pFunc)(a, b); 
+} 
+… 
+
+这样就正确了。可是这样又带来了一个新问题：一个宏里只能使用一个可变参数。解决方法是，使用另外的宏来产生这两个__VA_ARGS__！好了，我不再说废话了，直接给出代码来，代码比我的表达能力更强。
+
+?1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99 #define DECLARE_PARAMS(...) __VA_ARGS__ 
+#define DECLARE_ARGS(...) __VA_ARGS__ 
+  
+//0个参数的委托 
+#define DELEGATE0(retType, name) \ 
+    DECLARE_DELEGATE(retType, name, DECLARE_PARAMS(void), ) 
+  
+//1个参数的委托 
+#define DELEGATE1(retType, name, p1) \ 
+    DECLARE_DELEGATE( \ 
+        retType, \ 
+        name, \ 
+        DECLARE_PARAMS(p1 a), \ 
+        DECLARE_ARGS(a)) 
+  
+//2个参数的委托 
+#define DELEGATE2(retType, name, p1, p2) \ 
+    DECLARE_DELEGATE( \ 
+        retType, \ 
+        name, \ 
+        DECLARE_PARAMS(p1 a, p2 b), \ 
+        DECLARE_ARGS(a, b)) 
+      
+//3个参数的委托 
+#define DELEGATE3(retType, name, p1, p2, p3) \ 
+    DECLARE_DELEGATE( \ 
+        retType, \ 
+        name, \ 
+        DECLARE_PARAMS(p1 a, p2 b, p3 c), \ 
+        DECLARE_ARGS(a, b, c)) 
+  
+//4个参数的委托 
+#define DELEGATE4(retType, name, p1, p2, p3, p4) \ 
+    DECLARE_DELEGATE( \ 
+        retType, \ 
+        name, \ 
+        DECLARE_PARAMS(p1 a, p2 b, p3 c, p4 d), \ 
+        DECLARE_ARGS(a, b, c, d)) 
+  
+//5个参数的委托 
+#define DELEGATE5(retType, name, p1, p2, p3, p4, p5) \ 
+    DECLARE_DELEGATE( \ 
+        retType, \ 
+        name, \ 
+        DECLARE_PARAMS(p1 a, p2 b, p3 c, p4 d, p5 e), \ 
+        DECLARE_ARGS(a, b, c, d, e)) 
+  
+//6个参数的委托 
+#define DELEGATE6(retType, name, p1, p2, p3, p4, p5, p6) \ 
+    DECLARE_DELEGATE( \ 
+        retType, \ 
+        name, \ 
+        DECLARE_PARAMS(p1 a, p2 b, p3 c, p4 d, p5 e, p6 f), \ 
+        DECLARE_ARGS(a, b, c, d, e, f)) 
+  
+//7个参数的委托 
+#define DELEGATE7(retType, name, p1, p2, p3, p4, p5, p6, p7) \ 
+    DECLARE_DELEGATE( \ 
+        retType, \ 
+        name, \ 
+        DECLARE_PARAMS(p1 a, p2 b, p3 c, p4 d, p5 e, p6 f, p7 g), \ 
+        DECLARE_ARGS(a, b, c, d, e, f, g)) 
+  
+//8个参数的委托 
+#define DELEGATE8(retType, name, p1, p2, p3, p4, p5, p6, p7, p8) \ 
+    DECLARE_DELEGATE( \ 
+        retType, \ 
+        name, \ 
+        DECLARE_PARAMS(p1 a, p2 b, p3 c, p4 d, p5 e, p6 f, p7 g, p8 h), \ 
+        DECLARE_ARGS(a, b, c, d, e, f, g, h)) 
+  
+#define DECLARE_DELEGATE(retType, name, params, args)                         \ 
+class I##name {                                                               \ 
+public:                                                                       \ 
+    virtual ~I##name() { }                                                    \ 
+    virtual retType Invoke(params) = 0;                                       \ 
+};                                                                            \ 
+template<typename T>                                                          \ 
+class name : public I##name {                                                 \ 
+public:                                                                       \ 
+    name(T* pType, retType (T::*pFunc)(params))                               \ 
+        : m_pType(pType), m_pFunc(pFunc) { }                                  \ 
+    retType Invoke(params) {                                                  \ 
+        return (m_pType->*m_pFunc)(args);                                     \ 
+    }                                                                         \ 
+private:                                                                      \ 
+    T* m_pType; retType (T::*m_pFunc)(params);                                \ 
+};                                                                            \ 
+template<>                                                                    \ 
+class name<void> : public I##name {                                           \ 
+public:                                                                       \ 
+    name(retType (*pFunc)(params))                                            \ 
+        : m_pFunc(pFunc) { }                                                  \ 
+    retType Invoke(params) {                                                  \ 
+        return (*m_pFunc)(args);                                              \ 
+    }                                                                         \ 
+private:                                                                      \ 
+    retType (*m_pFunc)(params);                                               \ 
+} 
+
+注意最后面少了一个分号，这是故意为之的，为了强迫在定义委托的时候加上分号。这种宏定义的方法对参数个数有了限制，我这里的定义最多只支持8个参数，为了支持更多参数，需要写更多的代码。其实我认为8个参数已经足够了，超过8个参数的函数不是好的设计，应该重新考虑一下。
+
+
+
+http://www.cnblogs.com/zplutor/archive/2011/09/17/2179756.html
