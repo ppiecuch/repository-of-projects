@@ -9,12 +9,12 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 
-IModel* cubeModel=NULL;
-IModel* weedModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* weedModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel=NULL;
 f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
@@ -63,7 +63,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
@@ -94,7 +94,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createCube(50,50,50);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	cubeModel=sceneMgr->addModel(entity);
+	cubeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=cubeModel->getMaterial(0);
 		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT;
@@ -108,7 +108,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createWeed(100);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	weedModel=sceneMgr->addModel(entity);
+	weedModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=weedModel->getMaterial(0);
 		material.MaterialType=ENUM_MATERIAL_TYPE_TRANSPARENT;
@@ -123,7 +123,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createTeapot(2,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	teapotModel=sceneMgr->addModel(entity);
+	teapotModel=sceneMgr->addSceneNode(entity);
 	teapotModel->setPosition(core::vector3df(50,-50,0));
 	shap->drop();
 	unit->drop();
@@ -132,7 +132,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	planeModel=sceneMgr->addModel(entity);
+	planeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=planeModel->getMaterial(0);
 		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
@@ -154,7 +154,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	planeModel->addAnimator(alphaAnimator);
 	alphaAnimator->drop();
 
-	shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
+	/*shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
 	unit->setVertexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
 	unit->setIndexHardwareBufferUsageType(video::ENUM_HARDWARDBUFFER_USAGE_TYPE_DYNAMIC);
@@ -176,7 +176,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	uvParam.animatorUV.stage=0;
 	IAnimator* uvAnimator=animatorFty->createAnimator(uvParam);
 	waterfallModel->addAnimator(uvAnimator);
-	uvAnimator->drop();
+	uvAnimator->drop();*/
 
 	return true;
 }
@@ -185,7 +185,7 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin(true,true,video::SColor(0xFF132E47));
+	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
 	const core::vector3df crot=cubeModel->getRotation();
 	cubeModel->setRotation(core::vector3df(crot.x,crot.y+0.5f ,crot.z));

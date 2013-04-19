@@ -2,22 +2,27 @@
 #include <vector>
 using namespace std;
 
+#include "yonConfig.h"
+
+#ifdef YON_COMPILE_WITH_ANDROID
+
 #include "client/linux/handler/exception_handler.h"
 #include "client/linux/handler/minidump_descriptor.h"
 
-#include "framework.h"
-
-
-
 bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,void* context,bool succeeded) {
 	YON_DEBUG("Dump path: %s\n", descriptor.path());
-	 return succeeded;
+	return succeeded;
 }
 
 void Crash() {
 	volatile int* a = reinterpret_cast<volatile int*>(NULL);
 	*a = 1;
 }
+
+#endif
+
+#include "framework.h"
+
 
 SYonEngineParameters params;
 IYonEngine* engine=NULL;
@@ -66,11 +71,13 @@ public:
 			{
 			case event::ENUM_TOUCH_INPUT_TYPE_DOWN:
 				//logger->debug("[P]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
+#ifdef YON_COMPILE_WITH_ANDROID
 				{
 					google_breakpad::MinidumpDescriptor descriptor(fs->getResourcePath(".").c_str());
 					google_breakpad::ExceptionHandler eh(descriptor, NULL, DumpCallback,NULL, true, -1);
 					Crash();
 				}
+#endif
 				return true;
 			case event::ENUM_TOUCH_INPUT_TYPE_UP:
 				//logger->debug("[R]%.2f,%.2f\n",evt.touchInput.x,evt.touchInput.y);
@@ -97,7 +104,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	sceneMgr=engine->getSceneManager();
 	gfAdapter=engine->getGraphicsAdapterWindow();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
-	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
+	IAnimatorFactory* animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	logger=Logger;
