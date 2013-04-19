@@ -169,6 +169,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\AndroidCompress.mk"
+			>
+		</File>
+		<File
 			RelativePath=".\framework.cpp"
 			>
 		</File>
