@@ -1,0 +1,273 @@
+临界区，内核事件，互斥量，信号量，都能完成线程的同步，在这里把他们各自的函数调用，结构定义，以及适用情况做一个总结。
+
+
+临界区:
+适用范围：它只能同步一个进程中的线程，不能跨进程同步。一般用它来做单个进程内的代码快同步,效率比较高。
+相关结构：CRITICAL_SECTION  _critical
+相关方法：
+/*初始化，最先调用的函数。没什么好说的，一般windows编程都有类似初始化的方法*/
+InitializeCriticalSection(& _critical) 
+
+
+/*释放资源，确定不使用_critical时调用，一般在程序退出的时候调用。如果以后还要用_critical，则要重新调用InitializeCriticalSection
+*/
+DeleteCriticalSection(& _critical) 
+
+
+/*
+把代码保护起来。调用此函数后，他以后的资源其他线程就不能访问了。
+*/
+EnterCriticalSection（& _critical）
+
+
+/*
+离开临界区，表示其他线程能够进来了。注意EnterCritical和LeaveCrticalSection必须是成对出现的!当然除非你是想故意死锁！
+*/
+LeaveCriticalSection(& _critical)
+
+
+代码Demo
+临界区
+#include "stdafx.h"
+int thread_count = 0;
+/*Mutex mutex1;*/
+CRITICAL_SECTION g_cs;
+DWORD CALLBACK thread_proc(LPVOID params)
+{
+    for(int i = 0; i < 10; ++i)
+    {
+            //synchronized(mutex1)
+            EnterCriticalSection(&g_cs);
+            {
+                for(char c = 'A'; c <= 'Z'; ++c)
+                {
+                    printf("%c",c);
+                }
+                printf("\n");
+            }
+            LeaveCriticalSection(&g_cs);
+    }
+    thread_count--;
+    return 0;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+    InitializeCriticalSection(&g_cs);
+    thread_count = 4;
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    while (thread_count) 
+        Sleep(0);
+    getchar();
+    DeleteCriticalSection(&g_cs);
+    return 0;
+
+
+
+内核事件：
+适用范围：多用于线程间的通信，可以跨进程同步。
+相关结构: HANDLE hEvent;
+相关方法： 
+/*
+初始化方法，创建一个事件对象，第一个参数表示安全属性，一般情况下，遇到这类型的参数直接给空就行了，第二个参数是否是人工重置。（内核时间有两种工作模式：人工重置和自动重置。其区别会在下面提到。）。第三个参数是初始状态，第四个参数事件名称。
+*/
+hEvent = CreateEvent（NULL,FALSE,FALSE,NULL);
+
+
+/*
+等待单个事件置位，即线程会在这个函数阻塞直到事件被置位，SetEvent。
+如果是自动重置事件，则在此函数返返回后系统会自动调用ResetEvent（hEvnet），重置事件，保证其他线程不能访问。
+如果是人工重置事件，则在此函数返回以后，系统的其他线程能继续访问。
+第二个参数说明等待事件，INIFINET表示一直等待。
+*/
+WatiForSingleObject(hEvent,INIFINET)
+
+
+/*
+置位事件，只要使事件置位线程才能进去访问。即WatiForSingleObject(hEvent,INIFINET)才返回
+*/
+SerEvent(hEvent);
+
+
+/*
+重置事件,使得WatiForSingleObject（）不返回
+*/
+ResetEvent(hEvent)
+
+
+
+
+/*
+等待多个事件对象。参数nCount指定了要等待的内核对象的数目，存放这些内核对象的数组由lpHandles来指向。fWaitAll对指定的这nCount个内核对 象的两种等待方式进行了指定，为TRUE时当所有对象都被通知时函数才会返回，为FALSE则只要其中任何一个得到通知就可以返回。 dwMilliseconds在这里的作用与在WaitForSingleObject（）中的作用是完全一致的。如果等待超时，函数将返回 WAIT_TIMEOUT。如果返回WAIT_OBJECT_0到WAIT_OBJECT_0+nCount-1中的某个值，则说明所有指定对象的状态均 为已通知状态（当fWaitAll为TRUE时）或是用以减去WAIT_OBJECT_0而得到发生通知的对象的索引（当fWaitAll为FALSE 时）
+*/
+WaitForMultiObjects(DWORD nCount, // 等待句柄数
+　CONST HANDLE *lpHandles, // 句柄数组首地址
+BOOL fWaitAll, // 等待标志
+
+　DWORD dwMilliseconds // 等待时间间隔)
+
+
+/*
+打开一个命名的事件对象，可以用来跨进程同步
+*/
+HANDLE OpenEvent(
+DWORD dwDesiredAccess, // 访问标志
+BOOL bInheritHandle, // 继承标志
+LPCTSTR lpName // 指向事件对象名的指针
+);
+测试代码
+内核事件
+#include "stdafx.h"
+/*#include "Mutex.h"*/
+int thread_count = 0;
+/*Mutex mutex1;*/
+/*CRITICAL_SECTION g_cs;*/
+HANDLE hEvent;
+DWORD CALLBACK thread_proc(LPVOID params)
+{
+    for(int i = 0; i < 10; ++i)
+    {
+            //synchronized(mutex1)
+            //EnterCriticalSection(&g_cs);
+            
+            WaitForSingleObject(hEvent,INFINITE);
+            {    
+                for(char c = 'A'; c <= 'Z'; ++c)
+                {
+                    printf("%c",c);
+                    Sleep(1);
+                }
+                printf("\n");
+            }
+            SetEvent(hEvent);
+            //LeaveCriticalSection(&g_cs);
+    }
+    thread_count--;
+    return 0;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+    //InitializeCriticalSection(&g_cs);
+    hEvent = CreateEvent(NULL,FALSE,FALSE,NULL);
+    SetEvent(hEvent);
+    thread_count = 4;
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    while (thread_count) 
+        Sleep(0);
+    getchar();
+    //DeleteCriticalSection(&g_cs);
+    return 0;
+}
+
+
+
+互斥量：
+适用范围：可以跨进程同步，还可以用来保证程序只有一个实例运行（创建命名互斥量）,也可以用来做线程间的同步
+相关结构：HANDLE hMutex;
+相关方法：
+/*
+创建互斥量，初始化的工作
+参数一为安全选项，一般为空
+参数二表示当前互斥量是否属于某个线程，一般为空
+参数三互斥量的名称，如果需要跨进程同步或者需要保证程序只有一个实例运行，则需要设置，其他情况一般为空。
+*/
+CreateMutex(NULL,FALSE,NULL)
+
+
+
+
+WaitForSingleObject(hMutex,INIFINET);//同事件对象
+
+
+/*
+释放互斥量，以使得其他线程可以访问。
+*/
+ReleaseMutex(hMutex)
+
+
+/*
+在互斥对象通知引 起调用等待函数返回时，等待函数的返回值不再是通常的WAIT_OBJECT_0（对于WaitForSingleObject（）函数）或是在 WAIT_OBJECT_0到WAIT_OBJECT_0+nCount-1之间的一个值（对于WaitForMultipleObjects（）函 数），而是将返回一个WAIT_ABANDONED_0（对于WaitForSingleObject（）函数）或是在WAIT_ABANDONED_0 到WAIT_ABANDONED_0+nCount-1之间的一个值（对于WaitForMultipleObjects（）函数）。
+*/
+WaitForMultiObjects(DWORD nCount, // 等待句柄数
+　CONST HANDLE *lpHandles, // 句柄数组首地址
+BOOL fWaitAll, // 等待标志
+
+　DWORD dwMilliseconds // 等待时间间隔)
+
+
+/*
+打开一个已经创建好了的命名互斥量，用于跨进程同步
+*/
+HANDLE OpenMutex(
+DWORD dwDesiredAccess, // 访问标志
+BOOL bInheritHandle, // 继承标志
+LPCTSTR lpName // 互斥对象名
+);
+
+
+测试demo
+
+互斥量
+#include "stdafx.h"
+/*#include "Mutex.h"*/
+int thread_count = 0;
+/*Mutex mutex1;*/
+/*CRITICAL_SECTION g_cs;*/
+//HANDLE hEvent;
+HANDLE hMutex;
+DWORD CALLBACK thread_proc(LPVOID params)
+{
+    for(int i = 0; i < 10; ++i)
+    {
+            //synchronized(mutex1)
+            //EnterCriticalSection(&g_cs);
+            WaitForSingleObject(hMutex,INFINITE);
+            //WaitForSingleObject(hEvent,INFINITE);
+            //{    
+                for(char c = 'A'; c <= 'Z'; ++c)
+                {
+                    printf("%c",c);
+                    Sleep(1);
+                }
+                printf("\n");
+            //}
+            //SetEvent(hEvent);
+            ReleaseMutex(hMutex);
+            //LeaveCriticalSection(&g_cs);
+    }
+    thread_count--;
+    return 0;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+    //InitializeCriticalSection(&g_cs);
+    //hEvent = CreateEvent(NULL,FALSE,FALSE,NULL);
+    //SetEvent(hEvent);
+    hMutex = CreateMutex(NULL,FALSE,NULL);
+    thread_count = 4;
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    CreateThread(0, 0, thread_proc, 0, 0, 0);
+    while (thread_count) 
+        Sleep(0);
+    getchar();
+    //DeleteCriticalSection(&g_cs);
+    return 0;
+}
+
+
+
+
+注意事项：所有的同步操作的必须成对存在，即锁一对象，一定要释放一个对象。但是如果在保护的代码快中发生异常，程序流程发生意外跳转而没有释放锁对象，导致程序进入死锁。所以在程序中必要的异常处理是必须的，但是C++中没有finally这样的关键字来保证不管是否发生异常都会执行的代码快。那怎么办呢？这就需要对C++的异常加一些小技巧来处理了......
+
+
+http://www.cnblogs.com/vieri122/archive/2009/09/10/1564104.html

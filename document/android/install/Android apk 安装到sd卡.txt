@@ -1,0 +1,65 @@
+对于Android 2.2开始的软件可以装到到SD上的支持，对于adb命令而言也有了改进，对于Android 2.2固件中的pm命令开支持安装选项参数，这里新增了参数setInstallLocation，这里我们可以用adb通过shell命令执行linux的pm添加一些参数即可，比如adb shell pm setInstallLocation 0。其中最后一个参数0代表auto自动的，Android系统会自动选择，而1为手机内部的rom，2为外部sd卡存储，主要解释如下
+
+ 
+adb shell pm setInstallLocation
+option
+
+option 的值可以为以下数字
+
+       0 [auto] Let the system decide. 自动
+
+       1 [internal only] ROM中
+
+        2 [external] SD卡中
+
+  这里android123推荐大家对于经常用的小软件可以安装在手机内部，比如来电管理、系统工具这样可以提供更高的可靠性节省电量，而游戏类应用可以考虑安装到SD卡上，对于文件大小超过4MB的APK可以考虑安装到SD卡上，通过电脑墙纸让apk安装到sd卡的命令为
+
+ adb shell pm setInstallLocation 2 
+
+  当然Android开发网提醒大家，还有新的获取安装的位置参数为getInstallLocation，我们使用adb shell pm getInstallLocation来获取软件的安装位置列表。
+
+ 
+
+ 
+
+  在Android 2.2中新的特性可以支持类似APP2SD卡上，我们的APK文件可以安装在SD卡上供用户使用，Android123今天就说下目前项目的升级和一些配置。
+
+   1. 首先让你的程序支持SD卡上安装必须具备设置API Level至少为8，即androidmanifest.xml的中android:minSdkVersion至少为8这样你的APK最终运行时兼容的固件只有2.2了，同时在androidmanifest.xml文件的根节点中必须加入android:installLocation这个属性，类似代码如下:
+
+  <manifest xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:installLocation="preferExternal" 
+    ... >
+
+  2. android:installLocation的值主要有preferExternal、auto和internalOnly这三个选项，通常我们设置为preferExternal可以优先推荐应用安装到SD卡上，当然最终用户可以选择为内部的ROM存储上，如果外部存储已满，Android内部也会安装到内部存储上，auto将会根据存储空间自适应，当然还有一些应用可能会有特殊的目的，他们一般必须安装在内部存储才能可靠运行，设置为internalOnly比较合适，主要体现在：
+
+Services 服务
+Your running Service will be killed and will not be restarted when external storage is remounted. You can, however, register for the ACTION_EXTERNAL_APPLICATIONS_AVAILABLE broadcast Intent, which will notify your application when applications installed on external storage have become available to the system again. At which time, you can restart your Service. Android123提示大家一般实时后台监控类的应用都应该装到内部存储，比较可靠。
+
+Alarm Services  闹铃提醒服务
+Your alarms registered with AlarmManager will be cancelled. You must manually re-register any alarms when external storage is remounted.
+
+Input Method Engines 输入法引擎
+Your IME will be replaced by the default IME. When external storage is remounted, the user can open system settings to enable your IME again.
+
+Live Wallpapers 活动壁纸
+Your running Live Wallpaper will be replaced by the default Live Wallpaper. When external storage is remounted, the user can select your Live Wallpaper again.
+
+Live Folders 活动文件夹
+Your Live Folder will be removed from the home screen. When external storage is remounted, the user can add your Live Folder to the home screen again.
+
+App Widgets Widget
+Your App Widget will be removed from the home screen. When external storage is remounted, your App Widget will not be available for the user to select until the system resets the home application (usually not until a system reboot).
+
+Account Managers 账户管理
+Your accounts created with AccountManager will disappear until external storage is remounted.
+
+Sync Adapters 同步适配器
+Your AbstractThreadedSyncAdapter and all its sync functionality will not work until external storage is remounted.
+
+Device Administrators 设备管理器
+Your DeviceAdminReceiver and all its admin capabilities will be disabled, which can have unforeseeable consequences for the device functionality, which may persist after external storage is remounted.
+
+  那么哪些应用适合安装在SD卡中呢? Android开发网建议一些占用资源比较大的游戏，比如大于3MB的单个文件，不需要长期驻留内存的应用，不具备提醒和实时监控的应用一般放到SD卡上比较合适，不过目前想让你的应用装到SD卡上，必须设置API Level至少为8以上，同时显示注明android:installLocation。
+  
+  
+  http://xxw8393.blog.163.com/blog/static/37256834201010534752373/

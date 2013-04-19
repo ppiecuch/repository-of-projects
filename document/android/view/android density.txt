@@ -1,0 +1,40 @@
+1.          什么是density
+1)         density
+density表示每英寸有多少个显示点(逻辑值)，它的单位是dpi：dot per inch，通常屏幕大时，density就大，屏幕小时，density就小，通常
+屏幕实际分辨率为240px*400px时，density=120
+屏幕实际分辨率为320px*533px，density=160
+屏幕实际分辨率为480px*800px，density=240
+2)         分辨率
+是整个屏是多少点，比如800x480，它是软件的显示单位
+3)         从Android1.6版本开始支持density(对应API Level 4)
+用于解决应用在屏幕大小不同的硬件上正常显示的问题
+2.          相关代码及设置
+1)         AndroidManifest.xml
+<supports-screens android:anyDensity="true"/>
+<uses-sdk android:minSdkVersion="4"></uses-sdk>
+这个参数在API Level 4也就是SDK 1.6以后才启用的，而且1.6版本的API Level 4的应用默认值就是True
+2)         资源目录名（android 2.0以后）
+res/xxx-hdpi         当density为240时，使用此目录下的资源
+res/xxx-mdpi        当density为160时，使用此目录下的资源
+res/xxx-ldpi          当density为120时，使用此目录下的资源
+res/xxx                 不常后缀，为默认设置，同xxx-mdpi
+3)         资源单位（xml文件中定义大小的单位）
+a)        dp=dip=dx (Density independent pixel)
+基于屏幕密度的抽象单位，设备无关的点，用于说明与密度无关的尺寸和位置。这些单位是相对于一个160dpi的屏幕，所有一个dp是160dpi屏幕上的一个点。
+b)         px
+px指软件的单位点，设备相关的点
+c)          具体使用
+                                       i.              布局时尽量使用单位dip，少使用px
+若使用px，如果设某控件大小400x400px，在800x480上显示正常，而在533x320的屏上就超出屏幕了
+若使用dp，如果设某控件大小为160x160dp，就可以通过从系统中取density来算出真正的大小，比如在800x480屏的density设为240，而533x320屏的density设为160，借以下公式计算
+pixels = dips * (density / 160)
+在800x480在屏中显示240象素，而在533x320的屏中显示为160象素，控件在屏中显示的比例是一样的。
+                                      ii.              内部的处理过程分为三步：
+取screen中其它元素，转为应用的值，计算应用各控件位置，然后再转成800x480以供真正显示
+若res-xxx不存在，则读取res有的资源，然后对其做相应缩放
+3.          实现density的关键源码
+1)         BitmapFactory.java（用于缩放图片）
+2)         ComptibilityInfo.java（用于位置计算）
+
+
+http://blog.sina.com.cn/s/blog_61f4999d0100laxg.html

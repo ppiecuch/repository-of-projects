@@ -1,3 +1,67 @@
+[Unnormal]
+Waiting for Debugger
+Application HunyDew (process com.airvine.hunydew) is waiting for the debugger to attach.
+[解决]
+Some devices will only let the debugger attach if the application has the android.permission.SET_DEBUG_APP permission set in its manifest file:
+
+<manifest>
+  <uses-permission android:name="android.permission.SET_DEBUG_APP"></uses-permission>
+</manifest> 
+
+
+
+[Exception]
+java.lang.IllegalArgumentException: pointerIndex out of range
+[解决]
+
+第一种方式是：修改frameworks\base\core\jni\android_view_MotionEvent.cpp的android_view_MotionEvent_nativeGetAxisValue方法
+注释掉    if (!validatePointerIndex(env, pointerIndex, pointerCount)) {return 0;｝
+改完后需重新编译整个系统，然后替换lib库，重新编译整个系统一般需要半个多小时，这个方法就比较麻烦了 
+
+第二种方法是：捕获IllegalArgumentException（非法参数异常）异常 即如
+private float spacing(MotionEvent event) {  
+        try {  
+        x = event.getX(0) - event.getX(1);  
+        y = event.getY(0) - event.getY(1);  
+    } catch (IllegalArgumentException e) {  
+        // TODO Auto-generated catch block  
+        e.printStackTrace();  
+    }  
+
+
+[Failed]
+Failed to parse the output of 'adb version'
+[解决]
+启动eclipse时，出现标题【Failed to parse the output of 'adb version'】的错误，经尝试，发现环境变量的配置不正确。
+(1)设置Android路径
+新建一个“系统变量”，在“变量名”中填Android_Home（大小写没有问题），在“变量值”加填SDK的根目录
+(如：F:\android-sdk-windows-1.6_r1。）
+
+(2)设置PATH路径
+
+“编辑”PATH变量，在“变量值”后面加上;%Android_Home%\tools，注意前面的分号。
+如果tools文件夹和platform-tools文件夹同时存在，建议也把%Android_Home%\platform-tools添加上。  
+
+[Unnormal]
+当设置 android:screenOrientation = "landscape"时
+即使android:configChanges="orientation|keyboardHidden"
+在部分机型上，还会出现锁屏调用onDestroy->onCreate的问题（点击HOME键无此问题）
+[解决]
+In the Manifest, you can set the screenOrientation to landscape. It would look something like this in the XML:
+
+<activity android:name="MyActivity"
+android:screenOrientation="landscape"
+android:configChanges="keyboardHidden|orientation|screenSize">
+...
+</activity>
+
+Where MyActivity is the one you want to stay in landscape.
+The android:configChanges=... line prevents onResume(), onPause() from being called when the screen is rotated. 
+Without this line, the rotation will stay as you requested but the calls will still be made.
+Note: keyboardHidden and orientation are required for < Android 3.2 (API level 13), 
+and all three options are required 3.2 or above, not just orientation.
+
+
 [Exception]
 Android中引入第三方Jar包的方法(java.lang.NoClassDefFoundError解决办法)
 [解决]

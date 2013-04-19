@@ -1,0 +1,37 @@
+Applications are required to set up and initialize texturing state properly before executing a shader that accesses texture memory. An application must perform the following steps to set up a texture for use within a shader:
+
+1.
+Select a specific texture unit, and make it active by calling glActiveTexture.
+
+2.
+Create a texture object, and bind it to the active texture unit by calling glBindTexture.
+
+3.
+Set various parameters (wrapping, filtering, etc.) of the texture object by calling glTexParameter.
+
+4.
+Define the texture by calling glTexImage.
+
+If fixed functionality is used, the application must perform two additional steps: enabling the desired texture on the texture unit by calling glEnable and setting the texture function for the texture unit (modulate, decal, replace, etc.) by calling glTexEnv. (These steps are not required when an OpenGL shader is used, because the fixed functionality hierarchy of texture enables is ignored and the texture function is expressed within the shader code.) When these steps have been completed, the texture is ready for use by an OpenGL shader.
+
+It is quite straightforward to access textures from within a shader after texture state has been set up properly by the application. The OpenGL Shading Language has built-in data types (see Section 3.2.4) and built-in functions (see Section 5.7) to accomplish this task.
+
+A uniform variable of type sampler must be used to access a texture from within a shader. Within a shader, a sampler is considered an opaque data type containing a value that can access a particular texture. The shader is responsible for declaring such a uniform variable for each texture that it wants to access. The application must provide a value for the sampler before execution of the shader, as described in Section 7.9.
+
+The type of the sampler indicates the type of texture that is to be accessed. A variable of type sampler1D accesses a 1D texture; a variable of type sampler2D accesses a 2D texture; a variable of type sampler3D accesses a 3D texture; a variable of type samplerCube accesses a cube map texture; and variables of type samplerShadow1D and samplerShadow2D access 1D and 2D depth textures. For instance, if the application intends to use texture unit 4 to store a 2D texture, the shader must declare a uniform variable of type sampler2D, and the application must load a value of 4 into this variable before executing the shader.
+
+The built-in functions texture1D, texture2D, texture3D, textureCube, shadow1D, and so on, perform texture access within a shader. The first argument in each of these built-in functions is a sampler, and the type of the sampler must correspond to the name of the function. For instance, a sampler of type sampler1D must be the first argument to texture1D, a sampler of type sampler2D must be the first argument to texture2D, and so on. Mismatches cause a compiler error to occur.
+
+Each of these built-in texture-access functions also takes a texture coordinate as an argument. Hardware uses this texture coordinate to determine which locations in the texture map are to be accessed. A 1D texture is accessed with a single floating-point texture coordinate. A 2D texture is accessed with a vec2, and a 3D texture is accessed with a vec3. Projective versions of the texture access functions are also provided. In these functions, the individual components of the texture coordinate are divided by the last component of the texture coordinate, and the result is used in the texture access operation.
+
+There are some differences between accessing a texture from a vertex shader and accessing a texture from a fragment shader (the OpenGL Shading Language allows both). The level of detail to be used for accessing a mipmap texture is calculated by fixed functionality in between the vertex processor and the fragment processor. Therefore, this value is known within the fragment processor but not within the vertex processor. For this reason, the OpenGL Shading Language includes special built-in functions that can be used only in a vertex shader that allows the level of detail to be expressed directly as a function argument. The OpenGL Shading Language also includes built-in functions that can be used only in a fragment shader that allows a level-of-detail bias to be passed in. This bias value is added to the mechanically computed level-of-detail value. In this way, a shader writer can add a little extra sharpness or blurriness to the texture mapping function, depending on the situation. If any of these functions is used with a texture that is not a mipmap texture, the level-of-detail bias value is ignored.
+
+The built-in functions to access cube maps (textureCube and textureCubeLod) operate in the same way as defined for fixed functionality. The texture coordinate that is provided is treated as a direction vector that emanates from the center of a cube. This value selects one of the cube map's 2D textures, based on the coordinate with the largest magnitude. The other two coordinates are divided by the absolute value of this coordinate and scaled and biased to calculate a 2D coordinate that will be used to access the chosen face of the cube map.
+
+The built-in functions to access depth textures (shadow1D, shadow2D, etc.) also operate in the same way as defined for fixed functionality. The texture accessed by one of these functions must have a base internal format of GL_DEPTH_COMPONENT. The value that is returned when this type of texture is accessed depends on the texture-comparison mode, the texture-comparison function, and the depth texture mode. Each of these values can be set with glTexParameter.
+
+The built-in texture access functions operate according to the current state of the texture unit that is being accessed and according to the parameters of the texture object that is bound to that texture unit. In other words, the value returned by the built-in texture access functions take into consideration the texturing state that has already been established for the texture unit and the texture object, including wrap mode, minification filter, magnification filter, border color, minimum/maximum level of detail, texture comparison mode, and so on.
+
+
+
+http://www.yaldex.com/open-gl/ch10lev1sec1.html#ch10lev1sec1

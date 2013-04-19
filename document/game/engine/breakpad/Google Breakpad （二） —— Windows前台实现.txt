@@ -1,0 +1,195 @@
+看完了如何使用breakpad，我们现在看看breakpad在Windows下到底是如何实现的呢？
+
+一、代码结构
+
+在我们来看breakpad是如何实现其强大的功能之前，我们先来看一下他的代码结构吧。
+
+Google breakpad的源代码都在src的目录下，他分为如下几个文件夹：
+
+client：这下面包含了前台应用程序中捕捉dump的部分代码，里面按照平台分成各个子文件夹
+
+common：前台后台都会用到的部分基础代码，字符串转换，内存读写，md5神马的
+
+google_breakpad：breakpad中公共的头文件
+
+processor：用于在后台处理崩溃的核心代码
+
+testing：测试工程
+
+third_party：第三方库
+
+tools：一些小工具，用于处理dump文件和符号表
+
+我们先来看Windows下前台实现的部分，也就是client文件夹下的代码。
+
+二、breakpad的崩溃捕获机制
+
+在Windows下捕获崩溃，大家很容易会想到那个捕获结构化异常的Api：SetUnhandledExceptionFilter。
+
+breakpad中也使用了这个Api来实现的崩溃捕获，另外，breakpad还捕获了另外两种C++运行库提供的崩溃，一种是使用_set_purecall_handler捕获纯虚函数调用产生的崩溃，还有一种是使用_set_invalid_parameter_handler捕获错误的参数调用产生的崩溃。
+
+
+
+if(handler_types
+& HANDLER_EXCEPTION)
+
+
+previous_filter_ =
+SetUnhandledExceptionFilter(HandleException);
+
+#if_MSC_VER
+>= 1400  // MSVC2005/8
+    if (handler_types & HANDLER_INVALID_PARAMETER)
+
+      previous_iph_ = _set_invalid_parameter_handler(HandleInvalidParameter);
+
+#endif  // _MSC_VER >= 1400
+
+if (handler_types & HANDLER_PURECALL)
+
+previous_pch_ = _set_purecall_handler(HandlePureVirtualCall);
+
+  if (handler_types & HANDLER_EXCEPTION)
+
+      previous_filter_ = SetUnhandledExceptionFilter(HandleException);
+
+另外由于C++运行库提供的崩溃回调中，并不会提供当前的线程现场和崩溃信息，所以breakpad会自己生成好这些信息，然后请求生成dump。
+
+这里值得一说的是，在非异常崩溃处理中，breakpad获取线程现场使用的函数是RtlCaptureContext而不是GetThreadContext。
+
+RtlCaptureContext只能捕获当前线程的现场，而GetThreadContext可以捕获任意线程的现场，只要有这个线程的句柄即可。
+
+但是GetThreadContext有两个不好的地方：不能获取当前线程的现场；获取现场前必须先用SuspendThread暂停目标线程。
+
+而RtlCaptureContext虽然只能获取当前线程的现场，但是调用他时可以不用暂停线程的运行。
+
+对于breakpad来说，崩溃发生后越早获取现场就越好，所以breakpad使用RtlCaptureContext函数作为他的线程获取函数。
+
+三、breakpad中的C/S结构
+
+由于breakpad是在进程外抓取dump，所以breakpad需要实现一个C/S结构来处理崩溃进程抓取dump的请求。
+
+1. breakpad跨进程通信的实现
+
+breakpad中使用了命名管道来实现IPC。在客户端，初始化ExceptionHandler的时候，如果指定了PipeName，也就表示此时需要使用进程外的dump抓取，ExceptionHandler，会建立一个 CrashGenerationClient的对象，由这个对象连接服务端，将自己注册到服务端上去。大家可以参看exception_handler.cc中的ExceptionHandler::Initialize函数。
+
+在服务端，初始化CrashGenerationServer的时候，就会建立一个命名管道，并等待客户端来连接。一旦有客户端连接上来，服务端会为每一个客户端生成一个ClientInfo的对象，之后用这个对象来管理所有的客户端，一旦有崩溃发生，服务端都会从这个对象中取出dump所需要的信息。大家可以参看crash_generation_server.cc中的CrashGenerationServer::HandleReadDoneState函数。
+
+2. breakpad捕获崩溃生成dump的流程
+
+breakpad进程外生成dump的流程大概如下：google-breakpad-out-of-process-dump:
+
+
+这段流程的代码就是crash_generation_client.cc和crash_generation_server.cc。
+
+有两个简单的问题，这里说明一下，高手们就请直接忽略吧，咩哈哈：
+
+在服务端如何为客户端生成事件句柄？
+
+使用DuplicateHandle，即可把任意一个内核对象的句柄复制到其他进程，并且可以指定产生的句柄的权限。
+
+如何异步的等待一个事件？
+
+使用RegisterWaitForSingleObject，即可异步的等待一个事件，当事件发生的时候，就可以回调到一个指定的回调函数中，但是要注意的是，RegisterWaitForSingleObject会在一个新的线程中来等待这个事件，此处很容易产生多线程的调用，需要注意线程问题。
+
+3. 服务端关键数据结构：ClientInfo
+
+ClientInfo是服务端中最重要的数据结构，服务端通过它来管理所有的客户端。客户端注册时，会保存或生成里面所有的信息，在客户端请求生成dump的时候，服务端就会通过ClientInfo获取所有客户端的信息。ClientInfo中保存了如下信息：
+
+客户端进程pid和句柄
+
+生成Minidump的类型
+
+自定义的客户端信息
+
+客户端崩溃的线程ID
+
+客户端崩溃的信息
+
+客户端请求崩溃所使用的事件句柄
+
+这里有一个问题：在客户端发生崩溃时，服务器如何通过ClientInfo获取到客户端的崩溃信息呢？
+
+客户端中有几个用于保存崩溃信息的变量，在注册时，客户端会将这几个变量的地址发送至服务端，服务端将其保存在ClientInfo中，然后当崩溃发生的时候，服务端就可以通过ReadProcessMemory读取客户端中的信息，从而生成dump。这样做就避免了每次发生崩溃，都要通过Pipe将崩溃信息传递到服务端中去了。
+
+这些变量分别是：崩溃的线程ID，EXCEPTION_POINTERS和MDRawAssertionInfo。
+
+EXCEPTION_POINTERS和MDRawAssertionInfo的区别在于，异常崩溃的信息会被写入EXCEPTION_POINTERS，非异常崩溃（非法参数和纯虚函数调用）的信息会被写入MDRawAssertionInfo中。
+
+四、dump文件的上传
+
+在breakpad的工程中，有一个工程叫做：crash_report_sender，里面是一个上传崩溃文件的类，他的实现很简单，他使用Windows Internet Api来完成dump文件的上传。
+
+在使用crash_report_sender时，可以为其指定一个checkpoint_file。
+
+explicit CrashReportSender(const wstring &checkpoint_file);
+
+这个文件只有一个作用，就是用来保存上次上传崩溃的时间和今天上传过的崩溃的次数。通过这个文件，我们就可以来设置每日上传的崩溃的最大数量。
+
+CrashReportSender::CrashReportSender(const wstring &checkpoint_file)
+
+    : checkpoint_file_(checkpoint_file),
+
+      max_reports_per_day_(-1),
+
+      last_sent_date_(-1),
+
+      reports_sent_(0) {
+
+  FILE *fd;
+
+  if (OpenCheckpointFile(L"r", &fd) == 0) {
+
+    ReadCheckpoint(fd);
+
+    fclose(fd);
+
+  }
+
+}
+
+ReportResult CrashReportSender::SendCrashReport(
+
+    const wstring &url, const map<wstring, wstring> &parameters,
+
+    const wstring &dump_file_name, wstring *report_code) {
+
+  int today = GetCurrentDate();
+
+  if (today == last_sent_date_ &&
+
+      max_reports_per_day_ != -1 &&
+
+      reports_sent_ >= max_reports_per_day_) {
+
+    return RESULT_THROTTLED;
+
+  }
+
+ // 上传文件部分代码，省略
+
+}
+
+调整每日上传崩溃的最大数量的函数是set_max_reports_per_day。
+
+需要注意的是：在上传dump文件的时候，crash_report_sender并不会对dump文件进行分析，而是直接上传整个dump文件，如果你需要上传的dump文件非常大的话，可以考虑把崩溃分析处理的逻辑放入前台，通过去重或者直接上传分析结果，减少上传的文件大小。
+
+五、breakpad存在的问题
+
+进程外生成dump有很多好处，其中最大的好处就是不会被崩溃进程影响，这样dump的过程就不容易出错，但是这样也有一定的弊端。
+
+1. 部分崩溃无法抓取
+
+在一些极端的崩溃，如堆栈溢出之类的崩溃，进程外抓取dump有时候会失败。
+
+2. 无法抓取死锁或者其他原因导致的进程僵死
+
+breakpad现在没有检测进程死锁的代码，也没有在服务端控制客户端请求dump的代码，所以现在breakpad无法抓取死锁等进程僵死的问题。不过因为breakpad的定位是处理崩溃，如果有这种需要的童鞋，可以自行修改breakpad的代码，添加这些功能。
+
+3. 对服务端有依赖
+
+如果指定了在使用进程外抓取dump，breakpad对服务端就有依赖。主要体现在抓取dump时，如果服务端不存在，客户端将无法正常抓取dump，甚至有时会出现阻塞。
+
+当然对于这些问题，随着breakpad的发展肯定会越来越完善。如果，你遇到了了这些问题，而又绕过不了，那就改代码，并且提交给breakpad吧，开源项目就是这么发展的。
+
+http://blog.sina.com.cn/s/blog_8a9c4f74010143vi.html

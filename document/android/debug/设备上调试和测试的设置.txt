@@ -1,0 +1,13 @@
+Android提供了众多的设置使你可以更容易的调试和测试程序。要进入开发设置页面，在模拟器中转到Dev Tools > Development Settings。在该设置页面有以下选项： 
+
+Debug app：选择要调试的程序。你不需要设定其关联至调试器，但是设定这个值有两个效果： 
+在调试的时候，如果你在一个断点处暂停了过长的时间，这个设定会防止Android抛出一个错误 
+这个设定使你可以选择“等待调试器”选项，使程序只有在调试器关联上之后才启动 
+Wait for Debugger：阻塞所选的程序的加载直到有调试器关联上，这样你就可以在onCreate()中设置断点，这对于调试一个Activity的启动进程是非常重要的。当你对该选项进行了更改，任何正在运行的程序的实例都会被终止。你只有在上面的选项中选择了一个调试程序才能够选中该选项。你也可以在代码中添加waitForDebugger()来实现同样的功能。 
+Immediately destroy activities：告诉系统一旦一个activity停止了就销毁该activity（例如当Android释放内存的时候）。这对于测试代码onFreeze(Bundle)/onCreate(android.os.Bundle)是非常有用的，否则会比较困难。如果你的程序没有保存状态，那么选择这个选项很可能会引发很多问题。 
+Show screen updates：对于任何正在被重绘的screen sections都会在其上闪现一个粉红色的矩形。这对于发现不必要的screen绘制是很有必要的。 
+Show CPU usage：在屏幕上方显示CPU信息，显示有多少CPU资源正在被使用。上方红色条显示总的CPU使用率，它下方绿色的条显示CPU用在compositing the screen上的时间。注意：在没有重启模拟器之前，一旦你开启了该功能就不能关闭。 
+Show screen FPS：显示当前的帧率。这对于查看游戏达到的总的帧率是非常有用的。注意：在没有重启模拟器之前，一旦你开启了该功能就不能关闭。 
+Show background：当没有activity screens可见时，显示一个背景模式。一般是不会出现的，仅仅在Debug的时候会出现。 
+设定的选项在模拟器重启之后仍然有效，如果要取消设定的选项，在取消设定以后还要重启模拟器，才能生效。 
+
