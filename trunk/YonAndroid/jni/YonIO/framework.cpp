@@ -21,7 +21,8 @@ f32 factor=1.1f;
 
 class MyEventReceiver : public IEventReceiver{
 public:
-	virtual bool onEvent(const SEvent& evt){
+	virtual bool onEvent(const SEvent& evt)
+	{
 		switch(evt.type)
 		{
 		case event::ENUM_EVENT_TYPE_MOUSE:

@@ -111,7 +111,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 
 	family6=textSystem->getFontFamily("Droid Sans Fallback.ttf");
 	core::ustring str6=i18nMgr->convert("知之者不如好之者，好之者不如乐之者。",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str6,family6,core::position2di(10,150),12 ,video::COLOR_PURPLE, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	textSystem->addText(str6,family6,core::position2di(10,150),12 ,video::COLOR_CYAN, text::ENUM_FONT_RENDER_MODE_NORMAL);
 
 	return true;
 }
@@ -124,7 +124,7 @@ void resize(u32 width,u32 height){
 }
 void drawFrame(){
 
-	videoDriver->begin(true,true,COLOR_WHITE);
+	videoDriver->begin(true,true,COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
 
