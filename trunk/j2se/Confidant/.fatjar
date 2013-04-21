@@ -1,12 +1,12 @@
 #Fat Jar Configuration File
-#Tue Sep 15 15:08:06 CST 2009
+#Sun Jun 06 00:47:24 CST 2010
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
 onejar.checkbox=false
 jarname=Confidant.jar
 manifest.mergeall=true
-manifest.mainclass=beta02.Main
+manifest.mainclass=beta03.Main
 manifest.file=<createnew>
 jarname.isextern=false
 onejar.expand=

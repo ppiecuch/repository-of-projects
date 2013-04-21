@@ -19,6 +19,18 @@ public class TimerCommander extends Commander {
 	public void setTime(String time){
 		this.time=DateUtils.stringToDate(time,"yyyy-MM-dd HH:mm");
 	}
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void start() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 

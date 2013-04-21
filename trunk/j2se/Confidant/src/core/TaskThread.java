@@ -44,7 +44,7 @@ public final class TaskThread extends Thread {
 	private TaskThread(String threadId) {
 		this.threadId=threadId;
 	}
-
+	int count=0;
 	@Override
 	public void run() {
 		Task task;
@@ -64,9 +64,10 @@ public final class TaskThread extends Thread {
 				taskQueue.notify(); // release the task queue's obj lock
 			}
 			task.perform(); // perform the task
+			count++;
 		}
 		instanceMap.remove(threadId);
-		System.out.println("TaskThread close");
+		System.out.println("TaskThread close:"+count);
 		threadId=null;
 	}
 
@@ -113,7 +114,7 @@ public final class TaskThread extends Thread {
 		synchronized (taskQueue) { 
 			taskQueue.notify();
 		}
-		while(threadId!=null);
+		while(this.isAlive());
 	}
 
 }

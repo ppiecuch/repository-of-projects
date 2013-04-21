@@ -11,10 +11,10 @@ public abstract class Commander{
 	public static final int MODE_BUNCH=3;
 	
 	
-	private TaskThread taskThread;
-	private List<Command> commands;
-	private String id;
-	private int mode;
+	protected TaskThread executive;
+	protected List<Command> commands;
+	protected String id;
+	protected int mode;
 	
 	
 	public List<Command> getCommands() {
@@ -35,7 +35,11 @@ public abstract class Commander{
 	public void setMode(int mode) {
 		this.mode = mode;
 	}
+	public abstract void start();
+	public abstract void close();
 	
-	
+	public void setExecutive(TaskThread executive) {
+		this.executive = executive;
+	}
 
 }

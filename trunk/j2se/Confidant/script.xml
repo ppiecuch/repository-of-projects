@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System>
+	<commander id="loop1" mode="loop" time="3000">
+		<command type="key" value="67" delay="100" ctrl="true" alt="false" shift="false"/>
+		<command type="key" value="86" delay="100" ctrl="true" alt="false" shift="false"/>
+		<command type="checkColor" x="786" y="436" value="0xFFFFFFF0" delay="1000" trueRef="id00" falseRef="id01"/>
+		<command type="sendUDPMsg" value="test" delay="1000" ip="192.168.0.102"/>
+	</commander>
+</System>
