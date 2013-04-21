@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="assets"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.win32.jar"/>
 	<classpathentry kind="lib" path="lib/org.sf.feeling.swt.win32.extension_1.0.5.v20081205.jar"/>
 	<classpathentry kind="lib" path="lib/xmlbean.jar"/>

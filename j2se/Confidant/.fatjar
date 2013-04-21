@@ -1,14 +1,14 @@
 #Fat Jar Configuration File
-#Sun Jun 06 00:47:24 CST 2010
+#Sun Apr 21 11:23:16 CST 2013
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
 onejar.checkbox=false
-jarname=Confidant.jar
+jarname=E\:\\Game\\Tools\\Answer\\answer.jar
 manifest.mergeall=true
-manifest.mainclass=beta03.Main
+manifest.mainclass=beta04.Main4
 manifest.file=<createnew>
-jarname.isextern=false
+jarname.isextern=true
 onejar.expand=
 excludes=<po|Confidant>~.svn/
 includes=

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 import core.Task;
+import core.Tray;
 
 public class AnswerTask implements Task {
 	
@@ -44,16 +45,28 @@ public class AnswerTask implements Task {
 		
 		for(String q:quetions)
 		{
+			int index=q.indexOf('.');
+			String name=q.substring(0,index);
+			
+			String answer=null;
 			for(String a:answers)
 			{
-				if(q.equals(a) || (q+"_D").equals(a))
+				if(q.equals(a) || a.startsWith((name+"_A")))
 				{
-					PixelImage qpi=new PixelImage(questionsDir,q);
-					PixelImage api=new PixelImage(answersDir,a);
-					bank.put(qpi, api);
-					System.out.println("添加题目："+api);
+					answer=a;
+					if(q.equals(answer))
+						break;
 				}
 			}
+			
+			if(answer!=null)
+			{
+				PixelImage qpi=new PixelImage(questionsDir,q);
+				PixelImage api=new PixelImage(answersDir,answer);
+				bank.put(qpi, api);
+				System.out.println("添加题目："+qpi+","+answer);
+			}
+			
 		}
 	}
 
@@ -96,12 +109,15 @@ public class AnswerTask implements Task {
 					e.printStackTrace();
 				}
 				robot.mouseRelease(InputEvent.BUTTON1_MASK);
-				System.out.println("找到匹配项("+que+")，答案是:"+OPTIONS[i]+"("+p.x+","+p.y+")");
+				String msg="找到匹配项("+que+")，答案是:"+OPTIONS[i]+"("+p.x+","+p.y+")";
+				System.out.println(msg);
+				Tray.getInstance().tip(msg);
 				return;
 			}
 		}
-		
-		System.out.println("找不到匹配项("+que+")，不答案！");
+		String msg="找不到匹配项("+que+")，不回答！";
+		System.out.println(msg);
+		Tray.getInstance().tip(msg);
 	}
 	
 	private String save(String dir,String name,Image image) throws IOException{
@@ -139,16 +155,18 @@ public class AnswerTask implements Task {
 			String qf=save(questionsDir,""+bank.size(),image);
 			String af=null;
 			
-			for(int i=0;i<optionRects.length;++i)
+			//默认答案是A
+			for(int i=optionRects.length-1;i>=0;--i)
 			{
 				image = robot.createScreenCapture(new Rectangle(optionRects[i].topLeftX, optionRects[i].topLeftY, optionRects[i].getWidth(),optionRects[i].getHeight()));
 				af=save(answersDir,""+bank.size()+"_"+OPTIONS[i],image);
 			}
-			//默认其答案为D
 			PixelImage qpi=new PixelImage(questionsDir,qf);
 			PixelImage api=new PixelImage(answersDir,af);
 			bank.put(qpi, api);
-			System.out.println("找不到匹配题目，创建新题目("+qpi+"), use time:"+(System.currentTimeMillis()-start));
+			String msg="找不到匹配题目，创建新题目("+qpi+"), use time:"+(System.currentTimeMillis()-start);
+			System.out.println(msg);
+			Tray.getInstance().tip(null,msg);
 		} catch (AWTException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
