@@ -90,19 +90,19 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	skin.Slices[widget::CNT].build(texture,145,629,146-145,682-629);
 	skin.Slices[widget::EST].build(texture,164,629,223-164,682-629);
 	skin.Place=widget::HORIZONTAL;
-	theme->addSkin(widget::BUTTON,widget::HOVER,widget::CNT,skin);
+	theme->addSkin(widget::BUTTON,widget::HOVER,skin);
 
 	skin.Slices[widget::WST].build(texture,78,704,136-78,757-704);
 	skin.Slices[widget::CNT].build(texture,145,704,223-145,757-704);
 	skin.Slices[widget::EST].build(texture,164,704,223-164,757-704);
 	skin.Place=widget::HORIZONTAL;
-	theme->addSkin(widget::BUTTON,widget::LEAVE,widget::CNT,skin);
+	theme->addSkin(widget::BUTTON,widget::LEAVE,skin);
 
 	skin.Slices[widget::WST].build(texture,78,861,136-78,914-861);
 	skin.Slices[widget::CNT].build(texture,145,861,223-145,914-861);
 	skin.Slices[widget::EST].build(texture,164,861,223-164,914-861);
 	skin.Place=widget::HORIZONTAL;
-	theme->addSkin(widget::BUTTON,widget::DOWN,widget::CNT,skin);
+	theme->addSkin(widget::BUTTON,widget::DOWN,skin);
 
 	button=guiSystem->addButton(NULL,"test",core::recti(10,240,10+223-78,240+682-629));
 
