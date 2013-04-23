@@ -9,12 +9,12 @@ IGraphicsAdapter* gfAdapter=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
-IRandomizer* randomizer=NULL;
+//IRandomizer* randomizer=NULL;
 
-IModel* cubeModel=NULL;
-IModel* weedModel=NULL;
-IModel* planeModel=NULL;
-IModel* teapotModel=NULL;
+ISceneNode* cubeModel=NULL;
+ISceneNode* weedModel=NULL;
+ISceneNode* planeModel=NULL;
+ISceneNode* teapotModel=NULL;
 video::ITexture* rtt=NULL;
 f32 factor=1.1f;
 
@@ -62,11 +62,13 @@ public:
 	}
 };
 
-bool init(void *pJNIEnv,u32 width,u32 height){
+bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
 	params.pJNIEnv=pJNIEnv;
-	//params.fpsLimit=10;
+	//params.fpsLimit=60;
+	params.appPath=appPath;
+	params.resourcesPath=resPath;
 	params.pEventReceiver=new MyEventReceiver();
 	engine=CreateEngine(params);
 	if(engine->available()==false)
@@ -80,7 +82,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
-	randomizer=engine->getRandomizer();
+	//randomizer=engine->getRandomizer();
 
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media/");
@@ -101,7 +103,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createCube(150,150,150);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	cubeModel=sceneMgr->addModel(entity);
+	cubeModel=sceneMgr->addSceneNode(entity);
 	//cubeModel->debugName="cubeModel";
 	{
 		SMaterial& material=cubeModel->getMaterial(0);
@@ -118,7 +120,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	shap=geometryFty->createTeapot(7,video::COLOR_BLUE);
 	unit=geometryFty->createUnit(shap);
 	entity=geometryFty->createEntity(unit);
-	teapotModel=sceneMgr->addModel(entity);
+	teapotModel=sceneMgr->addSceneNode(entity);
 	teapotModel->setPosition(core::vector3df(0,-70,0));
 	shap->drop();
 	unit->drop();
@@ -126,10 +128,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	shap=geometryFty->createXYRectangle2D(-25,-25,25,25);
 	unit=geometryFty->createUnit(shap);
-	unit->setVertexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
-	unit->setIndexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+	//shap->setVertexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
+	//shap->setIndexHardwareBufferUsageType(ENUM_HARDWARDBUFFER_USAGE_TYPE_STATIC);
 	entity=geometryFty->createEntity(unit);
-	planeModel=sceneMgr->addModel(entity);
+	planeModel=sceneMgr->addSceneNode(entity);
 	{
 		SMaterial& material=planeModel->getMaterial(0);
 		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
