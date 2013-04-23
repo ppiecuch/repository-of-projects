@@ -20,11 +20,12 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
-public class AndroidGLView extends GLSurfaceView{
+public class AndroidGLView extends GLSurfaceView implements android.view.View.OnSystemUiVisibilityChangeListener{
 	
 	AndroidGLRender renderer;
 	Activity activity;
@@ -147,7 +148,7 @@ public class AndroidGLView extends GLSurfaceView{
 		DisplayMetrics dm = new DisplayMetrics();
 		activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		screenWidth = dm.widthPixels;
-		screenHeight = dm.heightPixels;
+		screenHeight = dm.heightPixels - getStatusBarHeight();
 		
 		currentMoveEvent=new MoveEvent();
 		lastMoveEvent=new MoveEvent();
@@ -165,6 +166,15 @@ public class AndroidGLView extends GLSurfaceView{
 		setRenderer(renderer);
 		
 		Log.d("AndroidGLView","construct AndroidGLView");
+	}
+	
+	private int getStatusBarHeight() {
+	      int result = 0;
+	      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+	      if (resourceId > 0) {
+	          result = getResources().getDimensionPixelSize(resourceId);
+	      }
+	      return result;
 	}
 	
 	@Override
@@ -413,5 +423,10 @@ public class AndroidGLView extends GLSurfaceView{
 	static {
     	System.loadLibrary("yon");
     }
+
+
+	@Override
+	public void onSystemUiVisibilityChange(int visibility) {
+	}
 	
 }
