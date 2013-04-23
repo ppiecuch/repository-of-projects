@@ -4,6 +4,20 @@
 #include "../log.h"
 
 const char* LOG_TAG = "yon_AndroidGLView";
+JavaVM *g_jvm=NULL;
+JNIEnv *g_env=NULL;
+jobject g_obj=NULL;
+ICallback* callback=NULL;
+
+
+const static s32 MSG_SHOW_SPINNER=0;
+const static s32 MSG_HIDE_SPINNER=1;
+const static s32 MSG_SETUP_INPUT=2;
+const static s32 MSG_COMPLETE_INPUT=3;
+const static s32 MSG_TOAST=4;
+const static s32 MSG_SETUP_CONFIRM=5;
+const static s32 MSG_POSITIVE_CONFIRM=6;
+const static s32 MSG_NEGATIVE_CONFIRM=7;
 
 const static s32 ACTION_MASK = 255;
 const static s32 ACTION_DOWN = 0;
@@ -16,8 +30,20 @@ const static s32 ACTION_POINTER_ID_SHIFT = 8;
 
 void Java_yon_AndroidGLView_nativeOnSurfaceCreated(JNIEnv *pEnv, jobject obj, jboolean first,jint width, jint height, jstring apkFilePath, jstring sdcardPath){
 	LOGD(LOG_TAG,"first:%s,screen:{%d,%d},pEnv:%08x,nativeOnSurfaceCreated",first?"true":"false",width,height,pEnv);
+	pEnv->GetJavaVM(&g_jvm);
+	if(g_obj!=NULL)
+	{
+		pEnv->DeleteGlobalRef(g_obj);
+		g_obj=NULL;
+	}
+	g_obj = pEnv->NewGlobalRef(obj);
+	g_env=pEnv;
 	if(first)
-		init(pEnv,width,height);
+	{
+		const char* root= pEnv->GetStringUTFChars(sdcardPath, 0);
+		init(pEnv,NULL,NULL,root,width,height);
+		pEnv->ReleaseStringUTFChars(sdcardPath, root);
+	}
 
 }
 void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, jint w, jint h){
@@ -25,8 +51,33 @@ void Java_yon_AndroidGLView_nativeOnSurfaceChanged(JNIEnv *pEnv, jobject obj, ji
 	getEngine()->onResize(w,h);
 }
 void Java_yon_AndroidGLView_nativeOnDrawFrame(JNIEnv *pEnv, jobject obj){
-	getEngine()->run();
-	drawFrame();
+	if(getEngine()&&getEngine()->run())
+		drawFrame();
+	else
+	{
+		const char* className="yon/AndroidGLView";
+		jclass cls = pEnv->FindClass(className);
+		if (cls == NULL) {
+			Logger->warn("can not find %s\n",className);
+			return;
+		}
+		//再找类中的方法
+		jmethodID callbackDestroy = pEnv->GetMethodID(cls, "callbackDestroy", "()V");
+		if (destroy == NULL) 
+		{
+			Logger->warn("no callbackDestroy function\n");
+			return;
+		}
+		//回调java中的方法
+		Logger->info("callbackDestroy function\n");
+		destroy();
+		LOGD(LOG_TAG,"delete callback");
+		delete callback;
+		LOGD(LOG_TAG,"pEnv->DeleteGlobalRef(g_obj)");
+		pEnv->DeleteGlobalRef(g_obj);
+		LOGD(LOG_TAG,"pEnv->CallVoidMethod(obj, callbackDestroy)");
+		pEnv->CallVoidMethod(obj, callbackDestroy);
+	}
 }
 void Java_yon_AndroidGLView_nativeOnPause(JNIEnv *pEnv, jobject obj){
 	Logger->debug("nativeOnPause\n");
