@@ -14,11 +14,13 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.ConfigurationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.view.Window;
 
 public class Util {
 	
@@ -156,6 +158,23 @@ public class Util {
 		} else {
 			return false;
 		}
+	}
+	
+	public static boolean hasStatusBar(Window w)
+	{
+		Rect localRect = new Rect();
+		w.getDecorView().getWindowVisibleDisplayFrame(localRect);
+		return localRect.top > 0;
+	}
+	
+	public static boolean supportsSystemUiFlags()
+	{
+		return Build.VERSION.SDK_INT >= 14;
+	}
+
+	public static boolean supportsSystemUiVisibilityAPI()
+	{
+		return Build.VERSION.SDK_INT >= 11;
 	}
 	
 	public static String getLanguage(){

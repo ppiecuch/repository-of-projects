@@ -1,5 +1,8 @@
 package yon.demo;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import org.fmod.FMODAudioDevice;
 
 import yon.AndroidGLView;
@@ -25,7 +28,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class YonAndroidActivity extends Activity {
+public class YonAndroidActivity extends Activity{
 
 	private final String TAG = "YonAndroidActivity";
 	AndroidGLView view;
@@ -64,6 +67,8 @@ public class YonAndroidActivity extends Activity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
 				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		//Òþ²Ø×´Ì¬À¸Í¼±ê
+		getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
 		
 		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
@@ -87,6 +92,30 @@ public class YonAndroidActivity extends Activity {
 		initInputPanel();
 
 	}
+	
+	/*
+	private void hideStatusBar(){
+		
+		Object object = getSystemService("statusbar");
+
+	    Class<?> statusBarManager;
+	    try {
+	        statusBarManager = Class.forName("android.app.StatusBarManager");
+
+	        Field field = statusBarManager.getDeclaredField("DISABLE_MASK");
+
+	        Method disable = statusBarManager.getMethod("disable",new Class[] {int.class});
+	        disable.setAccessible(true);
+	        field.setAccessible(true);
+	        
+	        disable.invoke(object,field.getInt(object));
+
+	    } catch (ClassNotFoundException e) {
+	        logger.warn(Util.expandException(e));
+	    } catch (Exception e) {
+	    	logger.warn(Util.expandException(e));
+	    }
+	}*/
 
 	public void initHandler() {
 		this.handler = new YonHandler() {
