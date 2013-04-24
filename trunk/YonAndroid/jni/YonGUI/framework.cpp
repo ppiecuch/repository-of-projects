@@ -86,22 +86,25 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 
 	ITexture* texture=videoDriver->getTexture("skin00.png");
 
-	skin.Slices[widget::WST].build(texture,78,629,136-78,682-629);
-	skin.Slices[widget::CNT].build(texture,145,629,146-145,682-629);
-	skin.Slices[widget::EST].build(texture,164,629,223-164,682-629);
+	skin.Slices[widget::WST].build(texture,78,629,134-78,682-629);
+	skin.Slices[widget::CNT].build(texture,150,629,151-150,682-629);
+	skin.Slices[widget::EST].build(texture,166,629,223-166,682-629);
 	skin.Place=widget::HORIZONTAL;
+	skin.Type=widget::BUTTON;
 	theme->addSkin(widget::BUTTON,widget::HOVER,skin);
 
 	skin.Slices[widget::WST].build(texture,78,704,136-78,757-704);
-	skin.Slices[widget::CNT].build(texture,145,704,223-145,757-704);
+	skin.Slices[widget::CNT].build(texture,145,704,146-145,757-704);
 	skin.Slices[widget::EST].build(texture,164,704,223-164,757-704);
 	skin.Place=widget::HORIZONTAL;
+	skin.Type=widget::BUTTON;
 	theme->addSkin(widget::BUTTON,widget::LEAVE,skin);
 
 	skin.Slices[widget::WST].build(texture,78,861,136-78,914-861);
-	skin.Slices[widget::CNT].build(texture,145,861,223-145,914-861);
+	skin.Slices[widget::CNT].build(texture,145,861,146-145,914-861);
 	skin.Slices[widget::EST].build(texture,164,861,223-164,914-861);
 	skin.Place=widget::HORIZONTAL;
+	skin.Type=widget::BUTTON;
 	theme->addSkin(widget::BUTTON,widget::DOWN,skin);
 
 	button=guiSystem->addButton(NULL,"test",core::recti(10,240,10+223-78,240+682-629));
@@ -117,7 +120,7 @@ void drawFrame(){
 
 	guiSystem->render();
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%u",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%u,DCL:%u",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 
