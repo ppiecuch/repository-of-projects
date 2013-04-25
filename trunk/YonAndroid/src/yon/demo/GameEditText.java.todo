@@ -1,0 +1,40 @@
+package yon.demo;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.KeyEvent;
+import android.view.SurfaceView;
+import android.widget.EditText;
+
+public class GameEditText extends EditText
+{
+  private SurfaceView mView;
+
+  public GameEditText(Context paramContext)
+  {
+    super(paramContext);
+  }
+
+  public GameEditText(Context paramContext, AttributeSet paramAttributeSet)
+  {
+    super(paramContext, paramAttributeSet);
+  }
+
+  public GameEditText(Context paramContext, AttributeSet paramAttributeSet, int paramInt)
+  {
+    super(paramContext, paramAttributeSet, paramInt);
+  }
+
+  public boolean onKeyDown(int paramInt, KeyEvent paramKeyEvent)
+  {
+    super.onKeyDown(paramInt, paramKeyEvent);
+    if (paramInt == KeyEvent.KEYCODE_BACK)
+      mView.requestFocus();
+    return true;
+  }
+
+  public void setMainView(SurfaceView paramGameGLSurfaceView)
+  {
+    this.mView = paramGameGLSurfaceView;
+  }
+}
