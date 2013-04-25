@@ -25,7 +25,7 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
-public class AndroidGLView extends GLSurfaceView implements android.view.View.OnSystemUiVisibilityChangeListener{
+public class AndroidGLView extends GLSurfaceView{
 	
 	AndroidGLRender renderer;
 	Activity activity;
@@ -357,7 +357,10 @@ public class AndroidGLView extends GLSurfaceView implements android.view.View.On
 		}
 
 		public void onDrawFrame(GL10 gl) {
-			nativeOnDrawFrame();
+			if(ready)
+			{
+				nativeOnDrawFrame();
+			}
 		}
 
 		/*
@@ -366,7 +369,10 @@ public class AndroidGLView extends GLSurfaceView implements android.view.View.On
 		 * 它在程序开始时至少运行一次，所以我们在该方法中设置OpenGL场景的大小  
 		 */
 		public void onSurfaceChanged(GL10 gl, int width, int height) {
-			nativeOnSurfaceChanged(width,height);
+			if(ready)
+			{
+				nativeOnSurfaceChanged(width,height);
+			}
 		}
 
 		/*
@@ -423,10 +429,4 @@ public class AndroidGLView extends GLSurfaceView implements android.view.View.On
 	static {
     	System.loadLibrary("yon");
     }
-
-
-	@Override
-	public void onSystemUiVisibilityChange(int visibility) {
-	}
-	
 }

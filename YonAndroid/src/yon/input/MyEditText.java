@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 
 /**
@@ -24,6 +25,15 @@ public class MyEditText extends EditText{
 
 	public MyEditText(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+	}
+	
+	@Override
+	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+		InputConnection conn = super.onCreateInputConnection(outAttrs);
+		//将回车按键替换为DONE按键
+		//TODO 不懂
+		outAttrs.imeOptions &= ~EditorInfo.IME_FLAG_NO_ENTER_ACTION;
+		return conn;
 	}
 	
 	/**
