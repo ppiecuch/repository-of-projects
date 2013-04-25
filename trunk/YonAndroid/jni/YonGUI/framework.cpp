@@ -7,9 +7,11 @@ IAudioDriver* audioDriver=NULL;
 ISceneManager* sceneMgr=NULL;
 IGUISystem* guiSystem=NULL;
 IGraphicsAdapter* gfAdapter=NULL;
+ITextSystem* textSystem=NULL;
 IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
+II18NManager* i18nMgr=NULL;
 
 IButton* button=NULL;
 
@@ -70,16 +72,22 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	sceneMgr=engine->getSceneManager();
 	guiSystem=engine->getGUISystem();
 	gfAdapter=engine->getGraphicsAdapter();
+	textSystem=engine->getTextSystem();
+	i18nMgr=engine->getI18NManager();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
 	logger=Logger;
-
+	
 #ifdef YON_COMPILE_WITH_WIN32
+	fs->addWorkingDirectory("../media/");
 	fs->addWorkingDirectory("../media/ui");
 #elif defined(YON_COMPILE_WITH_ANDROID)
 	fs->addWorkingDirectory("media/ui");
 #endif
+
+	IFontFamily* fontFamily=textSystem->getFontFamily("simsun.ttc");
+	guiSystem->setDefaultFontFamily(fontFamily);
 
 	ITheme* theme=guiSystem->getBindedTheme();
 	gui::SSkin skin;
@@ -94,20 +102,22 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	theme->addSkin(widget::BUTTON,widget::HOVER,skin);
 
 	skin.Slices[widget::WST].build(texture,78,704,136-78,757-704);
-	skin.Slices[widget::CNT].build(texture,145,704,146-145,757-704);
-	skin.Slices[widget::EST].build(texture,164,704,223-164,757-704);
+	skin.Slices[widget::CNT].build(texture,150,704,151-150,757-704);
+	skin.Slices[widget::EST].build(texture,166,704,223-166,757-704);
 	skin.Place=widget::HORIZONTAL;
 	skin.Type=widget::BUTTON;
 	theme->addSkin(widget::BUTTON,widget::LEAVE,skin);
 
 	skin.Slices[widget::WST].build(texture,78,861,136-78,914-861);
-	skin.Slices[widget::CNT].build(texture,145,861,146-145,914-861);
-	skin.Slices[widget::EST].build(texture,164,861,223-164,914-861);
+	skin.Slices[widget::CNT].build(texture,150,861,151-150,914-861);
+	skin.Slices[widget::EST].build(texture,166,861,223-166,914-861);
 	skin.Place=widget::HORIZONTAL;
 	skin.Type=widget::BUTTON;
 	theme->addSkin(widget::BUTTON,widget::DOWN,skin);
 
 	button=guiSystem->addButton(NULL,"test",core::recti(10,240,10+223-78,240+682-629));
+	core::ustring str=i18nMgr->convert("²âÊÔ²âÊÔ",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	button->getText()->setText(str);
 
 	return true;
 }
@@ -119,6 +129,8 @@ void drawFrame(){
 	videoDriver->begin();
 
 	guiSystem->render();
+
+	textSystem->render(videoDriver);
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%u,DCL:%u",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
