@@ -170,6 +170,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ATICompress", "ATICompress\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PNGVeticalFlip", "PNGVeticalFlip\PNGVeticalFlip.vcproj", "{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PNGAlpha", "PNGAlpha\PNGAlpha.vcproj", "{7858D3E0-39EB-47E2-9F39-BE056E68EA24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -388,6 +390,10 @@ Global
 		{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}.Debug|Win32.Build.0 = Debug|Win32
 		{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}.Release|Win32.ActiveCfg = Release|Win32
 		{4073B42A-382E-4A41-8D9C-B07D0A8E84E4}.Release|Win32.Build.0 = Release|Win32
+		{7858D3E0-39EB-47E2-9F39-BE056E68EA24}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7858D3E0-39EB-47E2-9F39-BE056E68EA24}.Debug|Win32.Build.0 = Debug|Win32
+		{7858D3E0-39EB-47E2-9F39-BE056E68EA24}.Release|Win32.ActiveCfg = Release|Win32
+		{7858D3E0-39EB-47E2-9F39-BE056E68EA24}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
