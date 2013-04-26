@@ -182,6 +182,9 @@ void drawFrame(){
 	pCamera->setDirty();
 	pCamera->render(videoDriver);
 	gfAdapter->clearZ(1000);
+	static core::rectf r1(0/512.f,0/256.0,200/512.f,200/256.f);
+	TO_PS(100,100,200,200)
+	gfAdapter->drawRegion(videoDriver->getTexture("1.png"),r1,ps,ENUM_TRANS_NONE,true);
 	TO_PS(100,100,128,128)
 	if(!gray)
 		gfAdapter->drawRegion(colorRTT,r,ps,ENUM_TRANS_NONE,true);
