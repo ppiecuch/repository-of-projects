@@ -107,7 +107,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	ps[2].set(x+w,y); \
 	ps[3].set(x+w,y+h);
 
-	TO_PS(0,0,128,128)
+	TO_PS(200,200,200,200)
 
 	//ps[0]=core::position2di(0,0);
 	//ps[1]=core::position2di(0,256);
@@ -170,7 +170,8 @@ void drawFrame(){
 
 	//static core::rectf r(0,0.5f,0.5f,0);
 	//static core::rectf r(0,1,1,0);
-	static core::rectf r(1/8.f,1/8.f,2/8.f,2/8.f);
+	static core::rectf r(355/1024.f,293/1024.f,555/1024.f,493/1024.f);
+	static core::rectf r1(0/512.f,0/256.0,200/512.f,200/256.f);
 	videoDriver->setMaterial(material);
 
 	//LG990
@@ -188,10 +189,14 @@ void drawFrame(){
 		//s32 x=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().w);
 		//s32 y=randomizer->rand(0,videoDriver->getCurrentRenderTargetSize().h);
 		//gfAdapter->drawRegion(texture,r,x,y,128,64,ENUM_TRANS_NONE);
+		ITexture* texture1=videoDriver->getTexture("1.png");
 		ITexture* texture=videoDriver->getTexture("250.png");
 		//ITexture* texture = videoDriver->getTexture("mosaic8.png");
-		//gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true);
-		gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
+		TO_PS(100,100,200,200)
+		gfAdapter->drawRegion(texture1,r1,ps,ENUM_TRANS_NONE,false);
+		TO_PS(200,200,200,200)
+		gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true);
+		//gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
 		//gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true,highlight?0xFFFFFFFF:0xFFDDDDDD);
 #else
 		//Logger->debug("i:%d--0x%08X\r\n",i,&shaps[i]);

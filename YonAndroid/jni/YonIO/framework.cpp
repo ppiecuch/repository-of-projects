@@ -13,6 +13,9 @@ ILogger* logger=NULL;
 II18NManager* i18nManager=NULL;
 ITimer* timer=NULL;
 
+SMaterial pointMaterial;
+SDynamicShap2D pointShap;
+
 ISceneNode* cubeModel=NULL;
 ISceneNode* weedModel=NULL;
 ISceneNode* planeModel=NULL;
@@ -90,7 +93,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300));
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	logger=Logger;
 	timer=engine->getTimer();
 	//randomizer=engine->getRandomizer();
@@ -104,6 +107,21 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 #endif
 
 	//Logger->debug("%s\n",fs->getAbsolutePath(fs->getWorkingDirectory()).c_str());
+
+	pointMaterial.PolygonMode=video::ENUM_POLYGON_MODE_POINT;
+
+	core::array<S2DVertex>& vertices=pointShap.getVertexArray();
+	core::array<u16>& indices=pointShap.getIndexArray();
+
+	S2DVertex v1(100,100,0,0,video::COLOR_WHITE);
+	S2DVertex v2(100,150,0,0,video::COLOR_WHITE);
+	S2DVertex v3(150,100,0,0,video::COLOR_WHITE);
+	vertices.push_back(v1);
+	vertices.push_back(v2);
+	vertices.push_back(v3);
+	indices.push_back(0);
+	indices.push_back(1);
+	indices.push_back(2);
 
 #if 0
 	Logger->debug("%s\n",fs->getResourcePath("test.png").c_str());
@@ -130,10 +148,10 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	YON_DEBUG("%s(%d)\r\n",utf8_1.toStringc().c_str(),utf8_1.size());
 	YON_DEBUG("%s(%d)\r\n",i18nManager->convert(utf8_2.toStringc().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str(),utf8_2.size());
 #endif
-#if 1
+#if 0
 	u32 test=0xFFFFFFFF;
 	YON_DEBUG("%u,%08X\r\n",test,(s32)test);
-#elif 1
+#elif 0
 	App app;
 
 	//创建委托。
@@ -158,7 +176,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	callback -= d1;
 	if(!callback.empty()) callback("5");
 
-#elif 1
+#elif 0
 
 	u32 start=timer->getRealTime();
 	for(u32 i=0;i<1000000;++i)
@@ -167,7 +185,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	YON_DEBUG("%u\r\n",(timer->getRealTime()-start));
 
 
-#elif 1
+#elif 0
 
 	//s32 s;
 	//core::convertor<core::stringc,s32>::convert(core::stringc("134FF2"),s);
@@ -202,7 +220,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	Logger->debug("%.2f\n",rs->readFloat());
 	Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
-#elif 1
+#elif 0
 	IWriteStream* ws=fs->createAndOpenWriteFileStream("tst/tst/tst/test.txt",true,ENUM_ENDIAN_MODE_BIG);
 	ws->writeBool(true);
 	ws->writeFloat(2.1f);
@@ -221,7 +239,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//Logger->debug("%.2f\n",rs->readFloat());
 	//Logger->debug("%ld\n",rs->readLong());
 	rs->drop();
-#elif 1
+#elif 0
 	IReadStream* rs=fs->createAndOpenReadFileStream("rotate_x_.dae");
 	XMLReader* reader=fs->createXMLReader(rs);
 	rs->drop();
@@ -256,7 +274,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//Logger->debug("%s\r\n",stream->readString().c_str());
 
 	stream->drop();
-#else
+#elif 0
 	c8 in_utf8[] = 
 	{0x20,0xe8,0xbf,0x99,0xe6,0x98,0xaf,0xe4,0xb8,0x80,0xe4,0xb8,0xaa,0x69,0x63,0x6f,
 	0x6e,0x76,0xe7,0x9a,0x84,0xe6,0xb5,0x8b,0xe8,0xaf,0x95,0xe4,0xbe,0x8b,0xe7,0xa8,
@@ -268,6 +286,16 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//Logger->debug("%s\r\n",i18nManager->convert("中华人民共和国",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8).c_str());
 	//Logger->debug("%s\r\n",i18nManager->convert("涓崕浜烘皯鍏卞拰鍥",ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
 	//Logger->debug("%s\r\n",i18nManager->convert(in_utf8,ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+
+#else
+
+	typedef core::map<s32,s32> TestMap;
+	TestMap m;
+	for(s32 i=0;i<100;++i)
+		m.set(i,i);
+	TestMap::Iterator iterator=m.getIterator();
+	for(;!iterator.atEnd();++iterator)
+		YON_DEBUG("%d->%d\r\n",iterator->getKey(),iterator->getValue());
 #endif
 
 	return true; 
@@ -280,6 +308,10 @@ void drawFrame(){
 	videoDriver->begin(true,true,video::COLOR_DEFAULT);
 
 	sceneMgr->render(videoDriver);
+	
+
+	videoDriver->setMaterial(pointMaterial);
+	videoDriver->drawShap(&pointShap);
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 

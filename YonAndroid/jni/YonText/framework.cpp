@@ -91,7 +91,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 
 	family1=textSystem->getFontFamily("staaiti.ttf");
 	core::ustring str1=i18nMgr->convert("天行健，君子以自强不息，地势坤，君子以厚德载物",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str1,family1,core::position2di(10,50),12,video::COLOR_GREEN, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	textSystem->addText(str1,family1,core::position2di(10,50),12,video::COLOR_GREEN, text::ENUM_FONT_RENDER_MODE_ANTIALIAS);
 
 	family2=textSystem->getFontFamily("mingliu.ttc");
 	core::ustring str2=i18nMgr->convert("莫为浮云遮望眼，风物长宜放眼量",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
@@ -103,15 +103,15 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 
 	family4=textSystem->getFontFamily("stxingka.ttf");
 	core::ustring str4=i18nMgr->convert("人生结交在终始，莫为升沉中路分",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str4,family4,core::position2di(10,110),18 ,video::COLOR_PURPLE, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	textSystem->addText(str4,family4,core::position2di(10,110),18 ,video::COLOR_PURPLE, text::ENUM_FONT_RENDER_MODE_ANTIALIAS);
 
 	family5=textSystem->getFontFamily("msyh.ttf");
 	core::ustring str5=i18nMgr->convert("水因地而制流，兵因敌而制胜。故兵无常势，水无常形。能因敌变化而取胜者，谓之神。",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str5,family5,core::position2di(10,130),10 ,video::COLOR_YELLOW, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	textSystem->addText(str5,family5,core::position2di(10,130),10 ,video::COLOR_YELLOW, text::ENUM_FONT_RENDER_MODE_ANTIALIAS);
 
 	family6=textSystem->getFontFamily("Droid Sans Fallback.ttf");
 	core::ustring str6=i18nMgr->convert("知之者不如好之者，好之者不如乐之者。",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str6,family6,core::position2di(10,150),12 ,video::COLOR_CYAN, text::ENUM_FONT_RENDER_MODE_NORMAL);
+	textSystem->addText(str6,family6,core::position2di(10,150),12 ,video::COLOR_CYAN, text::ENUM_FONT_RENDER_MODE_ANTIALIAS);
 
 	return true;
 }
