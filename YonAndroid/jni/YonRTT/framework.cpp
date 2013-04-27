@@ -174,7 +174,7 @@ void drawFrame(){
 	//TODO 当将半透明的元素绘制在GUI的RTT上时，结果不是期望的
 	//因为绘制到RTT上时，进行了一次SrcAlpha,1-SrcAlpha运算，然后从RTT绘制到屏幕上又进行了一次SrcAlpha,1-SrcAlpha，如此会导致颜色的丢失
 	static core::rectf r2(0,0,128/1024.f,128/1024.f);
-	gfAdapter->drawRegion(videoDriver->getTexture("250.png"),r2,ps,ENUM_TRANS_NONE,true);
+	gfAdapter->drawRegion(videoDriver->getTexture("250.png"),r2,ps,ENUM_TRANS_NONE);
 	gfAdapter->render(); 
 
 
