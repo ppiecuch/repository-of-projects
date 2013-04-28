@@ -86,7 +86,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/ui");
 #endif
 
-	IFontFamily* fontFamily=textSystem->getFontFamily("simsun.ttc");
+	//IFontFamily* fontFamily=textSystem->getFontFamily("simsun.ttc");
+	IFontFamily* fontFamily=textSystem->getFontFamily("Droid Sans Fallback.ttf");
 	guiSystem->setDefaultFontFamily(fontFamily);
 
 	ITheme* theme=guiSystem->getBindedTheme();
@@ -116,8 +117,9 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	theme->addSkin(widget::BUTTON,widget::DOWN,skin);
 
 	button=guiSystem->addButton(NULL,"test",core::recti(10,240,10+223-78,240+682-629));
-	core::ustring str=i18nMgr->convert("²âÊÔ²âÊÔ",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	button->getText()->setText(str);
+	core::ustring str=i18nMgr->convert("²âÊÔa²âÊÔ",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	//button->getText()->setText(str);
+	button->setText(str);
 
 	return true;
 }
