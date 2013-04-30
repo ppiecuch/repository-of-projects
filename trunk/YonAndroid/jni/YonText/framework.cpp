@@ -59,6 +59,7 @@ IFontFamily* family3=NULL;
 IFontFamily* family4=NULL;
 IFontFamily* family5=NULL;
 IFontFamily* family6=NULL;
+IFontFamily* family7=NULL;
 bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height){
 	params.windowSize.w=width;
 	params.windowSize.h=height;
@@ -75,7 +76,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	gfAdapter=engine->getGraphicsAdapter();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	fs=engine->getFileSystem();
-	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
+	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO,NULL,core::vector3df(0,0,300)); 
 	//pCamera=sceneMgr->addCameraFPS();
 	logger=Logger;
 	//randomizer=engine->getRandomizer();
@@ -113,12 +114,17 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 	core::ustring str6=i18nMgr->convert("知之者不如好之者，好之者不如乐之者。",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
 	textSystem->addText(str6,family6,core::position2di(10,150),12 ,video::COLOR_CYAN, text::ENUM_FONT_RENDER_MODE_ANTIALIAS);
 
+	family7=textSystem->getFontFamily("msyhbd.ttf");
+	core::ustring str7=i18nMgr->convert("谦谦君子，温润如玉。",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	textSystem->addText(str7,family7,core::position2di(10,190),14 ,video::COLOR_WHITE, text::ENUM_FONT_RENDER_MODE_ANTIALIAS);
+
 	return true;
 }
 ITexture* texture1=NULL;
 ITexture* texture2=NULL;
 ITexture* texture3=NULL;
 ITexture* texture4=NULL;
+ITexture* texture7=NULL;
 void resize(u32 width,u32 height){
 	engine->onResize(width,height);
 }
@@ -150,13 +156,19 @@ void drawFrame(){
 	{
 		core::stringc name("FT2FontPage_%s",core::getFileName(family4->getPath()).c_str());
 		texture4=videoDriver->getTexture(name);
+	}
+	if(family7!=NULL&&texture7==NULL)
+	{
+		core::stringc name("FT2FontPage_%s",core::getFileName(family7->getPath()).c_str());
+		texture7=videoDriver->getTexture(name);
 	}*/
 	
 
 	gfAdapter->clearZ(-1000);
 	//gfAdapter->drawImage(texture1,10,10,true);
 	//gfAdapter->drawImage(texture2,400,10,true);
-	gfAdapter->drawImage(texture4,400,10,true);
+	//gfAdapter->drawImage(texture4,400,10,true);
+	gfAdapter->drawImage(texture7,400,10,true);
 	gfAdapter->render();
 	
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,DCL:%d,TCC:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),videoDriver->getDrawCall(),videoDriver->getTextureChange()),core::ORIGIN_POSITION2DI,COLOR_GREEN);

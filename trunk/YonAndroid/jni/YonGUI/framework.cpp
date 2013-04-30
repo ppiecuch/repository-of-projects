@@ -14,6 +14,7 @@ ILogger* logger=NULL;
 II18NManager* i18nMgr=NULL;
 
 IButton* button=NULL;
+ILabel* label=NULL;
 
 
 f32 factor=1.1f;
@@ -86,8 +87,10 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	fs->addWorkingDirectory("media/ui");
 #endif
 
+	//guiSystem->setFontRenderMode(text::ENUM_FONT_RENDER_MODE_MONO);
+
 	//IFontFamily* fontFamily=textSystem->getFontFamily("simsun.ttc");
-	IFontFamily* fontFamily=textSystem->getFontFamily("Droid Sans Fallback.ttf");
+	IFontFamily* fontFamily=textSystem->getFontFamily("msyhbd.ttf");
 	guiSystem->setDefaultFontFamily(fontFamily);
 
 	ITheme* theme=guiSystem->getBindedTheme();
@@ -116,10 +119,13 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	skin.Type=widget::BUTTON;
 	theme->addSkin(widget::BUTTON,widget::DOWN,skin);
 
-	button=guiSystem->addButton(NULL,"test",core::recti(10,240,10+223-78,240+682-629));
-	core::ustring str=i18nMgr->convert("²âÊÔa²âÊÔ",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	button=guiSystem->addButton(NULL,"button",core::recti(10,240,10+223-78,240+682-629));
+	core::ustring str1=i18nMgr->convert("²âÊÔa²âÊÔ",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
 	//button->getText()->setText(str);
-	button->setText(str);
+	button->setText(str1);
+
+	core::ustring str2=i18nMgr->convert("±êÇ©²âÊÔ",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	label=guiSystem->addLabel(NULL,"label",str2,core::recti(10,200,10+223-78,200+682-629));
 
 	return true;
 }
