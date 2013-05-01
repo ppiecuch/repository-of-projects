@@ -119,9 +119,8 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	skin.Type=widget::BUTTON;
 	theme->addSkin(widget::BUTTON,widget::DOWN,skin);
 
-	button=guiSystem->addButton(NULL,"button",core::recti(10,240,10+223-78,240+682-629));
+	button=guiSystem->addButton(NULL,"button",core::recti(10,240,60+223-78,240+682-629));
 	core::ustring str1=i18nMgr->convert("≤‚ ‘a≤‚ ‘",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	//button->getText()->setText(str);
 	button->setText(str1);
 
 	core::ustring str2=i18nMgr->convert("±Í«©≤‚ ‘",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);

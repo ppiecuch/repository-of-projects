@@ -138,13 +138,15 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 		material.MaterialType=ENUM_MATERIAL_TYPE_BLEND;
 		material.BlendSrc=ENUM_BLEND_FACTOR_SRC_ALPHA;
 		material.BlendDst=ENUM_BLEND_FACTOR_ONE;
+		material.Modulate=ENUM_MODULATE_4X;
+		material.Brightness=4;
 		material.setTexture(0,videoDriver->getTexture("aura.png"));
 	}
 	planeModel->setPosition(core::vector3df(0,0,0));
 	shap->drop();
 	unit->drop();
 	entity->drop();
-	SAnimatorParam alphaParam;
+	/*SAnimatorParam alphaParam;
 	alphaParam.type=ENUM_ANIMATOR_TYPE_ALPHA;
 	alphaParam.animatorAlpha.unitIndex=0;
 	alphaParam.animatorAlpha.minValue=0;
@@ -152,7 +154,7 @@ bool init(void *pJNIEnv,u32 width,u32 height){
 	alphaParam.animatorAlpha.increment=5;
 	IAnimator* alphaAnimator=animatorFty->createAnimator(alphaParam);
 	planeModel->addAnimator(alphaAnimator);
-	alphaAnimator->drop();
+	alphaAnimator->drop();*/
 
 	/*shap=geometryFty->createXYRectangle2D2T(-25,-50,25,50,0,0,1,0.1f);
 	unit=geometryFty->createUnit(shap);
@@ -196,12 +198,13 @@ void drawFrame(){
 	const core::vector3df trot=teapotModel->getRotation();
 	teapotModel->setRotation(core::vector3df(trot.x+0.2f,trot.y-3.5f ,trot.z-0.5f));
 
-	const core::vector3df psca=planeModel->getScale();
+	/*const core::vector3df psca=planeModel->getScale();
 	if(psca.x>4)
 		factor= 0.9f;
 	else if(psca.x<2)
 		factor=1.1f;
-	planeModel->setScale(psca*factor);
+	planeModel->setScale(psca*factor);*/
+	planeModel->setScale(core::vector3df(4,4,4));
 
 	sceneMgr->render(videoDriver);
 
