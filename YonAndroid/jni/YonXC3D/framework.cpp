@@ -37,6 +37,11 @@ public:
 		node->setFrameLoop(0,skeletonEntity->getFrameCount());
 
 		node->setLoopMode(true);
+
+		for(s32 i=0;i<node->getMaterialCount();++i)
+		{
+			node->getMaterial(i).Brightness=1;
+		}
 		//roleNode->setAnimationSpeed(0.3f);	
 		//roleNode->setFrameLoop(1,1);
 	}
@@ -60,6 +65,11 @@ public:
 					roleNode->setFrameLoop(0,modelEntity->getFrameCount());
 
 					roleNode->setLoopMode(false);
+
+					for(s32 i=0;i<roleNode->getMaterialCount();++i)
+					{
+						roleNode->getMaterial(i).Brightness=2;
+					}
 				}
 				else
 				{

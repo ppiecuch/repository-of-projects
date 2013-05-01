@@ -116,7 +116,7 @@ bool init(void *pJNIEnv,const c8* appPath,const c8* resPath,u32 width,u32 height
 
 	family7=textSystem->getFontFamily("msyhbd.ttf");
 	core::ustring str7=i18nMgr->convert("Ç«Ç«¾ý×Ó£¬ÎÂÈóÈçÓñ¡£",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
-	textSystem->addText(str7,family7,core::position2di(10,190),14 ,video::COLOR_WHITE, text::ENUM_FONT_RENDER_MODE_ANTIALIAS);
+	textSystem->addText(str7,family7,core::position2di(10,190),17 ,video::COLOR_WHITE, text::ENUM_FONT_RENDER_MODE_ANTIALIAS);
 
 	return true;
 }
