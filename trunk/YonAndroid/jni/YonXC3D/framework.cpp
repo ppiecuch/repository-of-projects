@@ -102,6 +102,11 @@ public:
 					roleNode->setFrameLoop(0,modelEntity->getFrameCount());
 
 					roleNode->setLoopMode(false);
+
+					for(s32 i=0;i<roleNode->getMaterialCount();++i)
+					{
+						roleNode->getMaterial(i).Brightness=2;
+					}
 				}
 				else
 				{
