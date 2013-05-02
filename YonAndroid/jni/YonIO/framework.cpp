@@ -287,7 +287,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//Logger->debug("%s\r\n",i18nManager->convert("涓崕浜烘皯鍏卞拰鍥",ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
 	//Logger->debug("%s\r\n",i18nManager->convert(in_utf8,ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
 
-#else
+#elif 0
 
 	typedef core::map<s32,s32> TestMap;
 	TestMap m;
@@ -310,8 +310,8 @@ void drawFrame(){
 	sceneMgr->render(videoDriver);
 	
 
-	videoDriver->setMaterial(pointMaterial);
-	videoDriver->drawShap(&pointShap);
+	//videoDriver->setMaterial(pointMaterial);
+	//videoDriver->drawShap(&pointShap);
 
 	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
