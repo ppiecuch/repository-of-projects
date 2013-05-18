@@ -1,5 +1,6 @@
-#ifndef _CMDPACKET_H_
-#define _CMDPACKET_H_
+
+#ifndef __CMD_PACKET_H__
+#define __CMD_PACKET_H__
 
 #include "netconfig.h"
 
@@ -16,28 +17,21 @@ const int FLOAT_SIZE = 4;
 const int LONG_LONG_SIZE  = 8;
 const int WCHAR_SIZE = 2;		// !! Attention, sizeof(wchar_t) on android = 4
 
-#include "CPacketMgr.h"
-#include "basenetwork.h"
 
 //封包类
 //对网络流操作（读/写）的封装
 //NOTE: 读/写操作注意字节序大小端
-class CCmdPacket
+class CCmdPacket  
 {
-private:
-	SPacketBuffer* m_pBuffer;
-	static io::IFileSystem* s_pFileSystem;
-	io::IReadStream* m_pReadStream;
-	core::array<core::stringc> inPlaces;
-
-	bool ReadData(void *data,int len);
-	bool WriteData(void *data,int len);
 public:
 	CCmdPacket();
 	virtual ~CCmdPacket();
 
-	static void setFileSystem(io::IFileSystem* fs);
-	SPacketBuffer* getBuffer(){return m_pBuffer;}
+	void BeginWrite();
+	void BeginRead(char *p,int len);	//初始化读状态
+	void BeginRead();
+
+	bool ReadBinary(char **data,int *len);
 
 	// 字符串采用UTF-8编码传输
 	// 格式： | short | UTF8 string | '\0' | 
@@ -59,27 +53,23 @@ public:
 	// - 该函数效率最高，不涉及任何运行时动态内存分配，唯一的要求是谨慎使用！
 
 	bool ReadString(char* pstr);
-	//bool ReadString(char** ppstr);//好像没用到
+	bool ReadString(char** ppstr);
 	bool ReadStringInPlace(char** ppstr);
 
 	bool ReadFloat(float *f);
 	bool ReadInt32(int *l);
 	bool ReadLongLong(long long *ll);
+	//	bool ReadInt(int *l);
 	bool ReadShort(short *s);
 	bool ReadByte(unsigned char *c);
 
-	void BeginRead(char *p,int len);	//初始化读状态
-	//void BeginRead();//only for emulate Server
-
-	bool ReadBinary(char **data,int *len);
-
-	void BeginWrite();
-
 	bool WriteBinary(char *data,int len);
+
 	// 写入0结尾的c字符串
 	// 格式参考ReadString
 	// 注意：结尾0字节不写入网络流
 	bool WriteString(const char *str);
+	//	bool WriteString(const xc::c16 *str);
 
 	bool WriteFloat(float f);
 	bool WriteInt32(int l);
@@ -88,9 +78,22 @@ public:
 
 	char *GetData();
 	int   GetDataSize();
+	int   GetMaxSize();
 
 	bool  SetSize(int len);
-	//bool  CloneFrom(CCmdPacket *packet);//没有用到
+	bool  CloneFrom(CCmdPacket *packet);
+
+private :
+	bool  CopyData(char *buf,int len);
+	bool  WriteData(void *data,int len);
+	bool  ReadData(void *data,int len);
+
+	char *m_pData;			//写地址
+	char *m_pReadData;		//读地址
+	int   m_nLen;			//数据长度
+	int   m_nReadOffset;	//读偏移
+	int   m_nWriteOffset;	//写偏移
+	int   m_nMaxSize;		//最大长度
 };
 
 #endif

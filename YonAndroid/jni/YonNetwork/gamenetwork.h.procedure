@@ -1,0 +1,186 @@
+#ifndef _GAMENETWORK_H_
+#define _GAMENETWORK_H_
+
+#include "framework.h"
+#include "ISingleton.h"
+#include "gamenetworkprotocol.h"
+#include "delegate.h"
+#include "netsocket.h"
+#include "XCMutex.h"
+#include "SSpeedCounter.h"
+#include "IProcedure.h"
+
+
+struct SPacketBuffer : public core::IRecyclable{
+	//core::array<c8> Buffer;
+	core::stringc Buffer;
+	virtual void reset(){
+		//Buffer.set_used(0);
+		memset(Buffer.pointer(),0x0,Buffer.capacity());
+		Buffer.repair();
+	}
+
+	void setSize(u32 size){
+		Buffer.reserve(size);
+		reset();
+	}
+};
+
+class CCmdPacket;
+
+class CGameNetwork : public CSingleton<CGameNetwork>
+{
+private:
+
+	class INetProcedure : public IProcedure{
+	private:
+		virtual bool process(void* data){return false;}
+	protected:
+		static int s_iSeed;
+	public:
+		virtual int getHeadSize() = 0;
+		virtual bool processHead(void* data) = 0;
+		virtual bool processBody(void* data) = 0;
+	
+		static int bigEndian(int num);
+		static short bigEndian(short num);
+	};
+
+	class CSeedProcedure : public INetProcedure{
+		static const short SYS_PACKET_SET_SEED;		//加密种子协议号
+		bool m_bWaitingSeed;
+		int generateSecretKey(int seed);
+	public:
+		CSeedProcedure():m_bWaitingSeed(true){}
+		virtual int getHeadSize(){return 3;}
+		virtual void preProcess(void* data){}
+		virtual bool needProcess(void* data);
+		virtual bool processHead(void* data);
+		virtual bool processBody(void* data);
+		virtual bool canPass(void* data);
+	};
+
+	class CDecryptProcedure : public INetProcedure{
+	public:
+		virtual int getHeadSize(){return 2;}
+		virtual void preProcess(void* data){}
+		virtual bool needProcess(void* data){return true;}
+		virtual bool processHead(void* data);
+		virtual bool processBody(void* data);
+		virtual bool canPass(void* data){return true;}
+	};
+
+	class CEncryptProcedure : public INetProcedure{
+		int m_iSecSeed;				//第二加密种子
+	public:
+		virtual int getHeadSize(){return 2;}
+		virtual void preProcess(void* data);
+		virtual bool needProcess(void* data){return true;}
+		virtual bool processHead(void* data);
+		virtual bool processBody(void* data);
+		virtual bool canPass(void* data){return true;}
+	};
+
+	enum ENUM_STATE{
+		ENUM_STATE_NONE = 0,
+		ENUM_STATE_INITIALIZED,
+		ENUM_STATE_CONNECTED
+	};
+
+	typedef core::list<SPacketBuffer*> PacketBufferList;
+	typedef core::CObjectPoolFast<SPacketBuffer> PacketBufferPool;
+
+	bool m_bSendThreadRunnable,m_bRecvThreadRunnable;
+	CXCMutex m_notifyMutex;
+	CXCMutex m_sendMutex;
+	CXCMutex m_recvMutex;
+	CXCMutex m_poolMutex;
+	bool m_bDisconnectNotified;
+	PacketBufferList m_sendBufferList;
+	PacketBufferList m_recvBufferList;
+	PacketBufferPool m_pool;
+	bool m_bDataProccessible;
+	core::map< MSG_PROTOCOL_TYPE, CDelegate<CCmdPacket*> >	m_protocolDelegateMap;	//网络消息事件处理器map
+
+	core::array<INetProcedure*> m_recvProcedures;
+	core::array<INetProcedure*> m_sendProcedures;
+
+	SSpeedCounter m_sendSpeedCounter;
+	SSpeedCounter m_recvSpeedCounter;
+
+	CNetSocket* m_pSocket;
+	ENUM_STATE m_eState;
+	CDelegateVoid m_connectDlgt;
+	CDelegateVoid m_disconnectDlgt;
+	void notifyDisconnected();
+
+	void _sendProc();
+	void _recvProc();
+
+	void pushSendProcedure(INetProcedure* proc);
+	void pushRecvProcedure(INetProcedure* proc);
+public:
+	CGameNetwork();
+	~CGameNetwork();
+
+	
+	SPacketBuffer* getBuffer();
+	void recycleBuffer(SPacketBuffer* buffer);
+
+	void Init();
+	bool Connect(const char *remote,int port,char *bindIp=0,int bindPort=0);
+	void Close();
+
+	void Lock();
+	void UnLock();
+	bool IsLocked();
+
+	void setOnConnectDelegate(IDelegateVoid* dlgt);
+	void setOnDisconnectDelegate(IDelegateVoid* dlgt);
+
+	void SendPacket(SPacketBuffer *packet);
+
+	u32 getPoolSize(){
+		return m_pool.getSize();
+	}
+
+	u32 getPoolCapacity(){
+		return m_pool.getCapacity();
+	}
+
+	core::stringc getSendSpeed(){
+		return m_sendSpeedCounter.getSpeed();
+	}
+
+	core::stringc getRecvSpeed(){
+		return m_recvSpeedCounter.getSpeed();
+	}
+
+#ifdef WIN32
+	static unsigned int WINAPI ReceiverThread( void* lpData );
+	static unsigned int WINAPI SenderThread( void* lpData );
+#else
+	static void* ReceiverThread( void* data );
+	static void* SenderThread( void* data );
+#endif
+
+	// 注册网络消息事件处理器
+	template <typename T, typename TP1>
+	void RegisterEventHandler(MSG_PROTOCOL_TYPE code, T* _object, void (T::*_method)( TP1 p1 ))
+	{
+		m_protocolDelegateMap[code] = createDelegate(_object, _method);
+	}
+
+	// 注销网络消息事件处理器
+	void UnregisterEventHandler(MSG_PROTOCOL_TYPE code)
+	{
+		m_protocolDelegateMap.remove(code);
+	}
+
+	// 更新方法，需要周期性定时调用，通常每帧调用一次
+	void Update();
+};
+
+#define GameNetwork()	CGameNetwork::GetInstance()
+
+#endif

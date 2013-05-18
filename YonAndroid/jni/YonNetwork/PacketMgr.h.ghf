@@ -118,7 +118,7 @@ public:
 	static void sendC2SSendSomeMessage(void);
 
 	static void sendC2SHonourUpdate(short id);
-
+ 
 	//请求地图怪物列表
 	void sendC2SMapActor(int mapID);
 

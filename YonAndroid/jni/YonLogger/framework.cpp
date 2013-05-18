@@ -128,10 +128,10 @@ void drawFrame(){
 	//Logger->drawString(videoDriver,core::stringc("abcdefghijklmnopqrstuvwxyz"),core::position2di(0,40),COLOR_GREEN);
 	//Logger->drawString(videoDriver,core::stringc("0123456789+-*/\,./?<>|="),core::position2di(0,60),COLOR_GREEN);
 	
-	//TODO 此句一开，Android上必崩
-	//Logger->render(videoDriver);
-
 	u32 start=timer->getRealTime();
+
+	Logger->render(videoDriver);
+
 	u32 end=timer->getRealTime();
 	Logger->drawString(videoDriver,core::stringc("use time:%d",(end-start)),core::position2di(200,0),COLOR_GREEN);
 

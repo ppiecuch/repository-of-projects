@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin"
+			IntermediateDirectory="$(SolutionDir)obj\debug\$(ProjectName)"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../MyGUIEngine/include;../include;../freetype/include;../MyGUIAdapter"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -165,24 +166,193 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="源文件"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+		<File
+			RelativePath=".\basenetwork.cpp"
 			>
-		</Filter>
-		<Filter
-			Name="头文件"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+		</File>
+		<File
+			RelativePath=".\basenetwork.h"
 			>
-		</Filter>
-		<Filter
-			Name="资源文件"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+		</File>
+		<File
+			RelativePath=".\cmdpacket.cpp"
 			>
-		</Filter>
+		</File>
+		<File
+			RelativePath=".\cmdpacket.cpp.ghf"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\cmdpacket.h"
+			>
+		</File>
+		<File
+			RelativePath=".\cmdpacket.h.ghf"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\CPacketMgr.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\CPacketMgr.h"
+			>
+		</File>
+		<File
+			RelativePath=".\delegate.h"
+			>
+		</File>
+		<File
+			RelativePath=".\framework.cpp"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\framework.h"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\gamenetwork.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\gamenetwork.cpp.ghf"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\gamenetwork.cpp.origin"
+			>
+		</File>
+		<File
+			RelativePath=".\gamenetwork.cpp.procedure"
+			>
+		</File>
+		<File
+			RelativePath=".\gamenetwork.h"
+			>
+		</File>
+		<File
+			RelativePath=".\gamenetwork.h.ghf"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\gamenetwork.h.ogigin"
+			>
+		</File>
+		<File
+			RelativePath=".\gamenetwork.h.procedure"
+			>
+		</File>
+		<File
+			RelativePath=".\gamenetworkprotocol.h"
+			>
+		</File>
+		<File
+			RelativePath=".\IProcedure.h"
+			>
+		</File>
+		<File
+			RelativePath=".\ISingleton.h"
+			>
+		</File>
+		<File
+			RelativePath=".\main.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\netconfig.h"
+			>
+		</File>
+		<File
+			RelativePath=".\NetDataType.h"
+			>
+		</File>
+		<File
+			RelativePath=".\netsocket.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\netsocket.h"
+			>
+		</File>
+		<File
+			RelativePath=".\PacketMgr.cpp.ghf"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\PacketMgr.h.ghf"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\SSpeedCounter.h"
+			>
+		</File>
+		<File
+			RelativePath=".\XCMutex.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\XCMutex.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

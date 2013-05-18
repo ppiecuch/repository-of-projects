@@ -1,0 +1,89 @@
+/*!
+@file		gamenetwork.h: 
+@author		Guo Huafeng
+@date		08/2012
+@desc		interface for the CGameNetwork class.
+			封装网络模块，提供游戏应用层面的功能：
+			1. 注册/反注册事件处理器
+			2. 锁住/解锁消息处理
+			3. 连接/断开操作
+			4. 发送网络消息
+			5. 连接/断线通知
+*/
+#ifndef __GAME_NETWORK_H__
+#define __GAME_NETWORK_H__
+
+#include "CommonHeadFiles.h"
+#include "../ISingleton.h"
+#include "Common/delegate.h"
+#include "NetDataType.h"
+#include "GamePacket/GamePacket.h"
+
+#include <map>
+
+class CGameSession;
+class CCmdPacket;
+
+class CGameNetwork : public CSingleton<CGameNetwork>
+{
+public:
+	CGameNetwork();
+	virtual ~CGameNetwork();
+	void Init();
+	bool Connect(const char *remote,int port,char *bindIp=0,int bindPort=0);
+	bool SendPacket(CCmdPacket *packet,bool flush=true,bool sys=false);
+	bool SendPacket(CCmdPacket& packet,bool flush=true,bool sys=false);
+	bool SendPacket(CC2SPacket& packet,bool flush=true,bool sys=false);
+	void Close();
+	void Shutdown();
+
+	void Lock();
+	void UnLock();
+
+	// 数据收/发回调方法
+	void OnReceive(CCmdPacket *packet);
+	// 断线回调方法
+	void OnDisconnect();
+	// 连接回调方法
+	void OnConnect(bool ret);
+
+	// 注册网络消息事件处理器
+	template <typename T, typename TP1>
+	void RegisterEventHandler(MSG_PROTOCOL_TYPE code, T* _object, void (T::*_method)( TP1 p1 ))
+	{
+		mEventDelegateMap[code] = createDelegate(_object, _method);
+	}
+
+	// 注销网络消息事件处理器
+	void UnregisterEventHandler(MSG_PROTOCOL_TYPE code)
+	{
+		mEventDelegateMap.erase(code);
+	}
+
+	// 更新方法，需要周期性定时调用，通常每帧调用一次
+	void Update();
+
+#ifdef WIN32
+	static unsigned int WINAPI ReceiverThread( void* lpData );
+#else
+	static void* ReceiverThread( void* data );
+#endif
+
+	CGameSession* getSession()	{ return mGameSession;	}
+	bool IsLocked();
+	bool IsReadyDestory()		{ return mReadyDestory; }
+	bool IsRecieverThreadExit()	{ return sRecieverThreadExit; }
+
+private:
+	CGameSession*	mGameSession;		//游戏数据连接对象
+	CCmdPacket		mCmdPacket;			//共享变量，供消息处理使用
+	bool			mReadyDestory;		//是否准备好销毁
+	static bool		sRecieverThreadExit;
+
+	std::map< MSG_PROTOCOL_TYPE, CDelegate<CCmdPacket*> >	mEventDelegateMap;	//网络消息事件处理器map
+
+};
+
+#define GameNetwork()	CGameNetwork::GetInstance()
+
+#endif

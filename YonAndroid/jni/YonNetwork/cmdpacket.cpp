@@ -1,106 +1,179 @@
-/*
-	CmdPacket.cpp: implementation of the CCmdPacket class.
-*/
-
 #include "cmdpacket.h"
+#include "gamenetwork.h"
+
+io::IFileSystem* CCmdPacket::s_pFileSystem=NULL;
+
+void CCmdPacket::setFileSystem(io::IFileSystem* fs)
+{
+	s_pFileSystem=fs;
+}
 
 CCmdPacket::CCmdPacket()
+:m_pBuffer(NULL),m_pReadStream(NULL)
 {
-	m_nMaxSize = 0;
-	m_nLen = 0;
-	m_nReadOffset  = 0;
-	m_nWriteOffset = 0;
-	m_pData = NULL;
-	/* set buffer to default size */
-	SetSize(DEFAULT_CMD_PACKET_SIZE);
 }
 
 CCmdPacket::~CCmdPacket()
 {
-	delete []m_pData;
-}
-
-bool CCmdPacket::SetSize(int len)
-{
-	if(len > MAX_CMD_PACKET_SIZE) return false;
-	delete []m_pData;
-	m_pData = NULL;
-	m_pData = new char[len];
-	m_nMaxSize = len;
-	return m_pData?true:false;
-}
-
-/* try write data to packet */
-bool CCmdPacket::WriteData(void *data, int len)
-{
-	if ((m_nLen + len) > m_nMaxSize) return false;
-	memcpy(m_pData+m_nWriteOffset,data,len);
-	m_nLen += len;
-	m_nWriteOffset += len;
-	return true;
-}
-
-bool CCmdPacket::WriteByte(char c)
-{
-	return WriteData(&c,BYTE_SIZE);
+	//if(m_pBuffer)
+	//	GameNetwork()->recycleBuffer(m_pBuffer);
+	if(m_pReadStream)
+		m_pReadStream->drop();
 }
 
 void CCmdPacket::BeginRead(char *p,int len)
 {
-	m_pReadData = p;
-	m_nLen = len;
-	m_nReadOffset = 0;
+	YON_DEBUG_BREAK_IF(len<0);
+	
+#ifdef STREAM_ORDER_BIG_ENDIANNESS
+	io::ENUM_ENDIAN_MODE mode=io::ENUM_ENDIAN_MODE_BIG;
+#else
+	io::ENUM_ENDIAN_MODE mode=io::ENUM_ENDIAN_MODE_LITTLE;
+#endif
+	if(m_pReadStream)
+	{
+		m_pReadStream->drop();
+		m_pReadStream=NULL;
+	}
+	m_pReadStream=s_pFileSystem->createAndOpenReadMemoryStream("cmdpacket",p,(u32)len,false,mode);
 }
 
-void CCmdPacket::BeginRead()
+bool CCmdPacket::ReadString(char* pstr)
 {
-	m_pReadData = m_pData;
-	m_nReadOffset = 0;
+	if(m_pReadStream)
+	{
+		short len;
+		bool result=ReadShort(&len);
+		YON_DEBUG_BREAK_IF(!result||len<0||(u32)len>m_pReadStream->getSize()-m_pReadStream->getPos());
+		if(!result||len<=0)
+			return false;
+		s32 length=m_pReadStream->read((u8*)pstr,len);
+		YON_DEBUG_BREAK_IF(length<len);
+		if(length<len)
+			return false;
+
+		core::stringc str;
+		for(short i=0;i<len;++i)
+			str.append(core::stringc("%d,",((c8*)pstr)[i]));
+		YON_DEBUG("ReadString:%s\r\n",str.c_str());
+
+
+		return true;
+	}
+	return false;
+}
+
+bool CCmdPacket::ReadStringInPlace(char** ppstr)
+{
+	short len;
+	if (!ReadShort(&len)) return false;
+	//if (len <= 0) return false;
+	//if ((m_nReadOffset + len) > m_nLen) return false;
+	YON_DEBUG_BREAK_IF(len<=0||(u32)len>m_pReadStream->getSize()-m_pReadStream->getPos());
+
+	/* set end avoid overflow */
+	//*(m_pReadData+m_nReadOffset+len-1) = '\0';
+	//*ppstr = m_pReadData + m_nReadOffset;
+	//m_nReadOffset += len;
+
+	char* p=(char*)m_pReadStream->pointer();
+	p[m_pReadStream->getPos()+len-1]='\0';
+	*ppstr=p+m_pReadStream->getPos();
+	m_pReadStream->seek(len,true);
+
+	/*inPlaces.push_back(core::stringc(""));
+	core::stringc& str=inPlaces[inPlaces.size()-1];
+
+	str.reserve(len);
+	char* p=(char*)m_pReadStream->pointer();
+	memcpy(str.pointer(),p+m_pReadStream->getPos(),len);
+	str[len-1]='\0';
+	str.repair(len);
+	*ppstr=str.pointer();
+	m_pReadStream->seek(len,true);*/
+	return true;
+}
+
+bool CCmdPacket::ReadFloat(float *f)
+{
+	if(m_pReadStream)
+	{
+		*f=m_pReadStream->readFloat();
+		return true;
+	}
+	return false;
+}
+bool CCmdPacket::ReadInt32(int *l)
+{
+	if(m_pReadStream)
+	{
+		*l=m_pReadStream->readInt();
+		return true;
+	}
+	return false;
+}
+bool CCmdPacket::ReadLongLong(long long *ll)
+{
+	if(m_pReadStream)
+	{
+		*ll=m_pReadStream->readLong();
+		return true;
+	}
+	return false;
+}
+bool CCmdPacket::ReadShort(short *s)
+{
+	if(m_pReadStream)
+	{
+		*s=m_pReadStream->readShort();
+		return true;
+	}
+	return false;
+}
+bool CCmdPacket::ReadByte(unsigned char *c)
+{
+	if(m_pReadStream)
+	{
+		*c=m_pReadStream->readUnsignedByte();
+		return true;
+	}
+	return false;
 }
 
 void CCmdPacket::BeginWrite()
 {
-	m_nLen = 0;
-	m_nWriteOffset = 0;
+	YON_DEBUG_BREAK_IF(m_pBuffer!=NULL);
+
+	m_pBuffer=GameNetwork()->getBuffer();
+	m_pBuffer->Buffer.append("   ");
 }
 
-bool CCmdPacket::WriteBinary(char *data, int len)
+bool CCmdPacket::WriteData(void *data,int len)
 {
-	if (WriteShort(len)==false) 
-		return false;
-	return WriteData(data,len);
-}
-
-bool CCmdPacket::ReadBinary(char **data, int *len)
-{
-	short dataLen;
-	if (!ReadShort(&dataLen)) return false;
-	if (dataLen <= 0) return false;
-	if ((m_nReadOffset + dataLen) > m_nLen) return false;
-	*data = m_pReadData + m_nReadOffset;
-	*len = dataLen;
-	m_nReadOffset += dataLen;
+	YON_DEBUG_BREAK_IF(m_pBuffer==NULL||len<0);
+	m_pBuffer->Buffer.append((c8*)data,len);
 	return true;
 }
 
-bool CCmdPacket::WriteShort(short s)
+bool CCmdPacket::WriteBinary(char *data,int len)
 {
-#ifdef STREAM_ORDER_BIG_ENDIANNESS
-	unsigned short t = s;
-	t = (t << 8) | (t >> 8);
-	s = t;
-#endif
-	return WriteData(&s,SHORT_SIZE);
+	if (WriteShort(len)==false) 
+	{
+		YON_WARN(YON_LOG_WARN_FORMAT,"WriteShort in WriteBinary failed!");
+		return false;
+	}
+	return WriteData(data,len);
 }
 
-bool CCmdPacket::WriteInt32(int l)
+bool CCmdPacket::WriteString(const char *str)
 {
-#ifdef STREAM_ORDER_BIG_ENDIANNESS
-	unsigned int t = l;
-	t = (t << 24) | ((t & 0xFF00)  << 8) | ((t & 0x00FF0000) >> 8) | (t >> 24);
-	l = t;
-#endif
-	return WriteData(&l,LONG_SIZE);
+	short len = strlen(str);
+	if (!WriteShort(len))
+	{
+		YON_WARN(YON_LOG_WARN_FORMAT,"WriteShort in WriteString failed!");
+		return false;
+	}
+	return WriteData((void*)str,len);
 }
 
 bool CCmdPacket::WriteFloat(float f)
@@ -113,204 +186,44 @@ bool CCmdPacket::WriteFloat(float f)
 	return WriteData(&f,FLOAT_SIZE);
 }
 
-bool CCmdPacket::ReadByte(unsigned char *c)
-{
-	return ReadData(c,BYTE_SIZE);
-}
-
-bool CCmdPacket::ReadShort(short *s)
+bool CCmdPacket::WriteInt32(int l)
 {
 #ifdef STREAM_ORDER_BIG_ENDIANNESS
-	unsigned short t;
-	bool bRet = ReadData(&t, SHORT_SIZE);
-	*s = (t << 8) | (t >> 8);
-	return bRet;
-#else
-	return ReadData(s,SHORT_SIZE);
-#endif
-}
-
-bool CCmdPacket::ReadInt32(int *l)
-{
-#ifdef STREAM_ORDER_BIG_ENDIANNESS
-	unsigned int t;
-	bool bRet = ReadData(&t, LONG_SIZE);
-	*l = (t << 24) | ((t & 0xFF00)  << 8) | ((t & 0x00FF0000) >> 8) | (t >> 24);
-	return bRet;
-#else
-	return ReadData(l,LONG_SIZE);
-#endif
-}
-
-bool CCmdPacket::ReadLongLong(long long *ll)
-{
-#ifdef STREAM_ORDER_BIG_ENDIANNESS
-	unsigned long long t;
-	bool bRet = ReadData(&t, LONG_LONG_SIZE);
-	*ll = (t << 56) | ((t & 0xFF00)  << 40) | ((t & 0xFF0000) << 24) | ((t & 0xFF000000) << 8)
-		| ((t & 0xFF00000000LL) >> 8) | ((t & 0xFF0000000000LL) >> 24)  | ((t & 0xFF000000000000LL) >> 40) | ((t & 0xFF00000000000000LL) >> 56);
-	return bRet;
-#else
-	return ReadData(ll,LONG_SIZE);
-#endif
-}
-
-#if 0
-bool CCmdPacket::ReadInt32(int *i)
-{
-#ifdef STREAM_ORDER_BIG_ENDIANNESS
-	unsigned int t;
-	bool bRet = ReadData(&t, LONG_SIZE);
-	*i = (t << 24) | ((t & 0xFF00)  << 8) | ((t & 0x00FF0000) >> 8) | (t >> 24);
-	return bRet;
-#else
-	return ReadData(i,LONG_SIZE);
-#endif
-}
-#endif
-
-bool CCmdPacket::ReadFloat(float *f)
-{
-#ifdef STREAM_ORDER_BIG_ENDIANNESS
-	int t;
-	bool bRet = ReadData(&t, FLOAT_SIZE);
+	unsigned int t = l;
 	t = (t << 24) | ((t & 0xFF00)  << 8) | ((t & 0x00FF0000) >> 8) | (t >> 24);
-	float* tf = (float*) &t;
-	*f = *tf;
-	return bRet;
-#else
-	return ReadData(f,FLOAT_SIZE);
+	l = t;
 #endif
-}
-	
-bool CCmdPacket::ReadString(char* pstr)
-{
-	if (pstr == 0)	return false;
-
-	short len;
-	if (!ReadShort(&len)) return false;
-	if (len <= 0) return false;
-	if ((m_nReadOffset + len) > m_nLen) return false;
-	
-	/* set end avoid overflow */
-	*(pstr + len - 1) = '\0';
-	
-	return ReadData(pstr, len);
+	return WriteData(&l,LONG_SIZE);
 }
 
-bool CCmdPacket::ReadString(char** ppstr)
+bool CCmdPacket::WriteShort(short s)
 {
-	short len;
-	if (!ReadShort(&len)) return false;
-	if (len <= 0) return false;
-	if ((m_nReadOffset + len) > m_nLen) return false;
-	
-	*ppstr = new char[len];
-	if (*ppstr == 0)	return false;
-	
-	/* set end avoid overflow */
-	*(*ppstr+len-1) = '\0';
-
-	return ReadData(*ppstr, len);
-}
-
-bool CCmdPacket::ReadStringInPlace(char** ppstr)
-{
-	short len;
-	if (!ReadShort(&len)) return false;
-	if (len <= 0) return false;
-	if ((m_nReadOffset + len) > m_nLen) return false;
-	
-	/* set end avoid overflow */
-	*(m_pReadData+m_nReadOffset+len-1) = '\0';
-	*ppstr = m_pReadData + m_nReadOffset;
-	m_nReadOffset += len;
-	return true;
-}
-
-#if 0	//·ÏÆú£¬²ÉÓÃË«×Ö½Úwchar_t±àÂë´«Êä
-xc::c16* CCmdPacket::ReadString(xc::c16 *buf)
-{
-	xc::c16 *str = buf;
-	short len;
-	if (!ReadShort(&len))	return 0;
-	if (len <= 0)			return 0;
-	if ( (m_nReadOffset + len * WCHAR_SIZE ) > m_nLen) return 0;
-
-	if (str == 0)
-		str = GLL_NEW xc::c16[len+1];
-
-#if 0
-	/* set end avoid overflow */
-	*(m_pReadData+m_nReadOffset+len-1) = '\0';
-	*str = (wchar_t*)(m_pReadData + m_nReadOffset);
+#ifdef STREAM_ORDER_BIG_ENDIANNESS
+	unsigned short t = s;
+	t = (t << 8) | (t >> 8);
+	s = t;
 #endif
-	xc::c16* p = str;
-	for (short i = 0; i < len; i++)
-	{	
-		ReadShort((short*)p++);
-	}
-	*p = L'\0';	//½áÎ²null
-
-	return str;
+	return WriteData(&s,SHORT_SIZE);
 }
 
-bool CCmdPacket::WriteString(const xc::c16 *str)
+bool CCmdPacket::WriteByte(char c)
 {
-//	short len = wcslen(str) + 1;
-	short len = strlenc16(str);
-	if (!WriteShort(len)) return false;
-
-	for (short i = 0; i < len; i++)
-	{
-		WriteShort(*str++);
-	}
-	return true;
+	return WriteData(&c,BYTE_SIZE);
 }
 
-#endif
-
-bool CCmdPacket::WriteString(const char *str)
+char* CCmdPacket::GetData()
 {
-	short len = strlen(str);
-	if (!WriteShort(len)) return false;
-	return WriteData((void*)str,len);
+	YON_DEBUG_BREAK_IF(m_pBuffer==NULL);
+	return (char*)m_pBuffer->Buffer.pointer();
 }
-
-bool CCmdPacket::ReadData(void *data, int len)
-{
-	if ((m_nReadOffset + len)>m_nLen) return false;
-	
-	memcpy(data,m_pReadData+m_nReadOffset,len);
-	m_nReadOffset += len;
-	return true;
-}
-
-bool CCmdPacket::CopyData(char *buf,int len)
-{
-	if(!SetSize(len)) return false;
-	memcpy(m_pData,buf,len);
-	m_nLen = len;
-	return true;
-}
-
-bool CCmdPacket::CloneFrom(CCmdPacket *packet)
-{
-	return CopyData(packet->GetData(),packet->GetDataSize());
-}
-
-char *CCmdPacket::GetData()
-{
-	return m_pData;
-}
-
 int CCmdPacket::GetDataSize()
 {
-	return m_nLen;
+	YON_DEBUG_BREAK_IF(m_pBuffer==NULL);
+	return (int)m_pBuffer->Buffer.length();
 }
 
-int CCmdPacket::GetMaxSize()
+bool CCmdPacket::SetSize(int len)
 {
-	return m_nMaxSize;
+	m_pBuffer->setSize((u32)len);
+	return true;
 }
-
