@@ -1,0 +1,133 @@
+#ifndef _GAMENETWORK_H_
+#define _GAMENETWORK_H_
+
+#include "framework.h"
+#include "ISingleton.h"
+#include "gamenetworkprotocol.h"
+#include "delegate.h"
+#include "netsocket.h"
+#include "XCMutex.h"
+#include "SSpeedCounter.h"
+
+
+struct SPacketBuffer : public core::IRecyclable{
+	//core::array<c8> Buffer;
+	core::stringc Buffer;
+	virtual void reset(){
+		//Buffer.set_used(0);
+		memset(Buffer.pointer(),0x0,Buffer.capacity());
+		Buffer.repair();
+	}
+
+	void setSize(u32 size){
+		Buffer.reserve(size);
+		reset();
+	}
+};
+
+class CCmdPacket;
+
+class CGameNetwork : public CSingleton<CGameNetwork>
+{
+private:
+
+	enum ENUM_STATE{
+		ENUM_STATE_NONE = 0,
+		ENUM_STATE_INITIALIZED,
+		ENUM_STATE_CONNECTED
+	};
+
+	typedef core::list<SPacketBuffer*> PacketBufferList;
+	typedef core::CObjectPoolFast<SPacketBuffer> PacketBufferPool;
+
+	bool m_bSendThreadRunnable,m_bRecvThreadRunnable;
+	CXCMutex m_notifyMutex;
+	CXCMutex m_sendMutex;
+	CXCMutex m_recvMutex;
+	CXCMutex m_poolMutex;
+	bool m_bDisconnectNotified;
+	PacketBufferList m_sendBufferList;
+	PacketBufferList m_recvBufferList;
+	PacketBufferPool m_pool;
+	bool m_bDataProccessible;
+	core::map< MSG_PROTOCOL_TYPE, CDelegate<CCmdPacket*> >	m_protocolDelegateMap;	//网络消息事件处理器map
+
+	SSpeedCounter m_sendSpeedCounter;
+	SSpeedCounter m_recvSpeedCounter;
+
+	CNetSocket* m_pSocket;
+	ENUM_STATE m_eState;
+	CDelegateVoid m_connectDlgt;
+	CDelegateVoid m_disconnectDlgt;
+	void notifyDisconnected();
+
+	void _sendProc();
+	void _recvProc();
+
+	static int bigEndian(int num);
+	static short bigEndian(short num);
+public:
+	CGameNetwork();
+	~CGameNetwork();
+
+	
+	SPacketBuffer* getBuffer();
+	void recycleBuffer(SPacketBuffer* buffer);
+
+	void Init();
+	bool Connect(const char *remote,int port,char *bindIp=0,int bindPort=0);
+	void Close();
+
+	void Lock();
+	void UnLock();
+	bool IsLocked();
+
+	void setOnConnectDelegate(IDelegateVoid* dlgt);
+	void setOnDisconnectDelegate(IDelegateVoid* dlgt);
+
+	void SendPacket(SPacketBuffer *packet);
+
+	u32 getPoolSize(){
+		return m_pool.getSize();
+	}
+
+	u32 getPoolCapacity(){
+		return m_pool.getCapacity();
+	}
+
+	core::stringc getSendSpeed(){
+		return m_sendSpeedCounter.getSpeed();
+	}
+
+	core::stringc getRecvSpeed(){
+		return m_recvSpeedCounter.getSpeed();
+	}
+
+#ifdef WIN32
+	static unsigned int WINAPI ReceiverThread( void* lpData );
+	static unsigned int WINAPI SenderThread( void* lpData );
+#else
+	static void* ReceiverThread( void* data );
+	static void* SenderThread( void* data );
+#endif
+
+	// 注册网络消息事件处理器
+	template <typename T, typename TP1>
+	void RegisterEventHandler(MSG_PROTOCOL_TYPE code, T* _object, void (T::*_method)( TP1 p1 ))
+	{
+		m_protocolDelegateMap[code] = createDelegate(_object, _method);
+	}
+
+	// 注销网络消息事件处理器
+	void UnregisterEventHandler(MSG_PROTOCOL_TYPE code)
+	{
+		m_protocolDelegateMap.remove(code);
+	}
+
+	// 更新方法，需要周期性定时调用，通常每帧调用一次
+	void Update();
+};
+
+#define GameNetwork()	CGameNetwork::GetInstance()
+
+#endif

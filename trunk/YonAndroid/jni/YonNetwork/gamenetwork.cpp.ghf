@@ -1,0 +1,165 @@
+#include "gamenetwork.h"
+#include "gamesession.h"
+#include "../Game/Game.h"
+
+#ifdef WIN32
+#include <process.h>
+#else
+#include <pthread.h>
+#endif
+
+bool CGameNetwork::sRecieverThreadExit = false;
+
+CGameNetwork::CGameNetwork()
+: mReadyDestory (false)
+{
+}
+
+CGameNetwork::~CGameNetwork()
+{
+	Close();
+	delete mGameSession;
+	mGameSession = 0;
+}
+
+void CGameNetwork::Init()
+{
+	mGameSession = 0;
+
+	//创建网络工作线程
+#ifdef WIN32
+	unsigned int netRecvThreadId;
+	_beginthreadex( NULL, NULL, ReceiverThread, NULL, NULL, &netRecvThreadId );
+	sRecieverThreadExit = false;
+#else
+	pthread_t netRecvThreadId;
+	pthread_create(&netRecvThreadId, NULL, &ReceiverThread, NULL);
+#endif
+
+}
+
+bool CGameNetwork::Connect(const char *remote,int port,char *bindIp,int bindPort)
+{
+	if (mGameSession == 0)
+		mGameSession = new CGameSession;
+
+	return mGameSession->Connect(remote, port, bindIp, bindPort);
+}
+
+bool CGameNetwork::SendPacket(CCmdPacket *packet,bool flush,bool sys)
+{
+	if (mGameSession)
+		return mGameSession->SendPacket(packet, flush, sys);
+	
+	return false;
+}
+
+bool CGameNetwork::SendPacket(CCmdPacket& packet,bool flush,bool sys)
+{
+	return SendPacket(&packet, flush, sys);
+}
+
+bool CGameNetwork::SendPacket(CC2SPacket& packet,bool flush,bool sys)
+{
+	if (mGameSession)
+	{
+		packet.write(mCmdPacket);
+		return mGameSession->SendPacket(&mCmdPacket, flush, sys);
+	}
+	return false;
+
+}
+
+
+void CGameNetwork::Close()
+{
+	if (mGameSession)
+		mGameSession->Close();
+}
+
+void CGameNetwork::Shutdown()
+{
+	mReadyDestory = true;
+}
+
+//转发给Game类
+void CGameNetwork::OnDisconnect()
+{
+	CGame::getInstance()->OnDisconnect();
+}
+
+//转发给Game类
+void CGameNetwork::OnConnect(bool ret)
+{
+	CGame::getInstance()->OnConnect(ret);
+}
+
+//该方法进行网络消息分发
+void CGameNetwork::OnReceive(CCmdPacket *packet)
+{
+// 	assert(packet);
+	if(packet == NULL)
+		return;
+	MSG_PROTOCOL_TYPE code;
+	packet->ReadByte(&code);
+
+	// 执行对应委托函数
+#if 0
+	assert(mEventDelegateMap.count(code) > 0);
+#else
+	if (mEventDelegateMap.count(code) <= 0)
+	{
+		xc::debug::Logger->warn(" !!!!!!!!!!!!!!!!!! - NET - Unknow protocol code: 0x%X\n", (int)code);
+		return;
+	}
+#endif
+	CDelegate<CCmdPacket*> &d = mEventDelegateMap[code];
+	//XC_DEBUG("PCode: 0x%X\n", (int)code);
+
+	d(packet);
+}
+
+//处理接收到的网络数据
+void CGameNetwork::Update()
+{	
+	if ( mGameSession && (!mGameSession->IsLocked()) )
+	{
+		mGameSession->ProcessReceive();
+	}
+}
+
+//网络数据收/发线程
+#ifdef WIN32
+unsigned int WINAPI CGameNetwork::ReceiverThread( void* lpData )
+#else
+void* CGameNetwork::ReceiverThread( void* data )
+#endif
+{
+	while ( !GameNetwork()->IsReadyDestory() )
+	{
+		if (GameNetwork()->getSession())
+			GameNetwork()->getSession()->Process();
+
+		xc::core::xcSleep(10);	// free cpu 
+	}
+
+	sRecieverThreadExit = true;
+	return 0;
+}
+
+void CGameNetwork::Lock()		
+{ 
+	xc::debug::Logger->info("Lock net\n");
+	mGameSession->Lock();
+}
+
+void CGameNetwork::UnLock()	
+{ 
+	xc::debug::Logger->info("UnLock net\n");
+	mGameSession->UnLock();
+}
+
+bool CGameNetwork::IsLocked()
+{
+	return mGameSession->IsLocked();
+}

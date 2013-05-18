@@ -18,6 +18,7 @@ using namespace yon::audio;
 #ifdef YON_COMPILE_WITH_WIN32
 #ifdef _DEBUG
 #pragma comment(lib, "Yon_debug.lib")
+#pragma comment(lib, "MyGUIAdapter.lib")
 #else
 #pragma comment(lib, "Yon.lib")
 #endif

@@ -1,0 +1,315 @@
+#include "MyGUI_UString.h"
+#include "gamenetwork.h"
+
+
+#ifdef WIN32
+#include <process.h>
+#else
+#include <pthread.h>
+#endif
+
+int CGameNetwork::bigEndian(int num)
+{
+	return (num << 24) | ((num & 0xFF00)  << 8) | ((num & 0x00FF0000) >> 8) | (num >> 24);;
+}
+short CGameNetwork::bigEndian(short num)
+{
+	return (short)(num << 8) | (num >> 8);
+}
+
+CGameNetwork::CGameNetwork()
+:m_bSendThreadRunnable(true),m_bRecvThreadRunnable(true),m_bDisconnectNotified(false),m_pSocket(NULL),m_eState(ENUM_STATE_NONE),
+m_sendSpeedCounter(getEngine()->getTimer(),1500),m_recvSpeedCounter(getEngine()->getTimer(),1500)
+{
+}
+
+CGameNetwork::~CGameNetwork()
+{
+	m_pool.clear();
+}
+
+SPacketBuffer* CGameNetwork::getBuffer()
+{
+	CScopedMutexLock lock(m_poolMutex,__FILE__,__LINE__);
+	return m_pool.get();
+}
+
+void CGameNetwork::recycleBuffer(SPacketBuffer* buffer)
+{
+	CScopedMutexLock lock(m_poolMutex,__FILE__,__LINE__);
+	m_pool.recycle(buffer);
+}
+
+void CGameNetwork::SendPacket(SPacketBuffer *packet)
+{
+	m_sendMutex.Lock(__FILE__,__LINE__);
+	m_sendBufferList.push_back(packet);
+	m_sendMutex.Unlock(__FILE__,__LINE__);
+}
+
+void CGameNetwork::notifyDisconnected()
+{
+	CScopedMutexLock lock(m_notifyMutex,__FILE__,__LINE__);
+	if(m_bDisconnectNotified)
+		return;
+	m_disconnectDlgt();
+	m_bDisconnectNotified=true;
+}
+
+void CGameNetwork::setOnConnectDelegate(IDelegateVoid* dlgt)
+{
+	if(dlgt==NULL)
+	{
+		m_connectDlgt.clear();
+		return;
+	}
+	m_connectDlgt=dlgt;
+}
+
+void CGameNetwork::setOnDisconnectDelegate(IDelegateVoid* dlgt)
+{
+	if(dlgt==NULL)
+	{
+		m_disconnectDlgt.clear();
+		return;
+	}
+	m_disconnectDlgt=dlgt;
+}
+
+void CGameNetwork::_recvProc()
+{
+	while(m_bRecvThreadRunnable)
+	{
+		if(m_eState!=ENUM_STATE_CONNECTED)
+			core::yonSleep(500);
+		else
+		{
+			u16 packLen=0;
+			int len=0;
+			len=m_pSocket->Recv((char*)&packLen,2);
+
+			if(len==-1)
+			{
+				m_eState=ENUM_STATE_INITIALIZED;
+				notifyDisconnected();
+				continue;
+			}
+			else if(len==0)
+				YON_WARN(YON_LOG_WARN_FORMAT,core::stringc("recv1 len:%d,packLen:%u",len,packLen).c_str());
+
+			//packLen = (packLen << 8) | (packLen >> 8);
+			packLen = bigEndian(packLen);
+
+			SPacketBuffer* buffer=getBuffer();
+			buffer->Buffer.reserve(packLen);
+
+			memset(buffer->Buffer.pointer(),0x0,buffer->Buffer.capacity());
+			
+			len=m_pSocket->Recv(buffer->Buffer.pointer(),packLen);
+			//YON_DEBUG("Receive data:%d\r\n",len);
+
+			if(len==-1)
+			{
+				recycleBuffer(buffer);
+				m_eState=ENUM_STATE_INITIALIZED;
+				notifyDisconnected();
+			}
+			else if(len==0)
+				YON_WARN(YON_LOG_WARN_FORMAT,core::stringc("recv2 len:%d,packLen:%u",len,packLen).c_str());
+			else
+			{
+				buffer->Buffer.repair();
+
+				m_recvMutex.Lock(__FILE__,__LINE__);
+				m_recvBufferList.push_back(buffer);
+				m_recvMutex.Unlock(__FILE__,__LINE__);
+
+				m_recvSpeedCounter.increase(len);
+
+				core::yonSleep(5);
+			}
+		}
+	}
+	m_bRecvThreadRunnable=true;
+	YON_DEBUG("Shutdown network receiver thread\r\n");
+}
+
+#ifdef WIN32
+unsigned int WINAPI CGameNetwork::ReceiverThread( void* data )
+#else
+void* CGameNetwork::ReceiverThread( void* data )
+#endif
+{
+	CGameNetwork* instance=static_cast<CGameNetwork*>(data);
+	instance->_recvProc();
+	return 0;
+}
+
+void CGameNetwork::_sendProc()
+{
+	yon::ITimer* timer=getEngine()->getTimer();
+	SPacketBuffer* buffer=NULL;
+	while(m_bSendThreadRunnable)
+	{
+		if(m_eState!=ENUM_STATE_CONNECTED)
+			core::yonSleep(500);
+		else
+		{
+			m_sendMutex.Lock(__FILE__,__LINE__);
+			if(!m_sendBufferList.empty())
+			{
+				PacketBufferList::Iterator it=m_sendBufferList.begin();
+				buffer=*it;
+				m_sendBufferList.erase(it);
+			}
+			else
+				buffer=NULL;
+			m_sendMutex.Unlock(__FILE__,__LINE__);
+
+			u32 start=timer->getRealTime();
+
+			if(buffer==NULL)
+			{
+				core::yonSleep(5);
+			}
+			else
+			{
+				int len=buffer->Buffer.length();
+				len=m_pSocket->Send(buffer->Buffer.c_str(),len);
+				YON_DEBUG("send use time:%u\r\n",timer->getRealTime()-start);
+				recycleBuffer(buffer);
+				if(len==-1)
+				{
+					m_eState=ENUM_STATE_INITIALIZED;
+					notifyDisconnected();
+				}
+				else
+					m_sendSpeedCounter.increase(len);
+
+				core::yonSleep(5);
+			}
+		}
+	}
+	m_bSendThreadRunnable=true;
+	YON_DEBUG("Shutdown network sender thread\r\n");
+}
+
+#ifdef WIN32
+unsigned int WINAPI CGameNetwork::SenderThread( void* data )
+#else
+void* CGameNetwork::SenderThread( void* data )
+#endif
+{
+	CGameNetwork* instance=static_cast<CGameNetwork*>(data);
+	instance->_sendProc();
+	return 0;
+}
+void CGameNetwork::Init()
+{
+	YON_DEBUG_BREAK_IF(m_eState!=ENUM_STATE_NONE);
+
+	//创建网络工作线程
+#ifdef WIN32
+	unsigned int netRecvThreadId,netSendThreadId;
+	_beginthreadex( NULL, NULL, ReceiverThread, this, NULL, &netRecvThreadId );
+	_beginthreadex( NULL, NULL, SenderThread, this, NULL, &netSendThreadId );
+#else
+	pthread_t netRecvThreadId,netSendThreadId;
+	pthread_create(&netRecvThreadId, NULL, &ReceiverThread, this);
+	pthread_create(&netSendThreadId, NULL, &SenderThread, this);
+#endif
+	m_eState=ENUM_STATE_INITIALIZED;
+	YON_DEBUG("Create network thread:%u,%u\r\n",netRecvThreadId,netSendThreadId);
+}
+
+bool CGameNetwork::Connect(const char *remote,int port,char *bindIp,int bindPort)
+{
+	YON_DEBUG_BREAK_IF(m_eState!=ENUM_STATE_INITIALIZED);
+	if(m_pSocket==NULL)
+	{
+		m_pSocket=new CNetSocket();
+	}
+	if(!m_pSocket->Initialize())
+		return false;
+	if(!m_pSocket->BindAddr(bindIp,bindPort))
+		return false;
+	if(m_pSocket->Connect(remote,port))
+	{
+		YON_DEBUG("Connect to %s:%d successfully!\r\n",remote,port);
+		m_eState=ENUM_STATE_CONNECTED;
+		m_bDisconnectNotified=false;
+		m_connectDlgt();
+	}
+	return false;
+}
+
+void CGameNetwork::Close()
+{
+	YON_DEBUG_BREAK_IF(!m_bSendThreadRunnable||!m_bRecvThreadRunnable);
+	m_sendMutex.Lock(__FILE__,__LINE__);
+	PacketBufferList::Iterator it=m_sendBufferList.begin();
+	for(;it!=m_sendBufferList.end();++it)
+	{
+		SPacketBuffer* buffer=*it;
+		recycleBuffer(buffer);
+	}
+	m_sendBufferList.clear();
+	m_sendMutex.Unlock(__FILE__,__LINE__);
+
+	m_bSendThreadRunnable=false;
+	while(!m_bSendThreadRunnable)core::yonSleep(1);
+	if(m_pSocket)
+	{
+		m_pSocket->Close();
+		delete m_pSocket;
+		m_pSocket=NULL;
+	}
+	m_bRecvThreadRunnable=false;
+	while(!m_bRecvThreadRunnable)core::yonSleep(1);
+
+	m_recvMutex.Lock(__FILE__,__LINE__);
+	it=m_recvBufferList.begin();
+	for(;it!=m_recvBufferList.end();++it)
+	{
+		SPacketBuffer* buffer=*it;
+		recycleBuffer(buffer);
+	}
+	m_recvBufferList.clear();
+	m_recvMutex.Unlock(__FILE__,__LINE__);
+
+	m_eState=ENUM_STATE_NONE;
+}
+
+void CGameNetwork::Lock()
+{
+	m_bDataProccessible=false;
+}
+
+void CGameNetwork::UnLock()
+{
+	m_bDataProccessible=true;
+}
+
+bool CGameNetwork::IsLocked()
+{
+	return !m_bDataProccessible;
+}
+void CGameNetwork::Update()
+{
+	if(!m_bDataProccessible)
+		return;
+
+	static i18n::II18NManager* i18nMgr=getEngine()->getI18NManager();
+	
+	m_recvMutex.Lock(__FILE__,__LINE__);
+	PacketBufferList::Iterator it=m_recvBufferList.begin();
+	for(;it!=m_recvBufferList.end();++it)
+	{
+		SPacketBuffer* buffer=*it;
+		//TODO
+		//YON_DEBUG("recv:%s\r\n",i18nMgr->convert(buffer->Buffer.c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+		recycleBuffer(buffer);
+	}
+	m_recvBufferList.clear();
+	m_recvMutex.Unlock(__FILE__,__LINE__);
+}

@@ -1,0 +1,416 @@
+#include "PacketMgr.h"
+#include "gamenetworkprotocol.h"
+#include "Common/StringHelper.h"
+#include "../EMail/Email.h"
+#include "Game/GameState/GameState_GamePlay.h"
+#include "Game/Game.h"
+#include "NetNew/gamesession.h"
+#include "NetNew/gamenetwork.h"
+
+#ifdef WIN32
+#include <process.h>
+#else
+#include <pthread.h>
+#endif
+
+CGameNetwork*	CPacketMgr::s_mGameNetwork;
+CCmdPacket		CPacketMgr::s_mCmdPacket;
+
+bool CPacketMgr::sSenderThreadExit = false;
+
+//网络数据发送线程
+#ifdef WIN32
+unsigned int WINAPI CPacketMgr::SenderThread( void* lpData )
+#else
+void* CPacketMgr::SenderThread( void* data )
+#endif
+{
+	while ( !GameNetwork()->IsReadyDestory() )
+	{               
+		if (GameNetwork()->getSession())
+			GameNetwork()->getSession()->Process2();
+
+		xc::core::xcSleep(10);	// free cpu 
+	}
+
+	sSenderThreadExit = true;
+	return 0;
+}
+
+void CPacketMgr::Init()
+{
+	//创建网络工作线程
+#ifdef WIN32
+	unsigned int netRecvThreadId;
+	_beginthreadex( NULL, NULL, SenderThread, NULL, NULL, &netRecvThreadId );
+	sSenderThreadExit = false;
+#else
+	pthread_t netRecvThreadId;
+	pthread_create(&netRecvThreadId, NULL, &SenderThread, NULL);
+#endif
+
+}
+
+void CPacketMgr::sendC2SLoginPacket(const char* account, const char* password, const char* lianMeng, const char* ua)
+{
+	//重置封包 - 协议码
+	beginWrite();				
+	writeByte(MSG_ACCOUNT_C2S::CMD_C2SLoginReq);	
+
+	//数据
+	writeString(account);
+	writeString(password);
+	writeString(lianMeng);
+	writeString(ua);
+
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SPlayerListReqPacket(char* serverKey)
+{
+	//重置封包 - 协议码
+	beginWrite();
+	writeByte(MSG_ROLE_SELECT_C2S::CMD_C2SPlayerListReq);
+
+	//数据
+	writeString(serverKey);
+
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SEnterGamePacket(char* charKey)
+{
+	//重置封包 - 协议码
+	beginWrite();
+	writeByte(MSG_ROLE_SELECT_C2S::CMD_C2SGameLoginReq); // 协议码
+
+	//数据
+	writeString(charKey);
+
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SCreateRolePacket(const char* name, int jobId, int sex,bool isVisitor)
+{
+	beginWrite();
+	writeByte(MSG_ROLE_SELECT_C2S::CMD_C2SCreatePlayerReq); // 协议码
+
+	writeString(name);
+	writeByte(jobId);
+	writeByte(sex);
+	writeByte(isVisitor);
+
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SDeleteRolePacket(char* charKey)
+{
+	beginWrite();
+	writeByte(MSG_ROLE_SELECT_C2S::CMD_C2SDelPlayerReq); // 协议码
+
+	writeString(charKey);
+
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SAttack(int uuid, int skillID)
+{
+	beginWrite();
+	writeByte(MSG_BATTLE_C2S::CMD_C2SAttack); // 协议码
+	writeInt32(uuid);
+	writeShort((short)skillID);
+	// 	writeByte(0);
+	sendPacket();
+	// 	XC_DEBUG("sendC2SAttack skillID:%d->%d\r\n", skillID, uuid);
+}
+
+void CPacketMgr::sendC2SPreAttack(int uuid, int skillID)
+{
+	beginWrite();
+	writeByte(MSG_BATTLE_C2S::CMD_C2SPreAttack); // 协议码
+	writeInt32(uuid);
+	writeShort((short)skillID);
+	writeByte(0);
+	sendPacket();
+	// 	XC_DEBUG("sendC2SPreAttack skillID:%d->%d\r\n", skillID, uuid);
+}
+
+void CPacketMgr::sendC2SLocation(int posX, int posY)
+{
+	beginWrite();
+	writeByte(MSG_MAP_C2S::CMD_C2SLocation);
+	writeShort((short)posX);
+	writeShort((short)posY);
+	sendPacket();
+	// 	xc::debug::Logger->info("sendC2SLocation*********************\r\n");
+}
+
+void CPacketMgr::sendC2SLocationList(xc::core::array<xc::core::vector2df>& pos)
+{
+	// 	XC_DEBUG("\r\n*****************sendC2SLocationList*******************\r\n");
+	int size = pos.size();
+	beginWrite();
+	writeByte(MSG_MAP_C2S::CMD_C2SLocationList);
+	writeByte(size);
+	for(int i = 0; i < size; ++i)
+	{
+		writeShort((short)pos[i].x);
+		writeShort((short)pos[i].y);
+		// 		XC_DEBUG("X:%d,Y:%d\r\n",(short)pos[i].x,(short)pos[i].y);
+	}
+	sendPacket();
+	// 	XC_DEBUG("\r\n");
+}
+
+void CPacketMgr::sendC2SMoveTo(xc::core::array<xc::core::vector2df>& pos)
+{
+	beginWrite();
+	writeByte(MSG_MAP_C2S::CMD_C2SLocationTarget);
+	writeShort((short)pos[0].x);
+	writeShort((short)pos[0].y);
+	writeShort((short)pos[1].x);
+	writeShort((short)pos[1].y);
+	sendPacket();
+	//   	XC_DEBUG("\r\n**********************sendC2SMoveTo*********************\r\n");
+	// 	XC_DEBUG("X:%d,Y:%d,aimX:%d,aimY:%d\r\n", (short)pos[0].x, (short)pos[0].y, (short)pos[1].x, (short)pos[1].y);
+	// 	XC_DEBUG("\r\n");
+}
+
+void CPacketMgr::sendC2STalk2NPC(int uuid, int contextType, int taskId)
+{
+	beginWrite();
+	writeByte(MSG_MISC_C2S::CMD_C2STalk2NPC);
+	writeInt32(uuid);
+	writeByte(contextType);
+	writeInt32(taskId);
+	// 	if( 1 == contextType )
+	// 	{
+	// 		writeInt32(taskId);
+	// 	}else 
+	// 	{
+	// 		writeInt32(-1);
+	// 	}
+
+	sendPacket();
+	GetNPCDialogMgr()->setContextType(contextType);
+
+}
+
+void CPacketMgr::sendC2SCollect(int type, int uuid)//type:0-start, 1-cancel, 2-finish
+{
+	std::stringstream ss;
+	ss<<"collect:";
+
+	switch(type)
+	{
+	case 0:
+		ss<<"start:";
+		break;
+	case 1:
+		ss<<"cancel:";
+		break;
+	case 2:
+		ss<<"finish:";
+		break;
+	}
+
+	ss<<uuid;
+	sendC2SCmd(const_cast<char*>(ss.str().c_str()));
+}
+
+void CPacketMgr::sendC2SMapLoadComplete()
+{
+	std::stringstream ss;
+	ss<<"LoadFinshed";
+	sendC2SCmd(const_cast<char*>(ss.str().c_str()));
+}
+
+void CPacketMgr::sendC2SUpSkillLevel( int skillID )
+{
+	beginWrite();
+	writeByte(MSG_BATTLE_C2S::CMD_C2SSkillUpLevel);
+	writeShort(skillID);
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SSendChatMsg(const MyGUI::UString& srolename, int chattype, const MyGUI::UString& chatcontent)
+{
+	beginWrite();
+	writeByte(MSG_MISC_C2S::CMD_SendChatMsg);
+	writeString(srolename.asUTF8_c_str());
+	writeByte(chattype);
+	writeString(chatcontent.asUTF8_c_str());
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SSkillSave( int which )
+{
+	beginWrite();
+	writeByte(MSG_BATTLE_C2S::CMD_C2SSkillSave);
+	writeByte(which);
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SSkillLoad( int which )
+{
+	beginWrite();
+	writeByte(MSG_BATTLE_C2S::CMD_C2SSkillLoad);
+	writeByte(which);
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SSkillReset()
+{
+	beginWrite();
+	writeByte(MSG_BATTLE_C2S::CMD_C2SSkillReset);
+	sendPacket();
+}
+
+void CPacketMgr::sendC2SChangeAttackType(int attackType)
+{
+	std::stringstream ss;
+	ss<<"changeKill:";
+	ss<<attackType;
+	sendC2SCmd(const_cast<char*>(ss.str().c_str()));
+}
+void CPacketMgr::sendC2SCmd(const char* strCmd)
+{
+	beginWrite();
+	writeByte(MSG_MISC_C2S::CMD_C2SCmd); // 协议码
+	writeString(strCmd);
+	sendPacket();
+	// 	XC_DEBUG("<Attetion> client send cmd info :%s \n;", strCmd);
+
+}
+
+void CPacketMgr::sendC2SCmd(std::string& strCmd)
+{
+
+	if (strCmd.length() > 0)
+		sendC2SCmd(strCmd.c_str());
+
+}
+
+void CPacketMgr::sendC2SCmd(const MyGUI::UString& strCmd)
+{
+	if(strCmd.capacity() == 0)
+		return;
+	sendC2SCmd(strCmd.asUTF8_c_str());
+}
+
+void CPacketMgr::sendC2SItemInfo(int uuid, int itemServerId)
+{
+	beginWrite();
+	writeByte(MSG_ITEM_C2S::CMD_C2SItemInfo);
+	writeInt32(uuid);
+	writeInt32(itemServerId);
+	sendPacket();
+}
+void CPacketMgr::sendC2SRegisterPacket(const char* account, const char* password ,int type)
+{
+	//MyGUI::UString invalid("0");
+	beginWrite();
+	writeByte(MSG_ACCOUNT_C2S::CMD_C2SRegisterReq);
+	writeString(xc::core::stringc("%d",CGame::getInstance()->pUnion->getUnionId()).c_str());	//联盟ID
+	writeString( CGame::getInstance()->model.c_str());	//手机平台信息
+	writeByte(110); //客户端版本	Byte
+	writeByte(110);//Sdk	Byte
+	writeByte(type);//注册类型	Byte
+	if (type == 1)
+	{
+		writeString(account);
+		writeString(password);
+	}
+
+	sendPacket();
+}
+
+//邮件发送
+void CPacketMgr::sendEmailInfoC2S(const MyGUI::UString &s_name,unsigned int s_uuid,const MyGUI::UString &s_title,const MyGUI::UString &s_info,int s_money,
+								  unsigned int s_things_one,unsigned char s_number_one,	
+								  unsigned int s_things_two,unsigned char s_number_two,
+								  unsigned int s_things_three,unsigned char s_number_three)
+{
+	beginWrite();
+
+	writeByte(MSG_MISC_C2S::CMD_WriteMail);
+
+	writeString(s_name.asUTF8_c_str());
+
+	writeInt32(s_uuid);
+
+	writeString(s_title.asUTF8_c_str());
+
+	writeString(s_info.asUTF8_c_str());
+
+	writeInt32(s_money);
+
+	writeInt32(s_things_one);
+
+	writeByte(s_number_one);
+
+	writeInt32(s_things_two);
+
+	writeByte(s_number_two);
+
+	writeInt32(s_things_three);
+
+	writeByte(s_number_three);
+
+	sendPacket();
+
+}
+
+void CPacketMgr::sendC2SSendSomeMessage(void)
+{
+	beginWrite();
+
+	writeByte(MSG_ROLE_SELECT_C2S::CMD_C2SHeart);
+
+	sendPacket();
+
+}
+
+void CPacketMgr::sendC2SHonourUpdate(short id)
+{
+	beginWrite();
+
+	writeByte(MSG_MISC_C2S::CMD_changeHonour);
+
+	writeShort(id);
+
+	sendPacket();
+
+}
+
+//小地图
+
+void CPacketMgr::sendC2SMapActor( int mapID )
+{
+
+	//	std::string mapIDStr("mapActors:");
+	//	char  mID[10];
+	//	mapIDStr+=itoa(mapID,mID,10);
+	//	MyGUI::UString mapIDStr("mapActors:%d",mapID);
+
+	xc::core::stringc mapIDStr("mapActors:%d",mapID);
+	sendC2SCmd(mapIDStr.c_str());
+
+
+
+}
+
+void CPacketMgr::sendC2STeamMates( int mapID )
+{
+	xc::core::stringc mapIDStr("reqTeamxy:%d",mapID);
+	sendC2SCmd(mapIDStr.c_str());
+
+}
+
+//请求寻路数据
+void CPacketMgr::sendC2SPathFinding( int mapDestID,int npcID,int DestX, int DestY )
+{
+	xc::core::stringc searchMapStr("searchMap:%d:%d:%d:%d",mapDestID,npcID,DestX,DestY);
+	sendC2SCmd(searchMapStr.c_str());
+
+}
