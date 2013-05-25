@@ -1,0 +1,10 @@
+Alt+F2 然后：在input里输入：smb://192.168.10.10
+Alt+F2 然后：在input里输入：gnome-terminal 
+或者（Ctrl+Alt+T）打开终端
+输入sudo apt-get install samba 安装Samba服务器
+打开位置->网络->windows网络，找到名为DANGDANG的计算机双击，输入用户名密码为
+共享帐号：dangdang
+账号密码：dangdang
+
+即可登录share共享文件夹
+

@@ -44,6 +44,7 @@ mount -o remount rw /
 
 D:\Development\Workspace\VS2008\ZhanGu\trunk\project\android
 addr2line -C -f -e D:/Development/Workspace/VS2008/ZhanGu/trunk/project/android/obj/local/armeabi/libsyjt.so
+addr2line -C -f -e D:/Development/Workspace/VS2008/YonAndroid/obj/local/armeabi/libyon.so
 
 adb shell df
 

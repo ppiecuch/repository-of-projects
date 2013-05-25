@@ -1,0 +1,11 @@
+再给大家介绍个好项目
+https://github.com/steeve/dwmaxx2
+PMETGVI-疯光无线(1905202)  19:55:11
+DWMAXX2 实现了在Win7下 注入 WDM，直接取得shared texture.
+
+这也是低CPU占用，高性能截图的基础。
+PMETGVI-疯光无线(1905202)  19:55:52
+他的例子就是实时截图，用d3d10直接绘制出来。
+实时截图并扭曲显示
+PMETGVI-疯光无线(1905202)  19:56:09
+http://www.youtube.com/watch?v=Fpvh16VjrRE

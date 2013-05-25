@@ -1,0 +1,82 @@
+原文：http://hi.baidu.com/mcu99/blog/item/389a6fde38f69950cdbf1a75.html
+
+
+在这篇文章（【09.03.25】Linux环境中dlopen函数的简单应用）中。实现了在UBUNTU LINUX环境下使用dlopen函数动态调用.so链接库。但是也提到了在Android下未能成功。由于Android也是使用linux内核，因此估计程序本身可能并没有什么错误，问题应该是出现在Android.mk文件中。今天早上试着修改了一下Android.mk，终于将这个问题解决了。
+
+好在两个C程序和一个.mk文件并不是太长，现将它们贴一遍
+
+/*************************** dl1.c *******************************/
+#include<stdio.h>
+#include<stdlib.h>
+#include<dlfcn.h>
+int main()
+{
+    int a,b;
+    void *p;
+    int (*func)(int,int);
+    scanf("%d%d",&a,&b);
+    p=dlopen("./dl2.so",RTLD_NOW);
+    if(p==NULL)
+    {
+        printf("dlopen error!\n");
+        exit(0);
+    }
+    else
+        printf("dlopen ok!\n");
+    func=dlsym(p,"max");
+    printf("%d与%d相比，%d为大数。\n",a,b,(*func)(a,b));
+    dlclose(p);
+}
+/*************************** dl1.c *******************************/
+
+
+/*************************** dl2.c *******************************/
+#include<stdio.h>
+int max(int x,int y)
+{
+    return x>y?x:y;
+}
+/*************************** dl2.c *******************************/
+
+
+/*************************** Android.mk *******************************/
+LOCAL_PATH:= $(call my-dir)
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES:= \
+    dl2.c
+LOCAL_PRELINK_MODULE := true
+#LOCAL_CFLAGS=-fPIC
+LOCAL_MODULE:= dl2
+include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_SRC_FILES:= \
+    dl1.c
+LOCAL_SHARED_LIBRARIES := \
+    libdl
+#LOCAL_CFLAGS=-ldl
+LOCAL_PRELINK_MODULE := true
+LOCAL_MODULE:= dl1
+include $(BUILD_EXECUTABLE)
+/*************************** Android.mk *******************************/
+
+上一次之所以失败，原因似乎是使用了红色字体的那一句，因为我将其更换为蓝色字体的那一句，问题就解决了。看来这样写在链接时才能正确找到libdl.so，而包含该.so文件是使用dlopen函数的保证。
+
+将这三个文件放在Android源码目录下的development目录下的dl文件夹中（dl文件夹是新建的），然后在终端中使用root权限进入到Android源码目录下，执行 make dl1。成功后将会在android源码目录/out/target/product/generic/system/lib/中生成dl2.so动态链接库文件，在android源码目录/out/target/product/generic/system/bin/中生成dl1可执行文件。
+
+使用以下命令将它们放入Android模拟器，注意要先启动emulator
+
+adb push Android源码目录/out/target/product/generic/system/lib/dl2.so /data
+adb push Android源码目录/out/target/product/generic/system/bin/dl1 /data
+
+进入data文件夹执行
+adb shell
+# cd data
+# ./dl1
+
+87 9（这里随便输入两个数）
+dlopen ok!
+87与9相比，87为大数。
+
+http://www.cnblogs.com/heimi/archive/2013/03/11/2954077.html

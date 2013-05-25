@@ -1,0 +1,56 @@
+方法1：修改/etc/profile 文件
+所有用户的 shell都有权使用这些环境变量
+<1>在 shell终端执行命令：vi /etc/profile
+<2>在 profile文件末尾加入：
+JAVA_HOME=/usr/java/jdk1.6.0_45
+PATH=$JAVA_HOME/bin:$PATH 
+CLASSPATH=.:$JAVA_HOME/lib/dt.jar: $JAVA_HOME/lib/tools.jar
+export JAVA_HOME,PATH,CLASSPATH
+<3>重启系统
+方法2：修改.bashrc文件
+如果你需要给某个用户权限使用这些环境变量，你只需要修改其个人用户主目录下的.bashrc就可以了,而不像第一种方法给所有用户权限。
+<1>在 shell终端执行命令：vi /home/username/.bashrc 
+<2>在.bashrc文件末尾加入： 
+set JAVA_HOME=/usr/java/jdk1.6.0_45
+export JAVA_HOME
+set PATH=$JAVA_HOME/bin:$PATH
+export PATH
+set CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+export CLASSPATH
+<3>重新登录
+方法3：直接在shell下修改
+用于在Shell下临时使用，换个Shell即无效
+export JAVA_HOME=/opt/jdk1.5.0_02 
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar 
+export PATH=$JAVA_HOME/bin:$PATH
+注意：Linux使用:(冒号)而不是;(分号)来分隔路径
+
+要使得刚修改的环境变量生效：source .bashrc
+
+
+查询环境变量 用echo $JAVA_HOME
+
+http://tomyz0223.iteye.com/blog/1110703
+
+
+
+sudo vim /etc/environment
+
+在其中添加如下两行：
+JAVA_HOME="/usr/java/jdk1.6.0_45"
+CLASSPATH=".:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar"
+PATH=$JAVA_HOME/bin:$PATH
+
+sudo vim /etc/profile
+
+JAVA_HOME=/usr/java/jdk1.6.0_45
+export JAVA_HOME
+PATH=$PATH:$JAVA_HOME/bin
+export PATH
+CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+export CLASSPATH
+
+umask 022
+
+
+export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin"

@@ -1,0 +1,389 @@
+本文转自： http://www.cnblogs.com/shanyou/archive/2006/10/11/SpiderMonkey.html
+ 
+JavaScript在浏览器中的应用几乎是尽人皆知的。实际上，JavaScript技术也可以使用在非浏览器应用程序当中，从而让应用程序具有自动的脚本功能。本文介绍了一种功能非常强大的JavaScript引擎SpiderMonkey。这个引擎是Mozilla 浏览器的 JavaScript引擎。该引擎接口定义清晰，模块化好。本文简要介绍了 SpiderMonkey的基本结构，并讲解了如何在自己的应用程序中使用该引擎，最后给出了一个样例程序。该程序能够解释执行JavaScript脚本完成简单的脚本功能。 
+JavaScript是由Netscape开发的对象脚本语言，其特点是开发简单、功能灵活，目前已广泛应用于WEB页面及服务器应用程序中。HTML本身是静态的、不允许用户干预，但用JavaScript编写的脚本程序就可以在用户的浏览器端运行，可以同用户进行交互，从而实现动态页面。可以将JavaScript与嵌入WEB的大多数对象的事件（如鼠标点击、移动等）相关联，然后用自己的方式处理这些事件。JavaScript提供了丰富的内置函数及命令，能在浏览器中显示HTML、数值计算、多媒体播放、超级链接以及简单的交互窗口等，还可以使在浏览器中运行的小Java应用程序的性质改变从而很容易地改变控件或其它对象的行为而不必深入研究其本身的结构。
+
+JavaScript虽然是为Internet而开发的，但它的应用却不仅仅局限于Internet，事实上由于其面向对象的特性使得其适用范围非常广泛，只要我们的应用程序具有良好的对象机制，我们就可以借用JavaScript，从而实现很好的交互功能。
+
+SpiderMonkey是由C语言操作的JavaScript引擎，它支持JS1.4和ECMAScript-262规范。该引擎分析、编译和执行脚本，根据JS数据类型和对象的需要进行内存分配及释放操作。利用该引擎可以让你的应用程序具有解释JavaScript脚本的能力，目前已有若干个项目都采用了SpiderMonkey引擎，像K-3D、WebCrossing、WebMerger等。K-3D是用C++实现的3D建模与仿真系统，该系统内嵌SpiderMonkey引擎来提供自定义脚本（用户创建脚本生成像齿轮一样具有重复特性的复杂形体），也可用来驱动交互式的教学系统（用户可以使用一段JS脚本程序记录其交互过程，如移动鼠标、选择菜单、点击鼠标等）。WebCrossing利用SpiderMonkey实现了服务器端的脚本环境，提供了完全的Web-server脚本环境，服务器端的实现允许你在内置的、面向对象的数据库中创建永久对象，这样即可根据自己的需要扩展服务器环境。
+
+下面简要介绍在自己的应用程序中如何使用SpiderMonkey，最后给出一个简单的例子程序。
+
+如何使用引擎
+
+JS引擎一般作为共享库使用，应用程序调用引擎提供的API函数。引擎API函数大致分为以下几种：数据类型操作、RunTime控制、类与对象的创建和维护、函数与脚本执行、字符串操作、错误处理、安全控制、Debug支持。一般情况下，在你的应用程序中只需使用某几类函数。例如，在进行JS调用之前你必须调用JS_NewRuntime函数来创建并初始化JS引擎。有些类型的函数，象安全控制类，提供可选择的特征。
+
+从概念上讲，JS引擎是你系统上的一个共享资源。通过将引擎API调用嵌入到应用程序中（包含jsapi.h文件），你可以请求JS引擎进行操作。接下来，引擎处理你的请求，并将结果或状态信息返回给你的应用程序。
+
+例如，假定你在使用JS引擎自动化应用程序，脚本应用程序鉴别用户并设置权限。首先，应用程序创建JS对象，该对象描述用户信息，包括姓名、ID、权限和可用的函数列表。在这种情况下，应用程序首先调用JS_NewObject创建对象。当JS引擎创建对象后，返回一个指针给应用程序。应用程序再调用JS引擎执行脚本。在创建用户对象后，应用程序即刻传递脚本给JS_EvaluateScript以便编译和运行。脚本或许取得并效验用户信息，然后建立用户存取的权利。
+
+JS引擎收到初始化请求后，给JS RunTime分配内存，应用程序使用的变量、对象和上下文（上下文）都保存在RunTime中。一个上下文是脚本的执行状态（JS引擎使用的）。每个同时存在的脚本或线程都必须有自己的上下文。单个的JS RunTime可以包含多个上下文、对象和变量。几乎所有的JS引擎调用都需要一个上下文变量，应用程序在创建RunTime后，首先应调用至少一次JS_NewContext来创建一个上下文。上下文的实际数量依赖于程序中同时使用的脚本数。程序中每个同时存在的脚本都需要一个上下文。另一方面，如果某个时刻只有一个脚本编译和运行，那么你只需一个上下文给每个脚本重复使用即可。
+
+在创建上下文后，要调用JS_InitStandardClasses初始化引擎中的内置JS对象，包括Array、Boolean、Date、Math、Number和String。即使在创建对象时传递一个特定的上下文给JS引擎，这个对象在RunTime中也是独立于上下文。任意脚本能与任意上下文建立联系以便存取任意对象。脚本、上下文相互之间完全独立，即使它们存取同样的对象。在给定的RunTime中，应用程序能用未指定的上下文存取任意对象。你可以创建独立的RunTime，一个用于共享上下文和对象，其余的用于私有上下文和对象。但注意，某个时刻只有一个线程能存取特定的上下文。要让应用程序能识别JS，嵌入适当的引擎调用到你的程序中。大致有以下几个方面：
+
+程序中包含jsapi.h。 
+程序中提供结构和变量声明。例如，如果你计划传递一个脚本给JS引擎，提供一个脚本字符串变量。用jsapi.h中定义的JS数据类型来声明变量。 
+使用JavaScript的脚本应用对象。通常这些对象与C程序中的结构和方法相对应。 
+将JS引擎API函数调用和变量引用插入到程序中，包括初始化内置JS对象、创建并配置用户自定义对象。 
+大多数JS引擎调用返回一个值。如果该值是NULL，一般表示错误发生。如果非NULL，表示成功，返回值一般是指针，程序需要使用或留到将来使用。应用程序应检查JS引擎调用的返回值。 
+要让应用程序能解释JavaScript，你必须遵循某些JS API嵌入习惯。下面的例子简要说明需要嵌入到你的应用程序中去的一些API调用函数。大部分情况下，这些函数的插入顺序是很重要的。例如，在调用其他JS API之前必须初始化JS RunTime，同样在终止程序之前必须释放JS RunTime。
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+/* 包含JS引擎的API头文件 */
+#include "jsapi.h"
+.
+.
+.
+//主程序声明全局JS变量，包括RunTime、一个Context和一个全局对象，然后初始化JS RunTime、创建一个Context。
+
+int main(int argc, char **argv)
+{
+  int c, i;
+  /*声明全局JS变量，包括全局和自定义对象*/
+  JSVersion version;
+  JSRuntime *rt;
+  JSContext *cx;
+  JSObject *glob, *it;
+  JSBool builtins;
+  /* 初始化JS RunTime，返回结果给rt */
+  rt = JS_NewRuntime(8L * 1024L * 1024L);
+  /* 如果rt为空，程序终止 */
+  if (!rt)
+    return 1;
+  /* 创建一个Context，并将其与JS RunTime关联起来 */
+  cx = JS_NewContext(rt, 8192);
+  /* 如果cx为空，程序终止 */
+  if (cx == NULL)
+    return 1;
+  /* 创建全局对象 */
+  glob = JS_NewObject(cx, clasp, NULL, NULL);
+  /* 实例化内置对象和全局对象*/
+  builtins = JS_InitStandardClasses(cx, glob);
+  .
+  .
+  .
+  return 0;
+}
+
+ 
+
+如上面这个例子所示，调用JS引擎的应用程序必须首先创建JS RunTime，而且在终止程序之前要释放这个RunTime。在实例化RunTime后，即可创建自己的JS对象模型。对象模型决定了JS对象之间的关系，JS对象本质上是一种层次结构。缺省情况下，所有的JS对象都与全局对象相关联，它们都是全局对象的后代。当初始化标准的JS类时，你自动地得到一个全局对象：
+
+builtins = JS_InitStandardClasses(cx, glob);
+
+这个全局对象创建了一些基本的、被其它对象所继承的性质和方法。当你创建自定义对象时，它们自动使用全局对象所定义的性质和方法。你可以在自定义对象上重新定义这些性质和方法，从而重载这些缺省的性质和方法。当然，你也可以接受这些缺省的分配。你可以在内置JS对象或其它自定义对象的基础上创建自己的对象。无论哪种情况，你所创建的对象都继承了层次链中父对象、一直上溯到全局对象的全部性质和方法。
+
+管理RunTime
+
+JS RunTime是内存空间，JS引擎利用它来管理上下文、对象和与JS函数及脚本相关的变量。在执行JS函数或脚本之前，首先要调用JS_NewRunTime来初始化一个RunTime。JS_NewRunTime函数携带一个unsigned整型参数，这个参数指定了在碎片收集之前分配给RunTime内存的最大字节数。例如：
+
+rt = JS_NewRuntime(8L * 1024L * 1024L);
+
+如上所示，JS_NewRuntime返回一个指向RunTime的指针。非NULL表示创建成功。
+
+正常情况下，一个程序只需一个RunTime。当然，根据需要创建多个RunTime并将它们保存在不同指针上也是可以的。
+
+JS_DestroyRuntime(rt);
+
+如果你创建了多个RunTime，务必在应用程序终止前将每个都销毁。
+
+管理上下文(Contexts)
+
+几乎所有的JS API调用都要求你传递一个上下文参数。在JavaScript引擎中一个上下文代表一个脚本，引擎传递上下文信息给运行脚本的线程。每个同时运行的脚本必须指派一个唯一的上下文。当一个脚本运行完后，它的上下文也不再有用，因此这个上下文可以重新指派给一个新的脚本，或将其释放。
+
+调用函数JS_NewContext为某个脚本创建一个新的上下文。这个函数需要两个参数：一个与该上下文相关的RunTime指针，分配给该上下文的栈空间字节数。如果调用成功，函数返回一个指针，它指向这个新建立的上下文。例如：
+
+JSContext *cx;
+      .
+      .
+cx = JS_NewContext(rt, 8192);
+ 
+
+这个RunTime必须已经存在。你指派给上下文的栈空间必须足够大以便提供给使用该上下文的脚本所创建的变量和对象。注意，因为需要一些与分配和维护上下文相关的overhead，你必须做到：在应用程序中必须根据需要来确定创建上下文的数量；要确保上下文在被应用程序所需要时存在，而不是反复销毁和需要时重新创建。
+
+当某个上下文不再需要时，它应被销毁、释放内存资源给其它程序使用。根据应用程序中JS使用的范围，可以在使用完后及时销毁，或将其保留并反复利用直到应用程序终止。无论哪种情况，当上下文不再需要时都要调用函数JS_DestroyContext来释放它，这个函数携带一个指针参数，它指向要被释放的上下文：
+
+JS_DestroyContext(cx);
+
+如果你的应用程序创建了多个RunTime，那么，应用程序可能需要知道某个上下文是与哪个RunTime相关联的。这种情况下，可以调用函数JS_GetRuntime，同时传递该上下文作为参数。JS_GetRuntime返回一个指针，它指向合适的RunTime（如果存在的话）：
+
+rt=JS_GetRuntime(cx);
+
+当你创建一个上下文，你要给它指派栈空间用于存放变量和对象。在一个给定的上下文中，你也能够存放大量的数据。但是，你必须将所需的栈空间尽可能地降到最小。调用JS_SetContextPrivate函数创建一个指针，它指向该上下文所需的私有数据，调用JS_GetContextPrivate函数得到这个指针以便你能存取这数据。你的应用程序负责创建和管理私有数据。
+
+要创建私有数据并将其与上下文相关联：首先，创建私有数据，即常规的C语言void* 变量；然后，调用JS_SetContextPrivate函数，并指定创建私有数据的上下文和指向该数据的指针。例如：
+
+JS_SetContextPrivate(cx,pdata);
+
+随后要获取这个数据指针，请调用JS_GetContextPrivate，并传递这个上下文作为参数。这个函数返回指向私有数据的指针：
+
+pdata=JS_GetContextPrivate(cx);
+
+<?xml encoding="US-ASCII"?>
+<!ELEMENT order (header,item+,price)>
+<!ELEMENT header (billing,shipping)>
+<!ELEMENT billing (name,address,creditCard)>
+<!ELEMENT shipping (name,address)>
+<!ELEMENT name EMPTY>
+ 
+
+对象的处理
+
+1．创建内置对象和全局JS对象
+
+JavaScript引擎提供若干个内置对象，使得你的开发任务得以简化。例如，内置数组(Array)对象使得在JS引擎中创建和操作数组结构很容易。类似地，日期(Date)对象提供了一个操作日期的统一机制。要了解内置对象支持的全部内容，请参阅JS_InitStandardClasses。 JS引擎一直使用函数和全局对象。通常，全局对象居留在幕后，为应用程序中创建和使用的其它JS对象及全局变量提供缺省范围。在创建自己的对象前，你必须初始化全局对象。函数对象使得对象具有和调用构造函数的功能。
+
+一个简单的API调用，JS_InitStandardClasses，初始化全局和函数对象、内置引擎对象，方便应用程序使用它们：
+
+JSBool builtins;
+      .
+builtins = JS_InitStandardClasses(cx, glob);
+ 
+
+JS_InitStandardClasses函数返回一个JS布尔值，表示初始化成功与否。
+
+你也可以为应用程序指定另外一个不同的全局对象。例如，Navigator使用window作为其全局对象。要改变应用程序的全局对象，请调用JS_SetGlobalObject。要了解更多信息，请参阅JS_SetGlobalObject。
+
+2．创建并初始化自定义对象
+
+除了使用引擎内置对象外，你还可以创建、初始化并使用自己的JS对象。特别是你在使用JS引擎用脚本来自动化应用程序时更是如此。自定义的JS对象能提供直接的程序服务，或者作为你的程序服务的接口。
+
+有两种方法来创建JS引擎能使用的自定义对象：
+
+写一个JS脚本，它创建一个对象、性质、方法、构造函数，然后将这个脚本传递给JS引擎。 
+将代码插入到你的应用程序中，它定义了对象的性质和方法，调用引擎来初始化一个新对象，然后通过额外的引擎调用设置对象的性质。这种方法的好处是，应用程序能包含操作对象的本地方法。 
+无论哪种情况，如果你创建一个对象，然后让其存在于被其它脚本使用的RunTime中，你可以调用JS_AddRef和JS_AddNamedRoot使该对象为根。使用这些函数，确保JS引擎能跟踪这些对象并在碎片收集时清除它们。
+
+3．如何将自定义对象嵌入到应用程序中
+
+将自定义对象插入到应用程序中是很有用的，比如，当对象持续需要时，或者你知道有多个脚本需要使用一个对象。将自定义对象插入到应用程序中的步骤是：
+
+创建一个JSPropertySpec数据类型，将对象的属性信息指派给它，包括属性的GET和PUT方法名字。 
+创建一个JSFunctionSpec数据类型，将被你的对象所使用的方法信息指派给它。 
+创建实际的C函数，它们在响应你的对象方法调用时被执行。 
+调用JS_NewObject和JS_ConstructObject函数，以便实例化该对象。 
+调用JS_DefineFunctions函数来创建对象的方法。 
+调用JS_DefineProperties函数来创建对象的属性。 
+描述持续的、自定义的JS对象的代码必须放在靠近程序执行的开始部分，在那些依耐于先前已存在对象的代码之前。
+
+4．给对象提供私有数据
+
+象上下文一样，你可以将大量的数据与对象进行关联，而不是将这些数据直接存放在对象里。调用JS_SetPrivate函数来创建指向对象私有数据的指针，调用JS_GetPrivate函数来获取这个指针以便你能存取这些数据。你的应用程序负责创建和管理这些私有数据。
+
+创建私有数据并将其与对象关联的方法：
+
+1）创建私有数据，作为C语言的void*变量。 2）调用JS_SetPrivate函数，指定对象和私有数据指针。
+
+例如：
+
+JS_SetContextPrivate(cx,obj,pdata);
+
+随后，要获取这些数据，请调用JS_GetPrivate函数，将对象作为参数进行传递。这个函数返回指向对象私有数据的指针：
+
+pdata=JS_GetContextPrivate(cx,obj);
+
+数据处理
+
+1．处理JS数据类型
+
+JavaScript定义了自己的数据类型。有些数据类型直接对应于C语言中的副本。其它的，如JSObject、jsdouble和JSString，都是JavaScript独有的。
+
+通常，你可以在应用程序中像使用标准的C语言数据类型一样声明、使用JS数据类型，JS引擎对那些需要多于一个字存储空间的JS数据类型的变量保持单独的栈，例如：JSObject、jsdouble和JSString。引擎会周期性地检查这些变量，看看它们是否仍在使用，如果没有，引擎就碎片收集它们，释放存储空间。
+
+2．处理JS值
+
+除了JS数据类型以外，JS引擎也使用JS值，称其为jsvals。一个jsval本质上是一个指针，指向除了整型以外的JS数据类型。对于整型，一个jsval包含这个值自身。其它情况，指针被编码成包含额外信息。利用jsvals提高引擎的效率，允许API函数处理大量的潜在数据类型。引擎API包含一组宏，用于测试一个jsval的JS数据类型。他们是：
+
+JSVAL_IS_OBJECT 
+JSVAL_IS_NUMBER 
+JSVAL_IS_INT 
+JSVAL_IS_DOUBLE 
+JSVAL_IS_STRING 
+JSVAL_IS_BOOLEAN 
+除了测试一个jsval的潜在数据类型外，也能测试它看是否是原始JS数据类型（JSVAL_IS_PRIMITIVE)。原始数据类型是undefined、null、boolean、numeric和string类型。
+
+你也可测试jsval指向的值是否为NULL（JSVAL_IS_NULL）或void（JSVAL_IS_VOID）。
+
+如果一个jsval指向一个JSObject、 jsdouble或 jsstr等JS数据类型，你可利用JSVAL_TO_OBJECT、 JSVAL_TO_DOUBLE、 JSVAL_TO_STRING将jsval转为它的潜在类型。
+
+3．处理JS字符串
+
+你在JavaScript中做的许多事情都会涉及到字符串，JS引擎实现了一个称为JSString的字符串数据类型和一个指向JS字符数组的指针类型即jschar，用类处理Unicode编码的字符串。这个引擎也实现了一组通用的Unicode字符串程序。最后，JS引擎也提供内置串的支持，两个或多个独立的字符串在内存中能共享一个串。对于JSString类型的字符串，这个引擎跟踪并管理串资源。
+
+一般说来，当你用JS引擎操纵字符串时，你应该用JS API串处理函数来创建和复制字符串。有字符串管理程序用于创建NULL结尾的字符串或者指定长度的字符串。同时，也有程序用于计算字符串长度、比较字符串。
+
+4．对Unicode和Interned字符串的支持
+
+像其他API调用一样，具有Unicode能力的API字符串函数的名字与标准的引擎API字符串函数的名字是一一对应的。例如，如果一个标准函数名为JS_NewStringCopyN，对应的Unicode版函数就是JS_NewUCStringCopN。具有Unicode处理能力的API字符串函数对于interned字符串也是可行的。
+
+为了节约空间，JS引擎为共享单个字符串实例提供支持。这种共享的字符串称为"interned strings"。当你事先知道程序中会创建一个特定的、文本字符串并且要多次使用它时，请利用interned字符串。
+
+引擎为interned字符串提供了若干个调用：
+
+JS_InternString，用于创建或再次使用一个JSString。 
+JS_InternUCString，用于创建或再次使用一个Unicode类型的JSString。 
+JS_InternUCStringN，用于创建或再次使用固定长度的Unicode型JSString。 
+5．安全控制
+
+对于JavaScript1.3，JS引擎增加了安全增强型API函数，用于编译和运行传递给引擎的脚本或函数。JS安全模型是基于Java安全模型的。这个模型提供了一个通用的安全接口，但是，具体的安全实现是由应用程序自己来完成的。
+
+安全机制用在能够支持JavaScript的应用程序中的一种通用情形是比较脚本的真实性或者限制脚本的交互性。例如，你可以比较一个应用程序中两个或多个脚本的代码库，只允许来自同一个代码库的脚本能够修改共享代码库的脚本属性。
+
+如果要实现安全JS，请按以下步骤：
+
+1）在程序中声明一个或者多个JSPrincipals类型的结构。
+
+2）实现将给数组提供安全信息的函数。这些函数包括：给你的应用程序提供一个principals数组，用一套给定的规则对JS对象的引用数进行加减操作的机制。
+
+3）用你的安全信息给JSPrincipals结构赋值，这个信息可以包括通用代码信息。
+
+4）在运行时间环境中，编译与执行全部脚本和函数。下面列出了这些API函数和它们的目的：
+
+JS_CompileScriptForPrincipals：编译但不执行一段具有安全能力的脚本。 
+JS_CompileUCScriptForPrincipals：编译但不执行一段具有安全能力、Unicode编码的脚本。 
+JS_CompileFunctionForPrincipals：利用一个文本字符串创建一个具有安全能力的JS函数。 
+JS_CompileUCFunctionForPrincipals：利用一个Unicode编码的文本字符串创建一个具有安全信息的JS函数。 
+JS_EvaluateScriptForPrincipals ：编译并执行一段具有安全能力的脚本。 
+JS_EvaluateUCScriptForPrincipals：编译并执行一段具有安全能力、用Unicode编码的脚本。 
+程序样例
+
+以下是一个简单的样例程序，它从文件test.js中读入一段脚本，然后解释执行并输出结果。脚本中可嵌入自定义对象People，People对象具有属性name(表示该人的姓名)、address（表示该人的地址）及方法print（在屏幕上显示该人的姓名、地址信息）。
+
+例如：下面是一段简单的js脚本，它首先利用print方法输出该人的姓名和地址，然后将姓名和地址分别修改为John和Beijing，最后再次输出其姓名和地址，看是否修改正确。
+
+people.print();
+
+people.name="John";
+
+people.address="Beijing";
+
+people.print();
+
+下面是C源程序代码。
+
+#include "js.h"
+enum tagMY_PEOPLE {MY_NAME,MY_ADDRESS};
+static JSBool GetPeopleProperty (JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+static JSBool SetPeopleProperty (JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+static JSBool PeoplePrint(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+typedef struct{
+    char name[16];
+    char addr[64];}PeopleInfo;
+static PeopleInfo m_ainfo={"myName","myAddress"};
+/*定义属性的 GETTER*/
+static JSBool GetPeopleProperty (JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+{
+    if (JSVAL_IS_INT(id)) {
+        switch (JSVAL_TO_INT(id)) {
+            case MY_NAME:
+                *vp=STRING_TO_JSVAL (JS_NewStringCopyZ (cx,m_ainfo.name));
+                break;
+            case MY_ADDRESS:
+                *vp=STRING_TO_JSVAL (JS_NewStringCopyZ (cx,m_ainfo.addr));
+                break;
+            }
+    }
+    return JS_TRUE;
+}
+/*定义属性的SETTER*/
+static JSBool SetPeopleProperty (JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+{
+    if (JSVAL_IS_INT(id)) {
+        switch (JSVAL_TO_INT(id)) {
+            case MY_NAME:
+                strncpy (m_ainfo.name, JS_GetStringBytes (jss), 15);
+                break;
+            case MY_ADDRESS:
+                strncpy (m_ainfo.addr, JS_GetStringBytes (jss), 63);
+                break;
+            }
+    }
+    return JS_TRUE;
+}
+/*定义print方法*/
+static JSBool PeoplePrint(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+{
+    fprintf(stdout,"My Name is %s.\nMy Addr is %s.\n",m_ainfo.name,m_ainfo.addr);
+    return JS_TRUE;
+}
+void main()
+{
+    JSString* jss;
+    char buf[5120];
+    int len;
+    jsval rval;
+    JSRuntime *rt;
+    JSContext *cx;
+    JSObject *globalObj,*PeopleObj;
+    JSClass global_class = {
+            "global",0,
+            JS_PropertyStub, JS_PropertyStub,JS_PropertyStub, JS_PropertyStub,
+            JS_EnumerateStub, JS_ResolveStub,JS_ConvertStub, JS_FinalizeStub };
+/*定义People类的属性数组*/
+static JSPropertySpec PeopleProperties[] =
+  {
+    {"name", MY_NAME, JSPROP_ENUMERATE },
+    {"address", MY_ADDRESS, JSPROP_ENUMERATE },
+    {0}
+  } ;
+/*定义People类的方法数组*/
+static JSFunctionSpec PeopleMethods[] =
+{
+    {"print", PeoplePrint, 0},
+             {0}
+        };
+/*定义People类*/
+static JSClass PeopleClass = {
+        "people",0,
+  JS_PropertyStub,JS_PropertyStub, GetPeopleProperty, SetPeopleProperty,
+  JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, JS_FinalizeStub
+};
+    typedef struct{}
+      /* 初始化JS RunTime，返回结果给rt */
+rt = JS_Init(1000000L);
+    if (!rt)return;
+  /* 创建一个上下文，并将其与JS RunTime关联起来 */
+    cx = JS_NewContext(rt, 5120);
+    if (!cx)return;
+  /* 创建全局对象 */
+    if (!(globalObj = JS_NewObject (cx, &global_class, NULL, NULL)))return;
+      /* 实例化内置对象和全局对象*/
+JS_InitStandardClasses (cx, globalObj);
+/*实例化People对象*/
+PeopleObj = JS_DefineObject (cx, globalObj, "People", &PeopleClass, 0,JSPROP_ENUMERATE);
+/*创建对象的属性*/
+JS_DefineProperties (cx,PeopleObj, PeopleProperties);
+/*创建对象的方法*/
+JS_DefineFunctions (cx,PeopleObj, PeopleMethods);
+FILE* fp;
+/*打开文件，读入脚本*/
+    if (!(fp = fopen ("test.js", "r")))return;
+    len = fread (buf, 1, 5120, fp);
+    fclose (fp);
+    if (len <= 0)return;
+/*执行一段脚本*/
+    JS_EvaluateScript (cx, globalObj, buf, len, "", 1, &rval);
+    jss = JS_ValueToString (cx, rval);
+    fprintf(stdout，"The result is: %s"，JS_GetStringBytes (jss));
+/*释放上下文*/
+JS_DestroyContext(cx);
+/*释放RunTime*/
+JS_DestroyRuntime(rt);
+return;
+}
+ 
+spidermonkey-dotnet is a binding between the original JavaScript engine SpiderMonkey and the .Net platform. Future releases will include easy to use Javascript wrappers for .Net objects, and possibly the exposure of the .Net class library to JS. 
+
+Homepage:
+http://www.codeplex.com/[..]View.aspx?ProjectName=spidermonkeydotnet
+Zip:
+http://codeplex.com/[..]ectName=spidermonkeydotnet&ReleaseId=605
+Bug tracker:
+http://www.codeplex.com/[..]List.aspx?ProjectName=spidermonkeydotnet
+Demo site:
+http://codepraxis.com
+
+
+http://blog.chinaunix.net/uid-46552-id-2116910.html

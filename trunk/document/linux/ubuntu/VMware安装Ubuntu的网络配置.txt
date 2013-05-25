@@ -1,0 +1,31 @@
+网络配置：使用bridge
+XP下的两个VMware网络连接不用动
+
+
+为网卡配置静态IP地址
+
+sudo vim /etc/network/interfaces
+
+auto eth0
+iface eth0 inet static
+address 192.168.3.90
+gateway 192.168.3.1
+netmask 255.255.255.0
+
+配置完此步后一般可以ping主机的IP了，OK后进入下一步
+
+
+配置DNS服务器的地址，最多可以使用3个DNS服务器
+sudo vim /etc/resolv.conf
+
+
+search localdomain
+
+(保留原来的DNS，添加以下代码)
+nameserver 192.168.1.11
+nameserver 8.8.8.8
+
+配置完此步后一般可以ping一些常用的域名，如baidu.com
+
+保存退出后，使用重启networking命令让新配置生效：
+sudo /etc/init.d/networking restart

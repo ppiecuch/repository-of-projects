@@ -1,0 +1,48 @@
+转载地址:http://www.mattvsworld.com/blog/2010/02/install-the-latest-autoconf-and-automake-on-mac-os-10-6/
+
+I noticed today that while Mac OS 10.6 (specifically, 10.6.2) comes with automake and autoconf, the versions are a little bit dated. Normally I wouldn’t care, but I ran into an issue when trying to generate a portable distribution using those tools on my mac, and then configure, compile, and install the result on a linux box. What I discovered is that the version of autoconf and automake on OSX can generate a “configure” file which doesn’t work as expected on linux (at least one with gcc 4.3) — specifically, the step “checking for working mktime…” can hang and eventually return “no”, when that is not the correct result. Apparently you need at least autoconf 2.62 in order to avoid this bug.
+
+I figured as long as I was updating autoconf i’d update automake, m4, and libtool as well. Here’s the quick script (as always, I assume you prefer the installation prefix /usr/local as i do). It’s nothing too fancy, but the sequence of the installs is important:
+
+curl -O http://mirrors.kernel.org/gnu/m4/m4-1.4.13.tar.gz
+tar -xzvf m4-1.4.13.tar.gz
+cd m4-1.4.13
+./configure --prefix=/usr/local
+make
+sudo make install
+cd ..
+curl -O http://mirrors.kernel.org/gnu/autoconf/autoconf-2.65.tar.gz
+tar -xzvf autoconf-2.65.tar.gz
+cd autoconf-2.65
+./configure --prefix=/usr/local # ironic, isn't it?
+make
+sudo make install
+cd ..
+# here you might want to restart your terminal session, to ensure the new autoconf is picked up and used in the rest of the script
+curl -O http://mirrors.kernel.org/gnu/automake/automake-1.11.tar.gz
+tar xzvf automake-1.11.tar.gz
+cd automake-1.11
+./configure --prefix=/usr/local
+make
+sudo make install
+cd ..
+curl -O http://mirrors.kernel.org/gnu/libtool/libtool-2.2.6b.tar.gz
+tar xzvf libtool-2.2.6b.tar.gz
+cd libtool-2.2.6b
+./configure --prefix=/usr/local
+make
+sudo make install
+and now, (assuming you have /usr/local in your path), when you use autotools your distribution should be correctly portable (at least in regards to this mktime bug).
+
+http://www.cnblogs.com/hurricane2011/articles/2503582.html
+
+
+另外一种：
+
+安装 XCode-command line
+
+
+sudo xcode-select -switch /Users/3guu/Downloads/Xcode.app/Contents/Developer
+
+sudo port install automake autoconf libtool
+

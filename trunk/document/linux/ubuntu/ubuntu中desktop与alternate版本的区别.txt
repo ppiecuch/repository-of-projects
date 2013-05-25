@@ -1,0 +1,21 @@
+今天ubuntu发布了11.04版本，但是下载的时候有desktop和alternate版本，他们之间有神马区别呢？简单的说就像WIN里面的ghost版和安装版，详细解释如下~ubuntu 发布的linux里面有一个版本-desktop。因为有一套server，所以desktop很容易从字面上被理解成桌面版。而这样理解的人通常会弄不明白剩下那个alternate是什么东西。
+其实desktop是Live CD的名字，也就是刻录在光盘上运行的Linux。是一套已经装好的系统。把它烧录到光盘上放进光驱就可以直接运行这套完整的linux。当然你也可以在运行之后把它“安装”到硬盘上，而这样的安装更像是一种拷贝或者还原，类似ghost。
+真正意义上正统的安装版本则是alternate，它是由许多deb包组成的。可以详细的制定安装内容。是正宗的硬盘安装版。
+这两个版本还有一些速度上的区别。
+因为类似系统还原，desktop的安装速度较快。而alternate正式的安装相比之下会慢一些。
+而运行的时候恰好相反：desktop因为是既成的，可能会缺少对应软件环境的适应性，所以和灵活指定及安装的alternate相比会慢一些。您可以使用alternate安装CD执行特定的安装。有以下几种情况：
+创建预配置的OEM系统；
+设置自动部署；
+在没有网络连接的情况下，从旧系统升级；
+LVM 或 RAID 分区；
+安装GRUB，而不是（主引导记录）Master Boot Record；
+系统安装所需内存小于256MB。
+desktopCD安装前可以看到基本界面和试用(liveCD功能),alternate面向安装个性化需求更大的更专业一点点的用户。
+desktop和alternate都有基本的软件包,要更多的软件包只要修改合适的源下载也是很快的。desktop是一个live cd ,只用于桌面系统，也可以在LiveCD状态下安装。
+alternate是标准的安装CD。包含了一些桌面程序，可以用高级安装模式安装，在安装时可以划分分区。也可以当作Server来用，不过一些 Server 程序要自己通过网络来安装Alternate安装过程会有高级分区以及grub安装选项,Desktop没有.alternate既能安装desktop 也能安装server。
+desktop是一个live cd ，在桌面环境里面以向导的方式引导安装live CD 就是把安装好的软件放到光盘中，安装时就把其上的内容复制到硬盘再简单配置就行了。
+
+alternate CD上放的DEB的软件包，安装时要解压、配置
+只有在机子硬件配置很低时用 live CD安装较慢，其余都比alternate的要快。
+
+http://www.hyleong.com/ubuntu-desktop-alternate/

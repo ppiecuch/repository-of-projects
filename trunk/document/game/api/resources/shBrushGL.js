@@ -43,11 +43,13 @@
 			'glDrawElements ' +
 			'glEnable ' +
 			'glEnableClientState ' +
+			'glGet ' +
 			'glGenBuffers ' +
 			'glLoadMatrix ' +
 			'glMatrixMode ' +
 			'glNormalPointer ' +
 			'glPixelStorei ' +
+			'glPointSize ' +
 			'glReadPixels ' +
 			'glScissor ' +
 			'glTexCoordPointer ' +
@@ -56,23 +58,29 @@
 			
 			;
 		var constants =	
+			'GL_ALIASED_POINT_SIZE_RANGE ' +
 			'GL_ALPHA ' +
 			'GL_ALPHA_TEST ' +
 			'GL_ALWAYS ' +
 			'GL_ARRAY_BUFFER ' +
 			'GL_ARRAY_BUFFER_BINDING ' +
+			'GL_BACK ' +
 			'GL_CLAMP_TO_EDGE ' +
 			'GL_DST_ALPHA ' +
 			'GL_DST_COLOR ' +
 			'GL_DYNAMIC_DRAW ' +
 			'GL_ELEMENT_ARRAY_BUFFER ' +
 			'GL_EQUAL ' +
+			'GL_FILL ' +
+			'GL_FRONT ' +
+			'GL_FRONT_AND_BACK ' +
 			'GL_GENERATE_MIPMAP ' +
 			'GL_GEQUAL ' +
 			'GL_GREATER ' +
 			'GL_INVALID_OPERATION ' +
 			'GL_LEQUAL ' +
 			'GL_LESS ' +
+			'GL_LINE ' +
 			'GL_LINEAR ' +
 			'GL_LINEAR_MIPMAP_LINEAR ' +
 			'GL_LINEAR_MIPMAP_NEAREST ' +
@@ -92,11 +100,14 @@
 			'GL_ONE_MINUS_SRC_ALPHA ' +
 			'GL_ONE_MINUS_SRC_COLOR ' +
 			'GL_PACK_ALIGNMENT ' +
+			'GL_POINT ' +
+			'GL_POINT_SMOOTH ' +
 			'GL_READ_WRITE ' +
 			'GL_REPEAT ' +
 			'GL_RGB ' +
 			'GL_RGBA ' +
 			'GL_SCISSOR_TEST ' +
+			'GL_SMOOTH_POINT_SIZE_RANGE ' +
 			'GL_SRC_ALPHA ' +
 			'GL_SRC_ALPHA_SATURATE ' +
 			'GL_SRC_COLOR ' +
@@ -126,7 +137,8 @@
 			{ regex: /\u3010.*\u3011/gm,							css: 'h3' },				// h3
 			{ regex: new RegExp(this.getKeywords(keywords), 'gm'),	css: 'keyword' },			// keywords
 			{ regex: new RegExp(this.getKeywords(constants), 'gm'),	css: 'constants' },			// constants
-			{ regex: new RegExp(this.getKeywords(functions), 'gm'),	css: 'functions' }			// functions
+			{ regex: new RegExp(this.getKeywords(functions), 'gm'),	css: 'functions' },			// functions
+			{ regex: /GL_(OES|EXT|QCOM|NV|IMG|ATI|ARM|ARB|ANDROID|APPLE)_\w*/gm,		css: 'blue' }	// extensions
 			];
 	
 		this.forHtmlScript(r.scriptScriptTags);

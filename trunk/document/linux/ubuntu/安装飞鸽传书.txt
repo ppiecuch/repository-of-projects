@@ -1,0 +1,20 @@
+此方案在Ubuntu8.0.4/VMware8/WinXP下测试通过
+
+首先到：http://www.ipmsg.org/index.html.en 下载for unix   GNOME2的源文件
+cd /文件所在目录地址
+tar xvf g2ipmsg-0.9.6.tar.gz
+sudo apt-get install libxml-parser-perl libgnomeui-dev libpanel-applet2-dev intltool
+./configure --prefix=/usr/local --sysconfdir=/etc --enable-systray
+sudo make
+sudo make install
+
+启动失败：
+ubuntu8@ubuntu8-desktop:/usr/local/bin$ g2ipmsg
+Segmentation fault
+
+用sudo启动成功
+ubuntu8@ubuntu8-desktop:/usr/local/bin$ sudo g2ipmsg
+
+启动后提示错误，说什么userdb.c有问题
+解决方法：打开飞鸽的窗口，在设置－首选项，把字符编码的外部代号更改为：CP936。问题解决
+

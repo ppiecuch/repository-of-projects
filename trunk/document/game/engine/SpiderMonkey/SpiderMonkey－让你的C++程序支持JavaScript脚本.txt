@@ -1,0 +1,184 @@
+译序
+有些网友对为什么D2JSP能运行JavaScript脚本程序感到奇怪，因此我翻译了这篇文章，原文在这里。这篇教程手把手教你如何利用SpiderMonkey创建一个能执行JavaScript脚本的C++程序，并让JavaScript脚本操纵你的C++程序的内部数据、操作。从这篇教程可以看到在SpiderMonkey引擎的帮助下，让C++程序支持JavaScript脚本是一件很容易的事，更棒的是SpiderMonkey也可以在Macintosh和Unix平台使用。
+SpiderMonkey是Gecko（Firefox浏览器的内核）的JavaScript脚本引擎，详细文档请看这里。
+
+
+以下为翻译内容。
+
+－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+
+本教程的目的是教你如何用JavaScript做为脚本语言使你的C++程序自动化。
+
+SpiderMonkey
+SpiderMonkey是Mozilla项目的一部分，用C语言写成，是负责执行JavaScript脚本的引擎。另外还有一个叫Rhino的Java引擎。
+
+SpiderMonkey的最新版本可在这里下载。它是以源代码形式发布的，因此你必须自己编译它（译注：其实网上有很多编译好的二进制版本，google一下js32.dll就可找到）。Visual C++用户可以在src目录下找到Workspace项目工程文件来编译，编译结果会产生一个叫'js32.dll'的dll文件。
+
+SpiderMonkey也可以在Macintosh和Unix上使用，想了解如何在这些平台上进行编译请阅读Readme.html。
+
+在C++中执行JavaScript程序
+步骤1－创建JavaScript runtime（运行时实例）
+初始化一个JavaScript runtime可用JS_NewRuntime方法，该方法将为runtime分配内存，同时还得指定一个字节数，当内存分配超过这个数字时垃圾收集器会自动运行。
+
+
+JSRuntime *rt = JS_NewRuntime(1000000L);
+if ( rt == NULL )
+...{
+    // Do some error reporting
+}
+
+步骤2－创建context（上下文环境）
+Context指明了脚本运行所需的栈大小，即分配给脚本执行栈的私有内存数量。每个脚本都和它自己的context相关联。
+
+当一个context正在被某个脚本或线程使用时，其他脚本或线程不能使用该context。不过在脚本或线程结束时，该context可以被下一个脚本或线程重用。
+
+创建一个新context可用JS_NewContext方法。context必须关联到一个runtime，调用JS_NewContext方法时还必须指定栈的大小。
+
+JSContext *cx = JS_NewContext(m_rt, 8192);
+if ( cx == NULL )
+...{
+    // Do some error reporting
+}
+步骤3－初始化全局对象
+在一个脚本开始运行前，必须初始化一些大多数脚本会用到的通用的JavaScript函数和内置（build-in）类对象。
+
+全局对象是在一个JSClass结构中描述的。该结构可以按以下方式初始化：
+
+
+JSClass globalClass =
+...{
+    "Global", 0,
+    JS_PropertyStub,  JS_PropertyStub,
+    JS_PropertyStub, JS_PropertyStub,
+    JS_EnumerateStub, JS_ResolveStub,
+    JS_ConvertStub,  JS_FinalizeStub
+};
+现在创建和初始化这个全局对象：JSObject *globalObj = JS_NewObject(cx, &globalClass, 0, 0);JS_InitStandardClasses(cx, globalObj);步骤4－执行脚本
+执行脚本的一种途径是使用JS_EvaluateScript方法：
+
+
+std::string script = "var today = Date(); today.toString();"
+jsval rval;
+uintN lineno = 0;
+JSBool ok = JS_EvaluateScript(cx, globalObj, script.c_str(), 
+                              script.length(), "script", lineno, &rval);
+在这个脚本中，如果运行正确的话当天数据会保存在rval中。rval包含最后一个执行函数的结果。JS_EvaluteScript返回JS_TRUE代表执行成功，返回JS_FALSE则代表有错误发生。
+
+从rval得到相应的字符串值可以用下面的方法。在这里我不想解释所有细节，想获得更详细的信息请自己查API文档。
+
+
+JSString *str = JS_ValueToString(cx, rval);
+std::cout << JS_GetStringBytes(str);
+步骤5－清理脚本引擎
+程序结束前必须对脚本引擎做一些清理工作：JS_DestroyContext(cx);JS_DestroyRuntime(rt);在C++中定义一个在JavaScript中用的类
+这个例子中用到的类定义如下：
+
+class Customer
+...{
+public:
+    int GetAge() ...{ return m_age; }
+    void SetAge(int newAge) ...{ m_age = newAge; }
+    std::string GetName() ...{ return m_name; }
+    void SetName(std::string newName) ...{ m_name = newName; }
+
+private:
+    int m_age;
+    std::string m_name;
+};
+步骤1－JavaScript类
+从Customer类派生一个你想在JavaScript中用的新的C++类，或者创建一个包含一个Customer类型成员变量的新类。
+
+给JavaScript用的类得有一个JSClass结构，为此得创建一个JSClass类型的静态成员变量，该变量会被其他类用到，因此还得把它声明为public变量。别的类可以用该结构来判断对象的类型（见JS_InstanceOf API）。
+
+
+
+// JSCustomer.h
+class JSCustomer
+...{
+public:
+    JSCustomer() : m_pCustomer(NULL) 
+    ...{
+    }
+
+    ~JSCustomer()
+    ...{
+        delete m_pCustomer;
+        m_pCustomer = NULL;
+    }
+
+    static JSClass customerClass;
+
+protected:
+    void setCustomer(Customer *customer) 
+    ...{
+        m_pCustomer = customer; 
+    }
+
+    Customer* getCustomer()
+    ...{
+        return m_pCustomer; 
+    }
+
+private:
+    Customer *m_pCustomer;
+
+};
+该JSClass结构里包含了JavaScript类的名字、标志位以及给脚本引擎用的回调函数的名字。举个例子，脚本引擎使用回调函数从类中获取某个属性值。 
+在C++类的实现文件中定义JSClass结构如下：
+
+
+// JSCustomer.cpp
+JSClass JSCustomer::customerClass = 
+...{
+    "Customer", JSCLASS_HAS_PRIVATE,
+        JS_PropertyStub, JS_PropertyStub,
+        JSCustomer::JSGetProperty, JSCustomer::JSSetProperty,
+        JS_EnumerateStub, JS_ResolveStub, 
+        JS_ConvertStub, JSCustomer::JSDestructor
+};
+用到的回调函数是JSCustomer::JSGetProperty，JSCustomer::JSSetProperty和JSCustomer::JSDestructor。脚本引擎调用JSGetProperty获取属性值，调用JSSetProperty设置属性值，调用JSDestructor析构JavaScript对象。 
+JSCLASS_HAS_PRIVATE标志位会让脚本引擎分配一些内存，这样你可以在JavaScript对象中附加一些自定义数据，比如可以用它来保存类指针。
+
+回调函数以C++的类静态成员函数方式存在：
+
+
+static JSBool JSGetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+static JSBool JSSetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+static JSBool JSConstructor(JSContext *cx, JSObject *obj, uintN argc, 
+                            jsval *argv, jsval *rval);
+static void JSDestructor(JSContext *cx, JSObject *obj);
+步骤2－初始化你的JavaScript对象
+创建另外一个叫JSInit的静态方法，见下面的例子，该方法将在应用程序创建JavaScript runtime时被调用。
+
+
+static JSObject *JSInit(JSContext *cx, JSObject *obj, JSObject *proto);
+JSInit方法的实现大约如下： JSObject *JSCustomer::JSInit(JSContext *cx, JSObject *obj, JSObject *proto)
+...{
+    JSObject *newObj = JS_InitClass(cx, obj, proto, &customerClass,
+        JSCustomer::JSConstructor, 0,
+        JSCustomer::customer_properties, JSCustomer::customer_methods,
+        NULL, NULL);
+    return newObj;
+}
+对象在脚本中被具象化（译注：instantiated，简而言之就是对象new出来的时候）的时候，静态方法JSConstructor会被调用。在这个方法中可以用JS_SetPrivate API给该对象附加一些自定义数据。
+
+
+JSBool JSCustomer::JSConstructor(JSContext *cx, JSObject *obj, uintN argc, 
+                                 jsval *argv, jsval *rval)
+...{
+    JSCustomer *p = new JSCustomer();
+
+    p->setCustomer(new Customer());
+    if ( ! JS_SetPrivate(cx, obj, p) )
+        return JS_FALSE;
+    *rval = OBJECT_TO_JSVAL(obj);
+    return JS_TRUE;
+}
+JSConstructor构造方法可以带多个参数，用来初始化类。目前为止已经在堆上创建了一个指针，还需要一种途径来销毁它，这可以通过JS_Destructor完成： void JSCustomer::JSDestructor(JSContext *cx, JSObject *obj)
+...{
+    JSCustomer *p = JS_GetPrivate(cx, obj);
+    delete p;
+    p = NULL;
+}
+
+http://blog.chinaunix.net/uid-223060-id-2127069.html

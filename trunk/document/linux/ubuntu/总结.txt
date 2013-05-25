@@ -1,0 +1,38 @@
+如果使用VMware，那么Ubuntu8.0.4会屏蔽掉方向键，先恢复它：
+sudo chmod +w /etc/default/console-setup
+vim /etc/default/console-setup
+注掉原来的XKBMODEL=XXXX，改成
+XKBMODEL="pc105"
+保存退出
+sudo chmod u-w /etc/default/console-setup
+
+/etc/X11/xorg.conf里Option XkbModel "XXXX"也要改成Option XkbModel "pc105"
+
+如果觉得分辨率过高，可以在/etc/X11/xorg.conf修改
+
+先配置网络吧（参考《VMware安装Ubuntu的网络配置.txt》，如果配置失败，破坏了系统可以及时重装，所以这个放在第一步）
+
+安装飞鸽传书（参考《安装飞鸽传书.txt》，好处你懂的）
+
+安装rpm
+sudo apt-get install alien dpkg-dev debhelper build-essential
+
+安装JDK
+sudo chmod +x jdk-6u45-linux-i586-rpm.bin
+sudo ./jdk-6u45-linux-i586-rpm.bin
+sudo alien jdk-6u45-linux-i586.rpm
+sudo dpkg -i jdk-6u45-linux-i586.deb
+
+设置环境变量（如果设置错误很容易导致循环重启，这时需要在登陆界面的option里select session，
+选择teminal那一项，然后进行系统在控制台中重新export PATH=XXXX一下，恢复一下环境变量配置）
+以下是正确的设置方法
+sudo vim /etc/profile
+
+JAVA_HOME=/usr/java/jdk1.6.0_45
+export JAVA_HOME
+PATH=$PATH:$JAVA_HOME/bin
+export PATH
+CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+export CLASSPATH
+
+umask 022

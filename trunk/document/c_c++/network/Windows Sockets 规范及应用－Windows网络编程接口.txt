@@ -1,0 +1,2952 @@
+Windows Sockets 规范及应用
+
+           －Windows网络编程接口
+
+
+
+施 炜    李 铮    秦 颍         编著
+
+
+
+
+
+
+
+
+
+
+
+
+
+***************************************************************
+***
+版权信息
+
+    本书作者保留所有版权。禁止任何商业性的转载或复制。非赢利性
+质的转载和复制不得修改文章内容，并请保留此段文字。
+
+Copyright (c) 1995-1996  By 　施炜，李铮，秦颖
+All Right Reserved
+***************************************************************
+***
+
+
+
+
+
+
+
+内容提要
+
+    本书适应了Windows、Internet及计算机网络普及的潮流，介绍了一套在Windows
+下网络编程的规范－Windows Sockets。这套规范是Windows下得到广泛应用的、开
+放的、支持多种协议的网络编程接口。从1991年的1.0版到1995年的2.0.8版，经
+过不断完善并在Intel、Microsoft、Sun、SGI、Informix、Novell等公司的全力支持下，
+已成为Windows网络编程的事实上的标准。为使读者能够充分理解和应用这套规
+范，本书不但对Windows Sockets 1.1及2.0规范作了较为详尽的介绍，还结合了作
+者的实际工作，给出了具有实际应用价值的程序实例。书中的内容包括：Windows
+Sockets规范1.1版及2.0.8版介绍；Windows Sockets网络编程指导和具体应用实例；
+Windows Sockets规范1.1版及2.0.8版库函数参考等。
+    本书体系完整，文字流畅，可供从事网络应用开发的工程技术人员和大专院校
+师生参考。
+
+
+
+
+作者声明
+
+    由于成书时间紧迫。本书不免有许多错误和不当之处，故此作者衷心希望各位
+读者能对本书提出宝贵意见（包括补充新的应用实例和内容），以便我们进一步修
+改完善此书。我们会尊重相应修订者的版权。作者也衷心希望在我们和各位读者的
+努力下，本书能够成为一本关于Windows Sockets编程的系统而又准确的免费中文参
+考书，为广大读者在Windows下网络编程提供帮助。
+
+    作者联系地址：
+    施炜：上海交通大学94032班   （200030）
+          Email: weishi@fudan.ihep.ac.cn
+    李铮：上海交通大学自动化系  （200030）
+          Email: blee.bbs@captain.net.tsinghua.edu.cn
+    秦颖：上海交通大学94033A班  （200030）
+          Email: fluke.bbs@captain.net.tsinghua.edu.cn
+
+    作者希望每一位拿到本书的读者能以任何方式通知我们。以便我们掌握本书的
+应用情况。并敬请各位读者暂时不要在其他FTP站点散发，谢谢合作。
+
+编著者
+1996年5月20日
+
+前言
+
+    当今世界正处于信息时代，计算机和通信网络是这一时代所谓“信息基础设
+施”。网络化是计算机技术九十年代的重要发展趋势之一。目前计算机网络的新发
+展是：异机种网络和异网互联有较大突破。TCP/IP协议在异网互联中体现出了其强
+大的生命力，以它为基础组建的Internet是目前国际上规模最大的计算机网间网，到
+1991年底世界上已有26个国家的五千多个网络连入Internet，其中包含了数千个组
+织的30万台主机，用户数以百万计。
+    与计算机网络的普及相呼应的是Windows的广泛应用，现在在全世界各地已有
+超过四千万用户在使用不同版本的Windows。自1995年8月24日Windows 95正式
+推出以来，在短短的一个星期内销售量已超过100万份，有的零售商店不得不半夜
+开门，以迎接滚滚而来的抢购者。这说明以用户友好的图形界面为基础的Windows
+已得到用户的普遍认可，已经并将继续成为个人机平台上的事实上的操作系统标
+准。所以研究和开发在Windows下的网络编程技术具有普遍的应用价值。
+    在Windows下的各种网络编程接口中，Windows Sockets脱颖而出，越来越得到
+大家的重视，这是因为Windows Sockets规范是一套开放的、支持多种协议的
+Windows下的网络编程接口。从1991年的1.0版到1995年的2.0.8版，经过不断完
+善并在Intel、Microsoft、Sun、SGI、Informix、Novell等公司的全力支持下，已成为
+Windows网络编程的事实上的标准。
+    在作者利用Windows Sockets规范进行应用开发的过程中，发现这方面的资料很
+少，特别是缺乏一本全面而实用的专著。为了使广大用户能够充分理解和应用这套
+规范，我们编写了这本书。本书不但对Windows Sockets 1.1及2.0规范作了较为详
+尽的介绍，还结合了作者的实际工作，给出了具有实际应用价值的程序实例。希望
+它能对Windows Sockets规范在国内的推广和应用起到抛砖引玉的作用。读者在阅读
+本书的过程中，如果能对自己的学习工作有所帮助和指导，是作者的最大愿望。由
+于时间紧迫，作者学识有限，书中错误在所难免，偏颇和不当之处，恳请读者不吝
+赐教。
+    本书由施炜、李铮、秦颖合作完成，其中，第一、二、四、六章和5.2节由施
+炜编写；第七章、5.1节、3.4节由李铮编写；第5.3节、3.1－3.3节由秦颖编写。在
+本书的编写过程中，得到了上海交通大学的毛向辉先生的大力支持，并提供了一些
+最新的资料，在此谨表示衷心的谢意。
+
+                                               编著者
+                                        1995年9月于上海交通大学
+
+目录
+第一章 简介     11
+1.1 什么是WINDOWS SOCKETS规范?  11
+1.2 BEKELEY套接口       12
+1.3 MICROSOFT WINDOWS和针对WINDOWS的扩展        13
+1.4 这份规范的地位      13
+1.5 曾经作过的修改      13
+1.5.1 Windows Sockets 1.0       13
+1.5.2 Windows Sockets 1.1       13
+第二章 使用WINDOWS SOCKETS 1.1编程      15
+2.1 WINDOWS SOCKETS协议栈安装检查       15
+2.2 套接口      15
+2.2.1 基本概念  15
+2.2.2 客户机/服务器模型 16
+2.2.3 带外数据  17
+2.2.4 广播      17
+2.3 字节顺序    18
+2.4 套接口属性选项      18
+2.5 数据库文件  19
+2.6 与BERKELEY套接口的不同      20
+2.6.1 套接口数据类型和错误数值  20
+2.6.2 select()函数和FD_*宏      20
+2.6.3 错误代码－errno,h_errno,WSAGetLastError() 21
+2.6.4 指针      21
+2.6.5 重命名的函数      22
+  2.6.5.1 close()和closesocket()        22
+  2.6.5.2 ioctl()和iooctlsocket()       22
+2.6.6 阻塞例程和EINPROGRESS宏   22
+2.6.7 Windows Sockets支持的最大套接口数目       22
+2.6.8 头文件    23
+2.6.9 API调用失败时的返回值     23
+2.6.10 原始套接口       23
+2.7 在多线程WINDOWS版本中的WINDOWS SOCKETS      24
+第三章 WINDOWS SOCKETS 1.1应用实例      25
+3.1 套接口网络编程原理  25
+3.2 WINDOWS SOCKETS编程原理     27
+3.3 WINDOWS SOCKETS与UNIX套接口编程实例 28
+3.3.1 SERVER介绍        28
+3.3.2 CLIENT介绍        29
+3.3.3 源程序清单        30
+3.4 另一个精巧的应用程序实例－WSHOUT    37
+3.4.1 源程序目录        38
+3.4.2 程序逻辑结构      38
+3.4.3 源程序清单及注释  39
+3.4.3.1 wshout.c清单    39
+3.4.3.2 wshout.h清单    53
+3.4.3.3 wshout.rc清单   55
+3.4.3.4 ushout.c清单    60
+3.4.3.5 ulisten.c清单   63
+3.4.3.6 tshout.c清单    66
+3.4.3.7 tlisten.c清单   69
+3.4.3.8 errno.c清单     73
+3.4.3.9 resolve.c清单   74
+第四章 WINDOWS SOCKET 1.1库函数概览     79
+4.1 套接口函数  79
+4.1.1 阻塞/非阻塞和数据易失性   80
+4.2 数据库函数  81
+4.3 针对MICROSOFT WINDOWS的扩展函数     82
+4.3.1 异步选择机制      83
+4.3.2 异步支持例程      83
+4.3.3 阻塞钩子函数方法  83
+4.3.4 错误处理  84
+4.3.5 通过中介DLL调用Windows Sockets DLL        84
+4.3.6 Windows Sockets实现内部对消息的使用       85
+4.3.7 私有的API接口     85
+第五章 套接口库函数参考 86
+5.1 WINDOWS SOCKET 1.1库函数参考        86
+5.1.1 accept()  86
+5.1.2 bind()    87
+5.1.3 closesocket()     89
+5.1.4 connect() 90
+5.1.5 getpeername()     92
+5.1.6 getsockname()     93
+5.1.7 getsockopt()      94
+5.1.8 htonl()   95
+5.1.9 htons()   96
+5.1.10 inet_addr()      96
+5.1.11 inet_ntoa()      97
+5.1.12 ioctlsocket()    98
+5.1.13 listen() 99
+5.1.14 ntohl()  101
+5.1.15 ntohs()  101
+5.1.16 recv()   102
+5.1.17 recvfrom()       103
+5.1.18 select() 105
+5.1.19 send()   107
+5.1.20 sendto() 108
+5.1.21 setsockopt()     110
+5.1.22 shutdown()       112
+5.1.23 socket() 114
+5.2 数据库函数  115
+5.2.1 gethostbyaddr()   115
+5.2.2 gethostbyname()   116
+5.2.3 gethostname()     117
+5.2.4 getprotobyname()  118
+5.2.5 getprotobynumber()        119
+5.2.6 getservbyname()   120
+5.2.7 getservbyport()   122
+5.3 WINDOWS扩展函数     122
+5.3.1 WSAAsyncGetHostByAddr()   123
+5.3.2 WSAAsyncGetHostByName()   125
+5.3.3 WSAAsyncGetProtoByName()  126
+5.3.4 WSAAsyncGetProtoByNumber()        128
+5.3.5 WSAAsyncGetServByName()   130
+5.3.6 WSAAsyncGetServByPort()   132
+5.3.7 WSAAsyncSelect()  134
+5.3.8 WSACancelAsyncRequest()   139
+5.3.9 WSACancelBlockingCall()   140
+5.3.10 WSACleanup()     141
+5.3.11 WSAGetLastError()        142
+5.3.12 WSAIsBlocking()  143
+5.3.13 WSASetBlockingHook()     143
+5.3.14 WSASetLastError()        145
+5.3.15 WSAStartup()     146
+5.3.16 WSAUnhookBlockingHook()  150
+第六章 WINDOWS SOCKET 2的扩展特性       152
+6.1 同时使用多个传输协议        152
+6.2 与WINDOWS SOCKET 1.1应用程序的向后兼容性    153
+6.2.1 源码的兼容性      153
+6.2.2 二进制兼容性      153
+6.3 在WINDOWS SOCKETS中注册传输协议     154
+6.3.1 使用多个协议      154
+6.3.2 select()函数应用中关于多个服务提供者的限制        155
+6.4 协议无关的名字解析  155
+6.5 重叠I/O和事件对象   156
+6.5.1 事件对象  156
+6.5.2 接收操作完成指示  157
+6.5.2.1 阻塞并且等待完成指示。  157
+6.5.2.2 检查完成指示    157
+6.5.2.3 使用套接口I/O操作完成例程       157
+6.5.3 WSAOVERLAPPED的细节       158
+6.6 使用事件对象异步通知        159
+6.7 服务的质量（QOS）   159
+6.8 套接口组    160
+6.9 共享套接口  160
+6.10 连接建立和拆除的高级函数   161
+6.11 扩展的字节顺序转换例程     162
+6.12 分散/聚集方式I/O   162
+6.13 协议无关的多点通讯 162
+6.14 新增套接口选项一览 163
+6.15 新增套接口IOCTL操作代码    163
+6.16 新增函数一览       164
+第七章 WINDOWS SOCKETS 2扩展库函数简要参考      166
+7.1 WSAACCEPT() 166
+7.2 WSACLOSEEVENT()     167
+7.3 WSACONNECT()        167
+7.4 WSACREATEEVENT()    169
+7.5 WSADUPLICATESOCKET()        170
+7.6 WSAENUMNETWORKEVENTS()      171
+7.7 WSAENUMPROTOCOLS()  171
+7.8 WSAEVENTSELECT()    172
+7.9 WSAGETOVERLAPPEDRESULT()    174
+7.10 WSAGETQOSBYNAME()  175
+7.11 WSAHTONL() 175
+7.12 WSAHTONS() 176
+7.13 WSAIOCTL() 176
+7.14 WSAJOINLEAF()      177
+7.15 WSANTOHL() 179
+7.16 WSANTOHS() 179
+7.17 WSARECV()  180
+7.18 WSARECVDISCONNECT()        181
+7.19 WSARECVFROM()      182
+7.20 WSARESETEVENT()    184
+7.21 WSASEND()  184
+7.22 WSASENDDISCONNECT()        186
+7.23 WSASENDTO()        186
+7.24 WSASETEVENT()      188
+7.25 WSASOCKET()        189
+7.26 WSAWAITFORMULTIPLEEVENTS() 190
+附录A 错误代码  192
+附录B WINDOWS SOCKETS头文件     196
+附录B.1 WINDOWS SOCKETS 1.1头文件       196
+附录B.2 WINDOWS SOCKETS 2头文件 217
+附录B.3 WINSOCK.DEF文件 252
+附录C 参考文献  255
+
+
+第一章 简介
+1.1 什么是Windows Sockets规范?
+        Windows Sockets规范以U.C. Berkeley大学BSD UNIX中流行的Socket接口为范
+例定义了一套Micosoft Windows下网络编程接口。它不仅包含了人们所熟悉的
+Berkeley Socket风格的库函数；也包含了一组针对Windows的扩展库函数，以使程
+序员能充分地利用Windows消息驱动机制进行编程。
+        Windows Sockets规范本意在于提供给应用程序开发者一套简单的API，并让各
+家网络软件供应商共同遵守。此外，在一个特定版本Windows的基础上，Windows
+Sockets也定义了一个二进制接口（ABI），以此来保证应用Windows Sockets API的
+应用程序能够在任何网络软件供应商的符合Windows Sockets协议的实现上工作。因
+此这份规范定义了应用程序开发者能够使用，并且网络软件供应商能够实现的一套
+库函数调用和相关语义。
+        遵守这套Windows Sockets规范的网络软件，我们称之为Windows Sockets兼容
+的，而Windows Sockets兼容实现的提供者，我们称之为Windows Sockets提供者。
+一个网络软件供应商必须百分之百地实现Windows Sockets规范才能做到现
+Windows Sockets兼容。
+        任何能够与Windows Sockets兼容实现协同工作的应用程序就被认为是具有
+Windows Sockets接口。我们称这种应用程序为Windows Sockets应用程序。
+        Windows Sockets规范定义并记录了如何使用API与Internet协议族（IPS，通常
+我们指的是TCP/IP）连接，尤其要指出的是所有的Windows Sockets实现都支持流
+套接口和数据报套接口.
+    应用程序调用Windows Sockets的API实现相互之间的通讯。Windows Sockets
+又利用下层的网络通讯协议功能和操作系统调用实现实际的通讯工作。它们之间的 
+
+
+发信人: cooliu (苦瓜), 信区: Winsock       
+
+2.2 套接口
+
+2.2.1 基本概念
+        通讯的基石是套接口，一个套接口是通讯的一端。在这一端上你可以找到与其
+对应的一个名字。一个正在被使用的套接口都有它的类型和与其相关的进程。套接
+口存在于通讯域中。通讯域是为了处理一般的线程通过套接口通讯而引进的一种抽
+象概念。套接口通常和同一个域中的套接口交换数据（数据交换也可能穿越域的界
+限，但这时一定要执行某种解释程序）。Windows Sockets规范支持单一的通讯域，
+即Internet域。各种进程使用这个域互相之间用Internet协议族来进行通讯（Windows
+Sockets 1.1以上的版本支持其他的域，例如Windows Sockets 2）。
+        套接口可以根据通讯性质分类；这种性质对于用户是可见的。应用程序一般仅
+在同一类的套接口间通讯。不过只要底层的通讯协议允许，不同类型的套接口间也
+照样可以通讯。
+        用户目前可以使用两种套接口，即流套接口和数据报套接口。流套接口提供了
+双向的，有序的，无重复并且无记录边界的数据流服务。数据报套接口支持双向的
+数据流，但并不保证是可靠，有序，无重复的。也就是说，一个从数据报套接口接
+收信息的进程有可能发现信息重复了，或者和发出时的顺序不同。数据报套接口的
+一个重要特点是它保留了记录边界。对于这一特点，数据报套接口采用了与现在许
+多包交换网络（例如以太网）非常类似的模型。
+
+2.2.2 客户机/服务器模型
+        一个在建立分布式应用时最常用的范例便是客户机/服务器模型。在这种方案中
+客户应用程序向服务器程序请求服务。这种方式隐含了在建立客户机/服务器间通讯
+时的非对称性。客户机/服务器模型工作时要求有一套为客户机和服务器所共识的惯
+例来保证服务能够被提供（或被接受）。这一套惯例包含了一套协议。它必须在通
+讯的两头都被实现。根据不同的实际情况，协议可能是对称的或是非对称的。在对
+称的协议中，每一方都有可能扮演主从角色；在非对称协议中，一方被不可改变地
+认为是主机，而另一方则是从机。一个对称协议的例子是Internet中用于终端仿真的
+TELNET。而非对称协议的例子是Internet中的FTP。无论具体的协议是对称的或是
+非对称的，当服务被提供时必然存在“客户进程”和“服务进程”。
+        一个服务程序通常在一个众所周知的地址监听对服务的请求，也就是说，服务
+进程一直处于休眠状态，直到一个客户对这个服务的地址提出了连接请求。在这个
+时刻，服务程序被“惊醒”并且为客户提供服务－对客户的请求作出适当的反应。
+这一请求/相应的过程可以简单的用图2-1表示。虽然基于连接的服务是设计客户机
+/服务器应用程序时的标准，但有些服务也是可以通过数据报套接口提供的。
+
+
+2.2.3 带外数据
+        注意：以下对于带外数据（也称为TCP紧急数据）的讨论，都是基于BSD模型
+而言的。用户和实现者必须注意，目前有两种互相矛盾的关于RFC 793的解释，也
+就是在这基础上，带外数据这一概念才被引入的。而且BSD对于带外数据的实现并
+没有符合RFC 1122定下的主机的要求，为了避免互操作时的问题，应用程序开发
+者最好不要使用带外数据，除非是与某一既成事实的服务互操作时所必须的。
+Windows Sockets提供者也必须提供他们的产品对于带外数据实现的语义的文挡（采
+用BSD方式或者是RFC 1122方式）。规定一个特殊的带外数据语义集已经超出了
+Windows Sockets规范的讨论范围。
+        流套接口的抽象中包括了带外数据这一概念，带外数据是相连的每一对流套接
+口间一个逻辑上独立的传输通道。带外数据是独立于普通数据传送给用户的，这一
+抽象要求带外数据设备必须支持每一时刻至少一个带外数据消息被可靠地传送。这
+一消息可能包含至少一个字节；并且在任何时刻仅有一个带外数据信息等候发送。
+对于仅支持带内数据的通讯协议来说（例如紧急数据是与普通数据在同一序列中发
+送的），系统通常把紧急数据从普通数据中分离出来单独存放。这就允许用户可以
+在顺序接收紧急数据和非顺序接收紧急数据之间作出选择（非顺序接收时可以省去
+缓存重叠数据的麻烦）。在这种情况下，用户也可以“偷看一眼”紧急数据。
+        某一个应用程序也可能喜欢线内处理紧急数据，即把其作为普通数据流的一部
+分。这可以靠设置套接口选项中的SO_OOBINLINE来实现（参见5.1.21节，
+setsockopt()）。在这种情况下，应用程序可能希望确定未读数据中的哪一些是“紧
+急”的（“紧急”这一术语通常应用于线内带外数据）。为了达到这个目的，在
+Windows Sockets的实现中就要在数据流保留一个逻辑记号来指出带外数据从哪一
+点开始发送，一个应用程序可以使用SIOCATMARK ioctlsocket()命令（参见5.1.12
+节）来确定在记号之前是否还有未读入的数据。应用程序可以使用这一记号与其对
+方进行重新同步。
+        WSAAsyncSelect()函数可以用于处理对带外数据到来的通知。
+
+2.2.4 广播
+        数据报套接口可以用来向许多系统支持的网络发送广播数据包。要实现这种功
+能，网络本身必须支持广播功能，因为系统软件并不提供对广播功能的任何模拟。
+广播信息将会给网络造成极重的负担，因为它们要求网络上的每台主机都为它们服
+务，所以发送广播数据包的能力被限制于那些用显式标记了允许广播的套接口中。
+广播通常是为了如下两个原因而使用的：1. 一个应用程序希望在本地网络中找到一
+个资源，而应用程序对该资源的地址又没有任何先验的知识。2. 一些重要的功能，
+例如路由要求把它们的信息发送给所有可以找到的邻机。
+        被广播信息的目的地址取决于这一信息将在何种网络上广播。Internet域中支持
+一个速记地址用于广播－INADDR_BROADCAST。由于使用广播以前必须捆绑一个
+数据报套接口，所以所有收到的广播消息都带有发送者的地址和端口。
+        某些类型的网络支持多种广播的概念。例如IEEE802.5令牌环结构便支持链接
+层广播指示，它用来控制广播数据是否通过桥接器发送。Windows Sockets规范没有
+提供任何机制用来判断某个应用程序是基于何种网络之上的，而且也没有任何办法
+来控制广播的语义。
+
+2.3 字节顺序
+        Intel处理器的字节顺序是和DEC VAX处理器的字节顺序一致的。因此它与
+68000型处理器以及Internet的顺序是不同的，所以用户在使用时要特别小心以保证
+正确的顺序。
+        任何从Windows Sockets函数对IP地址和端口号的引用和传送给Windows
+Sockets函数的IP地址和端口号均是按照网络顺序组织的，这也包括了sockaddr_in
+结构这一数据类型中的IP地址域和端口域（但不包括sin_family域）。
+        考虑到一个应用程序通常用与“时间”服务对应的端口来和服务器连接，而服
+务器提供某种机制来通知用户使用另一端口。因此getservbyname()函数返回的端口
+号已经是网络顺序了，可以直接用来组成一个地址，而不需要进行转换。然而如果
+用户输入一个数，而且指定使用这一端口号，应用程序则必须在使用它建立地址以
+前，把它从主机顺序转换成网络顺序（使用htons()函数）。相应地，如果应用程序
+希望显示包含于某一地址中的端口号（例如从getpeername()函数中返回的），这一
+端口号就必须在被显示前从网络顺序转换到主机顺序（使用ntohs()函数）。
+        由于Intel处理器和Internet的字节顺序是不同的，上述的转换是无法避免的，应
+用程序的编写者应该使用作为Windows Sockets API一部分的标准的转换函数，而不
+要使用自己的转换函数代码。因为将来的Windows Sockets实现有可能在主机字节顺
+序与网络字节顺序相同的机器上运行。因此只有使用标准的转换函数的应用程序是
+
+
+
+发信人: cooliu (苦瓜), 信区: Winsock       
+
+可移植的。
+2.4 套接口属性选项
+        Windows Sockets规范支持的套接口属性选项都列在对setsockopt()函数和
+getsockopt()函数的叙述中。任何一个Windows Sockets实现必须能够识别所有这些属
+性选项，并且对每一个属性选项都返回合理的数值。每一个属性选项的缺省值列在
+下表中：
+        选项           类型    含义                    缺省值    注意事项
+        SO_ACCEPTCON   BOOL    套接口正在监听。        FALSE
+        SO_BROADCAST   BOOL    套接口被设置为可以      FALSE
+                                                   发送广播数据。
+        SO_DEBUG       BOOL    允许Debug。             FALSE      (*)
+        S0_DONTLINGER  BOOL    如果为真，SO_LINGER     TRUE
+                                                   选项被禁止。
+        SO_DONTROUTE   BOOL    路由被禁止。            FALSE      (*)
+        SO_ERROR       int     得到并且清除错误状态。  0
+        SO_KEEPALIVE   BOOL    活跃信息正在被发送。    FALSE
+        SO_LINGER      struct  返回目前的linger信息。  l_onoff
+                                   linger                          为0
+                                   FAR *
+        SO_OOBINLINE   BOOL    带外数据正在普通数据流  FALSE
+                                                   中被接收。
+        SO_RCVBUF      int     接收缓冲区大小。        决定于实现  (*)
+        SO_REUSEADDR   BOOL    该套接口捆绑的地址      FALSE
+                                                   是否可被其他人使用。
+        SO_SNDBUF      int     发送缓冲区大小。        决定于实现  (*)
+        SO_TYPE        int     套接口类型（如          和套接口被
+                                                   SOCK_STREAM）。         创
+建?br /> 一致
+        TCP_NODELAY    BOOL    禁止采用Nagle      决定于实现
+                              进行合并传送。
+        (*) Windows Sockets实现有可能在用户调用setsockopt()函数时忽略这些属性
+，?br /> 
+且在用户调用getsockopt()函数时返回一个没有变化的值。或者它可能在setsockopt()
+
+时接受某个值，并且在getsockopt()时返回相应的数值，但事实上并没有在任何地方
+使用它。
+2.5 数据库文件
+        getXbyY()和WSAAyncGetXByY()这一类的例程是用来得到某种特殊的网络信
+息的。getXbyY()例程最初（在第一版的BERKELY UNIX中）是被设计成一种在文
+本数据库中查询信息的机制。虽然Windows Sockets实现可能用不同的方式来得到这
+些信息，但Windows Sockets应用程序要求通过getXbyY()或WSAAyncGetXByY()这
+一类例程得到的信息是一致。
+2.6 与Berkeley套接口的不同
+        有一些很有限的地方，Windows Sockets API必须与从严格地坚持Berkeley传统
+
+风格中解放出来。通常这么做是因为在Windows环境中实现的难度。
+2.6.1 套接口数据类型和错误数值
+        Windows Sockets规范中定义了一个新的数据类型SOCKET，这一类型的定义对
+于将来Windows Sockets规范的升级是必要的。例如在Windows NT中把套接口作为
+文件句柄来使用。这一类型的定义也保证了应用程序向Win/32环境的可移植性。因
+为这一类型会自动地从16位升级到32位。
+        在UNIX中所有句柄包括套接口句柄，都是非负的短整数，而且一些应用程序
+把这一假设视为真理。Windows Sockets句柄则没有这一限制，除了
+INVALID_SOCKET不是一个有效的套接口外，套接口可以取从0到
+INVALID_SOCKET-1之间的任意值。
+因为SOCKET类型是unsigned，所以编译已经存在于UNIX环境中的应用程序的源
+代码可能会导致signed/unsigned数据类型不匹配的警告。
+        这还意味着，在socket()例程和accept()例程返回时，检查是否有错误发生就
+不应
+该再使用把返回值和-1比较的方法，或判断返回值是否为负（这两种方法在BSD中
+都是很普通，很合法的途径）。取而代之的是，一个应用程序应该使用常量
+INVALID_SOCKET，该常量已在WINSOCK.H中定义。
+        例如：
+                  典型的BSD风格：
+                  s = socket(...);
+                  if (s == -1)       /* of s<0 */
+                         {...}
+                  更优良的风格：
+                  s = socket(...);
+                  if (s == INVALID_SOCKET)
+                         {...}
+2.6.2 select()函数和FD_*宏
+        由于一个套接口不再表示了UNIX风格的小的非负的整数，select()函数在
+Windows Sockets API中的实现有一些变化：每一组套接口仍然用fd_set类型来代
+表，但是它并不是一个位掩码。整个组的套接口是用了一个套接口的数组来实现的。
+为了避免潜在的危险，应用程序应该坚持用FD_XXX宏来设置，初始化，清除和检
+查fd_set结构。
+2.6.3 错误代码－errno,h_errno,WSAGetLastError()
+        Windows Sockets实现所设置的错误代码是无法通过errno变量得到的。另外对
+
+于getXbyY()这一类的函数，错误代码无法从h_errno变量得到。错误代码可以使用
+WSAGetLastError()调用得到。这一函数在5.3.11中讨论。这个函数在Windows Sockets
+
+实现中是作为WIN/32函数GetLastError()的先导函数（最终是一个别名）。这样做
+是为了在多线程的进程中为每一线程得到自己的错误信息提供可靠的保障。
+        为了保持与BSD的兼容性，应用程序可以加入以下一行代码：
+                #define errno WSAGetLastError()
+        这就保证了用全程的errno变量所写的网络程序代码在单线程环境中可以正确
+使用。当然，这样做有许多明显的缺点：如果一个原程序包含了一段代码对套接口
+和非套接口函数都用errno变量来检查错误，那么这种机制将无法工作。此外，一
+个应用程序不可能为errno赋一个新的值（在Windows Sockets中，WSASetLastError()
+函数可以做到这一点）。
+        例如：
+                典型的BSD风格：
+                r = recv(...);
+                if (r == -1                             /* 但请见下文 */
+                        && errno == EWOULDBLOCK)
+                   {...}
+                更优良的风格：
+                r = recv(...);
+                if (r == -1                              /* 但请见下文 */
+                        && WSAGetLastError() == EWOULDBLOCK)
+                   {...}
+        虽然为了兼容性原因，错误常量与4.3BSD所提供的一致；应用程序应该尽可能
+
+地使用“WSA”系列错误代码定义。例如，一个更准确的上面程序片断的版本应该
+是：
+                r = recv(...);
+                if (r == -1                                 /* 但请见下文 */
+
+                        && WSAGetLastError() == WSAEWOULDBLOCK)
+                   {...}
+2.6.4 指针
+        所有应用程序与Windows Sockets使用的指针都必须是FAR指针，为了方便应
+用程序开发者使用，Windows Sockets规范定义了数据类型LPHOSTENT。
+2.6.5 重命名的函数
+        有两种原因Berkeley套接口中的函数必须重命名以避免与其他的API冲突：
+2.6.5.1 close()和closesocket()
+        在Berkeley套接口中，套接口出现的形式与标准文件描述字相同，所以close(
+)
+函数可以用来和关闭正规文件一样来关闭套接口。虽然在Windows Sockets API中，
+没有任何规定阻碍Windows Sockets实现用文件句柄来标识套接口，但是也没有任何
+规定要求这么做。套接口描述字并不认为是和正常文件句柄对应的,而且并不能认为
+文件操作，例如read()，write()和close()在应用于套接口后不能保证正确工作。套接
+
+口必须使用closesocket()例程来关闭，用close()例程来关闭套接口是不正确的，这样
+
+做的效果对于Windows Sockets规范说来也是未知的。
+2.6.5.2 ioctl()和iooctlsocket()
+        许多C语言的运行时系统出于与Windows Sockets无关的目的使用ioctl()例程，
+
+所以Windows Sockets定义ioctlsocket()例程。它被用于实现BSD中用ioctl()和fcntl(
+)
+实现的功能。
+2.6.6 阻塞例程和EINPROGRESS宏
+        虽然Windows Sockets支持关于套接口的阻塞操作，但是这种应用是被强烈反对
+
+的.如果程序员被迫使用阻塞模式（例如一个准备移植的已有的程序），那么他应该
+清楚地知道Windows Sockets中阻塞操作的语义。有关细节请参见4.1.1
+2.6.7 Windows Sockets支持的最大套接口数目
+        一个特定的Windows Sockets提供者所支持的套接口的最大数目是由实现确定
+的。任何一个应用程序都不应假设某个待定数目的套接口可用。这一点在4.3.15
+WSAStartup()中会被重申。而且一个应用程序可以真正使用的套接口的数目和某一
+特定的实现所支持的数目是完全无关的。
+        一个Windows Sockets应用程序可以使用的套接口的最大数目是在编译时由常量
+
+FD_SETSIZE决定的。这个常量在select()函数（参见4.1.18）中被用来组建fd_set
+结构。在WINSOCK.H中缺省值是64。如果一个应用程序希望能够使用超过64个
+套接口，则编程人员必须在每一个源文件包含WINSOCK.H前定义确切的FD_SET
+值。有一种方法可以完成这项工作，就是在工程项目文件中的编译器选项上加入这
+一定义。例如在使用Microsoft C时加入-D FD_SETSIZE=128作为编译命令的一个
+命令行参数.要强调的是：FD_SET定义的值对Windows Sockets实现所支持的套接
+口的数目并无任何影响。
+2.6.8 头文件
+为了方便基于Berkeley套接口的已有的源代码的移植，Windows Sockets支持许多
+Berkeley头文件。这些Berkeley头文件被包含在WINSOCK.H中。所以一个Windows
+Sockets应用程序只需简单的包含WINSOCK.H就足够了（这也是一种被推荐使用的
+方法）。
+2.6.9 API调用失败时的返回值
+        常量SOCKET_ERROR是被用来检查API调用失败的。虽然对这一常量的使用
+并不是强制性的，但这是推荐的。如下的例子表明了如何使用SOCKET_ERROR常
+量
+                典型的BSD风格：
+                r = recv(...);
+                if (r == -1                 /* or r < 0 */
+                        && errno == EWOULDBLOCK)
+                   {...}
+                更优良的风格：
+                r = recv(...);
+                if (r == SOCKET_ERROR
+                        && WSAGetLastError == WSAEWOULDBLOCK)
+                   {...}
+2.6.10 原始套接口
+        Windows Sockets规范并没有规定Windows Sockets DLL必须支持原始套接口－
+
+用SOCK_RAW打开的套接口。然而Windows Sockets规范鼓励Windows Sockets DLL
+提供原始套接口支持。一个Windows Sockets兼容的应用程序在希望使用原始套接口
+时应该试图用socket()调用（参见5.1.23节）来打开套接口。如果这么做失败了，应
+用程序则应该使用其他类型的套接口或向用户报告错误。
+2.7 在多线程Windows版本中的Windows Sockets
+        Windows Sockets接口被设计成既能够在单线程的Windows版本（例如Windows
+3.1）又能够在占先的多线程Windows版本（例如Windows NT）中使用，在多线程
+环境中，套接口接口基本上是不变的。但多线程应用程序的作者必须知道，在线程
+之间同步对套接口的使用是应用程序的责任，而不是Windows Sockets实现的责任。
+这一点在其他形式的I/O中管理，例如文件I/O中是一样的。没有对套接口调用进行
+同步将导致不可预测的结果。例如，如果有两个线程同时调用同一套接口进行
+send()，那么数据发送的先后顺序就无法保证了。
+        在一个线程中关闭一个未完成的阻塞的套接口将会导致另一个线程使用同一套
+
+接口的阻塞调用出错（WSAEINTER）返回，就象操作被取消一样。这也同样适用
+于某一个select()调用未完成时，应用程序关闭了其中的一个被选择的套接口。
+        在占先的多线程Windows版本中，并没有缺省的阻塞钩子函数。这是因为如果
+一个单一的应用程序在等待某一操作结束时并不会调用PeekMessage()或
+GetMessage()这些会使应用程序产生一个非占先窗口的函数。因此机器在这种情况下
+不会被阻塞。然而，为了向后的兼容性，在多线程Windows版本中，
+WSASetBlockingHook()函数也被实现了。任何使用缺省阻塞钩子的应用程序可以安
+装它们自己的阻塞钩子函数来覆盖缺省的阻塞钩子函数。
+第三章 Windows Sockets 1.1应用实例
+    在本章中，作者的实际工作为背景，给出了一个使用Windows Sockets 1.1编程
+的具体例子。并对这个例子作了详细的分析。这个例子在Windows 3.1、Windows
+Sockets 1.1和BSD OS for PC 2.0（BSD UNIX微机版）环境下调试通过。
+3.1 套接口网络编程原理
+        套接口有三种类型:流式套接口,数据报套接口及原始套接口.
+    流式套接口定义了一种可靠的面向连接的服务,实现了无差错无重复的顺序数
+据传输.数据报套接口定义了一种无连接的服务,数据通过相互独立的报文进行传输,
+是无序的,并且不保证可靠,无差错.原始套接口允许对低层协议如IP或ICMP直接访
+问,主要用于新的网络协议实现的测试等.
+    无连接服务器一般都是面向事务处理的，一个请求一个应答就完成了客户程序
+与服务程序之间的相互作用。若使用无连接的套接口编程，程序的流程可以用图3-
+1表示。
+    面向连接服务器处理的请求往往比较复杂，不是一来一去的请求应答所能解决
+的，而且往往是并发服务器。使用面向连接的套接口编程,可以通过图3-1来表示:其
+时序。
+        套接口工作过程如下:服务器首先启动,通过调用socket()建立一个套接口,然后
+
+调用bind()将该套接口和本地网络地址联系在一起,再调用listen()使套接口做好侦听 
+
+
+
+发信人: cooliu (苦瓜), 信区: Winsock       
+
+的准备,并规定它的请求队列的长度,之后就调用accept()来接收连接.客户在建立套
+接口后就可调用connect()和服务器建立连接.连接一旦建立,客户机和服务器之间就
+可以通过调用read()和write()来发送和接收数据.最后,待数据传送结束后,双方调用
+close()关闭套接口.
+3.2 Windows Sockets编程原理
+        由于Windows的基于消息的特点,WINSOCK和BSD套接口相比,有如下一些新
+的扩充:
+        1.异步选择机制
+                异步选择函数WSAAsyncSelect()允许应用程序提名一个或多个感兴趣
+的网
+络事件,如FD_READ,FD_WRITE,FD_CONNECT,FD_ACCEPT等等代表的网络事
+件.当被提名的网络事件发生时,Windows应用程序的窗口函数将收到一个消息.这样
+就可以实现事件驱动了.
+        2.异步请求函数
+                异步请求函数允许应用程序用异步方式获得请求的信息,如
+WSAAsyncGetXByY()类函数. 这些函数是对BSD标准函数的扩充.函数
+WSACancelAsyncRequest()允许用户中止一个正在执行的异步请求.
+        3.阻塞处理方法
+                WINSOCK提供了"钩子函数"负责处理Windows消息,使Windows的消息循
+
+环能够继续.WINSOCK提供了两个函数(WSASetBlockingHook()和
+WSAUnhookBlockingHook())让应用程序设置或取消自己的"钩子函数".函数
+WSAIsBlocking()可以检测是否阻塞,函数WSACancelBlockingCall()可以取消一个
+阻塞的调用.
+        4.错误处理
+                WINSOCK提供了两个WSAGetLastError()和WSASetLastError()来获取和
+
+设置最近错误号.
+        5.启动和终止
+                由于Windows Sockets的服务是以动态连接库WINSOCK.DLL形式实现的
+,
+所以必须要先调用WSAStartup()函数对Windows Sockets DLL进行初始化,协商
+WINSOCK的版本支持,并分配必要的资源.在应用程序关闭套接口后,还应调用
+WSACleanup()终止对Windows Sockets DLL的使用,并释放资源,以备下一次使用.
+        在这些函数中,实现Windows网络实时通信的关键是异步选择函数
+WSAAsyncSelect()的使用. 用法及详细说明参见第5.3.7.
+3.3 Windows Sockets与UNIX套接口编程实例
+        下面是一个简单的基于连接的点对点实时通信程序.它由两部分组成,服务器在
+
+主机UNIX下直接运行, 客户机在Windows下运行.
+3.3.1 SERVER介绍
+        由于SERVER是在UNIX下运行的,它对套接口的使用都是BSD的标准函数,程序
+也比较简单, 只有一段程序,下面简要解释一下.
+        首先,建立自己的套接口.在互连网的进程通信中,全局标识一个进程需要一个被
+
+称为"半相关"的三元组(协议,本地主机地址,本地端口号)来描述,而一个完整的进程
+通信实例则需要一个被称为"相关"的五元组(协议, 本地主机地址,本地端口号,远端
+主机地址,远端端口号)来描述.
+        s=socket(AF_INET, SOCK_STREAM, 0)
+        该函数建立指定地址格式,数据类型和协议下的套接口,地址格式为AF_INET(唯
+
+一支持的格式),数据类型SOCK_STREAM表示建立流式套接口,参数三为0,即协议
+缺省.
+        bind(s, (struct sockaddr *)&server, sizeof(server))
+        该函数将建立服务器本地的半相关,其中,server是sockaddr_in结构,其成员描
+述
+了本地端口号和本地主机地址,经过bind()将服务器进程在网上标识出来.
+        然后,建立连接.先是调用listen()函数表示开始侦听.再通过accept()调用等待
+接
+收连接.
+        listen(s,1)表示连接请求队列长度为1,即只允许有一个请求,若有多个请求,则
+出
+现错误,给出错误代码WSAECONNREFUSED.
+        ns = accept(s, (struct sockaddr *)&client, &namelen))
+        accept()阻塞(缺省)等待请求队列中的请求,一旦有连接请求来,该函数就建立
+一
+个和s有相同属性的新的套接口.client也是一个sockaddr_in结构,连接建立时填入请
+求连接的套接口的半相关信息.
+        接下来,就可以接收和发送数据了.
+        recv(ns,buf,1024,0)
+        send(ns,buf,pktlen,0)
+        上面两个函数分别负责接收和发送数据,recv从ns(建立连接的套接口)接收数据
+
+放入buf中,send则将buf中数据发送给ns.至于第四个参数,表示该函数调用方式,可
+选择MSG_DONTROUTE和MSG_OOB, 0表示缺省.
+        最后,关闭套接口.
+        close(ns);
+        close(s);
+3.3.2 CLIENT介绍
+        客户端是在Windows上运行的,使用了一些Windows Sockets的扩展函数,稍微
+复杂一些.包括了.RC和.C两个文件,其中的主窗口函数ClientProc()是程序的主要部
+分,下面简单解释一下.
+        首先,是在WinMain()中建立好窗口后,即向主窗口函数发一条自定义的
+WM_USER消息, 做相关的准备工作.在主窗口函数中,一接收到WM_USER消息,首
+先调用WSAStartup()函数初始化Windows Sockets DLL,并检查版本号.如下:
+        Status = WSAStartup(VersionReqd, lpmyWSAData);
+        其中,VersionReqd描述了WINSOCK的版本(这里为1.1版),lpmyWSAData指向
+一个WSADATA结构,该结构描述了Windows Sockets的实现细节.
+        WSAStartup()之后,进程通过主机名(运行时命令行参数传入)获取主机地址,如
+
+下:
+        hostaddr = gethostbyname(server_address);
+        hostaddr指向hostent结构,内容参见5.2.1.
+        然后,进程就不断地消息循环,等待用户通过菜单选择"启动".这时,通过调用
+Client()来启动套接口.在Client()中,首先也是调用socket()来建立套接口.如下:
+        if ((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+        {
+                AlertUser(hWnd, "Socket Failed");
+                return (FALSE);
+        }
+        紧接着,调用WSAAsyncSelect()函数提名FD_CONNECT网络事件,如下:
+        if (!SetSelect(hWnd, FD_CONNECT))
+                return (FALSE);
+        SetSelect()主要就是调用WSAASyncSelect(),让Windows Sockets DLL在侦测
+到连接建立时,就发送一条UM_SOCK的自定义消息,使消息循环继续下去.如下:
+        BOOL SetSelect(HWND hWnd, long lEvent)
+        {
+                if (WSAAsyncSelect(s, hWnd, UM_SOCK, lEvent) == SOCKET_ERROR
+)
+                {
+                        AlertUser(hWnd, "WSAAsyncSelect Failure.");
+                        return (FALSE);
+                }
+                return (TRUE);
+        }
+        为建立连接,必须马上调用connect()如下,由于先调用了
+WSAASyncSelect(),connect()便是非阻塞调用.进程发出连接请求后就不管了,当连
+接建立好后,WINSOCK DLL自动发一条消息给主窗口函数,以使程序运行下去.
+        connect(s, (struct sockaddr FAR *)&dst_addr, sizeof(dst_addr));
+        窗口函数在收到UM_SOCK消息后,判断是由哪个网络事件引起的,第一次,必然
+是由连接事件引起的,这样,就会执行相应的程序段,同样调用SetSelect()来提名
+FD_WRITE事件.希望在套接口可发送数据时接到消息.在收到FD_WRITE消息时,
+先调用send()发送数据,再调用SetSelect()来提名FD_READ事件, 希望在套接口可
+接收数据是接到消息.在收到FD_READ消息时,先调用recv()来接收数据再提名
+FD_WRITE事件,如此循环下去.直到发生连接关闭的事件FD_CLOSE,这时就调用
+WSAAsyncSelect(s,hWnd,0,0)来停止异步选择.在窗口函数接到WM_DESTROY消
+息时(即关闭窗口之前),先调用closesocket()(作用同UNIX 中的close())来关闭套接
+口,再调用WSACleanup()终止Windows Sockets DLL,并释放资源.
+3.3.3 源程序清单
+程序1:CLIENT.RC
+ClientMenu MENU
+BEGIN
+        POPUP "&Server"
+        BEGIN
+                MENUITEM "&Start...", 101
+                MENUITEM "&Exit",  102
+        END
+END
+程序2:CLIENT.C
+#define USERPORT 10001
+#define IDM_START 101
+#define IDM_EXIT  102
+#define UM_SOCK WM_USER + 0X100
+#include <alloc.h>
+#include <mem.h>
+#include <windows.h>
+#include <winsock.h>
+#define MAJOR_VERSION 1
+#define MINOR_VERSION 2
+#define WSA_MAKEWORD(x,y)  ((y)*256+(x))
+HANDLE hInst;
+char server_address[256] = {0};
+char buffer[1024];
+char FAR * lpBuffer = &buffer[0];
+SOCKET s = 0;
+struct sockaddr_in dst_addr;
+struct hostent far *hostaddr;
+struct hostent hostnm;
+struct servent far *sp;
+int count = 0;
+BOOL InitApplication(HINSTANCE hInstance);
+long FAR PASCAL ClientProc(HWND hWnd, unsigned message, UINT wParam, LONG
+lParam);
+void AlertUser(HWND hWnd, char *message);
+BOOL Client(HWND hWnd);
+BOOL ReceivePacket(HWND hWnd);
+BOOL SetSelect(HWND hWnd, long lEvent);
+BOOL SendPacket(HWND hWnd, int len);
+int PASCAL WinMain(HANDLE hInstance, HANDLE hPrevInstance, LPSTR lpCmdLine,
+int nCmdShow)
+{
+        HWND hWnd;
+        MSG msg;
+        lstrcpy((LPSTR)server_address, lpCmdLine);
+        if (!hPrevInstance)
+                if (!InitApplication(hInstance))
+                        return (FALSE);
+        hInst = hInstance;
+        hWnd = CreateWindow("ClientClass", "Windows ECHO Client",
+WS_OVERLAPPEDWINDOW,\
+                CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+CW_USEDEFAULT, NULL, NULL,\
+                hInstance, NULL);
+        if (!hWnd)
+                return (FALSE);
+        ShowWindow(hWnd, nCmdShow);
+        UpdateWindow(hWnd);
+        PostMessage(hWnd, WM_USER, (WPARAM)0, (LPARAM)0);
+        while (GetMessage(&msg, NULL, NULL, NULL))
+        {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+        }
+        return (msg.wParam);
+}
+BOOL InitApplication(HINSTANCE hInstance)
+{
+    WNDCLASS WndClass;
+        char *szAppName = "ClientClass";
+    // fill in window class information
+        WndClass.lpszClassName = (LPSTR)szAppName;
+        WndClass.hInstance     = hInstance;
+        WndClass.lpfnWndProc   = ClientProc;
+        WndClass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+        WndClass.hIcon         = LoadIcon(hInstance, NULL);
+        WndClass.lpszMenuName  = "ClientMenu";
+        WndClass.hbrBackground = GetStockObject(WHITE_BRUSH);
+        WndClass.style         = CS_HREDRAW | CS_VREDRAW;
+        WndClass.cbClsExtra    = 0;
+        WndClass.cbWndExtra    = 0;
+    // register the class
+    if (!RegisterClass(&WndClass))
+                return(FALSE);
+    return(TRUE);
+}
+long FAR PASCAL ClientProc(HWND hWnd, unsigned message, UINT wParam, LONG
+lParam)
+{
+        int length, i;
+        WSADATA wsaData;
+        int Status;
+        switch (message)
+        {
+                case WM_USER:
+                {
+                        WORD    wMajorVersion, wMinorVersion;
+                        LPWSADATA       lpmyWSAData;
+                        WORD            VersionReqd;
+                        int                     ret;
+                        wMajorVersion = MAJOR_VERSION;
+                        wMinorVersion = MINOR_VERSION;
+                        VersionReqd = WSA_MAKEWORD(wMajorVersion,wMinorVersi
+on);
+                        lpmyWSAData = (LPWSADATA)malloc(sizeof(WSADATA));
+                        Status = WSAStartup(VersionReqd, lpmyWSAData);
+                        if (Status != 0)
+                        {
+                                AlertUser(hWnd, "WSAStartup() failed\n");
+                                PostQuitMessage(0);
+                        }
+                        hostaddr = gethostbyname(server_address);
+                        if (hostaddr == NULL)
+                        {
+                                AlertUser(hWnd, "gethostbyname ERROR!\n");
+                                WSACleanup();
+                                PostQuitMessage(0);
+                        }
+                        _fmemcpy(&hostnm, hostaddr, sizeof(struct hostent));
+
+                }
+                        break;
+                case WM_COMMAND:
+                        switch (wParam)
+                        {
+                                case IDM_START:
+                                        if (!Client(hWnd))
+                                        {
+                                                closesocket(s);
+                                                AlertUser(hWnd, "Start Faile
+d");
+                                        }
+                                        break;
+                                case IDM_EXIT:
+//                                      WSACleanup();
+                                        PostQuitMessage(0);
+                                        break;
+                        }
+                        break;
+                case UM_SOCK:
+                        switch (lParam)
+                        {
+                                case FD_CONNECT:
+                                        if (!SetSelect(hWnd, FD_WRITE))
+                                                closesocket(s);
+                                        break;
+                                case FD_READ:
+                                        if (!ReceivePacket(hWnd))
+                                        {
+                                                AlertUser(hWnd, "Receive Pac
+ket
+ailed.\n");
+                                                closesocket(s);
+                                                break;
+                                        }
+                                        if (!SetSelect(hWnd, FD_WRITE))
+                                                closesocket(s);
+                                        break;
+                                case FD_WRITE:
+                                        for (i = 0; i < 1024; i ++)
+                                                buffer[i] = (char)'A' + i % 
+26;
+                                        length = 1024;
+                                        if (!SendPacket(hWnd, length))
+                                        {
+                                                AlertUser(hWnd, "Packet Send
+ Fai
+ed!\n");
+                                                closesocket(s);
+                                                break;
+                                        }
+                                        if (!SetSelect(hWnd, FD_READ))
+                                                closesocket(s);
+                                        break;
+                                case FD_CLOSE:
+                                        if (WSAAsyncSelect(s, hWnd, 0, 0) ==
+ SOC
+ET_ERROR)
+                                                AlertUser(hWnd, "WSAAsyncSel
+ect
+ailed.\n");
+                                        break;
+                                default:
+                                        if (WSAGETSELECTERROR(lParam) != 0)
+                                        {
+                                                AlertUser(hWnd, "Socket Repo
+rt F
+ilure.");
+                                                closesocket(s);
+                                                break;
+                                        }
+                                        break;
+            }
+                        break;
+                case WM_DESTROY:
+                        closesocket(s);
+                        WSACleanup();
+                        PostQuitMessage(0);
+                        break;
+                default:
+                        return (DefWindowProc(hWnd, message, wParam, lParam)
+);
+  
+
+
+发信人: cooliu (苦瓜), 信区: Winsock       
+
+
+        }
+        return(NULL);
+}
+void AlertUser(HWND hWnd, char *message)
+{
+        MessageBox(hWnd, (LPSTR)message, "Warning", MB_ICONEXCLAMATION);
+        return;
+}
+BOOL Client(HWND hWnd)
+{
+        memset(&dst_addr,'\0', sizeof (struct sockaddr_in));
+        _fmemcpy((char  FAR *)&dst_addr.sin_addr,(char  FAR
+*)hostnm.h_addr,hostnm.h_length);
+        dst_addr.sin_family = hostnm.h_addrtype;
+        dst_addr.sin_port = htons(USERPORT);
+        if ((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+        {
+                AlertUser(hWnd, "Socket Failed");
+                return (FALSE);
+        }
+        if (!SetSelect(hWnd, FD_CONNECT))
+                return (FALSE);
+        connect(s, (struct sockaddr FAR *)&dst_addr, sizeof(dst_addr));
+        return (TRUE);
+}
+BOOL ReceivePacket(HWND hWnd)
+{
+        HDC hDc;
+        int length;
+        int i1,i2,i3;
+        char line1[255], line2[255], line3[255];
+        count ++;
+        if ((length = recv(s, lpBuffer, 1024, 0)) == SOCKET_ERROR)
+                return (FALSE);
+        if (length == 0)
+                return (FALSE);
+        if (hDc = GetDC(hWnd))
+        {
+                i1 = wsprintf((LPSTR)line1, "TCP Echo Client No.%d", count);
+
+                i2 = wsprintf((LPSTR)line2, "Receive %d bytes",length);
+                i3 = wsprintf((LPSTR)line3, "Those are:%c, %c, %c, %c, %c,
+%c",buffer[0],buffer[1],buffer[2],buffer[100],buffer[1000],buffer[1023]);
+                TextOut(hDc, 10, 2, (LPSTR)line1, i1);
+                TextOut(hDc, 10, 22, (LPSTR)line2, i2);
+                TextOut(hDc, 10, 42, (LPSTR)line3, i3);
+                ReleaseDC(hWnd, hDc);
+        }
+        return (TRUE);
+}
+BOOL SetSelect(HWND hWnd, long lEvent)
+{
+        if (WSAAsyncSelect(s, hWnd, UM_SOCK, lEvent) == SOCKET_ERROR)
+        {
+                AlertUser(hWnd, "WSAAsyncSelect Failure.");
+                return (FALSE);
+        }
+        return (TRUE);
+}
+BOOL SendPacket(HWND hWnd, int len)
+{
+        int length;
+        if ((length = send(s, lpBuffer, len, 0)) == SOCKET_ERROR)
+                return (FALSE);
+        else
+        if (length != len)
+        {
+                AlertUser(hWnd, "Send Length NOT Match!");
+                return (FALSE);
+        }
+        return (TRUE);
+}
+程序3:SERVER.C
+#include <sys/types.h>
+#include <sys/mntent.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#define USERPORT 10001
+#define HOST_IP_ADDR "192.1.1.2"
+main(int argc, char **argv)
+{
+        char buf[1024];
+        struct sockaddr_in client;
+        struct sockaddr_in server;
+        int s;
+        int ns;
+        int namelen;
+        int pktlen;
+        if ((s=socket(AF_INET, SOCK_STREAM, 0))<0)
+        {
+                perror("Socket()");
+                return;
+        }
+        bzero((char *)&server,sizeof(server));
+        server.sin_family = AF_INET;
+        server.sin_port = htons(USERPORT);
+        server.sin_addr.s_addr = INADDR_ANY;
+        if (bind(s, (struct sockaddr *)&server, sizeof(server))<0)
+        {
+                perror("Bind()");
+                return;
+        }
+        if (listen(s,1)!=0)
+        {
+                perror("Listen()");
+                return;
+        }
+        namelen = sizeof(client);
+        if ((ns = accept(s, (struct sockaddr *)&client, &namelen)) ==-1)
+        {
+                perror("Accept()");
+                return;
+        }
+        for (;;)
+        {
+                if ((pktlen = recv(ns,buf,1024,0))<0)
+                {
+                        perror("Recv()");
+                        break;
+                }
+                else
+                if (pktlen == 0)
+                {
+                        printf("Recv():return FAILED,connection is shut down
+!\n"
+;
+                        break;
+                }
+                else
+                        printf("Recv():return SUCCESS,packet length = %d\n",
+pktl
+n);
+                sleep(1);
+                if (send(ns,buf,pktlen,0)<0)
+                {
+                        perror("Send()");
+                        break;
+                }
+                else
+                        printf("Send():return SUCCESS,packet length = %d\n",
+pktl
+n);
+        }
+        close(ns);
+        close(s);
+        printf("Server ended successfully\n");
+}
+3.4 另一个精巧的应用程序实例－wshout
+    在本节中，我们通过一个经过精心选择的例子，进一步讨论一下Windows
+Sockets编程技术。例如如何编制客户机或服务器程序，如何应用TCP有连接服务
+（流式套接口）或UDP无连接服务（数据报套接口），如何进行阻塞或非阻塞方式
+的套接口操作等等，这些都是经常碰到的问题。接下来要介绍的wshout程序，可以
+通过灵活地设置不同选项来达到上述应用情况的任意组合，从而基本覆盖了应用
+Windows Sockets编程所可能碰到的问题，具有很好的研究参考价值。
+    由于该程序思路清晰，结构精良，所以我们不打算很详细地剖析每一个语句，
+而只是简要介绍一下整个程序的逻辑结构，并在源程序中加入适当的注释。我们相
+信，任何具有基本C语言和Windows编程经验的读者，都能很轻松地读懂绝大部分
+内容。经过仔  咀嚼和推敲后，更能得到一些编写优质程序的灵感。
+    该程序在FTP公司的PCTCP支撑环境下调试通过，不过只要读者拥有任何符
+合Windows Sockets 1.1规范的实现，也能顺利执行该程序。
+3.4.1 源程序目录
+1. wshout.c wshout主程序
+2. wshout.h wshout头文件
+3. wshout.rc wshout资源文件
+4. ushout.c UDP客户机程序
+5. ulisten.c UDP服务器程序
+6. tshout.c TCP客户机程序
+7. tlisten.c TCP服务器程序
+8. errno.c 获取WSAE*错误描述字符串程序
+9. resolve.c 客户机/服务器启动程序
+    在编译本程序时，笔者用的是BC3.1，只需做一个PRJ工程文件，将上述.c文
+件及winsock.lib包括进来就行了。请注意winsock.h应在include目录或当前目录中，
+winsock.lib可利用winsock.dll通过implib工具来建立。如果读者使用其他的编译器，
+
+可自行作相应的调整，在此不再赘述。
+3.4.2 程序逻辑结构
+3.4.3 源程序清单及注释
+3.4.3.1 wshout.c清单
+/*
+ * 文件名: WSHOUT.C
+ */
+/* MSC Include files: */
+#include <stdio.h>
+#include <io.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include "wshout.h"
+#define MAJOR_VERSION   1
+#define MINOR_VERSION   2
+#define WSA_MAKEWORD(x,y)       ((y) * 256 + (x)) /* HI:Minor, LO:Major */
+HANDLE  hInst;                  /* 进程实例句柄 */
+HWND    hOurWnd;                /* 主窗口句柄 */
+HWND    hMainDlg;               /* 主对话框句柄 */
+int ret;                        /* 工作变量 */
+char    prbuf[PRBUF_LEN];       /* 用于显示文本的工作缓冲区 */
+SOCKET sd;                      /* 用于监听连接的套接口描述字 */
+long temporary_option   = 0L;   /* 缺省为阻塞模式 */
+long blocking_option    = 0L;   /* 阻塞模式的全局标识 */
+int run_cancelled       = 0;    /* 指示何时按下了取消按钮 */
+int len = 1024;                 /* 一次写的字节数 */
+BOOL    running = FALSE;        /* 程序的运行状态 */
+const int iTCP = 1;             /* 指定为TCP Shout */
+const int iUDP = 2;             /* 指定为UDP Shout */
+int iProto      = 1;            /* 缺省为TCP Shout */
+int iPortNo     = SOCK_SHOUT;
+int temporary_protocol  = 1;    /* 在Settings()中使用 */
+int iShout  = 1;
+int iListen = 2;
+int iClientOrServer = 1;        /* 缺省为Shout（客户机）        */
+int tClientOrServer = 1;        /* 在Settings()中使用 */
+char HostModeBuf[20];/* 保存模式字符串 */
+WORD VersionReqd;
+LPWSADATA lpmyWSAData;
+int PASCAL
+WinMain (HANDLE hInstance,HANDLE hPrevInstance,LPSTR lpCmdLine,int
+nCmdShow)
+{
+    HWND hWnd;
+    MSG msg;
+    BOOL InitApp(HANDLE);
+    if (!hPrevInstance)
+    if (!InitApp(hInstance))
+            return (NULL);
+    hInst = hInstance;
+    hWnd = CreateWindow("MainMenu",
+        "Windows Shout",
+        WS_OVERLAPPEDWINDOW | WS_SYSMENU | WS_MINIMIZEBOX,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        NULL,
+        NULL,
+        hInstance,
+        NULL);
+    if (!hWnd)
+        return (NULL);
+    hOurWnd = hWnd;
+    while (GetMessage(&msg, NULL, NULL, NULL)) {
+        TranslateMessage(&msg); /* 翻译虚拟键码 */
+        DispatchMessage(&msg);
+    }
+    return (msg.wParam);
+}
+BOOL InitApp(HANDLE hInstance)
+{
+    HANDLE hMemory;
+    PWNDCLASS pWndClass;
+    BOOL bSuccess;
+    hMemory = LocalAlloc(LPTR, sizeof(WNDCLASS));
+    pWndClass = (PWNDCLASS) LocalLock(hMemory);
+    pWndClass->hCursor = LoadCursor(NULL, IDC_ARROW);
+    pWndClass->hIcon = LoadIcon(hInstance, (LPSTR) "SHOUT");
+    pWndClass->lpszMenuName = (LPSTR) "MainMenu";
+    pWndClass->lpszClassName = (LPSTR) "MainMenu";
+    pWndClass->hbrBackground = GetStockObject(WHITE_BRUSH);
+    pWndClass->hInstance = hInstance;
+    pWndClass->style = NULL;
+    pWndClass->lpfnWndProc = ShoutWndProc;
+    bSuccess = RegisterClass(pWndClass);
+    LocalUnlock(hMemory);
+    LocalFree(hMemory);
+    return (bSuccess);
+}
+long FAR PASCAL ShoutWndProc(HWND hWnd, WORD message,WORD wParam,
+LONG lParam)
+{
+    FARPROC lpDialogBoxProc;
+    switch (message){
+        case WM_CREATE:
+            /* Put up the dialog box */
+            lpDialogBoxProc = MakeProcInstance(DialogProc, hInst);
+            DialogBox (hInst, (LPSTR) "MainDialog", hWnd, lpDialogBoxProc) ;
+
+            FreeProcInstance(lpDialogBoxProc);
+            PostMessage(hWnd, WM_DESTROY, 0, 0L);
+            break;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+        default:
+            return(DefWindowProc(hWnd, message, wParam, lParam));
+        }
+    return NULL;
+}
+BOOL FAR PASCAL DialogProc(HWND hOurDlg, WORD message, WORD wParam,
+LONG lParam)
+{
+    FARPROC lpProcAbout;
+    FARPROC lpProcSettings;
+    long lret;
+    WORD wMajorVersion, wMinorVersion;
+    char hostnm[64];            /* 包含主机名的工作缓冲区 */
+    switch (message) {
+        case WM_INITDIALOG:
+            /* 选择缺省主机 */
+            SetDlgItemText(hOurDlg, IDD_HNAME, "");
+            SendDlgItemMessage(hOurDlg,         /* 对话框句柄 */
+                IDD_HNAME,                      /* 向何处发送msg */
+                EM_SETSEL,                      /* 选择字符 */
+                NULL,                           /* 附加信息 */
+                MAKELONG(0, 0x7fff));           /* 全部内容 */
+            SetFocus(GetDlgItem(hOurDlg, IDD_HNAME));
+            /* 初始化 */
+            hMainDlg = hOurDlg;  /* 保存自己的窗口句柄 */
+            SetDlgItemText(hOurDlg, IDD_COHOST,"Shout to:");
+            wMajorVersion = MAJOR_VERSION;
+            wMinorVersion = MINOR_VERSION;
+            VersionReqd=WSA_MAKEWORD(wMajorVersion, wMinorVersion);
+            lpmyWSAData = (LPWSADATA)_calloc(1, sizeof(WSADATA));
+            ret = WSAStartup(VersionReqd, lpmyWSAData);
+            if (ret != 0){
+                wshout_err (hOurDlg, WSAGetLastError(), "WSAStartup()");
+            }
+            return (TRUE);
+        case WM_CLOSE:
+            PostMessage(hOurDlg, WM_COMMAND, IDM_EXIT, 0L);
+            break;
+        case WM_SYSCOMMAND:
+            SendMessage(hOurWnd, message, wParam, lParam);
+            break;
+        case WM_COMMAND:
+            switch (wParam) {
+            case IDD_CONNECT:           /* 按下连接按钮 */
+            case IDM_START:             /* 选择了Start菜单项 */
+                run_cancelled = FALSE;
+                /* 不能重入 */
+                if (running){
+                    MessageBox(hOurWnd,"Shout is already running !",
+                        "Shout", MB_OK | MB_APPLMODAL | MB_ICONEXCLAMATION);
+
+                    return FALSE;
+                }
+                ClearBoxes(hOurDlg);
+                running = TRUE;
+                if (iClientOrServer == iShout) {
+                   /* 确保有主机名 */
+                   if (GetDlgItemText (hOurDlg, IDD_HNAME, hostnm, 80) < 2) 
+{
+                       MessageBeep(0);
+                       SetDlgItemText(hOurDlg,
+                                      IDD_COMMENT,"No hostname specified");
+                       running = FALSE;
+                       break;
+                   }
+                   sd = ResolveAndConnectHost((char FAR *)hostnm,hOurDlg,iPr
+oto,
+                                              iPortNo);
+                   if (sd == SOCKET_ERROR) {/* 无法创建套接口 */
+                       running = FALSE;
+                       break;
+                   }
+                }
+                else {
+                   sd = GetSocketAndBind(hOurDlg, iProto, iPortNo);
+  
+
+
+发信人: cooliu (苦瓜), 信区: Winsock       
+
+
+                   if (sd == SOCKET_ERROR) {
+                    running = FALSE;
+                    break;
+                   }
+                }
+
+                /* Set the I/O mode of the socket */
+                if (blocking_option) {
+                    lret = 1L;  /* 非阻塞模式 */
+                    ioctlsocket(sd, FIONBIO, (u_long FAR *) &lret);
+                }
+                else {
+                    lret = 0L; /* 阻塞模式 */
+                    ioctlsocket(sd, FIONBIO, (u_long FAR *) &lret);
+                }
+
+                if (iClientOrServer == iShout) {  /* SHOUT */
+                    /* 产生数据并写入套接口 */
+                    if (iProto == iTCP)
+                        lret = TWriteData(sd, hOurDlg, len);
+                    else /* UDP */
+                        lret = UWriteData(sd, hOurDlg, len);
+                }
+                else {  /* LISTEN */
+                    if (iProto == iTCP)
+                        lret = TReadData(sd,hOurDlg, len);
+                    else /* UDP */
+                        lret = UReadData(sd,hOurDlg, len);
+                }
+
+                closesocket(sd);
+                running = FALSE;
+                break;
+
+            case IDD_CANCEL:
+                if (running) {
+                    /* 停止 */
+                    ret = WSACancelBlockingCall();
+                    run_cancelled = TRUE;
+                    if (ret == SOCKET_ERROR) {
+                        /* WSANOTINITIALISED or WSAENETDOWN or WSAEINVAL */
+                        if (h_errno == WSAENETDOWN) {
+                            /* Watch out for hAcceptSock! */
+                            /* close what is left of the connection */
+                            closesocket(sd);
+                        }
+                    }
+                }
+                break;
+
+            case IDM_EXIT:
+                ret = WSACleanup();
+                if (ret == SOCKET_ERROR && h_errno == WSAEINPROGRESS){
+                    MessageBox(hOurWnd,
+                        "Data transfer in progress.\nStop transfer first.",
+                        "WndProc()", MB_OK | MB_APPLMODAL|MB_ICONINFORMATION);
+                    break; /* 一个套接口正处于阻塞状态 */
+                }
+
+                _free((char NEAR *) lpmyWSAData);
+                EndDialog(hOurDlg, TRUE) ; /* 退出 */
+                break;
+
+            case IDM_ABOUT:
+                lpProcAbout = MakeProcInstance(About, hInst);
+                DialogBox(hInst, "AboutBox", hOurDlg, lpProcAbout);
+                FreeProcInstance(lpProcAbout);
+                break;
+
+            case IDM_SETTINGS:
+                lpProcSettings = MakeProcInstance(Settings, hInst);
+                DialogBox(hInst, "SettingsDialog", hOurDlg, lpProcSettings);
+                FreeProcInstance(lpProcSettings);
+                break;
+
+            default:
+                break;
+
+            } /* switch (wParam) */
+            break;
+        } /* switch (message) */
+    return FALSE;
+}
+
+
+/* 此函数处理About对话框 */
+BOOL FAR PASCAL About(HWND hDlg, WORD message, WORD wParam, LONG
+lParam)
+{
+    char tempBuf[15];
+
+    switch (message) {
+    case WM_INITDIALOG:
+        SetDlgItemText(hDlg, IDA_COPYRIGHT,(LPSTR)lpmyWSAData->szDescription);
+
+        wsprintf(tempBuf, "%d.%2d\n",MAJOR_VERSION, MINOR_VERSION);
+        SetDlgItemText(hDlg, IDA_APP_VERSION, (LPSTR) tempBuf);
+
+        wsprintf(tempBuf, "%d.%2d\n",
+                 lpmyWSAData->wVersion%256,lpmyWSAData->wVersion/256);
+        SetDlgItemText (hDlg, IDA_DLL_VERSION, (LPSTR) tempBuf);
+        return (FALSE);
+
+    case WM_COMMAND:
+        if (wParam == IDOK
+        || wParam == IDCANCEL) {
+        EndDialog(hDlg, TRUE);
+        return (TRUE);
+        }
+        break;
+    }
+    return (FALSE);
+}
+
+/* 此函数处理Settings 对话框 */
+BOOL FAR PASCAL Settings(HWND hDlg, WORD message, WORD wParam, LONG
+lParam)
+{
+    int buffer_len = len;
+    int port_no    = iPortNo;
+
+    switch (message) {
+    case WM_INITDIALOG:
+        /* Select a default send() buffer length */
+        SetDlgItemInt(hDlg, IDS_BUFFLEN, len, 0);
+
+        /* Select a default port number */
+        SetDlgItemInt(hDlg, IDS_PORTNO, iPortNo, 0);
+
+        if (iClientOrServer == iShout)          /* 程序类型 */
+            CheckThisProgBoxOn(hDlg, IDS_CLIENT);
+        else
+            CheckThisProgBoxOn(hDlg, IDS_SERVER);
+
+        if (iProto == iTCP)                     /* 协议类型 */
+            CheckThisProtoBoxOn(hDlg, IDS_TCP);
+        else
+            CheckThisProtoBoxOn(hDlg, IDS_UDP);
+
+        if (!blocking_option)                   /* 阻塞模式 */
+            CheckThisBoxOn(hDlg, IDS_BLOCK);
+        else
+            CheckThisBoxOn(hDlg, IDS_NOBLOCK);
+
+        SendDlgItemMessage(hDlg,                /* dialog handle        */
+                IDS_PORTNO,                     /* where to send msg    */
+                EM_SETSEL,                      /* select characters    */
+                NULL,                           /* additional info      */
+                MAKELONG(0, 0x7fff));           /* entire contents      */
+
+        SendDlgItemMessage(hDlg,                /* dialog handle        */
+                IDS_BUFFLEN,                    /* where to send msg    */
+                EM_SETSEL,                      /* select characters    */
+                NULL,                           /* additional info      */
+                MAKELONG(0, 0x7fff));           /* entire contents      */
+        SetFocus(GetDlgItem(hDlg, IDS_BUFFLEN));
+        return (TRUE);
+
+    case WM_COMMAND:
+        switch (wParam){
+        case IDS_CLIENT:
+            /* USer has set to Shout */
+            CheckThisProgBoxOn(hDlg, IDS_CLIENT);
+            tClientOrServer = iShout;
+            SetDlgItemText(hMainDlg, IDD_COHOST,"Foreign host:");
+            SetDlgItemText(hMainDlg, IDD_HNAME,"");
+            break;
+        case IDS_SERVER:
+            /* USer has set to Listen */
+            CheckThisProgBoxOn(hDlg, IDS_SERVER);
+            tClientOrServer = iListen;
+            SetDlgItemText(hMainDlg, IDD_COHOST,"Listening to:");
+            SetDlgItemText(hMainDlg, IDD_HNAME,"[Hit 'Start']");
+            break;
+        case IDS_TCP:
+            /* USer has set to TCP */
+            CheckThisProtoBoxOn(hDlg, IDS_TCP);
+            temporary_protocol = iTCP;
+            break;
+        case IDS_UDP:
+            /* USer has set to UDP */
+            CheckThisProtoBoxOn(hDlg, IDS_UDP);
+            temporary_protocol = iUDP;
+            break;
+        case IDS_BLOCK:
+            /* User has set to blocking mode */
+            CheckThisBoxOn(hDlg, IDS_BLOCK);
+            temporary_option = 0L;
+            break;
+        case IDS_NOBLOCK:
+            /* User has set to nonblocking mode */
+            CheckThisBoxOn(hDlg, IDS_NOBLOCK);
+            temporary_option = 1L;
+            break;
+        case IDOK:
+            /* 用户已完成对设置的修改 */
+            buffer_len = GetDlgItemInt(hDlg, IDS_BUFFLEN, NULL, 0);
+            if (buffer_len == 0 || buffer_len > 8192) {
+                MessageBox(hOurWnd, "Buffer length must be between 1 and 8K",
+                           "Settings()",
+                           MB_OK | MB_APPLMODAL | MB_ICONSTOP);
+                return (FALSE);
+            }
+
+            port_no = GetDlgItemInt(hDlg, IDS_PORTNO, NULL, 0);
+            if (port_no == 0) {
+                MessageBox(hDlg, "Port number must be between 0 and 65,535",
+                           "Settings()",
+                           MB_OK | MB_APPLMODAL | MB_ICONSTOP);
+                return (FALSE);
+            }
+            len     = buffer_len;
+            iPortNo = port_no;
+            blocking_option = temporary_option;
+            iProto          = temporary_protocol;
+            iClientOrServer = tClientOrServer;
+
+        case IDCANCEL:
+            /* 用户不想改变设置 */
+            EndDialog(hDlg, TRUE);
+            return (TRUE);
+
+        default:
+            break;
+        }
+
+    default:
+        break;
+    }
+    return (FALSE);
+}
+
+void
+CheckThisBoxOn(HWND hDlg, int ButtonID)
+{
+    switch (ButtonID) {
+    case IDS_BLOCK:
+        CheckDlgButton(hDlg, IDS_BLOCK, 1);
+        CheckDlgButton(hDlg, IDS_NOBLOCK, 0);
+        break;
+    case IDS_NOBLOCK:
+        CheckDlgButton(hDlg, IDS_BLOCK, 0);
+        CheckDlgButton(hDlg, IDS_NOBLOCK, 1);
+        break;
+    default:
+        break;
+    }
+    return;
+}
+
+void
+CheckThisProtoBoxOn(HWND hDlg, int ButtonID)
+{
+    switch (ButtonID) {
+    case IDS_TCP:
+        CheckDlgButton(hDlg, IDS_TCP, 1);
+        CheckDlgButton(hDlg, IDS_UDP, 0);
+        break;
+    case IDS_UDP:
+        CheckDlgButton(hDlg, IDS_TCP, 0);
+        CheckDlgButton(hDlg, IDS_UDP, 1);
+        break;
+    default:
+        break;
+    }
+    return;
+}
+
+void
+CheckThisProgBoxOn(HWND hDlg, int ButtonID)
+{
+    switch (ButtonID) {
+    case IDS_CLIENT: /* Shout */
+        CheckDlgButton(hDlg, IDS_CLIENT, 1);
+        CheckDlgButton(hDlg, IDS_SERVER, 0);
+        break;
+    case IDS_SERVER: /* Listen */
+        CheckDlgButton(hDlg, IDS_CLIENT, 0);
+        CheckDlgButton(hDlg, IDS_SERVER, 1);
+        break;
+    default:
+        break;
+    }
+    return;
+}
+
+/* 以下就是我们如何处理“模拟阻塞”－本函数检查消息队列，如果发现需要处理
+的消息，就返回一个正的值。*/
+int
+ShoutBlockingHook (void)
+{
+  MSG msg;              /* lets us pull messages via PeekMessage */
+  int ret = PeekMessage(&msg, NULL, 0, 0, PM_REMOVE);
+
+  if (ret) {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+  return ret;
+}
+
+char *
+_calloc (nelem, elsize)
+ unsigned nelem, elsize;
+{
+         HANDLE hMem;
+         PSTR ptr;
+         unsigned size = nelem * elsize;
+
+        if ((hMem = LocalAlloc(LPTR, size)) == NULL)
+                return (char *) 0;
+        if ((ptr = LocalLock(hMem)) == NULL) {
+                LocalFree(hMem);
+                return (char *) 0;
+        }
+        return (char *) ptr;
+}
+
+void
+_free (void *cP)
+{
+        (void) LocalFree(LocalHandle((WORD) cP));
+}
+
+void
+ClearBoxes(HWND hOurDlg)
+{
+    wsprintf(prbuf,"         \n");
+    SetDlgItemText(hOurDlg, IDD_WRITE, (LPSTR) prbuf);
+    SetDlgItemText(hOurDlg, IDD_SENT, (LPSTR) prbuf);
+    SetDlgItemText(hOurDlg, IDD_TIME, (LPSTR) prbuf);
+    SetDlgItemText(hOurDlg, IDD_WRITES,(LPSTR) prbuf);
+    SetDlgItemText(hOurDlg, IDD_BYTES, (LPSTR) prbuf);
+    SetDlgItemText(hOurDlg, IDD_BITS,  (LPSTR) prbuf);
+
+    return;
+}
+
+/*
+ * wshout_err()函数
+ * 描述:
+ *
+ * 通过错误代码获取相应的错误描述文本，与用户提供的错误前缀合
+ * 并，并显示在对话框中。
+ */
+void wshout_err (HWND hOurDlg, /* 对话框的窗口句柄 */
+                 int wsa_err,           /* WinSock错误代码 */
+                 char far *err_prefix)  /* 错误前缀字符串 */
+{
+        char errbuf[PRBUF_LEN];  /* 错误描述字符串缓冲区 */
+
+        /* 获取错误描述字符串 */
+        WSAsperror(hInst, wsa_err, (LPSTR)errbuf, PRBUF_LEN);
+
+        /* 合并错误描述字符串与用户错误前缀字符串 */
+        wsprintf((LPSTR)prbuf, "%s:%s", (LPSTR) err_prefix, (LPSTR)errbuf);
+
+        /* 在对话框中显示错误文本 */
+        SetDlgItemText(hOurDlg, IDD_COMMENT, (LPSTR) prbuf);
+
+}  /* end wshout_err() */
+
+
+/* eof */
+
+3.4.3.2 wshout.h清单
+/*
+ * 文件名: WSHOUT.H
+ */
+
+#ifndef _WSHOUT_INC_
+#define _WSHOUT_INC_
+
+/* Windows 3.0 头文件 */
+#include <windows.h>
+#define _INC_WINDOWS
+#include <winsock.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+
+/* WSHOUT.C 中定义的全局变量 */
+extern  HANDLE  hInst;                  /* Instance handle */
+extern  HWND    hOurWnd;                /* Main Window Handle */
+extern  int     ret;                    /* work variable */
+
+#define PRBUF_LEN       50
+extern  char    prbuf[PRBUF_LEN];       /* work buffer */
+
+/* 菜单IDs      */
+#define IDM_START       101
+#define IDM_ABOUT       102
+#define IDM_STOP        103
+#define IDM_EXIT        104
+#define IDM_SETTINGS    105
+
+/* 对话框控制IDs        */
+#define IDD_HNAME       200
+#define IDD_CONNECT     IDOK
+#define IDD_CANCEL      IDCANCEL
+#define IDD_WRITES      208
+#define IDD_BYTES       210
+#define IDD_BITS        212
+#define IDD_HELP        214
+#define IDD_SENT        230
+#define IDD_WRITE       232
+#define IDD_TIME        234
+#define IDD_COMMENT     236
+#define IDD_COHOST      240
+
+/* “Settings”对话框控制IDs    */
+#define IDS_BUFFLEN     300
+#define IDS_PORTNO      301
+#define IDS_BLOCK       302
+#define IDS_NOBLOCK     304
+#define IDS_TCP         306
+#define IDS_UDP         308
+#define IDS_CLIENT      310
+#define IDS_SERVER      312
+#define IDS_DEFAULT     314
+
+/* “About”对话框控制IDs       */
+#define IDA_COPYRIGHT   400
+#define IDA_APP_VERSION 402
+#define IDA_DLL_VERSION 404
+
+/* 程序控制IDs  */
+#define WM_SELECT               WM_USER+16
+
+/* 全局变量*/
+  
+
+
+发信人: cooliu (苦瓜), 信区: Winsock       
+
+
+#define SOCK_DISCARD    9       /* use the UDP ttytst source port for test *
+/
+#define SOCK_SHOUT      32766   /* TCP port used for SHOUT & LISTEN        *
+/
+#define BUF_SIZE        8192
+#define WRITE_TIMER     1
+/* 函数原型 */
+int PASCAL WinMain(HANDLE, HANDLE, LPSTR, int);
+long FAR PASCAL ShoutWndProc(HWND, WORD, WORD, LONG);
+BOOL FAR PASCAL About(HWND, WORD, WORD, LONG);
+BOOL FAR PASCAL DialogProc(HWND, WORD, WORD, LONG);
+BOOL FAR PASCAL Settings(HWND, WORD, WORD, LONG);
+BOOL InitApp(HANDLE);
+void CheckThisBoxOn(HWND, int);
+void CheckThisProtoBoxOn(HWND, int);
+void CheckThisProgBoxOn(HWND, int);
+void ClearBoxes(HWND);
+SOCKET ResolveAndConnectHost(LPSTR, HWND, int, int);
+SOCKET GetSocketAndBind(HWND, int, int);
+long UWriteData(SOCKET, HWND, int);
+long UReadData(SOCKET, HWND, int);
+long TWriteData(SOCKET, HWND, int);
+long TReadData(SOCKET, HWND, int);
+int ShoutBlockingHook (void);
+int PASCAL FAR WSAsperror (HANDLE, int, char far *, int);
+void wshout_err (HWND, int, char far *);
+#define bcopy(a,b,c)    _fmemcpy(b,a,c)
+char * _calloc (unsigned, unsigned);
+void _free (void *);
+#ifdef _cplusplus
+}
+#endif /* __cplusplus */
+#endif /* ifndef _WSHOUT_INC_ */
+/* eof */
+3.4.3.3 wshout.rc清单
+/*
+ * 文件名: WSHOUT.RC
+ */
+#include <windows.h>
+#include <winsock.h>
+#include "wshout.h"
+MainMenu MENU
+BEGIN
+        POPUP "&File"
+        BEGIN
+                MENUITEM "&Start", IDM_START
+                MENUITEM "Sto&p", IDM_STOP
+                MENUITEM SEPARATOR
+                MENUITEM "E&xit", IDM_EXIT
+        END
+        POPUP "&Options"
+        BEGIN
+                MENUITEM "&Settings ...", IDM_SETTINGS
+                MENUITEM SEPARATOR
+                MENUITEM "&About Shout...", IDM_ABOUT
+        END
+END
+ABOUTBOX DIALOG 22, 17, 144, 102
+CAPTION "About Shout for Windows"
+STYLE DS_MODALFRAME | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU
+BEGIN
+        CTEXT "Windows Shout", -1, 29, 5, 85, 8
+        CTEXT "Version", -1, 46, 13, 33, 8, SS_CENTER | WS_GROUP
+        CTEXT "WINSOCK.DLL \n FTP Software, Inc. \nCopyright 1993",
+IDA_COPYRIGHT, 38, 40, 68, 25, SS_CENTER | WS_GROUP
+        CTEXT "Version", -1, 46, 67, 33, 8, SS_CENTER | WS_GROUP
+        CTEXT "num", IDA_DLL_VERSION, 79, 67, 18, 8, SS_CENTER | WS_GROUP
+        CONTROL "OK", 1, "BUTTON", BS_DEFPUSHBUTTON | WS_GROUP |
+WS_TABSTOP, 56, 82, 32, 14
+        ICON "SHOUT", -1, 11, 8, 16, 16
+        CONTROL "num", IDA_APP_VERSION, "STATIC", SS_LEFT | WS_GROUP, 79,
+13, 18, 8
+        CONTROL "using", -1, "STATIC", SS_CENTER | WS_GROUP, 55, 26, 30, 8
+END
+SettingsDialog DIALOG 9, 16, 172, 117
+CAPTION "Settings"
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+BEGIN
+        CONTROL "   send/recv \nBuffer &length", -1, "STATIC", SS_LEFT |
+WS_GROUP, 84, 8, 48, 20
+        CONTROL "&Port number", -1, "STATIC", SS_LEFT | WS_GROUP, 84, 31, 48
+, 10
+        CONTROL "&Blocking", IDS_BLOCK, "BUTTON", BS_AUTOCHECKBOX |
+WS_TABSTOP, 100, 61, 56, 12
+        CONTROL "&TCP", IDS_TCP, "BUTTON", BS_AUTOCHECKBOX |
+WS_TABSTOP, 20, 60, 41, 12
+        CONTROL "&Client", IDS_CLIENT, "BUTTON", BS_AUTOCHECKBOX |
+WS_TABSTOP, 19, 15, 35, 12
+        CONTROL "&Server", IDS_SERVER, "BUTTON", BS_AUTOCHECKBOX |
+WS_TABSTOP, 19, 26, 35, 12
+        CONTROL "&UDP", IDS_UDP, "BUTTON", BS_AUTOCHECKBOX |
+WS_TABSTOP, 20, 72, 41, 12
+        CONTROL "&Nonblocking", IDS_NOBLOCK, "BUTTON",
+BS_AUTOCHECKBOX | WS_TABSTOP, 100, 73, 56, 12
+        CONTROL "O.K.", IDOK, "BUTTON", BS_PUSHBUTTON | WS_TABSTOP, 40,
+95, 37, 14
+        CONTROL "Cancel", IDCANCEL, "BUTTON", BS_PUSHBUTTON |
+WS_TABSTOP, 90, 95, 37, 14
+        CONTROL "", IDS_BUFFLEN, "EDIT", ES_CENTER | WS_BORDER |
+WS_TABSTOP, 130, 11, 36, 12
+        CONTROL "", IDS_PORTNO, "EDIT", ES_CENTER | WS_BORDER |
+WS_TABSTOP, 130, 29, 36, 12
+        CONTROL "Protocol", 237, "button", BS_GROUPBOX, 6, 49, 70, 38
+        CONTROL "I/O Mode", 239, "button", BS_GROUPBOX, 90, 49, 70, 38
+        CONTROL "Program Mode", 241, "button", BS_GROUPBOX, 6, 7, 70, 34
+END
+MainDialog DIALOG 17, 32, 163, 135
+CAPTION "Windows Shout"
+MENU MainMenu
+STYLE DS_ABSALIGN | WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
+WS_MINIMIZEBOX
+BEGIN
+        CONTROL "", IDD_HNAME, "EDIT", ES_CENTER | WS_BORDER |
+WS_GROUP | WS_TABSTOP, 62, 9, 93, 12
+        CONTROL "", IDD_WRITE, "STATIC", SS_CENTER | SS_NOPREFIX |
+WS_BORDER, 7, 95, 45, 11
+        CONTROL "", IDD_SENT, "STATIC", SS_CENTER | WS_BORDER, 59, 95, 45,
+11
+        CONTROL "", IDD_TIME, "STATIC", SS_CENTER | WS_BORDER, 111, 95, 45,
+11
+        CONTROL "", IDD_WRITES, "STATIC", SS_CENTER | WS_BORDER, 7, 120,
+45, 11
+        CONTROL "", IDD_BYTES, "STATIC", SS_CENTER | WS_BORDER, 59, 120, 45,
+
+11
+        CONTROL "", IDD_BITS, "STATIC", SS_CENTER | WS_BORDER, 111, 120, 45,
+
+11
+        CONTROL "writes[reads]", 105, "STATIC", SS_CENTER | WS_GROUP, 3, 85,
+ 52,
+9
+        CONTROL "writes[reads]/s", 105, "STATIC", SS_CENTER | WS_GROUP, 3, 1
+11,
+55, 9
+        CONTROL "bytes", 105, "STATIC", SS_CENTER | WS_GROUP, 61, 85, 42, 9
+        CONTROL "bytes/sec", 105, "STATIC", SS_CENTER | WS_GROUP, 61, 111, 4
+2, 9
+        CONTROL "time (sec)", 105, "STATIC", SS_CENTER | WS_GROUP, 111, 85, 
+45,
+9
+        CONTROL "bits/sec", 105, "STATIC", SS_CENTER | WS_GROUP, 113, 111, 4
+2, 9
+        CONTROL "Host", IDD_COHOST, "STATIC", SS_LEFT, 7, 10, 52, 10
+        CONTROL "", IDD_COMMENT, "STATIC", SS_CENTER | WS_BORDER |
+WS_GROUP, 9, 68, 146, 11
+        CONTROL "&Start", IDOK, "BUTTON", BS_PUSHBUTTON | WS_TABSTOP, 6,
+32, 32, 20
+        CONTROL "Sto&p", IDCANCEL, "BUTTON", BS_PUSHBUTTON |
+WS_TABSTOP, 65, 32, 32, 20
+        CONTROL "E&xit", IDM_EXIT, "BUTTON", BS_PUSHBUTTON |
+WS_TABSTOP, 125, 32, 32, 20
+        CONTROL "", -1, "static", SS_BLACKFRAME, 0, 60, 163, 1
+END
+SHOUT ICON wshout.ico
+/*
+ *  错误描述字符串表
+ *  用于WSAsperror()函数
+ */
+STRINGTABLE
+BEGIN
+  WSABASEERR,         "[0] No Error"
+  WSAEINTR,           "[10004] Interrupted system call"
+  WSAEBADF,           "[10009] Bad file number"
+  WSAEACCES,          "[10013] Permission denied"
+  WSAEFAULT,          "[10014] Bad address"
+  WSAEINVAL,          "[10022] Invalid argument"
+  WSAEMFILE,          "[10024] Too many open files"
+  WSAEWOULDBLOCK,     "[10035] Operation would block"
+  WSAEINPROGRESS,     "[10036] Operation now in progress"
+  WSAEALREADY,        "[10037] Operation already in progress"
+  WSAENOTSOCK,        "[10038] Socket operation on non-socket"
+  WSAEDESTADDRREQ,    "[10039] Destination address required"
+  WSAEMSGSIZE,        "[10040] Message too long"
+  WSAEPROTOTYPE,      "[10041] Protocol wrong type for socket"
+  WSAENOPROTOOPT,     "[10042] Bad protocol option"
+  WSAEPROTONOSUPPORT, "[10043] Protocol not supported"
+  WSAESOCKTNOSUPPORT, "[10044] Socket type not supported"
+  WSAEOPNOTSUPP,      "[10045] Operation not supported on socket"
+  WSAEPFNOSUPPORT,    "[10046] Protocol family not supported"
+  WSAEAFNOSUPPORT,    "[10047] Address family not supported by protocol
+family"
+  WSAEADDRINUSE,      "[10048] Address already in use"
+  WSAEADDRNOTAVAIL,   "[10049] Can't assign requested address"
+  WSAENETDOWN,        "[10050] Network is down"
+  WSAENETUNREACH,     "[10051] Network is unreachable"
+  WSAENETRESET,       "[10052] Net dropped connection or reset"
+  WSAECONNABORTED,    "[10053] Software caused connection abort"
+  WSAECONNRESET,      "[10054] Connection reset by peer"
+  WSAENOBUFS,         "[10055] No buffer space available"
+  WSAEISCONN,         "[10056] Socket is already connected"
+  WSAENOTCONN,        "[10057] Socket is not connected"
+  WSAESHUTDOWN,       "[10058] Can't send after socket shutdown"
+  WSAETOOMANYREFS,    "[10059] Too many references, can't splice"
+  WSAETIMEDOUT,       "[10060] Connection timed out"
+  WSAECONNREFUSED,    "[10061] Connection refused"
+  WSAELOOP,           "[10062] Too many levels of symbolic links"
+  WSAENAMETOOLONG,    "[10063] File name too long"
+  WSAEHOSTDOWN,       "[10064] Host is down"
+  WSAEHOSTUNREACH,    "[10065] No Route to Host"
+  WSAENOTEMPTY,       "[10066] Directory not empty"
+  WSAEPROCLIM,        "[10067] Too many processes"
+  WSAEUSERS,          "[10068] Too many users"
+  WSAEDQUOT,          "[10069] Disc Quota Exceeded"
+  WSAESTALE,          "[10070] Stale NFS file handle"
+  WSAEREMOTE,         "[10071] Too many levels of remote in path"
+  WSASYSNOTREADY,     "[10091] Network SubSystem is unavailable"
+  WSAVERNOTSUPPORTED, "[10092] WINSOCK DLL Version out of range"
+  WSANOTINITIALISED,  "[10093] Successful WSASTARTUP not yet performed"
+  WSAHOST_NOT_FOUND,  "[11001] Host not found"
+  WSATRY_AGAIN,       "[11002] Non-Authoritative Host not found"
+  WSANO_RECOVERY,     "[11003] Non-Recoverable errors: FORMERR,
+REFUSED, NOTIMP"
+  WSANO_DATA,         "[11004] Valid name, no data record of requested
+type"
+END
+/* eof */
+3.4.3.4 ushout.c清单
+/*
+ * 文件名: USHOUT.C
+ */
+#include "wshout.h"
+/* MSC Include files: */
+#include <stdio.h>
+#include <io.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+/* Returns the number of bytes written */
+long UWriteData(SOCKET hSock, HWND hOurDlg, int send_len)
+{
+    int counter;
+    static int DataBuffer[BUF_SIZE];  /* Buffer to hold generated data  */
+    static  char ReplyBuffer[512];    /* Buffer to hold any reply rcvd  */
+    long bytes_sent = 0L;             /* Counter of bytes on connection */
+    long total_len = 1024L*1024L;     /* Total # of bytes to generate   */
+    time_t start, end;                /* variables to hold read timing  */
+    long total_time = 0L;             /* variable to hold delta t       */
+    long write_count = 0L;            /* number of times                */
+    long tmp = 0L;                    /* holds count for bytes written  */
+    long ltemp = 0L;
+    int i_temp;
+    extern int run_cancelled;
+    struct      sockaddr_in dest;  /* Destination machine address structure 
+*/
+    /* What makes shout unique is that it generates data*
+     * in memory (as opposed to accessing the disk).    *
+     * This tests the 'raw' speed of the TCP connection *
+     * as the rate-limiting access time is eliminated.  *
+     * First, generate the data and place it into an    *
+     * array, data_buffer:                              */
+    for (counter = 0; counter < BUF_SIZE; counter++)
+        DataBuffer[counter] = counter;
+    /* Write data on the descriptor like a banshee,
+     * careful to time the writes and count data
+     * transmitted:
+     */
+    SetDlgItemText(hOurDlg, IDD_COMMENT, "Sending UDP Data ...");
+    time( &start );
+    while (bytes_sent < total_len){/* while still bytes to send */
+
+
+
+发信人: cooliu (苦瓜), 信区: Winsock       
+
+
+        do {
+            ;
+        } while (ShoutBlockingHook()); /* Dispatch messages if any */
+
+        if (run_cancelled) {
+            WSASetLastError(WSAEINTR);
+            break;      /* Non-blocking mode was cancelled */
+        }
+
+        tmp = send(hSock, (char FAR *) &DataBuffer, send_len, 0);
+        if (tmp == SOCKET_ERROR) {
+            if (h_errno == WSAEWOULDBLOCK) /* if no data, read again */
+                continue;
+            else {
+                wshout_err (hOurDlg, WSAGetLastError(), "send()");
+            }
+
+            /* Calc. time elapsed & stats about any data sent */
+            time(&end);
+            if (total_time = (long) difftime(end, start)) {
+                /* Print the statistics gathered    */
+                wsprintf((LPSTR)prbuf,"%ld\n",write_count);
+                SetDlgItemText(hOurDlg, IDD_WRITE, (LPSTR) prbuf);
+
+                wsprintf((LPSTR)prbuf,"%ld\n",bytes_sent);
+                SetDlgItemText(hOurDlg, IDD_SENT, (LPSTR) prbuf);
+
+                wsprintf((LPSTR)prbuf,"%ld\n",total_time);
+                SetDlgItemText(hOurDlg, IDD_TIME, (LPSTR) prbuf);
+
+                ltemp = write_count/total_time;
+                wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+                SetDlgItemText(hOurDlg, IDD_WRITES,(LPSTR) prbuf);
+
+                ltemp = bytes_sent/total_time;
+                wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+                SetDlgItemText(hOurDlg, IDD_BYTES, (LPSTR) prbuf);
+
+                ltemp = 8 * (bytes_sent/total_time);
+                wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+                SetDlgItemText(hOurDlg, IDD_BITS,  (LPSTR) prbuf);
+
+                /* exit from the while loop */
+                break;
+            } /* end if (total_time) */
+            write_count++;      /* incr. counter of times written  */
+            bytes_sent += tmp;    /* # of bytes placed on connection */
+            wsprintf((LPSTR)prbuf,"%ld\n",bytes_sent);
+            SetDlgItemText(hOurDlg, IDD_SENT, (LPSTR) prbuf);
+        } /* end if (tmp == -1) */
+
+        write_count++;  /* incr. counter of times written  */
+        bytes_sent += tmp;    /* # of bytes placed on connection */
+        wsprintf((LPSTR)prbuf,"%ld\n",write_count);
+        SetDlgItemText(hOurDlg, IDD_WRITE, (LPSTR) prbuf);
+
+        wsprintf((LPSTR)prbuf,"%ld\n",bytes_sent);
+        SetDlgItemText(hOurDlg, IDD_SENT, (LPSTR) prbuf);
+    } /* end while */
+
+    /* Look for a reply ... NOTE: most hosts won't give
+     * a 'reply', done to illustrate communication between
+     * sockets. Our ulisten example will give a reply though.
+     */
+
+    SetDlgItemText(hOurDlg, IDD_COMMENT, "Waiting for reply from server..\n");
+    while (1) {
+        tmp = sizeof(dest);
+        i_temp = recvfrom(hSock,(char FAR *) &ReplyBuffer,sizeof(ReplyBuffer),
+                       0, (struct sockaddr *) &dest, (int FAR *) &tmp);
+        if (i_temp == SOCKET_ERROR) {
+            if (h_errno == WSAEWOULDBLOCK) /* if no data, read again */
+                continue;
+            else {
+                /* any error besides these. just punt */
+                wshout_err (hOurDlg, WSAGetLastError(), "recvfrom()");
+            }
+            break;
+        } /* end if (i_temp == SOCKET_ERROR) */
+        /* else got a reply ...*/
+        wsprintf((LPSTR)prbuf, "Server: %s\n", (LPSTR) ReplyBuffer);
+        SetDlgItemText(hOurDlg, IDD_COMMENT, prbuf);
+        break;
+    } /* end while(1) */
+
+    /* All done */
+    return bytes_sent;
+}
+
+/* eof */
+
+3.4.3.5 ulisten.c清单
+/*
+ * 文件名: ULISTEN.C
+ */
+
+#include "wshout.h"
+
+
+/* MSC Include files: */
+#include <stdio.h>
+#include <io.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+/* Returns the number of bytes written */
+long UReadData(SOCKET hSock, HWND hOurDlg, int read_len)
+{
+    static char ReadBuf[BUF_SIZE];
+    static char SendBuf[512];
+    struct sockaddr_in local;   /* Local machine address structure      */
+    int i;                      /* General purpose return code          */
+    long total_time = 0L;       /* variable to hold delta t             */
+    int tmp, len   = 0;
+    int num_reads  = 0;
+    long bytes_read = 0L;
+    long last_time, now, timeout = 15L;
+    long ltemp;
+    extern int run_cancelled;
+
+    BOOL bTemp = TRUE;
+
+    SetDlgItemText(hOurDlg, IDD_COMMENT, "Awaiting the UDP Data ...");
+    SetDlgItemText(hOurDlg, IDD_HNAME, "                      ");
+
+    time(&now); time(&last_time);
+    while (last_time + timeout > now) {
+        time(&now);
+        tmp = sizeof(local);
+        do {
+            ;
+        } while (ShoutBlockingHook()); /* Dispatch messages while available */
+
+        if (run_cancelled) {
+            WSASetLastError(WSAEINTR);
+            break;      /* Non-blocking mode was cancelled */
+        }
+
+        len = recvfrom(hSock, ReadBuf, read_len, 0,
+                       (struct sockaddr *) &local, &tmp);
+        if (len == SOCKET_ERROR) {
+            if (h_errno == WSAEWOULDBLOCK) {/* if no data, read again */
+                continue;
+            } /* end: if (errno == WSAEWOULDBLOCK) */
+            else {
+                if (bytes_read) {
+                    wshout_err (hOurDlg, WSAGetLastError(), "recvfrom()");
+                }
+            } /* end else */
+            break;
+         } /* end: if (len == SOCKET_ERROR) */
+
+         if (bTemp) {   /* To update our main display once */
+             /* Do not use wsprintf() or you will add an extra char */
+             _fmemcpy(prbuf, inet_ntoa(local.sin_addr), 4*sizeof(u_long));
+             SetDlgItemText(hOurDlg, IDD_HNAME, (LPSTR) prbuf);
+             SetDlgItemText(hOurDlg, IDD_COMMENT, "Reading UDP Data ...");
+             bTemp = FALSE;
+         }
+
+         num_reads++;
+         if (len != SOCKET_ERROR)
+             bytes_read += len;
+         /* Print the statistics gathered    */
+         wsprintf((LPSTR)prbuf,"%d\n",num_reads);
+         SetDlgItemText(hOurDlg, IDD_WRITE, (LPSTR) prbuf);
+
+         wsprintf((LPSTR)prbuf,"%ld\n",bytes_read);
+         SetDlgItemText(hOurDlg, IDD_SENT, (LPSTR) prbuf);
+
+         time(&last_time);
+     } /* end: while */
+     total_time = timeout;
+
+     wsprintf((LPSTR)prbuf,"%ld\n",total_time);
+     SetDlgItemText(hOurDlg, IDD_TIME, (LPSTR) prbuf);
+
+     ltemp = num_reads/total_time;
+     wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+     SetDlgItemText(hOurDlg, IDD_WRITES,(LPSTR) prbuf);
+
+     ltemp = bytes_read/total_time;
+     wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+     SetDlgItemText(hOurDlg, IDD_BYTES, (LPSTR) prbuf);
+
+     ltemp = 8 * (bytes_read/total_time);
+     wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+     SetDlgItemText(hOurDlg, IDD_BITS,  (LPSTR) prbuf);
+
+     if (bytes_read) {
+         SetDlgItemText(hOurDlg, IDD_COMMENT, "...UDP Listen Done\n");
+     } /* end: if (bytes_read) */
+     else {
+         wsprintf((LPSTR)prbuf, "Timed out. No data received.\n");
+         SetDlgItemText(hOurDlg, IDD_COMMENT, prbuf);
+         goto come_here;
+     } /* end: else */
+
+     /* send reply to 'client' */
+     wsprintf((LPSTR)prbuf,
+         "Replied to %s\n", inet_ntoa(local.sin_addr));
+     SetDlgItemText(hOurDlg, IDD_COMMENT, prbuf);
+
+     for (i=0; i<10; ++i) {
+         sprintf(SendBuf, "Rec'd %ld bytes.\n", bytes_read);
+         if(len = sendto(hSock, SendBuf, sizeof(SendBuf), 0,
+                         (struct sockaddr FAR *)&local,sizeof(local)))
+             {
+             if (len == SOCKET_ERROR) { /* if could not send bec. */
+                 if (h_errno == WSAEWOULDBLOCK)
+                     continue;
+                 wshout_err (hOurDlg, WSAGetLastError(), "sendto()");
+                 break;
+             } /* end: if (len == -1) */
+         } /* end: if (len = sendto()) */
+     } /* end for */
+     come_here:
+     return (bytes_read);
+ }
+
+/* eof */
+
+3.4.3.6 tshout.c清单
+/*
+ * 文件名: TSHOUT.C
+ */
+
+#include "wshout.h"
+
+/* MSC Include files: */
+#include <stdio.h>
+#include <io.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+/* Returns the number of bytes written */
+long TWriteData(SOCKET hSock, HWND hOurDlg, int send_len)
+{
+    int counter;
+    static int DataBuffer[BUF_SIZE];      /* Buffer to hold generated data  */
+    long        total_len = 1024L*1024L;  /* Total # of bytes to generate   */
+    long        bytes_sent = 0L;          /* Counter of bytes on connection */
+    int         tmp = 0;                  /* holds count for bytes written  */
+    long        write_count = 0L;         /* number of times                */
+    time_t      start, end;               /* variables to hold read timing  */
+    long        total_time = 0L;          /* variable to hold delta t       */
+    long ltemp = 0L;
+    extern int run_cancelled;
+
+    /* What makes shout unique is that it generates data*
+     * in memory (as opposed to accessing the disk).    *
+     * This tests the 'raw' speed of the TCP connection *
+     * as the rate-limiting access time is eliminated.  *
+     * First, generate the data and place it into an    *
+     * array, data_buffer:                              */
+
+    for (counter = 0; counter < BUF_SIZE; counter++)
+        DataBuffer[counter] = counter;
+
+    /* Write data on the descriptor like a banshee,
+     * careful to time the writes and count data
+     * transmitted:
+     */
+
+    SetDlgItemText(hOurDlg, IDD_COMMENT, "...Sending TCP Data");
+    time(&start);
+    while ( bytes_sent < total_len) {   /* while still bytes to send... */
+        do {
+            ;
+        } while (ShoutBlockingHook()); /* Dispatch messages if any */
+
+        if (run_cancelled) {
+            WSASetLastError(WSAEINTR);
+            break;      /* Non-blocking mode was cancelled */
+        }
+
+        tmp = send(hSock, (char FAR*) &DataBuffer, send_len, 0);
+        if (tmp == SOCKET_ERROR) {
+            if (h_errno == WSAEWOULDBLOCK)
+                continue;
+            else {
+                wshout_err (hOurDlg, WSAGetLastError(), "send()");
+            }
+
+            /* Calc. time elapsed & stats about any data sent */
+            time(&end);
+            /* exit from the while loop */
+            break;
+
+        } /* end if (tmp == -1) */
+        write_count++;      /* incr. counter of times written */
+        bytes_sent += tmp;  /* total # of bytes placed on connection*/
+        wsprintf(prbuf,"%ld\n",write_count);
+        SetDlgItemText(hOurDlg, IDD_WRITE, (LPSTR) prbuf);
+
+        wsprintf(prbuf,"%ld\n",bytes_sent);
+        SetDlgItemText(hOurDlg, IDD_SENT, (LPSTR) prbuf);
+    } /* end while */
+    time(&end);
+
+    if (total_time = (long) difftime(end, start)) {
+        /* Print the statistics gathered    */
+        wsprintf((LPSTR)prbuf,"%ld\n",total_time);
+        SetDlgItemText(hOurDlg, IDD_TIME, (LPSTR) prbuf);
+
+        ltemp = write_count/total_time;
+        wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+        SetDlgItemText(hOurDlg, IDD_WRITES,(LPSTR) prbuf);
+
+        ltemp = bytes_sent/total_time;
+        wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+        SetDlgItemText(hOurDlg, IDD_BYTES, (LPSTR) prbuf);
+
+        ltemp = 8 * (bytes_sent/total_time);
+        wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+        SetDlgItemText(hOurDlg, IDD_BITS,  (LPSTR) prbuf);
+    } /* end if (total_time) */
+
+    /* All done */
+    SetDlgItemText(hOurDlg, IDD_COMMENT, "...TCP Shout Done");
+    return bytes_sent;
+}
+
+/* eof */
+
+3.4.3.7 tlisten.c清单
+/*
+ * 文件名：TLISTEN.C
+ */
+
+#include "wshout.h"
+
+
+
+发信人: cooliu (苦瓜), 信区: Winsock       
+
+
+/* MSC Include files: */
+#include <stdio.h>
+#include <io.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+/* Returns the number of bytes written */
+long TReadData(SOCKET hSock, HWND hOurDlg, int read_len)
+{
+    static char ReadBuf[BUF_SIZE];
+    SOCKET hAcceptSock;
+    struct sockaddr_in local;   /* Local machine address structure      */
+    long total_time = 0L;       /* variable to hold delta t             */
+    int tmp, len   = 0;
+    int num_reads  = 0;
+    long bytes_read = 0L;
+    long last_time = 0L;
+    long now = 0L;
+    long ltemp;
+    extern long blocking_option;
+    extern int run_cancelled;
+    struct linger AcceptLinger;
+
+    BOOL running = FALSE;
+    BOOL bTemp = TRUE;
+
+        SetDlgItemText(hOurDlg, IDD_COMMENT, "Awaiting the TCP Data ...");
+        SetDlgItemText(hOurDlg, IDD_HNAME, "                      ");
+
+        tmp = sizeof(local);
+        if (!blocking_option) {
+        hAcceptSock = accept(hSock,(struct sockaddr FAR *)&local,
+                (int FAR *)&tmp);
+        }
+        else {
+        for (;;) {
+                do {
+                ;
+                } while (ShoutBlockingHook()); /* Dispatch messages if any */
+
+                if (run_cancelled) {
+                WSASetLastError(WSAEINTR);
+                break;  /* Non-blocking mode was cancelled */
+                }
+
+                hAcceptSock = accept(hSock,(struct sockaddr FAR *)&local,
+                                                 (int FAR *)&tmp);
+                if (hAcceptSock == INVALID_SOCKET) {
+                if (h_errno == WSAEWOULDBLOCK)
+                        /* Try again */
+                        ;
+                else {
+                        /* Fatal error -- pop out. */
+                        break;
+                }
+                } /* end if ((hAcceptSock = .. */
+                else {
+                /* Success -- pop out. */
+                break;
+                }
+        } /* end for */
+        } /* end else */
+
+        if (hAcceptSock == INVALID_SOCKET) {
+        wshout_err (hOurDlg, WSAGetLastError(), "accept()");
+        return 0;
+        }
+
+    /* Now, read the data as fast as we can until no more to read */
+    time(&last_time);
+    do {
+        do {
+            ;
+        } while (ShoutBlockingHook()); /* Dispatch messages while available */
+
+        if (run_cancelled) {
+            WSASetLastError(WSAEINTR);
+            break;      /* Non-blocking mode was cancelled */
+        }
+
+        len = recv(hAcceptSock, ReadBuf, read_len, 0);
+        if (len == SOCKET_ERROR) {
+            if (h_errno == WSAEWOULDBLOCK)
+                continue;
+            else
+                break;
+        }
+        else if (len == 0)
+            break;
+        num_reads++;
+        bytes_read += len;
+
+        wsprintf((LPSTR)prbuf,"%d\n",num_reads);
+        SetDlgItemText(hOurDlg, IDD_WRITE, (LPSTR) prbuf);
+
+        wsprintf((LPSTR)prbuf,"%ld\n",bytes_read);
+        SetDlgItemText(hOurDlg, IDD_SENT, (LPSTR) prbuf);
+
+        if (bTemp) {    /* To update our main display once */
+            /* Do not use wsprintf() or you will add an extra char */
+             _fmemcpy(prbuf, inet_ntoa(local.sin_addr), 4*sizeof(u_long));
+             SetDlgItemText(hOurDlg, IDD_HNAME, (LPSTR) prbuf);
+             SetDlgItemText(hOurDlg, IDD_COMMENT, "Reading TCP Data ...");
+             bTemp = FALSE;
+        }
+
+    } while ((len != 0) || (len != SOCKET_ERROR));
+    time (&now);
+
+    if (len == SOCKET_ERROR) {
+        if ((h_errno == WSAESHUTDOWN) || (h_errno == WSAENOTCONN)) {
+            /* nothing available for read. */
+            wsprintf((LPSTR)prbuf,
+                "Connection from %s closed.\n",inet_ntoa(local.sin_addr));
+            SetDlgItemText(hOurDlg, IDD_COMMENT, prbuf);
+        }
+        else { /* Other error */
+            wshout_err (hOurDlg, WSAGetLastError(), "recv()");
+        }
+    }
+    else if (len == 0) {
+        /* Other side shut down the connection */
+        wsprintf((LPSTR)prbuf,
+            "Connection from %s closed.\n",inet_ntoa(local.sin_addr));
+        SetDlgItemText(hOurDlg, IDD_COMMENT, prbuf);
+    }
+
+    AcceptLinger.l_onoff = 1;
+    AcceptLinger.l_linger = 0;
+    ret = setsockopt(hAcceptSock, SOL_SOCKET, SO_LINGER,
+                     (char FAR *) &AcceptLinger, sizeof(AcceptLinger));
+    if (ret == SOCKET_ERROR) {
+        wshout_err (hOurDlg, WSAGetLastError(), "setsockopt()");
+    }
+
+    ret = closesocket(hAcceptSock);
+    if (ret == SOCKET_ERROR) {
+        wshout_err (hOurDlg, WSAGetLastError(), "closesocket()");
+    }
+
+    total_time = (long) difftime(now, last_time);
+    if (total_time == 0)
+        total_time = 1L;     /* Avoid dividing by zero */
+
+    wsprintf((LPSTR)prbuf,"%ld\n",total_time);
+    SetDlgItemText(hOurDlg, IDD_TIME, (LPSTR) prbuf);
+
+    ltemp = num_reads/total_time;
+    wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+    SetDlgItemText(hOurDlg, IDD_WRITES,(LPSTR) prbuf);
+
+    ltemp = bytes_read/total_time;
+    wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+    SetDlgItemText(hOurDlg, IDD_BYTES, (LPSTR) prbuf);
+
+    ltemp = 8 * (bytes_read/total_time);
+    wsprintf((LPSTR)prbuf,"%ld\n", ltemp);
+    SetDlgItemText(hOurDlg, IDD_BITS,  (LPSTR) prbuf);
+
+    if (bytes_read) {
+        SetDlgItemText(hOurDlg, IDD_COMMENT, "...TCP Listen Done\n");
+    } /* end: if (bytes_read) */
+
+    return (bytes_read);
+}
+
+/* eof */
+
+3.4.3.8 errno.c清单
+#include <windows.h>
+#include <winsock.h>
+
+/*
+ * 文件名: ERRNO.C
+ */
+
+/*
+ * Function: WSAsperror()
+ *
+ * Description:
+ *
+ * Copies string corresponding to the error code provided
+ * into buf, maximum length len. Returns length actually
+ * copied to buffer, or zero if error code is unknown.
+ * String resources should be present for each error code
+ * using the value of the code as the string ID (except for
+ * error = 0, which is mapped to WSABASEERR to keep it with
+ * the others). The DLL is free to use any string IDs that
+ * are less than WSABASEERR for its own use.
+ *
+ */
+int PASCAL FAR WSAsperror (HANDLE hInst,    /* Instance Handle */
+                           int errorcode,   /* WSA Error Number */
+                           char far * buf,  /* Buffer for error string */
+                           int len)         /* Length of buffer */
+{
+        int err_len;   /* length of error text */
+
+        if (errorcode == 0)             /* If error passed is 0, use the */
+                errorcode = WSABASEERR; /*  base resource file number */
+        if (errorcode < WSABASEERR)     /* If invalid Error code */
+                return 0;               /*  return string length of zero */
+
+        /* error string from the table in the Resource file into buffer */
+        err_len = LoadString(hInst,errorcode,buf,len);
+
+        return (err_len);  /* return length of error string retrieved */
+
+}  /* end WSAsperror() */
+
+/* eof */
+
+3.4.3.9 resolve.c清单
+/*
+ * 文件名: RESOLVE.C
+ */
+
+#include "wshout.h"
+
+/* MSC Include files: */
+#include <stdio.h>
+#include <io.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+SOCKET
+ResolveAndConnectHost(LPSTR lpHostName,HWND hOurDlg,int iproto, int iSockPort)
+{
+    struct      hostent FAR *host_ptr;          /* Ptr to the host name */
+    struct      sockaddr_in dest;               /* Addr of target host  */
+    SOCKET      hSock;                          /* The socket to create */
+    int iSockType;
+    extern int iTCP;
+    extern int iUDP;
+
+    /* Internet family addressing */
+    dest.sin_family = PF_INET;
+    if (iproto == iTCP) {
+        iSockType = SOCK_STREAM;
+    }
+    else if (iproto == iUDP) {
+        iSockType = SOCK_DGRAM;
+    }
+    else {
+        return (SOCKET) -1;             /* Unknown protocol */
+    }
+
+    /* default port to connect to. Must be in network byte order        */
+    dest.sin_port = htons((u_int) iSockPort);
+
+    SetDlgItemText(hOurDlg, IDD_COMMENT,"Resolving hostname...");
+
+    /* Resolve the host name */
+    host_ptr = gethostbyname(lpHostName);
+    if (host_ptr == NULL) {
+        wshout_err (hOurDlg, WSAGetLastError(), "gethostbyname()");
+        return (SOCKET) -1;
+    }
+    /* Patch host address into struct describing conn: */
+    bcopy(host_ptr->h_addr,&dest.sin_addr,host_ptr->h_length);
+
+    /* Allocate a network (socket) descriptor:      */
+    hSock = socket(PF_INET, iSockType, 0);
+    if (hSock == INVALID_SOCKET) {
+        wshout_err (hOurDlg, WSAGetLastError(), "socket()");
+        return (SOCKET) -1;
+    }
+
+    /* Start connection process to host described in 'dest'     *
+     * struct.
+     */
+    SetDlgItemText(hOurDlg, IDD_COMMENT, "Connecting ...");
+    ret=connect(hSock,(struct sockaddr FAR *)&dest,sizeof(dest));
+
+    if (ret == SOCKET_ERROR) {
+        wshout_err (hOurDlg, WSAGetLastError(), "connect()");
+        closesocket(hSock);
+        return (SOCKET) -1;
+    }
+
+    SetDlgItemText(hOurDlg, IDD_COMMENT, "...Connected");
+    return hSock;
+}
+
+
+SOCKET GetSocketAndBind(HWND hOurDlg, int iProto, int iSockPort)
+{
+    SOCKET hSock;                       /* Connection socket descriptor   */
+    struct sockaddr_in local;           /* Local machine address structure*/
+    int iSockType;
+    extern int iTCP;
+    extern int iUDP;
+
+    /* Internet family addressing */
+    if (iProto == iTCP) {
+        iSockType = SOCK_STREAM;
+    }
+    else {
+        iSockType = SOCK_DGRAM;
+    }
+
+    memset(&local, '\0', sizeof (local));
+    local.sin_family = PF_INET;
+    local.sin_port = htons((u_short)iSockPort);
+
+    /* allocate a socket descriptor */
+    hSock = socket(PF_INET, iSockType, 0);
+    if (hSock == INVALID_SOCKET) { /* socket() failed   */
+        wshout_err (hOurDlg, WSAGetLastError(), "socket()");
+        return (SOCKET) -1;
+    }
+
+    /* bind socket to a local addr */
+    ret = bind(hSock, (struct sockaddr FAR *) &local, sizeof(local));
+    if (ret == SOCKET_ERROR){       /* bind() failed        */
+        wshout_err (hOurDlg, WSAGetLastError(), "bind()");
+        return (SOCKET) -1;
+    }
+
+    if (iProto == iUDP)
+        return (hSock);
+
+    /* If iProto == iTCP, then must listen() and accept() also */
+
+    ret = listen(hSock, 0);         /* listen on the socket */
+    if (ret == SOCKET_ERROR){   /* listen() failed          */
+        wshout_err (hOurDlg, WSAGetLastError(), "listen()");
+        return (SOCKET) -1;
+    }
+
+    return(hSock);
+}
+
+/* eof */
+
+
+
+
+
+第四章 Windows Socket 1.1库函数概览
+
+4.1 套接口函数
+        Windows Sockets规范包含了以下Berkeley风格的套接口例程：
+
+        accept()*       响应联结请求，并且新建一个套接口。原来的套接口则返回监
+听状态。
+
+        bind()          把一个本地的名字和一个无名的套接口捆绑起来。
+
+        closesocket()*  把套接口从拥有对象参考表中取消。该函数只有在SO_LINGER
+被设置时才会阻塞。
+
+        connect()*      初始化到一个指定套接口上的连接。
+
+        getpeername()   得到连接在指定套接口上的对等通讯方的名字。
+
+        getsockname()   得到指定套接口上当前的名字。
+
+        getsockopt()    得到与指定套接口相关的属性选项。
+
+        htonl()         把32位的数字从主机字节顺序转换到网络字节顺序。
+
+        htons()         把16位的数字从主机字节顺序转换到网络字节顺序。
+
+        inet_addr()     把一个Internet标准的"."记号地址转换成Internet地址数值。
+
+
+
+
+发信人: cooliu (苦瓜), 信区: Winsock       
+
+
+        inet_ntoa()     把Internet地址数值转换成带"."的ASCII字符串。
+        ioctlsocket()   为套接口提供控制。
+        listen()        监听某一指定套接口上连接请求的到来。
+        ntohl()         把32位数字从网络字节顺序转换为主机字节顺序。
+        ntons()         把16位数字从网络字节顺序转换为主机字节顺序。
+        recv()*         从一个已连接的套接口接收数据。
+        recvfrom()*     从一个已连接的或未连接的套接口接收数据。
+        select()*       执行同步I/O多路复用。
+        send()*         从一已连接的套接口发送数据。
+        sendto()*       从已连接或未连接的套接口发送数据。
+        setsockopt()    设置与指定套接口相关的属性选项。
+        shutdown()      关闭一部分全双工的连接。
+        socket()        创建一个通讯端点并返回一个套接口。
+        *表示例程在应用于阻塞套接口时会阻塞。
+4.1.1 阻塞/非阻塞和数据易失性
+        阻塞是在把应用程序从Berkeley套接口环境中移植到Windows环境中的一个主
+要焦点。阻塞是指唤起一个函数，该函数直到相关操作完成时才返回。由于操作可
+能需要任意长的时间才能完成，于是问题就出现了。最明显的一个例子就是recv()，
+这个函数会一直处于阻塞状态直到收到对方系统发送的数据。在Berkeley套接口模
+型中，一个套接口的操作的缺省行为是阻塞方式的，除非程序员显式地请求该操作
+为非阻塞方式。我们强烈推荐程序员在尽可能的情况下使用非阻塞方式（异步方式）
+的操作。因为非阻塞方式的操作能够更好地在非占先的Windows环境下工作。程序
+员应该在绝对必要的时候才采用阻塞方式。而且在你必须使用阻塞方式的操作前仔
+细阅读并理解这一部分。
+        即使在阻塞方式下，有些操作（例如bind(),getsockopt(),getpeername()）也
+会?br /> 
+刻
+完成。对于这些操作，阻塞方式和非阻塞方式并没有什么两样。其他一些操作（例
+如recv()）可能立刻完成，也可能需要阻塞一段随机的时间才能完成。这都取决于
+不同的传输情况。当用于阻塞套接口时，这些操作被认为是工作于阻塞方式的，所
+有会阻塞的例程在以前或以后的列表中都打上了星号作标记。
+        在Windows Sockets实现中，一个无法立刻完成的阻塞操作是按如下方式处理
+的。DLL先初始化操作，然后进入一个循环，在循环中发送收到的任何信息－为了
+使在必要时把处理器交给其他线程，然后检查Windows Sockets功能是否完成。如果
+功能完成了，或者WSACancelBlockingCall()被唤起，阻塞操作以一个适当的返回值
+结束。完整的关于这种机制的描述，请参见5.3.13节，WSASetBlockingHook()，这
+一部分还包括了对于各种函数伪代码的讨论。
+        如果一个正在运行某一阻塞操作的进程收到了一个Windows消息，那么应用程
+序有可能试图发出另一个Windows Sockets调用，由于很难安全地处理这种情形，
+Windows Sockets规范不支持这种应用程序的工作方式。在这种情况下，有两个函数
+可以帮助程序员。WSAIsBlocking()可以用来确定在该进程上是否有阻塞的Windows
+Sockets调用。WSACancelBlookingCall()可以用来取消在线的阻塞调用，如果有的话。
+
+任何其他的Windows Sockets函数如果在这种情况下被调用，则会失败并返回错误代
+码WSAEINPROGRESS。要强调的是，这一限制适用于所有阻塞和非阻塞的操作。
+        虽然这种机制对于简单的应用程序已经足够了，但这不能支持高级应用程序的
+
+复杂的消息发送要求。（例如，那些MDI模型的用户）对于这样的应用程序，Windows
+Sockets API设计了WSASetBlockingHook()函数，这个函数可以允许程序员定义特殊
+的阻塞钩子来代替上面讨论的缺省消息发送例程。
+        只有在以下都为真时，Windows Sockets DLL才调用阻塞钩子函数：例程是被定
+
+义为可以阻塞的，指定的套接口也是阻塞套接口，而且请求不能被立刻完成。（套
+接口是被缺省地设为阻塞方式的，但IOCTL FIONBIO和WSAAsyncSelect()都可以
+把套接口设置成为非阻塞模式）。如果应用程序只使用非阻塞方式的套接口，而且
+使用WSAAsyncSelect()和/或WSAAsyncGetXByY()例程，而不是使用select()和/或
+getXbyY()例程，那么阻塞钩子函数就永远也不会被调用，应用程序也不用再操心由
+于阻塞钩子函数而带来的重入问题。
+        如果一个应用程序在唤起异步或非阻塞方式调用时使用了一个内存对象的指针
+
+（例如一个缓冲区，或者一个全程变量）作为参数，那么应用程序要保证那个对象
+在Windows Sockets实现的整个操作中都可得到并使用。应用程序不能再唤起可能影
+响到内存唤射或寻址能力的其他的Windows函数。在多线程系统中，应用程序也有
+责任使用某种同步机制来协调对内存对象的存取。Windows Sockets实现不能，也不
+会提出这种事情。没有遵守这条规则，所可能产生的后果已不在规范讨论的范围之
+内。
+4.2 数据库函数
+        Windows Sockets规范定义了如下数据库例程。正如我们先前提出的，Windows
+
+Sockets提供者有可能不采用依赖于本地数据库的方式来实现这些函数。某些数据库
+例程返回的指针（例如gethostbyname()）指向的区域是由Windows Sockets函数库分
+配的。这些指针指向的数据是易失的。它们只在该线程的下一个Windows Sockets API
+调用前有效。此外，应用程序不应试图修改这个结构，或者释放其中的任何一部分。
+在一个线程中，这个结构只有一份拷贝。因此，应用程序应该在发出下一个Windows
+Sockets API调用以前把所需的信息拷贝下来。
+        gethostbyaddr()*   从网络地址得到对应的名字（有可能多个）和地址。
+        gethostbyname()*   从主机名得到对应的名字（有可能多个）和地址。
+        gethostname()      得到本地主机名。
+        getprotbyname()*   从协议名得到对应的协议名和数值。
+        getservbyname()*   从一个服务的名字得到对应的服务名以及端口号。
+        getservbyport()*   从一个端口号得到对应的服务名以及端口号。
+        *表示例程在某些情况下可能会阻塞。
+4.3 针对Microsoft Windows的扩展函数
+        Windows Sockets规范提供了许多在标准的Berkelet套接口例程之外的扩展函
+数。本质上，这些扩展的API是为了应用程序能更好地处理基于消息的异步发送的
+网络事件。虽然基于Windows Sockets的编程并不强制要使用这个扩展的API集
+（WSAStartup()和WSACleanup()除外）但我们推荐应用程序开发者遵循Microsoft
+Windows的编程范例。
+        WSAAsyncGetHostByAddr()     一个标准的Berkeley的getXbyY()函数集合的
+异步版本。例如WSAAsyncGetHostByName()函数提供了一个标准Berkeley的
+gethostbyname()函数的异步基于消息的实现。
+        WSAAsyncGetHostByName()
+        WSAAsyncGetProtoByName()
+        WSAAsyncGetProtByNumber()
+        WSAAsyncGetServByName()
+        WSAAsyncGetServByPort()
+        WSAAsyncSelect()            select()函数的异步版本。
+        WSACancelAsyncRequest()     取消一个未完成的WSAAsyncGetXByY()函数的
+实例。
+        WSACancelBlockingCall()     取消未完成的阻塞的API调用。
+        WSACleanup()                从底层的Windows Sockets DLL中撤销注册。
+        WSAGetLastError()           得到最近的一个Windows Sockets API调用错误
+
+的详细情况。
+        WSAIsBlocking()             确定底层的Windows Sockets DLL是否在该线程
+
+已经被一个调用阻塞。
+        WSASetBlockingHook()        为底层的Windows Sockets实现设置阻塞钩子。
+
+        WSASetLastError()           设置下一次WSAGetLastError()返回的错误信
+息。
+        WSAStartup()                初始化底层的Windows Sockets DLL。
+        WSAUnhookBlockingHook()     恢复原始的阻塞钩子。
+4.3.1 异步选择机制
+        WSAAsyncSelect()调用允许应用程序程序注册一个或多个感兴趣的网络事件。
+这
+一API调用用来取代探寻网络I/O调用。在select()或非阻塞I/O例程（例如send()
+和recv()）已经被调用或将要被调用的情况下都可以使用WSAAsyncSelect()调用。在
+这种情况下，在声明感兴趣的网络事件时，你必须提供一个通知时使用的窗口句柄。
+那么在你声明的感兴趣的网络事件发生时，对应的窗口将收到一个基于消息的通
+知。
+        Windows Sockets允许对于一特定的套接口声明如下感兴趣的网络事件：
+        *套接口已准备读数据。
+        *套接口已准备写数据。
+        *带外数据准备好。
+        *套接口准备接收连接请求。
+        *非阻塞连接操作结束。
+        *连接关闭。
+4.3.2 异步支持例程
+        异步数据库函数允许应用程序用异步方式请求信息。某些网络实现和/或配置，
+
+需要通过执行网络操作来应答这些请求。WSAAsyncGetXByY()函数允许应用程序开
+发者不必象在使用Berkeley标准函数时阻塞整个Windows环境。
+WSACancelAsyncRequest()函数可以允许一个应用程序取消任何未完成的异步的
+WSAAsyncGetXByY()请求。
+4.3.3 阻塞钩子函数方法
+        正如4.1.1节所讲述的，Windows Sockets实现以这样一种方式阻塞一个操作，
+
+Windows消息处理可以继续，发出调用的应用程序仍然可以收到Windows消息。但
+在某些情况下，应用程序可能希望影响或改变这种伪阻塞的实现方式。
+WSASetBlockingHook()函数就提供了这样一种功能。它使得应用程序可以替换
+Windows Sockets实现在“阻塞”操作中放弃处理器时调用的例程。
+4.3.4 错误处理
+        为了与基于线程的环境兼容，API调用的错误细节可以通过WSAGetLastError()
+
+调用得到。虽然已经为大家接收的Berkeley风格的机制是通过"errno"得到关于套接
+口的网络错误的，这种机制不能够保证在多线程环境中错误代码的完整性和正确
+性。WSAGetLastError()允许程序员能够得到对应于每一线程的最近的错误代码。
+        WSAGetLastError()所返回的错误代码尽量避免与标准的Microsoft C错误代码
+冲
+突。但是某些Windows Sockets例程返回的错误代码是在Microsoft C定义的标准错
+误代码之内的。如果你使用的应用程序开发环境中的错误代码定义与Microsoft C不
+同，那么我们建议你使用Windows Sockets错误代码前缀"WSA"来保证准确的检测错
+误。
+        这份规范定义了一个推荐的错误代码的集合，而且列举了每一个函数有可能返
+
+回的错误。但是某些Windows Sockets实现也有可能返回一些在我们列举之外的错误
+代码。应用程序应该具备能够处理在每个API描述下列举的错误代码之外的错误的
+能力。然而Windows Sockets实现不能返回在附录4.1中列举的合法Windows Sockets
+错误之外的任何数值。
+4.3.5 通过中介DLL调用Windows Sockets DLL
+        Windows Sockets DLL既可以直接从应用程序中调用也可以通过中介DLL调
+用。通过中介DLL的例子是：使用Windows Sockets为应用程序实现一个提供通用
+网络功能的虚拟网络API层，这样的DLL可以同时被多个应用程序使用。担这样的
+DLL必须对WSAStartup()和WSACleanup()这两个函数非常警惕，它们必须保证在任
+何一个使用Windows Sockets调用的任务前后均调用了WSAStartup()和
+WSACleanup()。这是因为Windows Sockets DLL需要一个对WSAStartup()的调用来
+为每个任务初始化其数据结构，也需要一个对WSACleanup()的调用来释放为任务分
+配的所有资源。
+        有至少两种方法去完成这一任务。最简单的方法是中介DLL具有与WSAStarup()
+
+和WSACleanup()类似的调用提供给应用程序使用，DLL将在这些例程中调用
+WSAStartup()和WSACleanup()。另一种机制就是中介DLL建立一个任务句柄列表。
+任务句柄是从GetCurrentTask()这一个Windows API中获得的。在中介DLL的每一
+个入口处检查对于当前任务WSAStartup()函数是否已被调用，并且在必要的时候调
+用WSACleanup()函数。
+        在Windows NT环境中，这一点是没有必要的。因为Windows NT中的DLL结
+构与流程是与Windows不同的。在Windows NT中，中介DLL只需简单的在它的
+DLL初始化例程中调用WSAStartup()即可。这个例程将在任何一个新的进程试图使
+用DLL的开始时刻被执行。
+        如果中介DLL调用了阻塞操作而又没有安装任何它自己的阻塞钩子，那么DLL
+作者必须清楚地认识到控制有可能会通过应用程序安装的阻塞钩子或缺省的阻塞钩
+子回到应用程序手中。这样应用程序有可能通过WSACancelBlockingCall()来取消中
+介DLL的阻塞操作，如果这种情况发生了，中介DLL的阻塞操作会失败并返回错
+误代码WSAEINTR。这时候，中介DLL必须尽快地把控制交还给调用它的任务。
+因为用户有可能按了Cancel或者Close按钮。应用程序正在急切地盼望获得CPU的
+控制权。我们推荐中介DLL在进行阻塞调用时安装自己的阻塞钩子来防止不可预见
+的中介DLL和应用程序之间的互相影响。
+4.3.6 Windows Sockets实现内部对消息的使用
+        为了把Windows Sockets实现成一个纯粹的DLL，有时在DLL内部互相发送消
+息来通讯和定时是必要的。这是非常合法的。但是Windows DLL不应该无缘无故地
+
+http://www.newsmth.net/bbsanc.php?path=%2Fgroups%2Fcomp.faq%2FNetPRG%2FResource%2FReference%2FSocketRule
