@@ -1,0 +1,4 @@
+安装smb
+执行命令行：
+sudo apt-get install samba
+sudo apt-get install smbfs

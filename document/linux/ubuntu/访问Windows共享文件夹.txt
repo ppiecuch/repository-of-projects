@@ -1,0 +1,41 @@
+按下 ALT+F2，输入nautilus打开桌面文件管理器
+按Ctrl+L打开地址栏：输入smb://192.168.XXXX访问你Window主机
+
+错误：
+如果出现Failed to Retrieve Share List from Server
+解决一：
+sudo vim /etc/samba/smb.conf
+找到WORKGROUP = Workgroup_Name，在其下添加：
+name resolve order = bcast host，保存，重启
+
+解释：
+The name resolve order uses hosts files first and broadcasts last and it is commented out! Maybe we change that to:
+name resolve order = bcast host
+and then restart the servers with service smbd restart and service nmbd restart
+
+http://www.liberiangeek.net/2012/03/how-to-fix-failed-to-retrieve-share-list-from-server-in-ubuntu-12-04-11-10-when-file-sharing-with-windows/
+
+
+解决二：
+sudo vim /etc/samba/smb.conf
+Add to the [global] section the following two lines:
+Code:
+client lanman auth = Yes 
+lanman auth = Yes
+保存，重启
+http://ubuntuforums.org/showthread.php?t=1357070
+
+
+解决三：
+sudo chmod 777 /etc/nsswitch.conf
+vim /etc/nsswitch.conf
+Look for this line: hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4
+3) Add "wins" so it looks like this: hosts: files mdns4_minimal [NOTFOUND=return] wins dns mdns4
+sudo chmod u-w /etc/nsswitch.conf
+Install the "winbind" package: sudo apt-get install winbind
+重启
+http://askubuntu.com/questions/74789/failed-to-retrieve-share-list-from-server-error-when-browsing-a-share-with-nau
+
+
+
+sudo mount -t cifs //192.168.1.245/xc /home/ubuntu8 -o username=3guu,password=8888uug3

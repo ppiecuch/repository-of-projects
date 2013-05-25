@@ -1,0 +1,395 @@
+I've tried all the fbo class on the forum (moka's ofxFBO, and Zach Gage's ofFBOTexture and the ofFBOTexture in theo's render manager example) and I have the same problem on all. My FBO is darker.
+
+My code is simply this:
+Code:
+view plaincopy to clipboardprint?
+void drawFG() {  
+    glColor4f(1, 1, 1, fadeAmount);  
+    ofRect(100, 100, 200, 200);  
+      
+    glColor4f(0, 0, 1, fadeAmount);  
+    ofRect(120, 120, 200, 200);  
+}  
+  
+  
+void testApp::draw() {  
+    ofEnableAlphaBlending();  
+      
+    glColor4f(1, 0, 0, 1);  
+    ofRect(150, 150, 200, 200); // red rect bg  
+      
+    if(useFBO == false) {  
+        drawFG();  
+    } else {  
+        fboNew.begin();   
+        {  
+            fboNew.clear();  
+            drawFG();  
+        }  
+        fboNew.end();  
+          
+        glColor3f(1, 1, 1);  
+        fboNew.draw(0, 0, fboNew.getWidth(), fboNew.getHeight());  
+    }   
+}     
+
+If I use the FBO, the white rect is clearly a lot more see through. If fadeAmount ==1 then they are both white. But if fadeAmount is 0.5, drawing without FBO gives me 127/255 in photoshop but drawing with FBO gives 31/255!! 
+
+So I thought maybe its because the alpha is being applied twice. Its drawn into the FBO with alpha, and then drawn again to the screen with alpha. I would have thought if that is the case the final alpha should be 0.25 =>64/255, but the result i get is 31/255!
+
+So I thought I'd try disabling blend when drawing the FBO to the screen:
+ 
+Code:
+view plaincopy to clipboardprint?
+ofDisableAlphaBlending();  
+fboNew.draw(0, 0, fboNew.getWidth(), fboNew.getHeight());  
+
+Then the FG is identical whether using FBO or not, but of course this time I don't see the background, because the transparent parts of the FBO don't show through. 
+
+So I thought i'd disable blending when drawing into the FBO but enable when drawing to the screen:
+Code:
+view plaincopy to clipboardprint?
+if(useFBO == false) {  
+        drawFG();  
+    } else {  
+        fboNew.begin();   
+        {  
+            fboNew.clear();  
+            ofDisableAlphaBlending();  
+            drawFG();  
+        }  
+        fboNew.end();  
+          
+        glColor3f(1, 1, 1);  
+        ofEnableAlphaBlending();  
+        fboNew.draw(0, 0, fboNew.getWidth(), fboNew.getHeight());  
+    }   
+
+
+Now the FG has the correct alphas, white has the correct color on black and on the red, and the blue has the correct color on black and on the red. But since blending was disabled when writing into the FBO the white and blue aren't blended, the blue overwrote the white so where they overlap you don't see the white.
+
+This is driving me crazy and I can't find a solution, I actually have quite a few more FBOs and my elements aren't just 2 rects but hundreds of sprites. Does anyone know how to solve this problem?
+« Last Edit: January 01, 1970, 01:00:00 AM by memo »	 Logged
+otherside
+
+Posts: 94
+
+
+
+
+	(No subject)
+« Reply #1 on: February 27, 2009, 06:28:10 AM »
+I'll hazard a guess.  Do you have lighting turned on?  This could make it darker.
+« Last Edit: January 01, 1970, 01:00:00 AM by otherside »	 Logged
+memo
+London, UK
+
+Posts: 747
+
+
+
+I like to touch people and make them giggle or cry
+
+
+
+	(No subject)
+« Reply #2 on: February 27, 2009, 01:07:51 PM »
+no it's not lighting :P it is do do with blending and pixel alpha values. If I disable blending the colors/alphas are correct, but of course I don't see the background.
+« Last Edit: January 01, 1970, 01:00:00 AM by memo »	 Logged
+sth
+Hamburg
+
+Posts: 114
+
+
+
+
+
+	(No subject)
+« Reply #3 on: February 27, 2009, 01:52:37 PM »
+Hi,
+
+Have you played with glColorMask or glBlendFunc? 
+
+Try glBlendFunc(GL_SRC_ALPHA, GL_ONE); before rendering your FBO.
+
+cheers,
+Stephan
+« Last Edit: January 01, 1970, 01:00:00 AM by sth »	 Logged
+http://stephanmaximilianhuber.com
+memo
+London, UK
+
+Posts: 747
+
+
+
+I like to touch people and make them giggle or cry
+
+
+
+	(No subject)
+« Reply #4 on: February 27, 2009, 02:19:43 PM »
+i Stephan I hadn't tried colorMask and got excited for a moment! but unfortunately didn't work. 
+Additive blending doesn't work either because it just gets added, e.g. the semi transparent dark blue in the fg is just added to the red bg to give light purple, instead of dark purple. Also the fg is still alpha'd twice.
+
+But it did get me thinking and i'm trying some weird blend functions like:
+glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+or 
+glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+
+cos the src_alpha is already pre-multipled i'm not multiplying it again and its getting much closer!. Now the parts of the fg on an empty background are correct, but those that overlap the bg aren't still :/
+
+
+Searching the forums this is actually a really common problem, and anyone using transparency in FBO's will be experiencing it. Haven't found a solution other than disabling blending before rendering the FBO though (which means you cant render over a background)
+« Last Edit: January 01, 1970, 01:00:00 AM by memo »	 Logged
+moka
+Kiel - Germany
+
+Posts: 409
+
+
+
+
+
+	(No subject)
+« Reply #5 on: February 27, 2009, 03:42:05 PM »
+hi memo, 
+
+I actually tried to save PNGs with transparency from an FBO and that seemed to work fine, but looked a little bit weird when I drew it in my OF app. I will check again what I did and tell you!
+« Last Edit: January 01, 1970, 01:00:00 AM by moka »	 Logged
+memo
+London, UK
+
+Posts: 747
+
+
+
+I like to touch people and make them giggle or cry
+
+
+
+	(No subject)
+« Reply #6 on: February 27, 2009, 06:25:22 PM »
+Hi Moka, yea the FBO contains the alpha info. The problem comes about when you render an FBO into something else with blending enabled (when the fbo contains alpha). So when you have multiple render targets, all with alpha info, and you want to do blending, the results are gonna be far from what they would be if you had rendered the same thing without fbos. I couldn't find a solution so am now just tweaking the values and layers to look good with the fbo setup that I have :/
+« Last Edit: January 01, 1970, 01:00:00 AM by memo »	 Logged
+moka
+Kiel - Germany
+
+Posts: 409
+
+
+
+
+
+	(No subject)
+« Reply #7 on: February 27, 2009, 06:36:29 PM »
+I think the most important thing is how you set up the textures you attached to the FBO. So if you could post that part maybe there is an pbvious bug. I am guessing that it is a driver bug though. OpenGLs alpha blending is a total mess (at least at certain points). Another possibility would be to emulate alpha blending with a shader. that would be pretty slow though since you could always only blend 2 "layers" at a time.
+
+Oh, and do you clear the FBOs alpha value to zero too?
+« Last Edit: January 01, 1970, 01:00:00 AM by moka »	 Logged
+memo
+London, UK
+
+Posts: 747
+
+
+
+I like to touch people and make them giggle or cry
+
+
+
+	(No subject)
+« Reply #8 on: March 01, 2009, 12:20:46 AM »
+Hi Moka, yea I am clearing the texture's every frame. I've tried on 3 different machines now 2xATIs (1900 and 1600) and one Nvidia (8800) and all the same. From the forums posts I've been reading its apparently expected behaviour, and kind of makes sense (the alpha is being premultiplied with every render), it's just so frustrating that I can't find a work around, or settings to make it work smoothly - The work around is that if I'm going to render someting to a texture and then that to screen with blending, and I want it to have 50% alpha, I need to give it 71% alpha so that it has 50% when its rendered to the screen. Or if I'm gonna render to a texture, then that into another texture then that into the screen I need to give it 84% or something! which is quite a pain to deal with if you want to be precise! So i've given up like I said, just tweaking values to look good on my current setup (which is a lot of RTT!)
+
+my texture creation code is pretty standard and below, i've tried every glType / textureTarget combination available! :S
+Code:
+view plaincopy to clipboardprint?
+void ofFBOTexture::allocate(int w, int h, bool autoClear)  
+{  
+    texData.width = w;  
+    texData.height = h;  
+      
+    imageSaver.setUseTexture(false);  
+    imageSaver.allocate(texData.width, texData.height, OF_IMAGE_COLOR_ALPHA);  
+      
+    if (GLEE_ARB_texture_rectangle){  
+        texData.tex_w = w;  
+        texData.tex_h = h;  
+        texData.textureTarget = GL_TEXTURE_RECTANGLE_ARB;  
+    } else {  
+        texData.tex_w = ofNextPow2(w);  
+        texData.tex_h = ofNextPow2(h);  
+    }  
+      
+    if (GLEE_ARB_texture_rectangle){  
+        texData.tex_t = w;  
+        texData.tex_u = h;  
+    } else {  
+        texData.tex_t = 1.0f;  
+        texData.tex_u = 1.0f;  
+    }  
+      
+    // attempt to free the previous bound texture, if we can:  
+    clean();  
+      
+    texData.width = w;  
+    texData.height = h;  
+    texData.bFlipTexture = true;  
+    texData.glType = GL_RGBA;  
+      
+    this->autoClear = autoClear;  
+    // create & setup FBO  
+    glGenFramebuffersEXT(1, &fbo);  
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);  
+      
+    // Create the render buffer for depth  
+    glGenRenderbuffersEXT(1, &depthBuffer);  
+    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthBuffer);  
+    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, texData.tex_w, texData.tex_h);  
+      
+    // create & setup texture  
+    glGenTextures(1, (GLuint *)texData.textureName);   // could be more then one, but for now, just one  
+    glBindTexture(texData.textureTarget, (GLuint)texData.textureName[0]);  
+    glTexParameterf(texData.textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  
+    glTexParameterf(texData.textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);  
+    glTexParameterf(texData.textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
+    glTexParameterf(texData.textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  
+    glTexImage2D(texData.textureTarget, 0, texData.glType, texData.tex_w, texData.tex_h, 0, texData.glType, GL_UNSIGNED_BYTE, 0);     
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);  
+      
+    // attach it to the FBO so we can render to it  
+    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, texData.textureTarget, (GLuint)texData.textureName[0], 0);  
+      
+      
+    // Attach the depth render buffer to the FBO as it's depth attachment  
+    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthBuffer);  
+      
+      
+    GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);  
+    if(status != GL_FRAMEBUFFER_COMPLETE_EXT) {  
+        cout<<"glBufferTexture failed to initialize. Perhaps your graphics card doesnt support the framebuffer extension? If you are running osx prior to system 10.5, that could be the cause"<<endl;  
+        std::exit(1);  
+    }  
+    clear();  
+      
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);  
+}  
+« Last Edit: January 01, 1970, 01:00:00 AM by memo »	 Logged
+blainer_s
+
+Posts: 10
+
+
+
+
+	Re: FBO problems with alpha
+« Reply #9 on: July 01, 2010, 06:42:40 PM »
+I think this might be the answer. You have to draw the fbo with a different blending mode than when you are drawing to the fbo, otherwise the alpha gets rendered twice, thus creating the darker color. I am not an OpenGL expert, I am just guessing, and figured this out with help from klwilles and mostly by trial and error. This method also works when using an fbo to texture an object. 
+
+Here is my code:
+Code:
+view plaincopy to clipboardprint?
+void testApp::setup(){  
+    image.loadImage("myPng.png");  
+    //image is an ofImage, myPng.png is an image i created in photoshop real quick for testing  
+    texture.allocate(ofGetWidth(), ofGetHeight(), true);  
+    //texture is my ofxFBOTexture  
+}  
+  
+//--------------------------------------------------------------  
+void testApp::update(){}  
+  
+//--------------------------------------------------------------  
+void testApp::draw(){  
+      
+    texture.begin();  
+  
+    ofEnableAlphaBlending();  
+  
+    image.draw(0, 0);  
+  
+    ofDisableAlphaBlending();  
+      
+    texture.end();  
+      
+    glEnable(GL_BLEND);  
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);   
+  
+    //This is what is normally called with ofEnableAlphaBlending  
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+  
+    //if you have changed your blend equation, uncomment to return to default  
+    //glBlendEquation(GL_FUNC_ADD);  
+          
+    texture.draw(0,0);  
+  
+    glDisable(GL_BLEND);  
+}  
+
+Let me know if this works! It has for a project we did, (and will probably post soon)
+ Logged
+element
+
+Posts: 16
+
+
+
+
+	Re: FBO problems with alpha
+« Reply #10 on: December 08, 2010, 05:29:48 PM »
+God bless you!!!
+ Logged
+Guils
+
+Posts: 4
+
+
+
+
+	Re: FBO problems with alpha
+« Reply #11 on: January 08, 2011, 09:58:57 PM »
+Using the function glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA) didn't do the trick for me. I used glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA) right before writing in the FBO texture instead.
+
+Code:
+view plaincopy to clipboardprint?
+void DrawInFBOMethod()  
+{  
+    FBOCanvas.begin();  
+    glPushAttrib(GL_ALL_ATTRIB_BITS);  
+  
+    glEnable(GL_BLEND);  
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);  
+  
+    //Draw stuff here  
+    // ...  
+    glDisable(GL_BLEND);  
+    glPopAttrib();  
+    FBOCanvas.end();  
+}  
+  
+void DrawOnScreenMethod()  
+{  
+    ofEnableAlphaBlending();  
+    FBOCanvas.Draw(0,0);  
+    ofDisableAlphaBlending();  
+}  
+
+
+The FBO's png output file looks good too.
+ Logged
+frankiezafe
+
+Posts: 1
+
+
+
+
+	Re: FBO problems with alpha
+« Reply #12 on: March 20, 2012, 12:46:29 AM »
+Thanks a lot, Gulls, it's exactly what i was searching  for!
+Using FBO's has independant rendering layers.
+
+
+http://forum.openframeworks.cc/index.php?PHPSESSID=5f9fe2qihf6n19lf7v8ri5e2k3&/topic,1643.0.html

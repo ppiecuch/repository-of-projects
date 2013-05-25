@@ -1,0 +1,16 @@
+sudo chmod +x jdk-6u45-linux-i586-rpm.bin
+sudo ./jdk-6u45-linux-i586-rpm.bin
+sudo alien jdk-6u45-linux-i586.rpm
+sudo dpkg -i jdk-6u45-linux-i586.deb
+
+
+错误：
+运行java -version出现
+Error occurred during initialization of VM
+java/lang/NoClassDefFoundError: java/lang/Object
+解决：
+unpack200 rt.pack rt.jar
+Error: Could not open jar file: rt.jar
+
+sudo /usr/java/jdk1.6.0_45/bin/unpack200 rt.pack rt.jar
+sudo /usr/java/jdk1.6.0_45/bin/unpack200 tools.pack tools.jar

@@ -320,6 +320,9 @@
 .syntaxhighlighter .green {
   color: #00ff00 !important;
 }
+.syntaxhighlighter .blue {
+  color: #0000ff !important;
+}
 .syntaxhighlighter .color1, .syntaxhighlighter .color1 a {
   color: #f8bb00 !important;
 }

@@ -1,0 +1,9 @@
+异常：
+GNU gettext tools not found; required for intltool
+解决：
+sudo apt-get install intltool
+
+
+错误： No package 'libpanelapplet-2.0' found
+原因：
+解决：sudo apt-get install gnome-panel

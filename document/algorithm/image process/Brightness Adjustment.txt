@@ -1,0 +1,36 @@
+Image Processing Algorithms Part 4: Brightness Adjustment
+
+by Francis G. Loch
+
+    Adjusting the brightness of an image is one of the easiest image processing operations that can be done. All that is involved is adding the desired change in brightness to each of the red, green and blue colour components.
+
+    In pseudo-code it would go something like this:
+
+       colour = GetPixelColour(x, y)
+       newRed = Truncate(Red(colour) + brightness)
+       newGreen = Truncate(Green(colour) + brightness)
+       newBlue = Truncate(Blue(colour) + brightness)
+       PutPixelColour(x, y) = RGB(newRed, newGreen, newBlue)
+
+    The value of brightness will usually be in the range of -255 to +255 for a 24 bit palette. Negative values will darken the image and conversely positive values will brighten the image.
+
+    The procedure Truncate() was previously mentioned in part 2 of this series and just ensures that the new values of red, green and blue are within the valid range. Here it is again in pseudo-code:
+
+       Procedure Truncate(value)
+          If value < 0 Then value = 0
+          If value > 255 Then value = 255
+          Return value
+       EndProcedure
+
+    Here we have the the 'Lena' and 'mandrill' images which have had the brightness adjusted by -128 (darkened) and +128 (brightened):
+
+    	
+    'Lena' image with brightness = -128 	'Lena' image with brightness = +128
+
+    	
+    'Mandrill' image with brightness = -128 	'Mandrill' image with brightness = +128
+
+    As you can see adjusting the brightness is really simple. 
+
+
+http://www.thecryptmag.com/Online/55/imgproc_4.html

@@ -1,0 +1,16 @@
+TBDR架构原理上会对任意一个有效的pixel至少要进行读写读操作，所以对没有overdraw的情况带宽一定是负面影响。但是由于很多程序都有相当多的overdraw，所以IMG给的数据是平均会提高带宽利用率2.7-3倍。
+
+下面小议几点缺陷，欢迎拍砖。
+1）state load更加频繁。State load本质上是不利于访存的，所以对于小三角形多states的情况，由于要多次读写每个primitive状态配置信息，访存的完整性会更差。如果是处在多个tile间的三角形，则是多倍的影响。
+2）纹理读取效率会更低，如果纹理覆盖多个tile，那么就要多次读取这个纹理。
+3）对于海量triangle三角形的情况，scene buffer会毫无悬念的溢出。而现在几十million triangle/frame的应用是小case。这个大概是TBDR架构退出PC应用的最重要的原因。
+4）Pixel Shader不能改变Z值， 当然这个是所有deffered shading的共有问题。 不能在PS的时候改变Z值，意味着很多特效不能做。所以这时候一定要disable deffered shading.
+     但是TBDR架构如果diable deffered shading，那就要支持IMG的方式，又要有Z buffer, C buffer。当然可以用scene buffer来共享，但是控制一定要两套， 面积开销应该不小。
+5）Multi-pass技术的流行。Multi-pass同样会kill overdraw, 所以对这种应用来说，TBDR架构毫无优势可言。
+
+由于现在的应用在向更多的三角形，更通用的指令发展，所以个人觉得TBDR架构目前来看只适用于低端应用。但是对于低端应用，到底是面积更重要，还是带宽更重要，这是个艰难的取舍。
+更何况，现在HierarchyZ， EarlyZ，以及ZC压缩技术的发展，大大降低了带宽需求。
+
+未来也许在某些特定领域，TBDR架构仍然会有优势，但是越来越复杂的场景永远会是TBDR架构的噩梦。而你很难去阻止游戏设计者们向这个方向走。。
+
+http://www.opengpu.org/forum.php?mod=viewthread&tid=832
