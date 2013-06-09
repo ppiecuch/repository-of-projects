@@ -35,6 +35,14 @@ public:
 		core::yonSleep(500);
 	}
 };
+int ReentrantCounterReal=0;
+int ReentrantCounterTest=0;
+class ReentrantWork : public core::IWork{
+public:
+	virtual void process(){
+		ReentrantCounterTest+=1;
+	}
+};
 core::mutex MyWork::s_mutex;
 //core::semaphore MyWork::s_mutex;
 s32 MyWork::counter=1;
@@ -42,9 +50,12 @@ s32 MyWork::counter=1;
 void addWork(){
 	if(pool)
 	{
-		IWork* work=new MyWork();
+		//IWork* work=new MyWork();
+		IWork* work=new ReentrantWork();
 		pool->push(work);
 		work->drop();
+
+		ReentrantCounterReal++;
 	}
 }
 
@@ -61,7 +72,7 @@ public:
 				return true;
 			case event::ENUM_MOUSE_INPUT_TYPE_LUP:
 				//logger->debug("[LR]%d,%d\n",evt.mouseInput.x,evt.mouseInput.y);
-				s32 num=core::randomizer::rand(1,10);
+				s32 num=core::randomizer::rand(100,1000);
 				for(s32 i=0;i<num;++i)
 					addWork();
 				return true;
@@ -127,7 +138,7 @@ void drawFrame(){
 
 	sceneMgr->render(videoDriver);
 
-	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,WORK:%u",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),pool->size()),core::ORIGIN_POSITION2DI,COLOR_GREEN);
+	Logger->drawString(videoDriver,core::stringc("FPS:%d,TRI:%d,WORK:%u,%d/%d",videoDriver->getFPS(),videoDriver->getPrimitiveCountDrawn(),pool->size(),ReentrantCounterTest,ReentrantCounterReal),core::ORIGIN_POSITION2DI,COLOR_GREEN);
 
 	videoDriver->end();
 }

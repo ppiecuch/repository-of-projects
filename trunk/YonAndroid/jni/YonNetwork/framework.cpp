@@ -156,16 +156,16 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	IDelegateVoid* dlgt=createDelegateVoid<DlgtTest>(&test,&DlgtTest::test);
 	GameNetwork()->setOnDisconnectDelegate(dlgt);
 
-	GameNetwork()->RegisterEventHandler(MSG_ACCOUNT_S2C::CMD_S2CServerList, &test, &DlgtTest::scCmdLoginSuccess);
+	//GameNetwork()->RegisterEventHandler(MSG_ACCOUNT_S2C::CMD_S2CServerList, &test, &DlgtTest::scCmdLoginSuccess);
 
 	GameNetwork()->Init();
-	//GameNetwork()->Connect("192.168.1.245",8081);
+	GameNetwork()->Connect("192.168.1.245",8081);
 	//GameNetwork()->Connect("221.130.10.112",30003);
-	GameNetwork()->Connect("192.168.1.180",30001);
+	//GameNetwork()->Connect("192.168.1.180",30001);
 	//GameNetwork()->Connect("221.130.10.112",30001);
 
-	GetPacketMgr()->init(GameNetwork());
-	GetPacketMgr()->sendC2SLoginPacket("hongzb","123456","-2","Win32");
+	//GetPacketMgr()->init(GameNetwork());
+	//GetPacketMgr()->sendC2SLoginPacket("hongzb","123456","-2","Win32");
 	//GetPacketMgr()->sendC2SPlayerListReqPacket("5F19E5E739FC27253468142BFE920D47");
 	
 

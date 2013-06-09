@@ -23,6 +23,11 @@ void Crash() {
 
 #include "framework.h"
 
+ENUM_ENDIAN_MODE getEndian(){
+	static bool ret=(bool)(*(unsigned short *)"\0\xff" < 0x100);
+	return  ret?ENUM_ENDIAN_MODE_BIG:ENUM_ENDIAN_MODE_LITTLE;
+}
+
 
 SYonEngineParameters params;
 IYonEngine* engine=NULL;
@@ -110,6 +115,8 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	logger=Logger;
 	//randomizer=engine->getRandomizer();
 
+	//videoDriver->setTextureCreationConfig(MASK_TEXTURE_CREATION_CONFIG_16BIT_4ALPHA,true);
+
 #ifdef YON_COMPILE_WITH_WIN32
 	fs->addWorkingDirectory("../media",true);
 #elif defined(YON_COMPILE_WITH_ANDROID)
@@ -122,7 +129,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	ps[2].set(x+w,y); \
 	ps[3].set(x+w,y+h);
 
-	TO_PS(10,10,512,256)
+	TO_PS(10,10,1024,1024)
 
 	return true; 
 }
@@ -136,7 +143,7 @@ void drawFrame(){
 
 	static core::rectf r(0,0,1,1);
 	gfAdapter->clearZ(1000);
-	ITexture* texture=videoDriver->getTexture("de.png");
+	ITexture* texture=videoDriver->getTexture("506_4444.pvr.ccz");
 	//gfAdapter->drawFill(texture,r,ps,ENUM_TRANS_NONE,0xFF00FF00);
 	gfAdapter->drawRegion(texture,r,ps,ENUM_TRANS_NONE,true);
 	gfAdapter->render();
