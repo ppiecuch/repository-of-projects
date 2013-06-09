@@ -22,6 +22,16 @@ ISceneNode* planeModel=NULL;
 ISceneNode* teapotModel=NULL;
 f32 factor=1.1f;
 
+
+s32 strlen_utf8(const c8 *s) {
+	s32 i = 0, j = 0;
+	while (s[i]) {
+		if ((s[i] & 0xc0) != 0x80) j++;
+		i++;
+	}
+	return j;
+}
+
 class MyEventReceiver : public IEventReceiver{
 public:
 	virtual bool onEvent(const SEvent& evt)
@@ -108,7 +118,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 
 	//Logger->debug("%s\n",fs->getAbsolutePath(fs->getWorkingDirectory()).c_str());
 
-	pointMaterial.PolygonMode=video::ENUM_POLYGON_MODE_POINT;
+	/*pointMaterial.PolygonMode=video::ENUM_POLYGON_MODE_POINT;
 
 	core::array<S2DVertex>& vertices=pointShap.getVertexArray();
 	core::array<u16>& indices=pointShap.getIndexArray();
@@ -121,7 +131,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	vertices.push_back(v3);
 	indices.push_back(0);
 	indices.push_back(1);
-	indices.push_back(2);
+	indices.push_back(2);*/
 
 #if 0
 	Logger->debug("%s\n",fs->getResourcePath("test.png").c_str());
@@ -274,18 +284,21 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	//Logger->debug("%s\r\n",stream->readString().c_str());
 
 	stream->drop();
-#elif 0
-	c8 in_utf8[] = 
+#elif 1
+	/*c8 in_utf8[] = 
 	{0x20,0xe8,0xbf,0x99,0xe6,0x98,0xaf,0xe4,0xb8,0x80,0xe4,0xb8,0xaa,0x69,0x63,0x6f,
 	0x6e,0x76,0xe7,0x9a,0x84,0xe6,0xb5,0x8b,0xe8,0xaf,0x95,0xe4,0xbe,0x8b,0xe7,0xa8,
 	0x8b,0xef,0xbc,0x9a,0x0a,0xe2,0x80,0x9c,0xe7,0xba,0xb5,0xe6,0xb5,0xb7,0xe6,0x9d,
 	0xaf,0xe2,0x80,0x9d,0xe4,0xb8,0x9c,0xe5,0x8d,0x97,0xe5,0xa4,0xa7,0xe5,0xad,0xa6,
 	0xe7,0xac,0xac,0xe4,0xb8,0x89,0xe5,0xb1,0x8a,0xe5,0xb5,0x8c,0xe5,0x85,0xa5,0xe5,
 	0xbc,0x8f,0xe7,0xb3,0xbb,0xe7,0xbb,0x9f,0xe8,0xae,0xbe,0xe8,0xae,0xa1,0xe9,0x82,
-	0x80,0xe8,0xaf,0xb7,0xe8,0xb5,0x9b,0x00};    //UTF-8编码
+	0x80,0xe8,0xaf,0xb7,0xe8,0xb5,0x9b,0x00};    //UTF-8编码*/
 	//Logger->debug("%s\r\n",i18nManager->convert("中华人民共和国",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8).c_str());
 	//Logger->debug("%s\r\n",i18nManager->convert("涓崕浜烘皯鍏卞拰鍥",ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
 	//Logger->debug("%s\r\n",i18nManager->convert(in_utf8,ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str());
+
+	core::stringc str=i18nManager->convert("abc中华人民abc共和国abc",ENUM_ENCODING_GB18030,ENUM_ENCODING_UTF8);
+	YON_DEBUG("len:%d,clen:%d\r\n",str.length(),strlen_utf8(str.c_str()));
 
 #elif 0
 

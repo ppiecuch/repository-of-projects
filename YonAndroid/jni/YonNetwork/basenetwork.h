@@ -26,8 +26,8 @@ struct SPacketBuffer : public core::IRecyclable{
 	}
 };
 
-//class CBaseNetwork : public CSingleton<CBaseNetwork>
-class CBaseNetwork
+class CBaseNetwork : public CSingleton<CBaseNetwork>
+//class CBaseNetwork
 {
 protected:
 
@@ -117,6 +117,6 @@ public:
 	virtual void Update();
 };
 
-//#define GameNetwork()	CBaseNetwork::GetInstance()
+#define GameNetwork()	CBaseNetwork::GetInstance()
 
 #endif

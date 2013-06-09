@@ -73,6 +73,6 @@ public:
 	
 };
 
-#define GameNetwork()	CGameNetwork::GetInstance()
+//#define GameNetwork()	CGameNetwork::GetInstance()
 
 #endif
