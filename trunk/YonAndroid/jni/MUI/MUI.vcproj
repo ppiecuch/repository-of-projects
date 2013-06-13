@@ -180,7 +180,27 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_ILayer.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_ILayerItem.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_ILayerNode.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_IRenderTarget.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_LayerNode.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_LayerNode.h"
 			>
 		</File>
 		<File
