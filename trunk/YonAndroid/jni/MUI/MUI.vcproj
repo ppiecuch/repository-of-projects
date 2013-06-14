@@ -168,6 +168,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\MUI_Align.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_config.h"
 			>
 		</File>
@@ -241,6 +245,10 @@
 		</File>
 		<File
 			RelativePath=".\MUI_SkinLayerItem.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_WidgetStyle.h"
 			>
 		</File>
 	</Files>
