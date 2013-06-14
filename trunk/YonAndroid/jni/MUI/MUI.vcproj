@@ -196,11 +196,27 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_LayerItem.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_LayerItem.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_LayerManager.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_LayerNode.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\MUI_LayerNode.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_OverlappedLayer.h"
 			>
 		</File>
 		<File
@@ -213,6 +229,18 @@
 		</File>
 		<File
 			RelativePath=".\MUI_RenderItem.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_SharedLayer.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_SharedLayerNode.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_SkinLayerItem.h"
 			>
 		</File>
 	</Files>

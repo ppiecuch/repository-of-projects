@@ -7,8 +7,6 @@ using namespace yon;
 
 namespace mui{
 
-	class RenderItem;
-
 	class LayerNode : ILayerNode{
 
 		ILayerNode* m_pParent;
@@ -38,6 +36,10 @@ namespace mui{
 		virtual void removeChild(ILayerNode* node);
 
 		virtual void raiseChild(ILayerNode* node);
+
+		virtual void attach(ILayerItem* item);
+
+		virtual void detach(ILayerItem* item);
 
 		virtual u32 getChildrenCount() const;
 

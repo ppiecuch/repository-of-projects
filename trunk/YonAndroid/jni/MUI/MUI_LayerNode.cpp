@@ -56,6 +56,26 @@ namespace mui{
 		//TODO
 	}
 
+	void LayerNode::attach(ILayerItem* item){
+		m_layerItems.push_back(item);
+		item->attach(m_pLayer, this);
+		m_bDirty = true;
+	}
+
+	void LayerNode::detach(ILayerItem* item){
+		YON_DEBUG_BREAK_IF(item==NULL);
+		for(u32 i=0;i<m_layerItems.size();++i)
+		{
+			if(m_layerItems[i]==item)
+			{
+				m_layerItems.erase(i);
+				m_bDirty = true;
+				return;
+			}
+		}
+		YON_DEBUG_BREAK_IF(true);
+	}
+
 	u32 LayerNode::getChildrenCount() const{
 		return m_children.size();
 	}
@@ -180,6 +200,10 @@ namespace mui{
 	}
 
 	void LayerNode::renderToTarget(IRenderTarget* target){
+
+		//TODO
+		//mDepth = _target->getInfo().maximumDepth;
+
 		bool needCompression = false;
 
 		//TODO:“…Œ £¨≤ª∂Æ£ø
