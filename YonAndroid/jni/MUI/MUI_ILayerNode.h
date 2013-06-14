@@ -9,10 +9,17 @@ namespace mui{
 
 	class ILayer;
 	class ILayerItem;
+	class LayerItem;
 	class RenderItem;
 	class IRenderTarget;
 
 	class ILayerNode{
+	private:
+		//只被LayerItem调用
+		//virtual void detachLayerItem(ILayerItem* item) = 0;
+		virtual void detach(ILayerItem* item) = 0;
+
+		friend class LayerItem;
 	public:
 		virtual ~ILayerNode(){}
 
@@ -22,13 +29,19 @@ namespace mui{
 		virtual ILayer* getLayer() const = 0;
 
 		//add a child node and return it
+		//virtual ILayerNode* createChildItemNode() = 0;
 		virtual ILayerNode* addChild() = 0;
 
 		//removes a child node
+		//virtual void destroyChildItemNode(ILayerNode* _node) = 0;
 		virtual void removeChild(ILayerNode* node) = 0;
 
 		//raise a child node
+		//virtual void upChildItemNode(ILayerNode* _node) = 0;
 		virtual void raiseChild(ILayerNode* node) = 0;
+
+		//virtual void attachLayerItem(ILayerItem* item) = 0;
+		virtual void attach(ILayerItem* item) = 0;
 
 		virtual u32 getChildrenCount() const = 0;
 
