@@ -172,6 +172,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_CommonSkin.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_CommonSkin.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_config.h"
 			>
 		</File>
@@ -197,6 +205,10 @@
 		</File>
 		<File
 			RelativePath=".\MUI_IRenderTarget.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_IShapWidget.h"
 			>
 		</File>
 		<File
