@@ -28,10 +28,14 @@ namespace mui{
 
 		attachToLayerItemNode(node,true);
 	}
-	void LayerItem::detach();
-	void LayerItem::raiseLayerItem();
+	void LayerItem::detach(){
+		//TODO
+	}
+	void LayerItem::raiseLayerItem(){
+		//TODO
+	}
 
-	void LayerItem::setMaterial(const video::SMaterial& material);
+	//void LayerItem::setMaterial(const video::SMaterial& material);
 
 	void LayerItem::addChildItem(LayerItem* item){
 		m_children.push_back(item);
