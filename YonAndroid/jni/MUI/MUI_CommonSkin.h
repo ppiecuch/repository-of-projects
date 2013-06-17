@@ -66,6 +66,10 @@ namespace mui{
 		RenderItem* m_pRenderItem;
 		video::SColor m_color;
 
+		bool m_bEmptyView;
+		//IntCoord mCurrentCoord;
+		core::recti m_croppedCoordinate;
+
 		virtual void updateView();
 		virtual void repairView();
 

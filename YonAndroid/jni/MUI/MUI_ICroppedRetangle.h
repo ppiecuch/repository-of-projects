@@ -123,6 +123,7 @@ namespace mui{
 			return result;
 		}
 
+		//bool _checkOutside() const 
 		bool isFullCropped() const
 		{
 			return ( (getRight() < m_pParent->m_margin.Left ) ||
