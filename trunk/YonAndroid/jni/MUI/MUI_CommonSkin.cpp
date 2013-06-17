@@ -9,8 +9,40 @@ namespace mui{
 	}
 	CommonSkin::~CommonSkin(){}
 
-	void CommonSkin::updateView(){}
-	void CommonSkin::repairView(){}
+	void CommonSkin::updateView(){
+
+		bool bMargin=updateMargin();
+
+		m_bEmptyView=getViewWidth()<=0||getViewHeight()<=0;
+
+		m_croppedCoordinate.topLeft.set(m_coordinate.topLeft.x+m_margin.Left,m_coordinate.topLeft.y+m_margin.Top);
+
+		if(bMargin)
+		{
+			if(isFullCropped())
+			{
+				m_bMargin=bMargin;
+				if(m_pNode)
+					m_pNode->setDirty(m_pRenderItem);
+				return;
+			}
+		}
+
+		if(m_bMargin||bMargin)
+		{
+			m_croppedCoordinate.bottomRight.x=m_croppedCoordinate.topLeft.x+getViewWidth();
+			m_croppedCoordinate.bottomRight.y=m_croppedCoordinate.topLeft.y+getViewHeight();
+
+			if(m_croppedCoordinate.getWidth()>0||m_croppedCoordinate.getHeight()>0)
+			{
+
+			}
+		}
+	}
+	void CommonSkin::repairView(){
+		if(m_pNode)
+			m_pNode->setDirty(m_pRenderItem);
+	}
 
 	void CommonSkin::setAlign(const dimension2di& old){}
 
