@@ -66,17 +66,27 @@ namespace mui{
 		RenderItem* m_pRenderItem;
 		video::SColor m_color;
 
+		//FloatRect mRectTexture;
+		core::marginf m_unknownMargin;
+
 		bool m_bEmptyView;
+		//FloatRect mCurrentTexture;
+		core::marginf m_croppedMargin;	//TODO 名字可能不贴切
 		//IntCoord mCurrentCoord;
 		core::recti m_croppedCoordinate;
 
+		//virtual void _updateView();
 		virtual void updateView();
+		//virtual void _correctView();
 		virtual void repairView();
 
 		virtual void setAlign(const dimension2di& old);
 
-		virtual void setUVRect(const core::rectf& rect);
+		//_setUVSet(const FloatRect& _rect)
+		virtual void setUVRect(const core::marginf& rect);
 		virtual void setColor(const video::SColor& value);
+
+		void updateCroppedMargin();
 	public:
 		CommonSkin();
 		virtual ~CommonSkin();

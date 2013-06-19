@@ -9,6 +9,7 @@ namespace mui{
 
 	class ICroppedRetangle{
 	protected:
+		//ICroppedRectangle* mCroppedParent;
 		ICroppedRetangle* m_pParent;
 		bool m_bMargin;
 
