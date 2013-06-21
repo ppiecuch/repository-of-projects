@@ -11,6 +11,7 @@ using namespace yon::i18n;
 using namespace yon::platform;
 using namespace yon::video;
 using namespace yon::scene;
+using namespace yon::text;
 using namespace yon::scene::camera;
 using namespace yon::scene::animator;
 using namespace yon::audio;

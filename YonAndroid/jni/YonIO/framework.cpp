@@ -1,5 +1,4 @@
 ﻿#include "framework.h"
-
 SYonEngineParameters params;
 IYonEngine* engine=NULL;
 IVideoDriver* videoDriver=NULL;
@@ -10,6 +9,7 @@ IFileSystem* fs=NULL;
 ICamera* pCamera=NULL;
 ILogger* logger=NULL;
 //IRandomizer* randomizer=NULL;
+ITextSystem* textSystem=NULL;
 II18NManager* i18nManager=NULL;
 ITimer* timer=NULL;
 
@@ -32,6 +32,30 @@ s32 strlen_utf8(const c8 *s) {
 	return j;
 }
 
+/* 
+void substr (char *dest,char *str, unsigned start, unsigned end)
+{
+	unsigned n = end - start;
+	printf("\n%u \n",n);
+	strncpy(dest, str + start, n);
+	dest[n] = 0;
+}
+int Pattern(char *str,char *pattern,char *result)
+{
+	int cflags=REG_EXTENDED,z;
+	regex_t reg;
+	regmatch_t pm[10];
+	const size_t nmatch=10;
+	z = regcomp (&reg, pattern, cflags);
+	printf("%d\n",z);
+	if(z!=0) return z;
+	z = regexec (&reg, str, nmatch, pm, 0);
+	printf("%d\n",z);
+	if(z!=0) return z;
+	substr(result,str, pm[0].rm_so, pm[0].rm_eo);
+	return z;
+}
+*/
 class MyEventReceiver : public IEventReceiver{
 public:
 	virtual bool onEvent(const SEvent& evt)
@@ -102,6 +126,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	i18nManager=engine->getI18NManager();
 	const IGeometryFactory* geometryFty=sceneMgr->getGeometryFactory();
 	IAnimatorFactory*  animatorFty=sceneMgr->getAnimatorFactory();
+	textSystem=engine->getTextSystem();
 	fs=engine->getFileSystem();
 	pCamera=sceneMgr->addCamera(ENUM_CAMERA_TYPE_ORTHO_WINDOW,NULL,core::vector3df(0,0,-300),core::vector3df(0,-1,0)); 
 	logger=Logger;
@@ -133,7 +158,13 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	indices.push_back(1);
 	indices.push_back(2);*/
 
-#if 0
+#if 1
+	//char result[100];
+	//Pattern("Windows 95","Windows (?=95|98|NT|2000)",result);
+	//printf("%s\n",result);
+	IPattern* pattern=textSystem->compile("^(abcdefg.*)|(123456789.*)$");
+	pattern->drop();
+#elif 1
 	Logger->debug("%s\n",fs->getResourcePath("test.png").c_str());
 	Logger->debug("%s\n",fs->getResourcePath("Android.mk").c_str());
 	Logger->debug("%s\n",fs->getResourcePath("nothing.png").c_str());
@@ -157,8 +188,7 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 
 	YON_DEBUG("%s(%d)\r\n",utf8_1.toStringc().c_str(),utf8_1.size());
 	YON_DEBUG("%s(%d)\r\n",i18nManager->convert(utf8_2.toStringc().c_str(),ENUM_ENCODING_UTF8,ENUM_ENCODING_GB18030).c_str(),utf8_2.size());
-#endif
-#if 0
+#elif 1
 	u32 test=0xFFFFFFFF;
 	YON_DEBUG("%u,%08X\r\n",test,(s32)test);
 #elif 0

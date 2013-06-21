@@ -23,7 +23,8 @@ class MUI_API RenderItem{
 	video::SMaterial m_material;
 	core::array<SDrawItem> m_drawItems;
 	IRenderTarget* m_pRenderTarget;
-	scene::SDynamicShap2D m_shap;
+	//TODO use scene::SDynamicShap2D
+	scene::SDynamicShap3D m_shap;
 public:
 	RenderItem();
 	virtual ~RenderItem();
@@ -46,6 +47,9 @@ public:
 
 	u32 getRequestVertexCount() const;
 	u32 getVertexCount() const;
+
+	//Vertex* getCurrentVertexBuffer() const;
+	scene::SDynamicShap3D& getShap();
 
 	void addDrawItem(IBaseWidget* widget, size_t count);
 	void removeDrawItem(IBaseWidget* widget);
