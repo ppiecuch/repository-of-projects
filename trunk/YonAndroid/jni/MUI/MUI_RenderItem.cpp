@@ -88,4 +88,8 @@ namespace mui{
 	void RenderItem::reallockDrawItem(IBaseWidget* widget, size_t count){
 		//TODO
 	}
+
+	scene::SDynamicShap2D& RenderItem::getShap(){
+		return m_shap;
+	}
 }

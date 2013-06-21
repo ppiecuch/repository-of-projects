@@ -1,4 +1,5 @@
 #include "MUI_CommonSkin.h"
+#include "MUI_Fill.h"
 
 namespace mui{
 
@@ -111,6 +112,7 @@ namespace mui{
 	}
 
 	void CommonSkin::setAlign(const dimension2di& old){
+		YON_DEBUG_BREAK_IF(m_pParent->getWidth()<m_coordinate.getWidth()||m_pParent->getHeight()<m_coordinate.getHeight());
 		//SOLVED ´ýÀí½â
 		bool needUpdate=false;
 
@@ -204,5 +206,30 @@ namespace mui{
 	}
 
 	//virtual void doRender();
-	void CommonSkin::preRender(){}
+	void CommonSkin::preRender(){
+		if(!m_bVisible||m_bEmptyView)
+			return;
+
+		//m_pRenderItem->get
+		scene::SDynamicShap3D& shap=m_pRenderItem->getShap();
+		core::array<SVertex>& vertices=shap.getVertexArray();
+		core::array<u16>& indices=shap.getIndexArray();
+		IRenderTarget* rt=m_pRenderItem->getRenderTarget();
+
+		f32 depth = m_pNode->getDepth();
+
+		//float vertex_left = ((info.pixScaleX * (float)(mCurrentCoord.left + mCroppedParent->getAbsoluteLeft() - info.leftOffset) + info.hOffset) * 2) - 1;
+		//float vertex_right = vertex_left + (info.pixScaleX * (float)mCurrentCoord.width * 2);
+		//float vertex_top = -(((info.pixScaleY * (float)(mCurrentCoord.top + mCroppedParent->getAbsoluteTop() - info.topOffset) + info.vOffset) * 2) - 1);
+		//float vertex_bottom = vertex_top - (info.pixScaleY * (float)mCurrentCoord.height * 2);
+
+		f32 left=rt->getScaleToNormal().x*(f32)(m_croppedCoordinate.topLeft.x+m_pParent->getAbsoluteLeft())*2-1;
+		f32 right=left+rt->getScaleToNormal().x*(f32)m_croppedCoordinate.getWidth()*2;
+		f32 top=-((rt->getScaleToNormal().y*(f32)m_croppedCoordinate.topLeft.y+m_pParent->getAbsoluteTop())*2-1);
+		f32 bottom=top-rt->getScaleToNormal().y*m_croppedCoordinate.getHeight()*2;
+
+		vertices.set_used(4);
+		indices.set_used(6);
+
+	}
 }
