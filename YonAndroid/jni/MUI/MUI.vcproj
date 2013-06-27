@@ -264,6 +264,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_Widget.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_WidgetStyle.h"
 			>
 		</File>

@@ -7,6 +7,18 @@ namespace mui{
 
 	//class SkinItem
 	class SkinLayerItem : LayerItem{
+	private:
+		//VectorSubWidget mSubSkinChild;
+		core::array<IBaseWidget*> m_skinWidgets;
+
+		//ISubWidgetText* mText;
+		//TODO
+
+		//ISubWidgetRect* mMainSkin;
+		IShapWidget* m_pShapWidget;
+
+		//bool mSubSkinsVisible;
+		bool m_bSkinVisible;
 	public:
 		SkinLayerItem();
 	};

@@ -13,6 +13,7 @@ namespace mui{
 		//TODO ·ÏÆú
 		ILayerNode* m_pSavedLayerNode;
 
+		//VectorSubWidget mDrawItems;
 		core::array<IBaseWidget*> m_widgets;
 		core::array<LayerItem*> m_children;
 		core::array<LayerItem*> m_independents;
