@@ -64,8 +64,10 @@ namespace mui{
 	protected:
 		ILayerNode* m_pNode;
 		RenderItem* m_pRenderItem;
+		//uint32 mCurrentColour;
 		video::SColor m_color;
 
+		//TODO 这到底是什么东西？
 		//FloatRect mRectTexture;
 		core::marginf m_unknownMargin;
 
@@ -73,7 +75,7 @@ namespace mui{
 		//FloatRect mCurrentTexture;
 		core::marginf m_croppedMargin;	//TODO 名字可能不贴切
 		//IntCoord mCurrentCoord;
-		core::recti m_croppedCoordinate;
+		core::recti m_croppedCoordinate;		//裁剪后的坐标框
 
 		//virtual void _updateView();
 		virtual void updateView();

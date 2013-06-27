@@ -11,39 +11,47 @@ namespace mui{
 	protected:
 		//ICroppedRectangle* mCroppedParent;
 		ICroppedRetangle* m_pParent;
-		bool m_bMargin;
+		//bool mIsMargin;
+		bool m_bCroppedByParent;
 
 		core::margini m_margin;
-		core::recti m_coordinate;
+		core::recti m_coordinate;				//以左上角为基点相对于父节点偏移量
 		core::position2di m_absolutePosition;
 
 		/** True if rectangle is cropped by parent rectangle */
-		bool isMargin() const
+		//bool _isMargin() const
+		bool isCroppedByParent() const
 		{
-			return m_bMargin;
+			return m_bCroppedByParent;
 		}
 		// Get cropped by parent rectangle coordinates
-		s32 getViewLeft() const
+		//int _getViewLeft() const
+		s32 getCroppedLeft() const
 		{
 			return m_coordinate.topLeft.x + m_margin.Left;
 		}
-		s32 getViewRight() const
+		//int _getViewRight() const
+		s32 getCroppedRight() const
 		{
 			return m_coordinate.bottomRight.x - m_margin.Right;
 		}
-		s32 getViewTop() const
+		//int _getViewTop() const
+		s32 getCroppedTop() const
 		{
 			return m_coordinate.topLeft.y + m_margin.Top;
 		}
-		s32 getViewBottom() const
+		//int _getViewBottom() const
+		s32 getCroppedBottom() const
 		{
 			return m_coordinate.bottomRight.y - m_margin.Bottom;
 		}
-		s32 getViewWidth() const
+		//int _getViewWidth() const
+		s32 getCroppedWidth() const
 		{
 			return m_coordinate.getWidth() - m_margin.Left - m_margin.Right;
 		}
-		s32 getViewHeight() const
+		//int _getViewHeight() const
+		s32 getCroppedHeight() const
 		{
 			return m_coordinate.getHeight() - m_margin.Top - m_margin.Bottom;
 		}
@@ -78,6 +86,7 @@ namespace mui{
 		//对于coordinate而言，LTRB都是本Retangle以parent retangle的左上角为基点的长度
 		//对于margin而言，LTRB也是以parent为参照，不同的是margin.Left是相对于retangle的Left，
 		//margin.Right是相对于retangle的Right，以此类推（注意其取值范围是>=0；当>0时，表示当前retangle被裁剪了）
+		//如果被裁剪，返回true，否则返回false
 		bool updateMargin()
 		{
 			bool result = false;
@@ -134,7 +143,7 @@ namespace mui{
 		}
 	public:
 		ICroppedRectangle() :
-		  m_bMargin(false),
+		  m_bCroppedByParent(false),
 			  m_pParent(NULL)
 		{}
 		virtual ~ICroppedRectangle(){}
@@ -186,11 +195,13 @@ namespace mui{
 		{
 			return core::recti(m_absolutePosition.x, m_absolutePosition.y, m_absolutePosition.x + m_coordinate.getWidth(), m_absolutePosition.y + m_coordinate.getHeight());
 		}
+		//与getAbsoluteRect意义相同
 		//Get coordinate in screen coordinates
-		core::position2di getAbsoluteCoordinate() const
-		{
-			return core::position2di(m_absolutePosition.x, m_absolutePosition.y, m_coordinate.getWidth(), m_coordinate.getHeight());
-		}
+		//core::recti getAbsoluteCoordinate() const
+		//{
+			//return IntCoord(mAbsolutePosition.left, mAbsolutePosition.top, mCoord.width, mCoord.height);
+		//	return core::recti(m_absolutePosition.x, m_absolutePosition.y, m_absolutePosition.x + m_coordinate.getWidth(), m_absolutePosition.y + m_coordinate.getHeight());
+		//}
 
 		//Get X in screen coordinates
 		int getAbsoluteLeft() const
