@@ -5,7 +5,50 @@ namespace mui{
 
 	//Widget
 	class Widget
-		:public ICroppedRectangle, public SkinLayerItem,{
+		:public ICroppedRectangle
+		, public SkinLayerItem{
+	private:
+
+		//Widget* mWidgetClient;
+		Widget* m_pWidgetClient;
+
+		//VectorWidgetPtr mWidgetChild;
+		core::array<Widget*> m_children;
+
+		//VectorWidgetPtr mWidgetChildSkin;
+		core::array<Widget*> m_skinChildren;
+
+		//bool mEnabled;
+		bool m_bEnable;
+
+		//bool mVisible;
+		bool m_bVisible;
+
+		//float mAlpha;
+		f32 m_fAlpha;
+
+		//std::string mName;
+		core::stringc m_name;
+
+		//Widget* mParent;
+		Widget* m_pParent;
+
+		//WidgetStyle mWidgetStyle;
+		WidgetStyle m_widgetStyle;
+
+		//Align mAlign;
+		Align m_align;
+
+		//void frameEntered(float _frame);
+		virtual void onFrameEntered(u32 timeMs);
+
+	protected:
+		//all creation only through the factory
+		virtual ~Widget();
+
+		//creates a widget
+		//Widget* baseCreateWidget(WidgetStyle _style, const std::string& _type, const std::string& _skin, const IntCoord& _coord, Align _align, const std::string& _layer, const std::string& _name, bool _template);
+		Widget* baseCreateWidget(WidgetStyle style, const core::stringc& name, const core::stringc& type, const core::stringc& skin, const core::recti& coord, Align align, const core::stringc& layer, bool template);
 
 	public:
 
@@ -94,9 +137,9 @@ namespace mui{
 
 		/** 
 		 *@brief Attach widget to parent
-		 *@param _parent New parent
-		 *@param _style New widget style (see WidgetStyle::Enum)
-		 *@param _layer Attach to specified layer (if any)
+		 *@param parent New parent
+		 *@param style New widget style (see WidgetStyle::Enum)
+		 *@param layer Attach to specified layer (if any)
 		 */
 		void attachToWidget(Widget* parent, WidgetStyle style = WidgetStyle::Child, const core::stringc& layer = "");
 
@@ -107,8 +150,8 @@ namespace mui{
 
 		/** 
 		 *@brief Set widget style.
-		 *@param _style New widget style (see WidgetStyle::Enum)
-		 *@param _layer Attach to specified layer (if any)
+		 *@param style New widget style (see WidgetStyle::Enum)
+		 *@param layer Attach to specified layer (if any)
 		 *@note When choosing WidgetStyle::Popup style you also need attach widget to layer
 		 */
 		void setWidgetStyle(WidgetStyle style, const core::stringc& layer = "");
