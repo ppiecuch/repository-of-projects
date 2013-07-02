@@ -172,6 +172,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_Button.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_Button.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_CommonSkin.cpp"
 			>
 		</File>
@@ -181,6 +189,10 @@
 		</File>
 		<File
 			RelativePath=".\MUI_config.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_EventPair.h"
 			>
 		</File>
 		<File
@@ -208,11 +220,31 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_Input.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_Input.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_InputManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_InputManager.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_IRenderTarget.h"
 			>
 		</File>
 		<File
 			RelativePath=".\MUI_IShapWidget.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_Label.h"
 			>
 		</File>
 		<File
@@ -233,6 +265,10 @@
 		</File>
 		<File
 			RelativePath=".\MUI_LayerNode.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_MouseButton.h"
 			>
 		</File>
 		<File
@@ -261,6 +297,10 @@
 		</File>
 		<File
 			RelativePath=".\MUI_SkinLayerItem.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_Widget.cpp"
 			>
 		</File>
 		<File

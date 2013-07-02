@@ -6,6 +6,7 @@ namespace mui{
 	//Widget
 	class Widget
 		:public ICroppedRectangle
+		,public Input
 		, public SkinLayerItem{
 	private:
 
@@ -41,6 +42,9 @@ namespace mui{
 
 		//void frameEntered(float _frame);
 		virtual void onFrameEntered(u32 timeMs);
+
+		//void _forcePick(Widget* _widget);
+		void front(Widget* _widget);
 
 	protected:
 		//all creation only through the factory
@@ -81,7 +85,8 @@ namespace mui{
 		/** 
 		 *@brief Is widget enabled 
 		 */
-		bool getEnabled() const;
+		//bool getEnabled() const;
+		bool isEnabled() const;
 
 		/** 
 		 *@brief Set align 
