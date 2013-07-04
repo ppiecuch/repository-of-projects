@@ -1,0 +1,9 @@
+Opensteer是用来仿真群体动画的顶层实现代码，现在大多数游戏的ai群体行为仿真部分好多都是基于该思想作的。
+
+
+OpenSteer is a C++ library to help build steering behaviors for autonomous characters in games and animation. 
+OpenSteer provides an app which displays predefined demos of steering behaviors. 
+You can prototype, visualize and debug your own as a plug-in.
+
+http://sourceforge.jp/projects/sfnet_opensteer/
+http://sourceforge.net/projects/opensteer/

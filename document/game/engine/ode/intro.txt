@@ -1,0 +1,22 @@
+ODE (Open Dynamic Engine) 是一个免费的具有工业品质的刚体动力学的库，一款优秀的开源物理引擎，它为主程序员Russell Smith和几位开源社区贡献者共同努力下开发的。它能很好地仿真现实环境中的可移动物体，它是快速，强健和 可移植的。而且它有内建的碰撞检测系统。本人的主要工作是研究 ODE物理引擎在3D游戏中的应用。研究主要是通过学习ODE的用户手册、阅读和理解ODE的代码然后掌握ODE的编程接口从而使用ODE刚体游戏引擎编 写3D游戏场景来体现ODE的应用。3D游戏场景的编写主要使用了3D图形API－OpenGL 和ODE引擎等游戏仿真技术。
+特点
+总共实现了以下基本的刚体物理运动游戏场景：
+（1）单摆运动：主要体现了球连接的具体使用。
+（2）撞球：主要体现了碰撞的处理。
+（3）汽车：主要体现了Hinge－2连接的使用。
+（4）抛物线运动：主要体现了刚体方向和速度具体处理方法。[1]
+功能
+支持功能如下：
+· Rigid bodies with arbitrary mass distribution.
+· Joint types: ball-and-socket, hinge, slider (prismatic), hinge-2, fixed, angular motor, linear motor, universal.
+· Collision primitives: sphere, box, cylinder, capsule, plane, ray, and triangular mesh, convex.
+· Collision spaces: Quad tree, hash space, and simple.
+· Simulation method: The equations of motion are derived from a Lagrange multiplier velocity based model due to Trinkle/Stewart and Anitescu/Potra.
+· A first order integrator is being used. It's fast, but not accurate enough for quantitative engineering yet. Higher order integrators will come later.
+· Choice of time stepping methods: either the standard ``big matrix'' method or the newer iterative QuickStep method can be used.
+· Contact and friction model: This is based on the Dantzig LCP solver described by Baraff, although ODE implements a faster approximation to the Coloumb friction model.
+· Has a native C interface (even though ODE is mostly written in C++).
+· Has a C++ interface built on top of the C one.
+· Many unit tests, and more being written all the time.
+· Platform specific optimizations.
+· Other stuff I forgot to mention...

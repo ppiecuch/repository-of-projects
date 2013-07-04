@@ -1,0 +1,9 @@
+http://gimpact.sourceforge.net/
+
+GIMPACT is a software library with tools for geometry processing and collision detection, 
+focused on solving most common problems on Virtual Reality development.
+
+Since Version 0.2, GIMPACT will work integrated with the Bullet Engine for general collision detection and physics. 
+For more details, please visit http://www.continuousphysics.com/Bullet/
+
+For updates, please visit http://sourceforge.net/projects/gimpact/

@@ -1,0 +1,17 @@
+以下评论摘抄自：
+http://www.iieeg.com/newscon.php?id=3755
+
+个人开发视觉引擎Maratis登场
+
+孤独的开发者Anaël Seghezzi终于完成了长达8年的开源引擎项目。
+该引擎称为Maratis引擎，由Anaël Seghezzi独立开发，他表示自己的作品是“为美术师和程序员设计的强大的游戏视觉效果开发工具。”
+Seghezzi还表示该引擎已经经过Windows，Mac和Iphone平台测试，运行流畅并“可用于任何平台上的虚拟开发。”
+
+尽管付出了相当的精力，Seghezzi还是让Maratis引擎保持免费并开源。引擎使用简单的Lua脚本语言，开发者可通过C++充分使用这款引擎。
+
+其实我是在blender的官方新闻发现的，有开发小组使用Blender建模，加Maratis渲染，开发了一个IPhone游戏。
+IPhone游戏连接：http://itunes.apple.com/fr/app/s ... 01/id332023470?mt=8
+
+Maratis引擎主页：http://www.maratis3d.org/
+源代码：http://code.google.com/p/maratis/
+以下是该引擎的一些图片，感觉还可以。并且自带编辑器。
