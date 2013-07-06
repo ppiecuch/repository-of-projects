@@ -1,0 +1,16 @@
+// file: mylib.pkg
+$cfile "MyClass.h"
+
+class CMyClass
+{
+    CMyClass();
+    ~CMyClass();
+    
+    void staticGreet();
+
+    void Greet();
+};
+
+
+	
+	

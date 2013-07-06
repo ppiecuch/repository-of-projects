@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="tolua++lib"
-	ProjectGUID="{71891C1A-E328-4258-AC3F-6F9698C6D8B4}"
+	Name="tolua++"
+	ProjectGUID="{67886D54-EA11-4A2A-B5CA-0B5461BD2D9D}"
 	RootNamespace="tolua++"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
@@ -178,7 +178,7 @@
 			Name="withLua51_Debug|Win32"
 			OutputDirectory="$(SolutionDir)bin"
 			IntermediateDirectory="$(SolutionDir)obj\$(ProjectName)"
-			ConfigurationType="4"
+			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
 			>
@@ -220,11 +220,14 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\tolua++_d.lib"
+				Name="VCLinkerTool"
+				AdditionalDependencies="..\..\..\bin\tolua++_d.lib;..\..\..\bin\lua-5.1.4_d.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -234,6 +237,9 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -322,28 +328,39 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\src\lib\tolua_event.c"
+			RelativePath="..\..\include\tolua++.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\lib\tolua_event.h"
+			RelativePath="..\..\src\bin\tolua.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\lib\tolua_is.c"
+			RelativePath="..\..\src\bin\toluabind.c"
+			>
+			<FileConfiguration
+				Name="withLua51_Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\src\bin\toluabind.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\lib\tolua_map.c"
+			RelativePath="..\..\src\bin\toluabind_default.c"
 			>
-		</File>
-		<File
-			RelativePath="..\..\src\lib\tolua_push.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\src\lib\tolua_to.c"
-			>
+			<FileConfiguration
+				Name="withLua51_Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

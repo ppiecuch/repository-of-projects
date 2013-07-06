@@ -145,7 +145,7 @@ int main (int argc, char* argv[])
   }
   lua_pop(L,1);
  }
-/* #define TOLUA_SCRIPT_RUN */
+// #define TOLUA_SCRIPT_RUN 
 #ifndef TOLUA_SCRIPT_RUN
  {
   int tolua_tolua_open (lua_State* L);
