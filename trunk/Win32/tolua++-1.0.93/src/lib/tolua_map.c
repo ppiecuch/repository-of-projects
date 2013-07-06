@@ -412,8 +412,8 @@ TOLUA_API void tolua_beginmodule (lua_State* L, const char* name)
 	}
 	else
 	 //@hzb
-	 //lua_pushvalue(L,LUA_GLOBALSINDEX);
-	 lua_setglobal(L,name);
+	 lua_pushvalue(L,LUA_GLOBALSINDEX);
+	// lua_setglobal(L,name);
 }
 
 /* End module
@@ -448,8 +448,8 @@ TOLUA_API void tolua_module (lua_State* L, const char* name, int hasvar)
 	{
 		/* global table */
 		//@hzb
-		//lua_pushvalue(L,LUA_GLOBALSINDEX);
-		lua_setglobal(L,name);
+		lua_pushvalue(L,LUA_GLOBALSINDEX);
+		//lua_setglobal(L,name);
 	}
 	if (hasvar)
 	{
