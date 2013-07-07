@@ -166,12 +166,48 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="lua"
+			>
+			<File
+				RelativePath=".\base01.lua"
+				>
+			</File>
+			<File
+				RelativePath=".\base02.lua"
+				>
+			</File>
+			<File
+				RelativePath=".\base03.lua"
+				>
+			</File>
+			<File
+				RelativePath=".\base04.lua"
+				>
+			</File>
+			<File
+				RelativePath=".\base05.lua"
+				>
+			</File>
+			<File
+				RelativePath=".\test1.lua"
+				>
+			</File>
+		</Filter>
 		<File
-			RelativePath=".\main.cpp"
+			RelativePath=".\All.pkg"
 			>
 		</File>
 		<File
-			RelativePath=".\MyClass.cpp"
+			RelativePath=".\buildPkg.bat"
+			>
+		</File>
+		<File
+			RelativePath=".\LuaBind.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\main.cpp"
 			>
 		</File>
 		<File
@@ -180,10 +216,6 @@
 		</File>
 		<File
 			RelativePath=".\MyClass.pkg"
-			>
-		</File>
-		<File
-			RelativePath=".\test1.lua"
 			>
 		</File>
 	</Files>

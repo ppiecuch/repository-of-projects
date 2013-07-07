@@ -9,9 +9,9 @@ public:
 	CMyClass(void){}
 	~CMyClass(void){}
 
-	static void staticGreet()
+	static void staticGreet(int num)
 	{
-		std::cout << "static Hello World!" << std::endl;
+		std::cout << "static Hello World:" << num << "!" << std::endl;
 	}
 
 	void Greet()
