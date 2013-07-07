@@ -1,2 +1,2 @@
-..\bin\tolua++.exe -n test -o MyClass.cpp MyClass.pkg
+..\bin\tolua++.exe -n test -o LuaBind.cpp All.pkg
 pause

@@ -1,0 +1,49 @@
+-- 基本概念
+
+-- 1、栈
+-- c++调用lua是通过一个抽象的栈来实现数据的交换的。C++调用lua 时，首先需要把lua函数需要的参
+-- 数压入这个抽象的栈中，如果c++想要从lua中获取数据，则lua需要先把数据压入栈中，然后c++从
+-- 栈中取得需要的数据。Lua是以严格的LIFO 规则来操作栈的，即后进先出原则，而c++则可以操作栈上
+-- 的任何一个元素。
+
+-- 2、常用函数
+-- · void lua_pushnil (lua_State *L);
+-- 往栈中压入空值
+-- · void lua_pushboolean (lua_State *L, int bool);
+-- 往栈中压入布尔型值
+-- · void lua_pushnumber (lua_State *L, double n);
+-- 往栈中压入double型数值
+-- · void lua_pushlstring (lua_State *L, const char *s, size_t length);
+-- 往栈中压入字符串，但是该字符串中可以包含'\0'，字符串的长度为length
+-- · void lua_pushstring (lua_State *L, const char *s);
+-- 往栈中压入c 风格的字符串，以'\0'结尾
+-- · int lua_is... (lua_State *L, int index);
+-- 用来检查栈上的一个元素是否指定的类型
+-- · int lua_type (lua_State *L, int index);
+-- 返回栈中元素的类型
+-- 在lua.h中定义了各个元素对应的常量：LUA_TNIL、LUA_TBOOLEAN、LUA_TNUMBER、
+-- LUA_TSTRING、LUA_TTABLE、LUA_TFUNCTION、LUA_TUSERDATA 以及LUA_TTHREAD
+-- · int lua_toboolean (lua_State *L, int index);
+-- 将元素值转换为布尔型
+-- · double lua_tonumber (lua_State *L, int index);
+-- 将元素值转换为数值型
+-- · const char * lua_tostring (lua_State *L, int index);
+-- 该函数返回一个指向lua栈内元素的指针，该指针是不允许修改的
+-- 切记这里的指针是指向栈上元素的，如果lua清空了栈内元素，则该指针就无效了。
+-- · int lua_gettop (lua_State *L);
+-- 返回堆栈中的元素个数，它也是栈顶元素的索引
+-- · void lua_settop (lua_State *L, int index);
+-- 设置栈顶为一个指定的值
+-- 如果原栈顶大于新栈顶，则顶部的值被丢弃，如果原栈顶小于新栈顶，则将多出的元素赋nil。
+-- lua_settop(L,0)清空堆栈。
+-- 你也可以用负数索引作为调用lua_settop的参数；那将会设置栈顶到指定的索引。利用这种技巧，API
+-- 提供了下面这个宏，它从堆栈中弹出n 个元素：
+-- #define lua_pop(L,n) lua_settop(L, -(n)-1)
+-- void lua_pushvalue (lua_State *L, int index);
+-- 将指定元素的一个备份拷贝到栈顶
+-- void lua_remove (lua_State *L, int index);
+-- 移除指定元素，其上的其它元素依次下移
+-- void lua_insert (lua_State *L, int index);
+-- 将栈顶的元素移动到指定的索引处，其它元素依次上移
+-- void lua_replace (lua_State *L, int index);
+-- 将栈顶的值替换指定索引的元素，其它元素不变
