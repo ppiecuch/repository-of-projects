@@ -165,6 +165,26 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="lucid"
+			>
+			<File
+				RelativePath=".\LCAllocator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LCConfig.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LCDefine.h"
+				>
+			</File>
+			<File
+				RelativePath=".\version.txt"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\ck_mem_mgr.cpp"
 			>

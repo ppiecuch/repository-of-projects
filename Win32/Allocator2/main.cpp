@@ -9,6 +9,8 @@ inline void EnableMemLeakCheck()
 
 #include "ck_mem_mgr.h"
 
+#include "LCAllocator.h"
+
 int main()
 {
 	EnableMemLeakCheck();
