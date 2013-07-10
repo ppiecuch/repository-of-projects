@@ -24,8 +24,17 @@ public:
 	Derived(){
 		a=new int;
 	}
-	//~Derived(){delete a;printf("non-virtual destruct Derived\r\n");}
-	virtual ~Derived(){delete a;printf("virtual destruct Derived\r\n");}
+	~Derived(){delete a;printf("non-virtual destruct Derived\r\n");}
+	//virtual ~Derived(){delete a;printf("virtual destruct Derived\r\n");}
+};
+
+class Super : public Derived{
+	int* b;
+public:
+	Super(){
+		b=new int;
+	}
+	~Super(){delete b;printf("non-virtual destruct Super\r\n");}
 };
 
 class mystring{
@@ -51,12 +60,12 @@ int main(int argc, char* argv[])
 	EnableMemLeakCheck();
 
 
-	test(mystring().c_str());
-	int num=mystring().c_str();
-	printf("num\r\n");
+	//test(mystring().c_str());
+	//int num=mystring().c_str();
+	//printf("num\r\n");
 
-	//Base* base=new Derived();
-	//delete base;
+	Base* base=new Super();
+	delete base;
 
 	system("pause");
 	return 0;
