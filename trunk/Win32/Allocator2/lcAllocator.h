@@ -37,8 +37,8 @@ namespace lc{
 #define LC_ALLOC_ARGS_SL(...) __VA_ARGS__
 #endif
 
-#define LC_ALLOCATE(alct,sz) alct.allocate(LC_ALLOC_ARGS_MT(sz))
-#define LC_DEALLOCATE(alct,ptr) alct.deallocate(LC_ALLOC_ARGS_MT(ptr))
+#define LC_ALLOCATE(allocator,type,sz) allocator.allocate<type>(LC_ALLOC_ARGS_MT(sz))
+#define LC_DEALLOCATE(allocator,ptr) allocator.deallocate<void>(LC_ALLOC_ARGS_MT(ptr))
 
 enum ENUM_ALLOC_STRATEGY{
 	PRIMITIVE = 0,
@@ -73,13 +73,23 @@ protected:
 	u32 m_uAllocatedSize,m_uMaxSize;
 
 	virtual void* oomMalloc(LC_ALLOC_PARAMS(size_t sz)) = 0;
-	virtual void deallocate(const MemRecord& r) = 0;
+	virtual void internalDeallocate(const MemRecord& r) = 0;
+	virtual void* internalAllocate(LC_ALLOC_PARAMS(size_t sz)) = 0;
+	virtual void internalDeallocate(LC_ALLOC_PARAMS(void *ptr)) = 0;
 public:
 	BaseAllocator():m_uAllocatedSize(0),m_uMaxSize(LC_MEMORY_MAX_SIZE),m_pOutOfMemHandler(NULL){}
 	virtual ~BaseAllocator(){}
 
-	virtual void* allocate(LC_ALLOC_PARAMS(size_t sz)) = 0;
-	virtual void deallocate(LC_ALLOC_PARAMS(void *ptr)) = 0;
+	template<typename T>
+	T* allocate(LC_ALLOC_PARAMS(size_t sz))
+	{
+		return (T*)internalAllocate(LC_ALLOC_ARGS_SL(sz));
+	}
+	template<typename T>
+	void deallocate(LC_ALLOC_PARAMS(T *ptr))
+	{
+		internalDeallocate(LC_ALLOC_ARGS_SL((void*)ptr));
+	}
 
 	void destroy(){
 #ifdef LC_TRACK_DETAIL
@@ -89,7 +99,7 @@ public:
 			const MemRecord& r=it->getValue();
 			TRACE("Check memory leak in 0x%08X(%u bytes) in %s at \"%s(...)\" line:%d\r\n",r.Ptr,r.Size,r.File,r.Func,r.Line);
 			MemRecord m(LC_ALLOC_ARGS_MT(r.Ptr,r.Size));
-			deallocate(m);
+			internalDeallocate(m);
 		}
 #endif
 		m_recordMap.clear();
@@ -167,14 +177,14 @@ protected:
 		}
 	}
 
-	virtual void deallocate(const MemRecord& r)
+	virtual void internalDeallocate(const MemRecord& r)
 	{
 		operator delete(LC_ALLOC_ARGS_MR(r));
 		m_uAllocatedSize-=r.Size;
 	}
 public:
 
-	virtual void* allocate(LC_ALLOC_PARAMS(size_t sz))
+	virtual void* internalAllocate(LC_ALLOC_PARAMS(size_t sz))
 	{
 		if(m_uAllocatedSize+sz>m_uMaxSize)
 			lcThrow(OverflowException);
@@ -192,7 +202,7 @@ public:
 		return pResult;
 	}
 
-	virtual void deallocate(LC_ALLOC_PARAMS(void *ptr))
+	virtual void internalDeallocate(LC_ALLOC_PARAMS(void *ptr))
 	{
 		if(ptr==NULL)
 			return;
@@ -202,7 +212,7 @@ public:
 		if(m_recordMap.remove(ptr,&r))
 #endif
 		{
-			deallocate(r);
+			internalDeallocate(r);
 		}
 	}
 };
