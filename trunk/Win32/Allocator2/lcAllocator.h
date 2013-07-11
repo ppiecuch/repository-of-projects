@@ -3,6 +3,7 @@
 
 #include "lcMap.h"
 #include "lcException.h"
+#include "lcSingleton.h"
 //如果你想在预分配的内存上创建对象，用缺省的new操作符是行不通的。要解决这个问题，你可以用placement new构造。
 #include <new>
 
@@ -25,15 +26,19 @@ inline void TRACE(const char * pszFormat, ...)
 
 
 #ifdef LC_TRACK_DETAIL
-#define LC_ALLOC_PARAMS(pr) pr,const lc::c8* file,const lc::c8* func,lc::s32 line
+#define LC_ALLOC_PARAMS(...) __VA_ARGS__,const lc::c8* file,const lc::c8* func,lc::s32 line
 #define LC_ALLOC_ARGS_MT(...) __VA_ARGS__,LC_FILE,LC_FUNC,LC_LINE
 #define LC_ALLOC_ARGS_SL(...) __VA_ARGS__,file,func,line
-#define LUCID_NEW new(LC_FILE,LC_FUNC,LC_LINE)
+#define LC_NEW new(LC_FILE,LC_FUNC,LC_LINE)
+//delete : cannot delete objects that are not pointers 
+//refer to:http://computer-programming-forum.com/81-vc/82637f531ab0897c.htm
+//there's no such thing as placement delete
+//#define LUCID_DELETE(p) delete(p,LC_FILE,LC_FUNC,LC_LINE)
 #else
-#define LC_ALLOC_PARAMS(pr) pr
+#define LC_ALLOC_PARAMS(...) __VA_ARGS__
 #define LC_ALLOC_ARGS_MT(...) __VA_ARGS__
 #define LC_ALLOC_ARGS_SL(...) __VA_ARGS__
-#define LUCID_NEW new
+#define LC_NEW new
 #endif
 
 #define LC_ALLOCATE(allocator,type,sz) allocator.allocate<type>(LC_ALLOC_ARGS_MT(sz))
@@ -46,32 +51,50 @@ enum ENUM_ALLOC_STRATEGY{
 
 //TODO 如果operator new 在lc命名空间中声明，则对全局的new不做影响，为什么？
 void* operator new(LC_ALLOC_PARAMS(size_t sz));
+//void operator delete(LC_ALLOC_PARAMS(void* ptr));
 void operator delete(void* ptr);
 
 namespace lc{
 
 
 //refer to:http://holos.googlecode.com/svn/trunk/src/h_MemTracer.h
-class MemoryTracer{
-	struct MemRecord{
-		MemRecord():Ptr(NULL),File(NULL),Func(NULL),Line(-1),Size(0){}
-		MemRecord(void* ptr,u32 size):Ptr(ptr),File(NULL),Func(NULL),Line(-1),Size(size){}
-		MemRecord(void* ptr,u32 size,const c8* file,const c8* func,s32 line):Ptr(ptr),File(file),Func(func),Line(line),Size(size){}
+class MemoryTracer : public core::Singleton<MemoryTracer>{
+private:
+	struct TracerNode{
+		TracerNode():Prev(NULL),Next(NULL),Addr(NULL),Size(0),File(NULL),Func(NULL),Line(-1){}
+		TracerNode(void* p,u32 size):Prev(NULL),Next(NULL),Addr(p),Size(size),File(NULL),Func(NULL),Line(-1){}
+		TracerNode(void* p,u32 size,const c8* file,const c8* func,s32 line):Prev(NULL),Next(NULL),Addr(p),Size(size),File(file),Func(func),Line(line){}
 
-		void* Ptr;
-		const c8* File;
-		const c8* Func;
-		s32 Line;
-		u32 Size;
+		TracerNode* Prev;
+		TracerNode* Next;
 
+		void*		Addr;
+		u32			Size;
+		const c8*	File;
+		const c8*	Func;
+		s32			Line;
 	};
 
-	typedef core::map<void*,MemRecord> MemRecordMap;
-	static MemRecordMap s_recordMap;
+	TracerNode* m_pHead;
+	TracerNode* m_pTail;
 
-	static void* allocate(LC_ALLOC_PARAMS(size_t sz));
-	static void deallocate(void* ptr);
+	u32			m_uAllocatedSize;
+	u32			m_uAllocatedCount;
 
+	MemoryTracer();
+	void addNode(TracerNode* node);
+	void removeNode(TracerNode* node);
+	void deallocateNode(TracerNode* node);
+
+	friend class core::Singleton<MemoryTracer>;
+public:
+
+	void allocate(LC_ALLOC_PARAMS(void* p,size_t sz));
+	void deallocate(void* ptr);
+	u32 getAllocatedSize() const{return m_uAllocatedSize;}
+	u32 getAllocatedCount() const{return m_uAllocatedCount;}
+	void dump();
+	virtual void destroy();
 };
 
 //{return malloc(sz);}
@@ -85,6 +108,8 @@ class MemoryTracer{
 //the compiler must see both the Foo template and the fact that you're trying to make a specific Foo<int>. 
 //3、Your compiler probably doesn't remember the details of one .cpp file while it is compiling another .cpp file. 
 //It could, but most do not and if you are reading this FAQ, it almost definitely does not. BTW this is called the "separate compilation model." 
+
+/*
 
 class BaseAllocator{
 protected:
@@ -227,7 +252,7 @@ public:
 };
 
 
-/*
+
 	
 class Allocator{
 public:

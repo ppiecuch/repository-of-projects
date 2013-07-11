@@ -19,6 +19,19 @@ int main()
 {
 	EnableMemLeakCheck();
 
+#if 1
+	MemoryTracer::create();
+	int* p=LC_NEW int;
+	delete p;
+	double* d=LC_NEW double;
+	float* f=LC_NEW float;
+	short* s=LC_NEW short;
+	delete f;
+	long* l=new long;
+	char* c=new char;
+	delete c;
+	MemoryTracer::getInstance().destroy();
+#else
 	Allocator<PRIMITIVE> allocator;
 	allocator.setOutOfMemHandler(&outOfMemory);
 	//allocator.setMaxSize(1);
@@ -38,8 +51,10 @@ int main()
 	}
 
 	allocator.destroy();
+#endif
 
 	//int* p=new int;
+
 
 	system("pause");
 	return 0;

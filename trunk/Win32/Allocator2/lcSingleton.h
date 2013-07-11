@@ -18,6 +18,17 @@ namespace core{
 	protected:
 		static T* s_pSingleton;
 
+		Singleton()
+		{
+			LC_DEBUG_BREAK_IF( s_pSingleton!=NULL );
+#if defined( _MSC_VER ) && _MSC_VER < 1200	 
+			s32 offset = (s32)(T*)1 - (s32)(Singleton <T>*)(T*)1;
+			s_pSingleton = (T*)((s32)this + offset);
+#else
+			s_pSingleton = static_cast< T* >( this );
+#endif
+		}
+
 	public:
 		//MS VC++ 10.0 _MSC_VER = 1600
 		//MS VC++ 9.0 _MSC_VER = 1500
@@ -28,17 +39,13 @@ namespace core{
 		//MS VC++ 5.0 _MSC_VER = 1100
 		//Singleton();
 		//virtual ~Singleton();
-		Singleton()
-		{
-			LC_DEBUG_BREAK_IF( s_pSingleton!=NULL );
-#if defined( _MSC_VER ) && _MSC_VER < 1200	 
-			s32 offset = (s32)(T*)1 - (s32)(singleton <T>*)(T*)1;
-			s_pSingleton = (T*)((s32)this + offset);
-#else
-			s_pSingleton = static_cast< T* >( this );
-#endif
+		static void create(){
+			s_pSingleton = new T;
 		}
-		~Singleton() {  LC_DEBUG_BREAK_IF( s_pSingleton==NULL );  s_pSingleton = NULL;  }
+		virtual void destroy(){
+			delete this;
+		}
+		virtual ~Singleton() {  LC_DEBUG_BREAK_IF( s_pSingleton==NULL );  s_pSingleton = NULL;  }
 		
 
 		static T& getInstance() {LC_DEBUG_BREAK_IF( s_pSingleton==NULL );  return ( *s_pSingleton ); }
