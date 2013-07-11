@@ -3,8 +3,8 @@
 namespace lc{
 namespace core{
 
-	template<typename T>
-	T* Singleton<T >::s_pSingleton=NULL;
+	//template<typename T>
+	//T* Singleton<T>::s_pSingleton=NULL;
 
 	/*template<typename T>
 	Singleton<T >::Singleton()

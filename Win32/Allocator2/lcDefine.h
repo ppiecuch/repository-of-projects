@@ -147,12 +147,12 @@
 //__declspec(thread)不能用作类型修饰符。
 //如果在类声明的同时没有定义对象，则__declspec(thread)将被忽略
 #if defined(LC_CMPL_GCC)
-#define THREAD_LOCAL __thread
+#define LC_THREAD_LOCAL __thread
 #elif defined(LC_CMPL_MSVC)
-#define THREAD_LOCAL __declspec(thread)
+#define LC_THREAD_LOCAL __declspec(thread)
 #else
-#pragma message("Warning THREAD_LOCAL is not supported by this compiler")
-#define THREAD_LOCAL
+#pragma message("Warning: LC_THREAD_LOCAL is not supported by this compiler")
+#define LC_THREAD_LOCAL
 #endif
 
 //refer to:http://svn.bgmod.com/code/trunk/public/tier0/platform.h
