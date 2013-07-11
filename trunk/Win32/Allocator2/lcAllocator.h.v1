@@ -23,6 +23,7 @@ inline void TRACE(const char * pszFormat, ...)
 	OutputDebugStringA(szMessageBuffer);   
 }
 
+//refer to:http://holos.googlecode.com/svn/trunk/src/h_MemTracer.h
 
 #ifdef LC_TRACK_DETAIL
 #define LC_ALLOC_PARAMS(pr) pr,const lc::c8* file,const lc::c8* func,lc::s32 line
@@ -46,36 +47,13 @@ enum ENUM_ALLOC_STRATEGY{
 
 //TODO 如果operator new 在lc命名空间中声明，则对全局的new不做影响，为什么？
 void* operator new(LC_ALLOC_PARAMS(size_t sz));
-void operator delete(void* ptr);
 
 namespace lc{
 
 
-//refer to:http://holos.googlecode.com/svn/trunk/src/h_MemTracer.h
-class MemoryTracer{
-	struct MemRecord{
-		MemRecord():Ptr(NULL),File(NULL),Func(NULL),Line(-1),Size(0){}
-		MemRecord(void* ptr,u32 size):Ptr(ptr),File(NULL),Func(NULL),Line(-1),Size(size){}
-		MemRecord(void* ptr,u32 size,const c8* file,const c8* func,s32 line):Ptr(ptr),File(file),Func(func),Line(line),Size(size){}
-
-		void* Ptr;
-		const c8* File;
-		const c8* Func;
-		s32 Line;
-		u32 Size;
-
-	};
-
-	typedef core::map<void*,MemRecord> MemRecordMap;
-	static MemRecordMap s_recordMap;
-
-	static void* allocate(LC_ALLOC_PARAMS(size_t sz));
-	static void deallocate(void* ptr);
-
-};
-
 //{return malloc(sz);}
 //void operator delete(LC_ALLOC_PARAMS(void* ptr));
+void operator delete(void* ptr);
 
 //refer to:http://www.parashift.com/c++-faq-lite/templates-defn-vs-decl.html
 //Why can't I separate the definition of my templates class from its declaration and put it inside a .cpp file? 
