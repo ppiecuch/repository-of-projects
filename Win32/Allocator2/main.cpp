@@ -14,6 +14,7 @@ void outOfMemory(){
 	printf("outOfMemory\r\n");
 }
 
+
 int main()
 {
 	EnableMemLeakCheck();
@@ -31,12 +32,14 @@ int main()
 		printf("%d\r\n",*p1);
 		LC_DEALLOCATE(allocator,p1);
 		s32* p2=LC_ALLOCATE(allocator,s32,sizeof(s32));
+		//s32* p3=LUCID_NEW s32();
 	}lcCatch(...){
 		printf("Nothing!\r\n");
 	}
 
 	allocator.destroy();
-	
+
+	//int* p=new int;
 
 	system("pause");
 	return 0;
