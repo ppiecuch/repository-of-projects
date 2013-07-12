@@ -78,8 +78,8 @@ Defines an exception class.
 class e : public lc::Exception \
 { \
 public: \
-	e(const c8* exception, const c8* file, const c8* func, s32 line) : Exception(exception, file, func, line) {} \
-	e operator()(const c8* exception, const c8* file, const c8* func, s32 line) \
+	e(const lc::c8* exception, const lc::c8* file, const lc::c8* func, lc::s32 line) : Exception(exception, file, func, line) {} \
+	e operator()(const lc::c8* exception, const lc::c8* file, const lc::c8* func, lc::s32 line) \
 	{ \
 		return e(exception,file,func,line); \
 	} \
