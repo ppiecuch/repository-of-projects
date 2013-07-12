@@ -1,7 +1,7 @@
 #ifndef _LUCID_CORE_SINGLETON_H_
 #define _LUCID_CORE_SINGLETON_H_
 
-#include "lcTypes.h"
+#include "lcNewAndDelete.h"
 
 namespace lc{
 namespace core{
@@ -30,17 +30,10 @@ namespace core{
 		}
 
 	public:
-		//MS VC++ 10.0 _MSC_VER = 1600
-		//MS VC++ 9.0 _MSC_VER = 1500
-		//MS VC++ 8.0 _MSC_VER = 1400
-		//MS VC++ 7.1 _MSC_VER = 1310
-		//MS VC++ 7.0 _MSC_VER = 1300
-		//MS VC++ 6.0 _MSC_VER = 1200
-		//MS VC++ 5.0 _MSC_VER = 1100
 		//Singleton();
 		//virtual ~Singleton();
 		static void create(){
-			s_pSingleton = new T;
+			s_pSingleton = LC_NEW T;
 		}
 		virtual void destroy(){
 			delete this;

@@ -1,29 +1,7 @@
 #include "lcAllocator.h"
 #include <stdlib.h>
 
-void* operator new(LC_ALLOC_PARAMS(size_t size)){
-	//void* operator new(size_t size, void* ptr, void*){
-	//void* operator new(size_t size){
-	void* p = malloc(size);
-#ifdef LC_BUILD_DEBUG
-	//当使用operator new(size)时，Singleton的构造会调用此方法，此时s_instance为NULL，故须进行此判断
-	if(lc::MemoryTracer::getInstancePointer()&&p)
-		lc::MemoryTracer::getInstance().allocate(LC_ALLOC_ARGS_SL(p,size));
-#endif
-	return p;
-}
 
-//void operator delete(LC_ALLOC_PARAMS(void* ptr)){
-void operator delete(void* ptr){
-	if(ptr==NULL)
-		return;
-#ifdef LC_BUILD_DEBUG
-	//Singleton的析构中将s_instance赋值为NULL，故须进行此判断
-	if(lc::MemoryTracer::getInstancePointer())
-		lc::MemoryTracer::getInstance().deallocate(ptr);
-#endif
-	free(ptr);
-}
 
 namespace lc{
 

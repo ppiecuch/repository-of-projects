@@ -1,10 +1,20 @@
 #include "lcSingleton.h"
+#include "lcAllocator.h"
 
 namespace lc{
 namespace core{
 
 	//template<typename T>
 	//T* Singleton<T>::s_pSingleton=NULL;
+
+	/*&template<typename T>
+	void Singleton<T>::create(){
+		s_pSingleton = LUCID_NEW T;
+	}
+	template<typename T>
+	void Singleton<T>::destroy(){
+		delete this;
+	}*/
 
 	/*template<typename T>
 	Singleton<T >::Singleton()

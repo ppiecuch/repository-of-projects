@@ -170,6 +170,10 @@
 			Name="lucid"
 			>
 			<File
+				RelativePath=".\include.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\lcAllocator.cpp"
 				>
 			</File>
@@ -182,7 +186,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lcBackwardCompatibility.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lcBackwardCompatibility.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lcConfig.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lcDeclare.h"
 				>
 			</File>
 			<File
@@ -198,8 +214,40 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lcNewAndDelete.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lcNewAndDelete.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lcObsolete.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lcPrepare.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lcSingleton.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\lcSingleton.h"

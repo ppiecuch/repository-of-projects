@@ -27,9 +27,11 @@ int main()
 	float* f=LC_NEW float;
 	short* s=LC_NEW short;
 	delete f;
-	long* l=new long;
+	long* l= new  long;
 	char* c=new char;
 	delete c;
+	MemoryTracer::getInstance().testDeprecated1();
+	MemoryTracer::testDeprecated2(NULL);
 	MemoryTracer::getInstance().destroy();
 #else
 	Allocator<PRIMITIVE> allocator;
