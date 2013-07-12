@@ -1,64 +1,24 @@
 #ifndef _LUCID_ALLOCATOR_H_
 #define _LUCID_ALLOCATOR_H_
 
-#include "lcMap.h"
 #include "lcException.h"
 #include "lcSingleton.h"
+#include "lcBackwardCompatibility.h"
 //如果你想在预分配的内存上创建对象，用缺省的new操作符是行不通的。要解决这个问题，你可以用placement new构造。
 #include <new>
 
 //refer to:SGIMallocPool.hhp
-
-#include <stdio.h>
-#include <wtypes.h>
-#include <stdarg.h>
-#include <tchar.h>
-
-inline void TRACE(const char * pszFormat, ...)
-{
-	va_list pArgs;
-	char szMessageBuffer[16380]={0};
-	va_start( pArgs, pszFormat );
-	vsnprintf_s( szMessageBuffer, 16380,16380-1,pszFormat, pArgs );
-	va_end( pArgs );   
-	OutputDebugStringA(szMessageBuffer);   
-}
-
-
-#ifdef LC_TRACK_DETAIL
-#define LC_ALLOC_PARAMS(...) __VA_ARGS__,const lc::c8* file,const lc::c8* func,lc::s32 line
-#define LC_ALLOC_ARGS_MT(...) __VA_ARGS__,LC_FILE,LC_FUNC,LC_LINE
-#define LC_ALLOC_ARGS_SL(...) __VA_ARGS__,file,func,line
-#define LC_NEW new(LC_FILE,LC_FUNC,LC_LINE)
-//delete : cannot delete objects that are not pointers 
-//refer to:http://computer-programming-forum.com/81-vc/82637f531ab0897c.htm
-//there's no such thing as placement delete
-//#define LUCID_DELETE(p) delete(p,LC_FILE,LC_FUNC,LC_LINE)
-#else
-#define LC_ALLOC_PARAMS(...) __VA_ARGS__
-#define LC_ALLOC_ARGS_MT(...) __VA_ARGS__
-#define LC_ALLOC_ARGS_SL(...) __VA_ARGS__
-#define LC_NEW new
-#endif
-
-#define LC_ALLOCATE(allocator,type,sz) allocator.allocate<type>(LC_ALLOC_ARGS_MT(sz))
-#define LC_DEALLOCATE(allocator,ptr) allocator.deallocate<void>(LC_ALLOC_ARGS_MT(ptr))
 
 enum ENUM_ALLOC_STRATEGY{
 	PRIMITIVE = 0,
 	ENUM_ALLOC_STRATEGY_COUNT
 };
 
-//TODO 如果operator new 在lc命名空间中声明，则对全局的new不做影响，为什么？
-void* operator new(LC_ALLOC_PARAMS(size_t sz));
-//void operator delete(LC_ALLOC_PARAMS(void* ptr));
-void operator delete(void* ptr);
-
 namespace lc{
 
 
 //refer to:http://holos.googlecode.com/svn/trunk/src/h_MemTracer.h
-class MemoryTracer : public core::Singleton<MemoryTracer>{
+class MemoryTracer : public core::Singleton<MemoryTracer>,public Obsolete<MemoryTracer>{
 private:
 	struct TracerNode{
 		TracerNode():Prev(NULL),Next(NULL),Addr(NULL),Size(0),File(NULL),Func(NULL),Line(-1){}

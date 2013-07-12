@@ -1,12 +1,21 @@
 
+										lcPrepare
+
+
 
 										lcConfig
+										
+										
+										
+										lcDefine
 								
-			
-				lcDefine
 		
 		
-				lcTypes
+										lcTypes
+										
+										
+										
+						lcException					lcNewAndDelete
 		
 		
-		lcException		lcMap
+												lcMap		lcSingleton

@@ -1,7 +1,7 @@
 #ifndef _LUCID_TYPES_H_
 #define _LUCID_TYPES_H_
 
-#include "lcConfig.h"
+#include "lcDefine.h"
 
 namespace lc{
 
