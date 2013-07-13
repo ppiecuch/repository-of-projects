@@ -2,6 +2,9 @@
 #define _LUCID_LOCK_H_
 
 
+
+
+
 /************************************************************************/
 /*内核对象与非内核对象                                                  */
 /************************************************************************/
@@ -228,15 +231,5 @@ public:
 	virtual Lock::Type getType() const;
 };
 
-class MutexLock : public Lock{
-private:
-	HANDLE m_hMutex;
-public:
-	MutexLock();
-	~MutexLock();
-	virtual void lock();
-	virtual void unlock();
-	virtual bool canCrossProcess() const;
-	virtual Lock::Type getType() const;
-};
+
 #endif
