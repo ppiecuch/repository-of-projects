@@ -1,7 +1,95 @@
 #ifndef _LUCID_LOCK_H_
 #define _LUCID_LOCK_H_
 
-//同步---CriticalSection,Mutex,Event,Semaphores  
+
+/************************************************************************/
+/*内核对象与非内核对象                                                  */
+/************************************************************************/
+//《Windows核心编程系列》谈谈内核对象及句柄的本质
+//refer to:http://www.51testing.com/html/82/n-822682.html
+//句柄
+//refer to:http://baike.baidu.com/view/194921.htm
+
+//什么是内核对象
+//内核对象通过API来创建，每个内核对象是一个数据结构，它对应一块内存，由操作系统内核分配，并且只能由操作系统内核访问。
+//在此数据结构中少数成员如安全描述符和使用计数是所有对象都有的，但其他大多数成员都是不同类型的对象特有的。内核对象的数据结构只能由操作系统提供的API访问，应用程序在内存中不能访问。
+//调用创建内核对象的函数后，该函数会返回一个句柄，它标识了所创建的对象。它可以由进程的任何线程使用。在32位系统中，句柄是一个32位值。64位系统中则是64位值。
+
+//内核对象的所有者是操作系统内核，而非进程。也就是说多个进程可以共享一个内核对象。内核对象数据结构内有一个使用计数成员，它是所有对象都有的一个成员，标识该内核对象被引用的次数。
+//刚创建时使用计数被初始化为1，如果有另一个进程获得对此内核对象的访问后，使用计数就会递增。一个使用此内核对象的进程终止后或是对此内核对象调用CloseHandle，操作系统内核会自动递减内核对象的使用计数。
+//一旦计数变为0，操作系统内核就会销毁对象。
+
+//另一个进程不能直接使用一个进程的内核对象的句柄。注意这里使用直接二字，这并不意味着其他进程不能使用此内核对象，虽然句柄是依赖于进程的，但是内核对象是归系统内核所有，各个进程都可以使用
+
+//什么是句柄（HANDLE）
+//句柄与普通指针的区别在于，指针包含的是引用对象的内存地址，而句柄则是由系统所管理的引用标识，该标识可以被系统重新定位到一个内存地址上。这种间接访问对象的模式增强了系统对引用对象的控制。
+//内核对象句柄，是用来标识某个内核对象的一个ID，同一个对象的该id对于每个进程是不同的。，具体如何实现是ms不公开的算法，以下是一个近似的，可能的算法：
+//进程创建时，windows系统为进程构造了一个句柄表
+//当该进程希望获得一个内核对象句柄或者创建一个内核对象从而获得该对象句柄时
+//系统会将在句柄表中增加一个表项，表项的内容中存储了指向目标内核对象的指针
+//同时，系统返回这个表项在句柄表中的索引作为句柄
+
+//什么是安全描述符
+//安全描述符用以描述内核对象的安全性。它描述了内核对象的拥有者，那组用户可以访问此对象，那组用户无访问权限。
+//安全描述符对应一个数据结构：SECURITY_ATTRIBUTES结构，几乎内核对象在创建时都需要传入此结构，但是大部分情况下都是传入NULL，表示使用默认的安全性。
+
+//什么是非内核对象
+//除了使用内核对象，应用程序还需要使用其他类型的对象，如菜单、窗口、鼠标光标等，这些属于用户对象或GDI对象，而非内核对象。
+//要判断一个对象是不是内核对象，最简单的方法就是查看创建这个对象的函数，几乎所有的创建内核对象的函数都需要指定安全属性信息的参数，而用于创建用户对象的函数都不需要使用安全描述符。
+
+//跨进程共享内核对象方法之一：使用对象句柄继承
+//只有进程之间属于父子关系时才可以使用对象句柄继承。当父进程创建一个内核对象时，父进程必须向系统指出它希望这个对象的句柄是可继承的。
+//为了创建可继承句柄父进程必须分配并初始化一个SECURITY_ATTRIBUTES结构，并将这个结构的地址传递给Create*函数。如：
+//SECURITY_ATTRIBUTES sa;
+//sa.nLength=sizeof(sa);
+//sa.lpSecurityDescriptor=NULL；//使用默认安全性。
+//sa.bInheritHandle=TRUE；//是此句柄可以继承。
+//HANDLE mutex=CeattMutex(&sa,FALSE,NULL); 
+
+//句柄表的每个记录中还有一个指明该句柄是否可继承的标志位，如果在创建内核对象的时候将NULL作为PSECURITY_ATTRIBUTES的参数传入，则返回的句柄是不可继承的，标志位为0。
+
+//下一步是由父进程创建子进程，这是通过CreateProcess实现的，此函数第四章会详细介绍，此处仅仅注意bInheritHandles参数。如果在创建进程时，此参数被设为false，
+//则表明不希望子进程继承父进程句柄表中的可继承句柄。如为true，则表明希望子进程继承父进程句柄表中的可继承句柄。注意只有可继承句柄才可以被继承。
+
+//跨进程共享内核对象方法之二：命名对象
+//许多对象都可以进行命名，但并不是全部。因此该方法有一定局限性。有些创建内核对象的函数都有一个指定内核对象名称的参数，如果传入NULL，则会创建一个匿名的内核对象。
+//如果不为NULL，则应该传入一个一'\0'结尾的字符串。所有这些命名对象共享一个名字空间。即使它们类型不同，如果已存在同名对象，创建就会失败。
+//一旦一个命名的内核对象被创建，其他进程（不仅仅是子进程）可以通过调用Open*或是Create*函数来访问它。当使用Create*函数时，系统会检查是否存在一个传给此函数的名字，
+//如果确实存在一个这样的对象，内核执行安全检查，验证调用者是否有足够的安全权限。如果是，系统就会在此进程的句柄表中查找空白记录项，并将其初始化为指向已存在的命名的内核对象。
+//两个进程的句柄不一定相同，这没有任何影响。由于内核对象被再一次引用，所以其引用计数会被递增。
+
+//为了防止在创建一个命名对象时，仅仅打开了一个现有的而不是新建的，可以在创建后调用GetLastError获得详细信息。
+
+//使用Open*函数可以打开已存在的命名内核对象，如果没有找到这个名称的内核对象将返回NULL。如果找到这个名称的内核对象，但类型不同，函数仍返回NULL。
+//只有当名称相同且类型相同的情况下系统才会进一步检查访问权限。如果有权访问，系统就会更新此进程的句柄表，并递增内核对象的引用计数。在Open*函数中也可以指定此句柄的继承性。
+
+//Open*和Create*的区别：如果对象不存在，Create*会创建它，Open*将会调用失败。
+//我们经常使用命名的内核对象来防止运行一个程序的多个实例。可以在main函数中建立一个命名对象，返回后调用GetLastError如果GetLastError返回ERROR_ALREADY_EXISTS表明此程序的另一个实例在运行。
+
+
+//跨进程共享内核对象方法之三：复制对象句柄
+//实现该方法使用的是Duplicatehandle函数。
+//bool DuplicateHandle(
+//HANDLE hSourceProcessHandle,
+//HANDLE hSourceHandle,
+//HANDLE hTargetProcessHandle,
+//PHANDLE phTargethandle
+//DWORD ddwDesiredAccess,
+//BOOL bInheritHandle,
+//DWORD dwOptions
+//); 
+//这个函数的功能就是获得进程句柄表的一个记录项，然后在另一个进程中创建这个记录项的副本。第一个和第三个参数分别标识源进程和目标进程内核对象句柄。
+//第二个参数标识要复制的内核对象句柄，它可以指向任何类型的内核对象。第四个参数是一个目标句柄的地址，用来接收复制到的HANDLE值。
+//函数将源进程中的句柄信息复制到目标进程所标识的句柄表中。第五第六个参数用以指定此内核对象句柄在目标进程句柄表中应该使用何种访问掩码和继承标志。
+
+
+
+
+
+
+/************************************************************************/
+/* 同步---CriticalSection,Mutex,Event,Semaphores                        */
+/************************************************************************/  
 //refer to:http://kulong0105.blog.163.com/blog/static/174406191201182133344113/
 //关于线程的同步对象可分为内核对象与非内核对象，最大区别在于内核对象能跨越进程，而非内核对象不能跨越进程，只能同步单个进程中的线程。
 //内核对象：（非内核对象： CriticalSection）
@@ -23,23 +111,6 @@
 //3.当获得文件句柄时，本线程可与某一个异步文件的I/O操作获得同步等。
 //4.控制台输入对象可用来使线程在有输入进入时被唤醒以执行相关任务等。
 //5.其它内核对象―――文件改变通知、互斥量、信号量、事件、可等计时器等―――都只是为了同步对象而存在
-
-
-//WaitForMultipleObjects（）与WaitForSingleObject（）类似，同时监视位于句柄数组中的所有句柄。
-//这些被监视对象的句柄享有平等的优先权，任何一个句柄都不可能比其他句柄具有更高的优先权。WaitForMultipleObjects（）的函数原型为：
-//DWORD WaitForMultipleObjects(
-//		DWORD nCount, // 等待句柄数
-//		CONST HANDLE *lpHandles, // 句柄数组首地址
-//		BOOL fWaitAll, // 等待标志
-//		DWORD dwMilliseconds // 等待时间间隔
-//);
-//参数nCount指定了要等待的内核对象的数目，存放这些内核对象的数组由lpHandles来指向。
-//fWaitAll对指定的这nCount 个内核对象的两种等待方式进行了指定，为TRUE时当所有对象都被通知时函数才会返回，为FALSE则只要其中任何一个得到通知就可以返回。 
-//dwMilliseconds在这里的作用与在WaitForSingleObject（）中的作用是完全一致的。如果等待超时，函数将返回 WAIT_TIMEOUT。
-//如果返回WAIT_OBJECT_0到WAIT_OBJECT_0+nCount-1中的某个值，则说明所有指定对象的状态均为已通知状态（当fWaitAll为TRUE时）
-//或是用返回值减去WAIT_OBJECT_0可得到发生通知的对象的索引（当fWaitAll为FALSE 时）。
-//如果返回值在WAIT_ABANDONED_0与WAIT_ABANDONED_0+nCount-1之间，则表示所有指定对象的状态均为已通知，且其中至少有一个对象是被丢弃的互斥对象（当fWaitAll为TRUE时），
-//或是用返回值减去WAIT_OBJECT_0可得到表示一个等待正常结束的互斥对象的索引（当fWaitAll为FALSE时）。
 
 
 //CritiaclSection：
@@ -88,19 +159,84 @@
 //这个也带来了Mutex的另一个问题，线程1多次调用WaitForSingleObject后，其他线程如果想要有信息，那线程1必须ReleaseMutex对应Wait的次数或使线程1结束。
 //还有就是同一线程多次OpenMutex，而没及时CloseHandle容易导致句柄泄漏。
 
-enum ENUM_LOCK{
-	NIL = 0,
-	CRITICAL_SECTION,
-	MUTEX,
-	EVENT,
-	ENUM_LOCK_COUNT
-};
 
-template<ENUM_LOCK type>
+
+/************************************************************************/
+/*WaitForSingleObject与WaitForMultipleObjects                           */
+/************************************************************************/
+
+//WaitForMultipleObjects（）与WaitForSingleObject（）类似，同时监视位于句柄数组中的所有句柄。
+//这些被监视对象的句柄享有平等的优先权，任何一个句柄都不可能比其他句柄具有更高的优先权。WaitForMultipleObjects（）的函数原型为：
+//DWORD WaitForMultipleObjects(
+//		DWORD nCount, // 等待句柄数
+//		CONST HANDLE *lpHandles, // 句柄数组首地址
+//		BOOL fWaitAll, // 等待标志
+//		DWORD dwMilliseconds // 等待时间间隔
+//);
+//参数nCount指定了要等待的内核对象的数目，存放这些内核对象的数组由lpHandles来指向。
+//fWaitAll对指定的这nCount 个内核对象的两种等待方式进行了指定，为TRUE时当所有对象都被通知时函数才会返回，为FALSE则只要其中任何一个得到通知就可以返回。 
+//dwMilliseconds在这里的作用与在WaitForSingleObject（）中的作用是完全一致的。如果等待超时，函数将返回 WAIT_TIMEOUT。
+//如果返回WAIT_OBJECT_0到WAIT_OBJECT_0+nCount-1中的某个值，则说明所有指定对象的状态均为已通知状态（当fWaitAll为TRUE时）
+//或是用返回值减去WAIT_OBJECT_0可得到发生通知的对象的索引（当fWaitAll为FALSE 时）。
+//如果返回值在WAIT_ABANDONED_0与WAIT_ABANDONED_0+nCount-1之间，则表示所有指定对象的状态均为已通知，且其中至少有一个对象是被丢弃的互斥对象（当fWaitAll为TRUE时），
+//或是用返回值减去WAIT_OBJECT_0可得到表示一个等待正常结束的互斥对象的索引（当fWaitAll为FALSE时）。
+
+//WaitForSingleObject，在一个指定时间（dwMilliseconds）内等待某一个内核对象变为有信号，在此时间内，若等待的内核对象一直是无信号的，则调用线程将睡眠，否则继续执行。
+//超过此时间后，线程继续运行。函数返回值可能为：WAIT_OBJECT_0、WAIT_TIMEOUT、WAIT_ABANDONED（仅当内核对象为互斥量时）、WAIT_FAILED。
+
+//WaitForMultipleObjects与WaitForSingleObject类似，只是它要么等待指定列表（由lpHandles指定）中若干个对象（由nCount决定）都变为有信号，
+//要么等待一个列表（由lpHandles指定）中的某一个对象变为有信号（由bWaitAll决定）。
+
+//WaitForSingleObject和WaitForMultipleObjects函数对特定的内核对象有重要的副作用，即它们根据不同的内核对象，会决定是否改变内核对象的信号状态，并执行这种改变；
+//这些副作用，决定了是让等待该内核对象的进程或线程中的某一个被唤醒还是全都被唤醒。
+//(1) 对进程和线程内核对象，这两个函数不产生副作用。
+//在进程或线程内核对象变为有信号后，它们将保持有信号，这两个函数不会试图改变内核对象的信号状态。这样，所有等待这些内核对象的线程都会被唤醒。
+//(2) 对于互斥量、自动重置事件和自动重置可等的计时器对象，这两个函数将把它们的状态改为无信号。
+//换言之一旦这些对象变为有信号并且有一个线程被唤醒，则对象重被置为无信号状态。于是，只有一个正在等待的线程醒来，其它等待的线程将继续睡眠。
+//(3) 对于WaitForMultipleObjects函数还有非常重要的一个特性：当调用它时传递的bWaitAll为TRUE时，在所有被等待的对象都变为有信号之前，被等待的任何可以被改变状态的内核对象都不被重置为无信号状态。
+//换言之，在传入参数bWaitAll为TRUE，WaitForMultipleObjects除非能取得所有指定对象（由lpHandles指定）的所有权，它不会取得单个对象的所有权（不能取得所有权，自然也不会改变此对象的信号状态）。
+//这是为了防止死锁。换言之，在bWaitAll为TRUE时，WaitForMultipleObjects不会在没有获得所有被等对象所有权的情形下改变某一可以被改变状态的内核对象的信号状态，
+//任何以同样方式等待的线程都不会被唤醒，但以其它方式等待的线程将被唤醒。
+
+
+
 class Lock{
 public:
-	lock(){}
-	unlock(){}
+	enum Type{
+		CRITICAL_SECTION = 0,
+		MUTEX,
+		EVENT,
+		SEMAPHORE,
+		TYPE_COUNT
+	};
+	virtual ~Lock(){}
+	virtual void lock() = 0;
+	virtual void unlock() = 0;
 	virtual bool canCrossProcess() const = 0;
+	virtual Lock::Type getType() const = 0;
+};
+
+class CriticalSectionLock : public Lock{
+private:
+	CRITICAL_SECTION m_cs;
+public:
+	CriticalSectionLock();
+	~CriticalSectionLock();
+	virtual void lock();
+	virtual void unlock();
+	virtual bool canCrossProcess() const;
+	virtual Lock::Type getType() const;
+};
+
+class MutexLock : public Lock{
+private:
+	HANDLE m_hMutex;
+public:
+	MutexLock();
+	~MutexLock();
+	virtual void lock();
+	virtual void unlock();
+	virtual bool canCrossProcess() const;
+	virtual Lock::Type getType() const;
 };
 #endif
