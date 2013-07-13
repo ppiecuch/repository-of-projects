@@ -65,7 +65,9 @@ namespace lc{
 
 	void MemoryTracer::deallocateNode(TracerNode* node)
 	{
+		m_mutex.lock();
 		removeNode(node);
+		m_mutex.unlock();
 		free(node);
 	}
 
@@ -74,11 +76,14 @@ namespace lc{
 		TracerNode* n=(TracerNode*)malloc(sizeof(TracerNode));
 		TracerNode tmp(LC_ALLOC_ARGS_SL(p,sz));
 		new (n) TracerNode(tmp);
+		m_mutex.lock();
 		addNode(n);
+		m_mutex.unlock();
 	}
 
 	void MemoryTracer::deallocate(void* ptr)
 	{
+		m_mutex.lock();
 		TracerNode* n=m_pHead;
 		while(n)
 		{
@@ -88,6 +93,7 @@ namespace lc{
 		//LC_DEBUG_BREAK_IF(n==NULL);
 		if(n)
 			removeNode(n);
+		m_mutex.unlock();
 		free(n);
 	}
 
@@ -98,6 +104,7 @@ namespace lc{
 
 	void MemoryTracer::destroy()
 	{
+		m_mutex.lock();
 		TracerNode* n=m_pHead;
 		while(n)
 		{
@@ -106,6 +113,7 @@ namespace lc{
 			delete n->Addr;
 			n=next;
 		}
+		m_mutex.unlock();
 		core::Singleton<MemoryTracer>::destroy();
 	}
 

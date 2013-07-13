@@ -31,23 +31,3 @@ Lock::Type CriticalSectionLock::getType() const{
 }
 
 
-
-MutexLock::MutexLock(){
-
-}
-MutexLock::~MutexLock(){
-
-}
-
-void MutexLock::lock(){
-	::EnterCriticalSection(&m_cs);
-}
-void MutexLock::unlock(){
-	::LeaveCriticalSection(&m_cs);
-}
-bool MutexLock::canCrossProcess() const{
-	return false;
-}
-Lock::Type MutexLock::getType() const{
-	return CRITICAL_SECTION;
-}

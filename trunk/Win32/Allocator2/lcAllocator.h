@@ -4,6 +4,7 @@
 #include "lcException.h"
 #include "lcSingleton.h"
 #include "lcBackwardCompatibility.h"
+#include "lcMutex.h"
 //如果你想在预分配的内存上创建对象，用缺省的new操作符是行不通的。要解决这个问题，你可以用placement new构造。
 #include <new>
 
@@ -34,6 +35,8 @@ private:
 		const c8*	Func;
 		s32			Line;
 	};
+
+	mutex m_mutex;
 
 	TracerNode* m_pHead;
 	TracerNode* m_pTail;
