@@ -36,26 +36,34 @@ private:
 		s32			Line;
 	};
 
-	mutex m_mutex;
+	static mutex s_mutex;
 
 	TracerNode* m_pHead;
 	TracerNode* m_pTail;
 
 	u32			m_uAllocatedSize;
 	u32			m_uAllocatedCount;
+	u32			m_uMaxSize;
 
 	MemoryTracer();
+	static void lock();
+	static void unlock();
+	bool canAllocate(size_t sz);
 	void addNode(TracerNode* node);
 	void removeNode(TracerNode* node);
 	void deallocateNode(TracerNode* node);
 
 	friend class core::Singleton<MemoryTracer>;
+	friend void* ::operator new(LC_ALLOC_PARAMS(size_t size));
+	friend void ::operator delete(void* ptr);
 public:
 
 	void allocate(LC_ALLOC_PARAMS(void* p,size_t sz));
 	void deallocate(void* ptr);
 	u32 getAllocatedSize() const{return m_uAllocatedSize;}
 	u32 getAllocatedCount() const{return m_uAllocatedCount;}
+	void setMaxSize(size_t sz){m_uMaxSize=sz;}
+	u32 getMaxSize() const{return m_uMaxSize;}
 	void dump();
 	virtual void destroy();
 };

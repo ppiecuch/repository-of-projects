@@ -250,6 +250,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\lcLogger.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lcLogger.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lcMap.h"
 				>
 			</File>
@@ -302,7 +310,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lcThread.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lcThread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lcThreadWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lcThreadWindow.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lcTypes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lcUtil.h"
 				>
 			</File>
 			<File
