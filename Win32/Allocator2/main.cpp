@@ -7,11 +7,13 @@ inline void EnableMemLeakCheck()
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
 }
 
+
 #include "lcAllocator.h"
 #include "lcThread.h"
 #include "lcMutex.h"
 #include "lcUtil.h"
 #include "lcLogger.h"
+#include "lcMap.h"
 using namespace lc;
 
 void outOfMemory(){
@@ -25,7 +27,7 @@ struct SMyRunnable1 : public lc::IRunnable{
 		{
 			LC_NEW int;
 			lc::sleep(50);
-			LC_INFO("SMyRunnable1(%d)\r\n",i);
+			LC_DEBG("SMyRunnable1(%d)\r\n",i);
 		}
 		lc::sleep(50);
 		LC_INFO("end SMyRunnable1()\r\n");
@@ -38,7 +40,7 @@ struct SMyRunnable2 : public lc::IRunnable{
 		{
 			LC_NEW short;
 			lc::sleep(50);
-			LC_INFO("SMyRunnable2(%d)\r\n",i);
+			LC_DEBG("SMyRunnable2(%d)\r\n",i);
 		}
 		lc::sleep(50);
 		LC_INFO("end SMyRunnable2()\r\n");
@@ -51,7 +53,7 @@ struct SMyRunnable3 : public lc::IRunnable{
 		{
 			LC_NEW char;
 			lc::sleep(50);
-			LC_INFO("SMyRunnable3(%d)\r\n",i);
+			LC_DEBG("SMyRunnable3(%d)\r\n",i);
 		}
 		lc::sleep(50);
 		LC_INFO("end SMyRunnable3()\r\n");
@@ -64,7 +66,7 @@ struct SMyRunnable4 : public lc::IRunnable{
 		{
 			LC_NEW double;
 			lc::sleep(50);
-			LC_INFO("SMyRunnable4(%d)\r\n",i);
+			LC_DEBG("SMyRunnable4(%d)\r\n",i);
 		}
 		lc::sleep(50);
 		LC_INFO("end SMyRunnable4()\r\n");
@@ -76,6 +78,7 @@ int main()
 	//EnableMemLeakCheck();
 
 #if 1
+
 	MemoryTracer::create();
 
 	SMyRunnable1* r1=LC_NEW SMyRunnable1;
@@ -93,7 +96,17 @@ int main()
 	SMyRunnable4* r4=LC_NEW SMyRunnable4;
 	lc::thread* td4=lc::thread::createInstance(r4);
 	td4->start();
+
+	LC_DEBG("%s\r\n","!@#$%^&*()_+{}:\"|<>?[];'\\/.,-=");
+
+#elif 1
+	MemoryTracer::create();
 	
+	{
+		core::map<s32,s32> m;
+		m.set(0,0);
+		m.set(1,1);
+	}
 #elif 1
 	MemoryTracer::create();
 	int* p=LC_NEW int;
@@ -107,7 +120,6 @@ int main()
 	delete c;
 	MemoryTracer::getInstance().testDeprecated1();
 	MemoryTracer::testDeprecated2(NULL);
-	MemoryTracer::getInstance().destroy();
 #else
 	Allocator<PRIMITIVE> allocator;
 	allocator.setOutOfMemHandler(&outOfMemory);

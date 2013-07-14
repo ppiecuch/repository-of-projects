@@ -1,5 +1,5 @@
 #include "lcAllocator.h"
-#include <stdlib.h>
+#include "lcLogger.h"
 
 
 
@@ -125,74 +125,31 @@ namespace lc{
 	void MemoryTracer::destroy()
 	{
 		lock();
+		bool hasLeak=false;
 		TracerNode* n=m_pHead;
 		if(m_pHead)
 		{
-			TRACE("Check memory leak:%u bytes,%u calls in total\r\n",m_uAllocatedSize,m_uAllocatedCount);
+			LC_WARN("Detected memory leak: %u bytes,%u calls in total%8s\r\n",m_uAllocatedSize,m_uAllocatedCount,LC_SYMBOL_WARN);
 		}
 		TracerNode* thiz=NULL;
 		while(n)
 		{
 			TracerNode* next=n->Next;
-			TRACE("Check memory leak at 0x%08X(%u bytes) in %s within \"%s(...)\" at line:%d\r\n",n->Addr,n->Size,n->File,n->Func,n->Line);
+			LC_WARN("Detected memory leak at 0x%08X(%u bytes) in %s within \"%s(...)\" at line:%d%8s\r\n",n->Addr,n->Size,n->File,n->Func,n->Line,LC_SYMBOL_WARN);
 			//如果是MemoryTracer，将之放到最后去释放
 			if(n->Addr==this)
 				delete n->Addr;
 			else
 				thiz=n;
 			n=next;
+			hasLeak = true;
 		}
-		delete thiz;
+		if(thiz)
+			delete thiz;
 		unlock();
 		core::Singleton<MemoryTracer>::destroy();
+		if(!hasLeak)
+			LC_INFO("Congratulation! No memory leak detected!%8s\r\n",LC_SYMBOL_SUCS);
 	}
 
-	
-	/*
-
-	BaseAllocator::BaseAllocator():m_uAllocatedSize(0),m_uMaxSize(LC_MEMORY_MAX_SIZE),m_pOutOfMemHandler(NULL){}
-
-	BaseAllocator::~BaseAllocator(){}
-
-	void BaseAllocator::destroy(){
-#ifdef LC_TRACK_DETAIL
-		MemRecordMap::Iterator it=m_recordMap.getIterator();
-		for(;!it.atEnd();++it)
-		{
-			const MemRecord& r=it->getValue();
-			TRACE("Check memory leak in 0x%08X(%u bytes) in %s at \"%s(...)\" line:%d\r\n",r.Ptr,r.Size,r.File,r.Func,r.Line);
-			MemRecord m(LC_ALLOC_ARGS_MT(r.Ptr,r.Size));
-			internalDeallocate(m);
-		}
-#endif
-		m_recordMap.clear();
-	}
-
-	void BaseAllocator::setOutOfMemHandler(pOutOfMemHandler pFunc)
-	{
-		pOutOfMemHandler pOldFunc = m_pOutOfMemHandler;
-		m_pOutOfMemHandler = pFunc;
-	}
-
-	void BaseAllocator::setMaxSize(u32 size)
-	{
-		m_uMaxSize=size;
-	}
-
-	u32 BaseAllocator::getMaxSize()
-	{
-		return m_uMaxSize;
-	}
-
-	void BaseAllocator::setAllocatedSize(u32 size)
-	{
-		m_uAllocatedSize=size;
-	}
-
-	u32 BaseAllocator::getAllocatedSize()
-	{
-		return m_uAllocatedSize;
-	}
-
-	*/
 }

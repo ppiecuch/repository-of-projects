@@ -12,21 +12,9 @@
 	"powered by Holos v" LC_VERSION_STRING " (http://lucid.googlecode.com/)"
 
 
-#include <stdio.h>
-#include <wtypes.h>
-#include <stdarg.h>
-#include <tchar.h>
-
-inline void TRACE(const char * pszFormat, ...)
-{
-	va_list pArgs;
-	char szMessageBuffer[16380]={0};
-	va_start( pArgs, pszFormat );
-	vsnprintf_s( szMessageBuffer, 16380,16380-1,pszFormat, pArgs );
-	va_end( pArgs );   
-	OutputDebugStringA(szMessageBuffer);   
-}
-
+#define LC_SYMBOL_SUCS		"¡¾¡Ì¡¿"
+#define LC_SYMBOL_WARN		"¡¾©u¡¿"
+#define LC_SYMBOL_FAIL		"¡¾¨w¡¿"
 
 #ifdef LC_SHOW_OBSOLETE
 #define LC_OBSOLETE(text) /*! \deprecated text */ LC_OBSOLETE_START(text)LC_OBSOLETE_END

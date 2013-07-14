@@ -3,7 +3,7 @@
 
 #include "lcTypes.h"
 
-#if defined(LC_OS_WINNT)||defined(LC_OS_WINRT)
+#if defined(LC_OS_WIN32)
 #include <stdio.h>
 #include <wtypes.h>
 #include <stdarg.h>
@@ -11,14 +11,15 @@
 
 namespace lc{
 
-	void trace(const lc::c8 * pszFormat, ...);
+	void trace(lc::s32 level,const lc::c8 * pszFormat, ...);
 
 }
 
-#define LC_DEBG(fmt,...) lc::trace(fmt,__VA_ARGS__)
-#define LC_INFO(fmt,...) lc::trace(fmt,__VA_ARGS__)
-#define LC_WARN(fmt,...) lc::trace(fmt,__VA_ARGS__)
-#define LC_EROR(fmt,...) lc::trace(fmt,__VA_ARGS__)
+//TODO need try...catch...?
+#define LC_DEBG(fmt,...) lc::trace(0,fmt,__VA_ARGS__)
+#define LC_INFO(fmt,...) lc::trace(1,fmt,__VA_ARGS__)
+#define LC_WARN(fmt,...) lc::trace(2,fmt,__VA_ARGS__)
+#define LC_EROR(fmt,...) lc::trace(3,fmt,__VA_ARGS__)
 
 #elif defined(LC_OS_ANDROID)
 
@@ -37,4 +38,22 @@ namespace lc{
 #define LC_EROR(fmt,...) 
 
 #endif
+
+
+#if LC_LOG_LEVEL>0
+#undef LC_DEBG
+#define LC_DEBG(fmt,...) 
+#endif
+
+#if LC_LOG_LEVEL>1
+#undef LC_INFO
+#define LC_INFO(fmt,...) 
+#endif
+
+#if LC_LOG_LEVEL>2
+#undef LC_WARN
+#define LC_WARN(fmt,...) 
+#endif
+
+ 
 #endif

@@ -28,21 +28,26 @@
 #error unrecognized architecture
 #endif
 
+//Windows XP _WIN32_WINNT>=0x0501 
+//Windows 2000 _WIN32_WINNT>=0x0500 
+//Windows NT 4.0 _WIN32_WINNT>=0x0400 
+//Windows Me _WIN32_WINDOWS=0x0490 
+//Windows 98 _WIN32_WINDOWS>=0x0410 
 
+//refer to:http://pub.freerdp.com/FreeRDP.bzr/trunk/winpr/include/winpr/platform.h
 // operation system
 #if defined(_WIN32)
-#if defined( WINAPI_FAMILY_APP )
+#if defined( WINAPI_FAMILY ) && (WINAPI_FAMILY == WINAPI_FAMILY_APP) || defined(__cplusplus_winrt)
 #define LC_OS_WINRT
-#else
-#define LC_OS_WINNT
 #endif
+#define LC_OS_WIN32
 #elif defined(__GNUC__) && defined(__MACOS_CLASSIC__)
 #define LC_OS_MAC
 #elif defined(__GNUC__) && (defined(__APPLE_CPP__) || defined(__APPLE_CC__))
 #define LC_OS_IOS
 #elif defined(__ANDROID__)
 #define LC_OS_ANDROID
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(linux) || defined(__linux)
 #define LC_OS_LINUX
 #else
 #error unrecognized platform
@@ -197,7 +202,7 @@ MS VC++ 5.0 _MSC_VER = 1100
 //比如目标文件A定义全局变量global为int型，占4个字节；目标文件B定义global为double型，占8个字节，那么目标文件A和B链接后，
 //符号global占8个字节（尽量不要使用多个不同类型的弱符号，否则容易导致很难发现的程序错误）。
 
-#if defined(LC_OS_WINNT) || defined(LC_OS_WINRT)
+#if defined(LC_OS_WIN32)
 #define LC_SELECTANY __declspec(selectany)
 #elif defined(LC_OS_MAC) || defined(LC_OS_IOS) || defined(LC_OS_ANDROID) || defined(LC_OS_LINUX)
 #define LC_SELECTANY __attribute__((weak))
@@ -207,7 +212,7 @@ MS VC++ 5.0 _MSC_VER = 1100
 
 //refer to:http://eeepage.info/gcc-marco-01/
 #define LC_FILE __FILE__
-#if defined(LC_OS_WINNT) || defined(LC_OS_WINRT)
+#if defined(LC_OS_WIN32)
 #define LC_FUNC __FUNCTION__
 #else
 #define LC_FUNC __func__
@@ -216,7 +221,7 @@ MS VC++ 5.0 _MSC_VER = 1100
 
 //refer to:http://code.taobao.org/p/screagame/src/trunk/src/core/ScreaTypes.h
 #if defined(LC_BUILD_DEBUG)
-#    if defined(LC_OS_WINNT) || defined(LC_OS_WINRT)
+#    if defined(LC_OS_WIN32)
 #        if defined(LC_ARCH_64) // 兼容x64配置
 #            include <crtdbg.h>
 #            define LC_DEBUG_BREAK_IF(_CONDITION_) if (_CONDITION_) {_CrtDbgBreak();}
