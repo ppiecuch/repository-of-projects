@@ -8,18 +8,93 @@ inline void EnableMemLeakCheck()
 }
 
 #include "lcAllocator.h"
+#include "lcThread.h"
+#include "lcMutex.h"
+#include "lcUtil.h"
+#include "lcLogger.h"
 using namespace lc;
 
 void outOfMemory(){
 	printf("outOfMemory\r\n");
 }
 
+struct SMyRunnable1 : public lc::IRunnable{
+	virtual void run(){
+		LC_INFO("start SMyRunnable1()\r\n");
+		for(u32 i=0;i<100;++i)
+		{
+			LC_NEW int;
+			lc::sleep(50);
+			LC_INFO("SMyRunnable1(%d)\r\n",i);
+		}
+		lc::sleep(50);
+		LC_INFO("end SMyRunnable1()\r\n");
+	}
+};
+struct SMyRunnable2 : public lc::IRunnable{
+	virtual void run(){
+		LC_INFO("start SMyRunnable2()\r\n");
+		for(u32 i=0;i<100;++i)
+		{
+			LC_NEW short;
+			lc::sleep(50);
+			LC_INFO("SMyRunnable2(%d)\r\n",i);
+		}
+		lc::sleep(50);
+		LC_INFO("end SMyRunnable2()\r\n");
+	}
+};
+struct SMyRunnable3 : public lc::IRunnable{
+	virtual void run(){
+		LC_INFO("start SMyRunnable3()\r\n");
+		for(u32 i=0;i<100;++i)
+		{
+			LC_NEW char;
+			lc::sleep(50);
+			LC_INFO("SMyRunnable3(%d)\r\n",i);
+		}
+		lc::sleep(50);
+		LC_INFO("end SMyRunnable3()\r\n");
+	}
+};
+struct SMyRunnable4 : public lc::IRunnable{
+	virtual void run(){
+		LC_INFO("start SMyRunnable4()\r\n");
+		for(u32 i=0;i<100;++i)
+		{
+			LC_NEW double;
+			lc::sleep(50);
+			LC_INFO("SMyRunnable4(%d)\r\n",i);
+		}
+		lc::sleep(50);
+		LC_INFO("end SMyRunnable4()\r\n");
+	}
+};
 
 int main()
 {
-	EnableMemLeakCheck();
+	//EnableMemLeakCheck();
 
 #if 1
+	MemoryTracer::create();
+
+	SMyRunnable1* r1=LC_NEW SMyRunnable1;
+	lc::thread* td1=lc::thread::createInstance(r1);
+	td1->start();
+
+	SMyRunnable2* r2=LC_NEW SMyRunnable2;
+	lc::thread* td2=lc::thread::createInstance(r2);
+	td2->start();
+
+	SMyRunnable3* r3=LC_NEW SMyRunnable3;
+	lc::thread* td3=lc::thread::createInstance(r3);
+	td3->start();
+
+	SMyRunnable4* r4=LC_NEW SMyRunnable4;
+	lc::thread* td4=lc::thread::createInstance(r4);
+	td4->start();
+	
+#elif 1
 	MemoryTracer::create();
 	int* p=LC_NEW int;
 	delete p;
@@ -59,5 +134,6 @@ int main()
 
 
 	system("pause");
+	MemoryTracer::getInstance().destroy();
 	return 0;
 }

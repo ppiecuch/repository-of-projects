@@ -19,12 +19,14 @@
 #define LC_VERSION_PATCH   0
 
 
-// exception
+// exception (disable it with LC_WITHOUT_EXCEPTION)
 // -----------------------------------------------------------------------------
+#ifndef LC_WITHOUT_EXCEPTION
 #define LC_WITH_EXCEPTION
+#endif
 
 
-// track (debug: true & release: false)
+// track (debug: true & release: false)(force true with LC_SHOW_TRACK)
 // -----------------------------------------------------------------------------
 #if !defined(LC_SHOW_TRACK)&&defined(LC_BUILD_DEBUG)
 #define LC_SHOW_TRACK
@@ -36,10 +38,39 @@
 #define LC_MEMORY_MAX_SIZE 83886080	//80M
 
 
-// obsolete (debug: true & release: false)
+// obsolete (debug: true & release: false)(force true with LC_SHOW_OBSOLETE)
 // -----------------------------------------------------------------------------
 #if !defined(LC_SHOW_OBSOLETE)&&defined(LC_BUILD_DEBUG)
 #define LC_SHOW_OBSOLETE
 #endif
+
+
+// logger
+// -----------------------------------------------------------------------------
+#if	  defined(LC_LOG_LEVEL_DEBG)
+#ifdef LC_LOG_LEVEL
+#undef LC_LOG_LEVEL
+#endif
+#define LC_LOG_LEVEL 0
+#elif defined(LC_LOG_LEVEL_INFO)
+#ifdef LC_LOG_LEVEL
+#undef LC_LOG_LEVEL
+#endif
+#define LC_LOG_LEVEL 1
+#elif defined(LC_LOG_LEVEL_WARN)
+#ifdef LC_LOG_LEVEL
+#undef LC_LOG_LEVEL
+#endif
+#define LC_LOG_LEVEL 2
+#elif defined(LC_LOG_LEVEL_EROR)
+#ifdef LC_LOG_LEVEL
+#undef LC_LOG_LEVEL
+#endif
+#define LC_LOG_LEVEL 3
+#endif
+#if !defined()&&defined(LC_BUILD_DEBUG)
+#define LC_SHOW_OBSOLETE
+#endif
+
 
 #endif

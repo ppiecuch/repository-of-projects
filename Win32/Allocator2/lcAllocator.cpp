@@ -7,7 +7,26 @@ namespace lc{
 
 	template<> MemoryTracer* core::Singleton<MemoryTracer>::s_pSingleton = NULL;
 
-	MemoryTracer::MemoryTracer():m_pHead(NULL),m_pTail(NULL),m_uAllocatedSize(0),m_uAllocatedCount(0){}
+	mutex MemoryTracer::s_mutex;
+
+	MemoryTracer::MemoryTracer():m_pHead(NULL),m_pTail(NULL),m_uAllocatedSize(0),m_uAllocatedCount(0){
+		setMaxSize(LC_MEMORY_MAX_SIZE);
+	}
+
+	void MemoryTracer::lock(){
+		s_mutex.lock();
+	}
+
+	void MemoryTracer::unlock(){
+		s_mutex.unlock();
+	}
+
+	bool MemoryTracer::canAllocate(size_t sz)
+	{
+		if(m_uAllocatedSize+sz>m_uMaxSize)
+			return false;
+		return true;
+	}
 
 	void MemoryTracer::addNode(TracerNode* node)
 	{
@@ -65,25 +84,27 @@ namespace lc{
 
 	void MemoryTracer::deallocateNode(TracerNode* node)
 	{
-		m_mutex.lock();
 		removeNode(node);
-		m_mutex.unlock();
 		free(node);
 	}
 
 	void MemoryTracer::allocate(LC_ALLOC_PARAMS(void* p,size_t sz))
 	{
-		TracerNode* n=(TracerNode*)malloc(sizeof(TracerNode));
-		TracerNode tmp(LC_ALLOC_ARGS_SL(p,sz));
-		new (n) TracerNode(tmp);
-		m_mutex.lock();
-		addNode(n);
-		m_mutex.unlock();
-	}
+		if(canAllocate(sz))
+		{
+			TracerNode* n=(TracerNode*)malloc(sizeof(TracerNode));
+			TracerNode tmp(LC_ALLOC_ARGS_SL(p,sz));
+			new (n) TracerNode(tmp);
+			addNode(n);
+		}
+		else
+		{
+			lcThrow(OverflowException);
+		}
+	} 
 
 	void MemoryTracer::deallocate(void* ptr)
 	{
-		m_mutex.lock();
 		TracerNode* n=m_pHead;
 		while(n)
 		{
@@ -93,7 +114,6 @@ namespace lc{
 		//LC_DEBUG_BREAK_IF(n==NULL);
 		if(n)
 			removeNode(n);
-		m_mutex.unlock();
 		free(n);
 	}
 
@@ -104,16 +124,26 @@ namespace lc{
 
 	void MemoryTracer::destroy()
 	{
-		m_mutex.lock();
+		lock();
 		TracerNode* n=m_pHead;
+		if(m_pHead)
+		{
+			TRACE("Check memory leak:%u bytes,%u calls in total\r\n",m_uAllocatedSize,m_uAllocatedCount);
+		}
+		TracerNode* thiz=NULL;
 		while(n)
 		{
 			TracerNode* next=n->Next;
 			TRACE("Check memory leak at 0x%08X(%u bytes) in %s within \"%s(...)\" at line:%d\r\n",n->Addr,n->Size,n->File,n->Func,n->Line);
-			delete n->Addr;
+			//如果是MemoryTracer，将之放到最后去释放
+			if(n->Addr==this)
+				delete n->Addr;
+			else
+				thiz=n;
 			n=next;
 		}
-		m_mutex.unlock();
+		delete thiz;
+		unlock();
 		core::Singleton<MemoryTracer>::destroy();
 	}
 

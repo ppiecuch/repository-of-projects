@@ -18,4 +18,7 @@
 						lcException					lcNewAndDelete
 		
 		
-												lcMap		lcSingleton
+												lcMap		lcSingleton						lcBackwardCompatibility
+												
+												
+																			lcAllocator
