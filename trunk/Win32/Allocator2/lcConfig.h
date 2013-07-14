@@ -45,7 +45,12 @@
 #endif
 
 
-// logger
+// logger (debug: debg & release: warn)
+// It is the priority if you define the follow macros:
+// LC_LOG_LEVEL_DEBG: debg
+// LC_LOG_LEVEL_INFO: info
+// LC_LOG_LEVEL_WARN: warn
+// LC_LOG_LEVEL_EROR: eror
 // -----------------------------------------------------------------------------
 #if	  defined(LC_LOG_LEVEL_DEBG)
 #ifdef LC_LOG_LEVEL
@@ -67,9 +72,18 @@
 #undef LC_LOG_LEVEL
 #endif
 #define LC_LOG_LEVEL 3
+#else
+#ifdef LC_BUILD_DEBUG
+#ifdef LC_LOG_LEVEL
+#undef LC_LOG_LEVEL
 #endif
-#if !defined()&&defined(LC_BUILD_DEBUG)
-#define LC_SHOW_OBSOLETE
+#define LC_LOG_LEVEL 0
+#else
+#ifdef LC_LOG_LEVEL
+#undef LC_LOG_LEVEL
+#endif
+#define LC_LOG_LEVEL 2
+#endif
 #endif
 
 

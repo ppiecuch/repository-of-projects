@@ -1,9 +1,10 @@
 #include "lcNewAndDelete.h"
 #include "lcAllocator.h"
+#include "lcLogger.h"
 
 #ifdef LC_SHOW_TRACK
 void* operator new(size_t sz){
-	TRACE("\"new\" operator is deprecated,please use \"LC_NEW\" instead!\r\n");
+	LC_WARN("\"new\" operator is deprecated,please use \"LC_NEW\" instead%8s\r\n",LC_SYMBOL_WARN);
 	try{
 		return malloc(sz);
 	}catch(...){
@@ -11,7 +12,7 @@ void* operator new(size_t sz){
 	}
 }
 void operator delete(LC_ALLOC_PARAMS(void* ptr)){
-	TRACE("unexpected delete operator\r\n");
+	LC_WARN("unexpected delete operator\r\n");
 	return free(ptr);
 }
 #endif

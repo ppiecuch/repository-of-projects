@@ -323,7 +323,7 @@ namespace core{
 
 		//插入，如果已经存在k，返回false，否则返回true
 		bool insert(const K& k,const V& v){
-			Node* n = new Node(k,v);
+			Node* n = LC_NEW Node(k,v);
 			if (!insert(n)){
 				delete n;
 				return false;
