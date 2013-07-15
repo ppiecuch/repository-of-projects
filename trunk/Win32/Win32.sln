@@ -185,6 +185,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exception", "exception\exce
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Allocator2", "Allocator2\Allocator2.vcproj", "{F8DE7C75-9DDF-4F95-B1F7-7550ABB695C0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Window", "Window\Window.vcproj", "{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Multithreaded|Win32 = Debug Multithreaded|Win32
@@ -1879,6 +1881,26 @@ Global
 		{F8DE7C75-9DDF-4F95-B1F7-7550ABB695C0}.withLua51_Debug|Win32.Build.0 = Debug|Win32
 		{F8DE7C75-9DDF-4F95-B1F7-7550ABB695C0}.withLua51_Release|Win32.ActiveCfg = Release|Win32
 		{F8DE7C75-9DDF-4F95-B1F7-7550ABB695C0}.withLua51_Release|Win32.Build.0 = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Debug Multithreaded|Win32.ActiveCfg = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Debug Multithreaded|Win32.Build.0 = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Debug Singlethreaded|Win32.ActiveCfg = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Debug Singlethreaded|Win32.Build.0 = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Debug|Win32.Build.0 = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Release Multithreaded|Win32.ActiveCfg = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Release Multithreaded|Win32.Build.0 = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Release Singlethreaded|Win32.ActiveCfg = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Release Singlethreaded|Win32.Build.0 = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Release|Win32.ActiveCfg = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.Release|Win32.Build.0 = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua50_Debug|Win32.ActiveCfg = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua50_Debug|Win32.Build.0 = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua50_Release|Win32.ActiveCfg = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua50_Release|Win32.Build.0 = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua51_Debug|Win32.ActiveCfg = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua51_Debug|Win32.Build.0 = Debug|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua51_Release|Win32.ActiveCfg = Release|Win32
+		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua51_Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
