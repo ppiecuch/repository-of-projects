@@ -15,6 +15,7 @@ inline void EnableMemLeakCheck()
 #include "lcLogger.h"
 #include "lcMap.h"
 #include "lcTimer.h"
+#include "lcLimiter.h"
 using namespace lc;
 
 void outOfMemory(){
@@ -74,6 +75,15 @@ struct SMyRunnable4 : public lc::IRunnable{
 	}
 };
 
+f32 FPS=30.f;
+f32 sleepTime=30;
+void limitFPSCallback(f32 value)
+{
+	LC_DEBG("limitFPSCallback:%.2f\r\n",value);
+	sleepTime+=value;
+	if(sleepTime<0)sleepTime=0;
+}
+
 int main()
 {
 	//EnableMemLeakCheck();
@@ -83,6 +93,26 @@ int main()
 	MemoryTracer::create();
 
 	timer::create();
+	{
+#if 1
+		limiter<f32,1000> l;
+		l.setExceedCallback(&limitFPSCallback);
+		l.setLimit(FPS);
+		for(int i=0;i<200;++i)
+		{
+			u32 start=timer::getInstance().getTime();
+			lc::sleep((s32)sleepTime);
+			u32 end=timer::getInstance().getTime();
+			u32 diff=end-start;
+			f32 fps=diff?1000.f/diff:1000;
+			l.add(fps);
+			LC_DEBG("FPS:%.2f,diff:%u,sleepTime:%.2f\r\n",fps,diff,sleepTime);
+		}
+#else
+		limiter<s32,10000> l;
+		l.add(1);
+#endif
+	}
 
 	LC_DEBG("%u\r\n",timer::getInstance().getTime());
 
