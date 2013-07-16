@@ -210,6 +210,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lcLimiter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lcList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lcLock.cpp"
 				>
 				<FileConfiguration
@@ -513,10 +521,6 @@
 					Name="VCCustomBuildTool"
 				/>
 			</FileConfiguration>
-		</File>
-		<File
-			RelativePath=".\lcLimiter.h"
-			>
 		</File>
 		<File
 			RelativePath=".\main.cpp"
