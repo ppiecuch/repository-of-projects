@@ -2,6 +2,7 @@
 #define _LUCID_DECLARE_H_
 
 namespace lc{
+	class timer;
 	class MemoryTracer;
 }
 

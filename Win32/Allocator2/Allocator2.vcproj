@@ -326,7 +326,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lcTimer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lcTimer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lcTypes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lcUnderiable.h"
 				>
 			</File>
 			<File
@@ -501,6 +513,10 @@
 					Name="VCCustomBuildTool"
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\lcLimiter.h"
+			>
 		</File>
 		<File
 			RelativePath=".\main.cpp"
