@@ -14,6 +14,7 @@ inline void EnableMemLeakCheck()
 #include "lcUtil.h"
 #include "lcLogger.h"
 #include "lcMap.h"
+#include "lcTimer.h"
 using namespace lc;
 
 void outOfMemory(){
@@ -78,6 +79,16 @@ int main()
 	//EnableMemLeakCheck();
 
 #if 1
+
+	MemoryTracer::create();
+
+	timer::create();
+
+	LC_DEBG("%u\r\n",timer::getInstance().getTime());
+
+	timer::getInstance().destroy();
+
+#elif 1
 
 	MemoryTracer::create();
 
