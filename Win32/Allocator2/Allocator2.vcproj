@@ -210,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lcLimiter.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\lcLimiter.h"
 				>
 			</File>
@@ -294,6 +298,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lcRandomizer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lcRandomizer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lcSingleton.cpp"
 				>
 				<FileConfiguration
@@ -334,6 +346,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lcThrottle.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lcThrottle.h"
+				>
+			</File>
+			<File
 				RelativePath=".\lcTimer.cpp"
 				>
 			</File>
@@ -343,6 +363,10 @@
 			</File>
 			<File
 				RelativePath=".\lcTypes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\lcUncopyable.h"
 				>
 			</File>
 			<File

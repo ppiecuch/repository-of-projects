@@ -16,6 +16,7 @@ inline void EnableMemLeakCheck()
 #include "lcMap.h"
 #include "lcTimer.h"
 #include "lcLimiter.h"
+#include "lcRandomizer.h"
 using namespace lc;
 
 void outOfMemory(){
@@ -84,6 +85,8 @@ void limitFPSCallback(f32 value)
 	if(sleepTime<0)sleepTime=0;
 }
 
+lc::FPSLimiter fpsLimiter(false);
+
 int main()
 {
 	//EnableMemLeakCheck();
@@ -93,8 +96,25 @@ int main()
 	MemoryTracer::create();
 
 	timer::create();
+	randomizer::create();
 	{
 #if 1
+		fpsLimiter.setFPS((u32)FPS);
+		for(int i=0;i<200;++i)
+		{
+			//u32 start=timer::getInstance().getTime();
+			if(i==100)
+				fpsLimiter.setFPS(20);
+			//simulate update/draw
+			lc::sleep(randomizer::getInstance().rand(20,30));
+			fpsLimiter.tick();
+			//u32 end=timer::getInstance().getTime();
+			//u32 diff=end-start;
+			//f32 fps=diff?1000.f/diff:1000;
+			//LC_DEBG("FPS:%.2f,diff:%u\r\n",fps,diff);
+			LC_DEBG("FPS:%.2f\r\n",fpsLimiter.getRealFPS());
+		}
+#elif 1
 		limiter<f32,1000> l;
 		l.setExceedCallback(&limitFPSCallback);
 		l.setLimit(FPS);
@@ -111,11 +131,16 @@ int main()
 #else
 		limiter<s32,10000> l;
 		l.add(1);
+
+		LC_DEBG("%d\r\n",randomizer::getInstance().rand(0,10));
+		LC_DEBG("%d\r\n",randomizer::getInstance().rand(0,10));
+		LC_DEBG("%d\r\n",randomizer::getInstance().rand(0,10));
+		LC_DEBG("%d\r\n",randomizer::getInstance().rand(0,10));
 #endif
 	}
 
 	LC_DEBG("%u\r\n",timer::getInstance().getTime());
-
+	randomizer::getInstance().destroy();
 	timer::getInstance().destroy();
 
 #elif 1
