@@ -8,6 +8,7 @@
 
 namespace lc{
 
+/*
 template<typename T,size_t time_slot=0,bool safe=false>
 class limiter{
 public:
@@ -93,6 +94,21 @@ public:
 	void setLimit(T value){
 		m_limit=value;
 	}
+};
+*/
+
+class FPSLimiter{
+	u32 m_uFPS;
+	f32 m_fRealFPS;
+	u32 m_uTPF;
+	u32 m_uStart,m_uEnd,m_uLast;
+	u32 m_uFrameCount;
+	bool m_bSlotFPS;
+public:
+	FPSLimiter(bool slot=false);
+	void setFPS(u32 value);
+	void tick();
+	f32 getRealFPS() const;
 };
 }
 #endif
