@@ -5,6 +5,7 @@ adb -s <serialNumber> <command> 对某一设备执行命令：
 adb install -r 应用程序.apk
 adb shell mkdir yourfolder 建立目录
 adb shell rm -r <dir> 删除目录及其内容
+adb shell rm -r /mnt/sdcard/syjt/**/**/*.pkm 删除指定目录及子目录下的pkm文件
 adb logcat -s 标签名 在命令行中查看LOG信息
 adb -d shell cat /sdcard/log.txt 查看TXT文件
 adb push luan.jpg /sdcard/sdcard

@@ -1,0 +1,170 @@
+So I¡¯ve been trying to call a java method from C++ without any luck. This is the error that I receive:
+
+JNI ERROR (app bug): accessed stale local reference 0x5cb00019 (index
+6 in a table of size 2)
+VM aborting
+Fatal signal 11 (SIGSEGV) at 0xdeadd00d (code=1)
+
+Here is what I do in the code (java-side):
+
+    public class Wrapper extends Activity{
+        private native void initJNIBridge();
+            static final String TAG = "Wrapper";
+
+    protected void onCreate(Bundle savedInstanceState){
+    super.onCreate(savedInstanceState);
+
+            initJNIBridge(); // Calls C++ function.
+    }
+
+    public void upgradeAdFree() {
+             Log.d(TAG, "Wrapper::upgradeAdFree()");
+    }
+
+And here is the C++ side:
+
+    typedef struct JniMethodInfo_
+    {
+        JNIEnv *    env;
+        jclass      classID;
+        jmethodID   methodID;
+    } JniMethodInfo;
+
+    extern "C"
+    {
+static jobject javaObj;
+
+// get env and cache it
+static JNIEnv* getJNIEnv(void)
+{
+
+    JavaVM* jvm = cocos2d::JniHelper::getJavaVM();
+    if (NULL == jvm) {
+        LOGD("Failed to get JNIEnv. JniHelper::getJavaVM() is NULL");
+        return NULL;
+    }
+
+    JNIEnv *env = NULL;
+    // get jni environment
+    jint ret = jvm->GetEnv((void**)&env, JNI_VERSION_1_4);
+
+    switch (ret) {
+        case JNI_OK :
+            // Success!
+            return env;
+
+        case JNI_EDETACHED :
+            // Thread not attached
+
+            // TODO : If calling AttachCurrentThread() on a native thread
+            // must call DetachCurrentThread() in future.
+            // see: http://developer.android.com/guide/practices/design/jni.html
+
+            if (jvm->AttachCurrentThread(&env, NULL) < 0)
+            {
+                LOGD("Failed to get the environment using AttachCurrentThread()");
+                return NULL;
+            } else {
+                // Success : Attached and obtained JNIEnv!
+                return env;
+            }
+
+        case JNI_EVERSION :
+            // Cannot recover from this error
+            LOGD("JNI interface version 1.4 not supported");
+        default :
+            LOGD("Failed to get the environment using GetEnv()");
+            return NULL;
+    }
+}
+
+// get class and make it a global reference, release it at endJni().
+static jclass getClassID(JNIEnv *pEnv)
+{
+    jclass ret = pEnv->FindClass(CLASS_NAME);
+    if (! ret)
+    {
+        LOGD("Failed to find class of %s", CLASS_NAME);
+    }
+
+    return ret;
+}
+static bool getMethodInfo(JniMethodInfo &methodinfo, const char *methodName, const char *paramCode)
+{
+    jmethodID methodID = 0;
+    JNIEnv *pEnv = 0;
+    bool bRet = false;
+
+    do
+    {
+        pEnv = getJNIEnv();
+        if (! pEnv)
+        {
+            break;
+        }
+
+        jclass classID = getClassID(pEnv);
+
+        methodID = pEnv->GetMethodID(classID, methodName, paramCode);
+        if (! methodID)
+        {
+            LOGD("Failed to find method id of %s", methodName);
+            break;
+        }
+
+        methodinfo.classID = classID;
+        methodinfo.env = pEnv;
+        methodinfo.methodID = methodID;
+
+        bRet = true;
+    } while (0);
+
+    return bRet;
+}   
+
+JNIEXPORT void JNICALL Java_org_test_games_Wrapper_initJNIBridge(JNIEnv *, jobject jobj){
+    LOGD("Java_org_test_games_Wrapper_initJNIBridge()");
+
+    javaObj = jobj;
+
+    return;
+}
+
+void upgradeAdFreeJNI()
+{
+    LOGD("upgradeAdFreeJNI");
+
+    JniMethodInfo methodInfo;
+    if (! getMethodInfo(methodInfo, "upgradeAdFree", "()V"))
+    {
+        LOGD("Cannot find method!");
+        return;
+    }
+
+    methodInfo.env->CallVoidMethod(javaObj, methodInfo.methodID);
+}
+
+}
+
+Any suggestions here would be greatly appreciated as I¡¯ve been stumped on this for a few days and its not the easiest task in the world to debug this.
+
+Thanks
+
+ 
+
+Answer
+The problem is that your static pointer to your jobject is no longer valid. You need to protect it from any garbage collector runs. This can be done by using global references instead of local ones.
+Instead of just assigning the pointer create a globalRef.
+
+JNIEXPORT void JNICALL Java_org_test_games_Wrapper_initJNIBridge(JNIEnv *, jobject jobj)
+{
+    LOGD("Java_org_test_games_Wrapper_initJNIBridge()");
+
+    javaObj = env->NewGlobalRef(env, jobj);
+
+return;
+}
+
+But be aware that you must also release the globafRef.
+
+http://androiddev.orkitra.com/?p=21646

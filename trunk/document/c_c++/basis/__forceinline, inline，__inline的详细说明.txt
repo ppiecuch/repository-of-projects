@@ -1,0 +1,20 @@
+inline function_declarator;   
+__inline function_declarator;   // Microsoft相关
+__forceinline function_declarator;   // Microsoft相关
+
+__inline与inline等同。inline和__inline通知编译器将该函数的内容拷贝一份放在调用函数的地方，这称之为内联。内联减少了函数调用的开销，但却增加了代码量。__forceinline关键字则是不基于编译器的性能和优化分析而依赖于程序员的判断进行内联，但它也不保证一定内敛，有些情况函数是肯定不能内敛的。要慎用__forceinline，不加考虑的使用它将会造成代码量的膨胀而只得到很小的性能回报，甚至造成性能下降。
+1.当使用/clr编译器选项时，如果函数使用了安全属性，则不会进行内联。
+2.inline关键字仅用于C++；__inline和__forceinline在C和C++中都可用。
+3.类的成员函数如果是在类定义的同时定义的，那么它默认是inline的，否则也可以使用inline指定为内联的。
+4.如果函数使用了__forceinline关键字，但实际没有进行内联，将给出level 1警告。
+
+在以下情况中，编译器不进行函数内联，即使是使用__forceinline：
+1.函数或其调用者使用/Ob0编译器选项进行编译(Debug模式下的默认选项)。也就是说在Debug模式下，是不会发生函数内联的。
+2.函数和其调用者使用不同类型的异常处理。
+3.函数具有可变数目的参数。
+4.函数使用了在线汇编(即直接在你C/C++代码里加入汇编语言代码)。但使用了编译器关于优化的选项/Og，/Ox，/O1，或/O2的情况除外。
+5.是虚函数并且是虚调用。但对虚函数的直接调用可以inline。
+6.通过指向该函数的函数指针进行调用。
+7.函数被关键字__declspec(naked)修饰。
+
+http://blog.csdn.net/liukun321/article/details/5625051

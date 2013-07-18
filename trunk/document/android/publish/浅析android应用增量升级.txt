@@ -1,0 +1,525 @@
+很久没有更新博客了，真是堕落啊，几次想提起笔，却总是被各种琐事耽搁，以后会多写文章记录点滴。
+
+背景
+        随着android应用体积的不断增大，以及应用版本发布的不断更迭，用户的升级成了一个问题，google也意识到不断更新应用对用户流量的损耗，在Google I/O 上提及的 Smart App update，即应用增量升级，或者叫做差分升级的做法，并在新版本的Google Play中得到支持，某天在和群友聊天是扯到这方面的话题，好奇就稍微研究了一下。
+增量升级的原理
+        今天我们就来实现类似的应用的增量升级。其实增量升级的原理很简单，即首先将应用的旧版本Apk与新版本Apk做差分，得到更新的部分的补丁，例如旧版本的APK有5M，新版的有8M，更新的部分则可能只有3M左右(这里需要说明的是，得到的差分包大小并不是简单的相减，因为其实需要包含一些上下文相关的东西)，使用差分升级的好处显而易见，那么你不需要下载完整的8M文件，只需要下载更新部分就可以，而更新部分可能只有3、4M，可以很大程度上减少流量的损失。
+
+
+         在用户下载了差分包之后，需要在手机端将他们组合起来。可以参考的做法是先将手机端的旧版本软件(多半在/data/下)，复制到SD卡或者cache中，将它们和之前的差分patch进行组合，得到一个新版本的apk应用，如果不出意外的话，这个生成的apk和你之前做差分的apk是一致的。
+增量升级的操作
+       在了解基本的原理之后，我们来逐步解决其中的各个难点。首先是差分包patch的生成。如果做过android手机OTA升级的同学应该注意到，在update.zip中的patch文件夹中有需要与系统文件同名但是以xxx.p 为后缀的文件，他们就是生成的差分patch文件。我们可以借鉴OTA系统升级的差分生成工具来生成我们单个应用apk的差分patch文件。
+OTA系统差分包的制作，使用命令：
+[html] view plaincopyprint?./build/tools/releasetools/ota_from_target_files -n -i <旧包> <新包> <差分包名>  
+
+  ./build/tools/releasetools/ota_from_target_files -n -i <旧包> <新包> <差分包名>       在查阅ota_from_target_files 的代码可知，是在函数WriteIncrementalOTAPackage里生成差分包的，在这个函数里边创建了common.Difference这个类，我们继续跟进，在common.py中的类   class Difference(object):里可以看到：    
+[html] view plaincopyprint?diff_program = DIFF_PROGRAM_BY_EXT.get(ext, "bsdiff")  
+
+    diff_program = DIFF_PROGRAM_BY_EXT.get(ext, "bsdiff")       至此我们就看到了android中提供我们用来制作差分增量升级包的工具，"bsdiff"，这是一个很牛X开源的二进制差分工具.相关的介绍传送门
+相关的代码地址 或者在android的代码目录下 \external\bsdiff
+
+
+       bsdiff是二进制差分工具,其对应的bspatch是相应的补丁合成工具
+       需要注意的是增量升级的补丁包,是需要在服务器端,即PC端完成,大致流程如,制作补丁时调用bsdiff函数，根据两个不同版本的二进制文件，生成补丁文件。 
+[html] view plaincopyprint?命令：bsdiff oldfile newfile patchfile  
+例如: bsdiff xx_v1.0.apk xx_v2.0.apk xx.patch  
+
+命令：bsdiff oldfile newfile patchfile
+例如: bsdiff xx_v1.0.apk xx_v2.0.apk xx.patch
+
+       将生成的补丁包 xx.patch放置在升级服务器上，供用户下载升级，对应多版本需要对不同的版本进行差分，对于版本跨度较大的，建议整包升级。
+        用户在下载了 xx.patch补丁包后，需要用到补丁所对应的apk，即原来系统安装的旧版本apk和补丁合成的bspatch工具。系统旧版本的apk可以通过copy系统data/app目录下的apk文件获取，而补丁合成的bspatch可以通过将bspatch源码稍作修改，封装成一个so库，供手机端调用。
+[html] view plaincopyprint?bspatch的命令格式为：  
+bspatch oldfile newfile patchfile  
+
+   bspatch的命令格式为：
+   bspatch oldfile newfile patchfile      和差分时的参数一样。合成新的apk便可以用于安装。
+    以上只是简单的操作原理，增量升级还涉及很多其他方面，例如，升级补丁校验等问题，可以参考android源码中bootable\recovery\applypatch的相关操作，本文只是浅析，在此不表。
+不足
+     增量升级并非完美无缺的升级方式，至少存在以下两点不足：
+    1.增量升级是以两个应用版本之间的差异来生成补丁的，你无法保证用户每次的及时升级到最新，所以你必须对你所发布的每一个版本都和最新的版本作差分，以便使所有版本的用户都可以差分升级，这样操作相对于原来的整包升级较为繁琐，不过可以通过自动化的脚本批量生成。
+    2.增量升级成功的前提是，用户手机端必须有能够让你拷贝出来且与你服务器用于差分的版本一致的apk，这样就存在，例如，系统内置的apk无法获取到，无法进行增量升级；对于某些与你差分版本一致，但是内容有过修改的(比如破解版apk)，这样也是无法进行增量升级的，为了防止合成补丁错误，最好在补丁合成前对旧版本的apk进行sha1sum校验，保证基础包的一致性。
+小实验
+       多说无益，实践才是王道。下面就来简单实践一下，检测之前理论的正确性。下载实验包 (http://download.csdn.net/detail/hmg25/4676737)，解压后文件如下
+[html] view plaincopyprint?├── bsdiff-4.3        //bsdiff的源码路径，官网获取  
+│   ├── bsdiff.1  
+│   ├── bsdiff.c  
+│   ├── bspatch.1  
+│   ├── bspatch.c  
+│   └── Makefile  
+├── bsdiff-4.3.tar.gz      
+├── bsdiff4.3-win32     //windows PC端的测试工具  
+│   ├── Binary diff.txt  
+│   ├── bsdiff.exe  
+│   ├── bspatch.exe  
+│   └── LICENSE  
+├── bspatch             //手机端的测试工具  
+├── iReader1.6.2.0(v35).apk      // 旧版本的apk  
+└── iReader1.8.0.1(v40).apk    //新版本的apk  
+
+├── bsdiff-4.3        //bsdiff的源码路径，官网获取
+│   ├── bsdiff.1
+│   ├── bsdiff.c
+│   ├── bspatch.1
+│   ├── bspatch.c
+│   └── Makefile
+├── bsdiff-4.3.tar.gz    
+├── bsdiff4.3-win32     //windows PC端的测试工具
+│   ├── Binary diff.txt
+│   ├── bsdiff.exe
+│   ├── bspatch.exe
+│   └── LICENSE
+├── bspatch             //手机端的测试工具
+├── iReader1.6.2.0(v35).apk      // 旧版本的apk
+└── iReader1.8.0.1(v40).apk    //新版本的apk
+       以附带的iReader来做测试，在shell进入test\bsdiff4.3-win32文件夹，并下运行命令：
+[html] view plaincopyprint?bsdiff.exe   ../iReader1.6.2.0(v35).apk   ../iReader1.8.0.1(v40).apk   ../ireader.patch  
+
+   bsdiff.exe   ../iReader1.6.2.0(v35).apk   ../iReader1.8.0.1(v40).apk   ../ireader.patch       原来的apk(2.94M),新版本的(3.24M),得到的patch文件为1.77M，用户需要下载的就只是1.77M，流量节省了很多。
+     下面先在电脑端将他们合并。
+    [html] view plaincopyprint?bspatch.exe  ../iReader1.6.2.0(v35).apk   ../new.apk    ../ireader.patch  
+
+  bspatch.exe  ../iReader1.6.2.0(v35).apk   ../new.apk    ../ireader.patch     执行后得到名为new.apk 的合成版本应用，我在ubuntu下进行校验可以看出他们是一样的。
+
+   
+    下面我们在手机端合成看看，将根目录下的bspatch(此为手机端运行的)、iReader1.6.2.0(v35).apk 和ireader.patch ，通过adb push到你有权限操作的目录，最好是在/sdcard/下，然后设置bspatch的执行权限，重复操作上述命令，可以合成新版本的apk，稍后安装查看验证版本即可，不详述。
+扩展阅读
+      使用bsdiff 进行差分升级，还并不是最优的方式，google在它的Chromium项目中，对这个差分算法进行了优化，优化后的版本叫做小胡瓜Courgette，据说性能优化了很多不是一个数量级了，官方的一个例子：
+Full update       10,385,920
+bsdiff update     704,512
+Courgette update      78,848
+       大牛们可以去研究下。
+      最近有些小忙，稍后有时间会对增量升级进行封装下，将合成的代码弄成一个lib库，供java调用。有兴趣的童鞋可以自己操作一下~~~
+            By 何明桂（http://blog.csdn.net/hmg25） 转载请注明出处   原装正版，盗版必究 ^_^
+
+
+
+
+补充：
+很多人不知道怎么进行封装为lib，其实这个和一般的android的C库是一样的，不明白的看看jni相关的知识，原来的测试工程已经找不到了，下边我给出个简单的例子，抛砖引玉，给大家参考下。
+
+
+ [java] view plaincopyprint?#include <stdio.h>  
+#include "com_hmg25_newstart_BSpatch.h"  
+  
+#include <bzlib.h>  
+#include <stdlib.h>  
+#include <stdio.h>  
+#include <string.h>  
+#include <err.h>  
+#include <unistd.h>  
+#include <fcntl.h>  
+#include <android/log.h>  
+  
+  
+static off_t offtin(u_char *buf)  
+{  
+    off_t y;  
+  
+    y=buf[7]&0x7F;  
+    y=y*256;y+=buf[6];  
+    y=y*256;y+=buf[5];  
+    y=y*256;y+=buf[4];  
+    y=y*256;y+=buf[3];  
+    y=y*256;y+=buf[2];  
+    y=y*256;y+=buf[1];  
+    y=y*256;y+=buf[0];  
+  
+    if(buf[7]&0x80) y=-y;  
+  
+    return y;  
+}  
+  
+int applypatch(int argc,char * argv[])  
+{  
+    FILE * f, * cpf, * dpf, * epf;  
+    BZFILE * cpfbz2, * dpfbz2, * epfbz2;  
+    int cbz2err, dbz2err, ebz2err;  
+    int fd;  
+    ssize_t oldsize,newsize;  
+    ssize_t bzctrllen,bzdatalen;  
+    u_char header[32],buf[8];  
+    u_char *old, *new;  
+    off_t oldpos,newpos;  
+    off_t ctrl[3];  
+    off_t lenread;  
+    off_t i;  
+  
+    if(argc!=4) errx(1,"usage: %s oldfile newfile patchfile\n",argv[0]);  
+  
+    /* Open patch file */  
+    if ((f = fopen(argv[3], "r")) == NULL)  
+        err(1, "fopen(%s)", argv[3]);  
+  
+    /* 
+    File format: 
+        0   8   "BSDIFF40" 
+        8   8   X 
+        16  8   Y 
+        24  8   sizeof(newfile) 
+        32  X   bzip2(control block) 
+        32+X    Y   bzip2(diff block) 
+        32+X+Y  ??? bzip2(extra block) 
+    with control block a set of triples (x,y,z) meaning "add x bytes 
+    from oldfile to x bytes from the diff block; copy y bytes from the 
+    extra block; seek forwards in oldfile by z bytes". 
+    */  
+  
+    /* Read header */  
+    if (fread(header, 1, 32, f) < 32) {  
+        if (feof(f))  
+            errx(1, "Corrupt patch\n");  
+        err(1, "fread(%s)", argv[3]);  
+    }  
+  
+    /* Check for appropriate magic */  
+    if (memcmp(header, "BSDIFF40", 8) != 0)  
+        errx(1, "Corrupt patch\n");  
+  
+    /* Read lengths from header */  
+    bzctrllen=offtin(header+8);  
+    bzdatalen=offtin(header+16);  
+    newsize=offtin(header+24);  
+    if((bzctrllen<0) || (bzdatalen<0) || (newsize<0))  
+        errx(1,"Corrupt patch\n");  
+  
+    /* Close patch file and re-open it via libbzip2 at the right places */  
+    if (fclose(f))  
+        err(1, "fclose(%s)", argv[3]);  
+    if ((cpf = fopen(argv[3], "r")) == NULL)  
+        err(1, "fopen(%s)", argv[3]);  
+    if (fseeko(cpf, 32, SEEK_SET))  
+        err(1, "fseeko(%s, %lld)", argv[3],  
+            (long long)32);  
+    if ((cpfbz2 = BZ2_bzReadOpen(&cbz2err, cpf, 0, 0, NULL, 0)) == NULL)  
+        errx(1, "BZ2_bzReadOpen, bz2err = %d", cbz2err);  
+    if ((dpf = fopen(argv[3], "r")) == NULL)  
+        err(1, "fopen(%s)", argv[3]);  
+    if (fseeko(dpf, 32 + bzctrllen, SEEK_SET))  
+        err(1, "fseeko(%s, %lld)", argv[3],  
+            (long long)(32 + bzctrllen));  
+    if ((dpfbz2 = BZ2_bzReadOpen(&dbz2err, dpf, 0, 0, NULL, 0)) == NULL)  
+        errx(1, "BZ2_bzReadOpen, bz2err = %d", dbz2err);  
+    if ((epf = fopen(argv[3], "r")) == NULL)  
+        err(1, "fopen(%s)", argv[3]);  
+    if (fseeko(epf, 32 + bzctrllen + bzdatalen, SEEK_SET))  
+        err(1, "fseeko(%s, %lld)", argv[3],  
+            (long long)(32 + bzctrllen + bzdatalen));  
+    if ((epfbz2 = BZ2_bzReadOpen(&ebz2err, epf, 0, 0, NULL, 0)) == NULL)  
+        errx(1, "BZ2_bzReadOpen, bz2err = %d", ebz2err);  
+  
+    if(((fd=open(argv[1],O_RDONLY,0))<0) ||  
+        ((oldsize=lseek(fd,0,SEEK_END))==-1) ||  
+        ((old=malloc(oldsize+1))==NULL) ||  
+        (lseek(fd,0,SEEK_SET)!=0) ||  
+        (read(fd,old,oldsize)!=oldsize) ||  
+        (close(fd)==-1)) err(1,"%s",argv[1]);  
+    if((new=malloc(newsize+1))==NULL) err(1,NULL);  
+  
+    oldpos=0;newpos=0;  
+    while(newpos<newsize) {  
+        /* Read control data */  
+        for(i=0;i<=2;i++) {  
+            lenread = BZ2_bzRead(&cbz2err, cpfbz2, buf, 8);  
+            if ((lenread < 8) || ((cbz2err != BZ_OK) &&  
+                (cbz2err != BZ_STREAM_END)))  
+                errx(1, "Corrupt patch\n");  
+            ctrl[i]=offtin(buf);  
+        };  
+  
+        /* Sanity-check */  
+        if(newpos+ctrl[0]>newsize)  
+            errx(1,"Corrupt patch\n");  
+  
+        /* Read diff string */  
+        lenread = BZ2_bzRead(&dbz2err, dpfbz2, new + newpos, ctrl[0]);  
+        if ((lenread < ctrl[0]) ||  
+            ((dbz2err != BZ_OK) && (dbz2err != BZ_STREAM_END)))  
+            errx(1, "Corrupt patch\n");  
+  
+        /* Add old data to diff string */  
+        for(i=0;i<ctrl[0];i++)  
+            if((oldpos+i>=0) && (oldpos+i<oldsize))  
+                new[newpos+i]+=old[oldpos+i];  
+  
+        /* Adjust pointers */  
+        newpos+=ctrl[0];  
+        oldpos+=ctrl[0];  
+  
+        /* Sanity-check */  
+        if(newpos+ctrl[1]>newsize)  
+            errx(1,"Corrupt patch\n");  
+  
+        /* Read extra string */  
+        lenread = BZ2_bzRead(&ebz2err, epfbz2, new + newpos, ctrl[1]);  
+        if ((lenread < ctrl[1]) ||  
+            ((ebz2err != BZ_OK) && (ebz2err != BZ_STREAM_END)))  
+            errx(1, "Corrupt patch\n");  
+  
+        /* Adjust pointers */  
+        newpos+=ctrl[1];  
+        oldpos+=ctrl[2];  
+    };  
+  
+    /* Clean up the bzip2 reads */  
+    BZ2_bzReadClose(&cbz2err, cpfbz2);  
+    BZ2_bzReadClose(&dbz2err, dpfbz2);  
+    BZ2_bzReadClose(&ebz2err, epfbz2);  
+    if (fclose(cpf) || fclose(dpf) || fclose(epf))  
+        err(1, "fclose(%s)", argv[3]);  
+  
+    /* Write the new file */  
+    if(((fd=open(argv[2],O_CREAT|O_TRUNC|O_WRONLY,0666))<0) ||  
+        (write(fd,new,newsize)!=newsize) || (close(fd)==-1))  
+        err(1,"%s",argv[2]);  
+  
+    free(new);  
+    free(old);  
+  
+    return 0;  
+}  
+  
+JNIEXPORT jint JNICALL Java_com_hmg25_newstart_BSpatch_applyPatch(JNIEnv *env,  
+        jobject obj, jstring old, jstring new , jstring patch){  
+  int argc=4;  
+  char * argv[argc];  
+  argv[0]="bspatch";  
+  argv[1]=(*env)->GetStringUTFChars(env,old, 0);  
+  argv[2]=(*env)->GetStringUTFChars(env,new, 0);  
+  argv[3]=(*env)->GetStringUTFChars(env,patch, 0);  
+    
+  int ret=applypatch(argc, argv);  
+    
+   (*env)->ReleaseStringUTFChars(env,old,argv[1]);  
+   (*env)->ReleaseStringUTFChars(env,new,argv[2]);  
+   (*env)->ReleaseStringUTFChars(env,patch,argv[3]);  
+   return ret;  
+}  
+
+#include <stdio.h>
+#include "com_hmg25_newstart_BSpatch.h"
+
+#include <bzlib.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <err.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <android/log.h>
+
+
+static off_t offtin(u_char *buf)
+{
+    off_t y;
+
+    y=buf[7]&0x7F;
+    y=y*256;y+=buf[6];
+    y=y*256;y+=buf[5];
+    y=y*256;y+=buf[4];
+    y=y*256;y+=buf[3];
+    y=y*256;y+=buf[2];
+    y=y*256;y+=buf[1];
+    y=y*256;y+=buf[0];
+
+    if(buf[7]&0x80) y=-y;
+
+    return y;
+}
+
+int applypatch(int argc,char * argv[])
+{
+    FILE * f, * cpf, * dpf, * epf;
+    BZFILE * cpfbz2, * dpfbz2, * epfbz2;
+    int cbz2err, dbz2err, ebz2err;
+    int fd;
+    ssize_t oldsize,newsize;
+    ssize_t bzctrllen,bzdatalen;
+    u_char header[32],buf[8];
+    u_char *old, *new;
+    off_t oldpos,newpos;
+    off_t ctrl[3];
+    off_t lenread;
+    off_t i;
+
+    if(argc!=4) errx(1,"usage: %s oldfile newfile patchfile\n",argv[0]);
+
+    /* Open patch file */
+    if ((f = fopen(argv[3], "r")) == NULL)
+        err(1, "fopen(%s)", argv[3]);
+
+    /*
+    File format:
+        0   8   "BSDIFF40"
+        8   8   X
+        16  8   Y
+        24  8   sizeof(newfile)
+        32  X   bzip2(control block)
+        32+X    Y   bzip2(diff block)
+        32+X+Y  ??? bzip2(extra block)
+    with control block a set of triples (x,y,z) meaning "add x bytes
+    from oldfile to x bytes from the diff block; copy y bytes from the
+    extra block; seek forwards in oldfile by z bytes".
+    */
+
+    /* Read header */
+    if (fread(header, 1, 32, f) < 32) {
+        if (feof(f))
+            errx(1, "Corrupt patch\n");
+        err(1, "fread(%s)", argv[3]);
+    }
+
+    /* Check for appropriate magic */
+    if (memcmp(header, "BSDIFF40", 8) != 0)
+        errx(1, "Corrupt patch\n");
+
+    /* Read lengths from header */
+    bzctrllen=offtin(header+8);
+    bzdatalen=offtin(header+16);
+    newsize=offtin(header+24);
+    if((bzctrllen<0) || (bzdatalen<0) || (newsize<0))
+        errx(1,"Corrupt patch\n");
+
+    /* Close patch file and re-open it via libbzip2 at the right places */
+    if (fclose(f))
+        err(1, "fclose(%s)", argv[3]);
+    if ((cpf = fopen(argv[3], "r")) == NULL)
+        err(1, "fopen(%s)", argv[3]);
+    if (fseeko(cpf, 32, SEEK_SET))
+        err(1, "fseeko(%s, %lld)", argv[3],
+            (long long)32);
+    if ((cpfbz2 = BZ2_bzReadOpen(&cbz2err, cpf, 0, 0, NULL, 0)) == NULL)
+        errx(1, "BZ2_bzReadOpen, bz2err = %d", cbz2err);
+    if ((dpf = fopen(argv[3], "r")) == NULL)
+        err(1, "fopen(%s)", argv[3]);
+    if (fseeko(dpf, 32 + bzctrllen, SEEK_SET))
+        err(1, "fseeko(%s, %lld)", argv[3],
+            (long long)(32 + bzctrllen));
+    if ((dpfbz2 = BZ2_bzReadOpen(&dbz2err, dpf, 0, 0, NULL, 0)) == NULL)
+        errx(1, "BZ2_bzReadOpen, bz2err = %d", dbz2err);
+    if ((epf = fopen(argv[3], "r")) == NULL)
+        err(1, "fopen(%s)", argv[3]);
+    if (fseeko(epf, 32 + bzctrllen + bzdatalen, SEEK_SET))
+        err(1, "fseeko(%s, %lld)", argv[3],
+            (long long)(32 + bzctrllen + bzdatalen));
+    if ((epfbz2 = BZ2_bzReadOpen(&ebz2err, epf, 0, 0, NULL, 0)) == NULL)
+        errx(1, "BZ2_bzReadOpen, bz2err = %d", ebz2err);
+
+    if(((fd=open(argv[1],O_RDONLY,0))<0) ||
+        ((oldsize=lseek(fd,0,SEEK_END))==-1) ||
+        ((old=malloc(oldsize+1))==NULL) ||
+        (lseek(fd,0,SEEK_SET)!=0) ||
+        (read(fd,old,oldsize)!=oldsize) ||
+        (close(fd)==-1)) err(1,"%s",argv[1]);
+    if((new=malloc(newsize+1))==NULL) err(1,NULL);
+
+    oldpos=0;newpos=0;
+    while(newpos<newsize) {
+        /* Read control data */
+        for(i=0;i<=2;i++) {
+            lenread = BZ2_bzRead(&cbz2err, cpfbz2, buf, 8);
+            if ((lenread < 8) || ((cbz2err != BZ_OK) &&
+                (cbz2err != BZ_STREAM_END)))
+                errx(1, "Corrupt patch\n");
+            ctrl[i]=offtin(buf);
+        };
+
+        /* Sanity-check */
+        if(newpos+ctrl[0]>newsize)
+            errx(1,"Corrupt patch\n");
+
+        /* Read diff string */
+        lenread = BZ2_bzRead(&dbz2err, dpfbz2, new + newpos, ctrl[0]);
+        if ((lenread < ctrl[0]) ||
+            ((dbz2err != BZ_OK) && (dbz2err != BZ_STREAM_END)))
+            errx(1, "Corrupt patch\n");
+
+        /* Add old data to diff string */
+        for(i=0;i<ctrl[0];i++)
+            if((oldpos+i>=0) && (oldpos+i<oldsize))
+                new[newpos+i]+=old[oldpos+i];
+
+        /* Adjust pointers */
+        newpos+=ctrl[0];
+        oldpos+=ctrl[0];
+
+        /* Sanity-check */
+        if(newpos+ctrl[1]>newsize)
+            errx(1,"Corrupt patch\n");
+
+        /* Read extra string */
+        lenread = BZ2_bzRead(&ebz2err, epfbz2, new + newpos, ctrl[1]);
+        if ((lenread < ctrl[1]) ||
+            ((ebz2err != BZ_OK) && (ebz2err != BZ_STREAM_END)))
+            errx(1, "Corrupt patch\n");
+
+        /* Adjust pointers */
+        newpos+=ctrl[1];
+        oldpos+=ctrl[2];
+    };
+
+    /* Clean up the bzip2 reads */
+    BZ2_bzReadClose(&cbz2err, cpfbz2);
+    BZ2_bzReadClose(&dbz2err, dpfbz2);
+    BZ2_bzReadClose(&ebz2err, epfbz2);
+    if (fclose(cpf) || fclose(dpf) || fclose(epf))
+        err(1, "fclose(%s)", argv[3]);
+
+    /* Write the new file */
+    if(((fd=open(argv[2],O_CREAT|O_TRUNC|O_WRONLY,0666))<0) ||
+        (write(fd,new,newsize)!=newsize) || (close(fd)==-1))
+        err(1,"%s",argv[2]);
+
+    free(new);
+    free(old);
+
+    return 0;
+}
+
+JNIEXPORT jint JNICALL Java_com_hmg25_newstart_BSpatch_applyPatch(JNIEnv *env,
+        jobject obj, jstring old, jstring new , jstring patch){
+  int argc=4;
+  char * argv[argc];
+  argv[0]="bspatch";
+  argv[1]=(*env)->GetStringUTFChars(env,old, 0);
+  argv[2]=(*env)->GetStringUTFChars(env,new, 0);
+  argv[3]=(*env)->GetStringUTFChars(env,patch, 0);
+  
+  int ret=applypatch(argc, argv);
+  
+   (*env)->ReleaseStringUTFChars(env,old,argv[1]);
+   (*env)->ReleaseStringUTFChars(env,new,argv[2]);
+   (*env)->ReleaseStringUTFChars(env,patch,argv[3]);
+   return ret;
+}
+Android.mk：
+[java] view plaincopyprint?LOCAL_PATH:= $(call my-dir)  
+include $(CLEAR_VARS)  
+  
+# This is the target being built.  
+LOCAL_MODULE:= libbspatch  
+  
+  
+# All of the source files that we will compile.  
+LOCAL_SRC_FILES:= \  
+  com_hmg25_newstart_BSpatch.c  
+  
+  
+# No static libraries.  
+LOCAL_STATIC_LIBRARIES := \  
+     libbz  
+  
+  
+# Also need the JNI headers.  
+LOCAL_C_INCLUDES += \  
+    $(JNI_H_INCLUDE) external/bzip2  
+  
+# No special compiler flags.  
+LOCAL_CFLAGS +=  
+  
+include $(BUILD_SHARED_LIBRARY)  
+
+
+http://blog.csdn.net/hmg25/article/details/8100896
+
+评论：适用于应用性软件

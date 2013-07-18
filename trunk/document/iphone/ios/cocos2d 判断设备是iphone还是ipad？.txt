@@ -1,0 +1,37 @@
+原文地址：cocos2d 判断设备是iphone还是ipad？作者：speedboy
+        if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad) { 判断不是iPad
+
+            CGSize screenSize = [CCDirector sharedDirector].winSizeInPixels; 
+
+            if (screenSize.width == 960.0f) {
+
+                // iPhone 4 Retina
+
+                [sceneToRun setScaleX:0.9375f];
+
+                [sceneToRun setScaleY:0.8333f];
+
+                CCLOG(@"GameMgr:Scaling for iPhone 4 (retina)");
+
+                
+            } else {//因为iphone的图片是retina高清的，所以在iphone4以前的要缩小
+
+                [sceneToRun setScaleX:0.4688f];
+
+                [sceneToRun setScaleY:0.4166f];
+
+                CCLOG(@"GameMgr:Scaling for iPhone 3GS or older (non-retina)");
+
+
+
+//                CCLOG(@"parent node ====== %@",NSStringFromCGSize([[sceneToRun parent] contentSize]));
+
+//                CCLOG(@"parent node boundingBox ====== %@",NSStringFromCGRect([[sceneToRun parent] boundingBox]));
+
+            }
+
+            CCLOG(@"contentSize ==== %@",NSStringFromCGSize([sceneToRun contentSize]));
+
+            CCLOG(@"boundingBox ==== %@",NSStringFromCGRect([sceneToRun boundingBox]));
+
+        }

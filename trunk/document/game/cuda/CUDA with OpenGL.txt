@@ -1,0 +1,373 @@
+10-18-2011, 02:07 PM #1
+MasterKiten
+MasterKiten is offline
+Junior Member Newbie
+
+Join Date
+    Oct 2011
+Posts
+    4
+
+CUDA with OpenGL
+
+    Hi Im using CUDA as my base API and trying to interpolate it with OpenGL to make my display faster. Im currently using 9800GT and 9500GT Nvidia GPU on windows platform.
+
+    I have compiled my program and it says Im having unspecified device error at
+
+    cutilSafeCall(cudaGraphicsGLRegisterBuffer(cuda_pi xel_resource, *pixel_buffer, cudaGraphicsMapFlagsWriteDiscard));
+
+    which is an error message captured by cutilSafeCall. I read some pages regarding OpenGL and someone answered it would have been a problem related to glewInit() and when I placed after glutInit() and related calls, I get access violation. Following is the code without changing position of glewInit().
+
+    // includes, system
+
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <string.h>
+
+    // includes, GL
+    #include <GL/glew.h>
+    //#include <GL/freeglut.h>
+    #include <GL/glut.h>
+
+    #include <cuda.h>
+    #include <cudaGL.h>
+
+    // includes CUDA <--> C++ interlops
+    #include <cuda_runtime.h>
+    #include <cutil_inline.h>
+    #include <cutil_gl_inline.h>
+    #include <cutil_gl_error.h>
+    #include <cuda_gl_interop.h>
+
+    //define variables
+
+    // variables into cuda
+    const unsigned int window_width = 1000;
+    const unsigned int window_height = 1024;
+
+    float4 *d_vbo_buffer;
+
+    // pbo variables
+    GLuint pbo;
+    struct cudaGraphicsResource *cuda_pbo_resource;
+
+    extern "C"
+    void launch_kernel(int* sum, float* original_data, int* frame_num, cuComplex* d, float* k_resamp, float* dc_subtracted, float* resample, float4 *ptr);
+
+    void createVBO(GLuint* pixel_buffer, struct cudaGraphicsResource **cuda_pixel_resource)
+    {
+
+    if(pixel_buffer){
+    // create buffer object
+    glGenBuffers(1, pixel_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, *pixel_buffer);
+
+    //register buffer on cuda
+    unsigned int size = XDIM * YDIM * 4 * sizeof(float);
+    glBufferData(GL_ARRAY_BUFFER, size, 0, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    cutilSafeCall(cudaGraphicsGLRegisterBuffer(cuda_pi xel_resource, *pixel_buffer, cudaGraphicsMapFlagsWriteDiscard));
+    }
+    else{
+    cutilSafeCall( cudaMalloc( (void **)&amp;d_vbo_buffer, XDIM*YDIM*4*sizeof(float) ) );
+    }
+    }
+
+    void display() {
+
+    // Map buffer object for writing from CUDA
+    float4* pix_buff;
+    cudaGraphicsMapResources(1, &amp;cuda_pbo_resource, 0);
+    size_t num_bytes;
+    cudaGraphicsResourceGetMappedPointer((void**)&amp; pix_buff, &amp;num_bytes, cuda_pbo_resource);
+
+    // Execute kernel
+    // will execute by calling kernel.cu file
+    if(pbo)
+    launch_kernel(dev_sum, dev_original, dev_frame, d_in, dev_k_resampledspacing, dc_subtracted, dev_resamp, pix_buff);
+    else launch_kernel(dev_sum, dev_original, dev_frame, d_in, dev_k_resampledspacing, dc_subtracted, dev_resamp, d_vbo_buffer);
+    // Unmap buffer object
+    cudaGraphicsUnmapResources(1, &amp;cuda_pbo_resource, 0);
+
+    // copy to Open_gl texture
+    // Render from buffer object
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindBuffer(GL_ARRAY_BUFFER, pbo);
+    glVertexPointer(4, GL_FLOAT, 0, 0);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawArrays(GL_POINTS, 0, XDIM * YDIM);
+    glDisableClientState(GL_VERTEX_ARRAY);
+
+    // Swap buffers
+    glutSwapBuffers();
+    glutPostRedisplay();
+
+    }
+
+    void deleteVBO() {
+    cudaGraphicsUnregisterResource(cuda_pbo_resource);
+    glDeleteBuffers(1, &amp;pbo);
+    }
+
+    int main(int argc, char *argv[]) {
+    // Pre-Calculation
+    readData();
+    convertor(); //convert values into single float
+    calc_resample_coefficients();
+
+    //Cuda Memory Allocation
+    int frame = 0, sum =0;
+
+    cudaMalloc((void**)&amp;dev_frame, sizeof(int));
+    cudaMalloc((void**)&amp;dev_sum, sizeof(int));
+    cudaMalloc((void**)&amp;dev_original, sizeof(float)*FRAMES*XDIM*YDIM);
+    cudaMalloc((void**)&amp;d_in,sizeof(cuComplex)*YDI M*XDIM);
+    cudaMalloc((void**)&amp;dev_resamp, sizeof(float)*LINE_LENGTH*2);
+    cudaMalloc((void**)&amp;dev_k_resampledspacing, sizeof(float));
+    cudaMalloc((void**)&amp;dc_subtracted, sizeof(float)*XDIM*YDIM);
+
+    cudaMemcpy(dev_k_resampledspacing, &amp;k_resampledspacing, sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_resamp, resamp_1D, sizeof(float)*LINE_LENGTH*2, cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_original, original_cpu, sizeof(float)*FRAMES*XDIM*YDIM, cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_frame, &amp;frame, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_sum, &amp;sum, sizeof(int), cudaMemcpyHostToDevice);
+
+    // Explicitly set device
+    cudaGLSetGLDevice(2);
+
+    glutInit(&amp;argc, argv);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+    glutInitWindowSize(window_width, window_height);
+    glutCreateWindow("Cuda GL Interop (VBO)");
+    glutDisplayFunc(display);
+
+    glewInit();
+
+    /*
+    // default initialization
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glDisable(GL_DEPTH_TEST);
+
+    // viewport
+    glViewport(0, 0, window_width, window_height);
+
+    // projection
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60.0, (GLfloat)XDIM / (GLfloat) YDIM, 0.1, 10.0);
+
+    CUT_CHECK_ERROR_GL();
+    */
+
+    CUcontext *pCtx = NULL;
+
+    cuInit(0);
+    cuCtxCreate(pCtx, CU_CTX_MAP_HOST, 0);
+    cuGLInit();
+    cuGLCtxCreate(pCtx, CU_CTX_MAP_HOST, 0);
+
+    // Create buffer object and register it with CUDA
+    createVBO(&amp;pbo, &amp;cuda_pbo_resource);
+
+    // Loop
+    glutMainLoop();
+
+    deleteVBO();
+
+    cudaThreadExit();
+    }
+
+    access violation when I change the position of glewInit happens at glGenBuffers(1, pixel_buffer) of createVBO. As a beginner of OpenGL Im getting confused with reason of errors and have no progress debugging. Can someone help me? Thank you. 
+
+10-19-2011, 05:43 AM #2
+Dark Photon
+Dark Photon is offline
+Senior Member OpenGL Guru Dark Photon's Avatar
+
+Join Date
+    Oct 2004
+Location
+    Druidia
+Posts
+    2,908
+
+Re: CUDA with OpenGL
+
+    Quote Originally Posted by MasterKiten
+    Hi Im using CUDA as my base API and trying to [interoperate] it with OpenGL to make my display faster. ... I have compiled my program and it says Im having unspecified device error at
+
+    cutilSafeCall(cudaGraphicsGLRegisterBuffer(cuda_pi xel_resource, *pixel_buffer, cudaGraphicsMapFlagsWriteDiscard));
+    While you might find someone here that can help, you're probably more likely to get the help you need on the NVidia CUDA forums:
+
+    * http://forums.nvidia.com/index.php?showforum=62
+
+    While you wait, wind your code back to where you have no problems and it works well. Then add things in incrementally (binary search the problem; or linear search it -- whatever you prefer). 
+
+10-19-2011, 08:17 AM #3
+mobeen
+mobeen is offline
+Advanced Member Frequent Contributor
+
+Join Date
+    Mar 2009
+Location
+    Singapore
+Posts
+    802
+
+Re: CUDA with OpenGL
+
+    I think you should reorder your calls in this order and see if u still get the error.
+    Code :
+
+    int main(int argc, char *argv[]) { 
+       //set GL context first.
+       glutInit(&amp;argc, argv);
+       glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+       glutInitWindowSize(window_width, window_height);
+       glutCreateWindow("Cuda GL Interop (VBO)");
+       glutDisplayFunc(display);
+     
+       glewInit();
+     
+       // Pre-Calculation
+       readData();
+       convertor(); //convert values into single float
+       calc_resample_coefficients();
+     
+     
+       int frame = 0, sum =0;
+       CUcontext *pCtx = NULL;
+     
+       cuInit(0);
+       cuCtxCreate(pCtx, CU_CTX_MAP_HOST, 0); 
+     
+       //Cuda Memory Allocation
+       cudaMalloc((void**)&amp;dev_frame, sizeof(int));
+       cudaMalloc((void**)&amp;dev_sum, sizeof(int));
+       cudaMalloc((void**)&amp;dev_original, sizeof(float)*FRAMES*XDIM*YDIM);
+       cudaMalloc((void**)&amp;d_in,sizeof(cuComplex)*YDIM*XDIM);
+       cudaMalloc((void**)&amp;dev_resamp, sizeof(float)*LINE_LENGTH*2);
+       cudaMalloc((void**)&amp;dev_k_resampledspacing, sizeof(float));
+       cudaMalloc((void**)&amp;dc_subtracted, sizeof(float)*XDIM*YDIM);
+       cudaMemcpy(dev_k_resampledspacing, &amp;k_resampledspacing, sizeof(float), cudaMemcpyHostToDevice);
+       cudaMemcpy(dev_resamp, resamp_1D, sizeof(float)*LINE_LENGTH*2, cudaMemcpyHostToDevice);
+       cudaMemcpy(dev_original, original_cpu, sizeof(float)*FRAMES*XDIM*YDIM, cudaMemcpyHostToDevice);
+       cudaMemcpy(dev_frame, &amp;frame, sizeof(int),      cudaMemcpyHostToDevice);
+       cudaMemcpy(dev_sum, &amp;sum, sizeof(int), cudaMemcpyHostToDevice);
+     
+       // Explicitly set device
+       cudaGLSetGLDevice(2);
+     
+     
+    cuGLInit();
+    cuGLCtxCreate(pCtx, CU_CTX_MAP_HOST, 0);
+     
+    // Create buffer object and register it with CUDA
+    createVBO(&amp;pbo, &amp;cuda_pbo_resource);
+     
+    // Loop
+    glutMainLoop();
+     
+    deleteVBO();
+     
+    cudaThreadExit();
+    }
+
+    See if this helps. 
+
+    Regards,
+    Mobeen
+
+10-20-2011, 02:03 PM #4
+MasterKiten
+MasterKiten is offline
+Junior Member Newbie
+
+Join Date
+    Oct 2011
+Posts
+    4
+
+Re: CUDA with OpenGL
+
+    well after I changed the order and place CUT_ERROR_CHECK at
+
+    CUT_CHECK_ERROR(glGenBuffers(1, pixel_buffer));
+    CUT_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, *pixel_buffer));
+
+    I get
+
+    1>.\Resampling_GL.cpp(126) : error C2664: 'fprintf' : cannot convert parameter 3 from 'void' to '...'
+    1> Expressions of type void cannot be converted to other types
+    1>.\Resampling_GL.cpp(126) : error C2664: 'fprintf' : cannot convert parameter 3 from 'void' to '...'
+    1> Expressions of type void cannot be converted to other types
+    1>.\Resampling_GL.cpp(127) : error C2664: 'fprintf' : cannot convert parameter 3 from 'void' to '...'
+    1> Expressions of type void cannot be converted to other types
+    1>.\Resampling_GL.cpp(127) : error C2664: 'fprintf' : cannot convert parameter 3 from 'void' to '...'
+    1> Expressions of type void cannot be converted to other types
+
+    where line 126 and 127 is the place were glGenBuffers(1,pixel_buffer)) and glBindBuffer(GL_ARRAY_BUFFER, *pixel_buffer) is called respectively. Im not sure how there could be parameter 3 and why type conversion problem is happening. Is this supposed to happen? Thank you. 
+
+10-20-2011, 02:15 PM #5
+MasterKiten
+MasterKiten is offline
+Junior Member Newbie
+
+Join Date
+    Oct 2011
+Posts
+    4
+
+Re: CUDA with OpenGL
+
+    Oh Im sorry it was because CUT_CHECK_ERROR cannot use void type functions. if I get rid of it, it says
+
+    Unhandled exception at 0x68699d2f (msvcr90d.dll) in Resampling_GL.exe: 0xC0000005: Access violation reading location 0x000027d9.
+
+    Im not sure how this error is getting out since Im ignoring LIBMCT.lib so there should be no conflict between default libraries.. Is this something to do with my setting? Can anyone tell me how to fix this? 
+
+10-20-2011, 08:41 PM #6
+mobeen
+mobeen is offline
+Advanced Member Frequent Contributor
+
+Join Date
+    Mar 2009
+Location
+    Singapore
+Posts
+    802
+
+Re: CUDA with OpenGL
+
+    Unhandled exception at 0x68699d2f (msvcr90d.dll) in Resampling_GL.exe: 0xC0000005: Access violation reading location 0x000027d9.
+    This tells me that there is a conflict between the runtime libraries. What is the setting for project->properties->Config. properties -> c/c++ -> Code generation. I usually set this to
+    Multithreaded DLL (/MD) for Release and
+    Multithreaded Debug DLL (/MDd) for Debug
+    And ignore LIBCMT.lib.
+    What are your settings? 
+
+    Regards,
+    Mobeen
+
+10-25-2011, 08:29 AM #7
+MasterKiten
+MasterKiten is offline
+Junior Member Newbie
+
+Join Date
+    Oct 2011
+Posts
+    4
+
+Re: CUDA with OpenGL
+
+    Im actually using
+    Multithreaded Debug DLL (/MDd) for Debug now
+    and ignoring LIBCMT.lib so I wonder why Im getting such errors. 
+
+
+
+http://www.opengl.org/discussion_boards/showthread.php/175888-CUDA-with-OpenGL

@@ -1,0 +1,179 @@
+and 	
+10-9-15
+将帖子翻译为中文  
+Hi,
+I'm tryint to call a Java function from my callback called by a native
+thread created using pthread_create.
+But when I do, FindClass() fails. Maybe its not able to find the path
+of the class I'm passing to FindClass(). Can any1 please help me?
+
+Related post:
+http://groups.google.com/group/android-ndk/browse_thread/thread/15f4257eb2b0c2dc/baa3ae9acd21b6d7?lnk=gst&q=findclass#
+
+Thanks in advance,
+Nand
+	провод 	
+10-9-15
+将帖子翻译为中文  
+That's because your native thread doesn't have a valid class loader,
+so it fallbacks to a default one, which doesn't see any classes except
+system ones. There are two correct solutions for that (the URL you've
+provided also states them):
+1) "Preload" classes you need from correct Java context (i.e. in
+JNI_OnLoad, or in other function that was called from Java),
+NewGlobalRef them and store in some global/static variable.
+2) Rethink your architecture and create a Java thread instead of
+native one. This obviously might be a very hard or nearly impossible
+thing to do for your particular app.
+I've heard that it's somehow possible to create set a correct
+ClassLoader for a native thread, but I wasn't able to implement that.
+Maybe you could try to somehow pass a correct ClassLoader from Java
+context to native thread (like solution (1)).
+
+2010/9/15 Nand <nandit...@gmail.com>:
+- 显示引用文字 -
+> --
+> You received this message because you are subscribed to the Google Groups "android-ndk" group.
+> To post to this group, send email to andro...@googlegroups.com.
+> To unsubscribe from this group, send email to android-ndk...@googlegroups.com.
+> For more options, visit this group at http://groups.google.com/group/android-ndk?hl=en.
+>
+>
+
+	Pedro Lamarão 	
+10-9-15
+将帖子翻译为中文  
+провод wrote:
+
+
+> 1) "Preload" classes you need from correct Java context (i.e. in
+> JNI_OnLoad, or in other function that was called from Java),
+> NewGlobalRef them and store in some global/static variable.
+
+Sorry to hijack the thread but does Dalvik actually call JNI_OnLoad?
+
+My team told me it wasn't, and I never checked myself.
+
+-- 
+ P.
+	Tim in Boulder 	
+10-9-15
+将帖子翻译为中文  
+ On 9/15/2010 8:34 AM, Pedro Lamarão wrote:
+> Sorry to hijack the thread but does Dalvik actually call JNI_OnLoad?
+>
+> My team told me it wasn't, and I never checked myself.
+Yes, it does. I print a log message and do a few things in JNI_OnLoad(),
+so I know it's called. It even warns you if JNI_OnLoad() isn't present.
+
+Tim
+	fadden 	
+10-9-16
+将帖子翻译为中文  
+On Sep 15, 7:34 am, Pedro Lamarão <pedro.lama...@gmail.com> wrote:
+> Sorry to hijack the thread but does Dalvik actually call JNI_OnLoad?
+>
+> My team told me it wasn't, and I never checked myself.
+
+It does, and it will log a debug message if for some reason it can't
+find it (because e.g. you didn't declare it extern "C").
+	fadden 	
+10-9-16
+将帖子翻译为中文  
+I'm adding some FAQs to the "JNI Tips" document.  Here's what I
+currently have for this:
+
+-----
+FAQ: FindClass didn't find my class
+
+Make sure that the class name string has the correct format. JNI class
+names start with the package name and are separated with slashes, e.g.
+java/lang/String. If you're looking up an array class, you need to
+start with the appropriate number of square brackets and must also
+wrap the class with 'L' and ';', so a one-dimensional array of String
+would be [Ljava/lang/String;.
+
+If the class name looks right, you could be running into a class
+loader issue. FindClass wants to start the class search in the class
+loader associated with your code. It examines the VM call stack, which
+will look something like:
+
+    Foo.myfunc(Native Method)
+    Foo.main(Foo.java:10)
+    dalvik.system.NativeStart.main(Native Method)
+
+The topmost method is Foo.myfunc. FindClass finds the ClassLoader
+object associated with the Foo class and uses that.
+
+This usually does what you want. You can get into trouble if you
+create a thread outside the VM (perhaps by calling pthread_create and
+then attaching it to the VM with AttachCurrentThread). Now the stack
+trace looks like this:
+
+    dalvik.system.NativeStart.run(Native Method)
+
+The topmost method is NativeStart.run, which isn't part of your
+application. If you call FindClass from this thread, the VM will start
+in the "system" class loader instead of the one associated with your
+application, so attempts to find app-specific classes will fail.
+
+There are a few ways to work around this:
+
+ * Do your FindClass lookups once, in JNI_OnLoad, and cache the class
+references for later use. Any FindClass calls made as part of
+executing JNI_OnLoad will use the class loader associated with the
+function that called System.loadLibrary (this is a special rule,
+provided to make library initialization more convenient). If your app
+code is loading the library, FindClass will use the correct class
+loader.
+
+ * Pass an instance of the class into the functions that need it, e.g.
+declare your native method to take a Class argument and then pass
+Foo.class in.
+
+ * Cache a reference to the ClassLoader object somewhere handy, and
+issue loadClass calls directly. This requires some effort.
+-----
+	Nand 	
+10-9-16
+将帖子翻译为中文  
+Hi All,
+Thanks for the reply. I solved this issue. It was not able to find my
+class's path and load it. So I Preloaded my classes and declared them
+globally and used the same for further findclass calls.
+
+If anyone finds similar issue, you can go through the link below. It
+does have lot of information.
+http://android.wooyd.org/JNIExample/files/JNIExample.pdf
+
+Regards,
+Nand
+	Olivier Guilyardi 	
+10-10-8
+将帖子翻译为中文  
+- 显示引用文字 -
+
+In this pdf document, there native-thread-to-Java callback example (Page 7).
+
+A callback_handler() function is called from a native thread. Every time this
+callback handler is called,  it both attaches and detaches the thread to the JVM.
+
+Isn't this heavy? Isn't it better to attach the native thread once, perform any
+number of callbacks, and detach the thread when the job's done?
+
+--
+  Olivier
+
+	fadden 	
+10-10-9
+将帖子翻译为中文  
+On Sep 16, 4:58 am, Nand <nandithab...@gmail.com> wrote:
+> If anyone finds similar issue, you can go through the link below. It
+> does have lot of information.http://android.wooyd.org/JNIExample/files/JNIExample.pdf
+
+Some of it isn't quite right though.  See:
+
+ http://groups.google.com/group/android-ndk/browse_thread/thread/618ff83dd88694b/2f54e5969a832a63?lnk=gst&q=wooyd#2f54e5969a832a63 
+ 
+ 
+ https://groups.google.com/forum/#!topic/android-ndk/2gkr1mXKn_E

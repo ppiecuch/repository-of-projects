@@ -1,0 +1,20 @@
+PCU(Peak concurrent users ),最高同时在线玩家人数
+ARPU(AverageRevenuePerUser)即每用户平均收入
+DAU(DailyActiveUser)日活跃用户数量
+MAU=Monthly Activited Users  月活跃用户
+
+DAU/MAU:一般可叫做当前用户留存率，两者相比主要比较来看用户每月访问游戏的平均天数是多少
+（举例：如果游戏拥有50万DAU，100万MAU，其DAU/MAU比值就是0.5，也就是说玩家每月平均体验游戏的时间是15天，
+说明游戏粘度比较强。当比值接近于1时，就说明用户超级活跃，在一个月内用户天天登陆，流失率低，用户粘性强）。
+DAU/MAU比例是社交游戏的重要参数，同社交游戏成败息息相关。一般最低极限是0.2。这保证游戏能够达到临界规模的病毒式传播和用户粘性。
+其实之前也从这个角度来看：月活跃用户登陆天数分布，这主要也是看一个月用户的活跃度情况，当然，这又是另一个分析角度了。
+
+
+ACT
+RPG(Role Playing Game)
+FPS
+SLG
+STG（Shooting Game）：射击类游戏。玩家需要操纵一个物体（通常是飞机）发射子弹击毁敌机，同时躲避敌机的子弹的游戏。分为2D和3D两种。
+RTS
+MMORPG(MassivelyMultiplayerOnlineRole-PlayingGame)
+MOBAG(Multiplayer Online Battle Arena Games )

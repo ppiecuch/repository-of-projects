@@ -1,0 +1,123 @@
+The iOS SDK includes a tool that allows you to compress your textures into the PVR texture compression format, aptly named texturetool. If you have Xcode installed with the iOS 4.3 SDK in the default location (/Developer/Platforms/), then texturetool is located at: /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/texturetool.
+
+texturetool provides various compression options with tradeoffs between image quality and size. You need to experiment with each texture to determine which setting provides the best compromise.
+
+Note: The encoders, formats, and options available with texturetool are subject to change. This document describes those options available as of iOS 3.0. Options not compatible with previous versions of iOS are noted.
+
+
+texturetool Parameters
+The parameters that may be passed to texturetool are described in the rest of this section.
+
+user$ texturetool -h 
+  
+Usage: texturetool [-hlm] [-e <encoder>] [-p <preview_file>] -o <output> [-f <format>] input_image 
+  
+    -h            Display this help menu. 
+    -l            List available encoders, individual encoder options, and file formats. 
+    -m            Generate a complete mipmap chain from the input image. 
+    -e <encoder>        Encode texture levels with <encoder>. 
+    -p <preview_file>    Output a PNG preview of the encoded output to <preview_file>. Requires -e option 
+    -o <output>        Write processed image to <output>. 
+    -f <format>        Set file <format> for <output> image. 
+
+Note: The -p option indicates that it requires the -e option. It also requires the -o option.
+
+
+Listing A-1  Encoding options
+
+user$ texturetool -l 
+Encoders: 
+  
+PVRTC 
+ --channel-weighting-linear 
+ --channel-weighting-perceptual 
+ --bits-per-pixel-2 
+ --bits-per-pixel-4 
+  
+Formats: 
+  
+Raw 
+PVR 
+
+texturetool defaults to --bits-per-pixel-4, --channel-weighting-linear and -f Raw if no other options are provided.
+
+The --bits-per-pixel-2 and --bits-per-pixel-4 options create PVRTC data that encodes source pixels into 2 or 4 bits per pixel. These options represent a fixed 16:1 and 8:1 compression ratio over the uncompressed 32-bit RGBA image data. There is a minimum data size of 32 bytes; the compressor never produces files smaller than this, and at least that many bytes are expected when uploading compressed texture data.
+
+When compressing, specifying --channel-weighting-linear spreads compression error equally across all channels. By contrast, specifying --channel-weighting-perceptual attempts to reduce error in the green channel compared to the linear option. In general, PVRTC compression does better with photographic images than with line art.
+
+The -m option allows you to automatically generate mipmap levels for the source image. These levels are provided as additional image data in the archive created. If you use the Raw image format, then each level of image data is appended one after another to the archive. If you use the PVR archive format, then each mipmap image is provided as a separate image in the archive.
+
+The iOS 2.2 SDK added an additional format (-f) parameter that allows you to control the format of its output file. Although this parameter is not available with iOS 2.1 or earlier, the data files produced are compatible with those versions of iOS.
+
+The default format is Raw, which is equivalent to the format that texturetool produced under iOS SDK 2.0 and 2.1. This format is raw compressed texture data, either for a single texture level (without the -m option) or for each texture level concatenated together (with the -m option). Each texture level stored in the file is at least 32 bytes in size and must be uploaded to the GPU in its entirety.
+
+The PVR format matches the format used by the PVRTexTool found in Imagination Technologies¡¯s PowerVR SDK. Your application must parse the data header to obtain the actual texture data. See the PVRTextureLoader sample for an example of working with texture data in the PVR format.
+
+Important: Source images for the encoder must satisfy these requirements:
+
+
+Height and width must be at least 8.
+
+Height and width must be a power of 2.
+
+Must be square (height==width).
+
+Source images must be in a format that Image IO accepts in Mac OS X. For best results, your original textures should begin in an uncompressed data format.
+
+
+Important: If you are using PVRTexTool to compress your textures, then you must create textures that are square and a power of two in length. If your application attempts to load a non-square or non-power-of-two texture in iOS, an error is returned.
+
+
+Listing A-2  Encoding images into the PVRTC compression format
+
+Encode Image.png into PVRTC using linear weights and 4 bpp, and saving as ImageL4.pvrtc
+user$ texturetool -e PVRTC --channel-weighting-linear --bits-per-pixel-4 -o ImageL4.pvrtc Image.png
+
+Encode Image.png into PVRTC using perceptual weights and 4 bpp, and saving as ImageP4.pvrtc
+user$ texturetool -e PVRTC --channel-weighting-perceptual --bits-per-pixel-4 -o ImageP4.pvrtc Image.png
+
+Encode Image.png into PVRTC using linear weights and 2 bpp, and saving as ImageL2.pvrtc
+user$ texturetool -e PVRTC --channel-weighting-linear --bits-per-pixel-2 -o ImageL2.pvrtc Image.png
+
+Encode Image.png into PVRTC using perceptual weights and 2 bpp, and saving as ImageP2.pvrtc
+user$ texturetool -e PVRTC --channel-weighting-perceptual --bits-per-pixel-2 -o ImageP2.pvrtc Image.png 
+
+Listing A-3  Encoding images into the PVRTC compression format while creating a preview
+
+Encode Image.png into PVRTC using linear weights and 4 bpp, and saving the output as ImageL4.pvrtc and a PNG preview as ImageL4.png
+user$ texturetool -e PVRTC --channel-weighting-linear --bits-per-pixel-4 -o ImageL4.pvrtc -p ImageL4.png Image.png
+
+Encode Image.png into PVRTC using perceptual weights and 4 bpp, and saving the output as ImageP4.pvrtc and a PNG preview as ImageP4.png
+user$ texturetool -e PVRTC --channel-weighting-perceptual --bits-per-pixel-4 -o ImageP4.pvrtc -p ImageP4.png Image.png
+
+Encode Image.png into PVRTC using linear weights and 2 bpp, and saving the output as ImageL2.pvrtc and a PNG preview as ImageL2.png
+user$ texturetool -e PVRTC --channel-weighting-linear --bits-per-pixel-2 -o ImageL2.pvrtc -p ImageL2.png Image.png
+
+Encode Image.png into PVRTC using perceptual weights and 2 bpp, and saving the output as ImageP2.pvrtc and a PNG preview as ImageP2.png
+user$ texturetool -e PVRTC --channel-weighting-perceptual --bits-per-pixel-2 -o ImageP2.pvrtc -p ImageP2.png Image.png 
+
+Note: It is not possible to create a preview without also specifying the -o parameter and a valid output file. Preview images are always in PNG format.
+
+
+
+
+Listing A-4  Example of uploading PVRTC data to the graphics chip
+
+void texImage2DPVRTC(GLint level, GLsizei bpp, GLboolean hasAlpha, GLsizei width, GLsizei height, void *pvrtcData)
+{
+    GLenum format;
+    GLsizei size = width * height * bpp / 8;
+    if(hasAlpha) {
+        format = (bpp == 4) ? GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+    } else {
+        format = (bpp == 4) ? GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG : GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+    }
+    if(size < 32) {
+        size = 32;
+    }
+    glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height, 0, size, data);
+} 
+
+For sample code, see the PVRTextureLoader sample.
+
+http://developer.apple.com/library/ios/#documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/TextureTool/TextureTool.html

@@ -1,0 +1,503 @@
+×÷Õß£ºScott Meyers and Andrei Alexandrescu   ÒëÕß£º ChengHuige at gmail.com
+
+1.ÒıÑÔ 
+Ïê¾¡µÄÌÖÂÛÁËvolatileÓïÒåÒÔ¼°ÈçºÎÓÃC++ÊµÏÖÏß³Ì°²È«µÄSingletonÄ£Ê½¡£ 
+
+Ö÷Òª²Î¿¼Scott Meyers and Andrei AlexandrescuĞ´µÄ¡°C++ and the Perils of Double-Checked Locking¡±£¬ÕâÊÇ2004ÄêµÄÎÄÕÂ£¬ÒÔ¼°ÍøÉÏµÄÆäËû×ÊÔ´¡£ 
+
+ÆäËû²Î¿¼£º
+
+ 
+
+Threads Basics 
+        http://www.hpl.hp.com/personal/Hans_Boehm/c++mm/threadsintro.html
+
+ The "Double-Checked Locking is Broken" Declaration
+¡¡¡¡  http://www.cs.umd.edu/%7Epugh/java/memoryModel/DoubleCheckedLocking.html 
+
+ 
+
+·ÇÍêÃÀC++ SingletonÊµÏÖ[2]  IsmaydayµÄ¹Ù·½¼¼Êõ²©¿Í
+        http://hi.baidu.com/ismayday/blog/item/a797d6cae24b0d41f21fe788.html 
+ 
+
+ 
+
+ ¡¶C++0xÂşÌ¸¡·ÏµÁĞÖ®£º¶àÏß³ÌÄÚ´æÄ£ĞÍBy ÁõÎ´Åô(pongba)
+        http://blog.csdn.net/pongba/archive/2007/06/20/1659952.aspx 
+ 
+
+ 
+
+Ò»¸öÀÏÍâµÄ²©¿Í£¬°üÀ¨Ğè²»ĞèÒª¶Ôint¼ÓËø£¬gccÖĞµÄÔ­×Ó±äÁ¿²Ù×÷
+        http://www.alexonlinux.com/  
+ 
+
+ 
+
+ 
+
+ÔÚÇ°ÃæÎÒĞ´ÁËÒ»¸öÊ¹ÓÃc++0x STL×Ô´øµÄ¶àÏß³ÌAPIµÄÊ¾Àıhttp://www.cnblogs.com/rocketfan/archive/2009/12/02/1615093.html
+
+¶øÕâÀïÉæ¼°µÄ²»ÊÇ¶àÏß³Ì¿âµÄAPI£¬ÒòÎª¼¸ºõËùÓĞµÄ¶àÏß³Ì»¥³âÍ¬²½ÎÊÌâ¶¼¿ÉÒÔÍ¨¹ı»¥³âËømutexºÍÌõ¼ş±äÁ¿½â¾ö¡£µ«ÊÇÆµ·±µÄ¼ÓËø½âËøºÜºÄÊ±£¬
+
+±Ï¾¹ÓÃ¶àÏß³Ì¾ÍÊÇÒªËÙ¶È£¬±¾ÎÄÉæ¼°µÄ¶¼ÊÇÏà¹ØµÄÓëÏß³Ì¿âÎŞ¹ØµÄÎÊÌâ¡£  
+
+2.¶àÏß³ÌÎÊÌâ¼ò½é
+¡¡¡¡Ò»¸ö ¶àÏß³ÌµÄ³ÌĞòÔÊĞí¶à¸öÏß³ÌÍ¬Ê±ÔËĞĞ£¬¿ÉÄÜÒªÔÊĞíËüÃÇ·ÃÎÊ¼°¸üĞÂËüÃÇ¹²ÏíµÄ±äÁ¿£¬Ã¿¸öÏß³Ì¶¼ÓĞÆä¾Ö²¿±äÁ¿µ«ÊÇËùÓĞµÄÏß³Ì¶¼»á¿´µ½Í¬ÑùµÄÈ«¾Ö±äÁ¿»òÕß£¬¡°static"¾²Ì¬µÄÀà³ÉÔ±±äÁ¿¡£
+
+ ¡¡¡¡²»Í¬µÄÏß³Ì¿ÉÄÜ»áÔËĞĞÔÚÍ¬Ò»¸ö´¦ÀíÆ÷ÉÏ£¬ÂÖÁ÷Ö´ĞĞ£¨by interleaving execution).Ò²ÓĞ¿ÉÄÜ»áÔËĞĞÔÚ²»Í¬´¦ÀíÆ÷ÉÏ£¬ËùÎ½µÄhardware threadÏÖÔÚºÜ³£¼û¡£ 
+
+ 3.volatile±äÁ¿ÊÇÊ²Ã´
+Õâ¸öÍøÉÏÓĞºÜ¶à½éÉÜµ«¶¼Ã»ÓĞÈ«Ãæ½âÊÍ¡£¶øÔÚ¡°C++ and the Perils of Double-Checked Locking¡±µÄ¸½×¢£¬×÷Õß¸ø³öÁËÏêÏ¸È«ÃæµÄ½âÊÍ¡£
+
+×÷ÕßÊÇ´ÓvolatileµÄ²úÉú½²ÆğµÄ£¬µ±Ê±ÊÇÎªÁËÍ³Ò»µÄÊ¹ÓÃÏàÍ¬µÄµØÖ·´¦ÀíÄÚ´æµØÖ·ºÍIO portµØÖ·,ËùÎ½memory-mapped I/O (MMIO£©¡£
+
+¸öÈË¾õµÃ±¾ÖÊ¶¼ÊÇ²»Í¬²ã´Î´æ´¢Ó³Éä¹ØÏµ°É£¬Àà±È¼Ä´æÆ÷ºÍÄÚ´æ¡£ÏÂÃæ¶¼ÓÃ¼Ä´æÆ÷ºÍÄÚ´æ½âÊÍ¡£
+
+
+¶ÁµÄÇé¿ö  
+ 
+
+unsigned int *p = GetMagicAddress();
+
+unsigned int a, b;
+
+a = *p
+
+b = *p; 
+
+ ¿¼ÂÇÉÏÃæµÄ´úÂë£¬¼ÙÉèGetMagicAddress()ÊÇ»ñµÃÄÚ´æµÄµØÖ·£¬ÄÇÃ´a = *p, b = *p£¬»á±»±àÒëÆ÷ÈÏÎªÊÇÏàÍ¬µÄ²Ù×÷£¬¼ÙÉèa = *p Ê¹µÃÖµ»º´æÔÚ¼Ä´æÆ÷ÖĞ£¬ÄÇÃ´ÎªÁËËÙ¶ÈÓÅ»¯£¬±àÒëÆ÷¿ÉÄÜ»á½«×îºóÒ»ĞĞµÄ´úÂë»»³É
+
+b = a;
+
+ ÕâÑù¾Í²»È¥ÄÚ´æ¶Á¶øÊÇÖ±½ÓÈ¥¼Ä´æÆ÷¶Áµ«Õâ¿ÉÄÜ²¢²»ÊÇÎÒÃÇÏëÒªµÄ£¬ÒòÎªÈç¹ûÕâÆÚ¼äÆäËûµÄÏß³Ì¸ÄĞ´ÁËÄÚ´æÖĞ*PµÄÄÚÈİÄØ£¿
+
+thread1             thread2 
+
+a = *p;
+
+                       *p = 3
+
+b = a  //---------- ±àÒëÆ÷ÓÅ»¯µÄ½á¹ûÊ¹µÃÎÒÃÇ¶Áµ½µÄ²¢²»ÊÇ×îĞÂµÄpËùÖ¸µÄÄÚ´æµÄÖµ
+
+ 
+
+Ğ´µÄÇé¿ö
+*p = a;
+
+*p = b; 
+ 
+
+ÏòÉÏÃæµÄ´úÂë£¬±àÒëÆ÷¿ÉÄÜ»áÈÏÎª*p = aÊÇÈßÓà²Ù×÷´Ó¶øÈ¥µôËü£¬¶øÕâÒ²¿ÉÄÜ²»ÊÇÎÒÃÇÏëÒªµÄ¡£
+
+ 
+
+volatileµÄ×÷ÓÃ £º
+
+volatile exists for specifying special treatment for such locations, specifically: 
+
+(1) the content of a volatile variable is ¡°unstable¡± (can change by means unknown to the compiler),
+
+(2) all writes to volatile data are ¡°observable¡± so they must be executed religiously, and 
+
+(3) all operations on volatile data are executed in the sequence in which they appear in the source code.
+
+±»ÉùÃ÷ÎªvolatileµÄ±äÁ¿ÆäÄÚÈİÊÇ²»ÎÈ¶¨µÄ(unstable),ËüµÄÖµÓĞ¿ÉÄÜÓÉ±àÒëÆ÷Ëù²»ÄÜÖªÏşµÄÇé¿öËù¸Ä±ä¡£
+ËùÓĞ¶ÔÉùÃ÷ÎªvolatileµÄ±äÁ¿µÄĞ´²Ù×÷¶¼ÊÇ¿É¼ûµÄ£¬±ØĞëÑÏ¸ñÖ´ĞĞbe executed religiously¡£
+ËùÓĞ¶ÔÉùÃ÷ÎªvolatileµÄ±äÁ¿µÄ²Ù×÷£¨¶ÁĞ´£©¶¼±ØĞëÑÏ¸ñ°´ÕÕÔ´´úÂëµÄË³ĞòÖ´ĞĞ¡£
+ËùÒÔÉÏÃæµÄµÚÒ»ÌõÈ·±£¶ÁÕıÈ·£¬µÚ¶şÌõÈ·±£Ğ´ÕıÈ·£¬µÚÈıÌõÈ·±£¶ÁĞ´»ìºÏµÄÇé¿öÕıÈ·¡£JAVA¸ü½øÒ»²½¿çÔ½Ïß³Ì±£Ö¤ÉÏÃæµÄÌõ¼ş¡£¶øC/C++Ö»¶Ôµ¥Ò»Ïß³ÌÄÚ²¿±£Ö¤¡£ÁõÎ´ÅôÔÚ²©¿ÍÖĞÕâÃ´½âÊÍ£º¡°×Ü¶øÑÔÖ®£¬ÓÉÓÚC++03±ê×¼ÊÇµ¥Ïß³ÌµÄ£¬Òò´ËvolatileÖ»ÄÜ±£Ö¤µ¥Ïß³ÌÄÚÓïÒâ¡£¶ÔÓÚÇ°ÃæµÄÄÇ¸öÀı×Ó£¬½«xºÍyÉèÎªvolatileÖ»ÄÜ±£Ö¤·Ö±ğÔÚThread1ºÍThread2ÖĞµÄÁ½¸ö²Ù×÷ÊÇ°´´úÂëË³ĞòÖ´ĞĞµÄ£¬µ«²¢²»ÄÜ±£Ö¤ÔÚThread2¡°ÑÛÀï¡±µÄThread1µÄÁ½¸ö²Ù×÷ÊÇ°´´úÂëË³ĞòÖ´ĞĞµÄ¡£Ò²¾ÍÊÇËµ£¬Ö»ÄÜ±£Ö¤Á½¸ö²Ù×÷µÄÏß³ÌÄÚ´ÎĞò£¬²»ÄÜ±£Ö¤ËüÃÇµÄÏß³Ì¼ä´ÎĞò¡£Ò»¾ä»°£¬Ä¿Ç°µÄvolatileÓïÒâÊÇÎŞ·¨±£Ö¤¶àÏß³ÌÏÂµÄ²Ù×÷µÄÕıÈ·ĞÔµÄ¡£¡±  
+ 
+
+µ«ÊÇ¼´Ê¹ÊÇJAVAÄÜ¹»¿çÔ½Ïß³Ì±£Ö¤£¬ÈÔÈ»ÊÇ²»¹»µÄÒòÎªvolatileºÍ·Çvolatile²Ù×÷Ö®¼äµÄË³ĞòÈÔÈ»ÊÇÎ´¶¨ÒåµÄ£¬ÓĞ¿ÉÄÜ²úÉúÎÊÌâ£¬¿¼ÂÇÏÂÃæµÄ´úÂë£º
+
+volatile int vi;
+
+void bar(void) {
+vi = 1;
+foo();
+vi = 0;
+}
+
+ÎÒÃÇÒ»°ã»áÈÏÎªvi»áÔÚµ÷ÓÃfooÖ®Ç°ÉèÖÃÎª1,µ÷ÓÃÍêºó»á±»ÖÃÎª0¡£È»¶ø±àÒëÆ÷²»»á¶ÔÄã±£Ö¤ÕâÒ»µã£¬Ëü»áºÜ¸ßĞËµÄ½«ÄãµÄfoo()ÒÆÎ»£¬±ÈÈçÅÜµ½vi = 1Ç°Ãæ£¬Ö»ÒªËüÖªµÀÔÚfoo()Àï²»»áÉæ¼°µ½ÆäËüµÄvolatile²Ù×÷¡£ËùÒÔ°²È«µÄ·½·¨ÊÇÓÃÕ¤À¸memory barrierÀıÈç¡°asm volatile (¡±" ::: ¡°memory¡±)¼Óµ½fooµÄÇ°ÃæºÍºóÃæ À´±£Ö¤ÑÏ¸ñµÄÖ´ĞĞË³Ğò¡£
+
+MeyersÌáµ½ÓÉÓÚÉÏÃæµÄÔ­ÒòÎÒÃÇÍ¨³£»áĞèÒª¼Ó´óÁ¿µÄvolatile±äÁ¿£¬java1.5ÖĞµÄvolatile¸ø³öÁË¸üÑÏ¸ñ¼òµ¥µÄ¶¨Òå£¬ËùÓĞ¶ÔvolatileµÄ¶Á²Ù×÷£¬¶¼½«±»È·±£·¢ÉúÔÚ¸ÃÓï¾äºóÃæµÄ¶ÁĞ´(any memory reference volatile or not)²Ù×÷µÄÇ°Ãæ¡£¶øĞ´²Ù×÷Ôò±£Ö¤»á·¢ÉúÔÚ¸ÃÓï¾äÇ°ÃæµÄ¶ÁĞ´²Ù×÷µÄºóÃæ¡£.NETÒ²¶¨ÒåÁË¿çÏß³ÌµÄvolatileÓïÒâ¡£
+
+4.Ïß³Ì°²È«µÄC++ singletonÄ£Ê½
+ 
+
+×î¼òµ¥µÄsingleton
+×¢£ºÏÂÃæÓĞĞ©À´×ÔÔ­ÎÄ£¬ÓĞĞ©À´×Ô"·ÇÍêÃÀSingletonÊµÏÖ"£¬ÆäËü²Î¿¼Ö®3¡£ 
+ 
+
+
+´úÂë 
+ 1  // from the header file
+ 2  class Singleton {
+ 3  public:
+ 4  static Singleton* instance();
+ 5  ...
+ 6  private:
+ 7  static Singleton* pInstance;
+ 8  };
+ 9 
+10  // from the implementation file
+11  Singleton* Singleton::pInstance = 0;
+12 
+13  Singleton* Singleton::instance() {
+14  if (pInstance == 0) {
+15     pInstance = new Singleton;
+16  }
+17  return pInstance;
+18  }
+
+ 
+
+Èç¹ûÔÚµ¥Ïß³ÌÄ£Ê½ÄÇÃ´ÉÏÃæµÄ´úÂë³ıÁËinstance()¿ÉÄÜ»áÓĞÒì³£°²È«ÎÊÌâÍâÃ»ÓĞÌ«´óÎÊÌâ¡£µ«ÊÇ¶ÔÓÚ¶àÏß³Ì¶øÑÔ£¬Èç¹ûÁ½¸öÏß³ÌÔÚ14ÅĞ¶Ï¶¼¶Áµ½pInstance = 0Í¬Ê±½øÈë15£¬ÄÇÃ´¾Í»á²úÉúÁ½¸öSingleton¶ÔÏó¡£¶øpInstanceÖ¸Ïòºó²úÉúµÄÄÇÒ»¸ö¡£ 
+ 
+
+ ¼ÓËø±£»¤µÄsingleton
+
+´úÂë 
+1 Singleton* Singleton::instance() {
+2     Lock lock; // acquire lock (params omitted for simplicity)
+3     if (pInstance == 0) {
+4         pInstance = new Singleton;
+5     }
+6     return pInstance;
+7 } // release lock (via Lock destructor)
+
+ 
+
+ 
+
+ 
+
+ÕâÑùÊÇ¾ø¶ÔµÄ°²È«ÁË£¬µ«ÊÇÓÉÓÚ¼ÓËø½âËøµÄ´ú¼Û´ó£¬¶øinstanceÓÖÊÇ¿ÉÄÜ±»Æµ·±µ÷ÓÃµÄº¯ÊıËùÒÔ´ó´óÓ°ÏìĞÔÄÜ¡£ÊÂÊµÉÏÖ»ÒªpInstance == 0µÄÊ±ºò²Å¿ÉÄÜ³öÏÖÎÊÌâ£¬ĞèÒª¼ÓËø£¬ÄÇÃ´ÓĞÁËÏÂÃæµÄĞ´·¨£º´úÂë
+
+
+1 Singleton* Singleton::instance() {
+2     if (pInstance == 0) {
+3         Lock lock; // acquire lock (params omitted for simplicity)
+4         pInstance = new Singleton;
+5     }
+6     return pInstance;
+7 } // release lock (via Lock destructor)
+
+ 
+
+µ«ÊÇÕâÑùÊÇ´íÎóµÄ£¬ÒòÎªÁ½¸öÏß³ÌÈç¹ûÍ¬Ê±ÔÚ2ÅĞ¶ÏÎªtrue£¬ËäÈ»»áÔÚ3´¦»¥³â£¬µ«ÊÇ»¹ÊÇ»áÂÖÁ÷½øÈë±£»¤Çø£¬Éú³ÉÁ½¸öSingleton.ÓÚÊÇÓĞÈËÏëµ½ÏÂÃæµÄ·½·¨¡£
+
+ 
+
+DCL·½·¨£¨Double Checked  Locking)
+ÕâÒ²ÊÇACEÖĞSingletonµÄÊµÏÖ·½·¨£º 
+ 
+
+ ´úÂë
+
+
+1 Singleton* Singleton::instance() {
+2     if (pInstance == 0) { // 1st test
+3         Lock lock;
+4         if (pInstance == 0) { // 2nd test
+5             pInstance = new Singleton;
+6         }
+7     }
+8     return pInstance;
+9 }
+
+ 
+
+Õâ¿´ÉÏÈ¥ºÜÍêÃÀµ«ÊÇËüÒ²ÊÇÓĞÎÊÌâµÄ
+
+ÔÚ±àÒëÆ÷Î´ÓÅ»¯µÄÇé¿öÏÂË³ĞòÈçÏÂ£º
+1.new operator·ÖÅäÊÊµ±µÄÄÚ´æ£»
+2.ÔÚ·ÖÅäµÄÄÚ´æÉÏ¹¹ÔìSingleton¶ÔÏó£»
+3.ÄÚ´æµØÖ·¸³Öµ¸ø_instance¡£
+
+µ«ÊÇµ±±àÒëÆ÷ÓÅ»¯ºóÖ´ĞĞË³Ğò¿ÉÄÜÈçÏÂ£º
+1.new operator·ÖÅäÊÊµ±µÄÄÚ´æ£»
+2.ÄÚ´æµØÖ·¸³Öµ¸ø_instance£»
+
+3.ÔÚ·ÖÅäµÄÄÚ´æÉÏ¹¹ÔìSingleton¶ÔÏó¡£
+
+ ±àÒëÆ÷ÓÅ»¯ºóµÄ´úÂë¿´ÆğÀ´ÏñÏÂÃæÕâÑù£º
+
+ ´úÂë
+
+
+ 1 Singleton* Singleton::instance() {
+ 2     if (pInstance == 0) {
+ 3         Lock lock;
+ 4         if (pInstance == 0) {
+ 5             pInstance = // Step 3
+ 6               operator new(sizeof(Singleton)); // Step 1
+ 7             new (pInstance) Singleton; // Step 2
+ 8          }
+ 9     }
+10     return pInstance;
+11 }
+
+ 
+
+ ÕâÑùÈç¹ûÒ»¸öÏß³Ì°´ÕÕ±àÒëÆ÷ÓÅ»¯µÄË³ĞòÖ´ĞĞµ½5,ÕâÊ±ºópInstance¾ÍÒÑ¾­·Ç0ÁË£¬¶øÊµ¼ÊÉÏËüËùÖ¸ÏòµÄÄÚ´æÉÏSingleton¶ÔÏó»¹Ã»ÓĞ±»¹¹Ôì£¬Õâ¸öÊ±ºòÓĞ¿ÉÄÜÁíÒ»¸öÏß³ÌÔËĞĞµ½2,·¢ÏÖpInstance²»ÊÇ0,NULL£¬ÓÚÊÇreturn pInstance,¼ÙÉèËüÓÖÓÃÕâ¸öÖ¸Ïò»¹Î´¹¹Ôì¶ÔÏóµÄÖ¸Õëµ÷ÓÃpInstance->doSomeThing() .........£º£¨
+
+ 
+
+ Î´ÁË±ÜÃâÕâÖÖÇé¿ö£¬ÓÚÊÇÓĞÁËÏÂÃæµÄ×ö·¨
+
+ ´úÂë
+
+
+ 1 Singleton* Singleton::instance() {
+ 2      if (pInstance == 0) {
+ 3          Lock lock;
+ 4          if (pInstance == 0) {
+ 5               Singleton* temp = new Singleton; // initialize to temp
+ 6               pInstance = temp; // assign temp to pInstance
+ 7          }
+ 8      }
+ 9      return pInstance;
+10 }
+
+ 
+
+ÆóÍ¼ÀûÓÃÒ»¸öÁÙÊ±±äÁ¿£¬½öµ±Singleton¶ÔÏó¹¹ÔìÍê³Éºó²Å°ÑµØÖ·¸³¸øpInstance,È»¶øºÜ²»ĞÒ£¬±àÒëÆ÷»á°ÑÄãµÄÁÙÊ±±äÁ¿ÊÓÎªÎŞÓÃµÄ¶«Î÷´Ó¶øÓÅ»¯µô¡£¡£¡£¡£ 
+
+ÕâÀï²åÒ»¾äÎªÊ²Ã´ÓÃpthreadÖ®ÀàµÄ¿âÄÜ¹»½â¾öÎÊÌâ£¬±£Ö¤Ë³Ğò£¬ÒòÎªËüÃÇÊÇ·ÇÓïÑÔ±¾ÉíµÄ£¬ÍùÍù Ç¿ÆÈ±àÒëÆ÷²úÉúÓëÖ®ÊÊÓ¦µÄ´úÂë£¬ÍùÍù»áµ÷ÓÃÏµÍ³µ÷ÓÃ£¬ºÜ¶àÊÇÓÃ»ã±àÊµÏÖµÄ¡£
+
+ 
+
+¼ÓÈëvolatile
+Ç°Ãæ½²µ½volatileµÄ¶¨Òå£¬ÄÇÃ´ÕâÀïÄÜ·ñÀûÓÃvolatileÄØ¡£ÉÏÃæ×îºóµÄ´úÂëÏë·¨²»´í£¬Ö»ÊÇ±àÒëÆ÷»áµ·ÂÒ£º£©ÄÇÃ´ÎÒÃÇ¼ÓÈëvolatileÀ´±ÜÃâ±àÒëÆ÷µÄÓÅ»¯,±£Ö¤Óï¾äµÄË³ĞòÖ´ĞĞ¡£²»¹ıÕâÀïÎÒÃÇ¿¼ÂÇÕâÖÖÇé¿ö£¬Singlton´øÓĞÒ»¸ö±äÁ¿x,Ä¬ÈÏµÄË½ÓĞ¹¹Ôìº¯Êı»á½«Æä¸³ÖµÎª5. 
+ 
+
+
+´úÂë 
+ 1 class Singleton {
+ 2  public:
+ 3      static Singleton* instance();
+ 4      ...
+ 5  private:
+ 6      static Singleton* volatile pInstance; // volatile added
+ 7      int x;
+ 8      Singleton() : x(5) {}
+ 9  };
+10  
+11  // from the implementation file
+12  Singleton* Singleton::pInstance = 0;
+13  
+14  Singleton* Singleton::instance() {
+15      if (pInstance == 0) {
+16          Lock lock;
+17          if (pInstance == 0) {
+18              Singleton* volatile temp = new Singleton; // volatile added
+19              pInstance = temp;
+20          }
+21      }
+22      return pInstance;
+23 }
+
+ 
+
+ 
+
+ÏÂÃæ¿¼ÂÇ±àÒëÆ÷inline¹¹Ôìº¯ÊıºÍÖ®ºóµÄinstance()º¯ÊıµÄÑù×Ó
+
+ ´úÂë
+
+
+1 if (pInstance == 0) {
+2     Lock lock;
+3     if (pInstance == 0) {
+4         Singleton* volatile temp =
+5         static_cast<Singleton*>(operator new(sizeof(Singleton)));
+6         temp->x = 5; // inlined Singleton constructor
+7         pInstance = temp;
+8     }
+9 }
+
+ 
+
+ÎÊÌâ³öÀ´ÁË£¬¾¡¹Ütemp±»ÉùÃ÷Îªvolatile,µ«ÊÇ*temp²»ÊÇ£¬ÕâÒâÎ¶×Åtemp->xÒ²²»ÊÇ£¬ÕâÒâÎ¶×Å±àÒëÆ÷¿ÉÄÜ»á°Ñ6,7¾ä»»Î»ÖÃ£¬´Ó¶øÊ¹µÃÁíÒ»¸öÏß³ÌµÃµ½Ò»¸öÖ¸ÏòxÓò²¢Î´±»¹¹ÔìºÃµÄSigleton¶ÔÏó£¡
+
+½â¾ö°ì·¨ÊÇÎÒÃÇ²»½ö½öÉùÃ÷pInstanceÎªvolatileÒ²½«*pInstanceÉùÃ÷Îªvolatile.ÈçÏÂ£º
+
+
+´úÂë 
+ 1 class Singleton {
+ 2 public:
+ 3     static volatile Singleton* volatile instance();
+ 4     ...
+ 5 private:
+ 6     // one more volatile added
+ 7     static Singleton* volatile pInstance;
+ 8 };
+ 9 
+10 // from the implementation file
+11 volatile Singleton* volatile Singleton::pInstance = 0;
+12 volatile Singleton* volatile Singleton::instance() {
+13     if (pInstance == 0) {
+14         Lock lock;
+15         if (pInstance == 0) {
+16             // one more volatile added
+17             volatile Singleton* volatile temp = new volatile Singleton;
+18             pInstance = temp;
+19         }
+20     return pInstance;
+21 }
+
+ 
+
+ÕâÀïLock²»ĞèÒªÉùÃ÷ÎªvolatileÒòÎªËüÀ´×ÔÆäËüµÄÏß³Ì¿âÈëpthread»áÌá¹©ÏàÓ¦±£Ö¤ÆäÇ°ÃæµÄ´úÂë²»»á±»±àÒëÆ÷µ÷µ½ºóÃæ£¬ËüºóÃæµÄ´úÂëÒ²²»»á±»µ÷µ½Ç°Ãæ£¬Ïàµ±ÓÚÕ¤À¸Ğ§Ó¦¡£
+
+     Ò²Ğíµ½ÏÖÔÚÕâ¸ö°æ±¾ÊÇºÜÍêÃÀµÄÁË£¬µ«ÊÇÈÔÈ»¿ÉÄÜÊ§°Ü£¬ÓĞÏÂÃæÁ½¸öÔ­Òò£º
+
+ 
+
+the Standard¡¯s constraints on observable behavior are only for an abstract machine defined by the Standard, and that abstract machine has no notion of multiple threads of execution. As a result, though the Standard prevents compilers from reordering reads and writes to volatile data within a thread, it imposes no constraints at all on such reorderings across threads. Ò²¾ÍÊÇËµ»¹ÊÇÉÏÃævolatile½âÊÍÓïÒåÊ±Ìáµ½µÄ£¬volatile,Ö»±£Ö¤Ïß³ÌÄÚ²¿Ë³Ğò£¬²»±£Ö¤Ïß³ÌÖ®¼äµÄ¡£
+¾ÍÏñconst±äÁ¿Ö±µ½Æä¹¹Ôìº¯ÊıÍê³ÉÖ®ºó²»ÊÇconstµÄÒ»Ñù£¬volatile±äÁ¿Ö±µ½Æä¹¹Ôìº¯ÊıºÍÍê³ÉÖ®Ç°Ò²²»ÊÇvolatileµÄ¡£volatile Singleton* volatile temp = new volatile Singleton; ÒªÉú³ÉµÄ±äÁ¿Ö±µ½new volatile SingletonÍê³ÉÖ®ºó²ÅÊÇvolatileµÄ¡£ÕâÒâÎ¶Õâtemp->xÔÚ¹¹Ôìº¯ÊıÖĞ²»ÊÇvolatileµÄ´Ó¶ø»¹ÊÇ¿ÉÄÜ²úÉúÉÏÃæµÄÎÊÌâºÍpInstance = temp ±»±àÒëÆ÷µ÷»»Ë³Ğò¡£Õâ¸öÎÊÌâÊÇ¿ÉÒÔ½â¾öµÄ£¬°ì·¨ÈçÏÂ£¬¶ÔÄ¬ÈÏ¹¹Ôìº¯Êı¸ÄĞ´£¬½«¶ÔxµÄ³õÊ¼»¯ÁĞ±í¹¹Ôì³õÊ¼»¯¸ÄÎªÔÚ¹¹Ôìº¯ÊıÖĞÏÔÊ¾¸³Öµ¡£
+1 Singleton()
+2 {
+3     static_cast<volatile int&>(x) = 5; // note cast to volatile
+4 }    
+ 
+
+ÕâÑùµÄwork around¾Í½â¾öÁËÎÊÌâ¡£
+±àÒëÆ÷»áÉú³ÉÀàËÆÏÂÃæµÄ´úÂë£º
+
+ ´úÂë
+
+
+ 1 Singleton* Singleton::instance()
+ 2 {
+ 3     if (pInstance == 0) {
+ 4         Lock lock;
+ 5         if (pInstance == 0) {
+ 6            Singleton* volatile temp =
+ 7              static_cast<Singleton*>(operator new(sizeof(Singleton)));
+ 8            static_cast<volatile int&>(temp->x) = 5;
+ 9            pInstance = temp;
+10         }
+11     }
+12 }
+
+ 
+
+ 
+
+Õâ±£Ö¤ÁË8ºÍ9²»»á±»µ÷»»Ë³Ğò¡£
+
+ 
+
+ 
+
+Ò»¸ö¿ÉĞĞµÄ½â¾ö·½°¸
+ 
+
+ Èç¹ûÄãµÄ³ÌĞòÔËĞĞÔÚ¶à´¦ÀíÆ÷»úÆ÷ÉÏ£¬»áÃæÁÙCACHEÒ»ÖÂĞÔÎÊÌâ£¬¾ÍÊÇËµÃ¿Ò»¸ö´¦ÀíÆ÷»áÓĞ×Ô¼ºµÄCACHE,¶øËùÓĞµÄ´¦ÀíÆ÷ÓĞ¹²ÏíµÄMAIN CACHE£¬Ê²Ã´Ê±ºò½«×Ô¼ºµÄCAHEÄÚÈİĞ´µ½MAIN CACHEÖĞ£¬ÒÔ¼°Ê²Ã´Ê±ºòÈ¥´ÓMAIN CACHEÖĞ¶ÁÊı¾İ¶¼ÊÇÎÊÌâ£¬±àÒëÆ÷ÓĞÊ±ºò¿ÉÄÜ»á°Ñ¶à¸öĞ´ÈëMAIN CACHEµÄÊı¾İ°´ÕÕµØÖ·ÉıĞòĞ´ÈëÒÑ´ïµ½×î¼ÑËÙ¶È£¬´Ó¶øµ÷»»´úÂëÖ´ĞĞË³Ğò¡£Ò»°ã¶øÑÔ½â¾öCACHEÒ»ÖÂĞÔÎÊÌâ²ÉÓÃÕ¤À¸£¬barrier·½·¨¡£
+
+ 
+
+
+´úÂë 
+ 1 Singleton* Singleton::instance () {
+ 2     Singleton* tmp = pInstance;
+ 3     
+ 4     ... // insert memory barrier
+ 5     
+ 6     if (tmp == 0) {
+ 7         Lock lock;
+ 8         tmp = pInstance;
+ 9         if (tmp == 0) {
+10             tmp = new Singleton;
+11     
+12     ... // insert memory barrier
+13             pInstance = tmp;
+14         }
+15     }
+16     return tmp;
+17 }
+
+ 
+
+ 
+
+ÊÂÊµÉÏÎÒÃÇ²»ĞèÒªÍêÕûµÄË«ÏòÕ¤À¸£¬ÉÏÃæÒ»´¦Õ¤À¸Ö»ĞèÒª±£Ö¤Ç°ÃæµÄ´úÂë²»ÒªÌáµ½Õ¤À¸ºóÃæÈ¥£¬ÏÂÃæµÄÕ¤À¸±£Ö¤ºóÃæµÄ´úÂë²»ÒªÅ²µ½Õ¤À¸Ç°ÃæÈ¥¡£ 
+
+µ«ÊÇ×¢ÒâÕ¤À¸ÊÇÆ½Ì¨Ïà¹ØµÄ£¬ÓÈÆäÊÇassembler. Èç¹ûÄãµÄÆ½Ì¨Ö§³ÖÕ¤À¸ÄÇÃ´Õâ¾ÍÊÇÒ»¸ö¿ÉĞĞµÄ½â¾ö·½°¸¡£×¢ÒâGCC4.4.2ÖĞµÄstring¶ÔÓÚref countÒıÓÃ¼ÆÊı£¬¾ÍÊÇ²ÉÓÃÔ­×Ó²Ù×÷¼ÓÕ¤À¸ÊµÏÖµÄ¡£
+
+ 
+
+ Ïß³Ì°²È«µÄSingletonÄ£Ê½×Ü½á
+1.Ê×ÏÈÕâÀïÉÏÃæÖ÷ÒªÊÇÌÖÂÛÏß³Ì°²È«µÄÎÊÌâ£¬ÆäÊµ¿ÉÒÔÓĞºÜ¶à¿É¸Ä±äµÄµØ·½¡£±ÈÈçËµµÚÒ»ÖÖ¼ÓËøµÄ·½°¸ËüÊÇ¼ò½à°²È«µÄµ«ÊÇĞ§ÂÊµÍ£¬ÎÒÃÇÆäÊµ¿ÉÒÔ½¨Òé¿Í»§¶Ë´úÂëÕâÑùĞ´À´¼õÉÙ¶Ôinstanceº¯ÊıµÄµ÷ÓÃ£¬Ö»ĞèÒªÏÈ±£´æÒ»¸öSingletonÖ¸Õë¼´¿É¡£ 
+ 
+
+Singleton *instance = Singleton::instance();
+
+instance->doThing1();
+
+instance->donThing2();
+
+¶ø²»ÒªÃ¿´Î¶¼µ÷ÓÃinstance(), Singleton::instance()->doThings().
+
+ Ò²¿ÉÒÔÏÈ×öÊµÑé¿´¿´Ö±½ÓÓÃÕâÖÖ¼ÓËøµÄ·½°¸ÊÇ·ñÕæµÄºÜ´ó³Ì¶ÈÓ°ÏìÁËĞ§ÂÊÖµµÃÄãÈ¥¸Ä±äËü¡£ 
+
+ 
+
+2. ÁíÍâÎÒÃÇÉÏÃæÑİÊ¾µÄ´úÂë¶¼ÊÇ²ÉÓÃÁËlazily-initialized Singleton,¾ÍÊÇËµÖ»ÓĞÓÃµ½µÄÊ±ºò²Å»áÓĞSingleton¶ÔÏó²úÉú£¬Èç¹û³ÌĞòÃ»ÓĞµ÷ÓÃinstance¾Í²»»áÓĞSingleton¶ÔÏóµÄ²úÉú¡£ÕâÑù¹ÌÈ»±Èeager initializationºÃ£¬µ«ÊÇÕæµÄÄÇÃ´ÓĞ±ØÒªÂğ£¬Èç¹ûÎÒÃÇ²ÉÓÃ eager initializationÔÚ½øÈëmainÖ®Ç°²úÉúSingleton¶ÔÏó£¬
+
+¶øÒ»°ãµÄ¶àÏß³Ì³ÌĞò¶¼ÊÇÔÚ½øÈëmainºóÔÙÆô¶¯µÄÆäËüÏß³Ì£¬¾ÍÊÇËµ½øÈë mianÖ®Ç°ÊÇµ¥Ïß³Ì»·¾³£¬ÓÚÊÇ¾ÍÃ»ÓĞÕâÃ´¶àÎÊÌâÁË¡£¡£¡£¡£boost ¾ÍÊÇÕâÃ´¸ÉµÄ¡£
+
+"1) sington ÔÚ½øÈëmainº¯ÊıÇ°³õÊ¼»¯.
+
+2)µÚÒ»´ÎÊ¹ÓÃÊ±, singltonÒÑµÃµ½ÕıÈ·µÄ³õÊ¼»¯(°üÀ¨ÔÚstatic codeÖĞÇé¿ö). Written by gavinkwoe"
+
+"ÓÉÓÚcreate_object½«ÔÚ±»µ÷ÓÃ£¨static object_type & instance()£©Ö®Ç°½øĞĞ³õÊ¼»¯£¬Òò´Ësingleton_default¶ÔÏóµÄ³õÊ¼»¯±»·Åµ½ÁËmainÖ®Ç°¡£·Ç³£ÇÉÃîµÄÒ»¸öÉè¼Æ" 
+
+ ¿ÉÒÔ²Î¿¼ ÓÎÏ·ÈËÉú²©¿Í Writen by Fox(yulefox.at.gmail.com) Éè¼ÆÄ£Ê½£¨Èı£©¡ª¡ªSingleton
+
+http://www.cppblog.com/Fox/archive/2009/09/22/96898.html  http://www.yulefox.com/20081119/design-patterns-03.html/
+
+
+´úÂë 
+ 1 template <typename T>
+ 2 struct singleton
+ 3 {
+ 4   private:
+ 5         struct object_creator
+ 6        {
+ 7                object_creator() { singleton<T>::instance(); }  // ´´½¨ÊµÀı
+ 8                inline void do_nothing() const { } 
+ 9        };
+10      static object_creator create_object;
+11      singleton();
+12   public:
+13      typedef  T  object_type;
+14      static object_type & instance()
+15     {
+16          static object_type obj;
+17          create_object.do_nothing();// ĞèÒªcreate_objectµÄ³õÊ¼»¯
+18          return obj;
+19     }
+20 };
+21 template <typename T>  typename singleton<T>::object_creator singleton<T>::create_object; 
+22  
+
+ 
+
+¡¡Õâ¸öÉè¼ÆÓÃµ½ÁËÄ£°å¿É¸´ÓÃ£¬ÈçSingleton<MySingletonClass>::instance().
+
+
+ 
+
+ 3. Èç¹ûÎÒÃÇÔÊĞíÃ¿¸öÏß³ÌÄÜÓĞÒ»¸ö×Ô¼ºµÄSingleton¶ÔÏóÄØ£¬ÄÇÑù¾Í¼È¿ÉÒÔÍÆ³ÙSingleton¶ÔÏóÉú³É£¬Ò²²»ÓÃ¿¼ÂÇ¶àÏß³ÌÎÊÌâ¡£
+
+ 
+
+The end ~
+
+
+
+http://www.cnblogs.com/rocketfan/archive/2009/12/05/1617759.html

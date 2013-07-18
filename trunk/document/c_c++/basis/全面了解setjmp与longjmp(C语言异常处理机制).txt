@@ -1,0 +1,1226 @@
+全面了解setjmp与longjmp
+
+为了更好地、更方便地支持异常处理编程机制，使得程序员在C语言开发的程序中，能写出更高效、更友善的带有异常处理机制的代码模块来。于是，C语言中出现了一种更优雅的异常处理机制，那就是setjmp()函数与longjmp()函数。
+
+　　实际上，这种异常处理的机制不是C语言中自身的一部分，而是在C标准库中实现的两个非常有技巧的库函数，也许大多数C程序员朋友们对它都很熟悉，而且，通过使用setjmp()函数与 longjmp()函数组合后，而提供的对程序的异常处理机制，以被广泛运用到许多C语言开发的库系统中，如jpg解析库，加密解密库等等。
+
+　　也许C语言中的这种异常处理机制，较goto语句相比较，它才是真正意义上的、概念上比较彻底的，一种异常处理机制。
+setjmp函数有何作用？
+
+　　前面刚说了，setjmp是C标准库中提供的一个函数，它的作用是保存程序当前运行的一些状态。它的函数原型如下： 
+int setjmp( jmp_buf env );
+
+　　这是MSDN中对它的评论，如下：
+
+　　setjmp函数用于保存程序的运行时的堆栈环境，接下来的其它地方，你可以通过调用longjmp函数来恢复先前被保存的程序堆栈环境。当 setjmp和longjmp组合一起使用时，它们能提供一种在程序中实现“非本地局部跳转”（"non-local goto"）的机制。并且这种机制常常被用于来实现，把程序的控制流传递到错误处理模块之中；或者程序中不采用正常的返回（return）语句，或函数的正常调用等方法，而使程序能被恢复到先前的一个调用例程（也即函数）中。
+
+　　对setjmp函数的调用时，会保存程序当前的堆栈环境到env参数中；接下来调用longjmp时，会根据这个曾经保存的变量来恢复先前的环境，并且当前的程序控制流，会因此而返回到先前调用setjmp时的程序执行点。此时，在接下来的控制流的例程中，所能访问的所有的变量（除寄存器类型的变量以外），包含了longjmp函数调用时，所拥有的变量。
+
+　　setjmp和longjmp并不能很好地支持C++中面向对象的语义。因此在C++程序中，请使用C++提供的异常处理机制。
+
+　　好了，现在已经对setjmp有了很感性的了解，暂且不做过多评论，接着往下看longjmp函数。
+
+longjmp函数有何作用？
+
+　　同样，longjmp也是C标准库中提供的一个函数，它的作用是用于恢复程序执行的堆栈环境，它的函数原型如下：
+
+void longjmp( jmp_buf env, int value );
+
+　　这是MSDN中对它的评论，如下：
+
+　　longjmp函数用于恢复先前程序中调用的setjmp函数时所保存的堆栈环境。setjmp和longjmp组合一起使用时，它们能提供一种在程序中实现“非本地局部跳转”（"non-local goto"）的机制。并且这种机制常常被用于来实现，把程序的控制流传递到错误处理模块，或者不采用正常的返回（return）语句，或函数的正常调用等方法，使程序能被恢复到先前的一个调用例程（也即函数）中。
+
+　　对setjmp函数的调用时，会保存程序当前的堆栈环境到env参数中；接下来调用longjmp时，会根据这个曾经保存的变量来恢复先前的环境，并且因此当前的程序控制流，会返回到先前调用setjmp时的执行点。此时，value参数值会被setjmp函数所返回，程序继续得以执行。并且，在接下来的控制流的例程中，它所能够访问到的所有的变量（除寄存器类型的变量以外），包含了longjmp函数调用时，所拥有的变量；而寄存器类型的变量将不可预料。setjmp函数返回的值必须是非零值，如果longjmp传送的value参数值为0，那么实际上被setjmp返回的值是1。
+
+　　在调用setjmp的函数返回之前，调用longjmp，否则结果不可预料。
+
+　　在使用longjmp时，请遵守以下规则或限制：
+　　· 不要假象寄存器类型的变量将总会保持不变。在调用longjmp之后，通过setjmp所返回的控制流中，例程中寄存器类型的变量将不会被恢复。
+　　· 不要使用longjmp函数，来实现把控制流，从一个中断处理例程中传出，除非被捕获的异常是一个浮点数异常。在后一种情况下，如果程序通过调用_fpreset函数，来首先初始化浮点数包后，它是可以通过longjmp来实现从中断处理例程中返回。
+　　· 在C++程序中，小心对setjmp和longjmp的使用，应为setjmp和longjmp并不能很好地支持C++中面向对象的语义。因此在C++程序中，使用C++提供的异常处理机制将会更加安全。
+把setjmp和longjmp组合起来，原来它这么厉害！
+　　现在已经对setjmp和longjmp都有了很感性的了解，接下来，看一个示例，并从这个示例展开分析，示例代码如下（来源于MSDN）：
+
+/* FPRESET.C: This program uses signal to set up a
+* routine for handling floating-point errors.
+*/
+
+＃i nclude <stdio.h>
+＃i nclude <signal.h>
+＃i nclude <setjmp.h>
+＃i nclude <stdlib.h>
+＃i nclude <float.h>
+＃i nclude <math.h>
+＃i nclude <string.h>
+
+jmp_buf mark; /* Address for long jump to jump to */
+int fperr; /* Global error number */
+
+void __cdecl fphandler( int sig, int num ); /* Prototypes */
+void fpcheck( void );
+
+void main( void )
+{
+double n1, n2, r;
+int jmpret;
+/* Unmask all floating-point exceptions. */
+_control87( 0, _MCW_EM );
+/* Set up floating-point error handler. The compiler
+* will generate a warning because it expects
+* signal-handling functions to take only one argument.
+*/
+if( signal( SIGFPE, fphandler ) == SIG_ERR )
+
+{
+fprintf( stderr, "Couldn"t set SIGFPEn" );
+abort(); }
+
+/* Save stack environment for return in case of error. First 
+* time through, jmpret is 0, so true conditional is executed. 
+* If an error occurs, jmpret will be set to -1 and false 
+* conditional will be executed.
+*/ 
+
+// 注意，下面这条语句的作用是，保存程序当前运行的状态
+jmpret = setjmp( mark );
+if( jmpret == 0 )
+{
+printf( "Test for invalid operation - " );
+printf( "enter two numbers: " );
+scanf( "%lf %lf", &n1, &n2 );
+
+// 注意，下面这条语句可能出现异常，
+// 如果从终端输入的第2个变量是0值的话
+r = n1 / n2;
+/* This won"t be reached if error occurs. */
+printf( "nn%4.3g / %4.3g = %4.3gn", n1, n2, r );
+
+r = n1 * n2;
+/* This won"t be reached if error occurs. */
+printf( "nn%4.3g * %4.3g = %4.3gn", n1, n2, r );
+}
+else
+fpcheck();
+}
+/* fphandler handles SIGFPE (floating-point error) interrupt. Note
+* that this prototype accepts two arguments and that the 
+* prototype for signal in the run-time library expects a signal 
+* handler to have only one argument.
+*
+* The second argument in this signal handler allows processing of
+* _FPE_INVALID, _FPE_OVERFLOW, _FPE_UNDERFLOW, and 
+* _FPE_ZERODIVIDE, all of which are Microsoft-specific symbols 
+* that augment the information provided by SIGFPE. The compiler 
+* will generate a warning, which is harmless and expected.
+
+*/
+void fphandler( int sig, int num )
+{
+/* Set global for outside check since we don"t want
+* to do I/O in the handler.
+*/
+fperr = num;
+/* Initialize floating-point package. */
+_fpreset();
+/* Restore calling environment and jump back to setjmp. Return 
+* -1 so that setjmp will return false for conditional test.
+*/
+// 注意，下面这条语句的作用是，恢复先前setjmp所保存的程序状态
+longjmp( mark, -1 );
+}
+void fpcheck( void )
+{
+char fpstr[30];
+switch( fperr )
+{
+case _FPE_INVALID:
+strcpy( fpstr, "Invalid number" );
+break;
+case _FPE_OVERFLOW:
+strcpy( fpstr, "Overflow" );
+
+break;
+case _FPE_UNDERFLOW:
+strcpy( fpstr, "Underflow" );
+break;
+case _FPE_ZERODIVIDE:
+strcpy( fpstr, "Divide by zero" );
+break;
+default:
+strcpy( fpstr, "Other floating point error" );
+break;
+}
+printf( "Error %d: %sn", fperr, fpstr );
+}
+
+程序的运行结果如下：
+Test for invalid operation - enter two numbers: 1 2
+
+
+1 / 2 = 0.5
+
+
+1 * 2 = 2
+
+　　上面的程序运行结果正常。另外程序的运行结果还有一种情况，如下：
+Test for invalid operation - enter two numbers: 1 0
+Error 131: Divide by zero
+
+　　呵呵！程序运行过程中出现了异常（被0除），并且这种异常被程序预先定义的异常处理模块所捕获了。厉害吧！可千万别轻视，这可以C语言编写的程序。
+
+分析setjmp和longjmp
+
+　　现在，来分析上面的程序的执行过程。当然，这里主要分析在异常出现的情况下，程序运行的控制转移流程。由于文章篇幅有限，分析时，我们简化不相关的代码，这样更也易理解控制流的执行过程。如下图所示。
+
+ 
+
+　　呵呵！现在是否对程序的执行流程一目了然，其中最关键的就是setjjmp和longjmp函数的调用处理。我们分别来分析之。
+
+　　当程序运行到第②步时，调用setjmp函数，这个函数会保存程序当前运行的一些状态信息，主要是一些系统寄存器的值，如ss，cs，eip，eax， ebx，ecx，edx，eflags等寄存器，其中尤其重要的是eip的值，因为它相当于保存了一个程序运行的执行点。这些信息被保存到mark变量中，这是一个C标准库中所定义的特殊结构体类型的变量。
+
+　　调用setjmp函数保存程序状态之后，该函数返回0值，于是接下来程序执行到第③步和第④步中。在第④步中语句执行时，如果变量n2为0值，于是便引发了一个浮点数计算异常，，导致控制流转入fphandler函数中，也即进入到第⑤步。
+
+　　然后运行到第⑥步，调用longjmp函数，这个函数内部会从先前的setjmp所保存的程序状态，也即mark变量中，来恢复到以前的系统寄存器的值。于是便进入到了第⑦步，注意，这非常有点意思，实际上，通过longjmp函数的调用后，程序控制流（尤其是eip的值）再次戏剧性地进入到了 setjmp函数的处理内部中，但是这一次setjmp返回的值是longjmp函数调用时，所传入的第2个参数，也即-1，因此程序接下来进入到了第⑧ 步的执行之中。
+
+总结
+
+　　与goto语句不同，在C语言中，setjmp()与longjmp()的组合调用，为程序员提供了一种更优雅的异常处理机制。它具有如下特点：
+
+　　 （1） goto只能实现本地跳转，而setjmp()与longjmp()的组合运用，能有效的实现程序控制流的非本地（远程）跳转；
+
+　　 （2）与goto语句不同，setjmp()与longjmp()的组合运用，提供了真正意义上的异常处理机制。例如，它能有效定义受监控保护的模块区域（类似于C++中try关键字所定义的区域）；同时它也能有效地定义异常处理模块（类似于C++中catch关键字所定义的区域）；还有，它能在程序执行过程中，通过longjmp函数的调用，方便地抛出异常（类似于C++中throw关键字）。
+
+　　现在，相信大家已经对在C语言中提供的这种异常处理机制有了很全面地了解。但是我们还没有深入它研究它，下一篇文章中继续探讨吧！go！
+
+上一篇文章对setjmp函数与longjmp函数有了较全面的了解，尤其是这两个函数的作用，函数所完成的功能，以及将setjmp函数与 longjmp函数组合起来，实现异常处理机制时，程序模块控制流的执行过程等。这里更深入一步，将对setjmp与longjmp的具体使用方法和适用的场合，进行一个非常全面的阐述。
+
+　　另外请特别注意，setjmp函数与longjmp函数总是组合起来使用，它们是紧密相关的一对操作，只有将它们结合起来使用，才能达到程序控制流有效转移的目的，才能按照程序员的预先设计的意图，去实现对程序中可能出现的异常进行集中处理。
+
+　　与goto语句的作用类似，它能实现本地的跳转
+
+　　这种情况容易理解，不过还是列举出一个示例程序吧！如下： 
+
+void main( void )
+{
+int jmpret;
+
+jmpret = setjmp( mark );
+if( jmpret == 0 )
+{
+// 其它代码的执行
+// 判断程序远行中，是否出现错误，如果有错误，则跳转！
+if(1) longjmp(mark, 1);
+
+// 其它代码的执行
+// 判断程序远行中，是否出现错误，如果有错误，则跳转！
+if(2) longjmp(mark, 2);
+
+// 其它代码的执行
+// 判断程序远行中，是否出现错误，如果有错误，则跳转！
+if(-1) longjmp(mark, -1);
+
+// 其它代码的执行
+}
+else
+{
+// 错误处理模块
+switch (jmpret)
+{
+case 1:
+printf( "Error 1n");
+break;
+case 2:
+printf( "Error 2n");
+break;
+case 3:
+printf( "Error 3n");
+break;
+default :
+printf( "Unknown Error");
+break;
+}
+exit(0);
+}
+
+return;
+}
+
+　　上面的例程非常地简单，其中程序中使用到了异常处理的机制，这使得程序的代码非常紧凑、清晰，易于理解。在程序运行过程中，当异常情况出现后，控制流是进行了一个本地跳转（进入到异常处理的代码模块，是在同一个函数的内部），这种情况其实也可以用goto语句来予以很好的实现，但是，显然 setjmp与longjmp的方式，更为严谨一些，也更为友善。程序的执行流如图17-1所示。
+
+ 
+setjmp与longjmp相结合，实现程序的非本地的跳转
+
+　　呵呵！这就是goto语句所不能实现的。也正因为如此，所以才说在C语言中，setjmp与longjmp相结合的方式，它提供了真正意义上的异常处理机制。其实上一篇文章中的那个例程，已经演示了longjmp函数的非本地跳转的场景。这里为了更清晰演示本地跳转与非本地跳转，这两者之间的区别，我们在上面刚才的那个例程基础上，进行很小的一点改动，代码如下：
+
+void Func1()
+{
+// 其它代码的执行
+// 判断程序远行中，是否出现错误，如果有错误，则跳转！
+if(1) longjmp(mark, 1);
+}
+
+void Func2()
+{
+// 其它代码的执行
+// 判断程序远行中，是否出现错误，如果有错误，则跳转！
+if(2) longjmp(mark, 2);
+}
+
+void Func3()
+{
+// 其它代码的执行
+// 判断程序远行中，是否出现错误，如果有错误，则跳转！
+if(-1) longjmp(mark, -1);
+}
+
+void main( void )
+{
+int jmpret;
+
+jmpret = setjmp( mark );
+if( jmpret == 0 )
+{
+// 其它代码的执行
+
+// 下面的这些函数执行过程中，有可能出现异常
+Func1();
+
+Func2();
+
+Func3();
+
+// 其它代码的执行
+}
+else
+{
+// 错误处理模块
+switch (jmpret)
+{
+case 1:
+printf( "Error 1n");
+break;
+case 2:
+printf( "Error 2n");
+break;
+case 3:
+printf( "Error 3n");
+break;
+default :
+printf( "Unknown Error");
+break;
+}
+exit(0);
+}
+
+return;
+}
+
+　　回顾一下，这与C++中提供的异常处理模型是不是很相近。异常的传递是可以跨越一个或多个函数。这的确为C程序员提供了一种较完善的异常处理编程的机制或手段。
+
+setjmp和longjmp使用时，需要特别注意的事情
+
+　　1、setjmp与longjmp结合使用时，它们必须有严格的先后执行顺序，也即先调用setjmp函数，之后再调用longjmp函数，以恢复到先前被保存的“程序执行点”。否则，如果在setjmp调用之前，执行longjmp函数，将导致程序的执行流变的不可预测，很容易导致程序崩溃而退出。请看示例程序，代码如下：
+
+class Test
+{
+public:
+Test() {printf("构造对象n");}
+~Test() {printf("析构对象n");}
+}obj; 
+
+//注意，上面声明了一个全局变量obj
+
+void main( void )
+{
+int jmpret;
+
+// 注意，这里将会导致程序崩溃，无条件退出
+Func1();
+while(1);
+
+jmpret = setjmp( mark );
+if( jmpret == 0 )
+{
+// 其它代码的执行
+
+// 下面的这些函数执行过程中，有可能出现异常
+Func1();
+
+Func2();
+
+Func3();
+
+// 其它代码的执行
+}
+else
+{
+// 错误处理模块
+switch (jmpret)
+{
+case 1:
+printf( "Error 1n");
+break;
+case 2:
+printf( "Error 2n");
+break;
+case 3:
+printf( "Error 3n");
+break;
+default :
+printf( "Unknown Error");
+break;
+}
+exit(0);
+}
+
+return;
+}
+
+　　上面的程序运行结果，如下：
+　　构造对象
+　　Press any key to continue
+
+　　的确，上面程序崩溃了，由于在Func1()函数内，调用了longjmp，但此时程序还没有调用setjmp来保存一个程序执行点。因此，程序的执行流变的不可预测。这样导致的程序后果是非常严重的，例如说，上面的程序中，有一个对象被构造了，但程序崩溃退出时，它的析构函数并没有被系统来调用，得以清除一些必要的资源。所以这样的程序是非常危险的。（另外请注意，上面的程序是一个C++程序，所以大家演示并测试这个例程时，把源文件的扩展名改为xxx.cpp）。
+
+　　2、除了要求先调用setjmp函数，之后再调用longjmp函数（也即longjmp必须有对应的setjmp函数）之外。另外，还有一个很重要的规则，那就是longjmp的调用是有一定域范围要求的。这未免太抽象了，还是先看一个示例，如下：
+
+int Sub_Func()
+{
+int jmpret, be_modify;
+
+be_modify = 0;
+
+jmpret = setjmp( mark );
+if( jmpret == 0 )
+{
+// 其它代码的执行
+}
+else
+{
+// 错误处理模块
+switch (jmpret)
+{
+case 1:
+printf( "Error 1n");
+break;
+case 2:
+printf( "Error 2n");
+break;
+case 3:
+printf( "Error 3n");
+break;
+default :
+printf( "Unknown Error");
+break;
+}
+
+//注意这一语句，程序有条件地退出
+if (be_modify==0) exit(0);
+}
+
+return jmpret;
+}
+
+void main( void )
+{
+Sub_Func();
+
+// 注意，虽然longjmp的调用是在setjmp之后，但是它超出了setjmp的作用范围。
+longjmp(mark, 1);
+}
+
+　　如果你运行或调试（单步跟踪）一下上面程序，发现它真是挺神奇的，居然longjmp执行时，程序还能够返回到setjmp的执行点，程序正常退出。但是这就说明了上面的这个例程的没有问题吗？我们对这个程序小改一下，如下：
+
+int Sub_Func()
+{
+// 注意，这里改动了一点
+int be_modify, jmpret;
+
+be_modify = 0;
+
+jmpret = setjmp( mark );
+if( jmpret == 0 )
+{
+// 其它代码的执行
+}
+else
+{
+// 错误处理模块
+switch (jmpret)
+{
+case 1:
+printf( "Error 1n");
+break;
+case 2:
+printf( "Error 2n");
+break;
+case 3:
+printf( "Error 3n");
+break;
+default :
+printf( "Unknown Error");
+break;
+}
+
+//注意这一语句，程序有条件地退出
+if (be_modify==0) exit(0);
+}
+
+return jmpret;
+}
+
+void main( void )
+{
+Sub_Func();
+
+// 注意，虽然longjmp的调用是在setjmp之后，但是它超出了setjmp的作用范围。
+longjmp(mark, 1);
+}
+
+　　运行或调试（单步跟踪）上面的程序，发现它崩溃了，为什么？这就是因为，“在调用setjmp的函数返回之前，调用longjmp，否则结果不可预料”（这在上一篇文章中已经提到过，MSDN中做了特别的说明）。为什么这样做会导致不可预料？其实仔细想想，原因也很简单，那就是因为，当 setjmp函数调用时，它保存的程序执行点环境，只应该在当前的函数作用域以内（或以后）才会有效。如果函数返回到了上层（或更上层）的函数环境中，那么setjmp保存的程序的环境也将会无效，因为堆栈中的数据此时将可能发生覆盖，所以当然会导致不可预料的执行后果。
+
+　　3、不要假象寄存器类型的变量将总会保持不变。在调用longjmp之后，通过setjmp所返回的控制流中，例程中寄存器类型的变量将不会被恢复。（MSDN中做了特别的说明，上一篇文章中，这也已经提到过）。寄存器类型的变量，是指为了提高程序的运行效率，变量不被保存在内存中，而是直接被保存在寄存器中。寄存器类型的变量一般都是临时变量，在C语言中，通过register定义，或直接嵌入汇编代码的程序。这种类型的变量一般很少采用，所以在使用setjmp和longjmp时，基本上不用考虑到这一点。
+
+　　4、MSDN中还做了特别的说明，“在C++程序中，小心对setjmp和longjmp的使用，因为setjmp和longjmp并不能很好地支持C++中面向对象的语义。因此在C++程序中，使用C++提供的异常处理机制将会更加安全。”虽然说C++能非常好的兼容C，但是这并非是100% 的完全兼容。例如，这里就是一个很好的例子，在C++程序中，它不能很好地与setjmp和longjmp和平共处。在后面的一些文章中，有关专门讨论C ++如何兼容支持C语言中的异常处理机制时，会做详细深入的研究，这里暂且跳过。
+
+总结
+
+　　主人公阿愚现在对setjmp与longjmp已经是非常钦佩了，虽然它没有C++中提供的异常处理模型那么好用，但是毕竟在C语言中，有这么好用的东东，已经是非常不错了。为了更上一层楼，使setjmp与longjmp更接近C++中提供的异常处理模型（也即try()catch()语法）。阿愚找到了不少非常有价值的资料。不要错过，继续到下一篇文章中去吧！让程序员朋友们“玩转setjmp与longjmp”，Let’s go！
+
+不要忘记，前面我们得出过结论，C语言中提供的这种异常处理机制，与C++中的异常处理模型很相似。例如，可以定义出类似的try block（受到监控的代码）；catch block（异常错误的处理模块）；以及可以随时抛出的异常（throw语句）。所以说，我们可以通过一种非常有技巧的封装，来达到对setjmp和longjmp的使用方法（或者说语法规则），基本与C++中的语法一致。很有诱惑吧！ 
+
+首先展示阿愚封装的在C语言环境中异常处理框架
+
+　　1、首先是接口的头文件，主要采用“宏”技术！代码如下： 
+
+/*************************************************
+* author: 王胜祥 *
+* email: <mantx@21cn.com> *
+* date: 2005-03-07 *
+* version: *
+* filename: ceh.h *
+*************************************************/
+
+
+/********************************************************************
+
+This file is part of CEH(Exception Handling in C Language).
+
+CEH is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+CEH is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+　　注意：这个异常处理框架不支持线程安全，不能在多线程的程序环境下使用。
+如果您想在多线程的程序中使用它，您可以自己试着来继续完善这个
+框架模型。
+*********************************************************************/
+
+#include <stdio.h>
+#include <signal.h>
+#include <setjmp.h>
+#include <stdlib.h>
+#include <float.h>
+#include <math.h>
+#include <string.h>
+
+
+////////////////////////////////////////////////////
+/* 与异常有关的结构体定义 */
+typedef struct _CEH_EXCEPTION {
+int err_type; /* 异常类型 */
+int err_code; /* 错误代码 */
+char err_msg[80]; /* 错误信息 */
+}CEH_EXCEPTION; /* 异常对象 */
+
+typedef struct _CEH_ELEMENT {
+jmp_buf exec_status;
+CEH_EXCEPTION ex_info;
+
+struct _CEH_ELEMENT* next;
+} CEH_ELEMENT; /* 存储异常对象的链表元素 */
+////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////
+/* 内部接口定义，操纵维护链表数据结构 */
+extern void CEH_push(CEH_ELEMENT* ceh_element);
+extern CEH_ELEMENT* CEH_pop();
+extern CEH_ELEMENT* CEH_top();
+extern int CEH_isEmpty();
+////////////////////////////////////////////////////
+
+
+/* 以下是外部接口的定义 */
+////////////////////////////////////////////////////
+/* 抛出异常 */
+extern void thrower(CEH_EXCEPTION* e); 
+
+/* 抛出异常 (throw)
+a表示err_type 
+b表示err_code 
+c表示err_msg 
+*/
+#define throw(a, b, c) 
+{ 
+CEH_EXCEPTION ex; 
+memset(&ex, 0, sizeof(ex)); 
+ex.err_type = a; 
+ex.err_code = b; 
+strncpy(ex.err_msg, c, sizeof(c)); 
+thrower(&ex); 
+}
+
+/* 重新抛出原来的异常 (rethrow)*/
+#define rethrow thrower(ceh_ex_info)
+////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////
+/* 定义try block（受到监控的代码）*/
+#define try 
+{ 
+int ___ceh_b_catch_found, ___ceh_b_occur_exception; 
+CEH_ELEMENT ___ceh_element; 
+CEH_EXCEPTION* ceh_ex_info; 
+memset(&___ceh_element, 0, sizeof(___ceh_element)); 
+CEH_push(&___ceh_element); 
+ceh_ex_info = &___ceh_element.ex_info; 
+___ceh_b_catch_found = 0; 
+if (!(___ceh_b_occur_exception=setjmp(___ceh_element.exec_status))) 
+{
+
+
+/* 定义catch block（异常错误的处理模块）
+catch表示捕获所有类型的异常
+*/
+#define catch 
+} 
+else 
+{ 
+CEH_pop(); 
+___ceh_b_catch_found = 1;
+
+
+/* end_try表示前面定义的try block和catch block结束 */
+#define end_try 
+} 
+{ 
+/* 没有执行到任何的catch块中 */ 
+if(!___ceh_b_catch_found) 
+{ 
+CEH_pop(); 
+/* 出现了异常，但没有捕获到任何异常 */ 
+if(___ceh_b_occur_exception) thrower(ceh_ex_info); 
+} 
+} 
+} 
+
+
+/* 定义catch block（异常错误的处理模块）
+catch_part表示捕获一定范围内的异常
+*/
+#define catch_part(i, j) 
+} 
+else if(ceh_ex_info->err_type>=i && ceh_ex_info->err_type<=j) 
+{ 
+CEH_pop(); 
+___ceh_b_catch_found = 1;
+
+
+/* 定义catch block（异常错误的处理模块）
+catch_one表示只捕获一种类型的异常
+*/
+#define catch_one(i) 
+} 
+else if(ceh_ex_info->err_type==i) 
+{ 
+CEH_pop(); 
+___ceh_b_catch_found = 1;
+////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////
+/* 其它可选的接口定义 */
+extern void CEH_init();
+////////////////////////////////////////////////////
+
+
+2、另外还有一个简单的实现文件，主要实现功能封装。代码如下：
+
+/*************************************************
+* author: 王胜祥 *
+* email: <mantx@21cn.com> *
+* date: 2005-03-07 *
+* version: *
+* filename: ceh.c * 
+*************************************************/
+
+
+/********************************************************************
+
+This file is part of CEH(Exception Handling in C Language).
+
+CEH is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+CEH is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+注意：这个异常处理框架不支持线程安全，不能在多线程的程序环境下使用。
+如果您想在多线程的程序中使用它，您可以自己试着来继续完善这个
+框架模型。
+*********************************************************************/
+
+#include "ceh.h"
+
+////////////////////////////////////////////////////
+static CEH_ELEMENT* head = 0;
+
+/* 把一个异常插入到链表头中 */
+void CEH_push(CEH_ELEMENT* ceh_element)
+{
+if(head) ceh_element->next = head;
+head = ceh_element;
+}
+
+
+/* 从链表头中，删除并返回一个异常 */
+CEH_ELEMENT* CEH_pop()
+{
+CEH_ELEMENT* ret = 0;
+
+ret = head;
+head = head->next;
+
+return ret;
+}
+
+
+/* 从链表头中，返回一个异常 */
+CEH_ELEMENT* CEH_top()
+{
+return head;
+}
+
+
+/* 链表中是否有任何异常 */
+int CEH_isEmpty()
+{
+return head==0;
+}
+////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////
+/* 缺省的异常处理模块 */
+static void CEH_uncaught_exception_handler(CEH_EXCEPTION *ceh_ex_info) 
+{
+printf("捕获到一个未处理的异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+fprintf(stderr, "程序终止!n");
+fflush(stderr);
+exit(EXIT_FAILURE); 
+}
+////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////
+/* 抛出异常 */
+void thrower(CEH_EXCEPTION* e) 
+{
+CEH_ELEMENT *se;
+
+if (CEH_isEmpty()) CEH_uncaught_exception_handler(e);
+
+se = CEH_top();
+se->ex_info.err_type = e->err_type;
+se->ex_info.err_code = e->err_code;
+strncpy(se->ex_info.err_msg, e->err_msg, sizeof(se->ex_info.err_msg));
+
+longjmp(se->exec_status, 1);
+}
+////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////
+static void fphandler( int sig, int num )
+{
+_fpreset();
+
+switch( num )
+{
+case _FPE_INVALID:
+throw(-1, num, "Invalid number" );
+case _FPE_OVERFLOW:
+throw(-1, num, "Overflow" );
+case _FPE_UNDERFLOW:
+throw(-1, num, "Underflow" );
+case _FPE_ZERODIVIDE:
+throw(-1, num, "Divide by zero" );
+default:
+throw(-1, num, "Other floating point error" );
+}
+}
+
+void CEH_init()
+{
+_control87( 0, _MCW_EM );
+
+if( signal( SIGFPE, fphandler ) == SIG_ERR )
+{
+fprintf( stderr, "Couldn"t set SIGFPEn" );
+abort(); 
+}
+}
+////////////////////////////////////////////////////
+　　体验上面设计出的异常处理框架
+请花点时间仔细揣摩一下上面设计出的异常处理框架。呵呵！程序员朋友们，大家是不是发现它与C++提供的异常处理模型非常相似。例如，它提供的基本接口有 try、catch、以及throw等三条语句。还是先看个具体例子吧！以便验证一下这个C语言环境中异常处理框架是否真的比较好用。代码如下：
+
+#include "ceh.h"
+
+int main(void) 
+{
+//定义try block块
+try
+{
+int i,j;
+printf("异常出现前nn");
+
+// 抛出一个异常
+// 其中第一个参数，表示异常类型；第二个参数表示错误代码
+// 第三个参数表示错误信息
+throw(9, 15, "出现某某异常");
+
+printf("异常出现后nn");
+}
+//定义catch block块
+catch
+{
+printf("catch块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+// 这里稍有不同，需要定义一个表示当前的try block结束语句
+// 它主要是清除相应的资源
+end_try
+}
+
+　　注意，上面的测试程序可是C语言环境下的程序（文件的扩展名请使用.c结尾），虽然它看上去很像C++程序。请编译运行一下，发现它是不是运行结果如下：
+异常出现前
+
+catch块，被执行到
+
+　　捕获到一个异常，错误原因是：出现某某异常! err_type:9 err_code:15
+
+　　呵呵！程序的确是在按照我们预想的流程在执行。再次提醒，这可是C程序，但是它的异常处理却非常类似于C++中的风格，要知道，做到这一点其实非常地不容易。当然，上面异常对象的传递只是在一个函数的内部，同样，它也适用于多个嵌套函数间的异常传递，还是用代码验证一下吧！在上面的代码基础下，小小修改一点，代码如下：
+
+#include "ceh.h"
+
+void test1()
+{
+throw(0, 20, "hahaha");
+}
+
+void test()
+{
+test1();
+}
+
+int main(void) 
+{
+try
+{
+int i,j;
+printf("异常出现前nn");
+
+// 注意，这个函数的内部会抛出一个异常。
+test();
+
+throw(9, 15, "出现某某异常");
+
+printf("异常出现后nn");
+}
+catch
+{
+printf("catch块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+end_try
+}
+
+　　同样，在上面程序中，test1()函数内抛出的异常，可以被上层main()函数中的catch block中捕获到。运行结果就不再给出了，大家可以自己编译运行一把，看看运行结果。
+另外这个异常处理框架，与C++中的异常处理模型类似，它也支持try catch块的多层嵌套。很厉害吧！还是看演示代码吧！，如下：
+
+#include "ceh.h"
+
+int main(void) 
+{
+// 外层的try catch块
+try
+{
+// 内层的try catch块
+try
+{
+throw(1, 15, "嵌套在try块中");
+}
+catch
+{
+printf("内层的catch块被执行n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+
+printf("外层的catch块被执行n");
+}
+end_try
+
+throw(2, 30, "再抛一个异常");
+}
+catch
+{
+printf("外层的catch块被执行n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+end_try
+}
+
+　　请编译运行一下，程序的运行结果如下：
+　　内层的catch块被执行
+　　捕获到一个异常，错误原因是：嵌套在try块中! err_type:1 err_code:15
+　　外层的catch块被执行
+　　捕获到一个异常，错误原因是：再抛一个异常! err_type:2 err_code:30
+
+　　还有，这个异常处理框架也支持对异常的分类处理。这一点，也完全是模仿C++中的异常处理模型。不过，由于C语言中，不支持函数名重载，所以语法上略有不同，还是看演示代码吧！，如下：
+
+#include "ceh.h"
+
+int main(void) 
+{
+try
+{
+int i,j;
+printf("异常出现前nn");
+
+throw(9, 15, "出现某某异常");
+
+printf("异常出现后nn");
+}
+// 这里表示捕获异常类型从4到6的异常
+catch_part(4, 6)
+{
+printf("catch_part(4, 6)块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+// 这里表示捕获异常类型从9到10的异常
+catch_part(9, 10)
+{
+printf("catch_part(9, 10)块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+// 这里表示只捕获异常类型为1的异常
+catch_one(1)
+{
+printf("catch_one(1)块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+// 这里表示捕获所有类型的异常
+catch
+{
+printf("catch块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+end_try
+}
+
+　　请编译运行一下，程序的运行结果如下：
+　　异常出现前
+
+catch_part(9, 10)块，被执行到
+　　捕获到一个异常，错误原因是：出现某某异常! err_type:9 err_code:15
+
+　　与C++中的异常处理模型相似，它这里的对异常的分类处理不仅支持一维线性的；同样，它也支持分层的，也即在当前的try catch块中找不到相应的catch block，那么它将会到上一层的try catch块中继续寻找。演示代码如下：
+
+#include "ceh.h"
+
+int main(void) 
+{
+try
+{
+try
+{
+throw(1, 15, "嵌套在try块中");
+}
+catch_part(4, 6)
+{
+printf("catch_part(4, 6)块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+end_try
+
+printf("这里将不会被执行到n");
+}
+catch_part(2, 3)
+{
+printf("catch_part(2, 3)块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+// 找到了对应的catch block
+catch_one(1)
+{
+printf("catch_one(1)块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+catch
+{
+printf("catch块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+end_try
+
+}
+
+　　到目前为止，大家是不是已经觉得，这个主人公阿愚封装的在C语言环境中异常处理框架，已经与C++中的异常处理模型95%相似。无论是它的语法结构；还是所完成的功能；以及它使用上的灵活性等。下面我们来看一个各种情况综合的例子吧！代码如下：
+
+#include "ceh.h"
+
+void test1()
+{
+throw(0, 20, "hahaha");
+}
+
+void test()
+{
+test1();
+}
+
+int main(void) 
+{
+try
+{
+test();
+}
+catch
+{
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+end_try
+
+try
+{
+try
+{
+throw(1, 15, "嵌套在try块中");
+}
+catch
+{
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+end_try
+
+throw(2, 30, "再抛一个异常");
+}
+catch
+{
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+
+try
+{
+throw(0, 20, "嵌套在catch块中");
+}
+catch
+{
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+end_try
+}
+end_try
+}
+
+　　请编译运行一下，程序的运行结果如下：
+　　捕获到一个异常，错误原因是：hahaha! err_type:0 err_code:20
+　　捕获到一个异常，错误原因是：嵌套在try块中! err_type:1 err_code:15
+　　捕获到一个异常，错误原因是：再抛一个异常! err_type:2 err_code:30
+　　捕获到一个异常，错误原因是：嵌套在catch块中! err_type:0 err_code:20
+
+　　最后，为了体会到这个异常处理框架，更进一步与C++中的异常处理模型相似。那就是它还支持异常的重新抛出，以及系统中能捕获并处理程序中没有catch到的异常。看代码吧！如下：
+
+#include "ceh.h"
+
+void test1()
+{
+throw(0, 20, "hahaha");
+}
+
+void test()
+{
+test1();
+}
+
+int main(void) 
+{
+// 这里表示程序中将捕获浮点数计算异常
+CEH_init();
+
+try
+{
+try
+{
+try
+{
+double i,j;
+j = 0;
+// 这里出现浮点数计算异常
+i = 1/j ;
+
+test();
+
+throw(9, 15, "出现某某异常");
+}
+end_try
+}
+catch_part(4, 6)
+{
+printf("catch_part(4, 6)块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+catch_part(2, 3)
+{
+printf("catch_part(2, 3)块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+}
+// 捕获到上面的异常
+catch
+{
+printf("内层的catch块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+
+// 这里再次把上面的异常重新抛出
+rethrow;
+
+printf("这里将不会被执行到n");
+}
+end_try
+}
+catch_part(7, 9)
+{
+printf("catch_part(7, 9)块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+
+throw(2, 15, "出现某某异常");
+}
+// 再次捕获到上面的异常
+catch
+{
+printf("外层的catch块，被执行到n");
+printf("捕获到一个异常，错误原因是：%s! err_type:%d err_code:%dn",
+ceh_ex_info->err_msg, ceh_ex_info->err_type, ceh_ex_info->err_code);
+
+// 最后又抛出了一个异常，
+// 但是这个异常没有对应的catch block处理，所以系统中处理了
+throw(2, 15, "出现某某异常");
+}
+end_try
+}
+
+　　请编译运行一下，程序的运行结果如下：
+　　内层的catch块，被执行到
+　　捕获到一个异常，错误原因是：Divide by zero! err_type:-1 err_code:131
+　　外层的catch块，被执行到
+　　捕获到一个异常，错误原因是：Divide by zero! err_type:-1 err_code:131
+　　捕获到一个未处理的异常，错误原因是：出现某某异常! err_type:2 err_code:15
+　　程序终止!
+
+goto，longjmp()和setjmp()
+
+ goto语句实现程序执行中的近程跳转(local jump)，longjmp()和setjmp()函数实现程序执行中的远程跳转(nonlocaljump，也叫farjump)。通常你应该避免任何形式的执行中跳转，因为在程序中使用goto语句或longjmp()函数不是一种好的编程习惯。
+    goto语句会跳过程序中的一段代码并转到一个预先指定的位置。为了使用goto语句，你要预先指定一个有标号的位置作为跳转位置，这个位置必须与goto语句在同一个函数内。在不同的函数之间是无法实现goto跳转的。下面是一个使用goto语句的例子：
+
+void bad_programmers_function(void)
+{
+     int x
+     printf("Excuse me while I count to 5000... /n") ;
+     x----l~
+     while (1)
+    {
+           printf(" %d/n", x)
+           if (x ==5000)
+                 goto all_done
+           else
+                 x=x+1;
+    }
+all_done:
+     prinft("Whew! That wasn't so bad, was it?/n");
+} 
+
+如果不使用goto语句，是例可以编写得更好。下面就是一个改进了实现的例子： 
+
+void better_function (void)
+{
+     int x
+     printf("Excuse me while I count to 5000... /n");
+     for (x=1; x<=5000, x++)
+           printf(" %d/n", x)
+     printf("Whew! That wasn't so bad, was it?/n") ;
+}
+
+   前面已经提到，longjmp()和setjmp()函数实现程序执行中的远程跳转。当你在程序中调用setjmp()时，程序当前状态将被保存到一个jmp_buf类型的结构中。此后，你可以通过调用longjmp()函数恢复到调用setjmp()时的程序状态。与goto语句不同，longjmp()和setjmp()函数实现的跳转不一定在同一个函数内。然而，使用这两个函数有一个很大的缺陷，当程序恢复到它原来所保存的状态时，它将失去对所有在longjmp()和setjmp()之间动态分配的内存的控制，也就是说这将浪费所有在longjmp()和setjmp()之间用malloc()和calloc()分配所得的内存，从而使程序的效率大大降低。因此，你应该尽量避免使用longjmp()和setjmp()函数，它们和goto语句一样，都是不良编程习惯的表现。
+    下面是使用longjmp()函数和setjmp()函数的一个例子： 
+
+＃i nclude <stdio.h>
+＃i nclude <setjmp.h>
+＃i nclude <stdlib.h>
+jmp_buf saved_state;
+void main(void);
+void call_longjmp (void); 
+
+void main(void)
+{
+ int ret_code;
+ printf("The current state of the program is being saved... /n");
+ ret_code = setjmp (saved_state);
+ printf("test point-----------------------");
+ if (ret_code ==1)
+ {
+  printf("The longjmp function has been called. /n" );
+   printf("The program's previous state has been restored. /n");
+  exit(0);
+ }
+ printf("I am about to call longjmp and/n");
+ printf("return to the previous program state... /n" );
+ call_longjmp();
+}
+void call_longjmp (void)
+{
+ longjmp (saved_state, 1 );
+}
+
+
+
+http://blog.csdn.net/hbaizj/article/details/4008126

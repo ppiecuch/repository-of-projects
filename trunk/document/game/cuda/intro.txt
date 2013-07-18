@@ -1,0 +1,25 @@
+提出一种顺序独立透明现象的单遍高效绘制算法.首先设计了一个基于计算统一设备架构Compute unified device architecture,简称CUDA)的可编程渲染器.该系统采用扫描线算法光栅化场景,为每个像素生成多个对应的片元,同时,在GPU(graphics processing unit)的全局内存上为每个像素分配一个数组,以存储其相应的片元.基于这个框架,提出了两种并发的片元收集及排序策略,以单遍高效地绘制顺序独立的透明现象.第1种策略利用CUDA的原子操作符atomicMin收集各个像素上对应的所有片元并按深度动态排序,在后处理中片元即可按序逐一融合;第2种策略采用CUDA的原子操作符atomicInc按光栅化顺序收集所有片元,然后在后处理中按深度排序后再逐一融合.实验结果表明,与基于传统图形管线的经典深度剥离方法相比,该方法可以更高效地绘制顺序独立的透明现象,同时生成正确的绘制效果. 
+
+CUDA（Compute Unified Device Architecture，统一计算架构[1]）是由NVIDIA所推出的一种集成技术，是该公司对于GPGPU的正式名称。通过这个技术，用户可利用NVIDIA的GeForce 8以后的GPU和较新的Quadro GPU进行计算。亦是首次可以利用GPU作为C-编译器的开发环境。NVIDIA营销的时候[2]，往往将编译器与架构混合推广，造成混乱。实际上，CUDA架构可以兼容OpenCL或者自家的C-编译器。无论是CUDA C-语言或是OpenCL，指令最终都会被驱动程序转换成PTX代码，交由显示核心计算。[3]
+
+
+Advantages[edit]
+
+CUDA has several advantages over traditional general-purpose computation on GPUs (GPGPU) using graphics APIs:
+Scattered reads – code can read from arbitrary addresses in memory
+Shared memory – CUDA exposes a fast shared memory region (up to 48KB per Multi-Processor) that can be shared amongst threads. This can be used as a user-managed cache, enabling higher bandwidth than is possible using texture lookups.[12]
+Faster downloads and readbacks to and from the GPU
+Full support for integer and bitwise operations, including integer texture lookups
+Limitations[edit]
+
+Although advertised, CUDA does not really support C programming, and it forces host code through a C++ compiler, which makes some valid C code (but invalid C++) fail to compile.[13][14]
+Texture rendering is not supported (CUDA 3.2 and up addresses this by introducing "surface writes" to CUDA arrays, the underlying opaque data structure).
+Copying between host and device memory may incur a performance hit due to system bus bandwidth and latency (this can be partly alleviated with asynchronous memory transfers, handled by the GPU's DMA engine)
+Threads should be running in groups of at least 32 for best performance, with total number of threads numbering in the thousands. Branches in the program code do not affect performance significantly, provided that each of 32 threads takes the same execution path; the SIMD execution model becomes a significant limitation for any inherently divergent task (e.g. traversing a space partitioning data structure during ray tracing).
+Unlike OpenCL, CUDA-enabled GPUs are only available from Nvidia[15]
+Valid C/C++ may sometimes be flagged and prevent compilation due to optimization techniques the compiler is required to employ to use limited resources.
+CUDA (with compute capability 1.x) uses a recursion-free, function-pointer-free subset of the C language, plus some simple extensions. However, a single process must run spread across multiple disjoint memory spaces, unlike other C language runtime environments.
+CUDA (with compute capability 2.x) allows a subset of C++ class functionality, for example member functions may not be virtual (this restriction will be removed in some future release). [See CUDA C Programming Guide 3.1 – Appendix D.6]
+Double precision floats (CUDA compute capability 1.3 and above)[16] deviate from the IEEE 754 standard: round-to-nearest-even is the only supported rounding mode for reciprocal, division, and square root. In single precision, denormals and signalling NaNs are not supported; only two IEEE rounding modes are supported (chop and round-to-nearest even), and those are specified on a per-instruction basis rather than in a control word; and the precision of division/square root is slightly lower than single precision.
+
+http://zh.wikipedia.org/wiki/CUDA

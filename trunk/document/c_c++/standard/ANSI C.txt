@@ -1,0 +1,52 @@
+ANSI C refers to the family of successive standards published by the American National Standards Institute (ANSI) for the C programming language. 
+Software developers writing in C are encouraged to conform to the standards, as doing so aids portability between compilers.
+
+ANSI C是美国国家标准协会(ANSI)对C语言发布的标准。使用C的软件开发者被鼓励遵循ANSI C文档的要求，因为它鼓励使用跨平台的代码。
+
+
+History and outlook
+
+The first standard for C was published by ANSI. 
+Although this document was subsequently adopted by International Organization for Standardization (ISO) 
+and subsequent revisions published by ISO have been adopted by ANSI, the name ANSI C (rather than ISO C) is still more widely used. 
+While some software developers use the term ISO C, others are standards body–neutral and use Standard C.
+
+C 的第一个标准是由ANSI发布的。虽然这份文档后来被国际标准化组织(ISO)采纳并且ISO发布的修订版也被ANSI采纳了，
+但名称ANSI C(而不是 ISO C)仍被广泛使用。一些软件开发者使用ISO C，还有一些使用 Standard C。
+
+
+C89 and C90
+In 1983, the American National Standards Institute formed a committee, X3J11, to establish a standard specification of C. 
+After a long and arduous process, the standard was completed in 1989 and ratified as ANSI X3.159-1989 "Programming Language C." 
+This version of the language is often referred to as "ANSI C", or sometimes "C89" (to distinguish it from C99).
+The same standard was ratified by the International Organization for Standardization as ISO/IEC 9899:1990, 
+with only formatting changes,[1] which is sometimes referred to as C90. 
+Therefore, the terms "C89" and "C90" refer to essentially the same language.
+ISO also published an amendment in 1994, referred to as AMD1, introducing minor changes to the language and the library.
+This standard has been withdrawn by both INCITS and ISO/IEC.
+
+C89
+1983年，美国国家标准协会组成了一个委员会，X3J11，为了创立 C 的一套标准。
+经过漫长而艰苦的过程，该标准于1989年完成，并在作为ANSI X3.159-1989 "Programming Language C"正式生效。
+这个版本的语言经常被称作"ANSI C"，或有时称为"C89"（为了区别C99）。
+C90
+在1990年，ANSI C标准（带有一些小改动）被美国国家标准协会采纳为ISO/IEC 9899:1990。这个版本有时候称为C90。因此，C89和C90通常指同一种语言。
+
+
+
+C99
+In March 2000, ANSI adopted the ISO/IEC 9899:1999 standard. This standard is commonly referred to as C99.
+This standard has been withdrawn by ISO/IEC in favour of C11, but is still approved by INCITS.
+
+C99
+在2000年三月，ANSI 采纳了 ISO/IEC 9899:1999 标准。这个标准通常指C99。
+
+
+C11
+"C11" is the new standard for the C programming language.
+C11
+在2011年12月，ANSI 采纳了 ISO/IEC 9899:2011 标准。这个标准通常即C11，它是C程序语言的现行标准。
+
+
+http://en.wikipedia.org/wiki/ANSI_C
+http://zh.wikipedia.org/wiki/ANSI_C

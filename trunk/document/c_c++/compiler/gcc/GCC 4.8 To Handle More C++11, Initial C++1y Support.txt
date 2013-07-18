@@ -1,0 +1,11 @@
+GCC 4.8 is set to support more of the C++11 ISO standard and it also starts working on very early support for "C++1y", the next C++ standard that is still years away. 
+
+Besides supporting new hardware optimizations, potential Unified Parallel C support, a conversion to C++, and many other changes, GCC 4.8 improves its support for the C++11 ISO standard. 
+
+G++ in GCC 4.8 now supports the C++11 thread_local keyword. "G++ now implements the C++11 thread_local keyword; this differs from the GNU __thread keyword primarily in that it allows dynamic initialization and destruction semantics. Unfortunately, this support requires a run-time penalty for references to non-function-local thread_local variables even if they don't need dynamic initialization, so users may want to continue to use __thread for TLS variables with static initialization semantics. OpenMP threadprivate variables now also support dynamic initialization and destruction by the same mechanism." 
+
+Another C++11 feature for this GCC release due out in 2013 is support for the attribute syntax, alignment specifier, and inheriting constructors. 
+
+The early C++1y support is exposed via setting the -std=c++1y switch but right now the only proposed feature that is implemented is support for return type deduction in normal features. This next C++ standard isn't expected to be settled until 2017
+
+http://www.chineselinuxuniversity.net/news/93135.shtml

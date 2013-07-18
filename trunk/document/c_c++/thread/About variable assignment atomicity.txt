@@ -1,0 +1,26 @@
+Hi, I do not understand why variable assignment is not atomic. Being atomic means thread-safe, right? Can anyone please explain to me how is it not thread-safe? Doesn't it directly assign a value to a variable?
+
+And also I've read in some site that certain variable types (or assignment types?) are atomic, and some are not. Could someone also give me a link as to where I can find the specifications of what is atomic and what is not? Thanks!
+
+
+
+> Hi, I do not understand why variable assignment is not atomic. Being atomic means thread-safe, right?
+
+No.  All it means is that other threads will see the entire new value or the entire old value, not a partial combination of the two.  Even with atomicity, other threads might be able to load values in a different order than they were stored, and this can often lead to a program that is not thread-safe.
+
+I would recommend reading http://msdn.microsoft.com/en-us/magazine/cc163715.aspx to learn about these "ordering" issues, which stem from how memory caches are implemented in the hardware.
+
+> And also I've read in some site that certain variable types (or assignment types?) are atomic, and some are not.
+
+Depends on how the processor does stores and loads.  On x86, stores greater than 32-bits are not atomic.
+
+For example, if you look at the documentation for System.Int64 or System.Double you will see:
+
+    Assigning an instance of this type is not thread safe on all hardware platforms because the binary representation of that instance might be too large to assign in a single atomic operation.
+
+IMHO, this documentation is misleading because it suggests that "if the assignment were atomic, your program would be thread-safe" but this is not the full story.
+
+From a practical standpoint, you probably should be using locks (i.e., the lock keyword or System.Threading.Monitor methods).  For advanced scenarios, volatile variables or System.Threading.Interlocked methods can be useful.
+
+
+http://social.msdn.microsoft.com/Forums/vstudio/zh-CN/f03ea3c9-4c2b-4a79-8f8c-4a6b7476b20d/about-variable-assignment-atomicity

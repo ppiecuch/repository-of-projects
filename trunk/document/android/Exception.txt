@@ -1,3 +1,27 @@
+[Exception]
+引入第三方Jar包的方法(java.lang.NoClassDefFoundError解决办法) 
+解决方法：
+将lib设为源文件夹
+
+[Exception]
+R cannot be resolved to a variable
+解决方法：
+1、将gen文件夹删除
+2、After updating to SDK Tools to rev. 22 for the first time, 
+you may need to relaunch Android SDK Manager again and install a new item: Android SDK Build-tools. 
+After installing this, clean your projects and rebuild.
+
+
+
+[Failed]
+ADB server didn't ACK问题解决方案
+解决办法：
+
+（1）查看任务管理器，关闭所有adb.exe
+
+（2）重启eclipse即可
+
+
 [Unnormal]
 Waiting for Debugger
 Application HunyDew (process com.airvine.hunydew) is waiting for the debugger to attach.

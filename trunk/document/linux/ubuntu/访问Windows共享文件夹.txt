@@ -36,6 +36,9 @@ Install the "winbind" package: sudo apt-get install winbind
 重启
 http://askubuntu.com/questions/74789/failed-to-retrieve-share-list-from-server-error-when-browsing-a-share-with-nau
 
+解决四：
+原来是Window里的网络连接设置了"允许其他网络用户通过计算机的网络连接来连接"导致，关闭之即可
+
 
 
 sudo mount -t cifs //192.168.1.245/xc /home/ubuntu8 -o username=3guu,password=8888uug3

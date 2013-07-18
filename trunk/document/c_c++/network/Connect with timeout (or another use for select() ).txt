@@ -1,0 +1,179 @@
+6
+
+From: Desperado
+Can anyone _please_ show me how to create a client that connects to a web server using non-blocking sockets? Basically I have a requirement to connect to a web server, but I need to be able to control the timeout of the connect so I am trying to do it using non blocking sockets and the select function. It is not working - I end up getting a successful write connection but a failed read connection no matter how high I set the time out value. A simple blocking connect works fine though. Please help if you can!
+
+From: Loco
+If you are using a non-blocking socket and then call connect, it should return -1 and errno=EINPROGRESS.
+
+Then select the socket for writing with the timeout, and after select() indicates it is "writteable" (i don't know how to say this... ;) ), it has connected (or an error has occurred) so check with getsockopt() the SO_ERROR at the SOL_SOCKET level... It should be zero if the connection was successful, any other value is what errno should be if it was a blocking connect().
+
+If the timeout period expires, then you should be getting a 0 from select()...
+
+I hope this helps, tell us if you need further help...
+
+:D (HAL)
+
+From: Loco
+This example code (is really ugly, but i had to do it in a couple of minutes just to show I'm a nice guy), shows how to use non-blocking sockets just to connect.
+
+It could be better, but i took some code i did years ago and added the non-blocking stuff and select.
+
+void connect_w_to(void) { 
+  int res; 
+  struct sockaddr_in addr; 
+  long arg; 
+  fd_set myset; 
+  struct timeval tv; 
+  int valopt; 
+  socklen_t lon; 
+
+  // Create socket 
+  soc = socket(AF_INET, SOCK_STREAM, 0); 
+  if (soc < 0) { 
+     fprintf(stderr, "Error creating socket (%d %s)\n", errno, strerror(errno)); 
+     exit(0); 
+  } 
+
+  addr.sin_family = AF_INET; 
+  addr.sin_port = htons(2000); 
+  addr.sin_addr.s_addr = inet_addr("192.168.0.1"); 
+
+  // Set non-blocking 
+  if( (arg = fcntl(soc, F_GETFL, NULL)) < 0) { 
+     fprintf(stderr, "Error fcntl(..., F_GETFL) (%s)\n", strerror(errno)); 
+     exit(0); 
+  } 
+  arg |= O_NONBLOCK; 
+  if( fcntl(soc, F_SETFL, arg) < 0) { 
+     fprintf(stderr, "Error fcntl(..., F_SETFL) (%s)\n", strerror(errno)); 
+     exit(0); 
+  } 
+  // Trying to connect with timeout 
+  res = connect(soc, (struct sockaddr *)&addr, sizeof(addr)); 
+  if (res < 0) { 
+     if (errno == EINPROGRESS) { 
+        fprintf(stderr, "EINPROGRESS in connect() - selecting\n"); 
+        do { 
+           tv.tv_sec = 15; 
+           tv.tv_usec = 0; 
+           FD_ZERO(&myset); 
+           FD_SET(soc, &myset); 
+           res = select(soc+1, NULL, &myset, NULL, &tv); 
+           if (res < 0 && errno != EINTR) { 
+              fprintf(stderr, "Error connecting %d - %s\n", errno, strerror(errno)); 
+              exit(0); 
+           } 
+           else if (res > 0) { 
+              // Socket selected for write 
+              lon = sizeof(int); 
+              if (getsockopt(soc, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon) < 0) { 
+                 fprintf(stderr, "Error in getsockopt() %d - %s\n", errno, strerror(errno)); 
+                 exit(0); 
+              } 
+              // Check the value returned... 
+              if (valopt) { 
+                 fprintf(stderr, "Error in delayed connection() %d - %s\n", valopt, strerror(valopt) 
+); 
+                 exit(0); 
+              } 
+              break; 
+           } 
+           else { 
+              fprintf(stderr, "Timeout in select() - Cancelling!\n"); 
+              exit(0); 
+           } 
+        } while (1); 
+     } 
+     else { 
+        fprintf(stderr, "Error connecting %d - %s\n", errno, strerror(errno)); 
+        exit(0); 
+     } 
+  } 
+  // Set to blocking mode again... 
+  if( (arg = fcntl(soc, F_GETFL, NULL)) < 0) { 
+     fprintf(stderr, "Error fcntl(..., F_GETFL) (%s)\n", strerror(errno)); 
+     exit(0); 
+  } 
+  arg &= (~O_NONBLOCK); 
+  if( fcntl(soc, F_SETFL, arg) < 0) { 
+     fprintf(stderr, "Error fcntl(..., F_SETFL) (%s)\n", strerror(errno)); 
+     exit(0); 
+  } 
+  // I hope that is all 
+}
+
+I tested it and it worked just fine!
+
+The same example, without all the error checking (easier to follow):
+
+void connect_w_to(void) { 
+  int res, valopt; 
+  struct sockaddr_in addr; 
+  long arg; 
+  fd_set myset; 
+  struct timeval tv; 
+  socklen_t lon; 
+
+  // Create socket 
+  soc = socket(AF_INET, SOCK_STREAM, 0); 
+
+  // Set non-blocking 
+  arg = fcntl(soc, F_GETFL, NULL); 
+  arg |= O_NONBLOCK; 
+  fcntl(soc, F_SETFL, arg); 
+
+  // Trying to connect with timeout 
+  addr.sin_family = AF_INET; 
+  addr.sin_port = htons(2000); 
+  addr.sin_addr.s_addr = inet_addr("192.168.0.1"); 
+  res = connect(soc, (struct sockaddr *)&addr, sizeof(addr)); 
+
+  if (res < 0) { 
+     if (errno == EINPROGRESS) { 
+        tv.tv_sec = 15; 
+        tv.tv_usec = 0; 
+        FD_ZERO(&myset); 
+        FD_SET(soc, &myset); 
+        if (select(soc+1, NULL, &myset, NULL, &tv) > 0) { 
+           lon = sizeof(int); 
+           getsockopt(soc, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon); 
+           if (valopt) { 
+              fprintf(stderr, "Error in connection() %d - %s\n", valopt, strerror(valopt)); 
+              exit(0); 
+           } 
+        } 
+        else { 
+           fprintf(stderr, "Timeout or error() %d - %s\n", valopt, strerror(valopt)); 
+           exit(0); 
+        } 
+     } 
+     else { 
+        fprintf(stderr, "Error connecting %d - %s\n", errno, strerror(errno)); 
+        exit(0); 
+     } 
+  } 
+  // Set to blocking mode again... 
+  arg = fcntl(soc, F_GETFL, NULL); 
+  arg &= (~O_NONBLOCK); 
+  fcntl(soc, F_SETFL, arg); 
+  // I hope that is all 
+}
+
+Yeah, I know, it's an ugly code. And may be plagged by bugs. I'm a lousy programmer.
+
+:D (HAL)
+
+From: Desperado
+Thank you so much. The part that I was missing was the setting the socket back to blocking affter the select succeeds. Without doing this, all of my read attempts failed. When I added this code to set the socket back to blocking everything worked perfectly. Just curious - why is this? Anyway, if you don't have time to respond - I understand - I really appreciate your help - I'm sure others will benefit from your example code as well.
+
+From: Rob Seace
+
+You read attempts weren't really "failing" per se, but
+were simply not blocking, just as you had instructed
+them to... There was nothing to read immediately, so
+it returns -1 and sets errno to EAGAIN/EWOULDBLOCK...
+[/b]
+
+
+http://developerweb.net/viewtopic.php?id=3196

@@ -1,0 +1,31 @@
+使用 Visual C++ 可以预编译任何 C 或 C++ 代码；并不仅限于预编译头文件。 
+
+预编译要求先进行规划，但如果预编译的是除简单的头文件之外的源代码，则将大幅度提高编译速度。
+
+如果知道源文件使用一组通用的头文件但包含顺序不同，或者希望将源代码包含在预编译中，则需预编译代码。
+
+预编译头选项为 /Yc（创建预编译头文件）和 /Yu（使用预编译头文件）。
+使用 /Yc 创建预编译头。与可选的 hdrstop 杂注一起使用时，/Yc 允许对头文件和源代码都进行预编译。
+选择 /Yu 在现有编译中使用现有预编译头。还可以将 /Fp 与 /Yc 和 /Yu 选项结合使用，为预编译头提供其他名称。
+
+/Yu 和 /Yc 的编译器选项参考主题讨论如何在开发环境中访问此功能。
+
+生成 PCH 文件 
+可以通过非常简单的方法用一个 PCH 生成另一个 PCH。
+
+复制代码 
+cl -c -Yc"stuff.h" -Fplevel1.pch level1.cpp
+cl -c -Yu"stuff.h" -Fplevel1.pch -Yc level2.cpp
+level2.cpp 文件如下所示：
+
+复制代码 
+#include "stuff.h"
+#include "morestuff.h"
+#pragma hdrstop("level2.pch")
+以下命令将生成 level2.pch，它可用于进一步的编译中：
+
+复制代码 
+cl -c -Yu"morestuff.h" -Fplevel2.pch mysource.cpp
+请注意，只需将 #pragma hdrstop 指令放在生成另一个 PCH 的文件中；不必将其放在所有使用该 PCH 的 .cpp 文件中。
+使用 PCH 的文件可以在命令行中用名称指定 morestuff.h 文件（因此不必为使用它而编辑所有文件）。
+两种预编译代码的方法（手动或自动）都将生成的预编译代码存储在预编译头中。

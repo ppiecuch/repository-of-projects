@@ -1,0 +1,107 @@
+使用 hook ，为了方便管理员控制提交的过程 Subversion 提供了 hook 机制。当特定的事件发生时，相应的 hook 会被调用， hook 其实就相当于特定事件的处理函数。每个 hook 会得到与它所处理的事件相关的参数，根据 hook 的返回值， Subversion 会决定是否继续当前的提交过程。 
+
+当前 Subversion 提供了 5 种可以安装的 hook ： 
+
+事件名 
+ 时机 
+ 与 hook 交互 
+ 一般用途 
+ 
+start-commit 
+ 事务创建之前。 
+ 传给 hook 的参数： 
+
+-         参数 1 ，代码库路径。 
+
+-         参数 2 ，试图提交的用户名。 
+
+hook 的返回值：非 0 则终止。 
+ 判断用户是否有权限进行提交操作。 
+ 
+pre-commit 
+ 事务完成，但未提交。 
+ -         参数 1 ，代码库路径。 
+
+-         参数 2 ，事务名。 
+
+hook 的返回值：非 0 则终止提交，操作回滚。 
+ 对提交内容进行检查。如要求提交必须填写提交信息。 
+ 
+post-commit 
+ 事务提交完毕，新的修订版被创建。 
+ 传给 hook 的参数： 
+
+-         参数 1 ，代码库路径。 
+
+-         参数 2 ，刚创建的修订版号。 
+
+hook 的返回值被忽略。 
+ 发送邮件通知，或备份代码库。 
+ 
+pre-revprop-change 
+ 修改修订版属性（如提交时提供的信息 message ）之前。 
+
+由于修订版属性一旦修改就会永久的丢失，除非安装这个事件的 hook ， subversion 的客户端不允许远程修改修订版属性。 
+ 传给 hook 的参数： 
+
+-         参数 1 ，代码库路径。 
+
+-         参数 2 ，要修改的修订版号。 
+
+-         参数 3 ，操作用户名。 
+
+-         要修改的属性。 
+
+hook 的返回值：非 0 则终止。 
+ 保存修订版属性的改变记录。 
+ 
+post-revprop-change 
+ 修订版属性值被修改之后。 
+
+如果没有安装 pre-revprop-change 的 hook ，这个事件的 hook 不会被执行。 
+ 传给 hook 的参数： 
+
+-         参数 1 ，代码库路径。 
+
+-         参数 2 ，要修改的修订版号。 
+
+-         参数 3 ，操作用户名。 
+
+-         要修改的属性。 
+
+hook 的返回值被忽略。 
+ 发送邮件通知。 
+ 
+
+hook 只有安装之后才会被执行，在 Subversion 中这一过程相当简单。只需将 hook 放在代码库目录的 hooks 子目录下即可。为了能顺利地找到它们， Subversion 规定 hook 的命名与上表的事件名同名，如 pre-commit 的 hook 名就是 pre-commit （请确保它是可执行的，在 windows 平台下需要添加对应的扩展名，如 bat 、 exe 、 com 。）。创建代码库之后， Subversion 会创建对应的这 5 个事件的 hook 模版。选取所需的模版，然后将其改名，在修改内容。这样 hook 就可以工作了，当然请先确保 hook 本身能正常的执行。 
+
+hook 的编写非常简单，通常的做法： 
+
+-         法 1 ：使用所在平台的脚本语言，如 unix 下的 shell ，或 windows/dos 的批处理命令。 
+
+-         法 2 ：使用相关的语言，如 c 。 
+
+-         法 3 ：使用脚本语言，如 python 或 perl 等实现主体。然后通过法 1 来调用。 
+
+-         法 4 ：使用相关的语言实现主体，然后通过法 1 来调用。 
+
+这里给出在 windows 下使用 bat 的例子，它实现了 pre-commit hook 主要作用是检查提交内容中是否包含说明信息，如果没有就放弃： 
+
+set REPOS=%1 
+
+set TXN=%2 
+
+set SVNLOOK="D:/Program Files/Subversion/bin/SVNLOOK.exe" 
+
+rem  此处不太严格，因为把空格也算了 
+
+FOR /F "usebackq delims==" %%i IN (`%%SVNLOOK%% log -t %TXN% %REPOS%`) DO exit 0 
+
+exit 1 
+ 
+
+由于平台的脚本系统功能毕竟有限（ unix 下的不太清楚，不过批命令就太差了），建议采用方法 2 、 3 和 4 。从简易性方面的考虑，推荐方法 3 。因为象 python 就已经提供了一些常用的功能，如发送邮件。 
+
+最后，就是 subversion 以正在存取代码库的过程的所属用户来执行 hook 。因此，请确保这个用户具有足够的权限，可以访问 hook 可以直接或间接访问的资源。 
+
+http://blog.csdn.net/deepwishly/article/details/5366757

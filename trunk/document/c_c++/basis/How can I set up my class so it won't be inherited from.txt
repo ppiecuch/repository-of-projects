@@ -1,0 +1,22 @@
+This is known as making the class "final" or "a leaf." There are three ways to do it: an easy technical approach, an even easier non-technical approach, and a slightly trickier technical approach. 
+
+The (easy) technical approach is to make the class's constructors private and to use the Named Constructor Idiom to create the objects. No one can create objects of a derived class since the base class's constructor will be inaccessible. The "named constructors" themselves could return by pointer if you want your objects allocated by new or they could return by value if you want the objects created on the stack. 
+
+The (even easier) non-technical approach is to put a big fat ugly comment next to the class definition. The comment could say, for example, // We'll fire you if you inherit from this class or even just /*final*/ class Whatever {...};. Some programmers balk at this because it is enforced by people rather than by technology, but don't knock it on face value: it is quite effective in practice. 
+
+A slightly trickier technical approach is to exploit virtual inheritance. Since the most derived class's ctor needs to directly call the virtual base class's ctor, the following guarantees that no concrete class can inherit from class Fred: 
+
+class Fred;
+
+class FredBase {
+private:
+  friend class Fred;
+  FredBase() { }
+};
+
+class Fred : private virtual FredBase {
+public:
+  ...
+};
+Class Fred can access FredBase's ctor, since Fred is a friend of FredBase, but no class derived from Fred can access FredBase's ctor, and therefore no one can create a concrete class derived from Fred. 
+If you are in extremely space-constrained environments (such as an embedded system or a handheld with limited memory, etc.), you should be aware that the above technique might add a word of memory to sizeof(Fred). That's because most compilers implement virtual inheritance by adding a pointer in objects of the derived class. This is compiler specific; your mileage may vary. 
