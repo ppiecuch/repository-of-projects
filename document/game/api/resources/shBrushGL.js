@@ -29,7 +29,10 @@
 		var functions =
 			'glAlphaFunc ' +
 			'glActiveTexture ' +
+			'glAttachShader ' +
 			'glBindBuffer ' +
+			'glBlendColor ' +
+			'glBlendFuncSeparate ' +
 			'glBufferData ' +
 			'glBufferSubData ' +
 			'glClientActiveTexture ' +
@@ -38,6 +41,7 @@
 			'glCopyTexImage2D ' +
 			'glCopyTexSubImage2D ' +
 			'glDeleteBuffers ' +
+			'glDetachShader ' +
 			'glDisable ' +
 			'glDisableClientState ' +
 			'glDrawElements ' +
@@ -65,6 +69,7 @@
 			'GL_ARRAY_BUFFER ' +
 			'GL_ARRAY_BUFFER_BINDING ' +
 			'GL_BACK ' +
+			'GL_BLEND ' +
 			'GL_CLAMP_TO_EDGE ' +
 			'GL_DST_ALPHA ' +
 			'GL_DST_COLOR ' +

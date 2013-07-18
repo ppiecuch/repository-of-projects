@@ -1,0 +1,85 @@
+一、 介绍预定义宏"__cplusplus"
+
+        一.1 __cplusplus宏在C++标准中的描述如下：
+
+16.8 Predefined macro names
+__cplusplus The name __cplusplus is defined to the value 199711L when compiling a C++ translation unit.143)
+143) It is intended that future versions of this standard will replace the value of this macro with a greater value.
+Non-conforming compilers should use a value with at most five decimal digits.
+
+                                        —— ISO C++03 p315
+                                        —— ISO C++98 p309
+
+如果一段代码是需要针对C++编写的， 可以使用该宏进行条件编译。
+
+
+        一.2 __cplusplus的值是为了表示C++的版本
+        一.3 __cplusplus的类型是"long int"
+
+
+——这是理论上的。
+现在发布的C++标准只有C++98， C++03是C++98的修订， 内容只有很少改变。
+所以在ISO C++03中， 也规定该宏的值是199711L（这是一个长整数字面值）。
+
+——实际上， 目前不应该依赖该宏的值， 因为：
+1. 目前标准中规定的值只有一个——199711L， 没有根据该值进行条件编译的可能。
+
+2. 目前C++编译器并不一定按标准实现这个宏（见测试）。
+
+
+二、 测试预定义宏__cplusplus
+
+示例1：
+#include <stdio.h>
+
+int main() {
+
+#define TO_LITERAL(text) TO_LITERAL_(text)
+#define TO_LITERAL_(text) #text
+#ifndef __cplusplus
+/* this translation unit is being treated as a C one */
+    printf("a C program\n");
+#else
+// this translation unit is being treated as a C++ one
+    printf("a C++ program\n__cplusplus expands to \""
+          TO_LITERAL(__cplusplus) "\"\n");
+#endif
+    (void)getchar();
+    return 0;
+}
+代码很简单：
+如果没有定义__cplusplus， 那么当前源代码被当作C源代码处理。
+如果定义了__cplusplus，那么当前源代码被当中C++源代码处理， 并且输出__cplusplus宏被展开后的字符串。
+
+
+示例2：
+
+__cplusplus
+这段代码更简单了， 只是使用了__cplusplus宏。
+然后查看预处理（见《查看源文件预处理结果》），看其被扩展后的结果。
+
+
+三、 测试结果
+
+        ——msvc8
+        ——msvc9
+__cplusplus按照标准被扩展为——199711L。
+
+        ——msvc6
+        ——gcc (GCC) 3.4.2 (mingw-special)
+        ——gcc (GCC) 4.2.4 (Ubuntu 4.2.4-1ubuntu3)
+__cplusplus只是简单的被扩展为——1。
+
+
+这也说明了不应该依赖__cplusplus宏的值。
+
+
+相关链接：
+
+——源代码
+http://immature.googlecode.com/svn/trunk/iMmature/sample/predefined_macro/__cplusplus
+
+——《查看源文件预处理结果》
+http://www.cppblog.com/ownwaterloo/archive/2009/04/16/get_result_of_preprocessing.html
+
+http://www.cppblog.com/ownwaterloo/archive/2009/04/20/predefined_macro___cplusplus.html

@@ -1,0 +1,284 @@
+当C Runtime函数库于20世纪70年代产生出来时，PC的内存容量还很小,多任务是个新奇观念，更别提什么多线程了。因此以当时产品为基础所演化的C Runtime函数库在多线程（multithreaded）的表现上有严重问题，无法被多线程程序使用。
+利用各种同步机制（synchronous mechanism）如critical section、mutex、semaphore、event，可以重新开发一套支持多线程的runtime函数库。问题是，加上这样的能力，可能导致程序代码大小和执行效率都遭受不良波及──即使你只激活了一个线程。
+Visual C++ 的折衷方案是提供两种版本的C Runtime函数库。一种版本给单线程程序使用，一种版本给多线程程序使用。多线程版本的重大改变是：第一，变量如errno现在变成每个线程各拥有一个。第二，多线程版中的数据结构以同步机制加以保护。
+
+Visual C++ 一共有六个C Runtime函数库产品供你选择：
+
+◆   Single-Threaded（static）            libc.lib             898,826
+
+◆   Multithreaded（static）              libcmt.lib           951,142
+
+◆   Multithreaded DLL                    msvcrt.lib           5,510,000
+
+◆   Debug Single-Threaded（static）      libcd.lib            2,374,542
+
+◆   Debug Multithreaded（static）        libcmtd.lib          2,949,190
+
+◆   Debug Multithreaded DLL              msvcrtd.lib          803,418
+
+Visual C++ 编译器提供下列选项，让我们决定使用哪一个C Runtime函数库：
+
+◆   /ML          Single-Threaded（static）
+
+◆   /MT          Multithreaded（static）
+
+◆   /MD          Multithreaded DLL（dynamic import library）
+
+◆   /MLd         Debug Single-Threaded（static）
+
+◆   /MTd         Debug Multithreaded（static）
+
+◆   /MDd         Debug Multithreaded DLL（dynamic import library）
+
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/chuajiang/archive/2007/06/21/1660475.aspx
+
+ 
+
+
+MSVC CRT
+MSVC CRT是微软发布的c运行时，一直伴随着不同版本的Visual C++发布的MSVC CRT（Microsoft Visual C++ C Runtime）倒看过去更加有序一些。从1992年最初的Visual C++ 1.0版开始，一直到现在的Visual C++ 9.0（又叫做Visual C++ 2008），MSVC CRT也从1.0版发展到了9.0版。
+
+同一个版本的MSVC CRT根据不同的属性提供了多种子版本，以供不同需求的开发者使用。按照静态/动态链接，可以分为静态版和动态版；按照单线程/多线程，可以分为单线程版和多线程版；按照调试/发布，可分为调试版和发布版；按照是否支持C++分为纯C运行库版和支持C++版；按照是否支持托管代码分为支持本地代码/托管代码和纯托管代码版。这些属性很多时候是相互正交的，也就是说它们之间可以相互组合。比如可以有静态单线程纯C纯本地代码调试版；也可以有动态的多线程纯C纯本地代码发布版等。但有些组合是没有的，比如动态链接版本的CRT是没有单线程的，所有的动态链接CRT都是多线程安全的。
+
+这样的不同组合将会出现非常多的子版本，于是微软提供了一套运行库的命名方法。这个命名方法是这样的，静态版和动态版完全不同。静态版的CRT位于MSVC安装目录下的lib/，比如Visual C++ 2008的静态库路径为“Program Files/Microsoft Visual Studio 9.0/VC/lib”，它们的命名规则为：
+
+libc [p] [mt] [d] .lib
+
+l           p 表示 C Plusplus，即C++标准库。
+
+l           mt表示 Multi-Thread，即表示支持多线程。
+
+l           d 表示 Debug，即表示调试版本。
+
+比如静态的非C++的多线程版CRT的文件名为libcmtd.lib。动态版的CRT的每个版本一般有两个相对应的文件，一个用于链接的.lib文件，一个用于运行时用的.dll动态链接库。它们的命名方式与静态版的CRT非常类似，稍微有所不同的是，CRT的动态链接库DLL文件名中会包含版本号。比如Visual C++ 2005的多线程、动态链接版的DLL文件名为msvcr90.dll（Visual C++ 2005的内部版本号为8.0）。表11-1列举了一些最常见的MSVC CRT版本（以Visual C++ 2005为例）。
+
+表11-1
+
+ 
+
+文件名
+ 相关的DLL
+ 属性
+ 编译器选项
+ 预编译宏
+ 
+libcmt.lib
+ 无
+ 多线程，静态链接
+ /MT
+ _MT
+ 
+msvcrt.lib
+ msvcr80.dll
+ 多线程，动态链接
+ /MD
+ _MT, _DLL
+ 
+libcmtd.lib
+ 无
+ 多线程，静态链接，调试
+ /MTd
+ _DEBUG, _MT
+ 
+msvcrtd.lib
+ msvcr90d.dll
+ 多线程，动态链接，调试
+ /MDd
+ _DEBUG, _MT, _DLL
+ 
+msvcmrt.lib
+ msvcm90.dll
+ 托管/本地混合代码
+ /clr
+  
+ 
+msvcurt.lib
+ msvcm90.dll
+ 纯托管代码
+ /clr:pure
+  
+ 
+
+
+ 
+
+自从Visual C++ 2005（MSVC 8.0）以后，MSVC不再提供静态链接单线程版的运行库（LIBC.lib、LIBCD.lib），因为据微软声称，经过改进后的新的多线程版的C运行库在单线程的模式下运行速度已经接近单线程版的运行库，于是没有必要再额外提供一个只支持单线程的CRT版本。
+
+默认情况下，如果在编译链接时不指定链接哪个CRT，编译器会默认选择LIBCMT.LIB，即静态多线程CRT，Visual C++ 2005之前的版本会选择LIBC.LIB，即静态单线程版本。关于CRT的多线程和单线程的问题，我们在后面的章节还会再深入分析。
+
+除了使用编译命令行的选项之外，在Visual C++工程属性中也可以设置相关选项。如图11-9所示。
+
+
+
+ 
+
+ 
+
+图11-9  Visual C++ 2003 .NET工程属性的截图
+
+我们可以从图11-9中看到，除了多线程库以外，还有单线程静态/ML、单线程静态调试/MLd的选项。
+
+C++ CRT
+表11-1中的所有CRT都是指C语言的标准库，MSVC还提供了相应的C++标准库。如果你的程序是使用C++编写的，那么就需要额外链接相应的C++标准库。这里“额外”的意思是，如表11-2所列的C++标准库里面包含的仅仅是C++的内容，比如iostream、string、map等，不包含C的标准库。
+
+
+表11-2
+
+文件名
+ 相应DLL
+ 属性
+ 编译选项 
+ 宏定义
+ 
+LIBCPMT.LIB 
+ 无
+ 多线程，静态链接 
+ /MT 
+ _MT 
+ 
+MSVCPRT.LIB 
+ MSVCP90.dll
+ 多线程，动态链接
+ /MD 
+ _MT, _DLL 
+ 
+LIBCPMTD.LIB 
+ 无
+ 多线程，静态链接，调试
+ /MTd 
+ _DEBUG, _MT 
+ 
+MSVCPRTD.LIB 
+ MSVCP90D.dll
+ 多线程，动态链接，调试
+ /MDd 
+ _DEBUG, _MT, _DLL 
+ 
+
+
+ 
+当你在程序里包含了某个C++标准库的头文件时，MSVC编译器就认为该源代码文件是一个C++源代码程序，它会在编译时根据编译选项，在目标文件的“.drectve”段（还记得第2章中的DIRECTIVE吧？）相应的C++标准库链接信息。比如我们用C++写一个“Hello World”程序：
+
+
+// hello.cpp
+
+#include <iostream>
+
+int main()
+
+{
+
+    std::cout << "Hello world" << std::endl;
+
+    return 0;
+
+}
+
+然后将它编译成目标文件，并查看它的“.drectve”段的信息：
+
+cl /c hello.cpp
+
+dumpbin /DIRECTIVES hello.obj
+
+Microsoft (R) COFF/PE Dumper Version 9.00.21022.08
+
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+Dump of file msvcprt.obj
+
+File Type: COFF OBJECT
+
+   Linker Directives
+
+   -----------------
+
+   /DEFAULTLIB:"libcpmt"
+
+   /DEFAULTLIB:"LIBCMT"
+
+   /DEFAULTLIB:"OLDNAMES"
+
+cl /c /MDd hello.cpp
+
+dumpbin /DIRECTIVES hello.obj
+
+Microsoft (R) COFF/PE Dumper Version 9.00.21022.08
+
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+Dump of file msvcprt.obj
+
+File Type: COFF OBJECT
+
+   Linker Directives
+
+   -----------------
+
+   /manifestdependency:"type='win32'
+
+   name='Microsoft.VC90.DebugCRT'
+
+   version='9.0.21022.8'
+
+   processorArchitecture='x86'
+
+   publicKeyToken='1fc8b3b9a1e18e3b'"
+
+   /DEFAULTLIB:"msvcprtd"
+
+   /manifestdependency:"type='win32'
+
+   name='Microsoft.VC90.DebugCRT'
+
+   version='9.0.21022.8'
+
+   processorArchitecture='x86'
+
+   publicKeyToken='1fc8b3b9a1e18e3b'"
+
+   /DEFAULTLIB:"MSVCRTD"
+
+   /DEFAULTLIB:"OLDNAMES"
+
+可以看到，hello.obj须要链接libcpmt.lib、LIBCMT.lib和OLDNAMES.lib。当我们使用“/MDd”参数编译时，hello.obj就需要msvcprtd.lib、MSVCRTD.lib和OLDNAMES.lib，除此之外，编译器还给链接器传递了“/manifestdependency”参数，即manifest信息。
+
+Q&A
+
+Q：如果一个程序里面的不同obj文件或DLL文件使用了不同的CRT，会不会有问题？
+
+A：这个问题实际上分很多种情况。如果程序没有用到DLL，完全静态链接，不同的obj在编译时用到了不同版本的静态CRT。由于目前静态链接CRT只有多线程版，并且如果所有的目标文件都统一使用调试版或发布版，那么这种情况下一般是不会有问题的。因为我们知道，目标文件对静态库引用只是在目标文件的符号表中保留一个记号，并不进行实际的链接，也没有静态库的版本信息。
+
+       但是，如果程序涉及动态链接CRT，这就比较复杂了。因为不同的目标文件如果依赖于不同版本的msvcrt.lib和msvcrt.dll，甚至有些目标文件是依赖于静态CRT，而有些目标文件依赖于动态CRT，那么很有可能出现的问题就是无法通过链接。链接器对这种情况的具体反应依赖于输入目标文件的顺序，有些情况下它会报符号重复定义错误：
+
+       MSVCRTD.lib(MSVCR80D.dll) : error LNK2005: _printf already defined in LIBCMTD.lib (printf.obj)
+
+       但是有些情况下，它会使链接顺利通过，只是给出一个警告：
+
+       LINK : warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs; use /NODEFAULTLIB:library
+
+       如果碰到上面这种静态/动态CRT混合的情况，我们可以使用链接器的/NODEFAULTLIB来禁止某个或某些版本的CRT，这样一般就能使链接顺利进行。
+
+       最麻烦的情况应该属于一个程序所依赖的DLL分别使用不同的CRT，这会导致程序在运行时同时有多份CRT的副本。在一般情况下，这个程序应该能正常运行，但是值得注意的是，你不能够在这些DLL之间相互传递使用一些资源。比如两个DLL A和B分别使用不同的CRT，那么应该注意以下问题：
+
+     l     不能在A中申请内存然后在B中释放，因为它们分属于不同的CRT，即拥有不同的堆，这包括C++里面所有对象的申请和释放；
+
+     l     在A中打开的文件不能在B中使用，比如FILE*之类的，因为它们依赖于CRT的文件操作部分。
+
+       还有类似的问题，比如不能相互共享locale等。如果不违反上述规则，可能会使程序发生莫名其妙的错误并且很难发现。
+
+       防止出现上述问题的最好方法就是保证一个工程里面所有的目标文件和DLL都使用同一个版本的CRT。当然有时候事实并不能尽如人意，比如很多时候当我们要用到第三方提供的.lib或DLL文件而对方又不提供源代码时，就会比较难办。
+
+       Windows系统的system32目录下有个叫msvcrt.dll的文件，它跟msvcr90.dll这样的DLL有什么区别？
+
+Q：为什么我用Visual C++ 2005/2008编译的程序无法在别人的机器上运行？
+
+A：因为Visual C++ 2005/2008编译的程序使用了manifest机制，这些程序必须依赖于相对应版本的运行库。一个解决的方法就是使用静态链接，这样就不需要依赖于CRT的DLL。另外一个解决的方法就是将相应版本的运行库与程序一起发布给最终用户。
+
+ 
+
+本文来自CSDN博客，转载请标明出处：http://blog.csdn.net/hpghy123456/archive/2010/05/22/5616030.aspx
+
+连接（这篇文章非常好）：http://blog.csdn.net/hpghy123456/archive/2010/05/22/5616030.aspx
+
+http://blog.csdn.net/wzsbll/article/details/6338907

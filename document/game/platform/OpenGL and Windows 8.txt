@@ -1,0 +1,71 @@
+09-16-2011, 01:52 PM #1
+bugmenot  
+Junior Member
+Newbie
+Join Date
+Aug 2008
+Posts
+14
+OpenGL and Windows 8
+In case anyone was wondering:
+OpenGL on Windows 8 x86/x64: Yes
+OpenGL ES on Windows 8 ARM: No
+
+Microsoft is only allowing certain approved APIs for apps that want to run in Windows 8 ARM. While all the hardware will certainly be OpenGL ES 2.0 capable, Microsoft has and probably won't be exposing an EGL API. 
+
+Of course if you want to use Direct3D 11.1 (well with feature levels more like 9.3 since that's what the hardware is capable of) you can go right ahead.
+09-16-2011, 04:16 PM #2
+mhagain  
+Advanced Member
+Frequent Contributor
+Join Date
+Jan 2007
+Posts
+993
+Re: OpenGL and Windows 8
+They said the same about Vista at the start and it turned out quite different. There isn't even a ship date for Windows 8 yet; it's far too early for any of this kind of speculation.
+09-16-2011, 04:37 PM #3
+Alfonse Reinheart  
+Senior Member
+OpenGL Guru
+Join Date
+May 2009
+Posts
+4,793
+Re: OpenGL and Windows 8
+They said the same about Vista at the start and it turned out quite different.
+There's a rather big difference between "another version of Windows," and "Windows on a completely different processor and runtime."
+
+Microsoft wants to get rid of much of Win32, and they certainly have the chance to do so with Win8-for-ARM. After all, you don't have to care about backwards compatibility, since everyone's going to have to recompile (and likely recode) their apps for ARM anyway. So Microsoft has the chance to, for the first time ever, actually take stuff away from their APIs.
+
+WinRT is what Microsoft wants people using on ARM platforms. And I don't see any OpenGL context creation stuff in WinRT.
+
+In any case, Bugmenot is correct: Microsoft will not write EGL for WinRT, nor will they write any other way to create OpenGL ES contexts. Now, someone else may well write this, using D3D "11.1" as the backend. It's possible that IHVs may expose ES though some kind of side API, backdooring Microsoft entirely.
+
+But unless these things happen, you're not using GL ES on Win8-for-ARM.
+The Unofficial OpenGL SDK
+OpenGL Loader Generator, for making OpenGL loaders
+Learning Modern 3D Graphics Programming Through OpenGL
+09-16-2011, 05:31 PM #4
+bugmenot  
+Junior Member
+Newbie
+Join Date
+Aug 2008
+Posts
+14
+Re: OpenGL and Windows 8
+ Originally Posted by mhagain
+They said the same about Vista at the start and it turned out quite different. There isn't even a ship date for Windows 8 yet; it's far too early for any of this kind of speculation.
+Not really, they've already published the subset of Win32 API's available for Metro Apps:
+http://msdn.microsoft.com/en-us/libr.../apps/br205757
+WGL nor EGL is no where to be found.
+
+It really isn't all that surprising. Where is OpenGL ES on Windows Phone? All Win Phone hardware use a Qualcomm Soc that certainly has GL ES 2.0 capability. Yet GL ES is no where to be found.
+
+Microsoft has severely limited the amount of legacy APIs available to Metro apps (and by extension Windows 8 ARM). Hell, Microsoft even killed their own XNA framework in Metro which has pissed tons of their own fanbase off. I would guess they'll bring a WinRT version of XNA to market much sooner than any EGL implementation.
+
+It's not like you can run AutoCad, Photoshop or any other professional OpenGL accelerated windows app in Windows 8 ARM anyways, so what exactly is the business case? To help people make cross platform games? Unlikely.
+
+
+http://www.opengl.org/discussion_boards/showthread.php/175628-OpenGL-and-Windows-8

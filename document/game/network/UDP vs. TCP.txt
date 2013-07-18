@@ -1,0 +1,1573 @@
+Introduction
+
+Hi, I’m Glenn Fiedler and welcome to the first article in my online book Networking for Game Programmers
+
+In this article we start with the most basic aspect of network programming, sending and receiving data over the network. This is just the beginning – the simplest and most basic part of what network programmers do, but still it is quite intricate and non-obvious as to what the best course of action is. Take care because if you get this part wrong it will have terrible effects on your multiplayer game!
+
+You have most likely heard of sockets, and are probably aware that there are two main types: TCP and UDP. When writing a network game, we first need to choose what type of socket to use. Do we use TCP sockets, UDP sockets or a mixture of both?
+
+The choice you make depends entirely on what sort of game you want to network. So from this point on, and for the rest of this article series, I’m going to assume you want to network an action game. You know games like Halo, Battlefield 1942, Quake, Unreal, CounterStrke, Team Fortress and so on.
+
+In light of the fact that we want to network an action game, we’ll take a very close look at the properties of each type of socket, and dig a bit into how the internet actually works. Once we have all this information, the correct choice becomes very clear!
+
+TCP/IP
+
+TCP stands for “transmission control protocol” and IP stands for “internet protocol”. Together they form the backbone for almost everything you do online, from web browsing to IRC to email, its all built on top of TCP/IP.
+
+If you have ever used a TCP socket, then you’ll know that it is a reliable connection based protocol. This simply means that you make a connection between two machines, then you send data between the two computers much like you are writing to a file on one side, and reading from a file on the other.
+
+This connection is reliable and ordered, meaning that all data you send is guaranteed to arrive at the other side in the same order that you wrote it. Its also a stream of data, meaning that TCP takes care of splitting up your data into packets and sending those across the network for you.
+
+Again, remember its just like writing to a file. So simple!
+
+IP
+
+The simplicity is in stark contrast to what actually goes on at the lower level “IP” protocol underneath TCP.
+
+Here there is no concept of connection, instead packets are passed from one computer to the next. You can visualize this process like a hand-written note being passed from one person to the next across a crowded room, eventually reaching the person it is addressed to, but only after passing through many hands.
+
+There is no guarantee that this note will actually reach the person it is addressed to. The sender just passes the note along and hopes for the best, never knowing whether or not the note was received, unless the other person decides to write back!
+
+Of course, it is in reality a little bit more complicated than this, since of course no one computer knows the exact sequence of computers to pass the packet along to so that it reaches its destination quickly. Sometimes “IP” passes along multiple copies of the same packet, these packets make their way to the destination via different paths, so will most likely arrive at different times.
+
+This is because the internet is designed to be self-organizing and self-repairing, able to route around connectivity problems. It’s actually quite cool if you think about what it is really going on at the low level. You can read all about this in the classic book TCP/IP Illustrated.
+
+UDP
+
+Instead of treating communications between computers like writing to files, what if we want to send and receive packets directly?
+
+We can do this using UDP. UDP stands for “user datagram protocol” and it is another protocol built on top of IP, just like TCP, but this time instead of adding lots of features and complexity it is just a very thin layer over IP.
+
+With UDP we can send a packet to a destination IP address (eg. 112.140.20.10) and port (say 52423), and it will get passed from computer to computer until it arrives at the destination computer or is lost along the way.
+
+On the receiver side, we just sit there listening on a specific port (eg. 52423) and when a packet arrives from any computer (remember there are no connections!), we get notified of the address and port of the computer that sent the packet, the size of the packet, and can read the packet data.
+
+UDP is an unreliable protocol. In practice, most packets that are sent will get through, but you’ll usually have around 1-5% packet loss, and occasionally you’ll get periods where no packets get through at all (remember that there are lots of computers between you and your destination where things can go wrong…)
+
+There is also no guarantee of ordering of packets. You could send 5 packets in order 1,2,3,4,5 and they could arrive completely out of order like 3,1,2,5,4. In practice, they will actually arrive in order almost all of the time, but again, you cannot rely on this!
+
+Finally, although UDP doesn’t do much on top of IP, it does make one guarantee for you. If you send a packet, it will either arrive in whole at the destination, or not arrive at all. So if you send a 256 byte packet to another computer, that computer cannot receive just the first 100 bytes of the packet, it must get the full 256 bytes of data. This is pretty much the only guarantee you get with UDP, everything else is up to you!
+
+TCP vs. UDP
+
+We have a decision to make here, do we use TCP sockets or UDP sockets?
+
+Lets look at the properties of each:
+
+TCP:
+
+    Connection based
+    Guaranteed reliable and ordered
+    Automatically breaks up your data into packets for you
+    Makes sure it doesn’t send data too fast for the internet connection to handle (flow control)
+    Easy to use, you just read and write data like its a file
+
+UDP:
+
+    No concept of connection, you have to code this yourself
+    No guarantee of reliability or ordering of packets, they may arrive out of order, be duplicated, or not arrive at all!
+    You have to manually break your data up into packets and send them
+    You have to make sure you don’t send data too fast for your internet connection to handle
+    If a packet is lost, you need to devise some way to detect this, and resend that data if necessary
+
+The decision seems pretty clear then, TCP does everything we want and its super easy to use, while UDP is a huge pain in the ass and we have to code everything ourselves from scratch. So obviously we just use TCP right?
+
+Wrong.
+
+Using TCP is the worst possible mistake you can make when developing a networked game! To understand why, you need to see what TCP is actually doing above IP to make everything look so simple!
+
+How TCP really works
+
+TCP and UDP are both built on top of IP, but they are radically different. UDP behaves very much like the IP protocol underneath it, while TCP abstracts everything so it looks like you are reading and writing to a file, hiding all complexities of packets and unreliability from you.
+
+So how does it do this?
+
+Firstly, TCP is a stream protocol, so you just write bytes to a stream, and TCP makes sure that they get across to the other side. Since IP is built on packets, and TCP is built on top of IP, TCP must therefore break your stream of data up into packets. So, some internal TCP code queues up the data you send, then when enough data is pending the queue, it sends a packet to the other machine.
+
+This can be a problem for multiplayer games if you are sending very small packets. What can happen here is that TCP may decide that its not going to send data until you have buffered up enough data to make a reasonably sized packet (say more than 100 bytes or so). This is a problem because you want your client player input to get to the server as quickly as possible, if it is delayed or “clumped up” like TCP can do with small packets, the client’s user experience of the multiplayer game will be very poor. Game network updates will arrive late and infrequently, instead of on-time and frequently like we want.
+
+TCP has an option you can set that fixes this behavior called “TCP_NODELAY”. This option instructs TCP not to wait around until enough data is queued up, but to send whatever data you write to it immediately.
+
+Unfortunately, even if you set this option TCP still has serious problems for multiplayer games.
+
+It all stems from how TCP handles lost and out of order packets, to present you with the “illusion” of a reliable, ordered stream of data.
+
+How TCP implements reliability
+
+Fundamentally TCP breaks down a stream of data into packets, sends these packets over unreliable IP, then takes the packets received on the other side and reconstructs the stream.
+
+But what happens when a packet is lost? What happens when packets arrive out of order or are duplicated?
+
+Without going too much into the details of how TCP works because its super-complicated (please refer to TCP/IP Illustrated) in essence TCP sends out a packet, detects when that packet was lost, then resends that lost packet to the other machine. Duplicate packets are discarded on the receiver side, and out of order packets are resequenced so everything is reliable and in order.
+
+The problem is that if we were to attempt to synchronize this using TCP, whenever a packet is dropped it has to stop and wait for that data to be resent. Yes, even if more recent data arrives, that new data gets put in a queue, and you cannot access it until you receive the lost packet. How long does it take to resend the packet? Well, it is going to take at least round trip latency for TCP to work out that data needs to be resent, and another one way trip from the sender to the receiver for the resent packet to get there. So if you have a 125ms ping, you will be waiting roughly 1/5th of a second for the packet data to be resent at best, and in worst case conditions you could be waiting up to half a second or more (consider what happens if the attempt to resend the packet fails to get through?) Fun times!
+
+Why you should never use TCP to network a multiplayer game
+
+The problem with using TCP for games is that unlike web browsers, or email or most other applications, multiplayer games have a real time requirement on packet delivery. For many parts of your game, for example player input and character positions, it really doesn’t matter what happened a second ago, you only care about the most recent data.
+
+Consider a very simple example of a multiplayer game, some sort of action game like a shooter. You want to network this in a very simple way. Every frame you send the input from the client to the server (eg. keypresses, mouse input controller input), and each frame the server processes the input from each player, updates the simulation, then sends the current position of game objects back to the client for rendering.
+
+So in our simple multiplayer game, whenever a packet is lost, everything has to stop and wait for that packet to be resent. On the client game objects stop receiving updates so they appear to be standing still, and on the server input stops getting through from the client, so the players cannot move or shoot. When the resent packet finally arrives, you receive this stale, out of date information that you don’t even care about! Plus, there are packets backed up in queue waiting for the resend which arrive at same time, so you have to process all of these packets in one frame. Everything is clumped up!
+
+Unfortunately, there is nothing you can do to fix this behavior with TCP, nor would you want to, it is just the fundamental nature of it! This is just what it takes to make the unreliable, packet-based internet look like a reliable-ordered stream.
+
+We don’t want a reliable ordered stream.
+
+We want our data to get as quickly as possible from client to server without ever having to wait for lost data to be resent.
+
+This is why you never use TCP for networking a multiplayer game.
+
+Wait? Why can’t I use both UDP and TCP?
+
+For realtime game data like player input and state, only the most recent data is relevant, but for other types of data, say perhaps a sequence of commands sent from one machine to another, reliability and ordering can be very important.
+
+The temptation then is to use UDP for player input and state, and TCP for the reliable ordered data. If you’re sharp you’ve probably even worked out that you may have multiple “streams” of reliable ordered commands, maybe one about level loading, and another about AI. Perhaps you think to yourself, “Well, I’d really not want AI commands to stall out if a packet is lost containing a level loading command – they are completely unrelated!”. You are right, so you may be tempted to create one TCP socket for each stream of commands.
+
+On the surface, this seems like a great idea. The problem is that since TCP and UDP are both built on top of IP, the underlying packets sent by each protocol will affect each other. Exactly how they affect each other is quite complicated and relates to how TCP performs reliability and flow control, but fundamentally you should remember that TCP tends to induce packet loss in UDP packets. For more information, read this paper on the subject.
+
+Conclusion
+
+My recommendation then is not only that you use UDP, but that you only use UDP. Don’t mix TCP and UDP, instead learn how to implement the specific pieces of TCP that you wish to use inside your own custom UDP based protocol.
+
+The rest of the articles in this series show you how to do this, from creating your own virtual connection based protocol on top of UDP, to creating your own reliability and flow control.
+
+
+Next: Sending And Receiving Packets
+
+
+
+
+If you enjoyed this article please donate.
+
+Donations offset hosting costs and encourage me to write more articles!
+Related posts:
+
+    Reliability and Flow Control
+    Networking
+    Virtual Connection over UDP
+    Sending and Receiving Packets
+    Networked Physics
+
+{ 164 comments… read them below or add one }
+
+anonymous October 14, 2008 at 1:11 am
+
+    Conclusion:
+
+    That’s why all major MMORPG uses TCP…
+
+    Did you ever develop a real time online game? If so, you’ll see that the TCP is good enough to make one and UDP will not add better performances compared to the time you need to rewrite a good protocol on UDP.
+
+    Reply
+
+    Anonymous June 27, 2009 at 9:47 am
+
+        Um, you’re an idiot.
+
+        Reply
+
+        thebest August 5, 2010 at 8:23 pm
+
+            Do you even understand what he is saying? This guide is pretty fucking stupid, as are you for following it word for word. TCP is great, and unless you’re writing an FPS, it performs perfectly fine. My question is how low your IQ would have to be to listen to this guy when he says “Even with Nagle’s algorithm disabled, TCP still does bad fuck TCP” (paraphrased)? How does it do bad?
+
+            Reply
+
+            admin August 6, 2010 at 3:16 pm
+
+                Turning Nagle’s algorithm off with TCP_NODELAY does not stop TCP waiting for lost packets to be resent – it just turns off the code that coalesces small packets into one large packet on the send side.
+
+                http://en.wikipedia.org/wiki/Nagle's_algorithm
+
+                When a packet is lost TCP must wait for that packet to be resent. While waiting any other (out of order) packets received are held hostage in a queue so that the data transmission looks like a reliable ordered stream. If this behavior is undesirable, then UDP is a good choice.
+
+                Reply
+            MC February 8, 2012 at 5:25 am
+
+                How low does your IQ need to be to ask that question?
+
+                Reply
+            Richard November 16, 2012 at 5:33 pm
+
+                it may WORK but it is a waste
+
+                you’re adding unnecessary crap to your packets with TCP just because you’re too lazy to implement exception handling and error checking
+
+                UDP is basically do what you want, when you use TCP, all you are doing is adding an extra layer of software, it is therefore obvious really that since this is a game and not a fileserver, you should be using UDP.
+
+                How any of you actually think there is a debate in this matter and this article is doing anything other than stating the flat out obvious, is pretty silly…….. HOWEVER… TCP may be treated as trusted by a firewall when UDP is not (filesharing)… this is why, and only why you might choose TCP in environments where latency is less of an issue (not FPS games).
+
+                I note runescape uses TCP and our warehouse staff are always playing the bloody game. That’s a perfect example, no doubt the creators want it to work anywhere ANYONE can get the internet.
+
+                Reply
+
+    Anonymous August 20, 2012 at 10:40 pm
+
+        You’re conflating the latency increase present in TCP with the time required to re-engineer certain custom TCP functionality on top of UDP. While every good coder should consider whether the time they’re spending on a feature is worth it, the two are not fundamentally inter-related. If TCP is making an FPS run choppy, and bare-bones UDP isn’t sufficiently stable, then it’s not just desirable but necessary to implement your own version.
+
+        Reply
+
+        Glenn Fiedler August 21, 2012 at 1:18 am
+
+            We have a winner
+
+            Reply
+
+    Brian November 6, 2012 at 12:25 am
+
+        Anonymous – I will ask you – what MMO do you work on that is using TCP?
+
+        I can tell you I know of an example of the biggest MMO failure in history: Anarchy Online. Anarchy Online struggled for 2 years to fix lag issues, that were so extreme, players could not even play the game. The issues came down to two parts:
+        1. AO used exclusively TCP
+        2. AO had a client side memory leak
+
+        The memory leak was fixed over a series of patches the first 6 months, but the latency become serverside. While the client started behaving better, the dev team on AO just couldn’t resolve it. It took members of the community who were part of other MMO’s, who liked AO’s concept, to look in and tell them what’s going on…
+
+        The use of TCP – the turnaround on packets was too long. Pretty much everything this poster said in blog here was spot on the problem with Anarchy Online from launch to launch + 1 year. My understanding (and I could be wrong) is that the yresolved the issue by gutting TCP and goign strictly to a UDP model.
+
+        Reply
+
+        modiX March 5, 2013 at 10:31 am
+
+            Brian, same problem made Mabinogi …
+            wise words
+
+            Reply
+        arrowdodger March 11, 2013 at 4:17 pm
+
+            Lineage II uses TCP even today.
+
+            Reply
+
+            Glenn Fiedler March 11, 2013 at 6:33 pm
+
+                In Japan/Korea you can use whatever you want because their internet is like one big LAN party
+
+                Reply
+
+        Robert June 2, 2013 at 3:52 pm
+
+            I may be late to the party here, but you do realize that AO is still up and running and it did so for 12 years. I think it’s safe to say that this game is hardly a failure at all and calling it the “biggest MMO failure in history” is pretty dumb, regardless of it’s starting issues.
+
+            Reply
+
+Glenn Fiedler October 14, 2008 at 8:31 am
+
+    Anon:
+
+    UDP is standard technique for action games. All FPS and action games use UDP. Its such standard practice that UDP vs. TCP is always the first question I ask in a network programmer interview :)
+
+    Not convinced? Ok fine, lets look at the games that use UDP then: tribes, quake, unreal, starwars battlefront, battlefield 1942, halo, gears of war, team fortress 2, COD4… yes, pretty much all of the top-tier action game use UDP.
+
+    Now, regarding MMOs i have heard some of them use TCP fine and get away with it. But remember that MMOs don’t have the same characteristics as an online action game. I’ve not worked on an MMO, but I’d guess in this case they would have lower frequency updates based around a reliable-ordered stream of commands, whereas action games are based around high frequency updates of most recent state.
+
+    Given that this article series is about networking action games and not about networking MMOs, I think we can all move forward in the knowledge that UDP is the right way to go, in context
+
+    cheers
+
+    Reply
+
+    jack April 12, 2010 at 5:19 pm
+
+        if you have something such as a attack command (user fires a shot, swings their sword, etc), do you implement some kind of lossless UDP? Or, is their perhaps another model?
+
+        Reply
+
+        Glenn Fiedler April 12, 2010 at 11:11 pm
+
+            these things map well to reliable events. basically keep sending the event at some desired rate (more frequently = more time critcial info) until you receive an ACK for one of the packets which the event was sent in.
+
+            read the article or reliability and flow control later on in the series for more info about how to setup an ACK system over UDP
+
+            cheers
+
+            Reply
+
+    MrShankly November 8, 2011 at 11:00 am
+
+        Ha, you have a lot more patience than I have, Anyway thanks for the awesome article, im looking to do my honours game project using networking between mobile devices and this could come in really helpful!
+
+        Reply
+
+        Glenn Fiedler November 8, 2011 at 4:13 pm
+
+            Good luck!
+
+            Reply
+
+    g4b October 25, 2012 at 2:33 pm
+
+        I think you pretty much described it best already, what the difference is, and coming from the MMO/RTS perspective, udp is quite understandable as fast alternative for FPS, but you have to consider how many connections you will handle – in the end, a good async solution will spend less time in network and handle lags better in tcp, than in udp, and e.g. for deterministic simulations like RTS you would have to reimplement tcp in udp anyway if it gets too big and complicated.
+
+        Therefore, i think the only failure the article has, is your strongly expressed opinion, down to the fact, you see that as a question asked at interviews. You will discover anyway, that opinions, while certainly being valid, sometimes lead to generalization.
+
+        This upsets the readers, who do not share the opinion. And quite frankly, neither do I completely, but mostly.
+        SC2 e.g. uses tcp pretty well for action based stuff too. it depends entirely on the needs of the network layer for a specific simulation, and a good packet system will be usable in both.
+
+        Still, big thanks for these articles, I consider them very useful, especially since you cover the basics.
+
+        Reply
+
+        Glenn Fiedler October 31, 2012 at 3:01 am
+
+            Arguably, for an RTS as well, I can make a strong case that UDP is better. Complexity of your own reliability over UDP is solvable given a talented engineer and some time. The end result is all that counts: which is, how well you are able to handle packet loss over latency before your game becomes unplayable. With RTS games this means you can send via redundancy and reduce latency do to resends added by TCP.
+
+            cheers
+
+            Reply
+
+Matt.J October 30, 2008 at 2:24 am
+
+    @Glenn:
+
+    Well laid out article, as most of yours seem to be.
+
+    I suggest you remind people that using a client’s IP address is not a reliable token to base a session on.
+
+    I mention this due to I’ve seen it overlooked many times before, resulting in a myriad of possible exploits due to the relative ease of session hijacking.
+
+    @Anon:
+
+    Because it’s totally implausible that those developers most likely don’t have the resources/time/know-how to develop a custom transport protocol; right? Lets not disregard the fact a good percentage of programmers are just afraid of the unknown, for whatever reason and would prefer to just stick to standards like sheep due to their own ineptitude.
+
+    Reply
+
+    Anonymous August 8, 2011 at 11:21 pm
+
+        I wouldn’t say its due to their own ineptitude, but rather due to time constraints. I often want to try something new, but it takes time to implement something you’re unfamiliar with, and you’ll likely bang your head against a few walls doing so. Worst case, you could introduce a bug somewhere that could take hours to track down.
+
+        Reply
+
+Glenn Fiedler October 30, 2008 at 8:25 am
+
+    yes absolutely i should add a small note about security and NAT, the idea would be to use a session id and a packet hash based on some secure crypto
+
+    this also helps with NAT because some routers like to dynamically reassign port on the fly for some reason, i’ve heard
+
+    cheers
+
+    Reply
+Liam October 30, 2008 at 9:53 am
+
+    “That’s why all major MMORPG uses TCP…”
+    My understanding of why MMORPG etc use TCP over UDP (this is from reading blogs of network programmers from these types of games) is that data is more important than anything else where as in a fast paced game (FPS for example) the most recent data snapshot is most important.
+
+    Reply
+nenene November 2, 2008 at 4:29 am
+
+    “That’s why all major MMORPG uses TCP…”
+
+    How many fast-action, no-mouse-click-based MMORPGs use TCP?
+
+    For a point n’ click MMORPG it’s great to use TCP, plus, you can always see people complaining about lag on the global chat ;)
+
+    Reply
+
+    Anonymous September 20, 2011 at 4:29 pm
+
+        World of Warcraft uses TCP.
+
+        Oh, that’s only the largest MMO in existance. Ooops?
+
+        Reply
+
+        Glenn Fiedler September 27, 2011 at 5:53 am
+
+            And?
+
+            Reply
+        Vly June 20, 2012 at 4:31 am
+
+            Actually. A lot of popular games use TCP. And you know what happens? The players hate the lag. Then comes mods. Mods save the day for TCP games. Guess what. Leatrix Latency wasn’t made for WoW for no reason.
+
+            Reply
+
+            HonoredMule April 25, 2013 at 7:23 am
+
+                As a Guild Wars and Guild Wars 2 (WvW) player, I would very eagerly anticipate any new PvP-focused MMO that hired plenty of programming talent with extensive experience producing FPS games (concerning the rendering/input engines as well as the network protocols). ANet spent five years making their game, and the underlying gameplay mechanics are great but the practical experience is embarrassingly riddled with game-breaking horrors, especially regarding both network responsiveness /and connection reliability/.
+
+                Most of the disappointing results are clearly either design decisions (like fundamentally flawed world-colliding camera mechanics, camera easing, and other input delaying “features”) or design/architectural consequences (like choosing TCP over UDP, and using an out-of-process browser engine for the trading post–which makes a compact interface unreadable because of post-render font resizing). TCP-based protocols are just an easily identified contributing factor to their blatantly manifest shortcomings, due to its (academically and practically) well-understood behavior, and its performance costs which are so descriptively equivalent to the results we users experience.
+
+                Sure you can note that MMOs are more complex and deal with way more data and potentially more data-ordering sensitivity, but that’s exaggerating the difference, which is in scale, not kind–and to a lesser degree as FPS games also start adding skills, rpg elements, and larger player counts. Any MMO’s /can/ accomplish a level of responsiveness+correctness with today’s 1-100MBit connections and 20-40ms minimum network latencies that Q3A managed 14 years ago on dial-up with minimum latencies of 90ms.
+
+                And until they actually do, as far as I’m concerned they’re doing it wrong. There’s just no way it’s “too hard.” At best they’re not willing to make it a constraint on the gameplay mechanics, but more likely it’s just not a priority at all. Given that ANet decided to house ALL their North American servers in one datacenter in the furthest possible corner of the continent, in their case I’ll wager it’s the latter.
+
+                Anyway, my roundabout point: sure MMO’s use TCP–it sure as heck don’t make it the right choice.
+
+                Reply
+
+Vinterstum November 12, 2008 at 8:21 am
+
+    “How many fast-action, no-mouse-click-based MMORPGs use TCP?”
+
+    Quite a lot of them. Including World of Warcraft.
+
+    Game-state in MMOs is a pretty complex affair, meaning you often just send incremental updates of specific bits of data for your game objects, and not sync out the whole state. Interdependencies of data can also grow pretty strong. For most data, reliable ordering is a necessity.
+
+    Some MMOs actually do use both TCP and UDP, with most traffic going over TCP and things like position updates going over UDP. Dark Age of Camelot did this, for example.
+
+    Quick list found via some Googling:
+
+    UDP: Everquest, City of Heroes, Star Wars Galaxies, Ultima Online, Asheron’s Call, Final Fantasy XI
+
+    TCP: World of Warcraft, Lineage I/II, Guild Wars, Ragnarok Online, Anarchy Online, Mabinogi, Age of Conan
+
+    TCP + UDP: Dark Age of Camelot (and I’m going to assume Warhammer Online as well, due to being the same engine and company.).
+
+    Reply
+Glenn Fiedler November 15, 2008 at 4:45 pm
+
+    Vinterstum, how many FPS games use TCP?
+
+    Reply
+Vinterstum November 17, 2008 at 4:00 am
+
+    Reasonably few, I’d imagine. Very different beasts, with different latency tolerances in gameplay. I was just addressing the MMORPG question specifically :) .
+
+    Reply
+karim January 5, 2009 at 3:30 am
+
+    thanks, really nice and useful post, helped me a lot for my college work. cheers
+
+    Reply
+Viktoras Agejevas January 19, 2009 at 4:08 am
+
+    Thank you, I’m not a game developer, but I find some of your articles very interesting.
+
+    Reply
+Sam Jansen January 19, 2009 at 11:50 pm
+
+    Speaking as a network researcher and not a game developer, the conclusion to never use TCP and UDP together seems a bit strong. TCP will only have packet loss if it is sending too much data; in some ways just like the UDP data you are sending. The difference is you have no direct control on the rate TCP sends at, this is hidden to you.
+
+    If you just need to send some reliable data and do not want to worry about retransmission and implementing a reliable protocol, and you know the rate will be low, then there wont be any problems with using both TCP and UDP.
+
+    The relationship isn’t all that complex between the two really: TCP merely increases its send rate (if there is data to send) until it gets packet loss, in which case it dials back its rate, then starts increasing the rate again (this time more slowly). When its increase in rate causes packet loss, it is quite likely to hit any other streams of data as well, including your UDP packets.
+
+    Reply
+Glenn Fiedler January 20, 2009 at 10:33 am
+
+    agreed. the point i am making in this article is that you should not use TCP and UDP together for the *bulk* of your protocol data, for example lets say 50% of your data is reliable, 50% is unreliable — and together these sum up to something close to the available bandwidth …
+
+    in this case, you can get a bit stung by your TCP vs. UDP, for example assuming TCP needs to do resends, so you can go over the bandwidth required, and you start inducing packet loss in UDP, then your TCP dials back of course — but you’ve now lost a packet that needs to be resent, so your reliable events are delayed
+
+    the point is that this condition is entirely avoidable by doing everything inside UDP, because you can ensure that you have a flat bandwidth profile, say 256byte packets 30 times a second, that always stays under the available bandwidth – no matter what is going on, so worst case within your internal reliable protocol, some events are throttled and arrive a (tiny) bit late, but your bandwidth doesn’t increase under poor conditions (no resends)
+
+    now, of course if you just had the occasional event sent via TCP, and the bulk of your time sensitive data in UDP, no problems at all
+
+    cheers
+
+    Reply
+anon January 29, 2009 at 4:40 am
+
+    UDP for FPS games – no question.
+
+    A collection of possibly interesting papers and reports on various aspects of FPS games and their network traffic patterns can be found at http://caia.swin.edu.au/genius/ (also some papers on server discovery issues, and player tolerance of latency)
+
+    Reply
+Lonewolff February 27, 2009 at 2:42 am
+
+    Awesome article and discussion.
+
+    It is great to hear the views with the ‘fors & againsts’.
+
+    Reply
+Darrin West March 31, 2009 at 7:52 am
+
+    Some more thoughts on TCP vs. UDP:
+
+    * In network protocol design, be careful to optimize for the “normal” case, not the error cases. Think about how often a packet is actually dropped, and whether it is your own fault. Do you want to buy into a lot of protocol design (no matter how much fun that might be) to support the few users that are stuck on a low bandwidth connection?
+
+    * Surprisingly UDP tends to drop packets because the application uses more bandwidth than the user’s ISP connection can handle or if the app doesn’t drain the local buffers more often. Backbone WAN connections almost never need to throw something away. UDP packets are pretty much never lost on a LAN.
+
+    * From your app, you can tune the TCP stack to not have such large delays in transmitting a send request removing a *log* of latency. If you don’t overload the connection resending isn’t as big an issue as you might think.
+
+    * Look into TCP_NODELAY (http://en.wikipedia.org/wiki/Nagle%27s_algorithm)
+
+    * It is “hard” to get all this stuff working right if you build a custom protocol over UDP: bundling (reducing header overhead), rate limiting, congestion control, packet splitting, prioritization, connection error detection, …
+
+    * Be very sure your latency requirements do demand all that investment. It is a slippery slope. Start with latency hiding techniques (predictive contracts, optimistic client movement and fixup when the server responds…), they may wind up good enough. You may even be able to change your game design to not require so much finesse. Bioware survives very well just using dice.
+
+    * Data centers prioritize TCP and UDP differently. WAN switches have a lot of different modes. You may find your low priority stuff accidentally choking the stuff you wanted at high priority. These WAN level priorities are different in Asia than in the US.
+
+    Reply
+
+    Glenn Fiedler March 31, 2009 at 8:10 am
+
+        all good points darrin, thanks for your advice
+
+        Reply
+
+roman August 5, 2009 at 3:22 am
+
+    but what about the problem with getting past firewalls? when a TCP server accept()s, can you have any control over the port number it chooses? if not, how can the client properly set up his router to allow port forwarding to his gaming PC? I know UDP can and must define the port for send and recv; so there’s no arbitrary port number assignments.
+
+    If anyone can show me how to bind the TCP sockets on both ends of the connection (client and server), I’d be happy to try TCP.
+
+    thanks
+
+    Reply
+Kevin September 4, 2009 at 6:47 am
+
+    I can think of a good reason to go with TCP over UDP, so perhaps your “never” could use a qualifier. Flash currently only supports TCP. So if you want to make a multiplayer game for Flash clients, you’ll need to do it over TCP (or HTTP which is of course even worse, speed wise).
+
+    Reply
+
+    Glenn Fiedler September 4, 2009 at 8:26 am
+
+        that’s a fair point – but i’d consider it a great reason *not* to use Flash instead :)
+
+        when do you think they’ll fix that? it’s madness – 2009, and you can only use TCP in your flash application? *boggle* :)
+
+        Reply
+
+nouknouk October 9, 2009 at 2:51 pm
+
+    Some additional informations about Darrin West’s remarks:
+
+    - there are several ‘action’ games made in Flash (so using only TCP) which do behave very well.
+    Some good examples: the website omgpop.com which includes a bomberman-like and a mario-kart like game. I even saw once a flash FPS (2D graphics, top view, don’t remember his name) which was behaving ok too.
+
+    - Another example: Skype, which falls back to a TCP based protocol when UDP is not suitable (behind a proxy, …). It is still acceptable even if voice streaming typically has ‘real time’ needs too.
+
+    - Last but not least: in a client/server ‘star’ topology, TCP leads to an higher connexion success rate. For example, people behind a proxy have almost no chance to use UDP while TCP may be suitable (like corporate or university networks).
+
+    To be clear: I’m of course not saying that UDP is crap and TCP is heaven: typically UDP remains the best choice for FPS games. On the other hand I think it’s quite important to not let beginners think UDP is the ONLY way to do things.
+    A bomberman game, a car racing game, a FPS and a pong game don’t have the same requirements, and in some cases (when UDP is not an option like in flash, or when you don’t want to loose too much time in protocol design) TCP may be a really good compromise.
+
+    Darrin West said that better than me. His two remarks (“It is “hard” to get all this stuff working right” and “Be very sure your latency requirements do demand all that investment”) are really important and must be carefully considered before making a choice.
+
+    Best regards,
+
+    Nouk²
+
+    PS: sorry for my bad english ;-)
+
+    Reply
+Anon December 3, 2009 at 9:01 pm
+
+    Dude, check this out: An Empirical Evaluation of TCP Performance in Online Games:
+
+    http://mmnet.iis.sinica.edu.tw/publication_detail.html?lang=EN&key=chen06_tcp
+
+    According to the paper, TCP is not suitable for online games even for slow-paced games like MMORPG.
+
+    Reply
+nouknouk December 4, 2009 at 1:24 pm
+
+    Anon, I think you should rather make your own tests than only relying your judgement on articles readen among the web.
+
+    You may want to check too already existing online action flash games like those of omgpop.com, or even WoW to see that TCP usability in arcade multiplayer games can be a choice too.
+
+    Everything is not fully black or white.
+    I think that’s also true for the limit between usage of TCP and/or UDP in games.
+
+    My 2 cents.
+
+    Reply
+
+    Glenn Fiedler December 5, 2009 at 9:08 am
+
+        I think it’s pretty fair point to look at that article and conclude that TCP is probably not a good choice. If you would like to refute the points raised in the article and the research supporting it – go right ahead, but I hardly think it’s fair to tell somebody to ignore research and “make your own tests” when the research is in fact doing exactly that… testing how TCP performs in a real world situation.
+
+        Reply
+
+        nouknouk December 6, 2009 at 2:30 pm
+
+            Not only the papers deals only with one specific type of game (MMORPG) whereas Anon concludes it’s the same for all multiplayer games, which is wrong.
+
+            But also the paper only deals with the advantages of UDP over TCP, but this paper’s goal has neven been to give an objective comparison, as there are no mention about udp drawbacks.
+
+            Finally, I already gave a few arguments in my previous post (9 oct), and I’m still waiting counter arguments ;)
+
+            Reply
+
+nouknouk December 8, 2009 at 5:13 am
+
+    Some points on this paper:
+
+    - their tests assume a bandwith of a few hundreds kilobits/sec, which is clearly insufficiant and probably leads to packets drops. This is not the case in the real life where the backbone and game servers are typically well dimensionned to support the amount of traffic received and sent.
+
+    - their tests have also been performed with a loss packet rate of 4% ! I never encountered such high packet loss rate in my life (except if I unplug my network card :o ). Concretely, that means for their data sent 8 times per second (their testing base), something like one loss happend every 3 seconds ! This is even not coherent with their remark a few line before telling that some clients never encountered packet loss during the whole testing session.
+
+    For sure, as the biggest advantage of UDP over TCP is when you encounter packet losses, their result can only give a big advantage on UDP compared to TCP. But such network condition are purely theorical and never met in real life. Packet losts are the exception, not the common behavior. And as long as there is no packet loss, TCP behaves globaly as well as UDP.
+
+    > ” there must be some reason to use TCP in MMOs, and that paper seems to directly counter that argument ”
+
+    Blizzard did it for WoW (I mean using TCP). And we cannot reasonably tell that Blizzard is a company which is technically incompetent. So they had inevitably good reasons for using TCP.
+
+    Last but not least, about technical things which are not present in the paper:
+
+    - UDP is not as well routable as TCP on the net, especially behind NATs, Proxies, Firewalls, … That’s a fact and one more reason that makes some ‘real time’ application embed kind of ‘degraded mode’ to be used (and working) over TCP when UDP is not routable. Skype protocols are a good example : Skype makes use of TCP in environments that don’t accept UDP connexions, and it works almost ‘seamlessy’.
+
+    - UDP requires a LOT more technical knowledge to be used in a networked game than TCP. This is much more efforts to implement a complete unbugged network engine compared to TCP. The time you spent on this part of the project is time lost for other parts of it.
+
+    The real questions are:
+
+    - is UDP mandatory for my ‘real time networking needs’ ? I would say that in 90% of gmae projects (I mean almost all games except FPS like ones), this is not absolutely necessary. TCP will behave (very) well too.
+
+    - If UDP is not mandatory, will UDP be so much better than TCP that it could be interresting to spend much more time on the network engine instead of other parts of my project ? The answer also depends on the type of ‘real time networking’ you need, but generally no.
+
+    My 2 cents.
+
+    Reply
+
+    Glenn Fiedler December 8, 2009 at 8:16 am
+
+        fair points, but in general I’m only interested in real time networking – so I always use UDP. if you want to make a non-realtime solitaire game then sure, TCP is probably fine :)
+
+        Reply
+
+nouknouk December 8, 2009 at 8:36 am
+
+    That’s exactly why i commented this article: saying that UDP is mandatory for real time networked games is just TOTALLY WRONG. TCP can fit in most ACTION games (and not only turn based games) and will save a lot of effort for the developper for almost the same result.
+
+    As a proof, I already mentionned several sample links of REAL-TIME GAMES with real-time actions and real-time interactions between players (omgpop.com, …). They use TCP (the only protocol allowed in flash) in their flash games: bomberman-like, mariokart-like, … which are far from being turn-based (solitaire)
+
+    So:
+
+    - NO TCP is not only for turn based games (is WoW a solitaire-like ?) ; it will fit most of real-time networked games too (again: except FPS).
+
+    - YES TCP is internally a bit worst than UDP for this purpose, but in real life it is un-noticeable for the player and it saves a lot of efforts to the developpers.
+
+    Reply
+
+    Glenn Fiedler December 8, 2009 at 2:16 pm
+
+        I strongly disagree. If you have a realtime game, then by definition certain information needs to arrive as quickly as possible, for example object state updates in a FPS. If you use TCP as a transport when a packet is lost you must wait for old data to be resent before you can receive the most recent state which you are interested in.
+
+        This problem can be avoided by using UDP instead of TCP and developing a simple reliability layer on top of UDP. I don’t believe that implementing a reliability layer is beyond the level of ability of a typical professional game programmer, but even if it was, there are plenty of libraries that will do it for you: Raknet, ENet, Torque etc.
+
+        You point to flash games as some sort of proof of concept, and in the same sentence mention that it is the only protocol allowed in flash. Have you considered that perhaps the only reason these games use TCP is because they have no choice?
+
+        Reply
+
+Glenn Fiedler December 9, 2009 at 2:25 pm
+
+    They probably do have a good reason, but this article is not about how to write an MMO, it’s about how to network action games.
+
+    From the introduction to this article:
+
+    “The choice you make depends entirely on what sort of game you want to network. So from this point on, and for the rest of this article series, I’m going to assume you want to network an action game. You know games like Halo, Battlefield 1942, Quake, Unreal, CounterStrike, Team Fortress and so on.”
+
+    So let’s stop arguing this point because it’s not even remotely related to the content of this article.
+
+    In conclusion:
+
+    1. If you want to deliver time sensitive data and do not want for it to be delayed waiting for resent packets, use UDP.
+
+    2. If your data is not time sensitive and you don’t mind having gaps in your packet stream waiting for packets to be resent, then by all means go right ahead and use TCP.
+
+    3. In flash you can use only TCP. Looks like flash sucks balls.
+
+    4. Some MMOs use TCP (WoW), while others use UDP (Eve Online). It is conceivable but by no means conclusively proven that there may be scalability and/or simplicity benefits of using TCP over UDP for MMO games, given that Blizzard is not stupid, assuming of course that you have a good client-side prediction algorithm in place to smooth out the gaps when packets are resent.
+
+    end of discussion :)
+
+    Reply
+
+    Jim September 17, 2010 at 5:57 pm
+
+        FYI, EVE Online uses TCP as well. :-)
+
+        Reply
+
+        Glenn Fiedler April 3, 2011 at 6:07 am
+
+            BAM
+
+            Reply
+
+            Lesley March 27, 2013 at 3:41 pm
+
+                FYI: Eve uses both udp & tcp.
+
+                Reply
+
+nouknouk December 9, 2009 at 2:03 pm
+
+    then, why a AAA+ company like Blizzard decided to use TCP for a 10+ millions player’s game if TCP doesn’t fit realtime game requirements for their MMORPG ?
+    I suppose they had enough knowledge to implement a protocol over UDP. If they decided to use TCP, they must had good reasons to do so. Isn’t it ?
+
+    Reply
+
+    Glenn Fiedler November 1, 2012 at 4:53 pm
+
+        Because an MMO is not realtime. Durrrrrrrgh…
+
+        Reply
+
+        Anonymous December 14, 2012 at 6:37 am
+
+            Lol. Clearly you haven’t played in PvP battlegrounds in WoW.
+
+            Reply
+
+            Glenn Fiedler December 14, 2012 at 5:12 pm
+
+                Double lol. Clearly you are not a network programmer :)
+
+                Reply
+
+alain December 16, 2009 at 9:09 am
+
+    Hi,
+
+    I don’t understand why you discourage the mixing of TCP and UDP flows, even I agree when the bandwidth is limited (old PSTN modems), there can be issues.
+
+    But nowadays most of users have sufficient bandwith. For example, I often watch a TV flow (using UDP) while browsing the web and/or downloading (TCP) at the same time. As long as my bandwith is sufficient, there is no problem of packet loss.
+
+    Why would it behave differently in a networked game, which never consumes lot’s of bandwith compared to nowadays connexions ?
+
+    Reply
+
+    Glenn Fiedler February 6, 2010 at 6:37 pm
+
+        it comes down to console developers (ie. me) having to pass TCR before ship — on the 360 you need to show that your game is capable of running at 64kit/sec up and down limited bandwidth without disconnecting the user. if you mix TCP and UDP flows then this can actually be quite tricky, because you are not completely in control of everything. it’s generally good practice if you want to get as close to the available bandwidth as possible to use UDP only for maximum control.
+
+        Reply
+
+Merimbula December 30, 2009 at 7:44 pm
+
+    I would say that point #4 sums it up.
+
+    You can pretty much use either TCP over UDP if your client side prediction is good enough.
+
+    But, you have to weigh it all up, I guess.
+
+    Reply
+John January 13, 2010 at 12:50 pm
+
+    Mr. Fiedler, I had to chuckle a bit at the “Flash sucks” comment simply because it doesn’t support UDP :)
+
+    To be fair, only one of the three ‘major’ cross-platform browser plugins for gaming does support UDP, and that is Unity. Silverlight and Flash only permit TCP. Of course Flash is absolutely the dominant of the three, having something stupid like 99% market penetration.
+
+    There is some work on UDP protocols for Flash (eg., Adobe Stratus,) but as far as I can see they have no intention of exposing direct UDP socket control.. yet.
+
+    Reply
+
+    SimpleNick April 5, 2011 at 3:11 am
+
+        Silverlight supports UDP.
+
+        Reply
+
+        Glenn Fiedler April 5, 2011 at 4:44 pm
+
+            +1 microsoft!
+
+            Reply
+
+    Anonymous August 5, 2011 at 1:34 am
+
+        Unity isn’t cross-platform. It doesn’t exist on Linux and it’s never coming. Flash on Linux, however, is fully supported
+
+        Reply
+
+        Anonymous October 6, 2012 at 1:02 pm
+
+            Oh dear, Unity for Linux now exists… You promised that would never happen….
+
+            Reply
+
+Sam Leach February 6, 2010 at 5:54 pm
+
+    Hi, thanks for the info.
+
+    I am developing an online poker game. As it is mostly turn based I guess I will use TCP.
+
+    Reply
+
+    Glenn Fiedler February 6, 2010 at 6:36 pm
+
+        that is a totally wise decision.
+
+        Reply
+
+Geo February 11, 2010 at 9:44 am
+
+    Hi,
+
+    When developing a multiplayer action game over UDP,i guess we should have a max message size that is smaller than the MTU. If this is true, for an online game played on wireless devices a safe max message size would be 512?
+
+    Thank you, for the articles and for your time! :)
+
+    Reply
+
+    Glenn Fiedler February 11, 2010 at 10:47 am
+
+        You really just have to test it to be sure. I’ve had no problems with 256 byte packets 30x per-second. 512 should be fine, I wouldn’t go over 1k packets if I could avoid it.
+
+        Reply
+
+        Geo February 11, 2010 at 11:37 am
+
+            Thanks.
+
+            I am curious about something. You always refer to 30 packets/second so i am guessing that all multiplayer games must be tick based(i.e on tick X everything is the same on all machines).
+
+            The problem is that on slower machines(phones) you cannot limit the fps to it;s lower value because it would be too small. A way around it is to have constant 30 calls/sec to update and up to 30 calls to render. So each render will interpolate between the next update and the last one. Another way is to use everything time-based and have variable fps between machines. I think this may be a problem implementing lock-step games… what do you think?
+
+            Thank you again for sharing your knowledge!
+
+            Reply
+
+Geo February 24, 2010 at 4:10 am
+
+    Hi
+
+    On UDP, can you guarantee that one recvfrom() matches exactly one sendto() ? I.e if a client sends 3 messages/frame at 30fps will they arrive in 3 recvfrom/frame? On TCP they will surely arrive concatenated by the TCP layer. The problem is code design for parsing the array received from the socket – if i expect a single UDP header(seq, ackbitfield) and more than one game headers( a server sends X*playerAction messages concatenated by me) ; or i must expect multiple udp headers.
+
+    For an action game, is it ok to have always 2 sendto/frame ? i.e. one for position(unreliable) one for actions(reliable) or the number of sendto/frame shoul be minimal?
+
+    Thanks a lot!
+
+    Reply
+
+    Glenn Fiedler February 24, 2010 at 9:41 am
+
+        no. you cannot assume that packets are grouped together per-frame as they were sent. they may be in practice mostly like this on the other side, but consider that sometimes packets will be late, out of order, duplicated etc. you’ll see as well obviously packets could be jittered, or stretched out in time a bit, or compressed together a bit…
+
+        so basically if you want to send multiple packets per-frame, and they are all required for that frame of data, it would be much simple to just make them single packet.
+
+        this way, you’ll either get the data for that frame, or not — instead of having 3 or so packets to track loss on
+
+        also, you’ll save on bandwidth — each UDP packet has ~28 bytes of header overhead. 3 packets = ~56 bytes wasted vs. 1 packet with same data
+
+        cheers
+
+        Reply
+
+Glenn Fiedler February 24, 2010 at 9:42 am
+
+    RE: Geo
+
+    Dedicated servers generally run at fixed tick rates, but each player is in their own time stream (fps), and thus advance each player forward independently in time with (potentially) variable dt.
+
+    Clients typically run at whatever framerate they like, the exception being if you are synchronizing via deterministic lockstep therefore each player would need to have the same DT for everything to stay in sync, also, fixed dt (or at least, a multiple of a fixed base dt) is very useful for networking physics simulation
+
+    cheers
+
+    Reply
+Florian Lettner September 26, 2010 at 10:07 am
+
+    As I followed the discussion between TCP and UDP I have to back Glenn’s point of view up. The usage really depends on the type of game you want to create.
+
+    For action based games like FPS you will always use UDP. Raknet for example provides you with a protocol on top of UDP in order to provide reliability as well. Or you can even write your own protocol as Glenn suggests. UDP is also a good idea here because in FPS games for example join short matches around 15min maximum. Multiple matches form a game session. These sessions have a periodical behavior which results can be reproduced.
+
+    MMOG gamers will play one continuous session with varying parameters, this impacts the traffic patterns. MMOGs motivate to go online regularly to interact with the virtual environment. Therefore the inter session times may show a periodic profile. Due to some new circumstances, the maximum tolerable delays are much higher than those known from action games for example. As Glenn pointed out, action games that have a realtime requirement use UDP because retransmitted packets will have too high delay and will be discarded anyway. But for MMOGs like WOW TCP will be fine because larger delays do not cause problems. TCP is connection oriented and offers a reliable connection which will help preventing error propagation during long sessions.
+
+    A new way which may cause the gaming industry to change in the future is the protocol SCTP, which combines the good things of TCP and UDP. The protocol can easily be integrated into the existing network infrastructure as only server and client have to know the protocol. There are already some studies regarding the fitness of this protocol for multiplayer games.
+
+    However, really great articles.
+
+    Cheers
+
+    Reply
+
+    Lesley March 27, 2013 at 4:10 pm
+
+        I was thinking the entire article: why does he not mention sctp?
+
+        You could just take a userspace implementation and integrate it into the gameclient and server.
+
+        Another thing which I believe will have a bigger impact: zero-copy network traffic. Any packet is copied 3-4 times in inside a machine before it leaves the machine. This means most network traffic these days is limited by memory bandwidth. What they have come up with is dma for the nic(or rdma: http://en.wikipedia.org/wiki/RDMA). Quite nifty.
+
+        I have bought 2 cheap leftover Infiniband adapters and one cable to have a fast interface between my little server and my pc. And fast it is. No difference between a local ssd and one in the server. Latencies are cut immensely(we are talking nanoseconds instead of the usual 5 milliseconds or so) as well. Rdma is the next big thing, and I hope a fitting protocol will come along with it.
+
+        Reply
+
+James October 23, 2010 at 2:22 pm
+
+    How about MMO RTS games? Like End of Nations or Lord of Ultima?
+
+    Thanks
+
+    Reply
+
+    Glenn Fiedler October 23, 2010 at 4:20 pm
+
+        You could go either way, in fact that’s what I’d offer — both TCP and UDP to the user. UDP with a simple reliability system built on top, and TCP so that users behind firewalls and with aggressive UDP filtering can play. Given that you’d have a deterministic lockstep model, either way is fine — the UDP solution would end up being a 100% blocking waiting on a lost packet to be resent, just with UDP you could pre-emptively resend data redundantly to reduce the delay waiting for resend that you would get in TCP.
+
+        cheers
+
+        Reply
+
+Jaydeep February 5, 2011 at 8:31 am
+
+    INTRO
+    Guys , last semester I did literature review about “Selection of Transport Protocol for MMORPGs” . I went with the conclusion saying UDP + TCP is the best choice for MMORPG. For that assingment I found some particular characteristics from two different papers (1 about Shanzhou online “On the challenge …. Some thing” and 2 I forgot but the main author was same). In both the papers characteristics were same. On top of that I found one more paper about GTP. GTP was discussing the same characteristics as well in order to prove that there is a need of protocol that is mix of UDP and TCP.
+
+    Now Questions
+    (1) Am I completely wrong?
+    (2) Does such GTP exist?
+    (3) How about using P2P architecture for such MMORPG (Particularly for solving scalability issue)
+
+    Any new idea guys ,, let me know
+    I was wondering if GTP exists and really used.
+
+    Reply
+
+    Glenn Fiedler February 7, 2011 at 3:56 pm
+
+        What about RUDP?
+
+        Reply
+
+prast February 24, 2011 at 11:09 am
+
+    i’m begginer in networking
+    i’m still confused what protocol used to like game hearts (game in windows seven)?
+
+    Reply
+
+    Glenn Fiedler February 24, 2011 at 4:38 pm
+
+        I’ve no idea but for a card game you could just use TCP.
+
+        Reply
+
+        prast February 27, 2011 at 8:35 am
+
+            althought the card game use for game lan,i should use TCP?
+            thanks for the answer
+
+            Reply
+
+            Glenn Fiedler February 27, 2011 at 9:43 pm
+
+                yes.
+
+                Reply
+
+Chad March 27, 2011 at 1:54 pm
+
+    Is there a typical limit to the number of UDP messages receiveable by a typical game server?
+
+    Glenn, nice information you’ve got.
+    Now, I would like your advise on something I plan to test.
+    I understand I could setup a virtual connection over UDP. Since UDP can behave both as a client and server (depending how you implement it); I am wondering if there is a limit to how many virtual connections I can implement on a typical server (windows server eg.)
+    Even if I were to implement a single or a pool of asynchronous thread/s to process the UDP message queue for all virtually connected clients; would there be some limitations to how many connections the server can handle for a real-time game. (Assumming each packet is 64K or less.)
+    Would such a concept be able to handle 512 concurrent users easily? I imagining the load of handling all 512 messages in the message queue per game tick (30 times per sec. including game logic to process) Let’s say the typical user’s device is having a download speed of 500kbps and upload of 256Kbps. The server’s MTU is 1492, upstream 1024kbps, downstream 13997kbps.
+
+    Thanks.
+
+    Reply
+
+    Glenn Fiedler March 28, 2011 at 3:01 am
+
+        Question is too underspecified to answer. The real question is whether the CPU cost of processing your UDP protocol is worth it. In other words, as you scale up what is the cost per-user? Do you still make money? Obviously this depends on your business model and the power/cost ratio of your servers.
+
+        I’ve heard that many MMO and higher player count games use TCP simply because network cards run the whole TCP stack in hardware hardware and free up CPU for the game, allowing more game instances per-server, or more users per-server.
+
+        I’ve also heard that MMO guys setup proxies for users connecting via TCP so that therefore any packet-loss is only between the user and the proxy and is quickly handled with minimal resend time. Practically speaking packet loss between the proxy and the MMO server on the modern internet is zero, therefore this solves the major problems of using TCP vs. UDP for games, while still being able to scale up to MMO scale.
+
+        And of course it makes compression much simpler, you just run gzip over the TCP stream…
+
+        cheers
+
+        Reply
+
+Deryck April 1, 2011 at 11:12 pm
+
+    Wow, this stuff is GOLD. I’ve been looking for information like this on the internet for a while, but only found your site right now.
+
+    Thanks very much for putting in all the effort to write all of these articles. So far I’ve pretty much only used TCP (working on old-school text-based MUDs), but right now I’m designing an action-based multiplayer game, and UDP appears to be a great candidate for the transport layer.
+
+    I’ve noticed delta-compression is used by engines like Source to reduce the amount of data sent per server snapshot. What techniques would be good to deal with dropped snapshots?
+
+    Reply
+
+    Glenn Fiedler April 3, 2011 at 5:51 am
+
+        This article should help you out with your delta compression questions:
+        http://trac.bookofhook.com/bookofhook/trac.cgi/wiki/Quake3Networking
+
+        Reply
+
+GameBUilder April 22, 2011 at 12:45 pm
+
+    Hello Glenn ,Nice Article.. As i am very new to game programming , I want to know few things about it.
+    Suppose there is pong game application in a mobile(anderoid or iphone) and the game should be played between two person( on their own mobile) on the internet.While playing both the player can see the movement of paddle and ball of the other player.
+    Can U tell me which protocol(Http , TCP , UDP) should be used to design this kind of game and Why?.What will be the latency of the protocol.
+
+    Reply
+Glenn Fiedler April 24, 2011 at 4:12 pm
+
+    If you are just starting, I’d recommend using a library like OpenTNL, ENet or RakNet to handle the packet transport and reliability for you. These libraries work on top of UDP giving you the benefits of a custom protocol over UDP, without you having to write it yourself. They also handle NAT punch-through, which is important for P2P games to make sure everybody can connect from behind routers/firewalls.
+
+    Once you have this working, each player just has to continuously send packets containing the position of their paddle, and the position and velocity of the ball, as they see it. Then, on each players machine, cross-fade between your view of the ball and the remote view of the ball according to the horizontal position of the ball (on your machine). This is how latency is hidden while also seeing the ball connect with the paddle of each player when it is hit.
+
+    You can find more details on this classic method of networking pong here:
+
+    http://www.amazon.com/Networked-Virtual-Environments-Implementation-Siggraph/dp/0201325578
+
+    Reply
+
+    GameBUilder April 29, 2011 at 12:23 pm
+
+        Hi
+
+        Thanks For the reply.I want to know about the 3G network.
+        As i am trying to play a game (Application on Android ) on 3G network Suppose i am moving from one 3G cell to another,Will the Ip Address change?? If Yes the How Can i continue the same game while changing the base station as my IP address is already registered in The game server.
+        Will Handsover help me to keep the same IP .
+        Is there something like DHCP.???
+
+        Reply
+
+        Glenn Fiedler December 9, 2011 at 4:40 am
+
+            Sorry I don’t know the answer to this.
+
+            Reply
+
+Mattias Hedén April 27, 2011 at 11:18 pm
+
+    Hello Glenn and thanks for a great article.
+
+    I was wondering if you have any thoughts about possibly using SCTP instead of TCP/UDP for online games in the future? It seems to have several inbuilt features which could be taken advantage of, such as partial reliability, the ability to send both ordered an unordered data and multistreaming.
+
+    From what I’ve read in articles the default settings for retransmissions and congestion control does hurt latency but since it’s a new protocol there should be room to work with and I’ve seen modifications suggested and experiments run which seem to suggest that it could rival UDP for latency without giving up any of its advantages over TCP.
+
+    Here’s some interesting articles on the subject:
+    http://folk.uio.no/paalh/publications/files/mtap09-SCTP.pdf
+    http://heim.ifi.uio.no/~paalh/publications/files/netgames2007.pdf
+
+    Reply
+
+    Glenn Fiedler April 28, 2011 at 3:43 pm
+
+        Yeah my approach to this reliability in this series is based around the assumption that you have a steady stream of carrier packets, eg. 30pps up and down continuously. Clearly this is not the case for MMO like games. In these you want to minimize bandwidth and resends, but in my custom protocols I want to minimize latency (at the expense of more bandwidth/redundancy).
+
+        If I had to operate in a large scale, or high bandwidth cost situation, I’d consider RUDP, SCTP, or just plain old TCP.
+
+        cheers
+
+        Reply
+
+Jonathon Ogden June 10, 2011 at 11:58 am
+
+    Hello Glenn I want to say I enjoy your work on network programming, it’s clear and concise. Had a few questions I was hoping you wouldn’t mind looking over if you have the time? I’ll do one at a time rather than a large bulk :P
+
+    When it comes to TCP and UDP, am correct in thinking that TCP transmits data similar to a continuous stream as opposed to UDP which operates on the basis of discrete packets? Let me try and illustrate. At a higher level we speak of “packets”, “events” and “messages” which loosely fits with UDPs definition in that as a protocol it preserves the boundaries of data you send and receive. You send 128 bytes of data, you receive exactly 128 bytes of data (generally speaking…). When it comes to TCP however, it appears to me (please correct me if I am wrong though) and based on papers I have studied that through various TCP mechanisms data could be aggregated or combined prior to sending? So if I send three unique segments of data, two of them may be combined meaning I am responsible then as the receiver to identify and separate that data upon receipt.
+
+    Doesn’t that then lead to additional overhead in identifying the boundary of the “packet” I have received?
+
+    Reply
+
+    Glenn Fiedler June 11, 2011 at 6:18 pm
+
+        yes. as TCP you cannot rely on any “packets” you send coming through as whole packets on the other side, it will aggregate packets however it likes — you need to include your own packet delimiters in your TCP stream if you want to treat it like packets and this will create some small overhead
+
+        cheers
+
+        Reply
+
+Steve J June 30, 2011 at 12:24 am
+
+    I hardly ever add comments to blog posts, but I must say Glenn, your article is very interesting. I’ve been meddling with the issue myself for the past some 15 years of programming, and although I am by no means close to an expert, I would say what you’ve wrote is not too far from the truth. I am not a game builder, but I tend to deal with conferencing stuff a lot, and they require some sense of realtime transmission. True, Skype uses TCP and it performs better than UDP based protocols like H.323, but when it comes to realtime video, I would say UDP is pretty much the choice. Amount of data you need to process even with fancy codec like x.264, still places tough burden on TCP and trust me, NO_DELAY means nothing when it comes to transmitting 1024×768 in realtime. I guess in most MMORPG, you’re actually transmitting control packets or at some chunk of metadata (please correct me if I am wrong) and I think such can be accomplished with TCP even in realtime. But data transmission with 3Mbps and 20-30 fps, I don’t know what I would do without UDP. Of course, this is based on my limited experience, so if anyone knows how to implement such using TCP, I am more than willing to learn. :)
+
+    Reply
+
+    Glenn Fiedler August 15, 2011 at 1:04 am
+
+        Yes you are absolutely right, MMOs tend to send control data or commands in reliable/ordered form. The amount of data is quite small and TCP handles this just fine. Action games tend to act much more like streaming video, exchanging a delta compressed unreliable-unordered series of state snapshots of the game world, therefore UDP.
+
+        Of course even for action games you need some reliability *but* we want explicit control over the bandwidth stream up/down, hence a custom reliability protocol inside UDP.
+
+        cheers
+
+        Reply
+
+TsuG August 13, 2011 at 9:07 am
+
+    Mmm. I think this all debate of TCP vs. UDP is a bit out of context most of the time. It seems pretty obvious that, as Glenn mentioned, in fast paced games that you wanna network, latency is key. And by latency, I do not mean the quality of the line (of course it matters anyway) but the “application” latency.
+
+    I have the feeling that these discussion tends to forget the initial and authoritative requirement : The network engine itself.
+    Again, most of fast paced games (FPS like Quake for instance) network engines rely on the “last state is the right state” paradigm. Theses are client/server based most of the time to eliminate cheating (with an authoritative server) which leads to other interesting discussions between peer to peer vs. client/server based topology.
+
+    Let’s assume you network engine is “state based” in a client/Server topology : your server main goal is to convey this last game state to clients and clients to provide “change” events (most of the time player inputs) to the server.
+
+    So this is the starting point. given that context, you have 2 technical solutions to exchange data: TCP which is reliable (no packet loss, in-order delivery, etc.) and UDP which is not.
+
+    It seems pretty obvious that, in that case, as you do NOT require reliable communication, you would pick UDP over TCP. You can on the other hand use TCP if you want to, but it’s just overkill as you don’t need it.
+
+    TsuG
+
+    Reply
+
+    Glenn Fiedler August 15, 2011 at 12:54 am
+
+        It gets interesting when you require mostly unreliable-unordered state, but need to deliver some reliable-ordered data, especially when this reliable-ordered data is time critical.
+
+        Reply
+
+        Anonymous August 17, 2011 at 5:52 pm
+
+            Yeah, you’re right. However, according to what I’ve read (and experiment) so far, requiring a reliable & ordered data is uncommon.
+            I haven’t come to see any examples where it is required. I’ve read some of the game network engines articles available on the internet, like Q3 networking, Source (Half-life and others) networking, Age of empire networking and they all rely on UDP as far as I understood.
+            However, I would be curious about a network engine requiring a reliable in-order communication somewhere in the process.
+            Do you have any pointers ?
+            Thanks,
+            TsuG.
+
+            Reply
+
+            Glenn Fiedler August 17, 2011 at 6:05 pm
+
+                http://tinyurl.com/3ufsalz
+
+                Reply
+
+TsuG August 17, 2011 at 6:31 pm
+
+    Thanks :)
+
+    Reply
+Monco August 30, 2011 at 11:19 am
+
+    Glenn Fiedler,
+
+    What I understand from reading your article and the replies above TCP stalling the network (due to packet-loss/resending packets) is quite limited when there is sufficient bandwidth available. So in relation to what you said about mixing TCP and UDP in a networked FPS, and assuming the total bandwidth usage of the game is quite limited, what is your opinion on the idea of using UDP for non-critical packets (eg. mouse movement/player position), and TCP for the more important (and fewer) packets that may affect others players more drastically (eg. mouse clicks/shooting)?
+
+    Reply
+
+    Glenn Fiedler September 1, 2011 at 7:40 am
+
+        I think that if the reliable events you wish to send are time critical, then you would be better off embedding them in a custom UDP protocol and resending them at high frequency until they are acked — this works best if these events are small, relative to the stream of unreliable data, and infrequent.
+
+        cheers
+
+        Reply
+
+        Monco September 7, 2011 at 8:32 am
+
+            Thanks you, I trust this is the way to go then :)
+
+            Reply
+
+Lee September 8, 2011 at 6:19 pm
+
+    I only googled to make sure I haven’t been lying to people about UDP and I find this mess. I’m sorry Glenn these people are bugging you on protocol. I mean think of how awesome VOIP would be if they used TCP eh? I bet it would have failed hard. In network hierarchy I know that TCP is better and more reliable, but when you need bursts of data that software can make heads or tails of faster than a NIC card….. the answer is obvious. I’m only a Cisco nerd, I haven’t played in much game design other than the UDK. So, I’m speaking only from a network perspective but I think and know you are dead on Mr. Glenn. Hopefully this ignorance doesn’t bother you 3 more years and thanks for the write up.
+
+    Reply
+
+    Glenn Fiedler December 9, 2011 at 4:39 am
+
+        It’s OK Lee, I’m comfortable with them being wrong.
+
+        Reply
+
+Yaniv October 23, 2011 at 1:53 pm
+
+    In regards to what was written about using both TCP and UDP and the potential effect TCP has over UDP, will TCP traffic in other applications affect UDP traffic on the game application?
+
+    Reply
+
+    Glenn Fiedler October 24, 2011 at 3:25 am
+
+        yes. my comment applies primarily to consoles — my point is that if bandwidth is tight you are better off having complete control over the stream. this is likely not to be a significant issue for anybody developing on PC — except, that you should always remember that somebody may steal all your bandwidth (bit torrent, video streaming etc…) and you need to degrade gracefully. cheers
+
+        Reply
+
+crg January 10, 2012 at 11:57 pm
+
+    Hi, I am currently using the Quake3 model for my networking.
+    When the client joins the game, it has to download scripts, ini files and a map if it doesnt have it. TCP would be the best solution here wouldn’t it? but if the server is sending lots of TCP data to a client is joining, while sending UDP data to the rest of the joined in-game clients, what effect will this have?
+
+    Thanks :)
+
+    Reply
+
+    Glenn Fiedler January 11, 2012 at 6:17 pm
+
+        Generally speaking it is fine. It will only cause bad effects if the connection is saturated, which is unlikely. cheers
+
+        Reply
+
+Austin Keller January 20, 2012 at 8:05 pm
+
+    Networking is completely new to me, but I do understand your explanations (Thank you for that). Can you quickly explain the different in information between an MMO and FPS. I’ve always thought MMO’s were fairly quick paced games as well, at least when it comes to PvPing.
+
+    Would they change the way packets are sent if a player was in PvP mode?
+
+    Any help would be great! Thanks again for this!
+
+    Reply
+
+    Glenn Fiedler January 21, 2012 at 1:51 am
+
+        I’ve never coded an MMO so I don’t know!
+
+        Reply
+
+nzzz February 29, 2012 at 2:20 pm
+
+    I will develop an online fps game.The client side must be developed in flash (actionscript).and flash player only support tcp. Is there any way to use udp in flash? If not, what can I do
+
+    Reply
+
+    Glenn Fiedler February 29, 2012 at 4:26 pm
+
+        I’ve never coded flash so I don’t know. If all you have is TCP, I guess you have to use TCP.
+
+        Reply
+
+Glenn "Mazetar" Fredriksen March 11, 2012 at 2:39 pm
+
+    Hello!
+
+    Just wanted to say thank you for a great article :)
+
+    Reply
+Tom March 19, 2012 at 9:31 am
+
+    Hello Glenn, a few days ago I started to search what will be the best (UDP or TCP) for a simple 2d online fight game in which two player fighting, please tell me what you think?
+
+    Thanks! :)
+
+    Reply
+
+    Tom March 19, 2012 at 9:38 am
+
+        I forgot about RUDP.
+
+        Reply
+
+Bekzat March 30, 2012 at 8:32 am
+
+    An excellent arcticle. Written in simple words. Thanks!
+
+    Reply
+Zhang Xiao April 2, 2012 at 7:33 am
+
+    Hello Glenn, thanks for this tutorial and I will keep reading alone. Recently I am planning writing a simple multiplayer game demo, in which people can run against each other. I feel there is not too much data to be sent and the data does not need to be “very realtime”. So TCP should be good for me, am I right?
+
+    Reply
+
+    Glenn Fiedler April 3, 2012 at 3:04 am
+
+        I don’t understand what “run against each other” means
+
+        Reply
+
+ssp April 11, 2012 at 3:39 pm
+
+    Hi Glenn,
+
+    I am new to online Game development and I am trying to develop an online card game using ASP.Net MVC. I was reading your article on UDP vs TCP and some of your comments. You have explained it well to get basics of how both works. I understand for some games UDP will be the best choice. I am thinking to use TCP for the card Game. Is it a right choice and do you have good pointer which can lead me to right path.
+
+    Thanks and I appreciate your reply.
+    ssp
+
+    Reply
+
+    Glenn Fiedler April 13, 2012 at 2:58 am
+
+        I’m sure TCP would be just fine for a card game
+
+        Reply
+
+ssp April 13, 2012 at 2:39 pm
+
+    Thanks Glenn.
+    Do you have any sample website to see how this is done.
+    Just to get an idea.
+
+    Thanks
+
+    Reply
+
+    Glenn Fiedler April 13, 2012 at 5:18 pm
+
+        http://lmgtfy.com/?q=TCP
+
+        Reply
+
+Anonymous April 26, 2012 at 10:59 pm
+
+    There’s something I’ve been wondering about for a while.
+
+    A hybrid Action-MMORPG called TERA Online is nearing release, complete with the tagline “True Action Combat”. I’ve played in the public beta tests, and can personally attest to the legitimacy of the claim; the controls feel crisp and responsive. What’s even more interesting is that it is one of the first ‘action’ games to feature a persistent world, a la World of Warcraft, Guild Wars, and other more traditional MMORPGs. No lobbies, no rounds.
+
+    I did some googling, and it sounds like TERA uses both TCP and UDP to pull it off. Maybe I’ll try capturing some packets with Wireshark later (after double-checking the ToS to make sure I can do so) and take a look, but in the meanwhile, any thoughts on this?
+
+    Reply
+Patrick Wyatt May 3, 2012 at 11:33 pm
+
+    TERA uses only TCP for network communications, which you can verify using WireShark — it’s not against the Terms of Service. Full disclosure: I helped publish TERA but didn’t code the game itself.
+
+    And incidentally, as the Guild Wars programmer who wrote the client->server communication protocol, the server->server communication protocol, and the low-level network libraries (among other things), I want to caution folks about making assumptions about why we chose to use TCP for Guild Wars (or why Blizzard chose TCP for WoW). We didn’t pick TCP for Guild Wars because it was unequivocally the best choice; it was a trade-off.
+
+    It probably warrants a blog article, but the reason Guild Wars uses TCP is that I felt the labor required to write a reliable transport layer on top of UDP would take too long: we’d run out of money fooling around writing transport code instead of writing a game.
+
+    So I chose to write Guild Wars on top of TCP, and if it didn’t work out I could rewrite the client transport layer to use UDP. Fortunately TCP worked well enough for client->server code.
+
+    But there is a big downside to TCP that I should mention beyond what Glenn talked about: you lose control of when connections terminate. So if a router fails-over in your datacenter, or if one of your bandwidth providers fails, you’ll likely drop all your TCP connections traveling over that route. With UDP it’s possible to just ignore the loss of connectivity, wait for routes to re-converge through a different router or bandwidth provider, and keep going.
+
+    So in short, Glenn knows what he’s talking about!
+
+    Reply
+
+    Glenn Fiedler May 4, 2012 at 3:53 am
+
+        Awesome info, thanks!
+
+        Reply
+
+Tyler Millershaski May 10, 2012 at 10:34 pm
+
+    I found this information very useful and informative.
+
+    How does UDP get through routers without manually forwarding ports? I understand that it’s not really the topic of discussion here, but I feel that someone here could provide a better explanation from a developer perspective, then most google searches provide.
+
+    Thank you.
+
+    Reply
+
+    Glenn Fiedler May 11, 2012 at 12:24 am
+
+        Here are the best descriptions I’ve found:
+        http://en.wikipedia.org/wiki/STUN
+        http://en.wikipedia.org/wiki/UDP_hole_punching
+        http://www.raknet.net/raknet/manual/natpunchthrough.html
+
+        (I don’t typically implement my own NAT punchthrough — working on consoles it is already provided. If I were developing code for PC or Mac I’d licence some tech to do it, or go client/server with dedicated servers…)
+
+        cheers
+
+        Reply
+
+I SPY May 24, 2012 at 6:00 pm
+
+    Hello,
+
+    I have only TCP checksum offload and UDP checksum offload in my lan, so i disable TCP and leave UDP enabled?
+
+    Reply
+
+    Glenn Fiedler May 25, 2012 at 3:03 am
+
+        What?
+
+        Reply
+
+Ali from iran June 2, 2012 at 7:42 pm
+
+    hi Glenn Fiedler
+    i write a pachisi game that work on network, you right about tcp. i used it because i did not have a lot of input and output. sorry! i right can not speak english!
+
+    Reply
+Reddy June 8, 2012 at 11:08 am
+
+    Glenn Fiedler : I am not a game developer . But like the article and its very interesting and informative
+
+    Reply
+Anonymous June 25, 2012 at 10:13 pm
+
+    This article is exactly what i needed! thanks dude!
+
+    Reply
+Andy June 29, 2012 at 9:39 am
+
+    Love the articles. This stuff is so interesting to read about.
+
+    I’ve been doing a little bit of networking with Unity, but I want to take more control and do some experiments of my own without using a pre-existing network solution, so this is really good to learn from.
+
+    Thanks!
+
+    Reply
+Shy December 18, 2012 at 11:55 am
+
+    Very informative article that helps to better understand why Secondlife is moving from UDP to TCP (http) to resolve increasing inventory and rebaking issues. I hope they will stick to UDP for other things, even I’m sometimes in doubt UDP is best as I experience increasingly a drop in network quality for end-to-end communication over large distance (from Europe to the servers located in the US).
+
+    Reply
+
+    Glenn Fiedler December 18, 2012 at 4:29 pm
+
+        I hate Second Life!
+
+        Reply
+
+anon December 25, 2012 at 10:36 pm
+
+    So:
+    UDP is goot for shooters, and TCP is good for MMo’s.
+    What if i’m making a MMo shooter?
+
+    Reply
+
+    Glenn Fiedler December 28, 2012 at 2:26 am
+
+        Then good luck to you!
+
+        Reply
+
+Tanvir January 4, 2013 at 6:44 am
+
+    My COD4 is stuck in synchronising game setting after joining any GR room. Please help
+
+    Reply
+
+    Glenn Fiedler January 4, 2013 at 7:02 pm
+
+        ?!!!!
+
+        Reply
+
+Shy January 31, 2013 at 8:39 pm
+
+    But, major browsers still only using TCP. (I know real-time connection is being developed in browsers)
+    It must be non-FPS game, a first popular HTML5 game.
+
+    FPS games are too main stream though, and it’s now boring.
+
+    Brace yourself! HTML5 games, 3D web apps, real-time ‘internet’ are coming! even on mobile devices. And Javascript is rising!
+
+    UDP vs TCP? it is relative.
+    The best way is to know when both pros and cons occur.
+    decide and *DO*
+
+    Reply
+
+    Glenn Fiedler February 1, 2013 at 1:25 am
+
+        The fact that UDP is better for fast paced action games is true whether or not browsers support it.
+
+        Reply
+
+Graham Wood February 22, 2013 at 8:05 pm
+
+    I’m making a prototype for an online Bomberman type game (max 4 players for room), is TCP suitable for this kind of game ?
+
+    Thank you!
+
+    Reply
+
+    Glenn Fiedler February 23, 2013 at 2:17 am
+
+        It would be better if you used UDP
+
+        Reply
+
+        Glenn Fiedler February 23, 2013 at 8:17 am
+
+            But if you are just prototyping TCP would be totally fine
+
+            Reply
+
+Dan Carreker February 28, 2013 at 9:51 am
+
+    Hi Glenn, Great article. (Actually great site, I’ve stumbled across it just now and been here 2 hours reading.)
+
+    I’m not a network programmer but I found the whole protocol thing very interesting and it brought up a question. Would or could lag look differently to the client depending on which one was used? I would imagine that (at least with significant packet loss) the game state would appear to “snap” to the correct state with UDP but with TCP it would “fast-forward” as the reordered packets are resolved. Am I correct about this? Could this be used to diagnose where the packet lose was occurring in a system running both UDP and TCP?
+
+    Reply
+
+    Glenn Fiedler February 28, 2013 at 4:54 pm
+
+        Not really fast forward because TCP buffers out of order packets late tend to clump up and get delivered on the same frame.
+
+        So they both look like a snap but the period of no packets arriving is longer with TCP than with UDP under packet loss
+
+        Reply
+
+ABEER March 4, 2013 at 2:55 pm
+
+    please …can any body tell me the percent of videos transmitted reliably to those that are transmitted unreliably(best effort) with the reference (paper or site you get the information from)
+
+    Reply
+
+    Glenn Fiedler March 4, 2013 at 6:05 pm
+
+        http://bit.ly/VvezeK
+
+        Reply
+
+Gchat March 22, 2013 at 11:52 pm
+
+    Thank you for the details, How you compare disconnection issue in TCP while in UDP since now active connection is required, can UDP be more reliable in chat applications?
+
+    Reply
+
+    Glenn Fiedler March 23, 2013 at 1:48 am
+
+        I have no experience with chat applications.
+
+        Reply
+
+Jacob Harrison March 26, 2013 at 5:35 pm
+
+    Awesome article!
+
+    Starting to make an MMO and thank god I read your article.
+
+    I was concerned with performance using TCP over UDP, but wondered about the true differences and you could not of said it more intuitively.
+
+    Thanks!
+
+    Reply
+
+    Glenn Fiedler March 26, 2013 at 7:19 pm
+
+        Glad it was useful. Cheers!
+
+        Reply
+
+Iggy Zuk May 8, 2013 at 11:04 pm
+
+    Great Read, but what is your solution to reliable data with UDP?
+    Say we’re playing Team Fortress 2, you offers me trade for my amazing fez. Now the game becomes more of an IRC, suddenly we don’t care as much for the most recent data and rather individual events. Temptation to use a mixture of UDP&TCP!
+
+    Reply
+
+    Glenn Fiedler May 9, 2013 at 12:27 am
+
+        Bottom line is it’s only really problematic to mix UDP and TCP if you are saturating the link. These days especially on PC you can totally get away with it. I’d still say though that really, it’s probably just easier to use a nice reliability layer over UDP for your game protocol vs. mixing separate TCP and UDP sockets. Also, NATs.
+
+        Reply
+
+niluzhou1984 May 29, 2013 at 12:51 pm
+
+    Why can’t I use both UDP and TCP?
+
+    This conclusion is misleading. The paper is said that burst tcp flow will cause udp packet loss. Of course. burst udp flow will also cause udp packet loss. It have nothing todo with mixing udp and tcp. The paper means that when network is busy, packet will loss that’s all
+
+    Reply
+
+    Glenn Fiedler May 29, 2013 at 4:36 pm
+
+        I agree. When you saturate your link you will induce UDP loss due to TCP behavior.
+
+        Hence if you have a bandwidth intensive application (game) and it is running close close to total bandwidth on the link, then you would be wise to use UDP for all data intensive flows.
+
+        Of course you could, if you must, send a small amount of data over TCP, just don’t send the bandwidth intensive part or your game protocol will suffer
+
+        Cheers
+
+        Reply
+    Another Anonymous June 3, 2013 at 10:57 pm
+
+        I might be wrong but I think the point is that TCP will have more probability to clog network communication. Thus, it might (depending on what it is being used for) that TCP will clog UDP packets than the other way around.
+        An example is a network where a few servers are suffering issues consecutively and network traffic is continuously being lost UDP doesn’t care, while TCP will resend packets a few times unless some TTL on attempts.
+        You can for example have a chat client using TCP or a login service and the game package distribution being done via UDP for example.
+
+        Reply
+
+Another Anonymous June 3, 2013 at 10:53 pm
+
+    I’m reading this article among the ones in physics, because I stumbled upon this after searching for networked fluids simulations.
+    I have (not in industry) knowledge with fluids simulations and network games.
+    The article has a strong author opinion side. However, I wish to share some experience gathered over experiments regarding this article, and personal opinions.
+
+    It is rude and somewhat immature to insult someone who attempts to share knowledge because you think is wrong, regardless if he is you can point it out in civilized manner.
+
+    UDP for action games (FPS, Racing games, etc) and also RTS, even with prediction, is far preferable to TCP. Also, multicast is know days somewhat more manageable in the application level. I have made a mini MMOFPS, implemented on top of JGroups, tested in 160 physical machines, in distinct LANs, with real players and AI, so far. In which the world is partitioned in squares, each corresponding to a multicast group, and players can interact in real time, without major asynchronous issues. A implementation using TCP, soon achieved lag issues. I have to point out also that the amount of data to update/communicate per players in fast paced actions games, is far greater that in RPGs.
+
+    TCP however, for RPGs is often used. The reasons for such are:
+    1-Because of TCP reliability.
+    2-RPGs can infer a lot of information reducing significantly communication.
+    3-RPGs updates can be smaller in amount of information to send than for fast passed actions games.
+    Nevertheless, lag torments most MMORPGs in good days. What often happens is that after new games boom of initial players (sometimes over the initial predicted results) MMOGs tend to hold and survive or the crash into the ground. When they hold, after gaining a lot and losing some players, they achieve a somewhat fixes mass of players that will vary with some degree of predictability. This, is often well though but in many aspects unpredictable. World of Warcraft in its beginnings was in risk from shutting down. One of the oldest MMORPGs, Tibia, has many issues on this field, but to be fair WoW as a far better and younger network infrastructure design.
+    
+    
+    http://gafferongames.com/networking-for-game-programmers/udp-vs-tcp/#comment-808

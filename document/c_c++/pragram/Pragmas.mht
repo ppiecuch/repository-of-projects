@@ -1,0 +1,177 @@
+From: <ÓÉ Windows Internet Explorer 7 ±£´æ>
+Subject: The C Preprocessor
+Date: Thu, 11 Jul 2013 10:20:34 +0800
+MIME-Version: 1.0
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Pragmas.html
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.3664
+
+=EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML lang=3Den><HEAD><TITLE>The C Preprocessor</TITLE>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dutf-8">
+<META content=3D"The C Preprocessor" name=3Ddescription>
+<META content=3D"MSHTML 6.00.6000.16587" name=3DGENERATOR>
+<META http-equiv=3DContent-Style-Type content=3Dtext/css>
+<STYLE type=3Dtext/css>PRE.display {
+	FONT-FAMILY: inherit
+}
+PRE.format {
+	FONT-FAMILY: inherit
+}
+PRE.smalldisplay {
+	FONT-SIZE: smaller; FONT-FAMILY: inherit
+}
+PRE.smallformat {
+	FONT-SIZE: smaller; FONT-FAMILY: inherit
+}
+PRE.smallexample {
+	FONT-SIZE: smaller
+}
+PRE.smalllisp {
+	FONT-SIZE: smaller
+}
+</STYLE>
+</HEAD>
+<BODY>
+<DIV class=3Dnode>
+<P>Node:&nbsp;<A name=3DPragmas>Pragmas</A>, Next:&nbsp;<A accessKey=3Dn =
+
+href=3D"http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Other-Directives.html=
+#Other%20Directives"=20
+rel=3Dnext>Other Directives</A>, Previous:&nbsp;<A accessKey=3Dp=20
+href=3D"http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Line-Control.html#Lin=
+e%20Control"=20
+rel=3Dprevious>Line Control</A>, Up:&nbsp;<A accessKey=3Du=20
+href=3D"http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/index.html#Top" =
+rel=3Dup>Top</A>=20
+
+<HR>
+<BR></DIV>
+<H2 class=3Dchapter>Pragmas</H2>
+<P>The <CODE>#pragma</CODE> directive is the method specified by the C =
+standard=20
+for providing additional information to the compiler, beyond what is =
+conveyed in=20
+the language itself. Three forms of this directive (commonly known as=20
+<DFN>pragmas</DFN>) are specified by the 1999 C standard. A C compiler =
+is free=20
+to attach any meaning it likes to other pragmas.=20
+<P>GCC has historically preferred to use extensions to the syntax of the =
+
+language, such as <CODE>__attribute__</CODE>, for this purpose. However, =
+GCC=20
+does define a few pragmas of its own. These mostly have effects on the =
+entire=20
+translation unit or source file.=20
+<P>In GCC version 3, all GNU-defined, supported pragmas have been given =
+a=20
+<CODE>GCC</CODE> prefix. This is in line with the <CODE>STDC</CODE> =
+prefix on=20
+all pragmas defined by C99. For backward compatibility, pragmas which =
+were=20
+recognized by previous versions are still recognized without the=20
+<CODE>GCC</CODE> prefix, but that usage is deprecated. Some older =
+pragmas are=20
+deprecated in their entirety. They are not recognized with the =
+<CODE>GCC</CODE>=20
+prefix. See <A=20
+href=3D"http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Obsolete-Features.htm=
+l#Obsolete%20Features">Obsolete=20
+Features</A>.=20
+<P>C99 introduces the <CODE>_Pragma</CODE> operator. This feature =
+addresses a=20
+major problem with <CODE>#pragma</CODE>: being a directive, it cannot be =
+
+produced as the result of macro expansion. <CODE>_Pragma</CODE> is an =
+operator,=20
+much like <CODE>sizeof</CODE> or <CODE>defined</CODE>, and can be =
+embedded in a=20
+macro.=20
+<P>Its syntax is=20
+<CODE>_Pragma&nbsp;(</CODE><VAR>string-literal</VAR><CODE>)</CODE>, =
+where=20
+<VAR>string-literal</VAR> can be either a normal or wide-character =
+string=20
+literal. It is destringized, by replacing all <CODE>\\</CODE> with a =
+single=20
+<CODE>\</CODE> and all <CODE>\"</CODE> with a <CODE>"</CODE>. The result =
+is then=20
+processed as if it had appeared as the right hand side of a =
+<CODE>#pragma</CODE>=20
+directive. For example, <PRE class=3Dexample>     _Pragma ("GCC =
+dependency \"parse.y\"")
+     </PRE>
+<P>has the same effect as <CODE>#pragma GCC dependency "parse.y"</CODE>. =
+The=20
+same effect could be achieved using macros, for example <PRE =
+class=3Dexample>     #define DO_PRAGMA(x) _Pragma (#x)
+     DO_PRAGMA (GCC dependency "parse.y")
+     </PRE>
+<P>The standard is unclear on where a <CODE>_Pragma</CODE> operator can =
+appear.=20
+The preprocessor does not accept it within a preprocessing conditional =
+directive=20
+like <CODE>#if</CODE>. To be safe, you are probably best keeping it out =
+of=20
+directives other than <CODE>#define</CODE>, and putting it on a line of =
+its own.=20
+
+<P>This manual documents the pragmas which are meaningful to the =
+preprocessor=20
+itself. Other pragmas are meaningful to the C or C++ compilers. They are =
+
+documented in the GCC manual.=20
+<DL>
+  <DT><CODE>#pragma GCC dependency</CODE>=20
+  <DD><CODE>#pragma GCC dependency</CODE> allows you to check the =
+relative dates=20
+  of the current file and another file. If the other file is more recent =
+than=20
+  the current file, a warning is issued. This is useful if the current =
+file is=20
+  derived from the other file, and should be regenerated. The other file =
+is=20
+  searched for using the normal include search path. Optional trailing =
+text can=20
+  be used to give more information in the warning message. <PRE =
+class=3Dexample>          #pragma GCC dependency "parse.y"
+          #pragma GCC dependency "/usr/include/time.h" rerun fixincludes
+          </PRE><BR>
+  <DT><CODE>#pragma GCC poison</CODE>=20
+  <DD>Sometimes, there is an identifier that you want to remove =
+completely from=20
+  your program, and make sure that it never creeps back in. To enforce =
+this, you=20
+  can <DFN>poison</DFN> the identifier with this pragma. <CODE>#pragma =
+GCC=20
+  poison</CODE> is followed by a list of identifiers to poison. If any =
+of those=20
+  identifiers appears anywhere in the source after the directive, it is =
+a hard=20
+  error. For example, <PRE class=3Dexample>          #pragma GCC poison =
+printf sprintf fprintf
+          sprintf(some_string, "hello");
+          </PRE>
+  <P>will produce an error.=20
+  <P>If a poisoned identifier appears as part of the expansion of a =
+macro which=20
+  was defined before the identifier was poisoned, it will <EM>not</EM> =
+cause an=20
+  error. This lets you poison an identifier without worrying about =
+system=20
+  headers defining macros that use it.=20
+  <P>For example, <PRE class=3Dexample>          #define strrchr rindex
+          #pragma GCC poison rindex
+          strrchr(some_string, 'h');
+          </PRE>
+  <P>will not produce an error. <BR></P>
+  <DT><CODE>#pragma GCC system_header</CODE>=20
+  <DD>This pragma takes no arguments. It causes the rest of the code in =
+the=20
+  current file to be treated as if it came from a system header. See <A=20
+  =
+href=3D"http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/System-Headers.html#S=
+ystem%20Headers">System=20
+  Headers</A>. </DD></DL></BODY></HTML>

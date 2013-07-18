@@ -1,0 +1,532 @@
+  常见笔试题(1)  去掉msvcr90的依赖
+使用LZMA算法  2009-09-23 14:41:48|  分类： 算法 |  标签： |字号大
+中
+小 订阅 
+"LZMA，（Lempel-Ziv-Markov chain-Algorithm的缩写），是 2001年以来得到发展的一个数据压缩算法，它用于7-Zip归档工具中的 7z格式。它使用类似于LZ77的字典编码机制，在一般的情况下压缩率比bzip2为高，用于压缩的字典文件大小可达4GB。"
+http://zh.wikipedia.org/wiki/LZMA
+
+7-Zip官方页面：http://www.7-zip.org/  中文：http://7z.sparanoid.com/
+LZMA SDK页面： http://7z.sparanoid.com/sdk.html
+
+下面是使用LZMA算法的实例（SDK版本：7zip907）
+
+// 转载请注明转自http://blog.163.com/yesaidu@126
+unsigned long CompressFile(char *filein, char *fileout)
+
+{
+
+    bool dictionaryIsDefined = false;
+
+    UInt32 dictionary = (UInt32)-1;
+
+    UString mf = L"BT4";
+
+    UInt32 numThreads = 2/*(UInt32)-1*/;
+
+ 
+
+    CMyComPtr<ISequentialInStream> inStream;
+
+    CInFileStream *inStreamSpec = 0;
+
+    inStreamSpec = new CInFileStream;
+
+    inStream = inStreamSpec;
+
+    if (!inStreamSpec->Open(GetSystemString(filein)))
+
+    {
+
+        // Error: can not open input file
+
+        return 1;
+
+    }
+
+ 
+
+    CMyComPtr<ISequentialOutStream> outStream;
+
+    COutFileStream * outStreamSpec = new COutFileStream;
+
+    outStream = outStreamSpec;
+
+    if (!outStreamSpec->Create(GetSystemString(fileout), true))
+
+    {
+
+        // Error: can not open output file
+
+        return 1;
+
+    }
+
+ 
+
+    NCompress::NLzma::CEncoder *encoderSpec = new NCompress::NLzma::CEncoder;
+
+    CMyComPtr<ICompressCoder> encoder = encoderSpec;
+
+ 
+
+    if (!dictionaryIsDefined) 
+
+        dictionary = 1 << 23;
+
+ 
+
+    UInt32 pb = 2; // posStateBits
+
+    UInt32 lc = 3; // litContextBits,  = 0; for 32-bit data
+
+    UInt32 lp = 0; // litPosBits, = 2; for 32-bit data
+
+    UInt32 algo = 1; // algorithm
+
+    UInt32 fb = 128; // numFastBytes
+
+    UInt32 mc = 16 + fb / 2;
+
+    bool mcDefined = false;
+
+ 
+
+    PROPID propIDs[] = 
+
+    {
+
+        NCoderPropID::kDictionarySize,
+
+        NCoderPropID::kPosStateBits,
+
+        NCoderPropID::kLitContextBits,
+
+        NCoderPropID::kLitPosBits,
+
+        NCoderPropID::kAlgorithm,
+
+        NCoderPropID::kNumFastBytes,
+
+        NCoderPropID::kMatchFinder,
+
+        NCoderPropID::kEndMarker,
+
+        NCoderPropID::kNumThreads,
+
+        NCoderPropID::kMatchFinderCycles,
+
+    };
+
+    const int kNumPropsMax = sizeof(propIDs) / sizeof(propIDs[0]);
+
+    
+
+    PROPVARIANT properties[kNumPropsMax];
+
+    for (int p = 0; p < 6; p++) properties[p].vt = VT_UI4;
+
+ 
+
+    properties[0].ulVal = (UInt32)dictionary;
+
+    properties[1].ulVal = (UInt32)pb;
+
+    properties[2].ulVal = (UInt32)lc;
+
+    properties[3].ulVal = (UInt32)lp;
+
+    properties[4].ulVal = (UInt32)algo;
+
+    properties[5].ulVal = (UInt32)fb;
+
+ 
+
+    properties[6].vt = VT_BSTR;
+
+    properties[6].bstrVal = (BSTR)(const wchar_t *)mf;
+
+ 
+
+    properties[7].vt = VT_BOOL;
+
+    properties[7].boolVal = VARIANT_FALSE;
+
+ 
+
+    properties[8].vt = VT_UI4;
+
+    properties[8].ulVal = (UInt32)numThreads;
+
+ 
+
+    // it must be last in property list
+
+    properties[9].vt = VT_UI4;
+
+    properties[9].ulVal = (UInt32)mc;
+
+ 
+
+    int numProps = kNumPropsMax;
+
+    if (!mcDefined) numProps--;
+
+ 
+
+    if (encoderSpec->SetCoderProperties(propIDs, properties, kNumPropsMax) != S_OK)
+
+    {
+
+        //throw "Incorrect command";
+
+        return 1;
+
+    }
+
+ 
+
+    encoderSpec->WriteCoderProperties(outStream);
+
+ 
+
+    UInt64 fileSize = (UInt64)(Int64)-1;
+
+    inStreamSpec->File.GetLength(fileSize);
+
+ 
+
+    for (int i = 0; i < 8; i++)
+
+    {
+
+        BYTE b = BYTE(fileSize >> (8 * i));
+
+        if (outStream->Write(&b, sizeof(b), 0) != S_OK)
+
+        {
+
+            // Write error
+
+            return 1;
+
+        }
+
+    }
+
+ 
+
+    HRESULT result = encoder->Code(inStream, outStream, 0, 0,0);
+
+    if (result == E_OUTOFMEMORY)
+
+    {
+
+        // Error: Can not allocate memory
+
+        return 1;
+
+    }   
+
+    else if (result != S_OK)
+
+    {
+
+        // Encoder error: result
+
+        return 1;
+
+    }
+
+ 
+
+    if (outStreamSpec != NULL)
+
+    {
+
+        if (outStreamSpec->Close() != S_OK)
+
+        {
+
+            // File closing error
+
+            return 1;
+
+        }
+
+    }
+
+ 
+
+    return 0;
+
+} 
+
+ 
+
+unsigned long UncompressFile(char *filein, char *fileout)
+
+{
+
+    CMyComPtr<ISequentialInStream> inStream;
+
+    CInFileStream *inStreamSpec = 0;
+
+    inStreamSpec = new CInFileStream;
+
+    inStream = inStreamSpec;
+
+    if (!inStreamSpec->Open(GetSystemString(filein)))
+
+    {
+
+        // Error: can not open input file
+
+        return 1;
+
+    }
+
+    CMyComPtr<ISequentialOutStream> outStream;
+
+    COutFileStream *outStreamSpec = NULL;
+
+    outStreamSpec = new COutFileStream;
+
+    outStream = outStreamSpec;
+
+    if (!outStreamSpec->Create(GetSystemString(fileout), true))
+
+    {
+
+        // Error: can not open output file
+
+        return 1;
+
+    }
+
+ 
+
+    NCompress::NLzma::CDecoder *decoderSpec = new NCompress::NLzma::CDecoder;
+
+    CMyComPtr<ICompressCoder> decoder = decoderSpec;
+
+    decoderSpec->FinishStream = true;
+
+ 
+
+    const UInt32 kPropertiesSize = 5;
+
+    Byte header[kPropertiesSize + 8];
+
+    if (ReadStream_FALSE(inStream, header, kPropertiesSize + 8) != S_OK)
+
+    {
+
+        // Read error
+
+        return 1;
+
+    }
+
+    if (decoderSpec->SetDecoderProperties2(header, kPropertiesSize) != S_OK)
+
+    {
+
+        // SetDecoderProperties error
+
+        return 1;
+
+    }
+
+ 
+
+    UInt64 fileSize = 0;
+
+    for (int i = 0; i < 8; i++)
+
+        fileSize |= ((UInt64)header[kPropertiesSize + i]) << (8 * i);
+
+ 
+
+    if (decoder->Code(inStream, outStream, 0, (fileSize == (UInt64)(Int64)-1) ? 0 : &fileSize, 0) != S_OK)
+
+    {
+
+        // Decoder error
+
+        return 1;
+
+    }
+
+ 
+
+    if (outStreamSpec != NULL)
+
+    {
+
+        if (outStreamSpec->Close() != S_OK)
+
+        {
+
+            // File closing error
+
+            return 1;
+
+        }
+
+    }
+
+ 
+
+    return 0;
+
+}
+
+ 
+
+unsigned long CompressBuffer(unsigned char *inBuffer, unsigned long inSize, 
+
+                         unsigned char *outBuffer, unsigned long outSize, size_t *outSizeProcessed)
+
+{
+
+    bool dictDefined = false;
+
+    UInt32 dict = (UInt32)-1;
+
+ 
+
+    if ((inSize == 0) || (inBuffer == 0)) return 1;
+
+    if (/*(outSize == 0) || */(outBuffer == 0)) return 1;
+
+ 
+
+    Byte *outBuffer2 = 0;
+
+    size_t outSize2;
+
+ 
+
+    // we allocate 105% of original size for output buffer
+
+    outSize2 = (size_t)inSize / 20 * 21 + (1 << 16); //fileSize / 20 * 21 + (1 << 16)
+
+    if (outSize2 != 0)
+
+    {
+
+        outBuffer2 = (Byte *)MyAlloc((size_t)outSize2);
+
+        if (outBuffer2 == 0) return 1;//throw "Can not allocate memory";
+
+    }
+
+ 
+
+    if (!dictDefined) dict = 1 << 23;
+
+ 
+
+    *outSizeProcessed = outSize2; // !!
+
+    int res = Lzma86_Encode(outBuffer2, outSizeProcessed, inBuffer, inSize,
+
+                            5, dict, SZ_FILTER_AUTO);
+
+    if (res != 0)
+
+    {
+
+        // Encoder error = (int)res
+
+        return 1;
+
+    }
+
+ 
+
+    memcpy(outBuffer, outBuffer2, *outSizeProcessed);
+
+ 
+
+    MyFree(outBuffer2);
+
+ 
+
+    return *outSizeProcessed == 0 ?1:0;
+
+}
+
+ 
+
+unsigned long UncompressBuffer(unsigned char *inBuffer, unsigned long inSize, 
+
+                           unsigned char *outBuffer, unsigned long outSize, size_t *outSizeProcessed)
+
+{
+
+    if ((inSize == 0) || (inBuffer == 0)) return 1;
+
+    if (/*(outSize == 0) || */(outBuffer == 0)) return 1;
+
+ 
+
+    Byte *outBuffer2 = 0;
+
+    size_t outSize2;
+
+ 
+
+    UInt64 outSize64;
+
+    if (Lzma86_GetUnpackSize(inBuffer, inSize, &outSize64) != 0)
+
+        return 1;//throw "data error";
+
+    outSize2 = (size_t)outSize64;
+
+    if (outSize2 != outSize64)
+
+        return 1;//throw "too big";
+
+    if (outSize2 != 0)
+
+    {
+
+        outBuffer2 = (Byte *)MyAlloc(outSize2);
+
+        if (outBuffer2 == 0)
+
+            return 1;//throw "Can not allocate memory";
+
+    }
+
+ 
+
+    size_t inSize2 = inSize;
+
+    *outSizeProcessed = outSize2;
+
+    int res = Lzma86_Decode(outBuffer2, outSizeProcessed, inBuffer, &inSize2);
+
+    if (inSize2 != (size_t)inSize)
+
+        return 1;//throw "incorrect processed size";
+
+    if (res != 0)
+
+        return 1;//throw "LzmaDecoder error";
+
+ 
+
+    memcpy(outBuffer, outBuffer2, *outSizeProcessed);
+
+ 
+
+    MyFree(outBuffer2);
+
+ 
+
+    return *outSizeProcessed == 0 ?1:0;
+
+http://blog.163.com/yesaidu@126/blog/static/51819307200982324148127/

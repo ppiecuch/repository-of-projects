@@ -1,0 +1,30 @@
+1，项目需求，是程序home键切入后台，3分钟后退出登陆，
+  首先，iOS 会再持续切入后台，给我们5秒钟的时间去处理相关数据，5秒后，程序不会再执行任何代码，处于挂起状态。
+   
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+ //切入后台 ，申请后台任务时间，
+    UIApplication *app = [UIApplication sharedApplication];
+    UIBackgroundTaskIdentifier taskID;//一个后台任务标识符
+    taskID = [app beginBackgroundTaskWithExpirationHandler:^{ //如果系统觉得我们运行时间太长，将执行这个程序块，并停止运行应用程序
+       
+        [app endBackgroundTask:taskID];
+    }];
+    
+    if (taskID == UIBackgroundTaskInvalid) {//UIBackgroundTaskInvalid表示系统没有为我们提供额外的时间
+       
+        return;
+    }
+
+    [self performSelector:@selector(exitApp) withObject:nil afterDelay:180.0];//退入后台 延时3分钟，退出登陆
+  
+}
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+
+    [[UIApplication sharedApplication] endBackgroundTask:taskID];//切回前台，结束后台任务
+    [NSObject   cancelPreviousPerformRequestsWithTarget:self selector:@selector(exitApp) object:nil];//取消之前将要退出的方法
+
+}
+
+参考博客  http://blog.csdn.net/diyagoanyhacker/article/details/7071055
+http://blog.sina.com.cn/s/blog_7f422a89010190jk.html

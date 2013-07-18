@@ -7,12 +7,16 @@ encoding//android/proguard/Android\ \u4E2D\ Proguard\ \u548CJNI\ \u76F8\u5173.tx
 encoding//android/sound/OpenAL\ on\ Android.txt=UTF-8
 encoding//c_c++/C++/C++11/C++11\ \u6A19\u6E96\u6B63\u5F0F\u767C\u5E03.txt=UTF-8
 encoding//c_c++/basis/C++\u5B57\u7B26\u4E32\u5206\u8BCD.txt=UTF-8
+encoding//c_c++/memory/Don't\ Let\ Memory\ Allocation\ Failures\ Crash\ Your\ Legacy\ STL\ Application.txt=UTF-8
 encoding//c_c++/thread/\u4FE1\u53F7\u91CF\u4E0E\u4E92\u65A5\u9501.txt=UTF-8
 encoding//c_c++/thread/\u5728C++\u4E2D\u5B9E\u73B0\u540C\u6B65\u9501,\u7C7B\u4F3CSynchronize\uFF08object\uFF09.txt=UTF-8
 encoding//game/effects/\u8BF7\u6559ogre\u4E2D\u5982\u4F55\u5B9E\u73B0war3\u4E2D\u95EA\u7535\u94FE\u6548\u679C.txt=UTF-8
 encoding//game/emulator/OpenGL\ ES\ Emulator\u6A2A\u5411\u6BD4\u8F83.txt=UTF-8
+encoding//game/engine/Maratis/intro.txt=UTF-8
 encoding//game/engine/SilverLining/url.txt=UTF-8
+encoding//game/engine/raknet/intro.txt=UTF-8
 encoding//game/light/RayTrack/\u5149\u7EBF\u8FFD\u8E2A\u6280\u672F\u7684\u7406\u8BBA\u548C\u5B9E\u8DF5(\u9762\u5411\u5BF9\u8C61).txt=UTF-8
+encoding//game/network/UDP\ vs.\ TCP.txt=UTF-8
 encoding//game/server/\u5E26\u5BBD\u9650\u5236\u4E0B\u7684\u89C6\u89C9\u5B9E\u4F53\u5C5E\u6027\u4F20\u64AD.txt=UTF-8
 encoding//game/shader\ language/\u3010GLSL\u6559\u7A0B\u3011\uFF08\u4E03\uFF09\u9010\u50CF\u7D20\u7684\u5149\u7167.txt=UTF-8
 encoding//game/shader\ language/\u3010GLSL\u6559\u7A0B\u3011\uFF08\u4E5D\uFF09\u5176\u4ED6\u8BF4\u660E.txt=UTF-8
@@ -23,7 +27,9 @@ encoding//industry/2012/20120806_Khronos\ Releases\ OpenGL\ ES\ 3.0\ Specificati
 encoding//industry/2013/20130126\u6B27\u6D32\u79D1\u5B66\u5BB6\u6210\u529F\u5B9E\u73B0DNA\u5B58\u50A8\u6570\u636E\ \u53EF\u5B58\u50A8\u6570\u4E07\u5E74.txt=UTF-8
 encoding//industry/2013/20130204\ 2\u6708\u4E2D\u56FD\u64CD\u4F5C\u7CFB\u7EDF\u62A5\u544A\uFF1AXP\u536067%\uFF0CWin7\u670927.5%.txt=UTF-8
 encoding//industry/2013/\u5218\u97E7\uFF1A\u5173\u4E8E\u53F2\u7389\u67F1\u7684\u4E5D\u4E2A\u6545\u4E8B.txt=UTF-8
+encoding//j2se/jni/FindClass\ failed.txt=UTF-8
 encoding//j2se/jni/The\ Invocation\ API.txt=UTF-8
 encoding//j2se/jni/jniTOC.txt=UTF-8
 encoding//job/candidate/jobs20120226.html=UTF-8
 encoding//math/\u5F69\u8679\u4E3A\u4EC0\u4E48\u662F\u5F2F\u7684\uFF1F.txt=UTF-8
+encoding//tools/\u5B57\u7B26\u8F6C\u6362.html=UTF-8

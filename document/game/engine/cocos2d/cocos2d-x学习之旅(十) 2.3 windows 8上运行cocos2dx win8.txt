@@ -1,0 +1,21 @@
+由于cocos2d-x是基于open gl es 1.0/2.0的，所以不能在windows 8上运行,windows 8上使用的DirectX,所以cocos2dx出现了win8版分支
+
+cocos2dx-win8下载地址：https://github.com/cocos2d-x/cocos2dx-win8
+
+windows 8 RTM 企业版 9200
+
+看看cocos2dx-win8的项目截图
+
+
+
+在原来的cocos2d-x上增加了win8_metro目录，并采用directx重写了open gl es 渲染.
+
+编译运行看看结果
+
+
+
+
+
+先作个记号,以后把cocos2d-x的项目迁移到windows 8,android,ios上。
+
+http://www.cnblogs.com/dekins/archive/2012/09/19/2693079.html

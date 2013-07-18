@@ -1,0 +1,75 @@
+This is the mail archive of the libc-alpha@sourceware.org mailing list for the glibc project.
+
+Index Nav:	 [Date Index] [Subject Index] [Author Index] [Thread Index]
+Message Nav:	[Date Prev] [Date Next]	[Thread Prev] [Thread Next]
+Other format:	[Raw text]
+Re: getenv not thread safe
+
+From: Phil Harman <phil dot harman at sun dot com>
+To: Jakub Jelinek <jakub at redhat dot com>
+Cc: Paul Orang <orang139 at yahoo dot com>, libc-alpha at sourceware dot org
+Date: Mon, 15 Aug 2005 22:51:55 +0100
+Subject: Re: getenv not thread safe
+Hi,
+
+I'm the guy responsible for ...
+
+http://blogs.sun.com/roller/page/pgdh/20050614
+
+
+Thanks for your interest. I found this thread through comments left on the above blog entry. For completeness, I think it is worth quoting them and my response here ...
+
+Posted by *83.28.66.114* on August 15, 2005 at 05:21 AM PDT:
+http://www.opengroup.org/onlinepubs/009695399/functions/getenv.html ,,The getenv() function need not be reentrant. A function that is not required to be reentrant is not required to be thread-safe.''
+
+Posted by Mark Brown on August 15, 2005 at 09:20 AM PDT:
+Any code that relies upon getenv() being thread-safe is inherently non-portable. As the previous commenter points out, the POSIX and the UNIX standards specifications call out getenv() as not guaranteed to be reentrant. While this feature of your getenv() may have benefits, it's not usable in a portable environment.
+
+Posted by Phil Harman on August 15, 2005 at 01:20 PM PDT:
+Well of course that's all very nice, except that some care about *more* than *just* POSIX.
+
+The "MT-Safe" putback to the Solaris libc was made on 92/05/06 (according to the SCCS history). We didn't ship a user-level threads library until 1993, which means Solaris has *always* provided a thread safe getenv().
+
+The Pthreads specification *wasn't even ratified* until 1995 (Solaris 2.5 was shipped with support for Pthreads in November 1995).
+
+When I came to tune getenv(), dropping thread safety simply *wasn't an option*. We could argue until the proverbial cows come home about the relative merits of getenv() thread safety. But that's not the point. We said we were for it. We have always shipped it. We must assume there are people who depend on it.
+
+So, quote whatever standards you will! Our getenv() has always been thread safe, but it is now also *fast*! What's the problem? It's certainly not a problem for Solaris! If people need getenv() to be thread safe, they know where to come; if they don't, I think we've shown that we're here to compete.
+
+
+Now to your comment ...
+
+On Mon, 15 Aug 2005 13:49:53 +0200, Jakub Jelinek wrote:
+On Mon, Aug 15, 2005 at 03:16:56AM -0700, Paul Orang wrote:
+> http://blogs.sun.com/roller/page/pgdh/20050614 points
+> out that glibc getenv is not protected against
+> parallel setenvs. Can it be fixed?
+
+getenv is not required to be thread-safe, see
+http://www.opengroup.org/onlinepubs/009695399/functions/getenv.html
+The string returned by getenv may become invalid after next
+setenv/putenv/unsetenv call, so any program relying on thread-safety
+of these is broken.
+
+Jakub
+
+I agree, but it's a rather moot point due to the very nature of the APIs in question (e.g. that getenv() returns a pointer to the object added to the environment with putenv()). Solaris doesn't address this issue because it cannot be addressed as the APIs are defined.
+
+However, this is not the only issue of thread safety for getenv(). Consider this case ...
+
+While I'm in getenv() for one name another thread calls putenv() with a different name, but one which is not already in the environ array. This doesn't sound like such a broken thing to do, does it? However, putenv() may find that the current environ array is not big enough to hold the new value. What happens to me in getenv() if putenv() allocates a new array and releases the old one? Someone might get to reuse the memory while I'm still in getenv(). It's a SEGV waiting to happen.
+
+In Solaris we used to protect the environ array with a single lock. The problem was it didn't scale (and yes, we had customer demand for this). My lockless reworking of getenv() handles the above scenario (and others). It is safe, but it is also fast. Given the choice of "fast but unsafe" or "fast and safe", which one would you run your business on? The application may have been ported from Solaris, but the issue may have been overlooked (and even extensive testing is unlikely to expose the race).
+
+Cheers,
+
+Phil
+
+
+Attachment: smime.p7s
+Description: S/MIME Cryptographic Signature
+
+Index Nav:	 [Date Index] [Subject Index] [Author Index] [Thread Index]
+Message Nav:	[Date Prev] [Date Next]	[Thread Prev] [Thread Next]
+
+http://www.sourceware.org/ml/libc-alpha/2005-08/msg00053.html
