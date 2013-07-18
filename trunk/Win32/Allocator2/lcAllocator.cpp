@@ -149,7 +149,31 @@ namespace lc{
 		unlock();
 		core::Singleton<MemoryTracer>::destroy();
 		if(!hasLeak)
-			LC_INFO("Congratulation! No memory leak detected!%8s\r\n",LC_SYMBOL_SUCS);
+			LC_DEBG("Congratulation! No memory leak detected!%8s\r\n",LC_SYMBOL_SUCS);
+	}
+
+	void* PrimitiveAllocateTrait::allocate(size_t size){
+		LC_DEBG("PrimitiveAllocateTrait::allocate1\r\n");
+		return operator new(size);
+	}
+	void* PrimitiveAllocateTrait::allocate(size_t size,const c8* file,const c8* func,s32 line){
+		LC_DEBG("PrimitiveAllocateTrait::allocate2\r\n");
+		return operator new(LC_ALLOC_ARGS_SL(size));
+	}
+	void PrimitiveAllocateTrait::deallocate(void *p, size_t size){
+		operator delete(p);
+	}
+
+	void* FixedSizeAllocateTrait::allocate(size_t size){
+		LC_DEBG("FixedSizeAllocateTrait::allocate1\r\n");
+		return operator new(size);
+	}
+	void* FixedSizeAllocateTrait::allocate(size_t size,const c8* file,const c8* func,s32 line){
+		LC_DEBG("FixedSizeAllocateTrait::allocate2\r\n");
+		return operator new(LC_ALLOC_ARGS_SL(size));
+	}
+	void FixedSizeAllocateTrait::deallocate(void *p, size_t size){
+		operator delete(p);
 	}
 
 }

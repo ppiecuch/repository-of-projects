@@ -13,6 +13,12 @@
 
 namespace lc{
 
+class nil{
+public:
+	void lock(){}
+	void unlock(){}
+};
+
 class mutex{
 private:
 #ifdef LC_CMPL_MSVC

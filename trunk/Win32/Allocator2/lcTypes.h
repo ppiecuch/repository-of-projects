@@ -2,6 +2,7 @@
 #define _LUCID_TYPES_H_
 
 #include "lcDefine.h"
+#include "lcDeclare.h"
 
 namespace lc{
 
@@ -61,5 +62,30 @@ typedef unsigned short			c16;
 typedef unsigned long			c32;
 typedef float					f32;
 typedef double					f64;
+
+
+template<typename T, bool isMT>
+struct VolatileTrait
+{
+	typedef T* volatile ValueType;
+};
+template<typename T>
+struct VolatileTrait<T, false>
+{
+	typedef T* ValueType;
+};
+
+
+template<bool isMT>
+struct LockTrait
+{
+	typedef lc::mutex ValueType;
+};
+template<>
+struct LockTrait<false>
+{
+	typedef lc::nil	ValueType;
+};
+
 }
 #endif

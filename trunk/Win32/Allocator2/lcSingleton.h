@@ -21,7 +21,7 @@ namespace core{
 		Singleton()
 		{
 			LC_DEBUG_BREAK_IF( s_pSingleton!=NULL );
-#if defined( _MSC_VER ) && _MSC_VER < 1200	 
+#if defined( LC_CMPL_MSVC ) && LC_CMPL_VERSION < 1200	 
 			s32 offset = (s32)(T*)1 - (s32)(Singleton <T>*)(T*)1;
 			s_pSingleton = (T*)((s32)this + offset);
 #else

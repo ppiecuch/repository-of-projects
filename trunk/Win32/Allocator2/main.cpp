@@ -87,6 +87,11 @@ void limitFPSCallback(f32 value)
 
 lc::FPSLimiter fpsLimiter(false);
 
+struct TestAllocator{
+	s32 a;
+	f32 b;
+};
+
 int main()
 {
 	//EnableMemLeakCheck();
@@ -99,6 +104,15 @@ int main()
 	randomizer::create();
 	{
 #if 1
+
+		Allocator<TestAllocator,ENUM_ALLOCATE_STRATEGY_FIXED_SIZE,false> allocator1;
+		TestAllocator* t1=allocator1.allocate(1);
+		allocator1.deallocate(t1);
+
+		Allocator<TestAllocator,ENUM_ALLOCATE_STRATEGY_PRIMITIVE,false> allocator2;
+		TestAllocator* t2=allocator2.allocate(1);
+		allocator2.deallocate(t2);
+#elif 1
 		fpsLimiter.setFPS((u32)FPS);
 		for(int i=0;i<200;++i)
 		{
@@ -139,7 +153,7 @@ int main()
 #endif
 	}
 
-	LC_DEBG("%u\r\n",timer::getInstance().getTime());
+	//LC_DEBG("%u\r\n",timer::getInstance().getTime());
 	randomizer::getInstance().destroy();
 	timer::getInstance().destroy();
 
