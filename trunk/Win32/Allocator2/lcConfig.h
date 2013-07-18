@@ -36,6 +36,7 @@
 // memory
 // -----------------------------------------------------------------------------
 #define LC_MEMORY_MAX_SIZE 83886080	//80M
+#define LC_FIXED_MEMORY_POOL_GROWTH 16
 
 
 // obsolete (debug: true & release: false)(force true with LC_SHOW_OBSOLETE)

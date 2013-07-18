@@ -64,6 +64,67 @@ public:
 	virtual void destroy();
 };
 
+template<bool isMT,size_t size>
+class FixedMemoryPool : public Uncopyable{
+private:
+	//ROUND_UP 将bytes上调至__ALIGN的倍数
+	enum { ROUND = (size + s_uAlign - 1) & ~(s_uAlign - 1) };
+
+	union FixedNode
+	{
+		union FixedNode* Node;
+		c8 Data[1];
+	};
+	typedef typename VolatileTrait<FixedNode, isMT>::ValueType	FixedNodePtr;
+	typedef typename LockTrait<isMT>::ValueType LockType;
+
+	static const u32 s_uGrowth;
+	static const u32 s_uAlign;
+
+	LockType m_lock;
+
+	// 内存池起始位置
+	c8 *m_pStartFree;
+	// 内存池结束位置
+	c8 *m_pEndFree;
+	// 所分配的空间大小
+	u32 m_uCapacity;
+
+	// free数组
+	FixedNodePtr m_pFrees[1];
+
+	// roundup 将bytes上调至s_uAlign的倍数
+	static inline u32 roundup(u32 bytes)
+	{
+		return ((bytes) + s_uAlign - 1) & ~(s_uAlign - 1);
+	}
+
+	// 根据区块大小，决定使用第n号frees。n从0号起
+	static inline size_t indexInFrees(size_t bytes)
+	{
+		return (((bytes) + s_uAlign - 1) / s_uAlign) - 1;
+	}
+
+	// !配置一块大空间,可容纳count个大小为unit的区块
+	// 这些内存在物理地址上是连在一起的, 返回其指针
+	c8* allocateChunk(size_t unit,size_t& count);
+
+	// 返回一个大小为n的对象,并加入大小为n的其他区块到free队列中
+	FixedNode* refill(size_t n);
+
+	// 清空内存
+	void clear();
+public:
+	FixedMemoryPool();
+	~FixedMemoryPool();
+
+	// n必须大于0
+	void* allocate(size_t n);
+
+	// p不能为空
+	void deallocate(void *p, size_t n);
+};
+
 struct PrimitiveAllocateTrait{
 	static void* allocate(size_t size);
 	static void* allocate(size_t size,const c8* file,const c8* func,s32 line);
