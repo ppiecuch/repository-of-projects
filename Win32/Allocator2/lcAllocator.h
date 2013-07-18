@@ -10,13 +10,9 @@
 
 //refer to:SGIMallocPool.hhp
 
-enum ENUM_ALLOC_STRATEGY{
-	PRIMITIVE = 0,
-	ENUM_ALLOC_STRATEGY_COUNT
-};
-
 namespace lc{
 
+//TODO 此为非公开类
 
 //refer to:http://holos.googlecode.com/svn/trunk/src/h_MemTracer.h
 class MemoryTracer : public core::Singleton<MemoryTracer>,public Obsolete<MemoryTracer>{
@@ -66,6 +62,72 @@ public:
 	u32 getMaxSize() const{return m_uMaxSize;}
 	void dump();
 	virtual void destroy();
+};
+
+struct PrimitiveAllocateTrait{
+	static void* allocate(size_t size);
+	static void* allocate(size_t size,const c8* file,const c8* func,s32 line);
+	static void deallocate(void *p, size_t size);
+};
+
+struct FixedSizeAllocateTrait{
+	static void* allocate(size_t size);
+	static void* allocate(size_t size,const c8* file,const c8* func,s32 line);
+	static void deallocate(void *p, size_t size);
+};
+
+//TODO mem namespace
+enum ENUM_ALLOCATE_STRATEGY{
+	ENUM_ALLOCATE_STRATEGY_PRIMITIVE = 0,
+	ENUM_ALLOCATE_STRATEGY_FIXED_SIZE,
+	ENUM_ALLOCATE_STRATEGY_COUNT
+};
+
+template<ENUM_ALLOCATE_STRATEGY strategy>
+struct AllocateTrait
+{
+	typedef PrimitiveAllocateTrait ValueType;
+};
+
+template<>
+struct AllocateTrait<ENUM_ALLOCATE_STRATEGY_FIXED_SIZE>
+{
+	typedef FixedSizeAllocateTrait ValueType;
+};
+
+template<typename T,ENUM_ALLOCATE_STRATEGY strategy,bool isMT>
+class Allocator{
+	typedef typename AllocateTrait<strategy>::ValueType AllocateType;
+public:
+	T* allocate(size_t cnt)
+	{
+		return cnt==0?NULL:(T*)AllocateType::allocate(cnt* sizeof(T));
+	}
+
+	T* allocate(size_t cnt,const c8* file,const c8* func,s32 line)
+	{
+		return cnt==0?NULL:(T*)AllocateType::allocate(cnt* sizeof(T),file,func,line);
+	}
+
+	//! Deallocate memory for an array of objects
+	void deallocate(T* ptr)
+	{
+		if(ptr==NULL)
+			return;
+		AllocateType::deallocate(ptr,sizeof(T));
+	}
+
+	//! Construct an element
+	void construct(T* ptr, const T&e)
+	{
+		new ((void*)ptr) T(e);
+	}
+
+	//! Destruct an element
+	void destruct(T* ptr)
+	{
+		ptr->~T();
+	}
 };
 
 }
