@@ -17,6 +17,7 @@ inline void EnableMemLeakCheck()
 #include "lcTimer.h"
 #include "lcLimiter.h"
 #include "lcRandomizer.h"
+#include "lcFixedMemoryPool.h"
 using namespace lc;
 
 void outOfMemory(){
@@ -104,6 +105,17 @@ int main()
 	randomizer::create();
 	{
 #if 1
+
+		lc::Allocator<TestAllocator,ENUM_ALLOCATE_STRATEGY_FIXED_SIZE,false> allocator;
+		TestAllocator ta;
+		ta.a=10;
+		ta.b=10.f;
+		TestAllocator* p=allocator.allocate(LC_ALLOC_ARGS_MT(1));
+		allocator.construct(p,ta);
+		LC_DEBG("p:%d,%.2f\r\n",p->a,p->b);
+		allocator.destruct(p);
+		allocator.deallocate(p);
+#elif 1
 
 		Allocator<TestAllocator,ENUM_ALLOCATE_STRATEGY_FIXED_SIZE,false> allocator1;
 		TestAllocator* t1=allocator1.allocate(1);

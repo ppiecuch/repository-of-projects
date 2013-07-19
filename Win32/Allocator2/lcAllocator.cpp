@@ -1,4 +1,5 @@
 #include "lcAllocator.h"
+#include "lcFixedMemoryPool.h"
 #include "lcLogger.h"
 
 
@@ -152,11 +153,12 @@ namespace lc{
 			LC_DEBG("Congratulation! No memory leak detected!%8s\r\n",LC_SYMBOL_SUCS);
 	}
 
+	/*
 	const u32 FixedMemoryPool::s_uGrowth=LC_FIXED_MEMORY_POOL_GROWTH;
 
 	const u32 FixedMemoryPool::s_uAlign=4;
 
-	FixedMemoryPool::FixedMemoryPool():m_pStartFree(NULL),m_pEndFree(NULL),m_uCapacity(0){
+	FixedMemoryPool::FixedMemoryPool():m_pStartFree(NULL),m_pEndFree(NULL),m_uCapacity(0),m_pBlock(NULL){
 		::memset((void*)m_pFrees,0x0,sizeof(FixedNodePtr));
 	}
 
@@ -203,6 +205,12 @@ namespace lc{
 				m_uCapacity += szGet;
 				m_pEndFree = m_pStartFree + szGet;
 
+				// 存储起来提供释放
+				BlockNode* node=LC_NEW BlockNode();
+				node->Next=m_pBlock;
+				node->Ptr=m_pStartFree;
+				m_pBlock=node;
+
 				// 递归调用，修正count
 				return allocateChunk(unitSize, count);
 			}
@@ -225,7 +233,7 @@ namespace lc{
 			return reinterpret_cast<FixedNode*>(pChunk);
 
 		// 否则调整frees，注入新区块
-		FixedNodePtr *pFree  = m_pFrees + indexInFrees(size);
+		FixedNodePtr *pFree  = m_pFrees;
 
 		// 在Chunk空间内建立frees
 		// pResult准备返回给客户端
@@ -263,7 +271,13 @@ namespace lc{
 	}
 
 	void FixedMemoryPool::clear(){
-
+		while(m_pBlock)
+		{
+			BlockNode* next=m_pBlock->Next;
+			delete m_pBlock->Ptr;
+			delete m_pBlock;
+			m_pBlock=next;
+		}
 	}
 
 	void* FixedMemoryPool::allocate(size_t n){
@@ -307,6 +321,8 @@ namespace lc{
 		m_lock.unlock();
 	}
 
+	*/
+
 	void* PrimitiveAllocateTrait::allocate(size_t size){
 		LC_DEBG("PrimitiveAllocateTrait::allocate1\r\n");
 		return operator new(size);
@@ -319,16 +335,19 @@ namespace lc{
 		operator delete(p);
 	}
 
+	STFixedMemoryPool fmp;
 	void* FixedSizeAllocateTrait::allocate(size_t size){
 		LC_DEBG("FixedSizeAllocateTrait::allocate1\r\n");
 		return operator new(size);
 	}
 	void* FixedSizeAllocateTrait::allocate(size_t size,const c8* file,const c8* func,s32 line){
-		LC_DEBG("FixedSizeAllocateTrait::allocate2\r\n");
-		return operator new(LC_ALLOC_ARGS_SL(size));
+		return fmp.allocate(size);
+		//LC_DEBG("FixedSizeAllocateTrait::allocate2\r\n");
+		//return operator new(LC_ALLOC_ARGS_SL(size));
 	}
 	void FixedSizeAllocateTrait::deallocate(void *p, size_t size){
-		operator delete(p);
+		fmp.deallocate(p,size);
+		//operator delete(p);
 	}
 
 }
