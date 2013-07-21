@@ -334,6 +334,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YonEncrypt", "YonEncrypt\Yo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MUI", "MUI\MUI.vcproj", "{957D9AF3-FFFE-49B4-8031-65AD1E60323D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "darkFunction", "darkFunction\darkFunction.vcproj", "{789F7A49-BE7A-45E3-85BE-CFCDC6401361}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06BDAD58-392F-4E42-934E-17F9240080D8} = {06BDAD58-392F-4E42-934E-17F9240080D8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -616,6 +621,10 @@ Global
 		{957D9AF3-FFFE-49B4-8031-65AD1E60323D}.Debug|Win32.Build.0 = Debug|Win32
 		{957D9AF3-FFFE-49B4-8031-65AD1E60323D}.Release|Win32.ActiveCfg = Release|Win32
 		{957D9AF3-FFFE-49B4-8031-65AD1E60323D}.Release|Win32.Build.0 = Release|Win32
+		{789F7A49-BE7A-45E3-85BE-CFCDC6401361}.Debug|Win32.ActiveCfg = Debug|Win32
+		{789F7A49-BE7A-45E3-85BE-CFCDC6401361}.Debug|Win32.Build.0 = Debug|Win32
+		{789F7A49-BE7A-45E3-85BE-CFCDC6401361}.Release|Win32.ActiveCfg = Release|Win32
+		{789F7A49-BE7A-45E3-85BE-CFCDC6401361}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
