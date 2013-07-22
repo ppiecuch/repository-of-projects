@@ -187,6 +187,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Allocator2", "Allocator2\Al
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Window", "Window\Window.vcproj", "{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "doxygen", "doxygen\doxygen.vcproj", "{825569A5-72CB-4DF7-81C2-C28CD9A6F628}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Multithreaded|Win32 = Debug Multithreaded|Win32
@@ -1901,6 +1903,26 @@ Global
 		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua51_Debug|Win32.Build.0 = Debug|Win32
 		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua51_Release|Win32.ActiveCfg = Release|Win32
 		{BD1074A9-3B20-42EB-91D6-3DBE9BF88F8D}.withLua51_Release|Win32.Build.0 = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Debug Multithreaded|Win32.ActiveCfg = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Debug Multithreaded|Win32.Build.0 = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Debug Singlethreaded|Win32.ActiveCfg = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Debug Singlethreaded|Win32.Build.0 = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Debug|Win32.ActiveCfg = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Debug|Win32.Build.0 = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Release Multithreaded|Win32.ActiveCfg = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Release Multithreaded|Win32.Build.0 = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Release Singlethreaded|Win32.ActiveCfg = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Release Singlethreaded|Win32.Build.0 = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Release|Win32.ActiveCfg = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.Release|Win32.Build.0 = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.withLua50_Debug|Win32.ActiveCfg = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.withLua50_Debug|Win32.Build.0 = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.withLua50_Release|Win32.ActiveCfg = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.withLua50_Release|Win32.Build.0 = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.withLua51_Debug|Win32.ActiveCfg = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.withLua51_Debug|Win32.Build.0 = Debug|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.withLua51_Release|Win32.ActiveCfg = Release|Win32
+		{825569A5-72CB-4DF7-81C2-C28CD9A6F628}.withLua51_Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
