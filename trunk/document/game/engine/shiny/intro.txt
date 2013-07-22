@@ -1,0 +1,14 @@
+http://sourceforge.net/projects/shinyprofiler/
+
+Shiny is a lightning fast, fully documented & by-far-easiest-to-use C/C++/Lua profiler with no extensive surgery. 
+Results are smoothed & shown in run-time as a call-tree or sorted-by-time. 
+Output also renderable as graphs in Ogre3D or your custom engine
+
+Features
+
+    Very very low overhead, extremely powerful and accurate high speed profiling
+    Amazingly simple-to-use & flexible interface with lots of examples and docs
+    Results are shown as call-graph or sorted-by-time and readable in run-time code
+    On-the-fly smoothing averages for scientific or main-loop projects like game engines
+    Rendering history graphs & nicely colored output in OGRE 3D or custom engine
+    Clean platform-independent, object-oriented and free-for-any-purpose source code

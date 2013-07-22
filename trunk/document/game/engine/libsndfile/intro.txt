@@ -1,0 +1,32 @@
+Libsndfile is a C library for reading and writing files containing sampled sound (such as MS Windows WAV and the Apple/SGI AIFF format) through one standard library interface. It is released in source code format under the Gnu Lesser General Public License.
+
+The library was written to compile and run on a Linux system but should compile and run on just about any Unix (including MacOS X). There are also pre-compiled binaries available for 32 and 64 bit windows.
+
+It was designed to handle both little-endian (such as WAV) and big-endian (such as AIFF) data, and to compile and run correctly on little-endian (such as Intel and DEC/Compaq Alpha) processor systems as well as big-endian processor systems such as Motorola 68k, Power PC, MIPS and Sparc. Hopefully the design of the library will also make it easy to extend for reading and writing new sound file formats.
+
+It has been compiled and tested (at one time or another) on the following systems:
+
+    Every platform supported by Debian GNU/Linux including x86_64-linux-gnu, i486-linux-gnu, powerpc-linux-gnu, sparc-linux-gnu, alpha-linux-gnu, mips-linux-gnu and armel-linux-gnu.
+    arm-linux-androideab (Android phones OS)
+    powerpc-apple-darwin7.0 (Mac OS X 10.3)
+    sparc-sun-solaris2.8 (using gcc)
+    mips-sgi-irix5.3 (using gcc)
+    QNX 6.0
+    i386-unknown-openbsd2.9
+
+At the moment, each new release is being tested on i386 Linux, x86_64 Linux, PowerPC Linux, Win32 and Win64.
+Features
+
+libsndfile has the following main features :
+
+    Ability to read and write a large number of file formats.
+    A simple, elegant and easy to use Applications Programming Interface.
+    Usable on Unix, Win32, MacOS and others.
+    On the fly format conversion, including endian-ness swapping, type conversion and bitwidth scaling.
+    Optional normalisation when reading floating point data from files containing integer data.
+    Ability to open files in read/write mode.
+    The ability to write the file header without closing the file (only on files open for write or read/write).
+    Ability to query the library about all supported formats and retrieve text strings describing each format. 
+    
+    
+    http://www.mega-nerd.com/libsndfile/
