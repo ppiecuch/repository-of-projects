@@ -1,0 +1,45 @@
+http://allseeing-i.com/ASIPathFinder-cooperative-path-finding-for-real-time-strategy-games
+
+
+I had great fun building Space Harvest, and learned a massive amount. However, as with any project in which you have very little existing expertise, there were a couple of tricky areas. I spent many evenings banging my head against the wall, wondering if I¡¯d ever get something out the door.
+
+I had never written a full game before this, and, in hindsight, probably didn¡¯t choose the simplest place to start with an RTS game. Broadly speaking, there were two things I found especially difficult, path finding, and performance.
+
+I¡®d like to write a post with some tips for improving performance in games for iPhone OS (with a particular focus on the amazing Cocos2d for iPhone framework) a bit later this week.
+
+First though, path finding.
+
+What is path finding?
+
+
+Path finding is what units in Space Harvest do to find their way around the map. In basic terms, they look at where they want to get to, see if there are any obstacles in their path, and, if so, try to find a way around them.
+
+Cooperative path finding takes this a bit further - units plan their path in advance, letting other units on the same team know where they¡¯re likely to be in future. This way, units can plan to avoid each other before they collide.
+
+So, it turns out that a) this is incredibly difficult to get right, and b) it¡¯s even more difficult to get right in a frame-rate-friendly fashion on a relatively slow device like the iPhone / iPhone 3G.
+
+So, I¡¯ve decided to open source the path finding code I wrote for Space Harvest. In keeping with my tradition of releasing software with names that don¡¯t exactly trip off the tongue, it¡¯s called ASIPathFinder. An overview is available here, and the source is on Github.
+
+
+What is ASIPathFinder?
+ASIPathFinder is a complete implementation of a cooperative path finding algorithm, 
+and will probably be most useful for writing Real Time Strategy games. 
+It is written in Objective-C, and is compatible with Mac OS and iPhone OS.
+
+What is a co-operative path finder?
+
+A co-operative path finder allows multiple objects to find a path on a map, 
+planning ahead to alert other objects of where they¡¯re going to travel. 
+This means that an object can avoid other objects ahead of time, before they collide.
+
+ASIPathFinder is based on code I originally wrote for my Space Harvest game for iPod Touch and iPhone. 
+Download the game to get a feel for its capabilities.
+
+Key features
+3 stage path finding - initial assessment (A*), partial path finding avoiding other units, and movement with handling of unanticipated collisions
+Designed for real-time operation - path assessment and path finding can be paused and resumed later to keep frame rates manageable
+Relatively efficient - ASIPathFinder was originally designed for 1st generation iPhone OS devices, which are pretty slow by desktop standards. In Space Harvest it supports path finding for many units across terrain with a huge number of impassable obstacles
+Does not rely on ¡®hinting¡¯ maps with pre-calculated intermediate way points. This means it works well with dynamically changing obstacles, but may be less performant than other implementations if obstacles are static.
+Written in Objective-C (though much of the core stuff uses manual memory management with malloc() for speed), compatible with Mac and iPhone OS.
+Comes with a sample application that demonstrates the core approach, and highlights examples of where it works, and the cases where it will be unable to resolve a collision
+I¡¯ve deliberately made these instructions relatively general - they describe how ASIPathFinder works, but don¡¯t make much detailed reference to the code itself. The code is fairly well commented, but the hard part is understanding the overall process, and that¡¯s what I¡¯ve attempted to cover here. Additionally, I hope this may be useful to anyone implementing their own co-operative path finder, regardless of whether they program in Objective-C or not.
