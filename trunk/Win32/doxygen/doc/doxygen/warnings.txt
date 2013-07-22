@@ -1,0 +1,8 @@
+D:/Development/Workspace/VS2008/Win32/doxygen/include/variant.h:106: Warning: argument 'beginPos' of command @param is not found in the argument list of variant::setInverted(bool inverted)
+D:/Development/Workspace/VS2008/Win32/doxygen/include/variant.h:106: Warning: argument 'order' of command @param is not found in the argument list of variant::setInverted(bool inverted)
+D:/Development/Workspace/VS2008/Win32/doxygen/include/variant.h:106: Warning: argument 'linkChar' of command @param is not found in the argument list of variant::setInverted(bool inverted)
+D:/Development/Workspace/VS2008/Win32/doxygen/include/variant.h:106: Warning: argument 'year' of command @param is not found in the argument list of variant::setInverted(bool inverted)
+D:/Development/Workspace/VS2008/Win32/doxygen/include/variant.h:106: Warning: argument 'month' of command @param is not found in the argument list of variant::setInverted(bool inverted)
+D:/Development/Workspace/VS2008/Win32/doxygen/include/variant.h:106: Warning: argument 'day' of command @param is not found in the argument list of variant::setInverted(bool inverted)
+D:/Development/Workspace/VS2008/Win32/doxygen/include/variant.h:106: Warning: The following parameters of SPK::variant::setInverted(bool inverted) are not documented:
+  parameter 'inverted'
