@@ -1,0 +1,79 @@
+http://code.google.com/p/urho3d/
+
+
+Urho3D is a lightweight, cross-platform rendering and game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D (http://www.horde3d.org.)
+
+Features:
+- Direct3D9 or OpenGL rendering (Shader Model 2, OpenGL 2.0 or OpenGL ES 2.0 required as minimum)
+- HLSL or GLSL shaders + optional offline compilation of HLSL code
+- Configurable rendering pipeline. Default implementations for forward, light pre-pass and deferred rendering
+- Component based scene model
+- Skeletal (with hardware skinning), vertex morph and node animation
+- Automatic instancing on SM3 capable hardware
+- Point, spot and directional lights
+- Shadow mapping for all light types; cascaded shadow maps for directional lights
+- Particle rendering
+- Geomipmapped terrain
+- Static and skinned decals
+- Auxiliary view rendering (reflections etc.)
+- Geometry, material & animation LOD
+- Software rasterized occlusion culling
+- Post-processing
+- Task-based multithreading
+- Hierarchical performance profiler
+- Scene and object load/save in binary and XML format
+- Keyboard, mouse, joystick and touch input (if available)
+- Cross-platform support using SDL 2.0 (currently runs on Windows, Linux, Mac OS X, Android and iOS)
+- Physics using Bullet
+- Scripting using AngelScript
+- Networking using kNet
+- Pathfinding using Recast/Detour
+- Image loading using stb_image + DDS / KTX / PVR compressed texture support
+- 2D and "3D" audio playback, Ogg Vorbis support using stb_vorbis + WAV format support
+- TrueType font rendering using FreeType. AngelCode bitmap fonts are also supported.
+- Unicode string support
+- Inbuilt UI system
+- Scene editor and UI-layout editor implemented in script with undo & redo capabilities
+- Model/scene/animation/material import from formats supported by Open Asset Import Library
+- Alternative model/animation import from OGRE mesh.xml and skeleton.xml files
+- Minimal DLL dependencies (no VS runtime, no D3DX)
+
+Documentation:
+- Doxygen documentation is available online at http://cadaver.homeftp.net/urho3d/
+- Doxygen pages (but not code documentation) also exist converted in the project wiki.
+
+Discussions, support and contributing:
+- There is a Google Groups discussion group / mailing list for questions and discussion.
+- You can also post Urho3D-related questions to the GameDev.net APIs and Tools forum.
+- For bug reports and contributing patches, please use the issue tracker.
+- When you contribute, you have to agree that your work will be released under the license as seen at the top of Urho3D licenses file.
+
+Future work:
+- Restructure the examples: more/focused/smaller, preferably the same in script & C++
+- Rewrite low-level platform support to not use SDL
+- Add modern rendering API support (eg. Direct3D11)
+
+Limitations:
+Though Urho3D already contains several useful features and implements a framework for 3D games and applications, it is not yet a complete out-of-the-box game creation toolkit. Some things you can expect having to work on, or to require skills for: (contributions to the project are naturally welcome)
+- C++ for performance-critical code and improving existing subsystems such as networking, physics and animation, depending on your needs
+- HLSL and GLSL shaders: the provided shaders give only basic examples of what is possible
+- Additional optimization for mobile devices
+- Editors and additional asset conversion functionality
+- Integration of additional 3rd party libraries, for example a more complete UI library, HTML rendering, or additional network protocols
+
+Engine development, contributions and bugfixes by:
+- Lasse ??rni (loorni@gmail.com, AgentC on GameDev.net)
+- Wei Tjong Yao
+- Colin Barrett
+- Erik Beran
+- Carlo Carollo
+- Alex Fuller
+- Mika Heinonen
+- Jason Kinzer
+- Pete Leigh
+- Vladimir Pobedinsky
+- Miika Santala
+- Firegorilla
+- Magic.Lixin
+- primitivewaste
+- skaiware
