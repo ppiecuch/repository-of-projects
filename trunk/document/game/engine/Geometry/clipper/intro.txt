@@ -1,0 +1,12 @@
+Clipper - an open source freeware polygon clipping library.
+
+The Clipper library performs polygon clipping - intersection, union, difference & exclusive-or, and also polygon and polyline offsetting. The library is based on Vatti's clipping algorithm.
+
+The download package contains the library's full source code (written in Delphi, C++, C# and Python), numerous demos, a help file and links to third party Perl, Ruby and Haskell modules.
+
+Version: 5.1.6
+Last updated: 23 May 2013
+Freeware for both open source and commercial applications (Boost Software License).
+
+
+http://www.angusj.com/delphi/clipper.php
