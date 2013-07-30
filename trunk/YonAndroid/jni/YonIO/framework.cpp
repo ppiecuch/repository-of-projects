@@ -159,6 +159,17 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	indices.push_back(2);*/
 
 #if 1
+	int w=480;
+	int h=320;
+	core::matrix4f m1;
+	m1.makeIdentity();
+	m1.lookAt(480,320,553,480,320,0,0,1,0);
+	m1.print();
+	m1.translate(w,h,0);
+	m1.rotate(-90,0,0,1);
+	m1.translate(-h,-w,0);
+	m1.print();
+#elif 1
 	//char result[100];
 	//Pattern("Windows 95","Windows (?=95|98|NT|2000)",result);
 	//printf("%s\n",result);
