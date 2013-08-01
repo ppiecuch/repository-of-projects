@@ -172,6 +172,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PNGVeticalFlip", "PNGVetica
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PNGAlpha", "PNGAlpha\PNGAlpha.vcproj", "{7858D3E0-39EB-47E2-9F39-BE056E68EA24}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "39Silhouette", "39Silhouette\39Silhouette.vcproj", "{7CEF9F78-99A7-4DE4-B318-8DC6CBE97583}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -394,6 +396,10 @@ Global
 		{7858D3E0-39EB-47E2-9F39-BE056E68EA24}.Debug|Win32.Build.0 = Debug|Win32
 		{7858D3E0-39EB-47E2-9F39-BE056E68EA24}.Release|Win32.ActiveCfg = Release|Win32
 		{7858D3E0-39EB-47E2-9F39-BE056E68EA24}.Release|Win32.Build.0 = Release|Win32
+		{7CEF9F78-99A7-4DE4-B318-8DC6CBE97583}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7CEF9F78-99A7-4DE4-B318-8DC6CBE97583}.Debug|Win32.Build.0 = Debug|Win32
+		{7CEF9F78-99A7-4DE4-B318-8DC6CBE97583}.Release|Win32.ActiveCfg = Release|Win32
+		{7CEF9F78-99A7-4DE4-B318-8DC6CBE97583}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
