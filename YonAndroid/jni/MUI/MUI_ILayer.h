@@ -23,7 +23,7 @@ namespace mui{
 	//</Layer>
 	//</MyGUI>
 	//根节点MyGUI的type属性为Layer，表明当前定义的是Layer，也是界面上每个控件所位于的层次。在绘制时，第一个Layer总是最后一个绘制。
-	//所以下面的第一个Layer节点被定义为了Wallpaper，也就是背景。
+	//所以上面的第一个Layer节点被定义为了Wallpaper，也就是背景。
 	//
 	//Layer节点的类型为两类：SharedLayer和OverlappedLayer。位于SharedLayer层的控件是不能有重叠的情况发生的，否则会无法正确绘制。
 	//在绘制时，整个ShareLayer层的控件被同时绘制出来。如果希望控件可以相互重叠，那么需要使用OverlappedLayer，但是在绘制的时候是按照根节点的控件顺序进行的。
