@@ -192,11 +192,23 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_ControllerItem.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_ControllerManager.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_EventPair.h"
 			>
 		</File>
 		<File
 			RelativePath=".\MUI_Fill.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_Gui.h"
 			>
 		</File>
 		<File
@@ -242,6 +254,18 @@
 		<File
 			RelativePath=".\MUI_IShapWidget.h"
 			>
+		</File>
+		<File
+			RelativePath=".\MUI_IUnlinkWidget.h"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\MUI_Label.h"
@@ -305,6 +329,10 @@
 		</File>
 		<File
 			RelativePath=".\MUI_Widget.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_WidgetManager.h"
 			>
 		</File>
 		<File

@@ -175,6 +175,7 @@ namespace mui{
 
 		return isFocusMouse();
 		*/
+		//if any widget captured mouse 
 		if(isCaptureMouse())
 		{
 			if(hasFocusMouseWidget())
