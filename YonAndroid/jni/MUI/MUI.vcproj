@@ -208,6 +208,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_Gui.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_Gui.h"
 			>
 		</File>
@@ -292,6 +296,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_LayoutManager.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_MouseButton.h"
 			>
 		</File>
@@ -321,6 +329,10 @@
 		</File>
 		<File
 			RelativePath=".\MUI_SkinLayerItem.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_SkinManager.h"
 			>
 		</File>
 		<File

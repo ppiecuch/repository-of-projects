@@ -10,7 +10,7 @@ namespace mui{
 		void initialise();
 		void shutdown();
 
-		Widget* createWidget(WidgetStyle style, const core::stringc& type, const core::stringc& skin, const IntCoord& _coord, Widget* parent, ICroppedRectangle* cropeedParent, const core::stringc& name);
+		Widget* createWidget(WidgetStyle style, const core::stringc& type, const core::stringc& skin, const core::coordi& coord, Widget* parent, ICroppedRectangle* cropeedParent, const core::stringc& name);
 	};
 }
 #endif
