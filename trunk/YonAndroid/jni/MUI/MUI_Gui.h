@@ -7,25 +7,37 @@ namespace mui{
 
 	class Gui{
 	private:
+		//负责输入事件的管理与分派
 		InputManager* m_pInputManager;
+		//TODO 具体职责
 		SkinManager* m_pSkinManager;
+		//TODO 具体职责
+		LayerManager* m_pLayerManager;
+		//TODO 具体职责
 		LayoutManager* m_pLayoutManager;
+		//TODO 具体职责
 		ResourceManager* m_pResourceManager;
+		//TODO 具体职责
 		SubWidgetManager* m_pSubWidgetManager;
+		//TODO 具体职责
 		WidgetManager* m_pWidgetManager;
 		//TODO 允许继承
 		//LanguageManager* mLanguageManager;
 		//TODO 允许继承
 		//FontManager* mFontManager;
+
+		bool m_bIsInitialise;
+
+		Widget* baseCreateWidget(WidgetStyle style, const core::stringc& type, const core::stringc& skin, const core::coordi& coord, Align align, const core::stringc& layer, const core::stringc& name);
 	public:
 		Gui();
 
 		/** 
-		* @brief Initialise GUI and all GUI Managers
-		* @param[in] xml name of core config file for MyGUI (contain main config files with skins, layers, fonts, etc.)
+		* @brief Initialize GUI and all GUI Managers
+		* @param[in] xml name of core config file for MUI (contain main config files with skins, layers, fonts, etc.)
 		*/
 		//TODO 不从资源加载
-		void initialise(const core::stringc& xml = "MyGUI_Core.xml");
+		void initialize(const core::stringc& xml = "MUI_Core.xml");
 
 		/** 
 		* @brief Shutdown GUI and all GUI Managers
