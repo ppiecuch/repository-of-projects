@@ -4,6 +4,8 @@
 #include <string.h>
 #include <string>
 
+#include "MyGUI_RTTI.h"
+
 #include <crtdbg.h>
 inline void EnableMemLeakCheck()
 {
@@ -11,11 +13,15 @@ inline void EnableMemLeakCheck()
 }
 
 class Base{
-
+	MYGUI_RTTI_BASE(Base)
 };
 
 class Extend : public Base{
+	MYGUI_RTTI_DERIVED(Extend)
+};
 
+class Derived : public Extend{
+	MYGUI_RTTI_DERIVED(Derived)
 };
 
 class Other{
@@ -34,8 +40,19 @@ int main(int argc, char* argv[])
 
 	Base a;
 	Extend b;
-	Other c;
+	Derived c;
+	Other d;
 	bool result;
+
+	printf("%d\r\n",a.isType<Base>());
+	printf("%d\r\n",a.isType<Extend>());
+	printf("%d\r\n",a.isType<Derived>());
+	printf("%d\r\n",b.isType<Base>());
+	printf("%d\r\n",b.isType<Extend>());
+	printf("%d\r\n",b.isType<Derived>());
+	printf("%d\r\n",c.isType<Base>());
+	printf("%d\r\n",c.isType<Extend>());
+	printf("%d\r\n",c.isType<Derived>());
 
 	printf("%d\r\n",typeid(float)==typeid(0.f));
 
