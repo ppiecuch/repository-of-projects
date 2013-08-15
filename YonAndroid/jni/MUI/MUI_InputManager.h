@@ -33,7 +33,7 @@ namespace mui{
 		bool m_bInitialized;
 
 		//void frameEntered(float _frame);
-		void onFrameEntered(u32 time);
+		void onFrame(u32 time);
 
 		void resetMouseFocusWidget();
 
@@ -41,7 +41,7 @@ namespace mui{
 	public:
 		InputManager();
 
-		void initialise();
+		void initialize();
 		void shutdown();
 
 		/** 
@@ -99,12 +99,14 @@ namespace mui{
 		void addModalWidget(Widget* widget);
 
 		/** 
-		 *@brief Remove modal widget 
+		 * @brief Remove modal widget 
 		 */
 		//void removeWidgetModal(Widget* widget);
 		void removeModalWidget(Widget* widget);
 
-		/** Return true if any modal widget exist */
+		/** 
+		* @brief Return true if any modal widget exist 
+		*/
 		//bool isModalAny() const;
 		bool hasModalWidget() const;
 
@@ -117,10 +119,11 @@ namespace mui{
 
 		/** 
 		 *@brief Event : MultiDelegate. Mouse focus was changed.\n
-		 *signature : void method(MyGUI::Widget* _widget)\n
-		 *@param _widget
+		 *signature : void method(MyGUI::Widget* widget)\n
+		 *@param widget
 		 */
-		delegates::CMultiDelegate1<Widget*> eventChangeMouseFocus;
+		//delegates::CMultiDelegate1<Widget*> eventChangeMouseFocus;
+		delegates::CMultiDelegate1<Widget*> focusChangeEvents;
 	};
 }
 #endif

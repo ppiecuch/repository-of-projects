@@ -1,26 +1,35 @@
 #ifndef _MUI_GUI_H_
 #define _MUI_GUI_H_
 
-using namespace yon;
+//refer to:FactoryManager 主要管理控件创建的Delegate的注册Map 
+//http://blog.csdn.net/geometry_/article/details/7354252
+
+#include "MUI_Prepare.h"
+#include "MUI_Align.h"
+#include "MUI_WidgetStyle.h"
 
 namespace mui{
 
+	typedef core::CMultiDelegate1<u32> EventHandle_FrameEventDelegate;
+
 	class Gui{
 	private:
+		//凡是继承于基类IObject 的子类都可以通过FactoryManger创建。
+		FactoryManager* m_pFactoryManager;
 		//负责输入事件的管理与分派
-		InputManager* m_pInputManager;
+		//InputManager* m_pInputManager;
 		//TODO 具体职责
-		SkinManager* m_pSkinManager;
+		//SkinManager* m_pSkinManager;
 		//TODO 具体职责
-		LayerManager* m_pLayerManager;
+		//LayerManager* m_pLayerManager;
 		//TODO 具体职责
-		LayoutManager* m_pLayoutManager;
+		//LayoutManager* m_pLayoutManager;
 		//TODO 具体职责
-		ResourceManager* m_pResourceManager;
+		//ResourceManager* m_pResourceManager;
 		//TODO 具体职责
-		SubWidgetManager* m_pSubWidgetManager;
+		//SubWidgetManager* m_pSubWidgetManager;
 		//TODO 具体职责
-		WidgetManager* m_pWidgetManager;
+		//WidgetManager* m_pWidgetManager;
 		//TODO 允许继承
 		//LanguageManager* mLanguageManager;
 		//TODO 允许继承
@@ -28,7 +37,14 @@ namespace mui{
 
 		bool m_bIsInitialise;
 
+		//VectorWidgetPtr mWidgetChild;
+		core::array<Widget*> m_widgetChildren;
+
 		Widget* baseCreateWidget(WidgetStyle style, const core::stringc& type, const core::stringc& skin, const core::coordi& coord, Align align, const core::stringc& layer, const core::stringc& name);
+
+		//removes all children
+		//void _destroyAllChildWidget();
+		void destroyAllChildWidget();
 	public:
 		Gui();
 
@@ -53,21 +69,32 @@ namespace mui{
 		/** 
 		* @brief Destroy any created widget 
 		*/
-		void destroyWidget(Widget* widget);
+		//void destroyWidget(Widget* widget);
 
 		/** 
 		* @brief Find widget by name
 		*
 		* If widget is not found the exception will be thrown, or if the second parameter is false the nullptr pointer will be returned
 		*/
-		Widget* findWidgetT(const core::stringc& name, bool throwException = true);
+		//Widget* findWidgetT(const core::stringc& name, bool throwException = true);
+		Widget* findWidgetT(const core::stringc& name);
 
 		/** 
 		* @brief Inject frame entered event (called be renderer, do not call it manually).
 		*
 		* This function is called every frame by renderer.
 		*/
-		void frameEvent(f32 time);
+		//void frameEvent(float _time);
+		void onFrame(u32 time);
+
+		/** 
+		* @brief Event : Multidelegate. GUI per frame call.
+		*
+		* signature : void method(float time)
+		* @param time Time elapsed since last frame
+		*/
+		//EventHandle_FrameEventDelegate eventFrameStart;
+		EventHandle_FrameEventDelegate frameEvents;
 	};
 }
 #endif

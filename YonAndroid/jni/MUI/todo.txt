@@ -1,0 +1,3 @@
+1、添加SerializationManager、ISerializer，统一管理XML解析、流文件解析等资源解析工作(参考Serialization.vsd)
+2、屏蔽字符接口 §№☆★○●◎◇◆□℃‰�■△▲※→←↑↓〓¤°＃＆＠＼︿＿￣―♂♂∪ω
+3、UI控件池
