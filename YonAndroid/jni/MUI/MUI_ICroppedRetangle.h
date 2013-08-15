@@ -1,16 +1,14 @@
 #ifndef _MUI_ICROPPEDRETANGLE_H_
 #define _MUI_ICROPPEDRETANGLE_H_
 
-#include "rect.h"
-#include "margin.h"
-using namespace yon;
+#include "MUI_Prepare.h"
 
 namespace mui{
 
-	class ICroppedRetangle{
+	class ICroppedRectangle{
 	protected:
 		//ICroppedRectangle* mCroppedParent;
-		ICroppedRetangle* m_pParent;
+		ICroppedRectangle* m_pParent;
 		//bool mIsMargin;
 		bool m_bCroppedByParent;
 

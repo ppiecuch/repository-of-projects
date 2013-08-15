@@ -13,7 +13,7 @@ namespace mui{
 			instance = new Type();
 		}
 	public:
-		typedef core::CDelegate1<IObject*&> Delegate;
+		typedef core::CDelegate1<void,IObject*&> Delegate;
 		static typename Delegate::IDelegate* getFactory()
 		{
 			return newDelegate(createFromFactory);

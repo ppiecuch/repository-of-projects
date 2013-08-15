@@ -10,7 +10,7 @@
 
 namespace mui{
 
-	typedef core::CMultiDelegate1<u32> EventHandle_FrameEventDelegate;
+	typedef core::CMultiDelegate1<void,u32> EventHandle_FrameEventDelegate;
 
 	class Gui{
 	private:

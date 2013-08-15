@@ -86,6 +86,7 @@ namespace mui{
 			LayerManager::getInstance().attachToLayerNode(_layer, widget);
 		return widget;*/
 		//TODO
+		return NULL;
 	}
 
 	void Gui::destroyAllChildWidget(){

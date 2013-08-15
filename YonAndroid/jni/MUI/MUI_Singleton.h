@@ -41,4 +41,5 @@ namespace mui{
 		static T* getInstancePointer() { return s_pSingleton; }
 	};
 }
-}
+
+#endif

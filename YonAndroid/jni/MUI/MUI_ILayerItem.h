@@ -1,13 +1,9 @@
 #ifndef _MUI_ILAYERITEM_H_
 #define _MUI_ILAYERITEM_H_
 
-#include "rect.h"
+#include "MUI_Prepare.h"
 
 namespace mui{
-
-	class ILayer;
-	class ILayerNode;
-	class LayerNode;
 
 	class ILayerItem{
 	private:
@@ -17,7 +13,7 @@ namespace mui{
 
 		friend class LayerNode;
 	public:
-		LayerItem();
+		ILayerItem();
 		virtual ~ILayerItem(){}
 
 		virtual ILayerItem* getLayerItemByPosition(const core::position2di& pos) const = 0;

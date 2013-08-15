@@ -9,7 +9,7 @@ namespace mui{
 	//TODO µ¥Àý
 	class FactoryManager : public Singleton<FactoryManager>{
 	public:
-		typedef core::CDelegate1<IObject*&> Delegate;
+		typedef core::CDelegate1<void,IObject*&> Delegate;
 	private:
 		//typedef std::map<std::string, Delegate> MapFactoryItem;
 		//typedef std::map<std::string, MapFactoryItem> MapRegisterFactoryItem;
@@ -26,16 +26,16 @@ namespace mui{
 			GeneratorId(const core::stringc& category,const core::stringc& type)
 				:Category(category),Type(type){}
 
-			bool operator<(const GeneratorId& o){
+			bool operator<(const GeneratorId& o) const{
 				//TODO Ê¹ÓÃcompare
 				if(Category<o.Category)
 					return true;
-				if(Category>o.Category)
+				if(o.Category<Category)
 					return false;
 				return Type<o.Type;
 			};
 
-			bool operator==(const GeneratorId& o){
+			bool operator==(const GeneratorId& o) const{
 				return Category==o.Category&&Type==o.Type;
 			}
 		};

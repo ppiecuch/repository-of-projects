@@ -1,15 +1,19 @@
 #ifndef _MUI_INPUT_H_
 #define _MUI_INPUT_H_
 
+#include "MUI_Prepare.h"
+#include "MUI_MouseButton.h"
+#include "MUI_EventPair.h"
+
 namespace mui{
 
-	typedef delegates::CMultiDelegate1<Widget*> EventHandle_WidgetVoid;
-	typedef delegates::CMultiDelegate2<Widget*, Widget*> EventHandle_WidgetWidget;
-	typedef delegates::CMultiDelegate2<Widget*, bool> EventHandle_WidgetBool;
-	typedef delegates::CMultiDelegate2<Widget*, int> EventHandle_WidgetInt;
-	typedef delegates::CMultiDelegate2<Widget*, size_t> EventHandle_WidgetSizeT;
-	typedef delegates::CMultiDelegate3<Widget*, int, int> EventHandle_WidgetIntInt;
-	typedef delegates::CMultiDelegate4<Widget*, int, int, MouseButton> EventHandle_WidgetIntIntButton;
+	typedef core::CMultiDelegate1<void,Widget*> EventHandle_WidgetVoid;
+	typedef core::CMultiDelegate2<void,Widget*, Widget*> EventHandle_WidgetWidget;
+	typedef core::CMultiDelegate2<void,Widget*, bool> EventHandle_WidgetBool;
+	typedef core::CMultiDelegate2<void,Widget*, int> EventHandle_WidgetInt;
+	typedef core::CMultiDelegate2<void,Widget*, size_t> EventHandle_WidgetSizeT;
+	typedef core::CMultiDelegate3<void,Widget*, int, int> EventHandle_WidgetIntInt;
+	typedef core::CMultiDelegate4<void,Widget*, int, int, MouseButton> EventHandle_WidgetIntIntButton;
 
 	//Ö»±»Widget¼Ì³Ð
 	//WidgetInput
