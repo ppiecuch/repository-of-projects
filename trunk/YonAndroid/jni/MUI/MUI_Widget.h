@@ -1,6 +1,12 @@
 #ifndef _MUI_WIDGET_H_
 #define _MUI_WIDGET_H_
 
+#include "MUI_Prepare.h"
+#include "MUI_ICroppedRetangle.h"
+#include "MUI_Input.h"
+#include "MUI_SkinLayerItem.h"
+#include "MUI_WidgetStyle.h"
+
 namespace mui{
 
 	//Widget
@@ -52,7 +58,7 @@ namespace mui{
 
 		//creates a widget
 		//Widget* baseCreateWidget(WidgetStyle _style, const std::string& _type, const std::string& _skin, const IntCoord& _coord, Align _align, const std::string& _layer, const std::string& _name, bool _template);
-		Widget* baseCreateWidget(WidgetStyle style, const core::stringc& name, const core::stringc& type, const core::stringc& skin, const core::recti& coord, Align align, const core::stringc& layer, bool template);
+		Widget* baseCreateWidget(WidgetStyle style, const core::stringc& name, const core::stringc& type, const core::stringc& skin, const core::recti& coord, Align align, const core::stringc& layer, bool temp);
 
 	public:
 

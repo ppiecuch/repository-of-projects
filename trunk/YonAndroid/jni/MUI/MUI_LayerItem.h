@@ -1,11 +1,10 @@
 #ifndef _MUI_LAYERITEM_H_
 #define _MUI_LAYERITEM_H_
 
-#include "yonArray.h"
+#include "MUI_Prepare.h"
+#include "MUI_ILayerItem.h"
 
 namespace mui{
-
-	class IBaseWidget;
 
 	class LayerItem : ILayerItem{
 		ILayer* m_pLayer;

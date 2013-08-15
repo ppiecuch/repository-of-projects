@@ -6,7 +6,13 @@ using namespace yon;
 
 namespace mui{
 	class FactoryManager;
+	class IBaseWidget;
+	class ICroppedRectangle;
+	class ILayer;
+	class ILayerNode;
 	class IObject;
+	class IShapWidget;
+	class LayerNode;
 	class Widget;
 }
 #endif

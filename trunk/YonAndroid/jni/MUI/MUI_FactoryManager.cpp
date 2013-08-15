@@ -51,9 +51,9 @@ namespace mui{
 
 	void FactoryManager::unregisterFactory(const core::stringc& category, const core::stringc& type){
 		GeneratorId id(category,type);
-		Delegate::IDelegate* dg=NULL;
+		Delegate dg;
 		m_generators.remove(id,&dg);
-		if(dg==NULL)
+		if(dg.empty())
 			YON_WARN(YON_LOG_WARN_FORMAT,"unregisterFactory failed for not found generator with category:%s,type:%s\r\n",category.c_str(),type.c_str());
 		
 	}
@@ -78,7 +78,7 @@ namespace mui{
 			return NULL;
 		}
 		IObject* result = NULL;
-		Delegate::IDelegate* dg=node->getValue();
+		Delegate& dg=node->getValue();
 		dg(result);
 		return result;
 	}
