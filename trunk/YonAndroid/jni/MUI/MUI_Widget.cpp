@@ -8,12 +8,12 @@ namespace mui{
 		if(m_pWidgetClient)
 			m_pWidgetClient->tail(widget);
 
-		s32 index=m_children.binary_search(widget);
+		s32 index=m_widgetChildren.binary_search(widget);
 
 		if(index!=-1)
 		{
-			m_children.erase(index);
-			m_children.push_back(widget);
+			m_widgetChildren.erase(index);
+			m_widgetChildren.push_back(widget);
 		}
 	}
 }

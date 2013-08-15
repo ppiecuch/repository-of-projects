@@ -45,7 +45,7 @@ namespace mui{
 		m_bInitialized=false;
 	}
 
-	void InputManager::onFrameEntered(u32 time){
+	void InputManager::onFrame(u32 time){
 
 	}
 

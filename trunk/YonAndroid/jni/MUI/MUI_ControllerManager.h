@@ -21,7 +21,7 @@ namespace mui{
 	public:
 		ControllerManager();
 
-		void initialise();
+		void initialize();
 		void shutdown();
 
 		/** 

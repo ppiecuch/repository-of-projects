@@ -15,7 +15,7 @@ namespace mui{
 	public:
 		LayoutManager();
 
-		void initialise();
+		void initialize();
 		void shutdown();
 
 		/** Load layout file

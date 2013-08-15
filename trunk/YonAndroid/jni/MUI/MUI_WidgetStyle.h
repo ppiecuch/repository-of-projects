@@ -4,8 +4,6 @@
 namespace mui{
 
 	struct WidgetStyle{
-	private:
-		Enum value;
 	public:
 		//子级/弹出/重叠
 		//对于Window下的窗口，有以下特性：
@@ -21,6 +19,9 @@ namespace mui{
 			Overlapped, /**< child widget, cropped by parent widget borders, can overlap (used by default for root widgets) */
 			COUNT
 		};
+	private:
+		Enum value;
+	public:
 
 		WidgetStyle() : 
 			value(COUNT){

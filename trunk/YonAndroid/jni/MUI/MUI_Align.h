@@ -4,8 +4,6 @@
 namespace mui{
 
 	struct Align{
-	private:
-		Enum value;
 	public:
 		enum Enum{
 			HCenter = 0, //center horizontally
@@ -25,6 +23,8 @@ namespace mui{
 
 			COUNT = 11
 		};
+	private:
+		Enum value;
 		//缺点是水平方向跟垂直方向没有默认值
 		/*enum Enum{
 			HCenter = 0x1, //center horizontally
@@ -42,9 +42,9 @@ namespace mui{
 			Stretch = HStretch | VStretch, //stretch proportionate to parent window
 			Default = Left | Top //default value (value from left and top)
 		};*/
-
-		Align(Enum value = Default) :
-			value(value)
+	public:
+		Align(Enum v = Default) :
+			value(v)
 		{
 		}
 
@@ -116,18 +116,20 @@ namespace mui{
 
 		Align& operator |= (const Align& other)
 		{
-			value = Enum(value | other.value);
+			value = Enum(s32(value) | s32(other.value));
 			return *this;
 		}
 
+		//如果不进行s32()转换，会报 error C2440: “<function-style-cast>”: 无法从“mui::Align”转换为“mui::Align::Enum”
+		//没有可用于执行该转换的用户定义的转换运算符，或者无法调用该运算符
 		friend Align operator | (Enum a, Enum b)
 		{
-			return Align(Enum(a | b));
+			return Align(Enum(s32(a) | s32(b)));
 		}
 
 		friend Align operator | (const Align& a, const Align& b)
 		{
-			return Align(Enum(a.value | b.value));
+			return Align(Enum(s32(a.value) | s32(b.value)));
 		}
 
 		friend bool operator == (const Align& a, const Align& b)

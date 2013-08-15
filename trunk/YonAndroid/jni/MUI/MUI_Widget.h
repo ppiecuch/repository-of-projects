@@ -14,7 +14,7 @@ namespace mui{
 		Widget* m_pWidgetClient;
 
 		//VectorWidgetPtr mWidgetChild;
-		core::array<Widget*> m_children;
+		core::array<Widget*> m_widgetChildren;
 
 		//VectorWidgetPtr mWidgetChildSkin;
 		core::array<Widget*> m_skinChildren;
