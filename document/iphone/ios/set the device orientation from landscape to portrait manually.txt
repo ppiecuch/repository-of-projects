@@ -1,0 +1,48 @@
+he solution is different for ios5 and ios6. This is my code to set device orientation to landscape only.
+
+First, in RootViewController.mm:
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+return UIInterfaceOrientationIsLandscape( interfaceOrientation );
+}
+
+- (BOOL)shouldAutorotate {
+return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations {
+return UIInterfaceOrientationMaskLandscape;
+}
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
+return UIInterfaceOrientationLandscapeRight;
+}
+
+Secondly, in AppController.mm:
+
+use code below to set root view controller to window:
+NSString *reqSysVer = @"6.0";
+NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
+
+if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending)
+{
+        [window setRootViewController:viewController]; //iOS 6
+    } else {
+        [window addSubview: viewController.view]; //iOS 5 or less
+    }
+
+//    window.rootViewController = self.viewController;
+
+and overwrite this function:
+- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+NSString *reqSysVer = @"6.0";
+NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
+
+if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending)
+{
+        return UIInterfaceOrientationMaskLandscape; //iOS 6
+    } else {
+        return UIInterfaceOrientationPortrait; //iOS 5 or less
+    }
+}
+
+http://www.cocos2d-x.org/boards/6/topics/14072
