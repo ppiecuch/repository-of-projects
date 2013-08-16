@@ -168,6 +168,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\MUI.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MUI_Align.h"
 			>
 		</File>
