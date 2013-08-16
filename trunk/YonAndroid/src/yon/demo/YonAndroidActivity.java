@@ -68,7 +68,8 @@ public class YonAndroidActivity extends Activity{
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
 				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		//Òþ²Ø×´Ì¬À¸Í¼±ê
-		getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+		if(Util.supportsSystemUiFlags())
+			getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
 		
 		//setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
