@@ -10,9 +10,9 @@
 
 namespace mui{
 
-	typedef core::CMultiDelegate1<void,u32> EventHandle_FrameEventDelegate;
+	typedef core::CDelegate1<void,u32> EventHandle_FrameEventDelegate;
 
-	class Gui{
+	class MUI_API Gui{
 	private:
 		//凡是继承于基类IObject 的子类都可以通过FactoryManger创建。
 		FactoryManager* m_pFactoryManager;

@@ -7,13 +7,13 @@
 
 namespace mui{
 
-	typedef core::CMultiDelegate1<void,Widget*> EventHandle_WidgetVoid;
-	typedef core::CMultiDelegate2<void,Widget*, Widget*> EventHandle_WidgetWidget;
-	typedef core::CMultiDelegate2<void,Widget*, bool> EventHandle_WidgetBool;
-	typedef core::CMultiDelegate2<void,Widget*, int> EventHandle_WidgetInt;
-	typedef core::CMultiDelegate2<void,Widget*, size_t> EventHandle_WidgetSizeT;
-	typedef core::CMultiDelegate3<void,Widget*, int, int> EventHandle_WidgetIntInt;
-	typedef core::CMultiDelegate4<void,Widget*, int, int, MouseButton> EventHandle_WidgetIntIntButton;
+	typedef core::CDelegate1<void,Widget*> EventHandle_WidgetVoid;
+	typedef core::CDelegate2<void,Widget*, Widget*> EventHandle_WidgetWidget;
+	typedef core::CDelegate2<void,Widget*, bool> EventHandle_WidgetBool;
+	typedef core::CDelegate2<void,Widget*, u32> EventHandle_WidgetInt;
+	typedef core::CDelegate2<void,Widget*, size_t> EventHandle_WidgetSizeT;
+	typedef core::CDelegate3<void,Widget*, s32, s32> EventHandle_WidgetIntInt;
+	typedef core::CDelegate4<void,Widget*, s32, s32, MouseButton> EventHandle_WidgetIntIntButton;
 
 	//Ö»±»Widget¼Ì³Ð
 	//WidgetInput
