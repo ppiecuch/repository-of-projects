@@ -1,0 +1,59 @@
+【背景】
+由于iphone 早期的设备都是屏幕分辨率是320*480
+
+后来apple 在iPhone 4中采用了名为Retina的显示技术，iPhone 4采用了960x640像素分辨率的显示屏幕，相当于iPad屏幕78%的像素 。
+由于屏幕大小没有变化，还是3.5英寸，分辨率的提升将iPhone 4的显示分辨率提升至iPhone 3GS的四倍。每英寸的面积里有326个像素。
+通常电脑显示屏幕的分辨率为72ppi，iPhone 4的分辨率为电脑的4倍多，所以显示会非常细腻。
+
+
+
+1、 首先明确：
+iPhone 3G/3GS 屏幕像素分辨率是   320×480 ;
+iPhone4、iPod Touch4 屏幕像素分辨率 640×960。
+
+2、为了兼容 iOS 4.0 之前的程序也能在 iOS 4 上运行，苹果设计了一个逻辑分辨率单位 point ，在 iPhone3 上 1个 Point 相当于 1个pixel ; 
+而 iPhone4 上1个 point 就相当于4个 pixel；因此所有的iPhone、iPod Touch 设备的 Point 分辨率都是 320×480 ，也就是逻辑分辨率都一致，
+保证了App不需要修改也能正常的在高像素分辨率上运行，只是原来App中的图片会被拉升后显示，影响美观，没有发挥retina的优势。
+
+通过
+float scale = [[UIScreenmainScreen] scale];//得到设备的分辨率缩放因子
+(经测试，即使调用了view.contentScaleFactor=XXX；对此API也没有影响)
+
+
+【respondsToSelector】
+-(BOOL) isKindOfClass: classObj 用来判断是否是某个类或其子类的实例
+-(BOOL) isMemberOfClass: classObj 用来判断是否是某个类的实例
+-(BOOL) respondsToSelector: selector 用来判断是否有以某个名字命名的方法(被封装在一个selector的对象里传递)
++(BOOL) instancesRespondToSelector: selector 用来判断实例是否有以某个名字命名的方法. 和上面一个不同之处在于, 
+前面这个方法可以用在实例和类上，而此方法只能用在类上.
+-(id) performSelector: selector 
+
+SEL sel = @selector (start:) ; // 指定action  
+
+if ([obj respondsToSelector:sel]) 
+
+{ //判断该对象是否有相应的方法  
+
+[obj performSelector:sel withObject:self]; //调用选择器方法  
+
+} 
+
+
+
+【setContentScaleFactor】
+调用UIView的setContentScaleFactor方法来设置分辨率缩放因子。而这个方法是iOS4.0以上才有，如果是iOS3.2的系统直接就会导致应用崩溃。
+@implementation UIWebView(NotExpected)
+
+- (void)setContentScaleFactor:(CGFloat)factor
+{
+    if(![[UIView class] respondsToSelector:@selector(animateWithDuration:animations:)])
+        return;
+    else
+        [super setContentScaleFactor:factor];
+}
+
+
+
+http://blog.csdn.net/chengyingzhilian/article/details/7930398
+http://www.cnblogs.com/zenny-chen/archive/2011/12/20/2294962.html
+http://ihuby.info/2011/08/06/%E5%BC%80%E5%8F%91%E5%85%BC%E5%AE%B9-ios-retina-%E7%9A%84%E7%A8%8B%E5%BA%8F%EF%BC%8C%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81%E5%81%9A%E4%BB%80%E4%B9%88%EF%BC%9F/
