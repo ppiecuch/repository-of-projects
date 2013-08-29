@@ -82,8 +82,15 @@ public:
 	int b;
 };
 
+struct Desp{
+	std::string Name;
+	int Type;
+};
+
 int _tmain(int argc, _TCHAR* argv[])
 {
+
+#if 0
 	/*Trace("%d\r\n",argc);
 	cout<<argc<<endl;
 	for(int i=0;i<argc;i++)
@@ -126,9 +133,19 @@ int _tmain(int argc, _TCHAR* argv[])
 	cout<<gcd(60,1000)<<endl;
 	cout<<gcd(5,1000)<<endl;
 	cout<<gcd(7,1000)<<endl;
+#else
 
+	Desp ds[]={
+		{"name1",0},
+		{"name2",1},
+		{"name3",2}
+	};
 
-	getchar();
+	for(int i=0;i<3;++i)
+		cout<<ds[i].Name<<','<<ds[i].Type<<endl;
+#endif
+
+	system("pause");
 	return 0;
 }
 
