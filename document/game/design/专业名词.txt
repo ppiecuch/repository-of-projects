@@ -2,6 +2,7 @@ PCU(Peak concurrent users ),最高同时在线玩家人数
 ARPU(AverageRevenuePerUser)即每用户平均收入
 DAU(DailyActiveUser)日活跃用户数量
 MAU=Monthly Activited Users  月活跃用户
+Non-Player Characters (NPCs)
 
 DAU/MAU:一般可叫做当前用户留存率，两者相比主要比较来看用户每月访问游戏的平均天数是多少
 （举例：如果游戏拥有50万DAU，100万MAU，其DAU/MAU比值就是0.5，也就是说玩家每月平均体验游戏的时间是15天，
@@ -18,3 +19,12 @@ STG（Shooting Game）：射击类游戏。玩家需要操纵一个物体（通常是飞机）发射子弹击毁
 RTS
 MMORPG(MassivelyMultiplayerOnlineRole-PlayingGame)
 MOBAG(Multiplayer Online Battle Arena Games )
+
+prelude			开场戏，前奏
+heal			恢复生命
+health point	生命值
+magic point		魔法值
+teleport		远距传物
+cloak			披风，斗篷
+treasure chest	藏宝箱
+combo points	连击点
