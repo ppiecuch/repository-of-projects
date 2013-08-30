@@ -1,0 +1,9 @@
+Agar is a powerful open-source, cross-platform toolkit for graphical applications in C, 
+C++ or Objective-C (bindings to Perl and Ada are also available). Designed for ease of integration, 
+Agar follows the philosophy of building the GUI around the application, and not the other way around. 
+Agar applications should work seamlessly under any platform, and Agar itself should work without relying 
+on other libraries (Agar 1.4 can be compiled without dependencies, and has even been used on embedded 
+devices without filesystems or operating systems at all). When compiled with optional threads support, 
+Agar's entire documented API is thread-safe.
+
+http://libagar.org/
