@@ -1,9 +1,0 @@
-http://www.ogre3d.org/tikiwiki/QuickGUI
-http://stormsonggames.com/svn/SSE/Gaia2/QuickGUI
-http://stormsonggames.com/svn/SSE/Gaia2/QuickGUIOgreDemo
-http://stormsonggames.com/svn/SSE/Gaia2/QuickGUIOgrePlatform
-
-user name: Anonymous
-password: QuickGUI
-
-QuickGUI is designed to be an easy to use, but efficient and powerful GUI library that works with Ogre3d. QuickGUI is being actively developed, and new versions are released every few months. QuickGUI is input injection based, and works with any input system. The code is clean and well documented which makes it easy to use and extend. There is added focus on skinning which makes it easy for users to customize their GUI's appearance.
