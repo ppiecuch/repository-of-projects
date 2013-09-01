@@ -480,6 +480,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MUI_XMLDocument.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MUI_XMLDocument.h"
+			>
+		</File>
+		<File
 			RelativePath=".\todo.txt"
 			>
 		</File>
