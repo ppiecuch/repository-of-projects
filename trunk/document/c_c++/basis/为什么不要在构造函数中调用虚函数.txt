@@ -1,0 +1,301 @@
+先看一段在构造函数中直接调用虚函数的代码：
+
+
+ 1 #include <iostream>
+ 2 
+ 3 class Base
+ 4 {
+ 5 public:
+ 6     Base() { Foo(); }   ///< 打印 1
+ 7 
+ 8     virtual void Foo()
+ 9     {
+10         std::cout << 1 << std::endl;
+11     }
+12 };
+13 
+14 class Derive : public Base
+15 {
+16 public:
+17     Derive() : Base(), m_pData(new int(2)) {}
+18     ~Derive() { delete m_pData; }
+19 
+20     virtual void Foo()
+21     {
+22         std::cout << *m_pData << std::endl;
+23     }
+24 private:
+25     int* m_pData;
+26 };
+27 
+28 int main()
+29 {
+30     Base* p = new Derive();
+31     delete p;
+32     return 0;
+33 }
+
+　　这里的结果将打印：1。
+
+　　这表明第6行执行的的是Base::Foo()而不是Derive::Foo()，也就是说：虚函数在构造函数中“不起作用”。为什么？
+
+　　当实例化一个派生类对象时，首先进行基类部分的构造，然后再进行派生类部分的构造。即创建Derive对象时，会先调用Base的构造函数，再调用Derive的构造函数。
+
+　　当在构造基类部分时，派生类还没被完全创建，从某种意义上讲此时它只是个基类对象。即当Base::Base()执行时Derive对象还没被完全创建，此时它被当成一个Base对象，而不是Derive对象，因此Foo绑定的是Base的Foo。
+
+　　C++之所以这样设计是为了减少错误和Bug的出现。假设在构造函数中虚函数仍然“生效”，即Base::Base()中的Foo();所调用的是Derive::Foo()。当Base::Base()被调用时派生类中的数据m_pData还未被正确初始化，这时执行Derive::Foo()将导致程序对一个未初始化的地址解引用，得到的结果是不可预料的，甚至是程序崩溃（访问非法内存）。
+
+　　总结来说：基类部分在派生类部分之前被构造，当基类构造函数执行时派生类中的数据成员还没被初始化。如果基类构造函数中的虚函数调用被解析成调用派生类的虚函数，而派生类的虚函数中又访问到未初始化的派生类数据，将导致程序出现一些未定义行为和bug。
+
+　　对于这一点，一般编译器会给予一定的支持。如果将基类中的Foo声明成纯虚函数时（看下面代码），编译器可能会：在编译时给出警告、链接时给出符号未解析错误（unresolved external symbol）。如果能生成可执行文件，运行时一定出错。因为Base::Base()中的Foo总是调用Base::Foo，而此时Base::Foo只声明没定义。大部分编译器在链接时就能识别出来。
+
+
+ 1 #include <iostream>
+ 2 
+ 3 class Base
+ 4 {
+ 5 public:
+ 6     Base() { Foo(); }   ///< 可能的结果：编译警告、链接出错、运行时错误
+ 7 
+ 8     virtual void Foo() = 0;
+ 9 };
+10 
+11 class Derive : public Base
+12 {
+13 public:
+14     Derive() : Base(), m_pData(new int(2)) {}
+15     ~Derive() { delete m_pData; }
+16 
+17     virtual void Foo()
+18     {
+19         std::cout << *m_pData << std::endl;
+20     }
+21 private:
+22     int* m_pData;
+23 };
+24 
+25 int main()
+26 {
+27     Base* p = new Derive();
+28     delete p;
+29     return 0;
+30 }
+
+　　如果编译器都能够在编译或链接时识别出这种错误调用，那么我们犯错的机会将大大减少。只是有一些比较不直观的情况（看下面代码），编译器是无法判断出来的。这种情况下它可以生成可执行文件，但是当程序运行时会出错。
+
+
+ 1 #include <iostream>
+ 2 
+ 3 class Base
+ 4 {
+ 5 public:
+ 6     Base() { Subtle(); }   ///< 运行时错误(pure virtual function call)
+ 7 
+ 8     virtual void Foo() = 0;
+ 9     void Subtle() { Foo(); }
+10 };
+11 
+12 class Derive : public Base
+13 {
+14 public:
+15     Derive() : Base(), m_pData(new int(2)) {}
+16     ~Derive() { delete m_pData; }
+17 
+18     virtual void Foo()
+19     {
+20         std::cout << *m_pData << std::endl;
+21     }
+22 private:
+23     int* m_pData;
+24 };
+25 
+26 int main()
+27 {
+28     Base* p = new Derive();
+29     delete p;
+30     return 0;
+31 }
+
+　　从编译器开发人员的角度上看，如何实现上述的“特性”呢？
+
+　　我的猜测是在虚函数表地址的绑定上做文章：在“当前类”（正在被构造的类）的构造函数被调用时，将“当前类”的虚函数表地址绑定到对象上。当基类部分被构造时，“当前类”是基类，这里是Base，即当Base::Base()的函数体被调用时，Base的虚函数表地址会被绑定到对象上。而当Derive::Derive()的函数体被调用时，Derive的虚函数表地址被绑定到对象上，因此最终对象上绑定的是Derive的虚函数表。
+
+　　这样编译器在处理的时候就会变得很自然。因为每个类在被构造时不用去关心是否有其他类从自己派生，而不需要关心自己是否从其他类派生，而只要按照一个统一的流程，在自身的构造函数执行之前把自身的虚函数表地址绑定到当前对象上（一般是保存在对象内存空间中的前4个字节）。因为对象的构造是从最基类部分（比如A<-B<-C，A是最基类，C是最派生类）开始构造，一层一层往外构造中间类（B），最后构造的是最派生类（C），所以最终对象上绑定的就自然而然就是最派生类的虚函数表。
+
+　　也就是说对象的虚函数表在对象被构造的过程中是在不断变化的，构造基类部分(Base)时被绑定一次，构造派生类部分(Derive)时，又重新绑定一次。基类构造函数中的虚函数调用，按正常的虚函数调用规则去调用函数，自然而然地就调用到了基类版本的虚函数，因为此时对象绑定的是基类的虚函数表。
+
+　　下面要给出在WIN7下的Visual Studio2010写的一段程序，用以验证“对象的虚函数表在对象被构造的过程中是在不断变化的”这个观点。
+
+　　这个程序在类的构造函数里做了三件事：1.打印出this指针的地址；2.打印虚函数表的地址；3.直接通过虚函数表来调用虚函数。
+
+　　打印this指针，是为了表明创建Derive对象是，不管是执行Base::Base()还是执行Derive::Derive()，它们构造的是同一个对象，因此两次打印出来的this指针必定相等。
+
+　　打印虚函数表的地址，是为了表明在创建Derive对象的过程中，虚函数表的地址是有变化的，因此两次打印出来的虚函数表地址必定不相等。
+
+　　直接通过函数表来调用虚函数，只是为了表明前面所打印的确实是正确的虚函数表地址，因此Base::Base()的第19行将打印Base，而Derive::Derive()的第43行将打印Derive。
+
+　　注意：这段代码是编译器相关的，因为虚函数表的地址在对象中存储的位置不一定是前4个字节，这是由编译器的实现细节来决定的，因此这段代码在不同的编译器未必能正常工作，这里所使用的是Visual Studio2010。
+
+
+ 1 #include <iostream>
+ 2 
+ 3 class Base
+ 4 {
+ 5 public:
+ 6     Base() { PrintBase(); }
+ 7 
+ 8     void PrintBase()
+ 9     {
+10         std::cout << "Address of Base: " << this << std::endl;
+11 
+12         // 虚表的地址存在对象内存空间里的头4个字节
+13         int* vt = (int*)*((int*)this);
+14         std::cout << "Address of Base Vtable: " << vt << std::endl;
+15 
+16         // 通过vt来调用Foo函数，以证明vt指向的确实是虚函数表
+17         std::cout << "Call Foo by vt -> ";
+18         void (*pFoo)(Base* const) = (void (*)(Base* const))vt[0];
+19         (*pFoo)(this);
+20 
+21         std::cout << std::endl;
+22     }
+23 
+24     virtual void  Foo() { std::cout << "Base" << std::endl; }
+25 };
+26 
+27 class Derive : public Base
+28 {
+29 public:
+30     Derive() : Base() { PrintDerive(); }
+31 
+32     void PrintDerive()
+33     {
+34         std::cout << "Address of Derive: " << this << std::endl;
+35 
+36         // 虚表的地址存在对象内存空间里的头4个字节
+37         int* vt = (int*)*((int*)this);
+38         std::cout << "Address of Derive Vtable: " << vt << std::endl;
+39 
+40         // 通过vt来调用Foo函数，以证明vt指向的确实是虚函数表
+41         std::cout << "Call Foo by vt -> ";
+42         void (*pFoo)(Base* const) = (void (*)(Base* const))vt[0];
+43         (*pFoo)(this);
+44 
+45         std::cout << std::endl;
+46     }
+47 
+48     virtual void Foo() { std::cout << "Derive" << std::endl; }
+49 };
+50 
+51 int main()
+52 {
+53     Base* p = new Derive();
+54     delete p;
+55     return 0;
+56 }
+
+输出的结果跟预料的一样：
+
+
+1 Address of Base: 002E7F98
+2 Address of Base Vtable: 01387840
+3 Call Foo by vt -> Base
+4 
+5 Address of Derive: 002E7F98
+6 Address of Derive Vtable: 01387834
+7 Call Foo by vt -> Derive
+
+　　在析构函数中调用虚函数，和在构造函数中调用虚函数一样。
+
+　　析构函数的调用跟构造函数的调用顺序是相反的，它从最派生类的析构函数开始的。也就是说当基类的析构函数执行时，派生类的析构函数已经执行过，派生类中的成员数据被认为已经无效。假设基类中虚函数调用能调用得到派生类的虚函数，那么派生类的虚函数将访问一些已经“无效”的数据，所带来的问题和访问一些未初始化的数据一样。而同样，我们可以认为在析构的过程中，虚函数表也是在不断变化的。
+
+　　将上面的代码增加析构函数的调用，并稍微修改一下，就能验证这一点：
+
+
+ 1 #include <iostream>
+ 2 
+ 3 class Base
+ 4 {
+ 5 public:
+ 6     Base() { PrintBase(); }
+ 7     virtual ~Base() { PrintBase(); }
+ 8 
+ 9     void PrintBase()
+10     {
+11         std::cout << "Address of Base: " << this << std::endl;
+12 
+13         // 虚表的地址存在对象内存空间里的头4个字节
+14         int* vt = (int*)*((int*)this);
+15         std::cout << "Address of Base Vtable: " << vt << std::endl;
+16 
+17         // 通过vt来调用Foo函数，以证明vt指向的确实是虚函数表
+18         std::cout << "Call Foo by vt -> ";
+19         void (*pFoo)(Base* const) = (void (*)(Base* const))vt[1];   ///< 注意这里索引变成 1 了，因为析构函数定义在Foo之前
+20         (*pFoo)(this);
+21 
+22         std::cout << std::endl;
+23     }
+24 
+25     virtual void  Foo() { std::cout << "Base" << std::endl; }
+26 };
+27 
+28 class Derive : public Base
+29 {
+30 public:
+31     Derive() : Base() { PrintDerive(); }
+32     virtual ~Derive() { PrintDerive(); }
+33 
+34     void PrintDerive()
+35     {
+36         std::cout << "Address of Derive: " << this << std::endl;
+37 
+38         // 虚表的地址存在对象内存空间里的头4个字节
+39         int* vt = (int*)*((int*)this);
+40         std::cout << "Address of Derive Vtable: " << vt << std::endl;
+41 
+42         // 通过vt来调用Foo函数，以证明vt指向的确实是虚函数表
+43         std::cout << "Call Foo by vt -> ";
+44         void (*pFoo)(Base* const) = (void (*)(Base* const))vt[1];   ///< 注意这里索引变成 1 了，因为析构函数定义在Foo之前
+45         (*pFoo)(this);
+46 
+47         std::cout << std::endl;
+48     }
+49 
+50     virtual void Foo() { std::cout << "Derive" << std::endl; }
+51 };
+52 
+53 int main()
+54 {
+55     Base* p = new Derive();
+56     delete p;
+57     return 0;
+58 }
+
+下面是打印结果，可以看到构造和析构是顺序相反的两个过程：
+
+
+ 1 Address of Base: 001E7F98
+ 2 Address of Base Vtable: 01297844
+ 3 Call Foo by vt -> Base
+ 4 
+ 5 Address of Derive: 001E7F98
+ 6 Address of Derive Vtable: 01297834
+ 7 Call Foo by vt -> Derive
+ 8 
+ 9 Address of Derive: 001E7F98
+10 Address of Derive Vtable: 01297834
+11 Call Foo by vt -> Derive
+12 
+13 Address of Base: 001E7F98
+14 Address of Base Vtable: 01297844
+15 Call Foo by vt -> Base
+
+　　最终结论：
+
+　　　　1. 不要在构造函数和析构函数中调用虚函数，因为这种情况下的虚函数调用不会调用到外层派生类的虚函数（参考：http://www.artima.com/cppsource/nevercall.html、http://www.parashift.com/c%2B%2B-faq-lite/strange-inheritance.html#faq-23.5）。
+
+　　　　2. 对象的虚函数表地址在对象的构造和析构过程中会随着部分类的构造和析构而发生变化，这一点应该是编译器实现相关的。
+
+注：以上的讨论是基于简单的单继承，对于多重继承或虚继承会有一些细节上的差别。
+
+http://www.cnblogs.com/carter2000/archive/2012/04/28/2474960.html

@@ -1,0 +1,57 @@
+最近在用 template 编写singleton模式代码的时候，遇到了一个问题，template要求实现要在同一个文件中，所以，我只能在h文件中定义并实现 singleton 模式类。类中必然要有静态成员变量，静态成员变量的定义成了问题，如果我放在cpp文件中，模板是不支持的，放在h文件中，如果h文件被多次包含，会出现重定义的情况。
+
+    回来，请教高手，得知，可以在初始化静态成员变量前面加上__declspec(selectany) ，这样编译器会自动剔除对该静态成员的重复定义。
+
+   最近半年也一直用WTL，ATL，COM等。其实在WTL，ATL中已经大量使用了__declspec(selectany)方法。我猜想这是为解决template单文件编程和静态成员变量在头文件中定义会出现重复定义矛盾而提出的。
+
+总的来说：
+
+    __declspec(selelctany) 使在头文件中定义静态成员变量可行。
+
+===================================================================================
+
+其他资料：
+
+selectany使用在c/c++工程的连接期间，一般用得很少，所以很陌生。
+
+这个属性告诉编译器声明的全局变量是一个"任一拣选"(pick-any)COMDAT.在连接时间，如果多个COMDAT定义能看到，连接器选择一个并且丢弃所有的剩余的。如果连接器选项/OPT:REF被选择，COMDAT中所有的没有引用的数据项被删除。
+
+一个全局数据在EXE或者DLL中只能被初始化一次。当同一个头文件被多个源文件引用时，在头中定义全局数据始始化时，这个属性被使用。这个属性在c和c++的编译器中都是可用的。
+
+
+COMDAT record
+一个常用对象文件格式(COFF)记录,它包含的已被初始化的常用块数据和打包的函数对连接器是可以见的。
+packaged function
+当函数级的连接功能选择开关被打开时，一个函数能被编译器创建。在编译器产生的对象文件中COMDAT记录的打包的函数对于连接器是可见的。没有打包的函数只在对象级(the object level)上连接。
+
+下面是MSDN上一些例子:
+
+//Correct - x1 is initialized and externally visible
+
+__declspec(selectany) int x1=1;
+
+//Incorrect - const is by default static in C++, so
+
+//x2 is not visible externally (This is OK in C, since
+
+//const is not by default static in C)
+
+const __declspec(selectany) int x2 =2;
+
+//Correct - x3 is extern const, so externally visible
+
+extern const __declspec(selectany) int x3=3;
+
+//Correct - x4 is extern const, so it is externally visible
+
+extern const int x4;
+
+const __declspec(selectany) int x4=4;
+
+//Incorrect - __declspec(selectany) is applied to the uninitialized
+
+//declaration of x5
+
+extern __declspec(selectany) int x5;
+
+http://liftstring.blog.sohu.com/137578737.html

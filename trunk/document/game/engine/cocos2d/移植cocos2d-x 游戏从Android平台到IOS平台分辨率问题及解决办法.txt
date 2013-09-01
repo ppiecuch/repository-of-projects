@@ -1,0 +1,48 @@
+问题描述：
+
+因为游戏刚开始设计时是在Android平台上运行的，所以使用的是当时Android主流的分辨率(800 * 480), 使用cocos2d-x在其他Android平台可以做到等比例缩放，所以Android平台上没有做改动。
+
+但是移植到IOS平台之后，发现了如下问题：
+
+1. 如果设置enableRetinaDisplay(false), 则在iphone4平台上运行的结果是游戏的图片分辨率水平方向和垂直方向都拉伸了两倍。
+
+2. 如果设置enableRetinaDisplay(true), 则在iphone4平台上运行的结果是游戏的图片分辨率为800*480，但是放置的位置的水平方向和垂直方向都拉伸了两倍。
+
+
+IOS分辨率内幕：
+
+阅读Apple 开发者文档http://developer.apple.com/library/ios/#documentation/2DDrawing/Conceptual/DrawingPrintingiOS/SupportingHiResScreens/SupportingHiResScreens.html#//apple_ref/doc/uid/TP40010156-CH15，知道了问题产生的原因。
+
+1. iOS SDK 4.0 以及以后的SDK支持不同的分辨率，解决方案为将屏幕分为逻辑点和像素。如cocos2d-x中使用getContentSize获得的就是逻辑点的大小，而getContentSizeInPixels获得的就是像素点的大小。在Iphone3 和 Iphone4 中，逻辑点大小是一样的，而像素的分辨率不同。像素点和逻辑点的对应关系为:逻辑点的大小 = 像素大小 / contentScaleFactor。
+
+2. 如果在高分辨率的平台上（如Iphone4），使用非高分辨率的图片资源，且设置contentScaleFactor为1.0，则IOS的Core Animation compositor 会自动拉伸非高分辨率的资源来适配, 使其在非高分辨率和高分辨率设备上的视觉效果是一样的。
+
+3. 如果用户设置contentScaleFactor 为(1.0,2.0]之间的值，系统会使用用户设置的拉伸值。
+
+4. cocos2d-x提供了接口来设置contentScaleFactor, 接口为:CCDirector::setContentScaleFactor。
+
+
+
+问题解释：
+
+了解了IOS分辨率的内幕后，再来解释一下问题产生的原因。
+
+问题1： 因为设置enableRetinaDisplay(false),contentScaleFactor为1.0，所以图片会被当成非高清资源，在显示的时候水平和竖直的分辨率都会被拉伸2倍。
+
+问题2：因为设置enableRetinaDisplay(true), contentScaleFactor为2.0，所以图片会显示成原有的像素大小。但是设置位置是使用setPosition，该接口设置的是逻辑位置。因为之前的位置是参考800*480的屏幕大小来设置的，所以当contentScaleFactor为2.0时，就相当于参考屏幕的像素大小为1600*960, 所以精灵的位置等都出现了错误。
+
+
+
+解决方案：
+
+为了使程序能够更好的在Android和IOS设备上运行，所以建议采用以下解决方案:
+
+1. 使用相对于屏幕逻辑点分辨率的坐标系。
+
+2. 可以考虑使用单独的配置文件来配置IOS 和Android 上的layout布局，在IOS和Android 上使用不同的配置文件和不同的资源文件。
+
+
+
+感谢cocos2d-x张小明的热情帮助。
+
+http://blog.csdn.net/yuanhong2910/article/details/7195335

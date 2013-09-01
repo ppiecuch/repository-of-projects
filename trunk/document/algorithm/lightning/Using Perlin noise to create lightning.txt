@@ -1,0 +1,172 @@
+Actually I am having several questions related to the subject given in the topic title.
+
+I am already using Perlin functions to create lightning in my application, but I am not totally happy about my implementation.
+
+The following questions are based on the initial and the improved Perlin noise implementations.
+
+To simplify the issue, let's assume I am creating a simple 2D lightning by modulating the height of a horizontal line consisting of N nodes at these nodes using a 1D Perlin function.
+
+As far as I have understood, two subsequent values passed to the Perlin function must differ by at least one, or the resulting two values will be identical. That is because with the simple Perlin implementation, the Random function works with an int argument, and in the improved implementation values are mapped to [0..255] and are then used as index into an array containing the values [0..255] in a random distribution. Is that right?
+
+How do I achieve that the first and the last offset value (i.e. for nodes 0 and N-1) returned by the Perlin function is always 0 (zero)? Right now I am modulation a sine function (0 .. Pi) with my Perlin function to achieve that, but that's not really what I want. Just setting them to zero is not what I want, since I want a nice lightning path w/o jaggies at its ends.
+
+How do I vary the Perlin function (so that I would get two different paths I could use as animation start and end frames for the lightning)? I could of course add a fixed random offset per path calculation to each node value, or use a differently setup permutation table for improved Perlin noise, but are there better options?
+
+c++ perlin-noise
+share|improve this question
+edited Sep 1 '11 at 22:45
+
+asked Sep 1 '11 at 22:37
+
+karx11erx
+958818
+1	  
+This question is great. 每 sharptooth Sep 2 '11 at 10:06
+noisemachine.com/talk1/23.html 每 MJafar Mash Jul 3 at 11:39
+add comment (requires an account with 50 reputation)
+2 Answers activeoldestvotes
+up vote
+2
+down vote
+accepted
+That depends on how you implement it and sample from it. Using multiple octaves helps counter integers quite a bit.
+
+The octaves and additional interpolation/sampling done for each provides much of the noise in perlin noise. In theory, you should not need to use different integer positions; you should be able to sample at any point and it will be similar (but not always identical) to nearby values.
+
+I would suggest using the perlin as a multiplier instead of simply additive, and use a curve over the course of the lightning. For example, having perlin in the range [-1.5, 1.5] and a normal curve over the lightning (0 at both ends, 1 in the center), lightning + (perlin * curve) will keep your ends points still. Depending on how you've implemented your perlin noise generator, you may need something like:
+
+lightning.x += ((perlin(lightning.y, octaves) * 2.0) - 0.5) * curve(lightning.y);
+
+if perlin returns [0,1] or
+
+lightning.x += (perlin(lightning.y, octaves) / 128.0) * curve(lightning.y);
+
+if it returns [0, 255]. Assuming lightning.x started with a given value, perhaps 0, that would give a somewhat jagged line that still met the original start and end points.
+
+Add a dimension to the noise for every dimension you add to the lightning. If you're modifying the lightning in one dimension (horizontal jagged), you need 1D perlin noise. If you want to animate it, you need 2D. If you wanted lightning that was jagged on two axis and animated, you'd need 3D noise, and so on.
+share|improve this answer
+edited Sep 1 '11 at 23:50
+
+answered Sep 1 '11 at 23:37
+
+peachykeen
+7,85911647
+Your replies to (1.) and (3.) was really helpful. (2.) is exactly what I do, but don't want to do. Still, thanks a lot, this got me further. 每 karx11erx Sep 2 '11 at 0:55
+I'm not sure there's a better way for 2; certainly none I can come up with, without getting really complicated. You may get better results by playing with the curve you use, if that's an issue. 每 peachykeen Sep 2 '11 at 3:39
+How would I animate a 1D lightning path using 2D noise? I cannot quite figure that. Would y be the elapsed time (in frames, counting from 0 to <animation frame count> -1)? 每 karx11erx Sep 2 '11 at 10:03
+You can do it however you like, really. You just have to move the coordinate. You may take seconds since the lightning became visible, frames, or absolute system time. Anything that will change over time can be used to animate it. 每 peachykeen Sep 2 '11 at 15:31
+add comment (requires an account with 50 reputation)
+
+up vote
+1
+down vote
+After reading peachykeen's answer and doing some (more) own research in the internet, I have found the following solution to work for me.
+
+With my implementation of Perlin noise, using a value range of [0.0 .. 1.0] for the lightning path nodes work best, passing the value (double) M / (double) N for node M to the Perlin noise function.
+
+To have a noise function F' return the same value for node 0 and node N-1, the following formula can be applied: F'(M) = ((M - N) * F(N) + N * F (N - M)) / M. In order to have the lightning path offsets begin and end with 0, you simply need to subtract F'(0) from all lightning path offsets after having computed the path.
+
+To randomize the lightning path, before computing the offsets for each path node, a random offset R can be computed and added to the values passed to the noise function, so that a node's offset O = F'(N+R). To animate a lightning, two lightning paths need to be computed (start and end frame), and then each path vertex has to be lerped between its start and end position. Once the end frame has been reached, the end frame becomes the start frame and a new end frame is computed. For a 3D path, for each path node N two offset vectors can be computed that are perpendicular to the path at node N and each other, and can be scaled with two 1D Perlin noise values to lerp the node position from start to end frame position. That may be cheaper than doing 3D Perlin noise and works quite well in my application.
+
+Here is my implementation of standard 1D Perlin noise as a reference (some stuff is virtual because I am using this as base for improved Perlin noise, allowing to use standard or improved Perlin noise in a strategy pattern application. The code has been simplified somewhat as well to make it more concise for publishing it here):
+
+Header file:
+
+#ifndef __PERLIN_H
+#define __PERLIN_H
+
+class CPerlin {
+  private:
+    int m_randomize;
+
+  protected:  
+    double m_amplitude;
+    double m_persistence;
+    int m_octaves;
+
+  public:
+    virtual void Setup (double amplitude, double persistence, int octaves, int randomize = -1);
+    double ComputeNoise (double x);
+
+  protected:  
+    double LinearInterpolate (double a, double b, double x);
+    double CosineInterpolate (double a, double b, double x);
+    double CubicInterpolate (double v0, double v1, double v2, double v3, double x);
+    double Noise (int v);       
+    double SmoothedNoise (int x);
+    virtual double InterpolatedNoise (double x);
+  };
+
+#endif //__PERLIN_H
+Implementation:
+
+#include <math.h>
+#include <stdlib.h>
+#include "perlin.h"
+
+#define INTERPOLATION_METHOD 1
+
+#ifndef Pi
+#  define  Pi 3.141592653589793240
+#endif
+
+inline double CPerlin::Noise (int n) {
+  n = (n << 13) ^ n;
+  return 1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0;    
+  }
+
+double CPerlin::LinearInterpolate (double a, double b, double x) {
+  return a * (1.0 - x) + b * x;
+  }
+
+double CPerlin::CosineInterpolate (double a, double b, double x) {
+  double f = (1.0 - cos (x * Pi)) * 0.5;
+  return  a * (1.0 - f) + b * f;
+  }
+
+double CPerlin::CubicInterpolate (double v0, double v1, double v2, double v3, double x) {
+  double p = (v3 - v2) - (v0 - v1);
+  double x2 = x * x;
+  return v1 + (v2 - v0) * x + (v0 - v1 - p) * x2 + p * x2 * x;
+  }
+
+double CPerlin::SmoothedNoise (int v) {
+  return Noise (v) / 2  +  Noise (v-1) / 4  +  Noise (v+1) / 4;
+  }
+
+int FastFloor (double v) { return (int) ((v < 0) ? v - 1 : v; }
+
+double CPerlin::InterpolatedNoise (double v) {
+  int i = FastFloor (v);
+  double v1 = SmoothedNoise (i);
+  double v2 = SmoothedNoise (i + 1);
+#if INTERPOLATION_METHOD == 2
+  double v0 = SmoothedNoise (i - 1);
+  double v3 = SmoothedNoise (i + 2);
+  return CubicInterpolate (v0, v1, v2, v3, v - i);
+#elif INTERPOLATION_METHOD == 1
+  return CosineInterpolate (v1, v2, v - i);
+#else
+  return LinearInterpolate (v1, v2, v - i);
+#endif
+  }
+
+double CPerlin::ComputeNoise (double v) {
+  double total = 0, amplitude = m_amplitude, frequency = 1.0;
+  v += m_randomize;
+  for (int i = 0; i < m_octaves; i++) {
+    total += InterpolatedNoise (v * frequency) * amplitude;
+    frequency *= 2.0;
+    amplitude *= m_persistence;
+    }
+  return total;
+  }
+
+void CPerlin::Setup (double amplitude, double persistence, int octaves, int randomize) {
+  m_amplitude = (amplitude > 0.0) ? amplitude : 1.0;
+  m_persistence = (persistence > 0.0) ? persistence : 2.0 / 3.0;
+  m_octaves = (octaves > 0) ? octaves : 6;
+  m_randomize = (randomize < 0) ? (rand () * rand ()) & 0xFFFF : randomize;
+  }
+
+http://stackoverflow.com/questions/7277387/using-perlin-noise-to-create-lightning
