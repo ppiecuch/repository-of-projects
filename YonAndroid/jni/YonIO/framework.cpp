@@ -185,8 +185,12 @@ bool init(void *pJNIEnv,ICallback* pcb,const c8* appPath,const c8* resPath,u32 w
 	indices.push_back(1);
 	indices.push_back(2);*/
 
-#if 0
-	YON_DEBUG("ver:%s\r\n",getVersion().c_str());
+#if 1
+	//YON_DEBUG("ver:%s\r\n",getVersion().c_str());
+	core::stringc str1=core::stringc::formatAuto(6);
+	core::stringc str2=core::stringc::formatAuto(6.23423);
+	core::stringc str3=core::stringc::formatAuto((u32)6000);
+	core::stringc str4=core::stringc::formatAuto(6.23423f);
 #elif 0
 	float f=300.56f;
 	float tmp1=f;
