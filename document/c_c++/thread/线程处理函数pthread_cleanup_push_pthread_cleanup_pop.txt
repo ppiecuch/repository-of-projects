@@ -1,0 +1,101 @@
+线程可以安排它退出时需要调用的函数，这样的函数称为线程清理处理程序，线程可以建立多个清理处理程序。处理程序记录在栈中，也就是说它们的执行顺序与它们注册时的顺序相反。
+    pthread_cleanup_push来注册清理函数rtn,这个函数有一个参数arg。在以下三种情形之一发生时，注册的清理函数被执行：
+    1）调用pthread_exit。
+    2）作为对取消线程请求(pthread_cancel)的响应。
+    3）以非0参数调用pthread_cleanup_pop。
+注意：
+    1）如果线程只是由于简单的返回而终止的，则清除函数不会被调用。
+    2）如果pthread_cleanup_pop被传递0参数，则清除函数不会被调用，但是会清除处于栈顶的清理函数。
+ 
+名称：
+pthread_cleanup_push / pthread_cleanup_pop
+功能：
+线程清理处理程序
+头文件：
+#include <pthread.h>
+函数原形：
+void pthread_cleanup_push(void (*rtn)(void *)，void *arg);
+void pthread_cleanup_pop(int execute);
+参数：
+rtn 处理程序入口地址
+arg 传递给处理函数的参数
+返回值：
+无
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+#include <stdio.h>  
+#include <stdlib.h>  
+#include <pthread.h>  
+#include <string.h>  
+ 
+void cleanup(void *arg){  
+    printf("cleanup: %s/n",(char *)arg);  
+}  
+ 
+void *thr_fn1(void *arg){  
+    printf("thread 1 start/n");  
+    pthread_cleanup_push(cleanup,"thread 1 first handler");  
+    pthread_cleanup_push(cleanup,"thread 1 second handler");  
+    printf("thread 1 push complete/n");  
+    if(arg)  
+        return ((void *)1);  
+    pthread_cleanup_pop(1);  
+    pthread_cleanup_pop(1);  
+    return ((void *)1);  
+}  
+ 
+void *thr_fn2(void *arg){  
+    printf("thread 2 start/n");  
+    pthread_cleanup_push(cleanup,"thread 2 first handler");  
+    pthread_cleanup_push(cleanup,"thread 2 second handler");  
+    printf("thread 2 push complete/n");  
+    if(arg){  
+        pthread_exit((void *)2);  
+    }  
+    pthread_cleanup_pop(0);  //取消第一个线程处理程序
+    pthread_cleanup_pop(0);  //取消第二个线程处理程序
+ 
+    pthread_exit((void *) 2);  
+}  
+ 
+int main(void){  
+    int err;  
+    pthread_t tid1,tid2;  
+    void *tret;  
+ 
+    err = pthread_create(&tid1,NULL,thr_fn1,(void *)1);  
+    if( err != 0){  
+        fprintf(stderr,"create thread1 failed: %s",strerror(err));  
+        exit(1);  
+    }  
+ 
+    err = pthread_create(&tid2,NULL,thr_fn2,(void *)2);  
+    if(err != 0){  
+        fprintf(stderr,"create thread 2 failed: %s",strerror(err));  
+        exit(1);  
+    }  
+ 
+    err = pthread_join(tid1,&tret);  
+    if(err != 0){  
+        fprintf(stderr,"thread1 join failed: %s",strerror(err));  
+        exit(1);  
+    }  
+    printf("thread 1 exit code %d/n",(int)tret);  
+    err = pthread_join(tid2,&tret);  
+    if(err != 0){  
+        fprintf(stderr,"thread2 join failed: %s",strerror(err));  
+        exit(1);  
+    }  
+    printf("thread 2 exit code %d/n",(int) tret);  
+    exit(0);   
+} 
+
+http://blog.csdn.net/yanook/article/details/6579955

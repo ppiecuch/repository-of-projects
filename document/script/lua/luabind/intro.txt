@@ -1,0 +1,6 @@
+http://sourceforge.net/projects/luabind/
+
+luabind is a library, inspired by and similar to Boost.Python, that helps you create bindings between C++ and Lua. 
+It has the ability to expose functions and classes, written in C++, to Lua.
+
+×îÐÂ°æ±¾0.9.1

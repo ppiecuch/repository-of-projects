@@ -1,0 +1,70 @@
+3.5.5  弱符号与强符号
+
+我们经常在编程中碰到一种情况叫符号重复定义。多个目标文件中含有相同名字全局符号的定义，那么这些目标文件链接的时候将会出现符号重复定义的错误。比如我们在目标文件A和目标文件B都定义了一个全局整形变量global，并将它们都初始化，那么链接器将A和B进行链接时会报错：
+
+b.o:(.data+0x0): multiple definition of `global'
+a.o:(.data+0x0): first defined here
+这种符号的定义可以被称为强符号（Strong Symbol）。有些符号的定义可以被称为弱符号（Weak Symbol）。对于C/C++语言来说，编译器默认函数和初始化了的全局变量为强符号，未初始化的全局变量为弱符号。我们也可以通过GCC的"__attribute__((weak))"来定义任何一个强符号为弱符号。注意，强符号和弱符号都是针对定义来说的，不是针对符号的引用。比如我们有下面这段程序：
+extern int ext;
+int weak;
+int strong = 1;
+__attribute__((weak)) weak2 = 2;
+int main()
+{
+return 0;
+}
+上面这段程序中，"weak"和"weak2"是弱符号，"strong"和"main"是强符号，而"ext"既非强符号也非弱符号，因为它是一个外部变量的引用。针对强弱符号的概念，链接器就会按如下规则处理与选择被多次定义的全局符号：
+
+规则1：不允许强符号被多次定义（即不同的目标文件中不能有同名的强符号）；如果有多个强符号定义，则链接器报符号重复定义错误。
+
+规则2：如果一个符号在某个目标文件中是强符号，在其他文件中都是弱符号，那么选择强符号。
+
+规则3：如果一个符号在所有目标文件中都是弱符号，那么选择其中占用空间最大的一个。比如目标文件A定义全局变量global为int型，占4个字节；目标文件B定义global为double型，占8个字节，那么目标文件A和B链接后，符号global占8个字节（尽量不要使用多个不同类型的弱符号，否则容易导致很难发现的程序错误）。
+
+弱引用和强引用  目前我们所看到的对外部目标文件的符号引用在目标文件被最终链接成可执行文件时，它们须要被正确决议，如果没有找到该符号的定义，链接器就会报符号未定义错误，这种被称为强引用（Strong Reference）。与之相对应还有一种弱引用（Weak Reference），在处理弱引用时，如果该符号有定义，则链接器将该符号的引用决议；如果该符号未被定义，则链接器对于该引用不报错。链接器处理强引用和弱引用的过程几乎一样，只是对于未定义的弱引用，链接器不认为它是一个错误。一般对于未定义的弱引用，链接器默认其为0，或者是一个特殊的值，以便于程序代码能够识别。弱引用和弱符号主要用于库的链接过程，我们将在"库"这一章再来详细讲述。弱符号跟链接器的COMMON块概念联系很紧密，我们在后面"深入静态链接"这一章中的"COMMON块"一节还会回顾弱符号的概念。
+
+在GCC中，我们可以通过使用"__attribute__((weakref))"这个扩展关键字来声明对一个外部函数的引用为弱引用，比如下面这段代码：
+
+__attribute__ ((weakref)) void foo();
+int main()
+{
+foo();
+}
+我们可以将它编译成一个可执行文件，GCC并不会报链接错误。但是当我们运行这个可执行文件时，会发生运行错误。因为当main函数试图调用foo函数时，foo函数的地址为0，于是发生了非法地址访问的错误。一个改进的例子是：
+__attribute__ ((weakref)) void foo();
+int main()
+{
+if(foo) foo();
+}
+这种弱符号和弱引用对于库来说十分有用，比如库中定义的弱符号可以被用户定义的强符号所覆盖，从而使得程序可以使用自定义版本的库函数；或者程序可以对某些扩展功能模块的引用定义为弱引用，当我们将扩展模块与程序链接在一起时，功能模块就可以正常使用；如果我们去掉了某些功能模块，那么程序也可以正常链接，只是缺少了相应的功能，这使得程序的功能更加容易裁剪和组合。
+
+在Linux程序的设计中，如果一个程序被设计成可以支持单线程或多线程的模式，就可以通过弱引用的方法来判断当前的程序是链接到了单线程的Glibc库还是多线程的Glibc库（是否在编译时有-lpthread选项），从而执行单线程版本的程序或多线程版本的程序。我们可以在程序中定义一个pthread_create函数的弱引用，然后程序在运行时动态判断是否链接到pthread库从而决定执行多线程版本还是单线程版本：
+
+#include <stdio.h>
+#include <pthread.h>
+int pthread_create(
+pthread_t*, 
+const pthread_attr_t*, 
+void* (*)(void*), 
+void*) __attribute__ ((weak));
+int main()
+{
+if(pthread_create) {
+printf("This is multi-thread version!\n");
+// run the multi-thread version
+// main_multi_thread()
+} else {
+printf("This is single-thread version!\n");    
+// run the single-thread version
+// main_single_thread()
+}
+}
+编译运行结果如下：
+$ gcc pthread.c -o pt
+$ ./pt
+This is single-thread version!
+$ gcc pthread.c -lpthread -o pt
+$ ./pt
+This is multi-thread version!
+
+http://book.51cto.com/art/200904/121029.htm

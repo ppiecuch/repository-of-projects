@@ -1,0 +1,53 @@
+首先你必须知道pthread_cleanup_push与pthread_cleanup_pop的目的(作用)是什么。
+
+比如thread1:
+执行
+pthread_mutex_lock(&mutex);
+
+//一些会阻塞程序运行的调用，比如套接字的accept，等待客户连接
+sock = accept(......);            //这里是随便找的一个可以阻塞的接口
+
+pthread_mutex_unlock(&mutex);
+这个例子中，如果线程1执行accept时，线程会阻塞（也就是等在那里，有客户端连接的时候才返回，或则出现其他故障），线程等待中......
+
+这时候线程2发现线程1等了很久，不赖烦了，他想关掉线程1，于是调用pthread_cancel()或者类似函数，请求线程1立即退出。
+
+这时候线程1仍然在accept等待中，当它收到线程2的cancel信号后，就会从accept中退出，然后终止线程，注意这个时候线程1还没有执行：
+pthread_mutex_unlock(&mutex);
+也就是说锁资源没有释放，这回造成其他线程的死锁问题。
+
+所以必须在线程接收到cancel后用一种方法来保证异常退出(也就是线程没达到终点)时可以做清理工作(主要是解锁方面)，pthread_cleanup_push与pthread_cleanup_pop就是这样的。
+
+pthread_cleanup_push(some_clean_func,...)
+pthread_mutex_lock(&mutex);
+
+//一些会阻塞程序运行的调用，比如套接字的accept，等待客户连接
+sock = accept(......);            //这里是随便找的一个可以阻塞的接口
+
+pthread_mutex_unlock(&mutex);
+pthread_cleanup_pop(0);
+return NULL;
+上面的代码，如果accept被cancel后线程退出，会自动调用some_clean_func函数，在这个函数中你可以释放锁资源。如果accept没有被cancel，那么线程继续执行，当pthread_mutex_unlock(&mutex);表示线程自己正确的释放资源了，而执行pthread_cleanup_pop(0);也就是取消掉前面的some_clean_func函数。接着return线程就正确的结束了。
+
+不晓得你明白没，通俗点就是：
+pthread_cleanup_push注册一个回调函数，如果你的线程在对应的pthread_cleanup_pop之前异常退出(return是正常退出，其他是异常)，那么系统就会执行这个回调函数(回调函数要做什么你自己决定)。但是如果在pthread_cleanup_pop之前没有异常退出，pthread_cleanup_pop就把对应的回调函数取消了，
+
+关于取消点的解释：
+
+比如你执行：
+        printf("thread sleep\n");
+        sleep(10);
+        printf("thread wake...\n");
+在sleep函数中，线程睡眠，结果收到cancel信号，这时候线程从sleep中醒来，但是线程不会立刻退出。这是应为pthread与C库方面的原因(具体是啥我也不清楚)，pthread的建议是，如果一个函数是阻塞的，那么你必须在这个函数前后建立取消点,比如：
+        printf("thread sleep\n");
+        pthread_testcancel()；
+        sleep(10);
+        pthread_testcancel()；
+        printf("thread wake...\n");
+这样，就添加了两个取消掉。在执行到pthread_testcancel的位置时，线程才可能响应cancel退出进程。
+
+额外的知识：
+对于cancel信号，线程有两种方法： 忽略，和响应。默认是响应
+接收到cancel信号，线程有两种处理类型： 立即响应 和 延迟响应(在最近的取消点响应)，默认是延迟响应
+
+http://blog.csdn.net/slj_win/article/details/7267483
