@@ -1,0 +1,5 @@
+1.设置安卓版的图标
+修改编辑器菜单栏 - Edit - Project Setting - Player下的Default Icon
+
+2.设置安卓版的横屏与竖屏
+修改编辑器菜单栏 - Edit - Project Setting - Player下的Resolution and Presentation的Default Orientation（Landscape为横屏，Portrait为竖屏）

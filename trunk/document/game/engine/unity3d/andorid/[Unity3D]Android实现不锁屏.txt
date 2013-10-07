@@ -1,0 +1,41 @@
+简介
+手机不锁屏功能使用Android编辑器ADT其实是很容易实现的，但是Unity并没有提供现成的接口，这里会引用另一篇文章，用于说明Unity如何调用Android接口，来辅助实现这个不锁屏的功能
+调用Android接口的文章链接（http://blog.csdn.net/xv_ly15/article/details/9314199）
+
+
+
+
+
+
+
+实现
+1. 修改AndroidManifest.xml文件，添加
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+关于一些权限，可以参考：（http://blog.csdn.net/xv_ly15/article/details/9314299）
+
+2. 实现代码
+[javascript] view plaincopy
+package com.test;  
+  
+import android.os.Bundle;  
+import android.view.WindowManager;  
+  
+import com.unity3d.player.UnityPlayerActivity;  
+  
+public class MainActivity extends UnityPlayerActivity {  
+  
+      
+    @Override  
+    protected void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+                 
+        //不锁屏  
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);  
+    }  
+  
+   
+    
+   
+}  
+
+http://blog.csdn.net/xv_ly15/article/details/9341257
