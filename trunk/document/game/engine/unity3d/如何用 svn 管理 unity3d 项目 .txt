@@ -1,0 +1,11 @@
+因为svn用惯了， asset server还是收费的，所以这个版本还是使用svn来管理unity3d的工程，刚开始的时候各种问题，丢失场景啊，丢失纹理贴图等等。被折腾了好久，我终于抽时间去官网上看了下，并且按照官网设置，用了几个月，感觉很稳定，所以存档记录，并分享给大家。
+
+
+     1、在Uniyt里面， Edit->project settings->editor 里面选择metafile
+
+     2、提交的时候仅提交Assets 和 ProjectSettings 两个目录下所有东西，忽略掉其他所有目录和文件
+
+     3、提交的时候.metafile也要提交
+
+
+OK了，你就可以用svn来做unity的版本控制了
