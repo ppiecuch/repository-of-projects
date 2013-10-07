@@ -1,0 +1,36 @@
+Google Protocol Buffers是google出品的一个协议生成工具，特点就是跨平台，效率高，速度快，对我们自己的程序定义和使用私有协议很有帮助。
+　　Protocol Buffers入门：
+　　1、去 http://code.google.com/p/protobuf/downloads/list　下载一个源代码包和一个已编译好的二进制包
+　　2、找一个Proto示例代码，使用命令
+protoc　-I=$SRC_DIR　--java_out=$DST_DIR　$SRC_DIR/addressbook.proto
+　　将proto文件编译一下即可得到对应的Java源代码。例如 protoc　-I=src --java_out=addressbook.proto。
+　　Java项目配置：
+　　1、先用
+　　$ protoc --java_out=src/main/java -I../src ../src/google/protobuf/descriptor.proto
+　　命令把源代码包中的descriptor.proto编译一下，生成一个类。
+　　2、将第一步生成的那个文件连同源代码包中的java/src/main/java中的源代码，一起丢入你的项目工程，这就是基础类库了。
+　　3、之后你就可以写自己的proto文件，然后编译，连同上面的基础类库丢入你的项目工程中，就可以运行了。
+　　C#的配置：
+　　1、Google本身不自带生成C#源码的功能，要使用C#，必须使用一个Csharp port，项目地址是：http://code.google.com/p/protobuf-csharp-port/
+　　2、源码可以从SVN上面Download下来，Download下来之后，需要去下载一个NAnt，然后在项目源码目录下进行命令操作，用来编译生成可执行文件
+nant　clean　build　test　dist
+　　这步做完会生成几个文件：
+　　ProtoGen.exe - the source code generator
+　　Google.ProtocolBuffers.dll - the library part of the project
+　　ProtoMunge.exe - tool to remove sensitive data from binary messages
+　　ProtoDump.exe - tool to dump a binary message as text
+　　ProtoBench.exe - tool to run performance benchmarks on binary messages
+　　主要是第一个和第二个
+　　第一个ProtoGen.exe是用来生成C#源码的
+　　第二个Google.ProtocolBuffers.dll是用来在项目中进行引用的。
+　　3、在源码中附带了记个proto文件，是根据C#版本专门修改过的，可以拿出来做生成测试，执行以下命令可以得到C#源文件：
+双击代码全选
+1
+2
+3
+<img　src="http: www.blogjava.net="" images="" outliningindicators="" none.gif"　="">protoc　--descriptor_set_out=addressbook.protobin　--proto_path=protos　--include_imports　protostutorialaddressbook.proto　
+<img　src="http: www.blogjava.net="" images="" outliningindicators="" none.gif"　="">　
+<img　src="http: www.blogjava.net="" images="" outliningindicators="" none.gif"　="">protogen　addressbook.protobin</img　src="http:></img　src="http:></img　src="http:>
+　　如果想生成C#源码，需要执行第一步将源文件用Protoc编译一下，编译之后再用Protogen生成一份C#文件，会生成三个文件，只有 AddressBookProtos.cs有用，将这个文件连同Google.ProtocolBuffers.dll一起丢入项目，你就可以使用了。
+
+http://tech.ddvip.com/2009-09/1253626471134002.html
