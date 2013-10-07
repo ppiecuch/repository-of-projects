@@ -1,0 +1,16 @@
+在大场景加载时，都希望有一个进度条能显示当前加载的百分比，而不是卡在当前场景或者是直接黑屏。
+
+ 
+
+Unity3D提供了一些函数供我们使用。
+
+Application.LoadLevelAsync
+
+
+                    using UnityEngine; using System.Collections; public class example : MonoBehaviour { IEnumerator Start() { AsyncOperation async = Application.LoadLevelAsync("MyBigLevel"); yield return async; Debug.Log("Loading complete"); } }                
+
+ 
+
+这个是异步加载的函数，AsyncOperation的progress返回了0-1之间的值，表示进度。
+
+http://zhan.renren.com/unity3?gid=3602888498034663872&from=post&checked=true

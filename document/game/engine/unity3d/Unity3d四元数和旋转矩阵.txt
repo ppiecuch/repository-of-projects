@@ -1,0 +1,109 @@
+一 四元数
+
+ Quaternion中存放了x，y，z，w四个数据成员，可以用下标来进行访问，对应的下标分别是0,1,2,3。
+
+ 主要介绍几个函数
+
+ <1> 根据两个向量计算出旋转量，计算出来的旋转量为从fromDirection旋转到toDirection的旋转量
+static Quaternion FromToRotation(Vector3 fromDirection,Vector3 toDirection);
+
+
+ <2>
+static Quaternion LookRotation(Vector3 forward);
+static Quaternion LookRotation(Vector3 forward,Vector3 upwards);
+使用指定的向前方向和向上方向来创建四元数
+
+ 示例
+[csharp] view plaincopy
+Vector3 vr = new Vector3(1,0,0);  
+Quaternion q1 = Quaternion.LookRotation(vr);  
+Debug.Log(q1);  
+          
+Vector3 vforwardp = new Vector3(0,0,1);       
+Quaternion q2 = Quaternion.FromToRotation(vforwardp ,vr);  
+Debug.Log(q2);  
+
+
+这里面q1和q2的值是相同的，q2的计算过程是计算向前向量(vforwardp )到当前向量vr的旋转量，而这就是LookRotation的计算方式。
+
+ 而是LookRotation同时使用forward和upward两个参数的时候，就相当于指定了vz和vy两个向量，根据这两个向量可以直接算出对应的vx，然后再用这三个向量去set对应的3×3旋转矩阵的列向量即可获得一个旋转矩阵，再接着可以将其转换到四元数。
+
+ <3>
+void SetLookRotation(Vector3 view);
+void SetLookRotation(Vector3 view,Vector3 up);
+也是根据指定的向前和向上向量创建四元数，本质计算过程和LookRotation一样，只不过LookRotation是Quaternion上的静态函数，而SetLookRotation则是Quaternion的成员函数。
+
+ <4>
+static Quaternion RotateTowards(Quaternion from,Quaternion to, float maxDegreesDelta);
+以maxDegreesDelta作为角度步长计算从from到to之间的旋转量
+
+ <5>
+static Quaternion AngleAxis(float angle,Vector3 axis);
+根据旋转轴和旋转角度算出四元数
+
+ <6>Quaternion.eulerAngles
+存放四元数对应的三个轴向的欧拉角，分别是绕x轴、y轴、z轴旋转的角度
+
+[csharp] view plaincopy
+Quaternion q3 = new Quaternion();  
+q3.eulerAngles = new Vector3(10, 30, 20);  
+Quaternion qx3 = Quaternion.AngleAxis(10,Vector3.right);          
+Quaternion qy3 = Quaternion.AngleAxis(30,Vector3.up);  
+Quaternion qz3 = Quaternion.AngleAxis(20,Vector3.forward);  
+          
+Quaternion qxyz3 = qz3*qy3*qx3;  
+
+
+上面的代码可以得到q3和qxyz3值一样。从这里可以看出unity中旋转顺序也是按先绕x轴旋转，然后y，最后z。unity中对向量应用旋转量使用的是向量右乘，即如下：
+Vector3 newV = qxyz3*v=qz3*qy3*qx3*v;
+ 二 旋转矩阵
+unity中仅仅提供了一个4×4的矩阵类Matrix4x4，它可以包含位移T、旋转R和伸缩信息。矩阵中的元素都对应一个mxy的公有成员变量，因而要访问单个元素的话可以直接访问其成员。同时也提供了下标访问，如下
+[csharp] view plaincopy
+public float this [int row, int column]  
+{  
+    get  
+    {  
+<span style="white-space:pre">  </span>    return this [row + column * 4];  
+    }  
+    set  
+    {  
+<span style="white-space:pre">  </span>    this [row + column * 4] = value;  
+    }  
+}  
+public float this [int index]  
+
+ 三 四元数和旋转矩阵之间的转换
+unity中没有提供直接的四元数到旋转矩阵的转换，但是使用它们的一些成员函数可以实现两者之间的转换。
+1 四元数到旋转矩阵
+使用Matrix4x4的成员函数SetTRS
+void SetTRS(Vector3 pos,Quaternion q,Vector3 s);
+
+ 示例
+[csharp] view plaincopy
+Quaternion q = Quaternion.LookRotation(new Vector3(0,0.5,1));  
+Matrix4x4 rot = new Matrix4x4();  
+rot.SetTRS(new Vector3(0,0,0),q,new Vector3(1,1,1));  
+
+
+ 2 旋转矩阵到四元数
+使用Quaternion类的LookRotation函数
+static Quaternion LookRotation(Vector3 forward,Vector3 upwards);
+
+ 示例（接上面）：
+[csharp] view plaincopy
+Matrix4x4 rot = new Matrix4x4();  
+rot.SetTRS(new Vector3(0,0,0),q,new Vector3(1,1,1));  
+          
+Vector4 vy = rot.GetColumn(1);  
+Vector4 vz = rot.GetColumn(2);  
+          
+Quaternion newQ = Quaternion.LookRotation(new Vector3(vz.x,vz.y,vz.z),new Vector3(vy.x,vy.y,vy.z));  
+这里的newQ与上面的q等值
+
+四 其他
+unity中可以将一个四元数q换算到一个旋转矩阵R，同时将这个q在Ogre中换算到另一个旋转矩阵R1，发现R和R1是相同的。
+
+ 这说明虽然unity和Ogre采用的是不同的坐标系，但是对于四元数和旋转矩阵之间的换算是等价的。同时unity中四元数的计算公式也和《三维旋转基础》中的一样。
+
+
+http://blog.csdn.net/kfqcome/article/details/10729551

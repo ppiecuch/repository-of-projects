@@ -1,0 +1,244 @@
+Unity3D - 异步加载游戏场景与异步加载游戏资源进度条
+分类： Unity 3D 2012-09-13 15:39 843人阅读 评论(0) 收藏 举报
+原创文章如需转载请注明：转载自雨松MOMO程序研究院本文链接地址:Unity3D研究院之异步加载游戏场景与异步加载游戏资源进度条（三十一）
+          异步任务相信大家应该不会陌生，那么本章内容MOMO将带领大家学习Unity中的一些异步任务。在同步加载游戏场景的时候通常会使用方法 Application.LoadLevel(“yourScene”);  这句代码执行完毕后程序会干什么呢？？如下图所示，这是我随便找了一个游戏场景， 在Hierarchy视图中我们可以看到该场景中“天生”的所有游戏对象。天生的意思就是运行程序前该场景中就已经存在的所有游戏对象。然后这些对象就会在执行完Application.LoadLevel(“yourScene”);方法后加载至内存当中。如果该场景中的游戏对象过多那么瞬间将会出现卡一下的情况，因为LoadLevel()方法是同步进行的。MOMO把这种加载起个名字叫A形式加载。
+
+ 
+
+
+
+ 
+
+下面我说说“后天“加载的游戏对象。意思是这些游戏对象是通过脚本动态的创建出来的。比如常用方法 :
+
+1	GameObject Obj = (GameObject)Instantiate(prefab);
+ 
+
+这句代码执行完毕后同样会在Hierarchy视图中添加对应的游戏对象。MOMO把这种加载起个名字叫B形式加载。
+
+ 
+
+下面我们学习异步加载游戏场景，异步异步顾名思义就是不影响当前游戏场景的前提下加载新场景。通常异步加载的方式分为两种：第一种是异步加载新游戏场景，当新场景加载完成后进入新场景并且销毁之前的场景。第二种:同样异步加载新场景，新场景加载完毕后，保留旧场景的游戏对象并且进入新场景。 这里加载的内容就是上面提到的A形式加载。然后B形式加载不会记入这里的加载。
+
+第一种异步加载游戏场景对应的方法是：
+
+1	Application.LoadLevelAsync("yourScene");
+ 
+
+第二种异步家在游戏场景对应的方法是：
+
+1	Application.LoadLevelAdditiveAsync ("yourScene");
+这两种方法加载的方式完全一样。异步加载其实重要还是应用于游戏LOADING界面，毕竟LOADING如果采用同步的机制会影响用户体验，说到这里MOMO告诉大家如何在Unity中制作游戏进度条。我们应当在Unity中创建一个专门用于读取进度的场景，假设A场景到C场景，我们应当让A场景先到读取进度的场景B场景，当异步任务完成后在进入C场景。 A – 》B -》 C ，在B场景中绘制游戏进度条或读取动画。因为B场景仅仅是个显示LOADING动画的场景，所以读取该场景是瞬间就完成的。
+
+程序在切换场景时应当有一个全全局的静态变量来记录简要读取的场景名称。这里简单的写一下。
+
+1	using UnityEngine;
+2	using System.Collections;
+3	 
+4	public class Globe
+5	{
+6	         //在这里记录当前切换场景的名称
+7	     public static string loadName;
+8	}
+ 
+
+在A场景中通过某些触发条件 调用LoadLevel进入B场景。
+
+1	//记录LOADING场景中需要读取的C场景名称
+2	Globe.loadName = "C";
+3	//先进入B场景
+4	Application.LoadLevel ("B");
+ 
+
+OK我们在B场景中异步读取C场景与 播放读取动画，Loading.cs 绑定在B场景的摄像机对象身上。当C场景异步读取完毕后即可直接进入C场景。
+
+01	using UnityEngine;
+02	using System.Collections;
+03	 
+04	public class Loading : MonoBehaviour {
+05	 
+06	    private float fps = 10.0f;
+07	    private float time;
+08	    //一组动画的贴图，在编辑器中赋值。
+09	    public Texture2D[] animations;
+10	    private int nowFram;
+11	    //异步对象
+12	    AsyncOperation async;
+13	 
+14	    //读取场景的进度，它的取值范围在0 - 1 之间。
+15	    int progress = 0;
+16	 
+17	    void Start()
+18	    {
+19	        //在这里开启一个异步任务，
+20	        //进入loadScene方法。
+21	        StartCoroutine(loadScene());
+22	    }
+23	 
+24	    //注意这里返回值一定是 IEnumerator
+25	    IEnumerator loadScene()
+26	    {
+27	        //异步读取场景。
+28	        //Globe.loadName 就是A场景中需要读取的C场景名称。
+29	        async = Application.LoadLevelAsync(Globe.loadName);
+30	 
+31	        //读取完毕后返回， 系统会自动进入C场景
+32	        yield return async;
+33	 
+34	    }
+35	 
+36	    void OnGUI()
+37	    {
+38	        //因为在异步读取场景，
+39	        //所以这里我们可以刷新UI
+40	        DrawAnimation(animations);
+41	 
+42	    }
+43	 
+44	    void Update()
+45	    {
+46	 
+47	        //在这里计算读取的进度，
+48	        //progress 的取值范围在0.1 - 1之间， 但是它不会等于1
+49	        //也就是说progress可能是0.9的时候就直接进入新场景了
+50	        //所以在写进度条的时候需要注意一下。
+51	        //为了计算百分比 所以直接乘以100即可
+52	        progress =  (int)(async.progress *100);
+53	 
+54	        //有了读取进度的数值，大家可以自行制作进度条啦。
+55	        Debug.Log("xuanyusong" +progress);
+56	 
+57	    }
+58	    //这是一个简单绘制2D动画的方法，没什么好说的。
+59	    void   DrawAnimation(Texture2D[] tex)
+60	    {
+61	 
+62	        time += Time.deltaTime;
+63	 
+64	         if(time >= 1.0 / fps){
+65	 
+66	             nowFram++;
+67	 
+68	             time = 0;
+69	 
+70	             if(nowFram >= tex.Length)
+71	             {
+72	                nowFram = 0;
+73	             }
+74	        }
+75	        GUI.DrawTexture(new Rect( 100,100,40,60) ,tex[nowFram] );
+76	 
+77	        //在这里显示读取的进度。
+78	        GUI.Label(new Rect( 100,180,300,60), "lOADING!!!!!" + progress);
+79	 
+80	    }
+81	 
+82	}
+ 
+
+OK 下面我们继续学习在游戏场景中加载对象，文章的开始MOMO已经告诉大家，游戏场景中Hierarchy视图中的所有的对象在切换场景的时候都会加载。其实有一种方法可以让某些游戏对象不会被加载，如下图所示，首先在Hierarchy视图中选择一个游戏对象，在右侧监测面板视图中我们可以看到一个 “小对勾”默认情况下是勾选状态，说明该游戏对象处于激活状态，如果点掉的话该对象将被隐藏。这个小功能在开发中其实用处非常大，请大家务必记住哈。
+
+ 
+
+
+
+ 
+
+此时此刻大家相像一个游戏场景，默认进入的时候是没有任何游戏对象的，然后运行游戏时开启一个异步任务将它们一个一个的加载显示出来，这种方式适合异步的加载一个比较大的游戏场景。
+
+Test.cs 把它挂在摄像机对象中。
+
+01	using UnityEngine;
+02	using System.Collections;
+03	 
+04	public class Test : MonoBehaviour {
+05	 
+06	    //这里是需要加载激活的游戏对象
+07	    public GameObject  [] Objects;
+08	 
+09	    //当前加载的进度
+10	    int load_index =0;
+11	    void Start ()
+12	    {
+13	        //开启一个异步任务，加载模型。
+14	        StartCoroutine(loadObject());
+15	    }
+16	 
+17	    IEnumerator loadObject()
+18	    {
+19	        //便利所有游戏对象
+20	        foreach(GameObject obj in Objects)
+21	        {
+22	            //激活游戏对象
+23	            obj.active = true;
+24	            //记录当前加载的对象
+25	            load_index ++;
+26	 
+27	            //这里可以理解为通知主线程刷新UI
+28	            yield return 0;
+29	        }
+30	        //全部便利完毕返回
+31	        yield return 0;
+32	    }
+33	 
+34	    void OnGUI ()
+35	    {
+36	        //显示加载的进度
+37	        GUILayout.Box("当前加载的对象ID是： " + load_index);
+38	    }
+39	}
+ 
+
+如下图所示，我们把需要加载的游戏对象以数组的形式放在Objects数组中，因为这些对象属于未激活状态，所以不能通过Find 等方法在脚步那种中找到他们。讲到这里我们在说说 编辑器赋值与代码中赋值的区别，编辑器中赋值所消耗的时间都会记在loadlevel ()读取场景中。而代码中使用Resource.load()这类方法所消耗的时间会记在脚本中。开发中还得自行的把握一下把loading加在那里。
+
+ 
+
+
+
+ 
+
+当然我们还可以使用Instantiate(prefab);方法来动态的创建游戏对象。
+
+Main.cs 把它挂在摄像机中。
+
+01	using UnityEngine;
+02	using System.Collections;
+03	 
+04	public class Main : MonoBehaviour
+05	 {
+06	 
+07	    public int count;
+08	    //在编辑器中预设一个游戏对象
+09	    public  GameObject prefab;
+10	 
+11	    void Start ()
+12	    {
+13	        StartCoroutine(loaditem());
+14	    }
+15	 
+16	    void OnGUI()
+17	    {
+18	        GUILayout.Box("游戏对象已经加载到 ： " + count);
+19	    }
+20	 
+21	    IEnumerator loaditem()
+22	    {
+23	        //开始加载游戏对象
+24	        for(int i =0; i< 1000; i++)
+25	        {
+26	 
+27	            Instantiate(prefab);
+28	            count = i;
+29	            //可以理解为刷新UI，显示新加载的游戏对象
+30	            yield return 0;
+31	        }
+32	        //结束
+33	        yield return 0;
+34	    }
+35	}
+ 
+
+运行游戏后该游戏对象会循环1000遍逐个创建，不影响主线程。那么今天我们其实学习最多的就是StartCoroutine()，其实就是开启一个异步线程，这里可能有朋友会问Thread可以代替它吗？ 答案是不行， 比如查询数据库的时候如果用Thread的话Unity就会报错说不能在线程中查询，但是在StartCoroutine()中就可以完成，所以开发中大家可以尝试着使用它，我们还可以使用StopCoroutine(“name”)来关闭一个正在执行的异步线程。不早了晚安，MOMO祝大家学习愉快。
+
+
+http://www.douban.com/note/259053158/
