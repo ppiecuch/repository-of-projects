@@ -1,0 +1,7 @@
+obj
+Library
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.txt
