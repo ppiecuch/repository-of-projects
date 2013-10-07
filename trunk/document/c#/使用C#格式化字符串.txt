@@ -1,0 +1,407 @@
+1 前言
+
+   如果你熟悉Microsoft Foundation Classes（MFC）的CString，Windows Template Library（WTL）的CString或者Standard Template Library（STL）的字符串类，那么你对String.Format方法肯定很熟悉。在C#中也经常使用这个方法来格式化字符串，比如下面这样：
+
+int x = 16;
+decimal y = 3.57m;
+string h = String.Format( "item {0} sells at {1:C}", x, y );
+Console.WriteLine(h);
+
+在我的机器上，可以得到下面的输出：
+
+item 16 sells at ￥3.57
+
+也许你的机器上的输出和这个不太一样。这是正常的，本文稍后就会解释这个问题。
+
+   在我们日常使用中，更多的是使用Console.WriteLine方法来输出一个字符串。其实String.Format和Console.WriteLine有很多共同点。两个方法都有很多重载的格式并且采用无固定参数的对象数组作为最后一个参数。下面的两个语句会产生同样的输出。
+
+Console.WriteLine( "Hello {0} {1} {2} {3} {4} {5} {6} {7} {8}", 123, 45.67, true, 'Q', 4, 5, 6, 7, '8');
+string u = String.Format("Hello {0} {1} {2} {3} {4} {5} {6} {7} {8}", 123, 45.67, true, 'Q', 4, 5, 6, 7, '8');
+Console.WriteLine(u);
+
+输出如下：
+
+Hello 123 45.67 True Q 4 5 6 7 8
+Hello 123 45.67 True Q 4 5 6 7 8
+
+2 字符串格式
+
+String.Format和WriteLine都遵守同样的格式化规则。格式化的格式如下："{ N [, M ][: formatString ]}", arg1, ... argN，在这个格式中：
+
+1） N是从0开始的整数，表示要格式化的参数的个数
+
+2） M是一个可选的整数，表示格式化后的参数所占的宽度，如果M是负数，那么格式化后的值就是左对齐的，如果M是正数，那么格式化后的值是右对齐的
+
+3） formatString是另外一个可选的参数，表示格式代码
+
+argN表示要格式化的表达式，和N是对应的。
+
+如果argN是空值，那么就用一个空字符串来代替。如果没有formatString，那么就用参数N对应的ToString方法来格式化。下面的语句会产生同样的输出:
+
+public class TestConsoleApp
+{
+    public static void Main(string[] args)
+    {
+        Console.WriteLine(123);
+        Console.WriteLine("{0}", 123);
+        Console.WriteLine("{0:D3}", 123);
+    }
+}
+
+输出是：
+
+123
+123
+123
+
+也可以通过String.Format得到同样的输出。
+
+string s = string.Format("123");
+string t = string.Format("{0}", 123);
+string u = string.Format("{0:D3}", 123);
+Console.WriteLine(s);
+Console.WriteLine(t);
+Console.WriteLine(u);
+
+因此有如下结论：
+
+（,M）决定了格式化字符串的宽度和对齐方向
+
+（:formatString）决定了如何格式化数据，比如用货币符号，科学计数法或者16进制。就像下面这样：
+
+Console.WriteLine("{0,5} {1,5}", 123, 456);      // 右对齐
+Console.WriteLine("{0,-5} {1,-5}", 123, 456);    // 左对齐
+
+输出是
+
+123   456
+123   456
+
+也可以合并这些表达式，先放一个逗号，再放一个冒号。就像这样：
+
+Console.WriteLine("{0,-10:D6} {1,-10:D6}", 123, 456);
+
+输出是：
+
+000123     000456
+
+我们可以用这种格式化特性来对齐我们的输出。
+
+Console.WriteLine("\n{0,-10}{1,-3}", "Name","Salary");
+Console.WriteLine("----------------");
+Console.WriteLine("{0,-10}{1,6}", "Bill", 123456);
+Console.WriteLine("{0,-10}{1,6}", "Polly", 7890);
+
+输出是：
+
+Name      Salary
+----------------
+Bill      123456
+Polly       7890
+
+3 格式化标识符
+
+标准的数学格式字符串用于返回通常使用的字符串。它们通常象X0这样的格式。X是格式化标识符，0是精度标识符。格式标识符号共有9种，它们代表了大多数常用的数字格式。就像下表所示：
+
+字母	 含义
+C或c	Currency 货币格式
+D或d	Decimal 十进制格式（十进制整数，不要和.Net的Decimal数据类型混淆了）
+E或e	Exponent 指数格式
+F或f	Fixed point 固定精度格式
+G或g	General 常用格式
+N或n	用逗号分割千位的数字，比如1234将会被变成1,234
+P或p	Percentage 百分符号格式
+R或r	Round-trip  圆整（只用于浮点数）保证一个数字被转化成字符串以后可以再被转回成同样的数字
+X或x	Hex 16进制格式
+如果我们使用下面的表达方式，让我们看看会发生什么
+
+public class FormatSpecApp
+{
+    public static void Main(string[] args)
+    {
+        int i = 123456;
+        Console.WriteLine("{0:C}", i); // ￥123,456.00
+        Console.WriteLine("{0:D}", i); // 123456
+        Console.WriteLine("{0:E}", i); // 1.234560E+005
+        Console.WriteLine("{0:F}", i); // 123456.00
+        Console.WriteLine("{0:G}", i); // 123456
+        Console.WriteLine("{0:N}", i); // 123,456.00
+        Console.WriteLine("{0:P}", i); // 12,345,600.00 %
+        Console.WriteLine("{0:X}", i); // 1E240
+    }
+}
+
+精度控制标识控制了有效数字的个数或者十进制数小数的位数。
+
+Console.WriteLine("{0:C5}", i); // ￥123,456.00
+Console.WriteLine("{0:D5}", i); // 123456
+Console.WriteLine("{0:E5}", i); // 1.23456E+005
+Console.WriteLine("{0:F5}", i); // 123456.00000
+Console.WriteLine("{0:G5}", i); // 1.23456E5
+Console.WriteLine("{0:N5}", i); // 123,456.00000
+Console.WriteLine("{0:P5}", i); // 12,345,600.00000 %
+Console.WriteLine("{0:X5}", i); // 1E240
+
+R（圆整）格式仅仅对浮点数有效。这个值首先会用通用格式来格式化。对于双精度数有15位精度，对于单精度数有7位精度。如果这个值可以被正确地解析回原始的数字，就会用通用格式符来格式化。如果不能解析回去的话，那么就会用17位精度来格式化双精度数，用9位精度来格式化单精度数。尽管我们可以在圆整标识符后面添加有效数字的位数，但是它会被忽略掉。
+
+double d = 1.2345678901234567890;
+Console.WriteLine("Floating-Point:\t{0:F16}", d);  // 1.2345678901234600
+Console.WriteLine("Roundtrip:\t{0:R16}", d);       // 1.2345678901234567
+
+如果标准格式化标识符还不能满足你。你可以使用图形化格式字符串来创建定制的字符串输出。图形化格式化使用占位符来表示最小位数，
+
+最大位数，定位符号，负号的外观以及其它数字符号的外观。就像下表所示
+
+ 符号	名称	含义
+0	0占位符	用0填充不足的位数
+#	数字占位符	用#代替实际的位数
+.	十进制小数点	
+,	千位分隔符	用逗号进行千位分割，比如把1000分割成1,000
+%	百分符号	显示一个百分标识
+E+0
+E-0
+e+0
+e-0	指数符号	用指数符号格式化输出
+\	专一字符	用于传统格式的格式化序列，比如"\n"（新行）
+'ABC'
+"ABC"	常量字符串 	显示单引号或者双引号里面的字符串
+;	区域分隔符 	如果数字会被格式化成整数，负数，或者0，用;来进行分隔
+,.	缩放符号	数字除以1000
+看下面的例子：
+
+            double i = 123456.42;
+            Console.WriteLine();
+            Console.WriteLine("{0:000000.00}", i); //123456.42
+            Console.WriteLine("{0:00.00000000e+0}", i); //12.34564200e+4
+            Console.WriteLine("{0:0,.}", i);          //123
+            Console.WriteLine("{0:#0.000}", i);             // 123456.420
+            Console.WriteLine("{0:#0.000;(#0.000)}", i);        // 123456.420
+            Console.WriteLine("{0:#0.000;(#0.000);<zero>}", i); // 123456.420
+            Console.WriteLine("{0:#%}", i);     // 12345642%
+
+            i = -123456.42;
+            Console.WriteLine();
+            Console.WriteLine("{0:000000.00}", i); //-123456.42
+            Console.WriteLine("{0:00.00000000e+0}", i); //-12.34564200e+4
+            Console.WriteLine("{0:0,.}", i);          //-123
+            Console.WriteLine("{0:#0.000}", i);             // -123456.420
+            Console.WriteLine("{0:#0.000;(#0.000)}", i);        // (123456.420)
+            Console.WriteLine("{0:#0;(#0);<zero>}", i); // (123456)
+            Console.WriteLine("{0:#%}", i);             // -12345642%
+
+            i = 0;
+            Console.WriteLine();
+            Console.WriteLine("{0:0,.}", i);          //0
+            Console.WriteLine("{0:#0}", i);             // 0
+            Console.WriteLine("{0:#0;(#0)}", i);        // 0
+            Console.WriteLine("{0:#0;(#0);<zero>}", i); // <zero>
+            Console.WriteLine("{0:#%}", i);             // %
+
+4 数字字符串的解析
+
+所有的基础类型都有ToString方法，它是从object类型中继承过来的。所有的数值类型都有Parse方法，它用字符串为参数，并且返回相等的数值。比如
+
+public class NumParsingApp
+{
+    public static void Main(string[] args)
+    {
+        int i = int.Parse("12345");
+        Console.WriteLine("i = {0}", i);
+
+        int j = Int32.Parse("12345");
+        Console.WriteLine("j = {0}", j);
+
+        double d = Double.Parse("1.2345E+6");
+        Console.WriteLine("d = {0:F}", d);
+
+        string s = i.ToString();
+        Console.WriteLine("s = {0}", s);
+    }
+}
+
+输出如下
+
+i = 12345
+j = 12345
+d = 1234500.00
+s = 12345
+
+在缺省状况下，某些非数字字符是可以存在的。比如开头和结尾的空白。逗号和小数点，加号和减号，因此，下面的Parse语句是一样的
+
+string t = "  -1,234,567.890  ";
+//double g = double.Parse(t);        // 和下面的代码干同样的事情
+double g = double.Parse(t, 
+    NumberStyles.AllowLeadingSign | 
+    NumberStyles.AllowDecimalPoint |
+    NumberStyles.AllowThousands |
+    NumberStyles.AllowLeadingWhite | 
+    NumberStyles.AllowTrailingWhite);
+Console.WriteLine("g = {0:F}", g);
+
+输出都是这样
+
+g = -1234567.89
+
+注意到，如果你要使用NumberStyles，就要添加对System.Globalization的引用，然后就可以使用不同NumberStyles的组合或者其中的任意一种。如果你想兼容货币符号，就需要使用重载的Parse方法，它们采用了NumberFormatInfo对象作为一个参数，然后你可以设置NumberFormatInfo的CurrencySymbol属性来调用Parse方法，比如：
+
+string u = "￥  -1,234,567.890  ";
+NumberFormatInfo ni = new NumberFormatInfo();
+ni.CurrencySymbol = "￥";
+double h = Double.Parse(u, NumberStyles.Any, ni);
+Console.WriteLine("h = {0:F}", h);
+
+上面的代码有如下输出
+
+h = -1234567.89
+
+除了NumberFormatInfo，还可以使用CultureInfo类。CultureInfo代表了某种特定的文化，包括文化的名字，书写的方式，日历的格式。对于某种特定文化的操作是非常普遍的情况，比如格式化日期和排序。文化的命名方式遵从RFC1766标准，使用<语言代码2>-<国家/地区码2>的方式，其中的<语言代码2>是两个小写的字母，它们来自ISO639-1；<国家/地区码2>是两个大写字母，它们来自ISO3166。比如，美国英语是“en-US"。英国英语是"en-GB"。特立尼达和多巴哥英语是"en-TT"。例如，我们可以创建一个美国英语的CultureInfo对象并且基于这种文化将数字转换成字符串。
+
+int k = 12345;
+CultureInfo us = new CultureInfo("en-US");
+string v = k.ToString("c", us);
+Console.WriteLine(v);
+
+输出是：
+
+$12,345.00
+
+要注意到，我们使用了重载的ToString方法，它把第一个格式化字符串当成第一个参数，将一个CultureInfo对象（执行了IFormatProvider对象）作为第二个参数。这儿有第二个例子，对于丹麦人来说：
+
+CultureInfo dk = new CultureInfo("da-DK");
+string w = k.ToString("c", dk);
+Console.WriteLine(w);
+
+输出是：
+
+kr 12.345,00
+
+5 字符串和日期
+
+一个日期对象有个叫Ticks的属性。它存储了自从公元1年的1月1号上午12点开始的，以100纳秒为间隔的时间。比如，Ticks值等于31241376000000000L表示公元100年，星期五，1月1号，上午12点这一时间。Ticks总是以100纳秒为间隔递增。
+
+DateTime的值以存储在DateTimeFormatInfo实例里面的标准或者自定义的方式来表示。为了修改一个日期显示的方式，DateTimeFormatInfo实例必须要是可写的，以便我们写入自定义的格式并且存入属性中
+
+using System.Globalization;
+
+public class DatesApp
+{
+    public static void Main(string[] args)
+    {
+        DateTime dt = DateTime.Now;
+        Console.WriteLine(dt);
+        Console.WriteLine("date = {0}, time = {1}\n",
+            dt.Date, dt.TimeOfDay);
+    }
+}
+
+代码会产生下面的输出
+
+23/06/2001 17:55:10
+date = 23/06/2001 00:00:00, time = 17:55:10.3839296
+
+下表列出了标准的格式字符串以及相关的DateTimeFormatInfo属性
+
+D		
+D	MM/dd/yyyy	ShortDatePattern（短日期模式）
+D	dddd,MMMM dd,yyyy  	 LongDatePattern（长日期模式）
+F	dddd,MMMM dd,yyyy HH:mm	Full date and time (long date and short time)（全日期和时间模式）
+F	dddd,MMMM dd,yyyy HH:mm:ss	FullDateTimePattern (long date and long time)（长日期和长时间）
+G	MM/dd/yyyy HH:mm	General (short date and short time)（通用模式，短日期和短时间）
+G	MM/dd/yyyy HH:mm:ss	General (short date and long time)（通用模式，短日期和长时间）
+M,M	MMMM dd 	MonthDayPattern（月天模式）
+r,R	ddd,dd MMM yyyy,HH':'mm':'ss 'GMT'	RFC1123Pattern （RFC1123模式）
+S	yyyy-MM-dd HH:mm:ss 	SortableDateTimePattern (conforms to ISO 8601) using local time（使用本地时间的可排序模式）
+T	HH:mm 	ShortTimePattern （短时间模式）
+T	HH:mm:ss	LongTimePattern（长时间模式）
+U	yyyy-MM-dd HH:mm:ss	UniversalSortable-DateTimePattern (conforms to ISO 8601) using universal time（通用可排序模式）
+U	dddd,MMMM dd,yyyy,HH:mm:ss	UniversalSortable-DateTimePattern（通用可排序模式）
+y,Y	MMMM,yyyy	YearMonthPattern（年月模式）
+DateTimeFormatInfo.InvariantInfo属性得到了默认的只读的DateTimeFormatInfo实例，它与文化无关。你可以创建自定义的模式。要注意到的是InvariantInfo不一定和本地的格式一样。Invariant等于美国格式。另外，如果你向DateTime.Format方法传递的第二个参数是null，DateTimeFormatInfo将会是默认的CurrentInfo。比如
+
+Console.WriteLine(dt.ToString("d", dtfi));
+Console.WriteLine(dt.ToString("d", null));
+Console.WriteLine();
+
+输出是
+
+06/23/2001
+23/06/2001
+
+对比选择InvariantInfo和CurrentInfo的。
+
+DateTimeFormatInfo dtfi;
+Console.Write("[I]nvariant or [C]urrent Info?: ");
+if (Console.Read() == 'I')
+    dtfi = DateTimeFormatInfo.InvariantInfo;
+else
+    dtfi = DateTimeFormatInfo.CurrentInfo;
+DateTimeFormatInfo dtfi = DateTimeFormatInfo.InvariantInfo;
+Console.WriteLine(dt.ToString("D", dtfi));
+Console.WriteLine(dt.ToString("f", dtfi));
+Console.WriteLine(dt.ToString("F", dtfi));
+Console.WriteLine(dt.ToString("g", dtfi));
+Console.WriteLine(dt.ToString("G", dtfi));
+Console.WriteLine(dt.ToString("m", dtfi));
+Console.WriteLine(dt.ToString("r", dtfi));
+Console.WriteLine(dt.ToString("s", dtfi));
+Console.WriteLine(dt.ToString("t", dtfi));
+Console.WriteLine(dt.ToString("T", dtfi));
+Console.WriteLine(dt.ToString("u", dtfi));
+Console.WriteLine(dt.ToString("U", dtfi));
+Console.WriteLine(dt.ToString("d", dtfi));
+Console.WriteLine(dt.ToString("y", dtfi));
+Console.WriteLine(dt.ToString("dd-MMM-yy", dtfi));
+
+输出是
+
+[I]nvariant or [C]urrent Info?: I
+01/03/2002
+03/01/2002
+
+Thursday, 03 January 2002
+Thursday, 03 January 2002 12:55
+Thursday, 03 January 2002 12:55:03
+01/03/2002 12:55
+01/03/2002 12:55:03
+January 03
+Thu, 03 Jan 2002 12:55:03 GMT
+2002-01-03T12:55:03
+12:55
+12:55:03
+2002-01-03 12:55:03Z
+Thursday, 03 January 2002 12:55:03
+01/03/2002
+2002 January
+03-Jan-02
+
+
+[I]nvariant or [C]urrent Info?: C
+03/01/2002
+03/01/2002
+
+03 January 2002
+03 January 2002 12:55
+03 January 2002 12:55:47
+03/01/2002 12:55
+03/01/2002 12:55:47
+03 January
+Thu, 03 Jan 2002 12:55:47 GMT
+2002-01-03T12:55:47
+12:55
+12:55:47
+2002-01-03 12:55:47Z
+03 January 2002 12:55:47
+03/01/2002
+January 2002
+03-Jan-02
+
+/******************************************************************************************
+ *【Author】：flyingbread
+ *【Date】：2007年1月18日
+ *【Notice】：
+ *1、本文为原创技术文章，首发博客园个人站点(http://flyingbread.cnblogs.com/)，转载和引用请注明作者及出处。
+ *2、本文必须全文转载和引用，任何组织和个人未授权不能修改任何内容，并且未授权不可用于商业。
+ *3、本声明为文章一部分，转载和引用必须包括在原文中。
+
+http://www.cnblogs.com/zyh-nhy/archive/2007/10/11/921240.html
+ ******************************************************************************************/
