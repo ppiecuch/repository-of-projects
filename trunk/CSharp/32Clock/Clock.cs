@@ -147,7 +147,7 @@ public class Clock
             }
             else
             {
-                while ((limitation == 0 || counter < limitation) && time >= (startTime + delay) + counter * interval)
+                while ((limitation == 0 || counter < limitation) && time >= (startTime + delay) + (counter+1) * interval)
                 {
                     tick(time);
                 }

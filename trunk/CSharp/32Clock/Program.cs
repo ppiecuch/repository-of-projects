@@ -100,8 +100,28 @@ namespace _32Clock
             c5.start(getMilliTime());
             clocks.Add(c5);
 
-            Thread t = new Thread(run);
-            t.Start();
+            //测试六：10秒内回复生命600点，受攻击打断效果。
+            Clock c6 = new Clock(10000, 0, 1000, 0)
+            .setTick((Clock c, Clock.Stage s, uint counter) =>
+            {
+                Console.WriteLine("Stage;" + s + ",触发：10秒内回复生命600点，受攻击打断效果。(Counter:" + counter + ")[" + c.getRemainingTime(getMilliTime()) + "]" + getNowTime());
+            })
+            .setFinish((Clock c, Clock.Stage s, uint counter) =>
+            {
+                Console.WriteLine("Stage;" + s + ",卸下：10秒内回复生命600点，受攻击打断效果。(Counter:" + counter + ")[" + c.getRemainingTime(getMilliTime()) + "]" + getNowTime());
+            });
+            Console.WriteLine("c6 start:" + getNowTime());
+            c6.start(getMilliTime());
+            clocks.Add(c6);
+
+            Thread t1 = new Thread(run);
+            t1.Start();
+
+            Thread t2 = new Thread(() => {
+                Thread.Sleep(5000);
+                c6.finish();
+            });
+            t2.Start();
 
             Console.ReadKey();
         }
