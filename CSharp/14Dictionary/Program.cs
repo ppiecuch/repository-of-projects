@@ -53,8 +53,11 @@ namespace _14Dictionary
             string a = dic[1]; 
             string b = dic[2]; 
             string c = dic[3];
+            //string d = dic[4];//报错
+            string d = null;
+            dic.TryGetValue(4,out d);   //正常，返回null
 
-            Console.WriteLine("{0},{1},{2}", a, b, c);
+            Console.WriteLine("{0},{1},{2},{3}", a, b, c, d);
 
             //通过Key查找元素
             if(dic.ContainsKey(1))

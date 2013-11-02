@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+//C#的设计缺陷（2）：不能以void作为泛型参数
+//http://star.baidu.com/forum/forum.php?mod=viewthread&tid=407
+
+//The following kinds of type cannot be used as arguments in instantiations (of generic types or methods):
+//Byref types (e.g., System.Generic.Collection.List`1<string&> is invalid)
+//Value types that contain fields that can point into the CIL evaluation stack (e.g.,List<System.RuntimeArgumentHandle>)
+//void (e.g., List<System.Void> is invalid)
+
 //refer to:http://www.ibcibc.com/thread-1066-1-1.html
 
 //泛型是在.net 2.0中出现的，并且作为基本语法集成在CLR中，所以不仅C#中存在泛型，包括VB.NET，visual C++.NET都可以使用泛型。.NET中的泛型和C++中的模板是类似的，至少在语法表现上。

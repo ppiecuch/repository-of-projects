@@ -69,7 +69,7 @@ namespace _07Inherit
         decimal Balance
         {
             get;
-        }
+        }   
     }
 
     //派生类隐式获得基类的除构造函数和析构函数以外的所有成员。
@@ -124,6 +124,9 @@ namespace _07Inherit
         {
             Console.WriteLine("AA.ClassAA()");
         }
+
+        //public virtual void protectedMethod(){}
+        //protected virtual void protectedMethod() { }
     }
     class BB : AA
     {
@@ -131,6 +134,11 @@ namespace _07Inherit
         {
             Console.WriteLine("BB.ClassAA()");
         }
+
+        //错误 当重写“protected”继承成员“_07Inherit.AA.protectedMethod()”时，无法更改访问修饰符
+        //protected override void protectedMethod() { }
+        //错误 当重写“protected”继承成员“_07Inherit.AA.protectedMethod()”时，无法更改访问修饰符
+        //public override void protectedMethod() { }
 
     }
 

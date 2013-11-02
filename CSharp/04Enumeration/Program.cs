@@ -48,7 +48,7 @@ namespace _04Enumeration
             default:
                 colorName = "";
             }
-            Console.WriteLine(colorName);
+            Console.WriteLine(colorName + "," + System.Enum.GetNames(typeof(Color)).Length);
             Console.ReadKey();
 
         }
