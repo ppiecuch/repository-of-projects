@@ -12,6 +12,11 @@ namespace _10Delegate
 
     public delegate void GreetingDelegate(string name);
 
+    public delegate void ResultOperationHandler<T>(T obj);
+
+    public delegate object ReturnObjectHandler();
+    public delegate void ReturnVoidtHandler();
+
     class Program
     {
 
@@ -90,6 +95,25 @@ namespace _10Delegate
         //Observer模式是一种松耦合的设计模式。
 
 
+        static void getVoid(){}
+        static object getObject() { return null; }
+
+        public class TestReturn{
+            public ReturnObjectHandler roh;
+            public ReturnVoidtHandler rvh;
+
+            public TestReturn(ReturnObjectHandler roh){
+                this.roh = roh;
+            }
+
+            public TestReturn(ReturnVoidtHandler rvh)
+            {
+                this.rvh = rvh;
+            }
+
+        }
+
+
         static void Main(string[] args)
         {
             GreetPeople("sufei", EnglishGreeting);
@@ -116,6 +140,13 @@ namespace _10Delegate
 
             heater.BoilWater();   //烧水，会自动调用注册过对象的方法
 
+            //ReturnObjectHandler rh1 = getObject;
+            //错误 返回类型错误
+            //ReturnObjectHandler rh2 = getVoid;
+
+            //错误	在以下方法或属性之间的调用不明确:“_10Delegate.Program.TestReturn.TestReturn(_10Delegate.ReturnObjectHandler)”和“_10Delegate.Program.TestReturn.TestReturn(_10Delegate.ReturnVoidtHandler)”
+            //TestReturn rr1 = new TestReturn(getObject);
+            //TestReturn rr2 = new TestReturn(getVoid);
 
             Console.ReadKey();
 
