@@ -1,0 +1,28 @@
+An imported animation selected in the Project View
+在项目视图中选择一个导入的动画
+
+Animation Clips store all animation data that can be used for animated characters or simple animations.
+
+动画剪辑存储着所有可使用于角色动画或简单动画的动画数据
+
+They contain only one property which can not be modified: the sample rate. This is the sample rate at which the clip was created. Note that Unity performs keyframe reduction when importing animations, thus this is not the number of keys.
+
+它们只有一个属性而且不能修改：采样率。这是创建剪辑的采样率。请注意，导入动画时，Unity运行关键帧减少，因此这不是帧的数量。
+
+For details on the various import settings for an individual Animation Clip, please see the Mesh Component Reference page.
+
+更多关于单个动画剪辑的多种导入设置，请参阅网格组件参考页。
+
+Note: Imported animations can't be edited in the Animation View, but if you make a duplicate of the imported animation inside Unity, the duplicate can be edited.
+
+注：导入动画无法在动画视图中进行编辑，但如果你在Unity复制一个导入动画，复制的导入动画可以编辑。
+
+
+http://game.ceeger.com/Components/class-AnimationClip.html
+
+Enemies spawn with multiple of the same animation events
+....
+aState.clip.AddEvent(aEvent);
+You're adding event to AnimationClip. AnimtionClips are shared between animation states and your characters, so every time you add an event it gets added to the same clip. Just add events when you spawn first enemy, and do not add events when spawning other enemies.
+
+http://answers.unity3d.com/questions/125193/enemies-spawn-with-multiple-of-the-same-animation.html

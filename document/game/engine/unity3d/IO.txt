@@ -1,0 +1,10 @@
+public static void Load(string dbPath = @"/Configs/User/user_auth_info.bin")
+    {
+        mUserAuthInfo = new UserAuthInfo();
+
+        //使用流的形式读取
+        StreamReader sr = null;
+        string path = Application.persistentDataPath + dbPath;
+
+
+C:\Users\Administrator\AppData\LocalLow\DefaultCompany\Monster3d\Configs\User

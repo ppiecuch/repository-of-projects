@@ -1,0 +1,435 @@
+From: =?gb2312?B?08kgV2luZG93cyBJbnRlcm5ldCBFeHBsb3JlciA5ILGjtOY=?=
+Subject: Hermite Curve Interpolation
+Date: Thu, 10 Oct 2013 17:37:43 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0000_01CEC5DF.6CFEF470"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7601.17609
+
+这是 MIME 格式的多方邮件。
+
+------=_NextPart_000_0000_01CEC5DF.6CFEF470
+Content-Type: text/html;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://cubic.org/docs/hermite.htm
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<?xml-stylesheet type=3D"text/css" href=3D"/cubic.css" ?><HTML =
+xml:lang=3D"en"=20
+xmlns=3D"http://www.w3.org/1999/xhtml"><HEAD><TITLE>Hermite Curve =
+Interpolation</TITLE>
+<META content=3D"text/html; charset=3Dgb2312" http-equiv=3DContent-Type>
+<META content=3Dtext/css http-equiv=3DContent-Style-Type><LINK =
+rel=3Dstylesheet=20
+type=3Dtext/css href=3D"http://cubic.org/cubic.css">
+<META name=3DGENERATOR content=3D"MSHTML 9.00.8112.16514"></HEAD>
+<BODY>
+<H1>Hermite Curve Interpolation</H1>
+<P>Hamburg (Germany), the 30th March 1998. Written by Nils Pipenbrinck =
+aka=20
+Submissive/Cubic &amp; $eeN</P>
+<H2>Introduction</H2>
+<P>Hermite curves are very easy to calculate but also very powerful. =
+They are=20
+used to smoothly interpolate between key-points (like object movement in =
+
+keyframe animation or camera control). Understanding the mathematical =
+background=20
+of hermite curves will help you to understand the entire family of =
+splines.=20
+Maybe you have some experience with 3D programming and have already used =
+them=20
+without knowing that (the so called kb-splines, curves with control over =
+
+tension, continuity and bias are just a special form of the hermite =
+curves).</P>
+<H2>The Math</H2>
+<P>To keep it simple we first start with some simple stuff. We also only =
+talk=20
+about 2-dimensional curves here. If you need a 3D curve just do with the =
+
+z-coordinate what you do with y or x. Hermite curves work in in any =
+number of=20
+dimensions.<BR>To calculate a hermite curve you need the following =
+vectors:</P>
+<DIV>
+<UL>
+  <LI>P1: the startpoint of the curve=20
+  <LI>T1: the tangent (e.g. direction and speed) to how the curve leaves =
+the=20
+  startpoint=20
+  <LI>P2: he endpoint of the curve=20
+  <LI>T2: the tangent (e.g. direction and speed) to how the curves meets =
+the=20
+  endpoint </LI></UL></DIV>
+<P><IMG alt=3D"Hermite Curve in action"=20
+src=3D"http://cubic.org/docs/img/hermite.png"></P>
+<P>These 4 vectors are simply multiplied with 4 hermite basis functions =
+and=20
+added together.</P><PRE>h1(s) =3D  2s^3 - 3s^2 + 1
+h2(s) =3D -2s^3 + 3s^2
+h3(s) =3D   s^3 - 2s^2 + s
+h4(s) =3D   s^3 -  s^2</PRE>
+<P>Below are the 4 graphs of the 4 functions (from left to right: h1, =
+h2, h3,=20
+h4).</P>
+<P><IMG alt=3D"Hermite basis function h1"=20
+src=3D"http://cubic.org/docs/img/hermite1.png"> <IMG=20
+alt=3D"Hermite basis function h2" =
+src=3D"http://cubic.org/docs/img/hermite2.png">=20
+<IMG alt=3D"Hermite basis function h3"=20
+src=3D"http://cubic.org/docs/img/hermite3.png"> <IMG=20
+alt=3D"Hermite basis function h4"=20
+src=3D"http://cubic.org/docs/img/hermite4.png"><BR><SMALL>(all graphs =
+except the=20
+4th have been plotted from 0,0 to 1,1)</SMALL> </P>
+<P>Take a closer look at functions h1 and h2:</P>
+<DIV>
+<UL>
+  <LI>h1 starts at 1 and goes slowly to 0.=20
+  <LI>h2 starts at 0 and goes slowly to 1. </LI></UL></DIV>
+<P>Now multiply the startpoint with <STRONG>h1</STRONG> and the endpoint =
+with=20
+<STRONG>h2</STRONG>. Let <STRONG>s</STRONG> go from 0 to 1 to =
+interpolate=20
+between start and endpoint. <STRONG>h3</STRONG> and <STRONG>h4</STRONG> =
+are=20
+applied to the tangents in the same manner. They make sure that the =
+curve bends=20
+in the desired direction at the start and endpoint.</P>
+<H2>The Math in Matrix Form</H2>
+<P>All this stuff can be expessed with some vector and matrix algebra. I =
+think=20
+the matrix-form is much easier to understand.</P><PRE>Vector S: The =
+interpolation-point and it's powers up to 3:
+Vector C: The parameters of our hermite curve:
+Matrix h: The matrix form of the 4 hermite polynomials:
+
+
+     | s^3 |            | P1 |             |  2  -2   1   1 |
+S =3D  | s^2 |       C =3D  | P2 |        h =3D  | -3   3  -2  -1 |
+     | s^1 |            | T1 |             |  0   0   1   0 |
+     | 1   |            | T2 |             |  1   0   0   0 |</PRE>
+<P>To calculate a point on the curve you build the Vector S, multiply it =
+with=20
+the matrix h and then multiply with C.<BR><CODE>P =3D S * h * =
+C</CODE></P>
+<H3>A little side-note: Bezier-Curves</H3>
+<P>This matrix-form is valid for all cubic polynomial curves. The only =
+thing=20
+that changes is the polynomial matrix. For example, if you want to draw =
+a Bezier=20
+curve instead of hermites you might use this matrix:</P><PRE>     | -1   =
+3  -3   1 |
+b =3D  |  3  -6   3   0 |
+     | -3   3   0   0 |
+     |  1   0   0   0 |</PRE>
+<P>I wrote a separate page about <A=20
+href=3D"http://cubic.org/docs/bezier.htm">bezier curves</A>.</P>
+<H2>Some Pseudocode</H2>
+<P>Sure, this C-style pseudo-code won't compile. C doesn't come with a =
+power=20
+function, and unless you wrote yourself a vector-class any compiler =
+would=20
+generate hundreds of errors and make you feel like an idiot. I think =
+it's better=20
+to present this code in a more abstract form.</P><PRE>moveto (P1);       =
+                     // move pen to startpoint
+for (int t=3D0; t &lt; steps; t++)
+{
+  float s =3D (float)t / (float)steps;    // scale s to go from 0 to 1
+  float h1 =3D  2s^3 - 3s^2 + 1;          // calculate basis function 1
+  float h2 =3D -2s^3 + 3s^2;              // calculate basis function 2
+  float h3 =3D   s^3 - 2*s^2 + s;         // calculate basis function 3
+  float h4 =3D   s^3 -  s^2;              // calculate basis function 4
+  vector p =3D h1*P1 +                    // multiply and sum all =
+funtions
+             h2*P2 +                    // together to build the =
+interpolated
+             h3*T1 +                    // point along the curve.
+             h4*T2;
+  lineto (p)                            // draw to calculated point on =
+the curve
+}</PRE>
+<H2>Getting rid of the Tangents</H2>
+<P>I know... controlling the tangents is not easy. It's hard to guess =
+what a=20
+curve will look like if you have to define it. Also, to make a sharply =
+bending=20
+curve you have to drag the tangent-points far away from the curve. I'll =
+now show=20
+you how you can turn the hermite curves into cardinal splines.</P>
+<H3>Cardinal splines</H3>
+<P>Cardinal splines are just a subset of the hermite curves. They don't =
+need the=20
+tangent points because they will be calculated from the control points. =
+We'll=20
+lose some of the flexibility of the hermite curves, but as a tradeoff =
+the curves=20
+will be much easier to use. The formula for the tangents for cardinal =
+splines=20
+is:<BR>T<SUB>i</SUB> =3D a * ( P<SUB>i+1</SUB> - P<SUB>i-1</SUB> )<BR>a =
+is a=20
+constant which affects the tightness of the curve. Write yourself a =
+program and=20
+play around with it. ( a should be between 0 and 1, but this is not a =
+must).</P>
+<H3>Catmull-Rom splines</H3>
+<P>The Catmull-Rom spline is again just a subset of the cardinal =
+splines. You=20
+only have to define a as 0.5, and you can draw and interpolate =
+Catmull-Rom=20
+splines.<BR>T<SUB>i</SUB> =3D 0.5 * ( P <SUB>i+1</SUB> - P<SUB>i-1</SUB> =
+
+)<BR>Easy, isn't it? Take a math-book and look for Catmull-Rom splines. =
+Try to=20
+understand how they work! It's damn difficult, but when they are derived =
+from=20
+hermite curves the cardinal splines turn out to be very easy to =
+understand.=20
+Catmull-Rom splines are great if you have some data-points and just want =
+to=20
+interpolate smoothly between them.</P>
+<H3>The Kochanek-Bartels Splines (also called TCB-Splines)</H3>
+<P>Now we're going down to the guts of curve interpolation. The =
+kb-splines=20
+(mostly known from Autodesk's 3d-Studio Max and Newtek's Lightwave) are =
+nothing=20
+more than hermite curves and a handfull of formulas to calculate the =
+tangents.=20
+These curves have been introduced by D. Kochanek and R. Bartels in 1984 =
+to give=20
+animators more control over keyframe animation. They introduced three=20
+control-values for each keyframe point:</P>
+<DIV>
+<UL>
+  <LI><STRONG>Tension</STRONG>: How sharply does the curve bend?=20
+  <LI><STRONG>Continuity</STRONG>: How rapid is the change in speed and=20
+  direction?=20
+  <LI><STRONG>Bias</STRONG>: What is the direction of the curve as it =
+passes=20
+  through the keypoint? </LI></UL></DIV>
+<P>I won't try to derive the tangent-formulas here. I think just giving =
+you=20
+something you can use is a better idea. (if you're interested you can =
+ask me. I=20
+can write it down and send it to you via email.)</P><PRE>The "incoming" =
+Tangent equation:
+
+          (1-t)*(1-c)*(1+b)
+TS    =3D   -----------------  * ( P   -  P    )
+  i              2                i      i-1
+
+          (1-t)*(1+c)*(1-b)
+      +   -----------------  * ( P   -  P    )
+                 2                i+1    i
+
+The "outgoing" Tangent equation:
+
+          (1-t)*(1+c)*(1+b)
+TD    =3D   -----------------  * ( P   -  P    )
+  i              2                i      i-1
+
+          (1-t)*(1-c)*(1-b)
+      +   -----------------  * ( P   -  P    )
+                 2                i+1    i
+
+When you want to interpolate the curve you should use this vector:
+
+    |  P(i)    |
+C =3D |  P(i+1)  |
+    |  TD(i)   |
+    |  TS(i+1) |</PRE>
+<P>You might notice that you always need the previous and next point if =
+you want=20
+to calculate the curve. This might be a problem when you try to =
+calculate=20
+keyframe data from Lightwave or 3D-Studio. I don't know exactly how =
+these=20
+programs handle the cases of the first and last point, but there are =
+enough=20
+sources available on the internet. Just search around a little bit. =
+(Newtek has=20
+a good developer section. You can download the origignal Lightwave =
+motion code=20
+on their web-site).</P>
+<H4>Speed Control</H4>
+<P>If you write yourself keyframe-interpolation code and put it into a =
+program=20
+you'll notice one problem. Unless you have your keyframes in fixed =
+intervals you=20
+will have a sudden change of speed and direction whenever you pass a=20
+keyframe-point. This can be avoided if you take the number of =
+key-positions=20
+(frames) between two keyframes into account:</P><PRE>N is the number of =
+frames (seconds, whatever) between two keypoints.
+
+                    2 * N
+                         i-1
+TD  =3D  TD *     ---------------       adjustment of outgoing tangent
+  i      i          N    + N
+                     i-1    i
+
+
+                    2 * N
+                         i
+TS  =3D  TS *     ---------------       adjustment of incomming tangent
+  i      i          N    + N
+                     i-1    i</PRE>
+<H3>What about the "normal" Splines?</H3>
+<P>The other spline-types, beta-splines, uniform nonrational splines and =
+all the=20
+others are a completely different thing and are not covered here. They =
+share one=20
+thing with the hermite curves: They are still cubic polynomials, but the =
+way=20
+they are calculated is different.</P>
+<H2>Final Words</H2>
+<P>Why does no-one care that it's almost impossible to do nicely =
+formatted=20
+math-formulas in HTML? What's more important? Good design or good =
+content? As=20
+always you might want to contact me.</P>
+<HR>
+
+<P><SMALL>&copy; by submissive</SMALL> <A=20
+href=3D"http://validator.w3.org/check?uri=3Dreferer"><IMG alt=3D"Valid =
+XHTML 1.1!"=20
+src=3D"http://www.w3.org/Icons/valid-xhtml11" width=3D88 =
+height=3D31></A>=20
+</P></BODY></HTML>
+
+------=_NextPart_000_0000_01CEC5DF.6CFEF470
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://cubic.org/docs/img/hermite.png
+
+iVBORw0KGgoAAAANSUhEUgAAARgAAADICAMAAAAEGQ4lAAAAYFBMVEX///8ICAgQEBD/AAD37/f/
+9//33vfvzu/vxu/vve/npefenN7elN7WhNbWe9bOa87OWs7GSsa9Ob29Mb21GLW1ELUxADFaAFpj
+AGN7AHuMAIycAJytAK3vACH3AAgAAAAf02zgAAAAFnRFWHRTb2Z0d2FyZQBnaWYycG5nIDIuNC43
+0zSzgQAAAyNJREFUeNrt3duSmyAAgGGziTGKwRiw3QOt7/+W6yEHEyE1xnaq/P/szV7uN4DA7GgQ
+EBEREREREREREREREdGDyjoYuhqNR2uCzBnm/AOMCyYA5gEMLrc2lwUHDRsMLHYYXOwwPJUc27rr
+joaIiP5d6yoULkkh4mgLTC9l2pSYM8zUO41tnOqGRafhDEfM37hLqkgyZVQu84olT+a8aS8ngqlJ
+jkVFkkT1r4nJtvM+zbx+CN40JPpM0haGcz/mvXIItpIs5fx7mkdPuoQ7cWhIxLJI7h9G5VMkuapI
+skWS3M2eYS5hJDJtqvVVRGGw6G6Xl/IxSb0rUcelk9zOpAd3SRWJrHdqhfaCZODEke2uHpIOSd6Q
+7CA5dSExkPRINmA0rX+v15BYnkv1rQAkdyjNiOGC7ZblMpWAuR8r5DghkX0OESzMIoYLLMwiXHDB
+BRdccMGFcAEGF1xwwQUYXHDBBRgCBhdcgMEFGFyAwQUYYHAhYHABBhhcgMEFGFyAAYZwAQYYXIAB
+BhdgcMHFk1YQMGIYMLgAM2KNKIHpYFzfXvjS6rm4AdN9pW6Jy+Qwb8D4svJOArPEJ1L3fbElLvZ9
+/FiYN2A8crm+znzsF704C3g0XnDh6Diu+gWpY15FvVr6+lK5/Pr6EBuGi2XEGPP+9bEf/uWdcuXB
+4+j0ruHa5lMO+6KIdxe85ufn1/uPwacIv2yMqWxW9r/e85c3m+YDaGHZjx1KWNukWyAcA0ftsXFO
+KrnDwda2sskSHGxt2sUYCMdibATfKLGWVDYsxvZ29WIc4eBajE2Mg9UmrWxeXoyXuY8OkzGLcTnZ
+fxH83zaFKdRTi3HZ+Yzzsu8uYmmKYwSMrUjqIo+BsS7Ge1XkaTjUJvAGpj41iNwMsvENplmM8wFX
+OB7CNKeGTP/hCsdTmPrUILV2XuFM8F8EM1+MNVc4rlNDXnCF41yMi5wrHIfNoThyheM6NWjVXuFs
+uKzonRqUlnEgzIGJZVuMtTFFCkX/1NB8Bl1xMdrbFbcfiDeHkI9c346YKBJCyCyTETCOgAGGiIiI
+iIiIiIiIiIiIiDzsG7CuQgDHv6JcAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CEC5DF.6CFEF470
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://cubic.org/docs/img/hermite1.png
+
+iVBORw0KGgoAAAANSUhEUgAAAJEAAACGBAMAAAAvJXUzAAAAGFBMVEUAAAADA6sAAADx8fHz8/P7
++/v+/v7////g0MrrAAAAFnRFWHRTb2Z0d2FyZQBnaWYycG5nIDIuNC430zSzgQAAAaJJREFUeNrd
+2j1Ow0AQhmEfgancRmlyIc4ALZ8ocn2EBCTY+zMz++KscG09eWe9TpHscrky19vyb6TXv20ys+5d
+m097v7487+45fTY5LPc62YqtuFbs2Q1Tt2c3St3tAnE707g9btzbsmKSuDd4xSRx3yqGSfn5dpIw
+KR21l4RJ2aiCJExKRpUkYVIuqihpQik1XlkSJmWiKpIwKRFVk4RJ8aiqJEwKR9UlTShFx2tIwqRg
+VEsSJsWimpIwKRR1lCRMikR1JE0oBcbrScIkf9SBkjDJHdWXNKHkHc8hCZOcUcdKwiRf1MGSfNIZ
+ijq5fhMTNR0oecZzSsIkR9TxkjCpH+WWNKHUHc8vCZN6UQ+RhEmdqIgkTGpHPUgSJjWjYpIwqRUV
+lDSh1BgvKgmT6lFhSZhUjXqkJEyqRSUkYVIlKiNpQqk8XkoSJhWjcpIwqRSVlIRJhaisJEzaR6Ul
+YdIuKi8Jk7ZRA5IwafOP79DZkBWThEm/5hs8+WKYdLdUo9LtHMjwuZ4favyE0DcFnDX6oohTSzK/
+dHFshtNyJi4ze/oAl4dd2rRkcicAAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CEC5DF.6CFEF470
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://cubic.org/docs/img/hermite2.png
+
+iVBORw0KGgoAAAANSUhEUgAAAJMAAACDAgMAAAD0XcEdAAAADFBMVEX////+/v4DA6sAAAAjRsvD
+AAAAFnRFWHRTb2Z0d2FyZQBnaWYycG5nIDIuNC430zSzgQAAAUJJREFUeNqt1jtuwzAQRdHJVA9a
+xZRCVvmWojJwky1oYQKcALYTO/rwRiA7EWeoS6hRzEHWstq5z709nofLR7TPmn4n99d7AJUmagyg
+bke11BhEmaghiJqIyiBKSE1EZRAlpAopE5VBlJAqpExUBlFCqpAyURlECanqqExUBlFCqpByP5VB
+lJAqpExURj8lpAopE5VBlDqqQspEZRCljqqQMlHr+PNKSBVS7qc24jeUkKrTakHfZybxa6WOqpBy
+P7V5xZUSUtVRmajt+L9KHVUhZaJ24k8pIVVIuZ/ai39VQqqQMlG7WS9KSFVHZaL245+VkCqkTNRB
+1pMSUoWUiTrK+q8SUoWUiTrM+lFCqpAyUcdZDyWkJqIaL7wrIVVImaghiJqIat3wpkai0kS1j/pW
+g4EapuYf2RyXz2tzLZuTq50vMwykm9HBFXEAAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CEC5DF.6CFEF470
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://cubic.org/docs/img/hermite3.png
+
+iVBORw0KGgoAAAANSUhEUgAAAJIAAACCBAMAAABfg4wmAAAAD1BMVEX////+/v79/f0DA6sAAAB0
+l0+PAAAAFnRFWHRTb2Z0d2FyZQBnaWYycG5nIDIuNC430zSzgQAAANxJREFUeNrt2G0KgzAQRdFI
+3ga6gy5BsDvQ/a+paaVFaz5mUikU7vwTMse8QEYwLEtolj6eh8s1s0ahowbL+34sBSQkJCQkJCQk
+JCQkJCQkJCSk86Se/0/5NZw4EhISEhISEhISEtI/SnF61fiNtOt/mJ1SPDZad6a9k22KJmsrxWKD
+xZIFyscuSrHx2ta2ZIWaEWWGWhHlgOoR5YJqEVfJcytKEZ9S9N3V/LbkylaLKGe2csQkTV3j6DAk
+5D2k4pBQT7bt+Hq3a3JOnuyAHdOaeTmj5nRqt5O+GroDBhwkwNopZQAAAAAASUVORK5CYII=
+
+------=_NextPart_000_0000_01CEC5DF.6CFEF470
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://cubic.org/docs/img/hermite4.png
+
+iVBORw0KGgoAAAANSUhEUgAAAJEAAACGAgMAAACgZYCTAAAACVBMVEX///8DA6sAAAAlDz8nAAAA
+FnRFWHRTb2Z0d2FyZQBnaWYycG5nIDIuNC430zSzgQAAALZJREFUeNrtlD0OgzAMhfGQvUOzcxQf
+IYPd8/Q8nBJUUAiODahTKz2P0eefZz8YxuFOgAIFCtTvUdOtPOwLFChQoECBAgXqG8rLU31NV/Fe
+MknLRS3+vCU5HSptmaRn1KPWV44p3qfIIUbtrCH2PCjKccNWt4QNW4okanjYIRWnFHebTuyXMvfo
+hK6l7NWsUPFvq/aEvgPaW1U5vU9yMaP7zqxG2rV4/iUV09v/OkiXwH8C1P9RM41kNCtedP35AAAA
+AElFTkSuQmCC
+
+------=_NextPart_000_0000_01CEC5DF.6CFEF470
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://www.w3.org/Icons/valid-xhtml11
+
+iVBORw0KGgoAAAANSUhEUgAAAFgAAAAfCAMAAABUFvrSAAADAFBMVEUBAAAIBgMMCQQKCgoSDgYX
+EgkaFAoUFBQcHBwlHQ4vJRIwJhM2KxUjIyMoKCg0MzI7OztBNBpGOBxOPh5OSz9TQiFnUilqVCp1
+Rzl0XC5/ZTJOTk5ST0tWUk1VVVVcXFxqXUplZWVra2tya2FwcHB7e3sAWpwIX58JYJ8OY6ERZaIV
+aKQaa6Yebaghb6klcqopdawxea82fbE4frI+grRFhrZMi7pVkb1alL9dlsBkm8NoncRtocZ0pcl8
+qsyWBAOZAACcCASIIBmdNiegDge3PB6mPiqBZzODaDSJbTaOcTiUdjuXeDy6QiG/TCahclPATifB
+UCjIXy/QbzfWej3Yfj+Rh2ulhEKvjEazj0e0gVi3kkm6lEq+mEyjkmuzn2e7pnLFnU7eikXOpFHR
+p1PVqlXarlfesVjjlUrmm03poFDtqVTitFrmuFzqu13zwWD7xWL+y2WDg4OXl5eYmJippZ61rZis
+rKy0tLS/v7+Crs6FsNCLtNKQt9SWu9aYvNebvtifwdqjw9uox92ryd6yzeG20OPCwsLMzMzU1NTA
+1ufG2ujN3+zT4+7d6fL/7Mbn5+fs7Ozl7vXp8fbu9Pj09PTy9/r1+Pv+/v7MzMwAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAACCrylyAAAAmnRSTlP/////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+//////8Ay7CFYwAAAAFiS0dE/6UH8sUAAAAJcEhZcwAAAEgAAABIAEbJaz4AAAMlSURBVEjH7Zb7
+UxJRFMcvGjLUmpYhpWZl42GE8JnhqNjSa8Swxp5OSqULQ1rsI6d0zHGSgQR8lAizt/+2c3d5i6My
+1k99Z7icu8x+9u73nnMuJH7q+vKbicTp0fqpHF/v317/D64OHBIkHAKSKIhsIgcFpqAcYNdFQVBk
+IVQV+DVpVgKEk31kQlE4EjYTJnOYEKuiNBGDEibcAXDE6ca717rXGCRtszlR3S5KM5874nRF1a2w
+kJlzJKjkwILfSqx+AcE1UogcAt4FBxJ/wAADR0HXGFVb8YZEQ0IHi0ZCvAqCLT6fmYQVZYI9Ikwu
+1Dy+UseRimDaC9s42mEfxyFwpVIb4MjQZXK+s9FUu5fdPCsxSAysqQBusprPjHOVV0zdsIpjH0Q0
+/C5Ve1jY2ogu3OjMZkXAYGR2+ohXkrlicIAYxMPASeindB8Afd2CXrSbzamJ/aRmdLDMGYJNZDbv
+cQGsWFsUDXx2enpaZmCez2dFF7qwAdBF6Ri46b4dtnDr6ouzYhwNFo11EoLlErCFLVMDM0kIvscz
+sg524au7oA+SaHeSDgOMpnHvisGfQjJuYEiSQmh0mE20SA6JDBwOYcSEK77PM2XBEXCpXbei4E6B
+HR/jAOhX6VI1lSc/4nXp4DTYYzCStvV+hyE237JDlG5WA36S5eYqbwB9iNFB0DOD0hEYrqpX5Lk5
+8DcAm4rZAJDW5jHoKesVHMGcYBIwEsref/KjHkzluTnwNsAdVoJwW0dFwbmnR5mMDh63ZMEB78Uy
+sPyQf7BY4N7li5uQE9a1Elyj60OaFYObOrljM2tFC5nJgprLwOz9PR/y3Msl3W0EUloJ7mCyudMR
+O0TUa78YtzaRB89WBr/QeJ553V/P09K2GetjY7IbM8QBNmClFze1X6snS/SoFcuTfEGeN2X9WF3V
+vsbwszPqcAyzPUy0mxqWaQnYa61ghTxV4C6etNEHWcEaWe36tQ5fmhbPctyFE58g0gzKr8z5FZFF
+c2X5+zzHPfXD9GWWe/qn9LxH4/6F439B4/6T/xUrR+rru+Pr1c0cuPUYunSY2g5cudrWoIH/AGtu
+hy4iyA0OAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0000_01CEC5DF.6CFEF470
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://cubic.org/cubic.css
+
+BODY {
+	BACKGROUND: white; COLOR: black
+}
+IMG {
+	BORDER-RIGHT-WIDTH: 0px; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: =
+0px; BORDER-LEFT-WIDTH: 0px
+}
+
+------=_NextPart_000_0000_01CEC5DF.6CFEF470--

@@ -1,0 +1,269 @@
+ 前几天有个朋友问我为什么在IOS平台中可以正常的读写文件可是在Android平台中就无法正常的读写。当时因为在上班所以我没时间来帮他解决，晚上回家后我就拿起安卓手机真机调试很快就定位问题所在，原来是他文件的路径写错了。开发中往往一道很难的问题解开的时候发现原来真的非常的简单，哇咔咔。  刚好在MOMO的书中也有涉及到文件的读取与写入，那么本节我将书中的部分内容搬到博客中为大家讲解一下。废话我就不多说了咱直奔主题，创建Text.cs脚本，直接挂在摄像机中。代码中包括：创建文件、读取文件、删除文件。
+Text.cs
+ 
+001
+using UnityEngine;
+002
+using System.Collections;
+003
+using System.IO;
+004
+using System.Collections.Generic;
+005
+using System;
+006
+ 
+007
+public class Text : MonoBehaviour {
+008
+    //文本中每行的内容
+009
+    ArrayList infoall;
+010
+    //皮肤资源，这里用于显示中文
+011
+    public GUISkin skin;
+012
+    void Start ()
+013
+    {
+014
+ 
+015
+        //删除文件
+016
+        DeleteFile(Application.persistentDataPath,"FileName.txt");
+017
+ 
+018
+        //创建文件，共写入3次数据
+019
+        CreateFile(Application.persistentDataPath,"FileName.txt","宣雨松MOMO");
+020
+        CreateFile(Application.persistentDataPath,"FileName.txt","宣雨松MOMO");
+021
+        CreateFile(Application.persistentDataPath ,"FileName.txt","宣雨松MOMO");
+022
+        //得到文本中每一行的内容
+023
+        infoall = LoadFile(Application.persistentDataPath,"FileName.txt");
+024
+ 
+025
+    }
+026
+ 
+027
+   /**
+028
+   * path：文件创建目录
+029
+   * name：文件的名称
+030
+   *  info：写入的内容
+031
+   */
+032
+   void CreateFile(string path,string name,string info)
+033
+   {
+034
+      //文件流信息
+035
+      StreamWriter sw;
+036
+      FileInfo t = new FileInfo(path+"//"+ name);
+037
+      if(!t.Exists)
+038
+      {
+039
+        //如果此文件不存在则创建
+040
+        sw = t.CreateText();
+041
+      }
+042
+      else
+043
+      {
+044
+        //如果此文件存在则打开
+045
+        sw = t.AppendText();
+046
+      }
+047
+      //以行的形式写入信息
+048
+      sw.WriteLine(info);
+049
+      //关闭流
+050
+      sw.Close();
+051
+      //销毁流
+052
+      sw.Dispose();
+053
+   } 
+054
+ 
+055
+  /**
+056
+   * path：读取文件的路径
+057
+   * name：读取文件的名称
+058
+   */
+059
+   ArrayList LoadFile(string path,string name)
+060
+   {
+061
+        //使用流的形式读取
+062
+        StreamReader sr =null;
+063
+        try{
+064
+            sr = File.OpenText(path+"//"+ name);
+065
+        }catch(Exception e)
+066
+        {
+067
+            //路径与名称未找到文件则直接返回空
+068
+            return null;
+069
+        }
+070
+        string line;
+071
+        ArrayList arrlist = new ArrayList();
+072
+        while ((line = sr.ReadLine()) != null)
+073
+        {
+074
+            //一行一行的读取
+075
+            //将每一行的内容存入数组链表容器中
+076
+            arrlist.Add(line);
+077
+        }
+078
+        //关闭流
+079
+        sr.Close();
+080
+        //销毁流
+081
+        sr.Dispose();
+082
+        //将数组链表容器返回
+083
+        return arrlist;
+084
+   }  
+085
+ 
+086
+  /**
+087
+   * path：删除文件的路径
+088
+   * name：删除文件的名称
+089
+   */
+090
+ 
+091
+   void DeleteFile(string path,string name)
+092
+   {
+093
+        File.Delete(path+"//"+ name);
+094
+ 
+095
+   }
+096
+ 
+097
+   void OnGUI()
+098
+   {
+099
+        //用新的皮肤资源，显示中文
+100
+        GUI.skin = skin;
+101
+        //读取文件中的所有内容
+102
+        foreach(string str in infoall)
+103
+        {
+104
+            //绘制在屏幕当中，哇咔咔！
+105
+            GUILayout.Label(str);
+106
+        }
+107
+ 
+108
+   }
+109
+ 
+110
+}
+ 
+        代码中头文件需要注意一下，涉及到IO读取文件。创建文件、删除文件、读取文件的方法我也已经封装好，Start方法中为了避免上次保存文件的残留首先删除原来的文件，然后创建文件FileName.txt ，我们也可修改文件的类型的后缀名。这里我写的是.txt ，为了完整的让中文出现在IOS与Android中所以这里给文件中写的数据是”宣雨松MOMO”，最后在OnGUI中将读取文件的文本信息显示在屏幕中，脚本保存格式为UTF-16。
+        代码中我们保存文件的路径是Application.persistentDataPath。 如果你写的路径是 Application.dataPath在编辑器中是可以正常读取，但是在IOS与Android中是无法读取的，昨天问我的那个朋友就是因为这里路径写的有问题没能成功的写入文件。 Application.persistentDataPath路径就是将文件保存在手机的沙盒中，如果在编辑器中运行本程序文件将保存在Finder-》 资源库-》Caches-》你的工程-》保存的文件 。本例的路径就是 Finder->资源库-> Caches -> txt->FileName.txt。
+         OK 截至到这里，运行游戏后在编辑器中是可以正常的看到“宣雨松MOMO”出现在Game视图中，但是如果你编译在IOS或者Android上将只显示”MOMO”，原因很简单”宣雨松”三个字无法在Unity默认字体中找到，所以无法显示。而默认字体只有字母和数字、字符。我们为了在移动平台中正常的显示中文，需要自制中文字体包。下面我们开始制作一个简单的字体包，mac机的话大家可以在 资源库 -》 fonts中 找一个.ttf的字体，或者在网络中下载一个.ttf字体。MOMO比较喜欢微软雅黑字体，大家如果也喜欢微软雅黑可以在后面下载这个工程的源码，嘿嘿。如下图所示， Project视图中的”yh”就是MOMO在网络中下载的微软雅黑字体。
+FontSize：字体的大小，这里我设置呈50，为了让大家在IPAD中能看的更清楚。
+FontColor：字体颜色。
+Character：这里选择Custom set，因为这里需要配置我们需要的字体。
+CustomChars：这里输入需要制作的字体。Unity默认的字体包含数字符号字母，为了让移动设备支持中文，这里我输入”宣雨松”它将生成一个包含“宣雨松”的材质与贴图，也就是说将我们需要在移动设备中显示的任何字符串在这里配置一下就OK啦。
+最后点击又小角的Apply按钮即可完成字体配置。
+ 
+
+ 
+         将字符赋值给创建的皮肤文件然后应用在程序当中即可，如下图所示这是IPAD中截图的效果，大家应该会问上面代码中明明写入的是”宣雨松MOMO”为什么这里没能显示MOMO呢？蛤蛤 原因很简单，上图中在Custom Chars中我们只配置了 “宣雨松” 所以这里就只能显示”宣雨松”无法显示MOMO啦。。大家可根据自己需要显示的字符串添加进去即可。在程序中我们可能会写入很多的中文，但是同样的文字又没必要重复出现，那么如何来制作这个字体包呢？制作的细节大家可以参照威哥的博客：http://1vr.cn/article.asp?id=607  他已经写得很清楚啦。
+ 
+
+ 
+最后本文的程序MOMO已经打成包，雨松MOMO希望和大家一起学习，一起进步加油哇咔咔，拉拉～～
+下载地址：http://vdisk.weibo.com/s/ab_aA
+ 
+补充：假设你的程序中已经预先将2进制文件做好，如下图所示，你需要把二进制文件放在StreamingAssets这个文件夹中，一定要放在这里。
+
+ 
+举个例子，放在StreamingAssets中二进制文件打包后，Unity会将这些二进制文件放置在对应平台下的路径下。所以根据不同平台，访问的路径是不一样的。切记，你的二进制文件一定要放在StreamingAssets ！！！！！！
+01
+#if UNITY_EDITOR
+02
+        string filepath = Application.dataPath +"/StreamingAssets"+"/my.xml";
+03
+ 
+04
+#elif UNITY_IPHONE
+05
+      string filepath = Application.dataPath +"/Raw"+"/my.xml";
+06
+ 
+07
+#elif UNITY_ANDROID
+08
+      string filepath = "jar:file://" + Application.dataPath + "!/assets/"+"/my.xml;
+09
+ 
+10
+#endif
+ 
+
+http://www.xuanyusong.com/archives/1069

@@ -1,0 +1,7 @@
+1、将protoc.exe放到proto_home\src目录下
+2、定义环境变量 PROTOBUF_HOME:D:\Development\Software\protobuf-2.5.0
+3、在PATH中添加%PROTOBUF_HOME%\src
+4、把当前工作目录定位到proto_home\java 中，运行命令 mvn package
+5、出现BUILD SUCCESSFUL，后在target目录下找到protobuf-java-2.5.0.jar
+
+ 参考：http://lszdb1983.blog.163.com/blog/static/204263482012111152829861/

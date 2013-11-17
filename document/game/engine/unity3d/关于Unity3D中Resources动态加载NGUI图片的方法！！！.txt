@@ -1,0 +1,29 @@
+在NGUI中有些图片我需要动态进行变更或者加载，怎么办？
+
+首先在项目中创建一个Resources目录，接着把需要的图片放在这里面，可以有子文件夹么？当然可以，文件结构很重要哦~
+
+NGUI加载图片的方法其实是加载NGUI生成的atlas，大家可以看看NGUI的图集文件（一个material、一个prefab，一张图集），我们要做的就是动态加载这个prefab（它有UIAtlas属性），然后通过图片名称更改图片。
+
+我这里那UISprite来说明，我是这样做的：
+
+UIAtlas tu = Resources.Load("Cards/ 001", typeof(UIAtlas)) as UIAtlas;
+
+对于上面这行需要注意，后面的type，单独写括号里面的typeof(UIAtlas) 是不行的，后面还要更上 as UIAtlas，
+
+如果你的是GameObject的话就是这样：
+
+GameObject tu = Resources.Load("Cards/ 001", typeof(GameObject )) as GameObject ; 
+
+明白了吧。。。。
+
+Sprite sprite = _Player;    //_Player是暴露变量，用来记录外面的UISprite，你懂得
+
+sprite.atlas = tu;
+
+sprite.spriteName = "photo";  //这里跟上这个atlas里面的图片的名称
+
+sprite.MakePixelPerfect();    //这里记得要make一下，不然_Player的大小是不会变化的，看你个人需要
+
+Debug.Log("资源加载完成");
+
+http://momowing.diandian.com/post/2012-09-11/40038085597

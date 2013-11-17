@@ -1,0 +1,4 @@
+[异常]
+java.lang.UnsupportedOperationException: This is supposed to be overridden by subclasses.
+[解决]
+protoc.exe与jar版本不对应

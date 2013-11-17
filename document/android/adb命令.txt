@@ -53,6 +53,7 @@ APP_ABI = armeabi-v7a
 
 ps aux
 
+adb logcat | findstr "Unity mono"
 adb shell ps | grep "proj.syjt"
 adb shell top | grep "proj.syjt"
 adb shell ps proj.syjt

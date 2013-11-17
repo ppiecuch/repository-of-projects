@@ -1,0 +1,1213 @@
+导出Unity场景的所有游戏对象信息，一种是XML一种是JSON。本篇文章我们把游戏场景中游戏对象的、旋转、缩放、平移与Prefab的名称导出在XML与JSON中。然后解析刚刚导出的XML或JSON通过脚本把导出的游戏场景还原。在Unity官网上下载随便下载一个demo Project，如下图所示这是我刚刚在官网上下载的一个范例程序。
+ 
+
+ 
+          接着将层次视图中的所有游戏对象都封装成Prefab保存在资源路径中，这里注意一下如果你的Prefab绑定的脚本中有public Object 的话 ，需要在代码中改一下。。用 Find() FindTag()这类方法在脚本中Awake()方法中来拿，不然Prefab动态加载的时候无法赋值的，如下图所示，我把封装的Prefab对象都放在了Resources/Prefab文件夹下。
+
+ 
+OK，现在我们就需要编写我们的导出工具、在Project视图中创建Editor文件夹，接着创建脚本MyEditor 。如下图所示。
+
+ 
+因为编辑的游戏场景数量比较多，导出的时候我们需要遍历所有的游戏场景，一个一个的读取场景信息。然后取得游戏场景中所有游戏对象的Prefab的 名称 旋转 缩放 平移。有关XML的使用请大家看我的上一篇文章： Unity3D研究院之使用 C#合成解析XML与JSON（四十一） 代码中我只注释重点的部分，嘿嘿。
+ MyEditor.cs
+001
+using UnityEngine;
+002
+using System.Collections;
+003
+using UnityEditor;
+004
+using System.Collections.Generic;
+005
+using System.Xml;
+006
+using System.IO;
+007
+using System.Text;
+008
+using LitJson;
+009
+public class MyEditor : Editor
+010
+{
+011
+    //将所有游戏场景导出为XML格式
+012
+    [MenuItem ("GameObject/ExportXML")]
+013
+    static void ExportXML ()
+014
+    {
+015
+        string filepath = Application.dataPath + @"/StreamingAssets/my.xml";
+016
+        if(!File.Exists (filepath))
+017
+        {
+018
+            File.Delete(filepath);
+019
+        }
+020
+        XmlDocument xmlDoc = new XmlDocument();
+021
+        XmlElement root = xmlDoc.CreateElement("gameObjects");
+022
+        //遍历所有的游戏场景
+023
+        foreach (UnityEditor.EditorBuildSettingsScene S in UnityEditor.EditorBuildSettings.scenes)
+024
+        {
+025
+            //当关卡启用
+026
+            if (S.enabled)
+027
+            {
+028
+                //得到关卡的名称
+029
+                string name = S.path;
+030
+                //打开这个关卡
+031
+                EditorApplication.OpenScene(name);
+032
+                XmlElement scenes = xmlDoc.CreateElement("scenes");
+033
+                scenes.SetAttribute("name",name);
+034
+                foreach (GameObject obj in Object.FindObjectsOfType(typeof(GameObject)))
+035
+                {
+036
+                    if (obj.transform.parent == null)
+037
+                    {
+038
+                         XmlElement gameObject = xmlDoc.CreateElement("gameObjects");
+039
+                         gameObject.SetAttribute("name",obj.name);
+040
+ 
+041
+                         gameObject.SetAttribute("asset",obj.name + ".prefab");
+042
+                         XmlElement transform = xmlDoc.CreateElement("transform");
+043
+                         XmlElement position = xmlDoc.CreateElement("position");
+044
+                         XmlElement position_x = xmlDoc.CreateElement("x");
+045
+                         position_x.InnerText = obj.transform.position.x+"";
+046
+                         XmlElement position_y = xmlDoc.CreateElement("y");
+047
+                         position_y.InnerText = obj.transform.position.y+"";
+048
+                         XmlElement position_z = xmlDoc.CreateElement("z");
+049
+                         position_z.InnerText = obj.transform.position.z+"";
+050
+                         position.AppendChild(position_x);
+051
+                         position.AppendChild(position_y);
+052
+                         position.AppendChild(position_z);
+053
+ 
+054
+                         XmlElement rotation = xmlDoc.CreateElement("rotation");
+055
+                         XmlElement rotation_x = xmlDoc.CreateElement("x");
+056
+                         rotation_x.InnerText = obj.transform.rotation.eulerAngles.x+"";
+057
+                         XmlElement rotation_y = xmlDoc.CreateElement("y");
+058
+                         rotation_y.InnerText = obj.transform.rotation.eulerAngles.y+"";
+059
+                         XmlElement rotation_z = xmlDoc.CreateElement("z");
+060
+                         rotation_z.InnerText = obj.transform.rotation.eulerAngles.z+"";
+061
+                         rotation.AppendChild(rotation_x);
+062
+                         rotation.AppendChild(rotation_y);
+063
+                         rotation.AppendChild(rotation_z);
+064
+ 
+065
+                         XmlElement scale = xmlDoc.CreateElement("scale");
+066
+                         XmlElement scale_x = xmlDoc.CreateElement("x");
+067
+                         scale_x.InnerText = obj.transform.localScale.x+"";
+068
+                         XmlElement scale_y = xmlDoc.CreateElement("y");
+069
+                         scale_y.InnerText = obj.transform.localScale.y+"";
+070
+                         XmlElement scale_z = xmlDoc.CreateElement("z");
+071
+                         scale_z.InnerText = obj.transform.localScale.z+"";
+072
+ 
+073
+                         scale.AppendChild(scale_x);
+074
+                         scale.AppendChild(scale_y);
+075
+                         scale.AppendChild(scale_z);
+076
+ 
+077
+                         transform.AppendChild(position);
+078
+                         transform.AppendChild(rotation);
+079
+                         transform.AppendChild(scale); 
+080
+ 
+081
+                         gameObject.AppendChild(transform);
+082
+                         scenes.AppendChild(gameObject);
+083
+                         root.AppendChild(scenes);
+084
+                         xmlDoc.AppendChild(root);
+085
+                         xmlDoc.Save(filepath);
+086
+ 
+087
+                    }
+088
+                }
+089
+            }
+090
+        }
+091
+        //刷新Project视图， 不然需要手动刷新哦
+092
+         AssetDatabase.Refresh();
+093
+    }
+094
+ 
+095
+    //将所有游戏场景导出为JSON格式
+096
+    [MenuItem ("GameObject/ExportJSON")]
+097
+    static void ExportJSON ()
+098
+    {
+099
+        string filepath = Application.dataPath + @"/StreamingAssets/json.txt";
+100
+        FileInfo t = new FileInfo(filepath);
+101
+        if(!File.Exists (filepath))
+102
+        {
+103
+            File.Delete(filepath);
+104
+        }
+105
+        StreamWriter sw = t.CreateText();
+106
+ 
+107
+        StringBuilder sb = new StringBuilder ();
+108
+        JsonWriter writer = new JsonWriter (sb);
+109
+        writer.WriteObjectStart ();
+110
+        writer.WritePropertyName ("GameObjects");
+111
+        writer.WriteArrayStart ();
+112
+ 
+113
+        foreach (UnityEditor.EditorBuildSettingsScene S in UnityEditor.EditorBuildSettings.scenes)
+114
+        {
+115
+            if (S.enabled)
+116
+            {
+117
+                string name = S.path;
+118
+                EditorApplication.OpenScene(name);
+119
+                writer.WriteObjectStart();
+120
+                writer.WritePropertyName("scenes");
+121
+                writer.WriteArrayStart ();
+122
+                writer.WriteObjectStart();
+123
+                writer.WritePropertyName("name");
+124
+                writer.Write(name);
+125
+                writer.WritePropertyName("gameObject");
+126
+                writer.WriteArrayStart ();
+127
+ 
+128
+                foreach (GameObject obj in Object.FindObjectsOfType(typeof(GameObject)))
+129
+                {
+130
+                    if (obj.transform.parent == null)
+131
+                    {
+132
+                        writer.WriteObjectStart();
+133
+                        writer.WritePropertyName("name");
+134
+                        writer.Write(obj.name);
+135
+ 
+136
+                        writer.WritePropertyName("position");
+137
+                        writer.WriteArrayStart ();
+138
+                        writer.WriteObjectStart();
+139
+                        writer.WritePropertyName("x");
+140
+                        writer.Write(obj.transform.position.x.ToString("F5"));
+141
+                        writer.WritePropertyName("y");
+142
+                        writer.Write(obj.transform.position.y.ToString("F5"));
+143
+                        writer.WritePropertyName("z");
+144
+                        writer.Write(obj.transform.position.z.ToString("F5"));
+145
+                        writer.WriteObjectEnd();
+146
+                        writer.WriteArrayEnd();
+147
+ 
+148
+                        writer.WritePropertyName("rotation");
+149
+                        writer.WriteArrayStart ();
+150
+                        writer.WriteObjectStart();
+151
+                        writer.WritePropertyName("x");
+152
+                        writer.Write(obj.transform.rotation.eulerAngles.x.ToString("F5"));
+153
+                        writer.WritePropertyName("y");
+154
+                        writer.Write(obj.transform.rotation.eulerAngles.y.ToString("F5"));
+155
+                        writer.WritePropertyName("z");
+156
+                        writer.Write(obj.transform.rotation.eulerAngles.z.ToString("F5"));
+157
+                        writer.WriteObjectEnd();
+158
+                        writer.WriteArrayEnd();
+159
+ 
+160
+                        writer.WritePropertyName("scale");
+161
+                        writer.WriteArrayStart ();
+162
+                        writer.WriteObjectStart();
+163
+                        writer.WritePropertyName("x");
+164
+                        writer.Write(obj.transform.localScale.x.ToString("F5"));
+165
+                        writer.WritePropertyName("y");
+166
+                        writer.Write(obj.transform.localScale.y.ToString("F5"));
+167
+                        writer.WritePropertyName("z");
+168
+                        writer.Write(obj.transform.localScale.z.ToString("F5"));
+169
+                        writer.WriteObjectEnd();
+170
+                        writer.WriteArrayEnd();
+171
+ 
+172
+                        writer.WriteObjectEnd();
+173
+                    }
+174
+                }
+175
+ 
+176
+                writer.WriteArrayEnd();
+177
+                writer.WriteObjectEnd();
+178
+                writer.WriteArrayEnd();
+179
+                writer.WriteObjectEnd();
+180
+            }
+181
+        }
+182
+        writer.WriteArrayEnd();
+183
+        writer.WriteObjectEnd ();
+184
+ 
+185
+        sw.WriteLine(sb.ToString());
+186
+        sw.Close();
+187
+        sw.Dispose();
+188
+        AssetDatabase.Refresh();
+189
+    }
+190
+}
+ 
+OK。此时我们就可以导出游戏场景的信息拉，注意游戏场景的需要现在Project Setting 中注册。点击 GameObject – > Export    XML 和 GameObject – > ExportJson 菜单项即可开始生成。
+ 
+
+ 
+如下图所示，场景导出完毕后，会将xml 与Json 文件保存在StreamingAssets路径下，放在这里的原因是方便移动平台移植，因为它们属于二进制文件，移动平台在读取二进制文件的路径是不一样的。一定要放在这里喔。
+ 
+
+ 
+接着，我继续创建两个游戏场景，一个用来解析XML的场景，一个用来解析JSON的场景。 
+XML场景中，创建一个空的游戏对象，把XML.cs挂上去。
+001
+using UnityEngine;
+002
+using System.Collections;
+003
+using System.Xml;
+004
+using System.IO;
+005
+public class XML : MonoBehaviour {
+006
+ 
+007
+    // Use this for initialization
+008
+    void Start ()
+009
+    {
+010
+ 
+011
+//电脑和iphong上的路径是不一样的，这里用标签判断一下。
+012
+#if UNITY_EDITOR
+013
+        string filepath = Application.dataPath +"/StreamingAssets"+"/my.xml";
+014
+#elif UNITY_IPHONE
+015
+      string filepath = Application.dataPath +"/Raw"+"/my.xml";
+016
+#endif
+017
+        //如果文件存在话开始解析。
+018
+        if(File.Exists (filepath))
+019
+        {
+020
+            XmlDocument xmlDoc = new XmlDocument();
+021
+            xmlDoc.Load(filepath);
+022
+            XmlNodeList nodeList=xmlDoc.SelectSingleNode("gameObjects").ChildNodes;
+023
+            foreach(XmlElement scene  in nodeList)
+024
+            {
+025
+                //因为我的XML是把所有游戏对象全部导出， 所以这里判断一下只解析需要的场景中的游戏对象
+026
+                //JSON和它的原理类似
+027
+                if(!scene.GetAttribute("name").Equals("Assets/StarTrooper.unity"))
+028
+                {
+029
+                    continue;
+030
+                }
+031
+ 
+032
+                foreach(XmlElement gameObjects in scene.ChildNodes)
+033
+                {
+034
+ 
+035
+                    string asset = "Prefab/" + gameObjects.GetAttribute("name");
+036
+                    Vector3 pos = Vector3.zero;
+037
+                    Vector3 rot = Vector3.zero;
+038
+                    Vector3 sca = Vector3.zero;
+039
+                    foreach(XmlElement transform in gameObjects.ChildNodes)
+040
+                    {
+041
+                        foreach(XmlElement prs in transform.ChildNodes)
+042
+                        {
+043
+                            if(prs.Name == "position")
+044
+                            {
+045
+                                foreach(XmlElement position in prs.ChildNodes)
+046
+                                {
+047
+                                    switch(position.Name)
+048
+                                    {
+049
+                                    case "x":
+050
+                                        pos.x = float.Parse(position.InnerText);
+051
+                                        break;
+052
+                                    case "y":
+053
+                                        pos.y = float.Parse(position.InnerText);
+054
+                                        break;
+055
+                                    case "z":
+056
+                                        pos.z = float.Parse(position.InnerText);
+057
+                                        break;
+058
+                                }
+059
+                            }
+060
+                        }else if(prs.Name == "rotation")
+061
+                        {
+062
+                            foreach(XmlElement rotation in prs.ChildNodes)
+063
+                            {
+064
+                                switch(rotation.Name)
+065
+                                {
+066
+                                case "x":
+067
+                                    rot.x = float.Parse(rotation.InnerText);
+068
+                                    break;
+069
+                                case "y":
+070
+                                    rot.y = float.Parse(rotation.InnerText);
+071
+                                    break;
+072
+                                case "z":
+073
+                                    rot.z = float.Parse(rotation.InnerText);
+074
+                                    break;
+075
+                                }
+076
+                            }
+077
+                        }else if(prs.Name == "scale")
+078
+                        {
+079
+                            foreach(XmlElement scale in prs.ChildNodes)
+080
+                            {
+081
+                                switch(scale.Name)
+082
+                                {
+083
+                                case "x":
+084
+                                    sca.x = float.Parse(scale.InnerText);
+085
+                                    break;
+086
+                                case "y":
+087
+                                    sca.y = float.Parse(scale.InnerText);
+088
+                                    break;
+089
+                                case "z":
+090
+                                    sca.z = float.Parse(scale.InnerText);
+091
+                                    break;
+092
+                                }
+093
+                            }
+094
+                        }
+095
+                    }
+096
+ 
+097
+                    //拿到 旋转 缩放 平移 以后克隆新游戏对象
+098
+                    GameObject ob = (GameObject)Instantiate(Resources.Load(asset),pos,Quaternion.Euler(rot));
+099
+                    ob.transform.localScale = sca;
+100
+ 
+101
+                    }
+102
+            }
+103
+            }
+104
+        }
+105
+    }
+106
+ 
+107
+    // Update is called once per frame
+108
+    void Update ()
+109
+    {
+110
+ 
+111
+    }
+112
+ 
+113
+    void OnGUI()
+114
+    {
+115
+        if(GUI.Button(new Rect(0,0,200,200),"XML WORLD"))
+116
+        {
+117
+            Application.LoadLevel("JSONScene");
+118
+        }
+119
+ 
+120
+    }
+121
+ 
+122
+}
+ 
+接着JSON场景中，创建一个空的游戏对象，把JSON.cs挂上去。
+01
+using UnityEngine;
+02
+using System.Collections;
+03
+using System.IO;
+04
+using LitJson;
+05
+ 
+06
+public class JSON : MonoBehaviour {
+07
+ 
+08
+    // Use this for initialization
+09
+    void Start ()
+10
+    {
+11
+#if UNITY_EDITOR
+12
+      string filepath = Application.dataPath +"/StreamingAssets"+"/json.txt";
+13
+#elif UNITY_IPHONE
+14
+      string filepath = Application.dataPath +"/Raw"+"/json.txt";
+15
+#endif 
+16
+ 
+17
+        StreamReader sr  = File.OpenText(filepath);
+18
+        string  strLine = sr.ReadToEnd();
+19
+       JsonData jd = JsonMapper.ToObject(strLine);
+20
+       JsonData gameObjectArray = jd["GameObjects"];
+21
+        int i,j,k;
+22
+        for (i = 0; i < gameObjectArray.Count; i++)
+23
+        {
+24
+           JsonData senseArray = gameObjectArray[i]["scenes"];
+25
+           for (j = 0; j < senseArray.Count; j++)
+26
+           {
+27
+                string sceneName = (string)senseArray[j]["name"];
+28
+                if(!sceneName.Equals("Assets/StarTrooper.unity"))
+29
+                {
+30
+                    continue;
+31
+                }
+32
+                JsonData gameObjects = senseArray[j]["gameObject"];
+33
+ 
+34
+                for (k = 0; k < gameObjects.Count; k++)
+35
+                {
+36
+                    string objectName = (string)gameObjects[k]["name"];
+37
+                    string asset = "Prefab/" + objectName;
+38
+                    Vector3 pos = Vector3.zero;
+39
+                    Vector3 rot = Vector3.zero;
+40
+                    Vector3 sca = Vector3.zero;
+41
+ 
+42
+                    JsonData position = gameObjects[k]["position"];
+43
+                    JsonData rotation = gameObjects[k]["rotation"];
+44
+                    JsonData scale = gameObjects[k]["scale"];
+45
+ 
+46
+                    pos.x = float.Parse((string)position[0]["x"]);
+47
+                    pos.y = float.Parse((string)position[0]["y"]);
+48
+                    pos.z = float.Parse((string)position[0]["z"]);
+49
+ 
+50
+                    rot.x = float.Parse((string)rotation[0]["x"]);
+51
+                    rot.y = float.Parse((string)rotation[0]["y"]);
+52
+                    rot.z = float.Parse((string)rotation[0]["z"]);
+53
+ 
+54
+                    sca.x = float.Parse((string)scale[0]["x"]);
+55
+                    sca.y = float.Parse((string)scale[0]["y"]);
+56
+                    sca.z = float.Parse((string)scale[0]["z"]);
+57
+ 
+58
+                    GameObject ob = (GameObject)Instantiate(Resources.Load(asset),pos,Quaternion.Euler(rot));
+59
+                    ob.transform.localScale = sca;
+60
+ 
+61
+                }
+62
+ 
+63
+           }
+64
+        }
+65
+ 
+66
+    }
+67
+ 
+68
+    // Update is called once per frame
+69
+    void Update () {
+70
+ 
+71
+    }
+72
+ 
+73
+    void OnGUI()
+74
+    {
+75
+        if(GUI.Button(new Rect(0,0,200,200),"JSON WORLD"))
+76
+        {
+77
+            Application.LoadLevel("XMLScene");
+78
+        }
+79
+ 
+80
+    }
+81
+ 
+82
+}
+ 
+本例XML和JSON的解析与还原场景，在IOS真实设备上测试通过。
+ 
+
+ 
+本例的下载地址：http://vdisk.weibo.com/s/k0_DE
+雨松MOMO 祝大家学习愉快，准备睡觉，安 。欢迎讨论与学习 嘿嘿。
+补充
+最近在做客户端与服务器的交互，使用JSON 和XML会感觉数据量太大，影响效率。最后使用二进制的方式来完成。如下图所示，使用二进制可以把空间节省到803K ，是不是很不错呢？ 下面我们开始学习如何制作吧。
+ 
+
+ 
+导出场景时增加导出二进制文件选项，代码如下。
+ 
+01
+    [MenuItem ("GameObject/BINARY")]
+02
+    static void XMLJSONTOBinary ()
+03
+    {
+04
+        string filepath = Application.dataPath + @"/StreamingAssets/binary.txt";
+05
+        if(File.Exists (filepath))
+06
+        {
+07
+            File.Delete(filepath);
+08
+        }
+09
+        FileStream  fs = new FileStream(filepath, FileMode.Create);
+10
+        BinaryWriter bw = new BinaryWriter(fs);
+11
+        foreach (UnityEditor.EditorBuildSettingsScene S in UnityEditor.EditorBuildSettings.scenes)
+12
+        {
+13
+            if (S.enabled)
+14
+            {
+15
+                string name = S.path;
+16
+                EditorApplication.OpenScene(name);
+17
+ 
+18
+                foreach (GameObject obj in Object.FindObjectsOfType(typeof(GameObject)))
+19
+                {
+20
+                    if (obj.transform.parent == null)
+21
+                    {
+22
+//注解 直接写入字符串
+23
+                        bw.Write(name);
+24
+                        bw.Write(obj.name);
+25
+ 
+26
+                        short posx = (short)(obj.transform.position.x * 100);
+01
+                    bw.Write(posx);
+02
+                    bw.Write((short)(obj.transform.position.y * 100.0f));
+03
+                    bw.Write((short)(obj.transform.position.z * 100.0f));
+04
+                    bw.Write((short)(obj.transform.rotation.eulerAngles.x * 100.0f));
+05
+                    bw.Write((short)(obj.transform.rotation.eulerAngles.y * 100.0f));
+06
+                    bw.Write((short)(obj.transform.rotation.eulerAngles.z * 100.0f));
+07
+                    bw.Write((short)(obj.transform.localScale.x * 100.0f));
+08
+                    bw.Write((short)(obj.transform.localScale.y * 100.0f));
+09
+                    bw.Write((short)(obj.transform.localScale.z * 100.0f));
+10
+ 
+11
+                }
+12
+            }
+13
+ 
+14
+        }
+15
+    }
+16
+ 
+17
+    bw.Flush();
+18
+    bw.Close();
+19
+    fs.Close();
+20
+}
+ 
+注解
+在写入二进制数据时用到的核心类就是BinaryWriter ，Binary是二进制的意思 ，可见操作二进制写入就用BinaryWriter了。 常用的数据类型会分配固定的字节数量，假设BinaryWriter 写入一个short 那么就占2字节，写一个 int 就占4字节，如果是数组的话需要数组类型字节长度在乘以数组长度。
+byte：一个字节（8位） 
+short：两个字节（16位） 
+int：四个字节（32位）(一个字长) 
+long：八个字节（64位）
+float：四个字节（32位）
+double：八个字节（64位）
+然后在说说string，字符串它并不是标准的数据类型，它是一个对象 object 那么它的字节长度就是可变的。开始我也在string 上纠结了一小会儿。还有BinaryWriter 在写入string 的时候会现将字符串的长度以byte的形式储存，然后在储存字符串的字节长度。那么在解析字符串的时候需要先解析字符串长度，然后在根据长度取得后面对应长度的字节数组，再把这个字节数组转换成string就行啦。还有，上面我用的是short x 100 其实上为了节省长度， 因为short是2字节，float是4字节。我在解析的时候用short 在除以100 就可以 换算成float拉。
+然后我们在看看解析的代码，写入的时候我们用的是BinaryWriter 那么读取的时候应该是 BinaryReader。
+Binary.cs
+001
+using UnityEngine;
+002
+using System.Collections;
+003
+using System.IO;
+004
+using System.Text;
+005
+using System;
+006
+public class Binary : MonoBehaviour
+007
+{
+008
+ 
+009
+    void Start ()
+010
+    {
+011
+        string filepath = Application.dataPath + @"/StreamingAssets/binary.txt";
+012
+ 
+013
+        if(File.Exists (filepath))
+014
+        {
+015
+            FileStream fs = new FileStream (filepath,FileMode.Open);
+016
+            BinaryReader br = new BinaryReader(fs);
+017
+ 
+018
+            int index = 0;
+019
+            //将二进制字节流全部读取在这个byte数组当中
+020
+            //ReadBytes传递的参数是一个长度，也就是流的长度
+021
+            byte[] tempall = br.ReadBytes((int)fs.Length);
+022
+ 
+023
+            //开始解析这个字节数组
+024
+            while(true)
+025
+            {
+026
+                //当超过流长度，跳出循环
+027
+                if(index >= tempall.Length)
+028
+                {
+029
+                    break;
+030
+                }
+031
+ 
+032
+                //得到第一个byte 也就是得到字符串的长度
+033
+                int scenelength = tempall[index];
+034
+                byte []sceneName = new byte [scenelength];
+035
+                index += 1;
+036
+                //根据长度拷贝出对应长度的字节数组
+037
+                System.Array.Copy(tempall,index,sceneName,0,sceneName.Length); 
+038
+                //然后把字节数组对应转换成字符串
+039
+                string sname = System.Text.Encoding.Default.GetString(sceneName);
+040
+ 
+041
+                //这里和上面原理一样就不赘述
+042
+                int objectLength = tempall[index + sceneName.Length];
+043
+                byte []objectName = new byte [objectLength];
+044
+ 
+045
+                index += sceneName.Length + 1;
+046
+                System.Array.Copy(tempall,index,objectName,0,objectName.Length);   
+047
+                string oname = System.Text.Encoding.Default.GetString(objectName);
+048
+ 
+049
+                //下面就是拿short 每一个short的长度是2字节。
+050
+ 
+051
+                index += objectName.Length;
+052
+                byte[] posx = new byte[2];
+053
+                System.Array.Copy(tempall,index,posx,0,posx.Length);
+054
+                //取得对应的数值 然后 除以100 就是float拉。   
+055
+                float x = System.BitConverter.ToInt16(posx,0) /100.0f;
+056
+ 
+057
+                //下面都差不多
+058
+                index += posx.Length;
+059
+                byte[] posy = new byte[2];
+060
+                System.Array.Copy(tempall,index,posy,0,posy.Length);   
+061
+                float y = System.BitConverter.ToInt16(posy,0) /100.0f;
+062
+ 
+063
+                index += posy.Length;
+064
+                byte[] posz = new byte[2];
+065
+                System.Array.Copy(tempall,index,posz,0,posz.Length);   
+066
+                float z = System.BitConverter.ToInt16(posz,0) /100.0f; 
+067
+ 
+068
+                index += posz.Length;
+069
+                byte[] rotx = new byte[2];
+070
+                System.Array.Copy(tempall,index,rotx,0,rotx.Length);   
+071
+                float rx = System.BitConverter.ToInt16(rotx,0) /100.0f;
+072
+ 
+073
+                index += rotx.Length;
+074
+                byte[] roty = new byte[2];
+075
+                System.Array.Copy(tempall,index,roty,0,roty.Length);   
+076
+                float ry = System.BitConverter.ToInt16(roty,0) /100.0f;
+077
+ 
+078
+                index += roty.Length;
+079
+                byte[] rotz = new byte[2];
+080
+                System.Array.Copy(tempall,index,rotz,0,rotz.Length);   
+081
+                float rz = System.BitConverter.ToInt16(rotz,0) /100.0f;        
+082
+ 
+083
+                index += rotz.Length;
+084
+                byte[] scax = new byte[2];
+085
+                System.Array.Copy(tempall,index,scax,0,scax.Length);   
+086
+                float sx = System.BitConverter.ToInt16(scax,0) /100.0f;
+087
+ 
+088
+                index += scax.Length;
+089
+                byte[] scay = new byte[2];
+090
+                System.Array.Copy(tempall,index,scay,0,scay.Length);   
+091
+                float sy = System.BitConverter.ToInt16(scay,0) /100.0f;
+092
+ 
+093
+                index += scay.Length;
+094
+                byte[] scaz = new byte[2];
+095
+                System.Array.Copy(tempall,index,scaz,0,scaz.Length);   
+096
+                float sz = System.BitConverter.ToInt16(scaz,0) /100.0f;
+097
+ 
+098
+                index+=scaz.Length;
+099
+ 
+100
+                if(sname.Equals("Assets/StarTrooper.unity"))
+101
+                {
+102
+                    //最后在这里把场景生成出来
+103
+                    string asset = "Prefab/" + oname;
+104
+                    Vector3 pos = new Vector3 (x,y,z);
+105
+                    Vector3 rot = new Vector3(rx,ry,rz);
+106
+                    Vector3 sca = new Vector3(sx,sy,sz);
+107
+                    GameObject ob = (GameObject)Instantiate(Resources.Load(asset),pos,Quaternion.Euler(rot));
+108
+                    ob.transform.localScale = sca;
+109
+                }
+110
+ 
+111
+            }
+112
+        }
+113
+    }
+114
+ 
+115
+    // Update is called once per frame
+116
+    void Update ()
+117
+    {
+118
+ 
+119
+    }
+120
+}
+ 
+运行一下，场景依然生成的非常完美，在处理二进制解析的时候需要特别注意的就是字节对齐，因为你的所有数据其实就是一个byte[]字节数组，需要有理有序的把字节数组拆分，然后在转换成对应的数据，所以一定要对齐不然肯定会出错的。
+ 
+
+ 
+最后把代码放出来，晚安 Good Ngith 哇咔咔。
+下载地址 ：http://vdisk.weibo.com/s/la_QE 
+ 
+留言中刚好有人讨论到这块。另外还有一种方式也可以实现动态增加建立场景，使用.unity 来实现场景的加载，我觉得这种方式可能会更好一些。我在网上已经发现有人写了，那就转载过来吧。
+原文地址：http://blog.csdn.net/cony100/article/details/8842919
+在Unity3d中，场景（scene）多半通过在build settings中点击add current或者把场景拖进面板实现，假如不这么做，你的场景便不会被加载，哪怕你制定了绝对路径。
+就是说，一个游戏里要加载多少场景多半都是固定的。
+这样的方法会有很多不便，不容易动态加载场景。所以我们今天要说的，是一种动态加载场景的方法。
+首先，你需要一个编辑器文件，放在editor文件夹下。注意，这个文件不可以继承自monobehaviour
+1
+public class BuildSceneEditor{ 
+2
+    [@MenuItem("build/BuildWebplayerStreamed")] 
+3
+    static void Build(){ 
+4
+        string[] levels = new string[]{"Assets/Level1.unity","Assets/Level2.unity"}; 
+5
+        BuildPipeline.BuildStreamedSceneAssetBundle(levels,"streamed.unity3d",BuildTarget.WebPlayer); 
+6
+    } 
+7
+}
+这样，在你的unity编辑器上出现了一个按钮，你执行这个按钮，则会在你的Assets同级目录下出现你build好的streamed.unity3d文件，你把这个文件放在服务器上，下面一步就是下载这个文件并build了。
+1
+WWW download = WWW.LoadFromCacheOrDownload("http://xxx/streamed.unity3d",0); 
+2
+yield return download; 
+3
+Application.LoadLevel("Level1");
+大家注意到了吗。下载好以后就可以直接loadlevel了，不需要手动进行add current的操作了。
+ 
+这里还有一篇圣典翻译的文章 http://game.ceeger.com/Script/BuildPipeline/BuildPipeline.BuildStreamedSceneAssetBundle.html
+     最后我在补充一下使用.unity3d确实方便很多，因为它不仅会把场景打包进去，并且还会把场景中对应的资源文件打包进去。举个例子，你将美工做好的模型文件放在Project视图中，然后在将模型放在Hierarchy视图中的 100,100,100坐标点中，最后把该场景打包成.unity3d文件。此时你在新建一个工程只需下载刚刚打包的场景文件，他会自动把模型放在 100，100，100坐标点中。
+      这说明场景文件，包含了该场景中所用到的所有模型，并且还包含了模型资源与Hierarchy视图的关系。它会带来一个弊端，比如你有N个场景，每个场景中都有相同的模型文件，这样每个场景都需要重复下载这些相同的模型文件，所以我觉得最好还是使用assetbundle来对同类的资源文件进行分包处理。
+
+http://www.xuanyusong.com/archives/1919

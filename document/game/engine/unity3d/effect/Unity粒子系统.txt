@@ -1,0 +1,846 @@
+Unity Manual > User Guide > Building Scenes > Particle Systems
+
+Particle Systems（粒子系统）
+
+Particles are essentially 2D images rendered in 3D space. They are primarily used for effects such as smoke, fire, water droplets, or leaves. A Particle System is made up of three separate Components: Particle Emitter, Particle Animator, and a Particle Renderer. You can use a Particle Emitter and Renderer together if you want static particles. The Particle Animator will move particles in different directions and change colors. You also have access to each individual particle in a particle system via scripting, so you can create your own unique behaviors that way if you choose. 
+
+Please view the Particle Scripting Reference here. 
+
+The remainder of this page's text is from the Particle Component Reference pages. 
+
+粒子基本上是在三维空间中渲染的二维图像。它们主要用于诸如烟、火、水滴、或树叶等效果。一个粒子系统是由三个独立部分组成：粒子发射器、粒子动画器、和粒子渲染器。如果你想要一个静态粒子系统，你可以用一个粒子发射器和渲染器来完成。粒子动画器将在不同的方向移动粒子和改变粒子的颜色。你还可以通过脚本使用粒子系统中的每一个粒子，因此你可以创建自己独特的（粒子）行为，如果你选择这样。
+
+请点击这里查看粒子脚本参考。
+
+本页剩余的文字来自于Particle Component Reference。
+
+Particle Components（粒子的组成）
+
+Particle Systems（粒子系统）
+
+Particle Systems in Unity are used to make clouds of smoke, steam, fire and other atmospheric effects. Particle Systems work by using one or two Textures & drawing them many times, creating a chaotic effect. 
+
+粒子在Unity中是用来制造烟雾、蒸汽、火及其它大气的效果。粒子系统通过使用一或两个纹理并多次绘制它们，以创造一个混沌的效果。
+
+
+A Particle System included in the Standard Assets一个粒子系统包含在标准资源包中
+
+A typical Particle System in Unity is an object that contains a Particle Emitter, a Particle Animator and a Particle Renderer. The Particle Emitter generates the particles, the Particle Animator moves them over time, and the Particle Renderer draws them on the screen. 
+
+If you want your particles to interact with the world, add a Particle Collider Component to the GameObject. 
+
+Unity中一个典型的粒子系统是一个对象，它包含了一个粒子发射器、一个粒子动画器和一个粒子渲染器。粒子发射器产生粒子，粒子动画器则随时间移动它们，粒子渲染器将它们绘制在屏幕上。
+
+如果你想让你的粒子对世界有影响，添加一个粒子碰撞器组件到游戏对象中。
+
+Ellipsoid Particle Emitter（椭球粒子发射器）
+
+The Ellipsoid Particle Emitter spawns particles inside a sphere. Use the Ellipsoid property below to scale & stretch the sphere. 
+
+椭球粒子发射器在一个球形范围内产生大量粒子，使用Ellipsoid属性来缩放和拉伸范围。
+
+
+The Ellipsoid Particle Emitter Inspector椭球粒子发射器的检视视图
+
+Properties（属性）
+
+ 
+
+ 
+
+Emit 发射
+
+If enabled, the emitter will emit particles. 如果启用，发射器将发射粒子
+
+Min Size
+
+最小尺寸
+
+The minimum size each particle can be at the time when it is spawned. 在产生粒子时每个粒子可以达到的最小尺寸。
+
+Max Size
+
+最大尺寸
+
+The maximum size each particle can be at the time when it is spawned. 在产生粒子时每个粒子可以达到的最大尺寸。
+
+Min Energy
+
+最小活力
+
+The minimum lifetime of each particle, measured in seconds. 每个粒子的最短寿命，以秒为单位。
+
+Max Energy
+
+最大活力
+
+The maximum lifetime of each particle, measured in seconds. 每个粒子的最长寿命，以秒为单位。
+
+Min Emission
+
+最小发射
+
+The minimum number of particles that will be spawned every second. 每秒会产生的粒子的最小数目。
+
+Max Emission
+
+最大发射
+
+The maximum number of particles that will be spawned every second. 每秒会产生的粒子的最大数目。
+
+World Velocity
+
+世界速度
+
+The starting speed of particles in world space, along X, Y, and Z. 在世界空间中粒子的初始速度，沿X，Y和Z轴方向。
+
+Local Velocity
+
+相对速度
+
+The starting speed of particles along X, Y, and Z, measured in the object's orientation. 粒子沿X，Y和Z轴方向的初始速度，以对象的定向为测量基准（意思就是粒子以某个对象为参照的相对速度）
+
+Rnd Velocity
+
+随机速度
+
+A random speed along X, Y, and Z that is added to the velocity. 沿X，Y和Z的随机的加速度
+
+Emitter Velocity Scale
+
+发射器速度比例
+
+The amount of the emitter's speed that the particles inherit. 粒子继承的发射器速度的总和
+
+Tangent Velocity
+
+切线速度
+
+The starting speed of particles along X, Y, and Z, across the Emitter's surface. 粒子沿X，Y和Z跨越发射器表面的初始速度
+
+Simulate In World Space
+
+模拟世界空间
+
+If enabled, the particles don't move when the emitter moves. If false, when you move the emitter, the particles follow it around. 如果启用，发射器移动时粒子不动；如果禁用，发射器移动时，粒子则跟随在周围
+
+One Shot
+
+单次发射
+
+If enabled, the particle numbers specified by min & max emission is spawned all at once. If disabled, the particles are generated in a long stream. 如果启用，粒子数是最小和最大数目之间的一个数（？）。如果禁用，这些粒子将产生一个粒子流。
+
+Ellipsoid
+
+椭球
+
+Scale of the sphere along X, Y, and Z that the particles are spawned inside. 沿X，Y和Z产生粒子的球形范围
+
+MinEmitterRange
+
+最小发射器范围
+
+Determines an empty area in the center of the sphere - use this to make particles appear on the edge of the sphere. 在球形的中心确定一个空白区域——用此来使粒子出现在该球形的边缘
+
+Details（细节）
+
+Ellipsoid Particle Emitters (EPEs) are the basic emitter, and are included when you choose to add a Particle System to your scene from Components->Particles->Particle System. You can define the boundaries for the particles to be spawned, and give the particles an initial velocity. From here, use the Particle Animator to manipulate how your particles will change over time to achieve interesting effects. 
+
+椭球粒子发射器（EPEs）是基本的发射器，当你选择添加一个粒子系统到场景时，通过菜单Components->Particles->Particle System。你可以定义产生粒子的边界，并给出粒子的初速度。从这里，使用粒子动画器操纵你的粒子随时间实现有趣的效果。
+
+Particle Emitters work in conjunction with Particle Animators and Particle Renderers to create, manipulate, and display Particle Systems. All three Components must be present on an object before the particles will behave correctly. When particles are being emitted, all different velocities are added together to create the final velocity. 
+
+粒子发射器与粒子动画器和粒子渲染器一起工作来创建、处理和显示粒子系统。在粒子正确表现之前这三个组成部分都必须呈现在对象上。当粒子被发射，所有不同的速度相加成为最终的速度。
+
+Spawning Properties（属性）
+
+Spawning properties like Size, Energy, Emission, and Velocity will give your particle system distinct personality when trying to achieve different effects. Having a small Size could simulate fireflies or stars in the sky. A large Size could simulate dust clouds in a musky old building. 
+
+产生粒子的属性，如尺寸、活力、发射、和速度将在你试图达到不同的效果时，给你的粒子系统鲜明的个性。用一个小的尺寸可以模拟萤火虫或天空中的星星，大尺寸的可以模拟尘埃云。
+
+Energy and Emission will control how long your particles remain onscreen and how many particles can appear at any one time. For example, a rocket might have high Emission to simulate density of smoke, and high Energy to simulate the slow dispersion of smoke into the air. 
+
+活力和发射将控制你的屏幕上粒子将保留多久以及一次可以产生多少粒子。例如，火箭可能有较高的发射来模拟浓烟，较高的活力来模拟烟雾在空气中缓慢扩散。
+
+Velocity will control how your particles move. You might want to change your Velocity in scripting to achieve interesting effects, or if you want to simulate a constant effect like wind, set your X and Z Velocity to make your particles blow away. 
+
+速度将控制你的粒子如何运动。你可能希望通过脚本来改变速度以实现有趣的效果，或者如果你要模拟一个持续效果，比如风，设定你的X和Z的速度，使你的粒子被吹走。
+
+Simulate in World Space（模拟世界空间）
+
+If this is disabled, the position of each individual particle will always translate relative to the Position of the emitter. When the emitter moves, the particles will move along with it. If you have Simulate in World Space enabled, particles will not be affected by the translation of the emitter. For example, if you have a fireball that is spurting flames that rise, the flames will be spawned and float up in space as the fireball gets further away. If Simulate in World Space is disabled, those same flames will move across the screen along with the fireball. 
+
+如果该项被禁用，每个粒子的位置将始终相对于发射器的位置在变化。当发射器移动时，粒子将跟随它移动。如果启用该项，粒子将不会受到发射器移动的影响。例如，如果你有一个火球，它喷出的火焰是上升的，火焰会产生然后上浮在空中，离火球越来越远。如果模拟世界空间被禁用，相同的火焰会随着火球在屏幕上移动。
+
+Emitter Velocity Scale（发射器速度比例）
+
+This property will only apply if Simulate in World Space is enabled. 
+
+If this property is set to 1, the particles will inherit the exact translation of the emitter at the time they are spawned. If it is set to 2, the particles will inherit double the emitter's translation when they are spawned. 3 is triple the translation, etc. 
+
+此属性将只适用于模拟世界空间被启用时。
+
+如果此属性设置为1，粒子将在它们产生时精确继承发射器的变换（速度）。如果设置为2，粒子将继承双倍的发射器变换（速度）。设置为3则是三倍等等。
+
+One Shot（单次发射）
+
+One Shot emitters will create all particles within the Emission property all at once, and cease to emit particles over time. Here are some examples of different particle system uses with One Shot Enabled or Disabled: 
+
+单次发射器将一次性创建Emission属性中（指定的数目）的所有的粒子，然后停止发射粒子。下面是单次发射启用或禁用时一些不同的粒子系统的例子：
+
+Enabled: 启用时：
+
+· Explosion 爆炸
+
+· Water splash 水花飞溅
+
+· Magic spell 魔法效果
+
+Disabled: 禁用时：
+
+· Gun barrel smoke 枪筒的烟
+
+· Wind effect 风的效果
+
+· Waterfall 瀑布
+
+Min Emitter Range（最小发射器范围）
+
+The Min Emitter Range determines the depth within the ellipsoid that particles can be spawned. Setting it to 0 will allow particles to spawn anywhere from the center core of the ellipsoid to the outer-most range. Setting it to 1 will restrict spawn locations to the outer-most range of the ellipsoid. 
+
+最小发射器范围决定了可以产生粒子的椭球的内部深度。将其设置为0将允许从椭球中心到最外层的范围内任何地方产生粒子。将其设置为1将限制产生地点为椭球最外层。
+
+
+Min Emitter Range of 0最小发射器范围设置为0
+
+
+Min Emitter Range of 1最小发射器范围设置为1
+
+Hints（提示）
+
+· Be careful of using many large particles. This can seriously hinder performance on low-level machines. Always try to use the minimum number of particles to attain an effect. 
+
+· The Emit property works in conjunction with the AutoDestruct property of the Particle Animator. Through scripting, you can cease the emitter from emitting, and then AutoDestruct will automatically destroy the Particle System and the GameObject it is attached to. 
+
+· 使用大量粒子时要小心，这会严重妨碍低配置机器的性能。始终尝试用最小的粒子数目达到效果。
+
+· Emit属性要与粒子动画的AutoDestruct（自动销毁）属性结合使用。通过脚本，你可以停止发射器，然后AutoDestruct会自动销毁粒子系统和它所附属的游戏对象。
+
+Mesh Particle Emitter（网格粒子发射器）
+
+The Mesh Particle Emitter emits particles around a mesh. Particles are spawned from the surface of the mesh, which can be necessary when you want to make your particles interact in a complex way with objects. 
+
+网格粒子发射器在一个网格周围发射粒子。粒子从网格的表面产生，它适用于你想让粒子与物体通过复杂的方式相互作用的情况。
+
+
+The Mesh Particle Emitter Inspector网格粒子发射器的检视视图
+
+Properties（属性）
+
+ 
+
+ 
+
+Emit 发射
+
+If enabled, the emitter will emit particles. 如果启用，发射器将发射粒子
+
+Min Size
+
+最小尺寸
+
+The minimum size each particle can be at the time when it is spawned. 在产生粒子时每个粒子可以达到的最小尺寸。
+
+Max Size
+
+最大尺寸
+
+The maximum size each particle can be at the time when it is spawned. 在产生粒子时每个粒子可以达到的最大尺寸。
+
+Min Energy
+
+最小活力
+
+The minimum lifetime of each particle, measured in seconds. 每个粒子的最短寿命，以秒为单位。
+
+Max Energy
+
+最大活力
+
+The maximum lifetime of each particle, measured in seconds. 每个粒子的最长寿命，以秒为单位。
+
+Min Emission
+
+最小发射
+
+The minimum number of particles that will be spawned every second. 每秒会产生的粒子的最小数目。
+
+Max Emission
+
+最大发射
+
+The maximum number of particles that will be spawned every second. 每秒会产生的粒子的最大数目。
+
+World Velocity
+
+世界速度
+
+The starting speed of particles in world space, along X, Y, and Z. 在世界空间中粒子的初始速度，沿X，Y和Z轴方向。
+
+Local Velocity
+
+相对速度
+
+The starting speed of particles along X, Y, and Z, measured in the object's orientation. 粒子沿X，Y和Z轴方向的初始速度，以对象的定向为测量基准
+
+Rnd Velocity
+
+随机速度
+
+A random speed along X, Y, and Z that is added to the velocity. 沿X，Y和Z的随机的加速度
+
+Emitter Velocity Scale
+
+发射器速度比例
+
+The amount of the emitter's speed that the particles inherit. 粒子继承的发射器速度的总和
+
+Tangent Velocity
+
+切线速度
+
+The starting speed of particles along X, Y, and Z, across the Emitter's surface. 粒子沿X，Y和Z跨越发射器表面的初始速度
+
+Simulate In World Space
+
+模拟世界空间
+
+If enabled, the particles don't move when the emitter moves. If false, when you move the emitter, the particles follow it around. 如果启用，发射器移动时粒子不动；如果禁用，发射器移动时，粒子则跟随在周围
+
+One Shot
+
+单次发射
+
+If enabled, the particle numbers specified by min & max emission is spawned all at once. If disabled, the particles are generated in a long stream. 如果启用，粒子数是最小和最大数目之间的随机数（？）。如果禁用，这些粒子将产生一个粒子流。
+
+Interpolate Triangles
+
+插值三角形
+
+If enabled, particles are spawned all over the mesh's surface. If disabled, particles are only spawned from the mesh's vertrices. 如果启用，粒子将产生在网格的表面上；如果禁用，粒子仅从网格的顶点产生
+
+Systematic
+
+系统的
+
+If enabled, particles are spawned in the order of the vertices defined in the mesh. Although you seldom have direct control over vertex order in meshes, most 3D modelling applications have a very systematic setup when using primitives. It is important that the mesh contains no faces in order for this to work. 如果启用，粒子将按网格定义的顶点顺序来产生。虽然你很少直接控制网格顶点顺序，但在初始使用时大多数3D建模程序中有非常系统的设置。这在网格没有表面的时候是很重要的。
+
+Min Normal Velocity
+
+最小正常速率
+
+Minimum amount that particles are thrown away from the mesh.从网格抛出的粒子的最小数目
+
+Max Normal Velocity
+
+最大正常速率
+
+Maximum amount that particles are thrown away from the mesh.从网格抛出的粒子的最大数目
+
+Details（细节）
+
+Mesh Particle Emitters (MPEs) are used when you want more precise control over the spawn position & directions than the simpler Ellipsoid Particle Emitter gives you. They can be used for making advanced effects. 
+
+MPEs work by emitting particles at the vertices of the attached mesh. Therefore, the areas of your mesh that are more dense with polygons will be more dense with particle emission. 
+
+Particle Emitters work in conjunction with Particle Animators and Particle Renderers to create, manipulate, and display Particle Systems. All three Components must be present on an object before the particles will behave correctly. When particles are being emitted, all different velocities are added together to create the final velocity. 
+
+网格粒子发射器（MPEs）用来更精确地控制粒子生成位置和方向，比椭球粒子发射器更简单。它们可用于制造高级的效果。
+
+MPEs通过附属网格的顶点发射粒子。因此，你的网格区域的多边形越密集，粒子发射也就越密集。
+
+粒子发射器与粒子动画器和粒子渲染器一起工作来创建、处理和显示粒子系统。在粒子正确表现之前这三个组成部分都必须呈现在对象上。当粒子被发射，所有不同的速度相加成为最终的速度。
+
+Spawning Properties（属性）
+
+Spawning properties like Size, Energy, Emission, and Velocity will give your particle system distinct personality when trying to achieve different effects. Having a small Size could simulate fireflies or stars in the sky. A large Size could simulate dust clouds in a musky old building. 
+
+产生粒子的属性，如尺寸、活力、发射、和速度将在你试图达到不同的效果时，给你的粒子系统鲜明的个性。用一个小的尺寸可以模拟萤火虫或天空中的星星，大尺寸的可以模拟尘埃云。
+
+Energy and Emission will control how long your particles remain onscreen and how many particles can appear at any one time. For example, a rocket might have high Emission to simulate density of smoke, and high Energy to simulate the slow dispersion of smoke into the air. 
+
+活力和发射将控制你的屏幕上粒子将保留多久以及一次可以产生多少粒子。例如，火箭可能有较高的发射来模拟浓烟，较高的活力来模拟烟雾在空气中缓慢扩散。
+
+Velocity will control how your particles move. You might want to change your Velocity in scripting to achieve interesting effects, or if you want to simulate a constant effect like wind, set your X and Z Velocity to make your particles blow away. 
+
+速度将控制你的粒子如何运动。你可能希望通过脚本来改变速度以实现有趣的效果，或者如果你要模拟一个持续效果，比如风，设定你的X和Z的速度，使你的粒子被吹走。
+
+Simulate in World Space（模拟世界空间）
+
+If this is disabled, the position of each individual particle will always translate relative to the Position of the emitter. When the emitter moves, the particles will move along with it. If you have Simulate in World Space enabled, particles will not be affected by the translation of the emitter. For example, if you have a fireball that is spurting flames that rise, the flames will be spawned and float up in space as the fireball gets further away. If Simulate in World Space is disabled, those same flames will move across the screen along with the fireball. 
+
+如果该项被禁用，每个粒子的位置将始终相对于发射器的位置在变化。当发射器移动时，粒子将跟随它移动。如果启用该项，粒子将不会受到发射器移动的影响。例如，如果你有一个火球，它喷出的火焰是上升的，火焰会产生然后上浮在空中，离火球越来越远。如果模拟世界空间被禁用，相同的火焰会随着火球在屏幕上移动。
+
+Emitter Velocity Scale（发射器速度比例）
+
+This property will only apply if Simulate in World Space is enabled. 
+
+If this property is set to 1, the particles will inherit the exact translation of the emitter at the time they are spawned. If it is set to 2, the particles will inherit double the emitter's translation when they are spawned. 3 is triple the translation, etc. 
+
+此属性将只适用于模拟世界空间被启用时。
+
+如果此属性设置为1，粒子将在它们产生时精确继承发射器的变换（速度）。如果设置为2，粒子将继承双倍的发射器变换（速度）。设置为3则是三倍等等。
+
+One Shot（单次发射）
+
+One Shot emitters will create all particles within the Emission property all at once, and cease to emit particles over time. Here are some examples of different particle system uses with One Shot Enabled or Disabled: 
+
+单次发射器将一次性创建Emission属性中（指定的数目）的所有的粒子，然后停止发射粒子。下面是单次发射启用或禁用时一些不同的粒子系统的例子：
+
+Enabled: 启用时：
+
+· Explosion 爆炸
+
+· Water splash 水花飞溅
+
+· Magic spell 魔法效果
+
+Disabled: 禁用时：
+
+· Gun barrel smoke 枪筒的烟
+
+· Wind effect 风的效果
+
+· Waterfall 瀑布
+
+Interpolate Triangles（插值三角形）
+
+Enabling your emitter to Interpolate Triangles will allow particles to be spawned between the mesh's vertices. This option is off by default, so particles will only be spawned at the vertices. 
+
+让你的发射器启用插值三角形，将允许粒子在网格的顶点之间产生。这个选项默认是关闭的，所以粒子仅会产生在顶点上。
+
+
+A sphere with Interpolate Triangles off (the default)插值三角形关闭（默认情况）的一个球体
+
+Enabling this option will spawn particles on and in-between vertices, essentially all over the mesh's surface (seen below). 
+
+启用此选项粒子将产生在顶点上且在顶点之间，基本上全部是在网格的表面（如下图）。
+
+
+A sphere with Interpolate Triangles on插值三角形打开的一个球体
+
+It bears repeating that even with Interpolate Triangles enabled, particles will still be denser in areas of your mesh that are more dense with polygons. 
+
+必需重申的是，即使启用插值三角形，粒子仍然会堆积在你的网格多边形比较密集的区域。
+
+Systematic（系统）
+
+Enabling Systematic will cause your particles to be spawned in your mesh's vertex order. The vertex order is set by your 3D modeling application. 
+
+启用该项将导致你的粒子会按你的网格顶点顺序产生，顶点顺序是由你的三维建模程序设置的。
+
+
+An MPE attached to a sphere with Systematic enabled开启系统的一个球体粒子系统
+
+Normal Velocity（正常速率）
+
+Normal Velocity controls the speed at which particles are emitted along the normal from where they are spawned. 
+
+For example, create a Mesh Particle System, use a cube mesh as the emitter, enable Interpolate Triangles, and set Normal Velocity Min and Max to 1. You will now see the particles emit from the faces of the cube in a straight line. 
+
+正常速率控制粒子在它们产生的地方正常放出的速度。
+
+例如，创建一个网格粒子系统，用一个立方体作发射器，使用插值三角形，并设置正常速率的最小和最大值为1。现在你将看到粒子从立方体表面沿一条直线排放出来。
+
+See Also（参见）
+
+· How to make a Mesh Particle Emitter 
+
+Hints（提示）
+
+· Be careful of using many large particles. This can seriously hinder performance on low-level machines. Always try to use the minimum number of particles to attain an effect. 
+
+· The Emit property works in conjunction with the AutoDestruct property of the Particle Animator. Through scripting, you can cease the emitter from emitting, and then AutoDestruct will automatically destroy the Particle System and the GameObject it is attached to. 
+
+· MPEs can also be used to make glow from a lot of lamps placed in a scene. Simply make a mesh with one vertex in the center of each lamp, and build an MPE from that with a halo material. Great for evil sci-fi worlds. 
+
+· 使用大量粒子时要小心，这会严重妨碍低配置机器的性能。始终尝试用最小的粒子数目达到效果。
+
+· Emit属性要与粒子动画的AutoDestruct（自动销毁）属性结合使用。通过脚本，你可以停止发射器，然后AutoDestruct会自动销毁粒子系统和它所附属的游戏对象。
+
+· MPEs也可用于让场景中放置的大量灯来发光。只需在每盏灯的中心顶点建立一个网格，并使用一个光晕材质建立网格粒子系统。（用它来创建一个）非常棒的邪恶的科幻世界。
+
+Particle Animator（粒子动画器）
+
+Particle Animators move your particles over time, you use them to apply wind, drag & color cycling to your particle systems. 
+
+粒子动画器随着时间移动你的粒子，使用它们应用风、拖放和颜色循环到你的粒子系统（什么意思啊）。
+
+
+The Particle Animator Inspector粒子动画器的检视视图
+
+Properties（属性）
+
+ 
+
+ 
+
+Does Animate Color
+
+使用动画颜色
+
+If enabled, particles cycle their color over their lifetime. 如果启用，粒子在持续时间内将轮换使用颜色。
+
+Color Animation
+
+动画颜色
+
+The 5 colors particles go through. All particles cycle over this - if some have a shorter life span than others, they will animate faster. 列出5种粒子的颜色。所有粒子轮换使用这些颜色——如果有的粒子寿命比别的短，他们将动得更快。
+
+World Rotation Axis
+
+世界旋转轴
+
+An optional world-space axis the particles rotate around. Use this to make advanced spell effects or give caustic bubbles some life. 可选的世界空间轴，粒子在其周围旋转。使用它可制造高级法术效果，或提供一些腐蚀性泡沫。
+
+Local Rotation Axis
+
+本地旋转轴
+
+An optional local-space axis the particles rotate around. Use this to make advanced spell effects or give caustic bubbles some life. 可选的本地空间轴，粒子在其周围旋转。使用它可制造高级法术效果，或提供一些腐蚀性泡沫。
+
+Size Grow
+
+扩大规模
+
+Use this to make particles grow in size over their lifetime. As randomized forces will spread your particles out, it is often nice to make them grow in size so they don't fall apart. Use this to make smoke rise upwards, to simulate wind, etc. 用它来使粒子在其寿命范围内扩大规模。由于随机力量将向外散播你的粒子，扩大它们的规模往往是不错的，它们不会四分五裂。用它可以模拟烟的上升，模拟风等。
+
+Rnd Force
+
+随机外力
+
+A random force added to particles every frame. Use this to make smoke become more alive. 每一帧都给粒子随机力量。用它来让烟雾变得更活跃。
+
+Force
+
+外力
+
+The force being applied every frame to the particles, measure relative to the world. 每一帧都给粒子应用力量，以相对世界为基准。
+
+Damping
+
+减幅
+
+How much particles are slowed every frame. A value of 1 gives no damping, while less makes them slow down. 每一帧有多少粒子会变慢。值1是无阻尼使他们慢下来
+
+Autodestruct
+
+自动销毁
+
+If enabled, the GameObject attached to the Particle Animator will be destroyed when all particles disappear. 如果启用，所有的粒子消失时，附着了粒子动画的游戏对象将被销毁。
+
+Details（细节）
+
+Particle Animators allow your particle systems to be dynamic. They allow you to change the color of your particles, apply forces and rotation, and choose to destroy them when they are finished emitting. For more information about Particle Systems, reference Mesh Particle Emitters, Ellipsoid Particle Emitters, and Particle Renderers. 
+
+粒子动画器让你的粒子系统是动态的。它们允许你改变粒子的颜色，应用外力和旋转，并在它们完成发射时选择摧毁。如需粒子系统的更多信息，参考Mesh Particle Emitters, Ellipsoid Particle Emitters, Particle Renderers。
+
+Animating Color（动画颜色）
+
+If you would like your particles to change colors or fade in/out, enable them to Animate Color and specify the colors for the cycle. Any particle system that animates color will cycle through the 5 colors you choose. The speed at which they cycle will be determined by the Emitter's Energy value. 
+
+如果你想让粒子改变颜色或淡入/淡出，使用动画颜色为它们指定周期内色彩。使用动画颜色的任何粒子系统将循环使用你选择的5种颜色。发射器的活力值决定了它们的周期内速度。
+
+If you want your particles to fade in rather than instantly appear, set your first or last color to have a low Alpha value. 
+
+如果你想让你的粒子渐显（淡入）而不是立即出现，设置你的第一个或最后一个颜色，使其有一个较低的Alpha值（意思就是设置为较低的透明度）。
+
+
+An Animating Color Particle System一个动画颜色粒子系统
+
+Rotation Axes（旋转轴）
+
+Setting values in either the Local or World Rotation Axes will cause all spawned particles to rotate around the indicated axis (with the Transform's position as the center). The greater the value is entered on one of these axes, the faster the rotation will be. 
+
+无论设定本地还是世界旋转轴，都将导致所产生的粒子绕轴表示（使用Transform组件位置作为中心）。在这些轴上键入更大的值，则旋转会更快。
+
+Setting values in the Local Axes will cause the rotating particles to adjust their rotation as the Transform's rotation changes, to match its local axes. 
+
+设置本地轴的值将导致旋转粒子调整它们的旋转，作为Transform组件的旋转变化，以配合本地轴。
+
+Setting values in the World Axes will cause the particles' rotation to be consistent, regardless of the Transform's rotation. 
+
+设置世界轴的值将导致粒子的旋转是始终如一的，而不管Transform组件的旋转。
+
+Forces & Damping（外力和阻尼）
+
+You use force to make particles accelerate in the direction specified by the force. 
+
+你可以使用外力使粒子沿该力所指的方向加速。
+
+Damping can be used to decelerate or accelerate without changing their direction: 
+
+阻尼可用于减速或加速而不改变它们的方向：
+
+· A value of 1 means no Damping is applied, the particles will not slow down or accelerate. 
+
+· A value of 0 means particles will stop immediately. 
+
+· A value of 2 means particles will double their speed every second. 
+
+· 值为1表示没有阻尼应用，这些粒子将不会减速或加速。
+
+· 值为0表示粒子将立即停止。
+
+· 值为2表示粒子每秒双倍速（加减速）。
+
+Destroying GameObjects attached to Particles（破坏游戏对象到粒子的附属关系）
+
+You can destroy the Particle System and any attached GameObject by enabling the AutoDestruct property. For example, if you have an oil drum, you can attach a Particle System that has Emit disabled and AutoDestruct enabled. On collision, you enable the Particle Emitter. The explosion will occur and after it is over, the Particle System and the oil drum will be destroyed and removed from the scene. 
+
+你可以通过启用AutoDestruct属性破坏粒子系统和任意游戏对象的附属关系。例如，如果你有一个油桶，可以附着一个粒子系统，该系统Emit禁用，AutoDestruct启用。发生碰撞，你启用粒子发射器，爆炸发生并结束后，粒子系统和油桶将被摧毁，并从现场删除。
+
+Note that automatic destruction takes effect only after some particles have been emitted. The precise rules for when the object is destroyed when AutoDestruct is on: 
+
+请注意，仅在粒子被发射后自动销毁才会生效。当对象被销毁时AutoDestruct正在使用的情况如下：
+
+· If there have been some particles emitted already, but all of them are dead now, or 
+
+· If the emitter did have Emit on at some point, but now Emit is off. 
+
+· 如果一些粒子已经产生，但它们都失效了，或者
+
+· 如果发射器Emit属性在某些点打开，但现在Emit属性关闭了
+
+Hints（提示）
+
+· Use the Color Animation to make your particles fade in & out over their lifetime - otherwise, you will get nasty-looking pops. 
+
+· Use the Rotation Axes to make whirlpool-like swirly motions. 
+
+· 使用动画颜色，让你的粒子在它们的持续时间内淡入淡出——否则，你会得到很难看的泡泡（pops）。
+
+· 使用旋转轴来制作旋涡状运动。
+
+Particle Collider（粒子碰撞器）
+
+The World Particle Collider is used to collide particles against other Colliders in the scene. 
+
+世界粒子碰撞器是用来对场景中的其他碰撞体发生粒子碰撞。
+
+
+A Particle System colliding with a Mesh Collider一个粒子系统与一个网格碰撞体发生碰撞
+
+Properties（属性）
+
+ 
+
+ 
+
+Bounce Factor
+
+弹力系数
+
+Particles can be accelerated or slowed down when they collide against other objects. This factor is similar to the Particle Animator's Damping property. 粒子在与其他物体碰撞时，可以加速或减缓。该属性与粒子动画的阻尼属性类似。
+
+Collision Energy Loss
+
+碰撞活力丢失
+
+Amount of energy (in seconds) a particle should lose when colliding. If the energy goes below 0, the particle is killed. 粒子碰撞时丢失的活力总和（每秒）。如果低于0，粒子被消灭。
+
+Min Kill Velocity
+
+最小消灭速率
+
+If a particle's Velocity drops below Min Kill Velocity because of a collision, it will be eliminated. 如果一个粒子因为碰撞，速度下降低于该值，它会被剔除。
+
+Collides with
+
+碰撞于…
+
+Which Layers the particle will collide against.粒子相对碰撞的层
+
+Send Collision Message
+
+发送碰撞消息
+
+If enabled, every particle sends out a collision message that you can catch through scripting. 如果启用，每个粒子发出一个碰撞消息，你可以通过脚本捕获。
+
+Details（细节）
+
+To create a Particle System with Particle Collider: 
+
+要创建带有粒子碰撞的一个粒子系统：
+
+1. Create a Particle System using GameObject->Create Other->Particle System 
+
+2. Add the Particle Collider using Component->Particles->World Particle Collider 
+
+1. 利用菜单GameObject->Create Other->Particle System创建一个粒子系统
+
+2. 使用Component->Particles->World Particle Collider添加粒子碰撞。
+
+Messaging（传送消息）
+
+If Send Collision Message is enabled, any particles that are in a collision will send the message OnParticleCollision() to both the particle's GameObject and the GameObject the particle collided with. 
+
+如果启用了Send Collision Message，发生碰撞的粒子将发送消息OnParticleCollision（）到这两个对象——粒子对象和与粒子相撞的对象。
+
+Hints（提示）
+
+· Send Collision Message can be used to simulate bullets and apply damage on impact. 
+
+· Particle Collision Detection is slow when used with a lot of particles. Use Particle Collision Detection wisely. 
+
+· Message sending introduces a large overhead and shouldn't be used for normal Particle Systems. 
+
+· 发送碰撞消息可用于模拟子弹和运用撞击损坏
+
+· 使用很多粒子时，粒子碰撞检测是缓慢的。明智地使用粒子碰撞检测。
+
+· 消息发送引入了大量的开销，不应该用于正常的粒子系统。
+
+Particle Renderer（粒子渲染器）
+
+The Particle Renderer renders the Particle System on screen. 
+
+粒子渲染器在屏幕上渲染粒子系统。
+
+
+The Particle Renderer Inspector粒子渲染器检视视图
+
+Properties（属性）
+
+ 
+
+ 
+
+Materials
+
+材质
+
+Reference to a list of Materials that will be displayed in the position of each individual particle. 将在每个粒子个体的位置显示的材质参考清单。
+
+Camera Velocity Scale相机速度比例
+
+The amount of stretching that is applied to the Particles based on Camera movement.基于相机运动的粒子的伸展总量。
+
+Stretch Particles
+
+展开粒子
+
+Determines how the particles are rendered. 确定粒子如何被渲染
+
+Billboard布告板
+
+The particles are rendered as if facing the camera.粒子好像面对镜头被渲染
+
+Stretched伸展
+
+The particles are facing the direction they are moving. 粒子面对它们正在移动的方向
+
+SortedBillboard
+
+分类布告板
+
+The particles are sorted by depth. Use this when using a blending material. 粒子按深度分类。当使用混合材质时用这个选项。
+
+VerticalBillboard
+
+垂直布告板
+
+All particles are aligned flat along the X/Z axes. 所有的粒子沿X / Z轴对准平面
+
+HorizontalBillboard
+
+水平布告板
+
+All particles are aligned flat along the X/Y axes. 所有的粒子沿X / Y轴对准平面
+
+Length Scale
+
+长度比例
+
+If Stretch Particles is set to Stretched, this value determines how long the particles are in their direction of motion. 如果展开粒子设置为伸展，这个值决定粒子在其运动方向有多长。
+
+Velocity Scale
+
+速度比例
+
+If Stretch Particles is set to Stretched, this value determines the rate at which particles will be stretched, based on their movement speed. 如果展开粒子设置为伸展，这个值决定粒子将被拉伸的比率，以它们的运动速率为基准
+
+UV Animation
+
+UV动画
+
+If either of these are set, the UV coordinates of the particles will be generated for use with a tile animated texture. See the section on Animated Textures below. 如果任何一个被设置，粒子的UV坐标将使用动画纹理来生成。查看下面关于动画纹理的部分
+
+X Tile  X贴片
+
+Number of frames located across the X axis.横穿X轴的帧数
+
+Y Tile  Y贴片
+
+Number of frames located across the Y axis.横穿Y轴的帧数
+
+Cycles 循环
+
+How many times to loop the animation sequence.动画序列的循环次数
+
+Details（细节）
+
+Particle Renderers are required for any Particle Systems to be displayed on the screen. 
+
+粒子渲染器对于任何粒子系统在屏幕上的显示是必需的。
+
+
+A Particle Renderer makes the Gunship's engine exhaust appear on the screen一个粒子渲染器使武装直升机的发动机排气出现在屏幕上
+
+Choosing a Material（选择材质）
+
+When setting up a Particle Renderer it is very important to use an appropriate material and shader that renders both sides of the material. Most of the time you want to use a Material with one of the built-in Particle Shaders. There are some premade materials in the Standard Assets->Particles->Sources folder that you can use. 
+
+当建立一个粒子渲染器，使用适当的材质和渲染材质两面的着色器是非常重要的。大部分时间你想使用的材质都有一个内置的粒子着色器。在标准资源Standard Assets->Particles->Sources文件夹中，你可以使用一些预制材质。
+
+Creating a new material is easy: 创建一个新材质很容易：
+
+1. Select Assets->Create Other->Material from the menu bar. 
+
+2. The Material has a shader popup, choose one of the shaders in the Particles group. Eg. Particles->Multiply. 
+
+3. Now assign a Texture. The different shaders use the alpha channel of the textures slightly differently, but most of the time a value of black will make it invisible and white in the alpha channel will display it on screen. 
+
+1. 从菜单条选择Assets->Create Other->Material
+
+2. 材质具有着色器弹出窗口，在粒子组中选择一种着色器。例如，粒子->多样的
+
+3. 现在，分配一个纹理。不同的着色器使用的纹理alpha通道略有不同，但大部分时间黑色值将会不可见，alpha通道中的白色将显示在屏幕上。
+
+Distorting particles（扭曲粒子）
+
+By default particles are rendered billboarded. That is simple square sprites. This is good for smoke and explosions and most other particle effects. 
+
+默认情况下粒子用布告板方式渲染。这是简单的方形，这对于烟雾、爆炸和其它大部分粒子效果是比较好的。
+
+Particles can be made to either stretch with the velocity. This is useful for sparks, lightning or laser beams. Length Scale and Velocity Scale affects how long the stretched particle will be. 
+
+粒子可向任意速度方向伸展。这对于火花、闪电或激光束是有用的。长度比例和速度比例影响粒子可伸展的长度。
+
+Sorted Billboard can be used to make all particles sort by depth. Sometimes this is necessary, mostly when using Alpha Blended particle shaders. This can be expensive and should only be used if it really makes a quality difference when rendering. 
+
+分类布告板可以用来使所有粒子按深度分类。有时候这是必要的，主要是在使用Alpha混合粒子着色器时。如果它真的在渲染时造成质量差异，那么这也可以是花费浩大的，唯一被使用的。
+
+Animated textures（动画纹理）
+
+Particle Systems can be rendered with an animated tile texture. To use this feature, make the texture out of a grid of images. As the particles go through their life cycle, they will cycle through the images. This is good for adding more life to your particles, or making small rotating debris pieces. 
+
+粒子系统可以使用动画贴图纹理来渲染。要使用此功能，把纹理输出到图像栅格中。由于粒子通过其生命周期去（运动），它们将通过图像来周期循环。这对于给你的粒子增加更多的生命，或制作小的旋转碎片是比较好的。
+
+Hints（提示）
+
+· Use Particle Shaders with the Particle Renderer. 
+
+· 和粒子渲染器一起使用粒子着色器
+
+http://www.cnblogs.com/sevenyuan/archive/2012/08/07/2626771.html

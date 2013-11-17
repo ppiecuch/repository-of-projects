@@ -1,0 +1,27 @@
+Maven是一个java工具，所以请确保jdk环境已经正确安装在你的机器上。 
+
+首先，请在此下载Maven。这里选择的是apache-maven-2.2.1-bin.zip 
+
+window 7 
+
+1.解压apache-maven-2.2.1-bin.zip 到你想要安装的目录。这里我们假设你选择了 C:\Program Files\Apache Software Foundation.压缩档案将会创建子目录apache-maven-2.2.1 
+
+2.右键单击 计算机—>属性—>高级系统设置—>环境变量 在用户环境变量中 新建 M2_HOME 变量，值为 C:\Program Files\Apache Software Foundation\apache-maven-2.2.1 
+
+3.继续新建 M2 变量，值为 %M2_HOME%\bin 
+
+4.可选：继续新建 MAVEN_OPTS 变量，值为 -Xms256m -Xmx512m，指定jvm的运行参数。 
+
+5.在环境变量path中追加 %M2% 
+
+6.确定环境变量JAVA_HOME指向JDK的安装目录。例如 C:\Program Files\Java\jdk1.5.0_02并且环境变量path中有%JAVA_HOME\bin. 
+
+7.打开一个新的命令行窗口，执行mvn --version 检查maven是否安装成功。成功安装后，输出类似如下： 
+
+Apache Maven 2.2.1 (r801777; 2009-08-07 03:16:01+0800) 
+Java version: 1.6.0_17 
+Java home: C:\Program Files\Java\jdk1.6.0_17\jre 
+Default locale: zh_CN, platform encoding: GBK 
+OS name: "windows 7" version: "6.1" arch: "x86" Family: "windows" 
+
+http://zuoqiang.iteye.com/blog/1563250
