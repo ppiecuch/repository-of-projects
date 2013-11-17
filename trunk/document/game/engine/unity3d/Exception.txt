@@ -1,0 +1,14 @@
+[Exp]
+Problem with speed reset after crossfadeQueued
+[Analyse]
+CrossFadeQueued is not supposed to clone properties from "original" state, it only finds clip with same name (at least as far as I remember). You can always do this:
+
+AnimationState newWalk = objanimation.CrossFadeQueued("walk",0.2f,QueueMode.PlayNow);
+newWalk.speed = 2;
+[Solved]
+http://answers.unity3d.com/questions/358609/problem-with-speed-reset-after-crossfadequeued.html
+
+[Exp]
+"UnityEditor" namespace not found
+[Solved]
+http://answers.unity3d.com/questions/316805/unityeditor-namespace-not-found.html

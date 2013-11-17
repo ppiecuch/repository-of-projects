@@ -14,6 +14,7 @@ DAU/MAU比例是社交游戏的重要参数，同社交游戏成败息息相关。一般最低极限是0.2。这保
 ACT
 RPG(Role Playing Game)
 FPS
+TPS 第三人称射击游戏
 SLG
 STG（Shooting Game）：射击类游戏。玩家需要操纵一个物体（通常是飞机）发射子弹击毁敌机，同时躲避敌机的子弹的游戏。分为2D和3D两种。
 RTS
@@ -28,3 +29,5 @@ teleport		远距传物
 cloak			披风，斗篷
 treasure chest	藏宝箱
 combo points	连击点
+CD(cool down time)
+Duration	持续时间

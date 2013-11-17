@@ -1,0 +1,441 @@
+From: =?gb2312?B?08kgV2luZG93cyBJbnRlcm5ldCBFeHBsb3JlciA5ILGjtOY=?=
+Subject: DeCasteljau Algorithm
+Date: Thu, 10 Oct 2013 19:27:06 +0800
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----=_NextPart_000_0011_01CEC5EE.B5056100"
+X-MimeOLE: Produced By Microsoft MimeOLE V6.1.7601.17609
+
+这是 MIME 格式的多方邮件。
+
+------=_NextPart_000_0011_01CEC5EE.B5056100
+Content-Type: text/html;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://cubic.org/docs/bezier.htm
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<?xml-stylesheet type=3D"text/css" href=3D"/cubic.css" ?><HTML =
+xml:lang=3D"en"=20
+xmlns=3D"http://www.w3.org/1999/xhtml"><HEAD><TITLE>DeCasteljau =
+Algorithm</TITLE>
+<META content=3D"text/html; charset=3Dgb2312" http-equiv=3DContent-Type>
+<META content=3Dtext/css http-equiv=3DContent-Style-Type><LINK =
+rel=3Dstylesheet=20
+type=3Dtext/css href=3D"http://cubic.org/cubic.css">
+<META name=3DGENERATOR content=3D"MSHTML 9.00.8112.16514"></HEAD>
+<BODY>
+<H1>DeCasteljau Algorithm</H1>
+<P>Hamburg (Germany), the 19th September 1999. Written by Nils =
+Pipenbrinck aka=20
+Submissive/Cubic &amp; $eeN</P>
+<H2>Introduction</H2>
+<P>I learned a nice way to calculate bezier-curves a couple of weeks =
+ago. This=20
+algorithm is that nice and easy to understand. So if you ever had =
+problems=20
+remembering the basis-matrix of bezier curves don't worry... after this =
+article=20
+you'll never need it again.<BR>First remember what a bezier curve =
+is:</P>
+<P><IMG alt=3D"bezier-curve with control-points"=20
+src=3D"http://cubic.org/docs/img/bezier1.png"></P>
+<P>It's a curve defined by 4 control-points (named a to d). The curve =
+starts at=20
+the first point (a) and smoothly interpolates into the last one (d). The =
+two=20
+points (b and c) in the middle define the incoming and outgoing tangents =
+and=20
+indirectly the curvature of our bezier-curve.</P>
+<H2>DeCasteljau Subdivision</H2>
+<P>I think the best way to explain the DeCasteljau algorithm is to use =
+an=20
+example. The bezier-curve has 4 control-points. And we can connect these =
+4=20
+points with 3 lines (shown in red). I also build 3 new points which are =
+the=20
+midpoints of the new lines (shown as green dots).</P>
+<P><IMG alt=3Dstep1 src=3D"http://cubic.org/docs/img/bezier2.png"></P>
+<P>These points can again be used to build two new lines (green). Again =
+we also=20
+calculate the midpoints of these lines (blue dots).</P>
+<P><IMG alt=3Dstep2 src=3D"http://cubic.org/docs/img/bezier3.png"></P>
+<P>Finally we connect the blue dots and build a final line (blue. If you =
+zoom=20
+into the image you might be able to see the blue line.. it's hard to =
+see). Again=20
+we calculate the midpoint. This point is one of the points that define =
+the=20
+bezier-curve.</P>
+<P><IMG alt=3Dstep3 src=3D"http://cubic.org/docs/img/bezier4.png"></P>
+<P>Now we can calculate one single point of the bezier curve. That's =
+nice, but=20
+of no real use. Usually we want to calculate any point on the curve. To =
+do this=20
+we only have to change the way we calculate the new points. Instead of =
+always=20
+taking the midpoint we can use simple <B>linear interpolation</B> to =
+calculate=20
+any point in the lines. If we do so we can calculate any point on the=20
+bezier-curve. And that's what we want to do.</P>
+<H2>Example Code</H2>
+<P>I think there is not much to say about this simple C++ code. It's =
+easy, and=20
+with the explanations above you should be able to understand how it =
+works. Feel=20
+free to copy and modify this code...</P><PRE><TT><B><FONT =
+color=3D#000080>#include</FONT></B> <FONT =
+color=3D#ff0000>&lt;cstdio&gt;</FONT>
+
+<B><FONT color=3D#0000ff>struct</FONT></B> <FONT =
+color=3D#008080>point</FONT>
+<FONT color=3D#ff0000>{</FONT>
+    <FONT color=3D#009900>float</FONT> x<FONT color=3D#990000>;</FONT>
+    <FONT color=3D#009900>float</FONT> y<FONT color=3D#990000>;</FONT>
+<FONT color=3D#ff0000>}</FONT><FONT color=3D#990000>;</FONT>
+
+<I><FONT color=3D#9a1900>// simple linear interpolation between two =
+points</FONT></I>
+<FONT color=3D#009900>void</FONT> <B><FONT =
+color=3D#000000>lerp</FONT></B><FONT color=3D#990000>(</FONT>point<FONT =
+color=3D#990000>&amp;</FONT> dest<FONT color=3D#990000>,</FONT> <B><FONT =
+color=3D#0000ff>const</FONT></B> point<FONT color=3D#990000>&amp;</FONT> =
+a<FONT color=3D#990000>,</FONT> <B><FONT =
+color=3D#0000ff>const</FONT></B> point<FONT color=3D#990000>&amp;</FONT> =
+b<FONT color=3D#990000>,</FONT> <B><FONT =
+color=3D#0000ff>const</FONT></B> <FONT color=3D#009900>float</FONT> =
+t<FONT color=3D#990000>)</FONT>
+<FONT color=3D#ff0000>{</FONT>
+    dest<FONT color=3D#990000>.</FONT>x <FONT color=3D#990000>=3D</FONT> =
+a<FONT color=3D#990000>.</FONT>x <FONT color=3D#990000>+</FONT> <FONT =
+color=3D#990000>(</FONT>b<FONT color=3D#990000>.</FONT>x<FONT =
+color=3D#990000>-</FONT>a<FONT color=3D#990000>.</FONT>x<FONT =
+color=3D#990000>)*</FONT>t<FONT color=3D#990000>;</FONT>
+    dest<FONT color=3D#990000>.</FONT>y <FONT color=3D#990000>=3D</FONT> =
+a<FONT color=3D#990000>.</FONT>y <FONT color=3D#990000>+</FONT> <FONT =
+color=3D#990000>(</FONT>b<FONT color=3D#990000>.</FONT>y<FONT =
+color=3D#990000>-</FONT>a<FONT color=3D#990000>.</FONT>y<FONT =
+color=3D#990000>)*</FONT>t<FONT color=3D#990000>;</FONT>
+<FONT color=3D#ff0000>}</FONT>
+
+<I><FONT color=3D#9a1900>// evaluate a point on a bezier-curve. t goes =
+from 0 to 1.0</FONT></I>
+<FONT color=3D#009900>void</FONT> <B><FONT =
+color=3D#000000>bezier</FONT></B><FONT color=3D#990000>(</FONT><FONT =
+color=3D#008080>point</FONT> <FONT color=3D#990000>&amp;</FONT>dest<FONT =
+color=3D#990000>,</FONT> <B><FONT color=3D#0000ff>const</FONT></B> =
+point<FONT color=3D#990000>&amp;</FONT> a<FONT color=3D#990000>,</FONT> =
+<B><FONT color=3D#0000ff>const</FONT></B> point<FONT =
+color=3D#990000>&amp;</FONT> b<FONT color=3D#990000>,</FONT> <B><FONT =
+color=3D#0000ff>const</FONT></B> point<FONT color=3D#990000>&amp;</FONT> =
+c<FONT color=3D#990000>,</FONT> <B><FONT =
+color=3D#0000ff>const</FONT></B> point<FONT color=3D#990000>&amp;</FONT> =
+d<FONT color=3D#990000>,</FONT> <B><FONT =
+color=3D#0000ff>const</FONT></B> <FONT color=3D#009900>float</FONT> =
+t<FONT color=3D#990000>)</FONT>
+<FONT color=3D#ff0000>{</FONT>
+    <FONT color=3D#008080>point</FONT> ab<FONT =
+color=3D#990000>,</FONT>bc<FONT color=3D#990000>,</FONT>cd<FONT =
+color=3D#990000>,</FONT>abbc<FONT color=3D#990000>,</FONT>bccd<FONT =
+color=3D#990000>;</FONT>
+    <B><FONT color=3D#000000>lerp</FONT></B><FONT =
+color=3D#990000>(</FONT>ab<FONT color=3D#990000>,</FONT> a<FONT =
+color=3D#990000>,</FONT>b<FONT color=3D#990000>,</FONT>t<FONT =
+color=3D#990000>);</FONT>           <I><FONT color=3D#9a1900>// point =
+between a and b (green)</FONT></I>
+    <B><FONT color=3D#000000>lerp</FONT></B><FONT =
+color=3D#990000>(</FONT>bc<FONT color=3D#990000>,</FONT> b<FONT =
+color=3D#990000>,</FONT>c<FONT color=3D#990000>,</FONT>t<FONT =
+color=3D#990000>);</FONT>           <I><FONT color=3D#9a1900>// point =
+between b and c (green)</FONT></I>
+    <B><FONT color=3D#000000>lerp</FONT></B><FONT =
+color=3D#990000>(</FONT>cd<FONT color=3D#990000>,</FONT> c<FONT =
+color=3D#990000>,</FONT>d<FONT color=3D#990000>,</FONT>t<FONT =
+color=3D#990000>);</FONT>           <I><FONT color=3D#9a1900>// point =
+between c and d (green)</FONT></I>
+    <B><FONT color=3D#000000>lerp</FONT></B><FONT =
+color=3D#990000>(</FONT>abbc<FONT color=3D#990000>,</FONT> ab<FONT =
+color=3D#990000>,</FONT>bc<FONT color=3D#990000>,</FONT>t<FONT =
+color=3D#990000>);</FONT>       <I><FONT color=3D#9a1900>// point =
+between ab and bc (blue)</FONT></I>
+    <B><FONT color=3D#000000>lerp</FONT></B><FONT =
+color=3D#990000>(</FONT>bccd<FONT color=3D#990000>,</FONT> bc<FONT =
+color=3D#990000>,</FONT>cd<FONT color=3D#990000>,</FONT>t<FONT =
+color=3D#990000>);</FONT>       <I><FONT color=3D#9a1900>// point =
+between bc and cd (blue)</FONT></I>
+    <B><FONT color=3D#000000>lerp</FONT></B><FONT =
+color=3D#990000>(</FONT>dest<FONT color=3D#990000>,</FONT> abbc<FONT =
+color=3D#990000>,</FONT>bccd<FONT color=3D#990000>,</FONT>t<FONT =
+color=3D#990000>);</FONT>   <I><FONT color=3D#9a1900>// point on the =
+bezier-curve (black)</FONT></I>
+<FONT color=3D#ff0000>}</FONT>
+
+<I><FONT color=3D#9a1900>// small test program.. just prints the =
+points</FONT></I>
+<FONT color=3D#009900>int</FONT> <B><FONT =
+color=3D#000000>main</FONT></B><FONT color=3D#990000>()</FONT>
+<FONT color=3D#ff0000>{</FONT>
+    <I><FONT color=3D#9a1900>// 4 points define the bezier-curve. These =
+are the points used</FONT></I>
+    <I><FONT color=3D#9a1900>// for the example-images on this =
+page.</FONT></I>
+    <FONT color=3D#008080>point</FONT> a <FONT =
+color=3D#990000>=3D</FONT> <FONT color=3D#ff0000>{</FONT> <FONT =
+color=3D#993399>40</FONT><FONT color=3D#990000>,</FONT> <FONT =
+color=3D#993399>100</FONT> <FONT color=3D#ff0000>}</FONT><FONT =
+color=3D#990000>;</FONT>
+    <FONT color=3D#008080>point</FONT> b <FONT =
+color=3D#990000>=3D</FONT> <FONT color=3D#ff0000>{</FONT> <FONT =
+color=3D#993399>80</FONT><FONT color=3D#990000>,</FONT> <FONT =
+color=3D#993399>20</FONT>  <FONT color=3D#ff0000>}</FONT><FONT =
+color=3D#990000>;</FONT>
+    <FONT color=3D#008080>point</FONT> c <FONT =
+color=3D#990000>=3D</FONT> <FONT color=3D#ff0000>{</FONT> <FONT =
+color=3D#993399>150</FONT><FONT color=3D#990000>,</FONT> <FONT =
+color=3D#993399>180</FONT> <FONT color=3D#ff0000>}</FONT><FONT =
+color=3D#990000>;</FONT>
+    <FONT color=3D#008080>point</FONT> d <FONT =
+color=3D#990000>=3D</FONT> <FONT color=3D#ff0000>{</FONT> <FONT =
+color=3D#993399>260</FONT><FONT color=3D#990000>,</FONT> <FONT =
+color=3D#993399>100</FONT> <FONT color=3D#ff0000>}</FONT><FONT =
+color=3D#990000>;</FONT>
+
+    <B><FONT color=3D#0000ff>for</FONT></B> <FONT =
+color=3D#990000>(</FONT><FONT color=3D#009900>int</FONT> i<FONT =
+color=3D#990000>=3D</FONT><FONT color=3D#993399>0</FONT><FONT =
+color=3D#990000>;</FONT> i<FONT color=3D#990000>&lt;</FONT><FONT =
+color=3D#993399>1000</FONT><FONT color=3D#990000>;</FONT> <FONT =
+color=3D#990000>++</FONT>i<FONT color=3D#990000>)</FONT>
+    <FONT color=3D#ff0000>{</FONT>
+	<FONT color=3D#008080>point</FONT> p<FONT color=3D#990000>;</FONT>
+	<FONT color=3D#009900>float</FONT> t <FONT color=3D#990000>=3D</FONT> =
+<B><FONT color=3D#0000ff>static_cast</FONT></B><FONT =
+color=3D#990000>&lt;</FONT><FONT color=3D#009900>float</FONT><FONT =
+color=3D#990000>&gt;(</FONT>i<FONT color=3D#990000>)/</FONT><FONT =
+color=3D#993399>999.0</FONT><FONT color=3D#990000>;</FONT>
+	<B><FONT color=3D#000000>bezier</FONT></B><FONT =
+color=3D#990000>(</FONT>p<FONT color=3D#990000>,</FONT>a<FONT =
+color=3D#990000>,</FONT>b<FONT color=3D#990000>,</FONT>c<FONT =
+color=3D#990000>,</FONT>d<FONT color=3D#990000>,</FONT>t<FONT =
+color=3D#990000>);</FONT>
+	<B><FONT color=3D#000000>printf</FONT></B><FONT =
+color=3D#990000>(</FONT><FONT color=3D#ff0000>"%f %f</FONT><FONT =
+color=3D#cc33cc>\n</FONT><FONT color=3D#ff0000>"</FONT><FONT =
+color=3D#990000>,</FONT> p<FONT color=3D#990000>.</FONT>x<FONT =
+color=3D#990000>,</FONT> p<FONT color=3D#990000>.</FONT>y<FONT =
+color=3D#990000>);</FONT>
+    <FONT color=3D#ff0000>}</FONT>
+
+    <B><FONT color=3D#0000ff>return</FONT></B> <FONT =
+color=3D#993399>0</FONT><FONT color=3D#990000>;</FONT>
+<FONT color=3D#ff0000>}</FONT>
+</TT></PRE>
+<H2>Final Words (and thoughts)</H2>
+<P>One think I forgot.. This page here only dealt with cubic bezier =
+curves. You=20
+can also calculate quadratic beziers (the ones defined with just 3 =
+points). All=20
+you have to do is start with 3 instead of 4 points. The same can of =
+course be=20
+done with more than 4 points. If you need a higher order bezier just use =
+as many=20
+points as you want to... the algorithm works with any order beziers (I =
+wonder=20
+who needs higher order curves...). As always you might want to contact =
+me.</P>
+<HR>
+
+<P><SMALL>&copy; by submissive</SMALL> <A=20
+href=3D"http://validator.w3.org/check?uri=3Dreferer"><IMG alt=3D"Valid =
+XHTML 1.1!"=20
+src=3D"http://www.w3.org/Icons/valid-xhtml11" width=3D88 =
+height=3D31></A>=20
+</P></BODY></HTML>
+
+------=_NextPart_000_0011_01CEC5EE.B5056100
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://cubic.org/docs/img/bezier1.png
+
+iVBORw0KGgoAAAANSUhEUgAAAPIAAAC4CAMAAADudUGcAAAANlBMVEX/////7+//39//z8//v7//
+r6//n5//j4//f3//cHD/YGD/UFD/QED/MDD/ICD/EBD/AAAAAAAJb3bPAAAAFnRFWHRTb2Z0d2Fy
+ZQBnaWYycG5nIDIuNC430zSzgQAAApZJREFUeNrt3V1zqyAUheENqBBFWPz/P9uLpHMyPZqYDxXd
+67nq9EJ4I5qko1aEaJpT1mtDjtqSPbQlS8NkJp812fjgdCW7DKDXlJxi1wxAUJQ8GhG5IGs7fRnA
+KUuWiIbJ5wTgX7KWYuD3WO61Jfts9SQnXKz4pOV8DUCk6+PQGSEiIiIiIiIiIiIiIiIiIiIiIiIi
+IiIiIiI6h1JKKapir7l3P547eOo1OHPw/J5XFXza6udJh4xuevfWLj5stfGYvcl8ccrRomfvq3+l
+41jRc8kvRhwpeib59YLjRE8nvzX9A0S3Yxwvk8nvzr325i5ZkX7yjP3+zKuObq6teSL5k2nXvLpj
+njuWP5x0tdFm/nk3H8+40uj5R/x8Y7pVRjdI08lfmmyFzRaw08mbfQ3b4TPIaERk/JP8xYlWF+0y
+xrYdErxdYydXubpdAnITc7hLBr789K6KogGIuObP44+BrzdXEz3TtkZyLYf0lsl1RJe5tlWKa4gu
+ZbW2Og/pvQbfLXrPJbbP0A9GdT54e7roRyP2uW1HdOfa0w/XdIcg4m5fr85yaD0eKSCIyDbn8Y2i
+nw1jghFpt3rr2iB6yRA2jH67d+uVoxdtPqR2q4W9evSyTQc0sm3yatVLt5oh2yevEb18i4AXCcD2
+/z+o7PW3px6IqckYO5EdossOL54JsbfSxXa3j/6lxvPC+tVl53VykJ19/GuxXrpi8kRXVz7vPufF
+pOXO/7+Sk1MTSkREREREREREREREREREREREREREREQPtWNMg9NU3CUrJmerp7hBJyIDgp7kAUZu
+d4xrkSHaAEZf8vXOUqekFiLx9qjIi5JiQDxwERHv9STLCKSYRqMo2QwAopJz2O9Dx2yj6KMX0Zp+
+AKneJXeEWM5aAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0011_01CEC5EE.B5056100
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://cubic.org/docs/img/bezier2.png
+
+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
+
+------=_NextPart_000_0011_01CEC5EE.B5056100
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://cubic.org/docs/img/bezier3.png
+
+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
+4X/oyU9wqjgwSQAAAABJRU5ErkJggg==
+
+------=_NextPart_000_0011_01CEC5EE.B5056100
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: http://cubic.org/docs/img/bezier4.png
+
+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
+
+------=_NextPart_000_0011_01CEC5EE.B5056100
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: http://www.w3.org/Icons/valid-xhtml11
+
+iVBORw0KGgoAAAANSUhEUgAAAFgAAAAfCAMAAABUFvrSAAADAFBMVEUBAAAIBgMMCQQKCgoSDgYX
+EgkaFAoUFBQcHBwlHQ4vJRIwJhM2KxUjIyMoKCg0MzI7OztBNBpGOBxOPh5OSz9TQiFnUilqVCp1
+Rzl0XC5/ZTJOTk5ST0tWUk1VVVVcXFxqXUplZWVra2tya2FwcHB7e3sAWpwIX58JYJ8OY6ERZaIV
+aKQaa6Yebaghb6klcqopdawxea82fbE4frI+grRFhrZMi7pVkb1alL9dlsBkm8NoncRtocZ0pcl8
+qsyWBAOZAACcCASIIBmdNiegDge3PB6mPiqBZzODaDSJbTaOcTiUdjuXeDy6QiG/TCahclPATifB
+UCjIXy/QbzfWej3Yfj+Rh2ulhEKvjEazj0e0gVi3kkm6lEq+mEyjkmuzn2e7pnLFnU7eikXOpFHR
+p1PVqlXarlfesVjjlUrmm03poFDtqVTitFrmuFzqu13zwWD7xWL+y2WDg4OXl5eYmJippZ61rZis
+rKy0tLS/v7+Crs6FsNCLtNKQt9SWu9aYvNebvtifwdqjw9uox92ryd6yzeG20OPCwsLMzMzU1NTA
+1ufG2ujN3+zT4+7d6fL/7Mbn5+fs7Ozl7vXp8fbu9Pj09PTy9/r1+Pv+/v7MzMwAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAACCrylyAAAAmnRSTlP/////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+//////8Ay7CFYwAAAAFiS0dE/6UH8sUAAAAJcEhZcwAAAEgAAABIAEbJaz4AAAMlSURBVEjH7Zb7
+UxJRFMcvGjLUmpYhpWZl42GE8JnhqNjSa8Swxp5OSqULQ1rsI6d0zHGSgQR8lAizt/+2c3d5i6My
+1k99Z7icu8x+9u73nnMuJH7q+vKbicTp0fqpHF/v317/D64OHBIkHAKSKIhsIgcFpqAcYNdFQVBk
+IVQV+DVpVgKEk31kQlE4EjYTJnOYEKuiNBGDEibcAXDE6ca717rXGCRtszlR3S5KM5874nRF1a2w
+kJlzJKjkwILfSqx+AcE1UogcAt4FBxJ/wAADR0HXGFVb8YZEQ0IHi0ZCvAqCLT6fmYQVZYI9Ikwu
+1Dy+UseRimDaC9s42mEfxyFwpVIb4MjQZXK+s9FUu5fdPCsxSAysqQBusprPjHOVV0zdsIpjH0Q0
+/C5Ve1jY2ogu3OjMZkXAYGR2+ohXkrlicIAYxMPASeindB8Afd2CXrSbzamJ/aRmdLDMGYJNZDbv
+cQGsWFsUDXx2enpaZmCez2dFF7qwAdBF6Ri46b4dtnDr6ouzYhwNFo11EoLlErCFLVMDM0kIvscz
+sg524au7oA+SaHeSDgOMpnHvisGfQjJuYEiSQmh0mE20SA6JDBwOYcSEK77PM2XBEXCpXbei4E6B
+HR/jAOhX6VI1lSc/4nXp4DTYYzCStvV+hyE237JDlG5WA36S5eYqbwB9iNFB0DOD0hEYrqpX5Lk5
+8DcAm4rZAJDW5jHoKesVHMGcYBIwEsref/KjHkzluTnwNsAdVoJwW0dFwbmnR5mMDh63ZMEB78Uy
+sPyQf7BY4N7li5uQE9a1Elyj60OaFYObOrljM2tFC5nJgprLwOz9PR/y3Msl3W0EUloJ7mCyudMR
+O0TUa78YtzaRB89WBr/QeJ553V/P09K2GetjY7IbM8QBNmClFze1X6snS/SoFcuTfEGeN2X9WF3V
+vsbwszPqcAyzPUy0mxqWaQnYa61ghTxV4C6etNEHWcEaWe36tQ5fmhbPctyFE58g0gzKr8z5FZFF
+c2X5+zzHPfXD9GWWe/qn9LxH4/6F439B4/6T/xUrR+rru+Pr1c0cuPUYunSY2g5cudrWoIH/AGtu
+hy4iyA0OAAAAAElFTkSuQmCC
+
+------=_NextPart_000_0011_01CEC5EE.B5056100
+Content-Type: text/css;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Location: http://cubic.org/cubic.css
+
+BODY {
+	BACKGROUND: white; COLOR: black
+}
+IMG {
+	BORDER-RIGHT-WIDTH: 0px; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: =
+0px; BORDER-LEFT-WIDTH: 0px
+}
+
+------=_NextPart_000_0011_01CEC5EE.B5056100--

@@ -1,0 +1,12 @@
+Private Sub ComboBox1_LostFocus()
+'MsgBox ComboBox1.Value
+With ComboBox1
+.Clear
+.AddItem "A"
+.AddItem "B"
+.AddItem "C"
+.ListIndex = 0
+.ColumnCount = 3
+.Width = 30
+End With
+End Sub

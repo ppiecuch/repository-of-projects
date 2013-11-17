@@ -1,0 +1,19 @@
+public var isRendering:boolean=false;
+private var lastTime:float=0;
+private var curtTime:float=0;
+
+
+function Update()
+{
+isRendering=curtTime!=lastTime?true:false;
+lastTime=curtTime;
+}
+
+
+function OnWillRenderObject()
+{
+curtTime=Time.time;
+}
+
+如此简单！如此巧妙！！
+http://blog.csdn.net/we000636/article/details/7407207

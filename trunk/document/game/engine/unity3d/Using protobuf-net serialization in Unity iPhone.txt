@@ -1,0 +1,281 @@
+If performance is an issue for your serialization in a Unity iPhone project, this post shows you how to use the protobuf-net library.
+Some Background
+
+As part of a new game project I'm working on, I had to store level information in a file and read it in for each new level. I had created a simple level editor as a windows WPF C# project and then I would serialize my level model class onto the file system then include it in my Unity project to be loaded in during runtime.
+
+I initially used simple XML serialization, but as the levels increased in complexity it was taking longer and longer (well, 100s of miliseconds, but every bit counts ;-) to deserialize. So, off to the web to find the fastest and easiest serialization. The best candidate was Marc Gravell's protobuf-net, which provides 'Fast, portable, binary serialization for .Net' using Google's protocol buffers technology. And he's not kidding on the 'Fast' part either, see the performance stats here.
+
+So I grabbed the library, chuck it into Unity and start testing. It worked in Unity Windows, worked in Unity Mac but when I deployed it to my iPhone I hit this:
+
+    ExecutionEngineException: Attempting to JIT compile method
+
+Now, I'm no expert on the inner working of .Net and it's relationship with iOS running Mono, but according to this thread on the Unity forums, the culprit is the JIT (Just in Time) compilation of classes that have not been seen by the system before. Mono on iOS is an AOT (Ahead of Time) only system, so that's why it craps out. I'm sure smarter people than me could provide a better explanation, but that will do for now.
+
+So, I emailed Marc Gravell for help because he mentioned in this thread that version 2 of protobuf-net would have a 'pre-compile to dll' option, meaning that the serializer/deserializer classes can be pre-made in a dll instead of on the fly (and JIT'ed). I think that's how it works.
+
+Anyway, he sent me an alpha version of a Unity iPhone friendly protobuf-net and that's the one that works. Woohoo.
+
+I also have to say that this is all info that Marc sent me so all credit goes to him here. I wouldn't know a protocol buffer if it came up and bit me in the arse to be honest.
+The Solution
+
+First up, download the alpha version of the protobuf-net libraries. The link Marc sent me is this one but go check out the site to see if there is a later version.
+
+This contains two libraries, the 'Light Framework' and 'Full Framework' versions of protobuf-net. The basic procedure is this:
+
+    Create a library dll (assembly) of the model classes you want to serialize/deserialize. That is, just create a new 'Class Library' Visual Studio project and have it contain only your model. (I don't use MonoDevelop but I'm sure it's a similar process). You will have to reference the 'Light Framework' dll in this project in order to use the  [ProtoContract]/[ProtoMember] attributes, described in the Getting Started guide. Build this project to produce your MyModel.dll.
+
+?
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+	
+namespace ProtoTest
+{
+    // Simple model classes, with some inheritence and generics thrown in.
+    [ProtoContract]
+    public class MyModel
+    {
+        [ProtoMember(1)]
+        public int int1 { get; set; }
+        [ProtoMember(2)]
+        public TestEnum enum1 { get; set; }
+ 
+        public List<int> intList { get; set; }
+        [ProtoMember(3)]
+        public List<float> floatList { get; set; }
+        [ProtoMember(4)]
+        public List<string> stringList { get; set; }
+ 
+        [ProtoMember(5)]
+        public List<anotherclass> anotherClassList { get; set; }
+    }
+ 
+    [ProtoContract, ProtoInclude(10, typeof(DerivedClass))]
+    public class AnotherClass
+    {
+        [ProtoMember(1)]
+        public string string1 { get; set; }
+    }
+ 
+    [ProtoContract]
+    public class DerivedClass : AnotherClass
+    {
+        [ProtoMember(1)]
+        public float float1 { get; set; }
+    }
+ 
+    public enum TestEnum
+    {
+        run,
+        walk,
+        skip
+    }
+}
+</anotherclass></string></float></int>
+
+    Note: Make sure your model project is set to .Net 2.0 in the project properties, otherwise Unity will throw up the following error:
+
+        Unhandled Exception: System.TypeLoadException: Could not load type 'System.Runtime.Versioning.TargetFrameworkAttribute' from assembly 'MyModel' 
+
+    Next you need to create the serilization/deserialization classes. So create a new 'Console Application' Visual Studio project. Now, for this one you need to reference the Full Framework protobuf-net library as well as obviously your newly created MyModel.dll assembly. 
+    Now you need the code to create the libraries.
+
+?
+1
+2
+3
+4
+5
+6
+7
+	
+var model = TypeModel.Create();
+ 
+model.Add(typeof(AnotherClass), true);
+// Note: you don't need to add DerivedClass here, in fact it craps out if you do.
+model.Add(typeof(TestEnum), true);
+model.Add(typeof(MyModel), true);
+model.Compile("MySerializer", "MySerializer.dll");
+
+    This will output 'MySerializer.dll' 
+
+    Now we have our serialization library that we can use in our Unity project. So now you have to add three assemblies to your Unity iPhone project:
+        MyModel.dll
+        MySerializer.dll
+        Protobuf-net.dll (Light Framework)
+
+And we're good to go.
+
+To serialize the files in my external application, I used the following code. I haven't played around with writing files to the iOS file system so I won't post that code, but I'm sure it's similar once you get the paths correct.
+?
+1
+2
+3
+4
+5
+6
+7
+8
+	
+MyModel myNewModel = new MyModel();
+ 
+MySerializer mySerializer = new MySerializer();
+ 
+using(var file = File.Create("TestFile001.bytes"))
+{
+    mySerializer.Serialize(file, myNewModel);
+}
+
+In my case I was creating my game level files in an external application, so having the libraries external was actually more convenient. Once I had run my level editor app and created the binary serialized output files, I figured the easiest way to load them in Unity was via TextAsset class. TextAsset can be used to load files from the Resources folder just like any other resource, and despite the name, it is also fine for binary files. 
+
+Note: From the Unity docs on TextAsset
+
+    If you're using the text asset to contain binary data, you should make sure the file has the .bytes extension. For any other of the extensions the TextImporter will try to strip nonascii characters if it is unable to parse the file as an utf8 string.
+
+So inside our Unity project scripts, to read in the binary file we just use this.
+?
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+	
+TextAsset textFile = Resources.Load("TestFile001") as TextAsset;
+ 
+MySerializer mySerializer = new MySerializer();
+ 
+MyModel readInMyModel;
+ 
+using (System.IO.Stream s = new System.IO.MemoryStream(textFile.bytes))
+{
+    readInMyModel = mySerializer.Deserialize(s, null, typeof(MyModel)) as MyModel;
+}
+
+I had a look via Reflector and the second parameter to Deserialize() there is used in case your type variable is null, so I assume you can use either one.
+
+And there you have it. A bit more work than just using a library directly, but if performance is an issue then it is well worth the effort. I haven't done proper metrics yet, but from a quick look it seems at least an order of magnitude faster than the XmlSerializer I was using before.
+
+ 
+
+Edit: In response to the comment below about not being able to use Vector3.
+?
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+	
+[ProtoContract]
+public class MyVector3
+{
+    [ProtoMember(1)]
+    public float x { get; set; }
+ 
+    [ProtoMember(2)]
+    public float y { get; set; }
+ 
+    [ProtoMember(3)]
+    public float z { get; set; }
+ 
+    public MyVector3()
+    {
+        this.x = 0.0f;
+        this.y = 0.0f;
+        this.z = 0.0f;
+    }
+ 
+    public MyVector3(float x, float y, float z)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+ 
+    public static implicit operator Vector3(MyVector3 v)
+    {
+        return new Vector3(v.x, v.y, v.z);
+    }
+ 
+    public static implicit operator MyVector3(Vector3 v)
+    {
+        return new MyVector3(v.x, v.y, v.z);
+    }
+}
+
+http://www.frictionpointstudios.com/blog/2011/3/31/using-protobuf-net-serialization-in-unity-iphone.html
