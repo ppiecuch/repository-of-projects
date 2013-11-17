@@ -39,6 +39,8 @@ namespace _13List
             persons.Add(p3);
             persons.Add(p4);
 
+            
+
             //定义好默认比较规则后，就可以通过不带参数的Sort方法对集合进行排序，如下所示:
             //按照默认规则对集合进行排序
             //refer to:http://www.cnblogs.com/yuliantao/archive/2011/01/23/1942451.html

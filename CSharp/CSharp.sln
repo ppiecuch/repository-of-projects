@@ -69,6 +69,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "31Predicate", "31Predicate\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "32Clock", "32Clock\32Clock.csproj", "{ECFAB75E-4CC8-4BA1-9EF2-4464656AAC27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "33I18NManager", "33I18NManager\33I18NManager.csproj", "{98F88F5F-3143-4F32-B129-0D2A4CCCD56D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -211,6 +213,10 @@ Global
 		{ECFAB75E-4CC8-4BA1-9EF2-4464656AAC27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECFAB75E-4CC8-4BA1-9EF2-4464656AAC27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECFAB75E-4CC8-4BA1-9EF2-4464656AAC27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98F88F5F-3143-4F32-B129-0D2A4CCCD56D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98F88F5F-3143-4F32-B129-0D2A4CCCD56D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98F88F5F-3143-4F32-B129-0D2A4CCCD56D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98F88F5F-3143-4F32-B129-0D2A4CCCD56D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
