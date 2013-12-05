@@ -172,11 +172,27 @@ namespace _07Inherit
     class Super : Derived
     {   
         public override void test(){
-            Console.WriteLine("test");
+            Console.WriteLine("Super：test");
         }
         public override void demo()
         {
-            Console.WriteLine("demo");
+            Console.WriteLine("Super：demo");
+        }
+        public void solo(){
+            Console.WriteLine("Super：solo");
+        }
+    }
+
+    class Final : Super
+    {
+        public override void demo()
+        {
+            Console.WriteLine("Final：demo");
+        }
+        //使用了new，使用时由变量声明类型决定，不是多态
+        public new void solo()
+        {
+            Console.WriteLine("Final：solo");
         }
     }
 
@@ -190,6 +206,12 @@ namespace _07Inherit
             Super s = new Super();
             s.test();
             s.demo();
+            s.solo();
+
+            Super f = new Final();
+            f.test();
+            f.demo();
+            f.solo();
 
             B b = new B();
             b.Minus(3, 4);

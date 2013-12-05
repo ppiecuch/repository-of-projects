@@ -72,8 +72,36 @@ namespace _03BasicType
 {
     class Program
     {
+        public enum Mode
+        {
+            Console = 1,
+            Storage = 2
+        }
+
+        private static int modeMask = 0;
+
+        public static void setMode(Mode m, bool on)
+        {
+            modeMask = ((int)modeMask & (~(int)m)) | ((on?-1:0) & (int)m);
+        }
+
+        public static bool getMode(Mode m){
+			return ((int)modeMask&(int)m)!=0;
+		}
+
         static void Main(string[] args)
         {
+
+            Console.WriteLine("modeMask:" + modeMask + "," + getMode(Mode.Console)+","+getMode(Mode.Storage));
+            setMode(Mode.Console, true);
+            Console.WriteLine("modeMask:" + modeMask + "," + getMode(Mode.Console) + "," + getMode(Mode.Storage));
+            setMode(Mode.Storage, true);
+            Console.WriteLine("modeMask:" + modeMask + "," + getMode(Mode.Console) + "," + getMode(Mode.Storage));
+            setMode(Mode.Console, false);
+            Console.WriteLine("modeMask:" + modeMask + "," + getMode(Mode.Console) + "," + getMode(Mode.Storage));
+            setMode(Mode.Storage, false);
+            Console.WriteLine("modeMask:" + modeMask + "," + getMode(Mode.Console) + "," + getMode(Mode.Storage));
+
             //统计
             int count = 0;
             //字符串

@@ -30,11 +30,17 @@ namespace _23StateMachine
                 if (r == null)
                     return false;
 
-                return state.Equals(r.state) && evt.Equals(r.evt);
+                if (state == null && r.state == null)
+                    return evt.Equals(r.evt);
+                if (state != null && r.state != null)
+                    return state.Equals(r.state) && evt.Equals(r.evt);
+                return false;
             }
 
             public override int GetHashCode()
             {
+                if (state == null)
+                    return 0;
                 return state.GetHashCode() ^ evt.GetHashCode() + state.GetHashCode();
             }
         }
